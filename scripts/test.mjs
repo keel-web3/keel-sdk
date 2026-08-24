@@ -26,6 +26,7 @@ run("node", [
   "tests/sdk-wallet-link.test.mjs",
   "tests/sdk-module-review.test.mjs",
   "tests/sdk-publish-plan.test.mjs",
+  "tests/sdk-three-scene-publication.test.mjs",
   "tests/ethereum-adapter.test.mjs",
   "tests/ethereum-adapter-viem.test.mjs",
   "tests/ethereum-adapter-preflight.test.mjs",

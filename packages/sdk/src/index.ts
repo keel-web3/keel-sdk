@@ -14,6 +14,8 @@ export * from "./wallet-request.js";
 export * from "./wallet-intent.js";
 export * from "./wallet-link.js";
 export * from "./publish-plan.js";
+export * from "./managed-publication.js";
+export * from "./three-scene-publication.js";
 export * from "./drop-api.js";
 export * from "./fray-auction-intent.js";
 export * from "./studio-capabilities.js";

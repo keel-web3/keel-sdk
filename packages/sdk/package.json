@@ -14,6 +14,10 @@
       "types": "./dist/abi.d.ts",
       "import": "./dist/abi.js"
     },
+    "./managed-publication": {
+      "types": "./dist/managed-publication.d.ts",
+      "import": "./dist/managed-publication.js"
+    },
     "./verification-shell": {
       "types": "./dist/verification-shell.d.ts",
       "import": "./dist/verification-shell.js"
@@ -33,7 +37,8 @@
   "license": "MIT",
   "dependencies": {
     "@keel/protocol": "workspace:*",
-    "esbuild": "0.28.2"
+    "esbuild": "0.28.2",
+    "viem": "^2.38.0"
   },
   "devDependencies": {
     "@types/node": "^22.15.0",
