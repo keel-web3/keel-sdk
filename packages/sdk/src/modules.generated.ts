@@ -8,7 +8,7 @@ export type KeelModuleId = "keel-kernel" | "keel-codecs" | "keel-hold" | "keel-a
  * Concrete products built on the modules. Apps consume modules exactly as an
  * outside integrator does, and no module may depend on one.
  */
-export type KeelAppId = "keel-canvas" | "cool-s" | "onchaininator" | "line" | "vault-runner";
+export type KeelAppId = "keel-canvas" | "cool-s" | "line" | "vault-runner";
 
 /** Anything with contracts on a chain — a module or an app. */
 export type KeelUnitId = KeelModuleId | KeelAppId;
@@ -95,7 +95,7 @@ export const KEEL_MODULES: readonly KeelModule[] = [
     "title": "Storage",
     "group": "core",
     "visibility": "private",
-    "summary": "Immutable content-addressed chunk storage and the artifact registry that activates revisions.",
+    "summary": "The Hold: immutable content-addressed slug storage, on EVM and Tezos, and the index that activates revisions.",
     "version": "0.3.0",
     "repo": "keel-web3/keel-hold",
     "deps": [],
@@ -118,7 +118,7 @@ export const KEEL_MODULES: readonly KeelModule[] = [
     "title": "Object model",
     "group": "core",
     "visibility": "private",
-    "summary": "The Keel object graph: objects, viewers, links, seeds, and the manager that fronts them.",
+    "summary": "The Keel object graph: objects, harnesses, links, seeds, and the manager that fronts them.",
     "version": "0.3.0",
     "repo": "keel-web3/keel-artifacts",
     "deps": [
@@ -176,7 +176,7 @@ export const KEEL_MODULES: readonly KeelModule[] = [
     "title": "On-chain HTML builder",
     "group": "render",
     "visibility": "private",
-    "summary": "Assembles viewer HTML from chunk-stored resources entirely on chain.",
+    "summary": "Assembles harness HTML from slugs held on chain, entirely on chain.",
     "version": "0.3.0",
     "repo": "keel-web3/keel-harness",
     "deps": [
@@ -613,33 +613,6 @@ export const KEEL_APPS: readonly KeelModule[] = [
       "CoolSReleaseResolverV1",
       "CoolSTargetTableV1",
       "CoolSVisualRegistryV1"
-    ]
-  },
-  {
-    "id": "onchaininator",
-    "kind": "app",
-    "title": "Onchaininator",
-    "group": "apps",
-    "visibility": null,
-    "summary": "Wrapper collection that preserves a legacy token's art and proves the preservation on chain.",
-    "version": "0.3.0",
-    "repo": null,
-    "deps": [
-      "keel-kernel",
-      "keel-codecs"
-    ],
-    "contracts": [
-      "Onchaininator721.sol",
-      "OnchaininatorFactory.sol",
-      "OnchaininatorProofLedger.sol",
-      "PreservationBounty.sol",
-      "interfaces/IERC5192.sol"
-    ],
-    "deployable": [
-      "Onchaininator721",
-      "OnchaininatorFactory",
-      "OnchaininatorProofLedger",
-      "OnchaininatorProofRenderer"
     ]
   },
   {
