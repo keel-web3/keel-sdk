@@ -57,6 +57,8 @@ node packages/mcp/dist/cli.js --self-test --workspace .
 skill_validator="${CODEX_HOME:-${HOME}/.codex}/skills/.system/skill-creator/scripts/quick_validate.py"
 python3 "$skill_validator" skills/fray-keel-agent
 python3 "$skill_validator" .agents/skills/fray-keel-agent
+python3 "$skill_validator" skills/keel-onchain-data
+python3 "$skill_validator" .agents/skills/keel-onchain-data
 ```
 
 The bundled validator imports PyYAML; run it with a Python environment that has
@@ -226,6 +228,29 @@ local chain. It never fetches the container from a public RPC unless
 `KEEL_DOOM_SOURCE_RPC_URL` is explicitly supplied. Anvil and Tezos mockup
 receipts are local evidence. Large full-payload reads may use a deliberately
 raised local call budget; that is not a production RPC gas claim.
+
+### On-chain data
+
+A work whose script reads contract values builds its data layer against a
+disposable local chain first. The failure this gate catches is silent: a missing
+or late data layer draws `undefined` rather than throwing.
+
+```bash
+# In a separate terminal, start a disposable local chain.
+anvil --port 8545 --chain-id 31337
+
+# Then run both surfaces against it.
+node --test tests/sdk-onchain-data.test.mjs
+node --test tests/onchain-data-surfaces.test.mjs
+```
+
+Point the MCP tool at the same chain with `KEEL_ONCHAIN_RPC_URL`, then inspect
+the prepared project in the sandbox: its report names each data layer, its
+phase, and every variable it publishes. An anvil read is local evidence only.
+Re-run the reads against the selected chain, and pin the block, before preparing
+anything a collector will see. Read
+[On-chain data as script variables](KEEL_ONCHAIN_DATA.md) for the declaration
+shape and the traps.
 
 ### Flash AS3 / Ruffle
 

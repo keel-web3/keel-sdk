@@ -25,6 +25,7 @@ import {
 } from "@keel/viewer";
 
 import { inspectSandboxManifest } from "./inspect.js";
+import { readSandboxDataLayers } from "./onchain-data.js";
 import type { SandboxInspectionReport } from "./types.js";
 
 const BASE_URL = "https://sandbox.keel.invalid/project/";
@@ -62,7 +63,8 @@ export async function prepareBrowserSandboxProject(input: BrowserSandboxInput): 
   const files = withBrowserEntrypoint(normalizeFiles(input.files));
   const entry = chooseEntrypoint(files);
   const resources = await Promise.all(files.map((file) => browserResource(file, file.path === entry.path)));
-  const manifest = browserManifest(input, resources, entry);
+  const sources = new Map(files.map((file) => [file.path, file.bytes]));
+  const manifest = browserManifest(input, resources, entry, sources);
   assertValidManifest(manifest);
   const integrity = await manifestIntegrity(manifest);
   const locations = new Map(resources.map((resource, index) => [
@@ -80,7 +82,7 @@ export async function prepareBrowserSandboxProject(input: BrowserSandboxInput): 
   return {
     manifest,
     manifestIntegrity: integrity,
-    report: await inspectSandboxManifest(manifest),
+    report: await inspectSandboxManifest(manifest, { sources }),
     audit: resolved.audit,
     sandbox: createSandboxDocument(resolved),
   };
@@ -136,9 +138,14 @@ function browserManifest(
   input: BrowserSandboxInput,
   resources: readonly ArtifactResource[],
   entry: NormalizedBrowserFile,
+  sources: ReadonlyMap<string, Uint8Array>,
 ): ArtifactManifest {
   const entryResource = resources.find((resource) => resource.id === entry.path);
   if (entryResource === undefined) throw new Error("The browser sandbox entrypoint was not prepared.");
+  /* A data fragment is a data component, exactly as the Inline graph builder
+     labels it. Left as a plain "module" it reads like renderer code, and the one
+     thing a creator needs to see about it is that it is not. */
+  const dataLayerIds = new Set(readSandboxDataLayers(resources, sources).layers.map((layer) => layer.resourceId));
   const image = resources.find((resource) => resource.mediaType.startsWith("image/"));
   const motion = resources.find((resource) => resource.mediaType.startsWith("video/"));
   return {
@@ -154,7 +161,7 @@ function browserManifest(
       components: resources.map((resource, order) => ({
         id: resource.id,
         label: resource.originalName ?? resource.id,
-        role: componentRole(resource, entry.path),
+        role: dataLayerIds.has(resource.id) ? "data" : componentRole(resource, entry.path),
         order,
         resource: resource.id,
         resourceIntegrity: resource.sources[0]?.integrity ?? { algorithm: "none", digest: "0x" },

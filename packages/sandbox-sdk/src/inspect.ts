@@ -6,7 +6,8 @@ import {
   type KeelProjectComponent,
 } from "@keel/protocol";
 
-import type { SandboxDiagnostic, SandboxInspectionReport } from "./types.js";
+import { readSandboxDataLayers } from "./onchain-data.js";
+import type { SandboxDataLayer, SandboxDiagnostic, SandboxInspectionReport } from "./types.js";
 
 function decodedBytes(manifest: ArtifactManifest): number {
   const digests = new Map<string, number>();
@@ -54,9 +55,25 @@ function componentDiagnostics(component: KeelProjectComponent): readonly Sandbox
   return diagnostics;
 }
 
+function dataLayerDiagnostic(layer: SandboxDataLayer): SandboxDiagnostic {
+  return {
+    level: "pass",
+    code: "data.onchain-layer",
+    title: `${layer.resourceId} publishes ${layer.variables.length} on-chain value${layer.variables.length === 1 ? "" : "s"}`,
+    message: `Chain ${layer.chainId} at block ${layer.blockNumber}. The artwork reads ${layer.variables.map((name) => `${layer.globalName}.data.${name}`).join(", ")}. `
+      + `This fragment runs in the data phase, at position ${layer.order + 1} among the project's scripts, so the values exist before any runtime or render code looks for them.`,
+    componentId: layer.resourceId,
+  };
+}
+
 export async function inspectSandboxManifest(
   manifest: ArtifactManifest,
-  options: { readonly previousManifest?: ArtifactManifest; readonly manualApproval?: boolean } = {},
+  options: {
+    readonly previousManifest?: ArtifactManifest;
+    readonly manualApproval?: boolean;
+    /** Decoded resource bytes by resource ID. Without them a data layer stays invisible. */
+    readonly sources?: ReadonlyMap<string, Uint8Array>;
+  } = {},
 ): Promise<SandboxInspectionReport> {
   const validation = validateManifest(manifest);
   const components = manifest.stack?.components ?? [];
@@ -76,6 +93,19 @@ export async function inspectSandboxManifest(
     diagnostics.push({ level: "warning", code: "stack.missing", title: "Project parts are not labelled", message: "Add a Keel project stack so creators and collectors can see which exact renderer, assets, scripts, and update rules make up this revision." });
   } else {
     diagnostics.push(...components.flatMap(componentDiagnostics));
+  }
+  const dataLayer = options.sources === undefined
+    ? { layers: [], faults: [] }
+    : readSandboxDataLayers(manifest.resources, options.sources);
+  diagnostics.push(...dataLayer.layers.map(dataLayerDiagnostic));
+  for (const fault of dataLayer.faults) {
+    diagnostics.push({
+      level: "error",
+      code: "data.onchain-layer-unreadable",
+      title: `${fault.resourceId} looks like a data layer and cannot be read`,
+      message: `${fault.message} A fragment the sandbox cannot decode is one the document will publish blind, so treat this as a build failure rather than a warning.`,
+      componentId: fault.resourceId,
+    });
   }
   const hasRemote = manifest.resources.some((resource) => resource.sources.some((source) => source.kind === "uri" && !source.uri.startsWith("./") && !source.uri.startsWith("../")));
   diagnostics.push(hasRemote
@@ -108,6 +138,7 @@ export async function inspectSandboxManifest(
     diagnostics,
     componentCommitments,
     ...(projectRevision === undefined ? {} : { projectRevision }),
+    dataLayers: dataLayer.layers,
     summary: {
       resources: manifest.resources.length,
       components: components.length,
@@ -116,6 +147,7 @@ export async function inspectSandboxManifest(
       locked: components.filter((item) => item.updates.mode === "locked").length,
       manual: components.filter((item) => item.updates.mode === "manual").length,
       automatic: components.filter((item) => item.updates.mode === "auto-compatible").length,
+      dataVariables: dataLayer.layers.reduce((total, layer) => total + layer.variables.length, 0),
     },
   };
 }

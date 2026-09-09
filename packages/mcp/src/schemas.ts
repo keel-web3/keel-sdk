@@ -261,6 +261,33 @@ const shellSearch: JsonSchema = object({
   query: string("Shell name, description, version, creator, or tag query.", 120),
   creator: string("Optional exact creator wallet filter.", 42),
 }, ["query"]);
+const onchainRead: JsonSchema = object({
+  name: string("The variable the artwork reads, e.g. \"health\" becomes KEEL.data.health. Must be a JavaScript identifier.", 64),
+  address: string("Contract address to call.", 66),
+  signature: string("Solidity signature, e.g. \"bornBodyOf(uint256)\".", 256),
+  args: {
+    type: "array",
+    items: string("Decimal or 0x-hex argument. Text, never a JSON number, so a uint256 survives.", 80),
+    maxItems: 16,
+    description: "Static arguments in declaration order.",
+  },
+  returns: {
+    type: "array",
+    items: string("Static return type: bool, address, bytes32, or uint/int of any declared width.", 16),
+    minItems: 1,
+    maxItems: 32,
+    description: "Return types in order. Dynamic types are refused rather than mis-decoded.",
+  },
+  pick: integer("Take one member of a multi-value return instead of the whole tuple.", 0, 31),
+}, ["name", "address", "signature", "returns"]);
+const onchainData: JsonSchema = object({
+  rpcUrl: string("Optional JSON-RPC endpoint. Omit to resolve KEEL_ONCHAIN_RPC_URL, then the configured public RPC. HTTP is accepted only on a loopback host, which is how a local anvil is reached.", 512),
+  reads: { type: "array", items: onchainRead, minItems: 1, maxItems: 64, description: "The values this artwork needs." },
+  blockTag: string("Block to read at. Defaults to latest; pin a hex block number for a reproducible build.", 32),
+  globalName: string("Global the fragment publishes. Defaults to KEEL, so creator code reads KEEL.data.<name>.", 64),
+  moduleId: string("Inline module ID for the emitted fragment. Defaults to keel/onchain-data.", 120),
+  version: string("Inline module version recorded with the fragment. Defaults to 1.0.0.", 32),
+}, ["reads"]);
 const endpointConfig: JsonSchema = object({
   studioUrl: string("Optional credential-free HTTPS Studio origin.", 512),
   publicRpcUrl: string("Optional credential-free HTTPS public wallet/browser RPC origin.", 512),
@@ -323,6 +350,7 @@ export const TOOL_SCHEMAS = {
   frayStageProject,
   chainGuide,
   keelLibrarySearch,
+  onchainData,
   endpointConfig,
   studioCapabilities,
   studioProjectIntake,

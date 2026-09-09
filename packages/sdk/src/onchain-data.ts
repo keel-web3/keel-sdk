@@ -3,9 +3,11 @@ import { createHash } from "node:crypto";
 import {
   decodeKeelDataPack,
   encodeKeelDataPack,
+  orderKeelModules,
   type KeelDataValue,
   type KeelOrderedModule,
 } from "./data-layer.js";
+import { resolveKeelEndpoints, type KeelEndpointEnvironment } from "./endpoints.js";
 
 /**
  * ON-CHAIN DATA AS SCRIPT VARIABLES.
@@ -58,6 +60,9 @@ export interface KeelOnchainDataLayer {
   readonly blockNumber: number;
   readonly values: Readonly<Record<string, KeelDataValue>>;
 }
+
+/** Stamped into every fragment, so a host can recognise one it did not build. */
+export const KEEL_ONCHAIN_DATA_PROTOCOL = "keel-onchain-data@1" as const;
 
 const IDENTIFIER = /^[A-Za-z_$][A-Za-z0-9_$]*$/u;
 const STATIC_TYPE = /^(?:bool|address|bytes32|u?int(?:8|16|24|32|40|48|56|64|72|80|88|96|128|160|192|224|256)?)$/u;
@@ -264,7 +269,7 @@ export function buildOnchainDataFragment(
     + `if(m===5){const n=L(a),r={};for(let i=0;i<n;i++){const k=R();r[k]=R();}return r;}`
     + `throw new Error("keel-onchain-data: bad pack");};`
     + `const P0=R();const data=Object.freeze(P0.values||{});`
-    + `const api=Object.freeze({protocol:"keel-onchain-data@1",chainId:P0.chainId,blockNumber:P0.blockNumber,data,digest:"${digest}"});`
+    + `const api=Object.freeze({protocol:"${KEEL_ONCHAIN_DATA_PROTOCOL}",chainId:P0.chainId,blockNumber:P0.blockNumber,data,digest:"${digest}"});`
     /* Why defineProperty and not assignment: the whole contract of this layer is
        that the values are there and cannot be replaced by a later module. */
     + `Object.defineProperty(globalThis,"${globalName}",{value:api,enumerable:true,writable:false,configurable:false});`
@@ -280,6 +285,64 @@ export function buildOnchainDataFragment(
     digest,
     byteLength: pack.byteLength,
   };
+}
+
+export interface KeelOnchainDataFragmentReading {
+  readonly globalName: string;
+  readonly chainId: number;
+  readonly blockNumber: number;
+  readonly values: Readonly<Record<string, KeelDataValue>>;
+}
+
+const FRAGMENT_PAYLOAD = /^\(\(\)=>\{const P="([A-Za-z0-9_-]*)";/u;
+const FRAGMENT_GLOBAL = /Object\.defineProperty\(globalThis,"([A-Za-z_$][A-Za-z0-9_$]*)"/u;
+
+/**
+ * Read back a fragment WITHOUT running it, and say `undefined` for anything that
+ * is not one of ours.
+ *
+ * Why this exists next to the emitter: a host that wants to show a creator what
+ * their data layer contains -- the sandbox, an inspector, CI -- must not execute
+ * project bytes in its own process to find out. So the reader lives beside the
+ * writer and decodes the pack the writer embedded, and the two cannot drift
+ * apart into a host's private guess at the format.
+ */
+export function inspectOnchainDataFragment(source: string): KeelOnchainDataFragmentReading | undefined {
+  const payload = FRAGMENT_PAYLOAD.exec(source);
+  const globalName = FRAGMENT_GLOBAL.exec(source);
+  if (payload === null || globalName === null || !source.includes(KEEL_ONCHAIN_DATA_PROTOCOL)) return undefined;
+  const decoded = decodeKeelDataPack(base64urlBytes(payload[1] as string));
+  if (decoded === null || typeof decoded !== "object" || Array.isArray(decoded)) {
+    throw new TypeError("keel-onchain-data: the fragment carries no data pack.");
+  }
+  const { chainId, blockNumber, values } = decoded as Record<string, KeelDataValue>;
+  if (typeof chainId !== "number" || typeof blockNumber !== "number" || values === null || typeof values !== "object" || Array.isArray(values)) {
+    throw new TypeError("keel-onchain-data: the fragment's data pack is not a data layer.");
+  }
+  return {
+    globalName: globalName[1] as string,
+    chainId,
+    blockNumber,
+    values: Object.freeze({ ...(values as Record<string, KeelDataValue>) }),
+  };
+}
+
+function base64urlBytes(value: string): Uint8Array {
+  const bytes = new Uint8Array(Math.floor((value.length * 3) / 4));
+  let written = 0;
+  let buffer = 0;
+  let bits = 0;
+  for (const character of value) {
+    const index = B64.indexOf(character);
+    if (index < 0) throw new TypeError("keel-onchain-data: the fragment payload is not base64url.");
+    buffer = (buffer << 6) | index;
+    bits += 6;
+    if (bits >= 8) {
+      bits -= 8;
+      bytes[written++] = (buffer >> bits) & 0xff;
+    }
+  }
+  return bytes.subarray(0, written);
 }
 
 /**
@@ -301,6 +364,54 @@ export function verifyOnchainDataFragment(
   return published;
 }
 
+export interface KeelOnchainRpcEnvironment extends KeelEndpointEnvironment {
+  /** The chain a data layer is BUILT from. During development that is an anvil. */
+  readonly KEEL_ONCHAIN_RPC_URL?: string;
+}
+
+export interface ResolvedKeelOnchainRpc {
+  readonly url: string;
+  readonly source: "explicit" | "environment" | "canonical-default";
+}
+
+/**
+ * Decide which chain to read, so a caller does not have to pass a URL it does
+ * not have yet.
+ *
+ * Why this is not `resolveKeelEndpoints`: that resolver answers "where do
+ * collectors read this work", and so it refuses anything but a credential-free
+ * HTTPS origin. Building a data layer is the opposite situation -- the normal
+ * case is a local anvil on plain HTTP, which is exactly the URL the public
+ * resolver is right to reject. So loopback HTTP is allowed here and nowhere
+ * else, and the public resolver is still what answers when nothing local is
+ * configured.
+ */
+export function resolveKeelOnchainRpcUrl(
+  explicit?: string,
+  environment: KeelOnchainRpcEnvironment = {},
+): ResolvedKeelOnchainRpc {
+  if (explicit !== undefined) return { url: chainRpcUrl(explicit, "rpcUrl"), source: "explicit" };
+  if (environment.KEEL_ONCHAIN_RPC_URL !== undefined) {
+    return { url: chainRpcUrl(environment.KEEL_ONCHAIN_RPC_URL, "KEEL_ONCHAIN_RPC_URL"), source: "environment" };
+  }
+  const endpoints = resolveKeelEndpoints({}, environment);
+  return { url: endpoints.publicRpcUrl, source: endpoints.sources.publicRpcUrl };
+}
+
+function chainRpcUrl(value: string, label: string): string {
+  if (value.length === 0 || value.length > 512) throw new TypeError(`${label} must be a bounded JSON-RPC URL.`);
+  const url = new URL(value);
+  const loopback = url.hostname === "localhost" || url.hostname === "127.0.0.1"
+    || url.hostname === "[::1]" || url.hostname.endsWith(".localhost");
+  if (url.protocol !== "https:" && !(url.protocol === "http:" && loopback)) {
+    throw new TypeError(`${label} must be HTTPS, or HTTP on a loopback host such as a local anvil.`);
+  }
+  /* A URL that carries a secret in its userinfo would end up in every log line
+     and every returned descriptor. Refuse it rather than redact it later. */
+  if (url.username.length > 0 || url.password.length > 0) throw new TypeError(`${label} must not carry credentials.`);
+  return url.toString();
+}
+
 /** Round-trip check: what the chain said is what the document will read. */
 export function assertOnchainDataRoundTrip(layer: KeelOnchainDataLayer, fragment: { readonly source: string }): void {
   const published = verifyOnchainDataFragment(fragment);
@@ -315,4 +426,8 @@ export function assertOnchainDataRoundTrip(layer: KeelOnchainDataLayer, fragment
   }
 }
 
-export { decodeKeelDataPack };
+/* Re-exported so a consumer that only knows about this module -- the sandbox,
+   an MCP tool -- can prove the data phase really does sort first without
+   reaching for a second import and a second idea of what ordering means. */
+export { decodeKeelDataPack, orderKeelModules };
+export type { KeelDataValue, KeelModulePhase, KeelOrderedModule } from "./data-layer.js";

@@ -61,6 +61,7 @@ export async function prepareSandboxProject(input: SandboxProjectInput): Promise
   const report = await inspectSandboxManifest(prepared.manifest, {
     ...(input.previousManifest === undefined ? {} : { previousManifest: input.previousManifest }),
     manualApproval: input.manualApproval === true,
+    sources: new Map(prepared.resources.map((resource) => [resource.resource.id, resource.decodedBytes])),
   });
   return { prepared, report, audit: resolved.audit, sandbox: createSandboxDocument(resolved) };
 }

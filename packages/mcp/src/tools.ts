@@ -34,6 +34,11 @@ import {
   searchKeelShells,
   stageKeelStudioProject,
   resolveKeelEndpoints,
+  assertOnchainDataRoundTrip,
+  buildOnchainDataFragment,
+  readOnchainData,
+  resolveKeelOnchainRpcUrl,
+  type KeelOnchainRead,
   type KeelWalletLinkInput,
   type KeelModuleReviewInput,
   type KeelCreatorCollectionWalletReviewInput,
@@ -584,6 +589,102 @@ async function studioCapabilitiesTool(_context: ToolContext, value: unknown): Pr
   return fetchStudioCapabilities(new URL(endpoints.studioUrl));
 }
 
+function parseOnchainReads(value: unknown): readonly KeelOnchainRead[] {
+  if (!Array.isArray(value) || value.length === 0 || value.length > 64) {
+    throw new TypeError("reads must declare 1 to 64 values.");
+  }
+  return value.map((entry) => {
+    const read = record(entry, ["name", "address", "signature", "args", "returns", "pick"], "on-chain read");
+    const args = read.args;
+    if (args !== undefined && (!Array.isArray(args) || args.length > 16 || args.some((argument) => typeof argument !== "string"))) {
+      // JSON numbers stop being exact well below uint256, and an argument that
+      // silently loses its low bits selects a different token.
+      throw new TypeError("read args must be decimal or 0x-hex text, never JSON numbers.");
+    }
+    const returns = read.returns;
+    if (!Array.isArray(returns) || returns.length === 0 || returns.length > 32 || returns.some((type) => typeof type !== "string")) {
+      throw new TypeError("Each read declares 1 to 32 return types.");
+    }
+    const pick = optionalNumber(read, "pick");
+    if (pick !== undefined && (pick < 0 || pick >= returns.length)) throw new TypeError("read pick must name one of the declared return types.");
+    return {
+      name: requiredString(read, "name"),
+      address: requiredString(read, "address"),
+      signature: requiredString(read, "signature"),
+      ...(args === undefined ? {} : { args: args as readonly string[] }),
+      returns: returns as readonly string[],
+      ...(pick === undefined ? {} : { pick }),
+    };
+  });
+}
+
+/**
+ * The on-chain-to-script route, made reachable.
+ *
+ * An agent asked to put a chain value into an artwork otherwise writes a fetch
+ * into the artwork and hopes it resolves before the first frame. This tool ends
+ * that: it declares the reads, performs them, and hands back the init fragment
+ * that publishes the answers as frozen globals ahead of every other module. The
+ * fragment is executed here before it is returned, so "init works" is a checked
+ * fact in the response rather than a claim in a comment.
+ */
+async function onchainDataTool(_context: ToolContext, value: unknown): Promise<unknown> {
+  const input = record(value, ["rpcUrl", "reads", "blockTag", "globalName", "moduleId", "version"], "On-chain data arguments");
+  const reads = parseOnchainReads(input.reads);
+  const rpc = resolveKeelOnchainRpcUrl(optionalString(input, "rpcUrl"), process.env);
+  const blockTag = optionalString(input, "blockTag");
+  const globalName = optionalString(input, "globalName");
+  const moduleId = optionalString(input, "moduleId") ?? "keel/onchain-data";
+  const layer = await readOnchainData({
+    rpcUrl: rpc.url,
+    reads,
+    ...(blockTag === undefined ? {} : { blockTag }),
+  });
+  const fragment = buildOnchainDataFragment(layer, {
+    moduleId,
+    ...(globalName === undefined ? {} : { globalName }),
+  });
+  assertOnchainDataRoundTrip(layer, fragment);
+  return Object.freeze({
+    schema: "keel.onchain-data@1" as const,
+    status: "ok" as const,
+    rpcUrl: rpc.url,
+    rpcUrlSource: rpc.source,
+    chainId: layer.chainId,
+    blockNumber: layer.blockNumber,
+    blockTag: blockTag ?? "latest",
+    globalName: globalName ?? "KEEL",
+    variables: Object.keys(layer.values),
+    values: layer.values,
+    initVerified: true,
+    fragment: Object.freeze({
+      moduleId: fragment.moduleId,
+      phase: fragment.phase,
+      weight: fragment.weight,
+      mediaType: "text/javascript" as const,
+      execution: "classic" as const,
+      digest: fragment.digest,
+      packByteLength: fragment.byteLength,
+      sourceByteLength: new TextEncoder().encode(fragment.source).byteLength,
+      source: fragment.source,
+    }),
+    /* Write `source` to a workspace file, then hand this back to
+       keel-inline-prepare under `modules` with that file's `path`. The phase and
+       classic execution are what put the values in place before the artwork
+       looks for them; changing either breaks the guarantee. */
+    inlineModuleDeclaration: Object.freeze({
+      moduleId: fragment.moduleId,
+      version: optionalString(input, "version") ?? "1.0.0",
+      mediaType: "text/javascript" as const,
+      execution: "classic" as const,
+      phase: fragment.phase,
+      weight: fragment.weight,
+    }),
+    signing: "not-performed" as const,
+    submission: "not-performed" as const,
+  });
+}
+
 async function endpointConfigTool(_context: ToolContext, value: unknown): Promise<unknown> {
   const input = record(value, ["studioUrl", "publicRpcUrl", "indexerUrl"], "KEEL endpoint arguments");
   const studioUrl = optionalString(input, "studioUrl");
@@ -846,6 +947,7 @@ export const TOOL_DEFINITIONS: readonly ToolDefinition[] = [
   tool("fray-stage-project", "Upload bounded source bytes to the configured Fray Studio temporary project store, prepare still/video previews, preflight the fee, and return a wallet-facing handoff; no signing or submission occurs.", TOOL_SCHEMAS.frayStageProject, frayStageProjectTool),
   tool("keel-chain-guide", "List supported testnets and human faucet links; the MCP server never claims faucet funds or moves wallet assets.", TOOL_SCHEMAS.chainGuide, chainGuideTool),
   tool("keel-library-search", "Search configured Keel Studio Keel indexes for exact reusable library/module candidates; metadata only, no carrier bytes are fetched.", TOOL_SCHEMAS.keelLibrarySearch, keelLibrarySearchTool),
+  tool("keel-onchain-data-prepare", "Turn declared contract reads into artwork variables. Each read becomes one eth_call, the answers are frozen into a canonical pack, and the tool returns the init fragment that publishes them as a frozen global before any runtime or render module runs, so creator code reads KEEL.data.<name> instead of fetching at draw time and finding undefined. Static return types only: a dynamic return needs an offset table, and guessing it would hand back a plausible wrong number. Arguments are decimal or 0x-hex text because a uint256 does not survive a JSON number. An omitted rpcUrl resolves KEEL_ONCHAIN_RPC_URL, then the configured public RPC; loopback HTTP is accepted so a local anvil is the ordinary target while a work is being built. The returned fragment is executed before it is returned, so the published values are checked, not assumed. Read-only: eth_call plus chain identity and head. No signing or submission occurs, no state is written, and no wallet is touched.", TOOL_SCHEMAS.onchainData, onchainDataTool),
   tool("keel-endpoint-config", "Resolve the Studio, public RPC, and optional indexer URLs using explicit input, KEEL environment configuration, then canonical test defaults; no network request occurs.", TOOL_SCHEMAS.endpointConfig, endpointConfigTool),
   tool("keel-studio-capabilities", "Inspect a Studio's supported chains, zero-spend sandbox, staging, authorization, and MSP readiness before any upload or wallet action.", TOOL_SCHEMAS.studioCapabilities, studioCapabilitiesTool),
   tool("keel-studio-project-intake", "Ask only for missing project decisions, then return either storage-only preparation or an editable release/listing intent. No upload, signature, wallet request, or transaction occurs.", TOOL_SCHEMAS.studioProjectIntake, studioProjectIntakeTool),

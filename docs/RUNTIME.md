@@ -93,6 +93,14 @@ __KEEL_CONTENT__
 
 `__KEEL_CONTENT__` exposes only verified resources and returns copied bytes rather than mutable shared buffers.
 
+A work that reads a chain receives a third frozen object, published by an init fragment that runs in the `data` phase before any runtime or render module:
+
+```js
+__KEEL_ONCHAIN_DATA__
+```
+
+It is also installed under the artwork's chosen global — `KEEL` by default — so creator code reads `KEEL.data.<name>` with no await and no readiness check. The values are a snapshot taken when the work was built, and the object carries the chain ID and block number they were read at. See [On-chain data as script variables](KEEL_ONCHAIN_DATA.md).
+
 ## Long-term preservation
 
 For durable artifacts, publish:

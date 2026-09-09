@@ -7,6 +7,7 @@ import type {
   KeelComponentRole,
   KeelComponentUpdatePolicy,
 } from "@keel/protocol";
+import type { KeelDataValue } from "@keel/sdk/onchain-data";
 import type { PreparedStudioArtifact, StudioStackComponentInput } from "@keel/studio-core";
 import type { ResolutionAudit, SandboxDocument } from "@keel/viewer";
 
@@ -20,6 +21,26 @@ export interface SandboxDiagnostic {
   readonly componentId?: string;
 }
 
+/** One on-chain data fragment found in a project, and what it will publish. */
+export interface SandboxDataLayer {
+  readonly resourceId: string;
+  readonly phase: "data";
+  readonly weight: number;
+  /** Position among the project's scripts once the data phase has sorted. */
+  readonly order: number;
+  /** The global creator code reads, e.g. `KEEL` for `KEEL.data.health`. */
+  readonly globalName: string;
+  readonly chainId: number;
+  readonly blockNumber: number;
+  readonly variables: readonly string[];
+  readonly values: Readonly<Record<string, KeelDataValue>>;
+}
+
+export interface SandboxDataLayerFault {
+  readonly resourceId: string;
+  readonly message: string;
+}
+
 export interface SandboxInspectionReport {
   readonly schema: "keel-sandbox-report@1";
   readonly valid: boolean;
@@ -30,6 +51,8 @@ export interface SandboxInspectionReport {
   /** Canonical hashes consumed by Studio, updater apps, CI, and AI tooling. */
   readonly componentCommitments: readonly ProjectComponentCommitmentEntry[];
   readonly projectRevision?: ProjectRevisionEvaluation;
+  /** Empty unless the caller supplied resource bytes to read the fragments from. */
+  readonly dataLayers: readonly SandboxDataLayer[];
   readonly summary: {
     readonly resources: number;
     readonly components: number;
@@ -38,6 +61,7 @@ export interface SandboxInspectionReport {
     readonly locked: number;
     readonly manual: number;
     readonly automatic: number;
+    readonly dataVariables: number;
   };
 }
 
