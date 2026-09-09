@@ -16,6 +16,7 @@ export * from "./wallet-request.js";
 export * from "./wallet-intent.js";
 export * from "./wallet-link.js";
 export * from "./publish-plan.js";
+export * from "./revision-publication.js";
 export * from "./library-publication-plan.js";
 export * from "./managed-publication.js";
 export * from "./three-scene-publication.js";
@@ -34,7 +35,9 @@ export * from "./presentation.js";
 export * from "./asset-display.js";
 export * from "./shell-registry.js";
 export * from "./data-layer.js";
+export * from "./onchain-data.js";
 export * from "./inline-viewer-graph.js";
+export * from "./token-matrix.js";
 export * from "./frozen-dataset.js";
 export * from "./module-review.js";
 export * from "./modules.js";
@@ -42,3 +45,14 @@ export * from "./creative-runtime-catalog.js";
 export * from "./abis.js";
 // Node-only: reads shell sources from disk and bundles with esbuild.
 export * from "./verification-shell.js";
+export * from "./engine.js";
+export * from "./contract-controls.js";
+
+export * from "./tezos-shell.js";
+export * from "./tezos-publication.js";
+export * from "./tezos-standard.js";
+export * from "./tezos-modules.generated.js";
+
+export * from "./network-inspection.js";
+
+export { createKeelNativeObjectPlan, type KeelNativeObjectPlan } from "./native-publication.js";
