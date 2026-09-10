@@ -1221,6 +1221,19 @@ export const ABIS = {
     },
     {
       "type": "function",
+      "name": "TREE_DOMAIN",
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "",
+          "type": "bytes32",
+          "internalType": "bytes32"
+        }
+      ],
+      "stateMutability": "view"
+    },
+    {
+      "type": "function",
       "name": "activateFork",
       "inputs": [
         {
@@ -1270,6 +1283,89 @@ export const ABIS = {
           "name": "slotObjectRevisions",
           "type": "uint64[]",
           "internalType": "uint64[]"
+        },
+        {
+          "name": "manifestDigest",
+          "type": "bytes32",
+          "internalType": "bytes32"
+        },
+        {
+          "name": "seedSetDigest",
+          "type": "bytes32",
+          "internalType": "bytes32"
+        }
+      ],
+      "outputs": [
+        {
+          "name": "revision",
+          "type": "uint64",
+          "internalType": "uint64"
+        }
+      ],
+      "stateMutability": "nonpayable"
+    },
+    {
+      "type": "function",
+      "name": "appendHarnessSelections",
+      "inputs": [
+        {
+          "name": "harnessId",
+          "type": "bytes32",
+          "internalType": "bytes32"
+        },
+        {
+          "name": "expectedParent",
+          "type": "uint64",
+          "internalType": "uint64"
+        },
+        {
+          "name": "selectedObjectRevisions",
+          "type": "uint64[]",
+          "internalType": "uint64[]"
+        },
+        {
+          "name": "manifestDigest",
+          "type": "bytes32",
+          "internalType": "bytes32"
+        },
+        {
+          "name": "seedSetDigest",
+          "type": "bytes32",
+          "internalType": "bytes32"
+        }
+      ],
+      "outputs": [
+        {
+          "name": "revision",
+          "type": "uint64",
+          "internalType": "uint64"
+        }
+      ],
+      "stateMutability": "nonpayable"
+    },
+    {
+      "type": "function",
+      "name": "appendHarnessTree",
+      "inputs": [
+        {
+          "name": "harnessId",
+          "type": "bytes32",
+          "internalType": "bytes32"
+        },
+        {
+          "name": "expectedParent",
+          "type": "uint64",
+          "internalType": "uint64"
+        },
+        {
+          "name": "childCount",
+          "type": "uint8",
+          "internalType": "uint8"
+        },
+        {
+          "name": "children",
+          "type": "uint256[]",
+          "internalType": "uint256[]"
         },
         {
           "name": "manifestDigest",
@@ -1344,12 +1440,12 @@ export const ABIS = {
           "internalType": "struct KeelHarnessRegistry.EffectiveHarness",
           "components": [
             {
-              "name": "harnessRevision",
+              "name": "forkRevision",
               "type": "uint64",
               "internalType": "uint64"
             },
             {
-              "name": "forkRevision",
+              "name": "harnessRevision",
               "type": "uint64",
               "internalType": "uint64"
             },
@@ -1369,14 +1465,14 @@ export const ABIS = {
               "internalType": "bytes32"
             },
             {
-              "name": "slotObjectIds",
-              "type": "bytes32[]",
-              "internalType": "bytes32[]"
-            },
-            {
               "name": "selectedObjectRevisions",
               "type": "uint64[]",
               "internalType": "uint64[]"
+            },
+            {
+              "name": "slotObjectIds",
+              "type": "bytes32[]",
+              "internalType": "bytes32[]"
             }
           ]
         }
@@ -1498,6 +1594,119 @@ export const ABIS = {
     },
     {
       "type": "function",
+      "name": "forgeHarnessTree",
+      "inputs": [
+        {
+          "name": "salt",
+          "type": "bytes32",
+          "internalType": "bytes32"
+        },
+        {
+          "name": "collection",
+          "type": "address",
+          "internalType": "address"
+        },
+        {
+          "name": "editPolicy",
+          "type": "uint8",
+          "internalType": "enum KeelHarnessRegistry.HarnessEditPolicy"
+        },
+        {
+          "name": "forkPolicy",
+          "type": "uint8",
+          "internalType": "enum KeelHarnessRegistry.ForkPolicy"
+        },
+        {
+          "name": "childCount",
+          "type": "uint8",
+          "internalType": "uint8"
+        },
+        {
+          "name": "children",
+          "type": "uint256[]",
+          "internalType": "uint256[]"
+        },
+        {
+          "name": "manifestDigest",
+          "type": "bytes32",
+          "internalType": "bytes32"
+        },
+        {
+          "name": "seedSetDigest",
+          "type": "bytes32",
+          "internalType": "bytes32"
+        }
+      ],
+      "outputs": [
+        {
+          "name": "",
+          "type": "bytes32",
+          "internalType": "bytes32"
+        }
+      ],
+      "stateMutability": "nonpayable"
+    },
+    {
+      "type": "function",
+      "name": "forgeHarnessTreeFor",
+      "inputs": [
+        {
+          "name": "creator",
+          "type": "address",
+          "internalType": "address"
+        },
+        {
+          "name": "salt",
+          "type": "bytes32",
+          "internalType": "bytes32"
+        },
+        {
+          "name": "collection",
+          "type": "address",
+          "internalType": "address"
+        },
+        {
+          "name": "editPolicy",
+          "type": "uint8",
+          "internalType": "enum KeelHarnessRegistry.HarnessEditPolicy"
+        },
+        {
+          "name": "forkPolicy",
+          "type": "uint8",
+          "internalType": "enum KeelHarnessRegistry.ForkPolicy"
+        },
+        {
+          "name": "childCount",
+          "type": "uint8",
+          "internalType": "uint8"
+        },
+        {
+          "name": "children",
+          "type": "uint256[]",
+          "internalType": "uint256[]"
+        },
+        {
+          "name": "manifestDigest",
+          "type": "bytes32",
+          "internalType": "bytes32"
+        },
+        {
+          "name": "seedSetDigest",
+          "type": "bytes32",
+          "internalType": "bytes32"
+        }
+      ],
+      "outputs": [
+        {
+          "name": "",
+          "type": "bytes32",
+          "internalType": "bytes32"
+        }
+      ],
+      "stateMutability": "nonpayable"
+    },
+    {
+      "type": "function",
       "name": "forkHarnessForToken",
       "inputs": [
         {
@@ -1524,6 +1733,50 @@ export const ABIS = {
           "name": "selectedObjectRevisions",
           "type": "uint64[]",
           "internalType": "uint64[]"
+        },
+        {
+          "name": "manifestDigest",
+          "type": "bytes32",
+          "internalType": "bytes32"
+        }
+      ],
+      "outputs": [
+        {
+          "name": "forkRevision",
+          "type": "uint64",
+          "internalType": "uint64"
+        }
+      ],
+      "stateMutability": "nonpayable"
+    },
+    {
+      "type": "function",
+      "name": "forkHarnessTreeForToken",
+      "inputs": [
+        {
+          "name": "harnessId",
+          "type": "bytes32",
+          "internalType": "bytes32"
+        },
+        {
+          "name": "tokenId",
+          "type": "uint256",
+          "internalType": "uint256"
+        },
+        {
+          "name": "baseHarnessRevision",
+          "type": "uint64",
+          "internalType": "uint64"
+        },
+        {
+          "name": "expectedForkParent",
+          "type": "uint64",
+          "internalType": "uint64"
+        },
+        {
+          "name": "children",
+          "type": "uint256[]",
+          "internalType": "uint256[]"
         },
         {
           "name": "manifestDigest",
@@ -1611,6 +1864,44 @@ export const ABIS = {
     },
     {
       "type": "function",
+      "name": "harnessIds",
+      "inputs": [
+        {
+          "name": "key",
+          "type": "uint32",
+          "internalType": "uint32"
+        }
+      ],
+      "outputs": [
+        {
+          "name": "harnessId",
+          "type": "bytes32",
+          "internalType": "bytes32"
+        }
+      ],
+      "stateMutability": "view"
+    },
+    {
+      "type": "function",
+      "name": "harnessKeys",
+      "inputs": [
+        {
+          "name": "harnessId",
+          "type": "bytes32",
+          "internalType": "bytes32"
+        }
+      ],
+      "outputs": [
+        {
+          "name": "key",
+          "type": "uint32",
+          "internalType": "uint32"
+        }
+      ],
+      "stateMutability": "view"
+    },
+    {
+      "type": "function",
       "name": "harnessLineage",
       "inputs": [
         {
@@ -1626,6 +1917,21 @@ export const ABIS = {
           "internalType": "struct KeelHarnessRegistry.HarnessLineage",
           "components": [
             {
+              "name": "frozen",
+              "type": "bool",
+              "internalType": "bool"
+            },
+            {
+              "name": "exists",
+              "type": "bool",
+              "internalType": "bool"
+            },
+            {
+              "name": "latestRevision",
+              "type": "uint64",
+              "internalType": "uint64"
+            },
+            {
               "name": "creator",
               "type": "address",
               "internalType": "address"
@@ -1636,31 +1942,55 @@ export const ABIS = {
               "internalType": "address"
             },
             {
-              "name": "editPolicy",
-              "type": "uint8",
-              "internalType": "enum KeelHarnessRegistry.HarnessEditPolicy"
-            },
-            {
               "name": "forkPolicy",
               "type": "uint8",
               "internalType": "enum KeelHarnessRegistry.ForkPolicy"
             },
             {
-              "name": "latestRevision",
-              "type": "uint64",
-              "internalType": "uint64"
-            },
-            {
-              "name": "frozen",
-              "type": "bool",
-              "internalType": "bool"
-            },
-            {
-              "name": "exists",
-              "type": "bool",
-              "internalType": "bool"
+              "name": "editPolicy",
+              "type": "uint8",
+              "internalType": "enum KeelHarnessRegistry.HarnessEditPolicy"
             }
           ]
+        }
+      ],
+      "stateMutability": "view"
+    },
+    {
+      "type": "function",
+      "name": "harnessNode",
+      "inputs": [
+        {
+          "name": "key",
+          "type": "uint32",
+          "internalType": "uint32"
+        },
+        {
+          "name": "revision",
+          "type": "uint32",
+          "internalType": "uint32"
+        }
+      ],
+      "outputs": [
+        {
+          "name": "metadata",
+          "type": "uint256",
+          "internalType": "uint256"
+        },
+        {
+          "name": "children",
+          "type": "uint256[]",
+          "internalType": "uint256[]"
+        },
+        {
+          "name": "objectIds",
+          "type": "bytes32[]",
+          "internalType": "bytes32[]"
+        },
+        {
+          "name": "revisions",
+          "type": "uint64[]",
+          "internalType": "uint64[]"
         }
       ],
       "stateMutability": "view"
@@ -1687,9 +2017,29 @@ export const ABIS = {
           "internalType": "struct KeelHarnessRegistry.HarnessRevision",
           "components": [
             {
-              "name": "manifestDigest",
-              "type": "bytes32",
-              "internalType": "bytes32"
+              "name": "exists",
+              "type": "bool",
+              "internalType": "bool"
+            },
+            {
+              "name": "createdAt",
+              "type": "uint64",
+              "internalType": "uint64"
+            },
+            {
+              "name": "parentRevision",
+              "type": "uint64",
+              "internalType": "uint64"
+            },
+            {
+              "name": "treeMetadata",
+              "type": "uint80",
+              "internalType": "uint80"
+            },
+            {
+              "name": "slotSourceRevision",
+              "type": "uint40",
+              "internalType": "uint40"
             },
             {
               "name": "slotsDigest",
@@ -1702,24 +2052,14 @@ export const ABIS = {
               "internalType": "bytes32"
             },
             {
-              "name": "parentRevision",
-              "type": "uint64",
-              "internalType": "uint64"
-            },
-            {
-              "name": "createdAt",
-              "type": "uint64",
-              "internalType": "uint64"
+              "name": "manifestDigest",
+              "type": "bytes32",
+              "internalType": "bytes32"
             },
             {
               "name": "publisher",
               "type": "address",
               "internalType": "address"
-            },
-            {
-              "name": "exists",
-              "type": "bool",
-              "internalType": "bool"
             }
           ]
         }
@@ -1839,6 +2179,35 @@ export const ABIS = {
     },
     {
       "type": "function",
+      "name": "harnessTree",
+      "inputs": [
+        {
+          "name": "harnessId",
+          "type": "bytes32",
+          "internalType": "bytes32"
+        },
+        {
+          "name": "revision",
+          "type": "uint64",
+          "internalType": "uint64"
+        }
+      ],
+      "outputs": [
+        {
+          "name": "metadata",
+          "type": "uint256",
+          "internalType": "uint256"
+        },
+        {
+          "name": "children",
+          "type": "uint256[]",
+          "internalType": "uint256[]"
+        }
+      ],
+      "stateMutability": "view"
+    },
+    {
+      "type": "function",
       "name": "keelIndex",
       "inputs": [],
       "outputs": [
@@ -1913,12 +2282,68 @@ export const ABIS = {
     },
     {
       "type": "function",
+      "name": "registerHarnessKey",
+      "inputs": [
+        {
+          "name": "harnessId",
+          "type": "bytes32",
+          "internalType": "bytes32"
+        }
+      ],
+      "outputs": [
+        {
+          "name": "key",
+          "type": "uint32",
+          "internalType": "uint32"
+        }
+      ],
+      "stateMutability": "nonpayable"
+    },
+    {
+      "type": "function",
+      "name": "registerHarnessKeys",
+      "inputs": [
+        {
+          "name": "ids",
+          "type": "bytes32[]",
+          "internalType": "bytes32[]"
+        }
+      ],
+      "outputs": [
+        {
+          "name": "keys",
+          "type": "uint32[]",
+          "internalType": "uint32[]"
+        }
+      ],
+      "stateMutability": "nonpayable"
+    },
+    {
+      "type": "function",
       "name": "setPublicationJob",
       "inputs": [
         {
           "name": "nextPublicationJob",
           "type": "address",
           "internalType": "address"
+        }
+      ],
+      "outputs": [],
+      "stateMutability": "nonpayable"
+    },
+    {
+      "type": "function",
+      "name": "setTreeLimits",
+      "inputs": [
+        {
+          "name": "maxDepth",
+          "type": "uint8",
+          "internalType": "uint8"
+        },
+        {
+          "name": "maxObjects",
+          "type": "uint64",
+          "internalType": "uint64"
         }
       ],
       "outputs": [],
@@ -1946,6 +2371,11 @@ export const ABIS = {
           "internalType": "struct KeelHarnessRegistry.ForkLineage",
           "components": [
             {
+              "name": "frozen",
+              "type": "bool",
+              "internalType": "bool"
+            },
+            {
               "name": "latestRevision",
               "type": "uint64",
               "internalType": "uint64"
@@ -1959,11 +2389,6 @@ export const ABIS = {
               "name": "pendingRevision",
               "type": "uint64",
               "internalType": "uint64"
-            },
-            {
-              "name": "frozen",
-              "type": "bool",
-              "internalType": "bool"
             }
           ]
         }
@@ -1997,9 +2422,14 @@ export const ABIS = {
           "internalType": "struct KeelHarnessRegistry.ForkRevision",
           "components": [
             {
-              "name": "baseHarnessRevision",
-              "type": "uint64",
-              "internalType": "uint64"
+              "name": "exists",
+              "type": "bool",
+              "internalType": "bool"
+            },
+            {
+              "name": "cancelled",
+              "type": "bool",
+              "internalType": "bool"
             },
             {
               "name": "parentRevision",
@@ -2008,6 +2438,11 @@ export const ABIS = {
             },
             {
               "name": "keelIndexRevision",
+              "type": "uint64",
+              "internalType": "uint64"
+            },
+            {
+              "name": "baseHarnessRevision",
               "type": "uint64",
               "internalType": "uint64"
             },
@@ -2027,14 +2462,9 @@ export const ABIS = {
               "internalType": "address"
             },
             {
-              "name": "cancelled",
-              "type": "bool",
-              "internalType": "bool"
-            },
-            {
-              "name": "exists",
-              "type": "bool",
-              "internalType": "bool"
+              "name": "treeMetadata",
+              "type": "uint80",
+              "internalType": "uint80"
             }
           ]
         }
@@ -2071,9 +2501,68 @@ export const ABIS = {
       "stateMutability": "view"
     },
     {
+      "type": "function",
+      "name": "tokenForkTree",
+      "inputs": [
+        {
+          "name": "harnessId",
+          "type": "bytes32",
+          "internalType": "bytes32"
+        },
+        {
+          "name": "tokenId",
+          "type": "uint256",
+          "internalType": "uint256"
+        },
+        {
+          "name": "revision",
+          "type": "uint64",
+          "internalType": "uint64"
+        }
+      ],
+      "outputs": [
+        {
+          "name": "metadata",
+          "type": "uint256",
+          "internalType": "uint256"
+        },
+        {
+          "name": "children",
+          "type": "uint256[]",
+          "internalType": "uint256[]"
+        }
+      ],
+      "stateMutability": "view"
+    },
+    {
+      "type": "function",
+      "name": "treeControl",
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "",
+          "type": "uint256",
+          "internalType": "uint256"
+        }
+      ],
+      "stateMutability": "view"
+    },
+    {
       "type": "event",
       "name": "HarnessForged",
       "inputs": [
+        {
+          "name": "editPolicy",
+          "type": "uint8",
+          "indexed": false,
+          "internalType": "uint8"
+        },
+        {
+          "name": "forkPolicy",
+          "type": "uint8",
+          "indexed": false,
+          "internalType": "uint8"
+        },
         {
           "name": "harnessId",
           "type": "bytes32",
@@ -2091,18 +2580,25 @@ export const ABIS = {
           "type": "address",
           "indexed": true,
           "internalType": "address"
+        }
+      ],
+      "anonymous": false
+    },
+    {
+      "type": "event",
+      "name": "HarnessKeyRegistered",
+      "inputs": [
+        {
+          "name": "key",
+          "type": "uint32",
+          "indexed": true,
+          "internalType": "uint32"
         },
         {
-          "name": "editPolicy",
-          "type": "uint8",
-          "indexed": false,
-          "internalType": "enum KeelHarnessRegistry.HarnessEditPolicy"
-        },
-        {
-          "name": "forkPolicy",
-          "type": "uint8",
-          "indexed": false,
-          "internalType": "enum KeelHarnessRegistry.ForkPolicy"
+          "name": "harnessId",
+          "type": "bytes32",
+          "indexed": true,
+          "internalType": "bytes32"
         }
       ],
       "anonymous": false
@@ -2112,16 +2608,16 @@ export const ABIS = {
       "name": "HarnessPermanentlyFrozen",
       "inputs": [
         {
-          "name": "harnessId",
-          "type": "bytes32",
-          "indexed": true,
-          "internalType": "bytes32"
-        },
-        {
           "name": "revision",
           "type": "uint64",
           "indexed": true,
           "internalType": "uint64"
+        },
+        {
+          "name": "harnessId",
+          "type": "bytes32",
+          "indexed": true,
+          "internalType": "bytes32"
         }
       ],
       "anonymous": false
@@ -2130,12 +2626,6 @@ export const ABIS = {
       "type": "event",
       "name": "HarnessRevisionAppended",
       "inputs": [
-        {
-          "name": "harnessId",
-          "type": "bytes32",
-          "indexed": true,
-          "internalType": "bytes32"
-        },
         {
           "name": "revision",
           "type": "uint64",
@@ -2149,19 +2639,25 @@ export const ABIS = {
           "internalType": "uint64"
         },
         {
+          "name": "harnessId",
+          "type": "bytes32",
+          "indexed": true,
+          "internalType": "bytes32"
+        },
+        {
           "name": "slotsDigest",
           "type": "bytes32",
           "indexed": false,
           "internalType": "bytes32"
         },
         {
-          "name": "manifestDigest",
+          "name": "seedSetDigest",
           "type": "bytes32",
           "indexed": false,
           "internalType": "bytes32"
         },
         {
-          "name": "seedSetDigest",
+          "name": "manifestDigest",
           "type": "bytes32",
           "indexed": false,
           "internalType": "bytes32"
@@ -2180,18 +2676,6 @@ export const ABIS = {
       "name": "TokenForkActivated",
       "inputs": [
         {
-          "name": "harnessId",
-          "type": "bytes32",
-          "indexed": true,
-          "internalType": "bytes32"
-        },
-        {
-          "name": "tokenId",
-          "type": "uint256",
-          "indexed": true,
-          "internalType": "uint256"
-        },
-        {
           "name": "forkRevision",
           "type": "uint64",
           "indexed": true,
@@ -2202,6 +2686,18 @@ export const ABIS = {
           "type": "uint64",
           "indexed": false,
           "internalType": "uint64"
+        },
+        {
+          "name": "harnessId",
+          "type": "bytes32",
+          "indexed": true,
+          "internalType": "bytes32"
+        },
+        {
+          "name": "tokenId",
+          "type": "uint256",
+          "indexed": true,
+          "internalType": "uint256"
         }
       ],
       "anonymous": false
@@ -2211,6 +2707,12 @@ export const ABIS = {
       "name": "TokenForkCancelled",
       "inputs": [
         {
+          "name": "forkRevision",
+          "type": "uint64",
+          "indexed": true,
+          "internalType": "uint64"
+        },
+        {
           "name": "harnessId",
           "type": "bytes32",
           "indexed": true,
@@ -2221,12 +2723,6 @@ export const ABIS = {
           "type": "uint256",
           "indexed": true,
           "internalType": "uint256"
-        },
-        {
-          "name": "forkRevision",
-          "type": "uint64",
-          "indexed": true,
-          "internalType": "uint64"
         }
       ],
       "anonymous": false
@@ -2236,6 +2732,12 @@ export const ABIS = {
       "name": "TokenForkPermanentlyFrozen",
       "inputs": [
         {
+          "name": "forkRevision",
+          "type": "uint64",
+          "indexed": true,
+          "internalType": "uint64"
+        },
+        {
           "name": "harnessId",
           "type": "bytes32",
           "indexed": true,
@@ -2246,12 +2748,6 @@ export const ABIS = {
           "type": "uint256",
           "indexed": true,
           "internalType": "uint256"
-        },
-        {
-          "name": "forkRevision",
-          "type": "uint64",
-          "indexed": true,
-          "internalType": "uint64"
         }
       ],
       "anonymous": false
@@ -2261,27 +2757,9 @@ export const ABIS = {
       "name": "TokenForkPublished",
       "inputs": [
         {
-          "name": "harnessId",
-          "type": "bytes32",
-          "indexed": true,
-          "internalType": "bytes32"
-        },
-        {
-          "name": "tokenId",
-          "type": "uint256",
-          "indexed": true,
-          "internalType": "uint256"
-        },
-        {
           "name": "forkRevision",
           "type": "uint64",
           "indexed": true,
-          "internalType": "uint64"
-        },
-        {
-          "name": "baseHarnessRevision",
-          "type": "uint64",
-          "indexed": false,
           "internalType": "uint64"
         },
         {
@@ -2291,9 +2769,15 @@ export const ABIS = {
           "internalType": "uint64"
         },
         {
-          "name": "selectionDigest",
-          "type": "bytes32",
+          "name": "baseHarnessRevision",
+          "type": "uint64",
           "indexed": false,
+          "internalType": "uint64"
+        },
+        {
+          "name": "harnessId",
+          "type": "bytes32",
+          "indexed": true,
           "internalType": "bytes32"
         },
         {
@@ -2303,10 +2787,35 @@ export const ABIS = {
           "internalType": "bytes32"
         },
         {
+          "name": "selectionDigest",
+          "type": "bytes32",
+          "indexed": false,
+          "internalType": "bytes32"
+        },
+        {
+          "name": "tokenId",
+          "type": "uint256",
+          "indexed": true,
+          "internalType": "uint256"
+        },
+        {
           "name": "publisher",
           "type": "address",
           "indexed": false,
           "internalType": "address"
+        }
+      ],
+      "anonymous": false
+    },
+    {
+      "type": "event",
+      "name": "TreeLimitsSet",
+      "inputs": [
+        {
+          "name": "control",
+          "type": "uint256",
+          "indexed": false,
+          "internalType": "uint256"
         }
       ],
       "anonymous": false
@@ -2343,6 +2852,11 @@ export const ABIS = {
     },
     {
       "type": "error",
+      "name": "HarnessKeyOverflow",
+      "inputs": []
+    },
+    {
+      "type": "error",
       "name": "HarnessMissing",
       "inputs": []
     },
@@ -2373,6 +2887,11 @@ export const ABIS = {
     },
     {
       "type": "error",
+      "name": "InvalidTree",
+      "inputs": []
+    },
+    {
+      "type": "error",
       "name": "NoPendingFork",
       "inputs": []
     },
@@ -2384,6 +2903,16 @@ export const ABIS = {
     {
       "type": "error",
       "name": "RegistryCommitmentMismatch",
+      "inputs": []
+    },
+    {
+      "type": "error",
+      "name": "SlotSourceTooLarge",
+      "inputs": []
+    },
+    {
+      "type": "error",
+      "name": "TreeLimitExceeded",
       "inputs": []
     },
     {

@@ -1395,7 +1395,7 @@ function keelReader({
       case `${keelAddresses.seed}:harnessRegistry`:
         return keelAddresses.viewer;
       case `${keelAddresses.viewer}:effectiveHarness`:
-        return [1n, 0n, 0n, manifestDigest, keelIds.selection, [keelIds.object], [1n]];
+        return [0n, 1n, 0n, manifestDigest, keelIds.selection, [1n], [keelIds.object]];
       case `${keelAddresses.object}:artifactRevisionSource`: {
         const [objectId] = request.args;
         if (objectId === keelIds.gearObject) {
@@ -1459,6 +1459,36 @@ function keelReader({
         throw new Error(`Unexpected Keel read ${request.address}:${request.functionName}`);
     }
   };
+}
+
+for (const representation of ["tuple", "named"]) {
+  test(`Harness return order preserves distinct revisions through the viewer (${representation})`, async () => {
+    const objectBytes = new TextEncoder().encode('<svg xmlns="http://www.w3.org/2000/svg"/>');
+    const extension = baseKeelExtension({
+      expectedViewer: { harnessRevision: 2, forkRevision: 3, selectionDigest: keelIds.selection },
+    });
+    const { value, integrity, commitment } = await keelManifest(extension);
+    const base = keelReader({ manifestDigest: integrity.digest, objectBytes });
+    const effective = {
+      forkRevision: 3n, harnessRevision: 2n, keelIndexRevision: 7n,
+      manifestDigest: integrity.digest, selectionDigest: keelIds.selection,
+      selectedObjectRevisions: [1n], slotObjectIds: [keelIds.object],
+    };
+    const result = await bindKeelManifest(value, commitment, {
+      async readContract(request) {
+        if (request.functionName === "effectiveHarness") {
+          return representation === "tuple" ? Object.values(effective) : effective;
+        }
+        return base(request);
+      },
+      blockNumber: 123n,
+    });
+    assert.equal(result.binding.effectiveHarness.forkRevision, 3);
+    assert.equal(result.binding.effectiveHarness.harnessRevision, 2);
+    assert.equal(result.binding.effectiveHarness.keelIndexRevision, 7);
+    assert.deepEqual(result.binding.effectiveHarness.slotObjectIds, [keelIds.object]);
+    assert.deepEqual(result.binding.effectiveHarness.selectedObjectRevisions, [1]);
+  });
 }
 
 test("Keel link decoding covers every locator and its own compression tags", async () => {
@@ -2538,3 +2568,28 @@ test('native binding snapshots declarations before asynchronous chain reads', as
   });
   assert.ok(!bound.manifest.resources.find(resource => resource.id === 'image').aliases?.includes('https://undeclared.example/injected'));
 });
+
+for (const fork of [false, true]) {
+  test(`viewer resolves a pinned child Harness ${fork ? 'fork' : 'base'} before resource binding`, async () => {
+    const objectBytes = new TextEncoder().encode('<svg xmlns="http://www.w3.org/2000/svg"/>');
+    const {value, integrity, commitment} = await keelManifest(baseKeelExtension({expectedViewer:{harnessRevision:1,forkRevision:fork?1:0,selectionDigest:keelIds.selection}}));
+    const base = keelReader({manifestDigest:integrity.digest,objectBytes});
+    const calls=[];
+    const result=await bindKeelManifest(value,commitment,{
+      blockNumber:123n,
+      async readContract(request) {
+        calls.push(request);
+        if(request.functionName==='effectiveHarness') return [fork?1n:0n,1n,fork?3n:0n,integrity.digest,keelIds.selection,[],[]];
+        if(request.functionName===(fork?'tokenForkTree':'harnessTree')) return [1n|(2n<<8n)|(1n<<16n),[(7n<<32n)|2n]];
+        if(request.functionName==='harnessNode') {
+          assert.deepEqual(request.args,[7,2]);assert.equal(request.blockNumber,123n);
+          return [0n,[],[keelIds.object],[1n]];
+        }
+        return base(request);
+      },
+    });
+    assert.deepEqual(result.binding.effectiveHarness.slotObjectIds,[keelIds.object]);
+    assert.equal(calls.filter(c=>c.functionName==='harnessNode').length,1);
+    assert.equal(calls.filter(c=>c.functionName===(fork?'harnessTree':'tokenForkTree')).length,0);
+  });
+}

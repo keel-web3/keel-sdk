@@ -299,7 +299,7 @@ export const keelDirectReadPolicy = {
     "tokenRequirementCount",
     "tokenRequirement",
   ],
-  "keel-viewer-registry": ["artifactRegistry", "keelIndex", "harnessCreator", "harnessCollection", "effectiveHarness"],
+  "keel-viewer-registry": ["artifactRegistry", "keelIndex", "harnessCreator", "harnessCollection", "effectiveHarness", "harnessTree", "harnessNode", "tokenForkTree"],
   "keel-link-registry": ["artifactRegistry", "linkExists", "fidelityLink"],
   "keel-seed-registry": [
     "harnessRegistry",

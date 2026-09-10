@@ -72,3 +72,4 @@ export * from "./recovery.js";
 
 export * from "./manager-errors.js";
 export * from "./manager-events.js";
+export * from "./harness-tree.js";

@@ -1,5 +1,8 @@
 import {
   canonicalJson,
+  resolveHarnessTree,
+  type HarnessNode,
+  type HarnessWalkLimits,
   createIntegrity,
   encodeBase64,
   utf8ToBytes,
@@ -217,6 +220,9 @@ export type KeelContractFunction =
   | "characterRegistry"
   | "deriveTokenSeed"
   | "effectiveHarness"
+  | "harnessTree"
+  | "harnessNode"
+  | "tokenForkTree"
   | "equipmentSource"
   | "fidelityLink"
   | "linkExists"
@@ -593,6 +599,7 @@ export interface KeelRuntimeBinding {
 }
 
 export interface BindKeelManifestOptions {
+  readonly harnessTreeLimits?: HarnessWalkLimits;
   readonly readContract: KeelContractRead;
   readonly adapters?: ResolverAdapters;
   /** Gateway preferences never override a verified native object binding.
@@ -1020,18 +1027,18 @@ export function parseKeelRuntimeExtension(manifest: ArtifactManifest): KeelRunti
 }
 
 function parseEffectiveViewer(value: unknown): KeelEffectiveViewer {
-  const objectIds = array(tupleValue(value, "slotObjectIds", 5), "effectiveHarness.slotObjectIds").map((entry, index) =>
+  const objectIds = array(tupleValue(value, "slotObjectIds", 6), "effectiveHarness.slotObjectIds").map((entry, index) =>
     bytes32(entry, `effectiveHarness.slotObjectIds[${index}]`),
   );
-  const revisions = array(tupleValue(value, "selectedObjectRevisions", 6), "effectiveHarness.selectedObjectRevisions").map(
+  const revisions = array(tupleValue(value, "selectedObjectRevisions", 5), "effectiveHarness.selectedObjectRevisions").map(
     (entry, index) => safeNumber(entry, `effectiveHarness.selectedObjectRevisions[${index}]`, 1),
   );
-  if (objectIds.length === 0 || objectIds.length !== revisions.length) {
+  if (objectIds.length !== revisions.length) {
     throw new TypeError("Keel effective viewer returned an invalid slot selection.");
   }
   return {
-    harnessRevision: safeNumber(tupleValue(value, "harnessRevision", 0), "effectiveHarness.harnessRevision", 1),
-    forkRevision: safeNumber(tupleValue(value, "forkRevision", 1), "effectiveHarness.forkRevision"),
+    harnessRevision: safeNumber(tupleValue(value, "harnessRevision", 1), "effectiveHarness.harnessRevision", 1),
+    forkRevision: safeNumber(tupleValue(value, "forkRevision", 0), "effectiveHarness.forkRevision"),
     keelIndexRevision: safeNumber(
       tupleValue(value, "keelIndexRevision", 2),
       "effectiveHarness.keelIndexRevision",
@@ -1674,9 +1681,36 @@ export async function bindKeelManifest(
     throw new Error("Keel viewer collection does not match the verified KeelIndex collection.");
   }
 
-  const effective = parseEffectiveViewer(effectiveValue);
+  let effective = parseEffectiveViewer(effectiveValue);
   if (effective.manifestDigest !== commitment.integrity.digest) {
     throw new Error("Effective Keel viewer does not commit the verified manifest digest.");
+  }
+  if (effective.slotObjectIds.length === 0) {
+    const value = effective.forkRevision === 0
+      ? await read(extension.harnessRegistry, "harnessTree", [extension.viewerId, BigInt(effective.harnessRevision)])
+      : await read(extension.harnessRegistry, "tokenForkTree", [extension.viewerId, BigInt(extension.tokenId), BigInt(effective.forkRevision)]);
+    const root: HarnessNode = {
+      metadata: uintBig(tupleValue(value, "metadata", 0), "harnessTree.metadata"),
+      children: array(tupleValue(value, "children", 1), "harnessTree.children").map(v => uintBig(v, "harnessTree.word")),
+      objects: [],
+    };
+    const objects = await resolveHarnessTree(root, async ({key, revision}) => {
+      const node = await read(extension.harnessRegistry, "harnessNode", [key, revision]);
+      const ids = array(tupleValue(node, "objectIds", 2), "harnessNode.objectIds");
+      const revisions = array(tupleValue(node, "revisions", 3), "harnessNode.revisions");
+      if (ids.length !== revisions.length) throw new Error("Harness node returned mismatched arrays.");
+      return {
+        metadata: uintBig(tupleValue(node, "metadata", 0), "harnessNode.metadata"),
+        children: array(tupleValue(node, "children", 1), "harnessNode.children").map(v => uintBig(v, "harnessNode.word")),
+        objects: ids.map((id, i) => ({objectId: bytes32(id, "harnessNode.objectId"), revision:uintBig(revisions[i], "harnessNode.revision")})),
+      };
+    }, {
+      ...options.harnessTreeLimits,
+      maxObjects: Math.min(options.harnessTreeLimits?.maxObjects ?? 1_000_000, extension.slotResources.length),
+      signal,
+    });
+    effective = {...effective, slotObjectIds:objects.map(o=>o.objectId),
+      selectedObjectRevisions:objects.map(o=>safeNumber(o.revision, "harnessNode.revision", 1))};
   }
   if (effective.slotObjectIds.length !== extension.slotResources.length) {
     throw new Error("Effective Keel viewer slot count does not match the manifest resource map.");
