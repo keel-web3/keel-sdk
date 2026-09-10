@@ -18,13 +18,38 @@ export const keelGroupActionTypes = { GroupAction: [
 const sortAddresses = (addresses: readonly Address[]) => addresses.map(address => getAddress(address)).sort((a,b) => BigInt(a) < BigInt(b) ? -1 : BigInt(a) === BigInt(b) ? 0 : 1);
 
 /** Unsigned manager-governance action. The contract permanently prevents a
- * quorum group from returning to bootstrap, even if a caller bypasses this SDK. */
-export function buildKeelGroupConfiguration(groups: Address, groupId: Hex, members: readonly Address[], expectedRevision: bigint, enabled = true) {
+ * quorum group from returning to bootstrap, even if a caller bypasses this SDK.
+ * Pass the current memberPolicy.maximum for a local admission check. This builder
+ * only encodes an action; governance rechecks the live policy at execution. */
+export function buildKeelGroupConfiguration(groups: Address, groupId: Hex, members: readonly Address[], expectedRevision: bigint, enabled = true, maximum?: number) {
   const sorted = sortAddresses(members);
-  if (!groupId || BigInt(groupId) === 0n || sorted.length === 0 || sorted.length === 2 || sorted.length > 32)
-    throw new RangeError("A group needs one bootstrap wallet or 3–32 quorum members.");
+  if (!groupId || BigInt(groupId) === 0n || sorted.length === 0 || sorted.length === 2 || sorted.length > 0xffffffff)
+    throw new RangeError("A group needs one bootstrap wallet or at least three quorum members.");
+  if (maximum !== undefined) {
+    validateMemberMaximum(maximum);
+    if (sorted.length > maximum) throw new RangeError("Roster exceeds the current member policy.");
+  }
   if (sorted.some((member,i) => member === zeroAddress || member === sorted[i-1])) throw new RangeError("Group members must be nonzero and unique.");
   return { target: getAddress(groups), value: 0n, data: encodeFunctionData({ abi: groupsAbi, functionName: "configureGroup", args: [groupId, sorted, enabled, expectedRevision] }) };
+}
+
+/** Revision-checked governance action; lowering admission does not alter existing quorum. */
+export function buildKeelGroupMemberPolicy(groups: Address, maximum: number, expectedRevision: bigint) {
+  validateMemberMaximum(maximum);
+  return { target: getAddress(groups), value: 0n, data: encodeFunctionData({ abi: groupsAbi, functionName: "configureMemberPolicy", args: [maximum, expectedRevision] }) };
+}
+
+function validateMemberMaximum(maximum: number) {
+  if (!Number.isInteger(maximum) || maximum < 3 || maximum > 0xffffffff)
+    throw new RangeError("Member maximum must be a uint32 of at least three.");
+}
+
+/** Decode GroupConfigured without losing revision precision or hiding unknown flags. */
+export function decodeKeelGroupMetadata(metadata: Hex) {
+  if (!/^0x[0-9a-fA-F]{64}$/.test(metadata)) throw new RangeError("Group metadata must be bytes32.");
+  const word = BigInt(metadata);
+  if (word >> 66n) throw new RangeError("Unknown group metadata bits.");
+  return { revision: word & ((1n << 64n) - 1n), quorumActive: Boolean(word & (1n << 64n)), enabled: Boolean(word & (1n << 65n)) };
 }
 
 export function buildKeelGroupCapability(groups: Address, groupId: Hex, target: Address, selector: Hex, enabled = true) {

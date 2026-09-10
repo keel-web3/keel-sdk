@@ -105,6 +105,10 @@
     "./admin-pauses": {
       "types": "./dist/admin-pauses.d.ts",
       "import": "./dist/admin-pauses.js"
+    },
+    "./recovery": {
+      "types": "./dist/recovery.d.ts",
+      "import": "./dist/recovery.js"
     }
   },
   "files": [

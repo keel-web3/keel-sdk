@@ -489,19 +489,6 @@ export const ABIS = {
     },
     {
       "type": "function",
-      "name": "MAX_MEMBERS",
-      "inputs": [],
-      "outputs": [
-        {
-          "name": "",
-          "type": "uint256",
-          "internalType": "uint256"
-        }
-      ],
-      "stateMutability": "view"
-    },
-    {
-      "type": "function",
       "name": "MODERATION_GROUP",
       "inputs": [],
       "outputs": [
@@ -625,6 +612,102 @@ export const ABIS = {
     },
     {
       "type": "function",
+      "name": "capabilities",
+      "inputs": [
+        {
+          "name": "groupId",
+          "type": "bytes32",
+          "internalType": "bytes32"
+        },
+        {
+          "name": "epoch",
+          "type": "uint32",
+          "internalType": "uint32"
+        },
+        {
+          "name": "target",
+          "type": "address",
+          "internalType": "address"
+        },
+        {
+          "name": "selector",
+          "type": "bytes4",
+          "internalType": "bytes4"
+        }
+      ],
+      "outputs": [
+        {
+          "name": "",
+          "type": "bool",
+          "internalType": "bool"
+        }
+      ],
+      "stateMutability": "view"
+    },
+    {
+      "type": "function",
+      "name": "configureBackup",
+      "inputs": [
+        {
+          "name": "groupId",
+          "type": "bytes32",
+          "internalType": "bytes32"
+        },
+        {
+          "name": "nextGroup",
+          "type": "bytes32",
+          "internalType": "bytes32"
+        },
+        {
+          "name": "revision",
+          "type": "uint64",
+          "internalType": "uint64"
+        },
+        {
+          "name": "deadline",
+          "type": "uint64",
+          "internalType": "uint64"
+        },
+        {
+          "name": "currentApprovals",
+          "type": "tuple[]",
+          "internalType": "struct KeelRecoveryGroups.Signature[]",
+          "components": [
+            {
+              "name": "signer",
+              "type": "address",
+              "internalType": "address"
+            },
+            {
+              "name": "signature",
+              "type": "bytes",
+              "internalType": "bytes"
+            }
+          ]
+        },
+        {
+          "name": "incomingApprovals",
+          "type": "tuple[]",
+          "internalType": "struct KeelRecoveryGroups.Signature[]",
+          "components": [
+            {
+              "name": "signer",
+              "type": "address",
+              "internalType": "address"
+            },
+            {
+              "name": "signature",
+              "type": "bytes",
+              "internalType": "bytes"
+            }
+          ]
+        }
+      ],
+      "outputs": [],
+      "stateMutability": "nonpayable"
+    },
+    {
+      "type": "function",
       "name": "configureCapability",
       "inputs": [
         {
@@ -669,6 +752,24 @@ export const ABIS = {
           "name": "enabled",
           "type": "bool",
           "internalType": "bool"
+        },
+        {
+          "name": "expectedRevision",
+          "type": "uint64",
+          "internalType": "uint64"
+        }
+      ],
+      "outputs": [],
+      "stateMutability": "nonpayable"
+    },
+    {
+      "type": "function",
+      "name": "configureMemberPolicy",
+      "inputs": [
+        {
+          "name": "maximum",
+          "type": "uint32",
+          "internalType": "uint32"
         },
         {
           "name": "expectedRevision",
@@ -872,6 +973,111 @@ export const ABIS = {
       "stateMutability": "view"
     },
     {
+      "type": "function",
+      "name": "memberPolicy",
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "maximum",
+          "type": "uint32",
+          "internalType": "uint32"
+        },
+        {
+          "name": "revision",
+          "type": "uint64",
+          "internalType": "uint64"
+        }
+      ],
+      "stateMutability": "view"
+    },
+    {
+      "type": "function",
+      "name": "recoverGroup",
+      "inputs": [
+        {
+          "name": "groupId",
+          "type": "bytes32",
+          "internalType": "bytes32"
+        },
+        {
+          "name": "members",
+          "type": "address[]",
+          "internalType": "address[]"
+        },
+        {
+          "name": "grants",
+          "type": "tuple[]",
+          "internalType": "struct KeelAccessGroups.Capability[]",
+          "components": [
+            {
+              "name": "target",
+              "type": "address",
+              "internalType": "address"
+            },
+            {
+              "name": "selector",
+              "type": "bytes4",
+              "internalType": "bytes4"
+            }
+          ]
+        },
+        {
+          "name": "deadline",
+          "type": "uint64",
+          "internalType": "uint64"
+        },
+        {
+          "name": "approvals",
+          "type": "tuple[]",
+          "internalType": "struct KeelRecoveryGroups.Signature[]",
+          "components": [
+            {
+              "name": "signer",
+              "type": "address",
+              "internalType": "address"
+            },
+            {
+              "name": "signature",
+              "type": "bytes",
+              "internalType": "bytes"
+            }
+          ]
+        },
+        {
+          "name": "acceptances",
+          "type": "tuple[]",
+          "internalType": "struct KeelRecoveryGroups.Signature[]",
+          "components": [
+            {
+              "name": "signer",
+              "type": "address",
+              "internalType": "address"
+            },
+            {
+              "name": "signature",
+              "type": "bytes",
+              "internalType": "bytes"
+            }
+          ]
+        }
+      ],
+      "outputs": [],
+      "stateMutability": "nonpayable"
+    },
+    {
+      "type": "function",
+      "name": "recoveryGroups",
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "",
+          "type": "address",
+          "internalType": "contract KeelRecoveryGroups"
+        }
+      ],
+      "stateMutability": "view"
+    },
+    {
       "type": "event",
       "name": "EIP712DomainChanged",
       "inputs": [],
@@ -950,28 +1156,54 @@ export const ABIS = {
           "internalType": "bytes32"
         },
         {
-          "name": "revision",
-          "type": "uint64",
+          "name": "metadata",
+          "type": "bytes32",
           "indexed": false,
-          "internalType": "uint64"
-        },
-        {
-          "name": "quorumActive",
-          "type": "bool",
-          "indexed": false,
-          "internalType": "bool"
-        },
-        {
-          "name": "enabled",
-          "type": "bool",
-          "indexed": false,
-          "internalType": "bool"
+          "internalType": "bytes32"
         },
         {
           "name": "members",
           "type": "address[]",
           "indexed": false,
           "internalType": "address[]"
+        }
+      ],
+      "anonymous": false
+    },
+    {
+      "type": "event",
+      "name": "GroupRecovered",
+      "inputs": [
+        {
+          "name": "groupId",
+          "type": "bytes32",
+          "indexed": true,
+          "internalType": "bytes32"
+        },
+        {
+          "name": "capabilityEpoch",
+          "type": "uint32",
+          "indexed": false,
+          "internalType": "uint32"
+        }
+      ],
+      "anonymous": false
+    },
+    {
+      "type": "event",
+      "name": "MemberPolicyConfigured",
+      "inputs": [
+        {
+          "name": "maximum",
+          "type": "uint32",
+          "indexed": false,
+          "internalType": "uint32"
+        },
+        {
+          "name": "revision",
+          "type": "uint64",
+          "indexed": false,
+          "internalType": "uint64"
         }
       ],
       "anonymous": false
@@ -989,6 +1221,11 @@ export const ABIS = {
     {
       "type": "error",
       "name": "InvalidGroup",
+      "inputs": []
+    },
+    {
+      "type": "error",
+      "name": "InvalidMemberPolicy",
       "inputs": []
     },
     {
@@ -1028,6 +1265,11 @@ export const ABIS = {
     },
     {
       "type": "error",
+      "name": "StaleMemberPolicy",
+      "inputs": []
+    },
+    {
+      "type": "error",
       "name": "StringTooLong",
       "inputs": [
         {
@@ -1041,6 +1283,748 @@ export const ABIS = {
       "type": "error",
       "name": "UnauthorizedGovernance",
       "inputs": []
+    }
+  ],
+  "KeelRecoveryGroups": [
+    {
+      "type": "constructor",
+      "inputs": [],
+      "stateMutability": "nonpayable"
+    },
+    {
+      "type": "function",
+      "name": "ACCEPTANCE_TYPEHASH",
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "",
+          "type": "bytes32",
+          "internalType": "bytes32"
+        }
+      ],
+      "stateMutability": "view"
+    },
+    {
+      "type": "function",
+      "name": "ACTION_TYPEHASH",
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "",
+          "type": "bytes32",
+          "internalType": "bytes32"
+        }
+      ],
+      "stateMutability": "view"
+    },
+    {
+      "type": "function",
+      "name": "BINDING_TAG",
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "",
+          "type": "bytes32",
+          "internalType": "bytes32"
+        }
+      ],
+      "stateMutability": "view"
+    },
+    {
+      "type": "function",
+      "name": "ROSTER_TAG",
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "",
+          "type": "bytes32",
+          "internalType": "bytes32"
+        }
+      ],
+      "stateMutability": "view"
+    },
+    {
+      "type": "function",
+      "name": "acceptanceDigest",
+      "inputs": [
+        {
+          "name": "digest",
+          "type": "bytes32",
+          "internalType": "bytes32"
+        },
+        {
+          "name": "signer",
+          "type": "address",
+          "internalType": "address"
+        }
+      ],
+      "outputs": [
+        {
+          "name": "",
+          "type": "bytes32",
+          "internalType": "bytes32"
+        }
+      ],
+      "stateMutability": "view"
+    },
+    {
+      "type": "function",
+      "name": "actionDigest",
+      "inputs": [
+        {
+          "name": "id",
+          "type": "bytes32",
+          "internalType": "bytes32"
+        },
+        {
+          "name": "resource",
+          "type": "address",
+          "internalType": "address"
+        },
+        {
+          "name": "scope",
+          "type": "bytes32",
+          "internalType": "bytes32"
+        },
+        {
+          "name": "actionHash",
+          "type": "bytes32",
+          "internalType": "bytes32"
+        },
+        {
+          "name": "deadline",
+          "type": "uint64",
+          "internalType": "uint64"
+        }
+      ],
+      "outputs": [
+        {
+          "name": "",
+          "type": "bytes32",
+          "internalType": "bytes32"
+        }
+      ],
+      "stateMutability": "view"
+    },
+    {
+      "type": "function",
+      "name": "authorizeBound",
+      "inputs": [
+        {
+          "name": "scope",
+          "type": "bytes32",
+          "internalType": "bytes32"
+        },
+        {
+          "name": "actionHash",
+          "type": "bytes32",
+          "internalType": "bytes32"
+        },
+        {
+          "name": "deadline",
+          "type": "uint64",
+          "internalType": "uint64"
+        },
+        {
+          "name": "approvals",
+          "type": "tuple[]",
+          "internalType": "struct KeelRecoveryGroups.Signature[]",
+          "components": [
+            {
+              "name": "signer",
+              "type": "address",
+              "internalType": "address"
+            },
+            {
+              "name": "signature",
+              "type": "bytes",
+              "internalType": "bytes"
+            }
+          ]
+        }
+      ],
+      "outputs": [
+        {
+          "name": "digest",
+          "type": "bytes32",
+          "internalType": "bytes32"
+        }
+      ],
+      "stateMutability": "nonpayable"
+    },
+    {
+      "type": "function",
+      "name": "bindingHash",
+      "inputs": [
+        {
+          "name": "nextGroup",
+          "type": "bytes32",
+          "internalType": "bytes32"
+        },
+        {
+          "name": "revision",
+          "type": "uint64",
+          "internalType": "uint64"
+        }
+      ],
+      "outputs": [
+        {
+          "name": "",
+          "type": "bytes32",
+          "internalType": "bytes32"
+        }
+      ],
+      "stateMutability": "pure"
+    },
+    {
+      "type": "function",
+      "name": "bindings",
+      "inputs": [
+        {
+          "name": "resource",
+          "type": "address",
+          "internalType": "address"
+        },
+        {
+          "name": "scope",
+          "type": "bytes32",
+          "internalType": "bytes32"
+        }
+      ],
+      "outputs": [
+        {
+          "name": "groupId",
+          "type": "bytes32",
+          "internalType": "bytes32"
+        },
+        {
+          "name": "revision",
+          "type": "uint64",
+          "internalType": "uint64"
+        }
+      ],
+      "stateMutability": "view"
+    },
+    {
+      "type": "function",
+      "name": "boundDigest",
+      "inputs": [
+        {
+          "name": "resource",
+          "type": "address",
+          "internalType": "address"
+        },
+        {
+          "name": "scope",
+          "type": "bytes32",
+          "internalType": "bytes32"
+        },
+        {
+          "name": "actionHash",
+          "type": "bytes32",
+          "internalType": "bytes32"
+        },
+        {
+          "name": "deadline",
+          "type": "uint64",
+          "internalType": "uint64"
+        }
+      ],
+      "outputs": [
+        {
+          "name": "",
+          "type": "bytes32",
+          "internalType": "bytes32"
+        }
+      ],
+      "stateMutability": "view"
+    },
+    {
+      "type": "function",
+      "name": "configureBinding",
+      "inputs": [
+        {
+          "name": "scope",
+          "type": "bytes32",
+          "internalType": "bytes32"
+        },
+        {
+          "name": "nextGroup",
+          "type": "bytes32",
+          "internalType": "bytes32"
+        },
+        {
+          "name": "expectedRevision",
+          "type": "uint64",
+          "internalType": "uint64"
+        },
+        {
+          "name": "deadline",
+          "type": "uint64",
+          "internalType": "uint64"
+        },
+        {
+          "name": "currentApprovals",
+          "type": "tuple[]",
+          "internalType": "struct KeelRecoveryGroups.Signature[]",
+          "components": [
+            {
+              "name": "signer",
+              "type": "address",
+              "internalType": "address"
+            },
+            {
+              "name": "signature",
+              "type": "bytes",
+              "internalType": "bytes"
+            }
+          ]
+        },
+        {
+          "name": "incomingApprovals",
+          "type": "tuple[]",
+          "internalType": "struct KeelRecoveryGroups.Signature[]",
+          "components": [
+            {
+              "name": "signer",
+              "type": "address",
+              "internalType": "address"
+            },
+            {
+              "name": "signature",
+              "type": "bytes",
+              "internalType": "bytes"
+            }
+          ]
+        }
+      ],
+      "outputs": [],
+      "stateMutability": "nonpayable"
+    },
+    {
+      "type": "function",
+      "name": "createGroup",
+      "inputs": [
+        {
+          "name": "salt",
+          "type": "bytes32",
+          "internalType": "bytes32"
+        },
+        {
+          "name": "members",
+          "type": "address[]",
+          "internalType": "address[]"
+        },
+        {
+          "name": "verifyKeys",
+          "type": "bool",
+          "internalType": "bool"
+        },
+        {
+          "name": "deadline",
+          "type": "uint64",
+          "internalType": "uint64"
+        },
+        {
+          "name": "acceptances",
+          "type": "tuple[]",
+          "internalType": "struct KeelRecoveryGroups.Signature[]",
+          "components": [
+            {
+              "name": "signer",
+              "type": "address",
+              "internalType": "address"
+            },
+            {
+              "name": "signature",
+              "type": "bytes",
+              "internalType": "bytes"
+            }
+          ]
+        }
+      ],
+      "outputs": [
+        {
+          "name": "id",
+          "type": "bytes32",
+          "internalType": "bytes32"
+        }
+      ],
+      "stateMutability": "nonpayable"
+    },
+    {
+      "type": "function",
+      "name": "eip712Domain",
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "fields",
+          "type": "bytes1",
+          "internalType": "bytes1"
+        },
+        {
+          "name": "name",
+          "type": "string",
+          "internalType": "string"
+        },
+        {
+          "name": "version",
+          "type": "string",
+          "internalType": "string"
+        },
+        {
+          "name": "chainId",
+          "type": "uint256",
+          "internalType": "uint256"
+        },
+        {
+          "name": "verifyingContract",
+          "type": "address",
+          "internalType": "address"
+        },
+        {
+          "name": "salt",
+          "type": "bytes32",
+          "internalType": "bytes32"
+        },
+        {
+          "name": "extensions",
+          "type": "uint256[]",
+          "internalType": "uint256[]"
+        }
+      ],
+      "stateMutability": "view"
+    },
+    {
+      "type": "function",
+      "name": "group",
+      "inputs": [
+        {
+          "name": "id",
+          "type": "bytes32",
+          "internalType": "bytes32"
+        }
+      ],
+      "outputs": [
+        {
+          "name": "members",
+          "type": "address[]",
+          "internalType": "address[]"
+        },
+        {
+          "name": "threshold",
+          "type": "uint256",
+          "internalType": "uint256"
+        },
+        {
+          "name": "nonce",
+          "type": "uint128",
+          "internalType": "uint128"
+        },
+        {
+          "name": "revision",
+          "type": "uint64",
+          "internalType": "uint64"
+        },
+        {
+          "name": "verifyKeys",
+          "type": "bool",
+          "internalType": "bool"
+        },
+        {
+          "name": "quorumActive",
+          "type": "bool",
+          "internalType": "bool"
+        }
+      ],
+      "stateMutability": "view"
+    },
+    {
+      "type": "function",
+      "name": "rosterDigest",
+      "inputs": [
+        {
+          "name": "id",
+          "type": "bytes32",
+          "internalType": "bytes32"
+        },
+        {
+          "name": "members",
+          "type": "address[]",
+          "internalType": "address[]"
+        },
+        {
+          "name": "verifyKeys",
+          "type": "bool",
+          "internalType": "bool"
+        },
+        {
+          "name": "deadline",
+          "type": "uint64",
+          "internalType": "uint64"
+        }
+      ],
+      "outputs": [
+        {
+          "name": "",
+          "type": "bytes32",
+          "internalType": "bytes32"
+        }
+      ],
+      "stateMutability": "view"
+    },
+    {
+      "type": "function",
+      "name": "rotateGroup",
+      "inputs": [
+        {
+          "name": "id",
+          "type": "bytes32",
+          "internalType": "bytes32"
+        },
+        {
+          "name": "members",
+          "type": "address[]",
+          "internalType": "address[]"
+        },
+        {
+          "name": "verifyKeys",
+          "type": "bool",
+          "internalType": "bool"
+        },
+        {
+          "name": "deadline",
+          "type": "uint64",
+          "internalType": "uint64"
+        },
+        {
+          "name": "approvals",
+          "type": "tuple[]",
+          "internalType": "struct KeelRecoveryGroups.Signature[]",
+          "components": [
+            {
+              "name": "signer",
+              "type": "address",
+              "internalType": "address"
+            },
+            {
+              "name": "signature",
+              "type": "bytes",
+              "internalType": "bytes"
+            }
+          ]
+        },
+        {
+          "name": "acceptances",
+          "type": "tuple[]",
+          "internalType": "struct KeelRecoveryGroups.Signature[]",
+          "components": [
+            {
+              "name": "signer",
+              "type": "address",
+              "internalType": "address"
+            },
+            {
+              "name": "signature",
+              "type": "bytes",
+              "internalType": "bytes"
+            }
+          ]
+        }
+      ],
+      "outputs": [],
+      "stateMutability": "nonpayable"
+    },
+    {
+      "type": "function",
+      "name": "verifyNewKeys",
+      "inputs": [
+        {
+          "name": "digest",
+          "type": "bytes32",
+          "internalType": "bytes32"
+        },
+        {
+          "name": "members",
+          "type": "address[]",
+          "internalType": "address[]"
+        },
+        {
+          "name": "signatures",
+          "type": "tuple[]",
+          "internalType": "struct KeelRecoveryGroups.Signature[]",
+          "components": [
+            {
+              "name": "signer",
+              "type": "address",
+              "internalType": "address"
+            },
+            {
+              "name": "signature",
+              "type": "bytes",
+              "internalType": "bytes"
+            }
+          ]
+        }
+      ],
+      "outputs": [],
+      "stateMutability": "view"
+    },
+    {
+      "type": "event",
+      "name": "EIP712DomainChanged",
+      "inputs": [],
+      "anonymous": false
+    },
+    {
+      "type": "event",
+      "name": "RecoveryAuthorized",
+      "inputs": [
+        {
+          "name": "groupId",
+          "type": "bytes32",
+          "indexed": true,
+          "internalType": "bytes32"
+        },
+        {
+          "name": "resource",
+          "type": "address",
+          "indexed": true,
+          "internalType": "address"
+        },
+        {
+          "name": "scope",
+          "type": "bytes32",
+          "indexed": true,
+          "internalType": "bytes32"
+        },
+        {
+          "name": "digest",
+          "type": "bytes32",
+          "indexed": false,
+          "internalType": "bytes32"
+        },
+        {
+          "name": "nonce",
+          "type": "uint256",
+          "indexed": false,
+          "internalType": "uint256"
+        }
+      ],
+      "anonymous": false
+    },
+    {
+      "type": "event",
+      "name": "RecoveryBindingConfigured",
+      "inputs": [
+        {
+          "name": "resource",
+          "type": "address",
+          "indexed": true,
+          "internalType": "address"
+        },
+        {
+          "name": "scope",
+          "type": "bytes32",
+          "indexed": true,
+          "internalType": "bytes32"
+        },
+        {
+          "name": "groupId",
+          "type": "bytes32",
+          "indexed": true,
+          "internalType": "bytes32"
+        },
+        {
+          "name": "revision",
+          "type": "uint64",
+          "indexed": false,
+          "internalType": "uint64"
+        }
+      ],
+      "anonymous": false
+    },
+    {
+      "type": "event",
+      "name": "RecoveryGroupConfigured",
+      "inputs": [
+        {
+          "name": "groupId",
+          "type": "bytes32",
+          "indexed": true,
+          "internalType": "bytes32"
+        },
+        {
+          "name": "revision",
+          "type": "uint64",
+          "indexed": false,
+          "internalType": "uint64"
+        },
+        {
+          "name": "verifyKeys",
+          "type": "bool",
+          "indexed": false,
+          "internalType": "bool"
+        },
+        {
+          "name": "members",
+          "type": "address[]",
+          "indexed": false,
+          "internalType": "address[]"
+        }
+      ],
+      "anonymous": false
+    },
+    {
+      "type": "error",
+      "name": "InvalidRecoveryGroup",
+      "inputs": []
+    },
+    {
+      "type": "error",
+      "name": "InvalidRecoveryRoster",
+      "inputs": []
+    },
+    {
+      "type": "error",
+      "name": "InvalidRecoverySignatures",
+      "inputs": []
+    },
+    {
+      "type": "error",
+      "name": "InvalidShortString",
+      "inputs": []
+    },
+    {
+      "type": "error",
+      "name": "RecoveryExpired",
+      "inputs": []
+    },
+    {
+      "type": "error",
+      "name": "RecoveryLocked",
+      "inputs": []
+    },
+    {
+      "type": "error",
+      "name": "RecoveryNotConfigured",
+      "inputs": []
+    },
+    {
+      "type": "error",
+      "name": "RecoveryRevisionMismatch",
+      "inputs": []
+    },
+    {
+      "type": "error",
+      "name": "StringTooLong",
+      "inputs": [
+        {
+          "name": "str",
+          "type": "string",
+          "internalType": "string"
+        }
+      ]
     }
   ]
 } as const;

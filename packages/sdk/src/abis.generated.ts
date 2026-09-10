@@ -2,9 +2,9 @@
 
 /** Contracts with a recorded ABI, per unit. */
 export const ABI_CONTRACTS: Readonly<Record<string, readonly string[]>> = {
-  "keel-kernel": ["KeelFeeTreasury", "KeelAccessGroups"],
+  "keel-kernel": ["KeelAccessGroups","KeelFeeTreasury","KeelRecoveryGroups"],
   "keel-hold": ["Ingot","KeelHold","KeelIndex"],
-  "keel-artifacts": ["KeelArtifactRegistry","KeelHarnessRegistry","KeelLinkRegistry","KeelManager","KeelManagerProxy","KeelSeedRegistry"],
+  "keel-artifacts": ["KeelArtifactRegistry","KeelHarnessRegistry","KeelLinkRegistry","KeelManager","KeelManagerProxy","KeelManagerRecovery","KeelManagerRpcPolicy","KeelSeedRegistry"],
   "keel-graph": ["KeelAssetTagRegistry","KeelGraphRegistry","KeelLibraryRegistry","KeelModuleReviewRegistry","KeelPluginRegistry"],
   "keel-harness": ["KeelHarnessBuilder", "KeelObjectURIBuilder", "KeelPercentTokenURIBuilder", "KeelRawTokenURIBuilder"],
   "keel-presentation": ["KeelPresentationStateRegistry","KeelVisualStateLedger"],

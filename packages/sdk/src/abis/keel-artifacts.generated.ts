@@ -3868,7 +3868,7 @@ export const ABIS = {
           "internalType": "bytes32"
         }
       ],
-      "stateMutability": "pure"
+      "stateMutability": "view"
     },
     {
       "type": "function",
@@ -4905,12 +4905,12 @@ export const ABIS = {
       ],
       "outputs": [
         {
-          "name": "preimage",
+          "name": "",
           "type": "bytes",
           "internalType": "bytes"
         }
       ],
-      "stateMutability": "pure"
+      "stateMutability": "view"
     },
     {
       "type": "function",
@@ -6050,6 +6050,181 @@ export const ABIS = {
       "stateMutability": "payable"
     },
     {
+      "type": "function",
+      "name": "RECOVERY_SCOPE",
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "",
+          "type": "bytes32",
+          "internalType": "bytes32"
+        }
+      ],
+      "stateMutability": "view"
+    },
+    {
+      "type": "function",
+      "name": "configureBackup",
+      "inputs": [
+        {
+          "name": "nextGroup",
+          "type": "bytes32",
+          "internalType": "bytes32"
+        },
+        {
+          "name": "revision",
+          "type": "uint64",
+          "internalType": "uint64"
+        },
+        {
+          "name": "deadline",
+          "type": "uint64",
+          "internalType": "uint64"
+        },
+        {
+          "name": "currentApprovals",
+          "type": "tuple[]",
+          "internalType": "struct KeelRecoveryGroups.Signature[]",
+          "components": [
+            {
+              "name": "signer",
+              "type": "address",
+              "internalType": "address"
+            },
+            {
+              "name": "signature",
+              "type": "bytes",
+              "internalType": "bytes"
+            }
+          ]
+        },
+        {
+          "name": "incomingApprovals",
+          "type": "tuple[]",
+          "internalType": "struct KeelRecoveryGroups.Signature[]",
+          "components": [
+            {
+              "name": "signer",
+              "type": "address",
+              "internalType": "address"
+            },
+            {
+              "name": "signature",
+              "type": "bytes",
+              "internalType": "bytes"
+            }
+          ]
+        }
+      ],
+      "outputs": [],
+      "stateMutability": "nonpayable"
+    },
+    {
+      "type": "function",
+      "name": "recoverGovernors",
+      "inputs": [
+        {
+          "name": "governors",
+          "type": "address[]",
+          "internalType": "address[]"
+        },
+        {
+          "name": "deadline",
+          "type": "uint64",
+          "internalType": "uint64"
+        },
+        {
+          "name": "approvals",
+          "type": "tuple[]",
+          "internalType": "struct KeelRecoveryGroups.Signature[]",
+          "components": [
+            {
+              "name": "signer",
+              "type": "address",
+              "internalType": "address"
+            },
+            {
+              "name": "signature",
+              "type": "bytes",
+              "internalType": "bytes"
+            }
+          ]
+        },
+        {
+          "name": "acceptances",
+          "type": "tuple[]",
+          "internalType": "struct KeelRecoveryGroups.Signature[]",
+          "components": [
+            {
+              "name": "signer",
+              "type": "address",
+              "internalType": "address"
+            },
+            {
+              "name": "signature",
+              "type": "bytes",
+              "internalType": "bytes"
+            }
+          ]
+        }
+      ],
+      "outputs": [],
+      "stateMutability": "nonpayable"
+    },
+    {
+      "type": "function",
+      "name": "recoveryGroups",
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "",
+          "type": "address",
+          "internalType": "contract KeelRecoveryGroups"
+        }
+      ],
+      "stateMutability": "view"
+    },
+    {
+      "type": "function",
+      "name": "upgradeWithBackup",
+      "inputs": [
+        {
+          "name": "implementation",
+          "type": "address",
+          "internalType": "address"
+        },
+        {
+          "name": "initializer",
+          "type": "bytes",
+          "internalType": "bytes"
+        },
+        {
+          "name": "deadline",
+          "type": "uint64",
+          "internalType": "uint64"
+        },
+        {
+          "name": "approvals",
+          "type": "tuple[]",
+          "internalType": "struct KeelRecoveryGroups.Signature[]",
+          "components": [
+            {
+              "name": "signer",
+              "type": "address",
+              "internalType": "address"
+            },
+            {
+              "name": "signature",
+              "type": "bytes",
+              "internalType": "bytes"
+            }
+          ]
+        }
+      ],
+      "outputs": [],
+      "stateMutability": "nonpayable"
+    },
+    {
       "type": "event",
       "name": "Upgraded",
       "inputs": [
@@ -6097,6 +6272,46 @@ export const ABIS = {
     {
       "type": "error",
       "name": "FailedCall",
+      "inputs": []
+    },
+    {
+      "type": "error",
+      "name": "InvalidRecoveryGroup",
+      "inputs": []
+    },
+    {
+      "type": "error",
+      "name": "InvalidRecoveryRoster",
+      "inputs": []
+    },
+    {
+      "type": "error",
+      "name": "InvalidRecoverySignatures",
+      "inputs": []
+    },
+    {
+      "type": "error",
+      "name": "RecoveryExpired",
+      "inputs": []
+    },
+    {
+      "type": "error",
+      "name": "RecoveryLocked",
+      "inputs": []
+    },
+    {
+      "type": "error",
+      "name": "RecoveryNotConfigured",
+      "inputs": []
+    },
+    {
+      "type": "error",
+      "name": "RecoveryRevisionMismatch",
+      "inputs": []
+    },
+    {
+      "type": "error",
+      "name": "ReentrancyGuardReentrantCall",
       "inputs": []
     }
   ],
@@ -6687,6 +6902,175 @@ export const ABIS = {
       "type": "error",
       "name": "ZeroAddress",
       "inputs": []
+    }
+  ],
+  "KeelManagerRecovery": [
+    {
+      "type": "function",
+      "name": "restore",
+      "inputs": [
+        {
+          "name": "governors",
+          "type": "address[]",
+          "internalType": "address[]"
+        }
+      ],
+      "outputs": [],
+      "stateMutability": "nonpayable"
+    },
+    {
+      "type": "event",
+      "name": "ManagerRecovered",
+      "inputs": [
+        {
+          "name": "governanceEpoch",
+          "type": "uint64",
+          "indexed": false,
+          "internalType": "uint64"
+        },
+        {
+          "name": "recoveryEpoch",
+          "type": "uint64",
+          "indexed": false,
+          "internalType": "uint64"
+        },
+        {
+          "name": "governors",
+          "type": "address[]",
+          "indexed": false,
+          "internalType": "address[]"
+        }
+      ],
+      "anonymous": false
+    },
+    {
+      "type": "error",
+      "name": "InvalidRecoveryGovernors",
+      "inputs": []
+    }
+  ],
+  "KeelManagerRpcPolicy": [
+    {
+      "type": "function",
+      "name": "configureRpcHostList",
+      "inputs": [
+        {
+          "name": "hosts",
+          "type": "string[]",
+          "internalType": "string[]"
+        },
+        {
+          "name": "expectedRevision",
+          "type": "uint64",
+          "internalType": "uint64"
+        }
+      ],
+      "outputs": [],
+      "stateMutability": "nonpayable"
+    },
+    {
+      "type": "function",
+      "name": "preimage",
+      "inputs": [
+        {
+          "name": "hosts",
+          "type": "string[]",
+          "internalType": "string[]"
+        },
+        {
+          "name": "revision",
+          "type": "uint64",
+          "internalType": "uint64"
+        },
+        {
+          "name": "epoch",
+          "type": "uint64",
+          "internalType": "uint64"
+        },
+        {
+          "name": "domain",
+          "type": "string",
+          "internalType": "string"
+        }
+      ],
+      "outputs": [
+        {
+          "name": "result",
+          "type": "bytes",
+          "internalType": "bytes"
+        }
+      ],
+      "stateMutability": "pure"
+    },
+    {
+      "type": "function",
+      "name": "validate",
+      "inputs": [
+        {
+          "name": "hosts",
+          "type": "string[]",
+          "internalType": "string[]"
+        },
+        {
+          "name": "maximumBytes",
+          "type": "uint256",
+          "internalType": "uint256"
+        }
+      ],
+      "outputs": [],
+      "stateMutability": "pure"
+    },
+    {
+      "type": "event",
+      "name": "RpcHostListConfigured",
+      "inputs": [
+        {
+          "name": "digest",
+          "type": "bytes32",
+          "indexed": true,
+          "internalType": "bytes32"
+        },
+        {
+          "name": "revision",
+          "type": "uint64",
+          "indexed": false,
+          "internalType": "uint64"
+        },
+        {
+          "name": "epoch",
+          "type": "uint64",
+          "indexed": false,
+          "internalType": "uint64"
+        },
+        {
+          "name": "count",
+          "type": "uint256",
+          "indexed": false,
+          "internalType": "uint256"
+        }
+      ],
+      "anonymous": false
+    },
+    {
+      "type": "error",
+      "name": "InvalidRpcHostList",
+      "inputs": []
+    },
+    {
+      "type": "error",
+      "name": "RpcHostListRevisionMismatch",
+      "inputs": [
+        {
+          "name": "expected",
+          "type": "uint64",
+          "internalType": "uint64"
+        },
+        {
+          "name": "actual",
+          "type": "uint64",
+          "internalType": "uint64"
+        }
+      ]
     }
   ]
 } as const;

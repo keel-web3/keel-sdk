@@ -33,7 +33,9 @@ export const MODULES = [
     "title": "Kernel",
     "summary": "Admin/access primitives and encoding helpers every other module is allowed to import.",
     "deps": [],
-    "devDeps": [],
+    "devDeps": [
+      "keel-artifacts"
+    ],
     "contracts": [
       "SafeAdminAccessControl.sol",
       "libraries/JsonEscape.sol",
@@ -47,7 +49,11 @@ export const MODULES = [
       "KeelLocalPause.sol",
       "libraries/KeelPause.sol",
       "libraries/KeelTokenURIEnvelope.sol",
-      "interfaces/IKeelGovernanceErrors.sol"
+      "interfaces/IKeelGovernanceErrors.sol",
+      "interfaces/IKeelAccessGroupErrors.sol",
+      "interfaces/IKeelAccessGroupEvents.sol",
+      "KeelRecoveryGroups.sol",
+      "interfaces/IKeelRecoveryErrors.sol"
     ]
   },
   {
@@ -121,7 +127,9 @@ export const MODULES = [
       "interfaces/IKeelArtifactRegistry.sol",
       "interfaces/IKeelManager.sol",
       "interfaces/IKeelArtifactRevisionPolicy.sol",
-      "interfaces/IKeelHarnessRegistry.sol"
+      "interfaces/IKeelHarnessRegistry.sol",
+      "KeelManagerRecovery.sol",
+      "KeelManagerRpcPolicy.sol"
     ]
   },
   {

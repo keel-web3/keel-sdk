@@ -66,3 +66,5 @@ export * from "./admin-pauses.js";
 export * from "./hold-events.js";
 
 export * from "./hold-errors.js";
+
+export * from "./recovery.js";

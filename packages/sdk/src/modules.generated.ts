@@ -70,11 +70,16 @@ export const KEEL_MODULES: readonly KeelModule[] = [
       "KeelLocalPause.sol",
       "libraries/KeelPause.sol",
       "libraries/KeelTokenURIEnvelope.sol",
-      "interfaces/IKeelGovernanceErrors.sol"
+      "interfaces/IKeelGovernanceErrors.sol",
+      "interfaces/IKeelAccessGroupErrors.sol",
+      "interfaces/IKeelAccessGroupEvents.sol",
+      "KeelRecoveryGroups.sol",
+      "interfaces/IKeelRecoveryErrors.sol"
     ],
     "deployable": [
       "KeelFeeTreasury",
-      "KeelAccessGroups"
+      "KeelAccessGroups",
+      "KeelRecoveryGroups"
     ]
   },
   {
@@ -157,7 +162,9 @@ export const KEEL_MODULES: readonly KeelModule[] = [
       "interfaces/IKeelArtifactRegistry.sol",
       "interfaces/IKeelManager.sol",
       "interfaces/IKeelArtifactRevisionPolicy.sol",
-      "interfaces/IKeelHarnessRegistry.sol"
+      "interfaces/IKeelHarnessRegistry.sol",
+      "KeelManagerRecovery.sol",
+      "KeelManagerRpcPolicy.sol"
     ],
     "deployable": [
       "KeelArtifactRegistry",
@@ -165,7 +172,9 @@ export const KEEL_MODULES: readonly KeelModule[] = [
       "KeelLinkRegistry",
       "KeelManager",
       "KeelManagerProxy",
-      "KeelSeedRegistry"
+      "KeelSeedRegistry",
+      "KeelManagerRecovery",
+      "KeelManagerRpcPolicy"
     ]
   },
   {

@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {decodeFunctionData,parseAbi,zeroAddress,hashTypedData} from 'viem';
-import {buildKeelGroupConfiguration,prepareKeelGroupExecution,buildKeelGroupExecution,buildKeelGroupPayout,prepareKeelTreasuryPayout,keelDefaultGroups} from '../packages/sdk/dist/treasury.js';
+import {buildKeelGroupConfiguration,buildKeelGroupMemberPolicy,decodeKeelGroupMetadata,prepareKeelGroupExecution,buildKeelGroupExecution,buildKeelGroupPayout,prepareKeelTreasuryPayout,keelDefaultGroups} from '../packages/sdk/dist/treasury.js';
 import {keelAccessGroupsAbi,keelFeeTreasuryAbi} from '../packages/sdk/dist/abi.js';
 const treasury='0x0000000000000000000000000000000000001000',groups='0x0000000000000000000000000000000000002000',wallet='0x0000000000000000000000000000000000003000',manager='0x0000000000000000000000000000000000004000';
 const members=[5,6,7].map(n=>'0x'+String(n).padStart(40,'0'));
@@ -54,4 +54,38 @@ test('group execution obeys both manager policy and group capability',async()=>{
  for(const overrides of [{accountTier:1},{executionPolicy:{maxValue:2n,minimumTier:3,enabled:true}},{executionPolicy:{maxValue:5n,minimumTier:3,enabled:false}}])
  await assert.rejects(prepareKeelGroupExecution({client:client(overrides),groups,groupId:keelDefaultGroups.operations,action}),/manager does not permit/);
  await assert.rejects(prepareKeelGroupExecution({client:client({hasCapability:false}),groups,groupId:keelDefaultGroups.operations,action}),/cannot approve/);
+});
+
+
+test('member admission policy is mutable and builders do not pin the old ceiling',()=>{
+ const roster=Array.from({length:64},(_,i)=>'0x'+(i+1).toString(16).padStart(40,'0'));
+ assert(buildKeelGroupConfiguration(groups,keelDefaultGroups.treasury,roster,1n,true,64).data);
+ assert(buildKeelGroupConfiguration(groups,keelDefaultGroups.treasury,roster,1n).data);
+ assert.throws(()=>buildKeelGroupConfiguration(groups,keelDefaultGroups.treasury,roster,1n,true,32),/policy/);
+ const action=buildKeelGroupMemberPolicy(groups,64,2n);
+ assert.deepEqual(decodeFunctionData({abi:parseAbi(keelAccessGroupsAbi),data:action.data}).args,[64,2n]);
+ for(const maximum of [0,2,3.5,NaN,2**32]) assert.throws(()=>buildKeelGroupMemberPolicy(groups,maximum,1n),/uint32/);
+});
+
+test('packed roster metadata retains every flag and the full uint64 revision',()=>{
+ const hex=word=>'0x'+word.toString(16).padStart(64,'0');
+ for(const revision of [0n,1n,(1n<<64n)-1n]) for(const quorumActive of [false,true]) for(const enabled of [false,true]) {
+  const word=revision|(quorumActive?1n<<64n:0n)|(enabled?1n<<65n:0n);
+  assert.deepEqual(decodeKeelGroupMetadata(hex(word)),{revision,quorumActive,enabled});
+ }
+ assert.throws(()=>decodeKeelGroupMetadata(hex(1n<<66n)),/Unknown/);
+ assert.throws(()=>decodeKeelGroupMetadata('0x01'),/bytes32/);
+});
+
+test('browser group ABI matches packaged compiled inputs, outputs, and event indexing',async()=>{
+ const {ABIS}=await import('../packages/sdk/dist/abis/keel-kernel.generated.js');
+ const type=item=>item.type.startsWith('tuple')?'('+item.components.map(type).join(',')+')'+item.type.slice(5):item.type;
+ const key=item=>item.type+':'+(item.name??'')+'('+(item.inputs??[]).map(type).join(',')+')';
+ for(const item of parseAbi(keelAccessGroupsAbi)) {
+  const compiled=ABIS.KeelAccessGroups.find(candidate=>key(candidate)===key(item));
+  assert(compiled,`Compiled ABI missing ${key(item)}`);
+  assert.deepEqual((compiled.outputs??[]).map(type),(item.outputs??[]).map(type));
+  assert.equal(compiled.stateMutability,item.stateMutability);
+  if(item.type==='event') assert.deepEqual(compiled.inputs.map(x=>Boolean(x.indexed)),item.inputs.map(x=>Boolean(x.indexed)));
+ }
 });
