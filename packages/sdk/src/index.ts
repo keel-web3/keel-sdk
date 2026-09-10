@@ -56,3 +56,13 @@ export * from "./tezos-modules.generated.js";
 export * from "./network-inspection.js";
 
 export { createKeelNativeObjectPlan, type KeelNativeObjectPlan } from "./native-publication.js";
+
+export * from "./hold-publication.js";
+
+export * from "./treasury.js";
+
+export * from "./admin-pauses.js";
+
+export * from "./hold-events.js";
+
+export * from "./hold-errors.js";

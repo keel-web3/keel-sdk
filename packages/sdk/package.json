@@ -81,6 +81,30 @@
     "./creative-runtime-catalog": {
       "types": "./dist/creative-runtime-catalog.d.ts",
       "import": "./dist/creative-runtime-catalog.js"
+    },
+    "./hold-publication": {
+      "types": "./dist/hold-publication.d.ts",
+      "import": "./dist/hold-publication.js"
+    },
+    "./hold-errors": {
+      "types": "./dist/hold-errors.d.ts",
+      "import": "./dist/hold-errors.js"
+    },
+    "./hold-events": {
+      "types": "./dist/hold-events.d.ts",
+      "import": "./dist/hold-events.js"
+    },
+    "./native-publication": {
+      "types": "./dist/native-publication.d.ts",
+      "import": "./dist/native-publication.js"
+    },
+    "./treasury": {
+      "types": "./dist/treasury.d.ts",
+      "import": "./dist/treasury.js"
+    },
+    "./admin-pauses": {
+      "types": "./dist/admin-pauses.d.ts",
+      "import": "./dist/admin-pauses.js"
     }
   },
   "files": [

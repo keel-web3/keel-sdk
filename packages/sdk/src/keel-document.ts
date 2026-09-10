@@ -324,8 +324,8 @@ export async function createKeelChunkPlan(
 ): Promise<KeelChunkPlan> {
   if (bytes.byteLength === 0) throw new RangeError("Keel objects cannot be empty.");
   const maxChunkBytes = options.maxChunkBytes ?? 23_000;
-  if (!Number.isSafeInteger(maxChunkBytes) || maxChunkBytes <= 0 || maxChunkBytes > 23_000) {
-    throw new RangeError("maxChunkBytes must be between 1 and 23000.");
+  if (!Number.isSafeInteger(maxChunkBytes) || maxChunkBytes <= 0 || maxChunkBytes > 0xffff_ffff) {
+    throw new RangeError("maxChunkBytes must fit the selected Hold uint32 policy.");
   }
   const rawChunks = chunkBytes(bytes, maxChunkBytes);
   const chunks = await Promise.all(rawChunks.map(async (chunk) => ({

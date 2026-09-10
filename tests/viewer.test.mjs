@@ -128,6 +128,29 @@ test("viewer decodes the one canonical Inline graph as its HTML entrypoint", asy
   assert.doesNotMatch(sandbox.html, /keel-context=/u);
 });
 
+test("viewer decodes a compact percent Inline graph without an inner Base64 document", async () => {
+  const source = '<!doctype html><html><body><main data-inline="escaped">Inline</main></body></html>';
+  const escaped = encodeURIComponent(source);
+  const graph = Buffer.from(escaped).toString("base64");
+  const entry = await inline(
+    "keel-inline-percent-fragment",
+    "entrypoint",
+    "application/vnd.keel.token-uri-percent-fragment",
+    graph,
+    true,
+  );
+  const image = await inline("image", "fallback", "image/svg+xml", '<svg xmlns="http://www.w3.org/2000/svg"/>');
+  const value = baseManifest([entry, image], {
+    id: "inline-percent-viewer",
+    name: "Inline percent viewer",
+    entrypoint: { resource: entry.id, mode: "html" },
+    fallback: { image: image.id, animation: entry.id },
+  });
+  const sandbox = createSandboxDocument(await resolveArtifact(value));
+  assert.match(sandbox.html, /data-inline="escaped"/u);
+  assert.doesNotMatch(sandbox.html, /JTNDSA|data:text\/html;base64/u);
+});
+
 test("stake objects gate the staked entrypoint and expose global/token counters", async () => {
   const value = await manifest();
   const stakedViewer = await inline("staked-viewer", "entrypoint", "text/html", "<main data-staked>map</main>", true);
@@ -812,14 +835,14 @@ test("recursive KeelHold reader verifies leaf and composite objects", async () =
 });
 
 test("recursive KeelHold reader falls back to verified immutable descriptors", async () => {
-  const payload = new TextEncoder().encode("legacy-pointer-reader");
+  const payload = new TextEncoder().encode("keel-descriptor-reader");
   const integrity = await createIntegrity(payload);
   const objectId = `0x${"44".repeat(32)}`;
   const descriptorPointer = `0x${"cc".repeat(20)}`;
   const carrierPointer = `0x${"dd".repeat(20)}`;
   const media = new TextEncoder().encode("text/plain");
   const descriptor = Buffer.alloc(93 + media.length + 20);
-  descriptor.set(Buffer.from("4f434133", "hex"), 0);
+  descriptor.set(Buffer.from("4b45454c", "hex"), 0);
   descriptor[4] = 1;
   descriptor.writeUInt32BE(1, 8);
   descriptor.writeBigUInt64BE(BigInt(payload.length), 12);
@@ -841,7 +864,7 @@ test("recursive KeelHold reader falls back to verified immutable descriptors", a
         composite: false,
       };
     },
-    async getObjectSlugPointers() { throw new Error("legacy selector unavailable"); },
+    async getObjectSlugPointers() { throw new Error("pointer page unavailable"); },
     async getObjectPartIds() { throw new Error("not composite"); },
     async getCode({ address }) {
       return address === descriptorPointer
@@ -853,7 +876,24 @@ test("recursive KeelHold reader falls back to verified immutable descriptors", a
     { chainId: 11155111, store: "0x1111111111111111111111111111111111111111", objectId },
     new AbortController().signal,
   );
-  assert.equal(new TextDecoder().decode(result), "legacy-pointer-reader");
+  assert.equal(new TextDecoder().decode(result), "keel-descriptor-reader");
+  for (const tag of ["53545233", "4f434133", "00000000"]) {
+    descriptor.set(Buffer.from(tag, "hex"), 0);
+    await assert.rejects(reader(
+      {chainId:11155111,store:"0x1111111111111111111111111111111111111111",objectId},
+      new AbortController().signal,
+    ), /Unsupported KeelHold descriptor format/);
+  }
+  descriptor.set(Buffer.from("4b45454c", "hex"), 0);
+  for (const offset of [4,5,6,7]) {
+    const saved=descriptor[offset];descriptor[offset]=255;
+    await assert.rejects(reader(
+      {chainId:11155111,store:"0x1111111111111111111111111111111111111111",objectId},
+      new AbortController().signal,
+    ), /descriptor (format|metadata mismatch)/);
+    descriptor[offset]=saved;
+  }
+
 });
 
 test("manifest loader verifies RFC 8785 JSON and resolves relative resources", async () => {
@@ -2385,4 +2425,15 @@ test("plugin frame parser accepts only symbolic session-bound market intents", (
     }),
     /proposal/i,
   );
+});
+
+test("editor preview decodes the default saver without adding a Base64 document", async () => {
+  const source = '<!doctype html><html><body><main data-inline="raw">雪 100% # + / =</main></body></html>';
+  const entry = await inline("raw-inline", "entrypoint", "application/vnd.keel.token-uri-raw-percent-fragment", encodeURIComponent(encodeURIComponent(source)), true);
+  const image = await inline("image", "fallback", "image/svg+xml", '<svg xmlns="http://www.w3.org/2000/svg"/>');
+  const value = baseManifest([entry, image], { id: "raw-inline-viewer", name: "Compact viewer",
+    entrypoint: { resource: entry.id, mode: "html" }, fallback: { image: image.id, animation: entry.id } });
+  const sandbox = createSandboxDocument(await resolveArtifact(value));
+  assert.match(sandbox.html, /data-inline="raw">雪 100% # \+ \/ =/u);
+  assert.doesNotMatch(sandbox.html, /%253C!doctype|data:text\/html;base64/u);
 });

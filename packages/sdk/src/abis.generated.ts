@@ -2,12 +2,13 @@
 
 /** Contracts with a recorded ABI, per unit. */
 export const ABI_CONTRACTS: Readonly<Record<string, readonly string[]>> = {
+  "keel-kernel": ["KeelFeeTreasury", "KeelAccessGroups"],
   "keel-hold": ["Ingot","KeelHold","KeelIndex"],
   "keel-artifacts": ["KeelArtifactRegistry","KeelHarnessRegistry","KeelLinkRegistry","KeelManager","KeelManagerProxy","KeelSeedRegistry"],
   "keel-graph": ["KeelAssetTagRegistry","KeelGraphRegistry","KeelLibraryRegistry","KeelModuleReviewRegistry","KeelPluginRegistry"],
-  "keel-harness": ["KeelHarnessBuilder"],
+  "keel-harness": ["KeelHarnessBuilder", "KeelObjectURIBuilder", "KeelPercentTokenURIBuilder", "KeelRawTokenURIBuilder"],
   "keel-presentation": ["KeelPresentationStateRegistry","KeelVisualStateLedger"],
-  "keel-die": ["KEEL721","KEEL721Deployer","KeelArtifactTokenRenderer","KeelCreator1155","KeelCreator721","KeelCreator721A","KeelCreatorFactory","KeelFactory","KeelFactorySepolia","KeelShared1155"],
+  "keel-die": ["KEEL721", "KEEL721Deployer", "KeelArtifactTokenRenderer", "KeelCreator1155", "KeelCreator721", "KeelCreator721A", "KeelCreatorFactory", "KeelFactory", "KeelFactorySepolia", "KeelRawPrepared721", "KeelShared1155"],
   "keel-creator-identity": ["KeelAttributionRegistry","KeelCreatorCommitmentRegistry","KeelCreatorProfileRegistry"],
   "keel-mint-access": ["FrayAuctionIssuer","KeelMintGate","KeelMintRouteRegistry","OneMintController","OpenOneMintController"],
   "keel-equipment": ["KeelEquipmentDescriptorValidator","KeelEquipmentDistributor","KeelEquipmentInventory","KeelEquipmentInventoryReader","KeelEquipmentReservationEngine","KeelOneUseDuplicator"],
@@ -27,6 +28,7 @@ export const ABI_CONTRACTS: Readonly<Record<string, readonly string[]>> = {
 
 /** Lazy loaders — each unit's ABIs are a separate chunk. */
 export const ABI_LOADERS: Readonly<Record<string, () => Promise<{ ABIS: Record<string, unknown> }>>> = {
+  "keel-kernel": () => import("./abis/keel-kernel.generated.js"),
   "keel-hold": () => import("./abis/keel-hold.generated.js"),
   "keel-artifacts": () => import("./abis/keel-artifacts.generated.js"),
   "keel-graph": () => import("./abis/keel-graph.generated.js"),

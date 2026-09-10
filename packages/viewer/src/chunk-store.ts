@@ -1,4 +1,7 @@
 import {
+  KEEL_HOLD_DESCRIPTOR_MAGIC,
+  KEEL_HOLD_DESCRIPTOR_VERSION,
+  KEEL_HOLD_DESCRIPTOR_HEADER_BYTES,
   concatBytes,
   toBufferSource,
   verifyIntegrity,
@@ -164,18 +167,18 @@ async function descriptorReferences(
   const pointer = record.descriptorPointer;
   if (pointer === undefined) throw new Error("KeelHold does not expose descriptor fallback data.");
   const code = await context.client.getCode({ chainId: request.chainId, address: pointer }, context.signal);
-  if (code.byteLength < 94 || code[0] !== 0) throw new Error(`Invalid KeelHold descriptor bytecode at ${pointer}.`);
+  if (code.byteLength < KEEL_HOLD_DESCRIPTOR_HEADER_BYTES + 1 || code[0] !== 0) throw new Error(`Invalid KeelHold descriptor bytecode at ${pointer}.`);
   const descriptor = code.subarray(1);
-  // OCA3 is the original deployed v1 descriptor magic; STR3 renamed the same
-  // immutable wire layout. Both must remain readable or existing KEEL objects
-  // would be orphaned by the SDK migration.
   const magic = bytesHex(descriptor.subarray(0, 4));
-  if ((magic !== "0x4f434133" && magic !== "0x53545233") || descriptor[4] !== 1) {
+  if (magic !== KEEL_HOLD_DESCRIPTOR_MAGIC || descriptor[4] !== KEEL_HOLD_DESCRIPTOR_VERSION) {
     throw new Error(`Unsupported KeelHold descriptor format at ${pointer}.`);
   }
   const composite = descriptor[5] === 1;
   const count = safeNumber(record.chunkCount, "object child count");
   if ((descriptor[5] !== 0 && descriptor[5] !== 1)
+    || descriptor[7] !== 0
+    || descriptor[6] === undefined || descriptor[6] > 3
+    || (composite && descriptor[6] !== 0)
     || composite !== record.composite
     || descriptor[6] !== safeNumber(record.compression, "compression")
     || readBigEndian(descriptor, 8, 4) !== BigInt(count)
@@ -187,7 +190,7 @@ async function descriptorReferences(
   const mediaLength = descriptor[92];
   if (mediaLength === undefined) throw new Error(`Truncated KeelHold descriptor at ${pointer}.`);
   const width = composite ? 32 : 20;
-  const referencesOffset = 93 + mediaLength;
+  const referencesOffset = KEEL_HOLD_DESCRIPTOR_HEADER_BYTES + mediaLength;
   if (descriptor.byteLength !== referencesOffset + (count * width)) {
     throw new Error(`KeelHold descriptor length mismatch at ${pointer}.`);
   }

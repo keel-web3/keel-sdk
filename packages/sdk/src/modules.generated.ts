@@ -61,9 +61,21 @@ export const KEEL_MODULES: readonly KeelModule[] = [
       "SafeAdminAccessControl.sol",
       "libraries/JsonEscape.sol",
       "libraries/KeelCodeIdentity.sol",
-      "libraries/KeelCollectionFreezeValidation.sol"
+      "libraries/KeelCollectionFreezeValidation.sol",
+      "libraries/KeelUriEscape.sol",
+      "KeelFeeTreasury.sol",
+      "libraries/KeelPlatformFees.sol",
+      "libraries/KeelGovernance.sol",
+      "KeelAccessGroups.sol",
+      "KeelLocalPause.sol",
+      "libraries/KeelPause.sol",
+      "libraries/KeelTokenURIEnvelope.sol",
+      "interfaces/IKeelGovernanceErrors.sol"
     ],
-    "deployable": []
+    "deployable": [
+      "KeelFeeTreasury",
+      "KeelAccessGroups"
+    ]
   },
   {
     "id": "keel-codecs",
@@ -98,13 +110,23 @@ export const KEEL_MODULES: readonly KeelModule[] = [
     "summary": "Immutable content-addressed chunk storage and the artifact registry that activates revisions.",
     "version": "0.3.0",
     "repo": "keel-web3/keel-hold",
-    "deps": [],
+    "deps": [
+      "keel-kernel"
+    ],
     "contracts": [
       "KeelHold.sol",
       "Ingot.sol",
       "KeelIndex.sol",
       "interfaces/IKeelHold.sol",
-      "interfaces/IKeelIndex.sol"
+      "interfaces/IKeelHoldLimits.sol",
+      "interfaces/IKeelHoldSeal.sol",
+      "libraries/KeelSealValidation.sol",
+      "libraries/KeelCastDispatch.sol",
+      "interfaces/IKeelIndex.sol",
+      "interfaces/IKeelHoldHarness.sol",
+      "interfaces/IKeelHoldEvents.sol",
+      "libraries/KeelHoldMetadata.sol",
+      "interfaces/IKeelHoldErrors.sol"
     ],
     "deployable": [
       "Ingot",
@@ -122,7 +144,8 @@ export const KEEL_MODULES: readonly KeelModule[] = [
     "version": "0.3.0",
     "repo": "keel-web3/keel-artifacts",
     "deps": [
-      "keel-hold"
+      "keel-hold",
+      "keel-kernel"
     ],
     "contracts": [
       "KeelArtifactRegistry.sol",
@@ -151,7 +174,7 @@ export const KEEL_MODULES: readonly KeelModule[] = [
     "title": "Graph trust lattice",
     "group": "core",
     "visibility": "private",
-    "summary": "Graph/plugin/library/module registries — the on-chain trust lattice the runtime re-derives against.",
+    "summary": "Graph/plugin/library/module registries \u2014 the on-chain trust lattice the runtime re-derives against.",
     "version": "0.3.0",
     "repo": "keel-web3/keel-graph",
     "deps": [],
@@ -182,17 +205,27 @@ export const KEEL_MODULES: readonly KeelModule[] = [
     "version": "0.3.0",
     "repo": "keel-web3/keel-harness",
     "deps": [
-      "keel-hold"
+      "keel-hold",
+      "keel-kernel"
     ],
     "contracts": [
       "KeelHarnessBuilder.sol",
+      "KeelPercentTokenURIBuilder.sol",
       "interfaces/IKeelHarnessBuilder.sol",
+      "interfaces/IKeelPercentTokenURIBuilder.sol",
       "libraries/KeelHarnessContextDispatch.sol",
       "libraries/KeelPreEncodedTokenURI.sol",
-      "libraries/KeelPreparedTokenURI.sol"
+      "libraries/KeelPreparedTokenURI.sol",
+      "KeelObjectURIBuilder.sol",
+      "KeelRawTokenURIBuilder.sol",
+      "interfaces/IKeelObjectURIBuilder.sol",
+      "interfaces/IKeelRawTokenURIBuilder.sol"
     ],
     "deployable": [
-      "KeelHarnessBuilder"
+      "KeelHarnessBuilder",
+      "KeelPercentTokenURIBuilder",
+      "KeelObjectURIBuilder",
+      "KeelRawTokenURIBuilder"
     ]
   },
   {
@@ -228,7 +261,8 @@ export const KEEL_MODULES: readonly KeelModule[] = [
       "keel-kernel",
       "keel-harness",
       "keel-presentation",
-      "keel-artifacts"
+      "keel-artifacts",
+      "keel-hold"
     ],
     "contracts": [
       "KEEL721.sol",
@@ -249,7 +283,8 @@ export const KEEL_MODULES: readonly KeelModule[] = [
       "interfaces/IKeelCampaignAuthorizer.sol",
       "interfaces/IKeelItemMintTarget.sol",
       "interfaces/IKeelTokenRenderer.sol",
-      "interfaces/IKeelCreatorDirectory.sol"
+      "interfaces/IKeelCreatorDirectory.sol",
+      "KeelRawPrepared721.sol"
     ],
     "deployable": [
       "KEEL721",
@@ -261,7 +296,8 @@ export const KEEL_MODULES: readonly KeelModule[] = [
       "KeelCreatorFactory",
       "KeelFactory",
       "KeelFactorySepolia",
-      "KeelShared1155"
+      "KeelShared1155",
+      "KeelRawPrepared721"
     ]
   },
   {
@@ -274,7 +310,8 @@ export const KEEL_MODULES: readonly KeelModule[] = [
     "version": "0.3.0",
     "repo": "keel-web3/keel-creator-identity",
     "deps": [
-      "keel-artifacts"
+      "keel-artifacts",
+      "keel-kernel"
     ],
     "contracts": [
       "KeelCreatorProfileRegistry.sol",
@@ -365,7 +402,8 @@ export const KEEL_MODULES: readonly KeelModule[] = [
     "version": "0.3.0",
     "repo": "keel-web3/keel-market",
     "deps": [
-      "keel-graph"
+      "keel-graph",
+      "keel-kernel"
     ],
     "contracts": [
       "KeelMarket.sol"
@@ -474,7 +512,8 @@ export const KEEL_MODULES: readonly KeelModule[] = [
     "repo": "keel-web3/keel-ip-control",
     "deps": [
       "keel-hold",
-      "keel-artifacts"
+      "keel-artifacts",
+      "keel-kernel"
     ],
     "contracts": [
       "KeelIPControl.sol",
@@ -539,7 +578,8 @@ export const KEEL_MODULES: readonly KeelModule[] = [
     "repo": "keel-web3/keel-cross-chain-mint",
     "deps": [
       "keel-kernel",
-      "keel-mint-access"
+      "keel-mint-access",
+      "keel-hold"
     ],
     "contracts": [
       "KeelCrossChainMintBridge.sol",

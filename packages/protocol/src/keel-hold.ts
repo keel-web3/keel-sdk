@@ -1,5 +1,10 @@
 import type { Compression, Hex, Integrity } from "./types.js";
 
+// EVM descriptor header, excluding the carrier's leading STOP byte.
+export const KEEL_HOLD_DESCRIPTOR_MAGIC = "0x4b45454c" as const;
+export const KEEL_HOLD_DESCRIPTOR_VERSION = 1 as const;
+export const KEEL_HOLD_DESCRIPTOR_HEADER_BYTES = 93 as const;
+
 export const KEEL_STORAGE_PROTOCOL = "keel-hold@1" as const;
 export const KEEL_DIRECTORY_PROTOCOL = "keel-directory@1" as const;
 export const KEEL_MEDIA_DERIVATIVE_PROTOCOL = "keel-media-derivative@1" as const;
