@@ -128,9 +128,9 @@ export async function prepareKeelGroupExecution(input: {
   const blockNumber=block.number;
   const context=await groupContext(input.client,groups,input.groupId,target,selector,blockNumber);
   const {members,threshold,quorumActive,manager}=context;
-  const policyAbi=parseAbi(["function executionPolicy(address target,bytes4 selector) view returns ((uint96 maxValue,uint8 minimumTier,bool enabled))","function accountTier(address account) view returns (uint8)"]);
+  const policyAbi=parseAbi(["function executionPolicyState(address target,bytes4 selector) view returns ((uint96 maxValue,uint8 minimumTier,bool enabled,uint256 nonce))","function accountTier(address account) view returns (uint8)"]);
   const [policy,tier]=await Promise.all([
-    input.client.readContract({address:manager,abi:policyAbi,functionName:"executionPolicy",args:[target,selector],blockNumber}),
+    input.client.readContract({address:manager,abi:policyAbi,functionName:"executionPolicyState",args:[target,selector],blockNumber}),
     input.client.readContract({address:manager,abi:policyAbi,functionName:"accountTier",args:[groups],blockNumber}),
   ]);
   if(!policy.enabled || (tier!==2 && tier!==3) || tier<policy.minimumTier || action.value>policy.maxValue)

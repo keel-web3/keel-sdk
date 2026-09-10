@@ -238,9 +238,11 @@ export async function prepareKeelRecoveryEnrollment(client: PublicClient, plan: 
     if (block.number === null || block.timestamp >= plan.deadline || await client.getChainId() !== plan.chainId)
         throw Error("Refresh the enrollment plan.");
     const manager = op.resourceKind === "manager" ? op.resource : await client.readContract({ address: op.resource, abi: groupsAbi, functionName: "manager", blockNumber: block.number });
-    const [members, threshold, nonce, epoch] = await Promise.all([
-        client.readContract({ address: manager, abi: managerAbi, functionName: "governors", blockNumber: block.number }), client.readContract({ address: manager, abi: managerAbi, functionName: "governanceThreshold", blockNumber: block.number }), client.readContract({ address: manager, abi: managerAbi, functionName: "governanceNonce", blockNumber: block.number }), client.readContract({ address: manager, abi: managerAbi, functionName: "governanceEpoch", blockNumber: block.number })
+    const [members, state] = await Promise.all([
+        client.readContract({ address: manager, abi: managerAbi, functionName: "governors", blockNumber: block.number }),
+        client.readContract({ address: manager, abi: managerAbi, functionName: "governanceState", blockNumber: block.number })
     ]);
+    const { threshold, nonce, epoch } = state;
     const typedData = { domain: { name: "Keel Manager", version: "1", chainId: plan.chainId, verifyingContract: manager }, types: governanceTypes, primaryType: "GovernanceAction", message: { target: call.target, value: call.value, dataHash: keccak256(call.data), nonce, deadline: plan.deadline, epoch } } as const;
     const digest = hashTypedData(typedData);
     const actual = await client.readContract({ address: manager, abi: managerAbi, functionName: "governanceActionDigest", args: [call, plan.deadline], blockNumber: block.number });

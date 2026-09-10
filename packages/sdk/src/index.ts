@@ -68,3 +68,6 @@ export * from "./hold-events.js";
 export * from "./hold-errors.js";
 
 export * from "./recovery.js";
+
+export * from "./manager-errors.js";
+export * from "./manager-events.js";

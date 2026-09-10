@@ -164,7 +164,15 @@ export const KEEL_MODULES: readonly KeelModule[] = [
       "interfaces/IKeelArtifactRevisionPolicy.sol",
       "interfaces/IKeelHarnessRegistry.sol",
       "KeelManagerRecovery.sol",
-      "KeelManagerRpcPolicy.sol"
+      "KeelManagerRpcPolicy.sol",
+      "interfaces/IKeelManagerErrors.sol",
+      "interfaces/IKeelManagerEvents.sol",
+      "interfaces/IKeelManagerRecoveryErrors.sol",
+      "interfaces/IKeelManagerRecoveryEvents.sol",
+      "interfaces/IKeelManagerRpcErrors.sol",
+      "interfaces/IKeelManagerRpcEvents.sol",
+      "interfaces/IKeelManagerTypes.sol",
+      "libraries/KeelManagerGovernorState.sol"
     ],
     "deployable": [
       "KeelArtifactRegistry",

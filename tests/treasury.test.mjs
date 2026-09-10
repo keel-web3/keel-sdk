@@ -6,7 +6,7 @@ import {keelAccessGroupsAbi,keelFeeTreasuryAbi} from '../packages/sdk/dist/abi.j
 const treasury='0x0000000000000000000000000000000000001000',groups='0x0000000000000000000000000000000000002000',wallet='0x0000000000000000000000000000000000003000',manager='0x0000000000000000000000000000000000004000';
 const members=[5,6,7].map(n=>'0x'+String(n).padStart(40,'0'));
 function client(overrides={}){
- const values={requireSystemsActive:undefined,accessGroups:groups,payoutWallet:wallet,withdrawalsUnlockAt:50n,payoutRevision:3n,nextCustomPayoutAt:0n,customPayoutLimit:10n,group:[members,2n,4n,2n,true,true],hasCapability:true,manager,governanceEpoch:1n,paused:false,accountTier:3,executionPolicy:{maxValue:5n,minimumTier:3,enabled:true},...overrides};
+ const values={requireSystemsActive:undefined,accessGroups:groups,payoutWallet:wallet,withdrawalsUnlockAt:50n,payoutRevision:3n,nextCustomPayoutAt:0n,customPayoutLimit:10n,group:[members,2n,4n,2n,true,true],hasCapability:true,manager,governanceEpoch:1n,paused:false,accountTier:3,executionPolicyState:{maxValue:5n,minimumTier:3,enabled:true},...overrides};
  return {getBlock:async()=>({number:17n,timestamp:100n}),getChainId:async()=>31337,readContract:async call=>{assert.equal(call.blockNumber,17n);if(!(call.functionName in values))throw Error(call.functionName);return values[call.functionName]}};
 }
 test('group configuration sorts members and rejects two or duplicate wallets',()=>{
@@ -51,7 +51,7 @@ test('group execution obeys both manager policy and group capability',async()=>{
  const call=buildKeelGroupExecution(plan,[{signer:members[0],signature:'0x12'},{signer:members[1],signature:'0x34'}]);
  assert.equal(call.target,groups);assert.equal(call.value,3n);
  const decoded=decodeFunctionData({abi:parseAbi(keelAccessGroupsAbi),data:call.data});assert.equal(decoded.functionName,'execute');assert.deepEqual(decoded.args[1],action);
- for(const overrides of [{accountTier:1},{executionPolicy:{maxValue:2n,minimumTier:3,enabled:true}},{executionPolicy:{maxValue:5n,minimumTier:3,enabled:false}}])
+ for(const overrides of [{accountTier:1},{executionPolicyState:{maxValue:2n,minimumTier:3,enabled:true}},{executionPolicyState:{maxValue:5n,minimumTier:3,enabled:false}}])
  await assert.rejects(prepareKeelGroupExecution({client:client(overrides),groups,groupId:keelDefaultGroups.operations,action}),/manager does not permit/);
  await assert.rejects(prepareKeelGroupExecution({client:client({hasCapability:false}),groups,groupId:keelDefaultGroups.operations,action}),/cannot approve/);
 });

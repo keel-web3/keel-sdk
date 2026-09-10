@@ -109,6 +109,14 @@
     "./recovery": {
       "types": "./dist/recovery.d.ts",
       "import": "./dist/recovery.js"
+    },
+    "./manager-errors": {
+      "types": "./dist/manager-errors.d.ts",
+      "import": "./dist/manager-errors.js"
+    },
+    "./manager-events": {
+      "types": "./dist/manager-events.d.ts",
+      "import": "./dist/manager-events.js"
     }
   },
   "files": [

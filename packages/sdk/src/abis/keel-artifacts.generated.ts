@@ -3587,7 +3587,7 @@ export const ABIS = {
         {
           "name": "",
           "type": "uint8",
-          "internalType": "enum KeelManager.AccessTier"
+          "internalType": "enum IKeelManagerTypes.AccessTier"
         }
       ],
       "stateMutability": "view"
@@ -3740,7 +3740,7 @@ export const ABIS = {
     },
     {
       "type": "function",
-      "name": "automationKeyGeneration",
+      "name": "automationKeyState",
       "inputs": [
         {
           "name": "signer",
@@ -3750,47 +3750,26 @@ export const ABIS = {
       ],
       "outputs": [
         {
-          "name": "",
-          "type": "uint256",
-          "internalType": "uint256"
-        }
-      ],
-      "stateMutability": "view"
-    },
-    {
-      "type": "function",
-      "name": "automationKeyValidUntil",
-      "inputs": [
-        {
-          "name": "signer",
-          "type": "address",
-          "internalType": "address"
-        }
-      ],
-      "outputs": [
-        {
-          "name": "",
-          "type": "uint64",
-          "internalType": "uint64"
-        }
-      ],
-      "stateMutability": "view"
-    },
-    {
-      "type": "function",
-      "name": "automationNonce",
-      "inputs": [
-        {
-          "name": "signer",
-          "type": "address",
-          "internalType": "address"
-        }
-      ],
-      "outputs": [
-        {
-          "name": "",
-          "type": "uint256",
-          "internalType": "uint256"
+          "name": "state",
+          "type": "tuple",
+          "internalType": "struct IKeelManagerTypes.AutomationKeyState",
+          "components": [
+            {
+              "name": "validUntil",
+              "type": "uint64",
+              "internalType": "uint64"
+            },
+            {
+              "name": "nonce",
+              "type": "uint256",
+              "internalType": "uint256"
+            },
+            {
+              "name": "generation",
+              "type": "uint256",
+              "internalType": "uint256"
+            }
+          ]
         }
       ],
       "stateMutability": "view"
@@ -3882,7 +3861,7 @@ export const ABIS = {
         {
           "name": "tier",
           "type": "uint8",
-          "internalType": "enum KeelManager.AccessTier"
+          "internalType": "enum IKeelManagerTypes.AccessTier"
         }
       ],
       "outputs": [],
@@ -3966,7 +3945,7 @@ export const ABIS = {
         {
           "name": "minimumTier",
           "type": "uint8",
-          "internalType": "enum KeelManager.AccessTier"
+          "internalType": "enum IKeelManagerTypes.AccessTier"
         },
         {
           "name": "maxValue",
@@ -4291,7 +4270,7 @@ export const ABIS = {
     },
     {
       "type": "function",
-      "name": "executionPolicy",
+      "name": "executionPolicyState",
       "inputs": [
         {
           "name": "target",
@@ -4306,9 +4285,9 @@ export const ABIS = {
       ],
       "outputs": [
         {
-          "name": "",
+          "name": "state",
           "type": "tuple",
-          "internalType": "struct KeelManager.ExecutionPolicy",
+          "internalType": "struct IKeelManagerTypes.ExecutionPolicyState",
           "components": [
             {
               "name": "maxValue",
@@ -4318,38 +4297,19 @@ export const ABIS = {
             {
               "name": "minimumTier",
               "type": "uint8",
-              "internalType": "enum KeelManager.AccessTier"
+              "internalType": "enum IKeelManagerTypes.AccessTier"
             },
             {
               "name": "enabled",
               "type": "bool",
               "internalType": "bool"
+            },
+            {
+              "name": "nonce",
+              "type": "uint256",
+              "internalType": "uint256"
             }
           ]
-        }
-      ],
-      "stateMutability": "view"
-    },
-    {
-      "type": "function",
-      "name": "executionPolicyNonce",
-      "inputs": [
-        {
-          "name": "target",
-          "type": "address",
-          "internalType": "address"
-        },
-        {
-          "name": "selector",
-          "type": "bytes4",
-          "internalType": "bytes4"
-        }
-      ],
-      "outputs": [
-        {
-          "name": "",
-          "type": "uint256",
-          "internalType": "uint256"
         }
       ],
       "stateMutability": "view"
@@ -4430,39 +4390,35 @@ export const ABIS = {
     },
     {
       "type": "function",
-      "name": "governanceNonce",
+      "name": "governanceState",
       "inputs": [],
       "outputs": [
         {
-          "name": "",
-          "type": "uint256",
-          "internalType": "uint256"
-        }
-      ],
-      "stateMutability": "view"
-    },
-    {
-      "type": "function",
-      "name": "governanceThreshold",
-      "inputs": [],
-      "outputs": [
-        {
-          "name": "",
-          "type": "uint256",
-          "internalType": "uint256"
-        }
-      ],
-      "stateMutability": "view"
-    },
-    {
-      "type": "function",
-      "name": "governorChangeNonce",
-      "inputs": [],
-      "outputs": [
-        {
-          "name": "",
-          "type": "uint64",
-          "internalType": "uint64"
+          "name": "state",
+          "type": "tuple",
+          "internalType": "struct IKeelManagerTypes.GovernanceState",
+          "components": [
+            {
+              "name": "threshold",
+              "type": "uint256",
+              "internalType": "uint256"
+            },
+            {
+              "name": "nonce",
+              "type": "uint256",
+              "internalType": "uint256"
+            },
+            {
+              "name": "epoch",
+              "type": "uint64",
+              "internalType": "uint64"
+            },
+            {
+              "name": "changeNonce",
+              "type": "uint64",
+              "internalType": "uint64"
+            }
+          ]
         }
       ],
       "stateMutability": "view"
@@ -5070,13 +5026,13 @@ export const ABIS = {
           "name": "previousTier",
           "type": "uint8",
           "indexed": true,
-          "internalType": "enum KeelManager.AccessTier"
+          "internalType": "enum IKeelManagerTypes.AccessTier"
         },
         {
           "name": "nextTier",
           "type": "uint8",
           "indexed": true,
-          "internalType": "enum KeelManager.AccessTier"
+          "internalType": "enum IKeelManagerTypes.AccessTier"
         }
       ],
       "anonymous": false
@@ -5236,7 +5192,7 @@ export const ABIS = {
           "name": "minimumTier",
           "type": "uint8",
           "indexed": false,
-          "internalType": "enum KeelManager.AccessTier"
+          "internalType": "enum IKeelManagerTypes.AccessTier"
         },
         {
           "name": "maxValue",
@@ -5534,13 +5490,13 @@ export const ABIS = {
         {
           "name": "revision",
           "type": "uint64",
-          "indexed": true,
+          "indexed": false,
           "internalType": "uint64"
         },
         {
           "name": "epoch",
           "type": "uint64",
-          "indexed": true,
+          "indexed": false,
           "internalType": "uint64"
         },
         {
@@ -5932,7 +5888,7 @@ export const ABIS = {
           "internalType": "uint64"
         },
         {
-          "name": "expected",
+          "name": "current",
           "type": "uint64",
           "internalType": "uint64"
         }
@@ -6226,6 +6182,31 @@ export const ABIS = {
     },
     {
       "type": "event",
+      "name": "ManagerRecovered",
+      "inputs": [
+        {
+          "name": "governanceEpoch",
+          "type": "uint64",
+          "indexed": false,
+          "internalType": "uint64"
+        },
+        {
+          "name": "recoveryEpoch",
+          "type": "uint64",
+          "indexed": false,
+          "internalType": "uint64"
+        },
+        {
+          "name": "governors",
+          "type": "address[]",
+          "indexed": false,
+          "internalType": "address[]"
+        }
+      ],
+      "anonymous": false
+    },
+    {
+      "type": "event",
       "name": "Upgraded",
       "inputs": [
         {
@@ -6272,6 +6253,11 @@ export const ABIS = {
     {
       "type": "error",
       "name": "FailedCall",
+      "inputs": []
+    },
+    {
+      "type": "error",
+      "name": "InvalidRecoveryGovernors",
       "inputs": []
     },
     {
@@ -7043,7 +7029,7 @@ export const ABIS = {
           "internalType": "uint64"
         },
         {
-          "name": "count",
+          "name": "hostCount",
           "type": "uint256",
           "indexed": false,
           "internalType": "uint256"
@@ -7061,12 +7047,12 @@ export const ABIS = {
       "name": "RpcHostListRevisionMismatch",
       "inputs": [
         {
-          "name": "expected",
+          "name": "supplied",
           "type": "uint64",
           "internalType": "uint64"
         },
         {
-          "name": "actual",
+          "name": "current",
           "type": "uint64",
           "internalType": "uint64"
         }

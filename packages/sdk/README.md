@@ -373,3 +373,28 @@ use `CoolSLinkedLibraryDeployment` for `KeelHarnessContextDispatch`,
 `KeelCollectionFreezeValidation`, and
 `KeelMintBoundEquipmentProvision`. Library addresses remain deployment
 evidence, not shell getter facts.
+
+### Manager errors and events
+
+Use the compiler-owned manager and recovery-proxy ABIs through browser-safe subpaths:
+
+```ts
+import { decodeKeelManagerError } from "@keel/sdk/manager-errors";
+import { decodeKeelManagerLog } from "@keel/sdk/manager-events";
+
+const failure = decodeKeelManagerError(revertData);
+const event = decodeKeelManagerLog({ topics: log.topics, data: log.data });
+```
+
+Both return `null` for unknown or malformed input and make no RPC request. Match the
+emitting manager address before trusting a log. RPC list events expose `digest`,
+`revision`, `epoch` and `hostCount`; recovery logs include both epochs and the roster.
+
+### Manager read snapshots
+
+Use `governanceState()` for `{ threshold, nonce, epoch, changeNonce }`,
+`executionPolicyState(target, selector)` for `{ maxValue, minimumTier, enabled, nonce }`,
+and `automationKeyState(signer)` for `{ validUntil, nonce, generation }`.
+These replace the separate counter/policy/key getters. `governanceEpoch()` and
+`executionMode()` remain narrow reads for contract authorization. Snapshot types
+are return values; they add no storage and preserve recovery-based key retirement.
