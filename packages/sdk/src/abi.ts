@@ -1257,6 +1257,36 @@ export const keelAttributionRegistryAbi = [
 ] as const;
 
 export const keelLinkRegistryAbi = [
+  "error ZeroAddress()",
+  "error InvalidContract()",
+  "error InvalidLinkSet()",
+  "error LinkSetAlreadyExists()",
+  "error LinkSetNotCommitted()",
+  "error LinkSetCommitmentMismatch()",
+  "error InvalidURI()",
+  "error SchemeMismatch()",
+  "error InvalidMediaType()",
+  "error InvalidCommitment()",
+  "error HybridAlgorithmMismatch()",
+  "error HybridDigestMismatch()",
+  "error HybridLengthMismatch()",
+  "error HybridMediaTypeMismatch()",
+  "error VerificationShellRequired()",
+  "error LinkMissing()",
+  "function REQUIRED_SHELL_ID() view returns (bytes32)",
+  "function linkURI(bytes32 linkId) view returns (string)",
+  "function presentationURI(bytes32 linkId,bytes32 shellId) view returns (string)",
+  "function presentationBuilders(bytes32 shellId) view returns (address)",
+  "function setPresentationBuilder(bytes32 shellId,address builder)",
+  "event PresentationBuilderSet(bytes32 indexed shellId,address indexed builder)",
+  "error UnauthorizedGovernance()",
+  "error InvalidPresentationBuilder()",
+  "error PresentationBuilderMissing()",
+  // Builder failures bubble through presentationURI.
+  "error FragmentMismatch()",
+  "error UnsupportedLink()",
+  "error ResponseTooLarge()",
+  "function linkForPresentation(bytes32 linkId,bytes32 shellId) view returns ((bytes32 objectId,uint64 artifactRevision,uint8 fidelity,uint8 scheme,uint8 digestAlgorithm,uint8 compression,string uri,string mediaType,bytes32 decodedDigest,bytes32 provenanceDigest,uint64 byteLength,uint64 createdAt,address publisher,address revealer,bool exists))",
   "function artifactRegistry() view returns (address)",
   "function computeLinkSetDigest(bytes32 objectId,uint64 objectRevision,(uint8 fidelity,uint8 scheme,uint8 digestAlgorithm,uint8 compression,string uri,string mediaType,bytes32 decodedDigest,bytes32 provenanceDigest,uint64 byteLength)[] inputs) pure returns (bytes32)",
   "function publishFidelityLinks(bytes32 objectId,uint64 objectRevision,(uint8 fidelity,uint8 scheme,uint8 digestAlgorithm,uint8 compression,string uri,string mediaType,bytes32 decodedDigest,bytes32 provenanceDigest,uint64 byteLength)[] inputs) returns (bytes32 linkSetDigest)",
@@ -1265,8 +1295,8 @@ export const keelLinkRegistryAbi = [
   "function linkById(bytes32 linkId) view returns ((bytes32 objectId,uint64 objectRevision,uint8 fidelity,uint8 scheme,uint8 digestAlgorithm,uint8 compression,string uri,string mediaType,bytes32 decodedDigest,bytes32 provenanceDigest,uint64 byteLength,uint64 createdAt,address publisher,address revealer,bool exists))",
   "function linkExists(bytes32 objectId,uint64 objectRevision,uint8 fidelity) view returns (bool)",
   "function linkSet(bytes32 objectId,uint64 objectRevision) view returns (bytes32 digest,uint8 count)",
-  "event FidelityLinkSetPublished(bytes32 indexed objectId,uint64 indexed objectRevision,bytes32 indexed linkSetDigest,uint8 count,address publisher,address revealer)",
-  "event FidelityLinkPublished(bytes32 indexed objectId,uint64 indexed objectRevision,uint8 indexed fidelity,bytes32 linkId,uint8 scheme,uint8 digestAlgorithm,uint8 compression,bytes32 uriDigest,bytes32 mediaTypeDigest,bytes32 decodedDigest,bytes32 provenanceDigest,uint64 byteLength,address publisher,address revealer)",
+  "event FidelityLinkSetPublished(uint8 count,uint64 indexed artifactRevision,bytes32 indexed objectId,bytes32 indexed linkSetDigest,address revealer,address publisher)",
+  "event FidelityLinkPublished(uint8 scheme,uint8 indexed fidelity,uint8 compression,uint8 digestAlgorithm,uint64 byteLength,uint64 indexed artifactRevision,bytes32 linkId,bytes32 indexed objectId,bytes32 uriDigest,bytes32 decodedDigest,bytes32 mediaTypeDigest,bytes32 provenanceDigest,address revealer,address publisher)",
 ] as const;
 
 export const keelSeedRegistryAbi = [

@@ -723,9 +723,12 @@ function digestAlgorithm(value: unknown, label: string): Exclude<DigestAlgorithm
   }
 }
 
-function compression(value: unknown, label: string): Compression {
+function compression(
+  value: unknown, label: string,
+  names: readonly Compression[] = ["none", "gzip", "deflate", "brotli"],
+): Compression {
   const code = safeNumber(value, label);
-  const result = ["none", "gzip", "deflate", "brotli"][code];
+  const result = names[code];
   if (result === undefined) throw new TypeError(`${label} is not a supported compression.`);
   return result as Compression;
 }
@@ -1064,7 +1067,7 @@ function parseLink(value: unknown): KeelFidelityLink {
   if (fidelity > 2 || scheme > 3) throw new TypeError("Keel fidelity link returned an invalid enum value.");
   if (!bool(tupleValue(value, "exists", 14), "fidelityLink.exists")) throw new TypeError("Keel fidelity link is missing.");
   const uri = text(tupleValue(value, "uri", 6), "fidelityLink.uri");
-  const prefixes = ["https://", "ipfs://", "ipns://", "ar://"] as const;
+  const prefixes = ["ipfs://", "ipns://", "https://", "ar://"] as const;
   if (!uri.startsWith(prefixes[scheme]) || uri.length === prefixes[scheme].length) {
     throw new TypeError("Keel fidelity link URI does not match its scheme.");
   }
@@ -1078,7 +1081,7 @@ function parseLink(value: unknown): KeelFidelityLink {
     fidelity,
     scheme,
     digestAlgorithm: digestAlgorithm(tupleValue(value, "digestAlgorithm", 4), "fidelityLink.digestAlgorithm"),
-    compression: compression(tupleValue(value, "compression", 5), "fidelityLink.compression"),
+    compression: compression(tupleValue(value, "compression", 5), "fidelityLink.compression", ["none", "gzip", "brotli", "deflate"]),
     uri,
     mediaType,
     decodedDigest: bytes32(tupleValue(value, "decodedDigest", 8), "fidelityLink.decodedDigest"),

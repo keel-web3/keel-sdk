@@ -19,7 +19,7 @@
 
 import { readFile } from "node:fs/promises";
 import path from "node:path";
-import { pathToFileURL } from "node:url";
+import { pathToFileURL, fileURLToPath } from "node:url";
 import { promisify } from "node:util";
 import { brotliCompress, brotliDecompress, constants as zlibConstants, deflate, gzip } from "node:zlib";
 import { build } from "esbuild";
@@ -98,7 +98,7 @@ export interface KeelStandaloneViewerItem {
   readonly role?: "entrypoint" | "module" | "asset" | "data";
   readonly mediaType: string;
   readonly aliases: readonly string[];
-  readonly integrity: { readonly algorithm: "sha256"; readonly digest: Hex; readonly byteLength: number };
+  readonly integrity: { readonly algorithm: "sha256" | "keccak256"; readonly digest: Hex; readonly byteLength: number };
   readonly chainId?: number;
   readonly store?: string;
   readonly objectId?: Hex;
@@ -112,6 +112,12 @@ export interface KeelStandaloneViewerItem {
     readonly storeKind?: "keel-hold" | "stratus-chunk-store";
     readonly compression: "none" | "gzip" | "deflate" | "brotli";
     readonly storedIntegrity?: { readonly algorithm: "sha256"; readonly digest: Hex; readonly byteLength: number };
+  };
+  /** Committed remote bytes; fetched only by the outer shell and never executed before verification. */
+  readonly external?: {
+    readonly uriBase64: string;
+    readonly compression: "none" | "gzip" | "deflate";
+    readonly maxBytes: number;
   };
   readonly embedded?: {
     readonly storedBase64: string;
@@ -386,6 +392,7 @@ function compactInlineRuntime(
     readonly context?: unknown;
     readonly extraRows?: readonly { readonly key: string; readonly value: string }[];
   }) => unknown,
+  keccak: (bytes: Uint8Array) => Uint8Array,
 ): void {
   const globals = globalThis as typeof globalThis & {
     __KEEL_ITEMS__?: unknown;
@@ -474,10 +481,11 @@ function compactInlineRuntime(
   };
   const safeJSON = (value: unknown) => JSON.stringify(value)
     .replace(/[&<>\u2028\u2029]/gu, (character) => "\\u" + character.charCodeAt(0).toString(16).padStart(4, "0"));
-  const verify = async (bytes: Uint8Array, integrity: Sha256Integrity, label: string) => {
+  const verify = async (bytes: Uint8Array, integrity: KeelStandaloneViewerItem["integrity"], label: string) => {
     if (bytes.byteLength !== integrity.byteLength) throw new Error(`${label} length mismatch.`);
-    const seen = await sha256(bytes);
-    if (!equal(seen, fromHex(integrity.digest))) throw new Error(`${label} SHA-256 mismatch.`);
+    if (integrity.algorithm !== "sha256" && integrity.algorithm !== "keccak256") throw new Error("Unsupported digest algorithm.");
+    const seen = integrity.algorithm === "sha256" ? await sha256(bytes) : keccak(bytes);
+    if (!equal(seen, fromHex(integrity.digest))) throw new Error(`${label} ${integrity.algorithm === "sha256" ? "SHA-256" : "Keccak-256"} mismatch.`);
     return bytes;
   };
   const decompress = async (compression: "none" | "gzip" | "deflate" | "brotli", bytes: Uint8Array) => {
@@ -487,7 +495,45 @@ function compactInlineRuntime(
     const stream = new Blob([bytes as BlobPart]).stream().pipeThrough(new DecompressionStream(compression));
     return new Uint8Array(await new Response(stream).arrayBuffer());
   };
+  const readBounded = async (stream: ReadableStream<Uint8Array>, maximum: number) => {
+    const reader = stream.getReader();
+    const chunks: Uint8Array[] = [];
+    let length = 0;
+    try {
+      for (;;) {
+        const { value, done } = await reader.read();
+        if (done) break;
+        length += value.byteLength;
+        if (length > maximum) throw new Error("Declared response limit exceeded.");
+        chunks.push(value);
+      }
+    } finally { await reader.cancel().catch(() => {}); reader.releaseLock(); }
+    const output = new Uint8Array(length);
+    let offset = 0;
+    for (const chunk of chunks) { output.set(chunk, offset); offset += chunk.length; }
+    return output;
+  };
   const resolve = async (item: KeelStandaloneViewerItem) => {
+    if (item.external !== undefined) {
+      if (item.embedded !== undefined || item.onchain !== undefined) throw new Error("Ambiguous resource delivery.");
+      const external = item.external;
+      const maximum = external.maxBytes;
+      if (!Number.isSafeInteger(maximum) || maximum <= 0 || !Number.isSafeInteger(item.integrity.byteLength)
+          || item.integrity.byteLength <= 0 || item.integrity.byteLength > maximum) throw new Error("Invalid response limit.");
+      if (!["none", "gzip", "deflate"].includes(external.compression)) throw new Error("Unsupported external compression.");
+      const uri = new URL(decoder.decode(fromBase64(external.uriBase64)));
+      if (uri.protocol !== "https:" || uri.username || uri.password || uri.hash) throw new Error("Invalid external HTTPS locator.");
+      const controller = new AbortController();
+      const timer = setTimeout(() => controller.abort(), 30_000);
+      try {
+        const response = await fetch(uri.href, { credentials: "omit", redirect: "error", cache: "no-store", referrerPolicy: "no-referrer", signal: controller.signal });
+        if (!response.ok || response.body === null) throw new Error("External response unavailable.");
+        const stored = await readBounded(response.body, maximum);
+        const decoded = external.compression === "none" ? stored : await readBounded(
+          new Blob([stored as BlobPart]).stream().pipeThrough(new DecompressionStream(external.compression)), item.integrity.byteLength);
+        return verify(decoded, item.integrity, item.id);
+      } finally { clearTimeout(timer); }
+    }
     const embedded = item.embedded;
     if (embedded === undefined || typeof embedded.storedBase64 !== "string") {
       throw new Error(`Missing embedded bytes for ${item.id}.`);
@@ -867,7 +913,7 @@ export async function buildCompactInlineKeelShell(input: {
     target: ["es2022"],
     write: false,
     stdin: {
-      contents: `import { mountKeelVerification } from ${JSON.stringify(verificationChromePath)};(${compactInlineRuntime.toString()})(mountKeelVerification)`,
+      contents: `import {keccak_256} from ${JSON.stringify(fileURLToPath(import.meta.resolve("@noble/hashes/sha3")))};import { mountKeelVerification } from ${JSON.stringify(verificationChromePath)};(${compactInlineRuntime.toString()})(mountKeelVerification,keccak_256)`,
       resolveDir: repositoryRoot,
       sourcefile: "keel-inline-runtime.js",
       loader: "js",

@@ -34,6 +34,7 @@ export * from "./standard-chain-stack.js";
 export * from "./presentation.js";
 export * from "./asset-display.js";
 export * from "./shell-registry.js";
+export * from "./link-presentation.js";
 export * from "./data-layer.js";
 export * from "./onchain-data.js";
 export * from "./inline-viewer-graph.js";

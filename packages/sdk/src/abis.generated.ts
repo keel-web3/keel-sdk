@@ -4,7 +4,7 @@
 export const ABI_CONTRACTS: Readonly<Record<string, readonly string[]>> = {
   "keel-kernel": ["KeelAccessGroups","KeelFeeTreasury","KeelRecoveryGroups"],
   "keel-hold": ["Ingot","KeelHold","KeelIndex"],
-  "keel-artifacts": ["KeelArtifactRegistry","KeelHarnessRegistry","KeelLinkRegistry","KeelManager","KeelManagerProxy","KeelManagerRecovery","KeelManagerRpcPolicy","KeelSeedRegistry"],
+  "keel-artifacts": ["KeelArtifactRegistry","KeelHarnessRegistry","KeelLinkRegistry","KeelLinkURIBuilder","KeelManager","KeelManagerProxy","KeelManagerRecovery","KeelManagerRpcPolicy","KeelSeedRegistry"],
   "keel-graph": ["KeelAssetTagRegistry","KeelGraphRegistry","KeelLibraryRegistry","KeelModuleReviewRegistry","KeelPluginRegistry"],
   "keel-harness": ["KeelHarnessBuilder", "KeelObjectURIBuilder", "KeelPercentTokenURIBuilder", "KeelRawTokenURIBuilder"],
   "keel-presentation": ["KeelPresentationStateRegistry","KeelVisualStateLedger"],

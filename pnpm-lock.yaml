@@ -178,6 +178,9 @@ importers:
 
   packages/sdk:
     dependencies:
+      '@noble/hashes':
+        specifier: 1.8.0
+        version: 1.8.0
       '@keel/protocol':
         specifier: workspace:*
         version: link:../protocol

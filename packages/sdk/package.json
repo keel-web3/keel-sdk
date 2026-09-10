@@ -117,6 +117,10 @@
     "./manager-events": {
       "types": "./dist/manager-events.d.ts",
       "import": "./dist/manager-events.js"
+    },
+    "./link-presentation": {
+      "types": "./dist/link-presentation.d.ts",
+      "import": "./dist/link-presentation.js"
     }
   },
   "files": [
@@ -134,7 +138,8 @@
   "dependencies": {
     "@keel/protocol": "workspace:*",
     "esbuild": "0.28.2",
-    "viem": "^2.38.0"
+    "viem": "^2.38.0",
+    "@noble/hashes": "1.8.0"
   },
   "devDependencies": {
     "@types/node": "^22.15.0",

@@ -172,7 +172,12 @@ export const KEEL_MODULES: readonly KeelModule[] = [
       "interfaces/IKeelManagerRpcErrors.sol",
       "interfaces/IKeelManagerRpcEvents.sol",
       "interfaces/IKeelManagerTypes.sol",
-      "libraries/KeelManagerGovernorState.sol"
+      "libraries/KeelManagerGovernorState.sol",
+      "KeelLinkURIBuilder.sol",
+      "interfaces/IKeelLinkURIBuilder.sol",
+      "interfaces/IKeelLinkURIBuilderErrors.sol",
+      "interfaces/IKeelLinkRegistryErrors.sol",
+      "interfaces/IKeelLinkRegistryEvents.sol"
     ],
     "deployable": [
       "KeelArtifactRegistry",

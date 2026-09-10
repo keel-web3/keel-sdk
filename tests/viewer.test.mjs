@@ -1404,13 +1404,13 @@ function keelReader({
         return [getAddress(keelAddresses.store), keelIds.content, 1, objectDigest, BigInt(objectBytes.length), 0, "image/svg+xml"];
       }
       case `${keelAddresses.link}:linkExists`:
-        return request.args[2] === 2;
+        return request.args[2] === 1;
       case `${keelAddresses.link}:fidelityLink`:
         return [
           keelIds.object,
           1n,
+          1,
           2,
-          0,
           1,
           0,
           "https://mirror.example/object.svg",
@@ -1460,6 +1460,41 @@ function keelReader({
     }
   };
 }
+
+test("Keel link decoding covers every locator and its own compression tags", async () => {
+  const objectBytes = new TextEncoder().encode('<svg xmlns="http://www.w3.org/2000/svg"/>');
+  const { value, integrity, commitment } = await keelManifest(baseKeelExtension());
+  const reader = keelReader({ manifestDigest: integrity.digest, objectBytes });
+  const uris = ["ipfs://content", "ipns://name", "https://mirror.example/object.svg", "ar://transaction"];
+  const names = ["none", "gzip", "brotli", "deflate"];
+  for (let scheme = 0; scheme < uris.length; scheme++) {
+    for (let code = 0; code < names.length; code++) {
+      const result = await resolveKeelArtifact(value, commitment, {
+        async readContract(request) {
+          const result = await reader(request);
+          if (request.address === keelAddresses.link && request.functionName === "fidelityLink") {
+            const record = [...result];
+            record[3] = scheme; record[5] = code; record[6] = uris[scheme];
+            return record;
+          }
+          return result;
+        },
+        blockNumber: 123n,
+        adapters: {
+          async fetch() { assert.fail("Native storage must not fetch the declared link."); },
+          async readOnchainObject() { return objectBytes; },
+          async customDigest(_algorithm, bytes) { return keccak256(bytes, "bytes"); },
+        },
+      });
+      const link = result.binding.objects[0].fidelityLinks[0];
+      assert.equal(link.fidelity, 1);
+      assert.equal(link.scheme, scheme);
+      assert.equal(link.uri, uris[scheme]);
+      assert.equal(link.compression, names[code]);
+      assert.equal(result.binding.objects[0].source.storageCompression, "none");
+    }
+  }
+});
 
 test("Keel reads the chain by default and never touches the declared mirror", async () => {
   // The default transport is the chain the proof lives on. A mirror that is

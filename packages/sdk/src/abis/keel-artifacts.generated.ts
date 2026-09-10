@@ -2486,6 +2486,19 @@ export const ABIS = {
     },
     {
       "type": "function",
+      "name": "REQUIRED_SHELL_ID",
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "",
+          "type": "bytes32",
+          "internalType": "bytes32"
+        }
+      ],
+      "stateMutability": "view"
+    },
+    {
+      "type": "function",
       "name": "artifactRegistry",
       "inputs": [],
       "outputs": [
@@ -2806,6 +2819,107 @@ export const ABIS = {
     },
     {
       "type": "function",
+      "name": "linkForPresentation",
+      "inputs": [
+        {
+          "name": "linkId",
+          "type": "bytes32",
+          "internalType": "bytes32"
+        },
+        {
+          "name": "shellId",
+          "type": "bytes32",
+          "internalType": "bytes32"
+        }
+      ],
+      "outputs": [
+        {
+          "name": "record",
+          "type": "tuple",
+          "internalType": "struct KeelLinkRegistry.LinkRecord",
+          "components": [
+            {
+              "name": "objectId",
+              "type": "bytes32",
+              "internalType": "bytes32"
+            },
+            {
+              "name": "artifactRevision",
+              "type": "uint64",
+              "internalType": "uint64"
+            },
+            {
+              "name": "fidelity",
+              "type": "uint8",
+              "internalType": "enum KeelLinkRegistry.Fidelity"
+            },
+            {
+              "name": "scheme",
+              "type": "uint8",
+              "internalType": "enum KeelLinkRegistry.LocatorScheme"
+            },
+            {
+              "name": "digestAlgorithm",
+              "type": "uint8",
+              "internalType": "enum KeelLinkRegistry.DigestAlgorithm"
+            },
+            {
+              "name": "compression",
+              "type": "uint8",
+              "internalType": "enum KeelLinkRegistry.Compression"
+            },
+            {
+              "name": "uri",
+              "type": "string",
+              "internalType": "string"
+            },
+            {
+              "name": "mediaType",
+              "type": "string",
+              "internalType": "string"
+            },
+            {
+              "name": "decodedDigest",
+              "type": "bytes32",
+              "internalType": "bytes32"
+            },
+            {
+              "name": "provenanceDigest",
+              "type": "bytes32",
+              "internalType": "bytes32"
+            },
+            {
+              "name": "byteLength",
+              "type": "uint64",
+              "internalType": "uint64"
+            },
+            {
+              "name": "createdAt",
+              "type": "uint64",
+              "internalType": "uint64"
+            },
+            {
+              "name": "publisher",
+              "type": "address",
+              "internalType": "address"
+            },
+            {
+              "name": "revealer",
+              "type": "address",
+              "internalType": "address"
+            },
+            {
+              "name": "exists",
+              "type": "bool",
+              "internalType": "bool"
+            }
+          ]
+        }
+      ],
+      "stateMutability": "view"
+    },
+    {
+      "type": "function",
       "name": "linkSet",
       "inputs": [
         {
@@ -2829,6 +2943,25 @@ export const ABIS = {
           "name": "count",
           "type": "uint8",
           "internalType": "uint8"
+        }
+      ],
+      "stateMutability": "view"
+    },
+    {
+      "type": "function",
+      "name": "linkURI",
+      "inputs": [
+        {
+          "name": "linkId",
+          "type": "bytes32",
+          "internalType": "bytes32"
+        }
+      ],
+      "outputs": [
+        {
+          "name": "",
+          "type": "string",
+          "internalType": "string"
         }
       ],
       "stateMutability": "view"
@@ -2861,6 +2994,49 @@ export const ABIS = {
         }
       ],
       "stateMutability": "pure"
+    },
+    {
+      "type": "function",
+      "name": "presentationBuilders",
+      "inputs": [
+        {
+          "name": "shellId",
+          "type": "bytes32",
+          "internalType": "bytes32"
+        }
+      ],
+      "outputs": [
+        {
+          "name": "builder",
+          "type": "address",
+          "internalType": "address"
+        }
+      ],
+      "stateMutability": "view"
+    },
+    {
+      "type": "function",
+      "name": "presentationURI",
+      "inputs": [
+        {
+          "name": "linkId",
+          "type": "bytes32",
+          "internalType": "bytes32"
+        },
+        {
+          "name": "shellId",
+          "type": "bytes32",
+          "internalType": "bytes32"
+        }
+      ],
+      "outputs": [
+        {
+          "name": "",
+          "type": "string",
+          "internalType": "string"
+        }
+      ],
+      "stateMutability": "view"
     },
     {
       "type": "function",
@@ -2939,14 +3115,56 @@ export const ABIS = {
       "stateMutability": "nonpayable"
     },
     {
+      "type": "function",
+      "name": "setPresentationBuilder",
+      "inputs": [
+        {
+          "name": "shellId",
+          "type": "bytes32",
+          "internalType": "bytes32"
+        },
+        {
+          "name": "builder",
+          "type": "address",
+          "internalType": "address"
+        }
+      ],
+      "outputs": [],
+      "stateMutability": "nonpayable"
+    },
+    {
       "type": "event",
       "name": "FidelityLinkPublished",
       "inputs": [
         {
-          "name": "objectId",
-          "type": "bytes32",
+          "name": "scheme",
+          "type": "uint8",
+          "indexed": false,
+          "internalType": "uint8"
+        },
+        {
+          "name": "fidelity",
+          "type": "uint8",
           "indexed": true,
-          "internalType": "bytes32"
+          "internalType": "uint8"
+        },
+        {
+          "name": "compression",
+          "type": "uint8",
+          "indexed": false,
+          "internalType": "uint8"
+        },
+        {
+          "name": "digestAlgorithm",
+          "type": "uint8",
+          "indexed": false,
+          "internalType": "uint8"
+        },
+        {
+          "name": "byteLength",
+          "type": "uint64",
+          "indexed": false,
+          "internalType": "uint64"
         },
         {
           "name": "artifactRevision",
@@ -2955,43 +3173,19 @@ export const ABIS = {
           "internalType": "uint64"
         },
         {
-          "name": "fidelity",
-          "type": "uint8",
-          "indexed": true,
-          "internalType": "enum KeelLinkRegistry.Fidelity"
-        },
-        {
           "name": "linkId",
           "type": "bytes32",
           "indexed": false,
           "internalType": "bytes32"
         },
         {
-          "name": "scheme",
-          "type": "uint8",
-          "indexed": false,
-          "internalType": "enum KeelLinkRegistry.LocatorScheme"
-        },
-        {
-          "name": "digestAlgorithm",
-          "type": "uint8",
-          "indexed": false,
-          "internalType": "enum KeelLinkRegistry.DigestAlgorithm"
-        },
-        {
-          "name": "compression",
-          "type": "uint8",
-          "indexed": false,
-          "internalType": "enum KeelLinkRegistry.Compression"
-        },
-        {
-          "name": "uriDigest",
+          "name": "objectId",
           "type": "bytes32",
-          "indexed": false,
+          "indexed": true,
           "internalType": "bytes32"
         },
         {
-          "name": "mediaTypeDigest",
+          "name": "uriDigest",
           "type": "bytes32",
           "indexed": false,
           "internalType": "bytes32"
@@ -3003,25 +3197,25 @@ export const ABIS = {
           "internalType": "bytes32"
         },
         {
+          "name": "mediaTypeDigest",
+          "type": "bytes32",
+          "indexed": false,
+          "internalType": "bytes32"
+        },
+        {
           "name": "provenanceDigest",
           "type": "bytes32",
           "indexed": false,
           "internalType": "bytes32"
         },
         {
-          "name": "byteLength",
-          "type": "uint64",
-          "indexed": false,
-          "internalType": "uint64"
-        },
-        {
-          "name": "publisher",
+          "name": "revealer",
           "type": "address",
           "indexed": false,
           "internalType": "address"
         },
         {
-          "name": "revealer",
+          "name": "publisher",
           "type": "address",
           "indexed": false,
           "internalType": "address"
@@ -3034,10 +3228,10 @@ export const ABIS = {
       "name": "FidelityLinkSetPublished",
       "inputs": [
         {
-          "name": "objectId",
-          "type": "bytes32",
-          "indexed": true,
-          "internalType": "bytes32"
+          "name": "count",
+          "type": "uint8",
+          "indexed": false,
+          "internalType": "uint8"
         },
         {
           "name": "artifactRevision",
@@ -3046,27 +3240,46 @@ export const ABIS = {
           "internalType": "uint64"
         },
         {
+          "name": "objectId",
+          "type": "bytes32",
+          "indexed": true,
+          "internalType": "bytes32"
+        },
+        {
           "name": "linkSetDigest",
           "type": "bytes32",
           "indexed": true,
           "internalType": "bytes32"
         },
         {
-          "name": "count",
-          "type": "uint8",
+          "name": "revealer",
+          "type": "address",
           "indexed": false,
-          "internalType": "uint8"
+          "internalType": "address"
         },
         {
           "name": "publisher",
           "type": "address",
           "indexed": false,
           "internalType": "address"
+        }
+      ],
+      "anonymous": false
+    },
+    {
+      "type": "event",
+      "name": "PresentationBuilderSet",
+      "inputs": [
+        {
+          "name": "shellId",
+          "type": "bytes32",
+          "indexed": true,
+          "internalType": "bytes32"
         },
         {
-          "name": "revealer",
+          "name": "builder",
           "type": "address",
-          "indexed": false,
+          "indexed": true,
           "internalType": "address"
         }
       ],
@@ -3114,6 +3327,11 @@ export const ABIS = {
     },
     {
       "type": "error",
+      "name": "InvalidPresentationBuilder",
+      "inputs": []
+    },
+    {
+      "type": "error",
       "name": "InvalidURI",
       "inputs": []
     },
@@ -3139,7 +3357,22 @@ export const ABIS = {
     },
     {
       "type": "error",
+      "name": "PresentationBuilderMissing",
+      "inputs": []
+    },
+    {
+      "type": "error",
       "name": "SchemeMismatch",
+      "inputs": []
+    },
+    {
+      "type": "error",
+      "name": "UnauthorizedGovernance",
+      "inputs": []
+    },
+    {
+      "type": "error",
+      "name": "VerificationShellRequired",
       "inputs": []
     },
     {
@@ -7002,6 +7235,233 @@ export const ABIS = {
           "internalType": "uint64"
         }
       ]
+    }
+  ],
+  "KeelLinkURIBuilder": [
+    {
+      "type": "constructor",
+      "inputs": [
+        {
+          "name": "registry",
+          "type": "address",
+          "internalType": "address"
+        },
+        {
+          "name": "shellId_",
+          "type": "bytes32",
+          "internalType": "bytes32"
+        },
+        {
+          "name": "config",
+          "type": "tuple",
+          "internalType": "struct KeelLinkURIBuilder.Configuration",
+          "components": [
+            {
+              "name": "maxResponseBytes",
+              "type": "uint64",
+              "internalType": "uint64"
+            },
+            {
+              "name": "ipfsGateway",
+              "type": "string",
+              "internalType": "string"
+            },
+            {
+              "name": "arweaveGateway",
+              "type": "string",
+              "internalType": "string"
+            },
+            {
+              "name": "prefixObjectId",
+              "type": "bytes32",
+              "internalType": "bytes32"
+            },
+            {
+              "name": "suffixObjectId",
+              "type": "bytes32",
+              "internalType": "bytes32"
+            },
+            {
+              "name": "assetDisplayObjectId",
+              "type": "bytes32",
+              "internalType": "bytes32"
+            }
+          ]
+        }
+      ],
+      "stateMutability": "nonpayable"
+    },
+    {
+      "type": "function",
+      "name": "arweaveGateway",
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "",
+          "type": "string",
+          "internalType": "string"
+        }
+      ],
+      "stateMutability": "view"
+    },
+    {
+      "type": "function",
+      "name": "assetDisplayObjectId",
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "",
+          "type": "bytes32",
+          "internalType": "bytes32"
+        }
+      ],
+      "stateMutability": "view"
+    },
+    {
+      "type": "function",
+      "name": "buildURI",
+      "inputs": [
+        {
+          "name": "linkId",
+          "type": "bytes32",
+          "internalType": "bytes32"
+        }
+      ],
+      "outputs": [
+        {
+          "name": "",
+          "type": "string",
+          "internalType": "string"
+        }
+      ],
+      "stateMutability": "view"
+    },
+    {
+      "type": "function",
+      "name": "ipfsGateway",
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "",
+          "type": "string",
+          "internalType": "string"
+        }
+      ],
+      "stateMutability": "view"
+    },
+    {
+      "type": "function",
+      "name": "keelHold",
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "",
+          "type": "address",
+          "internalType": "contract IKeelHold"
+        }
+      ],
+      "stateMutability": "view"
+    },
+    {
+      "type": "function",
+      "name": "linkRegistry",
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "",
+          "type": "address",
+          "internalType": "contract KeelLinkRegistry"
+        }
+      ],
+      "stateMutability": "view"
+    },
+    {
+      "type": "function",
+      "name": "maxResponseBytes",
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "",
+          "type": "uint64",
+          "internalType": "uint64"
+        }
+      ],
+      "stateMutability": "view"
+    },
+    {
+      "type": "function",
+      "name": "prefixObjectId",
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "",
+          "type": "bytes32",
+          "internalType": "bytes32"
+        }
+      ],
+      "stateMutability": "view"
+    },
+    {
+      "type": "function",
+      "name": "shellId",
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "",
+          "type": "bytes32",
+          "internalType": "bytes32"
+        }
+      ],
+      "stateMutability": "view"
+    },
+    {
+      "type": "function",
+      "name": "suffixObjectId",
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "",
+          "type": "bytes32",
+          "internalType": "bytes32"
+        }
+      ],
+      "stateMutability": "view"
+    },
+    {
+      "type": "error",
+      "name": "FragmentMismatch",
+      "inputs": []
+    },
+    {
+      "type": "error",
+      "name": "InvalidConfiguration",
+      "inputs": []
+    },
+    {
+      "type": "error",
+      "name": "ResponseTooLarge",
+      "inputs": []
+    },
+    {
+      "type": "error",
+      "name": "StringsInsufficientHexLength",
+      "inputs": [
+        {
+          "name": "value",
+          "type": "uint256",
+          "internalType": "uint256"
+        },
+        {
+          "name": "length",
+          "type": "uint256",
+          "internalType": "uint256"
+        }
+      ]
+    },
+    {
+      "type": "error",
+      "name": "UnsupportedLink",
+      "inputs": []
     }
   ]
 } as const;
