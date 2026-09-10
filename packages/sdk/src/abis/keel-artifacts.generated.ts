@@ -463,19 +463,6 @@ export const ABIS = {
     },
     {
       "type": "function",
-      "name": "claimProtocolFees",
-      "inputs": [
-        {
-          "name": "amount",
-          "type": "uint256",
-          "internalType": "uint256"
-        }
-      ],
-      "outputs": [],
-      "stateMutability": "nonpayable"
-    },
-    {
-      "type": "function",
       "name": "forgeArtifact",
       "inputs": [
         {
@@ -792,19 +779,6 @@ export const ABIS = {
     },
     {
       "type": "function",
-      "name": "protocolFeesAccrued",
-      "inputs": [],
-      "outputs": [
-        {
-          "name": "",
-          "type": "uint256",
-          "internalType": "uint256"
-        }
-      ],
-      "stateMutability": "view"
-    },
-    {
-      "type": "function",
       "name": "publicationJob",
       "inputs": [],
       "outputs": [
@@ -1070,25 +1044,6 @@ export const ABIS = {
       "anonymous": false
     },
     {
-      "type": "event",
-      "name": "ProtocolFeesClaimed",
-      "inputs": [
-        {
-          "name": "recipient",
-          "type": "address",
-          "indexed": true,
-          "internalType": "address"
-        },
-        {
-          "name": "amount",
-          "type": "uint256",
-          "indexed": false,
-          "internalType": "uint256"
-        }
-      ],
-      "anonymous": false
-    },
-    {
       "type": "error",
       "name": "ArtifactAlreadyExists",
       "inputs": []
@@ -1111,11 +1066,6 @@ export const ABIS = {
     {
       "type": "error",
       "name": "DigestMismatch",
-      "inputs": []
-    },
-    {
-      "type": "error",
-      "name": "EtherTransferFailed",
       "inputs": []
     },
     {
@@ -1167,11 +1117,6 @@ export const ABIS = {
     {
       "type": "error",
       "name": "InvalidRevisionPolicy",
-      "inputs": []
-    },
-    {
-      "type": "error",
-      "name": "NothingToClaim",
       "inputs": []
     },
     {

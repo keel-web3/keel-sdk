@@ -1084,9 +1084,7 @@ export const keelObjectRegistryAbi = [
   "function manager() view returns (address)",
   "function forgingFee() view returns (uint256)",
   "function protocolFeeRecipient() view returns (address)",
-  "function protocolFeesAccrued() view returns (uint256)",
   "function setForgingFee(uint256 nextFee,address nextRecipient)",
-  "function claimProtocolFees(uint256 amount)",
   "function setRevisionPolicy(bytes32 objectId,address policy)",
   "function freezeArtifact(bytes32 objectId)",
   "function keelHold() view returns (address)",
@@ -1099,15 +1097,14 @@ export const keelObjectRegistryAbi = [
   "function artifactIsFrozen(bytes32 objectId) view returns (bool)",
   "function revisionPolicy(bytes32 objectId) view returns (address)",
   "function artifactLineage(bytes32 objectId) view returns ((address creator,(address collection,uint256 tokenId) binding,uint8 policy,uint64 latestRevision,bool frozen,bool exists))",
-  "function objectRevision(bytes32 objectId,uint64 revision) view returns ((bytes32 contentObjectId,bytes32 decodedDigest,bytes32 metadataDigest,bytes32 fidelitySetDigest,bytes32 mediaTypeDigest,uint64 byteLength,uint64 parentRevision,uint64 createdAt,address publisher,uint8 digestAlgorithm,uint8 compression,bool exists))",
+  "function artifactRevision(bytes32 objectId,uint64 revision) view returns ((bytes32 contentObjectId,bytes32 decodedDigest,bytes32 metadataDigest,bytes32 fidelitySetDigest,bytes32 mediaTypeDigest,uint64 byteLength,uint64 parentRevision,uint64 createdAt,address publisher,uint8 digestAlgorithm,uint8 compression,bool exists))",
   "function artifactRevisionDescriptor(bytes32 objectId,uint64 revision) view returns (address store,bytes32 contentObjectId,bytes32 decodedDigest,bytes32 metadataDigest,bytes32 fidelitySetDigest,bytes32 mediaTypeDigest,uint64 byteLength,uint8 digestAlgorithm,uint8 compression,address publisher)",
   "function artifactRevisionSource(bytes32 objectId,uint64 revision) view returns (address store,bytes32 contentObjectId,uint8 digestAlgorithm,bytes32 decodedDigest,uint64 byteLength,uint8 compression,string mediaType)",
-  "event ObjectWelded(bytes32 indexed objectId,address indexed creator,address indexed collection,uint256 tokenId,uint8 policy)",
+  "event ArtifactForged(bytes32 indexed objectId,address indexed creator,address indexed collection,uint256 tokenId,uint8 policy)",
   "event ArtifactRevisionAppended(bytes32 indexed objectId,uint64 indexed revision,uint64 indexed parentRevision,bytes32 contentObjectId,bytes32 decodedDigest,bytes32 metadataDigest,bytes32 fidelitySetDigest,bytes32 mediaTypeDigest,uint64 byteLength,uint8 digestAlgorithm,uint8 compression,address publisher)",
   "event ArtifactPermanentlyFrozen(bytes32 indexed objectId,uint64 indexed revision)",
   "event ArtifactRevisionPolicySet(bytes32 indexed objectId,address indexed policy,uint64 indexed revision)",
   "event ForgingFeeConfigured(uint256 indexed previousFee,uint256 indexed nextFee,address indexed feeRecipient)",
-  "event ProtocolFeesClaimed(address indexed recipient,uint256 amount)",
 ] as const;
 
 /** Creator-owned Keel license declarations and per-resource access rules. */

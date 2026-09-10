@@ -1,5 +1,24 @@
 import assert from "node:assert/strict";
 import test from "node:test";
+import { planKeelAssetPresentation, KEEL_INLINE_COMPRESSED_ASSET_BYTES } from '../packages/sdk/dist/presentation.js';
+
+test('asset delivery follows the inclusive 1.75 MB compressed boundary and keeps explicit choices', () => {
+  const input = { originalByteLength: 8_000_000, compressedByteLength: KEEL_INLINE_COMPRESSED_ASSET_BYTES };
+  assert.equal(planKeelAssetPresentation(input).mode, 'inline');
+  assert.equal(planKeelAssetPresentation({ ...input, compressedByteLength: input.compressedByteLength + 1 }).mode, 'hybrid');
+  assert.equal(planKeelAssetPresentation({ ...input, mode: 'hybrid' }).mode, 'hybrid');
+  assert.equal(planKeelAssetPresentation({ ...input, compressedByteLength: 2_000_000, mode: 'inline' }).mode, 'inline');
+  assert.throws(() => planKeelAssetPresentation({ ...input, compressedByteLength: -1 }), /byte count/);
+  assert.throws(() => planKeelAssetPresentation({ ...input, originalByteLength: NaN }), /byte count/);
+});
+
+test('small compressed assets retain Inline with separate complete-URI and gas warnings and honest direct retrieval', () => {
+  const plan = planKeelAssetPresentation({ originalByteLength: 2_000_000, compressedByteLength: 1_700_000, tokenUriByteLength: 2_400_000, readGas: 40_000_000n, blockGasLimit: 30_000_000n });
+  assert.equal(plan.mode, 'inline'); assert.equal(plan.publicationReady, false);
+  assert.deepEqual(plan.warnings.map((warning) => warning.code), ['token-uri-size', 'read-gas']);
+  assert.match(plan.retrieval.explanation, /Compressed objects require readSlug/);
+  assert.match(plan.retrieval.fullCallOption, /onchain Gzip decompression is not provided/);
+});
 
 import {
   KEEL_PRESENTATION_CODEC_POLICY,
@@ -145,4 +164,22 @@ test("Inline fails closed for a compressed root, an oversized document, or a mis
     tokenUriByteLength: 4_096,
     mediaType: "text/html",
   }).reason, /no verified KEEL inline builder/iu);
+});
+
+
+test('graph measurements cannot replace the default cutoff or an explicit delivery choice', () => {
+  for (const compressedByteLength of [1_749_999, 1_750_000, 1_750_001, 4_000_000]) {
+    for (const graphByteLength of [1_000_000, 5_000_000]) {
+      const input = { originalByteLength: 8_000_000, compressedByteLength, graphByteLength };
+      const automaticMode = compressedByteLength <= 1_750_000 ? 'inline' : 'hybrid';
+      assert.equal(planKeelAssetPresentation(input).mode, automaticMode);
+      assert.equal(planKeelAssetPresentation({ ...input, mode: 'auto' }).mode, automaticMode);
+      for (const mode of ['inline', 'hybrid']) {
+        const plan = planKeelAssetPresentation({ ...input, mode });
+        assert.equal(plan.mode, mode);
+        assert.equal(plan.automaticMode, automaticMode);
+        assert.equal(plan.publicationReady, false);
+      }
+    }
+  }
 });

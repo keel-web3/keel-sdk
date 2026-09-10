@@ -3,6 +3,7 @@ import {
   createIntegrity,
   encodeBase64,
   utf8ToBytes,
+  verifyIntegrity,
   type ArtifactManifest,
   type ArtifactResource,
   type Compression,
@@ -12,7 +13,6 @@ import {
   type OnchainSource,
   type ResourceSource,
   type KeelStakeObject,
-  type UriSource,
 } from "@keel/protocol";
 import type {
   CollectionFacetInput,
@@ -41,20 +41,8 @@ export const KEEL_INJECTION_PROTOCOL = "keel-injection@1" as const;
 export const KEEL_ANCHOR_TOKEN_ID = "$anchor.tokenId" as const;
 export const KEEL_STAKED_CHARACTER_ID = "$staked.characterId" as const;
 
-/**
- * How a bound resource reaches the reader.
- *
- *   `"off"`       chain only. The canonical KeelHold object is read over RPC
- *                 and no gateway is consulted for display. The default.
- *   `"fallback"`  chain first, a proven mirror behind it.
- *   `"preferred"` mirror first, the chain behind it. What Keel used to do.
- *
- * The RPC read is not free of hosts either — something answers the `eth_call` —
- * which is why the endpoint is itself governed (`keelRpcUrlAllowed`) and why
- * a viewer that reads the chain this way has to say so. What it buys is that
- * the bytes come from the ledger that proved them rather than from a copy
- * somebody else agreed to keep.
- */
+/** Gateway preference used by delivery callers. Verified native bindings
+ * always retain their native source; this preference cannot lower that tier. */
 export type KeelGatewayTransport = "off" | "fallback" | "preferred";
 
 export const DEFAULT_GATEWAY_TRANSPORT: KeelGatewayTransport = "off";
@@ -607,31 +595,10 @@ export interface KeelRuntimeBinding {
 export interface BindKeelManifestOptions {
   readonly readContract: KeelContractRead;
   readonly adapters?: ResolverAdapters;
-  /**
-   * Where the bytes a reader is shown are fetched from.
-   *
-   * `"off"` is the default: the artwork is read from KeelHold over RPC, and
-   * a declared IPFS, Arweave, or HTTPS mirror is not consulted for display at
-   * all. The bytes still come from the chain that proved them, and the reader
-   * is not made to depend on a content host staying alive and honest.
-   *
-   * This does not touch IPFS as *proof*. A CID the original collection
-   * committed to is still recomputed and still checked; `hybridSource` below
-   * still refuses a mirror whose committed digest, length, or media type
-   * disagrees with the object descriptor. What changes is only which of the
-   * two equally-proven copies is actually fetched.
-   *
-   * `"fallback"` keeps the mirror as a second chance behind the chain read,
-   * and `"preferred"` restores the old mirror-first order for a deployment
-   * that wants a gateway to absorb the read traffic. Both are opt-in.
-   */
+  /** Gateway preferences never override a verified native object binding.
+   * Declared mirrors remain available as provenance, not display fallbacks. */
   readonly gatewayTransport?: KeelGatewayTransport;
-  /**
-   * @deprecated Superseded by `gatewayTransport`. Honoured when supplied and
-   * `gatewayTransport` is not, so an existing caller keeps its old behaviour
-   * rather than being silently switched: `"hybrid-first"` maps to
-   * `"preferred"`, `"onchain-first"` to `"fallback"`.
-   */
+  /** Gateway preference for callers shared with non-native delivery paths. */
   readonly sourcePreference?: "hybrid-first" | "onchain-first";
   /** Staked character selected for a collection-shared map viewer. The arcade
    * registry still proves that this character is assigned to the anchored map. */
@@ -1541,37 +1508,6 @@ function onchainSource(chainId: number, source: KeelObjectSourceDescriptor): Onc
 }
 
 /**
- * A mirror is only a mirror if it is provably the same bytes. Every field here
- * is a proof input the fidelity link committed to on chain, and a link that
- * disagrees with the object descriptor on any of them is not a slower copy of
- * the artwork — it is a different artwork, and it is dropped.
- *
- * This check is unchanged by the transport default. Whether the mirror is ever
- * fetched is `gatewayTransport`'s business; whether it would have been the same
- * bytes is this function's, and those are separate questions.
- */
-function hybridSource(link: KeelFidelityLink, source: KeelObjectSourceDescriptor): UriSource | undefined {
-  if (
-    link.fidelity !== 2 ||
-    link.digestAlgorithm !== source.digestAlgorithm ||
-    link.decodedDigest !== source.decodedDigest ||
-    link.byteLength !== source.byteLength ||
-    link.mediaType !== source.mediaType
-  ) return undefined;
-  return {
-    kind: "uri",
-    uri: link.uri,
-    compression: link.compression,
-    integrity: {
-      algorithm: link.digestAlgorithm,
-      digest: link.decodedDigest,
-      byteLength: link.byteLength,
-    },
-    immutable: link.scheme === 1 || link.scheme === 3,
-  };
-}
-
-/**
  * Resolve the two knobs into one. `gatewayTransport` wins when both are given;
  * a caller that has migrated should not have an old option quietly override the
  * new one.
@@ -1590,29 +1526,18 @@ function bindResource(
   resource: ArtifactResource,
   chainId: number,
   source: KeelObjectSourceDescriptor,
-  links: readonly KeelFidelityLink[],
-  transport: KeelGatewayTransport = DEFAULT_GATEWAY_TRANSPORT,
 ): ArtifactResource {
   if (resource.mediaType !== source.mediaType) {
     throw new TypeError(`Resource ${resource.id} media type does not match its Keel object descriptor.`);
   }
   const integrity = integrityFor(source);
-  // A prior `uri` source is a gateway too, whatever it was declared for, so it
-  // is held to the same toggle as the fidelity mirror. Everything else already
-  // comes from the chain or from the document.
-  const prior = resource.sources.filter(
-    (candidate) => sameIntegrity(candidate, integrity) && (transport !== "off" || candidate.kind !== "uri"),
+  // The registry proves this exact revision exists in the native Hold. Retain
+  // only self-contained copies of those same bytes; gateway preferences, old
+  // contract calls and foreign-chain anchors cannot lower its delivery tier.
+  const inline = resource.sources.filter(
+    (candidate) => candidate.kind === "inline" && sameIntegrity(candidate, integrity),
   );
-  const hybrid = transport === "off"
-    ? undefined
-    : links.map((link) => hybridSource(link, source)).find((candidate) => candidate !== undefined);
-  const canonical = onchainSource(chainId, source);
-  return {
-    ...resource,
-    sources: transport === "preferred"
-      ? [...(hybrid === undefined ? [] : [hybrid]), canonical, ...prior]
-      : [canonical, ...(hybrid === undefined ? [] : [hybrid]), ...prior],
-  };
+  return { ...resource, sources: [onchainSource(chainId, source), ...inline] };
 }
 
 function requireCommitment(manifest: ArtifactManifest, commitment: ManifestCommitment, extension: KeelRuntimeExtension): void {
@@ -1683,6 +1608,13 @@ export async function bindKeelManifest(
   commitment: ManifestCommitment,
   options: BindKeelManifestOptions,
 ): Promise<BoundKeelManifest> {
+  // Snapshot and recheck the declaration before reading bindings. A caller must
+  // not add a URL to an already verified manifest or mutate it during RPC reads.
+  const declaration = canonicalJson(manifest);
+  manifest = JSON.parse(declaration) as ArtifactManifest;
+  if (!(await verifyIntegrity(utf8ToBytes(declaration), commitment.integrity, options.adapters?.customDigest))) {
+    throw new TypeError("Keel manifest declaration does not match its verified commitment.");
+  }
   const extension = resolveRuntimeExtension(parseKeelRuntimeExtension(manifest), commitment, options);
   requireCommitment(manifest, commitment, extension);
   if (extension.mode === "exact" && options.blockNumber === undefined) {
@@ -2190,7 +2122,6 @@ export async function bindKeelManifest(
   }
 
   const resources = new Map(manifest.resources.map((resource) => [resource.id, resource] as const));
-  const gatewayTransport = resolveGatewayTransport(options);
   for (const item of objects) {
     const resource = resources.get(item.resource);
     if (resource === undefined) throw new Error(`Keel resource ${item.resource} disappeared during binding.`);
@@ -2198,8 +2129,6 @@ export async function bindKeelManifest(
       resource,
       extension.chainId,
       item.source,
-      item.fidelityLinks,
-      gatewayTransport,
     ));
   }
   for (const mapping of extension.equipment?.resources ?? []) {
@@ -2207,7 +2136,7 @@ export async function bindKeelManifest(
     if (source === undefined) continue;
     const resource = resources.get(mapping.resource);
     if (resource === undefined) throw new Error(`Keel equipment resource ${mapping.resource} disappeared during binding.`);
-    resources.set(mapping.resource, bindResource(resource, extension.chainId, source, [], gatewayTransport));
+    resources.set(mapping.resource, bindResource(resource, extension.chainId, source));
   }
   if (extension.seasonalGroveState !== undefined && seasonalGroveStateSource !== undefined) {
     const resource = resources.get(extension.seasonalGroveState.resource);

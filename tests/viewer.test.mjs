@@ -1493,7 +1493,7 @@ test("Keel reads the chain by default and never touches the declared mirror", as
   assert.deepEqual(audits.map(entry => entry.status), ["loaded"]);
 });
 
-test("Keel binds exact viewer state and falls back from a corrupt hybrid to verified Keccak onchain bytes", async () => {
+test("Keel native binding overrides a caller requesting a remote mirror", async () => {
   const objectBytes = new TextEncoder().encode('<svg xmlns="http://www.w3.org/2000/svg"><rect width="9" height="9"/></svg>');
   const { value, integrity, commitment } = await keelManifest(baseKeelExtension());
   const reader = keelReader({ manifestDigest: integrity.digest, objectBytes });
@@ -1501,14 +1501,11 @@ test("Keel binds exact viewer state and falls back from a corrupt hybrid to veri
     readContract: reader,
     blockNumber: 123n,
     sourceAllowlist: ["mirror.example"],
-    // Mirror-first is opt-in now. The corrupt-mirror rejection it proves still
-    // has to work for anyone who turns it on, so the proof runs against the
-    // opt-in rather than being deleted with the default.
+    // A transport preference cannot authorize a native-to-remote downgrade.
     gatewayTransport: "preferred",
     adapters: {
       async fetch(url) {
-        assert.equal(url, "https://mirror.example/object.svg");
-        return fetchResponse(url, new TextEncoder().encode("corrupt mirror"));
+        assert.fail(`Native binding must not fetch a mirror: ${url}`);
       },
       async readOnchainObject({ objectId }) {
         assert.equal(objectId, keelIds.content);
@@ -1524,7 +1521,7 @@ test("Keel binds exact viewer state and falls back from a corrupt hybrid to veri
   assert.equal(result.binding.objects[0].fidelityLinks.length, 1);
   assert.equal(result.artifact.resources.get("image").source.kind, "onchain");
   const audits = result.artifact.audit.entries.filter(entry => entry.resourceId === "image");
-  assert.deepEqual(audits.map(entry => entry.status), ["failed", "loaded"]);
+  assert.deepEqual(audits.map(entry => entry.status), ["loaded"]);
 });
 
 test("Keel live injection pins reads while exposing only manifest-declared context fields", async () => {
@@ -2139,8 +2136,12 @@ test("Keel replay requires the contract-derived seed and a pinned exact viewer s
 
   const mismatched = structuredClone(value);
   mismatched.runtime.determinism.seed = `0x${"cd".repeat(32)}`;
+  const mismatchCommitment = structuredClone(commitment);
+  mismatchCommitment.integrity = await manifestIntegrity(mismatched);
+  mismatchCommitment.registry.presentation.manifestDigest = mismatchCommitment.integrity.digest;
+  const mismatchReader = keelReader({ manifestDigest: mismatchCommitment.integrity.digest, objectBytes, derivedSeed });
   await assert.rejects(
-    () => bindKeelManifest(mismatched, commitment, { readContract: reader, blockNumber: 123n }),
+    () => bindKeelManifest(mismatched, mismatchCommitment, { readContract: mismatchReader, blockNumber: 123n }),
     /replay seed does not match/i,
   );
   await assert.rejects(
@@ -2171,8 +2172,12 @@ test("Keel exact equipment overlays a manifest resource only after loadout and s
 
   const wrong = structuredClone(value);
   wrong.extensions["keel.runtime"].equipment.expectedLoadoutDigest = `0x${"ef".repeat(32)}`;
+  const wrongCommitment = structuredClone(commitment);
+  wrongCommitment.integrity = await manifestIntegrity(wrong);
+  wrongCommitment.registry.presentation.manifestDigest = wrongCommitment.integrity.digest;
+  const wrongReader = keelReader({ manifestDigest: wrongCommitment.integrity.digest, objectBytes, gearBytes });
   await assert.rejects(
-    () => bindKeelManifest(wrong, commitment, { readContract: reader, blockNumber: 123n }),
+    () => bindKeelManifest(wrong, wrongCommitment, { readContract: wrongReader, blockNumber: 123n }),
     /loadout does not match/i,
   );
 });
@@ -2436,4 +2441,65 @@ test("editor preview decodes the default saver without adding a Base64 document"
   const sandbox = createSandboxDocument(await resolveArtifact(value));
   assert.match(sandbox.html, /data-inline="raw">雪 100% # \+ \/ =/u);
   assert.doesNotMatch(sandbox.html, /%253C!doctype|data:text\/html;base64/u);
+});
+
+
+for (const preference of [{ gatewayTransport: 'preferred' }, { gatewayTransport: 'fallback' }, { sourcePreference: 'hybrid-first' }]) {
+  test(`native revision cannot reconnect declared remote or foreign-chain sources: ${JSON.stringify(preference)}`, async () => {
+    const objectBytes = utf8ToBytes('<svg xmlns="http://www.w3.org/2000/svg"/>');
+    const { value, commitment } = await keelManifest(baseKeelExtension());
+    const image = value.resources.find(resource => resource.id === 'image');
+    const integrity = { algorithm: 'keccak256', digest: keccak256(objectBytes), byteLength: objectBytes.length };
+    image.sources = [
+      ...['https://mirror.example/object.svg', 'ipfs://bafy-test/object.svg', 'ar://test-object'].map(uri => ({ kind: 'uri', uri, integrity })),
+      { kind: 'onchain', chainId: 1, store: keelAddresses.store, objectId: keelIds.content, integrity },
+      { kind: 'contract-call', chainId: 31337, to: keelAddresses.store, data: '0x12345678', decode: 'bytes', integrity },
+    ];
+    commitment.integrity = await manifestIntegrity(value);
+    commitment.registry.presentation.manifestDigest = commitment.integrity.digest;
+    let remoteCalls = 0;
+    await assert.rejects(() => resolveKeelArtifact(value, commitment, {
+      ...preference,
+      blockNumber: 123n,
+      readContract: keelReader({ manifestDigest: commitment.integrity.digest, objectBytes }),
+      adapters: {
+        async fetch() { remoteCalls++; throw new Error('Remote fallback must not run'); },
+        async callContract() { remoteCalls++; throw new Error('Old contract source must not run'); },
+        async readOnchainObject(request) {
+          assert.equal(request.chainId, 31337);
+          throw new Error('native RPC unavailable');
+        },
+        async customDigest(_algorithm, bytes) { return keccak256(bytes, 'bytes'); },
+      },
+    }), /native RPC unavailable/);
+    assert.equal(remoteCalls, 0);
+  });
+}
+
+test('native binding rejects a URL added after the revision manifest was committed', async () => {
+  const { value, commitment } = await keelManifest(baseKeelExtension());
+  value.resources.find(resource => resource.id === 'image').sources.push({
+    kind: 'uri', uri: 'https://undeclared.example/payload.svg',
+    integrity: { algorithm: 'sha256', digest: `0x${'11'.repeat(32)}`, byteLength: 1 },
+  });
+  let reads = 0;
+  await assert.rejects(() => bindKeelManifest(value, commitment, {
+    blockNumber: 123n,
+    async readContract() { reads++; throw new Error('Must reject before any chain reads'); },
+  }), /declaration does not match/);
+  assert.equal(reads, 0);
+});
+
+test('native binding snapshots declarations before asynchronous chain reads', async () => {
+  const objectBytes = utf8ToBytes('<svg xmlns="http://www.w3.org/2000/svg"/>');
+  const { value, commitment } = await keelManifest(baseKeelExtension());
+  const reader = keelReader({ manifestDigest: commitment.integrity.digest, objectBytes });
+  const bound = await bindKeelManifest(value, commitment, {
+    blockNumber: 123n,
+    readContract(request) {
+      value.resources.find(resource => resource.id === 'image').aliases = ['https://undeclared.example/injected'];
+      return reader(request);
+    },
+  });
+  assert.ok(!bound.manifest.resources.find(resource => resource.id === 'image').aliases?.includes('https://undeclared.example/injected'));
 });

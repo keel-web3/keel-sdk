@@ -66,9 +66,10 @@ rendering trust root.
 - Supports creator, token-owner, creator-or-token-owner, and immutable editing
   policies. Token ownership is read live from `ownerOf`; it is never cached.
 - Freezing is permanent. Immutable creation freezes revision one immediately.
-- Creation and revision-policy callbacks are non-reentrant. Incorrect native
-  payments revert before the object is committed, and `protocolFeesAccrued` is
-  decremented before the recipient interaction during claims.
+- Creation, revision, freeze and revision-policy changes are non-reentrant.
+  Incorrect native payments revert before commitment. Creation fees go directly
+  to the configured recipient after the complete revision is committed; failed
+  settlement reverts all changes. Frozen lineages cannot install a revision policy.
 
 An object revision descriptor commits decoded bytes, not Brotli recompression
 output. Different valid compressed streams may decode to the same committed

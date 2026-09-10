@@ -32,6 +32,7 @@ export const TEST_FILES_ON_DISK = Object.freeze(readdirSync(TEST_ROOT)
  * its execution boundary.
  */
 export const DETERMINISTIC_TEST_FILES = Object.freeze([
+  "tests/artifact-registry-abi.test.mjs",
   "tests/manager-wire.test.mjs",
   "tests/manager-state.test.mjs",
   "tests/adversarial-boundary.test.mjs",
