@@ -629,8 +629,15 @@ function parseOnchainReads(value: unknown): readonly KeelOnchainRead[] {
  * fact in the response rather than a claim in a comment.
  */
 async function onchainDataTool(_context: ToolContext, value: unknown): Promise<unknown> {
-  const input = record(value, ["rpcUrl", "reads", "blockTag", "globalName", "moduleId", "version"], "On-chain data arguments");
-  const reads = parseOnchainReads(input.reads);
+  const input = record(value, ["rpcUrl", "reads", "record", "blockTag", "globalName", "moduleId", "version"], "On-chain data arguments");
+  const seedInput = input.record === undefined ? undefined : record(input.record, ["address", "recordId", "batchSize"], "Seed record");
+  const seedBatchSize = seedInput === undefined ? undefined : optionalNumber(seedInput, "batchSize");
+  const seedRecord = seedInput === undefined ? undefined : {
+    address: requiredString(seedInput, "address") as `0x${string}`,
+    recordId: requiredString(seedInput, "recordId"),
+    ...(seedBatchSize === undefined ? {} : { batchSize: seedBatchSize }),
+  };
+  const reads = seedRecord && Array.isArray(input.reads) && input.reads.length === 0 ? [] : parseOnchainReads(input.reads);
   const rpc = resolveKeelOnchainRpcUrl(optionalString(input, "rpcUrl"), process.env);
   const blockTag = optionalString(input, "blockTag");
   const globalName = optionalString(input, "globalName");
@@ -638,6 +645,7 @@ async function onchainDataTool(_context: ToolContext, value: unknown): Promise<u
   const layer = await readOnchainData({
     rpcUrl: rpc.url,
     reads,
+    ...(seedRecord === undefined ? {} : { record: seedRecord }),
     ...(blockTag === undefined ? {} : { blockTag }),
   });
   const fragment = buildOnchainDataFragment(layer, {
@@ -947,7 +955,7 @@ export const TOOL_DEFINITIONS: readonly ToolDefinition[] = [
   tool("fray-stage-project", "Upload bounded source bytes to the configured Fray Studio temporary project store, prepare still/video previews, preflight the fee, and return a wallet-facing handoff; no signing or submission occurs.", TOOL_SCHEMAS.frayStageProject, frayStageProjectTool),
   tool("keel-chain-guide", "List supported testnets and human faucet links; the MCP server never claims faucet funds or moves wallet assets.", TOOL_SCHEMAS.chainGuide, chainGuideTool),
   tool("keel-library-search", "Search configured Keel Studio Keel indexes for exact reusable library/module candidates; metadata only, no carrier bytes are fetched.", TOOL_SCHEMAS.keelLibrarySearch, keelLibrarySearchTool),
-  tool("keel-onchain-data-prepare", "Turn declared contract reads into artwork variables. Each read becomes one eth_call, the answers are frozen into a canonical pack, and the tool returns the init fragment that publishes them as a frozen global before any runtime or render module runs, so creator code reads KEEL.data.<name> instead of fetching at draw time and finding undefined. Static return types only: a dynamic return needs an offset table, and guessing it would hand back a plausible wrong number. Arguments are decimal or 0x-hex text because a uint256 does not survive a JSON number. An omitted rpcUrl resolves KEEL_ONCHAIN_RPC_URL, then the configured public RPC; loopback HTTP is accepted so a local anvil is the ordinary target while a work is being built. The returned fragment is executed before it is returned, so the published values are checked, not assumed. Read-only: eth_call plus chain identity and head. No signing or submission occurs, no state is written, and no wallet is touched.", TOOL_SCHEMAS.onchainData, onchainDataTool),
+  tool("keel-onchain-data-prepare", "Turn declared contract reads into artwork variables. With record, automatically discover its KEEL seed profile and expose KEEL.data.token without individual field declarations; the contract must advertise IKeelMintSeededData. Each declared read becomes one eth_call, the answers are frozen into a canonical pack, and the tool returns the init fragment that publishes them as a frozen global before any runtime or render module runs, so creator code reads KEEL.data.<name> instead of fetching at draw time and finding undefined. Static return types only: a dynamic return needs an offset table, and guessing it would hand back a plausible wrong number. Arguments are decimal or 0x-hex text because a uint256 does not survive a JSON number. An omitted rpcUrl resolves KEEL_ONCHAIN_RPC_URL, then the configured public RPC; loopback HTTP is accepted so a local anvil is the ordinary target while a work is being built. The returned fragment is executed before it is returned, so the published values are checked, not assumed. Read-only: eth_call plus chain identity and head. No signing or submission occurs, no state is written, and no wallet is touched.", TOOL_SCHEMAS.onchainData, onchainDataTool),
   tool("keel-endpoint-config", "Resolve the Studio, public RPC, and optional indexer URLs using explicit input, KEEL environment configuration, then canonical test defaults; no network request occurs.", TOOL_SCHEMAS.endpointConfig, endpointConfigTool),
   tool("keel-studio-capabilities", "Inspect a Studio's supported chains, zero-spend sandbox, staging, authorization, and MSP readiness before any upload or wallet action.", TOOL_SCHEMAS.studioCapabilities, studioCapabilitiesTool),
   tool("keel-studio-project-intake", "Ask only for missing project decisions, then return either storage-only preparation or an editable release/listing intent. No upload, signature, wallet request, or transaction occurs.", TOOL_SCHEMAS.studioProjectIntake, studioProjectIntakeTool),

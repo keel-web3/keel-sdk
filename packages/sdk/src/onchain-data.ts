@@ -8,6 +8,8 @@ import {
   type KeelOrderedModule,
 } from "./data-layer.js";
 import { resolveKeelEndpoints, type KeelEndpointEnvironment } from "./endpoints.js";
+import { readKeelMintSeededData, type KeelMintSeededRecord } from "./mint-seeded-data.js";
+import type { Hex } from "viem";
 
 /**
  * ON-CHAIN DATA AS SCRIPT VARIABLES.
@@ -53,6 +55,8 @@ export interface KeelOnchainDataOptions {
   readonly blockTag?: string;
   /** Injected for tests and for runtimes with their own transport. */
   readonly fetchImpl?: typeof fetch;
+  /** Automatically discover this record's seed profile and publish it as KEEL.data.token. */
+  readonly record?: KeelMintSeededRecord;
 }
 
 export interface KeelOnchainDataLayer {
@@ -192,28 +196,39 @@ export async function readOnchainData(options: KeelOnchainDataOptions): Promise<
   const call = options.fetchImpl ?? fetch;
   const blockTag = options.blockTag ?? "latest";
   let id = 0;
-  const rpc = async (method: string, params: readonly unknown[]): Promise<string> => {
+  const rpc = async (method: string, params: readonly unknown[], probe = false): Promise<string> => {
     const response = await call(options.rpcUrl, {
       method: "POST",
       headers: { "content-type": "application/json" },
       body: JSON.stringify({ jsonrpc: "2.0", id: (id += 1), method, params }),
     });
     if (!response.ok) throw new Error(`${method} failed: HTTP ${response.status}`);
-    const body = (await response.json()) as { result?: string; error?: { message?: string } };
+    const body = (await response.json()) as { result?: string; error?: { code?: number; message?: string } };
+    if (probe && body.error && (body.error.code === 3 || /execution reverted/i.test(body.error.message ?? ""))) return "0x";
     if (body.error) throw new Error(`${method} failed: ${body.error.message ?? "unknown RPC error"}`);
     if (typeof body.result !== "string") throw new Error(`${method} returned no result.`);
     return body.result;
   };
 
   const chainId = Number(BigInt(await rpc("eth_chainId", [])));
-  const blockNumber = Number(BigInt(await rpc("eth_blockNumber", [])));
+  let blockNumber = Number(BigInt(await rpc("eth_blockNumber", [])));
+  let readBlockTag = blockTag;
+  if (options.record) {
+    if (!Number.isSafeInteger(chainId) || chainId < 1) throw new RangeError("Invalid seed-data chain ID");
+    if (blockTag !== "latest" && !/^0x[0-9a-f]+$/i.test(blockTag)) {
+      throw new Error("Seed-data snapshots require latest or a hexadecimal block number");
+    }
+    if (blockTag !== "latest") blockNumber = Number(BigInt(blockTag));
+    if (!Number.isSafeInteger(blockNumber)) throw new RangeError("Block number exceeds safe integer range");
+    readBlockTag = `0x${blockNumber.toString(16)}`;
+  }
 
   const values: Record<string, KeelDataValue> = {};
   for (const read of options.reads) {
     if (!IDENTIFIER.test(read.name)) throw new TypeError(`"${read.name}" is not a usable variable name.`);
     if (Object.hasOwn(values, read.name)) throw new TypeError(`Duplicate on-chain variable "${read.name}".`);
     const data = `${keccakSelector(read.signature)}${(read.args ?? []).map(encodeArg).join("")}`;
-    const raw = (await rpc("eth_call", [{ to: read.address, data }, blockTag])).slice(2);
+    const raw = (await rpc("eth_call", [{ to: read.address, data }, readBlockTag])).slice(2);
     if (raw.length < read.returns.length * 64) {
       throw new Error(`${read.name}: ${read.signature} returned ${raw.length / 2} bytes, too few for ${read.returns.length} values.`);
     }
@@ -221,6 +236,45 @@ export async function readOnchainData(options: KeelOnchainDataOptions): Promise<
     values[read.name] = read.pick === undefined
       ? (decoded.length === 1 ? decoded[0]! : decoded)
       : (decoded[read.pick] ?? null);
+  }
+  if (options.record) {
+    if (Object.hasOwn(values, "token")) throw new Error("The token variable is reserved for the discovered seed record");
+    const record = options.record;
+    let batching = true;
+    const readWordCalls = async (data: readonly Hex[]): Promise<readonly Hex[]> => {
+      if (!batching) {
+        const results: Hex[] = [];
+        for (const input of data) results.push(await rpc("eth_call", [{ to: record.address, data: input }, readBlockTag]) as Hex);
+        return results;
+      }
+      const requests = data.map(input => ({ jsonrpc: "2.0", id: (id += 1), method: "eth_call",
+        params: [{ to: record.address, data: input }, readBlockTag] }));
+      const response = await call(options.rpcUrl, { method: "POST", headers: { "content-type": "application/json" },
+        body: JSON.stringify(requests) });
+      if (!response.ok) throw new Error(`Seed-data batch failed: HTTP ${response.status}`);
+      const body = await response.json();
+      // A provider may explicitly reject batch envelopes. Individual contract
+      // errors, malformed replies and transport failures must not be hidden.
+      if (!Array.isArray(body) && body?.id === null && [-32600, -32601].includes(body?.error?.code)) {
+        batching = false;
+        return readWordCalls(data);
+      }
+      if (!Array.isArray(body) || body.length !== requests.length) throw new Error("Invalid seed-data RPC batch");
+      const expected = new Set(requests.map(request => request.id));
+      const results = new Map<number, Hex>();
+      for (const entry of body) {
+        if (!entry || entry.jsonrpc !== "2.0" || !expected.has(entry.id) || results.has(entry.id)) {
+          throw new Error("Invalid seed-data RPC batch ID");
+        }
+        if (entry.error) throw new Error(`Seed-data batch call failed: ${entry.error.message ?? "unknown RPC error"}`);
+        if (typeof entry.result !== "string") throw new Error("Seed-data batch returned no result");
+        results.set(entry.id, entry.result as Hex);
+      }
+      return requests.map(request => results.get(request.id)!);
+    };
+    const token = await readKeelMintSeededData(options.record, async (data, probe) =>
+      await rpc("eth_call", [{ to: record.address, data }, readBlockTag], probe) as Hex, readWordCalls);
+    if (token !== undefined) values.token = token;
   }
   return { chainId, blockNumber, values: Object.freeze(values) };
 }
@@ -268,7 +322,8 @@ export function buildOnchainDataFragment(
     + `if(m===4){const n=L(a),r=[];for(let i=0;i<n;i++)r.push(R());return r;}`
     + `if(m===5){const n=L(a),r={};for(let i=0;i<n;i++){const k=R();r[k]=R();}return r;}`
     + `throw new Error("keel-onchain-data: bad pack");};`
-    + `const P0=R();const data=Object.freeze(P0.values||{});`
+    + `const F=v=>{if(v&&typeof v==="object"){for(const x of Object.values(v))F(x);Object.freeze(v);}return v;};`
+    + `const P0=R();const data=F(P0.values||{});`
     + `const api=Object.freeze({protocol:"${KEEL_ONCHAIN_DATA_PROTOCOL}",chainId:P0.chainId,blockNumber:P0.blockNumber,data,digest:"${digest}"});`
     /* Why defineProperty and not assignment: the whole contract of this layer is
        that the values are there and cannot be replaced by a later module. */
@@ -418,11 +473,12 @@ export function assertOnchainDataRoundTrip(layer: KeelOnchainDataLayer, fragment
   if (published.chainId !== layer.chainId || published.blockNumber !== layer.blockNumber) {
     throw new Error("keel-onchain-data: the fragment does not carry the block it was built from.");
   }
-  for (const [name, value] of Object.entries(layer.values)) {
-    const seen = JSON.stringify(published.data[name]);
-    if (seen !== JSON.stringify(value)) {
-      throw new Error(`keel-onchain-data: "${name}" reads ${seen} in the document and ${JSON.stringify(value)} on chain.`);
-    }
+  // Canonical encoding compares nested values without treating map-key order
+  // as data. CBOR deliberately sorts keys when the fragment is built.
+  const expected = encodeKeelDataPack(layer.values, "none");
+  const seen = encodeKeelDataPack(published.data, "none");
+  if (seen.length !== expected.length || seen.some((byte, index) => byte !== expected[index])) {
+    throw new Error("keel-onchain-data: document values differ from the chain snapshot.");
   }
 }
 

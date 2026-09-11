@@ -282,7 +282,12 @@ const onchainRead: JsonSchema = object({
 }, ["name", "address", "signature", "returns"]);
 const onchainData: JsonSchema = object({
   rpcUrl: string("Optional JSON-RPC endpoint. Omit to resolve KEEL_ONCHAIN_RPC_URL, then the configured public RPC. HTTP is accepted only on a loopback host, which is how a local anvil is reached.", 512),
-  reads: { type: "array", items: onchainRead, minItems: 1, maxItems: 64, description: "The values this artwork needs." },
+  reads: { type: "array", items: onchainRead, minItems: 0, maxItems: 64, description: "Additional values this artwork needs. Can be empty when record is supplied." },
+  record: object({
+    address: string("Selected contract exposing the optional KEEL seed-profile interface.", 42),
+    recordId: string("Exact record or token ID as decimal or hexadecimal text.", 80),
+    batchSize: integer("Word reads per HTTP batch. Defaults to 64; use 1 for a provider without batch support.", 1, 256),
+  }, ["address", "recordId"]),
   blockTag: string("Block to read at. Defaults to latest; pin a hex block number for a reproducible build.", 32),
   globalName: string("Global the fragment publishes. Defaults to KEEL, so creator code reads KEEL.data.<name>.", 64),
   moduleId: string("Inline module ID for the emitted fragment. Defaults to keel/onchain-data.", 120),

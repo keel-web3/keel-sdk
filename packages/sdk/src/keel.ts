@@ -304,7 +304,7 @@ export const keelDirectReadPolicy = {
   "keel-seed-registry": [
     "harnessRegistry",
     "keelIndex",
-    "seedSetForViewerRevision",
+    "seedSetForHarnessRevision",
     "predictSeedSetId",
     "deriveTokenSeed",
   ],

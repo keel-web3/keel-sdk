@@ -121,6 +121,14 @@
     "./link-presentation": {
       "types": "./dist/link-presentation.d.ts",
       "import": "./dist/link-presentation.js"
+    },
+    "./mint-seeded": {
+      "types": "./dist/mint-seeded.d.ts",
+      "import": "./dist/mint-seeded.js"
+    },
+    "./mint-seeded-data": {
+      "types": "./dist/mint-seeded-data.d.ts",
+      "import": "./dist/mint-seeded-data.js"
     }
   },
   "files": [

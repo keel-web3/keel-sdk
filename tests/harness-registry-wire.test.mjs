@@ -68,3 +68,15 @@ test('HarnessRevision retains full-width counters beside the packed direct list 
   const data=encodeFunctionResult({abi:contract,functionName:'harnessRevision',result});
   assert.deepEqual(decodeFunctionResult({abi:sdk,functionName:'harnessRevision',data}),result);
 });
+
+test('seed context preserves exact addresses and digests, including the absent revision tuple', () => {
+  for (const result of [
+    [true, address('11'), address('22'), word('ff'), word('44')],
+    [true, address('11'), address('22'), word('33'), word('00')],
+    [false, address('00'), address('00'), word('00'), word('00')],
+  ]) {
+    const data = encodeFunctionResult({ abi: contract, functionName: 'harnessSeedContext', result });
+    assert.equal(data.length, 2 + 5 * 64);
+    assert.deepEqual(decodeFunctionResult({ abi: sdk, functionName: 'harnessSeedContext', data }), result);
+  }
+});

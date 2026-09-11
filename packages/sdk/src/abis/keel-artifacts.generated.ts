@@ -2150,6 +2150,50 @@ export const ABIS = {
     },
     {
       "type": "function",
+      "name": "harnessSeedContext",
+      "inputs": [
+        {
+          "name": "harnessId",
+          "type": "bytes32",
+          "internalType": "bytes32"
+        },
+        {
+          "name": "revision",
+          "type": "uint64",
+          "internalType": "uint64"
+        }
+      ],
+      "outputs": [
+        {
+          "name": "exists",
+          "type": "bool",
+          "internalType": "bool"
+        },
+        {
+          "name": "collection",
+          "type": "address",
+          "internalType": "address"
+        },
+        {
+          "name": "publisher",
+          "type": "address",
+          "internalType": "address"
+        },
+        {
+          "name": "manifestDigest",
+          "type": "bytes32",
+          "internalType": "bytes32"
+        },
+        {
+          "name": "seedSetDigest",
+          "type": "bytes32",
+          "internalType": "bytes32"
+        }
+      ],
+      "stateMutability": "view"
+    },
+    {
+      "type": "function",
       "name": "harnessSlots",
       "inputs": [
         {
@@ -7490,6 +7534,18 @@ export const ABIS = {
       "name": "SeedSetPublished",
       "inputs": [
         {
+          "name": "harnessRevision",
+          "type": "uint64",
+          "indexed": true,
+          "internalType": "uint64"
+        },
+        {
+          "name": "rootSeed",
+          "type": "bytes32",
+          "indexed": false,
+          "internalType": "bytes32"
+        },
+        {
           "name": "seedSetId",
           "type": "bytes32",
           "indexed": true,
@@ -7502,16 +7558,10 @@ export const ABIS = {
           "internalType": "bytes32"
         },
         {
-          "name": "harnessRevision",
-          "type": "uint64",
-          "indexed": true,
-          "internalType": "uint64"
-        },
-        {
-          "name": "collection",
-          "type": "address",
+          "name": "provenanceDigest",
+          "type": "bytes32",
           "indexed": false,
-          "internalType": "address"
+          "internalType": "bytes32"
         },
         {
           "name": "harnessManifestDigest",
@@ -7520,16 +7570,10 @@ export const ABIS = {
           "internalType": "bytes32"
         },
         {
-          "name": "rootSeed",
-          "type": "bytes32",
+          "name": "revealer",
+          "type": "address",
           "indexed": false,
-          "internalType": "bytes32"
-        },
-        {
-          "name": "provenanceDigest",
-          "type": "bytes32",
-          "indexed": false,
-          "internalType": "bytes32"
+          "internalType": "address"
         },
         {
           "name": "publisher",
@@ -7538,7 +7582,7 @@ export const ABIS = {
           "internalType": "address"
         },
         {
-          "name": "revealer",
+          "name": "collection",
           "type": "address",
           "indexed": false,
           "internalType": "address"
