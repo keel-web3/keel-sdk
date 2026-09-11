@@ -134,7 +134,9 @@ export const KEEL_MODULES: readonly KeelModule[] = [
       "interfaces/IKeelHoldHarness.sol",
       "interfaces/IKeelHoldEvents.sol",
       "libraries/KeelHoldMetadata.sol",
-      "interfaces/IKeelHoldErrors.sol"
+      "interfaces/IKeelHoldErrors.sol",
+      "interfaces/IKeelIndexErrors.sol",
+      "interfaces/IKeelIndexEvents.sol"
     ],
     "deployable": [
       "Ingot",

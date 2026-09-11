@@ -2479,7 +2479,7 @@ export const ABIS = {
           "name": "policy",
           "type": "uint8",
           "indexed": false,
-          "internalType": "enum KeelIndex.RevisionPolicy"
+          "internalType": "uint8"
         },
         {
           "name": "activationTime",

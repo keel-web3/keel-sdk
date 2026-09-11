@@ -11,6 +11,7 @@ export const BROWSER_TEST_FILES = Object.freeze([
 
 /** Reads neighboring repositories; each file uses siblingTest so ordinary clones skip honestly. */
 export const SIBLING_CONFORMANCE_TEST_FILES = Object.freeze([
+  "tests/index-registry-wire.test.mjs",
   "tests/fray-policy-source-conformance.test.mjs",
   "tests/keel-rpc-policy.test.mjs",
   "tests/sdk-keel721-compiled-abi.test.mjs",
