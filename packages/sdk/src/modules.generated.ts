@@ -73,7 +73,7 @@ export const KEEL_MODULES: readonly KeelModule[] = [
       "libraries/KeelMintSeeded.sol",
       "interfaces/IKeelMintSeededErrors.sol",
       "interfaces/IKeelMintSeededData.sol",
-      "interfaces/IKeelGovernanceErrors.sol",
+      "interfaces/IKeelGovernanceErrors.sol", "interfaces/IKeelPlatformFeeErrors.sol", "interfaces/IKeelFeeTreasuryErrors.sol", "interfaces/IKeelFeeTreasuryEvents.sol",
       "interfaces/IKeelAccessGroupErrors.sol",
       "interfaces/IKeelAccessGroupEvents.sol",
       "KeelRecoveryGroups.sol",
@@ -373,7 +373,7 @@ export const KEEL_MODULES: readonly KeelModule[] = [
     ],
     "contracts": [
       "FrayAuctionIssuer.sol",
-      "KeelMintGate.sol",
+      "KeelMintGate.sol", "interfaces/IKeelMintGateErrors.sol", "interfaces/IKeelMintGateEvents.sol",
       "KeelMintRouteRegistry.sol",
       "OneMintController.sol",
       "OpenOneMintController.sol",
