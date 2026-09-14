@@ -9,6 +9,7 @@ export const keelMetadataResolverAbi = [
   "function tokenJSON(uint256 tokenId) view returns (string)",
   "function tokenURI(uint256 tokenId) view returns (string)",
   "function erc4804URI(uint256 tokenId) view returns (string)",
+  "function erc4804URIOnChain(address target, uint256 chainId, uint256 tokenId) pure returns (string)",
 ] as const;
 
 export interface KeelTokenJSONURIInput {
@@ -20,7 +21,9 @@ export interface KeelTokenJSONURIInput {
 /**
  * Build the canonical ERC-4804 route exposed by Keel metadata resolvers.
  * The route deliberately targets the contract that exposes `tokenJSON`, not
- * a gateway or an HTTP mirror.
+ * a gateway or an HTTP mirror. Pass the current chain for the default route,
+ * or an explicit remote EVM chain and its deployed resolver address. Building
+ * the URL does not verify remote deployment or fetch cross-chain data.
  */
 export function keelTokenJSONURI(input: KeelTokenJSONURIInput): string {
   const chainId = uint(input.chainId, 0n, "chainId");
