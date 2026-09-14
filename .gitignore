@@ -2,3 +2,13 @@ node_modules/
 dist/
 *.tsbuildinfo
 .env
+.DS_Store
+.env.*
+.playwright-mcp/
+# Screenshots dropped at the repository root by tools and agents.
+/*.png
+/*.gif
+/*.avif
+# Built game documents and page bundles (rebuilt by the SDK CLI).
+examples/game-engine/*/out/
+examples/game-engine/*/tools/dist/

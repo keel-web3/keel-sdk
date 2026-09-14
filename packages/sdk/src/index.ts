@@ -76,3 +76,6 @@ export * from "./manager-events.js";
 export * from "./harness-tree.js";
 export * from "./mint-seeded.js";
 export * from "./mint-seeded-data.js";
+
+export * from './metadata-notifications.js';
+export * from './metadata-relay.js';
