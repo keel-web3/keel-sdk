@@ -326,7 +326,7 @@ export async function verifyBundledFfmpegExecutable(options: BundledFfmpegExecut
   }
 }
 
-async function resolveBundledFfmpeg(): Promise<VideoResolution> {
+export async function resolveBundledFfmpeg(): Promise<VideoResolution> {
   try {
     const packageJsonPath = localRequire.resolve("ffmpeg-static/package.json");
     const packageRoot = await realpath(path.dirname(packageJsonPath));

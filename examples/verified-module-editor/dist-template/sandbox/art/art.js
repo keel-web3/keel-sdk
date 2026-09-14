@@ -1796,6 +1796,7 @@ function mountTemplate(root, view) {
       }
       const set = (next) => {
         if (key === "style" && next && typeof next === "object") {
+          element.removeAttribute("style");
           for (const [property, setting] of Object.entries(next))
             element.style.setProperty(property.replace(/[A-Z]/gu, (letter) => `-${letter.toLowerCase()}`), String(setting));
           return;

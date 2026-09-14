@@ -9,6 +9,10 @@
     ".": {
       "types": "./dist/index.d.ts",
       "import": "./dist/index.js"
+    },
+    "./thumbnail-sequence": {
+      "types": "./dist/thumbnail-sequence.d.ts",
+      "import": "./dist/thumbnail-sequence.js"
     }
   },
   "files": [

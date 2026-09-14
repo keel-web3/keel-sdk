@@ -10,7 +10,7 @@ const root = fileURLToPath(new URL('.', import.meta.url));
 await mkdir(path.join(root, '.keel'), { recursive: true });
 await writeFile(path.join(root, '.keel/globals.d.ts'), createKeelGlobalDeclarations(root, [path.join(root, 'src/art.ts')]));
 const modules = JSON.parse(await readFile(path.join(root, 'keel.includes.json'), 'utf8'));
-const outputDirectory = path.join(root, entry.endsWith('.tsx') ? 'dist-template' : 'dist');
+const outputDirectory = path.join(root, entry.endsWith('.tsx') ? `dist-${path.basename(entry, '.tsx')}` : 'dist');
 const plan = await buildCreatorProject({ root, outputDirectory, modules, surfaces: [{ name: 'art', entry, isolation: 'sandbox' }] });
 const scripts = plan.nodes.filter(node => node.mediaType === 'text/javascript');
 if (scripts.length !== 1) throw new Error('This single-surface example must produce one bundled script.');

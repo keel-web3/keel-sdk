@@ -18,8 +18,8 @@
       "mediaType": "text/javascript",
       "integrity": {
         "algorithm": "sha256",
-        "digest": "0x351fdbc20e207d3c281140339df381179b0b50727c1a25545dc50fa04df19860",
-        "byteLength": 64980
+        "digest": "0x8ec2419b344d366f72b42312c86c64bc1532c1c9dddb2ff7a377378e3ae8a0e1",
+        "byteLength": 65024
       },
       "objectId": null
     }

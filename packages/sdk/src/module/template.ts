@@ -72,7 +72,7 @@ export function mountTemplate(root: Element, view: TemplateChild): Disposal {
         const event = key.slice(2).toLowerCase(); element.addEventListener(event, value as EventListener); cleanup.push(() => element.removeEventListener(event, value as EventListener)); continue;
       }
       const set = (next: unknown) => {
-        if (key === "style" && next && typeof next === "object") { for (const [property, setting] of Object.entries(next)) (element as HTMLElement).style.setProperty(property.replace(/[A-Z]/gu, letter => `-${letter.toLowerCase()}`), String(setting)); return; }
+        if (key === "style" && next && typeof next === "object") { element.removeAttribute("style"); for (const [property, setting] of Object.entries(next)) (element as HTMLElement).style.setProperty(property.replace(/[A-Z]/gu, letter => `-${letter.toLowerCase()}`), String(setting)); return; }
         const attribute = key === "className" ? "class" : key === "htmlFor" ? "for" : key;
         if (key === "value" || key === "checked" || key === "selected") (element as unknown as Record<string, unknown>)[key] = next;
         if (next == null || next === false) element.removeAttribute(attribute); else element.setAttribute(attribute, next === true ? "" : String(next));

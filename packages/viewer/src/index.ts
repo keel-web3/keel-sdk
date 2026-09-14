@@ -25,3 +25,5 @@ export * from "./marketplace.js";
 
 export * from "./egress.js";
 export * from "./frozen-dataset.js";
+
+export * from "./thumbnail-capture.js";
