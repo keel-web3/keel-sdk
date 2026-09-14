@@ -1,0 +1,42 @@
+/** Independent public-RPC and web3-protocol acceptance of the prepared token. */
+import assert from 'node:assert/strict';
+import {readFile,writeFile,mkdir} from 'node:fs/promises';
+import {createPublicClient,http,sha256,encodeFunctionData} from 'viem';
+import {Client} from '/tmp/keel-web3-jpeg-proof/node_modules/web3protocol/src/index.js';
+const root='apps/desktop/artifacts/gator-inline-sepolia/live-token-0';
+const json=async path=>JSON.parse(await readFile(path,'utf8'));
+const proof=await json(root+'/readers-proof.json');
+const original=await json('apps/desktop/artifacts/gator-sepolia/compiled-original.json');
+const matrix=await json('/Users/ravonus/dev/keel-contracts/out/KeelTokenMatrix.sol/KeelTokenMatrix.json');
+const rpc='https://sepolia.gateway.tenderly.co';
+const c=createPublicClient({transport:http(rpc,{timeout:60000,retryCount:1})});
+assert.equal(await c.getChainId(),11155111);
+const w3=new Client([{id:11155111,name:'Sepolia',rpcUrls:[rpc]}]);
+const fetchURI=async uri=>{const r=await w3.fetchUrl(uri);assert.equal(r.httpCode,200);return {bytes:Buffer.from(await new Response(r.output).arrayBuffer()),type:Object.entries(r.httpHeaders).find(([k])=>k.toLowerCase()==='content-type')?.[1]};};
+const metadataRead=await fetchURI(proof.tokenURI);
+assert.equal(metadataRead.type,'application/json');
+assert.deepEqual(metadataRead.bytes,await readFile(root+'/metadata-candidate.json'));
+const metadata=JSON.parse(metadataRead.bytes);
+assert.ok(metadata.image.startsWith(`web3://${proof.imageResolver}:11155111/`));
+const svg=await fetchURI(metadata.image);assert.equal(svg.type,'image/svg+xml');
+assert.deepEqual(svg.bytes,await readFile(root+'/image.svg'));
+assert.ok(metadata.animation_url.startsWith('data:text/html'));
+const html=Buffer.from(decodeURIComponent(metadata.animation_url.slice(metadata.animation_url.indexOf(',')+1)));
+assert.deepEqual(html,await readFile(root+'/viewer.html'));
+const {image:_image,animation_url:_animation,...fields}=metadata;
+const {image:_oldImage,animation_url:_oldAnimation,...expected}=await json('apps/desktop/artifacts/gator-ape-rebuild/metadata/0.json');
+assert.deepEqual(fields,expected);
+const gases={};
+for(const [name,address] of [['json',proof.metadataResolver],['svg',proof.imageResolver]]){
+ gases[name]=String(await c.estimateGas({to:address,data:encodeFunctionData({abi:matrix.abi,functionName:'tokenJSON',args:[0n]}),gas:60_000_000n}));
+ assert.ok(BigInt(gases[name])<60_000_000n);
+}
+const actualURI=await c.readContract({address:proof.collection,abi:original.abi,functionName:'tokenURI',args:[0n]});
+const activated=actualURI===proof.tokenURI;
+if(process.env.KEEL_GATOR_REQUIRE_ACTIVE==='1')assert.ok(activated,'Original collection URI has not been activated');
+await mkdir(root+'/public-readback',{recursive:true});
+await writeFile(root+'/public-readback/metadata.json',metadataRead.bytes);
+await writeFile(root+'/public-readback/image.svg',svg.bytes);
+await writeFile(root+'/public-readback/viewer.html',html);
+const report={...proof,checkedAt:new Date().toISOString(),rpc,activated,actualCollectionURI:actualURI,originalMetadataExact:true,metadataContentType:metadataRead.type,imageContentType:svg.type,jsonBytes:metadataRead.bytes.length,svgBytes:svg.bytes.length,htmlBytes:html.length,jsonDigest:sha256(metadataRead.bytes),svgDigest:sha256(svg.bytes),htmlDigest:sha256(html),readGas:gases,web3ProtocolReadback:true,browserAcceptance:false};
+await writeFile(root+'/public-readback/proof.json',JSON.stringify(report,null,2));console.log(JSON.stringify(report));

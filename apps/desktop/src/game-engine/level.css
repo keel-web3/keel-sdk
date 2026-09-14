@@ -1,0 +1,75 @@
+/* The Level tab, in the editor's own palette (styles.css :root), next to the Builder's and the Sound's. */
+.level{padding:24px 32px 40px}
+.level-heading{margin-bottom:14px}
+.level-bar .field{min-width:140px}
+.level-layout{display:grid;grid-template-columns:minmax(280px,340px) minmax(0,1fr) minmax(280px,340px);gap:16px;align-items:start}
+.level-recipe h3{font:18px var(--serif);margin:0 0 8px}
+.level-recipe .builder-row .field{min-width:0}
+.level-recipe input[type=number]{min-width:0}
+.level-stage{border:1px solid var(--line);background:var(--surface-sunken);min-width:0;padding-bottom:6px}
+.level-tools{display:flex;flex-wrap:wrap;gap:3px;padding:8px 10px}
+.level-tools button{font-size:10px;padding:5px 8px}
+.level-tools button.selected{border-color:var(--success);background:#4ee2ff14;color:var(--text)}
+.level-tools button.tool-place:not(.selected){color:var(--text-muted)}
+.level-tools-gap{flex:1}
+.level-options{display:flex;flex-wrap:wrap;gap:10px;align-items:flex-end;padding:0 12px 6px;min-height:34px}
+.level-options .field{margin:0;min-width:120px}
+.level-options .builder-hint{margin:0}
+.level-frame{height:min(64vh,640px);min-height:360px;background:#0b0c12;border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
+.level-frame iframe{width:100%;height:100%;border:0;display:block}
+.level-view-bar{display:flex;flex-wrap:wrap;gap:10px;align-items:flex-end;padding:8px 12px 0}
+.level-view-bar .field{margin:0;min-width:110px}
+.level-view-bar select{font-size:11px;padding:4px}
+.level-view-bar .checkbox{font-size:11px;margin:0 0 6px}
+.level-view-bar button{font-size:11px;padding:5px 10px;margin-bottom:2px}
+.level-hint{padding:0 12px;margin:4px 0}
+.level-side{display:flex;flex-direction:column;gap:8px;min-width:0}
+.level-stage-card{border:1px solid var(--line);background:var(--surface-sunken);padding:8px;margin:0 0 6px}
+.level-stage-card header{display:flex;gap:6px;align-items:center;margin-bottom:6px}
+.level-stage-card header strong{font-size:12px}
+.level-stage-moves{margin-left:auto;display:flex;gap:2px}
+.level-stage-moves button{font-size:10px;padding:1px 6px}
+.level-params{display:grid;grid-template-columns:1fr 1fr;gap:4px 8px}
+.level-params .field{margin:0}
+.level-params .field span{font-size:9px}
+.level-params input,.level-params select{font-size:11px;padding:3px 5px;min-width:0;width:100%}
+.level-params code{font-size:10px}
+.level-params .checkbox{font-size:11px;margin:12px 0 0}
+.level-mask{display:flex;flex-wrap:wrap;gap:4px;align-items:flex-end;margin-top:6px}
+.level-mask .field{margin:0;min-width:80px}
+.level-mask select{font-size:11px;padding:3px}
+.level-mask-fields{display:flex;gap:3px;flex-wrap:wrap}
+.level-mask-fields input{width:54px;font-size:11px;padding:3px}
+.level-stage-card>.field{margin:6px 0 0}
+.level-stage-card>.field input{font-size:11px;padding:3px 5px}
+.level-pin{display:flex;gap:3px;flex-wrap:wrap;align-items:center;margin:4px 0 8px}
+.level-pin input,.level-pin select{font-size:10px;padding:3px;min-width:0;width:auto}
+.level-pin input[aria-label="Pin rect"]{width:92px}
+.level-pin input[type=number]{width:44px}
+.level-pin button{font-size:10px;padding:3px 8px}
+.level-strip{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin:8px 0}
+.level-strip figure{margin:0}
+.level-variation{padding:0;width:100%;display:block;background:#0b0c12;border:1px solid var(--line)}
+.level-variation img{display:block;width:100%;image-rendering:pixelated}
+.level-strip figcaption{font-size:9px;color:var(--text-faint);margin-top:2px}
+.level-list{margin-top:6px}
+.level-list small{color:var(--text-faint);font-size:10px}
+.level-fair{border:1px solid var(--line);padding:8px;margin:8px 0 0;display:grid;gap:4px;font-size:11px}
+.level-fair.pass{border-color:var(--success)}
+.level-fair.fail strong{color:var(--warning,#ffb454)}
+.level-fair td,.level-fair th{font-size:10px;padding:2px 5px}
+.level-dungeon{border-bottom:1px solid var(--line);padding:4px 0 8px;margin-bottom:6px}
+.level-dungeon .field{min-width:0}
+.level-graph{width:100%;height:auto;display:block;margin:4px 0}
+.level-rooms{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
+.level-rooms figure{margin:0}
+.level-rooms pre{font:8px/1 var(--mono);margin:0;color:var(--text-muted);background:var(--surface-sunken);padding:4px;overflow:hidden}
+.level-rooms figcaption{font-size:9px;color:var(--text-faint)}
+.level-tileset{margin:8px 0 0}
+.level-tileset img{width:100%;image-rendering:pixelated;border:1px solid var(--line);display:block}
+.level-tileset figcaption{font-size:10px;color:var(--text-faint);margin-top:4px}
+.measurement-grid.level-sizes{grid-template-columns:1fr;gap:6px;margin:0 0 6px}
+.level-sizes>div{padding:8px 10px;gap:4px}
+.level-sizes strong{font-size:15px}
+@media (max-width:1320px){.level-layout{grid-template-columns:minmax(260px,320px) minmax(0,1fr)}.level-side{grid-column:1/-1;display:grid;grid-template-columns:1fr 1fr}}
+@media (max-width:900px){.level-layout,.level-side{grid-template-columns:1fr}}

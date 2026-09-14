@@ -1,0 +1,36 @@
+import { build } from 'esbuild';
+import postcss from 'postcss';
+import tailwind from '@tailwindcss/postcss';
+import { mkdir, readFile, writeFile, copyFile } from 'node:fs/promises';
+import { fileURLToPath } from 'node:url';
+import { buildKeelInlineShellFragments } from '@keel/sdk/inline-viewer-graph';
+import { installedRuntimeResources } from './src/runtime-library.mjs';
+import { verifyRuntimeBytes } from './src/runtime-files.mjs';
+await mkdir(new URL('./dist/', import.meta.url), { recursive: true });
+await mkdir('dist/runtime-modules', { recursive: true });
+for (const resource of installedRuntimeResources) {
+  let bytes = await readFile(new URL(`../../${resource.localPath}`, import.meta.url));
+  if (resource.localTransform) bytes = Buffer.from(bytes.toString('utf8').replaceAll(resource.localTransform.from, resource.localTransform.to));
+  verifyRuntimeBytes(resource, bytes);
+  await writeFile(`dist/runtime-modules/${resource.id}.js`, bytes);
+}
+await build({ entryPoints: ['src/main.ts'], outfile: 'dist/main.cjs', bundle: true, platform: 'node', format: 'cjs', external: ['electron', 'node:sqlite', '@keel/mcp', '@keel/sdk/inline-viewer-graph', 'langchain', '@langchain/*', '@modelcontextprotocol/sdk/*'], sourcemap: true });
+await build({ entryPoints: ['src/preview-worker.mjs'], outfile: 'dist/preview-worker.cjs', bundle: true, platform: 'node', format: 'cjs', external: ['node:sqlite', '@keel/sdk/inline-viewer-graph'] });
+await build({entryPoints:['src/raster-prepare-worker.mjs'],outfile:'dist/raster-prepare-worker.mjs',bundle:true,platform:'node',format:'esm',external:['@keel/sdk/raster-strips','@keel/sdk/raster-apng']});
+await build({entryPoints:['src/layer-image-worker.mjs'],outfile:'dist/layer-image-worker.mjs',bundle:true,platform:'node',format:'esm',external:['@keel/sdk/layered-image']});
+await build({entryPoints:['src/game-engine/game-engine-worker.mjs'],outfile:'dist/game-engine-worker.mjs',bundle:true,platform:'node',format:'esm',external:['@keel/sdk/*']});
+await build({entryPoints:['src/game-engine/builder-worker.mjs'],outfile:'dist/game-builder-worker.mjs',bundle:true,platform:'node',format:'esm',external:['esbuild']}); await copyFile('src/game-engine/builder-preview.mjs','dist/builder-preview.mjs');
+await build({entryPoints:['src/game-engine/codec-worker.mjs'],outfile:'dist/game-codec-worker.mjs',bundle:true,platform:'node',format:'esm'});
+await build({entryPoints:['src/game-engine/sound-worker.mjs'],outfile:'dist/game-sound-worker.mjs',bundle:true,platform:'node',format:'esm',external:['esbuild']}); await copyFile('src/game-engine/sound-preview.mjs','dist/sound-preview.mjs');
+await build({entryPoints:['src/game-engine/level-worker.mjs'],outfile:'dist/game-level-worker.mjs',bundle:true,platform:'node',format:'esm',external:['esbuild']}); await copyFile('src/game-engine/level-preview.mjs','dist/level-preview.mjs');
+await build({ entryPoints: ['src/preload.ts'], outfile: 'dist/preload.cjs', bundle: true, platform: 'node', format: 'cjs', external: ['electron'] });
+await build({ entryPoints: ['src/wallet-browser-preload.ts'], outfile: 'dist/wallet-browser-preload.cjs', bundle: true, platform: 'node', format: 'cjs', external: ['electron'] });
+await build({ entryPoints: ['src/wallet-beacon-page.ts'], outfile: 'dist/wallet-beacon.js', inject: ['src/wallet-browser-globals.ts'], alias: { crypto: fileURLToPath(new URL('./src/wallet-webcrypto.ts', import.meta.url)) }, bundle: true, platform: 'browser', format: 'iife', minify: true, define: { 'process.env.NODE_ENV': '"production"', global: 'globalThis' } });
+await build({ entryPoints: ['src/renderer.tsx'], outfile: 'dist/renderer.js', bundle: true, platform: 'browser', format: 'esm', minify: true, define: { 'process.env.NODE_ENV': '"production"' } });
+const css = await postcss([tailwind()]).process(await readFile('src/styles.css', 'utf8'), { from: 'src/styles.css', to: 'dist/styles.css' });
+await writeFile('dist/styles.css', css.css);
+await copyFile('src/index.html', 'dist/index.html');
+for (const font of ['StratusText-Regular.woff2', 'StratusTitle-Regular.woff2']) await copyFile(`src/assets/${font}`, `dist/${font}`);
+const shell = await buildKeelInlineShellFragments({ repositoryRoot: fileURLToPath(new URL('../../', import.meta.url)) });
+await writeFile('dist/canonical-shell.json', JSON.stringify({ ...shell, prefix: { ...shell.prefix, bytes: Buffer.from(shell.prefix.bytes).toString('base64') }, suffix: { ...shell.suffix, bytes: Buffer.from(shell.suffix.bytes).toString('base64') } }));
+console.log('KEEL desktop built: main, isolated bridge, React editor and Tailwind styles.');

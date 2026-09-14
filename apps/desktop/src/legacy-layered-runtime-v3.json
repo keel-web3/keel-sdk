@@ -1,0 +1,22 @@
+{
+  "id": "keel-layered-runtime-v3",
+  "version": "3.0.0",
+  "mediaType": "text/javascript",
+  "format": "classic-script",
+  "role": "runtime",
+  "referenceStatus": "active",
+  "dependencies": [],
+  "localPath": "packages/sdk/resources/layered-runtime-v3.js",
+  "integrity": {
+    "algorithm": "sha256",
+    "digest": "0x3a775c0c7486cccf6156ef8bed830a1c664e744e4c703e4f4bd44acc4ac79792",
+    "byteLength": 27615
+  },
+  "sourceRepository": "keel-sdk",
+  "sourceRevision": "local-layered-v3",
+  "aliases": [
+    "@keel/layered-runtime",
+    "layered-runtime.js",
+    "./layered-runtime.js"
+  ]
+}

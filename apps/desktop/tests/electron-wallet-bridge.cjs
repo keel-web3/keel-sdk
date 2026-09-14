@@ -1,0 +1,35 @@
+// Keyless provider and Beacon chooser acceptance; all windows remain hidden.
+const {app,BrowserWindow,session}=require('electron');
+const fs=require('node:fs');const path=require('node:path');const os=require('node:os');const assert=require('node:assert/strict');const {DatabaseSync}=require('node:sqlite');
+const {WalletBrowser,WalletRuntime,invokeWalletPage}=require('../artifacts/wallet-test-runtime.cjs');
+const root=fs.mkdtempSync(path.join(os.tmpdir(),'keel-wallet-bridge-'));app.setPath('userData',root);
+BrowserWindow.prototype.show=function(){};BrowserWindow.prototype.focus=function(){};
+app.on('browser-window-created',(_e,w)=>{w.hide();w.webContents.setBackgroundThrottling(false)});
+const wait=ms=>new Promise(r=>setTimeout(r,ms));
+const until=async fn=>{for(let i=0;i<150;i++){try{if(await fn())return}catch{}await wait(100)}throw Error('Wallet acceptance timed out')};
+const timeout=setTimeout(()=>app.exit(1),55000);
+app.whenReady().then(async()=>{
+ const create=WalletBrowser.prototype.create;WalletBrowser.prototype.create=function(url,options={}){return create.call(this,url,{...options,show:false})};
+ const directory=path.join(root,'fixture');fs.mkdirSync(directory);
+ fs.writeFileSync(path.join(directory,'manifest.json'),JSON.stringify({manifest_version:3,name:'Keyless EVM fixture',version:'1.0',permissions:['storage'],action:{default_popup:'popup.html'},content_scripts:[{matches:['https://wallet.keel.invalid/*'],js:['provider.js'],run_at:'document_start',world:'MAIN'}]}));
+ fs.writeFileSync(path.join(directory,'popup.html'),'<html><body>Keyless fixture</body></html>');
+ fs.writeFileSync(path.join(directory,'provider.js'),`(()=>{let account='0x2222222222222222222222222222222222222222';const provider={request:async({method})=>{if(method==='eth_requestAccounts'||method==='eth_accounts')return [account];if(method==='eth_chainId')return '0x7a69';if(method==='personal_sign')throw Object.assign(Error('Rejected by fixture'),{code:4001});if(method==='wallet_revokePermissions'){account=undefined;return null;}throw Error('Unsupported fixture method')},on(){}};window.ethereum=provider;const announce=()=>dispatchEvent(new CustomEvent('eip6963:announceProvider',{detail:{info:{uuid:'keyless-fixture',name:'Keyless EVM fixture',rdns:'invalid.keel.fixture'},provider}}));addEventListener('eip6963:requestProvider',announce);announce();})();`);
+ const db=new DatabaseSync(path.join(root,'wallets.sqlite'));const runtime=new WalletRuntime(db,path.join(root,'packages'));const review=await runtime.packages.stage(directory);await runtime.install(review.token,review.digest);const id=review.token;
+ const connected=await runtime.connect(id);assert.equal(connected.connection.chainId,31337);assert.equal(connected.connection.accounts[0],'0x2222222222222222222222222222222222222222');
+ await assert.rejects(runtime.request(id,'personal_sign',['0x00',connected.connection.accounts[0]],{account:connected.connection.accounts[0],chainId:31337}),error=>error.code===4001);
+ await assert.rejects(runtime.request(id,'eth_sign',[]),/Unsupported wallet request/);
+ await assert.rejects(runtime.request(id,'eth_getBalance',[],{account:connected.connection.accounts[0],chainId:1}),/network changed/);
+ await runtime.open(id);const popup=BrowserWindow.getAllWindows().find(w=>w.webContents.getURL().includes('popup.html'));
+ const result=await popup.webContents.executeJavaScript(`chrome.windows.create({url:'popup.html'}).then(w=>({id:w.id,tabs:w.tabs.length}))`);assert.equal(result.tabs,1);
+ await assert.rejects(popup.webContents.executeJavaScript(`chrome.windows.create({url:'https://example.com'})`),/outside its app/);
+ assert.equal(session.defaultSession.extensions.getAllExtensions().length,0);
+ const evm=BrowserWindow.getAllWindows().find(w=>w.webContents.getURL()==='https://wallet.keel.invalid/');assert.deepEqual(await evm.webContents.executeJavaScript('[typeof window.keel,typeof window.__keelBrowser,typeof require,typeof process]'),['undefined','undefined','undefined','undefined']);
+ const host=new WalletBrowser(session.fromPartition('persist:beacon-acceptance'),'Beacon fixture');const beacon=await host.beaconWindow(false);const errors=[];beacon.webContents.on('console-message',e=>{if(e.level==='error')errors.push(e.message)});
+ const request=invokeWalletPage(beacon,'https://wallet.keel.invalid/tezos',`window.keelTezos.request('connect',{network:{type:'mainnet',rpcUrl:'https://rpc.tzbeta.net'}})`);request.catch(()=>{});
+ const text=()=>beacon.webContents.executeJavaScript(`(()=>{function collect(root){let value=root.textContent||'';for(const el of root.querySelectorAll('*'))if(el.shadowRoot)value+=' '+collect(el.shadowRoot);return value;}return collect(document.body);})()`);
+ await until(async()=>{const value=await text();return value.includes('Kukai')&&value.includes('Umami')&&value.includes('Temple')});
+ assert.deepEqual(await beacon.webContents.executeJavaScript('[typeof window.keel,typeof window.__keelBrowser,typeof require,typeof process]'),['undefined','undefined','undefined','undefined']);
+ await wait(1000);assert.deepEqual(errors,[],'Beacon pairing emitted browser errors');
+ fs.writeFileSync(path.resolve(__dirname,'../artifacts/beacon-pairing.png'),(await beacon.webContents.capturePage()).toPNG());beacon.destroy();await assert.rejects(request,/window closed/);
+ db.close();clearTimeout(timeout);console.log(JSON.stringify({status:'passed',evidence:['native-EIP6963-connect','account-and-chain-binding','wallet-rejection','relative-approval-window','foreign-window-denied','no-wallet-IPC-in-connection-page','Beacon-wallet-chooser','pairing-close-rejects-pending-request'],keys:'none',transactions:'none'}));app.quit();
+}).catch(error=>{console.error(error);app.exit(1)});

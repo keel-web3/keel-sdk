@@ -1,0 +1,50 @@
+{
+  "name": "@keel/desktop",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "main": "dist/main.cjs",
+  "scripts": {
+    "build": "tsc --noEmit && node build.mjs",
+    "start": "electron .",
+    "dev": "pnpm build && electron .",
+    "test": "node --test tests/*.test.mjs",
+    "test:electron": "node tests/run-electron.mjs",
+    "benchmark": "node scripts/benchmark.mjs",
+    "test-drive": "node scripts/start-test.mjs"
+  },
+  "dependencies": {
+    "@airgap/beacon-dapp": "4.8.1",
+    "@airgap/beacon-types": "4.8.0",
+    "@airgap/beacon-utils": "4.8.0",
+    "@keel/mcp": "workspace:*",
+    "@keel/sdk": "workspace:*",
+    "@langchain/anthropic": "^1.5.9",
+    "@langchain/core": "^1.2.9",
+    "@langchain/openai": "^1.5.11",
+    "@modelcontextprotocol/sdk": "^1.30.0",
+    "@tanstack/react-query": "^5.90.5",
+    "@taquito/taquito": "^25.0.0",
+    "@taquito/utils": "^25.0.0",
+    "@trpc/server": "^11.6.0",
+    "buffer": "6.0.3",
+    "langchain": "^1.5.10",
+    "react": "19.2.0",
+    "react-dom": "19.2.0",
+    "react-markdown": "^10.1.0",
+    "remark-gfm": "^4.0.1",
+    "viem": "^2.55.0",
+    "zod": "^4.1.5"
+  },
+  "devDependencies": {
+    "@tailwindcss/postcss": "^4.1.14",
+    "@types/node": "^22.15.0",
+    "@types/react": "^19.1.16",
+    "@types/react-dom": "^19.1.9",
+    "electron": "44.2.0",
+    "esbuild": "0.28.2",
+    "postcss": "^8.5.6",
+    "tailwindcss": "^4.1.14",
+    "typescript": "^5.9.0"
+  }
+}

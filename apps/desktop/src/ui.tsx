@@ -1,0 +1,8 @@
+import React from 'react';
+const label = (value: string) => ({ erc721a: 'Your own ERC-721A', erc721: 'Standard ERC-721', erc1155: 'Your own editions', 'shared-erc1155': 'Shared editions', existing: 'Existing collection', external: 'Custom contract', 'mint-gate': 'Sale or gated mint', 'one-mint': 'Drop with phases', 'admin-mint': 'Mint to a recipient', 'fray-auction': 'Fray auction', 'static-media': 'Image, video or model', 'storage-only': 'Store the work', module: 'Reusable module', release: 'Release to collectors', explore: 'Explore locally', ethereum: 'EVM networks', tezos: 'Tezos', 'flash-ruffle': 'Flash / Ruffle', 'doom-wasm': 'Doom / WASM' }[value] ?? value.replaceAll('-', ' '));
+export function Badge({ children, tone = '' }: { children: React.ReactNode; tone?: string }) { return <span className={`badge ${tone}`}>{children}</span>; }
+export function Empty({ title, children }: { title: string; children: React.ReactNode }) { return <div className="empty"><div className="empty-mark">◇</div><h3>{title}</h3><p>{children}</p></div>; }
+export function Field({ label: name, children }: { label: string; children: React.ReactNode }) { return <label className="field"><span>{name}</span>{children}</label>; }
+export function Select({ value, onChange, choices, placeholder = 'Choose…' }: { value?: string; onChange: (value: string) => void; choices: readonly string[]; placeholder?: string }) { return <select value={value ?? ''} onChange={(e) => onChange(e.target.value)}><option value="">{placeholder}</option>{choices.map((value) => <option value={value} key={value}>{label(value)}</option>)}</select>; }
+
+export const fileSize = (bytes: number) => bytes >= 1_000_000 ? `${(bytes / 1_000_000).toFixed(2)} MB` : `${(bytes / 1000).toFixed(1)} KB`;

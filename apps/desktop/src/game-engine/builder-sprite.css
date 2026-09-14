@@ -1,0 +1,16 @@
+/* The Builder's "as in game" pane: the baked pixel sprite next to the 3D view. */
+.builder-views-row{display:grid;grid-template-columns:minmax(0,1.25fr) minmax(200px,1fr);gap:0;border-bottom:1px solid var(--line)}
+.builder-views-row .builder-frame{min-height:280px}
+.sprite-pane{display:flex;flex-direction:column;gap:8px;padding:10px 12px;border-left:1px solid var(--line);background:#0c0c14;min-width:0}
+.sprite-pane .pane-title{display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap}
+.sprite-badge{font:9px var(--mono);letter-spacing:.6px;color:var(--success)}
+.sprite-stage{flex:1;min-height:190px;display:grid;place-items:center;background:repeating-conic-gradient(#15151f 0% 25%,#101018 0% 50%) 50%/16px 16px;border:1px solid var(--line)}
+.sprite-stage canvas{image-rendering:pixelated;max-width:100%;max-height:100%}
+.sprite-stage .builder-hint{padding:0 12px;text-align:center}
+.sprite-ring{image-rendering:pixelated;width:100%;height:auto;cursor:pointer;background:#101018;border:1px solid var(--line)}
+.sprite-actions{display:flex;gap:6px;align-items:center;font-size:11px;color:var(--text-muted)}
+.sprite-actions span{flex:1;text-align:center;font:10px var(--mono)}
+.sprite-actions button,.sprite-actions select{font-size:11px;padding:4px 8px;width:auto}
+.builder-strip figure .variant-use{font-size:10px;padding:2px 0;margin-top:2px}
+.variant-review{margin:8px 0}
+@media (max-width:1100px){.builder-views-row{grid-template-columns:1fr}.sprite-pane{border-left:0;border-top:1px solid var(--line)}}

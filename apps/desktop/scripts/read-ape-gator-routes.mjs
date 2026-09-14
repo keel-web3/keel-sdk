@@ -1,0 +1,22 @@
+/** Fresh, pinned-block contract enumeration. Public reads only. */
+import {readFile,writeFile,rename} from 'node:fs/promises';
+import {createPublicClient,http} from 'viem';
+const root='apps/desktop/artifacts/gator-ape-rebuild';
+const abi=JSON.parse(await readFile(root+'/source/abi.json','utf8'));
+const address='0xd33edec311f8769c71f132a77f0c0796c22af1c5';
+const client=createPublicClient({transport:http('https://rpc.apechain.com',{timeout:20000,retryCount:2,batch:{batchSize:25,wait:25}})});
+if(await client.getChainId()!==33139)throw Error('Wrong chain');
+const block=await client.getBlock({blockTag:'finalized'});
+const count=Number(await client.readContract({address,abi,functionName:'totalSupply',blockNumber:block.number}));
+if(count!==4000)throw Error('Unexpected collection supply');
+const previous=JSON.parse(await readFile(root+'/routes.json','utf8'));
+const results=new Array(count);let cursor=0,done=0;
+await Promise.all(Array.from({length:12},async()=>{while(cursor<count){const tokenId=cursor++;
+ const uri=await client.readContract({address,abi,functionName:'tokenURI',args:[BigInt(tokenId)],blockNumber:block.number});
+ results[tokenId]={tokenId,uri,address,chainId:33139,blockNumber:String(block.number),blockHash:block.hash};
+ if(++done%500===0)console.log(JSON.stringify({contractURIsRead:done,total:count}));
+}}));
+const changed=results.filter(r=>r.uri!==previous.find(p=>p.tokenId===r.tokenId)?.uri);
+const report={address,chainId:33139,blockNumber:String(block.number),blockHash:block.hash,total:count,complete:results.length===4000,changed:changed.map(r=>r.tokenId),routes:results};
+await writeFile(root+'/current-routes.json.tmp',JSON.stringify(report));await rename(root+'/current-routes.json.tmp',root+'/current-routes.json');
+console.log(JSON.stringify({...report,routes:report.routes.length}));

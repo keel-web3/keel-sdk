@@ -1,0 +1,90 @@
+/* The codec inspector, in the editor's own palette (styles.css :root). */
+:root{--codec-value:#4ee2ff55;--codec-overhead:#9c96e855;--codec-text:#8fd6b455;--codec-header:#f0b86e55;--codec-padding:#68707c40;--codec-none:transparent;--codec-hl:#f2f3f5}
+.codec-card h2{font:20px var(--serif)}
+.codec-card>p{font-size:12px;line-height:1.7;color:var(--text-muted);max-width:820px}
+.codec-panel{margin-top:16px;display:flex;flex-direction:column;gap:12px;min-width:0}
+.codec-inputs{display:grid;grid-template-columns:minmax(0,1.3fr) minmax(0,1fr);gap:18px;align-items:start}
+.codec-inputs .field{margin:0}
+.codec-paste textarea{width:100%;box-sizing:border-box;font:11px var(--mono);background:var(--surface-sunken);color:var(--text);border:1px solid var(--line);padding:8px;resize:vertical;overflow-wrap:anywhere}
+.codec-panel .inline-actions{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:8px 0 0}
+.codec-panel .inline-actions button,.codec-panel .inline-actions select{font-size:11px;padding:6px 10px;width:auto}
+.codec-schema-key{font:11px var(--mono);padding:6px 8px;min-width:220px;flex:1}
+.codec-pickers .builder-row{align-items:flex-end}
+.codec-pickers .builder-row>button{margin-bottom:0;font-size:11px;padding:8px 10px}
+.codec-records{display:flex;flex-wrap:wrap;gap:6px;align-items:center;padding:10px 12px;border:1px solid var(--line);background:var(--surface)}
+.codec-records-title{font:9px var(--mono);letter-spacing:.8px;text-transform:uppercase;color:var(--text-faint);margin-right:6px}
+.codec-records small{font-size:11px;color:var(--text-faint)}
+.codec-record{display:flex;gap:6px;align-items:center;font-size:11px;padding:5px 9px}
+.codec-record .badge{margin-left:0;font-size:8px}
+.codec-error{margin:0}
+.codec-result{display:flex;flex-direction:column;gap:10px;min-width:0}
+.codec-schema-head{display:flex;justify-content:space-between;gap:16px;align-items:flex-start;border-top:1px solid var(--line);padding-top:14px}
+.codec-schema-head h3{font:19px var(--serif);margin:4px 0 6px}
+.codec-schema-head code{font-size:11px;color:var(--success)}
+.codec-schema-head small{font:9px var(--mono);color:var(--text-faint);overflow-wrap:anywhere}
+.codec-badges{display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end}
+.codec-badges .badge{margin-left:0}
+.codec-result .game-hint{margin:0}
+.measurement-grid.codec-sizes{grid-template-columns:repeat(4,minmax(0,1fr));margin:4px 0}
+.codec-sizes small{font-size:10px;color:var(--text-faint)}
+.codec-legend{display:flex;flex-wrap:wrap;gap:12px;align-items:center;font:9px var(--mono);letter-spacing:.6px;text-transform:uppercase;color:var(--text-muted)}
+.codec-legend span{display:flex;gap:5px;align-items:center}
+.codec-legend small{margin-left:auto;text-transform:none;letter-spacing:0;font-size:10px;color:var(--text-faint);max-width:50%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.codec-swatch{display:inline-block;width:10px;height:10px;flex:none;border:1px solid #ffffff22;margin-right:5px;vertical-align:-1px}
+.role-value{background:var(--codec-value)}.role-overhead{background:var(--codec-overhead)}.role-text{background:var(--codec-text)}.role-header{background:var(--codec-header)}.role-padding{background:var(--codec-padding)}.role-container{background:transparent}.role-none{background:var(--codec-none)}
+.codec-split{display:grid;grid-template-columns:minmax(0,1.35fr) minmax(0,1fr);gap:14px;align-items:start}
+.codec-tree,.codec-hex{border:1px solid var(--line);background:var(--surface-sunken);max-height:560px;overflow:auto;min-width:0}
+.codec-tree-head,.codec-row{display:grid;grid-template-columns:minmax(120px,1.3fr) minmax(80px,1fr) minmax(60px,1fr) 56px;gap:8px;align-items:center;padding:2px 10px;font-size:11px}
+.codec-tree-head{position:sticky;top:0;background:var(--surface);border-bottom:1px solid var(--line);font:8px var(--mono);letter-spacing:.8px;text-transform:uppercase;color:var(--text-faint);padding:7px 10px;z-index:1}
+.codec-row{border-left:2px solid transparent;cursor:default}
+.codec-row:hover{background:#ffffff0a}
+.codec-row.hl{background:#4ee2ff12}
+.codec-row.hl-deep{background:#4ee2ff26;border-left-color:var(--success)}
+.codec-row-error{border-left-color:var(--danger);background:#ff704d14}
+.codec-row>span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0}
+.codec-label{color:var(--text);display:flex;align-items:center;gap:2px}
+.codec-toggle{border:0;background:transparent;padding:0 4px 0 0;font-size:10px;color:var(--text-muted);width:auto;min-width:0;line-height:1}
+.codec-type{font:10px var(--mono);color:var(--text-faint)}
+.codec-value{font:10px var(--mono);color:var(--text-muted)}
+.codec-value em{font-style:normal;color:var(--text-faint)}
+.codec-bits{font:10px var(--mono);color:var(--text-faint);text-align:right}
+.codec-field-error{font-size:11px;color:var(--danger);padding:3px 10px 5px;border-left:2px solid var(--danger);background:#ff704d0b}
+.codec-hex{padding:8px 10px;font:11px var(--mono)}
+.codec-hex-row{display:flex;gap:2px;line-height:1.9}
+.codec-offset{color:var(--text-faint);margin-right:8px;font-size:10px}
+.codec-byte{display:inline-block;width:2.3ch;text-align:center;color:var(--text);outline:1px solid transparent;outline-offset:-1px;cursor:default}
+.codec-byte.hl{outline-color:var(--codec-hl);color:#fff;box-shadow:inset 0 -2px 0 var(--success)}
+.codec-costs,.codec-json,.codec-solidity{border-top:1px solid var(--line);padding-top:10px}
+.codec-result .section-line{margin:0 0 8px;display:flex;justify-content:space-between;align-items:baseline;gap:12px}
+.codec-result .section-line h4{font:9px var(--mono);letter-spacing:.8px;text-transform:uppercase;color:var(--text);margin:0}
+.codec-result .section-line span{font-size:10px;color:var(--text-faint)}
+.codec-cost{display:grid;grid-template-columns:minmax(120px,1.4fr) minmax(80px,2fr) 120px 40px;gap:10px;align-items:center;font-size:11px;padding:2px 0}
+.codec-cost-path{font:10px var(--mono);color:var(--text-muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.codec-cost-bar{height:8px;background:#ffffff08}
+.codec-cost-bar i{display:block;height:100%;background:var(--accent)}
+.codec-cost-bits{font:10px var(--mono);color:var(--text);text-align:right}
+.codec-cost small{font-size:10px;color:var(--text-faint);text-align:right}
+.codec-json-edit{resize:vertical;min-height:120px}
+.codec-edit-error{margin:6px 0}
+.codec-reencoded{display:grid;grid-template-columns:auto minmax(0,1fr);gap:6px 12px;align-items:center;margin-top:10px;padding:10px 12px;border:1px solid #4ee2ff44;background:#4ee2ff0a;font-size:12px}
+.codec-reencoded strong{font:15px var(--serif);color:var(--success)}
+.codec-reencoded span{color:var(--text-muted)}
+.codec-reencoded input{grid-column:1/-1;font:10px var(--mono);padding:6px 8px}
+.codec-reencoded button{grid-column:1/-1;justify-self:start}
+.codec-schema-section{margin:0}
+.codec-schema-node>summary,.codec-schema-leaf{font-size:11px;padding:2px 0;cursor:pointer}
+.codec-schema-leaf{cursor:default}
+.codec-schema-node strong,.codec-schema-leaf strong{font-weight:400;color:var(--text)}
+.codec-schema-node code,.codec-schema-leaf code{font-size:10px;color:var(--success);margin-left:4px}
+.codec-schema-node small,.codec-schema-leaf small{font:10px var(--mono);color:var(--text-faint)}
+.codec-code{max-height:420px;white-space:pre;overflow:auto}
+.codec-refusal{margin:8px 0 0}
+.codec-schemas{margin-top:14px}
+.codec-schemas .game-table td{padding:5px 10px}
+.codec-overlay{position:fixed;inset:0;z-index:60;background:#05060acc;display:flex;align-items:flex-start;justify-content:center;padding:36px 24px;overflow:auto}
+.codec-dialog{width:min(1320px,100%);background:var(--bg);border:1px solid #292d38;border-radius:10px;padding:18px 22px 24px;box-shadow:0 24px 80px #000a}
+.codec-dialog-head{display:flex;justify-content:space-between;align-items:flex-start;gap:16px}
+.codec-dialog-head strong{font:18px var(--serif);display:block;margin-top:4px}
+.codec-close{font-size:18px;line-height:1;padding:4px 10px;width:auto}
+@media (max-width:1180px){.codec-split,.codec-inputs{grid-template-columns:1fr}.measurement-grid.codec-sizes{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.codec-records select{font-size:11px;padding:5px 8px;width:auto;max-width:360px}
