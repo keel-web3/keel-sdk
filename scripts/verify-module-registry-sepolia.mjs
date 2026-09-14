@@ -7,6 +7,7 @@
 import { readFile } from "node:fs/promises";
 import path from "node:path";
 import { createPublicClient, http, getContract } from "../apps/studio/node_modules/viem/_esm/index.js";
+import { CONTRACTS_ROOT } from "../tools/keel/contracts-root.mjs";
 
 const CHAIN_ID = 11_155_111;
 const RPC = process.env.OCA_RPC_URL?.trim() || "https://ethereum-sepolia-rpc.publicnode.com";
@@ -29,7 +30,7 @@ async function main() {
   if (!code || code.length <= 2) throw new Error(`No contract at ${registryAddress}.`);
 
   const artifact = JSON.parse(
-    await readFile(path.resolve("packages/contracts/out/KeelModuleReviewRegistry.sol/KeelModuleReviewRegistry.json"), "utf8"),
+    await readFile(path.resolve(`${CONTRACTS_ROOT}/out/KeelModuleReviewRegistry.sol/KeelModuleReviewRegistry.json`), "utf8"),
   );
   const registry = getContract({ address: registryAddress, abi: artifact.abi, client: publicClient });
 

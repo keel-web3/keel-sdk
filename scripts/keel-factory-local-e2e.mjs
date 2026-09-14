@@ -12,6 +12,7 @@ import {
 import { privateKeyToAccount } from "viem/accounts";
 import { createOcaFactoryConfigDigest, createViemOcaFactoryConnectors, executeOcaFactoryCollection } from "@keel/ethereum-adapter";
 import { createKeelWalletLink, keelFactoryAbi } from "@keel/sdk";
+import { CONTRACTS_ROOT } from "../tools/keel/contracts-root.mjs";
 
 const PORT = Number(process.env.OCA_LOCAL_E2E_PORT ?? 18_545);
 const RPC_URL = `http://127.0.0.1:${PORT}`;
@@ -20,7 +21,7 @@ const DEPLOYER_KEY = "0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7b
 const CREATOR_KEY = "0x59c6995e998f97a5a0044966f0945389dc9e86dae88c7a8412f4603b6b78690d";
 const AGENT_KEY = "0x5de4111afa1a4b94908f83103eb1f1706367c2e68ca870fc3fb9a804cdab365a";
 const ABI = parseAbi(keelFactoryAbi);
-const artifactPath = path.resolve("packages/contracts/out/KeelFactory.sol/KeelFactory.json");
+const artifactPath = path.resolve(`${CONTRACTS_ROOT}/out/KeelFactory.sol/KeelFactory.json`);
 const LOCAL_CHAIN = {
   id: CHAIN_ID,
   name: "Keel local Anvil",

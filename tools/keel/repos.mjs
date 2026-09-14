@@ -11,13 +11,13 @@
  */
 import { readFileSync, writeFileSync } from "node:fs";
 import { execFileSync } from "node:child_process";
-import { join, resolve } from "node:path";
+import { join } from "node:path";
 import { MODULES, TIER_OF } from "./module-map.mjs";
+import { CONTRACTS_ROOT } from "./contracts-root.mjs";
 
 const SYNC = process.argv.includes("--sync");
 const ORG = (() => { const i = process.argv.indexOf("--org"); return i === -1 ? "keel-web3" : process.argv[i + 1]; })();
-const REPO = resolve(import.meta.dirname, "../..");
-const metaFile = (id) => join(REPO, "../keel-contracts", TIER_OF.get(id), id, "keel.module.json");
+const metaFile = (id) => join(CONTRACTS_ROOT, TIER_OF.get(id), id, "keel.module.json");
 
 let remote = new Map();
 try {

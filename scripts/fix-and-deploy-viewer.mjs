@@ -2,11 +2,12 @@ import { readFileSync, writeFileSync } from "node:fs";
 import { createPublicClient, createWalletClient, http, formatEther } from "viem";
 import { privateKeyToAccount } from "viem/accounts";
 import { sepolia } from "viem/chains";
+import { CONTRACTS_ROOT } from "../tools/keel/contracts-root.mjs";
 
 const RPC = "https://ethereum-sepolia-rpc.publicnode.com";
 const KEY = JSON.parse(readFileSync(".secrets/vault-sepolia-deployer.json", "utf8")).privateKey;
 const D = JSON.parse(readFileSync("scripts/backpack-sepolia.json", "utf8"));
-const art = (p, n) => JSON.parse(readFileSync(`packages/contracts/out/${p}/${n}.json`, "utf8"));
+const art = (p, n) => JSON.parse(readFileSync(`${CONTRACTS_ROOT}/out/${p}/${n}.json`, "utf8"));
 
 const VIEWER_BUILDER = "0x3C7A3c23Fefc682df3a06E5314311C3D9A3668bE";
 const VIEWER_OBJECT = "0x9648488907d74ae8787ecf27eb0fef8dd1572c22b5c11e3d6b98dfa88db255fe";

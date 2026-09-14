@@ -18,6 +18,7 @@ import {
 } from "../apps/studio/node_modules/viem/_esm/index.js";
 import { privateKeyToAccount } from "../apps/studio/node_modules/viem/_esm/accounts/index.js";
 import { sepolia } from "../apps/studio/node_modules/viem/_esm/chains/index.js";
+import { CONTRACTS_ROOT } from "../tools/keel/contracts-root.mjs";
 
 const CHAIN_ID = 11_155_111;
 const RPC = process.env.OCA_RPC_URL?.trim() || "https://ethereum-sepolia-rpc.publicnode.com";
@@ -36,7 +37,7 @@ async function readKey() {
 }
 
 async function loadArtifact(name) {
-  const file = path.resolve(`packages/contracts/out/${name}.sol/${name}.json`);
+  const file = path.resolve(`${CONTRACTS_ROOT}/out/${name}.sol/${name}.json`);
   const doc = JSON.parse(await readFile(file, "utf8"));
   return { abi: doc.abi, bytecode: doc.bytecode.object };
 }

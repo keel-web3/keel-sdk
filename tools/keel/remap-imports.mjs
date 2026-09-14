@@ -18,11 +18,12 @@
 import { readdirSync, readFileSync, writeFileSync, statSync, existsSync } from "node:fs";
 import { join, dirname, relative, resolve } from "node:path";
 import { MODULES } from "./module-map.mjs";
+import { CONTRACTS_ROOT } from "./contracts-root.mjs";
 
 const APPLY = process.argv.includes("--apply");
 const REPO = resolve(import.meta.dirname, "../..");
-const SRC = join(REPO, "packages/contracts/src");
-const TEST = join(REPO, "packages/contracts/test");
+const SRC = join(CONTRACTS_ROOT, "src");
+const TEST = join(CONTRACTS_ROOT, "test");
 const MODROOT = join(SRC, "modules");
 const IMPORT_RE = /(import\s+(?:[^"';]*?\s+from\s+)?["'])([^"']+)(["'])/g;
 

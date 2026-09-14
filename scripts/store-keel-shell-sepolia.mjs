@@ -11,11 +11,12 @@ import { readFileSync, writeFileSync, existsSync } from "node:fs";
 import { createPublicClient, createWalletClient, http, formatEther } from "viem";
 import { privateKeyToAccount } from "viem/accounts";
 import { sepolia } from "viem/chains";
+import { CONTRACTS_ROOT } from "../tools/keel/contracts-root.mjs";
 
 const RPC = process.env.KEEL_RPC_URL ?? "https://ethereum-sepolia-rpc.publicnode.com";
 const KEY = JSON.parse(readFileSync(".secrets/vault-sepolia-deployer.json", "utf8")).privateKey;
 const D = JSON.parse(readFileSync("scripts/backpack-sepolia.json", "utf8"));
-const CHUNK_STORE = JSON.parse(readFileSync("packages/contracts/out/KeelHold.sol/KeelHold.json", "utf8"));
+const CHUNK_STORE = JSON.parse(readFileSync(`${CONTRACTS_ROOT}/out/KeelHold.sol/KeelHold.json`, "utf8"));
 
 const account = privateKeyToAccount(KEY);
 const pub = createPublicClient({ chain: sepolia, transport: http(RPC) });

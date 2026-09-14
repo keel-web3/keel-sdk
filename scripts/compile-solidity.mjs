@@ -3,8 +3,9 @@ import path from "node:path";
 
 import { root } from "./run.mjs";
 import { compileCanonicalSolidityArtifacts, SOLIDITY_COMPILER_SETTINGS } from "./solidity-compiler.mjs";
+import { CONTRACTS_ROOT } from "../tools/keel/contracts-root.mjs";
 
-const artifactsRoot = path.join(root, "packages", "contracts", "artifacts");
+const artifactsRoot = path.join(CONTRACTS_ROOT, "artifacts");
 const compiled = await compileCanonicalSolidityArtifacts(root);
 for (const diagnostic of compiled.diagnostics) {
   const line = diagnostic.formattedMessage ?? diagnostic.message;

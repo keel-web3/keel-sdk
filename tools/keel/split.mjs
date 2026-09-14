@@ -12,12 +12,13 @@
 import { readdirSync, readFileSync, writeFileSync, mkdirSync, statSync, existsSync, cpSync, rmSync } from "node:fs";
 import { join, resolve, relative, dirname } from "node:path";
 import { MODULES, MODULE_BY_ID } from "./module-map.mjs";
+import { CONTRACTS_ROOT } from "./contracts-root.mjs";
 
 const argv = process.argv.slice(2);
 const APPLY = argv.includes("--apply");
 const flag = (n) => { const i = argv.indexOf(`--${n}`); return i === -1 ? undefined : argv[i + 1]; };
 const REPO = resolve(import.meta.dirname, "../..");
-const CONTRACTS = join(REPO, "../keel-contracts");
+const CONTRACTS = CONTRACTS_ROOT;
 const OUT = resolve(flag("out") ?? join(REPO, "build/keel-repos"));
 const ORG = flag("org") ?? "keel-web3";
 

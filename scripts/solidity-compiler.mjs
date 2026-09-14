@@ -3,10 +3,15 @@ import { readFile, readdir } from "node:fs/promises";
 import path from "node:path";
 
 import { root } from "./run.mjs";
+import { CONTRACTS_ROOT } from "../tools/keel/contracts-root.mjs";
 
 export const EIP170_MAX_RUNTIME_BYTES = 24_576;
 export const SOLIDITY_COMPILER_SETTINGS = Object.freeze({
-  evmVersion: "cancun",
+  // Pectra. EIP-2537's BLS12-381 precompiles are what let Solidity check Tezos
+  // consensus signatures (keel-contracts src/modules/keel-codecs/libraries/Bls12381.sol);
+  // under cancun those tests cannot run at all. Kept in step with
+  // keel-contracts/foundry.toml, which `solidity-gas-check` compares against.
+  evmVersion: "prague",
   optimizerRuns: 200,
   viaIR: true,
   bytecodeHash: "none",
@@ -53,7 +58,7 @@ export async function compileCanonicalSolidityArtifacts(
     options.sourceNames === undefined
       ? undefined
       : new Set(options.sourceNames);
-  const contractsRoot = path.join(repositoryRoot, "packages", "contracts");
+  const contractsRoot = CONTRACTS_ROOT;
   const sourceRoot = path.join(contractsRoot, "src");
   const sources = {};
   for (const file of await filesBelow(sourceRoot)) {
@@ -65,6 +70,7 @@ export async function compileCanonicalSolidityArtifacts(
   const importCallback = (importPath) => {
     const candidates = [
       path.join(contractsRoot, importPath),
+      path.join(contractsRoot, "node_modules", importPath),
       path.join(repositoryRoot, "node_modules", importPath),
     ];
     for (const candidate of candidates) {

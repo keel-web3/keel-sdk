@@ -25,6 +25,7 @@ import {
 } from "viem";
 import { privateKeyToAccount } from "viem/accounts";
 import { sepolia } from "viem/chains";
+import { CONTRACTS_ROOT } from "../tools/keel/contracts-root.mjs";
 
 const RPC = process.env.SEPOLIA_RPC ?? "https://ethereum-sepolia-rpc.publicnode.com";
 // Costs are reported at real mainnet gas, never at the sending chain's. Sepolia
@@ -33,7 +34,7 @@ const RPC = process.env.SEPOLIA_RPC ?? "https://ethereum-sepolia-rpc.publicnode.
 // make preserving an artwork look several times more expensive than it is.
 const MAINNET_RPC = process.env.MAINNET_RPC ?? "https://ethereum-rpc.publicnode.com";
 const BOOK = "scripts/backpack-sepolia.json";
-const FIXTURES = "packages/contracts/test/fixtures";
+const FIXTURES = `${CONTRACTS_ROOT}/test/fixtures`;
 const VIEWER = process.env.KEEL_VIEWER_HTML;
 
 const argv = process.argv.slice(2);
@@ -42,7 +43,7 @@ if (!recipient?.startsWith("0x") || recipient.length !== 42) {
   throw new Error("pass --to 0x… (the wallet that should receive the testable set)");
 }
 
-const art = (file, name) => JSON.parse(readFileSync(`packages/contracts/out/${file}/${name}.json`, "utf8"));
+const art = (file, name) => JSON.parse(readFileSync(`${CONTRACTS_ROOT}/out/${file}/${name}.json`, "utf8"));
 const CS = art("KeelHold.sol", "KeelHold");
 const FACTORY = art("KeelBackpackFactory.sol", "KeelBackpackFactory");
 const LEDGER = art("KeelBackpackProofLedger.sol", "KeelBackpackProofLedger");

@@ -1,6 +1,7 @@
 import { access } from "node:fs/promises";
 import path from "node:path";
 import { root, run, tsc } from "./run.mjs";
+import { CONTRACTS_ROOT } from "../tools/keel/contracts-root.mjs";
 
 run("node", ["scripts/check.mjs"]);
 tsc("apps/demo/tsconfig.json");
@@ -22,21 +23,6 @@ for (const required of [
   "docs/GAS.md",
   "docs/STORAGE.md",
   "docs/KEEL_CONTRACTS.md",
-  "packages/contracts/src/modules/keel-hold/KeelHold.sol",
-  "packages/contracts/src/modules/keel-hold/KeelIndex.sol",
-  "packages/contracts/src/modules/keel-mint-access/KeelMintGate.sol",
-  "packages/contracts/src/modules/keel-die/KEEL721.sol",
-  "packages/contracts/src/modules/keel-mint-access/OneMintController.sol",
-  "packages/contracts/src/modules/keel-artifacts/KeelArtifactRegistry.sol",
-  "packages/contracts/src/modules/keel-artifacts/KeelHarnessRegistry.sol",
-  "packages/contracts/src/modules/keel-creator-identity/KeelAttributionRegistry.sol",
-  "packages/contracts/src/modules/keel-artifacts/KeelLinkRegistry.sol",
-  "packages/contracts/src/modules/keel-artifacts/KeelSeedRegistry.sol",
-  "packages/contracts/src/modules/keel-equipment/KeelEquipmentInventory.sol",
-  "packages/contracts/src/modules/keel-graph/KeelGraphRegistry.sol",
-  "packages/contracts/src/modules/keel-graph/KeelPluginRegistry.sol",
-  "packages/contracts/src/modules/keel-graph/KeelModuleReviewRegistry.sol",
-  "packages/contracts/src/modules/keel-market/KeelMarket.sol",
   "packages/viewer/src/gateway.ts",
   "packages/viewer/src/registry-adapter.ts",
   "packages/viewer/src/egress.ts",
@@ -52,6 +38,27 @@ for (const required of [
   "packages/sandbox-sdk/src/inspect.ts",
 ]) {
   await access(path.join(root, required));
+}
+
+// contract sources live in the sibling keel-contracts repository, not here
+for (const required of [
+  "src/modules/keel-hold/KeelHold.sol",
+  "src/modules/keel-hold/KeelIndex.sol",
+  "src/modules/keel-mint-access/KeelMintGate.sol",
+  "src/modules/keel-die/KEEL721.sol",
+  "src/modules/keel-mint-access/OneMintController.sol",
+  "src/modules/keel-artifacts/KeelArtifactRegistry.sol",
+  "src/modules/keel-artifacts/KeelHarnessRegistry.sol",
+  "src/modules/keel-creator-identity/KeelAttributionRegistry.sol",
+  "src/modules/keel-artifacts/KeelLinkRegistry.sol",
+  "src/modules/keel-artifacts/KeelSeedRegistry.sol",
+  "src/modules/keel-equipment/KeelEquipmentInventory.sol",
+  "src/modules/keel-graph/KeelGraphRegistry.sol",
+  "src/modules/keel-graph/KeelPluginRegistry.sol",
+  "src/modules/keel-graph/KeelModuleReviewRegistry.sol",
+  "src/modules/keel-market/KeelMarket.sol",
+]) {
+  await access(path.join(CONTRACTS_ROOT, required));
 }
 
 console.log(

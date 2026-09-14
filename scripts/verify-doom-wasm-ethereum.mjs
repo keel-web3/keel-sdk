@@ -5,8 +5,8 @@ import path from "node:path";
 
 import { createPublicClient, hexToBytes, http, zeroAddress } from "viem";
 import { sha256Hex } from "@keel/protocol";
+import { CONTRACTS_ROOT } from "../tools/keel/contracts-root.mjs";
 
-const repoRoot = path.resolve(import.meta.dirname, "..");
 const args = new Map();
 for (let index = 2; index < process.argv.length; index += 1) {
   const value = process.argv[index];
@@ -58,8 +58,8 @@ const readGasWei = BigInt(readGas);
 if (readGasWei <= 0n) throw new Error("--read-gas must be positive.");
 
 const [keelHoldArtifact, portableAnchorArtifact] = await Promise.all([
-  readFile(path.join(repoRoot, "packages/contracts/artifacts/KeelHold.json"), "utf8"),
-  readFile(path.join(repoRoot, "packages/contracts/artifacts/KeelPortableAnchorRegistry.json"), "utf8"),
+  readFile(path.join(CONTRACTS_ROOT, "artifacts/KeelHold.json"), "utf8"),
+  readFile(path.join(CONTRACTS_ROOT, "artifacts/KeelPortableAnchorRegistry.json"), "utf8"),
 ]);
 const client = createPublicClient({ transport: http(rpcUrl, { timeout: 120_000, retryCount: 1 }) });
 const chainId = await client.getChainId();

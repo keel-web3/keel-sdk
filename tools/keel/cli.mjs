@@ -23,9 +23,10 @@ import { readFileSync, readdirSync, writeFileSync, mkdirSync, existsSync, statSy
 import { execFileSync, spawnSync } from "node:child_process";
 import { join, resolve } from "node:path";
 import { MODULES, MODULE_BY_ID, TIER_OF } from "./module-map.mjs";
+import { CONTRACTS_ROOT } from "./contracts-root.mjs";
 
 const REPO = resolve(import.meta.dirname, "../..");
-const CONTRACTS = join(REPO, "../keel-contracts");
+const CONTRACTS = CONTRACTS_ROOT;
 const MODULES_DIR = join(CONTRACTS, "modules");
 const [cmd, ...rest] = process.argv.slice(2);
 

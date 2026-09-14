@@ -17,9 +17,10 @@
 import { readFileSync, writeFileSync, existsSync, mkdirSync } from "node:fs";
 import { join, resolve } from "node:path";
 import { MODULE_BY_ID, TIER_OF } from "./module-map.mjs";
+import { CONTRACTS_ROOT } from "./contracts-root.mjs";
 
 const REPO = resolve(import.meta.dirname, "../..");
-const metaDir = (id) => join(REPO, "../keel-contracts", TIER_OF.get(id), id);
+const metaDir = (id) => join(CONTRACTS_ROOT, TIER_OF.get(id), id);
 const WRITE = process.argv.includes("--write");
 
 /** source file -> { instance, pick(json) -> [{key, module, contract}] } */

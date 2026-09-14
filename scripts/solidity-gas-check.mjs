@@ -1,7 +1,7 @@
 import { readFile, readdir } from "node:fs/promises";
 import path from "node:path";
 
-import { root } from "./run.mjs";
+import { CONTRACTS_ROOT } from "../tools/keel/contracts-root.mjs";
 import { SOLIDITY_COMPILER_SETTINGS } from "./solidity-compiler.mjs";
 
 async function filesBelow(directory) {
@@ -28,7 +28,7 @@ function functionHeaders(code) {
   ].map((match) => match[0]);
 }
 
-const contractsRoot = path.join(root, "packages", "contracts");
+const contractsRoot = CONTRACTS_ROOT;
 const sourceRoot = path.join(contractsRoot, "src");
 const foundryConfig = await readFile(
   path.join(contractsRoot, "foundry.toml"),
@@ -71,7 +71,7 @@ const expectedFoundrySettings = [
 const failures = [];
 for (const [label, pattern] of expectedFoundrySettings) {
   if (!pattern.test(foundryConfig)) {
-    failures.push(`packages/contracts/foundry.toml: expected ${label}`);
+    failures.push(`keel-contracts/foundry.toml: expected ${label}`);
   }
 }
 
@@ -81,7 +81,7 @@ let payableEntrypoints = 0;
 let transientProtectedEntrypoints = 0;
 
 for (const file of await filesBelow(sourceRoot)) {
-  const relative = path.relative(root, file);
+  const relative = `keel-contracts/${path.relative(contractsRoot, file)}`;
   const source = await readFile(file, "utf8");
   const code = policyCode(source);
 

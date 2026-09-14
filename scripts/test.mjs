@@ -5,6 +5,7 @@ run("node", [
   "--test",
   "tests/protocol.test.mjs",
   "tests/keel-modules.test.mjs",
+  "tests/keel-manifest-generation.test.mjs",
   "tests/portable-root.test.mjs",
   "tests/viewer.test.mjs",
   "tests/host-bridge.test.mjs",

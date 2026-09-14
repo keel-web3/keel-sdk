@@ -12,10 +12,11 @@ import { readdirSync, readFileSync, writeFileSync, statSync, mkdirSync, existsSy
 import { execFileSync } from "node:child_process";
 import { join, dirname, relative, resolve, basename } from "node:path";
 import { MODULES } from "./module-map.mjs";
+import { CONTRACTS_ROOT } from "./contracts-root.mjs";
 
 const APPLY = process.argv.includes("--apply");
 const REPO = resolve(import.meta.dirname, "../..");
-const CONTRACTS = join(REPO, "../keel-contracts");
+const CONTRACTS = CONTRACTS_ROOT;
 const SRC = join(CONTRACTS, "src");
 const TEST = join(CONTRACTS, "test");
 const IMPORT_RE = /(import\s+(?:[^"';]*?\s+from\s+)?["'])([^"']+)(["'])/g;

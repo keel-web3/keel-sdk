@@ -12,12 +12,13 @@ import { readFileSync, writeFileSync } from "node:fs";
 import { createPublicClient, createWalletClient, http, formatEther } from "viem";
 import { privateKeyToAccount } from "viem/accounts";
 import { sepolia } from "viem/chains";
+import { CONTRACTS_ROOT } from "../tools/keel/contracts-root.mjs";
 
 const RPC = "https://ethereum-sepolia-rpc.publicnode.com";
 const KEY = JSON.parse(readFileSync(".secrets/vault-sepolia-deployer.json", "utf8")).privateKey;
 const D = JSON.parse(readFileSync("scripts/backpack-sepolia.json", "utf8"));
 const SCRATCH = process.env.KEEL_SHELL_DIR;
-const art = (p, n) => JSON.parse(readFileSync(`packages/contracts/out/${p}/${n}.json`, "utf8"));
+const art = (p, n) => JSON.parse(readFileSync(`${CONTRACTS_ROOT}/out/${p}/${n}.json`, "utf8"));
 const CS = art("KeelHold.sol", "KeelHold");
 const LEDGER = art("KeelBackpackProofLedger.sol", "KeelBackpackProofLedger");
 
@@ -80,7 +81,7 @@ if (!D.viewerObject) {
   // The composite's digest is over the concatenation of its children.
   const chunks = [];
   for (const f of ["shell-prefix.bin", "slot-entry.bin", "slot-ape.bin", "shell-suffix.bin"]) chunks.push(new Uint8Array(readFileSync(`${SCRATCH}/${f}`)));
-  chunks.push(new Uint8Array(readFileSync("packages/contracts/test/fixtures/bayc-ape-1.png")));
+  chunks.push(new Uint8Array(readFileSync(`${CONTRACTS_ROOT}/test/fixtures/bayc-ape-1.png`)));
   const joined = new Uint8Array(chunks.reduce((a, c) => a + c.length, 0));
   let off = 0; for (const c of chunks) { joined.set(c, off); off += c.length; }
   const digest = `0x${Buffer.from(await crypto.subtle.digest("SHA-256", joined)).toString("hex")}`;

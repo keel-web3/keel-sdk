@@ -19,13 +19,14 @@ import { readFileSync, writeFileSync } from "node:fs";
 import { createPublicClient, createWalletClient, formatEther, getContractAddress, http } from "viem";
 import { privateKeyToAccount } from "viem/accounts";
 import { sepolia } from "viem/chains";
+import { CONTRACTS_ROOT } from "../tools/keel/contracts-root.mjs";
 
 const RPC = process.env.SEPOLIA_RPC ?? "https://ethereum-sepolia-rpc.publicnode.com";
 const MAINNET_RPC = "https://ethereum-rpc.publicnode.com";
 const argv = process.argv.slice(2);
 const tokenId = BigInt(argv[argv.indexOf("--token") + 1] ?? 4);
 
-const art = (file, name) => JSON.parse(readFileSync(`packages/contracts/out/${file}/${name}.json`, "utf8"));
+const art = (file, name) => JSON.parse(readFileSync(`${CONTRACTS_ROOT}/out/${file}/${name}.json`, "utf8"));
 const FACTORY = art("KeelBackpackFactory.sol", "KeelBackpackFactory");
 const LEDGER = art("KeelBackpackProofLedger.sol", "KeelBackpackProofLedger");
 const BACKPACK = art("KeelBackpack721.sol", "KeelBackpack721");

@@ -11,10 +11,11 @@
 import { readdirSync, readFileSync, writeFileSync, statSync, existsSync } from "node:fs";
 import { join, relative, resolve } from "node:path";
 import { MODULES, TIER_OF } from "./module-map.mjs";
+import { CONTRACTS_ROOT } from "./contracts-root.mjs";
 
 const APPLY = process.argv.includes("--apply");
 const REPO = resolve(import.meta.dirname, "../..");
-const srcRoot = (id) => join(REPO, "packages/contracts/src", TIER_OF.get(id), id);
+const srcRoot = (id) => join(CONTRACTS_ROOT, "src", TIER_OF.get(id), id);
 const MAP = join(import.meta.dirname, "module-map.mjs");
 
 const owned = new Set(MODULES.flatMap((m) => m.contracts));

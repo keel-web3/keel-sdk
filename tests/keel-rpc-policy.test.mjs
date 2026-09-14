@@ -48,7 +48,7 @@ test("the host list accepts exactly what the contract accepts", () => {
 test("the digest preimage is byte-identical to the one KeelManager hashes", async () => {
   const hosts = ["publicnode.com", "https://eth.example.org/v1/"];
   // Pinned against `testRpcHostListDigestIsTheReproduciblePreimageAndTracksEveryInput`
-  // in packages/contracts/test/KeelManager.t.sol. If these two ever
+  // in keel-contracts test/KeelManager.t.sol. If these two ever
   // disagree a published digest stops meaning anything, so both sides assert
   // the same literal rather than each computing its own idea of the format.
   assert.equal(

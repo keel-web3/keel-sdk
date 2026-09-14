@@ -10,6 +10,7 @@ import { readFileSync } from "node:fs";
 import { createPublicClient, createWalletClient, getContractAddress, http, formatEther } from "viem";
 import { privateKeyToAccount } from "viem/accounts";
 import { sepolia } from "viem/chains";
+import { CONTRACTS_ROOT } from "../tools/keel/contracts-root.mjs";
 
 const RPC = process.env.OCA_RPC_URL ?? "https://ethereum-sepolia-rpc.publicnode.com";
 
@@ -24,7 +25,7 @@ if (!KEY) {
 }
 
 const artifact = (name) =>
-  JSON.parse(readFileSync(`packages/contracts/out/${name}.sol/${name}.json`, "utf8"));
+  JSON.parse(readFileSync(`${CONTRACTS_ROOT}/out/${name}.sol/${name}.json`, "utf8"));
 
 const account = privateKeyToAccount(KEY.startsWith("0x") ? KEY : `0x${KEY}`);
 const publicClient = createPublicClient({ chain: sepolia, transport: http(RPC) });

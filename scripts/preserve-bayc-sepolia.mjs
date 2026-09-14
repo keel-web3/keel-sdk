@@ -10,6 +10,7 @@ import { readFileSync, writeFileSync } from "node:fs";
 import { createPublicClient, createWalletClient, http, formatEther } from "viem";
 import { privateKeyToAccount } from "viem/accounts";
 import { sepolia } from "viem/chains";
+import { CONTRACTS_ROOT } from "../tools/keel/contracts-root.mjs";
 
 const RPC = process.env.KEEL_RPC_URL ?? "https://ethereum-sepolia-rpc.publicnode.com";
 const KEY_FILE = process.env.KEEL_DEPLOYER_FILE ?? ".secrets/vault-sepolia-deployer.json";
@@ -18,7 +19,7 @@ const KEY = process.env.OCA_DEPLOYER_PRIVATE_KEY || JSON.parse(readFileSync(KEY_
 const D = JSON.parse(readFileSync("scripts/backpack-sepolia.json", "utf8"));
 
 const art = (path, name) =>
-  JSON.parse(readFileSync(`packages/contracts/out/${path}/${name}.json`, "utf8"));
+  JSON.parse(readFileSync(`${CONTRACTS_ROOT}/out/${path}/${name}.json`, "utf8"));
 const CHUNK_STORE = art("KeelHold.sol", "KeelHold");
 const FACTORY = art("KeelBackpackFactory.sol", "KeelBackpackFactory");
 const LEDGER = art("KeelBackpackProofLedger.sol", "KeelBackpackProofLedger");
@@ -104,9 +105,9 @@ if (!initialized) {
 console.log(`backpack                 ${backpack}\n`);
 
 // 3. The real blocks BAYC's tokenURI resolves to.
-const directory = new Uint8Array(readFileSync("packages/contracts/test/fixtures/bayc-directory.bin"));
-const metadata = new Uint8Array(readFileSync("packages/contracts/test/fixtures/bayc-token-1.json"));
-const image = new Uint8Array(readFileSync("packages/contracts/test/fixtures/bayc-ape-1.png"));
+const directory = new Uint8Array(readFileSync(`${CONTRACTS_ROOT}/test/fixtures/bayc-directory.bin`));
+const metadata = new Uint8Array(readFileSync(`${CONTRACTS_ROOT}/test/fixtures/bayc-token-1.json`));
+const image = new Uint8Array(readFileSync(`${CONTRACTS_ROOT}/test/fixtures/bayc-ape-1.png`));
 
 D.metadataObject = D.metadataObject ?? (await store("metadata", metadata, "application/json"));
 writeFileSync("scripts/backpack-sepolia.json", JSON.stringify(D, null, 2));

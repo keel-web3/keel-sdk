@@ -10,7 +10,6 @@ for (const directory of [
   "packages/ethereum-adapter/dist",
   "packages/studio-core/dist",
   ".verification",
-  "packages/contracts/artifacts",
 ]) {
   await rm(path.join(root, directory), { recursive: true, force: true });
 }

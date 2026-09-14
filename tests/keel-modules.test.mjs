@@ -21,13 +21,14 @@ import {
 } from "../packages/sdk/dist/index.js";
 
 import { MODULE_BY_ID as UNIT_MAP } from "../tools/keel/module-map.mjs";
+import { CONTRACTS_ROOT } from "../tools/keel/contracts-root.mjs";
 
-const MODULES_DIR = "../keel-contracts/modules";
-const APPS_DIR = "../keel-contracts/apps";
+const MODULES_DIR = join(CONTRACTS_ROOT, "modules");
+const APPS_DIR = join(CONTRACTS_ROOT, "apps");
 /** modules and apps live in sibling trees; everything else about them matches */
 const UNITS = [...KEEL_MODULES, ...KEEL_APPS];
 const metaDir = (unit) => (unit.kind === "app" ? APPS_DIR : MODULES_DIR);
-const srcDir = (unit) => `../keel-contracts/src/${unit.kind === "app" ? "apps" : "modules"}`;
+const srcDir = (unit) => join(CONTRACTS_ROOT, "src", unit.kind === "app" ? "apps" : "modules");
 
 /**
  * The checker only proves the map and the tree agree with each other. Deleting a

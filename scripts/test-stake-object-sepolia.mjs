@@ -11,6 +11,7 @@ import {
   stringToHex,
 } from "../apps/studio/node_modules/viem/_esm/index.js";
 import { privateKeyToAccount } from "../apps/studio/node_modules/viem/_esm/accounts/index.js";
+import { CONTRACTS_ROOT } from "../tools/keel/contracts-root.mjs";
 
 const repositoryRoot = path.resolve(new URL("..", import.meta.url).pathname);
 const rpcUrl = process.env.VAULT_SEPOLIA_RPC ?? "https://ethereum-sepolia-rpc.publicnode.com";
@@ -34,9 +35,9 @@ const artifact = async (relativePath) => {
   return { abi: value.abi, bytecode };
 };
 
-const registryArtifact = await artifact("packages/contracts/out/KeelStakeObjectManager.t.sol/StakeObjectRegistryMock.json");
-const nftArtifact = await artifact("packages/contracts/out/KeelStakeObjectManager.t.sol/StakeObject721Mock.json");
-const managerArtifact = await artifact("packages/contracts/out/KeelStakeObjectManager.sol/KeelStakeObjectManager.json");
+const registryArtifact = await artifact(`${CONTRACTS_ROOT}/out/KeelStakeObjectManager.t.sol/StakeObjectRegistryMock.json`);
+const nftArtifact = await artifact(`${CONTRACTS_ROOT}/out/KeelStakeObjectManager.t.sol/StakeObject721Mock.json`);
+const managerArtifact = await artifact(`${CONTRACTS_ROOT}/out/KeelStakeObjectManager.sol/KeelStakeObjectManager.json`);
 
 const operations = [];
 const recordReceipt = (label, receipt) => {

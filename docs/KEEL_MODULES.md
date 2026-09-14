@@ -304,3 +304,23 @@ pnpm keel:sync
 The `deployable` set is derived from compiled artifacts — a contract is deployable
 when forge emitted creation bytecode for it — so interfaces, abstract bases, and
 inlined libraries are excluded without anyone maintaining a list.
+
+Deriving from artifacts means an unbuilt tree has nothing to derive from, so sync
+separates *unknown* from *nothing*: a missing artifact directory is unknown, while
+one holding no creation bytecode is genuinely not deployable. A unit whose
+artifacts are unknown is never rederived, and a partial build is treated the same
+way as no build at all rather than being allowed to truncate the list.
+
+| unit | artifacts absent | sync does |
+| --- | --- | --- |
+| local | the tree is unbuilt | refuses to write **any** manifest, and asks for a `forge build` |
+| `external: true` | normal — sources live in another repository | keeps the committed `deployable`, and says so |
+
+Nothing is written until every unit resolves, so a refusal leaves the manifests
+exactly as they were.
+
+The contracts tree is a sibling of this repository, not part of it, so its path is
+derived in `tools/keel/contracts-root.mjs` rather than hardcoded per tool: from the
+main worktree's parent, which keeps the tools and the suite working from a linked
+git worktree, where `../keel-contracts` points at nothing. `KEEL_CONTRACTS_DIR`
+overrides it to point a run at another tree.

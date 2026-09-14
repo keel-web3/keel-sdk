@@ -11,9 +11,10 @@
 import { readdirSync, readFileSync, statSync, existsSync } from "node:fs";
 import { join, dirname, relative, resolve } from "node:path";
 import { MODULES, MODULE_BY_ID, OWNER_OF, TIER_OF, isApp } from "./module-map.mjs";
+import { CONTRACTS_ROOT } from "./contracts-root.mjs";
 
-const SRC = resolve(import.meta.dirname, "../../../keel-contracts/src");
-const CONTRACTS = resolve(import.meta.dirname, "../../../keel-contracts");
+const SRC = join(CONTRACTS_ROOT, "src");
+const CONTRACTS = CONTRACTS_ROOT;
 const TEST_TIERS = ["modules", "apps"];
 const IMPORT_RE = /import\s+(?:[^"';]*?\s+from\s+)?["']([^"']+)["']/g;
 

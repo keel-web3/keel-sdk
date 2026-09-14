@@ -16,8 +16,8 @@ import {
 } from "viem";
 import { privateKeyToAccount } from "viem/accounts";
 import { sha256Hex } from "@keel/protocol";
+import { CONTRACTS_ROOT } from "../tools/keel/contracts-root.mjs";
 
-const repoRoot = path.resolve(import.meta.dirname, "..");
 const args = new Map();
 for (let index = 2; index < process.argv.length; index += 1) {
   const value = process.argv[index];
@@ -59,7 +59,7 @@ const chainId = await publicClient.getChainId();
 if (!localMode && chainId === 31_337) throw new Error("Local Anvil chain requires --local; refusing an implicit local write.");
 
 async function artifact(name) {
-  const artifactPath = path.join(repoRoot, "packages/contracts/artifacts", `${name}.json`);
+  const artifactPath = path.join(CONTRACTS_ROOT, "artifacts", `${name}.json`);
   return JSON.parse(await readFile(artifactPath, "utf8"));
 }
 

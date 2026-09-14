@@ -1,6 +1,6 @@
 import { readFile, readdir } from "node:fs/promises";
 import path from "node:path";
-import { root } from "./run.mjs";
+import { CONTRACTS_ROOT } from "../tools/keel/contracts-root.mjs";
 // The policy itself lives with the module tooling so the repo-wide gate and the
 // per-module gate (`keel verify`) enforce exactly the same rules.
 import { checkSource, staticPolicyCode } from "../tools/keel/static-policy.mjs";
@@ -26,10 +26,10 @@ if (process.argv.includes("--self-test")) {
 }
 
 let failures = 0;
-for (const file of await walk(path.join(root, "packages", "contracts", "src"))) {
+for (const file of await walk(path.join(CONTRACTS_ROOT, "src"))) {
   const source = await readFile(file, "utf8");
   for (const finding of checkSource(source)) {
-    console.error(`${path.relative(root, file)}: ${finding}`);
+    console.error(`keel-contracts/${path.relative(CONTRACTS_ROOT, file)}: ${finding}`);
     failures += 1;
   }
 }

@@ -14,15 +14,15 @@
 import { readdirSync, readFileSync, writeFileSync, mkdirSync, existsSync, statSync } from "node:fs";
 import { spawnSync } from "node:child_process";
 import { createHash } from "node:crypto";
-import { join, resolve, basename } from "node:path";
+import { join, basename } from "node:path";
 import { MODULES, MODULE_BY_ID, TIER_OF } from "./module-map.mjs";
+import { CONTRACTS_ROOT } from "./contracts-root.mjs";
 import { checkSource } from "./static-policy.mjs";
 
 const argv = process.argv.slice(2);
 const UPDATE = argv.includes("--update");
 const EVIDENCE = argv.includes("--evidence");
-const REPO = resolve(import.meta.dirname, "../..");
-const CONTRACTS = join(REPO, "../keel-contracts");
+const CONTRACTS = CONTRACTS_ROOT;
 const OUT = join(CONTRACTS, "out");
 const metaDir = (id) => join(CONTRACTS, TIER_OF.get(id), id);
 const SIZE_LIMIT = 24576;
