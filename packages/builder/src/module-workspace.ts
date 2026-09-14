@@ -473,6 +473,7 @@ export interface KeelModuleCatalogEntry {
   /** The READABLE files the site shows, each pinned by digest. */
   readonly sourceFiles: readonly KeelCatalogSourceFile[];
   readonly types?: Awaited<ReturnType<typeof createKeelModuleTypes>>;
+  readonly runtime?: { readonly encoding: "base64"; readonly data: string; readonly format: string; readonly entry: string };
   readonly outputDigest: Hex;
   readonly receiptDigest: Hex;
   readonly disposition: KeelSourceReceipt["disposition"];
@@ -572,6 +573,7 @@ async function catalogEntry(module: KeelWorkspaceModule, options: IndexKeelWorks
   }
   return {
     ...(types === undefined ? {} : { types }),
+    runtime: { encoding: "base64", data: shippedBytes.toString("base64"), format: recipe.options.format, entry: recipe.entry },
     id: module.manifest.name,
     version: module.manifest.version,
     license: module.manifest.license,

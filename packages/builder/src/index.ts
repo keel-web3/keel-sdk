@@ -26,3 +26,5 @@ export * from "./module-inclusion.js";
 export * from "./module-unverified.js";
 
 export { syncKeelModuleEditor, checkKeelModuleEditor, watchKeelModuleEditor } from "./module-editor.js";
+export * from "./module-project.js";
+export * from "./module-project-bundle.js";

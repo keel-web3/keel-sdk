@@ -32,7 +32,7 @@ export function checkKeelModuleEditor(root: string, entries: readonly string[], 
   const configured = config ? ts.parseJsonConfigFileContent(config.config, ts.sys, path.dirname(configPath!)).options : {};
   const program = ts.createProgram([...entries.map(entry => path.resolve(root, entry)), ...declarations], {
     target: ts.ScriptTarget.ES2022, module: ts.ModuleKind.ESNext, moduleResolution: ts.ModuleResolutionKind.Bundler,
-    strict: true, skipLibCheck: true, types: [], ...configured, noEmit: true,
+    strict: true, skipLibCheck: true, types: [], jsx: ts.JsxEmit.ReactJSX, jsxImportSource: "@keel/sdk/module", ...configured, noEmit: true,
   });
   const errors = ts.getPreEmitDiagnostics(program).filter(item => item.category === ts.DiagnosticCategory.Error);
   if (errors.length) throw new Error(ts.formatDiagnostics(errors, {getCurrentDirectory: () => root, getCanonicalFileName: name => name, getNewLine: () => "\n"}));

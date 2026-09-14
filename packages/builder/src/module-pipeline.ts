@@ -22,8 +22,10 @@ import {
   canonicalJson,
   createIntegrity,
   utf8ToBytes,
+  type Compression,
   type Hex,
   type Integrity,
+  type KeelBuildOptions,
   type KeelBuildRecipe,
   type KeelSourceReceipt,
 } from "@keel/protocol";
@@ -96,6 +98,50 @@ export interface KeelModuleManifest {
   readonly placement?: KeelModulePlacement;
   /** The module's own public repository, once it has been split out. */
   readonly moduleRepository?: string;
+  /** Output format and linked (unbundled) imports; absent means the default ESM bundle. */
+  readonly build?: KeelModuleBuildSettings;
+}
+
+/**
+ * How a module links to the modules beside it, for multi-module workspaces
+ * (an engine whose parts are each their own module). `external` names the
+ * import specifiers left as imports instead of bundled in; `format` is the
+ * output shape the host loads (a classic-script host needs `iife`). Both are
+ * recipe options already, so both land in the recipe and its digest, and a
+ * reproduction repeats them from the recipe.
+ */
+export interface KeelModuleBuildSettings {
+  readonly format?: "esm" | "iife" | "cjs";
+  readonly external?: readonly string[];
+}
+
+const BUILD_FORMATS: ReadonlySet<string> = new Set(["esm", "iife", "cjs"]);
+
+function parseBuildSettings(value: unknown): KeelModuleBuildSettings {
+  if (value === null || typeof value !== "object" || Array.isArray(value)) fail(`${KEEL_MODULE_MANIFEST_FILE}: build must be an object with format and/or external.`);
+  const input = value as Record<string, unknown>;
+  for (const key of Object.keys(input)) if (key !== "format" && key !== "external") fail(`${KEEL_MODULE_MANIFEST_FILE}: build.${key} is not supported.`);
+  if (input.format !== undefined && (typeof input.format !== "string" || !BUILD_FORMATS.has(input.format))) {
+    fail(`${KEEL_MODULE_MANIFEST_FILE}: build.format must be esm, iife, or cjs.`);
+  }
+  if (input.external !== undefined && (!Array.isArray(input.external) || input.external.length > 256)) {
+    fail(`${KEEL_MODULE_MANIFEST_FILE}: build.external must be an array of at most 256 import specifiers.`);
+  }
+  const external = (input.external as readonly unknown[] | undefined)?.map((item) => textField(item, "build.external[]", 214));
+  return {
+    ...(input.format === undefined ? {} : { format: input.format as NonNullable<KeelModuleBuildSettings["format"]> }),
+    ...(external === undefined || external.length === 0 ? {} : { external }),
+  };
+}
+
+/** The recipe options a manifest builds with: the house defaults plus its declared format and externals. */
+export function keelModuleBuildOptions(manifest: KeelModuleManifest, overrides: Partial<KeelBuildOptions> = {}): KeelBuildOptions {
+  return {
+    ...KEEL_MODULE_BUILD_OPTIONS,
+    ...(manifest.build?.format === undefined ? {} : { format: manifest.build.format }),
+    ...(manifest.build?.external === undefined ? {} : { external: manifest.build.external }),
+    ...overrides,
+  };
 }
 
 function fail(message: string): never {
@@ -204,7 +250,7 @@ export function parseKeelModuleManifest(value: unknown): KeelModuleManifest {
   const input = value as Record<string, unknown>;
   if (input.schema === KEEL_JSMODULE_SCHEMA) return parseKeelJsModuleManifest(input, false);
   if (input.schema === KEEL_JSMODULE_SCHEMA_V2) return parseKeelJsModuleManifest(input, true);
-  const allowed = new Set(["protocol", "name", "version", "description", "entry", "license", "sourceRepository"]);
+  const allowed = new Set(["protocol", "name", "version", "description", "entry", "license", "sourceRepository", "build"]);
   for (const key of Object.keys(input)) if (!allowed.has(key)) fail(`${KEEL_MODULE_MANIFEST_FILE}: "${key}" is not supported.`);
   if (input.protocol !== KEEL_MODULE_MANIFEST_PROTOCOL) fail(`${KEEL_MODULE_MANIFEST_FILE}: protocol must be ${KEEL_MODULE_MANIFEST_PROTOCOL}.`);
   const name = moduleName(textField(input.name, "name", 64));
@@ -226,6 +272,7 @@ export function parseKeelModuleManifest(value: unknown): KeelModuleManifest {
       revision: textField(repository.revision, "sourceRepository.revision", 128),
       path: textField(repository.path, "sourceRepository.path", 256),
     },
+    ...(input.build === undefined ? {} : { build: parseBuildSettings(input.build) }),
   };
 }
 
@@ -432,6 +479,8 @@ export interface BuildKeelModuleOptions {
   readonly keepComments?: boolean;
   /** A file whose contents become a leading `/*!` banner in the shipped bytes. */
   readonly stampPath?: string;
+  /** false: skip the optional declaration output (dist/types, keel-module-types.json). */
+  readonly types?: boolean;
 }
 
 export async function buildKeelModule(directory: string, buildOptions: BuildKeelModuleOptions = {}): Promise<BuildKeelModuleResult> {
@@ -452,12 +501,9 @@ export async function buildKeelModule(directory: string, buildOptions: BuildKeel
   const built = await createKeelBuildRecipe({
     root,
     entry: manifest.entry,
-    options: {
-      ...KEEL_MODULE_BUILD_OPTIONS,
-      // Authors mark comments they want on chain as legal comments; esbuild
-      // must carry them through for the compact stage to be able to keep them.
-      legalComments: keepComments ? "inline" : "none",
-    },
+    // Authors mark comments they want on chain as legal comments; esbuild
+    // must carry them through for the compact stage to be able to keep them.
+    options: keelModuleBuildOptions(manifest, { legalComments: keepComments ? "inline" : "none" }),
     mediaType: "text/javascript",
     ...(compact ? { compact: { keepComments, ...(stampPath === undefined ? {} : { stamp: stampPath }) } } : {}),
   });
@@ -484,6 +530,9 @@ export async function buildKeelModule(directory: string, buildOptions: BuildKeel
   await writeFile(outputPath, built.outputBytes);
   await writeFile(recipePath, `${canonicalJson(built.recipe)}\n`);
   await writeFile(receiptPath, `${canonicalJson(receipt)}\n`);
+  // Declarations are an optional extra: a module whose linked imports resolve
+  // outside its own root (an engine part importing its neighbours) opts out.
+  if (buildOptions.types !== false) {
   const types = await createKeelModuleTypes(root, built.recipe);
   for (const [file, content] of Object.entries(types.files)) {
     const target = path.join(distDirectory, "types", file);
@@ -498,6 +547,7 @@ export async function buildKeelModule(directory: string, buildOptions: BuildKeel
     main: `./${manifest.name}.min.js`, types: `./types/${declarationEntry}`,
     exports: { ".": { types: `./types/${declarationEntry}`, import: `./${manifest.name}.min.js` } },
   }, null, 2)}\n`);
+  }
   const receiptDigest = (await createIntegrity(utf8ToBytes(canonicalJson(receipt)))).digest;
   return {
     directory: root,
@@ -519,6 +569,8 @@ export async function buildKeelModule(directory: string, buildOptions: BuildKeel
 export interface PlanKeelModuleOptions {
   readonly chainId?: number;
   readonly address?: `0x${string}`;
+  /** Stored compression; default "auto" (smallest). "gzip" keeps an object readable by a browser's DecompressionStream. */
+  readonly compression?: Compression | "auto";
 }
 
 export interface PlanKeelModuleResult {
@@ -576,7 +628,7 @@ export async function planKeelModule(directory: string, options: PlanKeelModuleO
     objectName: `${manifest.name}.min.js`,
     mediaType: recipe.output.mediaType,
     outputDirectory: distDirectory,
-    compression: "auto",
+    compression: options.compression ?? "auto",
   });
   const envelope = await createKeelPublishReviewPlan({
     schema: "keel-chain-operation-plan@1",

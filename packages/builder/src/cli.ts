@@ -11,6 +11,7 @@ import { bumpKeelModuleRegistration, registerKeelModuleFromOrigin } from "./modu
 import { runModuleAuthoringCommand } from "./module-authoring-cli.js";
 import { installKeelModule } from "./module-install.js";
 import { verifyKeelModuleFromOrigin } from "./module-verification.js";
+import { KEEL_MODULE_BUILD_OPTIONS } from "./build-recipe.js";
 import { analyzeCost } from "./cost-analysis.js";
 import { applyMediaOptimization, planMediaOptimization } from "./media-optimization.js";
 import { analyzeMedia, runMediaPipeline, verifyBuiltArtifact } from "./pipeline.js";
@@ -108,7 +109,7 @@ function usage(): string {
 
 Commands:
   keel module init <dir> [--name <name>]
-  keel module build <dir> [--keep-comments] [--stamp <file>] [--no-compact] [--json]
+  keel module build <dir> [--keep-comments] [--stamp <file>] [--no-compact] [--no-types] [--json]
   keel module build --all [--root <workspace>] [--keep-comments] [--stamp <file>] [--json]
   keel module test <dir> [--json]
   keel module test --all [--root <workspace>] [--json]
@@ -119,14 +120,14 @@ Commands:
   keel module editor [--root <project>] [--entry src/art.ts] [--includes keel.includes.json] [--watch]
   keel module install --repo <owner/name> --commit <sha> --version <v> --expect <sha256> [--name <id>] [--root <project>]
   keel module verify --repo <owner/name> --commit <sha> [--path <dir>] [--entry src/index.ts]
-    [--expect <0xdigest>] [--no-compact] [--json]
+    [--format esm|iife|cjs] [--external <a,b>] [--expect <0xdigest>] [--no-compact] [--json]
   keel module verify --all [--root <workspace>] [--json]
   keel module bump <dir> --commit <sha> [--version <v>] [--summary <text>] [--json]
   keel module register --repo <owner/name> --commit <sha> --out <dir> [--path <dir>]
     [--entry src/index.ts] [--id <id>] [--category <name>] [--owner-user <handle>]
     [--owner-org <id>] [--owner-group <id>] [--owner-member <id>] [--license MIT]
     [--summary <text>] [--version 0.1.0] [--json]
-  keel module plan <dir> [--chain-id 11155111] [--address <0x...>] [--json]
+  keel module plan <dir> [--chain-id 11155111] [--address <0x...>] [--compression auto|gzip|deflate|brotli|none] [--json]
   keel analyze <input> [--media-type <type>] [--json]
   keel build <input> --out <directory> --created-at <ISO date> [--name <name>] [--description <text>]
     [--id <id>] [--quality 82] [--creator <value>] [--source-repository <value>]
@@ -197,6 +198,8 @@ async function main(): Promise<void> {
           ...(args.flags["no-compact"] === true ? { compact: false } : {}),
           ...(args.flags["keep-comments"] === true ? { keepComments: true } : {}),
           ...(stampPath === undefined ? {} : { stampPath }),
+          // Declarations are optional; a linked module whose imports resolve outside its root opts out.
+          ...(args.flags["no-types"] === true ? { types: false } : {}),
         };
         if (all) {
           const results = await buildKeelWorkspace(workspaceRoot, buildOptions);
@@ -367,11 +370,20 @@ async function main(): Promise<void> {
         const entry = flag(args, "entry") ?? "src/index.ts";
         const expected = flag(args, "expect");
         if (expected !== undefined && !/^0x[0-9a-f]{64}$/u.test(expected)) throw new TypeError("--expect must be a lower-case sha256 digest.");
+        // A module that links to its neighbours (keel.module.json "build") is
+        // reproduced with the same format and externals its recipe recorded.
+        const format = flag(args, "format");
+        if (format !== undefined && format !== "esm" && format !== "iife" && format !== "cjs") throw new TypeError("--format must be esm, iife, or cjs.");
+        const externalFlag = flag(args, "external");
+        const external = externalFlag === undefined ? undefined : externalFlag.split(",").map((item) => item.trim()).filter(Boolean);
         const verified = await verifyKeelModuleFromOrigin({
           origin: { protocol: "keel-source-origin@1", provider: "github", owner, repo: name, commit, visibility: "public" },
           identity: { namespace: "keel", name, version: "0.0.0", entry },
           entry,
           ...(recipeRoot === undefined ? {} : { recipeRoot }),
+          ...(format === undefined && external === undefined
+            ? {}
+            : { options: { ...KEEL_MODULE_BUILD_OPTIONS, ...(format === undefined ? {} : { format }), ...(external === undefined || external.length === 0 ? {} : { external }) } }),
           ...(args.flags["no-compact"] === true ? {} : { compact: { keepComments: false } }),
           mediaType: "text/javascript",
         });
@@ -411,7 +423,10 @@ async function main(): Promise<void> {
         if (chainId !== undefined && (!Number.isSafeInteger(chainId) || chainId <= 0)) throw new RangeError("--chain-id must be a positive safe integer.");
         const address = flag(args, "address");
         if (address !== undefined && !/^0x[0-9a-f]{40}$/u.test(address)) throw new TypeError("--address must be a lower-case 20-byte Ethereum address.");
+        const compression = flag(args, "compression");
+        if (compression !== undefined && !["auto", "gzip", "deflate", "brotli", "none"].includes(compression)) throw new TypeError("--compression must be auto, gzip, deflate, brotli, or none.");
         const result = await planKeelModule(directory as string, {
+          ...(compression === undefined ? {} : { compression: compression as Compression | "auto" }),
           ...(chainId === undefined ? {} : { chainId }),
           ...(address === undefined ? {} : { address: address as `0x${string}` }),
         });

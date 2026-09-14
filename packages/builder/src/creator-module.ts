@@ -186,7 +186,7 @@ function hasProperty(object: ts.ObjectLiteralExpression, name: string): boolean 
   return object.properties.some((property) => propertyName(property) === name);
 }
 
-const MODULE_HELPERS = ["connectChildScopes", "defineDocument", "defineModule", "trustedHtml"] as const;
+const MODULE_HELPERS = ["connectChildScopes", "defineDocument", "defineModule", "defineTemplate", "trustedHtml"] as const;
 type ModuleHelper = (typeof MODULE_HELPERS)[number];
 
 function trustedModuleImports(file: ts.SourceFile): ReadonlyMap<string, ModuleHelper> {
@@ -279,30 +279,23 @@ function discoverStaticDocument(entry: string, surface: CreatorSurface): Discove
     if (parent === undefined) throw new TypeError(`surface ${surface.name} connectChildScopes() needs a parent module.`);
     moduleExpression = resolveStaticExpression(parent, bindings);
   }
-  if (!ts.isCallExpression(moduleExpression) || !isTrustedModuleCall(moduleExpression.expression, "defineModule", imports)) {
-    throw new TypeError(`surface ${surface.name} default export must resolve to defineModule().`);
+  const template = ts.isCallExpression(moduleExpression) && isTrustedModuleCall(moduleExpression.expression, "defineTemplate", imports);
+  let documentInput: ts.Expression | undefined;
+  if (template && ts.isCallExpression(moduleExpression)) {
+    documentInput = moduleExpression.arguments[0] === undefined ? undefined : resolveStaticExpression(moduleExpression.arguments[0], bindings);
+    if (!moduleExpression.arguments[1]) throw new TypeError(`surface ${surface.name} defineTemplate() needs template content.`);
+  } else {
+    if (!ts.isCallExpression(moduleExpression) || !isTrustedModuleCall(moduleExpression.expression, "defineModule", imports)) throw new TypeError(`surface ${surface.name} default export must resolve to defineModule() or defineTemplate().`);
+    const moduleInput = moduleExpression.arguments[1] === undefined ? undefined : resolveStaticExpression(moduleExpression.arguments[1], bindings);
+    if (!moduleInput || !ts.isObjectLiteralExpression(moduleInput)) throw new TypeError(`surface ${surface.name} defineModule() must declare document.`);
+    const expression = propertyValue(moduleInput, "document");
+    if (!expression) throw new TypeError(`surface ${surface.name} defineModule() must declare document.`);
+    const call = resolveStaticExpression(expression, bindings);
+    if (!ts.isCallExpression(call) || !isTrustedModuleCall(call.expression, "defineDocument", imports)) throw new TypeError(`surface ${surface.name} document must be created with defineDocument().`);
+    documentInput = call.arguments[0] === undefined ? undefined : resolveStaticExpression(call.arguments[0], bindings);
   }
-  const moduleInput = moduleExpression.arguments[1] === undefined
-    ? undefined
-    : resolveStaticExpression(moduleExpression.arguments[1], bindings);
-  if (moduleInput === undefined || !ts.isObjectLiteralExpression(moduleInput)) {
-    throw new TypeError(`surface ${surface.name} defineModule() must declare document.`);
-  }
-  const documentExpression = propertyValue(moduleInput, "document");
-  if (documentExpression === undefined) throw new TypeError(`surface ${surface.name} defineModule() must declare document.`);
-  const documentCall = resolveStaticExpression(documentExpression, bindings);
-  if (!ts.isCallExpression(documentCall) || !isTrustedModuleCall(documentCall.expression, "defineDocument", imports)) {
-    throw new TypeError(`surface ${surface.name} document must be created with defineDocument().`);
-  }
-  const documentInput = documentCall.arguments[0] === undefined
-    ? undefined
-    : resolveStaticExpression(documentCall.arguments[0], bindings);
-  if (documentInput === undefined || !ts.isObjectLiteralExpression(documentInput)) {
-    throw new TypeError(`surface ${surface.name} defineDocument() needs a static object literal.`);
-  }
-  if (!hasProperty(documentInput, "render")) {
-    throw new TypeError(`surface ${surface.name} defineDocument() must declare render.`);
-  }
+  if (!documentInput || !ts.isObjectLiteralExpression(documentInput)) throw new TypeError(`surface ${surface.name} document needs static options.`);
+  if (!template && !hasProperty(documentInput, "render")) throw new TypeError(`surface ${surface.name} defineDocument() must declare render.`);
   const title = staticString(propertyValue(documentInput, "title"), bindings, `surface ${surface.name} document title`);
   const lang = propertyValue(documentInput, "lang") === undefined
     ? "en"
@@ -617,6 +610,8 @@ async function runGroup(
     chunkNames: "shared/[name]-[hash]",
     assetNames: "shared/[name]-[hash]",
     write: true,
+    jsx: "automatic",
+    jsxImportSource: "@keel/sdk/module",
     inject: modules.length ? ["keel:auto-imports"] : [],
     plugins: [bootstrapPlugin, sourceBoundaryPlugin(root, surfaces, sharedRoots)],
   });
