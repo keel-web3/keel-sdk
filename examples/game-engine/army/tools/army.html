@@ -1,0 +1,9 @@
+<!doctype html>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>ARMY</title>
+<body></body>
+<script type="module">
+  import { main } from "./dist/army.js";
+  try { main(document.body); } catch (e) { document.body.textContent = String(e && e.stack || e); globalThis.armyError = String(e && e.stack || e); }
+</script>

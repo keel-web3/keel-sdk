@@ -1,0 +1,42 @@
+{
+  "schema": "keel-engine-link@1",
+  "manifest": {
+    "schema": "keel-engine-module@1",
+    "id": "examples/hello-pack",
+    "version": "0.1.0",
+    "kind": "pack",
+    "needs": [
+      "keel/runtime@^0.1"
+    ],
+    "provides": [
+      "body/blob@1.0.0"
+    ],
+    "contents": {
+      "entities": [
+        {
+          "id": "blob",
+          "body": "body/blob@1.0.0"
+        },
+        {
+          "id": "tall-blob",
+          "body": "body/blob@1.0.0"
+        }
+      ],
+      "attributes": [
+        {
+          "id": "party-hat",
+          "slot": "head"
+        }
+      ]
+    },
+    "title": "Hello pack",
+    "description": "Two blobs and a party hat: the smallest pack.",
+    "compatible": [],
+    "phase": "runtime",
+    "weight": -500
+  },
+  "imports": {
+    "@keel/game-engine": "keel/runtime"
+  },
+  "manifests": {}
+}

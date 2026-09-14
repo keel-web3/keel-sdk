@@ -1,0 +1,3 @@
+# The pinned engine release pnpm game:engine clones, and the practice chain pnpm game:sandbox keeps (both local).
+.engine/
+.sandbox/

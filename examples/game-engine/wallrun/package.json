@@ -1,0 +1,10 @@
+{
+  "name": "@examples/wallrun",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "WALLRUN: a seeded parkour course over dark water that runs itself until you play.",
+  "exports": {
+    ".": "./src/index.ts"
+  }
+}

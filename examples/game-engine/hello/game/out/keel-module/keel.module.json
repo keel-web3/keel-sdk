@@ -1,0 +1,19 @@
+{
+  "protocol": "keel-module-manifest@1",
+  "name": "examples-hello",
+  "version": "0.1.0",
+  "description": "Every blob from every pack providing body/blob, each in a hat that fits it.",
+  "entry": "keel/entry.ts",
+  "license": "MIT",
+  "sourceRepository": {
+    "url": "https://github.com/keel-web3/keel-engine",
+    "revision": "replace-with-a-commit-hash",
+    "path": "/Users/ravonus/dev/keel-sdk/examples/game-engine/hello/game"
+  },
+  "build": {
+    "format": "iife",
+    "external": [
+      "@keel/game-engine"
+    ]
+  }
+}

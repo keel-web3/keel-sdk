@@ -1,0 +1,8 @@
+{
+  "name": "@examples/ui-demo",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "UI DEMO: a whole RTS HUD from one call -- theme, fonts, icons and layout generated from a seed and a culture -- drawn over a stand-in game; click, hotkeys, Tab and arrows work.",
+  "exports": { ".": "./src/index.ts" }
+}

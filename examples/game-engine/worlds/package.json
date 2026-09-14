@@ -1,0 +1,10 @@
+{
+  "name": "@examples/worlds",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "WORLDS: the engine's world generation in pixel art -- an infinite Minecraft-style overworld streaming chunks, biome swaps, seasons and spreading creep, Diablo-style dungeons (stitched rooms, BSP, caves, drunkard walks, wave function collapse), and a mixed map; foliage scattered by rules, swaying in the sprite shader.",
+  "exports": {
+    ".": "./src/index.ts"
+  }
+}

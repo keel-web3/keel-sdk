@@ -1,0 +1,10 @@
+{
+  "name": "@examples/level-demo",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "LEVEL DEMO: a generated valley -- terrain heights, cliffs and ramps, a river and its bridge, roads, foliage and houses -- through the terrain's baked ground layers, with thousands of units walking flow fields.",
+  "exports": {
+    ".": "./src/index.ts"
+  }
+}

@@ -1,0 +1,19 @@
+{
+  "protocol": "keel-module-manifest@1",
+  "name": "examples-hello-pack",
+  "version": "0.1.0",
+  "description": "Two blobs and a party hat: the smallest pack.",
+  "entry": "keel/entry.ts",
+  "license": "MIT",
+  "sourceRepository": {
+    "url": "https://github.com/keel-web3/keel-engine",
+    "revision": "replace-with-a-commit-hash",
+    "path": "/Users/ravonus/dev/keel-sdk/examples/game-engine/hello/pack"
+  },
+  "build": {
+    "format": "iife",
+    "external": [
+      "@keel/game-engine"
+    ]
+  }
+}

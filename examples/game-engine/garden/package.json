@@ -1,0 +1,10 @@
+{
+  "name": "@examples/garden",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "GARDEN: a seeded plaza on the world runtime -- animals wandering, a drivable anthro, frame shots, a locks panel with explain().",
+  "exports": {
+    ".": "./src/index.ts"
+  }
+}

@@ -1,0 +1,10 @@
+{
+  "name": "@examples/zoo",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "ZOO: the engine's animals, humans, cloth and animal AI composed by contract in one KEEL document; a top-down placeholder view.",
+  "exports": {
+    ".": "./src/index.ts"
+  }
+}

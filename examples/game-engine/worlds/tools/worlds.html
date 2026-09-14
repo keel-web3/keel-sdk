@@ -1,0 +1,9 @@
+<!doctype html>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>WORLDS</title>
+<body></body>
+<script type="module">
+  import { main } from "./worlds.js";
+  try { main(document.body); } catch (e) { document.body.textContent = String(e && e.stack || e); globalThis.worldsError = String(e && e.stack || e); }
+</script>

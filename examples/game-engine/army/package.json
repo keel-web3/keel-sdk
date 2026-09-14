@@ -1,0 +1,10 @@
+{
+  "name": "@examples/army",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "ARMY: thousands of baked sprite units wandering a map -- the bake step's demo.",
+  "exports": {
+    ".": "./src/index.ts"
+  }
+}

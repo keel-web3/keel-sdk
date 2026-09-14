@@ -1,0 +1,12 @@
+{
+  "extends": "../../../../../../../keel-engine/tsconfig.base.json",
+  "compilerOptions": {
+    "noEmit": true,
+    "resolveJsonModule": true,
+    "types": []
+  },
+  "include": [
+    "src/**/*.ts",
+    "keel/**/*.ts"
+  ]
+}
