@@ -1,0 +1,12 @@
+{
+  "name": "keel-verified-module-editor",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "setup": "node setup.mjs",
+    "build": "node build.mjs",
+    "check": "node check-editor.mjs",
+    "preview": "node preview.mjs",
+    "editor": "node ../../packages/builder/dist/cli.js module editor --watch"
+  }
+}

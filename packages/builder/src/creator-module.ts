@@ -1,3 +1,5 @@
+import { syncKeelModuleEditor, checkKeelModuleEditor } from "./module-editor.js";
+import { createKeelModuleInclusions, type IncludedKeelModule } from "./module-inclusion.js";
 import { injectKeelModuleGlobals } from "./module-globals.js";
 import { mkdir, readFile, readdir, realpath, rm, stat, writeFile } from "node:fs/promises";
 import path from "node:path";
@@ -58,6 +60,7 @@ export interface BuildCreatorProjectOptions {
   readonly surfaces: readonly CreatorSurface[];
   /** Source directories deliberately shared by otherwise-private surfaces. */
   readonly sharedRoots?: readonly string[];
+  readonly modules?: readonly IncludedKeelModule[];
 }
 
 function safeName(value: string): string {
@@ -569,14 +572,18 @@ async function runGroup(
   surfaces: readonly PreparedSurface[],
   sharedRoots: readonly string[],
   subdirectory: string,
+  modules: readonly IncludedKeelModule[] = [],
 ): Promise<{ readonly metafile: Metafile; readonly surfaceEntries: ReadonlyMap<string, string> }> {
   await assertOutputTreeIsSafe(outputDirectory);
   const outdir = path.join(outputDirectory, subdirectory);
   const surfaceByName = new Map(surfaces.map((surface) => [surface.surface.name, surface]));
   const entryPoints = Object.fromEntries(surfaces.map((surface) => [surface.surface.name, `keel-entry:${surface.surface.name}`]));
+  const included = createKeelModuleInclusions(root, modules);
   const bootstrapPlugin: Plugin = {
     name: "keel-creator-bootstrap",
     setup(pluginBuild) {
+      pluginBuild.onResolve({ filter: /^keel:auto-imports$/ }, () => ({ path: "keel:auto-imports", namespace: "keel-auto-imports" }));
+      pluginBuild.onLoad({ filter: /.*/, namespace: "keel-auto-imports" }, () => ({ contents: included.runtime, loader: "js", resolveDir: root }));
       pluginBuild.onResolve({ filter: /^keel-entry:/ }, (args) => ({ path: args.path, namespace: "keel-bootstrap" }));
       pluginBuild.onLoad({ filter: /.*/, namespace: "keel-bootstrap" }, (args) => {
         const name = args.path.slice("keel-entry:".length);
@@ -610,6 +617,7 @@ async function runGroup(
     chunkNames: "shared/[name]-[hash]",
     assetNames: "shared/[name]-[hash]",
     write: true,
+    inject: modules.length ? ["keel:auto-imports"] : [],
     plugins: [bootstrapPlugin, sourceBoundaryPlugin(root, surfaces, sharedRoots)],
   });
   await assertOutputTreeIsSafe(outputDirectory);
@@ -681,6 +689,11 @@ export async function buildCreatorProject(options: BuildCreatorProjectOptions): 
     const sourceRoot = await resolveSurfaceRoot(root, surface, entry);
     surfaces.push({ surface, entry, sourceRoot, document: discoverStaticDocument(entry, surface) });
   }
+  if (options.modules !== undefined) {
+    const entries = surfaces.map(surface => surface.entry);
+    const editor = await syncKeelModuleEditor(root, options.modules, entries);
+    checkKeelModuleEditor(root, entries, editor.files);
+  }
   const sharedRoots = await resolveSharedRoots(root, options.sharedRoots);
   assertDisjointRoots(surfaces, sharedRoots);
   await assertOutputTreeIsSafe(outputDirectory);
@@ -689,9 +702,9 @@ export async function buildCreatorProject(options: BuildCreatorProjectOptions): 
 
   const builds: { metafile: Metafile; surfaceEntries: ReadonlyMap<string, string> }[] = [];
   const shared = surfaces.filter((surface) => surface.surface.isolation === "shared-library");
-  if (shared.length > 0) builds.push(await runGroup(root, outputDirectory, shared, sharedRoots, "library"));
+  if (shared.length > 0) builds.push(await runGroup(root, outputDirectory, shared, sharedRoots, "library", options.modules));
   for (const surface of surfaces.filter((candidate) => candidate.surface.isolation === "sandbox")) {
-    builds.push(await runGroup(root, outputDirectory, [surface], sharedRoots, `sandbox/${surface.surface.name}`));
+    builds.push(await runGroup(root, outputDirectory, [surface], sharedRoots, `sandbox/${surface.surface.name}`, options.modules));
   }
 
   const outputMetadata = new Map<string, Metafile["outputs"][string]>();

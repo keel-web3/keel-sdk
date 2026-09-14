@@ -1,0 +1,8 @@
+{
+  "folders": [{ "path": "." }],
+  "settings": {
+    "typescript.tsdk": "../../node_modules/typescript/lib",
+    "files.exclude": { ".keel": true, "dist": true },
+    "editor.quickSuggestions": { "other": true, "comments": false, "strings": true }
+  }
+}

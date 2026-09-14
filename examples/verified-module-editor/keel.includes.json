@@ -1,0 +1,10 @@
+[
+  {
+    "name": "thumbnail",
+    "specifier": "@keel-modules/thumbnail-capture"
+  },
+  {
+    "name": "solar",
+    "specifier": "@keel-modules/solar-example"
+  }
+]

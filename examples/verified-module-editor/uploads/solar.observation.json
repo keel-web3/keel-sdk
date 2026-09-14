@@ -1,0 +1,12 @@
+{
+  "schema": "keel-module-observation@1",
+  "digest": "0xe0b93f929bc15cbfd3b48859f5389555da09ecf847ba73ab7535af535814eeb6",
+  "trust": "unverified-observation",
+  "globals": {
+    "KEEL_solarDates": {
+      "kind": "function",
+      "arity": 0
+    }
+  },
+  "exports": {}
+}

@@ -44,3 +44,37 @@ The compiler recognizes direct named imports of `declareGlobals` from
 explicit name. The automatic path is independent of local absolute directories
 and generated asset hashes. Ordinary module imports use the existing ESM
 bundler and do not require an editor extension or manual `globalThis` access.
+
+## Automatic inclusion and ordinary IDE support
+
+Pass `modules: [{ name: "thumbnail", specifier: "@keel-modules/thumbnail-capture" }]`
+to `buildCreatorProject`. The same inclusion record generates editor declarations
+and esbuild imports. Author code can call `thumbnail.snapshot()` directly.
+Default explicit globals are `KEEL_<module>_<export>`; an existing `KEEL_` export
+keeps its declared name and also gets a short alias. Ambiguous aliases fail;
+use the inclusion record's `aliases` map to resolve them.
+
+The build refreshes `.keel/module-inclusions.d.ts` and `.keel/globals.d.ts`, then
+type-checks the entries before emitting. Include `.keel/*.d.ts` in tsconfig.
+`keel module editor --watch` keeps declarations current while editing a project
+with `keel.includes.json`. Exported `declareGlobals` variables automatically
+augment `GlobalModules`, using `typeof import` so their members retain live types.
+Excluded modules lose their automatic bindings. Ordinary explicit imports remain
+ordinary imports and do not require global inclusion.
+
+`keel module install` reproduces a pinned Git origin and installs its matching
+runtime and declaration files without running package scripts. Verification is
+optional for authoring: `module observe` creates a browser discovery page;
+`module infer` binds the saved observation to the uploaded source and prepares a
+local ESM package. These commands never execute uploaded JavaScript in Node.
+
+Discovery runs in an opaque `allow-scripts` iframe with networking disabled.
+Classic discovery records synchronous newly created own globals, without calling
+their functions or getters. The observation library also supports ESM exports.
+It cannot infer unexecuted branches, lexical globals, later interaction-created
+APIs, or every argument type. Source inference supplies signatures where possible;
+unresolved values remain `unknown`. Observations and inferred declarations do
+not confer verification. Discovery is optional for modules with an exported or
+author-declared API.
+
+See `examples/verified-module-editor/KEEL.code-workspace` for the tested project.

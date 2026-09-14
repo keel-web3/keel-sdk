@@ -8,6 +8,8 @@ import { buildKeelModule, initKeelModule, planKeelModule } from "./module-pipeli
 import { testKeelModule, verifyKeelModuleCandidate } from "./module-testing.js";
 import { buildKeelWorkspace, indexKeelWorkspace, testKeelWorkspace, verifyKeelWorkspaceRegistrations } from "./module-workspace.js";
 import { bumpKeelModuleRegistration, registerKeelModuleFromOrigin } from "./module-registration.js";
+import { runModuleAuthoringCommand } from "./module-authoring-cli.js";
+import { installKeelModule } from "./module-install.js";
 import { verifyKeelModuleFromOrigin } from "./module-verification.js";
 import { analyzeCost } from "./cost-analysis.js";
 import { applyMediaOptimization, planMediaOptimization } from "./media-optimization.js";
@@ -112,6 +114,10 @@ Commands:
   keel module test --all [--root <workspace>] [--json]
   keel module compact <dir> --candidate <file> [--json]
   keel module index [--root <workspace>] [--repository <url>] [--json]
+  keel module observe --file <script.js> --out <discovery.html>
+  keel module infer --file <script.js> --observation <json> --name <id> --out <new-package-directory>
+  keel module editor [--root <project>] [--entry src/art.ts] [--includes keel.includes.json] [--watch]
+  keel module install --repo <owner/name> --commit <sha> --version <v> --expect <sha256> [--name <id>] [--root <project>]
   keel module verify --repo <owner/name> --commit <sha> [--path <dir>] [--entry src/index.ts]
     [--expect <0xdigest>] [--no-compact] [--json]
   keel module verify --all [--root <workspace>] [--json]
@@ -176,7 +182,7 @@ async function main(): Promise<void> {
       const verb = required(args.positional[0], "module requires a subcommand: init, build, test, compact, verify, register, bump, index, or plan.");
       const all = args.flags.all === true && (verb === "build" || verb === "test" || verb === "verify");
       const workspaceRoot = flag(args, "root") ?? process.cwd();
-      const directory = verb === "index" || verb === "verify" || verb === "register" || all
+      const directory = ["index", "verify", "register", "install", "observe", "infer", "editor"].includes(verb) || all
         ? undefined
         : required(args.positional[1], `module ${verb} requires a module directory (or --all).`);
       if (verb === "init") {
@@ -330,6 +336,26 @@ async function main(): Promise<void> {
           `receipt digest: ${result.registration.expect.receiptDigest}\n` +
           "Commit this file. Indexing reads it offline; \"keel module verify --all\" re-checks it over the network.",
         );
+        return;
+      }
+      if (await runModuleAuthoringCommand(verb, args.flags)) return;
+      if (verb === "install") {
+        const repository = required(flag(args, "repo"), "module install requires --repo <owner/name>.");
+        const [owner, repo] = repository.split("/");
+        if (!owner || !repo || repository.split("/").length !== 2) throw new TypeError("Invalid module repository.");
+        const entry = flag(args, "entry") ?? "src/index.ts";
+        const name = flag(args, "name") ?? repo;
+        const version = required(flag(args, "version"), "module install requires --version.");
+        const commit = required(flag(args, "commit"), "module install requires an exact --commit.");
+        const result = await installKeelModule({
+          origin: { protocol: "keel-source-origin@1", provider: "github", owner, repo, commit, visibility: "public" },
+          identity: { namespace: "keel", name, version, entry }, entry,
+          projectRoot: flag(args, "root") ?? process.cwd(), name,
+          expectedOutput: required(flag(args, "expect"), "module install requires --expect <sha256>.") as Hex,
+          ...(flag(args, "path") === undefined ? {} : { recipeRoot: flag(args, "path")! }),
+          ...(args.flags["no-compact"] === true ? {} : { compact: { keepComments: false } }),
+        });
+        output(result, args.flags.json === true, `Installed ${result.importPath} with verified runtime and IDE declarations.\nSource commit: ${result.sourceCommit}\nOutput digest: ${result.output.digest}`);
         return;
       }
       if (verb === "verify") {

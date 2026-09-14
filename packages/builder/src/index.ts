@@ -19,3 +19,10 @@ export * from "./creator-module.js";
 
 export * from "./module-types.js";
 export * from "./module-globals.js";
+export * from "./module-install.js";
+export * from "./module-global-types.js";
+export * from "./module-observation.js";
+export * from "./module-inclusion.js";
+export * from "./module-unverified.js";
+
+export { syncKeelModuleEditor, checkKeelModuleEditor, watchKeelModuleEditor } from "./module-editor.js";
