@@ -494,6 +494,19 @@ export interface SandboxDocument {
  * contract graph have been verified at the same pinned block.
  */
 export interface RuntimeContext {
+  readonly releaseDisclosure?: {
+    readonly source: "pinned-rpc";
+    readonly router: Hex;
+    readonly collection: Hex;
+    readonly releaseId: string;
+    readonly localId: string;
+    readonly policyWord: string;
+    readonly targetMaximum: string;
+    readonly authority: Hex;
+    readonly blockNumber: string;
+    readonly blockHash: Hex;
+    readonly rows: readonly (readonly [string, string])[];
+  };
   readonly protocol: "keel-context@1";
   readonly chainId?: number;
   readonly blockNumber?: string;

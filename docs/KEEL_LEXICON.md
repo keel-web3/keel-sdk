@@ -119,21 +119,16 @@ history, old deployments, or old ABIs:
 | `mintFromManager` / `adminMint` | `strikeFromManager` / `adminStrike` |
 | `requestAnchor` / `anchorNative` / `finalizeAnchor` | `driveAnchor` / `stampNative` / `setAnchor` |
 
-> Deployed contracts from the Stratus era keep their old ABIs. The rename is
-> source-level; anything already on a network answers to its old selectors and
-> domain strings until redeployed.
+### KEEL wire identifiers
 
-### Wire formats keep their bytes
+This unreleased EVM format uses `KEEL` (`0x4b45454c`) descriptor magic,
+version `1`. The reader accepts only this format; obsolete tags are rejected.
+The 93-byte header and object-ID derivation are specified in the contracts
+repository's `docs/EVM_HOLD_WIRE_FORMAT.md`.
 
-A few identifiers are **format magic, not branding**, and deliberately keep
-their old spelling until the format itself revs — changing them would orphan
-every manifest and descriptor already published on chain:
+- `keel-manifest@2` identifies the manifest schema.
+- `keel://` is the virtual route scheme inside the sandbox.
+- `keel.per-token-mint-data.v1` and related hash domains identify KEEL commitments.
+- `web3://` addresses contract resources; it is not a binary descriptor tag.
 
-- `keel-manifest@2` — the manifest format id (becomes `keel-manifest@3` at the
-  next format bump, not before)
-- `keel://` — the virtual route scheme inside the sandbox
-- `keel.per-token-mint-data.v1` and related KEEL hash domains
-- `STR3` (`0x53545233`) — the descriptor magic in `KeelHold`
-
-New domain separators introduced after the rename are `keel.*`; the recorded
-cross-language golden vectors were re-cut for every renamed domain.
+New domain separators use `keel.*`. Golden vectors track the current format.

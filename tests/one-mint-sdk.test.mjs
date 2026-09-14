@@ -192,3 +192,22 @@ test("[OneMint/normalizeOneMintPerTokenMintData] enforces the pre-receiver hook 
     /even-length hexadecimal/u,
   );
 });
+
+test("[OneMint/claim words] groups NFT flags without changing the signed order", async () => {
+  const { planOneMintClaimWords, oneMintClaimPosition, oneMintClaimUsed } = await import("../packages/sdk/dist/one-mint.js");
+  const maximum = (1n << 256n) - 1n;
+  const ids = [256n, 0n, 255n, 511n, maximum, 1n];
+  const plan = planOneMintClaimWords(ids);
+  assert.deepEqual(plan.tokenIds, ids);
+  assert.deepEqual(plan.words.map(w => w.wordIndex), [1n, 0n, maximum >> 8n]);
+  assert.equal(plan.words[0].requestedMask, 1n | (1n << 255n));
+  assert.equal(plan.words[1].requestedMask, 3n | (1n << 255n));
+  assert.deepEqual(oneMintClaimPosition(maximum), { wordIndex: maximum >> 8n, mask: 1n << 255n });
+  assert.equal(oneMintClaimUsed(plan.words[0].requestedMask, 511n), true);
+  assert.equal(oneMintClaimUsed(plan.words[0].requestedMask, 257n), false);
+  assert.equal(Object.isFrozen(plan.words[0]), true);
+  for (const input of [[], [1n, 256n, 1n], Array.from({length:65}, (_,i) => BigInt(i)), [-1n], [maximum + 1n], [Number.MAX_SAFE_INTEGER + 1]]) {
+    assert.throws(() => planOneMintClaimWords(input));
+  }
+  assert.throws(() => oneMintClaimUsed(maximum + 1n, 1n));
+});

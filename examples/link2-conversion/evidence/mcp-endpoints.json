@@ -1,0 +1,34 @@
+{
+  "request": {
+    "method": "tools/call",
+    "params": {
+      "name": "keel-endpoint-config",
+      "arguments": {}
+    }
+  },
+  "response": {
+    "jsonrpc": "2.0",
+    "id": 6,
+    "result": {
+      "content": [
+        {
+          "type": "text",
+          "text": "{\"schema\":\"keel-endpoints@1\",\"studioUrl\":\"https://keel-test.149-28-255-65.sslip.io\",\"publicRpcUrl\":\"https://rpc.keel-test.149-28-255-65.sslip.io\",\"sources\":{\"studioUrl\":\"canonical-default\",\"publicRpcUrl\":\"canonical-default\"},\"compatibilityAliases\":{\"studioUrl\":\"https://stratus-test.149-28-255-65.sslip.io\",\"publicRpcUrl\":\"https://rpc.stratus-test.149-28-255-65.sslip.io\"}}"
+        }
+      ],
+      "structuredContent": {
+        "schema": "keel-endpoints@1",
+        "studioUrl": "https://keel-test.149-28-255-65.sslip.io",
+        "publicRpcUrl": "https://rpc.keel-test.149-28-255-65.sslip.io",
+        "sources": {
+          "studioUrl": "canonical-default",
+          "publicRpcUrl": "canonical-default"
+        },
+        "compatibilityAliases": {
+          "studioUrl": "https://stratus-test.149-28-255-65.sslip.io",
+          "publicRpcUrl": "https://rpc.stratus-test.149-28-255-65.sslip.io"
+        }
+      }
+    }
+  }
+}

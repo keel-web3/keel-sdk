@@ -1,0 +1,7 @@
+# Retain large local preservation inputs and candidates outside git.
+original/data/
+current/data/
+candidates/
+prepared/objects/
+evidence/token-source/data/
+evidence/*.png

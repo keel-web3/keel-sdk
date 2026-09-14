@@ -9,6 +9,7 @@ export interface KeelStudioProjectIntakeInput {
     readonly type?: "one-of-one" | "open-edition" | "limited-edition";
     readonly saleMechanism?: "fixed-price" | "auction" | "claim";
     readonly priceEth?: string;
+    readonly supply?: string;
     readonly startsAt?: string | null;
     readonly endsAt?: string | null;
   };
@@ -18,7 +19,7 @@ export type KeelStudioProjectIntakeResult =
   | {
       readonly status: "needs-input";
       readonly questions: readonly {
-        readonly field: "title" | "description" | "outcome" | "chainId" | "releaseType" | "saleMechanism" | "priceEth";
+        readonly field: "title" | "description" | "outcome" | "chainId" | "releaseType" | "saleMechanism" | "priceEth" | "supply";
         readonly question: string;
       }[];
     }
@@ -72,13 +73,20 @@ export function prepareKeelStudioProjectIntake(input: KeelStudioProjectIntakeInp
   }
   const title = bounded(input.title, 160);
   const description = bounded(input.description, 2_000);
-  const questions: Array<{ field: "title" | "description" | "outcome" | "chainId" | "releaseType" | "saleMechanism" | "priceEth"; question: string }> = [];
+  const suppliedSupply = input.release?.supply;
+  if (suppliedSupply !== undefined) {
+    if (typeof suppliedSupply !== "string" || !/^[1-9]\d{0,77}$/u.test(suppliedSupply) || BigInt(suppliedSupply) >= 2n ** 256n) throw new TypeError("release.supply must be a positive uint256 integer string.");
+    if (input.release?.type === "one-of-one" && suppliedSupply !== "1") throw new TypeError("A one-of-one must have supply 1.");
+    if (input.release?.type === "open-edition") throw new TypeError("An open edition cannot specify fixed supply.");
+  }
+  const questions: Array<{ field: "title" | "description" | "outcome" | "chainId" | "releaseType" | "saleMechanism" | "priceEth" | "supply"; question: string }> = [];
   if (title === undefined) questions.push({ field: "title", question: "What should this work be called?" });
   if (description === undefined) questions.push({ field: "description", question: "How should this work be described to collectors?" });
   if (input.outcome === undefined) questions.push({ field: "outcome", question: "Should I only store and verify the work, or also prepare an editable release/listing?" });
   if (input.outcome === "release") {
     if (!Number.isSafeInteger(input.chainId) || Number(input.chainId) <= 0) questions.push({ field: "chainId", question: "Which chain should the editable release use?" });
     if (input.release?.type === undefined) questions.push({ field: "releaseType", question: "Should this release be one-of-one, limited-edition, or open-edition?" });
+    if (input.release?.type === "limited-edition" && suppliedSupply === undefined) questions.push({ field: "supply", question: "How many copies should this limited edition contain?" });
     if (input.release?.saleMechanism === undefined) questions.push({ field: "saleMechanism", question: "Should this release use fixed-price, auction, or claim access?" });
     if (bounded(input.release?.priceEth, 80) === undefined) questions.push({ field: "priceEth", question: "What price should I prefill? You can still change it in Studio." });
   }
@@ -92,7 +100,7 @@ export function prepareKeelStudioProjectIntake(input: KeelStudioProjectIntakeInp
   const saleMechanism = input.release!.saleMechanism!;
   const priceEth = bounded(input.release?.priceEth, 80)!;
   if (!/^(?:0|[1-9]\d*)(?:\.\d{1,18})?$/u.test(priceEth)) throw new TypeError("priceEth must be a non-negative decimal ETH amount.");
-  const supply = type === "one-of-one" ? "1" : "0";
+  const supply = type === "one-of-one" ? "1" : type === "limited-edition" ? suppliedSupply! : "0";
   return Object.freeze({
     status: "ready",
     title: title!,

@@ -1,0 +1,43 @@
+{
+  "request": {
+    "method": "tools/call",
+    "params": {
+      "name": "keel-studio-capabilities",
+      "arguments": {}
+    }
+  },
+  "response": {
+    "jsonrpc": "2.0",
+    "id": 7,
+    "result": {
+      "content": [
+        {
+          "type": "text",
+          "text": "{\"schema\":\"keel-studio-capabilities@2\",\"generatedAt\":\"2026-09-10T17:45:45.215Z\",\"chainId\":11155111,\"staging\":{\"endpoint\":\"/api/agent/staging\",\"transport\":\"multipart-form-data\",\"authentication\":\"bearer\",\"maxSourceBytes\":134217728,\"maximumRetentionSeconds\":604800,\"resumable\":false,\"oneUseHandoff\":false},\"wallet\":{\"signing\":false,\"submission\":false},\"publication\":{\"readiness\":\"requires-project-verification\",\"canonicalShellRequired\":true}}"
+        }
+      ],
+      "structuredContent": {
+        "schema": "keel-studio-capabilities@2",
+        "generatedAt": "2026-09-10T17:45:45.215Z",
+        "chainId": 11155111,
+        "staging": {
+          "endpoint": "/api/agent/staging",
+          "transport": "multipart-form-data",
+          "authentication": "bearer",
+          "maxSourceBytes": 134217728,
+          "maximumRetentionSeconds": 604800,
+          "resumable": false,
+          "oneUseHandoff": false
+        },
+        "wallet": {
+          "signing": false,
+          "submission": false
+        },
+        "publication": {
+          "readiness": "requires-project-verification",
+          "canonicalShellRequired": true
+        }
+      }
+    }
+  }
+}

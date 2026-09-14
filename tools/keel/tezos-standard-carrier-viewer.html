@@ -1,0 +1,69 @@
+<!doctype html>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>KEEL Tezos standard carrier test</title>
+<style>
+  :root { color-scheme: dark; font: 15px/1.45 ui-monospace, SFMono-Regular, Menlo, monospace; background: #111; color: #eee; }
+  body { margin: 0; padding: 24px; max-width: 1180px; margin-inline: auto; }
+  h1 { font: 600 22px/1.2 system-ui, sans-serif; margin: 0 0 8px; }
+  p { color: #aaa; max-width: 850px; }
+  .grid { display: grid; grid-template-columns: minmax(280px, 1fr) minmax(420px, 2fr); gap: 16px; align-items: start; }
+  .card { border: 1px solid #333; border-radius: 10px; padding: 14px; background: #181818; }
+  dt { color: #888; margin-top: 10px; } dd { margin: 2px 0 0; overflow-wrap: anywhere; }
+  code { color: #8fe3a8; }
+  .ok { color: #8fe3a8; } .warn { color: #ffd27a; } .bad { color: #ff8c8c; }
+  iframe { width: 100%; height: min(72vh, 760px); border: 1px solid #333; border-radius: 8px; background: #000; }
+  img { display: block; max-width: 100%; max-height: 180px; margin-top: 12px; border-radius: 6px; }
+  pre { white-space: pre-wrap; overflow-wrap: anywhere; color: #bbb; }
+  @media (max-width: 800px) { .grid { grid-template-columns: 1fr; } }
+</style>
+<h1>Tezos standard carrier test</h1>
+<p>This is a local QA viewer. The public token path is ordinary FA2/TZIP metadata with an <code>onchfs://</code> carrier. The KEEL harness is shown only as a compatibility/readback route. The frame below mounts only after the local canonical shell passes its SHA-256 and byte-length check.</p>
+<div class="grid">
+  <section class="card">
+    <dl id="facts"><dt>Status</dt><dd>Loading…</dd></dl>
+    <img src="tezos-contracts/one_of_one_standard_collection/display.jpg" alt="Local poster fixture">
+  </section>
+  <section class="card"><iframe id="preview" title="Verified canonical shell" hidden></iframe><pre id="json"></pre></section>
+</div>
+<script type="module">
+  const facts = document.querySelector("#facts");
+  const json = document.querySelector("#json");
+  const frame = document.querySelector("#preview");
+  const add = (label, value, className = "") => {
+    const dt = document.createElement("dt"); dt.textContent = label;
+    const dd = document.createElement("dd"); dd.className = className; dd.textContent = value;
+    facts.append(dt, dd);
+  };
+  const digest = async (bytes) => {
+    const hash = await crypto.subtle.digest("SHA-256", bytes);
+    return "0x" + [...new Uint8Array(hash)].map((b) => b.toString(16).padStart(2, "0")).join("");
+  };
+  try {
+    const metadata = await fetch("./tezos-standard-token-metadata.json", { cache: "no-store" }).then((r) => {
+      if (!r.ok) throw new Error(`metadata HTTP ${r.status}`);
+      return r.json();
+    });
+    const shellBytes = await fetch("./canonical-shell.html", { cache: "no-store" }).then((r) => r.arrayBuffer());
+    const actualDigest = await digest(shellBytes);
+    const expectedDigest = metadata.canonicalSha256;
+    add("Public standard", "FA2/TZIP-12 token_metadata", "ok");
+    add("animation_url", metadata.animation_url, metadata.animation_url?.startsWith("onchfs://") ? "ok" : "bad");
+    add("artifactUri", metadata.artifactUri, metadata.artifactUri?.startsWith("onchfs://") ? "ok" : "bad");
+    add("KEEL compatibility", metadata.keelArtifactUri, metadata.keelArtifactUri?.startsWith("keel+tezos://") ? "warn" : "bad");
+    add("Selected carrier", metadata.selectedCarrier ?? "missing", metadata.selectedCarrier === "onchfs" ? "ok" : "warn");
+    add("Canonical bytes", `${shellBytes.byteLength} bytes`, Number(metadata.canonicalByteLength) === shellBytes.byteLength ? "ok" : "bad");
+    add("SHA-256", actualDigest, actualDigest === expectedDigest ? "ok" : "bad");
+    if (actualDigest === expectedDigest && Number(metadata.canonicalByteLength) === shellBytes.byteLength) {
+      frame.src = "./canonical-shell.html";
+      frame.hidden = false;
+      add("Viewer", "verified local canonical shell mounted", "ok");
+    } else {
+      add("Viewer", "blocked: canonical shell commitment mismatch", "bad");
+    }
+    json.textContent = JSON.stringify(metadata, null, 2);
+  } catch (error) {
+    add("Status", error?.message ?? String(error), "bad");
+    json.textContent = "The viewer needs the generated tezos-standard-token-metadata.json beside it.";
+  }
+</script>

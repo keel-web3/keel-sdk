@@ -161,6 +161,9 @@ export function createKeelChain({ rpc, keelHold, hosts = KEEL_VIEW_RPC_HOSTS, li
       return endpoints.length;
     },
 
+    /** Shared transport for bounded native chunk reads and chain checks. */
+    request: rpcCall,
+
     /** An arbitrary read, shaped like the contract call it is. */
     call(to, data) {
       return rpcCall("eth_call", [{ to, data }, "latest"]);

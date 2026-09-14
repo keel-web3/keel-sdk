@@ -7,7 +7,6 @@ import { fileURLToPath } from "node:url";
 import { build } from "esbuild";
 
 import {
-  CHAINLINK_FUNCTIONS_SOURCE_TEZOS_V1,
   KEEL_TEZOS_OBJECT_VIEW,
 } from "../packages/protocol/dist/index.js";
 import { siblingRepositories } from "./sibling-repository.mjs";
@@ -19,24 +18,15 @@ const TEZOS_STORE_SOURCE = resolve(
   CONTRACTS_ROOT,
   "src/modules/keel-hold/tezos/keel_hold_onchfs.py",
 );
-const TEZOS_CRE_VERIFIER = resolve(
-  CONTRACTS_ROOT,
-  "cre/attested-anchor-workflow/verifiers/tezos.ts",
-);
 
 test("protocol agrees with the authoritative Tezos byte-returning view", {
   skip: keelContractsSibling.skip,
 }, () => {
   const storeSource = readFileSync(TEZOS_STORE_SOURCE, "utf8");
-  const verifierSource = readFileSync(TEZOS_CRE_VERIFIER, "utf8");
 
   assert.match(storeSource, /def get_object\(self, object_id\):/u);
   assert.match(storeSource, /def haul_object\(self, object_id\):/u);
   assert.equal(KEEL_TEZOS_OBJECT_VIEW, "haul_object");
-  assert.match(verifierSource, /view:\s*"haul_object"/u);
-  assert.doesNotMatch(verifierSource, /read_keel_object/u);
-  assert.match(CHAINLINK_FUNCTIONS_SOURCE_TEZOS_V1, /view: "haul_object"/u);
-  assert.doesNotMatch(CHAINLINK_FUNCTIONS_SOURCE_TEZOS_V1, /read_keel_object/u);
 });
 
 test("browser bundle calls haul_object and decodes its returned bytes", async () => {

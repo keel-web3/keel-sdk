@@ -1,3 +1,23 @@
+import { CURATION_TOOL_DEFINITIONS } from './curation-tools.js';
+import { MATRIX_TOOL_DEFINITIONS } from './matrix-tools.js';
+import { LAYERED_TOOL_DEFINITIONS } from './layered-tools.js';
+import { SVG_TOOL_DEFINITIONS } from './svg-tools.js';
+import { resolveKeelInlineCarriage } from "@keel/sdk/presentation";
+import {
+  prepareKeelTezosShell,
+  buildKeelCollectionPresentation,
+  buildKeelCollectionSetTokenMetadata,
+  buildKeelCollectionSetTokenJson,
+  buildKeelCollectionFreezeTokenMetadata,
+  buildKeelCollectionSetMinter,
+  buildKeelCollectionStrike,
+  buildKeelForgeHarness,
+  buildKeelHoldConfigureVerifier,
+  buildKeelIndexActivateCollection,
+  buildKeelIndexPublishCollection,
+  buildKeelIndexRegisterCollection,
+  type KeelTezosShellPrepareInput,
+} from "@keel/sdk";
 import {
   applyMediaOptimization,
   analyzeCost,
@@ -16,9 +36,22 @@ import {
 import { mkdtemp, rm } from "node:fs/promises";
 import path from "node:path";
 import {
+  buildKeelInlineShellFragments,
+  buildKeelInlineModuleFragment,
+  buildKeelInlineLocalDocument,
+  buildKeelInlinePreEncodedTokenURIGraph,
+  buildKeelInlineFollowLatestTokenURIBodyGraph,
+  buildKeelInlineEscapedTokenURIGraph,
+  buildKeelInlineTokenURIGraph,
+  buildKeelPreparedOneOfOneTokenURI,
+  buildKeelWeb3TokenJSONGraph,
+  buildKeelInlineImageURI,
+  KEEL_INLINE_MAX_TOKEN_URI_BYTES,
   createKeelWalletRequest,
   encodeKeelWalletRequestQr,
   createKeelPublishReviewPlan,
+  planKeelGraphRevision,
+  assertKeelRevisionUploadMatchesPlan,
   createKeelWalletLink,
   createCollectionAuthorizationTypedData,
   fetchStudioCapabilities,
@@ -42,6 +75,7 @@ import {
   type KeelWalletLinkInput,
   type KeelModuleReviewInput,
   type KeelCreatorCollectionWalletReviewInput,
+  type StageKeelStudioProjectInput,
   type FrayAuctionPresetId,
 } from "@keel/sdk";
 import {
@@ -51,6 +85,8 @@ import {
 } from "@keel/ethereum-adapter";
 import type { Compression, Hex } from "@keel/protocol";
 import { TOOL_SCHEMAS } from "./schemas.js";
+import { ENGINE_TOOL_DEFINITIONS } from "./engine-tools.js";
+import { EDITOR_TOOL_DEFINITIONS } from "./editor-tools.js";
 import { createChainOperationPlan } from "./chain-plan.js";
 import { ethereumEncodeTool as runEthereumEncodeTool } from "./ethereum-encode.js";
 import { chainGuide, prepareFrayAuctionIntake, searchKeelIndexes, stageFrayProject, type FrayPreviewCapture } from "./fray-agent.js";
@@ -103,6 +139,23 @@ function errorCode(error: unknown): string | undefined {
   if (error === null || typeof error !== "object") return undefined;
   const value = (error as { readonly code?: unknown }).code;
   return typeof value === "string" ? value : undefined;
+}
+
+function storedUploadBytes(operations: readonly { readonly kind: string; readonly descriptor: Readonly<Record<string, unknown>> }[]): number {
+  let total = 0;
+  for (const operation of operations) {
+    if (operation.kind !== "castSlugs") continue;
+    const lengths = operation.descriptor.chunkByteLengths;
+    if (!Array.isArray(lengths) || lengths.some((item) => typeof item !== "number" || !Number.isSafeInteger(item) || item < 1)) {
+      throw new TypeError("The publish plan does not contain measurable carrier chunk lengths.");
+    }
+    for (const length of lengths as number[]) {
+      total += length;
+      if (!Number.isSafeInteger(total)) throw new RangeError("The publish plan stored-byte total is unsafe.");
+    }
+  }
+  if (total < 1) throw new TypeError("The publish plan contains no stored carrier bytes.");
+  return total;
 }
 
 function selectorValue(value: unknown): KeelModuleSelector {
@@ -355,13 +408,37 @@ async function ethereumEncodeTool(context: ToolContext, value: unknown): Promise
 }
 
 async function publishPlanTool(_context: ToolContext, value: unknown): Promise<unknown> {
-  const input = record(value, ["chainPlan"], "publish review plan arguments");
+  const input = record(value, ["chainPlan", "publicationIntent", "revision"], "publish review plan arguments");
+  const publicationIntent = requiredString(input, "publicationIntent");
+  if (publicationIntent !== "new-object" && publicationIntent !== "existing-graph-revision") {
+    throw new TypeError("publicationIntent must be new-object or existing-graph-revision.");
+  }
+  if (publicationIntent === "new-object" && input.revision !== undefined) {
+    throw new TypeError("A new-object publish plan cannot include an existing graph revision.");
+  }
+  if (publicationIntent === "existing-graph-revision" && input.revision === undefined) {
+    throw new TypeError("An existing graph revision requires the live and candidate graph gate.");
+  }
+  const revisionPlan = publicationIntent === "existing-graph-revision"
+    ? planKeelGraphRevision(input.revision)
+    : undefined;
   const envelope = await createKeelPublishReviewPlan(input.chainPlan);
+  if (revisionPlan !== undefined) {
+    assertKeelRevisionUploadMatchesPlan(revisionPlan, {
+      chainId: envelope.plan.target.chainId,
+      store: envelope.plan.target.address,
+      mediaType: envelope.plan.source.mediaType,
+      integrity: envelope.plan.source.integrity,
+      storedByteLength: storedUploadBytes(envelope.plan.operations),
+    });
+  }
   return {
     status: "review-only",
     chainReady: false,
+    publicationIntent,
     signing: "not-performed",
     submission: "not-performed",
+    ...(revisionPlan === undefined ? {} : { revisionPlan }),
     envelope,
   };
 }
@@ -722,7 +799,7 @@ async function studioProjectIntakeTool(_context: ToolContext, value: unknown): P
     throw new TypeError("outcome must be storage-only or release; fixed-price and claim belong in release.saleMechanism, and Fray auctions use fray-auction-intake.");
   }
   if (input.release !== undefined) {
-    const release = record(input.release, ["type", "saleMechanism", "priceEth", "startsAt", "endsAt"], "release");
+    const release = record(input.release, ["type", "saleMechanism", "priceEth", "supply", "startsAt", "endsAt"], "release");
     const releaseType = optionalString(release, "type");
     if (releaseType !== undefined && !["one-of-one", "open-edition", "limited-edition"].includes(releaseType)) {
       throw new TypeError("release.type must be one-of-one, open-edition, or limited-edition.");
@@ -760,7 +837,7 @@ async function studioDraftTool(_context: ToolContext, value: unknown): Promise<u
 }
 
 async function studioStageProjectTool(context: ToolContext, value: unknown): Promise<unknown> {
-  const input = record(value, ["studioUrl", "title", "description", "storageStrategy", "marketplaceExportMode", "viewer", "files", "releaseIntent"], "Studio stage project arguments");
+  const input = record(value, ["studioUrl", "title", "description", "storageStrategy", "marketplaceExportMode", "viewer", "files", "reusableModule", "releaseIntent"], "Studio stage project arguments");
   const token = process.env.KEEL_STUDIO_AGENT_TOKEN;
   if (typeof token !== "string" || token.length < 48) {
     throw new TypeError("KEEL Studio staging requires KEEL_STUDIO_AGENT_TOKEN. Create a scoped key in Studio account settings; never put it in MCP arguments.");
@@ -802,6 +879,29 @@ async function studioStageProjectTool(context: ToolContext, value: unknown): Pro
       ...(label === undefined ? {} : { label }),
     });
   }
+  let reusableModule: StageKeelStudioProjectInput["reusableModule"];
+  if (input.reusableModule !== undefined) {
+    const module = record(input.reusableModule, ["resourcePaths", "assetType", "license", "accessMode", "tags"], "reusableModule");
+    if (!Array.isArray(module.resourcePaths) || module.resourcePaths.length < 1 || module.resourcePaths.length > 256 || module.resourcePaths.some((item) => typeof item !== "string" || item.length < 1 || item.length > 512)) {
+      throw new TypeError("reusableModule.resourcePaths must contain from 1 through 256 staged paths.");
+    }
+    const stagedPaths = new Set(files.map((file) => file.path));
+    if (module.resourcePaths.some((item) => !stagedPaths.has(item as string))) throw new TypeError("Every reusableModule.resourcePaths entry must name a staged file.");
+    const assetType = requiredString(module, "assetType");
+    if (!["runtime", "library", "tool", "other"].includes(assetType)) throw new TypeError("reusableModule.assetType is unsupported.");
+    const license = requiredBoundedString(module, "license", 120);
+    const accessMode = optionalString(module, "accessMode");
+    if (accessMode !== undefined && !["open", "paid", "license", "subscription", "request", "special"].includes(accessMode)) throw new TypeError("reusableModule.accessMode is unsupported.");
+    const tags = module.tags ?? [];
+    if (!Array.isArray(tags) || tags.length > 24 || tags.some((item) => typeof item !== "string" || item.length < 1 || item.length > 64)) throw new TypeError("reusableModule.tags is invalid.");
+    reusableModule = {
+      resourcePaths: module.resourcePaths as string[],
+      assetType: assetType as "runtime" | "library" | "tool" | "other",
+      license,
+      ...(accessMode === undefined ? {} : { accessMode: accessMode as "open" | "paid" | "license" | "subscription" | "request" | "special" }),
+      tags: tags as string[],
+    };
+  }
   return stageKeelStudioProject({
     studioUrl,
     agentToken: token,
@@ -811,6 +911,7 @@ async function studioStageProjectTool(context: ToolContext, value: unknown): Pro
     ...(marketplaceExportMode === undefined ? {} : { marketplaceExportMode: marketplaceExportMode as "recursive" | "packed" | "hybrid" | "onchfs" }),
     viewer: viewer as "keel-verification-shell" | "none",
     files,
+    ...(reusableModule === undefined ? {} : { reusableModule }),
     ...(input.releaseIntent === undefined ? {} : { releaseIntent: input.releaseIntent as never }),
   });
 }
@@ -935,7 +1036,338 @@ function tool(name: string, description: string, inputSchema: JsonSchema, run: T
   return { descriptor: { name, description, inputSchema }, run };
 }
 
+
+/**
+ * The inline route, made reachable.
+ *
+ * Before this tool existed the MCP exposed no way to build an inline graph, so
+ * every agent driving Keel through it fell back to a manifest locator in
+ * `image` and `animation_url`. The correct builders lived in @keel/sdk and were
+ * documented in resources.ts, but there was no door to them. This is the door.
+ *
+ * Review-only: it plans bytes and returns digests. It never signs or submits.
+ */
+async function inlinePrepareTool(context: ToolContext, value: unknown): Promise<unknown> {
+  const input = record(
+    value,
+    ["repositoryRoot", "entry", "entryMediaType", "modules", "assets", "carriage", "collection",
+     "collectionName", "description", "imagePath", "manifestURI", "manifestDigest", "chainId",
+     "metadataTransport", "metadataPath", "tokenId", "tokenIdFieldsJson", "web3ImageResolver"],
+    "Inline prepare arguments",
+  );
+  const repositoryRoot = optionalString(input, "repositoryRoot");
+  const entryMediaType = (optionalString(input, "entryMediaType") ?? "text/javascript") as "text/javascript" | "text/html";
+  const entryBytes = (await context.workspace.readFile(requiredString(input, "entry"), MAX_MEDIA_BYTES)).bytes;
+  const entryText = new TextDecoder("utf-8", { fatal: true }).decode(entryBytes);
+  if (/(?:;base64,|"storedBase64"\s*:)[A-Za-z0-9+/=]{4096,}/u.test(entryText)) {
+    throw new TypeError(
+      "Large encoded artwork was embedded inside the Inline entry. Declare creator binary files in assets so KEEL packs them once and reports their exact overhead.",
+    );
+  }
+
+  const shell = await buildKeelInlineShellFragments(repositoryRoot === undefined ? {} : { repositoryRoot });
+
+  const declared = input.modules === undefined ? [] : input.modules;
+  if (!Array.isArray(declared)) throw new TypeError("modules must be a list.");
+  const modules = [];
+  for (const entry of declared) {
+    const module = record(entry, ["moduleId", "version", "path", "mediaType", "execution", "phase", "weight"], "Inline module");
+    const mediaType = requiredString(module, "mediaType");
+    if (!/^(?:text|application)\/(?:javascript|ecmascript)$/u.test(mediaType) && mediaType !== "application/wasm") {
+      throw new TypeError(
+        `Inline module ${requiredString(module, "moduleId")} is creator media, not reusable executable code. `
+        + "Declare it in assets so its bytes remain creator-owned and receive the automatic single-pack saver path.",
+      );
+    }
+    const execution = (optionalString(module, "execution") ?? "classic") as "classic" | "module";
+    // The canonical shell runs role:"module" JavaScript with
+    // document.head.append(script). An ES module there dies on `export`, which
+    // is a confusing runtime failure, so refuse it at plan time instead.
+    if (mediaType === "text/javascript" && execution !== "classic") {
+      throw new TypeError(
+        `Inline module ${requiredString(module, "moduleId")} is text/javascript with execution "${execution}". `
+        + "The canonical shell appends module JavaScript as a classic script, so it must be a classic script "
+        + "that publishes a global, not an ES module.",
+      );
+    }
+    modules.push(await buildKeelInlineModuleFragment({
+      moduleId: requiredString(module, "moduleId"),
+      version: requiredString(module, "version"),
+      mediaType,
+      aliases: [requiredString(module, "moduleId")],
+      decodedBytes: (await context.workspace.readFile(requiredString(module, "path"), MAX_MEDIA_BYTES)).bytes,
+      execution,
+      phase: (optionalString(module, "phase") ?? "runtime") as "data" | "runtime",
+      weight: typeof module.weight === "number" ? module.weight : 0,
+    }));
+  }
+
+  const declaredAssets = input.assets === undefined ? [] : input.assets;
+  if (!Array.isArray(declaredAssets)) throw new TypeError("assets must be a list.");
+  const assets = [];
+  let creatorSourceBytes = entryBytes.byteLength;
+  for (const entry of declaredAssets) {
+    const asset = record(entry, ["assetId", "path", "mediaType", "compression"], "Inline asset");
+    const source = (await context.workspace.readFile(requiredString(asset, "path"), MAX_MEDIA_BYTES)).bytes;
+    const compression = (optionalString(asset, "compression") ?? "gzip") as "none" | "gzip" | "deflate";
+    if (compression !== "none" && compression !== "gzip" && compression !== "deflate") {
+      throw new TypeError("Inline asset compression must be none, gzip, or deflate.");
+    }
+    creatorSourceBytes += source.byteLength;
+    assets.push({
+      id: requiredString(asset, "assetId"),
+      mediaType: requiredString(asset, "mediaType"),
+      source,
+      compression,
+    });
+  }
+
+  const document = await buildKeelInlineLocalDocument({
+    shell,
+    modules,
+    assets,
+    entry: { id: "entry", mediaType: entryMediaType, source: entryBytes },
+  });
+
+  const carriage = optionalString(input, "carriage") ?? "compact";
+  const resolvedCarriage = resolveKeelInlineCarriage(carriage);
+  const graph = await buildKeelInlineTokenURIGraph(document, { carriage: resolvedCarriage });
+
+  const shared = document.parts.filter((part) => part.kind === "existing");
+  const creator = document.parts.filter((part) => part.kind === "creator");
+  const creatorAssetParts = creator.filter((part) => part.role === "asset");
+  if (creatorAssetParts.length !== assets.length) {
+    throw new Error("Inline creator asset accounting did not match the verified document graph.");
+  }
+  const assetMeasurements = assets.map((asset, index) => {
+    const part = creatorAssetParts[index]!;
+    const item = JSON.parse(new TextDecoder("utf-8", { fatal: true }).decode(part.bytes).slice(1)) as {
+      readonly embedded?: { readonly storedBase64?: unknown };
+    };
+    if (typeof item.embedded?.storedBase64 !== "string") {
+      throw new Error(`Inline asset ${asset.id} has no canonical packed resource slot.`);
+    }
+    const storedBinaryBytes = Buffer.from(item.embedded.storedBase64, "base64").byteLength;
+    const sourceBytes = asset.source.byteLength;
+    const packedFragmentBytes = part.byteLength;
+    return Object.freeze({
+      assetId: asset.id,
+      mediaType: asset.mediaType,
+      sourceBytes,
+      storedBinaryBytes,
+      packedFragmentBytes,
+      sourceToPackedOverheadBytes: packedFragmentBytes - sourceBytes,
+      sourceToPackedOverheadPercent: ((packedFragmentBytes - sourceBytes) / sourceBytes) * 100,
+      compression: asset.compression,
+      binaryPackingLayers: 1,
+    });
+  });
+  const assetSourceBytes = assetMeasurements.reduce((total, asset) => total + asset.sourceBytes, 0);
+  const assetPackedBytes = assetMeasurements.reduce((total, asset) => total + asset.packedFragmentBytes, 0);
+
+  let prepared;
+  let web3Metadata;
+  const metadataTransport = optionalString(input, "metadataTransport");
+  if (metadataTransport !== undefined && metadataTransport !== "web3-json") throw new TypeError("Unknown metadata transport.");
+  if (metadataTransport === undefined && (input.metadataPath !== undefined || input.tokenId !== undefined || input.web3ImageResolver !== undefined)) {
+    throw new TypeError("metadataPath, tokenId and web3ImageResolver require metadataTransport: web3-json.");
+  }
+  const collection = optionalString(input, "collection");
+  if (metadataTransport === "web3-json" && resolvedCarriage !== "raw-percent") {
+    throw new TypeError("web3-json uses the compact raw-percent viewer carriage.");
+  }
+  if (collection !== undefined || metadataTransport === "web3-json") {
+    const imagePath = optionalString(input, "imagePath");
+    if (imagePath === undefined) {
+      throw new TypeError(
+        "A prepared one-of-one tokenURI needs imagePath. Keel inlines the poster as a data: URI; "
+        + "leaving it out makes KEEL721 fall back to the manifest locator, which marketplaces cannot fetch.",
+      );
+    }
+    const poster = (await context.workspace.readFile(imagePath, MAX_MEDIA_BYTES)).bytes;
+    const posterType = imagePath.endsWith(".webp") ? "image/webp"
+      : imagePath.endsWith(".png") ? "image/png"
+      : imagePath.endsWith(".avif") ? "image/avif"
+      : /\.jpe?g$/iu.test(imagePath) ? "image/jpeg"
+      : imagePath.endsWith(".gif") ? "image/gif"
+      : imagePath.endsWith(".svg") ? "image/svg+xml" : "image/webp";
+    if (metadataTransport === "web3-json") {
+      const original = (await context.workspace.readFile(requiredString(input, "metadataPath"), MAX_MEDIA_BYTES)).bytes;
+      web3Metadata = await buildKeelWeb3TokenJSONGraph({
+        document, metadata: JSON.parse(new TextDecoder("utf-8", { fatal: true }).decode(original)),
+        imageURI: buildKeelInlineImageURI(poster, posterType), tokenId: requiredString(input, "tokenId"),
+        ...(input.tokenIdFieldsJson === undefined ? {} : { tokenIdFields: JSON.parse(requiredString(input, "tokenIdFieldsJson")) }),
+        ...(input.web3ImageResolver === undefined ? {} : { web3Image: { resolver: requiredString(input, "web3ImageResolver") as `0x${string}`, chainId: input.chainId as number } }),
+      });
+    } else prepared = await buildKeelPreparedOneOfOneTokenURI({
+      graph,
+      chainId: typeof input.chainId === "number" ? input.chainId : 11_155_111,
+      collection: collection as `0x${string}`,
+      collectionName: optionalString(input, "collectionName") ?? "",
+      description: optionalString(input, "description") ?? "",
+      imageURI: buildKeelInlineImageURI(poster, posterType),
+      manifestURI: optionalString(input, "manifestURI") ?? "",
+      manifestDigest: (optionalString(input, "manifestDigest") ?? `0x${"0".repeat(64)}`) as `0x${string}`,
+      tokenId: 1,
+    });
+    const preparedTokenURIBytes = prepared === undefined ? web3Metadata!.byteLength : Buffer.byteLength(prepared.tokenURI, "utf8");
+    if (preparedTokenURIBytes > KEEL_INLINE_MAX_TOKEN_URI_BYTES) {
+      throw new RangeError(
+        `The complete prepared tokenURI is ${preparedTokenURIBytes.toLocaleString()} bytes, above KEEL's ${KEEL_INLINE_MAX_TOKEN_URI_BYTES.toLocaleString()}-byte public-read limit.`,
+      );
+    }
+  }
+
+  return Object.freeze({
+    schema: "keel.inline-prepare@1" as const,
+    status: "review-only" as const,
+    carriage,
+    resolvedCarriage,
+    shell: { prefixBytes: shell.prefix.bytes.byteLength, suffixBytes: shell.suffix.bytes.byteLength },
+    modules: modules.map((module) => Object.freeze({
+      moduleId: module.moduleId, version: module.version, execution: module.execution,
+      fragmentBytes: module.bytes.byteLength, integrity: module.integrity,
+    })),
+    assets: assetMeasurements,
+    storage: {
+      sharedBytes: shared.reduce((total, part) => total + part.byteLength, 0),
+      creatorBytes: creator.reduce((total, part) => total + part.byteLength, 0),
+      creatorSourceBytes,
+      graphStoredBytes: graph.fragmentBytes.byteLength,
+      sourceToGraphOverheadBytes: graph.fragmentBytes.byteLength - creatorSourceBytes,
+      sourceToGraphOverheadPercent: creatorSourceBytes === 0
+        ? 0
+        : ((graph.fragmentBytes.byteLength - creatorSourceBytes) / creatorSourceBytes) * 100,
+      assetSourceBytes,
+      assetPackedBytes,
+      assetPackingOverheadBytes: assetPackedBytes - assetSourceBytes,
+      assetPackingOverheadPercent: assetSourceBytes === 0
+        ? 0
+        : ((assetPackedBytes - assetSourceBytes) / assetSourceBytes) * 100,
+      artworkBinaryPackingLayers: assets.length === 0 ? 0 : 1,
+      completeDocumentBase64Layers: resolvedCarriage === "raw-percent" ? 0 : resolvedCarriage === "percent" ? 1 : 2,
+      note: "Compact is automatic: creator assets are packed once at their binary slot; the complete HTML and metadata are not Base64-wrapped again.",
+    },
+    tokenURIBytes: graph.fragmentBytes.byteLength,
+    fragmentIntegrity: graph.fragmentIntegrity,
+    mediaType: graph.mediaType,
+    ...(web3Metadata === undefined ? {} : {
+      web3Metadata: {
+        schema: web3Metadata.schema, tokenId: web3Metadata.tokenId,
+        mediaType: web3Metadata.mediaType, byteLength: web3Metadata.byteLength,
+        integrity: web3Metadata.integrity,
+        imageTransport: web3Metadata.imageTransport,
+        ...(web3Metadata.imageResponse === undefined ? {} : { imageResponse: {
+          uri: web3Metadata.imageResponse.uri, mediaType: web3Metadata.imageResponse.mediaType,
+          byteLength: web3Metadata.imageResponse.byteLength, integrity: web3Metadata.imageResponse.integrity,
+          parts: web3Metadata.imageResponse.parts.map(part => ({ role: part.role, sourceKind: part.sourceKind, integrity: part.integrity })),
+          read: "KeelTokenMatrix.tokenJSON(uint256)", published: false, selectedChainBindingVerified: false, readLimitsVerified: false,
+        } }),
+        originalMetadataIntegrity: web3Metadata.originalMetadataIntegrity,
+        completeDocumentBase64Layers: 0,
+        parts: web3Metadata.parts.map(part => ({ role: part.role, sourceKind: part.sourceKind, integrity: part.integrity })),
+        read: "KeelTokenMatrix.tokenJSON(uint256)",
+        binding: "Compile shared parts with keel-token-matrix-prepare. Each explicit token ID selects a template and compact trait/resource choices; no complete JSON is stored per token.",
+        selectedChainBindingVerified: false,
+      },
+    }),
+    ...(prepared === undefined ? {} : {
+      prepared: Object.freeze({
+        requiredBuilder: prepared.requiredBuilder,
+        animationEncoding: prepared.animationEncoding,
+        encodedPrefixBytes: prepared.encodedPrefix.byteLength,
+        encodedSuffixBytes: prepared.encodedSuffix.byteLength,
+        tokenURIBytes: Buffer.byteLength(prepared.tokenURI, "utf8"),
+        bind: prepared.requiredBuilder === "KeelHarnessBuilder"
+          ? "KEEL721.setPreEncodedOnchainHarness(builder, compositeObjectId, digest)"
+          : "KEEL721.setPreparedOnchainHarness(builder, compositeObjectId, digest, encodedPrefix, encodedSuffix)",
+      }),
+    }),
+    caveat: "Bytes are planned, not published. Cast the fragments into KeelHold, weld the composite, then bind.",
+  });
+}
+
+const tezosShellPrepareSchema: JsonSchema = {
+  type: "object", additionalProperties: false,
+  required: ["network", "builder", "creator", "action"],
+  properties: {
+    network: { type: "string", description: "Explicit Tezos chain ID (Net...), checked with its Base58 checksum." },
+    builder: { type: "string", description: "Originated KT1 KeelHarnessBuilder address." },
+    creator: { type: "string", description: "Expected Tezos sender; used in the native creator-shell identity." },
+    action: { type: "string", enum: ["register", "update", "freeze"] },
+    salt: { type: "string", description: "bytes32 salt; registration only." },
+    shellId: { type: "string", description: "bytes32 shell ID; update or freeze only." },
+    prefixObjectId: { type: "string" }, suffixObjectId: { type: "string" }, metadataObjectId: { type: "string" },
+    payloadMode: { type: "string", enum: ["sandboxed-html", "gzip-base64", "pre-encoded-graph"] },
+  },
+};
+
+const tezosPublicationPrepareSchema: JsonSchema = {
+  type: "object", additionalProperties: false,
+  required: ["network", "creator", "action"],
+  properties: {
+    network: { type: "string", description: "Exact selected Tezos Net... chain identity." },
+    creator: { type: "string", description: "Expected wallet sender; no key material is accepted." },
+    action: { type: "string", enum: ["configure-verifier", "forge-harness", "register-collection", "publish-collection", "activate-collection", "set-minter", "set-presentation", "set-token-metadata", "set-token-json", "freeze-token-metadata", "strike"] },
+    hold: { type: "string" }, index: { type: "string" }, collection: { type: "string" },
+    prefixObjectId: { type: "string" }, suffixObjectId: { type: "string" },
+    salt: { type: "string" }, slotObjectIds: { type: "array", items: { type: "string" }, maxItems: 128 }, manifestSha256: { type: "string" },
+    manifestUri: { type: "string", maxLength: 2048 }, manifestDigest: { type: "string" }, previewUri: { type: "string", maxLength: 2048 },
+    revision: { type: "integer", minimum: 1 }, tokenId: { type: "integer", minimum: 1 }, tokenInfo: { type: "object", description: "FA2/TZIP-12 token_info map. Values are ordinary URI or metadata strings; onchfs:// is supported." }, tokenJson: { type: "string", maxLength: 262144, description: "Raw JSON compatibility document returned by the KeelSleeve route." }, account: { type: "string" }, enabled: { type: "boolean" }, recipient: { type: "string" }, quantity: { type: "integer", minimum: 1 },
+  },
+};
+
+async function tezosPublicationPrepareTool(_context: ToolContext, value: unknown) {
+  const input = value as Record<string, any>;
+  for (const key of Object.keys(input)) if (/(?:private|secret|mnemonic|seed|passphrase)/iu.test(key)) throw new TypeError("Private signer material is never accepted by the Tezos publication adapter.");
+  if (!/^Net[1-9A-HJ-NP-Za-km-z]{12}$/u.test(input.network)) throw new TypeError("network must be an exact Tezos Net... identity.");
+  const common = { source: input.creator };
+  let operation;
+  switch (input.action) {
+    case "configure-verifier": operation = buildKeelHoldConfigureVerifier({ ...common, hold: input.hold, prefixObjectId: input.prefixObjectId, suffixObjectId: input.suffixObjectId }); break;
+    case "forge-harness": operation = buildKeelForgeHarness({ ...common, hold: input.hold, salt: input.salt, slotObjectIds: input.slotObjectIds, manifestSha256: input.manifestSha256 }); break;
+    case "register-collection": operation = buildKeelIndexRegisterCollection({ ...common, index: input.index, collection: input.collection, controller: input.account }); break;
+    case "publish-collection": operation = buildKeelIndexPublishCollection({ ...common, index: input.index, collection: input.collection, manifestUri: input.manifestUri, manifestDigest: input.manifestDigest, ...(input.revision === undefined ? {} : { parentRevision: Math.max(0, input.revision - 1) }) }); break;
+    case "activate-collection": operation = buildKeelIndexActivateCollection({ ...common, index: input.index, collection: input.collection, revision: input.revision }); break;
+    case "set-minter": operation = buildKeelCollectionSetMinter({ ...common, collection: input.collection, account: input.account, enabled: input.enabled }); break;
+    case "set-presentation": operation = buildKeelCollectionPresentation({ ...common, collection: input.collection, manifestUri: input.manifestUri, manifestDigest: input.manifestDigest, previewUri: input.previewUri }); break;
+    case "set-token-metadata": {
+      if (input.tokenInfo === null || typeof input.tokenInfo !== "object" || Array.isArray(input.tokenInfo)) throw new TypeError("tokenInfo must be an object.");
+      for (const [key, value] of Object.entries(input.tokenInfo)) if (typeof value !== "string") throw new TypeError(`tokenInfo.${key} must be a string.`);
+      operation = buildKeelCollectionSetTokenMetadata({ ...common, collection: input.collection, tokenId: input.tokenId, tokenInfo: input.tokenInfo });
+      break;
+    }
+    case "set-token-json": {
+      if (typeof input.tokenJson !== "string") throw new TypeError("tokenJson must be a string.");
+      operation = buildKeelCollectionSetTokenJson({ ...common, collection: input.collection, tokenId: input.tokenId, value: input.tokenJson });
+      break;
+    }
+    case "freeze-token-metadata": operation = buildKeelCollectionFreezeTokenMetadata({ ...common, collection: input.collection, tokenId: input.tokenId }); break;
+    case "strike": operation = buildKeelCollectionStrike({ ...common, collection: input.collection, recipient: input.recipient, quantity: input.quantity }); break;
+    default: throw new TypeError("Unsupported Tezos publication action.");
+  }
+  return {
+    schema: "keel.tezos.publication-call-prepare@1",
+    status: "review-only",
+    family: "tezos",
+    network: input.network,
+    expectedSender: input.creator,
+    operation,
+    signing: "not-performed",
+    submission: "not-performed",
+    caveat: "This is one receipt-bound call from the staged KEEL Tezos one-of-one adapter. It does not originate, sign, submit, or invent a contract address.",
+  };
+}
+
 export const TOOL_DEFINITIONS: readonly ToolDefinition[] = [
+  tool("keel-tezos-shell-prepare", "Prepare native Tezos shell registration, update, or permanent freeze parameters with explicit network and sender. Read-only preparation: no RPC, signing, submission, or default-shell replacement. Receipt-backed selected-chain object and registry checks are still required.", tezosShellPrepareSchema, async (_context, value) => prepareKeelTezosShell(value as KeelTezosShellPrepareInput)),
+  tool("keel-tezos-publication-prepare", "Prepare one exact receipt-bound Tezos KEEL one-of-one publication call using the standard Hold, Index, and FA2 modules. The public route is ordinary FA2/TZIP-12 token_metadata with onchfs:// or another selected carrier; the KEEL JSON/harness route is compatibility-only. Review-only: no private key, origination, signing, submission, or fake address is accepted.", tezosPublicationPrepareSchema, tezosPublicationPrepareTool),
+  ...ENGINE_TOOL_DEFINITIONS,
+  ...EDITOR_TOOL_DEFINITIONS,
+  ...LAYERED_TOOL_DEFINITIONS,
+  ...SVG_TOOL_DEFINITIONS,
+  ...CURATION_TOOL_DEFINITIONS,
+  ...MATRIX_TOOL_DEFINITIONS,
   tool("analyze", "Analyze a workspace media file and report integrity and wrapper support.", TOOL_SCHEMAS.analyze, analyzeTool),
   tool("media-optimize", "Dry-run a reversible media optimization. It reports only repository-supported adapters and never writes, changes storage mode, uploads, or touches a chain.", TOOL_SCHEMAS.mediaOptimize, mediaOptimizeTool),
   tool("media-optimize-apply", "Write one new optimized file only when its recomputed digest and byte length exactly match a reviewed media-optimize result. The source and selected storage mode are preserved; no upload, wallet, or chain action occurs.", TOOL_SCHEMAS.mediaOptimizeApply, mediaOptimizeApplyTool),
@@ -945,7 +1377,7 @@ export const TOOL_DEFINITIONS: readonly ToolDefinition[] = [
   tool("upload-plan", "Plan flat or recursive chunk uploads from bounded local bytes without writing to the workspace or touching a chain.", TOOL_SCHEMAS.uploadPlan, uploadPlanTool),
   tool("chain-plan", "Verify a materialized upload plan and emit deterministic review-only contract operation descriptors; no ABI encoding, signing, or submission occurs.", TOOL_SCHEMAS.chainPlan, chainPlanTool),
   tool("ethereum-encode", "Encode verified local Ethereum KeelHold operations with viem for review only; no RPC, signing, submission, or QR payload is produced.", TOOL_SCHEMAS.ethereumEncode, ethereumEncodeTool),
-  tool("publish-plan", "Bind a verified review-only chain descriptor to a canonical SDK envelope; no ABI encoding, signing, or submission occurs.", TOOL_SCHEMAS.publishPlan, publishPlanTool),
+  tool("publish-plan", "Bind a verified review-only chain descriptor to a canonical SDK envelope. Existing graph revisions must pass the one-resource delta gate and the upload digest must match that resource; unrelated asset republishing stops before wallet review. No ABI encoding, signing, or submission occurs.", TOOL_SCHEMAS.publishPlan, publishPlanTool),
   tool("module-resolve", "Resolve one exact module selector from a local snapshot without fetching carriers.", TOOL_SCHEMAS.moduleResolve, moduleResolveTool),
   tool("module-lock", "Write a canonical local module lock and unavailable-by-default receipt.", TOOL_SCHEMAS.moduleLock, moduleLockTool),
   tool("wallet-request-prepare", "Prepare a canonical user-reviewable wallet request or QR payload without signing or submitting.", TOOL_SCHEMAS.walletRequestPrepare, walletRequestPrepareTool),
@@ -960,9 +1392,10 @@ export const TOOL_DEFINITIONS: readonly ToolDefinition[] = [
   tool("keel-studio-capabilities", "Inspect a Studio's supported chains, zero-spend sandbox, staging, authorization, and MSP readiness before any upload or wallet action.", TOOL_SCHEMAS.studioCapabilities, studioCapabilitiesTool),
   tool("keel-studio-project-intake", "Ask only for missing project decisions, then return either storage-only preparation or an editable release/listing intent. No upload, signature, wallet request, or transaction occurs.", TOOL_SCHEMAS.studioProjectIntake, studioProjectIntakeTool),
   tool("keel-studio-draft", "List, read, create, or revision-safely edit a creator's private Studio release draft through a scoped key. It cannot prepare, sign, submit, cancel, or publish a chain action.", TOOL_SCHEMAS.studioDraft, studioDraftTool),
-  tool("keel-studio-stage-project", "Stage bounded creator resources/modules and return the server-issued Studio handoff. Omitted viewer selects Studio's canonical KEEL Inline graph for later preparation; `none` is the explicit raw-artifact route with no viewer and does not prevent a later release or mint. A direct image, video, or self-contained GLB resolves to registered shell plus registered keel.asset-display@1 plus the creator media entry, never zero modules or a generated index.html. Resolve the active builder from the selected-chain Studio Inline catalog and verify its registered pre-encoded shell record; legacy protector getters and NoProtector do not determine default Inline readiness. Creator HTML is content, never a replacement shell, and agents must not upload a locally manufactured KEEL shell, protected-harness wrapper, or local wrapper when the catalog is incomplete. Studio must fail closed for an incomplete selected-chain catalog during preparation. The scoped agent key remains in the MCP environment; no wallet signature or chain action occurs.", TOOL_SCHEMAS.studioStageProject, studioStageProjectTool),
+  tool("keel-studio-stage-project", "Stage bounded creator resources/modules and return the server-issued Studio handoff. Omitted viewer selects Studio's canonical KEEL Inline graph for later preparation; `none` is the explicit raw-artifact route with no viewer and does not prevent a later release or mint. Automatic compact preparation requires the exact selected-chain KeelRawTokenURIBuilder and canonical raw-percent shell fragments with receipts/read-back; Studio must never fall back to legacy Base64 carriage silently. A direct image, video, or self-contained GLB resolves to registered shell plus registered keel.asset-display@1 plus the creator media entry, never zero modules or a generated index.html. Legacy protector getters and NoProtector do not determine default Inline readiness. Creator HTML is content, never a replacement shell, and agents must not upload a locally manufactured KEEL shell, protected-harness wrapper, or local wrapper when the catalog is incomplete. Studio must fail closed for an incomplete selected-chain catalog during preparation. The scoped agent key remains in the MCP environment; no wallet signature or chain action occurs.", TOOL_SCHEMAS.studioStageProject, studioStageProjectTool),
   tool("keel-creator-collection-prepare", "Prepare one exact EIP-5792 KeelCreatorFactory batch plus its durable recovery envelope. This never signs or submits. Missing or ambiguous factory/renderer deployments stop before any wallet approval.", TOOL_SCHEMAS.creatorCollectionPrepare, creatorCollectionPrepareTool),
   tool("keel-shell-search", "Search the read-back-verified shell catalogue by creator, name, version, or tags. Returns top/bottom object pointers and metadata only; it never fetches carrier bytes, signs, or submits.", TOOL_SCHEMAS.shellSearch, shellSearchTool),
+  tool("keel-inline-prepare", "Plan an INLINE Keel graph with the canonical shell, reusable executable modules, creator-owned assets, and one creator entry. Omitted carriage automatically selects the compact raw-percent saver: binary artwork is packed once at its resource slot and the complete HTML/metadata are not Base64-wrapped again. The result reports source, stored graph, and complete tokenURI bytes and rejects a result above the public-read ceiling. Legacy Base64 carriage requires explicit selection. Review-only: it never signs or submits.", TOOL_SCHEMAS.inlinePrepare, inlinePrepareTool),
   tool("keel-shell-prepare", "Create canonical creator/tag shell metadata or prepare creator registration, update, or irreversible freeze calls. One stable shell ID can publish revisions until its creator freezes it. The recommended viewer follows the current revision; pinning one revision is explicit. A shell is one reusable top and bottom around the work graph; this tool never signs, submits, or invents a replacement default shell.", TOOL_SCHEMAS.shellPrepare, shellPrepareTool),
 ];
 

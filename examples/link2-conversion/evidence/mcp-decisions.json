@@ -1,0 +1,140 @@
+{
+  "request": {
+    "method": "tools/call",
+    "params": {
+      "name": "keel-project-decisions",
+      "arguments": {
+        "outcome": "storage-only",
+        "runtime": "html",
+        "family": "ethereum",
+        "title": "Link 2 — KEEL conversion",
+        "chainId": 1
+      }
+    }
+  },
+  "response": {
+    "jsonrpc": "2.0",
+    "id": 4,
+    "result": {
+      "content": [
+        {
+          "type": "text",
+          "text": "{\"schema\":\"keel-engine-plan@1\",\"status\":\"needs-input\",\"intent\":{\"outcome\":\"storage-only\",\"runtime\":\"html\",\"family\":\"ethereum\",\"title\":\"Link 2 — KEEL conversion\",\"chainId\":1},\"defaults\":{\"workspace\":\"local-first\",\"viewer\":\"registered-canonical-shell\",\"inlineCarriage\":\"raw-percent\",\"moduleSelection\":\"exact-same-chain\",\"signing\":\"external-wallet-only\"},\"suggestions\":[],\"questions\":[{\"field\":\"storage\",\"question\":\"Where should the work be stored? Compare measured costs before choosing.\",\"choices\":[\"inline\",\"native\",\"hybrid\",\"ipfs\",\"wake\"]}],\"nextQuestions\":[{\"field\":\"storage\",\"question\":\"Where should the work be stored? Compare measured costs before choosing.\",\"choices\":[\"inline\",\"native\",\"hybrid\",\"ipfs\",\"wake\"]}],\"blockers\":[],\"modules\":{\"required\":[],\"publicationStatus\":\"unverified\",\"setup\":[{\"id\":\"discover\",\"tool\":\"keel-library-search\",\"instruction\":\"Search configured Studio by name, artist, tag or exact digest. Display all candidates with chain, version, license and proof status.\"},{\"id\":\"resolve\",\"tool\":\"module-resolve\",\"instruction\":\"Resolve a bounded local catalog snapshot. Ask for a choice when ambiguous; do not select the first result.\"},{\"id\":\"build\",\"command\":\"keel module build --all --root ./keel-modules\",\"instruction\":\"If unavailable, prepare creator-owned source and module declaration locally; do not substitute runtime bytes in an artwork.\"},{\"id\":\"test\",\"command\":\"keel module test --all --root ./keel-modules\",\"instruction\":\"Test local bytes and runtime dependencies before publication planning.\"},{\"id\":\"index\",\"command\":\"keel module index --root ./keel-modules --repository <source-repository-url>\",\"instruction\":\"Index reproducible source locally; this does not deploy a module.\"},{\"id\":\"publish\",\"sdk\":\"buildKeelLibraryPublicationPlan\",\"instruction\":\"Prepare selected-chain object and registry calls, reuse existing records, review license/access, simulate and hand off to the wallet.\"},{\"id\":\"bind\",\"tool\":\"module-lock\",\"instruction\":\"Only label published after receipts and exact selected-chain object/registry read-back. Lock identity, digest, bytes, dependencies and policy.\"}]},\"nextTools\":[\"keel-studio-capabilities\",\"analyze\",\"cost\",\"keel-library-search\",\"upload-plan\",\"keel-studio-stage-project\"],\"remainingReview\":[\"Measured bytes, cost, selected-chain bindings and storage availability\"],\"evidence\":[\"local-build\",\"unit-contract\",\"source-reproduction\",\"browser-runtime\",\"selected-chain-receipt\",\"object-registry-readback\",\"public-viewer\"],\"authority\":{\"approvalRequiredNow\":false,\"signing\":\"not-performed\",\"submission\":\"not-performed\",\"publicationReady\":false}}"
+        }
+      ],
+      "structuredContent": {
+        "schema": "keel-engine-plan@1",
+        "status": "needs-input",
+        "intent": {
+          "outcome": "storage-only",
+          "runtime": "html",
+          "family": "ethereum",
+          "title": "Link 2 — KEEL conversion",
+          "chainId": 1
+        },
+        "defaults": {
+          "workspace": "local-first",
+          "viewer": "registered-canonical-shell",
+          "inlineCarriage": "raw-percent",
+          "moduleSelection": "exact-same-chain",
+          "signing": "external-wallet-only"
+        },
+        "suggestions": [],
+        "questions": [
+          {
+            "field": "storage",
+            "question": "Where should the work be stored? Compare measured costs before choosing.",
+            "choices": [
+              "inline",
+              "native",
+              "hybrid",
+              "ipfs",
+              "wake"
+            ]
+          }
+        ],
+        "nextQuestions": [
+          {
+            "field": "storage",
+            "question": "Where should the work be stored? Compare measured costs before choosing.",
+            "choices": [
+              "inline",
+              "native",
+              "hybrid",
+              "ipfs",
+              "wake"
+            ]
+          }
+        ],
+        "blockers": [],
+        "modules": {
+          "required": [],
+          "publicationStatus": "unverified",
+          "setup": [
+            {
+              "id": "discover",
+              "tool": "keel-library-search",
+              "instruction": "Search configured Studio by name, artist, tag or exact digest. Display all candidates with chain, version, license and proof status."
+            },
+            {
+              "id": "resolve",
+              "tool": "module-resolve",
+              "instruction": "Resolve a bounded local catalog snapshot. Ask for a choice when ambiguous; do not select the first result."
+            },
+            {
+              "id": "build",
+              "command": "keel module build --all --root ./keel-modules",
+              "instruction": "If unavailable, prepare creator-owned source and module declaration locally; do not substitute runtime bytes in an artwork."
+            },
+            {
+              "id": "test",
+              "command": "keel module test --all --root ./keel-modules",
+              "instruction": "Test local bytes and runtime dependencies before publication planning."
+            },
+            {
+              "id": "index",
+              "command": "keel module index --root ./keel-modules --repository <source-repository-url>",
+              "instruction": "Index reproducible source locally; this does not deploy a module."
+            },
+            {
+              "id": "publish",
+              "sdk": "buildKeelLibraryPublicationPlan",
+              "instruction": "Prepare selected-chain object and registry calls, reuse existing records, review license/access, simulate and hand off to the wallet."
+            },
+            {
+              "id": "bind",
+              "tool": "module-lock",
+              "instruction": "Only label published after receipts and exact selected-chain object/registry read-back. Lock identity, digest, bytes, dependencies and policy."
+            }
+          ]
+        },
+        "nextTools": [
+          "keel-studio-capabilities",
+          "analyze",
+          "cost",
+          "keel-library-search",
+          "upload-plan",
+          "keel-studio-stage-project"
+        ],
+        "remainingReview": [
+          "Measured bytes, cost, selected-chain bindings and storage availability"
+        ],
+        "evidence": [
+          "local-build",
+          "unit-contract",
+          "source-reproduction",
+          "browser-runtime",
+          "selected-chain-receipt",
+          "object-registry-readback",
+          "public-viewer"
+        ],
+        "authority": {
+          "approvalRequiredNow": false,
+          "signing": "not-performed",
+          "submission": "not-performed",
+          "publicationReady": false
+        }
+      }
+    }
+  }
+}

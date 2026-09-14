@@ -1,5 +1,6 @@
 import {
   canonicalJson,
+  describeKeelReleasePolicy,
   resolveHarnessTree,
   type HarnessNode,
   type HarnessWalkLimits,
@@ -94,6 +95,7 @@ export type KeelInjectionField =
   | "character.emitterSeedDomainVersion"
   | "character.emitterPaletteMode"
   | "character.sceneId"
+  | "collection.release"
   | "collection.verification"
   | "map.characterSeed"
   | "map.seed"
@@ -200,6 +202,7 @@ export interface KeelRuntimeExtension {
   readonly linkRegistry?: Hex;
   readonly seedRegistry?: Hex;
   readonly attestedAnchorRegistry?: Hex;
+  readonly mintRouter?: Hex;
   readonly viewerId: Hex;
   readonly tokenId: string;
   readonly slotResources: readonly string[];
@@ -214,6 +217,7 @@ export interface KeelRuntimeExtension {
 }
 
 export type KeelContractFunction =
+  | "releaseSnapshot"
   | "keelIndex"
   | "approvedEvidenceRoot"
   | "characterCollection"
@@ -252,7 +256,7 @@ export type KeelContractFunction =
   | "receiptCurrent"
   | "sourceAnchor"
   | "anchor"
-  | "seedSetForViewerRevision"
+  | "seedSetForHarnessRevision"
   | "harnessCollection"
   | "harnessRegistry"
   | "stakeObject"
@@ -794,6 +798,7 @@ function injectionExtension(value: unknown, label: string): KeelInjectionExtensi
     "character.emitterPaletteMode",
     "character.sceneId",
     "collection.verification",
+    "collection.release",
     "map.characterSeed",
     "map.seed",
     "map.buildRevision",
@@ -976,6 +981,7 @@ export function parseKeelRuntimeExtension(manifest: ArtifactManifest): KeelRunti
     ...(state === undefined ? {} : { state }),
     ...(seasonalGroveState === undefined ? {} : { seasonalGroveState }),
     ...(collectionVerification === undefined ? {} : { collectionVerification }),
+    ...(data.mintRouter === undefined ? {} : { mintRouter: address(data.mintRouter, "keel.mintRouter") }),
     ...(data.linkRegistry === undefined ? {} : { linkRegistry: address(data.linkRegistry, "keel.linkRegistry") }),
     ...(data.seedRegistry === undefined ? {} : { seedRegistry: address(data.seedRegistry, "keel.seedRegistry") }),
     ...(data.attestedAnchorRegistry === undefined
@@ -1001,6 +1007,12 @@ export function parseKeelRuntimeExtension(manifest: ArtifactManifest): KeelRunti
   }
   if (result.injection?.fields.includes("character.attestedAnchors") === true && result.attestedAnchorRegistry === undefined) {
     throw new TypeError("Keel character.attestedAnchors injection requires an attested-anchor registry binding.");
+  }
+  if (result.injection?.fields.includes("collection.release") === true && result.mintRouter === undefined) {
+    throw new TypeError("Release disclosure requires a declared mint router.");
+  }
+  if (result.mintRouter !== undefined && result.injection?.fields.includes("collection.release") !== true) {
+    throw new TypeError("A mint router must be explicitly injected as collection.release.");
   }
   const characterFields = result.injection?.fields.some((field) => field.startsWith("character.")) === true;
   if (characterFields && result.character === undefined) {
@@ -1648,7 +1660,7 @@ export async function bindKeelManifest(
     }
   }
   if (
-    extension.collectionVerification !== undefined
+    (extension.collectionVerification !== undefined || extension.mintRouter !== undefined)
     && (options.blockNumber === undefined || options.blockHash === undefined || options.blockTimestamp === undefined)
   ) throw new TypeError("Collection verification requires one pinned block number, hash, and timestamp.");
   const signal = options.signal ?? new AbortController().signal;
@@ -1899,7 +1911,7 @@ export async function bindKeelManifest(
     const [seedHarnessRegistry, seedKeelIndex, seedSetValue, seedSetIdValue] = await Promise.all([
       read(extension.seedRegistry, "harnessRegistry"),
       read(extension.seedRegistry, "keelIndex"),
-      read(extension.seedRegistry, "seedSetForViewerRevision", [extension.viewerId, BigInt(effective.harnessRevision)]),
+      read(extension.seedRegistry, "seedSetForHarnessRevision", [extension.viewerId, BigInt(effective.harnessRevision)]),
       read(extension.seedRegistry, "predictSeedSetId", [extension.viewerId, BigInt(effective.harnessRevision)]),
     ]);
     if (!sameAddress(contractAddress(scalar(seedHarnessRegistry), "seedRegistry.harnessRegistry"), extension.harnessRegistry)) {
@@ -1910,10 +1922,10 @@ export async function bindKeelManifest(
     }
     if (!bool(tupleValue(seedSetValue, "exists", 9), "seedSet.exists")) throw new Error("Keel seed set is missing.");
     if (
-      bytes32(tupleValue(seedSetValue, "viewerId", 0), "seedSet.viewerId") !== extension.viewerId ||
+      bytes32(tupleValue(seedSetValue, "harnessId", 0), "seedSet.harnessId") !== extension.viewerId ||
       safeNumber(tupleValue(seedSetValue, "harnessRevision", 1), "seedSet.harnessRevision", 1) !== effective.harnessRevision ||
       !sameAddress(contractAddress(tupleValue(seedSetValue, "collection", 2), "seedSet.collection"), anchor.collection) ||
-      bytes32(tupleValue(seedSetValue, "viewerManifestDigest", 3), "seedSet.viewerManifestDigest") !== effective.manifestDigest
+      bytes32(tupleValue(seedSetValue, "harnessManifestDigest", 3), "seedSet.harnessManifestDigest") !== effective.manifestDigest
     ) throw new Error("Keel seed set does not match the effective viewer.");
     const seedSetId = bytes32(scalar(seedSetIdValue), "seedSetId");
     const derivedTokenSeed = bytes32(
@@ -2303,6 +2315,23 @@ export async function bindKeelManifest(
     };
   }
 
+  let releaseDisclosure: RuntimeContext["releaseDisclosure"];
+  if (extension.mintRouter !== undefined) {
+    const tokenAnchor = commitment.registry?.driveAnchor ?? anchor;
+    if (extension.tokenId !== String(tokenAnchor.tokenId)) throw new Error("Release disclosure must use the anchored token.");
+    const snapshot = await read(extension.mintRouter, "releaseSnapshot", [anchor.collection, BigInt(extension.tokenId)]);
+    const policyWord = uintBig(tupleValue(snapshot, "policy", 2), "release.policy").toString();
+    releaseDisclosure = {
+      source: "pinned-rpc", router: extension.mintRouter, collection: anchor.collection,
+      releaseId: uintBig(tupleValue(snapshot, "id", 0), "release.id").toString(),
+      localId: uintBig(tupleValue(snapshot, "local", 1), "release.local").toString(),
+      policyWord, targetMaximum: uintBig(tupleValue(snapshot, "targetMaximum", 3), "release.targetMaximum").toString(),
+      authority: contractAddress(tupleValue(snapshot, "authority", 4), "release.authority"),
+      blockNumber: options.blockNumber!.toString(), blockHash: options.blockHash!,
+      rows: describeKeelReleasePolicy(policyWord),
+    };
+  }
+
   let attestedAnchors: readonly KeelAnchoredChain[] | undefined;
   if (extension.injection?.fields.includes("character.attestedAnchors") === true) {
     const anchorRegistry = extension.attestedAnchorRegistry;
@@ -2370,6 +2399,7 @@ export async function bindKeelManifest(
             ...(fields.has("character.emitterSeedDomainVersion") ? { emitterSeedDomainVersion: characterRecipe!.emitterSeedDomainVersion } : {}),
             ...(fields.has("character.emitterPaletteMode") ? { emitterPaletteMode: characterRecipe!.emitterPaletteMode } : {}),
             ...(fields.has("character.sceneId") ? { sceneId: characterRecipe!.sceneId } : {}),
+            ...(fields.has("collection.release") ? { releaseDisclosure: releaseDisclosure! } : {}),
             ...(fields.has("collection.verification") ? { collectionVerification: collectionVerification! } : {}),
             ...(fields.has("map.characterSeed") ? { mapCharacterSeed: mapCharacterSeed! } : {}),
             ...(fields.has("map.seed") ? { mapSeed: mapSeed! } : {}),

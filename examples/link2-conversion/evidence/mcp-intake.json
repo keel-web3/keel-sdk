@@ -1,0 +1,31 @@
+{
+  "request": {
+    "method": "tools/call",
+    "params": {
+      "name": "keel-studio-project-intake",
+      "arguments": {
+        "title": "Link 2 — KEEL conversion",
+        "description": "Original Gysin–Vanetti photographic loops and interactive playback, with a locally generated MP4 download.",
+        "outcome": "storage-only"
+      }
+    }
+  },
+  "response": {
+    "jsonrpc": "2.0",
+    "id": 5,
+    "result": {
+      "content": [
+        {
+          "type": "text",
+          "text": "{\"status\":\"ready\",\"title\":\"Link 2 — KEEL conversion\",\"description\":\"Original Gysin–Vanetti photographic loops and interactive playback, with a locally generated MP4 download.\",\"outcome\":\"storage-only\"}"
+        }
+      ],
+      "structuredContent": {
+        "status": "ready",
+        "title": "Link 2 — KEEL conversion",
+        "description": "Original Gysin–Vanetti photographic loops and interactive playback, with a locally generated MP4 download.",
+        "outcome": "storage-only"
+      }
+    }
+  }
+}

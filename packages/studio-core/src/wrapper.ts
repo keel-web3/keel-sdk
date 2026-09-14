@@ -89,7 +89,7 @@ const requestFallbackWasm = () => {
   });
 };`;
   const fallbackArgument = modernOnly ? "" : "fallbackWasmUrl,";
-  return `<div class="flash-stage" data-keel-flash-runtime="ruffle"><div class="flash-player" id="keel-flash-player" aria-label="${escapeAttribute(name)}"></div><p class="flash-status" id="keel-flash-status">VERIFYING RUFFLE RESOURCES</p>${fallbackMarkup}</div><script type="module">
+  return `<div class="flash-stage" data-keel-flash-runtime="ruffle"><div class="flash-player" id="keel-flash-player" aria-label="${escapeAttribute(name)}"></div><p class="flash-status" id="keel-flash-status">VERIFYING RUFFLE RESOURCES</p><button class="flash-fullscreen" id="keel-flash-fullscreen" type="button" aria-label="Enter fullscreen">FULLSCREEN</button>${fallbackMarkup}</div><script type="module">
 const content = globalThis.__KEEL_CONTENT__;
 const context = globalThis.__KEEL_CONTEXT__ ?? {};
 const maxToken = ${resources.collectionSize};
@@ -97,6 +97,30 @@ const tokenId = typeof context.tokenId === "string" && /^[0-9]+$/.test(context.t
 const safeToken = Number(tokenId);
 const status = document.querySelector("#keel-flash-status");
 const setStatus = (value, failed = false) => { if (status) { status.textContent = value; status.classList.toggle("error", failed); } };
+const flashStage = document.querySelector(".flash-stage");
+const fullscreenButton = document.querySelector("#keel-flash-fullscreen");
+let localFullscreen = false;
+const syncFullscreen = () => {
+  if (!(fullscreenButton instanceof HTMLButtonElement)) return;
+  const active = document.fullscreenElement === flashStage || localFullscreen;
+  fullscreenButton.textContent = active ? "EXIT FULLSCREEN" : "FULLSCREEN";
+  fullscreenButton.setAttribute("aria-label", active ? "Exit fullscreen" : "Enter fullscreen");
+};
+const toggleFullscreen = async () => {
+  if (!(flashStage instanceof HTMLElement)) return;
+  if (document.fullscreenElement) { await document.exitFullscreen(); return; }
+  if (localFullscreen) { localFullscreen = false; flashStage.classList.remove("is-fullscreen"); syncFullscreen(); return; }
+  try {
+    if (document.fullscreenEnabled !== true || typeof flashStage.requestFullscreen !== "function") throw new Error("Fullscreen API unavailable");
+    await flashStage.requestFullscreen();
+  } catch {
+    localFullscreen = true;
+    flashStage.classList.add("is-fullscreen");
+  }
+  syncFullscreen();
+};
+fullscreenButton?.addEventListener("click", () => void toggleFullscreen());
+document.addEventListener("fullscreenchange", syncFullscreen);
 const loadModule = async (resourceId) => {
   if (content === undefined || typeof content.url !== "function") throw new Error("Verified Keel content reader is unavailable.");
   const url = content.url(resourceId);
@@ -204,7 +228,7 @@ export function createGeneratedWrapper(input: {
     :root{color-scheme:dark;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;background:#08090c;color:#f7f7f8}
     *{box-sizing:border-box}html,body,main{width:100%;height:100%;margin:0}body{overflow:hidden}
     main{display:grid;place-items:center;position:relative;background:radial-gradient(circle at 50% 25%,#ffb6c11f,transparent 45%),#08090c}
-    img,video,iframe{display:block;width:100%;height:100%;object-fit:contain;border:0}.audio{display:grid;gap:28px;place-items:center}.disc{width:min(58vw,340px);aspect-ratio:1;border-radius:50%;background:repeating-radial-gradient(circle,#1b1d24 0 4px,#111218 5px 9px);box-shadow:0 30px 100px #000}.unsupported{max-width:620px;padding:32px;border:1px solid #ffffff1f;border-radius:20px;background:#11131acc;line-height:1.55}.unsupported a,.download{color:#ffb6c1}.flash-stage{position:relative;width:100%;height:100%;display:grid;place-items:center;background:#07070b}.flash-player{width:100%;height:100%}.flash-player ruffle-player{display:block;width:100%;height:100%}.flash-status{position:absolute;left:12px;bottom:10px;margin:0;padding:6px 9px;background:#07070bcc;color:#9ea6ff;font-size:11px;letter-spacing:.08em;pointer-events:none}.flash-status.error{color:#ff91c8}.download{position:absolute;right:16px;bottom:16px;padding:10px 14px;border:1px solid #ffffff24;border-radius:999px;background:#11131add;text-decoration:none;backdrop-filter:blur(14px)}
+    img,video,iframe{display:block;width:100%;height:100%;object-fit:contain;border:0}.audio{display:grid;gap:28px;place-items:center}.disc{width:min(58vw,340px);aspect-ratio:1;border-radius:50%;background:repeating-radial-gradient(circle,#1b1d24 0 4px,#111218 5px 9px);box-shadow:0 30px 100px #000}.unsupported{max-width:620px;padding:32px;border:1px solid #ffffff1f;border-radius:20px;background:#11131acc;line-height:1.55}.unsupported a,.download{color:#ffb6c1}.flash-stage{position:relative;width:100%;height:100%;min-width:0;min-height:0;display:grid;place-items:center;background:#07070b;overflow:hidden}.flash-stage.is-fullscreen{position:fixed;inset:0;width:100vw;height:100vh;z-index:50}.flash-stage:fullscreen{width:100vw;height:100vh;background:#07070b}.flash-player{width:100%;height:100%;min-width:0;min-height:0}.flash-player ruffle-player{display:block;width:100%;height:100%}.flash-status{position:absolute;left:12px;bottom:max(10px,env(safe-area-inset-bottom));margin:0;padding:6px 9px;background:#07070bcc;color:#9ea6ff;font-size:11px;letter-spacing:.08em;pointer-events:none;z-index:2}.flash-status.error{color:#ff91c8}.flash-fullscreen{position:absolute;right:12px;top:max(10px,env(safe-area-inset-top));z-index:3;border:1px solid #ffffff24;border-radius:999px;padding:8px 11px;background:#11131add;color:#e8e8ff;font:10px ui-monospace,SFMono-Regular,Menlo,monospace;letter-spacing:.08em;cursor:pointer;backdrop-filter:blur(12px)}.flash-fullscreen:hover,.flash-fullscreen:focus-visible{border-color:#ffb6c1;outline:2px solid #ffb6c144;outline-offset:2px}.download{position:absolute;right:16px;bottom:16px;padding:10px 14px;border:1px solid #ffffff24;border-radius:999px;background:#11131add;text-decoration:none;backdrop-filter:blur(14px)}
   </style>
 </head>
 <body>

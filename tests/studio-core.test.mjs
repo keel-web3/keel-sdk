@@ -82,6 +82,31 @@ test("canonical Inline graph is the entrypoint and never generates a replacement
   assert.equal(prepared.resources.some((resource) => resource.fileName === "index.html"), false);
 });
 
+test("compact percent Inline graph stays the exact uncompressed entrypoint", async () => {
+  const bytes = new TextEncoder().encode("JTNDSDElM0V4JTNDSy9oMSUzRQ==");
+  const prepared = await prepareStudioArtifact({
+    id: "compact-inline-entry",
+    name: "Compact Inline",
+    createdAt: "2026-08-30T00:00:00.000Z",
+    assets: [{
+      id: "keel-inline-percent-fragment",
+      fileName: "keel-inline-percent.fragment",
+      mediaType: "application/vnd.keel.token-uri-percent-fragment",
+      role: "entrypoint",
+      executable: true,
+      entrypoint: true,
+      bytes,
+    }],
+  });
+  assert.equal(prepared.manifest.entrypoint.resource, "keel-inline-percent-fragment");
+  assert.equal(prepared.manifest.entrypoint.mode, "html");
+  const fragment = prepared.resources.find((resource) => resource.resource.id === "keel-inline-percent-fragment");
+  assert.ok(fragment);
+  assert.equal(fragment.compression, "none");
+  assert.deepEqual(fragment.storedBytes, bytes);
+  assert.equal(prepared.resources.some((resource) => resource.fileName === "index.html"), false);
+});
+
 test("studio-core wrapper uses virtual content paths only", () => {
   const html = createArtifactWrapper({
     title: "Study",
@@ -813,4 +838,20 @@ test("prepared manifests commit generated media derivatives and exact output res
   const hostile = structuredClone(prepared.manifest);
   hostile.mediaDerivatives[0].outputIntegrity.digest = `0x${"ff".repeat(32)}`;
   assert.throws(() => assertValidManifest(hostile), /Derivative output commitment/u);
+});
+
+test("default raw-percent saver survives editor preparation without compression or a generated wrapper", async () => {
+  const bytes = new TextEncoder().encode(encodeURIComponent(encodeURIComponent("<!doctype html><main>雪 100% # + / =</main>")));
+  const prepared = await prepareStudioArtifact({ id: "raw-inline-entry", name: "Compact Inline",
+    createdAt: "2026-09-08T00:00:00.000Z",
+    assets: [{ id: "keel-inline-token-uri-fragment", fileName: "viewer.fragment",
+      mediaType: "application/vnd.keel.token-uri-raw-percent-fragment", role: "entrypoint",
+      executable: true, entrypoint: true, bytes }],
+  });
+  assert.equal(prepared.manifest.entrypoint.resource, "keel-inline-token-uri-fragment");
+  assert.equal(prepared.manifest.entrypoint.mode, "html");
+  const fragment = prepared.resources.find((r) => r.resource.id === "keel-inline-token-uri-fragment");
+  assert.equal(fragment.compression, "none");
+  assert.deepEqual(fragment.storedBytes, bytes);
+  assert.equal(prepared.resources.some((r) => r.fileName === "index.html"), false);
 });

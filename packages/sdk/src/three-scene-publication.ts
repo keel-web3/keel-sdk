@@ -477,9 +477,8 @@ function buildTokenPlan(input: {
     throw new TypeError("token name and symbol must be bounded and non-empty.");
   }
   const manifestURI = token.manifestURI ?? input.manifestURI;
-  const previewImageURI = token.previewImageURI ?? "";
-  if (manifestURI.length === 0 || manifestURI.length > 2_048 || previewImageURI.length > 2_048) {
-    throw new TypeError("token presentation URIs are outside the contract bounds.");
+  if (manifestURI.length === 0 || new TextEncoder().encode(manifestURI).length > 2_048) {
+    throw new TypeError("token manifestURI must fit the selected KeelIndex publication limit (2,048 bytes).");
   }
   const mintData = token.mintData ?? "0x";
   const factoryData = encodeFunctionData({

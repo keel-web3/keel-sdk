@@ -5,12 +5,13 @@ import { buildCreatorProject } from '../../packages/builder/dist/creator-module.
 import { createKeelGlobalDeclarations } from '../../packages/builder/dist/module-global-types.js';
 import { createLocalSandbox } from './local-sandbox.mjs';
 import { createIntegrity } from '../../packages/protocol/dist/index.js';
+const entry = process.argv[2] ?? 'src/art.ts';
 const root = fileURLToPath(new URL('.', import.meta.url));
 await mkdir(path.join(root, '.keel'), { recursive: true });
 await writeFile(path.join(root, '.keel/globals.d.ts'), createKeelGlobalDeclarations(root, [path.join(root, 'src/art.ts')]));
 const modules = JSON.parse(await readFile(path.join(root, 'keel.includes.json'), 'utf8'));
-const outputDirectory = path.join(root, 'dist');
-const plan = await buildCreatorProject({ root, outputDirectory, modules, surfaces: [{ name: 'art', entry: 'src/art.ts', isolation: 'sandbox' }] });
+const outputDirectory = path.join(root, entry.endsWith('.tsx') ? 'dist-template' : 'dist');
+const plan = await buildCreatorProject({ root, outputDirectory, modules, surfaces: [{ name: 'art', entry, isolation: 'sandbox' }] });
 const scripts = plan.nodes.filter(node => node.mediaType === 'text/javascript');
 if (scripts.length !== 1) throw new Error('This single-surface example must produce one bundled script.');
 const bytes = new Uint8Array(await readFile(path.join(outputDirectory, scripts[0].file)));

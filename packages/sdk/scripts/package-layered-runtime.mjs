@@ -1,0 +1,10 @@
+import { build } from 'esbuild';
+import { readFile, writeFile } from 'node:fs/promises';
+import { createHash } from 'node:crypto';
+import { fileURLToPath } from 'node:url';
+const root=fileURLToPath(new URL('../',import.meta.url));
+await build({stdin:{contents:"export * from './src/layered-art.ts'; export * from './src/layered-renderer.ts'; export {openLayeredBundle} from './src/layered-reveal.ts';",resolveDir:root,loader:'ts'},outfile:root+'dist/layered-runtime.js',platform:'browser',format:'iife',globalName:'KEEL_LAYERS',bundle:true,minify:true});
+const bytes=await readFile(root+'dist/layered-runtime.js');
+const info={id:'keel-layered-runtime-v4',version:'4.0.1',mediaType:'text/javascript',format:'classic-script',role:'runtime',referenceStatus:'active',dependencies:[],localPath:'packages/sdk/dist/layered-runtime.js',integrity:{algorithm:'sha256',digest:'0x'+createHash('sha256').update(bytes).digest('hex'),byteLength:bytes.length},sourceRepository:'keel-sdk',sourceRevision:'local-layered-v4.0.1',aliases:['@keel/layered-runtime','layered-runtime.js','./layered-runtime.js']};
+await writeFile(root+'dist/layered-runtime-info.js','export const LAYERED_RUNTIME = '+JSON.stringify(info)+';\n');
+await writeFile(root+'dist/layered-runtime-info.d.ts','export declare const LAYERED_RUNTIME: any;\n');

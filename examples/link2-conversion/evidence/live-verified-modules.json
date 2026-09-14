@@ -1,0 +1,400 @@
+{
+  "schema": "keel-module-catalog@3",
+  "publishers": [
+    {
+      "id": "keel-web3",
+      "kind": "org",
+      "title": "Keel",
+      "summary": "First-party Keel modules: the reference library every KEEL artwork can build on.",
+      "url": "https://github.com/keel-web3",
+      "identityId": null,
+      "members": [
+        {
+          "id": "ravonus",
+          "name": "Ravonus",
+          "role": "owner",
+          "github": "Ravonus",
+          "address": null
+        }
+      ],
+      "groups": [
+        {
+          "id": "generative",
+          "title": "Generative",
+          "summary": "Deterministic generators: the seed-driven core a replayable artwork is built from.",
+          "members": [
+            "ravonus"
+          ]
+        },
+        {
+          "id": "graphics",
+          "title": "Graphics",
+          "summary": "Drawing, colour, camera, and shader plumbing.",
+          "members": [
+            "ravonus"
+          ]
+        },
+        {
+          "id": "runtime",
+          "title": "Runtime",
+          "summary": "Host integration: timing, input, capture markers, and verified asset access.",
+          "members": [
+            "ravonus"
+          ]
+        },
+        {
+          "id": "sound",
+          "title": "Sound",
+          "summary": "Web Audio primitives.",
+          "members": [
+            "ravonus"
+          ]
+        }
+      ]
+    }
+  ],
+  "modules": [
+    {
+      "id": "audio-envelope",
+      "version": "0.1.0",
+      "license": "MIT",
+      "summary": "Deterministic oscillator and ADSR envelope primitives for Web Audio authoring.",
+      "sourceRepository": "https://github.com/Ravonus/keel-modules",
+      "githubPath": "modules/keel-web3/audio/audio-envelope/src/index.ts",
+      "sourceFiles": [
+        {
+          "path": "modules/keel-web3/audio/audio-envelope/src/index.ts",
+          "sha256": "0xd66c4af5d5e3d524681757f0bf80e7f6ce74482fd8dc506c837e28f7bbc100fc"
+        }
+      ],
+      "outputDigest": "0xda78abe62e662b9ff63ebc3c014f88744a98847dfefb5b1c039af95db4557b89",
+      "receiptDigest": "0xe55466e9673374ee9881bc9a79daa5e7e28ba53a97aa834976fbf43d6e9bbcb5",
+      "disposition": "reproducible-build",
+      "verified": true,
+      "publisher": "keel-web3",
+      "category": "audio",
+      "owner": {
+        "publisher": "keel-web3",
+        "kind": "org",
+        "group": "sound",
+        "member": null
+      },
+      "moduleRepository": "https://github.com/keel-web3/audio-envelope",
+      "deployments": [],
+      "deployed": false,
+      "provenance": "vendored",
+      "origin": null
+    },
+    {
+      "id": "frame-clock",
+      "version": "0.1.0",
+      "license": "MIT",
+      "summary": "Fixed-timestep animation clock with explicit FPS and bounded catch-up.",
+      "sourceRepository": "https://github.com/Ravonus/keel-modules",
+      "githubPath": "modules/keel-web3/timing/frame-clock/src/index.ts",
+      "sourceFiles": [
+        {
+          "path": "modules/keel-web3/timing/frame-clock/src/index.ts",
+          "sha256": "0x04002faabc35aed4894307516fc0ee7a3a9a648420ac8d670bebbfdfe5e273dc"
+        }
+      ],
+      "outputDigest": "0x49f70f6268dc3fd3ff09fa532b8308c005833f94d1bb88b1f9b56198b6fb1a9e",
+      "receiptDigest": "0x76406d28ae78a3deea26edebe41d43563987b2566d7300b53b7b00f7220f1a38",
+      "disposition": "reproducible-build",
+      "verified": true,
+      "publisher": "keel-web3",
+      "category": "timing",
+      "owner": {
+        "publisher": "keel-web3",
+        "kind": "org",
+        "group": "runtime",
+        "member": null
+      },
+      "moduleRepository": "https://github.com/keel-web3/frame-clock",
+      "deployments": [],
+      "deployed": false,
+      "provenance": "vendored",
+      "origin": null
+    },
+    {
+      "id": "hotkeys",
+      "version": "0.1.0",
+      "license": "MIT",
+      "summary": "Scoped, removable keyboard-command map for artwork documents.",
+      "sourceRepository": "https://github.com/Ravonus/keel-modules",
+      "githubPath": "modules/keel-web3/input/hotkeys/src/index.ts",
+      "sourceFiles": [
+        {
+          "path": "modules/keel-web3/input/hotkeys/src/index.ts",
+          "sha256": "0xccec5b6284a62f2a7dc7645f47446579185e2d4ebc24cbcbe7a905815198cb6b"
+        }
+      ],
+      "outputDigest": "0xe42ae24c7685ae08bef74e6d4b63b9ebcd5fd8b6a26c86783dd9dd1db2c18804",
+      "receiptDigest": "0x1986fcbb29e1fbc3b9864e65cdd7c103511c80f51d6a133dabc86a651d0f7e34",
+      "disposition": "reproducible-build",
+      "verified": true,
+      "publisher": "keel-web3",
+      "category": "input",
+      "owner": {
+        "publisher": "keel-web3",
+        "kind": "org",
+        "group": "runtime",
+        "member": null
+      },
+      "moduleRepository": "https://github.com/keel-web3/hotkeys",
+      "deployments": [],
+      "deployed": false,
+      "provenance": "vendored",
+      "origin": null
+    },
+    {
+      "id": "noise2d",
+      "version": "0.1.0",
+      "license": "MIT",
+      "summary": "Seeded 2D value noise with smooth interpolation and fractal octaves.",
+      "sourceRepository": "https://github.com/Ravonus/keel-modules",
+      "githubPath": "modules/keel-web3/generative/noise2d/src/index.ts",
+      "sourceFiles": [
+        {
+          "path": "modules/keel-web3/generative/noise2d/src/index.ts",
+          "sha256": "0xd27646ecab7182aa9f66e25259062ced3004ce896bc726c3cf4b161ffa08a93f"
+        }
+      ],
+      "outputDigest": "0x5cc34df154b618c502deb2e3b3809b1ab83b79a45508bcc37c62d7c05d388bc9",
+      "receiptDigest": "0xc201d13aba17295901e9748525bc72bafc46c91dd925c3f2e2c8637ab06734a1",
+      "disposition": "reproducible-build",
+      "verified": true,
+      "publisher": "keel-web3",
+      "category": "generative",
+      "owner": {
+        "publisher": "keel-web3",
+        "kind": "org",
+        "group": "generative",
+        "member": null
+      },
+      "moduleRepository": "https://github.com/keel-web3/noise2d",
+      "deployments": [],
+      "deployed": false,
+      "provenance": "vendored",
+      "origin": null
+    },
+    {
+      "id": "orbit-camera",
+      "version": "0.1.0",
+      "license": "MIT",
+      "summary": "Framework-free orbit-camera position and perspective matrix helpers.",
+      "sourceRepository": "https://github.com/Ravonus/keel-modules",
+      "githubPath": "modules/keel-web3/render/orbit-camera/src/index.ts",
+      "sourceFiles": [
+        {
+          "path": "modules/keel-web3/render/orbit-camera/src/index.ts",
+          "sha256": "0x2a09cde58389374c2594c9bd39a78d0ad58170c6774c31cb33881356a70647b9"
+        }
+      ],
+      "outputDigest": "0xd0feb4cf4356f59e95a9c168b2ecfa5063f6c1cc5ed3ced2305b1f04207885fc",
+      "receiptDigest": "0xe6397a6c4ef5c49bd6342d9f93cff1de8d5e6169fc30fde3864cb0b71f96a2a3",
+      "disposition": "reproducible-build",
+      "verified": true,
+      "publisher": "keel-web3",
+      "category": "render",
+      "owner": {
+        "publisher": "keel-web3",
+        "kind": "org",
+        "group": "graphics",
+        "member": null
+      },
+      "moduleRepository": "https://github.com/keel-web3/orbit-camera",
+      "deployments": [],
+      "deployed": false,
+      "provenance": "vendored",
+      "origin": null
+    },
+    {
+      "id": "palette",
+      "version": "0.1.0",
+      "license": "MIT",
+      "summary": "Hex palette parsing, interpolation, and deterministic selection.",
+      "sourceRepository": "https://github.com/Ravonus/keel-modules",
+      "githubPath": "modules/keel-web3/render/palette/src/index.ts",
+      "sourceFiles": [
+        {
+          "path": "modules/keel-web3/render/palette/src/index.ts",
+          "sha256": "0xb01bdb3e676a3954d969d6fff5e07da5f6e2248ab5fd5eaf2a986c201b378d8e"
+        }
+      ],
+      "outputDigest": "0x785ac9e4d8641662862703d3d3d7b97c6085528e03714ee331979619db2108da",
+      "receiptDigest": "0x9f7b6de1f7eee5633569020225a11cfbcc55124218002f7be311cde9ab7ebf18",
+      "disposition": "reproducible-build",
+      "verified": true,
+      "publisher": "keel-web3",
+      "category": "render",
+      "owner": {
+        "publisher": "keel-web3",
+        "kind": "org",
+        "group": "graphics",
+        "member": null
+      },
+      "moduleRepository": "https://github.com/keel-web3/palette",
+      "deployments": [],
+      "deployed": false,
+      "provenance": "vendored",
+      "origin": null
+    },
+    {
+      "id": "seeded-random",
+      "version": "0.1.0",
+      "license": "MIT",
+      "summary": "Deterministic xoshiro128** random helpers for replayable browser art.",
+      "sourceRepository": "https://github.com/Ravonus/keel-modules",
+      "githubPath": "modules/keel-web3/generative/seeded-random/src/index.ts",
+      "sourceFiles": [
+        {
+          "path": "modules/keel-web3/generative/seeded-random/src/index.ts",
+          "sha256": "0x8db873d5e92c511d534a9f6717d630306982649444e04a038ca4c88613eb5184"
+        }
+      ],
+      "outputDigest": "0x9f515ca67dc8b40705107024287016b3aeaf6a9b48519c7d90a0a44191391cc6",
+      "receiptDigest": "0x67b36eab07833a5c92bb33a10cce901ff1b7a702c77e20a0b237b9511b24f372",
+      "disposition": "reproducible-build",
+      "verified": true,
+      "publisher": "keel-web3",
+      "category": "generative",
+      "owner": {
+        "publisher": "keel-web3",
+        "kind": "org",
+        "group": "generative",
+        "member": null
+      },
+      "moduleRepository": "https://github.com/keel-web3/seeded-random",
+      "deployments": [],
+      "deployed": false,
+      "provenance": "vendored",
+      "origin": null
+    },
+    {
+      "id": "shader-uniforms",
+      "version": "0.1.0",
+      "license": "MIT",
+      "summary": "WebGL uniform discovery and strict typed uniform updates.",
+      "sourceRepository": "https://github.com/Ravonus/keel-modules",
+      "githubPath": "modules/keel-web3/render/shader-uniforms/src/index.ts",
+      "sourceFiles": [
+        {
+          "path": "modules/keel-web3/render/shader-uniforms/src/index.ts",
+          "sha256": "0x3bc7ba817fadd8ceff20694fe09cfe6258487ead689bd3a1f065374e1e335e87"
+        }
+      ],
+      "outputDigest": "0x57aaa53a83f5005519c087059a52f8cc1af9734cfe5f8cf8af647b420e0fcf98",
+      "receiptDigest": "0x92657ce4810a314b923c2f99ccb0a189a8e1ddd875ced7bc35c1d1eaec5e8a66",
+      "disposition": "reproducible-build",
+      "verified": true,
+      "publisher": "keel-web3",
+      "category": "render",
+      "owner": {
+        "publisher": "keel-web3",
+        "kind": "org",
+        "group": "graphics",
+        "member": null
+      },
+      "moduleRepository": "https://github.com/keel-web3/shader-uniforms",
+      "deployments": [],
+      "deployed": false,
+      "provenance": "vendored",
+      "origin": null
+    },
+    {
+      "id": "sprite-sheet",
+      "version": "0.1.0",
+      "license": "MIT",
+      "summary": "Equal-cell and JSON-atlas sprite sheet helpers with crisp pixel drawing.",
+      "sourceRepository": "https://github.com/Ravonus/keel-modules",
+      "githubPath": "modules/keel-web3/render/sprite-sheet/src/index.ts",
+      "sourceFiles": [
+        {
+          "path": "modules/keel-web3/render/sprite-sheet/src/index.ts",
+          "sha256": "0x79fec3c557ab51efbc89e130c8de07d73ac2cdca774b6d515256f0acad2b5424"
+        }
+      ],
+      "outputDigest": "0xff354364eddaaa27628c03d8c80c77ed9e0c6f3c0f1d66b2023a3a920b62e624",
+      "receiptDigest": "0x05c3023c4908aacd27799e91949f704b962a06624336fde5a7fdc4c2923921a8",
+      "disposition": "reproducible-build",
+      "verified": true,
+      "publisher": "keel-web3",
+      "category": "render",
+      "owner": {
+        "publisher": "keel-web3",
+        "kind": "org",
+        "group": "graphics",
+        "member": null
+      },
+      "moduleRepository": "https://github.com/keel-web3/sprite-sheet",
+      "deployments": [],
+      "deployed": false,
+      "provenance": "vendored",
+      "origin": null
+    },
+    {
+      "id": "thumbnail-capture",
+      "version": "0.1.0",
+      "license": "MIT",
+      "summary": "Capture markers for exact Keel poster and motion thumbnails.",
+      "sourceRepository": "https://github.com/Ravonus/keel-modules",
+      "githubPath": "modules/keel-web3/viewer/thumbnail-capture/src/index.ts",
+      "sourceFiles": [
+        {
+          "path": "modules/keel-web3/viewer/thumbnail-capture/src/index.ts",
+          "sha256": "0x76e941b60f491356db1db2f5c613001ecdb247c3b37b15d0ce5394fb360f38c5"
+        }
+      ],
+      "outputDigest": "0x4ff5fa94a12d806995c0f424822b6c532b2152657dd55b1a3fc2c46fda7b046e",
+      "receiptDigest": "0x0dc97fbe41f63e72dac80b1436750925f4fa6a62eca68169dddb53fec4dbb28a",
+      "disposition": "reproducible-build",
+      "verified": true,
+      "publisher": "keel-web3",
+      "category": "viewer",
+      "owner": {
+        "publisher": "keel-web3",
+        "kind": "org",
+        "group": "runtime",
+        "member": null
+      },
+      "moduleRepository": "https://github.com/keel-web3/thumbnail-capture",
+      "deployments": [],
+      "deployed": false,
+      "provenance": "vendored",
+      "origin": null
+    },
+    {
+      "id": "verified-assets",
+      "version": "0.1.0",
+      "license": "MIT",
+      "summary": "Cached byte, text, JSON, and image views over a host-injected verified resolver.",
+      "sourceRepository": "https://github.com/Ravonus/keel-modules",
+      "githubPath": "modules/keel-web3/viewer/verified-assets/src/index.ts",
+      "sourceFiles": [
+        {
+          "path": "modules/keel-web3/viewer/verified-assets/src/index.ts",
+          "sha256": "0xa6470c0ce35e7ef9217e880b886c8ade678e4d35db7ca1be117104d6db093ae1"
+        }
+      ],
+      "outputDigest": "0x24bfbcbc7159518b6cd9a673e3b0736000f31dc0880e54d6e16fd590666b9d25",
+      "receiptDigest": "0x6a6a66636e3ff85929f663b08b4f0c52b4c3e92dbe5ab64b0661f3de4d0a44b5",
+      "disposition": "reproducible-build",
+      "verified": true,
+      "publisher": "keel-web3",
+      "category": "viewer",
+      "owner": {
+        "publisher": "keel-web3",
+        "kind": "org",
+        "group": "runtime",
+        "member": null
+      },
+      "moduleRepository": "https://github.com/keel-web3/verified-assets",
+      "deployments": [],
+      "deployed": false,
+      "provenance": "vendored",
+      "origin": null
+    }
+  ],
+  "total": 11
+}

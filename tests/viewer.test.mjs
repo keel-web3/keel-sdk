@@ -3,6 +3,7 @@ import assert from "node:assert/strict";
 import {
   KEEL_REGISTRY_ANCHOR_PROTOCOL,
   canonicalJson,
+  intersectCapabilities,
   createIntegrity,
   encodeBase64,
   hexToBytes,
@@ -33,6 +34,8 @@ import {
   resolveArtifactFromManifestUri,
   resolveArtifactFromRegistry,
   resolveKeelContractPlugin,
+  createPublishedViewReader,
+  KEEL_CONTRACT_PLUGIN_PROTOCOL_HASH,
   resolveKeelArtifact,
   transitionViewerVerificationHost,
   uriLocations,
@@ -1423,7 +1426,7 @@ function keelReader({
           keelAddresses.collection,
           true,
         ];
-      case `${keelAddresses.seed}:seedSetForViewerRevision`:
+      case `${keelAddresses.seed}:seedSetForHarnessRevision`:
         return [
           keelIds.viewer,
           1n,
@@ -2199,6 +2202,27 @@ test("Keel replay requires the contract-derived seed and a pinned exact viewer s
   const bound = await bindKeelManifest(value, commitment, { readContract: reader, blockNumber: 123n });
   assert.equal(bound.binding.seed.derivedTokenSeed, derivedSeed);
 
+  // Named tuple results use the contract's Harness fields, just like ABI decoders.
+  const namedReader = async request => {
+    const result = await reader(request);
+    if (request.functionName !== "seedSetForHarnessRevision") return result;
+    return Object.fromEntries([
+      "harnessId", "harnessRevision", "collection", "harnessManifestDigest", "rootSeed",
+      "provenanceDigest", "createdAt", "publisher", "revealer", "exists",
+    ].map((name, index) => [name, result[index]]));
+  };
+  const named = await bindKeelManifest(value, commitment, { readContract: namedReader, blockNumber: 123n });
+  assert.deepEqual(named.binding.seed, bound.binding.seed);
+  const wrongHarnessReader = async request => {
+    const result = await namedReader(request);
+    return request.functionName === "seedSetForHarnessRevision"
+      ? { ...result, harnessId: `0x${"ee".repeat(32)}` } : result;
+  };
+  await assert.rejects(
+    () => bindKeelManifest(value, commitment, { readContract: wrongHarnessReader, blockNumber: 123n }),
+    /seed set does not match/i,
+  );
+
   const mismatched = structuredClone(value);
   mismatched.runtime.determinism.seed = `0x${"cd".repeat(32)}`;
   const mismatchCommitment = structuredClone(commitment);
@@ -2247,7 +2271,7 @@ test("Keel exact equipment overlays a manifest resource only after loadout and s
   );
 });
 
-async function contractPluginFixture() {
+async function contractPluginFixture(view = false) {
   const chainId = 31338;
   const graphRegistry = "0x1111111111111111111111111111111111111111";
   const pluginRegistry = "0x2222222222222222222222222222222222222222";
@@ -2268,8 +2292,8 @@ async function contractPluginFixture() {
       label: "Buy NFT",
       target: "plugin-contract",
       selector: "0x12345678",
-      stateMutability: "payable",
-      valuePolicy: "exact-quote",
+      stateMutability: view ? "view" : "payable",
+      valuePolicy: view ? "zero" : "exact-quote",
       confirmation: "Buy this exact token using the verified listing quote.",
     },
   ];
@@ -2357,6 +2381,7 @@ async function contractPluginFixture() {
       },
     ],
   };
+  if (view) outerManifest.extensions = { "keel-read-intents@1": { enabled: true, intents: [{ plugin: "keel-market", id: "market.buy" }] } };
   const outer = await resolveArtifact(outerManifest, {
     commitment: { integrity: await manifestIntegrity(outerManifest), digestVerified: true },
   });
@@ -2409,7 +2434,7 @@ async function contractPluginFixture() {
       case "walletAuthorized":
       case "bindingsMatch":
       case "supportsInterface": return true;
-      case "pluginProtocol": return "0x0e0eb5162ca8df7c079e8d31eaf2f514a536c16bf86ea734ab562928f4dac159";
+      case "pluginProtocol": return "0x6047fbc26549c6c27c3ef1062f7c9f92a95a30e97ad66f442f4015552aaf092b";
       case "pluginId": return pluginId;
       case "pluginVersion": return 1n;
       default: throw new Error(`Unexpected plugin read ${request.functionName}`);
@@ -2509,6 +2534,63 @@ test("editor preview decodes the default saver without adding a Base64 document"
 });
 
 
+const viewCapabilities = () => intersectCapabilities([
+  { label: "host", allow: ["network.manifested", "wallet.market.buy"], ceiling: true },
+  { label: "manifest", allow: ["network.manifested", "wallet.market.buy"] },
+], { strictCeiling: true });
+
+test("published read requires manifest enablement before any chain read", async () => {
+  const fixture = await contractPluginFixture();
+  let calls = 0;
+  await assert.rejects(() => createPublishedViewReader({ outer: fixture.outer, plugin: "keel-market", intentId: "market.buy",
+    capabilities: viewCapabilities(), operation: { selector: "0x12345678", encode: () => "0x12345678" },
+    verification: { ...fixture, readContract: async () => { calls++; throw Error("must not read"); } }, read: async () => { calls++; },
+  }), /manifest has not enabled/i);
+  assert.equal(calls, 0);
+});
+
+test("published read preserves host denial before verification networking", async () => {
+  const fixture = await contractPluginFixture(true);
+  let calls = 0;
+  await assert.rejects(() => createPublishedViewReader({ outer: fixture.outer, plugin: "keel-market", intentId: "market.buy",
+    capabilities: intersectCapabilities([{ label: "host", allow: [], ceiling: true }]),
+    operation: { selector: "0x12345678", encode: () => "0x12345678" },
+    verification: { ...fixture, readContract: async () => { calls++; throw Error("must not read"); } }, read: async () => { calls++; },
+  }), /host capability policy denies/i);
+  assert.equal(calls, 0);
+});
+
+test("published view verifies registry and pins target, selector and block", async () => {
+  const fixture = await contractPluginFixture(true);
+  const calls = [];
+  const reader = await createPublishedViewReader({ outer: fixture.outer, plugin: "keel-market", intentId: "market.buy",
+    capabilities: viewCapabilities(), operation: { selector: "0x12345678", encode: proposal => proposal },
+    verification: fixture, read: async request => { calls.push(request); return "0x01"; },
+  });
+  assert.equal(await reader.read("0x12345678"), "0x01");
+  assert.equal(calls[0].address, "0x3333333333333333333333333333333333333333");
+  assert.equal(calls[0].blockNumber, 91n);
+  assert.equal(calls[0].blockHash, `0x${"99".repeat(32)}`);
+  await assert.rejects(() => reader.read("0xffffffff"), /outside its published intent/i);
+  assert.equal(calls.length, 1);
+});
+
+
+test("a post-verification manifest toggle cannot enable network reads", async () => {
+  const fixture = await contractPluginFixture();
+  fixture.outer.manifest.extensions = { "keel-read-intents@1": { enabled: true, intents: [{ plugin: "keel-market", id: "market.buy" }] } };
+  let calls = 0;
+  await assert.rejects(() => createPublishedViewReader({ outer: fixture.outer, plugin: "keel-market", intentId: "market.buy",
+    capabilities: viewCapabilities(), operation: { selector: "0x12345678", encode: () => "0x12345678" },
+    verification: { ...fixture, readContract: async () => { calls++; throw Error("must not read"); } }, read: async () => { calls++; },
+  }), /manifest changed after verification/i);
+  assert.equal(calls, 0);
+});
+
+test("native plugin marker matches the deployed registry protocol domain", () => {
+  assert.equal(KEEL_CONTRACT_PLUGIN_PROTOCOL_HASH, keccak256(utf8ToBytes("keel.contract-plugin.v1")));
+});
+
 for (const preference of [{ gatewayTransport: 'preferred' }, { gatewayTransport: 'fallback' }, { sourcePreference: 'hybrid-first' }]) {
   test(`native revision cannot reconnect declared remote or foreign-chain sources: ${JSON.stringify(preference)}`, async () => {
     const objectBytes = utf8ToBytes('<svg xmlns="http://www.w3.org/2000/svg"/>');
@@ -2593,3 +2675,40 @@ for (const fork of [false, true]) {
     assert.equal(calls.filter(c=>c.functionName===(fork?'harnessTree':'tokenForkTree')).length,0);
   });
 }
+
+for (const collectionScoped of [false, true]) test(`logical release disclosure reads the pinned token (${collectionScoped ? "collection" : "token"} manifest)`, async () => {
+  const {encodeKeelReleasePolicy}=await import('../packages/protocol/dist/index.js');
+  const mintRouter='0x1111111111111111111111111111111111111111';
+  const extension=baseKeelExtension({tokenId:collectionScoped?'$anchor.tokenId':'7',mintRouter,injection:{protocol:'keel-injection@1',fields:['collection.release']}});
+  const {value,integrity,commitment}=await keelManifest(extension,undefined,collectionScoped?{collection:keelAddresses.collection,tokenId:'0',scope:'collection',requestTokenId:'7'}:undefined);
+  const blockHash=`0x${'de'.repeat(32)}`;
+  const baseReader=keelReader({manifestDigest:integrity.digest,objectBytes:new TextEncoder().encode('<svg xmlns="http://www.w3.org/2000/svg"/>')});
+  let snapshotReads=0;
+  const reader=async request=>{
+    if(request.functionName!=='releaseSnapshot')return baseReader(request);
+    snapshotReads++;assert.equal(request.address,mintRouter);assert.equal(request.blockHash,blockHash);assert.equal(request.blockNumber,123n);
+    assert.deepEqual(request.args,[keelAddresses.collection,7n]);
+    return [2n,5n,encodeKeelReleasePolicy({mode:'adjustable',limit:10n,ceiling:20n})|5n,100n,keelAddresses.collection];
+  };
+  const options={readContract:reader,blockNumber:123n,blockHash,blockTimestamp:1700000000n};
+  const bound=await bindKeelManifest(value,commitment,options);
+  const disclosure=bound.binding.runtimeContext.releaseDisclosure;
+  assert.equal(snapshotReads,1);assert.equal(disclosure.releaseId,'2');assert.equal(disclosure.localId,'5');
+  assert.equal(disclosure.source,'pinned-rpc');assert.match(JSON.stringify(disclosure.rows),/Adjustable maximum/);
+  await assert.rejects(()=>bindKeelManifest(value,commitment,{readContract:reader}),/pinned/);
+  await assert.rejects(()=>bindKeelManifest(value,commitment,{...options,readContract:async request=>request.functionName==='releaseSnapshot'?Promise.reject(Error('unassigned token')):reader(request)}),/unassigned/);
+});
+
+
+test("sandbox rejects forged supply labels and mismatched snapshot identity", async () => {
+  const {encodeKeelReleasePolicy,describeKeelReleasePolicy}=await import('../packages/protocol/dist/index.js');
+  const artifact=await resolveArtifact(await manifest());
+  const policyWord=encodeKeelReleasePolicy({mode:'adjustable',limit:10n,ceiling:20n}).toString();
+  const blockHash=`0x${'cd'.repeat(32)}`;
+  const release={source:'pinned-rpc',router:keelAddresses.collection,collection:keelAddresses.collection,authority:keelAddresses.collection,releaseId:'1',localId:'1',policyWord,targetMaximum:'100',blockNumber:'123',blockHash,rows:describeKeelReleasePolicy(policyWord)};
+  const context={protocol:'keel-context@1',blockNumber:'123',blockHash,releaseDisclosure:release};
+  assert.match(createSandboxDocument(artifact,{runtimeContext:context}).html,/Adjustable maximum/);
+  for(const invalid of [{...release,rows:[['Supply policy','Fixed maximum']]},{...release,blockNumber:'124'},{...release,releaseId:'0'},{...release,localId:(1n<<64n).toString()},{...release,policyWord:(1n<<254n).toString()}]) {
+    assert.throws(()=>createSandboxDocument(artifact,{runtimeContext:{...context,releaseDisclosure:invalid}}));
+  }
+});

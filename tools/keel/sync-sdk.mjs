@@ -12,11 +12,14 @@ const REPO = resolve(import.meta.dirname, "../..");
 const metaDir = (id) => join(REPO, "../keel-contracts", TIER_OF.get(id), id);
 const TARGET = join(REPO, "packages/sdk/src/modules.generated.ts");
 const ABI_DIR = join(REPO, "packages/sdk/src/abis");
+const abiOnly = process.argv.find(arg => arg.startsWith("--abis-only="))?.slice("--abis-only=".length);
+if (abiOnly && !MODULES.some(m => m.id === abiOnly)) throw new Error(`Unknown module: ${abiOnly}`);
 
 const modules = [];
 const deployments = [];
 const abiIndex = [];   // [unitId, [contractName, ...]]
 for (const m of MODULES) {
+  if (abiOnly && m.id !== abiOnly) continue;
   const d = JSON.parse(readFileSync(join(metaDir(m.id), "keel.module.json"), "utf8"));
   modules.push({ id: d.id, kind: d.kind, title: d.title, group: d.group, visibility: d.visibility ?? null, summary: d.summary, version: d.version, repo: d.repo, deps: d.deps, contracts: d.contracts, deployable: d.deployable });
   // ABIs are ~1 MiB in total, so each unit gets its own module and is loaded on
@@ -49,6 +52,7 @@ for (const m of MODULES) {
     }
   }
 }
+if (abiOnly) { console.log(`sync-sdk: regenerated ABIs for ${abiOnly}`); process.exit(0); }
 deployments.sort((a, b) => a.module.localeCompare(b.module) || a.chainId - b.chainId || a.instance.localeCompare(b.instance) || a.contract.localeCompare(b.contract));
 
 const onlyModules = modules.filter((m) => m.kind !== "app");

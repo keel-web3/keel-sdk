@@ -1,0 +1,14 @@
+import fs from 'node:fs';
+import {createPublicClient,createWalletClient,http,encodeFunctionData,defineChain} from 'viem';
+import {privateKeyToAccount} from 'viem/accounts';
+const [acceptanceFile,proofFile,contractsRoot='/Users/ravonus/dev/keel-contracts']=process.argv.slice(2);
+const acceptance=JSON.parse(fs.readFileSync(acceptanceFile)),proof=JSON.parse(fs.readFileSync(proofFile));
+if(!['localhost','127.0.0.1'].includes(new URL(acceptance.rpc).hostname)||acceptance.chainId!==31337)throw Error('Disposable chain required');
+const chain=defineChain({id:31337,name:'Local acceptance',nativeCurrency:{name:'Ether',symbol:'ETH',decimals:18},rpcUrls:{default:{http:[acceptance.rpc]}}});
+const account=privateKeyToAccount('0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80');
+const reader=createPublicClient({chain,transport:http(acceptance.rpc)}),wallet=createWalletClient({chain,account,transport:http(acceptance.rpc)});
+const abi=JSON.parse(fs.readFileSync(contractsRoot+'/out/SP1VerifierGroth16.sol/SP1Verifier.json')).abi;
+const data=encodeFunctionData({abi,functionName:'verifyProof',args:[proof.programVKey,proof.publicValues,proof.proofBytes]});
+const hash=await wallet.sendTransaction({to:acceptance.addresses.SP1Verifier,data});const receipt=await reader.waitForTransactionReceipt({hash});
+if(receipt.status!=='success')throw Error('Verifier reverted');
+fs.writeFileSync(acceptanceFile+'.verification-gas.json',JSON.stringify({hash,receipt,includesIntrinsicGas:true},(_,v)=>typeof v==='bigint'?v.toString():v,2)+'\n');console.log('Verification transaction gas:',receipt.gasUsed.toString());

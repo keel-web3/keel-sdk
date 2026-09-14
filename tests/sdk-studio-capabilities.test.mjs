@@ -49,6 +49,24 @@ const capabilities = () => ({
   ],
 });
 
+const stagingCapabilities = () => ({
+  schema: "keel-studio-capabilities@2", generatedAt: "2026-09-03T00:00:00.000Z", chainId: 11155111,
+  staging: { endpoint: "/api/agent/staging", transport: "multipart-form-data", authentication: "bearer",
+    maxSourceBytes: 134217728, maximumRetentionSeconds: 604800, resumable: false, oneUseHandoff: false },
+  wallet: { signing: false, submission: false },
+  publication: { readiness: "requires-project-verification", canonicalShellRequired: true },
+});
+
+test("multipart Studio reports actual staging without claiming publication readiness", () => {
+  const value = stagingCapabilities();
+  assert.deepEqual(parseStudioCapabilities(value), value);
+  assert.throws(() => parseStudioCapabilities({ ...value, chainId: 0 }), /chainId/u);
+  assert.throws(() => parseStudioCapabilities({ ...value, wallet: { signing: true, submission: false } }), /signing/u);
+  assert.throws(() => parseStudioCapabilities({ ...value, publication: { ...value.publication, readiness: "ready" } }), /readiness/u);
+  assert.throws(() => parseStudioCapabilities({ ...value, staging: { ...value.staging, oneUseHandoff: true } }), /oneUseHandoff/u);
+  assert.throws(() => parseStudioCapabilities({ ...value, credential: "must-not-be-public" }), /credential/u);
+});
+
 test("Studio capabilities parse strictly and retain honest readiness boundaries", () => {
   const parsed = parseStudioCapabilities(capabilities());
   assert.equal(parsed.staging.resumable, false);

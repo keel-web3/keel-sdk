@@ -179,7 +179,7 @@ test("creator deployment resolution requires one exact factory and renderer inst
 test("published module ABIs expose creator collections and exact item drops", async () => {
   assert.deepEqual(
     moduleAbiContracts("keel-die").filter((name) => name.startsWith("KeelCreator") || name === "KeelArtifactTokenRenderer" || name === "KeelShared1155"),
-    ["KeelArtifactTokenRenderer", "KeelCreator1155", "KeelCreator721", "KeelCreator721A", "KeelCreatorFactory", "KeelShared1155"],
+    ["KeelArtifactTokenRenderer", "KeelCreator1155", "KeelCreator721", "KeelCreator721A", "KeelCreatorFactory", "KeelCreatorSeeded721A", "KeelShared1155"],
   );
   const factoryAbi = await moduleAbi("keel-die", "KeelCreatorFactory");
   const rendererAbi = await moduleAbi("keel-die", "KeelArtifactTokenRenderer");
@@ -191,6 +191,7 @@ test("published module ABIs expose creator collections and exact item drops", as
     { name: "implementation721_", type: "address" },
     { name: "implementationStandard721_", type: "address" },
     { name: "implementation1155_", type: "address" },
+    { name: "implementationSeeded721_", type: "address" },
   ]);
   assert.ok(factoryAbi.some((entry) => entry.type === "function" && entry.name === "createERC721"));
   assert.ok(factoryAbi.some((entry) => entry.type === "function" && entry.name === "createStandardERC721"));

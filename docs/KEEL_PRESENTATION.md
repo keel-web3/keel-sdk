@@ -43,6 +43,35 @@ on the selected chain or stop before wallet review. Studio must label reused
 fragments as **onchain reused** and creator bytes as **new upload**; calling
 both “local” or charging for both hides the most important cost boundary.
 
+## Existing works publish a version delta
+
+Studio and MCP must determine from the selected target whether the creator is
+making a new work or revising an existing graph. The creator is never asked to
+understand that distinction. For an existing graph, call
+`planKeelGraphRevision` (MCP: `keel-revision-plan`) before creating any upload
+or wallet plan.
+
+The automatic revision path has a hard boundary:
+
+- compare the live selected-chain graph with the candidate next version;
+- accept exactly one declared changed resource;
+- require the graph version and that resource version to advance by one;
+- reuse every other resource with the exact same object ID, digest, byte
+  length, media type, role, and version;
+- bind the upload-plan digest and media type to that one changed resource;
+- stop before wallet review if another resource changes, identical bytes are
+  assigned a new object, or the changed resource exceeds 65,536 stored bytes.
+
+A follow-latest token needs no token presentation transaction. Publish and
+activate the next shared graph/module version and leave the token alone. A
+pinned token may update only its small version binding after the new resource
+exists. A multi-resource or large-resource change leaves the automatic path
+and requires a separate explicit full-graph review.
+
+Every revision cost view must show **new stored bytes** and **onchain reused
+bytes** separately. Reused shell, module, artwork, encoder, and media objects
+are never included in the upload plan or charged as new publication bytes.
+
 ## Presentation modes
 
 | Mode | What `animation_url` contains | Byte storage | Runtime dependency |
@@ -87,6 +116,25 @@ p5 and a creator copy of Brotli WASM. Use the Node-side
 - `buildKeelInlineLocalDocument` assembles the exact local sandbox document;
 - `buildKeelInlinePreEncodedTokenURIGraph` produces the one publishable ordered
   graph: shell top, project-selected middle, creator entry, shell bottom.
+
+Prepared publication has two explicit carriage choices. It never switches one
+silently:
+
+- `buildKeelInlinePreEncodedTokenURIGraph` is the legacy/read-gas Base64 lane;
+  decoding the outer metadata reveals `data:text/html;base64,...`.
+- `buildKeelInlineEscapedTokenURIGraph` is the compact saver lane; decoding the
+  outer metadata reveals `data:text/html;charset=utf-8,...`. Only parser
+  delimiters are percent-escaped, so embedded gzip `storedBase64` strings keep
+  their `+`, `/`, and `=` bytes without another expansion.
+- `compareKeelInlineTokenURICarriages` builds and measures both, returning the
+  smaller mode and exact byte savings without selecting publication bytes.
+
+The compact graph uses
+`application/vnd.keel.token-uri-percent-fragment` and
+`buildKeelPreparedOneOfOneTokenURI` reports
+`requiredBuilder: "KeelPercentTokenURIBuilder"`. The ordinary Base64 graph
+continues to require `KeelHarnessBuilder`. The separate builder binding is a
+hard validation boundary, not a caller convention.
 
 ### Normal image, video, and 3D works
 

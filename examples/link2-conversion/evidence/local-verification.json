@@ -1,0 +1,11 @@
+{
+  "status": "local-byte-integrity-pass",
+  "resources": 247,
+  "verifiedOriginalBytes": 234410717,
+  "exactSourceAndDecompression": true,
+  "mp4Implemented": false,
+  "mp4Verified": false,
+  "canonicalShellVerified": false,
+  "wholeCollectionPresent": false,
+  "publicationReady": false
+}

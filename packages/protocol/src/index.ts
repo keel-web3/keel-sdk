@@ -29,3 +29,6 @@ export * from "./keel-rpc-policy.js";
 export * from "./keel-rpc.js";
 export * from "./wake-uri.js";
 export * from "./harness-tree.js";
+
+export * from "./keel-release-policy.js";
+export * from "./bitcoin-proof.js";

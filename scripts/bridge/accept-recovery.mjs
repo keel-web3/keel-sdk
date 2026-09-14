@@ -1,0 +1,45 @@
+/** Exercise the real cold-backup flow on the disposable bridge deployment. */
+import fs from 'node:fs';
+import {createPublicClient,createWalletClient,http,defineChain,encodeFunctionData,encodeAbiParameters,keccak256,toHex} from 'viem';
+import {privateKeyToAccount} from 'viem/accounts';
+import {readBitcoinAttachment} from '../../packages/sdk/dist/bitcoin-proof.js';
+const [acceptanceFile,proofFile,contractsRoot='/Users/ravonus/dev/keel-contracts']=process.argv.slice(2);
+const a=JSON.parse(fs.readFileSync(acceptanceFile)),proof=JSON.parse(fs.readFileSync(proofFile));
+if(!['localhost','127.0.0.1'].includes(new URL(a.rpc).hostname)||a.chainId!==31337)throw Error('Disposable chain required');
+const chain=defineChain({id:31337,name:'Local recovery acceptance',nativeCurrency:{name:'Ether',symbol:'ETH',decimals:18},rpcUrls:{default:{http:[a.rpc]}}});
+const account=privateKeyToAccount('0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80');
+const reader=createPublicClient({chain,transport:http(a.rpc)}),wallet=createWalletClient({chain,account,transport:http(a.rpc)});
+const manager=a.addresses.KeelManagerProxy,controller=a.addresses.KeelProofUpgradeController,profileId=a.profileId;
+const abi=n=>JSON.parse(fs.readFileSync(contractsRoot+'/out/'+n+'.sol/'+n+'.json')).abi;
+const reads=(n,address,fn,args=[])=>reader.readContract({address,abi:abi(n),functionName:fn,args});
+const transactions=[];
+async function write(n,address,fn,args=[]){const simulation=await reader.simulateContract({address,abi:abi(n),functionName:fn,args,account});const hash=await wallet.writeContract(simulation.request);const receipt=await reader.waitForTransactionReceipt({hash});if(receipt.status!=='success')throw Error(fn+' reverted');transactions.push({action:fn,hash,gasUsed:receipt.gasUsed});return simulation.result;}
+const sorted=keys=>keys.map(k=>privateKeyToAccount(toHex(k,{size:32}))).sort((x,y)=>x.address.toLowerCase().localeCompare(y.address.toLowerCase()));
+let governors=sorted([1n,2n,3n]);const incoming=sorted([4n,5n,6n]),cold=privateKeyToAccount(toHex(0xC01Dn,{size:32}));
+const signature=async(signer,hash)=>({signer:signer.address,signature:await signer.sign({hash})});
+const deadline=(await reader.getBlock()).timestamp+3600n;
+async function govern(target,data){const action={target,value:0n,data};const digest=await reads('KeelManager',manager,'governanceActionDigest',[action,deadline]);return write('KeelManager',manager,'executeGovernance',[action,deadline,await Promise.all(governors.slice(0,2).map(g=>signature(g,digest)))]);}
+const recovery=await reads('KeelManagerProxy',manager,'recoveryGroups'),scope=await reads('KeelManagerProxy',manager,'RECOVERY_SCOPE');
+const salt=keccak256(toHex('bridge-cold-acceptance'));
+const groupId=keccak256(encodeAbiParameters([{type:'address'},{type:'bytes32'}],[account.address,salt]));
+let digest=await reads('KeelRecoveryGroups',recovery,'rosterDigest',[groupId,[cold.address],true,deadline]);
+let possession=await reads('KeelRecoveryGroups',recovery,'acceptanceDigest',[digest,cold.address]);
+await write('KeelRecoveryGroups',recovery,'createGroup',[salt,[cold.address],true,deadline,[await signature(cold,possession)]]);
+const bindingHash=await reads('KeelRecoveryGroups',recovery,'bindingHash',[groupId,0n]);
+digest=await reads('KeelRecoveryGroups',recovery,'actionDigest',[groupId,manager,scope,bindingHash,deadline]);
+await govern(manager,encodeFunctionData({abi:abi('KeelManagerProxy'),functionName:'configureBackup',args:[groupId,0n,deadline,[],[await signature(cold,digest)]]}));
+await govern(controller,encodeFunctionData({abi:abi('KeelProofUpgradeController'),functionName:'suspend',args:[profileId]}));
+const next=incoming.map(g=>g.address),actionHash=keccak256(encodeAbiParameters([{type:'address[]'}],[next]));
+digest=await reads('KeelRecoveryGroups',recovery,'boundDigest',[manager,scope,actionHash,deadline]);
+const acceptances=await Promise.all(incoming.map(async g=>signature(g,await reads('KeelRecoveryGroups',recovery,'acceptanceDigest',[digest,g.address]))));
+await write('KeelManagerProxy',manager,'recoverGovernors',[next,deadline,[await signature(cold,digest)],acceptances]);
+let retiredRejected=false;try{await govern(controller,encodeFunctionData({abi:abi('KeelProofUpgradeController'),functionName:'approve',args:[profileId]}));}catch{retiredRejected=true;}if(!retiredRejected)throw Error('Retired governors still approve');
+governors=incoming;
+await govern(controller,encodeFunctionData({abi:abi('KeelProofUpgradeController'),functionName:'approve',args:[profileId]}));
+const proposal=await reads('KeelProofUpgradeController',controller,'proposal',[profileId]);
+let earlyActivationRejected=false;try{await reader.simulateContract({address:controller,abi:abi('KeelProofUpgradeController'),functionName:'activate',args:[profileId],account});}catch{earlyActivationRejected=true;}if(!earlyActivationRejected)throw Error('Recovery bypassed review delay');
+await reader.request({method:'evm_setNextBlockTimestamp',params:[Number(proposal.readyAt)]});await reader.request({method:'evm_mine'});
+await write('KeelProofUpgradeController',controller,'activate',[profileId]);
+const readback=await readBitcoinAttachment({publicClient:reader,expectedChainId:31337,adapter:a.addresses.KeelZkAnchorVerifier,anchorId:a.first.anchorId,currentBlockHash:a.accepted.readback.receipt.blockHash,sourcePath:proof.sourceBlockPath});
+if(!readback.recordedAcceptance||!readback.profileAdmitted||readback.receipt.evidenceHash!==a.accepted.readback.receipt.evidenceHash)throw Error('Recovery changed historical acceptance');
+fs.writeFileSync(acceptanceFile+'.cold-recovery.json',JSON.stringify({recovery,groupId,incoming:next,retiredRejected,earlyActivationRejected,reviewReadyAt:proposal.readyAt,transactions,readback},(_,v)=>typeof v==='bigint'?v.toString():v,2)+'\n');console.log('Cold recovery, retired-key rejection, full review delay and historical receipt passed');

@@ -70,7 +70,10 @@ async function prepareResource(asset: NormalizedStudioAsset): Promise<PreparedSt
   // tiny orchestration documents, so keep them contract-readable and let
   // heavyweight scripts/assets use the ordinary compression policy.
   const contractReadable = (asset.entrypoint && asset.mediaType === "text/html")
-    || asset.mediaType === "application/vnd.keel.token-uri-base64-fragment";
+    || asset.mediaType === "application/vnd.keel.token-uri-base64-fragment"
+    || asset.mediaType === "application/vnd.keel.token-uri-percent-fragment"
+    || asset.mediaType === "application/vnd.keel.token-uri-raw-percent-fragment"
+    || asset.mediaType === "application/vnd.keel.token-uri-base64-body-fragment";
   const selected = contractReadable
     ? { compression: "none" as const, bytes: asset.bytes.slice() }
     : await chooseSmallestCompression(asset.bytes);
@@ -242,8 +245,13 @@ function ensureEntrypoint(
   description: string | undefined,
   flashRuntime?: FlashWrapperResources,
 ): readonly NormalizedStudioAsset[] {
-  const inlineGraphMediaType = "application/vnd.keel.token-uri-base64-fragment";
-  const selected = assets.find((asset) => asset.entrypoint && (asset.mediaType === "text/html" || asset.mediaType === inlineGraphMediaType)) ??
+  const inlineGraphMediaTypes = new Set([
+    "application/vnd.keel.token-uri-base64-fragment",
+    "application/vnd.keel.token-uri-percent-fragment",
+    "application/vnd.keel.token-uri-raw-percent-fragment",
+    "application/vnd.keel.token-uri-base64-body-fragment",
+  ]);
+  const selected = assets.find((asset) => asset.entrypoint && (asset.mediaType === "text/html" || inlineGraphMediaTypes.has(asset.mediaType))) ??
     assets.find((asset) => asset.mediaType === "text/html");
   if (selected !== undefined) {
     return assets.map((asset) => ({ ...asset, entrypoint: asset.id === selected.id }));

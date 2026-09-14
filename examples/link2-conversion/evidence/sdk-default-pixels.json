@@ -1,0 +1,11 @@
+{
+  "sdkDefaultQuality": 82,
+  "effort": 6,
+  "originalBytes": 113406,
+  "candidateBytes": 94002,
+  "pixelIdentical": false,
+  "changedChannels": 1479682,
+  "maxChannelDelta": 48,
+  "applied": false,
+  "reason": "User requires unchanged pixels."
+}

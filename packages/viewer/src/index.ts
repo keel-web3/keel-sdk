@@ -12,6 +12,7 @@ export * from "./registry-adapter.js";
 export * from "./keel-adapter.js";
 export * from "./ip-control.js";
 export * from "./plugin-adapter.js";
+export * from "./published-view-intents.js";
 export * from "./plugin-bridge.js";
 export * from "./host-bridge.js";
 export * from "./presentation-bridge.js";

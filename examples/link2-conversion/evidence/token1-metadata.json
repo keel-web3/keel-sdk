@@ -1,0 +1,31 @@
+{
+  "chainId": 1,
+  "contract": "0xac7e693f337739b195a5eef321aa62921d314085",
+  "tokenId": "1",
+  "uri": "data:application/json;base64,eyJuYW1lIjoiTGluayAyICMxIiwiZGVzY3JpcHRpb24iOiJHeXNpbi1WYW5ldHRpXG5MaW5rIDJcbjIwMjVcbkN1c3RvbSBzb2Z0d2FyZSBhbmQgaGFyZHdhcmUuXG5WYXJpYWJsZSBkaW1lbnNpb25zLCBzaWxlbnQuXG5FZGl0aW9uIG9mIDIyICh1bmlxdWUpXG5cblRoaXMgc2Vjb25kIHZlcnNpb24gb2YgTGluaywgYSBzdG9wLW1vdGlvbiBzZXF1ZW5jZSBjcmVhdGVkIHRocm91Z2ggbG9uZy1leHBvc3VyZSBwaG90b2dyYXBoeSwgY29uc2lzdHMgb2YgMjIgZ2VuZXJhdGl2ZSBsb29wcywgd2l0aCBlYWNoIHNlcXVlbmNlIGNvbXByaXNpbmcgYmV0d2VlbiA0OCBhbmQgMTkyIGluZGl2aWR1YWwgbG9uZy1leHBvc3VyZSBwaG90b2dyYXBocy5cbk1pbWkgTmd1eWVuIFdhaGVkOiBcIlsuLi5dTGluayB3YXMgY3JlYXRlZCB0aHJvdWdoIHRoaXMgZWxhYm9yYXRlIG1lY2hhbmljYWwgcHJvY2VzcyB0aGF0IGJvcmRlcnMgb24gdGhlIG9ic2Vzc2l2ZS4gRWFjaCBmcmFtZSByZXN1bHRzIGZyb20gbG9uZyBleHBvc3VyZSBvZiBhbiBMRUQgYXJyYXkgbW92ZWQgYnkgYSBkcmF3aW5nIHBsb3R0ZXIsIGxlYXZpbmcgcHJlY2lzZSBsaWdodCB0cmFpbHMgdGhhdCBhY2N1bXVsYXRlIGludG8gaW1hZ2luYXJ5IGdlb21ldHJpYyBmb3Jtcy4gVGhlIGdlb21ldHJpYyBsaWdodC1mb3JtcyBmbG9hdCBpbiBjb21wbGV0ZSBkYXJrbmVzcywgdGhlaXIgdHJhaWxzIGxlYXZpbmcgcHJlY2lzZSBtYXJrcyBpbiBwaHlzaWNhbCBzcGFjZS4gV2hhdCBtYWtlcyB0aGVzZSBpbWFnZXMgdW5jYW5ueSBpcyBzZWVpbmcgdGhlIHJlZmxlY3Rpb25zIG9uIHRoZSBmbG9vciBiZW5lYXRoLCBwcm9vZiB0aGVzZSBhcmVuJ3QgZGlnaXRhbCBlZmZlY3RzIGJ1dCBhY3R1YWwgbGlnaHQgbW92aW5nIHRocm91Z2ggYWN0dWFsIHNwYWNlIGp1c3QgbGlrZSBlcGhlbWVyYWwgc2N1bHB0dXJlcyBtYWRlIGZyb20gbm90aGluZyBidXQgbGlnaHQgYW5kIHRpbWUuXCJcblRvIG1haW50YWluIHRoZSBwaG90b2dyYXBoaWMgb3JpZ2luIG9mIHRoZSBwcm9qZWN0LCB0aGUgcGxheWJhY2sgb2YgZWFjaCBlZGl0aW9uIGlzIGhhbmRsZWQgYnkgYSBjdXN0b20gc2NyaXB0IHRoYXQgc2VxdWVuY2VzIHRoZSBpbmRpdmlkdWFsIGltYWdlcy4gVGhlIHNjYWxlLCBkaXJlY3Rpb24sIGFuZCBzcGVlZCBjYW4gYmUgbW9kaWZpZWQgaW50ZXJhY3RpdmVseS5cbkVhY2ggZWRpdGlvbiBjb250YWlucyB0d28gaW1hZ2Ugc2V0czogYSBmdWxsLXJlc29sdXRpb24gc2V0LCBkaXJlY3QgZnJvbSB0aGUgY2FtZXJhIHNlbnNvciwgb25seSBzbGlnaHRseSBjcm9wcGVkLCB3aXRoIG1ldGFkYXRhIGludGFjdCBhdCA0NjAwcHggcGVyIHNpZGUgYW5kIGEgc21hbGxlciwgbGlnaHRlciB2ZXJzaW9uIGF0IDE2MDBweCBmb3Igc21vb3RoIHBsYXliYWNrLiIsImltYWdlIjoiaHR0cHM6Ly9hcndlYXZlLm5ldC9VSzI3R01zaUVOMjJDZ2tjUHBvYXRBaDd0dHdHZXNOVTViNU1NODQ5WkZZL2RhdGEvMS80NjAwLzFfMDAwLmpwZyIsImFuaW1hdGlvbl91cmwiOiJodHRwczovL2Fyd2VhdmUubmV0L1VLMjdHTXNpRU4yMkNna2NQcG9hdEFoN3R0d0dlc05VNWI1TU04NDlaRlkvaW5kZXguaHRtbD9pZD0xIiwiZXh0ZXJuYWxfdXJsIjoiaHR0cHM6Ly9saW5rMi5neXNpbi12YW5ldHRpLmNvbSIsImF0dHJpYnV0ZXMiOlt7InRyYWl0X3R5cGUiOiJmcmFtZXMiLCJ2YWx1ZSI6IjQ4In0seyJ0cmFpdF90eXBlIjoidmFyIiwidmFsdWUiOiJmYWxzZSJ9LHsidHJhaXRfdHlwZSI6InN0cnVjdHVyZSIsInZhbHVlIjoiTGluZXMifSx7InRyYWl0X3R5cGUiOiJzaGFwZSIsInZhbHVlIjoiQ2lyY2xlIn1dfQ==",
+  "metadata": {
+    "name": "Link 2 #1",
+    "description": "Gysin-Vanetti\nLink 2\n2025\nCustom software and hardware.\nVariable dimensions, silent.\nEdition of 22 (unique)\n\nThis second version of Link, a stop-motion sequence created through long-exposure photography, consists of 22 generative loops, with each sequence comprising between 48 and 192 individual long-exposure photographs.\nMimi Nguyen Wahed: \"[...]Link was created through this elaborate mechanical process that borders on the obsessive. Each frame results from long exposure of an LED array moved by a drawing plotter, leaving precise light trails that accumulate into imaginary geometric forms. The geometric light-forms float in complete darkness, their trails leaving precise marks in physical space. What makes these images uncanny is seeing the reflections on the floor beneath, proof these aren't digital effects but actual light moving through actual space just like ephemeral sculptures made from nothing but light and time.\"\nTo maintain the photographic origin of the project, the playback of each edition is handled by a custom script that sequences the individual images. The scale, direction, and speed can be modified interactively.\nEach edition contains two image sets: a full-resolution set, direct from the camera sensor, only slightly cropped, with metadata intact at 4600px per side and a smaller, lighter version at 1600px for smooth playback.",
+    "image": "https://arweave.net/UK27GMsiEN22CgkcPpoatAh7ttwGesNU5b5MM849ZFY/data/1/4600/1_000.jpg",
+    "animation_url": "https://arweave.net/UK27GMsiEN22CgkcPpoatAh7ttwGesNU5b5MM849ZFY/index.html?id=1",
+    "external_url": "https://link2.gysin-vanetti.com",
+    "attributes": [
+      {
+        "trait_type": "frames",
+        "value": "48"
+      },
+      {
+        "trait_type": "var",
+        "value": "false"
+      },
+      {
+        "trait_type": "structure",
+        "value": "Lines"
+      },
+      {
+        "trait_type": "shape",
+        "value": "Circle"
+      }
+    ]
+  }
+}

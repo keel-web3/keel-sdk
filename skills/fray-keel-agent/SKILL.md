@@ -12,6 +12,14 @@ or module records.
 
 ## Always begin with a plan
 
+For discovery across the SDK, MCP, or desktop editor, first read
+`keel://mcp/engine` or call `keel-engine-catalog`. Use `keel-project-decisions`
+to preserve known answers and return at most three `nextQuestions` at a time.
+Only ask those questions; do not restart a completed intake. The planner's
+`planned` status is a direction, never publication readiness or permission.
+See [engine-and-contracts.md](references/engine-and-contracts.md) for defaults,
+contract/proxy tracking, independent access domains, and ABI controls.
+
 For every new creation, conversion, release, collection, sale, claim, or Fray
 auction, enter an explicit planning phase before staging or writing anything.
 Use the host's plan mode when available, then request the MCP prompt
@@ -79,6 +87,48 @@ its implementation details into project files.
    selected chain, contract lane, and current creator nonce are exact. MCP output
    remains review-only.
 
+## Apply the Inline saver automatically
+
+For every Inline work, call `keel-inline-prepare` without a carriage override.
+Its default compact route uses the raw-percent builder: creator binary assets
+receive their one required resource-slot packing, while the complete HTML and
+metadata receive no additional Base64 wrapper. Never ask the creator to opt in
+to this saving.
+
+Declare libraries and executable runtimes under `modules`; declare artwork,
+animation, palettes, timing, and project data under `assets`. Never hide a
+large Base64 payload inside the entry HTML or label creator media as a reusable
+once-per-chain module. Select `percent`, `follow-latest`, or `pinned` only when
+the creator explicitly requests that exact legacy carriage and accepts its
+measured overhead.
+
+Before staging, report the original creator source bytes, creator graph bytes,
+complete prepared tokenURI bytes, packing-layer count, and percentage overhead.
+Fail before publication when the complete prepared tokenURI exceeds the Inline
+public-read ceiling. One RFC 4648 Base64 layer adds approximately 33 percent
+before small envelope costs.
+
+## Revise one module without republishing the work
+
+When a target token, shell, module, or resource graph already exists, derive
+that fact from Studio or selected-chain state. Do not ask the creator whether
+this is a “new object” or a “graph revision.” Call `keel-revision-plan` with
+the live graph, the candidate next version, and exactly one changed logical
+resource before `upload-plan` or `publish-plan`.
+
+The gate must reuse every undeclared resource by exact object ID, digest,
+version, role, media type, and byte length. Never upload the artwork, encoder,
+shell, or another module again to make a viewer/CSS fix. The upload digest must
+match the single accepted delta. For a follow-latest binding, publish and
+activate the new graph/module version and do not rewrite token presentation.
+For a pinned binding, update only the small binding after the version exists.
+An unrelated change, redundant identical object, non-sequential version, or
+automatic delta above 65,536 stored bytes stops before wallet review.
+
+Show new stored bytes and reused onchain bytes separately. Never describe
+reused bytes as upload cost. This is automatic platform behavior, not a saving
+the creator must request.
+
 For large objects, mode selection, gas accounting, retry, or recovery, read
 [publication-modes.md](references/publication-modes.md). Never silently change
 storage or presentation mode during a retry.
@@ -105,3 +155,9 @@ wallet, recovery, or live-chain step. In particular:
 
 For the portable MCP connection and local self-test, read
 [mcp-config.md](references/mcp-config.md).
+
+## Layered candidate pools and curated sets
+
+For layered collections, use the desktop `keel_layer_curation` tool to read the pool/set, generate a bounded batch, propose assignments/reordering or inspect rarity. Use candidate IDs to inspect original choices. Edits produce exact project review cards. The portable MCP `keel-layered-curation` tool offers pure local planning from bounded JSON and never changes the workspace by itself.
+
+Saved candidates retain their original generator version, seed, draw token ID and trait/variant pins. Do not regenerate a curated piece from its new set position. Rarity targets guide selection; they do not alter saved pieces. Curated, seeded and mixed modes need a verified collection allocation adapter before publication. Keep private set plans and unrevealed traits out of public metadata. The layer importer preserves originals and verifies eligible PNG-to-lossless-WebP conversion; visible artwork is canvas-composed PNG for saving. Do not call arbitrary imported WebP lossless without proof, or claim legacy-generator parity from filenames alone.

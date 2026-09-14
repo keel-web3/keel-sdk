@@ -1,0 +1,65 @@
+{
+  "jsonrpc": "2.0",
+  "id": 3,
+  "result": {
+    "content": [
+      {
+        "type": "text",
+        "text": "{\"schema\":\"keel-media-optimization-plan@1\",\"mode\":\"dry-run\",\"status\":\"ready-for-explicit-apply\",\"input\":{\"path\":\"/Users/ravonus/dev/keel-sdk/examples/link2-conversion/original/data/1/1600/1_000.webp\",\"fileName\":\"1_000.webp\",\"mediaType\":\"image/webp\",\"kind\":\"image\",\"beforeBytes\":113406,\"integrity\":{\"algorithm\":\"sha256\",\"digest\":\"0x93e486651661a78b338ed4633afaf8f029ba9adcf77e0641d126b7e1e678ce11\",\"byteLength\":113406}},\"output\":{\"mediaType\":\"image/webp\",\"extension\":\".webp\",\"integrity\":{\"algorithm\":\"sha256\",\"digest\":\"0xdbd2d33aeb012891bd7de015d614d14e0d5cf45b41348ecac02d8d12be5a2707\",\"byteLength\":94002}},\"measurements\":{\"beforeBytes\":113406,\"afterBytes\":94002,\"savedBytes\":19404,\"percentSaved\":17.11,\"smaller\":true,\"state\":\"measured-in-memory\"},\"settings\":{\"adapter\":\"sharp-webp\",\"quality\":82,\"effort\":6},\"capability\":{\"kind\":\"image\",\"adapter\":\"sharp-webp\",\"available\":true,\"version\":\"0.35.3\"},\"sourceRetention\":{\"policy\":\"preserve-source\",\"sourceRemoved\":false},\"storage\":{\"selectedMode\":null,\"changed\":false}}"
+      }
+    ],
+    "structuredContent": {
+      "schema": "keel-media-optimization-plan@1",
+      "mode": "dry-run",
+      "status": "ready-for-explicit-apply",
+      "input": {
+        "path": "/Users/ravonus/dev/keel-sdk/examples/link2-conversion/original/data/1/1600/1_000.webp",
+        "fileName": "1_000.webp",
+        "mediaType": "image/webp",
+        "kind": "image",
+        "beforeBytes": 113406,
+        "integrity": {
+          "algorithm": "sha256",
+          "digest": "0x93e486651661a78b338ed4633afaf8f029ba9adcf77e0641d126b7e1e678ce11",
+          "byteLength": 113406
+        }
+      },
+      "output": {
+        "mediaType": "image/webp",
+        "extension": ".webp",
+        "integrity": {
+          "algorithm": "sha256",
+          "digest": "0xdbd2d33aeb012891bd7de015d614d14e0d5cf45b41348ecac02d8d12be5a2707",
+          "byteLength": 94002
+        }
+      },
+      "measurements": {
+        "beforeBytes": 113406,
+        "afterBytes": 94002,
+        "savedBytes": 19404,
+        "percentSaved": 17.11,
+        "smaller": true,
+        "state": "measured-in-memory"
+      },
+      "settings": {
+        "adapter": "sharp-webp",
+        "quality": 82,
+        "effort": 6
+      },
+      "capability": {
+        "kind": "image",
+        "adapter": "sharp-webp",
+        "available": true,
+        "version": "0.35.3"
+      },
+      "sourceRetention": {
+        "policy": "preserve-source",
+        "sourceRemoved": false
+      },
+      "storage": {
+        "selectedMode": null,
+        "changed": false
+      }
+    }
+  }
+}

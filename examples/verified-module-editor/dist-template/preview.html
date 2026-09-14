@@ -1,0 +1,6 @@
+<!doctype html><html lang="en"><meta charset="utf-8"><title>KEEL module runtime check</title>
+<style>body{background:#eef2f5;color:#152436;font:18px/24px system-ui;max-width:800px;margin:40px 16px}h1{font-size:32px;line-height:40px;margin:0 0 24px}p{margin:24px 0}iframe{display:block;width:100%;height:500px;border:1px solid #ced6df;background:white}code{font-size:15px}</style>
+<h1>Verified module editor example</h1><p>The artwork imports the real thumbnail module. Its runtime comes from the SDK sandbox.</p>
+<p id="status">Waiting for initialization…</p><iframe title="Artwork" sandbox="allow-scripts" src="sandbox.html"></iframe>
+<p>This checks initialization and capture requests. It does not publish or mint anything.</p>
+<script>const frame=document.querySelector('iframe');addEventListener('message',event=>{if(event.source!==frame.contentWindow||event.data?.protocol!=='keel-thumbnail-capture@1')return;document.querySelector('#status').textContent=event.data.action==='capture'?'Capture request received: '+event.data.label:'Module initialized: '+event.data.label;document.body.dataset.lastAction=event.data.action;});</script></html>

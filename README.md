@@ -10,6 +10,30 @@ core, MCP server, examples, and local verification tooling. The EVM contracts
 and their Forge tests live in the sibling
 [`keel-contracts`](https://github.com/Ravonus/keel-contracts) repository.
 
+## Default storage and read path
+
+`buildKeelInlineTokenURIGraph(root)` is the shared default used by the SDK,
+MCP preparation, desktop preview measurements, and Studio publication plans.
+It prepares `application/vnd.keel.token-uri-raw-percent-fragment` objects for
+`KeelRawTokenURIBuilder`. Creator resources keep their single gzip/Base64
+transport slot for the shell decoder. Neither the complete HTML nor the complete
+metadata JSON receives a Base64 wrapper. Unsafe bytes are escaped once per URI
+boundary at preparation time; contract reads copy the prepared objects and only
+format the small live metadata/context envelope.
+
+The canonical shell source is packaged with the SDK, so consumers do not need a
+KEEL checkout as their working directory. Publication reuses the selected chain's
+verified shell and module objects. Only creator fragments and their composite
+references are added for a work. Missing compact infrastructure blocks publication;
+it never silently selects an older encoding. Explicit legacy carriage selections
+remain available for existing publications.
+
+Measure the complete returned tokenURI, including its image preview and metadata,
+before publication. Report one-time shared infrastructure, creator writes, and
+read gas separately. Graph size or compressed asset size alone is not a read-gas
+measurement. Studio requires receipt-backed compact catalog records and verifies
+collection compatibility before preparing its existing wallet review flow.
+
 ## Start here
 
 Requirements: Node.js 22 or newer and pnpm 10.15. Foundry is additionally
@@ -97,7 +121,7 @@ release artifacts are project inputs, never SDK modules or catalog entries.
 Build and self-test the local server:
 
 ```bash
-pnpm --filter @keel/mcp build
+pnpm build
 node packages/mcp/dist/cli.js --self-test --workspace /path/to/artwork
 ```
 
@@ -135,12 +159,12 @@ Other MCP clients can point at the same built CLI:
 }
 ```
 
-The server advertises focused tools plus four prompts and four static resources:
+The server advertises focused tools plus four prompts and five static resources:
 
 - `keel-project-plan` for intent discovery and a plan-first handoff;
 - `keel-asset-review`, `keel-draft-repair`, and `fray-auction-review`;
 - `keel://mcp/workflow`, `keel://mcp/limits`,
-  `keel://mcp/project-routes`, and `keel://mcp/publication-modes`.
+  `keel://mcp/project-routes`, `keel://mcp/publication-modes`, and `keel://mcp/engine`.
 
 The MCP does not sign, submit, claim faucet funds, fetch undeclared carrier
 bytes, or treat a plan as approval. Optional Studio operations are bounded to
@@ -215,3 +239,20 @@ proves the stored state or bytes at a block.
 
 Do not collapse these into one "verified" label. A live publication claim needs
 receipts and read-back; a viewer claim also needs browser/runtime evidence.
+
+## Local KEEL Editor
+
+The Electron desktop preview in [`apps/desktop`](apps/desktop/README.md) uses
+React, Tailwind, the Studio design, and shared SDK decisions. It includes local
+projects, object imports, module guidance, a multi-contract/collection registry,
+ABI-generated controls, public wallet identities, explicit memory, advisory
+local/API assistant adapters, and experimental isolated wallet-extension
+installation. Contract writes remain unsigned reviews.
+
+Run `pnpm desktop:build` then `pnpm desktop`. Read the
+[engine readiness audit](docs/KEEL_ENGINE_READINESS.md) for verified behavior
+and outstanding wallet, provider, publication and release gates.
+
+## Runtime module discovery
+
+See [runtime module discovery and reuse](docs/KEEL_RUNTIME_MODULE_DISCOVERY.md) for the shared SDK/API/MCP lookup, unverified module sandbox, coverage limits, and browser MP4 encoding workflow. Empty catalog results never authorize rebuilding an existing module.

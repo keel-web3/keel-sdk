@@ -256,3 +256,15 @@ export function assessKeelInlinePresentation(input: {
       : "The prepared tokenURI return is under 2 MB. KEEL must still prove the exact builder read stays within the selected chain's current public RPC gas boundary before wallet review.",
   };
 }
+
+/** The automatic saver stores final fragments; reads only concatenate them. */
+export const KEEL_INLINE_COMPACT_MEDIA_TYPE = "application/vnd.keel.token-uri-raw-percent-fragment" as const;
+export const KEEL_INLINE_CARRIAGES = ["compact", "raw-percent", "percent", "follow-latest", "pinned"] as const;
+export type KeelInlineCarriage = typeof KEEL_INLINE_CARRIAGES[number];
+
+export function resolveKeelInlineCarriage(carriage: string = "compact"): Exclude<KeelInlineCarriage, "compact"> {
+  if (!(KEEL_INLINE_CARRIAGES as readonly string[]).includes(carriage)) {
+    throw new TypeError(`Unsupported Inline carriage: ${carriage}.`);
+  }
+  return carriage === "compact" ? "raw-percent" : carriage as Exclude<KeelInlineCarriage, "compact">;
+}

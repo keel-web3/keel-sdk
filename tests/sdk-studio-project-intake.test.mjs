@@ -3,6 +3,14 @@ import test from "node:test";
 
 import { prepareKeelStudioProjectIntake } from "../packages/sdk/dist/studio-project-intake.js";
 
+test("limited edition intake asks for and preserves an exact positive supply", () => {
+  const input = { title: "Edition", description: "Twenty copies.", outcome: "release", chainId: 11155111, release: { type: "limited-edition", saleMechanism: "fixed-price", priceEth: "0.01" } };
+  assert.deepEqual(prepareKeelStudioProjectIntake(input).questions.map((q) => q.field), ["supply"]);
+  assert.equal(prepareKeelStudioProjectIntake({ ...input, release: { ...input.release, supply: "20" } }).releaseIntent.release.supply, "20");
+  assert.throws(() => prepareKeelStudioProjectIntake({ ...input, release: { ...input.release, supply: "0" } }), /positive/);
+  assert.throws(() => prepareKeelStudioProjectIntake({ ...input, release: { ...input.release, supply: (2n ** 256n).toString() } }), /uint256/);
+});
+
 test("ambiguous requests ask once whether storage or release is wanted", () => {
   const result = prepareKeelStudioProjectIntake({ title: "Seed Current", description: "A p5 work." });
   assert.equal(result.status, "needs-input");

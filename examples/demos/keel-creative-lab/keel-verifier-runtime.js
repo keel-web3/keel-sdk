@@ -194,13 +194,18 @@ async function readEmbeddedItem(item) {
 }
 
 async function resolveItem(item) {
-  if (envelope.deliveryProfile === "onchain-recursive") {
+  const onchain = async () => {
     const stored = await readOnchainObject(item);
     if (item.onchain?.storedIntegrity) await verify(stored, item.onchain.storedIntegrity, `${item.id} packed object`);
     const decoded = await decompress(item.onchain?.compression ?? "none", stored);
     return verify(decoded, item.integrity, item.id);
-  }
+  };
+  if (envelope.deliveryProfile === "onchain-recursive") return onchain();
   if (envelope.deliveryProfile === "embedded-assembled") return readEmbeddedItem(item);
+  if (envelope.deliveryProfile === "hybrid-mixed") {
+    if (item.embedded?.storedBase64 !== undefined) return readEmbeddedItem(item);
+    return onchain();
+  }
   throw new Error(`Unsupported delivery profile ${envelope.deliveryProfile}.`);
 }
 

@@ -1,0 +1,30 @@
+{
+  "request": {
+    "method": "tools/call",
+    "params": {
+      "name": "keel-library-search",
+      "arguments": {
+        "query": "encoder",
+        "limit": 25
+      }
+    }
+  },
+  "response": {
+    "jsonrpc": "2.0",
+    "id": 9,
+    "result": {
+      "content": [
+        {
+          "type": "text",
+          "text": "{\"schema\":\"fray-keel-agent@1\",\"status\":\"unconfigured\",\"query\":\"encoder\",\"message\":\"Set KEEL_STUDIO_URL or pass studioUrl to search a live Keel index. No carrier bytes were fetched.\"}"
+        }
+      ],
+      "structuredContent": {
+        "schema": "fray-keel-agent@1",
+        "status": "unconfigured",
+        "query": "encoder",
+        "message": "Set KEEL_STUDIO_URL or pass studioUrl to search a live Keel index. No carrier bytes were fetched."
+      }
+    }
+  }
+}

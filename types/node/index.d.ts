@@ -11,7 +11,26 @@ declare const process: {
   stderr: { write(value: string): void };
 };
 
+declare module 'node:net' {
+  interface Socket {
+    destroy(): void;
+    end(): void;
+    write(value: string): void;
+    setTimeout(milliseconds: number, callback: () => void): void;
+    on(event: 'data', callback: (chunk: Buffer) => void): this;
+    on(event: 'error', callback: (error: Error) => void): this;
+    on(event: 'connect' | 'end', callback: () => void): this;
+  }
+  export function createConnection(path: string): Socket;
+}
 declare class Buffer extends Uint8Array {
+  static alloc(size: number): Buffer;
+  write(value: string, offset?: number, length?: number, encoding?: string): number;
+  writeUInt32BE(value: number, offset?: number): number;
+  writeUInt16BE(value: number, offset?: number): number;
+  readUInt32BE(offset?: number): number;
+  equals(other: Uint8Array): boolean;
+  copy(target: Uint8Array, targetStart?: number, sourceStart?: number, sourceEnd?: number): number;
   static from(value: string | ArrayBuffer | ArrayLike<number>, encoding?: string): Buffer;
   static concat(values: readonly Uint8Array[]): Buffer;
   static byteLength(value: string, encoding?: string): number;
@@ -81,6 +100,10 @@ declare module "node:crypto" {
 }
 
 declare module "node:zlib" {
+  export function deflateRawSync(data: Uint8Array, options?: unknown): Buffer;
+  export function inflateRawSync(data: Uint8Array, options?: unknown): Buffer;
+  export function deflateSync(data: Uint8Array, options?: unknown): Buffer;
+  export function inflateSync(data: Uint8Array, options?: unknown): Buffer;
   export function brotliCompress(data: Uint8Array, options: unknown, callback: (error: Error | null, result: Buffer) => void): void;
   export function brotliDecompress(data: Uint8Array, callback: (error: Error | null, result: Buffer) => void): void;
   export function gzip(data: Uint8Array, options: unknown, callback: (error: Error | null, result: Buffer) => void): void;

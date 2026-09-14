@@ -1,5 +1,7 @@
 import { canonicalJson, createIntegrity, utf8ToBytes } from "@keel/protocol";
 import {
+  searchKeelRuntimeModules,
+  resolveKeelEndpoints,
   FRAY_AUCTION_POLICY_PROFILES,
   createFrayAuctionIntent,
   formatFrayAtomicAmount,
@@ -608,7 +610,7 @@ function safeStudioBase(value: string | undefined): string | undefined {
   if (value === undefined || value.trim().length === 0) return undefined;
   let url: URL;
   try { url = new URL(value); } catch { throw new TypeError("studioUrl must be an absolute URL."); }
-  if (url.protocol !== "https:" && !(url.protocol === "http:" && ["localhost", "127.0.0.1", "::1"].includes(url.hostname))) throw new TypeError("studioUrl must use HTTPS, except for loopback development.");
+  if (url.protocol !== "https:" && !(url.protocol === "http:" && ["localhost", "127.0.0.1", "[::1]"].includes(url.hostname))) throw new TypeError("studioUrl must use HTTPS, except for loopback development.");
   if (url.username || url.password) throw new TypeError("studioUrl must not contain credentials.");
   url.pathname = url.pathname.replace(/\/+$/u, "");
   url.search = "";
@@ -620,11 +622,17 @@ async function readJson(url: string, label: string): Promise<unknown> {
   const controller = new AbortController();
   const timeout = setTimeout(() => controller.abort(), 10_000);
   try {
-    const response = await fetch(url, { headers: { accept: "application/json" }, signal: controller.signal });
-    if (!response.ok) throw new Error(`${label} returned HTTP ${response.status}.`);
-    const text = await response.text();
-    if (new TextEncoder().encode(text).byteLength > 512 * 1024) throw new Error(`${label} response is too large.`);
-    return JSON.parse(text) as unknown;
+    const response = await fetch(url, { headers: { accept: "application/json" }, signal: controller.signal, redirect: "error" });
+    if (!response.ok) { await response.body?.cancel(); throw new Error(`${label} returned HTTP ${response.status}.`); }
+    const reader = response.body?.getReader(); if (!reader) throw new Error(`${label} returned no body.`);
+    const chunks: Uint8Array[] = []; let size = 0;
+    for (;;) {
+      const { value, done } = await reader.read(); if (done) break;
+      size += value.length;
+      if (size > 512 * 1024) { await reader.cancel(); throw new Error(`${label} response is too large.`); }
+      chunks.push(value);
+    }
+    return JSON.parse(Buffer.concat(chunks).toString("utf8")) as unknown;
   } finally {
     clearTimeout(timeout);
   }
@@ -670,30 +678,33 @@ function libraryCandidate(value: Record<string, unknown>): Record<string, unknow
 export async function searchKeelIndexes(input: { readonly studioUrl?: string; readonly query: string; readonly limit?: number }): Promise<unknown> {
   const query = boundedText(input.query, "query", 160);
   if (query === undefined) throw new TypeError("query is required.");
-  const base = safeStudioBase(input.studioUrl ?? process.env.KEEL_STUDIO_URL);
+  const base = safeStudioBase(input.studioUrl ?? process.env.KEEL_STUDIO_URL ?? resolveKeelEndpoints().studioUrl);
   if (base === undefined) return { schema: FRAY_AGENT_PROTOCOL, status: "unconfigured", query, message: "Set KEEL_STUDIO_URL or pass studioUrl to search a live Keel index. No carrier bytes were fetched." };
   const limit = Math.min(100, Math.max(1, Math.trunc(input.limit ?? 20)));
   const encoded = encodeURIComponent(query);
   const [libraryResult, moduleResult] = await Promise.allSettled([
     readJson(`${base}/api/library?q=${encoded}`, "Keel Library index"),
-    readJson(`${base}/api/modules?q=${encoded}`, "Keel module catalogue"),
+    searchKeelRuntimeModules({ studioUrl: base, query }),
   ]);
   const library = libraryResult.status === "fulfilled" ? arrayField(libraryResult.value, "assets").slice(0, limit).map(libraryCandidate) : [];
-  const modules = moduleResult.status === "fulfilled" ? arrayField(moduleResult.value, "modules").slice(0, limit) : [];
+  const modules = moduleResult.status === "fulfilled" ? moduleResult.value.modules.slice(0, limit) : [];
   const errors = [
+    ...(moduleResult.status === "fulfilled" ? moduleResult.value.sources.filter(source => !source.complete).map(source => `${source.source}: ${source.error}`) : []),
     ...(libraryResult.status === "rejected" ? [`library: ${libraryResult.reason instanceof Error ? libraryResult.reason.message : String(libraryResult.reason)}`] : []),
     ...(moduleResult.status === "rejected" ? [`modules: ${moduleResult.reason instanceof Error ? moduleResult.reason.message : String(moduleResult.reason)}`] : []),
   ];
   const total = library.length + modules.length;
   return {
     schema: FRAY_AGENT_PROTOCOL,
-    status: errors.length === 2 ? "unavailable" : errors.length === 1 ? "partial" : "ok",
+    status: libraryResult.status === "rejected" && moduleResult.status === "rejected" ? "unavailable" : errors.length > 0 ? "partial" : "ok",
     studioUrl: base,
     query,
     library,
     modules,
-    reuse: total === 0
-      ? { status: "none", action: "upload-new-bytes" }
+    reuse: errors.length > 0
+      ? { status: "incomplete-search", action: "retry-unavailable-indexes-before-deciding-reuse" }
+      : total === 0
+      ? { status: "not-indexed", action: "resolve-selected-chain-object-id-or-hash-before-proposing-new-bytes" }
       : total === 1
         ? { status: "candidate", action: "bind-after-exact-integrity-and-license-review" }
         : { status: "needs-selection", action: "ask-the-creator-to-select-one-exact-release" },

@@ -72,6 +72,7 @@ test("data URI and script encoders escape parser delimiters at the shared protoc
   assert.deepEqual(JSON.parse(serialized), { source, html: "</script><div>& >" });
   assert.equal(escapeJsonForScript('{"x":"|&<>"}'), '{"x":"|\\u0026\\u003c\\u003e"}');
   assert.equal(assertDataUriMediaType("application/vnd.keel.token-uri-base64-fragment"), "application/vnd.keel.token-uri-base64-fragment");
+  assert.equal(assertDataUriMediaType("application/vnd.keel.token-uri-percent-fragment"), "application/vnd.keel.token-uri-percent-fragment");
   assert.throws(() => assertDataUriMediaType("text/html\n<script>"), /Invalid data URI media type/u);
   assert.throws(() => assertDataUriMediaType("text/html;base64"), /Invalid data URI media type parameter/u);
 });

@@ -37,6 +37,7 @@ const DECIMAL = /^(?:0|[1-9][0-9]*)$/u;
 const OPERATION_ID = /^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$/u;
 
 const CREATOR_FACTORY_ABI = parseAbi([
+  "function createSeededERC721((string name,string symbol,uint256 maxSupply,address royaltyReceiver,uint96 royaltyBps,bytes32 metadataDigest) config,(bool useVrf,bool lockUntilReveal,uint32 futureBlockDelay,uint32 sourceGas,address source,uint8 transferStorage,uint8 mode) profile) returns (uint256 collectionId,address tokenContract)",
   "function createERC721((string name,string symbol,uint256 maxSupply,address royaltyReceiver,uint96 royaltyBps,bytes32 metadataDigest) config) returns (uint256 collectionId,address tokenContract)",
   "function createStandardERC721((string name,string symbol,uint256 maxSupply,address royaltyReceiver,uint96 royaltyBps,bytes32 metadataDigest) config) returns (uint256 collectionId,address tokenContract)",
   "function createERC1155((string name,string symbol,address royaltyReceiver,uint96 royaltyBps,bytes32 metadataDigest) config) returns (uint256 collectionId,address tokenContract)",
@@ -1021,7 +1022,7 @@ function journalFactoryCall(
   if (call.schema !== "keel.creator-collection-call@1" || call.status !== "review-only") throw new TypeError("factoryCall has an unsupported review schema.");
   if (call.chainId !== chainId || address(call.from, "factoryCall.from") !== creator || address(call.to, "factoryCall.to") !== factoryAddress) throw new TypeError("factoryCall does not match the durable owner, chain, or factory.");
   if (call.valueWei !== "0" || call.walletApproval !== "required" || call.signing !== "not-performed" || call.submission !== "not-performed") throw new TypeError("factoryCall contains an unsafe value or execution state.");
-  if (!Array.isArray(call.arguments) || !["createERC721", "createStandardERC721", "createERC1155", "createSharedERC1155", "registerExternalCollection"].includes(call.functionName)) throw new TypeError("factoryCall function or arguments are unsupported.");
+  if (!Array.isArray(call.arguments) || !["createSeededERC721", "createERC721", "createStandardERC721", "createERC1155", "createSharedERC1155", "registerExternalCollection"].includes(call.functionName)) throw new TypeError("factoryCall function or arguments are unsupported.");
   if (typeof call.data !== "string" || !/^0x(?:[0-9a-f]{2})+$/u.test(call.data)) throw new TypeError("factoryCall calldata is invalid.");
   let expectedData: Hex;
   try {

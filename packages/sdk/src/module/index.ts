@@ -5,3 +5,5 @@ export * from "./document.js";
 export * from "./scope.js";
 export * from "./external.js";
 export * from "./globals.js";
+export { defineTemplate, signal, mountTemplate } from "./template.js";
+export type { Signal, TemplateChild, TemplateNode } from "./template.js";

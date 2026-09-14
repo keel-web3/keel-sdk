@@ -14,7 +14,37 @@ Use the SDK terms exactly:
 - **Browser decoder**: committed browser/WASM code that verifies stored bytes,
   decompresses them, and verifies decoded bytes before execution.
 - **Inline**: the complete `animation_url` is assembled onchain. It contains no
-  `/content`, gateway, IPFS, or RPC fetch dependency.
+  `/content`, gateway, IPFS, or RPC fetch dependency. **This is the default for a
+  collector-facing work.** Reach it with `keel-inline-prepare`, never by hand.
+
+### Inline is the default, and `image` is part of it
+
+An agent that skips Inline almost always does the same thing: it leaves
+`previewImageURI` empty and puts a locator in the presentation. `KEEL721.tokenJSON`
+then falls back to the manifest URI —
+
+```solidity
+imageURI = bytes(previewImageURI).length != 0 ? previewImageURI : manifestURI;
+```
+
+— so `image` becomes `eip155:.../object/0x...`, which no marketplace can fetch.
+The token looks minted and is unreadable.
+
+Rules, in order:
+
+1. `image` is an inlined `data:` URI. Never `web3://`, `ipfs://`, `https://`, or a
+   bare manifest locator. `buildKeelPreparedOneOfOneTokenURI` enforces this;
+   `setDefaultPresentation` does not, so do not go around it.
+2. Keep the poster small. It is stored per token, and roughly 20,000 gas per
+   32 bytes. Around 12 KB is a good ceiling; a 30 KB string is ~19M gas and an RPC
+   will refuse the transaction as `gas limit too high`.
+3. The work itself is the graph, not the poster. Big bytes belong in KeelHold as
+   shared fragments, cast once per chain and named by every token that uses them.
+4. A `text/javascript` graph module MUST be a classic script that publishes a
+   global. The shell runs module JavaScript with `document.head.append(script)`,
+   so an ES module fails on `export`.
+5. WebAssembly in the graph needs the shell's wasm allowance, which is granted
+   only when an `application/wasm` item is actually present.
 - **Hybrid**: the shell and resources may all remain native KEEL storage, but
   the browser resolves exact objects through an RPC reader.
 - **IPFS**: explicitly selected IPFS delivery. Never infer it from Hybrid.
@@ -26,13 +56,36 @@ thin WASM module published once per chain; never silently place another copy in
 the creator payload. A missing declared decoder module stops before wallet
 review.
 
+### Existing graph revisions reuse everything unchanged
+
+Resolve the live selected-chain graph first and call `keel-revision-plan`.
+The automatic path accepts one declared changed resource and the exact next
+graph/resource versions. All other object IDs, digests, roles, media types,
+versions, and byte lengths must remain identical. Never use an existing work
+revision as a reason to rerun `upload-plan` for its artwork, shell, encoder, or
+other unchanged modules. `publish-plan` recomputes this gate and binds the
+upload digest to the accepted resource before wallet review.
+
+With `follow-latest`, publish and activate the next graph or module version and
+perform no token presentation write. With `pinned`, update only the small
+binding after publication. Report new stored bytes separately from onchain
+reused bytes. An undeclared change, redundant byte copy, non-sequential
+version, or automatic delta above 65,536 stored bytes is blocked. Studio must
+derive this workflow from the existing target; the creator does not opt in.
+
 For a small p5 work, prefer the Gzip p5 fragment with the browser
 Gzip/Deflate shell profile. Use `buildKeelInlineShellFragments`,
 `buildKeelInlineModuleFragment`, `buildKeelInlineLocalDocument`, and
-`buildKeelInlinePreEncodedTokenURIGraph`. Publish only that last ordered graph;
-the local document is a preview/build result, not another object lane. Studio
-must bind its shell and middle fragments to exact same-chain objects and report
-only the compressed creator entry as new payload bytes.
+`compareKeelInlineTokenURICarriages`. The comparison reports both explicit
+prepared graphs: legacy inner-Base64 via
+`buildKeelInlinePreEncodedTokenURIGraph`, and compact escaped HTML via
+`buildKeelInlineEscapedTokenURIGraph`. Record the selected mode before wallet
+review and publish only that ordered graph; never switch to the measured winner
+during retry or recovery. Compact graphs require
+`KeelPercentTokenURIBuilder`. The local document is a preview/build result, not
+another object lane. Studio must bind its shell and middle fragments to exact
+same-chain objects and report only the compressed creator entry as new payload
+bytes.
 
 Call `assessKeelInlinePresentation` before recommending Inline. The boot shell
 must be uncompressed HTML, the complete reconstructed document must stay at or

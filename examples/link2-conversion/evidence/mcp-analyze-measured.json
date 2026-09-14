@@ -1,0 +1,31 @@
+{
+  "jsonrpc": "2.0",
+  "id": 2,
+  "result": {
+    "content": [
+      {
+        "type": "text",
+        "text": "{\"schema\":\"keel-media-analysis@1\",\"input\":{\"fileName\":\"index.html\",\"mediaType\":\"text/html\",\"kind\":\"text\",\"byteLength\":3220,\"integrity\":{\"algorithm\":\"sha256\",\"digest\":\"0x9c0772f7215d384d792ac7b60e2571767b903e8c7d43f7de9dc9890044a18ace\",\"byteLength\":3220}},\"wrapper\":{\"supported\":false,\"strategy\":\"none\",\"reason\":\"The first builder slice wraps image media; this file is ready for a media-specific builder.\"}}"
+      }
+    ],
+    "structuredContent": {
+      "schema": "keel-media-analysis@1",
+      "input": {
+        "fileName": "index.html",
+        "mediaType": "text/html",
+        "kind": "text",
+        "byteLength": 3220,
+        "integrity": {
+          "algorithm": "sha256",
+          "digest": "0x9c0772f7215d384d792ac7b60e2571767b903e8c7d43f7de9dc9890044a18ace",
+          "byteLength": 3220
+        }
+      },
+      "wrapper": {
+        "supported": false,
+        "strategy": "none",
+        "reason": "The first builder slice wraps image media; this file is ready for a media-specific builder."
+      }
+    }
+  }
+}

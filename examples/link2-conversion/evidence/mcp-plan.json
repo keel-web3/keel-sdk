@@ -1,0 +1,27 @@
+{
+  "request": {
+    "method": "prompts/get",
+    "params": {
+      "name": "keel-project-plan",
+      "arguments": {
+        "request": "Convert Ethereum Link 2 0xac7e693f337739b195a5eef321aa62921d314085 using SDK/MCP defaults. Preserve all 22 editions and photographic frames, variation, random edition choice, 30 fps, scale/direction/scrubbing/pause/high-resolution/still-save controls. Compare lossless AVIF and WebP; accept only pixel-identical smaller files. Reuse existing MP4 encoder during loading; right-click Save MP4 once ready. Local preparation only; no mint or sale requested. Canonical shell, default storage selection from measured bytes."
+      }
+    }
+  },
+  "response": {
+    "jsonrpc": "2.0",
+    "id": 3,
+    "result": {
+      "description": "Intent-first, review-only KEEL project plan.",
+      "messages": [
+        {
+          "role": "user",
+          "content": {
+            "type": "text",
+            "text": "Plan this KEEL project before staging, uploading, preparing a wallet request, or changing chain state: `Convert Ethereum Link 2 0xac7e693f337739b195a5eef321aa62921d314085 using SDK/MCP defaults. Preserve all 22 editions and photographic frames, variation, random edition choice, 30 fps, scale/direction/scrubbing/pause/high-resolution/still-save controls. Compare lossless AVIF and WebP; accept only pixel-identical smaller files. Reuse existing MP4 encoder during loading; right-click Save MP4 once ready. Local preparation only; no mint or sale requested. Canonical shell, default storage selection from measured bytes.`. No structured choices were supplied. Planning aliases are not MCP tool arguments: translate them to the advertised schema instead of forwarding scope, runtime, outcome aliases, or textual chain verbatim. Call keel-studio-project-intake without outcome so it asks storage-only versus release; after the answer, use only outcome=\"storage-only\" or outcome=\"release\" in that tool. Resolve scope before an ordinary release, then map it to release.type; scope is not an intake-tool argument. Runtime belongs in the project plan and later staging/module route, not in keel-studio-project-intake. For an ordinary release, resolve the selected network to the numeric chainId expected by keel-studio-project-intake. Use keel-project-decisions for the full creator decision worksheet and keel://mcp/engine for collection, mint, access and module setup discovery. Carry forward known answers and ask only returned nextQuestions, at most three at a time. Suggestions require selection; saved memory is not wallet authority. OneMint and MintGate configurations use distinct SDK builders and must not be squeezed into the simpler Studio intake schema. Return an explicit plan with these headings: Intent, Project graph, Storage and presentation, Contracts and sale, Verification, Approval boundary, and Open questions. For every collector-facing viewer, use the registered canonical KEEL verification shell by omitting viewer. Never author, copy, shrink, replace, or upload a shell. viewer=none is only an explicit raw-artifact route with no viewer; it is not a custom-shell route. Read keel://mcp/project-routes for p5, Three.js, Doom WASM, Flash AS3, OneMint, collection, fixed-sale, claim, and Fray routing. Read keel://mcp/publication-modes before selecting or pricing a storage route. Search the KEEL library before planning duplicate reusable runtime bytes. Keep SDK/unit, Forge contract, module-catalog, browser/runtime, and live-chain evidence as separate plan gates. Local tests do not prove a browser render, receipt, public RPC read-back, or deployed module binding. Stop at a reviewable plan. Do not stage, upload, sign, submit, claim faucet funds, or infer approval from this prompt."
+          }
+        }
+      ]
+    }
+  }
+}

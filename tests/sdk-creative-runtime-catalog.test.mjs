@@ -9,8 +9,8 @@ import {
   searchKeelCreativeRuntimes,
 } from "../packages/sdk/dist/creative-runtime-catalog.js";
 
-test("[creative runtime catalog] p5, Three.js, Doom WASM, and Flash/Ruffle are locally discoverable", () => {
-  assert.deepEqual(listKeelCreativeRuntimes().map(({ id }) => id), ["p5", "three", "doom-wasm", "flash-ruffle"]);
+test("[creative runtime catalog] p5, Three.js, Doom WASM, Flash/Ruffle, Tone.js, and keel-audio are locally discoverable", () => {
+  assert.deepEqual(listKeelCreativeRuntimes().map(({ id }) => id), ["p5", "three", "doom-wasm", "flash-ruffle", "tone", "keel-audio"]);
   assert.deepEqual(getKeelCreativeRuntime("p5").resources.map(({ id, version }) => ({ id, version })), [
     { id: "p5-1-11-3", version: "1.11.3" },
     { id: "p5-1-7-0", version: "1.7.0" },

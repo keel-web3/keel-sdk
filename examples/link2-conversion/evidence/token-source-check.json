@@ -1,0 +1,29 @@
+{
+  "base": "https://arweave.net/UK27GMsiEN22CgkcPpoatAh7ttwGesNU5b5MM849ZFY/",
+  "report": [
+    {
+      "path": "index.html",
+      "status": 200,
+      "bytes": 3220,
+      "sha256": "295ae005436c5f2b50e37885b26718a7cbd593af37f47c9b4f970503878c022b"
+    },
+    {
+      "path": "js/js.js",
+      "status": 200,
+      "bytes": 10869,
+      "sha256": "6e6641821e245715549b8767a258bc944b686c5205271f1c1a5c14a89fcc1ebe"
+    },
+    {
+      "path": "manifest.json",
+      "status": 200,
+      "bytes": 988314,
+      "sha256": "adc0624e17cb613b48e3299f757fda497d170c1e6eaa53111ce0373ee4566e76"
+    },
+    {
+      "path": "data/1/1600/1_000.webp",
+      "status": 200,
+      "bytes": 113406,
+      "sha256": "93e486651661a78b338ed4633afaf8f029ba9adcf77e0641d126b7e1e678ce11"
+    }
+  ]
+}

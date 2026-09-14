@@ -2,7 +2,7 @@ import type { Hex } from "./types.js";
 
 export const KEEL_CREATIVE_RUNTIME_CATALOG_PROTOCOL = "keel-creative-runtime-catalog@1" as const;
 
-export type KeelCreativeRuntimeId = "p5" | "three" | "doom-wasm" | "flash-ruffle";
+export type KeelCreativeRuntimeId = "p5" | "three" | "doom-wasm" | "flash-ruffle" | "tone" | "keel-audio";
 export type KeelCreativeRuntimeAvailability = "local-source" | "external-source-required";
 
 export interface KeelCreativeRuntimeResource {
@@ -328,6 +328,63 @@ export const KEEL_CREATIVE_RUNTIME_CATALOG: readonly KeelCreativeRuntimeCatalogE
       "packages/sdk/src/studio-upload.ts",
       "packages/viewer/src/sandbox.ts",
       "tests/viewer.test.mjs",
+    ],
+  }),
+  entry({
+    id: "tone",
+    title: "Tone.js",
+    summary: "Tone.js 15.1.22 rebuilt as one native classic script (standardized-audio-context replaced by a Web Audio shim) for generative sound.",
+    availability: "local-source",
+    resources: [{
+      id: "tone-native",
+      version: "15.1.22",
+      mediaType: "text/javascript",
+      format: "classic-script",
+      role: "runtime",
+      referenceStatus: "active",
+      dependencies: [],
+      localPath: "examples/demos/vendor/tone-15.1.22.native.min.js",
+      integrity: {
+        algorithm: "sha256",
+        digest: "0x2ac828bae11ef2c28c26ca7eae78a5394726775fe51eb3222dcf5c268bd15483",
+        byteLength: 235_850,
+      },
+      sourceRepository: "https://github.com/Tonejs/Tone.js",
+      sourceRevision: "npm:tone@15.1.22",
+    }],
+    evidencePaths: [
+      "scripts/build-tone-native.mjs",
+      "examples/demos/vendor/tone-15.1.22-LICENSE.txt",
+      "tests/sdk-audio-module.test.mjs",
+      "docs/KEEL_AUDIO.md",
+    ],
+  }),
+  entry({
+    id: "keel-audio",
+    title: "KEEL audio runtime",
+    summary: "Shared keel-audio 1.0.0 sound runtime: one AudioContext, gesture-only start, master gain, visibility pause and a standard sound button.",
+    availability: "local-source",
+    resources: [{
+      id: "keel-audio",
+      version: "1.0.0",
+      mediaType: "text/javascript",
+      format: "classic-script",
+      role: "module",
+      referenceStatus: "active",
+      dependencies: [],
+      localPath: "packages/sdk/resources/keel-audio-1.0.0.min.js",
+      integrity: {
+        algorithm: "sha256",
+        digest: "0x75cbdc41afc1636c4c5fd1c8a0508e2dbef2ed0d0af4c66c14149bdc8983efd3",
+        byteLength: 8_405,
+      },
+      sourceRepository: "keel-sdk",
+      sourceRevision: "keel-audio@1.0.0",
+    }],
+    evidencePaths: [
+      "scripts/build-keel-audio.mjs",
+      "tests/sdk-keel-audio-runtime.test.mjs",
+      "docs/KEEL_AUDIO.md",
     ],
   }),
 ]);

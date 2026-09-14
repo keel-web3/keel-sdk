@@ -1,0 +1,799 @@
+{"total":6526,"done":100,"remaining":6426,"reused":50,"bytes":9570590,"seconds":2,"errors":0,"playbackComplete":false}
+{"total":6526,"done":200,"remaining":6326,"reused":52,"bytes":19483406,"seconds":5,"errors":0,"playbackComplete":false}
+{"total":6526,"done":300,"remaining":6226,"reused":53,"bytes":30670692,"seconds":8,"errors":0,"playbackComplete":false}
+{"total":6526,"done":400,"remaining":6126,"reused":55,"bytes":44658780,"seconds":11,"errors":0,"playbackComplete":false}
+{"total":6526,"done":500,"remaining":6026,"reused":56,"bytes":60303410,"seconds":13,"errors":0,"playbackComplete":false}
+{"total":6526,"done":600,"remaining":5926,"reused":59,"bytes":75644830,"seconds":16,"errors":0,"playbackComplete":false}
+{"total":6526,"done":700,"remaining":5826,"reused":61,"bytes":92093238,"seconds":19,"errors":0,"playbackComplete":false}
+{"total":6526,"done":800,"remaining":5726,"reused":62,"bytes":110247878,"seconds":22,"errors":0,"playbackComplete":false}
+{"total":6526,"done":900,"remaining":5626,"reused":68,"bytes":125543276,"seconds":25,"errors":0,"playbackComplete":false}
+{"total":6526,"done":1000,"remaining":5526,"reused":70,"bytes":139904658,"seconds":28,"errors":0,"playbackComplete":false}
+{"total":6526,"done":1100,"remaining":5426,"reused":71,"bytes":153093468,"seconds":36,"errors":0,"playbackComplete":false}
+{"total":6526,"done":1200,"remaining":5326,"reused":73,"bytes":167214686,"seconds":42,"errors":0,"playbackComplete":false}
+{"total":6526,"done":1300,"remaining":5226,"reused":74,"bytes":182457888,"seconds":46,"errors":0,"playbackComplete":false}
+{"total":6526,"done":1400,"remaining":5126,"reused":79,"bytes":197148204,"seconds":48,"errors":0,"playbackComplete":false}
+{"total":6526,"done":1500,"remaining":5026,"reused":82,"bytes":208804616,"seconds":51,"errors":0,"playbackComplete":false}
+{"total":6526,"done":1600,"remaining":4926,"reused":83,"bytes":218246078,"seconds":54,"errors":0,"playbackComplete":false}
+{"total":6526,"done":1700,"remaining":4826,"reused":86,"bytes":231644246,"seconds":57,"errors":0,"playbackComplete":false}
+{"total":6526,"done":1800,"remaining":4726,"reused":89,"bytes":242143338,"seconds":60,"errors":0,"playbackComplete":false}
+{"total":6526,"done":1900,"remaining":4626,"reused":91,"bytes":255765570,"seconds":63,"errors":0,"playbackComplete":false}
+{"total":6526,"done":2000,"remaining":4526,"reused":92,"bytes":270768892,"seconds":66,"errors":0,"playbackComplete":false}
+{"total":6526,"done":2100,"remaining":4426,"reused":97,"bytes":283960170,"seconds":68,"errors":0,"playbackComplete":false}
+{"total":6526,"done":2200,"remaining":4326,"reused":100,"bytes":295149662,"seconds":71,"errors":0,"playbackComplete":false}
+{"total":6526,"done":2300,"remaining":4226,"reused":101,"bytes":302189084,"seconds":74,"errors":0,"playbackComplete":false}
+{"total":6526,"done":2400,"remaining":4126,"reused":103,"bytes":309220742,"seconds":77,"errors":0,"playbackComplete":false}
+{"total":6526,"done":2500,"remaining":4026,"reused":106,"bytes":320394896,"seconds":80,"errors":0,"playbackComplete":false}
+{"total":6526,"done":2600,"remaining":3926,"reused":109,"bytes":330970232,"seconds":83,"errors":10,"playbackComplete":false}
+{"total":6526,"done":2700,"remaining":3826,"reused":110,"bytes":337973672,"seconds":86,"errors":63,"playbackComplete":false}
+{"total":6526,"done":2800,"remaining":3726,"reused":112,"bytes":345320832,"seconds":90,"errors":117,"playbackComplete":false}
+{"total":6526,"done":2900,"remaining":3626,"reused":113,"bytes":354737702,"seconds":93,"errors":163,"playbackComplete":false}
+{"total":6526,"done":3000,"remaining":3526,"reused":115,"bytes":363250092,"seconds":97,"errors":212,"playbackComplete":false}
+{"total":6526,"done":3100,"remaining":3426,"reused":116,"bytes":364206794,"seconds":101,"errors":305,"playbackComplete":false}
+{"total":6526,"done":3200,"remaining":3326,"reused":118,"bytes":364585502,"seconds":105,"errors":402,"playbackComplete":false}
+{"total":6526,"done":3300,"remaining":3226,"reused":169,"bytes":446775235,"seconds":107,"errors":448,"playbackComplete":false}
+{"total":6526,"done":3400,"remaining":3126,"reused":172,"bytes":451747333,"seconds":111,"errors":543,"playbackComplete":false}
+{"total":6526,"done":3500,"remaining":3026,"reused":173,"bytes":453589041,"seconds":115,"errors":642,"playbackComplete":false}
+{"total":6526,"done":3600,"remaining":2926,"reused":175,"bytes":459455618,"seconds":119,"errors":739,"playbackComplete":false}
+{"total":6526,"done":100,"remaining":6426,"reused":100,"bytes":9580264,"seconds":0,"errors":0,"playbackComplete":false}
+{"total":6526,"done":200,"remaining":6326,"reused":200,"bytes":19514020,"seconds":0,"errors":0,"playbackComplete":false}
+{"total":6526,"done":300,"remaining":6226,"reused":300,"bytes":30670692,"seconds":0,"errors":0,"playbackComplete":false}
+{"total":6526,"done":400,"remaining":6126,"reused":400,"bytes":44658524,"seconds":0,"errors":0,"playbackComplete":false}
+{"total":6526,"done":500,"remaining":6026,"reused":500,"bytes":60296898,"seconds":0,"errors":0,"playbackComplete":false}
+{"total":6526,"done":600,"remaining":5926,"reused":600,"bytes":75644830,"seconds":0,"errors":0,"playbackComplete":false}
+{"total":6526,"done":700,"remaining":5826,"reused":700,"bytes":92093238,"seconds":0,"errors":0,"playbackComplete":false}
+{"total":6526,"done":800,"remaining":5726,"reused":800,"bytes":110247878,"seconds":0,"errors":0,"playbackComplete":false}
+{"total":6526,"done":900,"remaining":5626,"reused":900,"bytes":125548482,"seconds":0,"errors":0,"playbackComplete":false}
+{"total":6526,"done":1000,"remaining":5526,"reused":1000,"bytes":139905550,"seconds":0,"errors":0,"playbackComplete":false}
+{"total":6526,"done":1100,"remaining":5426,"reused":1100,"bytes":153076810,"seconds":0,"errors":0,"playbackComplete":false}
+{"total":6526,"done":1200,"remaining":5326,"reused":1200,"bytes":167221298,"seconds":0,"errors":0,"playbackComplete":false}
+{"total":6526,"done":1300,"remaining":5226,"reused":1300,"bytes":182468214,"seconds":0,"errors":0,"playbackComplete":false}
+{"total":6526,"done":1400,"remaining":5126,"reused":1400,"bytes":197148204,"seconds":0,"errors":0,"playbackComplete":false}
+{"total":6526,"done":1500,"remaining":5026,"reused":1500,"bytes":208804616,"seconds":0,"errors":0,"playbackComplete":false}
+{"total":6526,"done":1600,"remaining":4926,"reused":1600,"bytes":218245470,"seconds":0,"errors":0,"playbackComplete":false}
+{"total":6526,"done":1700,"remaining":4826,"reused":1700,"bytes":231645430,"seconds":0,"errors":0,"playbackComplete":false}
+{"total":6526,"done":1800,"remaining":4726,"reused":1800,"bytes":242178022,"seconds":0,"errors":0,"playbackComplete":false}
+{"total":6526,"done":1900,"remaining":4626,"reused":1900,"bytes":255764356,"seconds":0,"errors":0,"playbackComplete":false}
+{"total":6526,"done":2000,"remaining":4526,"reused":2000,"bytes":270768892,"seconds":0,"errors":0,"playbackComplete":false}
+{"total":6526,"done":2100,"remaining":4426,"reused":2100,"bytes":283988226,"seconds":0,"errors":0,"playbackComplete":false}
+{"total":6526,"done":2200,"remaining":4326,"reused":2200,"bytes":295193730,"seconds":0,"errors":0,"playbackComplete":false}
+{"total":6526,"done":2300,"remaining":4226,"reused":2300,"bytes":302189196,"seconds":0,"errors":0,"playbackComplete":false}
+{"total":6526,"done":2400,"remaining":4126,"reused":2400,"bytes":309141746,"seconds":0,"errors":0,"playbackComplete":false}
+{"total":6526,"done":2500,"remaining":4026,"reused":2500,"bytes":320395676,"seconds":0,"errors":0,"playbackComplete":false}
+{"retry":"data/6/1600/6_088.webp","attempt":1,"error":"HTTP 429"}
+{"retry":"data/6/1600/6_084.webp","attempt":1,"error":"HTTP 429"}
+{"retry":"data/6/1600/6_086.webp","attempt":1,"error":"HTTP 429"}
+{"retry":"data/6/1600/6_087.webp","attempt":1,"error":"HTTP 429"}
+{"retry":"data/6/1600/6_086.webp","attempt":2,"error":"HTTP 429"}
+{"retry":"data/6/1600/6_088.webp","attempt":2,"error":"HTTP 429"}
+{"retry":"data/6/1600/6_084.webp","attempt":2,"error":"HTTP 429"}
+{"retry":"data/6/1600/6_087.webp","attempt":2,"error":"HTTP 429"}
+{"retry":"data/6/1600/6_084.webp","attempt":3,"error":"HTTP 429"}
+{"retry":"data/6/1600/6_086.webp","attempt":3,"error":"HTTP 429"}
+{"retry":"data/6/1600/6_088.webp","attempt":3,"error":"HTTP 429"}
+{"retry":"data/6/1600/6_087.webp","attempt":3,"error":"HTTP 429"}
+{"retry":"data/6/1600/6_086.webp","attempt":4,"error":"HTTP 429"}
+{"retry":"data/6/1600/6_087.webp","attempt":4,"error":"HTTP 429"}
+{"retry":"data/6/1600/6_088.webp","attempt":4,"error":"HTTP 429"}
+{"retry":"data/6/1600/6_084.webp","attempt":4,"error":"HTTP 429"}
+{"retry":"data/6/1600/6_086.webp","attempt":5,"error":"HTTP 429"}
+{"retry":"data/6/1600/6_088.webp","attempt":5,"error":"HTTP 429"}
+{"retry":"data/6/1600/6_087.webp","attempt":5,"error":"HTTP 429"}
+{"retry":"data/6/1600/6_084.webp","attempt":5,"error":"HTTP 429"}
+{"retry":"data/6/1600/6_086.webp","attempt":6,"error":"HTTP 429"}
+{"retry":"data/6/1600/6_084.webp","attempt":6,"error":"HTTP 429"}
+{"retry":"data/6/1600/6_087.webp","attempt":6,"error":"HTTP 429"}
+{"retry":"data/6/1600/6_088.webp","attempt":6,"error":"HTTP 429"}
+{"retry":"data/6/1600/6_094.webp","attempt":1,"error":"HTTP 429"}
+{"retry":"data/6/1600/6_091.webp","attempt":1,"error":"HTTP 429"}
+{"retry":"data/7_var/1600/7_002.webp","attempt":1,"error":"HTTP 429"}
+{"retry":"data/6/1600/6_090.webp","attempt":1,"error":"HTTP 429"}
+{"retry":"data/6/1600/6_094.webp","attempt":2,"error":"HTTP 429"}
+{"retry":"data/7_var/1600/7_002.webp","attempt":2,"error":"HTTP 429"}
+{"retry":"data/6/1600/6_091.webp","attempt":2,"error":"HTTP 429"}
+{"retry":"data/6/1600/6_090.webp","attempt":2,"error":"HTTP 429"}
+{"retry":"data/6/1600/6_094.webp","attempt":3,"error":"HTTP 429"}
+{"retry":"data/6/1600/6_091.webp","attempt":3,"error":"HTTP 429"}
+{"retry":"data/7_var/1600/7_002.webp","attempt":3,"error":"HTTP 429"}
+{"retry":"data/6/1600/6_090.webp","attempt":3,"error":"HTTP 429"}
+{"retry":"data/6/1600/6_091.webp","attempt":4,"error":"HTTP 429"}
+{"retry":"data/7_var/1600/7_002.webp","attempt":4,"error":"HTTP 429"}
+{"retry":"data/6/1600/6_094.webp","attempt":4,"error":"HTTP 429"}
+{"retry":"data/6/1600/6_090.webp","attempt":4,"error":"HTTP 429"}
+{"retry":"data/7_var/1600/7_002.webp","attempt":5,"error":"HTTP 429"}
+{"retry":"data/6/1600/6_091.webp","attempt":5,"error":"HTTP 429"}
+{"retry":"data/6/1600/6_090.webp","attempt":5,"error":"HTTP 429"}
+{"retry":"data/6/1600/6_094.webp","attempt":5,"error":"HTTP 429"}
+{"retry":"data/6/1600/6_090.webp","attempt":6,"error":"HTTP 429"}
+{"retry":"data/6/1600/6_091.webp","attempt":6,"error":"HTTP 429"}
+{"retry":"data/6/1600/6_094.webp","attempt":6,"error":"HTTP 429"}
+{"retry":"data/7_var/1600/7_002.webp","attempt":6,"error":"HTTP 429"}
+{"retry":"data/7_var/1600/7_010.webp","attempt":1,"error":"HTTP 429"}
+{"retry":"data/7_var/1600/7_004.webp","attempt":1,"error":"HTTP 429"}
+{"retry":"data/7_var/1600/7_005.webp","attempt":1,"error":"HTTP 429"}
+{"retry":"data/7_var/1600/7_009.webp","attempt":1,"error":"HTTP 429"}
+{"retry":"data/7_var/1600/7_010.webp","attempt":2,"error":"HTTP 429"}
+{"retry":"data/7_var/1600/7_004.webp","attempt":2,"error":"HTTP 429"}
+{"retry":"data/7_var/1600/7_005.webp","attempt":2,"error":"HTTP 429"}
+{"retry":"data/7_var/1600/7_009.webp","attempt":2,"error":"HTTP 429"}
+{"retry":"data/7_var/1600/7_010.webp","attempt":3,"error":"HTTP 429"}
+{"retry":"data/7_var/1600/7_009.webp","attempt":3,"error":"HTTP 429"}
+{"retry":"data/7_var/1600/7_004.webp","attempt":3,"error":"HTTP 429"}
+{"retry":"data/7_var/1600/7_005.webp","attempt":3,"error":"HTTP 429"}
+{"retry":"data/7_var/1600/7_010.webp","attempt":4,"error":"HTTP 429"}
+{"retry":"data/7_var/1600/7_005.webp","attempt":4,"error":"HTTP 429"}
+{"retry":"data/7_var/1600/7_009.webp","attempt":4,"error":"HTTP 429"}
+{"retry":"data/7_var/1600/7_004.webp","attempt":4,"error":"HTTP 429"}
+{"retry":"data/7_var/1600/7_009.webp","attempt":5,"error":"HTTP 429"}
+{"retry":"data/7_var/1600/7_004.webp","attempt":5,"error":"HTTP 429"}
+{"retry":"data/7_var/1600/7_010.webp","attempt":5,"error":"HTTP 429"}
+{"retry":"data/7_var/1600/7_005.webp","attempt":5,"error":"HTTP 429"}
+{"retry":"data/7_var/1600/7_004.webp","attempt":6,"error":"HTTP 429"}
+{"retry":"data/7_var/1600/7_005.webp","attempt":6,"error":"HTTP 429"}
+{"total":6526,"done":2600,"remaining":3926,"reused":2590,"bytes":330970232,"seconds":98,"errors":10,"playbackComplete":false}
+{"retry":"data/7_var/1600/7_010.webp","attempt":6,"error":"HTTP 429"}
+{"retry":"data/7_var/1600/7_009.webp","attempt":6,"error":"HTTP 429"}
+{"retry":"data/7_var/1600/7_013.webp","attempt":1,"error":"HTTP 429"}
+{"retry":"data/7_var/1600/7_011.webp","attempt":1,"error":"HTTP 429"}
+{"retry":"data/7_var/1600/7_016.webp","attempt":1,"error":"HTTP 429"}
+{"retry":"data/7_var/1600/7_014.webp","attempt":1,"error":"HTTP 429"}
+{"retry":"data/7_var/1600/7_013.webp","attempt":2,"error":"HTTP 429"}
+{"retry":"data/7_var/1600/7_011.webp","attempt":2,"error":"HTTP 429"}
+{"retry":"data/7_var/1600/7_016.webp","attempt":2,"error":"HTTP 429"}
+{"retry":"data/7_var/1600/7_014.webp","attempt":2,"error":"HTTP 429"}
+{"retry":"data/7_var/1600/7_013.webp","attempt":3,"error":"HTTP 429"}
+{"retry":"data/7_var/1600/7_011.webp","attempt":3,"error":"HTTP 429"}
+{"retry":"data/7_var/1600/7_016.webp","attempt":3,"error":"HTTP 429"}
+{"retry":"data/7_var/1600/7_014.webp","attempt":3,"error":"HTTP 429"}
+{"retry":"data/7_var/1600/7_013.webp","attempt":4,"error":"HTTP 429"}
+{"retry":"data/7_var/1600/7_011.webp","attempt":4,"error":"HTTP 429"}
+{"retry":"data/7_var/1600/7_016.webp","attempt":4,"error":"HTTP 429"}
+{"retry":"data/7_var/1600/7_014.webp","attempt":4,"error":"HTTP 429"}
+{"retry":"data/7_var/1600/7_013.webp","attempt":5,"error":"HTTP 429"}
+{"retry":"data/7_var/1600/7_011.webp","attempt":5,"error":"HTTP 429"}
+{"retry":"data/7_var/1600/7_016.webp","attempt":5,"error":"HTTP 429"}
+{"retry":"data/7_var/1600/7_014.webp","attempt":5,"error":"HTTP 429"}
+{"retry":"data/7_var/1600/7_011.webp","attempt":6,"error":"HTTP 429"}
+{"retry":"data/7_var/1600/7_013.webp","attempt":6,"error":"HTTP 429"}
+{"retry":"data/7_var/1600/7_016.webp","attempt":6,"error":"HTTP 429"}
+{"retry":"data/7_var/1600/7_014.webp","attempt":6,"error":"HTTP 429"}
+{"retry":"data/7_var/1600/7_017.webp","attempt":1,"error":"HTTP 429"}
+{"retry":"data/7_var/1600/7_022.webp","attempt":1,"error":"HTTP 429"}
+{"retry":"data/7_var/1600/7_018.webp","attempt":1,"error":"HTTP 429"}
+{"retry":"data/7_var/1600/7_023.webp","attempt":1,"error":"HTTP 429"}
+{"retry":"data/7_var/1600/7_017.webp","attempt":2,"error":"HTTP 429"}
+{"retry":"data/7_var/1600/7_022.webp","attempt":2,"error":"HTTP 429"}
+{"retry":"data/7_var/1600/7_018.webp","attempt":2,"error":"HTTP 429"}
+{"retry":"data/7_var/1600/7_023.webp","attempt":2,"error":"HTTP 429"}
+{"retry":"data/7_var/1600/7_017.webp","attempt":3,"error":"HTTP 429"}
+{"retry":"data/7_var/1600/7_023.webp","attempt":3,"error":"HTTP 429"}
+{"retry":"data/7_var/1600/7_022.webp","attempt":3,"error":"HTTP 429"}
+{"retry":"data/7_var/1600/7_018.webp","attempt":3,"error":"HTTP 429"}
+{"retry":"data/7_var/1600/7_017.webp","attempt":4,"error":"HTTP 429"}
+{"retry":"data/7_var/1600/7_023.webp","attempt":4,"error":"HTTP 429"}
+{"retry":"data/7_var/1600/7_018.webp","attempt":4,"error":"HTTP 429"}
+{"retry":"data/7_var/1600/7_022.webp","attempt":4,"error":"HTTP 429"}
+{"retry":"data/7_var/1600/7_017.webp","attempt":5,"error":"HTTP 429"}
+{"retry":"data/7_var/1600/7_022.webp","attempt":5,"error":"HTTP 429"}
+{"retry":"data/7_var/1600/7_018.webp","attempt":5,"error":"HTTP 429"}
+{"retry":"data/7_var/1600/7_023.webp","attempt":5,"error":"HTTP 429"}
+{"retry":"data/7_var/1600/7_048.webp","attempt":1,"error":"HTTP 429"}
+{"retry":"data/7_var/1600/7_051.webp","attempt":1,"error":"HTTP 429"}
+{"retry":"data/7_var/1600/7_049.webp","attempt":1,"error":"HTTP 429"}
+{"retry":"data/7_var/1600/7_050.webp","attempt":1,"error":"HTTP 429"}
+{"retry":"data/7_var/1600/7_048.webp","attempt":2,"error":"HTTP 429"}
+{"retry":"data/7_var/1600/7_051.webp","attempt":2,"error":"HTTP 429"}
+{"retry":"data/7_var/1600/7_049.webp","attempt":2,"error":"HTTP 429"}
+{"retry":"data/7_var/1600/7_050.webp","attempt":2,"error":"HTTP 429"}
+{"retry":"data/7_var/1600/7_048.webp","attempt":3,"error":"HTTP 429"}
+{"retry":"data/7_var/1600/7_051.webp","attempt":3,"error":"HTTP 429"}
+{"retry":"data/7_var/1600/7_049.webp","attempt":3,"error":"HTTP 429"}
+{"retry":"data/7_var/1600/7_050.webp","attempt":3,"error":"HTTP 429"}
+{"retry":"data/7_var/1600/7_048.webp","attempt":4,"error":"HTTP 429"}
+{"retry":"data/7_var/1600/7_051.webp","attempt":4,"error":"HTTP 429"}
+{"retry":"data/7_var/1600/7_050.webp","attempt":4,"error":"HTTP 429"}
+{"retry":"data/7_var/1600/7_049.webp","attempt":4,"error":"HTTP 429"}
+{"retry":"data/7_var/1600/7_059.webp","attempt":1,"error":"HTTP 429"}
+{"retry":"data/7_var/1600/7_062.webp","attempt":1,"error":"HTTP 429"}
+{"retry":"data/7_var/1600/7_063.webp","attempt":1,"error":"HTTP 429"}
+{"retry":"data/7_var/1600/7_064.webp","attempt":1,"error":"HTTP 429"}
+{"retry":"data/7_var/1600/7_059.webp","attempt":2,"error":"HTTP 429"}
+{"retry":"data/7_var/1600/7_062.webp","attempt":2,"error":"HTTP 429"}
+{"retry":"data/7_var/1600/7_063.webp","attempt":2,"error":"HTTP 429"}
+{"retry":"data/7_var/1600/7_064.webp","attempt":2,"error":"HTTP 429"}
+{"retry":"data/7_var/1600/7_059.webp","attempt":3,"error":"HTTP 429"}
+{"retry":"data/7_var/1600/7_062.webp","attempt":3,"error":"HTTP 429"}
+{"retry":"data/7_var/1600/7_063.webp","attempt":3,"error":"HTTP 429"}
+{"retry":"data/7_var/1600/7_064.webp","attempt":3,"error":"HTTP 429"}
+{"retry":"data/7_var/1600/7_059.webp","attempt":4,"error":"HTTP 429"}
+{"retry":"data/7_var/1600/7_062.webp","attempt":4,"error":"HTTP 429"}
+{"retry":"data/7_var/1600/7_063.webp","attempt":4,"error":"HTTP 429"}
+{"retry":"data/7_var/1600/7_064.webp","attempt":4,"error":"HTTP 429"}
+{"retry":"data/7_var/1600/7_074.webp","attempt":1,"error":"HTTP 429"}
+{"retry":"data/7_var/1600/7_076.webp","attempt":1,"error":"HTTP 429"}
+{"retry":"data/7_var/1600/7_080.webp","attempt":1,"error":"HTTP 429"}
+{"retry":"data/7_var/1600/7_082.webp","attempt":1,"error":"HTTP 429"}
+{"retry":"data/7_var/1600/7_074.webp","attempt":2,"error":"HTTP 429"}
+{"retry":"data/7_var/1600/7_076.webp","attempt":2,"error":"HTTP 429"}
+{"retry":"data/7_var/1600/7_080.webp","attempt":2,"error":"HTTP 429"}
+{"retry":"data/7_var/1600/7_082.webp","attempt":2,"error":"HTTP 429"}
+{"retry":"data/7_var/1600/7_074.webp","attempt":3,"error":"HTTP 429"}
+{"retry":"data/7_var/1600/7_076.webp","attempt":3,"error":"HTTP 429"}
+{"retry":"data/7_var/1600/7_080.webp","attempt":3,"error":"HTTP 429"}
+{"retry":"data/7_var/1600/7_082.webp","attempt":3,"error":"HTTP 429"}
+{"retry":"data/7_var/1600/7_074.webp","attempt":4,"error":"HTTP 429"}
+{"retry":"data/7_var/1600/7_076.webp","attempt":4,"error":"HTTP 429"}
+{"retry":"data/7_var/1600/7_080.webp","attempt":4,"error":"HTTP 429"}
+{"retry":"data/7_var/1600/7_082.webp","attempt":4,"error":"HTTP 429"}
+{"retry":"data/7_var/1600/7_091.webp","attempt":1,"error":"HTTP 429"}
+{"retry":"data/7_var/1600/7_098.webp","attempt":1,"error":"HTTP 429"}
+{"retry":"data/7_var/1600/7_100.webp","attempt":1,"error":"HTTP 429"}
+{"retry":"data/7_var/1600/7_102.webp","attempt":1,"error":"HTTP 429"}
+{"retry":"data/7_var/1600/7_091.webp","attempt":2,"error":"HTTP 429"}
+{"retry":"data/7_var/1600/7_098.webp","attempt":2,"error":"HTTP 429"}
+{"retry":"data/7_var/1600/7_100.webp","attempt":2,"error":"HTTP 429"}
+{"retry":"data/7_var/1600/7_102.webp","attempt":2,"error":"HTTP 429"}
+{"retry":"data/7_var/1600/7_091.webp","attempt":3,"error":"HTTP 429"}
+{"retry":"data/7_var/1600/7_098.webp","attempt":3,"error":"HTTP 429"}
+{"retry":"data/7_var/1600/7_100.webp","attempt":3,"error":"HTTP 429"}
+{"retry":"data/7_var/1600/7_102.webp","attempt":3,"error":"HTTP 429"}
+{"retry":"data/7_var/1600/7_091.webp","attempt":4,"error":"HTTP 429"}
+{"retry":"data/7_var/1600/7_098.webp","attempt":4,"error":"HTTP 429"}
+{"retry":"data/7_var/1600/7_100.webp","attempt":4,"error":"HTTP 429"}
+{"retry":"data/7_var/1600/7_102.webp","attempt":4,"error":"HTTP 429"}
+{"total":6526,"done":2700,"remaining":3826,"reused":2635,"bytes":344917660,"seconds":230,"errors":16,"playbackComplete":false}
+{"retry":"data/7_var/1600/7_110.webp","attempt":1,"error":"HTTP 429"}
+{"retry":"data/7_var/1600/7_114.webp","attempt":1,"error":"HTTP 429"}
+{"retry":"data/7_var/1600/7_117.webp","attempt":1,"error":"HTTP 429"}
+{"retry":"data/7_var/1600/7_116.webp","attempt":1,"error":"HTTP 429"}
+{"retry":"data/7_var/1600/7_110.webp","attempt":2,"error":"HTTP 429"}
+{"retry":"data/7_var/1600/7_114.webp","attempt":2,"error":"HTTP 429"}
+{"retry":"data/7_var/1600/7_116.webp","attempt":2,"error":"HTTP 429"}
+{"retry":"data/7_var/1600/7_117.webp","attempt":2,"error":"HTTP 429"}
+{"retry":"data/7_var/1600/7_110.webp","attempt":3,"error":"HTTP 429"}
+{"retry":"data/7_var/1600/7_114.webp","attempt":3,"error":"HTTP 429"}
+{"retry":"data/7_var/1600/7_116.webp","attempt":3,"error":"HTTP 429"}
+{"retry":"data/7_var/1600/7_117.webp","attempt":3,"error":"HTTP 429"}
+{"retry":"data/7_var/1600/7_110.webp","attempt":4,"error":"HTTP 429"}
+{"retry":"data/7_var/1600/7_116.webp","attempt":4,"error":"HTTP 429"}
+{"retry":"data/7_var/1600/7_114.webp","attempt":4,"error":"HTTP 429"}
+{"retry":"data/7_var/1600/7_117.webp","attempt":4,"error":"HTTP 429"}
+{"retry":"data/7_var/1600/7_130.webp","attempt":1,"error":"HTTP 429"}
+{"retry":"data/7_var/1600/7_132.webp","attempt":1,"error":"HTTP 429"}
+{"retry":"data/7_var/1600/7_131.webp","attempt":1,"error":"HTTP 429"}
+{"retry":"data/7_var/1600/7_136.webp","attempt":1,"error":"HTTP 429"}
+{"retry":"data/7_var/1600/7_130.webp","attempt":2,"error":"HTTP 429"}
+{"retry":"data/7_var/1600/7_131.webp","attempt":2,"error":"HTTP 429"}
+{"retry":"data/7_var/1600/7_132.webp","attempt":2,"error":"HTTP 429"}
+{"retry":"data/7_var/1600/7_136.webp","attempt":2,"error":"HTTP 429"}
+{"retry":"data/7_var/1600/7_130.webp","attempt":3,"error":"HTTP 429"}
+{"retry":"data/7_var/1600/7_131.webp","attempt":3,"error":"HTTP 429"}
+{"retry":"data/7_var/1600/7_132.webp","attempt":3,"error":"HTTP 429"}
+{"retry":"data/7_var/1600/7_136.webp","attempt":3,"error":"HTTP 429"}
+{"retry":"data/7_var/1600/7_130.webp","attempt":4,"error":"HTTP 429"}
+{"retry":"data/7_var/1600/7_131.webp","attempt":4,"error":"HTTP 429"}
+{"retry":"data/7_var/1600/7_132.webp","attempt":4,"error":"HTTP 429"}
+{"retry":"data/7_var/1600/7_136.webp","attempt":4,"error":"HTTP 429"}
+{"retry":"data/7_var/1600/7_146.webp","attempt":1,"error":"HTTP 429"}
+{"retry":"data/7_var/1600/7_147.webp","attempt":1,"error":"HTTP 429"}
+{"retry":"data/7_var/1600/7_148.webp","attempt":1,"error":"HTTP 429"}
+{"retry":"data/7_var/1600/7_149.webp","attempt":1,"error":"HTTP 429"}
+{"retry":"data/7_var/1600/7_146.webp","attempt":2,"error":"HTTP 429"}
+{"retry":"data/7_var/1600/7_147.webp","attempt":2,"error":"HTTP 429"}
+{"retry":"data/7_var/1600/7_148.webp","attempt":2,"error":"HTTP 429"}
+{"retry":"data/7_var/1600/7_149.webp","attempt":2,"error":"HTTP 429"}
+{"retry":"data/7_var/1600/7_146.webp","attempt":3,"error":"HTTP 429"}
+{"retry":"data/7_var/1600/7_147.webp","attempt":3,"error":"HTTP 429"}
+{"retry":"data/7_var/1600/7_148.webp","attempt":3,"error":"HTTP 429"}
+{"retry":"data/7_var/1600/7_149.webp","attempt":3,"error":"HTTP 429"}
+{"retry":"data/7_var/1600/7_146.webp","attempt":4,"error":"HTTP 429"}
+{"retry":"data/7_var/1600/7_147.webp","attempt":4,"error":"HTTP 429"}
+{"retry":"data/7_var/1600/7_148.webp","attempt":4,"error":"HTTP 429"}
+{"retry":"data/7_var/1600/7_149.webp","attempt":4,"error":"HTTP 429"}
+{"retry":"data/7_var/1600/7_157.webp","attempt":1,"error":"HTTP 429"}
+{"retry":"data/7_var/1600/7_158.webp","attempt":1,"error":"HTTP 429"}
+{"retry":"data/7_var/1600/7_159.webp","attempt":1,"error":"HTTP 429"}
+{"retry":"data/7_var/1600/7_160.webp","attempt":1,"error":"HTTP 429"}
+{"retry":"data/7_var/1600/7_157.webp","attempt":2,"error":"HTTP 429"}
+{"retry":"data/7_var/1600/7_158.webp","attempt":2,"error":"HTTP 429"}
+{"retry":"data/7_var/1600/7_159.webp","attempt":2,"error":"HTTP 429"}
+{"retry":"data/7_var/1600/7_160.webp","attempt":2,"error":"HTTP 429"}
+{"retry":"data/7_var/1600/7_157.webp","attempt":3,"error":"HTTP 429"}
+{"retry":"data/7_var/1600/7_158.webp","attempt":3,"error":"HTTP 429"}
+{"retry":"data/7_var/1600/7_159.webp","attempt":3,"error":"HTTP 429"}
+{"retry":"data/7_var/1600/7_160.webp","attempt":3,"error":"HTTP 429"}
+{"retry":"data/7_var/1600/7_157.webp","attempt":4,"error":"HTTP 429"}
+{"retry":"data/7_var/1600/7_159.webp","attempt":4,"error":"HTTP 429"}
+{"retry":"data/7_var/1600/7_158.webp","attempt":4,"error":"HTTP 429"}
+{"retry":"data/7_var/1600/7_160.webp","attempt":4,"error":"HTTP 429"}
+{"retry":"data/7_var/1600/7_172.webp","attempt":1,"error":"HTTP 429"}
+{"retry":"data/7_var/1600/7_175.webp","attempt":1,"error":"HTTP 429"}
+{"retry":"data/7_var/1600/7_176.webp","attempt":1,"error":"HTTP 429"}
+{"retry":"data/7_var/1600/7_178.webp","attempt":1,"error":"HTTP 429"}
+{"retry":"data/7_var/1600/7_172.webp","attempt":2,"error":"HTTP 429"}
+{"retry":"data/7_var/1600/7_175.webp","attempt":2,"error":"HTTP 429"}
+{"retry":"data/7_var/1600/7_176.webp","attempt":2,"error":"HTTP 429"}
+{"retry":"data/7_var/1600/7_178.webp","attempt":2,"error":"HTTP 429"}
+{"retry":"data/7_var/1600/7_172.webp","attempt":3,"error":"HTTP 429"}
+{"retry":"data/7_var/1600/7_175.webp","attempt":3,"error":"HTTP 429"}
+{"retry":"data/7_var/1600/7_176.webp","attempt":3,"error":"HTTP 429"}
+{"retry":"data/7_var/1600/7_178.webp","attempt":3,"error":"HTTP 429"}
+{"retry":"data/7_var/1600/7_172.webp","attempt":4,"error":"HTTP 429"}
+{"retry":"data/7_var/1600/7_175.webp","attempt":4,"error":"HTTP 429"}
+{"retry":"data/7_var/1600/7_176.webp","attempt":4,"error":"HTTP 429"}
+{"retry":"data/7_var/1600/7_178.webp","attempt":4,"error":"HTTP 429"}
+{"retry":"data/7/1600/7_006.webp","attempt":1,"error":"HTTP 429"}
+{"retry":"data/7/1600/7_008.webp","attempt":1,"error":"HTTP 429"}
+{"retry":"data/7/1600/7_009.webp","attempt":1,"error":"HTTP 429"}
+{"retry":"data/7/1600/7_010.webp","attempt":1,"error":"HTTP 429"}
+{"retry":"data/7/1600/7_006.webp","attempt":2,"error":"HTTP 429"}
+{"retry":"data/7/1600/7_008.webp","attempt":2,"error":"HTTP 429"}
+{"retry":"data/7/1600/7_009.webp","attempt":2,"error":"HTTP 429"}
+{"retry":"data/7/1600/7_010.webp","attempt":2,"error":"HTTP 429"}
+{"retry":"data/7/1600/7_006.webp","attempt":3,"error":"HTTP 429"}
+{"retry":"data/7/1600/7_008.webp","attempt":3,"error":"HTTP 429"}
+{"retry":"data/7/1600/7_009.webp","attempt":3,"error":"HTTP 429"}
+{"retry":"data/7/1600/7_010.webp","attempt":3,"error":"HTTP 429"}
+{"retry":"data/7/1600/7_006.webp","attempt":4,"error":"HTTP 429"}
+{"retry":"data/7/1600/7_008.webp","attempt":4,"error":"HTTP 429"}
+{"retry":"data/7/1600/7_009.webp","attempt":4,"error":"HTTP 429"}
+{"retry":"data/7/1600/7_010.webp","attempt":4,"error":"HTTP 429"}
+{"total":6526,"done":2800,"remaining":3726,"reused":2684,"bytes":360633940,"seconds":331,"errors":16,"playbackComplete":false}
+{"retry":"data/7/1600/7_031.webp","attempt":1,"error":"HTTP 429"}
+{"retry":"data/7/1600/7_034.webp","attempt":1,"error":"HTTP 429"}
+{"retry":"data/7/1600/7_037.webp","attempt":1,"error":"HTTP 429"}
+{"retry":"data/7/1600/7_042.webp","attempt":1,"error":"HTTP 429"}
+{"retry":"data/7/1600/7_031.webp","attempt":2,"error":"HTTP 429"}
+{"retry":"data/7/1600/7_034.webp","attempt":2,"error":"HTTP 429"}
+{"retry":"data/7/1600/7_037.webp","attempt":2,"error":"HTTP 429"}
+{"retry":"data/7/1600/7_042.webp","attempt":2,"error":"HTTP 429"}
+{"retry":"data/7/1600/7_031.webp","attempt":3,"error":"HTTP 429"}
+{"retry":"data/7/1600/7_034.webp","attempt":3,"error":"HTTP 429"}
+{"retry":"data/7/1600/7_037.webp","attempt":3,"error":"HTTP 429"}
+{"retry":"data/7/1600/7_042.webp","attempt":3,"error":"HTTP 429"}
+{"retry":"data/7/1600/7_031.webp","attempt":4,"error":"HTTP 429"}
+{"retry":"data/7/1600/7_034.webp","attempt":4,"error":"HTTP 429"}
+{"retry":"data/7/1600/7_042.webp","attempt":4,"error":"HTTP 429"}
+{"retry":"data/7/1600/7_037.webp","attempt":4,"error":"HTTP 429"}
+{"retry":"data/7/1600/7_053.webp","attempt":1,"error":"HTTP 429"}
+{"retry":"data/7/1600/7_054.webp","attempt":1,"error":"HTTP 429"}
+{"retry":"data/7/1600/7_055.webp","attempt":1,"error":"HTTP 429"}
+{"retry":"data/7/1600/7_056.webp","attempt":1,"error":"HTTP 429"}
+{"retry":"data/7/1600/7_053.webp","attempt":2,"error":"HTTP 429"}
+{"retry":"data/7/1600/7_054.webp","attempt":2,"error":"HTTP 429"}
+{"retry":"data/7/1600/7_055.webp","attempt":2,"error":"HTTP 429"}
+{"retry":"data/7/1600/7_056.webp","attempt":2,"error":"HTTP 429"}
+{"retry":"data/7/1600/7_053.webp","attempt":3,"error":"HTTP 429"}
+{"retry":"data/7/1600/7_054.webp","attempt":3,"error":"HTTP 429"}
+{"retry":"data/7/1600/7_055.webp","attempt":3,"error":"HTTP 429"}
+{"retry":"data/7/1600/7_056.webp","attempt":3,"error":"HTTP 429"}
+{"retry":"data/7/1600/7_053.webp","attempt":4,"error":"HTTP 429"}
+{"retry":"data/7/1600/7_054.webp","attempt":4,"error":"HTTP 429"}
+{"retry":"data/7/1600/7_055.webp","attempt":4,"error":"HTTP 429"}
+{"retry":"data/7/1600/7_056.webp","attempt":4,"error":"HTTP 429"}
+{"retry":"data/7/1600/7_073.webp","attempt":1,"error":"HTTP 429"}
+{"retry":"data/7/1600/7_074.webp","attempt":1,"error":"HTTP 429"}
+{"retry":"data/7/1600/7_075.webp","attempt":1,"error":"HTTP 429"}
+{"retry":"data/7/1600/7_076.webp","attempt":1,"error":"HTTP 429"}
+{"retry":"data/7/1600/7_073.webp","attempt":2,"error":"HTTP 429"}
+{"retry":"data/7/1600/7_074.webp","attempt":2,"error":"HTTP 429"}
+{"retry":"data/7/1600/7_075.webp","attempt":2,"error":"HTTP 429"}
+{"retry":"data/7/1600/7_076.webp","attempt":2,"error":"HTTP 429"}
+{"retry":"data/7/1600/7_073.webp","attempt":3,"error":"HTTP 429"}
+{"retry":"data/7/1600/7_074.webp","attempt":3,"error":"HTTP 429"}
+{"retry":"data/7/1600/7_075.webp","attempt":3,"error":"HTTP 429"}
+{"retry":"data/7/1600/7_076.webp","attempt":3,"error":"HTTP 429"}
+{"retry":"data/7/1600/7_073.webp","attempt":4,"error":"HTTP 429"}
+{"retry":"data/7/1600/7_074.webp","attempt":4,"error":"HTTP 429"}
+{"retry":"data/7/1600/7_076.webp","attempt":4,"error":"HTTP 429"}
+{"retry":"data/7/1600/7_075.webp","attempt":4,"error":"HTTP 429"}
+{"total":6526,"done":100,"remaining":6426,"reused":100,"bytes":9580822,"seconds":0,"errors":0,"playbackComplete":false}
+{"total":6526,"done":200,"remaining":6326,"reused":200,"bytes":19514020,"seconds":0,"errors":0,"playbackComplete":false}
+{"total":6526,"done":300,"remaining":6226,"reused":300,"bytes":30670692,"seconds":0,"errors":0,"playbackComplete":false}
+{"total":6526,"done":400,"remaining":6126,"reused":400,"bytes":44658524,"seconds":0,"errors":0,"playbackComplete":false}
+{"total":6526,"done":500,"remaining":6026,"reused":500,"bytes":60295606,"seconds":0,"errors":0,"playbackComplete":false}
+{"total":6526,"done":600,"remaining":5926,"reused":600,"bytes":75644830,"seconds":0,"errors":0,"playbackComplete":false}
+{"total":6526,"done":700,"remaining":5826,"reused":700,"bytes":92093238,"seconds":0,"errors":0,"playbackComplete":false}
+{"total":6526,"done":800,"remaining":5726,"reused":800,"bytes":110247878,"seconds":0,"errors":0,"playbackComplete":false}
+{"total":6526,"done":900,"remaining":5626,"reused":900,"bytes":125548482,"seconds":0,"errors":0,"playbackComplete":false}
+{"total":6526,"done":1000,"remaining":5526,"reused":1000,"bytes":139905496,"seconds":0,"errors":0,"playbackComplete":false}
+{"total":6526,"done":1100,"remaining":5426,"reused":1100,"bytes":153076810,"seconds":0,"errors":0,"playbackComplete":false}
+{"total":6526,"done":1200,"remaining":5326,"reused":1200,"bytes":167221298,"seconds":0,"errors":0,"playbackComplete":false}
+{"total":6526,"done":1300,"remaining":5226,"reused":1300,"bytes":182468324,"seconds":0,"errors":0,"playbackComplete":false}
+{"total":6526,"done":1400,"remaining":5126,"reused":1400,"bytes":197148204,"seconds":0,"errors":0,"playbackComplete":false}
+{"total":6526,"done":1500,"remaining":5026,"reused":1500,"bytes":208804616,"seconds":0,"errors":0,"playbackComplete":false}
+{"total":6526,"done":1600,"remaining":4926,"reused":1600,"bytes":218244588,"seconds":0,"errors":0,"playbackComplete":false}
+{"total":6526,"done":1700,"remaining":4826,"reused":1700,"bytes":231645430,"seconds":0,"errors":0,"playbackComplete":false}
+{"total":6526,"done":1800,"remaining":4726,"reused":1800,"bytes":242178022,"seconds":0,"errors":0,"playbackComplete":false}
+{"total":6526,"done":1900,"remaining":4626,"reused":1900,"bytes":255764356,"seconds":0,"errors":0,"playbackComplete":false}
+{"total":6526,"done":2000,"remaining":4526,"reused":2000,"bytes":270768892,"seconds":0,"errors":0,"playbackComplete":false}
+{"total":6526,"done":2100,"remaining":4426,"reused":2100,"bytes":283988430,"seconds":0,"errors":0,"playbackComplete":false}
+{"total":6526,"done":2200,"remaining":4326,"reused":2200,"bytes":295193730,"seconds":0,"errors":0,"playbackComplete":false}
+{"total":6526,"done":2300,"remaining":4226,"reused":2300,"bytes":302189196,"seconds":0,"errors":0,"playbackComplete":false}
+{"total":6526,"done":2400,"remaining":4126,"reused":2400,"bytes":309141746,"seconds":0,"errors":0,"playbackComplete":false}
+{"total":6526,"done":2500,"remaining":4026,"reused":2500,"bytes":320395262,"seconds":0,"errors":0,"playbackComplete":false}
+{"total":6526,"done":2600,"remaining":3926,"reused":2590,"bytes":332220154,"seconds":10,"errors":0,"playbackComplete":false}
+{"total":6526,"done":2700,"remaining":3826,"reused":2687,"bytes":347088294,"seconds":14,"errors":0,"playbackComplete":false}
+{"total":6526,"done":2800,"remaining":3726,"reused":2787,"bytes":362886780,"seconds":14,"errors":0,"playbackComplete":false}
+{"total":6526,"done":2900,"remaining":3626,"reused":2864,"bytes":380159748,"seconds":33,"errors":0,"playbackComplete":false}
+{"total":6526,"done":3000,"remaining":3526,"reused":2913,"bytes":396729960,"seconds":77,"errors":0,"playbackComplete":false}
+{"total":6526,"done":3100,"remaining":3426,"reused":2921,"bytes":410333500,"seconds":136,"errors":0,"playbackComplete":false}
+{"total":6526,"done":100,"remaining":6426,"reused":100,"bytes":9580822,"seconds":0,"errors":0,"playbackComplete":false}
+{"total":6526,"done":200,"remaining":6326,"reused":200,"bytes":19514020,"seconds":0,"errors":0,"playbackComplete":false}
+{"total":6526,"done":300,"remaining":6226,"reused":300,"bytes":30670692,"seconds":0,"errors":0,"playbackComplete":false}
+{"total":6526,"done":400,"remaining":6126,"reused":400,"bytes":44658780,"seconds":0,"errors":0,"playbackComplete":false}
+{"total":6526,"done":500,"remaining":6026,"reused":500,"bytes":60295606,"seconds":0,"errors":0,"playbackComplete":false}
+{"total":6526,"done":600,"remaining":5926,"reused":600,"bytes":75638660,"seconds":0,"errors":0,"playbackComplete":false}
+{"total":6526,"done":700,"remaining":5826,"reused":700,"bytes":92093238,"seconds":0,"errors":0,"playbackComplete":false}
+{"total":6526,"done":800,"remaining":5726,"reused":800,"bytes":110247878,"seconds":0,"errors":0,"playbackComplete":false}
+{"total":6526,"done":900,"remaining":5626,"reused":900,"bytes":125547912,"seconds":0,"errors":0,"playbackComplete":false}
+{"total":6526,"done":1000,"remaining":5526,"reused":1000,"bytes":139905496,"seconds":0,"errors":0,"playbackComplete":false}
+{"total":6526,"done":1100,"remaining":5426,"reused":1100,"bytes":153076810,"seconds":0,"errors":0,"playbackComplete":false}
+{"total":6526,"done":1200,"remaining":5326,"reused":1200,"bytes":167221298,"seconds":0,"errors":0,"playbackComplete":false}
+{"total":6526,"done":1300,"remaining":5226,"reused":1300,"bytes":182468324,"seconds":0,"errors":0,"playbackComplete":false}
+{"total":6526,"done":1400,"remaining":5126,"reused":1400,"bytes":197148204,"seconds":0,"errors":0,"playbackComplete":false}
+{"total":6526,"done":1500,"remaining":5026,"reused":1500,"bytes":208804616,"seconds":0,"errors":0,"playbackComplete":false}
+{"total":6526,"done":1600,"remaining":4926,"reused":1600,"bytes":218245106,"seconds":0,"errors":0,"playbackComplete":false}
+{"total":6526,"done":1700,"remaining":4826,"reused":1700,"bytes":231645430,"seconds":0,"errors":0,"playbackComplete":false}
+{"total":6526,"done":1800,"remaining":4726,"reused":1800,"bytes":242173106,"seconds":0,"errors":0,"playbackComplete":false}
+{"total":6526,"done":1900,"remaining":4626,"reused":1900,"bytes":255764356,"seconds":0,"errors":0,"playbackComplete":false}
+{"total":6526,"done":2000,"remaining":4526,"reused":2000,"bytes":270768892,"seconds":0,"errors":0,"playbackComplete":false}
+{"total":6526,"done":2100,"remaining":4426,"reused":2100,"bytes":283988430,"seconds":0,"errors":0,"playbackComplete":false}
+{"total":6526,"done":2200,"remaining":4326,"reused":2200,"bytes":295193730,"seconds":0,"errors":0,"playbackComplete":false}
+{"total":6526,"done":2300,"remaining":4226,"reused":2300,"bytes":302189196,"seconds":0,"errors":0,"playbackComplete":false}
+{"total":6526,"done":2400,"remaining":4126,"reused":2400,"bytes":309141746,"seconds":0,"errors":0,"playbackComplete":false}
+{"total":6526,"done":2500,"remaining":4026,"reused":2500,"bytes":320395262,"seconds":0,"errors":0,"playbackComplete":false}
+{"total":6526,"done":2600,"remaining":3926,"reused":2600,"bytes":332220706,"seconds":0,"errors":0,"playbackComplete":false}
+{"total":6526,"done":2700,"remaining":3826,"reused":2700,"bytes":347073404,"seconds":0,"errors":0,"playbackComplete":false}
+{"total":6526,"done":2800,"remaining":3726,"reused":2800,"bytes":362798036,"seconds":0,"errors":0,"playbackComplete":false}
+{"total":6526,"done":2900,"remaining":3626,"reused":2900,"bytes":380158888,"seconds":0,"errors":0,"playbackComplete":false}
+{"total":6526,"done":3000,"remaining":3526,"reused":3000,"bytes":396726734,"seconds":0,"errors":0,"playbackComplete":false}
+{"total":6526,"done":3100,"remaining":3426,"reused":3100,"bytes":410329208,"seconds":0,"errors":0,"playbackComplete":false}
+{"total":6526,"done":3200,"remaining":3326,"reused":3196,"bytes":423203942,"seconds":2,"errors":0,"playbackComplete":false}
+{"total":6526,"done":3300,"remaining":3226,"reused":3246,"bytes":504875576,"seconds":12,"errors":0,"playbackComplete":false}
+{"total":6526,"done":3400,"remaining":3126,"reused":3252,"bytes":639098576,"seconds":62,"errors":0,"playbackComplete":true}
+{"total":6526,"done":100,"remaining":6426,"reused":100,"bytes":9581566,"seconds":0,"errors":0,"playbackComplete":false}
+{"total":6526,"done":200,"remaining":6326,"reused":200,"bytes":19514020,"seconds":0,"errors":0,"playbackComplete":false}
+{"total":6526,"done":300,"remaining":6226,"reused":300,"bytes":30670692,"seconds":0,"errors":0,"playbackComplete":false}
+{"total":6526,"done":400,"remaining":6126,"reused":400,"bytes":44658524,"seconds":0,"errors":0,"playbackComplete":false}
+{"total":6526,"done":500,"remaining":6026,"reused":500,"bytes":60295606,"seconds":0,"errors":0,"playbackComplete":false}
+{"total":6526,"done":600,"remaining":5926,"reused":600,"bytes":75644830,"seconds":0,"errors":0,"playbackComplete":false}
+{"total":6526,"done":700,"remaining":5826,"reused":700,"bytes":92093238,"seconds":0,"errors":0,"playbackComplete":false}
+{"total":6526,"done":800,"remaining":5726,"reused":800,"bytes":110247878,"seconds":0,"errors":0,"playbackComplete":false}
+{"total":6526,"done":900,"remaining":5626,"reused":900,"bytes":125547912,"seconds":0,"errors":0,"playbackComplete":false}
+{"total":6526,"done":1000,"remaining":5526,"reused":1000,"bytes":139905496,"seconds":0,"errors":0,"playbackComplete":false}
+{"total":6526,"done":1100,"remaining":5426,"reused":1100,"bytes":153076810,"seconds":0,"errors":0,"playbackComplete":false}
+{"total":6526,"done":1200,"remaining":5326,"reused":1200,"bytes":167221298,"seconds":0,"errors":0,"playbackComplete":false}
+{"total":6526,"done":1300,"remaining":5226,"reused":1300,"bytes":182468324,"seconds":0,"errors":0,"playbackComplete":false}
+{"total":6526,"done":1400,"remaining":5126,"reused":1400,"bytes":197145022,"seconds":0,"errors":0,"playbackComplete":false}
+{"total":6526,"done":1500,"remaining":5026,"reused":1500,"bytes":208804616,"seconds":0,"errors":0,"playbackComplete":false}
+{"total":6526,"done":1600,"remaining":4926,"reused":1600,"bytes":218244588,"seconds":0,"errors":0,"playbackComplete":false}
+{"total":6526,"done":1700,"remaining":4826,"reused":1700,"bytes":231646720,"seconds":0,"errors":0,"playbackComplete":false}
+{"total":6526,"done":1800,"remaining":4726,"reused":1800,"bytes":242178022,"seconds":0,"errors":0,"playbackComplete":false}
+{"total":6526,"done":1900,"remaining":4626,"reused":1900,"bytes":255764356,"seconds":0,"errors":0,"playbackComplete":false}
+{"total":6526,"done":2000,"remaining":4526,"reused":2000,"bytes":270768892,"seconds":0,"errors":0,"playbackComplete":false}
+{"total":6526,"done":2100,"remaining":4426,"reused":2100,"bytes":283988430,"seconds":0,"errors":0,"playbackComplete":false}
+{"total":6526,"done":2200,"remaining":4326,"reused":2200,"bytes":295186514,"seconds":0,"errors":0,"playbackComplete":false}
+{"total":6526,"done":2300,"remaining":4226,"reused":2300,"bytes":302189196,"seconds":0,"errors":0,"playbackComplete":false}
+{"total":6526,"done":2400,"remaining":4126,"reused":2400,"bytes":309142900,"seconds":0,"errors":0,"playbackComplete":false}
+{"total":6526,"done":2500,"remaining":4026,"reused":2500,"bytes":320395262,"seconds":0,"errors":0,"playbackComplete":false}
+{"total":6526,"done":2600,"remaining":3926,"reused":2600,"bytes":332222542,"seconds":0,"errors":0,"playbackComplete":false}
+{"total":6526,"done":2700,"remaining":3826,"reused":2700,"bytes":347073404,"seconds":0,"errors":0,"playbackComplete":false}
+{"total":6526,"done":2800,"remaining":3726,"reused":2800,"bytes":362798036,"seconds":0,"errors":0,"playbackComplete":false}
+{"total":6526,"done":2900,"remaining":3626,"reused":2900,"bytes":380158780,"seconds":0,"errors":0,"playbackComplete":false}
+{"total":6526,"done":3000,"remaining":3526,"reused":3000,"bytes":396723072,"seconds":0,"errors":0,"playbackComplete":false}
+{"total":6526,"done":3100,"remaining":3426,"reused":3100,"bytes":410329594,"seconds":0,"errors":0,"playbackComplete":false}
+{"total":6526,"done":3200,"remaining":3326,"reused":3200,"bytes":423201484,"seconds":0,"errors":0,"playbackComplete":false}
+{"total":6526,"done":3300,"remaining":3226,"reused":3300,"bytes":489651514,"seconds":0,"errors":0,"playbackComplete":true}
+{"total":6526,"done":3400,"remaining":3126,"reused":3400,"bytes":638451388,"seconds":0,"errors":0,"playbackComplete":true}
+{"total":6526,"done":3500,"remaining":3026,"reused":3463,"bytes":809739610,"seconds":6,"errors":0,"playbackComplete":true}
+{"total":6526,"done":3600,"remaining":2926,"reused":3465,"bytes":986016637,"seconds":24,"errors":0,"playbackComplete":true}
+{"total":6526,"done":3700,"remaining":2826,"reused":3466,"bytes":1200337330,"seconds":43,"errors":0,"playbackComplete":true}
+{"retry":"data/11/4600/11_116.jpg","attempt":1,"error":"The operation was aborted due to timeout"}
+{"retry":"data/11/4600/11_118.jpg","attempt":1,"error":"The operation was aborted due to timeout"}
+{"retry":"data/11/4600/11_125.jpg","attempt":1,"error":"The operation was aborted due to timeout"}
+{"retry":"data/11/4600/11_132.jpg","attempt":1,"error":"The operation was aborted due to timeout"}
+{"retry":"data/11/4600/11_135.jpg","attempt":1,"error":"The operation was aborted due to timeout"}
+{"retry":"data/11/4600/11_136.jpg","attempt":1,"error":"The operation was aborted due to timeout"}
+{"retry":"data/11/4600/11_138.jpg","attempt":1,"error":"The operation was aborted due to timeout"}
+{"retry":"data/11/4600/11_140.jpg","attempt":1,"error":"The operation was aborted due to timeout"}
+{"retry":"data/11/4600/11_145.jpg","attempt":1,"error":"The operation was aborted due to timeout"}
+{"retry":"data/11/4600/11_146.jpg","attempt":1,"error":"The operation was aborted due to timeout"}
+{"retry":"data/11/4600/11_153.jpg","attempt":1,"error":"The operation was aborted due to timeout"}
+{"retry":"data/11/4600/11_155.jpg","attempt":1,"error":"The operation was aborted due to timeout"}
+{"retry":"data/11/4600/11_156.jpg","attempt":1,"error":"The operation was aborted due to timeout"}
+{"retry":"data/11/4600/11_157.jpg","attempt":1,"error":"The operation was aborted due to timeout"}
+{"retry":"data/11/4600/11_166.jpg","attempt":1,"error":"The operation was aborted due to timeout"}
+{"retry":"data/11/4600/11_167.jpg","attempt":1,"error":"The operation was aborted due to timeout"}
+{"total":6526,"done":3800,"remaining":2726,"reused":3468,"bytes":1417490504,"seconds":111,"errors":0,"playbackComplete":true}
+{"retry":"data/12/4600/12_001.jpg","attempt":1,"error":"The operation was aborted due to timeout"}
+{"retry":"data/12/4600/12_005.jpg","attempt":1,"error":"The operation was aborted due to timeout"}
+{"retry":"data/12/4600/12_007.jpg","attempt":1,"error":"The operation was aborted due to timeout"}
+{"retry":"data/12/4600/12_025.jpg","attempt":1,"error":"The operation was aborted due to timeout"}
+{"retry":"data/12/4600/12_031.jpg","attempt":1,"error":"The operation was aborted due to timeout"}
+{"retry":"data/12/4600/12_034.jpg","attempt":1,"error":"The operation was aborted due to timeout"}
+{"retry":"data/12/4600/12_035.jpg","attempt":1,"error":"The operation was aborted due to timeout"}
+{"retry":"data/12/4600/12_038.jpg","attempt":1,"error":"The operation was aborted due to timeout"}
+{"retry":"data/12/4600/12_041.jpg","attempt":1,"error":"The operation was aborted due to timeout"}
+{"retry":"data/12/4600/12_042.jpg","attempt":1,"error":"The operation was aborted due to timeout"}
+{"retry":"data/12/4600/12_043.jpg","attempt":1,"error":"The operation was aborted due to timeout"}
+{"retry":"data/12/4600/12_044.jpg","attempt":1,"error":"The operation was aborted due to timeout"}
+{"retry":"data/12/4600/12_055.jpg","attempt":1,"error":"The operation was aborted due to timeout"}
+{"total":6526,"done":3900,"remaining":2626,"reused":3471,"bytes":1636243724,"seconds":169,"errors":0,"playbackComplete":true}
+{"retry":"data/12/4600/12_057.jpg","attempt":1,"error":"The operation was aborted due to timeout"}
+{"retry":"data/12/4600/12_059.jpg","attempt":1,"error":"The operation was aborted due to timeout"}
+{"retry":"data/12/4600/12_061.jpg","attempt":1,"error":"The operation was aborted due to timeout"}
+{"total":6526,"done":4000,"remaining":2526,"reused":3472,"bytes":1874992914,"seconds":176,"errors":0,"playbackComplete":true}
+{"retry":"data/12/4600/12_063.jpg","attempt":1,"error":"The operation was aborted due to timeout"}
+{"retry":"data/12/4600/12_065.jpg","attempt":1,"error":"The operation was aborted due to timeout"}
+{"retry":"data/12/4600/12_068.jpg","attempt":1,"error":"The operation was aborted due to timeout"}
+{"retry":"data/12/4600/12_071.jpg","attempt":1,"error":"The operation was aborted due to timeout"}
+{"retry":"data/12/4600/12_083.jpg","attempt":1,"error":"The operation was aborted due to timeout"}
+{"retry":"data/12/4600/12_084.jpg","attempt":1,"error":"The operation was aborted due to timeout"}
+{"retry":"data/12/4600/12_085.jpg","attempt":1,"error":"The operation was aborted due to timeout"}
+{"retry":"data/12/4600/12_086.jpg","attempt":1,"error":"The operation was aborted due to timeout"}
+{"retry":"data/12/4600/12_088.jpg","attempt":1,"error":"The operation was aborted due to timeout"}
+{"retry":"data/12/4600/12_090.jpg","attempt":1,"error":"The operation was aborted due to timeout"}
+{"retry":"data/14/4600/14_002.jpg","attempt":1,"error":"The operation was aborted due to timeout"}
+{"retry":"data/14/4600/14_004.jpg","attempt":1,"error":"The operation was aborted due to timeout"}
+{"retry":"data/14/4600/14_005.jpg","attempt":1,"error":"The operation was aborted due to timeout"}
+{"retry":"data/14/4600/14_009.jpg","attempt":1,"error":"The operation was aborted due to timeout"}
+{"retry":"data/14/4600/14_010.jpg","attempt":1,"error":"The operation was aborted due to timeout"}
+{"retry":"data/14/4600/14_012.jpg","attempt":1,"error":"The operation was aborted due to timeout"}
+{"retry":"data/14/4600/14_014.jpg","attempt":1,"error":"The operation was aborted due to timeout"}
+{"retry":"data/14/4600/14_015.jpg","attempt":1,"error":"The operation was aborted due to timeout"}
+{"retry":"data/12/4600/12_063.jpg","attempt":2,"error":"The operation was aborted due to timeout"}
+{"retry":"data/14/4600/14_016.jpg","attempt":1,"error":"The operation was aborted due to timeout"}
+{"retry":"data/14/4600/14_017.jpg","attempt":1,"error":"The operation was aborted due to timeout"}
+{"total":6526,"done":4100,"remaining":2426,"reused":3477,"bytes":2109332084,"seconds":230,"errors":0,"playbackComplete":true}
+{"retry":"data/14/4600/14_020.jpg","attempt":1,"error":"The operation was aborted due to timeout"}
+{"retry":"data/14/4600/14_029.jpg","attempt":1,"error":"The operation was aborted due to timeout"}
+{"retry":"data/12/4600/12_090.jpg","attempt":2,"error":"The operation was aborted due to timeout"}
+{"retry":"data/14/4600/14_039.jpg","attempt":1,"error":"The operation was aborted due to timeout"}
+{"retry":"data/14/4600/14_042.jpg","attempt":1,"error":"The operation was aborted due to timeout"}
+{"retry":"data/14/4600/14_043.jpg","attempt":1,"error":"The operation was aborted due to timeout"}
+{"retry":"data/14/4600/14_044.jpg","attempt":1,"error":"The operation was aborted due to timeout"}
+{"retry":"data/14/4600/14_045.jpg","attempt":1,"error":"The operation was aborted due to timeout"}
+{"retry":"data/14/4600/14_046.jpg","attempt":1,"error":"The operation was aborted due to timeout"}
+{"retry":"data/14/4600/14_002.jpg","attempt":2,"error":"The operation was aborted due to timeout"}
+{"retry":"data/14/4600/14_004.jpg","attempt":2,"error":"The operation was aborted due to timeout"}
+{"retry":"data/15/4600/15_001.jpg","attempt":1,"error":"The operation was aborted due to timeout"}
+{"retry":"data/14/4600/14_005.jpg","attempt":2,"error":"The operation was aborted due to timeout"}
+{"retry":"data/14/4600/14_009.jpg","attempt":2,"error":"The operation was aborted due to timeout"}
+{"retry":"data/14/4600/14_012.jpg","attempt":2,"error":"The operation was aborted due to timeout"}
+{"retry":"data/14/4600/14_014.jpg","attempt":2,"error":"The operation was aborted due to timeout"}
+{"retry":"data/14/4600/14_015.jpg","attempt":2,"error":"The operation was aborted due to timeout"}
+{"retry":"data/14/4600/14_016.jpg","attempt":2,"error":"The operation was aborted due to timeout"}
+{"retry":"data/15/4600/15_003.jpg","attempt":1,"error":"The operation was aborted due to timeout"}
+{"retry":"data/15/4600/15_004.jpg","attempt":1,"error":"The operation was aborted due to timeout"}
+{"retry":"data/14/4600/14_020.jpg","attempt":2,"error":"The operation was aborted due to timeout"}
+{"retry":"data/15/4600/15_006.jpg","attempt":1,"error":"The operation was aborted due to timeout"}
+{"retry":"data/15/4600/15_007.jpg","attempt":1,"error":"The operation was aborted due to timeout"}
+{"retry":"data/15/4600/15_008.jpg","attempt":1,"error":"The operation was aborted due to timeout"}
+{"retry":"data/15/4600/15_009.jpg","attempt":1,"error":"The operation was aborted due to timeout"}
+{"retry":"data/15/4600/15_010.jpg","attempt":1,"error":"The operation was aborted due to timeout"}
+{"retry":"data/15/4600/15_011.jpg","attempt":1,"error":"The operation was aborted due to timeout"}
+{"retry":"data/15/4600/15_012.jpg","attempt":1,"error":"The operation was aborted due to timeout"}
+{"retry":"data/15/4600/15_013.jpg","attempt":1,"error":"The operation was aborted due to timeout"}
+{"retry":"data/14/4600/14_029.jpg","attempt":2,"error":"The operation was aborted due to timeout"}
+{"retry":"data/15/4600/15_014.jpg","attempt":1,"error":"The operation was aborted due to timeout"}
+{"retry":"data/15/4600/15_015.jpg","attempt":1,"error":"The operation was aborted due to timeout"}
+{"retry":"data/15/4600/15_016.jpg","attempt":1,"error":"The operation was aborted due to timeout"}
+{"retry":"data/14/4600/14_042.jpg","attempt":2,"error":"The operation was aborted due to timeout"}
+{"retry":"data/14/4600/14_043.jpg","attempt":2,"error":"The operation was aborted due to timeout"}
+{"retry":"data/14/4600/14_045.jpg","attempt":2,"error":"The operation was aborted due to timeout"}
+{"total":6526,"done":100,"remaining":6426,"reused":100,"bytes":9580822,"seconds":0,"errors":0,"playbackComplete":false}
+{"total":6526,"done":200,"remaining":6326,"reused":200,"bytes":19514020,"seconds":0,"errors":0,"playbackComplete":false}
+{"total":6526,"done":300,"remaining":6226,"reused":300,"bytes":30670692,"seconds":0,"errors":0,"playbackComplete":false}
+{"total":6526,"done":400,"remaining":6126,"reused":400,"bytes":44658524,"seconds":0,"errors":0,"playbackComplete":false}
+{"total":6526,"done":500,"remaining":6026,"reused":500,"bytes":60295606,"seconds":0,"errors":0,"playbackComplete":false}
+{"total":6526,"done":600,"remaining":5926,"reused":600,"bytes":75644830,"seconds":0,"errors":0,"playbackComplete":false}
+{"total":6526,"done":700,"remaining":5826,"reused":700,"bytes":92093238,"seconds":0,"errors":0,"playbackComplete":false}
+{"total":6526,"done":800,"remaining":5726,"reused":800,"bytes":110247878,"seconds":0,"errors":0,"playbackComplete":false}
+{"total":6526,"done":900,"remaining":5626,"reused":900,"bytes":125548482,"seconds":0,"errors":0,"playbackComplete":false}
+{"total":6526,"done":1000,"remaining":5526,"reused":1000,"bytes":139905496,"seconds":0,"errors":0,"playbackComplete":false}
+{"total":6526,"done":1100,"remaining":5426,"reused":1100,"bytes":153076810,"seconds":0,"errors":0,"playbackComplete":false}
+{"total":6526,"done":1200,"remaining":5326,"reused":1200,"bytes":167221298,"seconds":0,"errors":0,"playbackComplete":false}
+{"total":6526,"done":1300,"remaining":5226,"reused":1300,"bytes":182468324,"seconds":0,"errors":0,"playbackComplete":false}
+{"total":6526,"done":1400,"remaining":5126,"reused":1400,"bytes":197148204,"seconds":0,"errors":0,"playbackComplete":false}
+{"total":6526,"done":1500,"remaining":5026,"reused":1500,"bytes":208804616,"seconds":0,"errors":0,"playbackComplete":false}
+{"total":6526,"done":1600,"remaining":4926,"reused":1600,"bytes":218244588,"seconds":0,"errors":0,"playbackComplete":false}
+{"total":6526,"done":1700,"remaining":4826,"reused":1700,"bytes":231646720,"seconds":0,"errors":0,"playbackComplete":false}
+{"total":6526,"done":1800,"remaining":4726,"reused":1800,"bytes":242178022,"seconds":0,"errors":0,"playbackComplete":false}
+{"total":6526,"done":1900,"remaining":4626,"reused":1900,"bytes":255764500,"seconds":0,"errors":0,"playbackComplete":false}
+{"total":6526,"done":2000,"remaining":4526,"reused":2000,"bytes":270768892,"seconds":0,"errors":0,"playbackComplete":false}
+{"total":6526,"done":2100,"remaining":4426,"reused":2100,"bytes":283988430,"seconds":0,"errors":0,"playbackComplete":false}
+{"total":6526,"done":2200,"remaining":4326,"reused":2200,"bytes":295193730,"seconds":0,"errors":0,"playbackComplete":false}
+{"total":6526,"done":2300,"remaining":4226,"reused":2300,"bytes":302187698,"seconds":0,"errors":0,"playbackComplete":false}
+{"total":6526,"done":2400,"remaining":4126,"reused":2400,"bytes":309142900,"seconds":0,"errors":0,"playbackComplete":false}
+{"total":6526,"done":2500,"remaining":4026,"reused":2500,"bytes":320395262,"seconds":0,"errors":0,"playbackComplete":false}
+{"total":6526,"done":2600,"remaining":3926,"reused":2600,"bytes":332222542,"seconds":0,"errors":0,"playbackComplete":false}
+{"total":6526,"done":2700,"remaining":3826,"reused":2700,"bytes":347073404,"seconds":0,"errors":0,"playbackComplete":false}
+{"total":6526,"done":2800,"remaining":3726,"reused":2800,"bytes":362798036,"seconds":0,"errors":0,"playbackComplete":false}
+{"total":6526,"done":2900,"remaining":3626,"reused":2900,"bytes":380158780,"seconds":0,"errors":0,"playbackComplete":false}
+{"total":6526,"done":3000,"remaining":3526,"reused":3000,"bytes":396727368,"seconds":0,"errors":0,"playbackComplete":false}
+{"total":6526,"done":3100,"remaining":3426,"reused":3100,"bytes":410329594,"seconds":0,"errors":0,"playbackComplete":false}
+{"total":6526,"done":3200,"remaining":3326,"reused":3200,"bytes":423201484,"seconds":0,"errors":0,"playbackComplete":false}
+{"total":6526,"done":3300,"remaining":3226,"reused":3300,"bytes":490433122,"seconds":0,"errors":0,"playbackComplete":true}
+{"total":6526,"done":3400,"remaining":3126,"reused":3400,"bytes":638432091,"seconds":0,"errors":0,"playbackComplete":true}
+{"total":6526,"done":3500,"remaining":3026,"reused":3500,"bytes":809043208,"seconds":0,"errors":0,"playbackComplete":true}
+{"total":6526,"done":3600,"remaining":2926,"reused":3600,"bytes":982575768,"seconds":0,"errors":0,"playbackComplete":true}
+{"total":6526,"done":3700,"remaining":2826,"reused":3700,"bytes":1200908204,"seconds":1,"errors":0,"playbackComplete":true}
+{"total":6526,"done":3800,"remaining":2726,"reused":3800,"bytes":1418108313,"seconds":1,"errors":0,"playbackComplete":true}
+{"total":6526,"done":3900,"remaining":2626,"reused":3900,"bytes":1626200846,"seconds":1,"errors":0,"playbackComplete":true}
+{"total":6526,"done":4000,"remaining":2526,"reused":4000,"bytes":1864134183,"seconds":1,"errors":0,"playbackComplete":true}
+{"total":6526,"done":4100,"remaining":2426,"reused":4100,"bytes":2108543845,"seconds":1,"errors":0,"playbackComplete":true}
+{"total":6526,"done":4200,"remaining":2326,"reused":4126,"bytes":2330229691,"seconds":5,"errors":0,"playbackComplete":true}
+{"total":6526,"done":4300,"remaining":2226,"reused":4128,"bytes":2525718475,"seconds":9,"errors":0,"playbackComplete":true}
+{"total":6526,"done":4400,"remaining":2126,"reused":4130,"bytes":2715599581,"seconds":13,"errors":0,"playbackComplete":true}
+{"total":6526,"done":4500,"remaining":2026,"reused":4132,"bytes":2922604319,"seconds":17,"errors":0,"playbackComplete":true}
+{"total":6526,"done":4600,"remaining":1926,"reused":4134,"bytes":3131731848,"seconds":21,"errors":0,"playbackComplete":true}
+{"total":6526,"done":4700,"remaining":1826,"reused":4140,"bytes":3337462407,"seconds":25,"errors":0,"playbackComplete":true}
+{"total":6526,"done":4800,"remaining":1726,"reused":4141,"bytes":3489678274,"seconds":30,"errors":0,"playbackComplete":true}
+{"total":6526,"done":4900,"remaining":1626,"reused":4143,"bytes":3636499148,"seconds":34,"errors":0,"playbackComplete":true}
+{"total":6526,"done":5000,"remaining":1526,"reused":4146,"bytes":3843535401,"seconds":38,"errors":0,"playbackComplete":true}
+{"total":6526,"done":5100,"remaining":1426,"reused":4149,"bytes":4000142536,"seconds":42,"errors":0,"playbackComplete":true}
+{"total":6526,"done":5200,"remaining":1326,"reused":4150,"bytes":4195184891,"seconds":46,"errors":0,"playbackComplete":true}
+{"total":6526,"done":5300,"remaining":1226,"reused":4152,"bytes":4390037148,"seconds":50,"errors":0,"playbackComplete":true}
+{"total":6526,"done":5400,"remaining":1126,"reused":4155,"bytes":4575688255,"seconds":54,"errors":0,"playbackComplete":true}
+{"total":6526,"done":5500,"remaining":1026,"reused":4158,"bytes":4728970083,"seconds":58,"errors":0,"playbackComplete":true}
+{"total":6526,"done":5600,"remaining":926,"reused":4159,"bytes":4851356948,"seconds":61,"errors":0,"playbackComplete":true}
+{"total":6526,"done":5700,"remaining":826,"reused":4162,"bytes":4992833076,"seconds":65,"errors":0,"playbackComplete":true}
+{"total":6526,"done":5800,"remaining":726,"reused":4165,"bytes":5163343719,"seconds":69,"errors":0,"playbackComplete":true}
+{"total":6526,"done":5900,"remaining":626,"reused":4167,"bytes":5356742156,"seconds":73,"errors":0,"playbackComplete":true}
+{"retry":"data/7_var/4600/7_142.jpg","attempt":1,"error":"HTTP 429"}
+{"retry":"data/7_var/4600/7_144.jpg","attempt":1,"error":"HTTP 429"}
+{"retry":"data/7_var/4600/7_148.jpg","attempt":1,"error":"HTTP 429"}
+{"retry":"data/7_var/4600/7_149.jpg","attempt":1,"error":"HTTP 429"}
+{"retry":"data/7_var/4600/7_150.jpg","attempt":1,"error":"HTTP 429"}
+{"retry":"data/7_var/4600/7_152.jpg","attempt":1,"error":"HTTP 429"}
+{"retry":"data/7_var/4600/7_153.jpg","attempt":1,"error":"HTTP 429"}
+{"retry":"data/7_var/4600/7_154.jpg","attempt":1,"error":"HTTP 429"}
+{"retry":"data/7_var/4600/7_155.jpg","attempt":1,"error":"HTTP 429"}
+{"retry":"data/7_var/4600/7_158.jpg","attempt":1,"error":"HTTP 429"}
+{"total":6526,"done":6000,"remaining":526,"reused":4168,"bytes":5578822178,"seconds":77,"errors":0,"playbackComplete":true}
+{"retry":"data/7_var/4600/7_159.jpg","attempt":1,"error":"HTTP 429"}
+{"retry":"data/7_var/4600/7_161.jpg","attempt":1,"error":"HTTP 429"}
+{"retry":"data/7_var/4600/7_162.jpg","attempt":1,"error":"HTTP 429"}
+{"retry":"data/7_var/4600/7_163.jpg","attempt":1,"error":"HTTP 429"}
+{"retry":"data/7_var/4600/7_165.jpg","attempt":1,"error":"HTTP 429"}
+{"retry":"data/7_var/4600/7_166.jpg","attempt":1,"error":"HTTP 429"}
+{"retry":"data/7/4600/7_005.jpg","attempt":1,"error":"HTTP 429"}
+{"retry":"data/7/4600/7_006.jpg","attempt":1,"error":"HTTP 429"}
+{"retry":"data/7/4600/7_008.jpg","attempt":1,"error":"HTTP 429"}
+{"retry":"data/7/4600/7_010.jpg","attempt":1,"error":"HTTP 429"}
+{"retry":"data/7/4600/7_013.jpg","attempt":1,"error":"HTTP 429"}
+{"retry":"data/7/4600/7_016.jpg","attempt":1,"error":"HTTP 429"}
+{"retry":"data/7/4600/7_040.jpg","attempt":1,"error":"HTTP 429"}
+{"retry":"data/7/4600/7_042.jpg","attempt":1,"error":"HTTP 429"}
+{"retry":"data/7/4600/7_047.jpg","attempt":1,"error":"HTTP 429"}
+{"retry":"data/7/4600/7_053.jpg","attempt":1,"error":"HTTP 429"}
+{"retry":"data/7/4600/7_055.jpg","attempt":1,"error":"HTTP 429"}
+{"retry":"data/7/4600/7_056.jpg","attempt":1,"error":"HTTP 429"}
+{"retry":"data/7_var/4600/7_149.jpg","attempt":2,"error":"The operation was aborted due to timeout"}
+{"retry":"data/7_var/4600/7_150.jpg","attempt":2,"error":"The operation was aborted due to timeout"}
+{"retry":"data/7_var/4600/7_158.jpg","attempt":2,"error":"The operation was aborted due to timeout"}
+{"retry":"data/7_var/4600/7_165.jpg","attempt":2,"error":"The operation was aborted due to timeout"}
+{"total":6526,"done":6100,"remaining":426,"reused":4170,"bytes":5813694144,"seconds":125,"errors":0,"playbackComplete":true}
+{"retry":"data/7/4600/7_076.jpg","attempt":1,"error":"HTTP 429"}
+{"retry":"data/7_var/4600/7_165.jpg","attempt":3,"error":"HTTP 429"}
+{"retry":"data/7/4600/7_079.jpg","attempt":1,"error":"HTTP 429"}
+{"retry":"data/7/4600/7_084.jpg","attempt":1,"error":"HTTP 429"}
+{"retry":"data/7/4600/7_088.jpg","attempt":1,"error":"HTTP 429"}
+{"retry":"data/7/4600/7_089.jpg","attempt":1,"error":"HTTP 429"}
+{"retry":"data/7/4600/7_093.jpg","attempt":1,"error":"HTTP 429"}
+{"retry":"data/7/4600/7_005.jpg","attempt":2,"error":"The operation was aborted due to timeout"}
+{"retry":"data/7/4600/7_006.jpg","attempt":2,"error":"The operation was aborted due to timeout"}
+{"retry":"data/7/4600/7_008.jpg","attempt":2,"error":"The operation was aborted due to timeout"}
+{"retry":"data/7/4600/7_010.jpg","attempt":2,"error":"The operation was aborted due to timeout"}
+{"retry":"data/7/4600/7_013.jpg","attempt":2,"error":"The operation was aborted due to timeout"}
+{"retry":"data/7/4600/7_127.jpg","attempt":1,"error":"HTTP 429"}
+{"retry":"data/7/4600/7_131.jpg","attempt":1,"error":"HTTP 429"}
+{"retry":"data/7/4600/7_133.jpg","attempt":1,"error":"HTTP 429"}
+{"retry":"data/7/4600/7_134.jpg","attempt":1,"error":"HTTP 429"}
+{"retry":"data/7/4600/7_136.jpg","attempt":1,"error":"HTTP 429"}
+{"retry":"data/7/4600/7_016.jpg","attempt":2,"error":"The operation was aborted due to timeout"}
+{"retry":"data/7/4600/7_138.jpg","attempt":1,"error":"HTTP 429"}
+{"retry":"data/7/4600/7_139.jpg","attempt":1,"error":"HTTP 429"}
+{"retry":"data/7/4600/7_013.jpg","attempt":3,"error":"HTTP 429"}
+{"retry":"data/7/4600/7_141.jpg","attempt":1,"error":"HTTP 429"}
+{"retry":"data/7/4600/7_143.jpg","attempt":1,"error":"HTTP 429"}
+{"retry":"data/7/4600/7_016.jpg","attempt":3,"error":"HTTP 429"}
+{"retry":"data/7/4600/7_147.jpg","attempt":1,"error":"HTTP 429"}
+{"retry":"data/7/4600/7_152.jpg","attempt":1,"error":"HTTP 429"}
+{"retry":"data/7/4600/7_153.jpg","attempt":1,"error":"HTTP 429"}
+{"retry":"data/7/4600/7_154.jpg","attempt":1,"error":"HTTP 429"}
+{"retry":"data/7/4600/7_155.jpg","attempt":1,"error":"HTTP 429"}
+{"retry":"data/7/4600/7_156.jpg","attempt":1,"error":"HTTP 429"}
+{"retry":"data/7/4600/7_042.jpg","attempt":2,"error":"The operation was aborted due to timeout"}
+{"retry":"data/7/4600/7_042.jpg","attempt":3,"error":"HTTP 429"}
+{"retry":"data/7/4600/7_160.jpg","attempt":1,"error":"HTTP 429"}
+{"retry":"data/7/4600/7_161.jpg","attempt":1,"error":"HTTP 429"}
+{"retry":"data/7/4600/7_162.jpg","attempt":1,"error":"HTTP 429"}
+{"total":6526,"done":6200,"remaining":326,"reused":4171,"bytes":6063995279,"seconds":163,"errors":0,"playbackComplete":true}
+{"retry":"data/7/4600/7_169.jpg","attempt":1,"error":"HTTP 429"}
+{"retry":"data/7/4600/7_170.jpg","attempt":1,"error":"HTTP 429"}
+{"retry":"data/8/4600/8_001.jpg","attempt":1,"error":"HTTP 429"}
+{"retry":"data/8/4600/8_003.jpg","attempt":1,"error":"HTTP 429"}
+{"retry":"data/8/4600/8_007.jpg","attempt":1,"error":"HTTP 429"}
+{"retry":"data/8/4600/8_010.jpg","attempt":1,"error":"HTTP 429"}
+{"retry":"data/8/4600/8_011.jpg","attempt":1,"error":"HTTP 429"}
+{"retry":"data/8/4600/8_012.jpg","attempt":1,"error":"HTTP 429"}
+{"retry":"data/8/4600/8_023.jpg","attempt":1,"error":"HTTP 429"}
+{"retry":"data/8/4600/8_025.jpg","attempt":1,"error":"HTTP 429"}
+{"retry":"data/8/4600/8_026.jpg","attempt":1,"error":"HTTP 429"}
+{"retry":"data/8/4600/8_027.jpg","attempt":1,"error":"HTTP 429"}
+{"retry":"data/8/4600/8_029.jpg","attempt":1,"error":"HTTP 429"}
+{"retry":"data/8/4600/8_044.jpg","attempt":1,"error":"HTTP 429"}
+{"retry":"data/8/4600/8_045.jpg","attempt":1,"error":"HTTP 429"}
+{"retry":"data/8/4600/8_046.jpg","attempt":1,"error":"HTTP 429"}
+{"retry":"data/8/4600/8_047.jpg","attempt":1,"error":"HTTP 429"}
+{"retry":"data/8/4600/8_049.jpg","attempt":1,"error":"HTTP 429"}
+{"retry":"data/8/4600/8_053.jpg","attempt":1,"error":"HTTP 429"}
+{"retry":"data/8/4600/8_054.jpg","attempt":1,"error":"HTTP 429"}
+{"retry":"data/8/4600/8_057.jpg","attempt":1,"error":"HTTP 429"}
+{"retry":"data/8/4600/8_058.jpg","attempt":1,"error":"HTTP 429"}
+{"retry":"data/8/4600/8_060.jpg","attempt":1,"error":"HTTP 429"}
+{"retry":"data/8/4600/8_062.jpg","attempt":1,"error":"HTTP 429"}
+{"retry":"data/8/4600/8_063.jpg","attempt":1,"error":"HTTP 429"}
+{"retry":"data/7/4600/7_153.jpg","attempt":2,"error":"The operation was aborted due to timeout"}
+{"retry":"data/7/4600/7_155.jpg","attempt":2,"error":"The operation was aborted due to timeout"}
+{"total":6526,"done":6300,"remaining":226,"reused":4173,"bytes":6278717388,"seconds":202,"errors":0,"playbackComplete":true}
+{"retry":"data/8/4600/8_078.jpg","attempt":1,"error":"HTTP 429"}
+{"retry":"data/7/4600/7_153.jpg","attempt":3,"error":"HTTP 429"}
+{"retry":"data/8/4600/8_082.jpg","attempt":1,"error":"HTTP 429"}
+{"retry":"data/8/4600/8_085.jpg","attempt":1,"error":"HTTP 429"}
+{"retry":"data/7/4600/7_155.jpg","attempt":3,"error":"HTTP 429"}
+{"retry":"data/8/4600/8_086.jpg","attempt":1,"error":"HTTP 429"}
+{"retry":"data/8/4600/8_088.jpg","attempt":1,"error":"HTTP 429"}
+{"retry":"data/8/4600/8_100.jpg","attempt":1,"error":"HTTP 429"}
+{"retry":"data/8/4600/8_106.jpg","attempt":1,"error":"HTTP 429"}
+{"retry":"data/8/4600/8_107.jpg","attempt":1,"error":"HTTP 429"}
+{"retry":"data/8/4600/8_119.jpg","attempt":1,"error":"HTTP 429"}
+{"retry":"data/8/4600/8_001.jpg","attempt":2,"error":"The operation was aborted due to timeout"}
+{"retry":"data/8/4600/8_120.jpg","attempt":1,"error":"HTTP 429"}
+{"retry":"data/8/4600/8_123.jpg","attempt":1,"error":"HTTP 429"}
+{"retry":"data/8/4600/8_124.jpg","attempt":1,"error":"HTTP 429"}
+{"retry":"data/8/4600/8_142.jpg","attempt":1,"error":"HTTP 429"}
+{"retry":"data/8/4600/8_143.jpg","attempt":1,"error":"HTTP 429"}
+{"retry":"data/8/4600/8_144.jpg","attempt":1,"error":"HTTP 429"}
+{"retry":"data/8/4600/8_145.jpg","attempt":1,"error":"HTTP 429"}
+{"retry":"data/8/4600/8_148.jpg","attempt":1,"error":"HTTP 429"}
+{"retry":"data/8/4600/8_054.jpg","attempt":2,"error":"The operation was aborted due to timeout"}
+{"total":6526,"done":6400,"remaining":126,"reused":4174,"bytes":6481322322,"seconds":240,"errors":0,"playbackComplete":true}
+{"retry":"data/9/4600/9_006.jpg","attempt":1,"error":"HTTP 429"}
+{"retry":"data/9/4600/9_007.jpg","attempt":1,"error":"HTTP 429"}
+{"retry":"data/9/4600/9_009.jpg","attempt":1,"error":"HTTP 429"}
+{"retry":"data/9/4600/9_010.jpg","attempt":1,"error":"HTTP 429"}
+{"retry":"data/9/4600/9_013.jpg","attempt":1,"error":"HTTP 429"}
+{"retry":"data/9/4600/9_014.jpg","attempt":1,"error":"HTTP 429"}
+{"retry":"data/9/4600/9_015.jpg","attempt":1,"error":"HTTP 429"}
+{"retry":"data/9/4600/9_017.jpg","attempt":1,"error":"HTTP 429"}
+{"retry":"data/9/4600/9_019.jpg","attempt":1,"error":"HTTP 429"}
+{"retry":"data/8/4600/8_085.jpg","attempt":2,"error":"The operation was aborted due to timeout"}
+{"retry":"data/7/4600/7_153.jpg","attempt":4,"error":"The operation was aborted due to timeout"}
+{"retry":"data/8/4600/8_085.jpg","attempt":3,"error":"HTTP 429"}
+{"retry":"data/9/4600/9_034.jpg","attempt":1,"error":"HTTP 429"}
+{"retry":"data/9/4600/9_036.jpg","attempt":1,"error":"HTTP 429"}
+{"retry":"data/9/4600/9_037.jpg","attempt":1,"error":"HTTP 429"}
+{"retry":"data/9/4600/9_038.jpg","attempt":1,"error":"HTTP 429"}
+{"retry":"data/9/4600/9_052.jpg","attempt":1,"error":"HTTP 429"}
+{"retry":"data/9/4600/9_054.jpg","attempt":1,"error":"HTTP 429"}
+{"retry":"data/9/4600/9_057.jpg","attempt":1,"error":"HTTP 429"}
+{"retry":"data/9/4600/9_058.jpg","attempt":1,"error":"HTTP 429"}
+{"retry":"data/7/4600/7_153.jpg","attempt":5,"error":"HTTP 429"}
+{"retry":"data/9/4600/9_060.jpg","attempt":1,"error":"HTTP 429"}
+{"retry":"data/9/4600/9_061.jpg","attempt":1,"error":"HTTP 429"}
+{"retry":"data/9/4600/9_063.jpg","attempt":1,"error":"HTTP 429"}
+{"retry":"data/9/4600/9_064.jpg","attempt":1,"error":"HTTP 429"}
+{"retry":"data/8/4600/8_123.jpg","attempt":2,"error":"The operation was aborted due to timeout"}
+{"retry":"data/9/4600/9_075.jpg","attempt":1,"error":"HTTP 429"}
+{"retry":"data/9/4600/9_079.jpg","attempt":1,"error":"HTTP 429"}
+{"retry":"data/9/4600/9_083.jpg","attempt":1,"error":"HTTP 429"}
+{"total":6526,"done":6500,"remaining":26,"reused":4177,"bytes":6648200950,"seconds":269,"errors":0,"playbackComplete":true}
+{"retry":"data/9/4600/9_087.jpg","attempt":1,"error":"HTTP 429"}
+{"retry":"data/9/4600/9_092.jpg","attempt":1,"error":"HTTP 429"}
+{"retry":"data/9/4600/9_093.jpg","attempt":1,"error":"HTTP 429"}
+{"retry":"data/9/4600/9_010.jpg","attempt":2,"error":"The operation was aborted due to timeout"}
+{"retry":"data/9/4600/9_013.jpg","attempt":2,"error":"The operation was aborted due to timeout"}
+{"retry":"data/9/4600/9_058.jpg","attempt":2,"error":"The operation was aborted due to timeout"}
+{"total":6526,"done":6526,"remaining":0,"reused":4178,"bytes":6688198629,"seconds":309,"errors":0,"playbackComplete":true}

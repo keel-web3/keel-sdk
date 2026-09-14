@@ -119,6 +119,38 @@ const chainOperationPlan: JsonSchema = object({
   encoding: string(), walletApproval: string(), signing: string(), submission: string(), caveat: string(),
 }, ["schema", "status", "materialized", "descriptorMaterialized", "chainReady", "target", "sourcePlan", "operations", "encoding", "walletApproval", "signing", "submission", "caveat"]);
 
+const revisionResource: JsonSchema = object({
+  id: string("Stable logical resource ID.", 128),
+  role: { type: "string", enum: ["shell-prefix", "module", "entrypoint", "asset", "shell-suffix"] },
+  version: integer("Sequential logical resource version.", 1),
+  store: string("Exact selected-chain KeelHold address.", 42),
+  objectId: string("Exact selected-chain object ID.", 66),
+  mediaType: string("Exact resource media type.", 128),
+  integrity,
+  storedByteLength: integer("Measured immutable storage bytes after the declared codec.", 1, 268435456),
+}, ["id", "role", "version", "store", "objectId", "mediaType", "integrity", "storedByteLength"]);
+
+const revisionSnapshot: JsonSchema = object({
+  chainId: integer("Exact selected EVM chain ID.", 1),
+  graphRegistry: string("Exact selected-chain KeelGraphRegistry address.", 42),
+  graphId: string("Stable KeelGraphRegistry graph ID.", 66),
+  graphVersion: integer("Sequential graph version.", 1),
+  resources: { type: "array", items: revisionResource, minItems: 1, maxItems: 128 },
+}, ["chainId", "graphRegistry", "graphId", "graphVersion", "resources"]);
+
+const graphRevision: JsonSchema = object({
+  kind: { type: "string", enum: ["module-revision", "entrypoint-revision", "asset-revision", "shell-revision"] },
+  bindingMode: { type: "string", enum: ["follow-latest", "pinned"] },
+  changedResourceIds: {
+    type: "array",
+    items: string("The one creator-declared changed file or module ID.", 128),
+    minItems: 1,
+    maxItems: 1,
+  },
+  live: revisionSnapshot,
+  candidate: revisionSnapshot,
+}, ["kind", "bindingMode", "changedResourceIds", "live", "candidate"]);
+
 const frayAuctionIntake: JsonSchema = object({
   sourcePath: string("Optional workspace-relative artwork path.", 1024),
   title: string("Artwork title.", 160),
@@ -178,6 +210,7 @@ const studioProjectIntake: JsonSchema = object({
     type: { type: "string", enum: ["one-of-one", "open-edition", "limited-edition"] },
     saleMechanism: { type: "string", enum: ["fixed-price", "auction", "claim"] },
     priceEth: string("Editable ETH price; required only for a release.", 80),
+    supply: string("Positive integer copy count required for limited editions. Omit for open editions.", 78),
     startsAt: string("Optional ISO timestamp. Omit for immediate availability.", 64),
     endsAt: string("Optional ISO timestamp.", 64),
   }),
@@ -200,6 +233,13 @@ const studioStageFile: JsonSchema = object({
   updateMode: { type: "string", enum: ["locked", "manual"] },
   label: string("Creator-facing component label. Do not declare a KEEL verification shell or replacement wrapper.", 96),
 }, ["path", "mediaType", "role", "format"]);
+const studioReusableModule: JsonSchema = object({
+  resourcePaths: { type: "array", items: string("Path of a staged module resource.", 512), minItems: 1, maxItems: 256 },
+  assetType: { type: "string", enum: ["runtime", "library", "tool", "other"] },
+  license: string("SPDX identifier or exact license name.", 120),
+  accessMode: { type: "string", enum: ["open", "paid", "license", "subscription", "request", "special"] },
+  tags: { type: "array", items: string("Reusable-module search tag.", 64), minItems: 0, maxItems: 24 },
+}, ["resourcePaths", "assetType", "license"]);
 const studioStageProject: JsonSchema = object({
   studioUrl: string("Optional HTTPS Studio URL; KEEL_STUDIO_URL is used otherwise.", 512),
   title: string("Project title.", 160),
@@ -208,6 +248,7 @@ const studioStageProject: JsonSchema = object({
   marketplaceExportMode: { type: "string", enum: ["recursive", "packed", "hybrid", "onchfs"] },
   viewer: { type: "string", enum: ["keel-verification-shell", "none"], description: "Omit to select Studio's canonical KEEL Inline graph for later preparation. Standalone image, video, and self-contained GLB use the registered keel.asset-display module plus the direct creator asset, never zero modules or a generated index.html. `none` opts out of the shell only: the immutable artifact may still be released, minted, and retrieved through its contract read. Creator HTML remains content, never a replacement shell or protected-harness/local wrapper." },
   files: { type: "array", items: studioStageFile, minItems: 1, maxItems: 256 },
+  reusableModule: studioReusableModule,
   releaseIntent: { type: "object", description: "Optional editable keel-release-intent@1 produced by keel-studio-project-intake." },
 }, ["title", "storageStrategy", "files"]);
 const creator721Config: JsonSchema = object({
@@ -256,6 +297,53 @@ const shellPrepare: JsonSchema = {
     object({ operation: { type: "string", enum: ["freeze"] }, creator: shellManifestFields.creator!, builderAddress: shellMutationFields.builderAddress!, shellId: shellMutationFields.shellId! }, ["operation", "creator", "builderAddress", "shellId"]),
   ],
 };
+const inlinePrepare: JsonSchema = object({
+  repositoryRoot: string("Optional checkout verification. Omit to use the packaged canonical shell."),
+  entry: string("Workspace-relative creator entry. JavaScript is composed by the SDK; HTML must be a complete document."),
+  entryMediaType: { type: "string", enum: ["text/javascript", "text/html"] },
+  modules: {
+    type: "array",
+    maxItems: 16,
+    description: "Reusable graph modules published once per chain. A text/javascript module MUST be a classic script: the shell executes it with document.head.append(script), so an ES module fails on `export`.",
+    items: object({
+      moduleId: string("Safe module id, e.g. keel.micropython.", 64),
+      version: string(undefined, 32),
+      path: string("Workspace-relative module payload."),
+      mediaType: string(undefined, 128),
+      execution: { type: "string", enum: ["classic", "module"] },
+      phase: { type: "string", enum: ["data", "runtime"] },
+      weight: integer("Ordering weight.", 0, 1000),
+    }, ["moduleId", "version", "path", "mediaType"]),
+  },
+  assets: {
+    type: "array",
+    maxItems: 32,
+    description: "Creator-specific artwork, media, palettes, timing, and data. KEEL packs these once at their binary slot and keeps them creator-owned.",
+    items: object({
+      assetId: string("Safe resource id used by __KEEL_CONTENT__, e.g. keel.animation.", 128),
+      path: string("Workspace-relative creator asset."),
+      mediaType: string(undefined, 128),
+      compression: { type: "string", enum: ["none", "gzip", "deflate"] },
+    }, ["assetId", "path", "mediaType"]),
+  },
+  carriage: {
+    type: "string",
+    enum: ["compact", "raw-percent", "percent", "follow-latest", "pinned"],
+    description: "Optional. Omit for compact raw-percent, which is the storage-saving default. Legacy Base64 carriages require explicit selection.",
+  },
+  collection: string("Collection address for a prepared one-of-one tokenURI.", 42),
+  metadataTransport: { type: "string", enum: ["web3-json"], description: "Existing collection URI route: prepare raw JSON with inline SVG/image and canonical HTML, without KEEL721-specific binding calls." },
+  web3ImageResolver: { type: "string", maxLength: 42, description: "Explicit separate SVG matrix address on chainId. Requires web3-json and the source imagePath; keeps animation inline and prepares both responses with shared layers. Does not verify deployment or bind the endpoint." },
+  metadataPath: string("Original contract-referenced metadata JSON. Required for web3-json; fields are preserved except image and animation_url."),
+  tokenId: string("Explicit decimal token ID for web3-json, including token zero.", 78),
+  tokenIdFieldsJson: string('Optional exact field patterns, e.g. {"name":{"prefix":"Gator #","suffix":""}}. Values must match original metadata; the matrix generates the ID at read time.', 16000),
+  collectionName: string(undefined, 128),
+  description: string(undefined, 1024),
+  imagePath: string("Workspace-relative poster used for image_url and inlined as a small data URI."),
+  manifestURI: string(undefined, 512),
+  manifestDigest: string("0x-prefixed sha256 of the canonical manifest.", 66),
+  chainId: integer("EVM chain id.", 1),
+}, ["entry"]);
 const shellSearch: JsonSchema = object({
   studioUrl: string("Optional configured KEEL Studio origin.", 512),
   query: string("Shell name, description, version, creator, or tag query.", 120),
@@ -345,7 +433,14 @@ export const TOOL_SCHEMAS = {
   }, ["plan", "family", "chainId", "target"]),
   publishPlan: object({
     chainPlan: { ...chainOperationPlan, description: "The structured result returned by chain-plan." },
-  }, ["chainPlan"]),
+    publicationIntent: {
+      type: "string",
+      enum: ["new-object", "existing-graph-revision"],
+      description: "Derived from the target state by Studio or the caller; creators are not asked to identify protocol mechanics.",
+    },
+    revision: { ...graphRevision, description: "Required for an existing graph revision and forbidden for a new object." },
+  }, ["chainPlan", "publicationIntent"]),
+  revisionPlan: graphRevision,
   moduleResolve: object({ snapshot: string(), selector: moduleSelector }, ["snapshot", "selector"]),
   moduleLock: object({ snapshot: string(), out: string(), selector: moduleSelector }, ["snapshot", "out", "selector"]),
   walletRequestPrepare: object({ request: walletRequest, qr: boolean() }, ["request"]),
@@ -362,6 +457,7 @@ export const TOOL_SCHEMAS = {
   studioDraft,
   studioStageProject,
   creatorCollectionPrepare,
+  inlinePrepare,
   shellSearch,
   shellPrepare,
 } as const;

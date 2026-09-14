@@ -34,8 +34,10 @@ export const KEEL_VERIFICATION_CSS = '\n      :root{color-scheme:dark;font:14px 
  */
 export const KEEL_VERIFICATION_RESPONSIVE_DOCK_CSS = `
 #keel-stage{position:absolute;inset:0;transition:right .38s cubic-bezier(.18,.86,.24,1)}
-.verify-corner .verify-seal{opacity:.24!important;visibility:visible!important;pointer-events:auto!important;transform:translateX(0) rotate(-4deg) scale(.94)!important}
-.verify-corner:hover .verify-seal,.verify-corner[data-verify-corner-active=true] .verify-seal,.verify-seal[aria-expanded=true]{opacity:1!important;transform:translateX(0) rotate(0deg) scale(1)!important}
+.verify-corner .verify-seal{opacity:0!important;visibility:visible!important;pointer-events:none!important;transform:translate(-140%,140%) rotate(-18deg) scale(.9)!important;transition:opacity var(--keel-seal-fade-in,240ms) ease,transform var(--keel-seal-fade-in,240ms) cubic-bezier(.2,.85,.25,1)!important}
+.verify-corner:hover .verify-seal,.verify-corner:focus-within .verify-seal,.verify-corner[data-verify-corner-active=true] .verify-seal,.verify-seal[aria-expanded=true]{opacity:1!important;pointer-events:auto!important;transform:translate(0,0) rotate(0deg) scale(1)!important}
+.verify-corner:focus{outline:none}
+@media(prefers-reduced-motion:reduce){.verify-corner .verify-seal{transition:none!important}}
 @media(min-width:701px){
   body[data-keel-panel-placement="right"] .verify-backdrop{display:none}
   body[data-keel-panel-placement="right"] .verify-panel{top:0!important;right:0!important;bottom:0!important;left:auto!important;width:var(--keel-panel-width,min(560px,44vw))!important;max-height:none!important;border-radius:0!important;transform:translateX(100%)!important}
@@ -52,7 +54,7 @@ export const KEEL_VERIFICATION_RESPONSIVE_DOCK_CSS = `
 }
 `;
 
-export const KEEL_VERIFICATION_MARKUP = '<div class="verify-corner" data-verify-intent-zone="bottom-left"><button class="verify-seal" id="verify-seal" data-keel-seal="stamp" type="button" tabindex="-1" aria-hidden="true" aria-controls="verify-panel" aria-expanded="false" aria-label="Open Keel verification proof"><span class="seal-mark" aria-hidden="true"></span><span class="seal-label">Keel proof</span></button></div><button class="verify-backdrop" id="verify-backdrop" type="button" tabindex="-1" aria-label="Close verification details"></button><aside class="verify-panel" id="verify-panel" role="dialog" aria-modal="true" aria-labelledby="verify-title" aria-describedby="verify-summary" aria-hidden="true"><header class="verify-head"><span class="verify-orb" aria-hidden="true"><span class="seal-mark"></span></span><div class="verify-copy"><p class="verify-kicker" id="verify-kicker">Checking proof</p><h2 class="verify-title" id="verify-title">Verification pending</h2><p class="verify-summary" id="verify-summary">Inspecting the pinned Keel runtime context.</p></div><button class="verify-close" id="verify-close" type="button" aria-label="Close verification details">×</button></header><div class="verify-scroll" id="verify-details"></div><footer class="verify-footer"><strong>Keel proof viewer</strong><span id="verify-tier">Client proof</span></footer></aside><section class="verify-alert" id="verify-alert" role="alert" aria-live="assertive"><div class="verify-alert-copy"><p class="verify-alert-kicker">Do not trust this render</p><h2>Verification failed</h2><p id="verify-alert-message">The supplied on-chain proof did not match the rendered asset.</p><div class="verify-alert-actions"><button id="verify-alert-open" type="button">Inspect failed checks</button><button class="verify-alert-dismiss" id="verify-alert-dismiss" type="button">Dismiss warning</button></div></div></section>';
+export const KEEL_VERIFICATION_MARKUP = '<div class="verify-corner" data-verify-intent-zone="bottom-left" tabindex="0" aria-label="Reveal Keel verification control"><button class="verify-seal" id="verify-seal" data-keel-seal="stamp" type="button" tabindex="-1" aria-hidden="true" aria-controls="verify-panel" aria-expanded="false" aria-label="Open Keel verification proof"><span class="seal-mark" aria-hidden="true"></span><span class="seal-label">Keel proof</span></button></div><button class="verify-backdrop" id="verify-backdrop" type="button" tabindex="-1" aria-label="Close verification details"></button><aside class="verify-panel" id="verify-panel" role="dialog" aria-modal="true" aria-labelledby="verify-title" aria-describedby="verify-summary" aria-hidden="true"><header class="verify-head"><span class="verify-orb" aria-hidden="true"><span class="seal-mark"></span></span><div class="verify-copy"><p class="verify-kicker" id="verify-kicker">Checking proof</p><h2 class="verify-title" id="verify-title">Verification pending</h2><p class="verify-summary" id="verify-summary">Inspecting the pinned Keel runtime context.</p></div><button class="verify-close" id="verify-close" type="button" aria-label="Close verification details">×</button></header><div class="verify-scroll" id="verify-details"></div><footer class="verify-footer"><strong>Keel proof viewer</strong><span id="verify-tier">Client proof</span></footer></aside><section class="verify-alert" id="verify-alert" role="alert" aria-live="assertive"><div class="verify-alert-copy"><p class="verify-alert-kicker">Do not trust this render</p><h2>Verification failed</h2><p id="verify-alert-message">The supplied on-chain proof did not match the rendered asset.</p><div class="verify-alert-actions"><button id="verify-alert-open" type="button">Inspect failed checks</button><button class="verify-alert-dismiss" id="verify-alert-dismiss" type="button">Dismiss warning</button></div></div></section>';
 export const KEEL_VERIFICATION_PRESENTATION = '{"protocol":"keel-verification-presentation@1","revision":2,"seal":{"glyph":"K","shape":"stamp","motion":"slide","color":"verification-state","sizePx":40,"fadeInMs":420,"holdMs":650,"fadeOutMs":900},"overlay":{"placement":"left","width":"wide","navigation":"tabs","initialPage":"overview"},"theme":{"accent":"verification-state","surface":"#07120f","text":"#d9e8e3","muted":"#748d85","radiusPx":22},"pages":[{"id":"overview","label":"Proof","layout":"stack","columns":1,"panels":[{"id":"proof-summary","type":"overview","span":1},{"id":"verification-checks","type":"checks","span":1}]},{"id":"sources","label":"Files","layout":"columns","columns":2,"panels":[{"id":"storage-sources","type":"storage","span":1},{"id":"verified-resources","type":"resources","span":1}]},{"id":"provenance","label":"Trail","layout":"grid","columns":2,"panels":[{"id":"token-identity","type":"identity","span":1},{"id":"version-commitments","type":"commitments","span":1},{"id":"keel-object-trail","type":"object-trail","span":2},{"id":"stake-object","type":"staking","span":2},{"id":"contract-facets","type":"contract-facets","span":2}]}]}';
 
 const KEEL_VERIFICATION_PRESENTATION_PROTOCOL = "keel-verification-presentation@1";
@@ -512,6 +514,18 @@ function mountVerificationUI(result, runtime, runtimeContext, presentationInput)
     if (identityCount === 0) note(identity, "No token-specific identity was supplied to this viewer.");
     else if (next.syntheticTokenContext) note(identity, "These are preview inputs. A live token proof also needs the pinned block and block hash.");
 
+    const release = runtimeContext?.releaseDisclosure;
+    if (release !== undefined) {
+      row(identity, "Logical release", release.releaseId, { plain: true });
+      row(identity, "Token within release", release.localId, { plain: true });
+      for (const [key, value] of release.rows) row(identity, key, value, { plain: true });
+      row(identity, "Token contract maximum", release.targetMaximum, { plain: true });
+      row(identity, "Current supply authority", release.authority);
+      row(identity, "Supply router", release.router);
+      row(identity, "Supply snapshot block", `${release.blockNumber} · ${release.blockHash}`);
+      note(identity, "Supply is reported at this pinned block. The policy applies to this logical release; contract-control verification is shown separately.");
+    }
+
     const versions = section("Versions & commitments", "commitments");
     let versionCount = 0;
     versionCount += row(versions, "Viewer revision", runtime?.revision) ? 1 : 0;
@@ -614,11 +628,14 @@ function mountVerificationUI(result, runtime, runtimeContext, presentationInput)
   const scheduleCornerHide = () => {
     clearTimeout(cornerHideTimer);
     cornerHideTimer = setTimeout(() => {
-      if (!document.body.classList.contains("verify-open")) setCornerPresence(false);
+      if (!document.body.classList.contains("verify-open") && !corner.matches(":hover") && !corner.contains(document.activeElement)) setCornerPresence(false);
     }, presentation.seal.holdMs);
   };
   setCornerPresence(false);
   corner.addEventListener("pointerenter", revealCorner);
+  corner.addEventListener("focus", revealCorner);
+  corner.addEventListener("blur", scheduleCornerHide);
+  corner.addEventListener("keydown", event => { if(event.target === corner && (event.key === "Enter" || event.key === " ")) {event.preventDefault();revealCorner();seal.focus({preventScroll:true});} });
   corner.addEventListener("pointerleave", scheduleCornerHide);
   corner.addEventListener("pointerdown", revealCorner);
   corner.addEventListener("pointerup", scheduleCornerHide);

@@ -242,10 +242,37 @@ Ethereum target, operation shapes, and SHA-256 envelope integrity while keeping
 encode ABI calldata, perform Tezos packing, query a chain, or expose a private
 key. Use `verifyKeelPublishReviewPlan` before handing the envelope to a
 future contract-specific adapter; generic Tezos descriptors fail closed until
-that adapter exists. Its `identifierSemantics` field makes clear that builder
+that adapter exists. The native Tezos FA2 adapter is exposed separately through
+`tezos-publication.ts`: `buildKeelCollectionSetTokenMetadata` writes ordinary
+FA2/TZIP-12 token metadata (including `onchfs://` or IPFS carriers),
+`buildKeelCollectionSetTokenJson` preserves the additive KEEL sleeve route, and
+`buildKeelCollectionFreezeTokenMetadata` permanently welds the reviewed values.
+Its `identifierSemantics` field makes clear that builder
 logical IDs are not chain IDs, and local source paths are deliberately omitted
 from the committed summary; adapters must bind their own workspace and
 recompute byte/receipt proofs.
+
+## Publish only an existing graph's changed module
+
+Use `planKeelGraphRevision` before planning an upload for an existing
+`KeelGraphRegistry` graph. Pass the live selected-chain snapshot, its exact
+next candidate version, and the one logical resource that changed. The
+automatic gate rejects any added, removed, renamed, reinterpreted, or
+undeclared resource; every unchanged resource must retain its exact object ID,
+integrity, version, role, media type, and measured byte length.
+
+The result separates `newStoredBytes` from `reusedStoredBytes` and exposes only
+the declared resource as uploadable. `assertKeelRevisionUploadMatchesPlan`
+then binds the chain-plan source digest, byte length, and media type to that
+resource. Identical-byte copies, non-sequential versions, and automatic deltas
+above 65,536 stored bytes fail before wallet review. A `follow-latest` binding
+publishes and activates the next graph version without rewriting the token
+presentation; a pinned binding updates only its small version reference.
+
+The MCP `publish-plan` tool requires a `publicationIntent`. Studio and the
+desktop derive it from the target's saved publication state so creators do not
+choose protocol mechanics. `existing-graph-revision` also requires the full
+revision input and recomputes the gate before returning a review envelope.
 
 ## Authorization semantics
 
@@ -398,3 +425,29 @@ and `automationKeyState(signer)` for `{ validUntil, nonce, generation }`.
 These replace the separate counter/policy/key getters. `governanceEpoch()` and
 `executionMode()` remain narrow reads for contract authorization. Snapshot types
 are return values; they add no storage and preserve recovery-based key retirement.
+
+## Runtime module discovery
+
+See [runtime module discovery and reuse](../../docs/KEEL_RUNTIME_MODULE_DISCOVERY.md) for the shared SDK/API/MCP lookup, unverified module sandbox, coverage limits, and browser MP4 encoding workflow. Empty catalog results never authorize rebuilding an existing module.
+
+
+### Seed request and reveal lifecycle
+
+Import `readKeelSeedStatus` and `buildKeelSeedAction` from
+`@keel/sdk/mint-seed-lifecycle`. The reader resolves a token's batch and separates
+waiting, missing history, request-needed, ready-to-reveal and revealed states.
+It also checks the sending wallet's credits or request authority when needed.
+Supply the chosen chain and a matching block hash/number; pin every transport
+read to that canonical block hash. RPC errors propagate instead of becoming
+pending status.
+
+The action builder accepts `buy-credits`, `request`, `reveal` or `deliver` and
+returns exact unsigned calldata/native value for review. Use bigint or canonical
+decimal text for IDs and prices. Refresh price and status before signing; these
+helpers never send transactions, fund a Chainlink subscription or promise that a
+coordinator will fulfill a request. One VRF request covers one committed mint
+batch; unrelated minters do not share pending requests.
+
+### Contract SVG renderer
+
+Use `@keel/sdk/svg-renderer-authoring` to create editable designs, deterministic previews and reusable Solidity renderers. Use `@keel/sdk/svg-renderer` to read native contract SVGs, inspect hidden proof provenance and compare complete SVG bytes against finalized contract output. See [the renderer guide](../../docs/KEEL_SVG_RENDERER.md).

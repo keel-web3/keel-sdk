@@ -114,11 +114,19 @@ uploaded `index.html`, and ordinary project agents do not author one:
   It uses `PreEncodedGraph`: registered top, any ordered shared modules and
   creator work, then registered bottom. `registeredPreEncodedTokenURI(...)`
   checks those exact graph boundaries and copies the already encoded graph.
-  It does not rebuild or Base64-encode the p5 runtime, shell, or creator work.
+  It does not rebuild or Base64-encode the p5 runtime, shell, or creator work
+  during a contract read; its legacy stored fragments were prepared with an
+  inner HTML Base64 layer at build time.
   Resolve its builder from the selected-chain Studio Inline catalog, require
   that address to be Studio's active `keel-harness-builder`, and verify the
   exact `shells(shellId)` record. An old deployment journal is a receipt, not
   active configuration.
+- `KeelPercentTokenURIBuilder` is the separately sized compact prepared route.
+  Its stored graph is still an aligned Base64 slice of the outer JSON tokenURI,
+  but the decoded `animation_url` is percent-carried HTML. It accepts only
+  `application/vnd.keel.token-uri-percent-fragment`, uppercase canonical
+  escapes, and the matching `data:text/html;charset=utf-8,` envelope. This
+  prevents a percent envelope from being paired with a legacy Base64 graph.
 - `PROTECTION_SHELL_ID()` keeps the older complete-document protection wrapper
   separate. Its three-argument `shellDataURI` overload remains compatible for
   advanced callers, but it is not the canonical Inline graph assembler. Current

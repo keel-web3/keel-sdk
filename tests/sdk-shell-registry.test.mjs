@@ -87,6 +87,14 @@ test("the generated harness ABI exposes the registry and overloaded shell reads"
   assert.ok(functions.some((item) => item.name === "shells"));
 });
 
+test("the generated compact prepared builder ABI exposes bound validation and assembly", async () => {
+  const abi = await moduleAbi("keel-harness", "KeelPercentTokenURIBuilder");
+  const functions = abi.filter((item) => item.type === "function");
+  assert.ok(functions.some((item) => item.name === "preparedTokenURIEnvelopeValid" && item.inputs.length === 4));
+  assert.ok(functions.some((item) => item.name === "preparedTokenURIFragmentValid" && item.inputs.length === 2));
+  assert.ok(functions.some((item) => item.name === "preparedTokenURI" && item.inputs.length === 4));
+});
+
 test("the SDK prepares explicit gzip-shell reads without claiming protection", () => {
   const shellId = keelShellId("luna.shell.gzip-only@1");
   const call = buildKeelShellDataURICall({

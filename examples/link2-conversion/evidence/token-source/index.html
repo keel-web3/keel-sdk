@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html>
+	<head>
+        <meta charset='utf-8'>
+		<title>Link 2</title>
+		<meta name='viewport' content='width=device-width, initial-scale=1, user-scalable=no'>
+		<link rel="manifest" href="./manifest.json">
+		<link rel="icon" type="image/png" sizes="32x32" href="./icons/icon_32.png">
+		<style type='text/css'>
+			html {
+				height: 100%;
+			}
+			body  {
+				margin: 0;
+				user-select: none;
+				-webkit-user-select: none;
+				overscroll-behavior: none;
+				overflow: hidden;
+			}
+			body {
+				background-color: black;
+			}
+			pre {
+				font-family: monospace;
+				padding: 1em;
+				margin: 0;
+				color: white;
+				position: absolute;
+				left:0;
+				top:0;
+			}
+		</style>
+	</head>
+	<body>
+		<canvas></canvas>
+		<pre></pre>
+		<script type='module'>
+
+			import { mergeSettings, TYPES } from './js/settings.js'
+			import { boot } from './js/js.js'
+
+			const CONFIG = {
+				 '1' : {frames :  48, var : false, structure : 'Lines', shape : 'Circle'},
+				 '2' : {frames : 192, var : false, structure : 'Lines', shape : 'Circle'},
+				 '3' : {frames :  95, var : false, structure : 'Lines', shape : 'Circle'},
+				 '4' : {frames :  96, var : false, structure : 'Lines', shape : 'Circle'},
+				 '5' : {frames : 192, var : false, structure : 'Lines', shape : 'Circle'},
+				 '6' : {frames :  96, var : true,  structure : 'Lines', shape : 'Square'},
+				 '7' : {frames : 192, var : true,  structure : 'Lines', shape : 'Circle'},
+				 '8' : {frames : 192, var : false, structure : 'Lines', shape : 'Circle'},
+				 '9' : {frames :  96, var : false, structure : 'Lines', shape : 'Square'},
+				'10' : {frames :  96, var : false, structure : 'Lines', shape : 'Circle'},
+				'11' : {frames : 192, var : true,  structure : 'Lines', shape : 'Circle'},
+				'12' : {frames :  96, var : false, structure : 'Lines', shape : 'Circle'},
+				'13' : {frames : 192, var : false, structure : 'Lines', shape : 'Circle'},
+				'14' : {frames :  48, var : false, structure : 'Lines', shape : 'Circle'},
+				'15' : {frames :  96, var : false, structure : 'Lines', shape : 'Circle'},
+				'16' : {frames : 192, var : false, structure : 'Lines', shape : 'Circle'},
+				'17' : {frames : 192, var : false, structure : 'Lines', shape : 'Circle'},
+				'18' : {frames :  48, var : false, structure : 'Lines', shape : 'Circle'},
+				'19' : {frames :  48, var : false, structure : 'Lines', shape : 'Circle'},
+				'20' : {frames :  96, var : false, structure : 'Lines', shape : 'Circle'},
+				'21' : {frames :  96, var : false, structure : 'Lines', shape : 'Circle'},
+				'22' : {frames : 192, var : false, structure : 'Lines', shape : 'Circle'},
+			}
+
+			const SETTINGS = mergeSettings({
+				id         : { type : TYPES.INT,     value : 0     }, // 0 = load a random id
+				resolution : { type : TYPES.INT,     value : 1600  }, // 1600 or 4600
+				zoom       : { type : TYPES.FLOAT,   value : 1.2   },
+				fps        : { type : TYPES.INT,     value : 30    },
+				cd         : { type : TYPES.INT,     value : 2     }, // concurrent downloads
+				var        : { type : TYPES.BOOLEAN, value : false }, // variationi enabled (if present)
+			}, new URLSearchParams(window.location.search))
+
+			boot(CONFIG, SETTINGS)
+
+		</script>
+	</body>
+</html>

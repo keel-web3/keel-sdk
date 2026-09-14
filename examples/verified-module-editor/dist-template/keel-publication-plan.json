@@ -1,0 +1,43 @@
+{
+  "schema": "keel-creator-publication-plan@1",
+  "nodes": [
+    {
+      "key": "object:art.html",
+      "file": "art.html",
+      "mediaType": "text/html",
+      "integrity": {
+        "algorithm": "sha256",
+        "digest": "0xec57c3c8d884024c785b05123c54acf2622ad94cfe475d2364fa18cecc2777c3",
+        "byteLength": 308
+      },
+      "objectId": null
+    },
+    {
+      "key": "object:sandbox/art/art.js",
+      "file": "sandbox/art/art.js",
+      "mediaType": "text/javascript",
+      "integrity": {
+        "algorithm": "sha256",
+        "digest": "0x351fdbc20e207d3c281140339df381179b0b50727c1a25545dc50fa04df19860",
+        "byteLength": 64980
+      },
+      "objectId": null
+    }
+  ],
+  "edges": [
+    {
+      "consumer": "object:art.html",
+      "dependency": "object:sandbox/art/art.js",
+      "localSpecifier": "./sandbox/art/art.js",
+      "publishResolution": "object-id-from-receipt"
+    }
+  ],
+  "surfaces": [
+    {
+      "name": "art",
+      "isolation": "sandbox",
+      "html": "art.html",
+      "entry": "sandbox/art/art.js"
+    }
+  ]
+}

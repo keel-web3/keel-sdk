@@ -264,57 +264,9 @@ export const keelAttestedAnchorRegistryAbi = [
 
 /** Chainlink Functions adapter that reports verification results into the
  * attested-anchor registry. */
-export const keelChainlinkFunctionsVerifierAbi = [
-  "function router() view returns (address)",
-  "function anchorRegistry() view returns (address)",
-  "function keelHold() view returns (address)",
-  "function donId() view returns (bytes32)",
-  "function subscriptionId() view returns (uint64)",
-  "function callbackGasLimit() view returns (uint32)",
-  "function REQUESTER_ROLE() view returns (bytes32)",
-  "function familyRoute(uint8 familyId) view returns ((bytes32 sourceSlugId,uint32 minConfirmations,bool exists))",
-  "function pendingRequest(bytes32 requestId) view returns ((bytes32 anchorId,uint64 nonce,uint32 taskIndex,uint64 requestedAt,bool exists))",
-  "function taskRequest(bytes32 anchorId,uint64 nonce,uint32 taskIndex) view returns (bytes32)",
-  "function setRequestConfig(bytes32 donId,uint64 subscriptionId,uint32 callbackGasLimit)",
-  "function setFamilyRoute(uint8 familyId,bytes32 sourceSlugId,uint32 minConfirmations)",
-  "function beginVerification(bytes32 anchorId,uint32 taskIndex) returns (bytes32 requestId)",
-  "function grantRole(bytes32 role,address account)",
-  "event RequestConfigured(bytes32 donId,uint64 subscriptionId,uint32 callbackGasLimit)",
-  "event FamilyRouteConfigured(uint8 indexed familyId,bytes32 sourceSlugId,uint32 minConfirmations)",
-  "event VerificationRequested(bytes32 indexed anchorId,bytes32 indexed requestId,uint64 nonce,uint32 taskIndex,address requester)",
-  "event VerificationFulfilled(bytes32 indexed anchorId,bytes32 indexed requestId,uint32 taskIndex,uint8 outcome,bytes32 reportedDigest)",
-  "event VerificationErrored(bytes32 indexed anchorId,bytes32 indexed requestId,uint32 taskIndex,bytes err)",
-  "event ResultDeliveryFailed(bytes32 indexed anchorId,bytes32 indexed requestId,uint32 taskIndex,bytes reason)",
-  "event UnknownFulfillment(bytes32 indexed requestId)",
-] as const;
-
 /** CRE report receiver adapter: the Chainlink Functions successor. Emits
  * VerificationRequested for the workflow's EVM log trigger and accepts
  * DON-signed reports from the KeystoneForwarder. */
-export const keelCreReportVerifierAbi = [
-  "function anchorRegistry() view returns (address)",
-  "function forwarder() view returns (address)",
-  "function expectedWorkflowOwner() view returns (address)",
-  "function expectedWorkflowName() view returns (bytes10)",
-  "function expectedWorkflowId() view returns (bytes32)",
-  "function familyConfig(uint8 familyId) view returns ((uint32 minConfirmations,bool exists))",
-  "function REQUESTER_ROLE() view returns (bytes32)",
-  "function configLocked() view returns (bool)",
-  "function setForwarder(address forwarder)",
-  "function setWorkflowIdentity(address expectedOwner,bytes10 expectedName,bytes32 workflowId)",
-  "function lockConfiguration()",
-  "function setFamilyConfig(uint8 familyId,uint32 minConfirmations)",
-  "function beginVerification(bytes32 anchorId,uint32 taskIndex)",
-  "function onReport(bytes metadata,bytes report)",
-  "function grantRole(bytes32 role,address account)",
-  "event ForwarderConfigured(address forwarder)",
-  "event WorkflowIdentityConfigured(address expectedOwner,bytes10 expectedName,bytes32 expectedWorkflowId)",
-  "event FamilyConfigured(uint8 indexed familyId,uint32 minConfirmations)",
-  "event VerificationRequested(bytes32 indexed anchorId,uint64 nonce,uint32 taskIndex,uint8 sourceFamily,uint32 sourceNetwork,uint8 digestKind,bytes32 expectedDigest,uint32 minConfirmations,string locator,address requester)",
-  "event ReportResultApplied(bytes32 indexed anchorId,uint64 nonce,uint32 taskIndex,uint8 outcome,bytes32 digest)",
-  "event ReportResultSkipped(bytes32 indexed anchorId,uint64 nonce,uint32 taskIndex,bytes reason)",
-] as const;
-
 /** Anchor-gated cross-chain minting: source-side requests trigger a CRE
  * workflow; target-side mints native tokens through the collection's manager
  * surface, deduped one mint per source token per chain. */
@@ -375,30 +327,22 @@ export const keelMintRouteRegistryAbi = [
   "function reserveCapacity(uint256 routeId,bytes32 allocationId,uint256 quantity)",
   "function releaseCapacity(uint256 routeId,bytes32 allocationId,uint256 quantity)",
   "function mintReserved(uint256 routeId,bytes32 allocationId,address recipient,uint256 quantity,bytes data)",
+  "function mintReservedBatch(address recipient,(bytes data,uint256 routeId,uint256 quantity,bytes32 allocationId)[] mints)",
+  "function mintUnreservedBatch(address recipient,(bytes data,uint256 routeId,uint256 quantity,bytes32 allocationId)[] mints)",
   "function mintUnreserved(uint256 routeId,bytes32 allocationId,address recipient,uint256 quantity,bytes data)",
   "function reservedCapacity(address controller,uint256 routeId,bytes32 allocationId) view returns (uint256)",
   "function routeKey(address target,uint256 tokenId,uint8 standard) pure returns (bytes32)",
-  "event ControlledMinterUpdated(address indexed controller,bool approved)",
-  "event MintRouteRegistered(uint256 indexed routeId,address indexed creator,address indexed target,uint256 tokenId,uint8 standard,address hook,bytes32 targetCodeHash,bytes32 hookCodeHash)",
-  "event MintRouteStatusUpdated(uint256 indexed routeId,bool enabled,address indexed authority)",
-  "event CreatorAdminMintingUpdated(uint256 indexed routeId,bool enabled,address indexed authority)",
-  "event CreatorAdminMinted(uint256 indexed routeId,bytes32 indexed allocationId,address indexed creator,address recipient,uint256 quantity)",
-  "event RouteCapacityReserved(address indexed controller,uint256 indexed routeId,bytes32 indexed allocationId,uint256 quantity)",
-  "event RouteCapacityReleased(address indexed controller,uint256 indexed routeId,bytes32 indexed allocationId,uint256 quantity)",
-  "event RouteMinted(address indexed controller,uint256 indexed routeId,bytes32 indexed allocationId,address recipient,uint256 quantity)",
+  "event ControlledMinterUpdated(bool approved,address indexed controller)",
+  "event MintRouteRegistered(uint256 indexed routeId,uint256 tokenId,address hook,address indexed target,address indexed creator,bytes32 hookCodeHash,bytes32 targetCodeHash,uint8 standard)",
+  "event MintRouteStatusUpdated(bool enabled,uint256 indexed routeId,address indexed authority)",
+  "event CreatorAdminMintingUpdated(bool enabled,uint256 indexed routeId,address indexed authority)",
+  "event CreatorAdminMinted(uint256 indexed routeId,uint256 quantity,bytes32 indexed allocationId,address indexed creator,address recipient)",
+  "event RouteCapacityReserved(address indexed controller,uint256 indexed routeId,uint256 quantity,bytes32 indexed allocationId)",
+  "event RouteCapacityReleased(address indexed controller,uint256 indexed routeId,uint256 quantity,bytes32 indexed allocationId)",
+  "event RouteMinted(address recipient,address indexed controller,uint256 indexed routeId,uint256 quantity,bytes32 indexed allocationId)",
 ] as const;
 
 /** Development-network stand-in for the Chainlink Functions router. */
-export const keelLocalFunctionsRouterAbi = [
-  "function sendRequest(uint64 subscriptionId,bytes data,uint16 dataVersion,uint32 callbackGasLimit,bytes32 donId) returns (bytes32)",
-  "function fulfill(bytes32 requestId,bytes response,bytes err)",
-  "function lastRequestId() view returns (bytes32)",
-  "function lastRequestData() view returns (bytes)",
-  "function recordedRequest(bytes32 requestId) view returns ((address consumer,uint64 subscriptionId,uint32 callbackGasLimit,bytes32 donId,bool exists))",
-  "event LocalRequestSent(bytes32 indexed requestId,address indexed consumer,uint64 subscriptionId,uint32 callbackGasLimit,bytes32 donId,bytes data)",
-  "event LocalRequestFulfilled(bytes32 indexed requestId,address indexed consumer,bytes response,bytes err)",
-] as const;
-
 /** Accepts pending community-replication carrier proofs from verified
  * attested anchors when deployed as a replication registry's proofVerifier. */
 export const keelAnchorReplicationBridgeAbi = [
@@ -537,6 +481,7 @@ export const keelMintGateAbi = [
 ] as const;
 
 export const keel721Abi = [
+  "event PresentationModuleSet(address indexed module)",
   "function DEFAULT_ADMIN_ROLE() view returns (bytes32)",
   "function MINTER_ROLE() view returns (bytes32)",
   "function PER_TOKEN_MINT_DATA_DOMAIN() view returns (bytes32)",
@@ -884,6 +829,51 @@ export const oneMintCoreDropReadAbi = [
 ] as const;
 
 export const oneMintControllerAbi = [
+  "function batchModule() view returns (address)",
+  "event CouponConfigured(bytes32 indexed dropId,bytes32 indexed couponId,uint256 terms,uint256 limits,uint256 authority)",
+  "event CouponRedeemed(uint32 quantity,uint64 nonce,uint64 revision,bytes32 indexed dropId,bytes32 indexed couponId,address indexed buyer,uint256 discount)",
+  "event CouponRevoked(bytes32 indexed dropId,bytes32 indexed couponId)",
+  "event MintFeePolicySet(uint16 bps,address indexed treasury)",
+  "event MintPlatformFeePaid(address indexed asset,address indexed treasury,uint256 amount)",
+  "error CouponExhausted()",
+  "error CouponExpired()",
+  "error CouponReplay()",
+  "error CouponSignatureInvalid()",
+  "error FeeTransferFailed()",
+  "error InvalidCoupon()",
+  "error InvalidCouponTerms()",
+  "error InvalidFeeRecipient()",
+  "error InvalidMintFeePolicy()",
+  "error InvalidPlatformFee()",
+  "error UnsupportedFeeToken()",
+  "function batchMintWithCoupons(address paymentAsset,uint256 maxTotal,(bytes mintData,bytes signature,uint32 allowance,bytes32[] merkleProof,uint256[] entitlementIds,(bytes32 dropId,uint16 stageIndex,address account,uint32 quantity,uint256 nonce,uint64 deadline,bytes32 contextHash) authorization)[] purchases,(bytes signature,uint64 nonce,uint64 revision,uint64 deadline,bytes32 couponId)[] redemptions) payable",
+  "function batchMintWithNftCoupons(address paymentAsset, uint256 maxTotal, (bytes mintData, bytes signature, uint32 allowance, bytes32[] merkleProof, uint256[] entitlementIds, (bytes32 dropId, uint16 stageIndex, address account, uint32 quantity, uint256 nonce, uint64 deadline, bytes32 contextHash) authorization)[] purchases, (bytes signature, uint64 nonce, uint64 revision, uint64 deadline, bytes32 couponId)[] redemptions, (uint256[] tokenIds, bytes32[][] proofs)[] proofs) payable",
+  "function mintWithNftCoupon((bytes mintData, bytes signature, uint32 allowance, bytes32[] merkleProof, uint256[] entitlementIds, (bytes32 dropId, uint16 stageIndex, address account, uint32 quantity, uint256 nonce, uint64 deadline, bytes32 contextHash) authorization) purchase, (bytes signature, uint64 nonce, uint64 revision, uint64 deadline, bytes32 couponId) coupon, (uint256[] tokenIds, bytes32[][] proofs) proof, uint256 maxTotal) payable",
+  "function nftCouponPolicies(bytes32 dropId, bytes32 couponId) view returns (bytes32 root, uint256 word, uint256 firstTokenId, uint256 lastTokenId)",
+  "function nftCouponUsedWords(bytes32 domain, uint256 bucket) view returns (uint256 word)",
+  "function setNftCoupon(bytes32 dropId, bytes32 couponId, (uint16 stageIndex, uint64 expiry, uint64 maxTotal, uint64 maxPerWallet, address signer, uint256 terms) settings, (bool singleUse, uint24 quantityPerToken, uint32 maxClaims, bytes32 root, address collection, uint256 firstTokenId, uint256 lastTokenId) nft)",
+  "event NftCouponConfigured(uint64 revision, bytes32 indexed dropId, bytes32 indexed couponId, bytes32 root, uint256 word, uint256 firstTokenId, uint256 lastTokenId)",
+  "event NftCouponRedeemed(uint32 claims, uint64 revision, bytes32 indexed dropId, bytes32 indexed couponId, bytes32 tokenIdsDigest, address indexed buyer)",
+  "error InvalidNftCoupon()",
+  "error NftCouponIneligible()",
+  "error NftCouponUsed()",
+  "function couponWalletWord(bytes32 dropId,bytes32 couponId,address buyer) view returns(uint256 word)",
+  "function coupons(bytes32 dropId,bytes32 couponId) view returns(uint256 terms,uint256 limits,uint256 authority)",
+  "function feeTreasury() view returns(address)",
+  "function mintWithCoupon((bytes mintData,bytes signature,uint32 allowance,bytes32[] merkleProof,uint256[] entitlementIds,(bytes32 dropId,uint16 stageIndex,address account,uint32 quantity,uint256 nonce,uint64 deadline,bytes32 contextHash) authorization) purchase,(bytes signature,uint64 nonce,uint64 revision,uint64 deadline,bytes32 couponId) coupon,uint256 maxTotal) payable",
+  "function platformFeeBps() view returns(uint16)",
+  "function revokeCoupon(bytes32 dropId,bytes32 couponId)",
+  "function setCoupon(bytes32 dropId,bytes32 couponId,(uint16 stageIndex,uint64 expiry,uint64 maxTotal,uint64 maxPerWallet,address signer,uint256 terms) settings)",
+  "function setMintFeePolicy(address treasury,uint16 bps)",
+  "error BatchDelegateOnly()",
+  "error InvalidCheckout()",
+  "error CheckoutPriceExceeded(uint256 maximum,uint256 total)",
+  "function batchMint(address paymentAsset,uint256 maxTotal,(bytes mintData,bytes signature,uint32 allowance,bytes32[] merkleProof,uint256[] entitlementIds,(bytes32 dropId,uint16 stageIndex,address account,uint32 quantity,uint256 nonce,uint64 deadline,bytes32 contextHash) authorization)[] purchases) payable",
+
+  "function claimWord(bytes32 dropId,address entitlementToken,uint256 wordIndex) view returns (uint256)",
+  "function mintQueue(bytes32 dropId) view returns (address)",
+  "function setMintQueue(bytes32 dropId,address queue)",
+  "event MintQueueSet(bytes32 indexed dropId,address indexed queue)",
   "function requireSystemsActive(uint192 mask) view",
   "function OPEN_SUPPLY() view returns (uint64)",
   "function creatorProfileRegistry() view returns (address)",
@@ -2544,4 +2534,16 @@ export const keelManagerProxyAbi = [
   "error RecoveryNotConfigured()",
   "error RecoveryRevisionMismatch()",
   "error ReentrancyGuardReentrantCall()"
+] as const;
+
+/** Pinned collector reads for logical release identity and lifetime supply. */
+export const keelReleaseSnapshotAbi = [
+  "function releaseSnapshot(address target,uint256 tokenId) view returns (uint64 id,uint64 local,uint256 policy,uint256 targetMaximum,address authority)",
+] as const;
+
+export const keelRouted721Abi = [
+  ...keel721Abi,
+  "function presentationModule() view returns (address)",
+  "function setPresentationModule(address module)",
+  "function authorizePresentation(uint256 tokenId,address account,bool image)",
 ] as const;

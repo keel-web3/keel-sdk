@@ -8,7 +8,7 @@ import { KEEL_THREE_R180 } from "../packages/sdk/dist/index.js";
 import { scanThreeR180Sepolia } from "../scripts/three-r180-sepolia-evidence.mjs";
 
 const HOLD = "0x0a4f31d5ab08029e4c68f6f3227d9fa3a2d66267";
-const EVENT_TOPIC = "0xa9b747b717f45aa5e0058b2f0ab1a924631f6adcdc0070c0a2a8fc3ac2f4e633";
+const EVENT_TOPIC = "0xdfe3b524c691fdbe3fea710d08f2fb4fea226556d6908531f745ac8e969fe5bd";
 const mainDigest = `0x${KEEL_THREE_R180.main.digest.slice("sha256:".length)}`;
 const coreDigest = `0x${KEEL_THREE_R180.core.digest.slice("sha256:".length)}`;
 const HOLD_ABI = parseAbi([

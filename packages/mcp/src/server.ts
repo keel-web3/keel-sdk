@@ -69,13 +69,14 @@ function emptyParams(value: unknown, label: string): void {
 function initializeParams(value: unknown): void {
   const params = object(value, "initialize params");
   exactKeys(params, ["protocolVersion", "capabilities", "clientInfo", "_meta"], "initialize params");
-  if (params.protocolVersion !== MCP_PROTOCOL_VERSION) {
-    throw new TypeError(`initialize params.protocolVersion must be ${MCP_PROTOCOL_VERSION}.`);
+  if (typeof params.protocolVersion !== "string" || !/^\d{4}-\d{2}-\d{2}$/u.test(params.protocolVersion)) {
+    throw new TypeError("initialize params.protocolVersion must be a dated MCP protocol version.");
   }
   object(params.capabilities, "initialize params.capabilities");
   if (params._meta !== undefined) object(params._meta, "initialize params._meta");
   const clientInfo = object(params.clientInfo, "initialize params.clientInfo");
-  exactKeys(clientInfo, ["name", "version"], "initialize params.clientInfo");
+  exactKeys(clientInfo, ["name", "version", "title"], "initialize params.clientInfo");
+  if (clientInfo.title !== undefined && (typeof clientInfo.title !== "string" || clientInfo.title.length > 256)) throw new TypeError("initialize clientInfo.title must be bounded text.");
   if (typeof clientInfo.name !== "string" || clientInfo.name.length === 0 || typeof clientInfo.version !== "string" || clientInfo.version.length === 0) {
     throw new TypeError("initialize params.clientInfo requires name and version strings.");
   }
@@ -117,7 +118,7 @@ export async function createMcpServer(options: { readonly workspaceRoot?: string
           protocolVersion: MCP_PROTOCOL_VERSION,
           capabilities: { tools: { listChanged: false }, prompts: { listChanged: false }, resources: { subscribe: false, listChanged: false } },
           serverInfo: { name: MCP_SERVER_NAME, version: MCP_SERVER_VERSION },
-          instructions: "For a new KEEL work, begin with keel-project-plan and resolve creator intent before staging. Every collector-facing viewer uses the registered canonical KEEL verification shell; never author or replace it. Keep storage mode explicit and keep local, browser, receipt, and live-chain proof separate. Tools do not sign, submit, claim faucet funds, or silently change storage. Optional Studio access is bounded to configured metadata and staging endpoints.",
+          instructions: "For a new KEEL work, begin with keel-project-plan and resolve creator intent before staging. Every collector-facing viewer uses the registered canonical KEEL verification shell; never author or replace it. For an existing graph, Studio derives revision intent automatically and must call keel-revision-plan: publish only the one declared changed resource, reuse every unchanged selected-chain object, and leave a follow-latest token presentation untouched. publish-plan rejects revision uploads that do not match that gate. On Tezos, the default is the KEEL Hold/Index/HarnessBuilder/FA2/Sleeve route with native OnchFS and ordinary FA2/TZIP-12 token_metadata; call keel-tezos-standard-route-plan with measured bytes so the SDK selects Inline only when the complete return fits, otherwise selecting the RPC-backed Hybrid presentation without moving bytes offchain. Keep the KEEL compatibility route separate from public metadata, and never select optional pixel/crucible modules by default. Keep storage mode explicit and keep local, browser, receipt, and live-chain proof separate. Tools do not sign, submit, claim faucet funds, or silently change storage. Optional Studio access is bounded to configured metadata and staging endpoints.",
         });
       }
       if (stopped) return rpcError(request.id, -32000, "MCP server is stopped.");

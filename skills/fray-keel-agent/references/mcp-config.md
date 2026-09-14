@@ -4,7 +4,7 @@ Use the built `@keel/mcp` CLI from the repository or an installed package. A
 Claude/Codex client can connect over stdio with a configuration equivalent to:
 
 ```bash
-pnpm --filter @keel/mcp build
+pnpm build
 node packages/mcp/dist/cli.js --self-test --workspace /path/to/artwork-workspace
 ```
 
@@ -41,7 +41,7 @@ Other MCP clients can use the generic JSON configuration below.
         "KEEL_STUDIO_URL": "https://keel-test.149-28-255-65.sslip.io",
         "KEEL_PUBLIC_RPC_URL": "https://rpc.keel-test.149-28-255-65.sslip.io",
         "KEEL_INDEXER_URL": "https://your-indexer.example",
-        "FRAY_STUDIO_AGENT_TOKEN": "<server-to-server-token>"
+        "KEEL_STUDIO_AGENT_TOKEN": "<creator-scoped-studio-token>"
       }
     }
   }
@@ -59,7 +59,9 @@ The current canonical Studio upload page is:
 `https://keel-test.149-28-255-65.sslip.io/studio/projects/new`.
 
 The MCP server reads only bounded JSON metadata from `/api/library` and
-`/api/modules`; `fray-stage-project` is the explicit exception that sends the
+`/api/modules`. Studio draft and staging tools require the creator-scoped
+`KEEL_STUDIO_AGENT_TOKEN`; draft updates additionally require the current revision.
+`fray-stage-project` sends the
 selected bounded source to the Studio temporary project endpoint. It requires
 the separate `FRAY_STUDIO_AGENT_TOKEN`, never accepts a wallet key, and never
 signs or submits a wallet request.
@@ -67,3 +69,9 @@ signs or submits a wallet request.
 Installing or discovering this skill does not install, start, authenticate, or
 connect the MCP. Build and configure the MCP separately, then confirm its
 self-test before using connected tools.
+
+The Electron assistant is an advisory connection. It does not automatically
+inherit arbitrary MCP actions from local clients. For the full MCP workflow in
+Codex or Claude, configure this server in that client and preserve its own
+permissions and exact creator review boundaries. The desktop catalog and the
+MCP `keel://mcp/engine` resource share the SDK decision source.

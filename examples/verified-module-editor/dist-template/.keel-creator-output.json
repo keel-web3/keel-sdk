@@ -1,0 +1,8 @@
+{
+  "schema": "keel-creator-output@1",
+  "files": [
+    "art.html",
+    "keel-publication-plan.json",
+    "sandbox/art/art.js"
+  ]
+}

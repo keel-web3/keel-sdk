@@ -3,6 +3,20 @@ import { concatHex, encodeAbiParameters, isAddress, keccak256, toHex, type Hex }
 const WORD_MAX = (1n << 256n) - 1n;
 const INDEX_MAX = 0xffff_ffff;
 
+export type KeelMintBatchSeedMode = "shared" | "derived";
+
+/** Mirrors KeelMintSeededBatches. Materialization does not change this value. */
+export function deriveKeelMintBatchSeed(seed: Hex, tokenId: bigint, mode: KeelMintBatchSeedMode): Hex {
+  if (!/^0x[0-9a-fA-F]{64}$/.test(seed)) throw new TypeError("Batch seed must be bytes32.");
+  if (typeof tokenId !== "bigint" || tokenId < 1n || tokenId >= 1n << 248n) throw new RangeError("Batch token ID must fit nonzero uint248.");
+  if (mode === "shared") return seed;
+  if (mode !== "derived") throw new TypeError("Batch seed mode must be shared or derived.");
+  return keccak256(encodeAbiParameters(
+    [{ type: "bytes32" }, { type: "bytes32" }, { type: "uint256" }],
+    [keccak256(toHex("keel.batch-seed@1")), seed, tokenId],
+  ));
+}
+
 export interface KeelMintSeedField {
   readonly name: string;
   readonly bits: number;

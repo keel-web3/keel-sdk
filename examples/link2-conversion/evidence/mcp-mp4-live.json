@@ -1,0 +1,26 @@
+{
+  "jsonrpc": "2.0",
+  "id": 2,
+  "result": {
+    "content": [
+      {
+        "type": "text",
+        "text": "{\"schema\":\"fray-keel-agent@1\",\"status\":\"ok\",\"studioUrl\":\"https://keel-test.149-28-255-65.sslip.io\",\"query\":\"mp4\",\"library\":[],\"modules\":[],\"reuse\":{\"status\":\"none\",\"action\":\"upload-new-bytes\"},\"errors\":[],\"carriers\":\"metadata-only; no carrier bytes were fetched or verified\"}"
+      }
+    ],
+    "structuredContent": {
+      "schema": "fray-keel-agent@1",
+      "status": "ok",
+      "studioUrl": "https://keel-test.149-28-255-65.sslip.io",
+      "query": "mp4",
+      "library": [],
+      "modules": [],
+      "reuse": {
+        "status": "none",
+        "action": "upload-new-bytes"
+      },
+      "errors": [],
+      "carriers": "metadata-only; no carrier bytes were fetched or verified"
+    }
+  }
+}

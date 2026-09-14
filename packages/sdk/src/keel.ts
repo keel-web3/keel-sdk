@@ -280,6 +280,7 @@ export function validateEquipmentDefinition(
  * provider and API relay. Keeping one policy prevents a viewer runtime read
  * from passing mocks while being rejected by a real host transport. */
 export const keelDirectReadPolicy = {
+  "keel-mint-route-registry": ["releaseSnapshot"],
   "keel-object-registry": ["artifactRevisionSource", "artifactCreator"],
   "keel-attribution-registry": [
     "artifactRegistry",
@@ -352,26 +353,7 @@ export const keelDirectReadPolicy = {
     "grip",
     "objectAnchoredChainAt",
   ],
-  "keel-chainlink-functions-verifier": [
-    "router",
-    "anchorRegistry",
-    "keelHold",
-    "donId",
-    "subscriptionId",
-    "callbackGasLimit",
-    "familyRoute",
-    "pendingRequest",
-    "taskRequest",
-  ],
   "keel-anchor-replication-bridge": ["anchorRegistry"],
-  "keel-cre-report-verifier": [
-    "anchorRegistry",
-    "forwarder",
-    "expectedWorkflowOwner",
-    "expectedWorkflowName",
-    "expectedWorkflowId",
-    "familyConfig",
-  ],
   "keel-manager": ["governanceEpoch", "rpcHostList", "rpcHostCount", "computeRpcHostListDigest", "rpcHostListPreimage"],
   // The Onchaininator ships from its own repository and vendors its own ABIs, so
   // no module entry or generated ABI for it lives in this SDK. This kind stays

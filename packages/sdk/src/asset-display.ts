@@ -1,6 +1,6 @@
 /** Browser-safe declarations and bytes for KEEL's reusable normal-media module. */
 export const KEEL_ASSET_DISPLAY_MODULE_ID = "keel.asset-display" as const;
-export const KEEL_ASSET_DISPLAY_MODULE_VERSION = "1.1.0" as const;
+export const KEEL_ASSET_DISPLAY_MODULE_VERSION = "1.2.0" as const;
 
 export const KEEL_ASSET_DISPLAY_MEDIA_TYPES = Object.freeze([
   "image/avif",
@@ -26,6 +26,24 @@ export function keelAssetDisplayKind(mediaType: string): KeelAssetDisplayKind {
   throw new TypeError(`The canonical KEEL asset-display module does not support ${mediaType}.`);
 }
 
+/** Pick a quiet surround from opaque edge pixels; never change artwork pixels. */
+export function keelAssetBackground(metadataColor: unknown, edgeRGBA: ArrayLike<number>): string {
+  if (typeof metadataColor === "string" && /^#?[0-9a-f]{6}$/i.test(metadataColor)) return "#" + metadataColor.replace(/^#/, "").toLowerCase();
+  const bins = new Map<string, {count: number; rgb: number[]}>();
+  const samples = Math.floor(edgeRGBA.length / 4);
+  for (let i = 0; i + 3 < edgeRGBA.length; i += 4) {
+    if (edgeRGBA[i + 3]! < 250) continue;
+    const rgb = [edgeRGBA[i]!, edgeRGBA[i + 1]!, edgeRGBA[i + 2]!];
+    const key = rgb.map(v => Math.floor(v / 8)).join(",");
+    const bin = bins.get(key) ?? {count: 0, rgb: [0, 0, 0]};
+    bin.count++; for (let c = 0; c < 3; c++) bin.rgb[c] = bin.rgb[c]! + rgb[c]!;
+    bins.set(key, bin);
+  }
+  const best = [...bins.values()].sort((a, b) => b.count - a.count)[0];
+  if (!best || best.count < Math.max(3, samples * .6)) return "#05060b";
+  return "#" + best.rgb.map(v => Math.round(v / best.count).toString(16).padStart(2, "0")).join("");
+}
+
 /**
  * This browser-only, no-network module is published once per chain. The
  * protected shell injects a frozen descriptor for the verified direct media
@@ -35,8 +53,10 @@ export function keelAssetDisplayKind(mediaType: string): KeelAssetDisplayKind {
 const KEEL_ASSET_DISPLAY_MODULE_SOURCE = `"use strict";(()=>{
 const fail=m=>{throw new Error("KEEL asset display: "+m)},entry=globalThis.__KEEL_ENTRY__,content=globalThis.__KEEL_CONTENT__,root=document.getElementById("keel-asset-display")||document.body;
 if(!entry||typeof entry.id!=="string"||typeof entry.mediaType!=="string"||typeof entry.url!=="string"||!content||typeof content.bytes!=="function")fail("missing verified entry descriptor");
-const style=e=>{Object.assign(e.style,{display:"block",width:"100%",height:"100%",maxWidth:"100%",maxHeight:"100%",objectFit:"contain",background:"#05060b"});return e},mount=e=>{root.replaceChildren(e);return e};
-if(entry.mediaType.startsWith("image/")){const e=document.createElement("img");e.alt=entry.name||"Verified KEEL image";if(entry.mediaType==="image/avif"||entry.mediaType==="image/webp"){e.onload=()=>{const c=document.createElement("canvas"),x=c.getContext("2d");if(!x)fail("2D canvas is unavailable");c.width=e.naturalWidth;c.height=e.naturalHeight;c.title="Right-click to save this verified image as PNG";c.setAttribute("aria-label",e.alt);Object.assign(c.style,{display:"block",width:"auto",height:"auto",maxWidth:"100%",maxHeight:"100%",margin:"auto",background:"#05060b"});x.drawImage(e,0,0);mount(c)};e.onerror=()=>fail("image decode failed");e.src=entry.url;return}style(e);e.src=entry.url;mount(e);return}
+const pickBackground=${keelAssetBackground.toString()};let background=pickBackground(entry.background_color,[]);
+const matchBackground=e=>{const c=document.createElement("canvas");c.width=c.height=16;const x=c.getContext("2d"),edges=[];if(x){try{x.drawImage(e,0,0,16,16);const p=x.getImageData(0,0,16,16).data;for(let y=0;y<16;y++)for(let z=0;z<16;z++)if(y===0||y===15||z===0||z===15){const i=(y*16+z)*4;edges.push(p[i],p[i+1],p[i+2],p[i+3]);}}catch{}}background=pickBackground(entry.background_color,edges);for(const n of [document.documentElement,document.body,root])n.style.background=background;return background;};
+const style=e=>{Object.assign(e.style,{display:"block",width:"100%",height:"100%",maxWidth:"100%",maxHeight:"100%",objectFit:"contain",background});return e},mount=e=>{root.replaceChildren(e);return e};
+if(entry.mediaType.startsWith("image/")){const e=document.createElement("img");e.alt=entry.name||"Verified KEEL image";if(entry.mediaType==="image/avif"||entry.mediaType==="image/webp"){e.onload=()=>{matchBackground(e);const c=document.createElement("canvas"),x=c.getContext("2d");if(!x)fail("2D canvas is unavailable");c.width=e.naturalWidth;c.height=e.naturalHeight;c.title="Right-click to save this verified image as PNG";c.setAttribute("aria-label",e.alt);Object.assign(c.style,{display:"block",width:"auto",height:"auto",maxWidth:"100%",maxHeight:"100%",margin:"auto",background});x.drawImage(e,0,0);mount(c)};e.onerror=()=>fail("image decode failed");e.src=entry.url;return}style(e);e.onload=()=>{e.style.background=matchBackground(e)};e.src=entry.url;mount(e);return}
 if(entry.mediaType.startsWith("video/")){const e=style(document.createElement("video"));e.src=entry.url;e.controls=true;e.autoplay=true;e.loop=true;e.muted=true;e.playsInline=true;mount(e);return}
 if(entry.mediaType!=="model/gltf-binary")fail("unsupported media type "+entry.mediaType);
 const b=content.bytes(entry.id),v=new DataView(b.buffer,b.byteOffset,b.byteLength);if(b.byteLength<20||v.getUint32(0,true)!==0x46546c67||v.getUint32(4,true)!==2||v.getUint32(8,true)!==b.byteLength)fail("invalid GLB header");

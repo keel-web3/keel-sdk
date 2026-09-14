@@ -1,10 +1,11 @@
 import { fileURLToPath } from "node:url";
 import { resolve } from "node:path";
 
-import { decodeFunctionResult, encodeFunctionData, parseAbi } from "viem";
+import { decodeFunctionResult, encodeFunctionData, parseAbi, toEventSelector } from "viem";
+import { keelObjectWeldedEvent } from "../packages/sdk/dist/hold-events.js";
 import { KEEL_THREE_R180 } from "../packages/sdk/dist/index.js";
 
-export const THREE_R180_SEPOLIA_OBJECT_WELDED_TOPIC = "0xa9b747b717f45aa5e0058b2f0ab1a924631f6adcdc0070c0a2a8fc3ac2f4e633";
+export const THREE_R180_SEPOLIA_OBJECT_WELDED_TOPIC = toEventSelector(keelObjectWeldedEvent);
 export const THREE_R180_SEPOLIA_DEFAULT_RPC = "https://ethereum-sepolia-rpc.publicnode.com";
 export const THREE_R180_SEPOLIA_WINDOW_BLOCKS = 2_048;
 export const THREE_R180_SEPOLIA_MAX_HEAD_ADVANCE = 16;

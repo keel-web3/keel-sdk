@@ -7,9 +7,25 @@ explicit Keel Studio Keel index. It never signs, submits, claims faucet funds,
 or mutates a wallet or chain; wallet output is a canonical request envelope for
 a separate user-approved wallet UI.
 
+Inline preparation defaults to the SDK's compact raw-percent graph. Omit the
+carriage override and repositoryRoot: the packaged canonical shell supplies local
+preparation, and verified selected-chain objects supply publication reuse. Binary
+resources retain one shell-decoder transport layer; whole HTML and JSON documents
+are never Base64-wrapped. Studio and desktop use the same default. Returned plans
+remain unsigned, and complete tokenURI byte/read-gas checks are still required.
+
+Tezos release planning uses the same KEEL default policy through the
+`keel-tezos-standard-route-plan` tool: registered canonical shell, native
+OnchFS, Hold/Index/HarnessBuilder, FA2/TZIP-12 metadata, and KeelSleeve. Supply
+the measured complete inline return; the SDK selects Inline only when the
+canonical builder, public-read size, and read-gas gates pass. Otherwise it
+selects the RPC-backed Hybrid presentation while keeping the immutable bytes
+onchain. Hybrid is not IPFS, and optional pixel/crucible modules are not part
+of this default lane.
+
 ```bash
 pnpm install
-pnpm --filter @keel/mcp build
+pnpm build
 node packages/mcp/dist/cli.js --workspace /path/to/project
 ```
 
@@ -21,8 +37,9 @@ the creator is making a 1/1 or collection, storage-only work, fixed sale, claim,
 or Fray auction; routes p5, Three.js, Doom WASM, and Flash AS3; and returns an
 explicit review-only plan before staging. It reads the machine-readable
 `keel://mcp/project-routes` and `keel://mcp/publication-modes` resources instead
-of reproducing contract policy in prompt text. Every collector-facing viewer
-uses the registered canonical KEEL verification shell. The MCP never authors,
+of reproducing contract policy in prompt text. Collector-facing viewers default
+to the registered canonical KEEL verification shell; an explicit `viewer: "none"`
+selection opts out. The MCP never authors,
 copies, shrinks, replaces, or uploads that shell.
 
 Use `--help` or `--version` for portable launcher discovery. For a deterministic
@@ -59,7 +76,12 @@ For a local agent configuration, point the MCP client at the built CLI:
 ```
 
 Messages are newline-delimited JSON-RPC. Initialize first, then use
-`tools/list` and `tools/call`. The twenty-seven tools are `analyze`,
+`tools/list` and `tools/call`. The forty-one tools are `keel-tezos-shell-prepare`,
+`keel-tezos-publication-prepare`, `keel-network-inspect`,
+`keel-tezos-standard-route-plan`, `keel-contract-controls`, `keel-engine-catalog`,
+`keel-revision-plan`, `keel-project-decisions`, `keel-layered-check`,
+`keel-layered-select`, `keel-layered-sample`, `keel-layered-reveal-plan`,
+`keel-layered-curation`, `keel-token-matrix-prepare`, `analyze`,
 `media-optimize`, `media-optimize-apply`, `build`, `verify`, `cost`,
 `upload-plan`, `chain-plan`, `ethereum-encode`, `publish-plan`,
 `module-resolve`, `module-lock`, `wallet-request-prepare`, `wallet-link`,
@@ -67,7 +89,7 @@ Messages are newline-delimited JSON-RPC. Initialize first, then use
 `keel-chain-guide`, `keel-library-search`, `keel-endpoint-config`,
 `keel-studio-capabilities`, `keel-studio-project-intake`, `keel-studio-draft`,
 `keel-studio-stage-project`, `keel-creator-collection-prepare`,
-`keel-shell-search`, and `keel-shell-prepare`.
+`keel-shell-search`, `keel-inline-prepare`, and `keel-shell-prepare`.
 File arguments must resolve inside the selected workspace; regular-file reads
 reject final symlinks, traversal, unstable content, and oversized frames/files.
 Builds and lock sidecars are local writes only. Wallet preparation returns a
@@ -94,10 +116,13 @@ ABI calldata and chunk IDs remain deferred to a contract-specific adapter; the
 result is `status: "review-only"`, `chainReady: false`, with signing and
 submission explicitly marked `not-performed`. `sourcePlan.path` identifies the
 workspace-relative plan directory used to resolve each `chunkFiles` entry.
-Tezos requests fail closed until
-a Tezos contract adapter is provided. Chunk files and decoded plan digests are
-verified locally, but this offline descriptor does not fetch a chain, sign,
-submit, or claim that ABI encoding has occurred. Recursive plans are bounded to
+The Tezos publication adapter prepares receipt-bound native calls for the
+shared Hold, Index, and FA2 modules, including ordinary FA2/TZIP-12 token
+metadata (`onchfs://`, IPFS, or another resolver-supported URI), the separate
+Keel JSON compatibility route, and permanent metadata freezing. Chunk files and
+decoded plan digests are verified locally, but this review-only descriptor does
+not fetch a chain, sign, submit, or claim that a publication receipt exists.
+Recursive plans are bounded to
 512 objects, 256 MiB of retained decoded bytes, and responses to 256 KiB.
 
 `ethereum-encode` is the first family-specific offline encoder. It reads a
@@ -110,10 +135,25 @@ or create a WalletConnect/Beacon QR payload. `qr: true` is reported as
 SDK QR budget. A later transport must rebind the plan, pin chain/code state,
 simulate, and hand the resulting unsigned request to the user's wallet UI.
 
+`keel-revision-plan` is the mandatory automatic path for an existing versioned
+graph. The caller supplies the live selected-chain resource graph, the
+candidate next version, and the one logical resource that changed. The SDK
+rejects additions, removals, role changes, non-sequential versions, identical
+bytes under a new object ID, and any change to an undeclared resource. Every
+unchanged object ID and commitment must remain exact. It reports measured new
+and reused bytes separately and blocks an automatic delta above 65,536 stored
+bytes before wallet review. Studio derives whether the target is existing; it
+does not ask the creator to choose a protocol path.
+
 `publish-plan` wraps the structured `chain-plan` result in the SDK's
 `keel-publish-plan@1` envelope. It strips local paths from the committed
 source summary, re-validates operation shapes and limits, binds a canonical
 SHA-256 envelope integrity, and remains `review-only`/`chainReady: false`.
+It requires `publicationIntent`. For `existing-graph-revision`, it recomputes
+the revision gate and requires the uploaded source digest, byte length, and
+media type to match the one accepted changed resource. A follow-latest revision
+leaves the token presentation untouched; a pinned revision can update only its
+small binding. A mismatch cannot reach wallet review.
 The embedded object IDs are explicitly logical builder IDs, not chain IDs;
 the adapter must recompute chain IDs from bytes and receipts. Local source paths
 are not committed in the envelope, so an adapter must retain its own bounded
@@ -123,6 +163,33 @@ remains within the stdio frame budget.
 It does not derive Keccak chunk IDs, encode calldata, perform Tezos packing,
 query a target contract, sign, or submit. A future family-specific adapter must
 do those steps and provide its own readback/receipt proof.
+
+## Live target networks and asset delivery
+
+`keel-network-inspect` uses `@keel/sdk/network-inspection` to inspect an explicit
+EVM or Tezos RPC. Supply the selected family and expected chain identity to
+prevent accidental retargeting. Custom networks are supported; they do not have
+to appear in the SDK deployment catalog. The result includes current block
+limits, EVM fees or Tezos-specific limits, and lookup/setup status for recorded
+or supplied KEEL addresses. Missing records are not proof that contracts are
+absent, and code presence is not verified identity. No contracts are deployed.
+
+For an exact EVM call, the SDK's `estimateNetworkCall` and the desktop provide
+a pinned-block gas estimate. Publication estimates describe execution cost;
+presentation reads use gas as a
+compatibility budget and do not spend native currency. Quotes are temporary and
+exclude separate transactions, transaction value and additional chain charges.
+Tezos fee estimation still requires operation simulation. Refresh after changing
+the target or call, and never reuse another network's addresses or old quote.
+
+The shared engine catalog also exposes asset delivery defaults: canonical shell,
+explicit direct display, and Inline through 1,750,000 measured Gzip bytes in Auto
+mode. Larger assets use RPC reconstruction in the delivery plan. Final URI size,
+actual read gas and reader compatibility remain separate checks. Direct retrieval
+guidance distinguishes uncompressed `haulObject` from paged `readSlug` plus
+declared decompression; it never claims an onchain Gzip decompressor. Desktop
+file import streams arbitrary regular files, while individual MCP planning tools
+retain their documented bounded input and response sizes.
 
 ## Module snapshots and locks
 
@@ -286,7 +353,8 @@ read files, execute the tools, fetch carriers, sign, or submit.
 
 ## Static resources
 
-`resources/list` advertises four fixed machine-readable resources:
+`resources/list` advertises five fixed machine-readable resources:
+`keel://mcp/engine` supplies the shared SDK/Desktop capability and decision catalog;
 `keel://mcp/workflow` describes the offline analyze-to-review sequence and
 `keel://mcp/limits` records the bounded frame, file, planner, and no-network
 limits. `keel://mcp/project-routes` maps creation scope, OneMint,
@@ -295,3 +363,47 @@ builders, contract evidence, and examples.
 `keel://mcp/publication-modes` defines storage, compression, recovery, and proof
 boundaries. `resources/read` serves those constant JSON documents only; unknown
 URIs and extra parameters fail closed, and no workspace or network access occurs.
+
+## Shared editor decisions and contract controls
+
+`keel-engine-catalog` exposes the browser-safe SDK catalog also used by the
+Electron editor. `keel-project-decisions` keeps explicit intent, recommends
+defaults without selecting them, and returns at most three next questions.
+Release type, collection model, mint system, storage, mint gates, library access
+and transaction authority remain separate decisions. Limited editions require
+a positive decimal `release.supply` in `keel-studio-project-intake`; open
+editions cannot silently receive a fixed cap.
+
+`keel-contract-controls` accepts bounded `abiJson` and describes exact overloaded
+read and write methods. ABI import proves neither contract identity nor
+permissions. The desktop can prepare unsigned calldata and perform explicit
+read-only RPC inspections; the MCP tool itself performs no RPC or signing.
+
+`keel-tezos-shell-prepare` prepares native Tezos shell registry parameters with
+an explicit network and sender. It is not an EVM mint adapter or a deployment.
+
+`keel-tezos-publication-prepare` prepares one receipt-bound Tezos call at a
+time. The public token path is `set-token-metadata` plus the standard FA2
+`token_metadata` view; `set-token-json` is only the compatibility surface used
+by the KEEL sleeve; and `freeze-token-metadata` permanently welds both routes.
+The tool never accepts signer material or submits a wallet operation.
+
+The desktop runs with `pnpm desktop:build` then `pnpm desktop`. See
+[desktop setup](../../apps/desktop/README.md) and the
+[readiness audit](../../docs/KEEL_ENGINE_READINESS.md).
+
+### Layered collection curation
+
+`keel-layered-curation` performs pure local `add`, `assign`, `remove`, `resolve`, `stats` and `plan` operations. Pass optional `workbenchJson`, `manifestJson`, seed/token ID and `choicesJson` (item/variant overrides) to create deterministic candidates. Saved generator snapshots are immutable by digest; changing weights affects future candidates only. `index` inserts before the current zero-based set position. A plan preserves each original draw token ID separately from its ordered set slot. Plans contain private authoring data and do not publish, sign or assign live tokens. In the desktop, prefer `keel_layer_curation` for scoped reads and reviewable edits to the actual workspace.
+
+### Shared token metadata matrices
+
+`keel-token-matrix-prepare` compiles a workspace manifest of explicit token IDs and ordered part files into shared value tables, templates, and compact selection rows. It uses the SDK compiler and preserves missing rows. It does not publish. Use it after canonical `keel-inline-prepare` with `metadataTransport: "web3-json"` for existing collections that expose URI controls. See [the matrix workflow](../../docs/TOKEN_MATRIX.md) for storage, binding, and proof requirements.
+
+## Runtime module discovery
+
+See [runtime module discovery and reuse](../../docs/KEEL_RUNTIME_MODULE_DISCOVERY.md) for the shared SDK/API/MCP lookup, unverified module sandbox, coverage limits, and browser MP4 encoding workflow. Empty catalog results never authorize rebuilding an existing module.
+
+### Native SVG tools
+
+`keel-svg-create` prepares an ordinary SVG renderer from a preset or recipe, with preview and Solidity export. `keel-svg-inspect` checks SVG structure and hidden provenance locally; `keel-svg-call-plan` prepares a read-only contract call. Neither tool claims verification from embedded labels. See [SVG renderer, SDK and editor integration](../../docs/KEEL_SVG_RENDERER.md).

@@ -6,13 +6,34 @@
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "exports": {
+    "./mint-seed-lifecycle": {
+      "types": "./dist/mint-seed-lifecycle.d.ts",
+      "import": "./dist/mint-seed-lifecycle.js"
+    },
+    "./mint-seeded": {
+      "types": "./dist/mint-seeded.d.ts",
+      "import": "./dist/mint-seeded.js"
+    },
+    "./mint-seeded-data": {
+      "types": "./dist/mint-seeded-data.d.ts",
+      "import": "./dist/mint-seeded-data.js"
+    },
     ".": {
       "types": "./dist/index.d.ts",
       "import": "./dist/index.js"
     },
+    "./mint-queue": {
+      "types": "./dist/mint-queue.d.ts",
+      "import": "./dist/mint-queue.js",
+      "default": "./dist/mint-queue.js"
+    },
     "./abi": {
       "types": "./dist/abi.d.ts",
       "import": "./dist/abi.js"
+    },
+    "./wallet-request": {
+      "types": "./dist/wallet-request.d.ts",
+      "import": "./dist/wallet-request.js"
     },
     "./module": {
       "types": "./dist/module/index.d.ts",
@@ -21,6 +42,10 @@
     "./managed-publication": {
       "types": "./dist/managed-publication.d.ts",
       "import": "./dist/managed-publication.js"
+    },
+    "./revision-publication": {
+      "types": "./dist/revision-publication.d.ts",
+      "import": "./dist/revision-publication.js"
     },
     "./three-scene-publication": {
       "types": "./dist/three-scene-publication.d.ts",
@@ -74,6 +99,22 @@
       "types": "./dist/onchain-data.d.ts",
       "import": "./dist/onchain-data.js"
     },
+    "./tezos-shell": {
+      "types": "./dist/tezos-shell.d.ts",
+      "import": "./dist/tezos-shell.js"
+    },
+    "./tezos-publication": {
+      "types": "./dist/tezos-publication.d.ts",
+      "import": "./dist/tezos-publication.js"
+    },
+    "./tezos-standard": {
+      "types": "./dist/tezos-standard.d.ts",
+      "import": "./dist/tezos-standard.js"
+    },
+    "./tezos-modules": {
+      "types": "./dist/tezos-modules.generated.d.ts",
+      "import": "./dist/tezos-modules.generated.js"
+    },
     "./shell-registry": {
       "types": "./dist/shell-registry.d.ts",
       "import": "./dist/shell-registry.js"
@@ -82,21 +123,105 @@
       "types": "./dist/creative-runtime-catalog.d.ts",
       "import": "./dist/creative-runtime-catalog.js"
     },
-    "./hold-publication": {
-      "types": "./dist/hold-publication.d.ts",
-      "import": "./dist/hold-publication.js"
+    "./engine": {
+      "types": "./dist/engine.d.ts",
+      "import": "./dist/engine.js"
     },
-    "./hold-errors": {
-      "types": "./dist/hold-errors.d.ts",
-      "import": "./dist/hold-errors.js"
+    "./contract-controls": {
+      "types": "./dist/contract-controls.d.ts",
+      "import": "./dist/contract-controls.js"
     },
-    "./hold-events": {
-      "types": "./dist/hold-events.d.ts",
-      "import": "./dist/hold-events.js"
+    "./infrastructure": {
+      "types": "./dist/infrastructure.d.ts",
+      "import": "./dist/infrastructure.js"
+    },
+    "./network-inspection": {
+      "types": "./dist/network-inspection.d.ts",
+      "import": "./dist/network-inspection.js"
+    },
+    "./layered-art": {
+      "types": "./dist/layered-art.d.ts",
+      "import": "./dist/layered-art.js"
+    },
+    "./layered-renderer": {
+      "types": "./dist/layered-renderer.d.ts",
+      "import": "./dist/layered-renderer.js"
+    },
+    "./layered-reveal": {
+      "types": "./dist/layered-reveal.d.ts",
+      "import": "./dist/layered-reveal.js"
+    },
+    "./layered-runtime-info": {
+      "types": "./dist/layered-runtime-info.d.ts",
+      "import": "./dist/layered-runtime-info.js"
+    },
+    "./layered-chain": {
+      "types": "./dist/layered-chain.d.ts",
+      "import": "./dist/layered-chain.js"
+    },
+    "./layered-image": {
+      "types": "./dist/layered-image.d.ts",
+      "import": "./dist/layered-image.js"
+    },
+    "./layered-curation": {
+      "types": "./dist/layered-curation.d.ts",
+      "import": "./dist/layered-curation.js"
     },
     "./native-publication": {
       "types": "./dist/native-publication.d.ts",
       "import": "./dist/native-publication.js"
+    },
+    "./gator-assembly": {
+      "types": "./dist/gator-assembly.d.ts",
+      "import": "./dist/gator-assembly.js"
+    },
+    "./gator-import": {
+      "types": "./dist/gator-import.d.ts",
+      "import": "./dist/gator-import.js"
+    },
+    "./layered-png": {
+      "types": "./dist/layered-png.d.ts",
+      "import": "./dist/layered-png.js"
+    },
+    "./layered-svg": {
+      "types": "./dist/layered-svg.d.ts",
+      "import": "./dist/layered-svg.js"
+    },
+    "./direct-image": {
+      "types": "./dist/direct-image.d.ts",
+      "import": "./dist/direct-image.js"
+    },
+    "./layered-math": {
+      "types": "./dist/layered-math.d.ts",
+      "import": "./dist/layered-math.js"
+    },
+    "./raster-strips": {
+      "types": "./dist/raster-strips.d.ts",
+      "import": "./dist/raster-strips.js"
+    },
+    "./raster-apng": {
+      "types": "./dist/raster-apng.d.ts",
+      "import": "./dist/raster-apng.js"
+    },
+    "./raster-regions": {
+      "types": "./dist/raster-regions.d.ts",
+      "import": "./dist/raster-regions.js"
+    },
+    "./raster-hybrid": {
+      "types": "./dist/raster-hybrid.d.ts",
+      "import": "./dist/raster-hybrid.js"
+    },
+    "./editor-client": {
+      "types": "./dist/editor-client.d.ts",
+      "import": "./dist/editor-client.js"
+    },
+    "./token-matrix": {
+      "types": "./dist/token-matrix.d.ts",
+      "import": "./dist/token-matrix.js"
+    },
+    "./hold-publication": {
+      "types": "./dist/hold-publication.d.ts",
+      "import": "./dist/hold-publication.js"
     },
     "./treasury": {
       "types": "./dist/treasury.d.ts",
@@ -106,9 +231,9 @@
       "types": "./dist/admin-pauses.d.ts",
       "import": "./dist/admin-pauses.js"
     },
-    "./recovery": {
-      "types": "./dist/recovery.d.ts",
-      "import": "./dist/recovery.js"
+    "./hold-events": {
+      "types": "./dist/hold-events.d.ts",
+      "import": "./dist/hold-events.js"
     },
     "./manager-errors": {
       "types": "./dist/manager-errors.d.ts",
@@ -118,22 +243,33 @@
       "types": "./dist/manager-events.d.ts",
       "import": "./dist/manager-events.js"
     },
-    "./link-presentation": {
-      "types": "./dist/link-presentation.d.ts",
-      "import": "./dist/link-presentation.js"
+    "./hold-errors": {
+      "types": "./dist/hold-errors.d.ts",
+      "import": "./dist/hold-errors.js"
     },
-    "./mint-seeded": {
-      "types": "./dist/mint-seeded.d.ts",
-      "import": "./dist/mint-seeded.js"
+    "./recovery": {
+      "types": "./dist/recovery.d.ts",
+      "import": "./dist/recovery.js"
     },
-    "./mint-seeded-data": {
-      "types": "./dist/mint-seeded-data.d.ts",
-      "import": "./dist/mint-seeded-data.js"
+    "./svg-renderer": {
+      "types": "./dist/svg-renderer.d.ts",
+      "import": "./dist/svg-renderer.js"
     },
-    "./mint-queue": {
-      "types": "./dist/mint-queue.d.ts",
-      "import": "./dist/mint-queue.js",
-      "default": "./dist/mint-queue.js"
+    "./svg-renderer-authoring": {
+      "types": "./dist/svg-renderer-authoring.d.ts",
+      "import": "./dist/svg-renderer-authoring.js"
+    },
+    "./stamps": {
+      "types": "./dist/stamps.d.ts",
+      "import": "./dist/stamps.js"
+    },
+    "./module/jsx-runtime": {
+      "types": "./dist/module/jsx-runtime.d.ts",
+      "import": "./dist/module/jsx-runtime.js"
+    },
+    "./module/jsx-dev-runtime": {
+      "types": "./dist/module/jsx-runtime.d.ts",
+      "import": "./dist/module/jsx-runtime.js"
     }
   },
   "files": [
@@ -142,17 +278,20 @@
   ],
   "scripts": {
     "clean": "rm -rf dist",
-    "build": "tsc -p tsconfig.json && node ../mint-queue/build.mjs"
+    "build": "tsc -p tsconfig.json && node scripts/package-canonical-shell.mjs && node scripts/package-layered-runtime.mjs && node ../mint-queue/build.mjs"
   },
   "engines": {
     "node": ">=22"
   },
   "license": "MIT",
   "dependencies": {
+    "@jsquash/png": "3.1.1",
+    "@jsquash/webp": "1.5.0",
     "@keel/protocol": "workspace:*",
+    "@keel/viewer": "workspace:*",
+    "@noble/hashes": "1.8.0",
     "esbuild": "0.28.2",
-    "viem": "^2.38.0",
-    "@noble/hashes": "1.8.0"
+    "viem": "^2.38.0"
   },
   "devDependencies": {
     "@types/node": "^22.15.0",

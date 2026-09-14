@@ -7,7 +7,7 @@ const DIGEST = /^0x[0-9a-f]{64}$/u;
 const HEX = /^0x(?:[0-9a-fA-F]{2})*$/u;
 const ADDRESS = /^0x[0-9a-f]{40}$/u;
 const DECIMAL = /^(?:0|[1-9][0-9]*)$/u;
-const TEZOS_ADDRESS = /^(?:tz[1-3]|KT1)[1-9A-HJ-NP-Za-km-z]{33}$/u;
+const TEZOS_ADDRESS = /^(?:tz[1-4]|KT1)[1-9A-HJ-NP-Za-km-z]{33}$/u;
 const ENTRYPOINT = /^[A-Za-z][A-Za-z0-9_.%@+-]{0,30}$/u;
 const TRANSPORTS = new Set<KeelWalletTransport>(["injected", "walletconnect-qr", "ledger", "tezconnect", "local-encrypted"]);
 const MAX_QR_BYTES = 24 * 1024;
@@ -112,7 +112,7 @@ function assertTransport(family: KeelWalletRequest["family"], transport: KeelWal
 function assertMicheline(value: unknown, depth = 0): void {
   if (depth > 32) throw new RangeError("wallet request.parameters exceeds the Micheline depth limit.");
   if (Array.isArray(value)) {
-    if (value.length === 0 || value.length > 256) throw new TypeError("wallet request.parameters arrays must contain 1 through 256 nodes.");
+    if (value.length > 256) throw new TypeError("wallet request.parameters arrays must contain at most 256 nodes.");
     value.forEach((item) => assertMicheline(item, depth + 1));
     return;
   }
@@ -124,7 +124,9 @@ function assertMicheline(value: unknown, depth = 0): void {
   }
   if (typeof input.string === "string") {
     exactKeys(input, ["string"], "wallet request.parameters string node");
-    text(input.string, "wallet request.parameters.string", 16_384);
+    // Empty strings, whitespace and newlines are valid contract data. Preserve
+    // their exact value rather than applying the human-label restrictions.
+    if (input.string.length > 16_384 || /[\uD800-\uDFFF]/u.test(input.string)) throw new TypeError("wallet request.parameters.string is invalid.");
     return;
   }
   if (typeof input.bytes === "string") {
@@ -149,7 +151,8 @@ function assertMicheline(value: unknown, depth = 0): void {
 }
 
 function normalizeParameters(value: unknown): string {
-  const source = text(value, "wallet request.parameters", 16_384);
+  if (typeof value !== 'string' || !value.trim() || value.length > 16_384) throw new TypeError('wallet request.parameters must be JSON text of at most 16384 characters.');
+  const source = value;
   let parsed: unknown;
   try {
     parsed = JSON.parse(source) as unknown;

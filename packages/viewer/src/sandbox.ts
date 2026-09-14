@@ -1,4 +1,4 @@
-import { assertDataUriMediaType, bytesToUtf8, decodeBase64, encodeBase64, serializeScriptJSON, toDataUrl, type ResourceSource } from "@keel/protocol";
+import { describeKeelReleasePolicy, assertDataUriMediaType, bytesToUtf8, decodeBase64, encodeBase64, serializeScriptJSON, toDataUrl, type ResourceSource } from "@keel/protocol";
 import { createVerifiedContentGateway, resourceGatewayAliases } from "./gateway.js";
 import { evaluateCollectionVerification } from "./collection-verification.js";
 import type { RuntimeCapabilities } from "@keel/protocol";
@@ -93,6 +93,19 @@ function entrypointText(materializer: Materializer): string {
       throw new TypeError("Legacy KEEL Inline graph has an invalid terminal context lane.");
     }
     text = bytesToUtf8(decodeBase64(context < 0 ? outer : outer.slice(0, context)));
+  } else if (entrypoint.mediaType === "application/vnd.keel.token-uri-raw-percent-fragment") {
+    try {
+      text = decodeURIComponent(decodeURIComponent(bytesToUtf8(entrypoint.bytes)));
+    } catch {
+      throw new TypeError("Compact KEEL Inline graph has an invalid percent-carried HTML stream.");
+    }
+  } else if (entrypoint.mediaType === "application/vnd.keel.token-uri-percent-fragment") {
+    const escaped = bytesToUtf8(decodeBase64(bytesToUtf8(entrypoint.bytes)));
+    try {
+      text = decodeURIComponent(escaped);
+    } catch {
+      throw new TypeError("Compact KEEL Inline graph has an invalid percent-carried HTML stream.");
+    }
   } else {
     text = bytesToUtf8(entrypoint.bytes);
   }
@@ -290,6 +303,17 @@ function validateRuntimeContext(context: RuntimeContext): RuntimeContext {
   if (context.emitterPaletteMode !== undefined && context.emitterPaletteMode > 3) {
     throw new RangeError("Runtime emitter palette mode is outside emitter@1 bounds.");
   }
+  if (context.releaseDisclosure !== undefined) {
+    const r = context.releaseDisclosure;
+    const address = /^0x[0-9a-f]{40}$/u;
+    if (r.source !== "pinned-rpc" || !address.test(r.router) || !address.test(r.collection) || !address.test(r.authority)
+        || !bytes32.test(r.blockHash) || !decimal.test(r.blockNumber) || !decimal.test(r.releaseId) || !decimal.test(r.localId)
+        || !decimal.test(r.targetMaximum) || BigInt(r.releaseId) === 0n || BigInt(r.localId) === 0n
+        || BigInt(r.releaseId) >= (1n << 64n) || BigInt(r.localId) >= (1n << 64n) || BigInt(r.targetMaximum) >= (1n << 256n)
+        || (context.blockHash !== undefined && context.blockHash !== r.blockHash)
+        || (context.blockNumber !== undefined && context.blockNumber !== r.blockNumber)) throw new TypeError("Invalid release disclosure identity.");
+    if (JSON.stringify(r.rows) !== JSON.stringify(describeKeelReleasePolicy(r.policyWord))) throw new TypeError("Release disclosure rows disagree with the policy word.");
+  }
   if (context.collectionVerification !== undefined) {
     evaluateCollectionVerification(context.collectionVerification);
   }
@@ -316,7 +340,7 @@ function runtimeBootstrap(artifact: ResolvedArtifact, runtimeContext?: RuntimeCo
 function thumbnailBootstrap(artifact: ResolvedArtifact): string {
   const capture = artifact.manifest.thumbnail?.capture;
   const serialized = scriptSafeJson(capture ?? null);
-  return `(()=>{"use strict";const policy=${serialized};const started=performance.now();let timer;let stopTimer;let initialized=false;const emit=(action,label)=>parent.postMessage({protocol:"keel-thumbnail-capture@1",action,label:String(label||policy?.label||"hero").slice(0,64),elapsedMs:Math.max(0,Math.round(performance.now()-started))},"*");const stop=label=>{clearTimeout(timer);clearTimeout(stopTimer);emit("stop",label)};const capture=label=>{emit("capture",label);if(policy?.durationMs)stopTimer=setTimeout(()=>stop(label),policy.durationMs)};const init=label=>{if(initialized)return;initialized=true;emit("init",label);if(policy?.mode==="after-init")timer=setTimeout(()=>capture(label),policy.delayMs||0)};const api=Object.freeze({protocol:"keel-thumbnail-capture@1",init,capture,ready:capture,stop,after:(delayMs,label)=>{const delay=Number(delayMs);if(!Number.isFinite(delay)||delay<0||delay>30000)throw new RangeError("Thumbnail delay must be from 0 through 30000ms.");clearTimeout(timer);timer=setTimeout(()=>capture(label),delay)}});Object.defineProperty(globalThis,"__KEEL_THUMBNAIL__",{value:api,enumerable:true,configurable:false,writable:false});for(const [name,action] of [["KEEL_THUMBNAIL_INIT",init],["KEEL_THUMBNAIL_STOP",stop]]){let value=false;Object.defineProperty(globalThis,name,{enumerable:true,configurable:false,get:()=>value,set:next=>{value=Boolean(next);if(value)action()}})}if(policy?.mode==="time")addEventListener("DOMContentLoaded",()=>{timer=setTimeout(()=>capture(),policy.delayMs||0)},{once:true})})();`;
+  return `(()=>{"use strict";const policy=${serialized};const started=performance.now();let timer;let stopTimer;let initialized=false;const emit=(action,label)=>{const detail={protocol:"keel-thumbnail-capture@1",action,label:String(label||policy?.label||"hero").slice(0,64),elapsedMs:Math.max(0,Math.round(performance.now()-started))};dispatchEvent(new CustomEvent("keel-thumbnail-capture",{detail}));parent.postMessage(detail,"*")};const stop=label=>{clearTimeout(timer);clearTimeout(stopTimer);emit("stop",label)};const capture=label=>{emit("capture",label);if(policy?.durationMs)stopTimer=setTimeout(()=>stop(label),policy.durationMs)};const init=label=>{if(initialized)return;initialized=true;emit("init",label);if(policy?.mode==="after-init")timer=setTimeout(()=>capture(label),policy.delayMs||0)};const api=Object.freeze({protocol:"keel-thumbnail-capture@1",init,capture,ready:capture,stop,after:(delayMs,label)=>{const delay=Number(delayMs);if(!Number.isFinite(delay)||delay<0||delay>30000)throw new RangeError("Thumbnail delay must be from 0 through 30000ms.");clearTimeout(timer);timer=setTimeout(()=>capture(label),delay)}});Object.defineProperty(globalThis,"__KEEL_THUMBNAIL__",{value:api,enumerable:true,configurable:false,writable:false});for(const [name,action] of [["KEEL_THUMBNAIL_INIT",init],["KEEL_THUMBNAIL_STOP",stop]]){let value=false;Object.defineProperty(globalThis,name,{enumerable:true,configurable:false,get:()=>value,set:next=>{value=Boolean(next);if(value)action()}})}if(policy?.mode==="time")addEventListener("DOMContentLoaded",()=>{timer=setTimeout(()=>capture(),policy.delayMs||0)},{once:true})})();`;
 }
 
 interface GatewayPayloadResource {

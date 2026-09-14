@@ -1,0 +1,70 @@
+{
+  "base": "https://arweave.net/UK27GMsiEN22CgkcPpoatAh7ttwGesNU5b5MM849ZFY/",
+  "sourceChainId": 1,
+  "contract": "0xac7e693f337739b195a5eef321aa62921d314085",
+  "tokenId": "1",
+  "records": [
+    {
+      "path": "index.html",
+      "url": "https://arweave.net/UK27GMsiEN22CgkcPpoatAh7ttwGesNU5b5MM849ZFY/index.html",
+      "bytes": 3220,
+      "sha256": "295ae005436c5f2b50e37885b26718a7cbd593af37f47c9b4f970503878c022b"
+    },
+    {
+      "path": "js/js.js",
+      "url": "https://arweave.net/UK27GMsiEN22CgkcPpoatAh7ttwGesNU5b5MM849ZFY/js/js.js",
+      "bytes": 10869,
+      "sha256": "6e6641821e245715549b8767a258bc944b686c5205271f1c1a5c14a89fcc1ebe"
+    },
+    {
+      "path": "js/settings.js",
+      "url": "https://arweave.net/UK27GMsiEN22CgkcPpoatAh7ttwGesNU5b5MM849ZFY/js/settings.js",
+      "bytes": 3365,
+      "sha256": "715b6759109b34b90a267a42e15528360b2e35fb41f883d26437c6ac0767f34d"
+    },
+    {
+      "path": "js/asyncpool.js",
+      "url": "https://arweave.net/UK27GMsiEN22CgkcPpoatAh7ttwGesNU5b5MM849ZFY/js/asyncpool.js",
+      "bytes": 691,
+      "sha256": "6ec1d04f12342a28b55e0c3acf724d1c5c7b4668487ca7c3759eca8a04da4787"
+    },
+    {
+      "path": "js/timings.js",
+      "url": "https://arweave.net/UK27GMsiEN22CgkcPpoatAh7ttwGesNU5b5MM849ZFY/js/timings.js",
+      "bytes": 408,
+      "sha256": "9185ed4faf56a44c8058b3ba202582bbe2f9e10e819e854bddb1d49ec82e92cf"
+    },
+    {
+      "path": "icons/icon_32.png",
+      "url": "https://arweave.net/UK27GMsiEN22CgkcPpoatAh7ttwGesNU5b5MM849ZFY/icons/icon_32.png",
+      "bytes": 122,
+      "sha256": "6989949a8e78b2f5d4a94e13aa77206b0e1eeac123a8dc0ce8f854ed7df7c571"
+    },
+    {
+      "path": "manifest.json",
+      "url": "https://arweave.net/UK27GMsiEN22CgkcPpoatAh7ttwGesNU5b5MM849ZFY/manifest.json",
+      "bytes": 988314,
+      "sha256": "adc0624e17cb613b48e3299f757fda497d170c1e6eaa53111ce0373ee4566e76"
+    }
+  ],
+  "framesCopiedAndVerified": 240,
+  "manifestMismatches": [
+    {
+      "path": "index.html",
+      "expectedManifest": "9c0772f7215d384d792ac7b60e2571767b903e8c7d43f7de9dc9890044a18ace",
+      "servedSha256": "295ae005436c5f2b50e37885b26718a7cbd593af37f47c9b4f970503878c022b"
+    },
+    {
+      "path": "js/js.js",
+      "expectedManifest": "713784e417a0cbd95302475da3c53dcbeaccbb7ce897a5bf9316d56530de9f2f",
+      "servedSha256": "6e6641821e245715549b8767a258bc944b686c5205271f1c1a5c14a89fcc1ebe"
+    },
+    {
+      "path": "manifest.json",
+      "expectedManifest": "609e65c3b61a719a6cda1d4570b41d28550c60492e1a91f2cd5aa94f5d432c3a",
+      "servedSha256": "adc0624e17cb613b48e3299f757fda497d170c1e6eaa53111ce0373ee4566e76"
+    }
+  ],
+  "authority": "Live tokenURI animation_url; source code byte captures are pinned separately because the embedded file manifest is stale for code.",
+  "publicationReady": false
+}

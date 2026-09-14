@@ -1,0 +1,25 @@
+{
+  "url": "http://127.0.0.1:64434/?id=1",
+  "source": "current token-linked capture",
+  "viewport": {
+    "width": 1280,
+    "height": 720
+  },
+  "observedFps": 30,
+  "frameCount": 48,
+  "pausedFrameBeforeStep": 14,
+  "frameAfterArrowRight": 13,
+  "directionAfterArrowRight": -1,
+  "zoomBefore": 1.2,
+  "zoomAfterArrowUp": 1.3,
+  "warningErrorLogs": [],
+  "mp4Tested": false,
+  "canonicalShellTested": false,
+  "otherControlsNotTested": [
+    "fullscreen",
+    "high-resolution playback",
+    "still-download",
+    "variation",
+    "mobile"
+  ]
+}

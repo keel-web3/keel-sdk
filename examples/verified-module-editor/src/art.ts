@@ -4,7 +4,7 @@ import "./state";
 // Completion after thumbnail. comes from the verified module source.
 // Completion after state. comes from state.ts through generated namespace types.
 const state = getGlobals("src/state.ts");
-
+a
 function capture() {
   state.captures += 1;
   thumbnail.snapshot(state.label);

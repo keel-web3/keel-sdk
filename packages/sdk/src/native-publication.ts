@@ -70,3 +70,7 @@ export async function createKeelNativeObjectPlan(bytes: Uint8Array, options: {
     storedBytes, reusedBytes: plan.byteLength - storedBytes,
   };
 }
+
+export { createKeelManagedCompositePlan, createKeelManagedObjectPlan, readKeelManagedObject, type KeelManagedObject } from "./native-managed.js";
+
+export { buildKeelManagedShellLoader } from "./managed-shell-loader.js";

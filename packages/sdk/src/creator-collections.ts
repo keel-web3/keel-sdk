@@ -72,6 +72,16 @@ export function buildKeelMintRewardSeedProfile(input: {
   return Object.freeze({ provider, archive, futureBlockDelay: profile.futureBlockDelay });
 }
 
+/** Decode a batch draw without losing the uint64 block number or its finalized bit. */
+export function decodeKeelSeedDraw(draw: bigint) {
+  if (typeof draw !== "bigint" || draw < 0n || draw >= (1n << 66n)) throw new RangeError("Invalid seed draw.");
+  const target = draw & ((1n << 64n) - 1n);
+  const vrf = (draw & (1n << 65n)) !== 0n;
+  if ((vrf && target !== 0n) || (!vrf && target === 0n && draw !== 0n)) throw new RangeError("Invalid draw state.");
+  return Object.freeze({ vrf, future: target !== 0n, firstBlock: target, secondBlock: target === 0n ? 0n : target + 1n,
+    revealed: draw === 0n || (draw & (1n << 64n)) !== 0n });
+}
+
 export interface KeelCreator721ConfigInput {
   readonly name: string;
   readonly symbol: string;
@@ -104,6 +114,7 @@ export type KeelCreatorCollectionOperation =
   | {
       readonly kind: "dedicated-erc721";
       readonly implementation?: "erc721a" | "erc721";
+      readonly seedProfile?: KeelCreatorSeedProfileInput;
       readonly config: KeelCreator721ConfigInput;
     }
   | { readonly kind: "dedicated-erc1155"; readonly config: KeelCreator1155ConfigInput }
@@ -208,10 +219,16 @@ export function buildKeelCreatorCollectionCall(input: KeelCreatorCollectionCallI
   if (creator === ZERO_ADDRESS) throw new TypeError("creator cannot be zero.");
   if (factoryAddress === ZERO_ADDRESS) throw new TypeError("factoryAddress cannot be zero.");
 
-  let functionName: "createERC721" | "createStandardERC721" | "createERC1155" | "createSharedERC1155" | "registerExternalCollection";
+  let functionName: "createSeededERC721" | "createERC721" | "createStandardERC721" | "createERC1155" | "createSharedERC1155" | "registerExternalCollection";
   let args: readonly unknown[];
   switch (input.operation.kind) {
     case "dedicated-erc721":
+      if (input.operation.seedProfile !== undefined) {
+        if (input.operation.implementation === "erc721") throw new TypeError("Batch seed profiles require ERC721A.");
+        functionName = "createSeededERC721";
+        args = [canonical721(buildKeelCreator721Config(input.operation.config)), buildKeelCreatorSeedProfile(input.operation.seedProfile)];
+        break;
+      }
       functionName = input.operation.implementation === "erc721" ? "createStandardERC721" : "createERC721";
       args = [canonical721(buildKeelCreator721Config(input.operation.config))];
       break;
@@ -252,7 +269,9 @@ export function buildKeelCreatorCollectionCall(input: KeelCreatorCollectionCallI
     walletApproval: "required" as const,
     signing: "not-performed" as const,
     submission: "not-performed" as const,
-    consequence: input.operation.kind === "external"
+    consequence: functionName === "createSeededERC721"
+      ? "Creates a seeded ERC721A clone using the reviewed immutable reveal and transfer policy. Requires a v3 creator factory; no tokens are minted."
+      : input.operation.kind === "external"
       ? "Registers an existing creator-controlled collection in the KEEL directory; it does not transfer ownership or imply mint compatibility."
       : "Creates one creator collection record and its selected compact dedicated clone or shared ERC-1155 namespace; it does not mint a token or create a sale.",
   });

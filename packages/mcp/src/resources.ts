@@ -1,4 +1,5 @@
 import type { McpResource, McpResourceReadResult } from "./types.js";
+import { KEEL_ENGINE_CATALOG } from "@keel/sdk/engine";
 
 export const KEEL_WORKFLOW_RESOURCE = "keel://mcp/workflow" as const;
 export const KEEL_LIMITS_RESOURCE = "keel://mcp/limits" as const;
@@ -16,10 +17,17 @@ export class McpResourceNotFoundError extends Error {
 const resourceJson = (value: unknown): string => `${JSON.stringify(value)}\n`;
 
 const RESOURCE_TEXT: Readonly<Record<string, string>> = {
+  "keel://mcp/svg-renderer": resourceJson({
+    ...KEEL_ENGINE_CATALOG.svgRenderer,
+    usage: { create: { tool: "keel-svg-create", inputs: ["preset or recipeJson", "tokenId (optional)"] }, inspect: { tool: "keel-svg-inspect", inputs: ["svg"] }, read: { tool: "keel-svg-call-plan", inputs: ["chainId", "address", "tokenId"] } },
+    hiddenRecord: ["renderer chain/address/token/code hash", "artwork SHA-256/length", "proof source/job/statement/beneficiary/kind/work/seed"],
+    security: ["Never trust a contract or RPC chosen by SVG metadata", "Inspect returns unverified", "SDK verifies code and exact svg(uint256) bytes at one finalized block", "Proof statement is not the full seal; inspect the source acceptance transaction", "Native code/state rendering does not claim a KeelHold upload or replace the canonical HTML shell"],
+  }),
+  "keel://mcp/engine": resourceJson(KEEL_ENGINE_CATALOG),
   [KEEL_WORKFLOW_RESOURCE]: resourceJson({
     schema: "keel-mcp-resource@1",
     kind: "offline-workflow",
-    steps: ["studio-capabilities", "analyze", "media-optimize", "media-optimize-apply", "cost", "upload-plan", "build", "verify", "module-resolve", "module-lock", "studio-stage-project", "studio-draft", "chain-plan", "ethereum-encode", "publish-plan", "wallet-request-prepare", "wallet-link"],
+    steps: ["studio-capabilities", "analyze", "media-optimize", "media-optimize-apply", "cost", "keel-revision-plan", "upload-plan", "build", "verify", "module-resolve", "module-lock", "studio-stage-project", "studio-draft", "chain-plan", "ethereum-encode", "publish-plan", "wallet-request-prepare", "wallet-link"],
     repair: {
       prompt: "keel-draft-repair",
       order: ["studio-draft:read", "media-optimize", "creator-review", "media-optimize-apply", "studio-stage-project", "creator-prepare", "studio-draft:update"],
@@ -141,6 +149,16 @@ const RESOURCE_TEXT: Readonly<Record<string, string>> = {
   [KEEL_PUBLICATION_MODES_RESOURCE]: resourceJson({
     schema: "keel-publication-modes@1",
     defaultMode: "native-carrier-v1",
+    tezosStandard: {
+      defaultRoute: "keel-tezos-standard-fa2-onchfs@1",
+      storage: "native-keel-onchfs",
+      modules: ["keel-hold-onchfs", "keel-index", "keel-harness-builder", "keel-collection-fa2", "keel-sleeve"],
+      publicSurface: "FA2/TZIP-12 token_metadata",
+      compatibilitySurface: "KeelSleeve.token_uri -> token_json",
+      presentationGate: "Measure the complete inline return. Use Inline only when the canonical shell, builder, public-read size, and read-gas checks pass; otherwise use the RPC-backed Hybrid presentation.",
+      hybridStorageRule: "Hybrid changes the reader path, not storage: immutable artwork and shell resources remain native OnchFS bytes onchain. It is not IPFS.",
+      excludedOptionalModules: ["keel-crucible"],
+    },
     presentation: {
       storageIndependent: true,
       terms: {
@@ -169,25 +187,31 @@ const RESOURCE_TEXT: Readonly<Record<string, string>> = {
         shell: "buildKeelInlineShellFragments",
         module: "buildKeelInlineModuleFragment",
         localDocument: "buildKeelInlineLocalDocument",
-        recommendedPublishableBody: "buildKeelInlineFollowLatestTokenURIBodyGraph",
+        automaticCompactGraph: "buildKeelInlineRawPercentTokenURIGraph",
+        recommendedPublishableBody: "buildKeelInlineRawPercentTokenURIGraph; creator binaries are packed once at their resource slot and the complete HTML and metadata are not Base64-wrapped again.",
+        legacyFollowLatestBody: "buildKeelInlineFollowLatestTokenURIBodyGraph; explicit only because it adds the nested Base64 carriage.",
+        creatorAssets: "Declare artwork, animation, palettes, timing, and project data as creator assets. Reusable modules are executable libraries or runtimes published once per chain.",
+        sizeReporting: "Always report original creator source bytes, creator graph bytes, complete prepared tokenURI bytes, packing-layer count, and percentage overhead before staging.",
         pinnedPublishableGraph: "buildKeelInlinePreEncodedTokenURIGraph",
         shellLifecycle: "The recommended body graph resolves the current registered KEEL shell when tokenURI is read. A full graph pins the selected shell revision. Creator shells can publish new revisions until their creator irreversibly freezes them.",
         portableP5Default: "Once-per-chain Gzip p5 fragment plus the browser Gzip/Deflate shell profile.",
         portableThreeDefault: "Once-per-chain exact Three.js r180 ESM main/core graph. Bind both verified current-chain objects; never embed Three.js in each creator project.",
         normalMediaDefault: "A standalone image, video, or self-contained GLB is exactly registered KEEL shell prefix, registered keel.asset-display@1 module, direct creator media entrypoint, registered shell suffix. It is never a zero-module project or a creator-uploaded index.html wrapper.",
         assetDisplay: "keel.asset-display@1 self-mounts the frozen verified direct entry descriptor: AVIF/WebP use an intrinsic-size canvas with a PNG save surface; other images and videos use direct data URLs; self-contained model/gltf-binary uses WebGL. It has no network or wallet authority; external-dependency .gltf is rejected from this compact path.",
+        revisionGate: "planKeelGraphRevision compares the live selected-chain graph to the next candidate version. The automatic path permits one declared changed resource, requires exact reuse of every other object ID and commitment, and caps new stored bytes at 65536 before wallet review.",
       },
     },
     staging: {
       defaultViewer: "keel-verification-shell",
-      defaultPresentation: "During later Studio preparation, the selected chain stores only the immutable work/module body and resolves the current catalog-backed KEEL Inline shell revision when tokenURI is read. Pinning a shell revision is an explicit opt-in.",
-      activeBuilderResolution: "Resolve the builder from the selected-chain Studio Inline catalog, require it to be the active keel-harness-builder, then verify INLINE_PROTECTION_SHELL_ID and the exact shells(shellId) prefix, suffix, metadata, exists=true, and PreEncodedGraph mode. Do not infer readiness from an old deployment journal or another builder address.",
+      defaultPresentation: "Use the compact raw-percent Inline graph automatically. Binary creator assets are packed once; the complete HTML and metadata are not Base64-wrapped again. Other carriages require explicit creator selection and measured overhead.",
+      activeBuilderResolution: "For the automatic compact route, resolve the exact selected-chain KeelRawTokenURIBuilder and canonical raw-percent shell fragments from the Studio Inline catalog. Verify their receipts and read-back before binding. Legacy pre-encoded carriage separately requires the active keel-harness-builder plus INLINE_PROTECTION_SHELL_ID and the exact shells(shellId) prefix, suffix, metadata, exists=true, and PreEncodedGraph mode. Do not infer readiness from an old deployment journal or another builder address, and never fall back from compact to legacy carriage silently.",
       legacyProtectorLane: "protectorPrefix, protectorSuffix, protectedHarnessDataURI, and NoProtector belong to the older complete-document protector lane. They are not the readiness check for the default registered Inline shell and must not trigger a locally manufactured fallback.",
       normalMedia: "Normal standalone image/video/GLB preparation resolves the registered keel.asset-display@1 module as part of that catalog graph; agents provide only the direct creator asset and never manufacture an index.html wrapper.",
       viewerNone: "Explicit shell opt-out. The immutable artifact remains independently releasable and contract-readable; selecting a shell never replaces that raw artifact route.",
       agentScope: "Agents supply only creator resources/modules and never manufacture or upload Studio's default KEEL shell, protected-harness wrapper, or local replacement wrapper.",
       creatorHtml: "Creator-authored HTML is project content, not a replacement verification shell.",
       catalogFailure: "Studio must fail closed when the selected chain's canonical Inline graph catalog is incomplete; agents must not substitute a protected-harness or local wrapper.",
+      existingGraphRevision: "Studio derives this state without asking the creator. Call keel-revision-plan before upload-plan. A follow-latest graph publishes and activates the next version without rewriting token presentation; a pinned graph may update only its small binding. Any undeclared resource, reused-byte upload, or digest mismatch is blocked before wallet review.",
     },
     modes: [{
       id: "native-carrier-v1",
@@ -219,6 +243,8 @@ const RESOURCE_TEXT: Readonly<Record<string, string>> = {
 };
 
 export const RESOURCE_DEFINITIONS: readonly McpResource[] = [
+  { uri: "keel://mcp/engine", name: "keel-engine", description: "Shared SDK and desktop collection, mint, permission, storage and module inventory.", mimeType: "application/json" },
+  { uri: "keel://mcp/svg-renderer", name: "keel-svg-renderer", description: "Contract-generated SVGs, hidden proof provenance, SDK/MCP/editor usage and verification boundaries.", mimeType: "application/json" },
   { uri: KEEL_WORKFLOW_RESOURCE, name: "keel-workflow", description: "Machine-readable offline analyze-to-review workflow.", mimeType: "application/json" },
   { uri: KEEL_LIMITS_RESOURCE, name: "keel-limits", description: "Machine-readable MCP and planner safety limits.", mimeType: "application/json" },
   { uri: KEEL_PROJECT_ROUTES_RESOURCE, name: "keel-project-routes", description: "Machine-readable intent, artifact/runtime, token, sale, and auction routing without duplicated contract logic.", mimeType: "application/json" },
