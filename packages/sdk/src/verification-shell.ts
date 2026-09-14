@@ -94,6 +94,7 @@ async function compressStored(compression: "none" | "gzip" | "deflate" | "brotli
 export const KEEL_STANDALONE_VIEWER_PROTOCOL = "keel-standalone-viewer@1" as const;
 
 export interface KeelStandaloneViewerItem {
+  readonly backgroundColor?: string;
   readonly id: string;
   readonly role?: "entrypoint" | "module" | "asset" | "data";
   readonly mediaType: string;
@@ -170,7 +171,7 @@ async function loadVaultVerificationChrome(
 }> {
   const modulePath = path.join(repositoryRoot, "packages/viewer/src/keel-verification-chrome.js");
   const sourceBytes = new Uint8Array(await readFile(modulePath));
-  const chrome = await import(`${pathToFileURL(modulePath).href}?keel-shell-source=${Date.now()}`) as {
+  const chrome = await import(/* webpackIgnore: true */ /* turbopackIgnore: true */ `${pathToFileURL(modulePath).href}?keel-shell-source=${Date.now()}`) as {
     readonly KEEL_VERIFICATION_CSS?: unknown;
     readonly KEEL_VERIFICATION_RESPONSIVE_DOCK_CSS?: unknown;
     readonly KEEL_VERIFICATION_MARKUP?: unknown;
@@ -392,6 +393,7 @@ function compactInlineRuntime(
     readonly context?: unknown;
     readonly extraRows?: readonly { readonly key: string; readonly value: string }[];
   }) => unknown,
+  installedViewReaderDigest: string,
   keccak: (bytes: Uint8Array) => Uint8Array,
 ): void {
   const globals = globalThis as typeof globalThis & {
@@ -549,9 +551,11 @@ function compactInlineRuntime(
     }
     return `data:${mediaType};base64,${btoa(binary)}`;
   };
-  const replaceAliases = (text: string, aliases: ReadonlyMap<string, string>) => {
+  const replaceAliases = (text: string, aliases: ReadonlyMap<string, () => string>) => {
     let output = text;
-    for (const [alias, url] of [...aliases].sort(([left], [right]) => right.length - left.length || left.localeCompare(right))) output = output.replaceAll(alias, url);
+    for (const [alias, url] of [...aliases].sort(([left], [right]) => right.length - left.length || left.localeCompare(right))) {
+      if (output.includes(alias)) output = output.replaceAll(alias, url());
+    }
     return output;
   };
   const identifier = /^[A-Za-z_$][A-Za-z0-9_$]*$/u;
@@ -680,12 +684,18 @@ function compactInlineRuntime(
     verification: unknown,
     contentUrls: Record<string, string>,
     scripts: readonly string[],
-    directEntry?: { readonly id: string; readonly name: string; readonly mediaType: string; readonly digest: string; readonly byteLength: number; readonly url: string; readonly moduleURL: string },
+    directEntry?: { readonly background_color?: string; readonly id: string; readonly name: string; readonly mediaType: string; readonly digest: string; readonly byteLength: number; readonly url: string; readonly moduleURL: string },
   ) => {
     // Construct the child terminator at runtime so the parent HTML parser
     // never sees a literal closing script tag inside this shell script.
     const closeScript = String.fromCharCode(60, 47, 115, 99, 114, 105, 112, 116, 62);
-    const policy = '<meta http-equiv="Content-Security-Policy" content="default-src \'none\'; script-src \'unsafe-inline\' data: blob:; style-src \'unsafe-inline\' data:; img-src data: blob:; media-src data: blob:; font-src data:; connect-src \'none\'; object-src \'none\'; frame-src \'none\'; form-action \'none\'; base-uri \'none\'">';
+    // Compiling WebAssembly needs 'wasm-unsafe-eval'. It is granted only when
+    // the verified graph actually carries a WebAssembly item, so a shell around
+    // a graph without one keeps byte-identical bytes and exactly the policy it
+    // had before. Nothing else widens: there is still no 'unsafe-eval', and
+    // connect-src stays 'none', so verified wasm can compute but cannot call out.
+    const wasmSource = items.some((item) => item.mediaType === "application/wasm") ? " 'wasm-unsafe-eval'" : "";
+    const policy = `<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline' data: blob:${wasmSource}; style-src 'unsafe-inline' data:; img-src data: blob:; media-src data: blob:; font-src data:; connect-src 'none'; object-src 'none'; frame-src 'none'; form-action 'none'; base-uri 'none'">`;
     const injection = `<script>{const report=detail=>parent.postMessage({protocol:"keel-inline-child@1",action:"failed",detail:String(detail)},"*");addEventListener("error",event=>report(event.message||event.error||"Verified child runtime failed."));addEventListener("unhandledrejection",event=>report(event.reason?.message||event.reason||"Verified child promise rejected."));const c=Object.freeze(${safeJSON(context ?? {})});globalThis.__KEEL_CONTEXT__=c;const s=c?.derivedTokenSeed??c?.tokenSeed??c?.seed;if(typeof s==="string"&&/^0x[0-9a-f]{64}$/i.test(s))Object.defineProperty(globalThis,"KEEL_SEED",{value:s.toLowerCase(),enumerable:true,writable:false,configurable:false});Object.defineProperty(globalThis,"__KEEL_VERIFICATION__",{value:Object.freeze(${safeJSON(verification)}),enumerable:true,writable:false,configurable:false})}${closeScript}`;
     const content = `<script>(()=>{const u=Object.freeze(${safeJSON(contentUrls)}),r=Object.freeze(${safeJSON((verification as { readonly checks?: unknown }).checks ?? [])}),bytes=id=>{const value=u[id];if(typeof value!=="string")throw new Error("Undeclared verified content "+id);const encoded=value.slice(value.indexOf(",")+1);return Uint8Array.from(atob(encoded),character=>character.charCodeAt(0))},resources=()=>r;Object.defineProperty(globalThis,"__KEEL_CONTENT__",{value:Object.freeze({url:id=>u[id]??null,bytes,resources}),enumerable:true,writable:false,configurable:false})})()${closeScript}`;
     const direct = directEntry === undefined ? "" : `<script>{const e=Object.freeze(${safeJSON(directEntry)});Object.defineProperty(globalThis,"__KEEL_ENTRY__",{value:e,enumerable:true,writable:false,configurable:false})}${closeScript}`;
@@ -699,6 +709,7 @@ function compactInlineRuntime(
   };
   const launch = async () => {
     if (items.length === 0) throw new Error("The KEEL Inline graph is empty.");
+    if (new Set(items.map(item => item.id)).size !== items.length) throw new Error("Duplicate KEEL resource identity.");
     status.textContent = `VERIFYING ${items.length} ITEMS`;
     const resolved = new Map<string, Uint8Array>();
     for (const item of items) {
@@ -707,17 +718,45 @@ function compactInlineRuntime(
     }
     const entry = items.find((item) => item.role === "entrypoint");
     if (entry === undefined) throw new Error("The KEEL Inline graph has no entrypoint.");
-    const aliases = new Map<string, string>();
-    for (const item of items.filter((candidate) => candidate !== entry)) {
+    // Resource names resolve lazily: an item's data URL is built only when a
+    // text that is actually inlined names it, and an item can name only items
+    // before it. Building every URL up front nested each module's URL inside
+    // every later module that merely mentioned its id (an engine module's
+    // wrapper names the modules it needs), which grew exponentially with the
+    // graph and ended in "Invalid string length". Modules the loader runs
+    // (below) are never rewritten: they reach other modules through import
+    // specifiers, which resolve by lookup in __KEEL_MODULES__.
+    const others = items.filter((candidate) => candidate !== entry);
+    const owners = new Map<string, number[]>();
+    others.forEach((item, index) => {
+      for (const name of [item.id, ...item.aliases]) owners.set(name, [...(owners.get(name) ?? []), index]);
+    });
+    const loaderRuns = (item: KeelStandaloneViewerItem) => item.id !== "keel.published-view-reader"
+      && (item.role === "module" || item.role === "data") && item.mediaType === "text/javascript";
+    const urls = new Map<number, string>();
+    const urlOf = (index: number): string => {
+      const known = urls.get(index);
+      if (known !== undefined) return known;
+      const item = others[index]!;
       const bytes = resolved.get(item.id);
       if (bytes === undefined) throw new Error(`Resolved bytes missing for ${item.id}.`);
-      const output = /^(?:text\/|application\/(?:javascript|json))/u.test(item.mediaType)
-        ? new TextEncoder().encode(replaceAliases(decoder.decode(bytes), aliases))
+      const output = !loaderRuns(item) && /^(?:text\/|application\/(?:javascript|json))/u.test(item.mediaType)
+        ? new TextEncoder().encode(replaceAliases(decoder.decode(bytes), aliasesBefore(index)))
         : bytes;
       const url = dataURL(output, item.mediaType);
-      aliases.set(item.id, url);
-      for (const alias of item.aliases) aliases.set(alias, url);
-    }
+      urls.set(index, url);
+      return url;
+    };
+    // (The names items before `bound` declare, each resolving -- only when used -- to the latest item declaring it.)
+    const aliasesBefore = (bound: number) => {
+      const view = new Map<string, () => string>();
+      for (const [name, declared] of owners) {
+        const owner = declared.filter((index) => index < bound).at(-1);
+        if (owner !== undefined) view.set(name, () => urlOf(owner));
+      }
+      return view;
+    };
+    const aliases = aliasesBefore(others.length);
     const entryBytes = resolved.get(entry.id);
     if (entryBytes === undefined) throw new Error("Resolved entrypoint bytes are missing.");
     const verificationChecks = Object.freeze(items.map((item) => Object.freeze({
@@ -750,7 +789,39 @@ function compactInlineRuntime(
     }));
     globals.__KEEL_VERIFICATION__ = verification;
     const resources = verificationChecks;
-    const context = globals.__KEEL_CONTEXT__;
+    // Optional live data has separate proof from the permanent resource graph.
+    // No transport is exposed to the creator frame and connect-src remains none.
+    let liveContent: Awaited<ReturnType<typeof import("./fray-content-view-runtime.js").resolveInlinePublishedContent>>;
+    let liveReadError: string | undefined;
+    try {
+      const readManifest = items.find(item => item.id === "keel.read-manifest" && item.mediaType === "application/json");
+      const manifestBytes = readManifest && resolved.get(readManifest.id);
+      const enabled = manifestBytes && JSON.parse(decoder.decode(manifestBytes))?.extensions?.["keel-read-intents@1"]?.enabled === true;
+      if (enabled) {
+        const installed = items.find(item => item.id === "keel.published-view-reader" && item.mediaType === "text/javascript");
+        if (!installed || installed.integrity.digest !== installedViewReaderDigest) throw new Error("Installed published-read module is missing or has changed");
+        const readerBytes = resolved.get(installed.id);
+        if (!readerBytes) throw new Error("Published-read module bytes missing");
+        await verify(readerBytes, installed.integrity, "Installed published-read runtime");
+        if (Object.hasOwn(globalThis, "__KEEL_PUBLISHED_VIEW_READER__")) throw new Error("Published-read runtime was installed outside the verified loader");
+        // Privileged host code is selected by this shell's compiled digest,
+        // never by a creator-provided URL, callback, selector or module hash.
+        const install = document.createElement("script");
+        install.textContent = decoder.decode(readerBytes);
+        document.head.append(install);
+        install.remove();
+        const reader = (globalThis as typeof globalThis & { __KEEL_PUBLISHED_VIEW_READER__?: typeof import("./fray-content-view-runtime.js").resolveInlinePublishedContent }).__KEEL_PUBLISHED_VIEW_READER__;
+        if (typeof reader !== "function") throw new Error("Published-read module did not install");
+        const shaItems = items.filter((item): item is KeelStandaloneViewerItem & { integrity: Sha256Integrity } => item.integrity.algorithm === "sha256");
+        if (shaItems.length !== items.length) throw new Error("Published reads require SHA-256 resources.");
+        liveContent = await reader(shaItems, resolved, globals.__KEEL_CONTEXT__);
+      }
+    }
+    catch (error) { liveReadError = error instanceof Error ? error.message : "Published content read unavailable"; }
+    const context: Record<string, unknown> = { ...(typeof globals.__KEEL_CONTEXT__ === "object" && globals.__KEEL_CONTEXT__ !== null ? globals.__KEEL_CONTEXT__ : {}),
+      // Always replace this field; token context cannot impersonate a host read.
+      contentView: liveContent ?? null };
+
     const extensions = typeof context === "object" && context !== null && Array.isArray((context as { shellPlugins?: unknown }).shellPlugins)
       ? (context as { shellPlugins: unknown[] }).shellPlugins.slice(0, 8).flatMap((value) => {
         if (typeof value !== "object" || value === null) return [];
@@ -778,7 +849,9 @@ function compactInlineRuntime(
       result: verification,
       runtime: Object.freeze({ protocol: "keel-inline-runtime@1" }),
       context,
-      extraRows: plugins.map((plugin) => Object.freeze({ key: plugin.title, value: plugin.body })),
+      extraRows: [...plugins.map((plugin) => Object.freeze({ key: plugin.title, value: plugin.body })),
+        ...(liveContent ? [{ key: "Live appearance reads", value: `Enabled manifest and published read intents verified. ${liveContent.state.appearance ? "Wallet choices, backpack items, campaign eligibility and restored slots are live. " : "Wallet choices are live. "}RPC state at block ${liveContent.disclosure.blockNumber}; registered artwork is checked against its stored digest. These reads do not change the original seed or mint catalog. Source: ${liveContent.disclosure.endpoint}` }] : []),
+        ...(liveReadError ? [{ key: "Wallet skins unavailable", value: liveReadError + ". Showing base artwork." }] : [])],
     }) as { fail(label: string, detail: string): void };
     const frame = document.createElement("iframe");
     frame.title = "Verified KEEL work";
@@ -795,7 +868,7 @@ function compactInlineRuntime(
     if (entryURL === undefined) throw new Error("Verified entrypoint descriptor is missing.");
     const moduleAliases = new Map<string, string>();
     const moduleScripts: string[] = [];
-    for (const item of items.filter((candidate) => candidate !== entry && (candidate.role === "module" || candidate.role === "data") && candidate.mediaType === "text/javascript")) {
+    for (const item of items.filter((candidate) => candidate !== entry && candidate.id !== "keel.published-view-reader" && (candidate.role === "module" || candidate.role === "data") && candidate.mediaType === "text/javascript")) {
       const bytes = resolved.get(item.id);
       if (bytes === undefined) throw new Error(`Resolved bytes missing for ${item.id}.`);
       moduleAliases.set(item.id, item.id);
@@ -810,7 +883,7 @@ function compactInlineRuntime(
       : prepareVerifiedEntry(decoder.decode(entryBytes), moduleAliases);
     const verifiedChildHTML = childHTML(
       directMedia ? "" : replaceAliases(preparedEntry.html, aliases),
-      globals.__KEEL_CONTEXT__,
+      context,
       verification,
       contentUrls,
       [...moduleScripts, ...preparedEntry.scripts],
@@ -822,6 +895,7 @@ function compactInlineRuntime(
         byteLength: entry.integrity.byteLength,
         url: entryURL,
         moduleURL: contentUrls[assetDisplay[0]!.id]!,
+        ...(entry.backgroundColor === undefined ? {} : { background_color: entry.backgroundColor }),
       } : undefined,
     );
     // `srcdoc` inherits the embedding page's CSP. Marketplaces commonly allow
@@ -891,6 +965,18 @@ function compactInlineRuntime(
 }
 
 /** Build the two small reusable halves for the composable Inline lane. */
+let publishedViewReaderBuild: Promise<{ id: string; source: Uint8Array; integrity: Sha256Integrity }> | undefined;
+export function buildPublishedViewReaderModule() {
+  return publishedViewReaderBuild ??= (async () => {
+    const sourcePath = fileURLToPath(new URL("./fray-content-view-runtime.js", import.meta.url));
+    const bundled = await build({ bundle: true, minify: true, platform: "browser", format: "iife", target: ["es2022"], write: false,
+      stdin: { contents: `import {resolveInlinePublishedContent} from ${JSON.stringify(sourcePath)};Object.defineProperty(globalThis,"__KEEL_PUBLISHED_VIEW_READER__",{value:resolveInlinePublishedContent,writable:false,configurable:false});`,
+        resolveDir: path.dirname(sourcePath), sourcefile: "keel-published-view-reader.js", loader: "js" } });
+    const source = utf8ToBytes(bundled.outputFiles[0]!.text);
+    return { id: "keel.published-view-reader", source, integrity: await sha256Integrity(source) };
+  })();
+}
+
 export async function buildCompactInlineKeelShell(input: {
   /** Checkout containing the one canonical KEEL verification chrome module. */
   readonly repositoryRoot?: string;
@@ -900,9 +986,15 @@ export async function buildCompactInlineKeelShell(input: {
   readonly prefixIntegrity: Sha256Integrity;
   readonly suffixIntegrity: Sha256Integrity;
 }> {
-  const repositoryRoot = path.resolve(input.repositoryRoot ?? ".");
-  const verificationChromePath = path.join(repositoryRoot, "packages/viewer/src/keel-verification-chrome.js");
-  await readFile(verificationChromePath);
+  const installedViewReader = await buildPublishedViewReaderModule();
+  // Packaged canonical source makes the default independent of the consumer's cwd.
+  const verificationChromePath = fileURLToPath(new URL("./assets/keel-verification-chrome.js", import.meta.url));
+  const canonical = await readFile(verificationChromePath);
+  if (input.repositoryRoot) {
+    const supplied = await readFile(path.join(path.resolve(input.repositoryRoot), "packages/viewer/src/keel-verification-chrome.js"));
+    if (supplied.length !== canonical.length || !supplied.every((byte, index) => byte === canonical[index])) throw new TypeError("The requested checkout differs from the packaged canonical KEEL shell. Rebuild the SDK before preparing this viewer.");
+  }
+  const repositoryRoot = path.dirname(verificationChromePath);
   const runtimeBuild = await build({
     absWorkingDir: repositoryRoot,
     bundle: true,
@@ -913,7 +1005,7 @@ export async function buildCompactInlineKeelShell(input: {
     target: ["es2022"],
     write: false,
     stdin: {
-      contents: `import {keccak_256} from ${JSON.stringify(fileURLToPath(import.meta.resolve("@noble/hashes/sha3")))};import { mountKeelVerification } from ${JSON.stringify(verificationChromePath)};(${compactInlineRuntime.toString()})(mountKeelVerification,keccak_256)`,
+      contents: `import {keccak_256} from "@noble/hashes/sha3";import { mountKeelVerification } from ${JSON.stringify(verificationChromePath)};(${compactInlineRuntime.toString()})(mountKeelVerification,${JSON.stringify(installedViewReader.integrity.digest)},keccak_256)`,
       resolveDir: repositoryRoot,
       sourcefile: "keel-inline-runtime.js",
       loader: "js",
@@ -929,6 +1021,7 @@ export async function buildCompactInlineKeelShell(input: {
 
 export async function buildEmbeddedKeelViewerSlot(input: {
   readonly id: string;
+  readonly backgroundColor?: string;
   readonly role: "entrypoint" | "module" | "asset" | "data";
   readonly mediaType: string;
   readonly aliases?: readonly string[];
@@ -941,10 +1034,12 @@ export async function buildEmbeddedKeelViewerSlot(input: {
 }> {
   if (!input.id || !input.mediaType || input.bytes.byteLength === 0) throw new TypeError("Embedded Keel viewer slots require an id, media type, and bytes.");
   assertDataUriMediaType(input.mediaType);
+  if (input.backgroundColor !== undefined && !/^#?[0-9a-f]{6}$/i.test(input.backgroundColor)) throw new TypeError("Background color must be six hex digits.");
   const compression = input.compression ?? "none";
   const stored = await compressStored(compression, input.bytes);
   const [integrity, storedIntegrity] = await Promise.all([sha256Integrity(input.bytes), sha256Integrity(stored)]);
   const item: KeelStandaloneViewerItem = {
+    ...(input.backgroundColor === undefined ? {} : { backgroundColor: input.backgroundColor.replace(/^#/, "").toLowerCase() }),
     id: input.id,
     role: input.role,
     mediaType: input.mediaType,
