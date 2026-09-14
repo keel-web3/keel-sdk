@@ -458,7 +458,9 @@ export const KEEL_MODULES: readonly KeelModule[] = [
       "interfaces/IKeelQueuePriorityErrors.sol",
       "interfaces/IKeelQueueReadAdapterErrors.sol",
       "interfaces/IKeelQueueDemandEvents.sol",
-      "interfaces/IKeelQueuePeriod.sol"
+      "interfaces/IKeelQueuePeriod.sol",
+      "interfaces/IKeelMintQueueErrors.sol",
+      "interfaces/IKeelMintQueueEvents.sol"
     ],
     "deployable": [
       "FrayAuctionIssuer",
