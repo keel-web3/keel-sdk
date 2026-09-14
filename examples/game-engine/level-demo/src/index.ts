@@ -128,6 +128,8 @@ export function bakeWorker(): void {
   serveBakes({
     renderer: (canvas) => createPixelRenderer(canvas as unknown as RenderCanvas, { width: 64, height: 64, bakeOnly: true }) as unknown as IndexedBakeRenderer,
     sources: (payload) => { const { seed, count, locks } = payload as { seed: string; count: number; locks: string }; return demoSources(seed, count, locks); },
+    // (Depth sprites: every texel at the depth of the point it shows -- keel/bake depth.ts.)
+    heights: true,
   });
 }
 
@@ -340,8 +342,9 @@ export function main(host: HTMLElement): void {
   let updates = 0, planKey = "", plannedAt = -99;
   let groundK = 0;
   let unitsShown = true;
-  // (Sprites' depth at their footprint's front edge -- off only to compare with the old way.)
-  let footprints = true;
+  // (Depth sprites: every texel at the depth of the point it shows -- keel/bake depth.ts. `footprints` puts the old
+  // one-depth footprint shift back on top, to compare.)
+  let footprints = false;
   // (Each layer instance's ground point, for the sprite check.)
   const instBase = new Float32Array((1 << 17) * 3);
   let faultList: unknown[] = [];
@@ -405,8 +408,8 @@ export function main(host: HTMLElement): void {
       const p = placed[vis[v]!]!;
       const dd = objDesigns[p.design]!;
       pos[0] = p.x; pos[1] = p.y; pos[2] = p.z;
-      // (Its depth is its base's front edge's -- a trunk, a rock's foot: keel/terrain spritePosition's footprint -- so the
-      // ground under it never sinks it; the canopy over units in front of the trunk still doesn't hide them.)
+      // (At the ground's depth rule -- keel/terrain spritePosition; its texels then at the depth of the points they show,
+      // so the ground under a trunk or a rock's foot never sinks it and its canopy hides only what's really behind.)
       spritePosition(a, pos, pos, footprints ? dd.radius * p.scale * 0.5 : 0);
       if (!onScreenObj(pos[0], pos[1], pos[2], dd.height * p.scale, dd.radius * p.scale)) continue;
       if (cut) {
@@ -436,7 +439,7 @@ export function main(host: HTMLElement): void {
       const ux = units.px[u]! + (units.x[u]! - units.px[u]!) * alpha, uz = units.pz[u]! + (units.z[u]! - units.pz[u]!) * alpha;
       if (ux < x0 || ux > x1 || uz < z0 || uz > z1) continue;
       pos[0] = ux; pos[1] = units.y[u]!; pos[2] = uz;
-      spritePosition(a, pos, pos, footprints ? 0.45 : 0); // (a stride: the front foot is ~0.4 m ahead)
+      spritePosition(a, pos, pos, footprints ? 0.45 : 0); // (depth sprites: a stride's front foot carries its own depth)
       if (!onScreen(pos[0], pos[1], pos[2], 2.4, 1.2)) continue;
       const n0 = layers.count;
       mobs.pushOrtho(li, layers, u, pos[0], pos[1], pos[2], s.yaw, s.k, t);
@@ -544,7 +547,7 @@ export function main(host: HTMLElement): void {
       if (left > 0.5) {
         const jobs = take(Math.max(2, Math.min(200, Math.round(left / msPerSprite))));
         if (jobs.length) {
-          const r = bakeSlice(bakeOnMain(), jobs, { indexed: mobs.sources.indexed, plain: mobs.sources.plain });
+          const r = bakeSlice(bakeOnMain(), jobs, { indexed: mobs.sources.indexed, plain: mobs.sources.plain }, { heights: true });
           const byKey = new Map(r.baked.map((s) => [s.key, s]));
           for (const j of jobs) { const s = byKey.get(j.key); const st = mobs.lanes[laneOfJob(j)]!.stream; if (s) st.put(j, s); else st.cancel(j); }
           bakedMain += r.baked.length; bakeMainMs += r.ms;
@@ -837,7 +840,7 @@ export function main(host: HTMLElement): void {
     ground: () => ({ mode: onGpu() ? "gpu" : "cpu", gpu: gpu ? { ...gpu.stats, ready: gpuT?.ready ?? false } : null, bakers: bakers.map((b) => ({ layers: b.layers().map((l) => l.k), ready: b.ready, stats: b.stats })) }),
     /** The ground's path: the GPU ground or the CPU bake (the reference). */
     setGround(m: "gpu" | "cpu") { setGroundMode(m); },
-    /** Sprites' depth at their footprint's front edge (true) or at their middle (the old way). */
+    /** The old footprint depth shift on top of the depth sprites (off by default), to compare. */
     setFootprints(on: boolean) { footprints = on; },
     /**
      * How much of the ground this frame should show it does show: the frame's ground drawn again exactly as it was (the

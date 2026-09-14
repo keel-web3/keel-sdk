@@ -92,7 +92,7 @@ export function main(host: HTMLElement): void {
   const gpuWorld = new Map<string, number>();                // (the overworld: chunk key -> the version uploaded)
   let gpuKeys: string[] = [];
   let lastPaintMs = 0, lastPaintChunks = 0, lastSeasonMs = 0;
-  let footprints = true, onlyThings = false;
+  let footprints = false, onlyThings = false;
   // What the ground drew this frame (the checks redraw exactly it).
   let lastGround: { view: PixelView; gpu: boolean; keys: readonly string[]; layers: readonly LayerToDraw[]; time: number } | null = null;
   let refGpu: GpuGround | null = null, lastRefKeys = 0;
@@ -346,8 +346,9 @@ export function main(host: HTMLElement): void {
       const r = rects.get(sh.design.key);
       if (!r) continue;
       pos[0] = d.x; pos[1] = d.y; pos[2] = d.z;
-      // (Its depth at its footprint's front edge -- a building's whole base, a plant's stem -- so the ground under it
-      // never sinks it: keel/terrain spritePosition's footprint.)
+      // (At the ground's depth rule -- keel/terrain spritePosition; each texel then at the depth of the point it shows, from
+      // its baked height: depth sprites, so the ground under a building's base never sinks it. `footprints` is the old
+      // way -- one depth, its footprint's front edge -- kept to compare.)
       spritePosition(a, pos, pos, footprints ? sh.design.radius * d.scale * (d.sway ? 0.4 : 1) : 0);
       const o = n * SWAY_INSTANCE_FLOATS;
       data[o] = pos[0]; data[o + 1] = pos[1]; data[o + 2] = pos[2]; data[o + 3] = r.x; data[o + 4] = r.y; data[o + 5] = r.w; data[o + 6] = r.h; data[o + 7] = r.ax; data[o + 8] = r.ay; data[o + 9] = r.page;
@@ -603,6 +604,7 @@ export function main(host: HTMLElement): void {
     stepCreep(n = 1) { for (let q = 0; q < n; q += 1) stepCreep(); },
     /** The ground's path: the GPU ground or the CPU bake (the reference). */
     setGround(m: "gpu" | "cpu") { groundMode = m; },
+    /** The old footprint depth on top of the depth sprites (off by default: each texel carries its own depth now). */
     setFootprints(on: boolean) { footprints = on; },
     /**
      * How much of the ground this frame should show it does: the frame's ground drawn again as it was, against a GPU

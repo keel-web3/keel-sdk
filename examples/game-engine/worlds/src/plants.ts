@@ -79,7 +79,8 @@ export function createCatalogue(): Catalogue {
       const plan = planBake(designs as never, { directions: 1, pixelsPerMetre: k, pitch, style: "worlds.indexed" });
       const sources = new Map(designs.map((d) => [d.key, d]));
       const todo = cache.missing(plan.sprites);
-      if (todo.length) cache.add(renderIndexedSprites(px, todo, sources as never).baked);
+      // (Depth sprites: a height per texel -- each texel at the depth of the point it shows, keel/bake depth.ts.)
+      if (todo.length) cache.add(renderIndexedSprites(px, todo, sources as never, { heights: true }).baked);
       const atlas = cache.atlas(plan.sprites.map((j) => j.key), { size: maxSize });
       const rects = new Map<string, SpriteRect>();
       for (const j of plan.sprites as readonly SpriteJob[]) {

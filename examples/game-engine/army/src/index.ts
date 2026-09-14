@@ -74,6 +74,8 @@ export function bakeWorker(): void {
   serveBakes({
     renderer: (canvas) => createPixelRenderer(canvas as unknown as RenderCanvas, { width: 64, height: 64, bakeOnly: true }) as unknown as IndexedBakeRenderer,
     sources: (payload) => { const { seed, count } = payload as { seed: string; count: number }; return armySources(seed, count); },
+    // (Depth sprites: every texel at the depth of the point it shows -- keel/bake depth.ts.)
+    heights: true,
   });
 }
 
@@ -285,8 +287,8 @@ export function main(host: HTMLElement): void {
       designs: streamDesigns(), ladder: LADDER, directions: DIRS, pitch: PITCH,
       // (Indexed shapes carry no style -- the look paints them -- but props bake their colours: theirs does.)
       style: (spec, s) => (plainSources.has(spec.key) ? JSON.stringify(propStyle(s)) : "indexed"),
-      onPages: (pages, size) => sr.reservePages(pages, size),
-      onWrite: (r, rgba) => sr.writeSprite(r.page, r.x, r.y, r.w, r.h, rgba),
+      onPages: (pages, size) => sr.reservePages(pages, size, { heights: true }),
+      onWrite: (r, rgba, heights) => sr.writeSprite(r.page, r.x, r.y, r.w, r.h, rgba, heights),
     });
     stream.setScale(k, now());
     arrived.length = 0;
@@ -346,7 +348,7 @@ export function main(host: HTMLElement): void {
         const jobs = maxRank === undefined ? st.take(nJobs) : st.take(nJobs, maxRank);
         if (jobs.length) {
           noteRank(jobs);
-          const r = bakeSlice(mainPx(), jobs, { indexed: sources, plain: plainSources });
+          const r = bakeSlice(mainPx(), jobs, { indexed: sources, plain: plainSources }, { heights: true });
           const byKey = new Map(r.baked.map((s) => [s.key, s]));
           for (const j of jobs) { const s = byKey.get(j.key); if (s) st.put(j, s); else st.cancel(j); }
           bakedMain += r.baked.length; bakeMainMs += r.ms;

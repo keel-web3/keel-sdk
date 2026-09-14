@@ -174,8 +174,8 @@ export function createMobs(designs: MobDesigns, units: Units, table: LookTable, 
       designs: streamDesigns, ladder: spec.ladder, directions: spec.dirs, pitch: spec.pitch, memory: spec.pages * PAGE_SIZE * PAGE_SIZE * 4, pageSize: PAGE_SIZE,
       style: (d, s) => (plainKeys.has(d.key) ? JSON.stringify(plainStyle(s)) : "indexed"),
       // (The three streams share one page array, reserved whole the first time: it's never regrown and copied.)
-      onPages: () => { if (!reserved) { sr.reservePages(TOTAL_PAGES, PAGE_SIZE); reserved = true; } },
-      onWrite: (r, rgba) => sr.writeSprite(base + r.page, r.x, r.y, r.w, r.h, rgba),
+      onPages: () => { if (!reserved) { sr.reservePages(TOTAL_PAGES, PAGE_SIZE, { heights: true }); reserved = true; } },
+      onWrite: (r, rgba, heights) => sr.writeSprite(base + r.page, r.x, r.y, r.w, r.h, rgba, heights),
     });
     const records = p.bodies.map((b) => b.records(spec.dirs, spec.pitch));
     if (Math.max(...records.map((r) => r.sockets.length)) > SOCK) throw new Error("More sockets than the lookup has room for.");

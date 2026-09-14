@@ -44,7 +44,9 @@ export const CRAWL_PITCH = Math.asin(0.5); // (30°: floor tiles as 2:1 diamonds
 export const CRAWL_LADDER = [16, 24, 32, 48];
 const TAU = Math.PI * 2;
 const PACKS: readonly ContentPack[] = [dungeonPack];
-const HANGS = new Set(["torch", "banner", "chains", "roots", "cobweb", "bookshelf", "weapon-rack", "statue", "furnace"]);
+// (Against a wall the cutaway sinks: what hangs on it goes with it; what stands on the floor before it is cut at the stub.)
+const HANGS = new Set(["torch", "banner", "chains", "roots", "cobweb"]);
+const STANDS = new Set(["bookshelf", "weapon-rack", "statue", "furnace"]);
 const now = () => performance.now();
 
 interface PropShape { readonly key: string; readonly built: BuiltObject; readonly design: StyledBakeDesign; readonly dirs: number; readonly flames: ReadonlyArray<readonly [number, number, number]> }
@@ -181,7 +183,8 @@ export function createCrawl(o: CrawlOptions) {
     jobs.push(...heroJobs);
     const sources = new Map<string, unknown>([...shapeList.map((s) => [s.design.key, s.design] as const), ...pop.bodies.map((b) => [b.key, b] as const)]);
     const todo = cache.missing(jobs);
-    if (todo.length) cache.add(renderIndexedSprites(px, todo, sources as never).baked);
+    // (Depth sprites: a height per texel, so each texel's depth is the point it shows -- keel/bake depth.ts.)
+    if (todo.length) cache.add(renderIndexedSprites(px, todo, sources as never, { heights: true }).baked);
     const atlas = cache.atlas(jobs.map((j) => j.key), { size: o.maxTexture });
     rects = new Map();
     for (const j of jobs as readonly SpriteJob[]) { const r = atlas.sprites.get(j.key); if (r) rects.set(`${j.style === "crawl-hero" ? "hero|" : ""}${j.design}|${j.clip}|${j.frame}|${j.direction}`, { x: r.x, y: r.y, w: r.w, h: r.h, ax: r.ax, ay: r.ay, page: r.page }); }
@@ -384,7 +387,8 @@ export function createCrawl(o: CrawlOptions) {
       if (!r) return;
       // (Hung on a wall the camera looks through -- one facing it, -x or -z of the room -- the cutaway takes it down with
       // the wall; what stands on the floor before it stays.)
-      put(n, p.x, 0, p.z, r, propLook[i]!, (p.wall === 2 || p.wall === 3) && HANGS.has(p.id) ? 4 : 0);
+      const front = p.wall === 2 || p.wall === 3;
+      put(n, p.x, 0, p.z, r, propLook[i]!, front && HANGS.has(p.id) ? 4 : front && STANDS.has(p.id) ? 4 | 16 : 0);
       n += 1;
     });
     propPack = { gen: packGen, count: n, data: inst.data.slice(0, n * LIT_SPRITE_FLOATS) };
@@ -511,7 +515,7 @@ export function createCrawl(o: CrawlOptions) {
     return pixelView({ center: c, yaw: CRAWL_YAW, pitch: CRAWL_PITCH, pixelsPerMetre: k, width: W, height: H });
   }
   let lastSprites = 0;
-  function draw(width: number, height: number) {
+  function draw(width: number, height: number, debug?: { ids?: boolean; depthTest?: boolean; heights?: boolean }) {
     W = width; H = height;
     if (bakedK !== k) bakeAll();
     const v = viewOf();
@@ -520,8 +524,8 @@ export function createCrawl(o: CrawlOptions) {
     inst.count = n; lastSprites = n;
     packShadows();
     // (The x-ray only when walls may stand in front of him: in the stub cutaway none do, and a table's legs are no wall.)
-    R.draw(v, { time, focus: [hero.x, hero.z], cutaway, fog: fogOn, lights: lightsOn, doors: doorAngle, sprites: inst, shadows, silhouette: cutaway === "stub" ? -1 : heroSprite, ring: [hero.x, hero.z] });
-    if (parts && pool) { pool.setView(v); parts.draw(v, pool); }
+    R.draw(v, { time, focus: [hero.x, hero.z], cutaway, fog: fogOn, lights: lightsOn, doors: doorAngle, sprites: inst, shadows, silhouette: cutaway === "stub" ? -1 : heroSprite, ring: [hero.x, hero.z], ...(debug ? { debug: { ids: !!debug.ids, depthTest: debug.depthTest !== false }, heights: debug.heights !== false } : {}) });
+    if (parts && pool && !debug?.ids) { pool.setView(v); parts.draw(v, pool); }
   }
 
   // ---------------------------------------------------------------- input
