@@ -4,3 +4,4 @@ export * from "./define.js";
 export * from "./document.js";
 export * from "./scope.js";
 export * from "./external.js";
+export * from "./globals.js";

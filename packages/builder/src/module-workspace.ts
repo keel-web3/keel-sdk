@@ -1,3 +1,4 @@
+import { createKeelModuleTypes } from "./module-types.js";
 /**
  * Workspace support for the module pipeline: many art items in one directory.
  *
@@ -471,6 +472,7 @@ export interface KeelModuleCatalogEntry {
   readonly githubPath: string;
   /** The READABLE files the site shows, each pinned by digest. */
   readonly sourceFiles: readonly KeelCatalogSourceFile[];
+  readonly types?: Awaited<ReturnType<typeof createKeelModuleTypes>>;
   readonly outputDigest: Hex;
   readonly receiptDigest: Hex;
   readonly disposition: KeelSourceReceipt["disposition"];
@@ -558,7 +560,18 @@ async function catalogEntry(module: KeelWorkspaceModule, options: IndexKeelWorks
   const manifestRepository = placeholderFree(module.manifest.sourceRepository.url);
   const placement = module.manifest.placement;
   const deployments = await readKeelModuleRevisions(module.directory);
+  let types: Awaited<ReturnType<typeof createKeelModuleTypes>> | undefined;
+  let storedTypes: string | undefined;
+  try { storedTypes = await readFile(path.join(distDirectory, "keel-module-types.json"), "utf8"); }
+  catch (error) {
+    if (!(typeof error === "object" && error !== null && "code" in error && error.code === "ENOENT")) throw error;
+  }
+  if (storedTypes !== undefined) {
+    types = await createKeelModuleTypes(module.directory, recipe);
+    if (canonicalJson(JSON.parse(storedTypes)) !== canonicalJson(types)) throw new Error("Module declarations differ from verified source; rebuild before indexing.");
+  }
   return {
+    ...(types === undefined ? {} : { types }),
     id: module.manifest.name,
     version: module.manifest.version,
     license: module.manifest.license,

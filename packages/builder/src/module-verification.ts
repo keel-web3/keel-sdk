@@ -1,3 +1,4 @@
+import { createKeelModuleTypes } from "./module-types.js";
 /**
  * The verification call itself: given a public repository and a commit, prove
  * that the bytes going on chain are the reproducible build of that source — and
@@ -85,6 +86,7 @@ export interface VerifyKeelModuleOptions {
 }
 
 export interface VerifiedKeelModule {
+  readonly types: Awaited<ReturnType<typeof createKeelModuleTypes>> | { readonly schema: "keel-module-types-unavailable@1"; readonly reason: string };
   readonly identity: KeelModuleIdentity;
   readonly origin: KeelSourceOrigin;
   readonly recipe: KeelBuildRecipe;
@@ -265,7 +267,15 @@ export async function verifyKeelModuleFromOrigin(
       ...(options.workspacePath === undefined ? {} : { workspace: { path: options.workspacePath } }),
       ...(options.description === undefined ? {} : { description: options.description }),
     };
+    let types: VerifiedKeelModule["types"];
+    try { types = await createKeelModuleTypes(root, recipe); }
+    catch (error) {
+      // Reproducible runtime verification accepts JavaScript and arbitrary
+      // author build conventions; missing declarations must not revoke it.
+      types = { schema: "keel-module-types-unavailable@1", reason: error instanceof Error ? error.message : String(error) };
+    }
     return {
+      types,
       identity: options.identity,
       origin: { ...origin, archiveIntegrity },
       recipe,

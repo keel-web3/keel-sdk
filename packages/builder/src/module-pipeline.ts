@@ -1,3 +1,4 @@
+import { createKeelModuleTypes } from "./module-types.js";
 /**
  * The author-facing module pipeline behind `keel module init|build|plan`.
  *
@@ -483,6 +484,20 @@ export async function buildKeelModule(directory: string, buildOptions: BuildKeel
   await writeFile(outputPath, built.outputBytes);
   await writeFile(recipePath, `${canonicalJson(built.recipe)}\n`);
   await writeFile(receiptPath, `${canonicalJson(receipt)}\n`);
+  const types = await createKeelModuleTypes(root, built.recipe);
+  for (const [file, content] of Object.entries(types.files)) {
+    const target = path.join(distDirectory, "types", file);
+    await mkdir(path.dirname(target), { recursive: true });
+    await writeFile(target, content);
+  }
+  await writeFile(path.join(distDirectory, "keel-module-types.json"), `${canonicalJson(types)}\n`);
+  const declarationEntry = manifest.entry.replace(/\.[cm][jt]s$/u, (extension) => extension.startsWith(".m") ? ".d.mts" : ".d.cts").replace(/\.[jt]sx?$/u, ".d.ts");
+  if (!(declarationEntry in types.files)) throw new Error("Module entry declaration was not generated.");
+  if (built.recipe.options.format === "esm") await writeFile(path.join(distDirectory, "package.json"), `${JSON.stringify({
+    name: `@keel-modules/${manifest.name}`, version: manifest.version, type: "module",
+    main: `./${manifest.name}.min.js`, types: `./types/${declarationEntry}`,
+    exports: { ".": { types: `./types/${declarationEntry}`, import: `./${manifest.name}.min.js` } },
+  }, null, 2)}\n`);
   const receiptDigest = (await createIntegrity(utf8ToBytes(canonicalJson(receipt)))).digest;
   return {
     directory: root,

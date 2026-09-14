@@ -16,3 +16,6 @@ export * from "./module-registration.js";
 export * from "./module-workspace.js";
 export * from "./cost-analysis.js";
 export * from "./creator-module.js";
+
+export * from "./module-types.js";
+export * from "./module-globals.js";

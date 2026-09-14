@@ -1,3 +1,4 @@
+import { injectKeelModuleGlobals } from "./module-globals.js";
 import { mkdir, readFile, readdir, realpath, rm, stat, writeFile } from "node:fs/promises";
 import path from "node:path";
 import { createRequire } from "node:module";
@@ -415,6 +416,14 @@ function sourceBoundaryPlugin(root: string, surfaces: readonly PreparedSurface[]
   return {
     name: "keel-creator-source-boundary",
     setup(pluginBuild) {
+      pluginBuild.onLoad({ filter: /\.[cm]?[jt]sx?$/ }, async (args) => {
+        if (!isInside(root, args.path) || args.path.split(path.sep).includes("node_modules")) return undefined;
+        const source = await readFile(args.path, "utf8");
+        const sourcePath = path.relative(root, args.path).split(path.sep).join("/");
+        const contents = injectKeelModuleGlobals(source, sourcePath);
+        const loader = /\.tsx$/u.test(args.path) ? "tsx" : /\.jsx$/u.test(args.path) ? "jsx" : /\.[cm]?ts$/u.test(args.path) ? "ts" : "js";
+        return { contents, loader, resolveDir: path.dirname(args.path) };
+      });
       pluginBuild.onResolve({ filter: /^(?:\.{1,2}(?:[/\\]|$)|[/\\])/ }, async (args) => {
         const owner = surfaceForImporter(root, surfaces, sharedRoots, args);
         if (owner === undefined) return undefined;
