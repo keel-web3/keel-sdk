@@ -23,6 +23,55 @@ export enum KeelCreatorDeploymentKind {
   External = 2,
 }
 
+export interface KeelCreatorSeedProfileInput {
+  readonly chainlinkVrf?: boolean;
+  readonly mode?: "derived" | "shared";
+  readonly storageOnTransfer?: "full-seed" | "reference";
+  readonly futureBlockReveal?: boolean;
+  readonly futureBlockDelay?: bigint | number;
+  readonly sealedTransfers?: "locked" | "allowed";
+  readonly source?: Address;
+  readonly sourceGas?: bigint | number;
+}
+
+/** Defaults to distinct seeds, two future hashes, locked sealed tokens, and full seed storage on transfer. */
+export function buildKeelCreatorSeedProfile(input: KeelCreatorSeedProfileInput = {}) {
+  const mode = input.mode ?? "derived";
+  const storage = input.storageOnTransfer ?? "full-seed";
+  const transfers = input.sealedTransfers ?? "locked";
+  if (!["derived", "shared"].includes(mode) || !["full-seed", "reference"].includes(storage) || !["locked", "allowed"].includes(transfers)) throw new TypeError("Invalid seed mode or transfer policy.");
+  if (input.futureBlockReveal !== undefined && typeof input.futureBlockReveal !== "boolean") throw new TypeError("futureBlockReveal must be boolean.");
+  if (input.chainlinkVrf !== undefined && typeof input.chainlinkVrf !== "boolean") throw new TypeError("chainlinkVrf must be boolean.");
+  const useVrf = input.chainlinkVrf ?? false;
+  const future = input.futureBlockReveal ?? !useVrf;
+  if (useVrf && future) throw new RangeError("Choose Chainlink VRF or future block hashes.");
+  const delay = uint(input.futureBlockDelay, future ? 1n : 0n, "futureBlockDelay", (1n << 32n) - 1n);
+  if ((future && delay === 0n) || (!future && delay !== 0n)) throw new RangeError("Future reveal and delay must agree.");
+  const source = normalizedAddress(input.source, ZERO_ADDRESS, "source");
+  const sourceGas = uint(input.sourceGas, source === ZERO_ADDRESS || useVrf ? 0n : 100_000n, "sourceGas", (1n << 32n) - 1n);
+  if (useVrf && (source === ZERO_ADDRESS || sourceGas !== 0n)) throw new RangeError("Chainlink VRF needs an adapter address and no static-call gas budget.");
+  if (!useVrf && (source === ZERO_ADDRESS) !== (sourceGas === 0n)) throw new RangeError("Source and its gas budget must both be enabled or disabled.");
+  return Object.freeze({ useVrf, lockUntilReveal: transfers === "locked", futureBlockDelay: delay.toString(), sourceGas: sourceGas.toString(), source,
+    transferStorage: storage === "full-seed" ? 1 : 0, mode: mode === "derived" ? 1 : 0 });
+}
+
+/** Queue/reward randomness uses the same delayed-block defaults as creator seeds. */
+export function buildKeelMintRewardSeedProfile(input: {
+  readonly provider?: Address;
+  readonly archive?: Address;
+  readonly futureBlockDelay?: bigint | number;
+}) {
+  const provider = normalizedAddress(input.provider, ZERO_ADDRESS, "provider");
+  const archive = normalizedAddress(input.archive, ZERO_ADDRESS, "archive");
+  const shared = provider !== ZERO_ADDRESS;
+  if (shared ? archive !== ZERO_ADDRESS : archive === ZERO_ADDRESS) throw new RangeError("Choose a seed provider or a block archive.");
+  const profile = buildKeelCreatorSeedProfile({
+    chainlinkVrf: shared, source: provider, futureBlockReveal: !shared,
+    ...(input.futureBlockDelay === undefined ? {} : { futureBlockDelay: input.futureBlockDelay }),
+  });
+  return Object.freeze({ provider, archive, futureBlockDelay: profile.futureBlockDelay });
+}
+
 export interface KeelCreator721ConfigInput {
   readonly name: string;
   readonly symbol: string;

@@ -154,6 +154,8 @@ importers:
         specifier: ^5.9.0
         version: 5.9.3
 
+  packages/mint-queue: {}
+
   packages/protocol:
     devDependencies:
       typescript:

@@ -129,6 +129,11 @@
     "./mint-seeded-data": {
       "types": "./dist/mint-seeded-data.d.ts",
       "import": "./dist/mint-seeded-data.js"
+    },
+    "./mint-queue": {
+      "types": "./dist/mint-queue.d.ts",
+      "import": "./dist/mint-queue.js",
+      "default": "./dist/mint-queue.js"
     }
   },
   "files": [
@@ -137,7 +142,7 @@
   ],
   "scripts": {
     "clean": "rm -rf dist",
-    "build": "tsc -p tsconfig.json"
+    "build": "tsc -p tsconfig.json && node ../mint-queue/build.mjs"
   },
   "engines": {
     "node": ">=22"

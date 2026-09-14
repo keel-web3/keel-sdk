@@ -33,6 +33,12 @@ export const TEST_FILES_ON_DISK = Object.freeze(readdirSync(TEST_ROOT)
  * its execution boundary.
  */
 export const DETERMINISTIC_TEST_FILES = Object.freeze([
+  "tests/mint-access-entropy.test.mjs",
+  "tests/mint-reward-seed-profile.test.mjs",
+  "tests/queue-access-plan.test.mjs",
+  "tests/sdk-mint-queue.test.mjs",
+  "tests/queue-bindings.test.mjs",
+  "tests/mint-queue-worker.test.mjs",
   "tests/artifact-registry-abi.test.mjs",
   "tests/manager-wire.test.mjs",
   "tests/manager-state.test.mjs",
