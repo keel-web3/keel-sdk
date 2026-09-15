@@ -31,9 +31,9 @@ if(phase==='storage'){
 // Source registration is necessary, but only the active catalog proof permits
 // the collector-facing reader and URI attachment steps.
 const binding=await readJSON('apps/desktop/artifacts/gator-inline-sepolia/canonical-bindings/catalog-live-proof.json');assert.ok(binding.exactReadback&&binding.mcpFoundRuntime);assert.equal(binding.sourceDigest,registration.sourceDigest);
-const imageResolver=await s.deploy('deploy:image-matrix',matrixBuild,[HOLD,collection,SIGNER,4000n,image.rowStride]);
+const imageResolver=await s.deploy('deploy:image-matrix',matrixBuild,[HOLD,collection,SIGNER,4000n,image.rowStride,image.rowsPerBlock,image.maxReadDepth ?? 8]);
 const prepared=await prepareLiveToken(imageResolver),metadata=prepared.matrices.metadata;
-const metadataResolver=await s.deploy('deploy:metadata-matrix',matrixBuild,[HOLD,collection,SIGNER,4000n,metadata.rowStride]);
+const metadataResolver=await s.deploy('deploy:metadata-matrix',matrixBuild,[HOLD,collection,SIGNER,4000n,metadata.rowStride,metadata.rowsPerBlock,metadata.maxReadDepth ?? 8]);
 // Group the small SDK-planned fragments into standard Hold castSlugs calls;
 // object identities, layer reuse and the subsequent exact read-back stay intact.
 await s.precast([...image.table,...metadata.table]);

@@ -637,7 +637,10 @@ export const KEEL_MODULES: readonly KeelModule[] = [
       "KeelSleeve.sol",
       "interfaces/IKeelTokenJSONResolver.sol",
       "KeelStoredTokenJSON.sol",
-      "KeelTokenMatrix.sol"
+      "KeelTokenMatrix.sol",
+      "interfaces/IKeelMatrixHold.sol",
+      "interfaces/IKeelTokenMatrixErrors.sol",
+      "interfaces/IKeelTokenMatrixEvents.sol"
     ],
     "deployable": [
       "KeelSleeve",

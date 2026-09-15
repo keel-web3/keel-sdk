@@ -37,7 +37,7 @@ try {
  const collection=await deploy({...original,bytecode:{object:'0x'+original.evm.bytecode.object}},constructorSource.decoded_constructor_args.map(([value,type])=>type.type.startsWith('uint')?BigInt(value):value));
  async function cast(bytes){const id=keccak256(bytes);if(!uploaded.has(id)){await receipt(await w.writeContract({account,chain:null,address:hold,abi:holdBuild.abi,functionName:'castSlugs',args:[[toHex(bytes)]]}));uploaded.add(id);storedBytes+=bytes.length;}return id;}
  async function publishMatrix(matrix){
-  const resolver=await deploy(matrixBuild,[hold,collection,account,4000n,matrix.rowStride]),ids=[];
+  const resolver=await deploy(matrixBuild,[hold,collection,account,4000n,matrix.rowStride,matrix.rowsPerBlock,matrix.maxReadDepth ?? 8]),ids=[];
   for(const value of matrix.table){
    let object=objects.get(value.digest);
    if(!object){

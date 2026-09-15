@@ -73,7 +73,7 @@ try {
  const hold=(await receipt(await w.deployContract({account,chain:null,abi:holdBuild.abi,bytecode:holdBuild.bytecode.object}))).contractAddress;
  const args=source.decoded_constructor_args.map(([v,t])=>t.type.startsWith('uint')?BigInt(v):v);
  const collection=(await receipt(await w.deployContract({account,chain:null,abi:original.abi,bytecode:'0x'+original.evm.bytecode.object,args}))).contractAddress;
- const resolver=(await receipt(await w.deployContract({account,chain:null,abi:resolverBuild.abi,bytecode:resolverBuild.bytecode.object,args:[hold,collection,account,4000n,matrix.rowStride]}))).contractAddress;
+ const resolver=(await receipt(await w.deployContract({account,chain:null,abi:resolverBuild.abi,bytecode:resolverBuild.bytecode.object,args:[hold,collection,account,4000n,matrix.rowStride,matrix.rowsPerBlock,matrix.maxReadDepth ?? 8]}))).contractAddress;
  const uploaded=new Set();let storedBytes=0;
  async function publishFixture(bytes,mediaType='text/plain') {
   const plan=await createKeelManagedObjectPlan(bytes,{hold,mediaType,compression:'none'});

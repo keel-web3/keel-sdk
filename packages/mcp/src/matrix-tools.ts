@@ -9,7 +9,7 @@ export const MATRIX_TOOL_DEFINITIONS: readonly ToolDefinition[] = [{
     name: 'keel-token-matrix-prepare',
     description: 'Compile shared metadata, traits and media parts into reusable storage values, output templates and compact token selection rows. Uses the same SDK compiler as the editor. Reads workspace files only; does not sign, upload, or change a collection.',
     inputSchema: { type:'object', properties:{
-      manifestPath:{type:'string',maxLength:4096,description:'Workspace JSON: {tokenCount,tokens:[{tokenId,parts:[{role,path}]}]}. Large collections can declare shared parts:[{id,role,path}] once and use partIds:[id,...] in each token. Part ID 0 inserts the current decimal token ID. Missing rows remain unavailable.'},
+      manifestPath:{type:'string',maxLength:4096,description:'Workspace JSON: {tokenCount,blockBytes?,maxReadDepth?,tokens:[{tokenId,parts:[{role,path}]}]}. Large collections can declare shared parts:[{id,role,path}] once and use partIds:[id,...] in each token. Part ID 0 inserts the current decimal token ID. Missing rows remain unavailable.'},
       outputPath:{type:'string',maxLength:4096,description:'Optional workspace path for the prepared matrix manifest.'},
     }, required:['manifestPath'], additionalProperties:false },
   },
@@ -51,10 +51,10 @@ export const MATRIX_TOOL_DEFINITIONS: readonly ToolDefinition[] = [{
       }
       tokens.push({tokenId:token.tokenId,parts});
     }
-    const matrix = compileKeelTokenMatrix(tokens,source.tokenCount);
+    const matrix = compileKeelTokenMatrix(tokens,source.tokenCount,{blockBytes:source.blockBytes,maxReadDepth:source.maxReadDepth});
     const result = {
       schema:matrix.schema, tokenCount:matrix.tokenCount,populatedTokens:matrix.populatedTokens,complete:matrix.complete,
-      rowStride:matrix.rowStride,rowsPerBlock:matrix.rowsPerBlock,matrixBytes:matrix.matrixBytes,sharedValueBytes:matrix.sharedValueBytes,
+      rowStride:matrix.rowStride,rowsPerBlock:matrix.rowsPerBlock,blockBytes:matrix.blockBytes,maxReadDepth:matrix.maxReadDepth,deploymentLayout:matrix.deploymentLayout,matrixBytes:matrix.matrixBytes,sharedValueBytes:matrix.sharedValueBytes,
       table:matrix.table.map(value=>({id:value.id,digest:value.digest,byteLength:value.bytes.length,roles:value.roles,path:paths.get(value.digest)})),
       templates:matrix.templates,
       blocks:matrix.blocks.map(block=>({index:block.index,bytes:toHex(block.bytes),digest:sha256(block.bytes)})),

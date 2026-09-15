@@ -128,3 +128,9 @@ Kubo. Recovery used 2,733 downloaded files plus 1,267 byte-for-byte matches from
 generator backup; no unmatched candidate was accepted. Layer order was checked
 against the corrected generator; this does not assert visual pixel equality to
 older published images. Nothing from this matrix is deployed yet.
+
+## Matrix layout configuration
+
+`compileKeelTokenMatrix(tokens, tokenCount, { blockBytes, maxReadDepth })` accepts a chain-appropriate row-block byte budget and initial nesting depth. Defaults remain 23,000 bytes and eight composite edges. The contract itself has no fixed 23,000-byte capacity: deploy it with `(hold, collection, owner, tokenCount, rowStride, rowsPerBlock, maxReadDepth)` using the returned `deploymentLayout`. Publication remains subject to the selected Hold and chain limits.
+
+The MCP preparation manifest accepts `blockBytes` and `maxReadDepth` too. Its result includes the deployment layout. Block coordinates are permanent for a deployed matrix; reuse its exact stride and rowsPerBlock when preparing revisions. The owner may raise maxReadDepth, including after freezing rows, but cannot decrease it. Zero allows only leaf objects. Higher depth does not guarantee that an RPC can execute an arbitrarily large read.

@@ -176,7 +176,7 @@ export const MODULES = [
     summary: "Token JSON resolution for collections that delegate metadata assembly.",
     deps: ["keel-hold"],
     devDeps: [],
-    contracts: ["KeelSleeve.sol", "interfaces/IKeelTokenJSONResolver.sol", "KeelStoredTokenJSON.sol", "KeelTokenMatrix.sol"],
+    contracts: ["KeelSleeve.sol", "interfaces/IKeelTokenJSONResolver.sol", "KeelStoredTokenJSON.sol", "KeelTokenMatrix.sol", "interfaces/IKeelMatrixHold.sol", "interfaces/IKeelTokenMatrixErrors.sol", "interfaces/IKeelTokenMatrixEvents.sol"],
   },
   {
     id: "keel-web3-url",

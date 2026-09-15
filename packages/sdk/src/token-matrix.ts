@@ -9,7 +9,17 @@ export interface KeelMatrixToken { readonly tokenId: number; readonly parts: rea
  * only 16-bit choices; they never contain a JSON document or an image payload.
  * Equal resources share one table entry even across different template layouts.
  */
-export function compileKeelTokenMatrix(tokens: readonly KeelMatrixToken[], tokenCount: number) {
+export interface KeelMatrixOptions {
+  /** Creation-time layout budget. Use the selected chain's supported slug size. */
+  readonly blockBytes?: number;
+  /** Initial composite-edge limit; the contract owner may raise it later. */
+  readonly maxReadDepth?: number;
+}
+export function compileKeelTokenMatrix(tokens: readonly KeelMatrixToken[], tokenCount: number, options: KeelMatrixOptions = {}) {
+  const blockBytes = options.blockBytes ?? 23_000;
+  const maxReadDepth = options.maxReadDepth ?? 8;
+  if (!Number.isSafeInteger(blockBytes) || blockBytes < 4 || blockBytes > 0xffffffff) throw new Error('Invalid matrix block byte budget.');
+  if (!Number.isInteger(maxReadDepth) || maxReadDepth < 0 || maxReadDepth > 0xffffffff) throw new Error('Invalid matrix read depth.');
   if (!Number.isSafeInteger(tokenCount) || tokenCount < 1 || tokenCount > 100_000 || !tokens.length) throw new Error('Invalid matrix supply.');
   const table: { id: number; digest: Hex; bytes: Uint8Array; roles: string[] }[] = [];
   const byDigest = new Map<Hex, number>();
@@ -60,7 +70,8 @@ export function compileKeelTokenMatrix(tokens: readonly KeelMatrixToken[], token
   }
   rows.sort((a, b) => a.tokenId - b.tokenId);
   const rowStride = 4 + 2 * Math.max(...templates.map(t => t.slots));
-  const rowsPerBlock = Math.floor(23_000 / rowStride);
+  const rowsPerBlock = Math.floor(blockBytes / rowStride);
+  if (rowsPerBlock < 1 || rowsPerBlock > 0xffff) throw new Error('Matrix block capacity exceeds uint16 row bounds.');
   const blocks = Array.from({ length: Math.ceil(tokenCount / rowsPerBlock) }, (_, index) => ({ index,
     bytes: new Uint8Array(Math.min(rowsPerBlock, tokenCount - index * rowsPerBlock) * rowStride) }));
   for (const row of rows) {
@@ -72,6 +83,8 @@ export function compileKeelTokenMatrix(tokens: readonly KeelMatrixToken[], token
   return { schema: 'keel-token-matrix@1' as const, tokenCount, populatedTokens: rows.length,
     complete: rows.length === tokenCount, table, templates, rows, blocks, rowStride, rowsPerBlock,
     sharedValueBytes: table.reduce((n, entry) => n + entry.bytes.length, 0),
+    blockBytes, maxReadDepth,
+    deploymentLayout: { tokenCount, rowStride, rowsPerBlock, maxReadDepth },
     matrixBytes: blocks.reduce((n, block) => n + block.bytes.length, 0) };
 }
 
