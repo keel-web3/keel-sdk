@@ -82,21 +82,6 @@ export const KEEL_TEZOS_MODULES: readonly KeelTezosModule[] = [
     ]
   },
   {
-    "id": "keel-equipment",
-    "sources": "src/modules/keel-equipment/tezos",
-    "contracts": [
-      "keel_equipment.py"
-    ],
-    "deployable": [
-      "KeelEquipmentDescriptorValidator",
-      "KeelEquipmentDistributor",
-      "KeelEquipmentInventory",
-      "KeelEquipmentInventoryReader",
-      "KeelEquipmentReservationEngine",
-      "KeelOneUseDuplicator"
-    ]
-  },
-  {
     "id": "keel-graph",
     "sources": "src/modules/keel-graph/tezos",
     "contracts": [

@@ -318,13 +318,6 @@ export const keelDirectReadPolicy = {
     "policyMaterialization",
   ],
   "keel-seasonal-grove-state": ["currentState", "owner", "timezoneName", "regionName"],
-  "keel-equipment-inventory": [
-    "artifactRegistry",
-    "keelIndex",
-    "characterCollection",
-    "loadout",
-    "equipmentSource",
-  ],
   "keel-portable-anchor-registry": ["artifactRegistry", "sourceAnchor", "portableAnchor", "anchor"],
   "keel-attested-anchor-registry": [
     "artifactRegistry",

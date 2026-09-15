@@ -41,7 +41,6 @@ const SOURCES = [
       oneMintController: ["keel-mint-access", "OneMintController"],
       factory: ["keel-die", "KeelFactory"],
       collection: ["keel-die", "KEEL721"],
-      keelEquipmentInventory: ["keel-equipment", "KeelEquipmentInventory"],
       keelGraphRegistry: ["keel-graph", "KeelGraphRegistry"],
       keelPluginRegistry: ["keel-graph", "KeelPluginRegistry"],
       keelMarket: ["keel-market", "KeelMarket"],
@@ -63,7 +62,6 @@ const SOURCES = [
     flat: true,
     map: {
       characterCollection: ["vault-runner", "VaultCharacter721"],
-      inventory: ["keel-equipment", "KeelEquipmentInventory"],
       arcade: ["vault-runner", "VaultArcadeRegistry"],
       pack: ["vault-runner", "VaultCharacterPackV2"],
     },

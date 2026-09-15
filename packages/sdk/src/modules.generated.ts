@@ -2,7 +2,7 @@
 // Source: packages/contracts/modules/*/keel.module.json and */deployments/*.json
 
 /** Reusable protocol infrastructure. Each module ships as its own repository. */
-export type KeelModuleId = "keel-kernel" | "keel-codecs" | "keel-hold" | "keel-artifacts" | "keel-graph" | "keel-harness" | "keel-presentation" | "keel-die" | "keel-creator-identity" | "keel-mint-access" | "keel-equipment" | "keel-market" | "keel-anchors" | "keel-crucible" | "keel-ip-control" | "keel-sleeve" | "keel-web3-url" | "keel-cross-chain-mint" | "keel-stake";
+export type KeelModuleId = "keel-kernel" | "keel-codecs" | "keel-hold" | "keel-artifacts" | "keel-graph" | "keel-harness" | "keel-presentation" | "keel-die" | "keel-creator-identity" | "keel-mint-access" | "keel-market" | "keel-anchors" | "keel-crucible" | "keel-ip-control" | "keel-sleeve" | "keel-web3-url" | "keel-cross-chain-mint" | "keel-stake";
 
 /**
  * Concrete products built on the modules. Apps consume modules exactly as an
@@ -61,7 +61,6 @@ export const KEEL_MODULES: readonly KeelModule[] = [
       "SafeAdminAccessControl.sol",
       "libraries/JsonEscape.sol",
       "libraries/KeelCodeIdentity.sol",
-      "libraries/KeelCollectionFreezeValidation.sol",
       "libraries/KeelUriEscape.sol",
       "KeelFeeTreasury.sol",
       "libraries/KeelPlatformFees.sol",
@@ -494,40 +493,6 @@ export const KEEL_MODULES: readonly KeelModule[] = [
     ]
   },
   {
-    "id": "keel-equipment",
-    "kind": "module",
-    "title": "Equipment",
-    "group": "assets",
-    "visibility": "private",
-    "summary": "Token-owned equipment: inventory custody, distribution lanes, reservations, and one-use duplication.",
-    "version": "0.3.0",
-    "repo": "keel-web3/keel-equipment",
-    "deps": [
-      "keel-kernel",
-      "keel-artifacts",
-      "keel-hold"
-    ],
-    "contracts": [
-      "KeelEquipmentInventory.sol",
-      "KeelEquipmentDistributor.sol",
-      "KeelEquipmentReservationEngine.sol",
-      "KeelEquipmentDescriptorValidator.sol",
-      "KeelEquipmentInventoryReader.sol",
-      "KeelOneUseDuplicator.sol",
-      "interfaces/IKeelERC1155EquipmentDescriptor.sol",
-      "interfaces/IKeelReservableMint1155.sol",
-      "libraries/KeelMintBoundEquipmentProvision.sol"
-    ],
-    "deployable": [
-      "KeelEquipmentDescriptorValidator",
-      "KeelEquipmentDistributor",
-      "KeelEquipmentInventory",
-      "KeelEquipmentInventoryReader",
-      "KeelEquipmentReservationEngine",
-      "KeelOneUseDuplicator"
-    ]
-  },
-  {
     "id": "keel-market",
     "kind": "module",
     "title": "Market",
@@ -799,7 +764,6 @@ export const KEEL_APPS: readonly KeelModule[] = [
     "deps": [
       "keel-kernel",
       "keel-die",
-      "keel-equipment",
       "keel-presentation"
     ],
     "contracts": [
@@ -863,7 +827,6 @@ export const KEEL_APPS: readonly KeelModule[] = [
       "keel-die",
       "keel-artifacts",
       "keel-hold",
-      "keel-equipment",
       "keel-crucible",
       "keel-harness"
     ],
@@ -995,24 +958,6 @@ export const KEEL_DEPLOYMENTS: readonly KeelDeployment[] = [
     "address": "0x8839dab4505128378947aa2f75a0556554043ce6",
     "block": "11629044",
     "txHash": "0xba468375724a1f02bc2baec26da7a57592c89dd16e734ae7d2fc7ced562671cd"
-  },
-  {
-    "module": "keel-equipment",
-    "chainId": 11155111,
-    "instance": "showcase",
-    "contract": "KeelEquipmentInventory",
-    "address": "0xf4b2044c15deed5f7bf1cf3468ae8c78fcfefccf",
-    "block": "11476947",
-    "txHash": "0x8c82308482b93b060fb499cf284d4b57355dd59df903f47827935062a01d6f59"
-  },
-  {
-    "module": "keel-equipment",
-    "chainId": 11155111,
-    "instance": "vault-runner",
-    "contract": "KeelEquipmentInventory",
-    "address": "0xe5f341AB0C6246E230412B464c298fa7980AAdC3",
-    "block": "11484773",
-    "txHash": "0x1ee75da2e0e69fb136c9d6cfb9dac31d33b0eaeb22380a074347a876dfa9ce7a"
   },
   {
     "module": "keel-graph",

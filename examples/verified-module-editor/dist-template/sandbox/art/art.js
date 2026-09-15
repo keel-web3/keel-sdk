@@ -73,7 +73,6 @@ var KEEL_MODULES = [
       "SafeAdminAccessControl.sol",
       "libraries/JsonEscape.sol",
       "libraries/KeelCodeIdentity.sol",
-      "libraries/KeelCollectionFreezeValidation.sol",
       "libraries/KeelUriEscape.sol",
       "KeelFeeTreasury.sol",
       "libraries/KeelPlatformFees.sol",
