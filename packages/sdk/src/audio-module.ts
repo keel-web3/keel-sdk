@@ -42,9 +42,9 @@ export const KEEL_TONE_15 = Object.freeze({
   buildRecipe: "scripts/build-tone-native.mjs",
   localPath: "examples/demos/vendor/tone-15.1.22.native.min.js",
   licensePath: "examples/demos/vendor/tone-15.1.22-LICENSE.txt",
-  digest: "sha256:2ac828bae11ef2c28c26ca7eae78a5394726775fe51eb3222dcf5c268bd15483",
-  byteLength: 235_850,
-  gzipByteLength: 51_958,
+  digest: "sha256:3c958bd766743343128220942f9798375c6d9782c61703cf3c84633cf3f74d76",
+  byteLength: 235_774,
+  gzipByteLength: 51_913,
 });
 
 /**

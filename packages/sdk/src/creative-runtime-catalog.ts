@@ -346,8 +346,8 @@ export const KEEL_CREATIVE_RUNTIME_CATALOG: readonly KeelCreativeRuntimeCatalogE
       localPath: "examples/demos/vendor/tone-15.1.22.native.min.js",
       integrity: {
         algorithm: "sha256",
-        digest: "0x2ac828bae11ef2c28c26ca7eae78a5394726775fe51eb3222dcf5c268bd15483",
-        byteLength: 235_850,
+        digest: "0x3c958bd766743343128220942f9798375c6d9782c61703cf3c84633cf3f74d76",
+        byteLength: 235_774,
       },
       sourceRepository: "https://github.com/Tonejs/Tone.js",
       sourceRevision: "npm:tone@15.1.22",
