@@ -8,7 +8,12 @@ export async function searchKeelRuntimeModules(options: {
   readonly fetch?: typeof globalThis.fetch;
   readonly maxPages?: number;
 }) {
-  const base = resolveKeelEndpoints(options.studioUrl === undefined ? {} : { studioUrl: options.studioUrl }).studioUrl;
+  // Match the desktop/MCP local Studio boundary without weakening public
+  // endpoint configuration. Only an explicitly supplied loopback origin gets HTTP.
+  const local = options.studioUrl === undefined ? undefined : new URL(options.studioUrl);
+  const loopback = local?.protocol === 'http:' && ['localhost', '127.0.0.1', '[::1]'].includes(local.hostname);
+  if (loopback && (local.username || local.password || local.search || local.hash || local.pathname !== '/')) throw new TypeError('Local Studio must be a credential-free loopback origin.');
+  const base = loopback ? local.origin : resolveKeelEndpoints(options.studioUrl === undefined ? {} : { studioUrl: options.studioUrl }).studioUrl;
   const request = options.fetch ?? globalThis.fetch;
   const query = options.query.trim().toLowerCase();
   if (!query) throw new TypeError("A module name, ID, or hash is required.");

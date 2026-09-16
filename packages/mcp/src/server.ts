@@ -60,6 +60,17 @@ function toolError(error: unknown): ToolCallResult {
   return { content: [{ type: "text", text }], isError: true };
 }
 
+const MCP_INSTRUCTIONS = [
+  "Assume creators are not developers: automatically inventory assets, preserve originals, discover reusable objects and measure storage/compression choices.",
+  "Default to separate HTML, CSS, individual JavaScript ES modules and assets; never flatten unless explicitly requested.",
+  "For every request phrased as make a contract, put it onchain, make an NFT, publish a viewer, deploy, or release—even when an ABI, address, old journal, or approval is supplied—automatically call keel-contract-workflow-preflight, read the target README/docs, inspect the exact selected chain, and search its module catalog before editing or wallet review. Missing evidence is a hard stop.",
+  "Every collector-facing viewer uses the registered canonical KEEL verification shell; never author or replace it.",
+  "Collector Inline defaults to raw-percent metadata and HTML. Keep HTML, CSS, JavaScript modules, and assets separate. Prepare the exact supplied image carriage once at build time as data:image/<type>;base64,<payload>, publish one receipt-bound ASCII payload or complete URI, and make the contract/viewer copy header/payload/footer only. Never publish raw image bytes plus a second encoded copy, and never Base64-encode or decode media during tokenURI.",
+  "GIF is direct data:image/gif;base64 from the exact high-quality source GIF, never an SVG wrapper, generated substitute, silent resize/re-encode or placeholder. IPFS, HTTP, web3://, resolver matrices and complete-HTML Base64 require an explicit reviewed exception.",
+  "Before staging or publishing, unpack every embedded gzip/deflate resource and scan its decoded bytes for concrete http(s), IPFS, Arweave, web3 or keel-onchain locators. A URL sentinel used only for an injected onchain content reader is still an external dependency and must be replaced with a path/identifier. Allow only the SVG namespace literal http://www.w3.org/2000/svg; fail closed on any other locator.",
+  "For a new KEEL work, begin with keel-project-plan. For an existing graph, derive revision intent, reuse every unchanged selected-chain object and publish only declared changes; the automatic revision path permits one declared changed resource. Keep local, browser, receipt and live-chain evidence separate. Tools do not sign, submit, claim faucet funds or silently change storage.",
+].join(" ");
+
 function emptyParams(value: unknown, label: string): void {
   const params = object(value === undefined ? {} : value, label);
   exactKeys(params, ["_meta"], label);
@@ -118,7 +129,7 @@ export async function createMcpServer(options: { readonly workspaceRoot?: string
           protocolVersion: MCP_PROTOCOL_VERSION,
           capabilities: { tools: { listChanged: false }, prompts: { listChanged: false }, resources: { subscribe: false, listChanged: false } },
           serverInfo: { name: MCP_SERVER_NAME, version: MCP_SERVER_VERSION },
-          instructions: "For a new KEEL work, begin with keel-project-plan and resolve creator intent before staging. Every collector-facing viewer uses the registered canonical KEEL verification shell; never author or replace it. For an existing graph, Studio derives revision intent automatically and must call keel-revision-plan: publish only the one declared changed resource, reuse every unchanged selected-chain object, and leave a follow-latest token presentation untouched. publish-plan rejects revision uploads that do not match that gate. On Tezos, the default is the KEEL Hold/Index/HarnessBuilder/FA2/Sleeve route with native OnchFS and ordinary FA2/TZIP-12 token_metadata; call keel-tezos-standard-route-plan with measured bytes so the SDK selects Inline only when the complete return fits, otherwise selecting the RPC-backed Hybrid presentation without moving bytes offchain. Keep the KEEL compatibility route separate from public metadata, and never select optional pixel/crucible modules by default. Keep storage mode explicit and keep local, browser, receipt, and live-chain proof separate. Tools do not sign, submit, claim faucet funds, or silently change storage. Optional Studio access is bounded to configured metadata and staging endpoints.",
+          instructions: MCP_INSTRUCTIONS,
         });
       }
       if (stopped) return rpcError(request.id, -32000, "MCP server is stopped.");

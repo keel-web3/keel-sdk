@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 import { fileURLToPath } from "node:url";
-import { gunzipSync } from "node:zlib";
+import { gunzipSync, gzipSync } from "node:zlib";
 
 import {
   KEEL_ASSET_DISPLAY_MODULE_ID,
@@ -21,6 +21,7 @@ import {
   buildKeelRegisteredInlineNormalMediaTokenURIGraph,
   buildKeelPreparedOneOfOneTokenURI,
   buildKeelInlineShellFragments,
+  assertKeelInlineNoExternalDependencies,
   concatenateComposableBase64Fragments,
   createComposableBase64Fragment,
   keelAssetDisplayModuleBytes,
@@ -29,12 +30,39 @@ import {
   verifyKeelPublishedInlineModuleFragment,
 } from "../packages/sdk/dist/inline-viewer-graph.js";
 import { KEEL_INLINE_PROTECTION_SHELL_ID } from "../packages/sdk/dist/shell-registry.js";
+import { assertKeelCollectorInlineMetadata, prepareKeelInlineImageCarriage } from "../packages/sdk/dist/collector-policy.js";
 
 const repositoryRoot = fileURLToPath(new URL("..", import.meta.url));
 const chainId = 11155111;
 
 const utf8 = (value) => new TextEncoder().encode(value);
 const decoded = (value) => new Uint8Array(Buffer.from(value, "base64"));
+const validPngBytes = Uint8Array.from([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a]);
+const validPngURI = `data:image/png;base64,${Buffer.from(validPngBytes).toString('base64')}`;
+const validWebpBytes = Buffer.from('RIFF\u0000\u0000\u0000\u0000WEBP', 'latin1');
+const validWebpURI = `data:image/webp;base64,${validWebpBytes.toString('base64')}`;
+const validAvifBytes = Uint8Array.from([0x00, 0x00, 0x00, 0x14, 0x66, 0x74, 0x79, 0x70, 0x61, 0x76, 0x69, 0x66, 0x00, 0x00, 0x00, 0x00, 0x61, 0x76, 0x69, 0x66]);
+const validGifBytes = decoded('R0lGODlhAQABAIAAAAAAAP///ywAAAAAAQABAAACAUwAOw==');
+
+test("Inline creator bytes reject hidden external URL sentinels before packing", () => {
+  assert.doesNotThrow(() => assertKeelInlineNoExternalDependencies(
+    utf8('const svg = "http://www.w3.org/2000/svg";'),
+  ));
+  assert.throws(
+    () => assertKeelInlineNoExternalDependencies(utf8('new URL("https://keel.invalid/weapon-art/index.json")')),
+    /external resource locator.*keel\.invalid/iu,
+  );
+  assert.throws(
+    () => assertKeelInlineNoExternalDependencies(utf8('fetch("https://example.invalid/asset.js")')),
+    /external resource locator.*https:\/\/example\.invalid/iu,
+  );
+  const hiddenModule = gzipSync(utf8('const asset = "https://keel.invalid/weapon-art/index.json";'));
+  const fragment = utf8(`,%7B%22embedded%22:%7B%22compression%22:%22gzip%22,%22storedBase64%22:%22${hiddenModule.toString("base64")}%22%7D%7D`);
+  assert.throws(
+    () => assertKeelInlineNoExternalDependencies(fragment),
+    /external resource locator.*keel\.invalid/iu,
+  );
+});
 
 test('inline SVG image carriage avoids double Base64 while retaining exact bytes', async () => {
   const svg=utf8('<svg xmlns="http://www.w3.org/2000/svg"><text>雪 # ? % &amp;</text><image href="data:image/avif;base64,'+'A+/='.repeat(5000)+'"/></svg>');
@@ -43,10 +71,33 @@ test('inline SVG image carriage avoids double Base64 while retaining exact bytes
   assert.deepEqual(utf8(decodeURIComponent(uri.slice(uri.indexOf(',')+1))),svg);
   assert.ok(uri.length<`data:image/svg+xml;base64,${Buffer.from(svg).toString('base64')}`.length);
   assert.equal(Buffer.from(await (await fetch(uri)).arrayBuffer()).equals(Buffer.from(svg)),true);
-  const raster=Uint8Array.from([0,1,250,255]);
-  assert.equal(buildKeelInlineImageURI(raster,'image/avif'),'data:image/avif;base64,AAH6/w==');
-  assert.throws(()=>buildKeelInlineImageURI(raster,'text/html'),/supported/);
+  assert.equal(buildKeelInlineImageURI(validAvifBytes,'image/avif'),`data:image/avif;base64,${Buffer.from(validAvifBytes).toString('base64')}`);
+  const gifURI = buildKeelInlineImageURI(validGifBytes, 'image/gif');
+  assert.equal(gifURI, `data:image/gif;base64,${Buffer.from(validGifBytes).toString('base64')}`);
+  const carriage = prepareKeelInlineImageCarriage(validGifBytes, 'image/gif');
+  assert.equal(carriage.uri, gifURI);
+  assert.equal(carriage.header, 'data:image/gif;base64,');
+  assert.equal(Buffer.from(carriage.payloadBytes).toString('ascii'), Buffer.from(validGifBytes).toString('base64'));
+  assert.deepEqual(carriage.sourceBytes, validGifBytes);
+  assert.deepEqual(Buffer.from(gifURI.slice(gifURI.indexOf(',') + 1), 'base64'), Buffer.from(validGifBytes));
+  assert.doesNotMatch(gifURI, /svg/iu);
+  assert.throws(() => buildKeelInlineImageURI(Uint8Array.from([0, 1, 2, 3]), 'image/gif'), /GIF source/u);
+  assert.throws(()=>buildKeelInlineImageURI(validAvifBytes,'text/html'),/supported/);
   assert.throws(()=>buildKeelInlineImageURI(new Uint8Array(),'image/png'),/empty/);
+});
+
+test("collector Inline rejects actual off-chain resource tags while allowing shell protocol text", () => {
+  const image = validPngURI;
+  const shellText = "<div class=\"verify-corner\"></div><script>const note=\"ipfs:// is only a mirror explanation\";</script>";
+  assert.doesNotThrow(() => assertKeelCollectorInlineMetadata({ image, animation_url: `data:text/html;charset=utf-8,${encodeURIComponent(shellText)}` }));
+  assert.throws(
+    () => assertKeelCollectorInlineMetadata({ image: "data:image/png;base64,AA==", animation_url: `data:text/html;charset=utf-8,${encodeURIComponent(shellText)}` }),
+    /PNG source/u,
+  );
+  assert.throws(
+    () => assertKeelCollectorInlineMetadata({ image, animation_url: `data:text/html;charset=utf-8,${encodeURIComponent(`${shellText}<img src=\"/off-chain.png\">`)}` }),
+    /external or relative resource/u,
+  );
 });
 
 test("composable Base64 fragments equal one traditional outer encoding across UTF-8 boundaries", () => {
@@ -223,13 +274,27 @@ test("Gzip Inline graph reuses shell and p5 fragments and publishes only creator
   assert.ok(followLatest.fragmentBytes.byteLength < tokenGraph.fragmentBytes.byteLength);
   assert.equal(followLatest.creatorPublicationBytes, tokenGraph.creatorPublicationBytes);
 
+  await assert.rejects(
+    buildKeelPreparedOneOfOneTokenURI({
+      graph: tokenGraph,
+      chainId,
+      collection: `0x${"ab".repeat(20)}`,
+      collectionName: "Legacy without policy",
+      description: "Legacy carriage must never be the collector default",
+      imageURI: validWebpURI,
+      manifestURI: "",
+      manifestDigest: `0x${"12".repeat(32)}`,
+    }),
+    /Collector-facing Inline requires the automatic raw-percent carriage/u,
+  );
+
   const prepared = await buildKeelPreparedOneOfOneTokenURI({
     graph: tokenGraph,
     chainId,
     collection: `0x${"ab".repeat(20)}`,
     collectionName: "Seed Current",
     description: "A deterministic p5 flow field </script> 雪",
-    imageURI: "data:image/webp;base64,UklGRg==",
+    imageURI: validWebpURI,
     manifestURI: `web3://0x${"cd".repeat(20)}:${chainId}/object/0x${"ef".repeat(32)}`,
     manifestDigest: `0x${"12".repeat(32)}`,
     artifact: {
@@ -239,6 +304,7 @@ test("Gzip Inline graph reuses shell and p5 fragments and publishes only creator
       byteLength: 3_300,
       mediaType: "text/javascript",
     },
+    presentationPolicy: "raw-artifact",
   });
   assert.equal(prepared.schema, "keel-prepared-one-of-one-token-uri@1");
   assert.equal(prepared.requiredBuilder, "KeelHarnessBuilder");
@@ -272,9 +338,10 @@ test("Gzip Inline graph reuses shell and p5 fragments and publishes only creator
     collection: `0x${"ab".repeat(20)}`,
     collectionName: "Seed Current",
     description: "A deterministic p5 flow field </script> 雪",
-    imageURI: "data:image/webp;base64,UklGRg==",
+      imageURI: validWebpURI,
     manifestURI: `web3://0x${"cd".repeat(20)}:${chainId}/object/0x${"ef".repeat(32)}`,
     manifestDigest: `0x${"12".repeat(32)}`,
+    presentationPolicy: "raw-artifact",
   });
   assert.equal(escapedPrepared.animationEncoding, "percent");
   assert.equal(escapedPrepared.requiredBuilder, "KeelPercentTokenURIBuilder");
@@ -297,7 +364,7 @@ test("Gzip Inline graph reuses shell and p5 fragments and publishes only creator
     collection: `0x${"ab".repeat(20)}`,
     collectionName: "Seed Current",
     description: "A deterministic p5 flow field </script> 雪",
-    imageURI: "data:image/webp;base64,UklGRg==",
+    imageURI: validWebpURI,
     manifestURI: `web3://0x${"cd".repeat(20)}:${chainId}/object/0x${"ef".repeat(32)}`,
     manifestDigest: `0x${"12".repeat(32)}`,
   });
@@ -320,7 +387,7 @@ test("Gzip Inline graph reuses shell and p5 fragments and publishes only creator
     collection: `0x${"ab".repeat(20)}`,
     collectionName: "Seed Current",
     description: "A deterministic p5 flow field </script> 雪",
-    imageURI: "data:image/webp;base64,UklGRg==",
+      imageURI: validWebpURI,
     manifestURI: `web3://0x${"cd".repeat(20)}:${chainId}/object/0x${"ef".repeat(32)}`,
     manifestDigest: `0x${"12".repeat(32)}`,
     artifact: {
@@ -330,6 +397,7 @@ test("Gzip Inline graph reuses shell and p5 fragments and publishes only creator
       byteLength: 3_300,
       mediaType: "text/javascript",
     },
+    presentationPolicy: "raw-artifact",
   });
   assert.equal(followLatestPrepared.tokenURI, prepared.tokenURI);
   assert.equal(followLatestPrepared.tokenJSON, prepared.tokenJSON);
@@ -344,6 +412,7 @@ test("Gzip Inline graph reuses shell and p5 fragments and publishes only creator
     imageURI: compactImageURI,
     manifestURI: `web3://0x${"cd".repeat(20)}:${chainId}/object/0x${"ef".repeat(32)}`,
     manifestDigest: `0x${"12".repeat(32)}`,
+    presentationPolicy: "raw-artifact",
   });
   assert.equal(JSON.parse(compactImagePrepared.tokenJSON).image, compactImageURI);
 
@@ -357,6 +426,7 @@ test("Gzip Inline graph reuses shell and p5 fragments and publishes only creator
       imageURI: "data:image/svg+xml,<svg></svg>",
       manifestURI: `web3://0x${"cd".repeat(20)}:${chainId}/object/0x${"ef".repeat(32)}`,
       manifestDigest: `0x${"12".repeat(32)}`,
+      presentationPolicy: "raw-artifact",
     }),
     /must be percent-escaped/u,
   );
@@ -370,6 +440,7 @@ test("Gzip Inline graph reuses shell and p5 fragments and publishes only creator
     imageURI: web3ImageURI,
     manifestURI: `web3://0x${"cd".repeat(20)}:${chainId}/haulObject/0x${"ef".repeat(32)}?mime.type=application%2Fjson`,
     manifestDigest: `0x${"12".repeat(32)}`,
+    presentationPolicy: "external-resolver",
   });
   assert.equal(JSON.parse(web3ImagePrepared.tokenJSON).image, web3ImageURI);
   await assert.rejects(
@@ -733,7 +804,7 @@ test("default saver keeps resource packing unchanged through SDK, publication re
   assert.equal(reused.creatorPublicationBytes, graph.parts.filter((p) => p.sourceKind === "creator").reduce((n, p) => n + p.bytes.length, 0));
   const prepared = await buildKeelPreparedOneOfOneTokenURI({ graph: reused, chainId,
     collection: `0x${"ab".repeat(20)}`, collectionName: "雪", description: "100% # + / =",
-    imageURI: "data:image/png;base64,aGVsbG8=", manifestURI: "ipfs://test", manifestDigest: `0x${"11".repeat(32)}` });
+      imageURI: validPngURI, manifestURI: "ipfs://test", manifestDigest: `0x${"11".repeat(32)}` });
   assert.equal(prepared.requiredBuilder, "KeelRawTokenURIBuilder");
   const metadata = JSON.parse(decodeURIComponent(prepared.tokenURI.split(",").slice(1).join(",")));
   assert.equal(metadata.description, "100% # + / =");

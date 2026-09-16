@@ -35,6 +35,11 @@ Rules, in order:
 1. `image` is an inlined `data:` URI. Never `web3://`, `ipfs://`, `https://`, or a
    bare manifest locator. `buildKeelPreparedOneOfOneTokenURI` enforces this;
    `setDefaultPresentation` does not, so do not go around it.
+   Keep the source image binary in one native KEEL object. At the final metadata
+   boundary, assemble the `data:image/<type>;base64,` header, canonical Base64
+   of the exact source bytes, and the JSON delimiter/footer; do not upload a
+   Base64 text duplicate. For GIFs this is a direct GIF URI, never an SVG
+   wrapper, generated substitute, or short placeholder such as `AA==`.
 2. Keep the poster small. It is stored per token, and roughly 20,000 gas per
    32 bytes. Around 12 KB is a good ceiling; a 30 KB string is ~19M gas and an RPC
    will refuse the transaction as `gas limit too high`.

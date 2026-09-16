@@ -3,6 +3,6 @@
   "about": "The KEEL game engine release this SDK builds with when no local checkout is set: its public repository and the exact commit (a tag names it for people; the commit is what is fetched and checked). `onchain` lists where that release is published: one EngineReleasePin per chain ({ version, chainId, hold, objectId, digest } -- the release record's KeelHold object and its sha256), which the editor resolves and verifies the engine by.",
   "repository": "https://github.com/keel-web3/keel-engine",
   "tag": null,
-  "commit": null,
+  "commit": "feadfc995fa16046f6b08e157803e47f6a87a93e",
   "onchain": []
 }

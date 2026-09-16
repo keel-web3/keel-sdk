@@ -9,6 +9,7 @@ import { defaultEngine, engineBuilds } from "./build.mjs";
 import { publishEngineRecord } from "./engine-release.mjs";
 import { clientsFor, readRecord, writeRecord } from "./local-chain.mjs";
 import { gasByShare, missingOnChain, missingShared, planGame, planTotals, readGame, releaseRecordOf, sendAll, shareLinks, transactionsFor } from "./publication.mjs";
+import { reusePublishedSlots } from './reuse.mjs';
 
 const hex = (bytes) => Buffer.from(bytes).toString("hex");
 // (The engine's build: passed in by the editor, which resolved its own engine; the command line's otherwise.)
@@ -44,7 +45,9 @@ export async function publishEngineRelease({ rpc, deployment, builds, shell, log
 export async function publishGame({ rpc, deployment, project, projects, gameId, builds, shell, includeEngine = false, context = {}, log = () => {}, record = true }) {
   const { publicClient, walletClient, account, chainId } = await clientsFor(rpc);
   const engine = await buildsOf(builds);
-  const { doc, engineModuleIds } = await engine.buildGame({ project, projects, gameId, shell });
+  const built = await engine.buildGame({ project, projects, gameId, shell });
+  const { engineModuleIds } = built;
+  const doc = await reusePublishedSlots({ doc: built.doc, engineModuleIds, release: readRecord('engine-release'), publicClient, chainId, hold: deployment.KeelHold });
   const plan = await planGame({ doc, engineModuleIds, hold: deployment.KeelHold, gameId });
   const missing = await missingOnChain({ publicClient, plan });
   const absent = missingShared(missing);

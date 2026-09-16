@@ -13,7 +13,7 @@ test('Studio capability and shared MCP discovery work through real bounded HTTP 
     if (request.url.startsWith('/.well-known/')) response.end(JSON.stringify(capabilities));
     else if (request.url.startsWith('/api/library')) response.end(JSON.stringify({ assets: [{ name: 'Shared palette', chainId: 11155111, assetId: '0x123', license: 'test license' }] }));
     else if (moduleFailure) { response.statusCode = 503; response.end('unavailable'); }
-    else response.end(JSON.stringify({ modules: [{ name: 'Three helpers', version: '1.0.0' }] }));
+    else response.end(JSON.stringify({ modules: [{ name: 'Shared palette helpers', version: '1.0.0' }] }));
   });
   await new Promise((resolve) => server.listen(0, '127.0.0.1', resolve));
   try {

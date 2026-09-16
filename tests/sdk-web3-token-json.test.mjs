@@ -83,8 +83,12 @@ test('the standard SDK and MCP path shares each prepared layer across SVG and HT
  assert.equal(matrix.table.filter(p=>p.roles.includes('image-asset')).length,1);
  assert.deepEqual(Buffer.from(readKeelTokenMatrix(matrix,0)),Buffer.from(graph.bytes));
  assert.equal(decode(graph.metadata.animation_url),Buffer.from(document.rootBytes).toString());
- const web3Image={chainId:11155111,resolver:'0x1111111111111111111111111111111111111111'};
- const linked=await buildKeelWeb3TokenJSONGraph({document,metadata:original,imageURI:buildKeelInlineImageURI(image,'image/svg+xml'),tokenId:'0',web3Image});
+  const web3Image={chainId:11155111,resolver:'0x1111111111111111111111111111111111111111'};
+  await assert.rejects(
+    buildKeelWeb3TokenJSONGraph({document,metadata:original,imageURI:buildKeelInlineImageURI(image,'image/svg+xml'),tokenId:'0',web3Image}),
+    /web3Image is disabled for collector-facing Inline by default/u,
+  );
+  const linked=await buildKeelWeb3TokenJSONGraph({document,metadata:original,imageURI:buildKeelInlineImageURI(image,'image/svg+xml'),tokenId:'0',web3Image,presentationPolicy:'external-resolver'});
  assert.equal(linked.imageTransport,'web3-svg');
  assert.equal(linked.metadata.image,'web3://0x1111111111111111111111111111111111111111:11155111/tokenJSON/0?mime.type=svg');
  assert.deepEqual(Buffer.from(linked.imageResponse.bytes),image);
@@ -93,7 +97,7 @@ test('the standard SDK and MCP path shares each prepared layer across SVG and HT
  assert.deepEqual(linked.parts.filter(p=>p.role==='image-asset').map(p=>p.integrity.digest),linked.imageResponse.parts.filter(p=>p.role==='image-asset').map(p=>p.integrity.digest));
  const imageMatrix=compileKeelTokenMatrix([{tokenId:0,parts:linked.imageResponse.parts}],4000);
  assert.deepEqual(Buffer.from(readKeelTokenMatrix(imageMatrix,0)),image);
- for(const bad of [{...web3Image,chainId:undefined},{...web3Image,chainId:0},{...web3Image,resolver:'0x'+'0'.repeat(40)}])await assert.rejects(buildKeelWeb3TokenJSONGraph({document,metadata:original,imageURI:buildKeelInlineImageURI(image,'image/svg+xml'),tokenId:'0',web3Image:bad}));
+ for(const bad of [{...web3Image,chainId:undefined},{...web3Image,chainId:0},{...web3Image,resolver:'0x'+'0'.repeat(40)}])await assert.rejects(buildKeelWeb3TokenJSONGraph({document,metadata:original,imageURI:buildKeelInlineImageURI(image,'image/svg+xml'),tokenId:'0',web3Image:bad,presentationPolicy:'external-resolver'}));
  const root=await mkdtemp('/tmp/keel-standard-layer-reuse-');
  try {
   await Promise.all([writeFile(root+'/layer.webp',raw),writeFile(root+'/image.svg',image),writeFile(root+'/entry.html',entry),writeFile(root+'/metadata.json',JSON.stringify(original))]);
@@ -103,7 +107,7 @@ test('the standard SDK and MCP path shares each prepared layer across SVG and HT
   const actual=response.structuredContent.web3Metadata;
   assert.equal(actual.integrity.digest,graph.integrity.digest);
   const items=actual.parts.filter(p=>p.role==='image-asset');assert.equal(items.length,2);assert.equal(items[0].integrity.digest,items[1].integrity.digest);
-  const linkedResponse=(await server.handle({jsonrpc:'2.0',id:2,method:'tools/call',params:{name:'keel-inline-prepare',arguments:{entry:'entry.html',entryMediaType:'text/html',assets:[{assetId:'layer',path:'layer.webp',mediaType:'image/webp',compression:'none'}],imagePath:'image.svg',metadataPath:'metadata.json',metadataTransport:'web3-json',tokenId:'0',chainId:11155111,web3ImageResolver:web3Image.resolver}}})).result;
+  const linkedResponse=(await server.handle({jsonrpc:'2.0',id:2,method:'tools/call',params:{name:'keel-inline-prepare',arguments:{entry:'entry.html',entryMediaType:'text/html',assets:[{assetId:'layer',path:'layer.webp',mediaType:'image/webp',compression:'none'}],imagePath:'image.svg',metadataPath:'metadata.json',metadataTransport:'web3-json',tokenId:'0',chainId:11155111,web3ImageResolver:web3Image.resolver,presentationPolicy:'external-resolver'}}})).result;
   assert.ok(!linkedResponse.isError,JSON.stringify(linkedResponse));
   assert.equal(linkedResponse.structuredContent.web3Metadata.integrity.digest,linked.integrity.digest);
   assert.equal(linkedResponse.structuredContent.web3Metadata.imageResponse.integrity.digest,linked.imageResponse.integrity.digest);

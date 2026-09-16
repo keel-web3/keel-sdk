@@ -18,21 +18,19 @@ cheaper read.
 
 ## The rules
 
-### 1. Store what a reader hands out, not what a reader must convert
+### 1. Store the original image bytes; carry Base64 only at the image boundary
 
-A `data:image/png;base64,…` URI needs base64. Store the artwork **already
-base64** and flag it in the media type:
+The canonical source object stores the original binary artwork exactly once. Do
+not upload a second object containing a Base64 text copy merely because the
+collector-facing JSON image field is a data URI. At the final image boundary,
+the contract/viewer assembles the `data:image/<type>;base64,` header, canonical
+Base64 of those exact bytes, and the JSON delimiter/footer. It verifies the
+source digest and returned bytes; a placeholder such as `AA==` is not an image.
 
-```
-mediaType: "image/png;base64"
-```
-
-The flag is load-bearing. A reader that finds it hands the bytes straight to a
-data URI without inspecting them, which is only safe because nothing unflagged
-can reach that path — `bindRender` reverts on an object without it, and reverts
-again if the bytes are not the encoding of the artwork the ladder proved.
-
-Costs a third more storage, once. Saves the encode on every read, forever.
+For GIFs the result is a direct `data:image/gif;base64,...` URI. Never wrap a
+GIF in SVG or silently change its dimensions, codec, or pixels. The complete
+metadata JSON and HTML remain in the raw-percent lane and do not receive a
+second whole-document Base64 wrapper.
 
 ### 2. Encode once, never twice
 

@@ -1,0 +1,46 @@
+<!doctype html><meta charset="utf-8"><title>CRATES</title>
+<style>body{margin:0;background:#000;color:#ddd;font:12px monospace}canvas{width:min(100vw,90vh);image-rendering:pixelated}</style>
+<canvas id="c"></canvas><div id="score"></div>
+<script type="module">
+import { createWorld } from "../../src/world/world.js";
+import { createPixelRenderer } from "../../src/gpu/pixel-renderer.js";
+import { oklch } from "../../src/core/palette.js";
+
+const ramp = (hue, chroma) => [0.2, 0.4, 0.6, 0.8, 0.95].map((L) => oklch(L, chroma, hue));
+const names = ["floor", "metal", "wall", "dark", "water", "sky", "fur", "cloth"]; // (4 is the water, 5 the sky)
+const world = createWorld({
+  seed: new URLSearchParams(location.search).get("seed") ?? "1", width: 96, height: 96,
+  config: { project: { "mat.wood": "wall", "mat.paint": "cloth", "render.waterY": -1, "system.physics.waterY": -1 } },
+  materials: names.map((name) => ({ name, ramp: name, pattern: name === "floor" ? 1 : 0 })),
+  palettes: { day: () => ({ ramps: Object.fromEntries(names.map((n, i) => [n, ramp([90, 240, 40, 280, 210, 220, 60, 200][i], n === "dark" ? 0.02 : 0.1)])) }) },
+});
+let score = 0;
+world.generate((g) => {
+  g.place("pad", { id: "floor", tags: ["floor"], ctx: { w: 14, d: 14, h: 0.3, lip: false }, on: [0] });
+  const S = g.stream("crates");
+  for (let i = 1; i <= g.int("crates", 4, 7); i += 1) {
+    const def = g.piece("crate", { id: `crate-${i}` });
+    const pos = [S.between(-6, 6), 0.3, S.between(-6, 6)];
+    if (Math.hypot(pos[0], pos[2]) > 1.5 && g.fits(def, { pos })) g.place(def, { id: `crate-${i}`, tags: ["crate"], pos, on: "auto" });
+  }
+  g.spawn({ id: "me", kind: "anthro", pos: [0, 1, 0], player: true, materials: { fur: "fur", cloth: "cloth", dark: "dark" } });
+});
+// A system of our own: walk into a crate and it's collected.
+world.system("collect", { order: 650, step(w) {
+  const p = w.entities.get("me").body.pos;
+  for (const o of w.objects.values()) {
+    if (o.tags.includes("crate") && Math.hypot(o.transform.pos[0] - p[0], o.transform.pos[2] - p[2]) < 1.1) { w.remove(o.id); score += 1; w.emit("collected", { at: [...p] }); }
+  }
+} });
+world.on("collected", (e, w) => w.particles.emit("dust", e.at, { count: 14, spread: 2 }));
+const canvas = document.getElementById("c");
+const px = createPixelRenderer(canvas, { width: 96, height: 96 });
+world.attach(window, { canvas }); // (click to look with the mouse; WASD runs where the camera looks)
+let last = performance.now();
+requestAnimationFrame(function loop(now) {
+  requestAnimationFrame(loop);
+  world.step((now - last) / 1000); last = now;
+  world.draw(px);
+  document.getElementById("score").textContent = `crates ${score} · click, then WASD`;
+});
+</script>

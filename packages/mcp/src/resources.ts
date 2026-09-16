@@ -27,6 +27,7 @@ const RESOURCE_TEXT: Readonly<Record<string, string>> = {
   [KEEL_WORKFLOW_RESOURCE]: resourceJson({
     schema: "keel-mcp-resource@1",
     kind: "offline-workflow",
+    contractFirst: ["keel-contract-workflow-preflight", "keel-engine-catalog", "keel-network-inspect", "keel-library-search", "edge-case-resolution", "keel-contract-controls", "wallet-review"],
     steps: ["studio-capabilities", "analyze", "media-optimize", "media-optimize-apply", "cost", "keel-revision-plan", "upload-plan", "build", "verify", "module-resolve", "module-lock", "studio-stage-project", "studio-draft", "chain-plan", "ethereum-encode", "publish-plan", "wallet-request-prepare", "wallet-link"],
     repair: {
       prompt: "keel-draft-repair",
@@ -188,7 +189,8 @@ const RESOURCE_TEXT: Readonly<Record<string, string>> = {
         module: "buildKeelInlineModuleFragment",
         localDocument: "buildKeelInlineLocalDocument",
         automaticCompactGraph: "buildKeelInlineRawPercentTokenURIGraph",
-        recommendedPublishableBody: "buildKeelInlineRawPercentTokenURIGraph; creator binaries are packed once at their resource slot and the complete HTML and metadata are not Base64-wrapped again.",
+        recommendedPublishableBody: "buildKeelInlineRawPercentTokenURIGraph; prepare each direct image carriage once, store one exact ASCII payload/URI slot, copy it opaquely at tokenURI, and keep the complete HTML and metadata in raw-percent form.",
+        embeddedResourceAudit: "Before staging, decode every raw-percent layer and unpack every embedded gzip/deflate resource. Reject concrete http(s), IPFS, Arweave, web3 and keel-onchain locators in creator bytes; an onchain URL sentinel is not exempt. Allow only http://www.w3.org/2000/svg as the SVG namespace literal.",
         legacyFollowLatestBody: "buildKeelInlineFollowLatestTokenURIBodyGraph; explicit only because it adds the nested Base64 carriage.",
         creatorAssets: "Declare artwork, animation, palettes, timing, and project data as creator assets. Reusable modules are executable libraries or runtimes published once per chain.",
         sizeReporting: "Always report original creator source bytes, creator graph bytes, complete prepared tokenURI bytes, packing-layer count, and percentage overhead before staging.",
@@ -203,7 +205,8 @@ const RESOURCE_TEXT: Readonly<Record<string, string>> = {
     },
     staging: {
       defaultViewer: "keel-verification-shell",
-      defaultPresentation: "Use the compact raw-percent Inline graph automatically. Binary creator assets are packed once; the complete HTML and metadata are not Base64-wrapped again. Other carriages require explicit creator selection and measured overhead.",
+      defaultPresentation: "Use collector-inline automatically: the compact raw-percent graph, exact supplied data:image/* bytes, complete data:text/html;charset=utf-8 HTML, and the registered canonical verification shell. Store original binary image bytes once; construct the final data:image/<type>;base64 URI header plus canonical Base64 of those exact bytes plus its JSON delimiter/footer only at the metadata boundary. For GIF use a direct data:image/gif URI, never an SVG wrapper or placeholder. The complete HTML and metadata are not Base64-wrapped again. IPFS, HTTP, web3 resolvers, and other carriages require an explicit reviewed policy and measured overhead.",
+      imageCarriage: "Binary image source is stored once, never as a second Base64 text object. At the final JSON image field, assemble header + canonical Base64 exact source bytes + JSON delimiter/footer; verify source digest, decoded bytes, output length and public-RPC read-back. GIF remains direct GIF and is never auto-wrapped in SVG.",
       activeBuilderResolution: "For the automatic compact route, resolve the exact selected-chain KeelRawTokenURIBuilder and canonical raw-percent shell fragments from the Studio Inline catalog. Verify their receipts and read-back before binding. Legacy pre-encoded carriage separately requires the active keel-harness-builder plus INLINE_PROTECTION_SHELL_ID and the exact shells(shellId) prefix, suffix, metadata, exists=true, and PreEncodedGraph mode. Do not infer readiness from an old deployment journal or another builder address, and never fall back from compact to legacy carriage silently.",
       legacyProtectorLane: "protectorPrefix, protectorSuffix, protectedHarnessDataURI, and NoProtector belong to the older complete-document protector lane. They are not the readiness check for the default registered Inline shell and must not trigger a locally manufactured fallback.",
       normalMedia: "Normal standalone image/video/GLB preparation resolves the registered keel.asset-display@1 module as part of that catalog graph; agents provide only the direct creator asset and never manufacture an index.html wrapper.",

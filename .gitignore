@@ -12,3 +12,6 @@ dist/
 # Built game documents and page bundles (rebuilt by the SDK CLI).
 examples/game-engine/*/out/
 examples/game-engine/*/tools/dist/
+
+# Local friend-test workspace and generated machine-specific MCP connections.
+.keel-workspace/

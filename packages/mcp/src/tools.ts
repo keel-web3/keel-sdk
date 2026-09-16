@@ -1050,7 +1050,7 @@ function tool(name: string, description: string, inputSchema: JsonSchema, run: T
 async function inlinePrepareTool(context: ToolContext, value: unknown): Promise<unknown> {
   const input = record(
     value,
-    ["repositoryRoot", "entry", "entryMediaType", "modules", "assets", "carriage", "collection",
+    ["repositoryRoot", "entry", "entryMediaType", "modules", "assets", "carriage", "presentationPolicy", "collection",
      "collectionName", "description", "imagePath", "manifestURI", "manifestDigest", "chainId",
      "metadataTransport", "metadataPath", "tokenId", "tokenIdFieldsJson", "web3ImageResolver"],
     "Inline prepare arguments",
@@ -1131,6 +1131,11 @@ async function inlinePrepareTool(context: ToolContext, value: unknown): Promise<
 
   const carriage = optionalString(input, "carriage") ?? "compact";
   const resolvedCarriage = resolveKeelInlineCarriage(carriage);
+  const presentationPolicy = (optionalString(input, "presentationPolicy") ?? "collector-inline") as "collector-inline" | "external-resolver" | "raw-artifact";
+  if (!["collector-inline", "external-resolver", "raw-artifact"].includes(presentationPolicy)) throw new TypeError("Unsupported presentationPolicy.");
+  if (presentationPolicy === "collector-inline" && resolvedCarriage !== "raw-percent") {
+    throw new TypeError("Collector-facing Inline defaults to raw-percent. Legacy carriage requires an explicit external-resolver or raw-artifact presentationPolicy.");
+  }
   const graph = await buildKeelInlineTokenURIGraph(document, { carriage: resolvedCarriage });
 
   const shared = document.parts.filter((part) => part.kind === "existing");
@@ -1198,6 +1203,7 @@ async function inlinePrepareTool(context: ToolContext, value: unknown): Promise<
         imageURI: buildKeelInlineImageURI(poster, posterType), tokenId: requiredString(input, "tokenId"),
         ...(input.tokenIdFieldsJson === undefined ? {} : { tokenIdFields: JSON.parse(requiredString(input, "tokenIdFieldsJson")) }),
         ...(input.web3ImageResolver === undefined ? {} : { web3Image: { resolver: requiredString(input, "web3ImageResolver") as `0x${string}`, chainId: input.chainId as number } }),
+        presentationPolicy,
       });
     } else prepared = await buildKeelPreparedOneOfOneTokenURI({
       graph,
@@ -1209,6 +1215,7 @@ async function inlinePrepareTool(context: ToolContext, value: unknown): Promise<
       manifestURI: optionalString(input, "manifestURI") ?? "",
       manifestDigest: (optionalString(input, "manifestDigest") ?? `0x${"0".repeat(64)}`) as `0x${string}`,
       tokenId: 1,
+      presentationPolicy,
     });
     const preparedTokenURIBytes = prepared === undefined ? web3Metadata!.byteLength : Buffer.byteLength(prepared.tokenURI, "utf8");
     if (preparedTokenURIBytes > KEEL_INLINE_MAX_TOKEN_URI_BYTES) {
@@ -1223,6 +1230,7 @@ async function inlinePrepareTool(context: ToolContext, value: unknown): Promise<
     status: "review-only" as const,
     carriage,
     resolvedCarriage,
+    presentationPolicy,
     shell: { prefixBytes: shell.prefix.bytes.byteLength, suffixBytes: shell.suffix.bytes.byteLength },
     modules: modules.map((module) => Object.freeze({
       moduleId: module.moduleId, version: module.version, execution: module.execution,
@@ -1246,7 +1254,9 @@ async function inlinePrepareTool(context: ToolContext, value: unknown): Promise<
         : ((assetPackedBytes - assetSourceBytes) / assetSourceBytes) * 100,
       artworkBinaryPackingLayers: assets.length === 0 ? 0 : 1,
       completeDocumentBase64Layers: resolvedCarriage === "raw-percent" ? 0 : resolvedCarriage === "percent" ? 1 : 2,
-      note: "Compact is automatic: creator assets are packed once at their binary slot; the complete HTML and metadata are not Base64-wrapped again.",
+      imageSourceStorage: "source bytes retained for validation; publish one prepared ASCII image payload/URI and never raw-plus-encoded duplicates",
+      imageBoundary: "one canonical Base64 data:image carriage prepared before publication; tokenURI only copies its header/payload/footer",
+      note: "Compact is automatic: creator assets are packed once at their binary slot; the complete HTML and metadata are not Base64-wrapped again, and media is never encoded during a read.",
     },
     tokenURIBytes: graph.fragmentBytes.byteLength,
     fragmentIntegrity: graph.fragmentIntegrity,
@@ -1395,7 +1405,7 @@ export const TOOL_DEFINITIONS: readonly ToolDefinition[] = [
   tool("keel-studio-stage-project", "Stage bounded creator resources/modules and return the server-issued Studio handoff. Omitted viewer selects Studio's canonical KEEL Inline graph for later preparation; `none` is the explicit raw-artifact route with no viewer and does not prevent a later release or mint. Automatic compact preparation requires the exact selected-chain KeelRawTokenURIBuilder and canonical raw-percent shell fragments with receipts/read-back; Studio must never fall back to legacy Base64 carriage silently. A direct image, video, or self-contained GLB resolves to registered shell plus registered keel.asset-display@1 plus the creator media entry, never zero modules or a generated index.html. Legacy protector getters and NoProtector do not determine default Inline readiness. Creator HTML is content, never a replacement shell, and agents must not upload a locally manufactured KEEL shell, protected-harness wrapper, or local wrapper when the catalog is incomplete. Studio must fail closed for an incomplete selected-chain catalog during preparation. The scoped agent key remains in the MCP environment; no wallet signature or chain action occurs.", TOOL_SCHEMAS.studioStageProject, studioStageProjectTool),
   tool("keel-creator-collection-prepare", "Prepare one exact EIP-5792 KeelCreatorFactory batch plus its durable recovery envelope. This never signs or submits. Missing or ambiguous factory/renderer deployments stop before any wallet approval.", TOOL_SCHEMAS.creatorCollectionPrepare, creatorCollectionPrepareTool),
   tool("keel-shell-search", "Search the read-back-verified shell catalogue by creator, name, version, or tags. Returns top/bottom object pointers and metadata only; it never fetches carrier bytes, signs, or submits.", TOOL_SCHEMAS.shellSearch, shellSearchTool),
-  tool("keel-inline-prepare", "Plan an INLINE Keel graph with the canonical shell, reusable executable modules, creator-owned assets, and one creator entry. Omitted carriage automatically selects the compact raw-percent saver: binary artwork is packed once at its resource slot and the complete HTML/metadata are not Base64-wrapped again. The result reports source, stored graph, and complete tokenURI bytes and rejects a result above the public-read ceiling. Legacy Base64 carriage requires explicit selection. Review-only: it never signs or submits.", TOOL_SCHEMAS.inlinePrepare, inlinePrepareTool),
+  tool("keel-inline-prepare", "Plan a collector-facing INLINE Keel graph with the registered canonical shell, reusable executable modules, creator-owned assets, and one creator entry. Omitted carriage and presentationPolicy use the automatic compact raw-percent saver plus collector-inline: exact supplied data:image/* bytes and complete data:text/html;charset=utf-8 HTML, with no IPFS/HTTP/web3 resolver or legacy complete-HTML Base64. Original binary image bytes are stored once; the final image field assembles its data:image/<type>;base64 header, canonical Base64 exact payload and JSON delimiter/footer. GIF is direct data:image/gif and never an SVG wrapper or placeholder. The result reports source, stored graph, and complete tokenURI bytes and rejects a result above the public-read ceiling. External resolvers and legacy artifact carriage require explicit reviewed policies. Review-only: it never signs or submits.", TOOL_SCHEMAS.inlinePrepare, inlinePrepareTool),
   tool("keel-shell-prepare", "Create canonical creator/tag shell metadata or prepare creator registration, update, or irreversible freeze calls. One stable shell ID can publish revisions until its creator freezes it. The recommended viewer follows the current revision; pinning one revision is explicit. A shell is one reusable top and bottom around the work graph; this tool never signs, submits, or invents a replacement default shell.", TOOL_SCHEMAS.shellPrepare, shellPrepareTool),
 ];
 

@@ -6,7 +6,7 @@ import {runInNewContext} from 'node:vm';
 import {newLayeredArt,defaultPlacement,selectLayeredArt,canonicalLayerJSON} from '@keel/sdk/layered-art';
 
 test('packaged inline runtime preserves SHA-256 and seeded choices without WebCrypto',async()=>{
-  const source=await readFile('packages/sdk/dist/layered-runtime.js','utf8');
+  const source=await readFile(new URL('../../../packages/sdk/dist/layered-runtime.js',import.meta.url),'utf8');
   const context={TextEncoder,Uint8Array}; // A data-URI frame has no usable crypto.subtle.
   runInNewContext(source,context);
   const runtime=context.KEEL_LAYERS;

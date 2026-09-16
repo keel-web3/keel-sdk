@@ -1,0 +1,14 @@
+{
+  "name": "@keel/pixel",
+  "version": "0.0.1",
+  "private": true,
+  "type": "module",
+  "description": "KEEL Pixel: a pixel-art engine for generative KEEL pieces and games -- seeded assets, OKLCH palettes, dither screens at any target size, SDF objects with real bounds, particles, fx, physics, audio.",
+  "scripts": {
+    "guard": "node guard/check.mjs",
+    "guard:capture": "node guard/capture.mjs",
+    "test": "node scripts/test.mjs",
+    "serve": "node tools/serve.mjs",
+    "build:keel": "node scripts/build-keel.mjs"
+  }
+}

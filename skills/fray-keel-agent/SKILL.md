@@ -10,6 +10,33 @@ review-only request envelopes. This skill supplies intent discovery, routing,
 proof boundaries, and stopping rules. It does not duplicate contract economics
 or module records.
 
+The defaults below are mandatory even when a request is phrased casually as
+“make a contract,” “make it onchain,” or “publish the NFT.” Never infer a new
+contract, custom shell, IPFS image, complete-document Base64 route, or flattened
+upload from that wording. Read the target README/docs, run the contract
+preflight, inspect the selected chain, search the module catalog, and resolve
+existing graph objects before editing or wallet review.
+
+## Contract work is always a KEEL workflow
+
+When the request mentions a contract, collection, viewer, token metadata,
+deployment, or release—even when it comes from an already detailed project
+context—do this automatically before editing or deploying:
+
+1. Read the target repository's `README.md` and the relevant `docs/` files for
+   architecture, contracts, modules, presentation, and the named edge case.
+2. Read `keel://mcp/engine` or call `keel-engine-catalog`.
+3. Inspect the exact selected chain with `keel-network-inspect`.
+4. Search the selected-chain module/library catalog with `keel-library-search`.
+5. Resolve existing collections, proxies, graph revisions, shell/builder
+   bindings, and reusable object receipts before planning a new contract.
+
+The agent owns this technical work. Do not make the user explain modules,
+shells, carriage, decoder reuse, or contract edge cases. Stop before wallet
+review when any document, module, authority, or chain binding is missing or
+ambiguous. A contract script or old deployment journal is not a substitute for
+this workflow.
+
 ## Always begin with a plan
 
 For discovery across the SDK, MCP, or desktop editor, first read
@@ -95,6 +122,24 @@ receive their one required resource-slot packing, while the complete HTML and
 metadata receive no additional Base64 wrapper. Never ask the creator to opt in
 to this saving.
 
+The image rule is automatic and must be explained in plain language when it
+matters: validate the original binary image locally, prepare the exact direct
+`data:image/<type>;base64,<payload>` carriage once, and publish one
+receipt-bound ASCII payload or complete URI. Do not publish raw image bytes plus
+a second encoded copy. The contract/viewer only copies the prepared header,
+payload and JSON delimiter/footer; it never Base64-encodes or decodes media
+during `tokenURI`. For GIFs use a direct `data:image/gif;base64,...` URI from
+the exact high-quality source GIF; never wrap it in SVG, resize/re-encode it
+silently, use IPFS/HTTP, or accept a short placeholder such as `AA==`. The
+prepared payload must decode to the source digest and match public-RPC
+read-back. The outer metadata and complete HTML remain in the raw-percent lane.
+
+Before staging or publishing, decode each raw-percent layer and unpack every
+embedded gzip or deflate resource. Reject concrete HTTP(S), IPFS, Arweave,
+web3, and keel-onchain locators in decoded creator bytes; an onchain content
+URL sentinel is not exempt. Allow only the SVG namespace literal
+http://www.w3.org/2000/svg.
+
 Declare libraries and executable runtimes under `modules`; declare artwork,
 animation, palettes, timing, and project data under `assets`. Never hide a
 large Base64 payload inside the entry HTML or label creator media as a reusable
@@ -161,3 +206,30 @@ For the portable MCP connection and local self-test, read
 For layered collections, use the desktop `keel_layer_curation` tool to read the pool/set, generate a bounded batch, propose assignments/reordering or inspect rarity. Use candidate IDs to inspect original choices. Edits produce exact project review cards. The portable MCP `keel-layered-curation` tool offers pure local planning from bounded JSON and never changes the workspace by itself.
 
 Saved candidates retain their original generator version, seed, draw token ID and trait/variant pins. Do not regenerate a curated piece from its new set position. Rarity targets guide selection; they do not alter saved pieces. Curated, seeded and mixed modes need a verified collection allocation adapter before publication. Keep private set plans and unrevealed traits out of public metadata. The layer importer preserves originals and verifies eligible PNG-to-lossless-WebP conversion; visible artwork is canvas-composed PNG for saving. Do not call arbitrary imported WebP lossless without proof, or claim legacy-generator parity from filenames alone.
+
+
+## Artist-first modular projects (default)
+
+Treat creators as artists, not developers. The agent and SDK own the technical decisions.
+Default to separate HTML entries, CSS stylesheets, JavaScript ES modules with explicit
+imports, and individually addressable assets. Preserve logical identities and dependency
+edges through publication. Never flatten the application into one creator bundle unless
+the user explicitly requests a self-contained file; “Inline” or “onchain” alone is not that request.
+
+Before creating reusable code or uploading assets, search the selected-chain KEEL registry
+and index through the MCP library/module tools. Check compatibility, licenses, exact digests,
+receipts and public-chain bytes before reusing a candidate. A search miss is not proof that
+no module exists; inspect the configured index and module bindings before rebuilding.
+
+Inventory supplied assets automatically, preserve originals, and compare supported lossless
+compression, decoder reuse, publication and read costs. Choose resource boundaries and
+storage automatically; keep reusable or independently editable resources separate. Group
+assets only for a measured benefit while preserving their identities. Do not ask artists to
+choose codecs, chunks, module boundaries or ABIs. Ask only for missing creative intent,
+rights, budget or visible quality tradeoffs. Never silently apply lossy conversion.
+
+For revisions, compare the dependency graph to the published graph, reuse unchanged module
+and asset objects, and publish only changed resources plus necessary references. Chunk
+reuse is a storage optimization, not a substitute for modular application design. Explain
+results in plain language and distinguish measured costs from estimates. Existing approval,
+canonical-shell, integrity and receipt/read-back rules still apply.

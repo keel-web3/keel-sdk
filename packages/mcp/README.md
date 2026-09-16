@@ -14,6 +14,20 @@ resources retain one shell-decoder transport layer; whole HTML and JSON document
 are never Base64-wrapped. Studio and desktop use the same default. Returned plans
 remain unsigned, and complete tokenURI byte/read-gas checks are still required.
 
+The image rule is automatic: validate the original binary image, prepare the
+exact direct `data:image/<type>;base64,<payload>` carriage once, and publish one
+receipt-bound ASCII payload or complete URI. Do not publish raw image bytes plus
+a second encoded copy. The contract/viewer only copies the prepared header,
+payload and JSON delimiter/footer; it never Base64-encodes or decodes media at
+read time. GIFs are direct `data:image/gif` payloads from the exact high-quality
+source, never SVG wrappers, generated substitutes, gateways, or placeholders.
+
+Before staging, the SDK/MCP audit decodes raw-percent layers and unpacks every
+embedded gzip or deflate resource. It rejects concrete HTTP(S), IPFS, Arweave,
+web3, and `keel-onchain` locators in decoded creator bytes, including URL
+sentinels intended only for an injected onchain reader. Only the SVG namespace
+literal is allowed.
+
 Tezos release planning uses the same KEEL default policy through the
 `keel-tezos-standard-route-plan` tool: registered canonical shell, native
 OnchFS, Hold/Index/HarnessBuilder, FA2/TZIP-12 metadata, and KeelSleeve. Supply
@@ -32,7 +46,13 @@ node packages/mcp/dist/cli.js --workspace /path/to/project
 When `@keel/mcp` is installed as a package, the equivalent launcher is
 `keel-mcp --workspace /path/to/project`.
 
-For a new work, start with the `keel-project-plan` prompt. It discovers whether
+For a new work, start with the `keel-project-plan` prompt. For any contract,
+collection, viewer, metadata, deployment, or release work, call
+`keel-contract-workflow-preflight` first: it reads the target README and
+available relevant docs, records their digests, and returns the required
+engine, exact-network, selected-chain module scan, edge-case, and contract
+control sequence. It is review-only and fails closed when the target has no
+README or docs. It discovers whether
 the creator is making a 1/1 or collection, storage-only work, fixed sale, claim,
 or Fray auction; routes p5, Three.js, Doom WASM, and Flash AS3; and returns an
 explicit review-only plan before staging. It reads the machine-readable
@@ -76,7 +96,8 @@ For a local agent configuration, point the MCP client at the built CLI:
 ```
 
 Messages are newline-delimited JSON-RPC. Initialize first, then use
-`tools/list` and `tools/call`. The forty-one tools are `keel-tezos-shell-prepare`,
+`tools/list` and `tools/call`. The tools include `keel-contract-workflow-preflight`,
+`keel-tezos-shell-prepare`,
 `keel-tezos-publication-prepare`, `keel-network-inspect`,
 `keel-tezos-standard-route-plan`, `keel-contract-controls`, `keel-engine-catalog`,
 `keel-revision-plan`, `keel-project-decisions`, `keel-layered-check`,
@@ -366,7 +387,11 @@ URIs and extra parameters fail closed, and no workspace or network access occurs
 
 ## Shared editor decisions and contract controls
 
-`keel-engine-catalog` exposes the browser-safe SDK catalog also used by the
+`keel-contract-workflow-preflight` is the mandatory read-only starting point
+for contract, collection, viewer, metadata, deployment, and release work. It
+reads the target README and available relevant docs, records their digests, and
+returns the required engine, selected-chain, module-catalog, edge-case, and
+contract-control sequence. `keel-engine-catalog` exposes the browser-safe SDK catalog also used by the
 Electron editor. `keel-project-decisions` keeps explicit intent, recommends
 defaults without selecting them, and returns at most three next questions.
 Release type, collection model, mint system, storage, mint gates, library access
