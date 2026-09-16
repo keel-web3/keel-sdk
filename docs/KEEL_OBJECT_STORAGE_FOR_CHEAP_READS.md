@@ -18,14 +18,15 @@ cheaper read.
 
 ## The rules
 
-### 1. Store the original image bytes; carry Base64 only at the image boundary
+### 1. Preserve the original image; prepare its carriage once
 
-The canonical source object stores the original binary artwork exactly once. Do
-not upload a second object containing a Base64 text copy merely because the
-collector-facing JSON image field is a data URI. At the final image boundary,
-the contract/viewer assembles the `data:image/<type>;base64,` header, canonical
-Base64 of those exact bytes, and the JSON delimiter/footer. It verifies the
-source digest and returned bytes; a placeholder such as `AA==` is not an image.
+Validate the original binary artwork locally and prepare the exact
+`data:image/<type>;base64,<payload>` carriage once. Publish one receipt-bound
+ASCII payload or complete URI, without a second raw-image upload. The
+contract/viewer copies the prepared header, payload and JSON delimiter/footer;
+it never Base64-encodes or decodes media during `tokenURI`. Verify that the
+payload decodes to the original source digest and matches public read-back;
+a placeholder such as `AA==` is not an image.
 
 For GIFs the result is a direct `data:image/gif;base64,...` URI. Never wrap a
 GIF in SVG or silently change its dimensions, codec, or pixels. The complete

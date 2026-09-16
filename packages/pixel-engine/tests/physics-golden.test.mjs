@@ -27,6 +27,7 @@ export const COURSE = (() => {
 export function trace(world, drive, steps, tuning) {
   const body = createCharacter({ ...world, tuning });
   const h = createHash("sha256");
+  const portable = createHash("sha256");
   const buf = new Float64Array(7);
   const modes = {};
   const events = {};
@@ -34,11 +35,16 @@ export function trace(world, drive, steps, tuning) {
     body.step(DT, drive(body, i));
     buf.set([...body.pos, ...body.vel, body.facing]);
     h.update(Buffer.from(buf.buffer));
+    // Cross-architecture oracle: compare every step at one millionth of a unit.
+    // Math.sin/cos/atan2 may differ in their final binary digits across CPUs.
+    portable.update(JSON.stringify(Array.from(buf, value => Math.round(value * 1e6))));
+    portable.update(body.mode);
+    for (const e of body.events) portable.update(e.type);
     h.update(body.mode);
     for (const e of body.events) { h.update(e.type); events[e.type] = (events[e.type] ?? 0) + 1; }
     modes[body.mode] = (modes[body.mode] ?? 0) + 1;
   }
-  return { hash: h.digest("hex").slice(0, 24), modes, events, body };
+  return { hash: h.digest("hex").slice(0, 24), portableHash: portable.digest("hex").slice(0, 24), modes, events, body };
 }
 
 // A closed-loop pilot: its inputs are a pure function of the body's state, so the run is one recorded sequence.
@@ -99,18 +105,41 @@ const PINS = {
   skim: "5bf9036cf92fe1f7a408477b",
 };
 
-test("golden: the course run is the recorded one, to the bit", () => {
+// The original pins are macOS arm64. Linux x64 Node 22 produces different
+// low float bits with identical observed event counts and final positions.
+// Preserve both exact regressions and require the same rounded EVERY-STEP
+// trace on all platforms; this is not a claim of cross-platform bit identity.
+const LINUX_PINS = {
+  course: "4bbb6fabf059594d741b59e7",
+  yard1: "3d29f88fd5e78609067bce28",
+  yard2: "057d190cd56523ab23483ce7",
+  yard3: "eb2ab619de1434e82dc34b81",
+};
+const PORTABLE_PINS = {
+  course: "0f51f5bd9ae85cc360d03591",
+  yard1: "93f2b56ae49258403a7d55b6",
+  yard2: "0f7a0e3371fd05d33d5b75c9",
+  yard3: "b061dd212b310f1f9fdfefb8",
+};
+function assertTrace(result, key) {
+  const details = JSON.stringify({ modes: result.modes, events: result.events, pos: result.body.pos });
+  assert.equal(result.portableHash, PORTABLE_PINS[key], `every-step portable trace: ${details}`);
+  if (process.platform === "darwin" && process.arch === "arm64") assert.equal(result.hash, PINS[key], details);
+  else if (process.platform === "linux" && process.arch === "x64") assert.equal(result.hash, LINUX_PINS[key], details);
+}
+
+test("golden: the course matches portable and platform-specific traces", () => {
   const r = trace(COURSE, coursePilot, 120 * 16);
   for (const m of ["ground", "air", "wall", "grind"]) assert.ok(r.modes[m] > 0, `the run visits ${m}: ${JSON.stringify(r.modes)}`);
   for (const e of ["jumped", "wallStart", "wallJump", "railStart", "railEnd", "landed"]) assert.ok(r.events[e] > 0, `the run has ${e}: ${JSON.stringify(r.events)}`);
-  assert.equal(r.hash, PINS.course, JSON.stringify({ modes: r.modes, events: r.events, pos: r.body.pos }));
+  assertTrace(r, "course");
 });
 
 for (const seed of [1, 2, 3]) {
-  test(`golden: wandering the yard (seed ${seed}) is the recorded walk, to the bit`, () => {
+  test(`golden: wandering the yard (seed ${seed}) matches portable and platform-specific traces`, () => {
     const next = wanderInputs(seed);
     const r = trace(YARD, () => next(), 120 * 20);
-    assert.equal(r.hash, PINS[`yard${seed}`], JSON.stringify({ modes: r.modes, events: r.events, pos: r.body.pos }));
+    assertTrace(r, `yard${seed}`);
   });
 }
 

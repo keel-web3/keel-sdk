@@ -17,6 +17,9 @@ to reproduce the setup. This is a source preview, not a signed desktop release.
 - Original JavaScript pixel engine: 180 passed, 1 skipped; four additional
   reference-dependent test files were omitted because the external NOCTURNES
   reference was absent. These omissions are printed by the test runner.
+  Linux x64 exposed final-bit differences in four physics hashes; the tests
+  retain the macOS arm64 pins and also check platform-specific hashes plus a
+  common per-step trace rounded to one millionth of a unit.
 - Modular TypeScript engine at
   `feadfc995fa16046f6b08e157803e47f6a87a93e`: typecheck passed; engine tests had
   778 passes and 71 skips. All 33 modules built reproducibly. Module vectors

@@ -51,7 +51,10 @@ those parts automatically. They are parts of one SDK workflow.
 Run `pnpm pixel:test` for the portable JavaScript engine tests, or
 `pnpm pixel:serve` and open the printed WALLRUN URL. Historical NOCTURNES
 comparison tests skip unless `NOCTURNES` points at that external reference
-checkout; the reference is not needed to use the engine.
+checkout; the reference is not needed to use the engine. Its floating-point
+physics has platform-specific last-bit results. Golden tests check a common
+per-step trace rounded to one millionth of a unit plus platform-specific exact
+hashes; do not use those raw floats as cross-machine consensus proofs.
 
 ## Convert generator code, then edit it visually
 
