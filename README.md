@@ -62,7 +62,7 @@ folder to the agent skills. Local Anvil testing and read-only Sepolia checks
 are separate commands; no developer checkout or private credentials are required.
 
 ```sh
-git clone --branch codex/friend-test-setup https://github.com/keel-web3/keel-sdk.git
+git clone https://github.com/keel-web3/keel-sdk.git
 cd keel-sdk
 pnpm setup:friend
 ```

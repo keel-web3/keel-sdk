@@ -32,3 +32,8 @@ Every example is ordinary TypeScript: a `src/module.ts` manifest (what it is,
 what it needs, what it provides) and a `src/index.ts`. Packs define entities
 and attributes one file each; games export `main(host)` and, when they need to
 find what's loaded, `setup(ctx)`.
+
+TypeScript is the default, not a requirement. The same files work as plain
+JavaScript (`src/module.js`, `src/index.js`, or a mix of `.ts` and `.js`).
+The build discovers, links and verifies them the same way, so an existing JS
+game can be ported onto the engine without being converted to TypeScript.

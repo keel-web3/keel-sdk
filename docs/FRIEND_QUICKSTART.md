@@ -13,7 +13,7 @@ macOS is the currently exercised desktop platform. Linux needs Electron's GUI
 libraries and a display. Native Windows desktop/Anvil setup is not certified.
 
 ```sh
-git clone --branch codex/friend-test-setup https://github.com/keel-web3/keel-sdk.git
+git clone https://github.com/keel-web3/keel-sdk.git
 cd keel-sdk
 pnpm setup:friend
 ```
@@ -41,12 +41,31 @@ do not automatically upgrade; compare them with `skills/` when updating KEEL.
 See the official [Codex MCP documentation](https://developers.openai.com/codex/mcp/)
 and [skills documentation](https://developers.openai.com/codex/skills/).
 
+## Update to the latest test release
+
+From the SDK folder:
+
+```sh
+git pull
+pnpm setup:friend
+```
+
+Setup fetches and links the engine commit the SDK now pins, and rebuilds the SDK,
+MCP and editor. Your artwork folders and agent settings are kept. Restart the
+editor and reload your agent's MCP connection afterwards.
+
 ## Pixel engine: part of the SDK
 
 `packages/pixel-engine` contains the original JavaScript KEEL Pixel generator
 source, docs, tests and WALLRUN example. `packages/game-engine` exposes the
-current modular TypeScript engine used by the editor; setup fetches and pins
-those parts automatically. They are parts of one SDK workflow.
+current modular engine used by the editor; setup fetches and pins those parts
+automatically. They are parts of one SDK workflow.
+
+The engine is written in TypeScript, and we recommend it for new games, but your
+game doesn't have to be. Game and pack projects can be plain JavaScript
+(`src/module.js`, `src/index.js`) or a mix of JS and TS. They build, link and
+verify the same way. Porting an existing JavaScript game means wiring it to the
+engine's modules, not converting it to TypeScript.
 
 Run `pnpm pixel:test` for the portable JavaScript engine tests, or
 `pnpm pixel:serve` and open the printed WALLRUN URL. Historical NOCTURNES
@@ -67,6 +86,8 @@ Give the agent this request with your original source attached or in the folder:
 > controls into the editor's Builder or level recipe tools. Show which code
 > still needs a custom control adapter. First build and test on local Anvil;
 > prepare Sepolia only after local rendering and exact byte read-back pass.
+> Plain JavaScript is supported: port JS code onto the engine as JavaScript and
+> don't treat converting it to TypeScript as a requirement or a porting cost.
 
 Then start the editor from the SDK folder:
 
