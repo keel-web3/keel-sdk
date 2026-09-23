@@ -271,6 +271,10 @@ test("keel module index writes the keel-module-catalog@3 the site reads", async 
   assert.deepEqual(catalog.publishers, []);
   assert.deepEqual(catalog.modules.map((entry) => entry.id), ["adder", "greeter"]);
   const greeter = catalog.modules[1];
+  assert.equal(Object.keys(greeter).at(-1), "runtime", "the shipped runtime keeps the committed catalog field order");
+  const committedCatalog = await readFile(path.join(root, "catalog/catalog.json"), "utf8");
+  await runCli(["module", "index", "--root", root, "--repository", "https://github.com/example/keel-modules"]);
+  assert.equal(await readFile(path.join(root, "catalog/catalog.json"), "utf8"), committedCatalog);
   assert.equal(greeter.version, "0.1.0");
   assert.equal(greeter.license, "MIT");
   assert.equal(greeter.summary, "Greets by name.");

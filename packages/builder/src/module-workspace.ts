@@ -573,7 +573,6 @@ async function catalogEntry(module: KeelWorkspaceModule, options: IndexKeelWorks
   }
   return {
     ...(types === undefined ? {} : { types }),
-    runtime: { encoding: "base64", data: shippedBytes.toString("base64"), format: recipe.options.format, entry: recipe.entry },
     id: module.manifest.name,
     version: module.manifest.version,
     license: module.manifest.license,
@@ -605,6 +604,7 @@ async function catalogEntry(module: KeelWorkspaceModule, options: IndexKeelWorks
     deployed: deployments.length > 0,
     provenance: "vendored",
     origin: null,
+    runtime: { encoding: "base64", data: shippedBytes.toString("base64"), format: recipe.options.format, entry: recipe.entry },
   };
 }
 
