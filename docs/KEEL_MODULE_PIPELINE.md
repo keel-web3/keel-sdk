@@ -41,9 +41,12 @@ One command runs the whole minify-and-hash pipeline:
    minified, ASCII, no legal comments unless `--keep-comments`).
 3. The compact stage: terser (exact version pinned by the builder and recorded
    in the recipe) re-minifies the esbuild output with fixed deterministic
-   settings (3 passes, mangle, nothing time- or path-dependent). Whichever
-   candidate is smaller ships as `dist/<name>.min.js`; the recipe records the
-   winner and BOTH candidate sizes. `--no-compact` skips the stage.
+   settings (3 passes, mangle, nothing time- or path-dependent). The smaller
+   raw JavaScript candidate ships by default, preserving existing receipts.
+   For modules stored with gzip -9, `--gzip-compact` selects the smaller stored
+   candidate instead. Its recipe records both raw and stored sizes, the zlib
+   version, and the winner. Reproduce it from a source commit with the same
+   `--gzip-compact` flag on `keel module verify`. `--no-compact` skips the stage.
 4. `createKeelBuildRecipe` records the resolved module graph by digest into
    `dist/keel-build-recipe.json` (`keel-build-recipe@2` with a `compact`
    section; `--no-compact` builds still emit `keel-build-recipe@1`, and @1
@@ -63,8 +66,8 @@ reproduction stays byte-exact:
 - `--stamp <file>` injects the file's contents as a leading `/*!` banner in
   the shipped bytes (for on-chain ASCII art). The file must live inside the
   module directory and must not contain `*/`. The recipe pins it by path and
-  digest like any other input, and it is applied after the winner is chosen so
-  it cannot tilt the size comparison.
+  digest like any other input. With `--gzip-compact`, its banner is included in
+  both measurements because it can affect how the JavaScript compresses.
 
 ### Workspaces: `keel module build --all`
 

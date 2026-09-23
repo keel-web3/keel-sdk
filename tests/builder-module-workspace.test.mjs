@@ -6,6 +6,7 @@ import path from "node:path";
 import test from "node:test";
 import { fileURLToPath } from "node:url";
 import { promisify } from "node:util";
+import { gzipSync } from "node:zlib";
 
 import { createIntegrity, keelBuildRecipeDigest, canonicalJson, utf8ToBytes } from "../packages/protocol/dist/index.js";
 import { verifyKeelBuildRecipe } from "../packages/builder/dist/index.js";
@@ -139,13 +140,16 @@ test("a stamp banner ships in the bytes and the stamped build reproduces exactly
   const moduleDirectory = path.join(root, "modules", "greeter");
   const stampPath = path.join(moduleDirectory, "stamp.txt");
   await writeFile(stampPath, " KEEL\n <>< on-chain art ><>\n");
-  await runCli(["module", "build", moduleDirectory, "--stamp", stampPath]);
+  await runCli(["module", "build", moduleDirectory, "--stamp", stampPath, "--gzip-compact"]);
 
   const shippedText = await readFile(path.join(moduleDirectory, "dist/greeter.min.js"), "utf8");
   assert.ok(shippedText.startsWith("/*!\n KEEL\n <>< on-chain art ><>\n*/\n"), "banner must lead the shipped bytes");
 
   const recipe = JSON.parse(await readFile(path.join(moduleDirectory, "dist/keel-build-recipe.json"), "utf8"));
   assert.equal(recipe.compact.stamp.path, "stamp.txt");
+  assert.equal(recipe.compact.selection, "gzip-9");
+  assert.equal(gzipSync(Buffer.from(shippedText), { level: 9 }).byteLength,
+    recipe.compact.candidateStoredBytes[recipe.compact.winner]);
   const stampIntegrity = await createIntegrity(new Uint8Array(await readFile(stampPath)));
   assert.equal(recipe.compact.stamp.integrity.digest, stampIntegrity.digest);
 

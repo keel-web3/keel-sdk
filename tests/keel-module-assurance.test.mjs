@@ -22,9 +22,10 @@ import path from "node:path";
 import test from "node:test";
 import { fileURLToPath } from "node:url";
 import { promisify } from "node:util";
+import { gzipSync } from "node:zlib";
 
 import { canonicalJson, createIntegrity, keelBuildRecipeDigest, utf8ToBytes } from "../packages/protocol/dist/index.js";
-import { verifyKeelBuildRecipe } from "../packages/builder/dist/index.js";
+import { createKeelBuildRecipe, verifyKeelBuildRecipe } from "../packages/builder/dist/index.js";
 import { wrapInVerificationShell } from "../packages/sdk/dist/index.js";
 
 const execFileAsync = promisify(execFile);
@@ -178,9 +179,9 @@ test("an author goes from zero to a build that proves itself", async (t) => {
   assert.match(tested.stdout, /4\/4 vectors/u);
 });
 
-test("the compactor ships the smaller candidate, records both sizes, and repeats byte for byte", async (t) => {
+test("the compactor ships the smaller stored candidate and repeats byte for byte", async (t) => {
   const { directory } = await authorModule(t);
-  await runCli(["module", "build", directory]);
+  await runCli(["module", "build", directory, "--gzip-compact"]);
   const outputPath = path.join(directory, "dist/beat-grid.min.js");
   const first = await readFile(outputPath);
   const recipe = JSON.parse(await readFile(path.join(directory, "dist/keel-build-recipe.json"), "utf8"));
@@ -188,14 +189,27 @@ test("the compactor ships the smaller candidate, records both sizes, and repeats
   assert.equal(recipe.protocol, "keel-build-recipe@2");
   assert.ok(recipe.compact.candidateBytes.esbuild > 0);
   assert.ok(recipe.compact.candidateBytes.terser > 0);
-  const { esbuild, terser } = recipe.compact.candidateBytes;
-  // Terser only wins when it is strictly smaller; ties go to esbuild.
+  assert.equal(recipe.compact.selection, "gzip-9");
+  assert.equal(recipe.compact.gzipVersion, process.versions.zlib);
+  const { esbuild, terser } = recipe.compact.candidateStoredBytes;
+  // The chain stores gzip -9, so that is the size the recipe selects by.
   assert.equal(recipe.compact.winner, terser < esbuild ? "terser" : "esbuild");
-  assert.equal(first.byteLength, recipe.compact.winner === "terser" ? terser : esbuild);
+  assert.equal(gzipSync(first, { level: 9 }).byteLength, recipe.compact.winner === "terser" ? terser : esbuild);
+  assert.equal(first.byteLength, recipe.compact.candidateBytes[recipe.compact.winner]);
+
+  // Older @2 recipes omitted selection and still reproduce with raw-byte selection.
+  const legacy = await createKeelBuildRecipe({
+    root: directory, entry: recipe.entry, options: recipe.options,
+    compact: { selection: "raw" },
+  });
+  assert.equal(legacy.recipe.compact.selection, undefined);
+  const raw = legacy.recipe.compact.candidateBytes;
+  assert.equal(legacy.recipe.compact.winner, raw.terser < raw.esbuild ? "terser" : "esbuild");
+  assert.equal((await verifyKeelBuildRecipe({ recipe: legacy.recipe, root: directory })).reproduced, true);
 
   // Determinism: the same tree built twice produces the same bytes and the
   // same recipe digest, which is the whole basis for third-party reproduction.
-  await runCli(["module", "build", directory]);
+  await runCli(["module", "build", directory, "--gzip-compact"]);
   const second = await readFile(outputPath);
   assert.deepEqual(new Uint8Array(second), new Uint8Array(first));
   const rebuiltRecipe = JSON.parse(await readFile(path.join(directory, "dist/keel-build-recipe.json"), "utf8"));

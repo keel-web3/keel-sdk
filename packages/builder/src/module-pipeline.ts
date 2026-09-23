@@ -475,6 +475,8 @@ function realRepository(manifest: KeelModuleManifest): KeelModuleManifest["sourc
 export interface BuildKeelModuleOptions {
   /** Skip the terser compact stage and emit a keel-build-recipe@1 as before. */
   readonly compact?: boolean;
+  /** Choose by gzip -9 storage size when the module will use gzip carriage. */
+  readonly compactSelection?: "gzip-9";
   /** Keep legal comments (`/*!`, `@license`, `@preserve`) in the shipped bytes. */
   readonly keepComments?: boolean;
   /** A file whose contents become a leading `/*!` banner in the shipped bytes. */
@@ -489,8 +491,8 @@ export async function buildKeelModule(directory: string, buildOptions: BuildKeel
   runStrictTypecheck(root);
   const compact = buildOptions.compact !== false;
   const keepComments = buildOptions.keepComments === true;
-  if (!compact && (keepComments || buildOptions.stampPath !== undefined)) {
-    fail("--keep-comments and --stamp belong to the compact stage; they cannot be combined with --no-compact.");
+  if (!compact && (keepComments || buildOptions.stampPath !== undefined || buildOptions.compactSelection !== undefined)) {
+    fail("--keep-comments, --stamp and --gzip-compact belong to the compact stage; they cannot be combined with --no-compact.");
   }
   const stampPath = buildOptions.stampPath === undefined
     ? undefined
@@ -505,7 +507,8 @@ export async function buildKeelModule(directory: string, buildOptions: BuildKeel
     // must carry them through for the compact stage to be able to keep them.
     options: keelModuleBuildOptions(manifest, { legalComments: keepComments ? "inline" : "none" }),
     mediaType: "text/javascript",
-    ...(compact ? { compact: { keepComments, ...(stampPath === undefined ? {} : { stamp: stampPath }) } } : {}),
+    ...(compact ? { compact: { keepComments, ...(stampPath === undefined ? {} : { stamp: stampPath }),
+      ...(buildOptions.compactSelection === undefined ? {} : { selection: buildOptions.compactSelection }) } } : {}),
   });
   // The readable source the receipt points a holder at is the resolved module
   // graph the recipe pinned, in recipe order, so no imported file escapes the

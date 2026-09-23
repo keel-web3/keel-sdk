@@ -28,6 +28,7 @@
 import { readFile } from "node:fs/promises";
 import { createRequire } from "node:module";
 import path from "node:path";
+import { gzipSync } from "node:zlib";
 import { build, version as esbuildVersion } from "esbuild";
 import { minify as terserMinify } from "terser";
 import {
@@ -76,6 +77,8 @@ export interface KeelCompactRequest {
   readonly keepComments?: boolean;
   /** A banner file (root-relative) injected as a leading comment, verbatim. */
   readonly stamp?: string;
+  /** Select by gzip -9 storage size for modules known to use that carriage. */
+  readonly selection?: "raw" | "gzip-9";
 }
 
 export interface CreateKeelBuildRecipeOptions {
@@ -196,10 +199,10 @@ interface CompactStageResult {
 }
 
 /**
- * Run terser over the esbuild output and ship whichever candidate is smaller
- * (ties go to esbuild: fewer moving parts for the same bytes). Both sizes and
- * the winner are recorded, and the optional stamp banner is applied after the
- * choice so it cannot tilt the comparison.
+ * Run terser over the esbuild output. The default and older recipes select by
+ * raw JavaScript length; gzip -9 selection is opt-in for that storage carriage.
+ * Ties go to esbuild. A stamp is included in both gzip measurements because
+ * its prefix can affect compression.
  */
 async function runCompactStage(
   root: string,
@@ -207,28 +210,37 @@ async function runCompactStage(
   options: KeelCompactOptions,
   stampPath: string | undefined,
   format: KeelBuildOptions["format"] = "esm",
+  selection: "gzip-9" | "raw" = "raw",
 ): Promise<CompactStageResult> {
   const terserBytes = await runTerser(esbuildBytes, options, format);
-  const winner = terserBytes.byteLength < esbuildBytes.byteLength ? "terser" : "esbuild";
-  const winnerBytes = winner === "terser" ? terserBytes : esbuildBytes;
   let stamp: KeelBuildCompact["stamp"];
-  let shippedBytes = winnerBytes;
+  let banner: Uint8Array | undefined;
   if (stampPath !== undefined) {
     const stampRelative = relative(root, path.resolve(root, stampPath));
     if (stampRelative.startsWith("..")) throw new Error(`Stamp ${stampPath} must live inside the recipe root.`);
     const stampBytes = new Uint8Array(await readFile(path.resolve(root, stampRelative)));
     stamp = { path: stampRelative, integrity: await createIntegrity(stampBytes) };
-    const banner = stampBanner(stampRelative, stampBytes);
-    const combined = new Uint8Array(banner.byteLength + winnerBytes.byteLength);
-    combined.set(banner, 0);
-    combined.set(winnerBytes, banner.byteLength);
-    shippedBytes = combined;
+    banner = stampBanner(stampRelative, stampBytes);
   }
+  const withBanner = (bytes: Uint8Array): Uint8Array => {
+    if (banner === undefined) return bytes;
+    const combined = new Uint8Array(banner.byteLength + bytes.byteLength);
+    combined.set(banner, 0);
+    combined.set(bytes, banner.byteLength);
+    return combined;
+  };
+  const stored = selection === "gzip-9" ? {
+    esbuild: gzipSync(withBanner(esbuildBytes), { level: 9 }).byteLength,
+    terser: gzipSync(withBanner(terserBytes), { level: 9 }).byteLength,
+  } : undefined;
+  const winner = (stored?.terser ?? terserBytes.byteLength) < (stored?.esbuild ?? esbuildBytes.byteLength) ? "terser" : "esbuild";
+  const shippedBytes = withBanner(winner === "terser" ? terserBytes : esbuildBytes);
   return {
     compact: {
       tool: { name: "terser", version: terserVersion },
       options,
       ...(stamp === undefined ? {} : { stamp }),
+      ...(stored === undefined ? {} : { selection: "gzip-9" as const, candidateStoredBytes: stored, gzipVersion: process.versions.zlib }),
       winner,
       candidateBytes: { esbuild: esbuildBytes.byteLength, terser: terserBytes.byteLength },
     },
@@ -258,7 +270,7 @@ export async function createKeelBuildRecipe(
       mangle: true,
       keepComments: options.compact.keepComments === true,
     };
-    const staged = await runCompactStage(root, bytes, compactOptions, options.compact.stamp, buildOptions.format);
+    const staged = await runCompactStage(root, bytes, compactOptions, options.compact.stamp, buildOptions.format, options.compact.selection ?? "raw");
     compactSection = staged.compact;
     outputBytes = staged.shippedBytes;
   }
@@ -322,7 +334,7 @@ export async function verifyKeelBuildRecipe(
   let rebuiltBytes = bytes;
   let actualCompact: KeelBuildCompact | undefined;
   if (recipe.compact !== undefined) {
-    const staged = await runCompactStage(root, bytes, recipe.compact.options, recipe.compact.stamp?.path, recipe.options.format);
+    const staged = await runCompactStage(root, bytes, recipe.compact.options, recipe.compact.stamp?.path, recipe.options.format, recipe.compact.selection ?? "raw");
     rebuiltBytes = staged.shippedBytes;
     actualCompact = staged.compact;
   }
