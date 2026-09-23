@@ -49,7 +49,7 @@ against both the freshly built copy and the committed `catalog/catalog.json`.
 | --- | --- |
 | `keel module init` to a self-proving build, with every printed digest recomputed from the file it names | `an author goes from zero to a build that proves itself` |
 | The recipe pins both toolchain stages by exact version (esbuild and terser, resolved the way the builder resolves them) | same |
-| The gzip -9 smaller candidate ships; both raw and stored sizes are recorded; older raw-byte recipes still reproduce | `the compactor ships the smaller stored candidate...` and, across all 11 published modules, `every published module rebuilds reproducibly, twice...` |
+| `--gzip-compact` ships the gzip -9 smaller candidate and records both raw and stored sizes; default raw-byte recipes still reproduce | `the compactor ships the smaller stored candidate...` and, across all 11 published modules, `every published module rebuilds reproducibly, twice...` |
 | `--stamp` reproduces byte exactly through the receipt flow, and a stamp containing `*/` is refused | `a stamped build reproduces byte exactly...` |
 | `--keep-comments` puts legal comments on chain and still reproduces | `--keep-comments puts legal comments on chain and still reproduces` |
 | A hand-minified candidate earns `behaviorally-verified` with per-vector evidence digests, and never claims a rebuild | `a hand-minified candidate earns behaviorally-verified and never more` |

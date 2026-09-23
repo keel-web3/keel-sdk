@@ -77,7 +77,7 @@ export interface KeelCompactRequest {
   readonly keepComments?: boolean;
   /** A banner file (root-relative) injected as a leading comment, verbatim. */
   readonly stamp?: string;
-  /** Only for reproducing a legacy raw-byte selection; new builds default to gzip -9. */
+  /** Select by gzip -9 storage size for modules known to use that carriage. */
   readonly selection?: "raw" | "gzip-9";
 }
 
@@ -199,10 +199,10 @@ interface CompactStageResult {
 }
 
 /**
- * Run terser over the esbuild output and select the candidate with fewer
- * gzip -9 storage bytes. Existing recipes without a selection still reproduce
- * their raw-byte choice. Ties go to esbuild. A stamp is included in both
- * storage measurements because its prefix can affect compression.
+ * Run terser over the esbuild output. The default and older recipes select by
+ * raw JavaScript length; gzip -9 selection is opt-in for that storage carriage.
+ * Ties go to esbuild. A stamp is included in both gzip measurements because
+ * its prefix can affect compression.
  */
 async function runCompactStage(
   root: string,
@@ -210,7 +210,7 @@ async function runCompactStage(
   options: KeelCompactOptions,
   stampPath: string | undefined,
   format: KeelBuildOptions["format"] = "esm",
-  selection: "gzip-9" | "raw" = "gzip-9",
+  selection: "gzip-9" | "raw" = "raw",
 ): Promise<CompactStageResult> {
   const terserBytes = await runTerser(esbuildBytes, options, format);
   let stamp: KeelBuildCompact["stamp"];
@@ -270,7 +270,7 @@ export async function createKeelBuildRecipe(
       mangle: true,
       keepComments: options.compact.keepComments === true,
     };
-    const staged = await runCompactStage(root, bytes, compactOptions, options.compact.stamp, buildOptions.format, options.compact.selection ?? "gzip-9");
+    const staged = await runCompactStage(root, bytes, compactOptions, options.compact.stamp, buildOptions.format, options.compact.selection ?? "raw");
     compactSection = staged.compact;
     outputBytes = staged.shippedBytes;
   }

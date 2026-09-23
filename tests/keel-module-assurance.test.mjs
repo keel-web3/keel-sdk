@@ -181,7 +181,7 @@ test("an author goes from zero to a build that proves itself", async (t) => {
 
 test("the compactor ships the smaller stored candidate and repeats byte for byte", async (t) => {
   const { directory } = await authorModule(t);
-  await runCli(["module", "build", directory]);
+  await runCli(["module", "build", directory, "--gzip-compact"]);
   const outputPath = path.join(directory, "dist/beat-grid.min.js");
   const first = await readFile(outputPath);
   const recipe = JSON.parse(await readFile(path.join(directory, "dist/keel-build-recipe.json"), "utf8"));
@@ -209,7 +209,7 @@ test("the compactor ships the smaller stored candidate and repeats byte for byte
 
   // Determinism: the same tree built twice produces the same bytes and the
   // same recipe digest, which is the whole basis for third-party reproduction.
-  await runCli(["module", "build", directory]);
+  await runCli(["module", "build", directory, "--gzip-compact"]);
   const second = await readFile(outputPath);
   assert.deepEqual(new Uint8Array(second), new Uint8Array(first));
   const rebuiltRecipe = JSON.parse(await readFile(path.join(directory, "dist/keel-build-recipe.json"), "utf8"));

@@ -109,8 +109,8 @@ function usage(): string {
 
 Commands:
   keel module init <dir> [--name <name>]
-  keel module build <dir> [--keep-comments] [--stamp <file>] [--no-compact] [--no-types] [--json]
-  keel module build --all [--root <workspace>] [--keep-comments] [--stamp <file>] [--json]
+  keel module build <dir> [--gzip-compact] [--keep-comments] [--stamp <file>] [--no-compact] [--no-types] [--json]
+  keel module build --all [--root <workspace>] [--gzip-compact] [--keep-comments] [--stamp <file>] [--json]
   keel module test <dir> [--json]
   keel module test --all [--root <workspace>] [--json]
   keel module compact <dir> --candidate <file> [--json]
@@ -196,6 +196,7 @@ async function main(): Promise<void> {
         const stampPath = flag(args, "stamp");
         const buildOptions = {
           ...(args.flags["no-compact"] === true ? { compact: false } : {}),
+          ...(args.flags["gzip-compact"] === true ? { compactSelection: "gzip-9" as const } : {}),
           ...(args.flags["keep-comments"] === true ? { keepComments: true } : {}),
           ...(stampPath === undefined ? {} : { stampPath }),
           // Declarations are optional; a linked module whose imports resolve outside its root opts out.
