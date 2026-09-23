@@ -72,7 +72,7 @@ async function spawnAnvil() {
   for (let attempt = 0; attempt < 4; attempt += 1) {
     const port = 9000 + Math.floor(Math.random() * 20_000);
     const rpcUrl = `http://127.0.0.1:${port}`;
-    const anvil = spawn("anvil", ["--port", String(port), "--silent"], { stdio: "ignore" });
+    const anvil = spawn("anvil", ["--port", String(port), "--silent", "--prune-history"], { stdio: "ignore" });
     const exited = new Promise((resolve) => anvil.once("exit", () => resolve("exited")));
     try {
       const outcome = await Promise.race([waitForRpc(rpcUrl).then(() => "ready"), exited]);

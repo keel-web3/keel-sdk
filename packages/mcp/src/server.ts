@@ -24,6 +24,22 @@ function exactKeys(value: Record<string, unknown>, allowed: readonly string[], l
   for (const key of Object.keys(value)) if (!fields.has(key)) throw new TypeError(`${label}.${key} is not supported.`);
 }
 
+/**
+ * Fields we do not know about on a HANDSHAKE, noted and ignored.
+ *
+ * MCP is a versioned protocol and clients add fields to `initialize` as it grows (`clientInfo.title` and
+ * `websiteUrl` arrived that way, and `description` before them). Refusing the whole handshake over one unread field
+ * means every such addition takes this server offline until somebody edits an allowlist -- which has already happened
+ * once here. The spec's rule is the right one: validate what you understand, ignore the rest. Everything past the
+ * handshake stays strict, because a tool call with a field we do not understand is a request we cannot honour.
+ */
+function ignoreUnknown(value: Record<string, unknown>, allowed: readonly string[], label: string): void {
+  const fields = new Set(allowed);
+  const extra = Object.keys(value).filter((key) => !fields.has(key));
+  // (stderr, never stdout: stdout is the JSON-RPC stream. The host shows this in its MCP log.)
+  if (extra.length) process.stderr.write(`keel-mcp: ignoring unknown ${label} field(s): ${extra.join(", ")}\n`);
+}
+
 function errorText(error: unknown): string {
   return error instanceof Error ? error.message : String(error);
 }
@@ -79,14 +95,14 @@ function emptyParams(value: unknown, label: string): void {
 
 function initializeParams(value: unknown): void {
   const params = object(value, "initialize params");
-  exactKeys(params, ["protocolVersion", "capabilities", "clientInfo", "_meta"], "initialize params");
+  ignoreUnknown(params, ["protocolVersion", "capabilities", "clientInfo", "_meta"], "initialize params");
   if (typeof params.protocolVersion !== "string" || !/^\d{4}-\d{2}-\d{2}$/u.test(params.protocolVersion)) {
     throw new TypeError("initialize params.protocolVersion must be a dated MCP protocol version.");
   }
   object(params.capabilities, "initialize params.capabilities");
   if (params._meta !== undefined) object(params._meta, "initialize params._meta");
   const clientInfo = object(params.clientInfo, "initialize params.clientInfo");
-  exactKeys(clientInfo, ["name", "version", "title"], "initialize params.clientInfo");
+  ignoreUnknown(clientInfo, ["name", "version", "title", "description", "websiteUrl"], "initialize params.clientInfo");
   if (clientInfo.title !== undefined && (typeof clientInfo.title !== "string" || clientInfo.title.length > 256)) throw new TypeError("initialize clientInfo.title must be bounded text.");
   if (typeof clientInfo.name !== "string" || clientInfo.name.length === 0 || typeof clientInfo.version !== "string" || clientInfo.version.length === 0) {
     throw new TypeError("initialize params.clientInfo requires name and version strings.");

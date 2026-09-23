@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { spawn } from "node:child_process";
+import { spawn, spawnSync } from "node:child_process";
 import { once } from "node:events";
 
 import { createMcpServer, toolByName } from "../packages/mcp/dist/index.js";
@@ -13,7 +13,7 @@ import { buildOnchainDataFragment, resolveKeelOnchainRpcUrl } from "../packages/
    RPC would prove the wiring and skip the promise. */
 async function withAnvil(run) {
   const port = 8900 + Math.floor(Math.random() * 300);
-  const anvil = spawn("anvil", ["--port", String(port), "--silent", "--chain-id", "31337"], { stdio: ["ignore", "pipe", "pipe"] });
+  const anvil = spawn("anvil", ["--port", String(port), "--silent", "--chain-id", "31337", "--prune-history"], { stdio: ["ignore", "pipe", "pipe"] });
   const rpcUrl = `http://127.0.0.1:${port}`;
   try {
     const deadline = Date.now() + 20_000;
@@ -59,8 +59,11 @@ async function setCode(rpcUrl, address, code) {
 }
 
 const HEALTH_AT = "0x00000000000000000000000000000000000da7a0";
+const anvilAvailable = spawnSync("anvil", ["--version"], { stdio: "ignore" }).status === 0;
 
-test("the MCP tool declares reads, performs them, and hands back a verified init fragment", async () => {
+test("the MCP tool declares reads, performs them, and hands back a verified init fragment", {
+  skip: anvilAvailable ? false : "Anvil is not installed",
+}, async () => {
   await withAnvil(async (rpcUrl) => {
     await setCode(rpcUrl, HEALTH_AT, returns(125n, 25n));
     const server = await createMcpServer({ workspaceRoot: "." });

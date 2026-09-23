@@ -38,7 +38,7 @@ const output=JSON.parse(solc.compile(JSON.stringify(input),{import:path=>{try{co
 assert.deepEqual((output.errors??[]).filter(e=>e.severity==='error'),[]);
 const artifact=output.contracts['BaseWeb3TinyTest.sol'].BaseWeb3TinyTest,data=encodeDeployData({abi:artifact.abi,bytecode:'0x'+artifact.evm.bytecode.object,args:[recipient]});
 for(const [file,content] of Object.entries({'BaseWeb3TinyTest.sol':source,'solc-input.json':JSON.stringify(input,null,2),'compiled.json':JSON.stringify(artifact,null,2),'deployment-data.txt':data,'metadata.json':metadata,'color.png':png}))await writeFile(root+'/'+file,content);
-const child=spawn('anvil',['--port','0','--chain-id','31337'],{stdio:['ignore','pipe','pipe']});
+const child=spawn('anvil',['--port','0','--chain-id','31337','--prune-history'],{stdio:['ignore','pipe','pipe']});
 try {
  const url=await new Promise((resolve,reject)=>{let out='';const timer=setTimeout(()=>reject(Error('Local EVM startup timeout')),15000);child.on('error',reject);child.on('exit',()=>{clearTimeout(timer);reject(Error('Local EVM exited'));});child.stdout.on('data',chunk=>{out+=chunk;const m=out.match(/Listening on (127\.0\.0\.1:\d+)/);if(m){clearTimeout(timer);resolve('http://'+m[1]);}});});
  const c=createPublicClient({transport:http(url)}),w=createWalletClient({transport:http(url)}),[account,other]=await w.getAddresses();

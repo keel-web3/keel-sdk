@@ -1,5 +1,6 @@
 import type { McpResource, McpResourceReadResult } from "./types.js";
 import { KEEL_ENGINE_CATALOG } from "@keel/sdk/engine";
+import { ARENA_RESOURCE_DEFINITION, ARENA_RESOURCE_TEXT } from "./arena-tools.js";
 
 export const KEEL_WORKFLOW_RESOURCE = "keel://mcp/workflow" as const;
 export const KEEL_LIMITS_RESOURCE = "keel://mcp/limits" as const;
@@ -24,6 +25,7 @@ const RESOURCE_TEXT: Readonly<Record<string, string>> = {
     security: ["Never trust a contract or RPC chosen by SVG metadata", "Inspect returns unverified", "SDK verifies code and exact svg(uint256) bytes at one finalized block", "Proof statement is not the full seal; inspect the source acceptance transaction", "Native code/state rendering does not claim a KeelHold upload or replace the canonical HTML shell"],
   }),
   "keel://mcp/engine": resourceJson(KEEL_ENGINE_CATALOG),
+  ...ARENA_RESOURCE_TEXT,
   [KEEL_WORKFLOW_RESOURCE]: resourceJson({
     schema: "keel-mcp-resource@1",
     kind: "offline-workflow",
@@ -252,6 +254,7 @@ export const RESOURCE_DEFINITIONS: readonly McpResource[] = [
   { uri: KEEL_LIMITS_RESOURCE, name: "keel-limits", description: "Machine-readable MCP and planner safety limits.", mimeType: "application/json" },
   { uri: KEEL_PROJECT_ROUTES_RESOURCE, name: "keel-project-routes", description: "Machine-readable intent, artifact/runtime, token, sale, and auction routing without duplicated contract logic.", mimeType: "application/json" },
   { uri: KEEL_PUBLICATION_MODES_RESOURCE, name: "keel-publication-modes", description: "Machine-readable KEEL storage modes, readiness, and accounting boundaries.", mimeType: "application/json" },
+  ARENA_RESOURCE_DEFINITION,
 ];
 
 export function getMcpResource(uri: unknown): McpResourceReadResult {

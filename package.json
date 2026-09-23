@@ -111,7 +111,8 @@
     "setup:test": "node --test scripts/setup.test.mjs scripts/reuse.test.mjs",
     "sandbox:test": "node packages/game-engine/chain/alpha-e2e.mjs --template blank",
     "pixel:test": "pnpm --filter @keel/pixel test",
-    "pixel:serve": "pnpm --filter @keel/pixel serve"
+    "pixel:serve": "pnpm --filter @keel/pixel serve",
+    "game:arena": "node packages/game-engine/chain/arena.mjs"
   },
   "engines": {
     "node": ">=22"

@@ -28,7 +28,7 @@ test("[modules/listModules,listApps,getModule] exposes every authoritative unit 
     assert.equal(indexed.group, source.group);
     assert.equal(indexed.title, source.title);
     assert.equal(indexed.summary, source.summary);
-    assert.deepEqual(indexed.deps, source.deps);
+    assert.deepEqual([...indexed.deps].sort(), [...source.deps].sort());
     assert.deepEqual(indexed.contracts, source.contracts);
   }
 

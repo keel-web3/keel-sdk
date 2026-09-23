@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { spawn } from "node:child_process";
+import { spawn, spawnSync } from "node:child_process";
 import { once } from "node:events";
 
 import {
@@ -19,7 +19,7 @@ const utf8 = (value) => new TextEncoder().encode(value);
    stub tests below cover the shapes anvil cannot easily produce. */
 async function withAnvil(run) {
   const port = 8600 + Math.floor(Math.random() * 300);
-  const anvil = spawn("anvil", ["--port", String(port), "--silent", "--chain-id", "31337"], { stdio: ["ignore", "pipe", "pipe"] });
+  const anvil = spawn("anvil", ["--port", String(port), "--silent", "--chain-id", "31337", "--prune-history"], { stdio: ["ignore", "pipe", "pipe"] });
   const rpcUrl = `http://127.0.0.1:${port}`;
   try {
     const deadline = Date.now() + 20_000;
@@ -63,7 +63,11 @@ test("keccak256 matches the published vectors, so the selectors are real", () =>
   assert.equal(keccak256(utf8("transfer(address,uint256)")).slice(0, 8), "a9059cbb");
 });
 
-test("reads a local anvil chain and the values arrive as document variables", async () => {
+const anvilAvailable = spawnSync("anvil", ["--version"], { stdio: "ignore" }).status === 0;
+
+test("reads a local anvil chain and the values arrive as document variables", {
+  skip: anvilAvailable ? false : "Anvil is not installed",
+}, async () => {
   await withAnvil(async (rpcUrl) => {
     const bodyAt = "0x00000000000000000000000000000000000c0de0";
     const weaponAt = "0x00000000000000000000000000000000000c0de1";
