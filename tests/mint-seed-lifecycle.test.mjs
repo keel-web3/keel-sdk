@@ -1,6 +1,7 @@
 import nodeTest from 'node:test';
-import { siblingTest } from "./sibling-repository.mjs";
+import { siblingRepositories, siblingTest } from "./sibling-repository.mjs";
 const test = siblingTest(nodeTest, "keel-contracts");
+const siblings = siblingRepositories("keel-contracts");
 import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
 import {decodeFunctionData,encodeFunctionResult} from 'viem';
@@ -10,7 +11,9 @@ const account='0x3333333333333333333333333333333333333333',archive='0x4444444444
 const hash=`0x${'ab'.repeat(32)}`,zero=`0x${'00'.repeat(32)}`;
 const snapshot={chainId:31337,blockNumber:100n,blockHash:hash};
 const abi=name=>JSON.parse(readFileSync(new URL(`../../keel-contracts/modules/keel-die/abi/${name}.json`,import.meta.url)));
-const tokenAbi=abi('KeelCreatorSeeded721A'),vrfAbi=abi('KeelSeedVrfAdapter'),archiveAbi=abi('KeelSeedBlockArchive');
+const tokenAbi=siblings.skip === false ? abi('KeelCreatorSeeded721A') : undefined;
+const vrfAbi=siblings.skip === false ? abi('KeelSeedVrfAdapter') : undefined;
+const archiveAbi=siblings.skip === false ? abi('KeelSeedBlockArchive') : undefined;
 function fixture(overrides={}) {
  const responses={seedBatchId:0n,seedProfile:[true,true,0,0,adapter,1,1],seedDraws:1n<<65n,requests:0n,
   deliveries:[collection,0,false,false,zero],prepaid:true,claims:2n,claimPriceWei:7n,owner:account,

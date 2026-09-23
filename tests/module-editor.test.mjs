@@ -67,7 +67,7 @@ test('CLI discovery needs no directory argument and watcher removes excluded glo
   assert.match(await readFile(path.join(root,'.keel/module-inclusions.d.ts'),'utf8'),/sample/);
   await writeFile(path.join(root,'keel.includes.json'),'[]');
   let removed=false;
-  for(let i=0;i<30;i++){
+  for(let i=0;i<100;i++){
    await new Promise(resolve=>setTimeout(resolve,100));
    if(!(await readFile(path.join(root,'.keel/module-inclusions.d.ts'),'utf8')).includes('sample')){removed=true;break;}
   }

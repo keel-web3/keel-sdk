@@ -31,6 +31,7 @@ export const SIBLING_CONFORMANCE_TEST_FILES = Object.freeze([
   "tests/sdk-recovery.test.mjs",
   "tests/seed-registry-wire.test.mjs",
   "tests/shared-1155-events.test.mjs",
+  "tests/studio-structure-check.test.mjs",
 ]);
 
 /** No node:test file is allowed to perform live-chain or public-network work in the ordinary gate. */
@@ -162,7 +163,6 @@ export const DETERMINISTIC_TEST_FILES = Object.freeze([
   "tests/sdk.test.mjs",
   "tests/source-verification.test.mjs",
   "tests/studio-core.test.mjs",
-  "tests/studio-structure-check.test.mjs",
   "tests/test-suite-classification.test.mjs",
   "tests/three-r180-sepolia-evidence.test.mjs",
   "tests/viewer-wake.test.mjs",
