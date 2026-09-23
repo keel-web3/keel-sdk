@@ -64,6 +64,7 @@ test("the canonical verifier accepts a mixed embedded WAD and RPC runtime graph"
   assert.match(html, /fray\.modern-runtime/u);
   assert.match(html, /fray\.episode\.e1/u);
   assert.match(html, /hybrid-mixed/u);
+  assert.match(html, /ResizeObserver loop completed with undelivered notifications\./u);
 });
 
 test("hybrid delivery fails closed unless both source kinds are present", async () => {

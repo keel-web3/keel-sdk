@@ -10,6 +10,12 @@
 // which hands Tone the page's native Web Audio constructors. Everything else is
 // the published npm ESM build, bundled by the pinned esbuild into an IIFE that
 // defines `globalThis.Tone`.
+//
+// KEEL Inline bytes may not carry network locators, even inert ones
+// (assertKeelInlineNoExternalDependencies in packages/sdk/src/inline-viewer-graph.ts).
+// The banner therefore names the npm package instead of the upstream
+// repository, and INERT_LOCATOR_EDITS removes the one wiki link from a console
+// warning. Each edit must match exactly once, and the output is re-scanned.
 import { execFileSync } from "node:child_process";
 import { createHash } from "node:crypto";
 import { mkdtemp, mkdir, readFile, rm, writeFile } from "node:fs/promises";
@@ -29,6 +35,13 @@ const INPUTS = Object.freeze([
   { name: "tslib", version: "2.8.1", integrity: "sha512-oJFu94HQb+KVduSUQL7wnpmqnfmLsOA/nAh6b6EH0wCEoK0/mPeXU6c3wKDV83MkOuHPRHtSXKKU99IBazS/2w==" },
 ]);
 const ESBUILD_VERSION = "0.28.2";
+
+/** Exact text edits applied to the bundled output; each must occur exactly once. */
+const INERT_LOCATOR_EDITS = Object.freeze([
+  { from: " See https://github.com/Tonejs/Tone.js/wiki/Accurate-Timing", to: "" },
+]);
+/** Mirrors EXTERNAL_RESOURCE_LITERAL in packages/sdk/src/inline-viewer-graph.ts. */
+const EXTERNAL_RESOURCE_LITERAL = /\b(?:https?|ipfs|ar|web3|keel-onchain):[^\s"'<>\\]+/giu;
 
 const args = process.argv.slice(2);
 const check = args.includes("--check");
@@ -60,7 +73,7 @@ function banner(license) {
   const body = license.trim().split("\n").map((line) => ` * ${line}`.trimEnd()).join("\n");
   return [
     "/*!",
-    " * Tone.js 15.1.22 (https://github.com/Tonejs/Tone.js) - KEEL native classic build",
+    " * Tone.js 15.1.22 (npm tone@15.1.22) - KEEL native classic build",
     " * Built by keel-sdk scripts/build-tone-native.mjs from npm tone@15.1.22 with esbuild " + ESBUILD_VERSION + ".",
     " * standardized-audio-context is replaced by a native Web Audio shim; tslib 2.8.1 (0BSD) helpers are inlined.",
     " *",
@@ -102,8 +115,15 @@ try {
     write: false,
     logLevel: "warning",
   });
-  const bytes = result.outputFiles[0].contents;
-  const source = new TextDecoder().decode(bytes);
+  let source = new TextDecoder().decode(result.outputFiles[0].contents);
+  for (const edit of INERT_LOCATOR_EDITS) {
+    const count = source.split(edit.from).length - 1;
+    if (count !== 1) throw new Error(`Expected exactly one ${JSON.stringify(edit.from)} in the bundle; found ${count}.`);
+    source = source.replace(edit.from, edit.to);
+  }
+  const locators = [...source.matchAll(EXTERNAL_RESOURCE_LITERAL)].map((match) => match[0]);
+  if (locators.length > 0) throw new Error(`The native build still carries external locator(s): ${locators.join(", ")}`);
+  const bytes = new TextEncoder().encode(source);
   if (/standardized-audio-context|automation-events/u.test(source.slice(source.indexOf("*/") + 2))) {
     throw new Error("The native build still carries standardized-audio-context code.");
   }
