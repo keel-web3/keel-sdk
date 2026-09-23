@@ -30,7 +30,7 @@ export async function startViewer({ port, rpc, builder, chainId, host = "127.0.0
       }
       if (url.pathname === "/") {
         const games = readRecord("games")?.games ?? [];
-        const rows = games.map((g) => `<tr><td>${esc(g.gameId)}</td><td><a href="/game/${g.chainId}/${g.root}?digest=${g.digest}">open from chain</a></td><td><code>${esc(g.root.slice(0, 18))}…</code></td><td>${esc(g.publishedAt)}</td></tr>`).join("");
+        const rows = games.map((g) => `<tr><td>${esc(g.gameId)}${g.entryExport ? `/${esc(g.entryExport)}` : ""}</td><td><a href="/game/${g.chainId}/${g.root}?digest=${g.digest}">open from chain</a></td><td><code>${esc(g.root.slice(0, 18))}…</code></td><td>${esc(g.publishedAt)}</td></tr>`).join("");
         response.writeHead(200, { "content-type": "text/html; charset=utf-8" });
         response.end(page("KEEL practice viewer", `<h1>KEEL practice viewer</h1><p>Chain ${chainId} at <code>${esc(rpc)}</code>, builder <code>${esc(builder)}</code>. Every game below is read from the chain when you open it.</p><table><tr><th>game</th><th></th><th>root</th><th>published</th></tr>${rows || "<tr><td colspan=4>Nothing published yet: <code>pnpm game:publish &lt;game-id&gt; --project &lt;dir&gt;</code></td></tr>"}</table>`));
         return;
