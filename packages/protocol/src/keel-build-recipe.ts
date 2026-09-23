@@ -108,17 +108,23 @@ export interface KeelCompactStamp {
 
 /**
  * The compact stage of a `keel-build-recipe@2`: the bundler's output is run
- * through a second minifier, and the smaller of the two candidates ships. Both
- * candidate sizes and the winner are recorded so the choice is auditable, and
- * the tool version is exact so the stage reproduces byte for byte.
+ * through a second minifier, and the smaller of the two candidates ships. Old
+ * recipes compare raw bytes; new recipes can compare deterministic gzip -9
+ * storage bytes. The choice and candidate sizes are recorded for reproduction.
  */
 export interface KeelBuildCompact {
   readonly tool: { readonly name: KeelCompactTool; readonly version: string };
   readonly options: KeelCompactOptions;
   readonly stamp?: KeelCompactStamp;
+  /** Absent in existing recipes, which select by raw JavaScript length. */
+  readonly selection?: "gzip-9";
   readonly winner: "esbuild" | "terser";
   /** Candidate sizes before any stamp banner, so the comparison is honest. */
   readonly candidateBytes: { readonly esbuild: number; readonly terser: number };
+  /** Present with gzip-9 selection; includes a stamp banner when supplied. */
+  readonly candidateStoredBytes?: { readonly esbuild: number; readonly terser: number };
+  /** The zlib implementation used to choose by stored size. */
+  readonly gzipVersion?: string;
 }
 
 export interface KeelBuildRecipe {
@@ -192,6 +198,21 @@ function assertValidCompact(compact: KeelBuildCompact): void {
     !Number.isSafeInteger(sizes.terser) || sizes.terser <= 0
   ) {
     throw new TypeError("recipe.compact.candidateBytes must record both candidate sizes.");
+  }
+  if (compact.selection !== undefined && compact.selection !== "gzip-9") {
+    throw new TypeError("recipe.compact.selection must be gzip-9 when present.");
+  }
+  const stored = compact.candidateStoredBytes;
+  if (compact.selection === "gzip-9") {
+    if (stored === undefined || stored === null || !Number.isSafeInteger(stored.esbuild) || stored.esbuild <= 0 ||
+        !Number.isSafeInteger(stored.terser) || stored.terser <= 0) {
+      throw new TypeError("recipe.compact.candidateStoredBytes must record both gzip-9 sizes.");
+    }
+    if (typeof compact.gzipVersion !== "string" || !/^[0-9A-Za-z.+-]{1,64}$/u.test(compact.gzipVersion)) {
+      throw new TypeError("recipe.compact.gzipVersion must pin the zlib version.");
+    }
+  } else if (stored !== undefined || compact.gzipVersion !== undefined) {
+    throw new TypeError("recipe.compact gzip fields require gzip-9 selection.");
   }
 }
 
@@ -312,6 +333,12 @@ export function diffKeelBuildRecipes(
       if (canonicalJson(expectedCompact.options) !== canonicalJson(actualCompact.options)) {
         issues.push("options: compact options differ from the recipe");
       }
+      if (expectedCompact.selection !== actualCompact.selection) {
+        issues.push("options: compact candidate selection differs from the recipe");
+      }
+      if (expectedCompact.gzipVersion !== actualCompact.gzipVersion) {
+        issues.push(`tool: gzip stage used zlib ${expectedCompact.gzipVersion}, this environment has ${actualCompact.gzipVersion}`);
+      }
       if ((expectedCompact.stamp?.path) !== (actualCompact.stamp?.path)) {
         issues.push("options: compact stamp declaration differs from the recipe");
       } else if (expectedCompact.stamp !== undefined && actualCompact.stamp !== undefined &&
@@ -320,7 +347,9 @@ export function diffKeelBuildRecipes(
       }
       if (expectedCompact.winner !== actualCompact.winner ||
           expectedCompact.candidateBytes.esbuild !== actualCompact.candidateBytes.esbuild ||
-          expectedCompact.candidateBytes.terser !== actualCompact.candidateBytes.terser) {
+          expectedCompact.candidateBytes.terser !== actualCompact.candidateBytes.terser ||
+          expectedCompact.candidateStoredBytes?.esbuild !== actualCompact.candidateStoredBytes?.esbuild ||
+          expectedCompact.candidateStoredBytes?.terser !== actualCompact.candidateStoredBytes?.terser) {
         issues.push("output: compact stage produced different candidates than the recipe records");
       }
     }
