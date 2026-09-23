@@ -92,6 +92,7 @@ export const DETERMINISTIC_TEST_FILES = Object.freeze([
   "tests/keel-frozen-dataset.test.mjs",
   "tests/keel-historical-evidence.test.mjs",
   "tests/keel-media-optimize-cli.test.mjs",
+  "tests/keel-manifest-generation.test.mjs",
   "tests/keel-module-assurance.test.mjs",
   "tests/keel-module-registration.test.mjs",
   "tests/keel-presentation.test.mjs",
