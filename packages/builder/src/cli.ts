@@ -120,7 +120,7 @@ Commands:
   keel module editor [--root <project>] [--entry src/art.ts] [--includes keel.includes.json] [--watch]
   keel module install --repo <owner/name> --commit <sha> --version <v> --expect <sha256> [--name <id>] [--root <project>]
   keel module verify --repo <owner/name> --commit <sha> [--path <dir>] [--entry src/index.ts]
-    [--format esm|iife|cjs] [--external <a,b>] [--expect <0xdigest>] [--no-compact] [--json]
+    [--format esm|iife|cjs] [--external <a,b>] [--expect <0xdigest>] [--gzip-compact] [--no-compact] [--json]
   keel module verify --all [--root <workspace>] [--json]
   keel module bump <dir> --commit <sha> [--version <v>] [--summary <text>] [--json]
   keel module register --repo <owner/name> --commit <sha> --out <dir> [--path <dir>]
@@ -363,6 +363,9 @@ async function main(): Promise<void> {
         return;
       }
       if (verb === "verify") {
+        if (args.flags["no-compact"] === true && args.flags["gzip-compact"] === true) {
+          throw new TypeError("--gzip-compact cannot be combined with --no-compact.");
+        }
         const repository = required(flag(args, "repo"), "module verify requires --repo <owner/name>.");
         const [owner, name] = repository.split("/");
         if (owner === undefined || name === undefined || name.length === 0) throw new TypeError("--repo must be <owner>/<name>.");
@@ -385,7 +388,8 @@ async function main(): Promise<void> {
           ...(format === undefined && external === undefined
             ? {}
             : { options: { ...KEEL_MODULE_BUILD_OPTIONS, ...(format === undefined ? {} : { format }), ...(external === undefined || external.length === 0 ? {} : { external }) } }),
-          ...(args.flags["no-compact"] === true ? {} : { compact: { keepComments: false } }),
+          ...(args.flags["no-compact"] === true ? {} : { compact: { keepComments: false,
+            ...(args.flags["gzip-compact"] === true ? { selection: "gzip-9" as const } : {}) } }),
           mediaType: "text/javascript",
         });
         const digest = verified.recipe.output.integrity.digest;

@@ -45,7 +45,8 @@ One command runs the whole minify-and-hash pipeline:
    raw JavaScript candidate ships by default, preserving existing receipts.
    For modules stored with gzip -9, `--gzip-compact` selects the smaller stored
    candidate instead. Its recipe records both raw and stored sizes, the zlib
-   version, and the winner. `--no-compact` skips the stage.
+   version, and the winner. Reproduce it from a source commit with the same
+   `--gzip-compact` flag on `keel module verify`. `--no-compact` skips the stage.
 4. `createKeelBuildRecipe` records the resolved module graph by digest into
    `dist/keel-build-recipe.json` (`keel-build-recipe@2` with a `compact`
    section; `--no-compact` builds still emit `keel-build-recipe@1`, and @1
