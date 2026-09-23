@@ -434,6 +434,23 @@ const SAFE_INLINE_MODULE_ID = /^[A-Za-z0-9][A-Za-z0-9._:/-]{0,127}$/u;
 // A minified JS ternary such as `ready ? ar : 1` is not a content locator.
 const EXTERNAL_RESOURCE_LITERAL = /\b(?:(?:https?|ipfs|web3|keel-onchain):[^\s"'<>\\]+|ar:(?:\/\/[^\s"'<>\\]+|[A-Za-z0-9_-]{43}(?![A-Za-z0-9_-])(?:\/[^\s"'<>\\]*)?))/giu;
 
+/** Shared library bytes are not creator resources. Match the full pinned artifact. */
+async function assertInlineModuleDependencies(bytes: Uint8Array, moduleId: string): Promise<void> {
+  const candidates: Array<{ id: string; integrity: Integrity | null }> = KEEL_CREATIVE_RUNTIME_CATALOG.flatMap(runtime => runtime.resources.filter(resource => resource.referenceStatus === 'active'));
+  if (moduleId === 'keel-layered-runtime-v4') {
+    const generated = './layered-runtime-info.js';
+    const { LAYERED_RUNTIME } = await import(generated);
+    candidates.push(LAYERED_RUNTIME);
+  }
+  const candidate = candidates.find(resource => resource.id === moduleId && resource.integrity !== null);
+  if (candidate?.integrity) {
+    const actual = await createIntegrity(bytes);
+    if (actual.digest === candidate.integrity.digest && actual.byteLength === candidate.integrity.byteLength) return;
+    throw new TypeError(`Inline shared runtime ${moduleId} differs from its pinned artifact.`);
+  }
+  assertKeelInlineNoExternalDependencies(bytes, 'Inline module ' + moduleId);
+}
+
 /**
  * Reject concrete network/content locators in creator-owned Inline bytes.
  *
