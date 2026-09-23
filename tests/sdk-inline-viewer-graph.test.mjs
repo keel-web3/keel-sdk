@@ -64,6 +64,14 @@ test("Inline creator bytes reject hidden external URL sentinels before packing",
   );
 });
 
+test('Inline locator check distinguishes minified ar variables from Arweave references', () => {
+  assert.doesNotThrow(()=>assertKeelInlineNoExternalDependencies(utf8('const ar=2;const x={bar:ready?ar:1,empty:false};')));
+  for(const uri of ['ar://asset','ar:'+ 'a'.repeat(43),'ar:'+ 'A_0-'.repeat(10)+'abc'+'/image.png']){
+    assert.throws(()=>assertKeelInlineNoExternalDependencies(utf8(`const asset="${uri}";`)),/external resource locator/);
+    assert.throws(()=>assertKeelInlineNoExternalDependencies(utf8(encodeURIComponent(uri))),/external resource locator/);
+  }
+});
+
 test('inline SVG image carriage avoids double Base64 while retaining exact bytes', async () => {
   const svg=utf8('<svg xmlns="http://www.w3.org/2000/svg"><text>雪 # ? % &amp;</text><image href="data:image/avif;base64,'+'A+/='.repeat(5000)+'"/></svg>');
   const uri=buildKeelInlineImageURI(svg,'image/svg+xml');

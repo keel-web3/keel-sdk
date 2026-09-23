@@ -102,7 +102,8 @@ Messages are newline-delimited JSON-RPC. Initialize first, then use
 `keel-tezos-standard-route-plan`, `keel-contract-controls`, `keel-engine-catalog`,
 `keel-revision-plan`, `keel-project-decisions`, `keel-layered-check`,
 `keel-layered-select`, `keel-layered-sample`, `keel-layered-reveal-plan`,
-`keel-layered-curation`, `keel-token-matrix-prepare`, `analyze`,
+`keel-layered-curation`, `keel-token-matrix-prepare`,
+`keel-arena-match-prepare`, `keel-arena-claim-prepare`, `analyze`,
 `media-optimize`, `media-optimize-apply`, `build`, `verify`, `cost`,
 `upload-plan`, `chain-plan`, `ethereum-encode`, `publish-plan`,
 `module-resolve`, `module-lock`, `wallet-request-prepare`, `wallet-link`,
@@ -424,6 +425,10 @@ The desktop runs with `pnpm desktop:build` then `pnpm desktop`. See
 ### Shared token metadata matrices
 
 `keel-token-matrix-prepare` compiles a workspace manifest of explicit token IDs and ordered part files into shared value tables, templates, and compact selection rows. It uses the SDK compiler and preserves missing rows. It does not publish. Use it after canonical `keel-inline-prepare` with `metadataTransport: "web3-json"` for existing collections that expose URI controls. See [the matrix workflow](../../docs/TOKEN_MATRIX.md) for storage, binding, and proof requirements.
+
+### Staked matches
+
+`keel-arena-match-prepare` turns a workspace match JSON (the `pnpm game:arena` shape) into the generic MatchInput bytes, `inputDigest`, the params/track/entrants digests and the prover witness. `keel-arena-claim-prepare` turns the match plus a per-entrant spent list into entrant *i*'s settlement leaf, Merkle proof, root and claim arguments, and with `publicValues` checks them against the settled root. Both use `@keel-engine/arena` through `@keel/game-engine` (loaded at call time, so the tools need an SDK checkout with the engine linked by `pnpm game:setup`). Neither runs a game's format module: re-running a match, auditing public values and deriving a spent list stay with `pnpm game:arena prepare|audit|claim --format`. `keel://mcp/arena` describes how to add a match format.
 
 ## Runtime module discovery
 
