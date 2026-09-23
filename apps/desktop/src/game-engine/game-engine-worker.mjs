@@ -10,6 +10,9 @@ import { basename, dirname, join, relative } from 'node:path';
 import { gzipSync } from 'node:zlib';
 
 const root = workerData.root;
+// (A module's src/<name> in whichever language it's written: TypeScript by default, plain JavaScript just as well.
+// Kept here rather than read from the engine, whose pinned release may predate it.)
+const sourceFileOf = (dir, name) => ['.ts', '.mts', '.js', '.mjs'].map((ext) => join(dir, 'src', name + ext)).find((path) => existsSync(path));
 let loaded;
 async function engine() {
   if (!loaded) {
@@ -31,19 +34,17 @@ function stream(seed) {
   return { f, between: (x, y) => x + (y - x) * f(), int: (x, y) => x + Math.floor(f() * (y - x + 1)), pick: (list) => list[Math.floor(f() * list.length)], chance: (p) => f() < p };
 }
 
-/** A pack's definitions (entities and attributes with their builders): its module.ts or index.ts exports `pack`. */
+/** A pack's definitions (entities and attributes with their builders): its src/module or src/index (TypeScript or JavaScript) exports `pack`. */
 async function packOf(mod) {
   const { packs } = await engine();
   if (packs.has(mod.manifest.id)) return packs.get(mod.manifest.id);
   let result = { pack: null, error: '' };
   try {
-    for (const file of ['module.ts', 'index.ts']) {
-      const path = join(mod.dir, 'src', file);
-      if (!existsSync(path)) continue;
+    for (const path of ['module', 'index'].map((name) => sourceFileOf(mod.dir, name)).filter(Boolean)) {
       const exported = await import(pathToFileURL(path).href);
       if (exported.pack?.entities && exported.pack?.attributes) { result = { pack: exported.pack, error: '' }; break; }
     }
-    if (!result.pack) result.error = 'This pack does not export `pack` from src/module.ts or src/index.ts, so only its table of contents is shown.';
+    if (!result.pack) result.error = 'This pack does not export `pack` from src/module or src/index, so only its table of contents is shown.';
   } catch (error) { result = { pack: null, error: String(error?.message ?? error) }; }
   packs.set(mod.manifest.id, result);
   return result;

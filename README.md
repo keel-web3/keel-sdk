@@ -12,6 +12,12 @@ and their Forge tests live in the sibling
 
 ## Default storage and read path
 
+These rules are automatic for every contract, collection, viewer, metadata,
+and release request. A creator does not need to know the terms “module,”
+“canonical shell,” “raw-percent,” or “media carriage” to receive the correct
+route; the agent reads the project README/docs and performs the selected-chain
+module and graph scan first. If that evidence is missing, publication stops.
+
 `buildKeelInlineTokenURIGraph(root)` is the shared default used by the SDK,
 MCP preparation, desktop preview measurements, and Studio publication plans.
 It prepares `application/vnd.keel.token-uri-raw-percent-fragment` objects for
@@ -20,6 +26,20 @@ transport slot for the shell decoder. Neither the complete HTML nor the complete
 metadata JSON receives a Base64 wrapper. Unsafe bytes are escaped once per URI
 boundary at preparation time; contract reads copy the prepared objects and only
 format the small live metadata/context envelope.
+
+For collector images, keep the original binary bytes in one KEEL object. At the
+final JSON image field, assemble the `data:image/<type>;base64,` header,
+canonical Base64 of those exact bytes, and the JSON delimiter/footer; never
+store a second Base64 text object. GIFs are direct GIF data URIs, never SVG
+wrappers or placeholders. The SDK validates the media container and exact
+source carriage, while publication verifies the digest and public-chain bytes.
+
+The SDK also audits the bytes a checker actually sees: it decodes raw-percent
+layers, unpacks embedded gzip/deflate resources, and rejects concrete HTTP(S),
+IPFS, Arweave, web3, and `keel-onchain` locators. A URL sentinel used only by
+an injected onchain content reader is still rejected; use a path or identifier
+and let the injected reader resolve it. The SVG namespace literal is the sole
+allowed protocol URL.
 
 The canonical shell source is packaged with the SDK, so consumers do not need a
 KEEL checkout as their working directory. Publication reuses the selected chain's
@@ -77,6 +97,24 @@ review-only plan. The repo-local `$fray-keel-agent` skill makes that planning
 phase the default agent workflow for 1/1s, collections, OneMint drops, sales,
 claims, and Fray auctions.
 
+### Contract work is always a KEEL workflow
+
+An agent must not start from an ABI, an old deployment script, or a guessed
+contract address. Before making or changing a contract, collection, viewer,
+metadata binding, deployment, or release, it reads this README and the target
+repository's relevant `docs/` files, then runs the MCP
+`keel-contract-workflow-preflight` and follows its required sequence:
+`keel-engine-catalog`, exact selected-chain `keel-network-inspect`,
+selected-chain `keel-library-search`, and only then contract controls or wallet
+review. The module scan is mandatory even when the request appears to be a new
+contract; existing modules, proxies, graph revisions, canonical shell/builder
+bindings, and edge-case recovery paths must be resolved before redeploying.
+
+This is a default, not a user option. Missing README/docs or ambiguous
+selected-chain module evidence stops the workflow before signing. The MCP and
+the `$fray-keel-agent` skill enforce the same order so a normal creator does
+not need to know the protocol vocabulary.
+
 ## The default verification shell is mandatory
 
 Every collector-facing viewer uses KEEL's registered canonical verification
@@ -107,6 +145,7 @@ boundary, and exact Ethereum/Tezos reconstruction paths.
 | `packages/mcp` | Stdio MCP tools, prompts, and resources for review-only agent workflows |
 | `examples` | Static, p5, Three.js, Doom, module, and marketplace fixtures |
 | `skills/fray-keel-agent` | Installable agent workflow with progressive references |
+| `skills/keel-sdk-mcp` | SDK/MCP workflow defaults for automatic module, image-carriage, and publication planning |
 | `.agents/skills/fray-keel-agent` | Repo-scoped discovery link to the canonical skill above |
 
 The contract module map is maintained in `tools/keel/module-map.mjs`; contract
@@ -174,10 +213,12 @@ contract.
 
 ## Skill setup
 
-Codex discovers the skill automatically when opened anywhere in this repository
-through `.agents/skills/fray-keel-agent`, which points to the one canonical
-source at `skills/fray-keel-agent`. Codex supports symlinked skill folders; if a
-new skill does not appear, restart Codex.
+Codex discovers the Fray workflow automatically when opened anywhere in this
+repository through `.agents/skills/fray-keel-agent`, which points to the one
+canonical source at `skills/fray-keel-agent`. The SDK/MCP workflow is also
+available as `skills/keel-sdk-mcp` and is installed globally for automatic
+selection when the request concerns the SDK or MCP. Codex supports symlinked
+skill folders; if a new skill does not appear, restart Codex.
 
 For a separate installation, use the skill installer with this repository path:
 

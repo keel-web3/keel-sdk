@@ -45,6 +45,22 @@ export interface KeelEngineIntent {
 
 export const KEEL_ENGINE_CATALOG = {
   schema: "keel-engine-catalog@1",
+  projectArchitecture: {
+    default: "modular",
+    audience: "Creators do not need development or storage expertise.",
+    assetPlanning: {
+      discovery: "Inventory every supplied asset and its actual type, digest, size and dependencies; preserve originals and search selected-chain registry/index for exact reusable objects.",
+      selection: "Measure supported lossless compression and total publication/read costs including decoder costs. Keep independently reusable or replaceable assets separate; group only when measured access and cost benefits justify it without losing identity.",
+      automatic: "Choose resource boundaries, dependency references and compatible codecs automatically. Do not ask creators to choose modules, chunks, ABI details or compression algorithms.",
+      questions: "Ask only about missing creative intent, rights, budget or user-visible quality tradeoffs. Lossy conversion requires explicit authorization.",
+      reporting: "Explain what is preserved, what is reused, what changes and measured cost in ordinary language. Estimates and unverified candidates must be labeled.",
+    },
+    selfContained: "Only when explicitly requested by the user; never inferred from Inline or onchain storage.",
+    resources: ["separate HTML entry", "separate CSS stylesheets", "individual JavaScript ES modules with explicit imports", "separate assets"],
+    discovery: "Search the selected-chain registry and index before creating reusable modules. Verify candidate interfaces, licenses, digests and onchain bytes before reuse.",
+    publication: "Preserve logical module identities and dependency edges. Reuse unchanged published objects; publish changed modules and graph references only. Storage chunks are not application modules.",
+    compression: "Compress each resource independently using a verified compatible decoder; compression must not flatten module boundaries.",
+  },
   svgRenderer: {
     schema: "keel.svg-native@1", contract: "KeelSVGRenderer", sdk: "@keel/sdk/svg-renderer",
     reads: ["svg(uint256)", "svgProvenance(uint256)"], tools: ["keel-svg-create", "keel-svg-inspect", "keel-svg-call-plan"],
@@ -236,4 +252,34 @@ export function planKeelProject(value: unknown = {}) {
     evidence: KEEL_ENGINE_CATALOG.evidence,
     authority: { approvalRequiredNow: false, signing: "not-performed", submission: "not-performed", publicationReady: false },
   };
+}
+
+/** Storage decisions are machinery, not questions for the artist. Costs must
+ * come from the selected-chain estimator; unknown costs are not zero. */
+export function planCreatorAssetStorage(assets: readonly {
+  id: string;
+  digest: string;
+  options: readonly {
+    kind: "existing" | "raw" | "gzip" | "brotli";
+    verified: boolean;
+    lossless: boolean;
+    totalGas: bigint;
+    objectId?: string;
+  }[];
+}[]) {
+  const ids = new Set<string>();
+  return assets.map(asset => {
+    if (!asset.id || ids.has(asset.id)) throw new Error("Asset IDs must be unique and nonempty");
+    ids.add(asset.id);
+    if (!/^(?:0x|sha256:)[0-9a-f]{64}$/i.test(asset.digest)) throw new Error("Asset requires an exact SHA-256 digest");
+    for (const option of asset.options) if (option.totalGas < 0n) throw new Error("Storage cost cannot be negative");
+    const eligible = asset.options.filter(option => option.verified && option.lossless &&
+      (option.kind !== "existing" || Boolean(option.objectId)));
+    const selected = eligible.reduce<(typeof eligible)[number] | undefined>((best, option) =>
+      !best || option.totalGas < best.totalGas ||
+      (option.totalGas === best.totalGas && option.kind === "existing") ? option : best, undefined);
+    return { id: asset.id, digest: asset.digest, preserveOriginal: true as const,
+      status: selected ? "planned" as const : "measurement-required" as const,
+      selected: selected ?? null };
+  });
 }

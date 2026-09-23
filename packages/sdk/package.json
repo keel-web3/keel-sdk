@@ -91,6 +91,10 @@
       "types": "./dist/presentation.d.ts",
       "import": "./dist/presentation.js"
     },
+    "./collector-policy": {
+      "types": "./dist/collector-policy.d.ts",
+      "import": "./dist/collector-policy.js"
+    },
     "./inline-viewer-graph": {
       "types": "./dist/inline-viewer-graph.d.ts",
       "import": "./dist/inline-viewer-graph.js"

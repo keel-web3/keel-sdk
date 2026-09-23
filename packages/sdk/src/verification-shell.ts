@@ -872,11 +872,19 @@ function compactInlineRuntime(
     if (entryURL === undefined) throw new Error("Verified entrypoint descriptor is missing.");
     const moduleAliases = new Map<string, string>();
     const moduleScripts: string[] = [];
-    for (const item of items.filter((candidate) => candidate !== entry && candidate.id !== "keel.published-view-reader" && (candidate.role === "module" || candidate.role === "data") && candidate.mediaType === "text/javascript")) {
+    const scriptItems = items.filter((candidate) => candidate !== entry && candidate.id !== "keel.published-view-reader" && (candidate.role === "module" || candidate.role === "data") && candidate.mediaType === "text/javascript");
+    // Discover all verified names before resolving any imports. Publication
+    // order is not a declaration of which dependencies exist.
+    for (const item of scriptItems) {
+      for (const alias of [item.id, ...item.aliases]) {
+        const previous = moduleAliases.get(alias);
+        if (previous !== undefined && previous !== item.id) throw new Error(`Ambiguous verified module alias ${alias}.`);
+        moduleAliases.set(alias, item.id);
+      }
+    }
+    for (const item of scriptItems) {
       const bytes = resolved.get(item.id);
       if (bytes === undefined) throw new Error(`Resolved bytes missing for ${item.id}.`);
-      moduleAliases.set(item.id, item.id);
-      for (const alias of item.aliases) moduleAliases.set(alias, item.id);
       const source = decoder.decode(bytes);
       moduleScripts.push(/(^|[;\n])\s*(?:import|export)\b/u.test(source)
         ? transformVerifiedModule(source, item.id, moduleAliases, true)

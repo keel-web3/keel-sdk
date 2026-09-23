@@ -13,6 +13,7 @@ const ONE_PIXEL_PNG = Buffer.from(
   "iVBORw0KGgoAAAANSUhEUgAAAAIAAAACCAYAAABytg0kAAAAFElEQVR4nGP8z8Dwn4GBgYGJAQoAHxcCAk+Uzr4AAAAASUVORK5CYII=",
   "base64",
 );
+const ONE_PIXEL_WEBP = Buffer.from("RIFF\u0000\u0000\u0000\u0000WEBP", "latin1");
 
 async function moduleSnapshot() {
   const content = bytes("export const demo = true;\n");
@@ -80,10 +81,11 @@ test("MCP initializes, lists strict tools, and returns JSON-RPC parameter errors
     assert.equal(initialized?.result.serverInfo.name, "keel-mcp");
     assert.deepEqual(Object.keys(initialized?.result.capabilities), ["tools", "prompts", "resources"]);
     assert.match(initialized?.result.instructions, /begin with keel-project-plan/iu);
+    assert.match(initialized?.result.instructions, /keel-contract-workflow-preflight/iu);
     assert.match(initialized?.result.instructions, /registered canonical KEEL verification shell/iu);
     assert.match(initialized?.result.instructions, /one declared changed resource/iu);
     const listed = await server.handle({ jsonrpc: "2.0", id: 5, method: "tools/list", params: {} });
-    assert.deepEqual(listed?.result.tools.map((tool) => tool.name), ["keel-tezos-shell-prepare", "keel-tezos-publication-prepare", "keel-network-inspect", "keel-tezos-standard-route-plan", "keel-contract-controls", "keel-engine-catalog", "keel-revision-plan", "keel-project-decisions", "keel-editor-project-list", "keel-editor-project-read", "keel-editor-project-update", "keel-editor-project-open", "keel-layered-check", "keel-layered-select", "keel-layered-sample", "keel-layered-math", "keel-layered-reveal-plan", "keel-layered-direct-image-plan", "keel-svg-create", "keel-svg-inspect", "keel-svg-call-plan", "keel-layered-curation", "keel-token-matrix-prepare", "analyze", "media-optimize", "media-optimize-apply", "build", "verify", "cost", "upload-plan", "chain-plan", "ethereum-encode", "publish-plan", "module-resolve", "module-lock", "wallet-request-prepare", "wallet-link", "module-review-prepare", "fray-auction-intake", "fray-stage-project", "keel-chain-guide", "keel-library-search", "keel-onchain-data-prepare", "keel-endpoint-config", "keel-studio-capabilities", "keel-studio-project-intake", "keel-studio-draft", "keel-studio-stage-project", "keel-creator-collection-prepare", "keel-shell-search", "keel-inline-prepare", "keel-shell-prepare"]);
+    assert.deepEqual(listed?.result.tools.map((tool) => tool.name), ["keel-tezos-shell-prepare", "keel-tezos-publication-prepare", "keel-network-inspect", "keel-tezos-standard-route-plan", "keel-contract-workflow-preflight", "keel-contract-controls", "keel-engine-catalog", "keel-revision-plan", "keel-project-decisions", "keel-editor-project-list", "keel-editor-project-read", "keel-editor-project-update", "keel-editor-project-open", "keel-layered-check", "keel-layered-select", "keel-layered-sample", "keel-layered-math", "keel-layered-reveal-plan", "keel-layered-direct-image-plan", "keel-svg-create", "keel-svg-inspect", "keel-svg-call-plan", "keel-layered-curation", "keel-token-matrix-prepare", "keel-arena-match-prepare", "keel-arena-claim-prepare", "analyze", "media-optimize", "media-optimize-apply", "build", "verify", "cost", "upload-plan", "chain-plan", "ethereum-encode", "publish-plan", "module-resolve", "module-lock", "wallet-request-prepare", "wallet-link", "module-review-prepare", "fray-auction-intake", "fray-stage-project", "keel-chain-guide", "keel-library-search", "keel-onchain-data-prepare", "keel-endpoint-config", "keel-studio-capabilities", "keel-studio-project-intake", "keel-studio-draft", "keel-studio-stage-project", "keel-creator-collection-prepare", "keel-shell-search", "keel-inline-prepare", "keel-shell-prepare"]);
     const revisionTool = listed?.result.tools.find((tool) => tool.name === "keel-revision-plan");
     assert.match(revisionTool?.description, /unchanged object ID.*reused/iu);
     assert.equal(revisionTool?.inputSchema.properties.changedResourceIds.maxItems, 1);
@@ -101,6 +103,15 @@ test("MCP initializes, lists strict tools, and returns JSON-RPC parameter errors
     const inlineTool = listed?.result.tools.find((tool) => tool.name === "keel-inline-prepare");
     assert.match(inlineTool?.description, /automatic.*raw-percent saver/iu);
     assert.deepEqual(inlineTool?.inputSchema.properties.carriage.enum, ["compact", "raw-percent", "percent", "follow-latest", "pinned"]);
+    const preflightTool = listed?.result.tools.find((tool) => tool.name === "keel-contract-workflow-preflight");
+    assert.match(preflightTool?.description, /target README/iu);
+    assert.match(preflightTool?.description, /module-catalog/iu);
+    await writeFile(path.join(directory, "README.md"), "# target\n");
+    await mkdir(path.join(directory, "docs"));
+    await writeFile(path.join(directory, "docs", "ARCHITECTURE.md"), "# architecture\n");
+    const preflight = await call(server, 30, "keel-contract-workflow-preflight", {});
+    assert.equal(preflight?.result.structuredContent.status, "docs-read-module-scan-required");
+    assert.deepEqual(preflight?.result.structuredContent.documents.map((document) => document.path), ["README.md", "docs/ARCHITECTURE.md"]);
     const creatorPlan = await call(server, 31, "keel-creator-collection-prepare", {
       chainId: 11155111,
       creator: "0x1111111111111111111111111111111111111111",
@@ -217,11 +228,12 @@ test("MCP initializes, lists strict tools, and returns JSON-RPC parameter errors
     assert.equal(malformedResourceList?.error?.code, -32602);
     const resourceFiles = await readdir(directory);
     const resourceList = await server.handle({ jsonrpc: "2.0", id: 23, method: "resources/list", params: {} });
-    assert.deepEqual(resourceList?.result.resources.map((resource) => resource.uri), ["keel://mcp/engine", "keel://mcp/svg-renderer", "keel://mcp/workflow", "keel://mcp/limits", "keel://mcp/project-routes", "keel://mcp/publication-modes"]);
+    assert.deepEqual(resourceList?.result.resources.map((resource) => resource.uri), ["keel://mcp/engine", "keel://mcp/svg-renderer", "keel://mcp/workflow", "keel://mcp/limits", "keel://mcp/project-routes", "keel://mcp/publication-modes", "keel://mcp/arena"]);
     const resourceRead = await server.handle({ jsonrpc: "2.0", id: 24, method: "resources/read", params: { uri: "keel://mcp/limits" } });
     assert.equal(JSON.parse(resourceRead?.result.contents[0].text).kind, "offline-limits");
     const workflowRead = await server.handle({ jsonrpc: "2.0", id: 27, method: "resources/read", params: { uri: "keel://mcp/workflow" } });
     const workflow = JSON.parse(workflowRead?.result.contents[0].text);
+    assert.deepEqual(workflow.contractFirst.slice(0, 4), ["keel-contract-workflow-preflight", "keel-engine-catalog", "keel-network-inspect", "keel-library-search"]);
     assert.ok(workflow.steps.includes("module-resolve"));
     assert.ok(workflow.steps.includes("module-lock"));
     assert.ok(workflow.steps.includes("ethereum-encode"));
@@ -705,7 +717,7 @@ test("Inline MCP automatically uses the single-pack compact carriage for creator
     await writeFile(path.join(directory, "entry.html"), "<!doctype html><img id='art'><script>art.src=__KEEL_CONTENT__.url('keel.animation')</script>");
     await writeFile(path.join(directory, "gif.js"), "globalThis.KEELGif=Object.freeze({ready:true});");
     await writeFile(path.join(directory, "animation.avif"), Buffer.from(Array.from({ length: 16_384 }, (_, index) => (index * 73) & 0xff)));
-    await writeFile(path.join(directory, "poster.webp"), ONE_PIXEL_PNG);
+    await writeFile(path.join(directory, "poster.webp"), ONE_PIXEL_WEBP);
     const server = await createMcpServer({ workspaceRoot: directory });
     await server.handle({ jsonrpc: "2.0", id: 1, method: "initialize", params: initializeParams });
     const result = await call(server, 2, "keel-inline-prepare", {
@@ -787,7 +799,7 @@ test("MCP rejects symlink inputs and CLI emits protocol JSON only", async () => 
     const listed = await server.handle({ jsonrpc: "2.0", id: 5, method: "tools/list", params: {} });
     assert.deepEqual(lines[1].result.tools, listed.result.tools);
     assert.ok(lines[1].result.tools.some(tool => tool.name === "keel-editor-project-open"));
-    assert.equal(lines[2].result.resources.length, 6);
+    assert.equal(lines[2].result.resources.length, 7);
     assert.ok(lines[2].result.resources.some(r=>r.uri === "keel://mcp/svg-renderer"));
     assert.equal(JSON.parse(lines[3].result.contents[0].text).kind, "offline-workflow");
   } finally {

@@ -1,5 +1,6 @@
 import { CURATION_TOOL_DEFINITIONS } from './curation-tools.js';
 import { MATRIX_TOOL_DEFINITIONS } from './matrix-tools.js';
+import { ARENA_TOOL_DEFINITIONS } from './arena-tools.js';
 import { LAYERED_TOOL_DEFINITIONS } from './layered-tools.js';
 import { SVG_TOOL_DEFINITIONS } from './svg-tools.js';
 import { resolveKeelInlineCarriage } from "@keel/sdk/presentation";
@@ -18,21 +19,15 @@ import {
   buildKeelIndexRegisterCollection,
   type KeelTezosShellPrepareInput,
 } from "@keel/sdk";
-import {
-  applyMediaOptimization,
-  analyzeCost,
-  analyzeMedia,
-  assertValidKeelModuleResolverSnapshot,
-  createRecursiveUploadPlan,
-  createUploadPlan,
-  planMediaOptimization,
-  resolveModule,
-  runMediaPipeline,
-  verifyBuiltArtifact,
-  type CostAnalysisOptions,
-  type KeelModuleResolverSnapshot,
-  type KeelModuleSelector,
-} from "@keel/builder";
+import type { CostAnalysisOptions, KeelModuleResolverSnapshot, KeelModuleSelector } from "@keel/builder";
+/**
+ * The heavy modules are loaded ON FIRST USE, not on import. Statically they cost ~50 s (@keel/builder) and ~19 s
+ * (@keel/ethereum-adapter) before this process can answer anything, which put the handshake past every MCP client's
+ * connect timeout. Nothing here is needed to LIST tools -- only to run one -- so the wait moves to the first call that
+ * actually needs it. Each namespace is fetched once and kept.
+ */
+let builderMod: typeof import("@keel/builder") | undefined;
+const builder = async (): Promise<typeof import("@keel/builder")> => (builderMod ??= await import("@keel/builder"));
 import { mkdtemp, rm } from "node:fs/promises";
 import path from "node:path";
 import {
@@ -78,11 +73,9 @@ import {
   type StageKeelStudioProjectInput,
   type FrayAuctionPresetId,
 } from "@keel/sdk";
-import {
-  createKeelFactoryConfigDigest,
-  normalizeKeelFactoryCollectionConfig,
-  type KeelFactoryCollectionConfig,
-} from "@keel/ethereum-adapter";
+import type { KeelFactoryCollectionConfig } from "@keel/ethereum-adapter";
+let ethMod: typeof import("@keel/ethereum-adapter") | undefined;
+const ethereumAdapter = async (): Promise<typeof import("@keel/ethereum-adapter")> => (ethMod ??= await import("@keel/ethereum-adapter"));
 import type { Compression, Hex } from "@keel/protocol";
 import { TOOL_SCHEMAS } from "./schemas.js";
 import { ENGINE_TOOL_DEFINITIONS } from "./engine-tools.js";
@@ -177,7 +170,10 @@ function selectorValue(value: unknown): KeelModuleSelector {
 async function snapshot(context: ToolContext, pathValue: string): Promise<KeelModuleResolverSnapshot> {
   const loaded = await context.workspace.readFile(pathValue, MAX_SNAPSHOT_BYTES);
   const parsed = JSON.parse(new TextDecoder("utf-8", { fatal: true }).decode(loaded.bytes)) as unknown;
-  assertValidKeelModuleResolverSnapshot(parsed);
+  // (An assertion function must be called through a plain name that carries an explicit type annotation.)
+  const assertSnapshot: (value: unknown) => asserts value is KeelModuleResolverSnapshot =
+    (await builder()).assertValidKeelModuleResolverSnapshot;
+  assertSnapshot(parsed);
   return parsed;
 }
 
@@ -185,7 +181,7 @@ async function analyzeTool(context: ToolContext, value: unknown): Promise<unknow
   const input = record(value, ["input", "mediaType"], "analyze arguments");
   const file = await context.workspace.resolveExistingFile(requiredString(input, "input"), MAX_MEDIA_BYTES);
   const mediaType = optionalString(input, "mediaType");
-  return analyzeMedia({ input: file, maxInputBytes: MAX_MEDIA_BYTES, ...(mediaType === undefined ? {} : { mediaType }) });
+  return (await builder()).analyzeMedia({ input: file, maxInputBytes: MAX_MEDIA_BYTES, ...(mediaType === undefined ? {} : { mediaType }) });
 }
 
 /** Always dry-run: the creator must review this result before a separate apply call. */
@@ -198,7 +194,7 @@ async function mediaOptimizeTool(context: ToolContext, value: unknown): Promise<
   const videoCrf = optionalNumber(input, "videoCrf");
   const videoCpuUsed = optionalNumber(input, "videoCpuUsed");
   const selectedStorageMode = optionalString(input, "selectedStorageMode");
-  return planMediaOptimization({
+  return (await builder()).planMediaOptimization({
     input: file,
     maxInputBytes: MAX_MEDIA_BYTES,
     ...(mediaType === undefined ? {} : { mediaType }),
@@ -233,7 +229,7 @@ async function mediaOptimizeApplyTool(context: ToolContext, value: unknown): Pro
   const videoCrf = optionalNumber(input, "videoCrf");
   const videoCpuUsed = optionalNumber(input, "videoCpuUsed");
   const selectedStorageMode = optionalString(input, "selectedStorageMode");
-  const plan = await planMediaOptimization({
+  const plan = await (await builder()).planMediaOptimization({
     input: file,
     maxInputBytes: MAX_MEDIA_BYTES,
     ...(mediaType === undefined ? {} : { mediaType }),
@@ -246,7 +242,7 @@ async function mediaOptimizeApplyTool(context: ToolContext, value: unknown): Pro
   if (plan.output?.integrity.digest !== expectedOutputDigest || plan.measurements.afterBytes !== expectedAfterBytes) {
     throw new Error("The current optimization candidate does not match the reviewed dry-run digest and byte length; review it again before applying.");
   }
-  return applyMediaOptimization({ plan, output: path.join(outputDirectory, outputName) });
+  return (await builder()).applyMediaOptimization({ plan, output: path.join(outputDirectory, outputName) });
 }
 
 async function buildTool(context: ToolContext, value: unknown): Promise<unknown> {
@@ -264,7 +260,7 @@ async function buildTool(context: ToolContext, value: unknown): Promise<unknown>
   const preserveOriginal = optionalBoolean(input, "preserveOriginal");
   const sourceMode = optionalString(input, "sourceMode");
   if (sourceMode !== undefined && sourceMode !== "files" && sourceMode !== "inline") throw new TypeError("sourceMode must be files or inline.");
-  return runMediaPipeline({
+  return (await builder()).runMediaPipeline({
     input: source,
     outputDirectory,
     createdAt,
@@ -290,17 +286,17 @@ async function verifyTool(context: ToolContext, value: unknown): Promise<unknown
   try {
     manifestBytes = await context.workspace.readFile(manifestPath, MAX_SNAPSHOT_BYTES);
   } catch (error) {
-    if (errorCode(error) === "ENOENT") return verifyBuiltArtifact({ directory, maxManifestBytes: MAX_SNAPSHOT_BYTES, maxSourceBytes: MAX_MEDIA_BYTES, ...(manifestName === undefined ? {} : { manifestName }) });
+    if (errorCode(error) === "ENOENT") return (await builder()).verifyBuiltArtifact({ directory, maxManifestBytes: MAX_SNAPSHOT_BYTES, maxSourceBytes: MAX_MEDIA_BYTES, ...(manifestName === undefined ? {} : { manifestName }) });
     throw error;
   }
   try { JSON.parse(new TextDecoder("utf-8", { fatal: true }).decode(manifestBytes.bytes)); }
-  catch { return verifyBuiltArtifact({ directory, maxManifestBytes: MAX_SNAPSHOT_BYTES, maxSourceBytes: MAX_MEDIA_BYTES, ...(manifestName === undefined ? {} : { manifestName }) }); }
+  catch { return (await builder()).verifyBuiltArtifact({ directory, maxManifestBytes: MAX_SNAPSHOT_BYTES, maxSourceBytes: MAX_MEDIA_BYTES, ...(manifestName === undefined ? {} : { manifestName }) }); }
   try {
     await context.workspace.readFile(`${directory}/manifest.integrity.json`, MAX_SNAPSHOT_BYTES);
   } catch (error) {
     if (errorCode(error) !== "ENOENT") throw error;
   }
-  return verifyBuiltArtifact({ directory, maxManifestBytes: MAX_SNAPSHOT_BYTES, maxSourceBytes: MAX_MEDIA_BYTES, ...(manifestName === undefined ? {} : { manifestName }) });
+  return (await builder()).verifyBuiltArtifact({ directory, maxManifestBytes: MAX_SNAPSHOT_BYTES, maxSourceBytes: MAX_MEDIA_BYTES, ...(manifestName === undefined ? {} : { manifestName }) });
 }
 
 async function costTool(context: ToolContext, value: unknown): Promise<unknown> {
@@ -321,7 +317,7 @@ async function costTool(context: ToolContext, value: unknown): Promise<unknown> 
     ...(maxPartsPerComposite === undefined ? {} : { maxPartsPerComposite }),
     ...(maxTreeDepth === undefined ? {} : { maxTreeDepth }),
   };
-  return analyzeCost(loaded.bytes, options);
+  return (await builder()).analyzeCost(loaded.bytes, options);
 }
 
 function boundedPlanText(value: unknown, key: string, max: number): string {
@@ -384,8 +380,8 @@ async function uploadPlanTool(context: ToolContext, value: unknown): Promise<unk
       ...(maxChunkBytes === undefined ? {} : { maxChunkBytes }),
     };
     const plan = strategy === "recursive"
-      ? await createRecursiveUploadPlan(source.bytes, { ...common, ...(leafDecodedBytes === undefined ? {} : { leafDecodedBytes }), ...(maxPartsPerComposite === undefined ? {} : { maxPartsPerComposite }) })
-      : await createUploadPlan(source.bytes, common);
+      ? await (await builder()).createRecursiveUploadPlan(source.bytes, { ...common, ...(leafDecodedBytes === undefined ? {} : { leafDecodedBytes }), ...(maxPartsPerComposite === undefined ? {} : { maxPartsPerComposite }) })
+      : await (await builder()).createUploadPlan(source.bytes, common);
     const planBytes = new TextEncoder().encode(JSON.stringify(plan)).byteLength;
     if (planBytes > MAX_PLAN_RESPONSE_BYTES) throw new RangeError(`upload plan response exceeds the ${MAX_PLAN_RESPONSE_BYTES}-byte MCP detail limit; use larger leaves or the builder CLI for a materialized plan.`);
     return { status: "planned", dryRun: true, materialized: false, files: "unavailable-after-dry-run", strategy, plan };
@@ -396,7 +392,7 @@ async function uploadPlanTool(context: ToolContext, value: unknown): Promise<unk
 
 async function moduleResolveTool(context: ToolContext, value: unknown): Promise<unknown> {
   const input = record(value, ["snapshot", "selector"], "module resolve arguments");
-  return resolveModule(await snapshot(context, requiredString(input, "snapshot")), selectorValue(input.selector));
+  return (await builder()).resolveModule(await snapshot(context, requiredString(input, "snapshot")), selectorValue(input.selector));
 }
 
 async function chainPlanTool(context: ToolContext, value: unknown): Promise<unknown> {
@@ -445,7 +441,7 @@ async function publishPlanTool(_context: ToolContext, value: unknown): Promise<u
 
 async function moduleLockTool(context: ToolContext, value: unknown): Promise<unknown> {
   const input = record(value, ["snapshot", "out", "selector"], "module lock arguments");
-  const result = await resolveModule(await snapshot(context, requiredString(input, "snapshot")), selectorValue(input.selector));
+  const result = await (await builder()).resolveModule(await snapshot(context, requiredString(input, "snapshot")), selectorValue(input.selector));
   if (result.status !== "bytes-unavailable" && result.status !== "resolved") throw new Error(`Module cannot be locked: ${result.status}.`);
   const out = await context.workspace.writeJson(requiredString(input, "out"), result.lock);
   const receiptEnvelope = { receipt: result.receipt, integrity: result.receiptDigest };
@@ -499,8 +495,8 @@ async function walletLinkTool(_context: ToolContext, value: unknown): Promise<un
       link,
     };
   }
-  const normalizedConfig: KeelFactoryCollectionConfig = normalizeKeelFactoryCollectionConfig(rawConfig);
-  const computedDigest = createKeelFactoryConfigDigest(normalizedConfig);
+  const normalizedConfig: KeelFactoryCollectionConfig = (await ethereumAdapter()).normalizeKeelFactoryCollectionConfig(rawConfig);
+  const computedDigest = (await ethereumAdapter()).createKeelFactoryConfigDigest(normalizedConfig);
   if (computedDigest !== link.target.configDigest) throw new Error("collectionConfig digest does not match wallet link.target.configDigest.");
   const typed = createCollectionAuthorizationTypedData(link.target.chainId, link.target.factoryAddress, {
     creator: link.accountAddress as `0x${string}`,
@@ -1050,7 +1046,7 @@ function tool(name: string, description: string, inputSchema: JsonSchema, run: T
 async function inlinePrepareTool(context: ToolContext, value: unknown): Promise<unknown> {
   const input = record(
     value,
-    ["repositoryRoot", "entry", "entryMediaType", "modules", "assets", "carriage", "collection",
+    ["repositoryRoot", "entry", "entryMediaType", "modules", "assets", "carriage", "presentationPolicy", "collection",
      "collectionName", "description", "imagePath", "manifestURI", "manifestDigest", "chainId",
      "metadataTransport", "metadataPath", "tokenId", "tokenIdFieldsJson", "web3ImageResolver"],
     "Inline prepare arguments",
@@ -1131,6 +1127,11 @@ async function inlinePrepareTool(context: ToolContext, value: unknown): Promise<
 
   const carriage = optionalString(input, "carriage") ?? "compact";
   const resolvedCarriage = resolveKeelInlineCarriage(carriage);
+  const presentationPolicy = (optionalString(input, "presentationPolicy") ?? "collector-inline") as "collector-inline" | "external-resolver" | "raw-artifact";
+  if (!["collector-inline", "external-resolver", "raw-artifact"].includes(presentationPolicy)) throw new TypeError("Unsupported presentationPolicy.");
+  if (presentationPolicy === "collector-inline" && resolvedCarriage !== "raw-percent") {
+    throw new TypeError("Collector-facing Inline defaults to raw-percent. Legacy carriage requires an explicit external-resolver or raw-artifact presentationPolicy.");
+  }
   const graph = await buildKeelInlineTokenURIGraph(document, { carriage: resolvedCarriage });
 
   const shared = document.parts.filter((part) => part.kind === "existing");
@@ -1198,6 +1199,7 @@ async function inlinePrepareTool(context: ToolContext, value: unknown): Promise<
         imageURI: buildKeelInlineImageURI(poster, posterType), tokenId: requiredString(input, "tokenId"),
         ...(input.tokenIdFieldsJson === undefined ? {} : { tokenIdFields: JSON.parse(requiredString(input, "tokenIdFieldsJson")) }),
         ...(input.web3ImageResolver === undefined ? {} : { web3Image: { resolver: requiredString(input, "web3ImageResolver") as `0x${string}`, chainId: input.chainId as number } }),
+        presentationPolicy,
       });
     } else prepared = await buildKeelPreparedOneOfOneTokenURI({
       graph,
@@ -1209,6 +1211,7 @@ async function inlinePrepareTool(context: ToolContext, value: unknown): Promise<
       manifestURI: optionalString(input, "manifestURI") ?? "",
       manifestDigest: (optionalString(input, "manifestDigest") ?? `0x${"0".repeat(64)}`) as `0x${string}`,
       tokenId: 1,
+      presentationPolicy,
     });
     const preparedTokenURIBytes = prepared === undefined ? web3Metadata!.byteLength : Buffer.byteLength(prepared.tokenURI, "utf8");
     if (preparedTokenURIBytes > KEEL_INLINE_MAX_TOKEN_URI_BYTES) {
@@ -1223,6 +1226,7 @@ async function inlinePrepareTool(context: ToolContext, value: unknown): Promise<
     status: "review-only" as const,
     carriage,
     resolvedCarriage,
+    presentationPolicy,
     shell: { prefixBytes: shell.prefix.bytes.byteLength, suffixBytes: shell.suffix.bytes.byteLength },
     modules: modules.map((module) => Object.freeze({
       moduleId: module.moduleId, version: module.version, execution: module.execution,
@@ -1246,7 +1250,9 @@ async function inlinePrepareTool(context: ToolContext, value: unknown): Promise<
         : ((assetPackedBytes - assetSourceBytes) / assetSourceBytes) * 100,
       artworkBinaryPackingLayers: assets.length === 0 ? 0 : 1,
       completeDocumentBase64Layers: resolvedCarriage === "raw-percent" ? 0 : resolvedCarriage === "percent" ? 1 : 2,
-      note: "Compact is automatic: creator assets are packed once at their binary slot; the complete HTML and metadata are not Base64-wrapped again.",
+      imageSourceStorage: "source bytes retained for validation; publish one prepared ASCII image payload/URI and never raw-plus-encoded duplicates",
+      imageBoundary: "one canonical Base64 data:image carriage prepared before publication; tokenURI only copies its header/payload/footer",
+      note: "Compact is automatic: creator assets are packed once at their binary slot; the complete HTML and metadata are not Base64-wrapped again, and media is never encoded during a read.",
     },
     tokenURIBytes: graph.fragmentBytes.byteLength,
     fragmentIntegrity: graph.fragmentIntegrity,
@@ -1368,6 +1374,7 @@ export const TOOL_DEFINITIONS: readonly ToolDefinition[] = [
   ...SVG_TOOL_DEFINITIONS,
   ...CURATION_TOOL_DEFINITIONS,
   ...MATRIX_TOOL_DEFINITIONS,
+  ...ARENA_TOOL_DEFINITIONS,
   tool("analyze", "Analyze a workspace media file and report integrity and wrapper support.", TOOL_SCHEMAS.analyze, analyzeTool),
   tool("media-optimize", "Dry-run a reversible media optimization. It reports only repository-supported adapters and never writes, changes storage mode, uploads, or touches a chain.", TOOL_SCHEMAS.mediaOptimize, mediaOptimizeTool),
   tool("media-optimize-apply", "Write one new optimized file only when its recomputed digest and byte length exactly match a reviewed media-optimize result. The source and selected storage mode are preserved; no upload, wallet, or chain action occurs.", TOOL_SCHEMAS.mediaOptimizeApply, mediaOptimizeApplyTool),
@@ -1395,7 +1402,7 @@ export const TOOL_DEFINITIONS: readonly ToolDefinition[] = [
   tool("keel-studio-stage-project", "Stage bounded creator resources/modules and return the server-issued Studio handoff. Omitted viewer selects Studio's canonical KEEL Inline graph for later preparation; `none` is the explicit raw-artifact route with no viewer and does not prevent a later release or mint. Automatic compact preparation requires the exact selected-chain KeelRawTokenURIBuilder and canonical raw-percent shell fragments with receipts/read-back; Studio must never fall back to legacy Base64 carriage silently. A direct image, video, or self-contained GLB resolves to registered shell plus registered keel.asset-display@1 plus the creator media entry, never zero modules or a generated index.html. Legacy protector getters and NoProtector do not determine default Inline readiness. Creator HTML is content, never a replacement shell, and agents must not upload a locally manufactured KEEL shell, protected-harness wrapper, or local wrapper when the catalog is incomplete. Studio must fail closed for an incomplete selected-chain catalog during preparation. The scoped agent key remains in the MCP environment; no wallet signature or chain action occurs.", TOOL_SCHEMAS.studioStageProject, studioStageProjectTool),
   tool("keel-creator-collection-prepare", "Prepare one exact EIP-5792 KeelCreatorFactory batch plus its durable recovery envelope. This never signs or submits. Missing or ambiguous factory/renderer deployments stop before any wallet approval.", TOOL_SCHEMAS.creatorCollectionPrepare, creatorCollectionPrepareTool),
   tool("keel-shell-search", "Search the read-back-verified shell catalogue by creator, name, version, or tags. Returns top/bottom object pointers and metadata only; it never fetches carrier bytes, signs, or submits.", TOOL_SCHEMAS.shellSearch, shellSearchTool),
-  tool("keel-inline-prepare", "Plan an INLINE Keel graph with the canonical shell, reusable executable modules, creator-owned assets, and one creator entry. Omitted carriage automatically selects the compact raw-percent saver: binary artwork is packed once at its resource slot and the complete HTML/metadata are not Base64-wrapped again. The result reports source, stored graph, and complete tokenURI bytes and rejects a result above the public-read ceiling. Legacy Base64 carriage requires explicit selection. Review-only: it never signs or submits.", TOOL_SCHEMAS.inlinePrepare, inlinePrepareTool),
+  tool("keel-inline-prepare", "Plan a collector-facing INLINE Keel graph with the registered canonical shell, reusable executable modules, creator-owned assets, and one creator entry. Omitted carriage and presentationPolicy use the automatic compact raw-percent saver plus collector-inline: exact supplied data:image/* bytes and complete data:text/html;charset=utf-8 HTML, with no IPFS/HTTP/web3 resolver or legacy complete-HTML Base64. Original binary image bytes are stored once; the final image field assembles its data:image/<type>;base64 header, canonical Base64 exact payload and JSON delimiter/footer. GIF is direct data:image/gif and never an SVG wrapper or placeholder. The result reports source, stored graph, and complete tokenURI bytes and rejects a result above the public-read ceiling. External resolvers and legacy artifact carriage require explicit reviewed policies. Review-only: it never signs or submits.", TOOL_SCHEMAS.inlinePrepare, inlinePrepareTool),
   tool("keel-shell-prepare", "Create canonical creator/tag shell metadata or prepare creator registration, update, or irreversible freeze calls. One stable shell ID can publish revisions until its creator freezes it. The recommended viewer follows the current revision; pinning one revision is explicit. A shell is one reusable top and bottom around the work graph; this tool never signs, submits, or invents a replacement default shell.", TOOL_SCHEMAS.shellPrepare, shellPrepareTool),
 ];
 

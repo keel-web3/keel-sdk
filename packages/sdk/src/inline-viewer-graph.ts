@@ -15,10 +15,11 @@ import {
   type Integrity,
 } from "@keel/protocol";
 import { promisify } from "node:util";
-import { gunzip, inflate } from "node:zlib";
+import { gunzip, gunzipSync, inflate, inflateSync } from "node:zlib";
 import { encodeAbiParameters, getAddress, keccak256, stringToHex } from "viem";
 
 import { KEEL_INLINE_MAX_TOKEN_URI_BYTES, keelWeb3ObjectURI, resolveKeelInlineCarriage, type KeelInlineCarriage } from "./presentation.js";
+import { assertKeelCollectorInlineMetadata, assertKeelInlineImageBytes, prepareKeelInlineImageCarriage, type KeelPresentationPolicy } from "./collector-policy.js";
 import {
   KEEL_ASSET_DISPLAY_MEDIA_TYPES,
   KEEL_ASSET_DISPLAY_MODULE_ID,
@@ -428,6 +429,70 @@ const decoder = new TextDecoder("utf-8", { fatal: true });
 const gunzipAsync = promisify(gunzip);
 const inflateAsync = promisify(inflate);
 const SAFE_INLINE_MODULE_ID = /^[A-Za-z0-9][A-Za-z0-9._:/-]{0,127}$/u;
+// Arweave locators carry an authority or a 32-byte base64url transaction ID.
+// A minified JS ternary such as `ready ? ar : 1` is not a content locator.
+const EXTERNAL_RESOURCE_LITERAL = /\b(?:(?:https?|ipfs|web3|keel-onchain):[^\s"'<>\\]+|ar:(?:\/\/[^\s"'<>\\]+|[A-Za-z0-9_-]{43}(?![A-Za-z0-9_-])(?:\/[^\s"'<>\\]*)?))/giu;
+
+/**
+ * Reject concrete network/content locators in creator-owned Inline bytes.
+ *
+ * Checkers inspect the decoded contents of embedded gzip/deflate slots, so a
+ * URL hidden inside a packed JavaScript module is still an external
+ * dependency. The SVG namespace is syntax rather than a fetchable resource;
+ * it is the sole protocol URL allowed in creator bytes. Onchain content
+ * runtimes must use their injected content reader and a path/identifier, not
+ * a URL sentinel.
+ */
+export function assertKeelInlineNoExternalDependencies(
+  bytes: Uint8Array,
+  label = "Inline creator resource",
+): void {
+  const found = new Set<string>();
+  const visited = new Set<string>();
+  const inspect = (candidate: Uint8Array, depth: number): void => {
+    let text: string;
+    try {
+      text = decoder.decode(candidate);
+    } catch {
+      return;
+    }
+    const key = `${depth}:${text.length}:${text.slice(0, 64)}:${text.slice(-64)}`;
+    if (visited.has(key)) return;
+    visited.add(key);
+    if (depth < 4) {
+      try {
+        const percentDecoded = decodeURIComponent(text);
+        if (percentDecoded !== text) inspect(encoder.encode(percentDecoded), depth + 1);
+      } catch {
+        // A non-percent text layer is checked as-is.
+      }
+    }
+    if (/keel\.invalid/iu.test(text)) found.add("keel.invalid");
+    for (const match of text.matchAll(EXTERNAL_RESOURCE_LITERAL)) {
+      const value = match[0].replace(/[),.;]+$/u, "");
+      if (value !== "http://www.w3.org/2000/svg") found.add(value);
+    }
+    if (depth >= 4) return;
+    for (const match of text.matchAll(/storedBase64["']?\s*:\s*["']([A-Za-z0-9+/=]+)["']/gu)) {
+      const stored = Buffer.from(match[1]!, "base64");
+      for (const unpack of [
+        () => gunzipSync(stored),
+        () => inflateSync(stored),
+      ]) {
+        try {
+          inspect(new Uint8Array(unpack()), depth + 1);
+          break;
+        } catch {
+          // The slot may use the other supported compression.
+        }
+      }
+    }
+  }
+  inspect(bytes, 0);
+  if (found.size > 0) {
+    throw new TypeError(label + " contains external resource locator(s): " + [...found].slice(0, 4).join(", "));
+  }
+}
 
 function base64Bytes(bytes: Uint8Array): Uint8Array {
   return encoder.encode(Buffer.from(bytes).toString("base64"));
@@ -527,6 +592,7 @@ export async function verifyKeelPublishedInlineModuleFragment(input: {
     : item.embedded.compression === "deflate"
       ? new Uint8Array(await inflateAsync(stored))
       : stored;
+  assertKeelInlineNoExternalDependencies(decoded, "Inline module " + input.moduleId);
   const [decodedIntegrity, storedIntegrity] = await Promise.all([
     createIntegrity(decoded),
     createIntegrity(stored),
@@ -691,9 +757,11 @@ function assertMarketplaceSafeDataURI(value: string, label: string): void {
   const header = value.slice(5, comma);
   const payload = value.slice(comma + 1);
   const mediaType = header.replace(/;base64$/iu, "");
+  const imageMediaType = mediaType.split(";", 1)[0]!;
   assertDataUriMediaType(mediaType);
   if (mediaType !== header) {
-    exactBase64Bytes(payload, `${label} Base64 payload`);
+    const bytes = exactBase64Bytes(payload, `${label} Base64 payload`);
+    if (imageMediaType.startsWith("image/")) assertKeelInlineImageBytes(bytes, imageMediaType, label);
     return;
   }
   for (let at = 0; at < payload.length; at += 1) {
@@ -704,6 +772,11 @@ function assertMarketplaceSafeDataURI(value: string, label: string): void {
       continue;
     }
     throw new TypeError(`${label} contains raw text that must be percent-escaped.`);
+  }
+  if (imageMediaType === "image/svg+xml") {
+    assertKeelInlineImageBytes(encoder.encode(decodeURIComponent(payload)), imageMediaType, label);
+  } else if (imageMediaType.startsWith("image/")) {
+    throw new TypeError(`${label} raster bytes must use the canonical exact Base64 image carriage.`);
   }
 }
 
@@ -718,15 +791,20 @@ function assertPreparedImageURI(value: string): void {
   throw new TypeError("A prepared Inline token image must be a self-contained data URI or an exact KEEL web3 object URI.");
 }
 
-/** Keep raster bytes binary until the URI boundary. SVG already contains its
- * raster data URIs, so a second Base64 envelope can be needlessly larger. */
+/**
+ * Prepare the direct image carriage once. Raster payload text is then split
+ * into its resource slot by the graph builder; a publisher or contract copies
+ * that exact ASCII payload and never encodes/decodes media at read time. SVG is
+ * the separate raw-percent text-media exception. GIF is never wrapped in SVG.
+ */
 export function buildKeelInlineImageURI(bytes: Uint8Array, mediaType: string): string {
   if (!['image/png', 'image/webp', 'image/avif', 'image/jpeg', 'image/gif', 'image/svg+xml'].includes(mediaType)) {
     throw new TypeError('Choose a supported inline image media type.');
   }
   if (!bytes.byteLength) throw new TypeError('An inline image cannot be empty.');
+  assertKeelInlineImageBytes(bytes, mediaType);
+  if (mediaType !== 'image/svg+xml') return prepareKeelInlineImageCarriage(bytes, mediaType).uri;
   const base64 = `data:${mediaType};base64,${Buffer.from(bytes).toString('base64')}`;
-  if (mediaType !== 'image/svg+xml') return base64;
   const percent = `data:${mediaType},${decoder.decode(compactPercentPayload(bytes))}`;
   const uri = percent.length < base64.length ? percent : base64;
   assertPreparedImageURI(uri);
@@ -777,6 +855,7 @@ export async function buildKeelInlineModuleFragment(input: {
   if (phase === "data" && execution !== "classic") {
     throw new TypeError("Inline data modules must use classic execution so they run before renderer code.");
   }
+  assertKeelInlineNoExternalDependencies(input.decodedBytes, "Inline module " + input.moduleId);
   const weight = input.weight ?? 0;
   orderKeelModules([{ moduleId: input.moduleId, phase, weight }]);
   const slot = await buildEmbeddedKeelViewerSlot({
@@ -925,6 +1004,7 @@ export async function buildKeelInlineLocalDocument(input: {
           `<script type="module">${source}</script>`,
         ].join(""))
       : htmlEntry!;
+  assertKeelInlineNoExternalDependencies(entrySource, "Inline entrypoint " + input.entry.id);
   const entry = await buildEmbeddedKeelViewerSlot({
     id: input.entry.id,
     ...(input.entry.backgroundColor === undefined ? {} : { backgroundColor: input.entry.backgroundColor }),
@@ -945,6 +1025,9 @@ export async function buildKeelInlineLocalDocument(input: {
       compression: asset.compression ?? "gzip",
     }),
   })));
+  for (const asset of assets) {
+    assertKeelInlineNoExternalDependencies(asset.source, "Inline asset " + asset.id);
+  }
   const parts: KeelInlineLocalDocument["parts"] = [
     { kind: "existing", role: "shell-prefix", bytes: input.shell.prefix.bytes, byteLength: input.shell.prefix.bytes.byteLength, integrity: input.shell.prefix.integrity },
     ...orderedModules.map((module) => ({
@@ -1457,6 +1540,8 @@ export async function buildKeelWeb3TokenJSONGraph(input: {
   /** Explicit separate SVG read. The source image remains required so both
    * matrix responses reuse the exact prepared asset slots. Never automatic. */
   readonly web3Image?: { readonly chainId: number; readonly resolver: Hex };
+  /** External image resolvers are an explicit existing-collection route. */
+  readonly presentationPolicy?: KeelPresentationPolicy;
 }) {
   if (!/^(0|[1-9][0-9]*)$/u.test(input.tokenId) || BigInt(input.tokenId) >= 1n << 256n) {
     throw new TypeError("tokenId must be a canonical uint256 decimal string.");
@@ -1466,6 +1551,11 @@ export async function buildKeelWeb3TokenJSONGraph(input: {
   }
   assertMarketplaceSafeDataURI(input.imageURI, "Token image");
   if (!input.imageURI.startsWith("data:image/")) throw new TypeError("Token image must be an inline image URI.");
+  const presentationPolicy = input.presentationPolicy ?? "collector-inline";
+  if (!["collector-inline", "external-resolver", "raw-artifact"].includes(presentationPolicy)) throw new TypeError("Unsupported presentation policy.");
+  if (input.web3Image !== undefined && presentationPolicy !== "external-resolver") {
+    throw new TypeError("web3Image is disabled for collector-facing Inline by default; select presentationPolicy: external-resolver explicitly for an existing collection.");
+  }
   let imageURI = input.imageURI;
   if (input.web3Image !== undefined) {
     if (!Number.isSafeInteger(input.web3Image.chainId) || input.web3Image.chainId <= 0) throw new TypeError("The image endpoint needs an explicit positive chain ID.");
@@ -1515,8 +1605,9 @@ export async function buildKeelWeb3TokenJSONGraph(input: {
     } else addMetadata("metadata-value", JSON.stringify(value));
   }
   addMetadata("image-field", `${fields.length ? "," : ""}"image":"`);
-  // Separate embedded raster payloads from SVG markup. An asset's encoded bytes
-  // can be shared by different token graphs regardless of its SVG element ID.
+  // Separate the already-prepared raster payload from SVG markup. The payload
+  // is a single exact ASCII resource slot that can be reused by different
+  // token graphs; no contract-side image encoding is implied by this split.
   const imageParts: { role: string; sourceKind: string; bytes: Uint8Array }[] = [];
   let imageCursor = 0;
   for (const match of input.imageURI.matchAll(/base64,([A-Za-z0-9+/=]+)/gu)) {
@@ -1581,6 +1672,7 @@ export async function buildKeelWeb3TokenJSONGraph(input: {
     animation_url: `data:text/html;charset=utf-8,${decoder.decode(graph.escapedHtmlBytes)}` })) {
     throw new Error("Web3 metadata graph changed its original fields or media.");
   }
+  if (presentationPolicy === "collector-inline") assertKeelCollectorInlineMetadata(metadata);
   return {
     schema: "keel-web3-token-json-graph@1" as const,
     tokenId: input.tokenId, mediaType: "application/json" as const,
@@ -1752,6 +1844,8 @@ export async function buildKeelPreparedOneOfOneTokenURI(input: {
    * the contract's seed system are byte-for-byte aligned.
    */
   readonly derivedTokenSeed?: Hex;
+  /** Collector-facing Inline is the default. Other routes must be explicit. */
+  readonly presentationPolicy?: KeelPresentationPolicy;
 }): Promise<KeelPreparedOneOfOneTokenURI> {
   if (!Number.isSafeInteger(input.chainId) || input.chainId <= 0) {
     throw new TypeError("A prepared tokenURI needs a positive safe chain ID.");
@@ -1760,6 +1854,8 @@ export async function buildKeelPreparedOneOfOneTokenURI(input: {
     throw new TypeError("A prepared tokenURI needs a canonical manifest digest.");
   }
   const collection = getAddress(input.collection);
+  const presentationPolicy = input.presentationPolicy ?? "collector-inline";
+  if (!["collector-inline", "external-resolver", "raw-artifact"].includes(presentationPolicy)) throw new TypeError("Unsupported presentation policy.");
   const artifact = input.artifact === undefined ? undefined : (() => {
     const store = getAddress(input.artifact.store);
     if (!/^0x[0-9a-f]{64}$/iu.test(input.artifact.objectId)) {
@@ -1827,6 +1923,9 @@ export async function buildKeelPreparedOneOfOneTokenURI(input: {
     : input.graph.mediaType === "application/vnd.keel.token-uri-percent-fragment"
       ? "percent"
       : "base64";
+  if (presentationPolicy === "collector-inline" && animationEncoding !== "raw-percent") {
+    throw new TypeError("Collector-facing Inline requires the automatic raw-percent carriage. Legacy Base64 requires an explicit presentation policy.");
+  }
   if (
     input.graph.mediaType !== "application/vnd.keel.token-uri-base64-fragment"
     && input.graph.mediaType !== "application/vnd.keel.token-uri-base64-body-fragment"
@@ -1873,7 +1972,8 @@ export async function buildKeelPreparedOneOfOneTokenURI(input: {
     if (tokenJSON !== expectedJSON) throw new Error("Prepared raw-percent fragments changed the exact token JSON bytes.");
     const metadata = JSON.parse(tokenJSON) as { readonly animation_url?: unknown };
     if (typeof metadata.animation_url !== "string") throw new Error("Prepared token metadata has no animation_url.");
-    assertMarketplaceSafeDataURI(metadata.animation_url, "Prepared token animation_url");
+    if (presentationPolicy === "collector-inline") assertKeelCollectorInlineMetadata(metadata);
+    else assertMarketplaceSafeDataURI(metadata.animation_url, "Prepared token animation_url");
     return {
       schema: "keel-prepared-one-of-one-token-uri@1",
       animationEncoding,
@@ -1913,7 +2013,8 @@ export async function buildKeelPreparedOneOfOneTokenURI(input: {
   if (tokenJSON !== expectedJSON) throw new Error("Prepared tokenURI fragments changed the exact token JSON bytes.");
   const metadata = JSON.parse(tokenJSON) as { readonly animation_url?: unknown };
   if (typeof metadata.animation_url !== "string") throw new Error("Prepared token metadata has no animation_url.");
-  assertMarketplaceSafeDataURI(metadata.animation_url, "Prepared token animation_url");
+  if (presentationPolicy === "collector-inline") assertKeelCollectorInlineMetadata(metadata);
+  else assertMarketplaceSafeDataURI(metadata.animation_url, "Prepared token animation_url");
   return {
     schema: "keel-prepared-one-of-one-token-uri@1",
     animationEncoding,

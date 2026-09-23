@@ -32,7 +32,7 @@ const hold = { name: "KeelHold", address: SEPOLIA_KEEL.KeelHold, tx: SEPOLIA_KEE
 const builder = { name: "KeelRawTokenURIBuilder", address: SEPOLIA_KEEL.KeelRawTokenURIBuilder, tx: SEPOLIA_KEEL.deployments.KeelRawTokenURIBuilder, bytecode: await creation(SEPOLIA_KEEL.deployments.KeelRawTokenURIBuilder, 32) };
 
 // Deploy both on a throwaway anvil and compare runtime code with Sepolia's.
-const anvil = spawn("anvil", ["--port", "0"], { stdio: ["ignore", "pipe", "pipe"] });
+const anvil = spawn("anvil", ["--port", "0", "--prune-history"], { stdio: ["ignore", "pipe", "pipe"] });
 try {
   const url = await new Promise((resolve, reject) => {
     let out = "";

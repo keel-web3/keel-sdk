@@ -11,7 +11,7 @@ const renderBuild=await json(`${root}/renderer-solc-output.json`);
 if(renderBuild.errors?.some(e=>e.severity==='error'))throw Error(JSON.stringify(renderBuild.errors));
 const rendererBuild=renderBuild.contracts['KeelGatorImageRenderer.sol'].KeelGatorImageRenderer;
 const holdBuild=await json('/Users/ravonus/dev/keel-contracts/out/KeelHold.sol/KeelHold.json');
-const child=spawn('anvil',['--port','0','--chain-id','31337'],{stdio:['ignore','pipe','pipe']});
+const child=spawn('anvil',['--port','0','--chain-id','31337','--prune-history'],{stdio:['ignore','pipe','pipe']});
 try{
  const url=await new Promise((resolve,reject)=>{let output='';const timer=setTimeout(()=>reject(Error('Local EVM startup timed out')),20000);child.on('error',reject);child.on('exit',()=>reject(Error('Local EVM exited')));child.stdout.on('data',chunk=>{output+=chunk;const m=output.match(/Listening on (127\.0\.0\.1:\d+)/);if(m){clearTimeout(timer);resolve('http://'+m[1]);}});});
  const client=createPublicClient({transport:http(url,{timeout:60000})}),wallet=createWalletClient({transport:http(url,{timeout:60000})});assert.equal(await client.getChainId(),31337);const [account,other]=await wallet.getAddresses();

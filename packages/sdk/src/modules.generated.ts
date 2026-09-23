@@ -2,7 +2,7 @@
 // Source: packages/contracts/modules/*/keel.module.json and */deployments/*.json
 
 /** Reusable protocol infrastructure. Each module ships as its own repository. */
-export type KeelModuleId = "keel-kernel" | "keel-codecs" | "keel-hold" | "keel-artifacts" | "keel-graph" | "keel-harness" | "keel-presentation" | "keel-die" | "keel-creator-identity" | "keel-mint-access" | "keel-market" | "keel-anchors" | "keel-crucible" | "keel-ip-control" | "keel-sleeve" | "keel-web3-url" | "keel-cross-chain-mint" | "keel-stake";
+export type KeelModuleId = "keel-kernel" | "keel-codecs" | "keel-hold" | "keel-artifacts" | "keel-graph" | "keel-harness" | "keel-presentation" | "keel-die" | "keel-creator-identity" | "keel-mint-access" | "keel-market" | "keel-anchors" | "keel-crucible" | "keel-ip-control" | "keel-sleeve" | "keel-web3-url" | "keel-cross-chain-mint" | "keel-publication" | "keel-stake";
 
 /**
  * Concrete products built on the modules. Apps consume modules exactly as an
@@ -75,11 +75,16 @@ export const KEEL_MODULES: readonly KeelModule[] = [
       "interfaces/IKeelMintSeededErrors.sol",
       "interfaces/IKeelMintSeededData.sol",
       "interfaces/IKeelVrfV2Plus.sol",
-      "interfaces/IKeelGovernanceErrors.sol", "interfaces/IKeelPlatformFeeErrors.sol", "interfaces/IKeelFeeTreasuryErrors.sol", "interfaces/IKeelFeeTreasuryEvents.sol",
+      "interfaces/IKeelGovernanceErrors.sol",
+      "interfaces/IKeelPlatformFeeErrors.sol",
+      "interfaces/IKeelFeeTreasuryErrors.sol",
+      "interfaces/IKeelFeeTreasuryEvents.sol",
       "interfaces/IKeelAccessGroupErrors.sol",
       "interfaces/IKeelAccessGroupEvents.sol",
       "KeelRecoveryGroups.sol",
-      "interfaces/IKeelRecoveryErrors.sol"
+      "interfaces/IKeelRecoveryErrors.sol",
+      "interfaces/IKeelMetadataRelay.sol",
+      "libraries/KeelMetadataSubscriptions.sol"
     ],
     "deployable": [
       "KeelFeeTreasury",
@@ -138,7 +143,8 @@ export const KEEL_MODULES: readonly KeelModule[] = [
       "libraries/KeelHoldMetadata.sol",
       "interfaces/IKeelHoldErrors.sol",
       "interfaces/IKeelIndexErrors.sol",
-      "interfaces/IKeelIndexEvents.sol"
+      "interfaces/IKeelIndexEvents.sol",
+      "interfaces/IKeelIndexMetadataReceiver.sol"
     ],
     "deployable": [
       "Ingot",
@@ -209,7 +215,7 @@ export const KEEL_MODULES: readonly KeelModule[] = [
     "title": "Graph trust lattice",
     "group": "core",
     "visibility": "private",
-    "summary": "Graph/plugin/library/module registries \u2014 the on-chain trust lattice the runtime re-derives against.",
+    "summary": "Graph/plugin/library/module registries — the on-chain trust lattice the runtime re-derives against.",
     "version": "0.3.0",
     "repo": "keel-web3/keel-graph",
     "deps": [],
@@ -254,7 +260,9 @@ export const KEEL_MODULES: readonly KeelModule[] = [
       "KeelObjectURIBuilder.sol",
       "KeelRawTokenURIBuilder.sol",
       "interfaces/IKeelObjectURIBuilder.sol",
-      "interfaces/IKeelRawTokenURIBuilder.sol"
+      "interfaces/IKeelRawTokenURIBuilder.sol",
+      "KeelSVGRenderer.sol",
+      "interfaces/IKeelSVGRenderer.sol"
     ],
     "deployable": [
       "KeelHarnessBuilder",
@@ -276,7 +284,13 @@ export const KEEL_MODULES: readonly KeelModule[] = [
     "contracts": [
       "KeelPresentationStateRegistry.sol",
       "KeelVisualStateLedger.sol",
-      "interfaces/IKeelPresentationRegistry.sol"
+      "interfaces/IKeelPresentationRegistry.sol",
+      "interfaces/IKeelImmutableObjectSource.sol",
+      "interfaces/IKeelPresentationStateErrors.sol",
+      "interfaces/IKeelPresentationStateEvents.sol",
+      "interfaces/IKeelStakingAdapter.sol",
+      "interfaces/IKeelVisualStateLedgerErrors.sol",
+      "interfaces/IKeelVisualStateLedgerEvents.sol"
     ],
     "deployable": [
       "KeelPresentationStateRegistry",
@@ -339,6 +353,7 @@ export const KEEL_MODULES: readonly KeelModule[] = [
       "interfaces/IKeelTokenRenderer.sol",
       "interfaces/IKeelCreatorDirectory.sol",
       "KeelRawPrepared721.sol",
+      "KeelRouted721.sol",
       "Keel721Presentation.sol",
       "interfaces/IKeel721Errors.sol",
       "interfaces/IKeel721Events.sol",
@@ -347,10 +362,12 @@ export const KEEL_MODULES: readonly KeelModule[] = [
       "interfaces/IKeelMintTargetErrors.sol",
       "interfaces/IKeelStrikeCapacityEvents.sol",
       "interfaces/IKeel721PresentationEvents.sol",
-      "KeelRouted721.sol",
-      "libraries/KeelSeedBlockEntropy.sol",
       "interfaces/IKeelDeferredCollectionResolver.sol",
-      "interfaces/IKeelDeferredMintSetup.sol"
+      "interfaces/IKeelDeferredMintSetup.sol",
+      "interfaces/IKeelMetadataEvents.sol",
+      "interfaces/IKeelMetadataReceiver.sol",
+      "libraries/Keel721MetadataFormatting.sol",
+      "libraries/KeelSeedBlockEntropy.sol"
     ],
     "deployable": [
       "KEEL721",
@@ -453,26 +470,30 @@ export const KEEL_MODULES: readonly KeelModule[] = [
       "KeelQueueLotteryPool.sol",
       "interfaces/IKeelLotteryQueueState.sol",
       "interfaces/IKeelQueueEntropyRecovery.sol",
+      "interfaces/IKeelAchievementEligibility.sol",
+      "interfaces/IKeelAuctionIssuer.sol",
+      "interfaces/IKeelAuctionIssuerErrors.sol",
+      "interfaces/IKeelAuctionIssuerEvents.sol",
+      "interfaces/IKeelAuctionPublication.sol",
+      "interfaces/IKeelAuctionReleaseRouter.sol",
+      "interfaces/IKeelDeferredAuctionIssuer.sol",
+      "interfaces/IKeelMintQueueErrors.sol",
+      "interfaces/IKeelMintQueueEvents.sol",
       "interfaces/IKeelMintRewardEntropyErrors.sol",
       "interfaces/IKeelMintRewardEntropyEvents.sol",
       "interfaces/IKeelQueueAccessErrors.sol",
       "interfaces/IKeelQueueAccessEvents.sol",
+      "interfaces/IKeelQueueDemandErrors.sol",
+      "interfaces/IKeelQueueDemandEvents.sol",
       "interfaces/IKeelQueueLotteryEngineErrors.sol",
       "interfaces/IKeelQueueLotteryPoolErrors.sol",
-      "interfaces/IKeelQueueDemandErrors.sol",
+      "interfaces/IKeelQueuePeriod.sol",
       "interfaces/IKeelQueuePriorityErrors.sol",
       "interfaces/IKeelQueueReadAdapterErrors.sol",
-      "interfaces/IKeelQueueDemandEvents.sol",
-      "interfaces/IKeelQueuePeriod.sol",
-      "interfaces/IKeelMintQueueErrors.sol",
-      "interfaces/IKeelMintQueueEvents.sol",
-      "interfaces/IKeelAuctionIssuer.sol",
-      "interfaces/IKeelAuctionIssuerErrors.sol",
-      "interfaces/IKeelAuctionIssuerEvents.sol",
-      "interfaces/IKeelAuctionReleaseRouter.sol",
-      "interfaces/IKeelUniqueTarget.sol",
-      "interfaces/IKeelDeferredAuctionIssuer.sol",
-      "interfaces/IKeelAuctionPublication.sol"
+      "interfaces/IKeelRewardClaimsErrors.sol",
+      "interfaces/IKeelRewardClaimsEvents.sol",
+      "interfaces/IKeelRewardReceiver.sol",
+      "interfaces/IKeelUniqueTarget.sol"
     ],
     "deployable": [
       "FrayAuctionIssuer",
@@ -546,7 +567,10 @@ export const KEEL_MODULES: readonly KeelModule[] = [
       "interfaces/IKeelAnchorProofBackend.sol",
       "interfaces/IKeelAnchorProofVerifier.sol",
       "interfaces/IKeelAnchoredChainQueries.sol",
-      "interfaces/IKeelSettlementSource.sol"
+      "interfaces/IKeelSettlementSource.sol",
+      "vendor/sp1/ISP1Verifier.sol",
+      "vendor/sp1/v5.0.0/Groth16Verifier.sol",
+      "vendor/sp1/v5.0.0/SP1VerifierGroth16.sol"
     ],
     "deployable": [
       "KeelProofUpgradeController",
@@ -591,7 +615,7 @@ export const KEEL_MODULES: readonly KeelModule[] = [
     "deployable": [
       "KeelCollectionAttestationRegistry",
       "KeelCollectionVerificationRegistry",
-      "KeelCommunityReplicationRegistry",
+      "KeelCommunityReplicationRegistry"
     ]
   },
   {
@@ -631,7 +655,8 @@ export const KEEL_MODULES: readonly KeelModule[] = [
     "version": "0.3.0",
     "repo": "keel-web3/keel-sleeve",
     "deps": [
-      "keel-hold"
+      "keel-hold",
+      "keel-kernel"
     ],
     "contracts": [
       "KeelSleeve.sol",
@@ -643,7 +668,10 @@ export const KEEL_MODULES: readonly KeelModule[] = [
       "interfaces/IKeelTokenMatrixEvents.sol",
       "KeelMetadataRelay.sol",
       "interfaces/IKeelMetadataRelayErrors.sol",
-      "interfaces/IKeelMetadataRelayEvents.sol"
+      "interfaces/IKeelMetadataRelayEvents.sol",
+      "interfaces/IKeelSleeveErrors.sol",
+      "interfaces/IKeelStoredTokenJSONErrors.sol",
+      "interfaces/IKeelStoredTokenJSONEvents.sol"
     ],
     "deployable": [
       "KeelSleeve",
@@ -675,26 +703,42 @@ export const KEEL_MODULES: readonly KeelModule[] = [
   {
     "id": "keel-cross-chain-mint",
     "kind": "module",
-    "title": "Cross-chain mint",
+    "title": "Optional cross-chain mint bridge",
     "group": "token",
     "visibility": "private",
-    "summary": "Bridged mint intents and the batcher that carries them between chains.",
+    "summary": "Optional attested cross-chain mint requests; not required for storage, publication, or local minting.",
     "version": "0.3.0",
     "repo": "keel-web3/keel-cross-chain-mint",
     "deps": [
       "keel-kernel",
-      "keel-mint-access",
+      "keel-mint-access"
+    ],
+    "contracts": [
+      "KeelCrossChainMintBridge.sol"
+    ],
+    "deployable": [
+      "KeelCrossChainMintBridge"
+    ]
+  },
+  {
+    "id": "keel-publication",
+    "kind": "module",
+    "title": "Publication",
+    "group": "core",
+    "visibility": "private",
+    "summary": "Optional upload batching and resumable publication jobs, including the explicitly selected history-inscription mode.",
+    "version": "0.3.0",
+    "repo": "keel-web3/keel-publication",
+    "deps": [
       "keel-hold"
     ],
     "contracts": [
-      "KeelCrossChainMintBridge.sol",
       "KeelCarrierBatcher.sol",
       "KeelHistoryPublicationJob.sol",
       "KeelPublicationJob.sol"
     ],
     "deployable": [
       "KeelCarrierBatcher",
-      "KeelCrossChainMintBridge",
       "KeelHistoryPublicationJob",
       "KeelPublicationJob"
     ]
@@ -705,7 +749,7 @@ export const KEEL_MODULES: readonly KeelModule[] = [
     "title": "Stake objects",
     "group": "assets",
     "visibility": "private",
-    "summary": "Stake-object custody and the seasonal grove state that consumes it.",
+    "summary": "Configurable ERC-721 staking custody, frozen terms, and optional token-bound accounts.",
     "version": "0.3.0",
     "repo": "keel-web3/keel-stake",
     "deps": [
@@ -713,7 +757,10 @@ export const KEEL_MODULES: readonly KeelModule[] = [
       "keel-kernel"
     ],
     "contracts": [
-      "KeelStakeObjectManager.sol"
+      "KeelStakeObjectManager.sol",
+      "interfaces/IKeelStakeObjectErrors.sol",
+      "interfaces/IKeelStakeObjectEvents.sol",
+      "interfaces/IKeelTokenBoundAccountRegistry.sol"
     ],
     "deployable": [
       "KeelStakeObjectManager"

@@ -105,7 +105,8 @@
     "game:publish": "node packages/game-engine/chain/publish.mjs",
     "game:e2e": "node packages/game-engine/chain/alpha-e2e.mjs",
     "game:engine-check": "node packages/game-engine/chain/engine-check.mjs",
-    "game:sepolia-dry-run": "node packages/game-engine/chain/sepolia-dry-run.mjs"
+    "game:sepolia-dry-run": "node packages/game-engine/chain/sepolia-dry-run.mjs",
+    "game:arena": "node packages/game-engine/chain/arena.mjs"
   },
   "engines": {
     "node": ">=22"

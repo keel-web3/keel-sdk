@@ -5,6 +5,7 @@ import type { JsonSchema, ToolDefinition } from "./types.js";
 import { contractControls, parseContractAbi } from "@keel/sdk/contract-controls";
 import { inspectNetwork, type KeelNetworkInspectionTarget } from "@keel/sdk/network-inspection";
 import { TOOL_SCHEMAS } from "./schemas.js";
+import { createIntegrity } from "@keel/protocol";
 
 const properties: Record<string, JsonSchema> = {};
 for (const [key, choices] of Object.entries(KEEL_ENGINE_CHOICES)) {
@@ -80,6 +81,51 @@ function tezosStandardRoutePlan(value: unknown) {
   });
 }
 
+const CONTRACT_WORKFLOW_DOCUMENTS = [
+  "README.md",
+  "docs/ARCHITECTURE.md",
+  "docs/KEEL_CONTRACTS.md",
+  "docs/KEEL_MODULES.md",
+  "docs/KEEL_PRESENTATION.md",
+  "docs/KEEL_VERIFICATION_SHELL.md",
+  "docs/INLINE_RECORD.md",
+  "docs/CONTENT_SYSTEM_STATUS.md",
+  "docs/PROOF_MARKET_PACKING.md",
+] as const;
+
+async function contractWorkflowPreflight(context: { readonly workspace: { readFile(pathValue: string, maxBytes: number): Promise<{ readonly path: string; readonly bytes: Uint8Array }> } }) {
+  const documents: Array<{ path: string; byteLength: number; sha256: string; status: "read" }> = [];
+  const unavailable: string[] = [];
+  for (const relativePath of CONTRACT_WORKFLOW_DOCUMENTS) {
+    try {
+      const loaded = await context.workspace.readFile(relativePath, 1_000_000);
+      const integrity = await createIntegrity(loaded.bytes);
+      documents.push({ path: relativePath, byteLength: loaded.bytes.byteLength, sha256: integrity.digest, status: "read" });
+    } catch (error) {
+      if (error !== null && typeof error === "object" && (error as { readonly code?: unknown }).code === "ENOENT") {
+        unavailable.push(relativePath);
+        continue;
+      }
+      throw error;
+    }
+  }
+  if (!documents.some((document) => document.path === "README.md")) throw new Error("Contract workflow preflight requires the target repository README.md.");
+  if (!documents.some((document) => document.path.startsWith("docs/"))) throw new Error("Contract workflow preflight requires at least one target repository docs/ file.");
+  return {
+    schema: "keel-contract-workflow-preflight@1",
+    status: "docs-read-module-scan-required" as const,
+    workspace: context.workspace,
+    documents,
+    unavailable,
+    requiredNext: ["keel-engine-catalog", "keel-network-inspect", "keel-library-search", "keel-contract-controls"] as const,
+    moduleScan: { required: true, selectedChain: "not-inspected", action: "Call keel-library-search against the selected chain before creating or redeploying any reusable contract/module." },
+    edgeCases: ["existing contract or proxy", "existing graph revision", "canonical shell and builder reuse", "selected-chain module/address ambiguity", "receipt and public byte read-back", "legacy presentation explicitly requested"],
+    authority: "review-only",
+    signing: "not-performed",
+    submission: "not-performed",
+  };
+}
+
 export const ENGINE_TOOL_DEFINITIONS: readonly ToolDefinition[] = [{
   descriptor: {
     name: "keel-network-inspect",
@@ -101,17 +147,29 @@ export const ENGINE_TOOL_DEFINITIONS: readonly ToolDefinition[] = [{
   async run(_context, value) { return tezosStandardRoutePlan(value); },
 }, {
   descriptor: {
+    name: "keel-contract-workflow-preflight",
+    description: "Mandatory read-only start for contract, collection, viewer, metadata, deployment or release work. Reads the target README and available relevant docs, records their byte digests, and returns the required engine, selected-chain, module-catalog, edge-case and contract-control checks. It never signs or submits.",
+    inputSchema: { type: "object", properties: {}, additionalProperties: false },
+  },
+  async run(context, value) {
+    if (!value || typeof value !== "object" || Array.isArray(value) || Object.keys(value).length) throw new TypeError("Contract workflow preflight accepts an empty object.");
+    const result = await contractWorkflowPreflight(context);
+    return { ...result, workspace: context.workspace.root };
+  },
+}, {
+  descriptor: {
     name: "keel-contract-controls",
-    description: "Inspect an uploaded ABI or compiler artifact as bounded JSON text and list exact read/write signatures and parameter controls. ABI import proves neither code identity nor user authority; proxy calls target the proxy. No RPC or wallet action occurs.",
+    description: "Inspect an uploaded ABI or compiler artifact as bounded JSON text and list exact read/write signatures and parameter controls. Contract work must first read the target README/docs, call keel-engine-catalog, inspect the selected chain, and search selected-chain modules; this tool does not replace that workflow. ABI import proves neither code identity nor user authority; proxy calls target the proxy. No RPC or wallet action occurs.",
     inputSchema: { type: "object", properties: { abiJson: { type: "string", minLength: 2, maxLength: 512000 } }, required: ["abiJson"], additionalProperties: false },
   },
-  async run(_context, value) {
+  async run(context, value) {
     if (!value || typeof value !== "object" || Array.isArray(value)) throw new TypeError("Contract controls require abiJson.");
     const input = value as Record<string, unknown>;
     if (Object.keys(input).some((key) => key !== "abiJson") || typeof input.abiJson !== "string" || input.abiJson.length > 512000) throw new TypeError("Contract controls require bounded abiJson only.");
     const result = { schema: "keel-contract-controls@1", controls: contractControls(parseContractAbi(input.abiJson)), authority: "unverified", signing: "not-performed", submission: "not-performed" };
     if (JSON.stringify(result).length > 262144) throw new TypeError("Contract controls exceed the MCP response budget. Inspect a smaller ABI.");
-    return result;
+    const preflight = await contractWorkflowPreflight(context);
+    return { ...result, workflowPreflight: { schema: preflight.schema, status: preflight.status, documents: preflight.documents, requiredNext: preflight.requiredNext, moduleScan: preflight.moduleScan, edgeCases: preflight.edgeCases } };
   },
 }, {
   descriptor: {
