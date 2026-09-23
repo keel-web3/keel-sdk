@@ -41,10 +41,10 @@ export async function publishEngineRelease({ rpc, deployment, builds, shell, log
  * Publish one game. Shared parts must already be on chain (the engine
  * release) unless `includeEngine`: then this publish stores them too.
  */
-export async function publishGame({ rpc, deployment, project, projects, gameId, builds, shell, includeEngine = false, context = {}, log = () => {}, record = true }) {
+export async function publishGame({ rpc, deployment, project, projects, gameId, entryExport = "main", builds, shell, includeEngine = false, context = {}, log = () => {}, record = true }) {
   const { publicClient, walletClient, account, chainId } = await clientsFor(rpc);
   const engine = await buildsOf(builds);
-  const { doc, engineModuleIds } = await engine.buildGame({ project, projects, gameId, shell });
+  const { doc, engineModuleIds } = await engine.buildGame({ project, projects, gameId, entryExport, shell });
   const plan = await planGame({ doc, engineModuleIds, hold: deployment.KeelHold, gameId });
   const missing = await missingOnChain({ publicClient, plan });
   const absent = missingShared(missing);
@@ -56,7 +56,7 @@ export async function publishGame({ rpc, deployment, project, projects, gameId, 
   log(`${gameId}: ${plan.parts.length} parts (${plan.parts.filter((p) => p.share === "game").length} its own), ${txs.length} transactions to send.`);
   const receipts = await sendAll({ publicClient, walletClient, account, txs, log });
   // Read it back from the chain and hold it against the local build.
-  const back = await readGame({ publicClient, builder: deployment.KeelRawTokenURIBuilder, rootId: plan.root.objectId, digest: plan.root.digest, context, name: gameId });
+  const back = await readGame({ publicClient, builder: deployment.KeelRawTokenURIBuilder, rootId: plan.root.objectId, digest: plan.root.digest, context, name: entryExport === "main" ? gameId : `${gameId}/${entryExport}` });
   const local = new Uint8Array(doc.html);
   const same = back.html.byteLength >= local.byteLength && hex(back.html.subarray(0, local.byteLength)) === hex(local);
   if (!same) throw new Error(`${gameId} read back from the chain does not match the local build.`);
@@ -65,7 +65,7 @@ export async function publishGame({ rpc, deployment, project, projects, gameId, 
   const releaseRecord = readRecord("engine-release");
   const enginePin = releaseRecord?.chainId === chainId && releaseRecord?.hold === deployment.KeelHold ? releaseRecord.release?.pin ?? null : null;
   const result = {
-    gameId, chainId, root: plan.root.objectId, digest: plan.root.digest, builder: deployment.KeelRawTokenURIBuilder, hold: deployment.KeelHold,
+    gameId, ...(entryExport === "main" ? {} : { entryExport }), chainId, root: plan.root.objectId, digest: plan.root.digest, builder: deployment.KeelRawTokenURIBuilder, hold: deployment.KeelHold,
     documentBytes: local.byteLength, readBackBytes: back.html.byteLength, readBackMatches: same,
     stored: planTotals(plan, ["game"]), shared: planTotals(plan, ["shell", "engine"]), gas: gasByShare(receipts), transactions: receipts.length,
     reused: plan.parts.filter((p) => p.share !== "game").map((p) => ({ role: p.role, ...(p.moduleId ? { moduleId: p.moduleId, version: p.version } : {}), objectId: p.objectId })),
@@ -75,7 +75,7 @@ export async function publishGame({ rpc, deployment, project, projects, gameId, 
   };
   if (record) {
     const games = readRecord("games")?.games ?? [];
-    writeRecord("games", { games: [...games.filter((g) => !(g.gameId === gameId && g.chainId === chainId)), { gameId, chainId, root: result.root, digest: result.digest, project, publishedAt: result.publishedAt, documentBytes: result.documentBytes, engineRelease: enginePin }] });
+    writeRecord("games", { games: [...games.filter((g) => !(g.gameId === gameId && (g.entryExport ?? "main") === entryExport && g.chainId === chainId)), { gameId, ...(entryExport === "main" ? {} : { entryExport }), chainId, root: result.root, digest: result.digest, project, publishedAt: result.publishedAt, documentBytes: result.documentBytes, engineRelease: enginePin }] });
   }
   return { result, html: back.html };
 }
