@@ -1,4 +1,6 @@
-import test from 'node:test';
+import nodeTest from 'node:test';
+import { siblingTest } from "./sibling-repository.mjs";
+const test = siblingTest(nodeTest, "keel-contracts");
 import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
 import {decodeFunctionData,encodeFunctionResult} from 'viem';
