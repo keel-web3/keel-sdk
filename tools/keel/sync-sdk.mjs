@@ -7,9 +7,10 @@
 import { readFileSync, readdirSync, writeFileSync, existsSync, mkdirSync, rmSync } from "node:fs";
 import { join, resolve } from "node:path";
 import { MODULES, TIER_OF } from "./module-map.mjs";
+import { CONTRACTS_ROOT } from "./contracts-root.mjs";
 
 const REPO = resolve(import.meta.dirname, "../..");
-const metaDir = (id) => join(REPO, "../keel-contracts", TIER_OF.get(id), id);
+const metaDir = (id) => join(CONTRACTS_ROOT, TIER_OF.get(id), id);
 const TARGET = join(REPO, "packages/sdk/src/modules.generated.ts");
 const ABI_DIR = join(REPO, "packages/sdk/src/abis");
 const abiOnly = process.argv.find(arg => arg.startsWith("--abis-only="))?.slice("--abis-only=".length);
