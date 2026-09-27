@@ -16,7 +16,7 @@ export const KEEL_ENGINE_CHOICES = {
   storage: ["inline", "native", "hybrid", "ipfs", "wake"],
   releaseType: ["one-of-one", "limited-edition", "open-edition", "series"],
   collection: ["erc721a", "erc721", "erc1155", "shared-erc1155", "tezos-fa2", "existing", "external"],
-  mintSystem: ["admin-mint", "mint-gate", "one-mint", "fray-auction"],
+  mintSystem: ["admin-mint", "mint-gate", "one-mint", "fray-auction", "mined-hash"],
   access: ["public", "allowlist", "erc20", "erc721", "erc721-token", "erc1155", "custom"],
   gateLogic: ["all", "any"],
   signature: ["none", "creator", "platform", "either"],
@@ -94,8 +94,45 @@ export const KEEL_ENGINE_CATALOG = {
   mintSystems: [
     { id: "admin-mint", label: "Mint to a recipient", behavior: "Creator-authorized mint; confirm recipient, item binding and remaining capacity.", sdk: "buildKeelCreatorAdminMintCall", mcp: "sdk-only" },
     { id: "mint-gate", label: "Sale or gated mint", behavior: "Independent campaign supply and wallet limits; native or exact ERC-20 payments; combinable gates and optional signatures.", sdk: "buildCampaign", mcp: "planning-only" },
-    { id: "one-mint", label: "A drop with phases", behavior: "Ordered stages share a single drop allocation and per-wallet count. Claim consumes owned entitlements once; premint is authority-only.", sdk: "buildOneMintDrop", mcp: "planning-only", stages: KEEL_ENGINE_CHOICES.stage, unsupported: ["proof-of-work", "auction", "neural-payment", "airdrop"] },
+    { id: "one-mint", label: "A drop with phases", behavior: "Ordered stages share a single drop allocation and per-wallet count. Claim consumes owned entitlements once; premint is authority-only.", sdk: "buildOneMintDrop", mcp: "planning-only", stages: KEEL_ENGINE_CHOICES.stage, unsupported: ["proof-of-work", "auction", "neural-payment", "airdrop"], note: "Proof-of-work is not a OneMint stage; use the mined-hash mint system." },
     { id: "fray-auction", label: "Fray auction", behavior: "Family-specific economics from digest-bound intake; select one of four presets.", mcp: "fray-auction-intake", presets: [1, 2, 3, 4] },
+    {
+      id: "mined-hash",
+      label: "Proof-of-work (mined hash) mint",
+      behavior: "The collector's browser searches for a salt whose hash meets a difficulty target, then mints in ONE transaction. The winning hash can seed the token.",
+      status: "documented-pattern",
+      mcp: "planning-only",
+      reference: "No shared KEEL contract. OneMint reserves StageKind.ProofOfWork and rejects it, and docs/MINT_ACCESS.md keeps proof-of-work in a separate reviewed adapter. Implement it in the project's own contract (or a narrow gate adapter) and keep the audit/workflow gates.",
+      checks: [
+        "Digest binds block.chainid, address(this), msg.sender (the minter) and a recent block anchor: keccak256(abi.encode(chainid, contract, minter, anchorNumber, blockhash(anchorNumber), salt)). A hash mined for one chain, contract or wallet must not verify for another.",
+        "Anchor freshness: require anchorNumber < block.number and block.number - anchorNumber <= window, with window <= 256 so blockhash(anchorNumber) is never zero; reject a zero blockhash explicitly.",
+        "Difficulty: uint256(digest) <= target (or leading zero bits >= difficulty). Target and window are fixed at deploy or changed only by KeelAuthority, and each change is evented.",
+        "Single use: mapping(bytes32 digest => bool) spent; set before any external call (checks-effects-interactions) and revert on reuse.",
+        "One transaction: mine(salt, anchorNumber) verifies, marks spent and mints in the same call. No commit/reveal, no off-chain signer, no second transaction.",
+        "Supply and per-wallet caps are checked in the same call; payment (if any) uses exact msg.value.",
+        "The seed derived from the digest is stored or emitted so tokenURI is reproducible, and tokenURI still passes keel-token-standard-audit (onchain data:image, canonical shell).",
+        "Tests: wrong chain/contract/minter, stale anchor (> window), future anchor, reused digest, digest above target, and a fuzzed valid mine.",
+      ],
+    },
+  ],
+  contractPatterns: [
+    {
+      id: "module-router-controller",
+      label: "Upgradeable module-router controller",
+      status: "documented-pattern",
+      behavior: "One fixed controller address that holders, marketplaces and other contracts keep forever. A fallback routes each 4-byte selector to a module via delegatecall, so features are added or replaced by swapping modules, not addresses.",
+      reference: "Authority: KeelAuthority (keel-contracts src/modules/keel-kernel/KeelAuthority.sol). ERC-7201 layout precedent: KeelManager (keel-contracts src/modules/keel-artifacts/KeelManager.sol). There is no shared KEEL router contract; do not add one to keel-contracts from a project.",
+      checks: [
+        "Fixed address: the controller is deployed once (non-proxy or immutable proxy) and never redeployed; its tokenURI/metadata entry points stay on that address.",
+        "Routing table: mapping(bytes4 selector => address module); fallback reverts on an unknown selector and never forwards to a default module. Controller-owned selectors (routing, freeze, authority) cannot be routed.",
+        "Admin = KeelAuthority: setModule/setModules and freeze are callable only by the KeelAuthority address; no EOA owner, no Ownable. Routing changes emit ModuleSet(selector, oldModule, newModule).",
+        "Module code checks: module.code.length > 0, and a module declares the selectors it implements so a batch update is checked against that list.",
+        "Storage: every module keeps its state in its own ERC-7201 namespace (keccak256(abi.encode(uint256(keccak256(\"<project>.<module>.storage\")) - 1)) & ~bytes32(uint256(0xff))) with the @custom:storage-location erc7201 annotation. No module declares plain state variables; the controller's own state is namespaced too.",
+        "One-way freeze: freeze() (or freezeSelector) permanently disables routing changes; there is no unfreeze path and setModule reverts after freeze. Freeze is evented.",
+        "Upgrade review: a replacement module must keep the namespace layout (append-only structs); run a storage-layout diff before routing a new module.",
+        "Tests: unknown selector reverts, non-authority setModule reverts, frozen setModule reverts, namespaced slots do not collide across modules, and delegatecall modules cannot selfdestruct or change the routing table directly.",
+      ],
+    },
   ],
   access: {
     mintEligibility: KEEL_ENGINE_CHOICES.access,
@@ -208,6 +245,10 @@ export function planKeelProject(value: unknown = {}) {
   const blockers: string[] = [];
   if (intent.mintSystem === "one-mint" && (intent.access || intent.signature || intent.gateLogic)) blockers.push("OneMint access is configured per stage. Independent campaign gate settings cannot be forwarded to this route.");
   if (intent.mintSystem === "admin-mint" && (intent.access || intent.signature || intent.gateLogic)) blockers.push("Admin mint uses creator authority and recipients, not campaign access gates.");
+  const patternChecks = intent.mintSystem === "mined-hash"
+    ? KEEL_ENGINE_CATALOG.mintSystems.find((entry) => entry.id === "mined-hash")?.checks ?? []
+    : [];
+  if (intent.mintSystem === "mined-hash" && (intent.access || intent.signature || intent.gateLogic)) blockers.push("A mined-hash mint is gated by the difficulty target and anchor window, not campaign access gates.");
   if (intent.storage === "wake") blockers.push("Wake requires separate evidence and viewer integration checks; no live readiness is established by this planner.");
   const runtimeModules = intent.runtime === "static-media" ? ["keel.asset-display@1"]
     : intent.runtime === "p5" ? ["p5", "keel.seeded-random"]
@@ -248,6 +289,7 @@ export function planKeelProject(value: unknown = {}) {
     blockers,
     modules: { required: modules, publicationStatus: "unverified", setup: KEEL_ENGINE_CATALOG.moduleWorkflow },
     nextTools,
+    ...(patternChecks.length ? { patternChecks } : {}),
     remainingReview: intent.outcome === "release" ? ["Exact price/payment asset, payout, royalties, schedule, recipients or access proofs", "Current owner/roles, manager authorization and reserved capacity", "Selected-chain contracts, simulation, durable operation and wallet review"] : ["Measured bytes, cost, selected-chain bindings and storage availability"],
     evidence: KEEL_ENGINE_CATALOG.evidence,
     authority: { approvalRequiredNow: false, signing: "not-performed", submission: "not-performed", publicationReady: false },

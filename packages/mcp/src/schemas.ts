@@ -10,6 +10,21 @@ const object = (properties: Readonly<Record<string, JsonSchema>>, required: read
   additionalProperties: false,
 });
 
+/**
+ * Evidence every signing-request tool checks before it prepares anything for contract, collection, metadata or
+ * viewer work. Order: keel-contract-workflow-preflight (receipt) → keel-engine-catalog → keel-network-inspect →
+ * keel-library-search → keel-contract-controls → build → keel-token-standard-audit (auditDigest) → request.
+ */
+export const standardsEvidence: JsonSchema = object({
+  preflightReceipt: string("receipt.id returned by keel-contract-workflow-preflight (0x + 64 hex)."),
+  auditDigest: string("digest returned by a passing keel-token-standard-audit (0x + 64 hex). Required whenever a token contract, collection or token metadata is involved."),
+  workKind: {
+    type: "string",
+    enum: ["token-contract", "collection", "metadata", "viewer", "registry-or-module", "storage-only"],
+    description: "What this request changes. Omitted means token-contract (the strictest). storage-only is accepted only when the tool verifies the calls are KeelHold storage writes.",
+  },
+});
+
 const moduleSelector: JsonSchema = {
   anyOf: [
     object({ sha256: string(), byteLength: integer() }, ["sha256", "byteLength"]),
@@ -272,7 +287,8 @@ const creatorCollectionPrepare: JsonSchema = object({
   instance: string("Optional exact recorded deployment instance.", 96),
   creatorNonce: string("Exact creator nonce read before preparation, encoded as canonical unsigned decimal text.", 78),
   operation: creatorCollectionOperation,
-}, ["chainId", "creator", "creatorNonce", "operation"]);
+  standards: { ...standardsEvidence, description: "Required: preflightReceipt and a passing auditDigest for the collection's prepared tokenURI (or the external token contract)." },
+}, ["chainId", "creator", "creatorNonce", "operation", "standards"]);
 const shellManifestFields: Readonly<Record<string, JsonSchema>> = {
   creator: string("Creator wallet used for namespacing and catalogue indexing."),
   name: string("Human-readable shell name.", 96),
@@ -289,14 +305,18 @@ const shellMutationFields: Readonly<Record<string, JsonSchema>> = {
   metadataObjectId: string("Committed JSON manifest object ID."),
   payloadMode: { type: "string", enum: ["sandboxed-html", "gzip-base64", "pre-encoded-graph"] },
 };
-const shellPrepare: JsonSchema = {
-  oneOf: [
-    object({ operation: { type: "string", enum: ["manifest"] }, ...shellManifestFields }, ["operation", "creator", "name", "version"]),
-    object({ operation: { type: "string", enum: ["register"] }, ...shellManifestFields, ...shellMutationFields }, ["operation", "creator", "name", "version", "builderAddress", "salt", "prefixObjectId", "suffixObjectId", "metadataObjectId"]),
-    object({ operation: { type: "string", enum: ["update"] }, ...shellManifestFields, ...shellMutationFields }, ["operation", "creator", "name", "version", "builderAddress", "shellId", "prefixObjectId", "suffixObjectId", "metadataObjectId"]),
-    object({ operation: { type: "string", enum: ["freeze"] }, creator: shellManifestFields.creator!, builderAddress: shellMutationFields.builderAddress!, shellId: shellMutationFields.shellId! }, ["operation", "creator", "builderAddress", "shellId"]),
-  ],
-};
+// One flat object, not a top-level oneOf: MCP clients require inputSchema.type "object" and reject the whole
+// tools/list otherwise (the host then shows zero tools). Per-operation requirements are enforced at runtime.
+const shellPrepare: JsonSchema = object({
+  operation: {
+    type: "string",
+    enum: ["manifest", "register", "update", "freeze"],
+    description: "manifest needs creator, name, version. register adds builderAddress, salt, prefixObjectId, suffixObjectId, metadataObjectId. update adds builderAddress, shellId and the three object IDs. freeze needs creator, builderAddress, shellId. register/update/freeze require standards.preflightReceipt.",
+  },
+  ...shellManifestFields,
+  ...shellMutationFields,
+  standards: standardsEvidence,
+}, ["operation", "creator"]);
 const inlinePrepare: JsonSchema = object({
   repositoryRoot: string("Optional checkout verification. Omit to use the packaged canonical shell."),
   entry: string("Workspace-relative creator entry. JavaScript is composed by the SDK; HTML must be a complete document."),
@@ -430,27 +450,45 @@ export const TOOL_SCHEMAS = {
     plan: string("Workspace-relative materialized upload-plan JSON."),
     family: { type: "string", enum: ["ethereum"] },
     chainId: integer(undefined, 1), target: string(),
+    out: string("Optional workspace-relative .json path. Large descriptor plans are written in full to a file and returned as path + sha256; pass that path to publish-plan as chainPlanPath."),
   }, ["plan", "family", "chainId", "target"]),
   ethereumEncode: object({
     plan: string("Workspace-relative materialized upload-plan JSON."),
     family: { type: "string", enum: ["ethereum"] },
     chainId: integer(undefined, 1), target: string(), qr: boolean(),
+    out: string("Optional workspace-relative .json path. Results above the 256 KiB inline budget are always written in full to a file (default <plan>.ethereum-encode.json) and returned as path + sha256; never re-encode by hand."),
   }, ["plan", "family", "chainId", "target"]),
   publishPlan: object({
-    chainPlan: { ...chainOperationPlan, description: "The structured result returned by chain-plan." },
+    chainPlan: { ...chainOperationPlan, description: "The structured result returned by chain-plan. Use chainPlanPath instead when chain-plan delivered a workspace file." },
+    chainPlanPath: string("Workspace-relative chain-plan result file (delivery.path from chain-plan)."),
     publicationIntent: {
       type: "string",
       enum: ["new-object", "existing-graph-revision"],
       description: "Derived from the target state by Studio or the caller; creators are not asked to identify protocol mechanics.",
     },
     revision: { ...graphRevision, description: "Required for an existing graph revision and forbidden for a new object." },
-  }, ["chainPlan", "publicationIntent"]),
+    standards: standardsEvidence,
+  }, ["publicationIntent"]),
   revisionPlan: graphRevision,
+  tokenStandardAudit: object({
+    rpcUrl: string("Live read: http(s) JSON-RPC URL of the selected chain.", 2048),
+    contract: string("Live read: token contract address."),
+    tokenId: string("Live read: token ID as canonical unsigned decimal text.", 78),
+    chainId: integer("Optional expected chain ID; the audit fails if the RPC reports another.", 1),
+    tokenUri: string("Offline: complete prepared tokenURI text (small documents; the stdio frame is 1 MiB).", 900000),
+    tokenUriPath: string("Offline: workspace-relative file holding the complete prepared tokenURI text."),
+    exception: object({
+      codes: { type: "array", items: string(undefined, 64), minItems: 1, maxItems: 16, description: "Exact finding codes being waived. Read, size, gas and decode findings cannot be waived." },
+      reason: string("Why this reviewed exception is acceptable (at least 20 characters).", 2000),
+      reviewer: string("Who reviewed it: wallet address or name.", 256),
+      signature: string("Optional 65-byte hex signature by the reviewer over the reason (recorded, not verified)."),
+    }, ["codes", "reason", "reviewer"]),
+  }),
   moduleResolve: object({ snapshot: string(), selector: moduleSelector }, ["snapshot", "selector"]),
   moduleLock: object({ snapshot: string(), out: string(), selector: moduleSelector }, ["snapshot", "out", "selector"]),
-  walletRequestPrepare: object({ request: walletRequest, qr: boolean() }, ["request"]),
-  walletLink: object({ link: walletLink }, ["link"]),
-  moduleReview: object({ review: moduleReview }, ["review"]),
+  walletRequestPrepare: object({ request: walletRequest, qr: boolean(), standards: standardsEvidence }, ["request"]),
+  walletLink: object({ link: walletLink, standards: standardsEvidence }, ["link"]),
+  moduleReview: object({ review: moduleReview, standards: standardsEvidence }, ["review"]),
   frayAuctionIntake,
   frayStageProject,
   chainGuide,

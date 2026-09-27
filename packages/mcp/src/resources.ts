@@ -29,7 +29,14 @@ const RESOURCE_TEXT: Readonly<Record<string, string>> = {
   [KEEL_WORKFLOW_RESOURCE]: resourceJson({
     schema: "keel-mcp-resource@1",
     kind: "offline-workflow",
-    contractFirst: ["keel-contract-workflow-preflight", "keel-engine-catalog", "keel-network-inspect", "keel-library-search", "edge-case-resolution", "keel-contract-controls", "wallet-review"],
+    contractFirst: ["keel-contract-workflow-preflight", "keel-engine-catalog", "keel-network-inspect", "keel-library-search", "edge-case-resolution", "keel-contract-controls", "build", "keel-token-standard-audit", "wallet-review"],
+    enforcement: {
+      evidence: "standards: { preflightReceipt, auditDigest }",
+      gatedTools: ["wallet-request-prepare", "publish-plan", "keel-creator-collection-prepare", "wallet-link", "keel-shell-prepare", "module-review-prepare", "keel-tezos-shell-prepare", "keel-tezos-publication-prepare"],
+      storageOnly: "KeelHold castSlugs/weldObject/weldComposite with zero value, and publish-plan of plain asset bytes, pass without evidence.",
+      audit: "Token, collection and metadata work needs a passing keel-token-standard-audit digest; a live token contract must be audited at the exact address the request targets.",
+      refusal: "isError result with structuredContent { code, nextTool, next }.",
+    },
     steps: ["studio-capabilities", "analyze", "media-optimize", "media-optimize-apply", "cost", "keel-revision-plan", "upload-plan", "build", "verify", "module-resolve", "module-lock", "studio-stage-project", "studio-draft", "chain-plan", "ethereum-encode", "publish-plan", "wallet-request-prepare", "wallet-link"],
     repair: {
       prompt: "keel-draft-repair",

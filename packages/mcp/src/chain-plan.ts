@@ -1,6 +1,7 @@
 import { verifyIntegrity, type Hex, type Integrity } from "@keel/protocol";
 import { decompressBytes } from "@keel/builder";
 import path from "node:path";
+import { deliverResult } from "./large-output.js";
 import type { Workspace } from "./types.js";
 
 const MAX_PLAN_BYTES = 4 * 1024 * 1024;
@@ -9,7 +10,6 @@ const MAX_TOTAL_DECODED_BYTES = 256 * 1024 * 1024;
 const MAX_SLUG_BYTES = 23_000;
 const MAX_OBJECTS = 512;
 const MAX_OPERATIONS = 16_384;
-const MAX_DESCRIPTOR_RESPONSE_BYTES = 256 * 1024;
 
 type Family = "ethereum" | "tezos";
 type Compression = "none" | "gzip" | "deflate" | "brotli";
@@ -359,7 +359,9 @@ async function validatePlan(workspace: Workspace, planDirectory: string, value: 
 
 export async function createChainOperationPlan(workspace: Workspace, value: unknown): Promise<unknown> {
   const input = object(value, "chain-plan arguments");
-  exact(input, ["plan", "family", "chainId", "network", "target"], "chain-plan arguments");
+  exact(input, ["plan", "family", "chainId", "network", "target", "out"], "chain-plan arguments");
+  const outValue = input.out;
+  if (outValue !== undefined && (typeof outValue !== "string" || !outValue.endsWith(".json") || outValue.startsWith("/") || outValue.split("/").includes(".."))) throw new TypeError("out must be a workspace-relative .json path.");
   const target = operationTarget(input);
   if (target.family === "tezos") throw new Error("Tezos chain operation planning requires a contract-specific adapter and is not emitted by this offline planner.");
   const planPath = text(input.plan, "plan");
@@ -383,8 +385,15 @@ export async function createChainOperationPlan(workspace: Workspace, value: unkn
     submission: "not-performed",
     caveat: "Operation descriptors are verified against local chunk files; a wallet or chain adapter must encode, review, sign, and submit them.",
   };
-  if (new TextEncoder().encode(JSON.stringify(result)).byteLength > MAX_DESCRIPTOR_RESPONSE_BYTES) {
-    throw new RangeError(`chain operation plan response exceeds the ${MAX_DESCRIPTOR_RESPONSE_BYTES}-byte MCP detail limit; use a smaller plan or a dedicated adapter.`);
-  }
-  return result;
+  // A plan too large to return inline is written in full (path + sha256), never refused into a hand-built fallback.
+  return deliverResult(workspace, result, {
+    outPath: typeof outValue === "string" ? outValue : path.join(planDirectory, `${path.basename(planPath, ".json")}.chain-plan.json`),
+    force: typeof outValue === "string",
+    summary: (value) => ({
+      schema: value.schema, status: value.status, materialized: value.materialized, descriptorMaterialized: value.descriptorMaterialized,
+      chainReady: value.chainReady, target: value.target, sourcePlan: value.sourcePlan, operationCount: value.operations.length,
+      encoding: value.encoding, walletApproval: value.walletApproval, signing: value.signing, submission: value.submission,
+      next: "Pass delivery.path to publish-plan as chainPlanPath.",
+    }),
+  });
 }

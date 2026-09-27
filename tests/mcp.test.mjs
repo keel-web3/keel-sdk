@@ -46,6 +46,20 @@ async function call(server, id, name, args) {
 
 const initializeParams = { protocolVersion: "2024-11-05", capabilities: {}, clientInfo: { name: "test", version: "1" } };
 
+/** A fully onchain tokenURI: raw-percent JSON with a data:image and no locators. */
+const ONCHAIN_TOKEN_URI = `data:application/json,${encodeURIComponent(JSON.stringify({ name: "One", image: `data:image/png;base64,${ONE_PIXEL_PNG.toString("base64")}` }))}`;
+
+/** Walk the enforced workflow far enough to hold real evidence: a preflight receipt and a passing audit digest. */
+async function standardsEvidence(server, directory, id = 900) {
+  await writeFile(path.join(directory, "README.md"), "# target\n");
+  await mkdir(path.join(directory, "docs"), { recursive: true });
+  await writeFile(path.join(directory, "docs", "ARCHITECTURE.md"), "# architecture\n");
+  const preflight = await call(server, id, "keel-contract-workflow-preflight", {});
+  const audit = await call(server, id + 1, "keel-token-standard-audit", { tokenUri: ONCHAIN_TOKEN_URI });
+  assert.equal(audit?.result.structuredContent.verdict, "pass");
+  return { preflightReceipt: preflight?.result.structuredContent.receipt.id, auditDigest: audit?.result.structuredContent.digest };
+}
+
 test("MCP initializes, lists strict tools, and returns JSON-RPC parameter errors", async () => {
   const directory = await mkdtemp(path.join("/tmp", "keel-mcp-"));
   try {
@@ -85,7 +99,7 @@ test("MCP initializes, lists strict tools, and returns JSON-RPC parameter errors
     assert.match(initialized?.result.instructions, /registered canonical KEEL verification shell/iu);
     assert.match(initialized?.result.instructions, /one declared changed resource/iu);
     const listed = await server.handle({ jsonrpc: "2.0", id: 5, method: "tools/list", params: {} });
-    assert.deepEqual(listed?.result.tools.map((tool) => tool.name), ["keel-tezos-shell-prepare", "keel-tezos-publication-prepare", "keel-network-inspect", "keel-tezos-standard-route-plan", "keel-contract-workflow-preflight", "keel-contract-controls", "keel-engine-catalog", "keel-revision-plan", "keel-project-decisions", "keel-editor-project-list", "keel-editor-project-read", "keel-editor-project-update", "keel-editor-project-open", "keel-layered-check", "keel-layered-select", "keel-layered-sample", "keel-layered-math", "keel-layered-reveal-plan", "keel-layered-direct-image-plan", "keel-svg-create", "keel-svg-inspect", "keel-svg-call-plan", "keel-layered-curation", "keel-token-matrix-prepare", "keel-arena-match-prepare", "keel-arena-claim-prepare", "analyze", "media-optimize", "media-optimize-apply", "build", "verify", "cost", "upload-plan", "chain-plan", "ethereum-encode", "publish-plan", "module-resolve", "module-lock", "wallet-request-prepare", "wallet-link", "module-review-prepare", "fray-auction-intake", "fray-stage-project", "keel-chain-guide", "keel-library-search", "keel-onchain-data-prepare", "keel-endpoint-config", "keel-studio-capabilities", "keel-studio-project-intake", "keel-studio-draft", "keel-studio-stage-project", "keel-creator-collection-prepare", "keel-shell-search", "keel-inline-prepare", "keel-shell-prepare"]);
+    assert.deepEqual(listed?.result.tools.map((tool) => tool.name), ["keel-tezos-shell-prepare", "keel-tezos-publication-prepare", "keel-network-inspect", "keel-tezos-standard-route-plan", "keel-contract-workflow-preflight", "keel-contract-controls", "keel-engine-catalog", "keel-revision-plan", "keel-project-decisions", "keel-token-standard-audit", "keel-editor-project-list", "keel-editor-project-read", "keel-editor-project-update", "keel-editor-project-open", "keel-layered-check", "keel-layered-select", "keel-layered-sample", "keel-layered-math", "keel-layered-reveal-plan", "keel-layered-direct-image-plan", "keel-svg-create", "keel-svg-inspect", "keel-svg-call-plan", "keel-layered-curation", "keel-token-matrix-prepare", "keel-arena-match-prepare", "keel-arena-claim-prepare", "analyze", "media-optimize", "media-optimize-apply", "build", "verify", "cost", "upload-plan", "chain-plan", "ethereum-encode", "publish-plan", "module-resolve", "module-lock", "wallet-request-prepare", "wallet-link", "module-review-prepare", "fray-auction-intake", "fray-stage-project", "keel-chain-guide", "keel-library-search", "keel-onchain-data-prepare", "keel-endpoint-config", "keel-studio-capabilities", "keel-studio-project-intake", "keel-studio-draft", "keel-studio-stage-project", "keel-creator-collection-prepare", "keel-shell-search", "keel-inline-prepare", "keel-shell-prepare"]);
     const revisionTool = listed?.result.tools.find((tool) => tool.name === "keel-revision-plan");
     assert.match(revisionTool?.description, /unchanged object ID.*reused/iu);
     assert.equal(revisionTool?.inputSchema.properties.changedResourceIds.maxItems, 1);
@@ -112,7 +126,9 @@ test("MCP initializes, lists strict tools, and returns JSON-RPC parameter errors
     const preflight = await call(server, 30, "keel-contract-workflow-preflight", {});
     assert.equal(preflight?.result.structuredContent.status, "docs-read-module-scan-required");
     assert.deepEqual(preflight?.result.structuredContent.documents.map((document) => document.path), ["README.md", "docs/ARCHITECTURE.md"]);
-    const creatorPlan = await call(server, 31, "keel-creator-collection-prepare", {
+    assert.match(preflight?.result.structuredContent.receipt.id, /^0x[0-9a-f]{64}$/u);
+    assert.ok(preflight?.result.structuredContent.requiredNext.includes("keel-token-standard-audit"));
+    const creatorArgs = {
       chainId: 11155111,
       creator: "0x1111111111111111111111111111111111111111",
       instance: "creator-v1",
@@ -121,7 +137,18 @@ test("MCP initializes, lists strict tools, and returns JSON-RPC parameter errors
         kind: "dedicated-erc721",
         config: { name: "One of One", symbol: "ONE", maxSupply: 1, metadataDigest: `0x${"a".repeat(64)}` },
       },
-    });
+    };
+    const creatorRefused = await call(server, 301, "keel-creator-collection-prepare", creatorArgs);
+    assert.equal(creatorRefused?.result.isError, true);
+    assert.equal(creatorRefused?.result.structuredContent.code, "standards-evidence-required");
+    assert.equal(creatorRefused?.result.structuredContent.nextTool, "keel-contract-workflow-preflight");
+    const receiptOnly = await call(server, 302, "keel-creator-collection-prepare", { ...creatorArgs, standards: { preflightReceipt: preflight?.result.structuredContent.receipt.id } });
+    assert.equal(receiptOnly?.result.structuredContent.code, "token-standard-audit-required");
+    assert.equal(receiptOnly?.result.structuredContent.nextTool, "keel-token-standard-audit");
+    const evidence = await standardsEvidence(server, directory, 303);
+    const creatorPlan = await call(server, 31, "keel-creator-collection-prepare", { ...creatorArgs, standards: evidence });
+    assert.equal(creatorPlan?.result.structuredContent.standards.workKind, "collection");
+    assert.equal(creatorPlan?.result.structuredContent.standards.audit.verdict, "pass");
     assert.equal(creatorPlan?.result.structuredContent.status, "blocked");
     assert.equal(creatorPlan?.result.structuredContent.walletApproval, "not-requested");
     assert.equal(creatorPlan?.result.structuredContent.signing, "not-performed");
@@ -142,6 +169,7 @@ test("MCP initializes, lists strict tools, and returns JSON-RPC parameter errors
       suffixObjectId: `0x${"3".repeat(64)}`,
       metadataObjectId: `0x${"4".repeat(64)}`,
       payloadMode: "sandboxed-html",
+      standards: { preflightReceipt: evidence.preflightReceipt },
     });
     assert.equal(shellPlan?.result.structuredContent.status, "review-only");
     assert.equal(shellPlan?.result.structuredContent.metadata.protocol, "keel-shell-manifest@1");
@@ -162,6 +190,7 @@ test("MCP initializes, lists strict tools, and returns JSON-RPC parameter errors
       suffixObjectId: `0x${"6".repeat(64)}`,
       metadataObjectId: `0x${"7".repeat(64)}`,
       payloadMode: "pre-encoded-graph",
+      standards: { preflightReceipt: evidence.preflightReceipt },
     });
     assert.equal(shellUpdate?.result.structuredContent.call.functionName, "updateShell");
     assert.equal(shellUpdate?.result.structuredContent.shellId, shellId);
@@ -171,6 +200,7 @@ test("MCP initializes, lists strict tools, and returns JSON-RPC parameter errors
       creator: "0x1111111111111111111111111111111111111111",
       builderAddress: "0x4f04bf6aac1183c26cadf05cf69d6148c9f6440b",
       shellId,
+      standards: { preflightReceipt: evidence.preflightReceipt },
     });
     assert.equal(shellFreeze?.result.structuredContent.call.functionName, "freezeShell");
     assert.equal(shellFreeze?.result.structuredContent.call.irreversible, true);
@@ -629,12 +659,20 @@ test("MCP cost, module lock, and wallet preparation stay offline and bounded", a
     const receiptSidecar = JSON.parse(await readFile(path.join(directory, "root.lock.json.receipt.json"), "utf8"));
     assert.equal(receiptSidecar.receipt.protocol, "keel-module-resolution-receipt@1");
     assert.equal(receiptSidecar.integrity.digest, locked?.result.structuredContent.receiptDigest.digest);
+    const contractCall = {
+      protocol: "keel-wallet-request@1", requestId: "mcp-test", label: "Review", family: "ethereum", chainId: 1,
+      to: "0x0000000000000000000000000000000000000000", data: "0x", valueWei: "0", transport: "walletconnect-qr",
+    };
+    const refusedRequest = await call(server, 51, "wallet-request-prepare", { request: contractCall, qr: true });
+    assert.equal(refusedRequest?.result.isError, true);
+    assert.equal(refusedRequest?.result.structuredContent.code, "standards-evidence-required");
+    const declaredStorage = await call(server, 52, "wallet-request-prepare", { request: contractCall, standards: { workKind: "storage-only" } });
+    assert.equal(declaredStorage?.result.structuredContent.code, "storage-only-not-verified");
+    // A genuine KeelHold storage write still needs no evidence.
     const prepared = await call(server, 5, "wallet-request-prepare", {
-      request: {
-        protocol: "keel-wallet-request@1", requestId: "mcp-test", label: "Review", family: "ethereum", chainId: 1,
-        to: "0x0000000000000000000000000000000000000000", data: "0x", valueWei: "0", transport: "walletconnect-qr",
-      }, qr: true,
+      request: { ...contractCall, data: "0x0d1ff9e2" }, qr: true,
     });
+    assert.equal(prepared?.result.structuredContent.standards.workKind, "storage-only");
     assert.equal(prepared?.result.structuredContent.status, "prepared-only");
     assert.match(prepared?.result.structuredContent.qr, /^keel-wallet-request:/u);
     const collectionConfig = {
@@ -668,7 +706,10 @@ test("MCP cost, module lock, and wallet preparation stay offline and bounded", a
         transport: "ledger",
         collectionConfig,
     };
-    const walletLink = await call(server, 35, "wallet-link", { link: walletLinkInput });
+    const unlinked = await call(server, 351, "wallet-link", { link: walletLinkInput });
+    assert.equal(unlinked?.result.structuredContent.code, "standards-evidence-required");
+    const linkEvidence = await standardsEvidence(server, directory, 352);
+    const walletLink = await call(server, 35, "wallet-link", { link: walletLinkInput, standards: linkEvidence });
     assert.equal(walletLink?.result.structuredContent.status, "review-only");
     assert.equal(walletLink?.result.structuredContent.link.signing, "not-performed");
     assert.equal(walletLink?.result.structuredContent.typedData.primaryType, "CollectionAuthorization");
@@ -999,7 +1040,7 @@ test("MCP CLI help, version, and self-test are explicit non-stdio modes", async 
     assert.equal(health.toolCount, health.toolNames.length);
     assert.equal(new Set(health.toolNames).size, health.toolCount);
     assert.ok(health.toolNames.includes("keel-editor-project-open"));
-    assert.deepEqual(health.checks, ["initialize", "ping", "tools/list", "prompts/list", "prompts/get", "resources/list", "resources/read"]);
+    assert.deepEqual(health.checks, ["initialize", "ping", "tools/list", "tools/list-schemas", "prompts/list", "prompts/get", "resources/list", "resources/read"]);
     assert.equal(health.jsonrpc, undefined);
   } finally {
     await rm(directory, { recursive: true, force: true });

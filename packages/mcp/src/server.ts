@@ -68,15 +68,20 @@ function rpcError(id: JsonRpcId | undefined, code: number, message: string, data
 
 function toolResult(value: unknown): ToolCallResult {
   const text = JSON.stringify(value);
-  return { content: [{ type: "text", text }], structuredContent: value };
+  // MCP structuredContent is a JSON object; a client drops a result whose structuredContent is an array or scalar.
+  const structured = value !== null && typeof value === "object" && !Array.isArray(value) ? value : { value };
+  return { content: [{ type: "text", text }], structuredContent: structured };
 }
 
 function toolError(error: unknown): ToolCallResult {
   const text = errorText(error);
-  return { content: [{ type: "text", text }], isError: true };
+  // A standards refusal keeps its machine-readable code and next tool.
+  const refusal = error !== null && typeof error === "object" ? (error as { readonly refusal?: unknown }).refusal : undefined;
+  return { content: [{ type: "text", text }], ...(refusal === undefined ? {} : { structuredContent: refusal }), isError: true };
 }
 
 const MCP_INSTRUCTIONS = [
+  "ENFORCED ORDER for any contract, NFT, collection, token metadata or viewer work: keel-contract-workflow-preflight (returns receipt.id) → keel-engine-catalog → keel-network-inspect → keel-library-search → keel-contract-controls → build (keel-inline-prepare/build/upload-plan) → keel-token-standard-audit (returns digest) → request. Signing-request tools refuse without standards.preflightReceipt, and token/collection/metadata work also needs a passing standards.auditDigest; a refusal names the exact next tool. Never hand-write tokenURI JSON or fall back to hand SDK encoding: large results are written to workspace files with a sha256.",
   "Assume creators are not developers: automatically inventory assets, preserve originals, discover reusable objects and measure storage/compression choices.",
   "Default to separate HTML, CSS, individual JavaScript ES modules and assets; never flatten unless explicitly requested.",
   "For every request phrased as make a contract, put it onchain, make an NFT, publish a viewer, deploy, or release—even when an ABI, address, old journal, or approval is supplied—automatically call keel-contract-workflow-preflight, read the target README/docs, inspect the exact selected chain, and search its module catalog before editing or wallet review. Missing evidence is a hard stop.",
@@ -142,6 +147,8 @@ export async function createMcpServer(options: { readonly workspaceRoot?: string
         }
         initialized = true;
         return response(request.id, {
+          // Deliberately the 2024-11-05 baseline for every client (a 2025-06-18 client accepts it). Not a cause of
+          // the "0 tools" symptom: that was an invalid inputSchema, which tool-contract.ts now rejects in CI.
           protocolVersion: MCP_PROTOCOL_VERSION,
           capabilities: { tools: { listChanged: false }, prompts: { listChanged: false }, resources: { subscribe: false, listChanged: false } },
           serverInfo: { name: MCP_SERVER_NAME, version: MCP_SERVER_VERSION },

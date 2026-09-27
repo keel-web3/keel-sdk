@@ -77,7 +77,9 @@ import type { KeelFactoryCollectionConfig } from "@keel/ethereum-adapter";
 let ethMod: typeof import("@keel/ethereum-adapter") | undefined;
 const ethereumAdapter = async (): Promise<typeof import("@keel/ethereum-adapter")> => (ethMod ??= await import("@keel/ethereum-adapter"));
 import type { Compression, Hex } from "@keel/protocol";
-import { TOOL_SCHEMAS } from "./schemas.js";
+import { standardsEvidence, TOOL_SCHEMAS } from "./schemas.js";
+import { analyzeTokenUri, enforceStandards, recordTokenStandardAudit, tokenStandardAuditTool } from "./standards.js";
+import { deliverResult } from "./large-output.js";
 import { ENGINE_TOOL_DEFINITIONS } from "./engine-tools.js";
 import { EDITOR_TOOL_DEFINITIONS } from "./editor-tools.js";
 import { createChainOperationPlan } from "./chain-plan.js";
@@ -89,9 +91,6 @@ const MAX_MEDIA_BYTES = 256 * 1024 * 1024;
 const MAX_SNAPSHOT_BYTES = 4 * 1024 * 1024;
 const MAX_PLAN_OBJECTS = 512;
 const MAX_PLAN_DEPTH = 8;
-// toolResult carries the same value as structuredContent and text; keep
-// detailed plans bounded so the duplicated JSON stays below the 1 MiB frame.
-const MAX_PLAN_RESPONSE_BYTES = 256 * 1024;
 
 function record(value: unknown, allowed: readonly string[], label: string): Record<string, unknown> {
   if (value === null || typeof value !== "object" || Array.isArray(value)) throw new TypeError(`${label} must be an object.`);
@@ -382,9 +381,12 @@ async function uploadPlanTool(context: ToolContext, value: unknown): Promise<unk
     const plan = strategy === "recursive"
       ? await (await builder()).createRecursiveUploadPlan(source.bytes, { ...common, ...(leafDecodedBytes === undefined ? {} : { leafDecodedBytes }), ...(maxPartsPerComposite === undefined ? {} : { maxPartsPerComposite }) })
       : await (await builder()).createUploadPlan(source.bytes, common);
-    const planBytes = new TextEncoder().encode(JSON.stringify(plan)).byteLength;
-    if (planBytes > MAX_PLAN_RESPONSE_BYTES) throw new RangeError(`upload plan response exceeds the ${MAX_PLAN_RESPONSE_BYTES}-byte MCP detail limit; use larger leaves or the builder CLI for a materialized plan.`);
-    return { status: "planned", dryRun: true, materialized: false, files: "unavailable-after-dry-run", strategy, plan };
+    // Too large to return inline: write the complete dry-run plan to the workspace (path + sha256) rather than
+    // pushing the agent out of the MCP to a CLI.
+    return deliverResult(context.workspace, { status: "planned", dryRun: true, materialized: false, files: "unavailable-after-dry-run", strategy, plan }, {
+      outPath: `${objectName}.upload-plan.dry-run.json`,
+      summary: (value) => ({ status: value.status, dryRun: true, materialized: false, files: value.files, strategy, planSchema: (plan as { readonly schema?: unknown }).schema }),
+    });
   } finally {
     await rm(scratch, { recursive: true, force: true });
   }
@@ -403,8 +405,15 @@ async function ethereumEncodeTool(context: ToolContext, value: unknown): Promise
   return runEthereumEncodeTool(context.workspace, value);
 }
 
-async function publishPlanTool(_context: ToolContext, value: unknown): Promise<unknown> {
-  const input = record(value, ["chainPlan", "publicationIntent", "revision"], "publish review plan arguments");
+/** Bytes that become token metadata or a viewer, rather than plain assets. */
+const DOCUMENT_MEDIA = /^(?:text\/html|application\/xhtml\+xml|application\/json|application\/[a-z0-9.+-]*\+json|application\/vnd\.keel\.token-uri[a-z0-9.+-]*)(?:;|$)/iu;
+
+async function publishPlanTool(context: ToolContext, value: unknown): Promise<unknown> {
+  const input = record(value, ["chainPlan", "chainPlanPath", "publicationIntent", "revision", "standards"], "publish review plan arguments");
+  if ((input.chainPlan === undefined) === (input.chainPlanPath === undefined)) throw new TypeError("Provide exactly one of chainPlan or chainPlanPath.");
+  const chainPlan = input.chainPlanPath === undefined
+    ? input.chainPlan
+    : JSON.parse(new TextDecoder("utf-8", { fatal: true }).decode((await context.workspace.readFile(requiredString(input, "chainPlanPath"), 512 * 1024 * 1024)).bytes)) as unknown;
   const publicationIntent = requiredString(input, "publicationIntent");
   if (publicationIntent !== "new-object" && publicationIntent !== "existing-graph-revision") {
     throw new TypeError("publicationIntent must be new-object or existing-graph-revision.");
@@ -418,7 +427,16 @@ async function publishPlanTool(_context: ToolContext, value: unknown): Promise<u
   const revisionPlan = publicationIntent === "existing-graph-revision"
     ? planKeelGraphRevision(input.revision)
     : undefined;
-  const envelope = await createKeelPublishReviewPlan(input.chainPlan);
+  const envelope = await createKeelPublishReviewPlan(chainPlan);
+  const mediaType = String(envelope.plan.source.mediaType);
+  const document = DOCUMENT_MEDIA.test(mediaType);
+  const storageOnly = !document && envelope.plan.operations.every((operation) => ["castSlugs", "weldObject", "weldComposite"].includes(operation.kind));
+  const clearance = await enforceStandards(context, input.standards, {
+    tool: "publish-plan",
+    defaultWorkKind: document ? "viewer" : "storage-only",
+    storageVerified: storageOnly,
+    auditChainId: envelope.plan.target.chainId,
+  });
   if (revisionPlan !== undefined) {
     assertKeelRevisionUploadMatchesPlan(revisionPlan, {
       chainId: envelope.plan.target.chainId,
@@ -434,6 +452,7 @@ async function publishPlanTool(_context: ToolContext, value: unknown): Promise<u
     publicationIntent,
     signing: "not-performed",
     submission: "not-performed",
+    standards: clearance,
     ...(revisionPlan === undefined ? {} : { revisionPlan }),
     envelope,
   };
@@ -449,8 +468,31 @@ async function moduleLockTool(context: ToolContext, value: unknown): Promise<unk
   return { status: "locked", lockPath: out, receiptPath: receipt, lock: result.lock, receipt: result.receipt, receiptDigest: result.receiptDigest, bytes: "unavailable" };
 }
 
-async function walletRequestPrepareTool(_context: ToolContext, value: unknown): Promise<unknown> {
-  const input = record(value, ["request", "qr"], "wallet request arguments");
+/** KeelHold storage writes. A request made only of these is storage, not contract/metadata/viewer work. */
+const KEEL_HOLD_STORAGE_SELECTORS: ReadonlySet<string> = new Set([
+  "0x0d1ff9e2", // castSlugs(bytes[])
+  "0xb17463a8", // weldObject(bytes32[],bytes32,uint64,uint8,string)
+  "0x5f97a164", // weldComposite(bytes32[],bytes32,uint64,string)
+]);
+
+async function walletRequestPrepareTool(context: ToolContext, value: unknown): Promise<unknown> {
+  const input = record(value, ["request", "qr", "standards"], "wallet request arguments");
+  const request = input.request !== null && typeof input.request === "object" && !Array.isArray(input.request) ? input.request as Record<string, unknown> : {};
+  const ethereum = request.family === "ethereum";
+  const data = typeof request.data === "string" ? request.data.toLowerCase() : "";
+  const storage = ethereum && KEEL_HOLD_STORAGE_SELECTORS.has(data.slice(0, 10)) && request.valueWei === "0";
+  const declared = input.standards !== null && typeof input.standards === "object" ? (input.standards as Record<string, unknown>).workKind : undefined;
+  const workKind = declared ?? (storage ? "storage-only" : "token-contract");
+  const clearance = await enforceStandards(context, input.standards, {
+    tool: "wallet-request-prepare",
+    defaultWorkKind: storage ? "storage-only" : "token-contract",
+    storageVerified: storage,
+    ...(ethereum && typeof request.chainId === "number" ? { auditChainId: request.chainId } : {}),
+    ...(ethereum && typeof request.to === "string" ? { auditContract: request.to } : {}),
+    // A call to an existing token contract must be backed by an audit of THAT contract's live tokenURI.
+    requireContractAudit: ethereum && workKind === "token-contract",
+    ...(ethereum ? {} : { auditUnavailable: "keel-token-standard-audit reads EVM tokenURI; Tezos token metadata is not audited yet." }),
+  });
   const envelope = await createKeelWalletRequest(input.request);
   const qr = optionalBoolean(input, "qr");
   const qrPayload = qr === true ? await encodeKeelWalletRequestQr(envelope) : undefined;
@@ -458,13 +500,14 @@ async function walletRequestPrepareTool(_context: ToolContext, value: unknown): 
     status: "prepared-only",
     signing: "not-performed",
     submission: "not-performed",
+    standards: clearance,
     envelope,
     ...(qrPayload === undefined ? {} : { qr: qrPayload }),
   };
 }
 
-async function walletLinkTool(_context: ToolContext, value: unknown): Promise<unknown> {
-  const input = record(value, ["link"], "wallet link arguments");
+async function walletLinkTool(context: ToolContext, value: unknown): Promise<unknown> {
+  const input = record(value, ["link", "standards"], "wallet link arguments");
   const rawLink = record(input.link, ["family", "accountAddress", "agentAddress", "target", "scopes", "issuedAt", "expiresAt", "nonce", "transport", "revocation", "rotation", "collectionConfig"], "wallet link");
   const { collectionConfig: rawConfig, ...linkInput } = rawLink;
   const link = await createKeelWalletLink(linkInput as unknown as KeelWalletLinkInput);
@@ -498,6 +541,13 @@ async function walletLinkTool(_context: ToolContext, value: unknown): Promise<un
   const normalizedConfig: KeelFactoryCollectionConfig = (await ethereumAdapter()).normalizeKeelFactoryCollectionConfig(rawConfig);
   const computedDigest = (await ethereumAdapter()).createKeelFactoryConfigDigest(normalizedConfig);
   if (computedDigest !== link.target.configDigest) throw new Error("collectionConfig digest does not match wallet link.target.configDigest.");
+  // Typed data here authorizes creating a collection: the same evidence as keel-creator-collection-prepare.
+  const clearance = await enforceStandards(context, input.standards, {
+    tool: "wallet-link",
+    defaultWorkKind: "collection",
+    allowedWorkKinds: ["collection"],
+    auditChainId: link.target.chainId,
+  });
   const typed = createCollectionAuthorizationTypedData(link.target.chainId, link.target.factoryAddress, {
     creator: link.accountAddress as `0x${string}`,
     agent: link.agentAddress as `0x${string}`,
@@ -519,6 +569,7 @@ async function walletLinkTool(_context: ToolContext, value: unknown): Promise<un
     approval: "not-granted",
     collectionConfig: normalizedConfig,
     configDigestVerified: true,
+    standards: clearance,
     link,
     typedData: jsonTyped,
   };
@@ -778,14 +829,16 @@ async function endpointConfigTool(_context: ToolContext, value: unknown): Promis
   }, process.env);
 }
 
-async function moduleReviewPrepareTool(_context: ToolContext, value: unknown): Promise<unknown> {
-  const input = record(value, ["review"], "module review arguments");
+async function moduleReviewPrepareTool(context: ToolContext, value: unknown): Promise<unknown> {
+  const input = record(value, ["review", "standards"], "module review arguments");
   const review = record(
     input.review,
     ["chainId", "registry", "action", "spec", "specDigest", "reviewDigest", "reasonDigest", "replacementSpecDigest", "validUntil"],
     "module review",
   );
-  return buildKeelModuleReviewRequest(review as unknown as KeelModuleReviewInput);
+  const clearance = await enforceStandards(context, input.standards, { tool: "module-review-prepare", defaultWorkKind: "registry-or-module", allowedWorkKinds: ["registry-or-module"] });
+  const request = await buildKeelModuleReviewRequest(review as unknown as KeelModuleReviewInput);
+  return request !== null && typeof request === "object" && !Array.isArray(request) ? { ...request, standards: clearance } : { request, standards: clearance };
 }
 
 async function studioProjectIntakeTool(_context: ToolContext, value: unknown): Promise<unknown> {
@@ -912,27 +965,37 @@ async function studioStageProjectTool(context: ToolContext, value: unknown): Pro
   });
 }
 
-async function creatorCollectionPrepareTool(_context: ToolContext, value: unknown): Promise<unknown> {
-  const input = record(value, ["chainId", "creator", "instance", "creatorNonce", "operation"], "Creator collection prepare arguments");
+async function creatorCollectionPrepareTool(context: ToolContext, value: unknown): Promise<unknown> {
+  const input = record(value, ["chainId", "creator", "instance", "creatorNonce", "operation", "standards"], "Creator collection prepare arguments");
   if (typeof input.chainId !== "number" || !Number.isSafeInteger(input.chainId) || input.chainId <= 0) throw new TypeError("chainId must be a positive safe integer.");
   const creator = requiredString(input, "creator");
   const instance = optionalString(input, "instance");
   const creatorNonce = requiredString(input, "creatorNonce");
   if (!/^(?:0|[1-9][0-9]*)$/u.test(creatorNonce)) throw new TypeError("creatorNonce must be canonical unsigned decimal text.");
   const operation = record(input.operation, ["kind", "implementation", "config", "name", "metadataDigest", "tokenContract"], "Creator collection operation");
-  return prepareKeelCreatorCollectionWalletReview({
+  const external = operation.kind === "external" && typeof operation.tokenContract === "string";
+  const clearance = await enforceStandards(context, input.standards, {
+    tool: "keel-creator-collection-prepare",
+    defaultWorkKind: "collection",
+    allowedWorkKinds: ["collection"],
+    auditChainId: input.chainId,
+    // Registering someone's existing contract: audit that contract. A new collection: audit its prepared tokenURI.
+    ...(external ? { auditContract: operation.tokenContract as string, requireContractAudit: true } : {}),
+  });
+  const prepared = await prepareKeelCreatorCollectionWalletReview({
     chainId: input.chainId,
     creator: creator as `0x${string}`,
     ...(instance === undefined ? {} : { instance }),
     creatorNonce,
     operation: operation as unknown as KeelCreatorCollectionWalletReviewInput["operation"],
   });
+  return { ...prepared, standards: clearance };
 }
 
-async function shellPrepareTool(_context: ToolContext, value: unknown): Promise<unknown> {
+async function shellPrepareTool(context: ToolContext, value: unknown): Promise<unknown> {
   const input = record(
     value,
-    ["operation", "creator", "name", "description", "version", "tags", "builderAddress", "shellId", "salt", "prefixObjectId", "suffixObjectId", "metadataObjectId", "payloadMode"],
+    ["operation", "creator", "name", "description", "version", "tags", "builderAddress", "shellId", "salt", "prefixObjectId", "suffixObjectId", "metadataObjectId", "payloadMode", "standards"],
     "Shell prepare arguments",
   );
   const operation = requiredString(input, "operation");
@@ -940,10 +1003,15 @@ async function shellPrepareTool(_context: ToolContext, value: unknown): Promise<
     throw new TypeError("operation must be manifest, register, update, or freeze.");
   }
   const creator = requiredString(input, "creator") as `0x${string}`;
+  // Registering, revising or freezing a shell is viewer work that ends in a wallet call.
+  const clearance = operation === "manifest"
+    ? undefined
+    : await enforceStandards(context, input.standards, { tool: "keel-shell-prepare", defaultWorkKind: "viewer", allowedWorkKinds: ["viewer"] });
   if (operation === "freeze") {
     return Object.freeze({
       schema: "keel.creator-shell-prepare@1" as const,
       status: "review-only" as const,
+      standards: clearance,
       creator,
       call: buildKeelCreatorShellFreezeCall({
         builderAddress: requiredString(input, "builderAddress") as `0x${string}`,
@@ -984,6 +1052,7 @@ async function shellPrepareTool(_context: ToolContext, value: unknown): Promise<
     return Object.freeze({
       schema: "keel.creator-shell-prepare@1" as const,
       status: "review-only" as const,
+      standards: clearance,
       shellId: requiredString(input, "shellId") as `0x${string}`,
       metadata,
       call: buildKeelCreatorShellUpdateCall({
@@ -1001,6 +1070,7 @@ async function shellPrepareTool(_context: ToolContext, value: unknown): Promise<
   return Object.freeze({
     schema: "keel.creator-shell-prepare@1" as const,
     status: "review-only" as const,
+    standards: clearance,
     shellId: keelCreatorShellId(creator, salt),
     metadata,
     call,
@@ -1168,6 +1238,7 @@ async function inlinePrepareTool(context: ToolContext, value: unknown): Promise<
 
   let prepared;
   let web3Metadata;
+  let preparedAudit: Awaited<ReturnType<typeof recordTokenStandardAudit>> | undefined;
   const metadataTransport = optionalString(input, "metadataTransport");
   if (metadataTransport !== undefined && metadataTransport !== "web3-json") throw new TypeError("Unknown metadata transport.");
   if (metadataTransport === undefined && (input.metadataPath !== undefined || input.tokenId !== undefined || input.web3ImageResolver !== undefined)) {
@@ -1213,6 +1284,10 @@ async function inlinePrepareTool(context: ToolContext, value: unknown): Promise<
       tokenId: 1,
       presentationPolicy,
     });
+    if (prepared !== undefined) {
+      // build → audit: the exact prepared tokenURI is audited here, so its digest can back the wallet request.
+      preparedAudit = await recordTokenStandardAudit(context.workspace, { subject: { kind: "bytes", source: "keel-inline-prepare" }, analysis: await analyzeTokenUri(prepared.tokenURI) });
+    }
     const preparedTokenURIBytes = prepared === undefined ? web3Metadata!.byteLength : Buffer.byteLength(prepared.tokenURI, "utf8");
     if (preparedTokenURIBytes > KEEL_INLINE_MAX_TOKEN_URI_BYTES) {
       throw new RangeError(
@@ -1284,6 +1359,11 @@ async function inlinePrepareTool(context: ToolContext, value: unknown): Promise<
         encodedPrefixBytes: prepared.encodedPrefix.byteLength,
         encodedSuffixBytes: prepared.encodedSuffix.byteLength,
         tokenURIBytes: Buffer.byteLength(prepared.tokenURI, "utf8"),
+        standardAudit: preparedAudit === undefined ? undefined : {
+          verdict: preparedAudit.verdict, digest: preparedAudit.digest, recordPath: preparedAudit.recordPath,
+          blocking: preparedAudit.summary.blocking, findings: preparedAudit.findings.slice(0, 16),
+          use: "Pass digest as standards.auditDigest to keel-creator-collection-prepare / wallet-link / wallet-request-prepare.",
+        },
         bind: prepared.requiredBuilder === "KeelHarnessBuilder"
           ? "KEEL721.setPreEncodedOnchainHarness(builder, compositeObjectId, digest)"
           : "KEEL721.setPreparedOnchainHarness(builder, compositeObjectId, digest, encodedPrefix, encodedSuffix)",
@@ -1305,6 +1385,7 @@ const tezosShellPrepareSchema: JsonSchema = {
     shellId: { type: "string", description: "bytes32 shell ID; update or freeze only." },
     prefixObjectId: { type: "string" }, suffixObjectId: { type: "string" }, metadataObjectId: { type: "string" },
     payloadMode: { type: "string", enum: ["sandboxed-html", "gzip-base64", "pre-encoded-graph"] },
+    standards: standardsEvidence,
   },
 };
 
@@ -1320,13 +1401,18 @@ const tezosPublicationPrepareSchema: JsonSchema = {
     salt: { type: "string" }, slotObjectIds: { type: "array", items: { type: "string" }, maxItems: 128 }, manifestSha256: { type: "string" },
     manifestUri: { type: "string", maxLength: 2048 }, manifestDigest: { type: "string" }, previewUri: { type: "string", maxLength: 2048 },
     revision: { type: "integer", minimum: 1 }, tokenId: { type: "integer", minimum: 1 }, tokenInfo: { type: "object", description: "FA2/TZIP-12 token_info map. Values are ordinary URI or metadata strings; onchfs:// is supported." }, tokenJson: { type: "string", maxLength: 262144, description: "Raw JSON compatibility document returned by the KeelSleeve route." }, account: { type: "string" }, enabled: { type: "boolean" }, recipient: { type: "string" }, quantity: { type: "integer", minimum: 1 },
+    standards: standardsEvidence,
   },
 };
 
-async function tezosPublicationPrepareTool(_context: ToolContext, value: unknown) {
-  const input = value as Record<string, any>;
+const TEZOS_AUDIT_GAP = "keel-token-standard-audit reads EVM tokenURI; Tezos token metadata is not audited yet.";
+
+async function tezosPublicationPrepareTool(context: ToolContext, value: unknown) {
+  if (value === null || typeof value !== "object" || Array.isArray(value)) throw new TypeError("Tezos publication arguments must be an object.");
+  const { standards, ...input } = value as Record<string, any>;
   for (const key of Object.keys(input)) if (/(?:private|secret|mnemonic|seed|passphrase)/iu.test(key)) throw new TypeError("Private signer material is never accepted by the Tezos publication adapter.");
   if (!/^Net[1-9A-HJ-NP-Za-km-z]{12}$/u.test(input.network)) throw new TypeError("network must be an exact Tezos Net... identity.");
+  const clearance = await enforceStandards(context, standards, { tool: "keel-tezos-publication-prepare", defaultWorkKind: "metadata", allowedWorkKinds: ["metadata", "collection", "viewer", "registry-or-module"], auditUnavailable: TEZOS_AUDIT_GAP });
   const common = { source: input.creator };
   let operation;
   switch (input.action) {
@@ -1359,6 +1445,7 @@ async function tezosPublicationPrepareTool(_context: ToolContext, value: unknown
     network: input.network,
     expectedSender: input.creator,
     operation,
+    standards: clearance,
     signing: "not-performed",
     submission: "not-performed",
     caveat: "This is one receipt-bound call from the staged KEEL Tezos one-of-one adapter. It does not originate, sign, submit, or invent a contract address.",
@@ -1366,9 +1453,16 @@ async function tezosPublicationPrepareTool(_context: ToolContext, value: unknown
 }
 
 export const TOOL_DEFINITIONS: readonly ToolDefinition[] = [
-  tool("keel-tezos-shell-prepare", "Prepare native Tezos shell registration, update, or permanent freeze parameters with explicit network and sender. Read-only preparation: no RPC, signing, submission, or default-shell replacement. Receipt-backed selected-chain object and registry checks are still required.", tezosShellPrepareSchema, async (_context, value) => prepareKeelTezosShell(value as KeelTezosShellPrepareInput)),
-  tool("keel-tezos-publication-prepare", "Prepare one exact receipt-bound Tezos KEEL one-of-one publication call using the standard Hold, Index, and FA2 modules. The public route is ordinary FA2/TZIP-12 token_metadata with onchfs:// or another selected carrier; the KEEL JSON/harness route is compatibility-only. Review-only: no private key, origination, signing, submission, or fake address is accepted.", tezosPublicationPrepareSchema, tezosPublicationPrepareTool),
+  tool("keel-tezos-shell-prepare", "Prepare native Tezos shell registration, update, or permanent freeze parameters with explicit network and sender. Requires standards.preflightReceipt. Read-only preparation: no RPC, signing, submission, or default-shell replacement. Receipt-backed selected-chain object and registry checks are still required.", tezosShellPrepareSchema, async (context, value) => {
+    if (value === null || typeof value !== "object" || Array.isArray(value)) throw new TypeError("Tezos shell arguments must be an object.");
+    const { standards, ...input } = value as Record<string, unknown>;
+    const clearance = await enforceStandards(context, standards, { tool: "keel-tezos-shell-prepare", defaultWorkKind: "viewer", allowedWorkKinds: ["viewer"] });
+    const prepared = await prepareKeelTezosShell(input as unknown as KeelTezosShellPrepareInput);
+    return prepared !== null && typeof prepared === "object" && !Array.isArray(prepared) ? { ...prepared, standards: clearance } : { prepared, standards: clearance };
+  }),
+  tool("keel-tezos-publication-prepare", "Prepare one exact receipt-bound Tezos KEEL one-of-one publication call using the standard Hold, Index, and FA2 modules. The public route is ordinary FA2/TZIP-12 token_metadata with onchfs:// or another selected carrier; the KEEL JSON/harness route is compatibility-only. Requires standards.preflightReceipt. Review-only: no private key, origination, signing, submission, or fake address is accepted.", tezosPublicationPrepareSchema, tezosPublicationPrepareTool),
   ...ENGINE_TOOL_DEFINITIONS,
+  tool("keel-token-standard-audit", "HARD GATE for tokens, collections, metadata and viewers. Reads tokenURI live (rpcUrl + contract + tokenId: one eth_call capped at 30M gas at a pinned block; eth_estimateGas is advisory only) or audits prepared bytes (tokenUri / tokenUriPath). Decodes the data: JSON (raw-percent or base64) and every embedded data: URI, unpacking gzip/deflate, and FAILS CLOSED on any http(s), ipfs, ar/arweave, web3:// or keel-onchain locator (only http://www.w3.org/2000/svg is allowed), an image that is not an onchain data:image, an HTML viewer that is not the registered canonical KEEL shell, complete-HTML Base64, reads above 30M gas or tokenURI over 2 MB. Returns verdict, exact findings and a digest; pass the digest as standards.auditDigest. A waiver must be an explicit exception {codes, reason, reviewer}. Writes only its record under .keel-mcp/audits/.", TOOL_SCHEMAS.tokenStandardAudit, tokenStandardAuditTool),
   ...EDITOR_TOOL_DEFINITIONS,
   ...LAYERED_TOOL_DEFINITIONS,
   ...SVG_TOOL_DEFINITIONS,
@@ -1383,13 +1477,13 @@ export const TOOL_DEFINITIONS: readonly ToolDefinition[] = [
   tool("cost", "Estimate compression, chunks, recursive depth, transactions, and calldata using an offline model.", TOOL_SCHEMAS.cost, costTool),
   tool("upload-plan", "Plan flat or recursive chunk uploads from bounded local bytes without writing to the workspace or touching a chain.", TOOL_SCHEMAS.uploadPlan, uploadPlanTool),
   tool("chain-plan", "Verify a materialized upload plan and emit deterministic review-only contract operation descriptors; no ABI encoding, signing, or submission occurs.", TOOL_SCHEMAS.chainPlan, chainPlanTool),
-  tool("ethereum-encode", "Encode verified local Ethereum KeelHold operations with viem for review only; no RPC, signing, submission, or QR payload is produced.", TOOL_SCHEMAS.ethereumEncode, ethereumEncodeTool),
-  tool("publish-plan", "Bind a verified review-only chain descriptor to a canonical SDK envelope. Existing graph revisions must pass the one-resource delta gate and the upload digest must match that resource; unrelated asset republishing stops before wallet review. No ABI encoding, signing, or submission occurs.", TOOL_SCHEMAS.publishPlan, publishPlanTool),
+  tool("ethereum-encode", "Encode verified local Ethereum KeelHold operations with viem for review only; no RPC, signing, submission, or QR payload is produced. Results above the inline budget are written in full to a workspace file and returned as path + sha256 (never re-encode by hand).", TOOL_SCHEMAS.ethereumEncode, ethereumEncodeTool),
+  tool("publish-plan", "Bind a verified review-only chain descriptor (chainPlan, or chainPlanPath when chain-plan delivered a file) to a canonical SDK envelope. Plain asset storage passes as storage-only; HTML, JSON or KEEL tokenURI fragment bytes are viewer/metadata work and require standards.preflightReceipt (metadata also standards.auditDigest). Existing graph revisions must pass the one-resource delta gate. No ABI encoding, signing, or submission occurs.", TOOL_SCHEMAS.publishPlan, publishPlanTool),
   tool("module-resolve", "Resolve one exact module selector from a local snapshot without fetching carriers.", TOOL_SCHEMAS.moduleResolve, moduleResolveTool),
   tool("module-lock", "Write a canonical local module lock and unavailable-by-default receipt.", TOOL_SCHEMAS.moduleLock, moduleLockTool),
-  tool("wallet-request-prepare", "Prepare a canonical user-reviewable wallet request or QR payload without signing or submitting.", TOOL_SCHEMAS.walletRequestPrepare, walletRequestPrepareTool),
-  tool("wallet-link", "Prepare a review-only account-to-agent KeelFactory castDieFor authorization and JSON-safe EIP-712 typed data; no signing, RPC, or submission occurs.", TOOL_SCHEMAS.walletLink, walletLinkTool),
-  tool("module-review-prepare", "Prepare a review-only KeelModuleReviewRegistry action (submit/sanction/deprecate/revoke a non-contract module's on-chain trust) as a canonical descriptor; no signing, encoding, or submission occurs.", TOOL_SCHEMAS.moduleReview, moduleReviewPrepareTool),
+  tool("wallet-request-prepare", "Prepare a canonical user-reviewable wallet request or QR payload without signing or submitting. Only KeelHold storage writes (castSlugs/weldObject/weldComposite, zero value) pass without evidence. Anything else refuses unless standards.preflightReceipt is valid, and token-contract work (the default) also needs standards.auditDigest from a passing keel-token-standard-audit of the exact target contract.", TOOL_SCHEMAS.walletRequestPrepare, walletRequestPrepareTool),
+  tool("wallet-link", "Prepare a review-only account-to-agent KeelFactory castDieFor authorization and JSON-safe EIP-712 typed data. Emitting typed data requires standards.preflightReceipt and a passing standards.auditDigest of the collection's prepared tokenURI. No signing, RPC, or submission occurs.", TOOL_SCHEMAS.walletLink, walletLinkTool),
+  tool("module-review-prepare", "Prepare a review-only KeelModuleReviewRegistry action (submit/sanction/deprecate/revoke a non-contract module's onchain trust) as a canonical descriptor. Requires standards.preflightReceipt. No signing, encoding, or submission occurs.", TOOL_SCHEMAS.moduleReview, moduleReviewPrepareTool),
   tool("fray-auction-intake", "Collect the title, description, chain, and one of exactly four Fray auction presets before emitting a user-approved API and wallet handoff; no signing or submission occurs.", TOOL_SCHEMAS.frayAuctionIntake, frayAuctionIntakeTool),
   tool("fray-stage-project", "Upload bounded source bytes to the configured Fray Studio temporary project store, prepare still/video previews, preflight the fee, and return a wallet-facing handoff; no signing or submission occurs.", TOOL_SCHEMAS.frayStageProject, frayStageProjectTool),
   tool("keel-chain-guide", "List supported testnets and human faucet links; the MCP server never claims faucet funds or moves wallet assets.", TOOL_SCHEMAS.chainGuide, chainGuideTool),
@@ -1400,10 +1494,10 @@ export const TOOL_DEFINITIONS: readonly ToolDefinition[] = [
   tool("keel-studio-project-intake", "Ask only for missing project decisions, then return either storage-only preparation or an editable release/listing intent. No upload, signature, wallet request, or transaction occurs.", TOOL_SCHEMAS.studioProjectIntake, studioProjectIntakeTool),
   tool("keel-studio-draft", "List, read, create, or revision-safely edit a creator's private Studio release draft through a scoped key. It cannot prepare, sign, submit, cancel, or publish a chain action.", TOOL_SCHEMAS.studioDraft, studioDraftTool),
   tool("keel-studio-stage-project", "Stage bounded creator resources/modules and return the server-issued Studio handoff. Omitted viewer selects Studio's canonical KEEL Inline graph for later preparation; `none` is the explicit raw-artifact route with no viewer and does not prevent a later release or mint. Automatic compact preparation requires the exact selected-chain KeelRawTokenURIBuilder and canonical raw-percent shell fragments with receipts/read-back; Studio must never fall back to legacy Base64 carriage silently. A direct image, video, or self-contained GLB resolves to registered shell plus registered keel.asset-display@1 plus the creator media entry, never zero modules or a generated index.html. Legacy protector getters and NoProtector do not determine default Inline readiness. Creator HTML is content, never a replacement shell, and agents must not upload a locally manufactured KEEL shell, protected-harness wrapper, or local wrapper when the catalog is incomplete. Studio must fail closed for an incomplete selected-chain catalog during preparation. The scoped agent key remains in the MCP environment; no wallet signature or chain action occurs.", TOOL_SCHEMAS.studioStageProject, studioStageProjectTool),
-  tool("keel-creator-collection-prepare", "Prepare one exact EIP-5792 KeelCreatorFactory batch plus its durable recovery envelope. This never signs or submits. Missing or ambiguous factory/renderer deployments stop before any wallet approval.", TOOL_SCHEMAS.creatorCollectionPrepare, creatorCollectionPrepareTool),
+  tool("keel-creator-collection-prepare", "Prepare one exact EIP-5792 KeelCreatorFactory batch plus its durable recovery envelope. Requires standards.preflightReceipt and a passing standards.auditDigest (the prepared tokenURI, or the live external token contract). This never signs or submits. Missing or ambiguous factory/renderer deployments stop before any wallet approval.", TOOL_SCHEMAS.creatorCollectionPrepare, creatorCollectionPrepareTool),
   tool("keel-shell-search", "Search the read-back-verified shell catalogue by creator, name, version, or tags. Returns top/bottom object pointers and metadata only; it never fetches carrier bytes, signs, or submits.", TOOL_SCHEMAS.shellSearch, shellSearchTool),
   tool("keel-inline-prepare", "Plan a collector-facing INLINE Keel graph with the registered canonical shell, reusable executable modules, creator-owned assets, and one creator entry. Omitted carriage and presentationPolicy use the automatic compact raw-percent saver plus collector-inline: exact supplied data:image/* bytes and complete data:text/html;charset=utf-8 HTML, with no IPFS/HTTP/web3 resolver or legacy complete-HTML Base64. Original binary image bytes are stored once; the final image field assembles its data:image/<type>;base64 header, canonical Base64 exact payload and JSON delimiter/footer. GIF is direct data:image/gif and never an SVG wrapper or placeholder. The result reports source, stored graph, and complete tokenURI bytes and rejects a result above the public-read ceiling. External resolvers and legacy artifact carriage require explicit reviewed policies. Review-only: it never signs or submits.", TOOL_SCHEMAS.inlinePrepare, inlinePrepareTool),
-  tool("keel-shell-prepare", "Create canonical creator/tag shell metadata or prepare creator registration, update, or irreversible freeze calls. One stable shell ID can publish revisions until its creator freezes it. The recommended viewer follows the current revision; pinning one revision is explicit. A shell is one reusable top and bottom around the work graph; this tool never signs, submits, or invents a replacement default shell.", TOOL_SCHEMAS.shellPrepare, shellPrepareTool),
+  tool("keel-shell-prepare", "Create canonical creator/tag shell metadata or prepare creator registration, update, or irreversible freeze calls (register/update/freeze require standards.preflightReceipt). One stable shell ID can publish revisions until its creator freezes it. The recommended viewer follows the current revision; pinning one revision is explicit. A shell is one reusable top and bottom around the work graph; this tool never signs, submits, or invents a replacement default shell.", TOOL_SCHEMAS.shellPrepare, shellPrepareTool),
 ];
 
 export function toolByName(name: string): ToolDefinition | undefined {

@@ -4,13 +4,15 @@ import {
   type EthereumAdapterResult,
 } from "@keel/ethereum-adapter";
 import path from "node:path";
+import { deliverResult, sha256Hex } from "./large-output.js";
 import type { Workspace } from "./types.js";
 
 const MAX_PLAN_BYTES = 4 * 1024 * 1024;
 const MAX_SLUG_BYTES = 23_000;
 const MAX_SOURCE_ENTRIES = 65_536;
 const MAX_SOURCE_BYTES = 256 * 1024 * 1024;
-const MAX_RESULT_BYTES = 256 * 1024;
+/** Descriptors are written to a workspace file when they do not fit inline; this only bounds process memory. */
+const MAX_FILE_RESULT_BYTES = 512 * 1024 * 1024;
 const SAFE_RELATIVE = /^(?!\/)(?!.*(?:^|\/)(?:\.|\.\.)$)[^\\\u0000-\u001f\u007f]+$/u;
 
 function safeRelative(value: string): boolean {
@@ -89,7 +91,7 @@ async function loadPlan(workspace: Workspace, planPath: string): Promise<{ reado
 
 export async function ethereumEncodeTool(workspace: Workspace, value: unknown): Promise<unknown> {
   const input = record(value, "ethereum-encode arguments");
-  exact(input, ["plan", "family", "chainId", "target", "qr"], "ethereum-encode arguments");
+  exact(input, ["plan", "family", "chainId", "target", "qr", "out"], "ethereum-encode arguments");
   const planPath = requiredString(input, "plan");
   const family = requiredString(input, "family");
   if (family !== "ethereum") throw new TypeError("ethereum-encode currently supports family ethereum only.");
@@ -97,12 +99,15 @@ export async function ethereumEncodeTool(workspace: Workspace, value: unknown): 
   if (typeof chainId !== "number" || !Number.isSafeInteger(chainId) || chainId <= 0) throw new TypeError("chainId must be a positive safe integer.");
   const target = requiredString(input, "target");
   const qrRequested = optionalBoolean(input, "qr") === true;
+  const outValue = input.out;
+  if (outValue !== undefined && (typeof outValue !== "string" || !safeRelative(outValue) || !outValue.endsWith(".json"))) throw new TypeError("out must be a workspace-relative .json path.");
   const loaded = await loadPlan(workspace, planPath);
   const result: EthereumAdapterResult = await prepareEthereumKeelHoldOperations({
     plan: loaded.plan,
     chunks: loaded.chunks,
     target: { family: "ethereum", chainId, address: target },
     codecs: createViemEthereumAdapterCodecs(),
+    maxResultBytes: MAX_FILE_RESULT_BYTES,
   });
   const output = {
     ...result,
@@ -113,6 +118,29 @@ export async function ethereumEncodeTool(workspace: Workspace, value: unknown): 
       reason: "This offline adapter emits unsigned calldata only; review it first, then use wallet-request-prepare for a connector-specific request.",
     },
   };
-  if (new TextEncoder().encode(JSON.stringify(output)).byteLength > MAX_RESULT_BYTES) throw new RangeError(`ethereum-encode response exceeds the ${MAX_RESULT_BYTES}-byte MCP detail limit.`);
-  return output;
+  // Never defer a valid encode because it is large: write the complete descriptors to the workspace and hand back
+  // the path + digest. Falling back to hand SDK encoding outside the MCP is exactly what this prevents.
+  const defaultOut = path.join(path.dirname(planPath), `${path.basename(planPath, ".json")}.ethereum-encode.json`);
+  return deliverResult(workspace, output, {
+    outPath: typeof outValue === "string" ? outValue : defaultOut,
+    force: typeof outValue === "string",
+    summary: (value) => ({
+      status: value.status,
+      family: value.family,
+      chainReady: value.chainReady,
+      ...("source" in value && value.source !== undefined ? { source: value.source } : {}),
+      planPath,
+      ...(value.status === "ready-for-review" ? {
+        operationCount: value.operations.length,
+        operations: value.operations.slice(0, 64).map((operation) => ({
+          operationId: operation.operationId, kind: operation.kind, to: operation.to, signature: operation.signature,
+          dataBytes: (operation.data.length - 2) / 2, dataSha256: sha256Hex(operation.data),
+        })),
+        operationsTruncated: value.operations.length > 64,
+        signing: value.signing,
+        submission: value.submission,
+      } : { issues: value.issues, code: value.code }),
+      transport: value.transport,
+    }),
+  });
 }
