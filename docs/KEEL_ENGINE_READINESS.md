@@ -100,7 +100,7 @@ sizes are measured from the preserved bytes. The inclusive 1.75 MB rule is a
 delivery default, not a claim that every collector supports the result. Complete
 URI overhead, reader response limits and actual presentation read gas still need
 checks. Warnings explain the current 2 MB reader budget, the smaller of the
-selected block gas limit and KEEL's 60M presentation policy, and RPC dependency
+selected block gas limit and KEEL's 30M public-RPC read policy, and RPC dependency
 for reconstruction. Endpoint-specific call limits may be lower and require an
 exact read. Local preview and a prepared delivery plan do not publish an object.
 

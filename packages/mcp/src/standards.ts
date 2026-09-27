@@ -9,8 +9,9 @@
  * any edit to them breaks the digest.
  */
 import { createHash } from "node:crypto";
+import { readFile } from "node:fs/promises";
 import { gunzipSync, inflateRawSync, inflateSync } from "node:zlib";
-import { buildCompactInlineKeelShell } from "@keel/sdk";
+import { buildCompactInlineKeelShell, KEEL_INLINE_SAFE_RPC_GAS } from "@keel/sdk";
 import { createIntegrity } from "@keel/protocol";
 import type { ToolContext, Workspace } from "./types.js";
 
@@ -18,8 +19,8 @@ export const EVIDENCE_DIRECTORY = ".keel-mcp";
 export const PREFLIGHT_RECEIPT_SCHEMA = "keel-contract-workflow-receipt@1" as const;
 export const TOKEN_STANDARD_AUDIT_SCHEMA = "keel-token-standard-audit@1" as const;
 export const STANDARDS_CLEARANCE_SCHEMA = "keel-standards-clearance@1" as const;
-/** Public-read ceiling for tokenURI: above this a marketplace or wallet RPC will not reliably return it. */
-export const TOKEN_URI_READ_GAS_LIMIT = 30_000_000;
+/** Public-read ceiling for tokenURI (the SDK's documented 30M public-RPC safety cap, one constant everywhere). */
+export const TOKEN_URI_READ_GAS_LIMIT = Number(KEEL_INLINE_SAFE_RPC_GAS);
 export const TOKEN_URI_MAX_BYTES = 2_000_000;
 export const EVIDENCE_TTL_MS = 24 * 60 * 60 * 1000;
 /** The single protocol literal allowed anywhere: the SVG namespace is syntax, not a fetch. */
@@ -129,10 +130,21 @@ interface PreflightReceiptBody {
   readonly expiresAt: string;
   readonly nonce: string;
   readonly documents: readonly PreflightDocument[];
+  readonly keelDocuments?: readonly PreflightDocument[];
   readonly requiredNext: readonly string[];
 }
 
-export async function issuePreflightReceipt(workspace: Workspace, documents: readonly PreflightDocument[], requiredNext: readonly string[], now = Date.now()) {
+/** KEEL's own docs, packaged next to this module (dist/docs/) by scripts/package-skills.mjs. */
+export async function readKeelSdkDocument(relativePath: string): Promise<Uint8Array | undefined> {
+  if (!/^docs\/[A-Z0-9_]+\.md$/u.test(relativePath)) return undefined;
+  try {
+    return new Uint8Array(await readFile(new URL(`./${relativePath}`, import.meta.url)));
+  } catch {
+    return undefined;
+  }
+}
+
+export async function issuePreflightReceipt(workspace: Workspace, documents: readonly PreflightDocument[], requiredNext: readonly string[], now = Date.now(), keelDocuments: readonly PreflightDocument[] = []) {
   const body: PreflightReceiptBody = {
     schema: PREFLIGHT_RECEIPT_SCHEMA,
     workspace: workspace.root,
@@ -140,6 +152,7 @@ export async function issuePreflightReceipt(workspace: Workspace, documents: rea
     expiresAt: new Date(now + EVIDENCE_TTL_MS).toISOString(),
     nonce: `0x${hex(crypto.getRandomValues(new Uint8Array(16)))}`,
     documents: documents.map((document) => ({ path: document.path, byteLength: document.byteLength, sha256: document.sha256 })),
+    keelDocuments: keelDocuments.map((document) => ({ path: document.path, byteLength: document.byteLength, sha256: document.sha256 })),
     requiredNext,
   };
   const id = sha256(canonicalJson(body));
@@ -193,6 +206,11 @@ async function verifyPreflightReceipt(context: ToolContext, tool: string, id: un
     }
     if (current !== document.sha256) throw new StandardsRefusal(tool, "preflight-receipt-stale", `${document.path} changed after the receipt was issued.`, preflight, "Re-read the changed docs by running it again.");
   }
+  for (const document of body.keelDocuments ?? []) {
+    const bundled = await readKeelSdkDocument(document.path);
+    const current = bundled === undefined ? undefined : (await createIntegrity(bundled)).digest;
+    if (current !== document.sha256) throw new StandardsRefusal(tool, "preflight-receipt-stale", `The KEEL SDK copy of ${document.path} changed (SDK updated) after the receipt was issued.`, preflight, "Re-read the docs by running it again.");
+  }
   return { id, issuedAt: body.issuedAt, expiresAt: body.expiresAt, documents: body.documents.map((document) => document.path) };
 }
 
@@ -213,11 +231,12 @@ export type AuditFindingCode =
   | "html-base64-not-raw-percent"
   | "viewer-not-canonical-shell"
   | "viewer-relative-resource"
-  | "decode-limit-exceeded";
+  | "decode-limit-exceeded"
+  | "graph-item-integrity-mismatch";
 
 /** These describe whether the token can be read at all; no exception can waive them. */
 const NON_EXCEPTABLE: ReadonlySet<AuditFindingCode> = new Set([
-  "read-failed", "read-gas-exceeds-limit", "token-uri-too-large", "token-uri-empty", "metadata-invalid-json", "data-uri-invalid", "decode-limit-exceeded", "image-missing",
+  "read-failed", "read-gas-exceeds-limit", "token-uri-too-large", "token-uri-empty", "metadata-invalid-json", "data-uri-invalid", "decode-limit-exceeded", "image-missing", "graph-item-integrity-mismatch",
 ]);
 
 export interface AuditFinding {
@@ -405,24 +424,104 @@ class AuditWalker {
     return parsed;
   }
 
+  /** Resource ids of the canonical graph being walked; set only while inside a verified canonical shell. */
+  private graphIds: ReadonlySet<string> | undefined;
+  graphItems = 0;
+
   html(text: string, at: string, depth: number): void {
     this.htmlDocuments += 1;
     const { prefix, suffix } = this.shell;
     const suffixAt = text.startsWith(prefix) ? text.indexOf(suffix, prefix.length) : -1;
-    let creator = text;
     if (suffixAt >= 0) {
-      // Exactly the registered shell: its pinned verifier code names protocols in prose, so only the creator
-      // bytes around it are scanned. Anything else in the document is scanned in full.
+      // Exactly the registered shell: its pinned verifier code names protocols in prose, so only the graph between
+      // the halves and the context tail after them are scanned.
       this.canonicalShells += 1;
-      creator = text.slice(prefix.length, suffixAt) + text.slice(suffixAt + suffix.length);
-    } else {
-      this.add("viewer-not-canonical-shell", at, "HTML viewer is not the registered canonical KEEL verification shell (prefix/suffix bytes do not match @keel/sdk buildCompactInlineKeelShell).");
+      this.canonicalGraph(text.slice(prefix.length, suffixAt), at, depth);
+      this.scanText(text.slice(suffixAt + suffix.length), at, depth);
+      return;
     }
-    for (const match of creator.matchAll(RESOURCE_TAG)) {
-      if (/^(?:https?|ipfs|ar|web3|keel-onchain):|^\/\//iu.test(match[1]!)) continue;
-      this.add("viewer-relative-resource", at, `Resource tag loads ${match[1]!.slice(0, 80)} relative to whatever host serves the page.`);
+    if (this.graphIds !== undefined) {
+      // A creator entry document packed inside the canonical graph. The shell loads its <script src>/<link href>
+      // by KEEL resource id, so those are graph references, not host-relative loads -- if the id exists.
+      this.resourceReferences(text, at, this.graphIds);
+      this.scanText(text, at, depth);
+      return;
     }
-    this.scanText(creator, at, depth);
+    this.add("viewer-not-canonical-shell", at, "HTML viewer is not the registered canonical KEEL verification shell (prefix/suffix bytes do not match @keel/sdk buildCompactInlineKeelShell).");
+    this.resourceReferences(text, at, new Set());
+    this.scanText(text, at, depth);
+  }
+
+  private resourceReferences(text: string, at: string, ids: ReadonlySet<string>): void {
+    for (const match of text.matchAll(RESOURCE_TAG)) {
+      const reference = match[1]!;
+      if (/^(?:https?|ipfs|ar|web3|keel-onchain):|^\/\//iu.test(reference)) continue; // reported as external-locator
+      if (ids.has(reference)) continue;
+      this.add("viewer-relative-resource", at, ids.size
+        ? `Resource tag loads ${reference.slice(0, 80)}, which is not a resource id in this KEEL graph.`
+        : `Resource tag loads ${reference.slice(0, 80)} relative to whatever host serves the page.`);
+    }
+  }
+
+  /**
+   * The canonical shell carries the graph as `globalThis.__KEEL_ITEMS__=[null,{item},...]`. Each item is decoded
+   * from its packed slot, checked against its committed integrity, and scanned as its own media type.
+   */
+  private canonicalGraph(region: string, at: string, depth: number): void {
+    let items: unknown[] | undefined;
+    try {
+      const parsed = JSON.parse(`[null${region}]`) as unknown;
+      if (Array.isArray(parsed) && parsed.slice(1).every((item) => item !== null && typeof item === "object" && !Array.isArray(item) && typeof (item as { id?: unknown }).id === "string")) items = parsed.slice(1);
+    } catch {
+      items = undefined;
+    }
+    const previous = this.graphIds;
+    if (items === undefined) {
+      // Not the SDK's item list: scan it all, allowing references only to ids that visibly appear in it.
+      const ids = new Set<string>();
+      for (const match of region.matchAll(/"(?:id|moduleId|assetId)"\s*:\s*"([^"]{1,200})"/gu)) ids.add(match[1]!);
+      this.graphIds = ids;
+      this.resourceReferences(region, at, ids);
+      this.scanText(region, at, depth);
+      this.graphIds = previous;
+      return;
+    }
+    const ids = new Set<string>();
+    for (const item of items as Record<string, unknown>[]) {
+      ids.add(item.id as string);
+      if (Array.isArray(item.aliases)) for (const alias of item.aliases) if (typeof alias === "string") ids.add(alias);
+    }
+    this.graphIds = ids;
+    for (const item of items as Record<string, unknown>[]) {
+      this.graphItems += 1;
+      const where = `${at}>${String(item.id).slice(0, 64)}`;
+      const mediaType = typeof item.mediaType === "string" ? item.mediaType.toLowerCase() : "application/octet-stream";
+      const embedded = item.embedded !== null && typeof item.embedded === "object" ? item.embedded as Record<string, unknown> : undefined;
+      if (embedded === undefined || typeof embedded.storedBase64 !== "string") {
+        this.scanText(JSON.stringify(item), where, depth + 1);
+        continue;
+      }
+      const stored = new Uint8Array(Buffer.from(embedded.storedBase64, "base64"));
+      let decoded: Uint8Array | undefined = stored;
+      const compression = embedded.compression;
+      try {
+        if (compression === "gzip") decoded = new Uint8Array(gunzipSync(stored, { maxOutputLength: 64 * 1024 * 1024 }));
+        else if (compression === "deflate") decoded = new Uint8Array(inflateSync(stored, { maxOutputLength: 64 * 1024 * 1024 }));
+        else if (compression !== undefined && compression !== "none") decoded = undefined;
+      } catch {
+        decoded = undefined;
+      }
+      if (decoded === undefined) {
+        this.add("data-uri-invalid", where, `Graph item ${String(item.id)} cannot be unpacked (${String(compression)}).`);
+        continue;
+      }
+      const integrity = item.integrity !== null && typeof item.integrity === "object" ? item.integrity as Record<string, unknown> : undefined;
+      if (integrity !== undefined && typeof integrity.digest === "string" && (integrity.digest.toLowerCase() !== sha256(decoded) || (integrity.byteLength !== undefined && integrity.byteLength !== decoded.byteLength))) {
+        this.add("graph-item-integrity-mismatch", where, `Graph item ${String(item.id)} does not match its committed sha256/byteLength.`);
+      }
+      this.bytes(decoded, mediaType, where, depth + 1);
+    }
+    this.graphIds = previous;
   }
 
   /** Walk metadata JSON: every string that is a data: URI is decoded; every other string is scanned. */
@@ -440,7 +539,7 @@ class AuditWalker {
 export interface TokenUriAnalysis {
   readonly findings: readonly AuditFinding[];
   readonly tokenUri: { readonly byteLength: number; readonly sha256: Hex; readonly encoding: string };
-  readonly metadata?: { readonly keys: readonly string[]; readonly image?: string; readonly animation?: string; readonly htmlDocuments: number; readonly canonicalShells: number };
+  readonly metadata?: { readonly keys: readonly string[]; readonly image?: string; readonly animation?: string; readonly htmlDocuments: number; readonly canonicalShells: number; readonly graphItems: number };
 }
 
 /** Pure offline audit of complete tokenURI text. */
@@ -508,6 +607,7 @@ export async function analyzeTokenUri(tokenUri: string): Promise<TokenUriAnalysi
       ...(animation === undefined ? {} : { animation }),
       htmlDocuments: walker.htmlDocuments,
       canonicalShells: walker.canonicalShells,
+      graphItems: walker.graphItems,
     },
   };
 }
@@ -567,6 +667,38 @@ function tokenUriCalldata(tokenId: bigint): Hex {
   return `0xc87b56dd${tokenId.toString(16).padStart(64, "0")}`;
 }
 
+/**
+ * Measure the real gas a read needs: binary-search the eth_call gas limit between a failing floor and the 30M cap
+ * that already succeeded. debug_traceCall's gasUsed is added when the node offers it; it undercounts the limit a
+ * caller must set (the 63/64 rule), so the searched limit is the reported number.
+ */
+async function measureReadGas(rpcUrl: string, call: { readonly to: string; readonly data: string }, block: string): Promise<Pick<LiveRead, "measuredGas" | "measurement">> {
+  let tracedGasUsed: number | undefined;
+  try {
+    const trace = await rpc(rpcUrl, "debug_traceCall", [{ ...call, gas: `0x${TOKEN_URI_READ_GAS_LIMIT.toString(16)}` }, block, { tracer: "callTracer" }]) as { readonly gasUsed?: unknown };
+    if (typeof trace?.gasUsed === "string") tracedGasUsed = Number(BigInt(trace.gasUsed));
+  } catch {
+    tracedGasUsed = undefined;
+  }
+  let low = 21_000;
+  let high = TOKEN_URI_READ_GAS_LIMIT;
+  let calls = 0;
+  while (high - low > Math.max(10_000, Math.floor(high / 200)) && calls < 32) {
+    const middle = Math.floor((low + high) / 2);
+    calls += 1;
+    try {
+      await rpc(rpcUrl, "eth_call", [{ ...call, gas: `0x${middle.toString(16)}` }, block]);
+      high = middle;
+    } catch (error) {
+      if (error instanceof RpcError && /rate|limit exceeded|too many|429|timeout/iu.test(error.message)) {
+        return { measurement: { method: "eth_call-binary-search", precision: high - low, calls, ...(tracedGasUsed === undefined ? {} : { tracedGasUsed }), note: `Measurement stopped: ${error.message}` } };
+      }
+      low = middle;
+    }
+  }
+  return { measuredGas: high, measurement: { method: "eth_call-binary-search", precision: high - low, calls, ...(tracedGasUsed === undefined ? {} : { tracedGasUsed }) } };
+}
+
 export interface LiveRead {
   readonly tokenUri?: string;
   readonly chainId: number;
@@ -574,6 +706,9 @@ export interface LiveRead {
   readonly gasLimit: number;
   readonly estimatedGas?: number;
   readonly estimateNote: string;
+  /** Smallest gas limit at which the read succeeds, found by eth_call binary search (the number that matters). */
+  readonly measuredGas?: number;
+  readonly measurement?: { readonly method: "eth_call-binary-search"; readonly precision: number; readonly calls: number; readonly tracedGasUsed?: number; readonly note?: string };
   readonly failure?: { readonly code: "read-failed" | "read-gas-exceeds-limit"; readonly detail: string };
 }
 
@@ -606,7 +741,9 @@ export async function readTokenUri(rpcUrl: string, contract: string, tokenId: bi
     }
   }
   try {
-    return { ...base, tokenUri: decodeAbiString(String(result)) };
+    const tokenUri = decodeAbiString(String(result));
+    const measurement = await measureReadGas(rpcUrl, call, block);
+    return { ...base, tokenUri, ...measurement };
   } catch (error) {
     return { ...base, failure: { code: "read-failed", detail: error instanceof Error ? error.message : String(error) } };
   }

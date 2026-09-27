@@ -96,11 +96,39 @@ allowed literal is `http://www.w3.org/2000/svg`), an `image` that is not an
 onchain `data:image`, an HTML viewer that is not the registered canonical KEEL
 shell (exact `buildCompactInlineKeelShell` prefix/suffix), complete-HTML
 Base64, relative resource tags, reads above 30M gas and tokenURI over 2 MB.
+Inside the canonical shell the audit parses the graph
+(`__KEEL_ITEMS__`), unpacks each item, checks it against its committed sha256,
+and scans it as its own media type. A packed creator entry document may load
+`<script src>`/`<link href>` only by a resource id present in that graph; any
+other reference, and any real locator in any item, fails. Live reads also
+report `measuredGas`: the smallest eth_call gas limit that succeeds (binary
+search), plus `debug_traceCall` gasUsed when the node offers it.
 Base64-wrapped metadata JSON is a warning. A reviewed exception is an explicit
 input `{ codes, reason, reviewer, signature? }` naming exactly the findings it
 waives; read, size, gas, decode and missing-image findings cannot be waived. The
 verdict is then `pass-with-exception` and the exception travels with every
 clearance.
+
+### Graph publication and deployment
+
+- `keel-inline-prepare` with `outputDirectory` writes every graph part, the
+  full fragment and (with `collection`) `tokenURI.txt`; adding `hold` also
+  writes `graph-weld.json` with every part's object id, `castSlugs` and
+  `weldObject` calldata, and the root `weldComposite`. With `collection`, the
+  image is either `imagePath` (prepared data:image) or `imageRoute:
+  "contract-svg"` + `imageSvgPath` (a sample from `keel-svg-create` or the
+  renderer; audit the live contract after binding).
+- `keel-graph-weld-prepare` plans the same from ordered part files (or
+  already-published object ids plus `contentPath`).
+- `wallet-request-prepare` takes `deploy: { artifactPath, chainId, args,
+  bytecode?, valueWei? }` for a contract deployment. The bytecode must equal
+  the compiler artifact's and constructor args are coerced like
+  `keel-contract-controls`; the same standards gate applies. Addresses may be
+  EIP-55 checksummed (normalized to lowercase; a bad checksum is refused).
+- The preflight reads KEEL's own `docs/KEEL_*.md` from the package when the
+  target repository does not vendor them (`keelDocuments`).
+- The public read cap is one constant, `KEEL_INLINE_SAFE_RPC_GAS` = 30,000,000,
+  used by network inspection, the Tezos route and the audit.
 
 ### Large results
 

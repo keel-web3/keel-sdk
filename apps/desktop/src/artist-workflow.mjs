@@ -44,6 +44,7 @@ export const CHOICE_COPY = {
     'mint-gate': ['A sale or claim', 'Set who can collect, with optional eligibility rules.'],
     'one-mint': ['A drop in phases', 'Arrange allowlist, public, claim or other supported phases.'],
     'fray-auction': ['A Fray auction', 'Continue with the four-preset Fray auction intake.'],
+    'mined-hash': ['Mined (proof of work)', 'Collectors mine a hash in the browser and mint in one transaction; the hash can seed the token.'],
   },
   access: {
     public: ['Anyone', 'No eligibility gate.'], allowlist: ['People on a list', 'An allowlist with proofs.'],

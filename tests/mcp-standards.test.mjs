@@ -5,7 +5,9 @@ import { createServer } from "node:http";
 import { existsSync } from "node:fs";
 import path from "node:path";
 import { createHash } from "node:crypto";
-import { gzipSync } from "node:zlib";
+import { gunzipSync, gzipSync } from "node:zlib";
+import { encodeDeployData, getAddress } from "viem";
+import { createKeelManagedCompositePlan, createKeelManagedObjectPlan } from "../packages/sdk/dist/native-managed.js";
 import { createUploadPlan } from "../packages/builder/dist/index.js";
 import { KEEL_ENGINE_CATALOG, planKeelProject } from "../packages/sdk/dist/engine.js";
 import { canonicalShellFragments, createMcpServer, mcpToolListIssues, TOOL_DEFINITIONS } from "../packages/mcp/dist/index.js";
@@ -41,7 +43,7 @@ function abiString(text) {
 }
 
 /** Loopback JSON-RPC that serves one tokenURI; `needsGas` makes calls capped at 30M fail as out-of-gas. */
-async function mockRpc({ tokenUri, chainId = 11155111, needsGas = false, estimate = 60_000 }) {
+async function mockRpc({ tokenUri, chainId = 11155111, needsGas = false, estimate = 60_000, requiredGas = needsGas ? 40_000_000 : 0, trace = false }) {
   const calls = [];
   const server = createServer((request, response) => {
     let body = "";
@@ -53,8 +55,9 @@ async function mockRpc({ tokenUri, chainId = 11155111, needsGas = false, estimat
       if (method === "eth_chainId") return reply({ result: `0x${chainId.toString(16)}` });
       if (method === "eth_blockNumber") return reply({ result: "0x10" });
       if (method === "eth_estimateGas") return reply({ result: `0x${estimate.toString(16)}` });
+      if (method === "debug_traceCall" && trace) return reply({ result: { gasUsed: `0x${Math.floor(requiredGas * 0.98).toString(16)}` } });
       if (method === "eth_call") {
-        if (needsGas && params[0].gas === `0x${(30_000_000).toString(16)}`) return reply({ error: { code: -32000, message: "out of gas" } });
+        if (params[0].gas !== undefined && Number(BigInt(params[0].gas)) < requiredGas) return reply({ error: { code: -32000, message: "out of gas" } });
         return reply({ result: abiString(tokenUri) });
       }
       return reply({ error: { code: -32601, message: "no" } });
@@ -354,6 +357,184 @@ test("keel-inline-prepare audits its own prepared tokenURI so build hands a dige
       standards: { preflightReceipt, auditDigest: prepared.standardAudit.digest },
     });
     assert.equal(collection.structuredContent.standards.audit.digest, prepared.standardAudit.digest);
+  } finally {
+    await rm(directory, { recursive: true, force: true });
+  }
+});
+
+const FORK_TOKEN_URI = gunzipSync(await readFile(new URL("./fixtures/redline-car-1-fork-tokenuri.txt.gz", import.meta.url))).toString("utf8");
+
+test("regression: KEEL's own multi-module Inline graph (REDLINE car #1 fork tokenURI) passes", async () => {
+  const { directory, call } = await workspace();
+  try {
+    await writeFile(path.join(directory, "fork.txt"), FORK_TOKEN_URI);
+    const result = (await call("keel-token-standard-audit", { tokenUriPath: "fork.txt" })).structuredContent;
+    assert.equal(result.verdict, "pass", JSON.stringify(result.findings));
+    assert.deepEqual(result.findings, []);
+    assert.equal(result.metadata.canonicalShells, 1);
+    assert.equal(result.metadata.graphItems, 4);
+    assert.match(result.metadata.image, /^data:image\/svg\+xml/u);
+
+    // The packed entry may only reference ids that exist in the graph.
+    const { prefix, suffix } = await canonicalShellFragments();
+    const item = (id, mediaType, role, text, aliases = []) => {
+      const bytes = Buffer.from(text);
+      return { aliases, embedded: { compression: "gzip", storedBase64: gzipSync(bytes).toString("base64") }, id, integrity: { algorithm: "sha256", byteLength: bytes.length, digest: `0x${createHash("sha256").update(bytes).digest("hex")}` }, mediaType, role };
+    };
+    const graphHtml = (items) => `${prefix}${items.map((entry) => `,${JSON.stringify(entry)}`).join("")}${suffix}`;
+    const token = (html) => rawPercent({ name: "g", image: IMAGE, animation_url: `${HTML_PREFIX}${encodeURIComponent(html)}` });
+    const kit = item("demo.kit", "text/javascript", "module", "window.kit=1;", ["demo.kit"]);
+    const good = graphHtml([kit, item("entry", "text/html", "entrypoint", '<!doctype html><html><head><link rel="stylesheet" href="demo.css"></head><body><script src="demo.kit"></script></body></html>'), item("demo.css", "text/css", "asset", "body{margin:0}")]);
+    assert.equal((await audit(call, token(good))).verdict, "pass");
+    const unknown = await audit(call, token(graphHtml([kit, item("entry", "text/html", "entrypoint", '<!doctype html><html><body><script src="missing.module"></script></body></html>')])));
+    assert.deepEqual(codes(unknown), ["viewer-relative-resource"]);
+    assert.match(unknown.findings[0].detail, /not a resource id in this KEEL graph/u);
+    const leaking = await audit(call, token(graphHtml([item("demo.kit", "text/javascript", "module", 'fetch("https://api.example/car.json")'), item("entry", "text/html", "entrypoint", '<!doctype html><html><body><script src="demo.kit"></script></body></html>')])));
+    assert.deepEqual(codes(leaking), ["external-locator"]);
+    assert.match(leaking.findings[0].at, /demo\.kit/u);
+    const tampered = { ...kit, integrity: { ...kit.integrity, digest: `0x${"0".repeat(64)}` } };
+    assert.deepEqual(codes(await audit(call, token(graphHtml([tampered])))), ["graph-item-integrity-mismatch"]);
+
+    // A hand-rolled page that is not the shell still fails, and so does the HashersCar shape.
+    assert.deepEqual(codes(await audit(call, token('<!doctype html><html><body><script src="demo.kit"></script></body></html>'))), ["viewer-not-canonical-shell", "viewer-relative-resource"]);
+    assert.equal((await audit(call, rawPercent({ name: "REDLINE #1", image: "https://hashers-test.example/api/cars/1/image.png" }))).verdict, "fail");
+  } finally {
+    await rm(directory, { recursive: true, force: true });
+  }
+});
+
+test("audit measures real read gas by eth_call binary search, alongside the trace", async () => {
+  const { directory, call } = await workspace();
+  const rpc = await mockRpc({ tokenUri: rawPercent({ name: "g", image: IMAGE }), estimate: 21_000, requiredGas: 6_000_000, trace: true });
+  try {
+    const result = (await call("keel-token-standard-audit", { rpcUrl: rpc.url, contract: CAR, tokenId: "1" })).structuredContent;
+    assert.equal(result.verdict, "pass");
+    assert.ok(result.read.measuredGas >= 6_000_000 && result.read.measuredGas <= 6_000_000 * 1.01, String(result.read.measuredGas));
+    assert.equal(result.read.measurement.method, "eth_call-binary-search");
+    assert.equal(result.read.measurement.tracedGasUsed, 5_880_000);
+    assert.equal(result.read.estimatedGas, 21_000);
+  } finally {
+    await rpc.close();
+    await rm(directory, { recursive: true, force: true });
+  }
+});
+
+test("wallet requests accept EIP-55 checksummed addresses and refuse a bad checksum", async () => {
+  const { directory, call } = await workspace();
+  try {
+    const checksummed = getAddress("0x3333333333333333333333333333333333333abc");
+    assert.notEqual(checksummed, checksummed.toLowerCase());
+    const base = { protocol: "keel-wallet-request@1", requestId: "cs", label: "Cast", family: "ethereum", chainId: 11155111, data: "0x0d1ff9e2", valueWei: "0" };
+    const ok = (await call("wallet-request-prepare", { request: { ...base, to: checksummed } })).structuredContent;
+    assert.equal(ok.envelope.request.to, checksummed.toLowerCase());
+    const wrong = checksummed.replace(/[a-f](?=[^a-f]*$)/u, (c) => c.toUpperCase());
+    const bad = await call("wallet-request-prepare", { request: { ...base, to: wrong } });
+    assert.equal(bad.isError, true);
+    assert.match(bad.content[0].text, /EIP-55/u);
+  } finally {
+    await rm(directory, { recursive: true, force: true });
+  }
+});
+
+test("contract deployments go through wallet-request-prepare, checked against the compiler artifact and gated", async () => {
+  const { directory, call } = await workspace();
+  try {
+    const abi = [{ type: "constructor", stateMutability: "nonpayable", inputs: [{ name: "supply", type: "uint256" }, { name: "authority", type: "address" }] }, { type: "function", name: "x", stateMutability: "view", inputs: [], outputs: [{ name: "", type: "uint256" }] }];
+    const bytecode = "0x6080604052348015600f57600080fd5b50603f80601d6000396000f3fe6080604052600080fdfea164736f6c6343000818000a";
+    await writeFile(path.join(directory, "Car.json"), JSON.stringify({ abi, bytecode: { object: bytecode } }));
+    const deploy = { artifactPath: "Car.json", chainId: 11155111, args: ["1000", "0x3333333333333333333333333333333333333abc"] };
+    const refused = await call("wallet-request-prepare", { deploy });
+    assert.equal(refused.structuredContent.code, "standards-evidence-required");
+    const preflightReceipt = (await call("keel-contract-workflow-preflight", {})).structuredContent.receipt.id;
+    const auditDigest = (await call("keel-token-standard-audit", { tokenUri: rawPercent({ name: "car", image: IMAGE }) })).structuredContent.digest;
+    const prepared = (await call("wallet-request-prepare", { deploy, standards: { preflightReceipt, auditDigest } })).structuredContent;
+    assert.equal(prepared.kind, "contract-deployment");
+    assert.equal(prepared.envelope.request.to, null);
+    assert.equal(prepared.envelope.request.data, encodeDeployData({ abi, bytecode, args: [1000n, getAddress("0x3333333333333333333333333333333333333abc")] }));
+    assert.equal(prepared.standards.audit.digest, auditDigest);
+    const mismatch = await call("wallet-request-prepare", { deploy: { ...deploy, bytecode: `${bytecode}00` }, standards: { preflightReceipt, auditDigest } });
+    assert.match(mismatch.content[0].text, /does not match the compiler artifact/u);
+    const arity = await call("wallet-request-prepare", { deploy: { ...deploy, args: ["1"] }, standards: { preflightReceipt, auditDigest } });
+    assert.match(arity.content[0].text, /takes 2 argument/u);
+    const registry = (await call("wallet-request-prepare", { deploy, standards: { preflightReceipt, workKind: "registry-or-module" } })).structuredContent;
+    assert.equal(registry.standards.workKind, "registry-or-module");
+  } finally {
+    await rm(directory, { recursive: true, force: true });
+  }
+});
+
+test("keel-graph-weld-prepare plans every part and the root weld, matching the SDK", async () => {
+  const { directory, call } = await workspace();
+  try {
+    const hold = "0x0a4f31d5ab08029e4c68f6f3227d9fa3a2d66267";
+    const media = "application/vnd.keel.token-uri-raw-percent-fragment";
+    const parts = ["top-", "middle-".repeat(40_000), "-bottom"].map((text) => Buffer.from(text));
+    for (const [index, part] of parts.entries()) await writeFile(path.join(directory, `p${index}.txt`), part);
+    const result = (await call("keel-graph-weld-prepare", { hold, chainId: 11155111, parts: parts.map((_, index) => ({ path: `p${index}.txt` })), out: "weld.json" })).structuredContent;
+    const plans = await Promise.all(parts.map((part) => createKeelManagedObjectPlan(new Uint8Array(part), { hold, mediaType: media, compression: "none" })));
+    const root = createKeelManagedCompositePlan(plans.map((plan) => plan.objectId), new Uint8Array(Buffer.concat(parts)), { hold, mediaType: media });
+    assert.equal(result.root.objectId, root.objectId);
+    assert.deepEqual(result.parts.map((part) => part.objectId), plans.map((plan) => plan.objectId));
+    const full = JSON.parse(await readFile(path.join(directory, "weld.json"), "utf8"));
+    assert.equal(full.operations.at(-1).kind, "weldComposite");
+    assert.equal(full.operations.at(-1).data, root.operation.data);
+    assert.ok(full.operations.some((operation) => operation.kind === "castSlugs"));
+    // Every operation is a KeelHold storage write, so wallet-request-prepare takes it without evidence.
+    const request = (await call("wallet-request-prepare", { request: { protocol: "keel-wallet-request@1", requestId: "root", label: "Weld root", family: "ethereum", chainId: 11155111, to: hold, data: full.operations.at(-1).data, valueWei: "0" } })).structuredContent;
+    assert.equal(request.standards.workKind, "storage-only");
+    // Reusing a published part by id needs the exact content the root commits to.
+    const reuse = await call("keel-graph-weld-prepare", { hold, parts: [{ objectId: plans[0].objectId }, { path: "p1.txt" }, { path: "p2.txt" }] });
+    assert.match(reuse.content[0].text, /contentPath/u);
+    await writeFile(path.join(directory, "all.txt"), Buffer.concat(parts));
+    const reused = (await call("keel-graph-weld-prepare", { hold, parts: [{ objectId: plans[0].objectId }, { path: "p1.txt" }, { path: "p2.txt" }], contentPath: "all.txt" })).structuredContent;
+    assert.equal(reused.root.objectId, root.objectId);
+    const lying = await call("keel-graph-weld-prepare", { hold, parts: [{ path: "p0.txt", objectId: plans[1].objectId }] });
+    assert.equal(lying.isError, true);
+  } finally {
+    await rm(directory, { recursive: true, force: true });
+  }
+});
+
+test("keel-inline-prepare writes part bytes, object ids and the root weld, and supports a contract-SVG image", async () => {
+  const { directory, call } = await workspace();
+  try {
+    await writeFile(path.join(directory, "entry.js"), "document.body.append('hi')\n");
+    await writeFile(path.join(directory, "car.svg"), '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 2 2"><rect width="2" height="2" fill="red"/></svg>');
+    const hold = "0x0a4f31d5ab08029e4c68f6f3227d9fa3a2d66267";
+    const result = (await call("keel-inline-prepare", { entry: "entry.js", collection: "0x1111111111111111111111111111111111111111", imageRoute: "contract-svg", imageSvgPath: "car.svg", chainId: 11155111, outputDirectory: "graph", hold })).structuredContent;
+    assert.equal(result.image.route, "contract-svg");
+    assert.equal(result.prepared.standardAudit.verdict, "pass");
+    const token = await readFile(path.join(directory, "graph", "tokenURI.txt"), "utf8");
+    assert.match(decodeURIComponent(token), /"image":"data:image\/svg\+xml/u);
+    assert.ok(result.graph.parts.length >= 3);
+    for (const part of result.graph.parts) assert.equal(`0x${createHash("sha256").update(await readFile(path.join(directory, part.path))).digest("hex")}`, part.sha256);
+    const again = (await call("keel-graph-weld-prepare", { hold, parts: result.graph.parts.map((part) => ({ path: part.path })), contentPath: "graph/graph-fragment.txt" })).structuredContent;
+    assert.equal(again.root.objectId, result.graph.weld.root.objectId);
+    const unsafe = await writeFile(path.join(directory, "bad.svg"), '<svg xmlns="http://www.w3.org/2000/svg" onload="x()"/>');
+    void unsafe;
+    const refused = await call("keel-inline-prepare", { entry: "entry.js", collection: "0x1111111111111111111111111111111111111111", imageRoute: "contract-svg", imageSvgPath: "bad.svg" });
+    assert.match(refused.content[0].text, /passive/u);
+    const missing = await call("keel-inline-prepare", { entry: "entry.js", collection: "0x1111111111111111111111111111111111111111", imageRoute: "contract-svg" });
+    assert.match(missing.content[0].text, /imageSvgPath/u);
+  } finally {
+    await rm(directory, { recursive: true, force: true });
+  }
+});
+
+test("preflight reads KEEL's own standards docs when the target does not vendor them; instructions name real tools", async () => {
+  const { directory, server, call } = await workspace();
+  try {
+    const preflight = (await call("keel-contract-workflow-preflight", {})).structuredContent;
+    const bundled = preflight.keelDocuments.map((document) => document.path);
+    for (const name of ["docs/KEEL_CONTRACTS.md", "docs/KEEL_PRESENTATION.md", "docs/KEEL_VERIFICATION_SHELL.md"]) assert.ok(bundled.includes(name), name);
+    for (const name of bundled) assert.ok(!preflight.unavailable.includes(name));
+    assert.ok(preflight.keelDocuments.every((document) => document.source === "keel-sdk" && /^0x[0-9a-f]{64}$/u.test(document.sha256)));
+    const init = await server.handle({ jsonrpc: "2.0", id: 500, method: "initialize", params: { protocolVersion: "2024-11-05", capabilities: {}, clientInfo: { name: "t", version: "1" } } });
+    const tools = new Set((await server.handle({ jsonrpc: "2.0", id: 501, method: "tools/list", params: {} })).result.tools.map((tool) => tool.name));
+    const prompts = new Set((await server.handle({ jsonrpc: "2.0", id: 502, method: "prompts/list", params: {} })).result.prompts.map((prompt) => prompt.name));
+    // Every keel-* name the instructions mention is a real tool or a real prompt.
+    for (const name of new Set(init.result.instructions.match(/\bkeel-[a-z0-9-]+/gu))) if (name !== "keel-onchain" /* a locator scheme, not a tool */) assert.ok(tools.has(name) || prompts.has(name), name);
+    assert.match(init.result.instructions, /keel-project-plan: it is an MCP PROMPT/u);
   } finally {
     await rm(directory, { recursive: true, force: true });
   }

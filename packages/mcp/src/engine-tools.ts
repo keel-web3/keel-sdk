@@ -6,7 +6,7 @@ import { contractControls, parseContractAbi } from "@keel/sdk/contract-controls"
 import { inspectNetwork, type KeelNetworkInspectionTarget } from "@keel/sdk/network-inspection";
 import { TOOL_SCHEMAS } from "./schemas.js";
 import { createIntegrity } from "@keel/protocol";
-import { issuePreflightReceipt, KEEL_STANDARD_WORKFLOW } from "./standards.js";
+import { issuePreflightReceipt, KEEL_STANDARD_WORKFLOW, readKeelSdkDocument } from "./standards.js";
 import type { ToolContext } from "./types.js";
 
 const properties: Record<string, JsonSchema> = {};
@@ -97,6 +97,7 @@ const CONTRACT_WORKFLOW_DOCUMENTS = [
 
 async function contractWorkflowPreflight(context: ToolContext, issueReceipt = false) {
   const documents: Array<{ path: string; byteLength: number; sha256: string; status: "read" }> = [];
+  const keelDocuments: Array<{ path: string; byteLength: number; sha256: string; status: "read"; source: "keel-sdk" }> = [];
   const unavailable: string[] = [];
   for (const relativePath of CONTRACT_WORKFLOW_DOCUMENTS) {
     try {
@@ -105,7 +106,10 @@ async function contractWorkflowPreflight(context: ToolContext, issueReceipt = fa
       documents.push({ path: relativePath, byteLength: loaded.bytes.byteLength, sha256: integrity.digest, status: "read" });
     } catch (error) {
       if (error !== null && typeof error === "object" && (error as { readonly code?: unknown }).code === "ENOENT") {
-        unavailable.push(relativePath);
+        // KEEL's own standards docs ship with this package; a target that does not vendor them still reads them.
+        const bundled = relativePath === "README.md" ? undefined : await readKeelSdkDocument(relativePath);
+        if (bundled === undefined) unavailable.push(relativePath);
+        else keelDocuments.push({ path: relativePath, byteLength: bundled.byteLength, sha256: (await createIntegrity(bundled)).digest, status: "read", source: "keel-sdk" });
         continue;
       }
       throw error;
@@ -114,12 +118,13 @@ async function contractWorkflowPreflight(context: ToolContext, issueReceipt = fa
   if (!documents.some((document) => document.path === "README.md")) throw new Error("Contract workflow preflight requires the target repository README.md.");
   if (!documents.some((document) => document.path.startsWith("docs/"))) throw new Error("Contract workflow preflight requires at least one target repository docs/ file.");
   const requiredNext = ["keel-engine-catalog", "keel-network-inspect", "keel-library-search", "keel-contract-controls", "keel-token-standard-audit"] as const;
-  const receipt = issueReceipt ? await issuePreflightReceipt(context.workspace, documents, requiredNext) : undefined;
+  const receipt = issueReceipt ? await issuePreflightReceipt(context.workspace, documents, requiredNext, undefined, keelDocuments) : undefined;
   return {
     schema: "keel-contract-workflow-preflight@1",
     status: "docs-read-module-scan-required" as const,
     workspace: context.workspace,
     documents,
+    keelDocuments,
     unavailable,
     requiredNext,
     ...(receipt === undefined ? {} : { receipt }),

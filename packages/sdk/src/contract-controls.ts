@@ -1,4 +1,4 @@
-import { encodeFunctionData, getAddress, toFunctionSignature, type Abi, type AbiFunction, type AbiParameter } from "viem";
+import { encodeDeployData, encodeFunctionData, getAddress, keccak256, toFunctionSignature, type Abi, type AbiFunction, type AbiParameter, type Hex } from "viem";
 
 export interface KeelTrackedContract {
   schema: "keel-tracked-contract@1";
@@ -118,5 +118,62 @@ export function prepareContractControl(input: { contract: KeelTrackedContract; s
     mode: fn.stateMutability === "view" || fn.stateMutability === "pure" ? "read" as const : "write" as const,
     authority: "unverified" as const, signing: "not-performed", submission: "not-performed",
     requires: ["selected-chain-code", "current-proxy-implementation", "current-account-authority", "simulation", "exact-wallet-review"],
+  };
+}
+
+/**
+ * Contract deployment checked against its compiler artifact.
+ *
+ * The init code is the artifact's creation bytecode (Foundry `bytecode.object` or Hardhat `bytecode`) followed by
+ * ABI-encoded constructor arguments coerced exactly like contract controls. A caller-supplied bytecode must equal
+ * the artifact's byte for byte, and unlinked library placeholders are refused, so what the wallet deploys is what
+ * was compiled and reviewed.
+ */
+export function prepareContractDeployment(input: {
+  readonly artifact: unknown;
+  readonly chainId: number;
+  readonly args?: readonly unknown[];
+  readonly bytecode?: string;
+  readonly valueWei?: string;
+}) {
+  const raw = typeof input.artifact === "string" ? JSON.parse(input.artifact) as unknown : input.artifact;
+  if (!raw || typeof raw !== "object" || Array.isArray(raw)) throw new TypeError("Deployment needs a compiler artifact object with abi and bytecode.");
+  const artifact = raw as Record<string, unknown>;
+  const abi = parseContractAbi(artifact);
+  const compiled = typeof artifact.bytecode === "string" ? artifact.bytecode
+    : artifact.bytecode && typeof artifact.bytecode === "object" && typeof (artifact.bytecode as { object?: unknown }).object === "string" ? (artifact.bytecode as { object: string }).object
+    : undefined;
+  if (compiled === undefined) throw new TypeError("The artifact has no creation bytecode (bytecode or bytecode.object).");
+  const normalized = (compiled.startsWith("0x") ? compiled : `0x${compiled}`).toLowerCase();
+  if (normalized.includes("__")) throw new TypeError("The artifact bytecode has unlinked library placeholders; link libraries before deployment.");
+  if (!/^0x(?:[0-9a-f]{2})+$/u.test(normalized)) throw new TypeError("The artifact creation bytecode is not hexadecimal.");
+  if (input.bytecode !== undefined) {
+    const supplied = (input.bytecode.startsWith("0x") ? input.bytecode : `0x${input.bytecode}`).toLowerCase();
+    if (supplied !== normalized) throw new TypeError("The supplied bytecode does not match the compiler artifact.");
+  }
+  if (!Number.isSafeInteger(input.chainId) || input.chainId <= 0) throw new TypeError("chainId must be a positive safe integer.");
+  const constructor = abi.find((item): item is Extract<Abi[number], { type: "constructor" }> => item.type === "constructor");
+  const inputs = constructor?.inputs ?? [];
+  const args = input.args ?? [];
+  if (!Array.isArray(args) || args.length !== inputs.length) throw new TypeError(`The constructor takes ${inputs.length} argument(s); provide every one in order.`);
+  if (JSON.stringify(args).length > 512_000) throw new TypeError("Constructor arguments exceed 512 KB.");
+  const coerced = inputs.map((parameter: AbiParameter, index: number) => coerce(parameter, args[index]));
+  const valueWei = input.valueWei ?? "0";
+  if (!/^(0|[1-9]\d{0,77})$/u.test(valueWei)) throw new TypeError("valueWei must be a uint256 integer string.");
+  if (constructor?.stateMutability !== "payable" && valueWei !== "0") throw new TypeError("Only a payable constructor can receive native value.");
+  const data = encodeDeployData({ abi, bytecode: normalized as Hex, args: coerced });
+  return {
+    schema: "keel-contract-deployment@1" as const,
+    status: "review-only" as const,
+    chainId: input.chainId,
+    data,
+    valueWei,
+    bytecodeKeccak: keccak256(normalized as Hex),
+    initCodeKeccak: keccak256(data),
+    constructor: { inputs, args },
+    authority: "unverified" as const,
+    signing: "not-performed" as const,
+    submission: "not-performed" as const,
+    requires: ["preflight-receipt", "token-standard-audit-when-a-token", "simulation", "exact-wallet-review", "post-deploy-code-readback"],
   };
 }

@@ -33,6 +33,12 @@ When changing the SDK or MCP:
   `oneOf`/`anyOf`/`allOf`. One invalid schema makes clients drop the whole tool
   list (the desktop app shows 0 tools). `mcpToolListIssues` and
   `tests/mcp-standards.test.mjs` check this.
+- Graph roots come from `keel-graph-weld-prepare` (or `keel-inline-prepare`
+  with `outputDirectory` + `hold`), deployments from `wallet-request-prepare`
+  `deploy`; never hand-build them with the SDK outside the MCP.
+- The audit must accept KEEL's own canonical multi-module graph (regression
+  fixture `tests/fixtures/redline-car-1-fork-tokenuri.txt.gz`) and still fail
+  real locators.
 - Never return `result-too-large` for a valid result. Write it with
   `deliverResult` (workspace file + sha256).
 - Mint systems and contract patterns agents need belong in

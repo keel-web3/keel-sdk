@@ -43,6 +43,7 @@ import {
   buildKeelInlineImageURI,
   KEEL_INLINE_MAX_TOKEN_URI_BYTES,
   createKeelWalletRequest,
+  prepareContractDeployment,
   encodeKeelWalletRequestQr,
   createKeelPublishReviewPlan,
   planKeelGraphRevision,
@@ -79,7 +80,8 @@ const ethereumAdapter = async (): Promise<typeof import("@keel/ethereum-adapter"
 import type { Compression, Hex } from "@keel/protocol";
 import { standardsEvidence, TOOL_SCHEMAS } from "./schemas.js";
 import { analyzeTokenUri, enforceStandards, recordTokenStandardAudit, tokenStandardAuditTool } from "./standards.js";
-import { deliverResult } from "./large-output.js";
+import { deliverResult, sha256Hex } from "./large-output.js";
+import { graphWeldPrepareTool, planGraphWeld, summarizeGraphWeld } from "./graph-weld.js";
 import { ENGINE_TOOL_DEFINITIONS } from "./engine-tools.js";
 import { EDITOR_TOOL_DEFINITIONS } from "./editor-tools.js";
 import { createChainOperationPlan } from "./chain-plan.js";
@@ -475,8 +477,61 @@ const KEEL_HOLD_STORAGE_SELECTORS: ReadonlySet<string> = new Set([
   "0x5f97a164", // weldComposite(bytes32[],bytes32,uint64,string)
 ]);
 
+/**
+ * Contract deployment: no `to`, init code from a compiler artifact. The SDK checks the bytecode against the
+ * artifact and encodes the constructor exactly like keel-contract-controls; the same standards gate applies.
+ */
+async function walletDeployPrepare(context: ToolContext, input: Record<string, unknown>): Promise<unknown> {
+  const deploy = record(input.deploy, ["artifactPath", "chainId", "args", "bytecode", "valueWei", "label", "requestId"], "deploy");
+  const artifactPath = requiredString(deploy, "artifactPath");
+  const artifactBytes = (await context.workspace.readFile(artifactPath, 32 * 1024 * 1024)).bytes;
+  if (typeof deploy.chainId !== "number") throw new TypeError("deploy.chainId is required.");
+  if (deploy.args !== undefined && !Array.isArray(deploy.args)) throw new TypeError("deploy.args must be the ordered constructor arguments (integers as decimal strings).");
+  const clearance = await enforceStandards(context, input.standards, {
+    tool: "wallet-request-prepare",
+    defaultWorkKind: "token-contract",
+    allowedWorkKinds: ["token-contract", "collection", "metadata", "viewer", "registry-or-module"],
+    auditChainId: deploy.chainId,
+  });
+  const deployment = prepareContractDeployment({
+    artifact: new TextDecoder("utf-8", { fatal: true }).decode(artifactBytes),
+    chainId: deploy.chainId,
+    ...(deploy.args === undefined ? {} : { args: deploy.args as unknown[] }),
+    ...(deploy.bytecode === undefined ? {} : { bytecode: requiredString(deploy, "bytecode") }),
+    ...(deploy.valueWei === undefined ? {} : { valueWei: requiredString(deploy, "valueWei") }),
+  });
+  const request = {
+    protocol: "keel-wallet-deploy-request@1",
+    requestId: optionalString(deploy, "requestId") ?? `deploy-${deployment.initCodeKeccak.slice(2, 14)}`,
+    label: optionalString(deploy, "label") ?? `Deploy ${path.basename(artifactPath, ".json")}`,
+    family: "ethereum",
+    chainId: deployment.chainId,
+    to: null,
+    data: deployment.data,
+    valueWei: deployment.valueWei,
+  };
+  const result = {
+    status: "prepared-only",
+    kind: "contract-deployment",
+    signing: "not-performed",
+    submission: "not-performed",
+    standards: clearance,
+    artifact: { path: artifactPath, sha256: sha256Hex(artifactBytes), bytecodeKeccak: deployment.bytecodeKeccak },
+    constructor: deployment.constructor,
+    initCodeKeccak: deployment.initCodeKeccak,
+    envelope: { request, integrity: { algorithm: "sha256", digest: sha256Hex(JSON.stringify(request)) } },
+    requires: deployment.requires,
+  };
+  return deliverResult(context.workspace, result, {
+    outPath: `.keel-mcp/deployments/${deployment.initCodeKeccak.slice(2, 18)}.json`,
+    summary: (full) => ({ ...full, envelope: { request: { ...full.envelope.request, data: `${full.envelope.request.data.slice(0, 66)}…` }, integrity: full.envelope.integrity, dataBytes: (full.envelope.request.data.length - 2) / 2 } }),
+  });
+}
+
 async function walletRequestPrepareTool(context: ToolContext, value: unknown): Promise<unknown> {
-  const input = record(value, ["request", "qr", "standards"], "wallet request arguments");
+  const input = record(value, ["request", "deploy", "qr", "standards"], "wallet request arguments");
+  if ((input.request === undefined) === (input.deploy === undefined)) throw new TypeError("Provide exactly one of request (a call) or deploy (a contract deployment).");
+  if (input.deploy !== undefined) return walletDeployPrepare(context, input);
   const request = input.request !== null && typeof input.request === "object" && !Array.isArray(input.request) ? input.request as Record<string, unknown> : {};
   const ethereum = request.family === "ethereum";
   const data = typeof request.data === "string" ? request.data.toLowerCase() : "";
@@ -1118,7 +1173,8 @@ async function inlinePrepareTool(context: ToolContext, value: unknown): Promise<
     value,
     ["repositoryRoot", "entry", "entryMediaType", "modules", "assets", "carriage", "presentationPolicy", "collection",
      "collectionName", "description", "imagePath", "manifestURI", "manifestDigest", "chainId",
-     "metadataTransport", "metadataPath", "tokenId", "tokenIdFieldsJson", "web3ImageResolver"],
+     "metadataTransport", "metadataPath", "tokenId", "tokenIdFieldsJson", "web3ImageResolver",
+     "imageSvgPath", "imageRoute", "hold", "outputDirectory"],
     "Inline prepare arguments",
   );
   const repositoryRoot = optionalString(input, "repositoryRoot");
@@ -1245,19 +1301,30 @@ async function inlinePrepareTool(context: ToolContext, value: unknown): Promise<
     throw new TypeError("metadataPath, tokenId and web3ImageResolver require metadataTransport: web3-json.");
   }
   const collection = optionalString(input, "collection");
+  const imageRoute = optionalString(input, "imageRoute") ?? "prepared";
+  if (imageRoute !== "prepared" && imageRoute !== "contract-svg") throw new TypeError("imageRoute must be prepared or contract-svg.");
   if (metadataTransport === "web3-json" && resolvedCarriage !== "raw-percent") {
     throw new TypeError("web3-json uses the compact raw-percent viewer carriage.");
   }
   if (collection !== undefined || metadataTransport === "web3-json") {
-    const imagePath = optionalString(input, "imagePath");
+    const imageSvgPath = optionalString(input, "imageSvgPath");
+    if (imageRoute === "contract-svg" && imageSvgPath === undefined) throw new TypeError("imageRoute contract-svg needs imageSvgPath: a sample svg(uint256) output from keel-svg-create or the deployed renderer.");
+    const imagePath = optionalString(input, "imagePath") ?? imageSvgPath;
     if (imagePath === undefined) {
       throw new TypeError(
-        "A prepared one-of-one tokenURI needs imagePath. Keel inlines the poster as a data: URI; "
-        + "leaving it out makes KEEL721 fall back to the manifest locator, which marketplaces cannot fetch.",
+        "A prepared one-of-one tokenURI needs an onchain image: imagePath (poster inlined as data:image) or, for a "
+        + "contract-generated SVG, imageRoute: contract-svg with imageSvgPath. Leaving it out makes KEEL721 fall back "
+        + "to the manifest locator, which marketplaces cannot fetch.",
       );
     }
+    if (optionalString(input, "imagePath") !== undefined && imageSvgPath !== undefined) throw new TypeError("Provide imagePath or imageSvgPath, not both.");
     const poster = (await context.workspace.readFile(imagePath, MAX_MEDIA_BYTES)).bytes;
-    const posterType = imagePath.endsWith(".webp") ? "image/webp"
+    if (imageSvgPath !== undefined) {
+      const svgText = new TextDecoder("utf-8", { fatal: true }).decode(poster);
+      if (!/<svg[\s>]/iu.test(svgText)) throw new TypeError("imageSvgPath must be an SVG document.");
+      if (/<script[\s>]|\son[a-z]+\s*=/iu.test(svgText)) throw new TypeError("A token image SVG must be passive: no <script> or event handlers.");
+    }
+    const posterType = imageSvgPath !== undefined ? "image/svg+xml" : imagePath.endsWith(".webp") ? "image/webp"
       : imagePath.endsWith(".png") ? "image/png"
       : imagePath.endsWith(".avif") ? "image/avif"
       : /\.jpe?g$/iu.test(imagePath) ? "image/jpeg"
@@ -1296,8 +1363,37 @@ async function inlinePrepareTool(context: ToolContext, value: unknown): Promise<
     }
   }
 
+  // Part bytes, object ids and the storage operations, so the whole graph (and its root weld) comes from the MCP.
+  const outputDirectory = optionalString(input, "outputDirectory");
+  const hold = optionalString(input, "hold");
+  if (hold !== undefined && outputDirectory === undefined) throw new TypeError("hold needs outputDirectory: the part bytes and the weld plan are written there.");
+  let graphOutput: Record<string, unknown> | undefined;
+  if (outputDirectory !== undefined) {
+    const safe = (value: string) => value.replace(/[^A-Za-z0-9._-]+/gu, "-").slice(0, 64);
+    const written: Array<Record<string, unknown> & { readonly path: string }> = [];
+    for (const [index, part] of graph.parts.entries()) {
+      const source = document.parts[index] as { readonly moduleId?: string; readonly id?: string } | undefined;
+      const name = `part-${String(index).padStart(2, "0")}-${part.role}${source?.moduleId ? `-${safe(source.moduleId)}` : ""}.txt`;
+      await context.workspace.writeText(`${outputDirectory}/${name}`, new TextDecoder().decode(part.bytes));
+      written.push({ index, role: part.role, sourceKind: (part as { sourceKind?: string }).sourceKind, ...((part as { sourceObjectId?: string }).sourceObjectId === undefined ? {} : { sourceObjectId: (part as { sourceObjectId?: string }).sourceObjectId }), path: `${outputDirectory}/${name}`, byteLength: part.bytes.byteLength, sha256: sha256Hex(part.bytes) });
+    }
+    await context.workspace.writeText(`${outputDirectory}/graph-fragment.txt`, new TextDecoder().decode(graph.fragmentBytes));
+    if (prepared !== undefined) await context.workspace.writeText(`${outputDirectory}/tokenURI.txt`, prepared.tokenURI);
+    let weld: Record<string, unknown> | undefined;
+    if (hold !== undefined) {
+      const plan = await planGraphWeld({ hold, mediaType: graph.mediaType, parts: graph.parts.map((part, index) => ({ bytes: part.bytes, label: `${index}:${part.role}`, path: written[index]!.path })), content: graph.fragmentBytes });
+      const weldPath = await context.workspace.writeText(`${outputDirectory}/graph-weld.json`, `${JSON.stringify(plan, null, 2)}\n`);
+      weld = { ...summarizeGraphWeld(plan), planPath: `${outputDirectory}/graph-weld.json`, planSha256: sha256Hex(`${JSON.stringify(plan, null, 2)}\n`), absolutePath: weldPath };
+    }
+    graphOutput = { directory: outputDirectory, fragmentPath: `${outputDirectory}/graph-fragment.txt`, ...(prepared === undefined ? {} : { tokenURIPath: `${outputDirectory}/tokenURI.txt` }), parts: written, ...(weld === undefined ? {} : { weld }) };
+  }
+
   return Object.freeze({
     schema: "keel.inline-prepare@1" as const,
+    ...(graphOutput === undefined ? {} : { graph: graphOutput }),
+    ...(collection === undefined ? {} : { image: imageRoute === "contract-svg"
+      ? { route: "contract-svg", note: "The prepared tokenURI embeds the sample SVG for review and audit. Live, the renderer contract generates the image (svg(uint256)); after binding it, run keel-token-standard-audit against the live contract." }
+      : { route: "prepared", note: "The exact image carriage is prepared once and copied by tokenURI." } }),
     status: "review-only" as const,
     carriage,
     resolvedCarriage,
@@ -1476,12 +1572,13 @@ export const TOOL_DEFINITIONS: readonly ToolDefinition[] = [
   tool("verify", "Verify a local artifact manifest and its available relative resources.", TOOL_SCHEMAS.verify, verifyTool),
   tool("cost", "Estimate compression, chunks, recursive depth, transactions, and calldata using an offline model.", TOOL_SCHEMAS.cost, costTool),
   tool("upload-plan", "Plan flat or recursive chunk uploads from bounded local bytes without writing to the workspace or touching a chain.", TOOL_SCHEMAS.uploadPlan, uploadPlanTool),
+  tool("keel-graph-weld-prepare", "Plan a multi-part KEEL graph in KeelHold from the MCP: each part's castSlugs + weldObject and the ROOT weldComposite joining them in order (e.g. canonical shell top + modules + assets + entry + shell bottom from keel-inline-prepare outputDirectory). Returns object ids and exact calldata (large plans as a workspace file + sha256). Storage-only; review-only, never signs or submits.", TOOL_SCHEMAS.graphWeld, graphWeldPrepareTool),
   tool("chain-plan", "Verify a materialized upload plan and emit deterministic review-only contract operation descriptors; no ABI encoding, signing, or submission occurs.", TOOL_SCHEMAS.chainPlan, chainPlanTool),
   tool("ethereum-encode", "Encode verified local Ethereum KeelHold operations with viem for review only; no RPC, signing, submission, or QR payload is produced. Results above the inline budget are written in full to a workspace file and returned as path + sha256 (never re-encode by hand).", TOOL_SCHEMAS.ethereumEncode, ethereumEncodeTool),
   tool("publish-plan", "Bind a verified review-only chain descriptor (chainPlan, or chainPlanPath when chain-plan delivered a file) to a canonical SDK envelope. Plain asset storage passes as storage-only; HTML, JSON or KEEL tokenURI fragment bytes are viewer/metadata work and require standards.preflightReceipt (metadata also standards.auditDigest). Existing graph revisions must pass the one-resource delta gate. No ABI encoding, signing, or submission occurs.", TOOL_SCHEMAS.publishPlan, publishPlanTool),
   tool("module-resolve", "Resolve one exact module selector from a local snapshot without fetching carriers.", TOOL_SCHEMAS.moduleResolve, moduleResolveTool),
   tool("module-lock", "Write a canonical local module lock and unavailable-by-default receipt.", TOOL_SCHEMAS.moduleLock, moduleLockTool),
-  tool("wallet-request-prepare", "Prepare a canonical user-reviewable wallet request or QR payload without signing or submitting. Only KeelHold storage writes (castSlugs/weldObject/weldComposite, zero value) pass without evidence. Anything else refuses unless standards.preflightReceipt is valid, and token-contract work (the default) also needs standards.auditDigest from a passing keel-token-standard-audit of the exact target contract.", TOOL_SCHEMAS.walletRequestPrepare, walletRequestPrepareTool),
+  tool("wallet-request-prepare", "Prepare a canonical user-reviewable wallet request (request) or a contract deployment (deploy: compiler artifact + constructor args; bytecode is checked against the artifact and args are encoded like keel-contract-controls) without signing or submitting. Addresses may be EIP-55 checksummed. Only KeelHold storage writes (castSlugs/weldObject/weldComposite, zero value) pass without evidence. Anything else refuses unless standards.preflightReceipt is valid, and token-contract work (the default) also needs standards.auditDigest from a passing keel-token-standard-audit of the exact target contract.", TOOL_SCHEMAS.walletRequestPrepare, walletRequestPrepareTool),
   tool("wallet-link", "Prepare a review-only account-to-agent KeelFactory castDieFor authorization and JSON-safe EIP-712 typed data. Emitting typed data requires standards.preflightReceipt and a passing standards.auditDigest of the collection's prepared tokenURI. No signing, RPC, or submission occurs.", TOOL_SCHEMAS.walletLink, walletLinkTool),
   tool("module-review-prepare", "Prepare a review-only KeelModuleReviewRegistry action (submit/sanction/deprecate/revoke a non-contract module's onchain trust) as a canonical descriptor. Requires standards.preflightReceipt. No signing, encoding, or submission occurs.", TOOL_SCHEMAS.moduleReview, moduleReviewPrepareTool),
   tool("fray-auction-intake", "Collect the title, description, chain, and one of exactly four Fray auction presets before emitting a user-approved API and wallet handoff; no signing or submission occurs.", TOOL_SCHEMAS.frayAuctionIntake, frayAuctionIntakeTool),

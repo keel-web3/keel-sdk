@@ -58,12 +58,15 @@ export function planKeelAssetPresentation(input: {
 /** @deprecated Use KEEL_INLINE_MAX_TOKEN_URI_BYTES; decoded browser bytes are not the RPC boundary. */
 export const KEEL_INLINE_MAX_RECONSTRUCTED_BYTES = KEEL_INLINE_MAX_TOKEN_URI_BYTES;
 /**
- * Upper bound KEEL will ever request for a read-only Inline reconstruction.
- * The caller must also cap this at the selected chain's latest block gas
- * limit; a hard-coded 30M ceiling incorrectly rejects valid reads on chains
- * whose public RPC execution boundary is higher.
+ * Upper bound KEEL will ever request for a read-only Inline reconstruction:
+ * the documented 30,000,000-gas public-RPC safety cap (docs/KEEL_PRESENTATION.md).
+ * Marketplaces and wallets call tokenURI through public RPCs whose default
+ * eth_call allowance is 30M-50M, so a read that needs more is not reliably
+ * readable. The caller also caps this at the selected chain's block gas limit.
+ * One constant: network inspection, the Tezos route planner and the MCP
+ * token standard audit all read it.
  */
-export const KEEL_INLINE_SAFE_RPC_GAS = 60_000_000n;
+export const KEEL_INLINE_SAFE_RPC_GAS = 30_000_000n;
 export const KEEL_INLINE_TOKEN_URI_FIXED_GAS = 5_000_000n;
 export const KEEL_INLINE_TOKEN_URI_GAS_PER_BYTE = 90n;
 export const KEEL_PREENCODED_TOKEN_URI_COLLECTION_MARGIN = 5_000_000n;

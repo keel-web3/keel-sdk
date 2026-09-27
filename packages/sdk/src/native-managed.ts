@@ -125,3 +125,19 @@ export function createKeelManagedCompositePlan(ids: readonly Hex[], bytes: Uint8
   return {objectId,digest,byteLength,operation:{target:options.hold,value:0n,
     data:encodeFunctionData({abi:holdAbi,functionName:"weldComposite",args:[ids,digest,byteLength,options.mediaType]})}};
 }
+
+/**
+ * The castSlugs writes that must precede a managed object's welds: every chunk the plan still needs, in canonical
+ * order, three slugs per call (the KeelHold batch the adapter uses). Together with `plan.operations` this is the
+ * complete ordered storage transaction list for one object.
+ */
+export function keelManagedCastOperations(plan: Pick<KeelManagedObject, "chunks">, hold: Address, batch = 3) {
+  if (!Number.isSafeInteger(batch) || batch < 1 || batch > 16) throw new Error("Invalid castSlugs batch size.");
+  const operations: { target: Address; value: bigint; data: Hex; slugIds: readonly Hex[] }[] = [];
+  for (let index = 0; index < plan.chunks.length; index += batch) {
+    const group = plan.chunks.slice(index, index + batch);
+    operations.push({ target: hold, value: 0n, slugIds: group.map((chunk) => chunk.id),
+      data: encodeFunctionData({ abi: holdAbi, functionName: "castSlugs", args: [group.map((chunk) => toHex(chunk.bytes))] }) });
+  }
+  return operations;
+}
