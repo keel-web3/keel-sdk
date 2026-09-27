@@ -6,7 +6,7 @@ import { existsSync } from "node:fs";
 import path from "node:path";
 import { createHash } from "node:crypto";
 import { gunzipSync, gzipSync } from "node:zlib";
-import { encodeDeployData, getAddress } from "viem";
+import { encodeDeployData, encodeFunctionData, getAddress } from "viem";
 import { createKeelManagedCompositePlan, createKeelManagedObjectPlan } from "../packages/sdk/dist/native-managed.js";
 import { createUploadPlan } from "../packages/builder/dist/index.js";
 import { KEEL_ENGINE_CATALOG, planKeelProject } from "../packages/sdk/dist/engine.js";
@@ -43,7 +43,7 @@ function abiString(text) {
 }
 
 /** Loopback JSON-RPC that serves one tokenURI; `needsGas` makes calls capped at 30M fail as out-of-gas. */
-async function mockRpc({ tokenUri, chainId = 11155111, needsGas = false, estimate = 60_000, requiredGas = needsGas ? 40_000_000 : 0, trace = false }) {
+async function mockRpc({ tokenUri, chainId = 11155111, needsGas = false, estimate = 60_000, requiredGas = needsGas ? 40_000_000 : 0, trace = false, fallbackTokenUri, answers = {} }) {
   const calls = [];
   const server = createServer((request, response) => {
     let body = "";
@@ -57,7 +57,11 @@ async function mockRpc({ tokenUri, chainId = 11155111, needsGas = false, estimat
       if (method === "eth_estimateGas") return reply({ result: `0x${estimate.toString(16)}` });
       if (method === "debug_traceCall" && trace) return reply({ result: { gasUsed: `0x${Math.floor(requiredGas * 0.98).toString(16)}` } });
       if (method === "eth_call") {
-        if (params[0].gas !== undefined && Number(BigInt(params[0].gas)) < requiredGas) return reply({ error: { code: -32000, message: "out of gas" } });
+        for (const [prefix, result] of Object.entries(answers)) if (params[0].data.startsWith(prefix)) return result === null ? reply({ error: { code: 3, message: "execution reverted" } }) : reply({ result });
+        const gas = params[0].gas === undefined ? Infinity : Number(BigInt(params[0].gas));
+        // Like HashersCar: with too little gas for the renderer it still answers, with different bytes.
+        if (gas < requiredGas && fallbackTokenUri !== undefined && gas >= 150_000) return reply({ result: abiString(fallbackTokenUri) });
+        if (gas < requiredGas) return reply({ error: { code: -32000, message: "out of gas" } });
         return reply({ result: abiString(tokenUri) });
       }
       return reply({ error: { code: -32601, message: "no" } });
@@ -409,9 +413,11 @@ test("audit measures real read gas by eth_call binary search, alongside the trac
   try {
     const result = (await call("keel-token-standard-audit", { rpcUrl: rpc.url, contract: CAR, tokenId: "1" })).structuredContent;
     assert.equal(result.verdict, "pass");
-    assert.ok(result.read.measuredGas >= 6_000_000 && result.read.measuredGas <= 6_000_000 * 1.01, String(result.read.measuredGas));
-    assert.equal(result.read.measurement.method, "eth_call-binary-search");
+    // The trace figure is primary; the equal-bytes search is reported beside it.
+    assert.equal(result.read.measuredGas, 5_880_000);
+    assert.equal(result.read.measurement.method, "debug_traceCall");
     assert.equal(result.read.measurement.tracedGasUsed, 5_880_000);
+    assert.ok(result.read.measurement.searchedGasLimit >= 6_000_000 && result.read.measurement.searchedGasLimit <= 6_000_000 * 1.01);
     assert.equal(result.read.estimatedGas, 21_000);
   } finally {
     await rpc.close();
@@ -536,6 +542,150 @@ test("preflight reads KEEL's own standards docs when the target does not vendor 
     for (const name of new Set(init.result.instructions.match(/\bkeel-[a-z0-9-]+/gu))) if (name !== "keel-onchain" /* a locator scheme, not a tool */) assert.ok(tools.has(name) || prompts.has(name), name);
     assert.match(init.result.instructions, /keel-project-plan: it is an MCP PROMPT/u);
   } finally {
+    await rm(directory, { recursive: true, force: true });
+  }
+});
+
+test("a low-gas fallback answer does not count: the search needs the full-gas bytes", async () => {
+  const { directory, call } = await workspace();
+  const rpc = await mockRpc({ tokenUri: rawPercent({ name: "full", image: IMAGE, description: "with renderer" }), fallbackTokenUri: rawPercent({ name: "fallback", image: IMAGE }), requiredGas: 5_990_000 });
+  try {
+    const result = (await call("keel-token-standard-audit", { rpcUrl: rpc.url, contract: CAR, tokenId: "1" })).structuredContent;
+    assert.equal(result.read.measurement.method, "eth_call-binary-search-equal-bytes");
+    assert.ok(result.read.measuredGas >= 5_990_000 && result.read.measuredGas <= 5_990_000 * 1.01, String(result.read.measuredGas));
+    assert.equal(result.read.measuredGas, result.read.measurement.searchedGasLimit);
+    assert.ok(result.read.measurement.lowGasDivergentResults > 0);
+    assert.match(result.read.measurement.note, /low-gas fallback/u);
+  } finally {
+    await rpc.close();
+    await rm(directory, { recursive: true, force: true });
+  }
+});
+
+test("call encoding through contract controls, nesting, and KeelAuthority forwards matched to the audited target", async () => {
+  const { directory, call } = await workspace();
+  const rpc = await mockRpc({ tokenUri: rawPercent({ name: "car", image: IMAGE }) });
+  try {
+    const authority = "0x7777777777777777777777777777777777777777";
+    const other = "0x8888888888888888888888888888888888888888";
+    const carAbi = [
+      { type: "function", name: "setRenderer", stateMutability: "nonpayable", inputs: [{ name: "renderer", type: "address" }], outputs: [] },
+      { type: "function", name: "setImageBase", stateMutability: "nonpayable", inputs: [{ name: "base", type: "string" }], outputs: [] },
+    ];
+    await writeFile(path.join(directory, "HashersCar.json"), JSON.stringify({ abi: carAbi, bytecode: { object: "0x00" } }));
+    const authorityAbi = [{ type: "function", name: "execute", stateMutability: "payable", inputs: [{ name: "call_", type: "tuple", components: [{ name: "target", type: "address" }, { name: "value", type: "uint256" }, { name: "data", type: "bytes" }] }], outputs: [{ name: "", type: "bytes" }] }];
+    const preflightReceipt = (await call("keel-contract-workflow-preflight", {})).structuredContent.receipt.id;
+    const auditDigest = (await call("keel-token-standard-audit", { rpcUrl: rpc.url, contract: CAR, tokenId: "1" })).structuredContent.digest;
+    const standards = { preflightReceipt, auditDigest };
+    const ok = (result) => { assert.equal(result.isError, undefined, result.content[0].text); return result.structuredContent; };
+    const renderer = getAddress("0x3333333333333333333333333333333333333abc");
+    const expectedInner = encodeFunctionData({ abi: carAbi, functionName: "setRenderer", args: [renderer] });
+
+    // Direct call encoded from the artifact.
+    const directResult = await call("wallet-request-prepare", { call: { chainId: 11155111, to: getAddress(CAR), abiPath: "HashersCar.json", signature: "setRenderer(address)", args: [renderer] }, standards });
+    assert.equal(directResult.isError, undefined, directResult.content[0].text);
+    const direct = directResult.structuredContent;
+    assert.equal(direct.envelope.request.data, expectedInner);
+    assert.equal(direct.envelope.request.to, CAR);
+    const empty = ok(await call("wallet-request-prepare", { call: { chainId: 11155111, to: CAR, abiPath: "HashersCar.json", signature: "setImageBase(string)", args: [""] }, standards }));
+    assert.equal(empty.envelope.request.data, encodeFunctionData({ abi: carAbi, functionName: "setImageBase", args: [""] }));
+
+    // via: KeelAuthority.execute wrapping the car call; the audit subject is matched to the inner target.
+    const wrapped = ok(await call("wallet-request-prepare", { call: { chainId: 11155111, to: CAR, abiPath: "HashersCar.json", signature: "setRenderer(address)", args: [renderer], via: { authority } }, standards }));
+    assert.equal(wrapped.envelope.request.to, authority);
+    assert.equal(wrapped.envelope.request.data, encodeFunctionData({ abi: authorityAbi, functionName: "execute", args: [{ target: getAddress(CAR), value: 0n, data: expectedInner }] }));
+    assert.deepEqual(wrapped.forwarded, { via: [{ authority, function: "execute" }], target: CAR, selector: expectedInner.slice(0, 10) });
+    assert.equal(wrapped.standards.audit.digest, auditDigest);
+
+    // Nesting: the authority ABI with a { call } argument builds the same bytes as via.
+    const nested = ok(await call("wallet-request-prepare", { call: { chainId: 11155111, to: authority, abiJson: JSON.stringify(authorityAbi), signature: "execute((address,uint256,bytes))", args: [[CAR, "0", { call: { abiPath: "HashersCar.json", signature: "setRenderer(address)", args: [renderer] } }]] }, standards }));
+    assert.equal(nested.envelope.request.data, wrapped.envelope.request.data);
+
+    // Prepared calldata to the authority is unwrapped too; an inner target that is NOT the audited contract is refused.
+    const raw = ok(await call("wallet-request-prepare", { request: { protocol: "keel-wallet-request@1", requestId: "x", label: "x", family: "ethereum", chainId: 11155111, to: authority, data: wrapped.envelope.request.data, valueWei: "0" }, standards }));
+    assert.equal(raw.status, "prepared-only");
+    const elsewhere = await call("wallet-request-prepare", { call: { chainId: 11155111, to: other, abiPath: "HashersCar.json", signature: "setRenderer(address)", args: [renderer], via: { authority } }, standards });
+    assert.equal(elsewhere.structuredContent.code, "token-standard-audit-subject-mismatch");
+    const unaudited = await call("wallet-request-prepare", { call: { chainId: 11155111, to: CAR, abiPath: "HashersCar.json", signature: "setRenderer(address)", args: [renderer], via: { authority, function: "callAsDelegate" } } });
+    assert.equal(unaudited.structuredContent.code, "standards-evidence-required");
+
+    // The controls still check signatures and arguments.
+    const unknownFn = await call("wallet-request-prepare", { call: { chainId: 11155111, to: CAR, abiPath: "HashersCar.json", signature: "burn(uint256)", args: ["1"] }, standards });
+    assert.equal(unknownFn.isError, true);
+    const badArg = await call("wallet-request-prepare", { call: { chainId: 11155111, to: CAR, abiPath: "HashersCar.json", signature: "setRenderer(address)", args: ["not-an-address"] }, standards });
+    assert.equal(badArg.isError, true);
+  } finally {
+    await rpc.close();
+    await rm(directory, { recursive: true, force: true });
+  }
+});
+
+test("role administration and ERC-20 targets need the receipt, never a tokenURI audit; decided by the inner function", async () => {
+  const { directory, call } = await workspace();
+  const erc20Rpc = await mockRpc({ tokenUri: "", answers: { "0x01ffc9a7": `0x${"0".repeat(64)}`, "0x313ce567": `0x${"12".padStart(64, "0")}` } });
+  const nftRpc = await mockRpc({ tokenUri: "", answers: { "0x01ffc9a780ac58cd": `0x${"1".padStart(64, "0")}`, "0x01ffc9a7": `0x${"0".repeat(64)}` } });
+  try {
+    const SCRAP = "0x5555555555555555555555555555555555555555";
+    const OLD = "0x6666666666666666666666666666666666666666";
+    const authority = "0x7777777777777777777777777777777777777777";
+    const BURNER = `0x${createHash("sha256").update("BURNER_ROLE").digest("hex")}`;
+    const scrapAbi = [
+      { type: "function", name: "decimals", stateMutability: "view", inputs: [], outputs: [{ name: "", type: "uint8" }] },
+      { type: "function", name: "transfer", stateMutability: "nonpayable", inputs: [{ name: "to", type: "address" }, { name: "amount", type: "uint256" }], outputs: [{ name: "", type: "bool" }] },
+      { type: "function", name: "mint", stateMutability: "nonpayable", inputs: [{ name: "to", type: "address" }, { name: "amount", type: "uint256" }], outputs: [] },
+      { type: "function", name: "grantRole", stateMutability: "nonpayable", inputs: [{ name: "role", type: "bytes32" }, { name: "account", type: "address" }], outputs: [] },
+      { type: "function", name: "revokeRole", stateMutability: "nonpayable", inputs: [{ name: "role", type: "bytes32" }, { name: "account", type: "address" }], outputs: [] },
+    ];
+    const carAbi = [
+      { type: "function", name: "tokenURI", stateMutability: "view", inputs: [{ name: "id", type: "uint256" }], outputs: [{ name: "", type: "string" }] },
+      { type: "function", name: "revokeRole", stateMutability: "nonpayable", inputs: [{ name: "role", type: "bytes32" }, { name: "account", type: "address" }], outputs: [] },
+      { type: "function", name: "setRenderer", stateMutability: "nonpayable", inputs: [{ name: "renderer", type: "address" }], outputs: [] },
+    ];
+    await writeFile(path.join(directory, "Scrap.json"), JSON.stringify({ abi: scrapAbi }));
+    await writeFile(path.join(directory, "Car.json"), JSON.stringify({ abi: carAbi }));
+    const preflightReceipt = (await call("keel-contract-workflow-preflight", {})).structuredContent.receipt.id;
+    const ok = (result) => { assert.equal(result.isError, undefined, result.content[0].text); return result.structuredContent; };
+    const revoke = { chainId: 11155111, to: SCRAP, abiPath: "Scrap.json", signature: "revokeRole(bytes32,address)", args: [BURNER, OLD] };
+
+    // Phase 2 exactly: authority.execute -> SCRAP.revokeRole(BURNER_ROLE, old). Receipt only.
+    const phase2 = ok(await call("wallet-request-prepare", { call: { ...revoke, via: { authority } }, standards: { preflightReceipt } }));
+    assert.equal(phase2.standards.workKind, "role-admin");
+    assert.equal(phase2.standards.audit, undefined);
+    assert.equal(phase2.classification.roleAdmin, "revokeRole(bytes32,address)");
+    assert.equal(phase2.classification.control.mode, "write");
+    assert.equal(phase2.forwarded.target, SCRAP);
+    assert.equal((await call("wallet-request-prepare", { call: { ...revoke, via: { authority } } })).structuredContent.code, "standards-evidence-required");
+
+    // The same calldata prepared elsewhere: the controls check needs the target ABI.
+    const raw = { protocol: "keel-wallet-request@1", requestId: "p2", label: "p2", family: "ethereum", chainId: 11155111, to: authority, data: phase2.envelope.request.data, valueWei: "0" };
+    assert.equal((await call("wallet-request-prepare", { request: raw, standards: { preflightReceipt } })).structuredContent.code, "contract-controls-required");
+    assert.equal(ok(await call("wallet-request-prepare", { request: raw, controlsAbiPath: "Scrap.json", standards: { preflightReceipt } })).standards.workKind, "role-admin");
+
+    // Role admin on the NFT is still role admin: decided by the function, not the target.
+    assert.equal(ok(await call("wallet-request-prepare", { call: { ...revoke, to: CAR, abiPath: "Car.json" }, standards: { preflightReceipt } })).standards.workKind, "role-admin");
+    // ... but a metadata setter on the NFT cannot be declared role-admin to dodge the audit.
+    const dodge = await call("wallet-request-prepare", { call: { chainId: 11155111, to: CAR, abiPath: "Car.json", signature: "setRenderer(address)", args: [OLD] }, standards: { preflightReceipt, workKind: "role-admin" } });
+    assert.equal(dodge.structuredContent.code, "work-kind-not-verified");
+    assert.equal((await call("wallet-request-prepare", { call: { chainId: 11155111, to: CAR, abiPath: "Car.json", signature: "setRenderer(address)", args: [OLD] }, standards: { preflightReceipt } })).structuredContent.code, "token-standard-audit-required");
+
+    // ERC-20 by ABI shape: any call is fungible-token work, no tokenURI audit.
+    const mint = ok(await call("wallet-request-prepare", { call: { chainId: 11155111, to: SCRAP, abiPath: "Scrap.json", signature: "mint(address,uint256)", args: [OLD, "1000"], via: { authority } }, standards: { preflightReceipt } }));
+    assert.equal(mint.standards.workKind, "fungible-token");
+    assert.equal(mint.classification.tokenKind, "erc20");
+    // ERC-20 by live detection (decimals(), no ERC-721/1155) for prepared calldata.
+    const mintRaw = { ...raw, to: SCRAP, data: mint.call.data };
+    assert.equal((await call("wallet-request-prepare", { request: mintRaw, standards: { preflightReceipt } })).structuredContent.code, "token-standard-audit-required");
+    assert.equal(ok(await call("wallet-request-prepare", { request: mintRaw, targetRpcUrl: erc20Rpc.url, standards: { preflightReceipt } })).standards.workKind, "fungible-token");
+    // An ERC-721 answering decimals-less ERC-165 stays strict, and fungible-token cannot be claimed for it.
+    assert.equal((await call("wallet-request-prepare", { request: { ...mintRaw, to: CAR }, targetRpcUrl: nftRpc.url, standards: { preflightReceipt } })).structuredContent.code, "token-standard-audit-required");
+    assert.equal((await call("wallet-request-prepare", { request: { ...mintRaw, to: CAR }, targetRpcUrl: nftRpc.url, standards: { preflightReceipt, workKind: "fungible-token" } })).structuredContent.code, "work-kind-not-verified");
+
+    // Deploying an ERC-20 needs no metadata audit either.
+    await writeFile(path.join(directory, "ScrapBuild.json"), JSON.stringify({ abi: scrapAbi, bytecode: { object: "0x6080604052600080fd" } }));
+    assert.equal(ok(await call("wallet-request-prepare", { deploy: { artifactPath: "ScrapBuild.json", chainId: 11155111 }, standards: { preflightReceipt } })).standards.workKind, "fungible-token");
+  } finally {
+    await erc20Rpc.close();
+    await nftRpc.close();
     await rm(directory, { recursive: true, force: true });
   }
 });

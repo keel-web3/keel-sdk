@@ -44,6 +44,12 @@ import {
   KEEL_INLINE_MAX_TOKEN_URI_BYTES,
   createKeelWalletRequest,
   prepareContractDeployment,
+  prepareContractCall,
+  contractControlForCalldata,
+  KEEL_ROLE_ADMIN_SELECTORS,
+  tokenKindFromAbi,
+  decodeKeelAuthorityCall,
+  encodeKeelAuthorityCall,
   encodeKeelWalletRequestQr,
   createKeelPublishReviewPlan,
   planKeelGraphRevision,
@@ -79,7 +85,7 @@ let ethMod: typeof import("@keel/ethereum-adapter") | undefined;
 const ethereumAdapter = async (): Promise<typeof import("@keel/ethereum-adapter")> => (ethMod ??= await import("@keel/ethereum-adapter"));
 import type { Compression, Hex } from "@keel/protocol";
 import { standardsEvidence, TOOL_SCHEMAS } from "./schemas.js";
-import { analyzeTokenUri, enforceStandards, recordTokenStandardAudit, tokenStandardAuditTool } from "./standards.js";
+import { analyzeTokenUri, detectTokenKind, enforceStandards, recordTokenStandardAudit, StandardsRefusal, tokenStandardAuditTool } from "./standards.js";
 import { deliverResult, sha256Hex } from "./large-output.js";
 import { graphWeldPrepareTool, planGraphWeld, summarizeGraphWeld } from "./graph-weld.js";
 import { ENGINE_TOOL_DEFINITIONS } from "./engine-tools.js";
@@ -487,10 +493,17 @@ async function walletDeployPrepare(context: ToolContext, input: Record<string, u
   const artifactBytes = (await context.workspace.readFile(artifactPath, 32 * 1024 * 1024)).bytes;
   if (typeof deploy.chainId !== "number") throw new TypeError("deploy.chainId is required.");
   if (deploy.args !== undefined && !Array.isArray(deploy.args)) throw new TypeError("deploy.args must be the ordered constructor arguments (integers as decimal strings).");
+  // A fungible ERC-20 has no tokenURI: deploying one needs the receipt, not a metadata audit.
+  let artifactAbi: unknown;
+  try { artifactAbi = JSON.parse(new TextDecoder("utf-8", { fatal: true }).decode(artifactBytes)); } catch { artifactAbi = undefined; }
+  let deployKind: "nft" | "erc20" | "unknown" = "unknown";
+  try { deployKind = artifactAbi === undefined ? "unknown" : tokenKindFromAbi(artifactAbi); } catch { deployKind = "unknown"; }
+  const declaredDeploy = input.standards !== null && typeof input.standards === "object" ? (input.standards as Record<string, unknown>).workKind : undefined;
+  if (declaredDeploy === "fungible-token" && deployKind !== "erc20") throw new StandardsRefusal("wallet-request-prepare", "work-kind-not-verified", "fungible-token deployment needs an artifact ABI with decimals() and transfer() and no tokenURI/uri.", "keel-contract-controls", "Declare the real workKind.");
   const clearance = await enforceStandards(context, input.standards, {
     tool: "wallet-request-prepare",
-    defaultWorkKind: "token-contract",
-    allowedWorkKinds: ["token-contract", "collection", "metadata", "viewer", "registry-or-module"],
+    defaultWorkKind: deployKind === "erc20" ? "fungible-token" : "token-contract",
+    allowedWorkKinds: ["token-contract", "collection", "metadata", "viewer", "registry-or-module", "fungible-token"],
     auditChainId: deploy.chainId,
   });
   const deployment = prepareContractDeployment({
@@ -528,22 +541,118 @@ async function walletDeployPrepare(context: ToolContext, input: Record<string, u
   });
 }
 
+/** ABI for a `call` spec: an inline ABI/artifact JSON string or a workspace artifact file. */
+async function callAbi(context: ToolContext, spec: Record<string, unknown>): Promise<unknown> {
+  if ((spec.abiPath === undefined) === (spec.abiJson === undefined)) throw new TypeError("call needs exactly one of abiPath (workspace artifact/ABI JSON) or abiJson.");
+  const text = spec.abiPath !== undefined
+    ? new TextDecoder("utf-8", { fatal: true }).decode((await context.workspace.readFile(requiredString(spec, "abiPath"), 32 * 1024 * 1024)).bytes)
+    : requiredString(spec, "abiJson");
+  const parsed = JSON.parse(text) as unknown;
+  // Artifacts can be large; the controls only need the ABI.
+  return parsed !== null && typeof parsed === "object" && !Array.isArray(parsed) && "abi" in parsed ? { abi: (parsed as { abi: unknown }).abi } : parsed;
+}
+
+/**
+ * Encode a call through keel-contract-controls (exact signature, coerced args). An argument written as
+ * { call: {...} } is itself encoded first and passed as bytes, so calls nest.
+ */
+async function encodeCallSpec(context: ToolContext, value: unknown, chainId: number, depth: number): Promise<{ readonly to: string; readonly data: `0x${string}`; readonly valueWei: string; readonly signature: string; readonly nested: readonly { readonly data: string; readonly abi: unknown }[]; readonly abi: unknown }> {
+  if (depth > 4) throw new RangeError("call nesting is limited to 4 levels.");
+  const spec = record(value, ["to", "signature", "args", "valueWei", "abiPath", "abiJson"], "call");
+  const to = optionalString(spec, "to") ?? "0x0000000000000000000000000000000000000001";
+  if (spec.args !== undefined && !Array.isArray(spec.args)) throw new TypeError("call.args must be the ordered arguments.");
+  const nested: { readonly data: string; readonly abi: unknown; readonly signature: string; readonly to: string }[] = [];
+  // { call: {...} } anywhere in the arguments (including inside tuples/arrays) becomes its encoded bytes.
+  const resolve = async (argument: unknown): Promise<unknown> => {
+    if (Array.isArray(argument)) return Promise.all(argument.map(resolve));
+    if (argument !== null && typeof argument === "object" && Object.keys(argument).length === 1 && "call" in argument) {
+      const inner = await encodeCallSpec(context, (argument as { call: unknown }).call, chainId, depth + 1);
+      nested.push({ signature: inner.signature, to: inner.to, data: inner.data, abi: inner.abi }, ...inner.nested as { readonly data: string; readonly abi: unknown; readonly signature: string; readonly to: string }[]);
+      return inner.data;
+    }
+    return argument;
+  };
+  const args = await resolve((spec.args as unknown[] | undefined) ?? []) as unknown[];
+  const abi = await callAbi(context, spec);
+  const prepared = prepareContractCall({ abi, chainId, to, signature: requiredString(spec, "signature"), args, ...(spec.valueWei === undefined ? {} : { valueWei: requiredString(spec, "valueWei") }) });
+  return { to: prepared.to.toLowerCase(), data: prepared.data, valueWei: prepared.valueWei, signature: prepared.signature, nested, abi };
+}
+
+/** Turn a `call` input (optionally wrapped by a KeelAuthority) into a canonical wallet request. */
+async function requestFromCall(context: ToolContext, value: unknown) {
+  const spec = record(value, ["chainId", "to", "signature", "args", "valueWei", "abiPath", "abiJson", "via", "label", "requestId"], "call");
+  if (typeof spec.chainId !== "number" || !Number.isSafeInteger(spec.chainId) || spec.chainId < 1) throw new TypeError("call.chainId is required.");
+  requiredString(spec, "to");
+  const { chainId, via, label, requestId, ...callSpec } = spec;
+  const inner = await encodeCallSpec(context, callSpec, chainId as number, 0);
+  let to = inner.to;
+  let data: string = inner.data;
+  let valueWei = inner.valueWei;
+  let wrapped: Record<string, unknown> | undefined;
+  if (via !== undefined) {
+    const route = record(via, ["authority", "function"], "call.via");
+    const functionName = (optionalString(route, "function") ?? "execute") as "execute" | "callAsDelegate";
+    if (functionName !== "execute" && functionName !== "callAsDelegate") throw new TypeError("call.via.function must be execute or callAsDelegate (executeSigned needs collected signatures).");
+    const authority = requiredString(route, "authority");
+    if (!/^0x[0-9a-fA-F]{40}$/u.test(authority)) throw new TypeError("call.via.authority must be an address.");
+    data = encodeKeelAuthorityCall(functionName, { target: inner.to, value: inner.valueWei, data: inner.data });
+    wrapped = { authority: authority.toLowerCase(), function: functionName, target: inner.to, innerSignature: inner.signature };
+    to = authority.toLowerCase();
+    valueWei = functionName === "execute" ? inner.valueWei : "0";
+  }
+  return {
+    request: { protocol: "keel-wallet-request@1", requestId: typeof requestId === "string" ? requestId : `call-${sha256Hex(data).slice(2, 14)}`, label: typeof label === "string" ? label : wrapped === undefined ? inner.signature : `${String(wrapped.function)} → ${inner.signature}`, family: "ethereum", chainId, to, data, valueWei },
+    call: { signature: inner.signature, to: inner.to, data: inner.data, nested: inner.nested.map(({ abi: _abi, ...entry }) => entry), ...(wrapped === undefined ? {} : { via: wrapped }) },
+    // ABIs of every call encoded here, so the gate can read the forwarded target's function and token shape.
+    abis: [{ data: inner.data.toLowerCase(), abi: inner.abi }, ...inner.nested.map((entry) => ({ data: entry.data.toLowerCase(), abi: entry.abi }))],
+  };
+}
+
+/** The contract a call really acts on: KeelAuthority forwards are unwrapped (up to 4 levels). */
+function effectiveCall(to: string, data: string): { readonly target: string; readonly data: string; readonly via: readonly { readonly authority: string; readonly function: string }[] } {
+  const via: { authority: string; function: string }[] = [];
+  let target = to.toLowerCase();
+  let current = data;
+  for (let depth = 0; depth < 4; depth += 1) {
+    const forwarded = decodeKeelAuthorityCall(current);
+    if (forwarded === undefined) break;
+    via.push({ authority: target, function: forwarded.functionName });
+    target = forwarded.target;
+    current = forwarded.data;
+  }
+  return { target, data: current, via };
+}
+
 async function walletRequestPrepareTool(context: ToolContext, value: unknown): Promise<unknown> {
-  const input = record(value, ["request", "deploy", "qr", "standards"], "wallet request arguments");
-  if ((input.request === undefined) === (input.deploy === undefined)) throw new TypeError("Provide exactly one of request (a call) or deploy (a contract deployment).");
+  const input = record(value, ["request", "deploy", "call", "qr", "standards", "controlsAbiPath", "targetRpcUrl"], "wallet request arguments");
+  if ([input.request, input.deploy, input.call].filter((entry) => entry !== undefined).length !== 1) throw new TypeError("Provide exactly one of request (prepared calldata), call (ABI + signature + args) or deploy (a contract deployment).");
   if (input.deploy !== undefined) return walletDeployPrepare(context, input);
+  const built = input.call === undefined ? undefined : await requestFromCall(context, input.call);
+  if (built !== undefined) input.request = built.request;
   const request = input.request !== null && typeof input.request === "object" && !Array.isArray(input.request) ? input.request as Record<string, unknown> : {};
   const ethereum = request.family === "ethereum";
-  const data = typeof request.data === "string" ? request.data.toLowerCase() : "";
+  const effective = ethereum && typeof request.to === "string" && typeof request.data === "string" ? effectiveCall(request.to, request.data) : undefined;
+  const data = (effective?.data ?? (typeof request.data === "string" ? request.data : "")).toLowerCase();
   const storage = ethereum && KEEL_HOLD_STORAGE_SELECTORS.has(data.slice(0, 10)) && request.valueWei === "0";
+  // Decide by the decoded inner function: role administration and fungible tokens never need a tokenURI audit.
+  const targetAbi = built?.abis.find((entry) => entry.data === data)?.abi ?? (input.controlsAbiPath === undefined ? undefined : await callAbi(context, { abiPath: input.controlsAbiPath }));
+  const control = targetAbi === undefined || !ethereum ? undefined : contractControlForCalldata(targetAbi, data);
+  const roleSignature = ethereum ? KEEL_ROLE_ADMIN_SELECTORS.get(data.slice(0, 10)) : undefined;
+  let tokenKind: "nft" | "erc20" | "unknown" = targetAbi === undefined ? "unknown" : tokenKindFromAbi(targetAbi);
+  if (tokenKind === "unknown" && effective !== undefined && typeof input.targetRpcUrl === "string") tokenKind = await detectTokenKind(input.targetRpcUrl, effective.target);
   const declared = input.standards !== null && typeof input.standards === "object" ? (input.standards as Record<string, unknown>).workKind : undefined;
-  const workKind = declared ?? (storage ? "storage-only" : "token-contract");
+  const defaultWorkKind = storage ? "storage-only" : roleSignature !== undefined ? "role-admin" : tokenKind === "erc20" ? "fungible-token" : "token-contract";
+  const workKind = declared ?? defaultWorkKind;
+  if (workKind === "role-admin" && roleSignature === undefined) throw new StandardsRefusal("wallet-request-prepare", "work-kind-not-verified", `role-admin is only for role administration (${[...KEEL_ROLE_ADMIN_SELECTORS.values()].join(", ")}); this call is ${data.slice(0, 10)}.`, "keel-contract-controls", "Declare the real workKind.");
+  if (workKind === "fungible-token" && tokenKind !== "erc20") throw new StandardsRefusal("wallet-request-prepare", "work-kind-not-verified", "fungible-token needs the target to be shown as an ERC-20: its ABI (call abiPath or controlsAbiPath) with decimals() and no tokenURI, or targetRpcUrl answering decimals() without ERC-721/1155.", "keel-contract-controls", "Pass the target ABI or targetRpcUrl.");
+  if (workKind === "role-admin" && (control === undefined || control.mode !== "write")) throw new StandardsRefusal("wallet-request-prepare", "contract-controls-required", `Role administration needs ${roleSignature ?? "the function"} confirmed as a listed write of the target.`, "keel-contract-controls", "Pass call with the target's abiPath/abiJson, or controlsAbiPath for prepared calldata.");
   const clearance = await enforceStandards(context, input.standards, {
     tool: "wallet-request-prepare",
-    defaultWorkKind: storage ? "storage-only" : "token-contract",
+    defaultWorkKind,
     storageVerified: storage,
     ...(ethereum && typeof request.chainId === "number" ? { auditChainId: request.chainId } : {}),
-    ...(ethereum && typeof request.to === "string" ? { auditContract: request.to } : {}),
+    // Through a KeelAuthority the audited contract is the forwarded target, not the authority.
+    ...(effective !== undefined ? { auditContract: effective.target } : {}),
     // A call to an existing token contract must be backed by an audit of THAT contract's live tokenURI.
     requireContractAudit: ethereum && workKind === "token-contract",
     ...(ethereum ? {} : { auditUnavailable: "keel-token-standard-audit reads EVM tokenURI; Tezos token metadata is not audited yet." }),
@@ -556,6 +665,9 @@ async function walletRequestPrepareTool(context: ToolContext, value: unknown): P
     signing: "not-performed",
     submission: "not-performed",
     standards: clearance,
+    ...(effective !== undefined && effective.via.length ? { forwarded: { via: effective.via, target: effective.target, selector: effective.data.slice(0, 10) } } : {}),
+    ...(built === undefined ? {} : { call: built.call }),
+    classification: { workKind: clearance.workKind, tokenKind, ...(roleSignature === undefined ? {} : { roleAdmin: roleSignature }), ...(control === undefined ? {} : { control: { signature: control.signature, mode: control.mode } }) },
     envelope,
     ...(qrPayload === undefined ? {} : { qr: qrPayload }),
   };
@@ -1578,7 +1690,7 @@ export const TOOL_DEFINITIONS: readonly ToolDefinition[] = [
   tool("publish-plan", "Bind a verified review-only chain descriptor (chainPlan, or chainPlanPath when chain-plan delivered a file) to a canonical SDK envelope. Plain asset storage passes as storage-only; HTML, JSON or KEEL tokenURI fragment bytes are viewer/metadata work and require standards.preflightReceipt (metadata also standards.auditDigest). Existing graph revisions must pass the one-resource delta gate. No ABI encoding, signing, or submission occurs.", TOOL_SCHEMAS.publishPlan, publishPlanTool),
   tool("module-resolve", "Resolve one exact module selector from a local snapshot without fetching carriers.", TOOL_SCHEMAS.moduleResolve, moduleResolveTool),
   tool("module-lock", "Write a canonical local module lock and unavailable-by-default receipt.", TOOL_SCHEMAS.moduleLock, moduleLockTool),
-  tool("wallet-request-prepare", "Prepare a canonical user-reviewable wallet request (request) or a contract deployment (deploy: compiler artifact + constructor args; bytecode is checked against the artifact and args are encoded like keel-contract-controls) without signing or submitting. Addresses may be EIP-55 checksummed. Only KeelHold storage writes (castSlugs/weldObject/weldComposite, zero value) pass without evidence. Anything else refuses unless standards.preflightReceipt is valid, and token-contract work (the default) also needs standards.auditDigest from a passing keel-token-standard-audit of the exact target contract.", TOOL_SCHEMAS.walletRequestPrepare, walletRequestPrepareTool),
+  tool("wallet-request-prepare", "Prepare a canonical user-reviewable wallet request: request (prepared calldata), call (ABI/artifact + exact signature + args, encoded through keel-contract-controls; a {call:{...}} argument nests, and via:{authority} wraps it in KeelAuthority.execute/callAsDelegate), or a contract deployment (deploy: compiler artifact + constructor args; bytecode is checked against the artifact and args are encoded like keel-contract-controls) without signing or submitting. Addresses may be EIP-55 checksummed. Only KeelHold storage writes (castSlugs/weldObject/weldComposite, zero value) pass without evidence. Anything else refuses unless standards.preflightReceipt is valid, and token-contract work (the default) also needs standards.auditDigest from a passing keel-token-standard-audit of the exact target contract.", TOOL_SCHEMAS.walletRequestPrepare, walletRequestPrepareTool),
   tool("wallet-link", "Prepare a review-only account-to-agent KeelFactory castDieFor authorization and JSON-safe EIP-712 typed data. Emitting typed data requires standards.preflightReceipt and a passing standards.auditDigest of the collection's prepared tokenURI. No signing, RPC, or submission occurs.", TOOL_SCHEMAS.walletLink, walletLinkTool),
   tool("module-review-prepare", "Prepare a review-only KeelModuleReviewRegistry action (submit/sanction/deprecate/revoke a non-contract module's onchain trust) as a canonical descriptor. Requires standards.preflightReceipt. No signing, encoding, or submission occurs.", TOOL_SCHEMAS.moduleReview, moduleReviewPrepareTool),
   tool("fray-auction-intake", "Collect the title, description, chain, and one of exactly four Fray auction presets before emitting a user-approved API and wallet handoff; no signing or submission occurs.", TOOL_SCHEMAS.frayAuctionIntake, frayAuctionIntakeTool),

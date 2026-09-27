@@ -1,4 +1,4 @@
-import { encodeDeployData, encodeFunctionData, getAddress, keccak256, toFunctionSignature, type Abi, type AbiFunction, type AbiParameter, type Hex } from "viem";
+import { decodeFunctionData, encodeDeployData, encodeFunctionData, getAddress, keccak256, parseAbi, toFunctionSelector, toFunctionSignature, type Abi, type AbiFunction, type AbiParameter, type Hex } from "viem";
 
 export interface KeelTrackedContract {
   schema: "keel-tracked-contract@1";
@@ -177,3 +177,75 @@ export function prepareContractDeployment(input: {
     requires: ["preflight-receipt", "token-standard-audit-when-a-token", "simulation", "exact-wallet-review", "post-deploy-code-readback"],
   };
 }
+
+/**
+ * A call checked through the same ABI controls: exact signature, every argument coerced (integers as decimal
+ * strings, tuples as ordered arrays, addresses EIP-55 checked), value only for payable functions.
+ */
+export function prepareContractCall(input: { readonly abi: unknown; readonly chainId: number; readonly to: string; readonly signature: string; readonly args?: readonly unknown[]; readonly valueWei?: string }) {
+  const contract = createTrackedContract({ chainId: input.chainId, address: input.to as `0x${string}`, name: "call target", kind: "custom", source: "manual", abi: input.abi });
+  return prepareContractControl({ contract, signature: input.signature, args: input.args ?? [], ...(input.valueWei === undefined ? {} : { valueWei: input.valueWei }) });
+}
+
+/** KeelAuthority entry points that forward one Call {target, value, data}. */
+export const KEEL_AUTHORITY_FORWARDING_ABI = parseAbi([
+  "function execute((address target, uint256 value, bytes data) call_) payable returns (bytes)",
+  "function executeSigned((address target, uint256 value, bytes data) call_, uint64 deadline, (address signer, bytes signature)[] signatures) payable returns (bytes)",
+  "function callAsDelegate((address target, uint256 value, bytes data) call_) returns (bytes)",
+]);
+
+export interface KeelAuthorityForwardedCall {
+  readonly functionName: "execute" | "executeSigned" | "callAsDelegate";
+  readonly target: `0x${string}`;
+  readonly value: string;
+  readonly data: Hex;
+}
+
+/** Decode a KeelAuthority forwarding call, or undefined when `data` is not one. */
+export function decodeKeelAuthorityCall(data: string): KeelAuthorityForwardedCall | undefined {
+  if (!/^0x[0-9a-fA-F]{8}/u.test(data)) return undefined;
+  try {
+    const decoded = decodeFunctionData({ abi: KEEL_AUTHORITY_FORWARDING_ABI, data: data as Hex });
+    const call = decoded.args[0] as { readonly target: string; readonly value: bigint; readonly data: Hex };
+    return { functionName: decoded.functionName, target: call.target.toLowerCase() as `0x${string}`, value: call.value.toString(), data: call.data };
+  } catch {
+    return undefined;
+  }
+}
+
+/** Wrap an inner call in KeelAuthority.execute or callAsDelegate. */
+export function encodeKeelAuthorityCall(functionName: "execute" | "callAsDelegate", call: { readonly target: string; readonly value?: string; readonly data: string }): Hex {
+  const value = BigInt(call.value ?? "0");
+  if (functionName === "callAsDelegate" && value !== 0n) throw new TypeError("callAsDelegate forwards no native value.");
+  return encodeFunctionData({ abi: KEEL_AUTHORITY_FORWARDING_ABI, functionName, args: [{ target: getAddress(call.target), value, data: call.data as Hex }] });
+}
+
+/**
+ * Role administration: AccessControl (grantRole/revokeRole/renounceRole) and the ownable-roles style
+ * (grantRoles/revokeRoles/renounceRoles). These change who may act, never what a token shows.
+ */
+export const KEEL_ROLE_ADMIN_SIGNATURES = Object.freeze([
+  "grantRole(bytes32,address)", "revokeRole(bytes32,address)", "renounceRole(bytes32,address)",
+  "grantRoles(address,uint256)", "revokeRoles(address,uint256)", "renounceRoles(uint256)",
+] as const);
+export const KEEL_ROLE_ADMIN_SELECTORS: ReadonlyMap<string, string> = new Map(KEEL_ROLE_ADMIN_SIGNATURES.map((signature) => [toFunctionSelector(signature), signature]));
+
+/** The ABI write (or read) whose selector starts `data`, as the contract controls list it. */
+export function contractControlForCalldata(abi: unknown, data: string) {
+  const selector = data.slice(0, 10).toLowerCase();
+  return contractControls(abi).find((control) => toFunctionSelector(control.signature) === selector);
+}
+
+/**
+ * Coarse token shape from an ABI: an NFT exposes tokenURI(uint256) or uri(uint256); a fungible ERC-20 exposes
+ * decimals() and transfer(address,uint256) without either. Fungible tokens have no tokenURI to audit.
+ */
+export function tokenKindFromAbi(abi: unknown): "nft" | "erc20" | "unknown" {
+  const signatures = new Set(contractControls(abi).map((control) => control.signature));
+  if (signatures.has("tokenURI(uint256)") || signatures.has("uri(uint256)")) return "nft";
+  if (signatures.has("decimals()") && signatures.has("transfer(address,uint256)")) return "erc20";
+  return "unknown";
+}
+
+/** Function names that set token metadata or presentation (tokenURI, base URI, renderer, contract URI, ...). */
+export const KEEL_METADATA_FUNCTION = /(?:token_?uri|base_?uri|contract_?uri|renderer|metadata|image|presentation|harness|shell|reveal|artwork|animation|svg)/iu;

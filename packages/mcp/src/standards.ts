@@ -83,7 +83,9 @@ export type StandardsRefusalCode =
   | "token-standard-audit-invalid"
   | "token-standard-audit-failed"
   | "token-standard-audit-expired"
-  | "token-standard-audit-subject-mismatch";
+  | "token-standard-audit-subject-mismatch"
+  | "work-kind-not-verified"
+  | "contract-controls-required";
 
 export interface StandardsRefusalDetail {
   readonly schema: "keel-standards-refusal@1";
@@ -668,11 +670,12 @@ function tokenUriCalldata(tokenId: bigint): Hex {
 }
 
 /**
- * Measure the real gas a read needs: binary-search the eth_call gas limit between a failing floor and the 30M cap
- * that already succeeded. debug_traceCall's gasUsed is added when the node offers it; it undercounts the limit a
- * caller must set (the 63/64 rule), so the searched limit is the reported number.
+ * Measure the real gas a read needs. A contract may answer DIFFERENTLY when gas runs low (HashersCar returns a
+ * renderer-less fallback), so "the call succeeded" is not the test: the binary search looks for the smallest gas
+ * limit whose returned bytes EQUAL the full-gas result. debug_traceCall's gasUsed, when the node offers it, is the
+ * primary measurement; the searched limit is reported next to it.
  */
-async function measureReadGas(rpcUrl: string, call: { readonly to: string; readonly data: string }, block: string): Promise<Pick<LiveRead, "measuredGas" | "measurement">> {
+async function measureReadGas(rpcUrl: string, call: { readonly to: string; readonly data: string }, block: string, fullResult: string): Promise<Pick<LiveRead, "measuredGas" | "measurement">> {
   let tracedGasUsed: number | undefined;
   try {
     const trace = await rpc(rpcUrl, "debug_traceCall", [{ ...call, gas: `0x${TOKEN_URI_READ_GAS_LIMIT.toString(16)}` }, block, { tracer: "callTracer" }]) as { readonly gasUsed?: unknown };
@@ -680,23 +683,45 @@ async function measureReadGas(rpcUrl: string, call: { readonly to: string; reado
   } catch {
     tracedGasUsed = undefined;
   }
+  const expected = fullResult.toLowerCase();
   let low = 21_000;
   let high = TOKEN_URI_READ_GAS_LIMIT;
   let calls = 0;
+  let divergent = 0;
+  let stopped: string | undefined;
   while (high - low > Math.max(10_000, Math.floor(high / 200)) && calls < 32) {
     const middle = Math.floor((low + high) / 2);
     calls += 1;
     try {
-      await rpc(rpcUrl, "eth_call", [{ ...call, gas: `0x${middle.toString(16)}` }, block]);
-      high = middle;
+      const returned = String(await rpc(rpcUrl, "eth_call", [{ ...call, gas: `0x${middle.toString(16)}` }, block])).toLowerCase();
+      if (returned === expected) high = middle;
+      else {
+        divergent += 1; // succeeded with DIFFERENT bytes: a low-gas fallback, not the real read
+        low = middle;
+      }
     } catch (error) {
       if (error instanceof RpcError && /rate|limit exceeded|too many|429|timeout/iu.test(error.message)) {
-        return { measurement: { method: "eth_call-binary-search", precision: high - low, calls, ...(tracedGasUsed === undefined ? {} : { tracedGasUsed }), note: `Measurement stopped: ${error.message}` } };
+        stopped = `Measurement stopped: ${error.message}`;
+        break;
       }
       low = middle;
     }
   }
-  return { measuredGas: high, measurement: { method: "eth_call-binary-search", precision: high - low, calls, ...(tracedGasUsed === undefined ? {} : { tracedGasUsed }) } };
+  const searchedGasLimit = stopped === undefined ? high : undefined;
+  const measuredGas = tracedGasUsed ?? searchedGasLimit;
+  return {
+    ...(measuredGas === undefined ? {} : { measuredGas }),
+    measurement: {
+      method: tracedGasUsed !== undefined ? "debug_traceCall" : "eth_call-binary-search-equal-bytes",
+      ...(tracedGasUsed === undefined ? {} : { tracedGasUsed }),
+      ...(searchedGasLimit === undefined ? {} : { searchedGasLimit }),
+      precision: high - low,
+      calls,
+      lowGasDivergentResults: divergent,
+      ...(divergent > 0 ? { note: "The contract returned different tokenURI bytes at lower gas (a low-gas fallback). Only calls returning the full-gas bytes count." } : {}),
+      ...(stopped === undefined ? {} : { stopped }),
+    },
+  };
 }
 
 export interface LiveRead {
@@ -706,9 +731,9 @@ export interface LiveRead {
   readonly gasLimit: number;
   readonly estimatedGas?: number;
   readonly estimateNote: string;
-  /** Smallest gas limit at which the read succeeds, found by eth_call binary search (the number that matters). */
+  /** debug_traceCall gasUsed when available, else the smallest gas limit returning the full-gas bytes. */
   readonly measuredGas?: number;
-  readonly measurement?: { readonly method: "eth_call-binary-search"; readonly precision: number; readonly calls: number; readonly tracedGasUsed?: number; readonly note?: string };
+  readonly measurement?: { readonly method: "debug_traceCall" | "eth_call-binary-search-equal-bytes"; readonly tracedGasUsed?: number; readonly searchedGasLimit?: number; readonly precision: number; readonly calls: number; readonly lowGasDivergentResults: number; readonly note?: string; readonly stopped?: string };
   readonly failure?: { readonly code: "read-failed" | "read-gas-exceeds-limit"; readonly detail: string };
 }
 
@@ -742,7 +767,7 @@ export async function readTokenUri(rpcUrl: string, contract: string, tokenId: bi
   }
   try {
     const tokenUri = decodeAbiString(String(result));
-    const measurement = await measureReadGas(rpcUrl, call, block);
+    const measurement = await measureReadGas(rpcUrl, call, block, String(result));
     return { ...base, tokenUri, ...measurement };
   } catch (error) {
     return { ...base, failure: { code: "read-failed", detail: error instanceof Error ? error.message : String(error) } };
@@ -892,7 +917,7 @@ export async function tokenStandardAuditTool(context: ToolContext, value: unknow
 
 // ─── the gate ────────────────────────────────────────────────────────────────────────────────────────────────────
 
-export const WORK_KINDS = ["token-contract", "collection", "metadata", "viewer", "registry-or-module", "storage-only"] as const;
+export const WORK_KINDS = ["token-contract", "collection", "metadata", "viewer", "registry-or-module", "role-admin", "fungible-token", "storage-only"] as const;
 export type WorkKind = typeof WORK_KINDS[number];
 const AUDITED_WORK: ReadonlySet<WorkKind> = new Set(["token-contract", "collection", "metadata"]);
 
@@ -978,4 +1003,26 @@ export async function enforceStandards(context: ToolContext, raw: unknown, requi
     preflightReceipt,
     audit: { digest, verdict: body.verdict, subject, auditedAt: body.auditedAt, ...(body.exception === undefined ? {} : { exception: body.exception }) },
   };
+}
+
+/**
+ * Live token shape of a target: ERC-165 ERC-721/1155 means a metadata-bearing NFT; otherwise a decimals() answer
+ * means a fungible ERC-20, which has no tokenURI to audit. Read-only eth_calls.
+ */
+export async function detectTokenKind(rpcUrl: string, target: string): Promise<"nft" | "erc20" | "unknown"> {
+  const call = async (data: string): Promise<string | undefined> => {
+    try {
+      return String(await rpc(rpcUrl, "eth_call", [{ to: target, data }, "latest"]));
+    } catch {
+      return undefined;
+    }
+  };
+  const supports = async (interfaceId: string) => {
+    const result = await call(`0x01ffc9a7${interfaceId.slice(2).padEnd(64, "0")}`);
+    return result !== undefined && /^0x0{63}1$/u.test(result);
+  };
+  if (await supports("0x80ac58cd") || await supports("0xd9b67a26")) return "nft";
+  const decimals = await call("0x313ce567");
+  if (decimals !== undefined && /^0x[0-9a-f]{64}$/iu.test(decimals) && BigInt(decimals) <= 255n) return "erc20";
+  return "unknown";
 }

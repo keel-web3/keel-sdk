@@ -39,6 +39,10 @@ When changing the SDK or MCP:
 - The audit must accept KEEL's own canonical multi-module graph (regression
   fixture `tests/fixtures/redline-car-1-fork-tokenuri.txt.gz`) and still fail
   real locators.
+- The metadata audit applies to calls that can change token metadata or
+  presentation. Role administration (`role-admin`) and ERC-20 calls
+  (`fungible-token`) need the receipt only, decided from the decoded inner
+  function, never from a guess about the target.
 - Never return `result-too-large` for a valid result. Write it with
   `deliverResult` (workspace file + sha256).
 - Mint systems and contract patterns agents need belong in

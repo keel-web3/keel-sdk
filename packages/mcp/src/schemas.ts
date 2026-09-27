@@ -20,8 +20,8 @@ export const standardsEvidence: JsonSchema = object({
   auditDigest: string("digest returned by a passing keel-token-standard-audit (0x + 64 hex). Required whenever a token contract, collection or token metadata is involved."),
   workKind: {
     type: "string",
-    enum: ["token-contract", "collection", "metadata", "viewer", "registry-or-module", "storage-only"],
-    description: "What this request changes. Omitted means token-contract (the strictest). storage-only is accepted only when the tool verifies the calls are KeelHold storage writes.",
+    enum: ["token-contract", "collection", "metadata", "viewer", "registry-or-module", "role-admin", "fungible-token", "storage-only"],
+    description: "What this request changes. Omitted: decided from the decoded (inner) function -- KeelHold storage writes are storage-only, grantRole/revokeRole/renounceRole-style calls are role-admin, calls to an ERC-20 are fungible-token (receipt only, no tokenURI audit); anything else is token-contract (the strictest). Declared kinds are verified.",
   },
 });
 
@@ -501,6 +501,20 @@ export const TOOL_SCHEMAS = {
       label: string(undefined, 128),
       requestId: string(undefined, 128),
     }, ["artifactPath", "chainId"]),
+    call: object({
+      chainId: integer("Target EVM chain ID.", 1),
+      to: string("Contract the call targets (EIP-55 or lowercase)."),
+      signature: string("Exact function signature, e.g. setRenderer(address).", 512),
+      args: { type: "array", maxItems: 64, description: "Ordered arguments: integers as decimal strings, tuples as arrays. A bytes argument may be {\"call\":{signature,args,abiPath|abiJson,to?}} to nest an encoded inner call." },
+      valueWei: string("Native value; only for payable functions.", 78),
+      abiPath: string("Workspace compiler artifact or ABI JSON."),
+      abiJson: string("Inline ABI or artifact JSON.", 512000),
+      via: object({ authority: string("KeelAuthority address."), function: { type: "string", enum: ["execute", "callAsDelegate"] } }, ["authority"]),
+      label: string(undefined, 128),
+      requestId: string(undefined, 128),
+    }, ["chainId", "to", "signature"]),
+    controlsAbiPath: string("Workspace ABI/artifact of the (forwarded) target, for prepared calldata: confirms the function is a listed write and the token shape."),
+    targetRpcUrl: string("Optional read-only RPC to detect the target's token shape (ERC-165 NFT vs ERC-20 decimals()).", 2048),
     qr: boolean(),
     standards: standardsEvidence,
   }),

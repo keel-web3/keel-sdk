@@ -77,7 +77,15 @@ Without valid evidence it refuses: the result has `isError: true` and
 strictest: a call to an existing token contract needs an audit of that exact
 contract on that chain. `collection` and `metadata` also need a passing audit
 (of the prepared tokenURI bytes or the live contract). `viewer` and
-`registry-or-module` need the receipt. Genuine storage stays open: KeelHold
+`registry-or-module` need the receipt. The work kind is decided from the
+decoded function (KeelAuthority `execute`/`executeSigned`/`callAsDelegate` are
+unwrapped first): `grantRole`/`revokeRole`/`renounceRole` (and
+`grantRoles`/`revokeRoles`/`renounceRoles`) are `role-admin`, which needs the
+receipt plus the function confirmed as a listed write in the target's ABI
+(from `call`, or `controlsAbiPath`); calls to, and deployments of, an ERC-20
+(ABI with `decimals()` and no `tokenURI`/`uri`, or `targetRpcUrl` answering
+`decimals()` without ERC-721/1155 via ERC-165) are `fungible-token`. Neither
+needs a tokenURI audit, and neither can be declared for a call that is not one. Genuine storage stays open: KeelHold
 `castSlugs`/`weldObject`/`weldComposite` with zero value, and `publish-plan` of
 plain asset bytes, need no evidence. HTML, JSON and KEEL tokenURI fragment
 uploads are viewer/metadata work. Tezos tools require the receipt; the
@@ -101,8 +109,10 @@ Inside the canonical shell the audit parses the graph
 and scans it as its own media type. A packed creator entry document may load
 `<script src>`/`<link href>` only by a resource id present in that graph; any
 other reference, and any real locator in any item, fails. Live reads also
-report `measuredGas`: the smallest eth_call gas limit that succeeds (binary
-search), plus `debug_traceCall` gasUsed when the node offers it.
+report `measuredGas`: `debug_traceCall` gasUsed when the node offers it,
+otherwise the smallest eth_call gas limit whose returned bytes EQUAL the
+full-gas result (a contract that answers differently when gas runs low, like a
+renderer-less fallback, does not count). Both figures are reported.
 Base64-wrapped metadata JSON is a warning. A reviewed exception is an explicit
 input `{ codes, reason, reviewer, signature? }` naming exactly the findings it
 waives; read, size, gas, decode and missing-image findings cannot be waived. The
@@ -120,6 +130,14 @@ clearance.
   renderer; audit the live contract after binding).
 - `keel-graph-weld-prepare` plans the same from ordered part files (or
   already-published object ids plus `contentPath`).
+- `wallet-request-prepare` takes `call: { chainId, to, abiPath|abiJson,
+  signature, args, valueWei?, via? }`: calldata encoded through the contract
+  controls (exact signature, coerced args). An argument written as
+  `{ "call": {...} }` (anywhere, including inside tuples) is encoded first and
+  passed as bytes; `via: { authority, function? }` wraps the call in
+  `KeelAuthority.execute` or `callAsDelegate`. For any request, KeelAuthority
+  `execute`/`executeSigned`/`callAsDelegate` calldata is unwrapped and the
+  audit subject is matched against the forwarded target.
 - `wallet-request-prepare` takes `deploy: { artifactPath, chainId, args,
   bytecode?, valueWei? }` for a contract deployment. The bytecode must equal
   the compiler artifact's and constructor args are coerced like
