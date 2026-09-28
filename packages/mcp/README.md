@@ -148,6 +148,27 @@ clearance.
 - The public read cap is one constant, `KEEL_INLINE_SAFE_RPC_GAS` = 30,000,000,
   used by network inspection, the Tezos route and the audit.
 
+### Per-transaction gas (EIP-7825)
+
+Every prepared Ethereum request carries an explicit `gasLimit` (estimate + 7%)
+at or under 16,777,216, the EIP-7825 per-transaction cap on Ethereum mainnet
+and its testnets (`keel-network-inspect` reports it as `transactionGasCap`).
+Wallets therefore never substitute their own larger estimate, which is what a
+23M-gas cast tripped over. KeelHold storage calls are priced offline from a
+model fitted to fork receipts (cast = 50k + 30k/slug + 222 gas/byte, about 1.5%
+high; welds 120k + 12k/slug; composites 150k + 12k/part). Other calls need
+`gas: { rpcUrl, from }` (eth_estimateGas as the real sender) or `gas: { limit }`.
+Anything that cannot fit is refused at prepare time with
+`transaction-gas-cap-exceeded`; a missing limit is `gas-limit-required`.
+
+`keel-graph-weld-prepare` packs the slugs of every part together (first-fit
+decreasing, at most 3 slugs per `castSlugs`, estimate at or under ~15.68M so the
+margined limit fits the cap). `chain-plan` packs by gas in order, and
+`ethereum-encode`, `chain-plan`, `upload-plan` and `cost` report
+`transactions { count, totalEstimatedGas, minimumPossible }`, where
+`minimumPossible` is total gas / cap. Welds cannot be batched: KeelHold has one
+weld per call and no KEEL weld batcher is deployed.
+
 ### Large results
 
 `ethereum-encode`, `chain-plan` and `upload-plan` never refuse a valid result

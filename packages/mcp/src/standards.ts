@@ -85,7 +85,9 @@ export type StandardsRefusalCode =
   | "token-standard-audit-expired"
   | "token-standard-audit-subject-mismatch"
   | "work-kind-not-verified"
-  | "contract-controls-required";
+  | "contract-controls-required"
+  | "gas-limit-required"
+  | "transaction-gas-cap-exceeded";
 
 export interface StandardsRefusalDetail {
   readonly schema: "keel-standards-refusal@1";
@@ -1025,4 +1027,10 @@ export async function detectTokenKind(rpcUrl: string, target: string): Promise<"
   const decimals = await call("0x313ce567");
   if (decimals !== undefined && /^0x[0-9a-f]{64}$/iu.test(decimals) && BigInt(decimals) <= 255n) return "erc20";
   return "unknown";
+}
+
+/** eth_estimateGas for a prepared transaction (to omitted for a deployment). */
+export async function estimateTransactionGas(rpcUrl: string, tx: { readonly from?: string; readonly to?: string; readonly data: string; readonly valueWei: string }): Promise<number> {
+  const call = { ...(tx.from === undefined ? {} : { from: tx.from }), ...(tx.to === undefined ? {} : { to: tx.to }), data: tx.data, value: `0x${BigInt(tx.valueWei).toString(16)}` };
+  return Number(BigInt(String(await rpc(rpcUrl, "eth_estimateGas", [call, "latest"]))));
 }

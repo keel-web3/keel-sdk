@@ -43,6 +43,7 @@ const walletRequest: JsonSchema = {
     object({
       protocol: string(), requestId: string(), label: string(), transport: string(), family: { type: "string", enum: ["ethereum"] },
       chainId: integer(), to: string(), data: string(), valueWei: string(),
+      gasLimit: string("Explicit decimal gas limit, at most 16777216 (EIP-7825). Normally set by the gas input."),
     }, ["protocol", "requestId", "label", "family", "chainId", "to", "data", "valueWei"]),
     object({
       protocol: string(), requestId: string(), label: string(), transport: string(), family: { type: "string", enum: ["tezos"] },
@@ -513,6 +514,11 @@ export const TOOL_SCHEMAS = {
       label: string(undefined, 128),
       requestId: string(undefined, 128),
     }, ["chainId", "to", "signature"]),
+    gas: object({
+      limit: integer("Explicit gas limit (at most the 16777216 per-transaction cap).", 21000, 16777216),
+      rpcUrl: string("Read-only RPC for eth_estimateGas; the limit is the estimate + 7%, refused above the cap.", 2048),
+      from: string("Signing wallet, so the estimate runs as the real sender."),
+    }),
     controlsAbiPath: string("Workspace ABI/artifact of the (forwarded) target, for prepared calldata: confirms the function is a listed write and the token shape."),
     targetRpcUrl: string("Optional read-only RPC to detect the target's token shape (ERC-165 NFT vs ERC-20 decimals()).", 2048),
     qr: boolean(),

@@ -50,3 +50,27 @@ export async function deliverResult<T>(
   };
   return { ...options.summary(result), delivery };
 }
+
+import { KEEL_EIP7825_TX_GAS_CAP, keelCastGasEstimate, keelMinimumTransactions, keelWeldCompositeGasEstimate, keelWeldObjectGasEstimate, packKeelCasts } from "@keel/sdk";
+
+/**
+ * Transaction count and gas for storing objects under the EIP-7825 cap: every leaf's slugs are packed together
+ * (content-addressed, so across leaves too), then one weld per leaf and per composite.
+ */
+export function storageTransactionEstimate(leaves: readonly (readonly number[])[], compositeParts: readonly number[] = []) {
+  const slugs = leaves.flatMap((lengths) => lengths.map((length) => ({ bytes: new Uint8Array(length) })));
+  const casts = packKeelCasts(slugs).map((group) => keelCastGasEstimate(group.map((slug) => slug.bytes.byteLength)));
+  const welds = [...leaves.map((lengths) => keelWeldObjectGasEstimate(lengths.length)), ...compositeParts.map((parts) => keelWeldCompositeGasEstimate(parts))];
+  const totalEstimatedGas = [...casts, ...welds].reduce((total, gas) => total + gas, 0);
+  return {
+    count: casts.length + welds.length,
+    casts: casts.length,
+    welds: welds.length,
+    largestCastGas: Math.max(0, ...casts),
+    totalEstimatedGas,
+    gasCap: KEEL_EIP7825_TX_GAS_CAP,
+    minimumPossible: keelMinimumTransactions(totalEstimatedGas),
+    weldBatching: "unavailable: one weld per KeelHold call",
+    model: "KeelHold receipts: 50k + 30k/slug + 222 gas/byte per cast; welds 120k + 12k/slug, composites 150k + 12k/part",
+  };
+}

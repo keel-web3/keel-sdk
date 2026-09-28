@@ -106,3 +106,4 @@ export * from "./deferred-auctions.js";
 export * from "./stamps.js";
 export * from './metadata-notifications.js';
 export * from './metadata-relay.js';
+export * from "./tx-gas.js";

@@ -29,6 +29,8 @@ export interface KeelEthereumWalletRequest extends WalletRequestBase {
   readonly to: `0x${string}`;
   readonly data: `0x${string}`;
   readonly valueWei: string;
+  /** Explicit transaction gas limit (decimal), at most the EIP-7825 cap. */
+  readonly gasLimit?: string;
 }
 
 export interface KeelTezosWalletRequest extends WalletRequestBase {
@@ -168,7 +170,9 @@ function normalizeParameters(value: unknown): string {
 function normalizeRequest(value: unknown): KeelWalletRequest {
   const input = object(value, "wallet request");
   if (input.family === "ethereum") {
-    exactKeys(input, ["protocol", "requestId", "label", "transport", "family", "chainId", "to", "data", "valueWei"], "ethereum wallet request");
+    exactKeys(input, ["protocol", "requestId", "label", "transport", "family", "chainId", "to", "data", "valueWei", "gasLimit"], "ethereum wallet request");
+    // An explicit limit keeps wallets from estimating their own (MetaMask's x1.5 broke the EIP-7825 cap).
+    if (input.gasLimit !== undefined && (typeof input.gasLimit !== "string" || !DECIMAL.test(input.gasLimit) || BigInt(input.gasLimit) < 21_000n || BigInt(input.gasLimit) > 16_777_216n)) throw new TypeError("wallet request.gasLimit must be decimal gas from 21000 through the EIP-7825 cap 16777216.");
     const base = normalizeBase(input);
     assertTransport("ethereum", base.transport);
     if (!Number.isSafeInteger(input.chainId) || (input.chainId as number) <= 0) throw new TypeError("wallet request.chainId must be a positive safe integer.");
@@ -178,7 +182,7 @@ function normalizeRequest(value: unknown): KeelWalletRequest {
     const body = input.to.slice(2);
     if (/[a-f]/u.test(body) && /[A-F]/u.test(body) && getAddress(input.to.toLowerCase()) !== input.to) throw new TypeError("wallet request.to has an invalid EIP-55 checksum.");
     if (typeof input.data !== "string" || !HEX.test(input.data)) throw new TypeError("wallet request.data must be even-length hexadecimal data.");
-    return { ...base, family: "ethereum", chainId: input.chainId as number, to: input.to.toLowerCase() as `0x${string}`, data: input.data.toLowerCase() as `0x${string}`, valueWei: decimal(input.valueWei, "wallet request.valueWei") };
+    return { ...base, family: "ethereum", chainId: input.chainId as number, to: input.to.toLowerCase() as `0x${string}`, data: input.data.toLowerCase() as `0x${string}`, valueWei: decimal(input.valueWei, "wallet request.valueWei"), ...(input.gasLimit === undefined ? {} : { gasLimit: input.gasLimit as string }) };
   }
   if (input.family === "tezos") {
     exactKeys(input, ["protocol", "requestId", "label", "transport", "family", "network", "destination", "amountMutez", "entrypoint", "parameters"], "tezos wallet request");

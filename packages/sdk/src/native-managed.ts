@@ -1,7 +1,8 @@
-import { concatHex, encodeAbiParameters, encodeFunctionData, keccak256, parseAbi, sha256, stringToHex, toHex, type Address, type Hex } from "viem";
+import { concatHex, decodeFunctionData, encodeAbiParameters, encodeFunctionData, keccak256, parseAbi, sha256, stringToHex, toHex, type Address, type Hex } from "viem";
 import { createKeelNativeObjectPlan } from "./native-publication.js";
 import { planKeelAssetPresentation } from "./presentation.js";
 import { keelHoldAbi } from "./abi.js";
+import { keelCastGasEstimate, keelGasLimit, keelWeldCompositeGasEstimate, keelWeldObjectGasEstimate, packKeelCasts } from "./tx-gas.js";
 
 const holdAbi = parseAbi(keelHoldAbi);
 export interface KeelManagedObject {
@@ -131,13 +132,24 @@ export function createKeelManagedCompositePlan(ids: readonly Hex[], bytes: Uint8
  * order, three slugs per call (the KeelHold batch the adapter uses). Together with `plan.operations` this is the
  * complete ordered storage transaction list for one object.
  */
-export function keelManagedCastOperations(plan: Pick<KeelManagedObject, "chunks">, hold: Address, batch = 3) {
-  if (!Number.isSafeInteger(batch) || batch < 1 || batch > 16) throw new Error("Invalid castSlugs batch size.");
-  const operations: { target: Address; value: bigint; data: Hex; slugIds: readonly Hex[] }[] = [];
-  for (let index = 0; index < plan.chunks.length; index += batch) {
-    const group = plan.chunks.slice(index, index + batch);
-    operations.push({ target: hold, value: 0n, slugIds: group.map((chunk) => chunk.id),
-      data: encodeFunctionData({ abi: holdAbi, functionName: "castSlugs", args: [group.map((chunk) => toHex(chunk.bytes))] }) });
-  }
-  return operations;
+export function keelManagedCastOperations(plan: Pick<KeelManagedObject, "chunks">, hold: Address, options: { readonly maxSlugs?: number; readonly targetGas?: number } = {}) {
+  // Gas-packed (EIP-7825): as few calls as possible, each estimated under the per-transaction target.
+  return packKeelCasts(plan.chunks, options).map((group) => {
+    const estimatedGas = keelCastGasEstimate(group.map((chunk) => chunk.bytes.byteLength));
+    return { target: hold, value: 0n, slugIds: group.map((chunk) => chunk.id), ...keelGasLimit(estimatedGas),
+      data: encodeFunctionData({ abi: holdAbi, functionName: "castSlugs", args: [group.map((chunk) => toHex(chunk.bytes))] }) };
+  });
+}
+
+/**
+ * Offline gas estimate for a KeelHold storage call from its calldata (castSlugs / weldObject / weldComposite), or
+ * undefined for anything else. Uses the receipt-fitted model in tx-gas.ts.
+ */
+export function estimateKeelHoldCallGas(data: Hex): number | undefined {
+  let decoded;
+  try { decoded = decodeFunctionData({ abi: holdAbi, data }); } catch { return undefined; }
+  if (decoded.functionName === "castSlugs") return keelCastGasEstimate((decoded.args[0] as readonly Hex[]).map((payload) => (payload.length - 2) / 2));
+  if (decoded.functionName === "weldObject") return keelWeldObjectGasEstimate((decoded.args[0] as readonly Hex[]).length);
+  if (decoded.functionName === "weldComposite") return keelWeldCompositeGasEstimate((decoded.args[0] as readonly Hex[]).length);
+  return undefined;
 }

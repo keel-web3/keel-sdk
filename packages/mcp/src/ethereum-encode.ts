@@ -5,6 +5,8 @@ import {
 } from "@keel/ethereum-adapter";
 import path from "node:path";
 import { deliverResult, sha256Hex } from "./large-output.js";
+import { KEEL_EIP7825_TX_GAS_CAP, keelGasLimit, keelMinimumTransactions } from "@keel/sdk";
+import { estimateKeelHoldCallGas } from "@keel/sdk/native-managed";
 import type { Workspace } from "./types.js";
 
 const MAX_PLAN_BYTES = 4 * 1024 * 1024;
@@ -109,8 +111,22 @@ export async function ethereumEncodeTool(workspace: Workspace, value: unknown): 
     codecs: createViemEthereumAdapterCodecs(),
     maxResultBytes: MAX_FILE_RESULT_BYTES,
   });
+  // Explicit per-transaction gas (EIP-7825): every operation carries estimate + 7%, and one that cannot fit is refused.
+  const priced = result.status === "ready-for-review"
+    ? {
+        ...result,
+        operations: result.operations.map((operation, index) => {
+          const estimatedGas = estimateKeelHoldCallGas(operation.data as `0x${string}`) ?? 0;
+          const limit = keelGasLimit(Math.max(estimatedGas, 21_000));
+          if (!limit.fits) throw new RangeError(`transaction-gas-cap-exceeded: operation ${index} (${operation.kind}) needs ~${estimatedGas} gas, above the ${limit.gasCap} per-transaction cap.`);
+          return { ...operation, estimatedGas, gasLimit: limit.gasLimit };
+        }),
+      }
+    : result;
+  const totalEstimatedGas = priced.status === "ready-for-review" ? priced.operations.reduce((total, operation) => total + (operation as { estimatedGas: number }).estimatedGas, 0) : 0;
   const output = {
-    ...result,
+    ...priced,
+    ...(priced.status === "ready-for-review" ? { transactions: { count: priced.operations.length, totalEstimatedGas, gasCap: KEEL_EIP7825_TX_GAS_CAP, minimumPossible: keelMinimumTransactions(totalEstimatedGas), weldBatching: "unavailable: one weld per KeelHold call" } } : {}),
     planPath,
     transport: {
       qr: "unsupported",
@@ -132,8 +148,10 @@ export async function ethereumEncodeTool(workspace: Workspace, value: unknown): 
       planPath,
       ...(value.status === "ready-for-review" ? {
         operationCount: value.operations.length,
+        transactions: (value as { transactions?: unknown }).transactions,
         operations: value.operations.slice(0, 64).map((operation) => ({
           operationId: operation.operationId, kind: operation.kind, to: operation.to, signature: operation.signature,
+          estimatedGas: (operation as { estimatedGas?: number }).estimatedGas, gasLimit: (operation as { gasLimit?: number }).gasLimit,
           dataBytes: (operation.data.length - 2) / 2, dataSha256: sha256Hex(operation.data),
         })),
         operationsTruncated: value.operations.length > 64,

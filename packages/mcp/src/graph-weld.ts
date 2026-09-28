@@ -4,8 +4,8 @@
  * could only composite its own single-file recursive plans, so the root weld of an Inline graph had to be built by
  * hand with the SDK outside the MCP.
  */
-import { createKeelManagedCompositePlan, createKeelManagedObjectPlan, keelManagedCastOperations } from "@keel/sdk/native-managed";
-import { KEEL_INLINE_COMPACT_MEDIA_TYPE } from "@keel/sdk";
+import { createKeelManagedCompositePlan, createKeelManagedObjectPlan, estimateKeelHoldCallGas, keelManagedCastOperations } from "@keel/sdk/native-managed";
+import { KEEL_INLINE_COMPACT_MEDIA_TYPE, KEEL_CAST_MAX_SLUGS, keelGasLimit, keelMinimumTransactions, keelTransactionGasCap } from "@keel/sdk";
 import { deliverResult, sha256Hex } from "./large-output.js";
 import type { ToolContext, Workspace } from "./types.js";
 
@@ -23,11 +23,19 @@ export interface GraphWeldPartInput {
 
 export interface GraphWeldOperation {
   readonly kind: "castSlugs" | "weldObject" | "weldComposite";
-  readonly part: number | "root";
+  readonly part: number | "root" | readonly number[];
   readonly to: Hex;
   readonly valueWei: "0";
   readonly data: Hex;
+  readonly estimatedGas: number;
+  readonly gasLimit: number;
 }
+
+/** Welds cannot be batched: KeelHold has one weldObject/weldComposite per call and no KEEL weld batcher exists. */
+export const KEEL_WELD_BATCHING = Object.freeze({
+  available: false,
+  reason: "KeelHold exposes weldObject/weldComposite one per call and no KEEL weld batcher is deployed; a generic multicall would make the batcher, not the creator, the welding msg.sender. Each weld is one transaction (about 130k-250k gas).",
+});
 
 /** Plan every part and the root. Parts given only by objectId are treated as already published. */
 export async function planGraphWeld(input: {
@@ -35,14 +43,24 @@ export async function planGraphWeld(input: {
   readonly mediaType: string;
   readonly parts: readonly GraphWeldPartInput[];
   readonly content?: Uint8Array;
+  readonly chainId?: number;
 }) {
   if (!ADDRESS.test(input.hold)) throw new TypeError("hold must be a 20-byte KeelHold address.");
   const hold = input.hold.toLowerCase() as Hex;
   if (input.parts.length < 1 || input.parts.length > 128) throw new RangeError("A graph root welds 1 through 128 parts.");
-  const operations: GraphWeldOperation[] = [];
+  const cap = keelTransactionGasCap({ ...(input.chainId === undefined ? {} : { chainId: input.chainId }) });
+  const casts: { chunk: { id: Hex; bytes: Uint8Array }; part: number }[] = [];
+  const welds: GraphWeldOperation[] = [];
   const parts = [];
   const ids: Hex[] = [];
   const pieces: Uint8Array[] = [];
+  const priced = (data: Hex) => {
+    const estimatedGas = estimateKeelHoldCallGas(data);
+    if (estimatedGas === undefined) throw new Error("Not a KeelHold storage call.");
+    const limit = keelGasLimit(estimatedGas, cap.gasCap);
+    if (!limit.fits) throw Object.assign(new RangeError(`transaction-gas-cap-exceeded: one KeelHold call needs ~${estimatedGas} gas, above the ${cap.gasCap} per-transaction cap.`), { code: "transaction-gas-cap-exceeded" });
+    return { estimatedGas, gasLimit: limit.gasLimit };
+  };
   for (const [index, part] of input.parts.entries()) {
     if (part.bytes === undefined) {
       if (part.objectId === undefined || !OBJECT_ID.test(part.objectId)) throw new TypeError(`part ${index} needs bytes (path) or an existing objectId.`);
@@ -54,15 +72,14 @@ export async function planGraphWeld(input: {
     if (part.objectId !== undefined && part.objectId.toLowerCase() !== plan.objectId.toLowerCase()) {
       throw new Error(`part ${index}: the bytes weld to ${plan.objectId}, not the declared objectId ${part.objectId}.`);
     }
-    const casts = keelManagedCastOperations(plan, hold as `0x${string}`);
-    for (const cast of casts) operations.push({ kind: "castSlugs", part: index, to: hold, valueWei: "0", data: cast.data });
-    for (const weld of plan.operations) operations.push({ kind: weld.data.startsWith("0x5f97a164") ? "weldComposite" : "weldObject", part: index, to: hold, valueWei: "0", data: weld.data });
+    for (const chunk of plan.chunks) if (!casts.some((entry) => entry.chunk.id === chunk.id)) casts.push({ chunk, part: index });
+    for (const weld of plan.operations) welds.push({ kind: weld.data.startsWith("0x5f97a164") ? "weldComposite" : "weldObject", part: index, to: hold, valueWei: "0", data: weld.data, ...priced(weld.data) });
     ids.push(plan.objectId);
     pieces.push(part.bytes);
     parts.push({
       index, ...(part.label === undefined ? {} : { label: part.label }), ...(part.path === undefined ? {} : { path: part.path }),
       objectId: plan.objectId, digest: plan.digest, byteLength: plan.byteLength, chunks: plan.chunks.length,
-      castOperations: casts.length, weldOperations: plan.operations.length, source: "bytes" as const,
+      weldOperations: plan.operations.length, source: "bytes" as const,
     });
   }
   let content = input.content;
@@ -79,7 +96,13 @@ export async function planGraphWeld(input: {
     if (joined.byteLength !== content.byteLength || !joined.equals(content)) throw new Error("contentPath does not equal the concatenation of the part files.");
   }
   const root = createKeelManagedCompositePlan(ids, content, { hold: hold as `0x${string}`, mediaType: input.mediaType });
-  operations.push({ kind: "weldComposite", part: "root", to: hold, valueWei: "0", data: root.operation.data });
+  // Casts from EVERY part packed together (slugs are content-addressed): as few transactions as the cap allows.
+  const packed = keelManagedCastOperations({ chunks: casts.map((entry) => entry.chunk) }, hold as `0x${string}`, { maxSlugs: KEEL_CAST_MAX_SLUGS, targetGas: cap.targetGas });
+  const castOperations: GraphWeldOperation[] = packed.map((cast) => ({
+    kind: "castSlugs", part: [...new Set(cast.slugIds.map((id) => casts.find((entry) => entry.chunk.id === id)!.part))], to: hold, valueWei: "0", data: cast.data, ...priced(cast.data),
+  }));
+  const operations: GraphWeldOperation[] = [...castOperations, ...welds, { kind: "weldComposite", part: "root", to: hold, valueWei: "0", data: root.operation.data, ...priced(root.operation.data) }];
+  const totalEstimatedGas = operations.reduce((total, operation) => total + operation.estimatedGas, 0);
   return {
     schema: "keel.graph-weld-prepare@1" as const,
     status: "review-only" as const,
@@ -88,6 +111,19 @@ export async function planGraphWeld(input: {
     root: { objectId: root.objectId, digest: root.digest, byteLength: Number(root.byteLength), contentSha256: sha256Hex(content), parts: ids },
     parts,
     operationCount: operations.length,
+    transactions: {
+      count: operations.length,
+      casts: castOperations.length,
+      welds: operations.length - castOperations.length,
+      totalEstimatedGas,
+      gasCap: cap.gasCap,
+      gasCapSource: cap.source,
+      packingTargetGas: cap.targetGas,
+      maxSlugsPerCast: KEEL_CAST_MAX_SLUGS,
+      minimumPossible: keelMinimumTransactions(totalEstimatedGas, cap.gasCap),
+      weldBatching: KEEL_WELD_BATCHING,
+      note: "Every operation carries gasLimit = estimate + 7%, always at or under the cap. Casts are packed across parts; welds stay one per transaction.",
+    },
     operations,
     storageOnly: true as const,
     next: "Each operation is a KeelHold storage write: pass it to wallet-request-prepare (storage-only needs no evidence). Check objectExists first and skip parts already on the selected chain. Bind the root objectId only after receipts and read-back.",
@@ -98,7 +134,7 @@ export async function planGraphWeld(input: {
 
 export function summarizeGraphWeld(plan: Awaited<ReturnType<typeof planGraphWeld>>) {
   const { operations, ...rest } = plan;
-  return { ...rest, operations: operations.slice(0, 32).map((operation) => ({ kind: operation.kind, part: operation.part, to: operation.to, dataBytes: (operation.data.length - 2) / 2, dataSha256: sha256Hex(operation.data) })), operationsTruncated: operations.length > 32 };
+  return { ...rest, operations: operations.slice(0, 32).map((operation) => ({ kind: operation.kind, part: operation.part, to: operation.to, estimatedGas: operation.estimatedGas, gasLimit: operation.gasLimit, dataBytes: (operation.data.length - 2) / 2, dataSha256: sha256Hex(operation.data) })), operationsTruncated: operations.length > 32 };
 }
 
 async function readPart(workspace: Workspace, pathValue: string): Promise<Uint8Array> {
@@ -128,7 +164,7 @@ export async function graphWeldPrepareTool(context: ToolContext, value: unknown)
     });
   }
   const content = typeof input.contentPath === "string" ? await readPart(context.workspace, input.contentPath) : undefined;
-  const plan = await planGraphWeld({ hold: input.hold, mediaType, parts, ...(content === undefined ? {} : { content }) });
+  const plan = await planGraphWeld({ hold: input.hold, mediaType, parts, ...(content === undefined ? {} : { content }), ...(typeof input.chainId === "number" ? { chainId: input.chainId } : {}) });
   const result = { ...plan, ...(typeof input.chainId === "number" ? { chainId: input.chainId } : {}) };
   return deliverResult(context.workspace, result, {
     outPath: typeof input.out === "string" ? input.out : `.keel-mcp/graph-weld/${plan.root.objectId.slice(2, 18)}.json`,

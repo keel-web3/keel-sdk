@@ -45,6 +45,8 @@ import {
   createKeelWalletRequest,
   prepareContractDeployment,
   prepareContractCall,
+  keelGasLimit,
+  keelTransactionGasCap,
   contractControlForCalldata,
   KEEL_ROLE_ADMIN_SELECTORS,
   tokenKindFromAbi,
@@ -85,9 +87,10 @@ let ethMod: typeof import("@keel/ethereum-adapter") | undefined;
 const ethereumAdapter = async (): Promise<typeof import("@keel/ethereum-adapter")> => (ethMod ??= await import("@keel/ethereum-adapter"));
 import type { Compression, Hex } from "@keel/protocol";
 import { standardsEvidence, TOOL_SCHEMAS } from "./schemas.js";
-import { analyzeTokenUri, detectTokenKind, enforceStandards, recordTokenStandardAudit, StandardsRefusal, tokenStandardAuditTool } from "./standards.js";
-import { deliverResult, sha256Hex } from "./large-output.js";
+import { analyzeTokenUri, detectTokenKind, enforceStandards, estimateTransactionGas, recordTokenStandardAudit, StandardsRefusal, tokenStandardAuditTool } from "./standards.js";
+import { deliverResult, sha256Hex, storageTransactionEstimate } from "./large-output.js";
 import { graphWeldPrepareTool, planGraphWeld, summarizeGraphWeld } from "./graph-weld.js";
+import { estimateKeelHoldCallGas } from "@keel/sdk/native-managed";
 import { ENGINE_TOOL_DEFINITIONS } from "./engine-tools.js";
 import { EDITOR_TOOL_DEFINITIONS } from "./editor-tools.js";
 import { createChainOperationPlan } from "./chain-plan.js";
@@ -324,7 +327,14 @@ async function costTool(context: ToolContext, value: unknown): Promise<unknown> 
     ...(maxPartsPerComposite === undefined ? {} : { maxPartsPerComposite }),
     ...(maxTreeDepth === undefined ? {} : { maxTreeDepth }),
   };
-  return (await builder()).analyzeCost(loaded.bytes, options);
+  const analysis = await (await builder()).analyzeCost(loaded.bytes, options) as unknown as Record<string, unknown>;
+  // Minimum possible transactions under the EIP-7825 cap for the recommended flat layout.
+  const stored = loaded.bytes.byteLength;
+  const chunkBytes = maxChunkBytes ?? 23_000;
+  const recommended = (analysis.candidates as { compression?: string; storedByteLength?: number }[] | undefined)?.find((candidate) => candidate.compression === (analysis.recommendation as { compression?: string } | undefined)?.compression);
+  const storedBytes = recommended?.storedByteLength ?? stored;
+  const lengths = Array.from({ length: Math.ceil(storedBytes / chunkBytes) }, (_, index) => Math.min(chunkBytes, storedBytes - index * chunkBytes));
+  return { ...analysis, transactionGas: storageTransactionEstimate([lengths]) };
 }
 
 function boundedPlanText(value: unknown, key: string, max: number): string {
@@ -391,9 +401,13 @@ async function uploadPlanTool(context: ToolContext, value: unknown): Promise<unk
       : await (await builder()).createUploadPlan(source.bytes, common);
     // Too large to return inline: write the complete dry-run plan to the workspace (path + sha256) rather than
     // pushing the agent out of the MCP to a CLI.
-    return deliverResult(context.workspace, { status: "planned", dryRun: true, materialized: false, files: "unavailable-after-dry-run", strategy, plan }, {
+    const planValue = plan as unknown as { readonly schema?: string; readonly chunks?: readonly { byteLength: number }[]; readonly objects?: readonly { kind: string; chunks?: readonly { byteLength: number }[]; parts?: readonly unknown[] }[] };
+    const transactions = planValue.schema === "keel-upload-plan@2"
+      ? storageTransactionEstimate([(planValue.chunks ?? []).map((chunk) => chunk.byteLength)])
+      : storageTransactionEstimate((planValue.objects ?? []).filter((item) => item.kind === "leaf").map((leaf) => (leaf.chunks ?? []).map((chunk) => chunk.byteLength)), (planValue.objects ?? []).filter((item) => item.kind === "composite").map((item) => item.parts?.length ?? 2));
+    return deliverResult(context.workspace, { status: "planned", dryRun: true, materialized: false, files: "unavailable-after-dry-run", strategy, transactions, plan }, {
       outPath: `${objectName}.upload-plan.dry-run.json`,
-      summary: (value) => ({ status: value.status, dryRun: true, materialized: false, files: value.files, strategy, planSchema: (plan as { readonly schema?: unknown }).schema }),
+      summary: (value) => ({ status: value.status, dryRun: true, materialized: false, files: value.files, strategy, transactions: value.transactions, planSchema: (plan as { readonly schema?: unknown }).schema }),
     });
   } finally {
     await rm(scratch, { recursive: true, force: true });
@@ -435,7 +449,9 @@ async function publishPlanTool(context: ToolContext, value: unknown): Promise<un
   const revisionPlan = publicationIntent === "existing-graph-revision"
     ? planKeelGraphRevision(input.revision)
     : undefined;
-  const envelope = await createKeelPublishReviewPlan(chainPlan);
+  // Gas annotations ride beside the canonical descriptor plan; the SDK envelope covers the descriptors only.
+  const { gas: planGas, transactions: planTransactions, ...canonicalPlan } = (chainPlan !== null && typeof chainPlan === "object" ? chainPlan : {}) as Record<string, unknown>;
+  const envelope = await createKeelPublishReviewPlan(chainPlan !== null && typeof chainPlan === "object" ? canonicalPlan : chainPlan);
   const mediaType = String(envelope.plan.source.mediaType);
   const document = DOCUMENT_MEDIA.test(mediaType);
   const storageOnly = !document && envelope.plan.operations.every((operation) => ["castSlugs", "weldObject", "weldComposite"].includes(operation.kind));
@@ -461,6 +477,8 @@ async function publishPlanTool(context: ToolContext, value: unknown): Promise<un
     signing: "not-performed",
     submission: "not-performed",
     standards: clearance,
+    ...(planGas === undefined ? {} : { gas: planGas }),
+    ...(planTransactions === undefined ? {} : { transactions: planTransactions }),
     ...(revisionPlan === undefined ? {} : { revisionPlan }),
     envelope,
   };
@@ -513,6 +531,7 @@ async function walletDeployPrepare(context: ToolContext, input: Record<string, u
     ...(deploy.bytecode === undefined ? {} : { bytecode: requiredString(deploy, "bytecode") }),
     ...(deploy.valueWei === undefined ? {} : { valueWei: requiredString(deploy, "valueWei") }),
   });
+  const gas = await resolveGasLimit("wallet-request-prepare", input.gas, { chainId: deployment.chainId, data: deployment.data, valueWei: deployment.valueWei });
   const request = {
     protocol: "keel-wallet-deploy-request@1",
     requestId: optionalString(deploy, "requestId") ?? `deploy-${deployment.initCodeKeccak.slice(2, 14)}`,
@@ -522,6 +541,7 @@ async function walletDeployPrepare(context: ToolContext, input: Record<string, u
     to: null,
     data: deployment.data,
     valueWei: deployment.valueWei,
+    gasLimit: String(gas.gasLimit),
   };
   const result = {
     status: "prepared-only",
@@ -532,6 +552,7 @@ async function walletDeployPrepare(context: ToolContext, input: Record<string, u
     artifact: { path: artifactPath, sha256: sha256Hex(artifactBytes), bytecodeKeccak: deployment.bytecodeKeccak },
     constructor: deployment.constructor,
     initCodeKeccak: deployment.initCodeKeccak,
+    gas,
     envelope: { request, integrity: { algorithm: "sha256", digest: sha256Hex(JSON.stringify(request)) } },
     requires: deployment.requires,
   };
@@ -623,8 +644,41 @@ function effectiveCall(to: string, data: string): { readonly target: string; rea
   return { target, data: current, via };
 }
 
+/**
+ * Every Ethereum request carries an explicit gas limit at or under the per-transaction cap (EIP-7825), so a wallet
+ * never estimates its own and never gets a request the network will reject. KeelHold storage calls are priced
+ * offline from the receipt-fitted model; anything else needs gas.limit or gas.rpcUrl (eth_estimateGas).
+ */
+async function resolveGasLimit(tool: string, value: unknown, tx: { readonly chainId: number; readonly to?: string; readonly data: string; readonly valueWei: string }) {
+  const gas = value === undefined ? {} : record(value, ["limit", "rpcUrl", "from"], "gas");
+  const cap = keelTransactionGasCap({ chainId: tx.chainId });
+  let estimatedGas: number | undefined;
+  let method: string;
+  const storage = tx.to === undefined ? undefined : estimateKeelHoldCallGas(tx.data as `0x${string}`);
+  if (storage !== undefined) {
+    estimatedGas = storage;
+    method = "keelhold-receipt-model";
+  } else if (gas.rpcUrl !== undefined) {
+    try {
+      estimatedGas = await estimateTransactionGas(requiredString(gas, "rpcUrl"), { ...(typeof gas.from === "string" ? { from: gas.from } : {}), ...(tx.to === undefined ? {} : { to: tx.to }), data: tx.data, valueWei: tx.valueWei });
+    } catch (error) {
+      throw new StandardsRefusal(tool, "gas-limit-required", `eth_estimateGas failed: ${error instanceof Error ? error.message : String(error)}.`, "keel-network-inspect", "Pass gas.from (the signing wallet) so the estimate runs as the real sender, or gas.limit.");
+    }
+    method = "eth_estimateGas";
+  } else if (gas.limit !== undefined) {
+    if (typeof gas.limit !== "number" || !Number.isSafeInteger(gas.limit) || gas.limit < 21_000) throw new TypeError("gas.limit must be an integer of at least 21000.");
+    if (gas.limit > cap.gasCap) throw new StandardsRefusal(tool, "transaction-gas-cap-exceeded", `gas.limit ${gas.limit} is above the ${cap.gasCap} per-transaction cap (${cap.source}).`, "keel-network-inspect", "Split the work into smaller transactions.");
+    return { gasLimit: gas.limit, method: "declared", gasCap: cap.gasCap, gasCapSource: cap.source };
+  } else {
+    throw new StandardsRefusal(tool, "gas-limit-required", "Every prepared request carries an explicit gas limit so the wallet never substitutes its own (which can exceed the EIP-7825 cap).", "keel-network-inspect", "Pass gas: { rpcUrl, from } to measure it with eth_estimateGas, or gas: { limit }.");
+  }
+  const limit = keelGasLimit(estimatedGas, cap.gasCap);
+  if (!limit.fits) throw new StandardsRefusal(tool, "transaction-gas-cap-exceeded", `This transaction needs ~${estimatedGas} gas (limit ${Math.ceil(estimatedGas * 1.07)} with margin), above the ${cap.gasCap} per-transaction cap (${cap.source}). A wallet would reject it.`, "keel-graph-weld-prepare", "Split it: pack storage with keel-graph-weld-prepare / chain-plan, or break the call up.");
+  return { estimatedGas, gasLimit: limit.gasLimit, method, gasCap: cap.gasCap, gasCapSource: cap.source };
+}
+
 async function walletRequestPrepareTool(context: ToolContext, value: unknown): Promise<unknown> {
-  const input = record(value, ["request", "deploy", "call", "qr", "standards", "controlsAbiPath", "targetRpcUrl"], "wallet request arguments");
+  const input = record(value, ["request", "deploy", "call", "qr", "standards", "controlsAbiPath", "targetRpcUrl", "gas"], "wallet request arguments");
   if ([input.request, input.deploy, input.call].filter((entry) => entry !== undefined).length !== 1) throw new TypeError("Provide exactly one of request (prepared calldata), call (ABI + signature + args) or deploy (a contract deployment).");
   if (input.deploy !== undefined) return walletDeployPrepare(context, input);
   const built = input.call === undefined ? undefined : await requestFromCall(context, input.call);
@@ -657,7 +711,10 @@ async function walletRequestPrepareTool(context: ToolContext, value: unknown): P
     requireContractAudit: ethereum && workKind === "token-contract",
     ...(ethereum ? {} : { auditUnavailable: "keel-token-standard-audit reads EVM tokenURI; Tezos token metadata is not audited yet." }),
   });
-  const envelope = await createKeelWalletRequest(input.request);
+  const gas = ethereum
+    ? await resolveGasLimit("wallet-request-prepare", input.gas, { chainId: request.chainId as number, to: request.to as string, data: request.data as string, valueWei: String(request.valueWei) })
+    : undefined;
+  const envelope = await createKeelWalletRequest(gas === undefined ? input.request : { ...request, gasLimit: String(gas.gasLimit) });
   const qr = optionalBoolean(input, "qr");
   const qrPayload = qr === true ? await encodeKeelWalletRequestQr(envelope) : undefined;
   return {
@@ -665,6 +722,7 @@ async function walletRequestPrepareTool(context: ToolContext, value: unknown): P
     signing: "not-performed",
     submission: "not-performed",
     standards: clearance,
+    ...(gas === undefined ? {} : { gas }),
     ...(effective !== undefined && effective.via.length ? { forwarded: { via: effective.via, target: effective.target, selector: effective.data.slice(0, 10) } } : {}),
     ...(built === undefined ? {} : { call: built.call }),
     classification: { workKind: clearance.workKind, tokenKind, ...(roleSignature === undefined ? {} : { roleAdmin: roleSignature }), ...(control === undefined ? {} : { control: { signature: control.signature, mode: control.mode } }) },

@@ -670,7 +670,7 @@ test("MCP cost, module lock, and wallet preparation stay offline and bounded", a
     assert.equal(declaredStorage?.result.structuredContent.code, "storage-only-not-verified");
     // A genuine KeelHold storage write still needs no evidence.
     const prepared = await call(server, 5, "wallet-request-prepare", {
-      request: { ...contractCall, data: "0x0d1ff9e2" }, qr: true,
+      request: { ...contractCall, data: "0x0d1ff9e2" }, qr: true, gas: { limit: 200_000 },
     });
     assert.equal(prepared?.result.structuredContent.standards.workKind, "storage-only");
     assert.equal(prepared?.result.structuredContent.status, "prepared-only");

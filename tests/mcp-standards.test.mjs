@@ -8,6 +8,7 @@ import { createHash } from "node:crypto";
 import { gunzipSync, gzipSync } from "node:zlib";
 import { encodeDeployData, encodeFunctionData, getAddress } from "viem";
 import { createKeelManagedCompositePlan, createKeelManagedObjectPlan } from "../packages/sdk/dist/native-managed.js";
+import { KEEL_CAST_TARGET_GAS, KEEL_EIP7825_TX_GAS_CAP, keelCastGasEstimate, packKeelCasts } from "../packages/sdk/dist/tx-gas.js";
 import { createUploadPlan } from "../packages/builder/dist/index.js";
 import { KEEL_ENGINE_CATALOG, planKeelProject } from "../packages/sdk/dist/engine.js";
 import { canonicalShellFragments, createMcpServer, mcpToolListIssues, TOOL_DEFINITIONS } from "../packages/mcp/dist/index.js";
@@ -26,8 +27,10 @@ async function workspace() {
   const server = await createMcpServer({ workspaceRoot: directory });
   await server.handle({ jsonrpc: "2.0", id: 0, method: "initialize", params: { protocolVersion: "2024-11-05", capabilities: {}, clientInfo: { name: "standards-test", version: "1" } } });
   let id = 1;
-  const call = async (name, args) => (await server.handle({ jsonrpc: "2.0", id: id++, method: "tools/call", params: { name, arguments: args } }))?.result;
-  return { directory, server, call };
+  const rawCall = async (name, args) => (await server.handle({ jsonrpc: "2.0", id: id++, method: "tools/call", params: { name, arguments: args } }))?.result;
+  // Wallet requests need an explicit gas limit; tests about other gates supply a fixed one (gas tests use rawCall).
+  const call = (name, args) => rawCall(name, name === "wallet-request-prepare" && args !== null && typeof args === "object" && !("gas" in args) ? { ...args, gas: { limit: 1_000_000 } } : args);
+  return { directory, server, call, rawCall };
 }
 
 async function audit(call, tokenUri, extra = {}) {
@@ -686,6 +689,97 @@ test("role administration and ERC-20 targets need the receipt, never a tokenURI 
   } finally {
     await erc20Rpc.close();
     await nftRpc.close();
+    await rm(directory, { recursive: true, force: true });
+  }
+});
+
+const holdCast = (sizes) => encodeFunctionData({ abi: [{ type: "function", name: "castSlugs", stateMutability: "nonpayable", inputs: [{ name: "payloads", type: "bytes[]" }], outputs: [] }], functionName: "castSlugs", args: [sizes.map((size, index) => `0x${String((index % 9) + 1).repeat(size * 2)}`)] });
+
+test("EIP-7825: the cast gas model tracks KeelHold receipts and packing stays under the per-transaction cap", () => {
+  // Receipts from the REDLINE fork run: 3 x 23 KB slugs = 15,224,852 gas; one 17.4 KB slug = 3,858,176.
+  for (const [sizes, measured] of [[[23_008, 23_008, 23_008], 15_224_852], [[17_376], 3_858_176], [[7_488], 1_709_339]]) {
+    const estimate = keelCastGasEstimate(sizes);
+    assert.ok(estimate >= measured && estimate <= measured * 1.03, `${sizes}: ${estimate} vs ${measured}`);
+  }
+  assert.equal(KEEL_EIP7825_TX_GAS_CAP, 16_777_216);
+  assert.ok(Math.ceil(KEEL_CAST_TARGET_GAS * 1.07) <= KEEL_EIP7825_TX_GAS_CAP);
+  const slugs = [23_000, 23_000, 23_000, 23_000, 17_000, 7_500, 1_000, 1_000].map((size) => ({ bytes: new Uint8Array(size) }));
+  const groups = packKeelCasts(slugs);
+  assert.equal(groups.length, 3);
+  for (const group of groups) assert.ok(group.length <= 3 && keelCastGasEstimate(group.map((slug) => slug.bytes.byteLength)) <= KEEL_CAST_TARGET_GAS);
+  assert.throws(() => packKeelCasts([{ bytes: new Uint8Array(80_000) }]), /per-transaction target/u);
+});
+
+test("every wallet request carries an explicit gas limit under the cap; oversize is refused at prepare time", async () => {
+  const { directory, rawCall } = await workspace();
+  const cheap = await mockRpc({ tokenUri: "", estimate: 100_000 });
+  const huge = await mockRpc({ tokenUri: "", estimate: 20_000_000 });
+  try {
+    const hold = "0x0a4f31d5ab08029e4c68f6f3227d9fa3a2d66267";
+    const base = { protocol: "keel-wallet-request@1", requestId: "g", label: "g", family: "ethereum", chainId: 11155111, to: hold, valueWei: "0" };
+    // KeelHold storage is priced offline: 3 full slugs fit (limit <= cap), 4 cannot and are refused.
+    const three = (await rawCall("wallet-request-prepare", { request: { ...base, data: holdCast([23_000, 23_000, 23_000]) } })).structuredContent;
+    assert.equal(three.gas.method, "keelhold-receipt-model");
+    assert.ok(three.gas.gasLimit <= KEEL_EIP7825_TX_GAS_CAP && three.gas.gasLimit > 15_000_000);
+    assert.equal(three.envelope.request.gasLimit, String(three.gas.gasLimit));
+    const four = await rawCall("wallet-request-prepare", { request: { ...base, data: holdCast([23_000, 23_000, 23_000, 23_000]) } });
+    assert.equal(four.structuredContent.code, "transaction-gas-cap-exceeded");
+    // Anything else needs a measured estimate or a declared limit.
+    const preflightReceipt = (await rawCall("keel-contract-workflow-preflight", {})).structuredContent.receipt.id;
+    const other = { ...base, to: CAR, data: "0x1249c58b" };
+    const standards = { preflightReceipt, workKind: "registry-or-module" };
+    assert.equal((await rawCall("wallet-request-prepare", { request: other, standards })).structuredContent.code, "gas-limit-required");
+    const measured = (await rawCall("wallet-request-prepare", { request: other, standards, gas: { rpcUrl: cheap.url, from: "0x764e3ee7a844d9165937c41fd08086e43b997149" } })).structuredContent;
+    assert.deepEqual([measured.gas.method, measured.gas.estimatedGas, measured.gas.gasLimit], ["eth_estimateGas", 100_000, 107_000]);
+    assert.equal(cheap.calls.find((entry) => entry.method === "eth_estimateGas").params[0].from, "0x764e3ee7a844d9165937c41fd08086e43b997149");
+    assert.equal((await rawCall("wallet-request-prepare", { request: other, standards, gas: { rpcUrl: huge.url } })).structuredContent.code, "transaction-gas-cap-exceeded");
+    assert.equal((await rawCall("wallet-request-prepare", { request: other, standards, gas: { limit: 23_020_276 } })).structuredContent.code, "transaction-gas-cap-exceeded");
+    assert.equal((await rawCall("wallet-request-prepare", { request: other, standards, gas: { limit: 500_000 } })).structuredContent.envelope.request.gasLimit, "500000");
+  } finally {
+    await cheap.close();
+    await huge.close();
+    await rm(directory, { recursive: true, force: true });
+  }
+});
+
+test("graph welds, encodes, chain plans, upload plans and cost report packed transactions under the cap", async () => {
+  const { directory, call } = await workspace();
+  try {
+    const hold = "0x0a4f31d5ab08029e4c68f6f3227d9fa3a2d66267";
+    const sizes = [60_000, 17_000, 7_500, 1_000, 1_000];
+    // Distinct bytes everywhere: identical slugs would be deduplicated (content-addressed) and skew the count.
+    for (const [index, size] of sizes.entries()) await writeFile(path.join(directory, `g${index}.txt`), Buffer.from(Array.from({ length: size }, (_, at) => (at * 131 + index * 17 + (at >> 8)) % 251)));
+    const weld = (await call("keel-graph-weld-prepare", { hold, chainId: 11155111, parts: sizes.map((_, index) => ({ path: `g${index}.txt` })), out: "w.json" })).structuredContent;
+    const full = JSON.parse(await readFile(path.join(directory, "w.json"), "utf8"));
+    for (const operation of full.operations) assert.ok(operation.gasLimit <= KEEL_EIP7825_TX_GAS_CAP && operation.gasLimit >= operation.estimatedGas);
+    // 60 KB = 3 slugs; with the four small parts that is 7 slugs, packed into 3 casts instead of one per part (6).
+    assert.equal(weld.transactions.casts, 3);
+    assert.ok(full.operations.filter((operation) => operation.kind === "castSlugs").some((operation) => operation.part.length > 1));
+    assert.equal(weld.transactions.welds, 6);
+    assert.equal(weld.transactions.weldBatching.available, false);
+    assert.equal(weld.transactions.minimumPossible, Math.ceil(weld.transactions.totalEstimatedGas / KEEL_EIP7825_TX_GAS_CAP));
+
+    const content = Buffer.alloc(150_000);
+    for (let index = 0; index < content.length; index += 1) content[index] = (index * 31) % 251;
+    await mkdir(path.join(directory, "u"));
+    await createUploadPlan(new Uint8Array(content), { objectName: "u", mediaType: "application/octet-stream", compression: "none", outputDirectory: path.join(directory, "u") });
+    const target = { plan: "u/upload-plan.json", family: "ethereum", chainId: 11155111, target: hold };
+    const encoded = JSON.parse(await readFile(path.join(directory, (await call("ethereum-encode", target)).structuredContent.delivery.path), "utf8"));
+    for (const operation of encoded.operations) assert.ok(operation.gasLimit <= KEEL_EIP7825_TX_GAS_CAP);
+    assert.ok(encoded.transactions.minimumPossible >= 1);
+    const chainPlan = (await call("chain-plan", target)).structuredContent;
+    assert.equal(chainPlan.gas.length, chainPlan.operations.length);
+    assert.ok(chainPlan.gas.every((entry) => entry.gasLimit <= KEEL_EIP7825_TX_GAS_CAP));
+    assert.equal(chainPlan.transactions.count, chainPlan.operations.length);
+    const published = (await call("publish-plan", { chainPlan, publicationIntent: "new-object" })).structuredContent;
+    assert.equal(published.transactions.count, chainPlan.transactions.count);
+    await writeFile(path.join(directory, "c.bin"), content);
+    const upload = (await call("upload-plan", { input: "c.bin", objectName: "c", mediaType: "application/octet-stream", compression: "none" })).structuredContent;
+    assert.ok(upload.transactions.count >= 3 && upload.transactions.minimumPossible >= 1);
+    const cost = (await call("cost", { input: "c.bin", compression: "none" })).structuredContent;
+    assert.equal(cost.transactionGas.gasCap, KEEL_EIP7825_TX_GAS_CAP);
+    assert.ok(cost.transactionGas.minimumPossible >= 1 && cost.transactionGas.largestCastGas <= KEEL_CAST_TARGET_GAS);
+  } finally {
     await rm(directory, { recursive: true, force: true });
   }
 });
