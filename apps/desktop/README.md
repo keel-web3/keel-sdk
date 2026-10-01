@@ -279,3 +279,9 @@ workspace revisions even with its chat closed. Unsaved project edits are retaine
 and cannot silently overwrite an external update. This transport has a 64 MB
 per-message memory budget; import individual assets, not an archive or collection
 as one request. It imposes no onchain storage limit.
+
+### Styled converter assets
+
+Builder → Import accepts `.keelasset` downloads from the converter. The engine validates and reconstructs the native package, then the trusted Three r180 player applies the saved Original, Pixel or Dither style and keeps its animation clips. Voxel assets rebuild the saved static cube recipe. They do not enter the older voxel segmentation pipeline.
+
+Attach styled asset to project keeps its content-addressed object and adds a small reference plus a reusable loader in `assets/`. The loader accepts the host's `readObject(id)` function, so large asset bytes stay in Objects rather than source files. It calls `@keel-engine/import/styled-asset`; uploaded scripts are never evaluated. This requires an engine checkout with the styled-asset runtime and shared Draco decoder. It is a desktop/tooling integration, not an on-chain module publication.

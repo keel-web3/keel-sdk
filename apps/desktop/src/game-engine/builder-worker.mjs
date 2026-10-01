@@ -18,6 +18,7 @@ import { tmpdir } from 'node:os';
 import { dirname, join } from 'node:path';
 import { deflateSync } from 'node:zlib';
 import { opsHash } from './builder-ops-hash.mjs';
+import {styledImportable} from './styled-asset-project.mjs';
 
 const root = workerData.root;
 const src = (group, name) => pathToFileURL(join(root, group, name, 'src', 'index.ts')).href;
@@ -493,10 +494,13 @@ function pngOf(importer, { width, height, data }) {
 }
 
 /** Import a 3D file: the proposal, the op list that replays it, and the four views (source -> voxels -> parts -> body / worn). */
-async function importFile({ bytes, name, voxels = 48, as = 'auto', size = 176 }) {
+async function importFile({ bytes, name, fileName, voxels = 48, as = 'auto', size = 176 }) {
+  const input = bytes instanceof Uint8Array ? bytes : new Uint8Array(bytes);
+  const hasStyledRuntime=existsSync(join(root,'packages/import/src/styled-asset-runtime.ts'));
+  const wantsStyled=styledImportable(fileName||name)||(hasStyledRuntime&&(await styledRuntime()).isStyledAsset(input));
+  if(wantsStyled)return importStyledFile(input,name);
   const { importer, core } = await engine();
   const t0 = performance.now();
-  const input = bytes instanceof Uint8Array ? bytes : new Uint8Array(bytes);
   const r = importer.importModel(input, { name, voxels, ...(as !== 'auto' ? { as } : {}) });
   const ms = Math.round(performance.now() - t0);
   const b = r.model.bounds();
@@ -524,6 +528,33 @@ async function sample({ name = 'robot' }) {
   return { name: s.name, format: s.format, bytes: new Uint8Array(bytes), options: clean(s.options ?? {}) };
 }
 
+
+let styledModule,styledDraco,styledPage;
+async function styledRuntime(){
+  const file=join(root,'packages/import/src/styled-asset-runtime.ts');
+  if(!existsSync(file))throw Error('This engine checkout does not support .keelasset. Update the engine before importing styled assets.');
+  return styledModule??=import(pathToFileURL(file).href);
+}
+async function importStyledFile(input,name){
+  const start=performance.now(),runtime=await styledRuntime();
+  let dracoDecoder;
+  try{styledDraco??=createRequire(pathToFileURL(join(root,'package.json')))('draco3dgltf').createDecoderModule();dracoDecoder=await styledDraco;}catch{/* The trusted runtime reports a missing codec only if this asset needs it. */}
+  const asset=await runtime.importStyledAsset(input,{dracoDecoder});
+  return{kind:'styled-asset',name:asset.name||name,ms:Math.round(performance.now()-start),style:clean(asset.style),animation:clean(asset.animation),dependencies:clean(asset.envelope.dependencies),sourceBounds:clean(asset.sourceBounds),byteLength:input.byteLength,nativeDracoRequired:asset.envelope.native.dracoRequired===true,voxelCount:asset.voxelCount??asset.voxel?.indices.length??0,
+    playback:{format:asset.format,version:asset.version,name:asset.name,style:clean(asset.style),animation:clean(asset.animation),sourceBounds:clean(asset.sourceBounds),glbBase64:Buffer.from(asset.glb).toString('base64')}};
+}
+async function styledPreview(){
+  if(styledPage)return styledPage;await styledRuntime();
+  const entry=[join(dirname(new URL(import.meta.url).pathname),'builder-styled-preview.mjs'),join(workerData.sourceDir??'','builder-styled-preview.mjs')].find(file=>existsSync(file));
+  if(!entry)throw Error('Styled asset preview is missing from this editor build.');
+  let esbuild;for(const from of[import.meta.url,pathToFileURL(join(root,'package.json')).href]){try{esbuild=createRequire(from)('esbuild');break;}catch{}}
+  if(!esbuild)throw Error('The editor cannot find its trusted preview bundler.');
+  const plugin={name:'keel-styled-source',setup(b){b.onResolve({filter:/^@keel-engine\/[\w-]+(?:\/styled-asset)?$/},a=>{const file=a.path==='@keel-engine/import/styled-asset'?join(root,'packages/import/src/styled-asset-runtime.ts'):join(root,'packages',a.path.slice('@keel-engine/'.length),'src/index.ts');return existsSync(file)?{path:file}:undefined;});}};
+  const out=await esbuild.build({entryPoints:[entry],bundle:true,format:'iife',platform:'browser',target:'es2022',minify:true,write:false,logLevel:'silent',plugins:[plugin]});
+  const js=out.outputFiles[0].text.replaceAll('</script','<\\/script');
+  styledPage=`<!doctype html><meta charset="utf-8"><title>KEEL styled asset player</title><style>[hidden]{display:none!important}html,body{margin:0;height:100%;background:#101018;color:#e4e8f0;font:12px system-ui}#view{width:100%;height:calc(100% - 70px);display:block}#controls{padding:8px;display:flex;gap:8px;align-items:center}#time{flex:1}#status{margin:0;padding:0 8px}select,button{font:inherit}</style><canvas id="view" aria-label="Styled asset preview"></canvas><div id="controls"><select id="clip" aria-label="Animation clip"></select><button id="play">Pause</button><input id="time" type="range" min="0" max="1" step="0.001" value="0" aria-label="Animation time"><output id="time-label"></output></div><p id="status" role="status">Waiting for a validated styled asset</p><script>${js}</script>`;return styledPage;
+}
+
 // ---------------------------------------------------------------- the preview page
 
 let page;
@@ -543,7 +574,7 @@ async function preview() {
   return page;
 }
 
-const operations = { open, apply, state, frame, close, validate, reference, variants, variantOps, poses, exportPack, loadPack, importFile, sample, preview };
+const operations = { open, apply, state, frame, close, validate, reference, variants, variantOps, poses, exportPack, loadPack, importFile, sample, preview, styledPreview };
 parentPort.on('message', async ({ id, op, input }) => {
   try {
     const run = operations[op];

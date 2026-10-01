@@ -26,7 +26,7 @@ export function builderProcedures(t: { procedure: any }, builder: () => GameBuil
     gameBuilderClose: t.procedure.input(build).mutation(({ input }: { input: Build }) => builder().closeBuild(input.projectId, input.name)),
     gameImport: t.procedure.input(z.object({ objectId, ...importOptions }).strict()).mutation(async ({ input }: { input: { objectId: string; voxels: number; as: string } }) => {
       const file = await importBytes(store(), input.objectId);
-      return { objectId: input.objectId, ...await builder().importFile({ bytes: file.bytes, name: file.name, voxels: input.voxels, as: input.as }) };
+      return { objectId: input.objectId, ...await builder().importFile({ bytes: file.bytes, name: file.name, fileName: file.fileName, voxels: input.voxels, as: input.as }) };
     }),
     gameImportSample: t.procedure.input(z.object({ name: z.string().regex(/^[a-z-]{1,40}$/), ...importOptions }).strict()).mutation(async ({ input }: { input: { name: string; voxels: number; as: string } }) => {
       const sample = await builder().sample(input.name);
