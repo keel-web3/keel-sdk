@@ -19,6 +19,7 @@ export * from "./keel-viewer-bridge.js";
 export * from "./stake-object.js";
 export * from "./creation-module.js";
 export * from "./module-inputs.js";
+export * from "./sealed.js";
 export * from "./community-replication.js";
 export * from "./keel-ip-control.js";
 export * from "./keel-attribution.js";

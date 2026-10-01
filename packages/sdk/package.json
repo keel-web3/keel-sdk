@@ -131,6 +131,18 @@
       "types": "./dist/contract-controls.d.ts",
       "import": "./dist/contract-controls.js"
     },
+    "./contract-registry": {
+      "types": "./dist/contract-registry.d.ts",
+      "import": "./dist/contract-registry.js"
+    },
+    "./sealed-passkey": {
+      "types": "./dist/sealed-passkey.d.ts",
+      "import": "./dist/sealed-passkey.js"
+    },
+    "./transfer-rules": {
+      "types": "./dist/transfer-rules.d.ts",
+      "import": "./dist/transfer-rules.js"
+    },
     "./infrastructure": {
       "types": "./dist/infrastructure.d.ts",
       "import": "./dist/infrastructure.js"
