@@ -19,6 +19,8 @@ import { dirname, join } from 'node:path';
 import { deflateSync } from 'node:zlib';
 import { opsHash } from './builder-ops-hash.mjs';
 import {styledImportable} from './styled-asset-project.mjs';
+import { inspectRedesignSource, preflightRedesignGltf, redesignSourceBytes, redesignSourceLabels, REDESIGN_SOURCE_LIMITS } from './builder-redesign-source.mjs';
+import { nativeRedesignPlayback, REDESIGN_PREVIEW_LIMITS } from './builder-redesign-preview.mjs';
 
 const root = workerData.root;
 const src = (group, name) => pathToFileURL(join(root, group, name, 'src', 'index.ts')).href;
@@ -555,6 +557,68 @@ async function styledPreview(){
   styledPage=`<!doctype html><meta charset="utf-8"><title>KEEL styled asset player</title><style>[hidden]{display:none!important}html,body{margin:0;height:100%;background:#101018;color:#e4e8f0;font:12px system-ui}#view{width:100%;height:calc(100% - 70px);display:block}#controls{padding:8px;display:flex;gap:8px;align-items:center}#time{flex:1}#status{margin:0;padding:0 8px}select,button{font:inherit}</style><canvas id="view" aria-label="Styled asset preview"></canvas><div id="controls"><select id="clip" aria-label="Animation clip"></select><button id="play">Pause</button><input id="time" type="range" min="0" max="1" step="0.001" value="0" aria-label="Animation time"><output id="time-label"></output></div><p id="status" role="status">Waiting for a validated styled asset</p><script>${js}</script>`;return styledPage;
 }
 
+// ---------------------------------------------------------------- isolated generative redesign
+
+let generativeModule;
+async function generativeRuntime() {
+  const file = join(root, 'packages/builder/src/generative.ts');
+  if (!existsSync(file)) throw new Error('This engine checkout does not support seeded generative redesign. Update the engine first.');
+  return generativeModule ??= import(pathToFileURL(file).href);
+}
+async function redesignReference() {
+  const [{ core }, runtime, styleRuntime] = await Promise.all([engine(), generativeRuntime(), styledRuntime()]);
+  const defaults = styleRuntime.validateStyledAssetStyle({ kind: 'original', pixelSize: 4, toneLevels: 8, screen: 'bayer4' });
+  const kinds = ['original', 'pixel', 'dither', 'voxel'], screens = Object.keys(core.SCREENS);
+  return { runtimeVersion: runtime.GENERATIVE_RUNTIME_VERSION, programReference: clean(runtime.generativeProgramReference()), sourceLimits: REDESIGN_SOURCE_LIMITS, previewLimits: REDESIGN_PREVIEW_LIMITS, styles: { kinds, screens, defaults, schema: { type: 'object', additionalProperties: false, required: ['kind', 'pixelSize', 'toneLevels', 'screen'], properties: { kind: { enum: kinds }, pixelSize: { type: 'integer', minimum: 1, maximum: 64 }, toneLevels: { type: 'integer', minimum: 2, maximum: 256 }, screen: { enum: screens } } } } };
+}
+async function redesignSource({ bytes, fileName = '', name = '' }) {
+  const input = redesignSourceBytes(bytes), { importer } = await engine(), semanticLabels = redesignSourceLabels(name, fileName);
+  const runtime = await styledRuntime();
+  if (styledImportable(fileName || name) || runtime.isStyledAsset(input)) {
+    let dracoDecoder;
+    try { styledDraco ??= createRequire(pathToFileURL(join(root, 'package.json')))('draco3dgltf').createDecoderModule(); dracoDecoder = await styledDraco; } catch { /* The trusted runtime diagnoses required codecs. */ }
+    const asset = await runtime.importStyledAsset(input, { dracoDecoder });
+    return inspectRedesignSource(asset.glb, { importer, semanticLabels, fileName: 'source.glb', sourceKind: 'keelasset', animation: { mode: asset.animation.mode, clips: asset.animation.clips }, sourceStyle: clean(asset.style) });
+  }
+  const isGlb = importer.isGlb(input), isGltf = /\.gltf$/i.test(fileName || name);
+  if (isGlb || isGltf) {
+    const parsed = isGlb ? importer.readGlb(input) : { json: JSON.parse(new TextDecoder().decode(input)), bin: null };
+    preflightRedesignGltf(parsed.json, parsed.bin);
+    const animation = { mode: 'source-clips', clips: Array.isArray(parsed.json.animations) ? parsed.json.animations.length : 0 };
+    if (parsed.json.meshes?.some(mesh => mesh.primitives?.some(p => p.extensions?.KHR_draco_mesh_compression))) {
+      const [{ normalizeAsset }, { writeNativeGlb }] = await Promise.all(['asset-normalize-v3.ts', 'asset-native-base-v3.ts'].map(file => import(pathToFileURL(join(root, 'packages/import/src', file)).href)));
+      try { styledDraco ??= createRequire(pathToFileURL(join(root, 'package.json')))('draco3dgltf').createDecoderModule(); } catch { throw new Error('Redesign source: this compressed model requires the engine shared Draco decoder.'); }
+      const entry = isGlb ? 'source.glb' : 'source.gltf';
+      const normalized = await normalizeAsset({ files: [{ name: entry, data: input }], entry, dracoDecoder: await styledDraco });
+      const decoded = writeNativeGlb(normalized.json, normalized.accessors.map(a => a.array), normalized.images);
+      return { ...inspectRedesignSource(decoded, { importer, semanticLabels, fileName: 'source.glb', sourceKind: isGlb ? 'glb' : 'gltf', animation }), normalization: { dracoPrimitives: normalized.validation.dracoPrimitives } };
+    }
+    return inspectRedesignSource(input, { importer, semanticLabels, fileName: fileName || name, animation });
+  }
+  return inspectRedesignSource(input, { importer, semanticLabels, fileName: fileName || name });
+}
+async function redesignPreview({ program, seed, style }) {
+  const started = performance.now();
+  const [{ builder, importer }, runtime, styleRuntime] = await Promise.all([engine(), generativeRuntime(), styledRuntime()]);
+  let validatedStyle;
+  try { validatedStyle = styleRuntime.validateStyledAssetStyle(style); } catch (error) { return { ok: false, validation: { ok: false, errors: [{ path: 'style', message: String(error.message).slice(0, 500) }] } }; }
+  const checked = runtime.validateGenerativeProgram(program);
+  if (!checked.ok) return { ok: false, validation: { ok: false, errors: clean(checked.errors) } };
+  const result = runtime.runGenerativeProgram(program, seed);
+  if (!result.ok) return { ok: false, validation: { ok: false, errors: clean(result.errors) } };
+  // Never add this session to the persistent editor map or its progress stream.
+  // References to it are scoped to this request and released even on failure.
+  const entry = { key: 'redesign-preview', session: result.session, live: builder.livePreview(result.session), rigCache: null, frame: 0 };
+  try {
+    entry.rigCache = await rigOf(entry);
+    const { solids, look } = entry.live.solids();
+    const { playback, stats } = nativeRedesignPlayback({ importer, solids, look, style: validatedStyle, name: result.program.title ?? result.program.id });
+    return { ok: true, runtimeVersion: runtime.GENERATIVE_RUNTIME_VERSION, program: clean(result.program), seed: result.seed, ops: clean(result.ops), style: validatedStyle, frame: frameOf(entry, { reset: true, label: 'Seeded native redesign' }), state: await stateOf(entry), playback, stats: { ...stats, ops: result.ops.length, voxels: result.session.editor.model.count, elapsedMs: Math.round(performance.now() - started) }, validation: { ok: true, errors: [], ...(checked.budget ? { budget: clean(checked.budget) } : {}) } };
+  } catch (error) {
+    return { ok: false, validation: { ok: false, errors: [{ path: 'preview', message: String(error.message).slice(0, 500) }] } };
+  } finally { entry.live = null; entry.session = null; entry.rigCache = null; }
+}
+
 // ---------------------------------------------------------------- the preview page
 
 let page;
@@ -574,7 +638,7 @@ async function preview() {
   return page;
 }
 
-const operations = { open, apply, state, frame, close, validate, reference, variants, variantOps, poses, exportPack, loadPack, importFile, sample, preview, styledPreview };
+const operations = { open, apply, state, frame, close, validate, reference, variants, variantOps, poses, exportPack, loadPack, importFile, sample, preview, styledPreview, redesignReference, redesignSource, redesignPreview };
 parentPort.on('message', async ({ id, op, input }) => {
   try {
     const run = operations[op];

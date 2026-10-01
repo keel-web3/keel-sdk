@@ -57,6 +57,8 @@ import { gameProcedures } from './game-engine/game-procedures';
 import { isGameProject } from './game-engine/game-project.mjs';
 import { GameBuilderService, BUILDER_PREVIEW_HEADERS, STYLED_PREVIEW_HEADERS } from './game-engine/builder-service.mjs';
 import { builderProcedures } from './game-engine/builder-procedures';
+import { GenerativeRedesignService } from './game-engine/generative-redesign-service.mjs';
+import { generativeRedesignProcedures } from './game-engine/generative-redesign-procedures';
 import { GameCodecService } from './game-engine/codec-service.mjs';
 import { codecProcedures } from './game-engine/codec-procedures';
 import { BUILDER_PREVIEW_HOST } from './game-engine/builder-project.mjs';
@@ -95,6 +97,7 @@ let canonicalShell: any;
 let previews: PreviewService;
 let gameEngine: GameEngineService;
 let gameBuilder: GameBuilderService;
+let gameRedesign: GenerativeRedesignService;
 let gameCodec: GameCodecService;
 let gameSound: GameSoundService;
 let gameLevel: GameLevelService;
@@ -417,6 +420,7 @@ const router = t.router({
   deleteKey: t.procedure.input(keyProvider).mutation(({ input }) => { store.db.prepare('DELETE FROM credentials WHERE provider=?').run(input); return { removed: true }; }),
   ...gameProcedures(t, () => gameEngine),
   ...builderProcedures(t, () => gameBuilder, () => store),
+  ...generativeRedesignProcedures(t, () => gameRedesign),
   ...codecProcedures(t, () => gameCodec, () => store),
   ...soundProcedures(t, () => gameSound),
   ...levelProcedures(t, () => gameLevel, () => store),
@@ -451,6 +455,7 @@ async function start() {
   try { linkGamesFolder({ sdkRoot: games.sdkRoot, gamesDir: games.gamesDir }); } catch (error) { console.warn(`Your games folder can't reach the engine yet: ${(error as Error).message}`); }
   gameEngine = new GameEngineService({ workerPath: path.join(__dirname, 'game-engine-worker.mjs'), shell: canonicalShell, chainDir: games.chainDir, projects: [...findGameProjects([path.resolve(app.getAppPath(), '../../examples/game-engine'), path.resolve(__dirname, '../../../examples/game-engine')]), games.gamesDir], ...findGameEngineRoot([path.resolve(app.getAppPath(), '../../../keel-engine'), path.resolve(__dirname, '../../../../keel-engine')], [engineLockOf(games).dir]) });
   gameBuilder = new GameBuilderService({ workerPath: path.join(__dirname, 'game-builder-worker.mjs'), engine: gameEngine });
+  gameRedesign = new GenerativeRedesignService({ builder: gameBuilder, store });
   gameCodec = new GameCodecService({ workerPath: path.join(__dirname, 'game-codec-worker.mjs'), engine: gameEngine });
   gameSound = new GameSoundService({ workerPath: path.join(__dirname, 'game-sound-worker.mjs'), engine: gameEngine });
   gameLevel = new GameLevelService({ workerPath: path.join(__dirname, 'game-level-worker.mjs'), engine: gameEngine });
@@ -597,5 +602,5 @@ if (process.env.KEEL_DESKTOP_DATA_DIR && path.isAbsolute(process.env.KEEL_DESKTO
 if (!app.requestSingleInstanceLock()) app.quit();
 else { app.on('second-instance', () => { window?.show(); window?.focus(); }); void start().catch((error) => { console.error(error); app.quit(); }); }
 app.on('window-all-closed', () => app.quit());
-app.on('before-quit', () => { agents?.close(); });
+app.on('before-quit', () => { agents?.close(); gameRedesign?.close(); });
 app.on('will-quit', () => { void workspaceService?.close(); layerImages.close(); rasterImages.close(); previews?.close(); gameEngine?.close(); gameBuilder?.close(); gameCodec?.close(); gameSound?.close(); gameLevel?.close(); store?.close(); });
