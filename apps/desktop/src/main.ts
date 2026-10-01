@@ -48,6 +48,7 @@ import { inspectStudio, searchStudio } from './studio.mjs';
 import { readImportFile, sourceFile, MAX_SOURCE_BYTES } from './file-import.mjs';
 import { PreviewService } from './preview-service.mjs';
 import { loadRuntimeModules, directRuntimeImports } from './runtime-files.mjs';
+import { projectInputsScript, withProjectInputs } from './module-settings.mjs';
 import { inspectNetwork, estimateNetworkCall } from './network.mjs';
 import { sameState } from './editor-state.mjs';
 import { metadataDocument, parseMetadata } from './metadata.mjs';
@@ -99,7 +100,11 @@ let gameCodec: GameCodecService;
 let gameSound: GameSoundService;
 let gameLevel: GameLevelService;
 function previewFor(project: any) {
-  return previews.preview(project, store.read().state.objects);
+  const { state } = store.read();
+  // Chosen module settings reach the entry page as KEEL_INPUTS, exactly as in the live preview.
+  const script = projectInputsScript(state.moduleSelections, project.id);
+  const files = script ? project.files.map((file: any) => file.name === 'index.html' && file.type === 'text/html' ? { ...file, content: withProjectInputs(file.content, script) } : file) : project.files;
+  return previews.preview({ ...project, files }, state.objects);
 }
 function objectResponse(object: any, request: Request) {
   const headers = { 'content-type': object.type, 'content-length': String(object.byteLength), 'access-control-allow-origin': '*', 'accept-ranges': 'bytes', 'x-content-type-options': 'nosniff', 'content-security-policy': "default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; img-src data: blob:; media-src data: blob:; sandbox allow-scripts" };
@@ -548,7 +553,8 @@ async function start() {
     }
     if (!file) return new Response('Save an index.html file to preview this project.', { status: 404 });
     const origin = `keel-preview://${projectId}`;
-    return new Response(file.type === 'text/html' ? directRuntimeImports(file.content, project.runtimeModules, origin) : file.content, { headers: { 'content-type': file.type, 'access-control-allow-origin': '*', 'x-content-type-options': 'nosniff', 'content-security-policy': `default-src 'none'; script-src 'unsafe-inline' 'wasm-unsafe-eval' ${origin}; style-src 'unsafe-inline' ${origin}; img-src data: ${origin}; media-src data: ${origin}; connect-src ${origin}; frame-src 'none'; worker-src blob: ${origin}; base-uri 'none'; form-action 'none'; sandbox allow-scripts` } });
+    const html = file.type === 'text/html' ? withProjectInputs(directRuntimeImports(file.content, project.runtimeModules, origin), projectInputsScript(store.read().state.moduleSelections, projectId)) : undefined;
+    return new Response(html ?? file.content, { headers: { 'content-type': file.type, 'access-control-allow-origin': '*', 'x-content-type-options': 'nosniff', 'content-security-policy': `default-src 'none'; script-src 'unsafe-inline' 'wasm-unsafe-eval' ${origin}; style-src 'unsafe-inline' ${origin}; img-src data: ${origin}; media-src data: ${origin}; connect-src ${origin}; frame-src 'none'; worker-src blob: ${origin}; base-uri 'none'; form-action 'none'; sandbox allow-scripts` } });
   });
   session.defaultSession.setPermissionRequestHandler((webContents, permission, callback, details) => callback(allowGamePermission(permission, details, webContents)));
   session.defaultSession.setPermissionCheckHandler(() => false);

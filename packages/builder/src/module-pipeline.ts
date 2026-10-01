@@ -20,13 +20,16 @@ import { createRequire } from "node:module";
 import path from "node:path";
 import {
   canonicalJson,
+  KEEL_MODULE_INPUTS_PROTOCOL,
   createIntegrity,
+  normalizeModuleInputManifest,
   utf8ToBytes,
   type Compression,
   type Hex,
   type Integrity,
   type KeelBuildOptions,
   type KeelBuildRecipe,
+  type KeelModuleInputManifest,
   type KeelSourceReceipt,
 } from "@keel/protocol";
 import {
@@ -100,6 +103,12 @@ export interface KeelModuleManifest {
   readonly moduleRepository?: string;
   /** Output format and linked (unbundled) imports; absent means the default ESM bundle. */
   readonly build?: KeelModuleBuildSettings;
+  /**
+   * Settings the module asks its user for (keel-module-inputs@1). Hosts show
+   * matching controls when the module is included, and the chosen values
+   * reach the module as `globalThis.KEEL_INPUTS["<name>"]`.
+   */
+  readonly inputs?: KeelModuleInputManifest;
 }
 
 /**
@@ -151,6 +160,15 @@ function fail(message: string): never {
 function moduleName(value: string): string {
   if (!MODULE_NAME.test(value)) fail(`Module name "${value}" must match ${MODULE_NAME.source}.`);
   return value;
+}
+
+/** `inputs` may be the full keel-module-inputs@1 object or just its field list. */
+function parseInputs(value: unknown): KeelModuleInputManifest {
+  try {
+    return normalizeModuleInputManifest(Array.isArray(value) ? { protocol: KEEL_MODULE_INPUTS_PROTOCOL, fields: value } : value);
+  } catch (error) {
+    fail(`${KEEL_MODULE_MANIFEST_FILE}: inputs: ${error instanceof Error ? error.message : String(error)}`);
+  }
 }
 
 function textField(value: unknown, label: string, maximum = 512): string {
@@ -223,8 +241,8 @@ function parsePlacement(value: unknown, category: string): KeelModulePlacement {
 
 function parseKeelJsModuleManifest(input: Record<string, unknown>, version2: boolean): KeelModuleManifest {
   const allowed = version2
-    ? new Set(["schema", "id", "version", "entry", "license", "summary", "category", "owner", "repository"])
-    : new Set(["schema", "id", "version", "entry", "license", "summary"]);
+    ? new Set(["schema", "id", "version", "entry", "license", "summary", "category", "owner", "repository", "inputs"])
+    : new Set(["schema", "id", "version", "entry", "license", "summary", "inputs"]);
   for (const key of Object.keys(input)) if (!allowed.has(key)) fail(`${KEEL_MODULE_MANIFEST_FILE}: "${key}" is not supported in ${input.schema as string}.`);
   const name = moduleName(textField(input.id, "id", 64));
   const placement = version2 ? parsePlacement(input.owner, slug(input.category, "category")) : undefined;
@@ -242,6 +260,7 @@ function parseKeelJsModuleManifest(input: Record<string, unknown>, version2: boo
     },
     ...(placement === undefined ? {} : { placement }),
     ...(input.repository === undefined ? {} : { moduleRepository: textField(input.repository, "repository", 512) }),
+    ...(input.inputs === undefined ? {} : { inputs: parseInputs(input.inputs) }),
   };
 }
 
@@ -250,7 +269,7 @@ export function parseKeelModuleManifest(value: unknown): KeelModuleManifest {
   const input = value as Record<string, unknown>;
   if (input.schema === KEEL_JSMODULE_SCHEMA) return parseKeelJsModuleManifest(input, false);
   if (input.schema === KEEL_JSMODULE_SCHEMA_V2) return parseKeelJsModuleManifest(input, true);
-  const allowed = new Set(["protocol", "name", "version", "description", "entry", "license", "sourceRepository", "build"]);
+  const allowed = new Set(["protocol", "name", "version", "description", "entry", "license", "sourceRepository", "build", "inputs"]);
   for (const key of Object.keys(input)) if (!allowed.has(key)) fail(`${KEEL_MODULE_MANIFEST_FILE}: "${key}" is not supported.`);
   if (input.protocol !== KEEL_MODULE_MANIFEST_PROTOCOL) fail(`${KEEL_MODULE_MANIFEST_FILE}: protocol must be ${KEEL_MODULE_MANIFEST_PROTOCOL}.`);
   const name = moduleName(textField(input.name, "name", 64));
@@ -273,6 +292,7 @@ export function parseKeelModuleManifest(value: unknown): KeelModuleManifest {
       path: textField(repository.path, "sourceRepository.path", 256),
     },
     ...(input.build === undefined ? {} : { build: parseBuildSettings(input.build) }),
+    ...(input.inputs === undefined ? {} : { inputs: parseInputs(input.inputs) }),
   };
 }
 

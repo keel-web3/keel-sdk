@@ -1,10 +1,26 @@
 import path from "node:path";
+import {
+  KEEL_MODULE_INPUTS_PROTOCOL,
+  createKeelInputsScript,
+  normalizeModuleInputValues,
+  type KeelModuleInputManifest,
+  type KeelModuleInputValues,
+} from "@keel/protocol";
 import { createKeelModuleInclusions } from "./module-inclusion.js";
+import { createKeelInputsDeclarations } from "./module-inputs-types.js";
+
+export interface EditorModuleSettings {
+  /** The id the module reads its settings under: `KEEL_INPUTS[id]`. */
+  readonly id: string;
+  readonly manifest: KeelModuleInputManifest;
+  readonly values: Readonly<Record<string, unknown>>;
+}
 
 export interface EditorModulePackage {
   readonly name: string;
   readonly files: Readonly<Record<string, string>>;
   readonly aliases?: Readonly<Record<string, string>>;
+  readonly settings?: EditorModuleSettings;
 }
 /** Portable files: the editor works before installation; compilation installs only pinned build tools. */
 export function createKeelEditorProject(modules: readonly EditorModulePackage[]) {
@@ -24,13 +40,24 @@ export function createKeelEditorProject(modules: readonly EditorModulePackage[])
   const included = createKeelModuleInclusions(root, modules.map(module => ({name:module.name,specifier:`./modules/${module.name}/index.js`,...(module.aliases ? {aliases:module.aliases} : {})})), Object.fromEntries(Object.entries(files).map(([file,contents])=>[path.join(root,file),contents])));
   files["keel-bindings.js"] = included.runtime;
   files["keel-globals.d.ts"] = included.declarations;
+  const settings: { id: string; manifest: KeelModuleInputManifest; values: KeelModuleInputValues }[] = [];
+  for (const module of modules) {
+    if (!module.settings) continue;
+    if (settings.some((entry) => entry.id === module.settings!.id)) throw new Error(`Settings for ${module.settings.id} were supplied twice.`);
+    settings.push({ id: module.settings.id, manifest: module.settings.manifest, values: normalizeModuleInputValues(module.settings.manifest, module.settings.values) });
+  }
+  if (settings.length) {
+    files["keel-inputs.js"] = createKeelInputsScript(settings.map(({ id, values }) => ({ moduleId: id, values })));
+    files["keel-inputs.d.ts"] = createKeelInputsDeclarations(settings);
+    files["keel-inputs.json"] = JSON.stringify({ protocol: KEEL_MODULE_INPUTS_PROTOCOL, modules: settings }, null, 2);
+  }
   files["src/main.ts"] = `// Modules are included by the build and typed by keel-globals.d.ts.\n// Start typing a module name here.\nconsole.log(${included.names.filter(name=>!name.startsWith("KEEL_")).map(name=>name).join(", ")});\n`;
-  files["tsconfig.json"] = JSON.stringify({compilerOptions:{target:"ES2022",module:"ESNext",moduleResolution:"Bundler",strict:true,noEmit:true,skipLibCheck:true,types:[]},include:["src/**/*.ts","keel-globals.d.ts"]},null,2);
+  files["tsconfig.json"] = JSON.stringify({compilerOptions:{target:"ES2022",module:"ESNext",moduleResolution:"Bundler",strict:true,noEmit:true,skipLibCheck:true,types:[]},include:["src/**/*.ts","keel-globals.d.ts",...(settings.length ? ["keel-inputs.d.ts"] : [])]},null,2);
   files["KEEL.code-workspace"] = JSON.stringify({folders:[{path:"."}]},null,2);
   files["package.json"] = JSON.stringify({name:"keel-module-project",private:true,type:"module",scripts:{check:"tsc",build:"tsc && node build.mjs"},devDependencies:{esbuild:"0.28.2",typescript:"5.9.3"}},null,2);
-  files["build.mjs"] = `import { build } from "esbuild";\nawait build({entryPoints:["src/main.ts"],bundle:true,format:"esm",platform:"browser",target:"es2022",inject:["./keel-bindings.js"],outfile:"dist/artwork.js"});\n`;
-  files["README.md"] = "Open KEEL.code-workspace, then src/main.ts. Types and autocomplete work immediately. Run npm install and npm run build to compile the included runtime bytes into dist/artwork.js. This is a browser module, ready for the normal KEEL upload flow; this project does not publish or sign transactions. Module provenance records keep inferred and verified types distinct.\n";
-  return {files, names:included.names};
+  files["build.mjs"] = `import { build } from "esbuild";\nawait build({entryPoints:["src/main.ts"],bundle:true,format:"esm",platform:"browser",target:"es2022",inject:[${settings.length ? `"./keel-inputs.js",` : ""}"./keel-bindings.js"],outfile:"dist/artwork.js"});\n`;
+  files["README.md"] = `Open KEEL.code-workspace, then src/main.ts. Types and autocomplete work immediately. Run npm install and npm run build to compile the included runtime bytes into dist/artwork.js. This is a browser module, ready for the normal KEEL upload flow; this project does not publish or sign transactions. Module provenance records keep inferred and verified types distinct.${settings.length ? " Chosen module settings are in keel-inputs.json and reach each module as KEEL_INPUTS[<module id>] before it runs; keel-inputs.d.ts types them." : ""}\n`;
+  return {files, names:included.names, settings};
 }
 
 /** Deterministic, uncompressed ZIP for small text editor projects. */

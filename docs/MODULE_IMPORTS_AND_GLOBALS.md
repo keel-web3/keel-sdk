@@ -16,6 +16,13 @@ Origin verification regenerates these declarations from the pinned checkout.
 If an external project cannot produce declarations, verification reports that
 separately; reproducible JavaScript does not require TypeScript adoption.
 
+## Settings chosen by whoever includes a module
+
+Modules can declare settings in `keel.module.json`. Hosts publish the chosen
+values as `globalThis.KEEL_INPUTS["<module id>"]` before any module runs, and
+the editor project types them in `keel-inputs.d.ts`. See
+[Module settings](MODULE_SETTINGS.md).
+
 ## Shared state across your items
 
 ```ts

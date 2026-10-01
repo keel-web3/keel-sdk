@@ -7,6 +7,7 @@ import { z } from 'zod';
 import { parseKeelEngineIntent } from '@keel/sdk/engine';
 import { createTrackedContract } from '@keel/sdk/contract-controls';
 import { MAX_SOURCE_BYTES, preserveImportedFile } from './file-import.mjs';
+import { assertModuleSelectionSettings } from './module-settings.mjs';
 import { readFileSync, existsSync, createReadStream } from 'node:fs';
 import { Readable } from 'node:stream';
 import path from 'node:path';
@@ -46,7 +47,7 @@ export const stateSchema = z.object({
   wallets: z.array(z.object({ id: z.string().uuid(), label: z.string().min(1).max(160), family: z.enum(['ethereum', 'tezos']), address: z.string().min(1).max(128) }).strict().refine((wallet) => wallet.family === 'ethereum' ? /^0x[0-9a-fA-F]{40}$/.test(wallet.address) : /^(tz[1-4]|KT1)[1-9A-HJ-NP-Za-km-z]{33}$/.test(wallet.address), 'Enter a public address for the selected wallet family.')).max(100),
   memories: z.array(z.object({ id: z.string().uuid(), title: z.string().min(1).max(160), content: text, projectId: z.string().uuid().optional(), enabled: z.boolean().optional(), pinned: z.boolean().optional(), source: z.enum(['creator','assistant']).optional() }).strict()).max(200),
   objects: z.array(z.object({ id: z.string().regex(/^[a-f0-9]{64}$/), name: z.string().max(255), type: z.string().max(160), byteLength: z.number().int().nonnegative(), compressedByteLength: z.number().int().nonnegative().optional(), compression: z.literal('gzip').optional(), source: z.literal('local-import') }).strict()).max(5000),
-  moduleSelections: z.array(z.object({ id: z.string().uuid(), projectId: z.string().uuid(), studioUrl: z.string().url().max(2048), name: z.string().max(160), metadata: z.record(z.string(), z.unknown()).refine((value) => JSON.stringify(value).length <= 64_000), observedAt: z.string().datetime(), evidence: z.literal('catalog-metadata-only') }).strict()).max(1000).default([]),
+  moduleSelections: z.array(z.object({ id: z.string().uuid(), projectId: z.string().uuid(), studioUrl: z.string().url().max(2048), name: z.string().max(160), metadata: z.record(z.string(), z.unknown()).refine((value) => JSON.stringify(value).length <= 64_000), observedAt: z.string().datetime(), evidence: z.literal('catalog-metadata-only'), settings: z.record(z.string(), z.unknown()).refine((value) => JSON.stringify(value).length <= 96_000).optional() }).strict()).max(1000).default([]),
 }).strict();
 export const blankState = () => ({ projects: [], contracts: [], collections: [], wallets: [], memories: [], objects: [] });
 
@@ -97,6 +98,7 @@ export class WorkspaceStore {
     for (const key of ['projects', 'contracts', 'collections', 'wallets', 'memories', 'objects', 'moduleSelections']) {
       if (new Set(parsed[key].map((item) => item.id)).size !== parsed[key].length) throw new Error(`Duplicate ${key} identity.`);
     }
+    assertModuleSelectionSettings(parsed.moduleSelections);
     const contractIds = new Set(parsed.contracts.map((contract) => contract.id));
     const objectIds = new Set(parsed.objects.map((object) => object.id));
     for (const project of parsed.projects) {

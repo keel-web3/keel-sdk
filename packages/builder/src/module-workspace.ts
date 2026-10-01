@@ -36,6 +36,7 @@ import {
   canonicalJson,
   type Hex,
   type KeelBuildRecipe,
+  type KeelModuleInputManifest,
   type KeelSourceReceipt,
 } from "@keel/protocol";
 import {
@@ -473,6 +474,8 @@ export interface KeelModuleCatalogEntry {
   /** The READABLE files the site shows, each pinned by digest. */
   readonly sourceFiles: readonly KeelCatalogSourceFile[];
   readonly types?: Awaited<ReturnType<typeof createKeelModuleTypes>>;
+  /** Settings declared in keel.module.json, shown to whoever includes the module. */
+  readonly inputs?: KeelModuleInputManifest;
   readonly runtime?: { readonly encoding: "base64"; readonly data: string; readonly format: string; readonly entry: string };
   readonly outputDigest: Hex;
   readonly receiptDigest: Hex;
@@ -573,6 +576,7 @@ async function catalogEntry(module: KeelWorkspaceModule, options: IndexKeelWorks
   }
   return {
     ...(types === undefined ? {} : { types }),
+    ...(module.manifest.inputs === undefined ? {} : { inputs: module.manifest.inputs }),
     runtime: { encoding: "base64", data: shippedBytes.toString("base64"), format: recipe.options.format, entry: recipe.entry },
     id: module.manifest.name,
     version: module.manifest.version,

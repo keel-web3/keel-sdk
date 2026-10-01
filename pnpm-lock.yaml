@@ -93,6 +93,9 @@ importers:
       '@keel/mcp':
         specifier: workspace:*
         version: link:../../packages/mcp
+      '@keel/protocol':
+        specifier: workspace:*
+        version: link:../../packages/protocol
       '@keel/sdk':
         specifier: workspace:*
         version: link:../../packages/sdk
