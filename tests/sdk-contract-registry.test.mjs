@@ -16,6 +16,7 @@ import {
   normalizeKeelContractOrganization,
   normalizeKeelContractSigner,
   normalizeKeelContractTags,
+  isKeelTransportFailure,
 } from "../packages/sdk/dist/contract-registry.js";
 
 const A = "0x1111111111111111111111111111111111111111";
@@ -165,4 +166,12 @@ test("signer and collection-label validators keep records honest and secret-free
   assert.throws(() => normalizeKeelContractSigner({ id: "s1", role: "owner", flow: "wallet", label: "x", status: "active", bridge: { server: "a", queue: "/b" } }), /Only bridge/u);
   assert.deepEqual(normalizeKeelCollectionLabels({ "shared:3": { label: " Postcards ", tags: ["Summer"] }, "drop:0xabc": {} }), { "shared:3": { label: "Postcards", tags: ["summer"] }, "drop:0xabc": {} });
   assert.throws(() => normalizeKeelCollectionLabels({ "../x": {} }));
+});
+
+test("transport failures are told apart from contract answers", () => {
+  const http = Object.assign(new Error("HTTP request failed."), { name: "HttpRequestError" });
+  assert.equal(isKeelTransportFailure(Object.assign(new Error("call failed"), { name: "ContractFunctionExecutionError", cause: { name: "CallExecutionError", cause: http } })), true);
+  assert.equal(isKeelTransportFailure(Object.assign(new Error("timed out"), { name: "TimeoutError" })), true);
+  assert.equal(isKeelTransportFailure(Object.assign(new Error("execution reverted"), { name: "ContractFunctionExecutionError", cause: { name: "ContractFunctionRevertedError" } })), false);
+  assert.equal(isKeelTransportFailure(new Error("revert name")), false);
 });

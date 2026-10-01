@@ -94,3 +94,13 @@ test("changes become exact calls that encode against their ABI", () => {
   assert.throws(() => prepareKeelTransferRuleChange({ kind: "v3-set-level", validator: CREATOR_TOKEN_VALIDATORS.v3, collection: COLLECTION, level: 12 }));
   assert.throws(() => prepareKeelTransferRuleChange({ kind: "list-accounts", version: "v3", validator: CREATOR_TOKEN_VALIDATORS.v3, listId: "1", list: "allowed", action: "add", accounts: [] }));
 });
+
+test("a network outage is an error, never a rule", async () => {
+  const offline = {
+    async readContract() {
+      const transport = Object.assign(new Error("HTTP request failed."), { name: "HttpRequestError" });
+      throw Object.assign(new Error("The contract function reverted?"), { name: "ContractFunctionExecutionError", cause: transport });
+    },
+  };
+  await assert.rejects(() => readKeelTransferRules(offline, { collection: COLLECTION }), (error) => error.cause?.name === "HttpRequestError");
+});

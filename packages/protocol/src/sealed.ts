@@ -65,6 +65,11 @@ export const KEEL_COMMITMENT_PROTOCOL = "keel-commitment@1" as const;
 export const KEEL_MERKLE_PROTOCOL = "keel-merkle@1" as const;
 export const KEEL_MERKLE_PROOF_PROTOCOL = "keel-merkle-proof@1" as const;
 export const KEEL_MERKLE_MAX_ITEMS = 1 << 20;
+export const KEEL_PROOF_REVEAL_PROTOCOL = "keel-proof-reveal@1" as const;
+export const KEEL_MERKLE_REVEAL_PROTOCOL = "keel-merkle-reveal@1" as const;
+/** Reveal files list files, not their bytes, so they stay small; text is carried inline. */
+export const KEEL_REVEAL_MAX_TEXT_BYTES = 1024 * 1024;
+export const KEEL_MERKLE_REVEAL_MAX_ITEMS = 10_000;
 
 export const KEEL_SEALED_PROTOCOL = "keel-sealed@1" as const;
 /** Media type for a stored envelope; the sealed content's own type is inside the header. */
@@ -739,6 +744,194 @@ export async function verifyKeelMerkleProof(root: Hex, content: Uint8Array | str
   }
   if (used !== normalized.siblings.length) return false;
   return equalBytes(await merkleRoot(normalized.count, hash), expected);
+}
+
+// --------------------------------------------------------------- reveal files
+
+/** What a proof was made for. Text travels inside the reveal file; a file is described and checked against its bytes. */
+export type KeelRevealContent =
+  | { readonly kind: "text"; readonly text: string }
+  | { readonly kind: "file"; readonly name: string; readonly mediaType: string; readonly byteLength: number; readonly sha256: Hex };
+
+/** The private half of a single proof: publish `commitment.digest`, keep this until you reveal. */
+export interface KeelProofReveal {
+  readonly protocol: typeof KEEL_PROOF_REVEAL_PROTOCOL;
+  readonly createdAt: string;
+  readonly commitment: KeelCommitment;
+  readonly content: KeelRevealContent;
+}
+
+export interface KeelMerkleRevealItem {
+  readonly name: string;
+  readonly mediaType: string;
+  readonly byteLength: number;
+  readonly sha256: Hex;
+  readonly proof: KeelMerkleProof;
+}
+
+/** The private half of a many-file proof: publish `root`; each item reveals on its own. */
+export interface KeelMerkleReveal {
+  readonly protocol: typeof KEEL_MERKLE_REVEAL_PROTOCOL;
+  readonly createdAt: string;
+  readonly root: Hex;
+  readonly count: number;
+  readonly items: readonly KeelMerkleRevealItem[];
+}
+
+export type KeelReveal = KeelProofReveal | KeelMerkleReveal;
+
+export interface KeelRevealFile {
+  readonly name: string;
+  readonly bytes: Uint8Array;
+  /** Defaults to application/octet-stream. */
+  readonly mediaType?: string;
+}
+
+export interface KeelRevealCheck {
+  /** The content matches the reveal file's own commitment or root. */
+  readonly valid: boolean;
+  /** Present when a published value was given: whether it is the one this reveal proves. */
+  readonly matchesPublished?: boolean;
+  /** For Merkle reveals, the item the checked file matched. */
+  readonly item?: string;
+  readonly reason?: string;
+}
+
+function revealName(value: unknown, what: string): string {
+  if (typeof value !== "string" || value.trim() === "" || value.length > 255 || /[\u0000-\u001f\u007f]/u.test(value)) throw new TypeError(`${what} must be a file name of 1–255 printable characters.`);
+  return value;
+}
+
+function revealTimestamp(value: unknown): string {
+  if (typeof value !== "string" || value.length > 40 || Number.isNaN(Date.parse(value))) throw new TypeError("Reveal createdAt must be an ISO timestamp.");
+  return value;
+}
+
+function revealFileFacts(file: KeelRevealFile, what: string) {
+  const input = record(file, what);
+  onlyKeys(input, ["name", "bytes", "mediaType"], what);
+  const bytes = bytesInput(input.bytes, `${what} bytes`, 0, KEEL_SEALED_MAX_PLAINTEXT_BYTES);
+  const mediaType = input.mediaType === undefined ? "application/octet-stream" : assertDataUriMediaType(input.mediaType as string);
+  return { name: revealName(input.name, `${what} name`), mediaType, bytes };
+}
+
+/**
+ * Commit to text or one file and return both halves: `commitment.digest` to
+ * publish, and a reveal file to keep private until you want to prove it.
+ */
+export async function createKeelProofReveal(
+  content: string | KeelRevealFile,
+  options: KeelCommitmentOptions = {},
+): Promise<{ readonly commitment: KeelCommitment; readonly reveal: KeelProofReveal }> {
+  let bytes: Uint8Array;
+  let described: KeelRevealContent;
+  if (typeof content === "string") {
+    bytes = utf8ToBytes(content);
+    if (bytes.byteLength > KEEL_REVEAL_MAX_TEXT_BYTES) throw new TypeError("Text proofs are limited to 1 MiB; prove it as a file instead.");
+    described = { kind: "text", text: content };
+  } else {
+    const file = revealFileFacts(content, "Proof file");
+    bytes = file.bytes;
+    described = { kind: "file", name: file.name, mediaType: file.mediaType, byteLength: bytes.byteLength, sha256: bytesToHex(await sha256(bytes)) };
+  }
+  const commitment = await createKeelCommitment(bytes, options);
+  return { commitment, reveal: { protocol: KEEL_PROOF_REVEAL_PROTOCOL, createdAt: new Date().toISOString(), commitment, content: described } };
+}
+
+/** One root over several files, each salted on its own; the reveal file holds every item's proof. */
+export async function createKeelMerkleReveal(
+  files: readonly KeelRevealFile[],
+): Promise<{ readonly root: Hex; readonly count: number; readonly reveal: KeelMerkleReveal }> {
+  if (!Array.isArray(files) || files.length < 1 || files.length > KEEL_MERKLE_REVEAL_MAX_ITEMS) throw new TypeError(`A many-file proof needs 1–${KEEL_MERKLE_REVEAL_MAX_ITEMS} files.`);
+  const facts = files.map((file, index) => revealFileFacts(file, `File ${index + 1}`));
+  const tree = await createKeelMerkleCommitment(facts.map((file) => file.bytes));
+  const items: KeelMerkleRevealItem[] = [];
+  for (const [index, file] of facts.entries()) {
+    items.push({ name: file.name, mediaType: file.mediaType, byteLength: file.bytes.byteLength, sha256: bytesToHex(await sha256(file.bytes)), proof: tree.proofFor(index) });
+  }
+  return { root: tree.root, count: tree.count, reveal: { protocol: KEEL_MERKLE_REVEAL_PROTOCOL, createdAt: new Date().toISOString(), root: tree.root, count: tree.count, items } };
+}
+
+function normalizeRevealContent(value: unknown): KeelRevealContent {
+  const input = record(value, "Reveal content");
+  if (input.kind === "text") {
+    onlyKeys(input, ["kind", "text"], "Reveal content");
+    if (typeof input.text !== "string" || utf8ToBytes(input.text).byteLength > KEEL_REVEAL_MAX_TEXT_BYTES) throw new TypeError("Reveal text must be text of at most 1 MiB.");
+    return { kind: "text", text: input.text };
+  }
+  if (input.kind !== "file") throw new TypeError('Reveal content kind must be "text" or "file".');
+  onlyKeys(input, ["kind", "name", "mediaType", "byteLength", "sha256"], "Reveal content");
+  return {
+    kind: "file",
+    name: revealName(input.name, "Reveal file name"),
+    mediaType: assertDataUriMediaType(input.mediaType as string),
+    byteLength: integer(input.byteLength, "Reveal file size", 0, KEEL_SEALED_MAX_PLAINTEXT_BYTES),
+    sha256: hex32(input.sha256, "Reveal file SHA-256"),
+  };
+}
+
+/** Validates a reveal file read from JSON (or already parsed) and returns it normalized. */
+export function normalizeKeelReveal(value: unknown): KeelReveal {
+  let parsed = value;
+  if (typeof parsed === "string") {
+    try { parsed = JSON.parse(parsed); } catch { throw new TypeError("Reveal file is not JSON."); }
+  }
+  const input = record(parsed, "Reveal file");
+  if (input.protocol === KEEL_PROOF_REVEAL_PROTOCOL) {
+    onlyKeys(input, ["protocol", "createdAt", "commitment", "content"], "Reveal file");
+    return { protocol: KEEL_PROOF_REVEAL_PROTOCOL, createdAt: revealTimestamp(input.createdAt), commitment: normalizeKeelCommitment(input.commitment), content: normalizeRevealContent(input.content) };
+  }
+  if (input.protocol !== KEEL_MERKLE_REVEAL_PROTOCOL) throw new TypeError(`Reveal file must use ${KEEL_PROOF_REVEAL_PROTOCOL} or ${KEEL_MERKLE_REVEAL_PROTOCOL}.`);
+  onlyKeys(input, ["protocol", "createdAt", "root", "count", "items"], "Reveal file");
+  const count = integer(input.count, "Reveal item count", 1, KEEL_MERKLE_REVEAL_MAX_ITEMS);
+  if (!Array.isArray(input.items) || input.items.length < 1 || input.items.length > count) throw new TypeError("Reveal items must list 1 to count files.");
+  const items = input.items.map((entry, index): KeelMerkleRevealItem => {
+    const item = record(entry, `Reveal item ${index + 1}`);
+    onlyKeys(item, ["name", "mediaType", "byteLength", "sha256", "proof"], `Reveal item ${index + 1}`);
+    const proof = normalizeKeelMerkleProof(item.proof);
+    if (proof.count !== count) throw new TypeError(`Reveal item ${index + 1} belongs to a different tree.`);
+    return {
+      name: revealName(item.name, `Reveal item ${index + 1} name`),
+      mediaType: assertDataUriMediaType(item.mediaType as string),
+      byteLength: integer(item.byteLength, `Reveal item ${index + 1} size`, 0, KEEL_SEALED_MAX_PLAINTEXT_BYTES),
+      sha256: hex32(item.sha256, `Reveal item ${index + 1} SHA-256`),
+      proof,
+    };
+  });
+  return { protocol: KEEL_MERKLE_REVEAL_PROTOCOL, createdAt: revealTimestamp(input.createdAt), root: hex32(input.root, "Reveal root"), count, items };
+}
+
+/**
+ * Checks a reveal file. Text proofs check themselves; file proofs need the
+ * file's bytes, and Merkle reveals find the item whose SHA-256 matches the
+ * file. Pass `published` (the digest or root you saw on chain) to confirm the
+ * reveal proves that value. Malformed reveal files throw TypeError.
+ */
+export async function verifyKeelReveal(
+  reveal: unknown,
+  options: { readonly file?: Uint8Array; readonly published?: Hex } = {},
+): Promise<KeelRevealCheck> {
+  const normalized = normalizeKeelReveal(reveal);
+  const input = record(options, "Reveal check options");
+  onlyKeys(input, ["file", "published"], "Reveal check options");
+  const file = input.file === undefined ? undefined : bytesInput(input.file, "Checked file", 0, KEEL_SEALED_MAX_PLAINTEXT_BYTES);
+  const value = normalized.protocol === KEEL_PROOF_REVEAL_PROTOCOL ? normalized.commitment.digest : normalized.root;
+  const published = input.published === undefined ? undefined : hex32(input.published, "Published value") === value;
+  const result = (valid: boolean, extra: { item?: string; reason?: string } = {}): KeelRevealCheck =>
+    ({ valid, ...(published === undefined ? {} : { matchesPublished: published }), ...extra });
+  if (normalized.protocol === KEEL_PROOF_REVEAL_PROTOCOL) {
+    if (normalized.content.kind === "text") {
+      return (await verifyKeelCommitment(normalized.commitment, normalized.content.text)) ? result(true) : result(false, { reason: "The text does not match its fingerprint." });
+    }
+    if (file === undefined) return result(false, { reason: `Add ${normalized.content.name} to check it.` });
+    if (file.byteLength !== normalized.content.byteLength || bytesToHex(await sha256(file)) !== normalized.content.sha256) return result(false, { reason: `This is not the ${normalized.content.name} that was proved.` });
+    return (await verifyKeelCommitment(normalized.commitment, file)) ? result(true, { item: normalized.content.name }) : result(false, { reason: "The file does not match its fingerprint." });
+  }
+  if (file === undefined) return result(false, { reason: "Add one of the proved files to check it." });
+  const digest = bytesToHex(await sha256(file));
+  const item = normalized.items.find((entry) => entry.sha256 === digest && entry.byteLength === file.byteLength);
+  if (item === undefined) return result(false, { reason: "This file is not one of the proved files." });
+  return (await verifyKeelMerkleProof(normalized.root, file, item.proof)) ? result(true, { item: item.name }) : result(false, { item: item.name, reason: "The file's proof does not lead to the root." });
 }
 
 // ------------------------------------------------------------- header format

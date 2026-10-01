@@ -96,6 +96,26 @@ and opening throws `KeelSealedError` with `code` `"no-slot"`,
 - Proof (`keel-merkle-proof@1`): `{ index, count, item: <commitment with salt>, siblings: [hex…] }`.
   The verifier walks from `index` using `count` to know where a level has no sibling.
 
+### Reveal files: `keel-proof-reveal@1` and `keel-merkle-reveal@1`
+
+The private half of a proof, written by `createKeelProofReveal` /
+`createKeelMerkleReveal` and checked by `verifyKeelReveal`. Studio and the
+desktop editor read and write the same JSON, so either can check the other's.
+
+- `keel-proof-reveal@1`: `{ protocol, createdAt, commitment, content }`.
+  `content` is `{ kind: "text", text }` (text up to 1 MiB travels inside the
+  file) or `{ kind: "file", name, mediaType, byteLength, sha256 }` (the file's
+  bytes are kept separately and checked against `sha256` before the
+  commitment).
+- `keel-merkle-reveal@1`: `{ protocol, createdAt, root, count, items }`, each
+  item `{ name, mediaType, byteLength, sha256, proof }`. A checked file is
+  matched to its item by SHA-256, then its proof is walked to `root`.
+
+Publish only `commitment.digest` or `root`. A reveal file holds salts, so
+sharing it reveals what was proved. `verifyKeelReveal(reveal, { file,
+published })` returns `{ valid, matchesPublished?, item?, reason? }`, where
+`reason` is plain language suitable for showing to people.
+
 ### `keel-sealed@1` envelope
 
 | offset | bytes | field |

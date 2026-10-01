@@ -25,6 +25,10 @@ import {
   sealKeelContent,
   verifyKeelCommitment,
   verifyKeelMerkleProof,
+  createKeelProofReveal,
+  createKeelMerkleReveal,
+  normalizeKeelReveal,
+  verifyKeelReveal,
 } from "../packages/protocol/dist/index.js";
 
 const subtle = globalThis.crypto.subtle;
@@ -581,4 +585,37 @@ test("unsalted trees are deterministic and accept existing commitments as items"
   assert.ok(await verifyKeelMerkleProof(first.root, files[1], fromCommitments.proofFor(1)));
   await assert.rejects(createKeelMerkleCommitment([]), TypeError);
   await assert.rejects(createKeelMerkleCommitment(["a"], { salt: random(32) }), TypeError);
+});
+
+test("reveal files prove text and files and say which published value they prove", async () => {
+  const text = await createKeelProofReveal("first sketch, 3 March");
+  const roundTrip = normalizeKeelReveal(JSON.stringify(text.reveal));
+  assert.deepEqual(roundTrip, text.reveal);
+  assert.deepEqual(await verifyKeelReveal(roundTrip, { published: text.commitment.digest }), { valid: true, matchesPublished: true });
+  const tampered = { ...text.reveal, content: { kind: "text", text: "first sketch, 4 March" } };
+  assert.equal((await verifyKeelReveal(tampered)).valid, false);
+
+  const bytes = new TextEncoder().encode("<svg/>");
+  const file = await createKeelProofReveal({ name: "mark.svg", mediaType: "image/svg+xml", bytes });
+  assert.equal(file.reveal.content.kind, "file");
+  assert.equal(file.reveal.content.sha256, `0x${createHash("sha256").update(bytes).digest("hex")}`);
+  assert.equal((await verifyKeelReveal(file.reveal)).valid, false);
+  assert.deepEqual(await verifyKeelReveal(file.reveal, { file: bytes }), { valid: true, item: "mark.svg" });
+  const other = await verifyKeelReveal(file.reveal, { file: new TextEncoder().encode("<svg />"), published: text.commitment.digest });
+  assert.equal(other.valid, false);
+  assert.equal(other.matchesPublished, false);
+});
+
+test("many-file reveals check each file on its own against one root", async () => {
+  const files = ["a", "b", "c"].map((name) => ({ name: `${name}.txt`, bytes: new TextEncoder().encode(`file ${name}`) }));
+  const { root, count, reveal } = await createKeelMerkleReveal(files);
+  assert.equal(count, 3);
+  const parsed = normalizeKeelReveal(JSON.parse(JSON.stringify(reveal)));
+  for (const file of files) assert.deepEqual(await verifyKeelReveal(parsed, { file: file.bytes, published: root }), { valid: true, matchesPublished: true, item: file.name });
+  const stranger = await verifyKeelReveal(parsed, { file: new TextEncoder().encode("file d") });
+  assert.equal(stranger.valid, false);
+  assert.match(stranger.reason, /not one of the proved files/u);
+  assert.throws(() => normalizeKeelReveal({ ...reveal, items: [{ ...reveal.items[0], proof: { ...reveal.items[0].proof, count: 4 } }] }), /different tree|count/u);
+  assert.throws(() => normalizeKeelReveal({ ...reveal, extra: 1 }), /not supported/u);
+  assert.throws(() => normalizeKeelReveal("{nope"), /not JSON/u);
 });

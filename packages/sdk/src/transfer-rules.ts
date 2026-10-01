@@ -1,5 +1,7 @@
 import { getAddress, parseAbi, type Address, type Hex } from "viem";
 
+import { isKeelTransportFailure } from "./contract-registry.js";
+
 /**
  * Trading rules a collection enforces on transfers, read and changed the same
  * way in Studio, the KEEL editor and agents.
@@ -154,8 +156,12 @@ export interface KeelTransferRules {
 }
 
 const ZERO = /^0x0{40}$/iu;
+/** A revert means "not supported"; a network failure is thrown so it is never reported (or cached) as a rule. */
 async function attempt<T>(read: () => Promise<T>): Promise<T | undefined> {
-  try { return await read(); } catch { return undefined; }
+  try { return await read(); } catch (error) {
+    if (isKeelTransportFailure(error)) throw error;
+    return undefined;
+  }
 }
 const named = (addresses: readonly unknown[] | undefined): KeelOperatorEntry[] => (addresses ?? []).map((value) => {
   const address = getAddress(String(value));

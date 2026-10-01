@@ -203,8 +203,28 @@ function slotAddress(value: Hex | undefined): Address | undefined {
   return getAddress(`0x${value.slice(-40)}`);
 }
 
+const TRANSPORT_ERRORS: ReadonlySet<string> = new Set(["HttpRequestError", "WebSocketRequestError", "SocketClosedError", "TimeoutError", "LimitExceededRpcError", "ResourceUnavailableRpcError"]);
+
+/**
+ * True when a read failed because the network didn't answer, not because the
+ * contract said no. Optional probes treat a revert as "not supported" but must
+ * not turn an outage into a wrong (and cached) answer.
+ */
+export function isKeelTransportFailure(error: unknown): boolean {
+  let current: unknown = error;
+  for (let depth = 0; current !== null && typeof current === "object" && depth < 8; depth += 1) {
+    const { name, cause } = current as { readonly name?: unknown; readonly cause?: unknown };
+    if (typeof name === "string" && TRANSPORT_ERRORS.has(name)) return true;
+    current = cause;
+  }
+  return false;
+}
+
 async function optional<T>(read: () => Promise<T>): Promise<T | undefined> {
-  try { return await read(); } catch { return undefined; }
+  try { return await read(); } catch (error) {
+    if (isKeelTransportFailure(error)) throw error;
+    return undefined;
+  }
 }
 
 /**
@@ -504,7 +524,7 @@ export interface KeelFactoryTemplates { readonly erc721a?: string; readonly erc7
 /** Reads the factory's template (implementation) addresses so clones can name what they copy. */
 export async function readKeelFactoryTemplates(reader: Pick<KeelContractReader, "readContract">, factory: string, blockNumber?: bigint): Promise<KeelFactoryTemplates> {
   const read = async (functionName: string) => {
-    try { return getAddress(String(await reader.readContract({ address: getAddress(factory), abi: keelCreatorFactoryRegistryAbi, functionName, ...(blockNumber === undefined ? {} : { blockNumber }) }))); } catch { return undefined; }
+    try { return getAddress(String(await reader.readContract({ address: getAddress(factory), abi: keelCreatorFactoryRegistryAbi, functionName, ...(blockNumber === undefined ? {} : { blockNumber }) }))); } catch (error) { if (isKeelTransportFailure(error)) throw error; return undefined; }
   };
   const [erc721a, erc721, seeded, erc1155] = await Promise.all([read("implementation721"), read("implementationStandard721"), read("implementationSeeded721"), read("implementation1155")]);
   return { ...(erc721a ? { erc721a } : {}), ...(erc721 ? { erc721 } : {}), ...(seeded ? { seeded } : {}), ...(erc1155 ? { erc1155 } : {}) };
