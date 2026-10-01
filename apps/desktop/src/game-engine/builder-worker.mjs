@@ -540,7 +540,7 @@ async function importStyledFile(input,name){
   let dracoDecoder;
   try{styledDraco??=createRequire(pathToFileURL(join(root,'package.json')))('draco3dgltf').createDecoderModule();dracoDecoder=await styledDraco;}catch{/* The trusted runtime reports a missing codec only if this asset needs it. */}
   const asset=await runtime.importStyledAsset(input,{dracoDecoder});
-  return{kind:'styled-asset',name:asset.name||name,ms:Math.round(performance.now()-start),style:clean(asset.style),animation:clean(asset.animation),dependencies:clean(asset.envelope.dependencies),sourceBounds:clean(asset.sourceBounds),byteLength:input.byteLength,nativeDracoRequired:asset.envelope.native.dracoRequired===true,voxelCount:asset.voxel?.indices.length??0,
+  return{kind:'styled-asset',name:asset.name||name,ms:Math.round(performance.now()-start),style:clean(asset.style),animation:clean(asset.animation),dependencies:clean(asset.envelope.dependencies),sourceBounds:clean(asset.sourceBounds),byteLength:input.byteLength,nativeDracoRequired:asset.envelope.native.dracoRequired===true,voxelCount:asset.voxelCount??asset.voxel?.indices.length??0,
     playback:{format:asset.format,version:asset.version,name:asset.name,style:clean(asset.style),animation:clean(asset.animation),sourceBounds:clean(asset.sourceBounds),glbBase64:Buffer.from(asset.glb).toString('base64')}};
 }
 async function styledPreview(){
