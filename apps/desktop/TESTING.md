@@ -146,3 +146,17 @@ install a real wallet, sign or submit a chain transaction.
 
 For local runtime measurements, run `pnpm --filter @keel/desktop benchmark`.
 See [PERFORMANCE.md](PERFORMANCE.md) for the sample, results and limits.
+
+## Seeded redesign acceptance
+
+See [GENERATIVE_REDESIGN.md](GENERATIVE_REDESIGN.md) for the provider and runtime
+boundaries. In Builder → Generative redesign, select one source, use Original
+and a custom theme in turn, and test each visual style. A generated candidate
+must preview before it can be accepted. Changing seed must stay local; changing
+source, design guidance or style must invalidate the previous candidate. Cancel
+while source analysis or the provider is pending, navigate away, and start a
+new request; old results must never return. Repeated Generate/Accept clicks
+must not start duplicate turns or duplicate project files. On Accept, check the
+new recipe/build/loader and verify prior files and the source object are intact.
+Use the offline fixtures for automated acceptance. Real-provider authoring is
+an explicit creator action and may consume their existing provider usage.

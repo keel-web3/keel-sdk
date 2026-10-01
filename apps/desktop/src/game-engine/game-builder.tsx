@@ -12,6 +12,7 @@ import { api, queryClient } from '../client';
 import { Badge, Empty, Field } from '../ui';
 import { BUILDER_PREVIEW_URL, buildFileName, buildName as buildNameSchema, destructiveOps, importable, opsHash, packFileName, projectBuilds, withBuildFile, withPackFiles } from './builder-project.mjs';
 import {StyledAssetPanel} from './styled-asset-panel';
+import { GenerativeRedesignPanel } from './generative-redesign-panel';
 import {styledImportable,withStyledAssetReference} from './styled-asset-project.mjs';
 import { SpritePane } from './builder-sprite';
 import { CodecInspectorHost, openCodecInspector } from './codec-inspector';
@@ -93,7 +94,7 @@ export function GameBuilder({ project, change, persist, action }: { project: Pro
   const [group, setGroup] = useState('');
   const [corner, setCorner] = useState<number[] | null>(null);
   const [showRig, setShowRig] = useState(true);
-  const [panel, setPanel] = useState<'build' | 'import'>('build');
+  const [panel, setPanel] = useState<'build' | 'import' | 'redesign'>('build');
   const [pose, setPose] = useState<any>(null);
   const [look, setLook] = useState<'pixel' | 'voxel'>('pixel');
   const latest = useRef<Frame | null>(null);
@@ -183,11 +184,12 @@ export function GameBuilder({ project, change, persist, action }: { project: Pro
     <div className="builder-bar">
       <Field label="Build"><select aria-label="Build" value={name} onChange={(event) => setName(event.target.value)}>{[...new Set([name, ...builds.map((item) => item.name)])].map((item) => <option key={item} value={item}>{item}{builds.some((b) => b.name === item) ? '' : ' (new)'}</option>)}</select></Field>
       <NewBuild onCreate={(value) => setName(value)} />
-      <div className="builder-tabs" role="tablist">{(['build', 'import'] as const).map((item) => <button key={item} role="tab" aria-selected={panel === item} className={panel === item ? 'selected' : ''} onClick={() => setPanel(item)}>{item === 'build' ? 'Build' : 'Import 3D'}</button>)}</div>
+      <div className="builder-tabs" role="tablist">{(['build', 'import', 'redesign'] as const).map((item) => <button key={item} role="tab" aria-selected={panel === item} className={panel === item ? 'selected' : ''} onClick={() => setPanel(item)}>{item === 'build' ? 'Build' : item === 'import' ? 'Import 3D' : 'Generative redesign'}</button>)}</div>
     </div>
     {saved?.error && <p role="alert" className="notice error">{saved.error}</p>}
     {message && <p role="status" className="notice builder-message">{message}</p>}
-    <div className="builder-layout">
+    {panel === 'redesign' && <GenerativeRedesignPanel key={project.id} project={project} change={change} persist={persist} />}
+    <div className="builder-layout" hidden={panel === 'redesign'} style={panel === 'redesign' ? { display: 'none' } : undefined}>
       <aside className="builder-tools">
         <div className="builder-tool-grid" role="toolbar" aria-label="Brushes">{TOOLS.map((item) => <button key={item.id} aria-pressed={tool === item.id} className={tool === item.id ? 'selected' : ''} disabled={state?.mode === 'character' && item.clicks > 0} title={item.hint} onClick={() => setTool(item.id)}>{item.label}</button>)}</div>
         <p className="builder-hint">{corner ? `First corner ${corner.join(', ')}: click the other.` : spec.hint}{spec.clicks ? ' Alt-click works on the block itself.' : ''}</p>
