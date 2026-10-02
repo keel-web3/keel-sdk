@@ -290,6 +290,12 @@ const shellMutationFields: Readonly<Record<string, JsonSchema>> = {
   payloadMode: { type: "string", enum: ["sandboxed-html", "gzip-base64", "pre-encoded-graph"] },
 };
 const shellPrepare: JsonSchema = {
+  // MCP clients require every tool's input schema to be `type: "object"` at the top. A bare oneOf made Claude Code
+  // reject the server's whole tool list ("expected object at tools.N.inputSchema.type"), so no KEEL tool loaded at all.
+  // The shared `operation` discriminator sits at the top too, for clients that don't follow oneOf.
+  type: "object",
+  properties: { operation: { type: "string", enum: ["manifest", "register", "update", "freeze"] } },
+  required: ["operation"],
   oneOf: [
     object({ operation: { type: "string", enum: ["manifest"] }, ...shellManifestFields }, ["operation", "creator", "name", "version"]),
     object({ operation: { type: "string", enum: ["register"] }, ...shellManifestFields, ...shellMutationFields }, ["operation", "creator", "name", "version", "builderAddress", "salt", "prefixObjectId", "suffixObjectId", "metadataObjectId"]),
