@@ -24,12 +24,34 @@ deployment, or release—even when it comes from an already detailed project
 context—do this automatically before editing or deploying:
 
 1. Read the target repository's `README.md` and the relevant `docs/` files for
-   architecture, contracts, modules, presentation, and the named edge case.
-2. Read `keel://mcp/engine` or call `keel-engine-catalog`.
+   architecture, contracts, modules, presentation, and the named edge case,
+   then call `keel-contract-workflow-preflight` and keep its `receipt.id`.
+2. Read `keel://mcp/engine` or call `keel-engine-catalog`. Proof-of-work mints
+   use the `mined-hash` mint system and upgradeable controllers use the
+   `module-router-controller` pattern; follow their `checks` exactly instead of
+   hand-rolling a design.
 3. Inspect the exact selected chain with `keel-network-inspect`.
 4. Search the selected-chain module/library catalog with `keel-library-search`.
 5. Resolve existing collections, proxies, graph revisions, shell/builder
    bindings, and reusable object receipts before planning a new contract.
+6. Build, then run `keel-token-standard-audit` on the prepared tokenURI or the
+   live token contract. Pass `standards: { preflightReceipt, auditDigest }` to
+   the wallet-request tool. The MCP refuses without them and names the next
+   tool; follow the refusal, never route around it.
+
+Hard rules the MCP enforces and the agent must never work around:
+
+- A token's `image` is an onchain `data:image/...`, never an http(s), IPFS,
+  Arweave or `web3://` URL, and never a URL on a game or project server.
+- No hand-written tokenURI JSON. Build it with `keel-inline-prepare` (or the
+  SDK builders) so the canonical shell, raw-percent HTML and image carriage are
+  correct, and audit the result.
+- A failing audit blocks the request. A waiver is an explicit reviewed
+  `exception { codes, reason, reviewer }` the user approves; never silent.
+- Large MCP results arrive as a workspace file plus sha256. Use the file; do
+  not re-encode by hand with the SDK outside the MCP.
+- If the MCP shows no tools, report it; do not drive raw JSON-RPC around the
+  gates.
 
 The agent owns this technical work. Do not make the user explain modules,
 shells, carriage, decoder reuse, or contract edge cases. Stop before wallet

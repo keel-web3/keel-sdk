@@ -1,5 +1,6 @@
 import { KEEL_DEPLOYMENTS } from './modules.js';
 import { KEEL_INLINE_SAFE_RPC_GAS, keelInlineReadGasLimit } from './presentation.js';
+import { keelTransactionGasCap } from './tx-gas.js';
 export interface KeelNetworkInspectionTarget {
   readonly rpcUrl: string;
   readonly family: "ethereum" | "tezos";
@@ -74,7 +75,7 @@ export async function inspectNetwork(input: KeelNetworkInspectionTarget, fetcher
     try { const code = await call('eth_getCode', [addresses[0], block.number]); if (typeof code !== 'string' || !/^0x(?:[0-9a-f]{2})*$/i.test(code)) throw new Error(); return { contract, address: addresses[0], status: code === '0x' ? 'no-code' : 'code-present-identity-unverified' }; }
     catch { return { contract, address: addresses[0], status: 'read-unavailable' }; }
   }));
-  return { family: 'ethereum' as const, chainId, block: blockNumber.toString(), checkedAt: new Date().toISOString(), blockTimestamp: new Date(timestamp * 1000).toISOString(), blockGasLimit: blockGasLimit.toString(), inlineReadGasLimit: keelInlineReadGasLimit(blockGasLimit).toString(), maximumInlineReadGas: KEEL_INLINE_SAFE_RPC_GAS.toString(), fees: { status: gasPrice === null ? 'unavailable' : 'live-rpc-quote', gasPriceWei: gasPrice?.toString() ?? null, baseFeeWei: baseFee?.toString() ?? null, priorityFeeWei: priorityFee?.toString() ?? null, note: 'Use exact prepared calls for estimation. Rollup L1 data fees and chain-specific charges may be additional.' }, deployments, publicationReady: false, setup: 'Resolve deployed KEEL instances, verify their code and active shell/module registry, or prepare deployment of missing modules. Never reuse another chain\'s addresses.' };
+  return { family: 'ethereum' as const, chainId, block: blockNumber.toString(), checkedAt: new Date().toISOString(), blockTimestamp: new Date(timestamp * 1000).toISOString(), blockGasLimit: blockGasLimit.toString(), transactionGasCap: (() => { const cap = keelTransactionGasCap({ chainId, blockGasLimit }); return { gasCap: cap.gasCap, source: cap.source, packingTargetGas: cap.targetGas, note: 'Every KEEL request carries an explicit gas limit at or under this cap (EIP-7825 on Ethereum mainnet and its testnets); a larger limit is rejected by wallets and RPCs.' }; })(), inlineReadGasLimit: keelInlineReadGasLimit(blockGasLimit).toString(), maximumInlineReadGas: KEEL_INLINE_SAFE_RPC_GAS.toString(), fees: { status: gasPrice === null ? 'unavailable' : 'live-rpc-quote', gasPriceWei: gasPrice?.toString() ?? null, baseFeeWei: baseFee?.toString() ?? null, priorityFeeWei: priorityFee?.toString() ?? null, note: 'Use exact prepared calls for estimation. Rollup L1 data fees and chain-specific charges may be additional.' }, deployments, publicationReady: false, setup: 'Resolve deployed KEEL instances, verify their code and active shell/module registry, or prepare deployment of missing modules. Never reuse another chain\'s addresses.' };
 }
 
 export async function estimateNetworkCall(input: KeelNetworkCall, fetcher: typeof fetch = fetch) {

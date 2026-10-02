@@ -1,4 +1,5 @@
 import { canonicalJson, createIntegrity, utf8ToBytes, type Integrity } from "@keel/protocol";
+import { getAddress } from "viem";
 
 export const KEEL_WALLET_REQUEST_PROTOCOL = "keel-wallet-request@1" as const;
 export const KEEL_WALLET_QR_SCHEME = "keel-wallet-request:" as const;
@@ -6,6 +7,7 @@ export const KEEL_WALLET_QR_SCHEME = "keel-wallet-request:" as const;
 const DIGEST = /^0x[0-9a-f]{64}$/u;
 const HEX = /^0x(?:[0-9a-fA-F]{2})*$/u;
 const ADDRESS = /^0x[0-9a-f]{40}$/u;
+const ANY_CASE_ADDRESS = /^0x[0-9a-fA-F]{40}$/u;
 const DECIMAL = /^(?:0|[1-9][0-9]*)$/u;
 const TEZOS_ADDRESS = /^(?:tz[1-4]|KT1)[1-9A-HJ-NP-Za-km-z]{33}$/u;
 const ENTRYPOINT = /^[A-Za-z][A-Za-z0-9_.%@+-]{0,30}$/u;
@@ -27,6 +29,8 @@ export interface KeelEthereumWalletRequest extends WalletRequestBase {
   readonly to: `0x${string}`;
   readonly data: `0x${string}`;
   readonly valueWei: string;
+  /** Explicit transaction gas limit (decimal), at most the EIP-7825 cap. */
+  readonly gasLimit?: string;
 }
 
 export interface KeelTezosWalletRequest extends WalletRequestBase {
@@ -166,13 +170,19 @@ function normalizeParameters(value: unknown): string {
 function normalizeRequest(value: unknown): KeelWalletRequest {
   const input = object(value, "wallet request");
   if (input.family === "ethereum") {
-    exactKeys(input, ["protocol", "requestId", "label", "transport", "family", "chainId", "to", "data", "valueWei"], "ethereum wallet request");
+    exactKeys(input, ["protocol", "requestId", "label", "transport", "family", "chainId", "to", "data", "valueWei", "gasLimit"], "ethereum wallet request");
+    // An explicit limit keeps wallets from estimating their own (MetaMask's x1.5 broke the EIP-7825 cap).
+    if (input.gasLimit !== undefined && (typeof input.gasLimit !== "string" || !DECIMAL.test(input.gasLimit) || BigInt(input.gasLimit) < 21_000n || BigInt(input.gasLimit) > 16_777_216n)) throw new TypeError("wallet request.gasLimit must be decimal gas from 21000 through the EIP-7825 cap 16777216.");
     const base = normalizeBase(input);
     assertTransport("ethereum", base.transport);
     if (!Number.isSafeInteger(input.chainId) || (input.chainId as number) <= 0) throw new TypeError("wallet request.chainId must be a positive safe integer.");
-    if (typeof input.to !== "string" || !ADDRESS.test(input.to)) throw new TypeError("wallet request.to must be a 20-byte Ethereum address.");
+    if (typeof input.to !== "string" || !ANY_CASE_ADDRESS.test(input.to)) throw new TypeError("wallet request.to must be a 20-byte Ethereum address.");
+    // Lowercase, all-caps and valid EIP-55 checksummed addresses are accepted and normalized; a mixed-case address
+    // with a wrong checksum is a typo and is refused.
+    const body = input.to.slice(2);
+    if (/[a-f]/u.test(body) && /[A-F]/u.test(body) && getAddress(input.to.toLowerCase()) !== input.to) throw new TypeError("wallet request.to has an invalid EIP-55 checksum.");
     if (typeof input.data !== "string" || !HEX.test(input.data)) throw new TypeError("wallet request.data must be even-length hexadecimal data.");
-    return { ...base, family: "ethereum", chainId: input.chainId as number, to: input.to.toLowerCase() as `0x${string}`, data: input.data.toLowerCase() as `0x${string}`, valueWei: decimal(input.valueWei, "wallet request.valueWei") };
+    return { ...base, family: "ethereum", chainId: input.chainId as number, to: input.to.toLowerCase() as `0x${string}`, data: input.data.toLowerCase() as `0x${string}`, valueWei: decimal(input.valueWei, "wallet request.valueWei"), ...(input.gasLimit === undefined ? {} : { gasLimit: input.gasLimit as string }) };
   }
   if (input.family === "tezos") {
     exactKeys(input, ["protocol", "requestId", "label", "transport", "family", "network", "destination", "amountMutez", "entrypoint", "parameters"], "tezos wallet request");

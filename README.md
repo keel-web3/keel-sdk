@@ -118,8 +118,11 @@ metadata binding, deployment, or release, it reads this README and the target
 repository's relevant `docs/` files, then runs the MCP
 `keel-contract-workflow-preflight` and follows its required sequence:
 `keel-engine-catalog`, exact selected-chain `keel-network-inspect`,
-selected-chain `keel-library-search`, and only then contract controls or wallet
-review. The module scan is mandatory even when the request appears to be a new
+selected-chain `keel-library-search`, contract controls, the build, then
+`keel-token-standard-audit`, and only then wallet review. The MCP enforces
+this: signing-request tools refuse without the preflight receipt and, for
+token, collection and metadata work, a passing audit digest (see
+`packages/mcp/README.md`, "Enforced standards order"). The module scan is mandatory even when the request appears to be a new
 contract; existing modules, proxies, graph revisions, canonical shell/builder
 bindings, and edge-case recovery paths must be resolved before redeploying.
 

@@ -45,6 +45,7 @@ export interface JsonSchema {
 export interface McpTool {
   readonly name: string;
   readonly description: string;
+  /** MCP requires an object schema at the top; see tool-contract.ts. */
   readonly inputSchema: JsonSchema;
 }
 
@@ -100,6 +101,8 @@ export interface Workspace {
   resolveExistingDirectory(pathValue: string): Promise<string>;
   resolveOutputDirectory(pathValue: string): Promise<string>;
   writeJson(pathValue: string, value: unknown): Promise<string>;
+  /** Write text, creating missing parent directories inside the workspace. */
+  writeText(pathValue: string, text: string): Promise<string>;
 }
 
 export interface ToolContext {

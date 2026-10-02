@@ -131,6 +131,10 @@
       "types": "./dist/engine.d.ts",
       "import": "./dist/engine.js"
     },
+    "./native-managed": {
+      "types": "./dist/native-managed.d.ts",
+      "import": "./dist/native-managed.js"
+    },
     "./contract-controls": {
       "types": "./dist/contract-controls.d.ts",
       "import": "./dist/contract-controls.js"

@@ -12,6 +12,43 @@ automatically starts with the target README/docs scan, `keel-engine-catalog`,
 exact selected-chain inspection, selected-chain library/module search, and
 edge-case resolution. The user does not need to know or request that sequence.
 
+## Enforced standards gate
+
+The MCP enforces this order for contract, NFT, collection, metadata and viewer
+work: `keel-contract-workflow-preflight` (receipt) → `keel-engine-catalog` →
+`keel-network-inspect` → `keel-library-search` → `keel-contract-controls` →
+build → `keel-token-standard-audit` (digest) → request. Signing-request tools
+(`wallet-request-prepare`, `publish-plan`, `keel-creator-collection-prepare`,
+`wallet-link`, `keel-shell-prepare`, `module-review-prepare`, Tezos prepare
+tools) refuse without `standards.preflightReceipt`, and token, collection and
+metadata work also needs a passing `standards.auditDigest`. Refusals carry a
+code and the exact next tool. Only KeelHold storage writes pass without
+evidence.
+
+When changing the SDK or MCP:
+
+- Every new signing-request tool calls `enforceStandards` before it prepares
+  anything, and its schema accepts `standards`.
+- Every tool `inputSchema` is `type: "object"` with no top-level
+  `oneOf`/`anyOf`/`allOf`. One invalid schema makes clients drop the whole tool
+  list (the desktop app shows 0 tools). `mcpToolListIssues` and
+  `tests/mcp-standards.test.mjs` check this.
+- Graph roots come from `keel-graph-weld-prepare` (or `keel-inline-prepare`
+  with `outputDirectory` + `hold`), deployments from `wallet-request-prepare`
+  `deploy`; never hand-build them with the SDK outside the MCP.
+- The audit must accept KEEL's own canonical multi-module graph (regression
+  fixture `tests/fixtures/redline-car-1-fork-tokenuri.txt.gz`) and still fail
+  real locators.
+- The metadata audit applies to calls that can change token metadata or
+  presentation. Role administration (`role-admin`) and ERC-20 calls
+  (`fungible-token`) need the receipt only, decided from the decoded inner
+  function, never from a guess about the target.
+- Never return `result-too-large` for a valid result. Write it with
+  `deliverResult` (workspace file + sha256).
+- Mint systems and contract patterns agents need belong in
+  `KEEL_ENGINE_CATALOG` with enforceable `checks`, so agents do not hand-roll
+  them.
+
 ## Required default architecture
 
 - Keep HTML entries, CSS stylesheets, JavaScript ES modules with explicit imports, and assets separate. Preserve stable logical identities and dependency edges through build, storage and updates.

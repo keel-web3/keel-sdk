@@ -27,7 +27,7 @@ test('custom EVM networks return fresh fees and setup gaps without pretending de
   try {
     const input = { family: 'ethereum', rpcUrl: server.rpcUrl };
     const first = await inspectNetwork(input);
-    assert.equal(first.chainId, 999999); assert.equal(first.inlineReadGasLimit, '45000000');
+    assert.equal(first.chainId, 999999); assert.equal(first.inlineReadGasLimit, '30000000'); assert.equal(first.transactionGasCap.gasCap, 16777216); assert.equal(first.transactionGasCap.source, 'keel-policy-eip-7825'); // min(block 45M, KEEL's documented 30M public-RPC read cap)
     assert.equal(first.fees.gasPriceWei, '2000000000'); assert.ok(first.deployments.every((item) => item.status === 'needs-setup'));
     assert.equal(first.publicationReady, false);
     server.updateGas('0xee6b2800'); assert.equal((await inspectNetwork(input)).fees.gasPriceWei, '4000000000');

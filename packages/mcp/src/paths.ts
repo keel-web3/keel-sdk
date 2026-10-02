@@ -1,4 +1,4 @@
-import { readFile as fsReadFile, readdir, realpath, rename, stat, writeFile } from "node:fs/promises";
+import { mkdir, readFile as fsReadFile, readdir, realpath, rename, stat, writeFile } from "node:fs/promises";
 import path from "node:path";
 import type { Workspace } from "./types.js";
 
@@ -98,6 +98,21 @@ async function writeJson(root: string, value: string, payload: unknown): Promise
   return requested;
 }
 
+/** Write text to a workspace file, creating missing parent directories inside the workspace. Atomic rename. */
+async function writeText(root: string, value: string, text: string): Promise<string> {
+  const requested = lexicalPath(root, value, "output file");
+  const parentPath = await outputDirectory(root, path.dirname(requested));
+  await mkdir(parentPath, { recursive: true });
+  const parent = await existingDirectory(root, path.relative(root, parentPath) || ".");
+  const entries = await readdir(parent, { withFileTypes: true });
+  const existing = entries.find((candidate) => candidate.name === path.basename(requested));
+  if (existing?.isSymbolicLink()) throw new TypeError("output file cannot overwrite a symlink.");
+  const temporary = path.join(parent, `.keel-mcp-${Date.now()}-${Math.random().toString(16).slice(2)}.tmp`);
+  await writeFile(temporary, text, { flag: "wx" });
+  await rename(temporary, path.join(parent, path.basename(requested)));
+  return path.join(parent, path.basename(requested));
+}
+
 export async function createWorkspace(rootValue = "."): Promise<Workspace> {
   const requested = path.resolve(safeText(rootValue, "workspace root"));
   const root = await realpath(requested);
@@ -109,5 +124,6 @@ export async function createWorkspace(rootValue = "."): Promise<Workspace> {
     resolveExistingDirectory: (value) => existingDirectory(root, value),
     resolveOutputDirectory: (value) => outputDirectory(root, value),
     writeJson: (value, payload) => writeJson(root, value, payload),
+    writeText: (value, text) => writeText(root, value, text),
   };
 }

@@ -68,15 +68,20 @@ function rpcError(id: JsonRpcId | undefined, code: number, message: string, data
 
 function toolResult(value: unknown): ToolCallResult {
   const text = JSON.stringify(value);
-  return { content: [{ type: "text", text }], structuredContent: value };
+  // MCP structuredContent is a JSON object; a client drops a result whose structuredContent is an array or scalar.
+  const structured = value !== null && typeof value === "object" && !Array.isArray(value) ? value : { value };
+  return { content: [{ type: "text", text }], structuredContent: structured };
 }
 
 function toolError(error: unknown): ToolCallResult {
   const text = errorText(error);
-  return { content: [{ type: "text", text }], isError: true };
+  // A standards refusal keeps its machine-readable code and next tool.
+  const refusal = error !== null && typeof error === "object" ? (error as { readonly refusal?: unknown }).refusal : undefined;
+  return { content: [{ type: "text", text }], ...(refusal === undefined ? {} : { structuredContent: refusal }), isError: true };
 }
 
 const MCP_INSTRUCTIONS = [
+  "ENFORCED ORDER for any contract, NFT, collection, token metadata or viewer work: keel-contract-workflow-preflight (returns receipt.id) → keel-engine-catalog → keel-network-inspect → keel-library-search → keel-contract-controls → build (keel-inline-prepare/build/upload-plan) → keel-token-standard-audit (returns digest) → request. Signing-request tools refuse without standards.preflightReceipt, and token/collection/metadata work also needs a passing standards.auditDigest; a refusal names the exact next tool. Never hand-write tokenURI JSON or fall back to hand SDK encoding: large results are written to workspace files with a sha256.",
   "Assume creators are not developers: automatically inventory assets, preserve originals, discover reusable objects and measure storage/compression choices.",
   "Default to separate HTML, CSS, individual JavaScript ES modules and assets; never flatten unless explicitly requested.",
   "For every request phrased as make a contract, put it onchain, make an NFT, publish a viewer, deploy, or release—even when an ABI, address, old journal, or approval is supplied—automatically call keel-contract-workflow-preflight, read the target README/docs, inspect the exact selected chain, and search its module catalog before editing or wallet review. Missing evidence is a hard stop.",
@@ -84,7 +89,7 @@ const MCP_INSTRUCTIONS = [
   "Collector Inline defaults to raw-percent metadata and HTML. Keep HTML, CSS, JavaScript modules, and assets separate. Prepare the exact supplied image carriage once at build time as data:image/<type>;base64,<payload>, publish one receipt-bound ASCII payload or complete URI, and make the contract/viewer copy header/payload/footer only. Never publish raw image bytes plus a second encoded copy, and never Base64-encode or decode media during tokenURI.",
   "GIF is direct data:image/gif;base64 from the exact high-quality source GIF, never an SVG wrapper, generated substitute, silent resize/re-encode or placeholder. IPFS, HTTP, web3://, resolver matrices and complete-HTML Base64 require an explicit reviewed exception.",
   "Before staging or publishing, unpack every embedded gzip/deflate resource and scan its decoded bytes for concrete http(s), IPFS, Arweave, web3 or keel-onchain locators. A URL sentinel used only for an injected onchain content reader is still an external dependency and must be replaced with a path/identifier. Allow only the SVG namespace literal http://www.w3.org/2000/svg; fail closed on any other locator.",
-  "For a new KEEL work, begin with keel-project-plan. For an existing graph, derive revision intent, reuse every unchanged selected-chain object and publish only declared changes; the automatic revision path permits one declared changed resource. Keep local, browser, receipt and live-chain evidence separate. Tools do not sign, submit, claim faucet funds or silently change storage.",
+  "For a new KEEL work, begin with keel-project-plan: it is an MCP PROMPT (prompts/get), not a tool; clients that only expose tools call keel-project-decisions, the same planner. For an existing graph, derive revision intent, reuse every unchanged selected-chain object and publish only declared changes; the automatic revision path permits one declared changed resource. Keep local, browser, receipt and live-chain evidence separate. Tools do not sign, submit, claim faucet funds or silently change storage.",
 ].join(" ");
 
 function emptyParams(value: unknown, label: string): void {
@@ -142,6 +147,8 @@ export async function createMcpServer(options: { readonly workspaceRoot?: string
         }
         initialized = true;
         return response(request.id, {
+          // Deliberately the 2024-11-05 baseline for every client (a 2025-06-18 client accepts it). Not a cause of
+          // the "0 tools" symptom: that was an invalid inputSchema, which tool-contract.ts now rejects in CI.
           protocolVersion: MCP_PROTOCOL_VERSION,
           capabilities: { tools: { listChanged: false }, prompts: { listChanged: false }, resources: { subscribe: false, listChanged: false } },
           serverInfo: { name: MCP_SERVER_NAME, version: MCP_SERVER_VERSION },

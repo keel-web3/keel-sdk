@@ -1,4 +1,5 @@
 import { createMcpServer } from "./server.js";
+import { mcpToolListIssues } from "./tool-contract.js";
 import {
   MCP_PROTOCOL_VERSION,
   MCP_SERVER_VERSION,
@@ -11,7 +12,7 @@ const INITIALIZE_PARAMS = {
   clientInfo: { name: "keel-mcp-self-test", version: MCP_SERVER_VERSION },
 } as const;
 
-export const MCP_SELF_TEST_CHECKS = ["initialize", "ping", "tools/list", "prompts/list", "prompts/get", "resources/list", "resources/read"] as const;
+export const MCP_SELF_TEST_CHECKS = ["initialize", "ping", "tools/list", "tools/list-schemas", "prompts/list", "prompts/get", "resources/list", "resources/read"] as const;
 
 export interface McpSelfTestResult {
   readonly status: "ok";
@@ -51,6 +52,9 @@ export async function runMcpSelfTest(workspaceRoot = "."): Promise<McpSelfTestRe
   resultObject(await server.handle({ jsonrpc: "2.0", id: 6, method: "resources/list", params: {} }), "resources/list");
   resultObject(await server.handle({ jsonrpc: "2.0", id: 7, method: "resources/read", params: { uri: "keel://mcp/project-routes" } }), "resources/read");
   const names = toolNames(listed.tools);
+  // A client rejects the WHOLE list for one bad schema and shows zero tools, so any issue fails the self-test.
+  const issues = mcpToolListIssues(listed.tools as Parameters<typeof mcpToolListIssues>[0]);
+  if (issues.length) throw new Error(`tools/list would be rejected by MCP clients: ${issues.slice(0, 8).join("; ")}`);
   return {
     status: "ok",
     protocolVersion: MCP_PROTOCOL_VERSION,
