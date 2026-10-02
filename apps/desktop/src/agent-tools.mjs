@@ -11,13 +11,14 @@ import { parseMetadata } from './metadata.mjs';
 import { projectWithRuntime } from './runtime-library.mjs';
 import { safeContext } from './agent-context.mjs';
 import { contractControls, createTrackedContract } from '@keel/sdk/contract-controls';
+import { contractInventory, filterContractEntries, workspaceContractEntries } from './contract-registry.mjs';
 import { registerGameEngineTools } from './game-engine/agent-game-tools.mjs';
 import { registerGameBuilderTools } from './game-engine/agent-builder-tools.mjs';
 import { registerGameSoundTools } from './game-engine/agent-sound-tools.mjs';
 import { registerGameCodecTools } from './game-engine/agent-codec-tools.mjs';
 import { registerGameLevelTools } from './game-engine/agent-level-tools.mjs';
 
-export const viewSchema = z.object({ page: z.enum(['Projects','Objects','Modules','GameEngine','Contracts','Wallets','Memory','Connections','Agents']), projectId: z.string().uuid().optional(), contractId: z.string().max(128).optional(), tab: z.enum(['Game','Builder','Sound','Level','Layers','SVG renderer','Preview','Source','Metadata','Viewing','Release','Manage','Resources','Notes']).optional(), search: z.string().max(160).optional() }).strict();
+export const viewSchema = z.object({ page: z.enum(['Projects','Objects','Seal','Modules','GameEngine','Contracts','Wallets','Memory','Connections','Agents']), projectId: z.string().uuid().optional(), contractId: z.string().max(128).optional(), tab: z.enum(['Game','Builder','Sound','Level','Layers','SVG renderer','Preview','Source','Metadata','Viewing','Release','Manage','Resources','Notes']).optional(), search: z.string().max(160).optional() }).strict();
 export const digest = value => createHash('sha256').update(JSON.stringify(value)).digest('hex');
 const uuid = z.string().uuid();
 const argsSchema = z.array(z.unknown()).max(64);
@@ -56,12 +57,18 @@ export function createAgentTools({ workspace, chats, chat, run, hooks, signal, e
     if (!value) throw Error('Choose an existing project first.');
     return value;
   }
+  // Project chats only see contracts linked to their project.
+  function visibleContractIds() {
+    access(); if (!chat.projectId) return undefined;
+    const p = project(); return workspace.read().state.contracts.filter(c => c.projectId === p.id || p.contractIds.includes(c.id)).map(c => c.id);
+  }
   function canEdit() { access(); if (!chat.allowEdits) throw Error('Draft creation and editing are disabled for this chat.'); }
   function action(kind, title, payload) { signal.throwIfAborted(); const item = chats.action(run, kind, title, payload); emit({type:'action', action:item}); return { actionId:item.id, status:'awaiting-creator', title }; }
   const noArgs = z.object({}).strict();
   register('keel_editor_context', 'See the current editor view and saved workspace inventory. Contains public labels only, never credentials.', noArgs, () => {
     access(); const state = workspace.read().state;
-    return { view: hooks.view(), revision: workspace.read().revision, projects: state.projects.filter(item => !chat.projectId || item.id === chat.projectId).map(({id,title,intent})=>({id,title,intent})), networks: hooks.networks(), wallets: hooks.wallets() };
+    const contracts = contractInventory(state, { contractIds: visibleContractIds(), limit: 40 }).map(({id,name,group,category,tags,network,collections}) => ({id,name,group,...(category?{category}:{}),...(tags?{tags}:{}),network,collections:collections.slice(0,12).map(item=>item.name)}));
+    return { view: hooks.view(), revision: workspace.read().revision, projects: state.projects.filter(item => !chat.projectId || item.id === chat.projectId).map(({id,title,intent})=>({id,title,intent})), contracts, networks: hooks.networks(), wallets: hooks.wallets() };
   });
   register('keel_read_project', 'Read one project, metadata, intent, attached files and contract identities. Use keel_read_source for source text.', z.object({projectId:uuid}).strict(), ({projectId}) => { const p = project(projectId); return {...p,...(p.layerCuration?{layerCuration:{mode:p.layerCuration.mode,supply:p.layerCuration.supply,candidates:p.layerCuration.candidates.length,set:p.layerCuration.set.length}}:{}),...(p.layered?{layered:{...p.layered,attributes:p.layered.attributes.map(a=>({id:a.id,name:a.name,items:a.items.length})),readWith:'keel_read_layers'}}:{}), files:p.files.map(({content,...file})=>({...file,characters:content.length})), fingerprint:digest(p)}; });
   register('keel_read_source', 'Read a bounded section of a source file. Offset is a character offset. Never reads files outside this saved project.', z.object({projectId:uuid,fileId:uuid,offset:z.number().int().min(0).default(0),length:z.number().int().min(1).max(24000).default(16000)}).strict(), ({projectId,fileId,offset,length}) => {
@@ -161,8 +168,19 @@ export function createAgentTools({ workspace, chats, chat, run, hooks, signal, e
     access();const c=workspace.read().state.contracts.find(item=>item.id===id);if(!c)throw Error('Tracked contract not found.');
     if(chat.projectId){const p=project();if(c.projectId!==p.id&&!p.contractIds.includes(c.id))throw Error('Contract is not linked to this project.');}return c;
   };
-  register('keel_contract_controls', 'List exact ABI methods for a tracked contract, including overloads and read/write modes.', z.object({contractId:z.string().max(128)}).strict(),({contractId})=>{const c=contract(contractId);return {id:c.id,name:c.name,chainId:c.chainId,address:c.address,controls:contractControls(c.abi)};});
+  register('keel_find_contracts', 'Find tracked contracts by the creator’s own names, tags, categories, notes, network, or the collections and token ranges inside them (e.g. "my spring drop"). Read-only; lists signer records but never signs.', z.object({query:z.string().max(160).default(''),tag:z.string().max(40).optional(),category:z.string().max(48).optional(),chainId:z.number().int().positive().optional(),includeArchived:z.boolean().default(false)}).strict(), ({query,tag,category,chainId,includeArchived}) => {
+    const state = workspace.read().state; const allowed = visibleContractIds();
+    const matches = filterContractEntries(workspaceContractEntries(state), {query,tag:tag?.toLowerCase(),category,chainId}).filter(entry => (!allowed || allowed.includes(entry.key)) && (includeArchived || !entry.archived)).map(entry => entry.key);
+    return { contracts: contractInventory(state, { contractIds: matches, query, limit: 25 }), total: matches.length, note: 'Labels and tags are the creator’s organization; they are not on-chain facts or authority.' };
+  });
+  register('keel_contract_controls', 'List exact ABI methods for a tracked contract, including overloads and read/write modes.', z.object({contractId:z.string().max(128)}).strict(),({contractId})=>{const c=contract(contractId);return {id:c.id,name:c.name,...(c.organization?.label?{label:c.organization.label}:{}),chainId:c.chainId,address:c.address,controls:contractControls(c.abi)};});
   register('keel_read_contract', 'Read one tracked ABI method using a saved network. Checks chain identity before reading.', z.object({contractId:z.string().max(128),profileId:uuid,signature:z.string().max(4096),args:argsSchema}).strict(),input=>hooks.readContract({...input,contract:contract(input.contractId)}));
+  register('keel_trading_rules', 'Read who may trade a tracked collection: its creator-token (ERC721-C) validator policy, allowed and blocked marketplaces, frozen accounts and operator-filter registration, at one block of a saved network. Read-only; changes are reviewed and approved by the creator in the Contracts page.', z.object({contractId:z.string().max(128),profileId:uuid}).strict(),input=>hooks.readTransferRules({contract:contract(input.contractId),profileId:input.profileId}));
+  register('keel_studio_workspace', 'Read the creator’s KEEL Studio through the editor’s Studio connection: projects and releases with their status, and contracts with labels, tags and the collections inside. Read-only; the creator opens Studio links themselves.', z.object({query:z.string().max(120).optional()}).strict(), async ({query})=>{
+    access(); const overview=await hooks.studioOverview(query);
+    // Contract links carry their identity in the query string, which reference data strips; keep it as a field.
+    return {...overview,contracts:overview.contracts.map(item=>({...item,studioContract:`${item.chainId}:${String(item.address).toLowerCase()}`}))};
+  });
   register('keel_open_wallet', 'Open an installed wallet so the creator can unlock or view it. This does not connect, sign, or approve anything.', z.object({installationId:uuid}).strict(),({installationId})=>{access();return hooks.openWallet(installationId);});
   register('keel_prepare_transaction', 'Simulate and estimate one exact tracked contract call. Produces a review card; only a creator click can send it to the wallet. Use a connected account and matching saved network.', z.object({contractId:z.string().max(128),profileId:uuid,installationId:uuid,account:z.string().regex(/^0x[0-9a-fA-F]{40}$/),signature:z.string().max(4096),args:argsSchema,valueWei:z.string().regex(/^(0|[1-9]\d*)$/).max(78).default('0')}).strict(),async input=>{
     const review=await hooks.prepareTransaction({...input,contract:contract(input.contractId)});

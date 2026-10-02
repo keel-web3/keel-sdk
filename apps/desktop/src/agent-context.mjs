@@ -1,4 +1,5 @@
 import { KEEL_ENGINE_CATALOG, planKeelProject } from '@keel/sdk/engine';
+import { contractInventory } from './contract-registry.mjs';
 
 export const AGENT_INSTRUCTIONS = `You are KEEL's creative assistant inside its Electron editor. Help artists make working projects using the supplied KEEL tools. Act on the creator's request: inspect the work, make local drafts, run checks and show the appropriate editor view. Explain what actually happened in plain language. Ask only missing decisions, up to three at once. Use the shared planner for mint, collection, access, network and storage choices. Do not invent a deployment, module ID, transaction result or authority.
 You can create new local projects. Edits to existing work and durable memories are review cards; they are not applied until the creator clicks Apply. Wallet tools prepare exact reviews; only the creator can send a review to their wallet, and only the wallet can sign. Never request secrets or use another means to sign, submit or install software. A public address or an ABI is not authority. Report unknown outcomes and never retry transactions automatically.
@@ -22,6 +23,7 @@ export function safeContext(value) {
     return item;
   }));
 }
+const CONTRACT_ASK = /contract|mint|drop|collection|permission|access|sale|release|publish|wallet|auction|signer|bridge|tag/i;
 const words = text => new Set(String(text).toLowerCase().match(/[\p{L}\p{N}]{3,}/gu) ?? []);
 export const relevance = (text, ask) => { const terms = words(text); return [...words(ask)].reduce((sum, word) => sum + Number(terms.has(word)), 0); };
 export function buildAgentContext({ chat, prompt, workspace, view = {} }) {
@@ -44,11 +46,16 @@ export function buildAgentContext({ chat, prompt, workspace, view = {} }) {
     if (codeAsk) for (const file of [...project.files].sort((a,b) => relevance(b.name, prompt) - relevance(a.name, prompt)).slice(0,3)) add(file.name, 'Source relevant to this request', { id: file.id, content: file.content }, 5000);
     if (/module|library|depend|runtime|build|create|make/i.test(prompt) || view.page === 'Modules') add('Project modules', 'Dependencies and reuse', state.moduleSelections.filter(item => item.projectId === project.id), 4000);
     if (/file|asset|image|gif|video|model|metadata|preview/i.test(prompt)) add('Project files', 'Original asset inventory', state.objects.filter(item => project.objectIds.includes(item.id)), 3000);
-    if (/contract|mint|drop|collection|permission|access|sale|release|publish|wallet/i.test(prompt) || view.page === 'Contracts') {
-      add('Project contracts', 'Contract identities and permissions', state.contracts.filter(item => item.projectId === project.id || project.contractIds.includes(item.id)).map(({abi,...item}) => item), 5000);
+    if (CONTRACT_ASK.test(prompt) || view.page === 'Contracts') {
+      const contractIds = state.contracts.filter(item => item.projectId === project.id || project.contractIds.includes(item.id)).map(item => item.id);
+      add('Project contracts', 'Contracts, their creator labels, tags, collections inside and signer records', contractInventory(state, { contractIds, query: prompt }), 5000);
       add('Collections', 'Collections linked to this project', state.collections.filter(item => project.contractIds.includes(item.contractId)), 2500);
     }
-  } else if (!chat.projectId) add('Workspace index', 'Choose work by name', { projects: state.projects.map(({id,title,intent}) => ({id,title,intent})), objects: state.objects.map(({id,name,type}) => ({id,name,type})) }, 5000);
+  } else if (!chat.projectId) {
+    add('Workspace index', 'Choose work by name', { projects: state.projects.map(({id,title,intent}) => ({id,title,intent})), objects: state.objects.map(({id,name,type}) => ({id,name,type})) }, 5000);
+    // Creators name contracts and collections their own way ("my spring drop"); labels, tags and collection names are searchable here.
+    if (state.contracts.length && (CONTRACT_ASK.test(prompt) || view.page === 'Contracts')) add('Contracts', 'Your contracts by label, tag, category and the collections inside them; most relevant first', contractInventory(state, { query: `${prompt} ${view.contractId ?? ''}`, limit: 40 }), 6000);
+  }
   const memories = state.memories.filter(item => item.enabled !== false && (!item.projectId || item.projectId === chat.projectId)).map(item => ({...item, score: relevance(`${item.title} ${item.content}`, prompt)})).sort((a,b) => b.score - a.score).filter(item => item.score > 0 || item.pinned || item.projectId === chat.projectId).slice(0,8);
   if (memories.length) add('Remembered details', 'Matching preferences and project decisions', memories, 6000);
   return { mode: 'auto', parts, characters: 42000 - remaining };

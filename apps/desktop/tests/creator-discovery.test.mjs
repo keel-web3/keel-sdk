@@ -24,6 +24,10 @@ test('discovery preserves two logical collections sharing one token contract', a
   assert.ok(result.records[0].contract.abi.length > 0);
   assert.equal(result.infrastructure[1].address, renderer);
   assert.equal(result.factoryIdentity, 'code-observed-not-authenticated');
+  // Both shared collections are listed inside the one shared contract, each with its exact token id range.
+  const shared = result.records[0].contract;
+  assert.equal(shared.registry.family, 'shared-collection');
+  assert.deepEqual(shared.collections.map((item) => [item.key, item.tokenIds.from]), [['shared:101', (101n << 128n).toString()], ['shared:102', (102n << 128n).toString()]]);
 });
 test('discovery rejects wrong-chain, unbounded and contradictory directory reads', async () => {
   await assert.rejects(discoverCreatorContracts(input, client({ getChainId: async () => 1 })), /does not match/);

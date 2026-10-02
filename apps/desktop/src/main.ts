@@ -28,9 +28,11 @@ import { mkdtemp } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { attachArtwork } from './creation-workflow.mjs';
 import { mainnet, base, polygon, arbitrum, optimism, sepolia, baseSepolia } from 'viem/chains';
-import { inspectContract, readControl, simulateControl } from './contract-rpc.mjs';
+import { inspectContractFacts, readControl, readTransferRules, simulateControl } from './contract-rpc.mjs';
 import { runLocalAgent, localAgentCommand, localAgentVersion, claudeSignInStatus } from './providers.mjs';
 import { discoverCreatorContracts } from './creator-discovery.mjs';
+import { SealedService } from './sealed-service.mjs';
+import { StudioLink, studioContractUrl } from './studio-link.mjs';
 import { WalletRuntime } from './wallet-runtime';
 import { WALLET_SOURCES } from './wallet-extensions.mjs';
 import { CURATED_WALLETS, downloadWallet } from './wallet-download.mjs';
@@ -44,7 +46,7 @@ import { AgentService } from './agent-service.mjs';
 import { chatOptions, chatPatch } from './agent-store.mjs';
 import { viewSchema } from './agent-tools.mjs';
 import { exportWorkspace, inspectArchive, mergeArchive, MAX_ARCHIVE_BYTES } from './workspace-exchange.mjs';
-import { inspectStudio, searchStudio } from './studio.mjs';
+import { inspectStudio, searchStudio, studioUrl } from './studio.mjs';
 import { readImportFile, sourceFile, MAX_SOURCE_BYTES } from './file-import.mjs';
 import { PreviewService } from './preview-service.mjs';
 import { loadRuntimeModules, directRuntimeImports } from './runtime-files.mjs';
@@ -98,6 +100,8 @@ let gameEngine: GameEngineService;
 let gameBuilder: GameBuilderService;
 let gameCodec: GameCodecService;
 let gameSound: GameSoundService;
+let sealed: SealedService;
+let studioLink: StudioLink;
 let gameLevel: GameLevelService;
 function previewFor(project: any) {
   const { state } = store.read();
@@ -124,6 +128,11 @@ const provider = z.enum(['codex', 'claude', 'openai', 'anthropic']);
 const keyProvider = z.enum(['openai', 'anthropic']);
 const networkInput = z.object({ label: z.string().trim().min(1).max(100), family: z.enum(['ethereum', 'tezos']), rpcUrl: z.string().url().max(2048), chainId: z.number().int().positive().optional(), network: z.string().max(64).optional(), holdAddress: z.string().regex(/^0x[0-9a-fA-F]{40}$/).optional(), builderAddress: z.string().regex(/^0x[0-9a-fA-F]{40}$/).optional() }).strict();
 function networkProfile(id: string) { const row = store.db.prepare('SELECT encrypted FROM network_profiles WHERE id=?').get(id) as any; if (!row || !credentialEncryptionAvailable()) throw new Error('Reconnect this network in Viewing or Release.'); return JSON.parse(safeStorage.decryptString(Buffer.from(row.encrypted))); }
+const objectId = z.string().regex(/^[a-f0-9]{64}$/);
+const sealSource = z.discriminatedUnion('kind', [z.object({ kind: z.literal('text'), text: z.string().min(1).max(16 * 1024 * 1024), name: z.string().max(240).optional() }).strict(), z.object({ kind: z.literal('object'), objectId }).strict()]);
+const base64url = z.string().regex(/^[A-Za-z0-9_-]{1,1400}$/);
+const passkeySlot = z.object({ credentialId: base64url, prfSalt: base64url, prfOutput: base64url, rpId: z.string().max(253).optional(), includeCredentialId: z.boolean().optional() }).strict();
+const sealUnlock = z.discriminatedUnion('kind', [z.object({ kind: z.literal('passphrase'), passphrase: z.string().min(1).max(1024) }).strict(), z.object({ kind: z.literal('recovery'), key: z.string().min(1).max(200) }).strict(), z.object({ kind: z.literal('keychain') }).strict(), z.object({ kind: z.literal('passkey'), prfOutput: base64url, credentialId: base64url.optional(), slotIndex: z.number().int().min(0).max(7).optional() }).strict()]);
 const controlInput = z.object({ contract: z.unknown(), signature: z.string().max(4096), args: z.array(z.unknown()).max(64), valueWei: z.string().max(78).optional() }).strict();
 const walletProcedure = t.procedure.use(async ({ next }) => { await walletRestore; return next(); });
 const tezosWalletId = z.union([z.literal('beacon'), z.string().uuid()]);
@@ -135,6 +144,7 @@ async function chosenFile(limit: number, purpose = 'file') {
 }
 
 function keyAvailable(name: string) { return !!store.db.prepare('SELECT provider FROM credentials WHERE provider=?').get(name); }
+function configuredStudio(): string | undefined { return (store.db.prepare("SELECT value FROM editor_settings WHERE key='studio-url'").get() as any)?.value; }
 function credentialEncryptionAvailable() { return safeStorage.isEncryptionAvailable() && (process.platform !== 'linux' || !['basic_text', 'unknown'].includes(safeStorage.getSelectedStorageBackend())); }
 function readKey(name: string) {
   const row = store.db.prepare('SELECT encrypted FROM credentials WHERE provider=?').get(name);
@@ -189,6 +199,26 @@ const router = t.router({
   checkCodex: t.procedure.mutation(async () => runLocalAgent('codex', '', path.join(app.getPath('userData'), 'agent-workspace'), { command: await localAgentCommand('codex'), diagnosticsOnly: true })),
   studioSettings: t.procedure.query(() => ({ url: (store.db.prepare("SELECT value FROM editor_settings WHERE key='studio-url'").get() as any)?.value ?? '' })),
   connectStudio: t.procedure.input(z.string().url().max(2048)).mutation(async ({ input }) => { const result = await inspectStudio(input); store.db.prepare("INSERT INTO editor_settings VALUES ('studio-url', ?) ON CONFLICT(key) DO UPDATE SET value=excluded.value").run(result.studioUrl); return result; }),
+  // Connect to Studio (device-style pairing) and read the creator's Studio through its MCP endpoint. Read-only; the key never reaches the renderer unless revealed.
+  studioLinkStatus: t.procedure.query(() => ({ ...studioLink.status(), configured: configuredStudio() ?? null })),
+  studioLinkStart: t.procedure.input(z.object({ studioUrl: z.string().url().max(2048).optional() }).strict()).mutation(async ({ input }) => {
+    const address = input.studioUrl ?? configuredStudio();
+    if (!address) throw new Error('Enter your Studio’s address first.');
+    const origin = studioUrl(address);
+    const result = await studioLink.start(origin);
+    store.db.prepare("INSERT INTO editor_settings VALUES ('studio-url', ?) ON CONFLICT(key) DO UPDATE SET value=excluded.value").run(origin);
+    return { ...result, configured: origin };
+  }),
+  studioLinkCancel: t.procedure.mutation(() => { studioLink.cancel(); return studioLink.status(); }),
+  studioLinkDisconnect: t.procedure.mutation(() => studioLink.disconnect()),
+  studioLinkReveal: t.procedure.mutation(() => studioLink.revealToken()),
+  studioLinkOverview: t.procedure.input(z.object({ query: z.string().max(120).optional() }).strict()).mutation(({ input }) => studioLink.overview(input)),
+  studioOpen: t.procedure.input(z.object({ url: z.string().url().max(2048) }).strict()).mutation(({ input }) => studioLink.open(input.url, studioLink.connection()?.studio ?? configuredStudio())),
+  studioOpenContract: t.procedure.input(z.object({ chainId: z.number().int().positive(), address: z.string().regex(/^0x[0-9a-fA-F]{40}$/), tab: z.enum(['overview', 'collections', 'rules', 'admin', 'signers']) }).strict()).mutation(({ input }) => {
+    const origin = studioLink.connection()?.studio ?? configuredStudio();
+    if (!origin) throw new Error('Connect a Studio in Setup first.');
+    return studioLink.open(studioContractUrl(origin, input.chainId, input.address, input.tab), origin);
+  }),
   searchStudio: t.procedure.input(z.string().trim().min(1).max(160)).query(async ({ input }) => {
     const entry = store.db.prepare("SELECT value FROM editor_settings WHERE key='studio-url'").get() as any;
     if (!entry) throw new Error('Connect a Studio in Connections before searching its library.');
@@ -381,6 +411,27 @@ const router = t.router({
     return (store.db.prepare('SELECT fingerprint, body FROM project_checks WHERE project_id=? ORDER BY id DESC LIMIT 10').all(input) as any[]).map((row) => ({ ...JSON.parse(row.body), current: row.fingerprint === projectFingerprint(project) }));
   }),
   projectPresentation: t.procedure.input(z.string().uuid()).query(async ({ input }) => { const project = store.read().state.projects.find((item: any) => item.id === input); if (!project) throw new Error('Project not found.'); const result = project.game ? await gameEngine.presentation(project) : await previewFor(project); return { ...result, html: undefined }; }),
+  // Seal & prove. Secrets (passphrases, recovery keys, passkey outputs) arrive once per call and are never stored or logged.
+  sealedStatus: t.procedure.query(() => sealed.status()),
+  sealedCommit: t.procedure.input(z.object({ source: sealSource, salted: z.boolean() }).strict()).mutation(({ input }) => sealed.commit(input.source as never, { salted: input.salted })),
+  sealedMerkle: t.procedure.input(z.object({ objectIds: z.array(objectId).min(2).max(256) }).strict()).mutation(({ input }) => sealed.merkle(input.objectIds)),
+  sealedSeal: t.procedure.input(z.object({ source: sealSource, name: z.string().max(240).optional(), passphrase: z.string().max(1024).optional(), keychain: z.boolean(), passkey: passkeySlot.optional(), revision: z.number().int().nonnegative() }).strict()).mutation(({ input }) => sealed.seal(input as never)),
+  sealedDescribe: t.procedure.input(objectId).query(({ input }) => sealed.describe(input)),
+  sealedOpen: t.procedure.input(z.object({ objectId, unlock: sealUnlock }).strict()).mutation(({ input }) => sealed.open(input.objectId, input.unlock as never)),
+  sealedExport: t.procedure.input(z.object({ objectId, unlock: sealUnlock }).strict()).mutation(async ({ input }) => {
+    const opened = await sealed.openBytes(input.objectId, input.unlock as never);
+    const selected = await dialog.showSaveDialog(window, { title: 'Save an opened copy (it is no longer sealed)', defaultPath: opened.name });
+    if (selected.canceled || !selected.filePath) return null;
+    await writeFile(selected.filePath, opened.bytes, { mode: 0o600 });
+    return { saved: true, byteLength: opened.bytes.byteLength };
+  }),
+  sealedAddSlot: t.procedure.input(z.object({ objectId, unlock: sealUnlock, slot: z.discriminatedUnion('kind', [z.object({ kind: z.literal('passphrase'), passphrase: z.string().min(1).max(1024) }).strict(), z.object({ kind: z.literal('recovery') }).strict(), z.object({ kind: z.literal('keychain') }).strict(), passkeySlot.extend({ kind: z.literal('passkey') })]), revision: z.number().int().nonnegative() }).strict()).mutation(({ input }) => sealed.addSlot(input as never)),
+  sealedSaveText: t.procedure.input(z.object({ purpose: z.enum(['reveal', 'recovery']), suggestedName: z.string().min(1).max(160), text: z.string().min(1).max(64_000_000) }).strict()).mutation(async ({ input }) => {
+    const selected = await dialog.showSaveDialog(window, { title: input.purpose === 'recovery' ? 'Save your recovery key somewhere safe (offline if you can)' : 'Save the reveal file (keep it private until you reveal)', defaultPath: input.suggestedName.replace(/[\\/:*?"<>|\u0000-\u001f]/gu, '_') });
+    if (selected.canceled || !selected.filePath) return null;
+    await writeFile(selected.filePath, input.text, { mode: 0o600 });
+    return { saved: true };
+  }),
   exportObject: t.procedure.input(z.string().regex(/^[a-f0-9]{64}$/)).mutation(async ({ input }) => {
     const object = store.read().state.objects.find((item: any) => item.id === input); if (!object) throw new Error('Object not found.');
     await store.verifyObject(input);
@@ -403,7 +454,9 @@ const router = t.router({
     await writeFile(selected.filePath,prepared.solidity);return {fileName:prepared.fileName,status:'exported',deployed:false};
   }),
   contractSimulate: t.procedure.input(controlInput.extend({ rpcUrl: z.string().url().max(2048), account: z.string().regex(/^0x[0-9a-fA-F]{40}$/) })).mutation(({ input }) => simulateControl(input)),
-  contractInspect: t.procedure.input(z.object({ contract: z.unknown(), rpcUrl: z.string().url().max(2048) }).strict()).mutation(({ input }) => inspectContract(input.contract, input.rpcUrl)),
+  contractInspect: t.procedure.input(z.object({ contract: z.unknown(), rpcUrl: z.string().url().max(2048) }).strict()).mutation(({ input }) => inspectContractFacts(input.contract, input.rpcUrl)),
+  // Read-only: trading-rule changes go through contractReview / contractSimulate / prepareWalletTransaction like any other write.
+  contractTransferRules: t.procedure.input(z.object({ contract: z.unknown(), rpcUrl: z.string().url().max(2048) }).strict()).mutation(({ input }) => readTransferRules(input.contract, input.rpcUrl)),
   discoverCreator: t.procedure.input(z.object({ chainId: z.number().int().positive(), factoryAddress: z.string().max(42), creator: z.string().max(42), rpcUrl: z.string().url().max(2048) }).strict()).query(({ input }) => discoverCreatorContracts(input)),
   discoverProjectCollections: t.procedure.input(z.object({ profileId: z.string().uuid(), creator: z.string().regex(/^0x[0-9a-fA-F]{40}$/) }).strict()).query(async ({ input }) => {
     const profile = networkProfile(input.profileId);
@@ -437,6 +490,10 @@ async function start() {
   await app.whenReady();
   await mkdir(path.join(app.getPath('userData'), 'agent-workspace'), { recursive: true, mode: 0o700 });
   store = new WorkspaceStore(path.join(app.getPath('userData'), 'workspace.sqlite'));
+  // "This computer's keychain" slots: their keys are wrapped by the OS and never leave the main process.
+  sealed = new SealedService(store, { available: credentialEncryptionAvailable, encrypt: (text: string) => safeStorage.encryptString(text), decrypt: (bytes: Uint8Array) => safeStorage.decryptString(Buffer.from(bytes)) });
+  // The Studio agent key follows the same rule: wrapped by the OS, kept outside the workspace JSON.
+  studioLink = new StudioLink({ db: store.db, keychain: { available: credentialEncryptionAvailable, encrypt: (text: string) => safeStorage.encryptString(text), decrypt: (bytes: Uint8Array) => safeStorage.decryptString(Buffer.from(bytes)) }, openExternal: (url: string) => shell.openExternal(url) });
   const connectionDirectory = await mkdtemp(path.join(tmpdir(), 'keel-workspace-'));
   const workspaceSocket = process.platform === 'win32' ? `\\\\.\\pipe\\keel-workspace-${randomUUID()}` : path.join(connectionDirectory, 'workspace.sock');
   workspaceService = await serveWorkspace({store,socketPath:workspaceSocket,changed:()=>{if(window&&!window.isDestroyed())window.webContents.send('keel:agent-event',{type:'workspace'});},openProject:(projectId:string)=>{
@@ -577,6 +634,8 @@ async function start() {
     findModules:(query:string)=>caller.searchStudio(query),
     networkStatus:(id:string)=>caller.liveNetwork(id),
     readContract:(input:any)=>caller.contractRead({contract:input.contract,signature:input.signature,args:input.args,rpcUrl:networkProfile(input.profileId).rpcUrl}),
+    readTransferRules:(input:any)=>caller.contractTransferRules({contract:input.contract,rpcUrl:networkProfile(input.profileId).rpcUrl}),
+    studioOverview:(query?:string)=>studioLink.overview(query?{query}:{}),
     openWallet:async(id:string)=>{await walletRestore;await wallets.open(id);return {opened:true};},
     prepareTransaction:(input:any)=>caller.prepareWalletTransaction({contract:input.contract,signature:input.signature,args:input.args,valueWei:input.valueWei,installationId:input.installationId,account:input.account,rpcUrl:networkProfile(input.profileId).rpcUrl}),
     prepareTezos:(input:any)=>caller.prepareTezosTransaction(input),

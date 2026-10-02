@@ -1,10 +1,34 @@
 import { createPublicClient, http, getAddress, keccak256 } from 'viem';
 import { moduleAbi } from '@keel/sdk/infrastructure';
 import { createTrackedContract } from '@keel/sdk/contract-controls';
-import { rpcUrl } from './contract-rpc.mjs';
+import { discoverKeelCreatorFactoryCollections, entriesFromFactoryRecords, keelCreatorFactoryRegistryAbi, readKeelFactoryTemplates } from '@keel/sdk/contract-registry';
+import { networkError, rpcUrl } from './contract-rpc.mjs';
+import { parseWorkspaceContract, registryFieldsFromEntry } from './contract-registry.mjs';
 
-/** Bounded, read-only discovery from one explicitly selected creator factory. */
+const MAX_COLLECTIONS = 100;
+
+/** Which recorded keel-die ABI fits a factory record's token contract. */
+function tokenAbiName(record) {
+  if (record.deployment === 'external') return undefined;
+  if (record.deployment === 'shared') return 'KeelShared1155';
+  if (record.standard === 'erc1155') return 'KeelCreator1155';
+  return { erc721a: 'KeelCreator721A', erc721: 'KeelCreator721', 'seeded-erc721a': 'KeelCreatorSeeded721A' }[record.implementation];
+}
+
+/**
+ * Bounded, read-only discovery from one explicitly selected creator factory.
+ * Every read is pinned to one block. The SDK's strict mode refuses a factory
+ * without code, a count that disagrees with the ids, duplicate ids and more
+ * collections than the limit. Collections that share one token contract (the
+ * shared ERC-1155) become logical collections inside a single tracked
+ * contract, each with its exact token range, and clones name the template
+ * they copy.
+ */
 export async function discoverCreatorContracts(input, clientOverride) {
+  try { return await discover(input, clientOverride); } catch (error) { throw networkError(error); }
+}
+
+async function discover(input, clientOverride) {
   if (!Number.isSafeInteger(input.chainId) || input.chainId < 1) throw new Error('Select an exact chain.');
   const factory = getAddress(input.factoryAddress), creator = getAddress(input.creator);
   const client = clientOverride ?? createPublicClient({ transport: http(rpcUrl(input.rpcUrl), { timeout: 15_000, retryCount: 0 }) });
@@ -12,32 +36,47 @@ export async function discoverCreatorContracts(input, clientOverride) {
   const blockNumber = await client.getBlockNumber();
   const factoryCode = await client.getCode({ address: factory, blockNumber });
   if (!factoryCode || factoryCode === '0x') throw new Error('The selected factory has no code on this chain.');
-  const abi = await moduleAbi('keel-die', 'KeelCreatorFactory');
-  const read = (functionName, args = []) => client.readContract({ address: factory, abi, functionName, args, blockNumber });
+  const read = (functionName, args = []) => client.readContract({ address: factory, abi: keelCreatorFactoryRegistryAbi, functionName, args, blockNumber });
+  // Check the count before asking for the id list, so a huge account is refused without fetching it.
   const count = await read('creatorCollectionCount', [creator]);
-  if (typeof count !== 'bigint' || count < 0n || count > 100n) throw new Error('This discovery view supports at most 100 collections per creator/factory. Use a paginated indexer for larger accounts.');
-  const ids = await read('creatorCollectionIds', [creator]);
-  if (!Array.isArray(ids) || ids.length !== Number(count) || new Set(ids.map(String)).size !== ids.length) throw new Error('Factory collection count and IDs disagree at the selected block.');
+  if (typeof count !== 'bigint' || count < 0n || count > BigInt(MAX_COLLECTIONS)) throw new Error(`This discovery view supports at most ${MAX_COLLECTIONS} collections per creator/factory. Use a paginated indexer for larger accounts.`);
   const renderer = getAddress(await read('metadataRenderer'));
-  const records = [];
-  for (const id of ids) {
-    if (typeof id !== 'bigint' || id <= 0n) throw new Error('Invalid factory collection ID.');
-    const record = await read('collection', [id]);
-    if (!record || getAddress(record.creator) !== creator || typeof record.name !== 'string' || ![0, 1].includes(Number(record.standard)) || ![0, 1, 2].includes(Number(record.deployment))) throw new Error('Factory returned an invalid or unrelated creator record.');
-    const address = getAddress(record.tokenContract);
-    let contractName;
-    if (Number(record.deployment) === 2) contractName = undefined;
-    else if (Number(record.deployment) === 1) contractName = 'KeelShared1155';
-    else if (Number(record.standard) === 1) contractName = 'KeelCreator1155';
-    else {
-      const implementationKind = Number(await read('erc721ImplementationKind', [id]));
-      if (![0, 1].includes(implementationKind)) throw new Error('Unknown ERC-721 implementation kind.');
-      contractName = implementationKind === 0 ? 'KeelCreator721A' : 'KeelCreator721';
-    }
-    records.push({ collectionId: id.toString(), sharedCollectionId: String(record.sharedCollectionId), name: record.name, open: record.open, deployment: ['dedicated', 'shared', 'external'][Number(record.deployment)], contract: createTrackedContract({ chainId: input.chainId, address, name: record.name || `Collection ${id}`, kind: 'collection', source: 'factory-readback', abi: contractName ? await moduleAbi('keel-die', contractName) : [], notes: `Creator ${creator}; factory ${factory}; collection ${id}; shared collection ${record.sharedCollectionId}; read at block ${blockNumber}. Factory membership is not current token ownership or role authority.` }) });
+  let found;
+  try {
+    found = await discoverKeelCreatorFactoryCollections(client, { factory, creator, abi: keelCreatorFactoryRegistryAbi, blockNumber, limit: MAX_COLLECTIONS, strict: true });
+  } catch (error) {
+    // The SDK names the exact record it refused; keep the editor's wording in front of it.
+    if (error instanceof Error && /^Factory collection \d+ /u.test(error.message)) throw new Error(`Factory returned an invalid or unrelated creator record. ${error.message}`);
+    throw error;
   }
-  return { creator, factory, chainId: input.chainId, blockNumber: blockNumber.toString(), factoryCodeHash: keccak256(factoryCode), factoryIdentity: 'code-observed-not-authenticated', authority: 'unverified', records, infrastructure: [
-    createTrackedContract({ chainId: input.chainId, address: factory, name: 'Creator factory', kind: 'default', source: 'factory-readback', abi, notes: `Selected factory read at block ${blockNumber}; not user-owned by implication.` }),
-    createTrackedContract({ chainId: input.chainId, address: renderer, name: 'Collection renderer', kind: 'default', source: 'factory-readback', abi: await moduleAbi('keel-die', 'KeelArtifactTokenRenderer'), notes: `Factory metadataRenderer read at block ${blockNumber}; code and authority still require inspection.` }),
-  ] };
+  const templates = await readKeelFactoryTemplates(client, factory, blockNumber);
+  const abi = await moduleAbi('keel-die', 'KeelCreatorFactory');
+
+  const contracts = new Map();
+  for (const entry of entriesFromFactoryRecords(input.chainId, found.records, templates)) {
+    const records = found.records.filter((record) => record.tokenContract === entry.address);
+    const abiName = tokenAbiName(records[0]);
+    const ids = records.map((record) => record.collectionId).join(', ');
+    const tracked = createTrackedContract({
+      chainId: input.chainId, address: entry.address, kind: 'collection', source: 'factory-readback',
+      name: (entry.name || `Collection ${records[0].collectionId}`).slice(0, 160),
+      abi: abiName ? await moduleAbi('keel-die', abiName) : [],
+      notes: `Creator ${creator}; factory ${factory}; factory collection${records.length === 1 ? '' : 's'} ${ids}; read at block ${blockNumber}. Factory membership is not current token ownership or role authority.`,
+    });
+    const fields = registryFieldsFromEntry(entry);
+    contracts.set(entry.key, parseWorkspaceContract({ ...tracked, ...fields, registry: { ...fields.registry, observedBlock: blockNumber.toString() } }));
+  }
+  const infrastructure = (name, address, abi, notes) => parseWorkspaceContract({ ...createTrackedContract({ chainId: input.chainId, address, name, kind: 'default', source: 'factory-readback', abi, notes }), registry: { family: 'infrastructure', deployment: 'standalone', sources: ['factory'], observedBlock: blockNumber.toString() } });
+  return {
+    creator, factory, chainId: input.chainId, blockNumber: blockNumber.toString(), factoryCodeHash: keccak256(factoryCode), factoryIdentity: 'code-observed-not-authenticated', authority: 'unverified',
+    records: found.records.map((record) => ({
+      collectionId: record.collectionId, sharedCollectionId: record.sharedCollectionId, name: record.name, open: record.open,
+      deployment: record.deployment, standard: record.standard, ...(record.implementation ? { implementation: record.implementation } : {}),
+      contract: contracts.get(`${input.chainId}:${record.tokenContract.toLowerCase()}`),
+    })),
+    infrastructure: [
+      infrastructure('Creator factory', factory, abi, `Selected factory read at block ${blockNumber}; not user-owned by implication.`),
+      infrastructure('Collection renderer', renderer, await moduleAbi('keel-die', 'KeelArtifactTokenRenderer'), `Factory metadataRenderer read at block ${blockNumber}; code and authority still require inspection.`),
+    ],
+  };
 }

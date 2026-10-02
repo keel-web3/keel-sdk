@@ -5,7 +5,7 @@ import { DatabaseSync } from 'node:sqlite';
 import { randomUUID, createHash } from 'node:crypto';
 import { z } from 'zod';
 import { parseKeelEngineIntent } from '@keel/sdk/engine';
-import { createTrackedContract } from '@keel/sdk/contract-controls';
+import { parseWorkspaceContract } from './contract-registry.mjs';
 import { MAX_SOURCE_BYTES, preserveImportedFile } from './file-import.mjs';
 import { assertModuleSelectionSettings } from './module-settings.mjs';
 import { readFileSync, existsSync, createReadStream } from 'node:fs';
@@ -42,7 +42,9 @@ export const projectSchema = z.object({
 }).strict();
 export const stateSchema = z.object({
   projects: z.array(projectSchema).max(100),
-  contracts: z.array(z.unknown()).max(1000).transform((items) => items.map(createTrackedContract)),
+  // Each record keeps its reviewed ABI binding (createTrackedContract) and may carry optional
+  // creator organization, logical collections, signer records and registry facts.
+  contracts: z.array(z.unknown()).max(1000).transform((items) => items.map(parseWorkspaceContract)),
   collections: z.array(z.object({ id: z.string().max(256), name: z.string().max(160), chainId: z.number().int().positive(), creator: z.string().regex(/^0x[0-9a-fA-F]{40}$/), factory: z.string().regex(/^0x[0-9a-fA-F]{40}$/), contractId: z.string().max(80), collectionId: z.string().regex(/^[1-9]\d*$/), sharedCollectionId: z.string().regex(/^\d+$/), deployment: z.enum(['dedicated', 'shared', 'external']), observedBlock: z.string().regex(/^\d+$/) }).strict()).max(1000).default([]),
   wallets: z.array(z.object({ id: z.string().uuid(), label: z.string().min(1).max(160), family: z.enum(['ethereum', 'tezos']), address: z.string().min(1).max(128) }).strict().refine((wallet) => wallet.family === 'ethereum' ? /^0x[0-9a-fA-F]{40}$/.test(wallet.address) : /^(tz[1-4]|KT1)[1-9A-HJ-NP-Za-km-z]{33}$/.test(wallet.address), 'Enter a public address for the selected wallet family.')).max(100),
   memories: z.array(z.object({ id: z.string().uuid(), title: z.string().min(1).max(160), content: text, projectId: z.string().uuid().optional(), enabled: z.boolean().optional(), pinned: z.boolean().optional(), source: z.enum(['creator','assistant']).optional() }).strict()).max(200),

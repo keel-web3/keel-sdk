@@ -3,6 +3,7 @@ import { newLayeredArt, checkLayeredArt } from '@keel/sdk/layered-art';
 import { runtimeReferences } from './runtime-library.mjs';
 import { projectWithRuntime } from './runtime-library.mjs';
 import { isGameProject } from './game-engine/game-project.mjs';
+import { mergeTrackedContract } from './contract-registry.mjs';
 
 // The same template choices drive the launcher, saved draft and guided editor.
 export const CREATION_TEMPLATES = [
@@ -82,8 +83,10 @@ export function collectionChoices(state, intent, custom = false) {
   if (intent.family !== 'ethereum' || !intent.chainId) return [];
   const contracts = state.contracts.filter(item => item.chainId === intent.chainId);
   const records = state.collections.filter(item => item.chainId === intent.chainId);
-  const choices = records.flatMap(record => { const contract = contracts.find(item => item.id === record.contractId); return contract ? [{ id: record.id, name: record.name, contract, record }] : []; });
-  for (const contract of contracts) if ((custom || contract.kind === 'collection') && !choices.some(item => item.contract.id === contract.id)) choices.push({ id: contract.id, name: contract.name, contract });
+  // Creator labels (contract organization and logical collection names) are what the creator recognizes.
+  const labelFor = (contract, record) => contract.collections?.find(item => item.key === (record.deployment === 'shared' ? `shared:${record.sharedCollectionId}` : `factory:${record.collectionId}`))?.label ?? record.name;
+  const choices = records.flatMap(record => { const contract = contracts.find(item => item.id === record.contractId); return contract ? [{ id: record.id, name: labelFor(contract, record), contract, record }] : []; });
+  for (const contract of contracts) if ((custom || contract.kind === 'collection') && !choices.some(item => item.contract.id === contract.id)) choices.push({ id: contract.id, name: contract.organization?.label ?? contract.name, contract });
   return choices;
 }
 
@@ -91,7 +94,8 @@ export function mergeDiscoveredCollections(state, results) {
   const contracts = new Map(state.contracts.map(item => [item.id, item]));
   const collections = new Map(state.collections.map(item => [item.id, item]));
   for (const result of results) {
-    for (const contract of [...result.infrastructure, ...result.records.map(item => item.contract)]) if (!contracts.has(contract.id)) contracts.set(contract.id, contract);
+    // A contract the creator already tracks keeps its ABI binding, names and labels; discovery only adds facts and logical collections.
+    for (const contract of [...result.infrastructure, ...result.records.map(item => item.contract)]) contracts.set(contract.id, contracts.has(contract.id) ? mergeTrackedContract(contracts.get(contract.id), contract) : contract);
     for (const record of result.records) {
       const id = `${result.chainId}:${result.factory.toLowerCase()}:${record.collectionId}`;
       collections.set(id, { id, name: record.name, chainId: result.chainId, creator: result.creator, factory: result.factory, contractId: record.contract.id,
