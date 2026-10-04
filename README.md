@@ -10,7 +10,7 @@ agent control of a wallet.
 This repository contains the TypeScript protocol, SDK, builder, viewer, Studio
 core, MCP server, examples, and local verification tooling. The EVM contracts
 and their Forge tests live in the sibling
-[`keel-contracts`](https://github.com/Ravonus/keel-contracts) repository.
+[`keel-contracts`](https://github.com/keel-web3/keel-contracts) repository.
 
 ## Default storage and read path
 
@@ -76,6 +76,19 @@ chain/store. Fresh MCP preparation accepts compact COPY only; selecting a
 carriage or setting an environment variable does not unlock a new wrapper.
 The prototype and test map is in [Prepared COPY assembly](docs/KEEL_PREPARED_COPY_ASSEMBLY.md).
 
+## Try the SDK, agent and visual editor
+
+Start with [the friend quickstart](docs/FRIEND_QUICKSTART.md). One command builds
+the SDK/MCP/editor, fetches the pinned public engine, and connects an artwork
+folder to the agent skills. Local Anvil testing and read-only Sepolia checks
+are separate commands; no developer checkout or private credentials are required.
+
+```sh
+git clone https://github.com/keel-web3/keel-sdk.git
+cd keel-sdk
+pnpm setup:friend
+```
+
 ## Start here
 
 Requirements: Node.js 22 or newer and pnpm 10.15. Foundry is additionally
@@ -120,6 +133,24 @@ phase the default agent workflow for 1/1s, collections, OneMint drops, sales,
 claims, and Fray auctions.
 
 ### Contract work is always a KEEL workflow
+
+An agent must not start from an ABI, an old deployment script, or a guessed
+contract address. Before making or changing a contract, collection, viewer,
+metadata binding, deployment, or release, it reads this README and the target
+repository's relevant `docs/` files, then runs the MCP
+`keel-contract-workflow-preflight` and follows its required sequence:
+`keel-engine-catalog`, exact selected-chain `keel-network-inspect`,
+selected-chain `keel-library-search`, and only then contract controls or wallet
+review. The module scan is mandatory even when the request appears to be a new
+contract; existing modules, proxies, graph revisions, canonical shell/builder
+bindings, and edge-case recovery paths must be resolved before redeploying.
+
+This is a default, not a user option. Missing README/docs or ambiguous
+selected-chain module evidence stops the workflow before signing. The MCP and
+the `$fray-keel-agent` skill enforce the same order so a normal creator does
+not need to know the protocol vocabulary.
+
+## Shell choice and verification
 
 An agent must not start from an ABI, an old deployment script, or a guessed
 contract address. Before making or changing a contract, collection, viewer,
@@ -245,14 +276,14 @@ contract.
 Codex discovers the Fray workflow automatically when opened anywhere in this
 repository through `.agents/skills/fray-keel-agent`, which points to the one
 canonical source at `skills/fray-keel-agent`. The SDK/MCP workflow is also
-available as `skills/keel-sdk-mcp` and is installed globally for automatic
-selection when the request concerns the SDK or MCP. Codex supports symlinked
+available as `skills/keel-sdk-mcp`. `pnpm setup:friend` installs both skills in
+the chosen artwork folder for project-scoped discovery. Codex supports symlinked
 skill folders; if a new skill does not appear, restart Codex.
 
 For a separate installation, use the skill installer with this repository path:
 
 ```text
-$skill-installer Install https://github.com/Ravonus/keel-sdk/tree/master/skills/fray-keel-agent
+$skill-installer Install https://github.com/keel-web3/keel-sdk/tree/master/skills/fray-keel-agent
 ```
 
 Then start with a request such as:

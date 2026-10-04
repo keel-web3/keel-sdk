@@ -41,10 +41,10 @@ export function engineBuilds(engine) {
   };
 
   /** A game's document, as `keel-game document <id>` builds it. */
-  const buildGame = async ({ project, projects, gameId, workspace, minify = true, audio = true, shell, payloadStorage }) => {
+  const buildGame = async ({ project, projects, gameId, workspace, minify = true, entryExport = "main", audio = entryExport === "main", shell, payloadStorage }) => {
     const ws = workspace ?? await workspaceOf(projects ?? [project]);
     const withAudio = audio && keel.closureOf(gameId, ws).some((m) => m.manifest.id === "keel/audio") && existsSync(vendor);
-    const doc = await keel.buildGameDocument(gameId, ws, { minify, payloadStorage: resolveKeelPayloadStorage(payloadStorage), ...(shell ? { shell } : {}), ...(withAudio ? { pageScripts: await keel.keelAudioScripts(vendor) } : {}) });
+    const doc = await keel.buildGameDocument(gameId, ws, { minify, entryExport, payloadStorage: resolveKeelPayloadStorage(payloadStorage), ...(shell ? { shell } : {}), ...(withAudio ? { pageScripts: await keel.keelAudioScripts(vendor) } : {}) });
     return { doc, workspace: ws, engineModuleIds: await engineModuleIds(ws) };
   };
 

@@ -70,7 +70,7 @@ export function inspectKeelPreparedDenseCopyDocument(html: string) {
   };
   const prefix = decode(formula[1]!), suffix = decode(formula[3]!), bridge = JSON.parse(formula[2]!) as string;
   if (bridge !== "];globalThis.__KEEL_ITEMS__=[null") throw new TypeError("Invalid prepared dense COPY bridge.");
-  const profiles = [...suffix.matchAll(/transportProfile:\s*"(base90-v1|base91-v1|base90-block-v2)"/gu)].map(match => match[1]);
+  const profiles = [...suffix.matchAll(/transportProfile:\s*"(base89-v1|base90-v1|base91-v1|base90-block-v2)"/gu)].map(match => match[1]);
   if (profiles.length !== 1) throw new TypeError("Prepared dense COPY must declare one exact decoder profile.");
   const packs = readKeelInlineJSONArray(html, "const __KEEL_PREPARED_DENSE_PACKS__="), items = readKeelInlineJSONArray(html, "globalThis.__KEEL_ITEMS__=");
   if (!packs.length || items[0] !== null || items.length < 2) throw new TypeError("Incomplete prepared dense COPY resources.");
@@ -156,7 +156,7 @@ export function assertKeelFreshPayloadAudit(value: unknown): void {
       || audit.requiresExistingPreparedReuse !== false || !Array.isArray(audit.payloads) || audit.payloads.length > 16_384
       || audit.payloadCount !== audit.payloads.length) throw new TypeError("Invalid fresh payload carriage audit.");
   const prepared = audit.preparedDenseCopy === undefined ? undefined : object(audit.preparedDenseCopy);
-  if (prepared && (Object.keys(prepared).some(key => !["transportProfile","shellBootEncoding","shellBootCompression","payloadPreparation","contractOperation"].includes(key)) || !["base90-v1","base91-v1","base90-block-v2"].includes(prepared.transportProfile as string) || prepared.shellBootEncoding !== "base64" || prepared.shellBootCompression !== undefined && prepared.shellBootCompression !== "gzip" && prepared.shellBootCompression !== "none" || prepared.payloadPreparation !== "build-time" || prepared.contractOperation !== "verified-copy")) throw new TypeError("Invalid prepared dense COPY audit.");
+  if (prepared && (Object.keys(prepared).some(key => !["transportProfile","shellBootEncoding","shellBootCompression","payloadPreparation","contractOperation"].includes(key)) || !["base89-v1","base90-v1","base91-v1","base90-block-v2"].includes(prepared.transportProfile as string) || prepared.shellBootEncoding !== "base64" || prepared.shellBootCompression !== undefined && prepared.shellBootCompression !== "gzip" && prepared.shellBootCompression !== "none" || prepared.payloadPreparation !== "build-time" || prepared.contractOperation !== "verified-copy")) throw new TypeError("Invalid prepared dense COPY audit.");
   let binary = 0, carried = 0;
   for (const value of audit.payloads) {
     const payload = object(value);

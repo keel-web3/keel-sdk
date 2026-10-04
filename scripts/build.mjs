@@ -11,6 +11,7 @@ run("node", ["packages/sdk/scripts/package-layered-runtime.mjs"]);
 tsc("packages/builder/tsconfig.json");
 tsc("packages/ethereum-adapter/tsconfig.json");
 tsc("packages/mcp/tsconfig.json");
+run("node", ["packages/mcp/scripts/package-skills.mjs"]);
 tsc("packages/sprite-codex/tsconfig.json");
 tsc("packages/studio-core/tsconfig.json");
 tsc("packages/sandbox-sdk/tsconfig.json");

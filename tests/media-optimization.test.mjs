@@ -198,7 +198,7 @@ test("the bundled FFmpeg adapter dry-runs, rechecks its pinned version, and writ
       assert.equal(unavailable.status, "unavailable");
       assert.equal(unavailable.capability.adapter, "ffmpeg-webm-vp9");
       assert.equal(unavailable.capability.available, false);
-      assert.match(unavailable.capability.reason ?? "", /bundled binary|not installed/u);
+      assert.match(unavailable.capability.reason ?? "", /bundled binary|not installed|No reviewed bundled FFmpeg executable digest/u);
       assert.deepEqual(unavailable.storage, { selectedMode: "native-carrier-v1", changed: false });
       return;
     }

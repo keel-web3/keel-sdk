@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// pnpm game:publish <game-id> --project <dir> [--rpc <url>] [--include-engine] [--seed <text>] [--json]
+// pnpm game:publish <game-id> --project <dir> [--entry <export>] [--rpc <url>] [--include-engine] [--seed <text>] [--json]
 //
 // Builds the game, publishes what the chain doesn't have yet -- by default to
 // the running practice chain (pnpm game:sandbox) -- reads it back through the
@@ -12,8 +12,9 @@ import { PRACTICE_CHAIN_ID, clientsFor, deploymentAlive, readRecord } from "./lo
 
 const argv = process.argv.slice(2);
 const option = (name) => { const i = argv.indexOf(name); return i >= 0 ? argv[i + 1] : undefined; };
-const gameId = argv.find((a, i) => !a.startsWith("--") && !["--project", "--rpc", "--seed"].includes(argv[i - 1] ?? ""));
-if (!gameId) { console.error("usage: pnpm game:publish <game-id> --project <dir> [--rpc <url>] [--include-engine] [--seed <text>] [--json]"); process.exit(2); }
+const gameId = argv.find((a, i) => !a.startsWith("--") && !["--project", "--entry", "--rpc", "--seed"].includes(argv[i - 1] ?? ""));
+if (!gameId) { console.error("usage: pnpm game:publish <game-id> --project <dir> [--entry <export>] [--rpc <url>] [--include-engine] [--seed <text>] [--json]"); process.exit(2); }
+const entryExport = option("--entry") ?? "main";
 const project = resolve(option("--project") ?? process.cwd());
 const deployment = readRecord("deployment");
 const rpc = option("--rpc") ?? readRecord("sandbox")?.rpc ?? deployment?.rpc;
@@ -25,11 +26,11 @@ const { chainId } = await clientsFor(rpc);
 if (chainId !== PRACTICE_CHAIN_ID) { console.error(`${rpc} is chain ${chainId}; this command only publishes to the practice chain (${PRACTICE_CHAIN_ID}).`); process.exit(1); }
 const seed = option("--seed");
 try {
-  const { result } = await publishGame({ rpc, deployment, project, gameId, includeEngine: argv.includes("--include-engine"), context: seed ? { seed } : {}, log: (l) => { if (!argv.includes("--json")) console.log(`  ${l}`); } });
+  const { result } = await publishGame({ rpc, deployment, project, gameId, entryExport, includeEngine: argv.includes("--include-engine"), context: seed ? { seed } : {}, log: (l) => { if (!argv.includes("--json")) console.log(`  ${l}`); } });
   if (argv.includes("--json")) { console.log(JSON.stringify(result, (_k, v) => typeof v === "bigint" ? v.toString() : v, 2)); process.exit(0); }
   const kb = (n) => `${(n / 1024).toFixed(1)} KB`;
   console.log(`
-${gameId} is on the practice chain.
+${gameId}${entryExport === "main" ? "" : `/${entryExport}`} is on the practice chain.
   root         ${result.root}
   stored now   ${kb(result.stored.bytes)} in ${result.stored.chunks} chunks (${result.transactions} transactions, ${result.gas.total} gas)
   reused       ${result.reused.length} shared objects (the shell and ${result.reused.filter((r) => r.moduleId).length} engine modules), ${kb(result.shared.bytes)} not stored again

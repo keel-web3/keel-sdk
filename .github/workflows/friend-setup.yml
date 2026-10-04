@@ -1,0 +1,36 @@
+name: Friend setup
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  portable:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22.22.1'
+          cache: pnpm
+      - name: Fresh checkout setup without sibling repositories
+        run: pnpm setup:friend --skip-desktop
+      - name: Setup and network rejection tests
+        run: pnpm setup:test
+      - name: MCP and generator preparation
+        run: node --test tests/mcp.test.mjs tests/runtime-module-index.test.mjs tests/sdk-inline-viewer-graph.test.mjs tests/sdk-managed-publication.test.mjs tests/sdk-web3-token-json.test.mjs tests/sdk-asset-storage-planner.test.mjs tests/sdk-publication-module.test.mjs tests/sdk-stake-schemas.test.mjs
+      - name: Build editor
+        run: pnpm --filter @keel/desktop build
+      - name: Desktop local tests
+        run: pnpm desktop:test
+      - name: Pixel generator source tests
+        run: pnpm pixel:test
+      - uses: foundry-rs/foundry-toolchain@v1
+        with:
+          version: stable
+      - name: Local contract publication and exact byte read-back
+        run: pnpm sandbox:test
+      - name: Setup leaves tracked source unchanged
+        run: git diff --exit-code

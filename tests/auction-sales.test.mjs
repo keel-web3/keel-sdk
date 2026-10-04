@@ -1,4 +1,6 @@
 import test from "node:test";
+import { siblingTest } from "./sibling-repository.mjs";
+const testWithFunArt = siblingTest(test, "fun-art");
 import assert from "node:assert/strict";
 import { decodeFunctionData } from "viem";
 import { prepareKeelAuctionOutcomes, decodeKeelAuctionSalePolicy, keelAuctionAllocationId } from "../packages/sdk/dist/auction-sales.js";
@@ -33,7 +35,7 @@ test("packed policy covers independent standards and supply boundaries", () => {
  for (const supply of [0,-1,1.5,2**32]) assert.throws(()=>prepareKeelAuctionOutcomes({...common,bidder:{...common.bidder,supply}}));
 });
 
-test("SDK sale call and event schemas match the canonical auction house ABI", async () => {
+testWithFunArt("SDK sale call and event schemas match the canonical auction house ABI", async () => {
  const { readFile } = await import("node:fs/promises");
  const { keelAuctionSaleHouseAbi } = await import("../packages/sdk/dist/auction-sales.js");
  const source = await readFile(new URL("../../fun-art/packages/abi/src/generated/patrons-auction-house.ts", import.meta.url),"utf8");

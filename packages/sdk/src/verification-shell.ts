@@ -1107,7 +1107,7 @@ export async function buildCompactInlineKeelShell(input: {
   /** Contain an authored viewport without moving scene controls. */
   readonly fitViewport?: { readonly width: number; readonly height: number };
   /** Explicit wire choice, independent of native Hold storage. No fallback. */
-  readonly binaryPayloadCarriage?: "as-is" | "base64" | "base90" | "base91" | "base90-block";
+  readonly binaryPayloadCarriage?: "as-is" | "base64" | "base89" | "base90" | "base91" | "base90-block";
   /** Opt-in trusted decoder profile; the native default retains its exact boot bytes. */
   readonly codecProfile?: "native" | "brotli-js" | "lzma-js" | "brotli-lzma-js";
 } = {}): Promise<{
@@ -1115,7 +1115,7 @@ export async function buildCompactInlineKeelShell(input: {
   readonly codecProfile: "native" | "brotli-js" | "lzma-js" | "brotli-lzma-js";
   readonly supportedCodecs: readonly ("none" | "gzip" | "deflate" | "brotli" | "lzma")[];
   readonly decoderIntegrity?: Sha256Integrity;
-  readonly resourceProfile?: "embedded-shared-containers@1" | "embedded-shared-containers-base90@1" | "embedded-shared-containers-base91@1" | "embedded-shared-containers-base90-block@2";
+  readonly resourceProfile?: "embedded-shared-containers@1" | "embedded-shared-containers-base89@1" | "embedded-shared-containers-base90@1" | "embedded-shared-containers-base91@1" | "embedded-shared-containers-base90-block@2";
   readonly transportDecoderIntegrity?: Sha256Integrity;
   readonly containerBridge?: Uint8Array;
   readonly containerBridgeIntegrity?: Sha256Integrity;
@@ -1124,7 +1124,7 @@ export async function buildCompactInlineKeelShell(input: {
   readonly prefixIntegrity: Sha256Integrity;
   readonly suffixIntegrity: Sha256Integrity;
 }> {
-  if (input.binaryPayloadCarriage !== undefined && !["as-is", "base64", "base90", "base91", "base90-block"].includes(input.binaryPayloadCarriage)) throw new TypeError("Invalid binary payload carriage.");
+  if (input.binaryPayloadCarriage !== undefined && !["as-is", "base64", "base89", "base90", "base91", "base90-block"].includes(input.binaryPayloadCarriage)) throw new TypeError("Invalid binary payload carriage.");
   if (input.binaryPayloadCarriage !== undefined && !input.embeddedContainerDelivery) throw new TypeError("Binary payload carriage requires an embedded container profile.");
   if (input.embeddedContainerDelivery && input.onchainDelivery) throw new TypeError("Select exactly one KEEL delivery profile.");
   if (input.embeddedContainerDelivery && (!Number.isSafeInteger(input.embeddedContainerDelivery.chainId) || input.embeddedContainerDelivery.chainId <= 0
@@ -1148,7 +1148,7 @@ export async function buildCompactInlineKeelShell(input: {
     ...(codecProfile === "lzma-js" || codecProfile === "brotli-lzma-js" ? ["lzma" as const] : []),
   ];
   const decoderModule = codecs.length ? await buildKeelDecoderModule({ codecs }) : undefined;
-  const transportProfile = input.binaryPayloadCarriage === "base90-block" ? "base90-block-v2" : input.binaryPayloadCarriage === "base90" ? "base90-v1" : input.binaryPayloadCarriage === "base91" ? "base91-v1" : undefined;
+  const transportProfile = input.binaryPayloadCarriage === "base89" ? "base89-v1" : input.binaryPayloadCarriage === "base90-block" ? "base90-block-v2" : input.binaryPayloadCarriage === "base90" ? "base90-v1" : input.binaryPayloadCarriage === "base91" ? "base91-v1" : undefined;
   const transportModule = transportProfile ? await buildKeelDenseTransportDecoder() : undefined;
   let runtimeSource = compactInlineRuntime.toString();
   if (decoderModule || input.onchainDelivery || input.embeddedContainerDelivery) {
@@ -1251,7 +1251,7 @@ export async function buildCompactInlineKeelShell(input: {
   const suffix = utf8ToBytes(`];${runtime}</script></body></html>`);
   const [prefixIntegrity, suffixIntegrity] = await Promise.all([sha256Integrity(prefix), sha256Integrity(suffix)]);
   const containerBridge = input.embeddedContainerDelivery ? utf8ToBytes("];globalThis.__KEEL_ITEMS__=[null") : undefined;
-  return { prefix, suffix, prefixIntegrity, suffixIntegrity, ...(containerBridge ? { resourceProfile: transportProfile === "base90-block-v2" ? "embedded-shared-containers-base90-block@2" as const : transportProfile === "base90-v1" ? "embedded-shared-containers-base90@1" as const : transportProfile === "base91-v1" ? "embedded-shared-containers-base91@1" as const : "embedded-shared-containers@1" as const, containerBridge,
+  return { prefix, suffix, prefixIntegrity, suffixIntegrity, ...(containerBridge ? { resourceProfile: transportProfile === "base89-v1" ? "embedded-shared-containers-base89@1" as const : transportProfile === "base90-block-v2" ? "embedded-shared-containers-base90-block@2" as const : transportProfile === "base90-v1" ? "embedded-shared-containers-base90@1" as const : transportProfile === "base91-v1" ? "embedded-shared-containers-base91@1" as const : "embedded-shared-containers@1" as const, containerBridge,
     containerBridgeIntegrity: await sha256Integrity(containerBridge) } : {}), deliveryProfile: input.onchainDelivery ? "onchain-recursive" : "embedded-assembled", codecProfile, supportedCodecs: ["none", "gzip", "deflate", ...codecs], ...(decoderModule ? { decoderIntegrity: decoderModule.integrity } : {}), ...(transportModule ? { transportDecoderIntegrity: transportModule.integrity } : {}) };
 }
 

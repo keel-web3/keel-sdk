@@ -1,0 +1,243 @@
+<!doctype html>
+<meta charset="utf-8">
+<title>FX sheet</title>
+<style>
+  body { margin: 0; background: #16161c; color: #cfd0d8; font: 12px/1.4 ui-monospace, Menlo, monospace; }
+  header { padding: 10px 14px; display: flex; flex-wrap: wrap; gap: 12px; align-items: center; position: sticky; top: 0; background: #16161ce8; z-index: 1; }
+  header label { display: flex; gap: 6px; align-items: center; }
+  button { background: #2c2c36; color: inherit; border: 1px solid #44444f; padding: 3px 10px; cursor: pointer; }
+  #sheet { padding: 0 14px 20px; }
+  .row { display: flex; gap: 6px; margin-bottom: 6px; align-items: flex-start; }
+  .who { width: 150px; flex: none; padding-top: 4px; }
+  .who b { color: #fff; }
+  .who small { display: block; color: #8a8b96; }
+  .cell { position: relative; }
+  .cell canvas { display: block; width: 160px; height: 160px; image-rendering: pixelated; }
+  .cell span { position: absolute; left: 3px; top: 2px; font-size: 10px; color: #fff; text-shadow: 0 0 2px #000, 0 0 2px #000; }
+  .cell i { position: absolute; right: 3px; bottom: 2px; font-size: 10px; font-style: normal; text-shadow: 0 0 2px #000, 0 0 2px #000; }
+  .bad { color: #ff7070; } .ok { color: #8ef0a0; }
+  #perf, #status { color: #8a8b96; white-space: pre; }
+</style>
+<header>
+  <b>FX sheet</b>
+  <label>time <input id="time" type="range" min="0" max="4" step="0.05" value="0.6"></label>
+  <label><input id="anim" type="checkbox"> animate (cycling, water)</label>
+  <button id="save">save PNGs to out/fx-sheet/</button>
+  <button id="perfBtn">measure ms/frame</button>
+  <span id="status"></span>
+</header>
+<div id="perf"></div>
+<div id="sheet"></div>
+<script type="module">
+// One test scene -- boxes, a wedge ramp (and a steep one), water, capsules
+// standing in for a character, an emissive rail and a lamp, a few sparks --
+// drawn at 32 / 64 / 128 / 256 through each fx pass (src/fx), each cell
+// checked palette-true (every pixel a palette entry). `sheet` on the window
+// drives it: sheet.render(), sheet.save(), sheet.perf().
+import { createPixelRenderer } from "../src/gpu/pixel-renderer.js";
+import { ALL_FX } from "../src/fx/fx.js";
+
+const $ = (id) => document.getElementById(id);
+const SIZES = [32, 64, 128, 256];
+
+function oklchToRgb(L, C, h) {
+  const a = C * Math.cos((h * Math.PI) / 180);
+  const b = C * Math.sin((h * Math.PI) / 180);
+  const l = (L + 0.3963377774 * a + 0.2158037573 * b) ** 3;
+  const m = (L - 0.1055613458 * a - 0.0638541728 * b) ** 3;
+  const s = (L - 0.0894841775 * a - 1.291485548 * b) ** 3;
+  const lin = [4.0767416621 * l - 3.3077115913 * m + 0.2309699292 * s, -1.2684380046 * l + 2.6097574011 * m - 0.3413193965 * s, -0.0041960863 * l - 0.7034186147 * m + 1.707614701 * s];
+  return lin.map((v) => { const c = Math.max(0, Math.min(1, v)); return Math.round(255 * (c <= 0.0031308 ? 12.92 * c : 1.055 * c ** (1 / 2.4) - 0.055)); });
+}
+const ramp = (n, h, C, L0, L1, turn = 0) => Array.from({ length: n }, (_, i) => { const k = i / (n - 1); return oklchToRgb(L0 + (L1 - L0) * k, C * Math.sin(Math.PI * (0.15 + 0.7 * k)), h + turn * (k - 0.5)); });
+const LIST = {
+  stone: ramp(8, 250, 0.018, 0.16, 0.86, 10), rail: ramp(5, 230, 0.03, 0.3, 0.92), dark: ramp(3, 280, 0.02, 0.08, 0.3),
+  water: ramp(8, 172, 0.13, 0.12, 0.93, -20), sky: ramp(6, 45, 0.035, 0.08, 0.7, 20), fur: ramp(5, 80, 0.03, 0.55, 0.98),
+  jacket: ramp(5, 180, 0.12, 0.3, 0.8, 15), spark: ramp(5, 40, 0.19, 0.55, 0.97, 60), glow: ramp(5, 70, 0.14, 0.55, 0.98, 20),
+  neon: ramp(6, 330, 0.2, 0.35, 0.92, 30), ramp: ramp(6, 30, 0.06, 0.25, 0.8, 10), white: ramp(3, 90, 0.01, 0.9, 1),
+  // (Night twins for the grade pass, and a long ramp: 64 entries, dithered like any other.)
+  stoneNight: ramp(8, 265, 0.03, 0.08, 0.55, 10), waterNight: ramp(8, 220, 0.09, 0.08, 0.6, -20), skyNight: ramp(6, 270, 0.05, 0.05, 0.4, 10),
+  smooth: ramp(64, 300, 0.12, 0.2, 0.9, 80),
+};
+const colours = [];
+const ramps = {};
+for (const [name, r] of Object.entries(LIST)) { ramps[name] = [colours.length, r.length]; colours.push(...r); }
+const MATERIALS = [
+  { ramp: "stone", light: 1, pattern: 1 }, { ramp: "stone", light: 0.9, pattern: 1 }, { ramp: "rail", light: 1, glow: 0.35 }, { ramp: "dark", light: 0.8 },
+  { ramp: "water" }, { ramp: "sky" }, { ramp: "fur", light: 1.1 }, { ramp: "jacket", light: 1 }, { ramp: "ramp", light: 1 }, { ramp: "glow", light: 0.6, glow: 0.6 },
+  { ramp: "neon", light: 0.7, glow: 0.4 }, { ramp: "smooth", light: 1.2 },
+];
+
+// ---- the scene
+const boxes = [];
+const slab = (x0, x1, z0, z1, top, mat = 1) => boxes.push({ c: [(x0 + x1) / 2, top - 1.5, (z0 + z1) / 2], h: [(x1 - x0) / 2, 1.5, (z1 - z0) / 2], mat });
+slab(-4, 4, -3, 6, 0.35);
+slab(-4, 4, 11, 16, 1.95);
+boxes.push({ c: [-3.8, 2.5, 7], h: [0.25, 4, 5], mat: 0 }, { c: [4.5, 3, 9], h: [0.3, 4.5, 2.5], yaw: 0.35, mat: 0 }, { c: [2.4, 0.95, 3.2], h: [0.3, 0.6, 0.3], yaw: 0.6, mat: 10 });
+// A ramp from the near pad up to the far one (its foot at +z local: turned PI so it climbs toward +z), and a steep one.
+const wedges = [
+  { c: [0, 0.35 + 0.8, 8.5], h: [1.6, 0.8, 2.5], yaw: Math.PI, lo: 0, mat: 8 },
+  { c: [-2.2, 0.35 + 0.9, 3.8], h: [0.8, 0.9, 0.9], yaw: Math.PI / 2, mat: 0 },
+];
+const capsules = [];
+// (A figure of capsules: legs, body, arms, head -- the character's stand-in.)
+const fig = (x, z, mat, head) => {
+  capsules.push({ a: [x - 0.12, 0.45, z], b: [x - 0.12, 0.85, z], r: 0.09, mat: 3 }, { a: [x + 0.12, 0.45, z], b: [x + 0.12, 0.85, z], r: 0.09, mat: 3 });
+  capsules.push({ a: [x, 1.0, z], b: [x, 1.35, z], r: 0.2, mat }, { a: [x - 0.28, 1.3, z], b: [x - 0.35, 0.95, z + 0.1], r: 0.07, mat }, { a: [x + 0.28, 1.3, z], b: [x + 0.4, 1.0, z - 0.1], r: 0.07, mat });
+  capsules.push({ a: [x, 1.62, z], b: [x, 1.64, z], r: 0.19, mat: head });
+};
+fig(0.6, 1.2, 7, 6);
+fig(-1.4, 5.8, 10, 6);
+// The emissive rail over the water, and a lamp.
+for (let k = 0; k < 8; k += 1) capsules.push({ a: [4.2, 1.1 + 0.08 * k, -1 + k * 1.6], b: [4.2, 1.1 + 0.08 * (k + 1), -1 + (k + 1) * 1.6], r: 0.07, mat: 2 });
+capsules.push({ a: [-2.2, 0.35, 1.5], b: [-2.2, 2.3, 1.5], r: 0.06, mat: 3 }, { a: [-2.2, 2.45, 1.5], b: [-2.2, 2.46, 1.5], r: 0.18, mat: 9 });
+// A ball on the far pad, on the 64-entry ramp.
+capsules.push({ a: [1.8, 2.5, 13], b: [1.8, 2.52, 13], r: 0.5, mat: 11 });
+const particles = Array.from({ length: 24 }, (_, i) => ({ p: [4.2 + Math.sin(i * 2.1) * 0.3, 1.3 + ((i * 37) % 10) * 0.05, 2 + (i % 8) * 0.25], size: 0.7, light: 0.9, ramp: "spark", glow: 0.8 }));
+const VIEW = { eye: [2.6, 3.6, -6.5], target: [0.2, 1.2, 4.5], fov: 1.1, sun: [0.45, 0.8, 0.35], waterY: 0, fogNear: 30, fogFar: 120 };
+
+// ---- the rows: each an fx list (and a style)
+const ROWS = [
+  ["base", "no fx: the style's screen and outline", []],
+  ["fog", "to the sky ramp from 6 m", [{ name: "fog", ramp: "sky", near: 6, far: 22, light: 0.35 }]],
+  ["glow", "emissive climbs; halo climbs what's near", [{ name: "glow" }]],
+  ["glow tint", "the halo wears the glow's ramp", [{ name: "glow", tint: true, radius: 4 }]],
+  ["rim", "edges on the sun's side climb", [{ name: "rim", steps: 2 }]],
+  ["flash", "materials 6, 7 struck (0.8)", [{ name: "flash", amount: 0.8, mats: [6, 7] }]],
+  ["vignette", "dithered darkening", [{ name: "vignette", steps: 2.5 }]],
+  ["scanlines", "from 96 px", [{ name: "scanlines" }]],
+  ["crt", "bend, from 64 px", [{ name: "crt", curve: 0.12, border: { ramp: "dark", index: 0 } }]],
+  ["grade dusk", "shift -0.6", [{ name: "grade", preset: "dusk" }]],
+  ["grade night", "ramps swapped + shift", [{ name: "grade", preset: "night", map: { stone: "stoneNight", water: "waterNight", sky: "skyNight" } }]],
+  ["cycle", "water + neon turn over", [{ name: "cycle", ramps: { water: { speed: 4, from: 0.4 }, neon: { speed: 6, from: 0.3 } } }]],
+  ["dither stipple", "blue noise", [{ name: "dither", screen: "stipple" }]],
+  ["dither halftone", "dot family", [{ name: "dither", screen: "dot" }]],
+  ["dither lines", "line family", [{ name: "dither", screen: "line" }]],
+  ["dither none", "flat steps", [{ name: "dither", screen: "none" }]],
+  ["outline outer", "silhouettes only", [{ name: "outline", mode: "outer" }]],
+  ["outline ink", "one colour", [{ name: "outline", color: { ramp: "neon", index: 1 } }]],
+  ["outline none", "", [{ name: "outline", mode: "none" }]],
+  ["all fx", "src/fx ALL_FX", ALL_FX()],
+];
+
+const gl = document.createElement("canvas");
+const px = createPixelRenderer(gl, { width: 128, height: 128 });
+px.setPalette(colours, ramps);
+px.setMaterials(MATERIALS);
+const styleFor = (size) => ({ screen: size <= 48 ? 2 : size <= 128 ? 4 : 8, dither: 0.9, outline: 1 });
+const cells = {};
+const sheet = $("sheet");
+for (const [name, note] of ROWS) {
+  const row = document.createElement("div");
+  row.className = "row";
+  row.innerHTML = `<div class="who"><b>${name}</b><small>${note}</small></div>`;
+  for (const s of SIZES) {
+    const cell = document.createElement("div");
+    cell.className = "cell";
+    const c = document.createElement("canvas");
+    c.width = s; c.height = s;
+    cell.append(c);
+    cell.insertAdjacentHTML("beforeend", `<span>${s}</span><i></i>`);
+    row.append(cell);
+    cells[`${name}|${s}`] = { c, tag: cell.querySelector("i") };
+  }
+  sheet.append(row);
+}
+
+function draw(fx, size, time) {
+  if (px.width !== size) px.setTarget(size, size);
+  px.setStyle(styleFor(size));
+  px.setFx(fx);
+  px.setWorld({ boxes, wedges, capsules });
+  px.render({ ...VIEW, time, particles });
+}
+
+const results = {};
+function render(time = +$("time").value) {
+  for (const [name, , fx] of ROWS) {
+    for (const s of SIZES) {
+      draw(fx, s, time);
+      const { c, tag } = cells[`${name}|${s}`];
+      c.getContext("2d").drawImage(gl, 0, 0);
+      const off = px.offPalette();
+      const skipped = px.fxResolved.filter((p) => !p.on).map((p) => `${p.name}: ${p.note}`);
+      results[`${name}|${s}`] = { off, skipped };
+      tag.className = off === 0 ? "ok" : "bad";
+      tag.textContent = (off === 0 ? "palette ✓" : `${off} off`) + (skipped.length ? ` · ${skipped.join(", ")}` : "");
+    }
+  }
+  return results;
+}
+
+async function save(prefix = "fx-sheet") {
+  const names = [];
+  for (const key of Object.keys(cells)) {
+    const [name, s] = key.split("|");
+    const blob = await new Promise((r) => cells[key].c.toBlob(r, "image/png"));
+    const file = `${prefix}/${name.replace(/\s+/g, "-")}-${s}.png`;
+    await fetch(`../out/${file}`, { method: "PUT", body: blob });
+    names.push(file);
+  }
+  // And the whole sheet in one picture (each cell at 2x its 128 slot).
+  const cols = SIZES.length;
+  const big = document.createElement("canvas");
+  big.width = cols * 256; big.height = ROWS.length * 256;
+  const g = big.getContext("2d");
+  g.imageSmoothingEnabled = false;
+  ROWS.forEach(([name], r) => SIZES.forEach((s, k) => g.drawImage(cells[`${name}|${s}`].c, k * 256, r * 256, 256, 256)));
+  const blob = await new Promise((r) => big.toBlob(r, "image/png"));
+  await fetch(`../out/${prefix}/sheet.png`, { method: "PUT", body: blob });
+  names.push(`${prefix}/sheet.png`);
+  $("status").textContent = `saved ${names.length} PNGs to out/${prefix}/`;
+  return names;
+}
+
+// ms per frame: the GPU timer query where it exists, else the CPU round trip (a 1-pixel read each frame).
+async function perf(frames = 60) {
+  const out = {};
+  const timer = px.gl.getExtension("EXT_disjoint_timer_query_webgl2");
+  const one = new Uint8Array(4);
+  for (const size of [128, 256]) {
+    for (const [label, fx] of [["base", []], ["all fx", ALL_FX()]]) {
+      draw(fx, size, 0.5);
+      let gpu = null;
+      if (timer) {
+        const qs = [];
+        for (let i = 0; i < frames; i += 1) {
+          const q = px.gl.createQuery();
+          px.gl.beginQuery(timer.TIME_ELAPSED_EXT, q);
+          draw(fx, size, 0.5 + i / 60);
+          px.gl.endQuery(timer.TIME_ELAPSED_EXT);
+          qs.push(q);
+        }
+        // (Results arrive a little later; wait for the lot at once -- a background tab's timers are slow.)
+        const t0q = performance.now();
+        while (performance.now() - t0q < 4000 && !px.gl.getQueryParameter(qs[qs.length - 1], px.gl.QUERY_RESULT_AVAILABLE)) await new Promise((r) => setTimeout(r, 30));
+        const t = [];
+        for (const q of qs) {
+          if (px.gl.getQueryParameter(q, px.gl.QUERY_RESULT_AVAILABLE) && !px.gl.getParameter(timer.GPU_DISJOINT_EXT)) t.push(px.gl.getQueryParameter(q, px.gl.QUERY_RESULT) / 1e6);
+          px.gl.deleteQuery(q);
+        }
+        t.sort((a, b) => a - b);
+        gpu = t.length ? +t[Math.floor(t.length / 2)].toFixed(3) : null;
+      }
+      const t0 = performance.now();
+      for (let i = 0; i < frames; i += 1) { draw(fx, size, 0.5 + i / 60); px.gl.readPixels(0, 0, 1, 1, px.gl.RGBA, px.gl.UNSIGNED_BYTE, one); }
+      const cpu = +((performance.now() - t0) / frames).toFixed(3);
+      out[`${size} ${label}`] = { gpuMedianMs: gpu, roundTripMs: cpu };
+    }
+  }
+  $("perf").textContent = `ms/frame (GPU median via EXT_disjoint_timer_query_webgl2 ${timer ? "on" : "unavailable"}; round trip = draw + 1 px read):\n` + Object.entries(out).map(([k, v]) => `  ${k.padEnd(12)} gpu ${v.gpuMedianMs ?? "-"}  round trip ${v.roundTripMs}`).join("\n");
+  render();
+  return out;
+}
+
+$("time").oninput = () => render();
+$("save").onclick = () => save();
+$("perfBtn").onclick = () => perf();
+let t = +$("time").value;
+function loop() { if ($("anim").checked) { t = (t + 1 / 20) % 4; $("time").value = t; render(t); } setTimeout(loop, 100); }
+loop();
+render();
+globalThis.sheet = { render, save, perf, results, px, ROWS };
+</script>

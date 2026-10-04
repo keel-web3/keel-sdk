@@ -4,6 +4,7 @@
 // the builder's pack-file export (packs/<id>.ts). Destructive op batches are
 // named here, so the agent tools send them through a review card first.
 import { z } from 'zod';
+import {styledImportable} from './styled-asset-project.mjs';
 export { opsHash } from './builder-ops-hash.mjs';
 
 export const BUILD_FORMAT = 'keel-game-build@1';
@@ -19,8 +20,8 @@ const savedOps = z.array(builderOp).max(20000);
 export const BUILDER_PREVIEW_HOST = 'game-builder';
 export const BUILDER_PREVIEW_URL = `keel-preview://${BUILDER_PREVIEW_HOST}/index.html`;
 /** File types a 3D import reads (the engine's import tells formats from the bytes; these are what the picker offers). */
-export const IMPORT_EXTENSIONS = ['glb', 'gltf', 'obj', 'stl', 'vox'];
-export const importable = (name = '') => IMPORT_EXTENSIONS.includes(String(name).toLowerCase().split('.').pop() ?? '');
+export const IMPORT_EXTENSIONS = ['glb', 'gltf', 'obj', 'stl', 'vox', 'keelasset'];
+export const importable = (name = '') => styledImportable(name) || IMPORT_EXTENSIONS.includes(String(name).toLowerCase().split('.').pop() ?? '');
 
 export const builderKey = (projectId, name) => `${projectId}/${name}`;
 export const buildFileName = (name) => `builds/${name}.build.json`;
@@ -104,5 +105,5 @@ export async function importBytes(store, id) {
   if (!object) throw Error('Import this file into KEEL first (Files, or the Import panel\'s file picker).');
   if (object.byteLength > MAX_IMPORT_BYTES) throw Error(`${object.name} is ${Math.round(object.byteLength / 1048576)} MB; the 3D import reads files up to ${MAX_IMPORT_BYTES / 1048576} MB.`);
   await store.verifyObject(id);
-  return { name: object.name.replace(/\.[^.]+$/, ''), bytes: new Uint8Array(store.object(id)) };
+  return { name: object.name.replace(/\.[^.]+$/, ''), fileName: object.name, bytes: new Uint8Array(store.object(id)) };
 }

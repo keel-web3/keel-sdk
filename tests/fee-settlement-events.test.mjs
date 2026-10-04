@@ -1,4 +1,7 @@
-import test from 'node:test';
+import nodeTest from 'node:test';
+import { siblingRepositories, siblingTest } from "./sibling-repository.mjs";
+const test = siblingTest(nodeTest, "keel-contracts");
+const siblings = siblingRepositories("keel-contracts");
 import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
 import {parseAbi,decodeEventLog,erc20Abi} from 'viem';
@@ -22,7 +25,7 @@ for(const [name,abi,generated,module] of [['KeelFeeTreasury',keelFeeTreasuryAbi,
   }
  });
 }
-const evidence=read(base+'receipts.json');
+const evidence=siblings.skip === false ? read(base+'receipts.json') : undefined;
 test('treasury real receipt logs identify the asset and recipient after indexed-field reordering',()=>{
  for(const row of evidence.records.filter(r=>r.label.startsWith('treasury sweep '))) {
   const transfers=row.logs.flatMap(log=>{try{return [decodeEventLog({abi:erc20Abi,...log})]}catch{return []}}).filter(e=>e.eventName==='Transfer');

@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { spawn } from "node:child_process";
+import { spawn, spawnSync } from "node:child_process";
 import { once } from "node:events";
 
 import { createMcpServer, toolByName } from "../packages/mcp/dist/index.js";
@@ -59,8 +59,11 @@ async function setCode(rpcUrl, address, code) {
 }
 
 const HEALTH_AT = "0x00000000000000000000000000000000000da7a0";
+const anvilAvailable = spawnSync("anvil", ["--version"], { stdio: "ignore" }).status === 0;
 
-test("the MCP tool declares reads, performs them, and hands back a verified init fragment", async () => {
+test("the MCP tool declares reads, performs them, and hands back a verified init fragment", {
+  skip: anvilAvailable ? false : "Anvil is not installed",
+}, async () => {
   await withAnvil(async (rpcUrl) => {
     await setCode(rpcUrl, HEALTH_AT, returns(125n, 25n));
     const server = await createMcpServer({ workspaceRoot: "." });

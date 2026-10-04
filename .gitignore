@@ -17,3 +17,5 @@ examples/game-engine/*/tools/dist/
 /keel-sdk
 __pycache__/
 *.pyc
+# Local friend-test workspace and generated machine-specific MCP connections.
+.keel-workspace/

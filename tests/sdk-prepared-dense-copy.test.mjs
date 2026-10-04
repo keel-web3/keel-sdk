@@ -3,7 +3,7 @@ import {buildKeelPreparedDenseCopyShell,inspectKeelInlinePayloadCarriage,inspect
 const sha=bytes=>'0x'+createHash('sha256').update(bytes).digest('hex');
 const delivery={chainId:11155111,store:'0x1111111111111111111111111111111111111111'};
 async function fixture(carriage='base90'){
- const shell=await buildKeelPreparedDenseCopyShell({codecProfile:'lzma-js',embeddedContainerDelivery:delivery,binaryPayloadCarriage:carriage});const profile={base90:'base90-v1',base91:'base91-v1','base90-block':'base90-block-v2'}[carriage];
+ const shell=await buildKeelPreparedDenseCopyShell({codecProfile:'lzma-js',embeddedContainerDelivery:delivery,binaryPayloadCarriage:carriage});const profile={base89:'base89-v1',base90:'base90-v1',base91:'base91-v1','base90-block':'base90-block-v2'}[carriage];
  const bytes=randomBytes(4096),pack={containerId:'0x'+'22'.repeat(32),objectId:'0x'+'33'.repeat(32),storedIntegrity:{algorithm:'sha256',digest:sha(bytes),byteLength:bytes.length},storedDense:encodeKeelDenseTransport(bytes,profile)};
  const item={id:'example',onchain:{containerId:pack.containerId,offset:0}};
  const body=Buffer.from(shell.prefix).toString()+serializeKeelDenseTransportJSON(pack)+Buffer.from(shell.containerBridge).toString()+','+serializeKeelDenseTransportJSON(item)+Buffer.from(shell.suffix).toString();return{shell,bytes,profile,pack,body};
@@ -12,7 +12,7 @@ test('prepared dense shell defaults to Base90 and rejects incompatible explicit 
  const shell=await buildKeelPreparedDenseCopyShell({embeddedContainerDelivery:delivery});assert.equal(shell.payloadPreparation,'build-time');assert.equal(shell.contractOperation,'verified-copy');assert.equal(shell.resourceProfile,'embedded-shared-containers-base90@1');assert.equal(shell.shellBootEncoding,'base64');
  for(const binaryPayloadCarriage of ['as-is','base64'])await assert.rejects(buildKeelPreparedDenseCopyShell({embeddedContainerDelivery:delivery,binaryPayloadCarriage}),/dense payload format/);
 });
-for(const carriage of ['base90','base91','base90-block'])test(`${carriage}: inspect literal shell framing and exact packed commitments without execution`,async()=>{
+for(const carriage of ['base89','base90','base91','base90-block'])test(`${carriage}: inspect literal shell framing and exact packed commitments without execution`,async()=>{
  const f=await fixture(carriage),unwrapped=inspectKeelPreparedDenseCopyDocument(f.body);assert.equal(unwrapped.transportProfile,f.profile);assert.match(unwrapped.html,/globalThis\.__KEEL_EMBEDDED_CONTAINERS__/);const audit=inspectKeelInlinePayloadCarriage(Buffer.from(f.body));assert.equal(audit.payloadCount,1);assert.equal(audit.packedPayloadBytes,f.bytes.length);assert.equal(audit.payloads[0].encoding,'dense');assert.equal(audit.preparedDenseCopy.contractOperation,'verified-copy');assertKeelFreshPayloadCarriage(Buffer.from(f.body));assertKeelFreshPayloadAudit(audit);
  const changed=f.body.replace(f.pack.storedIntegrity.digest,'0x'+'00'.repeat(32));assert.throws(()=>inspectKeelInlinePayloadCarriage(Buffer.from(changed)),/stored commitment/);
  const invalid=structuredClone(audit);invalid.preparedDenseCopy.payloadPreparation='read-time';assert.throws(()=>assertKeelFreshPayloadAudit(invalid),/prepared dense COPY audit/);

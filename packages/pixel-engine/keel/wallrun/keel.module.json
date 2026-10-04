@@ -1,0 +1,30 @@
+{
+  "schema": "keel-agent-project-declaration@1",
+  "module": {
+    "schema": "keel-module@1",
+    "name": "Wallrun",
+    "kind": "app",
+    "target": {
+      "raw": "@keel/eth/sepolia/browser",
+      "family": "eth",
+      "network": "sepolia",
+      "surface": "browser"
+    },
+    "use": [],
+    "modules": [],
+    "moduleBindings": [],
+    "assets": {},
+    "npm": {},
+    "verification": {
+      "shell": true
+    }
+  },
+  "resources": {
+    "wallrun.js": {
+      "sha256": "0xb3df3b3b845c3e0edc8a795addebd46a5aab4454162b6dd4a8e9d665de01e11c",
+      "byteLength": 365971
+    }
+  },
+  "storageStrategy": "onchain",
+  "immutable": true
+}

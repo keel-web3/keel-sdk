@@ -4,8 +4,11 @@ import { readFile } from "node:fs/promises";
 import path from "node:path";
 import test from "node:test";
 import { siteRoot } from "../scripts/run.mjs";
+import { siblingTest } from "./sibling-repository.mjs";
 
-test("Studio structure accepts canonical and idempotent Drizzle CREATE TABLE migrations", async () => {
+const siteTest = siblingTest(test, "keel-site");
+
+siteTest("Studio structure accepts canonical and idempotent Drizzle CREATE TABLE migrations", async () => {
   const [checker, migration] = await Promise.all([
     readFile(new URL("../scripts/studio-structure-check.mjs", import.meta.url), "utf8"),
     readFile(path.join(siteRoot, "apps/studio/drizzle/0004_vault_character_index.sql"), "utf8"),

@@ -29,11 +29,14 @@
  * HTML script delimiters must still be escaped by the enclosing serializer.
  * See docs/KEEL_DENSE_TRANSPORT.md for the format and BSD attribution.
  */
-export type KeelDenseTransportProfile = "base90-v1" | "base91-v1" | "base90-block-v2";
+export type KeelDenseTransportProfile = "base89-v1" | "base90-v1" | "base91-v1" | "base90-block-v2";
 export const KEEL_BASE90_ALPHABET = "!$&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[]^_`abcdefghijklmnopqrstuvwxyz{|}~";
+// Base89 additionally omits the URI query delimiter, avoiding escapes at both URI layers.
+export const KEEL_BASE89_ALPHABET = KEEL_BASE90_ALPHABET.replace("?", "");
 export const KEEL_BASE91_ALPHABET = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!#$%&()*+,./:;<=>?@[]^_`{|}~"';
 const MAX_BYTES = 4 * 1024 * 1024;
 function parameters(profile: KeelDenseTransportProfile) {
+  if (profile === "base89-v1") return { alphabet: KEEL_BASE89_ALPHABET, radix: 89, bits: 12, mask: 4095, threshold: 3824 };
   if (profile === "base90-v1") return { alphabet: KEEL_BASE90_ALPHABET, radix: 90, bits: 12, mask: 4095, threshold: 4003 };
   if (profile === "base91-v1") return { alphabet: KEEL_BASE91_ALPHABET, radix: 91, bits: 13, mask: 8191, threshold: 88 };
   throw new TypeError("Unsupported KEEL dense transport profile.");

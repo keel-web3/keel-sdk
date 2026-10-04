@@ -1,0 +1,213 @@
+<!doctype html>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>GARDEN</title>
+<style>
+  :root { color-scheme: dark; }
+  html, body { margin: 0; height: 100%; background: #0b0d0c; color: #cfd6d0; font: 12px/1.45 ui-monospace, Menlo, monospace; }
+  body { display: grid; grid-template-columns: minmax(0, 1fr) 330px; }
+  #stage { display: grid; place-items: center; min-height: 0; min-width: 0; position: relative; }
+  canvas { width: min(100%, 100dvh); aspect-ratio: 1; image-rendering: pixelated; background: #000; }
+  #hud { position: absolute; left: 10px; top: 8px; color: #e8efe9; text-shadow: 0 1px 2px #000; pointer-events: none; }
+  aside { border-left: 1px solid #1d2320; padding: 10px 12px; overflow: auto; }
+  h2 { font-size: 11px; letter-spacing: .08em; color: #7d8a82; margin: 14px 0 6px; font-weight: normal; text-transform: uppercase; }
+  .row { display: grid; grid-template-columns: 92px 1fr auto; gap: 6px; align-items: center; margin: 4px 0; }
+  .row small { color: #6f7a73; }
+  select, input, button { background: #121614; color: inherit; border: 1px solid #28302c; border-radius: 4px; padding: 3px 6px; font: inherit; }
+  input[type=text] { width: 100%; box-sizing: border-box; }
+  label.lock { display: flex; gap: 3px; align-items: center; color: #9fb3a6; }
+  pre { white-space: pre-wrap; background: #0f1311; border: 1px solid #1d2320; padding: 6px; margin: 4px 0; font-size: 11px; color: #aebdb3; max-height: 320px; overflow: auto; }
+  .fx { display: flex; gap: 8px; flex-wrap: wrap; }
+  #warn { color: #d9b36b; }
+  @media (max-width: 760px) {
+    html, body { height: auto; }
+    body { grid-template-columns: 1fr; }
+    canvas { width: 100%; }
+    aside { border-left: 0; border-top: 1px solid #1d2320; }
+  }
+</style>
+<div id="stage"><canvas id="c"></canvas><div id="hud"></div></div>
+<aside>
+  <div class="row"><span>seed</span><input id="seed" type="text"><button id="dice" title="another seed">new</button></div>
+  <div class="row"><span>pixels</span><select id="px"><option>32</option><option>48</option><option>64</option><option>96</option><option selected>128</option><option>192</option><option>256</option></select><span></span></div>
+  <small>click the picture to drive (W is where the camera looks, space jumps); idle 8 s and the hero strolls</small>
+
+  <h2>Filters · scene scope</h2>
+  <div class="row"><span>palette</span><select id="palette"><option value="">(project)</option><option>meadow</option><option>dusk</option><option>moss</option><option>noir</option></select><label class="lock"><input type="checkbox" data-lock="palette">lock</label></div>
+  <div class="row"><span>dither</span><select id="dither"><option value="">(auto)</option><option value="0">none</option><option>2</option><option>4</option><option>8</option></select><label class="lock"><input type="checkbox" data-lock="dither">lock</label></div>
+  <div class="row"><span>fx</span><span class="fx"><label><input type="checkbox" data-fx="dusk">dusk</label><label><input type="checkbox" data-fx="mist">mist</label><label><input type="checkbox" data-fx="lantern">lantern</label><label><input type="checkbox" data-fx="glow">glow</label><label><input type="checkbox" data-fx="vignette">vignette</label><label><input type="checkbox" data-fx="scanlines">scanlines</label></span><label class="lock"><input type="checkbox" data-lock="fx">lock</label></div>
+
+  <h2>Systems</h2>
+  <div class="row"><span>camera</span><select id="camera"><option value="">(auto)</option><option>orbit</option><option>chase</option><option>frame</option><option>first</option></select><label class="lock"><input type="checkbox" data-lock="camera">lock</label></div>
+  <div class="row"><span>particles</span><select id="particles"><option value="">(on)</option><option value="false">off</option></select><label class="lock"><input type="checkbox" data-lock="particles">lock</label></div>
+
+  <h2>Items · regenerate, the rest stays</h2>
+  <div class="row"><span>animals</span><select id="animal"><option value="">(seed)</option><option>cat</option><option>dog</option><option>fox</option><option>bear</option><option>rabbit</option><option>mouse</option><option>deer</option></select><label class="lock"><input type="checkbox" data-lock="animal" checked>lock</label></div>
+  <div class="row"><span>hero</span><select id="hero"><option value="">(seed)</option><option>cat</option><option>fox</option><option>bunny</option><option>bear</option><option>mouse</option><option>frog</option><option>dog</option></select><label class="lock"><input type="checkbox" data-lock="hero" checked>lock</label></div>
+
+  <h2>Per object</h2>
+  <div class="row"><select id="obj"></select><select id="mat"><option value="">(seed)</option><option>oak</option><option>teak</option><option>paint</option><option>metal</option><option>hedge</option></select><label class="lock"><input type="checkbox" data-lock="mat" checked>lock</label></div>
+  <div class="row"><span>show</span><select id="show"><option value="">(yes)</option><option value="false">hidden</option></select><span></span></div>
+
+  <h2>Locks (URL)</h2>
+  <input id="locks" type="text" spellcheck="false">
+  <div id="warn"></div>
+  <h2>explain()</h2>
+  <pre id="explain"></pre>
+</aside>
+<script type="module">
+  import { createPixelRenderer } from "../../src/gpu/pixel-renderer.js";
+  import { formatLocks, parseLocks } from "../../src/world/settings.js";
+  import { gardenWorld } from "./garden.js";
+
+  const $ = (id) => document.getElementById(id);
+  const q = new URLSearchParams(location.search);
+  const px = +(q.get("px") ?? 128);
+  const canvas = $("c");
+  const renderer = createPixelRenderer(canvas, { width: px, height: px });
+  let world = null;
+  let detach = null;
+
+  // The panel's controls, each one a setting at a scope (null = not set there).
+  const CONTROLS = {
+    palette: { scope: "scene", key: "render.palette", read: () => $("palette").value || null },
+    dither: { scope: "scene", key: "render.dither.screen", read: () => ($("dither").value === "" ? null : +$("dither").value) },
+    fx: { scope: "scene", key: "render.fx", read: () => { const on = [...document.querySelectorAll("[data-fx]")].filter((b) => b.checked).map((b) => b.dataset.fx); return on.length || lockOn("fx") ? on : null; } },
+    camera: { scope: "scene", key: "system.camera.mode", read: () => $("camera").value || null },
+    particles: { scope: "scene", key: "system.particles.enabled", read: () => ($("particles").value === "false" ? false : null) },
+    animal: { scope: "tag:animal", key: "species", read: () => $("animal").value || null, item: true },
+    hero: { scope: "id:hero", key: "species", read: () => $("hero").value || null, item: true },
+  };
+  const lockOn = (name) => Boolean(document.querySelector(`[data-lock="${name}"]`)?.checked);
+  // Per object: { id: { material, lock, hidden } }, the selected one in the panel.
+  const objs = {};
+  let extra = []; // (locks typed into the URL that no control shows: kept as they are)
+
+  // The panel -> [{ scope, key, value, lock }] ("~" in the text: set without locking).
+  function panelLocks() {
+    const out = [];
+    for (const [name, c] of Object.entries(CONTROLS)) {
+      const v = c.read();
+      if (v !== null) out.push({ scope: c.scope, key: c.key, value: v, lock: lockOn(name) });
+    }
+    for (const [id, o] of Object.entries(objs)) {
+      if (o.material) out.push({ scope: `id:${id}`, key: "material", value: o.material, lock: o.lock });
+      if (o.hidden) out.push({ scope: `id:${id}`, key: "show", value: false, lock: true });
+    }
+    for (const l of extra) if (!out.some((o) => o.scope === l.scope && o.key === l.key)) out.push(l);
+    return out;
+  }
+
+  function build(seed, locks) {
+    detach?.();
+    world = gardenWorld({ seed, width: px, height: px, locks });
+    detach = world.attach(globalThis, { canvas });
+    globalThis.world = world;
+    const ids = [...world.objects.values()].filter((o) => !o.tags.includes("hedge") && !o.tags.includes("ground")).map((o) => o.id);
+    const keep = $("obj").value;
+    $("obj").innerHTML = ids.map((id) => `<option>${id}</option>`).join("");
+    $("obj").value = ids.includes(keep) ? keep : ids.find((id) => id.startsWith("bench")) ?? ids[0];
+    showObj();
+    $("warn").textContent = world.warnings.join(" · ");
+    explain();
+  }
+  // The selected object's row from `objs`.
+  function showObj() {
+    const o = objs[$("obj").value] ?? {};
+    $("mat").value = o.material ?? "";
+    document.querySelector('[data-lock="mat"]').checked = o.lock ?? true;
+    $("show").value = o.hidden ? "false" : "";
+  }
+  function readObj() {
+    objs[$("obj").value] = { material: $("mat").value || null, lock: lockOn("mat"), hidden: $("show").value === "false" };
+  }
+
+  function apply({ regenerate = false } = {}) {
+    const text = formatLocks(panelLocks());
+    $("locks").value = text;
+    const url = new URL(location.href);
+    url.searchParams.set("seed", world.seed);
+    url.searchParams.set("px", String(px));
+    if (text) url.searchParams.set("lock", text); else url.searchParams.delete("lock");
+    history.replaceState(null, "", url);
+    if (regenerate) { build(world.seed, text); return; }
+    // (Live: clear what the panel writes, then write the panel again. Items need a regenerate.)
+    const clear = (scope, key) => { world.unlock(scope, key); world.unset(scope, key, { force: true }); };
+    for (const c of Object.values(CONTROLS)) clear(c.scope, c.key);
+    for (const id of world.objects.keys()) { clear(`id:${id}`, "material"); clear(`id:${id}`, "show"); }
+    const refused = world.applyLocks(text);
+    $("warn").textContent = [...world.warnings, ...refused.map((r) => `refused: ${r.key} at ${r.layer} (locked at ${r.lockedAt})`)].join(" · ");
+    explain();
+  }
+
+  function explain() {
+    const lines = [];
+    const show = (key, thing = null) => {
+      const ex = world.explain(key, thing);
+      const who = ex.locked ? `LOCKED at ${ex.lockedAt}` : `set by ${ex.layer ?? "nobody"}`;
+      lines.push(`${thing ? thing + " " : ""}${key} = ${JSON.stringify(ex.value)}  ${who}${ex.rule ? `  (${ex.rule})` : ""}`);
+      for (const c of ex.chain) lines.push(`    ${c.shadowed ? "x" : "·"} ${c.layer}: ${JSON.stringify(c.value)}${c.locked ? " (lock)" : ""}`);
+    };
+    show("render.palette"); show("render.dither.screen"); show("render.fx"); show("system.camera.mode"); show("system.particles.enabled");
+    show("species", "hero");
+    for (const e of world.entities.values()) if (e.tags.includes("animal")) show("species", e.id);
+    show("material", $("obj").value);
+    $("explain").textContent = lines.join("\n");
+  }
+
+  // ---- the panel from the URL
+  for (const l of parseLocks(q.get("lock") ?? "")) {
+    const hit = Object.entries(CONTROLS).find(([, c]) => c.scope === l.scope && c.key === l.key);
+    const box = hit && document.querySelector(`[data-lock="${hit[0]}"]`);
+    if (box) box.checked = l.lock;
+    if (hit?.[0] === "fx") for (const b of document.querySelectorAll("[data-fx]")) b.checked = l.value.includes(b.dataset.fx);
+    else if (hit) $(hit[0]).value = String(l.value);
+    else if (l.scope.startsWith("id:") && (l.key === "material" || l.key === "show")) {
+      const o = (objs[l.scope.slice(3)] ??= { material: null, lock: true, hidden: false });
+      if (l.key === "material") { o.material = l.value; o.lock = l.lock; } else o.hidden = l.value === false;
+    } else extra.push(l);
+  }
+  $("seed").value = q.get("seed") ?? "1";
+  $("px").value = String(px);
+  build($("seed").value, q.get("lock") ?? "");
+  const first = Object.keys(objs)[0];
+  if (first && world.objects.has(first)) { $("obj").value = first; showObj(); }
+  apply();
+
+  for (const [name, c] of Object.entries(CONTROLS)) if (name !== "fx") $(name).addEventListener("change", () => apply({ regenerate: Boolean(c.item) }));
+  for (const b of document.querySelectorAll("[data-fx]")) b.addEventListener("change", () => apply());
+  for (const b of document.querySelectorAll("[data-lock]")) b.addEventListener("change", () => { if (b.dataset.lock === "mat") readObj(); apply({ regenerate: Boolean(CONTROLS[b.dataset.lock]?.item) }); });
+  $("mat").addEventListener("change", () => { readObj(); apply(); });
+  $("show").addEventListener("change", () => { readObj(); apply(); });
+  $("obj").addEventListener("change", () => { showObj(); explain(); });
+  $("seed").addEventListener("change", () => { build($("seed").value, $("locks").value); apply(); });
+  $("dice").onclick = () => { $("seed").value = String(1 + Math.floor(Math.random() * 99999)); build($("seed").value, $("locks").value); apply(); };
+  $("px").onchange = () => { const url = new URL(location.href); url.searchParams.set("px", $("px").value); location.href = url; };
+  $("locks").addEventListener("change", () => { const url = new URL(location.href); url.searchParams.set("lock", $("locks").value); location.href = url; });
+
+  // ---- the loop: fixed steps for real time, then one frame
+  let last = performance.now();
+  let frames = 0;
+  let fpsAt = last;
+  let fps = 0;
+  function loop(now) {
+    requestAnimationFrame(loop);
+    world.step((now - last) / 1000);
+    last = now;
+    world.draw(renderer);
+    frames += 1;
+    if (now - fpsAt > 500) { fps = Math.round((frames * 1000) / (now - fpsAt)); frames = 0; fpsAt = now; hud(); }
+  }
+  function hud() {
+    const cam = world.camera;
+    const showing = cam.mode === "frame" ? ` · showing ${world.state.camera?.showing} (its front)` : "";
+    const hero = world.entities.get("hero");
+    $("hud").textContent = `${cam.mode}${showing} · hero ${hero.spec.species} ${hero.mind.state ?? world.intent.driver} · ${fps} fps · ${world.width}×${world.height}`;
+  }
+  requestAnimationFrame(loop);
+
+  // (Dev: save the picture -- the Browser pane can't screenshot a hidden page.)
+  globalThis.snap = async (name) => { world.draw(renderer); const blob = await (await fetch(canvas.toDataURL("image/png"))).blob(); await fetch(`../../out/${name}.png`, { method: "PUT", body: blob }); return name; };
+  // (Dev: run the world on without drawing, e.g. to reach a moment before a snap.)
+  globalThis.advance = (sec) => { world.simulate(sec); world.draw(renderer); hud(); return world.time; };
+</script>

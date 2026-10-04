@@ -25,6 +25,7 @@ import { encodeAbiParameters, getAddress, keccak256, stringToHex } from "viem";
 
 import { KEEL_INLINE_MAX_TOKEN_URI_BYTES, keelWeb3ObjectURI, resolveKeelInlineCarriage, type KeelInlineCarriage } from "./presentation.js";
 import { assertKeelCollectorInlineMetadata, assertKeelInlineImageBytes, prepareKeelInlineImageCarriage, type KeelPresentationPolicy } from "./collector-policy.js";
+import { KEEL_CREATIVE_RUNTIME_CATALOG } from './creative-runtime-catalog.js';
 import {
   KEEL_ASSET_DISPLAY_MEDIA_TYPES,
   KEEL_ASSET_DISPLAY_MODULE_ID,
@@ -503,10 +504,27 @@ const SAFE_INLINE_MODULE_ID = /^[A-Za-z0-9][A-Za-z0-9._:/-]{0,127}$/u;
 // A minified JS ternary such as `ready ? ar : 1` is not a content locator.
 const EXTERNAL_RESOURCE_LITERAL = /\b(?:(?:https?|ipfs|web3|keel-onchain):[^\s"'<>\\]+|ar:(?:\/\/[^\s"'<>\\]+|[A-Za-z0-9_-]{43}(?![A-Za-z0-9_-])(?:\/[^\s"'<>\\]*)?))/giu;
 
+/** Shared library bytes are not creator resources. Match the full pinned artifact. */
+async function assertInlineModuleDependencies(bytes: Uint8Array, moduleId: string): Promise<void> {
+  const candidates: Array<{ id: string; integrity: Integrity | null }> = KEEL_CREATIVE_RUNTIME_CATALOG.flatMap(runtime => runtime.resources.filter(resource => resource.referenceStatus === 'active'));
+  if (moduleId === 'keel-layered-runtime-v4') {
+    const generated = './layered-runtime-info.js';
+    const { LAYERED_RUNTIME } = await import(generated);
+    candidates.push(LAYERED_RUNTIME);
+  }
+  const candidate = candidates.find(resource => resource.id === moduleId && resource.integrity !== null);
+  if (candidate?.integrity) {
+    const actual = await createIntegrity(bytes);
+    if (actual.digest === candidate.integrity.digest && actual.byteLength === candidate.integrity.byteLength) return;
+    throw new TypeError(`Inline shared runtime ${moduleId} differs from its pinned artifact.`);
+  }
+  assertKeelInlineNoExternalDependencies(bytes, 'Inline module ' + moduleId);
+}
+
 /**
  * Reject concrete network/content locators in creator-owned Inline bytes.
  *
- * Checkers inspect the decoded contents of bounded embedded gzip/deflate/Brotli and committed LZMA slots, so a
+ * Checkers inspect the decoded contents of embedded gzip/deflate slots, so a
  * URL hidden inside a packed JavaScript module is still an external
  * dependency. The SVG namespace is syntax rather than a fetchable resource;
  * it is the sole protocol URL allowed in creator bytes. Onchain content
@@ -839,7 +857,7 @@ export async function verifyKeelPublishedInlineModuleFragment(input: {
         : item.embedded.compression === "lzma"
           ? await (await import("./decoders/index.js")).decodeLzma(stored, { decodedByteLength: input.decodedBytes.byteLength })
           : stored;
-  assertKeelInlineNoExternalDependencies(decoded, "Inline module " + input.moduleId);
+  await assertInlineModuleDependencies(decoded, input.moduleId);
   const [decodedIntegrity, storedIntegrity] = await Promise.all([
     createIntegrity(decoded),
     createIntegrity(stored),
@@ -1108,7 +1126,7 @@ export async function buildKeelInlineModuleFragment(input: {
   if (phase === "data" && execution !== "classic") {
     throw new TypeError("Inline data modules must use classic execution so they run before renderer code.");
   }
-  assertKeelInlineNoExternalDependencies(input.decodedBytes, "Inline module " + input.moduleId);
+  await assertInlineModuleDependencies(input.decodedBytes, input.moduleId);
   const weight = input.weight ?? 0;
   orderKeelModules([{ moduleId: input.moduleId, phase, weight }]);
   const slot = await buildEmbeddedKeelViewerSlot({

@@ -1,0 +1,183 @@
+<!doctype html>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>KEEL audio lab</title>
+<!-- Dev tool (npm run serve, then http://localhost:4200/tools/audio-lab.html): pick a seed and a mood, play the
+     loop and push its intensity, trigger every sound effect, render a loop or an sfx sheet to out/ as WAV.
+     window.lab.renderLoop({...}) and window.lab.renderSheet({...}) do the same from a script. -->
+<script src="../vendor/tone-15.1.22-native.js"></script>
+<style>
+  :root { color-scheme: dark; --bg: #0b0c14; --fg: #dde; --dim: #8a8fa8; --line: #262a3c; --acc: #6fd3c7; }
+  body { margin: 0; font: 13px/1.45 ui-monospace, SFMono-Regular, Menlo, monospace; background: var(--bg); color: var(--fg); }
+  main { display: grid; grid-template-columns: minmax(280px, 360px) 1fr; gap: 18px; padding: 18px; max-width: 1200px; }
+  @media (max-width: 800px) { main { grid-template-columns: 1fr; } }
+  h1 { font-size: 15px; margin: 0 0 10px; color: var(--acc); }
+  h2 { font-size: 12px; text-transform: uppercase; letter-spacing: .08em; color: var(--dim); margin: 16px 0 6px; }
+  label { display: flex; justify-content: space-between; gap: 8px; margin: 4px 0; align-items: center; }
+  input[type=range] { flex: 1; }
+  input, select, button { font: inherit; background: #151827; color: var(--fg); border: 1px solid var(--line); border-radius: 4px; padding: 3px 6px; }
+  button { cursor: pointer; } button:hover { border-color: var(--acc); }
+  .row { display: flex; flex-wrap: wrap; gap: 6px; }
+  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(96px, 1fr)); gap: 6px; }
+  pre { white-space: pre-wrap; background: #10121d; border: 1px solid var(--line); border-radius: 4px; padding: 8px; margin: 0; max-height: 360px; overflow: auto; }
+  .muted { color: var(--dim); }
+</style>
+<main>
+  <section>
+    <h1>KEEL audio lab</h1>
+    <label>seed <input id="seed" value="wallrun" size="18"></label>
+    <label>mood <select id="preset"></select></label>
+    <label>energy <input id="energy" type="range" min="0" max="1" step="0.01" value="0.65"><span id="energyV">0.65</span></label>
+    <label>darkness <input id="darkness" type="range" min="0" max="1" step="0.01" value="0.7"><span id="darknessV">0.70</span></label>
+    <label>hue <input id="hue" placeholder="(seed)" size="6"></label>
+    <div class="row" id="weather"></div>
+    <h2>pins</h2>
+    <div id="pins"></div>
+    <h2>play</h2>
+    <div class="row"><button id="play">play loop</button><button id="stop">stop</button><button id="wav">render loop .wav</button></div>
+    <label>intensity <input id="intensity" type="range" min="0" max="1" step="0.01" value="0.5"><span id="intensityV">0.50</span></label>
+    <h2>sound effects</h2>
+    <label>style <select id="style"></select></label>
+    <label>speed <input id="speed" type="range" min="0" max="16" step="0.1" value="8"><span id="speedV">8.0</span></label>
+    <div class="grid" id="fx"></div>
+    <div class="grid" id="loops" style="margin-top:6px"></div>
+    <div class="row" style="margin-top:8px"><button id="sheet">render sfx sheet .wav</button></div>
+  </section>
+  <section>
+    <h2>plan</h2>
+    <pre id="plan"></pre>
+    <h2>log</h2>
+    <pre id="log" class="muted">ready</pre>
+  </section>
+</main>
+<script type="module">
+  import { BANDS, CHOICES, WEATHER_KINDS, moodFor, scoreOf } from "../src/audio/score.js";
+  import { play, render } from "../src/audio/player.js";
+  import { LOOP_NAMES, STYLE_NAMES, SURFACES, createSfx } from "../src/audio/sfx.js";
+  import { encodeWav, measureLoop } from "../src/audio/wav.js";
+
+  const $ = (id) => document.getElementById(id);
+  const log = (s) => { $("log").textContent += `\n${s}`; $("log").scrollTop = 1e9; };
+  const PRESETS = {
+    "WALLRUN: night water": { name: "Night Water", energy: 0.65, darkness: 0.7, weather: ["waves", "wind"] },
+    "idle menu": { name: "Menu", energy: 0.1, darkness: 0.35, weather: ["hush"] },
+    "driving night rain": { name: "Rain Run", energy: 1, darkness: 0.9, weather: ["rain"] },
+    "city dusk": { name: "Dusk", energy: 0.45, darkness: 0.5, weather: ["traffic", "car"] },
+    ...Object.fromEntries(Object.keys(BANDS).map((b) => [`band: ${b}`, { band: b }])),
+  };
+  $("preset").innerHTML = Object.keys(PRESETS).map((k) => `<option>${k}</option>`).join("");
+  $("style").innerHTML = STYLE_NAMES.map((k) => `<option>${k}</option>`).join("");
+  $("weather").innerHTML = WEATHER_KINDS.map((w) => `<label style="margin:0"><input type="checkbox" value="${w}"> ${w}</label>`).join("");
+  $("pins").innerHTML = ["keys", "lead", "bass", "kit", "mode", "key"].map((k) => `<label>${k} <select data-pin="${k}"><option value="">(seed)</option>${CHOICES[k].map((v, i) => `<option value="${k === "key" ? i : v}">${v}</option>`).join("")}</select></label>`).join("") + '<label>tempo <input data-pin="tempo" placeholder="(seed)" size="6"></label>';
+
+  function setPreset() {
+    const p = PRESETS[$("preset").value];
+    if (p.energy !== undefined) { $("energy").value = p.energy; $("darkness").value = p.darkness; }
+    for (const c of $("weather").querySelectorAll("input")) c.checked = (p.weather ?? []).includes(c.value);
+    sync();
+  }
+  function spec() {
+    const p = PRESETS[$("preset").value];
+    if (p.band) return p;
+    return { name: p.name, energy: +$("energy").value, darkness: +$("darkness").value, weather: [...$("weather").querySelectorAll("input:checked")].map((c) => c.value), hue: $("hue").value === "" ? undefined : +$("hue").value };
+  }
+  function pins() {
+    const o = {};
+    for (const el of document.querySelectorAll("[data-pin]")) if (el.value !== "") o[el.dataset.pin] = el.dataset.pin === "tempo" ? +el.value : el.value;
+    return o;
+  }
+  const moodOf = (s) => (s.band ? { band: s.band } : moodFor(s));
+  let plan = null;
+  function sync() {
+    for (const k of ["energy", "darkness", "intensity"]) $(`${k}V`).textContent = (+$(k).value).toFixed(2);
+    $("speedV").textContent = (+$("speed").value).toFixed(1);
+    plan = scoreOf(moodOf(spec()), $("seed").value, { pins: pins() });
+    const names = CHOICES.key;
+    $("plan").textContent = [
+      `${plan.theme}  seed ${plan.seed}`,
+      `${names[plan.tonic]} ${plan.mode}  ${plan.bpm} bpm  swing ${plan.swing.toFixed(2)}  ${plan.loopBars} bars = ${plan.loopSec.toFixed(1)} s`,
+      `keys ${plan.keys} (${plan.comp})  lead ${plan.lead}  bass ${plan.bass} (${plan.bassStyle})  kit ${plan.kit} (${plan.design.back})`,
+      `form ${plan.form.map(([s, n]) => `${s}${n}`).join(" ")}`,
+      `weather ${plan.weather.join(", ")}  room ${plan.room.join(", ")}`,
+      `mix cutoff ${plan.mix.cutoff}  tape ${plan.mix.tape.toFixed(2)}  reverb ${plan.mix.reverb.toFixed(2)}  wow ${plan.mix.wow.toFixed(2)}`,
+      `worn: ${plan.design.bits} bits, hold ${plan.design.hold}, top ${plan.design.top} Hz; pump ${plan.design.pump.toFixed(2)}`,
+    ].join("\n");
+  }
+  for (const el of document.querySelectorAll("input, select")) el.addEventListener("input", () => { if (el.id === "preset") setPreset(); else sync(); });
+  setPreset();
+
+  // ---- playing
+  let band = null;
+  let sfx = null;
+  const ensure = async () => { await Tone.start(); if (!sfx || sfx.style.name !== $("style").value || sfx.seed !== $("seed").value) { sfx?.dispose(); sfx = createSfx(Tone, { seed: $("seed").value, style: $("style").value }); sfx.seed = $("seed").value; } };
+  $("play").onclick = async () => { await ensure(); band?.stop(0.2, { transport: false }); band = play(Tone, plan, null, { intensity: +$("intensity").value }); log(`playing ${plan.theme} ${plan.bpm} bpm`); };
+  $("stop").onclick = () => { band?.stop(); band = null; sfx?.stopAll(); };
+  $("intensity").addEventListener("input", () => band?.setIntensity(+$("intensity").value));
+  const fxButtons = [...SURFACES.map((s) => [`step ${s}`, "step", { surface: s }]), ["jump", "jump"], ["land soft", "land", { speed: 4 }], ["land hard", "land", { speed: 13 }], ["wallStart", "wallStart"], ["wallJump", "wallJump"], ["railStart", "railStart"], ["railEnd", "railEnd"], ["splash", "splash"], ["skimStart", "skimStart"], ["respawn", "respawn"], ...["blip", "hover", "select", "back", "confirm", "error"].map((u) => [u, u])];
+  $("fx").innerHTML = fxButtons.map(([l], i) => `<button data-fx="${i}">${l}</button>`).join("");
+  $("fx").onclick = async (e) => { const i = e.target.dataset.fx; if (i === undefined) return; await ensure(); const [, n, p = {}] = fxButtons[i]; sfx.play(n, { speed: +$("speed").value, ...p }); };
+  const held = {};
+  $("loops").innerHTML = LOOP_NAMES.map((n) => `<button data-loop="${n}">${n} loop</button>`).join("");
+  $("loops").onclick = async (e) => { const n = e.target.dataset.loop; if (!n) return; await ensure(); if (held[n]) { held[n].stop(); held[n] = null; e.target.textContent = `${n} loop`; } else { held[n] = sfx.loop(n, { speed: +$("speed").value }); e.target.textContent = `${n} (stop)`; } };
+  $("speed").addEventListener("input", () => { for (const h of Object.values(held)) h?.set({ speed: +$("speed").value }); });
+
+  // ---- rendering to out/
+  async function put(name, channels, rate) {
+    const bytes = encodeWav(channels, rate);
+    const r = await fetch(`../out/${name}.wav`, { method: "PUT", body: bytes });
+    if (!r.ok) throw new Error(`PUT out/${name}.wav: ${r.status}`);
+    return bytes.length;
+  }
+  /** One loop of { seed, spec (moodFor's), pins, intensity } rendered, measured and saved to out/<name>.wav. */
+  async function renderLoop({ seed = $("seed").value, spec: s = spec(), pins: p = pins(), intensity, name } = {}) {
+    const pl = scoreOf(moodOf(s), seed, { pins: p });
+    const t0 = performance.now();
+    // (Rendered 50 ms past the end: what the band plays going round must be the loop's own start.)
+    const over = 0.05;
+    const buf = await render(Tone, pl, { intensity, overrun: over });
+    const rate = buf.sampleRate;
+    const n = Math.round(pl.loopSec * rate);
+    const e = Math.round(over * rate);
+    const full = [buf.getChannelData(0), buf.getChannelData(1)];
+    const ch = full.map((c) => c.subarray(0, n));
+    const m = measureLoop(ch, rate);
+    // The seam: the loop's first 50 ms against the 50 ms that follow its end (correlation, and their levels).
+    let xy = 0, xx = 0, yy = 0;
+    for (const c of full) for (let i = 0; i < e; i += 1) { const a = c[i], b = c[n + i]; xy += a * b; xx += a * a; yy += b * b; }
+    const seam = { corr: +(xy / Math.sqrt(xx * yy || 1)).toFixed(3), headDb: +(10 * Math.log10(xx / (2 * e) || 1e-12)).toFixed(1), goingRoundDb: +(10 * Math.log10(yy / (2 * e) || 1e-12)).toFixed(1) };
+    const file = name ?? `audio-loop-${String(seed).replace(/[^\w-]/g, "_")}`;
+    const bytes = await put(file, ch, rate);
+    const out = { file: `out/${file}.wav`, bytes, seam, theme: pl.theme, key: `${CHOICES.key[pl.tonic]} ${pl.mode}`, bpm: pl.bpm, bars: pl.loopBars, keys: pl.keys, lead: pl.lead, bass: pl.bass, kit: pl.kit, weather: pl.weather, ...m, ms: Math.round(performance.now() - t0) };
+    log(JSON.stringify(out));
+    return out;
+  }
+  /** Every sound effect of { seed, style } in a row (the loops swept through their speeds), saved to out/<name>.wav. */
+  async function renderSheet({ seed = $("seed").value, style = $("style").value, name } = {}) {
+    const rate = 44100;
+    const plan2 = [...fxButtons.map(([l, n, p = {}]) => ({ l, n, p, len: 0.55 })), ...LOOP_NAMES.map((n) => ({ l: `${n} loop`, n, loop: true, len: 2.2 }))];
+    const total = plan2.reduce((a, x) => a + x.len, 0.3);
+    const ctx = new OfflineAudioContext(2, Math.ceil(total * rate), rate);
+    const fx = createSfx(ctx, { seed, style });
+    let t = 0.1;
+    const marks = [];
+    for (const x of plan2) {
+      if (x.loop) { const h = fx.loop(x.n, { speed: 5, when: t }); h.set({ speed: 14, when: t + 0.9 }, 0.6); h.stop(0.15, t + x.len - 0.25); }
+      else fx.play(x.n, { speed: 8, ...x.p, when: t });
+      marks.push([x.l, t, t + x.len]);
+      t += x.len;
+    }
+    const buf = await ctx.startRendering();
+    const ch = [buf.getChannelData(0), buf.getChannelData(1)];
+    const each = marks.map(([l, a, b]) => { const sub = ch.map((c) => c.subarray(Math.round(a * rate), Math.round(b * rate))); const m = measureLoop(sub, rate); return { sound: l, rmsDb: m.rmsDb, peak: m.peak }; });
+    const file = name ?? `audio-sfx-${String(seed).replace(/[^\w-]/g, "_")}-${style}`;
+    const bytes = await put(file, ch, rate);
+    const m = measureLoop(ch, rate);
+    const out = { file: `out/${file}.wav`, bytes, seconds: m.seconds, rmsDb: m.rmsDb, peak: m.peak, nan: m.nan, silent: each.filter((e) => e.rmsDb < -50).map((e) => e.sound), each };
+    log(JSON.stringify({ ...out, each: undefined }));
+    return out;
+  }
+  $("wav").onclick = () => renderLoop({ intensity: +$("intensity").value }).catch((e) => log(`error: ${e.stack ?? e}`));
+  $("sheet").onclick = () => renderSheet().catch((e) => log(`error: ${e.stack ?? e}`));
+  window.lab = { renderLoop, renderSheet, get plan() { return plan; }, PRESETS };
+  log("lab ready: window.lab.renderLoop({ seed, spec, pins, intensity, name }), window.lab.renderSheet({ seed, style, name })");
+</script>

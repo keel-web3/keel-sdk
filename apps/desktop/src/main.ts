@@ -58,7 +58,7 @@ import { checkLocalProject, checkPublishedMetadata, projectFingerprint, remoteBy
 import { GameEngineService, findGameEngineRoot, findGameProjects, allowGamePermission } from './game-engine/game-engine-service.mjs';
 import { gameProcedures } from './game-engine/game-procedures';
 import { isGameProject } from './game-engine/game-project.mjs';
-import { GameBuilderService, BUILDER_PREVIEW_HEADERS } from './game-engine/builder-service.mjs';
+import { GameBuilderService, BUILDER_PREVIEW_HEADERS, STYLED_PREVIEW_HEADERS } from './game-engine/builder-service.mjs';
 import { builderProcedures } from './game-engine/builder-procedures';
 import { GameCodecService } from './game-engine/codec-service.mjs';
 import { codecProcedures } from './game-engine/codec-procedures';
@@ -581,7 +581,7 @@ async function start() {
   });
   protocol.handle('keel-preview', async (request) => {
     const url = new URL(request.url); const projectId = url.hostname;
-    if (projectId === BUILDER_PREVIEW_HOST) { try { return new Response(await gameBuilder.preview(), { headers: BUILDER_PREVIEW_HEADERS }); } catch (error) { return previewFailure(error); } }
+    if (projectId === BUILDER_PREVIEW_HOST) { try { return new Response(await (url.pathname === '/styled.html' ? gameBuilder.styledPreview() : gameBuilder.preview()), { headers: url.pathname === '/styled.html' ? STYLED_PREVIEW_HEADERS : BUILDER_PREVIEW_HEADERS }); } catch (error) { return previewFailure(error); } }
     if (projectId === SOUND_PREVIEW_HOST) { try { return new Response(await gameSound.page(), { headers: SOUND_PREVIEW_HEADERS }); } catch (error) { return previewFailure(error); } }
     if (projectId === LEVEL_PREVIEW_HOST) { try { return new Response(await gameLevel.page(), { headers: LEVEL_PREVIEW_HEADERS }); } catch (error) { return previewFailure(error); } }
     const project = store.read().state.projects.find((p: { id: string }) => p.id === projectId);

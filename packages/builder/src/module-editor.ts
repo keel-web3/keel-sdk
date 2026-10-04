@@ -1,3 +1,4 @@
+import { watchFile, unwatchFile } from "node:fs";
 import { lstat, mkdir, writeFile } from "node:fs/promises";
 import path from "node:path";
 import ts from "typescript";
@@ -50,11 +51,18 @@ export async function watchKeelModuleEditor(root: string, entries: readonly stri
   await refresh();
   let timer: ReturnType<typeof setTimeout> | undefined;
   let queue = Promise.resolve();
-  const watcher = ts.sys.watchDirectory(root, file => {
-    const relative = path.relative(root, file).split(path.sep).join("/");
-    if (relative.split("/").some(part => ["node_modules", ".keel", "dist", ".git"].includes(part))) return;
+  const schedule = () => {
     if (timer !== undefined) clearTimeout(timer);
     timer = setTimeout(() => { queue = queue.then(async () => { await refresh(); }).catch(onError); }, 200);
+  };
+  const includesPath = path.join(root, includes);
+  const includesChanged = () => schedule();
+  watchFile(includesPath, { interval: 250 }, includesChanged);
+  const watcher = ts.sys.watchDirectory(root, file => {
+    const relative = path.relative(root, file).split(path.sep).join("/");
+    if (relative === includes) return;
+    if (relative.split("/").some(part => ["node_modules", ".keel", "dist", ".git"].includes(part))) return;
+    schedule();
   }, true);
-  return { close() { if (timer !== undefined) clearTimeout(timer); watcher.close(); } };
+  return { close() { if (timer !== undefined) clearTimeout(timer); unwatchFile(includesPath, includesChanged); watcher.close(); } };
 }

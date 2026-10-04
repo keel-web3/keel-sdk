@@ -3,8 +3,8 @@
 // Carries the KEEL game engine (a separate repository) into the SDK: finds it
 // (KEEL_GAME_ENGINE_ROOT, or ../keel-engine beside this repository), links each
 // of its packages -- engine parts, standard packs, ai, systems -- into this
-// package's node_modules, records them as `link:` dependencies (so a pnpm
-// install makes the same links), and writes one entry per part so projects
+// package's node_modules. With --write-manifest, also records them as `link:`
+// dependencies and writes one entry per part so projects
 // import `@keel/game-engine/<part>`. It also links examples/game-engine to this
 // package, so the examples reach the engine exactly as a creator's project does.
 
@@ -52,14 +52,18 @@ for (const p of parts) {
 }
 const pkgFile = join(pkgDir, "package.json");
 const pkg = JSON.parse(readFileSync(pkgFile, "utf8"));
-pkg.dependencies = deps;
-writeFileSync(pkgFile, `${JSON.stringify(pkg, null, 2)}\n`);
+// Consumer setup only changes ignored node_modules. Regeneration is an explicit
+// maintainer operation: never erase source entries or dirty the lockfile on install.
+const regenerate = process.argv.includes("--write-manifest");
+if (regenerate) {
+  pkg.dependencies = deps;
+  writeFileSync(pkgFile, `${JSON.stringify(pkg, null, 2)}\n`);
+}
 
 // One entry per part: @keel/game-engine/<part> is @keel-engine/<part>.
 const engineDir = join(pkgDir, "src", "engine");
-rmSync(engineDir, { recursive: true, force: true });
-mkdirSync(engineDir, { recursive: true });
-for (const p of parts) {
+if (regenerate) mkdirSync(engineDir, { recursive: true });
+for (const p of regenerate ? parts : []) {
   writeFileSync(join(engineDir, `${p.part}.ts`), `// @keel/game-engine/${p.part}: the engine's ${p.name}, carried by the SDK (written by scripts/link-engine.mjs).\nexport * from "${p.name}";\n`);
   // (A package that exports its manifest -- "./module" -- gets @keel/game-engine/<part>/module too: tools read packs without running them.)
   const exportsOf = JSON.parse(readFileSync(join(p.dir, "package.json"), "utf8")).exports ?? {};

@@ -11,6 +11,8 @@ import { builderKey, sameOps } from './builder-project.mjs';
 /** The builder preview document's headers: scripts and styles inline, pictures as data, nothing else (and sandboxed). */
 export const BUILDER_PREVIEW_HEADERS = { 'content-type': 'text/html', 'x-content-type-options': 'nosniff', 'content-security-policy': "default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; img-src data: blob:; connect-src 'none'; frame-src 'none'; base-uri 'none'; form-action 'none'; sandbox allow-scripts" };
 
+export const STYLED_PREVIEW_HEADERS={...BUILDER_PREVIEW_HEADERS,'content-security-policy':BUILDER_PREVIEW_HEADERS['content-security-policy'].replace("connect-src 'none'",'connect-src blob: data:')};
+
 export class GameBuilderService extends GameEngineService {
   /** @param {{ workerPath: string; engine?: GameEngineService; root?: string | null; searched?: string[]; [key: string]: unknown }} options -- `engine`: use the game engine's checkout (its root, and where it looked). */
   constructor({ engine, ...options }) {
@@ -85,6 +87,8 @@ export class GameBuilderService extends GameEngineService {
     this.previewPage = { print, html };
     return html;
   }
+
+  async styledPreview() { const print=await this.current();if(this.styledPreviewPage?.print===print)return this.styledPreviewPage.html;const html=await this.call('styledPreview');this.styledPreviewPage={print,html};return html;}
 
   /** The latest frame after `after` for a build, waiting up to `waitMs` for one. */
   frame(projectId, name, after = 0, waitMs = 15_000) {

@@ -874,9 +874,8 @@ test("Fray intake asks for creator choices and emits a digest-bound approval han
     });
     assert.equal(release?.result.structuredContent.releaseIntent.release.priceEth, "0.1");
 
-    const search = await call(server, 5, "keel-library-search", { query: "three.js" });
-    assert.equal(search?.result.structuredContent.status, "unconfigured");
-    assert.match(search?.result.structuredContent.message, /no carrier bytes were fetched/iu);
+    // Network discovery has its own loopback fixture below. A missing explicit
+    // Studio URL now selects a public default, so never fetch it in this test.
     const endpoints = await call(server, 6, "keel-endpoint-config", {
       studioUrl: "https://studio.example",
       publicRpcUrl: "https://rpc.example",
@@ -910,7 +909,7 @@ test("Keel index search reads bounded metadata and locks an exact reuse candidat
     }
     if (request.url?.startsWith("/api/modules?")) {
       response.end(JSON.stringify({ modules: [{
-        name: "three",
+        name: "Three.js",
         namespace: "npm",
         versions: [{
           identity: { namespace: "npm", name: "three", version: "0.180.0", entry: "build/three.module.js" },
@@ -923,6 +922,10 @@ test("Keel index search reads bounded metadata and locks an exact reuse candidat
         }],
         carrierKinds: ["keel"],
       }] }));
+      return;
+    }
+    if (request.url?.startsWith("/api/verified-modules?")) {
+      response.end(JSON.stringify({ modules: [] }));
       return;
     }
     if (request.url?.startsWith("/api/shells?")) {
@@ -963,7 +966,7 @@ test("Keel index search reads bounded metadata and locks an exact reuse candidat
     assert.equal(content.status, "ok");
     assert.equal(content.library[0].selection.updateMode, "locked");
     assert.equal(content.library[0].selection.policyVersion, 2);
-    assert.equal(content.modules[0].versions[0].identity.name, "three");
+    assert.equal(content.modules[0].entry.versions[0].identity.name, "three");
     assert.equal(content.reuse.status, "needs-selection");
     assert.match(content.carriers, /metadata-only/iu);
     const shellResult = await call(server, 3, "keel-shell-search", { studioUrl: `http://127.0.0.1:${address.port}`, query: "proof" });

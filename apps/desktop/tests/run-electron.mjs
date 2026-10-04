@@ -3,8 +3,12 @@ import electron from 'electron';
 import { fileURLToPath } from 'node:url';
 import { build } from 'esbuild';
 import { mkdir, copyFile, cp } from 'node:fs/promises';
+import { findEngine } from '../../../packages/game-engine/scripts/engine-source.mjs';
 
 const root = fileURLToPath(new URL('../', import.meta.url));
+// Exercise the same pinned release a fresh checkout uses, not only siblings.
+const engine = findEngine();
+if (engine.root && !process.env.KEEL_GAME_ENGINE_ROOT) process.env.KEEL_GAME_ENGINE_ROOT = engine.root;
 const suite = ['electron-smoke.cjs', 'electron-restore.cjs', 'electron-wallet-bridge.cjs', 'electron-agents.cjs', 'electron-shared-runtime.cjs', 'electron-creation.cjs', 'electron-layers.cjs', 'electron-game.cjs', 'electron-builder.cjs', 'electron-sound.cjs', 'electron-level.cjs'];
 const selected = process.argv.slice(2);
 if (selected.some(file => ![...suite,'electron-gators.cjs','electron-gator-inline.cjs','electron-raster.cjs','electron-svg.cjs','electron-codec.cjs','electron-alpha.cjs'].includes(file))) throw Error('Choose an existing Electron test filename.');

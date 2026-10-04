@@ -1,6 +1,6 @@
 /** Internal library stubs have bytecode but no callable dispatch surface. */
-export function compiledDeployableNames(solFile, artifact) {
-  const name = solFile.split('/').at(-1).replace(/\.sol$/, '');
+export function compiledDeployableNames(solFile, artifact, contractName) {
+  const name = contractName ?? solFile.split('/').at(-1).replace(/\.sol$/, '');
   const code = artifact?.bytecode?.object;
   if (typeof code !== 'string' || code.replace(/^0x/, '').length === 0) return [];
   const definition = artifact.ast?.nodes?.find(node => node.nodeType === 'ContractDefinition' && node.name === name);

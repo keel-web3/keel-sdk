@@ -1,0 +1,66 @@
+<!doctype html>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>WALLRUN</title>
+<style>
+  :root { color-scheme: dark; }
+  html, body { margin: 0; height: 100%; background: #07080b; color: #cfd6d4; font: 12px/1.4 ui-monospace, Menlo, monospace; }
+  body { display: grid; grid-template-rows: minmax(0, 1fr) auto; }
+  #stage { position: relative; display: grid; place-items: center; min-height: 0; }
+  canvas { width: min(100vw, calc(100dvh - 48px)); aspect-ratio: 1; image-rendering: pixelated; background: #000; }
+  footer { display: flex; flex-wrap: wrap; gap: 8px 14px; align-items: center; padding: 8px 12px; border-top: 1px solid #1a1d22; }
+  select, input, button { background: #101216; color: inherit; border: 1px solid #262a31; border-radius: 4px; padding: 4px 8px; font: inherit; }
+  small { color: #6f7780; }
+</style>
+<div id="stage"><canvas id="c"></canvas></div>
+<footer>
+  <label>seed <input id="seed" value="1" size="6"></label><button id="dice">🎲</button>
+  <label>pixels <select id="size"><option>32</option><option>48</option><option>64</option><option>96</option><option selected>128</option><option>192</option><option>256</option></select></label>
+  <button id="auto">autopilot on</button>
+  <small id="info"></small>
+  <small>click to look with the mouse · WASD / arrows to run (W is where you look) · space to jump, hold to go higher · idle 8 s and it runs itself</small>
+</footer>
+<!-- (What a KEEL document gets from the piece's extends: Tone, then keel-audio. Without them the game is silent.) -->
+<script src="../../vendor/tone-15.1.22-native.js"></script>
+<script src="../../vendor/keel-audio-1.0.0.min.js"></script>
+<script type="module">
+  import { createGame } from "./game.js";
+  const $ = (id) => document.getElementById(id);
+  const q = new URLSearchParams(location.search);
+  const game = createGame($("c"), { host: $("stage"), seed: q.get("seed") ?? "1", width: +(q.get("px") ?? 128), height: +(q.get("px") ?? 128) });
+  globalThis.game = game;
+  $("seed").value = game.seed;
+  $("size").value = q.get("px") ?? "128";
+  $("size").onchange = () => { const n = +$("size").value; game.setTarget(n, n); };
+  $("seed").onchange = () => game.load($("seed").value);
+  $("dice").onclick = () => { $("seed").value = String(1 + Math.floor(Math.random() * 99999)); game.load($("seed").value); };
+  $("auto").onclick = () => { game.autopilot = !game.autopilot; };
+  game.attachInput(globalThis); // (click the picture to lock the mouse; Esc lets it go)
+  let last = performance.now();
+  let frames = 0;
+  let fpsAt = last;
+  let paused = false; // (while a clip is filmed, it steps the game itself)
+  function loop(now) {
+    requestAnimationFrame(loop);
+    if (paused) return;
+    game.tick((now - last) / 1000);
+    last = now;
+    frames += 1;
+    if (now - fpsAt > 500) { $("info").textContent = `${game.runner.species} · ${game.body.mode} · ${Math.round((frames * 1000) / (now - fpsAt))} fps · ${game.px.width}×${game.px.height}`; frames = 0; fpsAt = now; $("auto").textContent = game.autopilot ? "autopilot on" : "autopilot off"; $("info").textContent += ` · ${game.driver}`; }
+  }
+  requestAnimationFrame(loop);
+  // (Dev: stills and clips, through the engine's optional capture module -- loaded only when asked for.
+  // snap("name") -> out/name.png; film("name", { seconds }) -> out/name.webm, full colour, stepped
+  // frame by frame so a seed films the same clip every time; gif("name", { seconds }) -> out/name.gif.)
+  let cap = null;
+  const capture = async () => {
+    if (cap) return cap;
+    const { createCapture } = await import("../../src/capture/capture.js");
+    cap = createCapture($("c"), { renderer: game.px, step: (dt) => game.simulate(dt), draw: () => game.draw() });
+    return cap;
+  };
+  const held = async (fn) => { paused = true; try { return await fn(); } finally { paused = false; last = performance.now(); } };
+  globalThis.snap = async (name) => (await capture()).save(await (await capture()).png(), `../../out/${name}.png`);
+  globalThis.film = (name, o = {}) => held(async () => { const c = await capture(); const b = await c.film(o); await c.save(b, `../../out/${name}.webm`); return `${name}.webm ${(b.size / 1024).toFixed(0)} KB`; });
+  globalThis.gif = (name, o = {}) => held(async () => { const c = await capture(); const b = await c.gif(o); await c.save(b, `../../out/${name}.gif`); return `${name}.gif ${(b.size / 1024).toFixed(0)} KB`; });
+</script>

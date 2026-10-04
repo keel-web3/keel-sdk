@@ -1,0 +1,194 @@
+<!doctype html>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>KEEL Pixel camera demo</title>
+<style>
+  :root { color-scheme: dark; }
+  html, body { margin: 0; height: 100%; background: #07080b; color: #cfd6d4; font: 12px/1.4 ui-monospace, Menlo, monospace; }
+  body { display: grid; grid-template-rows: minmax(0, 1fr) auto; }
+  #stage { display: grid; place-items: center; min-height: 0; }
+  #frame { position: relative; width: min(100vw, calc(100dvh - 76px)); aspect-ratio: 1; }
+  canvas { width: 100%; height: 100%; image-rendering: pixelated; background: #000; display: block; cursor: crosshair; touch-action: none; }
+  #cross { position: absolute; left: 50%; top: 50%; width: 11px; height: 11px; transform: translate(-50%, -50%); pointer-events: none; opacity: 0.7; }
+  #cross::before, #cross::after { content: ""; position: absolute; background: #e8ecea; }
+  #cross::before { left: 5px; top: 0; width: 1px; height: 11px; }
+  #cross::after { top: 5px; left: 0; height: 1px; width: 11px; }
+  #hint { position: absolute; left: 0; right: 0; bottom: 10px; text-align: center; pointer-events: none; color: #e8ecea; text-shadow: 0 1px 2px #000; }
+  footer { display: flex; flex-wrap: wrap; gap: 6px 12px; align-items: center; padding: 8px 12px; border-top: 1px solid #1a1d22; }
+  select, input, button { background: #101216; color: inherit; border: 1px solid #262a31; border-radius: 4px; padding: 3px 8px; font: inherit; }
+  button[aria-pressed="true"] { background: #1d3a36; border-color: #2f6b62; }
+  small { color: #6f7780; }
+</style>
+<div id="stage"><div id="frame"><canvas id="c"></canvas><div id="cross"></div><div id="hint"></div></div></div>
+<footer>
+  <span id="modes"></span>
+  <label>pixels <select id="size"><option>32</option><option>48</option><option>64</option><option>96</option><option selected>128</option><option>192</option><option>256</option></select></label>
+  <label><input type="checkbox" id="inv"> invert Y</label>
+  <label>mouse <input type="range" id="sens" min="0.0008" max="0.006" step="0.0002" value="0.0025"></label>
+  <label>shoulder <input type="range" id="shoulder" min="-0.8" max="0.8" step="0.1" value="0"></label>
+  <small id="info"></small>
+  <small>click to lock the mouse (Esc lets go) · WASD / arrows · space jumps (hold for higher) · run along a wall and jump to wall-run</small>
+</footer>
+<script type="module">
+  import { createPixelRenderer } from "../src/gpu/pixel-renderer.js";
+  import { createCharacter } from "../src/physics/character.js";
+  import { createParticles } from "../src/particles/particles.js";
+  import { localToWorld } from "../src/core/frame.js";
+  import { createCamera, subjectOf } from "../src/camera/camera.js";
+  import { createInput } from "../src/input/input.js";
+
+  const $ = (id) => document.getElementById(id);
+  const STEP = 1 / 120;
+
+  // ---- a palette (WALLRUN's ramp recipe, fixed colours)
+  function oklchToRgb(L, C, h) {
+    const a = C * Math.cos((h * Math.PI) / 180);
+    const b = C * Math.sin((h * Math.PI) / 180);
+    const l = (L + 0.3963377774 * a + 0.2158037573 * b) ** 3;
+    const m = (L - 0.1055613458 * a - 0.0638541728 * b) ** 3;
+    const s = (L - 0.0894841775 * a - 1.291485548 * b) ** 3;
+    const lin = [4.0767416621 * l - 3.3077115913 * m + 0.2309699292 * s, -1.2684380046 * l + 2.6097574011 * m - 0.3413193965 * s, -0.0041960863 * l - 0.7034186147 * m + 1.707614701 * s];
+    return lin.map((v) => { const c = Math.max(0, Math.min(1, v)); return Math.round(255 * (c <= 0.0031308 ? 12.92 * c : 1.055 * c ** (1 / 2.4) - 0.055)); });
+  }
+  const ramp = (n, h, C, L0, L1, turn = 0) => Array.from({ length: n }, (_, i) => { const k = i / (n - 1); return oklchToRgb(L0 + (L1 - L0) * k, C * Math.sin(Math.PI * (0.15 + 0.7 * k)), h + turn * (k - 0.5)); });
+  const LIST = {
+    stone: ramp(8, 250, 0.018, 0.16, 0.86, 10), rail: ramp(5, 230, 0.03, 0.3, 0.92), dark: ramp(3, 280, 0.02, 0.08, 0.3),
+    water: ramp(8, 172, 0.13, 0.12, 0.93, -20), sky: ramp(6, 45, 0.035, 0.08, 0.7, 20), fur: ramp(5, 80, 0.03, 0.55, 0.98),
+    jacket: ramp(5, 180, 0.12, 0.3, 0.8, 15), pack: ramp(5, 20, 0.12, 0.28, 0.72, 15), blush: ramp(4, 15, 0.1, 0.5, 0.85), spark: ramp(5, 40, 0.19, 0.55, 0.97, 60),
+  };
+  const colours = [];
+  const ramps = {};
+  for (const [name, r] of Object.entries(LIST)) { ramps[name] = [colours.length, r.length]; colours.push(...r); }
+  const MATERIALS = [
+    { ramp: "stone", light: 1, pattern: 1 }, { ramp: "stone", light: 0.9, pattern: 1 }, { ramp: "rail", light: 1, glow: 0.1 }, { ramp: "dark", light: 0.8 },
+    { ramp: "water" }, { ramp: "sky" }, { ramp: "fur", light: 1.1 }, { ramp: "jacket", light: 1 }, { ramp: "pack", light: 1 }, { ramp: "blush", light: 1 }, { ramp: "spark", light: 1, glow: 0.4 },
+  ];
+
+  // ---- a test course: a floor, walls to run along, pillars, stairs, a low tunnel (the arm must pull in), a tall block
+  const boxes = [];
+  const floor = (x0, x1, z0, z1, top = 0) => boxes.push({ c: [(x0 + x1) / 2, top - 1.5, (z0 + z1) / 2], h: [(x1 - x0) / 2, 1.5, (z1 - z0) / 2], mat: 1 });
+  const block = (c, h, yaw = 0, mat = 0) => boxes.push({ c, h, yaw, mat });
+  floor(-16, 16, -16, 34);
+  block([7, 2.5, 8], [0.3, 3, 9]); // (the wall to run along, on the right)
+  block([-7, 2.5, 8], [0.3, 3, 9]); // (and the left)
+  for (const [x, z, h] of [[-11, -6, 5], [11, -8, 7], [-12, 16, 4], [12, 20, 8], [3, -11, 3]]) block([x, h / 2 - 0.5, z], [0.8, h / 2 + 0.5, 0.8], 0.4);
+  for (let i = 0; i < 6; i += 1) block([-3, 0.2 + i * 0.25, -6 - i * 0.9], [1.6, 0.2 + i * 0.25, 0.45], 0, 1); // (stairs going back)
+  block([0, 1.5, -12.5], [3, 1.5, 1.5], 0, 1); // (the landing the stairs reach)
+  block([0, 2.3, 26], [2.6, 0.25, 4]); // (a low tunnel roof)
+  block([-2.35, 1, 26], [0.25, 1.1, 4]);
+  block([2.35, 1, 26], [0.25, 1.1, 4]);
+  block([9, 0.2, 29], [3, 0.2, 3], 0.3, 1); // (a low pad)
+  const world = { boxes };
+  const spawn = [0, 0.1, 0];
+
+  // ---- the parts
+  const px = createPixelRenderer($("c"), { width: 128, height: 128 });
+  px.setPalette(colours, ramps);
+  px.setMaterials(MATERIALS);
+  const screenFor = (w, h) => (Math.min(w, h) <= 48 ? 2 : Math.min(w, h) <= 128 ? 4 : 8);
+  px.setStyle({ screen: screenFor(128, 128), dither: 0.9, outline: 1 });
+  const body = createCharacter({ boxes, rails: [], waterY: -10, spawn });
+  const ps = createParticles(300);
+  const input = createInput({ idle: 8 });
+  input.attach(window, { canvas: $("c") });
+  const cam = createCamera({
+    mode: "chase", width: 128, height: 128, fovKick: 0.06,
+    frame: { spin: 0.5 },
+    rail: { keys: [
+      { at: 0, eye: [0, 6, -14] }, { at: 3, eye: [12, 5, 0] }, { at: 6, eye: [10, 3, 22], target: [0, 1, 26] },
+      { at: 9, eye: [-10, 7, 30] }, { at: 12, eye: [-13, 4, 4] },
+    ] },
+  });
+  let chosen = "orbit";
+  const HEIGHT = 1.15;
+
+  // ---- an autopilot: a loop round the course, a hop now and then (a deterministic dance)
+  const ROUTE = [[0, 6, 0], [5.8, 12, 1], [0, 21, 0], [0, 30, 0], [-5, 31, 0], [-10, 20, 0], [-9, 4, 1], [-3, -4, 0], [0, 0, 0]];
+  let wp = 0;
+  let pilotClock = 0;
+  function pilot() {
+    const [gx, gz, hop] = ROUTE[wp];
+    const dx = gx - body.pos[0];
+    const dz = gz - body.pos[2];
+    const d = Math.hypot(dx, dz) || 1;
+    if (d < 1.5) wp = (wp + 1) % ROUTE.length;
+    pilotClock += STEP;
+    // (Off a wall before its end: the kick across.)
+    const jump = (hop && d < 3 && body.mode === "ground") || (body.mode === "wall" && body.wallTime > 0.55) || (pilotClock % 4 < STEP);
+    return { move: [dx / d, dz / d], jump, hold: true };
+  }
+
+  // ---- the capsule stand-in: a body, a head, a visor on its FRONT, a pack on its back, a pink right hand
+  function standIn() {
+    if (cam.hidesSubject) return [];
+    const p = body.pos;
+    const at = (l) => localToWorld(p, body.facing, l);
+    return [
+      { a: [p[0], p[1] + 0.26, p[2]], b: [p[0], p[1] + 0.8, p[2]], r: 0.26, mat: 7 },
+      { a: at([0, 0.98, 0]), b: at([0, 0.98, 0]), r: 0.17, mat: 6 },
+      { a: at([-0.07, 1.0, 0.15]), b: at([0.07, 1.0, 0.15]), r: 0.05, mat: 3 },
+      { a: at([0, 0.5, -0.26]), b: at([0, 0.72, -0.26]), r: 0.13, mat: 8 },
+      { a: at([0.3, 0.55, 0.02]), b: at([0.3, 0.55, 0.02]), r: 0.07, mat: 9 },
+    ];
+  }
+
+  // ---- the fixed-step loop: input -> body -> camera; drawing only reads the camera
+  function stepOnce() {
+    const it = input.sample(STEP, cam.yaw);
+    body.step(STEP, it.player ? it : pilot());
+    for (const e of body.events) {
+      if (e.type === "landed") { cam.thud(Math.min(1, e.speed / 12) * 0.06); ps.emit("dust", e.at, { count: 5, S: { f: pseudo } }); }
+      if (e.type === "wallJump") cam.shake(0.25);
+    }
+    if (body.pos[1] < -6) { body.pos = [...spawn]; body.vel = [0, 0, 0]; }
+    ps.step(STEP);
+    // (No player: the orbit hands over to the chase, the attract mode.)
+    cam.setMode(!it.player && chosen === "orbit" ? "chase" : chosen);
+    cam.step(STEP, subjectOf(body, { height: HEIGHT }), world, it.player ? it : {});
+  }
+  let seed = 1;
+  function pseudo() { seed = (Math.imul(seed, 1103515245) + 12345) >>> 0; return seed / 4294967296; }
+
+  function draw() {
+    px.setWorld({ boxes, capsules: standIn() });
+    px.render({ ...cam.view(), time: cam.time, sun: [0.35, 0.85, 0.25], waterY: -10, particles: ps.list() });
+  }
+
+  // ---- the page
+  for (const m of ["orbit", "chase", "first", "frame", "rail"]) {
+    const b = document.createElement("button");
+    b.textContent = m; b.dataset.mode = m;
+    b.onclick = () => { chosen = m; input.arbiter.takeOver(); for (const x of $("modes").children) x.setAttribute("aria-pressed", String(x.dataset.mode === m)); };
+    b.setAttribute("aria-pressed", String(m === chosen));
+    $("modes").append(b, " ");
+  }
+  $("size").onchange = () => { const n = +$("size").value; px.setTarget(n, n); px.setStyle({ screen: screenFor(n, n) }); cam.setTarget(n, n); };
+  $("inv").onchange = () => { input.opt.invertY = $("inv").checked; };
+  $("sens").oninput = () => { input.opt.sensitivity = +$("sens").value; };
+  $("shoulder").oninput = () => { cam.rigs.orbit.opt.shoulder = +$("shoulder").value; };
+  // (Buttons shouldn't keep the focus: space would press them again.)
+  for (const el of document.querySelectorAll("button, select, input")) el.addEventListener("keyup", (e) => { if (e.code === "Space") e.preventDefault(); });
+  for (const el of document.querySelectorAll("button")) el.addEventListener("click", () => el.blur());
+
+  let acc = 0;
+  let last = performance.now();
+  let frames = 0;
+  let fpsAt = last;
+  function loop(now) {
+    requestAnimationFrame(loop);
+    acc += Math.min((now - last) / 1000, 0.1);
+    last = now;
+    while (acc >= STEP) { stepOnce(); acc -= STEP; }
+    draw();
+    frames += 1;
+    if (now - fpsAt > 400) {
+      $("info").textContent = `${cam.mode} · ${input.driver} · ${body.mode} · yaw ${cam.yaw.toFixed(2)} pitch ${cam.pitch.toFixed(2)} · ${Math.round((frames * 1000) / (now - fpsAt))} fps · ${px.width}×${px.height}`;
+      $("hint").textContent = input.locked ? "" : "click to lock the mouse";
+      frames = 0; fpsAt = now;
+    }
+  }
+  requestAnimationFrame(loop);
+  globalThis.demo = { cam, input, body, px, world, stepOnce, draw };
+  // (Dev: save what's on the canvas into out/.)
+  globalThis.snap = async (name) => { draw(); const blob = await (await fetch($("c").toDataURL("image/png"))).blob(); await fetch(`../out/${name}.png`, { method: "PUT", body: blob }); return name; };
+</script>

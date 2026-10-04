@@ -141,6 +141,9 @@ importers:
       remark-gfm:
         specifier: ^4.0.1
         version: 4.0.1
+      three:
+        specifier: 0.180.0
+        version: 0.180.0
       viem:
         specifier: ^2.55.0
         version: 2.55.19(typescript@5.9.3)(zod@4.5.4)
@@ -232,104 +235,7 @@ importers:
         specifier: ^5.9.0
         version: 5.9.3
 
-  packages/game-engine:
-    dependencies:
-      '@keel-engine/animals':
-        specifier: link:../../../keel-engine/packs/animals
-        version: link:../../../keel-engine/packs/animals
-      '@keel-engine/audio':
-        specifier: link:../../../keel-engine/packages/audio
-        version: link:../../../keel-engine/packages/audio
-      '@keel-engine/bake':
-        specifier: link:../../../keel-engine/packages/bake
-        version: link:../../../keel-engine/packages/bake
-      '@keel-engine/builder':
-        specifier: link:../../../keel-engine/packages/builder
-        version: link:../../../keel-engine/packages/builder
-      '@keel-engine/buildings':
-        specifier: link:../../../keel-engine/packs/buildings
-        version: link:../../../keel-engine/packs/buildings
-      '@keel-engine/camera':
-        specifier: link:../../../keel-engine/packages/camera
-        version: link:../../../keel-engine/packages/camera
-      '@keel-engine/capture':
-        specifier: link:../../../keel-engine/packages/capture
-        version: link:../../../keel-engine/packages/capture
-      '@keel-engine/cloth':
-        specifier: link:../../../keel-engine/packs/cloth
-        version: link:../../../keel-engine/packs/cloth
-      '@keel-engine/codec':
-        specifier: link:../../../keel-engine/packages/codec
-        version: link:../../../keel-engine/packages/codec
-      '@keel-engine/core':
-        specifier: link:../../../keel-engine/packages/core
-        version: link:../../../keel-engine/packages/core
-      '@keel-engine/creatures':
-        specifier: link:../../../keel-engine/packs/creatures
-        version: link:../../../keel-engine/packs/creatures
-      '@keel-engine/dungeon':
-        specifier: link:../../../keel-engine/packs/dungeon
-        version: link:../../../keel-engine/packs/dungeon
-      '@keel-engine/entity':
-        specifier: link:../../../keel-engine/packages/entity
-        version: link:../../../keel-engine/packages/entity
-      '@keel-engine/foliage':
-        specifier: link:../../../keel-engine/packs/foliage
-        version: link:../../../keel-engine/packs/foliage
-      '@keel-engine/herd':
-        specifier: link:../../../keel-engine/ai/herd
-        version: link:../../../keel-engine/ai/herd
-      '@keel-engine/humans':
-        specifier: link:../../../keel-engine/packs/humans
-        version: link:../../../keel-engine/packs/humans
-      '@keel-engine/import':
-        specifier: link:../../../keel-engine/packages/import
-        version: link:../../../keel-engine/packages/import
-      '@keel-engine/input':
-        specifier: link:../../../keel-engine/packages/input
-        version: link:../../../keel-engine/packages/input
-      '@keel-engine/keel':
-        specifier: link:../../../keel-engine/packages/keel
-        version: link:../../../keel-engine/packages/keel
-      '@keel-engine/level':
-        specifier: link:../../../keel-engine/packages/level
-        version: link:../../../keel-engine/packages/level
-      '@keel-engine/object':
-        specifier: link:../../../keel-engine/packages/object
-        version: link:../../../keel-engine/packages/object
-      '@keel-engine/particles':
-        specifier: link:../../../keel-engine/packages/particles
-        version: link:../../../keel-engine/packages/particles
-      '@keel-engine/physics':
-        specifier: link:../../../keel-engine/packages/physics
-        version: link:../../../keel-engine/packages/physics
-      '@keel-engine/render':
-        specifier: link:../../../keel-engine/packages/render
-        version: link:../../../keel-engine/packages/render
-      '@keel-engine/runtime':
-        specifier: link:../../../keel-engine/packages/runtime
-        version: link:../../../keel-engine/packages/runtime
-      '@keel-engine/scene':
-        specifier: link:../../../keel-engine/packages/scene
-        version: link:../../../keel-engine/packages/scene
-      '@keel-engine/terrain':
-        specifier: link:../../../keel-engine/packages/terrain
-        version: link:../../../keel-engine/packages/terrain
-      '@keel-engine/ui':
-        specifier: link:../../../keel-engine/packages/ui
-        version: link:../../../keel-engine/packages/ui
-      '@keel-engine/view':
-        specifier: link:../../../keel-engine/packages/view
-        version: link:../../../keel-engine/packages/view
-      '@keel-engine/wander':
-        specifier: link:../../../keel-engine/ai/wander
-        version: link:../../../keel-engine/ai/wander
-      '@keel-engine/world':
-        specifier: link:../../../keel-engine/packages/world
-        version: link:../../../keel-engine/packages/world
-      '@keel-engine/worldgen':
-        specifier: link:../../../keel-engine/packages/worldgen
-        version: link:../../../keel-engine/packages/worldgen
+  packages/game-engine: {}
 
   packages/mcp:
     dependencies:
@@ -351,6 +257,8 @@ importers:
         version: 5.9.3
 
   packages/mint-queue: {}
+
+  packages/pixel-engine: {}
 
   packages/protocol:
     devDependencies:
@@ -466,6 +374,9 @@ importers:
         version: 0.6.3(typescript@5.9.3)(zod@4.5.4)
 
 packages:
+
+  three@0.180.0:
+    resolution: {integrity: sha512-o+qycAMZrh+TsE01GqWUxUIKR1AL0S8pq7zDkYOQw8GqfX8b8VoCKYUoHbhiX5j+7hr8XsuHDVU6+gkQJQKg9w==}
 
   '@adraffy/ens-normalize@1.10.0':
     resolution: {integrity: sha512-nA9XHtlAkYfJxY7bce8DcN7eKxWWCWkU+1GR9d+U6MbNpfwQp8TI7vqOsBsMcHoT4mBu2kypKoSKnghEzOOq5Q==}
@@ -3658,6 +3569,8 @@ packages:
     resolution: {integrity: sha512-bXE4cR/kVZhKZX/RjPEflHaKVhUVl85noU3v6b8apfQEc1x4A+zBxjZ4lN8LqGd6WZ3dl98pY4o717VFmoPp+A==}
 
 snapshots:
+
+  three@0.180.0: {}
 
   '@adraffy/ens-normalize@1.10.0': {}
 

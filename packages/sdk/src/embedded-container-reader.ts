@@ -64,7 +64,7 @@ export function createKeelEmbeddedContainerReader(input: {
   readonly decompress: (codec: string, bytes: Uint8Array, decodedByteLength: number) => Promise<Uint8Array>;
 }) {
   const dense = input.transportProfile !== undefined;
-  if (dense && !["base90-v1", "base91-v1", "base90-block-v2"].includes(input.transportProfile!)) throw new TypeError("Unsupported offline dense transport profile.");
+  if (dense && !["base89-v1", "base90-v1", "base91-v1", "base90-block-v2"].includes(input.transportProfile!)) throw new TypeError("Unsupported offline dense transport profile.");
   if (dense !== (typeof input.decodeTransport === "function")) throw new TypeError("Offline dense transport requires its matching decoder.");
   if (!integer(input.chainId, Number.MAX_SAFE_INTEGER, "offline chain ID") || !ADDRESS.test(input.store) || /^0x0{40}$/iu.test(input.store)) throw new TypeError("Invalid offline selected-chain binding.");
   if (!Array.isArray(input.containers) || !input.containers.length || input.containers.length > 128

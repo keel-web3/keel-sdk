@@ -1,4 +1,6 @@
 import test from 'node:test';
+import { siblingTest } from "./sibling-repository.mjs";
+const testWithFunArt = siblingTest(test, "fun-art");
 import assert from 'node:assert/strict';
 import {readFile} from 'node:fs/promises';
 import {decodeFunctionData,decodeAbiParameters,parseAbiParameters} from 'viem';
@@ -37,7 +39,7 @@ test('funding quote pins its reads and sends only the remaining amount',async()=
  let n=0;client.getBlock=async()=>({...block,hash:n++?`0x${'cd'.repeat(32)}`:objectId});
  await assert.rejects(()=>prepareKeelAuctionPublication({client,issuer,auctionId:7n,chainId:31337}),/reorganized/);
 });
-test('deferred house ABI matches the compiled canonical house',async()=>{
+testWithFunArt('deferred house ABI matches the compiled canonical house',async()=>{
  const source=await readFile(new URL('../../fun-art/packages/abi/src/generated/patrons-auction-house.ts',import.meta.url),'utf8');
  const compiled=JSON.parse(source.slice(source.indexOf('['),source.lastIndexOf(' as const;')));
  const normalize=x=>JSON.parse(JSON.stringify(x,(k,v)=>k==='internalType'||k==='name'&&v===''?undefined:v));

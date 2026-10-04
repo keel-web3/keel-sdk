@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { spawn } from "node:child_process";
+import { spawn, spawnSync } from "node:child_process";
 import { once } from "node:events";
 
 import {
@@ -63,7 +63,11 @@ test("keccak256 matches the published vectors, so the selectors are real", () =>
   assert.equal(keccak256(utf8("transfer(address,uint256)")).slice(0, 8), "a9059cbb");
 });
 
-test("reads a local anvil chain and the values arrive as document variables", async () => {
+const anvilAvailable = spawnSync("anvil", ["--version"], { stdio: "ignore" }).status === 0;
+
+test("reads a local anvil chain and the values arrive as document variables", {
+  skip: anvilAvailable ? false : "Anvil is not installed",
+}, async () => {
   await withAnvil(async (rpcUrl) => {
     const bodyAt = "0x00000000000000000000000000000000000c0de0";
     const weaponAt = "0x00000000000000000000000000000000000c0de1";

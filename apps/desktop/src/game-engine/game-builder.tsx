@@ -11,6 +11,8 @@ import type { Project, Shared, Workspace } from '../types';
 import { api, queryClient } from '../client';
 import { Badge, Empty, Field } from '../ui';
 import { BUILDER_PREVIEW_URL, buildFileName, buildName as buildNameSchema, destructiveOps, importable, opsHash, packFileName, projectBuilds, withBuildFile, withPackFiles } from './builder-project.mjs';
+import {StyledAssetPanel} from './styled-asset-panel';
+import {styledImportable,withStyledAssetReference} from './styled-asset-project.mjs';
 import { SpritePane } from './builder-sprite';
 import { CodecInspectorHost, openCodecInspector } from './codec-inspector';
 
@@ -212,7 +214,7 @@ export function GameBuilder({ project, change, persist, action }: { project: Pro
         {live && <Stats state={live} />}
       </section>
       <div className="builder-side">
-        {panel === 'import' ? <ImportPanel project={project} build={name} state={state} action={action} run={run} setMessage={setMessage} /> : <>
+        {panel === 'import' ? <ImportPanel project={project} build={name} state={state} action={action} run={run} setMessage={setMessage} attachStyled={async(result:any)=>{const next=withStyledAssetReference(project,result,result.objectId) as Project;change({files:next.files,objectIds:next.objectIds});await persist(next);setMessage(`Attached ${result.name} with its saved style and loader.`);}} /> : <>
           <StartPanel state={state} apply={apply} />
           {state?.mode === 'character' ? <CharacterPanel state={state} apply={apply} /> : <><GroupsPanel state={state} group={group} setGroup={setGroup} apply={apply} /><RigPanel state={state} apply={apply} /></>}
           <TargetPanel state={state} apply={apply} />
@@ -437,7 +439,7 @@ function HistoryPanel({ state }: { state: State }) {
 }
 
 /** The 3D import: a file from the workspace store (or an engine sample) through the engine's import, then into the build. */
-function ImportPanel({ project, build, state, action, run, setMessage }: { project: Project; build: string; state: State; action: Shared['action']; run: (ops: Op[], label?: string) => Promise<any>; setMessage: (value: string) => void }) {
+function ImportPanel({ project, build, state, action, run, setMessage, attachStyled }: { project: Project; attachStyled:(result:any)=>Promise<void>; build: string; state: State; action: Shared['action']; run: (ops: Op[], label?: string) => Promise<any>; setMessage: (value: string) => void }) {
   const workspace = queryClient.getQueryData<Workspace>(['workspace']);
   const files = (workspace?.state.objects ?? []).filter((item) => importable(item.name));
   const [objectId, setObjectId] = useState(files[0]?.id ?? '');
@@ -445,37 +447,42 @@ function ImportPanel({ project, build, state, action, run, setMessage }: { proje
   const [voxels, setVoxels] = useState(48);
   const [as, setAs] = useState('auto');
   const [result, setResult] = useState<any>(null);
+  const importSequence=useRef(0);
+  useEffect(()=>{importSequence.current++;setResult(null);return()=>{importSequence.current++;};},[project.id]);
   const [opened, setOpened] = useState(false);
   const [picked, setPicked] = useState<string[]>([]);
-  const run1 = (load: () => Promise<any>) => void action(async () => { setResult(null); setOpened(false); setResult(await load()); });
+  const run1 = (load: () => Promise<any>) => {const id=++importSequence.current;void action(async () => {setResult(null);setOpened(false);const loaded=await load();if(id===importSequence.current)setResult(loaded);});};
   async function choose() {
+    const id=++importSequence.current;
     const current = queryClient.getQueryData<Workspace>(['workspace'])!;
     const next = await api('importObject', { revision: current.revision });
     if (!next) return;
     queryClient.setQueryData(['workspace'], next);
+    if(id!==importSequence.current)return;
     const object = next.state.objects.at(-1);
-    if (!importable(object.name)) throw Error(`${object.name} is kept in Files, but the 3D import reads ${['glTF/GLB', 'OBJ', 'STL', '.vox'].join(', ')}.`);
+    if (!importable(object.name)) throw Error(`${object.name} is kept in Files, but the 3D import reads ${['.keelasset', 'glTF/GLB', 'OBJ', 'STL', '.vox'].join(', ')}.`);
     setObjectId(object.id);
-    setResult(null); setResult(await api('gameImport', { objectId: object.id, voxels, as }));
+    setResult(null);const loaded=await api('gameImport', { objectId: object.id, voxels, as });if(id===importSequence.current)setResult(loaded);
   }
   const open = () => void action(async () => {
     const r = await run(result.ops, `Opened ${result.name} in the builder: ${result.ops.length} ops.`);
     if (r.ok) setOpened(true);
     setMessage(r.ok ? `Opened ${result.name} in ${build}: ${r.applied} ops drew it.` : r.errors.map((e: any) => e.message).join(' '));
   });
-  const parts: any[] = result?.proposal.parts ?? [];
-  const worn = new Map<string, any>((result?.proposal.attributes ?? []).map((a: any) => [a.part, a]));
+  const parts: any[] = result?.proposal?.parts ?? [];
+  const nativeSelected=styledImportable(files.find(item=>item.id===objectId)?.name)||result?.kind==='styled-asset';
+  const worn = new Map<string, any>((result?.proposal?.attributes ?? []).map((a: any) => [a.part, a]));
   const sockets: string[] = state?.rig?.sockets?.length ? state.rig.sockets : ['head', 'face', 'neck', 'chest', 'back', 'waist', 'hand.L', 'hand.R', 'foot.L', 'foot.R', 'tail'];
   return <div className="builder-import">
     <section className="builder-section open-section"><h3>Import a 3D model</h3>
-      <p className="builder-hint">glTF/GLB, OBJ, STL or MagicaVoxel .vox: voxelised, colours clustered into roles, split into parts, a creature's worn things proposed for sockets. The file stays in Files, content-addressed.</p>
-      <div className="builder-row"><Field label="File"><select aria-label="Import file" value={objectId} onChange={(event) => setObjectId(event.target.value)}><option value="">Choose a file…</option>{files.map((item) => <option key={item.id} value={item.id}>{item.name}</option>)}</select></Field><button onClick={() => void action(choose)}>Choose a file…</button></div>
-      <Field label={`Resolution · ${voxels} voxels along the longest side`}><input aria-label="Import resolution" type="range" min={16} max={96} step={4} value={voxels} onChange={(event) => setVoxels(Number(event.target.value))} /></Field>
-      <div className="builder-row"><Field label="Read it as"><select aria-label="Import as" value={as} onChange={(event) => setAs(event.target.value)}><option value="auto">auto</option><option value="creature">a creature</option><option value="object">an object</option></select></Field></div>
+      <p className="builder-hint">.keelasset preserves the compiled scene, animation and selected render style. Other 3D formats (glTF/GLB, OBJ, STL or MagicaVoxel .vox) are voxelised, colours clustered into roles, split into parts, a creature's worn things proposed for sockets. The file stays in Files, content-addressed.</p>
+      <div className="builder-row"><Field label="File"><select aria-label="Import file" value={objectId} onChange={(event) => {importSequence.current++;setObjectId(event.target.value);setResult(null);setOpened(false);}}><option value="">Choose a file…</option>{files.map((item) => <option key={item.id} value={item.id}>{item.name}</option>)}</select></Field><button onClick={() => void action(choose)}>Choose a file…</button></div>
+      <Field label={`Resolution · ${voxels} voxels along the longest side`}><input aria-label="Import resolution" disabled={nativeSelected} type="range" min={16} max={96} step={4} value={voxels} onChange={(event) => setVoxels(Number(event.target.value))} /></Field>
+      <div className="builder-row"><Field label="Read it as"><select aria-label="Import as" disabled={nativeSelected} value={as} onChange={(event) => setAs(event.target.value)}><option value="auto">auto</option><option value="creature">a creature</option><option value="object">an object</option></select></Field></div>
       <div className="inline-actions"><button className="primary" disabled={!objectId} onClick={() => run1(() => api('gameImport', { objectId, voxels, as }))}>Import</button><select aria-label="Engine sample" value={sample} onChange={(event) => setSample(event.target.value)}>{SAMPLES.map((item) => <option key={item}>{item}</option>)}</select><button onClick={() => run1(() => api('gameImportSample', { name: sample, voxels, as }))}>Try an engine sample</button></div>
     </section>
     {!result && <Empty title="Nothing imported yet">Choose a file, or try one of the engine's samples (written in code, nothing downloaded).</Empty>}
-    {result && <>
+    {result?.kind==='styled-asset' ? <StyledAssetPanel result={result} onAttach={()=>void action(()=>attachStyled(result))}/> : result && <>
       <div className="builder-views">{result.views.map((v: any) => <figure key={v.id}><img src={v.url} alt={v.label} /><figcaption>{v.label}</figcaption></figure>)}</div>
       <p className="builder-hint">{result.proposal.kind === 'creature' ? `A creature (${result.proposal.creature?.plan}, from its ${result.proposal.creature?.source}; ${Math.round((result.proposal.creature?.confidence ?? 0) * 100)}% sure)` : `An object`} · {result.stats.voxels.toLocaleString()} voxels on a {result.stats.grid.join('×')} grid · {result.stats.parts} parts · {result.ops.length} ops · {result.ms} ms</p>
       <div className="inline-actions"><button className="primary" onClick={open}>{opened ? 'Open again in the builder' : 'Open in builder'}</button>{!opened && state?.model?.count > 0 && <small className="builder-hint">It replaces what the build shows now (Undo brings it back).</small>}</div>

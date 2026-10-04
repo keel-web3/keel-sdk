@@ -2,11 +2,12 @@ import assert from 'node:assert/strict';
 import {test} from 'node:test';
 import {createContext,runInContext} from 'node:vm';
 import {randomBytes} from 'node:crypto';
-import {encodeKeelDenseTransport as encode,decodeKeelDenseTransport as decode,KEEL_BASE90_ALPHABET,KEEL_BASE91_ALPHABET} from '../packages/sdk/dist/dense-transport.js';
+import {encodeKeelDenseTransport as encode,decodeKeelDenseTransport as decode,KEEL_BASE89_ALPHABET,KEEL_BASE90_ALPHABET,KEEL_BASE91_ALPHABET} from '../packages/sdk/dist/dense-transport.js';
 import {buildKeelDenseTransportDecoder} from '../packages/sdk/dist/verification-shell.js';
-const profiles=['base90-v1','base91-v1'];
+const profiles=['base89-v1','base90-v1','base91-v1'];
 test('standard basE91 known vector and distinct versioned Base90 alphabet',()=>{
  assert.equal(encode(Buffer.from('Hello World!'),'base91-v1'),'>OwJh>Io0Tv!8PE');
+ assert.equal(KEEL_BASE89_ALPHABET.length,89);assert.equal(new Set(KEEL_BASE89_ALPHABET).size,89);assert.doesNotMatch(KEEL_BASE89_ALPHABET,/["\\%#?\s]/);
  assert.equal(KEEL_BASE90_ALPHABET.length,90);assert.equal(new Set(KEEL_BASE90_ALPHABET).size,90);
  assert.equal(KEEL_BASE91_ALPHABET.length,91);assert.doesNotMatch(KEEL_BASE90_ALPHABET,/["\\%#\s]/);
 });
@@ -32,7 +33,7 @@ test('foreign characters, invalid profiles, truncated/oversized output and dirty
  assert.throws(()=>decode('~~',{profile:'base90-v1',byteLength:1}),/tail|length/);
 });
 test('optional browser module reconstructs bytes without Buffer, atob or compression dependencies',async()=>{
- const module=await buildKeelDenseTransportDecoder();assert.ok(module.integrity.byteLength<4000);
+ const module=await buildKeelDenseTransportDecoder();assert.ok(module.integrity.byteLength<4200);
  assert.doesNotMatch(module.javascript,/atob|Buffer|fetch\(|DecompressionStream|encodeKeelDenseTransport/);
  const context=createContext({Uint8Array,Int16Array});runInContext(module.javascript,context);
  for(const profile of profiles){const b=randomBytes(4097);assert.deepEqual(Buffer.from(context.KEEL_DENSE_TRANSPORT.decodeKeelDenseTransport(encode(b,profile),{profile,byteLength:b.length})),b);}

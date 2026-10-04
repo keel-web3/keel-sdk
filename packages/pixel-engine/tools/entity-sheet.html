@@ -1,0 +1,184 @@
+<!doctype html>
+<meta charset="utf-8">
+<title>Entity sheet</title>
+<style>
+  body { margin: 0; background: #16161c; color: #cfd0d8; font: 12px/1.4 ui-monospace, Menlo, monospace; }
+  header { padding: 10px 14px; display: flex; flex-wrap: wrap; gap: 14px; align-items: center; position: sticky; top: 0; background: #16161ce8; z-index: 1; }
+  header label { display: flex; gap: 6px; align-items: center; }
+  input[type=text] { width: 150px; background: #22222a; color: inherit; border: 1px solid #3a3a46; padding: 2px 6px; }
+  button { background: #2c2c36; color: inherit; border: 1px solid #44444f; padding: 3px 10px; cursor: pointer; }
+  #sheet { padding: 0 14px 20px; }
+  .row { display: flex; gap: 6px; margin-bottom: 6px; align-items: flex-start; }
+  .who { width: 120px; flex: none; padding-top: 4px; }
+  .who b { color: #fff; }
+  .cell { position: relative; }
+  .cell canvas { display: block; image-rendering: pixelated; }
+  .cell span { position: absolute; left: 3px; top: 2px; font-size: 10px; color: #fff; text-shadow: 0 0 2px #000, 0 0 2px #000; }
+  .cell i { position: absolute; right: 3px; bottom: 2px; font-size: 10px; font-style: normal; text-shadow: 0 0 2px #000, 0 0 2px #000; }
+  .bad { color: #ff7070; } .ok { color: #8ef0a0; }
+  #note { color: #8a8b96; }
+</style>
+<header>
+  <label>seeds <input id="seeds" type="text" value="1,2,3,4"></label>
+  <label>kinds <input id="kinds" type="text" value="anthro,humanoid,animal"></label>
+  <label>target <select id="size"><option>64</option><option selected>96</option><option>128</option><option>192</option></select></label>
+  <label>yaw <input id="yaw" type="range" min="-3.14" max="3.14" step="0.01" value="0.6"></label>
+  <label>view <select id="view"><option value="front3q" selected>front 3/4</option><option value="back3q">back 3/4</option><option value="side">side (its right)</option><option value="front">front</option><option value="top">top</option></select></label>
+  <label><input id="anim" type="checkbox"> animate</label>
+  <button id="save">save PNG to out/</button>
+  <span id="note">The red bar on the floor is the declared front (own +z); the corner tag is frontOfEntity's reading (ok = agrees).</span>
+</header>
+<div id="sheet"></div>
+<script type="module">
+import { createPixelRenderer } from "../src/gpu/pixel-renderer.js";
+import { frontOf, localToWorld } from "../src/core/frame.js";
+import { entityOf, posed, seatOf, skinOf, frontOfEntity } from "../src/entity/index.js";
+
+// OKLCH -> sRGB and ramps (as projects/wallrun/palette.js does them).
+function oklchToRgb(L, C, h) {
+  const a = C * Math.cos((h * Math.PI) / 180);
+  const b = C * Math.sin((h * Math.PI) / 180);
+  const l = (L + 0.3963377774 * a + 0.2158037573 * b) ** 3;
+  const m = (L - 0.1055613458 * a - 0.0638541728 * b) ** 3;
+  const s = (L - 0.0894841775 * a - 1.291485548 * b) ** 3;
+  const lin = [4.0767416621 * l - 3.3077115913 * m + 0.2309699292 * s, -1.2684380046 * l + 2.6097574011 * m - 0.3413193965 * s, -0.0041960863 * l - 0.7034186147 * m + 1.707614701 * s];
+  return lin.map((v) => { const c = Math.max(0, Math.min(1, v)); return Math.round(255 * (c <= 0.0031308 ? 12.92 * c : 1.055 * c ** (1 / 2.4) - 0.055)); });
+}
+function ramp(n, h, C, L0, L1, turn = 0) {
+  return Array.from({ length: n }, (_, i) => { const k = i / (n - 1); return oklchToRgb(L0 + (L1 - L0) * k, C * Math.sin(Math.PI * (0.15 + 0.7 * k)), h + turn * (k - 0.5)); });
+}
+// A ramp around one colour of the spec: from well under it to a little over.
+const around = ([L, C, h], n = 5) => ramp(n, h, Math.max(C, 0.012), Math.max(0.08, L - 0.42), Math.min(0.98, L + 0.14), 12);
+function paletteFor(spec) {
+  const c = spec.colours;
+  const list = {
+    stone: ramp(6, 250, 0.018, 0.22, 0.8, 10), marker: ramp(3, 25, 0.2, 0.5, 0.75), dark: ramp(3, 280, 0.02, 0.08, 0.3),
+    water: ramp(4, 172, 0.1, 0.2, 0.8), sky: ramp(5, 250, 0.03, 0.2, 0.45),
+    fur: around(c.fur), cloth: around(c.cloth), accent: around(c.accent), blush: ramp(4, 15, 0.1, 0.5, 0.85),
+    furAlt: around(c.furAlt), clothAlt: around(c.clothAlt), hair: around(c.hair),
+  };
+  const colours = [];
+  const ramps = {};
+  for (const [name, r] of Object.entries(list)) { ramps[name] = [colours.length, r.length]; colours.push(...r); }
+  return { colours, ramps };
+}
+const MATERIALS = [
+  { ramp: "stone", light: 0.9, pattern: 1 }, { ramp: "marker", light: 1, glow: 0.3 }, { ramp: "stone" }, { ramp: "dark", light: 0.8 },
+  { ramp: "water" }, { ramp: "sky" }, { ramp: "fur", light: 1.1 }, { ramp: "cloth" }, { ramp: "accent" }, { ramp: "blush" },
+  { ramp: "furAlt", light: 1.1 }, { ramp: "clothAlt" }, { ramp: "hair" },
+];
+const ROLES = { dark: 3, fur: 6, cloth: 7, accent: 8, blush: 9, furAlt: 10, clothAlt: 11, hair: 12 };
+const POSES = {
+  humanoid: [["idle"], ["walk", { phase: 0.1 }], ["run", { phase: 0.15, params: { speed: 8 } }], ["jump"], ["fall"], ["land", { landT: 0.03 }], ["wallRun", { phase: 0.15, params: { wall: 1, speed: 8 } }], ["grind"], ["skim", { phase: 0.2 }], ["sit"], ["sit", { params: { seat: 0 } }, "sit floor"], ["turn", { t: 0.1, params: { turn: 2 } }]],
+  quadruped: [["idle"], ["walk", { phase: 0.1 }], ["trot", { phase: 0.1 }], ["gallop", { phase: 0.2 }], ["leap"], ["sit"], ["lie"]],
+};
+
+const $ = (id) => document.getElementById(id);
+const work = document.createElement("canvas");
+const px = createPixelRenderer(work, { width: 96, height: 96 });
+let cells = [];
+
+function build() {
+  const size = +$("size").value;
+  px.setTarget(size, size);
+  px.setStyle({ screen: size <= 64 ? 2 : 4, dither: 0.8, outline: 1 });
+  const sheet = $("sheet");
+  sheet.textContent = "";
+  cells = [];
+  for (const kind of $("kinds").value.split(",").map((s) => s.trim()).filter(Boolean)) {
+    for (const seed of $("seeds").value.split(",").map((s) => s.trim()).filter(Boolean)) {
+      const spec = entityOf(seed, { kind });
+      const row = document.createElement("div");
+      row.className = "row";
+      const who = document.createElement("div");
+      who.className = "who";
+      const o = spec.outfit;
+      who.innerHTML = `<b>${kind} ${spec.species}</b><br>seed ${seed}<br>${spec.plan}<br>${kind === "animal" ? `${spec.features.coat}${spec.features.antlers ? ", antlers" : ""}${o.accessory !== "none" ? `, ${o.accessory}` : ""}` : `${o.top}${o.hood ? "+hood" : ""}, ${o.pack} pack<br>${o.pants} pants, ${o.shoes}${o.accessory !== "none" ? `<br>${o.accessory}` : ""}${spec.features.hair !== "none" ? `<br>${spec.features.hair} hair` : ""}`}`;
+      row.append(who);
+      for (const [clip, opts = {}, label = clip] of POSES[spec.plan]) {
+        const cell = document.createElement("div");
+        cell.className = "cell";
+        const cv = document.createElement("canvas");
+        cv.width = size; cv.height = size;
+        cv.style.width = cv.style.height = `${Math.max(128, size * 1.5)}px`;
+        const tag = document.createElement("span");
+        tag.textContent = label;
+        const read = document.createElement("i");
+        cell.append(cv, tag, read);
+        row.append(cell);
+        cells.push({ spec, clip, opts, cv, read, pal: paletteFor(spec) });
+      }
+      sheet.append(row);
+    }
+  }
+  draw(0);
+}
+
+function cameraFor(spec, yaw, view) {
+  const H = spec.body.H;
+  const d = H * 1.9 + 0.03;
+  const off = { front3q: 0.7, back3q: Math.PI - 0.7, side: Math.PI / 2, front: 0, top: 0.4 }[view];
+  const f = frontOf(yaw + off);
+  const up = view === "top" ? d * 1.1 : H * 0.75;
+  return { eye: [f[0] * d, up, f[2] * d], target: [0, H * (spec.plan === "quadruped" ? 0.35 : 0.45), 0] };
+}
+
+function draw(time) {
+  const yaw = +$("yaw").value;
+  const view = $("view").value;
+  for (const c of cells) {
+    const H = c.spec.body.H;
+    const o = { ...c.opts, yaw, t: (c.opts.t ?? 0) + time };
+    if (time && c.opts.phase !== undefined) o.phase = (c.opts.phase + time * 1.2) % 1;
+    if (time && c.clip === "land") o.landT = (time * 0.6) % 0.3;
+    const skel = posed(c.spec, c.clip, o);
+    const caps = skinOf(c.spec, skel, ROLES);
+    const seen = frontOfEntity(caps, { yaw });
+    c.read.textContent = seen.agrees ? `ok ${(seen.error * 57.3).toFixed(0)}°` : `OFF ${(seen.error * 57.3).toFixed(0)}°`;
+    c.read.className = seen.agrees ? "ok" : "bad";
+    const boxes = [{ c: [0, -0.5, 0], h: [30, 0.5, 30], mat: 0 }];
+    // The declared front: a bar on the floor from the feet out along frontOf(yaw).
+    const fp = localToWorld([0, 0, 0], yaw, [0, 0.004, H * 0.55]);
+    boxes.push({ c: fp, h: [H * 0.02, 0.004, H * 0.28], yaw, mat: 1 });
+    if (c.clip === "wallRun") boxes.push({ c: localToWorld([0, 0, 0], yaw, [-H * 0.45, H, 0]), h: [0.05, H, H * 2], yaw, mat: 2 });
+    if (c.clip === "sit" && (c.opts.params?.seat ?? 1) > 0) {
+      const seat = c.spec.plan === "quadruped" ? 0 : seatOf(c.spec);
+      if (seat) boxes.push({ c: localToWorld([0, 0, 0], yaw, [0, seat / 2, -c.spec.body.thigh * 0.1]), h: [c.spec.body.hipW * 2.5, seat / 2, c.spec.body.thigh * 0.55], yaw, mat: 2 });
+    }
+    px.setPalette(c.pal.colours, c.pal.ramps);
+    px.setMaterials(MATERIALS);
+    px.setWorld({ boxes, capsules: caps });
+    px.render({ ...cameraFor(c.spec, yaw, view), fov: 0.9, time, sun: [0.4, 0.8, 0.45], waterY: -50, fogNear: 60, fogFar: 200 });
+    c.cv.getContext("2d").drawImage(work, 0, 0);
+  }
+}
+
+let t0 = 0;
+function loop(now) {
+  if (!$("anim").checked) return;
+  if (!t0) t0 = now;
+  draw((now - t0) / 1000);
+  requestAnimationFrame(loop);
+}
+for (const id of ["seeds", "kinds", "size"]) $(id).addEventListener("change", build);
+for (const id of ["yaw", "view"]) $(id).addEventListener("input", () => draw(0));
+$("anim").addEventListener("change", () => { t0 = 0; if ($("anim").checked) requestAnimationFrame(loop); else draw(0); });
+$("save").addEventListener("click", async () => {
+  // (One PNG of the whole sheet: every cell's canvas copied into one.)
+  const rows = [...document.querySelectorAll(".row")];
+  const size = +$("size").value;
+  const cols = Math.max(...rows.map((r) => r.querySelectorAll("canvas").length));
+  const out = document.createElement("canvas");
+  out.width = cols * (size + 2);
+  out.height = rows.length * (size + 2);
+  const g = out.getContext("2d");
+  g.fillStyle = "#16161c"; g.fillRect(0, 0, out.width, out.height);
+  rows.forEach((r, y) => r.querySelectorAll("canvas").forEach((cv, x) => g.drawImage(cv, x * (size + 2), y * (size + 2))));
+  const blob = await new Promise((res) => out.toBlob(res, "image/png"));
+  const name = `out/entity-sheet-${$("view").value}.png`;
+  const r = await fetch(`/${name}`, { method: "PUT", body: blob });
+  $("note").textContent = r.ok ? `saved ${name}` : `save failed (${r.status})`;
+});
+window.sheet = { build, draw, cells: () => cells };
+build();
+</script>

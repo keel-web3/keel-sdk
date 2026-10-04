@@ -9,6 +9,7 @@
 import { z } from 'zod';
 import { isGameProject } from './game-project.mjs';
 import { buildName, builderOps, destructiveOps, importBytes, packFileName, projectBuilds, withBuildFile, withPackFiles } from './builder-project.mjs';
+import {withStyledAssetReference} from './styled-asset-project.mjs';
 import { projectSchema } from '../workspace.mjs';
 
 const uuid = z.string().uuid();
@@ -83,7 +84,14 @@ export function registerGameBuilderTools({ register, project, canEdit, access, a
   register('keel_game_import', 'Import a 3D file already in the workspace (glTF/GLB, OBJ, STL or MagicaVoxel .vox; by its Files object id) with the engine\'s import: voxelised at a resolution, colours clustered into roles, segmented into parts, a creature split into its rigged body and the things it wears (each proposed for a socket with a confidence). Returns the proposal; with open: true it also replays the import\'s op list into the build so it draws live (through a review card if the build already has work). Adjust afterwards with builder ops: attach (move to another socket), detach (make body), merge, recolour with group (a part\'s role).', z.object({ ...where, objectId: z.string().regex(/^[a-f0-9]{64}$/), voxels: z.number().int().min(12).max(128).default(48).describe('Voxels along the longest side'), as: z.enum(['auto', 'creature', 'object']).default('auto'), open: z.boolean().default(true) }).strict(), async (input) => {
     access();
     const file = await importBytes(workspace, input.objectId);
-    const r = await ready().importFile({ bytes: file.bytes, name: file.name, voxels: input.voxels, as: input.as });
+    const r = await ready().importFile({ bytes: file.bytes, name: file.name, fileName: file.fileName, voxels: input.voxels, as: input.as });
+    if(r.kind==='styled-asset'){
+      const summary={kind:r.kind,name:r.name,ms:r.ms,style:r.style,animation:r.animation,dependencies:r.dependencies,voxelCount:r.voxelCount,byteLength:r.byteLength};
+      if(!input.open)return{...summary,opened:false};
+      canEdit();const p=project(input.projectId),next=projectSchema.parse(withStyledAssetReference(p,r,input.objectId));
+      const card=action('project-edit',`Attach styled asset ${r.name} with its saved style and trusted loader`,{projectId:p.id,before:digest(p),previous:p,next});
+      return{...summary,opened:card,hint:'Apply the project attachment, then use Builder Import to preview its preserved animation and style. Native assets do not become voxel editor ops.'};
+    }
     const pr = r.proposal;
     const summary = {
       name: r.name, ms: r.ms, stats: r.stats, kind: pr.kind, creature: pr.creature && { plan: pr.creature.plan, source: pr.creature.source, confidence: pr.creature.confidence, why: pr.creature.why?.slice(0, 3), missing: pr.creature.missing },
