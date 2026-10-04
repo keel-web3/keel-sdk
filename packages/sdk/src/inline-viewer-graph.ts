@@ -31,6 +31,7 @@ import {
   KEEL_ASSET_DISPLAY_MODULE_ID,
   KEEL_ASSET_DISPLAY_MODULE_VERSION,
   keelAssetDisplayKind,
+  keelAssetDisplayModuleRevision,
   keelAssetDisplayModuleBytes,
   type KeelAssetDisplayKind,
   type KeelAssetDisplayMediaType,
@@ -1170,19 +1171,32 @@ function isNormalMediaEntry(mediaType: string): mediaType is KeelAssetDisplayMed
 }
 
 async function assertCanonicalAssetDisplayModule(module: KeelInlineModuleFragment): Promise<void> {
-  const expected = module.item.embedded?.compression === "gzip"
-    ? await buildKeelInlineModuleFragment({
-        moduleId: KEEL_ASSET_DISPLAY_MODULE_ID,
-        version: KEEL_ASSET_DISPLAY_MODULE_VERSION,
-        mediaType: "text/javascript",
-        aliases: [KEEL_ASSET_DISPLAY_MODULE_ID],
-        decodedBytes: keelAssetDisplayModuleBytes(),
-        compression: "gzip",
-        execution: "classic",
-        phase: "render",
-        weight: 0,
-      })
-    : await buildKeelInlineAssetDisplayModuleFragment();
+  const revision = keelAssetDisplayModuleRevision(module.version);
+  const embedded = module.item.embedded;
+  if (revision === undefined || embedded === undefined || !["none", "gzip"].includes(embedded.compression)) {
+    throw new TypeError("Direct media requires the exact registered keel.asset-display module in a supported canonical revision.");
+  }
+  const stored = embedded.storedText !== undefined
+    ? encoder.encode(embedded.storedText)
+    : exactBase64Bytes(embedded.storedBase64 ?? "", "Canonical asset-display payload");
+  const decoded = embedded.compression === "gzip"
+    ? new Uint8Array(gunzipSync(stored, {maxOutputLength: revision.byteLength}))
+    : stored;
+  const decodedHash=createHash("sha256"); decodedHash.update(decoded);
+  if (decoded.byteLength !== revision.byteLength || "0x" + decodedHash.digest("hex") !== revision.digest) {
+    throw new TypeError("Direct media asset-display bytes do not match their canonical revision.");
+  }
+  const expected = await buildKeelInlineModuleFragment({
+    moduleId: KEEL_ASSET_DISPLAY_MODULE_ID,
+    version: revision.version,
+    mediaType: "text/javascript",
+    aliases: [KEEL_ASSET_DISPLAY_MODULE_ID],
+    decodedBytes: decoded,
+    compression: embedded.compression as "none" | "gzip",
+    execution: "classic",
+    phase: "render",
+    weight: 0,
+  });
   if (
     module.moduleId !== expected.moduleId
     || module.version !== expected.version
