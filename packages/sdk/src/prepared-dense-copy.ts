@@ -13,7 +13,7 @@ export async function buildKeelPreparedDenseCopyShell(input: Parameters<typeof b
   const { context, shellBootCompression = "gzip", ...options } = input;
   if (shellBootCompression !== "gzip" && shellBootCompression !== "none") throw new TypeError("Unsupported shell boot compression.");
   const carriage = options.binaryPayloadCarriage ?? "base90";
-  if (!["base89", "base90", "base91", "base90-block"].includes(carriage)) throw new TypeError("Prepared dense COPY requires an explicit dense payload format.");
+  if (!["base90", "base91", "base90-block"].includes(carriage)) throw new TypeError("Prepared dense COPY requires an explicit dense payload format.");
   const canonical = await buildCompactInlineKeelShell({ ...options, binaryPayloadCarriage: carriage });
   if (!canonical.containerBridge) throw new TypeError("Prepared dense COPY requires embedded container delivery.");
   const prefix = Buffer.from('<!doctype html><html><head><meta charset="utf-8"></head><body><script>'

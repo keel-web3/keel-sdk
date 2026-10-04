@@ -33,3 +33,5 @@ The Base90 alphabet excludes JSON string escapes and URL percent/fragment delimi
 ## Provenance
 
 The pair-code algorithm is derived from Joachim Henke's basE91 encoding/decoding routines, Copyright (c) 2000-2006, under BSD-3-Clause. The source and emitted decoder retain the full notice. Primary reference: https://github.com/mscdex/base91.js/blob/master/deps/base91/base91.c . The Base90 alphabet, generalized threshold, strict decoder bounds and profile integration are KEEL additions.
+
+The direct data-URI helper preserves `?` in Base90 payloads. The [WHATWG Fetch data-URL processor](https://fetch.spec.whatwg.org/#data-url-processor) serializes the URL excluding its fragment, including the query; it then percent-decodes the entire body. A question mark is therefore payload, not a truncation boundary. The helper still escapes `%`, `#`, controls/whitespace and non-ASCII, and the script serializer still closes HTML sentinels. Keep this optimization confined to this tested direct data-URI boundary; quoted HTML attributes and generic URL parameters have different rules.

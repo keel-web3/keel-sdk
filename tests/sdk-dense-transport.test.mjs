@@ -2,12 +2,11 @@ import assert from 'node:assert/strict';
 import {test} from 'node:test';
 import {createContext,runInContext} from 'node:vm';
 import {randomBytes} from 'node:crypto';
-import {encodeKeelDenseTransport as encode,decodeKeelDenseTransport as decode,KEEL_BASE89_ALPHABET,KEEL_BASE90_ALPHABET,KEEL_BASE91_ALPHABET} from '../packages/sdk/dist/dense-transport.js';
+import {encodeKeelDenseTransport as encode,decodeKeelDenseTransport as decode,KEEL_BASE90_ALPHABET,KEEL_BASE91_ALPHABET} from '../packages/sdk/dist/dense-transport.js';
 import {buildKeelDenseTransportDecoder} from '../packages/sdk/dist/verification-shell.js';
-const profiles=['base89-v1','base90-v1','base91-v1'];
+const profiles=['base90-v1','base91-v1'];
 test('standard basE91 known vector and distinct versioned Base90 alphabet',()=>{
  assert.equal(encode(Buffer.from('Hello World!'),'base91-v1'),'>OwJh>Io0Tv!8PE');
- assert.equal(KEEL_BASE89_ALPHABET.length,89);assert.equal(new Set(KEEL_BASE89_ALPHABET).size,89);assert.doesNotMatch(KEEL_BASE89_ALPHABET,/["\\%#?\s]/);
  assert.equal(KEEL_BASE90_ALPHABET.length,90);assert.equal(new Set(KEEL_BASE90_ALPHABET).size,90);
  assert.equal(KEEL_BASE91_ALPHABET.length,91);assert.doesNotMatch(KEEL_BASE90_ALPHABET,/["\\%#\s]/);
 });
@@ -33,7 +32,7 @@ test('foreign characters, invalid profiles, truncated/oversized output and dirty
  assert.throws(()=>decode('~~',{profile:'base90-v1',byteLength:1}),/tail|length/);
 });
 test('optional browser module reconstructs bytes without Buffer, atob or compression dependencies',async()=>{
- const module=await buildKeelDenseTransportDecoder();assert.ok(module.integrity.byteLength<4200);
+ const module=await buildKeelDenseTransportDecoder();assert.ok(module.integrity.byteLength<4000);
  assert.doesNotMatch(module.javascript,/atob|Buffer|fetch\(|DecompressionStream|encodeKeelDenseTransport/);
  const context=createContext({Uint8Array,Int16Array});runInContext(module.javascript,context);
  for(const profile of profiles){const b=randomBytes(4097);assert.deepEqual(Buffer.from(context.KEEL_DENSE_TRANSPORT.decodeKeelDenseTransport(encode(b,profile),{profile,byteLength:b.length})),b);}
@@ -47,4 +46,18 @@ test('paired wrapper survives both URI/JSON layers, closes script sentinels and 
  const animation=toKeelDenseTransportDataURL('html',html),uri=toKeelDenseTransportDataURL('metadata',JSON.stringify({name:'Test 🔥',animation_url:animation}));
  const metadata=JSON.parse(await(await fetch(uri)).text());assert.equal(metadata.animation_url,animation);assert.equal(await(await fetch(metadata.animation_url)).text(),html);
  assert.throws(()=>toKeelDenseTransportDataURL('svg',html),/input/);assert.throws(()=>serializeKeelDenseTransportJSON(undefined),/serializable/);
+});
+
+// A data URL body includes its query according to WHATWG Fetch. Escaping ?
+// costs four bytes through nested metadata/HTML layers with no decoding benefit.
+test('Base90 punctuation remains direct through two data URI layers',async()=>{
+ const body='?'+KEEL_BASE90_ALPHABET.repeat(64);
+ const html='<script type="application/json">'+serializeKeelDenseTransportJSON({body})+'</script>';
+ const animation=toKeelDenseTransportDataURL('html',html);
+ const uri=toKeelDenseTransportDataURL('metadata',JSON.stringify({animation_url:animation}));
+ assert.doesNotMatch(animation,/%3[fF]/);assert.doesNotMatch(uri,/%3[fF]/);
+ const metadata=await(await fetch(uri)).json();assert.equal(metadata.animation_url,animation);
+ assert.equal(await(await fetch(metadata.animation_url)).text(),html);
+ const sensitive='?%23#%3F\n\t🔥';
+ assert.equal(await(await fetch(toKeelDenseTransportDataURL('html',sensitive))).text(),sensitive);
 });
