@@ -13,7 +13,7 @@ import { buildOnchainDataFragment, resolveKeelOnchainRpcUrl } from "../packages/
    RPC would prove the wiring and skip the promise. */
 async function withAnvil(run) {
   const port = 8900 + Math.floor(Math.random() * 300);
-  const anvil = spawn("anvil", ["--port", String(port), "--silent", "--chain-id", "31337"], { stdio: ["ignore", "pipe", "pipe"] });
+  const anvil = spawn("anvil", ["--port", String(port), "--silent", "--chain-id", "31337", "--prune-history"], { stdio: ["ignore", "pipe", "pipe"] });
   const rpcUrl = `http://127.0.0.1:${port}`;
   try {
     const deadline = Date.now() + 20_000;

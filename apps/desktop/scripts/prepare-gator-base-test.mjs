@@ -40,7 +40,7 @@ await writeFile(root+'/solc-input.json',JSON.stringify(input,null,2));
 await writeFile(root+'/compiled.json',JSON.stringify(artifact,null,2));
 const data=encodeDeployData({abi:artifact.abi,bytecode:'0x'+artifact.evm.bytecode.object,args:[recipient]});
 await writeFile(root+'/deployment-data.txt',data);
-const child=spawn('anvil',['--port','0','--chain-id','31337'],{stdio:['ignore','pipe','pipe']});
+const child=spawn('anvil',['--port','0','--chain-id','31337','--prune-history'],{stdio:['ignore','pipe','pipe']});
 try {
  const url=await new Promise((resolve,reject)=>{let out='';const timer=setTimeout(()=>reject(Error('Local EVM startup timeout')),15000);child.on('error',reject);child.on('exit',()=>{clearTimeout(timer);reject(Error('Local EVM exited'));});child.stdout.on('data',chunk=>{out+=chunk;const match=out.match(/Listening on (127\.0\.0\.1:\d+)/);if(match){clearTimeout(timer);resolve('http://'+match[1]);}});});
  const c=createPublicClient({transport:http(url)}),w=createWalletClient({transport:http(url)});

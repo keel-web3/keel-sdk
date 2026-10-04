@@ -1,12 +1,20 @@
 # KEEL publication modes and recovery
 
+**Shared storage and shell policy:** Default payloadStorage is Compact: native bytes stored once, beneficial compatible lossless compression, no generated encoded sibling. Raw preserves supplied bytes and intentional creator formatting. Shell selection is independent. Default to the registered KEEL verification shell; explicit viewer=none preserves creator-owned HTML/direct artifacts without a canonical protection claim. Requirements below for canonical shell records, protected K, and canonical mounting apply to the verification-shell choice. Native-container composers require native storage inventory, decoded source and selected-chain reader proof; their transient return encoding is not another stored copy. Read `docs/KEEL_PAYLOAD_STORAGE.md` and `docs/KEEL_BINARY_RESOURCE_DELIVERY.md`. Persist both choices and reject unsupported readers instead of silently changing storage or presentation.
+
 Read the MCP resource `keel://mcp/publication-modes` before quoting or planning
 a large publication. A selected mode is part of the plan identity and must not
 change during retry or recovery.
 
 ## Presentation is separate from storage
 
-Use the SDK terms exactly:
+Use the SDK terms exactly. Shell choice (`keel-verification-shell` by
+default, explicit `none` for creator-owned HTML) and payloadStorage
+(`compact` by default or explicit `raw`) are separate from delivery.
+For viewer=none, one self-contained UTF-8 HTML entrypoint uses the existing
+raw-percent builder and raw-artifact metadata policy without canonical
+protection. The initial direct HTML route rejects separate files/modules/
+assets and declared runtimes; do not silently wrap or flatten them.
 
 - **Boot shell**: small, uncompressed HTML the contract can read directly.
 - **Resource graph**: digest-bound scripts, modules, assets, and data. Child
@@ -35,6 +43,11 @@ Rules, in order:
 1. `image` is an inlined `data:` URI. Never `web3://`, `ipfs://`, `https://`, or a
    bare manifest locator. `buildKeelPreparedOneOfOneTokenURI` enforces this;
    `setDefaultPresentation` does not, so do not go around it.
+   Keep the source image binary in one native KEEL object. At the final metadata
+   boundary, assemble the `data:image/<type>;base64,` header, canonical Base64
+   of the exact source bytes, and the JSON delimiter/footer; do not upload a
+   Base64 text duplicate. For GIFs this is a direct GIF URI, never an SVG
+   wrapper, generated substitute, or short placeholder such as `AA==`.
 2. Keep the poster small. It is stored per token, and roughly 20,000 gas per
    32 bytes. Around 12 KB is a good ceiling; a 30 KB string is ~19M gas and an RPC
    will refuse the transaction as `gas limit too high`.
@@ -83,9 +96,11 @@ prepared graphs: legacy inner-Base64 via
 review and publish only that ordered graph; never switch to the measured winner
 during retry or recovery. Compact graphs require
 `KeelPercentTokenURIBuilder`. The local document is a preview/build result, not
-another object lane. Studio must bind its shell and middle fragments to exact
-same-chain objects and report only the compressed creator entry as new payload
-bytes.
+another object lane. Studio binds the selected graph parts to exact same-chain
+objects and reports newly stored creator bytes separately from reused shell
+and module bytes. A creator-owned HTML graph has no canonical shell halves.
+Raw retains the original supplied bytes; Compact compares only codecs the
+selected reader supports.
 
 Call `assessKeelInlinePresentation` before recommending Inline. The boot shell
 must be uncompressed HTML, the complete reconstructed document must stay at or

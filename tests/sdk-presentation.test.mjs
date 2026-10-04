@@ -2,7 +2,7 @@ import assert from "node:assert/strict";
 import test from "node:test";
 import { planKeelAssetPresentation, KEEL_INLINE_COMPRESSED_ASSET_BYTES } from '../packages/sdk/dist/presentation.js';
 
-test('asset delivery follows the inclusive 1.75 MB compressed boundary and keeps explicit choices', () => {
+test('asset delivery follows the inclusive 2 MB provisional compressed boundary and keeps explicit choices', () => {
   const input = { originalByteLength: 8_000_000, compressedByteLength: KEEL_INLINE_COMPRESSED_ASSET_BYTES };
   assert.equal(planKeelAssetPresentation(input).mode, 'inline');
   assert.equal(planKeelAssetPresentation({ ...input, compressedByteLength: input.compressedByteLength + 1 }).mode, 'hybrid');
@@ -13,9 +13,9 @@ test('asset delivery follows the inclusive 1.75 MB compressed boundary and keeps
 });
 
 test('small compressed assets retain Inline with separate complete-URI and gas warnings and honest direct retrieval', () => {
-  const plan = planKeelAssetPresentation({ originalByteLength: 2_000_000, compressedByteLength: 1_700_000, tokenUriByteLength: 2_400_000, readGas: 40_000_000n, blockGasLimit: 30_000_000n });
+  const plan = planKeelAssetPresentation({ originalByteLength: 2_000_000, compressedByteLength: 1_700_000, tokenUriByteLength: 2_400_000, mode: 'inline', readGas: 40_000_000n, blockGasLimit: 30_000_000n });
   assert.equal(plan.mode, 'inline'); assert.equal(plan.publicationReady, false);
-  assert.deepEqual(plan.warnings.map((warning) => warning.code), ['token-uri-size', 'read-gas']);
+  assert.deepEqual(plan.warnings.map((warning) => warning.code), ['above-inline-default', 'token-uri-size', 'read-gas']);
   assert.match(plan.retrieval.explanation, /Compressed objects require readSlug/);
   assert.match(plan.retrieval.fullCallOption, /onchain Gzip decompression is not provided/);
 });
@@ -171,7 +171,7 @@ test('graph measurements cannot replace the default cutoff or an explicit delive
   for (const compressedByteLength of [1_749_999, 1_750_000, 1_750_001, 4_000_000]) {
     for (const graphByteLength of [1_000_000, 5_000_000]) {
       const input = { originalByteLength: 8_000_000, compressedByteLength, graphByteLength };
-      const automaticMode = compressedByteLength <= 1_750_000 ? 'inline' : 'hybrid';
+      const automaticMode = compressedByteLength <= KEEL_INLINE_COMPRESSED_ASSET_BYTES ? 'inline' : 'hybrid';
       assert.equal(planKeelAssetPresentation(input).mode, automaticMode);
       assert.equal(planKeelAssetPresentation({ ...input, mode: 'auto' }).mode, automaticMode);
       for (const mode of ['inline', 'hybrid']) {
@@ -180,6 +180,20 @@ test('graph measurements cannot replace the default cutoff or an explicit delive
         assert.equal(plan.automaticMode, automaticMode);
         assert.equal(plan.publicationReady, false);
       }
+    }
+  }
+});
+
+
+test('complete tokenURI overrides the compressed estimate at the inclusive 2 MB default', () => {
+  for (const compressedByteLength of [1_700_000,1_900_000,3_000_000]) {
+    for (const tokenUriByteLength of [1_999_999,2_000_000,2_000_001]) {
+      const input={originalByteLength:8_000_000,compressedByteLength,tokenUriByteLength};
+      const automaticMode=tokenUriByteLength<=2_000_000?'inline':'hybrid';
+      const plan=planKeelAssetPresentation(input);
+      assert.equal(plan.mode,automaticMode);assert.equal(plan.selectionBasis,'complete-token-uri');
+      assert.equal(plan.selectionByteLength,tokenUriByteLength);assert.equal(plan.publicationReady,false);
+      for(const mode of ['inline','hybrid'])assert.equal(planKeelAssetPresentation({...input,mode}).mode,mode);
     }
   }
 });

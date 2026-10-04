@@ -1,3 +1,5 @@
+import { gzipSync } from "node:zlib";
+import { resolveKeelPayloadStorage } from "@keel/protocol";
 // Builds for publishing: a game's KEEL document (exactly what `keel-game
 // document` writes, Tone and keel-audio included for audio games), and the
 // engine release -- every engine module as the same KEEL module slot a game
@@ -39,10 +41,10 @@ export function engineBuilds(engine) {
   };
 
   /** A game's document, as `keel-game document <id>` builds it. */
-  const buildGame = async ({ project, projects, gameId, workspace, minify = true, audio = true, shell }) => {
+  const buildGame = async ({ project, projects, gameId, workspace, minify = true, audio = true, shell, payloadStorage }) => {
     const ws = workspace ?? await workspaceOf(projects ?? [project]);
     const withAudio = audio && keel.closureOf(gameId, ws).some((m) => m.manifest.id === "keel/audio") && existsSync(vendor);
-    const doc = await keel.buildGameDocument(gameId, ws, { minify, ...(shell ? { shell } : {}), ...(withAudio ? { pageScripts: await keel.keelAudioScripts(vendor) } : {}) });
+    const doc = await keel.buildGameDocument(gameId, ws, { minify, payloadStorage: resolveKeelPayloadStorage(payloadStorage), ...(shell ? { shell } : {}), ...(withAudio ? { pageScripts: await keel.keelAudioScripts(vendor) } : {}) });
     return { doc, workspace: ws, engineModuleIds: await engineModuleIds(ws) };
   };
 
@@ -51,14 +53,16 @@ export function engineBuilds(engine) {
    * scripts) as a KEEL document whose parts are exactly the slots games carry.
    * A module that fails to bundle is reported, not published.
    */
-  const buildEngineRelease = async ({ workspace, minify = true, shell } = {}) => {
+  const buildEngineRelease = async ({ workspace, minify = true, shell, payloadStorage } = {}) => {
+    payloadStorage = resolveKeelPayloadStorage(payloadStorage);
+    const compression = (bytes) => payloadStorage === "raw" || gzipSync(bytes, { level: 9 }).byteLength >= bytes.byteLength ? "none" : "gzip";
     const ws = workspace ?? await workspaceOf([]);
     const modules = [];
     const failed = [];
     const reports = [];
     if (existsSync(vendor)) {
       for (const p of await keel.keelAudioScripts(vendor)) {
-        modules.push(await buildKeelInlineModuleFragment({ moduleId: p.id, version: p.version, mediaType: "text/javascript", ...(p.aliases ? { aliases: p.aliases } : {}), decodedBytes: p.bytes, compression: "gzip", execution: "classic", phase: "runtime", weight: p.weight }));
+        modules.push(await buildKeelInlineModuleFragment({ moduleId: p.id, version: p.version, mediaType: "text/javascript", ...(p.aliases ? { aliases: p.aliases } : {}), decodedBytes: p.bytes, compression: compression(p.bytes), execution: "classic", phase: "runtime", weight: p.weight }));
         reports.push({ id: p.id, version: p.version, kind: "page-script", bytes: p.bytes.byteLength });
       }
     }
@@ -70,7 +74,7 @@ export function engineBuilds(engine) {
       try {
         const b = typeof keel.buildVerifiedModule === "function" ? await keel.buildVerifiedModule(mod, ws, root) : await keel.bundleModule(mod, ws, { minify });
         if (b.outputDigest) verified.push(b);
-        modules.push(await buildKeelInlineModuleFragment({ moduleId: b.manifest.id, version: b.manifest.version, mediaType: "text/javascript", decodedBytes: b.bytes, compression: "gzip", execution: "classic", phase: b.manifest.phase, weight: b.manifest.weight }));
+        modules.push(await buildKeelInlineModuleFragment({ moduleId: b.manifest.id, version: b.manifest.version, mediaType: "text/javascript", decodedBytes: b.bytes, compression: compression(b.bytes), execution: "classic", phase: b.manifest.phase, weight: b.manifest.weight }));
         reports.push({ id: b.manifest.id, version: b.manifest.version, kind: b.manifest.kind, bytes: b.bytes.byteLength, ...(b.outputDigest ? { digest: b.outputDigest } : {}) });
       } catch (error) {
         failed.push({ id: mod.manifest.id, version: mod.manifest.version, error: String(error?.message ?? error).split("\n")[0] });

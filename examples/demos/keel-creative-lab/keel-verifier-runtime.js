@@ -1,4 +1,4 @@
-import { decodeBrotli, initBrotli } from "keel:compression-runtime";
+import { decodeBrotli, decodeLzma, initBrotli } from "keel:compression-runtime";
 import { replaceVerifiedAliases } from "./alias-resolution.js";
 import { browserSha256 } from "./sha256.js";
 
@@ -84,12 +84,26 @@ async function verify(bytes, integrity, label) {
   return bytes;
 }
 
-async function decompress(compression, bytes) {
+async function decompress(compression, bytes, decodedByteLength) {
+  if (!Number.isSafeInteger(decodedByteLength) || decodedByteLength < 0 || decodedByteLength > 32 * 1024 * 1024) throw new RangeError("Committed decoded length exceeds shell limit.");
   if (compression === "none") return bytes;
-  if (compression === "brotli") return decodeBrotli(bytes);
+  if (compression === "brotli") return decodeBrotli(bytes, { decodedByteLength });
+  if (compression === "lzma") return decodeLzma(bytes, { decodedByteLength });
+  if (compression !== "gzip" && compression !== "deflate") throw new Error(`Unsupported compression ${compression}.`);
   if (typeof DecompressionStream !== "function") throw new Error(`${compression} decompression is unavailable.`);
-  const stream = new Blob([bytes]).stream().pipeThrough(new DecompressionStream(compression));
-  return new Uint8Array(await new Response(stream).arrayBuffer());
+  const reader = new Blob([bytes]).stream().pipeThrough(new DecompressionStream(compression)).getReader();
+  const output = new Uint8Array(decodedByteLength); let offset = 0;
+  try {
+    while (true) {
+      const { value, done } = await reader.read();
+      if (done) break;
+      if (value.length > output.length - offset) throw new RangeError("Decoded length exceeds commitment.");
+      output.set(value, offset); offset += value.length;
+    }
+    if (offset !== output.length) throw new RangeError("Decoded length differs from commitment.");
+    return output;
+  } catch (error) { await reader.cancel(error).catch(() => {}); throw error; }
+  finally { reader.releaseLock(); }
 }
 
 const rpcUrls = Object.freeze(Array.isArray(envelope.rpcUrls) && envelope.rpcUrls.length > 0
@@ -173,7 +187,7 @@ async function readOnchainObject(item, active = new Set()) {
       let offset = 0;
       for (const carrier of carriers) { stored.set(carrier, offset); offset += carrier.byteLength; }
       if (stored.byteLength !== record.storedByteLength) throw new Error(`Stored length mismatch for ${item.objectId}.`);
-      decoded = await decompress(compressionName(record.compression), stored);
+      decoded = await decompress(compressionName(record.compression), stored, record.byteLength);
     }
     return verify(decoded, { digest: record.digest, byteLength: record.byteLength }, item.id);
   } finally {
@@ -182,14 +196,20 @@ async function readOnchainObject(item, active = new Set()) {
 }
 
 async function readEmbeddedItem(item) {
-  if (!item.embedded || typeof item.embedded.storedBase64 !== "string") {
+  if (!item.embedded) {
     throw new Error(`Missing embedded bytes for ${item.id}.`);
   }
-  const stored = fromBase64(item.embedded.storedBase64);
+  const text = item.embedded.storedText !== undefined, base64 = item.embedded.storedBase64 !== undefined;
+  if (text === base64 || (text && (typeof item.embedded.storedText !== "string" || item.embedded.compression !== "none"))
+      || (base64 && typeof item.embedded.storedBase64 !== "string")) throw new Error(`Invalid embedded bytes for ${item.id}.`);
+  const stored = text ? new TextEncoder().encode(item.embedded.storedText) : fromBase64(item.embedded.storedBase64);
+  if (text && new TextDecoder("utf-8", { fatal: true, ignoreBOM: true }).decode(stored) !== item.embedded.storedText) {
+    throw new Error(`Invalid UTF-8 text for ${item.id}.`);
+  }
   if (item.embedded.storedIntegrity) {
     await verify(stored, item.embedded.storedIntegrity, `${item.id} stored source`);
   }
-  const decoded = await decompress(item.embedded.compression, stored);
+  const decoded = await decompress(item.embedded.compression, stored, item.integrity.byteLength);
   return verify(decoded, item.integrity, item.id);
 }
 
@@ -197,13 +217,13 @@ async function resolveItem(item) {
   const onchain = async () => {
     const stored = await readOnchainObject(item);
     if (item.onchain?.storedIntegrity) await verify(stored, item.onchain.storedIntegrity, `${item.id} packed object`);
-    const decoded = await decompress(item.onchain?.compression ?? "none", stored);
+    const decoded = await decompress(item.onchain?.compression ?? "none", stored, item.integrity.byteLength);
     return verify(decoded, item.integrity, item.id);
   };
   if (envelope.deliveryProfile === "onchain-recursive") return onchain();
   if (envelope.deliveryProfile === "embedded-assembled") return readEmbeddedItem(item);
   if (envelope.deliveryProfile === "hybrid-mixed") {
-    if (item.embedded?.storedBase64 !== undefined) return readEmbeddedItem(item);
+    if (item.embedded !== undefined) return readEmbeddedItem(item);
     return onchain();
   }
   throw new Error(`Unsupported delivery profile ${envelope.deliveryProfile}.`);

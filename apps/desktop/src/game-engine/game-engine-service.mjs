@@ -1,3 +1,4 @@
+import { resolveKeelPayloadStorage } from "@keel/protocol";
 // The editor's side of the KEEL game engine: one lazy worker, requests run one
 // at a time from a bounded queue, and results cached until the engine's
 // sources change (the worker is recycled then, since Node caches the modules
@@ -100,7 +101,7 @@ export class GameEngineService {
 
   modules() { return this.cached('modules', () => this.call('modules')); }
   graph(gameId) { return this.cached(`graph:${gameId}`, () => this.call('graph', { gameId })); }
-  build(gameId, { minify = true } = {}) { return this.cached(`build:${gameId}:${minify}`, () => this.call('build', { gameId, minify }), (result) => result.html.byteLength); }
+  build(gameId, { minify = true, payloadStorage } = {}) { payloadStorage = resolveKeelPayloadStorage(payloadStorage); return this.cached(`build:${gameId}:${minify}:${payloadStorage}`, () => this.call('build', { gameId, minify, payloadStorage }), (result) => result.html.byteLength); }
   fit(attribute, entity) { return this.call('fit', { attribute, entity }); }
   // (Publishing: never cached. The practice chain's publish, the engine on a chain, a Sepolia plan.)
   publish(input) { return this.call('publish', input); }
@@ -117,18 +118,20 @@ export class GameEngineService {
 
   /** The preview document for a game project: the built game, plus its token context. */
   async document(project) {
+    if (project.presentation?.shell === "none") throw new TypeError("Creator-owned engine games require an explicit compatible game reader/composer. Use a self-contained HTML project for the current creator-owned route; KEEL will not silently insert its verification shell.");
     if (!project.game?.id) throw new Error('Choose the game this project plays in its Game tab to preview it.');
-    const built = await this.build(project.game.id);
+    const built = await this.build(project.game.id, { payloadStorage: project.presentation?.payloadStorage });
     const tail = gameContextTail(project.game);
     return tail ? Buffer.concat([built.html, Buffer.from(tail)]) : Buffer.from(built.html);
   }
 
   /** The same shape the canonical preview reports, so the Viewing tab measures a game like any other work. */
   async presentation(project) {
+    if (project.presentation?.shell === "none") throw new TypeError("Creator-owned engine games require an explicit compatible game reader/composer. The verification game graph is not a measurement of your own shell.");
     if (!project.game?.id) throw new Error('Choose the game this project plays in its Game tab to measure it.');
-    const built = await this.build(project.game.id);
+    const built = await this.build(project.game.id, { payloadStorage: project.presentation?.payloadStorage });
     return {
-      byteLength: built.byteLength, saver: built.saver, uploads: built.uploads, game: { gameId: built.gameId, order: built.order, modules: built.modules },
+      payloadStorage: built.payloadStorage, storageEncoding: "native-bytes", byteLength: built.byteLength, saver: built.saver, uploads: built.uploads, game: { gameId: built.gameId, order: built.order, modules: built.modules },
       plan: planKeelAssetPresentation({ originalByteLength: built.totals.originalByteLength, compressedByteLength: built.totals.compressedByteLength, graphByteLength: built.saver.graphByteLength, mode: project.presentation?.delivery ?? 'auto' }),
       evidence: 'local-byte-verification-only', published: false,
     };

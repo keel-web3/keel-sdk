@@ -3,6 +3,7 @@ export * from "./bytes.js";
 export * from "./canonical.js";
 export * from "./integrity.js";
 export * from "./packing.js";
+export * from "./payload-storage.js";
 export * from "./validate.js";
 export * from "./parse.js";
 export * from "./project-stack.js";

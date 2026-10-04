@@ -3,11 +3,13 @@
  *
  * `deployable` is derived from compiled artifacts rather than declared by hand: a
  * contract is deployable when forge emitted non-empty creation bytecode for it,
- * which excludes interfaces, libraries, and abstract bases automatically.
+ * which excludes interfaces and abstract bases. Internal-only library stubs are
+ * excluded; callable public/external libraries are required deployment dependencies.
  */
 import { readdirSync, readFileSync, writeFileSync, mkdirSync, existsSync, statSync } from "node:fs";
 import { join, resolve, basename } from "node:path";
 import { MODULES, TIER_OF } from "./module-map.mjs";
+import { compiledDeployableNames } from "./compiled-deployables.mjs";
 
 const REPO = resolve(import.meta.dirname, "../..");
 const CONTRACTS = join(REPO, "../keel-contracts");
@@ -22,8 +24,7 @@ function deployableFor(solFile) {
   if (!existsSync(artifact)) return [];
   try {
     const a = JSON.parse(readFileSync(artifact, "utf8"));
-    const code = a?.bytecode?.object ?? "";
-    return code.replace(/^0x/, "").length > 0 ? [contract] : [];
+    return compiledDeployableNames(solFile, a);
   } catch { return []; }
 }
 
@@ -51,12 +52,12 @@ let written = 0;
 for (const m of MODULES) {
   const dir = join(metaDir(m.id), m.id);
   mkdirSync(join(dir, "deployments"), { recursive: true });
-  // interfaces are never deployed, and every library here is internal-only and
-  // inlined by the compiler — forge still emits a stub for them, so filter by path.
+  // Interfaces are never deployed. Compiled callable libraries stay in the
+  // deployment closure; internal-only library stubs are excluded by their ABI.
   const deployable = m.external
     ? externalDeployables(m.id)
     : [...new Set(
-      m.contracts.filter((c) => !c.startsWith("interfaces/") && !c.startsWith("libraries/"))
+      m.contracts.filter((c) => !c.startsWith("interfaces/"))
         .flatMap(deployableFor),
     )].sort();
   const manifest = {

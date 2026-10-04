@@ -269,12 +269,15 @@ or the public tokenURI.
 
 ## Canonical shell checks
 
-Every collector-facing viewer must use the one registered canonical shell. No
-test fixture, starter, Flash loader, p5 file, Three.js entrypoint, or Doom shell
-is a replacement. Read [The KEEL verification shell](KEEL_VERIFICATION_SHELL.md)
-for the exact implementation map and existing regression tests.
+The verification shell remains the default. Its canonical protection claim
+requires the registered shell; no fixture, starter, Flash loader, p5 file,
+Three.js entrypoint, or Doom shell may be relabeled as canonical. Explicit
+viewer=none instead preserves one self-contained creator HTML entrypoint
+with raw-artifact policy, without loading or claiming canonical protection.
+Read [The KEEL verification shell](KEEL_VERIFICATION_SHELL.md) for its
+implementation map and existing regression tests.
 
-The readiness rule is simple:
+For the verification-shell route:
 
 1. resolve the active builder from the selected-chain Studio Inline catalog;
 2. derive the canonical shell ID with the SDK;
@@ -282,6 +285,12 @@ The readiness rule is simple:
    `PreEncodedGraph` mode;
 4. fail closed if any piece is absent or ambiguous;
 5. separately smoke the reconstructed viewer in a browser.
+
+For creator-owned HTML, test exact UTF-8/source round-trip, one raw-percent
+creator fragment, raw-artifact metadata policy, persisted viewer=none, and
+independent Compact/Raw. Reject unsupported separate files/modules/assets
+and declared runtimes. Read back its actual store/builder/bytes and smoke
+its committed presentation without requiring canonical shell halves or K.
 
 ## Before a public test
 
@@ -291,7 +300,7 @@ The readiness rule is simple:
 - Every selected-chain module binding has object and registry receipt/read-back.
 - Storage and presentation mode are explicit and unchanged from the reviewed
   plan.
-- Canonical shell registration is read back from the active builder.
+- Canonical shell registration is read back when the verification shell is selected or canonical protection is claimed; creator-owned HTML verifies its actual presentation binding instead.
 - Wallet request names the chain, targets, values, operations, and approval
   boundary exactly.
 - Durable recovery state is saved before submission.

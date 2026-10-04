@@ -14,7 +14,7 @@
   "files": ["dist", "README.md"],
   "scripts": {
     "clean": "rm -rf dist",
-    "build": "tsc -p tsconfig.json"
+    "build": "tsc -p tsconfig.json && node scripts/package-skills.mjs"
   },
   "engines": { "node": ">=22" },
   "license": "MIT",

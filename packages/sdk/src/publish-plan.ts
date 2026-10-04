@@ -1,3 +1,6 @@
+import { assertKeelFreshPayloadAudit } from "./inline-transport-audit.js";
+import { assertKeelPreparedCopyRead, keelPreparedCopyBuilder, type KeelPreparedCopyReadCheck, type KeelPreparedCopyPublishEvidence } from "./prepared-copy-publication.js";
+import { KEEL_INLINE_MAX_TOKEN_URI_BYTES, keelInlineReadGasLimit } from "./presentation.js";
 import { canonicalJson, createIntegrity, utf8ToBytes, type Hex, type Integrity } from "@keel/protocol";
 
 export const KEEL_PUBLISH_PLAN_PROTOCOL = "keel-publish-plan@1" as const;
@@ -42,6 +45,7 @@ export interface KeelPublishReviewPlan {
   readonly status: "review-only";
   readonly chainReady: false;
   readonly target: KeelPublishReviewTarget;
+  readonly preparedCopy?: KeelPreparedCopyReadCheck;
   readonly source: KeelPublishReviewSource;
   readonly operationCount: number;
   readonly operations: readonly KeelPublishReviewOperation[];
@@ -187,7 +191,7 @@ function operation(value: unknown, index: number): KeelPublishReviewOperation {
   throw new TypeError(`chain operation ${index}.kind is unsupported.`);
 }
 
-function normalize(value: unknown): KeelPublishReviewPlan {
+function normalize(value: unknown, suppliedCopy?: unknown): KeelPublishReviewPlan {
   const input = object(value, "chain operation plan");
   exact(input, ["schema", "status", "materialized", "descriptorMaterialized", "chainReady", "target", "sourcePlan", "operations", "encoding", "walletApproval", "signing", "submission", "caveat"], "chain operation plan");
   if (input.schema !== "keel-chain-operation-plan@1" || input.status !== "review-only" || input.chainReady !== false || input.encoding !== "deferred-contract-abi" || input.walletApproval !== "required" || input.signing !== "not-performed" || input.submission !== "not-performed") throw new TypeError("Only deferred, unsigned Keel chain operation plans can become review plans.");
@@ -198,11 +202,13 @@ function normalize(value: unknown): KeelPublishReviewPlan {
   const normalizedSource = source(input.sourcePlan);
   const normalizedTarget = target(input.target);
   validateOperationGraph(normalizedSource, normalizedOperations);
+  const preparedCopy = copyCheck(suppliedCopy, normalizedSource, normalizedTarget);
   const result: KeelPublishReviewPlan = {
     protocol: KEEL_PUBLISH_REVIEW_PLAN_PROTOCOL,
     status: "review-only",
     chainReady: false,
     target: normalizedTarget,
+    ...(preparedCopy === undefined ? {} : { preparedCopy }),
     source: normalizedSource,
     operationCount: normalizedOperations.length,
     operations: normalizedOperations,
@@ -289,6 +295,28 @@ async function planIntegrity(plan: KeelPublishReviewPlan): Promise<Integrity> {
   return createIntegrity(canonicalPlanBytes(plan));
 }
 
+
+function copyCheck(value: unknown, source: KeelPublishReviewSource, target: KeelPublishReviewTarget): KeelPreparedCopyReadCheck | undefined {
+  if (!source.mediaType.startsWith("application/vnd.keel.token-uri-")) {
+    if (value !== undefined) throw new TypeError("COPY evidence cannot authorize an unrelated source.");
+    return undefined;
+  }
+  const check = object(value, "prepared COPY publication check");
+  exact(check, ["schema", "policy", "chainId", "store", "mediaType", "requiredBuilder", "readOperation", "graphIntegrity", "tokenURIIntegrity", "completeTokenURIBytes", "payloadCarriage", "callGasLimit", "blockGasLimit", "selectedChainReadAuthenticated", "caveat"], "prepared COPY publication check");
+  if (check.schema !== "keel-prepared-copy-read-check@1" || check.policy !== "prepared-copy"
+      || check.chainId !== target.chainId || check.store !== target.address || check.mediaType !== source.mediaType
+      || check.requiredBuilder !== keelPreparedCopyBuilder(source.mediaType) || check.readOperation !== "copy-prepared-fragments"
+      || check.selectedChainReadAuthenticated !== false) throw new TypeError("Prepared COPY check does not match the exact source/chain/store and COPY route.");
+  if (!sameIntegrity(digest(check.graphIntegrity, "COPY graph commitment"), source.integrity)) throw new TypeError("Prepared COPY check changes the source commitment.");
+  assertKeelFreshPayloadAudit(check.payloadCarriage);
+  const uri = digest(check.tokenURIIntegrity, "COPY URI commitment");
+  if (check.completeTokenURIBytes !== uri.byteLength || uri.byteLength > KEEL_INLINE_MAX_TOKEN_URI_BYTES) throw new RangeError("Prepared COPY check has an invalid complete return length.");
+  for (const key of ["callGasLimit", "blockGasLimit"] as const) if (typeof check[key] !== "string" || !/^[1-9][0-9]{0,77}$/u.test(check[key] as string)) throw new TypeError("Prepared COPY check has an invalid gas boundary.");
+  if (BigInt(check.callGasLimit as string) > keelInlineReadGasLimit(BigInt(check.blockGasLimit as string))) throw new RangeError("Prepared COPY check exceeds the selected-chain read boundary.");
+  text(check.caveat, "prepared COPY check.caveat", 512);
+  return { ...check, graphIntegrity: source.integrity, tokenURIIntegrity: uri } as unknown as KeelPreparedCopyReadCheck;
+}
+
 function canonicalPlanBytes(plan: KeelPublishReviewPlan): Uint8Array {
   const bytes = utf8ToBytes(canonicalJson(plan));
   if (bytes.byteLength > MAX_REVIEW_PLAN_BYTES) throw new RangeError(`Publish review plan exceeds the ${MAX_REVIEW_PLAN_BYTES}-byte detail limit.`);
@@ -301,7 +329,7 @@ function sameIntegrity(left: Integrity, right: Integrity): boolean {
 
 export function parseKeelPublishReviewPlan(value: unknown): KeelPublishReviewPlan {
   const input = object(value, "publish review plan");
-  exact(input, ["protocol", "status", "chainReady", "target", "source", "operationCount", "operations", "encoding", "identifierSemantics", "walletApproval", "signing", "submission", "caveat"], "publish review plan");
+  exact(input, ["protocol", "status", "chainReady", "target", "source", "preparedCopy", "operationCount", "operations", "encoding", "identifierSemantics", "walletApproval", "signing", "submission", "caveat"], "publish review plan");
   if (input.protocol !== KEEL_PUBLISH_REVIEW_PLAN_PROTOCOL) throw new TypeError("Unsupported Keel publish review plan protocol.");
   if (input.identifierSemantics !== "logical-builder-ids-not-chain-ids") throw new TypeError("Publish review plan identifiers are not chain IDs.");
   if (!Array.isArray(input.operations)) throw new TypeError("publish review plan.operations must be an array.");
@@ -325,13 +353,21 @@ export function parseKeelPublishReviewPlan(value: unknown): KeelPublishReviewPla
     signing: input.signing,
     submission: input.submission,
     caveat: "ignored",
-  });
+  }, input.preparedCopy);
   if (input.operationCount !== normalized.operationCount || input.caveat !== normalized.caveat) throw new TypeError("Publish review plan fields are not canonical.");
   return normalized;
 }
 
-export async function createKeelPublishReviewPlan(value: unknown): Promise<KeelPublishReviewPlanEnvelope> {
-  const plan = normalize(value);
+export async function createKeelPublishReviewPlan(value: unknown, options?: { readonly preparedCopy?: KeelPreparedCopyPublishEvidence }): Promise<KeelPublishReviewPlanEnvelope> {
+  const snapshot = structuredClone(value);
+  const input = object(snapshot, "chain operation plan");
+  const boundSource = source(input.sourcePlan), boundTarget = target(input.target);
+  const viewer = boundSource.mediaType.startsWith("application/vnd.keel.token-uri-");
+  if (viewer && options?.preparedCopy === undefined) throw new TypeError("Prepared viewer publish plans require canonical preparedCopy full-return evidence before wallet review.");
+  if (!viewer && options?.preparedCopy !== undefined) throw new TypeError("COPY evidence cannot authorize an unrelated source upload.");
+  const preparedCopy = viewer ? await assertKeelPreparedCopyRead({ ...options!.preparedCopy!,
+    chainId: boundTarget.chainId, store: boundTarget.address, mediaType: boundSource.mediaType, graphIntegrity: boundSource.integrity }) : undefined;
+  const plan = normalize(snapshot, preparedCopy);
   return { plan, integrity: await planIntegrity(plan) };
 }
 

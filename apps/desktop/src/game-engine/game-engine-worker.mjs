@@ -1,3 +1,4 @@
+import { resolveKeelPayloadStorage } from "@keel/protocol";
 // The KEEL game engine, off the editor's main thread. Node runs the engine's
 // TypeScript directly, so this worker imports the engine checkout's own build
 // (packages/keel) and runtime (packages/runtime) and answers with plain JSON.
@@ -10,6 +11,9 @@ import { basename, dirname, join, relative } from 'node:path';
 import { gzipSync } from 'node:zlib';
 
 const root = workerData.root;
+// (A module's src/<name> in whichever language it's written: TypeScript by default, plain JavaScript just as well.
+// Kept here rather than read from the engine, whose pinned release may predate it.)
+const sourceFileOf = (dir, name) => ['.ts', '.mts', '.js', '.mjs'].map((ext) => join(dir, 'src', name + ext)).find((path) => existsSync(path));
 let loaded;
 async function engine() {
   if (!loaded) {
@@ -31,19 +35,17 @@ function stream(seed) {
   return { f, between: (x, y) => x + (y - x) * f(), int: (x, y) => x + Math.floor(f() * (y - x + 1)), pick: (list) => list[Math.floor(f() * list.length)], chance: (p) => f() < p };
 }
 
-/** A pack's definitions (entities and attributes with their builders): its module.ts or index.ts exports `pack`. */
+/** A pack's definitions (entities and attributes with their builders): its src/module or src/index (TypeScript or JavaScript) exports `pack`. */
 async function packOf(mod) {
   const { packs } = await engine();
   if (packs.has(mod.manifest.id)) return packs.get(mod.manifest.id);
   let result = { pack: null, error: '' };
   try {
-    for (const file of ['module.ts', 'index.ts']) {
-      const path = join(mod.dir, 'src', file);
-      if (!existsSync(path)) continue;
+    for (const path of ['module', 'index'].map((name) => sourceFileOf(mod.dir, name)).filter(Boolean)) {
       const exported = await import(pathToFileURL(path).href);
       if (exported.pack?.entities && exported.pack?.attributes) { result = { pack: exported.pack, error: '' }; break; }
     }
-    if (!result.pack) result.error = 'This pack does not export `pack` from src/module.ts or src/index.ts, so only its table of contents is shown.';
+    if (!result.pack) result.error = 'This pack does not export `pack` from src/module or src/index, so only its table of contents is shown.';
   } catch (error) { result = { pack: null, error: String(error?.message ?? error) }; }
   packs.set(mod.manifest.id, result);
   return result;
@@ -88,20 +90,22 @@ async function graph({ gameId }) {
   };
 }
 
-async function build({ gameId, minify = true }) {
+async function build({ gameId, minify = true, payloadStorage }) {
+  payloadStorage = resolveKeelPayloadStorage(payloadStorage);
   const { keel, workspace } = await engine();
-  const doc = await keel.buildGameDocument(gameId, workspace, { minify, ...(workerData.shell ? { shell: workerData.shell } : {}) });
+  const doc = await keel.buildGameDocument(gameId, workspace, { minify, payloadStorage, ...(workerData.shell ? { shell: workerData.shell } : {}) });
   const sdk = await import('@keel/sdk/inline-viewer-graph');
   // The game module and its entry are the creator's new work; engine modules and the shell are shared.
   const creatorModules = new Set([gameId]);
   const measured = { ...doc.document, parts: doc.document.parts.map((part) => creatorModules.has(part.moduleId) ? { ...part, kind: 'creator' } : part) };
   const saver = sdk.measureKeelInlineCompactGraph(measured);
   const entryPart = doc.document.parts.find((part) => part.kind === 'creator' && !part.moduleId);
-  const entryBytes = entryPart?.bytes.byteLength ?? 0;
+  const entry = entryPart ? JSON.parse(Buffer.from(entryPart.bytes).toString('utf8').replace(/^,/, '')) : null;
+  const entryBytes = entry?.integrity.byteLength ?? 0;
   const game = doc.modules.filter((m) => creatorModules.has(m.id));
   const shared = doc.modules.filter((m) => !creatorModules.has(m.id));
   const sum = (list, key) => list.reduce((total, item) => total + item[key], 0);
-  const entryStored = entryPart ? gzipSync(entryPart.bytes, { level: 9 }).byteLength : 0;
+  const entryStored = entry?.embedded.storedIntegrity.byteLength ?? 0;
   const uploads = {
     creatorByteLength: sum(game, 'bytes') + entryBytes, creatorCompressedByteLength: sum(game, 'stored') + entryStored,
     creatorPublicationBytes: saver.creatorPublicationBytes,
@@ -113,7 +117,7 @@ async function build({ gameId, minify = true }) {
   const html = new Uint8Array(doc.html);
   return {
     result: {
-      gameId, html, byteLength: html.byteLength, order: [...doc.resolution.order], problems: clean(doc.resolution.problems), modules: clean(doc.modules),
+      gameId, payloadStorage, html, byteLength: html.byteLength, order: [...doc.resolution.order], problems: clean(doc.resolution.problems), modules: clean(doc.modules),
       saver, uploads, totals: { originalByteLength: sum(doc.modules, 'bytes') + entryBytes, compressedByteLength: sum(doc.modules, 'stored') + entryStored },
     },
     transfer: [html.buffer],
@@ -201,10 +205,10 @@ async function chain() {
 const bigints = (value) => JSON.parse(JSON.stringify(value, (_key, item) => typeof item === 'bigint' ? item.toString() : item));
 
 /** Publish a game to the practice chain (only what the chain doesn't have), read it back, and return its links. */
-async function publish({ gameId, rpc, deployment, context = {}, includeEngine = false }) {
+async function publish({ gameId, rpc, deployment, context = {}, includeEngine = false, payloadStorage }) {
   const { flows, builds } = await chain();
   const log = [];
-  const { result } = await flows.publishGame({ rpc, deployment, projects: workerData.projects ?? [], gameId, builds, shell: workerData.shell, includeEngine, context, log: (line) => log.push(line) });
+  const { result } = await flows.publishGame({ rpc, deployment, projects: workerData.projects ?? [], gameId, builds, payloadStorage: resolveKeelPayloadStorage(payloadStorage), shell: workerData.shell, includeEngine, context, log: (line) => log.push(line) });
   return bigints({ ...result, log: log.slice(-40) });
 }
 
@@ -247,9 +251,9 @@ async function engineOnChain({ rpc, hold, record }) {
  * Sepolia's KeelHold, what Sepolia already holds (read-only calls), and the
  * transactions a wallet would sign, in order. Nothing is signed or sent.
  */
-async function planPublication({ gameId, rpc, hold, chainId }) {
+async function planPublication({ gameId, rpc, hold, chainId, payloadStorage }) {
   const { builds, publication, local } = await chain();
-  const { doc, engineModuleIds } = await builds.buildGame({ projects: workerData.projects ?? [], gameId, shell: workerData.shell });
+  const { doc, engineModuleIds } = await builds.buildGame({ projects: workerData.projects ?? [], gameId, payloadStorage: resolveKeelPayloadStorage(payloadStorage), shell: workerData.shell });
   const plan = await publication.planGame({ doc, engineModuleIds, hold, gameId });
   const { publicClient, chainId: seen } = await local.clientsFor(rpc, { account: '0x0000000000000000000000000000000000000001' });
   if (seen !== chainId) throw new Error(`${rpc} is chain ${seen}, not ${chainId}.`);

@@ -41,10 +41,10 @@ export async function publishEngineRelease({ rpc, deployment, builds, shell, log
  * Publish one game. Shared parts must already be on chain (the engine
  * release) unless `includeEngine`: then this publish stores them too.
  */
-export async function publishGame({ rpc, deployment, project, projects, gameId, builds, shell, includeEngine = false, context = {}, log = () => {}, record = true }) {
+export async function publishGame({ rpc, deployment, project, projects, gameId, builds, shell, includeEngine = false, context = {}, log = () => {}, record = true, payloadStorage }) {
   const { publicClient, walletClient, account, chainId } = await clientsFor(rpc);
   const engine = await buildsOf(builds);
-  const { doc, engineModuleIds } = await engine.buildGame({ project, projects, gameId, shell });
+  const { doc, engineModuleIds } = await engine.buildGame({ project, projects, gameId, shell, payloadStorage });
   const plan = await planGame({ doc, engineModuleIds, hold: deployment.KeelHold, gameId });
   const missing = await missingOnChain({ publicClient, plan });
   const absent = missingShared(missing);

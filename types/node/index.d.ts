@@ -105,6 +105,7 @@ declare module "node:zlib" {
   export function deflateSync(data: Uint8Array, options?: unknown): Buffer;
   export function inflateSync(data: Uint8Array, options?: unknown): Buffer;
   export function brotliCompress(data: Uint8Array, options: unknown, callback: (error: Error | null, result: Buffer) => void): void;
+  export function brotliDecompressSync(data: Uint8Array, options?: unknown): Buffer;
   export function brotliDecompress(data: Uint8Array, callback: (error: Error | null, result: Buffer) => void): void;
   export function gzip(data: Uint8Array, options: unknown, callback: (error: Error | null, result: Buffer) => void): void;
   export function gunzip(data: Uint8Array, callback: (error: Error | null, result: Buffer) => void): void;

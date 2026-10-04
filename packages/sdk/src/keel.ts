@@ -309,6 +309,13 @@ export const keelDirectReadPolicy = {
     "predictSeedSetId",
     "deriveTokenSeed",
   ],
+  "keel-equipment-inventory": [
+    "definition", "bindingPolicy", "bindingState", "inventoryCount",
+    "inventoryDefinitionAt", "equippedDefinition", "loadoutDigest",
+    "reader", "reservationEngine", "descriptorValidator",
+    "definitionDescriptorCommitment", "erc721Location", "characterCollection",
+    "artifactRegistry", "keelIndex", "runLootIssuer", "predictDefinitionId",
+  ],
   "keel-presentation-state-registry": [
     "presentationPolicy",
     "presentationRevision",

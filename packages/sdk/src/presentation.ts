@@ -1,3 +1,6 @@
+import { resolveKeelShell, type KeelShellChoice } from "@keel/protocol";
+export { KEEL_DEFAULT_PAYLOAD_STORAGE, KEEL_PAYLOAD_STORAGE_MODES, KEEL_PAYLOAD_STORAGE_POLICY, resolveKeelPayloadStorage, keelPayloadCompressionPolicy, resolveKeelPayloadCompression, KEEL_SHELL_CHOICES, KEEL_DEFAULT_SHELL, resolveKeelShell, type KeelShellChoice, type KeelPayloadStorageMode } from "@keel/protocol";
+
 /**
  * KEEL presentation vocabulary and the fail-closed Inline eligibility check.
  *
@@ -7,14 +10,15 @@
 
 /** Maximum complete tokenURI string returned through the public RPC read. */
 export const KEEL_INLINE_MAX_TOKEN_URI_BYTES = 2_000_000;
-/** Default automatic switch after resource compression; never an Inline admission limit. */
-export const KEEL_INLINE_COMPRESSED_ASSET_BYTES = 1_750_000;
+/** @deprecated Preliminary estimate only. The complete tokenURI measurement owns the default. */
+export const KEEL_INLINE_COMPRESSED_ASSET_BYTES = KEEL_INLINE_MAX_TOKEN_URI_BYTES;
 
 /** Local measurements choose presentation; they never establish chain publication. */
 export function planKeelAssetPresentation(input: {
   readonly originalByteLength: number;
   readonly compressedByteLength: number;
   readonly mode?: "auto" | "inline" | "hybrid";
+  readonly viewer?: KeelShellChoice;
   readonly tokenUriByteLength?: number;
   /** Prepared graph only; the final metadata and preview envelope must still be measured. */
   readonly graphByteLength?: number;
@@ -22,30 +26,39 @@ export function planKeelAssetPresentation(input: {
   readonly blockGasLimit?: bigint;
 }) {
   for (const [key, value] of Object.entries(input)) {
-    if (["originalByteLength", "compressedByteLength", "tokenUriByteLength", "graphByteLength"].includes(key) && (!Number.isSafeInteger(value) || Number(value) < 0)) throw new TypeError(`${key} must be a nonnegative safe byte count.`);
+    if (["originalByteLength", "compressedByteLength", "tokenUriByteLength", "graphByteLength"].includes(key) && value !== undefined && (!Number.isSafeInteger(value) || Number(value) < 0)) throw new TypeError(`${key} must be a nonnegative safe byte count.`);
   }
   if (!Number.isSafeInteger(input.originalByteLength) || !Number.isSafeInteger(input.compressedByteLength)) throw new TypeError("Original and compressed byte measurements are required.");
   if (input.mode !== undefined && !["auto", "inline", "hybrid"].includes(input.mode)) throw new TypeError("Unsupported presentation mode.");
   if (input.readGas !== undefined && input.readGas < 0n) throw new TypeError("Read gas cannot be negative.");
-  // Complete graph/URI measurements inform compatibility checks separately.
-  // Neither those measurements nor the default may replace an explicit choice.
-  const automaticMode = input.compressedByteLength <= KEEL_INLINE_COMPRESSED_ASSET_BYTES ? "inline" : "hybrid";
+  // The final returned URI owns delivery selection; compressed bytes are only
+  // a preliminary estimate. Graph bytes omit envelope/carriage overhead.
+  // Neither measurement nor default may replace an explicit creator choice.
+  const viewer = resolveKeelShell(input.viewer);
+  const selectionByteLength = input.tokenUriByteLength ?? input.compressedByteLength;
+  const selectionBasis = input.tokenUriByteLength === undefined ? "compressed-estimate" : "complete-token-uri";
+  const automaticMode = selectionByteLength <= KEEL_INLINE_MAX_TOKEN_URI_BYTES ? "inline" : "hybrid";
   const mode = !input.mode || input.mode === "auto" ? automaticMode : input.mode;
   const warnings: { code: string; message: string; remedy: string }[] = [];
   if (mode === "hybrid") warnings.push({ code: "rpc-presentation", message: "The HTML viewer reconstructs the work through read-only RPC calls. All published resource bytes can still remain onchain.", remedy: "Use declared RPC providers, verify every resource digest, and expose direct contract retrieval alongside the viewer. Some collectors block network access inside animation_url." });
-  if (input.compressedByteLength > KEEL_INLINE_COMPRESSED_ASSET_BYTES && mode === "inline") warnings.push({ code: "above-inline-default", message: "Inline is selected above the 1.75 MB automatic switching point. Your choice is preserved.", remedy: "Measure the complete tokenURI and public read cost; choose RPC reconstruction if the selected reader cannot return it." });
+  if (selectionByteLength > KEEL_INLINE_MAX_TOKEN_URI_BYTES && mode === "inline") warnings.push({ code: "above-inline-default", message: "Inline is explicitly selected above the 2 MB automatic boundary. Your choice is preserved.", remedy: "Measure the complete tokenURI and public read cost; choose RPC reconstruction if the selected reader cannot return it." });
   if (input.tokenUriByteLength !== undefined && input.tokenUriByteLength > KEEL_INLINE_MAX_TOKEN_URI_BYTES) warnings.push({ code: "token-uri-size", message: "The complete tokenURI exceeds KEEL's 2 MB public-reader compatibility limit. This is a reader limit, not a file-import limit or an ERC-721 file-size rule.", remedy: "Reuse registered modules, reduce metadata/preview overhead, or explicitly choose RPC reconstruction. Keep original onchain bytes directly retrievable." });
   const gasLimit = input.blockGasLimit === undefined ? KEEL_INLINE_SAFE_RPC_GAS : keelInlineReadGasLimit(input.blockGasLimit);
   if (input.readGas !== undefined && input.readGas > gasLimit) warnings.push({ code: "read-gas", message: "The measured complete read exceeds the selected RPC gas boundary.", remedy: "Use paged readSlug calls and reconstruct locally, or choose a reader that can execute the full read. Publication gas is a separate measurement." });
   return {
     schema: "keel-asset-presentation-plan@1" as const,
-    mode, automaticMode, cutoffBytes: KEEL_INLINE_COMPRESSED_ASSET_BYTES,
+    mode, automaticMode, selectionBasis, selectionByteLength, cutoffBytes: KEEL_INLINE_MAX_TOKEN_URI_BYTES,
     carriage: "raw-percent" as const, completeDocumentBase64Layers: 0 as const,
     ...(input.graphByteLength === undefined ? {} : { graphByteLength: input.graphByteLength }),
     originalByteLength: input.originalByteLength, compressedByteLength: input.compressedByteLength,
-    shell: "registered-canonical-shell" as const, warnings,
+    viewer,
+    shell: viewer === "none" ? "creator-owned-shell" as const : "registered-canonical-shell" as const,
+    canonicalProtection: viewer === "keel-verification-shell", warnings,
     publicationReady: false as const,
-    remainingChecks: ["Exact registered shell and module bindings on the chosen chain", "Complete prepared tokenURI byte length and public RPC read gas", "Receipts and exact object read-back"],
+    remainingChecks: [viewer === "none"
+      ? "Exact creator-owned source bytes and compatible reader on the chosen chain"
+      : "Exact registered shell and module bindings on the chosen chain",
+      "Complete prepared tokenURI byte length and public RPC read gas", "Receipts and exact object read-back"],
     retrieval: {
       descriptor: "getObject(bytes32 objectId)",
       fullUncompressedObject: "haulObject(bytes32 objectId)",

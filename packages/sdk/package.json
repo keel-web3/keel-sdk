@@ -6,6 +6,14 @@
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "exports": {
+    "./decoders/node": {
+      "types": "./dist/decoders/node.d.ts",
+      "import": "./dist/decoders/node.js"
+    },
+    "./decoders": {
+      "types": "./dist/decoders/index.d.ts",
+      "import": "./dist/decoders/index.js"
+    },
     "./mint-seed-lifecycle": {
       "types": "./dist/mint-seed-lifecycle.d.ts",
       "import": "./dist/mint-seed-lifecycle.js"
@@ -90,6 +98,10 @@
     "./presentation": {
       "types": "./dist/presentation.d.ts",
       "import": "./dist/presentation.js"
+    },
+    "./collector-policy": {
+      "types": "./dist/collector-policy.d.ts",
+      "import": "./dist/collector-policy.js"
     },
     "./inline-viewer-graph": {
       "types": "./dist/inline-viewer-graph.d.ts",
@@ -290,7 +302,7 @@
   ],
   "scripts": {
     "clean": "rm -rf dist",
-    "build": "tsc -p tsconfig.json && node scripts/package-canonical-shell.mjs && node scripts/package-layered-runtime.mjs && node ../mint-queue/build.mjs"
+    "build": "tsc -p tsconfig.json && node scripts/package-canonical-shell.mjs && node scripts/package-layered-runtime.mjs && node scripts/package-storage-policy.mjs && node ../mint-queue/build.mjs"
   },
   "engines": {
     "node": ">=22"

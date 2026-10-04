@@ -37,6 +37,7 @@ export * from "./studio-capabilities.js";
 export * from "./endpoints.js";
 export * from "./standard-chain-stack.js";
 export * from "./presentation.js";
+export * from "./collector-policy.js";
 export * from "./asset-display.js";
 export * from "./shell-registry.js";
 export * from "./link-presentation.js";
@@ -105,3 +106,16 @@ export * from "./deferred-auctions.js";
 export * from "./stamps.js";
 export * from './metadata-notifications.js';
 export * from './metadata-relay.js';
+
+export * from "./embedded-container-reader.js";
+export * from "./embedded-container-context.js";
+export * from "./inline-delivery-profile.js";
+
+export * from "./prepared-copy-publication.js";
+
+export * from "./inline-transport-audit.js";
+export * from "./inline-token-read.js";
+
+export * from "./dense-transport.js";
+
+export * from "./prepared-dense-copy.js";

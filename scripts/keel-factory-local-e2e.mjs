@@ -56,7 +56,7 @@ async function deployFactory(wallet, publicClient) {
 
 async function main() {
   if (!Number.isSafeInteger(PORT) || PORT <= 0 || PORT > 65_535) throw new TypeError("KEEL_LOCAL_E2E_PORT is invalid.");
-  const anvil = spawn("anvil", ["--silent", "--host", "127.0.0.1", "--port", String(PORT), "--chain-id", String(CHAIN_ID), "--accounts", "3", "--balance", "1000", "--disable-code-size-limit"], {
+  const anvil = spawn("anvil", ["--silent", "--host", "127.0.0.1", "--port", String(PORT), "--chain-id", String(CHAIN_ID), "--accounts", "3", "--balance", "1000", "--disable-code-size-limit", "--prune-history"], {
     stdio: ["ignore", "ignore", "pipe"],
   });
   let stderr = "";

@@ -26,11 +26,15 @@ fragment that is missing from the selected chain/store.
   from Hybrid.
 
 Use `assessKeelInlinePresentation` from `@keel/sdk/presentation` before wallet
-review. It enforces the uncompressed root, 2 MB reconstruction ceiling,
+review. It enforces the uncompressed root, 2,000,000-byte complete-return ceiling,
 self-contained document, and configured-builder boundary. The exact builder
-read must also pass the 30M-gas public-RPC safety check. See
+read must also pass the 30,000,000-gas full public tokenURI read safety check. See
 [`docs/KEEL_PRESENTATION.md`](../../docs/KEEL_PRESENTATION.md) for the complete
 contract and SDK terminology.
+
+For binary KEEL resources, the optional canonical `onchain-recursive` profile stores compressed streams directly and returns small committed descriptors. It uses a governed, block-pinned reader and preserves independently revisioned resource handles. See [`docs/KEEL_BINARY_RESOURCE_DELIVERY.md`](../../docs/KEEL_BINARY_RESOURCE_DELIVERY.md) for storage versus presentation accounting, bounds and publication gates.
+
+For EVM-assembled Inline reuse of those same binary objects, the optional canonical `embedded-shared-containers@1` resource profile emits each stored pack once in the tokenURI response and verifies it locally without RPC. Use `buildCompactInlineKeelShell({codecProfile:"lzma-js",embeddedContainerDelivery:{chainId,store}})` with the registered EVM composer and revision-selected table. MCP Inline preflight rejects `onchain-recursive`; changing a delivery label does not change contract assembly. Default prepared-carriage Inline remains unchanged. See the binary delivery guide for exact boundaries and proof requirements.
 
 ## Stage creator projects without manufacturing a shell
 

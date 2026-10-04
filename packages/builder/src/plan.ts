@@ -5,6 +5,8 @@ import {
   KEEL_OBJECT_INDEX_ENCODING,
   chunkBytes,
   createIntegrity,
+  resolveKeelPayloadCompression,
+  type KeelPayloadStorageMode,
   type Compression,
 } from "@keel/protocol";
 import { chooseSmallestCompression, compressBytes } from "./compress.js";
@@ -15,6 +17,7 @@ export interface CreateUploadPlanOptions {
   readonly mediaType: string;
   readonly outputDirectory: string;
   readonly compression?: Compression | "auto";
+  readonly payloadStorage?: KeelPayloadStorageMode;
   readonly maxChunkBytes?: number;
 }
 
@@ -28,13 +31,14 @@ export async function createUploadPlan(
   options: CreateUploadPlanOptions,
 ): Promise<ObjectUploadPlan> {
   if (sourceBytes.byteLength === 0) throw new RangeError("Object source cannot be empty.");
+  const compression = resolveKeelPayloadCompression(options.payloadStorage, options.compression);
   const maxChunkBytes = positiveSafeInteger(options.maxChunkBytes ?? 23_000, "maxChunkBytes");
   if (maxChunkBytes > 23_000) throw new RangeError("maxChunkBytes cannot exceed the KeelHold limit of 23000.");
 
   const selected =
-    options.compression === undefined || options.compression === "auto"
+    compression === "auto"
       ? await chooseSmallestCompression(sourceBytes)
-      : { compression: options.compression, bytes: await compressBytes(options.compression, sourceBytes) };
+      : { compression, bytes: await compressBytes(compression, sourceBytes) };
   const chunks = chunkBytes(selected.bytes, maxChunkBytes);
   if (chunks.length > KEEL_MAX_OBJECT_CHILDREN) {
     throw new RangeError(

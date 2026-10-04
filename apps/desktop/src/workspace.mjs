@@ -1,3 +1,4 @@
+import { KEEL_DEFAULT_PAYLOAD_STORAGE, KEEL_PAYLOAD_STORAGE_MODES } from "@keel/protocol";
 import {parseSVGRendererRecipe} from '@keel/sdk/svg-renderer-authoring';
 import {parseDirectImageSettings} from '@keel/sdk/direct-image';
 import {parseLayerCuration} from '@keel/sdk/layered-curation';
@@ -33,7 +34,7 @@ export const projectSchema = z.object({
   contractIds: z.array(z.string().min(1).max(128)).max(1000).default([]),
   targetNetworkId: z.string().uuid().optional(),
   creation: z.object({ template: z.enum(['image', 'edition', 'collection', 'interactive', 'layered', 'game']), step: z.enum(['artwork', 'collection', 'review']), collectionName: z.string().max(160), artworkIds: z.array(z.string().regex(/^[a-f0-9]{64}$/)).max(1000), selectedCollectionId: z.string().max(256).optional() }).strict().optional(),
-  presentation: z.object({ shell: z.enum(['canonical', 'none']).default('canonical'), delivery: z.enum(['auto', 'inline', 'hybrid']).default('auto'), entryObjectId: z.string().regex(/^[a-f0-9]{64}$/).optional() }).strict().default({ shell: 'canonical', delivery: 'auto' }),
+  presentation: z.object({ payloadStorage: z.enum(KEEL_PAYLOAD_STORAGE_MODES).default(KEEL_DEFAULT_PAYLOAD_STORAGE), shell: z.enum(['canonical', 'none']).default('canonical'), delivery: z.enum(['auto', 'inline', 'hybrid']).default('auto'), entryObjectId: z.string().regex(/^[a-f0-9]{64}$/).optional() }).strict().default({ payloadStorage: KEEL_DEFAULT_PAYLOAD_STORAGE, shell: 'canonical', delivery: 'auto' }),
   listing: z.object({ artist: z.string().trim().max(160).default(''), tags: z.array(z.string().trim().min(1).max(40)).max(20).default([]), discoverability: z.enum(['undecided', 'listed', 'unlisted']).default('undecided') }).strict().default({ artist: '', tags: [], discoverability: 'undecided' }),
   metadata: z.unknown().transform((value, ctx) => { try { return parseMetadata(value ?? {}); } catch (error) { ctx.addIssue({ code: 'custom', message: error.message }); return z.NEVER; } }).default({}),
   publication: z.object({ chainId: z.number().int().positive(), contractAddress: z.string().regex(/^0x[0-9a-fA-F]{40}$/), tokenId: z.string().max(78).regex(/^(0|[1-9]\d*)$/).refine((value) => BigInt(value) < 2n ** 256n), standard: z.enum(['erc721', 'erc1155']) }).strict().optional(),

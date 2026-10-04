@@ -21,7 +21,7 @@ for(const r of rows.values()){
 const chunkList=[...chunks.values()],storedBytes=chunkList.reduce((n,b)=>n+b.length,0);
 console.log(JSON.stringify({phase:'inventory',assets:rows.size,paths:paths.size,rawBytes,storedBytes,chunks:chunks.size,registrations:operations.length}));
 const artifact=await json('/Users/ravonus/dev/keel-contracts/out/KeelHold.sol/KeelHold.json');
-const child=spawn('anvil',['--port','0','--chain-id','31337'],{stdio:['ignore','pipe','pipe']});
+const child=spawn('anvil',['--port','0','--chain-id','31337','--prune-history'],{stdio:['ignore','pipe','pipe']});
 try{
  const url=await new Promise((resolve,reject)=>{let s='';child.on('error',reject);child.stdout.on('data',d=>{s+=d;const m=s.match(/Listening on (127\.0\.0\.1:\d+)/);if(m)resolve('http://'+m[1]);});setTimeout(()=>reject(Error('local startup timeout')),15000).unref();});
  const local=createPublicClient({transport:http(url)}),wallet=createWalletClient({transport:http(url)}),[account]=await wallet.getAddresses();

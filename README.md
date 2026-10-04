@@ -1,5 +1,7 @@
 # KEEL SDK
 
+Payload storage defaults to **Compact** across SDK/MCP/editor/Studio. **Raw** keeps supplied bytes and manual control. See [shared storage defaults](docs/KEEL_PAYLOAD_STORAGE.md) before preparing binary or interpreting tokenURI sizes.
+
 KEEL is a toolkit for storing browser-native artwork as immutable object graphs,
 assembling collector-facing token views, verifying every byte before execution,
 and preparing mint, sale, collection, and Fray auction actions without giving an
@@ -12,7 +14,24 @@ and their Forge tests live in the sibling
 
 ## Default storage and read path
 
-`buildKeelInlineTokenURIGraph(root)` is the shared default used by the SDK,
+**Existing objects use prepared COPY first.** Call `keel-inline-reuse-plan`
+before preparing or uploading source. Preserve the exact ordered objects and
+their registered builder; an existing padded Base64 lane is copied without
+re-encoding the body, not transcoded into a new upload. The SDK route uses
+`inspectKeelInlineExistingObjectReuse` and
+`existingObjectReuse: { mode: "assembly-only", chainId, store }`. Read
+[Prepared COPY assembly](docs/KEEL_PREPARED_COPY_ASSEMBLY.md) before planning a
+viewer repair or revision. Local byte inspection still requires authenticated
+selected-chain receipt, registration, authority and complete read-back proof.
+
+These rules are automatic for every contract, collection, viewer, metadata,
+and release request. A creator does not need to know the terms “module,”
+“canonical shell,” “raw-percent,” or “media carriage” to receive the correct
+route; the agent reads the project README/docs and performs the selected-chain
+module and graph scan first. If that evidence is missing, publication stops.
+
+For explicitly new or changed source, `buildKeelInlineTokenURIGraph(root)` is
+the fresh preparation default used by the SDK,
 MCP preparation, desktop preview measurements, and Studio publication plans.
 It prepares `application/vnd.keel.token-uri-raw-percent-fragment` objects for
 `KeelRawTokenURIBuilder`. Creator resources keep their single gzip/Base64
@@ -21,18 +40,41 @@ metadata JSON receives a Base64 wrapper. Unsafe bytes are escaped once per URI
 boundary at preparation time; contract reads copy the prepared objects and only
 format the small live metadata/context envelope.
 
+For new collector images, preserve the original binary source locally,
+validate it, and prepare one exact direct `data:image/<type>;base64,<payload>`
+carriage at build time. Publish one receipt-bound ASCII payload/URI; the
+contract copies it and never encodes or decodes image bytes during `tokenURI`.
+Existing image objects keep their exact source and carriage commitments; do
+not upload an encoded duplicate. GIFs remain direct GIF data URIs, never SVG
+wrappers or placeholders. Publication verifies source digest, decoded media
+and exact public-chain bytes.
+
+The SDK also audits the bytes a checker actually sees: it decodes raw-percent
+layers, unpacks embedded gzip/deflate resources, and rejects concrete HTTP(S),
+IPFS, Arweave, web3, and `keel-onchain` locators. A URL sentinel used only by
+an injected onchain content reader is still rejected; use a path or identifier
+and let the injected reader resolve it. The SVG namespace literal is the sole
+allowed protocol URL.
+
 The canonical shell source is packaged with the SDK, so consumers do not need a
 KEEL checkout as their working directory. Publication reuses the selected chain's
 verified shell and module objects. Only creator fragments and their composite
-references are added for a work. Missing compact infrastructure blocks publication;
-it never silently selects an older encoding. Explicit legacy carriage selections
-remain available for existing publications.
+references are added for a work. Missing compatible infrastructure blocks
+publication. Existing prepared Base64 or percent objects retain their bound
+reader; preservation does not require a carriage migration or fresh encoding.
+New carriage selections remain explicit and reviewed.
 
 Measure the complete returned tokenURI, including its image preview and metadata,
 before publication. Report one-time shared infrastructure, creator writes, and
 read gas separately. Graph size or compressed asset size alone is not a read-gas
-measurement. Studio requires receipt-backed compact catalog records and verifies
+measurement. Studio requires receipt-backed compatible catalog records and verifies
 collection compatibility before preparing its existing wallet review flow.
+
+Prepared viewer publication plans now require `keel-inline-publication-check`
+evidence, revalidated by `publish-plan` against their source and selected
+chain/store. Fresh MCP preparation accepts compact COPY only; selecting a
+carriage or setting an environment variable does not unlock a new wrapper.
+The prototype and test map is in [Prepared COPY assembly](docs/KEEL_PREPARED_COPY_ASSEMBLY.md).
 
 ## Start here
 
@@ -77,19 +119,44 @@ review-only plan. The repo-local `$fray-keel-agent` skill makes that planning
 phase the default agent workflow for 1/1s, collections, OneMint drops, sales,
 claims, and Fray auctions.
 
-## The default verification shell is mandatory
+### Contract work is always a KEEL workflow
 
-Every collector-facing viewer uses KEEL's registered canonical verification
-shell. A project supplies creator files and exact module declarations; it never
-authors, copies, forks, shrinks, relabels, or uploads another default shell.
-Omitting `viewer` in the Studio handoff selects the registered selected-chain
-shell graph. If that graph is unavailable or ambiguous, preparation fails
-closed.
+An agent must not start from an ABI, an old deployment script, or a guessed
+contract address. Before making or changing a contract, collection, viewer,
+metadata binding, deployment, or release, it reads this README and the target
+repository's relevant `docs/` files, then runs the MCP
+`keel-contract-workflow-preflight` and follows its required sequence:
+`keel-engine-catalog`, exact selected-chain `keel-network-inspect`,
+selected-chain `keel-library-search`, and only then contract controls or wallet
+review. The module scan is mandatory even when the request appears to be a new
+contract; existing modules, proxies, graph revisions, canonical shell/builder
+bindings, and edge-case recovery paths must be resolved before redeploying.
 
-`viewer: "none"` is the explicit raw-artifact route with no viewer—not a custom
-shell route. The immutable artifact remains independently releasable, mintable,
-and contract-readable. Creator-authored HTML remains artwork content inside the
-canonical shell.
+This is a default, not a user option. Missing README/docs or ambiguous
+selected-chain module evidence stops the workflow before signing. The MCP and
+the `$fray-keel-agent` skill enforce the same order so a normal creator does
+not need to know the protocol vocabulary.
+
+## Verification shell default and creator-owned HTML
+
+Omitting `viewer` in the Studio handoff selects KEEL's registered selected-chain
+verification shell. Creator files and module declarations run inside that
+shell; do not copy, fork, relabel, or upload a replacement canonical shell.
+If its registration is unavailable or ambiguous, that route fails closed.
+
+Explicit `viewer: "none"` preserves one self-contained UTF-8 HTML entrypoint
+as a creator-owned shell and publishes self-contained raw-percent Inline
+HTML with `presentationPolicy: "raw-artifact"`. It does not insert or claim
+canonical K/Proof/Files/Trail protection. Separate files, modules, assets,
+and runtime-dependent projects are unsupported by this initial direct HTML
+route and fail rather than being flattened or sent through a network loader.
+Explicit compatible registered creator shells remain a separate SDK route.
+
+Persist shell choice independently of `payloadStorage: "compact" | "raw"`.
+Raw preserves supplied source bytes and intentional formatting without
+automatic compression. Both routes retain byte-integrity, selected-chain
+receipt/read-back, and exact returned URI checks. The immutable artifact
+remains independently releasable, mintable, and contract-readable.
 
 Read [The KEEL verification shell](docs/KEEL_VERIFICATION_SHELL.md) for the
 single implementation map, registry checks, protected K control, opaque child
@@ -107,6 +174,7 @@ boundary, and exact Ethereum/Tezos reconstruction paths.
 | `packages/mcp` | Stdio MCP tools, prompts, and resources for review-only agent workflows |
 | `examples` | Static, p5, Three.js, Doom, module, and marketplace fixtures |
 | `skills/fray-keel-agent` | Installable agent workflow with progressive references |
+| `skills/keel-sdk-mcp` | SDK/MCP workflow defaults for automatic module, image-carriage, and publication planning |
 | `.agents/skills/fray-keel-agent` | Repo-scoped discovery link to the canonical skill above |
 
 The contract module map is maintained in `tools/keel/module-map.mjs`; contract
@@ -174,10 +242,12 @@ contract.
 
 ## Skill setup
 
-Codex discovers the skill automatically when opened anywhere in this repository
-through `.agents/skills/fray-keel-agent`, which points to the one canonical
-source at `skills/fray-keel-agent`. Codex supports symlinked skill folders; if a
-new skill does not appear, restart Codex.
+Codex discovers the Fray workflow automatically when opened anywhere in this
+repository through `.agents/skills/fray-keel-agent`, which points to the one
+canonical source at `skills/fray-keel-agent`. The SDK/MCP workflow is also
+available as `skills/keel-sdk-mcp` and is installed globally for automatic
+selection when the request concerns the SDK or MCP. Codex supports symlinked
+skill folders; if a new skill does not appear, restart Codex.
 
 For a separate installation, use the skill installer with this repository path:
 

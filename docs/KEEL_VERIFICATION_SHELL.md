@@ -3,8 +3,11 @@
 Every default collector-facing Keel viewer is wrapped in one canonical on-chain
 HTML verification shell: the seal button in the bottom-left corner (green or
 red by verification state) that opens a tabbed proof surface. A creator can
-explicitly select another compatible registered shell or publish an artifact
-without a viewer, but an agent must never silently manufacture a replacement.
+explicitly select another compatible registered shell or preserve one
+self-contained UTF-8 HTML entrypoint with viewer=none as a creator-owned
+shell. That direct raw-percent Inline route uses raw-artifact metadata
+policy without claiming canonical protection. An agent must never silently
+manufacture or relabel a replacement canonical shell.
 People call it
 "the stamp", "the Keel button", "the wrapper", or "the verifier" — it is
 one system, and this page is the map that was previously missing.
@@ -14,7 +17,7 @@ one system, and this page is the map that was previously missing.
 | When someone says… | They mean | Lives in |
 | --- | --- | --- |
 | the stamp / the Keel button / the seal | The in-artifact verification shell UI | shell sources below |
-| the wrapper | The on-chain HTML file that goes around every build (the shell is inside it) | built by the viewer builders below |
+| the default wrapper | The on-chain verification HTML around a build that selects the verification shell | built by the viewer builders below |
 | the native stamp / `stampNative` | A stored receipt in the attested-anchor registry (not UI, adds no verification for same-chain bytes) | `docs/KEEL_ATTESTED_ANCHORS.md`, "Native stamps" |
 | the proof modal in Studio | The React host chrome around embedded viewers — NOT the canonical shell | `apps/studio/src/components/artifacts/artifact-viewer.tsx` |
 
@@ -171,15 +174,22 @@ handoff use the registered default KEEL shell when a collector-facing viewer is
 requested and no shell was explicitly selected. A creator may explicitly
 select any compatible registered shell from the indexed catalogue; ownership
 of the shell is not required. No selected shell can overwrite or impersonate
-the platform default. The supported raw artifact choice is no shell at all.
-None of these presentation choices changes the immutable artifact object.
+the platform default. Explicit viewer=none means no KEEL-provided wrapper;
+supported self-contained creator HTML owns its presentation and is delivered
+Inline with raw-artifact policy. The initial Studio direct HTML route rejects
+separate creator files/modules/assets or declared runtimes instead of adding
+a canonical/network wrapper. Compact/Raw storage is an independent choice;
+Raw preserves exact supplied markup. No custom presentation choice grants
+the default shell protection or changes the immutable source commitment.
 
 Every released work keeps a direct artifact descriptor: store, object ID,
 digest, byte length, media type, and its `web3://.../haulObject/<objectId>`
 URI. A KEEL-aware reader can call `haulObject(bytes32)` and recover the exact
 raw image, video, model, script, or other artifact even while the standard
 `tokenURI` presents that same work through a shell. Artifact-only therefore
-means **no shell**, not “cannot be minted” and not “no contract-readable art.”
+means **no KEEL-provided shell**. A creator HTML artifact can own its shell
+and be delivered directly Inline; other raw artifacts remain contract-readable
+without a KEEL viewer. Canonical protection must not be inferred from either route.
 
 ## Protected K and extension API
 

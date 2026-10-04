@@ -20,6 +20,7 @@ export const SIBLING_CONFORMANCE_TEST_FILES = Object.freeze([
   "tests/keel-rpc-policy.test.mjs",
   "tests/sdk-keel721-compiled-abi.test.mjs",
   "tests/tezos-view-agreement.test.mjs",
+  "tests/mcp-arena.test.mjs",
 ]);
 
 /** No node:test file is allowed to perform live-chain or public-network work in the ordinary gate. */

@@ -9,7 +9,9 @@ schema; never forward a full engine intent into Studio intake.
 ## Defaults and missing choices
 
 - Local exploration requires no chain, wallet, collection or sale choice.
-- Use the registered canonical viewer and automatic compact Inline carriage.
+- Default to the registered verification shell and compact Inline carriage.
+  Honor explicit viewer=none for supported creator-owned self-contained HTML;
+  persist Compact/Raw payload storage independently of the shell choice.
 - Discover and lock exact selected-chain modules before planning another upload.
 - Suggest a dedicated ERC-721A for unique works and a dedicated ERC-1155 for
   editions; these are suggestions until selected. Existing collection choices
@@ -26,7 +28,10 @@ schema; never forward a full engine intent into Studio intake.
 Import original files regardless of type or size; use streaming local storage
 instead of routing binary media through the text editor. The canonical shell
 is the default for local previews and published viewers. A creator may explicitly
-choose direct display in the desktop Shell area; do not silently change that choice.
+choose Creator-owned shell/direct display in the desktop Shell area or
+viewer=none in a Studio handoff. Preserve the choice; the initial Studio direct
+HTML route requires one self-contained UTF-8 entrypoint without separate
+files/modules/assets. Unsupported inputs fail without a canonical fallback.
 
 For a new asset's automatic presentation, measure deterministic Gzip bytes.
 At or below 1,750,000 bytes choose Inline; above that choose HTML with native
@@ -106,8 +111,10 @@ license/access, dependencies and evidence. Let the creator resolve ambiguity.
 When no usable same-chain record exists, show the module workflow returned by
 the catalog: source/declaration → local build/test → reproducible index →
 publication plan → wallet review → receipt and registry/object read-back →
-exact lock. Never upload a replacement canonical shell or silently embed a
-missing executable library in each artwork.
+exact lock. Do not substitute or relabel custom bytes as the registered
+canonical shell, or silently embed a missing executable library in each
+artwork. Explicit creator-owned HTML has no canonical shell dependency or
+canonical protection claim; unsupported declared dependencies still fail.
 
 ## Desktop connections and memory
 

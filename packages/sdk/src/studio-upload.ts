@@ -1,3 +1,4 @@
+import { resolveKeelShell, resolveKeelPayloadStorage, type KeelPayloadStorageMode } from "@keel/protocol";
 import {
   defaultKeelStudioPublicationIntent,
   type KeelStudioPublicationIntent,
@@ -75,6 +76,7 @@ export interface KeelStudioStagedProjectFile {
 }
 
 export interface StageKeelStudioProjectInput {
+  readonly payloadStorage?: KeelPayloadStorageMode;
   readonly studioUrl: string | URL;
   readonly agentToken: string;
   readonly title: string;
@@ -190,7 +192,7 @@ function declaresLocallyManufacturedKeelShell(declaration: string): boolean {
     /protectedharnessdatauri|protected[-_\s]+harness[-_\s]+(?:shell|wrapper)|local[-_\s]+(?:shell|wrapper)/iu.test(declaration);
 }
 
-function stageComponents(files: readonly KeelStudioStagedProjectFile[], paths: readonly string[]): readonly Record<string, string>[] {
+function stageComponents(files: readonly KeelStudioStagedProjectFile[], paths: readonly string[], creatorOwned = false): readonly Record<string, string>[] {
   return files.map((file, index) => {
     const path = paths[index] as string;
     const explicitLabel = file.label;
@@ -199,7 +201,7 @@ function stageComponents(files: readonly KeelStudioStagedProjectFile[], paths: r
     // An explicit creator-facing label is the declaration of intent. This
     // catches an agent presenting bytes as KEEL's shell without banning a
     // creator artwork merely because its filename happens to contain "shell".
-    if (explicitLabel !== undefined && declaresLocallyManufacturedKeelShell(explicitLabel)) {
+    if (!creatorOwned && explicitLabel !== undefined && declaresLocallyManufacturedKeelShell(explicitLabel)) {
       throw new TypeError("Agents stage creator resources/modules only; Studio supplies the canonical KEEL Inline graph. Do not upload a locally manufactured KEEL shell.");
     }
     return {
@@ -225,7 +227,8 @@ export async function stageKeelStudioProject(
   if (title.length < 2 || title.length > 160) throw new RangeError("Staged project title must contain from 2 through 160 characters.");
   if (input.agentToken.length < 32) throw new TypeError("KEEL Studio agent token must contain at least 32 characters.");
   if (input.files.length < 1 || input.files.length > 256) throw new RangeError("Stage from 1 through 256 project files.");
-  const viewer = input.viewer ?? KEEL_VERIFICATION_SHELL;
+  const payloadStorage = resolveKeelPayloadStorage(input.payloadStorage);
+  const viewer = resolveKeelShell(input.viewer);
   if (viewer !== KEEL_VERIFICATION_SHELL && viewer !== "none") throw new TypeError("viewer must be keel-verification-shell or none.");
   if (viewer === "none" && input.publicationIntent !== undefined) {
     throw new TypeError("An artifact-only project cannot also require the KEEL verification shell.");
@@ -234,7 +237,7 @@ export async function stageKeelStudioProject(
   const paths = input.files.map((file) => safeProjectPath(file.path));
   if (new Set(paths).size !== paths.length) throw new TypeError("Staged project paths must be unique.");
   const form = new FormData();
-  const components = stageComponents(input.files, paths);
+  const components = stageComponents(input.files, paths, viewer === "none");
   const publicationIntent = viewer === "none"
     ? undefined
     : input.publicationIntent ?? defaultKeelStudioPublicationIntent();
@@ -243,6 +246,8 @@ export async function stageKeelStudioProject(
     title,
     description: input.description?.trim() ?? "",
     storageStrategy: input.storageStrategy,
+    payloadStorage,
+    viewer,
     marketplaceExportMode: input.marketplaceExportMode ?? "recursive",
     components,
     ...(input.reusableModule === undefined ? {} : { reusableModule: input.reusableModule }),

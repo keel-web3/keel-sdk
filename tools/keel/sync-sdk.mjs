@@ -12,15 +12,26 @@ const REPO = resolve(import.meta.dirname, "../..");
 const metaDir = (id) => join(REPO, "../keel-contracts", TIER_OF.get(id), id);
 const TARGET = join(REPO, "packages/sdk/src/modules.generated.ts");
 const ABI_DIR = join(REPO, "packages/sdk/src/abis");
-const abiOnly = process.argv.find(arg => arg.startsWith("--abis-only="))?.slice("--abis-only=".length);
+const options = name => {
+  const found = process.argv.slice(2).filter(arg => arg === `--${name}` || arg.startsWith(`--${name}=`));
+  if (found.length > 1 || (found.length && !found[0].startsWith(`--${name}=`))) throw new Error(`Expected one --${name}= value`);
+  const value = found[0]?.slice(name.length + 3);
+  if (value === "") throw new Error(`--${name} requires a value`);
+  return value;
+};
+const abiOnly = options("abis-only");
+const selectedArg = options("modules-only");
+const selected = selectedArg === undefined ? null : new Set(selectedArg.split(","));
+if (selected && (abiOnly || !selected.size || [...selected].some(id => !MODULES.some(m => m.id === id)))) throw new Error("Expected known module IDs for --modules-only, without --abis-only");
 if (abiOnly && !MODULES.some(m => m.id === abiOnly)) throw new Error(`Unknown module: ${abiOnly}`);
 
 const modules = [];
 const deployments = [];
 const abiIndex = [];   // [unitId, [contractName, ...]]
 for (const m of MODULES) {
-  if (abiOnly && m.id !== abiOnly) continue;
+  if ((abiOnly && m.id !== abiOnly) || (selected && !selected.has(m.id))) continue;
   const d = JSON.parse(readFileSync(join(metaDir(m.id), "keel.module.json"), "utf8"));
+  if (d.id !== m.id) throw new Error(`Manifest identity does not match selected unit ${m.id}`);
   modules.push({ id: d.id, kind: d.kind, title: d.title, group: d.group, visibility: d.visibility ?? null, summary: d.summary, version: d.version, repo: d.repo, deps: d.deps, contracts: d.contracts, deployable: d.deployable });
   // ABIs are ~1 MiB in total, so each unit gets its own module and is loaded on
   // demand rather than embedded in the registry every consumer imports.
@@ -54,6 +65,35 @@ for (const m of MODULES) {
 }
 if (abiOnly) { console.log(`sync-sdk: regenerated ABIs for ${abiOnly}`); process.exit(0); }
 deployments.sort((a, b) => a.module.localeCompare(b.module) || a.chainId - b.chainId || a.instance.localeCompare(b.instance) || a.contract.localeCompare(b.contract));
+
+// A scoped release must not publish unrelated dirty manifests or deployment records.
+// Keep the existing generated registry and replace only the explicitly selected units.
+if (selected) {
+  let registry = readFileSync(TARGET, "utf8");
+  for (const [name, fresh] of [["KEEL_MODULES", modules.filter(m => m.kind !== "app")], ["KEEL_APPS", modules.filter(m => m.kind === "app")]]) {
+    const pattern = new RegExp(`(export const ${name}: [^=]+ = )(\\[[\\s\\S]*?\\])( as const;)`);
+    const match = pattern.exec(registry);
+    if (!match) throw new Error(`Cannot read existing generated ${name}`);
+    const old = JSON.parse(match[2]);
+    for (const item of fresh) if (old.filter(m => m.id === item.id).length !== 1) throw new Error(`Scoped sync cannot add or reclassify module ${item.id}`);
+    const replacement = new Map(fresh.map(m => [m.id, m]));
+    const next = old.map(m => replacement.get(m.id) ?? m);
+    registry = registry.replace(pattern, (_, prefix, value, suffix) => prefix + JSON.stringify(next, null, 2) + suffix);
+  }
+  const indexPath = join(REPO, "packages/sdk/src/abis.generated.ts");
+  let index = readFileSync(indexPath, "utf8");
+  for (const [id, names] of abiIndex) {
+    const escaped = id.replace(/[.*+?^${}()|[\\]\\\\]/g, "\\$&");
+    const contractLine = new RegExp(`^  "${escaped}": \\[.*\\],$`, "m");
+    const loaderLine = new RegExp(`^  "${escaped}": \\(\\) => import\\(.*\\),$`, "m");
+    if (!contractLine.test(index) || !loaderLine.test(index)) throw new Error(`Scoped sync requires existing ABI catalog ${id}`);
+    index = index.replace(contractLine, `  ${JSON.stringify(id)}: ${JSON.stringify(names)},`);
+  }
+  writeFileSync(TARGET, registry);
+  writeFileSync(indexPath, index);
+  console.log(`sync-sdk: scoped manifests and ABIs for ${[...selected].join(", ")}; all deployment records unchanged`);
+  process.exit(0);
+}
 
 const onlyModules = modules.filter((m) => m.kind !== "app");
 const onlyApps = modules.filter((m) => m.kind === "app");

@@ -64,7 +64,7 @@ export function alphaProcedures(t: { procedure: any }, deps: Deps) {
       sync(item);
       const { chain, deployment } = await practice();
       const context = item.game?.seed ? { seed: item.game.seed } : {};
-      const result = await deps.engine().publish({ gameId: input.gameId, rpc: chain.rpc, deployment, context, includeEngine: input.includeEngine }).catch(failed(deps.logs, `publish ${input.gameId}`));
+      const result = await deps.engine().publish({ gameId: input.gameId, payloadStorage: item.presentation?.payloadStorage, rpc: chain.rpc, deployment, context, includeEngine: input.includeEngine }).catch(failed(deps.logs, `publish ${input.gameId}`));
       deps.logs.push('log', [`published ${input.gameId} to the practice chain: root ${result.root}`]);
       return result;
     }),
@@ -103,8 +103,9 @@ export function alphaProcedures(t: { procedure: any }, deps: Deps) {
     }),
     /** A game's Sepolia publication, prepared up to the wallet's signature (read-only calls to Sepolia). */
     gamePlanSepolia: t.procedure.input(z.object({ projectId: z.string().uuid(), gameId: gameModuleId, rpcUrl: z.string().url().max(2048).optional() }).strict()).mutation(async ({ input }: { input: { projectId: string; gameId: string; rpcUrl?: string } }) => {
-      sync(project(input.projectId));
-      return deps.engine().planPublication({ gameId: input.gameId, rpc: input.rpcUrl ?? SEPOLIA_GAME_TARGET.rpc, hold: SEPOLIA_GAME_TARGET.hold, chainId: SEPOLIA_GAME_TARGET.chainId }).catch(failed(deps.logs, `Sepolia plan for ${input.gameId}`));
+      const item = project(input.projectId);
+      sync(item);
+      return deps.engine().planPublication({ gameId: input.gameId, payloadStorage: item.presentation?.payloadStorage, rpc: input.rpcUrl ?? SEPOLIA_GAME_TARGET.rpc, hold: SEPOLIA_GAME_TARGET.hold, chainId: SEPOLIA_GAME_TARGET.chainId }).catch(failed(deps.logs, `Sepolia plan for ${input.gameId}`));
     }),
     /** Get the engine: clone the pinned release (pnpm game:engine). The editor picks it up after a restart. */
     gameGetEngine: t.procedure.mutation(async () => {

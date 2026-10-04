@@ -1,5 +1,7 @@
 # Proof, approval, and recovery boundaries
 
+**Shared storage and shell policy:** Default payloadStorage is Compact: native bytes stored once, beneficial compatible lossless compression, no generated encoded sibling. Raw preserves supplied bytes and intentional creator formatting. Shell selection is independent. Default to the registered KEEL verification shell; explicit viewer=none preserves creator-owned HTML/direct artifacts without a canonical protection claim. Requirements below for canonical shell records, protected K, and canonical mounting apply to the verification-shell choice. Native-container composers require native storage inventory, decoded source and selected-chain reader proof; their transient return encoding is not another stored copy. Read `docs/KEEL_PAYLOAD_STORAGE.md` and `docs/KEEL_BINARY_RESOURCE_DELIVERY.md`. Persist both choices and reject unsupported readers instead of silently changing storage or presentation.
+
 Use the smallest evidence set that proves the requested claim, and name what it
 does not prove.
 
@@ -15,7 +17,12 @@ does not prove.
 Require both receipt and read-back for a publication claim. Require browser
 evidence for a viewer/playback claim. For a shared module, require object bytes,
 digest/length, graph/library/review registration, and selected-chain binding;
-a plan or predicted object ID is insufficient.
+a plan or predicted object ID is insufficient. For the verification-shell
+choice or a canonical protection claim, also require the selected-chain
+canonical shell record and protected K browser behavior. Explicit viewer=none
+creator-owned HTML requires its own exact bytes, store/builder/read-back, and
+browser behavior; it does not require or claim canonical protection. Persist
+shell choice and Compact/Raw storage independently in the reviewed plan.
 
 ## Approval boundary
 

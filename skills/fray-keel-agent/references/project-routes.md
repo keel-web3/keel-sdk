@@ -13,8 +13,9 @@ Capture known answers and ask only for missing decisions:
 | Outcome | storage-only, release, fixed-price, claim, Fray auction |
 | Runtime | static media, p5, Three.js, Doom WASM, Flash AS3, other |
 | Chain | creator-selected supported chain/testnet |
-| Storage | explicit native/Inline/Hybrid/IPFS route; never silently changed |
-| Viewer | registered canonical KEEL verification shell for every viewer |
+| Payload storage | Compact by default; explicit Raw preserves supplied bytes without automatic compression |
+| Delivery | Inline by default; preserve explicit supported Hybrid/IPFS routes |
+| Viewer | registered verification shell by default; explicit viewer=none for supported creator-owned self-contained HTML |
 | Modules | exact reusable same-chain bindings or explicit new-publication plan |
 | Evidence | local, contract, catalog, browser, and live-chain gates needed |
 
@@ -54,7 +55,18 @@ Planning terms are not intake arguments. Translate them exactly:
   Fray Auction showcase. Bind the full family-specific terms returned by the
   SDK; never infer terms from the number alone.
 
-## Runtime routes
+## Creator-owned HTML route
+
+For explicit viewer=none, retain one self-contained UTF-8 HTML entrypoint and
+persist that choice through staging, preparation, estimates, and release.
+The existing raw-percent builder delivers the creator-owned document with
+raw-artifact policy; it does not add canonical shell bytes or a protection
+claim. The initial direct HTML route rejects separate files, modules, assets,
+and runtime declarations. Do not silently bundle them, introduce a network
+loader, or change the shell choice. Payload storage remains independently
+Compact or Raw; explicit Raw preserves supplied markup and intentional encoding.
+
+## Runtime routes (verification-shell default)
 
 ### Static image, video, or self-contained GLB
 

@@ -78,7 +78,7 @@ test("agent staging preserves exact component declarations and never invokes a w
   assert.equal(request.init.body instanceof FormData, true);
   const metadata = JSON.parse(request.init.body.get("metadata"));
   assert.equal(metadata.storageStrategy, "onchain");
-  assert.equal("viewer" in metadata, false);
+  assert.equal(metadata.viewer, "keel-verification-shell");
   assert.deepEqual(metadata.components.map(({ path: item, role, format, updateMode }) => ({ path: item, role, format, updateMode })), [
     { path: "index.html", role: "entrypoint", format: "asset", updateMode: "locked" },
     { path: "modules/p5.min.js", role: "renderer", format: "umd", updateMode: "locked" },
@@ -123,7 +123,7 @@ test("agent staging defaults projects to the reusable KEEL verification shell", 
     verifyManifest: true,
     verifyChunks: true,
   });
-  assert.equal("viewer" in metadata, false);
+  assert.equal(metadata.viewer, "keel-verification-shell");
 });
 
 test("agent staging preserves standard image, video, and model roles without manufacturing a viewer", async () => {
@@ -200,7 +200,7 @@ test("agent staging keeps an artifact release independent from the explicit no-s
     },
   };
   await stageKeelStudioProject(input);
-  assert.equal("viewer" in metadata, false);
+  assert.equal(metadata.viewer, "none");
   assert.equal("publicationIntent" in metadata, false);
   assert.equal(metadata.releaseIntent.release.type, "one-of-one");
   await assert.rejects(
@@ -246,7 +246,7 @@ test("agent staging rejects a locally declared KEEL shell but preserves creator 
     files: [{ path: "index.html", label: "Creator HTML artwork", bytes: new Uint8Array([1]), mediaType: "text/html", role: "entrypoint", format: "asset" }],
   });
   assert.equal(requests, 1);
-  assert.equal("viewer" in metadata, false);
+  assert.equal(metadata.viewer, "keel-verification-shell");
   assert.deepEqual(metadata.components.map(({ path: componentPath, label }) => [componentPath, label]), [["index.html", "Creator HTML artwork"]]);
   await stageKeelStudioProject({
     ...base,

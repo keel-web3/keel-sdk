@@ -8,6 +8,8 @@ import {
   KEEL_VIEWER_PROTOCOL,
   assertValidManifest,
   createIntegrity,
+  resolveKeelPayloadStorage,
+  type KeelPayloadStorageMode,
   manifestIntegrity,
   utf8ToBytes,
   type ArtifactDownload,
@@ -63,7 +65,7 @@ function resourceAliases(resourceId: string, fileName: string): readonly string[
   return [...new Set([`/content/${encodeURIComponent(resourceId)}`, `/content/${filePath}`])];
 }
 
-async function prepareResource(asset: NormalizedStudioAsset): Promise<PreparedStudioResource> {
+async function prepareResource(asset: NormalizedStudioAsset, payloadStorage: KeelPayloadStorageMode): Promise<PreparedStudioResource> {
   const decodedIntegrity = await createIntegrity(asset.bytes);
   // The inline presentation contract must be able to concatenate the exact
   // HTML shell without running a browser codec. Entrypoints are deliberately
@@ -74,7 +76,7 @@ async function prepareResource(asset: NormalizedStudioAsset): Promise<PreparedSt
     || asset.mediaType === "application/vnd.keel.token-uri-percent-fragment"
     || asset.mediaType === "application/vnd.keel.token-uri-raw-percent-fragment"
     || asset.mediaType === "application/vnd.keel.token-uri-base64-body-fragment";
-  const selected = contractReadable
+  const selected = contractReadable || payloadStorage === "raw"
     ? { compression: "none" as const, bytes: asset.bytes.slice() }
     : await chooseSmallestCompression(asset.bytes);
   const storedIntegrity = await createIntegrity(selected.bytes);
@@ -477,13 +479,14 @@ function stats(resources: readonly PreparedStudioResource[]): StudioArtifactStat
 
 export async function prepareStudioArtifact(options: PrepareStudioArtifactOptions): Promise<PreparedStudioArtifact> {
   if (options.id.trim().length === 0 || options.name.trim().length === 0) throw new TypeError("Artifact ID and name are required.");
+  const payloadStorage = resolveKeelPayloadStorage(options.payloadStorage);
   const withDerivatives = await appendMediaDerivatives(normalizeAssets(options.assets), options.mediaDerivativeProfiles ?? []);
   const flashRuntime = options.flashRuntime === undefined ? undefined : resolveFlashRuntime(options.flashRuntime, withDerivatives.assets);
   const normalized = ensureEntrypoint(withDerivatives.assets, options.name, options.description, flashRuntime?.wrapper);
   const maxResources = positiveSafe(options.maxResources, 512, "maxResources");
   if (normalized.length > maxResources) throw new RangeError(`Artifact has ${normalized.length} resources; limit is ${maxResources}.`);
 
-  const resources = await Promise.all(normalized.map(prepareResource));
+  const resources = await Promise.all(normalized.map((asset) => prepareResource(asset, payloadStorage)));
   const entrypoint = normalized.find((asset) => asset.entrypoint);
   if (entrypoint === undefined) throw new Error("Artifact preparation did not produce an entrypoint.");
   const total = stats(resources);
@@ -559,6 +562,7 @@ export async function prepareStudioArtifact(options: PrepareStudioArtifactOption
         stats: total,
       },
       ...(options.extensions ?? {}),
+      "keel:payload-storage": { mode: payloadStorage, storedRepresentation: "native-bytes" },
       ...(flashRuntime === undefined ? {} : { "keel:flash": flashRuntime.extension }),
     },
   };

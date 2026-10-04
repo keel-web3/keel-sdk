@@ -19,7 +19,7 @@ const utf8 = (value) => new TextEncoder().encode(value);
    stub tests below cover the shapes anvil cannot easily produce. */
 async function withAnvil(run) {
   const port = 8600 + Math.floor(Math.random() * 300);
-  const anvil = spawn("anvil", ["--port", String(port), "--silent", "--chain-id", "31337"], { stdio: ["ignore", "pipe", "pipe"] });
+  const anvil = spawn("anvil", ["--port", String(port), "--silent", "--chain-id", "31337", "--prune-history"], { stdio: ["ignore", "pipe", "pipe"] });
   const rpcUrl = `http://127.0.0.1:${port}`;
   try {
     const deadline = Date.now() + 20_000;

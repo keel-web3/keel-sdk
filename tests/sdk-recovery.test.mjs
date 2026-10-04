@@ -13,7 +13,7 @@ import {keelManagerAbi,keelRecoveryGroupsAbi} from '../packages/sdk/dist/abi.js'
 // deployment catalog or wallet files participate in this integration test.
 test('recovery SDK agrees with deployed contracts and relays cold-only upgrades',async t=>{
  const server=createServer();await new Promise(r=>server.listen(0,'127.0.0.1',r));const port=server.address().port;await new Promise(r=>server.close(r));
- const child=spawn('anvil',['--host','127.0.0.1','--port',String(port),'--silent'],{stdio:'ignore'});
+ const child=spawn('anvil',['--host','127.0.0.1','--port',String(port),'--silent','--prune-history'],{stdio:'ignore'});
  t.after(()=>child.kill('SIGTERM'));
  const chain={...foundry,rpcUrls:{default:{http:[`http://127.0.0.1:${port}`]}}};
  const client=createPublicClient({chain,transport:http(chain.rpcUrls.default.http[0],{retryCount:0})});

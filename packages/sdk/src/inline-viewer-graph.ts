@@ -1,3 +1,4 @@
+import { assertKeelFreshPayloadCarriage } from "./inline-transport-audit.js";
 /**
  * Node-only planner for a modular Inline KEEL viewer.
  *
@@ -8,6 +9,8 @@
 import {
   assertDataUriMediaType,
   createIntegrity,
+  resolveKeelPayloadStorage,
+  type KeelPayloadStorageMode,
   isDataUriLiteralByte,
   serializeScriptJSON,
   toPercentDataUrl,
@@ -15,10 +18,13 @@ import {
   type Integrity,
 } from "@keel/protocol";
 import { promisify } from "node:util";
-import { gunzip, inflate } from "node:zlib";
+import { createHash } from "node:crypto";
+import { decodeLzmaCommittedSync } from "./decoders/node.js";
+import { gzipSync, gunzip, gunzipSync, inflate, inflateSync, brotliDecompress, brotliDecompressSync } from "node:zlib";
 import { encodeAbiParameters, getAddress, keccak256, stringToHex } from "viem";
 
 import { KEEL_INLINE_MAX_TOKEN_URI_BYTES, keelWeb3ObjectURI, resolveKeelInlineCarriage, type KeelInlineCarriage } from "./presentation.js";
+import { assertKeelCollectorInlineMetadata, assertKeelInlineImageBytes, prepareKeelInlineImageCarriage, type KeelPresentationPolicy } from "./collector-policy.js";
 import {
   KEEL_ASSET_DISPLAY_MEDIA_TYPES,
   KEEL_ASSET_DISPLAY_MODULE_ID,
@@ -31,6 +37,7 @@ import {
 import {
   buildCompactInlineKeelShell,
   buildEmbeddedKeelViewerSlot,
+  isKeelViewerTextMediaType,
   type KeelStandaloneViewerItem,
 } from "./verification-shell.js";
 import { orderKeelModules, type KeelModulePhase } from "./data-layer.js";
@@ -161,9 +168,39 @@ export interface KeelPublishedInlineFragment extends KeelInlineFragmentBytes {
   };
 }
 
+export type KeelInlineCodecProfile = "native" | "brotli-js" | "lzma-js" | "brotli-lzma-js";
+export type KeelInlineCompression = "none" | "gzip" | "deflate" | "brotli" | "lzma";
+
+function inlineCompression(mode: KeelPayloadStorageMode, compression: KeelInlineCompression | undefined, fallback: KeelInlineCompression): KeelInlineCompression {
+  if (mode === "raw" && compression !== undefined && compression !== "none") {
+    throw new TypeError("Raw payload storage preserves supplied bytes; remove the Inline compression override or select Compact.");
+  }
+  return mode === "raw" ? "none" : compression ?? fallback;
+}
+
+function assetCompression(asset: { readonly payloadStorage?: KeelPayloadStorageMode; readonly compression?: KeelInlineCompression; readonly mediaType: string; readonly source: Uint8Array }, mode: KeelPayloadStorageMode): KeelInlineCompression {
+  const storage = inheritInlineStorage(mode, asset.payloadStorage);
+  const selected = inlineCompression(storage, asset.compression, "none");
+  if (asset.compression !== undefined || storage === "raw" || isKeelViewerTextMediaType(asset.mediaType)) return selected;
+  return gzipSync(asset.source, { level: 9 }).byteLength < asset.source.byteLength ? "gzip" : "none";
+}
+
+function inheritInlineStorage(parent: KeelPayloadStorageMode, child?: KeelPayloadStorageMode): KeelPayloadStorageMode {
+  const storage = resolveKeelPayloadStorage(child ?? parent);
+  if (parent === "raw" && storage !== "raw") throw new TypeError("A Compact child cannot override Raw payload storage.");
+  return storage;
+}
+
+const INLINE_PROFILE_CODECS: Readonly<Record<KeelInlineShellFragments["codecProfile"], readonly KeelInlineCompression[]>> = {
+  "browser-gzip-deflate": ["none", "gzip", "deflate"],
+  "browser-gzip-deflate-brotli-js": ["none", "gzip", "deflate", "brotli"],
+  "browser-gzip-deflate-lzma-js": ["none", "gzip", "deflate", "lzma"],
+  "browser-gzip-deflate-brotli-lzma-js": ["none", "gzip", "deflate", "brotli", "lzma"],
+};
+
 export interface KeelInlineShellFragments {
   readonly schema: "keel-inline-shell-fragments@1";
-  readonly codecProfile: "browser-gzip-deflate";
+  readonly codecProfile: "browser-gzip-deflate" | "browser-gzip-deflate-brotli-js" | "browser-gzip-deflate-lzma-js" | "browser-gzip-deflate-brotli-lzma-js";
   readonly prefix: KeelInlineFragmentBytes;
   readonly suffix: KeelInlineFragmentBytes;
 }
@@ -185,7 +222,7 @@ export type KeelInlineAssetDisplayModuleFragment = KeelInlineModuleFragment & {
 
 export type KeelInlineDocumentPart = {
   readonly kind: "existing";
-  readonly role: "shell-prefix" | "module" | "entrypoint" | "shell-suffix";
+  readonly role: "shell-prefix" | "module" | "entrypoint" | "asset" | "shell-suffix";
   readonly moduleId?: string;
   readonly moduleVersion?: string;
   readonly execution?: "classic" | "module";
@@ -207,6 +244,39 @@ export interface KeelInlineGraphDocument {
   readonly rootIntegrity: Integrity;
   readonly byteLength: number;
   readonly parts: readonly KeelInlineDocumentPart[];
+}
+
+/** Reuse published prepared bytes; this context never authorizes new source objects. */
+export interface KeelInlineExistingObjectReuse {
+  readonly mode: "assembly-only";
+  readonly chainId: number;
+  readonly store: Hex;
+}
+
+/** Ordered receipt/read-back bytes, not a locally prepared replacement. */
+export interface KeelInlineExistingObjectReusePart extends KeelPublishedInlineFragment {
+  readonly role: KeelInlineDocumentPart["role"];
+  readonly moduleId?: string;
+  readonly moduleVersion?: string;
+  readonly execution?: "classic" | "module";
+  readonly phase?: KeelModulePhase;
+  readonly weight?: number;
+}
+
+export interface KeelInlineExistingObjectReuseOptions {
+  readonly existingParts?: readonly KeelPublishedInlineFragment[];
+  readonly existingObjectReuse?: KeelInlineExistingObjectReuse;
+}
+
+export interface KeelInlineExistingObjectReuseInspection {
+  readonly root: KeelInlineGraphDocument;
+  readonly carriage: Exclude<KeelInlineCarriage, "compact">;
+  readonly existingParts: readonly KeelInlineExistingObjectReusePart[];
+  readonly reusedObjectIds: readonly Hex[];
+  readonly newSourcePublicationBytes: 0;
+  readonly storageTransform: "none";
+  /** Byte inspection does not replace selected-chain registration/read-back proof. */
+  readonly selectedChainBindingVerified: false;
 }
 
 export interface KeelInlineLocalDocument extends KeelInlineGraphDocument {
@@ -427,7 +497,108 @@ const encoder = new TextEncoder();
 const decoder = new TextDecoder("utf-8", { fatal: true });
 const gunzipAsync = promisify(gunzip);
 const inflateAsync = promisify(inflate);
+const brotliDecompressAsync = promisify(brotliDecompress);
 const SAFE_INLINE_MODULE_ID = /^[A-Za-z0-9][A-Za-z0-9._:/-]{0,127}$/u;
+// Arweave locators carry an authority or a 32-byte base64url transaction ID.
+// A minified JS ternary such as `ready ? ar : 1` is not a content locator.
+const EXTERNAL_RESOURCE_LITERAL = /\b(?:(?:https?|ipfs|web3|keel-onchain):[^\s"'<>\\]+|ar:(?:\/\/[^\s"'<>\\]+|[A-Za-z0-9_-]{43}(?![A-Za-z0-9_-])(?:\/[^\s"'<>\\]*)?))/giu;
+
+/**
+ * Reject concrete network/content locators in creator-owned Inline bytes.
+ *
+ * Checkers inspect the decoded contents of bounded embedded gzip/deflate/Brotli and committed LZMA slots, so a
+ * URL hidden inside a packed JavaScript module is still an external
+ * dependency. The SVG namespace is syntax rather than a fetchable resource;
+ * it is the sole protocol URL allowed in creator bytes. Onchain content
+ * runtimes must use their injected content reader and a path/identifier, not
+ * a URL sentinel.
+ */
+export function assertKeelInlineNoExternalDependencies(
+  bytes: Uint8Array,
+  label = "Inline creator resource",
+): void {
+  const found = new Set<string>();
+  const visited = new Set<string>();
+  const scanLimit = 32 * 1024 * 1024;
+  let expandedBytes = 0;
+  const inspect = (candidate: Uint8Array, depth: number): void => {
+    let text: string;
+    try {
+      text = decoder.decode(candidate);
+    } catch {
+      return;
+    }
+    const digest = createHash("sha256"); digest.update(candidate);
+    const key = `${depth}:${digest.digest("hex")}`;
+    if (visited.has(key)) return;
+    visited.add(key);
+    if (depth < 4) {
+      let percentDecoded: string | undefined;
+      try { percentDecoded = decodeURIComponent(text); } catch { /* Not percent-encoded text. */ }
+      if (percentDecoded !== undefined && percentDecoded !== text) inspect(encoder.encode(percentDecoded), depth + 1);
+    }
+    if (/keel\.invalid/iu.test(text)) found.add("keel.invalid");
+    for (const match of text.matchAll(EXTERNAL_RESOURCE_LITERAL)) {
+      const value = match[0].replace(/[),.;]+$/u, "");
+      if (value !== "http://www.w3.org/2000/svg") found.add(value);
+    }
+    if (depth >= 4) return;
+    const expanded = (value: Uint8Array): void => {
+      expandedBytes += value.byteLength;
+      if (expandedBytes > scanLimit) throw new TypeError(label + " exceeds nested resource scan bounds.");
+      inspect(value, depth + 1);
+    };
+    // Exact JSON slot descriptors carry the output commitment needed by LZMA-alone.
+    // The native stream header commonly has no size; never infer or guess one.
+    const knownLzma = new Set<string>();
+    let json: unknown;
+    try { if (/compression["']?\s*:\s*["']lzma["']/u.test(text)) json = JSON.parse(text.trimStart().replace(/^,/u, "")); } catch { /* Source code need not be JSON. */ }
+    const objects: unknown[] = json === undefined ? [] : [json];
+    for (let at = 0; at < objects.length; at++) {
+      if (objects.length > 65536) throw new TypeError(label + " exceeds nested descriptor bounds.");
+      const value = objects[at];
+      if (value === null || typeof value !== "object") continue;
+      const item = value as { embedded?: { compression?: unknown; storedBase64?: unknown }; integrity?: { byteLength?: unknown } };
+      if (item.embedded?.compression === "lzma" && typeof item.embedded.storedBase64 === "string") {
+        const length = item.integrity?.byteLength;
+        if (typeof length !== "number" || !Number.isSafeInteger(length) || length < 0 || length > scanLimit - expandedBytes) {
+          throw new TypeError(label + " needs a bounded decoded length for nested LZMA.");
+        }
+        const packed = exactBase64Bytes(item.embedded.storedBase64, label + " nested LZMA");
+        expanded(decodeLzmaCommittedSync(packed, { decodedByteLength: length, maxDecodedBytes: scanLimit - expandedBytes }));
+        knownLzma.add(item.embedded.storedBase64);
+      }
+      const children = Object.values(value);
+      if (objects.length + children.length > 65536) throw new TypeError(label + " exceeds nested descriptor bounds.");
+      for (const child of children) objects.push(child);
+    }
+    for (const match of text.matchAll(/storedBase64["']?\s*:\s*["']([A-Za-z0-9+/=]+)["']/gu)) {
+      if (knownLzma.has(match[1]!)) continue;
+      if (/compression["']?\s*:\s*["']lzma["']/u.test(text)) {
+        throw new TypeError(label + " contains nested LZMA without an exact JSON output commitment.");
+      }
+      const stored = Buffer.from(match[1]!, "base64"), remaining = Math.max(1, scanLimit - expandedBytes);
+      for (const unpack of [
+        () => gunzipSync(stored, { maxOutputLength: remaining }),
+        () => inflateSync(stored, { maxOutputLength: remaining }),
+        () => brotliDecompressSync(stored, { maxOutputLength: remaining }),
+      ]) {
+        let unpacked: Uint8Array;
+        try { unpacked = new Uint8Array(unpack()); }
+        catch (error) {
+          if ((error as { code?: string }).code === "ERR_BUFFER_TOO_LARGE") throw new TypeError(label + " exceeds nested resource scan bounds.");
+          continue; // May use another supported compression.
+        }
+        expanded(unpacked);
+        break;
+      }
+    }
+  }
+  inspect(bytes, 0);
+  if (found.size > 0) {
+    throw new TypeError(label + " contains external resource locator(s): " + [...found].slice(0, 4).join(", "));
+  }
+}
 
 function base64Bytes(bytes: Uint8Array): Uint8Array {
   return encoder.encode(Buffer.from(bytes).toString("base64"));
@@ -477,6 +648,134 @@ async function assertPublishedFragmentIntegrity(fragment: KeelPublishedInlineFra
   }
 }
 
+/**
+ * Inspect exact published prepared fragments without encoding, padding or
+ * compressing them. The host must verify their selected-chain receipts,
+ * registration and original graph order before proposing an assembly revision.
+ * Raw binary objects are incompatible with a prepared-copy carriage: fail
+ * instead of silently transcoding or republishing them.
+ */
+export async function inspectKeelInlineExistingObjectReuse(input: {
+  readonly existingObjectReuse: KeelInlineExistingObjectReuse;
+  readonly existingParts: readonly KeelInlineExistingObjectReusePart[];
+  readonly carriage?: KeelInlineCarriage;
+}): Promise<KeelInlineExistingObjectReuseInspection> {
+  const scope = { ...input.existingObjectReuse };
+  const requestedCarriage = input.carriage;
+  if (scope?.mode !== "assembly-only" || !Number.isSafeInteger(scope.chainId) || scope.chainId <= 0
+      || !/^0x[0-9a-f]{40}$/iu.test(scope.store) || /^0x0{40}$/iu.test(scope.store)) {
+    throw new TypeError("Existing-object reuse requires an assembly-only selected-chain store binding.");
+  }
+  if (!Array.isArray(input.existingParts) || input.existingParts.length < 2 || input.existingParts.length > 128
+      || input.existingParts[0]?.role !== "shell-prefix" || input.existingParts.at(-1)?.role !== "shell-suffix") {
+    throw new TypeError("Existing-object reuse requires 2–128 ordered published parts with both shell boundaries.");
+  }
+  // Capture every caller-owned value before the first digest await.
+  const suppliedParts = input.existingParts.map(source => ({ ...source,
+    bytes: source.bytes instanceof Uint8Array ? new Uint8Array(source.bytes) : source.bytes,
+    carrier: { ...source.carrier }, integrity: { ...source.integrity } }));
+  const existingParts: KeelInlineExistingObjectReusePart[] = [];
+  const parts: KeelInlineDocumentPart[] = [];
+  const commitments = new Map<string, string>();
+  let storedBytes = 0;
+  for (let index = 0; index < suppliedParts.length; index += 1) {
+    const source = suppliedParts[index]!;
+    if (!["shell-prefix", "module", "entrypoint", "asset", "shell-suffix"].includes(source.role)
+        || (index > 0 && index < suppliedParts.length - 1 && source.role.startsWith("shell-"))) {
+      throw new TypeError("Existing-object reuse cannot move shell boundaries into body slots.");
+    }
+    if (!(source.bytes instanceof Uint8Array) || source.bytes.byteLength === 0
+        || source.carrier?.chainId !== scope.chainId || typeof source.carrier.store !== "string"
+        || source.carrier.store.toLowerCase() !== scope.store.toLowerCase()
+        || !/^0x[0-9a-f]{64}$/iu.test(source.carrier.objectId) || /^0x0{64}$/iu.test(source.carrier.objectId)
+        || source.integrity?.algorithm !== "sha256" || !/^0x[0-9a-f]{64}$/iu.test(source.integrity.digest)) {
+      throw new TypeError(`Existing Inline part ${index} has an invalid selected-chain object or SHA-256 commitment.`);
+    }
+    storedBytes += source.bytes.byteLength;
+    if (storedBytes > KEEL_INLINE_MAX_TOKEN_URI_BYTES) {
+      throw new RangeError("Existing prepared bytes exceed the 2,000,000-byte public-read ceiling.");
+    }
+    const published = source;
+    await assertPublishedFragmentIntegrity(published, `Existing Inline ${source.role}`);
+    const media = published.carrier.mediaType;
+    if (!["application/vnd.keel.token-uri-raw-percent-fragment", "application/vnd.keel.token-uri-percent-fragment",
+      "application/vnd.keel.token-uri-base64-fragment", "application/vnd.keel.token-uri-base64-body-fragment"].includes(media)) {
+      throw new TypeError(`Existing Inline part ${index} has incompatible prepared-copy media ${media}; reuse never transcodes stored bytes.`);
+    }
+    const decodedBytes = decodePublishedGraphPart(published);
+    if (media !== "application/vnd.keel.token-uri-raw-percent-fragment" && decoder.decode(published.bytes).includes("=")) {
+      throw new TypeError("Existing prepared fragments must be unpadded for exact concatenation.");
+    }
+    if (media.includes("base64") && decodedBytes.byteLength % 9 !== 0) {
+      throw new TypeError("Existing Base64 fragments must retain their exact nine-byte HTML alignment.");
+    }
+    const id = published.carrier.objectId.toLowerCase();
+    const commitment = JSON.stringify([media, published.carrier.compression, published.integrity.digest.toLowerCase(), published.bytes.byteLength]);
+    if (commitments.has(id) && commitments.get(id) !== commitment) {
+      throw new TypeError("One immutable object ID has conflicting prepared-byte commitments.");
+    }
+    commitments.set(id, commitment);
+    existingParts.push(published);
+    parts.push({ kind: "existing", role: published.role,
+      ...(published.moduleId === undefined ? {} : { moduleId: published.moduleId }),
+      ...(published.moduleVersion === undefined ? {} : { moduleVersion: published.moduleVersion }),
+      ...(published.execution === undefined ? {} : { execution: published.execution }),
+      ...(published.phase === undefined ? {} : { phase: published.phase }),
+      ...(published.weight === undefined ? {} : { weight: published.weight }),
+      bytes: decodedBytes, byteLength: decodedBytes.byteLength, integrity: await createIntegrity(decodedBytes) });
+  }
+  const media = existingParts.map(part => part.carrier.mediaType);
+  let carriage: Exclude<KeelInlineCarriage, "compact">;
+  if (media.every(value => value === "application/vnd.keel.token-uri-raw-percent-fragment")) carriage = "raw-percent";
+  else if (media.every(value => value === "application/vnd.keel.token-uri-percent-fragment")) carriage = "percent";
+  else if (media[0] === "application/vnd.keel.token-uri-base64-fragment" && media.at(-1) === media[0]
+      && media.every(value => value === media[0] || value === "application/vnd.keel.token-uri-base64-body-fragment")) {
+    carriage = media.includes("application/vnd.keel.token-uri-base64-body-fragment") ? "follow-latest" : "pinned";
+  } else throw new TypeError("Existing Inline objects have incompatible mixed prepared-copy carriages.");
+  if (requestedCarriage !== undefined && resolveKeelInlineCarriage(requestedCarriage) !== carriage) {
+    throw new TypeError(`Requested Inline carriage does not match the existing ${carriage} prepared bytes.`);
+  }
+  const rootBytes = concat(parts.map(part => part.bytes));
+  return { root: { rootBytes, rootIntegrity: await createIntegrity(rootBytes), byteLength: rootBytes.byteLength, parts },
+    carriage, existingParts, reusedObjectIds: existingParts.map(part => part.carrier.objectId),
+    newSourcePublicationBytes: 0, storageTransform: "none", selectedChainBindingVerified: false };
+}
+
+async function inspectExistingGraphReuse(
+  root: KeelInlineGraphDocument,
+  options: KeelInlineExistingObjectReuseOptions,
+  carriage?: KeelInlineCarriage,
+): Promise<KeelInlineExistingObjectReuseInspection | undefined> {
+  if (options.existingObjectReuse === undefined) return undefined;
+  root = { ...root, rootBytes: new Uint8Array(root.rootBytes), rootIntegrity: { ...root.rootIntegrity },
+    parts: root.parts.map(part => ({ ...part, bytes: new Uint8Array(part.bytes), integrity: { ...part.integrity } })) };
+  if (root.parts.some(part => part.kind !== "existing") || options.existingParts?.length !== root.parts.length) {
+    throw new TypeError("Assembly-only reuse requires an exact published object for every ordered part; new source publication is forbidden.");
+  }
+  const inspected = await inspectKeelInlineExistingObjectReuse({ existingObjectReuse: options.existingObjectReuse,
+    existingParts: options.existingParts.map((part, index) => ({ ...root.parts[index]!, ...part, role: root.parts[index]!.role })),
+    ...(carriage === undefined ? {} : { carriage }) });
+  for (let index = 0; index < root.parts.length; index += 1) {
+    const source = root.parts[index]!;
+    const actual = inspected.root.parts[index]!;
+    if (source.byteLength !== source.bytes.byteLength || !exactBytes(source.bytes, actual.bytes)
+        || (source.kind === "existing" && actual.kind === "existing"
+          && ["moduleId", "moduleVersion", "execution", "phase", "weight"].some(key =>
+            source[key as keyof typeof source] !== actual[key as keyof typeof actual]))
+        || source.integrity.algorithm !== actual.integrity.algorithm || source.integrity.byteLength !== actual.integrity.byteLength
+        || source.integrity.digest.toLowerCase() !== actual.integrity.digest.toLowerCase()) {
+      throw new TypeError(`Existing Inline part ${index} differs from the published decoded source; reuse cannot replace or repad it.`);
+    }
+  }
+  if (root.byteLength !== root.rootBytes.byteLength || !exactBytes(root.rootBytes, inspected.root.rootBytes)
+      || root.rootIntegrity.algorithm !== inspected.root.rootIntegrity.algorithm
+      || root.rootIntegrity.byteLength !== inspected.root.rootIntegrity.byteLength
+      || root.rootIntegrity.digest.toLowerCase() !== inspected.root.rootIntegrity.digest.toLowerCase()) {
+    throw new TypeError("Existing Inline root differs from its exact ordered published source commitment.");
+  }
+  return inspected;
+}
+
 function exactStringArray(value: unknown, expected: readonly string[]): boolean {
   return Array.isArray(value)
     && value.length === expected.length
@@ -517,16 +816,30 @@ export async function verifyKeelPublishedInlineModuleFragment(input: {
     || item.integrity.algorithm !== "sha256"
     || item.integrity.byteLength !== input.decodedBytes.byteLength
     || item.embedded === undefined
-    || !["none", "gzip", "deflate"].includes(item.embedded.compression)
+    || !["none", "gzip", "deflate", "brotli", "lzma"].includes(item.embedded.compression)
   ) {
     throw new TypeError(`Inline module ${input.moduleId} metadata does not match its SDK declaration.`);
   }
-  const stored = exactBase64Bytes(item.embedded.storedBase64, `Inline module ${input.moduleId} payload`);
+  const hasText = item.embedded.storedText !== undefined, hasBase64 = item.embedded.storedBase64 !== undefined;
+  if (hasText === hasBase64 || (hasText && (typeof item.embedded.storedText !== "string" || item.embedded.compression !== "none"))
+      || (hasBase64 && typeof item.embedded.storedBase64 !== "string")) {
+    throw new TypeError(`Inline module ${input.moduleId} has ambiguous or invalid embedded bytes.`);
+  }
+  const stored = hasText ? encoder.encode(item.embedded.storedText!)
+    : exactBase64Bytes(item.embedded.storedBase64!, `Inline module ${input.moduleId} payload`);
+  if (hasText && new TextDecoder("utf-8", { fatal: true, ignoreBOM: true }).decode(stored) !== item.embedded.storedText) {
+    throw new TypeError(`Inline module ${input.moduleId} has invalid UTF-8 text.`);
+  }
   const decoded = item.embedded.compression === "gzip"
-    ? new Uint8Array(await gunzipAsync(stored))
+    ? new Uint8Array(await gunzipAsync(stored, { maxOutputLength: Math.max(1, input.decodedBytes.byteLength) }))
     : item.embedded.compression === "deflate"
-      ? new Uint8Array(await inflateAsync(stored))
-      : stored;
+      ? new Uint8Array(await inflateAsync(stored, { maxOutputLength: Math.max(1, input.decodedBytes.byteLength) }))
+      : item.embedded.compression === "brotli"
+        ? new Uint8Array(await brotliDecompressAsync(stored, { maxOutputLength: Math.max(1, input.decodedBytes.byteLength) }))
+        : item.embedded.compression === "lzma"
+          ? await (await import("./decoders/index.js")).decodeLzma(stored, { decodedByteLength: input.decodedBytes.byteLength })
+          : stored;
+  assertKeelInlineNoExternalDependencies(decoded, "Inline module " + input.moduleId);
   const [decodedIntegrity, storedIntegrity] = await Promise.all([
     createIntegrity(decoded),
     createIntegrity(stored),
@@ -691,9 +1004,11 @@ function assertMarketplaceSafeDataURI(value: string, label: string): void {
   const header = value.slice(5, comma);
   const payload = value.slice(comma + 1);
   const mediaType = header.replace(/;base64$/iu, "");
+  const imageMediaType = mediaType.split(";", 1)[0]!;
   assertDataUriMediaType(mediaType);
   if (mediaType !== header) {
-    exactBase64Bytes(payload, `${label} Base64 payload`);
+    const bytes = exactBase64Bytes(payload, `${label} Base64 payload`);
+    if (imageMediaType.startsWith("image/")) assertKeelInlineImageBytes(bytes, imageMediaType, label);
     return;
   }
   for (let at = 0; at < payload.length; at += 1) {
@@ -704,6 +1019,11 @@ function assertMarketplaceSafeDataURI(value: string, label: string): void {
       continue;
     }
     throw new TypeError(`${label} contains raw text that must be percent-escaped.`);
+  }
+  if (imageMediaType === "image/svg+xml") {
+    assertKeelInlineImageBytes(encoder.encode(decodeURIComponent(payload)), imageMediaType, label);
+  } else if (imageMediaType.startsWith("image/")) {
+    throw new TypeError(`${label} raster bytes must use the canonical exact Base64 image carriage.`);
   }
 }
 
@@ -718,15 +1038,20 @@ function assertPreparedImageURI(value: string): void {
   throw new TypeError("A prepared Inline token image must be a self-contained data URI or an exact KEEL web3 object URI.");
 }
 
-/** Keep raster bytes binary until the URI boundary. SVG already contains its
- * raster data URIs, so a second Base64 envelope can be needlessly larger. */
+/**
+ * Prepare the direct image carriage once. Raster payload text is then split
+ * into its resource slot by the graph builder; a publisher or contract copies
+ * that exact ASCII payload and never encodes/decodes media at read time. SVG is
+ * the separate raw-percent text-media exception. GIF is never wrapped in SVG.
+ */
 export function buildKeelInlineImageURI(bytes: Uint8Array, mediaType: string): string {
   if (!['image/png', 'image/webp', 'image/avif', 'image/jpeg', 'image/gif', 'image/svg+xml'].includes(mediaType)) {
     throw new TypeError('Choose a supported inline image media type.');
   }
   if (!bytes.byteLength) throw new TypeError('An inline image cannot be empty.');
+  assertKeelInlineImageBytes(bytes, mediaType);
+  if (mediaType !== 'image/svg+xml') return prepareKeelInlineImageCarriage(bytes, mediaType).uri;
   const base64 = `data:${mediaType};base64,${Buffer.from(bytes).toString('base64')}`;
-  if (mediaType !== 'image/svg+xml') return base64;
   const percent = `data:${mediaType},${decoder.decode(compactPercentPayload(bytes))}`;
   const uri = percent.length < base64.length ? percent : base64;
   assertPreparedImageURI(uri);
@@ -738,14 +1063,16 @@ async function exactFragment(bytes: Uint8Array): Promise<KeelInlineFragmentBytes
   return { bytes, integrity: await createIntegrity(bytes) };
 }
 
-/** Build the small reusable shell halves without embedding Brotli WASM. */
+/** Build official reusable shell halves with an explicit optional JavaScript decoder profile. */
 export async function buildKeelInlineShellFragments(input: {
   readonly repositoryRoot?: string;
+  readonly codecProfile?: KeelInlineCodecProfile;
 } = {}): Promise<KeelInlineShellFragments> {
   const shell = await buildCompactInlineKeelShell(input);
   return {
     schema: "keel-inline-shell-fragments@1",
-    codecProfile: "browser-gzip-deflate",
+    codecProfile: input.codecProfile === undefined || input.codecProfile === "native"
+      ? "browser-gzip-deflate" : `browser-gzip-deflate-${input.codecProfile}`,
     prefix: await exactFragment(shell.prefix),
     suffix: await exactFragment(shell.suffix),
   };
@@ -761,11 +1088,15 @@ export async function buildKeelInlineModuleFragment(input: {
   readonly mediaType: string;
   readonly aliases?: readonly string[];
   readonly decodedBytes: Uint8Array;
-  readonly compression?: "none" | "gzip" | "deflate";
+  readonly compression?: KeelInlineCompression;
+  readonly payloadStorage?: KeelPayloadStorageMode;
+  /** Exact precompressed input; required for LZMA. The SDK validates its reconstruction. */
+  readonly storedBytes?: Uint8Array;
   readonly execution?: "classic" | "module";
   readonly phase?: KeelModulePhase;
   readonly weight?: number;
 }): Promise<KeelInlineModuleFragment> {
+  const payloadStorage = resolveKeelPayloadStorage(input.payloadStorage);
   if (input.moduleId.trim() === "" || input.version.trim() === "") {
     throw new TypeError("An Inline module fragment needs an exact module ID and version.");
   }
@@ -777,6 +1108,7 @@ export async function buildKeelInlineModuleFragment(input: {
   if (phase === "data" && execution !== "classic") {
     throw new TypeError("Inline data modules must use classic execution so they run before renderer code.");
   }
+  assertKeelInlineNoExternalDependencies(input.decodedBytes, "Inline module " + input.moduleId);
   const weight = input.weight ?? 0;
   orderKeelModules([{ moduleId: input.moduleId, phase, weight }]);
   const slot = await buildEmbeddedKeelViewerSlot({
@@ -785,7 +1117,8 @@ export async function buildKeelInlineModuleFragment(input: {
     mediaType: input.mediaType,
     ...(input.aliases === undefined ? {} : { aliases: input.aliases }),
     bytes: input.decodedBytes,
-    compression: input.compression ?? "gzip",
+    compression: inlineCompression(payloadStorage, input.compression, "none"),
+    ...(input.storedBytes === undefined ? {} : { storedBytes: input.storedBytes }),
   });
   return {
     schema: "keel-inline-module-fragment@1",
@@ -808,7 +1141,7 @@ export async function buildKeelInlineAssetDisplayModuleFragment(): Promise<KeelI
     mediaType: "text/javascript",
     aliases: [KEEL_ASSET_DISPLAY_MODULE_ID],
     decodedBytes: keelAssetDisplayModuleBytes(),
-    compression: "gzip",
+    compression: "none",
     execution: "classic",
     phase: "render",
   }) as KeelInlineAssetDisplayModuleFragment;
@@ -819,7 +1152,19 @@ function isNormalMediaEntry(mediaType: string): mediaType is KeelAssetDisplayMed
 }
 
 async function assertCanonicalAssetDisplayModule(module: KeelInlineModuleFragment): Promise<void> {
-  const expected = await buildKeelInlineAssetDisplayModuleFragment();
+  const expected = module.item.embedded?.compression === "gzip"
+    ? await buildKeelInlineModuleFragment({
+        moduleId: KEEL_ASSET_DISPLAY_MODULE_ID,
+        version: KEEL_ASSET_DISPLAY_MODULE_VERSION,
+        mediaType: "text/javascript",
+        aliases: [KEEL_ASSET_DISPLAY_MODULE_ID],
+        decodedBytes: keelAssetDisplayModuleBytes(),
+        compression: "gzip",
+        execution: "classic",
+        phase: "render",
+        weight: 0,
+      })
+    : await buildKeelInlineAssetDisplayModuleFragment();
   if (
     module.moduleId !== expected.moduleId
     || module.version !== expected.version
@@ -840,6 +1185,7 @@ async function assertCanonicalAssetDisplayModule(module: KeelInlineModuleFragmen
  */
 export async function buildKeelInlineLocalDocument(input: {
   readonly shell: KeelInlineShellFragments;
+  readonly payloadStorage?: KeelPayloadStorageMode;
   readonly modules: readonly KeelInlineModuleFragment[];
   /**
    * Creator-specific binary/data resources. These are verified by the same
@@ -851,7 +1197,10 @@ export async function buildKeelInlineLocalDocument(input: {
     readonly mediaType: string;
     readonly source: Uint8Array;
     readonly aliases?: readonly string[];
-    readonly compression?: "none" | "gzip" | "deflate";
+    readonly compression?: KeelInlineCompression;
+  readonly payloadStorage?: KeelPayloadStorageMode;
+  /** Exact precompressed input; required for LZMA. The SDK validates its reconstruction. */
+  readonly storedBytes?: Uint8Array;
   }[];
   readonly entry: {
     readonly id: string;
@@ -860,12 +1209,26 @@ export async function buildKeelInlineLocalDocument(input: {
     /** Text artwork, or the direct creator media entry mounted by keel.asset-display. */
     readonly mediaType: "text/html" | "text/javascript" | KeelAssetDisplayMediaType;
     readonly source: Uint8Array;
-    readonly compression?: "none" | "gzip" | "deflate";
+    readonly compression?: KeelInlineCompression;
+  readonly payloadStorage?: KeelPayloadStorageMode;
+  /** Exact precompressed input; required for LZMA. The SDK validates its reconstruction. */
+  readonly storedBytes?: Uint8Array;
     readonly aliases?: readonly string[];
   };
 }): Promise<KeelInlineLocalDocument> {
+  const payloadStorage = resolveKeelPayloadStorage(input.payloadStorage);
+  const entryCompression = inlineCompression(inheritInlineStorage(payloadStorage, input.entry.payloadStorage), input.entry.compression, "none");
   const orderedModules = orderKeelModules(input.modules);
   const assets = input.assets ?? [];
+  const supported = INLINE_PROFILE_CODECS[input.shell.codecProfile];
+  if (supported === undefined) throw new TypeError("Unknown Inline decoder shell profile.");
+  const requireCodec = (compression: string, label: string): void => {
+    if (!supported.includes(compression as KeelInlineCompression)) {
+      throw new TypeError(`${label} requires a declared ${compression} decoder shell profile.`);
+    }
+  };
+  requireCodec(entryCompression, `Inline entrypoint ${input.entry.id}`);
+  for (const asset of assets) requireCodec(assetCompression(asset, payloadStorage), `Inline asset ${asset.id}`);
   const ids = new Set<string>();
   for (const module of orderedModules) {
     if (!SAFE_INLINE_MODULE_ID.test(module.moduleId) || module.item.id !== module.moduleId) {
@@ -873,9 +1236,7 @@ export async function buildKeelInlineLocalDocument(input: {
     }
     if (ids.has(module.moduleId)) throw new TypeError(`Duplicate Inline resource ID ${module.moduleId}.`);
     ids.add(module.moduleId);
-    if (module.item.embedded?.compression === "brotli") {
-      throw new TypeError(`Inline module ${module.moduleId} requires a declared Brotli decoder shell profile.`);
-    }
+    requireCodec(module.item.embedded?.compression ?? "none", `Inline module ${module.moduleId}`);
   }
   if (!SAFE_INLINE_MODULE_ID.test(input.entry.id) || ids.has(input.entry.id)) {
     throw new TypeError(`Inline entrypoint ${input.entry.id} has an unsafe or duplicate resource ID.`);
@@ -898,7 +1259,7 @@ export async function buildKeelInlineLocalDocument(input: {
     }
     await assertCanonicalAssetDisplayModule(orderedModules[0]!);
   }
-  const source = directMedia ? undefined : new TextDecoder("utf-8", { fatal: true }).decode(input.entry.source);
+  const source = directMedia ? undefined : new TextDecoder("utf-8", { fatal: true, ignoreBOM: true }).decode(input.entry.source);
   if (input.entry.mediaType === "text/javascript" && source !== undefined && /<\/script/iu.test(source)) {
     throw new TypeError("An Inline JavaScript entry cannot contain a closing script tag.");
   }
@@ -912,6 +1273,9 @@ export async function buildKeelInlineLocalDocument(input: {
         ? source.replace(/<head(?:\s[^>]*)?>/iu, (head) => `${head}${dataScripts.join("")}`)
         : `<!doctype html><html><head>${dataScripts.join("")}</head><body>${source}</body></html>`,
     );
+  if (input.entry.storedBytes !== undefined && (dataScripts.length !== 0 || input.entry.mediaType === "text/javascript")) {
+    throw new TypeError("A precompressed Inline entry must use its exact final HTML/media bytes; data-script insertion and JavaScript wrapping change them.");
+  }
   const entrySource = directMedia
     ? input.entry.source
     : input.entry.mediaType === "text/javascript" && source !== undefined
@@ -925,6 +1289,7 @@ export async function buildKeelInlineLocalDocument(input: {
           `<script type="module">${source}</script>`,
         ].join(""))
       : htmlEntry!;
+  assertKeelInlineNoExternalDependencies(entrySource, "Inline entrypoint " + input.entry.id);
   const entry = await buildEmbeddedKeelViewerSlot({
     id: input.entry.id,
     ...(input.entry.backgroundColor === undefined ? {} : { backgroundColor: input.entry.backgroundColor }),
@@ -932,7 +1297,8 @@ export async function buildKeelInlineLocalDocument(input: {
     mediaType: directMedia ? input.entry.mediaType : "text/html",
     ...(input.entry.aliases === undefined ? {} : { aliases: input.entry.aliases }),
     bytes: entrySource,
-    compression: input.entry.compression ?? (directMedia ? "none" : "gzip"),
+    compression: entryCompression,
+    ...(input.entry.storedBytes === undefined ? {} : { storedBytes: input.entry.storedBytes }),
   });
   const assetSlots = await Promise.all(assets.map(async (asset) => ({
     asset,
@@ -942,9 +1308,13 @@ export async function buildKeelInlineLocalDocument(input: {
       mediaType: asset.mediaType,
       ...(asset.aliases === undefined ? {} : { aliases: asset.aliases }),
       bytes: asset.source,
-      compression: asset.compression ?? "gzip",
+      compression: assetCompression(asset, payloadStorage),
+      ...(asset.storedBytes === undefined ? {} : { storedBytes: asset.storedBytes }),
     }),
   })));
+  for (const asset of assets) {
+    assertKeelInlineNoExternalDependencies(asset.source, "Inline asset " + asset.id);
+  }
   const parts: KeelInlineLocalDocument["parts"] = [
     { kind: "existing", role: "shell-prefix", bytes: input.shell.prefix.bytes, byteLength: input.shell.prefix.bytes.byteLength, integrity: input.shell.prefix.integrity },
     ...orderedModules.map((module) => ({
@@ -1148,7 +1518,7 @@ export async function buildKeelRegisteredInlineNormalMediaTokenURIGraph(input: {
  * The compact raw-percent lane is the standard. The Base64-carried lanes stay
  * in the SDK for already-minted collections and reviewed exceptions, but they
  * cannot be reached by accident: a caller must acknowledge the legacy carriage
- * in its options, or the operator must set KEEL_LEGACY_CARRIAGE=allow.
+ * in its options, by explicitly passing a reviewed acknowledgement. Environment variables do not bypass this gate.
  */
 export interface KeelLegacyCarriageOptions {
   readonly legacyCarriage?: "acknowledged";
@@ -1160,7 +1530,7 @@ export class KeelLegacyCarriageError extends Error {
     super(
       `${lane} is a legacy Base64-carried Inline lane. Use buildKeelInlineRawPercentTokenURIGraph (compact raw-percent), `
       + "or pass { legacyCarriage: \"acknowledged\" } after an explicit creator/agent instruction, "
-      + "or set KEEL_LEGACY_CARRIAGE=allow for a reviewed environment.",
+      + "Existing objects use exact assembly-only reuse; environment variables never bypass this gate.",
     );
     this.name = "KeelLegacyCarriageError";
     this.lane = lane;
@@ -1169,16 +1539,16 @@ export class KeelLegacyCarriageError extends Error {
 
 export function assertLegacyCarriageAllowed(lane: string, options: KeelLegacyCarriageOptions | undefined): void {
   if (options?.legacyCarriage === "acknowledged") return;
-  const env = (globalThis as { process?: { env?: Record<string, string | undefined> } }).process?.env;
-  if (env?.["KEEL_LEGACY_CARRIAGE"] === "allow") return;
   throw new KeelLegacyCarriageError(lane);
 }
 
 export async function buildKeelInlinePreEncodedTokenURIGraph(
   root: KeelInlineGraphDocument,
-  options: { readonly existingParts?: readonly KeelPublishedInlineFragment[] } & KeelLegacyCarriageOptions = {},
+  options: KeelInlineExistingObjectReuseOptions & KeelLegacyCarriageOptions = {},
 ): Promise<KeelInlinePreEncodedTokenURIGraph> {
-  assertLegacyCarriageAllowed("buildKeelInlinePreEncodedTokenURIGraph", options);
+  const reuse = await inspectExistingGraphReuse(root, options, "pinned");
+  if (reuse === undefined) assertLegacyCarriageAllowed("buildKeelInlinePreEncodedTokenURIGraph", options);
+  else { root = reuse.root; options = { ...options, existingParts: reuse.existingParts }; }
   if (root.parts.length < 2 || root.parts.at(-1)?.role !== "shell-suffix") {
     throw new TypeError("An Inline pre-encoded tokenURI graph requires an ordered shell and terminal suffix.");
   }
@@ -1268,8 +1638,7 @@ export async function buildKeelInlinePreEncodedTokenURIGraph(
  */
 export async function buildKeelInlineEscapedTokenURIGraph(
   root: KeelInlineGraphDocument,
-  options: KeelLegacyCarriageOptions & {
-    readonly existingParts?: readonly KeelPublishedInlineFragment[];
+  options: KeelLegacyCarriageOptions & KeelInlineExistingObjectReuseOptions & {
     /**
      * Explicitly reviewed public-read ceiling for unusually large immutable
      * works. The protocol default remains 2 MB; callers may raise it only when
@@ -1278,7 +1647,9 @@ export async function buildKeelInlineEscapedTokenURIGraph(
     readonly maxTokenURIBytes?: number;
   } = {},
 ): Promise<KeelInlineEscapedTokenURIGraph> {
-  assertLegacyCarriageAllowed("buildKeelInlineEscapedTokenURIGraph", options);
+  const reuse = await inspectExistingGraphReuse(root, options, "percent");
+  if (reuse === undefined) assertLegacyCarriageAllowed("buildKeelInlineEscapedTokenURIGraph", options);
+  else { root = reuse.root; options = { ...options, existingParts: reuse.existingParts }; }
   if (root.parts.length < 2 || root.parts.at(-1)?.role !== "shell-suffix") {
     throw new TypeError("An Inline escaped tokenURI graph requires an ordered shell and terminal suffix.");
   }
@@ -1364,11 +1735,13 @@ export async function buildKeelInlineEscapedTokenURIGraph(
  */
 export async function buildKeelInlineRawPercentTokenURIGraph(
   root: KeelInlineGraphDocument,
-  options: {
-    readonly existingParts?: readonly KeelPublishedInlineFragment[];
+  options: KeelInlineExistingObjectReuseOptions & {
     readonly maxTokenURIBytes?: number;
   } = {},
 ): Promise<KeelInlineRawPercentTokenURIGraph> {
+  const reuse = await inspectExistingGraphReuse(root, options, "raw-percent");
+  if (reuse !== undefined) { root = reuse.root; options = { ...options, existingParts: reuse.existingParts }; }
+  if (reuse === undefined) assertKeelFreshPayloadCarriage(root.rootBytes);
   if (root.parts.length < 2 || root.parts.at(-1)?.role !== "shell-suffix") {
     throw new TypeError("An Inline raw-percent tokenURI graph requires an ordered shell and terminal suffix.");
   }
@@ -1457,6 +1830,8 @@ export async function buildKeelWeb3TokenJSONGraph(input: {
   /** Explicit separate SVG read. The source image remains required so both
    * matrix responses reuse the exact prepared asset slots. Never automatic. */
   readonly web3Image?: { readonly chainId: number; readonly resolver: Hex };
+  /** External image resolvers are an explicit existing-collection route. */
+  readonly presentationPolicy?: KeelPresentationPolicy;
 }) {
   if (!/^(0|[1-9][0-9]*)$/u.test(input.tokenId) || BigInt(input.tokenId) >= 1n << 256n) {
     throw new TypeError("tokenId must be a canonical uint256 decimal string.");
@@ -1466,6 +1841,11 @@ export async function buildKeelWeb3TokenJSONGraph(input: {
   }
   assertMarketplaceSafeDataURI(input.imageURI, "Token image");
   if (!input.imageURI.startsWith("data:image/")) throw new TypeError("Token image must be an inline image URI.");
+  const presentationPolicy = input.presentationPolicy ?? "collector-inline";
+  if (!["collector-inline", "external-resolver", "raw-artifact"].includes(presentationPolicy)) throw new TypeError("Unsupported presentation policy.");
+  if (input.web3Image !== undefined && presentationPolicy !== "external-resolver") {
+    throw new TypeError("web3Image is disabled for collector-facing Inline by default; select presentationPolicy: external-resolver explicitly for an existing collection.");
+  }
   let imageURI = input.imageURI;
   if (input.web3Image !== undefined) {
     if (!Number.isSafeInteger(input.web3Image.chainId) || input.web3Image.chainId <= 0) throw new TypeError("The image endpoint needs an explicit positive chain ID.");
@@ -1515,8 +1895,9 @@ export async function buildKeelWeb3TokenJSONGraph(input: {
     } else addMetadata("metadata-value", JSON.stringify(value));
   }
   addMetadata("image-field", `${fields.length ? "," : ""}"image":"`);
-  // Separate embedded raster payloads from SVG markup. An asset's encoded bytes
-  // can be shared by different token graphs regardless of its SVG element ID.
+  // Separate the already-prepared raster payload from SVG markup. The payload
+  // is a single exact ASCII resource slot that can be reused by different
+  // token graphs; no contract-side image encoding is implied by this split.
   const imageParts: { role: string; sourceKind: string; bytes: Uint8Array }[] = [];
   let imageCursor = 0;
   for (const match of input.imageURI.matchAll(/base64,([A-Za-z0-9+/=]+)/gu)) {
@@ -1581,6 +1962,7 @@ export async function buildKeelWeb3TokenJSONGraph(input: {
     animation_url: `data:text/html;charset=utf-8,${decoder.decode(graph.escapedHtmlBytes)}` })) {
     throw new Error("Web3 metadata graph changed its original fields or media.");
   }
+  if (presentationPolicy === "collector-inline") assertKeelCollectorInlineMetadata(metadata);
   return {
     schema: "keel-web3-token-json-graph@1" as const,
     tokenId: input.tokenId, mediaType: "application/json" as const,
@@ -1601,22 +1983,33 @@ export async function buildKeelWeb3TokenJSONGraph(input: {
   };
 }
 
-/** Shared SDK, MCP and editor entrypoint. No override means the compact saver. */
+/** Shared SDK/MCP planner. Local work defaults compact; exact object reuse infers its stored carriage. */
 export function buildKeelInlineTokenURIGraph(
   root: KeelInlineGraphDocument,
-  options?: { readonly existingParts?: readonly KeelPublishedInlineFragment[]; readonly maxTokenURIBytes?: number; readonly carriage?: "compact" | "raw-percent" },
+  options?: KeelInlineExistingObjectReuseOptions & { readonly existingObjectReuse?: never; readonly maxTokenURIBytes?: number; readonly carriage?: "compact" | "raw-percent" },
 ): Promise<KeelInlineRawPercentTokenURIGraph>;
 export function buildKeelInlineTokenURIGraph(
   root: KeelInlineGraphDocument,
-  options: { readonly existingParts?: readonly KeelPublishedInlineFragment[]; readonly maxTokenURIBytes?: number; readonly carriage?: KeelInlineCarriage },
+  options: KeelInlineExistingObjectReuseOptions & KeelLegacyCarriageOptions & { readonly maxTokenURIBytes?: number; readonly carriage?: KeelInlineCarriage },
 ): Promise<KeelInlineRawPercentTokenURIGraph | KeelInlineEscapedTokenURIGraph | KeelInlinePreEncodedTokenURIGraph | KeelInlinePreEncodedTokenURIBodyGraph>;
-export function buildKeelInlineTokenURIGraph(
+export async function buildKeelInlineTokenURIGraph(
   root: KeelInlineGraphDocument,
-  options: { readonly existingParts?: readonly KeelPublishedInlineFragment[]; readonly maxTokenURIBytes?: number; readonly carriage?: KeelInlineCarriage } = {},
+  options: KeelInlineExistingObjectReuseOptions & KeelLegacyCarriageOptions & { readonly maxTokenURIBytes?: number; readonly carriage?: KeelInlineCarriage } = {},
 ) {
-  const carriage = resolveKeelInlineCarriage(options.carriage);
+  const reuse = await inspectExistingGraphReuse(root, options, options.carriage);
+  const carriage = reuse?.carriage ?? resolveKeelInlineCarriage(options.carriage);
+  if (reuse === undefined) assertKeelFreshPayloadCarriage(root.rootBytes);
+  if (reuse !== undefined) {
+    root = reuse.root;
+    // The strict check has cloned all receipt bytes. Do not inspect/transform them twice.
+    options = { existingParts: reuse.existingParts,
+      ...(options.maxTokenURIBytes === undefined ? {} : { maxTokenURIBytes: options.maxTokenURIBytes }),
+      ...(options.carriage === undefined ? {} : { carriage: options.carriage }) };
+  }
   if (carriage === "raw-percent") return buildKeelInlineRawPercentTokenURIGraph(root, options);
-  // Reached only through an explicit caller selection, never a fallback.
+  // Selecting a carriage is not a reviewed encoding exception. Exact existing
+  // objects were already checked above; fresh encoding requires acknowledgement.
+  if (reuse === undefined) assertLegacyCarriageAllowed("buildKeelInlineTokenURIGraph", options);
   const legacy = { ...(options.existingParts === undefined ? {} : { existingParts: options.existingParts }), legacyCarriage: "acknowledged" as const };
   if (carriage === "percent") return buildKeelInlineEscapedTokenURIGraph(root, legacy);
   if (carriage === "pinned") return buildKeelInlinePreEncodedTokenURIGraph(root, legacy);
@@ -1658,10 +2051,12 @@ export async function compareKeelInlineTokenURICarriages(
  */
 export async function buildKeelInlineFollowLatestTokenURIBodyGraph(
   root: KeelInlineGraphDocument,
-  options: { readonly existingParts?: readonly KeelPublishedInlineFragment[] } & KeelLegacyCarriageOptions = {},
+  options: KeelInlineExistingObjectReuseOptions & KeelLegacyCarriageOptions = {},
 ): Promise<KeelInlinePreEncodedTokenURIBodyGraph> {
-  assertLegacyCarriageAllowed("buildKeelInlineFollowLatestTokenURIBodyGraph", options);
-  const full = await buildKeelInlinePreEncodedTokenURIGraph(root, options);
+  const reuse = await inspectExistingGraphReuse(root, options, "follow-latest");
+  if (reuse === undefined) assertLegacyCarriageAllowed("buildKeelInlineFollowLatestTokenURIBodyGraph", options);
+  const full = await buildKeelInlinePreEncodedTokenURIGraph(reuse?.root ?? root, reuse === undefined ? options
+    : { existingParts: reuse.existingParts, legacyCarriage: "acknowledged" });
   const first = full.parts[0];
   const last = full.parts.at(-1);
   if (first?.role !== "shell-prefix" || last?.role !== "shell-suffix") {
@@ -1752,6 +2147,8 @@ export async function buildKeelPreparedOneOfOneTokenURI(input: {
    * the contract's seed system are byte-for-byte aligned.
    */
   readonly derivedTokenSeed?: Hex;
+  /** Collector-facing Inline is the default. Other routes must be explicit. */
+  readonly presentationPolicy?: KeelPresentationPolicy;
 }): Promise<KeelPreparedOneOfOneTokenURI> {
   if (!Number.isSafeInteger(input.chainId) || input.chainId <= 0) {
     throw new TypeError("A prepared tokenURI needs a positive safe chain ID.");
@@ -1760,6 +2157,8 @@ export async function buildKeelPreparedOneOfOneTokenURI(input: {
     throw new TypeError("A prepared tokenURI needs a canonical manifest digest.");
   }
   const collection = getAddress(input.collection);
+  const presentationPolicy = input.presentationPolicy ?? "collector-inline";
+  if (!["collector-inline", "external-resolver", "raw-artifact"].includes(presentationPolicy)) throw new TypeError("Unsupported presentation policy.");
   const artifact = input.artifact === undefined ? undefined : (() => {
     const store = getAddress(input.artifact.store);
     if (!/^0x[0-9a-f]{64}$/iu.test(input.artifact.objectId)) {
@@ -1827,6 +2226,9 @@ export async function buildKeelPreparedOneOfOneTokenURI(input: {
     : input.graph.mediaType === "application/vnd.keel.token-uri-percent-fragment"
       ? "percent"
       : "base64";
+  if (presentationPolicy === "collector-inline" && animationEncoding !== "raw-percent") {
+    throw new TypeError("Collector-facing Inline requires the automatic raw-percent carriage. Legacy Base64 requires an explicit presentation policy.");
+  }
   if (
     input.graph.mediaType !== "application/vnd.keel.token-uri-base64-fragment"
     && input.graph.mediaType !== "application/vnd.keel.token-uri-base64-body-fragment"
@@ -1873,7 +2275,8 @@ export async function buildKeelPreparedOneOfOneTokenURI(input: {
     if (tokenJSON !== expectedJSON) throw new Error("Prepared raw-percent fragments changed the exact token JSON bytes.");
     const metadata = JSON.parse(tokenJSON) as { readonly animation_url?: unknown };
     if (typeof metadata.animation_url !== "string") throw new Error("Prepared token metadata has no animation_url.");
-    assertMarketplaceSafeDataURI(metadata.animation_url, "Prepared token animation_url");
+    if (presentationPolicy === "collector-inline") assertKeelCollectorInlineMetadata(metadata);
+    else assertMarketplaceSafeDataURI(metadata.animation_url, "Prepared token animation_url");
     return {
       schema: "keel-prepared-one-of-one-token-uri@1",
       animationEncoding,
@@ -1913,7 +2316,8 @@ export async function buildKeelPreparedOneOfOneTokenURI(input: {
   if (tokenJSON !== expectedJSON) throw new Error("Prepared tokenURI fragments changed the exact token JSON bytes.");
   const metadata = JSON.parse(tokenJSON) as { readonly animation_url?: unknown };
   if (typeof metadata.animation_url !== "string") throw new Error("Prepared token metadata has no animation_url.");
-  assertMarketplaceSafeDataURI(metadata.animation_url, "Prepared token animation_url");
+  if (presentationPolicy === "collector-inline") assertKeelCollectorInlineMetadata(metadata);
+  else assertMarketplaceSafeDataURI(metadata.animation_url, "Prepared token animation_url");
   return {
     schema: "keel-prepared-one-of-one-token-uri@1",
     animationEncoding,
@@ -1975,4 +2379,58 @@ export async function buildKeelPublishedInlineNormalMediaTokenURIGraph(input: {
     throw new Error("Inline graph did not preserve the exact registered fragments.");
   }
   return { document, graph };
+}
+
+
+/** Prepare one creator-owned HTML document. No canonical verification shell is
+ * inserted, no source is minified, and no Base64 copy of the document is made.
+ * Raw keeps deliberate creator-authored encodings as part of the supplied HTML.
+ * The percent carriage is URI syntax; publish its one fragment, not a second
+ * copy of the original HTML. Public-chain read-back remains a separate gate. */
+export async function buildKeelCreatorOwnedInlineDocument(input: {
+  readonly source: Uint8Array;
+  readonly payloadStorage?: KeelPayloadStorageMode;
+}): Promise<{ readonly root: KeelInlineLocalDocument; readonly graph: KeelInlineRawPercentTokenURIGraph }> {
+  resolveKeelPayloadStorage(input.payloadStorage);
+  if (!(input.source instanceof Uint8Array) || input.source.byteLength === 0) {
+    throw new TypeError("A creator-owned shell needs nonempty UTF-8 HTML.");
+  }
+  const source = input.source.slice();
+  const html = new TextDecoder("utf-8", { fatal: true }).decode(source);
+  assertKeelInlineNoExternalDependencies(source, "Creator-owned shell");
+  const embedded = (reference: string): boolean => reference === "" || reference.startsWith("#")
+    || reference.startsWith("data:") || reference.startsWith("blob:") || reference === "about:blank";
+  const references = [
+    ...html.matchAll(/\b(?:src|href|poster)\s*=\s*(?:(["'])(.*?)\1|([^\s"'=<>`]+))/giu),
+    ...html.matchAll(/\burl\(\s*(["']?)([^"')\s]+)\1\s*\)/giu),
+    ...html.matchAll(/@import\s*(["'])(.*?)\1/giu),
+    ...html.matchAll(/\b(?:fetch|import)\s*\(\s*(["'])(.*?)\1/gu),
+    ...html.matchAll(/\b(?:import|export)\s+[^;]*?\bfrom\s*(["'])(.*?)\1/gu),
+  ];
+  for (const match of references) {
+    const reference = (match[2] ?? match[3] ?? "").trim();
+    if (!embedded(reference)) throw new TypeError("Creator-owned Inline HTML must be self-contained; unsupported resource " + reference + ".");
+  }
+  const sourceIntegrity = await createIntegrity(source);
+  const escapedHtmlBytes = compactPercentPayload(source);
+  const fragmentBytes = compactPercentPayload(escapedHtmlBytes);
+  if (fragmentBytes.byteLength > KEEL_INLINE_MAX_TOKEN_URI_BYTES) {
+    throw new RangeError("The creator-owned Inline carriage exceeds the public-read byte ceiling.");
+  }
+  const fragmentIntegrity = await createIntegrity(fragmentBytes);
+  const root: KeelInlineLocalDocument = {
+    schema: "keel-inline-local-document@1", rootBytes: source, rootIntegrity: sourceIntegrity,
+    byteLength: source.byteLength,
+    parts: [{ kind: "creator", role: "entrypoint", bytes: source, byteLength: source.byteLength, integrity: sourceIntegrity }],
+  };
+  const graph: KeelInlineRawPercentTokenURIGraph = {
+    schema: "keel-inline-raw-percent-token-uri@1",
+    mediaType: "application/vnd.keel.token-uri-raw-percent-fragment",
+    contextParameter: "keel-context", contextDelivery: "percent-html-tail",
+    fragmentBytes, fragmentIntegrity, htmlBytes: source, htmlIntegrity: sourceIntegrity,
+    escapedHtmlBytes, creatorPublicationBytes: fragmentBytes.byteLength,
+    parts: [{ role: "entrypoint", sourceKind: "creator", bytes: fragmentBytes, integrity: fragmentIntegrity,
+      sourceIntegrity, decodedHtmlBytes: source, escapedHtmlBytes, encodedMetadataBytes: fragmentBytes }],
+  };
+  return { root, graph };
 }

@@ -69,6 +69,10 @@ for (const p of parts) {
   }
 }
 
+// Carry the engine's optional feature entry points alongside the broad legacy
+// package facades. Games can select these without adding unrelated systems.
+await import('./link-engine-features.mjs');
+
 // The examples reach the engine through this package, as a creator's project would.
 const examples = join(sdkRoot, "examples", "game-engine");
 if (existsSync(examples)) link(pkgDir, join(examples, "node_modules", "@keel", "game-engine"));

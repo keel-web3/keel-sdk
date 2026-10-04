@@ -21,6 +21,9 @@ import { opsHash } from './builder-ops-hash.mjs';
 
 const root = workerData.root;
 const src = (group, name) => pathToFileURL(join(root, group, name, 'src', 'index.ts')).href;
+// (A module's src/<name> in whichever language it's written: TypeScript by default, plain JavaScript just as well.
+// Kept here rather than read from the engine, whose pinned release may predate it.)
+const sourceFileOf = (dir, name) => ['.ts', '.mts', '.js', '.mjs'].map((ext) => join(dir, 'src', name + ext)).find((path) => existsSync(path));
 let loaded;
 async function engine() {
   if (!loaded) {
@@ -38,9 +41,7 @@ async function registry() {
   try {
     const workspace = await e.keel.readWorkspace(root, { projects: [] });
     for (const mod of workspace.filter((m) => m.manifest.kind === 'pack')) {
-      for (const file of ['module.ts', 'index.ts']) {
-        const path = join(mod.dir, 'src', file);
-        if (!existsSync(path)) continue;
+      for (const path of ['module', 'index'].map((name) => sourceFileOf(mod.dir, name)).filter(Boolean)) {
         try {
           const exported = await import(pathToFileURL(path).href);
           for (const def of exported.pack?.attributes ?? []) if (typeof def?.build === 'function' && !out.some((item) => item.id === def.id)) out.push(def);

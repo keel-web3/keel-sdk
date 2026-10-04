@@ -35,7 +35,7 @@ test('worker preserves the canonical graph and shares builds across unrelated ed
     assert.equal(result.plan.graphByteLength, result.saver.graphByteLength);
     assert.ok(result.saver.creatorPublicationBytes < result.saver.graphByteLength);
     assert.equal(service.cache.size, 1);
-    const hybrid = await service.preview({ ...project, presentation: { shell: 'none', delivery: 'hybrid' } }, []);
+    const hybrid = await service.preview({ ...project, presentation: { shell: 'canonical', delivery: 'hybrid' } }, []);
     assert.equal(hybrid.html, result.html);
     assert.equal(hybrid.plan.mode, 'hybrid');
     assert.equal(service.cache.size, 1);

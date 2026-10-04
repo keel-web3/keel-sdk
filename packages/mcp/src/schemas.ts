@@ -1,3 +1,5 @@
+import { KEEL_DEFAULT_PAYLOAD_STORAGE, KEEL_PAYLOAD_STORAGE_MODES, KEEL_DEFAULT_SHELL, KEEL_SHELL_CHOICES } from "@keel/protocol";
+import { COPY_READ_SCHEMA } from "./copy-read-tool.js";
 import type { JsonSchema } from "./types.js";
 
 const string = (description?: string, maxLength?: number): JsonSchema => ({ type: "string", ...(description === undefined ? {} : { description }), ...(maxLength === undefined ? {} : { maxLength }) });
@@ -226,7 +228,7 @@ const studioDraft: JsonSchema = object({
   },
 }, ["operation"]);
 const studioStageFile: JsonSchema = object({
-  path: string("Workspace-relative creator resource or module; never a locally manufactured KEEL shell, protected-harness wrapper, or local replacement wrapper.", 512),
+  path: string("Workspace-relative creator resource/module. Default verification uses the registered KEEL shell. With explicit viewer=none, one self-contained creator HTML entry owns the presentation without canonical claims.", 512),
   mediaType: string("Printable media type.", 160),
   role: { type: "string", enum: ["entrypoint", "renderer", "runtime", "script", "module", "style", "shader", "sprite-atlas", "sprite-loader", "audio-engine", "wallet-runtime", "font", "audio", "video", "model", "data", "plugin", "library", "image", "other"] },
   format: { type: "string", enum: ["asset", "classic-script", "es-module", "umd", "wasm"] },
@@ -241,12 +243,13 @@ const studioReusableModule: JsonSchema = object({
   tags: { type: "array", items: string("Reusable-module search tag.", 64), minItems: 0, maxItems: 24 },
 }, ["resourcePaths", "assetType", "license"]);
 const studioStageProject: JsonSchema = object({
+  payloadStorage: { type: "string", enum: [...KEEL_PAYLOAD_STORAGE_MODES], default: KEEL_DEFAULT_PAYLOAD_STORAGE, description: "Compact stores losslessly compressed native bytes once. Raw preserves supplied bytes without automatic compression. Independent of viewer and Inline/Hybrid delivery; never store a second Base64/hex copy just for the shell." },
   studioUrl: string("Optional HTTPS Studio URL; KEEL_STUDIO_URL is used otherwise.", 512),
   title: string("Project title.", 160),
   description: string("Collector-facing project description.", 2_000),
   storageStrategy: { type: "string", enum: ["local", "onchain", "hybrid"] },
   marketplaceExportMode: { type: "string", enum: ["recursive", "packed", "hybrid", "onchfs"] },
-  viewer: { type: "string", enum: ["keel-verification-shell", "none"], description: "Omit to select Studio's canonical KEEL Inline graph for later preparation. Standalone image, video, and self-contained GLB use the registered keel.asset-display module plus the direct creator asset, never zero modules or a generated index.html. `none` opts out of the shell only: the immutable artifact may still be released, minted, and retrieved through its contract read. Creator HTML remains content, never a replacement shell or protected-harness/local wrapper." },
+  viewer: { type: "string", enum: [...KEEL_SHELL_CHOICES], default: KEEL_DEFAULT_SHELL, description: "Default: registered KEEL verification shell. Explicit none: preserve creator-owned self-contained HTML with raw-artifact presentation and no canonical protection claim. Independent of payloadStorage. Both choices preserve immutable source, contract retrieval, and selected-chain checks." },
   files: { type: "array", items: studioStageFile, minItems: 1, maxItems: 256 },
   reusableModule: studioReusableModule,
   releaseIntent: { type: "object", description: "Optional editable keel-release-intent@1 produced by keel-studio-project-intake." },
@@ -298,6 +301,9 @@ const shellPrepare: JsonSchema = {
   ],
 };
 const inlinePrepare: JsonSchema = object({
+  viewer: { type: "string", enum: [...KEEL_SHELL_CHOICES], default: KEEL_DEFAULT_SHELL, description: "Default verification shell; none uses your self-contained HTML as a creator-owned shell. Independent of Compact/Raw storage. A custom shell does not claim canonical protection." },
+  payloadStorage: { type: "string", enum: [...KEEL_PAYLOAD_STORAGE_MODES], default: KEEL_DEFAULT_PAYLOAD_STORAGE, description: "Compact uses native payload bytes with lossless compression when beneficial. Raw keeps supplied bytes unchanged; separate from shell and delivery." },
+  deliveryProfile: { type: "string", enum: ["embedded-assembled"], description: "Inline contains all work bytes in the EVM tokenURI response. Browser RPC onchain-recursive delivery is hybrid and is rejected by this tool." },
   repositoryRoot: string("Optional checkout verification. Omit to use the packaged canonical shell."),
   entry: string("Workspace-relative creator entry. JavaScript is composed by the SDK; HTML must be a complete document."),
   entryMediaType: { type: "string", enum: ["text/javascript", "text/html"] },
@@ -328,8 +334,13 @@ const inlinePrepare: JsonSchema = object({
   },
   carriage: {
     type: "string",
-    enum: ["compact", "raw-percent", "percent", "follow-latest", "pinned"],
-    description: "Optional. Omit for compact raw-percent, which is the storage-saving default. Legacy Base64 carriages require explicit selection.",
+    enum: ["compact", "raw-percent"],
+    description: "Fresh source uses compact raw-percent COPY only. Existing aligned Base64 or percent fragments go through keel-inline-reuse-plan without transcoding.",
+  },
+  presentationPolicy: {
+    type: "string",
+    enum: ["collector-inline", "external-resolver", "raw-artifact"],
+    description: "Optional. Defaults to collector-inline: self-contained data:image/* plus raw-percent data:text/html HTML inside the registered canonical KEEL verification shell. Prepare the exact image carriage once at build time and publish one ASCII payload or URI; never publish raw image bytes plus a second encoded copy. The contract/viewer only copies the prepared header/payload/footer and never Base64-encodes media during tokenURI. GIF is direct data:image/gif from the exact source, never an SVG wrapper, resize or placeholder. External resolvers and legacy artifact routes require an explicit policy.",
   },
   collection: string("Collection address for a prepared one-of-one tokenURI.", 42),
   metadataTransport: { type: "string", enum: ["web3-json"], description: "Existing collection URI route: prepare raw JSON with inline SVG/image and canonical HTML, without KEEL721-specific binding calls." },
@@ -339,7 +350,7 @@ const inlinePrepare: JsonSchema = object({
   tokenIdFieldsJson: string('Optional exact field patterns, e.g. {"name":{"prefix":"Gator #","suffix":""}}. Values must match original metadata; the matrix generates the ID at read time.', 16000),
   collectionName: string(undefined, 128),
   description: string(undefined, 1024),
-  imagePath: string("Workspace-relative poster used for image_url and inlined as a small data URI."),
+  imagePath: string("Workspace-relative original image bytes. The SDK validates the source and prepares one exact data:image URI/payload carriage; the contract/viewer must only copy it and never encode/decode GIF at read time or wrap it in SVG."),
   manifestURI: string(undefined, 512),
   manifestDigest: string("0x-prefixed sha256 of the canonical manifest.", 66),
   chainId: integer("EVM chain id.", 1),
@@ -412,10 +423,12 @@ export const TOOL_SCHEMAS = {
   }, ["input", "outputDirectory", "createdAt"]),
   verify: object({ directory: string(), manifestName: string() }, ["directory"]),
   cost: object({
+    payloadStorage: { type: "string", enum: [...KEEL_PAYLOAD_STORAGE_MODES], default: KEEL_DEFAULT_PAYLOAD_STORAGE, description: "Compact uses native payload bytes with lossless compression when beneficial. Raw keeps supplied bytes unchanged; separate from shell and delivery." },
     input: string(), mediaType: string(), compression: { type: "string", enum: ["auto", "none", "brotli", "gzip", "deflate"] },
     maxChunkBytes: integer(), leafDecodedBytes: integer(), maxPartsPerComposite: integer(), maxTreeDepth: integer(),
   }, ["input"]),
   uploadPlan: object({
+    payloadStorage: { type: "string", enum: [...KEEL_PAYLOAD_STORAGE_MODES], default: KEEL_DEFAULT_PAYLOAD_STORAGE, description: "Compact uses native payload bytes with lossless compression when beneficial. Raw keeps supplied bytes unchanged; separate from shell and delivery." },
     input: string("Workspace-relative source file."), objectName: string(undefined, 128), mediaType: string(undefined, 128),
     strategy: { type: "string", enum: ["flat", "recursive"] },
     compression: { type: "string", enum: ["auto", "none", "brotli", "gzip", "deflate"] },
@@ -433,6 +446,7 @@ export const TOOL_SCHEMAS = {
   }, ["plan", "family", "chainId", "target"]),
   publishPlan: object({
     chainPlan: { ...chainOperationPlan, description: "The structured result returned by chain-plan." },
+    preparedCopy: { ...COPY_READ_SCHEMA, description: "Mandatory for prepared viewer source. Rechecked against the exact source commitment and selected chain/store; caller-supplied files are not authenticated chain evidence." },
     publicationIntent: {
       type: "string",
       enum: ["new-object", "existing-graph-revision"],

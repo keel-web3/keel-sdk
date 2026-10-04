@@ -5,6 +5,7 @@ import type {
   ArtifactResource,
   ArtifactThumbnail,
   Compression,
+  KeelPayloadStorageMode,
   EntrypointMode,
   Integrity,
   ResourceRole,
@@ -51,6 +52,8 @@ export interface StudioAssetInput {
 }
 
 export interface PrepareStudioArtifactOptions {
+  /** Compact stores losslessly compressed native bytes; Raw disables automatic compression. */
+  readonly payloadStorage?: KeelPayloadStorageMode;
   readonly id: string;
   readonly name: string;
   readonly description?: string;

@@ -6,7 +6,7 @@ import {createPublicClient,createWalletClient,http} from 'viem';
 const root='apps/desktop/artifacts/gator-sepolia';
 const source=JSON.parse(await readFile(`${root}/mainnet-source.json`,'utf8'));
 const compiled=JSON.parse(await readFile(`${root}/compiled-original.json`,'utf8'));
-const child=spawn('anvil',['--port','0','--chain-id','31337'],{stdio:['ignore','pipe','pipe']});
+const child=spawn('anvil',['--port','0','--chain-id','31337','--prune-history'],{stdio:['ignore','pipe','pipe']});
 try{
   const url=await new Promise((resolve,reject)=>{let output='';const timer=setTimeout(()=>reject(Error('Local EVM startup timed out')),20000);child.on('error',reject);child.on('exit',()=>reject(Error('Local EVM exited')));child.stdout.on('data',chunk=>{output+=chunk;const match=output.match(/Listening on (127\.0\.0\.1:\d+)/);if(match){clearTimeout(timer);resolve('http://'+match[1]);}});});
   const publicClient=createPublicClient({transport:http(url)}),wallet=createWalletClient({transport:http(url)});

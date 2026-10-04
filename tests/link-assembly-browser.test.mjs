@@ -73,7 +73,7 @@ test('contract-returned canonical link URI verifies each HTTPS fetch before moun
     server.listen(0, '127.0.0.1'); await once(server, 'listening');
     const origin = `https://127.0.0.1:${server.address().port}`;
     const port = await freePort();
-    anvil = spawn('anvil', ['--port',String(port),'--gas-limit','1000000000','--silent'], {stdio:'ignore'});
+    anvil = spawn('anvil', ['--port',String(port),'--gas-limit','1000000000','--silent','--prune-history'], {stdio:'ignore'});
     const transport = http(`http://127.0.0.1:${port}`, {retryCount:0});
     const client = createPublicClient({transport, pollingInterval:20});
     // Anvil's documented disposable account; never a user key or live RPC.

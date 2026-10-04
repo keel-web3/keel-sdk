@@ -1,3 +1,4 @@
+import { resolveKeelPayloadStorage, resolveKeelShell } from "@keel/protocol";
 import { Worker } from 'node:worker_threads';
 import { createHash } from 'node:crypto';
 import { planKeelAssetPresentation } from '@keel/sdk/presentation';
@@ -24,7 +25,8 @@ export class PreviewService {
     const attached = new Set(project.objectIds);
     const resources = objects.filter((object) => attached.has(object.id));
     // Names, identities and bytes affect the graph; notes, wallets, networks and delivery do not.
-    const source = { layered: project.layered, files: project.files, runtimeModules: project.runtimeModules, objectIds: project.objectIds, presentation: { entryObjectId: project.presentation.entryObjectId, shell: 'canonical', delivery: 'auto' } };
+    const viewer = resolveKeelShell(project.presentation.shell === "none" ? "none" : undefined);
+    const source = { layered: project.layered, files: project.files, runtimeModules: project.runtimeModules, objectIds: project.objectIds, presentation: { entryObjectId: project.presentation.entryObjectId, payloadStorage: resolveKeelPayloadStorage(project.presentation.payloadStorage), viewer, shell: viewer === 'none' ? 'none' : 'canonical', delivery: 'auto' } };
     const key = createHash('sha256').update(JSON.stringify({ source, resources })).digest('hex');
     let result = this.cache.get(key)?.result;
     if (result) {
@@ -43,7 +45,11 @@ export class PreviewService {
       }
       result = await job.promise;
     }
-    return { ...result, plan: planKeelAssetPresentation({ originalByteLength: result.plan.originalByteLength, compressedByteLength: result.plan.compressedByteLength, graphByteLength: result.saver.graphByteLength, mode: project.presentation.delivery }) };
+    const plan = planKeelAssetPresentation({ originalByteLength: result.plan.originalByteLength, compressedByteLength: result.plan.compressedByteLength, graphByteLength: result.saver?.graphByteLength, mode: project.presentation.delivery, viewer });
+    if (result.publicationMeasurement?.status === 'unsupported') {
+      plan.warnings.push(...result.plan.warnings.filter(warning => warning.code === 'creator-owned-publication-unsupported'));
+    }
+    return { ...result, plan };
   }
 
   pump() {
@@ -72,7 +78,7 @@ export class PreviewService {
     if (error) job.reject(new Error(error));
     else {
       // V8 may retain a two-byte string. Charge conservatively rather than counting entries alone.
-      const size = result.html.length * 2;
+      const size = (result.html?.length ?? 0) * 2;
       if (size <= this.maxBytes) {
         this.cache.set(id, { result, size });
         this.cacheBytes += size;

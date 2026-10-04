@@ -25,7 +25,7 @@ import {
   selectKeelManagedPublicationJob,
   uploadKeelStudioArtifact,
 } from "../packages/sdk/dist/index.js";
-import { ABIS as crossChainMintAbis } from "../packages/sdk/dist/abis/keel-cross-chain-mint.generated.js";
+import { ABIS as publicationAbis } from "../packages/sdk/dist/abis/keel-publication.generated.js";
 import { selectDoomInput } from "../scripts/verify-doom-managed-publication.mjs";
 
 const address = (byte) => `0x${byte.repeat(40)}`;
@@ -453,7 +453,7 @@ test("explicit v1 operation fallback emits one contiguous executeOperation call 
 });
 
 test("generated publication-job ABI exposes packed operations alongside the v1 entrypoint", () => {
-  const names = crossChainMintAbis.KeelPublicationJob
+  const names = publicationAbis.KeelPublicationJob
     .filter((item) => item.type === "function")
     .map((item) => item.name);
   assert.equal(names.includes("executeOperation"), true);

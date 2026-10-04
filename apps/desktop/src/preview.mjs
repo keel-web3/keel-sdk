@@ -1,6 +1,7 @@
+import { creatorOwnedPreviewMeasurement } from "./creator-owned-preview.mjs";
+import { resolveKeelPayloadStorage, resolveKeelShell } from "@keel/protocol";
 import {selectLayeredArt,layeredDrawList} from '@keel/sdk/layered-art';
 import { layeredHTML } from './layered-project.mjs';
-import { gzipSync } from 'node:zlib';
 import { planKeelAssetPresentation } from '@keel/sdk/presentation';
 import { KEEL_ASSET_DISPLAY_MEDIA_TYPES } from '@keel/sdk/asset-display';
 import { loadRuntimeModules } from './runtime-files.mjs';
@@ -23,6 +24,10 @@ export function assetContent(object) {
 
 export async function canonicalPreview({ store, project, shell, runtimeDirectory }) {
   const sdk = await tools();
+  const payloadStorage = resolveKeelPayloadStorage(project.presentation.payloadStorage);
+  const viewer = resolveKeelShell(project.presentation.shell === "none" ? "none" : undefined);
+  if (viewer === "none") return creatorOwnedPreviewMeasurement({ store, project, sdk, payloadStorage });
+  const measuredStorageBytes = (bytes) => bytes.length;
   const objects = store.read().state.objects;
   if (project.layered) project={...project,presentation:{...project.presentation,entryObjectId:undefined},files:[{id:'layered-local-preview',name:'keel-layered.html',type:'text/html',content:layeredHTML(project.layered,undefined,true,Object.fromEntries(objects.map(o=>[o.id,o.type])))}]};
   const selected = project.presentation.entryObjectId && objects.find((object) => object.id === project.presentation.entryObjectId);
@@ -41,8 +46,8 @@ export async function canonicalPreview({ store, project, shell, runtimeDirectory
   if (directMedia) {
     const source = store.object(selected.id);
     originalByteLength = source.length;
-    compressedByteLength = selected.compressedByteLength ?? gzipSync(source, { level: 9 }).length;
-    local = await sdk.buildKeelInlineLocalDocument({ shell, modules: [await sdk.buildKeelInlineAssetDisplayModuleFragment()], entry: { id: `asset-${selected.id}`, mediaType: selected.type, source, aliases: [selected.name] } });
+    compressedByteLength = measuredStorageBytes(source);
+    local = await sdk.buildKeelInlineLocalDocument({ shell, payloadStorage, modules: [await sdk.buildKeelInlineAssetDisplayModuleFragment()], entry: { id: `asset-${selected.id}`, mediaType: selected.type, source, aliases: [selected.name] } });
   } else {
     const entry = selected ? { id: 'entry.html', content: selected.type === 'text/html' ? new TextDecoder('utf-8', { fatal: true }).decode(store.object(selected.id)) : assetContent(selected), type: 'text/html' } : project.files.find((file) => file.name === (project.layered ? 'keel-layered.html' : 'index.html')) ?? project.files.find((file) => file.type === 'text/html');
     if (!entry) throw new Error('Choose an HTML entry or an object to display in Shell.');
@@ -50,7 +55,7 @@ export async function canonicalPreview({ store, project, shell, runtimeDirectory
     const assets = [];
     for (const file of selected ? [] : project.files.filter((file) => file.id !== entry.id)) {
       const source = Buffer.from(file.content); if (!source.length) continue;
-      originalByteLength += source.length; compressedByteLength += gzipSync(source, { level: 9 }).length;
+      originalByteLength += source.length; compressedByteLength += measuredStorageBytes(source);
       if (file.type === 'text/javascript') {
         creatorModuleIds.add(`local-${file.id}`);
         modules.push(await sdk.buildKeelInlineModuleFragment({ moduleId: `local-${file.id}`, version: 'local', mediaType: file.type, decodedBytes: source, aliases: aliases(file.name), execution: 'module' }));
@@ -60,18 +65,26 @@ export async function canonicalPreview({ store, project, shell, runtimeDirectory
     for (const object of assetObjects) {
       if (!object.byteLength || selected?.type === 'text/html' && object.id === selected.id) continue;
       const source = store.object(object.id);
-      originalByteLength += source.length; compressedByteLength += object.compressedByteLength ?? gzipSync(source, { level: 9 }).length;
+      originalByteLength += source.length; compressedByteLength += measuredStorageBytes(source);
       assets.push({ id: `asset-${object.id}`, mediaType: object.type, source, aliases: aliases(`objects/${object.id}`) });
     }
     const source = Buffer.from(entry.content);
-    originalByteLength += source.length; compressedByteLength += gzipSync(source, { level: 9 }).length;
-    local = await sdk.buildKeelInlineLocalDocument({ shell, modules, assets, entry: { id: 'entry.html', mediaType: 'text/html', source } });
+    originalByteLength += source.length; compressedByteLength += measuredStorageBytes(source);
+    local = await sdk.buildKeelInlineLocalDocument({ shell, payloadStorage, modules, assets, entry: { id: 'entry.html', mediaType: 'text/html', source } });
   }
+  const itemBytes = local.parts.filter(part => part.kind === 'creator').reduce((sum, part) => {
+    const text = Buffer.from(part.bytes).toString('utf8').trim().replace(/,$/, '');
+    const embedded = JSON.parse(text.replace(/^,/, '')).embedded;
+    return sum + embedded.storedIntegrity.byteLength;
+  }, 0);
+  compressedByteLength = itemBytes + local.parts.filter(part => creatorModuleIds.has(part.moduleId)).reduce((sum, part) => {
+    return sum + JSON.parse(Buffer.from(part.bytes).toString('utf8').trim().replace(/^,|,$/g, '')).embedded.storedIntegrity.byteLength;
+  }, 0);
   // Artist-authored JavaScript is new work even though the viewer executes it as a module.
   const measured = { ...local, parts: local.parts.map(part => creatorModuleIds.has(part.moduleId) ? { ...part, kind: 'creator' } : part) };
   const saver = sdk.measureKeelInlineCompactGraph(measured);
   const sharedOriginalByteLength = sharedModules.reduce((sum, module) => sum + module.bytes.length, 0);
-  const sharedCompressedByteLength = sharedModules.reduce((sum, module) => sum + gzipSync(module.bytes, { level: 9 }).length, 0);
+  const sharedCompressedByteLength = sharedModules.reduce((sum, module) => sum + measuredStorageBytes(module.bytes), 0);
   const uploads = {
     ...(project.layered?{scope:'preview-token-1',collectionAssetBytes:allAttached.reduce((n,o)=>n+o.byteLength,0),collectionAssetCount:allAttached.length}:{}),
     creatorByteLength: originalByteLength, creatorCompressedByteLength: compressedByteLength,
@@ -82,5 +95,5 @@ export async function canonicalPreview({ store, project, shell, runtimeDirectory
     reuseStatus: 'selected-network-verification-required',
   };
   // A full Inline read still includes shared resources. Reuse reduces new storage, not read size.
-  return { html: Buffer.from(local.rootBytes).toString('utf8'), byteLength: local.byteLength, saver, uploads, plan: planKeelAssetPresentation({ originalByteLength: originalByteLength + sharedOriginalByteLength, compressedByteLength: compressedByteLength + sharedCompressedByteLength, graphByteLength: saver.graphByteLength, mode: project.presentation.delivery }), evidence: 'local-byte-verification-only', published: false };
+  return { payloadStorage, storageEncoding: 'native-bytes', html: Buffer.from(local.rootBytes).toString('utf8'), byteLength: local.byteLength, saver, uploads, plan: planKeelAssetPresentation({ originalByteLength: originalByteLength + sharedOriginalByteLength, compressedByteLength: compressedByteLength + sharedCompressedByteLength, graphByteLength: saver.graphByteLength, mode: project.presentation.delivery, viewer }), evidence: 'local-byte-verification-only', published: false };
 }

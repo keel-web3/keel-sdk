@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 import { fileURLToPath } from "node:url";
-import { gunzipSync } from "node:zlib";
+import { gunzipSync, gzipSync } from "node:zlib";
 
 import {
   KEEL_ASSET_DISPLAY_MODULE_ID,
@@ -21,6 +21,7 @@ import {
   buildKeelRegisteredInlineNormalMediaTokenURIGraph,
   buildKeelPreparedOneOfOneTokenURI,
   buildKeelInlineShellFragments,
+  assertKeelInlineNoExternalDependencies,
   concatenateComposableBase64Fragments,
   createComposableBase64Fragment,
   keelAssetDisplayModuleBytes,
@@ -29,12 +30,47 @@ import {
   verifyKeelPublishedInlineModuleFragment,
 } from "../packages/sdk/dist/inline-viewer-graph.js";
 import { KEEL_INLINE_PROTECTION_SHELL_ID } from "../packages/sdk/dist/shell-registry.js";
+import { assertKeelCollectorInlineMetadata, prepareKeelInlineImageCarriage } from "../packages/sdk/dist/collector-policy.js";
 
 const repositoryRoot = fileURLToPath(new URL("..", import.meta.url));
 const chainId = 11155111;
 
 const utf8 = (value) => new TextEncoder().encode(value);
 const decoded = (value) => new Uint8Array(Buffer.from(value, "base64"));
+const validPngBytes = Uint8Array.from([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a]);
+const validPngURI = `data:image/png;base64,${Buffer.from(validPngBytes).toString('base64')}`;
+const validWebpBytes = Buffer.from('RIFF\u0000\u0000\u0000\u0000WEBP', 'latin1');
+const validWebpURI = `data:image/webp;base64,${validWebpBytes.toString('base64')}`;
+const validAvifBytes = Uint8Array.from([0x00, 0x00, 0x00, 0x14, 0x66, 0x74, 0x79, 0x70, 0x61, 0x76, 0x69, 0x66, 0x00, 0x00, 0x00, 0x00, 0x61, 0x76, 0x69, 0x66]);
+const validGifBytes = decoded('R0lGODlhAQABAIAAAAAAAP///ywAAAAAAQABAAACAUwAOw==');
+
+test("Inline creator bytes reject hidden external URL sentinels before packing", () => {
+  assert.doesNotThrow(() => assertKeelInlineNoExternalDependencies(
+    utf8('const svg = "http://www.w3.org/2000/svg";'),
+  ));
+  assert.throws(
+    () => assertKeelInlineNoExternalDependencies(utf8('new URL("https://keel.invalid/weapon-art/index.json")')),
+    /external resource locator.*keel\.invalid/iu,
+  );
+  assert.throws(
+    () => assertKeelInlineNoExternalDependencies(utf8('fetch("https://example.invalid/asset.js")')),
+    /external resource locator.*https:\/\/example\.invalid/iu,
+  );
+  const hiddenModule = gzipSync(utf8('const asset = "https://keel.invalid/weapon-art/index.json";'));
+  const fragment = utf8(`,%7B%22embedded%22:%7B%22compression%22:%22gzip%22,%22storedBase64%22:%22${hiddenModule.toString("base64")}%22%7D%7D`);
+  assert.throws(
+    () => assertKeelInlineNoExternalDependencies(fragment),
+    /external resource locator.*keel\.invalid/iu,
+  );
+});
+
+test('Inline locator check distinguishes minified ar variables from Arweave references', () => {
+  assert.doesNotThrow(()=>assertKeelInlineNoExternalDependencies(utf8('const ar=2;const x={bar:ready?ar:1,empty:false};')));
+  for(const uri of ['ar://asset','ar:'+ 'a'.repeat(43),'ar:'+ 'A_0-'.repeat(10)+'abc'+'/image.png']){
+    assert.throws(()=>assertKeelInlineNoExternalDependencies(utf8(`const asset="${uri}";`)),/external resource locator/);
+    assert.throws(()=>assertKeelInlineNoExternalDependencies(utf8(encodeURIComponent(uri))),/external resource locator/);
+  }
+});
 
 test('inline SVG image carriage avoids double Base64 while retaining exact bytes', async () => {
   const svg=utf8('<svg xmlns="http://www.w3.org/2000/svg"><text>雪 # ? % &amp;</text><image href="data:image/avif;base64,'+'A+/='.repeat(5000)+'"/></svg>');
@@ -43,10 +79,33 @@ test('inline SVG image carriage avoids double Base64 while retaining exact bytes
   assert.deepEqual(utf8(decodeURIComponent(uri.slice(uri.indexOf(',')+1))),svg);
   assert.ok(uri.length<`data:image/svg+xml;base64,${Buffer.from(svg).toString('base64')}`.length);
   assert.equal(Buffer.from(await (await fetch(uri)).arrayBuffer()).equals(Buffer.from(svg)),true);
-  const raster=Uint8Array.from([0,1,250,255]);
-  assert.equal(buildKeelInlineImageURI(raster,'image/avif'),'data:image/avif;base64,AAH6/w==');
-  assert.throws(()=>buildKeelInlineImageURI(raster,'text/html'),/supported/);
+  assert.equal(buildKeelInlineImageURI(validAvifBytes,'image/avif'),`data:image/avif;base64,${Buffer.from(validAvifBytes).toString('base64')}`);
+  const gifURI = buildKeelInlineImageURI(validGifBytes, 'image/gif');
+  assert.equal(gifURI, `data:image/gif;base64,${Buffer.from(validGifBytes).toString('base64')}`);
+  const carriage = prepareKeelInlineImageCarriage(validGifBytes, 'image/gif');
+  assert.equal(carriage.uri, gifURI);
+  assert.equal(carriage.header, 'data:image/gif;base64,');
+  assert.equal(Buffer.from(carriage.payloadBytes).toString('ascii'), Buffer.from(validGifBytes).toString('base64'));
+  assert.deepEqual(carriage.sourceBytes, validGifBytes);
+  assert.deepEqual(Buffer.from(gifURI.slice(gifURI.indexOf(',') + 1), 'base64'), Buffer.from(validGifBytes));
+  assert.doesNotMatch(gifURI, /svg/iu);
+  assert.throws(() => buildKeelInlineImageURI(Uint8Array.from([0, 1, 2, 3]), 'image/gif'), /GIF source/u);
+  assert.throws(()=>buildKeelInlineImageURI(validAvifBytes,'text/html'),/supported/);
   assert.throws(()=>buildKeelInlineImageURI(new Uint8Array(),'image/png'),/empty/);
+});
+
+test("collector Inline rejects actual off-chain resource tags while allowing shell protocol text", () => {
+  const image = validPngURI;
+  const shellText = "<div class=\"verify-corner\"></div><script>const note=\"ipfs:// is only a mirror explanation\";</script>";
+  assert.doesNotThrow(() => assertKeelCollectorInlineMetadata({ image, animation_url: `data:text/html;charset=utf-8,${encodeURIComponent(shellText)}` }));
+  assert.throws(
+    () => assertKeelCollectorInlineMetadata({ image: "data:image/png;base64,AA==", animation_url: `data:text/html;charset=utf-8,${encodeURIComponent(shellText)}` }),
+    /PNG source/u,
+  );
+  assert.throws(
+    () => assertKeelCollectorInlineMetadata({ image, animation_url: `data:text/html;charset=utf-8,${encodeURIComponent(`${shellText}<img src=\"/off-chain.png\">`)}` }),
+    /external or relative resource/u,
+  );
 });
 
 test("composable Base64 fragments equal one traditional outer encoding across UTF-8 boundaries", () => {
@@ -188,23 +247,33 @@ test("Gzip Inline graph reuses shell and p5 fragments and publishes only creator
   const escapedPayload = new TextDecoder().decode(escapedGraph.escapedHtmlBytes);
   assert.equal(new TextEncoder().encode(decodeURIComponent(escapedPayload)).byteLength, escapedGraph.htmlBytes.byteLength);
   assert.equal(decodeURIComponent(escapedPayload), new TextDecoder().decode(root.rootBytes));
-  const storedBase64 = JSON.parse(new TextDecoder().decode(root.parts.find((part) => part.kind === "creator").bytes).slice(1)).embedded.storedBase64;
+  const storedBase64 = p5.item.embedded.storedBase64;
+  const creatorSlot = JSON.parse(new TextDecoder().decode(root.parts.find((part) => part.kind === "creator").bytes).slice(1));
+  assert.match(creatorSlot.embedded.storedText, /new p5\(\(\)=>\{\}\);/u);
+  assert.equal(Object.hasOwn(creatorSlot.embedded, "storedBase64"), false);
   assert.equal(escapedPayload.includes(storedBase64), true, "compressed resource Base64 must remain literal");
 
-  const rawPercentGraph = await buildKeelInlineRawPercentTokenURIGraph(root);
+  await assert.rejects(buildKeelInlineRawPercentTokenURIGraph(root), /forbids new storedBase64/u);
+  const rawP5 = await buildKeelInlineModuleFragment({ moduleId: "p5", version: "1.11.11", mediaType: "text/javascript",
+    decodedBytes: utf8(`globalThis.p5=${JSON.stringify("x".repeat(200_000))}`), execution: "classic" });
+  const rawRoot = await buildKeelInlineLocalDocument({ shell, modules: [rawP5],
+    entry: { id: "sketch.js", mediaType: "text/javascript", source: utf8("new p5(()=>{});") } });
+  const rawPercentGraph = await buildKeelInlineRawPercentTokenURIGraph(rawRoot);
   assert.equal(rawPercentGraph.schema, "keel-inline-raw-percent-token-uri@1");
   assert.equal(rawPercentGraph.mediaType, "application/vnd.keel.token-uri-raw-percent-fragment");
-  assert.deepEqual(Buffer.from(rawPercentGraph.htmlBytes), Buffer.from(root.rootBytes));
+  assert.deepEqual(Buffer.from(rawPercentGraph.htmlBytes), Buffer.from(rawRoot.rootBytes));
   assert.equal(
     decodeURIComponent(new TextDecoder().decode(rawPercentGraph.fragmentBytes)),
     new TextDecoder().decode(rawPercentGraph.escapedHtmlBytes),
   );
-  assert.equal(decodeURIComponent(new TextDecoder().decode(rawPercentGraph.escapedHtmlBytes)), new TextDecoder().decode(root.rootBytes));
+  assert.equal(decodeURIComponent(new TextDecoder().decode(rawPercentGraph.escapedHtmlBytes)), new TextDecoder().decode(rawRoot.rootBytes));
 
-  const comparison = await compareKeelInlineTokenURICarriages(root);
+  const comparison = await compareKeelInlineTokenURICarriages(rawRoot);
+  const comparisonPercent = await buildKeelInlineEscapedTokenURIGraph(rawRoot, { legacyCarriage: "acknowledged" });
+  const comparisonBase64 = await buildKeelInlinePreEncodedTokenURIGraph(rawRoot, { legacyCarriage: "acknowledged" });
   assert.equal(comparison.schema, "keel-inline-token-uri-carriage-comparison@1");
-  assert.equal(comparison.percentStorageBytes, escapedGraph.fragmentBytes.byteLength);
-  assert.equal(comparison.base64StorageBytes, tokenGraph.fragmentBytes.byteLength);
+  assert.equal(comparison.percentStorageBytes, comparisonPercent.fragmentBytes.byteLength);
+  assert.equal(comparison.base64StorageBytes, comparisonBase64.fragmentBytes.byteLength);
   assert.equal(comparison.preferred, "percent");
   assert.ok(comparison.percentStorageBytes < comparison.base64StorageBytes);
   assert.equal(comparison.savingsBytes, comparison.base64StorageBytes - comparison.percentStorageBytes);
@@ -223,13 +292,27 @@ test("Gzip Inline graph reuses shell and p5 fragments and publishes only creator
   assert.ok(followLatest.fragmentBytes.byteLength < tokenGraph.fragmentBytes.byteLength);
   assert.equal(followLatest.creatorPublicationBytes, tokenGraph.creatorPublicationBytes);
 
+  await assert.rejects(
+    buildKeelPreparedOneOfOneTokenURI({
+      graph: tokenGraph,
+      chainId,
+      collection: `0x${"ab".repeat(20)}`,
+      collectionName: "Legacy without policy",
+      description: "Legacy carriage must never be the collector default",
+      imageURI: validWebpURI,
+      manifestURI: "",
+      manifestDigest: `0x${"12".repeat(32)}`,
+    }),
+    /Collector-facing Inline requires the automatic raw-percent carriage/u,
+  );
+
   const prepared = await buildKeelPreparedOneOfOneTokenURI({
     graph: tokenGraph,
     chainId,
     collection: `0x${"ab".repeat(20)}`,
     collectionName: "Seed Current",
     description: "A deterministic p5 flow field </script> 雪",
-    imageURI: "data:image/webp;base64,UklGRg==",
+    imageURI: validWebpURI,
     manifestURI: `web3://0x${"cd".repeat(20)}:${chainId}/object/0x${"ef".repeat(32)}`,
     manifestDigest: `0x${"12".repeat(32)}`,
     artifact: {
@@ -239,6 +322,7 @@ test("Gzip Inline graph reuses shell and p5 fragments and publishes only creator
       byteLength: 3_300,
       mediaType: "text/javascript",
     },
+    presentationPolicy: "raw-artifact",
   });
   assert.equal(prepared.schema, "keel-prepared-one-of-one-token-uri@1");
   assert.equal(prepared.requiredBuilder, "KeelHarnessBuilder");
@@ -272,9 +356,10 @@ test("Gzip Inline graph reuses shell and p5 fragments and publishes only creator
     collection: `0x${"ab".repeat(20)}`,
     collectionName: "Seed Current",
     description: "A deterministic p5 flow field </script> 雪",
-    imageURI: "data:image/webp;base64,UklGRg==",
+      imageURI: validWebpURI,
     manifestURI: `web3://0x${"cd".repeat(20)}:${chainId}/object/0x${"ef".repeat(32)}`,
     manifestDigest: `0x${"12".repeat(32)}`,
+    presentationPolicy: "raw-artifact",
   });
   assert.equal(escapedPrepared.animationEncoding, "percent");
   assert.equal(escapedPrepared.requiredBuilder, "KeelPercentTokenURIBuilder");
@@ -297,7 +382,7 @@ test("Gzip Inline graph reuses shell and p5 fragments and publishes only creator
     collection: `0x${"ab".repeat(20)}`,
     collectionName: "Seed Current",
     description: "A deterministic p5 flow field </script> 雪",
-    imageURI: "data:image/webp;base64,UklGRg==",
+    imageURI: validWebpURI,
     manifestURI: `web3://0x${"cd".repeat(20)}:${chainId}/object/0x${"ef".repeat(32)}`,
     manifestDigest: `0x${"12".repeat(32)}`,
   });
@@ -307,8 +392,13 @@ test("Gzip Inline graph reuses shell and p5 fragments and publishes only creator
   assert.equal(decodeURIComponent(rawPercentPrepared.tokenURI.slice(rawPercentPrepared.tokenURI.indexOf(",") + 1)), rawPercentPrepared.tokenJSON);
   const rawPercentMetadata = JSON.parse(rawPercentPrepared.tokenJSON);
   assert.match(rawPercentMetadata.animation_url, /^data:text\/html;charset=utf-8,/u);
-  assert.equal(decodeURIComponent(rawPercentMetadata.animation_url.slice(rawPercentMetadata.animation_url.indexOf(",") + 1)).startsWith(new TextDecoder().decode(root.rootBytes)), true);
-  assert.ok(rawPercentPrepared.tokenURI.length < escapedPrepared.tokenURI.length);
+  assert.equal(decodeURIComponent(rawPercentMetadata.animation_url.slice(rawPercentMetadata.animation_url.indexOf(",") + 1)).startsWith(new TextDecoder().decode(rawRoot.rootBytes)), true);
+  const comparablePrepared = await buildKeelPreparedOneOfOneTokenURI({ graph: comparisonPercent,
+    chainId, collection: `0x${"ab".repeat(20)}`, collectionName: "Seed Current",
+    description: "A deterministic p5 flow field </script> 雪", imageURI: validWebpURI,
+    manifestURI: `web3://0x${"cd".repeat(20)}:${chainId}/object/0x${"ef".repeat(32)}`,
+    manifestDigest: `0x${"12".repeat(32)}`, presentationPolicy: "raw-artifact" });
+  assert.ok(rawPercentPrepared.tokenURI.length < comparablePrepared.tokenURI.length);
 
   const followLatestPrepared = await buildKeelPreparedOneOfOneTokenURI({
     graph: followLatest,
@@ -320,7 +410,7 @@ test("Gzip Inline graph reuses shell and p5 fragments and publishes only creator
     collection: `0x${"ab".repeat(20)}`,
     collectionName: "Seed Current",
     description: "A deterministic p5 flow field </script> 雪",
-    imageURI: "data:image/webp;base64,UklGRg==",
+      imageURI: validWebpURI,
     manifestURI: `web3://0x${"cd".repeat(20)}:${chainId}/object/0x${"ef".repeat(32)}`,
     manifestDigest: `0x${"12".repeat(32)}`,
     artifact: {
@@ -330,6 +420,7 @@ test("Gzip Inline graph reuses shell and p5 fragments and publishes only creator
       byteLength: 3_300,
       mediaType: "text/javascript",
     },
+    presentationPolicy: "raw-artifact",
   });
   assert.equal(followLatestPrepared.tokenURI, prepared.tokenURI);
   assert.equal(followLatestPrepared.tokenJSON, prepared.tokenJSON);
@@ -344,6 +435,7 @@ test("Gzip Inline graph reuses shell and p5 fragments and publishes only creator
     imageURI: compactImageURI,
     manifestURI: `web3://0x${"cd".repeat(20)}:${chainId}/object/0x${"ef".repeat(32)}`,
     manifestDigest: `0x${"12".repeat(32)}`,
+    presentationPolicy: "raw-artifact",
   });
   assert.equal(JSON.parse(compactImagePrepared.tokenJSON).image, compactImageURI);
 
@@ -357,6 +449,7 @@ test("Gzip Inline graph reuses shell and p5 fragments and publishes only creator
       imageURI: "data:image/svg+xml,<svg></svg>",
       manifestURI: `web3://0x${"cd".repeat(20)}:${chainId}/object/0x${"ef".repeat(32)}`,
       manifestDigest: `0x${"12".repeat(32)}`,
+      presentationPolicy: "raw-artifact",
     }),
     /must be percent-escaped/u,
   );
@@ -370,6 +463,7 @@ test("Gzip Inline graph reuses shell and p5 fragments and publishes only creator
     imageURI: web3ImageURI,
     manifestURI: `web3://0x${"cd".repeat(20)}:${chainId}/haulObject/0x${"ef".repeat(32)}?mime.type=application%2Fjson`,
     manifestDigest: `0x${"12".repeat(32)}`,
+    presentationPolicy: "external-resolver",
   });
   assert.equal(JSON.parse(web3ImagePrepared.tokenJSON).image, web3ImageURI);
   await assert.rejects(
@@ -387,7 +481,7 @@ test("Gzip Inline graph reuses shell and p5 fragments and publishes only creator
   );
 });
 
-test("creator binary assets stay creator-owned and use one resource-slot Base64 packing layer", async () => {
+test("historical compressed assets remain exact locally while fresh Inline rejects encoded body copies", async () => {
   const shell = await buildKeelInlineShellFragments({ repositoryRoot });
   const runtime = await buildKeelInlineModuleFragment({
     moduleId: "keel.gif-encoder",
@@ -419,12 +513,8 @@ test("creator binary assets stay creator-owned and use one resource-slot Base64 
   const assetItem = JSON.parse(new TextDecoder().decode(assetPart.bytes).slice(1));
   const stored = Buffer.from(assetItem.embedded.storedBase64, "base64");
   assert.deepEqual(gunzipSync(stored), Buffer.from(animation));
-  const graph = await buildKeelInlineRawPercentTokenURIGraph(root);
-  assert.equal(
-    graph.creatorPublicationBytes,
-    graph.parts.filter((part) => part.sourceKind === "creator").reduce((total, part) => total + part.bytes.byteLength, 0),
-  );
-  assert.equal(new TextDecoder().decode(graph.htmlBytes).includes(assetItem.embedded.storedBase64), true);
+  await assert.rejects(buildKeelInlineRawPercentTokenURIGraph(root), /forbids new storedBase64/u);
+  await assert.rejects(buildKeelInlineRawPercentTokenURIGraph(root, { existingParts: [] }), /forbids new storedBase64/u);
   await assert.rejects(
     buildKeelInlineLocalDocument({
       shell,
@@ -546,7 +636,7 @@ test("normal-media default compact graphs accept only the registered shell and d
   const shell = await buildKeelInlineShellFragments({ repositoryRoot });
   const document = await buildKeelInlineNormalMediaDocument({
     shell,
-    asset: { id: "poster.png", mediaType: "image/png", source: new Uint8Array([0x89, 0x50, 0x4e, 0x47]) },
+    asset: { id: "poster.png", mediaType: "image/png", source: validPngBytes },
   });
   const local = await buildKeelInlineTokenURIGraph(document);
   const existingParts = local.parts.filter((part) => part.sourceKind === "existing").map((part, index) => ({
@@ -689,7 +779,7 @@ test("published canonical fragments survive platform-specific module recompressi
   );
 });
 
-test("the legacy Base64 lanes refuse to run without an acknowledgment or the environment switch", async () => {
+test("fresh Base64 encoding requires acknowledgement and ignores the environment bypass", async () => {
   const { assertLegacyCarriageAllowed, KeelLegacyCarriageError } = await import("../packages/sdk/dist/inline-viewer-graph.js");
   const saved = process.env.KEEL_LEGACY_CARRIAGE;
   delete process.env.KEEL_LEGACY_CARRIAGE;
@@ -698,19 +788,19 @@ test("the legacy Base64 lanes refuse to run without an acknowledgment or the env
     assert.throws(() => assertLegacyCarriageAllowed("buildKeelInlinePreEncodedTokenURIGraph", {}), /compact raw-percent/u);
     assert.doesNotThrow(() => assertLegacyCarriageAllowed("buildKeelInlinePreEncodedTokenURIGraph", { legacyCarriage: "acknowledged" }));
     process.env.KEEL_LEGACY_CARRIAGE = "allow";
-    assert.doesNotThrow(() => assertLegacyCarriageAllowed("buildKeelInlineEscapedTokenURIGraph", {}));
+    assert.throws(() => assertLegacyCarriageAllowed("buildKeelInlineEscapedTokenURIGraph", {}), KeelLegacyCarriageError);
   } finally {
     if (saved === undefined) delete process.env.KEEL_LEGACY_CARRIAGE; else process.env.KEEL_LEGACY_CARRIAGE = saved;
   }
 });
 
-test("default saver keeps resource packing unchanged through SDK, publication reuse, and metadata", async () => {
+test("default saver keeps raw text unchanged through SDK, publication reuse, and metadata", async () => {
   const shell = await buildKeelInlineShellFragments({ repositoryRoot });
-  const artwork = Uint8Array.from({ length: 171_425 }, (_, i) => (i * 73 + (i >>> 8)) & 255);
+  const artwork = utf8("body{color:blue}/*水 # %*/\n".repeat(6000));
   const document = await buildKeelInlineLocalDocument({
     shell, modules: [],
     entry: { id: "entry.html", mediaType: "text/html", source: utf8("<main>雪 100% # + / =</main>") },
-    assets: [{ id: "artwork.bin", mediaType: "application/octet-stream", source: artwork, compression: "gzip" }],
+    assets: [{ id: "artwork.css", mediaType: "text/css", source: artwork }],
   });
   const graph = await buildKeelInlineTokenURIGraph(document);
   assert.equal(graph.mediaType, "application/vnd.keel.token-uri-raw-percent-fragment");
@@ -719,10 +809,11 @@ test("default saver keeps resource packing unchanged through SDK, publication re
   assert.deepEqual(decodeKeelInlineGraphFragment(graph.fragmentBytes, graph.mediaType), document.rootBytes);
   const asset = graph.parts.find((part) => part.role === "asset");
   const slot = JSON.parse(Buffer.from(asset.decodedHtmlBytes).toString().slice(1));
-  assert.deepEqual(new Uint8Array(gunzipSync(Buffer.from(slot.embedded.storedBase64, "base64"))), artwork);
-  // The exact already-packed alphabet appears once, unwrapped, in the stored graph.
-  const stored = Buffer.from(graph.fragmentBytes).toString();
-  assert.equal(stored.split(slot.embedded.storedBase64).length, 2);
+  assert.equal(slot.embedded.compression, "none");
+  assert.equal(Object.hasOwn(slot.embedded, "storedBase64"), false);
+  assert.deepEqual(utf8(slot.embedded.storedText), artwork);
+  const returnedHTML = decodeURIComponent(decodeURIComponent(Buffer.from(graph.fragmentBytes).toString()));
+  assert.equal(returnedHTML.split(JSON.stringify(slot.embedded.storedText)).length, 2);
   const existingParts = graph.parts.filter((part) => part.sourceKind === "existing").map((part, i) => ({
     bytes: part.bytes, integrity: part.integrity,
     carrier: { chainId, store: `0x${"ab".repeat(20)}`, objectId: `0x${String(i + 1).padStart(64, "0")}`,
@@ -733,12 +824,12 @@ test("default saver keeps resource packing unchanged through SDK, publication re
   assert.equal(reused.creatorPublicationBytes, graph.parts.filter((p) => p.sourceKind === "creator").reduce((n, p) => n + p.bytes.length, 0));
   const prepared = await buildKeelPreparedOneOfOneTokenURI({ graph: reused, chainId,
     collection: `0x${"ab".repeat(20)}`, collectionName: "雪", description: "100% # + / =",
-    imageURI: "data:image/png;base64,aGVsbG8=", manifestURI: "ipfs://test", manifestDigest: `0x${"11".repeat(32)}` });
+      imageURI: validPngURI, manifestURI: "ipfs://test", manifestDigest: `0x${"11".repeat(32)}` });
   assert.equal(prepared.requiredBuilder, "KeelRawTokenURIBuilder");
   const metadata = JSON.parse(decodeURIComponent(prepared.tokenURI.split(",").slice(1).join(",")));
   assert.equal(metadata.description, "100% # + / =");
   assert.ok(metadata.animation_url.startsWith("data:text/html;charset=utf-8,"));
   assert.ok(decodeURIComponent(metadata.animation_url.slice(metadata.animation_url.indexOf(",") + 1)).startsWith(Buffer.from(document.rootBytes).toString()));
-  assert.throws(() => buildKeelInlineTokenURIGraph(document, { carriage: "typo" }), /Unsupported Inline carriage/);
+  await assert.rejects(buildKeelInlineTokenURIGraph(document, { carriage: "typo" }), /Unsupported Inline carriage/);
   await assert.rejects(buildKeelInlineTokenURIGraph(document, { existingParts: existingParts.map((p) => ({ ...p, carrier: { ...p.carrier, mediaType: "application/vnd.keel.token-uri-base64-fragment" } })) }), /not a raw-percent fragment/);
 });
