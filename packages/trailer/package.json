@@ -1,0 +1,28 @@
+{
+  "name": "@keel/trailer",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Private, deterministic beat-synced launch trailers for agents.",
+  "type": "module",
+  "exports": {
+    ".": {
+      "types": "./src/index.d.ts",
+      "import": "./src/index.mjs"
+    },
+    "./schema": "./src/schema.mjs"
+  },
+  "bin": {
+    "keel-trailer": "./src/cli.mjs"
+  },
+  "scripts": {
+    "test": "node --test test/*.test.mjs",
+    "schema": "node src/export-schemas.mjs"
+  },
+  "engines": {
+    "node": ">=22"
+  },
+  "dependencies": {},
+  "optionalDependencies": {
+    "playwright": "1.62.0"
+  }
+}

@@ -4,7 +4,7 @@ import path from "node:path";
 const root = path.resolve(new URL("..", import.meta.url).pathname);
 const scope = path.join(root, "node_modules", "@keel");
 await mkdir(scope, { recursive: true });
-for (const name of ["protocol", "viewer", "sdk", "builder", "studio-core", "sandbox-sdk", "mcp", "ethereum-adapter"]) {
+for (const name of ["trailer", "protocol", "viewer", "sdk", "builder", "studio-core", "sandbox-sdk", "mcp", "ethereum-adapter"]) {
   const target = path.join(root, "packages", name);
   const link = path.join(scope, name);
   try {

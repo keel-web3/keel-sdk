@@ -22,7 +22,8 @@
     "@keel/builder": "workspace:*",
     "@keel/ethereum-adapter": "workspace:*",
     "@keel/protocol": "workspace:*",
-    "@keel/sdk": "workspace:*"
+    "@keel/sdk": "workspace:*",
+    "@keel/trailer": "workspace:*"
   },
   "devDependencies": {
     "typescript": "^5.9.0"

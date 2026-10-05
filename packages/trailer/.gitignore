@@ -1,0 +1,10 @@
+.venv/
+artifacts/
+captures/
+*.mkv
+*.wav
+*.mp4
+*.png
+*.log
+__pycache__/
+*.py[cod]

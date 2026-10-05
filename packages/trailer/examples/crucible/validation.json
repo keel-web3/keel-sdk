@@ -1,0 +1,351 @@
+{
+  "version": 1,
+  "reference": "CRUCIBLE.EXE v3",
+  "comparison": "All decoded frames in the v3 lossless intermediates; no claim of identical lossy MP4 bytes",
+  "edit": {
+    "beats": 74,
+    "bpm": 127.9875,
+    "beatSeconds": 0.46879578083797246,
+    "nominalSeconds": 34.69088778200996,
+    "deliveredFrames": 1040,
+    "fps": 30,
+    "deliveredSeconds": 34.666666666666664,
+    "durationPolicy": "Preserve v3 floor-to-frame duration"
+  },
+  "beatAlignment": {
+    "cuts": [
+      {
+        "cut": 7.500732493407559,
+        "attackMs": 5,
+        "jump": 2.967,
+        "aligned": true
+      },
+      {
+        "cut": 8.438324055083504,
+        "attackMs": 5,
+        "jump": 20.833,
+        "aligned": true
+      },
+      {
+        "cut": 9.37591561675945,
+        "attackMs": 0,
+        "jump": 21.481,
+        "aligned": true
+      },
+      {
+        "cut": 13.126281863463229,
+        "attackMs": 3,
+        "jump": 22.277,
+        "aligned": true
+      },
+      {
+        "cut": 14.063873425139175,
+        "attackMs": 3,
+        "jump": 16.509,
+        "aligned": true
+      },
+      {
+        "cut": 14.532669205977147,
+        "attackMs": 4,
+        "jump": 29.589,
+        "aligned": true
+      },
+      {
+        "cut": 15.001464986815119,
+        "attackMs": 1,
+        "jump": 18.722,
+        "aligned": true
+      },
+      {
+        "cut": 18.7518312335189,
+        "attackMs": 5,
+        "jump": 7.005,
+        "aligned": true
+      },
+      {
+        "cut": 19.22062701435687,
+        "attackMs": 1,
+        "jump": 19.707,
+        "aligned": true
+      },
+      {
+        "cut": 19.689422795194844,
+        "attackMs": 4,
+        "jump": 7.856,
+        "aligned": true
+      },
+      {
+        "cut": 20.158218576032816,
+        "attackMs": 3,
+        "jump": 29.589,
+        "aligned": true
+      },
+      {
+        "cut": 20.627014356870788,
+        "attackMs": 5,
+        "jump": 3.454,
+        "aligned": true
+      },
+      {
+        "cut": 23.439789041898624,
+        "attackMs": 4,
+        "jump": 5.858,
+        "aligned": true
+      },
+      {
+        "cut": 23.67418693231761,
+        "attackMs": 3,
+        "jump": 6.615,
+        "aligned": true
+      },
+      {
+        "cut": 23.908584822736596,
+        "attackMs": 3,
+        "jump": 10.249,
+        "aligned": true
+      },
+      {
+        "cut": 24.142982713155583,
+        "attackMs": 6,
+        "jump": 2.987,
+        "aligned": true
+      },
+      {
+        "cut": 24.37738060357457,
+        "attackMs": 2,
+        "jump": 3.052,
+        "aligned": true
+      },
+      {
+        "cut": 25.314972165250513,
+        "attackMs": 0,
+        "jump": 7.303,
+        "aligned": true
+      },
+      {
+        "cut": 26.252563726926457,
+        "attackMs": 4,
+        "jump": 3.281,
+        "aligned": true
+      },
+      {
+        "cut": 27.1901552886024,
+        "attackMs": 1,
+        "jump": 2.504,
+        "aligned": true
+      },
+      {
+        "cut": 28.12774685027835,
+        "attackMs": 10,
+        "jump": 1.796,
+        "aligned": true
+      },
+      {
+        "cut": 28.59654263111632,
+        "attackMs": 4,
+        "jump": 3.315,
+        "aligned": true
+      },
+      {
+        "cut": 30.002929973630238,
+        "attackMs": 3,
+        "jump": 2.871,
+        "aligned": true
+      }
+    ],
+    "aligned": 23,
+    "total": 23,
+    "passed": true,
+    "method": "PCM 1 ms peak-envelope jump against preceding 30..5 ms; attacks must exceed 1.5x"
+  },
+  "encodedAttackToleranceMs": 48.333333333333336,
+  "frameQuantization": [
+    {
+      "cut": 7.500732493407559,
+      "frame": 226,
+      "deltaMs": 32.601
+    },
+    {
+      "cut": 8.438324055083504,
+      "frame": 254,
+      "deltaMs": 28.343
+    },
+    {
+      "cut": 9.37591561675945,
+      "frame": 282,
+      "deltaMs": 24.084
+    },
+    {
+      "cut": 13.126281863463229,
+      "frame": 394,
+      "deltaMs": 7.051
+    },
+    {
+      "cut": 14.063873425139175,
+      "frame": 422,
+      "deltaMs": 2.793
+    },
+    {
+      "cut": 14.532669205977147,
+      "frame": 436,
+      "deltaMs": 0.664
+    },
+    {
+      "cut": 15.001464986815119,
+      "frame": 451,
+      "deltaMs": 31.868
+    },
+    {
+      "cut": 18.7518312335189,
+      "frame": 563,
+      "deltaMs": 14.835
+    },
+    {
+      "cut": 19.22062701435687,
+      "frame": 577,
+      "deltaMs": 12.706
+    },
+    {
+      "cut": 19.689422795194844,
+      "frame": 591,
+      "deltaMs": 10.577
+    },
+    {
+      "cut": 20.158218576032816,
+      "frame": 605,
+      "deltaMs": 8.448
+    },
+    {
+      "cut": 20.627014356870788,
+      "frame": 619,
+      "deltaMs": 6.319
+    },
+    {
+      "cut": 23.439789041898624,
+      "frame": 704,
+      "deltaMs": 26.878
+    },
+    {
+      "cut": 23.67418693231761,
+      "frame": 711,
+      "deltaMs": 25.813
+    },
+    {
+      "cut": 23.908584822736596,
+      "frame": 718,
+      "deltaMs": 24.749
+    },
+    {
+      "cut": 24.142982713155583,
+      "frame": 725,
+      "deltaMs": 23.684
+    },
+    {
+      "cut": 24.37738060357457,
+      "frame": 732,
+      "deltaMs": 22.619
+    },
+    {
+      "cut": 25.314972165250513,
+      "frame": 760,
+      "deltaMs": 18.361
+    },
+    {
+      "cut": 26.252563726926457,
+      "frame": 788,
+      "deltaMs": 14.103
+    },
+    {
+      "cut": 27.1901552886024,
+      "frame": 816,
+      "deltaMs": 9.845
+    },
+    {
+      "cut": 28.12774685027835,
+      "frame": 844,
+      "deltaMs": 5.586
+    },
+    {
+      "cut": 28.59654263111632,
+      "frame": 858,
+      "deltaMs": 3.457
+    },
+    {
+      "cut": 30.002929973630238,
+      "frame": 901,
+      "deltaMs": 30.403
+    }
+  ],
+  "outputs": [
+    {
+      "target": "16x9",
+      "path": "../../artifacts/crucible/render/CRUCIBLE-trailer-16x9.mp4",
+      "sha256": "800cb03731dd9ff622a48f19da0f86f203ec2d0d432185351202bb5817f5f07e",
+      "frames": 1040,
+      "referenceRgbSha256": "a5d6660409155b137c2164eb368864d1fbf01d8c776c1e1a43a2f546df627000",
+      "renderRgbSha256": "a5d6660409155b137c2164eb368864d1fbf01d8c776c1e1a43a2f546df627000",
+      "allFramesIdentical": true,
+      "bytes": 13295312,
+      "maxBytes": 14500000,
+      "integratedLUFS": -14.05,
+      "truePeakDBTP": -1.68,
+      "sizePassed": true,
+      "hashPassed": true,
+      "dimensionsPassed": true,
+      "loudnessPassed": true,
+      "truePeakPassed": true,
+      "passed": true,
+      "deliveredCutsAligned": 23,
+      "deliveredCutsTotal": 23
+    },
+    {
+      "target": "9x16",
+      "path": "../../artifacts/crucible/render/CRUCIBLE-trailer-9x16.mp4",
+      "sha256": "18b649a5501774efc09edd30e1e43cb02aafe10e1eb60818b734f380319c5b71",
+      "frames": 1040,
+      "referenceRgbSha256": "cac60ebd22049c4e21f0d1166a889a7987d9a53e9b2dbc918378de7c3955d02d",
+      "renderRgbSha256": "cac60ebd22049c4e21f0d1166a889a7987d9a53e9b2dbc918378de7c3955d02d",
+      "allFramesIdentical": true,
+      "bytes": 13126629,
+      "maxBytes": 14500000,
+      "integratedLUFS": -14.05,
+      "truePeakDBTP": -1.68,
+      "sizePassed": true,
+      "hashPassed": true,
+      "dimensionsPassed": true,
+      "loudnessPassed": true,
+      "truePeakPassed": true,
+      "passed": true,
+      "deliveredCutsAligned": 23,
+      "deliveredCutsTotal": 23
+    },
+    {
+      "target": "1x1",
+      "path": "../../artifacts/crucible/render/CRUCIBLE-trailer-1x1.mp4",
+      "sha256": "a065863d8ba908d58350f54022584cf73c87f4c072b05228d7429cc73800e6c8",
+      "frames": 1040,
+      "referenceRgbSha256": "c5a66f1a75edbaead040081069db5759cb0a05264deaa51adb822b36035e7293",
+      "renderRgbSha256": "c5a66f1a75edbaead040081069db5759cb0a05264deaa51adb822b36035e7293",
+      "allFramesIdentical": true,
+      "bytes": 13158823,
+      "maxBytes": 14500000,
+      "integratedLUFS": -14.05,
+      "truePeakDBTP": -1.68,
+      "sizePassed": true,
+      "hashPassed": true,
+      "dimensionsPassed": true,
+      "loudnessPassed": true,
+      "truePeakPassed": true,
+      "passed": true,
+      "deliveredCutsAligned": 23,
+      "deliveredCutsTotal": 23
+    }
+  ],
+  "passed": true,
+  "evidence": {
+    "captureManifest": "../../artifacts/crucible/capture-manifest.json",
+    "renderManifest": "../../artifacts/crucible/render/render.json",
+    "verification": "../../artifacts/crucible/render/verification.json",
+    "sheet": "../../artifacts/crucible/render/verification-sheet.png"
+  }
+}
