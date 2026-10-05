@@ -1,3 +1,4 @@
+import type { McpPluginOptions } from "./plugins.js";
 import { createMcpServer } from "./server.js";
 import type { StdioInput, StdioOutput } from "./types.js";
 
@@ -11,8 +12,9 @@ export async function runStdio(
   input: StdioInput = (process as unknown as { readonly stdin: StdioInput }).stdin,
   output: StdioOutput = process.stdout,
   workspaceRoot = ".",
+  options: McpPluginOptions = {},
 ): Promise<void> {
-  const server = await createMcpServer({ workspaceRoot });
+  const server = await createMcpServer({ workspaceRoot, ...options });
   let buffer = "";
   let droppingOversized = false;
   let queue = Promise.resolve();

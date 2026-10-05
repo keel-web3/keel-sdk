@@ -7,6 +7,9 @@ const HELP = `Usage: keel-mcp [--workspace <directory> | --workspace=<directory>
 
 Run the offline MCP JSON-RPC server over stdio (the default).
   --workspace <directory>  Restrict local reads and writes to this directory.
+  --plugin <entry>        Load a trusted local KEEL plugin (repeatable).
+  --plugin-config <file>  Use a registry instead of ~/.keel/plugins.json.
+  --no-plugins            Disable the default registry; explicit --plugin entries still load.
   --self-test              Run initialize, ping, tools/list, prompts/list/get, and static resource checks.
   --version, -v            Print the server version and exit.
   --help, -h               Print this help and exit.
@@ -17,12 +20,16 @@ type Action = "stdio" | "help" | "version" | "self-test";
 interface ParsedArgs {
   readonly action: Action;
   readonly workspace: string;
+  readonly plugins: readonly string[];
+  readonly pluginConfig?: string | false;
 }
 
 function parseArgs(args: readonly string[]): ParsedArgs {
   let action: Action = "stdio";
   let workspace = ".";
   let workspaceSeen = false;
+  const plugins: string[] = [];
+  let pluginConfig: string | false | undefined;
   for (let index = 0; index < args.length; index += 1) {
     const argument = args[index];
     if (argument === undefined) throw new TypeError("Missing command argument.");
@@ -39,6 +46,17 @@ function parseArgs(args: readonly string[]): ParsedArgs {
       if (value.length === 0) throw new TypeError("--workspace requires a directory.");
       workspace = value;
       workspaceSeen = true;
+    } else if (argument === "--plugin") {
+      const value = args[++index];
+      if (!value || value.startsWith("--")) throw new TypeError("--plugin requires a local entry path.");
+      plugins.push(value);
+    } else if (argument === "--plugin-config") {
+      const value = args[++index];
+      if (!value || value.startsWith("--") || pluginConfig !== undefined) throw new TypeError("--plugin-config requires one registry path.");
+      pluginConfig = value;
+    } else if (argument === "--no-plugins") {
+      if (pluginConfig !== undefined) throw new TypeError("--no-plugins conflicts with --plugin-config.");
+      pluginConfig = false;
     } else if (argument === "--help" || argument === "-h") {
       action = selectAction(action, "help");
     } else if (argument === "--version" || argument === "-v") {
@@ -49,7 +67,7 @@ function parseArgs(args: readonly string[]): ParsedArgs {
       throw new TypeError(`Unknown argument: ${argument}`);
     }
   }
-  return { action, workspace };
+  return { action, workspace, plugins, ...(pluginConfig === undefined ? {} : { pluginConfig }) };
 }
 
 function selectAction(current: Action, next: Exclude<Action, "stdio">): Action {
@@ -64,9 +82,9 @@ async function main(args: readonly string[]): Promise<void> {
   } else if (parsed.action === "version") {
     process.stdout.write(`${MCP_SERVER_VERSION}\n`);
   } else if (parsed.action === "self-test") {
-    process.stdout.write(`${JSON.stringify(await runMcpSelfTest(parsed.workspace))}\n`);
+    process.stdout.write(`${JSON.stringify(await runMcpSelfTest(parsed.workspace, parsed))}\n`);
   } else {
-    await runStdio(undefined, undefined, parsed.workspace);
+    await runStdio(undefined, undefined, parsed.workspace, parsed);
   }
 }
 

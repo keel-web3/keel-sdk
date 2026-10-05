@@ -437,3 +437,20 @@ See [runtime module discovery and reuse](../../docs/KEEL_RUNTIME_MODULE_DISCOVER
 ### Native SVG tools
 
 `keel-svg-create` prepares an ordinary SVG renderer from a preset or recipe, with preview and Solidity export. `keel-svg-inspect` checks SVG structure and hidden provenance locally; `keel-svg-call-plan` prepares a read-only contract call. Neither tool claims verification from embedded labels. See [SVG renderer, SDK and editor integration](../../docs/KEEL_SVG_RENDERER.md).
+
+## Optional local plugins
+
+`keel-mcp` loads explicitly installed plugins from `~/.keel/plugins.json`. No project file, remote URL or npm package is automatically executed. Plugins are trusted local code with the same permissions as the server; the workspace helper scopes tool file operations but is not a code sandbox. Restart the MCP host after installing or removing a plugin.
+
+```sh
+# In the engine checkout; writes only the named user registry.
+node tools/plugins.mjs install ./packages/react
+node tools/plugins.mjs install /path/to/private/keel-trailer
+keel-mcp --workspace /path/to/project --self-test
+# Temporary invocation without changing the registry:
+keel-mcp --no-plugins --plugin /path/to/plugin/src/mcp.mjs
+```
+
+`keel-plugins-list` returns installed plugin identities, versions, paths and tools. Configuration schema: `{ "schema": "keel-plugins@1", "plugins": [{ "id": "keel/react", "entry": "/absolute/path/src/mcp.mjs", "enabled": true }] }`. Set `KEEL_MCP_PLUGIN_CONFIG` or `--plugin-config` for an isolated registry; `--no-plugins` disables the default registry. Invalid manifests, API versions, identities and duplicate tool names stop startup with an actionable error. No private trailer dependency is carried by the SDK.
+
+An entry exports `keelPlugin = { apiVersion: 1, id, version, instructions?, tools }`; each tool supplies `descriptor: { name, description, inputSchema: { type: "object", ... } }` and `async run({ workspace }, input)`. Public TypeScript interfaces are exported from `@keel/mcp`. Keep plugin input validation, media requirements and machine-load handling inside its package.
