@@ -1,4 +1,517 @@
 {
+  "trailer-snapshot": {
+    "type": "object",
+    "properties": {
+      "mediaPath": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 4096
+      },
+      "timelinePath": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 4096
+      },
+      "timeline": {
+        "type": "object",
+        "additionalProperties": true
+      },
+      "target": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 4096
+      },
+      "times": {
+        "type": "array",
+        "items": {
+          "type": "number",
+          "minimum": 0
+        },
+        "minItems": 1,
+        "maxItems": 120
+      },
+      "frames": {
+        "type": "array",
+        "items": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "minItems": 1,
+        "maxItems": 120
+      },
+      "views": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "properties": {
+            "id": {
+              "type": "string",
+              "pattern": "^[a-zA-Z0-9_-]{1,80}$"
+            },
+            "crop": {
+              "type": "object",
+              "properties": {
+                "x": {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                "y": {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                "width": {
+                  "type": "integer",
+                  "minimum": 1
+                },
+                "height": {
+                  "type": "integer",
+                  "minimum": 1
+                }
+              },
+              "required": [
+                "x",
+                "y",
+                "width",
+                "height"
+              ],
+              "additionalProperties": false
+            },
+            "scale": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 32
+            }
+          },
+          "required": [
+            "id"
+          ],
+          "additionalProperties": false
+        },
+        "minItems": 1,
+        "maxItems": 24
+      },
+      "pixelData": {
+        "type": "boolean"
+      },
+      "outDir": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 4096
+      },
+      "remote": {
+        "enum": [
+          "yuna-mbp"
+        ]
+      }
+    },
+    "required": [
+      "outDir"
+    ],
+    "additionalProperties": false
+  },
+  "trailer-clip": {
+    "type": "object",
+    "properties": {
+      "mediaPath": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 4096
+      },
+      "startFrame": {
+        "type": "integer",
+        "minimum": 0
+      },
+      "endFrame": {
+        "type": "integer",
+        "minimum": 1
+      },
+      "crop": {
+        "type": "object",
+        "properties": {
+          "x": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "y": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "width": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "height": {
+            "type": "integer",
+            "minimum": 1
+          }
+        },
+        "required": [
+          "x",
+          "y",
+          "width",
+          "height"
+        ],
+        "additionalProperties": false
+      },
+      "scale": {
+        "type": "integer",
+        "minimum": 1,
+        "maximum": 32
+      },
+      "includeAudio": {
+        "type": "boolean"
+      },
+      "outDir": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 4096
+      },
+      "remote": {
+        "enum": [
+          "yuna-mbp"
+        ]
+      }
+    },
+    "required": [
+      "mediaPath",
+      "startFrame",
+      "endFrame",
+      "outDir"
+    ],
+    "additionalProperties": false
+  },
+  "trailer-inspect": {
+    "type": "object",
+    "properties": {
+      "snapshot": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "title": "KEEL inspection snapshot",
+        "type": "object",
+        "properties": {
+          "version": {
+            "const": 1
+          },
+          "schema": {
+            "const": "keel-inspection@1"
+          },
+          "frame": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "seconds": {
+            "type": "number",
+            "minimum": 0
+          },
+          "meshes": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "string",
+                  "pattern": "^[a-zA-Z0-9_-]{1,80}$"
+                },
+                "positions": {
+                  "type": "array",
+                  "items": {
+                    "type": "number"
+                  },
+                  "minItems": 3,
+                  "maxItems": 2000000
+                },
+                "indices": {
+                  "type": "array",
+                  "items": {
+                    "type": "integer",
+                    "minimum": 0
+                  },
+                  "minItems": 0,
+                  "maxItems": 2000000
+                },
+                "attributes": {
+                  "type": "object",
+                  "additionalProperties": true
+                },
+                "metadata": {
+                  "type": "object",
+                  "additionalProperties": true
+                }
+              },
+              "required": [
+                "id",
+                "positions",
+                "indices"
+              ],
+              "additionalProperties": false
+            },
+            "minItems": 0,
+            "maxItems": 1000
+          },
+          "graphs": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "string",
+                  "pattern": "^[a-zA-Z0-9_-]{1,80}$"
+                },
+                "nodes": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "id": {
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 4096
+                      },
+                      "label": {
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 4096
+                      },
+                      "position": {
+                        "type": "array",
+                        "items": {
+                          "type": "number"
+                        },
+                        "minItems": 2,
+                        "maxItems": 3
+                      },
+                      "data": {
+                        "type": "object",
+                        "additionalProperties": true
+                      }
+                    },
+                    "required": [
+                      "id"
+                    ],
+                    "additionalProperties": false
+                  },
+                  "minItems": 0,
+                  "maxItems": 2000000
+                },
+                "edges": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "id": {
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 4096
+                      },
+                      "from": {
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 4096
+                      },
+                      "to": {
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 4096
+                      },
+                      "directed": {
+                        "type": "boolean"
+                      },
+                      "points": {
+                        "type": "array",
+                        "items": {
+                          "type": "array",
+                          "items": {
+                            "type": "number"
+                          },
+                          "minItems": 2,
+                          "maxItems": 3
+                        },
+                        "minItems": 0,
+                        "maxItems": 2000000
+                      },
+                      "data": {
+                        "type": "object",
+                        "additionalProperties": true
+                      }
+                    },
+                    "required": [
+                      "id",
+                      "from",
+                      "to"
+                    ],
+                    "additionalProperties": false
+                  },
+                  "minItems": 0,
+                  "maxItems": 2000000
+                },
+                "metadata": {
+                  "type": "object",
+                  "additionalProperties": true
+                }
+              },
+              "required": [
+                "id",
+                "nodes",
+                "edges"
+              ],
+              "additionalProperties": false
+            },
+            "minItems": 0,
+            "maxItems": 1000
+          },
+          "grids": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "string",
+                  "pattern": "^[a-zA-Z0-9_-]{1,80}$"
+                },
+                "width": {
+                  "type": "integer",
+                  "minimum": 1
+                },
+                "height": {
+                  "type": "integer",
+                  "minimum": 1
+                },
+                "channels": {
+                  "type": "object",
+                  "additionalProperties": true
+                },
+                "metadata": {
+                  "type": "object",
+                  "additionalProperties": true
+                }
+              },
+              "required": [
+                "id",
+                "width",
+                "height",
+                "channels"
+              ],
+              "additionalProperties": false
+            },
+            "minItems": 0,
+            "maxItems": 1000
+          },
+          "state": {
+            "type": "object",
+            "additionalProperties": true
+          },
+          "metadata": {
+            "type": "object",
+            "additionalProperties": true
+          }
+        },
+        "required": [
+          "version",
+          "schema"
+        ],
+        "additionalProperties": false
+      },
+      "snapshotPath": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 4096
+      },
+      "outDir": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 4096
+      },
+      "remote": {
+        "enum": [
+          "yuna-mbp"
+        ]
+      },
+      "width": {
+        "type": "integer",
+        "minimum": 128,
+        "maximum": 2048
+      },
+      "height": {
+        "type": "integer",
+        "minimum": 128,
+        "maximum": 2048
+      },
+      "views": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "properties": {
+            "id": {
+              "type": "string",
+              "pattern": "^[a-zA-Z0-9_-]{1,80}$"
+            },
+            "kind": {
+              "enum": [
+                "mesh",
+                "graph",
+                "grid"
+              ]
+            },
+            "objectId": {
+              "type": "string",
+              "pattern": "^[a-zA-Z0-9_-]{1,80}$"
+            },
+            "projection": {
+              "enum": [
+                "front",
+                "top",
+                "side",
+                "iso"
+              ]
+            },
+            "channel": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 4096
+            }
+          },
+          "required": [
+            "id",
+            "kind",
+            "objectId"
+          ],
+          "additionalProperties": false
+        },
+        "minItems": 0,
+        "maxItems": 64
+      },
+      "queries": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "properties": {
+            "pointer": {
+              "type": "string",
+              "maxLength": 4096
+            },
+            "start": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "count": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 10000
+            }
+          },
+          "required": [
+            "pointer"
+          ],
+          "additionalProperties": false
+        },
+        "minItems": 0,
+        "maxItems": 100
+      }
+    },
+    "required": [
+      "outDir"
+    ],
+    "additionalProperties": false
+  },
   "trailer-plan": {
     "type": "object",
     "properties": {
@@ -301,6 +814,20 @@
             },
             "minItems": 0,
             "maxItems": 10000
+          },
+          "inspectionFrames": {
+            "type": "array",
+            "items": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "minItems": 0,
+            "maxItems": 10000
+          },
+          "probeGlobal": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 4096
           },
           "steps": {
             "type": "array",

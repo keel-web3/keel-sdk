@@ -18,3 +18,7 @@ export function editSeconds(tempo:Tempo,beat:number):number;
 export function boundaryFrame(seconds:number,fps:number):number;
 export function sourceFrame(shot:Shot,localBeat:number,localSeconds:number,sourceFps?:number):number;
 export function registerCaptureAdapter(name:string,adapter:(capture:Record<string,unknown>,outDir:string,context:unknown)=>Promise<unknown>,optionsSchema?:Record<string,unknown>):void;
+export * from './probe.js';
+export const INSPECTION_SCHEMA: Readonly<Record<string,unknown>>;
+export function assertInspection(snapshot:unknown):import('./probe.js').InspectionSnapshot;
+export function queryInspection(snapshot:import('./probe.js').InspectionSnapshot,query:{pointer:string;start?:number;count?:number}):unknown;

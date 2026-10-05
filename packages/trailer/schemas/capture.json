@@ -92,6 +92,20 @@
       "minItems": 0,
       "maxItems": 10000
     },
+    "inspectionFrames": {
+      "type": "array",
+      "items": {
+        "type": "integer",
+        "minimum": 0
+      },
+      "minItems": 0,
+      "maxItems": 10000
+    },
+    "probeGlobal": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 4096
+    },
     "steps": {
       "type": "array",
       "items": {

@@ -9,7 +9,11 @@
       "types": "./src/index.d.ts",
       "import": "./src/index.mjs"
     },
-    "./schema": "./src/schema.mjs"
+    "./schema": "./src/schema.mjs",
+    "./probe": {
+      "types": "./src/probe.d.ts",
+      "import": "./src/probe.mjs"
+    }
   },
   "bin": {
     "keel-trailer": "./src/cli.mjs"

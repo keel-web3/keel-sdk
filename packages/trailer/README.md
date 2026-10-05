@@ -19,7 +19,7 @@ libx264, FFV1 and loudnorm are required.
     node packages/mcp/dist/cli.js --workspace /absolute/path/to/creator/project
 
 For an MCP client, point its existing KEEL connection at that built CLI and set
-TRAILER_PYTHON in the connection environment. The six tools register in
+TRAILER_PYTHON in the connection environment. The nine tools register in
 packages/mcp/src/tools.ts; there is no second MCP server. The shared launcher
 ~/.keel/bin/keel-mcp still runs its separate stable checkout. This local branch
 does not replace that installation.
@@ -56,6 +56,9 @@ TypeScript interfaces: [src/index.d.ts](src/index.d.ts).
 
 | Tool | Request | Structured result |
 | --- | --- | --- |
+| trailer-snapshot | mediaPath **or** timeline/timelinePath; frames **or** times; named views/crops/scales, pixelData | exact decoded/replayed PNGs, sheet, viewer, source/PNG/RGB hashes, RGB statistics and optional raw RGB buffers |
+| trailer-clip | mediaPath, startFrame, endFrame; crop, scale, includeAudio | lossless FFV1/PCM interval, playable H.264/AAC preview, viewer, hashes and verified frame count |
+| trailer-inspect | snapshot **or** snapshotPath; views, queries, output dimensions | exact saved JSON, geometry/topology/graph/grid statistics, projections, CSV/DOT, paginated JSON pointers and offline inspector |
 | trailer-plan | brief, sources; optional bpm, durationBeats, targets, font | timeline, planning notes |
 | trailer-capture | capture, outDir | artifacts, SHA-256, frame count/rate, marks; web rects/state; GB memory reads, ROM hashes and link exchange count |
 | trailer-beats | audioPath; optional bpm/beatSeconds/firstDownbeat/beats, outPath | tempo, onsets, PCM attacks, confidence, source hash and limitations |
@@ -197,9 +200,105 @@ rather than assuming the WAV's peak/loudness carries through compression.
 Size budgets are decimal bytes. A missing bed/silent track cannot pass an
 attack check merely because its declared tempo is valid.
 
+## Visual and code inspection
+
+Use both views of the same artifact:
+
+- **trailer-snapshot** reads an existing image/video or replays a timeline. Give
+  exact frame numbers or time requests, and named crops at integer scales.
+  It writes PNGs, a contact sheet and an offline frame/region browser. With
+  pixelData:true it also writes RGB24 buffers: rowStride, byte count and SHA-256
+  make the pixels directly accessible to code. Source files are untouched.
+- **trailer-clip** takes a startFrame/endFrame interval (end exclusive) and an
+  optional crop/scale. The FFV1/PCM result retains exact pixels and source audio
+  samples; a separate H.264/AAC preview and HTML player make it easy to view.
+  Odd dimensions pad one pixel on the preview; the lossless clip stays exact.
+- **trailer-inspect** takes exported system data. It saves the complete snapshot,
+  front/top/side/isometric wireframes, graph views with actual path samples,
+  channel grids, topology/statistics and CSV/DOT exports. Its offline viewer
+  lets you rotate a mesh, click a vertex/node, hover a grid cell and query the
+  underlying values by JSON pointer. Views are diagnostic projections of the
+  supplied data, not a substitute for the canonical engine material renderer.
+
+Requests use the same CLI and MCP JSON schemas:
+
+```json
+{
+  "mediaPath": "trailer.mp4",
+  "frames": [226, 451, 704],
+  "views": [
+    {"id": "full"},
+    {"id": "detail", "crop": {"x": 400, "y": 36, "width": 1120, "height": 1008}, "scale": 1}
+  ],
+  "pixelData": true,
+  "outDir": "inspection/frames"
+}
+```
+
+    node packages/trailer/src/cli.mjs snapshot --json snapshot-request.json
+    node packages/trailer/src/cli.mjs clip --json clip-request.json
+    node packages/trailer/src/cli.mjs inspect --json inspection-request.json
+
+Inspection snapshot schema: [schemas/inspection.json](schemas/inspection.json).
+Its meshes have flattened xyz positions, triangle indices and per-vertex
+attribute arrays. Graphs have stable node/edge IDs, positions and optional
+polyline points. Grids have width/height and exact row-major channel arrays.
+state and metadata retain explicitly exported JSON data, including provenance.
+Dangling graph links, invalid indices, incomplete grids, non-finite values and
+cycles fail validation. Indexed boundaries are reported without welding
+coincident vertices, so they do not establish whether a geometric solid is
+watertight. Default large mesh views sample at most 20,000 triangles; raw arrays
+and CSV retain every supplied triangle. Select views explicitly for large
+systems rather than generating more than 64 default views.
+
+**The code API works in Node and in project browser bundles:**
+
+```ts
+import { createInspectionProbe } from '@keel/trailer/probe';
+const inspection = createInspectionProbe();
+inspection.register('vehicle', 'mesh', () => existingLookMesh);
+inspection.register('roads', 'graph', () => existingRoadGraph);
+inspection.register('terrain', 'grid', () => existingTerrain);
+inspection.register('simulation', 'state', () => ({ tick, seed, position }));
+const snapshot = inspection.snapshot({ frame: tick, seconds: tick / fps });
+// Persist snapshot as JSON, or expose this explicit browser capture hook:
+window.__KEEL_INSPECTION__ = inspection;
+```
+
+These adapters copy canonical LookMesh, RoadGraph and Terrain buffers; they
+retain normals/attrs/bodies/facade, road polylines/adjacency and grid channels/
+units/version. They read existing objects synchronously, so code and visual
+views share one frame. No parallel regenerated scene is introduced. Readers
+must export data; functions/GPU-private state cannot be recovered from pixels.
+To inspect another system, register its mesh/graph/grid/state readers or supply
+a snapshot matching the schema. Unregister a reader with the returned function.
+
+For a live web capture, add inspectionFrames:[0,30,60] and optionally
+probeGlobal:"__KEEL_INSPECTION__" to trailer-capture. The paused clock records a
+validated inspection JSON beside that exact screenshot frame. Existing page
+controls and visual design remain intact. The page must expose the probe.
+
+For code queries, supply e.g.
+queries:[{pointer:"/meshes/0/positions",start:300,count:30}] to trailer-inspect,
+or call queryInspection(snapshot, query). Results paginate large arrays while
+the snapshot preserves the complete data. CSV exports include vertex/triangle
+IDs and one matrix per grid channel; graph DOT retains IDs and direction.
+
+Frame indices select exact decoded frames. Time requests use the average-FPS
+grid and report actual decoded PTS; use frame numbers for variable-rate sources.
+Clip extraction currently requires constant frame rate. Media inspection is
+RGB24; it does not export alpha/depth/GPU buffers implicitly. The offline
+viewer is an inspection artifact, not a replacement project UI or scene editor.
+
+A runnable canonical-engine example is in
+[examples/inspection/README.md](examples/inspection/README.md). Private captures,
+reports and raw pixels remain ignored artifacts. These tools support
+remote:"yuna-mbp" and the same automatic busy-Mac offload/cleanup.
+
 ## Busy-Mac offload
 
-Capture/render/stills check the 1-minute load. Render/stills automatically use
+Capture/render/stills/inspection operations check the 1-minute load. Render/stills,
+snapshots, clips and data inspections automatically use
 the user-owned yuna-mbp when load exceeds 40; remote:"yuna-mbp" or
 --remote yuna-mbp selects it explicitly. Capture stops with OFFLOAD_REQUIRED:
 its browser/ROM runtime must be arranged on the helper machine.
@@ -207,7 +306,7 @@ its browser/ROM runtime must be arranged on the helper machine.
 The helper checks free space and runtime availability, transfers only validated
 inputs over SSH/rsync into a random private ~/work job, renders there, copies
 results back and removes both remote/local job scratch. It never pushes Git
-or publishes assets. Paths in returned render artifacts are rebased locally.
+or publishes assets. Paths in returned artifacts, reports and offline viewers are rebased locally.
 
 The Sonoma helper cannot use current Homebrew runtime bottles. The included
 scripts/bootstrap-yuna.sh builds a minimal ffmpeg/x264 and installs uv-managed
@@ -264,7 +363,8 @@ artifacts, not committed package assets.
     TRAILER_TEST_ROM=/absolute/path/to/project.gbc \
       node --test packages/trailer/test/*.test.mjs
 
-Tests cover schema and timing math, synthetic tempo/silence/declared grids,
+Tests cover exact cropped RGB/PCM clips, same-frame live probes, offline viewer
+interactions and JSON data/topology checks, plus schema and timing math, synthetic tempo/silence/declared grids,
 the existing MCP dispatch, actual web capture, real-ROM memory/input capture,
 two-ROM serial byte exchange, a tiny all-target production render, identical
 hashes on repeat, still-frame equality, attack failures and path confinement.

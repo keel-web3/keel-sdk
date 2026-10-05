@@ -1,0 +1,150 @@
+{
+  "version": 1,
+  "snapshotSha256": "22b746b6c23671e42e703c35313bb3cd92e30b3ba21ee4c4fa95ac2c704097c8",
+  "example": {
+    "mesh": {
+      "id": "look",
+      "vertices": 128,
+      "triangles": 180,
+      "bounds": {
+        "min": [
+          -1.2000000476837158,
+          -0.20000000298023224,
+          -0.5
+        ],
+        "max": [
+          1.2000000476837158,
+          2,
+          0.5
+        ]
+      },
+      "surfaceArea": 18.959114457573925,
+      "degenerateTriangles": 24,
+      "indexedBoundaryEdges": 62,
+      "indexedNonManifoldEdges": 0,
+      "attributeStrides": {
+        "normals": 3,
+        "attrs": 4,
+        "bodies": 3
+      },
+      "topologyNote": "Indexed topology; coincident duplicated vertices are not welded or treated as proof of a closed solid"
+    },
+    "graph": {
+      "id": "roads",
+      "nodes": 3,
+      "edges": 2,
+      "weakComponents": [
+        [
+          "0",
+          "1",
+          "2"
+        ]
+      ],
+      "isolatedNodes": [],
+      "undirectedCycleRank": 0,
+      "directedEdges": 0
+    },
+    "grid": {
+      "id": "terrain",
+      "width": 8,
+      "height": 6,
+      "channels": {
+        "height": {
+          "count": 48,
+          "min": -5,
+          "max": 7,
+          "mean": 1,
+          "stddev": 2.857738033247041
+        },
+        "type": {
+          "count": 48,
+          "min": 0,
+          "max": 0,
+          "mean": 0,
+          "stddev": 0
+        },
+        "flags": {
+          "count": 48,
+          "min": 0,
+          "max": 0,
+          "mean": 0,
+          "stddev": 0
+        },
+        "dir": {
+          "count": 48,
+          "min": 0,
+          "max": 0,
+          "mean": 0,
+          "stddev": 0
+        },
+        "water": {
+          "count": 48,
+          "min": -32768,
+          "max": -32768,
+          "mean": -32768,
+          "stddev": 0
+        },
+        "deck": {
+          "count": 48,
+          "min": -32768,
+          "max": -32768,
+          "mean": -32768,
+          "stddev": 0
+        }
+      }
+    }
+  },
+  "views": 11,
+  "queries": [
+    {
+      "pointer": "/meshes/0/positions",
+      "start": 0,
+      "total": 384,
+      "values": [
+        1,
+        0,
+        0.5,
+        1,
+        0,
+        -0.5,
+        1,
+        2,
+        -0.5,
+        1,
+        2,
+        0.5
+      ],
+      "truncated": true
+    },
+    {
+      "pointer": "/grids/0/channels/height",
+      "start": 0,
+      "total": 48,
+      "values": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7
+      ],
+      "truncated": true
+    }
+  ],
+  "viewer": "../../artifacts/inspection-example/report/index.html",
+  "fullJson": "../../artifacts/inspection-example/report/snapshot.json",
+  "crucibleFramesViewer": "../../artifacts/inspection-example/crucible-views/index.html",
+  "validated": [
+    "raw snapshot SHA-256 and round-trip equality",
+    "front/top/side/isometric projections and graph/grid channels",
+    "14 local tests plus 10 final focused yuna tests",
+    "all three new tools exercised on private offload runtime"
+  ],
+  "limits": [
+    "Frames/crops and JSON values retain source hashes.",
+    "Code view exports selected observable state; hidden GPU state and functions are not reconstructed from video.",
+    "Diagnostic mesh projections preserve source arrays; they are not canonical material renders."
+  ]
+}

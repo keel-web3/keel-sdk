@@ -1,22 +1,27 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {mkdtemp,writeFile,rm,mkdir,copyFile} from 'node:fs/promises';
+import {mkdtemp,writeFile,readFile,rm,mkdir,copyFile} from 'node:fs/promises';
 import os from 'node:os';
 import path from 'node:path';
+import {pathToFileURL} from 'node:url';
 import {spawnSync} from 'node:child_process';
 import {runTrailerTool} from '../src/index.mjs';
 const python=process.env.TRAILER_PYTHON??'python3';
 test('web adapter captures a paused clock, scripted clicks and match-cut element rects reproducibly',async()=>{
  const root=await mkdtemp(path.join(os.tmpdir(),'keel-trailer-web-'));
  try{
-  const html='<html data-mode="idle"><body><button id="button" onclick="document.documentElement.dataset.mode=\'clicked\'">GO</button><div id="box" style="width:80px;height:40px;background:#ff00ff"></div><div id="time"></div><script>setInterval(()=>document.querySelector("#time").textContent=Date.now(),50)</script></body></html>';
-  const capture={adapter:'web',url:'data:text/html,'+encodeURIComponent(html),width:320,height:240,fps:10,frames:8,readySelector:'#box',readyFrames:2,rectSelectors:['#box'],stateAttributes:['data-mode'],steps:[{frame:3,action:'click',selector:'#button'}]};
+  const probe=(await readFile(new URL('../src/probe.mjs',import.meta.url),'utf8')).replaceAll('export ','');
+  const html='<html data-mode="idle"><body><button id="button" onclick="document.documentElement.dataset.mode=\'clicked\'">GO</button><div id="box" style="width:80px;height:40px;background:#ff00ff"></div><div id="time"></div><script>setInterval(()=>document.querySelector("#time").textContent=Date.now(),50)</script><script>'+probe+';window.__KEEL_INSPECTION__=createInspectionProbe();window.__KEEL_INSPECTION__.register("page","state",()=>({mode:document.documentElement.dataset.mode}));</script></body></html>';
+  await writeFile(path.join(root,'index.html'),html);
+  const capture={adapter:'web',url:pathToFileURL(path.join(root,'index.html')).href,width:320,height:240,fps:10,frames:8,readySelector:'#box',readyFrames:2,inspectionFrames:[0,3],rectSelectors:['#box'],stateAttributes:['data-mode'],steps:[{frame:3,action:'click',selector:'#button'}]};
   const opts={workspaceRoot:root,python};
   const a=await runTrailerTool('trailer-capture',{capture,outDir:'a'},opts);
   const b=await runTrailerTool('trailer-capture',{capture,outDir:'b'},opts);
   assert.equal(a.frames,8);assert.deepEqual(a.rects,b.rects);assert.equal(a.sha256,b.sha256);
   assert.ok(a.marks.some(m=>m.name==='state:clicked' && m.frame===3));
   assert.equal(a.rects[0].elements['#box'].width,80);
+  assert.equal(a.inspectionFiles.length,2);assert.equal(JSON.parse(await readFile(a.inspectionFiles[1].path,'utf8')).state.page.mode,'clicked');
+  assert.equal(JSON.parse(await readFile(a.inspectionFiles[1].path,'utf8')).frame,3);
  }finally{await rm(root,{recursive:true,force:true});}
 });
 test('Game Boy adapter isolates saves, reads symbols and applies inputs on exact frames',{skip:!process.env.TRAILER_TEST_ROM},async()=>{

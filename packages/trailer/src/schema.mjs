@@ -1,3 +1,4 @@
+import {INSPECTION_TOOL_SCHEMAS} from './inspection-schema.mjs';
 // Deliberately small JSON Schema vocabulary: also validated without a dependency.
 const str = {type:'string', minLength:1, maxLength:4096};
 const num = {type:'number'};
@@ -71,7 +72,7 @@ export const CAPTURE_SCHEMA = obj({
   adapter:{enum:['web','gameboy','video','image']},options:{type:'object',additionalProperties:true},
   path:str,url:str,cinematicFlag:str,width:integer,height:integer,fps:pos,frames:integer,
   epoch:str,readySelector:str,readyAttribute:str,readyValue:str,readyFrames:uint,seed:uint,
-  rectSelectors:array(str),stateAttributes:array(str),
+  rectSelectors:array(str),stateAttributes:array(str),inspectionFrames:array(uint),probeGlobal:str,
   steps:array(obj({frame:uint,action:{enum:['click','scroll','mark']},selector:str,x:num,y:num,name:str,endFrame:uint,fromX:num,fromY:num},['frame','action'])),
   rom:str,guestRom:str,symbolsPath:str,reads:array(obj({name:str,address:uint,bank:uint,symbol:str,side:{enum:['host','guest']}},['name'])),
   events:array(event),link:obj({host:hook,guest:hook},['host','guest']),
@@ -79,6 +80,7 @@ export const CAPTURE_SCHEMA = obj({
 }, ['adapter']);
 const timelineInput = obj({timeline:TIMELINE_SCHEMA,timelinePath:str});
 export const TOOL_SCHEMAS = {
+  ...INSPECTION_TOOL_SCHEMAS,
   'trailer-plan':obj({brief:str,sources:array(source,1),bpm:pos,durationBeats:pos,targets:array(target,1),font:str},['brief','sources']),
   'trailer-capture':obj({capture:CAPTURE_SCHEMA,outDir:str},['capture','outDir']),
   'trailer-beats':obj({audioPath:str,bpm:pos,beatSeconds:pos,firstDownbeat:nonneg,beats:array(nonneg,2),outPath:str},['audioPath']),

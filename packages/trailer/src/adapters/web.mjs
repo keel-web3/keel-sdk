@@ -2,6 +2,7 @@ import {spawn} from 'node:child_process';
 import {once} from 'node:events';
 import {writeFile,mkdir,readFile} from 'node:fs/promises';
 import {createHash} from 'node:crypto';
+import {assertInspection} from '../inspection.mjs';
 export async function webCapture(c,outDir) {
   let chromium;
   try {({chromium}=await import('playwright'));}catch{throw Error('Web capture needs playwright and its Chromium browser: pnpm --filter @keel/trailer exec playwright install chromium');}
@@ -31,7 +32,7 @@ export async function webCapture(c,outDir) {
     exited=new Promise((resolve,reject)=>{ff.once('error',reject);ff.once('close',resolve);});ff.stderr.on('data',d=>stderr.push(d));
     // Keep process/pipe failures visible even while taking screenshots.
     let pipeError;ff.stdin.on('error',e=>{pipeError=e;});
-    const marks=[],rects=[];let last='';
+    const marks=[],rects=[],inspectionFiles=[];let last='';
     for(let f=0;f<frames;f++) {
       for(const step of c.steps??[]) {
         if(step.frame===f) {
@@ -50,13 +51,20 @@ export async function webCapture(c,outDir) {
       if(c.rectSelectors?.length)rects.push({frame:f,elements:await page.evaluate(selectors=>{
         const out={};for(const selector of selectors){const el=document.querySelector(selector);if(el){const r=el.getBoundingClientRect();out[selector]={x:r.x,y:r.y,width:r.width,height:r.height};}}return out;
       },c.rectSelectors)});
+      if(c.inspectionFrames?.includes(f)) {
+        const snapshot=await page.evaluate(({name,frame,seconds})=>{
+          const probe=globalThis[name];if(!probe||typeof probe.snapshot!=='function')throw Error('Page has no inspection probe: '+name);
+          return probe.snapshot({frame,seconds});
+        },{name:c.probeGlobal??'__KEEL_INSPECTION__',frame:f,seconds:f/fps});
+        assertInspection(snapshot);const p=outDir+'/inspection-'+String(f).padStart(8,'0')+'.json';await writeFile(p,JSON.stringify(snapshot,null,2)+'\n');inspectionFiles.push({frame:f,path:p});
+      }
       if(pipeError)throw pipeError;
       const png=await page.screenshot({type:'png',timeout:180000,animations:'allow'});
       if(!ff.stdin.write(png))await once(ff.stdin,'drain');
       await page.clock.runFor(Math.round((f+1)*1000/fps)-Math.round(f*1000/fps));
     }
     ff.stdin.end();const code=await exited;if(code!==0)throw Error('ffmpeg web capture failed: '+Buffer.concat(stderr).toString().slice(-2000));
-    const result={adapter:'web',path:video,fps,width,height,frames,url:url.href,epoch,marks,rects,
+    const result={adapter:'web',path:video,fps,width,height,frames,url:url.href,epoch,marks,rects,inspectionFiles,
       sha256:createHash('sha256').update(await readFile(video)).digest('hex'),
       determinism:'Paused fake clock and seeded Math.random; recapture also depends on pinned browser, GPU renderer and page assets.'};
     const metadataPath=outDir+'/web.json';await writeFile(metadataPath,JSON.stringify(result,null,2)+'\n');

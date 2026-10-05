@@ -2,7 +2,7 @@
 import {readFile} from 'node:fs/promises';
 import {runTrailerTool,TIMELINE_SCHEMA,TOOL_SCHEMAS,validateTimeline} from './index.mjs';
 const [op,...args]=process.argv.slice(2);
-const help='keel-trailer plan|capture|beats|render|verify|stills --json request.json [--workspace DIR]\nkeel-trailer render TIMELINE --out DIR [--preview] [--targets 16x9,9x16]\nkeel-trailer render TIMELINE --out DIR --stills 1,7.5\nkeel-trailer schema|tools|validate TIMELINE\nSet TRAILER_PYTHON to the interpreter with requirements.txt installed.';
+const help='keel-trailer plan|capture|beats|render|verify|stills|snapshot|clip|inspect --json request.json [--workspace DIR]\nkeel-trailer render TIMELINE --out DIR [--preview] [--targets 16x9,9x16]\nkeel-trailer render TIMELINE --out DIR --stills 1,7.5\nkeel-trailer schema|tools|validate TIMELINE\nSet TRAILER_PYTHON to the interpreter with requirements.txt installed.';
 function opt(key,fallback){const i=args.indexOf('--'+key);return i<0?fallback:args[i+1];}
 try {
   if(!op||op==='--help'){console.log(help);process.exit(0);}

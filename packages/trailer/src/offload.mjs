@@ -14,7 +14,7 @@ function command(binary,args,log=()=>{}) {
   });
 }
 export async function offload(op,input,{log=()=>{}}={}) {
-  if(!['render','stills'].includes(op))throw Error('Offload supports render and stills; capture needs its browser/ROM runtime on the selected machine');
+  if(!['render','stills','snapshot','clip','inspect'].includes(op))throw Error('Capture needs its browser/ROM runtime on the selected machine');
   const stage=await mkdtemp(path.join(os.tmpdir(),'keel-trailer-offload-'));const id='keel-trailer-'+randomUUID();
   const relative='work/'+id;const host='yuna-mbp';const ssh=s=>command('ssh',['-o','BatchMode=yes','-o','ConnectTimeout=10',host,'export PATH="$HOME/.local/share/keel-trailer-runtime/bin":/opt/homebrew/bin:$PATH; '+s],log);
   let created=false;
@@ -24,18 +24,19 @@ export async function offload(op,input,{log=()=>{}}={}) {
     await ssh('command -v ffmpeg && python3 -c "import sys; assert sys.version_info >= (3,11)"');
     await ssh('mkdir -p "$HOME/'+relative+'"');created=true;
     const pkg=fileURLToPath(new URL('../',import.meta.url));await mkdir(path.join(stage,'pkg'));
-    for(const part of ['src','python','package.json','requirements.txt'])await cp(path.join(pkg,part),path.join(stage,'pkg',part),{recursive:true,filter:p=>!p.includes('__pycache__')});
+    for(const part of ['src','python','assets','package.json','requirements.txt'])await cp(path.join(pkg,part),path.join(stage,'pkg',part),{recursive:true,filter:p=>!p.includes('__pycache__')});
     const x=structuredClone(input),t=x.timeline;const mapping=new Map();let index=0;
     async function media(p) {
       if(mapping.has(p))return mapping.get(p);
       let target;
-      if(t.reference && p.startsWith(input.timeline.reference.capturesRoot+path.sep))target=path.join('captures',path.relative(input.timeline.reference.capturesRoot,p));
+      if(t?.reference && p.startsWith(input.timeline.reference.capturesRoot+path.sep))target=path.join('captures',path.relative(input.timeline.reference.capturesRoot,p));
       else target=path.join('media',String(index++)+path.extname(p));
       const dest=path.join(stage,target);await mkdir(path.dirname(dest),{recursive:true});await cp(p,dest);mapping.set(p,target);return target;
     }
-    for(const s of t.sources){s.path=await media(s.path);if(s.metadataPath)s.metadataPath=await media(s.metadataPath);for(const v of s.variants??[]){v.path=await media(v.path);if(v.metadataPath)v.metadataPath=await media(v.metadataPath);}}
-    for(const shot of t.shots)for(const text of [shot.text,shot.caption])if(text)text.font=await media(text.font);
-    if(t.reference){t.reference.font=await media(t.reference.font);t.reference.capturesRoot='captures';}
+    for(const s of t?.sources??[]){s.path=await media(s.path);if(s.metadataPath)s.metadataPath=await media(s.metadataPath);for(const v of s.variants??[]){v.path=await media(v.path);if(v.metadataPath)v.metadataPath=await media(v.metadataPath);}}
+    for(const shot of t?.shots??[])for(const text of [shot.text,shot.caption])if(text)text.font=await media(text.font);
+    if(t?.reference){t.reference.font=await media(t.reference.font);t.reference.capturesRoot='captures';}
+    if(x.mediaPath)x.mediaPath=await media(x.mediaPath);
     const localOutput=x.outDir;x.outDir='output';delete x.remote;
     await writeFile(path.join(stage,'request.json'),JSON.stringify({name:'trailer-'+op,input:x}));
     await command('rsync',['-a',stage+'/',host+':'+relative+'/'],log);
@@ -52,8 +53,13 @@ export async function offload(op,input,{log=()=>{}}={}) {
       if(v && typeof v==='object')return Object.fromEntries(Object.entries(v).map(([k,val])=>[k,rebase(val)]));
       return v;
     }
+    function remoteRoot(v){
+      const marker='/'+relative+'/output';if(typeof v==='string'&&v.includes(marker))return v.slice(0,v.indexOf(marker)+marker.length);
+      if(v&&typeof v==='object')for(const x of Object.values(v)){const root=remoteRoot(x);if(root)return root;}
+    }
+    const root=remoteRoot(result);if(root){const f=path.join(localOutput,'index.html');try{const html=await readFile(f,'utf8');await writeFile(f,html.replaceAll(root,JSON.stringify(localOutput).slice(1,-1).replaceAll('<','\\u003c')));}catch(e){if(e.code!=='ENOENT')throw e;}}
     const local=rebase(result);local.execution={host,offloaded:true,privateTransfer:true};
-    for(const name of ['render.json','verification.json']) {
+    for(const name of ['render.json','verification.json','inspection.json','snapshots.json','clip.json']) {
       const f=path.join(localOutput,name);try{const m=JSON.parse(await readFile(f,'utf8'));await writeFile(f,JSON.stringify(rebase(m),null,2)+'\n');}catch(e){if(e.code!=='ENOENT')throw e;}
     }
     return local;

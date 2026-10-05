@@ -7,6 +7,9 @@ import {createHash} from 'node:crypto';
 import {assertTimeline,assertSchema,TOOL_SCHEMAS,validateTimeline,TIMELINE_SCHEMA,CAPTURE_SCHEMA} from './schema.mjs';
 import {editSeconds,beatToSeconds} from './timing.mjs';
 import {captureWithAdapter,registerCaptureAdapter} from './adapters/index.mjs';
+import {inspectSnapshot,mediaSnapshot,clipMedia,assertInspection} from './inspection.mjs';
+export {createInspectionProbe,meshSnapshot,graphSnapshot,gridSnapshot} from './probe.mjs';
+export {INSPECTION_SCHEMA,assertInspection,queryInspection} from './inspection.mjs';
 export {validateTimeline,TIMELINE_SCHEMA,TOOL_SCHEMAS,CAPTURE_SCHEMA,registerCaptureAdapter};
 export {beatToSeconds,editSeconds,boundaryFrame,sourceFrame} from './timing.mjs';
 const packageRoot=fileURLToPath(new URL('../',import.meta.url));
@@ -96,7 +99,24 @@ export async function runTrailerTool(name,input,{workspaceRoot='.',python,log,si
   assertSchema(input,TOOL_SCHEMAS[name]);const x=structuredClone(input);
   if(name==='trailer-plan')return plan(x);
   const root=await realpath(workspaceRoot);const context={...(python?{python}:{}),...(log?{log}:{}),...(signal?{signal}:{})};
+  async function onHelper(name,x){if(!allowOffload){checkLoad(name);throw Error('Remote offload is disabled in this worker');}const {offload}=await import('./offload.mjs');return offload(name.slice('trailer-'.length),x,context);}
   if(checkMachineLoad&&name==='trailer-capture')checkLoad(name);
+  if(name==='trailer-inspect') {
+    if((x.snapshot===undefined)===(x.snapshotPath===undefined))throw Error('Provide exactly one of snapshot or snapshotPath');
+    if(x.snapshotPath){const p=await file(root,root,x.snapshotPath);if((await stat(p)).size>64000000)throw Error('Snapshot exceeds 64 MB');x.snapshot=JSON.parse(await readFile(p,'utf8'));delete x.snapshotPath;}
+    assertInspection(x.snapshot);x.outDir=await output(root,x.outDir);
+    if(x.remote||(checkMachineLoad&&os.loadavg()[0]>40))return onHelper(name,x);
+    return inspectSnapshot(x,(op,data)=>runWorker(op,data,context));
+  }
+  if(name==='trailer-snapshot' || name==='trailer-clip') {
+    if(name==='trailer-snapshot' && (Number(x.mediaPath!==undefined)+Number(x.timeline!==undefined)+Number(x.timelinePath!==undefined)!==1))throw Error('Provide one mediaPath, timeline or timelinePath');
+    if(x.mediaPath)x.mediaPath=await file(root,root,x.mediaPath);
+    else {x.timeline=await resolveTimeline(root,x,context);delete x.timelinePath;if(x.target&&!x.timeline.targets.some(t=>t.id===x.target))throw Error('Unknown target');}
+    x.outDir=await output(root,x.outDir);
+    if(x.remote||(checkMachineLoad&&os.loadavg()[0]>40))return onHelper(name,x);
+    if(name==='trailer-clip')return clipMedia(x,(op,data)=>runWorker(op,data,context));
+    return mediaSnapshot(x,(op,data)=>runWorker(op,data,context));
+  }
   if(name==='trailer-beats'){
     x.audioPath=await file(root,root,x.audioPath);
     const result=await runWorker('beats',x,context);
@@ -106,6 +126,7 @@ export async function runTrailerTool(name,input,{workspaceRoot='.',python,log,si
   if(name==='trailer-capture'){
     const c=x.capture;
     for(const k of ['path','rom','guestRom','symbolsPath'])if(c[k])c[k]=await file(root,root,c[k]);
+    if(c.inspectionFrames?.some(f=>f>=(c.frames??600)))throw Error('Inspection frame falls outside capture');
     if(c.adapter==='web'&&!c.url)throw Error('Web capture requires url');
     if(c.adapter==='gameboy'&&!c.rom)throw Error('Game Boy capture requires rom');
     if(['video','image'].includes(c.adapter)&&!c.path)throw Error('File capture requires path');

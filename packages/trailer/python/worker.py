@@ -5,6 +5,9 @@ from common import analyze_beats
 from renderer import render,verify,stills
 def main():
     op=sys.argv[1];x=json.load(sys.stdin)
+    if op in ('snapshot','inspect','clip'):
+        import inspection
+        return getattr(inspection,op)(x)
     if op=="beats":return analyze_beats(x["audioPath"],**{k:x[k] for k in ("bpm","beatSeconds","firstDownbeat","beats") if k in x})
     if op=="render":return render(x["timeline"],x["outDir"],x.get("preview",False),x.get("targets"))
     if op=="verify":return verify(x["timeline"],x["renderDir"],x.get("attackToleranceMs",15),x.get("loudnessTolerance",.5))

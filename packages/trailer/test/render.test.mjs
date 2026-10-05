@@ -39,10 +39,12 @@ test('tiny end-to-end render, all targets, deterministic hashes, exact stills, v
   assert.equal(one.outputs.length,3);
   for(let i=0;i<3;i++){assert.equal(one.outputs[i].frames,48);assert.equal(one.outputs[i].sha256,two.outputs[i].sha256);assert.equal(one.outputs[i].rgbSha256,two.outputs[i].rgbSha256);}
   const still=await runTrailerTool('trailer-stills',{timeline,outDir:'stills',times:[2.25],targets:['wide']},opts);
-  const exact=path.join(root,'exact.png');
-  const ff=spawnSync('ffmpeg',['-v','error','-y','-i',one.outputs[0].losslessPath,'-vf','select=eq(n\\,27)','-frames:v','1',exact]);assert.equal(ff.status,0,ff.stderr.toString());
-  const decode=p=>spawnSync('ffmpeg',['-v','error','-i',p,'-f','rawvideo','-pix_fmt','rgb24','-']).stdout;
-  assert.deepEqual(decode(still.stills[0].path),decode(exact));
+  const inspected=await runTrailerTool('trailer-snapshot',{timeline,outDir:'snapshot',frames:[27],target:'wide',pixelData:true},opts);
+  assert.equal(inspected.stills[0].frame,27);
+  const exact=path.join(root,'exact.rgb');
+  const ff=spawnSync('ffmpeg',['-v','error','-y','-i',one.outputs[0].losslessPath,'-vf','select=eq(n\\,27)','-frames:v','1','-f','rawvideo','-pix_fmt','rgb24',exact]);assert.equal(ff.status,0,ff.stderr.toString());
+  const decode=p=>spawnSync(python,['-c','from PIL import Image;import sys;sys.stdout.buffer.write(Image.open(sys.argv[1]).convert("RGB").tobytes())',p]).stdout;const exactPixels=await readFile(exact);
+  assert.deepEqual(decode(still.stills[0].path),exactPixels);assert.deepEqual(await readFile(inspected.stills[0].pixels.path),exactPixels);
   const report=await runTrailerTool('trailer-verify',{timeline,renderDir:'one'},opts);
   assert.equal(report.outputs.length,3);assert.ok(report.beatAlignment.passed);assert.ok(report.passed,JSON.stringify(report.outputs));
   const offbeat=structuredClone(timeline);offbeat.shots[0].beats=4.2;offbeat.shots[1].startBeat=4.2;offbeat.shots[1].beats=3.8;
