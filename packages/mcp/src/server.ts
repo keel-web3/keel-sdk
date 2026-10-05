@@ -2,7 +2,9 @@ import { PREPARED_COPY_GUIDANCE, COPY_PUBLICATION_GUIDANCE, BINARY_PAYLOAD_GUIDA
 import { createWorkspace } from "./paths.js";
 import { getFrayAuctionReviewPrompt, getKeelAssetReviewPrompt, getKeelDraftRepairPrompt, getKeelProjectPlanPrompt, PROMPT_DEFINITIONS } from "./prompts.js";
 import { getMcpResource, McpResourceNotFoundError, RESOURCE_DEFINITIONS } from "./resources.js";
-import { toolByName, TOOL_DEFINITIONS } from "./tools.js";
+import { TOOL_DEFINITIONS } from "./tools.js";
+import { loadMcpPlugins, type McpPluginOptions } from "./plugins.js";
+import type { ToolDefinition } from "./types.js";
 import {
   MCP_PROTOCOL_VERSION,
   MCP_SERVER_NAME,
@@ -113,8 +115,12 @@ function initializeParams(value: unknown): void {
   }
 }
 
-export async function createMcpServer(options: { readonly workspaceRoot?: string } = {}): Promise<McpServer> {
+export async function createMcpServer(options: { readonly workspaceRoot?: string } & McpPluginOptions = {}): Promise<McpServer> {
   const workspace = await createWorkspace(options.workspaceRoot ?? ".");
+  const info: ToolDefinition = { descriptor: { name: "keel-plugins-list", description: "List explicitly installed local KEEL plugins, versions, entries and tool names.", inputSchema: { type: "object", properties: {}, additionalProperties: false } }, async run(_context, input) { emptyParams(input, "keel-plugins-list"); return { schema: "keel-plugins@1", plugins: plugins.map(({id,version,entry,tools}) => ({id,version,entry,tools:tools.map(t=>t.descriptor.name)})) }; } };
+  const plugins = await loadMcpPlugins(options, [...TOOL_DEFINITIONS, info]);
+  const tools = [...TOOL_DEFINITIONS, info, ...plugins.flatMap(plugin => plugin.tools)];
+  const instructions = [MCP_INSTRUCTIONS, ...plugins.map(plugin => plugin.instructions ?? "")].join(" ");
   let initialized = false;
   let stopped = false;
   return {
@@ -149,7 +155,7 @@ export async function createMcpServer(options: { readonly workspaceRoot?: string
           protocolVersion: MCP_PROTOCOL_VERSION,
           capabilities: { tools: { listChanged: false }, prompts: { listChanged: false }, resources: { subscribe: false, listChanged: false } },
           serverInfo: { name: MCP_SERVER_NAME, version: MCP_SERVER_VERSION },
-          instructions: MCP_INSTRUCTIONS,
+          instructions,
         });
       }
       if (stopped) return rpcError(request.id, -32000, "MCP server is stopped.");
@@ -172,7 +178,7 @@ export async function createMcpServer(options: { readonly workspaceRoot?: string
         } catch (error) {
           return rpcError(request.id, -32602, errorText(error));
         }
-        return response(request.id, { tools: TOOL_DEFINITIONS.map((entry) => entry.descriptor) });
+        return response(request.id, { tools: tools.map((entry) => entry.descriptor) });
       }
       if (request.method === "tools/call") {
         let params: Record<string, unknown>;
@@ -185,7 +191,7 @@ export async function createMcpServer(options: { readonly workspaceRoot?: string
           return rpcError(request.id, -32602, errorText(error));
         }
         if (typeof params.name !== "string" || params.name.length === 0) return rpcError(request.id, -32602, "tools/call requires a tool name.");
-        const tool = toolByName(params.name);
+        const tool = tools.find(entry => entry.descriptor.name === params.name);
         if (tool === undefined) return response(request.id, toolError(new Error(`Unknown MCP tool: ${params.name}.`)));
         try {
           const result = await tool.run({ workspace }, params.arguments ?? {});
