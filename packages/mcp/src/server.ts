@@ -1,3 +1,4 @@
+import { findKeelRpcSetupError } from "@keel/sdk/rpc";
 import { PREPARED_COPY_GUIDANCE, COPY_PUBLICATION_GUIDANCE, BINARY_PAYLOAD_GUIDANCE } from "./prepared-copy-guidance.js";
 import { createWorkspace } from "./paths.js";
 import { getFrayAuctionReviewPrompt, getKeelAssetReviewPrompt, getKeelDraftRepairPrompt, getKeelProjectPlanPrompt, PROMPT_DEFINITIONS } from "./prompts.js";
@@ -75,11 +76,15 @@ function toolResult(value: unknown): ToolCallResult {
 }
 
 function toolError(error: unknown): ToolCallResult {
+  const setup = findKeelRpcSetupError(error);
+  if (setup) { const structuredContent = { code: setup.code, reason: setup.reason, retryAfterMs: setup.retryAfterMs, providers: setup.providers, setup: setup.setup, signing: "not-performed", submission: "not-performed" };
+    return { content: [{ type: "text", text: JSON.stringify(structuredContent) }], structuredContent, isError: true }; }
   const text = errorText(error);
   return { content: [{ type: "text", text }], isError: true };
 }
 
 const MCP_INSTRUCTIONS = [
+  "Ethereum Sepolia read-only checks default to the public PublicNode, Tenderly and public.1rpc.io pool. Respect chain checks, provider rate-limit cooldowns and private workspace/env overrides. If a tool returns rpc.setup-required, explain the failure, ask which provider the user prefers, and help them create a Sepolia endpoint with Alchemy, Infura or QuickNode. Save keyed URLs locally using pnpm rpc:configure, rerun pnpm rpc:check and the failed exact verification. Never ask for wallet keys, seed phrases or API keys in chat; never bypass missing receipts or substitute a different chain.",
   PREPARED_COPY_GUIDANCE,
   COPY_PUBLICATION_GUIDANCE,
   BINARY_PAYLOAD_GUIDANCE,

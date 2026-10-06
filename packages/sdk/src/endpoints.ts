@@ -1,5 +1,6 @@
+import { normalizeKeelRpcUrl, resolveKeelRpcConfiguration, type KeelRpcEnvironment } from "./rpc.js";
 export const KEEL_TEST_STUDIO_URL = "https://keel-test.149-28-255-65.sslip.io" as const;
-export const KEEL_TEST_PUBLIC_RPC_URL = "https://rpc.keel-test.149-28-255-65.sslip.io" as const;
+export const KEEL_TEST_PUBLIC_RPC_URL = "https://ethereum-sepolia-rpc.publicnode.com" as const;
 export const KEEL_LEGACY_STRATUS_TEST_STUDIO_URL = "https://stratus-test.149-28-255-65.sslip.io" as const;
 export const KEEL_LEGACY_STRATUS_TEST_PUBLIC_RPC_URL = "https://rpc.stratus-test.149-28-255-65.sslip.io" as const;
 
@@ -8,10 +9,11 @@ export type KeelEndpointSource = "explicit" | "environment" | "canonical-default
 export interface KeelEndpointOverrides {
   readonly studioUrl?: string;
   readonly publicRpcUrl?: string;
+  readonly publicRpcUrls?: readonly string[];
   readonly indexerUrl?: string;
 }
 
-export interface KeelEndpointEnvironment {
+export interface KeelEndpointEnvironment extends KeelRpcEnvironment {
   readonly KEEL_STUDIO_URL?: string;
   /** Public wallet/browser RPC. KEEL_RPC_URL remains reserved for server upstreams. */
   readonly KEEL_PUBLIC_RPC_URL?: string;
@@ -24,6 +26,7 @@ export interface ResolvedKeelEndpoints {
   readonly schema: "keel-endpoints@1";
   readonly studioUrl: string;
   readonly publicRpcUrl: string;
+  readonly publicRpcUrls: readonly string[];
   readonly indexerUrl?: string;
   readonly sources: {
     readonly studioUrl: KeelEndpointSource;
@@ -47,18 +50,19 @@ export function resolveKeelEndpoints(
     KEEL_TEST_STUDIO_URL,
     "studioUrl",
   );
-  const publicRpc = chooseEndpoint(
-    overrides.publicRpcUrl,
-    environment.KEEL_PUBLIC_RPC_URL,
-    KEEL_TEST_PUBLIC_RPC_URL,
-    "publicRpcUrl",
-  );
+  const rpc = resolveKeelRpcConfiguration({
+    ...(overrides.publicRpcUrl === undefined ? {} : { rpcUrl: overrides.publicRpcUrl }),
+    ...(overrides.publicRpcUrls === undefined ? {} : { rpcUrls: overrides.publicRpcUrls }),
+  }, environment);
+  const publicRpcUrls = Object.freeze(rpc.rpcUrls.map(url => normalizeKeelRpcUrl(url)));
+  const publicRpc = { url: publicRpcUrls[0]!, source: rpc.source === "public-default" ? "canonical-default" as const : rpc.source as "explicit" | "environment" };
   const indexer = chooseOptionalEndpoint(overrides.indexerUrl, environment.KEEL_INDEXER_URL, "indexerUrl");
 
   return Object.freeze({
     schema: "keel-endpoints@1",
     studioUrl: studio.url,
     publicRpcUrl: publicRpc.url,
+    publicRpcUrls,
     ...(indexer === undefined ? {} : { indexerUrl: indexer.url }),
     sources: Object.freeze({
       studioUrl: studio.source,
@@ -78,9 +82,10 @@ function chooseEndpoint(
   fallback: string,
   label: string,
 ): { readonly url: string; readonly source: KeelEndpointSource } {
-  if (explicit !== undefined) return { url: publicHttpsOrigin(explicit, label), source: "explicit" };
-  if (environment !== undefined) return { url: publicHttpsOrigin(environment, label), source: "environment" };
-  return { url: publicHttpsOrigin(fallback, label), source: "canonical-default" };
+  const validate = (value: string) => publicHttpsOrigin(value, label);
+  if (explicit !== undefined) return { url: validate(explicit), source: "explicit" };
+  if (environment !== undefined) return { url: validate(environment), source: "environment" };
+  return { url: validate(fallback), source: "canonical-default" };
 }
 
 function chooseOptionalEndpoint(

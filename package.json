@@ -115,7 +115,9 @@
     "sandbox:test": "node packages/game-engine/chain/alpha-e2e.mjs --template blank",
     "pixel:test": "pnpm --filter @keel/pixel test",
     "pixel:serve": "pnpm --filter @keel/pixel serve",
-    "game:arena": "node packages/game-engine/chain/arena.mjs"
+    "game:arena": "node packages/game-engine/chain/arena.mjs",
+    "rpc:check": "node scripts/rpc.mjs check",
+    "rpc:configure": "node scripts/rpc.mjs configure"
   },
   "engines": {
     "node": ">=22"

@@ -1,3 +1,4 @@
+import { keelRpcReaderTransport } from "./rpc.js";
 import { auditKeelInlineTokenURI } from "./inline-transport-audit.js";
 import { keelInlineReadGasLimit } from "./presentation.js";
 
@@ -9,9 +10,12 @@ const quantity = (value: unknown): bigint => {
 };
 /** Read-only, bounded, block-pinned user-facing audit. Never signs or submits. */
 export async function readKeelInlineTokenAudit(input: {
-  readonly rpcUrl: string; readonly chainId: number; readonly collection: string; readonly tokenId: string;
+  readonly rpcUrl?: string; readonly chainId: number; readonly collection: string; readonly tokenId: string;
 }, fetcher: typeof fetch = fetch) {
-  const {rpcUrl, chainId, collection, tokenId} = input;
+  const {chainId, collection, tokenId} = input;
+  const transport = keelRpcReaderTransport(input.rpcUrl, chainId);
+  const rpcUrl = transport.rpcUrl;
+  if (fetcher === fetch) fetcher = transport.fetchImpl;
   const endpoint = new URL(rpcUrl);
   if (rpcUrl.length > 2048 || endpoint.username || endpoint.password || endpoint.hash
       || !(endpoint.protocol === "https:" || endpoint.protocol === "http:" && ["localhost", "127.0.0.1", "[::1]"].includes(endpoint.hostname))) throw new TypeError("Use HTTPS RPC or loopback HTTP without URL credentials.");

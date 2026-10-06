@@ -39,7 +39,6 @@ Other MCP clients can use the generic JSON configuration below.
       "args": ["/path/to/keel-sdk/packages/mcp/dist/cli.js", "--workspace", "/path/to/artwork-workspace"],
       "env": {
         "KEEL_STUDIO_URL": "https://keel-test.149-28-255-65.sslip.io",
-        "KEEL_PUBLIC_RPC_URL": "https://rpc.keel-test.149-28-255-65.sslip.io",
         "KEEL_INDEXER_URL": "https://your-indexer.example",
         "KEEL_STUDIO_AGENT_TOKEN": "<creator-scoped-studio-token>"
       }
@@ -49,11 +48,12 @@ Other MCP clients can use the generic JSON configuration below.
 ```
 
 All endpoint values are optional. `keel-endpoint-config` resolves each URL with
-this precedence: explicit tool input, KEEL environment value, canonical KEEL
-test default. There is no canonical indexer default. `FRAY_STUDIO_URL` remains
+this precedence: explicit tool input, KEEL environment value, private workspace
+RPC configuration, public Sepolia pool (PublicNode, Tenderly and public.1rpc.io). Studio
+and indexer settings use their existing explicit/environment/default rules. There is no canonical indexer default. `FRAY_STUDIO_URL` remains
 a deprecated Studio-only compatibility input; new configuration must use
-`KEEL_STUDIO_URL`. `KEEL_PUBLIC_RPC_URL` names the browser/wallet-facing RPC and
-must not be confused with a server's private upstream `KEEL_RPC_URL`.
+`KEEL_STUDIO_URL`. `KEEL_SEPOLIA_RPC_URL(S)` or `KEEL_PUBLIC_RPC_URL(S)` select local verification
+providers and must not be confused with a server's private upstream `KEEL_RPC_URL`.
 
 The current canonical Studio upload page is:
 `https://keel-test.149-28-255-65.sslip.io/studio/projects/new`.
@@ -75,3 +75,12 @@ inherit arbitrary MCP actions from local clients. For the full MCP workflow in
 Codex or Claude, configure this server in that client and preserve its own
 permissions and exact creator review boundaries. The desktop catalog and the
 MCP `keel://mcp/engine` resource share the SDK decision source.
+
+Call `keel-rpc-check` before selected-chain verification. The public pool checks
+chain identity and honors rate-limit cooldowns/history failover. If it returns
+`rpc.setup-required`, ask which provider the creator prefers and help them create
+a Sepolia endpoint with Alchemy, Infura or QuickNode. Run `pnpm rpc:configure
+--workspace /path/to/artwork` from the SDK checkout to save the URL privately,
+then `pnpm rpc:check --workspace /path/to/artwork` and the failed exact check.
+Keep API keys out of chat/Git/artwork; no wallet keys are needed. Details are in
+`docs/KEEL_RPC_SETUP.md`. A browser mint page is not established by this release.

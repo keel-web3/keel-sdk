@@ -1,0 +1,40 @@
+{
+  "schema": "keel-public-sepolia-verification@1",
+  "checkedAt": "2026-10-06T04:17:43.674Z",
+  "status": "mint-receipt-and-exact-public-readback-verified",
+  "chainId": 11155111,
+  "blockNumber": "11853464",
+  "collection": "0x14966C71bB7fc552c993cF13d97B0F249F6d5819",
+  "tokenId": "1",
+  "owner": "0x5E2a993c132A6869b9e636D139E1Ba698F7918F0",
+  "tokenURIBytes": 193146,
+  "recordedBrowserProof": "deployments/creator-inline-20261005/browser-proof.json",
+  "browserRun": "not-performed-by-this-read-only-check",
+  "rpcSource": "public-default",
+  "rpcProviders": [
+    {
+      "endpoint": "https://ethereum-sepolia-rpc.publicnode.com",
+      "checkedChainId": 11155111,
+      "reason": "history-unavailable",
+      "retryAfterMs": 0,
+      "disabled": false
+    },
+    {
+      "endpoint": "https://sepolia.gateway.tenderly.co",
+      "checkedChainId": 11155111,
+      "retryAfterMs": 0,
+      "disabled": false
+    },
+    {
+      "endpoint": "https://public.1rpc.io/…",
+      "retryAfterMs": 0,
+      "disabled": false
+    }
+  ],
+  "verifiedInfrastructureContracts": 15,
+  "tokenURIIntegrity": {
+    "byteLength": 193146,
+    "sha256": "0x1feca2e8c6d9e50233cb7e8a1e49b408fe2145b97fba8bb59d4b5c7efe2f9781"
+  },
+  "writes": 0
+}

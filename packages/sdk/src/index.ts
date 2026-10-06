@@ -35,6 +35,7 @@ export * from "./drop-api.js";
 export * from "./fray-auction-intent.js";
 export * from "./studio-capabilities.js";
 export * from "./endpoints.js";
+export * from "./rpc.js";
 export * from "./standard-chain-stack.js";
 export * from "./presentation.js";
 export * from "./collector-policy.js";

@@ -1,3 +1,4 @@
+import { mcpRpc, RPC_TOOL_DEFINITIONS } from "./rpc-tools.js";
 import { TOKEN_AUDIT_TOOL_DEFINITIONS } from "./token-audit-tool.js";
 import { KEEL_ENGINE_CATALOG, KEEL_ENGINE_CHOICES, planKeelProject } from "@keel/sdk/engine";
 import { planKeelTezosStandardRoute } from "@keel/sdk/tezos-standard";
@@ -141,13 +142,15 @@ export const ENGINE_TOOL_DEFINITIONS: readonly ToolDefinition[] = [{
   descriptor: {
     name: "keel-network-inspect",
     description: "Read the chosen EVM or Tezos RPC network now: chain identity, current head, gas boundaries, available fee quote and KEEL setup gaps. Custom networks are supported. Does not deploy, sign or establish contract authority; fee quotes need exact prepared calls before estimating publication cost.",
-    inputSchema: { type: "object", properties: { family: { type: "string", enum: ["ethereum", "tezos"] }, rpcUrl: { type: "string", minLength: 1, maxLength: 2048 }, chainId: { type: "integer", minimum: 1 }, network: { type: "string", minLength: 1, maxLength: 64 }, holdAddress: { type: "string", minLength: 42, maxLength: 42 }, builderAddress: { type: "string", minLength: 42, maxLength: 42 } }, required: ["family", "rpcUrl"], additionalProperties: false },
+    inputSchema: { type: "object", properties: { family: { type: "string", enum: ["ethereum", "tezos"] }, rpcUrl: { type: "string", minLength: 1, maxLength: 2048 }, chainId: { type: "integer", minimum: 1 }, network: { type: "string", minLength: 1, maxLength: 64 }, holdAddress: { type: "string", minLength: 42, maxLength: 42 }, builderAddress: { type: "string", minLength: 42, maxLength: 42 } }, required: ["family"], additionalProperties: false },
   },
-  async run(_context, value) {
+  async run(context, value) {
     if (!value || typeof value !== "object" || Array.isArray(value)) throw new TypeError("Network inspection requires an exact RPC target.");
     const input = value as Record<string, unknown>;
     if (Object.keys(input).some((key) => !["family", "rpcUrl", "chainId", "network", "holdAddress", "builderAddress"].includes(key))) throw new TypeError("Unsupported network inspection field.");
-    return inspectNetwork(input as unknown as KeelNetworkInspectionTarget);
+    if (input.family === "tezos") return inspectNetwork(input as unknown as KeelNetworkInspectionTarget);
+    const rpc = await mcpRpc(context, { ...(input.rpcUrl === undefined ? {} : { rpcUrl: input.rpcUrl as string }), ...(input.chainId === undefined ? {} : { chainId: input.chainId as number }) }, true);
+    return inspectNetwork({ ...input, rpcUrl: rpc.rpcUrl } as unknown as KeelNetworkInspectionTarget, rpc.fetchImpl);
   },
 }, {
   descriptor: {
@@ -208,4 +211,4 @@ export const ENGINE_TOOL_DEFINITIONS: readonly ToolDefinition[] = [{
     inputSchema: { type: "object", properties, additionalProperties: false },
   },
   async run(_context, value) { return planKeelProject(value); },
-}, ...PREPARED_COPY_TOOL_DEFINITIONS, ...COPY_READ_TOOL_DEFINITIONS, ...TOKEN_AUDIT_TOOL_DEFINITIONS];
+}, ...PREPARED_COPY_TOOL_DEFINITIONS, ...COPY_READ_TOOL_DEFINITIONS, ...TOKEN_AUDIT_TOOL_DEFINITIONS, ...RPC_TOOL_DEFINITIONS];

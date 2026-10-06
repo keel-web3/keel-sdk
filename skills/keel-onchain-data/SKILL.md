@@ -131,3 +131,17 @@ chain, or that the prepared graph was published. Keep those gates separate, as
 The full reference — the pack format, the ordering rule, the SDK entry points,
 and the sandbox report fields — is
 [On-chain data as script variables](../../docs/KEEL_ONCHAIN_DATA.md).
+
+### RPC failures and provider setup
+
+Ethereum Sepolia read-only tools default to checked public PublicNode, Tenderly and 1RPC
+endpoints, with per-provider pacing, rate-limit cooldowns and bounded failover.
+Use `keel-rpc-check`; a successful chain-ID read alone does not prove historical
+receipt access. If a tool returns `rpc.setup-required`, explain its reason and
+retry-after, ask which provider the user prefers, and help set up a Sepolia
+endpoint with Alchemy, Infura or QuickNode. From the SDK checkout, run
+`pnpm rpc:configure --workspace /path/to/artwork` to save private local settings,
+then `pnpm rpc:check --workspace /path/to/artwork` and the exact failed check.
+Read `docs/KEEL_RPC_SETUP.md`. Never request wallet keys, seed phrases or RPC API
+keys in chat; keep keyed URLs out of Git, logs and artwork. Do not bypass missing
+receipts or change chains. No browser minting page is implied by this workflow.

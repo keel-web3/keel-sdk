@@ -153,7 +153,7 @@ alone does not establish public-chain size or gas eligibility.
 
 See [the Sepolia tester handoff](SEPOLIA_TESTER_HANDOFF.md) and
 [`deployments/ethereum-sepolia.json`](../deployments/ethereum-sepolia.json)
-for the complete infrastructure inventory and modern creator-route gaps.
+for the current infrastructure inventory and tested modern creator route.
 `pnpm sepolia:manifest` lists the bundled records; `pnpm sepolia:verify`
 rechecks their receipts, runtime code and reader bindings.
 
@@ -161,18 +161,23 @@ rechecks their receipts, runtime code and reader bindings.
 pnpm setup:sepolia
 ```
 
-This reads chain ID `11155111`, pins a block, checks both contract runtime hashes
-and deployment receipts, and verifies the builder points to the recorded storage
-contract. It uses a public RPC by default; set `KEEL_SEPOLIA_RPC_URL` for another
-provider. The default is KEEL's public Sepolia RPC, which serves the historical
-deployment receipts; some public endpoints return null for these older transactions.
-Keep credentials in your environment, not Git. An RPC outage fails the
-check; it never changes networks or reports readiness on failure.
+This reads chain ID `11155111`, pins a block, checks the modern creator instance's
+contract runtime hashes and deployment receipts, and verifies factory/renderer
+and reader/store bindings. It defaults to PublicNode, Tenderly and the documented public
+1RPC Sepolia endpoint, with pacing, rate-limit cooldowns and history failover.
+Use `pnpm rpc:check` to check access, and `pnpm sepolia:smoke-check` to recheck
+the recorded mint and exact tokenURI without signing.
 
-The checked contract addresses come from
-`packages/game-engine/chain/contracts.mjs`. This check proves infrastructure
-identity only. The agent must still inspect the selected network, search and
-verify shared module/shell records, and validate your project's exact bytes.
+If public endpoints are exhausted, the agent receives `rpc.setup-required`
+and helps configure Alchemy, Infura or QuickNode. Save a private provider locally
+with `pnpm rpc:configure --workspace /path/to/art`, or set
+`KEEL_SEPOLIA_RPC_URL(S)` privately in the process environment. See
+[RPC setup](KEEL_RPC_SETUP.md). No wallet keys are needed for these checks.
+An RPC outage fails verification; it never changes networks or reports readiness.
+
+The checked records are from the SDK registry's `creator-inline-20261005`
+instance. This proves infrastructure identity only. The agent must still search
+and verify shared module/shell records and validate your project's exact bytes.
 In the editor, use the Sepolia preparation action for an unsigned review.
 Actual publication needs your wallet on Sepolia, faucet-provided test ETH,
 explicit approval, successful receipts and exact public read-back. Setup never

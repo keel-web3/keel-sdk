@@ -7,7 +7,7 @@ import {
   resolveKeelEndpoints,
 } from "../packages/sdk/dist/index.js";
 
-test("KEEL endpoints use canonical test hosts by default", () => {
+test("KEEL Studio keeps its default and RPC uses public Sepolia providers", () => {
   const resolved = resolveKeelEndpoints();
   assert.equal(resolved.studioUrl, KEEL_TEST_STUDIO_URL);
   assert.equal(resolved.publicRpcUrl, KEEL_TEST_PUBLIC_RPC_URL);
@@ -58,4 +58,17 @@ test("endpoint configuration rejects paths, credentials, queries, and insecure U
   ]) {
     assert.throws(() => resolveKeelEndpoints({ studioUrl }), /credential-free HTTPS origin/u);
   }
+});
+
+test("public RPC supports keyed HTTPS paths while rejecting URL userinfo", () => {
+  const endpoint = "https://eth-sepolia.g.alchemy.com/v2/local-test-key";
+  assert.equal(resolveKeelEndpoints({ publicRpcUrl: endpoint }).publicRpcUrl, endpoint);
+  assert.throws(() => resolveKeelEndpoints({ publicRpcUrl: "https://user:secret@example.com/v2/key" }), /RPC URL/u);
+});
+
+test("endpoint configuration resolves Sepolia lists with environment precedence", () => {
+  const resolved = resolveKeelEndpoints({}, { KEEL_SEPOLIA_RPC_URLS: "https://first.example/path,https://second.example/path" });
+  assert.deepEqual(resolved.publicRpcUrls, ["https://first.example/path", "https://second.example/path"]);
+  assert.equal(resolved.sources.publicRpcUrl, "environment");
+  assert.equal(resolveKeelEndpoints({ publicRpcUrl: "https://chosen.example" }, { KEEL_SEPOLIA_RPC_URL: "https://ignored.example" }).sources.publicRpcUrl, "explicit");
 });

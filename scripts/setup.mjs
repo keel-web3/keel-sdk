@@ -56,6 +56,9 @@ export function connectWorkspace(workspace, root = sdkRoot, editorConnection) {
     mkdirSync(dirname(file), { recursive: true });
     writeFileSync(file, content, { flag: 'wx' });
   }
+  const ignore = join(workspace, ".gitignore");
+  const priorIgnore = existsSync(ignore) ? readFileSync(ignore, "utf8") : "";
+  if (!priorIgnore.split(/\r?\n/u).includes("/.keel/rpc.json")) writeFileSync(ignore, priorIgnore + (priorIgnore && !priorIgnore.endsWith("\n") ? "\n" : "") + "/.keel/rpc.json\n");
   const skills = ['fray-keel-agent', 'keel-sdk-mcp', 'keel-onchain-data'];
   for (const name of skills) {
     const source = join(root, 'skills', name);

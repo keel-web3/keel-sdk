@@ -3,7 +3,9 @@
 import { mkdir, readFile, writeFile } from 'node:fs/promises';
 import { dirname, resolve } from 'node:path';
 import { pathToFileURL } from 'node:url';
-import { createPublicClient, http, keccak256, parseAbi } from 'viem';
+import { createSepoliaReadClient, reportRpcFailure } from './sepolia-rpc.mjs';
+import { findKeelRpcSetupError } from '../packages/sdk/dist/rpc.js';
+import { keccak256, parseAbi } from 'viem';
 
 export const SEPOLIA_CHAIN_ID = 11155111;
 export const SEPOLIA_MANIFEST_PROTOCOL = 'keel-sepolia-deployment-manifest@1';
@@ -49,6 +51,7 @@ export async function verifySepoliaManifest(client, manifest) {
       if (receipt.status !== 'success' || !addressEqual(receipt.contractAddress, entry.address) || receipt.blockNumber > blockNumber || (entry.block !== null && receipt.blockNumber !== BigInt(entry.block))) throw new Error('receipt-mismatch');
       result.verification = { status: 'receipt-and-runtime-verified', deploymentBlock: String(receipt.blockNumber), deploymentBlockHash: receipt.blockHash };
     } catch (error) {
+      if (findKeelRpcSetupError(error)) throw error;
       // Provider errors may include authenticated URLs. Only emit our own codes.
       const codes = ['missing-runtime', 'runtime-mismatch', 'missing-receipt-record', 'receipt-mismatch'];
       result.verification = { status: 'not-verified', reason: codes.includes(error.message) ? error.message : 'rpc-read-failed' };
@@ -61,7 +64,7 @@ export async function verifySepoliaManifest(client, manifest) {
     try {
       const hold = await client.readContract({ address: builder.address, abi: readerAbi, functionName: 'keelHold', blockNumber });
       bindings.push({ builder: builder.address, hold, status: holds.some(row => addressEqual(row.address, hold)) ? 'verified' : 'unrecorded-or-unverified-hold' });
-    } catch { bindings.push({ builder: builder.address, status: 'rpc-read-failed' }); }
+    } catch (error) { if (findKeelRpcSetupError(error)) throw error; bindings.push({ builder: builder.address, status: 'rpc-read-failed' }); }
   }
   const modernCreator = { ...manifest.modernCreator };
   if (!modernCreator.missing.length && !modernCreator.ambiguous.length) {
@@ -72,7 +75,7 @@ export async function verifySepoliaManifest(client, manifest) {
       modernCreator.status = addressEqual(bound, renderer.address) && [factory, renderer].every(row => row.verification.status === 'receipt-and-runtime-verified') ? 'infrastructure-verified-project-gates-required' : 'renderer-binding-or-identity-mismatch';
       modernCreator.factory = factory.address;
       modernCreator.renderer = renderer.address;
-    } catch { modernCreator.status = 'renderer-binding-unverified'; }
+    } catch (error) { if (findKeelRpcSetupError(error)) throw error; modernCreator.status = 'renderer-binding-unverified'; }
   }
   return { ...manifest, contracts, modernCreator, bindings, verification: { status: contracts.length > 0 && contracts.every(row => row.verification.status === 'receipt-and-runtime-verified') && bindings.every(row => row.status === 'verified') ? 'checked' : 'partial', blockNumber: String(blockNumber), blockHash: block.hash, checkedAt: new Date().toISOString(), scope: 'Recorded infrastructure only. Runtime presence does not authenticate an ABI or prove project publication readiness.' } };
 }
@@ -83,8 +86,8 @@ async function main() {
   const { KEEL_DEPLOYMENTS } = await import('../packages/sdk/dist/modules.js');
   let manifest = createSepoliaManifest(KEEL_DEPLOYMENTS);
   if (args.includes('--verify')) {
-    const rpc = process.env.KEEL_SEPOLIA_RPC_URL ?? 'https://rpc.keel-test.149-28-255-65.sslip.io';
-    manifest = await verifySepoliaManifest(createPublicClient({ transport: http(rpc, { timeout: 20_000, retryCount: 1 }) }), manifest);
+    const { client } = await createSepoliaReadClient();
+    manifest = await verifySepoliaManifest(client, manifest);
   }
   try {
     const creator = JSON.parse(await readFile(resolve(import.meta.dirname, '../deployments/creator-inline-20261005/manifest.json'), 'utf8'));
@@ -99,5 +102,5 @@ async function main() {
 }
 
 if (process.argv[1] && import.meta.url === pathToFileURL(resolve(process.argv[1])).href) {
-  main().catch(() => { console.error('Sepolia manifest failed. Build the SDK, check the selected RPC and retry. No transaction was sent.'); process.exitCode = 1; });
+  main().catch(error => { reportRpcFailure(error,'Sepolia manifest failed. Build the SDK, check the selected RPC and retry. No transaction was sent.'); process.exitCode = 1; });
 }

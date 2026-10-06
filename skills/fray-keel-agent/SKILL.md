@@ -303,3 +303,17 @@ authentication, registered runtime and browser proof remain separate. Report
 the full returned size separately from compressed/stored bytes; 900 KB is not
 a universal promise. Direct wallet programs must call the same check; the
 SDK/MCP cannot intercept arbitrary programs.
+
+### RPC failures and provider setup
+
+Ethereum Sepolia read-only tools default to checked public PublicNode, Tenderly and 1RPC
+endpoints, with per-provider pacing, rate-limit cooldowns and bounded failover.
+Use `keel-rpc-check`; a successful chain-ID read alone does not prove historical
+receipt access. If a tool returns `rpc.setup-required`, explain its reason and
+retry-after, ask which provider the user prefers, and help set up a Sepolia
+endpoint with Alchemy, Infura or QuickNode. From the SDK checkout, run
+`pnpm rpc:configure --workspace /path/to/artwork` to save private local settings,
+then `pnpm rpc:check --workspace /path/to/artwork` and the exact failed check.
+Read `docs/KEEL_RPC_SETUP.md`. Never request wallet keys, seed phrases or RPC API
+keys in chat; keep keyed URLs out of Git, logs and artwork. Do not bypass missing
+receipts or change chains. No browser minting page is implied by this workflow.

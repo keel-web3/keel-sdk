@@ -63,10 +63,14 @@ pnpm setup:sepolia
 
 `setup:sepolia` verifies the modern instance's exact deployment receipts, runtime
 hashes, factory/renderer and reader/store bindings. It is read-only. The default
-RPC is `https://rpc.keel-test.149-28-255-65.sslip.io`; set `KEEL_SEPOLIA_RPC_URL`
-to use another archival Sepolia endpoint. `pnpm sepolia:manifest` prints the full
+RPC pool is PublicNode, Tenderly and `https://public.1rpc.io/sepolia`, with chain checks,
+paced requests and rate-limit/history failover. Use `pnpm rpc:check` to test it.
+Private provider URLs can be configured with `pnpm rpc:configure --workspace
+/path/to/artwork`, or local `KEEL_SEPOLIA_RPC_URL(S)` environment settings; see
+[RPC setup and automatic agent guidance](KEEL_RPC_SETUP.md). `pnpm sepolia:manifest` prints the full
 inventory offline; `pnpm sepolia:verify --output=sepolia-readback.json` refreshes
-its public-chain evidence without signing. Unrelated historical records can
+its public-chain evidence without signing. The recorded [public-pool verification](../deployments/creator-inline-20261005/public-rpc-verification.json)
+reauthenticates all 15 contracts and the exact smoke tokenURI with zero writes. Unrelated historical records can
 remain unverified without substituting them for the authenticated creator instance.
 
 Start MCP with `pnpm mcp`, then call **`keel-creator-inline-prepare`** for the

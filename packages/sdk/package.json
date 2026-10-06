@@ -306,6 +306,14 @@
     "./pre-reveal": {
       "types": "./dist/pre-reveal.d.ts",
       "import": "./dist/pre-reveal.js"
+    },
+    "./rpc": {
+      "types": "./dist/rpc.d.ts",
+      "import": "./dist/rpc.js"
+    },
+    "./rpc-node": {
+      "types": "./dist/rpc-node.d.ts",
+      "import": "./dist/rpc-node.js"
     }
   },
   "files": [

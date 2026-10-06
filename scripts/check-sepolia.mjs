@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 // Read-only: verify the deployment records shipped with the practice contracts.
-import { createPublicClient, http, keccak256 } from 'viem';
+import { createSepoliaReadClient, reportRpcFailure } from './sepolia-rpc.mjs';
+import { keccak256 } from 'viem';
 import { builderAbi, keelContracts, SEPOLIA_KEEL } from '../packages/game-engine/chain/contracts.mjs';
 import { createSepoliaManifest, verifySepoliaManifest } from './sepolia-manifest.mjs';
 
@@ -33,12 +34,10 @@ export async function checkSepolia(client, record = keelContracts()) {
 
 if (process.argv[1] && import.meta.url === (await import('node:url')).pathToFileURL((await import('node:path')).resolve(process.argv[1])).href) {
   try {
-    const rpc = process.env.KEEL_SEPOLIA_RPC_URL ?? 'https://rpc.keel-test.149-28-255-65.sslip.io';
-    const client = createPublicClient({ transport: http(rpc, { timeout: 20_000, retryCount: 1 }) });
+    const { client } = await createSepoliaReadClient();
     console.log(JSON.stringify(await checkCreatorSepolia(client), null, 2));
-  } catch {
-    // RPC URLs can contain credentials; don't print transport request details.
-    console.error('Sepolia verification failed. Check KEEL_SEPOLIA_RPC_URL, chain identity, and the shipped deployment records. No transaction was sent.');
+  } catch (error) {
+    reportRpcFailure(error, 'Sepolia verification failed. Check chain identity and the shipped deployment records. No transaction was sent.');
     process.exitCode = 1;
   }
 }
