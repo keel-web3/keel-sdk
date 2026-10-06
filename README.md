@@ -376,3 +376,11 @@ The canonical verifier follows the OnKEEL brand and supports bounded app panels 
 Public Sepolia verification uses a checked PublicNode/Tenderly/1RPC pool with rate-limit and history failover. Run `pnpm rpc:check`; private provider setup and agent recovery are documented in [RPC setup](docs/KEEL_RPC_SETUP.md).
 
 Deployment availability and active creator targets come from the [public network index and workspace configuration](docs/KEEL_NETWORK_DISCOVERY.md). Use `pnpm network:discover` / `pnpm network:check` or MCP `keel-network-discover` / `keel-network-check`; wallet chain catalogs are not KEEL deployment evidence.
+
+### Connect an agent to your Studio account
+
+After building the SDK, run `pnpm studio:connect --window --workspace /path/to/project`.
+Approve the code and permissions in Studio; the SDK saves the key privately and
+local MCP draft/staging tools use it automatically. Agents can instead use
+`keel-studio-connect` (`start`, open `approveUrl`, then `complete`). No environment
+file or Desktop app is required. [Connection and wallet review](docs/KEEL_STUDIO_WALLET_REVIEW.md).

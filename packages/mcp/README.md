@@ -465,3 +465,12 @@ keel-mcp --no-plugins --plugin /path/to/plugin/src/mcp.mjs
 An entry exports `keelPlugin = { apiVersion: 1, id, version, instructions?, tools }`; each tool supplies `descriptor: { name, description, inputSchema: { type: "object", ... } }` and `async run({ workspace }, input)`. Public TypeScript interfaces are exported from `@keel/mcp`. Keep plugin input validation, media requirements and machine-load handling inside its package.
 
 Read-only Ethereum tools may omit `rpcUrl` for the public Sepolia pool or private workspace/env settings. `keel-rpc-check` verifies access and optional receipt history. Exhaustion returns structured `rpc.setup-required` instructions to help configure Alchemy, Infura or QuickNode. See [RPC setup](../../docs/KEEL_RPC_SETUP.md); API keys stay local and no wallet key is needed.
+
+## Connect your agent to Studio
+
+Run `pnpm studio:connect --window --workspace /path/to/project` in the SDK checkout,
+or call `keel-studio-connect` with `operation=start`, open `approveUrl` for the user,
+and call `operation=complete` after approval. Local drafts and staging then use
+the privately saved key automatically. No environment file or Desktop app is
+required. See [the account connection guide](../../docs/KEEL_STUDIO_WALLET_REVIEW.md).
+`--connection-status` prints metadata only; `--import-key` uses a hidden prompt.

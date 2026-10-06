@@ -16,13 +16,51 @@ not transaction approval. An agent key does not grant wallet-signing authority.
 ## Connect to the user's account
 
 1. Discover `/.well-known/keel.json` and `/llms.txt` on the Studio origin.
-2. The user connects their wallet and signs in on the website, then approves an
-   agent connection at `/studio#agents`. Store the scoped key in
-   `KEEL_STUDIO_AGENT_TOKEN` for local MCP/SDK use, or the remote MCP's bearer
-   header. Never put it in tool arguments, prompts, or review URLs.
-3. Remote MCP is Streamable HTTP at `/api/mcp`. Initialize, list tools, then
-   call `keel_whoami`. This is independent of Desktop and local stdio MCP.
-   The connection's current schemas and granted scopes are authoritative.
+2. Use local MCP `keel-studio-connect` with `operation: "start"`. Open the returned
+   `approveUrl` for the user and show its code. The user signs in using their
+   existing wallet and approves the requested permissions in Studio.
+3. Call `keel-studio-connect` with `operation: "complete"` after approval. The
+   SDK privately saves the scoped key outside the project, bound to this
+   workspace and Studio origin. Draft and staging tools use it automatically.
+   Neither MCP results nor approval links contain the key. Status is available
+   with `operation: "status"`. Existing environment overrides remain compatible.
+
+From an SDK checkout, the equivalent one-command connection is:
+
+```sh
+pnpm studio:connect --window --workspace /path/to/your/project
+```
+
+The Node CLI opens a small browser helper on macOS, Windows or Linux. It shows
+only the code and approval status; the approved key travels directly from Studio
+into the SDK's private user-profile file. `--no-open` prints the links for an
+agent or headless terminal to open. `--reconnect --scopes drafts:read,drafts:create,drafts:write,contracts:read`
+requests editing permission as well. The creator can narrow permissions before
+approving and revoke access at `/studio#agents`.
+
+For an existing manual key, use `keel-mcp --import-key --workspace <project>`
+in an interactive terminal. Paste into the hidden prompt, never command-line
+arguments, chat, shell profiles or a project `.env`. `--connection-status`
+prints metadata only. Credentials are owner-only (0700/0600 on POSIX; restricted
+user ACL on Windows), scoped to the real workspace path and Studio HTTPS origin.
+They expire with the grant; deleting local credentials does not revoke the
+server grant. Revoke it in Studio. A changed workspace path needs its own pairing.
+
+Configure local MCP with that same workspace. It can run without a Desktop app:
+
+```sh
+codex mcp add keel -- node /path/to/keel-sdk/packages/mcp/dist/cli.js --workspace /path/to/your/project
+# or
+claude mcp add keel -- node /path/to/keel-sdk/packages/mcp/dist/cli.js --workspace /path/to/your/project
+```
+
+Remote MCP remains Streamable HTTP at `/api/mcp` with a scoped bearer grant.
+An app implementing its own connection can POST `/api/agent/pair` with
+`client`, `label`, `scopes`, keep `pollToken` secret, open `approveUrl`, then POST
+`{pollToken}` to `/api/agent/pair/poll` every 2 seconds. Approval delivers the key
+once. Do not approve on the user's behalf. Initialized remote MCP tools and
+granted scopes remain authoritative. The SDK wrapper is the preferred local
+agent route because it manages credentials without pasted secrets.
 
 ## Create the website review route
 
@@ -43,7 +81,7 @@ draft using its ID and current revision instead of creating a replacement
 just to obtain another link.
 
 ```ts
-import { createKeelStudioAgentDraftClient } from "@keel/sdk/studio-agent-drafts";
+import { createConnectedStudioDraftClient } from "@keel/sdk/studio-connection-node";
 
 const client = createKeelStudioAgentDraftClient({
   grantToken: process.env.KEEL_STUDIO_AGENT_TOKEN!,

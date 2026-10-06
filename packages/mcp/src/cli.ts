@@ -1,6 +1,8 @@
 #!/usr/bin/env node
 import { runMcpSelfTest } from "./health.js";
 import { MCP_SERVER_VERSION } from "./types.js";
+import { runConnectionCli } from "./connection-cli.js";
+import { STUDIO_CONNECTION_SCOPES, type StudioConnectionScope } from "@keel/sdk/studio-connection-node";
 import { runStdio } from "./stdio.js";
 
 const HELP = `Usage: keel-mcp [--workspace <directory> | --workspace=<directory>] [--help | --version | --self-test]
@@ -10,23 +12,39 @@ Run the offline MCP JSON-RPC server over stdio (the default).
   --plugin <entry>        Load a trusted local KEEL plugin (repeatable).
   --plugin-config <file>  Use a registry instead of ~/.keel/plugins.json.
   --no-plugins            Disable the default registry; explicit --plugin entries still load.
+  --connect               Request Studio access; opens your browser, saves the approved key privately.
+  --connection-status     Show connection metadata (never the key).
+  --import-key            Import an existing key using a hidden terminal prompt.
+  --studio-url <origin>   Choose Studio (defaults to https://studio.onkeel.io).
+  --window                Open a small browser connection helper. No Desktop app required.
+  --no-open               Print approval links without opening a browser.
+  --reconnect             Request a new grant, for example to change permissions.
+  --scopes <comma-list>   Requested permissions; the user may reduce them in Studio.
+  --label <name>          Name shown to the user on the approval page.
   --self-test              Run initialize, ping, tools/list, prompts/list/get, and static resource checks.
   --version, -v            Print the server version and exit.
   --help, -h               Print this help and exit.
 `;
 
-type Action = "stdio" | "help" | "version" | "self-test";
+type Action = "stdio" | "help" | "version" | "self-test" | "connect" | "connection-status" | "import-key";
 
 interface ParsedArgs {
   readonly action: Action;
   readonly workspace: string;
   readonly plugins: readonly string[];
   readonly pluginConfig?: string | false;
+  readonly studioUrl?: string;
+  readonly noOpen?: boolean;
+  readonly window?: boolean;
+  readonly reconnect?: boolean;
+  readonly label?: string;
+  readonly scopes?: readonly StudioConnectionScope[];
 }
 
 function parseArgs(args: readonly string[]): ParsedArgs {
   let action: Action = "stdio";
   let workspace = ".";
+  const connection: { studioUrl?: string; noOpen?: boolean; window?: boolean; reconnect?: boolean; label?: string; scopes?: StudioConnectionScope[] } = {};
   let workspaceSeen = false;
   const plugins: string[] = [];
   let pluginConfig: string | false | undefined;
@@ -57,6 +75,22 @@ function parseArgs(args: readonly string[]): ParsedArgs {
     } else if (argument === "--no-plugins") {
       if (pluginConfig !== undefined) throw new TypeError("--no-plugins conflicts with --plugin-config.");
       pluginConfig = false;
+    } else if (["--connect", "--connection-status", "--import-key"].includes(argument)) {
+      action = selectAction(action, argument.slice(2) as "connect" | "connection-status" | "import-key");
+    } else if (["--window", "--no-open", "--reconnect"].includes(argument)) {
+      if (argument === "--window") connection.window = true;
+      if (argument === "--no-open") connection.noOpen = true;
+      if (argument === "--reconnect") connection.reconnect = true;
+    } else if (["--studio-url", "--label", "--scopes"].includes(argument)) {
+      const value = args[++index];
+      if (!value || value.startsWith("--")) throw new TypeError(`${argument} requires a value.`);
+      if (argument === "--studio-url") connection.studioUrl = value;
+      else if (argument === "--label") connection.label = value;
+      else {
+        const scopes = value.split(",");
+        if (!scopes.every(scope => STUDIO_CONNECTION_SCOPES.includes(scope as StudioConnectionScope))) throw new TypeError("Invalid connection permissions.");
+        connection.scopes = scopes as StudioConnectionScope[];
+      }
     } else if (argument === "--help" || argument === "-h") {
       action = selectAction(action, "help");
     } else if (argument === "--version" || argument === "-v") {
@@ -67,11 +101,11 @@ function parseArgs(args: readonly string[]): ParsedArgs {
       throw new TypeError(`Unknown argument: ${argument}`);
     }
   }
-  return { action, workspace, plugins, ...(pluginConfig === undefined ? {} : { pluginConfig }) };
+  return { action, workspace, plugins, ...connection, ...(pluginConfig === undefined ? {} : { pluginConfig }) };
 }
 
 function selectAction(current: Action, next: Exclude<Action, "stdio">): Action {
-  if (current !== "stdio" && current !== next) throw new TypeError("Choose only one of --help, --version, or --self-test.");
+  if (current !== "stdio" && current !== next) throw new TypeError("Choose only one CLI action.");
   return next;
 }
 
@@ -83,7 +117,11 @@ async function main(args: readonly string[]): Promise<void> {
     process.stdout.write(`${MCP_SERVER_VERSION}\n`);
   } else if (parsed.action === "self-test") {
     process.stdout.write(`${JSON.stringify(await runMcpSelfTest(parsed.workspace, parsed))}\n`);
+  } else if (parsed.action === "connect" || parsed.action === "connection-status" || parsed.action === "import-key") {
+    await runConnectionCli({ ...parsed, action: parsed.action });
   } else {
+    if (parsed.studioUrl) process.env.KEEL_STUDIO_URL = parsed.studioUrl;
+    if (parsed.window || parsed.noOpen || parsed.reconnect || parsed.label || parsed.scopes) throw new TypeError("Connection options require --connect, --connection-status, or --import-key.");
     await runStdio(undefined, undefined, parsed.workspace, parsed);
   }
 }

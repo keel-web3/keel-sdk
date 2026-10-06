@@ -1,3 +1,4 @@
+import { startStudioConnection, getStudioConnection, completeStudioConnection, loadStudioAgentToken, type StudioConnectionScope } from "@keel/sdk/studio-connection-node";
 import { resolveKeelShell, resolveKeelPayloadStorage, resolveKeelPayloadCompression } from "@keel/protocol";
 import { loadCopyReadFiles } from "./copy-read-tool.js";
 import { CURATION_TOOL_DEFINITIONS } from './curation-tools.js';
@@ -567,6 +568,7 @@ async function frayStageProjectTool(context: ToolContext, value: unknown): Promi
     : parseViewerModules(input.viewerModules);
   const studioUrl = optionalString(input, "studioUrl");
   return stageFrayProject({
+    workspace: context.workspace.root,
     ...(studioUrl === undefined ? {} : { studioUrl }),
     sourcePath,
     sourceFileName: path.basename(sourcePath),
@@ -827,18 +829,28 @@ async function studioProjectIntakeTool(_context: ToolContext, value: unknown): P
   return prepareKeelStudioProjectIntake(input as Parameters<typeof prepareKeelStudioProjectIntake>[0]);
 }
 
-async function studioDraftTool(_context: ToolContext, value: unknown): Promise<unknown> {
+async function studioConnectTool(context: ToolContext, value: unknown): Promise<unknown> {
+  const input = record(value, ["operation", "studioUrl", "label", "scopes", "reconnect"], "Studio connection arguments");
+  const operation = requiredString(input, "operation");
+  const configured = optionalString(input, "studioUrl");
+  const options = { workspace: context.workspace.root, studioUrl: resolveKeelEndpoints(configured ? { studioUrl: configured } : {}, process.env).studioUrl };
+  if (operation === "status") return getStudioConnection(options);
+  if (operation === "complete") return completeStudioConnection(options);
+  if (operation !== "start") throw new TypeError("operation must be start, status, or complete.");
+  if (input.reconnect !== undefined && typeof input.reconnect !== "boolean") throw new TypeError("reconnect must be a boolean.");
+  return startStudioConnection({ ...options, ...(input.label === undefined ? {} : { label: requiredString(input, "label") }),
+    ...(input.scopes === undefined ? {} : { scopes: input.scopes as StudioConnectionScope[] }), ...(input.reconnect === undefined ? {} : { reconnect: input.reconnect as boolean }) });
+}
+
+async function studioDraftTool(context: ToolContext, value: unknown): Promise<unknown> {
   const input = record(value, ["studioUrl", "operation", "releaseId", "expectedRevision", "draft"], "Studio draft arguments");
   const operation = requiredString(input, "operation");
   if (!["list", "read", "create", "update"].includes(operation)) throw new TypeError("operation must be list, read, create, or update.");
-  const token = process.env.KEEL_STUDIO_AGENT_TOKEN;
-  if (typeof token !== "string" || token.length < 48) {
-    throw new TypeError("KEEL Studio draft access requires KEEL_STUDIO_AGENT_TOKEN. Create a scoped key in Studio account settings; never put it in MCP arguments.");
-  }
   const configuredStudioUrl = optionalString(input, "studioUrl");
   const studioUrl = resolveKeelEndpoints({
     ...(configuredStudioUrl === undefined ? {} : { studioUrl: configuredStudioUrl }),
   }, process.env).studioUrl;
+  const token = await loadStudioAgentToken({ workspace: context.workspace.root, studioUrl });
   const releaseId = optionalString(input, "releaseId");
   const expectedRevision = optionalNumber(input, "expectedRevision");
   return executeKeelStudioAgentDraftOperation({
@@ -853,12 +865,9 @@ async function studioDraftTool(_context: ToolContext, value: unknown): Promise<u
 
 async function studioStageProjectTool(context: ToolContext, value: unknown): Promise<unknown> {
   const input = record(value, ["studioUrl", "title", "description", "storageStrategy", "payloadStorage", "marketplaceExportMode", "viewer", "files", "reusableModule", "releaseIntent"], "Studio stage project arguments");
-  const token = process.env.KEEL_STUDIO_AGENT_TOKEN;
-  if (typeof token !== "string" || token.length < 48) {
-    throw new TypeError("KEEL Studio staging requires KEEL_STUDIO_AGENT_TOKEN. Create a scoped key in Studio account settings; never put it in MCP arguments.");
-  }
   const configuredStudioUrl = optionalString(input, "studioUrl");
   const studioUrl = resolveKeelEndpoints({ ...(configuredStudioUrl === undefined ? {} : { studioUrl: configuredStudioUrl }) }, process.env).studioUrl;
+  const token = await loadStudioAgentToken({ workspace: context.workspace.root, studioUrl });
   const title = requiredBoundedString(input, "title", 160);
   const description = optionalString(input, "description") ?? "";
   if (description.length > 2_000 || /[\u0000-\u001f\u007f]/u.test(description)) throw new TypeError("description must be bounded text.");
@@ -1442,8 +1451,9 @@ export const TOOL_DEFINITIONS: readonly ToolDefinition[] = [
   tool("keel-endpoint-config", "Resolve the hosted Studio website (https://studio.onkeel.io by default; Desktop is optional), indexer settings and the index/config-selected network RPC pool with explicit input, environment or private workspace configuration. Keyed RPC paths/query strings are redacted in the response; deployment index may be fetched; no wallet request occurs.", TOOL_SCHEMAS.endpointConfig, endpointConfigTool),
   tool("keel-studio-capabilities", "Inspect a Studio's supported chains, zero-spend sandbox, staging, authorization, and MSP readiness before any upload or wallet action.", TOOL_SCHEMAS.studioCapabilities, studioCapabilitiesTool),
   tool("keel-studio-project-intake", "Ask only for missing project decisions, then return either storage-only preparation or an editable release/listing intent. No upload, signature, wallet request, or transaction occurs.", TOOL_SCHEMAS.studioProjectIntake, studioProjectIntakeTool),
+  tool("keel-studio-connect", "Connect this workspace to the user’s Studio account without copying keys. start returns a public approveUrl and code: open it for the user, who signs in and approves permissions. complete collects and privately saves the approved key; status never returns secrets. Draft/staging tools automatically use the saved connection. Never approve access for the user. No Desktop app or wallet transaction is required.", TOOL_SCHEMAS.studioConnect, studioConnectTool),
   tool("keel-studio-draft", "Create a website wallet-review route by creating a private release draft in the user's Studio account, or list/read/revision-safely edit it through their scoped key. Returns reviewUrl for the creator to open in their browser and publish with their existing connected wallet. KEEL Desktop and a separate signing page are not required. This tool does not sign or submit a chain action.", TOOL_SCHEMAS.studioDraft, studioDraftTool),
-  tool("keel-studio-stage-project", "Stage bounded creator resources/modules and return the server-issued Studio handoff. Omitted viewer selects Studio's canonical KEEL Inline graph for later preparation; `none` is the explicit raw-artifact route with no viewer and does not prevent a later release or mint. Automatic compact preparation requires the exact selected-chain KeelRawTokenURIBuilder and canonical raw-percent shell fragments with receipts/read-back; Studio must never fall back to legacy Base64 carriage silently. A direct image, video, or self-contained GLB resolves to registered shell plus registered keel.asset-display@1 plus the creator media entry, never zero modules or a generated index.html. Legacy protector getters and NoProtector do not determine default Inline readiness. Creator HTML is content, never a replacement shell, and agents must not upload a locally manufactured KEEL shell, protected-harness wrapper, or local wrapper when the catalog is incomplete. Studio must fail closed for an incomplete selected-chain catalog during preparation. The scoped agent key remains in the MCP environment; no wallet signature or chain action occurs.", TOOL_SCHEMAS.studioStageProject, studioStageProjectTool),
+  tool("keel-studio-stage-project", "Stage bounded creator resources/modules and return the server-issued Studio handoff. Omitted viewer selects Studio's canonical KEEL Inline graph for later preparation; `none` is the explicit raw-artifact route with no viewer and does not prevent a later release or mint. Automatic compact preparation requires the exact selected-chain KeelRawTokenURIBuilder and canonical raw-percent shell fragments with receipts/read-back; Studio must never fall back to legacy Base64 carriage silently. A direct image, video, or self-contained GLB resolves to registered shell plus registered keel.asset-display@1 plus the creator media entry, never zero modules or a generated index.html. Legacy protector getters and NoProtector do not determine default Inline readiness. Creator HTML is content, never a replacement shell, and agents must not upload a locally manufactured KEEL shell, protected-harness wrapper, or local wrapper when the catalog is incomplete. Studio must fail closed for an incomplete selected-chain catalog during preparation. The scoped key is loaded from the private Studio connection or an existing environment override; no wallet signature or chain action occurs.", TOOL_SCHEMAS.studioStageProject, studioStageProjectTool),
   tool("keel-creator-collection-prepare", "Prepare one exact EIP-5792 KeelCreatorFactory batch plus its durable recovery envelope. This never signs or submits. Missing or ambiguous factory/renderer deployments stop before any wallet approval.", TOOL_SCHEMAS.creatorCollectionPrepare, creatorCollectionPrepareTool),
   tool("keel-shell-search", "Search the read-back-verified shell catalogue by creator, name, version, or tags. Returns top/bottom object pointers and metadata only; it never fetches carrier bytes, signs, or submits.", TOOL_SCHEMAS.shellSearch, shellSearchTool),
   tool("keel-inline-prepare", "NEW SOURCE ONLY: for existing onchain objects call keel-inline-reuse-plan first; preserve exact prepared carriage and never republish it. Plan a new INLINE Keel graph. The registered verification shell is the default; explicit viewer=none preserves self-contained creator-owned HTML without canonical protection. Shell choice is independent of Compact/Raw payload storage. Reusable modules and separate assets require a compatible reader. Omitted carriage and presentationPolicy use the automatic compact raw-percent saver plus collector-inline: exact supplied data:image/* bytes and complete data:text/html;charset=utf-8 HTML, with no IPFS/HTTP/web3 resolver or legacy complete-HTML Base64. For new source prepare one exact ASCII image carriage at build time; the final image field only copies its prepared header, payload and footer. Never add a runtime media encoder or publish raw and encoded copies. GIF is direct data:image/gif and never an SVG wrapper or placeholder. The result reports source, stored graph, and complete tokenURI bytes and rejects a result above the public-read ceiling. External resolvers and legacy artifact carriage require explicit reviewed policies. Review-only: it never signs or submits.", TOOL_SCHEMAS.inlinePrepare, inlinePrepareTool),

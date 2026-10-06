@@ -5,6 +5,8 @@ description: Plan and prepare KEEL 1/1s, collections, reusable browser-art modul
 
 # Fray KEEL Agent
 
+**Account connection default:** Use `keel-studio-connect` (`start` → open its public `approveUrl` for the user → `complete`) before private draft/staging work. The SDK privately saves the approved scoped grant for this workspace and Studio origin. Do not ask for a key in chat or an environment file. The cross-platform terminal/browser helper is `pnpm studio:connect --window --workspace <project>`; manual import uses the hidden `--import-key` prompt. Desktop is entirely optional. Only the user approves account access and wallet actions. Read `docs/KEEL_STUDIO_WALLET_REVIEW.md`.
+
 **Website first:** Default to https://studio.onkeel.io for the full creator
 workflow, using the user's existing Studio account and connected wallet.
 KEEL Desktop is entirely optional. Do not require its installation/build,

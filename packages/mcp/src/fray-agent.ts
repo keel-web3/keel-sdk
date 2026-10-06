@@ -1,3 +1,5 @@
+import { loadStudioAgentToken } from "@keel/sdk/studio-connection-node";
+import { KEEL_STUDIO_URL } from "@keel/sdk";
 import { canonicalJson, createIntegrity, utf8ToBytes } from "@keel/protocol";
 import {
   searchKeelRuntimeModules,
@@ -204,6 +206,7 @@ export interface FrayPreviewCapture {
 }
 
 export interface FrayStageProjectInput {
+  readonly workspace?: string;
   readonly studioUrl?: string;
   readonly sourcePath: string;
   readonly sourceFileName: string;
@@ -393,7 +396,7 @@ export async function prepareFrayAuctionIntake(value: unknown): Promise<unknown>
  * wallet-facing handoff. The agent token is only used for this server-to-server
  * upload; it never has wallet authority and is never returned. */
 export async function stageFrayProject(input: FrayStageProjectInput): Promise<unknown> {
-  const base = safeStudioBase(input.studioUrl ?? process.env.KEEL_STUDIO_URL ?? process.env.FRAY_STUDIO_URL);
+  const base = safeStudioBase(input.studioUrl ?? process.env.KEEL_STUDIO_URL ?? process.env.FRAY_STUDIO_URL ?? KEEL_STUDIO_URL);
   if (base === undefined) {
     return {
       schema: FRAY_AGENT_PROTOCOL,
@@ -402,13 +405,13 @@ export async function stageFrayProject(input: FrayStageProjectInput): Promise<un
       wallet: { signing: "not-performed", submission: "not-performed" },
     };
   }
-  const token = process.env.FRAY_STUDIO_AGENT_TOKEN;
+  const token = await loadStudioAgentToken({ ...(input.workspace ? { workspace: input.workspace } : {}), studioUrl: base }).catch(() => undefined);
   if (token === undefined || token.length < 32) {
     return {
       schema: FRAY_AGENT_PROTOCOL,
       status: "unconfigured",
       studioUrl: base,
-      message: "FRAY_STUDIO_AGENT_TOKEN is not configured. No source bytes were uploaded.",
+      message: "Connect with keel-studio-connect first. No source bytes were uploaded.",
       wallet: { signing: "not-performed", submission: "not-performed" },
     };
   }

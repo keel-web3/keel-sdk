@@ -206,6 +206,7 @@ function clientRequest(options: KeelStudioAgentDraftClientOptions, path: string,
   headers.set("authorization", `Bearer ${options.grantToken}`);
   return (options.fetchImplementation ?? fetch)(endpoint(options.studioUrl ?? KEEL_STUDIO_URL, path), {
     ...init,
+    redirect: "error",
     headers,
   });
 }

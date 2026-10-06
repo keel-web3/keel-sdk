@@ -217,6 +217,13 @@ const studioProjectIntake: JsonSchema = object({
     endsAt: string("Optional ISO timestamp.", 64),
   }),
 });
+const studioConnect: JsonSchema = object({
+  operation: { type: "string", enum: ["start", "status", "complete"] },
+  studioUrl: string("Optional Studio HTTPS origin.", 512),
+  label: string("Name displayed to the user before they approve access.", 80),
+  scopes: { type: "array", items: { type: "string", enum: ["drafts:read", "drafts:create", "drafts:write", "contracts:read", "bridge:serve"] }, minItems: 1, maxItems: 5 },
+  reconnect: { type: "boolean", description: "Request a new grant instead of reusing the current connection." },
+}, ["operation"]);
 const studioDraft: JsonSchema = object({
   studioUrl: string("Optional HTTPS Studio URL; KEEL_STUDIO_URL is used otherwise.", 512),
   operation: { type: "string", enum: ["list", "read", "create", "update"] },
@@ -474,6 +481,7 @@ export const TOOL_SCHEMAS = {
   endpointConfig,
   studioCapabilities,
   studioProjectIntake,
+  studioConnect,
   studioDraft,
   studioStageProject,
   creatorCollectionPrepare,
