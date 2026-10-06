@@ -213,6 +213,16 @@ export function toKeelDenseTransportDataURL(kind: "html" | "metadata", text: str
   return `data:${kind === "html" ? "text/html" : "application/json"};charset=utf-8,${encoded}`;
 }
 
+/** COPY preparation also supports the deployed stricter reader grammar.
+ * URI-valid question marks, apostrophes and ampersands are escaped at build
+ * time so existing registered readers can copy the same exact source bytes. */
+export function prepareKeelDenseCopyFragment(text: string): Uint8Array {
+  if (typeof text !== "string") throw new TypeError("Prepared COPY requires UTF-8 text.");
+  const escape = (value: string) => toKeelDenseTransportDataURL("html", value).split(",").slice(1).join(",")
+    .replaceAll("?", "%3F").replaceAll("'", "%27").replaceAll("&", "%26");
+  return new TextEncoder().encode(escape(JSON.stringify(escape(text)).slice(1, -1)));
+}
+
 /** Inspection also supports existing browser-readable noncompliant returns.
  * Publication separately rejects them instead of treating playback as URI proof.
  */

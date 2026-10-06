@@ -1,0 +1,70 @@
+{
+  "jsonrpc": "2.0",
+  "id": 2,
+  "result": {
+    "content": [
+      {
+        "type": "text",
+        "text": "{\"status\":\"review-only\",\"chainReady\":false,\"preparedCopy\":{\"schema\":\"keel-prepared-copy-read-check@1\",\"policy\":\"prepared-copy\",\"chainId\":11155111,\"store\":\"0xd820e337692a6eb7a4878e42ce88cbcff49b55cf\",\"mediaType\":\"application/vnd.keel.token-uri-raw-percent-fragment\",\"requiredBuilder\":\"KeelRawTokenURIBuilder\",\"readOperation\":\"copy-prepared-fragments\",\"graphIntegrity\":{\"algorithm\":\"sha256\",\"digest\":\"0xdc1575ba24e83ffe65996a0f96e78e17d401658227286c9d0ee9ba5edf76538e\",\"byteLength\":3027},\"tokenURIIntegrity\":{\"algorithm\":\"sha256\",\"digest\":\"0x1feca2e8c6d9e50233cb7e8a1e49b408fe2145b97fba8bb59d4b5c7efe2f9781\",\"byteLength\":193146},\"completeTokenURIBytes\":193146,\"payloadCarriage\":{\"schema\":\"keel-inline-payload-carriage@1\",\"payloadCount\":1,\"packedPayloadBytes\":689,\"payloadTextCarriageBytes\":849,\"addedTextBytes\":160,\"requiresExistingPreparedReuse\":false,\"payloads\":[{\"id\":\"0x11097cc04b2c58472de94ae05bf926ed330cd6ebe237290912edff501e469ffd\",\"mediaType\":\"application/octet-stream\",\"encoding\":\"dense\",\"compression\":\"container-bound\",\"binaryBytes\":689,\"textCarriageBytes\":849,\"directImage\":false,\"requiresExistingPreparedReuse\":false,\"transportProfile\":\"base90-v1\"}],\"preparedDenseCopy\":{\"transportProfile\":\"base90-v1\",\"shellBootEncoding\":\"base64\",\"shellBootCompression\":\"gzip\",\"payloadPreparation\":\"build-time\",\"contractOperation\":\"verified-copy\"}},\"callGasLimit\":\"50000000\",\"blockGasLimit\":\"60000000\",\"selectedChainReadAuthenticated\":false,\"caveat\":\"Caller-supplied read bytes and gas cap only; authenticate the selected-chain call, registration, receipts and authority separately.\"},\"signing\":\"not-performed\",\"submission\":\"not-performed\"}"
+      }
+    ],
+    "structuredContent": {
+      "status": "review-only",
+      "chainReady": false,
+      "preparedCopy": {
+        "schema": "keel-prepared-copy-read-check@1",
+        "policy": "prepared-copy",
+        "chainId": 11155111,
+        "store": "0xd820e337692a6eb7a4878e42ce88cbcff49b55cf",
+        "mediaType": "application/vnd.keel.token-uri-raw-percent-fragment",
+        "requiredBuilder": "KeelRawTokenURIBuilder",
+        "readOperation": "copy-prepared-fragments",
+        "graphIntegrity": {
+          "algorithm": "sha256",
+          "digest": "0xdc1575ba24e83ffe65996a0f96e78e17d401658227286c9d0ee9ba5edf76538e",
+          "byteLength": 3027
+        },
+        "tokenURIIntegrity": {
+          "algorithm": "sha256",
+          "digest": "0x1feca2e8c6d9e50233cb7e8a1e49b408fe2145b97fba8bb59d4b5c7efe2f9781",
+          "byteLength": 193146
+        },
+        "completeTokenURIBytes": 193146,
+        "payloadCarriage": {
+          "schema": "keel-inline-payload-carriage@1",
+          "payloadCount": 1,
+          "packedPayloadBytes": 689,
+          "payloadTextCarriageBytes": 849,
+          "addedTextBytes": 160,
+          "requiresExistingPreparedReuse": false,
+          "payloads": [
+            {
+              "id": "0x11097cc04b2c58472de94ae05bf926ed330cd6ebe237290912edff501e469ffd",
+              "mediaType": "application/octet-stream",
+              "encoding": "dense",
+              "compression": "container-bound",
+              "binaryBytes": 689,
+              "textCarriageBytes": 849,
+              "directImage": false,
+              "requiresExistingPreparedReuse": false,
+              "transportProfile": "base90-v1"
+            }
+          ],
+          "preparedDenseCopy": {
+            "transportProfile": "base90-v1",
+            "shellBootEncoding": "base64",
+            "shellBootCompression": "gzip",
+            "payloadPreparation": "build-time",
+            "contractOperation": "verified-copy"
+          }
+        },
+        "callGasLimit": "50000000",
+        "blockGasLimit": "60000000",
+        "selectedChainReadAuthenticated": false,
+        "caveat": "Caller-supplied read bytes and gas cap only; authenticate the selected-chain call, registration, receipts and authority separately."
+      },
+      "signing": "not-performed",
+      "submission": "not-performed"
+    }
+  }
+}

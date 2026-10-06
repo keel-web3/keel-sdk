@@ -2,6 +2,15 @@
 // Read-only: verify the deployment records shipped with the practice contracts.
 import { createPublicClient, http, keccak256 } from 'viem';
 import { builderAbi, keelContracts, SEPOLIA_KEEL } from '../packages/game-engine/chain/contracts.mjs';
+import { createSepoliaManifest, verifySepoliaManifest } from './sepolia-manifest.mjs';
+
+export async function checkCreatorSepolia(client) {
+  const { KEEL_DEPLOYMENTS } = await import('../packages/sdk/dist/modules.js');
+  const rows = KEEL_DEPLOYMENTS.filter(row => row.chainId === 11155111 && row.instance === 'creator-inline-20261005');
+  const result = await verifySepoliaManifest(client, createSepoliaManifest(rows));
+  if (result.verification.status !== 'checked' || result.modernCreator.status !== 'infrastructure-verified-project-gates-required') throw Error('Modern creator infrastructure failed receipt, runtime or renderer-binding verification.');
+  return result;
+}
 
 export async function checkSepolia(client, record = keelContracts()) {
   if (await client.getChainId() !== 11155111) throw Error('Expected Sepolia (11155111); refusing another chain.');
@@ -26,7 +35,7 @@ if (process.argv[1] && import.meta.url === (await import('node:url')).pathToFile
   try {
     const rpc = process.env.KEEL_SEPOLIA_RPC_URL ?? 'https://rpc.keel-test.149-28-255-65.sslip.io';
     const client = createPublicClient({ transport: http(rpc, { timeout: 20_000, retryCount: 1 }) });
-    console.log(JSON.stringify(await checkSepolia(client), null, 2));
+    console.log(JSON.stringify(await checkCreatorSepolia(client), null, 2));
   } catch {
     // RPC URLs can contain credentials; don't print transport request details.
     console.error('Sepolia verification failed. Check KEEL_SEPOLIA_RPC_URL, chain identity, and the shipped deployment records. No transaction was sent.');

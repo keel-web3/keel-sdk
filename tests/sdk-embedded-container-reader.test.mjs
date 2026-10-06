@@ -43,3 +43,11 @@ test('prepared-fragment context uses its own explicit commitment domain',()=>{
  const c=context();c.presentationDigestType='keccak256:keel.evm-prepared-fragment-presentation@1';
  assert.equal(validateKeelEmbeddedContainerContext(c,chainId).presentationDigestType,c.presentationDigestType);
 });
+
+test('creator COPY context authenticates its own seedless commitment and rejects invented provenance',()=>{
+ const old=context();
+ const keys=['chainId','collection','tokenId','composerAddress','composerCodeHash','composerRevision','containerTableObjectId','containerTableDigest','presentationDigest'];
+ const c={protocol:'keel-context@3',...Object.fromEntries(keys.map(k=>[k,old[k]])),presentationDigestType:'keccak256:keel.creator-prepared-copy-presentation@1'};
+ assert.deepEqual(validateKeelEmbeddedContainerContext(c,chainId),c);
+ for(const patch of [{derivedTokenSeed:old.derivedTokenSeed},{composerManager:old.composerManager},{chainId:'1'},{presentationDigestType:old.presentationDigestType},{composerCodeHash:'0x'+'00'.repeat(32)}]) assert.throws(()=>validateKeelEmbeddedContainerContext({...c,...patch},chainId));
+});

@@ -1,7 +1,13 @@
 import test from 'node:test';import assert from 'node:assert/strict';import {createHash,randomBytes} from 'node:crypto';
-import {buildKeelPreparedDenseCopyShell,prepareKeelDensePayload,decodeKeelDenseTransport,decodeKeelPreparedDenseCopyFragment,inspectKeelInlinePayloadCarriage,inspectKeelPreparedDenseCopyDocument,assertKeelFreshPayloadCarriage,assertKeelFreshPayloadAudit,encodeKeelDenseTransport,serializeKeelDenseTransportJSON,toKeelDenseTransportDataURL,decodeKeelInlineDataURI} from '../packages/sdk/dist/index.js';
+import {buildKeelPreparedDenseCopyShell,prepareKeelDensePayload,prepareKeelDenseCopyFragment,decodeKeelDenseTransport,decodeKeelPreparedDenseCopyFragment,inspectKeelInlinePayloadCarriage,inspectKeelPreparedDenseCopyDocument,assertKeelFreshPayloadCarriage,assertKeelFreshPayloadAudit,encodeKeelDenseTransport,serializeKeelDenseTransportJSON,toKeelDenseTransportDataURL,decodeKeelInlineDataURI} from '../packages/sdk/dist/index.js';
 const sha=bytes=>'0x'+createHash('sha256').update(bytes).digest('hex');
 const delivery={chainId:11155111,store:'0x1111111111111111111111111111111111111111'};
+test('COPY fragment preparation round-trips URI-valid characters rejected by deployed older readers',()=>{
+ const source='? & \' " # % 🔥 </script>';
+ const prepared=prepareKeelDenseCopyFragment(source);
+ assert.doesNotMatch(Buffer.from(prepared).toString(),/[?&']/);
+ assert.equal(Buffer.from(decodeKeelPreparedDenseCopyFragment(prepared)).toString(),source);
+});
 test('fresh preparation compresses with Brotli before Base90 and nested escaping; incompressible and explicit none stay uncompressed',async()=>{
  const {brotliDecompressSync}=await import('node:zlib');
  const source=Buffer.from('Hello world🔥%#"</script>\0'.repeat(100));

@@ -21,10 +21,39 @@ const options = name => {
   return value;
 };
 const abiOnly = options("abis-only");
+const deploymentsOnly = options("deployments-only");
 const selectedArg = options("modules-only");
 const selected = selectedArg === undefined ? null : new Set(selectedArg.split(","));
 if (selected && (abiOnly || !selected.size || [...selected].some(id => !MODULES.some(m => m.id === id)))) throw new Error("Expected known module IDs for --modules-only, without --abis-only");
 if (abiOnly && !MODULES.some(m => m.id === abiOnly)) throw new Error(`Unknown module: ${abiOnly}`);
+
+// Deployment-only refreshes preserve unrelated manifests and ABI baselines.
+if (deploymentsOnly) {
+  const ids = new Set(deploymentsOnly.split(","));
+  if (abiOnly || selected || [...ids].some(id => !MODULES.some(m => m.id === id))) throw new Error("Expected known module IDs for --deployments-only, without other scopes");
+  const fresh = [];
+  for (const id of ids) {
+    const dir = join(metaDir(id), "deployments");
+    if (!existsSync(dir)) continue;
+    for (const file of readdirSync(dir).filter(f => f.endsWith(".json"))) {
+      const rec = JSON.parse(readFileSync(join(dir, file), "utf8"));
+      if (rec.module !== id) throw new Error(`Deployment module mismatch: ${id}`);
+      for (const [instance, slot] of Object.entries(rec.deployments ?? {})) for (const c of Object.values(slot.contracts ?? {})) {
+        fresh.push({ module: id, chainId: rec.chainId, instance, contract: c.contract, address: c.address, block: c.block ?? null, txHash: c.txHash ?? null, ...(c.runtimeCodeHash ? { runtimeCodeHash: c.runtimeCodeHash } : {}) });
+      }
+    }
+  }
+  let registry = readFileSync(TARGET, "utf8");
+  const pattern = /(export const KEEL_DEPLOYMENTS: [^=]+ = )(\[[\s\S]*?\])( as const;)/;
+  const match = pattern.exec(registry);
+  if (!match) throw new Error("Cannot read existing deployment registry");
+  const next = [...JSON.parse(match[2]).filter(row => !ids.has(row.module)), ...fresh];
+  next.sort((a, b) => a.module.localeCompare(b.module) || a.chainId - b.chainId || a.instance.localeCompare(b.instance) || a.contract.localeCompare(b.contract));
+  registry = registry.replace(pattern, (_, prefix, value, suffix) => prefix + JSON.stringify(next, null, 2) + suffix);
+  writeFileSync(TARGET, registry);
+  console.log(`sync-sdk: deployment records for ${[...ids].join(", ")}; manifests and ABIs unchanged`);
+  process.exit(0);
+}
 
 const modules = [];
 const deployments = [];

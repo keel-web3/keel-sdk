@@ -1,0 +1,86 @@
+{
+  "protocol": "keel.creator-prepared-inline-deployment@1",
+  "status": "live-mint-and-browser-verified",
+  "chainId": 11155111,
+  "instance": "creator-inline-20261005",
+  "factory": "0x5828eBA761ab5eA72A349284da5658AD0ECD8416",
+  "renderer": "0x315368393AfAd4b1EDcbFC6E82152aCeB3b9263d",
+  "mintRoutes": "0xB3CD12cEf903B889Bc6C500726411d4c04f62bC1",
+  "store": "0xD820e337692A6Eb7a4878e42ce88CBCFF49B55CF",
+  "builder": "0x1AB38f8c568FD373AEf05618C0ab387b30707AaE",
+  "validationRegistry": "0xbBD281E72167D33261EBe9aa78F34907EFC2861D",
+  "shellRegistry": "0x7879cB175ef93c22A1E99bceD6868d3e7bC5A3D6",
+  "shellId": "0x14fbf5986c636c08a0bd9f919fe45905deba37d3271dcbfebbdee171f8a85882",
+  "shellRevision": "1",
+  "shell": {
+    "prefix": {
+      "objectId": "0x43f35e94bdf433dd4a47afb7a66203fecd85189014eb5a86bc22ccaaa5282963",
+      "algorithm": "sha256",
+      "digest": "0x544649250d343c45e02cc47cffbfc5e663fc61bb696724fb82d033b086b684be",
+      "byteLength": 187
+    },
+    "suffix": {
+      "objectId": "0xf496fd69f2fe1402dfc1413c18e8fb4b937d7db9e0dd98689b50cce0909c2869",
+      "algorithm": "sha256",
+      "digest": "0xcea7a3ebb9b1454190ed4791090af7cd97db1ce5127bd6bd821dc35843fbb1bb",
+      "byteLength": 187845
+    },
+    "metadata": {
+      "objectId": "0x6a25fdea78aced554ddbad6689b47f6e6072493032b0a458539718f43c233000",
+      "algorithm": "sha256",
+      "digest": "0xbf8db6ec14334c7895e01e2c4c429f6636f98481a0a287412b168c398e6ee5be",
+      "byteLength": 571
+    },
+    "bootEncoding": "base64",
+    "bootCompression": "gzip"
+  },
+  "payloadDefaults": {
+    "encoding": "base90-v1",
+    "compression": "brotli-when-smaller",
+    "encryption": "none",
+    "escaping": "JSON, nested URI and deployed COPY reader",
+    "wholeDocumentBase64": false
+  },
+  "preparation": {
+    "sdk": "prepareKeelCreatorInline",
+    "mcp": "keel-creator-inline-prepare",
+    "bindingSDK": "buildKeelCreatorPreparedCopyBindingCall"
+  },
+  "smoke": {
+    "collection": "0x14966C71bB7fc552c993cF13d97B0F249F6d5819",
+    "tokenId": "1",
+    "owner": "0x5E2a993c132A6869b9e636D139E1Ba698F7918F0",
+    "mintTransaction": "0x4998538877c6e87e970f7e7df519d9e2131d416214bc798c48134624892feae0",
+    "tokenURIIntegrity": {
+      "algorithm": "sha256",
+      "digest": "0x1feca2e8c6d9e50233cb7e8a1e49b408fe2145b97fba8bb59d4b5c7efe2f9781",
+      "byteLength": 193146
+    },
+    "tokenURICallGas": "2815501",
+    "sourceIntegrity": {
+      "algorithm": "sha256",
+      "digest": "0xc68784b93a48646c10110ec7674ec11213d14b611bba778fefbbf375133eff3d",
+      "byteLength": 2394
+    },
+    "compressedIntegrity": {
+      "algorithm": "sha256",
+      "digest": "0x236232ae8620cc2af95146ccc93d816f626f728418c08d30222a5d55e32fb8a9",
+      "byteLength": 689
+    },
+    "totalNewStoredBytes": 191936,
+    "totalGasUsed": "119818913",
+    "transactions": 56,
+    "externalHTTPRequests": 0,
+    "proof": "proof.json",
+    "browserProof": "browser-proof.json",
+    "completeURICheck": "publication-check.json"
+  },
+  "authorityProfile": {
+    "kind": "owner-governed-Sepolia-test",
+    "storageManager": "0x560AeEFAE5e9a9cC94198B25Dc359C1579763DB6",
+    "governanceThreshold": 1,
+    "zeroProtocolFees": true,
+    "transactionGasPayable": true
+  },
+  "projectGatesStillRequired": true
+}

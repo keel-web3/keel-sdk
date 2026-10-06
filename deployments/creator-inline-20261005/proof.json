@@ -1,0 +1,75 @@
+{
+  "status": "mint-and-exact-readback-verified",
+  "chainId": 11155111,
+  "collection": "0x14966C71bB7fc552c993cF13d97B0F249F6d5819",
+  "tokenId": "1",
+  "factory": "0x5828eBA761ab5eA72A349284da5658AD0ECD8416",
+  "renderer": "0x315368393AfAd4b1EDcbFC6E82152aCeB3b9263d",
+  "mintRoutes": "0xB3CD12cEf903B889Bc6C500726411d4c04f62bC1",
+  "routeId": "1",
+  "store": "0xD820e337692A6Eb7a4878e42ce88CBCFF49B55CF",
+  "builder": "0x1AB38f8c568FD373AEf05618C0ab387b30707AaE",
+  "shellRegistry": "0x7879cB175ef93c22A1E99bceD6868d3e7bC5A3D6",
+  "shellId": "0x14fbf5986c636c08a0bd9f919fe45905deba37d3271dcbfebbdee171f8a85882",
+  "shellRevision": "1",
+  "context": {
+    "protocol": "keel-context@3",
+    "chainId": "11155111",
+    "collection": "0x14966c71bb7fc552c993cf13d97b0f249f6d5819",
+    "tokenId": "1",
+    "composerAddress": "0x315368393afad4b1edcbfc6e82152aceb3b9263d",
+    "composerCodeHash": "0x29f552e26df31950fe44c1c5d4f2804935b947aad82fca2bf85f0862d7f7621d",
+    "composerRevision": "1",
+    "containerTableObjectId": "0xc120ca595b2f92283149ba66d1c3818c8c1e050ee8ba6b50475c3c85950a2dfa",
+    "containerTableDigest": "0xd963dcb48de8dc49848040851bafa8a268b3bca683cff78dd4fc31ca69ab8c02",
+    "presentationDigest": "0x594402e1ae39866a5e67baf184aae6f4ccf92b308b87df176732b81914c0cca4",
+    "presentationDigestType": "keccak256:keel.creator-prepared-copy-presentation@1"
+  },
+  "sourceIntegrity": {
+    "algorithm": "sha256",
+    "digest": "0xc68784b93a48646c10110ec7674ec11213d14b611bba778fefbbf375133eff3d",
+    "byteLength": 2394
+  },
+  "compressedIntegrity": {
+    "algorithm": "sha256",
+    "digest": "0x236232ae8620cc2af95146ccc93d816f626f728418c08d30222a5d55e32fb8a9",
+    "byteLength": 689
+  },
+  "tokenURIIntegrity": {
+    "algorithm": "sha256",
+    "digest": "0x1feca2e8c6d9e50233cb7e8a1e49b408fe2145b97fba8bb59d4b5c7efe2f9781",
+    "byteLength": 193146
+  },
+  "tokenURICallGas": "2815501",
+  "totalGasUsed": "119818913",
+  "newStoredBytes": 191936,
+  "transactions": 56,
+  "audit": {
+    "schema": "keel-inline-payload-carriage@1",
+    "payloadCount": 1,
+    "packedPayloadBytes": 689,
+    "payloadTextCarriageBytes": 849,
+    "addedTextBytes": 160,
+    "requiresExistingPreparedReuse": false,
+    "payloads": [
+      {
+        "id": "0x11097cc04b2c58472de94ae05bf926ed330cd6ebe237290912edff501e469ffd",
+        "mediaType": "application/octet-stream",
+        "encoding": "dense",
+        "compression": "container-bound",
+        "binaryBytes": 689,
+        "textCarriageBytes": 849,
+        "directImage": false,
+        "requiresExistingPreparedReuse": false,
+        "transportProfile": "base90-v1"
+      }
+    ],
+    "preparedDenseCopy": {
+      "transportProfile": "base90-v1",
+      "shellBootEncoding": "base64",
+      "shellBootCompression": "gzip",
+      "payloadPreparation": "build-time",
+      "contractOperation": "verified-copy"
+    }
+  }
+}

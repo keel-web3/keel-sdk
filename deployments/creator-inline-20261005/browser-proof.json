@@ -1,0 +1,12 @@
+{
+  "status": "exact-minted-viewer-browser-verified",
+  "mode": "live",
+  "game": {
+    "ready": true,
+    "remaining": 2,
+    "x": 2,
+    "y": 2
+  },
+  "externalHTTPRequests": 0,
+  "errors": []
+}

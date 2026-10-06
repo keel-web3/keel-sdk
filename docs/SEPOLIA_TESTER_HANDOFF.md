@@ -1,101 +1,114 @@
 # Ethereum Sepolia tester handoff
 
-Updated 2026-10-05. Chain ID **11155111**. The complete recorded infrastructure
-inventory is in [`deployments/ethereum-sepolia.json`](../deployments/ethereum-sepolia.json).
-Its pinned verification block and per-contract results distinguish a recorded
-address from an authenticated receipt and runtime.
+Updated 2026-10-05. Chain ID **11155111**. Use the refresh revision supplied with
+[SDK PR 13](https://github.com/keel-web3/keel-sdk/pull/13), replacing checkout
+`7e562740e93152e59f827937acb52de46922f30c`. The new revision adds the deployed
+modern creator factory/renderer, automatic modular Brotli/Base90 preparation
+and their matching ABIs. The supported agent path is the SDK and MCP workflow
+below. A modern minting UI is not established by this handoff.
 
-The checkout at `7e562740e93152e59f827937acb52de46922f30c` already contains
-the modern creator APIs and ABIs, but the Sepolia registry has **no deployment
-record for `KeelCreatorFactory` or `KeelArtifactTokenRenderer`**. A new 1/1 using
-`buildKeelCreatorERC721ACall` requires that exact modern factory and its bound
-renderer. Do not pass the older `KeelFactory` address to those calls. No supported
-modern minting UI or publication-ready modern pair is established by this handoff.
-Supply the deployment manifest/transaction hashes if that pair was deployed
-outside the committed records; verify both receipts, code identities and
-`factory.metadataRenderer()` before selecting it.
+## Current creator deployment
 
-The current `KeelArtifactTokenRenderer` source returns a Base64 animation document
-and Base64 metadata. Deploying that pair alone would not implement the prepared
-Base90/Brotli COPY route. That route also needs its matching registered composer,
-reader and shell, authenticated full-return bytes and offline browser proof.
-Do not describe the older renderer path as prepared COPY.
+Select instance **`creator-inline-20261005`** explicitly. The complete receipt
+and runtime inventory is in [ethereum-sepolia.json](../deployments/ethereum-sepolia.json).
 
-## Verified storage and COPY infrastructure
+| Contract | Address |
+| --- | --- |
+| KeelCreatorFactory | `0x5828eBA761ab5eA72A349284da5658AD0ECD8416` |
+| KeelArtifactTokenRenderer | `0x315368393AfAd4b1EDcbFC6E82152aCeB3b9263d` |
+| KeelMintRouteRegistry | `0xB3CD12cEf903B889Bc6C500726411d4c04f62bC1` |
+| KeelHold | `0xD820e337692A6Eb7a4878e42ce88CBCFF49B55CF` |
+| KeelRawTokenURIBuilder | `0x1AB38f8c568FD373AEf05618C0ab387b30707AaE` |
+| KeelRawFragmentValidationRegistry | `0xbBD281E72167D33261EBe9aa78F34907EFC2861D` |
+| KeelRawInlineShellRegistry | `0x7879cB175ef93c22A1E99bceD6868d3e7bC5A3D6` |
 
-| Contract | Address | Use |
-| --- | --- | --- |
-| KeelHold | `0x0a4f31d5ab08029e4c68f6f3227d9fa3a2d66267` | Immutable object storage |
-| KeelRawTokenURIBuilder | `0x70b5984c19baec22beefb1c2e0bd75a41e1452e0` | Existing raw-percent COPY reader bound to that Hold |
+`factory.metadataRenderer()` binds the renderer above. The renderer's configured
+prepared COPY reader and shell registry authenticate raw-percent fragments and
+container-table commitments. The collection's owner can bind its presentation.
+The factory's four implementations and seed-block archive are also recorded.
+The older `KeelFactory` and legacy Base64 renderer route are separate APIs.
 
-`pnpm setup:sepolia` verifies both exact runtime hashes and deployment receipts
-and their storage binding. Use `KEEL_SEPOLIA_RPC_URL` to select an archival
-Sepolia endpoint; the default KEEL public RPC returned the historical receipts
-on 2026-10-05. PublicNode returned null for the older Hold receipt at this check,
-so runtime presence there alone did not pass receipt verification.
+The reusable verification shell uses **gzip/Base64 boot** with its embedded
+**Base90/Brotli decoder**. Fresh packages default to Brotli when smaller, then
+Base90 and parser/COPY-reader escaping. Prepared payloads are copied during
+tokenURI, with no runtime payload encoder or whole-document Base64 wrapper.
+Public modules declare `encryption: none`; optional private envelopes keep their
+actual encryption profile. Existing REDLINE PPMd packages retain their codec.
 
-These immutable addresses predate the newer transport source changes. Updating the
-SDK or contract source does not update deployed code. Fresh Base90/Brotli and optional profiles
-require their matching registered reader and shell revisions plus a complete
-selected-chain return test. Preserve existing compatible object carriages and
-do not silently re-encode or substitute a transport to fit an older reader.
+This is governed Sepolia tester infrastructure. Its storage manager uses the
+existing one-owner test policy; production governance is unchanged. Protocol
+fees for this instance are zero, while Ethereum transaction gas remains payable.
 
-## Install and verify
+The verified smoke 1/1 is token 1 at
+`0x14966C71bB7fc552c993cF13d97B0F249F6d5819`, minted in transaction
+`0x4998538877c6e87e970f7e7df519d9e2131d416214bc798c48134624892feae0`.
+Its complete tokenURI is **193,146 bytes** and the measured call uses
+**2,815,501 gas**. Exact mint/read-back, complete URI/MCP and Chrome gameplay
+proofs are included in [the creator manifest](../deployments/creator-inline-20261005/manifest.json).
+Chrome recorded zero external HTTP/RPC requests. `pnpm sepolia:smoke-check`
+rechecks the successful receipt, owner and exact public bytes without signing.
+The separate [creator-wallet fork proof](../deployments/creator-inline-20261005/creator-wallet-fork-proof.json)
+uses automatic SDK preparation and a fresh wallet rather than platform authority;
+its chain-31337 evidence is distinct from the live Sepolia smoke mint.
 
-Check out the exact published refresh commit supplied with this handoff, then:
+## Install and prepare a new 1-of-1
+
+Preserve local edits, fetch `codex/sepolia-index-refresh`, and check out the exact
+refresh commit supplied in the release message. Then run:
 
 ```sh
 pnpm setup:friend
 pnpm setup:sepolia
-pnpm sepolia:verify
 ```
 
-For an existing checkout, preserve local edits before switching revisions.
-`pnpm sepolia:manifest` prints the recorded addresses without network access.
-`pnpm sepolia:verify --output=sepolia-readback.json` writes a fresh read-only
-snapshot. These commands never sign, upload, deploy or mint.
+`setup:sepolia` verifies the modern instance's exact deployment receipts, runtime
+hashes, factory/renderer and reader/store bindings. It is read-only. The default
+RPC is `https://rpc.keel-test.149-28-255-65.sslip.io`; set `KEEL_SEPOLIA_RPC_URL`
+to use another archival Sepolia endpoint. `pnpm sepolia:manifest` prints the full
+inventory offline; `pnpm sepolia:verify --output=sepolia-readback.json` refreshes
+its public-chain evidence without signing. Unrelated historical records can
+remain unverified without substituting them for the authenticated creator instance.
 
-## Modules and the 1/1 publication boundary
+Start MCP with `pnpm mcp`, then call **`keel-creator-inline-prepare`** for the
+game's modular files and poster. It defaults to the correct Sepolia store and
+handles compression, Base90, escaping, shell references and renderer commitments.
+The SDK equivalent is **`prepareKeelCreatorInline`**. See the complete arguments
+and wallet steps in [modern creator prepared Inline](KEEL_CREATOR_PREPARED_INLINE.md).
 
-New module packages record their actual Base90/Brotli transport and encryption
-status. See [module runtime transport](KEEL_MODULE_RUNTIME_TRANSPORT.md). Update
-the Studio catalog consumer before promoting that new catalog format. The public
-master catalog's 14 modules remain readable by the currently deployed consumer.
+The creator's own wallet publishes new objects with the existing fee-aware
+`prepareKeelWeld` calls, creates its 1/1 with `buildKeelCreatorERC721ACall`, binds
+token 1 using `buildKeelCreatorPreparedCopyBindingCall`, and registers/opts in
+its mint route before `buildKeelCreatorAdminMintCall`. It does not need the
+deployment wallet. Reuse the exact registered shell and unchanged module IDs.
 
-Infrastructure modules/ABIs and executable artwork modules are separate indexes.
-The SDK infrastructure registry is generated from `keel-contracts`; runtime
-discovery searches both `/api/modules` and `/api/verified-modules` at the
-configured Studio. Catalog membership and source verification do not prove
-Sepolia publication. Inspect exact network, store, object ID, digest, license
-and receipt/read-back before binding a runtime.
+Each new game still needs complete URI/MCP, selected-chain source/read-back,
+actual gas and offline-browser checks before minting. At or below 2,000,000
+complete prepared bytes, full Inline is the default when the call fits. The
+successful mint receipt, token owner and exact public tokenURI establish
+completion. Compressed payload size alone is insufficient.
 
-Before publishing a game, resolve its registered shell and reader, reuse exact
-unchanged modules, prepare only new creator resources, and measure the complete
-tokenURI. At or below 2,000,000 complete prepared bytes, default to full Inline
-when the selected-chain call fits. Run `keel-inline-publication-check`, verify
-the exact public return and offline browser behavior, then obtain the creator's
-wallet approval. Mint completion requires a successful receipt and the minted
-token's exact public tokenURI read-back. Local Anvil publication remains available
-through `pnpm game:sandbox` and `pnpm sandbox:test` while the modern Sepolia pair
-is unresolved.
+## Indexes and validation boundaries
 
-## Validation and release status
+The generated SDK registry includes all newly deployed creator contracts and
+the reused dependencies under the explicit creator instance. Executable modules
+report their actual encoding, compression and encryption; see
+[module runtime transport](KEEL_MODULE_RUNTIME_TRANSPORT.md). Catalog presence
+does not establish a module's Sepolia identity: verify its exact store, object,
+source hash, license and public bytes before reuse.
 
-The refresh branch passes the SDK build, 30 focused package/transport/manifest
-tests, the prepared Brotli/Base90 opaque data-URI browser test, all 74 module
-vectors and catalog reproduction. Studio's full type check and 27 focused module
-tests pass. The contract COPY/TokenMatrix tests pass (26 cases); source ownership
-and module boundaries now pass, including the previously omitted name-source
-interface and KeelAuthority.
+The updated dense catalog and compatible Studio consumer are on their refresh
+branches. The public master catalog keeps its 14 legacy-compatible packages
+until that consumer is deployed and verified. Promoting the dense format ahead
+of the reader would make the current reader drop those modules.
 
-The broader SDK suite ran 1,380 tests: 1,359 passed, 13 failed and 8 skipped.
-Failures include legacy shell size/digest expectations, changed shell UI mocks,
-MCP preparation fixtures, an audio compression pin and a sibling mint ABI
-baseline. In particular, the older MCP binary asset preparation route is not
-release-verified. Contract catalog checks also found unclassified newer callable
-surfaces and unclassified package fixtures. These branches are review candidates;
-they are not a publication-ready release or evidence of a completed Sepolia mint.
+Focused creator-renderer, immutable binding, container-table, SDK/MCP preparation
+and browser checks cover this route. Earlier broad SDK results were 1,359 passed,
+13 failed and 8 skipped out of 1,380, including older preparation fixtures,
+shell expectations, audio and sibling ABI baselines. Contract catalog checks
+also reported unclassified newer surfaces. These release gaps are separate from
+the selected-chain creator-route proof; a clean full-suite release is not claimed.
 
-## Recent REDLINE reference
-
-The live REDLINE mint at `0xAe73eC8A4867C3886E8987371f0D57943f0f6BDB`, token 1, uses a separately registered prepared-carrier route with Base90, PPMd containers and gzip/Base64 shell boot. Its complete public return was reread on 2026-10-05 and matches the mint artifact byte for byte. See [the reference manifest](../deployments/redline-sepolia-reference.json) and [transport comparison](REDLINE_TRANSPORT_REFERENCE.md). It is an existing game viewer, not a supported general minting UI or evidence of the modern creator pair. Its owner-governed test infrastructure is recorded under `redline-reference-20261004`; select instances explicitly and preserve their authority boundaries. Fresh work defaults to Base90 carriage with the compact Brotli decoder available. Existing PPMd revisions retain their codec and commitments.
+The earlier REDLINE mint at `0xAe73eC8A4867C3886E8987371f0D57943f0f6BDB`, token
+1, remains recorded in [the reference manifest](../deployments/redline-sepolia-reference.json)
+with its existing Base90/PPMd and gzip/Base64 shell boot. Preserve that immutable
+revision rather than migrating its stored format as part of a fresh game mint.

@@ -148,7 +148,15 @@ replace a fixed reader. Use `inspectKeelInlineExistingObjectReuse` with
 `existingObjectReuse: { mode: "assembly-only", chainId, store }` for SDK work;
 its local byte checks do not authenticate chain evidence or grant authority.
 
-Only for explicitly new or changed source, call `keel-inline-prepare` without a
+For fresh modular game files using the modern Sepolia creator factory/renderer,
+call `keel-creator-inline-prepare` (SDK: `prepareKeelCreatorInline`). It defaults
+to the `creator-inline-20261005` store and automatically prepares Brotli when
+smaller, escaped Base90 COPY carriers, container commitments and the registered
+gzip/Base64 shell references. Authenticate those exact shell references; keep
+the fee-aware upload, complete URI/MCP, gas, offline browser and mint read-back
+gates. Read `docs/KEEL_CREATOR_PREPARED_INLINE.md` and the Sepolia tester handoff.
+
+For other explicitly new or changed source, call `keel-inline-prepare` without a
 carriage override. New compact preparation uses the raw-percent builder:
 resource packing happens once and the complete HTML/metadata receive no new
 Base64 wrapper. Existing bound carriage is retained automatically; the creator

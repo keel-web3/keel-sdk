@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 // Deployment discovery and optional public-chain verification. Never signs.
-import { mkdir, writeFile } from 'node:fs/promises';
+import { mkdir, readFile, writeFile } from 'node:fs/promises';
 import { dirname, resolve } from 'node:path';
 import { pathToFileURL } from 'node:url';
 import { createPublicClient, http, keccak256, parseAbi } from 'viem';
@@ -86,6 +86,12 @@ async function main() {
     const rpc = process.env.KEEL_SEPOLIA_RPC_URL ?? 'https://rpc.keel-test.149-28-255-65.sslip.io';
     manifest = await verifySepoliaManifest(createPublicClient({ transport: http(rpc, { timeout: 20_000, retryCount: 1 }) }), manifest);
   }
+  try {
+    const creator = JSON.parse(await readFile(resolve(import.meta.dirname, '../deployments/creator-inline-20261005/manifest.json'), 'utf8'));
+    const instance = manifest.contracts.filter(row => row.instance === 'creator-inline-20261005');
+    if (creator.chainId !== SEPOLIA_CHAIN_ID || !instance.some(row => row.contract === 'KeelCreatorFactory' && addressEqual(row.address, creator.factory)) || !instance.some(row => row.contract === 'KeelArtifactTokenRenderer' && addressEqual(row.address, creator.renderer))) throw new Error('Creator proof does not match recorded infrastructure.');
+    manifest.creatorPreparedInline = { ...creator, evidence: 'recorded-live-mint-and-browser-proof; each new game requires its own project gates' };
+  } catch (error) { if (error.code !== 'ENOENT') throw error; }
   const json = `${JSON.stringify(manifest, null, 2)}\n`;
   const output = args.find(arg => arg.startsWith('--output='))?.slice(9);
   if (output) { const file = resolve(output); await mkdir(dirname(file), { recursive: true }); await writeFile(file, json); console.log(`${manifest.contracts.length} Sepolia records -> ${file}; modern creator: ${manifest.modernCreator.status}`); }

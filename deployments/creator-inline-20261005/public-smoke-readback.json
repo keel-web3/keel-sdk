@@ -1,0 +1,12 @@
+{
+  "status": "mint-receipt-and-exact-public-readback-verified",
+  "chainId": 11155111,
+  "blockNumber": "11852907",
+  "collection": "0x14966C71bB7fc552c993cF13d97B0F249F6d5819",
+  "tokenId": "1",
+  "owner": "0x5E2a993c132A6869b9e636D139E1Ba698F7918F0",
+  "tokenURIBytes": 193146,
+  "recordedBrowserProof": "deployments/creator-inline-20261005/browser-proof.json",
+  "browserRun": "not-performed-by-this-read-only-check",
+  "writes": 0
+}

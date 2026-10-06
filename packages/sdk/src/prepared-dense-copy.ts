@@ -3,7 +3,7 @@ import { createHash } from "node:crypto";
 import { transform } from "esbuild";
 import { unpackKeelInlineDescriptors } from "./inline-descriptor-columns.js";
 import { buildCompactInlineKeelShell } from "./verification-shell.js";
-import { encodeKeelDenseTransport, serializeKeelDenseTransportJSON, toKeelDenseTransportDataURL, type KeelDenseTransportProfile } from "./dense-transport.js";
+import { encodeKeelDenseTransport, serializeKeelDenseTransportJSON, prepareKeelDenseCopyFragment, type KeelDenseTransportProfile } from "./dense-transport.js";
 
 /** Prepare one fresh COPY carrier. Only preparedBytes is uploaded; the local
  * compressed bytes supply the source commitment for the container descriptor. */
@@ -22,8 +22,7 @@ export function prepareKeelDensePayload(source: Uint8Array, options: {
   const transportProfile = options.transportProfile ?? "base90-v1";
   const storedDense = encodeKeelDenseTransport(compressedBytes, transportProfile);
   const jsonText = serializeKeelDenseTransportJSON(storedDense).slice(1, -1);
-  const body = (kind: "html" | "metadata", text: string) => toKeelDenseTransportDataURL(kind, text).slice(toKeelDenseTransportDataURL(kind, "").length);
-  const preparedBytes = new Uint8Array(Buffer.from(body("metadata", JSON.stringify(body("html", jsonText)).slice(1, -1))));
+  const preparedBytes = prepareKeelDenseCopyFragment(jsonText);
   const integrity = (bytes: Uint8Array) => { const hash = createHash("sha256"); hash.update(bytes); return { algorithm: "sha256" as const, digest: `0x${hash.digest("hex")}` as const, byteLength: bytes.length }; };
   return { compression, transportProfile, storedDense, compressedBytes: new Uint8Array(compressedBytes), preparedBytes,
     decodedIntegrity: integrity(original), storedIntegrity: integrity(compressedBytes), preparedIntegrity: integrity(preparedBytes),

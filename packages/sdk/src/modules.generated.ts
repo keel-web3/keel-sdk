@@ -963,6 +963,26 @@ export const KEEL_DEPLOYMENTS: readonly KeelDeployment[] = [
   {
     "module": "keel-artifacts",
     "chainId": 11155111,
+    "instance": "creator-inline-20261005",
+    "contract": "KeelArtifactRegistry",
+    "address": "0x44AeAEBe72a28C9fd59a1633Ed69d1eB5c421270",
+    "block": "11831485",
+    "txHash": "0x6dc207be9132761ff4010ce04925053ac2c2dabb9f1cfae06215376f241dd077",
+    "runtimeCodeHash": "0x998f0f57c7450d4b3395b851b2b4aad783dc5095dd16dfcdba84b9506624de7d"
+  },
+  {
+    "module": "keel-artifacts",
+    "chainId": 11155111,
+    "instance": "creator-inline-20261005",
+    "contract": "KeelRawFragmentValidationRegistry",
+    "address": "0xbBD281E72167D33261EBe9aa78F34907EFC2861D",
+    "block": "11831486",
+    "txHash": "0x7d104cfc22df5f3a41024f3364f4d0b66b9bf02a72696480e6537ad9a6e1f4a9",
+    "runtimeCodeHash": "0x9447e8d5d3e74d95d9a336b17617ab5a0d44ae09adf25a0ab7c05de27726de57"
+  },
+  {
+    "module": "keel-artifacts",
+    "chainId": 11155111,
     "instance": "redline-reference-20261004",
     "contract": "KeelArtifactFragmentResolver",
     "address": "0x0C3b49efE400Cb1b098D978B1512ca609F4DA6b6",
@@ -1125,6 +1145,76 @@ export const KEEL_DEPLOYMENTS: readonly KeelDeployment[] = [
   {
     "module": "keel-die",
     "chainId": 11155111,
+    "instance": "creator-inline-20261005",
+    "contract": "KeelArtifactTokenRenderer",
+    "address": "0x315368393AfAd4b1EDcbFC6E82152aCeB3b9263d",
+    "block": "11852701",
+    "txHash": "0xd8c04513d1c4b8a0994f2ef695be1c65a3ceba1a9b78ea0820bc0c38b5e6665a",
+    "runtimeCodeHash": "0x29f552e26df31950fe44c1c5d4f2804935b947aad82fca2bf85f0862d7f7621d"
+  },
+  {
+    "module": "keel-die",
+    "chainId": 11155111,
+    "instance": "creator-inline-20261005",
+    "contract": "KeelCreator1155",
+    "address": "0x14BE3D519Cb72F6613F8D0a8AaCba0e788D00a37",
+    "block": "11852735",
+    "txHash": "0x05e403f4af41b377c0941570a84fe1bf891badff431106f42a83327ca1d684c1",
+    "runtimeCodeHash": "0x8f21138bacb1ad7267632eabb124b147a2216ed39242b21aef6c64d627952b3a"
+  },
+  {
+    "module": "keel-die",
+    "chainId": 11155111,
+    "instance": "creator-inline-20261005",
+    "contract": "KeelCreator721",
+    "address": "0x2E714D7E056395Fa8B1e08EecCf591Ad800E468A",
+    "block": "11852733",
+    "txHash": "0x132a26dfa4e3457d78865f364eb39fb208840dbd8479f0e5e80d6de7bc2468f4",
+    "runtimeCodeHash": "0xb6159e4c11a2c81ae99a829cc6c7404c674620d4fc413057f157c5b3df735f08"
+  },
+  {
+    "module": "keel-die",
+    "chainId": 11155111,
+    "instance": "creator-inline-20261005",
+    "contract": "KeelCreator721A",
+    "address": "0x1d1F5133113d832b8e7f5beBC17A3850656ADa8e",
+    "block": "11852732",
+    "txHash": "0x5924fb73bf0ed48f3c7a6d1d886f6ea290477553098d12208655d29a9ada2711",
+    "runtimeCodeHash": "0xbc0d654213c8d70f30ed073db4228c164ae99d2f7d6859737d97497d6fbedbae"
+  },
+  {
+    "module": "keel-die",
+    "chainId": 11155111,
+    "instance": "creator-inline-20261005",
+    "contract": "KeelCreatorFactory",
+    "address": "0x5828eBA761ab5eA72A349284da5658AD0ECD8416",
+    "block": "11852738",
+    "txHash": "0x2a5f34a7084db09da2c4d83b7a9eec1955e4f12078cbb713b7e9bd1858def02a",
+    "runtimeCodeHash": "0x0b4179995be5ba969fc5dbce1f092fff110fa251f36a03767d4a5c01b41a19f2"
+  },
+  {
+    "module": "keel-die",
+    "chainId": 11155111,
+    "instance": "creator-inline-20261005",
+    "contract": "KeelCreatorSeeded721A",
+    "address": "0xd96CA5ed492BF3442Aa3fDFe27aff2202879CcaD",
+    "block": "11852737",
+    "txHash": "0xc9ec520bbf0e09d09db5bfc0a7e1d65581c43cb1571206fe94e5c856f488509d",
+    "runtimeCodeHash": "0x5fb0457e4cd0c122397189eacf9b4b175cd93d61deb5fbe0df03c0caae923be0"
+  },
+  {
+    "module": "keel-die",
+    "chainId": 11155111,
+    "instance": "creator-inline-20261005",
+    "contract": "KeelSeedBlockArchive",
+    "address": "0xB8ECaA39B4f8777B27996914992a69C752D17023",
+    "block": "11852736",
+    "txHash": "0xdb528ef0685890f430c2ccf6d7546b90e68507b9e2109a9761461bdc2f9df56e",
+    "runtimeCodeHash": "0x35cba7fd1c83c46dac95f47bbf874b94cbfbbb2c869a9d5a63acee35334d6a65"
+  },
+  {
+    "module": "keel-die",
+    "chainId": 11155111,
     "instance": "showcase",
     "contract": "KEEL721",
     "address": "0x71B25649E8A27992494eDAD355497c0Bea50A8e0",
@@ -1179,6 +1269,36 @@ export const KEEL_DEPLOYMENTS: readonly KeelDeployment[] = [
   {
     "module": "keel-harness",
     "chainId": 11155111,
+    "instance": "creator-inline-20261005",
+    "contract": "KeelHarnessBuilder",
+    "address": "0x3c70931E0cc22EeEd3716d2a8BB86Eb34e13Ce65",
+    "block": "11852677",
+    "txHash": "0xe0120eb1574f1ec13885bfed637cff9a35683ffd278a361c44e15fb52e688fda",
+    "runtimeCodeHash": "0x4bff03ee7dbafa5b02bebae51065d2ed57f2e4342d0244acb3b78320d36ed99c"
+  },
+  {
+    "module": "keel-harness",
+    "chainId": 11155111,
+    "instance": "creator-inline-20261005",
+    "contract": "KeelRawInlineShellRegistry",
+    "address": "0x7879cB175ef93c22A1E99bceD6868d3e7bC5A3D6",
+    "block": "11852676",
+    "txHash": "0xb2c792c92098ae992de0cc059d81c8da9c61c3e3883f1fbfa5fd2102eef0807b",
+    "runtimeCodeHash": "0xcd950bd1582022b4b14b697676e5bea70a8c572532d3ee18d242ec4037fa8478"
+  },
+  {
+    "module": "keel-harness",
+    "chainId": 11155111,
+    "instance": "creator-inline-20261005",
+    "contract": "KeelRawTokenURIBuilder",
+    "address": "0x1AB38f8c568FD373AEf05618C0ab387b30707AaE",
+    "block": "11831483",
+    "txHash": "0x6d60bc832a15f560b322ce5c81e1edd4ab50c91f73aa364fa9da5aed06c4c7c7",
+    "runtimeCodeHash": "0x4751a10e95fce5b2c195cf16dac31b4b3bbce11bc8b8671feb6ef11c2977ae44"
+  },
+  {
+    "module": "keel-harness",
+    "chainId": 11155111,
     "instance": "raw-copy",
     "contract": "KeelRawTokenURIBuilder",
     "address": "0x70b5984c19baec22beefb1c2e0bd75a41e1452e0",
@@ -1214,6 +1334,16 @@ export const KEEL_DEPLOYMENTS: readonly KeelDeployment[] = [
     "address": "0x7ac86609d6781e896c541210fdd8d1d919c5584a",
     "block": "11631488",
     "txHash": "0x822a9256583393e43a4fbca24adbc5bf8ba8f5611ae889fcdb08ae46f4a7e2d6"
+  },
+  {
+    "module": "keel-hold",
+    "chainId": 11155111,
+    "instance": "creator-inline-20261005",
+    "contract": "KeelHold",
+    "address": "0xD820e337692A6Eb7a4878e42ce88CBCFF49B55CF",
+    "block": "11831482",
+    "txHash": "0x98228e828e8b5167e7ef49311a2a8d36543907c33b051f8b4699f4e664598a2c",
+    "runtimeCodeHash": "0xce80e0ef810ed22ef959d62cf47c19f9f7e2c7ec0d22f4304489abc368d9720e"
   },
   {
     "module": "keel-hold",
@@ -1301,6 +1431,16 @@ export const KEEL_DEPLOYMENTS: readonly KeelDeployment[] = [
   {
     "module": "keel-mint-access",
     "chainId": 11155111,
+    "instance": "creator-inline-20261005",
+    "contract": "KeelMintRouteRegistry",
+    "address": "0xB3CD12cEf903B889Bc6C500726411d4c04f62bC1",
+    "block": "11852705",
+    "txHash": "0x420dc8294b5a9243d6aae643e1a9c8eb671981949cc07a157226f2b7c13013ac",
+    "runtimeCodeHash": "0xe66621ec52c726a358dc740216f24abe2dbb658d16d80d2623d234275477928d"
+  },
+  {
+    "module": "keel-mint-access",
+    "chainId": 11155111,
     "instance": "showcase",
     "contract": "KeelMintGate",
     "address": "0x9f21416da06edddb7f21a70bcbc91cd732803262",
@@ -1324,6 +1464,16 @@ export const KEEL_DEPLOYMENTS: readonly KeelDeployment[] = [
     "address": "0xc5a82b8320b6ad23cda749f079e3d7ad7b45cec9",
     "block": "11629046",
     "txHash": "0xb261303956960015186934bf8ca1131ed4f1284d3f771621897cfd4c34e5f867"
+  },
+  {
+    "module": "keel-publication",
+    "chainId": 11155111,
+    "instance": "creator-inline-20261005",
+    "contract": "KeelCarrierBatcher",
+    "address": "0x1854858Ea4574f4e293466DD0309BB3178d568E3",
+    "block": "11831595",
+    "txHash": "0xe29fc6aa8bca6b986b266eb5e69a13c6e72f1966ccb3ce42cc42411424c48739",
+    "runtimeCodeHash": "0x14e1b4260b30e4240c062b1c4562e2caefd45d0f70acaf086a31f695db8f0d21"
   },
   {
     "module": "keel-publication",

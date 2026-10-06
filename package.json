@@ -110,6 +110,7 @@
     "setup:sepolia": "node scripts/check-sepolia.mjs",
     "sepolia:manifest": "node scripts/sepolia-manifest.mjs",
     "sepolia:verify": "node scripts/sepolia-manifest.mjs --verify",
+    "sepolia:smoke-check": "node scripts/verify-creator-sepolia-mint.mjs",
     "setup:test": "node --test scripts/setup.test.mjs scripts/reuse.test.mjs",
     "sandbox:test": "node packages/game-engine/chain/alpha-e2e.mjs --template blank",
     "pixel:test": "pnpm --filter @keel/pixel test",
