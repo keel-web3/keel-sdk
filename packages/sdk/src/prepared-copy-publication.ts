@@ -1,3 +1,4 @@
+import { assertKeelDataURICompatibility, decodeKeelPreparedDenseCopyFragment } from "./dense-transport.js";
 import { assertKeelFreshPayloadCarriage, inspectKeelInlinePayloadCarriage } from "./inline-transport-audit.js";
 import { createIntegrity, type Integrity } from "@keel/protocol";
 import { assertKeelInlineImageBytes } from "./collector-policy.js";
@@ -107,15 +108,20 @@ export async function assertKeelPreparedCopyRead(input: KeelPreparedCopyReadInpu
   const raw = mediaType === "application/vnd.keel.token-uri-raw-percent-fragment";
   if (raw && !expectedTokenURI.startsWith("data:application/json;charset=utf-8,")) throw new TypeError("Compact COPY cannot add a complete-metadata Base64 layer.");
   if (!raw && !expectedTokenURI.startsWith("data:application/json;base64,")) throw new TypeError("Preserve the existing prepared Base64/percent envelope.");
+  assertKeelDataURICompatibility(expectedTokenURI, "Prepared tokenURI");
   const metadata = JSON.parse(decoder.decode(dataURI(expectedTokenURI, "application/json"))) as Record<string, unknown>;
   if (raw && (typeof metadata.animation_url !== "string" || !metadata.animation_url.startsWith("data:text/html;charset=utf-8,"))) throw new TypeError("Compact COPY cannot add a complete-HTML Base64 layer.");
+  if (typeof metadata.animation_url !== "string") throw new TypeError("Prepared COPY requires animation_url.");
+  assertKeelDataURICompatibility(metadata.animation_url, "Prepared animation_url");
   const html = dataURI(metadata.animation_url, "text/html");
-  const sourceHTML = decodeKeelInlineGraphFragment(graphBytes, mediaType);
-  if (!decoder.decode(html).includes(decoder.decode(sourceHTML))) throw new TypeError("Returned animation does not contain the exact decoded prepared graph.");
-  auditCreatorItems(html);
   assertKeelFreshPayloadCarriage(html);
   const payloadCarriage = inspectKeelInlinePayloadCarriage(html);
+  const sourceHTML = raw && payloadCarriage.preparedDenseCopy?.contractOperation === "verified-copy"
+    ? decodeKeelPreparedDenseCopyFragment(graphBytes) : decodeKeelInlineGraphFragment(graphBytes, mediaType);
+  if (!decoder.decode(html).includes(decoder.decode(sourceHTML))) throw new TypeError("Returned animation does not contain the exact decoded prepared graph.");
+  auditCreatorItems(html);
   if (typeof metadata.image !== "string" || !metadata.image.startsWith("data:image/")) throw new TypeError("Prepared COPY needs the self-contained original collector image.");
+  assertKeelDataURICompatibility(metadata.image, "Prepared image");
   const imageHeader = metadata.image.slice(5, metadata.image.indexOf(",")).split(";", 1)[0]!;
   assertKeelInlineImageBytes(dataURI(metadata.image, imageHeader), imageHeader);
   return Object.freeze({

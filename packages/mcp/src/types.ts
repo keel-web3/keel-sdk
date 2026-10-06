@@ -102,6 +102,7 @@ export interface Workspace {
   resolveExistingDirectory(pathValue: string): Promise<string>;
   resolveOutputDirectory(pathValue: string): Promise<string>;
   writeJson(pathValue: string, value: unknown): Promise<string>;
+  writeBytes(pathValue: string, value: Uint8Array, options?: { readonly private?: boolean }): Promise<string>;
 }
 
 export interface ToolContext {

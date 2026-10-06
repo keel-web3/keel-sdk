@@ -40,7 +40,7 @@ export async function loadCopyReadFiles(context: ToolContext, value: unknown) {
 export const COPY_READ_TOOL_DEFINITIONS: readonly ToolDefinition[] = [{
   descriptor: {
     name: "keel-inline-publication-check",
-    description: "Mandatory byte/route check for prepared-fragment publish-plan: compare the complete collection tokenURI with canonical prepared COPY, including image, envelope and exact graph commitment. Reject extra wrappers, changed bytes, custom transport, external dependencies and oversized reads. Existing aligned Base64/percent fragments retain their original builder. Local files/caller-supplied gas are review evidence; this does not authenticate a chain read or sign/submit.",
+    description: "Mandatory byte/route check for prepared-fragment publish-plan: compare the complete collection tokenURI with canonical prepared COPY, including image, envelope and exact graph commitment. Reject unescaped URI characters at both metadata and animation layers, extra wrappers, changed bytes, custom transport, external dependencies and oversized reads. Browser playback does not establish URI compatibility. Existing aligned Base64/percent fragments retain their original builder. Local files/caller-supplied gas are review evidence; this does not authenticate a chain read or sign/submit.",
     inputSchema: { type: "object", additionalProperties: false, properties: {
       ...COPY_READ_SCHEMA.properties,
       chainId: { type: "integer", minimum: 1 }, store: { type: "string", pattern: "^0x[0-9a-fA-F]{40}$" },

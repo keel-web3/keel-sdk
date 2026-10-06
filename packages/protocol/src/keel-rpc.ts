@@ -96,6 +96,8 @@ export interface KeelRpcClientOptions {
   readonly chainId?: number;
   /** Tezos chain id (`NetXdQprcVkpaWU`), for disclosure and endpoint checks. */
   readonly network?: string;
+  /** Check the expected EVM chain on every endpoint, including failover. */
+  readonly verifyChainId?: boolean;
   /**
    * The governed host list. Defaults to the built-in genesis list; pass the
    * deployment's own list (read from `KeelManager.rpcHostList`) to hold
@@ -140,10 +142,21 @@ export interface KeelTezosView {
   readonly block?: string;
 }
 
+export interface KeelRpcSnapshot {
+  readonly chainId: number;
+  readonly blockNumber: string;
+  readonly blockHash: string;
+  readonly timestamp: string;
+}
+
 export interface KeelRpcClient {
   readonly family: KeelRpcFamily;
   /** An arbitrary read. Ethereum only; throws on a Tezos client. */
   call(request: KeelEthCall): Promise<string>;
+  /** Read deployed EVM code at the same pinned snapshot as contract calls. */
+  getCode(address: string, block?: KeelEthCall["block"]): Promise<string>;
+  /** An EVM block snapshot for consistent EIP-1898 reads. No signing methods. */
+  snapshot(): Promise<KeelRpcSnapshot>;
   /** An arbitrary on-chain view. Tezos only; throws on an Ethereum client. */
   view(request: KeelTezosView): Promise<unknown>;
   /** The bytes of one Keel object, whichever family holds it. */
@@ -216,6 +229,9 @@ function normalizedObjectId(objectId: string): string {
 
 export function createKeelRpcClient(options: KeelRpcClientOptions): KeelRpcClient {
   const { family } = options;
+  if (options.verifyChainId && (family !== "ethereum" || !Number.isSafeInteger(options.chainId) || options.chainId! <= 0)) {
+    throw new TypeError("Chain checking requires an expected EVM chainId.");
+  }
   if (family !== "ethereum" && family !== "tezos") {
     throw new TypeError(`Unsupported RPC family ${String(family)}.`);
   }
@@ -237,6 +253,7 @@ export function createKeelRpcClient(options: KeelRpcClientOptions): KeelRpcClien
     ? undefined
     : (options.hostList as KeelRpcHostList);
 
+  const checkedChains = new Map<string, Promise<void>>();
   let servedBy: string | undefined;
   let reads = 0;
 
@@ -244,12 +261,14 @@ export function createKeelRpcClient(options: KeelRpcClientOptions): KeelRpcClien
     let last: unknown;
     for (const endpoint of endpoints) {
       try {
+        if (options.verifyChainId) await checkChain(endpoint);
         const value = await run(endpoint);
         servedBy = endpoint;
         reads += 1;
         return value;
       } catch (error) {
         last = error;
+        if (options.signal?.aborted) throw error;
       }
     }
     throw last instanceof Error
@@ -258,6 +277,7 @@ export function createKeelRpcClient(options: KeelRpcClientOptions): KeelRpcClien
   }
 
   async function request(endpoint: string, path: string, body?: unknown): Promise<unknown> {
+    if (options.signal?.aborted) throw new KeelRpcError("RPC request aborted.", "transport.aborted");
     const controller = new AbortController();
     const timer = setTimeout(() => controller.abort(), timeoutMs);
     const onAbort = (): void => controller.abort();
@@ -277,33 +297,62 @@ export function createKeelRpcClient(options: KeelRpcClientOptions): KeelRpcClien
           redactRpcUrl(endpoint),
         );
       }
-      const text = await response.text();
-      if (text.length > maxResponseBytes * 2 + 1024) {
-        throw new KeelRpcError("RPC response exceeds the configured limit.", "limit.response-bytes");
+      // Enforce the cap while reading, before allocating an unbounded string.
+      // ABI hex has two ASCII characters per byte plus its JSON envelope.
+      const reader = response.body?.getReader();
+      if (!reader) throw new KeelRpcError("RPC response has no body.", "rpc.empty");
+      const decoder = new TextDecoder("utf-8", {fatal: true});
+      const chunks: string[] = []; let size = 0;
+      try {
+        while (true) {
+          const {done, value} = await reader.read();
+          if (done) break;
+          size += value.byteLength;
+          if (size > maxResponseBytes * 2 + 1024) {
+            throw new KeelRpcError("RPC response exceeds the configured limit.", "limit.response-bytes");
+          }
+          chunks.push(decoder.decode(value, {stream: true}));
+        }
+        chunks.push(decoder.decode());
+        return JSON.parse(chunks.join("")) as unknown;
+      } finally {
+        await reader.cancel().catch(() => undefined);
+        reader.releaseLock();
       }
-      return JSON.parse(text) as unknown;
     } finally {
       clearTimeout(timer);
       options.signal?.removeEventListener("abort", onAbort);
     }
   }
 
-  async function jsonRpc(endpoint: string, method: string, params: readonly unknown[]): Promise<string> {
+  async function jsonRpcResult(endpoint: string, method: string, params: readonly unknown[]): Promise<unknown> {
     const body = (await request(endpoint, "", { jsonrpc: "2.0", id: 1, method, params })) as {
-      result?: unknown;
-      error?: { message?: string };
+      jsonrpc?: string; id?: unknown; result?: unknown; error?: { message?: string };
     };
-    if (body.error !== undefined) {
-      throw new KeelRpcError(
-        `${method} failed: ${body.error.message ?? "node returned an error"}.`,
-        "rpc.error",
-        redactRpcUrl(endpoint),
-      );
-    }
-    if (typeof body.result !== "string") {
-      throw new KeelRpcError(`${method} returned no result.`, "rpc.empty", redactRpcUrl(endpoint));
+    if (body?.jsonrpc !== "2.0" || body.id !== 1 || body.error !== undefined || !Object.hasOwn(body, "result")) {
+      throw new KeelRpcError(`${method} returned an invalid response.`, "rpc.error", redactRpcUrl(endpoint));
     }
     return body.result;
+  }
+
+  async function jsonRpc(endpoint: string, method: string, params: readonly unknown[]): Promise<string> {
+    const result = await jsonRpcResult(endpoint, method, params);
+    if (typeof result !== "string") throw new KeelRpcError(`${method} returned no result.`, "rpc.empty", redactRpcUrl(endpoint));
+    return result;
+  }
+
+  function checkChain(endpoint: string): Promise<void> {
+    let pending = checkedChains.get(endpoint);
+    if (pending === undefined) {
+      pending = jsonRpc(endpoint, "eth_chainId", []).then(value => {
+        if (!/^0x[0-9a-f]+$/iu.test(value) || BigInt(value) !== BigInt(options.chainId!)) {
+          throw new KeelRpcError("RPC returned a different chain.", "chain.mismatch", redactRpcUrl(endpoint));
+        }
+      });
+      checkedChains.set(endpoint, pending);
+      void pending.catch(() => { if (checkedChains.get(endpoint) === pending) checkedChains.delete(endpoint); });
+    }
+    return pending;
   }
 
   function requireFamily(expected: KeelRpcFamily, method: string): void {
@@ -321,6 +370,33 @@ export function createKeelRpcClient(options: KeelRpcClientOptions): KeelRpcClien
       return attempt((endpoint) =>
         jsonRpc(endpoint, "eth_call", [{ to: callRequest.to, data: callRequest.data }, block]),
       );
+    },
+
+    async getCode(address: string, block: KeelEthCall["block"] = "latest"): Promise<string> {
+      requireFamily("ethereum", "getCode");
+      if (!/^0x[0-9a-f]{40}$/iu.test(address)) throw new TypeError("Invalid code address.");
+      return attempt(async endpoint => {
+        const result = await jsonRpc(endpoint, "eth_getCode", [address, block]);
+        if (!/^0x(?:[0-9a-f]{2})*$/iu.test(result)) throw new KeelRpcError("RPC returned invalid code.", "decode.hex");
+        return result;
+      });
+    },
+
+    async snapshot(): Promise<KeelRpcSnapshot> {
+      requireFamily("ethereum", "snapshot");
+      if (!Number.isSafeInteger(options.chainId) || options.chainId! <= 0) throw new TypeError("An EVM snapshot requires chainId.");
+      return attempt(async endpoint => {
+        await checkChain(endpoint);
+        const raw = await jsonRpcResult(endpoint, "eth_getBlockByNumber", ["latest", false]);
+        const block = raw as { number?: unknown; hash?: unknown; timestamp?: unknown } | null;
+        if (!block || typeof block.number !== "string" || !/^0x[0-9a-f]+$/iu.test(block.number)
+          || typeof block.hash !== "string" || !/^0x[0-9a-f]{64}$/iu.test(block.hash)
+          || typeof block.timestamp !== "string" || !/^0x[0-9a-f]+$/iu.test(block.timestamp)) {
+          throw new KeelRpcError("RPC block snapshot is incomplete.", "snapshot.invalid", redactRpcUrl(endpoint));
+        }
+        return Object.freeze({chainId: options.chainId!, blockNumber: BigInt(block.number).toString(),
+          blockHash: block.hash.toLowerCase(), timestamp: BigInt(block.timestamp).toString()});
+      });
     },
 
     async view(viewRequest: KeelTezosView): Promise<unknown> {

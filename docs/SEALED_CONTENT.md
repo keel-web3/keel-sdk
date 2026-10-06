@@ -201,17 +201,30 @@ be linked to the same passkey unless the writer chose to store the raw id
 recovery key, a passphrase) still opens the object. With no working slot left
 the content cannot be recovered: there is no escrow and no reset.
 
-**Why it is quantum-resistant.** Nothing in the content path uses public-key
-cryptography. AES-256, HKDF-SHA-256, HMAC-SHA-256 (inside the passkey's PRF)
-and SHA-256 keep about 128-bit security against Grover's algorithm, and
-Shor's algorithm does not apply. Recorded ciphertext today cannot be opened
-by a future quantum computer without one of the secrets. Two edges to know:
+**Quantum resistance of the content cipher.** The content path and key wrapping
+use AES-256-GCM, random 256-bit content keys and symmetric key derivation.
+There is no RSA or elliptic-curve key establishment in this envelope. Generic
+quantum AES key search has roughly 128-bit query complexity; this is not a
+guarantee about future cryptanalysis or every hash property. NIST suggests
+AES-256-GCM with random IVs in its [post-quantum guidance](https://csrc.nist.gov/Projects/Post-Quantum-Cryptography/faqs).
+Confidentiality is limited by the weakest unlock slot, including password
+entropy and authenticator behavior. Two further edges to know:
 the passkey's own signature (ECDSA/EdDSA) is never used for sealing, but the
 channel that carries a PRF result from a USB/NFC security key or a phone
 (CTAP2 PIN/UV protocol, hybrid transport) and passkey sync between devices use
 elliptic-curve key agreement today; someone who records that traffic and later
 has a quantum computer could recover that one slot's secret. Local platform
-passkeys, passphrases and recovery keys do not have that exposure.
+passkeys and locally held recovery keys avoid that particular transport exposure;
+weak passphrases remain susceptible to guessing.
+
+`describeKeelSealed` now reports native-binary encoding, actual compression,
+AES-256-GCM, 256-bit keys, 128-bit authentication tags, symmetric key wrapping
+and the key-derivation algorithms. `unlockSecretStrength: "not-attested"` prevents
+that metadata from claiming to have measured password or PRF entropy. This
+description does not change existing envelope bytes. Ethereum signatures are a
+separate security boundary. Future public-key recipient encryption must use a
+reviewed post-quantum key-establishment profile; this symmetric layer does not
+claim to implement ML-KEM.
 
 **Limits.**
 

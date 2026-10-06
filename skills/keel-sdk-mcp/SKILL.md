@@ -86,3 +86,25 @@ authentication, registered runtime and browser proof remain separate. Report
 the full returned size separately from compressed/stored bytes; 900 KB is not
 a universal promise. Direct wallet programs must call the same check; the
 SDK/MCP cannot intercept arbitrary programs.
+
+**Dense Inline boundary:** Read docs/KEEL_PREPARED_DENSE_COPY.md before preparing fresh binary COPY content. Fresh bulk payloads default to Base90 text (base90-v1), with the compact Brotli decoder available by default; only the compressed shell boot uses Base64 literals. Apply strict URI escaping at both data URI layers and script-safe JSON serialization. Default preparation is buildKeelPreparedDenseCopyShell with omitted binaryPayloadCarriage and codecProfile; preserve explicit URI81, LZMA and PPMd choices. Do not apply whole-document Base64, blanket punctuation escaping or an unused encoded sibling upload. Optional PPMd and column descriptors require matching registered revisions; local fixture IDs are not chain receipts. Price the complete returned tokenURI and verify exact offline replay.
+
+## Canonical shell integrations
+
+Use the shared protected shell and `docs/KEEL_SHELL_APPLICATION_API.md`. The artwork client `__KEEL_SHELL__` supports data-only App panels and read-only verification/catalog calls. Keep protected proof state distinct from creator claims. The default retains auto-hide and one OnKEEL header with Proof, Token, Files, System and App pages. Token metadata, attributes, checked manifests, modules, plugins and external sources must show their actual provenance; do not invent missing declarations or execute manifest plugins.
+
+
+### Optional information and prereveal modules
+
+Keep Inline delivery unchanged when adding optional RPC information. Reuse the
+governed KEEL RPC reader for marketplace/commitment enrichment; denial, offline
+nodes or stale listing data must not delay artwork or change protected file
+verification. Show only fresh token-specific listings; retain OnKEEL gallery.
+For hidden-art/trait/seed-rule commitments use the optional `@keel/sdk/pre-reveal`
+module and `keel-prereveal-prepare`, with separate private proof output. Read
+`docs/KEEL_PREREVEAL.md`: pin the original registry revision and runtime, do not
+mix its salted SHA-256 proof with OZ metadata leaves, do not publish salts/keys
+early, and do not claim a recipe or burn-rule hash proves final pixels or a burn.
+Reuse native sealed/layered envelopes and compact attribute pages. Enable this
+feature only when the creator chooses a prereveal; it adds no required network
+dependency or authority to the canonical file proof.

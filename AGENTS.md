@@ -2,7 +2,7 @@
 
 # KEEL publication agent instructions
 
-**New collector Inline binary default:** Use `buildKeelPreparedDenseCopyShell` from `@keel/sdk`: prepare Base90 payload text and shell Base64 literals at build time, upload one chosen representation for new work, and make `tokenURI` copy committed fragments. Never add a runtime payload encoder or a whole-document Base64 layer. Read `docs/KEEL_PREPARED_DENSE_COPY.md`. Keep explicit Raw/as-is and custom-shell choices intact. Existing native packs need an explicitly authorized transport migration and a separate new-storage quote; do not describe it as zero-upload reuse. Before publication, run the complete URI/MCP check, authenticate the registered composer/shell, and verify offline browser behavior.
+**New collector Inline binary default:** Use `buildKeelPreparedDenseCopyShell` from `@keel/sdk`: prepare escaped Base90 payload text and compressed shell Base64 literals at build time, upload one chosen representation for new work, and make `tokenURI` copy committed fragments. Never add a runtime payload encoder or a whole-document Base64 layer. Read `docs/KEEL_PREPARED_DENSE_COPY.md`. Keep explicit Raw/as-is and custom-shell choices intact. Existing native packs need an explicitly authorized transport migration and a separate new-storage quote; do not describe it as zero-upload reuse. Before publication, run the complete URI/MCP check, authenticate the registered composer/shell, and verify offline browser behavior.
 
 **No encoded-return substitution:** An explicit native/as-is payload requirement for no Base64, no hex, unchanged files or no expanding encoding covers the contract return and HTML as well as storage. Do not claim compliance because Hold bytes are raw while the composer encodes them on read. The SDK refuses the Base64 embedded-container profile without an explicit creator-authorized `binaryPayloadCarriage: "base64"` selection; never add that selection to bypass an as-is request. Test actual source bytes, padding, ABI string decoding and browser data-URL behavior. If exact bytes do not survive, report the unsupported boundary and stop before signing. Do not silently choose Hybrid or a custom viewer. No prototype, size claim or padding recipe is considered working until the exact full-return and browser byte checks pass.
 
@@ -40,3 +40,19 @@ publisher must verify the complete expected/returned URI and selected-chain
 bytes before binding or minting. Require canonical shell records only when
 canonical protection is selected or claimed; do not claim universal
 enforcement from instructions alone.
+
+
+### Optional information and prereveal modules
+
+Keep Inline delivery unchanged when adding optional RPC information. Reuse the
+governed KEEL RPC reader for marketplace/commitment enrichment; denial, offline
+nodes or stale listing data must not delay artwork or change protected file
+verification. Show only fresh token-specific listings; retain OnKEEL gallery.
+For hidden-art/trait/seed-rule commitments use the optional `@keel/sdk/pre-reveal`
+module and `keel-prereveal-prepare`, with separate private proof output. Read
+`docs/KEEL_PREREVEAL.md`: pin the original registry revision and runtime, do not
+mix its salted SHA-256 proof with OZ metadata leaves, do not publish salts/keys
+early, and do not claim a recipe or burn-rule hash proves final pixels or a burn.
+Reuse native sealed/layered envelopes and compact attribute pages. Enable this
+feature only when the creator chooses a prereveal; it adds no required network
+dependency or authority to the canonical file proof.

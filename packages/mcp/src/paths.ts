@@ -86,14 +86,14 @@ async function outputDirectory(root: string, value: string): Promise<string> {
   }
 }
 
-async function writeJson(root: string, value: string, payload: unknown): Promise<string> {
+async function writeBytes(root: string, value: string, bytes: Uint8Array, options?: { readonly private?: boolean }): Promise<string> {
   const requested = lexicalPath(root, value, "output file");
   const parent = await existingDirectory(root, path.dirname(requested));
   const entries = await readdir(parent, { withFileTypes: true });
   const existing = entries.find((candidate) => candidate.name === path.basename(requested));
   if (existing?.isSymbolicLink()) throw new TypeError("output file cannot overwrite a symlink.");
   const temporary = path.join(parent, `.keel-mcp-${Date.now()}-${Math.random().toString(16).slice(2)}.tmp`);
-  await writeFile(temporary, `${JSON.stringify(payload, null, 2)}\n`, { flag: "wx" });
+  await writeFile(temporary, bytes, { flag: "wx", ...(options?.private ? {mode: 0o600} : {}) });
   await rename(temporary, requested);
   return requested;
 }
@@ -108,6 +108,7 @@ export async function createWorkspace(rootValue = "."): Promise<Workspace> {
     readFile: (value, maxBytes) => stableFile(root, value, maxBytes),
     resolveExistingDirectory: (value) => existingDirectory(root, value),
     resolveOutputDirectory: (value) => outputDirectory(root, value),
-    writeJson: (value, payload) => writeJson(root, value, payload),
+    writeJson: (value, payload) => writeBytes(root, value, new TextEncoder().encode(`${JSON.stringify(payload, null, 2)}\n`)),
+    writeBytes: (value, bytes, options) => writeBytes(root, value, bytes, options),
   };
 }

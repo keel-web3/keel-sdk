@@ -151,6 +151,12 @@ alone does not establish public-chain size or gas eligibility.
 
 ## Check Sepolia without signing
 
+See [the Sepolia tester handoff](SEPOLIA_TESTER_HANDOFF.md) and
+[`deployments/ethereum-sepolia.json`](../deployments/ethereum-sepolia.json)
+for the complete infrastructure inventory and modern creator-route gaps.
+`pnpm sepolia:manifest` lists the bundled records; `pnpm sepolia:verify`
+rechecks their receipts, runtime code and reader bindings.
+
 ```sh
 pnpm setup:sepolia
 ```
@@ -158,7 +164,9 @@ pnpm setup:sepolia
 This reads chain ID `11155111`, pins a block, checks both contract runtime hashes
 and deployment receipts, and verifies the builder points to the recorded storage
 contract. It uses a public RPC by default; set `KEEL_SEPOLIA_RPC_URL` for another
-provider. Keep credentials in your environment, not Git. An RPC outage fails the
+provider. The default is KEEL's public Sepolia RPC, which serves the historical
+deployment receipts; some public endpoints return null for these older transactions.
+Keep credentials in your environment, not Git. An RPC outage fails the
 check; it never changes networks or reports readiness on failure.
 
 The checked contract addresses come from

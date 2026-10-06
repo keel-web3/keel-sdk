@@ -1,0 +1,590 @@
+{
+  "protocol": "keel-sepolia-publication-reference@1",
+  "chainId": 11155111,
+  "collection": "0xAe73eC8A4867C3886E8987371f0D57943f0f6BDB",
+  "tokenId": "1",
+  "mintTransaction": "0xbe4b02c84f1d4c611c91b902e1a1e1d477119e350081ca8b9ec92990e7585183",
+  "link": "https://onchainchecker.xyz/collection/sepolia/0xAe73eC8A4867C3886E8987371f0D57943f0f6BDB/1",
+  "blockNumber": "11852174",
+  "blockHash": "0xeb2e2fad4c45da995b345234478b78bfd6b618436676f771af3425fb938c29bb",
+  "tokenURI": {
+    "byteLength": 999307,
+    "sha256": "0x97d439dc242aaf12f5dc71db54bbd3f4a3f5c36cacd2a070a3a58483b3f89394",
+    "matchesPublication": "exact"
+  },
+  "transport": {
+    "payload": "base90-v1",
+    "compression": "ppmd",
+    "shellBoot": "gzip+base64",
+    "preparation": "build-time",
+    "contractOperation": "verified-copy",
+    "completeDocumentBase64Layers": 0
+  },
+  "uriCompatibility": {
+    "tokenURI": {
+      "strictURICompatible": false,
+      "unsafeLiteralCount": 92993,
+      "unsafeLiteralExamples": [
+        "{",
+        "\"",
+        "\\",
+        "}",
+        "<",
+        "]",
+        ">",
+        "[",
+        "^",
+        "|",
+        "`"
+      ],
+      "malformedEscapeCount": 0
+    },
+    "animationURL": {
+      "strictURICompatible": false,
+      "unsafeLiteralCount": 93045,
+      "unsafeLiteralExamples": [
+        "<",
+        ">",
+        "\"",
+        "[",
+        "{",
+        "}",
+        "]",
+        "^",
+        "|",
+        "`",
+        "\\"
+      ],
+      "malformedEscapeCount": 0
+    },
+    "image": {
+      "strictURICompatible": true,
+      "unsafeLiteralCount": 0,
+      "unsafeLiteralExamples": [],
+      "malformedEscapeCount": 0
+    }
+  },
+  "resources": {
+    "logical": 28,
+    "containers": 3,
+    "resourceRPCs": 0
+  },
+  "shellId": "0x14fbf5986c636c08a0bd9f919fe45905deba37d3271dcbfebbdee171f8a85882",
+  "records": [
+    {
+      "contract": "KeelTestOwnerManager",
+      "address": "0xff0C324E076BD0E4d866cE564AD494a5e9B4398D",
+      "txHash": "0xb9d53a40cb94fc6f34bb486a26c8f923638f4ceb2d751eb00b5e41058dd77f28",
+      "block": "11831476",
+      "runtimeCodeHash": "0x7d23ceb5a487f08b5d6771025cb8784237bbb0e73edab08a86d4116fb0b5d2ee",
+      "runtimeIntegrity": {
+        "algorithm": "sha256",
+        "digest": "0xfd61b42612c3cdb28c604f109a499da01792460bf93d2558ab03040326e106cd",
+        "byteLength": 24205
+      },
+      "source": "REDLINE public deployment journal",
+      "scope": "application-reference",
+      "verification": {
+        "status": "receipt-and-runtime-verified",
+        "blockNumber": "11852174",
+        "blockHash": "0xeb2e2fad4c45da995b345234478b78bfd6b618436676f771af3425fb938c29bb"
+      }
+    },
+    {
+      "contract": "ERC1967Proxy",
+      "address": "0x560AeEFAE5e9a9cC94198B25Dc359C1579763DB6",
+      "txHash": "0x189798d00ed2829cc1c640515fe2fd76b12da443c6dc492bbee36d0f58280ddf",
+      "block": "11831477",
+      "runtimeCodeHash": "0x46a010df31eb642b47284650e80051e8f6239a0c995003d230b437810bc4b9b4",
+      "runtimeIntegrity": {
+        "algorithm": "sha256",
+        "digest": "0x257725b3197c327ba0c61bc82c91d399b51be675971f186578c13e6b55cb0714",
+        "byteLength": 76
+      },
+      "source": "REDLINE public deployment journal",
+      "scope": "application-reference",
+      "verification": {
+        "status": "receipt-and-runtime-verified",
+        "blockNumber": "11852174",
+        "blockHash": "0xeb2e2fad4c45da995b345234478b78bfd6b618436676f771af3425fb938c29bb"
+      }
+    },
+    {
+      "contract": "KeelFeeTreasury",
+      "address": "0xee1ab4dF9EFE27AB92Dd5B5ED9310C1eB7Ac3b7F",
+      "txHash": "0xbb5e344159a46e85195a2026cd8df3708adb23984ad8b1bf2a247ab942991b8c",
+      "block": "11831479",
+      "runtimeCodeHash": "0x4a80aee7404a845c918e952f68514cbdc7304fa9e4b69a4f2a0a26d4f96ace1e",
+      "runtimeIntegrity": {
+        "algorithm": "sha256",
+        "digest": "0xf879b030a99160d0a452b836b8b865ae328bd02bb6252687872f682c581a0cda",
+        "byteLength": 4309
+      },
+      "source": "REDLINE public deployment journal",
+      "scope": "application-reference",
+      "verification": {
+        "status": "receipt-and-runtime-verified",
+        "blockNumber": "11852174",
+        "blockHash": "0xeb2e2fad4c45da995b345234478b78bfd6b618436676f771af3425fb938c29bb"
+      }
+    },
+    {
+      "contract": "KeelHold",
+      "address": "0xD820e337692A6Eb7a4878e42ce88CBCFF49B55CF",
+      "txHash": "0x98228e828e8b5167e7ef49311a2a8d36543907c33b051f8b4699f4e664598a2c",
+      "block": "11831482",
+      "runtimeCodeHash": "0xce80e0ef810ed22ef959d62cf47c19f9f7e2c7ec0d22f4304489abc368d9720e",
+      "runtimeIntegrity": {
+        "algorithm": "sha256",
+        "digest": "0x2613e3d2e3dc25ff9c4d633c784471a9dbda644d0a98f82af800b11ddcc9ce0e",
+        "byteLength": 16437
+      },
+      "source": "REDLINE public deployment journal",
+      "scope": "application-reference",
+      "verification": {
+        "status": "receipt-and-runtime-verified",
+        "blockNumber": "11852174",
+        "blockHash": "0xeb2e2fad4c45da995b345234478b78bfd6b618436676f771af3425fb938c29bb"
+      }
+    },
+    {
+      "contract": "KeelRawTokenURIBuilder",
+      "address": "0x1AB38f8c568FD373AEf05618C0ab387b30707AaE",
+      "txHash": "0x6d60bc832a15f560b322ce5c81e1edd4ab50c91f73aa364fa9da5aed06c4c7c7",
+      "block": "11831483",
+      "runtimeCodeHash": "0x4751a10e95fce5b2c195cf16dac31b4b3bbce11bc8b8671feb6ef11c2977ae44",
+      "runtimeIntegrity": {
+        "algorithm": "sha256",
+        "digest": "0xdd086b49d282c36493971581bc4eb1f40258f798725fba07e0b835a0ddd46a2c",
+        "byteLength": 13253
+      },
+      "source": "REDLINE public deployment journal",
+      "scope": "application-reference",
+      "verification": {
+        "status": "receipt-and-runtime-verified",
+        "blockNumber": "11852174",
+        "blockHash": "0xeb2e2fad4c45da995b345234478b78bfd6b618436676f771af3425fb938c29bb"
+      }
+    },
+    {
+      "contract": "KeelArtifactRegistry",
+      "address": "0x44AeAEBe72a28C9fd59a1633Ed69d1eB5c421270",
+      "txHash": "0x6dc207be9132761ff4010ce04925053ac2c2dabb9f1cfae06215376f241dd077",
+      "block": "11831485",
+      "runtimeCodeHash": "0x998f0f57c7450d4b3395b851b2b4aad783dc5095dd16dfcdba84b9506624de7d",
+      "runtimeIntegrity": {
+        "algorithm": "sha256",
+        "digest": "0x998262e056912196f5e5e7750baa163d2a4b9eafd4f4da6f414cfa695e1bb08f",
+        "byteLength": 10899
+      },
+      "source": "REDLINE public deployment journal",
+      "scope": "application-reference",
+      "verification": {
+        "status": "receipt-and-runtime-verified",
+        "blockNumber": "11852174",
+        "blockHash": "0xeb2e2fad4c45da995b345234478b78bfd6b618436676f771af3425fb938c29bb"
+      }
+    },
+    {
+      "contract": "KeelRawFragmentValidationRegistry",
+      "address": "0xbBD281E72167D33261EBe9aa78F34907EFC2861D",
+      "txHash": "0x7d104cfc22df5f3a41024f3364f4d0b66b9bf02a72696480e6537ad9a6e1f4a9",
+      "block": "11831486",
+      "runtimeCodeHash": "0x9447e8d5d3e74d95d9a336b17617ab5a0d44ae09adf25a0ab7c05de27726de57",
+      "runtimeIntegrity": {
+        "algorithm": "sha256",
+        "digest": "0x90c7453fa3f8fdd2bdcb3cc59795ac77c818fc284172b90ae5b8e37e17ea97a2",
+        "byteLength": 3084
+      },
+      "source": "REDLINE public deployment journal",
+      "scope": "application-reference",
+      "verification": {
+        "status": "receipt-and-runtime-verified",
+        "blockNumber": "11852174",
+        "blockHash": "0xeb2e2fad4c45da995b345234478b78bfd6b618436676f771af3425fb938c29bb"
+      }
+    },
+    {
+      "contract": "KeelRawFragmentRevisionPolicy",
+      "address": "0xE1d19BDC56757Eb7F37F1028c467E55881f7add7",
+      "txHash": "0xd153f5a1eeaded8d7ddfc5deb848e727ab661efa89ecb62e5c3aadf403bc6dbb",
+      "block": "11831488",
+      "runtimeCodeHash": "0x1a58b0c7b98bbebb9b7c9c34dad7a841b7beb8022d02b8df1bb24916eb93575e",
+      "runtimeIntegrity": {
+        "algorithm": "sha256",
+        "digest": "0x5a4763d038c1031abc49b9864c01bb4ac38877d5e5e2d80598a1541a2551b8c9",
+        "byteLength": 933
+      },
+      "source": "REDLINE public deployment journal",
+      "scope": "application-reference",
+      "verification": {
+        "status": "receipt-and-runtime-verified",
+        "blockNumber": "11852174",
+        "blockHash": "0xeb2e2fad4c45da995b345234478b78bfd6b618436676f771af3425fb938c29bb"
+      }
+    },
+    {
+      "contract": "KeelRawImageRevisionPolicy",
+      "address": "0xCd987AD1496A3a449306068A88B282A9516C853A",
+      "txHash": "0x14affd3cf9f9db4a0e2fa656561e6573ee03896eaeae0497a5fe9e4e6032f50c",
+      "block": "11831489",
+      "runtimeCodeHash": "0x8a14c0bed9e98c438ec72e0b8c94a17f5b6d7c10ad92fbbb7963b3a4c4e534e9",
+      "runtimeIntegrity": {
+        "algorithm": "sha256",
+        "digest": "0x91dad89a7f9c00dc5fc7bf80e1ecf8d529c8ffa39f814b5e36198ada9478a442",
+        "byteLength": 1003
+      },
+      "source": "REDLINE public deployment journal",
+      "scope": "application-reference",
+      "verification": {
+        "status": "receipt-and-runtime-verified",
+        "blockNumber": "11852174",
+        "blockHash": "0xeb2e2fad4c45da995b345234478b78bfd6b618436676f771af3425fb938c29bb"
+      }
+    },
+    {
+      "contract": "KeelRawInlineShellRegistry",
+      "address": "0xb079820f391C18940446e591505Adb422C69e51b",
+      "txHash": "0x15ff5a7a30942f1c61f14c8e0256c42535e842af23668ee4033f0059703b1cd0",
+      "block": "11831491",
+      "runtimeCodeHash": "0xcd950bd1582022b4b14b697676e5bea70a8c572532d3ee18d242ec4037fa8478",
+      "runtimeIntegrity": {
+        "algorithm": "sha256",
+        "digest": "0x3c4b04423bdcc92e92f28f2c5972bf8c1e07ca90652fea133481558188d9a8b3",
+        "byteLength": 2920
+      },
+      "source": "REDLINE public deployment journal",
+      "scope": "application-reference",
+      "verification": {
+        "status": "receipt-and-runtime-verified",
+        "blockNumber": "11852174",
+        "blockHash": "0xeb2e2fad4c45da995b345234478b78bfd6b618436676f771af3425fb938c29bb"
+      }
+    },
+    {
+      "contract": "KeelCarrierBatcher",
+      "address": "0x1854858Ea4574f4e293466DD0309BB3178d568E3",
+      "txHash": "0xe29fc6aa8bca6b986b266eb5e69a13c6e72f1966ccb3ce42cc42411424c48739",
+      "block": "11831595",
+      "runtimeCodeHash": "0x14e1b4260b30e4240c062b1c4562e2caefd45d0f70acaf086a31f695db8f0d21",
+      "runtimeIntegrity": {
+        "algorithm": "sha256",
+        "digest": "0x6c6ad86981a6032dc777bc01758d839ac0116176a5bac8b82996d628c7fd2713",
+        "byteLength": 3459
+      },
+      "source": "REDLINE public deployment journal",
+      "scope": "application-reference",
+      "verification": {
+        "status": "receipt-and-runtime-verified",
+        "blockNumber": "11852174",
+        "blockHash": "0xeb2e2fad4c45da995b345234478b78bfd6b618436676f771af3425fb938c29bb"
+      }
+    },
+    {
+      "contract": "KeelArtifactFragmentResolver",
+      "address": "0x1cf50b81A5155C1984F8293eedB5E66Fed936E10",
+      "txHash": "0x6233afd4ee84a047ac6737a840c9ebebbbe3b343a783b6adfe7378820e69d4af",
+      "block": "11831722",
+      "runtimeCodeHash": "0x75eb06954b81ea50128cc36d15ff102a1000302bb1654cdb1a013191084573ae",
+      "runtimeIntegrity": {
+        "algorithm": "sha256",
+        "digest": "0xe270f0c9d4bd8dc0b788a858e2d20d3771575a7a3b5a2cc3ce44ef808c5cf4b8",
+        "byteLength": 3749
+      },
+      "source": "REDLINE public deployment journal",
+      "scope": "application-reference",
+      "verification": {
+        "status": "receipt-and-runtime-verified",
+        "blockNumber": "11852174",
+        "blockHash": "0xeb2e2fad4c45da995b345234478b78bfd6b618436676f771af3425fb938c29bb"
+      }
+    },
+    {
+      "contract": "KeelRegisteredArtifactFragmentResolver",
+      "address": "0xD3c609FBfaa016866BC7CefFc3462CF745aA8918",
+      "txHash": "0x9dd4476592d34df51ff0162a264e706da626f5bf98f67f85478b2f71ed359634",
+      "block": "11831723",
+      "runtimeCodeHash": "0xb7326065511165473393a62f94cf30243d273d3ed020e2e91baa3554a3c64edc",
+      "runtimeIntegrity": {
+        "algorithm": "sha256",
+        "digest": "0x9830ebaed965fa49bcf164f3beb68985bd7576c24993a932c9ae74aebae8904f",
+        "byteLength": 7667
+      },
+      "source": "REDLINE public deployment journal",
+      "scope": "application-reference",
+      "verification": {
+        "status": "receipt-and-runtime-verified",
+        "blockNumber": "11852174",
+        "blockHash": "0xeb2e2fad4c45da995b345234478b78bfd6b618436676f771af3425fb938c29bb"
+      }
+    },
+    {
+      "contract": "Keel721MetadataFormatting",
+      "address": "0xe9663bcA8cf89bd2C570031a2A5934C4Fe9425fA",
+      "txHash": "0x0d569526d96e11b0d44e7c6072d45b24c330a92182027738cefeb5645710965b",
+      "block": "11831724",
+      "runtimeCodeHash": "0xd7d042765a972c73fac3a803a10874591793e54ccac7f6405b9fe851bf07e928",
+      "runtimeIntegrity": {
+        "algorithm": "sha256",
+        "digest": "0x0c0378cd53af45c0b9a0df29db7615bf122fc0ac68cc59918efcb98593293584",
+        "byteLength": 4683
+      },
+      "source": "REDLINE public deployment journal",
+      "scope": "application-reference",
+      "verification": {
+        "status": "receipt-and-runtime-verified",
+        "blockNumber": "11852174",
+        "blockHash": "0xeb2e2fad4c45da995b345234478b78bfd6b618436676f771af3425fb938c29bb"
+      }
+    },
+    {
+      "contract": "KeelRevisioned721",
+      "address": "0x7C92380e0c9300Ba9aBa33D4F501235698f00586",
+      "txHash": "0xe00d3ee04fdfbe97840ac91fd3b97a708ae180f4f417b74fe3159acb3e14165b",
+      "block": "11831725",
+      "runtimeCodeHash": "0xe5bc1c43d88b6b1d6ce24c3d5b1ad17697041e00dfdc29a9cab0f952a8ca318f",
+      "runtimeIntegrity": {
+        "algorithm": "sha256",
+        "digest": "0xc597eda1eb0ebeed4a451900aca1572fb772992d56c1bcfaf5b44ab7a10c9dc4",
+        "byteLength": 18394
+      },
+      "source": "REDLINE public deployment journal",
+      "scope": "application-reference",
+      "verification": {
+        "status": "receipt-and-runtime-verified",
+        "blockNumber": "11852174",
+        "blockHash": "0xeb2e2fad4c45da995b345234478b78bfd6b618436676f771af3425fb938c29bb"
+      }
+    },
+    {
+      "contract": "KeelHarnessRegistry",
+      "address": "0x813c962d99A0789aBc31b98C51251b81C54b9f2D",
+      "txHash": "0xb0704ac2175f182e909ab5ecc35bdeff3b0724be2f7a92f762008ba6c2760388",
+      "block": "11831727",
+      "runtimeCodeHash": "0x881be821105e6c12518ba03df010d51db868c698cd40022add1cdba6b2991740",
+      "runtimeIntegrity": {
+        "algorithm": "sha256",
+        "digest": "0x6651db54770d3f7bf3f41d56e382ae670cd702f08c66052a0ac182de07beb366",
+        "byteLength": 16793
+      },
+      "source": "REDLINE public deployment journal",
+      "scope": "application-reference",
+      "verification": {
+        "status": "receipt-and-runtime-verified",
+        "blockNumber": "11852174",
+        "blockHash": "0xeb2e2fad4c45da995b345234478b78bfd6b618436676f771af3425fb938c29bb"
+      }
+    },
+    {
+      "contract": "KeelSeedRegistry",
+      "address": "0xc71A56300Ae327c3262dF247639a7b5730a78224",
+      "txHash": "0x313ba30c2d442368f661f36db4089119556784cfe0fe63a0666620e42365452f",
+      "block": "11831728",
+      "runtimeCodeHash": "0x5db74651e301a313c38c892cf0f34e84c4c1cde92d83b7e7b4cae96d209d3df5",
+      "runtimeIntegrity": {
+        "algorithm": "sha256",
+        "digest": "0xc3e4b087899b483e7bf65e171408f3f51a9aced5ecd118d3fc4720a5cd44d328",
+        "byteLength": 3545
+      },
+      "source": "REDLINE public deployment journal",
+      "scope": "application-reference",
+      "verification": {
+        "status": "receipt-and-runtime-verified",
+        "blockNumber": "11852174",
+        "blockHash": "0xeb2e2fad4c45da995b345234478b78bfd6b618436676f771af3425fb938c29bb"
+      }
+    },
+    {
+      "contract": "KeelRegisteredArtifactFragment721Presentation",
+      "address": "0x902e2cC13Ee5DB221F7819Db7154cfBb2f506A9A",
+      "txHash": "0x45adb92150055031113bcfbb0e7f8c7e6546889f134f7a48ec0c491661030d4e",
+      "block": "11831731",
+      "runtimeCodeHash": "0xcad3ff06ff39336929ddea6815898dfe542e670c0ff5e2a96b3a3aaae8f5942b",
+      "runtimeIntegrity": {
+        "algorithm": "sha256",
+        "digest": "0x6c75489e184e69d4f0a534034c5f5a3ad8a407115a57a63cb970d018f785523f",
+        "byteLength": 10711
+      },
+      "source": "REDLINE public deployment journal",
+      "scope": "application-reference",
+      "verification": {
+        "status": "receipt-and-runtime-verified",
+        "blockNumber": "11852174",
+        "blockHash": "0xeb2e2fad4c45da995b345234478b78bfd6b618436676f771af3425fb938c29bb"
+      }
+    },
+    {
+      "contract": "KeelRawInlineShellRegistry",
+      "address": "0x4D2450C58442162921E8d4d5A2A2C6DA403b94c0",
+      "txHash": "0xb39ad9a69a7dac30a0fb50b76cc61cfff0cf3de83d06d128d08a64555a456df1",
+      "block": "11844862",
+      "runtimeCodeHash": "0xcd950bd1582022b4b14b697676e5bea70a8c572532d3ee18d242ec4037fa8478",
+      "runtimeIntegrity": {
+        "algorithm": "sha256",
+        "digest": "0x3c4b04423bdcc92e92f28f2c5972bf8c1e07ca90652fea133481558188d9a8b3",
+        "byteLength": 2920
+      },
+      "source": "REDLINE public deployment journal",
+      "scope": "application-reference",
+      "verification": {
+        "status": "receipt-and-runtime-verified",
+        "blockNumber": "11852174",
+        "blockHash": "0xeb2e2fad4c45da995b345234478b78bfd6b618436676f771af3425fb938c29bb"
+      }
+    },
+    {
+      "contract": "KeelPreparedContainerTablePolicyV2",
+      "address": "0xeeE184aAB5109431d3C85753269F12dDC2E35c88",
+      "txHash": "0x5fb9d6950e0fca31adb1eafae3ca3b357dd5911ba9c25335893060dd6caf7952",
+      "block": "11844862",
+      "runtimeCodeHash": "0xd194c3f28c08e7136f95e96704dfa0a21d56152598fe7e7543b72ee8889e7b57",
+      "runtimeIntegrity": {
+        "algorithm": "sha256",
+        "digest": "0xe4947fa80101a6f72fc56dd51be90dc07fe99d66d576d24cfeb456c54014174f",
+        "byteLength": 4169
+      },
+      "source": "REDLINE public deployment journal",
+      "scope": "application-reference",
+      "verification": {
+        "status": "receipt-and-runtime-verified",
+        "blockNumber": "11852174",
+        "blockHash": "0xeb2e2fad4c45da995b345234478b78bfd6b618436676f771af3425fb938c29bb"
+      }
+    },
+    {
+      "contract": "KeelEvmPreparedCarrierInlineComposer",
+      "address": "0x3711D3F77BE6A57505E846399E0e41340B707Ff4",
+      "txHash": "0x394c72906d0ca203126e7dfb64edda990084f62bc9581b86358f068b57016bbc",
+      "block": "11844862",
+      "runtimeCodeHash": "0xb11d1985033ca3e6c82b45819fef152bf47eb41a23235335d8d50b7bc50221ee",
+      "runtimeIntegrity": {
+        "algorithm": "sha256",
+        "digest": "0x54d89bc72e0b55e4675b609bdb6bb279053ab4441134e8775928c11374bc5194",
+        "byteLength": 6494
+      },
+      "source": "REDLINE public deployment journal",
+      "scope": "application-reference",
+      "verification": {
+        "status": "receipt-and-runtime-verified",
+        "blockNumber": "11852174",
+        "blockHash": "0xeb2e2fad4c45da995b345234478b78bfd6b618436676f771af3425fb938c29bb"
+      }
+    },
+    {
+      "contract": "KeelModuleRevisioned721",
+      "address": "0xAe73eC8A4867C3886E8987371f0D57943f0f6BDB",
+      "txHash": "0x4d907462402edfe93dd99033c0ef01e0ba5628fbb691df51e2d57c106aec9202",
+      "block": "11844862",
+      "runtimeCodeHash": "0x979fb73b8a8cb46511c80e97e7930f988a759a08b48f6b36ed5bc696803b3682",
+      "runtimeIntegrity": {
+        "algorithm": "sha256",
+        "digest": "0x5ad9b15d77d6b78ee127228e8dab7dc027e0216e2689266fc9aeddbdb8b45311",
+        "byteLength": 18269
+      },
+      "source": "REDLINE public deployment journal",
+      "scope": "application-reference",
+      "verification": {
+        "status": "receipt-and-runtime-verified",
+        "blockNumber": "11852174",
+        "blockHash": "0xeb2e2fad4c45da995b345234478b78bfd6b618436676f771af3425fb938c29bb"
+      }
+    },
+    {
+      "contract": "KeelArtifactFragmentResolver",
+      "address": "0x0C3b49efE400Cb1b098D978B1512ca609F4DA6b6",
+      "txHash": "0x215bf52b0192b825ffc211deb1f0f02f77391d7919463109ce9374817e1d3e2a",
+      "block": "11844873",
+      "runtimeCodeHash": "0x75eb06954b81ea50128cc36d15ff102a1000302bb1654cdb1a013191084573ae",
+      "runtimeIntegrity": {
+        "algorithm": "sha256",
+        "digest": "0xe270f0c9d4bd8dc0b788a858e2d20d3771575a7a3b5a2cc3ce44ef808c5cf4b8",
+        "byteLength": 3749
+      },
+      "source": "REDLINE public deployment journal",
+      "scope": "application-reference",
+      "verification": {
+        "status": "receipt-and-runtime-verified",
+        "blockNumber": "11852174",
+        "blockHash": "0xeb2e2fad4c45da995b345234478b78bfd6b618436676f771af3425fb938c29bb"
+      }
+    },
+    {
+      "contract": "KeelRegisteredArtifactFragmentResolver",
+      "address": "0x5c296077d507b8fBEC06462AAF2D580640016C04",
+      "txHash": "0xefaafbfde6cf3e0de648e51a9f1fa04a486d0ad8bc841633960d9d85a4d20cb1",
+      "block": "11844874",
+      "runtimeCodeHash": "0x43d8a05edc8cf2317508c39b158e226e70d436b3b41a01b51770ce0612b04864",
+      "runtimeIntegrity": {
+        "algorithm": "sha256",
+        "digest": "0x6871a30b25590a383845345089ec2478934c503a5d62679cb4d58577d364ffdd",
+        "byteLength": 7667
+      },
+      "source": "REDLINE public deployment journal",
+      "scope": "application-reference",
+      "verification": {
+        "status": "receipt-and-runtime-verified",
+        "blockNumber": "11852174",
+        "blockHash": "0xeb2e2fad4c45da995b345234478b78bfd6b618436676f771af3425fb938c29bb"
+      }
+    },
+    {
+      "contract": "KeelModulePrepared721PresentationV2",
+      "address": "0xc26b289D1cf27C5864A51318c8e2Ec59f2452d8E",
+      "txHash": "0x9a4f40e3da3ac585e98f052665aefbc45f4d8c57e63ab0f4048b3627952a3c9a",
+      "block": "11844875",
+      "runtimeCodeHash": "0xca68be291f6b490aee3d9d4f48746444edd9a98b9cb27936cb6ede6ca0367b05",
+      "runtimeIntegrity": {
+        "algorithm": "sha256",
+        "digest": "0x585e3414a92748e4349a9d2d2fc3b6bec7465f3a55f9d42f6e21dd182fe202f5",
+        "byteLength": 16069
+      },
+      "source": "REDLINE public deployment journal",
+      "scope": "application-reference",
+      "verification": {
+        "status": "receipt-and-runtime-verified",
+        "blockNumber": "11852174",
+        "blockHash": "0xeb2e2fad4c45da995b345234478b78bfd6b618436676f771af3425fb938c29bb"
+      }
+    }
+  ],
+  "carriageComparison": [
+    {
+      "id": "dictionary.creator",
+      "compression": "ppmd",
+      "compressedBytes": 642835,
+      "percentEncodedBytes": 1597495,
+      "nestedPercentEncodedBytes": 2552155,
+      "base90Characters": 792542,
+      "base90PreparedFragmentBytes": 1105950,
+      "percentRoundTrip": "exact"
+    },
+    {
+      "id": "dictionary.shared",
+      "compression": "ppmd",
+      "compressedBytes": 114700,
+      "percentEncodedBytes": 285132,
+      "nestedPercentEncodedBytes": 455564,
+      "base90Characters": 141417,
+      "base90PreparedFragmentBytes": 197821,
+      "percentRoundTrip": "exact"
+    },
+    {
+      "id": "redline.build-facts",
+      "compression": "ppmd",
+      "compressedBytes": 144,
+      "percentEncodedBytes": 378,
+      "nestedPercentEncodedBytes": 612,
+      "base90Characters": 178,
+      "base90PreparedFragmentBytes": 238,
+      "percentRoundTrip": "exact"
+    }
+  ],
+  "modernCreator": {
+    "status": "not-this-route",
+    "note": "This collection uses KeelModuleRevisioned721 and a prepared carrier composer. It does not establish deployment of KeelCreatorFactory or KeelArtifactTokenRenderer."
+  },
+  "browserVerification": {
+    "status": "historical-evidence-only",
+    "freshRun": false
+  }
+}

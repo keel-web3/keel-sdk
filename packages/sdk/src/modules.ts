@@ -109,6 +109,13 @@ export function resolveModuleTarget(query: ModuleTargetQuery): KeelDeployment {
   throw new Error(`${matches.length} deployments match ${where}; pass instance (one of: ${instances.join(", ")})`);
 }
 
+/** Preserve the original public planning store when additional test instances
+ * are indexed. General module resolution still requires an unambiguous query. */
+export function resolveDefaultKeelHoldTarget(chainId: number): KeelDeployment {
+  return resolveModuleTarget({ module: "keel-hold", contract: "KeelHold", chainId,
+    ...(chainId === 11155111 ? { instance: "showcase" } : {}) });
+}
+
 /** Convenience wrapper returning just the address. */
 export function moduleAddress(
   module: KeelUnitId,

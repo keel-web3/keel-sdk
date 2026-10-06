@@ -5,6 +5,7 @@ const TEST_ROOT = resolve(import.meta.dirname, "../tests");
 
 /** Requires a real installed headless browser and therefore stays out of the default unit gate. */
 export const BROWSER_TEST_FILES = Object.freeze([
+  "tests/sdk-prepared-dense-copy-browser.test.mjs",
   "tests/sdk-verification-shell-browser.test.mjs",
   "tests/sdk-verification-shell-large-graph-browser.test.mjs",
   "tests/link-assembly-browser.test.mjs",
@@ -49,6 +50,17 @@ export const TEST_FILES_ON_DISK = Object.freeze(readdirSync(TEST_ROOT)
  * its execution boundary.
  */
 export const DETERMINISTIC_TEST_FILES = Object.freeze([
+  "tests/mcp-pre-reveal.test.mjs",
+  "tests/sdk-collector-metadata.test.mjs",
+  "tests/sdk-compact-extensions.test.mjs",
+  "tests/sdk-marketplace-reader.test.mjs",
+  "tests/sdk-pre-reveal.test.mjs",
+  "tests/sdk-uri81-transport.test.mjs",
+  "tests/verification-shell-application-api.test.mjs",
+  "tests/verification-shell-catalog.test.mjs",
+  "tests/sepolia-manifest.test.mjs",
+  "tests/data-uri-binary-percent.test.mjs",
+
   "tests/compact-game-copy-boundary.test.mjs",
   "tests/copy-publication-enforcement.test.mjs",
   "tests/creator-owned-shell.test.mjs",
@@ -66,6 +78,7 @@ export const DETERMINISTIC_TEST_FILES = Object.freeze([
   "tests/sdk-onchain-resource-reader.test.mjs",
   "tests/sdk-onchain-shell-profile.test.mjs",
   "tests/sdk-prepared-dense-copy.test.mjs",
+  "tests/sdk-module-runtime.test.mjs",
   "tests/sdk-resource-decoders.test.mjs",
   "tests/stored-text-runtime.test.mjs",
   "tests/mint-access-entropy.test.mjs",

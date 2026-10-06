@@ -155,3 +155,34 @@ test("MCP publish-plan requires evidence, reruns the SDK gate and rejects file t
   assert.equal(tampered.isError, true);
   assert.match(tampered.content[0].text, /differs from canonical/);
 });
+
+test('publication rejects browser-tolerated unescaped outer metadata',async()=>{
+ const f=await fixture();const uri=f.prepared.tokenURI.replace('%7B','{');
+ await assert.rejects(assertKeelPreparedCopyRead({...f.bound,expectedTokenURI:uri,returnedTokenURI:uri}),/unescaped URI/);
+});
+
+async function unescapedAnimationFixture() {
+  const f = await fixture();
+  const metadata = JSON.parse(decodeURIComponent(f.prepared.tokenURI.slice(f.prepared.tokenURI.indexOf(',') + 1)));
+  metadata.animation_url = 'data:text/html;charset=utf-8,' + encodeURIComponent('<!doctype html><body>Exact</body>').replace('%3C', '<');
+  const uri = 'data:application/json;charset=utf-8,' + encodeURIComponent(JSON.stringify(metadata));
+  const graphBytes = bytes(encodeURIComponent(encodeURIComponent('</body>')));
+  return { ...f.bound, graphBytes, graphIntegrity: await createIntegrity(graphBytes), expectedTokenURI: uri, returnedTokenURI: uri };
+}
+
+test('publication rejects unescaped animation even when outer metadata is escaped', async () => {
+  await assert.rejects(assertKeelPreparedCopyRead(await unescapedAnimationFixture()), /Prepared animation_url.*unescaped URI/);
+});
+
+test('MCP publication check rejects unescaped characters at either URI boundary', async t => {
+  const f = await mcp(t);
+  const outer = f.prepared.tokenURI.replace('%7B', '{');
+  for (const input of [{...f.bound, expectedTokenURI: outer, returnedTokenURI: outer}, await unescapedAnimationFixture()]) {
+    await writeFile(path.join(f.dir, 'graph.bin'), input.graphBytes);
+    await writeFile(path.join(f.dir, 'expected.uri'), input.expectedTokenURI);
+    await writeFile(path.join(f.dir, 'returned.uri'), input.returnedTokenURI);
+    const result = await f.call('keel-inline-publication-check', { ...f.files, chainId, store, mediaType: input.mediaType, digest: input.graphIntegrity.digest, byteLength: input.graphBytes.length });
+    assert.equal(result.isError, true);
+    assert.match(result.content[0].text, /unescaped URI/);
+  }
+});

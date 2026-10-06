@@ -16,4 +16,5 @@ export const KEEL_DECODER_PROVENANCE = {
     "derivedSha256": "1bab6c96eefe7b1cc01d13708c9b8f671627a111f927d7b53cf12f45f6ed7493",
     "license": "MIT"
   }
+  ,"ppmd": {"upstream":"ppmd-rust","version":"1.4.1","sourceUrl":"https://github.com/hasenbanck/ppmd-rust/","derivedSha256":"1bb1722632812280c8f33c2ffa03f8548416e287c19efd67f27cd33e821e0d6f","license":"CC0-1.0 OR MIT-0","target":"decode-only JavaScript, wasm2js 132"}
 } as const;

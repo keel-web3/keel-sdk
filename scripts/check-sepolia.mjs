@@ -24,7 +24,7 @@ export async function checkSepolia(client, record = keelContracts()) {
 
 if (process.argv[1] && import.meta.url === (await import('node:url')).pathToFileURL((await import('node:path')).resolve(process.argv[1])).href) {
   try {
-    const rpc = process.env.KEEL_SEPOLIA_RPC_URL ?? 'https://ethereum-sepolia-rpc.publicnode.com';
+    const rpc = process.env.KEEL_SEPOLIA_RPC_URL ?? 'https://rpc.keel-test.149-28-255-65.sslip.io';
     const client = createPublicClient({ transport: http(rpc, { timeout: 20_000, retryCount: 1 }) });
     console.log(JSON.stringify(await checkSepolia(client), null, 2));
   } catch {

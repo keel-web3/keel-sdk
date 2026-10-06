@@ -50,14 +50,26 @@ test('paired wrapper survives both URI/JSON layers, closes script sentinels and 
 
 // A data URL body includes its query according to WHATWG Fetch. Escaping ?
 // costs four bytes through nested metadata/HTML layers with no decoding benefit.
-test('Base90 punctuation remains direct through two data URI layers',async()=>{
+test('Base90 punctuation gets strict URI escaping through both layers',async()=>{
  const body='?'+KEEL_BASE90_ALPHABET.repeat(64);
  const html='<script type="application/json">'+serializeKeelDenseTransportJSON({body})+'</script>';
  const animation=toKeelDenseTransportDataURL('html',html);
  const uri=toKeelDenseTransportDataURL('metadata',JSON.stringify({animation_url:animation}));
  assert.doesNotMatch(animation,/%3[fF]/);assert.doesNotMatch(uri,/%3[fF]/);
+ assert.doesNotMatch(animation.slice(animation.indexOf(',')+1),/[<>"\\\[\]{}^|`]/);
+ assert.doesNotMatch(uri.slice(uri.indexOf(',')+1),/[<>"\\\[\]{}^|`]/);
+ assert.match(animation,/%3C/);assert.match(uri,/%253C/);
  const metadata=await(await fetch(uri)).json();assert.equal(metadata.animation_url,animation);
  assert.equal(await(await fetch(metadata.animation_url)).text(),html);
  const sensitive='?%23#%3F\n\t🔥';
  assert.equal(await(await fetch(toKeelDenseTransportDataURL('html',sensitive))).text(),sensitive);
+});
+
+test('strict URI audit flags browser-tolerated characters and malformed escapes',async()=>{
+ const {inspectKeelDataURICompatibility:inspect,assertKeelDataURICompatibility:check}=await import('../packages/sdk/dist/dense-transport.js');
+ for(const text of ['<','>','"','[',']','{','}','|','\\','^','`','#',' ','é','%','%0','%GG']){
+  const uri='data:text/html;charset=utf-8,'+text;assert.equal(inspect(uri).strictURICompatible,false);assert.throws(()=>check(uri,'Animation'),/unescaped URI/);
+ }
+ const text='<>"[]{}|\\^`# % 💧?';const uri=toKeelDenseTransportDataURL('html',text);
+ assert.equal(inspect(uri).strictURICompatible,true);check(uri,'Animation');assert.equal(await(await fetch(uri)).text(),text);
 });

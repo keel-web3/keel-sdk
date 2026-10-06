@@ -42,7 +42,11 @@ import {
   type KeelVerificationPresentationOverrides,
 } from "@keel/protocol";
 import { createKeelPublishReviewPlan, type KeelPublishReviewPlanEnvelope } from "./publish-plan.js";
-import { resolveModuleTarget } from "./modules.js";
+import { buildKeelShellCatalog } from "./verification-shell-catalog.js";
+import {KEEL_LOADING_CSS,KEEL_LOADING_MARKUP,normalizeKeelLoadingManifest} from "./verification-shell-loading.js";
+import { createKeelShellClient } from "./verification-shell-client.js";
+import type { KeelShellMarketplaceConfig, startKeelShellMarketplaceInfo } from "./marketplace-reader.js";
+import { resolveDefaultKeelHoldTarget } from "./modules.js";
 
 type Sha256Integrity = { readonly algorithm: "sha256"; readonly digest: Hex; readonly byteLength: number };
 
@@ -99,7 +103,7 @@ export interface KeelOnchainContainerBinding {
   readonly chainId: number;
   readonly store: string;
   readonly objectId: Hex;
-  readonly compression: "none" | "gzip" | "deflate" | "brotli" | "lzma";
+  readonly compression: "none" | "gzip" | "deflate" | "brotli" | "lzma" | "ppmd";
   readonly storedIntegrity: Sha256Integrity;
   readonly integrity: Sha256Integrity;
 }
@@ -109,7 +113,7 @@ export type KeelEmbeddedViewerSource = {
   readonly storedIntegrity?: { readonly algorithm: "sha256"; readonly digest: Hex; readonly byteLength: number };
 } & (
   | { readonly storedText: string; readonly storedBase64?: never; readonly compression: "none" }
-  | { readonly storedBase64: string; readonly storedText?: never; readonly compression: "none" | "gzip" | "deflate" | "brotli" | "lzma" }
+  | { readonly storedBase64: string; readonly storedText?: never; readonly compression: "none" | "gzip" | "deflate" | "brotli" | "lzma" | "ppmd" }
 );
 
 export function isKeelViewerTextMediaType(mediaType: string): boolean {
@@ -149,7 +153,7 @@ export interface KeelStandaloneViewerItem {
     readonly range?: { readonly offset: number; readonly containerIntegrity: Sha256Integrity };
     readonly containerId?: Hex;
     readonly offset?: number;
-    readonly compression?: "none" | "gzip" | "deflate" | "brotli" | "lzma";
+    readonly compression?: "none" | "gzip" | "deflate" | "brotli" | "lzma" | "ppmd";
     readonly storedIntegrity?: { readonly algorithm: "sha256"; readonly digest: Hex; readonly byteLength: number };
   };
   /** Committed remote bytes; fetched only by the outer shell and never executed before verification. */
@@ -233,7 +237,7 @@ async function loadVaultVerificationChrome(
 /** Build only the declared browser decoders; no WASM, network, or global worker hook. */
 export async function buildKeelDecoderModule(input: {
   readonly repositoryRoot?: string;
-  readonly codecs: readonly ("brotli" | "lzma")[];
+  readonly codecs: readonly ("brotli" | "lzma" | "ppmd")[];
 }): Promise<{
   readonly javascript: string;
   readonly javascriptBytes: Uint8Array;
@@ -241,7 +245,7 @@ export async function buildKeelDecoderModule(input: {
   readonly sourceBytes: Uint8Array;
 }> {
   const codecs = [...new Set(input.codecs)].sort();
-  if (codecs.some((codec) => codec !== "brotli" && codec !== "lzma")) throw new TypeError("Unsupported decoder module codec.");
+  if (codecs.some((codec) => codec !== "brotli" && codec !== "lzma" && codec !== "ppmd")) throw new TypeError("Unsupported decoder module codec.");
   if (!codecs.length) {
     const javascriptBytes = new Uint8Array();
     return { javascript: "", javascriptBytes, integrity: await sha256Integrity(javascriptBytes), sourceBytes: javascriptBytes };
@@ -251,11 +255,13 @@ export async function buildKeelDecoderModule(input: {
   const sourceBytes = new Uint8Array(Buffer.concat(await Promise.all([
     readFile(path.join(directory, `index.${extension}`)),
     readFile(path.join(directory, `provenance.${extension}`)),
-    ...(["brotli", "lzma"] as const).map((codec) => readFile(path.join(directory, "vendor", `${codec}.${extension}`))),
+    ...(codecs as readonly string[]).map((codec) => readFile(path.join(directory, "vendor", `${codec}.${extension}`))),
+    ...(codecs.includes("ppmd") ? [readFile(path.join(directory,"vendor",`ppmd-runtime.${extension}`))] : []),
   ])));
   const bundled = await build({
-    stdin: { contents: `export { ${codecs.map((codec) => codec === "brotli" ? "decodeBrotli" : "decodeLzma").join(",")} } from "./index.js";`, resolveDir: directory, sourcefile: "keel-resource-decoders.ts", loader: "ts" },
+    stdin: { contents: `export { ${codecs.map((codec) => codec === "brotli" ? "decodeBrotli" : codec === "lzma" ? "decodeLzma" : "decodePpmd").join(",")} } from "./index.js";`, resolveDir: directory, sourcefile: "keel-resource-decoders.ts", loader: "ts" },
     bundle: true, minify: true, treeShaking: true, platform: "browser", format: "iife", globalName: "KEEL_RESOURCE_DECODERS", target: "es2022", write: false,
+    legalComments: codecs.length === 1 && codecs[0] === "ppmd" ? "none" : "inline",
   });
   const javascript = bundled.outputFiles[0]?.text;
   if (!javascript) throw new Error("Decoder module produced no JavaScript.");
@@ -264,19 +270,19 @@ export async function buildKeelDecoderModule(input: {
 }
 
 /** Optional, self-contained binary-to-text decoder; no compression/network code. */
-export async function buildKeelDenseTransportDecoder(): Promise<{
+export async function buildKeelDenseTransportDecoder(profile?: import("./dense-transport.js").KeelDenseTransportProfile): Promise<{
   readonly javascript: string;
   readonly javascriptBytes: Uint8Array;
   readonly integrity: Sha256Integrity;
 }> {
   const bundled = await build({
-    stdin: { contents: 'export {decodeKeelDenseTransport} from "./dense-transport.js";',
+    stdin: { contents: 'export {' + (profile === 'uri81-block-v1' ? 'decodeKeelURI81Transport' : 'decodeKeelLegacyDenseTransport') + ' as decodeKeelDenseTransport} from "./dense-transport.js";',
       resolveDir: fileURLToPath(new URL("./", import.meta.url)), sourcefile: "keel-dense-transport.js", loader: "js" },
     bundle: true, minify: true, treeShaking: true, platform: "browser", format: "iife",
     globalName: "KEEL_DENSE_TRANSPORT", target: "es2022", write: false,
   });
   const { KEEL_DENSE_TRANSPORT_LICENSE } = await import("./dense-transport.js");
-  const javascript = bundled.outputFiles[0]?.text ? "/*! " + KEEL_DENSE_TRANSPORT_LICENSE + " */\n" + bundled.outputFiles[0].text : undefined;
+  const javascript = bundled.outputFiles[0]?.text ? (profile === "uri81-block-v1" ? "" : "/*! " + KEEL_DENSE_TRANSPORT_LICENSE + " */\n") + bundled.outputFiles[0].text : undefined;
   if (!javascript) throw new Error("Dense transport decoder produced no JavaScript.");
   const javascriptBytes = utf8ToBytes(javascript);
   return { javascript, javascriptBytes, integrity: await sha256Integrity(javascriptBytes) };
@@ -342,7 +348,7 @@ export async function buildStandaloneKeelViewer(input: {
   if (runtimeWithoutVerificationChromeMarker === runtimeSource.toString("utf8")) {
     throw new Error("Standalone verifier runtime is missing its Vault verification chrome marker.");
   }
-  const runtimeWithVerificationChrome = `import { mountVerificationUI } from ${JSON.stringify(verificationChrome.modulePath)};\n${runtimeWithoutVerificationChromeMarker}`;
+  const runtimeWithVerificationChrome = `import { mountVerificationUI } from ${JSON.stringify(verificationChrome.modulePath)};import {createKeelShellClient} from ${JSON.stringify(path.join(input.repositoryRoot,"packages/sdk/src/verification-shell-client.ts"))};import {buildKeelShellCatalog} from ${JSON.stringify(path.join(input.repositoryRoot,"packages/sdk/src/verification-shell-catalog.ts"))};\n${runtimeWithoutVerificationChromeMarker}`;
   const bundled = await build({
     absWorkingDir: path.join(input.repositoryRoot, "apps/studio"),
     bundle: true,
@@ -379,7 +385,7 @@ ${lzmaMode === "javascript" ? `export const decodeLzma=KEEL_RESOURCE_DECODERS.de
   });
   const runtime = bundled.outputFiles[0]?.text;
   if (!runtime) throw new Error("Standalone verifier bundle produced no JavaScript.");
-  const htmlText = `<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><style>*{box-sizing:border-box}html,body,#keel-stage,iframe{width:100%;height:100%;margin:0;border:0;overflow:hidden;background:#05060b}body{position:relative}#keel-status{position:fixed;inset:0;z-index:6;display:grid;place-items:center;padding:8vw;white-space:pre-wrap;text-align:center;background:#05060b;color:#d7ff63;font:700 12px/1.7 ui-monospace,monospace;letter-spacing:.12em}#keel-status[hidden]{display:none}${verificationChrome.css}</style></head><body data-verification="pending"><div id="keel-stage"></div><div id="keel-status">VERIFYING KEEL GRAPH</div>${verificationChrome.markup}<script id="keel-verification-envelope" type="application/json">${escapeScriptJson(input.envelope)}</script><script>${runtime}</script></body></html>`;
+  const htmlText = `<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><style>*{box-sizing:border-box}html,body,#keel-stage,iframe{width:100%;height:100%;margin:0;border:0;overflow:hidden;background:#05060b}body{position:relative}#keel-status{position:fixed;inset:0;z-index:6;display:grid;place-items:center;padding:8vw;white-space:pre-wrap;text-align:center;background:#05060b;color:#d7ff63;font:700 12px/1.7 ui-monospace,monospace;letter-spacing:.12em}#keel-status[hidden]{display:none}${KEEL_LOADING_CSS}${verificationChrome.css}</style></head><body data-verification="pending"><div id="keel-stage"></div>${KEEL_LOADING_MARKUP}${verificationChrome.markup}<script id="keel-verification-envelope" type="application/json">${escapeScriptJson(input.envelope)}</script><script>${runtime}</script></body></html>`;
   const html = utf8ToBytes(htmlText.replace("<head>", '<head><link rel="icon" href="data:," />'));
   const compressedHtml = await compressBrotli(html);
   const roundTrip = await decompressBrotli(compressedHtml);
@@ -490,6 +496,10 @@ function compactInlineRuntime(
   }) => unknown,
   installedViewReaderDigest: string,
   keccak: (bytes: Uint8Array) => Uint8Array,
+  shellClientFactory: (target: Window) => unknown,
+  shellCatalogFactory: typeof buildKeelShellCatalog,
+  loadingManifestFactory: typeof normalizeKeelLoadingManifest,
+  optionalMarketplaces?: {readonly config: KeelShellMarketplaceConfig;readonly start: typeof startKeelShellMarketplaceInfo},
 ): void {
   const benignChildRuntimeMessages = [
     "ResizeObserver loop completed with undelivered notifications.",
@@ -498,6 +508,9 @@ function compactInlineRuntime(
   const globals = globalThis as typeof globalThis & {
     __KEEL_ITEMS__?: unknown;
     __KEEL_CONTEXT__?: unknown;
+    __KEEL_TOKEN_METADATA__?: unknown;
+    __KEEL_COLLECTION_METADATA__?: unknown;
+    __KEEL_MARKETPLACES__?: unknown;
     __KEEL_VERIFICATION__?: unknown;
     __KEEL_SHELL_API__?: unknown;
   };
@@ -507,6 +520,8 @@ function compactInlineRuntime(
   if (!(stage instanceof HTMLElement) || !(status instanceof HTMLElement) || typeof mountKeelVerification !== "function") {
     throw new Error("Invalid KEEL Inline shell.");
   }
+  const loadingCopy=status.querySelector("#keel-loading-copy")??status;
+  const updateLoading=(stageName:string,message:string,percent?:number)=>{status.dataset.stage=stageName;loadingCopy.textContent=message;if(percent!==undefined)status.style.setProperty("--keel-load-progress",Math.max(0,Math.min(100,percent))+"%");};
   const items = source as KeelStandaloneViewerItem[];
   const decoder = new TextDecoder("utf-8", { fatal: true, ignoreBOM: true });
   const fromBase64 = (value: string) => Uint8Array.from(atob(value), (character) => character.charCodeAt(0));
@@ -589,7 +604,7 @@ function compactInlineRuntime(
     if (!equal(seen, fromHex(integrity.digest))) throw new Error(`${label} ${integrity.algorithm === "sha256" ? "SHA-256" : "Keccak-256"} mismatch.`);
     return bytes;
   };
-  const decompress = async (compression: "none" | "gzip" | "deflate" | "brotli" | "lzma", bytes: Uint8Array) => {
+  const decompress = async (compression: "none" | "gzip" | "deflate" | "brotli" | "lzma" | "ppmd", bytes: Uint8Array) => {
     if (compression === "none") return bytes;
     if (compression !== "gzip" && compression !== "deflate") throw new Error("Unsupported KEEL resource compression.");
     if (typeof DecompressionStream !== "function") throw new Error(`${compression} decompression is unavailable.`);
@@ -799,7 +814,7 @@ function compactInlineRuntime(
     // connect-src stays 'none', so verified wasm can compute but cannot call out.
     const wasmSource = items.some((item) => item.mediaType === "application/wasm") ? " 'wasm-unsafe-eval'" : "";
     const policy = `<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline' data: blob:${wasmSource}; style-src 'unsafe-inline' data:; img-src data: blob:; media-src data: blob:; font-src data:; connect-src 'none'; object-src 'none'; frame-src 'none'; form-action 'none'; base-uri 'none'">`;
-    const injection = `<script>{const benign=Object.freeze(${safeJSON(benignChildRuntimeMessages)}),report=detail=>{const message=String(detail);if(benign.includes(message.trim()))return;parent.postMessage({protocol:"keel-inline-child@1",action:"failed",detail:message},"*")};addEventListener("error",event=>report(event.message||event.error||"Verified child runtime failed."));addEventListener("unhandledrejection",event=>report(event.reason?.message||event.reason||"Verified child promise rejected."));const c=Object.freeze(${safeJSON(context ?? {})});globalThis.__KEEL_CONTEXT__=c;const s=c?.derivedTokenSeed??c?.tokenSeed??c?.seed;if(typeof s==="string"&&/^0x[0-9a-f]{64}$/i.test(s))Object.defineProperty(globalThis,"KEEL_SEED",{value:s.toLowerCase(),enumerable:true,writable:false,configurable:false});Object.defineProperty(globalThis,"__KEEL_VERIFICATION__",{value:Object.freeze(${safeJSON(verification)}),enumerable:true,writable:false,configurable:false})}${closeScript}`;
+    const injection = `<script>{Object.defineProperty(globalThis,"__KEEL_SHELL__",{value:(${shellClientFactory.toString()})(parent),writable:false,configurable:false});const benign=Object.freeze(${safeJSON(benignChildRuntimeMessages)}),report=detail=>{const message=String(detail);if(benign.includes(message.trim()))return;parent.postMessage({protocol:"keel-inline-child@1",action:"failed",detail:message},"*")};addEventListener("error",event=>report(event.message||event.error||"Verified child runtime failed."));addEventListener("unhandledrejection",event=>report(event.reason?.message||event.reason||"Verified child promise rejected."));let loaded=false,painted=false;addEventListener("load",async()=>{loaded=true;await document.fonts?.ready;await Promise.allSettled([...document.images].map(image=>image.decode()));requestAnimationFrame(()=>requestAnimationFrame(()=>{painted=true;parent.postMessage({protocol:"keel-inline-child@1",action:"painted"},"*")}))},{once:true});const c=Object.freeze(${safeJSON(context ?? {})});globalThis.__KEEL_CONTEXT__=c;const s=c?.derivedTokenSeed??c?.tokenSeed??c?.seed;if(typeof s==="string"&&/^0x[0-9a-f]{64}$/i.test(s))Object.defineProperty(globalThis,"KEEL_SEED",{value:s.toLowerCase(),enumerable:true,writable:false,configurable:false});Object.defineProperty(globalThis,"__KEEL_VERIFICATION__",{value:Object.freeze(${safeJSON(verification)}),enumerable:true,writable:false,configurable:false})}${closeScript}`;
     const content = `<script>(()=>{const u=Object.freeze(${safeJSON(contentUrls)}),r=Object.freeze(${safeJSON((verification as { readonly checks?: unknown }).checks ?? [])}),bytes=id=>{const value=u[id];if(typeof value!=="string")throw new Error("Undeclared verified content "+id);const encoded=value.slice(value.indexOf(",")+1);return Uint8Array.from(atob(encoded),character=>character.charCodeAt(0))},resources=()=>r;Object.defineProperty(globalThis,"__KEEL_CONTENT__",{value:Object.freeze({url:id=>u[id]??null,bytes,resources}),enumerable:true,writable:false,configurable:false})})()${closeScript}`;
     const direct = directEntry === undefined ? "" : `<script>{const e=Object.freeze(${safeJSON(directEntry)});Object.defineProperty(globalThis,"__KEEL_ENTRY__",{value:e,enumerable:true,writable:false,configurable:false})}${closeScript}`;
     const loader = `<script>{Object.defineProperty(globalThis,"__KEEL_MODULES__",{value:Object.create(null),enumerable:false,writable:false,configurable:false});const run=()=>{for(const source of ${safeJSON(scripts)}){const script=document.createElement("script");script.textContent=source;document.head.append(script)}};document.readyState==="loading"?addEventListener("DOMContentLoaded",run,{once:true}):run()}${closeScript}`;
@@ -813,10 +828,10 @@ function compactInlineRuntime(
   const launch = async () => {
     if (items.length === 0) throw new Error("The KEEL Inline graph is empty.");
     if (new Set(items.map(item => item.id)).size !== items.length) throw new Error("Duplicate KEEL resource identity.");
-    status.textContent = `VERIFYING ${items.length} ITEMS`;
+    updateLoading("verify","Checking the work’s files",15);
     const resolved = new Map<string, Uint8Array>();
     for (const item of items) {
-      status.textContent = `VERIFYING ${item.id.toUpperCase()}`;
+      updateLoading("verify","Checking the work’s files",15+60*resolved.size/items.length);
       resolved.set(item.id, await resolve(item));
     }
     const entry = items.find((item) => item.role === "entrypoint");
@@ -862,6 +877,7 @@ function compactInlineRuntime(
     const aliases = aliasesBefore(others.length);
     const entryBytes = resolved.get(entry.id);
     if (entryBytes === undefined) throw new Error("Resolved entrypoint bytes are missing.");
+    const sourceBindings = new Map(items.flatMap(item=>item.containerBindings ?? []).map(binding=>[binding.id,binding]));
     const verificationChecks = Object.freeze(items.map((item) => Object.freeze({
       id: item.id,
       name: item.aliases[0] ?? item.id,
@@ -873,6 +889,7 @@ function compactInlineRuntime(
       passed: true,
       detail: `${item.integrity.byteLength} bytes matched ${item.integrity.digest}`,
       severity: "fatal",
+      sources: Object.freeze([Object.freeze({kind:"inline",...(item.onchain?.containerId && sourceBindings.get(item.onchain.containerId) ? {chainId:sourceBindings.get(item.onchain.containerId)!.chainId,store:sourceBindings.get(item.onchain.containerId)!.store,objectId:sourceBindings.get(item.onchain.containerId)!.objectId} : {})})]),
     })));
     const verification = Object.freeze({
       protocol: "keel-inline-verification@1",
@@ -923,7 +940,7 @@ function compactInlineRuntime(
     catch (error) { liveReadError = error instanceof Error ? error.message : "Published content read unavailable"; }
     const context: Record<string, unknown> = { ...(typeof globals.__KEEL_CONTEXT__ === "object" && globals.__KEEL_CONTEXT__ !== null ? globals.__KEEL_CONTEXT__ : {}),
       // Always replace this field; token context cannot impersonate a host read.
-      contentView: liveContent ?? null };
+      tokenMetadata:globals.__KEEL_TOKEN_METADATA__,collectionMetadata:globals.__KEEL_COLLECTION_METADATA__,marketplaces:globals.__KEEL_MARKETPLACES__,contentView: liveContent ?? null, shellCatalog:shellCatalogFactory(items,resolved) };
 
     const extensions = typeof context === "object" && context !== null && Array.isArray((context as { shellPlugins?: unknown }).shellPlugins)
       ? (context as { shellPlugins: unknown[] }).shellPlugins.slice(0, 8).flatMap((value) => {
@@ -937,17 +954,6 @@ function compactInlineRuntime(
       })
       : [];
     const plugins = Object.freeze(extensions);
-    Object.defineProperty(globals, "__KEEL_SHELL_API__", {
-      value: Object.freeze({
-        protocol: "keel-shell-plugin@1",
-        verification: () => verification,
-        resources: () => resources,
-        plugins: () => plugins,
-      }),
-      enumerable: true,
-      writable: false,
-      configurable: false,
-    });
     const verificationUI = mountKeelVerification({
       result: verification,
       runtime: Object.freeze({ protocol: "keel-inline-runtime@1" }),
@@ -955,7 +961,13 @@ function compactInlineRuntime(
       extraRows: [...plugins.map((plugin) => Object.freeze({ key: plugin.title, value: plugin.body })),
         ...(liveContent ? [{ key: "Live appearance reads", value: `Enabled manifest and published read intents verified. ${liveContent.state.appearance ? "Wallet choices, backpack items, campaign eligibility and restored slots are live. " : "Wallet choices are live. "}RPC state at block ${liveContent.disclosure.blockNumber}; registered artwork is checked against its stored digest. These reads do not change the original seed or mint catalog. Source: ${liveContent.disclosure.endpoint}` }] : []),
         ...(liveReadError ? [{ key: "Wallet skins unavailable", value: liveReadError + ". Showing base artwork." }] : [])],
-    }) as { fail(label: string, detail: string): void };
+    }) as { fail(label: string, detail: string): void; verification(): unknown; putPanel(input: unknown): unknown; removePanel(id: string): unknown; connectChild(frame: HTMLIFrameElement,loading?:{ready():boolean;progress(payload:unknown):boolean}): void; open(page?: string): void; close(): void; catalog(): unknown;setMarketplaces(input: unknown): unknown };
+    Object.defineProperty(globals, "__KEEL_SHELL_API__", {
+      value: Object.freeze({protocol:"keel-shell-plugin@1",version:2,
+        verification:verificationUI.verification,catalog:verificationUI.catalog,resources:()=>resources,plugins:()=>plugins,
+        putPanel:verificationUI.putPanel,removePanel:verificationUI.removePanel,open:verificationUI.open,close:verificationUI.close}),
+      enumerable:true,writable:false,configurable:false,
+    });
     const frame = document.createElement("iframe");
     frame.title = "Verified KEEL work";
     frame.sandbox.add("allow-scripts", "allow-pointer-lock");
@@ -985,7 +997,7 @@ function compactInlineRuntime(
       const bytes = resolved.get(item.id);
       if (bytes === undefined) throw new Error(`Resolved bytes missing for ${item.id}.`);
       const source = decoder.decode(bytes);
-      moduleScripts.push(/(^|[;\n])\s*(?:import|export)\b/u.test(source)
+      moduleScripts.push(/(^|[;\n}])\s*(?:import|export)\b/u.test(source)
         ? transformVerifiedModule(source, item.id, moduleAliases, true)
         : source);
     }
@@ -1014,36 +1026,56 @@ function compactInlineRuntime(
     // already-verified module bytes as inline text. Keeping the document in
     // srcdoc also avoids turning a large p5/Three graph into a multi-megabyte
     // nested data URL that browsers may reject before execution.
+    const loadingItem=items.find(item=>item.id==="keel.loading-manifest" || item.aliases.includes("keel.loading-manifest"));
+    const loading=loadingManifestFactory(loadingItem?JSON.parse(decoder.decode(resolved.get(loadingItem.id)!)):undefined);
+    let creatorLoader:HTMLIFrameElement|undefined;
+    if(loading.loaderResourceId){
+      const descriptor=items.find(item=>item.id===loading.loaderResourceId);
+      if(!descriptor||descriptor.mediaType!=="text/html"||descriptor.integrity.byteLength>65536||descriptor.role==="entrypoint")throw new Error("Initialization loader must be a checked HTML asset under 64 KiB");
+      creatorLoader=document.createElement("iframe");creatorLoader.id="keel-init-loader";creatorLoader.title="Artwork initialization";creatorLoader.sandbox.add("allow-scripts");creatorLoader.referrerPolicy="no-referrer";
+      const text=decoder.decode(resolved.get(descriptor.id)!);
+      const guard=`<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; img-src data:; font-src data:; connect-src 'none'; frame-src 'none'; object-src 'none'; form-action 'none'; base-uri 'none'">`;
+      creatorLoader.srcdoc='<!doctype html><html><head>'+guard+'</head><body style="margin:0;background:#0c0d10">'+text+'</body></html>';
+      creatorLoader.addEventListener("load",()=>{if(document.body.dataset.verification!=="failed" && status.dataset.stage!=="ready")status.hidden=true;},{once:true});document.body.append(creatorLoader);
+    }
+    updateLoading("initialize","Starting the work",80);
+    let resolvePaint:()=>void=()=>{},rejectPaint:(error:Error)=>void=()=>{},manualReady=false,hasPainted=false,childFailed=false,progress=80;
+    const ready=new Promise<void>((resolve,reject)=>{resolvePaint=resolve;rejectPaint=reject;});
+    const finish=()=>{if(hasPainted&&(loading.readiness!=="manual"||manualReady)&&!childFailed)resolvePaint();};
+    const timer=setTimeout(()=>rejectPaint(new Error("Verified entrypoint initialization timed out")),loading.timeoutMs);
+    verificationUI.connectChild(frame,{ready(){manualReady=true;finish();return true;},progress(payload){
+      if(!payload||typeof payload!=="object")throw new TypeError("Invalid initialization progress");const data=payload as {percent?:unknown;message?:unknown};
+      if(typeof data.percent!=="number"||!Number.isFinite(data.percent)||data.percent<0||data.percent>100||(data.message!==undefined&&(typeof data.message!=="string"||data.message.length>160)))throw new TypeError("Invalid initialization progress");
+      progress=Math.max(progress,80+data.percent*.2);updateLoading("initialize",typeof data.message==="string"?data.message:"Starting the work",progress);
+      creatorLoader?.contentWindow?.postMessage({protocol:"keel-loading@1",action:"progress",percent:data.percent,message:data.message},"*");return true;
+    }});
     frame.srcdoc = verifiedChildHTML;
     addEventListener("message", (event) => {
-      if (event.source !== frame.contentWindow || event.data?.protocol !== "keel-inline-child@1" || event.data?.action !== "failed") return;
-      const message = typeof event.data.detail === "string" ? event.data.detail : "Verified child runtime failed.";
-      document.body.dataset.verification = "failed";
-      status.hidden = false;
-      status.textContent = `KEEL VERIFICATION FAILED\n${message}`;
-      verificationUI.fail("Verified child runtime", message);
-      parent.postMessage({ protocol: "keel-inline-runtime@1", action: "failed", detail: message }, "*");
+      if(event.source!==frame.contentWindow||event.data?.protocol!=="keel-inline-child@1")return;
+      if(event.data.action==="painted"){hasPainted=true;finish();return;}
+      if(event.data.action!=="failed")return;
+      childFailed=true;const message=typeof event.data.detail==="string"?event.data.detail:"Verified child runtime failed";
+      rejectPaint(new Error(message));creatorLoader?.remove();document.body.dataset.verification="failed";status.hidden=false;updateLoading("failed",message,100);verificationUI.fail("Verified child runtime",message);
+      parent.postMessage({protocol:"keel-inline-runtime@1",action:"failed",detail:message},"*");
     });
+    frame.addEventListener("error",()=>rejectPaint(new Error("Verified entrypoint failed to load")),{once:true});
     stage.replaceChildren(frame);
-    await new Promise<void>((resolveReady, reject) => {
-      const timer = setTimeout(() => reject(new Error("Verified entrypoint timed out.")), 15_000);
-      frame.addEventListener("load", () => {
-        clearTimeout(timer);
-        resolveReady();
-      }, { once: true });
-      frame.addEventListener("error", () => {
-        clearTimeout(timer);
-        reject(new Error("Verified entrypoint failed to load."));
-      }, { once: true });
-    });
-    document.body.dataset.verification = "verified";
-    status.hidden = true;
+    // Optional enrichment is never awaited by paint, readiness or verification.
+    // Permission/CSP/RPC failures cannot enter the committed-resource fail path.
+    if(optionalMarketplaces && typeof context.chainId==="number" && typeof context.collection==="string" && (typeof context.tokenId==="string"||typeof context.tokenId==="number")) {
+      try {optionalMarketplaces.start(optionalMarketplaces.config,{chainId:context.chainId,collection:context.collection,tokenId:String(context.tokenId)},
+        {setMarketplaces:async(directory)=>verificationUI.setMarketplaces(directory)});} catch { /* Optional information only. */ }
+    }
+    try{await ready;}finally{clearTimeout(timer);}
+    if(childFailed)throw new Error("Verified child failed during initialization");
+    document.body.dataset.verification="verified";creatorLoader?.remove();status.hidden=false;updateLoading("ready","Ready",100);
+    setTimeout(()=>{if(document.body.dataset.verification==="verified")status.hidden=true;},200);
   };
-  document.addEventListener("DOMContentLoaded", () => void launch().catch((error: unknown) => {
+  const start = () => void launch().catch((error: unknown) => {
     const message = error instanceof Error ? error.message : String(error);
     document.body.dataset.verification = "failed";
     status.hidden = false;
-    status.textContent = `KEEL VERIFICATION FAILED\n${message}`;
+    updateLoading("failed",message,100);document.querySelector("#keel-init-loader")?.remove();
     parent.postMessage({ protocol: "keel-inline-runtime@1", action: "failed", detail: message }, "*");
     const mounted = (globals as typeof globalThis & {
       __VAULT_VERIFICATION_UI__?: { fail?: (label: string, detail: string) => void };
@@ -1072,7 +1104,8 @@ function compactInlineRuntime(
         context: globals.__KEEL_CONTEXT__,
       });
     }
-  }), { once: true });
+  });
+  if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",start,{once:true});else start();
 }
 
 /** Build the two small reusable halves for the composable Inline lane. */
@@ -1104,18 +1137,23 @@ export async function buildCompactInlineKeelShell(input: {
   };
   /** EVM-assembled compressed packs; the response contains every byte and never exposes a browser RPC transport. */
   readonly embeddedContainerDelivery?: { readonly chainId: number; readonly store: string };
+  /** Optional RPC information only. Never changes embedded artwork delivery or the proof. */
+  readonly optionalMarketplaceInfo?: KeelShellMarketplaceConfig;
   /** Contain an authored viewport without moving scene controls. */
   readonly fitViewport?: { readonly width: number; readonly height: number };
   /** Explicit wire choice, independent of native Hold storage. No fallback. */
-  readonly binaryPayloadCarriage?: "as-is" | "base64" | "base90" | "base91" | "base90-block";
+  readonly binaryPayloadCarriage?: "as-is" | "base64" | "base90" | "base91" | "base90-block" | "uri81";
   /** Opt-in trusted decoder profile; the native default retains its exact boot bytes. */
-  readonly codecProfile?: "native" | "brotli-js" | "lzma-js" | "brotli-lzma-js";
+  readonly codecProfile?: "native" | "brotli-js" | "lzma-js" | "brotli-lzma-js" | "ppmd-js";
+  /** Prepared boot owns one selected decoder instance; no runtime network import. */
+  readonly decoderDelivery?: "inline" | "preloaded";
+  readonly contextCarriage?: "json" | "columns-v1";
 } = {}): Promise<{
   readonly deliveryProfile: "embedded-assembled" | "onchain-recursive";
-  readonly codecProfile: "native" | "brotli-js" | "lzma-js" | "brotli-lzma-js";
-  readonly supportedCodecs: readonly ("none" | "gzip" | "deflate" | "brotli" | "lzma")[];
+  readonly codecProfile: "native" | "brotli-js" | "lzma-js" | "brotli-lzma-js" | "ppmd-js";
+  readonly supportedCodecs: readonly ("none" | "gzip" | "deflate" | "brotli" | "lzma" | "ppmd")[];
   readonly decoderIntegrity?: Sha256Integrity;
-  readonly resourceProfile?: "embedded-shared-containers@1" | "embedded-shared-containers-base90@1" | "embedded-shared-containers-base91@1" | "embedded-shared-containers-base90-block@2";
+  readonly resourceProfile?: "embedded-shared-containers@1" | "embedded-shared-containers-base90@1" | "embedded-shared-containers-base91@1" | "embedded-shared-containers-base90-block@2" | "embedded-shared-containers-uri81@1";
   readonly transportDecoderIntegrity?: Sha256Integrity;
   readonly containerBridge?: Uint8Array;
   readonly containerBridgeIntegrity?: Sha256Integrity;
@@ -1124,14 +1162,23 @@ export async function buildCompactInlineKeelShell(input: {
   readonly prefixIntegrity: Sha256Integrity;
   readonly suffixIntegrity: Sha256Integrity;
 }> {
-  if (input.binaryPayloadCarriage !== undefined && !["as-is", "base64", "base90", "base91", "base90-block"].includes(input.binaryPayloadCarriage)) throw new TypeError("Invalid binary payload carriage.");
+  if (input.binaryPayloadCarriage !== undefined && !["as-is", "base64", "base90", "base91", "base90-block", "uri81"].includes(input.binaryPayloadCarriage)) throw new TypeError("Invalid binary payload carriage.");
   if (input.binaryPayloadCarriage !== undefined && !input.embeddedContainerDelivery) throw new TypeError("Binary payload carriage requires an embedded container profile.");
   if (input.embeddedContainerDelivery && input.onchainDelivery) throw new TypeError("Select exactly one KEEL delivery profile.");
   if (input.embeddedContainerDelivery && (!Number.isSafeInteger(input.embeddedContainerDelivery.chainId) || input.embeddedContainerDelivery.chainId <= 0
       || !/^0x[0-9a-f]{40}$/iu.test(input.embeddedContainerDelivery.store) || /^0x0{40}$/iu.test(input.embeddedContainerDelivery.store))) throw new TypeError("Invalid offline selected-chain binding.");
   if (input.embeddedContainerDelivery && (input.binaryPayloadCarriage ?? "as-is") === "as-is") throw new TypeError("Unchanged compressed bytes were requested. embedded-shared-containers@1 emits Base64 in the contract return and cannot satisfy as-is carriage. Three-byte padding does not make raw binary a valid Base64/UTF-8 tokenURI. No encoding or Hybrid fallback was selected. Use a proved native byte reader; Base64 return requires an explicit binaryPayloadCarriage choice.");
+  if (input.contextCarriage !== undefined && (!["json","columns-v1"].includes(input.contextCarriage) || !input.embeddedContainerDelivery)) throw new TypeError("Context columns require offline delivery");
+  if (input.decoderDelivery !== undefined && !["inline","preloaded"].includes(input.decoderDelivery)) throw new TypeError("Unknown decoder delivery");
+  if (input.decoderDelivery === "preloaded" && (!input.embeddedContainerDelivery || !["base90", "uri81"].includes(input.binaryPayloadCarriage ?? "") || input.codecProfile !== "ppmd-js")) throw new TypeError("Preloaded decoders require an explicit offline Base90 or URI81/PPMd boot profile");
   if (input.fitViewport && (![input.fitViewport.width, input.fitViewport.height].every(value => Number.isSafeInteger(value) && value >= 64 && value <= 8192))) throw new RangeError("Invalid authored viewport dimensions.");
   // Offline assembly never ships or invokes the optional published RPC reader.
+  if(input.optionalMarketplaceInfo){
+    const config=input.optionalMarketplaceInfo;
+    if(!Number.isSafeInteger(config.chainId)||config.chainId<=0||!Array.isArray(config.rpcUrls)||config.rpcUrls.length<1||config.rpcUrls.length>8||!Array.isArray(config.markets)||config.markets.length>8)throw new TypeError("Invalid optional marketplace reader configuration");
+    for(const endpoint of config.rpcUrls)assertKeelRpcUrl(endpoint,config.rpcHosts);
+    if((input.embeddedContainerDelivery?.chainId??input.onchainDelivery?.chainId??config.chainId)!==config.chainId)throw new TypeError("Optional marketplace reads must use the artwork's chain");
+  }
   const installedViewReader = input.embeddedContainerDelivery ? { integrity: { digest: `0x${"0".repeat(64)}` } } : await buildPublishedViewReaderModule();
   // Packaged canonical source makes the default independent of the consumer's cwd.
   const verificationChromePath = fileURLToPath(new URL("./assets/keel-verification-chrome.js", import.meta.url));
@@ -1142,21 +1189,23 @@ export async function buildCompactInlineKeelShell(input: {
   }
   const repositoryRoot = path.dirname(verificationChromePath);
   const codecProfile = input.codecProfile ?? "native";
-  if (!["native", "brotli-js", "lzma-js", "brotli-lzma-js"].includes(codecProfile)) throw new TypeError("Unsupported KEEL shell codec profile.");
-  const codecs: ("brotli" | "lzma")[] = [
+  if (!["native", "brotli-js", "lzma-js", "brotli-lzma-js", "ppmd-js"].includes(codecProfile)) throw new TypeError("Unsupported KEEL shell codec profile.");
+  const codecs: ("brotli" | "lzma" | "ppmd")[] = [
     ...(codecProfile === "brotli-js" || codecProfile === "brotli-lzma-js" ? ["brotli" as const] : []),
     ...(codecProfile === "lzma-js" || codecProfile === "brotli-lzma-js" ? ["lzma" as const] : []),
+    ...(codecProfile === "ppmd-js" ? ["ppmd" as const] : []),
   ];
   const decoderModule = codecs.length ? await buildKeelDecoderModule({ codecs }) : undefined;
-  const transportProfile = input.binaryPayloadCarriage === "base90-block" ? "base90-block-v2" : input.binaryPayloadCarriage === "base90" ? "base90-v1" : input.binaryPayloadCarriage === "base91" ? "base91-v1" : undefined;
-  const transportModule = transportProfile ? await buildKeelDenseTransportDecoder() : undefined;
+  const transportProfile = input.binaryPayloadCarriage === "uri81" ? "uri81-block-v1" : input.binaryPayloadCarriage === "base90-block" ? "base90-block-v2" : input.binaryPayloadCarriage === "base90" ? "base90-v1" : input.binaryPayloadCarriage === "base91" ? "base91-v1" : undefined;
+  const transportModule = transportProfile ? await buildKeelDenseTransportDecoder(transportProfile) : undefined;
   let runtimeSource = compactInlineRuntime.toString();
   if (decoderModule || input.onchainDelivery || input.embeddedContainerDelivery) {
     const replacement = `const decompress = async (compression, bytes, decodedByteLength) => {
       if (!Number.isSafeInteger(decodedByteLength) || decodedByteLength < 0 || decodedByteLength > 32 * 1024 * 1024) throw new RangeError("Committed decoded length exceeds shell limit.");
       if (compression === "none") return bytes;
       ${decoderModule ? `if (compression === "brotli" && KEEL_RESOURCE_DECODERS.decodeBrotli) return KEEL_RESOURCE_DECODERS.decodeBrotli(bytes, { decodedByteLength });
-      if (compression === "lzma" && KEEL_RESOURCE_DECODERS.decodeLzma) return KEEL_RESOURCE_DECODERS.decodeLzma(bytes, { decodedByteLength });` : ""}
+      if (compression === "lzma" && KEEL_RESOURCE_DECODERS.decodeLzma) return KEEL_RESOURCE_DECODERS.decodeLzma(bytes, { decodedByteLength });
+      if (compression === "ppmd" && KEEL_RESOURCE_DECODERS.decodePpmd) return KEEL_RESOURCE_DECODERS.decodePpmd(bytes, { decodedByteLength, maxDictionaryBytes: 64 * 1024 * 1024 });` : ""}
       if (compression !== "gzip" && compression !== "deflate") throw new Error("Unsupported KEEL resource compression.");
       if (typeof DecompressionStream !== "function") throw new Error(compression + " decompression is unavailable.");
       return readBounded(new Blob([bytes]).stream().pipeThrough(new DecompressionStream(compression)), decodedByteLength);
@@ -1200,8 +1249,8 @@ export async function buildCompactInlineKeelShell(input: {
     const prelude = `let offlineReader;
     const initializeOfflineReader = async () => {
       if (document.readyState === "loading") await new Promise(done => document.addEventListener("DOMContentLoaded", done, {once:true}));
-      const context = validateKeelEmbeddedContainerContext(globals.__KEEL_CONTEXT__, ${delivery.chainId});
-      globals.__KEEL_CONTEXT__ = context;
+      const context = ${input.contextCarriage === "columns-v1" ? "unpackKeelEmbeddedContainerContext" : "validateKeelEmbeddedContainerContext"}(globals.__KEEL_CONTEXT__, ${delivery.chainId});
+      ${input.contextCarriage === "columns-v1" ? "globals.__KEEL_CONTEXT__ = context;" : ""}
       return createKeelEmbeddedContainerReader({...${escapeScriptJson(delivery)},tableDigest:context.containerTableDigest,
         containers:items.flatMap(item=>item.containerBindings??[]),payloads:globalThis.__KEEL_EMBEDDED_CONTAINERS__,items,verify,decompress
         ${transportProfile ? `,transportProfile:${JSON.stringify(transportProfile)},decodeTransport:(text,byteLength)=>KEEL_DENSE_TRANSPORT.decodeKeelDenseTransport(text,{profile:${JSON.stringify(transportProfile)},byteLength})` : ""}});
@@ -1215,7 +1264,7 @@ export async function buildCompactInlineKeelShell(input: {
     const disabledPublishedReader = withResolve.replace("if (enabled) {", "if (false) {");
     if (disabledPublishedReader === withResolve) throw new Error("Canonical Inline optional published-reader hook is missing.");
     runtimeSource = disabledPublishedReader;
-    binaryReaderImport = `import {createKeelEmbeddedContainerReader} from ${JSON.stringify(fileURLToPath(new URL("./embedded-container-reader.js", import.meta.url)))};import {validateKeelEmbeddedContainerContext} from ${JSON.stringify(fileURLToPath(new URL("./embedded-container-context.js", import.meta.url)))};`;
+    binaryReaderImport = `import {createKeelEmbeddedContainerReader} from ${JSON.stringify(fileURLToPath(new URL("./embedded-container-reader.js", import.meta.url)))};import {validateKeelEmbeddedContainerContext,unpackKeelEmbeddedContainerContext} from ${JSON.stringify(fileURLToPath(new URL("./embedded-container-context.js", import.meta.url)))};`;
   }
   if (input.fitViewport) {
     const {width, height} = input.fitViewport;
@@ -1224,6 +1273,7 @@ export async function buildCompactInlineKeelShell(input: {
       const fitFrame = () => {
         const scale = Math.min(stage.clientWidth / ${width}, stage.clientHeight / ${height});
         Object.assign(frame.style, {position:"absolute",width:"${width}px",height:"${height}px",left:"50%",top:"50%",transformOrigin:"center",transform:"translate(-50%,-50%) scale("+scale+")"});
+        document.body.scrollLeft=0;document.body.scrollTop=0;stage.scrollLeft=0;stage.scrollTop=0;
       };
       fitFrame();new ResizeObserver(fitFrame).observe(stage);`);
     if (updated === runtimeSource) throw new Error("Canonical authored viewport hook is missing.");
@@ -1239,7 +1289,7 @@ export async function buildCompactInlineKeelShell(input: {
     target: ["es2022"],
     write: false,
     stdin: {
-      contents: `${binaryReaderImport}${transportModule?.javascript ?? ""}${decoderModule?.javascript ?? ""}${input.onchainDelivery || input.embeddedContainerDelivery ? "" : 'import {keccak_256} from "@noble/hashes/sha3";'}import { mountKeelVerification } from ${JSON.stringify(verificationChromePath)};(${runtimeSource})(mountKeelVerification,${JSON.stringify(installedViewReader.integrity.digest)},${input.onchainDelivery || input.embeddedContainerDelivery ? "undefined" : "keccak_256"})`,
+      contents: `${input.optionalMarketplaceInfo ? `import {startKeelShellMarketplaceInfo} from ${JSON.stringify(fileURLToPath(new URL("./marketplace-reader.js",import.meta.url)))};` : ""}${binaryReaderImport}${input.decoderDelivery === "preloaded" ? "const KEEL_RESOURCE_DECODERS=globalThis.__KEEL_BOOT_RESOURCE_DECODERS__,KEEL_DENSE_TRANSPORT=globalThis.__KEEL_BOOT_DENSE_TRANSPORT__;" : (transportModule?.javascript ?? "")+(decoderModule?.javascript ?? "")}${input.onchainDelivery || input.embeddedContainerDelivery ? "" : 'import {keccak_256} from "@noble/hashes/sha3";'}import { mountKeelVerification } from ${JSON.stringify(verificationChromePath)};import {createKeelShellClient} from ${JSON.stringify(fileURLToPath(new URL("./verification-shell-client.js", import.meta.url)))};import {buildKeelShellCatalog} from ${JSON.stringify(fileURLToPath(new URL("./verification-shell-catalog.js", import.meta.url)))};import {normalizeKeelLoadingManifest} from ${JSON.stringify(fileURLToPath(new URL("./verification-shell-loading.js", import.meta.url)))};(${runtimeSource})(mountKeelVerification,${JSON.stringify(installedViewReader.integrity.digest)},${input.onchainDelivery || input.embeddedContainerDelivery ? "undefined" : "keccak_256"},createKeelShellClient,buildKeelShellCatalog,normalizeKeelLoadingManifest${input.optionalMarketplaceInfo ? `,{config:${JSON.stringify(input.optionalMarketplaceInfo)},start:startKeelShellMarketplaceInfo}` : ""})`,
       resolveDir: repositoryRoot,
       sourcefile: "keel-inline-runtime.js",
       loader: "js",
@@ -1247,11 +1297,11 @@ export async function buildCompactInlineKeelShell(input: {
   });
   const runtime = runtimeBuild.outputFiles[0]?.text;
   if (runtime === undefined) throw new Error("Compact KEEL Inline runtime produced no JavaScript.");
-  const prefix = utf8ToBytes('<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><style>*{box-sizing:border-box}html,body,#keel-stage,iframe{width:100%;height:100%;margin:0;border:0;overflow:hidden;background:#05060b;color:#eafff8}body{position:relative}#keel-status{position:fixed;inset:0;z-index:2;display:grid;place-items:center;white-space:pre-wrap;text-align:center;color:#d7ff63;background:#05060b;font:700 12px/1.7 monospace}[hidden]{display:none!important}</style></head><body data-verification="pending"><div id="keel-stage"></div><div id="keel-status">VERIFYING KEEL GRAPH</div><script>globalThis.__KEEL_ITEMS__=[null'.replace("globalThis.__KEEL_ITEMS__=[null", input.embeddedContainerDelivery ? "globalThis.__KEEL_EMBEDDED_CONTAINERS__=[" : "globalThis.__KEEL_ITEMS__=[null"));
+  const prefix = utf8ToBytes(('<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><style>*{box-sizing:border-box}html,body,#keel-stage,iframe{width:100%;height:100%;margin:0;border:0;overflow:hidden;background:#0c0d10}body{position:relative;overflow:clip!important}[hidden]{display:none!important}'+KEEL_LOADING_CSS+'</style></head><body data-verification="pending"><div id="keel-stage"></div>'+KEEL_LOADING_MARKUP+'<script>globalThis.__KEEL_ITEMS__=[null').replace("globalThis.__KEEL_ITEMS__=[null", input.embeddedContainerDelivery ? "globalThis.__KEEL_EMBEDDED_CONTAINERS__=[" : "globalThis.__KEEL_ITEMS__=[null"));
   const suffix = utf8ToBytes(`];${runtime}</script></body></html>`);
   const [prefixIntegrity, suffixIntegrity] = await Promise.all([sha256Integrity(prefix), sha256Integrity(suffix)]);
   const containerBridge = input.embeddedContainerDelivery ? utf8ToBytes("];globalThis.__KEEL_ITEMS__=[null") : undefined;
-  return { prefix, suffix, prefixIntegrity, suffixIntegrity, ...(containerBridge ? { resourceProfile: transportProfile === "base90-block-v2" ? "embedded-shared-containers-base90-block@2" as const : transportProfile === "base90-v1" ? "embedded-shared-containers-base90@1" as const : transportProfile === "base91-v1" ? "embedded-shared-containers-base91@1" as const : "embedded-shared-containers@1" as const, containerBridge,
+  return { prefix, suffix, prefixIntegrity, suffixIntegrity, ...(containerBridge ? { resourceProfile: transportProfile === "uri81-block-v1" ? "embedded-shared-containers-uri81@1" as const : transportProfile === "base90-block-v2" ? "embedded-shared-containers-base90-block@2" as const : transportProfile === "base90-v1" ? "embedded-shared-containers-base90@1" as const : transportProfile === "base91-v1" ? "embedded-shared-containers-base91@1" as const : "embedded-shared-containers@1" as const, containerBridge,
     containerBridgeIntegrity: await sha256Integrity(containerBridge) } : {}), deliveryProfile: input.onchainDelivery ? "onchain-recursive" : "embedded-assembled", codecProfile, supportedCodecs: ["none", "gzip", "deflate", ...codecs], ...(decoderModule ? { decoderIntegrity: decoderModule.integrity } : {}), ...(transportModule ? { transportDecoderIntegrity: transportModule.integrity } : {}) };
 }
 
@@ -1262,7 +1312,7 @@ export async function buildEmbeddedKeelViewerSlot(input: {
   readonly mediaType: string;
   readonly aliases?: readonly string[];
   readonly bytes: Uint8Array;
-  readonly compression?: "none" | "gzip" | "deflate" | "brotli" | "lzma";
+  readonly compression?: "none" | "gzip" | "deflate" | "brotli" | "lzma" | "ppmd";
   /** Explicit LZMA-alone stream from the caller's pinned build encoder. */
   readonly storedBytes?: Uint8Array;
 }): Promise<{
@@ -1275,14 +1325,14 @@ export async function buildEmbeddedKeelViewerSlot(input: {
   if (input.backgroundColor !== undefined && !/^#?[0-9a-f]{6}$/i.test(input.backgroundColor)) throw new TypeError("Background color must be six hex digits.");
   const compression = input.compression ?? "none";
   let stored: Uint8Array;
-  if (compression === "lzma") {
+  if (compression === "lzma" || compression === "ppmd") {
     if (!input.storedBytes) throw new TypeError("LZMA resources require explicit precompressed storedBytes from a pinned encoder.");
     stored = input.storedBytes.slice();
-    const { decodeLzma } = await import("./decoders/index.js");
-    const decoded = await decodeLzma(stored, { decodedByteLength: input.bytes.byteLength });
+    const { decodeLzma, decodePpmd } = await import("./decoders/index.js");
+    const decoded = await (compression === "ppmd" ? decodePpmd : decodeLzma)(stored, { decodedByteLength: input.bytes.byteLength, maxDictionaryBytes: compression === "ppmd" ? 64 * 1024 * 1024 : 4 * 1024 * 1024 });
     if (decoded.byteLength !== input.bytes.byteLength || !decoded.every((value, index) => value === input.bytes[index])) throw new Error("LZMA resource does not decode to the committed original bytes.");
   } else {
-    if (input.storedBytes !== undefined) throw new TypeError("Explicit storedBytes are accepted only for LZMA resources.");
+    if (input.storedBytes !== undefined) throw new TypeError("Explicit storedBytes are accepted only for declared LZMA/PPMd resources.");
     stored = await compressStored(compression, input.bytes);
   }
   const [integrity, storedIntegrity] = await Promise.all([sha256Integrity(input.bytes), sha256Integrity(stored)]);
@@ -1338,7 +1388,7 @@ function assertOnchainSlot(item: KeelStandaloneViewerItem): void {
   if (!Number.isSafeInteger(item.chainId) || !item.chainId || item.chainId < 0
       || typeof item.store !== "string" || !/^0x[0-9a-f]{40}$/iu.test(item.store) || /^0x0{40}$/iu.test(item.store)
       || typeof item.objectId !== "string" || !/^0x[0-9a-f]{64}$/iu.test(item.objectId) || /^0x0{64}$/iu.test(item.objectId)
-      || onchain.storeKind !== "keel-hold" || !["none", "gzip", "deflate", "brotli", "lzma"].includes(onchain.compression ?? "")) throw new TypeError("Invalid selected-chain binary descriptor.");
+      || onchain.storeKind !== "keel-hold" || !["none", "gzip", "deflate", "brotli", "lzma", "ppmd"].includes(onchain.compression ?? "")) throw new TypeError("Invalid selected-chain binary descriptor.");
   exactKeys(onchain, ["storeKind", "compression", "storedIntegrity", "range"]);
   checkIntegrity(onchain.storedIntegrity, 4 * 1024 * 1024);
   if (onchain.range) {
@@ -1369,7 +1419,7 @@ export async function buildOnchainKeelViewerSlot(input: {
   readonly chainId: number;
   readonly store: string;
   readonly objectId: Hex;
-  readonly compression: "none" | "gzip" | "deflate" | "brotli" | "lzma";
+  readonly compression: "none" | "gzip" | "deflate" | "brotli" | "lzma" | "ppmd";
   readonly storedBytes: Uint8Array;
   readonly container?: { readonly bytes: Uint8Array; readonly memberOffset: number };
   readonly containerReference?: KeelOnchainContainerBinding;
@@ -1397,9 +1447,9 @@ export async function buildOnchainKeelViewerSlot(input: {
   assertOnchainSlot(item);
   if (input.container && !input.bytes.every((value, index) => value === container[input.container!.memberOffset + index])) throw new Error("Binary container member differs from its exact source.");
   let decoded: Uint8Array;
-  if (input.compression === "lzma") {
-    const { decodeLzma } = await import("./decoders/index.js");
-    decoded = await decodeLzma(input.storedBytes, { decodedByteLength: container.length });
+  if (input.compression === "lzma" || input.compression === "ppmd") {
+    const { decodeLzma, decodePpmd } = await import("./decoders/index.js");
+    decoded = await (input.compression === "ppmd" ? decodePpmd : decodeLzma)(input.storedBytes, { decodedByteLength: container.length, maxDictionaryBytes: input.compression === "ppmd" ? 64 * 1024 * 1024 : 4 * 1024 * 1024 });
   } else if (input.compression === "none") decoded = input.storedBytes;
   else {
     const zlib = await import("node:zlib"), options = { maxOutputLength: container.length };
@@ -1510,7 +1560,7 @@ export async function wrapInVerificationShell(options: WrapInVerificationShellOp
   });
   const target = options.target ?? {
     chainId: 11_155_111,
-    address: resolveModuleTarget({ module: "keel-hold", contract: "KeelHold", chainId: 11_155_111 }).address,
+    address: resolveDefaultKeelHoldTarget(11_155_111).address,
   };
   const chunks = chunkBytes(built.compressedHtml, MAX_SLUG_BYTES);
   const chunkIntegrities = await Promise.all(chunks.map((chunk) => sha256Integrity(chunk.bytes)));

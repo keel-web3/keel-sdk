@@ -1,6 +1,8 @@
 import { gunzipSync } from "node:zlib";
+import {createPpmdTask} from "./decoders/vendor/ppmd.js";
+import { unpackKeelInlineDescriptors } from "./inline-descriptor-columns.js";
 import { createHash } from "node:crypto";
-import { decodeKeelDenseTransport, serializeKeelDenseTransportJSON, type KeelDenseTransportProfile } from "./dense-transport.js";
+import { inspectKeelDataURICompatibility, decodeKeelDenseTransport, serializeKeelDenseTransportJSON, type KeelDenseTransportProfile } from "./dense-transport.js";
 import { createIntegrity } from "@keel/protocol";
 import { assertKeelInlineImageBytes } from "./collector-policy.js";
 
@@ -39,7 +41,17 @@ export function readKeelInlineJSONArray(html: string, marker: string): readonly 
 export function decodeKeelInlineDataURI(uri: unknown, mediaPrefix: string): Uint8Array {
   if (typeof uri !== "string" || !uri.startsWith("data:")) throw new TypeError("Inline requires a self-contained data URI.");
   const parsed = new URL(uri);
-  if (parsed.hash || parsed.href !== uri) throw new TypeError("Inline data URI is not canonical: URL normalization or a fragment would change the bytes.");
+  if (parsed.hash) throw new TypeError("Inline data URI cannot contain a fragment.");
+  // Query punctuation is valid in a data body. URL serializers can percent-escape
+  // subsequent markup while preserving every decoded byte. Reject normalization
+  // only when it changes the MIME boundary or the decoded UTF-8 body.
+  if (parsed.href !== uri) {
+    const seenComma = parsed.href.indexOf(","), originalComma = uri.indexOf(",");
+    if (seenComma < 5 || originalComma < 5 || parsed.href.slice(0, seenComma) !== uri.slice(0, originalComma)
+        || decodeURIComponent(parsed.href.slice(seenComma + 1)) !== decodeURIComponent(uri.slice(originalComma + 1))) {
+      throw new TypeError("Inline data URI normalization would change its bytes.");
+    }
+  }
   const comma = uri.indexOf(",");
   if (comma < 5 || encoder.encode(uri).length > MAX_BYTES) throw new RangeError("Invalid or oversized Inline data URI.");
   const header = uri.slice(0, comma), text = uri.slice(comma + 1);
@@ -55,9 +67,43 @@ export function decodeKeelInlineDataURI(uri: unknown, mediaPrefix: string): Uint
   return bytes;
 }
 
+/** Decode bounded literal boot data without evaluating scripts or importing its module. */
+function inspectSharedPpmdBoot(html:string) {
+  const literal=/const __KEEL_PREPARED_BOOT__=(\{[\s\S]*?\});queueMicrotask/u.exec(html);
+  if(!literal)throw new TypeError("Missing shared PPMd boot literal");
+  const boot=object(JSON.parse(literal[1]!)),keys=["profile","prefix64","decoder64","suffixDense","storedByteLength","decodedByteLength","suffixSHA256",...(boot.profile==="keel.prepared-ppmd-boot@3"?["transportProfile"]:[])];
+  const transportProfile=boot.profile==="keel.prepared-ppmd-boot@3"?boot.transportProfile:"uri81-block-v1";
+  if(Object.keys(boot).length!==keys.length||Object.keys(boot).some(k=>!keys.includes(k))||!["keel.prepared-ppmd-boot@1","keel.prepared-ppmd-boot@2","keel.prepared-ppmd-boot@3"].includes(String(boot.profile))||!["base90-v1","uri81-block-v1"].includes(String(transportProfile))
+    ||!Number.isSafeInteger(boot.storedByteLength)||Number(boot.storedByteLength)<9||Number(boot.storedByteLength)>MAX_BYTES
+    ||!Number.isSafeInteger(boot.decodedByteLength)||Number(boot.decodedByteLength)<1||Number(boot.decodedByteLength)>MAX_BYTES
+    ||typeof boot.suffixDense!=="string"||typeof boot.suffixSHA256!=="string"||!/^0x[0-9a-f]{64}$/u.test(boot.suffixSHA256))throw new TypeError("Invalid shared PPMd boot bounds");
+  if(boot.profile==="keel.prepared-ppmd-boot@1" && !html.includes('const html=(await utf8(b.prefix64))+JSON.stringify(__KEEL_PREPARED_DENSE_PACKS__).slice(1,-1)+new TextDecoder().decode(s);document.open();document.write(html);document.close()'))throw new TypeError("Unsupported shared PPMd boot formula");
+  const gzip=(value:unknown)=>{
+    if(typeof value!=="string"||value.length>MAX_BYTES||!value.length||! /^(?:[A-Za-z0-9+/]{4})*(?:[A-Za-z0-9+/]{2}==|[A-Za-z0-9+/]{3}=)?$/u.test(value))throw new TypeError("Invalid boot gzip carriage");
+    const bytes=Buffer.from(value,"base64");if(bytes.toString("base64")!==value)throw new TypeError("Noncanonical boot Base64");
+    return decoder.decode(gunzipSync(bytes,{maxOutputLength:MAX_BYTES}));
+  };
+  const prefix=gzip(boot.prefix64);gzip(boot.decoder64);
+  if(boot.profile==="keel.prepared-ppmd-boot@2"||boot.profile==="keel.prepared-ppmd-boot@3"){
+    const expectedPrefix=prefix.replace("globalThis.__KEEL_EMBEDDED_CONTAINERS__=[","const __KEEL_PREPARED_DENSE_PACKS__=[");
+    if(!html.startsWith(expectedPrefix)||!html.includes('globalThis.__KEEL_EMBEDDED_CONTAINERS__=__KEEL_PREPARED_DENSE_PACKS__;const text=new TextDecoder().decode(s),end=text.lastIndexOf("<"+"/script>"),script=document.createElement("script");if(!text.startsWith("];" )||end<2)throw Error("Boot boundaries invalid");script.textContent=text.slice(2,end);document.head.append(script);script.remove()'))throw new TypeError("Unsupported in-place shared PPMd boot formula");
+  }
+  const packed=decodeKeelDenseTransport(boot.suffixDense,{profile:transportProfile as "base90-v1"|"uri81-block-v1",byteLength:boot.storedByteLength as number});
+  const task=createPpmdTask(packed,{decodedByteLength:boot.decodedByteLength,maxDictionaryBytes:67108864,maxWork:MAX_BYTES*16});
+  let suffix:string;try{while(!task.done)task.step(65536);const hash=createHash("sha256");hash.update(task.bytes);if('0x'+hash.digest("hex")!==boot.suffixSHA256)throw new TypeError("Shared boot integrity mismatch");suffix=decoder.decode(task.bytes);}finally{task.dispose();}
+  const profiles=[...suffix.matchAll(/transportProfile:\s*"(base90-v1|base91-v1|base90-block-v2|uri81-block-v1)"/gu)].map(m=>m[1]);
+  if(profiles.length!==1||profiles[0]!==transportProfile)throw new TypeError("Shared boot requires the matching dense reader");
+  const packs=readKeelInlineJSONArray(html,"const __KEEL_PREPARED_DENSE_PACKS__="),columns=readKeelInlineJSONArray(suffix,"globalThis.__KEEL_ITEMS__=");
+  const context=/\)\(globalThis\.__KEEL_ITEMS__,([0-9]+),("0x[0-9a-fA-F]{40}")\);/u.exec(suffix);
+  if(!context||!packs.length||columns[0]!==null)throw new TypeError("Shared boot descriptors are incomplete");
+  const items=unpackKeelInlineDescriptors(columns,Number(context[1]),JSON.parse(context[2]!));
+  return {html:prefix+serializeKeelDenseTransportJSON(packs).slice(1,-1)+suffix,items,transportProfile:transportProfile as "base90-v1"|"uri81-block-v1",shellBootEncoding:"base64" as const,shellBootCompression:"ppmd" as const,payloadPreparation:"build-time" as const,contractOperation:"verified-copy" as const};
+}
+
 /** Inspect the two literal shell strings and data arrays without executing the bootstrap. */
 export function inspectKeelPreparedDenseCopyDocument(html: string) {
   if (!html.includes("const __KEEL_PREPARED_DENSE_PACKS__=")) return undefined;
+  if(html.includes("const __KEEL_PREPARED_BOOT__="))return inspectSharedPpmdBoot(html);
   const formula = /const html=(?:\(await )?utf8\(("[A-Za-z0-9+/=]+")\)\)?\+safe\(__KEEL_PREPARED_DENSE_PACKS__\)\.slice\(1,-1\)\+("(?:[^"\\]|\\.)*")\+safe\(globalThis\.__KEEL_ITEMS__\)\.slice\(5,-1\)\+(?:\(await )?utf8\(("[A-Za-z0-9+/=]+")\)\)?;document.open\(\);document.write\(html\);document.close\(\)/u.exec(html);
   if (!formula) throw new TypeError("Unsupported prepared dense COPY bootstrap.");
   const shellBootCompression = html.includes('const bootCompression="gzip";const utf8=async s=>') ? "gzip" as const : "none" as const;
@@ -70,12 +116,17 @@ export function inspectKeelPreparedDenseCopyDocument(html: string) {
   };
   const prefix = decode(formula[1]!), suffix = decode(formula[3]!), bridge = JSON.parse(formula[2]!) as string;
   if (bridge !== "];globalThis.__KEEL_ITEMS__=[null") throw new TypeError("Invalid prepared dense COPY bridge.");
-  const profiles = [...suffix.matchAll(/transportProfile:\s*"(base90-v1|base91-v1|base90-block-v2)"/gu)].map(match => match[1]);
+  const profiles = [...suffix.matchAll(/transportProfile:\s*"(base90-v1|base91-v1|base90-block-v2|uri81-block-v1)"/gu)].map(match => match[1]);
   if (profiles.length !== 1) throw new TypeError("Prepared dense COPY must declare one exact decoder profile.");
-  const packs = readKeelInlineJSONArray(html, "const __KEEL_PREPARED_DENSE_PACKS__="), items = readKeelInlineJSONArray(html, "globalThis.__KEEL_ITEMS__=");
+  const packs = readKeelInlineJSONArray(html, "const __KEEL_PREPARED_DENSE_PACKS__=");
+  let items = readKeelInlineJSONArray(html, "globalThis.__KEEL_ITEMS__=");
+  const compactContext=/const compactDescriptorContext=(\{[^;}]+\});/u.exec(html);
+  const innerContext=/const compactDescriptorContext=(\{[^;}]+\});/u.exec(suffix);
+  let expandedItems=items;
+  if(compactContext||innerContext){const context=object(JSON.parse((compactContext??innerContext)![1]!));expandedItems=unpackKeelInlineDescriptors(items,context.chainId as number,context.store as string);if(compactContext)items=expandedItems;}
   if (!packs.length || items[0] !== null || items.length < 2) throw new TypeError("Incomplete prepared dense COPY resources.");
   return { html: prefix + serializeKeelDenseTransportJSON(packs).slice(1,-1) + bridge + serializeKeelDenseTransportJSON(items).slice(5,-1) + suffix,
-    transportProfile: profiles[0] as KeelDenseTransportProfile, shellBootEncoding: "base64" as const, shellBootCompression, payloadPreparation: "build-time" as const, contractOperation: "verified-copy" as const };
+    items: expandedItems, transportProfile: profiles[0] as KeelDenseTransportProfile, shellBootEncoding: "base64" as const, shellBootCompression, payloadPreparation: "build-time" as const, contractOperation: "verified-copy" as const };
 }
 
 export function inspectKeelInlinePayloadCarriage(htmlBytes: Uint8Array) {
@@ -83,7 +134,7 @@ export function inspectKeelInlinePayloadCarriage(htmlBytes: Uint8Array) {
   const source = decoder.decode(htmlBytes), preparedDenseCopy = inspectKeelPreparedDenseCopyDocument(source);
   const html = preparedDenseCopy?.html ?? source;
   const containers = readKeelInlineJSONArray(html, "globalThis.__KEEL_EMBEDDED_CONTAINERS__=");
-  const items = readKeelInlineJSONArray(html, "globalThis.__KEEL_ITEMS__=");
+  const items = preparedDenseCopy?.items ?? readKeelInlineJSONArray(html, "globalThis.__KEEL_ITEMS__=");
   const payloads = [];
   for (const [container, values] of [[true, containers], [false, items]] as const) {
     for (const value of values) {
@@ -156,7 +207,7 @@ export function assertKeelFreshPayloadAudit(value: unknown): void {
       || audit.requiresExistingPreparedReuse !== false || !Array.isArray(audit.payloads) || audit.payloads.length > 16_384
       || audit.payloadCount !== audit.payloads.length) throw new TypeError("Invalid fresh payload carriage audit.");
   const prepared = audit.preparedDenseCopy === undefined ? undefined : object(audit.preparedDenseCopy);
-  if (prepared && (Object.keys(prepared).some(key => !["transportProfile","shellBootEncoding","shellBootCompression","payloadPreparation","contractOperation"].includes(key)) || !["base90-v1","base91-v1","base90-block-v2"].includes(prepared.transportProfile as string) || prepared.shellBootEncoding !== "base64" || prepared.shellBootCompression !== undefined && prepared.shellBootCompression !== "gzip" && prepared.shellBootCompression !== "none" || prepared.payloadPreparation !== "build-time" || prepared.contractOperation !== "verified-copy")) throw new TypeError("Invalid prepared dense COPY audit.");
+  if (prepared && (Object.keys(prepared).some(key => !["transportProfile","shellBootEncoding","shellBootCompression","payloadPreparation","contractOperation"].includes(key)) || !["base90-v1","base91-v1","base90-block-v2","uri81-block-v1"].includes(prepared.transportProfile as string) || prepared.shellBootEncoding !== "base64" || prepared.shellBootCompression !== undefined && prepared.shellBootCompression !== "gzip" && prepared.shellBootCompression !== "none" && prepared.shellBootCompression !== "ppmd" || prepared.payloadPreparation !== "build-time" || prepared.contractOperation !== "verified-copy")) throw new TypeError("Invalid prepared dense COPY audit.");
   let binary = 0, carried = 0;
   for (const value of audit.payloads) {
     const payload = object(value);
@@ -198,5 +249,8 @@ export async function auditKeelInlineTokenURI(tokenURI: string) {
     payloadPolicyScope: "prepared-copy-representation" as const,
     onchainStorage: { status: "not-inspected" as const, storedBytes: null, duplicateEncodedCopy: null,
       explanation: "Returned Base64/hex may be emitted from native Hold bytes at read time. Verify object records, carrier bytes and the upload inventory before claiming stored duplication or storage savings." },
+    uriCompatibility: { tokenURI: inspectKeelDataURICompatibility(tokenURI),
+      animationURL: inspectKeelDataURICompatibility(metadata.animation_url as string),
+      image: inspectKeelDataURICompatibility(metadata.image as string) },
     browserVerified: false as const });
 }

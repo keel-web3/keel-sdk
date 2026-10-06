@@ -2,9 +2,9 @@
 
 /** Contracts with a recorded ABI, per unit. */
 export const ABI_CONTRACTS: Readonly<Record<string, readonly string[]>> = {
-  "keel-kernel": ["KeelAccessGroups","KeelFeeTreasury","KeelRawStringReturn","KeelRecoveryGroups"],
+  "keel-kernel": ["KeelAccessGroups","KeelAuthority","KeelFeeTreasury","KeelRawStringReturn","KeelRecoveryGroups"],
   "keel-hold": ["Ingot","KeelHold","KeelIndex"],
-  "keel-artifacts": ["IKeelArtifactFragmentResolver","IKeelRawCanonicalShellRegistry","IKeelRawFragmentRevisionPolicy","IKeelRawFragmentValidationRegistry","IKeelRawFragmentValidationRegistryEvents","IKeelRawImageRevisionPolicy","IKeelRevisionedRawTokenURIBuilder","KeelArtifactFragmentResolver","KeelArtifactRegistry","KeelHarnessRegistry","KeelLinkRegistry","KeelLinkURIBuilder","KeelManager","KeelManagerProxy","KeelManagerRecovery","KeelManagerRpcPolicy","KeelRawFragmentRevisionPolicy","KeelRawFragmentValidationRegistry","KeelRawImageRevisionPolicy","KeelRegisteredArtifactFragmentResolver","KeelSeedRegistry"],
+  "keel-artifacts": ["IKeelArtifactFragmentResolver","IKeelRawCanonicalShellRegistry","IKeelRawFragmentRevisionPolicy","IKeelRawFragmentValidationRegistry","IKeelRawFragmentValidationRegistryEvents","IKeelRawImageRevisionPolicy","IKeelRevisionedRawTokenURIBuilder","KeelArtifactFragmentResolver","KeelArtifactRegistry","KeelHarnessRegistry","KeelLinkRegistry","KeelLinkURIBuilder","KeelManager","KeelManagerProxy","KeelManagerRecovery","KeelManagerRpcPolicy","KeelRawFragmentRevisionPolicy","KeelRawFragmentValidationRegistry","KeelRawImageRevisionPolicy","KeelRegisteredArtifactFragmentResolver","KeelSeedRegistry","KeelTestOwnerManager"],
   "keel-graph": ["KeelAssetTagRegistry","KeelGraphRegistry","KeelLibraryRegistry","KeelModuleReviewRegistry","KeelPluginRegistry"],
   "keel-harness": ["IKeelRawInlineShellRegistry","KeelHarnessBuilder","KeelObjectURIBuilder","KeelPercentTokenURIBuilder","KeelRawInlineShellRegistry","KeelRawTokenURIBuilder"],
   "keel-presentation": ["KeelPresentationStateRegistry","KeelVisualStateLedger"],
@@ -12,13 +12,13 @@ export const ABI_CONTRACTS: Readonly<Record<string, readonly string[]>> = {
   "keel-creator-identity": ["KeelAttributionRegistry","KeelCreatorCommitmentRegistry","KeelCreatorProfileRegistry"],
   "keel-mint-access": ["FrayAuctionIssuer","KeelMintGate","KeelMintQueue","KeelMintRewardEntropy","KeelMintRouteRegistry","KeelOneMintBatch","KeelQueueAccess","KeelQueueDemand","KeelQueueLotteryEngine","KeelQueueLotteryPool","KeelQueuePriority","KeelQueueReadAdapter","KeelRewardClaims","OneMintController","OpenOneMintController"],
   "keel-market": ["KeelMarket"],
-  "keel-anchors": ["KeelProofUpgradeController","KeelAnchorReplicationBridge","KeelAttestedAnchorRegistry","KeelIpfsCidVerifier","KeelL2AnchorVerifier","KeelL2StateVerifier","KeelNodeRegistry","KeelPortableAnchorRegistry","KeelSettlementRegistry","KeelSp1GatewayProofBackend","KeelSp1GatewayProofVerifier","KeelZkAnchorVerifier","KeelZkVerifyProofBackend","KeelZkVerifyProofVerifier"],
+  "keel-anchors": ["KeelAnchorReplicationBridge","KeelAttestedAnchorRegistry","KeelIpfsCidVerifier","KeelL2AnchorVerifier","KeelL2StateVerifier","KeelNodeRegistry","KeelPortableAnchorRegistry","KeelProofUpgradeController","KeelSettlementRegistry","KeelSp1GatewayProofBackend","KeelSp1GatewayProofVerifier","KeelZkAnchorVerifier","KeelZkVerifyProofBackend","KeelZkVerifyProofVerifier"],
   "keel-crucible": ["KeelCollectionAttestationRegistry","KeelCollectionVerificationRegistry","KeelCommunityReplicationRegistry"],
   "keel-ip-control": ["KeelIPActionExecutor","KeelIPControl","KeelIPWrapped721"],
-  "keel-sleeve": ["KeelSleeve","KeelStoredTokenJSON","KeelTokenMatrix"],
+  "keel-sleeve": ["KeelMetadataRelay","KeelSleeve","KeelStoredTokenJSON","KeelTokenMatrix"],
   "keel-web3-url": ["KeelWeb3ResourceAdapter"],
   "keel-cross-chain-mint": ["KeelCrossChainMintBridge"],
-  "keel-publication": ["KeelCarrierBatcher", "KeelHistoryPublicationJob", "KeelPublicationJob"],
+  "keel-publication": ["KeelCarrierBatcher","KeelHistoryPublicationJob","KeelPublicationJob"],
   "keel-stake": ["KeelStakeObjectManager"],
   "keel-canvas": ["CoolSCanvas721","CoolSCanvasMintController","CoolSCanvasRenderer","CoolSCanvasSplitter","CoolSComposer"],
   "cool-s": ["CoolS721","CoolSLocalVRFCoordinator","CoolSMetadataRendererV1","CoolSNoveltyLedgerV1","CoolSReleaseResolverV1","CoolSTargetTableV1","CoolSVisualRegistryV1"],

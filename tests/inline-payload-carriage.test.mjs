@@ -83,7 +83,7 @@ test('audit rejects headers and URL delimiters that would make native decoding d
   const metadata=JSON.parse(decodeURIComponent(good.slice(good.indexOf(',')+1)));
   const custom=value=>'data:application/json;charset=utf-8,'+encodeURIComponent(JSON.stringify({...metadata,animation_url:value}));
   for(const bad of ['data:text/html; base64,PGgxPnRlc3Q8L2gxPg==','data:text/htmlx,Exact','data:text/html;charset=utf-8,Exact#lost'])
-    await assert.rejects(auditKeelInlineTokenURI(custom(bad)),/header|canonical/);
+    await assert.rejects(auditKeelInlineTokenURI(custom(bad)),/header|canonical|fragment/);
   await assert.rejects(auditKeelInlineTokenURI(good.replace('application/json','application/jsonx')),/header/);
 });
 

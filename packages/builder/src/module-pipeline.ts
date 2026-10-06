@@ -34,7 +34,7 @@ import {
 } from "@keel/protocol";
 import {
   createKeelPublishReviewPlan,
-  resolveModuleTarget,
+  resolveDefaultKeelHoldTarget,
   type KeelPublishReviewPlanEnvelope,
 } from "@keel/sdk";
 import {
@@ -646,7 +646,7 @@ export async function planKeelModule(directory: string, options: PlanKeelModuleO
   }
   const chainId = options.chainId ?? DEFAULT_PLAN_CHAIN_ID;
   const address = options.address
-    ?? resolveModuleTarget({ module: "keel-hold", contract: "KeelHold", chainId }).address;
+    ?? resolveDefaultKeelHoldTarget(chainId).address;
   const uploadPlan = await createUploadPlan(new Uint8Array(outputBytes), {
     objectName: `${manifest.name}.min.js`,
     mediaType: recipe.output.mediaType,

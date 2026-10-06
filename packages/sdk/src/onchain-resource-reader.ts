@@ -12,7 +12,7 @@ export interface KeelBinaryResource {
   readonly integrity: KeelBinaryIntegrity;
   readonly onchain?: {
     readonly storeKind?: "keel-hold";
-    readonly compression?: "none" | "gzip" | "deflate" | "brotli" | "lzma";
+    readonly compression?: "none" | "gzip" | "deflate" | "brotli" | "lzma" | "ppmd";
     readonly containerId?: `0x${string}`;
     readonly offset?: number;
     readonly storedIntegrity?: KeelBinaryIntegrity;
@@ -25,7 +25,7 @@ export interface KeelBinaryContainer {
   readonly chainId: number;
   readonly store: string;
   readonly objectId: `0x${string}`;
-  readonly compression: "none" | "gzip" | "deflate" | "brotli" | "lzma";
+  readonly compression: "none" | "gzip" | "deflate" | "brotli" | "lzma" | "ppmd";
   readonly storedIntegrity: KeelBinaryIntegrity;
   readonly integrity: KeelBinaryIntegrity;
 }
@@ -131,7 +131,7 @@ export function createKeelOnchainResourceReader(input: {
   if ((input.containers?.length ?? 0) > 128) throw new RangeError("KEEL container table exceeds its bound.");
   for (const value of input.containers ?? []) {
     if (!HASH.test(value.id) || containers.has(value.id.toLowerCase()) || value.chainId !== chainId || value.store.toLowerCase() !== input.store.toLowerCase()
-        || !HASH.test(value.objectId) || !["none", "gzip", "deflate", "brotli", "lzma"].includes(value.compression)
+        || !HASH.test(value.objectId) || !["none", "gzip", "deflate", "brotli", "lzma", "ppmd"].includes(value.compression)
         || Object.keys(value).some(key => !["id", "chainId", "store", "objectId", "compression", "storedIntegrity", "integrity"].includes(key))) throw new Error("Invalid or conflicting KEEL container binding.");
     const stored = integrity(value.storedIntegrity, MAX_STORED), decoded = integrity(value.integrity, MAX_DECODED);
     if (!stored.byteLength || !decoded.byteLength) throw new Error("Empty KEEL container commitment.");
@@ -265,7 +265,7 @@ export function createKeelOnchainResourceReader(input: {
     }
     if (item.chainId !== chainId || typeof item.store !== "string" || item.store.toLowerCase() !== input.store.toLowerCase()
         || typeof item.objectId !== "string" || !HASH.test(item.objectId) || !item.onchain || (item.onchain.storeKind && item.onchain.storeKind !== "keel-hold")) throw new Error("Invalid selected-chain binary binding.");
-    if (!["none", "gzip", "deflate", "brotli", "lzma"].includes(item.onchain.compression ?? "")) throw new Error("Unsupported KEEL binary compression.");
+    if (!["none", "gzip", "deflate", "brotli", "lzma", "ppmd"].includes(item.onchain.compression ?? "")) throw new Error("Unsupported KEEL binary compression.");
     const stored = integrity(item.onchain.storedIntegrity, MAX_STORED), member = integrity(item.integrity, MAX_DECODED);
     if (stored.byteLength === 0 || member.byteLength === 0) throw new Error("Empty KEEL binary resource.");
     const range = item.onchain.range, container = range ? integrity(range.containerIntegrity, MAX_DECODED) : member;

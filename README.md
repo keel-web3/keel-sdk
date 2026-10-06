@@ -78,6 +78,12 @@ The prototype and test map is in [Prepared COPY assembly](docs/KEEL_PREPARED_COP
 
 ## Try the SDK, agent and visual editor
 
+For Ethereum Sepolia, start with the [current deployment handoff](docs/SEPOLIA_TESTER_HANDOFF.md)
+and [machine-readable manifest](deployments/ethereum-sepolia.json). The modern
+creator factory/renderer route requires its own verified deployment pair; the
+older `KeelFactory` is not a substitute. Run `pnpm sepolia:verify` to refresh
+the recorded contract receipts and runtime commitments without signing.
+
 Start with [the friend quickstart](docs/FRIEND_QUICKSTART.md). One command builds
 the SDK/MCP/editor, fetches the pinned public engine, and connects an artwork
 folder to the agent skills. Local Anvil testing and read-only Sepolia checks
@@ -357,3 +363,5 @@ and outstanding wallet, provider, publication and release gates.
 ## Runtime module discovery
 
 See [runtime module discovery and reuse](docs/KEEL_RUNTIME_MODULE_DISCOVERY.md) for the shared SDK/API/MCP lookup, unverified module sandbox, coverage limits, and browser MP4 encoding workflow. Empty catalog results never authorize rebuilding an existing module.
+
+The canonical verifier follows the OnKEEL brand and supports bounded app panels through the [protected shell API](docs/KEEL_SHELL_APPLICATION_API.md). App data cannot override KEEL proof results.

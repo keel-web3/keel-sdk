@@ -16,7 +16,7 @@ const ADDRESS = /^0x[0-9a-f]{40}$/iu;
 const MAX_STORED = 4 * 1024 * 1024;
 const MAX_TOTAL_STORED = 16 * 1024 * 1024;
 const MAX_DECODED = 32 * 1024 * 1024;
-const CODECS = ["none", "gzip", "deflate", "brotli", "lzma"];
+const CODECS = ["none", "gzip", "deflate", "brotli", "lzma", "ppmd"];
 const alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
 function record(value: unknown, keys: readonly string[], label: string): asserts value is Record<string, unknown> {
   if (typeof value !== "object" || value === null || Array.isArray(value) || Object.getPrototypeOf(value) !== Object.prototype
@@ -64,7 +64,7 @@ export function createKeelEmbeddedContainerReader(input: {
   readonly decompress: (codec: string, bytes: Uint8Array, decodedByteLength: number) => Promise<Uint8Array>;
 }) {
   const dense = input.transportProfile !== undefined;
-  if (dense && !["base90-v1", "base91-v1", "base90-block-v2"].includes(input.transportProfile!)) throw new TypeError("Unsupported offline dense transport profile.");
+  if (dense && !["base90-v1", "base91-v1", "base90-block-v2", "uri81-block-v1"].includes(input.transportProfile!)) throw new TypeError("Unsupported offline dense transport profile.");
   if (dense !== (typeof input.decodeTransport === "function")) throw new TypeError("Offline dense transport requires its matching decoder.");
   if (!integer(input.chainId, Number.MAX_SAFE_INTEGER, "offline chain ID") || !ADDRESS.test(input.store) || /^0x0{40}$/iu.test(input.store)) throw new TypeError("Invalid offline selected-chain binding.");
   if (!Array.isArray(input.containers) || !input.containers.length || input.containers.length > 128

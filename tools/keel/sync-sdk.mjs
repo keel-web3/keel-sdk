@@ -59,7 +59,7 @@ for (const m of MODULES) {
     const rec = JSON.parse(readFileSync(join(dir, f), "utf8"));
     for (const [instance, slot] of Object.entries(rec.deployments ?? {})) {
       for (const c of Object.values(slot.contracts ?? {})) {
-        deployments.push({ module: rec.module, chainId: rec.chainId, instance, contract: c.contract, address: c.address, block: c.block ?? null, txHash: c.txHash ?? null });
+        deployments.push({ module: rec.module, chainId: rec.chainId, instance, contract: c.contract, address: c.address, block: c.block ?? null, txHash: c.txHash ?? null, ...(c.runtimeCodeHash ? { runtimeCodeHash: c.runtimeCodeHash } : {}) });
       }
     }
   }
@@ -147,6 +147,8 @@ export interface KeelDeployment {
   readonly address: \`0x\${string}\`;
   readonly block: string | null;
   readonly txHash: string | null;
+  /** Exact deployed runtime commitment when authenticated separately from the ABI. */
+  readonly runtimeCodeHash?: \`0x\${string}\`;
 }
 
 export const KEEL_MODULES: readonly KeelModule[] = ${JSON.stringify(onlyModules, null, 2)} as const;
