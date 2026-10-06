@@ -83,7 +83,7 @@ chain/store. Fresh MCP preparation accepts compact COPY only; selecting a
 carriage or setting an environment variable does not unlock a new wrapper.
 The prototype and test map is in [Prepared COPY assembly](docs/KEEL_PREPARED_COPY_ASSEMBLY.md).
 
-## Try the SDK, agent and visual editor
+## Try the SDK and agent with Studio
 
 For Ethereum Sepolia, start with the [current deployment handoff](docs/SEPOLIA_TESTER_HANDOFF.md)
 and [machine-readable manifest](deployments/ethereum-sepolia.json). The modern
@@ -92,14 +92,16 @@ older `KeelFactory` is not a substitute. Run `pnpm sepolia:verify` to refresh
 the recorded contract receipts and runtime commitments without signing.
 
 Start with [the friend quickstart](docs/FRIEND_QUICKSTART.md). One command builds
-the SDK/MCP/editor, fetches the pinned public engine, and connects an artwork
-folder to the agent skills. Local Anvil testing and read-only Sepolia checks
+the SDK/MCP, fetches the pinned public engine, and connects an artwork
+folder to the agent skills. Studio provides the creator workspace and wallet review;
+Desktop is optional and builds only with `pnpm setup:friend --desktop`. Local Anvil testing and read-only Sepolia checks
 are separate commands; no developer checkout or private credentials are required.
 
 ```sh
-git clone https://github.com/keel-web3/keel-sdk.git
+git clone --branch codex/studio-agent-connect https://github.com/keel-web3/keel-sdk.git
 cd keel-sdk
 pnpm setup:friend
+pnpm studio:connect --window --workspace .keel-workspace
 ```
 
 ## Start here

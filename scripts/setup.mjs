@@ -7,11 +7,12 @@ import { fileURLToPath, pathToFileURL } from 'node:url';
 export const sdkRoot = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 
 export function parseSetup(args) {
-  const options = { workspace: join(sdkRoot, '.keel-workspace'), desktop: true, engine: true, connectOnly: false, editorConnection: undefined };
+  const options = { workspace: join(sdkRoot, '.keel-workspace'), desktop: false, engine: true, connectOnly: false, editorConnection: undefined };
   for (let i = 0; i < args.length; i++) {
     const arg = args[i];
     if (arg === '--workspace' && args[i + 1] && !args[i + 1].startsWith('--')) options.workspace = resolve(args[++i]);
     else if (arg === '--editor-connection' && args[i + 1] && !args[i + 1].startsWith('--')) options.editorConnection = resolve(args[++i]);
+    else if (arg === '--desktop') options.desktop = true;
     else if (arg === '--skip-desktop') options.desktop = false;
     else if (arg === '--skip-engine') options.engine = false;
     else if (arg === '--connect-only') options.connectOnly = true;
@@ -96,7 +97,7 @@ export function setup(args) {
   mkdirSync(options.workspace, { recursive: true });
   run(process.execPath, [join(sdkRoot, 'packages/mcp/dist/cli.js'), '--self-test', '--workspace', options.workspace]);
   const result = connectWorkspace(options.workspace, sdkRoot, options.editorConnection);
-  console.log(`\nKEEL setup complete. Open this artwork folder in your agent: ${result.workspace}\nConnection files: ${result.output}\nEditor: pnpm desktop\nPractice chain: pnpm game:sandbox\nDeployed networks: pnpm network:discover\nSelected-chain check (read only): pnpm network:check\nGuide: docs/FRIEND_QUICKSTART.md`);
+  console.log(`\nKEEL setup complete. Open this artwork folder in your agent: ${result.workspace}\nConnection files: ${result.output}\nStudio: https://studio.onkeel.io/studio\nConnect Studio: pnpm studio:connect --window --workspace ${JSON.stringify(result.workspace)}\nOptional editor: pnpm setup:friend --desktop, then pnpm desktop\nPractice chain: pnpm game:sandbox\nDeployed networks: pnpm network:discover\nSelected-chain check (read only): pnpm network:check\nGuide: docs/FRIEND_QUICKSTART.md`);
   if (result.preserved.length) console.log(`Preserved existing settings/skills; merge or update explicitly if needed:\n${result.preserved.join('\n')}`);
 }
 

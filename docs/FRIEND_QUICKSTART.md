@@ -5,26 +5,29 @@ Use the normal [network discovery/configuration workflow](KEEL_NETWORK_DISCOVERY
 index and workspace settings; `keel-network-check` verifies it read-only.
 The Sepolia commands below are compatibility/release-fixture checks.
 
-This is a source-based test release: SDK, local MCP, agent skills, visual editor,
+This is a source-based test release: SDK, local MCP, agent skills, optional visual editor,
 and a pinned public game engine. You do not need the maintainer's sibling repos,
 Studio credentials, Docker, or a private key to build and practice locally.
-The desktop is a development preview, not a signed installer.
+Studio provides the full creator workflow and wallet review at
+[studio.onkeel.io](https://studio.onkeel.io/studio). The optional Desktop editor is a
+development preview, not a signed installer. Agents never need it for Studio work.
 
 ## Install once
 
 Install Git, **Node 22.18+** and **pnpm 10.15.0**. For chain practice, also
 install [Foundry](https://getfoundry.sh/) so `anvil --version` works.
-macOS is the currently exercised desktop platform. Linux needs Electron's GUI
-libraries and a display. Native Windows desktop/Anvil setup is not certified.
+The Studio connection opens your browser on macOS, Windows or Linux. Desktop
+is separate: macOS is the currently exercised Desktop platform; Linux needs
+Electron GUI libraries and a display. Native Windows Desktop/Anvil setup is not certified.
 
 ```sh
-git clone https://github.com/keel-web3/keel-sdk.git
+git clone --branch codex/studio-agent-connect https://github.com/keel-web3/keel-sdk.git
 cd keel-sdk
 pnpm setup:friend
 ```
 
 Setup installs locked dependencies, builds the SDK/MCP, fetches the exact engine
-commit in `packages/game-engine/engine.lock.json`, links it, builds the editor,
+commit in `packages/game-engine/engine.lock.json`, links it,
 and checks MCP discovery. It creates an empty `.keel-workspace` artwork folder
 with project-scoped MCP settings and copies of the available KEEL skills for
 Codex and Claude Code. It does not start a server, send a model request, or
@@ -34,8 +37,9 @@ absolute path and your Node executable.
 For existing artwork, use `pnpm setup:friend --workspace /absolute/path/to/art`.
 Existing agent settings and skill copies are preserved; setup prints anything
 that needs merging. The generated `.keel/codex.toml` and `.keel/mcp.json` always
-contain the new connection. Other MCP clients can use that JSON. For a headless
-agent, add `--skip-desktop`. `--skip-engine` supports SDK/MCP-only use.
+contain the new connection. Other MCP clients can use that JSON. Desktop is
+excluded by default; add `--desktop` only to build the optional editor.
+`--skip-engine` supports SDK/MCP-only use.
 After a successful build, `--connect-only --workspace /path/to/another/work`
 connects another folder without reinstalling. Review generated machine-specific
 settings before committing an artwork repository.
@@ -45,6 +49,21 @@ its skills/MCP connections. The MCP is scoped to that folder. The copied skills
 do not automatically upgrade; compare them with `skills/` when updating KEEL.
 See the official [Codex MCP documentation](https://developers.openai.com/codex/mcp/)
 and [skills documentation](https://developers.openai.com/codex/skills/).
+
+## Connect the project to your Studio account
+
+After setup, run:
+
+```sh
+pnpm studio:connect --window --workspace /absolute/path/to/art
+```
+
+Studio opens in a small browser helper. Sign in with your selected wallet, check
+the approval code, choose the permissions, and approve. The SDK saves the scoped
+key privately outside your project; SDK and MCP draft/staging tools use it
+automatically. No `.env` file or Desktop app is required. Agents can use
+`keel-studio-connect` with `start`, open `approveUrl` for you, then call `complete`
+after approval. Wallet signatures and transaction approvals remain yours.
 
 ## Update to the latest test release
 
@@ -56,8 +75,8 @@ pnpm setup:friend
 ```
 
 Setup fetches and links the engine commit the SDK now pins, and rebuilds the SDK,
-MCP and editor. Your artwork folders and agent settings are kept. Restart the
-editor and reload your agent's MCP connection afterwards.
+MCP. Your artwork folders and agent settings are kept. Reload your agent's MCP
+connection afterwards. Add `--desktop` if you also want to rebuild the optional editor.
 
 ## Pixel engine: part of the SDK
 
@@ -94,9 +113,11 @@ Give the agent this request with your original source attached or in the folder:
 > Plain JavaScript is supported: port JS code onto the engine as JavaScript and
 > don't treat converting it to TypeScript as a requirement or a porting cost.
 
-Then start the editor from the SDK folder:
+For the browser workflow, let your agent prepare the Studio draft and open its
+review/signing link. To use the optional Desktop editor instead:
 
 ```sh
+pnpm setup:friend --desktop
 pnpm desktop
 ```
 
@@ -110,8 +131,8 @@ can use the Interactive Art workflow and code preview without becoming a game.
 
 The editor's own assistant connections need your installed, signed-in agent CLI
 or your own model API credentials. The external MCP connection above is usable
-independently. No hosted Studio is needed for local work; Studio staging and
-hosted publication require a separately configured authorized Studio service.
+independently. Local work is available offline; hosted preparation and wallet
+review use your existing Studio account through the approval-code connection above.
 
 To let the external agent open and update projects in the running editor, copy
 the connection-file path from **Setup → Use your assistant from another app**,
