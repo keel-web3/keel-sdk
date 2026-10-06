@@ -25,7 +25,8 @@ Public discovery starts at `https://studio.onkeel.io/.well-known/keel.json`.
 Its `networks.index` points to
 `https://studio.onkeel.io/deployments/networks.json`, schema
 `keel-network-index@1`. The SDK's normal default uses that endpoint. Node/MCP
-fetches it with bounded reads, a timeout and a 60-second cache; explicit
+fetches it with bounded reads, a 30-second timeout for service wake-up and a
+60-second cache; explicit
 discovery refreshes it. An unavailable/invalid index returns
 `network.index-unavailable`; it does not silently select another chain or an
 old catalog. The browser-safe bundled snapshot remains available explicitly

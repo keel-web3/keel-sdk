@@ -107,7 +107,7 @@ export class KeelNetworkIndexError extends Error {
 }
 export async function fetchKeelNetworkIndex(options: { indexUrl?: string; fetchImpl?: typeof fetch; signal?: AbortSignal } = {}): Promise<KeelNetworkIndex> {
   const url = normalizeKeelIndexUrl(options.indexUrl ?? KEEL_NETWORK_INDEX_URL);
-  const signal = options.signal ? AbortSignal.any([options.signal, AbortSignal.timeout(10000)]) : AbortSignal.timeout(10000);
+  const signal = options.signal ? AbortSignal.any([options.signal, AbortSignal.timeout(30000)]) : AbortSignal.timeout(30000);
   try {
     const response = await (options.fetchImpl ?? fetch)(url, { signal, redirect: 'error', headers: { accept: 'application/json' } });
     if (!response.ok || Number(response.headers.get('content-length') ?? 0) > 1024 * 1024 || !response.body) throw new Error();
