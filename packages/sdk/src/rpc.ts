@@ -1,17 +1,15 @@
 /** Read-only preparation/verification RPC. Collector host governance stays separate. */
 import { redactRpcUrl, remoteUrlAllowed } from "@keel/protocol";
+import { KEEL_BUNDLED_NETWORK_INDEX, KEEL_NETWORK_CONFIGURATION, type KeelNetworkIndex } from './network-index.js';
 
-export const KEEL_SEPOLIA_PUBLIC_RPC_URLS: readonly string[] = Object.freeze([
-  "https://ethereum-sepolia-rpc.publicnode.com",
-  "https://sepolia.gateway.tenderly.co",
-  "https://public.1rpc.io/sepolia",
-]);
+/** Compatibility export. Network selection/defaults live in networks.config.json and the index. */
+export const KEEL_SEPOLIA_PUBLIC_RPC_URLS: readonly string[] = KEEL_BUNDLED_NETWORK_INDEX.networks.find(n => n.chainId === KEEL_NETWORK_CONFIGURATION.legacySepoliaChainId)!.rpcUrls.map(u => normalizeKeelRpcUrl(u));
 export const KEEL_RPC_PROVIDER_SETUP = Object.freeze({
   action: "ask-user-to-configure-rpc" as const,
   configFile: ".keel/rpc.json",
   configureCommand: "pnpm rpc:configure",
   checkCommand: "pnpm rpc:check",
-  instructions: "Ask which RPC provider the user prefers. Help create an Ethereum Sepolia app and save its HTTPS RPC URL locally with pnpm rpc:configure, then check chain identity and required receipt/history reads. Never ask for wallet keys or a seed phrase, and keep RPC API keys out of chat, logs, Git and artwork.",
+  instructions: "Ask which RPC provider the user prefers. Help create an app for the index/config-selected chain and save its HTTPS RPC URL locally with pnpm rpc:configure, then check chain identity and required receipt/history reads. Never ask for wallet keys or a seed phrase, and keep RPC API keys out of chat, logs, Git and artwork.",
   providers: Object.freeze([
     { name: "Alchemy", documentation: "https://www.alchemy.com/docs/reference/ethereum-api-quickstart" },
     { name: "Infura", documentation: "https://docs.infura.io/get-started/infura/" },
@@ -28,6 +26,9 @@ export interface KeelRpcConfiguration {
   readonly maxResponseBytes?: number;
 }
 export interface KeelRpcEnvironment {
+  readonly KEEL_CHAIN_ID?: string;
+  readonly KEEL_RPC_URL?: string;
+  readonly KEEL_RPC_URLS?: string;
   readonly KEEL_SEPOLIA_RPC_URL?: string;
   readonly KEEL_SEPOLIA_RPC_URLS?: string;
   readonly KEEL_PUBLIC_RPC_URL?: string;
@@ -60,17 +61,19 @@ function bound(value: number | undefined, fallback: number, min: number, max: nu
 }
 export function resolveKeelRpcConfiguration(
   explicit: KeelRpcConfiguration = {}, environment: KeelRpcEnvironment = {}, file: KeelRpcConfiguration = {},
+  index: KeelNetworkIndex = KEEL_BUNDLED_NETWORK_INDEX,
 ): ResolvedKeelRpcConfiguration {
   if (explicit.rpcUrl !== undefined && explicit.rpcUrls !== undefined || file.rpcUrl !== undefined && file.rpcUrls !== undefined) throw new TypeError("Choose rpcUrl or rpcUrls, not both.");
-  const env = environment.KEEL_SEPOLIA_RPC_URLS ?? environment.KEEL_SEPOLIA_RPC_URL
-    ?? environment.KEEL_PUBLIC_RPC_URLS ?? environment.KEEL_PUBLIC_RPC_URL;
-  const selected = explicit.rpcUrls ?? (explicit.rpcUrl === undefined ? undefined : [explicit.rpcUrl]);
-  const configured = file.rpcUrls ?? (file.rpcUrl === undefined ? undefined : [file.rpcUrl]);
-  const source = selected ? "explicit" : env !== undefined ? "environment" : configured ? "workspace-config" : "public-default";
-  const chainId = explicit.chainId ?? file.chainId ?? 11155111;
+  const chainId = explicit.chainId ?? (environment.KEEL_CHAIN_ID === undefined ? undefined : Number(environment.KEEL_CHAIN_ID)) ?? file.chainId ?? index.defaultChainId;
   if (!Number.isSafeInteger(chainId) || chainId < 1) throw new TypeError("RPC chainId must be a positive safe integer.");
-  if (source === "public-default" && chainId !== 11155111) throw new TypeError("Configure RPC URLs for the selected chain; public defaults are Ethereum Sepolia only.");
-  const urls = selected ?? (env === undefined ? undefined : env.split(",").map(s => s.trim())) ?? configured ?? KEEL_SEPOLIA_PUBLIC_RPC_URLS;
+  const env = environment.KEEL_RPC_URLS ?? environment.KEEL_RPC_URL ?? environment.KEEL_PUBLIC_RPC_URLS ?? environment.KEEL_PUBLIC_RPC_URL
+    ?? (chainId === KEEL_NETWORK_CONFIGURATION.legacySepoliaChainId ? environment.KEEL_SEPOLIA_RPC_URLS ?? environment.KEEL_SEPOLIA_RPC_URL : undefined);
+  const selected = explicit.rpcUrls ?? (explicit.rpcUrl === undefined ? undefined : [explicit.rpcUrl]);
+  const configured = file.chainId === undefined || file.chainId === chainId ? file.rpcUrls ?? (file.rpcUrl === undefined ? undefined : [file.rpcUrl]) : undefined;
+  const source = selected ? "explicit" : env !== undefined ? "environment" : configured ? "workspace-config" : "public-default";
+  const indexed = index.networks.find(n => n.chainId === chainId)?.rpcUrls;
+  if (source === "public-default" && !indexed?.length) throw new TypeError("Configure RPC URLs for the selected chain; the KEEL index has no public RPC pool for it.");
+  const urls = selected ?? (env === undefined ? undefined : env.split(",").map(s => s.trim())) ?? configured ?? indexed!;
   if (!Array.isArray(urls) || urls.length < 1 || urls.length > 6 || urls.some(u => typeof u !== "string" || !u)) throw new TypeError("Configure one to six RPC URLs.");
   return Object.freeze({ chainId, source, rpcUrls: Object.freeze([...new Set(urls.map(u => normalizeKeelRpcUrl(u, source === "explicit")))]),
     timeoutMs: bound(explicit.timeoutMs ?? file.timeoutMs, 8000, 100, 30000),
@@ -83,7 +86,7 @@ export class KeelRpcSetupError extends Error {
   readonly code = "rpc.setup-required";
   readonly setup = KEEL_RPC_PROVIDER_SETUP;
   constructor(readonly reason: FailureReason, readonly providers: readonly KeelRpcProviderStatus[], readonly retryAfterMs = 0) {
-    super(`RPC verification unavailable (${reason}). Public/configured endpoints were exhausted. Run pnpm rpc:configure and pnpm rpc:check; ask the user to choose a Sepolia provider such as Alchemy, Infura or QuickNode. No wallet key is needed.`);
+    super(`RPC verification unavailable (${reason}). Public/configured endpoints were exhausted. Run pnpm rpc:configure and pnpm rpc:check; ask the user to choose a provider for the selected chain, such as Alchemy, Infura or QuickNode. No wallet key is needed.`);
     this.name = "KeelRpcSetupError";
   }
 }
@@ -289,9 +292,9 @@ export function findKeelRpcSetupError(error: unknown): KeelRpcSetupError | undef
 }
 
 /** Browser-safe default reader transport; explicit endpoints retain custom-chain discovery. */
-export function keelRpcReaderTransport(rpcUrl?: string, chainId?: number): { rpcUrl: string; fetchImpl: typeof fetch } {
-  const urls = rpcUrl === undefined ? KEEL_SEPOLIA_PUBLIC_RPC_URLS : [normalizeKeelRpcUrl(rpcUrl, true)];
-  const expectedChain = chainId ?? (rpcUrl === undefined ? 11155111 : undefined);
+export function keelRpcReaderTransport(rpcUrl?: string, chainId?: number, index: KeelNetworkIndex = KEEL_BUNDLED_NETWORK_INDEX): { rpcUrl: string; fetchImpl: typeof fetch } {
+  const urls = rpcUrl === undefined ? resolveKeelRpcConfiguration(chainId === undefined ? {} : { chainId }, {}, {}, index).rpcUrls : [normalizeKeelRpcUrl(rpcUrl, true)];
+  const expectedChain = chainId ?? (rpcUrl === undefined ? index.defaultChainId : undefined);
   const pool = createKeelRpcPool({ rpcUrls: urls, ...(expectedChain === undefined ? {} : { chainId: expectedChain }), allowLoopback: rpcUrl !== undefined });
   return { rpcUrl: urls[0]!, fetchImpl: createKeelRpcFetch(pool) };
 }

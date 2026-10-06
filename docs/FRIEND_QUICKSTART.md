@@ -1,5 +1,10 @@
 # Try KEEL with your own code
 
+Use the normal [network discovery/configuration workflow](KEEL_NETWORK_DISCOVERY.md):
+`keel-network-discover` selects the deployed chain/creator instance from the public
+index and workspace settings; `keel-network-check` verifies it read-only.
+The Sepolia commands below are compatibility/release-fixture checks.
+
 This is a source-based test release: SDK, local MCP, agent skills, visual editor,
 and a pinned public game engine. You do not need the maintainer's sibling repos,
 Studio credentials, Docker, or a private key to build and practice locally.

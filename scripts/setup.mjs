@@ -29,7 +29,7 @@ export function connectWorkspace(workspace, root = sdkRoot, editorConnection) {
     try { editorConnection = JSON.parse(readFileSync(savedConnection, 'utf8')).mcpServers?.keel?.env?.KEEL_EDITOR_CONNECTION; } catch { /* Preserve customized settings below. */ }
   }
   const readme = join(workspace, 'README.md');
-  if (!existsSync(readme)) writeFileSync(readme, '# KEEL artwork workspace\n\nAdd your original generator code here. Ask the KEEL agent to inspect it,\npreserve originals, and plan a modular conversion before publishing.\nSelect local Anvil or Sepolia explicitly. No publication has occurred.\n', { flag: 'wx' });
+  if (!existsSync(readme)) writeFileSync(readme, '# KEEL artwork workspace\n\nAdd your original generator code here. Ask the KEEL agent to inspect it,\npreserve originals, and plan a modular conversion before publishing.\nAsk the KEEL agent to run keel-network-discover and select an indexed deployment with .keel/config.json. Local Anvil inspection remains available. No publication has occurred.\n', { flag: 'wx' });
   const presentation = join(workspace, 'docs/KEEL_PRESENTATION.md');
   if (!existsSync(presentation)) {
     mkdirSync(dirname(presentation), { recursive: true });
@@ -96,7 +96,7 @@ export function setup(args) {
   mkdirSync(options.workspace, { recursive: true });
   run(process.execPath, [join(sdkRoot, 'packages/mcp/dist/cli.js'), '--self-test', '--workspace', options.workspace]);
   const result = connectWorkspace(options.workspace, sdkRoot, options.editorConnection);
-  console.log(`\nKEEL setup complete. Open this artwork folder in your agent: ${result.workspace}\nConnection files: ${result.output}\nEditor: pnpm desktop\nPractice chain: pnpm game:sandbox\nSepolia check (read only): pnpm setup:sepolia\nGuide: docs/FRIEND_QUICKSTART.md`);
+  console.log(`\nKEEL setup complete. Open this artwork folder in your agent: ${result.workspace}\nConnection files: ${result.output}\nEditor: pnpm desktop\nPractice chain: pnpm game:sandbox\nDeployed networks: pnpm network:discover\nSelected-chain check (read only): pnpm network:check\nGuide: docs/FRIEND_QUICKSTART.md`);
   if (result.preserved.length) console.log(`Preserved existing settings/skills; merge or update explicitly if needed:\n${result.preserved.join('\n')}`);
 }
 

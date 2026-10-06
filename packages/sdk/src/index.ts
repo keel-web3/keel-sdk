@@ -135,3 +135,6 @@ export {buildKeelShellCatalog,type KeelShellCatalog} from "./verification-shell-
 
 export * from "./marketplace-reader.js";
 export * from "./pre-reveal.js";
+
+export * from "./network-index.js";
+export * from "./network-verification.js";

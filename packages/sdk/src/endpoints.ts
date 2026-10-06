@@ -1,6 +1,6 @@
-import { normalizeKeelRpcUrl, resolveKeelRpcConfiguration, type KeelRpcEnvironment } from "./rpc.js";
+import { KEEL_SEPOLIA_PUBLIC_RPC_URLS, normalizeKeelRpcUrl, resolveKeelRpcConfiguration, type KeelRpcEnvironment } from "./rpc.js";
 export const KEEL_TEST_STUDIO_URL = "https://keel-test.149-28-255-65.sslip.io" as const;
-export const KEEL_TEST_PUBLIC_RPC_URL = "https://ethereum-sepolia-rpc.publicnode.com" as const;
+export const KEEL_TEST_PUBLIC_RPC_URL = KEEL_SEPOLIA_PUBLIC_RPC_URLS[0]!;
 export const KEEL_LEGACY_STRATUS_TEST_STUDIO_URL = "https://stratus-test.149-28-255-65.sslip.io" as const;
 export const KEEL_LEGACY_STRATUS_TEST_PUBLIC_RPC_URL = "https://rpc.stratus-test.149-28-255-65.sslip.io" as const;
 
@@ -15,7 +15,7 @@ export interface KeelEndpointOverrides {
 
 export interface KeelEndpointEnvironment extends KeelRpcEnvironment {
   readonly KEEL_STUDIO_URL?: string;
-  /** Public wallet/browser RPC. KEEL_RPC_URL remains reserved for server upstreams. */
+  /** Public read-only RPC override. Provider API keys must remain local. */
   readonly KEEL_PUBLIC_RPC_URL?: string;
   readonly KEEL_INDEXER_URL?: string;
   /** Deprecated compatibility input. Prefer KEEL_STUDIO_URL. */

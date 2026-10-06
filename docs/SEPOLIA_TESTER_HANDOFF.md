@@ -1,5 +1,10 @@
 # Ethereum Sepolia tester handoff
 
+Use the normal [network discovery/configuration workflow](KEEL_NETWORK_DISCOVERY.md):
+`keel-network-discover` selects the deployed chain/creator instance from the public
+index and workspace settings; `keel-network-check` verifies it read-only.
+The Sepolia commands below are compatibility/release-fixture checks.
+
 Updated 2026-10-05. Chain ID **11155111**. Use the refresh revision supplied with
 [SDK PR 13](https://github.com/keel-web3/keel-sdk/pull/13), replacing checkout
 `7e562740e93152e59f827937acb52de46922f30c`. The new revision adds the deployed

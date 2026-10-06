@@ -42,7 +42,7 @@ const RESOURCE_TEXT: Readonly<Record<string, string>> = {
     schema: "keel-mcp-resource@1",
     kind: "offline-workflow",
     payloadStorage: KEEL_PAYLOAD_STORAGE_POLICY,
-    contractFirst: ["keel-contract-workflow-preflight", "keel-engine-catalog", "keel-network-inspect", "keel-library-search", "edge-case-resolution", "keel-contract-controls", "wallet-review"],
+    contractFirst: ["keel-network-discover", "keel-network-check", "keel-contract-workflow-preflight", "keel-engine-catalog", "keel-network-inspect", "keel-library-search", "edge-case-resolution", "keel-contract-controls", "wallet-review"],
     steps: ["studio-capabilities", "analyze", "media-optimize", "media-optimize-apply", "cost", "keel-revision-plan", "upload-plan", "build", "verify", "module-resolve", "module-lock", "studio-stage-project", "studio-draft", "chain-plan", "ethereum-encode", "publish-plan", "wallet-request-prepare", "wallet-link"],
     repair: {
       prompt: "keel-draft-repair",

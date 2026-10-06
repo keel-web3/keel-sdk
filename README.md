@@ -367,3 +367,5 @@ See [runtime module discovery and reuse](docs/KEEL_RUNTIME_MODULE_DISCOVERY.md) 
 The canonical verifier follows the OnKEEL brand and supports bounded app panels through the [protected shell API](docs/KEEL_SHELL_APPLICATION_API.md). App data cannot override KEEL proof results.
 
 Public Sepolia verification uses a checked PublicNode/Tenderly/1RPC pool with rate-limit and history failover. Run `pnpm rpc:check`; private provider setup and agent recovery are documented in [RPC setup](docs/KEEL_RPC_SETUP.md).
+
+Deployment availability and active creator targets come from the [public network index and workspace configuration](docs/KEEL_NETWORK_DISCOVERY.md). Use `pnpm network:discover` / `pnpm network:check` or MCP `keel-network-discover` / `keel-network-check`; wallet chain catalogs are not KEEL deployment evidence.

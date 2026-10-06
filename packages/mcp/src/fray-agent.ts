@@ -720,5 +720,6 @@ export function chainGuide(value: unknown): unknown {
   if (family !== undefined && family !== "ethereum" && family !== "tezos") throw new TypeError("family must be ethereum or tezos.");
   const network = boundedText(input.network, "network", 64)?.toLowerCase();
   const profiles = FRAY_CHAIN_PROFILES.filter((profile) => (family === undefined || profile.family === family) && (network === undefined || profile.network === network || String(profile.chainId) === network));
-  return { schema: FRAY_AGENT_PROTOCOL, status: profiles.length === 0 ? "not-found" : "ok", chains: profiles, faucetAction: "show-links-only" };
+  return { schema: FRAY_AGENT_PROTOCOL, status: profiles.length === 0 ? "not-found" : "ok", chains: profiles,
+    catalogPurpose: 'wallet-connectivity-and-faucet-help', deploymentEvidence: 'not-established-by-this-catalog', deploymentDiscoveryTool: 'keel-network-discover', faucetAction: "show-links-only" };
 }

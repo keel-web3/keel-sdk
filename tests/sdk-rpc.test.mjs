@@ -101,11 +101,11 @@ test('private configuration precedence, keyed HTTPS paths, validation and bounde
     assert.deepEqual((await readKeelRpcConfiguration(root)).rpcUrls, file.rpcUrls);
     await writeFile(root+'/.keel/rpc.json', JSON.stringify({ rpcUrl: urls[0], invalid: 'private-key' }));
     await assert.rejects(readKeelRpcConfiguration(root), e => !e.message.includes('private-key') && /Invalid local RPC config/u.test(e.message));
-    const result = spawnSync(process.execPath, ['scripts/rpc.mjs', 'configure', '--from-env', '--workspace', root], { cwd: new URL('..', import.meta.url), env: { ...process.env, KEEL_SEPOLIA_RPC_URL: urls[0] }, encoding: 'utf8' });
+    const result = spawnSync(process.execPath, ['scripts/rpc.mjs', 'configure', '--from-env', '--chain-id', '11155111', '--workspace', root], { cwd: new URL('..', import.meta.url), env: { ...process.env, KEEL_SEPOLIA_RPC_URL: urls[0] }, encoding: 'utf8' });
     // Existing invalid config is preserved until corrected.
     assert.equal(result.status, 1);
     await rm(root+'/.keel/rpc.json');
-    const configured = spawnSync(process.execPath, ['scripts/rpc.mjs', 'configure', '--from-env', '--workspace', root], { cwd: new URL('..', import.meta.url), env: { ...process.env, KEEL_SEPOLIA_RPC_URL: urls[0] }, encoding: 'utf8' });
+    const configured = spawnSync(process.execPath, ['scripts/rpc.mjs', 'configure', '--from-env', '--chain-id', '11155111', '--workspace', root], { cwd: new URL('..', import.meta.url), env: { ...process.env, KEEL_SEPOLIA_RPC_URL: urls[0] }, encoding: 'utf8' });
     assert.equal(configured.status, 0, configured.stderr); assert.doesNotMatch(configured.stdout+configured.stderr, /private-key|token=hidden/u);
     assert.equal((await stat(root+'/.keel/rpc.json')).mode & 0o777, 0o600);
   } finally { await rm(root, { recursive: true, force: true }); }

@@ -314,6 +314,18 @@
     "./rpc-node": {
       "types": "./dist/rpc-node.d.ts",
       "import": "./dist/rpc-node.js"
+    },
+    "./network-index": {
+      "types": "./dist/network-index.d.ts",
+      "import": "./dist/network-index.js"
+    },
+    "./network-node": {
+      "types": "./dist/network-node.d.ts",
+      "import": "./dist/network-node.js"
+    },
+    "./network-verification": {
+      "types": "./dist/network-verification.d.ts",
+      "import": "./dist/network-verification.js"
     }
   },
   "files": [

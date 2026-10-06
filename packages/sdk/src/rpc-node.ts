@@ -2,6 +2,8 @@
 import { readFile, realpath, stat } from "node:fs/promises";
 import { resolve, relative, isAbsolute } from "node:path";
 import { createKeelRpcPool, resolveKeelRpcConfiguration, type KeelRpcConfiguration, type KeelRpcEnvironment } from "./rpc.js";
+import { discoverKeelNodeNetworks, resolveKeelNodeNetworkSelection, type KeelNetworkEnvironment } from './network-node.js';
+import { KEEL_BUNDLED_NETWORK_INDEX, KEEL_NETWORK_CONFIGURATION, type KeelNetworkIndex } from './network-index.js';
 
 export function parseKeelRpcConfiguration(value: unknown): KeelRpcConfiguration {
   if (value === null || typeof value !== "object" || Array.isArray(value)) throw new TypeError("RPC config must be a JSON object.");
@@ -11,7 +13,8 @@ export function parseKeelRpcConfiguration(value: unknown): KeelRpcConfiguration 
   for (const k of ["chainId", "timeoutMs", "minIntervalMs", "maxResponseBytes"]) if (object[k] !== undefined && typeof object[k] !== "number") throw new TypeError("RPC numeric settings must be numbers.");
   if (object.rpcUrl !== undefined && typeof object.rpcUrl !== "string" || object.rpcUrls !== undefined && (!Array.isArray(object.rpcUrls) || object.rpcUrls.some(v => typeof v !== "string"))) throw new TypeError("RPC URLs must be strings.");
   const config = object as KeelRpcConfiguration;
-  resolveKeelRpcConfiguration({}, {}, config);
+  // Shape validation must not assume the bundled snapshot knows a newly deployed chain.
+  resolveKeelRpcConfiguration(config.rpcUrl || config.rpcUrls ? {} : { rpcUrls: ['https://validation.invalid'] }, {}, config);
   return config;
 }
 export async function readKeelRpcConfiguration(workspace = process.cwd()): Promise<KeelRpcConfiguration> {
@@ -29,9 +32,21 @@ export async function readKeelRpcConfiguration(workspace = process.cwd()): Promi
 export async function createKeelNodeRpc(options: {
   readonly workspace?: string;
   readonly explicit?: KeelRpcConfiguration;
-  readonly environment?: KeelRpcEnvironment;
+  readonly environment?: KeelRpcEnvironment & KeelNetworkEnvironment;
+  readonly index?: KeelNetworkIndex;
 } = {}) {
-  const configuration = resolveKeelRpcConfiguration(options.explicit, options.environment ?? process.env,
-    await readKeelRpcConfiguration(options.workspace));
+  const environment = options.environment ?? process.env, file = await readKeelRpcConfiguration(options.workspace);
+  const selection = await resolveKeelNodeNetworkSelection({ ...(options.workspace ? { workspace: options.workspace } : {}), environment,
+    ...(options.explicit?.chainId === undefined ? {} : { explicit: { chainId: options.explicit.chainId } }) });
+  const selectedChain = selection.chainId ?? file.chainId;
+  const explicit = { ...options.explicit, ...(selectedChain === undefined ? {} : { chainId: selectedChain }) };
+  // Explicit/private RPCs also support read-only inspection of unindexed chains.
+  // Ordinary defaults always fetch the public deployment index, with no silent stale fallback.
+  const custom = explicit.rpcUrl || explicit.rpcUrls || environment.KEEL_RPC_URL || environment.KEEL_RPC_URLS || environment.KEEL_PUBLIC_RPC_URL || environment.KEEL_PUBLIC_RPC_URLS
+    || (selectedChain ?? KEEL_BUNDLED_NETWORK_INDEX.defaultChainId) === KEEL_NETWORK_CONFIGURATION.legacySepoliaChainId && (environment.KEEL_SEPOLIA_RPC_URL || environment.KEEL_SEPOLIA_RPC_URLS)
+    || (file.chainId === undefined || file.chainId === selectedChain) && (file.rpcUrl || file.rpcUrls);
+  const index = options.index ?? (custom ? KEEL_BUNDLED_NETWORK_INDEX : (await discoverKeelNodeNetworks({ ...(options.workspace ? { workspace: options.workspace } : {}), environment,
+    explicit: { ...selection, ...(selectedChain === undefined ? {} : { chainId: selectedChain }) } })).index);
+  const configuration = resolveKeelRpcConfiguration(explicit, environment, file, index);
   return { configuration, pool: createKeelRpcPool({ ...configuration, allowLoopback: configuration.source === "explicit" }) };
 }

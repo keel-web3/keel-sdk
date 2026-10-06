@@ -6,19 +6,22 @@ import { createInterface } from 'node:readline';
 import { randomUUID } from 'node:crypto';
 import { createKeelNodeRpc, readKeelRpcConfiguration } from '../packages/sdk/dist/rpc-node.js';
 import { resolveKeelRpcConfiguration, KEEL_RPC_PROVIDER_SETUP } from '../packages/sdk/dist/rpc.js';
+import { discoverKeelNodeNetworks, resolveKeelNodeNetworkSelection } from '../packages/sdk/dist/network-node.js';
+import { KEEL_BUNDLED_NETWORK_INDEX } from '../packages/sdk/dist/network-index.js';
 import { reportRpcFailure } from './sepolia-rpc.mjs';
 
 const args = process.argv.slice(2), mode = args.shift();
-let workspace = process.cwd(), fromEnv = false, receipt;
+let workspace = process.cwd(), fromEnv = false, receipt, selectedChainId;
 for (let i = 0; i < args.length; i++) {
   if (args[i] === '--workspace' && args[i + 1]) workspace = resolve(args[++i]);
+  else if (args[i] === '--chain-id' && /^\d+$/u.test(args[i + 1] ?? '')) selectedChainId = Number(args[++i]);
   else if (args[i] === '--from-env') fromEnv = true;
   else if (args[i] === '--receipt' && /^0x[0-9a-f]{64}$/iu.test(args[i + 1] ?? '')) receipt = args[++i];
-  else throw new Error('Usage: pnpm rpc:check|rpc:configure [--workspace directory] [--receipt hash] [--from-env]');
+  else throw new Error('Usage: pnpm rpc:check|rpc:configure [--workspace directory] [--receipt hash] [--from-env] [--chain-id id]');
 }
 try {
   if (mode === 'check') {
-    const { pool, configuration } = await createKeelNodeRpc({ workspace });
+    const { pool, configuration } = await createKeelNodeRpc({ workspace, explicit: selectedChainId === undefined ? {} : { chainId: selectedChainId } });
     const chainId = Number(BigInt(await pool.request({ method: 'eth_chainId' })));
     const head = await pool.request({ method: 'eth_blockNumber' });
     if (typeof head !== 'string' || !/^0x[0-9a-f]+$/iu.test(head)) throw new Error('Invalid RPC head.');
@@ -29,14 +32,18 @@ try {
     console.log(JSON.stringify({ status: 'checked', chainId, blockNumber: BigInt(head).toString(), source: configuration.source,
       providers: pool.status(), historicalReceipt: receipt ? 'readable-identity-checked' : 'not-checked', writes: 0 }, null, 2));
   } else if (mode === 'configure') {
+    const selection = await resolveKeelNodeNetworkSelection({ workspace, explicit: selectedChainId === undefined ? {} : { chainId: selectedChainId } });
+    const prior = await readKeelRpcConfiguration(workspace);
+    const chainId = selection.chainId ?? prior.chainId ?? (await discoverKeelNodeNetworks({ workspace })).network.chainId;
+    const name = KEEL_BUNDLED_NETWORK_INDEX.networks.find(n => n.chainId === chainId)?.name ?? `chain ${chainId}`;
     let rpcUrls;
     if (fromEnv) {
-      const resolved = resolveKeelRpcConfiguration({}, process.env);
-      if (resolved.source !== 'environment') throw new Error('Set KEEL_SEPOLIA_RPC_URL or KEEL_SEPOLIA_RPC_URLS locally first.');
+      const resolved = resolveKeelRpcConfiguration({ chainId }, process.env);
+      if (resolved.source !== 'environment') throw new Error('Set KEEL_RPC_URL or KEEL_RPC_URLS locally for the selected chain first.');
       rpcUrls = resolved.rpcUrls;
     } else {
-      if (!process.stdin.isTTY) throw new Error('Use an interactive terminal, or --from-env with a locally set KEEL_SEPOLIA_RPC_URL.');
-      console.log('Create an Ethereum Sepolia endpoint with Alchemy, Infura or QuickNode. Use chain 11155111 and permit this machine to read contracts/receipts.');
+      if (!process.stdin.isTTY) throw new Error('Use an interactive terminal, or --from-env with a locally set KEEL_RPC_URL and KEEL_CHAIN_ID.');
+      console.log(`Create a ${name} endpoint with Alchemy, Infura or QuickNode. Use chain ${chainId} and permit this machine to read contracts/receipts.`);
       for (const provider of KEEL_RPC_PROVIDER_SETUP.providers) console.log(`${provider.name}: ${provider.documentation}`);
       // Typed provider keys never echo into terminal/session logs.
       const hidden = new Writable({ write(_chunk, _encoding, callback) { callback(); } });
@@ -45,9 +52,8 @@ try {
       try { const value = await new Promise(resolve => rl.question('', resolve)); rpcUrls = String(value).split(',').map(s => s.trim()); }
       finally { rl.close(); console.log(); }
     }
-    const prior = await readKeelRpcConfiguration(workspace);
     const { rpcUrl: _old, ...settings } = prior;
-    const config = { ...settings, schema: 'keel-rpc-config@1', chainId: 11155111, rpcUrls };
+    const config = { ...settings, schema: 'keel-rpc-config@1', chainId, rpcUrls };
     resolveKeelRpcConfiguration({}, {}, config);
     const root = await realpath(workspace), directory = resolve(root, '.keel');
     await mkdir(directory, { recursive: true });

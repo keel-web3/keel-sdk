@@ -111,14 +111,19 @@ dependency or authority to the canonical file proof.
 
 ### RPC failures and provider setup
 
-Ethereum Sepolia read-only tools default to checked public PublicNode, Tenderly and 1RPC
-endpoints, with per-provider pacing, rate-limit cooldowns and bounded failover.
+Start chain-dependent work with `keel-network-discover`, then `keel-network-check`.
+The configured public index establishes recorded deployments, selected chain and
+active creator instance; wallet/faucet lists and source modules do not. Respect
+`.keel/config.json` and `KEEL_CHAIN_ID`/`KEEL_DEPLOYMENT_INSTANCE`/`KEEL_NETWORK_INDEX_URL`.
+Read-only tools default to the selected indexed network public RPC pool, with per-provider pacing, rate-limit cooldowns and bounded failover.
 Use `keel-rpc-check`; a successful chain-ID read alone does not prove historical
 receipt access. If a tool returns `rpc.setup-required`, explain its reason and
-retry-after, ask which provider the user prefers, and help set up a Sepolia
-endpoint with Alchemy, Infura or QuickNode. From the SDK checkout, run
+retry-after, ask which provider the user prefers, and help set up an endpoint for the selected chain
+with Alchemy, Infura or QuickNode. From the SDK checkout, run
 `pnpm rpc:configure --workspace /path/to/artwork` to save private local settings,
 then `pnpm rpc:check --workspace /path/to/artwork` and the exact failed check.
 Read `docs/KEEL_RPC_SETUP.md`. Never request wallet keys, seed phrases or RPC API
 keys in chat; keep keyed URLs out of Git, logs and artwork. Do not bypass missing
 receipts or change chains. No browser minting page is implied by this workflow.
+
+Read [KEEL_NETWORK_DISCOVERY.md](../../docs/KEEL_NETWORK_DISCOVERY.md) for normal network discovery, configuration and selected-chain verification.
