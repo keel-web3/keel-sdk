@@ -5,6 +5,14 @@ description: Build, modify, test, or use the KEEL SDK and MCP for module discove
 
 # KEEL SDK and MCP
 
+**Website first:** Default to https://studio.onkeel.io for the full creator
+workflow and wallet review through the user's existing Studio account.
+KEEL Desktop is entirely optional. Never require installing/building Desktop,
+setting up another wallet, or a separate signing page for a supported Studio
+workflow. Return the staged project's `handoffUrl` or draft's `reviewUrl`;
+the user opens it in the website and approves with their connected wallet.
+Read `docs/KEEL_STUDIO_WALLET_REVIEW.md`; agent keys never authorize signing.
+
 **Payload storage default:** Default payloadStorage is compact across SDK, MCP, editor and Studio. Store native bytes once; compare supported lossless codecs and keep none when compression does not save bytes. Raw is an explicit persisted choice that keeps supplied bytes unchanged and disables automatic compression; it is separate from viewer=none, Inline/Hybrid delivery and prepared URI carriage. Reuse unchanged onchain object IDs and publish changed resources only. For native compressed binary, use the registered reader/composer profile in docs/KEEL_BINARY_RESOURCE_DELIVERY.md, not a second stored Base64/hex copy. Contract return encoding and storage are different boundaries: read-time Base64 or hex output does not prove another paid stored copy. Fresh prepared-COPY UTF-8 text uses storedText/none with exact byte verification; its guard does not validate native binary composers. Read docs/KEEL_PAYLOAD_STORAGE.md and audit source, new/reused stored bytes, complete tokenURI bytes and call gas separately. Raw does not bypass byte integrity or selected-chain receipt/read-back checks. Canonical-shell evidence is required when the verification shell is selected or canonical protection is claimed; it is not required for explicit creator-owned HTML.
 
 **Shell choice:** Shell choice is independent of payload storage. Default to the registered KEEL verification shell. If a creator explicitly selects viewer=none, preserve their creator-owned HTML shell and direct-artifact presentation through handoff, preview, preparation and publication; do not insert or label it as canonical protection. The same native-byte/no-duplicate storage policy applies to both. Existing explicit creator shell registration/selection APIs remain available for reusable custom shells.

@@ -1,6 +1,7 @@
 import { findKeelRpcSetupError } from "@keel/sdk/rpc";
 import { KeelNetworkIndexError } from '@keel/sdk/network-index';
 import { PREPARED_COPY_GUIDANCE, COPY_PUBLICATION_GUIDANCE, BINARY_PAYLOAD_GUIDANCE } from "./prepared-copy-guidance.js";
+import { STUDIO_WALLET_GUIDANCE } from "./studio-wallet-guidance.js";
 import { createWorkspace } from "./paths.js";
 import { getFrayAuctionReviewPrompt, getKeelAssetReviewPrompt, getKeelDraftRepairPrompt, getKeelProjectPlanPrompt, PROMPT_DEFINITIONS } from "./prompts.js";
 import { getMcpResource, McpResourceNotFoundError, RESOURCE_DEFINITIONS } from "./resources.js";
@@ -89,6 +90,7 @@ function toolError(error: unknown): ToolCallResult {
 }
 
 const MCP_INSTRUCTIONS = [
+  STUDIO_WALLET_GUIDANCE,
   "Start chain-dependent work with keel-network-discover. The configured KEEL public deployment index tells you where KEEL is actually deployed and which creator instance is active. Resolve selection from explicit input, .keel/config.json or KEEL_CHAIN_ID/KEEL_DEPLOYMENT_INSTANCE; respect the index default otherwise. Wallet/faucet catalogs do not prove KEEL deployments. Run keel-network-check before publication. RPC defaults come from the selected indexed network; private .keel/rpc.json and KEEL_RPC_URL(S) override them. Respect chain checks, rate-limit cooldowns and pacing. If a tool returns rpc.setup-required, explain the failure, ask which provider the user prefers, and help configure Alchemy, Infura or QuickNode for the selected chain with pnpm rpc:configure. Rerun pnpm rpc:check and the failed verification. Never ask for wallet keys, seed phrases or API keys in chat; never bypass missing receipts, use a stale index silently, or substitute a different chain.",
   PREPARED_COPY_GUIDANCE,
   COPY_PUBLICATION_GUIDANCE,

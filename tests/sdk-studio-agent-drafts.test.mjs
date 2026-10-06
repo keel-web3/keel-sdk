@@ -25,6 +25,28 @@ const baseDraft = {
   page: {},
 };
 
+test("draft review links use the hosted default and never forward untrusted URLs or credentials", async () => {
+  const { createKeelStudioAgentDraftClient } = await import(MODULE);
+  const token = `keel_agent_${"q".repeat(48)}`;
+  let requested;
+  const client = createKeelStudioAgentDraftClient({ grantToken: token, fetchImplementation: async (url, init) => {
+    requested = String(url);
+    assert.equal(new Headers(init.headers).get("authorization"), `Bearer ${token}`);
+    return Response.json({ ...baseDraft, id: "release-1", slug: "saved-release-1", revision: 1, status: "draft", reviewUrl: `https://untrusted.example/?token=${token}` });
+  } });
+  const release = await client.create(baseDraft);
+  assert.equal(requested, "https://studio.onkeel.io/api/agent/drafts");
+  assert.equal(release.reviewUrl, "https://studio.onkeel.io/release/saved-release-1");
+  assert.equal(release.reviewUrl.includes(token), false);
+  assert.equal(new URL(release.reviewUrl).search, "");
+  const hostile = createKeelStudioAgentDraftClient({ studioUrl: "https://secret@studio.example", grantToken: token, fetchImplementation: async () => { throw new Error("must not fetch"); } });
+  await assert.rejects(hostile.list(), /HTTPS/u);
+  for (const slug of ["", "../settings", "a?token=secret", "https://untrusted.example"]) {
+    const broken = createKeelStudioAgentDraftClient({ grantToken: token, fetchImplementation: async () => Response.json({ ...release, slug }) });
+    await assert.rejects(broken.read("release-1"), /invalid release review slug/u);
+  }
+});
+
 test("agent draft client covers every Studio release type without wallet or publication methods", async () => {
   const { createKeelStudioAgentDraftClient, KEEL_STUDIO_RELEASE_TYPES } = await import(MODULE);
   const requests = [];
@@ -62,13 +84,16 @@ test("agent draft client covers every Studio release type without wallet or publ
   for (const releaseType of KEEL_STUDIO_RELEASE_TYPES) {
     const supply = releaseType === "open-edition" ? "open" : releaseType === "one-of-one" ? "1" : "100";
     const created = await client.create({ ...baseDraft, releaseType, supply, title: `Agent ${releaseType}` });
+    assert.equal(created.reviewUrl, `https://studio.example/release/${created.slug}`);
     const listed = await client.list();
     assert.equal(listed.releases.some((draft) => draft.id === created.id), true);
     const reopened = await client.read(created.id);
+    assert.equal(reopened.reviewUrl, created.reviewUrl);
     assert.equal(reopened.releaseType, releaseType);
     const updated = await client.update(created.id, { ...reopened, title: `${reopened.title} revised` }, reopened.revision);
     assert.equal(updated.releaseType, releaseType);
     assert.equal(updated.revision, 2);
+    assert.equal(updated.reviewUrl, created.reviewUrl);
     assert.match(updated.title, /revised$/u);
   }
   assert.equal(requests.length, KEEL_STUDIO_RELEASE_TYPES.length * 4);

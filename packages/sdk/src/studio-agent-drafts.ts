@@ -1,3 +1,5 @@
+import { KEEL_STUDIO_URL } from "./endpoints.js";
+
 export const KEEL_STUDIO_AGENT_DRAFT_API = "keel-studio-agent-drafts@1" as const;
 
 export const KEEL_STUDIO_RELEASE_TYPES = [
@@ -38,6 +40,8 @@ export interface KeelStudioAgentReleaseView extends KeelStudioAgentReleaseDraft 
   readonly revision: number;
   readonly status: string;
   readonly slug: string;
+  /** Open in the website with the creator's existing wallet to review and publish. */
+  readonly reviewUrl: string;
 }
 
 export interface KeelStudioAgentDraftWorkspace {
@@ -46,7 +50,7 @@ export interface KeelStudioAgentDraftWorkspace {
 }
 
 export interface KeelStudioAgentDraftClientOptions {
-  readonly studioUrl: string | URL;
+  readonly studioUrl?: string | URL;
   readonly grantToken: string;
   readonly fetchImplementation?: typeof fetch;
 }
@@ -108,7 +112,7 @@ export function validateKeelStudioAgentReleaseDraft(value: unknown): KeelStudioA
   const input = value as Record<string, unknown>;
   // A creator or agent commonly edits the object returned by `read`; accept
   // those read-only view fields and strip them from the update payload.
-  const allowed = new Set<string>([...RELEASE_DRAFT_FIELDS, "id", "revision", "status", "slug"]);
+  const allowed = new Set<string>([...RELEASE_DRAFT_FIELDS, "id", "revision", "status", "slug", "reviewUrl"]);
   for (const key of Object.keys(input)) if (!allowed.has(key)) throw new TypeError(`Studio release draft.${key} is not supported.`);
   for (const key of RELEASE_DRAFT_FIELDS) if (!(key in input)) throw new TypeError(`Studio release draft.${key} is required.`);
 
@@ -160,7 +164,7 @@ function isDraftOperation(value: unknown): value is KeelStudioAgentDraftOperatio
 
 function endpoint(studioUrl: string | URL, path: string): URL {
   const url = new URL(path, studioUrl);
-  if (url.protocol !== "https:" && !(url.protocol === "http:" && ["localhost", "127.0.0.1", "::1"].includes(url.hostname))) {
+  if (url.username || url.password || (url.protocol !== "https:" && !(url.protocol === "http:" && ["localhost", "127.0.0.1", "::1"].includes(url.hostname)))) {
     throw new TypeError("KEEL Studio agent draft API requires HTTPS, except on loopback.");
   }
   return url;
@@ -200,7 +204,7 @@ function clientRequest(options: KeelStudioAgentDraftClientOptions, path: string,
   if (typeof options.grantToken !== "string" || options.grantToken.length < 48) throw new TypeError("KEEL Studio agent draft grant is invalid.");
   const headers = new Headers(init?.headers);
   headers.set("authorization", `Bearer ${options.grantToken}`);
-  return (options.fetchImplementation ?? fetch)(endpoint(options.studioUrl, path), {
+  return (options.fetchImplementation ?? fetch)(endpoint(options.studioUrl ?? KEEL_STUDIO_URL, path), {
     ...init,
     headers,
   });
@@ -213,29 +217,40 @@ function clientRequest(options: KeelStudioAgentDraftClientOptions, path: string,
 export function createKeelStudioAgentDraftClient(options: KeelStudioAgentDraftClientOptions) {
   if (options === null || typeof options !== "object") throw new TypeError("KEEL Studio agent draft client options are required.");
   if (typeof options.grantToken !== "string" || options.grantToken.length < 48) throw new TypeError("KEEL Studio agent draft grant is invalid.");
-  if (typeof options.studioUrl !== "string" && !(options.studioUrl instanceof URL)) throw new TypeError("Studio URL must be text or a URL.");
+  if (options.studioUrl !== undefined && typeof options.studioUrl !== "string" && !(options.studioUrl instanceof URL)) throw new TypeError("Studio URL must be text or a URL.");
   if (options.fetchImplementation !== undefined && typeof options.fetchImplementation !== "function") throw new TypeError("fetchImplementation must be a function.");
 
-  const list = async (): Promise<KeelStudioAgentDraftWorkspace> =>
-      responseJson(await clientRequest(options, "/api/agent/drafts", { cache: "no-store" }), [options.grantToken]);
+  const reviewed = (release: KeelStudioAgentReleaseView): KeelStudioAgentReleaseView => {
+    if (!release || typeof release.slug !== "string" || !/^[a-zA-Z0-9][a-zA-Z0-9_-]{0,199}$/u.test(release.slug)) {
+      throw new TypeError("Studio returned an invalid release review slug.");
+    }
+    // Derive only the existing release route from the persisted server slug.
+    // Never forward a token, caller-provided URL, or unsigned calldata in the link.
+    const reviewUrl = endpoint(options.studioUrl ?? KEEL_STUDIO_URL, `/release/${encodeURIComponent(release.slug)}`).href;
+    return Object.freeze({ ...release, reviewUrl });
+  };
+  const list = async (): Promise<KeelStudioAgentDraftWorkspace> => {
+    const workspace = await responseJson<KeelStudioAgentDraftWorkspace>(await clientRequest(options, "/api/agent/drafts", { cache: "no-store" }), [options.grantToken]);
+    return { ...workspace, releases: workspace.releases.map(reviewed) };
+  };
   const read = async (releaseId: string): Promise<KeelStudioAgentReleaseView> =>
-      responseJson(await clientRequest(options, releasePath(releaseId), { cache: "no-store" }), [options.grantToken]);
+      reviewed(await responseJson(await clientRequest(options, releasePath(releaseId), { cache: "no-store" }), [options.grantToken]));
   const create = async (draft: KeelStudioAgentReleaseDraft): Promise<KeelStudioAgentReleaseView> => {
     const validated = validateKeelStudioAgentReleaseDraft(draft);
-    return responseJson(await clientRequest(options, "/api/agent/drafts", {
+    return reviewed(await responseJson(await clientRequest(options, "/api/agent/drafts", {
       method: "POST",
       headers: { "content-type": "application/json" },
       body: JSON.stringify(validated),
-    }), [options.grantToken]);
+    }), [options.grantToken]));
   };
   const update = async (releaseId: string, draft: KeelStudioAgentReleaseDraft, expectedRevision: number): Promise<KeelStudioAgentReleaseView> => {
     if (!Number.isSafeInteger(expectedRevision) || expectedRevision < 1) throw new TypeError("Expected draft revision must be a positive integer.");
     const validated = validateKeelStudioAgentReleaseDraft(draft);
-    return responseJson(await clientRequest(options, releasePath(releaseId), {
+    return reviewed(await responseJson(await clientRequest(options, releasePath(releaseId), {
       method: "PATCH",
       headers: { "content-type": "application/json" },
       body: JSON.stringify({ draft: validated, expectedRevision }),
-    }), [options.grantToken]);
+    }), [options.grantToken]));
   };
   return Object.freeze<KeelStudioAgentDraftClient>({ list, read, create, update });
 }

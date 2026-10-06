@@ -1,11 +1,20 @@
 # `@keel/mcp`
 
+**Default to the [Studio website](https://studio.onkeel.io) and the user's
+existing wallet. KEEL Desktop is entirely optional.** Use
+`keel-studio-stage-project` and `keel-studio-draft` to prepare work in the
+user's approved Studio account and return `handoffUrl` / `reviewUrl`. The
+website handles verification, preparation, transaction review and publication.
+Do not build another signing page for this supported flow. Read
+`keel://mcp/studio-wallet-review` or the
+[wallet-review guide](../../docs/KEEL_STUDIO_WALLET_REVIEW.md).
+
 A stdio MCP server for the headless Keel/Keel builder and Fray agent
 workflow. It exposes strict local planning tools, conversational Fray auction
 intake, supported-testnet/faucet guidance, and an optional bounded search of an
 explicit Keel Studio Keel index. It never signs, submits, claims faucet funds,
 or mutates a wallet or chain; wallet output is a canonical request envelope for
-a separate user-approved wallet UI.
+the user-approved wallet review in the Studio website by default.
 
 Inline preparation defaults to the SDK's compact raw-percent graph. Omit the
 carriage override and repositoryRoot: the packaged canonical shell supplies local

@@ -5,6 +5,14 @@ description: Plan and prepare KEEL 1/1s, collections, reusable browser-art modul
 
 # Fray KEEL Agent
 
+**Website first:** Default to https://studio.onkeel.io for the full creator
+workflow, using the user's existing Studio account and connected wallet.
+KEEL Desktop is entirely optional. Do not require its installation/build,
+another wallet setup, or a separate signing page. Stage creator files, create
+an account-scoped release draft, and give the user its `handoffUrl` or
+`reviewUrl` for website review and wallet approval. The agent never signs.
+Read `docs/KEEL_STUDIO_WALLET_REVIEW.md` for exact SDK/MCP steps.
+
 **Shared storage and shell policy:** Default payloadStorage is Compact: native bytes stored once, beneficial compatible lossless compression, no generated encoded sibling. Raw preserves supplied bytes and intentional creator formatting. Shell selection is independent. Default to the registered KEEL verification shell; explicit viewer=none preserves creator-owned HTML/direct artifacts without a canonical protection claim. Requirements below for canonical shell records, protected K, and canonical mounting apply to the verification-shell choice. Native-container composers require native storage inventory, decoded source and selected-chain reader proof; their transient return encoding is not another stored copy. Read `docs/KEEL_PAYLOAD_STORAGE.md` and `docs/KEEL_BINARY_RESOURCE_DELIVERY.md`. Persist both choices and reject unsupported readers instead of silently changing storage or presentation.
 
 **Payload storage default:** Compact stores native bytes once and compares supported lossless compression; keep none when compression does not save bytes. Raw preserves exact supplied bytes and intentional creator-authored encodings without automatic compression. Do not generate a stored Base64/hex sibling for either choice. Prepared-COPY UTF-8 text uses storedText/none with exact byte verification; native compressed binary needs a verified compatible reader/composer. Existing prepared objects use exact assembly-only reuse. MIME type labels content; ;base64 selects decoding. Padding/newlines align already encoded slices and do not preserve arbitrary unencoded middle bytes. Read docs/KEEL_PAYLOAD_STORAGE.md and docs/KEEL_INLINE_PAYLOAD_BOUNDARIES.md. Audit actual stored objects separately from returned bytes; registry and browser proof remain separate.

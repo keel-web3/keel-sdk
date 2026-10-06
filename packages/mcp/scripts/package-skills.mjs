@@ -12,6 +12,7 @@ await cp(new URL("../../../skills/fray-keel-agent/", import.meta.url), new URL("
 const documents = [
   'KEEL_NETWORK_DISCOVERY.md',
   'KEEL_RPC_SETUP.md',
+  'KEEL_STUDIO_WALLET_REVIEW.md',
   'KEEL_PREPARED_COPY_ASSEMBLY.md',
   'KEEL_PREPARED_DENSE_COPY.md',
   'KEEL_INLINE_PAYLOAD_BOUNDARIES.md',
