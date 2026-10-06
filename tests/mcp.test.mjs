@@ -799,7 +799,8 @@ test("MCP rejects symlink inputs and CLI emits protocol JSON only", async () => 
     const listed = await server.handle({ jsonrpc: "2.0", id: 5, method: "tools/list", params: {} });
     assert.deepEqual(lines[1].result.tools, listed.result.tools);
     assert.ok(lines[1].result.tools.some(tool => tool.name === "keel-editor-project-open"));
-    assert.equal(lines[2].result.resources.length, 7);
+    assert.equal(lines[2].result.resources.length, 8);
+    assert.ok(lines[2].result.resources.some(r=>r.uri === "keel://mcp/studio-wallet-review"));
     assert.ok(lines[2].result.resources.some(r=>r.uri === "keel://mcp/svg-renderer"));
     assert.equal(JSON.parse(lines[3].result.contents[0].text).kind, "offline-workflow");
   } finally {

@@ -1,4 +1,5 @@
 import { PREPARED_COPY_GUIDANCE, COPY_PUBLICATION_GUIDANCE, BINARY_PAYLOAD_GUIDANCE } from "./prepared-copy-guidance.js";
+import { STUDIO_WALLET_GUIDANCE } from "./studio-wallet-guidance.js";
 import { createWorkspace } from "./paths.js";
 import { getFrayAuctionReviewPrompt, getKeelAssetReviewPrompt, getKeelDraftRepairPrompt, getKeelProjectPlanPrompt, PROMPT_DEFINITIONS } from "./prompts.js";
 import { getMcpResource, McpResourceNotFoundError, RESOURCE_DEFINITIONS } from "./resources.js";
@@ -80,6 +81,7 @@ function toolError(error: unknown): ToolCallResult {
 }
 
 const MCP_INSTRUCTIONS = [
+  STUDIO_WALLET_GUIDANCE,
   PREPARED_COPY_GUIDANCE,
   COPY_PUBLICATION_GUIDANCE,
   BINARY_PAYLOAD_GUIDANCE,

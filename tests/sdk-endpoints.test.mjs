@@ -3,13 +3,14 @@ import test from "node:test";
 
 import {
   KEEL_TEST_PUBLIC_RPC_URL,
-  KEEL_TEST_STUDIO_URL,
+  KEEL_STUDIO_URL,
   resolveKeelEndpoints,
 } from "../packages/sdk/dist/index.js";
 
-test("KEEL endpoints use canonical test hosts by default", () => {
+test("KEEL endpoints default to the hosted Studio website without changing the public RPC", () => {
   const resolved = resolveKeelEndpoints();
-  assert.equal(resolved.studioUrl, KEEL_TEST_STUDIO_URL);
+  assert.equal(resolved.studioUrl, KEEL_STUDIO_URL);
+  assert.equal(resolved.studioUrl, "https://studio.onkeel.io");
   assert.equal(resolved.publicRpcUrl, KEEL_TEST_PUBLIC_RPC_URL);
   assert.deepEqual(resolved.sources, {
     studioUrl: "canonical-default",

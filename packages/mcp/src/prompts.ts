@@ -1,4 +1,5 @@
 import { BINARY_PAYLOAD_GUIDANCE, PREPARED_COPY_GUIDANCE } from "./prepared-copy-guidance.js";
+import { STUDIO_WALLET_GUIDANCE } from "./studio-wallet-guidance.js";
 import type { McpPrompt, McpPromptResult } from "./types.js";
 
 export const KEEL_ASSET_REVIEW_PROMPT = "keel-asset-review" as const;
@@ -150,6 +151,7 @@ export function getKeelProjectPlanPrompt(name: unknown, argumentsValue: unknown)
       content: {
         type: "text",
         text: [
+          STUDIO_WALLET_GUIDANCE,
           BINARY_PAYLOAD_GUIDANCE,
           `Plan this KEEL project before staging, uploading, preparing a wallet request, or changing chain state: ${quote(request)}.`,
           supplied.length === 0 ? "No structured choices were supplied." : `Known choices: ${supplied.join(", ")}.`,
@@ -192,6 +194,7 @@ export function getKeelAssetReviewPrompt(name: unknown, argumentsValue: unknown)
       content: {
         type: "text",
         text: [
+          STUDIO_WALLET_GUIDANCE,
           BINARY_PAYLOAD_GUIDANCE,
           "Review a Keel asset without fetching, executing, signing, or submitting anything.",
           `Start with the analyze tool for ${quote(args.input)}, then compare modeled cost options with cost and plan a deterministic flat or recursive upload with upload-plan.`,
@@ -223,6 +226,7 @@ export function getFrayAuctionReviewPrompt(name: unknown, argumentsValue: unknow
       content: {
         type: "text",
         text: [
+          STUDIO_WALLET_GUIDANCE,
           BINARY_PAYLOAD_GUIDANCE,
           "Prepare a Fray auction through Keel, but do not sign, submit, claim faucet funds, or report a mint/upload without receipts.",
           "Call fray-auction-intake first. If title or description is missing, ask for it; the creator may choose the short default description.",
@@ -255,6 +259,7 @@ export function getKeelDraftRepairPrompt(name: unknown, argumentsValue: unknown)
       content: {
         type: "text",
         text: [
+          STUDIO_WALLET_GUIDANCE,
           BINARY_PAYLOAD_GUIDANCE,
           `Repair Studio release draft ${quote(releaseId)} at exact revision ${expectedRevision}.`,
           `Requested change: ${request}`,

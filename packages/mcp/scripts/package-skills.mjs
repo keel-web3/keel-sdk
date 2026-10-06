@@ -10,6 +10,7 @@ await cp(new URL("../../../skills/fray-keel-agent/", import.meta.url), new URL("
 
 // Bundle the exact documents referenced by the distributed skill.
 const documents = [
+  'KEEL_STUDIO_WALLET_REVIEW.md',
   'KEEL_PREPARED_COPY_ASSEMBLY.md',
   'KEEL_INLINE_PAYLOAD_BOUNDARIES.md',
   'KEEL_PAYLOAD_STORAGE.md',

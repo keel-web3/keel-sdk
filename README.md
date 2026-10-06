@@ -1,5 +1,12 @@
 # KEEL SDK
 
+**Use the [Studio website](https://studio.onkeel.io) by default.** It handles
+the creator workflow and review/signing with the user's existing wallet.
+Agents connect to the user's Studio account, prepare drafts, and return the
+website review link. KEEL Desktop is entirely optional; it is not required
+for minting, publication, or wallet review. See the
+[Studio wallet-review workflow](docs/KEEL_STUDIO_WALLET_REVIEW.md).
+
 Payload storage defaults to **Compact** across SDK/MCP/editor/Studio. **Raw** keeps supplied bytes and manual control. See [shared storage defaults](docs/KEEL_PAYLOAD_STORAGE.md) before preparing binary or interpreting tokenURI sizes.
 
 KEEL is a toolkit for storing browser-native artwork as immutable object graphs,

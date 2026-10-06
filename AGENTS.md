@@ -1,3 +1,12 @@
+# Hosted Studio is the default
+
+Use https://studio.onkeel.io and the creator's existing Studio account for
+preparation, previews, release drafts, contract review and wallet approval.
+KEEL Desktop is entirely optional. Do not require it, another wallet setup,
+or a separate signing page for the supported website workflow. Return the
+server-issued project handoff or release `reviewUrl`; never sign through an
+agent grant. Read `docs/KEEL_STUDIO_WALLET_REVIEW.md`.
+
 **Full Inline delivery default:** At or below 2,000,000 bytes for the complete prepared tokenURI, default to embedded-assembled Inline: one public tokenURI call returns all shell, modules and assets; no follow-up browser RPC. Count the complete metadata/carriage/envelope, not only compressed files. Before that measurement, compressed size is a provisional estimate. Preserve explicit creator choices. Internal descriptor/carrier calls are not additional browser requests and still require the selected-chain gas check. Never silently switch to Hybrid to work around resource count.
 
 # KEEL publication agent instructions

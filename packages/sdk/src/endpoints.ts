@@ -1,3 +1,5 @@
+/** Hosted creator workspace and wallet review; no desktop installation required. */
+export const KEEL_STUDIO_URL = "https://studio.onkeel.io" as const;
 export const KEEL_TEST_STUDIO_URL = "https://keel-test.149-28-255-65.sslip.io" as const;
 export const KEEL_TEST_PUBLIC_RPC_URL = "https://rpc.keel-test.149-28-255-65.sslip.io" as const;
 export const KEEL_LEGACY_STRATUS_TEST_STUDIO_URL = "https://stratus-test.149-28-255-65.sslip.io" as const;
@@ -44,7 +46,7 @@ export function resolveKeelEndpoints(
   const studio = chooseEndpoint(
     overrides.studioUrl,
     environment.KEEL_STUDIO_URL ?? environment.FRAY_STUDIO_URL,
-    KEEL_TEST_STUDIO_URL,
+    KEEL_STUDIO_URL,
     "studioUrl",
   );
   const publicRpc = chooseEndpoint(

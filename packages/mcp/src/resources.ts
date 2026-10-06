@@ -3,11 +3,13 @@ import { PREPARED_COPY_POLICY } from "./prepared-copy-guidance.js";
 import type { McpResource, McpResourceReadResult } from "./types.js";
 import { KEEL_ENGINE_CATALOG } from "@keel/sdk/engine";
 import { ARENA_RESOURCE_DEFINITION, ARENA_RESOURCE_TEXT } from "./arena-tools.js";
+import { STUDIO_WALLET_POLICY } from "./studio-wallet-guidance.js";
 
 export const KEEL_WORKFLOW_RESOURCE = "keel://mcp/workflow" as const;
 export const KEEL_LIMITS_RESOURCE = "keel://mcp/limits" as const;
 export const KEEL_PUBLICATION_MODES_RESOURCE = "keel://mcp/publication-modes" as const;
 export const KEEL_PROJECT_ROUTES_RESOURCE = "keel://mcp/project-routes" as const;
+export const KEEL_STUDIO_WALLET_REVIEW_RESOURCE = "keel://mcp/studio-wallet-review" as const;
 const MAX_RESOURCE_BYTES = 64 * 1024;
 
 export class McpResourceNotFoundError extends Error {
@@ -20,6 +22,7 @@ export class McpResourceNotFoundError extends Error {
 const resourceJson = (value: unknown): string => `${JSON.stringify(value)}\n`;
 
 const RESOURCE_TEXT: Readonly<Record<string, string>> = {
+  [KEEL_STUDIO_WALLET_REVIEW_RESOURCE]: resourceJson(STUDIO_WALLET_POLICY),
   "keel://mcp/svg-renderer": resourceJson({
     ...KEEL_ENGINE_CATALOG.svgRenderer,
     usage: { create: { tool: "keel-svg-create", inputs: ["preset or recipeJson", "tokenId (optional)"] }, inspect: { tool: "keel-svg-inspect", inputs: ["svg"] }, read: { tool: "keel-svg-call-plan", inputs: ["chainId", "address", "tokenId"] } },
@@ -31,6 +34,7 @@ const RESOURCE_TEXT: Readonly<Record<string, string>> = {
   [KEEL_WORKFLOW_RESOURCE]: resourceJson({
     schema: "keel-mcp-resource@1",
     kind: "offline-workflow",
+    walletReview: STUDIO_WALLET_POLICY,
     payloadStorage: KEEL_PAYLOAD_STORAGE_POLICY,
     contractFirst: ["keel-contract-workflow-preflight", "keel-engine-catalog", "keel-network-inspect", "keel-library-search", "edge-case-resolution", "keel-contract-controls", "wallet-review"],
     steps: ["studio-capabilities", "analyze", "media-optimize", "media-optimize-apply", "cost", "keel-revision-plan", "upload-plan", "build", "verify", "module-resolve", "module-lock", "studio-stage-project", "studio-draft", "chain-plan", "ethereum-encode", "publish-plan", "wallet-request-prepare", "wallet-link"],
@@ -264,6 +268,7 @@ const RESOURCE_TEXT: Readonly<Record<string, string>> = {
 };
 
 export const RESOURCE_DEFINITIONS: readonly McpResource[] = [
+  { uri: KEEL_STUDIO_WALLET_REVIEW_RESOURCE, name: "keel-studio-wallet-review", description: "Default hosted Studio account and existing-wallet review workflow; desktop is optional.", mimeType: "application/json" },
   { uri: "keel://mcp/engine", name: "keel-engine", description: "Shared SDK and desktop collection, mint, permission, storage and module inventory.", mimeType: "application/json" },
   { uri: "keel://mcp/svg-renderer", name: "keel-svg-renderer", description: "Contract-generated SVGs, hidden proof provenance, SDK/MCP/editor usage and verification boundaries.", mimeType: "application/json" },
   { uri: KEEL_WORKFLOW_RESOURCE, name: "keel-workflow", description: "Machine-readable offline analyze-to-review workflow.", mimeType: "application/json" },
