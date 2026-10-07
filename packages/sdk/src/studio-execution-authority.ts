@@ -2,7 +2,7 @@
 export const KEEL_EXECUTION_AUTHORITY_VERSION = "keel-execution-authority@1" as const;
 export const KEEL_AUTHORITY_CONTRACT_SOURCE = "ace3fed7aff1765c7d2ee9bba4d0232246f86ffb" as const;
 export type KeelExecutionMode = "owner-review" | "delegated-agent" | "agent-owned";
-export type KeelExecutionRoute = "studio-release" | "creator-factory-direct" | "publication-job" | "authority-delegate" | "manager-automation";
+export type KeelExecutionRoute = "studio-release" | "creator-factory-direct" | "factory-authorized-agent" | "publication-job" | "authority-delegate" | "manager-automation";
 export type KeelIdentityEvidence = { readonly address: string | null; readonly basis: "creator-account" | "requested-wallet" | "not-established"; readonly explanation: string };
 
 const source = (path: string) => `https://github.com/Ravonus/keel-contracts/blob/${KEEL_AUTHORITY_CONTRACT_SOURCE}/${path}`;
@@ -11,7 +11,7 @@ export const KEEL_EXECUTION_ROUTES = Object.freeze({
     title: "Studio release review",
     rule: "The saved creator account reviews the exact collection and sale calls in its own wallet. A Studio agent grant prepares drafts; it does not sign or grant contract permissions.",
     delegated: "unsupported" as const,
-    reason: "This release publisher has no verified delegated-agent transaction route. Use the creator wallet review; changing an executor label cannot grant authority.",
+    reason: "This release publisher has no verified delegated-agent transaction route. The separate SDK wallet-link tool can prepare a one-shot factory authorization, but it does not delegate this full release. Use the creator wallet review; changing an executor label cannot grant authority.",
     source: source("src/modules/keel-die/KeelFactory.sol"),
   },
   "creator-factory-direct": {
@@ -27,6 +27,13 @@ export const KEEL_EXECUTION_ROUTES = Object.freeze({
     delegated: "configuration-required" as const,
     reason: "Read and verify the existing job's owner, executor, commitments, cursor, expiry and runtime before offering resume. This capability description does not create or fund a job.",
     source: source("src/modules/keel-publication/KeelPublicationJob.sol"),
+  },
+  "factory-authorized-agent": {
+    title: "One-shot creator-authorized factory call",
+    rule: "KeelFactory.castDieFor verifies the creator's EIP-712 signature over the exact agent, factory domain, nonce, deadline and complete collection configuration. Creator, collection admin and calling agent remain separate event fields.",
+    delegated: "owner-authorization-required" as const,
+    reason: "The existing wallet-link tool prepares review-only typed data with chainReady=false and approval=not-granted. The owner must explicitly approve the exact authorization, and the target runtime and unused nonce must be checked before a configured agent executes it. This does not authorize arbitrary release calls.",
+    source: source("src/modules/keel-die/KeelFactory.sol"),
   },
   "authority-delegate": {
     title: "Exact-selector project authority",
@@ -44,6 +51,8 @@ export const KEEL_EXECUTION_ROUTES = Object.freeze({
   },
 });
 
+for (const route of Object.values(KEEL_EXECUTION_ROUTES)) Object.freeze(route);
+
 const address = (value: string | undefined) => {
   if (value === undefined) return null;
   if (!/^0x[0-9a-f]{40}$/iu.test(value) || /^0x0{40}$/iu.test(value)) throw new TypeError("Use a nonzero verified account address.");
@@ -60,6 +69,7 @@ export interface KeelExecutionAuthorityInput {
 
 /** A read-only explanation of the current owner-signing route, never an authorization token. */
 export function describeKeelExecutionAuthority(input: KeelExecutionAuthorityInput) {
+  if (!input || typeof input !== "object" || Object.keys(input).some(key => !["route", "creatorAccount", "requestedSigner", "releaseId", "revision", "operationId"].includes(key))) throw new TypeError("Execution explanations accept identity context only, never keys, grants or signing instructions.");
   const uuid = /^[0-9a-f]{8}(?:-[0-9a-f]{4}){3}-[0-9a-f]{12}$/iu;
   if (!Object.hasOwn(KEEL_EXECUTION_ROUTES, input.route) || !uuid.test(input.releaseId) || !Number.isSafeInteger(input.revision) || input.revision < 1 || input.operationId !== undefined && !uuid.test(input.operationId)) throw new TypeError("Use the saved route, release and revision identity.");
   const creator = address(input.creatorAccount), signer = address(input.requestedSigner);
@@ -72,7 +82,8 @@ export function describeKeelExecutionAuthority(input: KeelExecutionAuthorityInpu
     route: input.route, releaseId: input.releaseId, revision: input.revision,
     ...(input.operationId === undefined ? {} : { operationId: input.operationId }),
     mode: "owner-review" as const,
-    routeStatus: implemented ? "review-implemented" as const : "source-primitive-only" as const,
+    routeStatus: implemented ? "review-implemented" as const : input.route === "factory-authorized-agent" ? "authorization-preparation-implemented" as const : "source-primitive-only" as const,
+    preparationTool: input.route === "factory-authorized-agent" ? "wallet-link" as const : null,
     title: route.title, explanation: route.rule,
     options: [
       { mode: "owner-review" as const, label: "Your wallet approves", status: implemented ? "available" as const : "configuration-required" as const, explanation: implemented ? "Use Studio yourself or let an agent prepare the same saved plan. You review and sign each new wallet action." : "This source primitive still needs a verified route adapter before this review helper can prepare it." },
@@ -88,8 +99,29 @@ export function describeKeelExecutionAuthority(input: KeelExecutionAuthorityInpu
       recipient: unknown("A recipient must be established by the exact mint or transfer call. Do not infer one from this account."),
       feePayer: unknown("The wallet may use a separate sponsor or relayer. The transaction sender is not proof of who ultimately pays fees."),
     },
-    sourceUrl: route.source, deployedAuthorityVerified: false as const,
+    sourceUrl: route.source, deployedAuthorityVerified: false as const, authorizesExecution: false as const,
     signing: "not-performed" as const, submission: "not-performed" as const, grantChanges: "not-performed" as const,
   };
 }
 export type KeelExecutionAuthorityView = ReturnType<typeof describeKeelExecutionAuthority>;
+
+/** Bind an optional server explanation to the same saved plan or exact wallet operation. */
+export function parseKeelExecutionAuthority(value: unknown, identity: { readonly releaseId: string; readonly revision: number; readonly operationId?: string; readonly wallet?: string }): KeelExecutionAuthorityView {
+  if (!value || typeof value !== "object" || Array.isArray(value)) throw new TypeError("Invalid execution explanation.");
+  const input = value as Record<string, unknown>;
+  if (input.schema !== KEEL_EXECUTION_AUTHORITY_VERSION || input.sourceRevision !== KEEL_AUTHORITY_CONTRACT_SOURCE || input.releaseId !== identity.releaseId || input.revision !== identity.revision || input.operationId !== identity.operationId
+    || input.mode !== "owner-review" || input.signing !== "not-performed" || input.submission !== "not-performed" || input.grantChanges !== "not-performed" || input.deployedAuthorityVerified !== false || input.authorizesExecution !== false) throw new TypeError("The execution explanation belongs to another review or authority policy.");
+  const identities = input.identities as Record<string, unknown> | undefined;
+  const read = (key: string) => {
+    const item = identities?.[key];
+    if (!item || typeof item !== "object" || Array.isArray(item)) throw new TypeError("Invalid review identity.");
+    const address = (item as Record<string, unknown>).address;
+    if (address !== null && typeof address !== "string") throw new TypeError("Invalid review identity address.");
+    return address ?? undefined;
+  };
+  const creatorAccount = read("creatorAccount"), requestedSigner = read("requestedSigner");
+  if (identity.wallet !== undefined && (creatorAccount?.toLowerCase() !== identity.wallet.toLowerCase() || requestedSigner?.toLowerCase() !== identity.wallet.toLowerCase())) throw new TypeError("The execution explanation names another wallet.");
+  return describeKeelExecutionAuthority({ route: input.route as KeelExecutionRoute, releaseId: identity.releaseId, revision: identity.revision,
+    ...(identity.operationId === undefined ? {} : { operationId: identity.operationId }),
+    ...(creatorAccount === undefined ? {} : { creatorAccount }), ...(requestedSigner === undefined ? {} : { requestedSigner }) });
+}

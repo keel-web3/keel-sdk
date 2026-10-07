@@ -1,4 +1,4 @@
-import type { KeelExecutionAuthorityView } from "./studio-execution-authority.js";
+import { parseKeelExecutionAuthority, type KeelExecutionAuthorityView } from "./studio-execution-authority.js";
 import { parseKeelNamedProjectProfile, validateKeelNamedProfileCommand, type KeelNamedProjectProfile, type KeelNamedProfileCommand } from "./studio-project-profiles.js";
 import { parseKeelSelectedProjectProfile, type KeelSelectedProjectProfile } from "./studio-project-defaults.js";
 export type KeelStudioProjectProfilesView = KeelStudioDefaultsView & { readonly starters: readonly KeelNamedProjectProfile[] };
@@ -354,7 +354,7 @@ export function createKeelStudioAgentDraftClient(options: KeelStudioAgentDraftCl
     const value = await studioAgentResponse<KeelStudioReleasePlanning>(await studioAgentRequest(options, `${releasePath(releaseId)}/plan`, command === undefined
       ? { cache: "no-store" } : { method: "PATCH", headers: { "content-type": "application/json" }, body: JSON.stringify(command) }), [options.grantToken]);
     if (value.schema !== "keel-release-planning@1" || value.releaseId !== releaseId || !Number.isSafeInteger(value.revision) || value.revision < 1) throw new TypeError("Studio returned another or invalid planning revision.");
-    return { ...value, planningUrl: endpoint(options.studioUrl ?? KEEL_STUDIO_URL, `/studio/releases/${encodeURIComponent(releaseId)}/plan`).href };
+    return { ...value, ...(value.execution === undefined ? {} : { execution: parseKeelExecutionAuthority(value.execution, { releaseId, revision: value.revision }) }), planningUrl: endpoint(options.studioUrl ?? KEEL_STUDIO_URL, `/studio/releases/${encodeURIComponent(releaseId)}/plan`).href };
   };
   const conversation = async (releaseId: string, suggestion?: KeelStudioConversationSuggestion): Promise<KeelStudioReleaseConversation | KeelStudioConversationSuggestionReceipt> => {
     if (suggestion !== undefined) {
@@ -400,7 +400,7 @@ export function createKeelStudioAgentDraftClient(options: KeelStudioAgentDraftCl
       || !/^0x[0-9a-f]{40}$/iu.test(value.wallet) || !prepared || !/^[0-9a-f]{8}(?:-[0-9a-f]{4}){3}-[0-9a-f]{12}$/iu.test(prepared.operationId)
       || !Number.isSafeInteger(prepared.chainId) || prepared.chainId < 1 || !Array.isArray(prepared.calls) || prepared.calls.length < 1 || prepared.calls.length > 8
       || !Array.from(prepared.calls).every(call => call && typeof call.kind === "string" && /^0x[0-9a-f]{40}$/iu.test(call.to) && /^0x(?:[0-9a-f]{2})*$/iu.test(call.data) && /^(?:0|[1-9][0-9]*|0x[0-9a-f]+)$/iu.test(call.value))) throw new TypeError("Studio returned another or invalid wallet-review identity.");
-    return { ...value, reviewUrl: endpoint(options.studioUrl ?? KEEL_STUDIO_URL, `/studio/releases/${encodeURIComponent(releaseId)}/review?operation=${encodeURIComponent(prepared.operationId)}&revision=${expectedRevision}`).href };
+    return { ...value, ...(value.execution === undefined ? {} : { execution: parseKeelExecutionAuthority(value.execution, { releaseId, revision: expectedRevision, operationId: prepared.operationId, wallet: value.wallet }) }), reviewUrl: endpoint(options.studioUrl ?? KEEL_STUDIO_URL, `/studio/releases/${encodeURIComponent(releaseId)}/review?operation=${encodeURIComponent(prepared.operationId)}&revision=${expectedRevision}`).href };
   };
   const storageReview = async (projectId: string): Promise<KeelStudioStorageReview> => {
     if (!/^[0-9a-f]{8}(?:-[0-9a-f]{4}){3}-[0-9a-f]{12}$/iu.test(projectId)) throw new TypeError("Use this project's Studio UUID.");
