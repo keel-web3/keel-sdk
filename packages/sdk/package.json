@@ -330,6 +330,10 @@
     "./studio-connection-node": {
       "types": "./dist/studio-connection-node.d.ts",
       "import": "./dist/studio-connection-node.js"
+    },
+    "./studio-access": {
+      "types": "./dist/studio-access.d.ts",
+      "import": "./dist/studio-access.js"
     }
   },
   "files": [

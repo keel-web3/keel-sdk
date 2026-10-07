@@ -184,7 +184,7 @@ function redactSensitiveMessage(message: string, secrets: readonly string[]): st
   }, message);
 }
 
-async function responseJson<T>(response: Response, secrets: readonly string[]): Promise<T> {
+export async function studioAgentResponse<T>(response: Response, secrets: readonly string[]): Promise<T> {
   let value: unknown;
   try {
     value = await response.json();
@@ -200,7 +200,7 @@ async function responseJson<T>(response: Response, secrets: readonly string[]): 
   return value as T;
 }
 
-function clientRequest(options: KeelStudioAgentDraftClientOptions, path: string, init?: RequestInit): Promise<Response> {
+export function studioAgentRequest(options: KeelStudioAgentDraftClientOptions, path: string, init?: RequestInit): Promise<Response> {
   if (typeof options.grantToken !== "string" || options.grantToken.length < 48) throw new TypeError("KEEL Studio agent draft grant is invalid.");
   const headers = new Headers(init?.headers);
   headers.set("authorization", `Bearer ${options.grantToken}`);
@@ -231,14 +231,14 @@ export function createKeelStudioAgentDraftClient(options: KeelStudioAgentDraftCl
     return Object.freeze({ ...release, reviewUrl });
   };
   const list = async (): Promise<KeelStudioAgentDraftWorkspace> => {
-    const workspace = await responseJson<KeelStudioAgentDraftWorkspace>(await clientRequest(options, "/api/agent/drafts", { cache: "no-store" }), [options.grantToken]);
+    const workspace = await studioAgentResponse<KeelStudioAgentDraftWorkspace>(await studioAgentRequest(options, "/api/agent/drafts", { cache: "no-store" }), [options.grantToken]);
     return { ...workspace, releases: workspace.releases.map(reviewed) };
   };
   const read = async (releaseId: string): Promise<KeelStudioAgentReleaseView> =>
-      reviewed(await responseJson(await clientRequest(options, releasePath(releaseId), { cache: "no-store" }), [options.grantToken]));
+      reviewed(await studioAgentResponse(await studioAgentRequest(options, releasePath(releaseId), { cache: "no-store" }), [options.grantToken]));
   const create = async (draft: KeelStudioAgentReleaseDraft): Promise<KeelStudioAgentReleaseView> => {
     const validated = validateKeelStudioAgentReleaseDraft(draft);
-    return reviewed(await responseJson(await clientRequest(options, "/api/agent/drafts", {
+    return reviewed(await studioAgentResponse(await studioAgentRequest(options, "/api/agent/drafts", {
       method: "POST",
       headers: { "content-type": "application/json" },
       body: JSON.stringify(validated),
@@ -247,7 +247,7 @@ export function createKeelStudioAgentDraftClient(options: KeelStudioAgentDraftCl
   const update = async (releaseId: string, draft: KeelStudioAgentReleaseDraft, expectedRevision: number): Promise<KeelStudioAgentReleaseView> => {
     if (!Number.isSafeInteger(expectedRevision) || expectedRevision < 1) throw new TypeError("Expected draft revision must be a positive integer.");
     const validated = validateKeelStudioAgentReleaseDraft(draft);
-    return reviewed(await responseJson(await clientRequest(options, releasePath(releaseId), {
+    return reviewed(await studioAgentResponse(await studioAgentRequest(options, releasePath(releaseId), {
       method: "PATCH",
       headers: { "content-type": "application/json" },
       body: JSON.stringify({ draft: validated, expectedRevision }),

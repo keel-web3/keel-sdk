@@ -63,7 +63,7 @@ const walletLink: JsonSchema = object({
   accountAddress: string("Account/creator wallet address."),
   agentAddress: string("Agent wallet address."),
   target: walletLinkTarget,
-  scopes: { type: "array", items: { type: "string", enum: ["read", "analyze", "prepare", "request", "create-collection"] }, minItems: 1, maxItems: 5 },
+  scopes: { type: "array", items: { type: "string", enum: ["read", "analyze", "prepare", "request", "create-collection"] }, minItems: 1, maxItems: 7 },
   issuedAt: integer("Unix seconds.", 0),
   expiresAt: integer("Unix seconds; at most 30 days after issuedAt.", 1),
   nonce: string("Link nonce.", 96),
@@ -221,7 +221,7 @@ const studioConnect: JsonSchema = object({
   operation: { type: "string", enum: ["start", "status", "complete"] },
   studioUrl: string("Optional Studio HTTPS origin.", 512),
   label: string("Name displayed to the user before they approve access.", 80),
-  scopes: { type: "array", items: { type: "string", enum: ["drafts:read", "drafts:create", "drafts:write", "contracts:read", "bridge:serve"] }, minItems: 1, maxItems: 5 },
+  scopes: { type: "array", items: { type: "string", enum: ["drafts:read", "drafts:create", "drafts:write", "contracts:read", "bridge:serve", "access:read", "access:write"] }, minItems: 1, maxItems: 7 },
   reconnect: { type: "boolean", description: "Request a new grant instead of reusing the current connection." },
 }, ["operation"]);
 const studioDraft: JsonSchema = object({

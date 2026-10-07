@@ -86,3 +86,9 @@ test('origin rules and terminal import never return the secret', async t => {
   assert.equal(await loadStudioAgentToken(f.options), f.token);
   await assert.rejects(importStudioAgentToken('wallet-private-key', f.options));
 });
+test('extra access permissions request fresh consent and denial preserves the existing connection', async t => {
+ const f = await fixture(t); await startStudioConnection(f.options); f.setOutcome('approved'); await completeStudioConnection(f.options);
+ const extra = await startStudioConnection({ ...f.options, scopes: ['drafts:read', 'access:read', 'access:write'] });
+ assert.equal(extra.status, 'pending'); assert.ok(extra.scopes.includes('access:write')); assert.equal(await loadStudioAgentToken(f.options), f.token);
+ f.setOutcome('denied'); assert.equal((await completeStudioConnection(f.options)).status, 'denied'); assert.equal((await getStudioConnection(f.options)).status, 'connected'); assert.equal(await loadStudioAgentToken(f.options), f.token);
+});

@@ -842,6 +842,21 @@ async function studioConnectTool(context: ToolContext, value: unknown): Promise<
     ...(input.scopes === undefined ? {} : { scopes: input.scopes as StudioConnectionScope[] }), ...(input.reconnect === undefined ? {} : { reconnect: input.reconnect as boolean }) });
 }
 
+async function studioAccessTool(context: ToolContext, value: unknown): Promise<unknown> {
+  const input = record(value, ["operation", "releaseId", "input", "studioUrl"], "Studio access arguments");
+  const operation = requiredString(input, "operation"), releaseId = requiredString(input, "releaseId");
+  const configured = optionalString(input, "studioUrl");
+  const { createConnectedStudioAccessClient } = await import("@keel/sdk/studio-connection-node");
+  const client = await createConnectedStudioAccessClient({ workspace: context.workspace.root, studioUrl: resolveKeelEndpoints(configured ? { studioUrl: configured } : {}, process.env).studioUrl });
+  if (operation === "read") return client.read(releaseId);
+  if (operation === "requests") return client.requests(releaseId);
+  const data = record(input.input, operation === "update" ? ["wallets", "expectedRevision", "campaign", "members"] : operation === "test" ? ["wallet", "claimIds"] : ["requestId", "signature"], "Studio access input");
+  if (operation === "update") return client.update(releaseId, data as unknown as Parameters<typeof client.update>[1]);
+  if (operation === "test") return client.test(releaseId, requiredString(data, "wallet") as `0x${string}`, (data.claimIds ?? []) as string[]);
+  if (operation === "approve") return client.approve(releaseId, requiredString(data, "requestId"), requiredString(data, "signature") as `0x${string}`);
+  throw new TypeError("Use read, update, test, requests or approve.");
+}
+
 async function studioDraftTool(context: ToolContext, value: unknown): Promise<unknown> {
   const input = record(value, ["studioUrl", "operation", "releaseId", "expectedRevision", "draft"], "Studio draft arguments");
   const operation = requiredString(input, "operation");
@@ -1452,6 +1467,7 @@ export const TOOL_DEFINITIONS: readonly ToolDefinition[] = [
   tool("keel-studio-capabilities", "Inspect a Studio's supported chains, zero-spend sandbox, staging, authorization, and MSP readiness before any upload or wallet action.", TOOL_SCHEMAS.studioCapabilities, studioCapabilitiesTool),
   tool("keel-studio-project-intake", "Ask only for missing project decisions, then return either storage-only preparation or an editable release/listing intent. No upload, signature, wallet request, or transaction occurs.", TOOL_SCHEMAS.studioProjectIntake, studioProjectIntakeTool),
   tool("keel-studio-connect", "Connect this workspace to the user’s Studio account without copying keys. start returns a public approveUrl and code: open it for the user, who signs in and approves permissions. complete collects and privately saves the approved key; status never returns secrets. Draft/staging tools automatically use the saved connection. Never approve access for the user. No Desktop app or wallet transaction is required.", TOOL_SCHEMAS.studioConnect, studioConnectTool),
+  tool("keel-studio-access", "Read, revision-safely update or test the creator's access list with access:read/access:write. Supports automatic conditions and agent-managed custom rules, plus pending EIP-712 packets for a caller-owned signer. Never send a private key. approve submits only the configured signer's exact signature; it sends no transaction.", { type: "object", properties: { operation: { type: "string", enum: ["read", "update", "test", "requests", "approve"] }, releaseId: { type: "string", pattern: "^[0-9a-f-]{36}$" }, studioUrl: { type: "string" }, input: { type: "object" } }, required: ["operation", "releaseId"], additionalProperties: false }, studioAccessTool),
   tool("keel-studio-draft", "Create a website wallet-review route by creating a private release draft in the user's Studio account, or list/read/revision-safely edit it through their scoped key. Returns reviewUrl for the creator to open in their browser and publish with their existing connected wallet. KEEL Desktop and a separate signing page are not required. This tool does not sign or submit a chain action.", TOOL_SCHEMAS.studioDraft, studioDraftTool),
   tool("keel-studio-stage-project", "Stage bounded creator resources/modules and return the server-issued Studio handoff. Omitted viewer selects Studio's canonical KEEL Inline graph for later preparation; `none` is the explicit raw-artifact route with no viewer and does not prevent a later release or mint. Automatic compact preparation requires the exact selected-chain KeelRawTokenURIBuilder and canonical raw-percent shell fragments with receipts/read-back; Studio must never fall back to legacy Base64 carriage silently. A direct image, video, or self-contained GLB resolves to registered shell plus registered keel.asset-display@1 plus the creator media entry, never zero modules or a generated index.html. Legacy protector getters and NoProtector do not determine default Inline readiness. Creator HTML is content, never a replacement shell, and agents must not upload a locally manufactured KEEL shell, protected-harness wrapper, or local wrapper when the catalog is incomplete. Studio must fail closed for an incomplete selected-chain catalog during preparation. The scoped key is loaded from the private Studio connection or an existing environment override; no wallet signature or chain action occurs.", TOOL_SCHEMAS.studioStageProject, studioStageProjectTool),
   tool("keel-creator-collection-prepare", "Prepare one exact EIP-5792 KeelCreatorFactory batch plus its durable recovery envelope. This never signs or submits. Missing or ambiguous factory/renderer deployments stop before any wallet approval.", TOOL_SCHEMAS.creatorCollectionPrepare, creatorCollectionPrepareTool),

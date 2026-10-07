@@ -9,7 +9,7 @@ import { promisify } from "node:util";
 import { KEEL_STUDIO_URL } from "./endpoints.js";
 import { createKeelStudioAgentDraftClient } from "./studio-agent-drafts.js";
 
-export const STUDIO_CONNECTION_SCOPES = ["drafts:read", "drafts:create", "drafts:write", "contracts:read", "bridge:serve"] as const;
+export const STUDIO_CONNECTION_SCOPES = ["drafts:read", "drafts:create", "drafts:write", "contracts:read", "bridge:serve", "access:read", "access:write"] as const;
 export type StudioConnectionScope = typeof STUDIO_CONNECTION_SCOPES[number];
 export interface StudioConnectionOptions {
   readonly workspace?: string;
@@ -27,7 +27,7 @@ export interface StudioConnectionView {
   readonly scopes?: readonly StudioConnectionScope[];
   readonly label?: string;
 }
-type Saved = StudioConnectionView & { readonly token?: string; readonly pollToken?: string; readonly interval?: number };
+type Saved = StudioConnectionView & { readonly token?: string; readonly pollToken?: string; readonly interval?: number; readonly previous?: Saved };
 const TOKEN = /^keel_agent_[A-Za-z0-9_-]{20,180}$/u;
 const POLL = /^keel_pair_[A-Za-z0-9_-]{43}$/u;
 const locks = new Map<string, Promise<unknown>>();
@@ -68,7 +68,8 @@ async function readSaved(path: string, origin: string): Promise<Saved> {
       const saved = JSON.parse(await file.readFile("utf8")) as Saved;
       if (saved.studioUrl !== origin || !["pending", "connected", "denied", "expired", "collected"].includes(saved.status)) throw new Error("Studio credential record is invalid.");
       if ((saved.status === "connected" && !TOKEN.test(saved.token ?? "")) || (saved.status === "pending" && (!POLL.test(saved.pollToken ?? "") || !/^[A-Z2-9]{4}-[A-Z2-9]{4}$/u.test(saved.code ?? "")))) throw new Error("Studio credential record is invalid.");
-      if (saved.expiresAt && (!Number.isFinite(Date.parse(saved.expiresAt)) || Date.parse(saved.expiresAt) <= Date.now())) return { status: "expired", studioUrl: origin };
+      if (saved.previous && (saved.previous.status !== "connected" || saved.previous.studioUrl !== origin || !TOKEN.test(saved.previous.token ?? "") || saved.previous.previous)) throw new Error("Studio credential backup is invalid.");
+      if (saved.expiresAt && (!Number.isFinite(Date.parse(saved.expiresAt)) || Date.parse(saved.expiresAt) <= Date.now())) return saved.previous && (saved.previous.expiresAt === undefined || Date.parse(saved.previous.expiresAt) > Date.now()) ? saved.previous : { status: "expired", studioUrl: origin };
       return saved;
     } finally { await file.close(); }
   } catch (error) {
@@ -135,7 +136,7 @@ async function request(options: StudioConnectionOptions, origin: string, path: s
   return data;
 }
 function scopesOf(raw: unknown): StudioConnectionScope[] {
-  if (!Array.isArray(raw) || raw.length < 1 || raw.length > 5 || raw.some(s => !STUDIO_CONNECTION_SCOPES.includes(s))) throw new TypeError("Choose valid Studio connection permissions.");
+  if (!Array.isArray(raw) || raw.length < 1 || raw.length > 7 || raw.some(s => !STUDIO_CONNECTION_SCOPES.includes(s))) throw new TypeError("Choose valid Studio connection permissions.");
   return [...new Set(raw)] as StudioConnectionScope[];
 }
 export async function getStudioConnection(options: StudioConnectionOptions = {}): Promise<StudioConnectionView> {
@@ -146,13 +147,14 @@ export async function startStudioConnection(options: StudioConnectionOptions & {
   const { path, origin } = await location(options);
   return exclusive(path, async () => {
     const previous = await readSaved(path, origin);
-    if (!options.reconnect && ["pending", "connected"].includes(previous.status)) return view(previous);
     const scopes = scopesOf(options.scopes ?? ["drafts:read", "drafts:create", "contracts:read"]);
+    const needsMore = options.scopes !== undefined && scopes.some(scope => !previous.scopes?.includes(scope));
+    if (!options.reconnect && !needsMore && ["pending", "connected"].includes(previous.status)) return view(previous);
     const label = options.label ?? "KEEL agent";
     if (label.trim().length < 2 || label.length > 80 || /[\u0000-\u001f]/u.test(label)) throw new TypeError("Use a connection label of 2–80 characters.");
     const result = await request(options, origin, "/api/agent/pair", { client: options.client ?? "keel-mcp", label, scopes });
     if (!POLL.test(String(result.pollToken)) || !/^[A-Z2-9]{4}-[A-Z2-9]{4}$/u.test(String(result.code)) || !Number.isFinite(Date.parse(String(result.expiresAt)))) throw new Error("Studio pairing response is invalid.");
-    const saved: Saved = { status: "pending", studioUrl: origin, code: String(result.code), pollToken: String(result.pollToken), expiresAt: String(result.expiresAt), interval: Math.max(2, Number(result.interval) || 2), scopes, label };
+    const saved: Saved = { status: "pending", studioUrl: origin, code: String(result.code), pollToken: String(result.pollToken), expiresAt: String(result.expiresAt), interval: Math.max(2, Number(result.interval) || 2), scopes, label, ...(previous.status === "connected" ? { previous } : previous.previous ? { previous: previous.previous } : {}) };
     await save(path, saved);
     return view(saved);
   });
@@ -166,7 +168,7 @@ export async function completeStudioConnection(options: StudioConnectionOptions 
     if (result.status === "pending") return view(previous);
     if (["denied", "expired", "collected"].includes(String(result.status))) {
       const saved: Saved = { status: result.status as "denied" | "expired" | "collected", studioUrl: origin };
-      await save(path, saved); return view(saved);
+      await save(path, previous.previous ?? saved); return view(saved);
     }
     const grant = result.grant as Record<string, unknown> | undefined;
     if (result.status !== "approved" || !TOKEN.test(String(result.token)) || !grant || !Number.isFinite(Date.parse(String(grant.expiresAt)))) throw new Error("Studio approval response is invalid.");
@@ -185,7 +187,8 @@ export async function loadStudioAgentToken(options: StudioConnectionOptions = {}
     if (!TOKEN.test(envToken)) throw new Error("Configured Studio agent key is invalid.");
     return envToken;
   }
-  const saved = await readSaved(path, origin);
+  let saved = await readSaved(path, origin);
+  if (saved.status === "pending" && saved.previous && (saved.previous.expiresAt === undefined || Date.parse(saved.previous.expiresAt) > Date.now())) saved = saved.previous;
   if (saved.status !== "connected" || !saved.token) throw new Error("Connect this workspace to Studio first: call keel-studio-connect with operation=start, open approveUrl for the user, then operation=complete. Or run keel-mcp --connect --workspace . No key needs to be pasted into chat or environment files.");
   return saved.token;
 }
@@ -197,4 +200,9 @@ export async function importStudioAgentToken(token: string, options: StudioConne
 }
 export async function createConnectedStudioDraftClient(options: StudioConnectionOptions = {}) {
   return createKeelStudioAgentDraftClient({ studioUrl: studioConnectionOrigin(options.studioUrl), grantToken: await loadStudioAgentToken(options), ...(options.fetchImplementation ? { fetchImplementation: options.fetchImplementation } : {}) });
+}
+
+export async function createConnectedStudioAccessClient(options: StudioConnectionOptions = {}) {
+  const { createKeelStudioAccessClient } = await import("./studio-access.js");
+  return createKeelStudioAccessClient({ studioUrl: studioConnectionOrigin(options.studioUrl), grantToken: await loadStudioAgentToken(options), ...(options.fetchImplementation ? { fetchImplementation: options.fetchImplementation } : {}) });
 }

@@ -138,3 +138,5 @@ export * from "./pre-reveal.js";
 
 export * from "./network-index.js";
 export * from "./network-verification.js";
+
+export * from "./studio-access.js";

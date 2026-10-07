@@ -332,3 +332,7 @@ keys in chat; keep keyed URLs out of Git, logs and artwork. Do not bypass missin
 receipts or change chains. No browser minting page is implied by this workflow.
 
 Read [KEEL_NETWORK_DISCOVERY.md](../../docs/KEEL_NETWORK_DISCOVERY.md) for normal network discovery, configuration and selected-chain verification.
+
+## Studio collector access
+
+Use the Studio website for lists and condition setup; Desktop is optional. Read `docs/STUDIO_ACCESS.md` and the site's `/api/access/schema`. Request `access:read` and `access:write` through the user-approved secure connection; never assume a draft grant includes them. Local MCP `keel-studio-access` can read/update/test creator-owned lists and handle an external signer's pending packets. Remote MCP uses `keel_access_read/update/test/requests/approve`. Preserve revisions and unrelated member allocations/statuses. For unsupported social/history/custom sources use explicit agent-managed verification with real evidence. Never call an unavailable provider verified. A caller-owned signer keeps its key locally and sends only a signature over the reviewed packet. NFT ID consumption uses the onchain ERC-721 claim bitmap; ordinary ownership and ERC-1155/ERC-20 balances are separate reusable checks. Publishing/minting still needs the user's selected wallet in Studio.
