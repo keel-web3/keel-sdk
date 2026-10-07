@@ -867,7 +867,7 @@ async function studioAccessTool(context: ToolContext, value: unknown): Promise<u
 }
 
 async function studioDraftTool(context: ToolContext, value: unknown): Promise<unknown> {
-  const input = record(value, ["studioUrl", "operation", "releaseId", "projectId", "expectedRevision", "draft", "planningCommand", "defaultsCommand", "profileCommand", "profileSelection", "conversationCommand"], "Studio draft arguments");
+  const input = record(value, ["studioUrl", "operation", "releaseId", "projectId", "expectedRevision", "draft", "planningCommand", "defaultsCommand", "profileCommand", "profileSelection", "conversationCommand", "includeReadCall"], "Studio draft arguments");
   const operation = requiredString(input, "operation");
   if (!["list", "read", "diagnose", "plan", "plan-edit", "defaults", "defaults-edit", "profiles", "profiles-edit", "profile-select", "conversation", "conversation-suggest", "prepare-review", "storage-review", "create", "update"].includes(operation)) throw new TypeError("operation must be list, read, diagnose, plan, plan-edit, defaults, defaults-edit, conversation, conversation-suggest, prepare-review, storage-review, create, or update.");
   const configuredStudioUrl = optionalString(input, "studioUrl");
@@ -881,6 +881,7 @@ async function studioDraftTool(context: ToolContext, value: unknown): Promise<un
     studioUrl,
     grantToken: token,
     operation: operation as "list" | "read" | "diagnose" | "plan" | "plan-edit" | "defaults" | "defaults-edit" | "profiles" | "profiles-edit" | "profile-select" | "conversation" | "conversation-suggest" | "prepare-review" | "storage-review" | "create" | "update",
+    ...(input.includeReadCall === undefined ? {} : { includeReadCall: optionalBoolean(input, "includeReadCall")! }),
     ...(input.conversationCommand === undefined ? {} : { conversationCommand: input.conversationCommand as never }),
     ...(input.profileCommand === undefined ? {} : { profileCommand: input.profileCommand as never }),
     ...(input.profileSelection === undefined ? {} : { profileSelection: input.profileSelection as never }),

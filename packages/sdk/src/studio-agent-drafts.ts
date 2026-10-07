@@ -1,3 +1,4 @@
+import { decodeFunctionData, keccak256, parseAbi, type Hex } from "viem";
 import { parseKeelExecutionAuthority, type KeelExecutionAuthorityView } from "./studio-execution-authority.js";
 import { parseKeelNamedProjectProfile, validateKeelNamedProfileCommand, type KeelNamedProjectProfile, type KeelNamedProfileCommand } from "./studio-project-profiles.js";
 import { parseKeelSelectedProjectProfile, type KeelSelectedProjectProfile } from "./studio-project-defaults.js";
@@ -123,6 +124,28 @@ export interface KeelStudioMetadataReadCall {
   readonly runtimeSourceMatch: "not-established";
   readonly signing: "not-performed";
   readonly submission: "not-performed";
+}
+
+function checkedMetadataReadCall(value: KeelStudioMetadataReadCall): KeelStudioMetadataReadCall {
+  const hex = (input: unknown, bytes?: number): input is Hex => typeof input === "string" && /^0x(?:[0-9a-f]{2})*$/iu.test(input) && (bytes === undefined || input.length === 2 + bytes * 2);
+  const quantity = (input: unknown): input is string => typeof input === "string" && /^0x(?:0|[1-9a-f][0-9a-f]*)$/iu.test(input);
+  if (!value || value.schema !== "keel-metadata-read-call@1" || !Number.isSafeInteger(value.chainId) || value.chainId < 1
+    || value.signing !== "not-performed" || value.submission !== "not-performed" || value.runtimeSourceMatch !== "not-established"
+    || !value.request || Object.keys(value.request).some(key => !["to", "data", "value", "gas"].includes(key))
+    || !hex(value.request.to, 20) || !hex(value.request.data) || value.request.data.length > 4_200_002 || value.request.value !== "0x0"
+    || !quantity(value.request.gas) || BigInt(value.request.gas) <= 0n || BigInt(value.request.gas) > 60_000_000n
+    || !value.block || !quantity(value.block.number) || !(value.block.hash === null || hex(value.block.hash, 32))
+    || !/^[1-9][0-9]*$/u.test(value.block.gasLimit) || !hex(value.readerRuntimeCodeHash, 32) || !hex(value.calldataDigest, 32)
+    || keccak256(value.request.data) !== value.calldataDigest || !hex(value.expectedMetadataDigest, 32)
+    || ![value.expectedMetadataBytes, value.graphBytes, value.prefixBytes, value.suffixBytes].every(size => Number.isSafeInteger(size) && size >= 0)
+    || !Array.isArray(value.attempts) || value.attempts.length > 64
+    || Array.from(value.attempts).some(attempt => !attempt || !["eth_call", "eth_estimateGas"].includes(attempt.method) || !/^[1-9][0-9]*$/u.test(attempt.gas) || BigInt(attempt.gas) > 60_000_000n)) throw new TypeError("Studio returned an invalid read-only metadata call.");
+  const decoded = decodeFunctionData({ abi: parseAbi([
+    "function preparedTokenURI(bytes32 objectId,bytes32 digest,bytes prefix,bytes suffix) view returns (string)",
+    "function preEncodedTokenURI(bytes32 objectId,bytes32 digest,bytes prefix,bytes suffix) view returns (string)",
+  ]), data: value.request.data });
+  if (decoded.functionName !== value.functionName) throw new TypeError("The metadata call does not match its declared reader method.");
+  return value;
 }
 
 export interface KeelStudioReleaseDiagnostics {
@@ -371,7 +394,13 @@ export function createKeelStudioAgentDraftClient(options: KeelStudioAgentDraftCl
       reviewed(await studioAgentResponse(await studioAgentRequest(options, releasePath(releaseId), { cache: "no-store" }), [options.grantToken]));
   const diagnose = async (releaseId: string, diagnosticOptions: { readonly includeReadCall?: boolean } = {}): Promise<KeelStudioReleaseDiagnostics> => {
     if (diagnosticOptions.includeReadCall !== undefined && typeof diagnosticOptions.includeReadCall !== "boolean") throw new TypeError("includeReadCall must be a boolean.");
-    return studioAgentResponse(await studioAgentRequest(options, `${releasePath(releaseId)}/diagnostics${diagnosticOptions.includeReadCall ? "?includeReadCall=true" : ""}`, { cache: "no-store" }), [options.grantToken]);
+    const value = await studioAgentResponse<KeelStudioReleaseDiagnostics>(await studioAgentRequest(options, `${releasePath(releaseId)}/diagnostics${diagnosticOptions.includeReadCall ? "?includeReadCall=true" : ""}`, { cache: "no-store" }), [options.grantToken]);
+    if (value.schema !== "keel-release-diagnostics@1" || value.releaseId !== releaseId || value.signing !== "not-performed" || value.submission !== "not-performed" || value.uploadedBytes !== 0 || value.changed !== false) throw new TypeError("Studio returned another or mutating diagnostic result.");
+    if (value.metadataReadCall !== undefined) {
+      if (!diagnosticOptions.includeReadCall) throw new TypeError("Studio returned private call data that was not requested.");
+      checkedMetadataReadCall(value.metadataReadCall);
+    }
+    return value;
   };
   const planning = async (releaseId: string, command?: KeelStudioPlanningCommand): Promise<KeelStudioReleasePlanning> => {
     if (command !== undefined) validatePlanningCommand(command);
@@ -487,7 +516,7 @@ function operationDraft(config: KeelStudioAgentDraftOperationConfig): KeelStudio
 /** Execute one explicitly configured, creator-scoped draft operation. */
 export async function executeKeelStudioAgentDraftOperation(config: KeelStudioAgentDraftOperationConfig): Promise<KeelStudioAgentDraftOperationResult> {
   if (config === null || typeof config !== "object" || !isDraftOperation(config.operation)) throw new TypeError("Studio agent draft operation is unsupported.");
-  const supported = new Set(["studioUrl", "grantToken", "operation", "releaseId", "projectId", "draft", "expectedRevision", "planningCommand", "defaultsCommand", "profileCommand", "profileSelection", "conversationCommand", "fetchImplementation"]);
+  const supported = new Set(["studioUrl", "grantToken", "operation", "releaseId", "projectId", "draft", "expectedRevision", "planningCommand", "defaultsCommand", "profileCommand", "profileSelection", "conversationCommand", "includeReadCall", "fetchImplementation"]);
   for (const key of Object.keys(config)) if (!supported.has(key)) throw new TypeError(`Studio agent draft configuration.${key} is not supported.`);
   const client = createKeelStudioAgentDraftClient(config);
   switch (config.operation) {
