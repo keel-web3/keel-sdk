@@ -70,7 +70,7 @@ const published = fragment => {
 // Return the real compact reader before UI launch; the source change exists only in this proof bundle.
 const compactSource = sdk.compactInlineRuntime.toString().replace('const dataURL =', 'return resolve;\nconst dataURL =');
 assert.notEqual(compactSource, sdk.compactInlineRuntime.toString());
-class Element {}
+class Element { dataset = {}; style = { setProperty() {} }; querySelector() { return null; } }
 const compactRead = vm.runInNewContext(`(${compactSource})(()=>{},'',()=>{throw Error('unexpected Keccak')})`, {
   HTMLElement: Element, document: { querySelector: () => new Element() }, TextEncoder, TextDecoder, Uint8Array, DataView,
   crypto: webcrypto, atob, Blob, Response, DecompressionStream, URL, AbortController, setTimeout, clearTimeout,

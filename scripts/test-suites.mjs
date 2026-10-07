@@ -50,6 +50,14 @@ export const TEST_FILES_ON_DISK = Object.freeze(readdirSync(TEST_ROOT)
  * its execution boundary.
  */
 export const DETERMINISTIC_TEST_FILES = Object.freeze([
+  "tests/creator-prepared-inline.test.mjs",
+  "tests/mcp-studio-wallet-default.test.mjs",
+  "tests/sdk-network-index.test.mjs",
+  "tests/sdk-rpc.test.mjs",
+  "tests/sdk-publication-preflight.test.mjs",
+  "tests/sdk-studio-project-decisions.test.mjs",
+  "tests/sdk-studio-project-planner.test.mjs",
+
   "tests/mcp-pre-reveal.test.mjs",
   "tests/sdk-collector-metadata.test.mjs",
   "tests/sdk-compact-extensions.test.mjs",

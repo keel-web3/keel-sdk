@@ -50,9 +50,9 @@ test("MCP initializes, lists strict tools, and returns JSON-RPC parameter errors
   const directory = await mkdtemp(path.join("/tmp", "keel-mcp-"));
   try {
     const agentSkill = await readFile(new URL("../skills/fray-keel-agent/SKILL.md", import.meta.url), "utf8");
-    assert.match(agentSkill, /omit `viewer` for the normal path/iu);
-    assert.match(agentSkill, /does \*\*not\*\* ask\s+the\s+agent\s+to create another shell/iu);
-    assert.match(agentSkill, /Creator-authored HTML\s+is\s+still\s+valid project content/iu);
+    assert.match(agentSkill, /Omit `viewer` when no shell choice was supplied/iu);
+    assert.match(agentSkill, /Do not copy, fork, shrink, relabel, or upload\s+another canonical shell/iu);
+    assert.match(agentSkill, /Honor explicit `viewer: "none"` as creator-owned self-contained UTF-8 HTML/iu);
     assert.match(agentSkill, /Apply the Inline saver automatically/iu);
     assert.match(agentSkill, /Never ask the creator to opt in/iu);
     assert.match(agentSkill, /Revise one module without republishing the work/iu);
@@ -85,7 +85,7 @@ test("MCP initializes, lists strict tools, and returns JSON-RPC parameter errors
     assert.match(initialized?.result.instructions, /registered canonical KEEL verification shell/iu);
     assert.match(initialized?.result.instructions, /one declared changed resource/iu);
     const listed = await server.handle({ jsonrpc: "2.0", id: 5, method: "tools/list", params: {} });
-    assert.deepEqual(listed?.result.tools.map((tool) => tool.name), ["keel-tezos-shell-prepare", "keel-tezos-publication-prepare", "keel-network-inspect", "keel-tezos-standard-route-plan", "keel-contract-workflow-preflight", "keel-contract-controls", "keel-engine-catalog", "keel-revision-plan", "keel-project-decisions", "keel-inline-reuse-plan", "keel-inline-publication-check", "keel-inline-token-audit", "keel-editor-project-list", "keel-editor-project-read", "keel-editor-project-update", "keel-editor-project-open", "keel-layered-check", "keel-layered-select", "keel-layered-sample", "keel-layered-math", "keel-layered-reveal-plan", "keel-layered-direct-image-plan", "keel-svg-create", "keel-svg-inspect", "keel-svg-call-plan", "keel-layered-curation", "keel-token-matrix-prepare", "keel-arena-match-prepare", "keel-arena-claim-prepare", "analyze", "media-optimize", "media-optimize-apply", "build", "verify", "cost", "upload-plan", "chain-plan", "ethereum-encode", "publish-plan", "module-resolve", "module-lock", "wallet-request-prepare", "wallet-link", "module-review-prepare", "fray-auction-intake", "fray-stage-project", "keel-chain-guide", "keel-library-search", "keel-onchain-data-prepare", "keel-endpoint-config", "keel-studio-capabilities", "keel-studio-project-intake", "keel-studio-draft", "keel-studio-stage-project", "keel-creator-collection-prepare", "keel-shell-search", "keel-inline-prepare", "keel-shell-prepare", "keel-plugins-list"]);
+    assert.deepEqual(listed?.result.tools.map((tool) => tool.name), ["keel-tezos-shell-prepare", "keel-tezos-publication-prepare", "keel-network-inspect", "keel-tezos-standard-route-plan", "keel-contract-workflow-preflight", "keel-contract-controls", "keel-engine-catalog", "keel-revision-plan", "keel-project-decisions", "keel-inline-reuse-plan", "keel-inline-publication-check", "keel-inline-token-audit", "keel-network-discover", "keel-network-check", "keel-rpc-check", "keel-editor-project-list", "keel-editor-project-read", "keel-editor-project-update", "keel-editor-project-open", "keel-layered-check", "keel-layered-select", "keel-layered-sample", "keel-layered-math", "keel-layered-reveal-plan", "keel-layered-direct-image-plan", "keel-svg-create", "keel-svg-inspect", "keel-svg-call-plan", "keel-creator-inline-prepare", "keel-layered-curation", "keel-token-matrix-prepare", "keel-metadata-prepare", "keel-prereveal-prepare", "keel-arena-match-prepare", "keel-arena-claim-prepare", "analyze", "media-optimize", "media-optimize-apply", "build", "verify", "cost", "upload-plan", "chain-plan", "ethereum-encode", "publish-plan", "module-resolve", "module-lock", "wallet-request-prepare", "wallet-link", "module-review-prepare", "fray-auction-intake", "fray-stage-project", "keel-chain-guide", "keel-library-search", "keel-onchain-data-prepare", "keel-endpoint-config", "keel-studio-capabilities", "keel-studio-project-intake", "keel-studio-connect", "keel-studio-access", "keel-studio-draft", "keel-studio-stage-project", "keel-creator-collection-prepare", "keel-shell-search", "keel-inline-prepare", "keel-shell-prepare", "keel-plugins-list"]);
     const revisionTool = listed?.result.tools.find((tool) => tool.name === "keel-revision-plan");
     assert.match(revisionTool?.description, /unchanged object ID.*reused/iu);
     assert.equal(revisionTool?.inputSchema.properties.changedResourceIds.maxItems, 1);
@@ -97,9 +97,9 @@ test("MCP initializes, lists strict tools, and returns JSON-RPC parameter errors
     assert.match(stageTool?.description, /selected-chain KeelRawTokenURIBuilder/iu);
     assert.match(stageTool?.description, /never fall back to legacy Base64 carriage silently/iu);
     assert.match(stageTool?.description, /legacy protector getters and NoProtector do not determine default Inline readiness/iu);
-    assert.match(stageTool?.inputSchema.properties.viewer.description, /opts out of the shell only/iu);
-    assert.match(stageTool?.inputSchema.properties.viewer.description, /released, minted, and retrieved through its contract read/iu);
-    assert.match(stageTool?.inputSchema.properties.viewer.description, /direct creator asset/iu);
+    assert.match(stageTool?.inputSchema.properties.viewer.description, /Explicit none: preserve creator-owned self-contained HTML/iu);
+    assert.match(stageTool?.inputSchema.properties.viewer.description, /Both choices preserve immutable source, contract retrieval, and selected-chain checks/iu);
+    assert.match(stageTool?.inputSchema.properties.viewer.description, /no canonical protection claim/iu);
     const inlineTool = listed?.result.tools.find((tool) => tool.name === "keel-inline-prepare");
     assert.match(inlineTool?.description, /automatic.*raw-percent saver/iu);
     assert.deepEqual(inlineTool?.inputSchema.properties.carriage.enum, ["compact", "raw-percent"]);
@@ -214,26 +214,27 @@ test("MCP initializes, lists strict tools, and returns JSON-RPC parameter errors
     assert.match(frayPrompt?.result.messages[0].content.text, /stop and wait/iu);
     const keelPrompt = await server.handle({ jsonrpc: "2.0", id: 12, method: "prompts/get", params: { name: "keel-asset-review", arguments: { input: "asset.js" } } });
     assert.match(keelPrompt?.result.messages[0].content.text, /canonical KEEL Inline graph/iu);
-    assert.match(keelPrompt?.result.messages[0].content.text, /protected-harness wrapper/iu);
+    assert.match(keelPrompt?.result.messages[0].content.text, /registered canonical shell/iu);
     assert.match(keelPrompt?.result.messages[0].content.text, /Never use protectorPrefix, protectorSuffix, protectedHarnessDataURI, or a NoProtector result/iu);
-    assert.match(keelPrompt?.result.messages[0].content.text, /automatic compact raw-percent saver/iu);
+    assert.match(keelPrompt?.result.messages[0].content.text, /raw-percent preparation prepares one exact image carriage/iu);
     const repairPrompt = await server.handle({ jsonrpc: "2.0", id: 32, method: "prompts/get", params: { name: "keel-draft-repair", arguments: { releaseId: "release-1", expectedRevision: 7, request: "Optimize the poster without changing Inline mode.", presentationMode: "inline" } } });
     assert.equal(repairPrompt?.result.description, "Revision-bound, wallet-neutral KEEL Studio draft repair.");
     assert.match(repairPrompt?.result.messages[0].content.text, /media-optimize-apply/u);
     assert.match(repairPrompt?.result.messages[0].content.text, /expectedRevision 7/u);
-    assert.match(repairPrompt?.result.messages[0].content.text, /Never cancel, sign, submit, publish, request wallet approval/u);
+    assert.match(repairPrompt?.result.messages[0].content.text, /Never cancel, sign, submit, publish, or change storage\/presentation mode implicitly/u);
+    assert.match(repairPrompt?.result.messages[0].content.text, /owner-signable review link.*The owner approves in their wallet/u);
     const malformedPromptList = await server.handle({ jsonrpc: "2.0", id: 10, method: "prompts/list", params: { unexpected: true } });
     assert.equal(malformedPromptList?.error?.code, -32602);
     const malformedResourceList = await server.handle({ jsonrpc: "2.0", id: 22, method: "resources/list", params: null });
     assert.equal(malformedResourceList?.error?.code, -32602);
     const resourceFiles = await readdir(directory);
     const resourceList = await server.handle({ jsonrpc: "2.0", id: 23, method: "resources/list", params: {} });
-    assert.deepEqual(resourceList?.result.resources.map((resource) => resource.uri), ["keel://mcp/engine", "keel://mcp/svg-renderer", "keel://mcp/workflow", "keel://mcp/limits", "keel://mcp/project-routes", "keel://mcp/publication-modes", "keel://mcp/arena"]);
+    assert.deepEqual(resourceList?.result.resources.map((resource) => resource.uri), ["keel://mcp/studio-wallet-review", "keel://mcp/engine", "keel://mcp/svg-renderer", "keel://mcp/workflow", "keel://mcp/limits", "keel://mcp/project-routes", "keel://mcp/publication-modes", "keel://mcp/prereveal", "keel://mcp/arena"]);
     const resourceRead = await server.handle({ jsonrpc: "2.0", id: 24, method: "resources/read", params: { uri: "keel://mcp/limits" } });
     assert.equal(JSON.parse(resourceRead?.result.contents[0].text).kind, "offline-limits");
     const workflowRead = await server.handle({ jsonrpc: "2.0", id: 27, method: "resources/read", params: { uri: "keel://mcp/workflow" } });
     const workflow = JSON.parse(workflowRead?.result.contents[0].text);
-    assert.deepEqual(workflow.contractFirst.slice(0, 4), ["keel-contract-workflow-preflight", "keel-engine-catalog", "keel-network-inspect", "keel-library-search"]);
+    assert.deepEqual(workflow.contractFirst.slice(0, 6), ["keel-network-discover", "keel-network-check", "keel-contract-workflow-preflight", "keel-engine-catalog", "keel-network-inspect", "keel-library-search"]);
     assert.ok(workflow.steps.includes("module-resolve"));
     assert.ok(workflow.steps.includes("module-lock"));
     assert.ok(workflow.steps.includes("ethereum-encode"));
@@ -271,10 +272,10 @@ test("MCP initializes, lists strict tools, and returns JSON-RPC parameter errors
     assert.match(publicationModes.presentation.sdkPlanner.sizeReporting, /complete prepared tokenURI bytes/iu);
     assert.equal(publicationModes.staging.defaultViewer, "keel-verification-shell");
     assert.match(publicationModes.staging.normalMedia, /never manufacture an index\.html wrapper/iu);
-    assert.match(publicationModes.staging.catalogFailure, /fail closed/iu);
+    assert.match(publicationModes.staging.catalogFailure, /Fail when the chosen reader, builder or Hold lacks selected-chain evidence/iu);
     assert.match(publicationModes.staging.existingGraphRevision, /without asking the creator/iu);
     assert.match(publicationModes.staging.existingGraphRevision, /follow-latest.*without rewriting token presentation/iu);
-    assert.match(publicationModes.staging.activeBuilderResolution, /selected-chain KeelRawTokenURIBuilder.*Studio Inline catalog/iu);
+    assert.match(publicationModes.staging.activeBuilderResolution, /selected-chain KeelRawTokenURIBuilder, Hold code and deployment receipts/iu);
     assert.match(publicationModes.staging.activeBuilderResolution, /KeelRawTokenURIBuilder/iu);
     assert.match(publicationModes.staging.activeBuilderResolution, /PreEncodedGraph mode/iu);
     assert.match(publicationModes.staging.legacyProtectorLane, /older complete-document protector lane/iu);
@@ -716,7 +717,8 @@ test("Inline MCP automatically uses the single-pack compact carriage for creator
   try {
     await writeFile(path.join(directory, "entry.html"), "<!doctype html><img id='art'><script>art.src=__KEEL_CONTENT__.url('keel.animation')</script>");
     await writeFile(path.join(directory, "gif.js"), "globalThis.KEELGif=Object.freeze({ready:true});");
-    await writeFile(path.join(directory, "animation.avif"), Buffer.from(Array.from({ length: 16_384 }, (_, index) => (index * 73) & 0xff)));
+    const assetBytes = await readFile(new URL("../examples/demos/p5-flowfield/poster.webp", import.meta.url));
+    await writeFile(path.join(directory, "animation.webp"), assetBytes);
     await writeFile(path.join(directory, "poster.webp"), ONE_PIXEL_WEBP);
     const server = await createMcpServer({ workspaceRoot: directory });
     await server.handle({ jsonrpc: "2.0", id: 1, method: "initialize", params: initializeParams });
@@ -731,7 +733,7 @@ test("Inline MCP automatically uses the single-pack compact carriage for creator
         mediaType: "text/javascript",
         execution: "classic",
       }],
-      assets: [{ assetId: "keel.animation", path: "animation.avif", mediaType: "image/avif" }],
+      assets: [{ assetId: "keel.animation", path: "animation.webp", mediaType: "image/webp" }],
       collection: "0x1111111111111111111111111111111111111111",
       collectionName: "Compact",
       description: "Single-pack Inline test.",
@@ -739,6 +741,7 @@ test("Inline MCP automatically uses the single-pack compact carriage for creator
       manifestDigest: `0x${"1".repeat(64)}`,
       chainId: 11155111,
     });
+    assert.ok(!result?.result.isError, JSON.stringify(result));
     const plan = result?.result.structuredContent;
     assert.equal(plan.carriage, "compact");
     assert.equal(plan.resolvedCarriage, "raw-percent");
@@ -746,14 +749,14 @@ test("Inline MCP automatically uses the single-pack compact carriage for creator
     assert.equal(plan.storage.artworkBinaryPackingLayers, 1);
     assert.equal(plan.storage.completeDocumentBase64Layers, 0);
     assert.equal(plan.assets[0].binaryPackingLayers, 1);
-    assert.equal(plan.assets[0].sourceBytes, 16_384);
+    assert.equal(plan.assets[0].sourceBytes, assetBytes.byteLength);
     assert.equal(
       plan.assets[0].sourceToPackedOverheadPercent,
       ((plan.assets[0].packedFragmentBytes - plan.assets[0].sourceBytes) / plan.assets[0].sourceBytes) * 100,
     );
-    assert.equal(plan.storage.assetSourceBytes, 16_384);
+    assert.equal(plan.storage.assetSourceBytes, assetBytes.byteLength);
     assert.equal(plan.storage.assetPackedBytes, plan.assets[0].packedFragmentBytes);
-    assert.equal(plan.storage.creatorSourceBytes, 16_384 + Buffer.byteLength(await readFile(path.join(directory, "entry.html"))));
+    assert.equal(plan.storage.creatorSourceBytes, assetBytes.byteLength + Buffer.byteLength(await readFile(path.join(directory, "entry.html"))));
     assert.equal(plan.prepared.requiredBuilder, "KeelRawTokenURIBuilder");
     assert.equal(plan.prepared.animationEncoding, "raw-percent");
     assert.ok(plan.prepared.tokenURIBytes < 2_000_000);
@@ -764,8 +767,8 @@ test("Inline MCP automatically uses the single-pack compact carriage for creator
       modules: [{
         moduleId: "keel.animation",
         version: "1.0.0",
-        path: "animation.avif",
-        mediaType: "image/avif",
+        path: "animation.webp",
+        mediaType: "image/webp",
       }],
     });
     assert.equal(misclassified?.result.isError, true);
