@@ -1,4 +1,4 @@
-import { parseKeelNamedProjectProfile, type KeelNamedProjectProfile } from "./studio-project-profiles.js";
+import { parseKeelProjectProfileSnapshot, parseKeelNamedProjectProfile, type KeelProjectProfileSnapshot, type KeelNamedProjectProfile } from "./studio-project-profiles.js";
 import { compileKeelPlanMatrix, validateKeelPlanValue, type KeelPlanAnswers, type KeelPlanDefaults, type KeelPlanMatrix, type KeelPlanValue } from "./studio-project-planner.js";
 
 export interface KeelStudioDefaultProfile {
@@ -122,4 +122,22 @@ export function validateKeelStudioDefaultsCommand(value: unknown): KeelStudioDef
     scope: scope.kind === "global" ? { kind: "global" } : { kind: "media", mediaType: String(scope.mediaType) },
     values: JSON.parse(JSON.stringify(values)) as KeelStudioDefaultsCommand["values"],
     ...(input.askToSave === undefined ? {} : { askToSave: input.askToSave as boolean }) };
+}
+
+/** Private copied defaults. Never put this record in an artwork manifest or public metadata. */
+export interface KeelSelectedProjectProfile {
+  readonly snapshot: KeelProjectProfileSnapshot;
+  readonly defaults?: Pick<KeelPlanDefaults, "revision" | "global" | "byMedia">;
+}
+export function parseKeelSelectedProjectProfile(input: unknown): KeelSelectedProjectProfile {
+  if (!input || typeof input !== "object" || Array.isArray(input)) throw new TypeError("Invalid selected project profile.");
+  const value = input as Record<string, unknown>;
+  if (Object.keys(value).some(key => key !== "snapshot" && key !== "defaults")) throw new TypeError("A profile selection cannot carry permissions or wallet actions.");
+  const snapshot = parseKeelProjectProfileSnapshot(value.snapshot);
+  if (value.defaults === undefined) return { snapshot };
+  if (!value.defaults || typeof value.defaults !== "object" || Array.isArray(value.defaults)) throw new TypeError("Invalid copied project defaults.");
+  const defaults = value.defaults as Record<string, unknown>;
+  if (Object.keys(defaults).some(key => !["revision", "global", "byMedia"].includes(key)) || typeof defaults.revision !== "string" || !defaults.revision || defaults.revision.length > 240) throw new TypeError("Use bounded copied project defaults.");
+  const parsed = parseKeelStudioDefaultProfile({ schema: "keel-studio-default-profile@1", revision: 0, askToSave: false, global: defaults.global ?? {}, byMedia: defaults.byMedia ?? {} });
+  return { snapshot, defaults: { revision: defaults.revision, global: parsed.global, byMedia: parsed.byMedia } };
 }
