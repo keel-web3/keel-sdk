@@ -1,6 +1,6 @@
 import { createKeelStudioAgentDraftClient, studioAgentRequest, studioAgentResponse, type KeelStudioAgentDraftClientOptions } from "./studio-agent-drafts.js";
 import type { Account, Address, Hex } from "viem";
-export type KeelStudioAccessMember = { readonly wallet: Address; readonly allocation: number | null; readonly status: "eligible" | "ineligible" | "revoked"; readonly reason: string };
+export type KeelStudioAccessMember = { readonly audienceIds?: readonly string[]; readonly wallet: Address; readonly allocation: number | null; readonly status: "eligible" | "ineligible" | "revoked"; readonly reason: string };
 export type KeelStudioAccessUpdate = { readonly wallets: readonly Address[]; readonly expectedRevision: number | null; readonly campaign?: Readonly<Record<string, unknown>>; readonly members?: readonly KeelStudioAccessMember[] };
 export interface KeelStudioAccessSigningPacket {
   readonly domain: { readonly name: "Keel OneMint"; readonly version: "2"; readonly chainId: number; readonly verifyingContract: Address };
@@ -34,7 +34,7 @@ export function createKeelStudioAccessClient(options: KeelStudioAgentDraftClient
     confirmRaffle: (id: string, transactionHash: Hex) => raffle(id, { action: "confirm", transactionHash }),
     drawRaffle: (id: string) => raffle(id, { action: "draw" }),
     cancelUnsignedRaffle: (id: string) => raffle(id, { action: "cancel" }),
-    read: (id: string) => request<{ list: { id: string; revision: number; campaign: Record<string, unknown>; members: readonly { walletAddress: Address; allocation: number | null; status: string }[] } | null }>(id, "GET"),
+    read: (id: string) => request<{ list: { id: string; revision: number; campaign: Record<string, unknown>; members: readonly { walletAddress: Address; audienceIds?: readonly string[]; allocation: number | null; status: string }[] } | null }>(id, "GET"),
     update: (id: string, input: KeelStudioAccessUpdate) => request(id, "PUT", input),
     test: (id: string, wallet: Address, claimIds: readonly string[] = []) => request(id, "POST", { action: "test", wallet, claimIds }),
     requests: (id: string) => request<{ requests: readonly KeelStudioAccessSigningRequest[] }>(id, "GET", undefined, "?view=requests"),
