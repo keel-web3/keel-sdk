@@ -97,5 +97,25 @@ Focused tests cover resolver branching/defaults, persistence, optimistic conflic
 same-command retry, auth scopes, direct-mode parity, review invalidation and safe
 handler errors. The editor bundles with repository CSS. Browser interaction and
 accessibility execution, full repository checks, real PostgreSQL behavior and live
-chain simulation remain required before release. The current agent panel exposes
-the shared-plan workflow; provider setup and persistent chat are not active yet.
+chain simulation remain required before release. The in-editor Agent panel now reuses the existing connection setup and creator
+bridge queue. Conversations persist by release, with the latest twenty requests
+shown and the latest six included as bounded context. Only a strict reply schema
+can create proposed form values. Plain replies render as text; executable code and
+wallet instructions are never injected. The creator can edit those inputs and apply
+them through the same revision-checked draft writer. Older or conflicting proposals
+must be updated before application. Migration 0048 adds queue context and retry
+identity; the Rust bridge wire format and credentials are unchanged.
+
+Connected MCP agents use hosted `keel_release_conversation_read/suggest`, or portable
+`keel-studio-draft` operations `conversation` / `conversation-suggest` with a
+`conversationCommand` containing commandId, expectedRevision, message and optional
+answers. These operations require separate opt-in conversations:read/write scopes;
+existing project grants do not acquire access to private conversation history.
+Suggestions are saved as completed messages without invoking another model and
+without changing the plan. Applying the form remains an explicit owner action;
+ordinary scoped plan-edit remains available for creator-authorized direct edits.
+
+The current chat provider is the creator's existing bridge. Direct API-provider
+configuration, hosted paid assistance, vector memory, agent wallets and code-preview
+composition are not activated by this slice. No new credential, grant, subscription
+or wallet transaction is created by these source tests.

@@ -9,7 +9,7 @@ import { promisify } from "node:util";
 import { KEEL_STUDIO_URL } from "./endpoints.js";
 import { createKeelStudioAgentDraftClient } from "./studio-agent-drafts.js";
 
-export const STUDIO_CONNECTION_SCOPES = ["drafts:read", "drafts:create", "drafts:write", "contracts:read", "bridge:serve", "access:read", "access:write", "preferences:read", "preferences:write"] as const;
+export const STUDIO_CONNECTION_SCOPES = ["drafts:read", "drafts:create", "drafts:write", "contracts:read", "bridge:serve", "access:read", "access:write", "preferences:read", "preferences:write", "conversations:read", "conversations:write"] as const;
 export type StudioConnectionScope = typeof STUDIO_CONNECTION_SCOPES[number];
 export interface StudioConnectionOptions {
   readonly workspace?: string;

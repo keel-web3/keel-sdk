@@ -259,3 +259,24 @@ test("portable MCP forwards explicit defaults operations through the same accoun
     assert.equal(unsupported?.result.isError, true); assert.equal(requests.length, 2);
   } finally { globalThis.fetch = previousFetch; if (previousToken === undefined) delete process.env.KEEL_STUDIO_AGENT_TOKEN; else process.env.KEEL_STUDIO_AGENT_TOKEN = previousToken; }
 });
+
+test("portable MCP reads and shares reviewable conversation forms without model execution or plan mutation", async () => {
+  const previousToken = process.env.KEEL_STUDIO_AGENT_TOKEN, previousFetch = globalThis.fetch;
+  process.env.KEEL_STUDIO_AGENT_TOKEN = token;
+  const releaseId = "11111111-1111-4111-8111-111111111111", requests = [];
+  const suggestion = { commandId: "22222222-2222-4222-8222-222222222222", expectedRevision: 3, message: "A suggested title", answers: { title: "The proposal" } };
+  globalThis.fetch = async (url, init) => { requests.push({ url: String(url), init }); return Response.json(init.method === "POST"
+    ? { schema: "keel-release-conversation-suggestion@1", releaseId, revision: 3, turn: { id: suggestion.commandId }, signing: "not-performed", submission: "not-performed" }
+    : { schema: "keel-release-conversation@1", releaseId, revision: 3, turns: [], bridge: { configured: false, online: false }, editable: true, planningUrl: "https://untrusted.example" }); };
+  try {
+    const server = await createMcpServer(); await server.handle({ jsonrpc: "2.0", id: 1, method: "initialize", params: initializeParams });
+    for (const args of [{ operation: "conversation", releaseId }, { operation: "conversation-suggest", releaseId, conversationCommand: suggestion }]) {
+      const result = await call(server, 2, args); assert.notEqual(result?.result.isError, true, result?.result.content?.[0]?.text);
+      assert.equal(result?.result.structuredContent.planningUrl, `https://studio.example/studio/releases/${releaseId}/plan`);
+    }
+    assert.ok(requests.every(request => request.url === `https://studio.example/api/agent/drafts/${releaseId}/conversation`));
+    assert.equal(requests[1].init.method, "POST"); assert.deepEqual(JSON.parse(requests[1].init.body), suggestion);
+    const forbidden = await call(server, 3, { operation: "conversation-suggest", releaseId, conversationCommand: { ...suggestion, transaction: { data: "0x" } } });
+    assert.equal(forbidden?.result.isError, true); assert.equal(requests.length, 2);
+  } finally { globalThis.fetch = previousFetch; if (previousToken === undefined) delete process.env.KEEL_STUDIO_AGENT_TOKEN; else process.env.KEEL_STUDIO_AGENT_TOKEN = previousToken; }
+});
