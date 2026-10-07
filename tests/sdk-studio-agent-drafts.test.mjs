@@ -25,6 +25,24 @@ const baseDraft = {
   page: {},
 };
 
+test("shared planning reads and edits the same release revision without signing or trusting supplied URLs", async () => {
+  const { createKeelStudioAgentDraftClient } = await import(MODULE);
+  const releaseId = "11111111-1111-4111-8111-111111111111";
+  const command = { operation: "answer", commandId: releaseId, expectedRevision: 4, answers: { title: "My work" } };
+  const requests = [];
+  const client = createKeelStudioAgentDraftClient({ grantToken: "x".repeat(48), fetchImplementation: async (url, init) => {
+    requests.push({ url: String(url), ...init });
+    return Response.json({ schema: "keel-release-planning@1", releaseId, revision: init.method === "PATCH" ? 5 : 4, planningUrl: "https://untrusted.example/token", signing: "not-performed", submission: "not-performed" });
+  } });
+  assert.equal((await client.plan(releaseId)).planningUrl, `https://studio.onkeel.io/studio/releases/${releaseId}/plan`);
+  assert.equal(requests[0].method, undefined);
+  assert.equal((await client.editPlan(releaseId, command)).revision, 5);
+  assert.equal(requests[1].method, "PATCH");
+  assert.deepEqual(JSON.parse(requests[1].body), command);
+  await assert.rejects(client.editPlan(releaseId, { ...command, signingKey: "not-allowed" }), /Unsupported/u);
+  assert.equal(requests.length, 2);
+});
+
 test("draft review links use the hosted default and never forward untrusted URLs or credentials", async () => {
   const { createKeelStudioAgentDraftClient } = await import(MODULE);
   const token = `keel_agent_${"q".repeat(48)}`;
@@ -80,7 +98,7 @@ test("agent draft client covers every Studio release type without wallet or publ
     },
   });
 
-  assert.deepEqual(Object.keys(client).sort(), ["create", "list", "read", "update"]);
+  assert.deepEqual(Object.keys(client).sort(), ["create", "diagnose", "editPlan", "list", "plan", "read", "update"]);
   for (const releaseType of KEEL_STUDIO_RELEASE_TYPES) {
     const supply = releaseType === "open-edition" ? "open" : releaseType === "one-of-one" ? "1" : "100";
     const created = await client.create({ ...baseDraft, releaseType, supply, title: `Agent ${releaseType}` });
@@ -190,4 +208,18 @@ test("portable draft validation rejects malformed or stale-agent payloads before
   });
   await assert.rejects(client.create({ ...baseDraft, supply: "0" }), /positive integer/u);
   assert.equal(requests, 0);
+});
+
+test("diagnose retries the existing release with a read-only request and unchanged IDs", async () => {
+  const { executeKeelStudioAgentDraftOperation } = await import(MODULE);
+  const calls = [];
+  const diagnostic = { schema: "keel-release-diagnostics@1", releaseId: "release-existing", artifactId: "artifact-existing", status: "blocked", code: "rpc-unavailable", actions: ["retry-read"], signing: "not-performed", submission: "not-performed", uploadedBytes: 0, changed: false };
+  const result = await executeKeelStudioAgentDraftOperation({ operation: "diagnose", releaseId: "release-existing", grantToken: "a".repeat(48),
+    fetchImplementation: async (url, init) => { calls.push({ url: String(url), init }); return Response.json(diagnostic); } });
+  assert.deepEqual(result, diagnostic);
+  assert.equal(calls.length, 1);
+  assert.equal(calls[0].url, "https://studio.onkeel.io/api/agent/drafts/release-existing/diagnostics");
+  assert.equal(calls[0].init.method, undefined);
+  assert.equal(calls[0].init.body, undefined);
+  assert.equal(calls[0].init.cache, "no-store");
 });

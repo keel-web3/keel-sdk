@@ -334,6 +334,10 @@
     "./studio-access": {
       "types": "./dist/studio-access.d.ts",
       "import": "./dist/studio-access.js"
+    },
+    "./studio-project-planner": {
+      "types": "./dist/studio-project-planner.d.ts",
+      "import": "./dist/studio-project-planner.js"
     }
   },
   "files": [
