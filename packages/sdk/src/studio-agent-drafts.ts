@@ -1,3 +1,4 @@
+import type { KeelExecutionAuthorityView } from "./studio-execution-authority.js";
 import { parseKeelNamedProjectProfile, validateKeelNamedProfileCommand, type KeelNamedProjectProfile, type KeelNamedProfileCommand } from "./studio-project-profiles.js";
 import { parseKeelSelectedProjectProfile, type KeelSelectedProjectProfile } from "./studio-project-defaults.js";
 export type KeelStudioProjectProfilesView = KeelStudioDefaultsView & { readonly starters: readonly KeelNamedProjectProfile[] };
@@ -27,6 +28,7 @@ import type { KeelStudioPlanningCommand, KeelStudioPlan, KeelPlanMatrix, KeelRes
 
 export interface KeelStudioReleasePlanning {
   readonly schema: "keel-release-planning@1";
+  readonly execution?: KeelExecutionAuthorityView;
   readonly releaseId: string;
   readonly revision: number;
   readonly plan: KeelStudioPlan;
@@ -40,6 +42,7 @@ export interface KeelStudioReleasePlanning {
 }
 export interface KeelStudioReleaseWalletReview {
   readonly schema: "keel-release-wallet-review@1";
+  readonly execution?: KeelExecutionAuthorityView;
   readonly releaseId: string; readonly revision: number; readonly wallet: string;
   readonly preparation: { readonly operationId: string; readonly chainId: number;
     readonly calls: readonly { readonly kind: string; readonly to: string; readonly data: string; readonly value: string }[];

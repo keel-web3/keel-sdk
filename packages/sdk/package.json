@@ -354,6 +354,10 @@
     "./studio-project-profiles": {
       "types": "./dist/studio-project-profiles.d.ts",
       "import": "./dist/studio-project-profiles.js"
+    },
+    "./studio-execution-authority": {
+      "types": "./dist/studio-execution-authority.d.ts",
+      "import": "./dist/studio-execution-authority.js"
     }
   },
   "files": [
