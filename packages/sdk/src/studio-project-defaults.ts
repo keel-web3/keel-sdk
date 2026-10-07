@@ -1,3 +1,4 @@
+import { parseKeelNamedProjectProfile, type KeelNamedProjectProfile } from "./studio-project-profiles.js";
 import { compileKeelPlanMatrix, validateKeelPlanValue, type KeelPlanAnswers, type KeelPlanDefaults, type KeelPlanMatrix, type KeelPlanValue } from "./studio-project-planner.js";
 
 export interface KeelStudioDefaultProfile {
@@ -6,6 +7,7 @@ export interface KeelStudioDefaultProfile {
   readonly askToSave: boolean;
   readonly global: KeelPlanAnswers;
   readonly byMedia: Readonly<Record<string, KeelPlanAnswers>>;
+  readonly namedProfiles?: readonly KeelNamedProjectProfile[];
 }
 export type KeelStudioDefaultScope = { readonly kind: "global" } | { readonly kind: "media"; readonly mediaType: string };
 const mediaPattern = /^[a-z0-9][a-z0-9.+-]{0,63}\/[a-z0-9][a-z0-9.+-]{0,95}$/u;
@@ -37,13 +39,16 @@ export function createKeelStudioDefaultProfile(): KeelStudioDefaultProfile {
 
 export function parseKeelStudioDefaultProfile(value: unknown): KeelStudioDefaultProfile {
   const input = object(value);
-  if (Object.keys(input).some(key => !["schema", "revision", "askToSave", "global", "byMedia"].includes(key))
+  if (Object.keys(input).some(key => !["schema", "revision", "askToSave", "global", "byMedia", "namedProfiles"].includes(key))
     || input.schema !== "keel-studio-default-profile@1" || !Number.isSafeInteger(input.revision) || Number(input.revision) < 0
     || typeof input.askToSave !== "boolean") throw new TypeError("Invalid saved defaults profile.");
   const media = Object.entries(object(input.byMedia));
   if (media.length > 32 || media.some(([key]) => !mediaPattern.test(key))) throw new TypeError("Saved defaults need a bounded set of exact media types.");
+  if (input.namedProfiles !== undefined && (!Array.isArray(input.namedProfiles) || input.namedProfiles.length > 24)) throw new TypeError("Use a bounded named profile collection.");
+  const namedProfiles = input.namedProfiles === undefined ? undefined : (input.namedProfiles as unknown[]).map(parseKeelNamedProjectProfile);
+  if (namedProfiles && new Set(namedProfiles.map(profile => profile.id)).size !== namedProfiles.length) throw new TypeError("Named profile IDs must be unique.");
   const profile = { schema: "keel-studio-default-profile@1" as const, revision: Number(input.revision), askToSave: input.askToSave,
-    global: answers(input.global), byMedia: Object.freeze(Object.fromEntries(media.map(([key, item]) => [key, answers(item)]))) };
+    ...(namedProfiles ? { namedProfiles } : {}), global: answers(input.global), byMedia: Object.freeze(Object.fromEntries(media.map(([key, item]) => [key, answers(item)]))) };
   if (new TextEncoder().encode(JSON.stringify(profile)).byteLength > 65_536) throw new RangeError("Saved defaults exceed the supported profile size.");
   return Object.freeze(profile);
 }

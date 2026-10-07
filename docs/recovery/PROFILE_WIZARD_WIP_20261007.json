@@ -1,0 +1,114 @@
+{
+  "schema": "keel-profile-wizard-wip@1",
+  "status": "unfinished unvalidated source checkpoint",
+  "parents": {
+    "site": "3bea287c57bb373c17322f5bc4c1d4e46144c3e7",
+    "sdk": "0aaadd3ea06a5412574736bad15e53c25d7ded7a"
+  },
+  "implemented": [
+    "Typed orthogonal named profile model",
+    "Shared preferences revision/idempotency boundary for profile edits",
+    "Profile picker and one-stage creation work surface"
+  ],
+  "remaining": [
+    "Bind copied profile settings to durable project creation and resume",
+    "Profile MCP/SDK client exposure",
+    "Focused regression tests and full typecheck",
+    "Independent review and browser validation"
+  ],
+  "files": [
+    {
+      "repository": "keel-web3/keel-site",
+      "path": "apps/studio/src/server/services/studio-project-defaults-service.ts",
+      "bytes": 3575,
+      "sha256": "0ed26af79c56abc8f49f1e085482c4d156c81cca2a533b9b6e1b126f43d5c4c2",
+      "gitSha": "4b0b53d2b92d17a680300cf06b0024ae87232b38"
+    },
+    {
+      "repository": "keel-web3/keel-site",
+      "path": "apps/studio/src/lib/studio-defaults-client.ts",
+      "bytes": 5443,
+      "sha256": "3df99c8e5a4bd98ebea2b32678ef3479ee0abe8e9afb069e59ab38f372aafa28",
+      "gitSha": "6fd0529329b59308f795757c5f1f00d6c079f7cb"
+    },
+    {
+      "repository": "keel-web3/keel-site",
+      "path": "apps/studio/src/server/services/studio-project-profiles-service.ts",
+      "bytes": 2265,
+      "sha256": "cccada3f7d7f7c3dff8c59ed32d7e01ddcba3ae3f176422b312f87d539bc2df8",
+      "gitSha": "772c48b0893d46d98e6c252b72c442030d43d9d9"
+    },
+    {
+      "repository": "keel-web3/keel-site",
+      "path": "apps/studio/src/server/http/studio-project-profiles-handler.ts",
+      "bytes": 3277,
+      "sha256": "2947130491185703a2509fd3fec5dce5d15c6b76fdece781a22e2173014b1ce1",
+      "gitSha": "f43d98f63e17ba857c60ab3aaf68be9bfdfbfb31"
+    },
+    {
+      "repository": "keel-web3/keel-site",
+      "path": "apps/studio/src/app/api/account/project-profiles/route.ts",
+      "bytes": 301,
+      "sha256": "82a6d20f7e6b8f0144941c2e84bf6649b3f2fc945bbe82a2045d01e7a8e37374",
+      "gitSha": "34cbaac6f65540d54c6471cec817f2463dcc9163"
+    },
+    {
+      "repository": "keel-web3/keel-site",
+      "path": "apps/studio/src/app/api/agent/project-profiles/route.ts",
+      "bytes": 300,
+      "sha256": "fc99d8d927c40e23851d928f9e3b0f0dca784a5c504a2d3231c2628ae9d2bab1",
+      "gitSha": "1de92f0f3e86d2277f2611a352f290dc9982ad74"
+    },
+    {
+      "repository": "keel-web3/keel-site",
+      "path": "apps/studio/src/components/create/project-profile-chooser.tsx",
+      "bytes": 12544,
+      "sha256": "0a84eda0697e687e450d85985464c5096118c4d1dc7f78e7b04329945fa47f17",
+      "gitSha": "08b5d40ad0d6342783b6a9ba00aa62becc40d72a"
+    },
+    {
+      "repository": "keel-web3/keel-site",
+      "path": "apps/studio/src/components/create/focused-project-wizard.tsx",
+      "bytes": 2954,
+      "sha256": "c7271b1e7fa2c4b6c7c59a324a8d97a265ea88dd035b2bc68e3f4dcc0e8beb80",
+      "gitSha": "178e477126989a918013859a7fcfa992f47d1fcf"
+    },
+    {
+      "repository": "keel-web3/keel-site",
+      "path": "apps/studio/src/stores/upload-store.ts",
+      "bytes": 18024,
+      "sha256": "5ccc4d581576269eb6e9b80380affeae880415e333e13c690765fd868af1e4cf",
+      "gitSha": "630de16d73e04452f876ec218ec37448c64399b0"
+    },
+    {
+      "repository": "keel-web3/keel-site",
+      "path": "apps/studio/src/components/create/upload-wizard.tsx",
+      "bytes": 49017,
+      "sha256": "1dd31b129e5742baf065709e9363a1f84b0974afc37e220b72b3ee97574f405b",
+      "gitSha": "c338a07e5b2736b1728809e3a64fd2f6db5cb7ce"
+    },
+    {
+      "repository": "keel-web3/keel-sdk",
+      "path": "packages/sdk/src/studio-project-profiles.ts",
+      "bytes": 12722,
+      "sha256": "398a26ca970ecf21573c647752a500957b409eee6537189d97c514c7e2ca0208",
+      "gitSha": "ab2071e13ddd3b125a3e9106b63cf97624ad3e9a"
+    },
+    {
+      "repository": "keel-web3/keel-sdk",
+      "path": "packages/sdk/src/studio-project-defaults.ts",
+      "bytes": 9662,
+      "sha256": "ace9b35deb6e78aa96a6ec4b2774f7c93140bc489dbc6e46abc1298a694425ca",
+      "gitSha": "be2fa37e26dd1642d7a578ffd2a8ef7d4b5cc002"
+    },
+    {
+      "repository": "keel-web3/keel-sdk",
+      "path": "packages/sdk/package.json",
+      "bytes": 11673,
+      "sha256": "ab5839f3122f1f9ff6cc08bc646433f46873c79a933c9edc55f5a31b26467702",
+      "gitSha": "d32987752538175421972561ce71cec024dc98c3"
+    }
+  ],
+  "merged": false,
+  "deployed": false
+}
