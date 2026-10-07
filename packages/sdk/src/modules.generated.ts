@@ -1466,6 +1466,36 @@ export const KEEL_DEPLOYMENTS: readonly KeelDeployment[] = [
     "txHash": "0xb261303956960015186934bf8ca1131ed4f1284d3f771621897cfd4c34e5f867"
   },
   {
+    "module": "keel-mint-access",
+    "chainId": 11155111,
+    "instance": "studio-audience-checkout-20261006",
+    "contract": "KeelMintRouteRegistry",
+    "address": "0x96Cef44bDd8647F42c66d1B82e69334a9b4aDcB3",
+    "block": "11860361",
+    "txHash": "0x73b06797679e78d74eacf3c25dd50b2e25965256a414ee5e4c049c09a63e1d4c",
+    "runtimeCodeHash": "0xaf8ae20faf322f9c1f4e05aa15b8c9daf3e326c38a12a1241347b1f19a99ff6c"
+  },
+  {
+    "module": "keel-mint-access",
+    "chainId": 11155111,
+    "instance": "studio-audience-checkout-20261006",
+    "contract": "KeelOneMintBatch",
+    "address": "0xF3F919f9841eAcd166E49EBc42660e1F48491018",
+    "block": "11860363",
+    "txHash": "0x2b353f0a5c17e5f55a86a661cd71287bf0148bc45e92357977936676f4564d95",
+    "runtimeCodeHash": "0xa460048aa67eecce1f61733a005a16f3655aca832797e14eb1681adf5bf3eae3"
+  },
+  {
+    "module": "keel-mint-access",
+    "chainId": 11155111,
+    "instance": "studio-audience-checkout-20261006",
+    "contract": "OpenOneMintController",
+    "address": "0xEF3306378895a9B49ed16416A8fCb767E79b8595",
+    "block": "11860365",
+    "txHash": "0x653fc27e4b519864ba76db379fa6beef5fb17bfe4a8c9869395a3fd47671d894",
+    "runtimeCodeHash": "0x9ffeb1f1302e98b028184673c50ba3bb869fa52f0be1533c5c948c9f7ca6a4bf"
+  },
+  {
     "module": "keel-publication",
     "chainId": 11155111,
     "instance": "creator-inline-20261005",

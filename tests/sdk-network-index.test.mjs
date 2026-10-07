@@ -15,11 +15,16 @@ const response = value => async () => Response.json(value);
 
 test('deployed network catalog derives from actual records, not wallet/faucet support', () => {
   assert.deepEqual(snapshot.networks.map(n => n.chainId), [11155111]);
-  assert.equal(snapshot.networks[0].deployments.length, 58);
+  assert.equal(snapshot.networks[0].deployments.length, 61);
   const creator = resolveKeelCreatorTarget(snapshot);
   assert.equal(creator.instance, 'creator-inline-20261005');
   assert.equal(creator.deployments.length, 15);
   assert.equal(creator.factory, '0x5828eBA761ab5eA72A349284da5658AD0ECD8416');
+  const checkout = snapshot.networks[0].deployments.filter(d => d.instance === 'studio-audience-checkout-20261006');
+  assert.deepEqual(checkout.map(d => d.contract).sort(), ['KeelMintRouteRegistry','KeelOneMintBatch','OpenOneMintController']);
+  assert.equal(checkout.find(d => d.contract === 'OpenOneMintController').address, '0xEF3306378895a9B49ed16416A8fCb767E79b8595');
+  assert.ok(checkout.every(d => /^0x[0-9a-f]{64}$/u.test(d.runtimeCodeHash) && d.txHash && BigInt(d.block) > 11860360n));
+  assert.throws(() => resolveKeelCreatorTarget(snapshot, { instance: 'studio-audience-checkout-20261006' }), /KeelHold/u);
   assert.throws(() => resolveKeelIndexedNetwork(snapshot, { chainId: 84532 }), /no indexed deployments/u);
 });
 
@@ -112,7 +117,7 @@ test('MCP discovery and creator preparation share the index-selected target and 
     const index = clone(); const modern = index.networks[0].deployments.filter(d => d.instance === 'creator-inline-20261005');
     index.networks[0].deployments = modern.map(d => ({ ...d, instance: 'configured-creator' })); index.networks[0].defaultInstance = 'configured-creator';
     globalThis.fetch = response(index);
-    const server = await createMcpServer({ workspaceRoot: root });
+    const server = await createMcpServer({ workspaceRoot: root, pluginConfig: false });
     await server.handle({ jsonrpc: '2.0', id: 0, method: 'initialize', params: { protocolVersion: '2024-11-05', capabilities: {}, clientInfo: { name: 'network-test', version: '1' } } });
     const call = (id,name,args={}) => server.handle({ jsonrpc: '2.0', id, method: 'tools/call', params: { name, arguments: args } });
     const discovered = (await call(1, 'keel-network-discover')).result.structuredContent;
