@@ -112,7 +112,7 @@ test("agent draft client covers every Studio release type without wallet or publ
     },
   });
 
-  assert.deepEqual(Object.keys(client).sort(), ["conversation", "create", "defaults", "diagnose", "editDefaults", "editPlan", "list", "plan", "read", "storageReview", "suggest", "update"]);
+  assert.deepEqual(Object.keys(client).sort(), ["conversation", "create", "defaults", "diagnose", "editDefaults", "editPlan", "list", "plan", "prepareReview", "read", "storageReview", "suggest", "update"]);
   for (const releaseType of KEEL_STUDIO_RELEASE_TYPES) {
     const supply = releaseType === "open-edition" ? "open" : releaseType === "one-of-one" ? "1" : "100";
     const created = await client.create({ ...baseDraft, releaseType, supply, title: `Agent ${releaseType}` });
@@ -236,4 +236,26 @@ test("diagnose retries the existing release with a read-only request and unchang
   assert.equal(calls[0].init.method, undefined);
   assert.equal(calls[0].init.body, undefined);
   assert.equal(calls[0].init.cache, "no-store");
+});
+
+test("exact owner-review preparation binds the saved revision and derives a safe operation URL", async () => {
+  const { createKeelStudioAgentDraftClient, executeKeelStudioAgentDraftOperation } = await import(MODULE);
+  const releaseId = "11111111-1111-4111-8111-111111111111", operationId = "22222222-2222-4222-8222-222222222222";
+  const requests = [], answer = { schema: "keel-release-wallet-review@1", releaseId, revision: 7, wallet: `0x${"33".repeat(20)}`,
+    preparation: { operationId, chainId: 11155111, calls: [{ kind: "create-drop", to: `0x${"44".repeat(20)}`, data: "0x1234", value: "0x0" }] },
+    reviewUrl: "https://wrong.example/?secret=discard", signing: "not-performed", submission: "not-performed" };
+  let current = answer;
+  const config = { studioUrl: "https://studio.example", grantToken: "x".repeat(48), fetchImplementation: async (url, init) => { requests.push({ url: String(url), ...init }); return Response.json(current); } };
+  const client = createKeelStudioAgentDraftClient(config);
+  const result = await client.prepareReview(releaseId, 7);
+  assert.equal(result.reviewUrl, `https://studio.example/studio/releases/${releaseId}/review?operation=${operationId}&revision=7`);
+  assert.equal(requests[0].url, `https://studio.example/api/agent/drafts/${releaseId}/review`); assert.equal(requests[0].method, "POST");
+  assert.deepEqual(JSON.parse(requests[0].body), { expectedRevision: 7 });
+  assert.equal((await executeKeelStudioAgentDraftOperation({ ...config, operation: "prepare-review", releaseId, expectedRevision: 7 })).preparation.operationId, operationId);
+  await assert.rejects(client.prepareReview(releaseId, 0), /revision/u);
+  await assert.rejects(executeKeelStudioAgentDraftOperation({ ...config, operation: "prepare-review", releaseId, expectedRevision: 7, wallet: "override" }), /wallet is not supported/u);
+  assert.equal(requests.length, 2);
+  for (const bad of [{ revision: 8 }, { releaseId: operationId }, { signing: "performed" }, { preparation: { ...answer.preparation, operationId: "../other" } }, { preparation: { ...answer.preparation, calls: [null] } }]) {
+    current = { ...answer, ...bad }; await assert.rejects(client.prepareReview(releaseId, 7), /invalid wallet-review identity/u);
+  }
 });

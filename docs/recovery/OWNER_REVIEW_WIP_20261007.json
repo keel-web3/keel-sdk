@@ -1,0 +1,181 @@
+{
+  "schema": "keel-owner-review-wip@1",
+  "createdAt": "2026-10-07T13:52:24Z",
+  "status": "unreviewed source-only checkpoint",
+  "parents": {
+    "site": "6f8d1707c07bc2ac3900b6fc503e11107620932b",
+    "sdk": "7de466d467bb964d0b064fcfd2fa8e97c636286e"
+  },
+  "validation": {
+    "serviceHandlerPlannerTests": 33,
+    "navigationTests": 8,
+    "mountedDomTests": 2,
+    "sdkPortableTests": 17,
+    "sdkBuild": "passed",
+    "siteTypecheck": "earlier source passed; final generated-route check in progress",
+    "browser": "not run; prior environment launch denied",
+    "liveDatabase": "not run",
+    "liveIncident": "not recovered"
+  },
+  "files": [
+    {
+      "repository": "keel-web3/keel-site",
+      "path": "apps/studio/tests/unit/release-review-handoff.test.ts",
+      "gitSha": "771365e613ec254bad66fa255e28fb1ddd646e53",
+      "sha256": "f9e1c4b6acae794ab4691972f572cceb5df084b5ecbb476c2e9c07492d549b63",
+      "bytes": 7245
+    },
+    {
+      "repository": "keel-web3/keel-site",
+      "path": "apps/studio/tests/unit/studio-plan-navigation.test.ts",
+      "gitSha": "44fd97e4dc1bec0395117c3eeab4c493829cc315",
+      "sha256": "cac7de73861f83e7a50d234bf110b890e2704695eea4f2e4529f77cb4224f4f7",
+      "bytes": 3935
+    },
+    {
+      "repository": "keel-web3/keel-site",
+      "path": "apps/studio/tests/unit/release-owner-review-mounted.test.ts",
+      "gitSha": "ead292bfb56765619bc767ea2e2c145e43b32104",
+      "sha256": "2132b923a4d5efa7ce0f346b65503ea680e3a56ef8fa245a2a6c5dfa401b28e3",
+      "bytes": 9011
+    },
+    {
+      "repository": "keel-web3/keel-site",
+      "path": "apps/studio/tests/unit/release-read-integration.test.ts",
+      "gitSha": "1225d3c586c26b8a3ff87d5584cfa7bdc671c03f",
+      "sha256": "e2e19ce7def623aedf279f62d352a847ce588bd6aac1f2b40c81153c9dd4cb63",
+      "bytes": 28146
+    },
+    {
+      "repository": "keel-web3/keel-site",
+      "path": "apps/studio/tests/unit/release-planning.test.ts",
+      "gitSha": "4fb95b8ddb9aec8cab3ff396c11a3c5ad92b7a64",
+      "sha256": "f65d2dfcc6ab6abf799438c739e1ad5f5fbe216157e212b74147c5c4db943f1f",
+      "bytes": 23747
+    },
+    {
+      "repository": "keel-web3/keel-site",
+      "path": "apps/studio/src/server/services/release-planning-service.ts",
+      "gitSha": "b99e85a5faacc4109886c5d5e725ea2a4f7d8ef5",
+      "sha256": "1a4ab1b0d1fc193121854364bf2cfb863991c308320d2cd33bc8a1b81462ec5b",
+      "bytes": 5137
+    },
+    {
+      "repository": "keel-web3/keel-site",
+      "path": "apps/studio/src/server/agent/studio-mcp.ts",
+      "gitSha": "49c7b4f36898fd176a6fcf963c8b21bd15a7e0b5",
+      "sha256": "8d0c3d46096b69a15a839d769b8484c5644fc7dc6a5b27d0052824eb4f3f8161",
+      "bytes": 40567
+    },
+    {
+      "repository": "keel-web3/keel-site",
+      "path": "apps/studio/src/app/api/agent/drafts/[releaseId]/review/route.ts",
+      "gitSha": "70e16aa873cbcd11fb28a813a23bd172b6eda55c",
+      "sha256": "ac77dcf57ce90895dc853472ed9635559dfe6e82d7eaa8dab0a05e2fe50d2777",
+      "bytes": 375
+    },
+    {
+      "repository": "keel-web3/keel-site",
+      "path": "apps/studio/src/app/api/releases/[releaseId]/review/route.ts",
+      "gitSha": "f897dff6435a6f85777cc7f231692c2853402de7",
+      "sha256": "b68108b18eabfdf2e0d36bd35d4829044b204fa860202a09e201c4cd09103c33",
+      "bytes": 376
+    },
+    {
+      "repository": "keel-web3/keel-site",
+      "path": "apps/studio/src/app/api/releases/[releaseId]/prepare/route.ts",
+      "gitSha": "2651a58490fc1b9322049793f2669a629de625b3",
+      "sha256": "413b99452398e7b7eb82765324c7d677ad5629e31a155bbf67cdf22f3e5fd7f7",
+      "bytes": 3591
+    },
+    {
+      "repository": "keel-web3/keel-site",
+      "path": "apps/studio/src/app/studio/releases/[releaseId]/plan/page.tsx",
+      "gitSha": "a174c9dda8043a2fbce55df601e2c890c24f7105",
+      "sha256": "5af8bce1eb77384852b87242efee5b06023881e659e1785163e1e17f7bce6c2f",
+      "bytes": 1040
+    },
+    {
+      "repository": "keel-web3/keel-site",
+      "path": "apps/studio/src/components/studio/planning/release-plan-editor.tsx",
+      "gitSha": "fd25fcd6711e940f7f2667fda1ad64e0530637d3",
+      "sha256": "00391f99a35beee0bf6612eb4ad8b7834e92314de4eaa9e195a9bb9db6196851",
+      "bytes": 14057
+    },
+    {
+      "repository": "keel-web3/keel-site",
+      "path": "apps/studio/src/components/launch/release-studio.tsx",
+      "gitSha": "bb554120fa1a1ddbe59683f532765a60f97f2bdf",
+      "sha256": "8a95e3966a7b0496c1660e38ddea21648a64becc878d2f6097915b1ee56b7c00",
+      "bytes": 141511
+    },
+    {
+      "repository": "keel-web3/keel-site",
+      "path": "apps/studio/src/lib/studio-plan-navigation.ts",
+      "gitSha": "11f2ba2f6773f9a208346c97a832ca5466eb1c16",
+      "sha256": "d0bd771ea82825c743a3edafc02b2238916b15ff85361219a4647c4696f49cfd",
+      "bytes": 1861
+    },
+    {
+      "repository": "keel-web3/keel-site",
+      "path": "apps/studio/src/lib/studio-plan-client.ts",
+      "gitSha": "3bfda7e89b6557061f3381c59f9525b366f9acef",
+      "sha256": "798c859970a208c8c204fe4e754839db2f1cde4c7ee5df5f5a8c1c31681c4a9e",
+      "bytes": 8282
+    },
+    {
+      "repository": "keel-web3/keel-sdk",
+      "path": "docs/KEEL_STUDIO_SHARED_PLANNING.md",
+      "gitSha": "6220ef58305247c6da64bf16478065fe45e207eb",
+      "sha256": "2417fef6697d2e3a49215d2191e709996d42001fdaf925f538c1f186c23a0cbd",
+      "bytes": 9738
+    },
+    {
+      "repository": "keel-web3/keel-sdk",
+      "path": "packages/mcp/src/prompts.ts",
+      "gitSha": "3e7aff5fc72b80b792591ddafaf040d29b3cf8ae",
+      "sha256": "fa2c3d3a2a45e5c345fae48d403125c54e295e7ae7bc9d258fce9dd9e2478e8b",
+      "bytes": 26535
+    },
+    {
+      "repository": "keel-web3/keel-sdk",
+      "path": "packages/mcp/src/schemas.ts",
+      "gitSha": "d4a9772ebcd9eeed18ad62380b9344cc70641f7e",
+      "sha256": "947e7f5306559701bdc6b186f1e818a2890fae910fa80cdd46556907279d01f8",
+      "bytes": 36679
+    },
+    {
+      "repository": "keel-web3/keel-sdk",
+      "path": "packages/mcp/src/tools.ts",
+      "gitSha": "b31351b88dd568566c6ed93a8eced469b4f63f3f",
+      "sha256": "306b899a45ce805c1ecf08309e7b14f7e96a9a1beb540bbf060a01767ced9c7c",
+      "bytes": 101753
+    },
+    {
+      "repository": "keel-web3/keel-sdk",
+      "path": "packages/sdk/src/studio-agent-drafts.ts",
+      "gitSha": "e5354711c5e204183930435aa2a33f67ce78896f",
+      "sha256": "1d493888f7aba30c1a67a5fad81a9151cd93b64d087293b00eb76bb4c6c198ae",
+      "bytes": 31353
+    },
+    {
+      "repository": "keel-web3/keel-sdk",
+      "path": "tests/mcp-studio-draft.test.mjs",
+      "gitSha": "f8c287c9fc067a3705b32606c23ccfc72f3d8041",
+      "sha256": "fe45874e0801a2930c4ef4411f8fb9e5038d5d09d9c9c78790f045bce1263a77",
+      "bytes": 16716
+    },
+    {
+      "repository": "keel-web3/keel-sdk",
+      "path": "tests/sdk-studio-agent-drafts.test.mjs",
+      "gitSha": "3dcbc7f1b95d0bd5e5ef8019ad31b30c39411ca7",
+      "sha256": "7f98e73146bbbc7790a891d4488e5f7bfc0d3e90bbb4a87ffbe344ffde9fab65",
+      "bytes": 15912
+    }
+  ],
+  "limitations": [
+    "Named profile-first creation remains unfinished.",
+    "This is not merge or deployment clearance.",
+    "Exact private incident RPC remains unapproved."
+  ]
+}

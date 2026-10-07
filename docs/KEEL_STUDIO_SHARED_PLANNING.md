@@ -119,3 +119,13 @@ The current chat provider is the creator's existing bridge. Direct API-provider
 configuration, hosted paid assistance, vector memory, agent wallets and code-preview
 composition are not activated by this slice. No new credential, grant, subscription
 or wallet transaction is created by these source tests.
+
+## From plan to owner review
+
+The shared plan returns focused section links carrying the release, field and saved revision. A link shows the latest canonical values; it never restores values from its URL. Explicit edits use the same revision-checked writer in guided, direct and agent workflows.
+
+After the plan is complete and confirmed, hosted `keel_release_review_prepare` or portable `keel-studio-draft` with `operation: prepare-review`, `releaseId` and `expectedRevision` saves the exact unsigned owner-review operation. It requires `drafts:write`. The SDK exposes `prepareReview(releaseId, expectedRevision)`. The server selects the creator account wallet; callers cannot supply another wallet or arbitrary calldata. The returned review URL pins the operation and revision.
+
+The private review page explains each supported call, network, signing wallet, creator payment, separate collector prices, and exact calldata in an advanced fold. Opening it does not request a wallet approval. The owner explicitly continues through the existing Studio wallet flow. Changed plans and stale operations invalidate the handoff; submitted operations resume their saved receipt instead of repeating storage or release calls.
+
+This release publisher currently compiles its existing fixed-price controller routes and strict presentation repairs. An auction, advanced overlapping lane, unsupported reader or unverified IPFS route remains blocked. A profile or agent suggestion is not evidence that a contract capability is implemented.

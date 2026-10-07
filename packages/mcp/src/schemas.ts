@@ -226,13 +226,13 @@ const studioConnect: JsonSchema = object({
 }, ["operation"]);
 const studioDraft: JsonSchema = object({
   studioUrl: string("Optional HTTPS Studio URL; KEEL_STUDIO_URL is used otherwise.", 512),
-  operation: { type: "string", enum: ["list", "read", "diagnose", "plan", "plan-edit", "defaults", "defaults-edit", "conversation", "conversation-suggest", "storage-review", "create", "update"] },
-  releaseId: string("Required for read, diagnose, plan, plan-edit, or update.", 128),
+  operation: { type: "string", enum: ["list", "read", "diagnose", "plan", "plan-edit", "defaults", "defaults-edit", "conversation", "conversation-suggest", "prepare-review", "storage-review", "create", "update"] },
+  releaseId: string("Required for read, diagnose, plan, plan-edit, prepare-review, conversation, conversation-suggest, or update.", 128),
   projectId: string("Required for storage-review; uses the owner-scoped project and never signs or submits.", 128),
   conversationCommand: { type: "object", description: "For conversation-suggest: stable commandId UUID, expectedRevision, plain message, optional typed answers. Requires conversations:write and records an editable proposal, never a wallet action or automatic plan edit." },
   defaultsCommand: { type: "object", description: "For defaults-edit: explicit creator instruction, separate preferences:write permission, stable commandId UUID, expectedRevision, global or exact media scope, values (null clears), optional askToSave. Applies to future guided drafts only." },
   planningCommand: { type: "object", description: "For plan-edit: operation answer/navigate/mode/review, stable commandId UUID, current expectedRevision, and the matching answers/fieldId/mode/configurationKey. Read plan first. This never signs or spends." },
-  expectedRevision: integer("Required for update; prevents a stale agent from overwriting newer browser work.", 1),
+  expectedRevision: integer("Required for update and prepare-review; binds the request to the current saved revision.", 1),
   draft: {
     type: "object",
     description: "Complete Studio release draft. Required for create or update and validated again by the SDK and Studio.",

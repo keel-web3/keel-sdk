@@ -31,9 +31,19 @@ export interface KeelStudioReleasePlanning {
   readonly resolved: KeelResolvedPlan;
   readonly editable: boolean;
   readonly planningUrl: string;
+  readonly sections?: readonly { readonly fieldId: string; readonly label: string; readonly editPath: string }[];
   readonly signing: "not-performed";
   readonly submission: "not-performed";
 }
+export interface KeelStudioReleaseWalletReview {
+  readonly schema: "keel-release-wallet-review@1";
+  readonly releaseId: string; readonly revision: number; readonly wallet: string;
+  readonly preparation: { readonly operationId: string; readonly chainId: number;
+    readonly calls: readonly { readonly kind: string; readonly to: string; readonly data: string; readonly value: string }[];
+    readonly [key: string]: unknown };
+  readonly reviewUrl: string; readonly signing: "not-performed"; readonly submission: "not-performed";
+}
+
 export interface KeelStudioStorageReview {
   readonly projectId: string;
   readonly status: "complete" | "approval-required" | "resume" | "pending-approval-receipt" | "blocked" | "failed";
@@ -132,13 +142,13 @@ export interface KeelStudioAgentDraftClientOptions {
   readonly fetchImplementation?: typeof fetch;
 }
 
-const KEEL_STUDIO_AGENT_DRAFT_OPERATIONS = ["list", "read", "diagnose", "plan", "plan-edit", "defaults", "defaults-edit", "conversation", "conversation-suggest", "storage-review", "create", "update"] as const;
+const KEEL_STUDIO_AGENT_DRAFT_OPERATIONS = ["list", "read", "diagnose", "plan", "plan-edit", "defaults", "defaults-edit", "conversation", "conversation-suggest", "prepare-review", "storage-review", "create", "update"] as const;
 export type KeelStudioAgentDraftOperation = (typeof KEEL_STUDIO_AGENT_DRAFT_OPERATIONS)[number];
 
 /**
  * A flat, JSON/YAML-friendly description of one draft operation. The
  * operation is deliberately limited to the creator's Studio draft API; it
- * has no wallet, chain, signing, or publication fields.
+ * accepts no caller-supplied wallet, calldata, signing or submission fields.
  */
 export interface KeelStudioAgentDraftOperationConfig extends KeelStudioAgentDraftClientOptions {
   readonly operation: KeelStudioAgentDraftOperation;
@@ -151,7 +161,7 @@ export interface KeelStudioAgentDraftOperationConfig extends KeelStudioAgentDraf
   readonly projectId?: string;
 }
 
-export type KeelStudioAgentDraftOperationResult = KeelStudioAgentDraftWorkspace | KeelStudioAgentReleaseView | KeelStudioReleaseDiagnostics | KeelStudioReleasePlanning | KeelStudioStorageReview | KeelStudioDefaultsView | KeelStudioReleaseConversation | KeelStudioConversationSuggestionReceipt;
+export type KeelStudioAgentDraftOperationResult = KeelStudioAgentDraftWorkspace | KeelStudioAgentReleaseView | KeelStudioReleaseDiagnostics | KeelStudioReleasePlanning | KeelStudioStorageReview | KeelStudioReleaseWalletReview | KeelStudioDefaultsView | KeelStudioReleaseConversation | KeelStudioConversationSuggestionReceipt;
 
 export interface KeelStudioAgentDraftClient {
   readonly list: () => Promise<KeelStudioAgentDraftWorkspace>;
@@ -163,6 +173,7 @@ export interface KeelStudioAgentDraftClient {
   readonly suggest: (releaseId: string, suggestion: KeelStudioConversationSuggestion) => Promise<KeelStudioConversationSuggestionReceipt>;
   readonly defaults: () => Promise<KeelStudioDefaultsView>;
   readonly editDefaults: (command: KeelStudioDefaultsCommand) => Promise<KeelStudioDefaultsView>;
+  readonly prepareReview: (releaseId: string, expectedRevision: number) => Promise<KeelStudioReleaseWalletReview>;
   readonly storageReview: (projectId: string) => Promise<KeelStudioStorageReview>;
   readonly create: (draft: KeelStudioAgentReleaseDraft) => Promise<KeelStudioAgentReleaseView>;
   readonly update: (releaseId: string, draft: KeelStudioAgentReleaseDraft, expectedRevision: number) => Promise<KeelStudioAgentReleaseView>;
@@ -302,7 +313,7 @@ export function studioAgentRequest(options: KeelStudioAgentDraftClientOptions, p
 
 /**
  * Creates a wallet-neutral client for creator-authorized draft work. It cannot
- * prepare, submit, confirm, cancel, or otherwise mutate a chain operation.
+ * sign, submit, confirm or cancel a chain operation. prepareReview saves only an unsigned owner-review operation through Studio.
  */
 export function createKeelStudioAgentDraftClient(options: KeelStudioAgentDraftClientOptions) {
   if (options === null || typeof options !== "object") throw new TypeError("KEEL Studio agent draft client options are required.");
@@ -355,6 +366,16 @@ export function createKeelStudioAgentDraftClient(options: KeelStudioAgentDraftCl
     if (value.schema !== "keel-studio-defaults-view@1" || value.signing !== "not-performed") throw new TypeError("Studio returned an invalid defaults profile.");
     return { ...value, profile: parseKeelStudioDefaultProfile(value.profile) };
   };
+  const prepareReview = async (releaseId: string, expectedRevision: number): Promise<KeelStudioReleaseWalletReview> => {
+    if (!/^[0-9a-f]{8}(?:-[0-9a-f]{4}){3}-[0-9a-f]{12}$/iu.test(releaseId) || !Number.isSafeInteger(expectedRevision) || expectedRevision < 1) throw new TypeError("Use the saved release UUID and current reviewed revision.");
+    const value = await studioAgentResponse<KeelStudioReleaseWalletReview>(await studioAgentRequest(options, `${releasePath(releaseId)}/review`, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ expectedRevision }) }), [options.grantToken]);
+    const prepared = value.preparation;
+    if (value.schema !== "keel-release-wallet-review@1" || value.releaseId !== releaseId || value.revision !== expectedRevision || value.signing !== "not-performed" || value.submission !== "not-performed"
+      || !/^0x[0-9a-f]{40}$/iu.test(value.wallet) || !prepared || !/^[0-9a-f]{8}(?:-[0-9a-f]{4}){3}-[0-9a-f]{12}$/iu.test(prepared.operationId)
+      || !Number.isSafeInteger(prepared.chainId) || prepared.chainId < 1 || !Array.isArray(prepared.calls) || prepared.calls.length < 1 || prepared.calls.length > 8
+      || !Array.from(prepared.calls).every(call => call && typeof call.kind === "string" && /^0x[0-9a-f]{40}$/iu.test(call.to) && /^0x(?:[0-9a-f]{2})*$/iu.test(call.data) && /^(?:0|[1-9][0-9]*|0x[0-9a-f]+)$/iu.test(call.value))) throw new TypeError("Studio returned another or invalid wallet-review identity.");
+    return { ...value, reviewUrl: endpoint(options.studioUrl ?? KEEL_STUDIO_URL, `/studio/releases/${encodeURIComponent(releaseId)}/review?operation=${encodeURIComponent(prepared.operationId)}&revision=${expectedRevision}`).href };
+  };
   const storageReview = async (projectId: string): Promise<KeelStudioStorageReview> => {
     if (!/^[0-9a-f]{8}(?:-[0-9a-f]{4}){3}-[0-9a-f]{12}$/iu.test(projectId)) throw new TypeError("Use this project's Studio UUID.");
     const value = await studioAgentResponse<KeelStudioStorageReview>(await studioAgentRequest(options, `/api/agent/projects/${encodeURIComponent(projectId)}/storage-review`, { method: "POST" }), [options.grantToken]);
@@ -378,7 +399,7 @@ export function createKeelStudioAgentDraftClient(options: KeelStudioAgentDraftCl
       body: JSON.stringify({ draft: validated, expectedRevision }),
     }), [options.grantToken]));
   };
-  return Object.freeze<KeelStudioAgentDraftClient>({ list, read, diagnose, plan: releaseId => planning(releaseId), editPlan: planning, conversation: async releaseId => await conversation(releaseId) as KeelStudioReleaseConversation, suggest: async (releaseId, suggestion) => await conversation(releaseId, suggestion) as KeelStudioConversationSuggestionReceipt, defaults: () => defaults(), editDefaults: defaults, storageReview, create, update });
+  return Object.freeze<KeelStudioAgentDraftClient>({ list, read, diagnose, plan: releaseId => planning(releaseId), editPlan: planning, conversation: async releaseId => await conversation(releaseId) as KeelStudioReleaseConversation, suggest: async (releaseId, suggestion) => await conversation(releaseId, suggestion) as KeelStudioConversationSuggestionReceipt, defaults: () => defaults(), editDefaults: defaults, prepareReview, storageReview, create, update });
 }
 
 function validatePlanningIdentity(command: { readonly commandId: string; readonly expectedRevision: number }): void {
@@ -434,6 +455,7 @@ export async function executeKeelStudioAgentDraftOperation(config: KeelStudioAge
       if (!config.defaultsCommand) throw new TypeError("defaults-edit requires an explicit defaultsCommand and preferences:write permission.");
       return client.editDefaults(config.defaultsCommand);
     }
+    case "prepare-review": return client.prepareReview(operationReleaseId(config), config.expectedRevision!);
     case "storage-review": {
       if (!config.projectId) throw new TypeError("storage-review requires the creator's projectId.");
       return client.storageReview(config.projectId);

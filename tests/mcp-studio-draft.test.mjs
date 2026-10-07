@@ -280,3 +280,23 @@ test("portable MCP reads and shares reviewable conversation forms without model 
     assert.equal(forbidden?.result.isError, true); assert.equal(requests.length, 2);
   } finally { globalThis.fetch = previousFetch; if (previousToken === undefined) delete process.env.KEEL_STUDIO_AGENT_TOKEN; else process.env.KEEL_STUDIO_AGENT_TOKEN = previousToken; }
 });
+
+test("portable MCP prepares the same owner review and never accepts caller wallet or calldata", async () => {
+  const previousToken = process.env.KEEL_STUDIO_AGENT_TOKEN, previousFetch = globalThis.fetch;
+  const releaseId = "11111111-1111-4111-8111-111111111111", operationId = "22222222-2222-4222-8222-222222222222";
+  let requests = 0;
+  process.env.KEEL_STUDIO_AGENT_TOKEN = token;
+  globalThis.fetch = async (url, init) => {
+    requests++; assert.equal(String(url), `https://studio.example/api/agent/drafts/${releaseId}/review`); assert.equal(init.method, "POST"); assert.deepEqual(JSON.parse(init.body), { expectedRevision: 3 });
+    return Response.json({ schema: "keel-release-wallet-review@1", releaseId, revision: 3, wallet: `0x${"33".repeat(20)}`, preparation: { operationId, chainId: 11155111,
+      calls: [{ kind: "create-drop", to: `0x${"44".repeat(20)}`, data: "0x1234", value: "0x0" }] }, signing: "not-performed", submission: "not-performed" });
+  };
+  try {
+    const server = await createMcpServer(); await server.handle({ jsonrpc: "2.0", id: 1, method: "initialize", params: initializeParams });
+    const answer = await call(server, 2, { operation: "prepare-review", releaseId, expectedRevision: 3 });
+    assert.notEqual(answer.result.isError, true); assert.equal(answer.result.structuredContent.schema, "keel-release-wallet-review@1"); assert.equal(answer.result.structuredContent.reviewUrl, `https://studio.example/studio/releases/${releaseId}/review?operation=${operationId}&revision=3`);
+    assert.equal(answer.result.structuredContent.submission, "not-performed");
+    const rejected = await call(server, 3, { operation: "prepare-review", releaseId, expectedRevision: 3, wallet: "attacker", data: "0x1234" });
+    assert.equal(rejected.result.isError, true); assert.equal(requests, 1);
+  } finally { globalThis.fetch = previousFetch; if (previousToken === undefined) delete process.env.KEEL_STUDIO_AGENT_TOKEN; else process.env.KEEL_STUDIO_AGENT_TOKEN = previousToken; }
+});
