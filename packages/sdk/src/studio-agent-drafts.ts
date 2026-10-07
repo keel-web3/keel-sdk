@@ -1,3 +1,6 @@
+import { parseKeelNamedProjectProfile, validateKeelNamedProfileCommand, type KeelNamedProjectProfile, type KeelNamedProfileCommand } from "./studio-project-profiles.js";
+import { parseKeelSelectedProjectProfile, type KeelSelectedProjectProfile } from "./studio-project-defaults.js";
+export type KeelStudioProjectProfilesView = KeelStudioDefaultsView & { readonly starters: readonly KeelNamedProjectProfile[] };
 import type { KeelPlanValue } from "./studio-project-planner.js";
 export interface KeelStudioConversationSuggestion {
   readonly commandId: string; readonly expectedRevision: number; readonly message: string;
@@ -142,7 +145,7 @@ export interface KeelStudioAgentDraftClientOptions {
   readonly fetchImplementation?: typeof fetch;
 }
 
-const KEEL_STUDIO_AGENT_DRAFT_OPERATIONS = ["list", "read", "diagnose", "plan", "plan-edit", "defaults", "defaults-edit", "conversation", "conversation-suggest", "prepare-review", "storage-review", "create", "update"] as const;
+const KEEL_STUDIO_AGENT_DRAFT_OPERATIONS = ["list", "read", "diagnose", "plan", "plan-edit", "defaults", "defaults-edit", "profiles", "profiles-edit", "profile-select", "conversation", "conversation-suggest", "prepare-review", "storage-review", "create", "update"] as const;
 export type KeelStudioAgentDraftOperation = (typeof KEEL_STUDIO_AGENT_DRAFT_OPERATIONS)[number];
 
 /**
@@ -157,11 +160,13 @@ export interface KeelStudioAgentDraftOperationConfig extends KeelStudioAgentDraf
   readonly expectedRevision?: number;
   readonly planningCommand?: KeelStudioPlanningCommand;
   readonly defaultsCommand?: KeelStudioDefaultsCommand;
+  readonly profileCommand?: KeelNamedProfileCommand;
+  readonly profileSelection?: { readonly profileId: string; readonly expectedProfileRevision: number };
   readonly conversationCommand?: KeelStudioConversationSuggestion;
   readonly projectId?: string;
 }
 
-export type KeelStudioAgentDraftOperationResult = KeelStudioAgentDraftWorkspace | KeelStudioAgentReleaseView | KeelStudioReleaseDiagnostics | KeelStudioReleasePlanning | KeelStudioStorageReview | KeelStudioReleaseWalletReview | KeelStudioDefaultsView | KeelStudioReleaseConversation | KeelStudioConversationSuggestionReceipt;
+export type KeelStudioAgentDraftOperationResult = KeelStudioAgentDraftWorkspace | KeelStudioAgentReleaseView | KeelStudioReleaseDiagnostics | KeelStudioReleasePlanning | KeelStudioStorageReview | KeelStudioReleaseWalletReview | KeelStudioDefaultsView | KeelStudioReleaseConversation | KeelStudioConversationSuggestionReceipt | KeelStudioProjectProfilesView | KeelSelectedProjectProfile;
 
 export interface KeelStudioAgentDraftClient {
   readonly list: () => Promise<KeelStudioAgentDraftWorkspace>;
@@ -171,6 +176,9 @@ export interface KeelStudioAgentDraftClient {
   readonly editPlan: (releaseId: string, command: KeelStudioPlanningCommand) => Promise<KeelStudioReleasePlanning>;
   readonly conversation: (releaseId: string) => Promise<KeelStudioReleaseConversation>;
   readonly suggest: (releaseId: string, suggestion: KeelStudioConversationSuggestion) => Promise<KeelStudioConversationSuggestionReceipt>;
+  readonly profiles: () => Promise<KeelStudioProjectProfilesView>;
+  readonly editProfiles: (command: KeelNamedProfileCommand) => Promise<KeelStudioDefaultsView>;
+  readonly selectProfile: (profileId: string, expectedProfileRevision: number) => Promise<KeelSelectedProjectProfile>;
   readonly defaults: () => Promise<KeelStudioDefaultsView>;
   readonly editDefaults: (command: KeelStudioDefaultsCommand) => Promise<KeelStudioDefaultsView>;
   readonly prepareReview: (releaseId: string, expectedRevision: number) => Promise<KeelStudioReleaseWalletReview>;
@@ -366,6 +374,21 @@ export function createKeelStudioAgentDraftClient(options: KeelStudioAgentDraftCl
     if (value.schema !== "keel-studio-defaults-view@1" || value.signing !== "not-performed") throw new TypeError("Studio returned an invalid defaults profile.");
     return { ...value, profile: parseKeelStudioDefaultProfile(value.profile) };
   };
+  const profiles = async (command?: KeelNamedProfileCommand): Promise<KeelStudioProjectProfilesView> => {
+    const input = command === undefined ? undefined : validateKeelNamedProfileCommand(command);
+    const value = await studioAgentResponse<KeelStudioProjectProfilesView>(await studioAgentRequest(options, "/api/agent/project-profiles", input === undefined
+      ? { cache: "no-store" } : { method: "PATCH", headers: { "content-type": "application/json" }, body: JSON.stringify(input) }), [options.grantToken]);
+    if (value.schema !== "keel-studio-defaults-view@1" || value.signing !== "not-performed") throw new TypeError("Studio returned an invalid project profile view.");
+    if (input === undefined && !Array.isArray(value.starters)) throw new TypeError("Studio did not return its supported starting profiles.");
+    return { ...value, profile: parseKeelStudioDefaultProfile(value.profile), starters: (value.starters ?? []).map(parseKeelNamedProjectProfile) };
+  };
+  const selectProfile = async (profileId: string, expectedProfileRevision: number): Promise<KeelSelectedProjectProfile> => {
+    if (!/^(?:builtin:[a-z][a-z0-9-]{0,63}|[0-9a-f]{8}(?:-[0-9a-f]{4}){3}-[0-9a-f]{12})$/iu.test(profileId) || !Number.isSafeInteger(expectedProfileRevision) || expectedProfileRevision < 1) throw new TypeError("Select the saved profile ID and its exact revision.");
+    const value = await studioAgentResponse<KeelSelectedProjectProfile & { signing: string; submission: string }>(await studioAgentRequest(options, "/api/agent/project-profiles", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ profileId, expectedProfileRevision }) }), [options.grantToken]);
+    const selected = parseKeelSelectedProjectProfile({ snapshot: value.snapshot, ...(value.defaults ? { defaults: value.defaults } : {}) });
+    if (selected.snapshot.id !== profileId || selected.snapshot.revision !== expectedProfileRevision || value.signing !== "not-performed" || value.submission !== "not-performed") throw new TypeError("Studio returned another profile or an invalid selection receipt.");
+    return selected;
+  };
   const prepareReview = async (releaseId: string, expectedRevision: number): Promise<KeelStudioReleaseWalletReview> => {
     if (!/^[0-9a-f]{8}(?:-[0-9a-f]{4}){3}-[0-9a-f]{12}$/iu.test(releaseId) || !Number.isSafeInteger(expectedRevision) || expectedRevision < 1) throw new TypeError("Use the saved release UUID and current reviewed revision.");
     const value = await studioAgentResponse<KeelStudioReleaseWalletReview>(await studioAgentRequest(options, `${releasePath(releaseId)}/review`, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ expectedRevision }) }), [options.grantToken]);
@@ -399,7 +422,7 @@ export function createKeelStudioAgentDraftClient(options: KeelStudioAgentDraftCl
       body: JSON.stringify({ draft: validated, expectedRevision }),
     }), [options.grantToken]));
   };
-  return Object.freeze<KeelStudioAgentDraftClient>({ list, read, diagnose, plan: releaseId => planning(releaseId), editPlan: planning, conversation: async releaseId => await conversation(releaseId) as KeelStudioReleaseConversation, suggest: async (releaseId, suggestion) => await conversation(releaseId, suggestion) as KeelStudioConversationSuggestionReceipt, defaults: () => defaults(), editDefaults: defaults, prepareReview, storageReview, create, update });
+  return Object.freeze<KeelStudioAgentDraftClient>({ list, read, diagnose, profiles: () => profiles(), editProfiles: profiles, selectProfile, plan: releaseId => planning(releaseId), editPlan: planning, conversation: async releaseId => await conversation(releaseId) as KeelStudioReleaseConversation, suggest: async (releaseId, suggestion) => await conversation(releaseId, suggestion) as KeelStudioConversationSuggestionReceipt, defaults: () => defaults(), editDefaults: defaults, prepareReview, storageReview, create, update });
 }
 
 function validatePlanningIdentity(command: { readonly commandId: string; readonly expectedRevision: number }): void {
@@ -437,7 +460,7 @@ function operationDraft(config: KeelStudioAgentDraftOperationConfig): KeelStudio
 /** Execute one explicitly configured, creator-scoped draft operation. */
 export async function executeKeelStudioAgentDraftOperation(config: KeelStudioAgentDraftOperationConfig): Promise<KeelStudioAgentDraftOperationResult> {
   if (config === null || typeof config !== "object" || !isDraftOperation(config.operation)) throw new TypeError("Studio agent draft operation is unsupported.");
-  const supported = new Set(["studioUrl", "grantToken", "operation", "releaseId", "projectId", "draft", "expectedRevision", "planningCommand", "defaultsCommand", "conversationCommand", "fetchImplementation"]);
+  const supported = new Set(["studioUrl", "grantToken", "operation", "releaseId", "projectId", "draft", "expectedRevision", "planningCommand", "defaultsCommand", "profileCommand", "profileSelection", "conversationCommand", "fetchImplementation"]);
   for (const key of Object.keys(config)) if (!supported.has(key)) throw new TypeError(`Studio agent draft configuration.${key} is not supported.`);
   const client = createKeelStudioAgentDraftClient(config);
   switch (config.operation) {
@@ -449,6 +472,15 @@ export async function executeKeelStudioAgentDraftOperation(config: KeelStudioAge
     case "conversation-suggest": {
       if (!config.conversationCommand) throw new TypeError("conversation-suggest requires a typed suggestion and conversations:write permission.");
       return client.suggest(operationReleaseId(config), config.conversationCommand);
+    }
+    case "profiles": return client.profiles();
+    case "profiles-edit": {
+      if (!config.profileCommand) throw new TypeError("profiles-edit requires an explicit profileCommand and preferences:write permission.");
+      return client.editProfiles(config.profileCommand);
+    }
+    case "profile-select": {
+      if (!config.profileSelection || Object.keys(config.profileSelection).some(key => !["profileId", "expectedProfileRevision"].includes(key))) throw new TypeError("profile-select needs the exact profile identity.");
+      return client.selectProfile(config.profileSelection.profileId, config.profileSelection.expectedProfileRevision);
     }
     case "defaults": return client.defaults();
     case "defaults-edit": {

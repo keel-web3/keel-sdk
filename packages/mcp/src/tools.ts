@@ -867,9 +867,9 @@ async function studioAccessTool(context: ToolContext, value: unknown): Promise<u
 }
 
 async function studioDraftTool(context: ToolContext, value: unknown): Promise<unknown> {
-  const input = record(value, ["studioUrl", "operation", "releaseId", "projectId", "expectedRevision", "draft", "planningCommand", "defaultsCommand", "conversationCommand"], "Studio draft arguments");
+  const input = record(value, ["studioUrl", "operation", "releaseId", "projectId", "expectedRevision", "draft", "planningCommand", "defaultsCommand", "profileCommand", "profileSelection", "conversationCommand"], "Studio draft arguments");
   const operation = requiredString(input, "operation");
-  if (!["list", "read", "diagnose", "plan", "plan-edit", "defaults", "defaults-edit", "conversation", "conversation-suggest", "prepare-review", "storage-review", "create", "update"].includes(operation)) throw new TypeError("operation must be list, read, diagnose, plan, plan-edit, defaults, defaults-edit, conversation, conversation-suggest, prepare-review, storage-review, create, or update.");
+  if (!["list", "read", "diagnose", "plan", "plan-edit", "defaults", "defaults-edit", "profiles", "profiles-edit", "profile-select", "conversation", "conversation-suggest", "prepare-review", "storage-review", "create", "update"].includes(operation)) throw new TypeError("operation must be list, read, diagnose, plan, plan-edit, defaults, defaults-edit, conversation, conversation-suggest, prepare-review, storage-review, create, or update.");
   const configuredStudioUrl = optionalString(input, "studioUrl");
   const studioUrl = resolveKeelEndpoints({
     ...(configuredStudioUrl === undefined ? {} : { studioUrl: configuredStudioUrl }),
@@ -880,8 +880,10 @@ async function studioDraftTool(context: ToolContext, value: unknown): Promise<un
   return executeKeelStudioAgentDraftOperation({
     studioUrl,
     grantToken: token,
-    operation: operation as "list" | "read" | "diagnose" | "plan" | "plan-edit" | "defaults" | "defaults-edit" | "conversation" | "conversation-suggest" | "prepare-review" | "storage-review" | "create" | "update",
+    operation: operation as "list" | "read" | "diagnose" | "plan" | "plan-edit" | "defaults" | "defaults-edit" | "profiles" | "profiles-edit" | "profile-select" | "conversation" | "conversation-suggest" | "prepare-review" | "storage-review" | "create" | "update",
     ...(input.conversationCommand === undefined ? {} : { conversationCommand: input.conversationCommand as never }),
+    ...(input.profileCommand === undefined ? {} : { profileCommand: input.profileCommand as never }),
+    ...(input.profileSelection === undefined ? {} : { profileSelection: input.profileSelection as never }),
     ...(input.defaultsCommand === undefined ? {} : { defaultsCommand: input.defaultsCommand as never }),
     ...(input.planningCommand === undefined ? {} : { planningCommand: input.planningCommand as never }),
     ...(input.projectId === undefined ? {} : { projectId: requiredString(input, "projectId") }),
@@ -892,7 +894,7 @@ async function studioDraftTool(context: ToolContext, value: unknown): Promise<un
 }
 
 async function studioStageProjectTool(context: ToolContext, value: unknown): Promise<unknown> {
-  const input = record(value, ["studioUrl", "title", "description", "storageStrategy", "payloadStorage", "marketplaceExportMode", "viewer", "files", "reusableModule", "releaseIntent"], "Studio stage project arguments");
+  const input = record(value, ["studioUrl", "title", "description", "storageStrategy", "payloadStorage", "marketplaceExportMode", "viewer", "files", "reusableModule", "releaseIntent", "projectProfile"], "Studio stage project arguments");
   const configuredStudioUrl = optionalString(input, "studioUrl");
   const studioUrl = resolveKeelEndpoints({ ...(configuredStudioUrl === undefined ? {} : { studioUrl: configuredStudioUrl }) }, process.env).studioUrl;
   const token = await loadStudioAgentToken({ workspace: context.workspace.root, studioUrl });
@@ -903,8 +905,8 @@ async function studioStageProjectTool(context: ToolContext, value: unknown): Pro
   if (!["local", "onchain", "hybrid"].includes(storageStrategy)) throw new TypeError("storageStrategy must be local, onchain, or hybrid.");
   const marketplaceExportMode = optionalString(input, "marketplaceExportMode");
   if (marketplaceExportMode !== undefined && !["recursive", "packed", "hybrid", "onchfs"].includes(marketplaceExportMode)) throw new TypeError("marketplaceExportMode is unsupported.");
-  const viewer = optionalString(input, "viewer") ?? "keel-verification-shell";
-  if (viewer !== "keel-verification-shell" && viewer !== "none") throw new TypeError("viewer must be keel-verification-shell or none.");
+  const viewer = optionalString(input, "viewer");
+  if (viewer !== undefined && viewer !== "keel-verification-shell" && viewer !== "none") throw new TypeError("viewer must be keel-verification-shell or none.");
   if (!Array.isArray(input.files) || input.files.length < 1 || input.files.length > 256) throw new TypeError("files must contain from 1 through 256 entries.");
   let totalBytes = 0;
   const files = [];
@@ -960,11 +962,12 @@ async function studioStageProjectTool(context: ToolContext, value: unknown): Pro
     title,
     description,
     storageStrategy: storageStrategy as "local" | "onchain" | "hybrid",
-    payloadStorage: resolveKeelPayloadStorage(input.payloadStorage),
+    ...(input.payloadStorage === undefined ? {} : { payloadStorage: resolveKeelPayloadStorage(input.payloadStorage) }),
     ...(marketplaceExportMode === undefined ? {} : { marketplaceExportMode: marketplaceExportMode as "recursive" | "packed" | "hybrid" | "onchfs" }),
-    viewer: viewer as "keel-verification-shell" | "none",
+    ...(viewer === undefined ? {} : { viewer: viewer as "keel-verification-shell" | "none" }),
     files,
     ...(reusableModule === undefined ? {} : { reusableModule }),
+    ...(input.projectProfile === undefined ? {} : { projectProfile: input.projectProfile as never }),
     ...(input.releaseIntent === undefined ? {} : { releaseIntent: input.releaseIntent as never }),
   });
 }

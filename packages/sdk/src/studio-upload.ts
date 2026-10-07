@@ -1,3 +1,4 @@
+import { parseKeelSelectedProjectProfile, type KeelSelectedProjectProfile } from "./studio-project-defaults.js";
 import { resolveKeelShell, resolveKeelPayloadStorage, type KeelPayloadStorageMode } from "@keel/protocol";
 import {
   defaultKeelStudioPublicationIntent,
@@ -97,6 +98,7 @@ export interface StageKeelStudioProjectInput {
     readonly accessMode?: "open" | "paid" | "license" | "subscription" | "request" | "special";
     readonly tags?: readonly string[];
   };
+  readonly projectProfile?: KeelSelectedProjectProfile;
   readonly releaseIntent?: {
     readonly schema: "keel-release-intent@1";
     readonly chainId: number;
@@ -227,8 +229,9 @@ export async function stageKeelStudioProject(
   if (title.length < 2 || title.length > 160) throw new RangeError("Staged project title must contain from 2 through 160 characters.");
   if (input.agentToken.length < 32) throw new TypeError("KEEL Studio agent token must contain at least 32 characters.");
   if (input.files.length < 1 || input.files.length > 256) throw new RangeError("Stage from 1 through 256 project files.");
-  const payloadStorage = resolveKeelPayloadStorage(input.payloadStorage);
-  const viewer = resolveKeelShell(input.viewer);
+  const projectProfile = input.projectProfile === undefined ? undefined : parseKeelSelectedProjectProfile(input.projectProfile);
+  const payloadStorage = resolveKeelPayloadStorage(input.payloadStorage ?? projectProfile?.snapshot.configuration.payloadStorage);
+  const viewer = resolveKeelShell(input.viewer ?? projectProfile?.snapshot.configuration.viewer);
   if (viewer !== KEEL_VERIFICATION_SHELL && viewer !== "none") throw new TypeError("viewer must be keel-verification-shell or none.");
   if (viewer === "none" && input.publicationIntent !== undefined) {
     throw new TypeError("An artifact-only project cannot also require the KEEL verification shell.");
@@ -251,6 +254,7 @@ export async function stageKeelStudioProject(
     marketplaceExportMode: input.marketplaceExportMode ?? "recursive",
     components,
     ...(input.reusableModule === undefined ? {} : { reusableModule: input.reusableModule }),
+    ...(projectProfile === undefined ? {} : { projectProfile }),
     ...(input.releaseIntent === undefined ? {} : { releaseIntent: input.releaseIntent }),
     ...(publicationIntent === undefined ? {} : { publicationIntent }),
     ...(input.flashRuntime === undefined ? {} : { flashRuntime: input.flashRuntime }),
