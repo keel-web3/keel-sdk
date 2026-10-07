@@ -80,7 +80,7 @@ test("agent draft client covers every Studio release type without wallet or publ
     },
   });
 
-  assert.deepEqual(Object.keys(client).sort(), ["create", "list", "read", "update"]);
+  assert.deepEqual(Object.keys(client).sort(), ["create", "diagnose", "list", "read", "update"]);
   for (const releaseType of KEEL_STUDIO_RELEASE_TYPES) {
     const supply = releaseType === "open-edition" ? "open" : releaseType === "one-of-one" ? "1" : "100";
     const created = await client.create({ ...baseDraft, releaseType, supply, title: `Agent ${releaseType}` });
@@ -190,4 +190,18 @@ test("portable draft validation rejects malformed or stale-agent payloads before
   });
   await assert.rejects(client.create({ ...baseDraft, supply: "0" }), /positive integer/u);
   assert.equal(requests, 0);
+});
+
+test("diagnose retries the existing release with a read-only request and unchanged IDs", async () => {
+  const { executeKeelStudioAgentDraftOperation } = await import(MODULE);
+  const calls = [];
+  const diagnostic = { schema: "keel-release-diagnostics@1", releaseId: "release-existing", artifactId: "artifact-existing", status: "blocked", code: "rpc-unavailable", actions: ["retry-read"], signing: "not-performed", submission: "not-performed", uploadedBytes: 0, changed: false };
+  const result = await executeKeelStudioAgentDraftOperation({ operation: "diagnose", releaseId: "release-existing", grantToken: "a".repeat(48),
+    fetchImplementation: async (url, init) => { calls.push({ url: String(url), init }); return Response.json(diagnostic); } });
+  assert.deepEqual(result, diagnostic);
+  assert.equal(calls.length, 1);
+  assert.equal(calls[0].url, "https://studio.onkeel.io/api/agent/drafts/release-existing/diagnostics");
+  assert.equal(calls[0].init.method, undefined);
+  assert.equal(calls[0].init.body, undefined);
+  assert.equal(calls[0].init.cache, "no-store");
 });

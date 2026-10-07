@@ -10,7 +10,7 @@ export const STUDIO_WALLET_POLICY = {
   remoteMcpUrl: "https://studio.onkeel.io/api/mcp",
   connection: { default: "approval-code", cli: "keel-mcp --connect --window --workspace <project>", startApi: "/api/agent/pair", pollApi: "/api/agent/pair/poll", approvePage: "/studio/connect", secrets: "private user-profile credential file, scoped by workspace and Studio origin; no token in URLs, MCP results, project files or shell history", terminalImport: "keel-mcp --import-key --workspace <project> (hidden prompt)" },
   localTools: ["keel-studio-connect","keel-studio-capabilities", "keel-studio-stage-project", "keel-studio-draft"],
-  remoteTools: ["keel_whoami", "keel_workspace", "keel_create_draft", "keel_contracts", "keel_inspect_contract"],
+  remoteTools: ["keel_release_diagnose", "keel_whoami", "keel_workspace", "keel_create_draft", "keel_contracts", "keel_inspect_contract"],
   handoff: "Return the stage response's handoffUrl or the draft response's reviewUrl; use returned contract reviewUrl for existing contract controls.",
   creator: "Signs in and reviews/publishes in the website using their existing connected wallet; EVM uses the selected wagmi connector.",
   agentSigning: false,

@@ -112,3 +112,39 @@ assuming a new browser application is required.
 
 Desktop remains an optional local authoring client. Its build status, wallet
 setup or availability must not be used to describe the website as unavailable.
+
+## Recover an already-stored project
+
+Start with the existing project and release IDs. Run local `keel-studio-draft`
+with `operation: "diagnose"`, or hosted `keel_release_diagnose`. These use the
+creator's `drafts:read` scope, rerun Studio's actual release checks, and return
+structured recovery actions. They never upload, prepare a durable chain operation,
+sign, or submit. Inspect the granted scope/tool list before claiming an action is
+unavailable. A missing scope is different from an RPC outage or an implementation
+limitation; neither implies that a KEEL administrator must control the owner's work.
+
+- `retry-read`: rerun the same diagnostic after a transient RPC problem.
+- `resume-saved-receipts`: reopen the same release to reconcile its saved operation.
+  Do not create a replacement release, reupload files, or resubmit confirmed calls.
+- `review-hybrid`: an established Inline capability boundary can be reviewed using
+  the already-stored artwork. Hybrid has a network/gateway dependency. An IPFS
+  option requires an actual configured pinning route, verified CID, and durable pin
+  receipt; do not claim that changing a label creates one.
+- Integrity errors and contract reverts are not permission to claim verified
+  Inline or switch delivery to conceal the failure.
+
+Read `completeTokenUriBytes` separately from `graphByteLength` or stored resource
+bytes. A failed read does not prove the artwork is oversized. Successful diagnostics
+include the exact read boundary/block and configuration fingerprint; edits require a
+fresh check and the wallet path revalidates again. The project-specific recovery
+page is `/studio/projects/{projectId}/recovery`; it uses the same typed operations
+and saved identities as the agent API, with no injected wallet code.
+
+For a genuinely new compatible shell/reader binding, discover and reuse supported
+registered shells first. `keel-shell-search` and `keel-shell-prepare` remain distinct
+from payload compression. A creator-selected custom shell must satisfy its actual
+capabilities and must not claim canonical verification protection. Use supported
+Studio transaction review primitives to show exact network, destination, calldata,
+value, and costs for the owner's approval. A low-level unsigned envelope is not a
+hosted signing job. If the necessary handoff is unavailable, identify that precise
+boundary instead of inventing a transaction URL or demanding centralized control.

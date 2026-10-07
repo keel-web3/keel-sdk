@@ -44,6 +44,38 @@ export interface KeelStudioAgentReleaseView extends KeelStudioAgentReleaseDraft 
   readonly reviewUrl: string;
 }
 
+export interface KeelStudioReleaseDiagnostics {
+  readonly schema: "keel-release-diagnostics@1";
+  readonly releaseId: string;
+  readonly artifactId: string | null;
+  readonly slug: string;
+  readonly revision: number;
+  readonly artifactRevision: number | null;
+  readonly manifestDigest: string | null;
+  readonly chainId: number | null;
+  readonly presentationMode: string;
+  readonly status: "ready-for-review" | "blocked" | "resume-saved-operation";
+  readonly message: string;
+  readonly code?: string;
+  readonly retryable?: boolean;
+  readonly fingerprint?: string;
+  readonly diagnostic?: Readonly<Record<string, string | number | boolean>>;
+  readonly actions: readonly string[];
+  readonly operations?: readonly Readonly<Record<string, unknown>>[];
+  readonly storageEvidence?: readonly {
+    readonly resourceId: string;
+    readonly status: string;
+    readonly chainId: number | null;
+    readonly store: string | null;
+    readonly objectId: string | null;
+    readonly transactionHashes: readonly string[];
+  }[];
+  readonly signing: "not-performed";
+  readonly submission: "not-performed";
+  readonly uploadedBytes: 0;
+  readonly changed: false;
+}
+
 export interface KeelStudioAgentDraftWorkspace {
   readonly projects: readonly Readonly<Record<string, unknown>>[];
   readonly releases: readonly KeelStudioAgentReleaseView[];
@@ -55,7 +87,7 @@ export interface KeelStudioAgentDraftClientOptions {
   readonly fetchImplementation?: typeof fetch;
 }
 
-const KEEL_STUDIO_AGENT_DRAFT_OPERATIONS = ["list", "read", "create", "update"] as const;
+const KEEL_STUDIO_AGENT_DRAFT_OPERATIONS = ["list", "read", "diagnose", "create", "update"] as const;
 export type KeelStudioAgentDraftOperation = (typeof KEEL_STUDIO_AGENT_DRAFT_OPERATIONS)[number];
 
 /**
@@ -70,11 +102,12 @@ export interface KeelStudioAgentDraftOperationConfig extends KeelStudioAgentDraf
   readonly expectedRevision?: number;
 }
 
-export type KeelStudioAgentDraftOperationResult = KeelStudioAgentDraftWorkspace | KeelStudioAgentReleaseView;
+export type KeelStudioAgentDraftOperationResult = KeelStudioAgentDraftWorkspace | KeelStudioAgentReleaseView | KeelStudioReleaseDiagnostics;
 
 export interface KeelStudioAgentDraftClient {
   readonly list: () => Promise<KeelStudioAgentDraftWorkspace>;
   readonly read: (releaseId: string) => Promise<KeelStudioAgentReleaseView>;
+  readonly diagnose: (releaseId: string) => Promise<KeelStudioReleaseDiagnostics>;
   readonly create: (draft: KeelStudioAgentReleaseDraft) => Promise<KeelStudioAgentReleaseView>;
   readonly update: (releaseId: string, draft: KeelStudioAgentReleaseDraft, expectedRevision: number) => Promise<KeelStudioAgentReleaseView>;
 }
@@ -112,7 +145,7 @@ export function validateKeelStudioAgentReleaseDraft(value: unknown): KeelStudioA
   const input = value as Record<string, unknown>;
   // A creator or agent commonly edits the object returned by `read`; accept
   // those read-only view fields and strip them from the update payload.
-  const allowed = new Set<string>([...RELEASE_DRAFT_FIELDS, "id", "revision", "status", "slug", "reviewUrl"]);
+  const allowed = new Set<string>([...RELEASE_DRAFT_FIELDS, "id", "revision", "status", "slug", "reviewUrl", "lastReadDiagnostic"]);
   for (const key of Object.keys(input)) if (!allowed.has(key)) throw new TypeError(`Studio release draft.${key} is not supported.`);
   for (const key of RELEASE_DRAFT_FIELDS) if (!(key in input)) throw new TypeError(`Studio release draft.${key} is required.`);
 
@@ -236,6 +269,8 @@ export function createKeelStudioAgentDraftClient(options: KeelStudioAgentDraftCl
   };
   const read = async (releaseId: string): Promise<KeelStudioAgentReleaseView> =>
       reviewed(await studioAgentResponse(await studioAgentRequest(options, releasePath(releaseId), { cache: "no-store" }), [options.grantToken]));
+  const diagnose = async (releaseId: string): Promise<KeelStudioReleaseDiagnostics> =>
+    studioAgentResponse(await studioAgentRequest(options, `${releasePath(releaseId)}/diagnostics`, { cache: "no-store" }), [options.grantToken]);
   const create = async (draft: KeelStudioAgentReleaseDraft): Promise<KeelStudioAgentReleaseView> => {
     const validated = validateKeelStudioAgentReleaseDraft(draft);
     return reviewed(await studioAgentResponse(await studioAgentRequest(options, "/api/agent/drafts", {
@@ -253,7 +288,7 @@ export function createKeelStudioAgentDraftClient(options: KeelStudioAgentDraftCl
       body: JSON.stringify({ draft: validated, expectedRevision }),
     }), [options.grantToken]));
   };
-  return Object.freeze<KeelStudioAgentDraftClient>({ list, read, create, update });
+  return Object.freeze<KeelStudioAgentDraftClient>({ list, read, diagnose, create, update });
 }
 
 function operationReleaseId(config: KeelStudioAgentDraftOperationConfig): string {
@@ -275,6 +310,7 @@ export async function executeKeelStudioAgentDraftOperation(config: KeelStudioAge
   switch (config.operation) {
     case "list": return client.list();
     case "read": return client.read(operationReleaseId(config));
+    case "diagnose": return client.diagnose(operationReleaseId(config));
     case "create": return client.create(operationDraft(config));
     case "update": return client.update(operationReleaseId(config), operationDraft(config), config.expectedRevision!);
   }

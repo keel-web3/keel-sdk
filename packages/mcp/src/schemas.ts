@@ -226,8 +226,8 @@ const studioConnect: JsonSchema = object({
 }, ["operation"]);
 const studioDraft: JsonSchema = object({
   studioUrl: string("Optional HTTPS Studio URL; KEEL_STUDIO_URL is used otherwise.", 512),
-  operation: { type: "string", enum: ["list", "read", "create", "update"] },
-  releaseId: string("Required for read or update.", 128),
+  operation: { type: "string", enum: ["list", "read", "diagnose", "create", "update"] },
+  releaseId: string("Required for read, diagnose, or update.", 128),
   expectedRevision: integer("Required for update; prevents a stale agent from overwriting newer browser work.", 1),
   draft: {
     type: "object",
