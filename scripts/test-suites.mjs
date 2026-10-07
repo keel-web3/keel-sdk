@@ -57,6 +57,7 @@ export const DETERMINISTIC_TEST_FILES = Object.freeze([
   "tests/sdk-publication-preflight.test.mjs",
   "tests/sdk-studio-project-decisions.test.mjs",
   "tests/sdk-studio-project-planner.test.mjs",
+  "tests/sdk-studio-project-defaults.test.mjs",
 
   "tests/mcp-pre-reveal.test.mjs",
   "tests/sdk-collector-metadata.test.mjs",

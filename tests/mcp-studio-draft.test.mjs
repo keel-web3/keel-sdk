@@ -237,3 +237,25 @@ test("MCP rejects a locally declared KEEL shell before staging while allowing cr
     await rm(root, { recursive: true, force: true });
   }
 });
+
+test("portable MCP forwards explicit defaults operations through the same account-scoped endpoint", async () => {
+  const previousToken = process.env.KEEL_STUDIO_AGENT_TOKEN, previousFetch = globalThis.fetch;
+  process.env.KEEL_STUDIO_AGENT_TOKEN = token;
+  const requests = [], command = { commandId: "11111111-1111-4111-8111-111111111111", expectedRevision: 0, scope: { kind: "global" }, values: { delivery: "inline" } };
+  globalThis.fetch = async (url, init) => {
+    requests.push({ url: String(url), init });
+    return Response.json({ schema: "keel-studio-defaults-view@1", profile: { schema: "keel-studio-default-profile@1", revision: 0, askToSave: false, global: {}, byMedia: {} }, signing: "not-performed" });
+  };
+  try {
+    const server = await createMcpServer();
+    await server.handle({ jsonrpc: "2.0", id: 1, method: "initialize", params: initializeParams });
+    for (const args of [{ operation: "defaults" }, { operation: "defaults-edit", defaultsCommand: command }]) {
+      const response = await call(server, 2, args); assert.notEqual(response?.result.isError, true, response?.result.content?.[0]?.text);
+      assert.equal(response?.result.structuredContent.signing, "not-performed");
+    }
+    assert.deepEqual(requests.map(request => request.url), ["https://studio.example/api/agent/project-defaults", "https://studio.example/api/agent/project-defaults"]);
+    assert.deepEqual(JSON.parse(requests[1].init.body), command);
+    const unsupported = await call(server, 3, { operation: "defaults-edit", defaultsCommand: { ...command, signingKey: "forbidden" } });
+    assert.equal(unsupported?.result.isError, true); assert.equal(requests.length, 2);
+  } finally { globalThis.fetch = previousFetch; if (previousToken === undefined) delete process.env.KEEL_STUDIO_AGENT_TOKEN; else process.env.KEEL_STUDIO_AGENT_TOKEN = previousToken; }
+});

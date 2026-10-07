@@ -25,16 +25,34 @@ but inactive values are excluded from the resolved configuration.
 Default precedence is explicit project answers, project defaults, media defaults,
 then global defaults. Each draft pins its preference snapshot. Invalid defaults
 reopen the question; recommendations alone never answer a required question.
-Reusable account-default persistence and optional save-default prompts are not yet
-connected in the current release adapter. Inferred style is a suggestion, not an
-explicit preference, authority grant, or reason to skip consent.
+Explicit account-default persistence and optional save-default prompts use
+`@keel/sdk/studio-project-defaults`. Studio's Saved defaults fold can save the current
+answer globally or for its original media type, remove a default, and opt into
+asking to save future answers. Only defaultable fields and available choices are
+accepted. The preference profile has its own revision and stable command ID;
+conflicts require a fresh explicit choice, and uncertain saves retry the same command.
+New guided drafts copy the profile once. Existing drafts keep their original
+answers and pinned snapshot. Changing media or available capabilities revalidates
+those defaults; invalid combinations reopen their question. Inferred style remains
+a suggestion, never an explicit preference, authority grant or reason to skip consent.
+
+The hosted tools are `keel_project_defaults_read` and `keel_project_defaults_edit`;
+portable `keel-studio-draft` uses `defaults` / `defaults-edit` with `defaultsCommand`.
+These require separate `preferences:read` / `preferences:write` permissions selected
+by the creator in Agent setup. Existing draft grants are not broadened. The browser
+uses `/api/account/project-defaults`, agents `/api/agent/project-defaults`; both
+resolve ownership from their existing authentication and call one service. Schema
+migration `0047_creator_project_defaults` must be applied with the site rollout.
+No migration or new grant is created by source tests.
 
 Planning can begin before storage publication. The existing release publisher
 still checks actual storage evidence and complete metadata before its wallet
-review. The complete initial-storage simulation gate is separate unfinished work:
-do not call a planning confirmation, size estimate, browser sandbox or compressed
-graph length a verified reader preflight. No first-storage safety claim follows
-from this planning API alone.
+review. The initial-storage gate is implemented separately in the
+[initial-storage preflight](KEEL_STUDIO_INITIAL_STORAGE_PREFLIGHT.md) adapter and
+must pass at the real funding boundary. It requires a compatible simulation provider
+including pre-refund gas evidence; unsupported providers fail before new funding.
+A planning confirmation, size estimate, sandbox or compressed graph length is not
+reader proof. Source implementation and local tests are not a live rollout claim.
 
 The current release adapter supports the publisher's fixed-price route, including
 zero price, and its public/invite access entry points. An auction is not substituted

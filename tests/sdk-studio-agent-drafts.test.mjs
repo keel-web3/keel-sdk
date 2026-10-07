@@ -112,7 +112,7 @@ test("agent draft client covers every Studio release type without wallet or publ
     },
   });
 
-  assert.deepEqual(Object.keys(client).sort(), ["create", "diagnose", "editPlan", "list", "plan", "read", "storageReview", "update"]);
+  assert.deepEqual(Object.keys(client).sort(), ["create", "defaults", "diagnose", "editDefaults", "editPlan", "list", "plan", "read", "storageReview", "update"]);
   for (const releaseType of KEEL_STUDIO_RELEASE_TYPES) {
     const supply = releaseType === "open-edition" ? "open" : releaseType === "one-of-one" ? "1" : "100";
     const created = await client.create({ ...baseDraft, releaseType, supply, title: `Agent ${releaseType}` });

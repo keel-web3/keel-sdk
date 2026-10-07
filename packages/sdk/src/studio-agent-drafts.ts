@@ -1,3 +1,4 @@
+import { parseKeelStudioDefaultProfile, validateKeelStudioDefaultsCommand, type KeelStudioDefaultsCommand, type KeelStudioDefaultsView } from "./studio-project-defaults.js";
 import { KEEL_STUDIO_URL } from "./endpoints.js";
 import type { KeelStudioPlanningCommand, KeelStudioPlan, KeelPlanMatrix, KeelResolvedPlan } from "./studio-project-planner.js";
 
@@ -111,7 +112,7 @@ export interface KeelStudioAgentDraftClientOptions {
   readonly fetchImplementation?: typeof fetch;
 }
 
-const KEEL_STUDIO_AGENT_DRAFT_OPERATIONS = ["list", "read", "diagnose", "plan", "plan-edit", "storage-review", "create", "update"] as const;
+const KEEL_STUDIO_AGENT_DRAFT_OPERATIONS = ["list", "read", "diagnose", "plan", "plan-edit", "defaults", "defaults-edit", "storage-review", "create", "update"] as const;
 export type KeelStudioAgentDraftOperation = (typeof KEEL_STUDIO_AGENT_DRAFT_OPERATIONS)[number];
 
 /**
@@ -125,10 +126,11 @@ export interface KeelStudioAgentDraftOperationConfig extends KeelStudioAgentDraf
   readonly draft?: KeelStudioAgentReleaseDraft;
   readonly expectedRevision?: number;
   readonly planningCommand?: KeelStudioPlanningCommand;
+  readonly defaultsCommand?: KeelStudioDefaultsCommand;
   readonly projectId?: string;
 }
 
-export type KeelStudioAgentDraftOperationResult = KeelStudioAgentDraftWorkspace | KeelStudioAgentReleaseView | KeelStudioReleaseDiagnostics | KeelStudioReleasePlanning | KeelStudioStorageReview;
+export type KeelStudioAgentDraftOperationResult = KeelStudioAgentDraftWorkspace | KeelStudioAgentReleaseView | KeelStudioReleaseDiagnostics | KeelStudioReleasePlanning | KeelStudioStorageReview | KeelStudioDefaultsView;
 
 export interface KeelStudioAgentDraftClient {
   readonly list: () => Promise<KeelStudioAgentDraftWorkspace>;
@@ -136,6 +138,8 @@ export interface KeelStudioAgentDraftClient {
   readonly diagnose: (releaseId: string) => Promise<KeelStudioReleaseDiagnostics>;
   readonly plan: (releaseId: string) => Promise<KeelStudioReleasePlanning>;
   readonly editPlan: (releaseId: string, command: KeelStudioPlanningCommand) => Promise<KeelStudioReleasePlanning>;
+  readonly defaults: () => Promise<KeelStudioDefaultsView>;
+  readonly editDefaults: (command: KeelStudioDefaultsCommand) => Promise<KeelStudioDefaultsView>;
   readonly storageReview: (projectId: string) => Promise<KeelStudioStorageReview>;
   readonly create: (draft: KeelStudioAgentReleaseDraft) => Promise<KeelStudioAgentReleaseView>;
   readonly update: (releaseId: string, draft: KeelStudioAgentReleaseDraft, expectedRevision: number) => Promise<KeelStudioAgentReleaseView>;
@@ -307,6 +311,13 @@ export function createKeelStudioAgentDraftClient(options: KeelStudioAgentDraftCl
     if (value.schema !== "keel-release-planning@1" || value.releaseId !== releaseId || !Number.isSafeInteger(value.revision) || value.revision < 1) throw new TypeError("Studio returned another or invalid planning revision.");
     return { ...value, planningUrl: endpoint(options.studioUrl ?? KEEL_STUDIO_URL, `/studio/releases/${encodeURIComponent(releaseId)}/plan`).href };
   };
+  const defaults = async (command?: KeelStudioDefaultsCommand): Promise<KeelStudioDefaultsView> => {
+    const input = command === undefined ? undefined : validateKeelStudioDefaultsCommand(command);
+    const value = await studioAgentResponse<KeelStudioDefaultsView>(await studioAgentRequest(options, "/api/agent/project-defaults", input === undefined
+      ? { cache: "no-store" } : { method: "PATCH", headers: { "content-type": "application/json" }, body: JSON.stringify(input) }), [options.grantToken]);
+    if (value.schema !== "keel-studio-defaults-view@1" || value.signing !== "not-performed") throw new TypeError("Studio returned an invalid defaults profile.");
+    return { ...value, profile: parseKeelStudioDefaultProfile(value.profile) };
+  };
   const storageReview = async (projectId: string): Promise<KeelStudioStorageReview> => {
     if (!/^[0-9a-f]{8}(?:-[0-9a-f]{4}){3}-[0-9a-f]{12}$/iu.test(projectId)) throw new TypeError("Use this project's Studio UUID.");
     const value = await studioAgentResponse<KeelStudioStorageReview>(await studioAgentRequest(options, `/api/agent/projects/${encodeURIComponent(projectId)}/storage-review`, { method: "POST" }), [options.grantToken]);
@@ -330,7 +341,7 @@ export function createKeelStudioAgentDraftClient(options: KeelStudioAgentDraftCl
       body: JSON.stringify({ draft: validated, expectedRevision }),
     }), [options.grantToken]));
   };
-  return Object.freeze<KeelStudioAgentDraftClient>({ list, read, diagnose, plan: releaseId => planning(releaseId), editPlan: planning, storageReview, create, update });
+  return Object.freeze<KeelStudioAgentDraftClient>({ list, read, diagnose, plan: releaseId => planning(releaseId), editPlan: planning, defaults: () => defaults(), editDefaults: defaults, storageReview, create, update });
 }
 
 function validatePlanningCommand(command: KeelStudioPlanningCommand): void {
@@ -365,7 +376,7 @@ function operationDraft(config: KeelStudioAgentDraftOperationConfig): KeelStudio
 /** Execute one explicitly configured, creator-scoped draft operation. */
 export async function executeKeelStudioAgentDraftOperation(config: KeelStudioAgentDraftOperationConfig): Promise<KeelStudioAgentDraftOperationResult> {
   if (config === null || typeof config !== "object" || !isDraftOperation(config.operation)) throw new TypeError("Studio agent draft operation is unsupported.");
-  const supported = new Set(["studioUrl", "grantToken", "operation", "releaseId", "projectId", "draft", "expectedRevision", "planningCommand", "fetchImplementation"]);
+  const supported = new Set(["studioUrl", "grantToken", "operation", "releaseId", "projectId", "draft", "expectedRevision", "planningCommand", "defaultsCommand", "fetchImplementation"]);
   for (const key of Object.keys(config)) if (!supported.has(key)) throw new TypeError(`Studio agent draft configuration.${key} is not supported.`);
   const client = createKeelStudioAgentDraftClient(config);
   switch (config.operation) {
@@ -373,6 +384,11 @@ export async function executeKeelStudioAgentDraftOperation(config: KeelStudioAge
     case "read": return client.read(operationReleaseId(config));
     case "diagnose": return client.diagnose(operationReleaseId(config));
     case "plan": return client.plan(operationReleaseId(config));
+    case "defaults": return client.defaults();
+    case "defaults-edit": {
+      if (!config.defaultsCommand) throw new TypeError("defaults-edit requires an explicit defaultsCommand and preferences:write permission.");
+      return client.editDefaults(config.defaultsCommand);
+    }
     case "storage-review": {
       if (!config.projectId) throw new TypeError("storage-review requires the creator's projectId.");
       return client.storageReview(config.projectId);

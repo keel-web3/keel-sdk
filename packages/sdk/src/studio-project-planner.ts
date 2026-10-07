@@ -31,6 +31,8 @@ export interface KeelPlanField {
   readonly choices?: readonly KeelPlanChoice[];
   readonly minimum?: number;
   readonly maximum?: number;
+  /** Integer bound supplied by another active answer; an unanswered bound keeps this question open. */
+  readonly maximumFrom?: string;
   readonly required: boolean;
   readonly when?: KeelPlanPredicate;
   readonly dependencies?: readonly string[];
@@ -124,18 +126,20 @@ export function compileKeelPlanMatrix(matrix: KeelPlanMatrix): readonly KeelPlan
     if ((field.kind === "choice" || field.kind === "multi-choice") && !field.choices) throw new TypeError(`Missing capability choices for ${id}.`);
     if (field.choices && new Set(field.choices.map(choice => choice.value)).size !== field.choices.length) throw new TypeError(`Duplicate capability choice for ${id}.`);
     visiting.add(id);
-    for (const dependency of new Set([...(field.dependencies ?? []), ...(field.when ? predicateFields(field.when) : [])])) visit(dependency);
+    for (const dependency of new Set([...(field.dependencies ?? []), ...(field.maximumFrom ? [field.maximumFrom] : []), ...(field.when ? predicateFields(field.when) : [])])) visit(dependency);
     visiting.delete(id); visited.add(id); ordered.push(field);
   }
   for (const field of matrix.fields) visit(field.id);
   return Object.freeze(ordered);
 }
 
-function invalidValue(field: KeelPlanField, value: KeelPlanValue): KeelPlanIssue | undefined {
+export function validateKeelPlanValue(field: KeelPlanField, value: KeelPlanValue, context?: KeelPlanAnswers): KeelPlanIssue | undefined {
   const invalid = (message: string): KeelPlanIssue => ({ field: field.id, kind: "invalid", message });
   if (field.kind === "boolean") return typeof value === "boolean" ? undefined : invalid("Choose yes or no.");
+  const contextMaximum = field.maximumFrom && context ? context[field.maximumFrom] : undefined;
+  if (field.maximumFrom && context && (typeof contextMaximum !== "number" || !Number.isSafeInteger(contextMaximum))) return invalid("Answer the related limit first.");
   if (field.kind === "integer") return typeof value === "number" && Number.isSafeInteger(value)
-    && value >= (field.minimum ?? 0) && value <= (field.maximum ?? Number.MAX_SAFE_INTEGER) ? undefined : invalid("Enter a whole number within the allowed range.");
+    && value >= (field.minimum ?? 0) && value <= Math.min(field.maximum ?? Number.MAX_SAFE_INTEGER, typeof contextMaximum === "number" ? contextMaximum : Number.MAX_SAFE_INTEGER) ? undefined : invalid("Enter a whole number within the allowed range.");
   if (field.kind === "choice" || field.kind === "multi-choice") {
     const values = field.kind === "choice" ? (typeof value === "string" ? [value] : undefined) : (Array.isArray(value) ? value : undefined);
     if (!values || values.length === 0 || new Set(values).size !== values.length || values.some(item => typeof item !== "string")) return invalid("Choose an available option.");
@@ -168,7 +172,7 @@ function validatePlan(plan: KeelStudioPlan) {
 }
 
 function dependencyKey(field: KeelPlanField, answers: KeelPlanAnswers): string {
-  const dependencies = [...new Set([...(field.dependencies ?? []), ...(field.when ? predicateFields(field.when) : [])])].sort();
+  const dependencies = [...new Set([...(field.dependencies ?? []), ...(field.maximumFrom ? [field.maximumFrom] : []), ...(field.when ? predicateFields(field.when) : [])])].sort();
   return canonicalJson(Object.fromEntries(dependencies.map(id => [id, answers[id] ?? null])));
 }
 function snapshotValue(value: KeelPlanValue): KeelPlanValue {
@@ -197,10 +201,10 @@ export function resolveKeelStudioPlan(matrix: KeelPlanMatrix, plan: KeelStudioPl
     if (value === undefined && field.allowDefault && Object.hasOwn(defaults, defaultKey)) {
       const proposed = defaults[defaultKey]!;
       // Invalid defaults reopen the question instead of silently overriding it.
-      if (!invalidValue(field, proposed)) { value = proposed; defaulted.push(field.id); }
+      if (!validateKeelPlanValue(field, proposed, answers)) { value = proposed; defaulted.push(field.id); }
     }
     if (value === undefined) { if (field.required) issues.push({ field: field.id, kind: "missing", message: field.label }); continue; }
-    const issue = invalidValue(field, value);
+    const issue = validateKeelPlanValue(field, value, answers);
     if (issue) { issues.push(issue); continue; }
     answers[field.id] = snapshotValue(value);
   }

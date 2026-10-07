@@ -9,7 +9,7 @@ import { promisify } from "node:util";
 import { KEEL_STUDIO_URL } from "./endpoints.js";
 import { createKeelStudioAgentDraftClient } from "./studio-agent-drafts.js";
 
-export const STUDIO_CONNECTION_SCOPES = ["drafts:read", "drafts:create", "drafts:write", "contracts:read", "bridge:serve", "access:read", "access:write"] as const;
+export const STUDIO_CONNECTION_SCOPES = ["drafts:read", "drafts:create", "drafts:write", "contracts:read", "bridge:serve", "access:read", "access:write", "preferences:read", "preferences:write"] as const;
 export type StudioConnectionScope = typeof STUDIO_CONNECTION_SCOPES[number];
 export interface StudioConnectionOptions {
   readonly workspace?: string;
@@ -136,7 +136,7 @@ async function request(options: StudioConnectionOptions, origin: string, path: s
   return data;
 }
 function scopesOf(raw: unknown): StudioConnectionScope[] {
-  if (!Array.isArray(raw) || raw.length < 1 || raw.length > 7 || raw.some(s => !STUDIO_CONNECTION_SCOPES.includes(s))) throw new TypeError("Choose valid Studio connection permissions.");
+  if (!Array.isArray(raw) || raw.length < 1 || raw.length > STUDIO_CONNECTION_SCOPES.length || raw.some(s => !STUDIO_CONNECTION_SCOPES.includes(s))) throw new TypeError("Choose valid Studio connection permissions.");
   return [...new Set(raw)] as StudioConnectionScope[];
 }
 export async function getStudioConnection(options: StudioConnectionOptions = {}): Promise<StudioConnectionView> {

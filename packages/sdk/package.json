@@ -346,6 +346,10 @@
     "./studio-project-intake": {
       "types": "./dist/studio-project-intake.d.ts",
       "import": "./dist/studio-project-intake.js"
+    },
+    "./studio-project-defaults": {
+      "types": "./dist/studio-project-defaults.d.ts",
+      "import": "./dist/studio-project-defaults.js"
     }
   },
   "files": [
