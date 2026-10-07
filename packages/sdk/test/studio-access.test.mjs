@@ -22,3 +22,17 @@ test('caller-owned signer produces the expected mint signature and rejects anoth
  await assert.rejects(signKeelStudioAccessRequest({ ...request, signer: packet.domain.verifyingContract }, signer), /not the configured/);
  await assert.rejects(signKeelStudioAccessRequest({ ...request, packet: { ...packet, types: { OneMintAuthorization: [{ name: 'spender', type: 'address' }] } } }, signer), /Unsupported/);
 });
+
+test('provider secrets are redacted and raffle/benefit preparation returns only reviewed calls', async () => {
+ const seen = [], token = `keel_agent_${'B'.repeat(48)}`;
+ const client = createKeelStudioAccessClient({ grantToken: token, studioUrl: 'https://studio.example', fetchImplementation: async (url, init) => { seen.push({ url: String(url), init }); return Response.json({ changed: false, sent: false }); } });
+ await client.providers(); await client.prepareRaffle(id); await client.recordRaffleTransaction(id, `0x${'33'.repeat(32)}`); await client.confirmRaffle(id, `0x${'33'.repeat(32)}`); await client.benefits(id); await client.prepareBenefit(id, id, 0);
+ assert.equal(seen[0].url, 'https://studio.example/api/agent/access/providers');
+ assert.ok(seen.slice(1,4).every(item => item.url.endsWith('/raffle')));
+ assert.deepEqual(JSON.parse(seen[2].init.body), { action: 'record', transactionHash: `0x${'33'.repeat(32)}` });
+ assert.equal(seen[4].url.endsWith('/benefits'), true);
+ assert.deepEqual(JSON.parse(seen[5].init.body), { action: 'prepare', groupId: id, stageIndex: 0 });
+ const secret = 'private-provider-secret';
+ const rejected = createKeelStudioAccessClient({ grantToken: token, studioUrl: 'https://studio.example', fetchImplementation: async () => Response.json({ error: `${secret} ${token}` }, {status:400}) });
+ await assert.rejects(rejected.configureProvider({ expectedRevision:0,provider:'email',values:{apiKey:secret} }), error => !error.message.includes(secret) && !error.message.includes(token));
+});
