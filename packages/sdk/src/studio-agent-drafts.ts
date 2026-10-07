@@ -105,8 +105,29 @@ export interface KeelStudioAgentReleaseView extends KeelStudioAgentReleaseDraft 
   readonly reviewUrl: string;
 }
 
+/** Owner-scoped read-only replay data. It is not a wallet request or permission to contact another provider. */
+export interface KeelStudioMetadataReadCall {
+  readonly schema: "keel-metadata-read-call@1";
+  readonly chainId: number;
+  readonly request: { readonly to: string; readonly data: string; readonly value: "0x0"; readonly gas: string };
+  readonly block: { readonly number: string; readonly hash: string | null; readonly gasLimit: string };
+  readonly readerRuntimeCodeHash: string;
+  readonly functionName: "preparedTokenURI" | "preEncodedTokenURI";
+  readonly calldataDigest: string;
+  readonly expectedMetadataDigest: string;
+  readonly expectedMetadataBytes: number;
+  readonly graphBytes: number;
+  readonly prefixBytes: number;
+  readonly suffixBytes: number;
+  readonly attempts: readonly { readonly method: "eth_estimateGas" | "eth_call"; readonly gas: string }[];
+  readonly runtimeSourceMatch: "not-established";
+  readonly signing: "not-performed";
+  readonly submission: "not-performed";
+}
+
 export interface KeelStudioReleaseDiagnostics {
   readonly schema: "keel-release-diagnostics@1";
+  readonly metadataReadCall?: KeelStudioMetadataReadCall;
   readonly releaseId: string;
   readonly artifactId: string | null;
   readonly slug: string;
@@ -167,6 +188,7 @@ export interface KeelStudioAgentDraftOperationConfig extends KeelStudioAgentDraf
   readonly profileSelection?: { readonly profileId: string; readonly expectedProfileRevision: number };
   readonly conversationCommand?: KeelStudioConversationSuggestion;
   readonly projectId?: string;
+  readonly includeReadCall?: boolean;
 }
 
 export type KeelStudioAgentDraftOperationResult = KeelStudioAgentDraftWorkspace | KeelStudioAgentReleaseView | KeelStudioReleaseDiagnostics | KeelStudioReleasePlanning | KeelStudioStorageReview | KeelStudioReleaseWalletReview | KeelStudioDefaultsView | KeelStudioReleaseConversation | KeelStudioConversationSuggestionReceipt | KeelStudioProjectProfilesView | KeelSelectedProjectProfile;
@@ -174,7 +196,7 @@ export type KeelStudioAgentDraftOperationResult = KeelStudioAgentDraftWorkspace 
 export interface KeelStudioAgentDraftClient {
   readonly list: () => Promise<KeelStudioAgentDraftWorkspace>;
   readonly read: (releaseId: string) => Promise<KeelStudioAgentReleaseView>;
-  readonly diagnose: (releaseId: string) => Promise<KeelStudioReleaseDiagnostics>;
+  readonly diagnose: (releaseId: string, options?: { readonly includeReadCall?: boolean }) => Promise<KeelStudioReleaseDiagnostics>;
   readonly plan: (releaseId: string) => Promise<KeelStudioReleasePlanning>;
   readonly editPlan: (releaseId: string, command: KeelStudioPlanningCommand) => Promise<KeelStudioReleasePlanning>;
   readonly conversation: (releaseId: string) => Promise<KeelStudioReleaseConversation>;
@@ -347,8 +369,10 @@ export function createKeelStudioAgentDraftClient(options: KeelStudioAgentDraftCl
   };
   const read = async (releaseId: string): Promise<KeelStudioAgentReleaseView> =>
       reviewed(await studioAgentResponse(await studioAgentRequest(options, releasePath(releaseId), { cache: "no-store" }), [options.grantToken]));
-  const diagnose = async (releaseId: string): Promise<KeelStudioReleaseDiagnostics> =>
-    studioAgentResponse(await studioAgentRequest(options, `${releasePath(releaseId)}/diagnostics`, { cache: "no-store" }), [options.grantToken]);
+  const diagnose = async (releaseId: string, diagnosticOptions: { readonly includeReadCall?: boolean } = {}): Promise<KeelStudioReleaseDiagnostics> => {
+    if (diagnosticOptions.includeReadCall !== undefined && typeof diagnosticOptions.includeReadCall !== "boolean") throw new TypeError("includeReadCall must be a boolean.");
+    return studioAgentResponse(await studioAgentRequest(options, `${releasePath(releaseId)}/diagnostics${diagnosticOptions.includeReadCall ? "?includeReadCall=true" : ""}`, { cache: "no-store" }), [options.grantToken]);
+  };
   const planning = async (releaseId: string, command?: KeelStudioPlanningCommand): Promise<KeelStudioReleasePlanning> => {
     if (command !== undefined) validatePlanningCommand(command);
     const value = await studioAgentResponse<KeelStudioReleasePlanning>(await studioAgentRequest(options, `${releasePath(releaseId)}/plan`, command === undefined
@@ -469,7 +493,7 @@ export async function executeKeelStudioAgentDraftOperation(config: KeelStudioAge
   switch (config.operation) {
     case "list": return client.list();
     case "read": return client.read(operationReleaseId(config));
-    case "diagnose": return client.diagnose(operationReleaseId(config));
+    case "diagnose": return client.diagnose(operationReleaseId(config), config.includeReadCall === undefined ? {} : { includeReadCall: config.includeReadCall });
     case "plan": return client.plan(operationReleaseId(config));
     case "conversation": return client.conversation(operationReleaseId(config));
     case "conversation-suggest": {
