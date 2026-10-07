@@ -867,9 +867,9 @@ async function studioAccessTool(context: ToolContext, value: unknown): Promise<u
 }
 
 async function studioDraftTool(context: ToolContext, value: unknown): Promise<unknown> {
-  const input = record(value, ["studioUrl", "operation", "releaseId", "expectedRevision", "draft", "planningCommand"], "Studio draft arguments");
+  const input = record(value, ["studioUrl", "operation", "releaseId", "projectId", "expectedRevision", "draft", "planningCommand"], "Studio draft arguments");
   const operation = requiredString(input, "operation");
-  if (!["list", "read", "diagnose", "plan", "plan-edit", "create", "update"].includes(operation)) throw new TypeError("operation must be list, read, diagnose, plan, plan-edit, create, or update.");
+  if (!["list", "read", "diagnose", "plan", "plan-edit", "storage-review", "create", "update"].includes(operation)) throw new TypeError("operation must be list, read, diagnose, plan, plan-edit, create, or update.");
   const configuredStudioUrl = optionalString(input, "studioUrl");
   const studioUrl = resolveKeelEndpoints({
     ...(configuredStudioUrl === undefined ? {} : { studioUrl: configuredStudioUrl }),
@@ -880,8 +880,9 @@ async function studioDraftTool(context: ToolContext, value: unknown): Promise<un
   return executeKeelStudioAgentDraftOperation({
     studioUrl,
     grantToken: token,
-    operation: operation as "list" | "read" | "diagnose" | "plan" | "plan-edit" | "create" | "update",
+    operation: operation as "list" | "read" | "diagnose" | "plan" | "plan-edit" | "storage-review" | "create" | "update",
     ...(input.planningCommand === undefined ? {} : { planningCommand: input.planningCommand as never }),
+    ...(input.projectId === undefined ? {} : { projectId: requiredString(input, "projectId") }),
     ...(releaseId === undefined ? {} : { releaseId }),
     ...(input.draft === undefined ? {} : { draft: input.draft as never }),
     ...(expectedRevision === undefined ? {} : { expectedRevision }),

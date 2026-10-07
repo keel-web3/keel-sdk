@@ -2376,3 +2376,11 @@ function canonicalCheckpointStorageMode(mode: KeelPublicationStorageMode | KeelL
   if (mode === "native") return KEEL_NATIVE_CARRIER_V1;
   return selectKeelPublicationStorageMode(mode);
 }
+
+/** One gas-envelope policy for preflight and managed execution. */
+export function keelExecutorGasLimit(estimate: bigint, maximumGas?: bigint): bigint {
+  if (estimate <= 0n) throw new RangeError("The executor gas estimate must be positive.");
+  if (maximumGas !== undefined && (maximumGas <= 0n || estimate > maximumGas)) throw new RangeError("The executor call exceeds this network's transaction gas cap. No transaction was sent.");
+  const padded = estimate + ((estimate + 19n) / 20n);
+  return maximumGas !== undefined && padded > maximumGas ? maximumGas : padded;
+}

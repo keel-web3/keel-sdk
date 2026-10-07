@@ -226,8 +226,9 @@ const studioConnect: JsonSchema = object({
 }, ["operation"]);
 const studioDraft: JsonSchema = object({
   studioUrl: string("Optional HTTPS Studio URL; KEEL_STUDIO_URL is used otherwise.", 512),
-  operation: { type: "string", enum: ["list", "read", "diagnose", "plan", "plan-edit", "create", "update"] },
+  operation: { type: "string", enum: ["list", "read", "diagnose", "plan", "plan-edit", "storage-review", "create", "update"] },
   releaseId: string("Required for read, diagnose, plan, plan-edit, or update.", 128),
+  projectId: string("Required for storage-review; uses the owner-scoped project and never signs or submits.", 128),
   planningCommand: { type: "object", description: "For plan-edit: operation answer/navigate/mode/review, stable commandId UUID, current expectedRevision, and the matching answers/fieldId/mode/configurationKey. Read plan first. This never signs or spends." },
   expectedRevision: integer("Required for update; prevents a stale agent from overwriting newer browser work.", 1),
   draft: {

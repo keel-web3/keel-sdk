@@ -43,6 +43,20 @@ test("shared planning reads and edits the same release revision without signing 
   assert.equal(requests.length, 2);
 });
 
+test("storage review uses the owner-scoped server preparation path and returns its existing Studio page", async () => {
+  const { createKeelStudioAgentDraftClient } = await import(MODULE);
+  const projectId = "11111111-1111-4111-8111-111111111111";
+  let request;
+  const client = createKeelStudioAgentDraftClient({ grantToken: "x".repeat(48), fetchImplementation: async (url, init) => {
+    request = { url: String(url), ...init };
+    return Response.json({ projectId, status: "blocked", walletApprovalRequired: false, message: "Preflight needs an answer", signing: "not-performed", submission: "not-performed", reviewUrl: "https://wrong.example" });
+  } });
+  const result = await client.storageReview(projectId);
+  assert.equal(request.url, `https://studio.onkeel.io/api/agent/projects/${projectId}/storage-review`); assert.equal(request.method, "POST");
+  assert.equal(request.body, undefined); assert.equal(result.walletApprovalRequired, false);
+  assert.equal(result.reviewUrl, `https://studio.onkeel.io/artifacts/${projectId}?studio=1`);
+});
+
 test("draft review links use the hosted default and never forward untrusted URLs or credentials", async () => {
   const { createKeelStudioAgentDraftClient } = await import(MODULE);
   const token = `keel_agent_${"q".repeat(48)}`;
@@ -98,7 +112,7 @@ test("agent draft client covers every Studio release type without wallet or publ
     },
   });
 
-  assert.deepEqual(Object.keys(client).sort(), ["create", "diagnose", "editPlan", "list", "plan", "read", "update"]);
+  assert.deepEqual(Object.keys(client).sort(), ["create", "diagnose", "editPlan", "list", "plan", "read", "storageReview", "update"]);
   for (const releaseType of KEEL_STUDIO_RELEASE_TYPES) {
     const supply = releaseType === "open-edition" ? "open" : releaseType === "one-of-one" ? "1" : "100";
     const created = await client.create({ ...baseDraft, releaseType, supply, title: `Agent ${releaseType}` });

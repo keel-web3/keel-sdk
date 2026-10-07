@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 
-import { prepareKeelStudioProjectIntake } from "../packages/sdk/dist/studio-project-intake.js";
+import { prepareKeelStudioProjectIntake, createKeelStudioStorageOnlyIntent } from "../packages/sdk/dist/studio-project-intake.js";
 
 test("limited edition intake asks for and preserves an exact positive supply", () => {
   const input = { title: "Edition", description: "Twenty copies.", outcome: "release", chainId: 11155111, release: { type: "limited-edition", saleMechanism: "fixed-price", priceEth: "0.01" } };
@@ -76,4 +76,14 @@ test("invalid or contradictory release routing fails closed", () => {
     () => prepareKeelStudioProjectIntake({ title: "Bad", description: "Bad route.", outcome: "storage-only", release: { type: "one-of-one", saleMechanism: "fixed-price", priceEth: "0.1" } }),
     /release must be omitted for a storage-only project/u,
   );
+});
+
+
+test("explicit storage-only intent persists the selected network without authorizing a release or transaction", () => {
+  const prepared = prepareKeelStudioProjectIntake({ title: "Preserve", description: "Store the original", outcome: "storage-only", chainId: 11155111 });
+  assert.equal(prepared.status, "ready"); assert.equal(prepared.releaseIntent.mode, "art-only");
+  assert.equal(prepared.releaseIntent.chainId, 11155111);
+  assert.deepEqual(prepared.releaseIntent.wallet, { approvalRequiredNow: false, transactionSubmitted: false });
+  for (const chain of [0, -1, 1.5, Number.NaN, Number.MAX_SAFE_INTEGER + 1]) assert.throws(() => createKeelStudioStorageOnlyIntent(chain), /selected chain/);
+  assert.throws(() => prepareKeelStudioProjectIntake({ title: "Preserve", description: "Store", outcome: "storage-only", chainId: 0 }), /selected chain/);
 });

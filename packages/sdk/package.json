@@ -338,6 +338,14 @@
     "./studio-project-planner": {
       "types": "./dist/studio-project-planner.d.ts",
       "import": "./dist/studio-project-planner.js"
+    },
+    "./publication-preflight": {
+      "types": "./dist/publication-preflight.d.ts",
+      "import": "./dist/publication-preflight.js"
+    },
+    "./studio-project-intake": {
+      "types": "./dist/studio-project-intake.d.ts",
+      "import": "./dist/studio-project-intake.js"
     }
   },
   "files": [
