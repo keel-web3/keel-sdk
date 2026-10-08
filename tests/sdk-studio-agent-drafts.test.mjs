@@ -112,7 +112,7 @@ test("agent draft client covers every Studio release type without wallet or publ
     },
   });
 
-  assert.deepEqual(Object.keys(client).sort(), ["conversation", "create", "defaults", "diagnose", "editDefaults", "editPlan", "list", "plan", "read", "storageReview", "suggest", "update"]);
+  assert.deepEqual(Object.keys(client).sort(), ["conversation", "create", "defaults", "diagnose", "editDefaults", "editPlan", "editProfiles", "effectiveBuildDefaults", "list", "plan", "prepareReview", "profiles", "read", "selectProfile", "storageReview", "suggest", "update"]);
   for (const releaseType of KEEL_STUDIO_RELEASE_TYPES) {
     const supply = releaseType === "open-edition" ? "open" : releaseType === "one-of-one" ? "1" : "100";
     const created = await client.create({ ...baseDraft, releaseType, supply, title: `Agent ${releaseType}` });
@@ -236,4 +236,49 @@ test("diagnose retries the existing release with a read-only request and unchang
   assert.equal(calls[0].init.method, undefined);
   assert.equal(calls[0].init.body, undefined);
   assert.equal(calls[0].init.cache, "no-store");
+});
+
+test("exact owner-review preparation binds the saved revision and derives a safe operation URL", async () => {
+  const { createKeelStudioAgentDraftClient, executeKeelStudioAgentDraftOperation } = await import(MODULE);
+  const releaseId = "11111111-1111-4111-8111-111111111111", operationId = "22222222-2222-4222-8222-222222222222";
+  const requests = [], answer = { schema: "keel-release-wallet-review@1", releaseId, revision: 7, wallet: `0x${"33".repeat(20)}`,
+    preparation: { operationId, chainId: 11155111, calls: [{ kind: "create-drop", to: `0x${"44".repeat(20)}`, data: "0x1234", value: "0x0" }] },
+    reviewUrl: "https://wrong.example/?secret=discard", signing: "not-performed", submission: "not-performed" };
+  let current = answer;
+  const config = { studioUrl: "https://studio.example", grantToken: "x".repeat(48), fetchImplementation: async (url, init) => { requests.push({ url: String(url), ...init }); return Response.json(current); } };
+  const client = createKeelStudioAgentDraftClient(config);
+  const result = await client.prepareReview(releaseId, 7);
+  assert.equal(result.reviewUrl, `https://studio.example/studio/releases/${releaseId}/review?operation=${operationId}&revision=7`);
+  assert.equal(requests[0].url, `https://studio.example/api/agent/drafts/${releaseId}/review`); assert.equal(requests[0].method, "POST");
+  assert.deepEqual(JSON.parse(requests[0].body), { expectedRevision: 7 });
+  assert.equal((await executeKeelStudioAgentDraftOperation({ ...config, operation: "prepare-review", releaseId, expectedRevision: 7 })).preparation.operationId, operationId);
+  await assert.rejects(client.prepareReview(releaseId, 0), /revision/u);
+  await assert.rejects(executeKeelStudioAgentDraftOperation({ ...config, operation: "prepare-review", releaseId, expectedRevision: 7, wallet: "override" }), /wallet is not supported/u);
+  assert.equal(requests.length, 2);
+  for (const bad of [{ revision: 8 }, { releaseId: operationId }, { signing: "performed" }, { preparation: { ...answer.preparation, operationId: "../other" } }, { preparation: { ...answer.preparation, calls: [null] } }]) {
+    current = { ...answer, ...bad }; await assert.rejects(client.prepareReview(releaseId, 7), /invalid wallet-review identity/u);
+  }
+});
+
+
+test("diagnostics explicitly request replay evidence and reject a mutating or unrelated reply", async () => {
+  const { executeKeelStudioAgentDraftOperation } = await import(MODULE);
+  const calls = [], releaseId = "release-existing";
+  const diagnostic = { schema: "keel-release-diagnostics@1", releaseId, signing: "not-performed", submission: "not-performed", uploadedBytes: 0, changed: false };
+  const input = { operation: "diagnose", releaseId, includeReadCall: true, grantToken: "a".repeat(48), fetchImplementation: async (url, init) => { calls.push({url: String(url), init}); return Response.json(diagnostic); } };
+  assert.deepEqual(await executeKeelStudioAgentDraftOperation(input), diagnostic);
+  assert.match(calls[0].url, /diagnostics\?includeReadCall=true$/u); assert.equal(calls[0].init.method, undefined);
+  for (const changed of [{ releaseId: "another" }, { changed: true }, { signing: "performed" }]) await assert.rejects(executeKeelStudioAgentDraftOperation({ ...input, fetchImplementation: async () => Response.json({ ...diagnostic, ...changed }) }), /diagnostic result/u);
+  await assert.rejects(executeKeelStudioAgentDraftOperation({ ...input, includeReadCall: "true" }), /boolean/u);
+});
+
+test("metadata replay validates exact ABI calldata, hashes and read-only gas boundaries", async () => {
+  const { createKeelStudioAgentDraftClient } = await import(MODULE), { encodeFunctionData, keccak256, parseAbi } = await import("viem");
+  const data = encodeFunctionData({ abi: parseAbi(["function preparedTokenURI(bytes32,bytes32,bytes,bytes) view returns (string)"]), functionName: "preparedTokenURI", args: ['0x'+'22'.repeat(32), '0x'+'33'.repeat(32), '0x253742', '0x253744'] });
+  const call = { schema: "keel-metadata-read-call@1", chainId: 11155111, request: { to: '0x'+'11'.repeat(20), data, value: '0x0', gas: '0x3938700' }, block: { number: '0x2a', hash: '0x'+'44'.repeat(32), gasLimit: '60000000' }, readerRuntimeCodeHash: '0x'+'55'.repeat(32), functionName: 'preparedTokenURI', calldataDigest: keccak256(data), expectedMetadataDigest: '0x'+'66'.repeat(32), expectedMetadataBytes: 14, graphBytes: 100, prefixBytes: 3, suffixBytes: 3, attempts: [{method: 'eth_call', gas: '60000000'}], runtimeSourceMatch: 'not-established', signing: 'not-performed', submission: 'not-performed' };
+  const response = value => ({ schema: 'keel-release-diagnostics@1', releaseId: 'release-existing', metadataReadCall: value, signing: 'not-performed', submission: 'not-performed', uploadedBytes: 0, changed: false });
+  const client = value => createKeelStudioAgentDraftClient({ grantToken: 'a'.repeat(48), fetchImplementation: async () => Response.json(response(value)) });
+  assert.deepEqual((await client(call).diagnose('release-existing', {includeReadCall:true})).metadataReadCall, call);
+  await assert.rejects(client(call).diagnose('release-existing'), /not requested/u);
+  for (const bad of [{ ...call, calldataDigest: '0x'+'77'.repeat(32) }, { ...call, functionName: 'preEncodedTokenURI' }, { ...call, request: {...call.request, value:'0x1'} }, { ...call, request: {...call.request, gas:'0x3938701'} }, { ...call, request: {...call.request, rpcUrl:'https://private.invalid'} }]) await assert.rejects(client(bad).diagnose('release-existing', {includeReadCall:true}));
 });

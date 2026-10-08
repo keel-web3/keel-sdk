@@ -9,6 +9,9 @@ import {
   type Hex,
 } from "viem";
 import { sha256Hex, type Compression } from "@keel/protocol";
+export { resolveKeelTransactionGasPolicy, assertKeelAmsterdamSimulationHeader, KEEL_SEPOLIA_AMSTERDAM_TIMESTAMP } from "./transaction-gas-policy.js";
+export type { KeelTransactionGasPolicy } from "./transaction-gas-policy.js";
+import { resolveKeelTransactionGasPolicy, type KeelTransactionGasPolicy } from "./transaction-gas-policy.js";
 
 /**
  * Chain-agnostic planning and recovery rules for managed KEEL publications.
@@ -1657,6 +1660,7 @@ export function encodeKeelHistoryPublicationOpen(input: {
 }
 
 export interface KeelEip7623CalldataGasEstimate extends EthereumCalldataIntrinsicGasEstimate {
+  readonly gasProfile: "legacy-eip7623-quote" | KeelTransactionGasPolicy["profile"];
   readonly standardCalldataGas: number;
   readonly floorCalldataGas: number;
   readonly standardTotalGas: number;
@@ -1676,11 +1680,16 @@ export function estimateEthereumCalldataIntrinsicGasWithEip7623(input: {
   readonly envelopeByteLengthPerTransaction?: number;
   readonly envelopeZeroByteCountPerTransaction?: number;
   readonly executionGas?: number;
+  /** Omission is a legacy EIP-7623 quote, never current-chain transaction proof. */
+  readonly transactionGasPolicy?: KeelTransactionGasPolicy;
 }): KeelEip7623CalldataGasEstimate {
-  const standard = estimateEthereumCalldataIntrinsicGas(input);
+  const raw = estimateEthereumCalldataIntrinsicGas(input);
+  const policy = input.transactionGasPolicy;
+  const transactionBaseGas = policy === undefined ? raw.transactionBaseGas : raw.transactionCount * (policy.transactionBaseGas + policy.recipientAccessGas);
+  const standard = { ...raw, transactionBaseGas, calldataIntrinsicGas: transactionBaseGas + raw.calldataByteGas };
   const executionGas = nonNegativeSafeInteger(input.executionGas ?? 0, "EIP-7623 execution gas");
-  const floorCalldataGas = standard.zeroByteCount * ETHEREUM_EIP_7623_ZERO_CALLDATA_BYTE_GAS
-    + standard.nonZeroByteCount * ETHEREUM_EIP_7623_NONZERO_CALLDATA_BYTE_GAS;
+  const floorCalldataGas = standard.zeroByteCount * (policy?.zeroCalldataFloorGas ?? ETHEREUM_EIP_7623_ZERO_CALLDATA_BYTE_GAS)
+    + standard.nonZeroByteCount * (policy?.nonzeroCalldataFloorGas ?? ETHEREUM_EIP_7623_NONZERO_CALLDATA_BYTE_GAS);
   const standardTotalGas = standard.calldataIntrinsicGas;
   const floorTotalGas = standard.transactionBaseGas + floorCalldataGas;
   const chargedCalldataIntrinsicGas = Math.max(standardTotalGas, floorTotalGas);
@@ -1688,6 +1697,7 @@ export function estimateEthereumCalldataIntrinsicGasWithEip7623(input: {
   const chargedTotalGas = Math.max(standardTotalGasWithExecution, floorTotalGas);
   return Object.freeze({
     ...standard,
+    gasProfile: policy?.profile ?? "legacy-eip7623-quote",
     standardCalldataGas: standard.calldataByteGas,
     floorCalldataGas,
     standardTotalGas,
@@ -1716,6 +1726,8 @@ export interface KeelHistoryBatchGasEstimate {
 }
 
 export interface KeelHistoryInscriptionGasEstimate {
+  readonly gasProfile: "legacy-eip7623-quote" | KeelTransactionGasPolicy["profile"];
+  readonly verification: "unverified-quote";
   readonly storageMode: typeof KEEL_HISTORY_INSCRIPTION_V1;
   readonly storedByteLength: number;
   readonly chunkCount: number;
@@ -1750,13 +1762,17 @@ export function estimateKeelHistoryInscriptionGas(input: {
   readonly logicalRegistryOperationGas?: number;
   readonly executorControlGas?: number;
   readonly transactionGasCap?: number;
+  readonly transactionGasPolicy?: KeelTransactionGasPolicy;
 }): KeelHistoryInscriptionGasEstimate {
   const eventTopicCount = nonNegativeSafeInteger(input.eventTopicCount ?? KEEL_HISTORY_EVENT_TOPIC_COUNT, "history event topic count");
   const validationGasPerBatch = nonNegativeSafeInteger(input.validationGasPerBatch ?? KEEL_HISTORY_BATCH_VALIDATION_GAS, "history batch validation gas");
   const commitmentStateGas = nonNegativeSafeInteger(input.commitmentStateGas ?? KEEL_HISTORY_COMMITMENT_STATE_GAS, "history commitment state gas");
   const logicalRegistryOperationGas = nonNegativeSafeInteger(input.logicalRegistryOperationGas ?? 0, "history logical operation gas");
   const executorControlGas = nonNegativeSafeInteger(input.executorControlGas ?? KEEL_HISTORY_EXECUTOR_CONTROL_GAS, "history executor control gas");
-  const transactionGasCap = positiveSafeInteger(input.transactionGasCap ?? KEEL_EIP_7825_TRANSACTION_GAS_CAP, "history transaction gas cap");
+  const policy = input.transactionGasPolicy;
+  const selectedTotalCap = policy === undefined ? KEEL_EIP_7825_TRANSACTION_GAS_CAP : Number(policy.maximumTotalGas);
+  const transactionGasCap = positiveSafeInteger(input.transactionGasCap ?? selectedTotalCap, "history transaction gas cap");
+  if (transactionGasCap > selectedTotalCap) throw new RangeError("History quote exceeds its selected fork/block total gas cap.");
   const batchEstimates: KeelHistoryBatchGasEstimate[] = [];
   let storedByteLength = 0;
   let chunkCount = 0;
@@ -1777,11 +1793,16 @@ export function estimateKeelHistoryInscriptionGas(input: {
     const calldata = estimateEthereumCalldataIntrinsicGasWithEip7623({
       bytes: hexToBytes(batch.transactionInput),
       executionGas,
+      ...(policy === undefined ? {} : { transactionGasPolicy: policy }),
     });
     const totalBatchGas = calldata.chargedTotalGas;
     if (totalBatchGas > transactionGasCap) {
-      throw new RangeError(`History batch ${batch.batchIndex} exceeds the EIP-7825 transaction gas cap.`);
+      throw new RangeError(`History batch ${batch.batchIndex} exceeds the selected total transaction gas cap.`);
     }
+    // These inscription estimates model no new persistent state per calldata batch.
+    // The calldata floor still counts toward regular gas; do not claim that a
+    // quote validates the separately priced commitment/registry operations.
+    if (policy?.separateStateGas && calldata.chargedTotalGas > Number(policy.maximumExecutionGas)) throw new RangeError(`History batch ${batch.batchIndex} exceeds the regular execution gas cap.`);
     const estimate: KeelHistoryBatchGasEstimate = Object.freeze({
       batchIndex: batch.batchIndex,
       payloadByteLength: batch.payloads.reduce((total, payload) => total + (payload.length - 2) / 2, 0),
@@ -1811,6 +1832,8 @@ export function estimateKeelHistoryInscriptionGas(input: {
     + executorControlGas;
   return Object.freeze({
     storageMode: KEEL_HISTORY_INSCRIPTION_V1,
+    gasProfile: policy?.profile ?? "legacy-eip7623-quote",
+    verification: "unverified-quote",
     storedByteLength,
     chunkCount,
     batchCount: batchEstimates.length,
@@ -1881,6 +1904,9 @@ export async function buildKeelPublicationPlan(input: {
     readonly logicalRegistryOperationGas?: number;
     readonly executorControlGas?: number;
     readonly transactionGasCap?: number;
+    /** Actual selected-chain header is required for mainnet/Sepolia history quotes. */
+    readonly blockTimestamp?: bigint;
+    readonly blockGasLimit?: bigint;
     /** Read-only nextPublicationId used to bind the exact future publication. */
     readonly publicationIdForQuote?: bigint;
   };
@@ -2036,6 +2062,10 @@ export async function buildKeelPublicationPlan(input: {
   });
   const gas = estimateKeelHistoryInscriptionGas({
     batches: historyBatches,
+    ...((Number(input.history?.chainId) === 1 || Number(input.history?.chainId) === 11_155_111) ? {
+      transactionGasPolicy: resolveKeelTransactionGasPolicy({ chainId: Number(input.history?.chainId),
+        blockTimestamp: input.history?.blockTimestamp as bigint, blockGasLimit: input.history?.blockGasLimit as bigint }),
+    } : {}),
     ...(input.history?.eventTopicCount === undefined ? {} : { eventTopicCount: input.history.eventTopicCount }),
     ...(input.history?.eventDataByteLength === undefined ? {} : { eventDataByteLength: input.history.eventDataByteLength }),
     ...(input.history?.validationGasPerBatch === undefined ? {} : { validationGasPerBatch: input.history.validationGasPerBatch }),

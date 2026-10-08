@@ -119,3 +119,26 @@ The current chat provider is the creator's existing bridge. Direct API-provider
 configuration, hosted paid assistance, vector memory, agent wallets and code-preview
 composition are not activated by this slice. No new credential, grant, subscription
 or wallet transaction is created by these source tests.
+
+## From plan to owner review
+
+The shared plan returns focused section links carrying the release, field and saved revision. A link shows the latest canonical values; it never restores values from its URL. Explicit edits use the same revision-checked writer in guided, direct and agent workflows.
+
+After the plan is complete and confirmed, hosted `keel_release_review_prepare` or portable `keel-studio-draft` with `operation: prepare-review`, `releaseId` and `expectedRevision` saves the exact unsigned owner-review operation. It requires `drafts:write`. The SDK exposes `prepareReview(releaseId, expectedRevision)`. The server selects the creator account wallet; callers cannot supply another wallet or arbitrary calldata. The returned review URL pins the operation and revision.
+
+The private review page explains each supported call, network, signing wallet, creator payment, separate collector prices, and exact calldata in an advanced fold. Opening it does not request a wallet approval. The owner explicitly continues through the existing Studio wallet flow. Changed plans and stale operations invalidate the handoff; submitted operations resume their saved receipt instead of repeating storage or release calls.
+
+This release publisher currently compiles its existing fixed-price controller routes and strict presentation repairs. An auction, advanced overlapping lane, unsupported reader or unverified IPFS route remains blocked. A profile or agent suggestion is not evidence that a contract capability is implemented.
+
+
+## Named profiles and focused creation
+
+On this source revision, Studio starts new work with a small set of named profiles and a direct-settings opt-out. A profile keeps content type, token standard, token structure and sale method separate. Draft, stored, scheduled and live are actual progress, never a preset. Auction profiles link to the existing Fray intent builder; this publisher does not implement sealed-bid settlement or ERC-1155 publishing.
+
+Hosted MCP exposes `keel_project_profiles_read`, `keel_project_profiles_select` and `keel_project_profiles_edit`. Portable `keel-studio-draft` operations are `profiles`, `profile-select` and `profiles-edit`. Read/select require `preferences:read`; create/edit/remove require `preferences:write` and the creator's explicit instruction. Existing grants are unchanged. Edits use `commandId`, the account `expectedRevision`, and `profileId`; retry uncertain writes with the identical command. A conflict requires reviewing the saved version before another edit.
+
+Select an exact `profileId` and `expectedProfileRevision`. Carry the returned `snapshot` and copied `defaults` as `projectProfile` in SDK `stageKeelStudioProject` or portable `keel-studio-stage-project`. Stage only the creator's intended files. The editor loads those values into the same creation state. Explicit project answers override profile values, media defaults and global defaults. Later profile edits do not alter an existing project. The private copied configuration is committed with artifact preparation and is part of its retry fingerprint; it never belongs in the public artwork manifest. Migration `0049_artifact_project_profiles.sql` must be applied before deploying this revision.
+
+The creation page accepts a focused `step` of `profile`, `identity`, `setup`, `files`, `libraries`, `preview` or `review`, or an exact declared `prompt:<id>`. Add it to the server-issued handoff URL while retaining that URL's identity. These links select a view, never inject answers or wallet calls. A profile is still chosen before other creation steps. Once a collectible project is prepared, Studio opens its shared release plan; the existing exact owner-review page remains the signing path.
+
+Before preparation, same-tab browser recovery keeps editable choices and attempt identity. Local files must be reselected after a full reload; browser storage does not claim to preserve their bytes. Returning to the same agent handoff restores missing verified files without replacing edited values. After preparation, the private project/profile copy lives in the creator's database record. Do not describe precreation browser recovery as cross-device synchronization. Browser layout/accessibility, production migration concurrency and live provider behavior still need their separate validation.

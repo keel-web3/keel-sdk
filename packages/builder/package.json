@@ -13,6 +13,18 @@
     "./thumbnail-sequence": {
       "types": "./dist/thumbnail-sequence.d.ts",
       "import": "./dist/thumbnail-sequence.js"
+    },
+    "./media-preparation": {
+      "types": "./dist/media-preparation.d.ts",
+      "import": "./dist/media-preparation.js"
+    },
+    "./media-edit-recipe": {
+      "types": "./dist/media-edit-recipe.d.ts",
+      "import": "./dist/media-edit-recipe.js"
+    },
+    "./media-slot-plan": {
+      "types": "./dist/media-slot-plan.d.ts",
+      "import": "./dist/media-slot-plan.js"
     }
   },
   "files": [

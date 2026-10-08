@@ -325,30 +325,36 @@ export function validateKeelCreationAnswers(
   const normalized: Record<string, string | number | boolean> = {};
   for (const prompt of manifest.prompts) {
     if (prompt.type === "files") continue;
-    const raw = answers[prompt.id] ?? prompt.default;
+    const value = validateKeelCreationAnswer(prompt, answers[prompt.id]);
+    if (value !== undefined) normalized[prompt.id] = value;
+  }
+  return normalized;
+}
+
+/** Validate one declared question using the same rules as complete module intake. */
+export function validateKeelCreationAnswer(prompt: Exclude<KeelCreationPrompt, { readonly type: "files" }>, value: unknown): string | number | boolean | undefined {
+  const raw = value ?? prompt.default;
     if (raw === undefined || raw === "" || (typeof raw === "string" && raw.trim().length === 0)) {
       if (prompt.required) throw new TypeError(`${prompt.label} is required.`);
-      continue;
+      return undefined;
     }
     if (prompt.type === "short-text" || prompt.type === "long-text") {
       if (typeof raw !== "string" || raw.length > prompt.maxLength) throw new TypeError(`${prompt.label} is invalid.`);
-      normalized[prompt.id] = raw.trim();
+      return raw.trim();
     } else if (prompt.type === "choice") {
       if (typeof raw !== "string" || !prompt.options.some((option) => option.value === raw)) throw new TypeError(`${prompt.label} is invalid.`);
-      normalized[prompt.id] = raw;
+      return raw;
     } else if (prompt.type === "toggle") {
       if (typeof raw !== "boolean") throw new TypeError(`${prompt.label} is invalid.`);
-      normalized[prompt.id] = raw;
+      return raw;
     } else if (prompt.type === "number") {
       if (
         typeof raw !== "number" || !Number.isFinite(raw) || raw < prompt.min || raw > prompt.max
         || Math.abs(((raw - prompt.min) / prompt.step) - Math.round((raw - prompt.min) / prompt.step)) > 1e-9
       ) throw new TypeError(`${prompt.label} is invalid.`);
-      normalized[prompt.id] = raw;
+      return raw;
     } else {
       if (typeof raw !== "string" || !COLOR.test(raw)) throw new TypeError(`${prompt.label} is invalid.`);
-      normalized[prompt.id] = raw;
+      return raw;
     }
-  }
-  return normalized;
 }

@@ -18,6 +18,9 @@ export const KEEL_CREATOR_PREPARED_COPY_ABI = parseAbi([
 export async function prepareKeelCreatorInline(input: {
   readonly chainId: number;
   readonly store: Address;
+  /** Default shared by all resources; per-resource explicit choices win. */
+  readonly compression?: "auto" | "brotli" | "none";
+  readonly brotliQuality?: number;
   readonly resources: readonly {
     readonly id: string; readonly aliases?: readonly string[];
     readonly role: "entrypoint" | "module" | "asset";
@@ -52,7 +55,7 @@ export async function prepareKeelCreatorInline(input: {
     if (!["entrypoint", "module", "asset"].includes(resource.role) || typeof resource.mediaType !== "string" || !resource.mediaType || resource.mediaType.length > 128 || !(resource.bytes instanceof Uint8Array) || !resource.bytes.length) throw new TypeError("Invalid creator resource.");
     if (resource.role === "entrypoint" && resource.mediaType !== "text/html") throw new TypeError("The creator entrypoint must be HTML.");
     const source = resource.bytes.slice();
-    const payload = prepareKeelDensePayload(source, { compression: resource.compression ?? "auto" });
+    const payload = prepareKeelDensePayload(source, { compression: resource.compression ?? input.compression ?? "auto", ...(input.brotliQuality === undefined ? {} : { brotliQuality: input.brotliQuality }) });
     const carrier = await object(resource.id + ":payload", payload.preparedBytes);
     const binding = await buildKeelOnchainContainerBinding({ chainId: input.chainId, store, objectId: carrier.objectId, compression: payload.compression, bytes: source, storedBytes: payload.compressedBytes });
     const pack = { containerId: binding.id, objectId: carrier.objectId, storedIntegrity: payload.storedIntegrity, storedDense: payload.storedDense };
@@ -93,6 +96,17 @@ export async function prepareKeelCreatorInline(input: {
     status: "review-only" as const, signing: "not-performed" as const, submission: "not-performed" as const,
     shell: { revision: shellRevision, prefix, suffix, requiredRegistration: "keel.shell.inline-raw-percent-protection@1" as const, bootEncoding: shell.shellBootEncoding, bootCompression: shell.shellBootCompression },
     resources, objects, preparedBodyBytes, table, image, posterURI,
+    optimization: {
+      sourceByteIdentity: "verified-exact" as const,
+      compressedPayloadBytes: resources.reduce((n, r) => n + r.payload.compressedBytes.length, 0),
+      preparedPayloadBytes: resources.reduce((n, r) => n + r.carrier.bytes.length, 0),
+      preparedPayloadBytesSaved: resources.some(r => r.payload.optimization.preparedBytesSaved === null) ? null
+        : resources.reduce((n, r) => n + (r.payload.optimization.preparedBytesSaved ?? 0), 0),
+      shellPreparedBytes: prefix.bytes.length + suffix.bytes.length,
+      decoderDelivery: "included-in-prepared-shell" as const,
+      requiredCodecs: [...new Set(resources.map(r => r.compression).filter(c => c !== "none"))],
+      offchainPayloads: [] as readonly string[],
+    },
     request: { shellRevision, bodyObjectIds: body.map(o => o.objectId), bodyDigests: body.map(o => o.digest), imageObjectId: image.objectId, imageDigest: image.digest, containerTableObjectId: table.objectId, containerTableDigest: table.digest, description },
     sourceBytes: resources.reduce((n, r) => n + r.sourceIntegrity.byteLength, 0),
     newStoredBytes: objects.reduce((n, o) => n + o.newBytes, 0), reusedStoredBytes: objects.reduce((n, o) => n + o.reusedBytes, 0),

@@ -75,3 +75,44 @@ test('prepared fragment decodes JSON escapes and both percent layers exactly',as
  assert.equal(Buffer.from(decodeKeelPreparedDenseCopyFragment(Buffer.from(outer))).toString(),text);
  for(const bad of ['space here','#','%aF','%','%0','%GG','%FF'])assert.throws(()=>decodeKeelPreparedDenseCopyFragment(Buffer.from(bad)));
 });
+
+test('default compression quality is pinned and auto compares exact paid carrier bytes', async () => {
+ const {brotliCompressSync,constants}=await import('node:zlib');
+ const source=Buffer.from('deterministic source ? & < > 🔥 '.repeat(500));
+ const automatic=prepareKeelDensePayload(source);
+ assert.equal(automatic.brotliQuality,11);
+ assert.deepEqual(Buffer.from(automatic.compressedBytes),brotliCompressSync(source,{params:{[constants.BROTLI_PARAM_QUALITY]:11}}));
+ const off=prepareKeelDensePayload(source,{compression:'none'});
+ assert.equal(automatic.optimization.uncompressedPreparedBytes,off.preparedBytes.length);
+ assert.equal(automatic.optimization.preparedBytesSaved,off.preparedBytes.length-automatic.preparedBytes.length);
+ assert.equal(automatic.optimization.sourceByteIdentity,'verified-exact');
+ for(const brotliQuality of [-1,12,1.5,NaN])assert.throws(()=>prepareKeelDensePayload(source,{brotliQuality}),/quality/);
+ const fast=prepareKeelDensePayload(source,{brotliQuality:4});assert.equal(fast.brotliQuality,4);
+});
+
+
+test('large decoded sources may compress into bounded stored carriers without encoding an illegal raw baseline',()=>{
+ const source=Buffer.alloc(4*1024*1024+1,65);
+ for(const compression of ['auto','brotli']){
+  const prepared=prepareKeelDensePayload(source,{compression,brotliQuality:4});
+  assert.equal(prepared.compression,'brotli');assert.ok(prepared.compressedBytes.length<1024);
+  assert.equal(prepared.optimization.uncompressedPreparedBytes,null);
+  assert.equal(prepared.optimization.preparedBytesSaved,null);
+ }
+ assert.throws(()=>prepareKeelDensePayload(source,{compression:'none'}),/stored-carrier/);
+});
+test('an oversized compression candidate cannot invalidate a legal raw carrier',()=>{
+ const source=randomBytes(4*1024*1024);
+ const prepared=prepareKeelDensePayload(source,{brotliQuality:0});
+ assert.equal(prepared.compression,'none');assert.deepEqual(Buffer.from(prepared.compressedBytes),source);
+ assert.throws(()=>prepareKeelDensePayload(source,{compression:'brotli',brotliQuality:0}),/stored-carrier/);
+});
+
+test('auto rejects a smaller compressed binary when its exact paid escaped carrier is larger',()=>{
+ const source=Buffer.from('010106030202060007050703020601020606030003060502030201020201020702070607040300','hex');
+ const options={transportProfile:'base91-v1'};
+ const compressed=prepareKeelDensePayload(source,{...options,compression:'brotli'});
+ const raw=prepareKeelDensePayload(source,{...options,compression:'none'});
+ assert.ok(compressed.compressedBytes.length<source.length);assert.ok(compressed.preparedBytes.length>raw.preparedBytes.length);
+ assert.equal(prepareKeelDensePayload(source,options).compression,'none');
+});

@@ -88,3 +88,44 @@ configured-provider run remain required before release. Do not replace them with
 the focused tests or with the planning API's confirmation flag.
 
 Simulation semantics: https://geth.ethereum.org/docs/interacting-with-geth/rpc/ns-eth#eth-simulate-v1
+
+
+## Exact standalone-reader parity and endpoint ceilings
+
+The pre-payment public replay also executes the same fragment-validity and exact
+standalone builder envelope that Forge will require after storage. A dynamic
+collection envelope can differ from that standalone envelope, so a passing
+collection tokenURI alone cannot stand in for this check. Both ABI results must
+match exactly; the standalone read also retains Forge's collection gas margin.
+The margin is reserved inside the actual execution allowance, including after an
+explicit provider-cap reduction. Low reported consumption alone is insufficient
+because nested EIP-150 forwarding can require more initial gas than it consumes.
+The final collection call is one complete EVM execution: its gas budget includes
+all nested reader, descriptor and carrier calls, rather than a separate allowance
+for each nested call.
+
+`keel-inline-read-policy@1` binds the inherited KEEL product ceilings of 60,000,000
+read gas and 2,000,000 UTF-8 tokenURI bytes. These are not independently verified
+RPC-provider capacities. The actual selected block and a lower configured read
+budget remain authoritative; full ABI output adds its 64-byte header and rounded
+32-byte payload padding, and JSON-RPC hex/transport overhead is separate. Exact
+ABI bytes and digest are retained in the report as size/hash evidence, not stored
+as another artwork object.
+
+An explicitly reported smaller positive provider gas ceiling permits a bounded
+retry of the same ephemeral replay at that smaller read request limit. It never
+raises a ceiling, overrides chain state, modifies validated transaction gas,
+changes payload bytes or selects another delivery mode. Reverts, OOG, ambiguous
+provider failures and unknown response limits never become passing evidence.
+Reports retain requested/effective limits, explicit-cap retry attempts, selected
+block/runtime identity, per-reader calldata/return hashes, ABI lengths and gas.
+The funding journal retains that report for audit; it never authorizes skipping a
+fresh unsigned-funding check. Original report and paid-object receipts survive
+concurrent or resumed paid-job requests.
+
+Hosted and portable MCP storage-review tools use this same authoritative server
+boundary. Generic `publish-plan`, `ethereum-encode` and `wallet-request-prepare`
+remain unsigned review descriptors, not live simulation or permission to submit.
+This guarantee does not intercept unrelated raw-wallet tools or third-party
+publishers. This patch is prevention and evidence retention, not a historical
+root-cause finding or proof that an already paid release recovered.

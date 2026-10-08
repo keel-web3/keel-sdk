@@ -91,8 +91,10 @@ export class KeelRpcSetupError extends Error {
   }
 }
 export class KeelRpcResponseError extends Error {
-  constructor(readonly rpcCode: number, readonly data?: string) {
-    super(rpcCode === 3 ? "RPC execution reverted." : "RPC rejected this read request.");
+  readonly code: number;
+  constructor(readonly rpcCode: number, readonly data?: string, providerGasCap?: bigint) {
+    super(providerGasCap === undefined ? rpcCode === 3 ? "RPC execution reverted." : "RPC rejected this read request." : `RPC gas cap: ${providerGasCap}`);
+    this.code = rpcCode;
     this.name = "KeelRpcResponseError";
   }
 }
@@ -126,7 +128,7 @@ export interface KeelRpcPoolOptions {
   readonly allowLoopback?: boolean;
   readonly fetchImpl?: typeof fetch;
 }
-const READ_METHODS = new Set(["eth_chainId", "eth_blockNumber", "eth_getBlockByNumber", "eth_getBlockByHash", "eth_getCode", "eth_getBalance", "eth_getTransactionCount", "eth_getTransactionReceipt", "eth_getTransactionByHash", "eth_call", "eth_estimateGas", "eth_gasPrice", "eth_maxPriorityFeePerGas", "eth_feeHistory", "eth_getLogs", "eth_getStorageAt", "eth_getProof", "net_version", "web3_clientVersion"]);
+const READ_METHODS = new Set(["eth_chainId", "eth_blockNumber", "eth_getBlockByNumber", "eth_getBlockByHash", "eth_getCode", "eth_getBalance", "eth_getTransactionCount", "eth_getTransactionReceipt", "eth_getTransactionByHash", "eth_call", "eth_simulateV1", "eth_estimateGas", "eth_gasPrice", "eth_maxPriorityFeePerGas", "eth_feeHistory", "eth_getLogs", "eth_getStorageAt", "eth_getProof", "net_version", "web3_clientVersion"]);
 function pause(ms: number, signal?: AbortSignal): Promise<void> {
   signal?.throwIfAborted();
   return new Promise((resolve, reject) => {
@@ -193,6 +195,13 @@ export function createKeelRpcPool(options: KeelRpcPoolOptions): KeelRpcPool {
         if (/missing trie|historical|pruned|state.*unavailable|header not found/iu.test(message)) throw new ProviderFailure("history-unavailable");
         if (code === 3 || /execution reverted/iu.test(message)) throw new KeelRpcResponseError(3, typeof body.error.data === "string" && /^0x[0-9a-f]*$/iu.test(body.error.data) ? body.error.data : undefined);
         if ([401, 403].includes(code) || /api.?key|unauthorized|authentication|access denied/iu.test(message)) throw new ProviderFailure("access-denied");
+        if (method === "eth_simulateV1") {
+          // Preserve typed failure evidence while never exposing a provider URL,
+          // key, request body, or arbitrary remote error message.
+          const cap = /(?:gas cap|maximum allowed gas|gas limit too high[^\n]*?cap)\s*[:=(]\s*(0x[\da-f]+|\d+)/iu.exec(message)?.[1];
+          if (cap && cap.length <= 20 && BigInt(cap) > 0n) throw new KeelRpcResponseError(code, undefined, BigInt(cap));
+          if (code === -32601 || code === -38014) throw new KeelRpcResponseError(code);
+        }
         if (code === -32602) throw new KeelRpcResponseError(code);
         throw new ProviderFailure("unavailable");
       }
@@ -228,7 +237,21 @@ export function createKeelRpcPool(options: KeelRpcPoolOptions): KeelRpcPool {
   return { status, async request(input) {
     if (!READ_METHODS.has(input.method)) throw new TypeError("RPC pool supports read-only methods; wallet/signing/submission methods are refused.");
     const params = input.params ?? [];
-    if (!Array.isArray(params) || JSON.stringify(params).length > 512 * 1024) throw new TypeError("RPC parameters must be a bounded array.");
+    const simulation = input.method === "eth_simulateV1";
+    if (!Array.isArray(params) || JSON.stringify(params).length > (simulation ? 32 * 1024 * 1024 : 512 * 1024)) throw new TypeError("RPC parameters must be a bounded array.");
+    if (simulation) {
+      const payload = params[0] as { blockStateCalls?: unknown; validation?: unknown; traceTransfers?: unknown; returnFullTransactions?: unknown } | undefined;
+      if (params.length !== 2 || !payload || typeof payload !== "object" || Array.isArray(payload)
+        || Object.keys(payload).some(key => !["blockStateCalls", "validation", "traceTransfers", "returnFullTransactions"].includes(key))
+        || typeof payload.validation !== "boolean" || payload.traceTransfers !== false || payload.returnFullTransactions !== false
+        || !Array.isArray(payload.blockStateCalls) || payload.blockStateCalls.length < 1 || payload.blockStateCalls.length > 256
+        || payload.blockStateCalls.some(block => !block || typeof block !== "object" || Array.isArray(block)
+          || Object.keys(block).some(key => key !== "calls") || !Array.isArray((block as { calls?: unknown }).calls)
+          || (block as { calls: unknown[] }).calls.length !== 1)
+        || typeof params[1] !== "string" || !/^(?:latest|0x[0-9a-f]+)$/iu.test(params[1])) {
+        throw new TypeError("Publication simulation requires bounded exact call blocks without state, balance or code overrides.");
+      }
+    }
     input.signal?.throwIfAborted();
     let last: FailureReason = "unavailable", missing = false;
     const start = cursor;

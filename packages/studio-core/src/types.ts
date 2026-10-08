@@ -52,6 +52,9 @@ export interface StudioAssetInput {
 }
 
 export interface PrepareStudioArtifactOptions {
+  /** Explicit lossless codec policy; none is independent of Compact/Raw storage. */
+  readonly compression?: "auto" | "brotli" | "none";
+  readonly brotliQuality?: number;
   /** Compact stores losslessly compressed native bytes; Raw disables automatic compression. */
   readonly payloadStorage?: KeelPayloadStorageMode;
   readonly id: string;

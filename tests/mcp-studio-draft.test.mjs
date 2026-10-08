@@ -280,3 +280,38 @@ test("portable MCP reads and shares reviewable conversation forms without model 
     assert.equal(forbidden?.result.isError, true); assert.equal(requests.length, 2);
   } finally { globalThis.fetch = previousFetch; if (previousToken === undefined) delete process.env.KEEL_STUDIO_AGENT_TOKEN; else process.env.KEEL_STUDIO_AGENT_TOKEN = previousToken; }
 });
+
+test("portable MCP prepares the same owner review and never accepts caller wallet or calldata", async () => {
+  const previousToken = process.env.KEEL_STUDIO_AGENT_TOKEN, previousFetch = globalThis.fetch;
+  const releaseId = "11111111-1111-4111-8111-111111111111", operationId = "22222222-2222-4222-8222-222222222222";
+  let requests = 0;
+  process.env.KEEL_STUDIO_AGENT_TOKEN = token;
+  globalThis.fetch = async (url, init) => {
+    requests++; assert.equal(String(url), `https://studio.example/api/agent/drafts/${releaseId}/review`); assert.equal(init.method, "POST"); assert.deepEqual(JSON.parse(init.body), { expectedRevision: 3 });
+    return Response.json({ schema: "keel-release-wallet-review@1", releaseId, revision: 3, wallet: `0x${"33".repeat(20)}`, preparation: { operationId, chainId: 11155111,
+      calls: [{ kind: "create-drop", to: `0x${"44".repeat(20)}`, data: "0x1234", value: "0x0" }] }, signing: "not-performed", submission: "not-performed" });
+  };
+  try {
+    const server = await createMcpServer(); await server.handle({ jsonrpc: "2.0", id: 1, method: "initialize", params: initializeParams });
+    const answer = await call(server, 2, { operation: "prepare-review", releaseId, expectedRevision: 3 });
+    assert.notEqual(answer.result.isError, true); assert.equal(answer.result.structuredContent.schema, "keel-release-wallet-review@1"); assert.equal(answer.result.structuredContent.reviewUrl, `https://studio.example/studio/releases/${releaseId}/review?operation=${operationId}&revision=3`);
+    assert.equal(answer.result.structuredContent.submission, "not-performed");
+    const rejected = await call(server, 3, { operation: "prepare-review", releaseId, expectedRevision: 3, wallet: "attacker", data: "0x1234" });
+    assert.equal(rejected.result.isError, true); assert.equal(requests, 1);
+  } finally { globalThis.fetch = previousFetch; if (previousToken === undefined) delete process.env.KEEL_STUDIO_AGENT_TOKEN; else process.env.KEEL_STUDIO_AGENT_TOKEN = previousToken; }
+});
+
+test("portable MCP forwards explicit read-call diagnosis without accepting wallet commands", async () => {
+  const previousToken = process.env.KEEL_STUDIO_AGENT_TOKEN, previousFetch = globalThis.fetch;
+  process.env.KEEL_STUDIO_AGENT_TOKEN = token; const requests = [];
+  globalThis.fetch = async (url, init = {}) => { requests.push({url: String(url), init}); return Response.json({schema:'keel-release-diagnostics@1',releaseId:'release-existing',signing:'not-performed',submission:'not-performed',uploadedBytes:0,changed:false}); };
+  try {
+    const server = await createMcpServer(); await server.handle({jsonrpc:'2.0',id:1,method:'initialize',params:initializeParams});
+    const result = await call(server, 2, {studioUrl:'https://studio.example',operation:'diagnose',releaseId:'release-existing',includeReadCall:true});
+    assert.equal(result.result.isError, undefined, JSON.stringify(result));
+    assert.equal(result.result.structuredContent.signing, 'not-performed'); assert.equal(requests.length,1);
+    assert.equal(requests[0].url,'https://studio.example/api/agent/drafts/release-existing/diagnostics?includeReadCall=true'); assert.equal(requests[0].init.method, undefined);
+    const denied = await call(server,3,{studioUrl:'https://studio.example',operation:'diagnose',releaseId:'release-existing',includeReadCall:true,sendTransaction:true});
+    assert.equal(denied.result.isError,true); assert.equal(requests.length,1);
+  } finally { globalThis.fetch=previousFetch; if(previousToken === undefined) delete process.env.KEEL_STUDIO_AGENT_TOKEN; else process.env.KEEL_STUDIO_AGENT_TOKEN=previousToken; }
+});

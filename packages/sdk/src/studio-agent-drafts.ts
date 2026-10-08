@@ -1,3 +1,8 @@
+import { decodeFunctionData, keccak256, parseAbi, type Hex } from "viem";
+import { parseKeelExecutionAuthority, type KeelExecutionAuthorityView } from "./studio-execution-authority.js";
+import { parseKeelNamedProjectProfile, validateKeelNamedProfileCommand, type KeelNamedProjectProfile, type KeelNamedProfileCommand } from "./studio-project-profiles.js";
+import { parseKeelSelectedProjectProfile, type KeelSelectedProjectProfile } from "./studio-project-defaults.js";
+export type KeelStudioProjectProfilesView = KeelStudioDefaultsView & { readonly starters: readonly KeelNamedProjectProfile[] };
 import type { KeelPlanValue } from "./studio-project-planner.js";
 export interface KeelStudioConversationSuggestion {
   readonly commandId: string; readonly expectedRevision: number; readonly message: string;
@@ -18,12 +23,13 @@ export interface KeelStudioConversationSuggestionReceipt {
   readonly signing: "not-performed"; readonly submission: "not-performed";
   readonly planningUrl?: string;
 }
-import { parseKeelStudioDefaultProfile, validateKeelStudioDefaultsCommand, type KeelStudioDefaultsCommand, type KeelStudioDefaultsView } from "./studio-project-defaults.js";
+import { resolveKeelBuildDefaults, type KeelEffectiveBuildDefaults, parseKeelStudioDefaultProfile, validateKeelStudioDefaultsCommand, type KeelStudioDefaultsCommand, type KeelStudioDefaultsView } from "./studio-project-defaults.js";
 import { KEEL_STUDIO_URL } from "./endpoints.js";
 import type { KeelStudioPlanningCommand, KeelStudioPlan, KeelPlanMatrix, KeelResolvedPlan } from "./studio-project-planner.js";
 
 export interface KeelStudioReleasePlanning {
   readonly schema: "keel-release-planning@1";
+  readonly execution?: KeelExecutionAuthorityView;
   readonly releaseId: string;
   readonly revision: number;
   readonly plan: KeelStudioPlan;
@@ -31,9 +37,20 @@ export interface KeelStudioReleasePlanning {
   readonly resolved: KeelResolvedPlan;
   readonly editable: boolean;
   readonly planningUrl: string;
+  readonly sections?: readonly { readonly fieldId: string; readonly label: string; readonly editPath: string }[];
   readonly signing: "not-performed";
   readonly submission: "not-performed";
 }
+export interface KeelStudioReleaseWalletReview {
+  readonly schema: "keel-release-wallet-review@1";
+  readonly execution?: KeelExecutionAuthorityView;
+  readonly releaseId: string; readonly revision: number; readonly wallet: string;
+  readonly preparation: { readonly operationId: string; readonly chainId: number;
+    readonly calls: readonly { readonly kind: string; readonly to: string; readonly data: string; readonly value: string }[];
+    readonly [key: string]: unknown };
+  readonly reviewUrl: string; readonly signing: "not-performed"; readonly submission: "not-performed";
+}
+
 export interface KeelStudioStorageReview {
   readonly projectId: string;
   readonly status: "complete" | "approval-required" | "resume" | "pending-approval-receipt" | "blocked" | "failed";
@@ -89,8 +106,51 @@ export interface KeelStudioAgentReleaseView extends KeelStudioAgentReleaseDraft 
   readonly reviewUrl: string;
 }
 
+/** Owner-scoped read-only replay data. It is not a wallet request or permission to contact another provider. */
+export interface KeelStudioMetadataReadCall {
+  readonly schema: "keel-metadata-read-call@1";
+  readonly chainId: number;
+  readonly request: { readonly to: string; readonly data: string; readonly value: "0x0"; readonly gas: string };
+  readonly block: { readonly number: string; readonly hash: string | null; readonly gasLimit: string };
+  readonly readerRuntimeCodeHash: string;
+  readonly functionName: "preparedTokenURI" | "preEncodedTokenURI";
+  readonly calldataDigest: string;
+  readonly expectedMetadataDigest: string;
+  readonly expectedMetadataBytes: number;
+  readonly graphBytes: number;
+  readonly prefixBytes: number;
+  readonly suffixBytes: number;
+  readonly attempts: readonly { readonly method: "eth_estimateGas" | "eth_call"; readonly gas: string }[];
+  readonly runtimeSourceMatch: "not-established";
+  readonly signing: "not-performed";
+  readonly submission: "not-performed";
+}
+
+function checkedMetadataReadCall(value: KeelStudioMetadataReadCall): KeelStudioMetadataReadCall {
+  const hex = (input: unknown, bytes?: number): input is Hex => typeof input === "string" && /^0x(?:[0-9a-f]{2})*$/iu.test(input) && (bytes === undefined || input.length === 2 + bytes * 2);
+  const quantity = (input: unknown): input is string => typeof input === "string" && /^0x(?:0|[1-9a-f][0-9a-f]*)$/iu.test(input);
+  if (!value || value.schema !== "keel-metadata-read-call@1" || !Number.isSafeInteger(value.chainId) || value.chainId < 1
+    || value.signing !== "not-performed" || value.submission !== "not-performed" || value.runtimeSourceMatch !== "not-established"
+    || !value.request || Object.keys(value.request).some(key => !["to", "data", "value", "gas"].includes(key))
+    || !hex(value.request.to, 20) || !hex(value.request.data) || value.request.data.length > 4_200_002 || value.request.value !== "0x0"
+    || !quantity(value.request.gas) || BigInt(value.request.gas) <= 0n || BigInt(value.request.gas) > 60_000_000n
+    || !value.block || !quantity(value.block.number) || !(value.block.hash === null || hex(value.block.hash, 32))
+    || !/^[1-9][0-9]*$/u.test(value.block.gasLimit) || !hex(value.readerRuntimeCodeHash, 32) || !hex(value.calldataDigest, 32)
+    || keccak256(value.request.data) !== value.calldataDigest || !hex(value.expectedMetadataDigest, 32)
+    || ![value.expectedMetadataBytes, value.graphBytes, value.prefixBytes, value.suffixBytes].every(size => Number.isSafeInteger(size) && size >= 0)
+    || !Array.isArray(value.attempts) || value.attempts.length > 64
+    || Array.from(value.attempts).some(attempt => !attempt || !["eth_call", "eth_estimateGas"].includes(attempt.method) || !/^[1-9][0-9]*$/u.test(attempt.gas) || BigInt(attempt.gas) > 60_000_000n)) throw new TypeError("Studio returned an invalid read-only metadata call.");
+  const decoded = decodeFunctionData({ abi: parseAbi([
+    "function preparedTokenURI(bytes32 objectId,bytes32 digest,bytes prefix,bytes suffix) view returns (string)",
+    "function preEncodedTokenURI(bytes32 objectId,bytes32 digest,bytes prefix,bytes suffix) view returns (string)",
+  ]), data: value.request.data });
+  if (decoded.functionName !== value.functionName) throw new TypeError("The metadata call does not match its declared reader method.");
+  return value;
+}
+
 export interface KeelStudioReleaseDiagnostics {
   readonly schema: "keel-release-diagnostics@1";
+  readonly metadataReadCall?: KeelStudioMetadataReadCall;
   readonly releaseId: string;
   readonly artifactId: string | null;
   readonly slug: string;
@@ -132,13 +192,13 @@ export interface KeelStudioAgentDraftClientOptions {
   readonly fetchImplementation?: typeof fetch;
 }
 
-const KEEL_STUDIO_AGENT_DRAFT_OPERATIONS = ["list", "read", "diagnose", "plan", "plan-edit", "defaults", "defaults-edit", "conversation", "conversation-suggest", "storage-review", "create", "update"] as const;
+const KEEL_STUDIO_AGENT_DRAFT_OPERATIONS = ["list", "read", "diagnose", "plan", "plan-edit", "defaults", "defaults-edit", "profiles", "profiles-edit", "profile-select", "conversation", "conversation-suggest", "prepare-review", "storage-review", "create", "update"] as const;
 export type KeelStudioAgentDraftOperation = (typeof KEEL_STUDIO_AGENT_DRAFT_OPERATIONS)[number];
 
 /**
  * A flat, JSON/YAML-friendly description of one draft operation. The
  * operation is deliberately limited to the creator's Studio draft API; it
- * has no wallet, chain, signing, or publication fields.
+ * accepts no caller-supplied wallet, calldata, signing or submission fields.
  */
 export interface KeelStudioAgentDraftOperationConfig extends KeelStudioAgentDraftClientOptions {
   readonly operation: KeelStudioAgentDraftOperation;
@@ -147,22 +207,31 @@ export interface KeelStudioAgentDraftOperationConfig extends KeelStudioAgentDraf
   readonly expectedRevision?: number;
   readonly planningCommand?: KeelStudioPlanningCommand;
   readonly defaultsCommand?: KeelStudioDefaultsCommand;
+  readonly profileCommand?: KeelNamedProfileCommand;
+  readonly profileSelection?: { readonly profileId: string; readonly expectedProfileRevision: number };
   readonly conversationCommand?: KeelStudioConversationSuggestion;
   readonly projectId?: string;
+  readonly includeReadCall?: boolean;
 }
 
-export type KeelStudioAgentDraftOperationResult = KeelStudioAgentDraftWorkspace | KeelStudioAgentReleaseView | KeelStudioReleaseDiagnostics | KeelStudioReleasePlanning | KeelStudioStorageReview | KeelStudioDefaultsView | KeelStudioReleaseConversation | KeelStudioConversationSuggestionReceipt;
+export type KeelStudioAgentDraftOperationResult = KeelStudioAgentDraftWorkspace | KeelStudioAgentReleaseView | KeelStudioReleaseDiagnostics | KeelStudioReleasePlanning | KeelStudioStorageReview | KeelStudioReleaseWalletReview | KeelStudioDefaultsView | KeelStudioReleaseConversation | KeelStudioConversationSuggestionReceipt | KeelStudioProjectProfilesView | KeelSelectedProjectProfile;
 
 export interface KeelStudioAgentDraftClient {
   readonly list: () => Promise<KeelStudioAgentDraftWorkspace>;
   readonly read: (releaseId: string) => Promise<KeelStudioAgentReleaseView>;
-  readonly diagnose: (releaseId: string) => Promise<KeelStudioReleaseDiagnostics>;
+  readonly diagnose: (releaseId: string, options?: { readonly includeReadCall?: boolean }) => Promise<KeelStudioReleaseDiagnostics>;
   readonly plan: (releaseId: string) => Promise<KeelStudioReleasePlanning>;
   readonly editPlan: (releaseId: string, command: KeelStudioPlanningCommand) => Promise<KeelStudioReleasePlanning>;
   readonly conversation: (releaseId: string) => Promise<KeelStudioReleaseConversation>;
   readonly suggest: (releaseId: string, suggestion: KeelStudioConversationSuggestion) => Promise<KeelStudioConversationSuggestionReceipt>;
+  readonly profiles: () => Promise<KeelStudioProjectProfilesView>;
+  readonly editProfiles: (command: KeelNamedProfileCommand) => Promise<KeelStudioDefaultsView>;
+  readonly selectProfile: (profileId: string, expectedProfileRevision: number) => Promise<KeelSelectedProjectProfile>;
   readonly defaults: () => Promise<KeelStudioDefaultsView>;
+  /** Fresh authenticated read on every call; never a process-wide preferences cache. */
+  readonly effectiveBuildDefaults: (input?: Parameters<typeof resolveKeelBuildDefaults>[1]) => Promise<KeelEffectiveBuildDefaults>;
   readonly editDefaults: (command: KeelStudioDefaultsCommand) => Promise<KeelStudioDefaultsView>;
+  readonly prepareReview: (releaseId: string, expectedRevision: number) => Promise<KeelStudioReleaseWalletReview>;
   readonly storageReview: (projectId: string) => Promise<KeelStudioStorageReview>;
   readonly create: (draft: KeelStudioAgentReleaseDraft) => Promise<KeelStudioAgentReleaseView>;
   readonly update: (releaseId: string, draft: KeelStudioAgentReleaseDraft, expectedRevision: number) => Promise<KeelStudioAgentReleaseView>;
@@ -302,7 +371,7 @@ export function studioAgentRequest(options: KeelStudioAgentDraftClientOptions, p
 
 /**
  * Creates a wallet-neutral client for creator-authorized draft work. It cannot
- * prepare, submit, confirm, cancel, or otherwise mutate a chain operation.
+ * sign, submit, confirm or cancel a chain operation. prepareReview saves only an unsigned owner-review operation through Studio.
  */
 export function createKeelStudioAgentDraftClient(options: KeelStudioAgentDraftClientOptions) {
   if (options === null || typeof options !== "object") throw new TypeError("KEEL Studio agent draft client options are required.");
@@ -325,14 +394,22 @@ export function createKeelStudioAgentDraftClient(options: KeelStudioAgentDraftCl
   };
   const read = async (releaseId: string): Promise<KeelStudioAgentReleaseView> =>
       reviewed(await studioAgentResponse(await studioAgentRequest(options, releasePath(releaseId), { cache: "no-store" }), [options.grantToken]));
-  const diagnose = async (releaseId: string): Promise<KeelStudioReleaseDiagnostics> =>
-    studioAgentResponse(await studioAgentRequest(options, `${releasePath(releaseId)}/diagnostics`, { cache: "no-store" }), [options.grantToken]);
+  const diagnose = async (releaseId: string, diagnosticOptions: { readonly includeReadCall?: boolean } = {}): Promise<KeelStudioReleaseDiagnostics> => {
+    if (diagnosticOptions.includeReadCall !== undefined && typeof diagnosticOptions.includeReadCall !== "boolean") throw new TypeError("includeReadCall must be a boolean.");
+    const value = await studioAgentResponse<KeelStudioReleaseDiagnostics>(await studioAgentRequest(options, `${releasePath(releaseId)}/diagnostics${diagnosticOptions.includeReadCall ? "?includeReadCall=true" : ""}`, { cache: "no-store" }), [options.grantToken]);
+    if (value.schema !== "keel-release-diagnostics@1" || value.releaseId !== releaseId || value.signing !== "not-performed" || value.submission !== "not-performed" || value.uploadedBytes !== 0 || value.changed !== false) throw new TypeError("Studio returned another or mutating diagnostic result.");
+    if (value.metadataReadCall !== undefined) {
+      if (!diagnosticOptions.includeReadCall) throw new TypeError("Studio returned private call data that was not requested.");
+      checkedMetadataReadCall(value.metadataReadCall);
+    }
+    return value;
+  };
   const planning = async (releaseId: string, command?: KeelStudioPlanningCommand): Promise<KeelStudioReleasePlanning> => {
     if (command !== undefined) validatePlanningCommand(command);
     const value = await studioAgentResponse<KeelStudioReleasePlanning>(await studioAgentRequest(options, `${releasePath(releaseId)}/plan`, command === undefined
       ? { cache: "no-store" } : { method: "PATCH", headers: { "content-type": "application/json" }, body: JSON.stringify(command) }), [options.grantToken]);
     if (value.schema !== "keel-release-planning@1" || value.releaseId !== releaseId || !Number.isSafeInteger(value.revision) || value.revision < 1) throw new TypeError("Studio returned another or invalid planning revision.");
-    return { ...value, planningUrl: endpoint(options.studioUrl ?? KEEL_STUDIO_URL, `/studio/releases/${encodeURIComponent(releaseId)}/plan`).href };
+    return { ...value, ...(value.execution === undefined ? {} : { execution: parseKeelExecutionAuthority(value.execution, { releaseId, revision: value.revision }) }), planningUrl: endpoint(options.studioUrl ?? KEEL_STUDIO_URL, `/studio/releases/${encodeURIComponent(releaseId)}/plan`).href };
   };
   const conversation = async (releaseId: string, suggestion?: KeelStudioConversationSuggestion): Promise<KeelStudioReleaseConversation | KeelStudioConversationSuggestionReceipt> => {
     if (suggestion !== undefined) {
@@ -354,6 +431,31 @@ export function createKeelStudioAgentDraftClient(options: KeelStudioAgentDraftCl
       ? { cache: "no-store" } : { method: "PATCH", headers: { "content-type": "application/json" }, body: JSON.stringify(input) }), [options.grantToken]);
     if (value.schema !== "keel-studio-defaults-view@1" || value.signing !== "not-performed") throw new TypeError("Studio returned an invalid defaults profile.");
     return { ...value, profile: parseKeelStudioDefaultProfile(value.profile) };
+  };
+  const profiles = async (command?: KeelNamedProfileCommand): Promise<KeelStudioProjectProfilesView> => {
+    const input = command === undefined ? undefined : validateKeelNamedProfileCommand(command);
+    const value = await studioAgentResponse<KeelStudioProjectProfilesView>(await studioAgentRequest(options, "/api/agent/project-profiles", input === undefined
+      ? { cache: "no-store" } : { method: "PATCH", headers: { "content-type": "application/json" }, body: JSON.stringify(input) }), [options.grantToken]);
+    if (value.schema !== "keel-studio-defaults-view@1" || value.signing !== "not-performed") throw new TypeError("Studio returned an invalid project profile view.");
+    if (input === undefined && !Array.isArray(value.starters)) throw new TypeError("Studio did not return its supported starting profiles.");
+    return { ...value, profile: parseKeelStudioDefaultProfile(value.profile), starters: (value.starters ?? []).map(parseKeelNamedProjectProfile) };
+  };
+  const selectProfile = async (profileId: string, expectedProfileRevision: number): Promise<KeelSelectedProjectProfile> => {
+    if (!/^(?:builtin:[a-z][a-z0-9-]{0,63}|[0-9a-f]{8}(?:-[0-9a-f]{4}){3}-[0-9a-f]{12})$/iu.test(profileId) || !Number.isSafeInteger(expectedProfileRevision) || expectedProfileRevision < 1) throw new TypeError("Select the saved profile ID and its exact revision.");
+    const value = await studioAgentResponse<KeelSelectedProjectProfile & { signing: string; submission: string }>(await studioAgentRequest(options, "/api/agent/project-profiles", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ profileId, expectedProfileRevision }) }), [options.grantToken]);
+    const selected = parseKeelSelectedProjectProfile({ snapshot: value.snapshot, ...(value.defaults ? { defaults: value.defaults } : {}) });
+    if (selected.snapshot.id !== profileId || selected.snapshot.revision !== expectedProfileRevision || value.signing !== "not-performed" || value.submission !== "not-performed") throw new TypeError("Studio returned another profile or an invalid selection receipt.");
+    return selected;
+  };
+  const prepareReview = async (releaseId: string, expectedRevision: number): Promise<KeelStudioReleaseWalletReview> => {
+    if (!/^[0-9a-f]{8}(?:-[0-9a-f]{4}){3}-[0-9a-f]{12}$/iu.test(releaseId) || !Number.isSafeInteger(expectedRevision) || expectedRevision < 1) throw new TypeError("Use the saved release UUID and current reviewed revision.");
+    const value = await studioAgentResponse<KeelStudioReleaseWalletReview>(await studioAgentRequest(options, `${releasePath(releaseId)}/review`, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ expectedRevision }) }), [options.grantToken]);
+    const prepared = value.preparation;
+    if (value.schema !== "keel-release-wallet-review@1" || value.releaseId !== releaseId || value.revision !== expectedRevision || value.signing !== "not-performed" || value.submission !== "not-performed"
+      || !/^0x[0-9a-f]{40}$/iu.test(value.wallet) || !prepared || !/^[0-9a-f]{8}(?:-[0-9a-f]{4}){3}-[0-9a-f]{12}$/iu.test(prepared.operationId)
+      || !Number.isSafeInteger(prepared.chainId) || prepared.chainId < 1 || !Array.isArray(prepared.calls) || prepared.calls.length < 1 || prepared.calls.length > 8
+      || !Array.from(prepared.calls).every(call => call && typeof call.kind === "string" && /^0x[0-9a-f]{40}$/iu.test(call.to) && /^0x(?:[0-9a-f]{2})*$/iu.test(call.data) && /^(?:0|[1-9][0-9]*|0x[0-9a-f]+)$/iu.test(call.value))) throw new TypeError("Studio returned another or invalid wallet-review identity.");
+    return { ...value, ...(value.execution === undefined ? {} : { execution: parseKeelExecutionAuthority(value.execution, { releaseId, revision: expectedRevision, operationId: prepared.operationId, wallet: value.wallet }) }), reviewUrl: endpoint(options.studioUrl ?? KEEL_STUDIO_URL, `/studio/releases/${encodeURIComponent(releaseId)}/review?operation=${encodeURIComponent(prepared.operationId)}&revision=${expectedRevision}`).href };
   };
   const storageReview = async (projectId: string): Promise<KeelStudioStorageReview> => {
     if (!/^[0-9a-f]{8}(?:-[0-9a-f]{4}){3}-[0-9a-f]{12}$/iu.test(projectId)) throw new TypeError("Use this project's Studio UUID.");
@@ -378,7 +480,7 @@ export function createKeelStudioAgentDraftClient(options: KeelStudioAgentDraftCl
       body: JSON.stringify({ draft: validated, expectedRevision }),
     }), [options.grantToken]));
   };
-  return Object.freeze<KeelStudioAgentDraftClient>({ list, read, diagnose, plan: releaseId => planning(releaseId), editPlan: planning, conversation: async releaseId => await conversation(releaseId) as KeelStudioReleaseConversation, suggest: async (releaseId, suggestion) => await conversation(releaseId, suggestion) as KeelStudioConversationSuggestionReceipt, defaults: () => defaults(), editDefaults: defaults, storageReview, create, update });
+  return Object.freeze<KeelStudioAgentDraftClient>({ list, read, diagnose, profiles: () => profiles(), editProfiles: profiles, selectProfile, plan: releaseId => planning(releaseId), editPlan: planning, conversation: async releaseId => await conversation(releaseId) as KeelStudioReleaseConversation, suggest: async (releaseId, suggestion) => await conversation(releaseId, suggestion) as KeelStudioConversationSuggestionReceipt, defaults: () => defaults(), effectiveBuildDefaults: async input => resolveKeelBuildDefaults((await defaults()).profile, input), editDefaults: defaults, prepareReview, storageReview, create, update });
 }
 
 function validatePlanningIdentity(command: { readonly commandId: string; readonly expectedRevision: number }): void {
@@ -416,24 +518,34 @@ function operationDraft(config: KeelStudioAgentDraftOperationConfig): KeelStudio
 /** Execute one explicitly configured, creator-scoped draft operation. */
 export async function executeKeelStudioAgentDraftOperation(config: KeelStudioAgentDraftOperationConfig): Promise<KeelStudioAgentDraftOperationResult> {
   if (config === null || typeof config !== "object" || !isDraftOperation(config.operation)) throw new TypeError("Studio agent draft operation is unsupported.");
-  const supported = new Set(["studioUrl", "grantToken", "operation", "releaseId", "projectId", "draft", "expectedRevision", "planningCommand", "defaultsCommand", "conversationCommand", "fetchImplementation"]);
+  const supported = new Set(["studioUrl", "grantToken", "operation", "releaseId", "projectId", "draft", "expectedRevision", "planningCommand", "defaultsCommand", "profileCommand", "profileSelection", "conversationCommand", "includeReadCall", "fetchImplementation"]);
   for (const key of Object.keys(config)) if (!supported.has(key)) throw new TypeError(`Studio agent draft configuration.${key} is not supported.`);
   const client = createKeelStudioAgentDraftClient(config);
   switch (config.operation) {
     case "list": return client.list();
     case "read": return client.read(operationReleaseId(config));
-    case "diagnose": return client.diagnose(operationReleaseId(config));
+    case "diagnose": return client.diagnose(operationReleaseId(config), config.includeReadCall === undefined ? {} : { includeReadCall: config.includeReadCall });
     case "plan": return client.plan(operationReleaseId(config));
     case "conversation": return client.conversation(operationReleaseId(config));
     case "conversation-suggest": {
       if (!config.conversationCommand) throw new TypeError("conversation-suggest requires a typed suggestion and conversations:write permission.");
       return client.suggest(operationReleaseId(config), config.conversationCommand);
     }
+    case "profiles": return client.profiles();
+    case "profiles-edit": {
+      if (!config.profileCommand) throw new TypeError("profiles-edit requires an explicit profileCommand and preferences:write permission.");
+      return client.editProfiles(config.profileCommand);
+    }
+    case "profile-select": {
+      if (!config.profileSelection || Object.keys(config.profileSelection).some(key => !["profileId", "expectedProfileRevision"].includes(key))) throw new TypeError("profile-select needs the exact profile identity.");
+      return client.selectProfile(config.profileSelection.profileId, config.profileSelection.expectedProfileRevision);
+    }
     case "defaults": return client.defaults();
     case "defaults-edit": {
       if (!config.defaultsCommand) throw new TypeError("defaults-edit requires an explicit defaultsCommand and preferences:write permission.");
       return client.editDefaults(config.defaultsCommand);
     }
+    case "prepare-review": return client.prepareReview(operationReleaseId(config), config.expectedRevision!);
     case "storage-review": {
       if (!config.projectId) throw new TypeError("storage-review requires the creator's projectId.");
       return client.storageReview(config.projectId);

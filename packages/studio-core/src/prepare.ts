@@ -1,3 +1,5 @@
+import { promisify } from "node:util";
+import { brotliCompress, constants as zlibConstants } from "node:zlib";
 import {
   KEEL_CANONICALIZATION,
   KEEL_CONTENT_GATEWAY_PROTOCOL,
@@ -65,7 +67,8 @@ function resourceAliases(resourceId: string, fileName: string): readonly string[
   return [...new Set([`/content/${encodeURIComponent(resourceId)}`, `/content/${filePath}`])];
 }
 
-async function prepareResource(asset: NormalizedStudioAsset, payloadStorage: KeelPayloadStorageMode): Promise<PreparedStudioResource> {
+const brotliCompressAsync = promisify(brotliCompress);
+async function prepareResource(asset: NormalizedStudioAsset, payloadStorage: KeelPayloadStorageMode, compression: "auto" | "brotli" | "none", brotliQuality: number): Promise<PreparedStudioResource> {
   const decodedIntegrity = await createIntegrity(asset.bytes);
   // The inline presentation contract must be able to concatenate the exact
   // HTML shell without running a browser codec. Entrypoints are deliberately
@@ -76,9 +79,18 @@ async function prepareResource(asset: NormalizedStudioAsset, payloadStorage: Kee
     || asset.mediaType === "application/vnd.keel.token-uri-percent-fragment"
     || asset.mediaType === "application/vnd.keel.token-uri-raw-percent-fragment"
     || asset.mediaType === "application/vnd.keel.token-uri-base64-body-fragment";
-  const selected = contractReadable || payloadStorage === "raw"
-    ? { compression: "none" as const, bytes: asset.bytes.slice() }
-    : await chooseSmallestCompression(asset.bytes);
+  let selected: { compression: import("@keel/protocol").Compression; bytes: Uint8Array } = { compression: "none", bytes: asset.bytes.slice() };
+  if (!contractReadable && payloadStorage !== "raw" && compression !== "none") {
+    const compressed = new Uint8Array(await brotliCompressAsync(asset.bytes, { params: {
+      [zlibConstants.BROTLI_PARAM_QUALITY ?? 1]: brotliQuality,
+      [zlibConstants.BROTLI_PARAM_MODE ?? 0]: zlibConstants.BROTLI_MODE_GENERIC ?? 0,
+    } }));
+    if (compressed.byteLength < selected.bytes.byteLength) selected = { compression: "brotli", bytes: compressed };
+    if (compression === "auto") {
+      const alternative = await chooseSmallestCompression(asset.bytes, ["gzip", "deflate", "none"]);
+      if (alternative.bytes.byteLength < selected.bytes.byteLength) selected = alternative;
+    }
+  }
   const storedIntegrity = await createIntegrity(selected.bytes);
   const sources: ResourceSource[] = asset.sourceMode === "additional-only"
     ? []
@@ -480,13 +492,16 @@ function stats(resources: readonly PreparedStudioResource[]): StudioArtifactStat
 export async function prepareStudioArtifact(options: PrepareStudioArtifactOptions): Promise<PreparedStudioArtifact> {
   if (options.id.trim().length === 0 || options.name.trim().length === 0) throw new TypeError("Artifact ID and name are required.");
   const payloadStorage = resolveKeelPayloadStorage(options.payloadStorage);
+  const compression = options.compression ?? "auto", brotliQuality = options.brotliQuality ?? 11;
+  if (!["auto", "brotli", "none"].includes(compression)) throw new TypeError("Unsupported lossless compression policy.");
+  if (!Number.isInteger(brotliQuality) || brotliQuality < 0 || brotliQuality > 11) throw new TypeError("Brotli quality must be an integer from 0 to 11.");
   const withDerivatives = await appendMediaDerivatives(normalizeAssets(options.assets), options.mediaDerivativeProfiles ?? []);
   const flashRuntime = options.flashRuntime === undefined ? undefined : resolveFlashRuntime(options.flashRuntime, withDerivatives.assets);
   const normalized = ensureEntrypoint(withDerivatives.assets, options.name, options.description, flashRuntime?.wrapper);
   const maxResources = positiveSafe(options.maxResources, 512, "maxResources");
   if (normalized.length > maxResources) throw new RangeError(`Artifact has ${normalized.length} resources; limit is ${maxResources}.`);
 
-  const resources = await Promise.all(normalized.map((asset) => prepareResource(asset, payloadStorage)));
+  const resources = await Promise.all(normalized.map((asset) => prepareResource(asset, payloadStorage, compression, brotliQuality)));
   const entrypoint = normalized.find((asset) => asset.entrypoint);
   if (entrypoint === undefined) throw new Error("Artifact preparation did not produce an entrypoint.");
   const total = stats(resources);
