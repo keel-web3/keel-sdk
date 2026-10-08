@@ -178,3 +178,5 @@ build a new signing page or ask for keys in chat. Receipts and public read-back,
 not a prepared link, establish publication success.
 
 Sepolia simulation must use a consistent compatible provider. The public HTTP pool can return contradictory results for the same pinned request. Hosted Studio uses a persistent compatible Geth connection, chosen before any project calldata is sent, and never retries a reverted program to obtain success. SDK integrations can use `createKeelSepoliaSimulationTransport()` and close it when finished. The full atomic transaction is validated against the selected fork; collector metadata has its separate public-read budget.
+
+An exact recovered full-revert receipt preserves the previous plan confirmation at the same draft revision when only platform infrastructure changed. Hosted Studio compares all terms, access phases and committed resources. Do not edit or restart an unchanged plan because a reader was updated; prepare a fresh exact wallet review, which still requires full-batch gas and collector metadata validation. Changed creator terms or resources require plan confirmation again.
