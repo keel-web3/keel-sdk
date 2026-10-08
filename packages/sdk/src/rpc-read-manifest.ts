@@ -2,6 +2,16 @@ import { assertKeelRpcUrl, keelRpcHostList, keelRpcHostListDigest, keelRpcHostLi
 
 export const KEEL_DEFAULT_RPC_READ_CONCURRENCY = 4;
 
+export interface KeelRpcMethodCapability {
+  readonly method: string;
+  readonly supported?: boolean;
+  /** This cap applies to this method only, never transaction submission. */
+  readonly maxGas?: number;
+  readonly maxResponseBytes?: number;
+  readonly maxConcurrentReads?: number;
+  readonly minIntervalMs?: number;
+}
+
 /** Advisory read evidence. These are eth_call/response limits, never transaction gas limits. */
 export interface KeelRpcEndpointCapability {
   readonly url: string;
@@ -19,6 +29,10 @@ export interface KeelRpcEndpointCapability {
   readonly maxCallGas?: number;
   readonly maxResponseBytes?: number;
   readonly maxConcurrentReads?: number;
+  readonly methods?: readonly KeelRpcMethodCapability[];
+  /** Endpoints with a shared account/IP quota must declare the same group. */
+  readonly quotaGroup?: string;
+  readonly authorizationScope?: string;
 }
 export interface KeelRpcReadManifest {
   readonly schema: "keel-rpc-read-manifest@1";
@@ -39,6 +53,46 @@ function range(value: readonly [number, number] | undefined, label: string): rea
   integer(value[0], label); integer(value[1], label);
   if (value[1] < value[0]) throw new TypeError(`Invalid ${label} order.`);
   return Object.freeze([value[0], value[1]]);
+}
+function scopeLabel(value: string): string {
+  if (typeof value !== "string" || !/^[a-zA-Z0-9_.:-]{1,128}$/u.test(value)) throw new TypeError("Invalid RPC policy scope label.");
+  return value;
+}
+export function normalizeKeelRpcMethodCapabilities(values: readonly KeelRpcMethodCapability[]): readonly KeelRpcMethodCapability[] {
+  if (!Array.isArray(values) || values.length > 64) throw new TypeError("Invalid RPC method capabilities.");
+  const seen = new Set<string>();
+  return Object.freeze(values.map(value => {
+    if (!value || typeof value.method !== "string" || !/^[a-zA-Z][a-zA-Z0-9_]{0,63}$/u.test(value.method) || seen.has(value.method)) throw new TypeError("Invalid or duplicate RPC method capability.");
+    seen.add(value.method);
+    if (value.supported !== undefined && typeof value.supported !== "boolean") throw new TypeError("Invalid RPC method support.");
+    for (const key of ["maxGas", "maxResponseBytes", "maxConcurrentReads", "minIntervalMs"] as const) if (value[key] !== undefined) integer(value[key], key, key === "minIntervalMs" ? 0 : 1, key === "maxConcurrentReads" ? 64 : key === "minIntervalMs" ? 10_000 : Number.MAX_SAFE_INTEGER);
+    return Object.freeze({ method: value.method,
+      ...(value.supported === undefined ? {} : { supported: value.supported }),
+      ...(value.maxGas === undefined ? {} : { maxGas: value.maxGas }),
+      ...(value.maxResponseBytes === undefined ? {} : { maxResponseBytes: value.maxResponseBytes }),
+      ...(value.maxConcurrentReads === undefined ? {} : { maxConcurrentReads: value.maxConcurrentReads }),
+      ...(value.minIntervalMs === undefined ? {} : { minIntervalMs: value.minIntervalMs }) });
+  }));
+}
+/** Validate advisory evidence independently of collector host governance. */
+export function normalizeKeelRpcEndpointCapability(value: KeelRpcEndpointCapability, chainId: number): KeelRpcEndpointCapability {
+  if (!value || value.chainId !== chainId || !["measured", "declared"].includes(value.basis)) throw new TypeError("Invalid or cross-chain RPC capability record.");
+  integer(value.observedAtMs, "capability timestamp", 0);
+  integer(value.validUntilMs, "capability expiration", value.observedAtMs + 1);
+  if (typeof value.source !== "string" || value.source.length < 1 || value.source.length > 512 || /[\u0000-\u001f\u007f]/u.test(value.source)) throw new TypeError("Capability evidence needs a bounded source label.");
+  if (value.basis === "measured" && (value.observedChainId !== chainId || value.samples === undefined)) throw new TypeError("Measured capability evidence needs the verified chain and sample count.");
+  if (value.observedChainId !== undefined && value.observedChainId !== chainId) throw new TypeError("Capability evidence is for another chain.");
+  if (value.samples !== undefined) integer(value.samples, "sample count");
+  for (const key of ["maxCallGas", "maxResponseBytes", "maxConcurrentReads"] as const) if (value[key] !== undefined) integer(value[key], key, 1, key === "maxConcurrentReads" ? 64 : Number.MAX_SAFE_INTEGER);
+  const latencyMs = range(value.latencyMs, "latency range"), bytesPerSecond = range(value.bytesPerSecond, "throughput range");
+  return Object.freeze({ url: new URL(value.url).href, chainId, basis: value.basis, observedAtMs: value.observedAtMs, validUntilMs: value.validUntilMs, source: value.source,
+    ...(value.observedChainId === undefined ? {} : { observedChainId: value.observedChainId }), ...(value.samples === undefined ? {} : { samples: value.samples }),
+    ...(latencyMs ? { latencyMs } : {}), ...(bytesPerSecond ? { bytesPerSecond } : {}),
+    ...(value.maxCallGas === undefined ? {} : { maxCallGas: value.maxCallGas }), ...(value.maxResponseBytes === undefined ? {} : { maxResponseBytes: value.maxResponseBytes }),
+    ...(value.maxConcurrentReads === undefined ? {} : { maxConcurrentReads: value.maxConcurrentReads }),
+    ...(value.methods === undefined ? {} : { methods: normalizeKeelRpcMethodCapabilities(value.methods) }),
+    ...(value.quotaGroup === undefined ? {} : { quotaGroup: scopeLabel(value.quotaGroup) }),
+    ...(value.authorizationScope === undefined ? {} : { authorizationScope: scopeLabel(value.authorizationScope) }) });
 }
 /** Construct data only. A host snapshot is NOT proof that governance approved these capability claims. */
 export function createKeelRpcReadManifest(input: {
@@ -66,19 +120,7 @@ export function createKeelRpcReadManifest(input: {
     const url = new URL(value.url).href;
     if (!rpcUrls.includes(url) || seen.has(url) || value.chainId !== chainId || !["measured", "declared"].includes(value.basis)) throw new TypeError("Invalid, duplicate or cross-chain RPC capability record.");
     seen.add(url);
-    integer(value.observedAtMs, "capability timestamp", 0);
-    integer(value.validUntilMs, "capability expiration", value.observedAtMs + 1);
-    if (typeof value.source !== "string" || value.source.length < 1 || value.source.length > 512 || /[\u0000-\u001f\u007f]/u.test(value.source)) throw new TypeError("Capability evidence needs a bounded source label.");
-    if (value.basis === "measured" && (value.observedChainId !== chainId || value.samples === undefined)) throw new TypeError("Measured capability evidence needs the verified chain and sample count.");
-    if (value.observedChainId !== undefined && value.observedChainId !== chainId) throw new TypeError("Capability evidence is for another chain.");
-    if (value.samples !== undefined) integer(value.samples, "sample count");
-    for (const key of ["maxCallGas", "maxResponseBytes", "maxConcurrentReads"] as const) if (value[key] !== undefined) integer(value[key], key, 1, key === "maxConcurrentReads" ? 64 : Number.MAX_SAFE_INTEGER);
-    const latencyMs = range(value.latencyMs, "latency range"), bytesPerSecond = range(value.bytesPerSecond, "throughput range");
-    return Object.freeze({ url, chainId, basis: value.basis, observedAtMs: value.observedAtMs, validUntilMs: value.validUntilMs, source: value.source,
-      ...(value.observedChainId === undefined ? {} : { observedChainId: value.observedChainId }), ...(value.samples === undefined ? {} : { samples: value.samples }),
-      ...(latencyMs ? { latencyMs } : {}), ...(bytesPerSecond ? { bytesPerSecond } : {}),
-      ...(value.maxCallGas === undefined ? {} : { maxCallGas: value.maxCallGas }), ...(value.maxResponseBytes === undefined ? {} : { maxResponseBytes: value.maxResponseBytes }),
-      ...(value.maxConcurrentReads === undefined ? {} : { maxConcurrentReads: value.maxConcurrentReads }) });
+    return normalizeKeelRpcEndpointCapability(value, chainId);
   });
   return Object.freeze({ schema: "keel-rpc-read-manifest@1", revision, chainId, policySource: input.hostList === undefined ? "bundled" : "host-snapshot", hostList,
     rpcUrls: Object.freeze(rpcUrls), endpoints: Object.freeze(endpoints) });

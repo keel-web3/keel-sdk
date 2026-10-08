@@ -226,10 +226,16 @@ const studioConnect: JsonSchema = object({
 }, ["operation"]);
 const studioDraft: JsonSchema = object({
   studioUrl: string("Optional HTTPS Studio URL; KEEL_STUDIO_URL is used otherwise.", 512),
-  operation: { type: "string", enum: ["list", "read", "diagnose", "plan", "plan-edit", "defaults", "defaults-edit", "profiles", "profiles-edit", "profile-select", "conversation", "conversation-suggest", "prepare-review", "storage-review", "create", "update"] },
-  releaseId: string("Required for read, diagnose, plan, plan-edit, prepare-review, conversation, conversation-suggest, or update.", 128),
+  operation: { type: "string", enum: ["list", "read", "diagnose", "reconcile", "plan", "plan-edit", "defaults", "defaults-edit", "profiles", "profiles-edit", "profile-select", "conversation", "conversation-suggest", "prepare-review", "storage-review", "create", "update"] },
+  releaseId: string("Required for read, diagnose, reconcile, plan, plan-edit, prepare-review, conversation, conversation-suggest, or update.", 128),
   projectId: string("Required for storage-review; uses the owner-scoped project and never signs or submits.", 128),
   includeReadCall: { type: "boolean", description: "For diagnose only: include the exact private metadata eth_call calldata, pinned block/runtime hash, byte commitments and attempted gas envelopes. Read-only evidence, not a wallet request. Never forward it to a new provider without permission." },
+  includePublicationTrace: { type: "boolean", description: "For diagnose only: request bounded callTracer evidence on an already configured provider. Missing or unsupported trace leaves the cause unknown; scalar gas never proves state-gas depletion." },
+  reconciliation: { type: "object", properties: {
+    operationId: { type: "string", format: "uuid" }, expectedRevision: { type: "integer", minimum: 1 },
+    walletBatchId: { type: "string", minLength: 1, maxLength: 1024 }, txHashes: { type: "array", maxItems: 8, uniqueItems: true, items: { type: "string", pattern: "^0x[0-9a-fA-F]{64}$" } }, includeTrace: { type: "boolean" },
+  }, required: ["operationId", "expectedRevision", "txHashes"], additionalProperties: false,
+  description: "For reconcile only: the exact existing operation and returned wallet hashes. Requires drafts:write; persists receipt reconciliation, never signs, uploads or pays storage again. Pending or unknown submissions remain blocked from replacement." },
   conversationCommand: { type: "object", description: "For conversation-suggest: stable commandId UUID, expectedRevision, plain message, optional typed answers. Requires conversations:write and records an editable proposal, never a wallet action or automatic plan edit." },
   profileCommand: { type: "object", description: "For profiles-edit: explicit create/edit/remove, stable commandId, expectedRevision, profileId and typed profile configuration. Requires preferences:write. Lifecycle and signing are never presets." },
   profileSelection: { type: "object", properties: { profileId: { type: "string" }, expectedProfileRevision: { type: "integer", minimum: 1 } }, required: ["profileId", "expectedProfileRevision"], additionalProperties: false },

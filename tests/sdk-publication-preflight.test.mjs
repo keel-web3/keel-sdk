@@ -23,7 +23,7 @@ function fixture(change = {}) {
       return request.params[0].blockStateCalls.map((_, index) => {
         const finalRead = simulationPass === 3 && index === request.params[0].blockStateCalls.length - 1;
         const gasUsed = finalRead ? change.readGas ?? change.gas ?? "0x186a0" : change.gas ?? "0x186a0";
-        return { ...(change.timestamp && !change.omitForkHeader ? { timestamp: `0x${(BigInt(change.timestamp) + BigInt(index + 1)).toString(16)}`, number: `0x${(BigInt(change.blockNumber ?? block.number) + BigInt(index + 1)).toString(16)}`, slotNumber: `0x${(index + 1).toString(16)}`, blockAccessListHash: block.hash,
+        return { ...(!change.omitForkHeader ? { timestamp: `0x${(BigInt(change.timestamp ?? block.timestamp) + BigInt(index + 1)).toString(16)}`, number: `0x${(BigInt(change.blockNumber ?? block.number) + BigInt(index + 1)).toString(16)}`, slotNumber: `0x${(index + 1).toString(16)}`, blockAccessListHash: block.hash,
           hash: `0x${(index + 1).toString(16).padStart(64, "0")}`, parentHash: index === 0 ? block.hash : `0x${index.toString(16).padStart(64, "0")}` } : {}), calls: [{ status: change.revert === index || (change.strictRevert && request.params[0].validation) ? "0x0" : "0x1", ...(change.contradictoryError ? { error: { code: 3, message: "execution reverted SECRET" } } : {}), gasUsed,
           ...(change.omitMaximum ? {} : { maxUsedGas: finalRead ? gasUsed : change.maximumGas ?? gasUsed }),
           returnData: simulationPass === 3 && change.readerReturns && index > 0 && !finalRead ? change.readerReturns[index - 1] : finalRead ? change.storage ? encodeAbiParameters([{ type: "bool" }], [change.exists ?? true]) : encodeAbiParameters([{ type: "string" }], [change.metadata ?? expected]) : "0x" }] };

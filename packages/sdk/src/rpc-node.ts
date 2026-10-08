@@ -8,7 +8,7 @@ import { KEEL_BUNDLED_NETWORK_INDEX, KEEL_NETWORK_CONFIGURATION, type KeelNetwor
 export function parseKeelRpcConfiguration(value: unknown): KeelRpcConfiguration {
   if (value === null || typeof value !== "object" || Array.isArray(value)) throw new TypeError("RPC config must be a JSON object.");
   const object = value as Record<string, unknown>;
-  if (Object.keys(object).some(k => !["schema", "chainId", "rpcUrl", "rpcUrls", "timeoutMs", "minIntervalMs", "maxResponseBytes"].includes(k))
+  if (Object.keys(object).some(k => !["schema", "chainId", "rpcUrl", "rpcUrls", "timeoutMs", "minIntervalMs", "maxResponseBytes", "endpoints"].includes(k))
       || object.schema !== undefined && object.schema !== "keel-rpc-config@1") throw new TypeError("Unsupported RPC config fields/schema.");
   for (const k of ["chainId", "timeoutMs", "minIntervalMs", "maxResponseBytes"]) if (object[k] !== undefined && typeof object[k] !== "number") throw new TypeError("RPC numeric settings must be numbers.");
   if (object.rpcUrl !== undefined && typeof object.rpcUrl !== "string" || object.rpcUrls !== undefined && (!Array.isArray(object.rpcUrls) || object.rpcUrls.some(v => typeof v !== "string"))) throw new TypeError("RPC URLs must be strings.");

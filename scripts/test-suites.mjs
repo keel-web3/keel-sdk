@@ -50,6 +50,9 @@ export const TEST_FILES_ON_DISK = Object.freeze(readdirSync(TEST_ROOT)
  * its execution boundary.
  */
 export const DETERMINISTIC_TEST_FILES = Object.freeze([
+  "tests/sdk-publication-recovery.test.mjs",
+  "tests/sdk-rpc-routing.test.mjs",
+  "tests/signature-privacy.test.mjs",
   "tests/creator-prepared-inline.test.mjs",
   "tests/inline-build-route.test.mjs",
   "tests/creator-prepared-route.test.mjs",
@@ -312,3 +315,4 @@ export function validateTestSuiteClassification(testFiles = TEST_FILES_ON_DISK) 
   }
   return Object.freeze(issues);
 }
+

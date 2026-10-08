@@ -188,7 +188,7 @@ async function performPublicationSimulation(input: KeelPublicationSimulationInpu
   try { transactionPolicy = resolveKeelTransactionGasPolicy({ chainId: identity.chainId, blockTimestamp, blockGasLimit }); }
   catch { return failure("configuration-invalid", "This selected chain needs an explicitly registered transaction gas profile."); }
   if (BigInt(identity.maximumTransactionGas) > transactionPolicy.maximumTotalGas) return failure("configuration-invalid", "The configured total transaction envelope exceeds the selected fork or block limit.");
-  const transactionGasPolicy = { profile: transactionPolicy.profile, blockTimestamp: blockTimestamp.toString(),
+  const transactionGasPolicy = { profile: transactionPolicy.profile, fork: transactionPolicy.fork, rulesSource: transactionPolicy.rulesSource, feeModel: transactionPolicy.feeModel, blockTimestamp: blockTimestamp.toString(),
     maximumExecutionGas: transactionPolicy.maximumExecutionGas.toString(), maximumTotalGas: transactionPolicy.maximumTotalGas.toString(),
     separateStateGas: transactionPolicy.separateStateGas, validation: "selected-fork-transaction-validation" as const };
   if ([...preparationCalls, ...requiredReaderCalls.map(check => check.call), ...observationCalls, metadataCall].some(call => BigInt(call.gas) > blockGasLimit)) return failure("configuration-invalid", "A planned call exceeds the actual selected-chain block gas limit.");
