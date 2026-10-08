@@ -178,7 +178,6 @@ export function pinKeelSelectedProjectDefaults(selection: KeelSelectedProjectPro
 
 /** Shared private build choices. Contract limits are hard ceilings, never preferences. */
 export const KEEL_BUILD_DEFAULT_FIELDS: readonly import("./studio-project-planner.js").KeelPlanField[] = [
-  ...(["imageDelivery", "animationDelivery"] as const).map(id => ({ id, label: id === "imageDelivery" ? "Image slot delivery" : "Animation slot delivery", kind: "choice" as const, required: false, allowDefault: true, choices: ["onchain", "ipfs", "hosted"].map(value => ({ value, label: value, status: "available" as const })), explanation: "Saved intent only. External delivery requires a supported route and exact source/read checks; this does not upload, pin, publish or authorize spending." })),
   { id: "rpcMaxConcurrentReads", label: "Parallel native RPC reads", kind: "integer", minimum: 1, maximum: 64, required: false, allowDefault: true, explanation: "Bounded Hybrid carrier reads. This does not change delivery, authorize a provider or set transaction gas." },
   { id: "compression", label: "Lossless compression", kind: "choice", required: false, allowDefault: true, choices: ["auto", "brotli", "none"].map(value => ({ value, label: value, status: "available" as const })) },
   { id: "brotliQuality", label: "Brotli quality", kind: "integer", minimum: 0, maximum: 11, required: false, allowDefault: true },
@@ -204,11 +203,15 @@ export function resolveKeelBuildDefaults(profile: KeelStudioDefaultProfile, inpu
   readonly constraints?: { readonly maxReadGas?: number; readonly maxOutputBytes?: number; readonly transportProfiles?: readonly string[] };
 } = {}): KeelEffectiveBuildDefaults {
   const current = parseKeelStudioDefaultProfile(profile);
-  const values: Record<string, KeelPlanValue> = { imageDelivery: "onchain", animationDelivery: "onchain", compression: "auto", brotliQuality: 11, transportProfile: "base90-v1", payloadStorage: "compact", hybridFallback: false, rpcMaxConcurrentReads: KEEL_DEFAULT_RPC_READ_CONCURRENCY };
+  const values: Record<string, KeelPlanValue> = { compression: "auto", brotliQuality: 11, transportProfile: "base90-v1", payloadStorage: "compact", hybridFallback: false, rpcMaxConcurrentReads: KEEL_DEFAULT_RPC_READ_CONCURRENCY };
   const sources: Record<string, "system" | "account" | "media" | "collection" | "project" | "build" | "contract"> = Object.fromEntries(Object.keys(values).map(key => [key, "system"]));
   const fields = new Map(KEEL_BUILD_DEFAULT_FIELDS.map(field => [field.id, field]));
+  // Preserve future private fields. These known delivery intents need a real
+  // compiler consumer, so an effective unsupported choice must never be ignored.
+  const deliveryIntents: Record<string, KeelPlanValue> = {};
   for (const [source, layer] of [["account", current.global], ["media", current.byMedia[input.mediaType ?? ""]], ["collection", resolveKeelCollectionDefaultValues(current.collectionFilters, input.collection, input.mediaType)], ["project", input.project], ["build", input.build]] as const) {
     for (const [key, value] of Object.entries(layer ?? {})) {
+      if (key === "imageDelivery" || key === "animationDelivery") { deliveryIntents[key] = copyValue(value); continue; }
       const field = fields.get(key);
       if (!field) { if (source === "build") throw new TypeError("Unsupported explicit build setting."); continue; }
       const issue = validateKeelPlanValue(field, value);
@@ -216,6 +219,7 @@ export function resolveKeelBuildDefaults(profile: KeelStudioDefaultProfile, inpu
       values[key] = copyValue(value); sources[key] = source;
     }
   }
+  if (Object.values(deliveryIntents).some(value => value !== "onchain")) throw new TypeError("This saved media delivery preference requires a supported compiler before preparation. The preference is preserved; review an explicit supported slot choice.");
   if (values.payloadStorage === "raw") { values.compression = "none"; sources.compression = sources.payloadStorage!; }
   for (const key of ["maxReadGas", "maxOutputBytes"] as const) {
     const ceiling = input.constraints?.[key];
@@ -229,11 +233,6 @@ export function resolveKeelBuildDefaults(profile: KeelStudioDefaultProfile, inpu
 }
 /** Call immediately before funding; a stale build must be rebuilt and reviewed. */
 export function assertKeelBuildDefaultsCurrent(prepared: KeelEffectiveBuildDefaults, current: KeelEffectiveBuildDefaults): void {
-  // Snapshots predating slot preferences used onchain for both slots. Adding those
-  // explicit system defaults must not invalidate unchanged paid/prepared work.
-  const comparable = (values: KeelPlanAnswers) => {
-    const normalized = { imageDelivery: "onchain", animationDelivery: "onchain", ...values };
-    return JSON.stringify(Object.keys(normalized).sort().map(key => [key, normalized[key as keyof typeof normalized]]));
-  };
+  const comparable = (values: KeelPlanAnswers) => JSON.stringify(Object.keys(values).sort().map(key => [key, values[key]]));
   if (prepared.revision !== current.revision || comparable(prepared.values) !== comparable(current.values)) throw new Error("build-defaults-stale: refresh defaults, rebuild and review before funding");
 }

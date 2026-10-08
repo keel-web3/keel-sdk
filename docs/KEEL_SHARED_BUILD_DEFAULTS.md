@@ -68,15 +68,17 @@ or explicit release intent; custom content alone does not imply a collection typ
 
 `resolveKeelBuildDefaults(profile, { mediaType, collection, project, build })`
 returns effective values and source provenance. `collection` contains known
-`tokenStandard`, `tokenStructure`, and/or `saleMethod` axes. `imageDelivery` and
-`animationDelivery` accept `onchain`, `ipfs`, or `hosted`; both default to onchain.
-These values express intent only. They do not upload, pin, prove durability,
-authorize funds, or enable an unsupported metadata route. Explicit metadata slot
-choices override these defaults and still pass the selected publication gates.
+`tokenStandard`, `tokenStructure`, and/or `saleMethod` axes. Only build fields
+consumed by the current compiler are editable. Image/animation slot-delivery
+defaults are deferred until their actual compiler consumer is available.
+Existing private unknown fields survive parsing and unrelated edits. If a saved
+non-onchain slot-delivery intent remains effective after explicit overrides,
+preparation stops with an unsupported-consumer error; it never silently selects
+another carrier or duplicates artwork. Profiles are not migrated or rewritten.
 
 New guided plans copy matching values once. Named profile selections retain a
 private copy of collection filters so later account edits cannot rewrite them.
 Before new funding, the stored build snapshot is compared with a fresh effective
 policy. Changes require preparation and review, without replaying paid storage.
-Legacy build snapshots missing the two slot-delivery fields compare as their
-previous onchain defaults; the code upgrade alone does not make them stale.
+The collection-filter extension adds no new implicit delivery fields to legacy
+build snapshots.
