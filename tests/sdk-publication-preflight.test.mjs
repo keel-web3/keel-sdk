@@ -291,3 +291,20 @@ test("a synthetic future sequence crossing the selected fork must replan instead
  const f=fixture({timestamp:"0x6ac4fd5f"});
  await assert.rejects(simulateKeelPublicationBeforeFunding(input(),f.transport),error=>error.kind==="unsupported-simulation");
 });
+
+test("atomic wallet preflight validates its real fee envelope on every preparation replay", async () => {
+  const f = fixture();
+  const batch = { ...call, from: owner, to: owner, data: "0xe9ae5c530000" };
+  const planned = { ...input(), transactionContext: "atomic-wallet", preparationCalls: [batch] };
+  const proof = await simulateKeelPublicationBeforeFunding(planned, f.transport);
+  const simulations = f.requests.filter(request => request.method === "eth_simulateV1");
+  assert.deepEqual(simulations.map(request => request.params[0].validation), [true, true, false]);
+  assert.equal(simulations[0].params[0].blockStateCalls[0].calls[0].maxFeePerGas, call.maxFeePerGas);
+  assert.equal(simulations[2].params[0].blockStateCalls[0].blockOverrides, undefined);
+  assert.equal(simulations[2].params[0].blockStateCalls.at(-1).blockOverrides, undefined);
+  assert.equal(proof.observationPolicy, "eth-call");
+  assert.deepEqual(proof.transactionGasLimits, ["120000"]);
+  for (const preparationCalls of [[call], [batch, batch]]) {
+    await assert.rejects(simulateKeelPublicationBeforeFunding({ ...planned, preparationCalls }, fixture().transport), error => error.kind === "configuration-invalid");
+  }
+});

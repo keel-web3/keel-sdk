@@ -44,6 +44,8 @@ test('simulated Amsterdam headers must advance block number, timestamp and known
  const parent={hash,number:42n,timestamp:KEEL_SEPOLIA_AMSTERDAM_TIMESTAMP,slotNumber:10n};
  const header={hash,parentHash:hash,number:'0x2b',timestamp:'0x6ac4fd61',slotNumber:'0xb',blockAccessListHash:hash};
  assert.doesNotThrow(()=>assertKeelAmsterdamSimulationHeader(p,header,parent));
+ const {slotNumber, ...gethHeader}=header;assert.doesNotThrow(()=>assertKeelAmsterdamSimulationHeader(p,gethHeader,parent));
+ assert.throws(()=>assertKeelAmsterdamSimulationHeader(p,{...gethHeader,blockAccessListHash:undefined},parent),/simulator/);
  for (const patch of [{number:'0x2a'},{timestamp:'0x6ac4fd60'},{slotNumber:'0xa'},{parentHash:'0x'+'cd'.repeat(32)}])assert.throws(()=>assertKeelAmsterdamSimulationHeader(p,{...header,...patch},parent),/simulator/);
  const before=policy(11155111,KEEL_SEPOLIA_AMSTERDAM_TIMESTAMP-1n);
  assert.throws(()=>assertKeelAmsterdamSimulationHeader(before,header,parent),/crossed/);

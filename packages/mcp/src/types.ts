@@ -1,6 +1,6 @@
 export const MCP_PROTOCOL_VERSION = "2024-11-05" as const;
 export const MCP_SERVER_NAME = "keel-mcp" as const;
-export const MCP_SERVER_VERSION = "0.4.0" as const;
+export const MCP_SERVER_VERSION = "0.4.1" as const;
 
 export type JsonRpcId = string | number | null;
 
