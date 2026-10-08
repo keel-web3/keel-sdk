@@ -1,0 +1,17 @@
+{
+  "schema": "keel.reader-deployment@1",
+  "chainId": 11155111,
+  "sourceCommit": "25673ad331ca7fff38488eed6b3719172a69dad1",
+  "address": "0xfbbb2a0c470ac0e81ed35de6722e26ca8ff8134d",
+  "transactionHash": "0x66ee037713d4878d90a1b551c58b53e62dad8a8ada51edc2ec27ee4c65af4cf2",
+  "blockNumber": "11873456",
+  "blockHash": "0xb1b0312a155109b421bd7d6bd049a6fc23ca3f369f294af11ecc87f6ec1cf400",
+  "runtimeCodeHash": "0x4b38e44025978596b6940908c5494c2358125b832e3086b54291bca626b35c2c",
+  "runtimeBytes": 13606,
+  "gasUsed": "21254589",
+  "effectiveGasPrice": "1000013",
+  "actualFeeWei": "21254865309657",
+  "approvedCapWei": "1000000000000000",
+  "store": "0x0a4F31D5Ab08029e4C68f6F3227d9fa3A2D66267",
+  "profile": "sepolia-historical-hold-copy"
+}
