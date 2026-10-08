@@ -38,3 +38,45 @@ its independently verified registered contract route. This change deploys nothin
 Monetary spending budgets and multistage codecs are not inferred or implemented by
 this preference surface; gas/output ceilings do not represent a price quote or
 permission to fund. Existing publication quotes and owner wallet review still apply.
+
+
+## Collection-type filters
+
+The optional `collectionFilters` array in `keel-studio-default-profile@1` stores
+up to 32 `{ filter, values }` records in the same account preference JSON row.
+Old profiles without the array remain valid; no database migration is needed.
+A filter requires at least one existing configuration axis:
+
+- `tokenStandard`: `none`, `erc721`, `erc1155`
+- `tokenStructure`: `none`, `one-of-one`, `edition`, `collection`
+- `saleMethod`: `none`, `fixed-price`, `auction`, `sealed-bid`
+- Optional `mediaType`: one exact MIME type, never a wildcard
+
+Use scope `{ kind: "collection", filter: { tokenStructure: "edition", mediaType: "image/png" } }`
+with the usual stable command UUID and expected account revision. The hosted
+MCP defaults tools and portable `defaults-edit` operation use this same scope.
+Preferences grants remain separate from draft grants. Filters cannot carry an
+address, lifecycle, signer, or authority, and cannot change the release/token/sale
+type being matched. An unsupported token or sale route remains unsupported.
+
+Build inheritance is system → account → exact media → matching collection
+filters → explicit project → explicit build. More populated filters are more
+specific; equally specific overlapping filters must agree on shared values.
+Conflicting overlaps are rejected. Registered reader limits remain hard ceilings.
+Missing context does not match a filter. Context comes from a selected profile
+or explicit release intent; custom content alone does not imply a collection type.
+
+`resolveKeelBuildDefaults(profile, { mediaType, collection, project, build })`
+returns effective values and source provenance. `collection` contains known
+`tokenStandard`, `tokenStructure`, and/or `saleMethod` axes. `imageDelivery` and
+`animationDelivery` accept `onchain`, `ipfs`, or `hosted`; both default to onchain.
+These values express intent only. They do not upload, pin, prove durability,
+authorize funds, or enable an unsupported metadata route. Explicit metadata slot
+choices override these defaults and still pass the selected publication gates.
+
+New guided plans copy matching values once. Named profile selections retain a
+private copy of collection filters so later account edits cannot rewrite them.
+Before new funding, the stored build snapshot is compared with a fresh effective
+policy. Changes require preparation and review, without replaying paid storage.
+Legacy build snapshots missing the two slot-delivery fields compare as their
+previous onchain defaults; the code upgrade alone does not make them stale.
