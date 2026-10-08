@@ -10,10 +10,12 @@ export const STUDIO_WALLET_POLICY = {
   remoteMcpUrl: "https://studio.onkeel.io/api/mcp",
   connection: { default: "approval-code", cli: "keel-mcp --connect --window --workspace <project>", startApi: "/api/agent/pair", pollApi: "/api/agent/pair/poll", approvePage: "/studio/connect", secrets: "private user-profile credential file, scoped by workspace and Studio origin; no token in URLs, MCP results, project files or shell history", terminalImport: "keel-mcp --import-key --workspace <project> (hidden prompt)" },
   localTools: ["keel-studio-connect","keel-studio-capabilities", "keel-studio-stage-project", "keel-studio-draft"],
-  remoteTools: ["keel_release_diagnose", "keel_whoami", "keel_workspace", "keel_create_draft", "keel_contracts", "keel_inspect_contract"],
+  remoteTools: ["keel_release_diagnose", "keel_release_recover", "keel_whoami", "keel_workspace", "keel_create_draft", "keel_contracts", "keel_inspect_contract"],
   handoff: "Return the stage response's handoffUrl or the draft response's reviewUrl; use returned contract reviewUrl for existing contract controls.",
   creator: "Signs in and reviews/publishes in the website using their existing connected wallet; EVM uses the selected wagmi connector.",
   agentSigning: false,
   agentSubmission: false,
   rawTransactionImport: "No generic URL importer is advertised. Use the supported Studio project/release/contract workflow; an unsigned wallet envelope is not a hosted job.",
 } as const;
+
+export const STUDIO_RELEASE_RECOVERY_GUIDANCE = "Paid artwork stays attached to the same release. Diagnose first. For a submitted failed atomic transaction, use keel-studio-draft operation=recover with releaseId, operationId and its existing transactionHashes (drafts:write), or hosted keel_release_recover. Studio verifies the creator, chain, exact ordered calls and reverted receipt, preserves receipts and unlocks a fresh review without signing, uploading or resubmitting. Pending, unknown, mismatched or partially successful transactions remain blocked. Then diagnose the same release and prepare-review only after the complete actual wallet batch and exact final tokenURI pass selected-fork transaction validation. Separate regular execution gas from state gas and public read gas; InvalidPresentation can be an envelope validator exhausting transaction gas even when a standalone read works. A preview reference only removes duplicate display storage; it cannot fix an over-budget reader. Agents must never retry unchanged failed calldata, reupload paid artwork, change metadata/ownership/supply or create a new release to work around this. Hosted Studio is the default; Desktop is optional. A platform reader deployment is separate from the creator review and must be reported explicitly.";

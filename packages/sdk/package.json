@@ -1,6 +1,6 @@
 {
   "name": "@keel/sdk",
-  "version": "0.3.0",
+  "version": "0.3.1",
   "description": "Typed campaign builders, EIP-712 payloads, ABIs, and signer-policy helpers for Keel contracts.",
   "type": "module",
   "main": "./dist/index.js",
@@ -366,6 +366,18 @@
     "./signature-privacy": {
       "types": "./dist/signature-privacy.d.ts",
       "import": "./dist/signature-privacy.js"
+    },
+    "./release-wallet-batch": {
+      "types": "./dist/release-wallet-batch.d.ts",
+      "import": "./dist/release-wallet-batch.js"
+    },
+    "./transaction-gas-policy": {
+      "types": "./dist/transaction-gas-policy.d.ts",
+      "import": "./dist/transaction-gas-policy.js"
+    },
+    "./sepolia-simulation-transport": {
+      "types": "./dist/sepolia-simulation-transport.d.ts",
+      "import": "./dist/sepolia-simulation-transport.js"
     }
   },
   "files": [

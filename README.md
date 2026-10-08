@@ -386,3 +386,33 @@ Approve the code and permissions in Studio; the SDK saves the key privately and
 local MCP draft/staging tools use it automatically. Agents can instead use
 `keel-studio-connect` (`start`, open `approveUrl`, then `complete`). No environment
 file or Desktop app is required. [Connection and wallet review](docs/KEEL_STUDIO_WALLET_REVIEW.md).
+
+## Recover a failed paid release
+
+Keep the existing release, artifact, storage objects, metadata, owner and supply.
+Do not reupload, create a replacement release, switch delivery or retry unchanged calldata.
+A successful standalone tokenURI read is not proof that the complete wallet transaction fits.
+`InvalidPresentation()` can hide an envelope validator exhausting execution gas;
+removing a duplicate preview URI alone does not repair an over-budget reader.
+
+Run `keel-studio-draft` with `operation: "diagnose"` first (`drafts:read`).
+For one fully reverted atomic receipt, use `operation: "recover"`, the saved
+`releaseId`, `operationId` and `transactionHashes: [failedHash]` (`drafts:write`).
+The SDK client method is `client.recover(releaseId, operationId, [failedHash])`;
+the hosted MCP equivalent is `keel_release_recover`. Studio verifies the exact
+creator, selected chain, ordered calls and canonical receipt, retains the old
+operation, and unlocks another review without uploading, signing or submitting.
+Pending, unknown, mismatched or partially successful batches stay preserved.
+Then diagnose that same release. Prepare a new Studio website review only when
+the actual complete atomic wallet program passes selected-fork transaction
+validation and the final tokenURI matches the expected bytes. Keep regular
+execution gas, state gas and public read budgets separate. A platform reader
+deployment needs its own approval and deployed runtime proof; an agent cannot
+fix missing infrastructure by requesting another creator signature.
+
+Hosted Studio handles the entire workflow. Desktop is optional. Return the
+server-issued website review link for the existing connected wallet; do not
+build a new signing page or ask for keys in chat. Receipts and public read-back,
+not a prepared link, establish publication success.
+
+Sepolia simulation must use a consistent compatible provider. The public HTTP pool can return contradictory results for the same pinned request. Hosted Studio uses a persistent compatible Geth connection, chosen before any project calldata is sent, and never retries a reverted program to obtain success. SDK integrations can use `createKeelSepoliaSimulationTransport()` and close it when finished. The full atomic transaction is validated against the selected fork; collector metadata has its separate public-read budget.

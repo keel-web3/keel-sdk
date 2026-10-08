@@ -149,3 +149,7 @@ export * from "./creator-prepared-route.js";
 export * from "./creator-publication-journal.js";
 
 export * from "./creator-prepared-compiler.js";
+
+export * from "./release-wallet-batch.js";
+
+export { createKeelSepoliaSimulationTransport } from "./sepolia-simulation-transport.js";

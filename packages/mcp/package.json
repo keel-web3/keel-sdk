@@ -1,7 +1,7 @@
 {
   "name": "@keel/mcp",
-  "version": "0.4.0",
-  "description": "Offline Model Context Protocol bridge for the Keel/Keel builder and wallet request envelopes.",
+  "version": "0.4.1",
+  "description": "KEEL discovery, Hosted Studio drafts and website wallet-review workflows through Model Context Protocol.",
   "type": "module",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
@@ -11,12 +11,17 @@
       "import": "./dist/index.js"
     }
   },
-  "files": ["dist", "README.md"],
+  "files": [
+    "dist",
+    "README.md"
+  ],
   "scripts": {
     "clean": "rm -rf dist",
     "build": "tsc -p tsconfig.json && node scripts/package-skills.mjs"
   },
-  "engines": { "node": ">=22" },
+  "engines": {
+    "node": ">=22"
+  },
   "license": "MIT",
   "dependencies": {
     "@keel/builder": "workspace:*",

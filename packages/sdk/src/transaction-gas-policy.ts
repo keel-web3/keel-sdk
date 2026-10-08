@@ -45,7 +45,10 @@ export function assertKeelAmsterdamSimulationHeader(policy: KeelTransactionGasPo
   const slotNumber = quantity(block?.slotNumber);
   if (!block || timestamp === undefined || timestamp < policy.blockTimestamp || timestamp < KEEL_SEPOLIA_AMSTERDAM_TIMESTAMP
     || timestamp <= parent.timestamp || quantity(block.number) !== parent.number + 1n
-    || slotNumber === undefined || (parent.slotNumber !== undefined && slotNumber <= parent.slotNumber)
+    // Geth's simulateV1 omits slotNumber while supplying the linked Amsterdam
+    // access-list header. Validate slot order when the RPC exposes it.
+    || (block.slotNumber !== undefined && slotNumber === undefined)
+    || (slotNumber !== undefined && parent.slotNumber !== undefined && slotNumber <= parent.slotNumber)
     || !hash(block.blockAccessListHash) || !hash(block.hash)
     || typeof block.parentHash !== "string" || block.parentHash.toLowerCase() !== parent.hash.toLowerCase()) {
     throw new TypeError("The simulator did not prove an Amsterdam block linked to the exact pinned chain snapshot.");
