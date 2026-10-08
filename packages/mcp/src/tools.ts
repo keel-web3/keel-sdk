@@ -1,3 +1,4 @@
+import { SIGNATURE_PRIVACY_TOOL_DEFINITIONS } from "./signature-privacy-tools.js";
 import { MEDIA_EDIT_TOOL_DEFINITIONS } from "./media-edit-tools.js";
 import { startStudioConnection, getStudioConnection, completeStudioConnection, loadStudioAgentToken, type StudioConnectionScope } from "@keel/sdk/studio-connection-node";
 import { resolveKeelShell, resolveKeelPayloadStorage, resolveKeelPayloadCompression } from "@keel/protocol";
@@ -1450,6 +1451,7 @@ async function tezosPublicationPrepareTool(_context: ToolContext, value: unknown
 
 export const TOOL_DEFINITIONS: readonly ToolDefinition[] = [
   ...MEDIA_EDIT_TOOL_DEFINITIONS,
+  ...SIGNATURE_PRIVACY_TOOL_DEFINITIONS,
   tool("keel-tezos-shell-prepare", "Prepare native Tezos shell registration, update, or permanent freeze parameters with explicit network and sender. Read-only preparation: no RPC, signing, submission, or default-shell replacement. Receipt-backed selected-chain object and registry checks are still required.", tezosShellPrepareSchema, async (_context, value) => prepareKeelTezosShell(value as KeelTezosShellPrepareInput)),
   tool("keel-tezos-publication-prepare", "Prepare one exact receipt-bound Tezos KEEL one-of-one publication call using the standard Hold, Index, and FA2 modules. The public route is ordinary FA2/TZIP-12 token_metadata with onchfs:// or another selected carrier; the KEEL JSON/harness route is compatibility-only. Review-only: no private key, origination, signing, submission, or fake address is accepted.", tezosPublicationPrepareSchema, tezosPublicationPrepareTool),
   ...ENGINE_TOOL_DEFINITIONS,

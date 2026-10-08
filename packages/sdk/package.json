@@ -362,6 +362,10 @@
     "./rpc-read-manifest": {
       "types": "./dist/rpc-read-manifest.d.ts",
       "import": "./dist/rpc-read-manifest.js"
+    },
+    "./signature-privacy": {
+      "types": "./dist/signature-privacy.d.ts",
+      "import": "./dist/signature-privacy.js"
     }
   },
   "files": [

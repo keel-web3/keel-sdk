@@ -1,0 +1,35 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import { createRequire } from 'node:module';
+import { readFileSync } from 'node:fs';
+const require=createRequire(new URL('../packages/sdk/package.json',import.meta.url));
+const {hashTypedData}=require('viem');
+const {privateKeyToAccount}=require('viem/accounts');
+const {keelSignaturePrivacyReadiness:ready,serializeUnsignedSigningRequests:unsigned,parsePrivateApprovals:parse,serializePrivateApprovals:privateExport}=await import('../packages/sdk/dist/signature-privacy.js');
+const signer=privateKeyToAccount('0x'+'01'.padStart(64,'0'));
+const typedData={domain:{name:'Keel Manager',version:'1',chainId:11155111,verifyingContract:'0x'+'11'.repeat(20)},primaryType:'GovernanceAction',types:{GovernanceAction:[{name:'target',type:'address'},{name:'value',type:'uint256'},{name:'dataHash',type:'bytes32'},{name:'nonce',type:'uint256'},{name:'deadline',type:'uint64'},{name:'epoch',type:'uint64'}]},message:{target:'0x'+'22'.repeat(20),value:0n,dataHash:'0x'+'33'.repeat(32),nonce:1n,deadline:2000000000n,epoch:1n}};
+const request={role:'governance',members:[signer.address],threshold:1n,digest:hashTypedData(typedData),typedData};
+const signature=await signer.signTypedData(typedData);
+const packet={signer:signer.address,digest:request.digest,signature};
+test('defaults never force address changes or claim persistent privacy',()=>{const r=ready();assert.equal(r.preferences.forceAddressChange,false);assert.equal(r.ready,true);assert.equal(r.executionDisclosure,'public-calldata');assert.equal(r.persistentPrivacy,'unavailable');assert.equal(r.hashBasedValidator,'unverified');assert.match(r.evidence,/not-live/);});
+for(const option of ['forceAddressChange','requirePersistentPrivacy']) test(`${option} blocks unsupported operation without claiming authority change`,()=>{assert.equal(ready({[option]:true}).ready,false);assert.equal(ready({[option]:true}).blockers.length,1);});
+for(const value of [null,[],{forceAddressChange:'false'},{notes:'private'},{signatures:[packet]},{requirePersistentPrivacy:1}]) test(`reject unsafe preferences without reflecting input`,()=>assert.throws(()=>ready(value)));
+test('unsigned allowlist excludes notes and signatures at every input layer',()=>{const contaminated={...request,notes:'SECRET_NOTE',signatures:[packet],typedData:{...typedData,notes:'SECRET_NOTE',signature,domain:{...typedData.domain,notes:'SECRET_NOTE'},message:{...typedData.message,notes:'SECRET_NOTE',signature}}};const result=unsigned([contaminated]);assert.ok(!result.includes('SECRET_NOTE'));assert.ok(!result.includes(signature));assert.equal(JSON.parse(result).requests[0].digest,request.digest);assert.equal(JSON.parse(result).requests[0].typedData.message.nonce,'1');});
+test('signature schema/domain/digest tampering rejected',()=>{for(const td of [{...typedData,domain:{...typedData.domain,chainId:1}},{...typedData,domain:{...typedData.domain,name:'Other'}},{...typedData,message:{...typedData.message,nonce:2n}},{...typedData,types:{GovernanceAction:[]}}])assert.throws(()=>unsigned([{...request,typedData:td}]));});
+test('private export requires explicit acknowledgment and is round-trip importable',()=>{assert.throws(()=>privateExport([packet],[request],false));assert.deepEqual(parse(privateExport([packet],[request],true),[request]),[packet]);});
+test('private export strips unexpected fields rather than leaking notes',()=>assert.ok(!privateExport([{...packet,note:'SECRET_NOTE'}],[request],true).includes('SECRET_NOTE')));
+test('import rejects unknown digests/signers, duplicate and malformed packets',()=>{for(const packets of [[{...packet,digest:'0x'+'44'.repeat(32)}],[{...packet,signer:'0x'+'55'.repeat(20)}],[packet,packet],[{...packet,signature:'0x1'}],[{...packet,note:'SECRET_NOTE'}],[{...packet,signer:[signer.address]}],[null],[]])assert.throws(()=>parse(JSON.stringify(packets),[request]));});
+test('empty contract-wallet signatures remain syntactically permitted for cryptographic verification',()=>assert.equal(parse(JSON.stringify([{...packet,signature:'0x'}]),[request])[0].signature,'0x'));
+test('input and signature size bounded',()=>{assert.throws(()=>parse(' '.repeat(2000001),[request]));assert.throws(()=>parse(JSON.stringify([{...packet,signature:'0x'+'11'.repeat(65537)}]),[request]));assert.throws(()=>unsigned(Array(257).fill(request)));});
+
+test('MCP handler shares readiness semantics and rejects notes/signatures without reflection',async()=>{
+ const ts=require('typescript');
+ const source=readFileSync(new URL('../packages/mcp/src/signature-privacy-tools.ts',import.meta.url),'utf8');
+ const moduleUrl=new URL('../packages/sdk/dist/signature-privacy.js',import.meta.url).href;
+ const javascript=ts.transpileModule(source,{compilerOptions:{module:ts.ModuleKind.ESNext,target:ts.ScriptTarget.ES2022}}).outputText.replace('"@keel/sdk/signature-privacy"',JSON.stringify(moduleUrl));
+ const {SIGNATURE_PRIVACY_TOOL_DEFINITIONS:[tool]}=await import('data:text/javascript;base64,'+Buffer.from(javascript).toString('base64'));
+ assert.deepEqual(await tool.run({},{}),ready());
+ assert.deepEqual(await tool.run({},{forceAddressChange:true}),ready({forceAddressChange:true}));
+ for(const input of [{notes:'SECRET_NOTE'},{signatures:[packet]}]) await assert.rejects(tool.run({},input),e=>!e.message.includes('SECRET_NOTE')&&!e.message.includes(signature));
+ const registry=readFileSync(new URL('../packages/mcp/src/tools.ts',import.meta.url),'utf8');assert.ok(registry.includes('...SIGNATURE_PRIVACY_TOOL_DEFINITIONS'));
+});
