@@ -365,3 +365,15 @@ test("Studio module verification fails closed on wrong bytes, lengths, and unsaf
     globalThis.fetch = originalFetch;
   }
 });
+
+test('SDK image staging shares original/GIF no-shell defaults and retains explicit media-slot choices',async()=>{
+ const {stageKeelStudioProject}=await import(MODULE);
+ for(const [mediaType,viewer] of [['image/png','none'],['image/gif','none'],['image/webp','keel-verification-shell'],['image/avif','keel-verification-shell']]) {
+  let metadata;
+  const slots={image:{resourceId:'keel-direct-image',presentation:'direct',delivery:'ipfs'},animation_url:null};
+  await stageKeelStudioProject({studioUrl:'https://studio.example',agentToken:'k'.repeat(48),title:'Original image',storageStrategy:'onchain',files:[{path:'source.bin',mediaType,bytes:Uint8Array.of(1),role:'image',format:'asset'}],...(viewer==='none'?{mediaSlots:slots}:{}),fetchImplementation:async(_url,init)=>{
+   metadata=JSON.parse(init.body.get('metadata'));return Response.json({schema:'keel-studio-project-handoff@1',id:'image-1',handoffUrl:'https://studio.example/studio/projects/new?handoff=secret',expiresAt:'2027-09-01T00:00:00.000Z',fileCount:1,totalBytes:1,wallet:{signing:'not-performed',submission:'not-performed'}},{status:201});
+  }});
+  assert.equal(metadata.viewer,viewer);if(viewer==='none'){assert.deepEqual(metadata.mediaSlots,slots);assert.equal(metadata.publicationIntent,undefined);}
+ }
+});

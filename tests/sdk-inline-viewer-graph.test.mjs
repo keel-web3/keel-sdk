@@ -1,4 +1,5 @@
 import assert from "node:assert/strict";
+import { createHash } from "node:crypto";
 import test from "node:test";
 import { fileURLToPath } from "node:url";
 import { gunzipSync, gzipSync } from "node:zlib";
@@ -94,18 +95,25 @@ test('inline SVG image carriage avoids double Base64 while retaining exact bytes
   assert.throws(()=>buildKeelInlineImageURI(new Uint8Array(),'image/png'),/empty/);
 });
 
-test("collector Inline rejects actual off-chain resource tags while allowing shell protocol text", () => {
+test("collector Inline rejects off-chain resources while allowing navigation links and protocol text", () => {
   const image = validPngURI;
-  const shellText = "<div class=\"verify-corner\"></div><script>const note=\"ipfs:// is only a mirror explanation\";</script>";
+  const shellText = "<div class=\"verify-corner\"></div><a href=\"https://onkeel.io/gallery\">OnKEEL</a><script>const note=\"ipfs:// is only a mirror explanation\";</script>";
   assert.doesNotThrow(() => assertKeelCollectorInlineMetadata({ image, animation_url: `data:text/html;charset=utf-8,${encodeURIComponent(shellText)}` }));
   assert.throws(
     () => assertKeelCollectorInlineMetadata({ image: "data:image/png;base64,AA==", animation_url: `data:text/html;charset=utf-8,${encodeURIComponent(shellText)}` }),
     /PNG source/u,
   );
-  assert.throws(
-    () => assertKeelCollectorInlineMetadata({ image, animation_url: `data:text/html;charset=utf-8,${encodeURIComponent(`${shellText}<img src=\"/off-chain.png\">`)}` }),
-    /external or relative resource/u,
-  );
+  for (const resource of [
+    '<img src="/off-chain.png">',
+    '<script src="https://example.invalid/remote.js"></script>',
+    '<iframe src="https://example.invalid/artwork"></iframe>',
+    '<style>body{background:url(https://example.invalid/remote.png)}</style>',
+  ]) {
+    assert.throws(
+      () => assertKeelCollectorInlineMetadata({ image, animation_url: `data:text/html;charset=utf-8,${encodeURIComponent(shellText + resource)}` }),
+      /external or relative resource/u,
+    );
+  }
 });
 
 test("composable Base64 fragments equal one traditional outer encoding across UTF-8 boundaries", () => {
@@ -171,7 +179,19 @@ test("composable Base64 rejects malformed Unicode and padded non-terminal fragme
 test("Gzip Inline graph reuses shell and p5 fragments and publishes only creator bytes", async () => {
   const shell = await buildKeelInlineShellFragments({ repositoryRoot });
   assert.equal(shell.codecProfile, "browser-gzip-deflate");
-  assert.ok(shell.prefix.bytes.byteLength + shell.suffix.bytes.byteLength < 100_000);
+  // Pin the canonical fragments already emitted by 7de466d, where the old
+  // 100 KB estimate was already stale. Byte/hash checks catch unreviewed growth
+  // or substitution without changing its runtime or publication limits.
+  const canonicalFragments = [
+    { byteLength: 15_108, digest: "0x4a5405a5794aa91206ef4cebebee127d8917735d4d33546a0bbf8c6bead9a58e" },
+    { byteLength: 143_710, digest: "0x71e27b6cc8c5b5620d6428512ed8d55605f136dc7bed51367b3359f2113d99ef" },
+  ];
+  for (const [index, fragment] of [shell.prefix, shell.suffix].entries()) {
+    const expected = canonicalFragments[index];
+    assert.equal(fragment.bytes.byteLength, expected.byteLength);
+    assert.equal(`0x${createHash("sha256").update(fragment.bytes).digest("hex")}`, expected.digest);
+    assert.deepEqual(fragment.integrity, { algorithm: "sha256", ...expected });
+  }
   const shellText = new TextDecoder().decode(new Uint8Array([
     ...shell.prefix.bytes,
     ...shell.suffix.bytes,
@@ -213,7 +233,11 @@ test("Gzip Inline graph reuses shell and p5 fragments and publishes only creator
   );
   assert.ok(root.byteLength < 2_000_000);
   const html = new TextDecoder().decode(root.rootBytes);
-  assert.doesNotMatch(html, /\/content\/|\/api\/onchain\/|https?:\/\//u);
+  assert.doesNotMatch(html, /\/content\/|\/api\/onchain\//u);
+  // Canonical navigation links are allowed; artwork resource loads stay Inline.
+  assert.doesNotThrow(() => assertKeelCollectorInlineMetadata({
+    image: validPngURI, animation_url: `data:text/html;charset=utf-8,${encodeURIComponent(html)}`,
+  }));
   assert.match(html, /"compression":"gzip"/u);
   assert.match(html, /"id":"sketch\.js"/u);
 
@@ -230,7 +254,11 @@ test("Gzip Inline graph reuses shell and p5 fragments and publishes only creator
   assert.ok(tokenGraph.creatorPublicationBytes < tokenGraph.fragmentBytes.byteLength / 2);
   assert.doesNotMatch(new TextDecoder().decode(tokenGraph.fragmentBytes), /=/u);
   assert.match(new TextDecoder().decode(tokenGraph.htmlBytes), /"compression":"gzip"/u);
-  assert.doesNotMatch(new TextDecoder().decode(tokenGraph.htmlBytes), /\/content\/|\/api\/onchain\/|https?:\/\//u);
+  const tokenGraphHtml = new TextDecoder().decode(tokenGraph.htmlBytes);
+  assert.doesNotMatch(tokenGraphHtml, /\/content\/|\/api\/onchain\//u);
+  assert.doesNotThrow(() => assertKeelCollectorInlineMetadata({
+    image: validPngURI, animation_url: `data:text/html;charset=utf-8,${encodeURIComponent(tokenGraphHtml)}`,
+  }));
 
   const decodedMiddle = Buffer.from(new TextDecoder().decode(tokenGraph.fragmentBytes), "base64").toString("utf8");
   assert.match(decodedMiddle, /^[A-Za-z0-9+/]+$/u);

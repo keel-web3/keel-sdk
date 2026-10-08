@@ -1,3 +1,5 @@
+import { parseKeelProjectProfileSnapshot, parseKeelNamedProjectProfile, type KeelProjectProfileSnapshot, type KeelNamedProjectProfile } from "./studio-project-profiles.js";
+import { KEEL_DEFAULT_RPC_READ_CONCURRENCY } from "./rpc-read-manifest.js";
 import { compileKeelPlanMatrix, validateKeelPlanValue, type KeelPlanAnswers, type KeelPlanDefaults, type KeelPlanMatrix, type KeelPlanValue } from "./studio-project-planner.js";
 
 export interface KeelStudioDefaultProfile {
@@ -6,6 +8,7 @@ export interface KeelStudioDefaultProfile {
   readonly askToSave: boolean;
   readonly global: KeelPlanAnswers;
   readonly byMedia: Readonly<Record<string, KeelPlanAnswers>>;
+  readonly namedProfiles?: readonly KeelNamedProjectProfile[];
 }
 export type KeelStudioDefaultScope = { readonly kind: "global" } | { readonly kind: "media"; readonly mediaType: string };
 const mediaPattern = /^[a-z0-9][a-z0-9.+-]{0,63}\/[a-z0-9][a-z0-9.+-]{0,95}$/u;
@@ -37,13 +40,16 @@ export function createKeelStudioDefaultProfile(): KeelStudioDefaultProfile {
 
 export function parseKeelStudioDefaultProfile(value: unknown): KeelStudioDefaultProfile {
   const input = object(value);
-  if (Object.keys(input).some(key => !["schema", "revision", "askToSave", "global", "byMedia"].includes(key))
+  if (Object.keys(input).some(key => !["schema", "revision", "askToSave", "global", "byMedia", "namedProfiles"].includes(key))
     || input.schema !== "keel-studio-default-profile@1" || !Number.isSafeInteger(input.revision) || Number(input.revision) < 0
     || typeof input.askToSave !== "boolean") throw new TypeError("Invalid saved defaults profile.");
   const media = Object.entries(object(input.byMedia));
   if (media.length > 32 || media.some(([key]) => !mediaPattern.test(key))) throw new TypeError("Saved defaults need a bounded set of exact media types.");
+  if (input.namedProfiles !== undefined && (!Array.isArray(input.namedProfiles) || input.namedProfiles.length > 24)) throw new TypeError("Use a bounded named profile collection.");
+  const namedProfiles = input.namedProfiles === undefined ? undefined : (input.namedProfiles as unknown[]).map(parseKeelNamedProjectProfile);
+  if (namedProfiles && new Set(namedProfiles.map(profile => profile.id)).size !== namedProfiles.length) throw new TypeError("Named profile IDs must be unique.");
   const profile = { schema: "keel-studio-default-profile@1" as const, revision: Number(input.revision), askToSave: input.askToSave,
-    global: answers(input.global), byMedia: Object.freeze(Object.fromEntries(media.map(([key, item]) => [key, answers(item)]))) };
+    ...(namedProfiles ? { namedProfiles } : {}), global: answers(input.global), byMedia: Object.freeze(Object.fromEntries(media.map(([key, item]) => [key, answers(item)]))) };
   if (new TextEncoder().encode(JSON.stringify(profile)).byteLength > 65_536) throw new RangeError("Saved defaults exceed the supported profile size.");
   return Object.freeze(profile);
 }
@@ -117,4 +123,77 @@ export function validateKeelStudioDefaultsCommand(value: unknown): KeelStudioDef
     scope: scope.kind === "global" ? { kind: "global" } : { kind: "media", mediaType: String(scope.mediaType) },
     values: JSON.parse(JSON.stringify(values)) as KeelStudioDefaultsCommand["values"],
     ...(input.askToSave === undefined ? {} : { askToSave: input.askToSave as boolean }) };
+}
+
+/** Private copied defaults. Never put this record in an artwork manifest or public metadata. */
+export interface KeelSelectedProjectProfile {
+  readonly snapshot: KeelProjectProfileSnapshot;
+  readonly defaults?: Pick<KeelPlanDefaults, "revision" | "global" | "byMedia">;
+}
+export function parseKeelSelectedProjectProfile(input: unknown): KeelSelectedProjectProfile {
+  if (!input || typeof input !== "object" || Array.isArray(input)) throw new TypeError("Invalid selected project profile.");
+  const value = input as Record<string, unknown>;
+  if (Object.keys(value).some(key => key !== "snapshot" && key !== "defaults")) throw new TypeError("A profile selection cannot carry permissions or wallet actions.");
+  const snapshot = parseKeelProjectProfileSnapshot(value.snapshot);
+  if (value.defaults === undefined) return { snapshot };
+  if (!value.defaults || typeof value.defaults !== "object" || Array.isArray(value.defaults)) throw new TypeError("Invalid copied project defaults.");
+  const defaults = value.defaults as Record<string, unknown>;
+  if (Object.keys(defaults).some(key => !["revision", "global", "byMedia"].includes(key)) || typeof defaults.revision !== "string" || !defaults.revision || defaults.revision.length > 240) throw new TypeError("Use bounded copied project defaults.");
+  const parsed = parseKeelStudioDefaultProfile({ schema: "keel-studio-default-profile@1", revision: 0, askToSave: false, global: defaults.global ?? {}, byMedia: defaults.byMedia ?? {} });
+  return { snapshot, defaults: { revision: defaults.revision, global: parsed.global, byMedia: parsed.byMedia } };
+}
+
+/** Shared private build choices. Contract limits are hard ceilings, never preferences. */
+export const KEEL_BUILD_DEFAULT_FIELDS: readonly import("./studio-project-planner.js").KeelPlanField[] = [
+  { id: "rpcMaxConcurrentReads", label: "Parallel native RPC reads", kind: "integer", minimum: 1, maximum: 64, required: false, allowDefault: true, explanation: "Bounded Hybrid carrier reads. This does not change delivery, authorize a provider or set transaction gas." },
+  { id: "compression", label: "Lossless compression", kind: "choice", required: false, allowDefault: true, choices: ["auto", "brotli", "none"].map(value => ({ value, label: value, status: "available" as const })) },
+  { id: "brotliQuality", label: "Brotli quality", kind: "integer", minimum: 0, maximum: 11, required: false, allowDefault: true },
+  { id: "transportProfile", label: "Prepared payload encoding", kind: "choice", required: false, allowDefault: true, choices: ["base90-v1", "base91-v1", "base90-block-v2", "uri81-block-v1"].map(value => ({ value, label: value, status: "available" as const })) },
+  { id: "payloadStorage", label: "Payload storage", kind: "choice", required: false, allowDefault: true, choices: ["compact", "raw"].map(value => ({ value, label: value, status: "available" as const })) },
+  { id: "maxReadGas", label: "Maximum complete-read gas", kind: "integer", minimum: 1, maximum: Number.MAX_SAFE_INTEGER, required: false, allowDefault: true },
+  { id: "maxOutputBytes", label: "Maximum complete tokenURI bytes", kind: "integer", minimum: 1, maximum: Number.MAX_SAFE_INTEGER, required: false, allowDefault: true },
+  { id: "hybridFallback", label: "Allow reviewing Hybrid after an Inline limit", kind: "boolean", required: false, allowDefault: true, explanation: "This preference never approves payment, external uploads or a silent delivery change." },
+];
+export interface KeelEffectiveBuildDefaults {
+  readonly schema: "keel-effective-build-defaults@1";
+  readonly revision: number;
+  readonly values: KeelPlanAnswers;
+  readonly sources: Readonly<Record<string, "system" | "account" | "media" | "project" | "build" | "contract">>;
+  readonly requiresFullReadValidation: true;
+}
+/** Fetch the authoritative profile before calling. Project/build overrides stay explicit. */
+export function resolveKeelBuildDefaults(profile: KeelStudioDefaultProfile, input: {
+  readonly mediaType?: string;
+  readonly project?: KeelPlanAnswers;
+  readonly build?: KeelPlanAnswers;
+  readonly constraints?: { readonly maxReadGas?: number; readonly maxOutputBytes?: number; readonly transportProfiles?: readonly string[] };
+} = {}): KeelEffectiveBuildDefaults {
+  const current = parseKeelStudioDefaultProfile(profile);
+  const values: Record<string, KeelPlanValue> = { compression: "auto", brotliQuality: 11, transportProfile: "base90-v1", payloadStorage: "compact", hybridFallback: false, rpcMaxConcurrentReads: KEEL_DEFAULT_RPC_READ_CONCURRENCY };
+  const sources: Record<string, "system" | "account" | "media" | "project" | "build" | "contract"> = Object.fromEntries(Object.keys(values).map(key => [key, "system"]));
+  const fields = new Map(KEEL_BUILD_DEFAULT_FIELDS.map(field => [field.id, field]));
+  for (const [source, layer] of [["account", current.global], ["media", current.byMedia[input.mediaType ?? ""]], ["project", input.project], ["build", input.build]] as const) {
+    for (const [key, value] of Object.entries(layer ?? {})) {
+      const field = fields.get(key);
+      if (!field) { if (source === "build") throw new TypeError("Unsupported explicit build setting."); continue; }
+      const issue = validateKeelPlanValue(field, value);
+      if (issue) throw new TypeError(issue.message);
+      values[key] = copyValue(value); sources[key] = source;
+    }
+  }
+  if (values.payloadStorage === "raw") { values.compression = "none"; sources.compression = sources.payloadStorage!; }
+  for (const key of ["maxReadGas", "maxOutputBytes"] as const) {
+    const ceiling = input.constraints?.[key];
+    if (ceiling !== undefined) {
+      if (!Number.isSafeInteger(ceiling) || ceiling < 1) throw new TypeError("Invalid registered reader limit.");
+      if (values[key] === undefined || Number(values[key]) > ceiling) { values[key] = ceiling; sources[key] = "contract"; }
+    }
+  }
+  if (input.constraints?.transportProfiles && !input.constraints.transportProfiles.includes(String(values.transportProfile))) throw new TypeError("The selected prepared encoding is not supported by the registered reader.");
+  return Object.freeze({ schema: "keel-effective-build-defaults@1", revision: current.revision, values: Object.freeze(values), sources: Object.freeze(sources), requiresFullReadValidation: true });
+}
+/** Call immediately before funding; a stale build must be rebuilt and reviewed. */
+export function assertKeelBuildDefaultsCurrent(prepared: KeelEffectiveBuildDefaults, current: KeelEffectiveBuildDefaults): void {
+  const comparable = (values: KeelPlanAnswers) => JSON.stringify(Object.keys(values).sort().map(key => [key, values[key]]));
+  if (prepared.revision !== current.revision || comparable(prepared.values) !== comparable(current.values)) throw new Error("build-defaults-stale: refresh defaults, rebuild and review before funding");
 }

@@ -29,3 +29,19 @@ test('address spelling cannot change registered shell bytes or container commitm
  assert.deepEqual(lower.request.bodyObjectIds,checksum.request.bodyObjectIds);
  assert.equal(lower.request.containerTableObjectId,checksum.request.containerTableObjectId);
 });
+
+test('shared creator compression default and explicit Off retain resource identity and account for decoder overhead',async()=>{
+ const off=await prepareKeelCreatorInline({chainId:11155111,store,resources,poster,compression:'none'});
+ assert.ok(off.resources.every(r=>r.compression==='none'));
+ assert.equal(off.optimization.preparedPayloadBytesSaved,0);
+ const on=await prepareKeelCreatorInline({chainId:11155111,store,resources,poster});
+ assert.deepEqual(on.resources.map(r=>r.sourceIntegrity),off.resources.map(r=>r.sourceIntegrity));
+ assert.ok(on.optimization.preparedPayloadBytesSaved>0);
+ assert.equal(on.optimization.preparedPayloadBytes,on.resources.reduce((n,r)=>n+r.carrier.bytes.length,0));
+ assert.equal(on.optimization.shellPreparedBytes,on.shell.prefix.bytes.length+on.shell.suffix.bytes.length);
+ assert.equal(on.optimization.decoderDelivery,'included-in-prepared-shell');
+ assert.deepEqual(on.optimization.requiredCodecs,['brotli']);
+ assert.deepEqual(on.optimization.offchainPayloads,[]);
+ const mixed=await prepareKeelCreatorInline({chainId:11155111,store,resources:[{...resources[0],compression:'none'},resources[1]],poster});
+ assert.equal(mixed.resources[0].compression,'none');assert.equal(mixed.resources[1].compression,'brotli');
+});

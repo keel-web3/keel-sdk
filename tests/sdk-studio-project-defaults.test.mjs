@@ -74,6 +74,8 @@ test('portable draft client uses the same typed preferences API without broadeni
   await assert.rejects(client.editDefaults({ ...command, wallet: 'sign' }), /bounded defaults edit/u);
   await assert.rejects(client.editDefaults({ ...command, scope: { kind: 'global', owner: 'other' } }), /exact media/u);
   assert.equal(requests.length, 3);
+  const effective = await client.effectiveBuildDefaults({ build: { brotliQuality: 4 } });
+  assert.equal(effective.values.brotliQuality, 4); assert.equal(requests[3].cache, 'no-store');
   const denied = createKeelStudioAgentDraftClient({ ...options, fetchImplementation: async () => Response.json({ error: 'preferences:write required' }, { status: 403 }) });
   await assert.rejects(denied.editDefaults(command), /preferences:write/u);
 });
@@ -92,4 +94,22 @@ test('removing the last media value reclaims capacity, including older invisible
   const old = { ...createKeelStudioDefaultProfile(), byMedia: Object.fromEntries(Array.from({ length: 32 }, (_, index) => ['image/x-old-' + index, {}])) };
   const saved = change(old, { kind: 'media', mediaType: 'image/jpeg' }, { delivery: 'hybrid' });
   assert.deepEqual(Object.keys(saved.byMedia), ['image/jpeg']);
+});
+
+test('fresh build defaults layer explicit overrides, hard reader bounds and Raw semantics', async () => {
+  const { KEEL_BUILD_DEFAULT_FIELDS, resolveKeelBuildDefaults, assertKeelBuildDefaultsCurrent } = await import('../packages/sdk/dist/studio-project-defaults.js');
+  const buildMatrix = { schema: 'keel-studio-plan-matrix@1', capabilityRevision: 'build', fields: KEEL_BUILD_DEFAULT_FIELDS };
+  let profile = updateKeelStudioDefaultProfile(createKeelStudioDefaultProfile(), buildMatrix, { expectedRevision: 0, scope: { kind: 'global' }, values: { compression: 'brotli', brotliQuality: 7, maxReadGas: 9000000 } });
+  profile = updateKeelStudioDefaultProfile(profile, buildMatrix, { expectedRevision: 1, scope: { kind: 'media', mediaType: 'image/png' }, values: { brotliQuality: 8 } });
+  const current = resolveKeelBuildDefaults(profile, { mediaType: 'image/png', project: { brotliQuality: 9 }, build: { brotliQuality: 10 }, constraints: { maxReadGas: 2000000, maxOutputBytes: 2000000, transportProfiles: ['base90-v1'] } });
+  assert.equal(current.values.brotliQuality, 10); assert.equal(current.sources.brotliQuality, 'build');
+  assert.equal(current.values.maxReadGas, 2000000); assert.equal(current.requiresFullReadValidation, true);
+  assert.equal(resolveKeelBuildDefaults(profile, { build: { payloadStorage: 'raw', compression: 'brotli' } }).values.compression, 'none');
+  assert.throws(() => resolveKeelBuildDefaults(profile, { constraints: { transportProfiles: ['unknown'] } }), /registered reader/);
+  assert.throws(() => updateKeelStudioDefaultProfile(profile, buildMatrix, { expectedRevision: 2, scope: { kind: 'global' }, values: { multistage: true } }), /cannot become a default/);
+  assert.throws(() => resolveKeelBuildDefaults(profile, { build: { brotliQuality: 12 } }));
+  assertKeelBuildDefaultsCurrent(current, current);
+  assertKeelBuildDefaultsCurrent({ ...current, values: Object.fromEntries(Object.entries(current.values).reverse()) }, current);
+  assert.throws(() => assertKeelBuildDefaultsCurrent(current, { ...current, revision: current.revision + 1 }), /build-defaults-stale/);
+  assert.throws(() => assertKeelBuildDefaultsCurrent(current, { ...current, values: { ...current.values, maxReadGas: 1 } }), /build-defaults-stale/);
 });

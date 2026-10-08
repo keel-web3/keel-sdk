@@ -29,3 +29,5 @@ export { syncKeelModuleEditor, checkKeelModuleEditor, watchKeelModuleEditor } fr
 export * from "./module-project.js";
 export * from "./module-project-bundle.js";
 export * from "./thumbnail-sequence.js";
+
+export * from "./media-preparation.js";

@@ -23,6 +23,7 @@ export * from "./publish-plan.js";
 export * from "./revision-publication.js";
 export * from "./library-publication-plan.js";
 export * from "./managed-publication.js";
+export * from "./rpc-read-manifest.js";
 export * from "./three-scene-publication.js";
 export * from "./three-module.js";
 export * from "./audio-module.js";
@@ -140,3 +141,11 @@ export * from "./network-index.js";
 export * from "./network-verification.js";
 
 export * from "./studio-access.js";
+
+export * from "./inline-build-route.js";
+
+export * from "./creator-prepared-route.js";
+
+export * from "./creator-publication-journal.js";
+
+export * from "./creator-prepared-compiler.js";

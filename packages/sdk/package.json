@@ -350,6 +350,18 @@
     "./studio-project-defaults": {
       "types": "./dist/studio-project-defaults.d.ts",
       "import": "./dist/studio-project-defaults.js"
+    },
+    "./studio-project-profiles": {
+      "types": "./dist/studio-project-profiles.d.ts",
+      "import": "./dist/studio-project-profiles.js"
+    },
+    "./studio-execution-authority": {
+      "types": "./dist/studio-execution-authority.d.ts",
+      "import": "./dist/studio-execution-authority.js"
+    },
+    "./rpc-read-manifest": {
+      "types": "./dist/rpc-read-manifest.d.ts",
+      "import": "./dist/rpc-read-manifest.js"
     }
   },
   "files": [

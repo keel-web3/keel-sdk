@@ -226,10 +226,13 @@ const studioConnect: JsonSchema = object({
 }, ["operation"]);
 const studioDraft: JsonSchema = object({
   studioUrl: string("Optional HTTPS Studio URL; KEEL_STUDIO_URL is used otherwise.", 512),
-  operation: { type: "string", enum: ["list", "read", "diagnose", "plan", "plan-edit", "defaults", "defaults-edit", "conversation", "conversation-suggest", "prepare-review", "storage-review", "create", "update"] },
+  operation: { type: "string", enum: ["list", "read", "diagnose", "plan", "plan-edit", "defaults", "defaults-edit", "profiles", "profiles-edit", "profile-select", "conversation", "conversation-suggest", "prepare-review", "storage-review", "create", "update"] },
   releaseId: string("Required for read, diagnose, plan, plan-edit, prepare-review, conversation, conversation-suggest, or update.", 128),
   projectId: string("Required for storage-review; uses the owner-scoped project and never signs or submits.", 128),
+  includeReadCall: { type: "boolean", description: "For diagnose only: include the exact private metadata eth_call calldata, pinned block/runtime hash, byte commitments and attempted gas envelopes. Read-only evidence, not a wallet request. Never forward it to a new provider without permission." },
   conversationCommand: { type: "object", description: "For conversation-suggest: stable commandId UUID, expectedRevision, plain message, optional typed answers. Requires conversations:write and records an editable proposal, never a wallet action or automatic plan edit." },
+  profileCommand: { type: "object", description: "For profiles-edit: explicit create/edit/remove, stable commandId, expectedRevision, profileId and typed profile configuration. Requires preferences:write. Lifecycle and signing are never presets." },
+  profileSelection: { type: "object", properties: { profileId: { type: "string" }, expectedProfileRevision: { type: "integer", minimum: 1 } }, required: ["profileId", "expectedProfileRevision"], additionalProperties: false },
   defaultsCommand: { type: "object", description: "For defaults-edit: explicit creator instruction, separate preferences:write permission, stable commandId UUID, expectedRevision, global or exact media scope, values (null clears), optional askToSave. Applies to future guided drafts only." },
   planningCommand: { type: "object", description: "For plan-edit: operation answer/navigate/mode/review, stable commandId UUID, current expectedRevision, and the matching answers/fieldId/mode/configurationKey. Read plan first. This never signs or spends." },
   expectedRevision: integer("Required for update and prepare-review; binds the request to the current saved revision.", 1),
@@ -263,6 +266,7 @@ const studioStageProject: JsonSchema = object({
   viewer: { type: "string", enum: [...KEEL_SHELL_CHOICES], default: KEEL_DEFAULT_SHELL, description: "Default: registered KEEL verification shell. Explicit none: preserve creator-owned self-contained HTML with raw-artifact presentation and no canonical protection claim. Independent of payloadStorage. Both choices preserve immutable source, contract retrieval, and selected-chain checks." },
   files: { type: "array", items: studioStageFile, minItems: 1, maxItems: 256 },
   reusableModule: studioReusableModule,
+  projectProfile: { type: "object", description: "Copied snapshot and defaults returned by keel-studio-draft profile-select. Keep it with the private project; explicit project values take precedence." },
   releaseIntent: { type: "object", description: "Optional editable keel-release-intent@1 produced by keel-studio-project-intake." },
 }, ["title", "storageStrategy", "files"]);
 const creator721Config: JsonSchema = object({

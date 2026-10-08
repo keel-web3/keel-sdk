@@ -10,21 +10,43 @@ import { encodeKeelDenseTransport, serializeKeelDenseTransportJSON, prepareKeelD
 export function prepareKeelDensePayload(source: Uint8Array, options: {
   readonly compression?: "auto" | "brotli" | "none";
   readonly transportProfile?: KeelDenseTransportProfile;
+  /** Pinned build-time quality; independent of process environment. */
+  readonly brotliQuality?: number;
 } = {}) {
   if (!(source instanceof Uint8Array) || source.length > 32 * 1024 * 1024) throw new RangeError("Dense payload source exceeds its byte bound.");
   const requested = options.compression ?? "auto";
   if (!["auto", "brotli", "none"].includes(requested)) throw new TypeError("Unsupported fresh dense payload compression.");
+  const quality = options.brotliQuality ?? 11;
+  if (!Number.isInteger(quality) || quality < 0 || quality > 11) throw new RangeError("Brotli quality must be an integer from 0 through 11.");
   const original = Buffer.from(source);
-  const candidate = requested === "none" ? original : brotliCompressSync(original, { params: { [constants.BROTLI_PARAM_QUALITY as number]: 9 } });
-  const compression = requested === "brotli" || requested === "auto" && candidate.length < original.length ? "brotli" as const : "none" as const;
+  const candidate = requested === "none" ? original : brotliCompressSync(original, { params: { [constants.BROTLI_PARAM_QUALITY as number]: quality } });
+  const transportProfile = options.transportProfile ?? "base90-v1";
+  const prepare = (bytes: Uint8Array) => {
+    const dense = encodeKeelDenseTransport(bytes, transportProfile);
+    return { dense, bytes: prepareKeelDenseCopyFragment(serializeKeelDenseTransportJSON(dense).slice(1, -1)) };
+  };
+  // The decoded source bound is larger than the dense stored-carrier bound.
+  // An unavailable raw alternative must not reject a valid compressed carrier.
+  const maxStoredBytes = 4 * 1024 * 1024;
+  const originalPrepared = original.length <= maxStoredBytes ? prepare(original) : undefined;
+  const candidatePrepared = requested === "none" ? originalPrepared
+    : candidate.length <= maxStoredBytes ? prepare(candidate) : undefined;
+  // Pay for the exact escaped COPY carrier, not the pre-encoding estimate.
+  const compression = requested === "brotli" || requested === "auto"
+    && candidate.length < original.length && candidatePrepared !== undefined
+    && (originalPrepared === undefined || candidatePrepared.bytes.length < originalPrepared.bytes.length) ? "brotli" as const : "none" as const;
   const compressedBytes = compression === "brotli" ? candidate : original;
   if (compression === "brotli" && !brotliDecompressSync(compressedBytes, { maxOutputLength: Math.max(1, original.length) }).equals(original)) throw new TypeError("Brotli preparation changed source bytes.");
-  const transportProfile = options.transportProfile ?? "base90-v1";
-  const storedDense = encodeKeelDenseTransport(compressedBytes, transportProfile);
-  const jsonText = serializeKeelDenseTransportJSON(storedDense).slice(1, -1);
-  const preparedBytes = prepareKeelDenseCopyFragment(jsonText);
+  const selected = compression === "brotli" ? candidatePrepared : originalPrepared;
+  if (selected === undefined) throw new RangeError("Selected dense payload exceeds its stored-carrier byte bound.");
+  const storedDense = selected.dense;
+  const preparedBytes = selected.bytes;
   const integrity = (bytes: Uint8Array) => { const hash = createHash("sha256"); hash.update(bytes); return { algorithm: "sha256" as const, digest: `0x${hash.digest("hex")}` as const, byteLength: bytes.length }; };
-  return { compression, transportProfile, storedDense, compressedBytes: new Uint8Array(compressedBytes), preparedBytes,
+  return { compression, brotliQuality: quality, transportProfile, storedDense,
+    optimization: { sourceBytes: original.length, compressedBytes: compressedBytes.length,
+      preparedBytes: preparedBytes.length, uncompressedPreparedBytes: originalPrepared?.bytes.length ?? null,
+      preparedBytesSaved: originalPrepared === undefined ? null : originalPrepared.bytes.length - preparedBytes.length,
+      sourceByteIdentity: "verified-exact" as const, selection: requested }, compressedBytes: new Uint8Array(compressedBytes), preparedBytes,
     decodedIntegrity: integrity(original), storedIntegrity: integrity(compressedBytes), preparedIntegrity: integrity(preparedBytes),
     mediaType: "application/vnd.keel.token-uri-raw-percent-fragment" as const, payloadPreparation: "build-time" as const };
 }
