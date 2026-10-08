@@ -9,6 +9,7 @@ const schedules: Readonly<Record<number, { readonly prague: bigint; readonly osa
 };
 const source = "https://github.com/ethereum/go-ethereum/blob/v1.17.7/params/config.go";
 function selectedFork(chainId: number, timestamp: bigint): "prague" | "osaka" | "amsterdam" {
+  if (!Number.isSafeInteger(chainId) || chainId < 1) throw new TypeError("Transaction gas policy requires a valid numeric chain ID.");
   const schedule = schedules[chainId];
   if (!schedule || timestamp < schedule.prague) throw new TypeError("This historical chain/fork needs an explicitly registered transaction gas profile.");
   return schedule.amsterdam !== undefined && timestamp >= schedule.amsterdam ? "amsterdam" : timestamp >= schedule.osaka ? "osaka" : "prague";

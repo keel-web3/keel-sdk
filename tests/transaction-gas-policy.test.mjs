@@ -20,6 +20,7 @@ test('missing timestamp, malformed block and unknown chain do not inherit a perm
  assert.throws(()=>policy(11155111,-1n),/timestamp/);
  assert.throws(()=>policy(11155111,1n,0n),/timestamp/);
  assert.throws(()=>policy(31337,1n),/registered/);
+ for (const chain of ['1', 1.1, 0, -1, NaN]) assert.throws(()=>policy(chain,KEEL_SEPOLIA_AMSTERDAM_TIMESTAMP),/numeric chain/);
 });
 
 import { estimateEthereumCalldataIntrinsicGasWithEip7623, estimateKeelHistoryInscriptionGas } from '../packages/sdk/dist/managed-publication.js';

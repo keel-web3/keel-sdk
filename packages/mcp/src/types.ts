@@ -37,6 +37,7 @@ export interface JsonSchema {
   readonly anyOf?: readonly JsonSchema[];
   readonly minItems?: number;
   readonly maxItems?: number;
+  readonly uniqueItems?: boolean;
   readonly minLength?: number;
   readonly maxLength?: number;
   readonly minimum?: number;

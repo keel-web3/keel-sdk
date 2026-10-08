@@ -232,7 +232,7 @@ const studioDraft: JsonSchema = object({
   includeReadCall: { type: "boolean", description: "For diagnose only: include the exact private metadata eth_call calldata, pinned block/runtime hash, byte commitments and attempted gas envelopes. Read-only evidence, not a wallet request. Never forward it to a new provider without permission." },
   includePublicationTrace: { type: "boolean", description: "For diagnose only: request bounded callTracer evidence on an already configured provider. Missing or unsupported trace leaves the cause unknown; scalar gas never proves state-gas depletion." },
   reconciliation: { type: "object", properties: {
-    operationId: { type: "string", format: "uuid" }, expectedRevision: { type: "integer", minimum: 1 },
+    operationId: { type: "string", pattern: "^[0-9a-fA-F]{8}(-[0-9a-fA-F]{4}){3}-[0-9a-fA-F]{12}$" }, expectedRevision: { type: "integer", minimum: 1 },
     walletBatchId: { type: "string", minLength: 1, maxLength: 1024 }, txHashes: { type: "array", maxItems: 8, uniqueItems: true, items: { type: "string", pattern: "^0x[0-9a-fA-F]{64}$" } }, includeTrace: { type: "boolean" },
   }, required: ["operationId", "expectedRevision", "txHashes"], additionalProperties: false,
   description: "For reconcile only: the exact existing operation and returned wallet hashes. Requires drafts:write; persists receipt reconciliation, never signs, uploads or pays storage again. Pending or unknown submissions remain blocked from replacement." },
