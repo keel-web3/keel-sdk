@@ -8,6 +8,8 @@ import type {
   KeelPayloadStorageMode,
   EntrypointMode,
   Integrity,
+  Hex,
+  OnchainSource,
   ResourceRole,
   ResourceSource,
   KeelComponentFormat,
@@ -52,6 +54,11 @@ export interface StudioAssetInput {
 }
 
 export interface PrepareStudioArtifactOptions {
+  /** Keep only the selected local collector image readable by historical Hold.haulObject.
+   * Uses Studio's Compact derivative preference without changing manifest.fallback.
+   * Non-image fallbacks and existing chain bindings retain their representation.
+   * Upload planning must independently retain compression:none for changed storage. */
+  readonly contractReadableFallback?: boolean;
   /** Explicit lossless codec policy; none is independent of Compact/Raw storage. */
   readonly compression?: "auto" | "brotli" | "none";
   readonly brotliQuality?: number;
@@ -93,6 +100,21 @@ export interface PrepareStudioArtifactOptions {
   readonly maxTotalBytes?: number;
   readonly maxResources?: number;
   readonly timeoutMs?: number;
+}
+
+/** An explicit new proposal; callers must verify that storage is still unfunded. */
+export interface PrepareContractReadableStudioFallbackOptions {
+  readonly mode: "unfunded-replan";
+  readonly expectedManifestDigest: Hex;
+  readonly revision: number;
+  /** Explicitly undefined when replacing the still-unfunded initial draft. */
+  readonly parentRevision: number | undefined;
+  /** The caller proves this exact binding is only a prediction for unfunded storage.
+   * Omit replacement to remove it; unrelated sources are preserved in order. */
+  readonly replacePredictedFallbackSource?: {
+    readonly expected: OnchainSource;
+    readonly replacement?: OnchainSource;
+  };
 }
 
 /** Paths are resolved against the exact normalized Studio asset paths. */

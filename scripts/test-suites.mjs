@@ -72,6 +72,7 @@ export const DETERMINISTIC_TEST_FILES = Object.freeze([
   "tests/media-preparation.test.mjs",
   "tests/media-slot-plan.test.mjs",
   "tests/studio-core-build-defaults.test.mjs",
+  "tests/studio-contract-readable-fallback.test.mjs",
   "tests/sdk-studio-project-decisions.test.mjs",
   "tests/sdk-studio-project-planner.test.mjs",
   "tests/sdk-studio-project-defaults.test.mjs",

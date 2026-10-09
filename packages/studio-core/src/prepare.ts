@@ -9,10 +9,12 @@ import {
   KEEL_THUMBNAIL_PROTOCOL,
   KEEL_VIEWER_PROTOCOL,
   assertValidManifest,
+  canonicalJson,
   createIntegrity,
   resolveKeelPayloadStorage,
   type KeelPayloadStorageMode,
   manifestIntegrity,
+  verifyIntegrity,
   utf8ToBytes,
   type ArtifactDownload,
   type ArtifactManifest,
@@ -31,11 +33,13 @@ import type {
   PreparedStudioArtifact,
   PreparedStudioResource,
   PrepareStudioArtifactOptions,
+  PrepareContractReadableStudioFallbackOptions,
   StudioFlashRuntime,
   StudioArtifactStats,
 } from "./types.js";
 import { createGeneratedWrapper, type FlashWrapperResources } from "./wrapper.js";
 import { buildKeelWebpDerivative } from "./media-derivative.js";
+import { verifyPreparedStudioArtifact } from "./verification.js";
 
 function positiveSafe(value: number | undefined, fallback: number, label: string): number {
   const resolved = value ?? fallback;
@@ -489,8 +493,161 @@ function stats(resources: readonly PreparedStudioResource[]): StudioArtifactStat
   };
 }
 
+function extensionRecord(value: unknown): Readonly<Record<string, unknown>> {
+  return value !== null && typeof value === "object" && !Array.isArray(value)
+    ? value as Readonly<Record<string, unknown>> : {};
+}
+
+export const STUDIO_COLLECTOR_PREVIEW_RESOURCE_ID = "derivative:preview-webp-512-v1" as const;
+
+/**
+ * The collector image selected by Studio release presentation. The manifest's
+ * ordinary fallback is retained; Compact prefers its existing WebP derivative.
+ * Callers reading published storage must supply only eligible resources: this
+ * selector does not establish receipt, chain, store or completed-plan evidence.
+ */
+export function selectStudioCollectorImageResourceId(input: {
+  readonly payloadStorage?: KeelPayloadStorageMode;
+  readonly fallbackImageResourceId: string | null;
+  readonly resources: readonly { readonly resourceId: string; readonly mediaType: string }[];
+}): string | null {
+  return resolveKeelPayloadStorage(input.payloadStorage) === "compact"
+    && input.resources.some((resource) => resource.resourceId === STUDIO_COLLECTOR_PREVIEW_RESOURCE_ID && resource.mediaType === "image/webp")
+    ? STUDIO_COLLECTOR_PREVIEW_RESOURCE_ID : input.fallbackImageResourceId;
+}
+
+async function contractReadableFallbackResources(
+  resources: readonly PreparedStudioResource[],
+  fallbackId: string,
+  sourceChange?: PrepareContractReadableStudioFallbackOptions["replacePredictedFallbackSource"],
+  unfundedReplan = false,
+): Promise<readonly PreparedStudioResource[]> {
+  const matches = resources.filter((item) => item.resource.id === fallbackId);
+  const selected = matches[0];
+  if (matches.length !== 1 || selected === undefined) {
+    throw new TypeError("Contract-readable fallback requires the exact selected image resource.");
+  }
+  if (!selected.resource.mediaType.startsWith("image/")) {
+    if (unfundedReplan) throw new TypeError("Contract-readable fallback requires the exact selected image resource.");
+    return resources;
+  }
+  if (!unfundedReplan && selected.resource.sources.some((source) => source.kind === "onchain" || source.kind === "contract-call")) {
+    return resources;
+  }
+  if (selected.decodedByteLength !== selected.decodedBytes.byteLength
+    || !(await verifyIntegrity(selected.decodedBytes, selected.decodedIntegrity))) {
+    throw new Error("The selected fallback decoded bytes do not match their commitment.");
+  }
+  const storedBytes = selected.decodedBytes.slice();
+  const storedIntegrity = await createIntegrity(storedBytes);
+  let sources = selected.resource.sources;
+  if (sourceChange !== undefined) {
+    const { expected, replacement } = sourceChange;
+    if (expected.kind !== "onchain" || canonicalJson(expected.integrity) !== canonicalJson(selected.decodedIntegrity)) {
+      throw new TypeError("The predicted fallback source must commit to the exact decoded image.");
+    }
+    const matches = sources.filter((source) => canonicalJson(source) === canonicalJson(expected));
+    if (matches.length !== 1) throw new Error("The exact predicted fallback source is missing or ambiguous.");
+    if (replacement !== undefined && (replacement.kind !== "onchain"
+      || replacement.chainId !== expected.chainId || replacement.store.toLowerCase() !== expected.store.toLowerCase()
+      || canonicalJson(replacement.integrity) !== canonicalJson(selected.decodedIntegrity)
+      || (replacement.compression !== undefined && replacement.compression !== "none"))) {
+      throw new TypeError("A replacement fallback source must retain chain, store and decoded commitment with compression:none.");
+    }
+    sources = sources.flatMap((source) => source === matches[0] ? replacement === undefined ? [] : [replacement] : [source]);
+    if (sources.length === 0) throw new Error("Removing the predicted fallback would leave no committed source.");
+  }
+  const resource: ArtifactResource = {
+    ...selected.resource,
+    sources,
+    extensions: {
+      ...selected.resource.extensions,
+      studio: {
+        ...extensionRecord(selected.resource.extensions?.studio),
+        compression: "none",
+        storedIntegrity,
+        storedByteLength: storedBytes.byteLength,
+      },
+    },
+  };
+  const replacement: PreparedStudioResource = {
+    ...selected,
+    resource,
+    decodedBytes: selected.decodedBytes.slice(),
+    storedBytes,
+    compression: "none",
+    storedIntegrity,
+    storedByteLength: storedBytes.byteLength,
+    compressionRatio: 1,
+  };
+  return resources.map((item) => item === selected ? replacement : item);
+}
+
+/**
+ * Pure preparation for an explicitly versioned, still-unfunded storage proposal.
+ * Preserves the selected image and every decoded byte; changes its storage codec.
+ * This does not inspect funding, update a project, build upload plans or authorize
+ * replacement of published objects. Callers own those gates and the new review.
+ * Predicted onchain sources are not receipts. They are retained here; callers
+ * must replace obsolete predicted bindings after rebuilding the upload plan.
+ */
+export async function prepareContractReadableStudioFallback(
+  prepared: PreparedStudioArtifact,
+  options: PrepareContractReadableStudioFallbackOptions,
+): Promise<PreparedStudioArtifact> {
+  assertValidManifest(prepared.manifest);
+  const previousRevision = prepared.manifest.revision;
+  if (options.mode !== "unfunded-replan" || options.expectedManifestDigest !== prepared.manifestIntegrity.digest) {
+    throw new Error("Fallback repreparation requires an unfunded replan and the exact expected manifest digest.");
+  }
+  const initialDraft = previousRevision.number === 1 && previousRevision.parent === undefined
+    && options.revision === 1 && Object.hasOwn(options, "parentRevision") && options.parentRevision === undefined;
+  if (!initialDraft && (!Number.isSafeInteger(options.revision) || options.revision !== previousRevision.number + 1
+    || options.parentRevision !== previousRevision.number)) {
+    throw new RangeError("Fallback repreparation requires an explicit initial draft revision or next revision and parent.");
+  }
+  if ((!initialDraft && (previousRevision.policy === "immutable" || previousRevision.frozen === true))
+    || prepared.manifest.anchor !== undefined || prepared.manifest.provenance.collection !== undefined
+    || prepared.manifest.provenance.tokenId !== undefined) {
+    throw new TypeError("A frozen or published artifact cannot be reprepared as unfunded storage.");
+  }
+  const verification = await verifyPreparedStudioArtifact(prepared);
+  if (!verification.valid) throw new Error(verification.errors.join(" "));
+  if (canonicalJson(prepared.manifest.resources) !== canonicalJson(prepared.resources.map((item) => item.resource))) {
+    throw new Error("Prepared resource descriptors differ from the committed manifest.");
+  }
+  const collectorImageId = selectStudioCollectorImageResourceId({
+    payloadStorage: resolveKeelPayloadStorage(extensionRecord(prepared.manifest.extensions?.["keel:payload-storage"]).mode),
+    fallbackImageResourceId: prepared.manifest.fallback.image,
+    resources: prepared.resources.map((item) => ({ resourceId: item.resource.id, mediaType: item.resource.mediaType })),
+  });
+  if (collectorImageId === null) throw new TypeError("Contract-readable fallback requires the exact selected image resource.");
+  const resources = await contractReadableFallbackResources(prepared.resources, collectorImageId, options.replacePredictedFallbackSource, true);
+  const total = stats(resources);
+  const manifest: ArtifactManifest = {
+    ...prepared.manifest,
+    resources: resources.map((item) => item.resource),
+    revision: initialDraft ? previousRevision : {
+      ...previousRevision,
+      number: options.revision,
+      parent: previousRevision.number,
+      parentDigest: prepared.manifestIntegrity,
+      compatibility: { ...previousRevision.compatibility, max: options.revision },
+    },
+    extensions: {
+      ...prepared.manifest.extensions,
+      studio: { ...extensionRecord(prepared.manifest.extensions?.studio), stats: total },
+    },
+  };
+  assertValidManifest(manifest);
+  return { manifest, manifestIntegrity: await manifestIntegrity(manifest), resources, stats: total };
+}
+
 export async function prepareStudioArtifact(options: PrepareStudioArtifactOptions): Promise<PreparedStudioArtifact> {
   if (options.id.trim().length === 0 || options.name.trim().length === 0) throw new TypeError("Artifact ID and name are required.");
+  if (options.contractReadableFallback !== undefined && typeof options.contractReadableFallback !== "boolean") {
+    throw new TypeError("contractReadableFallback must be a boolean.");
+  }
   const payloadStorage = resolveKeelPayloadStorage(options.payloadStorage);
   const compression = options.compression ?? "auto", brotliQuality = options.brotliQuality ?? 11;
   if (!["auto", "brotli", "none"].includes(compression)) throw new TypeError("Unsupported lossless compression policy.");
@@ -501,9 +658,17 @@ export async function prepareStudioArtifact(options: PrepareStudioArtifactOption
   const maxResources = positiveSafe(options.maxResources, 512, "maxResources");
   if (normalized.length > maxResources) throw new RangeError(`Artifact has ${normalized.length} resources; limit is ${maxResources}.`);
 
-  const resources = await Promise.all(normalized.map((asset) => prepareResource(asset, payloadStorage, compression, brotliQuality)));
+  let resources: readonly PreparedStudioResource[] = await Promise.all(normalized.map((asset) => prepareResource(asset, payloadStorage, compression, brotliQuality)));
   const entrypoint = normalized.find((asset) => asset.entrypoint);
   if (entrypoint === undefined) throw new Error("Artifact preparation did not produce an entrypoint.");
+  if (options.contractReadableFallback === true) {
+    const collectorImageId = selectStudioCollectorImageResourceId({
+      payloadStorage,
+      fallbackImageResourceId: fallback(resources, entrypoint.id).image,
+      resources: resources.map((item) => ({ resourceId: item.resource.id, mediaType: item.resource.mediaType })),
+    });
+    if (collectorImageId !== null) resources = await contractReadableFallbackResources(resources, collectorImageId);
+  }
   const total = stats(resources);
   const maxResourceBytes = positiveSafe(options.maxResourceBytes, 64 * 1024 * 1024, "maxResourceBytes");
   const maxTotalBytes = positiveSafe(options.maxTotalBytes, 256 * 1024 * 1024, "maxTotalBytes");
