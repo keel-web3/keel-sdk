@@ -57,6 +57,21 @@ export interface KeelStudioReleaseRecovery {
   readonly receiptsPreserved: true; readonly uploadedBytes: 0; readonly signing: "not-performed"; readonly submission: "not-performed";
 }
 
+export type KeelStudioReleaseWalletRejection =
+  | { readonly kind: "wallet-policy-rejected"; readonly provider: "metamask"; readonly method: "eth_sendTransaction"; readonly code: -32602; readonly reason: "internal-account-data" }
+  | { readonly kind: "user-rejected"; readonly provider: "metamask" | "eip1193"; readonly method: "eth_sendTransaction" | "wallet_sendCalls"; readonly code: 4001; readonly reason: "user-declined" }
+  | { readonly kind: "dispatch-aborted"; readonly provider: "studio"; readonly method: "eth_sendTransaction" | "wallet_sendCalls"; readonly reason: "browser-journal-unavailable" };
+export interface KeelStudioReleaseWalletRejectionInput {
+  readonly operationId: string; readonly attemptId: string; readonly expectedRevision: number; readonly chainId: number;
+  readonly preparedDigest: string; readonly walletProofFingerprint: string;
+  readonly rejection: KeelStudioReleaseWalletRejection;
+}
+export interface KeelStudioReleaseWalletRejectionRecovery {
+  readonly schema: "keel-release-wallet-rejection-recovery@1"; readonly releaseId: string; readonly operationId: string; readonly attemptId: string;
+  readonly status: "recovered"; readonly releaseStatus: "ready"; readonly nextAction: "prepare-review";
+  readonly storagePreserved: true; readonly uploadedBytes: 0; readonly signing: "not-performed"; readonly submission: "not-performed";
+}
+
 export interface KeelStudioStorageReview {
   readonly projectId: string;
   readonly status: "complete" | "approval-required" | "resume" | "pending-approval-receipt" | "blocked" | "failed";
@@ -173,6 +188,8 @@ export interface KeelStudioReleaseDiagnostics {
   readonly diagnostic?: Readonly<Record<string, string | number | boolean>>;
   readonly actions: readonly string[];
   readonly operations?: readonly Readonly<Record<string, unknown>>[];
+  readonly recoveryInput?: Omit<KeelStudioReleaseWalletRejectionInput, "rejection">;
+  readonly legacyObservationInput?: Omit<KeelStudioReleaseWalletRejectionInput, "rejection" | "attemptId">;
   readonly storageEvidence?: readonly {
     readonly resourceId: string;
     readonly status: string;
@@ -198,7 +215,7 @@ export interface KeelStudioAgentDraftClientOptions {
   readonly fetchImplementation?: typeof fetch;
 }
 
-const KEEL_STUDIO_AGENT_DRAFT_OPERATIONS = ["list", "read", "diagnose", "recover", "plan", "plan-edit", "defaults", "defaults-edit", "profiles", "profiles-edit", "profile-select", "conversation", "conversation-suggest", "prepare-review", "storage-review", "create", "update"] as const;
+const KEEL_STUDIO_AGENT_DRAFT_OPERATIONS = ["list", "read", "diagnose", "recover", "recover-wallet-rejection", "plan", "plan-edit", "defaults", "defaults-edit", "profiles", "profiles-edit", "profile-select", "conversation", "conversation-suggest", "prepare-review", "storage-review", "create", "update"] as const;
 export type KeelStudioAgentDraftOperation = (typeof KEEL_STUDIO_AGENT_DRAFT_OPERATIONS)[number];
 
 /**
@@ -220,14 +237,16 @@ export interface KeelStudioAgentDraftOperationConfig extends KeelStudioAgentDraf
   readonly includeReadCall?: boolean;
   readonly operationId?: string;
   readonly transactionHashes?: readonly string[];
+  readonly recoveryInput?: KeelStudioReleaseWalletRejectionInput;
 }
 
-export type KeelStudioAgentDraftOperationResult = KeelStudioReleaseRecovery | KeelStudioAgentDraftWorkspace | KeelStudioAgentReleaseView | KeelStudioReleaseDiagnostics | KeelStudioReleasePlanning | KeelStudioStorageReview | KeelStudioReleaseWalletReview | KeelStudioDefaultsView | KeelStudioReleaseConversation | KeelStudioConversationSuggestionReceipt | KeelStudioProjectProfilesView | KeelSelectedProjectProfile;
+export type KeelStudioAgentDraftOperationResult = KeelStudioReleaseRecovery | KeelStudioReleaseWalletRejectionRecovery | KeelStudioAgentDraftWorkspace | KeelStudioAgentReleaseView | KeelStudioReleaseDiagnostics | KeelStudioReleasePlanning | KeelStudioStorageReview | KeelStudioReleaseWalletReview | KeelStudioDefaultsView | KeelStudioReleaseConversation | KeelStudioConversationSuggestionReceipt | KeelStudioProjectProfilesView | KeelSelectedProjectProfile;
 
 export interface KeelStudioAgentDraftClient {
   readonly list: () => Promise<KeelStudioAgentDraftWorkspace>;
   readonly read: (releaseId: string) => Promise<KeelStudioAgentReleaseView>;
   readonly recover: (releaseId: string, operationId: string, transactionHashes: readonly string[]) => Promise<KeelStudioReleaseRecovery>;
+  readonly recoverWalletRejection: (releaseId: string, input: KeelStudioReleaseWalletRejectionInput) => Promise<KeelStudioReleaseWalletRejectionRecovery>;
   readonly diagnose: (releaseId: string, options?: { readonly includeReadCall?: boolean }) => Promise<KeelStudioReleaseDiagnostics>;
   readonly plan: (releaseId: string) => Promise<KeelStudioReleasePlanning>;
   readonly editPlan: (releaseId: string, command: KeelStudioPlanningCommand) => Promise<KeelStudioReleasePlanning>;
@@ -411,10 +430,57 @@ export function createKeelStudioAgentDraftClient(options: KeelStudioAgentDraftCl
     if (value.schema !== "keel-release-recovery@1" || value.releaseId !== releaseId || value.operationId !== operationId || value.receiptsPreserved !== true || value.uploadedBytes !== 0 || value.signing !== "not-performed" || value.submission !== "not-performed" || !["recovered", "pending"].includes(value.status) || value.nextAction !== (value.status === "recovered" ? "prepare-review" : "await-receipt")) throw new TypeError("Studio returned invalid release recovery evidence.");
     return value;
   };
+  const recoverWalletRejection = async (releaseId: string, input: KeelStudioReleaseWalletRejectionInput): Promise<KeelStudioReleaseWalletRejectionRecovery> => {
+    const uuid = /^[0-9a-f]{8}(?:-[0-9a-f]{4}){3}-[0-9a-f]{12}$/iu, hash = /^0x[0-9a-f]{64}$/iu;
+    if (!input || typeof input !== "object" || Array.isArray(input)
+      || Object.keys(input).some(key => !["operationId", "attemptId", "expectedRevision", "chainId", "preparedDigest", "walletProofFingerprint", "rejection"].includes(key))
+      || typeof releaseId !== "string" || !uuid.test(releaseId) || typeof input.operationId !== "string" || !uuid.test(input.operationId)
+      || typeof input.attemptId !== "string" || !uuid.test(input.attemptId)
+      || !Number.isSafeInteger(input.expectedRevision) || input.expectedRevision < 1
+      || !Number.isSafeInteger(input.chainId) || input.chainId < 1
+      || typeof input.preparedDigest !== "string" || !hash.test(input.preparedDigest)
+      || typeof input.walletProofFingerprint !== "string" || !hash.test(input.walletProofFingerprint)) {
+      throw new TypeError("Wallet rejection recovery requires the exact saved operation, revision, chain, digest and proof fingerprint.");
+    }
+    const rejection = input.rejection;
+    if (!rejection || typeof rejection !== "object" || Array.isArray(rejection)
+      || Object.keys(rejection).some(key => !["kind", "provider", "method", "code", "reason"].includes(key))
+      || !(rejection.kind === "wallet-policy-rejected" && rejection.provider === "metamask" && rejection.method === "eth_sendTransaction"
+        && rejection.code === -32602 && rejection.reason === "internal-account-data"
+        || rejection.kind === "user-rejected" && ["metamask", "eip1193"].includes(rejection.provider)
+          && ["eth_sendTransaction", "wallet_sendCalls"].includes(rejection.method) && rejection.code === 4001 && rejection.reason === "user-declined"
+        || rejection.kind === "dispatch-aborted" && rejection.provider === "studio" && !("code" in rejection)
+          && ["eth_sendTransaction", "wallet_sendCalls"].includes(rejection.method) && rejection.reason === "browser-journal-unavailable")) {
+      throw new TypeError("Unknown wallet or transport errors cannot establish a rejected transaction.");
+    }
+    const value = await studioAgentResponse<KeelStudioReleaseWalletRejectionRecovery>(await studioAgentRequest(options, `${releasePath(releaseId)}/wallet-rejection`, {
+      method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify(input),
+    }), [options.grantToken]);
+    if (value.schema !== "keel-release-wallet-rejection-recovery@1" || value.releaseId !== releaseId || value.operationId !== input.operationId
+      || value.attemptId !== input.attemptId || value.status !== "recovered" || value.releaseStatus !== "ready" || value.nextAction !== "prepare-review"
+      || value.storagePreserved !== true || value.uploadedBytes !== 0 || value.signing !== "not-performed" || value.submission !== "not-performed") {
+      throw new TypeError("Studio returned invalid wallet rejection recovery evidence.");
+    }
+    return value;
+  };
   const diagnose = async (releaseId: string, diagnosticOptions: { readonly includeReadCall?: boolean } = {}): Promise<KeelStudioReleaseDiagnostics> => {
     if (diagnosticOptions.includeReadCall !== undefined && typeof diagnosticOptions.includeReadCall !== "boolean") throw new TypeError("includeReadCall must be a boolean.");
     const value = await studioAgentResponse<KeelStudioReleaseDiagnostics>(await studioAgentRequest(options, `${releasePath(releaseId)}/diagnostics${diagnosticOptions.includeReadCall ? "?includeReadCall=true" : ""}`, { cache: "no-store" }), [options.grantToken]);
     if (value.schema !== "keel-release-diagnostics@1" || value.releaseId !== releaseId || value.signing !== "not-performed" || value.submission !== "not-performed" || value.uploadedBytes !== 0 || value.changed !== false) throw new TypeError("Studio returned another or mutating diagnostic result.");
+    for (const field of ["recoveryInput", "legacyObservationInput"] as const) {
+      const recovery = value[field];
+      if (recovery === undefined) continue;
+      if (!recovery || typeof recovery !== "object" || Array.isArray(recovery)
+        || Object.keys(recovery).some(key => !["operationId", "expectedRevision", "chainId", "preparedDigest", "walletProofFingerprint", ...(field === "recoveryInput" ? ["attemptId"] : [])].includes(key))
+        || typeof recovery.operationId !== "string" || !/^[0-9a-f]{8}(?:-[0-9a-f]{4}){3}-[0-9a-f]{12}$/iu.test(recovery.operationId)
+        || (field === "recoveryInput" && (!("attemptId" in recovery) || typeof recovery.attemptId !== "string" || !/^[0-9a-f]{8}(?:-[0-9a-f]{4}){3}-[0-9a-f]{12}$/iu.test(recovery.attemptId)))
+        || !Number.isSafeInteger(recovery.expectedRevision) || recovery.expectedRevision !== value.revision
+        || !Number.isSafeInteger(recovery.chainId) || recovery.chainId !== value.chainId
+        || typeof recovery.preparedDigest !== "string" || !/^0x[0-9a-f]{64}$/iu.test(recovery.preparedDigest)
+        || typeof recovery.walletProofFingerprint !== "string" || !/^0x[0-9a-f]{64}$/iu.test(recovery.walletProofFingerprint)) {
+        throw new TypeError("Studio returned invalid wallet rejection recovery input.");
+      }
+    }
     if (value.metadataReadCall !== undefined) {
       if (!diagnosticOptions.includeReadCall) throw new TypeError("Studio returned private call data that was not requested.");
       checkedMetadataReadCall(value.metadataReadCall);
@@ -497,7 +563,7 @@ export function createKeelStudioAgentDraftClient(options: KeelStudioAgentDraftCl
       body: JSON.stringify({ draft: validated, expectedRevision }),
     }), [options.grantToken]));
   };
-  return Object.freeze<KeelStudioAgentDraftClient>({ list, read, diagnose, recover, profiles: () => profiles(), editProfiles: profiles, selectProfile, plan: releaseId => planning(releaseId), editPlan: planning, conversation: async releaseId => await conversation(releaseId) as KeelStudioReleaseConversation, suggest: async (releaseId, suggestion) => await conversation(releaseId, suggestion) as KeelStudioConversationSuggestionReceipt, defaults: () => defaults(), effectiveBuildDefaults: async input => resolveKeelBuildDefaults((await defaults()).profile, input), editDefaults: defaults, prepareReview, storageReview, create, update });
+  return Object.freeze<KeelStudioAgentDraftClient>({ list, read, diagnose, recover, recoverWalletRejection, profiles: () => profiles(), editProfiles: profiles, selectProfile, plan: releaseId => planning(releaseId), editPlan: planning, conversation: async releaseId => await conversation(releaseId) as KeelStudioReleaseConversation, suggest: async (releaseId, suggestion) => await conversation(releaseId, suggestion) as KeelStudioConversationSuggestionReceipt, defaults: () => defaults(), effectiveBuildDefaults: async input => resolveKeelBuildDefaults((await defaults()).profile, input), editDefaults: defaults, prepareReview, storageReview, create, update });
 }
 
 function validatePlanningIdentity(command: { readonly commandId: string; readonly expectedRevision: number }): void {
@@ -535,13 +601,17 @@ function operationDraft(config: KeelStudioAgentDraftOperationConfig): KeelStudio
 /** Execute one explicitly configured, creator-scoped draft operation. */
 export async function executeKeelStudioAgentDraftOperation(config: KeelStudioAgentDraftOperationConfig): Promise<KeelStudioAgentDraftOperationResult> {
   if (config === null || typeof config !== "object" || !isDraftOperation(config.operation)) throw new TypeError("Studio agent draft operation is unsupported.");
-  const supported = new Set(["studioUrl", "grantToken", "operation", "releaseId", "projectId", "draft", "expectedRevision", "planningCommand", "defaultsCommand", "profileCommand", "profileSelection", "conversationCommand", "includeReadCall", "operationId", "transactionHashes", "fetchImplementation"]);
+  const supported = new Set(["studioUrl", "grantToken", "operation", "releaseId", "projectId", "draft", "expectedRevision", "planningCommand", "defaultsCommand", "profileCommand", "profileSelection", "conversationCommand", "includeReadCall", "operationId", "transactionHashes", "recoveryInput", "fetchImplementation"]);
   for (const key of Object.keys(config)) if (!supported.has(key)) throw new TypeError(`Studio agent draft configuration.${key} is not supported.`);
   const client = createKeelStudioAgentDraftClient(config);
   switch (config.operation) {
     case "list": return client.list();
     case "read": return client.read(operationReleaseId(config));
     case "recover": return client.recover(operationReleaseId(config), config.operationId!, config.transactionHashes ?? []);
+    case "recover-wallet-rejection": {
+      if (!config.recoveryInput) throw new TypeError("recover-wallet-rejection requires the diagnostic recoveryInput and an explicitly confirmed typed wallet rejection.");
+      return client.recoverWalletRejection(operationReleaseId(config), config.recoveryInput);
+    }
     case "diagnose": return client.diagnose(operationReleaseId(config), config.includeReadCall === undefined ? {} : { includeReadCall: config.includeReadCall });
     case "plan": return client.plan(operationReleaseId(config));
     case "conversation": return client.conversation(operationReleaseId(config));

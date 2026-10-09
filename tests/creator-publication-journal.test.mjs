@@ -19,7 +19,7 @@ function transport(journal,options={}){let pass=0;const requests=[];return {requ
  if(request.method==='eth_getCode')return request.params[0]===collection?(options.existing?'0x6000':'0x'):code;
  if(request.method==='eth_getTransactionByHash'){const step=journal.steps[0];return {hash:h(100),from:owner,to:step.call.to,input:options.changedReceipt?'0x99':step.call.data,value:'0x0'};}
  if(request.method==='eth_getTransactionReceipt')return {status:'0x1',transactionHash:h(100),blockHash:block.hash,blockNumber:block.number};
- if(request.method==='eth_simulateV1'){if(options.error)throw options.error;pass++;const calls=request.params[0].blockStateCalls;return calls.map((_,i)=>({calls:[{status:'0x1',gasUsed:'0x186a0',maxUsedGas:'0x186a0',returnData:pass===3&&i===calls.length-1?encodeAbiParameters([{type:'string'}],[options.badMetadata?'changed':expected]):'0x'}]}));}
+ if(request.method==='eth_simulateV1'){if(options.error)throw options.error;pass++;const calls=request.params[0].blockStateCalls;return calls.map((item,i)=>({transactions:item.calls.map(({gas,nonce})=>({gas,...(nonce===undefined?{}:{nonce})})),calls:[{status:'0x1',gasUsed:'0x186a0',maxUsedGas:'0x186a0',returnData:pass===3&&i===calls.length-1?encodeAbiParameters([{type:'string'}],[options.badMetadata?'changed':expected]):'0x'}]}));}
  throw Error(request.method);
 }};}
 test('fresh creator journal exposes no wallet request until every remaining transaction and full read passes',async()=>{

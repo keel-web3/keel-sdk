@@ -50,6 +50,9 @@ export const TEST_FILES_ON_DISK = Object.freeze(readdirSync(TEST_ROOT)
  * its execution boundary.
  */
 export const DETERMINISTIC_TEST_FILES = Object.freeze([
+  "tests/acceptance-boundary-properties.test.mjs",
+  "tests/acceptance-media-fixture-parity.test.mjs",
+  "tests/acceptance-mcp-route-guards.test.mjs",
   "tests/creator-prepared-inline.test.mjs",
   "tests/inline-build-route.test.mjs",
   "tests/creator-prepared-route.test.mjs",
@@ -166,6 +169,7 @@ export const DETERMINISTIC_TEST_FILES = Object.freeze([
   "tests/mcp-media-optimization.test.mjs",
   "tests/mcp-plugins.test.mjs",
   "tests/mcp-studio-draft.test.mjs",
+  "tests/mcp-studio-wallet-rejection.test.mjs",
   "tests/mcp.test.mjs",
   "tests/media-optimization.test.mjs",
   "tests/native-publication.test.mjs",
@@ -213,6 +217,7 @@ export const DETERMINISTIC_TEST_FILES = Object.freeze([
   "tests/sdk-tezos-shell.test.mjs",
   "tests/sdk-standard-chain-stack.test.mjs",
   "tests/sdk-studio-agent-drafts.test.mjs",
+  "tests/sdk-studio-wallet-rejection.test.mjs",
   "tests/sdk-studio-capabilities.test.mjs",
   "tests/sdk-studio-project-handoff.test.mjs",
   "tests/sdk-studio-project-intake.test.mjs",
