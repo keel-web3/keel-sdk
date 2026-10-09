@@ -1,3 +1,4 @@
+import { KeelStudioAgentError } from "@keel/sdk/studio-agent-drafts";
 import { STUDIO_RELEASE_RECOVERY_GUIDANCE } from "./studio-wallet-guidance.js";
 import { findKeelRpcSetupError } from "@keel/sdk/rpc";
 import { KeelNetworkIndexError } from '@keel/sdk/network-index';
@@ -79,6 +80,10 @@ function toolResult(value: unknown): ToolCallResult {
 }
 
 function toolError(error: unknown): ToolCallResult {
+  if (error instanceof KeelStudioAgentError) {
+    const structuredContent = { error: error.message, code: error.code, status: error.status, retryable: error.retryable, nextAction: error.nextAction, signing: "not-performed", submission: "not-performed" };
+    return { content: [{ type: "text", text: JSON.stringify(structuredContent) }], structuredContent, isError: true };
+  }
   if (error instanceof KeelNetworkIndexError) {
     const structuredContent = { code: error.code, setup: error.setup, signing: 'not-performed', submission: 'not-performed' };
     return { content: [{ type: 'text', text: JSON.stringify(structuredContent) }], structuredContent, isError: true };
