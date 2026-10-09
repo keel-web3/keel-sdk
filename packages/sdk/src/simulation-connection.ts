@@ -168,12 +168,18 @@ export function createPinnedKeelSepoliaSimulationTransport(connect: () => Promis
           if (closed) throw new KeelPublicationSimulationError("rpc-unavailable", "The pinned simulator transport was closed.");
           return result;
         } catch (error) {
-          if (!gasClamp(error)) throw error;
+          const unavailable = error instanceof KeelPublicationSimulationError && error.kind === "rpc-unavailable";
+          if (!gasClamp(error) && !unavailable) throw error;
           if (rpc) retired.add(rpc);
           if (selected === candidate) {
             selected = undefined; qualifiedProbeGas = undefined;
             if (rpc) { const retiring = rpc; replacementReady = new Promise(resolve => { drainResolvers.set(retiring, resolve); }); }
           }
+          // A failed qualification promise or disconnected retained socket must
+          // not poison every subsequent saved-plan check. Do not replay this
+          // request on an uncertain failure: a fresh check requalifies first.
+          if (rpc && !acquired) closeSocket(rpc);
+          if (unavailable) throw error;
           // A symbolic block tag could select different state on replay. Keep
           // that request blocked, even though a later fresh read may requalify.
           if (attempt === 3 || rpc && quantity(tag) === undefined) throw new KeelPublicationSimulationError("provider-limit",

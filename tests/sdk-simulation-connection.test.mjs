@@ -58,12 +58,13 @@ const hasProgram = node => simulationRequests(node).some(r => r.params[0].blockS
 
 async function rejectedQualification(change, kind = 'unsupported-simulation') {
   const node = socket(change); let connections = 0;
-  const transport = createPinnedKeelSepoliaSimulationTransport(async () => { connections++; return node; });
+  const transport = createPinnedKeelSepoliaSimulationTransport(async () => { connections++; return connections === 1 ? node : socket(change); });
   await assert.rejects(transport.request(program), error => error.kind === kind);
-  // Failure is cached: no fresh socket, public probe or project attempt on retry.
+  // Unsupported evidence stays blocked. Transport unavailability permits a
+  // fresh qualification on the next check, never a project attempt without it.
   const requests = node.requests.length;
   await assert.rejects(transport.request(program), error => error.kind === kind);
-  assert.equal(connections, 1); assert.equal(node.requests.length, requests);
+  assert.equal(connections, kind === 'rpc-unavailable' ? 2 : 1); assert.equal(node.requests.length, requests);
   assert.equal(node.closed, 1); assert.equal(hasProgram(node), false);
   await transport.close();
   return node;
@@ -168,6 +169,31 @@ test('wrong chain, invalid snapshot, reorg and missing method fail closed with n
   await rejectedQualification({ probeError: { code: -32601, message: 'private-url' } });
 });
 
+test('a fresh saved-plan check requalifies after an initial connection outage instead of caching its rejected promise', async()=>{
+  let attempts=0;const node=socket();
+  const t=createPinnedKeelSepoliaSimulationTransport(async()=>{if(++attempts===1)throw Error('synthetic temporary connection failure');return node;});
+  await assert.rejects(t.request(program),e=>e.kind==='rpc-unavailable'&&e.diagnostic.stage==='connection');
+  assert.equal(attempts,1);assert.equal(node.requests.length,0);
+  await t.request(program);assert.equal(attempts,2);assert.equal(hasProgram(node),true);await t.close();
+});
+
+test('unavailable public qualification never sends project data and a later check must fully qualify a new socket', async()=>{
+  const nodes=[socket({probeError:{code:-32000,message:'synthetic unavailable'}}),socket()];let attempts=0;
+  const t=createPinnedKeelSepoliaSimulationTransport(async()=>nodes[attempts++]);
+  await assert.rejects(t.request(program),e=>e.kind==='rpc-unavailable');
+  assert.equal(attempts,1);assert.equal(nodes[0].closed,1);assert.equal(hasProgram(nodes[0]),false);
+  await t.request(program);assert.equal(attempts,2);assert.equal(simulationRequests(nodes[1]).length,4);await t.close();
+});
+
+test('a disconnected retained socket fails the current check and permits a fully qualified fresh check', async()=>{
+  const nodes=[socket(),socket()];let attempts=0;
+  const t=createPinnedKeelSepoliaSimulationTransport(async()=>nodes[attempts++]);
+  await t.request({method:'eth_chainId',params:[]});nodes[0].socket.readyState=3;
+  await assert.rejects(t.request(program),e=>e.kind==='rpc-unavailable');
+  assert.equal(attempts,1);assert.equal(hasProgram(nodes[0]),false);assert.equal(nodes[0].closed,1);
+  await t.request(program);assert.equal(attempts,2);assert.equal(hasProgram(nodes[1]),true);await t.close();
+});
+
 test('unknown provider errors expose only the failed public capability stage', async () => {
   const node = socket({ probeError: { code: 403, message: 'https://private-secret/' } });
   const t = createPinnedKeelSepoliaSimulationTransport(async () => node);
@@ -221,12 +247,12 @@ test('concurrent clamped reads share replacement qualification and do not close 
   await t.close();assert.equal(nodes[1].closed,1);
 });
 
-test('an actual program revert stays a revert and closed sockets never implicitly reconnect', async () => {
+test('an actual program revert stays a revert and a disconnected socket fails the current check without replay', async () => {
   const node = socket({ revert: true }); let count = 0;
   const t = createPinnedKeelSepoliaSimulationTransport(async () => { count++; return node; });
   assert.equal((await t.request(program))[0].calls[0].status, '0x0');
   node.socket.readyState = 3;
-  for (let i = 0; i < 2; i++) await assert.rejects(t.request(program), e => e.kind === 'rpc-unavailable');
+  await assert.rejects(t.request(program), e => e.kind === 'rpc-unavailable');
   assert.equal(count, 1); assert.equal(simulationRequests(node).length, 4);
   await t.close();
 });
