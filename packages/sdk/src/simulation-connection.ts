@@ -40,7 +40,9 @@ export function createPinnedKeelSepoliaSimulationTransport(connect: () => Promis
   const active = new Map<KeelSimulationSocket, number>();
   const retired = new Set<KeelSimulationSocket>();
   const closedSockets = new WeakSet<KeelSimulationSocket>();
-  const closeSocket = (rpc: KeelSimulationSocket) => { if (!closedSockets.has(rpc)) { closedSockets.add(rpc); rpc.close(); } retired.delete(rpc); };
+  const drainResolvers = new Map<KeelSimulationSocket, () => void>();
+  let replacementReady: Promise<void> | undefined;
+  const closeSocket = (rpc: KeelSimulationSocket) => { if (!closedSockets.has(rpc)) { closedSockets.add(rpc); rpc.close(); } retired.delete(rpc); drainResolvers.get(rpc)?.(); drainResolvers.delete(rpc); };
   const gasClamp = (error: unknown): error is KeelPublicationSimulationError => error instanceof KeelPublicationSimulationError
     && error.kind === "provider-limit" && typeof error.diagnostic?.requestedGasLimit === "string" && typeof error.diagnostic?.providerGasCap === "string";
   const select = async (requiredGas?: bigint) => {
@@ -142,7 +144,12 @@ export function createPinnedKeelSepoliaSimulationTransport(connect: () => Promis
       let snapshotHash: string | undefined;
       for (let attempt = 1; attempt <= 3; attempt++) {
         if (closed) throw new KeelPublicationSimulationError("rpc-unavailable", "The pinned simulator transport was closed.");
-        const candidate = selected ??= select(requiredGas);
+        // viem caches sockets by endpoint until close(). Do not ask the factory
+        // for a replacement while a retired socket still has active readers.
+        const candidate = selected ??= replacementReady ? replacementReady.then(() => {
+          if (closed) throw new KeelPublicationSimulationError("rpc-unavailable", "The pinned simulator transport was closed.");
+          return select(requiredGas);
+        }) : select(requiredGas);
         let rpc: KeelSimulationSocket | undefined;
         let acquired = false;
         try {
@@ -162,8 +169,11 @@ export function createPinnedKeelSepoliaSimulationTransport(connect: () => Promis
           return result;
         } catch (error) {
           if (!gasClamp(error)) throw error;
-          if (selected === candidate) { selected = undefined; qualifiedProbeGas = undefined; }
           if (rpc) retired.add(rpc);
+          if (selected === candidate) {
+            selected = undefined; qualifiedProbeGas = undefined;
+            if (rpc) { const retiring = rpc; replacementReady = new Promise(resolve => { drainResolvers.set(retiring, resolve); }); }
+          }
           // A symbolic block tag could select different state on replay. Keep
           // that request blocked, even though a later fresh read may requalify.
           if (attempt === 3 || rpc && quantity(tag) === undefined) throw new KeelPublicationSimulationError("provider-limit",

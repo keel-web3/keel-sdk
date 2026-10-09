@@ -326,3 +326,17 @@ test('public qualification uses observed nonzero nonce and records the exact sel
   const request=structuredClone(program);request.params[0].blockStateCalls[0].calls[0].gas='0x493e0';await t.request(request);
   assert.equal(count,1);assert.equal(t.qualifiedProbeGas,300_000n);assert.equal(simulationRequests(n).at(-1).params[0].blockStateCalls[0].calls[0].gas,'0x493e0');await t.close();
 });
+
+test('endpoint-cached socket factories cannot reselect the capped socket while another read is draining', {timeout:5000}, async () => {
+  const first=socket({programCap:incidentCap}),next=socket(),original=first.requestAsync.bind(first);let connections=0,releaseRead,entered;
+  const started=new Promise(resolve=>{entered=resolve});
+  first.requestAsync=async args=>{if(args.body.method==='eth_getCode'&&args.body.params[0]==='fixture-concurrent-reader'){entered();await new Promise(resolve=>{releaseRead=resolve});}return original(args)};
+  // viem's cache retains the socket until its close() deletes the cache entry.
+  const t=createPinnedKeelSepoliaSimulationTransport(async()=>{connections++;return first.closed?next:first;});
+  await t.request({method:'eth_chainId',params:[]});
+  const reader=t.request({method:'eth_getCode',params:['fixture-concurrent-reader','0x12']});await started;
+  const recovering=t.request(program);recovering.catch(()=>{});
+  try {await new Promise(resolve=>setTimeout(resolve,30));assert.equal(connections,1);assert.equal(first.closed,0);}
+  finally {releaseRead();}
+  await reader;assert.equal((await recovering)[0].calls[0].status,'0x1');assert.equal(connections,2);assert.equal(first.closed,1);await t.close();assert.equal(next.closed,1);
+});
