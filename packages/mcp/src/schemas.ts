@@ -226,10 +226,10 @@ const studioConnect: JsonSchema = object({
 }, ["operation"]);
 const studioDraft: JsonSchema = object({
   studioUrl: string("Optional HTTPS Studio URL; KEEL_STUDIO_URL is used otherwise.", 512),
-  operation: { type: "string", enum: ["list", "read", "diagnose", "continue-publication", "storage-recovery", "recover", "recover-wallet-rejection", "plan", "plan-edit", "defaults", "defaults-edit", "profiles", "profiles-edit", "profile-select", "conversation", "conversation-suggest", "prepare-review", "storage-review", "create", "update"] },
+  operation: { type: "string", enum: ["list", "read", "diagnose", "continue-publication", "cancel-review", "storage-recovery", "recover", "recover-wallet-rejection", "plan", "plan-edit", "defaults", "defaults-edit", "profiles", "profiles-edit", "profile-select", "conversation", "conversation-suggest", "prepare-review", "storage-review", "create", "update"] },
   releaseId: string("Required for read, diagnose, plan, plan-edit, prepare-review, conversation, conversation-suggest, or update.", 128),
-  projectId: string("Required for storage-review; uses the owner-scoped project and never signs or submits.", 128),
-  operationId: string("For recover: the existing submitted operation UUID.", 128),
+  projectId: string("Required for storage-review or storage-recovery; uses the owner-scoped project and never signs or submits.", 128),
+  operationId: string("For recover or cancel-review: the exact existing operation UUID.", 128),
   transactionHashes: { type: "array", items: { type: "string", pattern: "^0x[0-9a-fA-F]{64}$" }, minItems: 1, maxItems: 1, description: "For recover: the failed atomic wallet transaction, never new calldata." },
   recoveryInput: object({
     attemptId: { type: "string", pattern: "^[0-9a-fA-F]{8}(?:-[0-9a-fA-F]{4}){3}-[0-9a-fA-F]{12}$" },
