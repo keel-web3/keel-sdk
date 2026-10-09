@@ -6,6 +6,8 @@ import path from "node:path";
 import test from "node:test";
 
 import { createMcpServer } from "../packages/mcp/dist/index.js";
+import { pathToFileURL } from "node:url";
+const recoveryServer = process.env.KEEL_PACKED_MCP_ENTRY ? (await import(pathToFileURL(process.env.KEEL_PACKED_MCP_ENTRY).href)).createMcpServer : createMcpServer;
 
 const initializeParams = { protocolVersion: "2024-11-05", capabilities: {}, clientInfo: { name: "draft-test", version: "1" } };
 const previousStudioOrigin = process.env.KEEL_STUDIO_URL;
@@ -314,4 +316,40 @@ test("portable MCP forwards explicit read-call diagnosis without accepting walle
     const denied = await call(server,3,{studioUrl:'https://studio.example',operation:'diagnose',releaseId:'release-existing',includeReadCall:true,sendTransaction:true});
     assert.equal(denied.result.isError,true); assert.equal(requests.length,1);
   } finally { globalThis.fetch=previousFetch; if(previousToken === undefined) delete process.env.KEEL_STUDIO_AGENT_TOKEN; else process.env.KEEL_STUDIO_AGENT_TOKEN=previousToken; }
+});
+
+test("registered portable MCP continues the paid release, preserves unknown outcomes, and cancels only an exact review", async () => {
+  const previousToken=process.env.KEEL_STUDIO_AGENT_TOKEN, previousFetch=globalThis.fetch;
+  process.env.KEEL_STUDIO_AGENT_TOKEN=token;
+  const releaseId='dcd04c0e-a875-4b62-93c5-b7c325a0d789',operationId='0f851190-776d-4133-a1d4-b28f745e7af4';
+  const projectId='150485a1-78b5-425f-a0b7-093d4409fed5', requests=[];
+  let status='owner-observation-required';
+  globalThis.fetch=async(url,init={})=>{
+    requests.push({url:String(url),method:init.method,body:init.body?JSON.parse(init.body):undefined});
+    assert.equal(new Headers(init.headers).get('authorization'),`Bearer ${token}`);
+    if(String(url).endsWith('/continue'))return Response.json({schema:'keel-release-continuation@1',releaseId,revision:34,status,
+      nextAction:status==='owner-observation-required'?'record-owner-observation':'prepare-review',message:'Preserve job 10 and the existing release',
+      reviewPath:`/studio/releases/${releaseId}`,storagePreserved:true,uploadedBytes:0,signing:'not-performed',submission:'not-performed'});
+    if(String(url).endsWith('/preview-replan/legacy'))return Response.json({status:'not-applicable',message:'Keep paid storage job 10',ownerPath:`/studio/projects/${projectId}/recovery`,nextActions:[]});
+    if(String(url).endsWith('/review/cancel'))return Response.json({schema:'keel-release-review-cancelled@1',releaseId,operationId,revision:34,status:'draft',nextAction:'plan',storagePreserved:true,uploadedBytes:0,signing:'not-performed',submission:'not-performed'});
+    throw Error('Unexpected endpoint '+url);
+  };
+  try{
+    const server=await recoveryServer();await server.handle({jsonrpc:'2.0',id:1,method:'initialize',params:initializeParams});
+    const listed=await server.handle({jsonrpc:'2.0',id:2,method:'tools/list'});
+    const tool=listed.result.tools.find(t=>t.name==='keel-studio-draft');
+    for(const op of ['continue-publication','storage-recovery','cancel-review','prepare-review','recover'])assert.ok(tool.inputSchema.properties.operation.enum.includes(op),op);
+    const unknown=await call(server,3,{operation:'continue-publication',releaseId,expectedRevision:34});
+    assert.equal(unknown.result.structuredContent.status,'owner-observation-required');
+    assert.equal(unknown.result.structuredContent.uploadedBytes,0);assert.equal(requests.length,1);
+    const spoof=await call(server,4,{operation:'continue-publication',releaseId,expectedRevision:34,ownerRecordedRejection:{code:-32602}});
+    assert.equal(spoof.result.isError,true);assert.equal(requests.length,1);
+    // Separate transport fixture: server has independently verified a saved rejection.
+    status='review-required';assert.equal((await call(server,5,{operation:'continue-publication',releaseId,expectedRevision:34})).result.structuredContent.nextAction,'prepare-review');
+    const cancelled=await call(server,6,{operation:'cancel-review',releaseId,expectedRevision:34,operationId});
+    assert.equal(cancelled.result.structuredContent.status,'draft');
+    assert.deepEqual(requests.at(-1).body,{expectedRevision:34,operationId});
+    assert.equal((await call(server,7,{operation:'storage-recovery',projectId})).result.structuredContent.status,'not-applicable');
+    assert.ok(requests.every(r=>!r.url.includes('/deployment/')&&!r.url.includes('/upload')));
+  }finally{globalThis.fetch=previousFetch;if(previousToken===undefined)delete process.env.KEEL_STUDIO_AGENT_TOKEN;else process.env.KEEL_STUDIO_AGENT_TOKEN=previousToken;}
 });
