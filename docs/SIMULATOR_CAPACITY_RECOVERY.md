@@ -8,6 +8,8 @@ On a confirmed clamp, the unchanged ephemeral simulation can be retried after pu
 
 Missing/enlarged envelopes, wrong-chain or fork evidence, changed snapshots, genuine EVM reverts and symbolic snapshot tags cannot produce an automatic project replay. Exhausted capacity remains a `provider-limit` error with the observed gas cap and attempt count. A subsequent saved-plan read may try again. Full strict transaction validation, pre-refund measurement, selected-chain limits, canonical snapshot checks and byte-exact complete metadata verification remain mandatory.
 
+A separate reproducible defect cached an initial `rpc-unavailable` qualification failure forever: later checks reused the rejected promise without trying a connection. Such failures and disconnected retained sockets now retire that selection and fail the current check. A new saved-plan check performs full qualification at the same endpoint. This does not replay an uncertain request or relax unsupported-evidence failures. The owner's separately observed viewer `rpc-unavailable` incident is not attributed to this defect without its runtime trace.
+
 `tests/fixtures/gatorrr-simulator-cap-20261009.json` records the supplied IDs and numeric evidence with provenance. Socket responses and short metadata used by tests are synthetic, not production artwork or proof of deployment. Coverage includes initial capacity rejection, retained low-cap connection then eligible replacement, three-attempt exhaustion and fresh retry, concurrency/close, request mutation, small plans and lower block limits, changed snapshot refusal, and full atomic preflight that still rejects wrong metadata, nonce, missing measurement or genuine execution failure.
 
 Run after `node scripts/build.mjs`:
