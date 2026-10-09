@@ -186,6 +186,10 @@ Sepolia publication preflight qualifies the simulator with bounded public empty 
 ### Discover and continue saved work
 
 `client.list({ limit, cursor, projectId })` / MCP `keel-studio-draft` operation
+`list` and `read` explicitly request discovery version 1 with the
+`X-Keel-Agent-Discovery: 1` header. Updated servers preserve complete, unpaginated
+workspace results for older clients without that header or paging parameters;
+older servers may ignore the header and return their complete legacy response.
 `list` returns projects and releases plus `pagination`. The default is 50 entries
 per collection, maximum 100. Follow `pagination.nextCursor` until null, preserving
 the project filter. Cursors belong to the authenticated owner and snapshot;

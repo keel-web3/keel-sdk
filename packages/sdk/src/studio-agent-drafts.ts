@@ -497,7 +497,7 @@ export function createKeelStudioAgentDraftClient(options: KeelStudioAgentDraftCl
       || query.cursor !== undefined && (typeof query.cursor !== "string" || query.cursor.length > 4096)
       || query.projectId !== undefined && !/^[0-9a-f]{8}(?:-[0-9a-f]{4}){3}-[0-9a-f]{12}$/iu.test(query.projectId)) throw new TypeError("Invalid workspace page request.");
     const params = new URLSearchParams(Object.entries(query).filter(([, value]) => value !== undefined).map(([key, value]) => [key, String(value)]));
-    const workspace = await studioAgentResponse<KeelStudioAgentDraftWorkspace>(await studioAgentRequest(options, `/api/agent/drafts${params.size ? `?${params}` : ""}`, { cache: "no-store" }), [options.grantToken]);
+    const workspace = await studioAgentResponse<KeelStudioAgentDraftWorkspace>(await studioAgentRequest(options, `/api/agent/drafts${params.size ? `?${params}` : ""}`, { cache: "no-store", headers: { "x-keel-agent-discovery": "1" } }), [options.grantToken]);
     const page = workspace.pagination;
     if (page && (!Number.isSafeInteger(page.limit) || page.limit < 1 || page.limit > 100 || typeof page.hasMore !== "boolean" || page.hasMore !== (page.nextCursor !== null)
       || page.nextCursor !== null && (typeof page.nextCursor !== "string" || page.nextCursor.length > 4096) || page.order !== "created-desc-id-desc" || !Number.isFinite(Date.parse(page.snapshotAt)))) throw new TypeError("Invalid workspace pagination.");
@@ -508,7 +508,7 @@ export function createKeelStudioAgentDraftClient(options: KeelStudioAgentDraftCl
     return { ...workspace, projects: workspace.projects.map(project => ({ ...project, ...(project.agentProgress === undefined ? {} : { agentProgress: parseKeelStudioAgentProgress(project.agentProgress, { projectId: String(project.id) }) }) })), releases: workspace.releases.map(reviewed) };
   };
   const read = async (releaseId: string, expectedState?: KeelStudioAgentStateBinding): Promise<KeelStudioAgentReleaseView> =>
-      reviewed(await studioAgentResponse(await studioAgentRequest(options, `${releasePath(releaseId)}${expectedState ? `?${stateQuery(expectedState)}` : ""}`, { cache: "no-store" }), [options.grantToken]));
+      reviewed(await studioAgentResponse(await studioAgentRequest(options, `${releasePath(releaseId)}${expectedState ? `?${stateQuery(expectedState)}` : ""}`, { cache: "no-store", headers: { "x-keel-agent-discovery": "1" } }), [options.grantToken]));
   const cancelReview = async (releaseId: string, expectedRevision: number, operationId: string): Promise<KeelStudioReviewCancellation> => {
     if (!Number.isSafeInteger(expectedRevision) || expectedRevision < 1 || typeof operationId !== "string" || !/^[0-9a-f]{8}(?:-[0-9a-f]{4}){3}-[0-9a-f]{12}$/iu.test(operationId)) throw new TypeError("Cancel review needs its exact saved revision and operation.");
     const value = await studioAgentResponse<KeelStudioReviewCancellation>(await studioAgentRequest(options, `${releasePath(releaseId)}/review/cancel`, {
