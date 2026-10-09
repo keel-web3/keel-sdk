@@ -1,6 +1,6 @@
 {
   "name": "@keel/sdk",
-  "version": "0.3.1",
+  "version": "0.3.2",
   "description": "Typed campaign builders, EIP-712 payloads, ABIs, and signer-policy helpers for Keel contracts.",
   "type": "module",
   "main": "./dist/index.js",
