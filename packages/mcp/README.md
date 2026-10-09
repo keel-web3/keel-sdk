@@ -474,3 +474,5 @@ and call `operation=complete` after approval. Local drafts and staging then use
 the privately saved key automatically. No environment file or Desktop app is
 required. See [the account connection guide](../../docs/KEEL_STUDIO_WALLET_REVIEW.md).
 `--connection-status` prints metadata only; `--import-key` uses a hidden prompt.
+
+Sepolia publication preflight checks the simulator version and transaction capacity with public empty calls on the same retained socket before sending project calldata. Every actual simulation returns its transaction gas envelope; silent RPC gas clamping is a provider limit, not a contract compatibility failure. Never retry a failed program on another backend to manufacture success. Use Hosted Studio receipt recovery and a fresh complete review; Desktop remains optional.

@@ -1,6 +1,6 @@
 {
   "name": "@keel/mcp",
-  "version": "0.4.1",
+  "version": "0.4.2",
   "description": "KEEL discovery, Hosted Studio drafts and website wallet-review workflows through Model Context Protocol.",
   "type": "module",
   "main": "./dist/index.js",
