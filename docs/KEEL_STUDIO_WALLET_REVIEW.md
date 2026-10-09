@@ -182,3 +182,35 @@ Sepolia simulation must use a consistent compatible provider. The public HTTP po
 An exact recovered full-revert receipt preserves the previous plan confirmation at the same draft revision when only platform infrastructure changed. Hosted Studio compares all terms, access phases and committed resources. Do not edit or restart an unchanged plan because a reader was updated; prepare a fresh exact wallet review, which still requires full-batch gas and collector metadata validation. Changed creator terms or resources require plan confirmation again.
 
 Sepolia publication preflight qualifies the simulator with bounded public empty calls, observed public account state and strict nonce controls on the exact retained socket before sending project calldata. This modest probe does not establish full transaction capacity; the exact project simulation must separately pass its requested gas and selected-fork limits. It checks the actual gas envelope on every simulation response. Silent RPC gas clamping is a provider limit, not a contract compatibility failure. Never replay a failed program on another backend to manufacture success. Use receipt recovery and a fresh complete Studio wallet review; Desktop is optional.
+
+### Discover and continue saved work
+
+`client.list({ limit, cursor, projectId })` / MCP `keel-studio-draft` operation
+`list` returns projects and releases plus `pagination`. The default is 50 entries
+per collection, maximum 100. Follow `pagination.nextCursor` until null, preserving
+the project filter. Cursors belong to the authenticated owner and snapshot;
+concurrent new entries appear on the next fresh listing.
+
+Read the chosen release with operation `read`. Its additive `agentProgress`
+contains the current owner/project/release revisions, manifest digest, unresolved
+operation, saved storage counters, blockers and `nextActions`. These records are
+not a fresh chain check. Preserve every action's `expectedState`, `expectedRevision`
+and `expectedOperationId`. The SDK validates cross-object tool instructions and
+controlled owner paths before returning them. Hosted MCP uses the tool name in
+`nextActions`; portable MCP uses `keel-studio-draft` with the action's `operation`
+and `arguments`. Never execute actions whose `allowed` is false.
+
+For existing wallet attempts, use `continue-publication` first. A missing hash
+never proves rejection. Pending, unknown, permission, stale-state and unavailable
+results do not authorize a replacement. A successful continuation returns updated
+guidance; reread status if anything changed. Operation `read-review` validates an
+exact saved operation; `prepare-review` prepares the current confirmed plan.
+Only their successful server-issued `reviewUrl` is a ready owner wallet handoff.
+The agent never signs, submits, records invented owner testimony or funds storage.
+
+`KeelStudioAgentError` exposes `status`, `code`, `retryable` and a bounded
+`nextAction`. Portable MCP preserves those fields in structured error content.
+HTTP 409 requires refreshing the same saved object, not retrying stale arguments.
+These additive capabilities require a Studio deployment with agent progress and
+pagination support. An older server may omit `agentProgress` and `pagination`;
+absence of guidance does not establish safety or publication.
