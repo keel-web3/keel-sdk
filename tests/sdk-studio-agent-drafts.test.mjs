@@ -112,7 +112,7 @@ test("agent draft client covers every Studio release type without wallet or publ
     },
   });
 
-  assert.deepEqual(Object.keys(client).sort(), ["conversation", "create", "defaults", "diagnose", "editDefaults", "editPlan", "editProfiles", "effectiveBuildDefaults", "list", "plan", "prepareReview", "profiles", "read", "recover", "recoverWalletRejection", "selectProfile", "storageReview", "suggest", "update"]);
+  assert.deepEqual(Object.keys(client).sort(), ["continuePublication", "conversation", "create", "defaults", "diagnose", "editDefaults", "editPlan", "editProfiles", "effectiveBuildDefaults", "list", "plan", "prepareReview", "profiles", "read", "recover", "recoverWalletRejection", "selectProfile", "storageRecovery", "storageReview", "suggest", "update"]);
   for (const releaseType of KEEL_STUDIO_RELEASE_TYPES) {
     const supply = releaseType === "open-edition" ? "open" : releaseType === "one-of-one" ? "1" : "100";
     const created = await client.create({ ...baseDraft, releaseType, supply, title: `Agent ${releaseType}` });
@@ -295,4 +295,35 @@ test("receipt recovery uses the same saved release and rejects unverified or mis
   reply = { ...reply, status: "pending", nextAction: "await-receipt" }; assert.equal((await client.recover(releaseId, operationId, [hash])).status, "pending");
   for (const mutation of [{ releaseId: operationId }, { receiptsPreserved: false }, { uploadedBytes: 1 }, { signing: "signed" }]) { const saved = reply; reply = { ...reply, ...mutation }; await assert.rejects(client.recover(releaseId, operationId, [hash])); reply = saved; }
   const count = calls.length; await assert.rejects(client.recover(releaseId, operationId, [hash, hash])); await assert.rejects(client.recover(releaseId, operationId, ["0xbad"])); assert.equal(calls.length, count);
+});
+
+test("bounded Continue uses the exact existing revision and refuses mismatched, mutating or private-call responses", async () => {
+  const { createKeelStudioAgentDraftClient, executeKeelStudioAgentDraftOperation } = await import(MODULE);
+  const releaseId = "dcd04c0e-a875-4b62-93c5-b7c325a0d789";
+  const response = { schema: "keel-release-continuation@1", releaseId, revision: 34, status: "review-required", nextAction: "prepare-review", message: "Review the saved release", reviewPath: `/studio/releases/${releaseId}`, storagePreserved: true, uploadedBytes: 0, signing: "not-performed", submission: "not-performed" };
+  const requests = [];
+  let patch = {};
+  const options = { grantToken: "x".repeat(48), fetchImplementation: async (url, init) => {
+    requests.push({ url: String(url), init }); return Response.json({ ...response, ...patch });
+  } };
+  const client = createKeelStudioAgentDraftClient(options);
+  assert.equal((await executeKeelStudioAgentDraftOperation({ ...options, operation: "continue-publication", releaseId, expectedRevision: 34 })).status, "review-required");
+  assert.equal(new URL(requests[0].url).pathname, `/api/agent/drafts/${releaseId}/continue`);
+  assert.deepEqual(JSON.parse(requests[0].init.body), { expectedRevision: 34 });
+  for (patch of [{ revision: 35 }, { releaseId: "wrong" }, { status: "ready" }, { nextAction: "sign" }, { uploadedBytes: 1 }, { signing: "performed" }, { storagePreserved: false }, { reviewPath: "https://untrusted.example" }, { diagnostic: { releaseId, revision: 34, metadataReadCall: {} } }]) await assert.rejects(client.continuePublication(releaseId, 34), /invalid saved publication progress/u);
+  const before = requests.length;
+  await assert.rejects(client.continuePublication(releaseId, 0));
+  assert.equal(requests.length, before);
+});
+
+test("storage recovery exposes bounded next steps without owner observation inputs", async () => {
+  const { executeKeelStudioAgentDraftOperation } = await import(MODULE);
+  const projectId = "83a98652-7160-4c6c-a9bd-c81cfb672fa5";
+  let response = { status: "owner-observation-required", ownerPath: `/studio/projects/${projectId}/recovery`, message: "The owner must record missing facts in Publish.", nextActions: [{ kind: "owner-observation", automatic: false, ownerPath: `/artifacts/${projectId}?studio=1` }] };
+  const config = { operation: "storage-recovery", projectId, grantToken: "x".repeat(48), fetchImplementation: async (url, init) => {
+    assert.equal(new URL(url).pathname, `/api/agent/projects/${projectId}/preview-replan/legacy`);assert.equal(init.cache, "no-store");return Response.json(response);
+  } };
+  assert.equal((await executeKeelStudioAgentDraftOperation(config)).status, "owner-observation-required");
+  response = { ...response, observationInput: {} };
+  await assert.rejects(executeKeelStudioAgentDraftOperation(config), /invalid storage recovery evidence/u);
 });
