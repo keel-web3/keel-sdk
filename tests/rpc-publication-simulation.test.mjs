@@ -1,15 +1,24 @@
 import test from 'node:test';import assert from 'node:assert/strict';
 import {createKeelRpcPool} from '../packages/sdk/dist/rpc.js';
 function fixture(){const requests=[];const pool=createKeelRpcPool({rpcUrls:['https://rpc.example'],chainId:11155111,minIntervalMs:0,fetchImpl:async(_url,init)=>{const request=JSON.parse(init.body);requests.push(request);return Response.json({jsonrpc:'2.0',id:request.id,result:request.method==='eth_chainId'?'0xaa36a7':[]});}});return {pool,requests};}
-const params=(data='0x')=>[{blockStateCalls:[{calls:[{from:'0x'+'11'.repeat(20),to:'0x'+'22'.repeat(20),data,value:'0x0',gas:'0x100000'}]}],validation:true,traceTransfers:false,returnFullTransactions:false},'0x12'];
+const params=(data='0x',returnFullTransactions=true)=>[{blockStateCalls:[{calls:[{from:'0x'+'11'.repeat(20),to:'0x'+'22'.repeat(20),data,value:'0x0',gas:'0x100000'}]}],validation:true,traceTransfers:false,returnFullTransactions},'0x12'];
 test('read-only RPC pool carries the complete bounded publication simulation instead of blocking all approvals',async()=>{
- const f=fixture();await f.pool.request({method:'eth_simulateV1',params:params('0x'+'00'.repeat(300_000))});
- assert.equal(f.requests.at(-1).method,'eth_simulateV1');
+ const f=fixture();
+ for(const full of [true,false]) {
+  const requestParams=params('0x'+'00'.repeat(300_000),full);
+  await f.pool.request({method:'eth_simulateV1',params:requestParams});
+  assert.equal(f.requests.at(-1).method,'eth_simulateV1');
+  assert.deepEqual(f.requests.at(-1).params,requestParams);
+ }
  for(const method of ['eth_sendTransaction','eth_sendRawTransaction','personal_sign'])await assert.rejects(f.pool.request({method,params:[]}),/read-only/);
 });
 test('simulation overrides and unbounded/ordinary oversized reads reject before network access',async()=>{
  for(const mutate of [p=>{p[0].stateOverrides={};},p=>{p[0].blockStateCalls[0].stateOverrides={};},p=>{p[0].validation=undefined;},p=>{p[0].blockStateCalls=[];}]){
   const f=fixture(),p=params();mutate(p);await assert.rejects(f.pool.request({method:'eth_simulateV1',params:p}),/without state/);assert.equal(f.requests.length,0);
+ }
+ for(const value of [undefined,null,'true',1,{},[]]) {
+  const f=fixture(),p=params();p[0].returnFullTransactions=value;
+  await assert.rejects(f.pool.request({method:'eth_simulateV1',params:p}),/without state/);assert.equal(f.requests.length,0);
  }
  const f=fixture();await assert.rejects(f.pool.request({method:'eth_call',params:[{data:'0x'+'00'.repeat(300_000)},'latest']}),/bounded/);assert.equal(f.requests.length,0);
 });

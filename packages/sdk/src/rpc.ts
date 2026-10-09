@@ -243,7 +243,7 @@ export function createKeelRpcPool(options: KeelRpcPoolOptions): KeelRpcPool {
       const payload = params[0] as { blockStateCalls?: unknown; validation?: unknown; traceTransfers?: unknown; returnFullTransactions?: unknown } | undefined;
       if (params.length !== 2 || !payload || typeof payload !== "object" || Array.isArray(payload)
         || Object.keys(payload).some(key => !["blockStateCalls", "validation", "traceTransfers", "returnFullTransactions"].includes(key))
-        || typeof payload.validation !== "boolean" || payload.traceTransfers !== false || payload.returnFullTransactions !== false
+        || typeof payload.validation !== "boolean" || payload.traceTransfers !== false || typeof payload.returnFullTransactions !== "boolean"
         || !Array.isArray(payload.blockStateCalls) || payload.blockStateCalls.length < 1 || payload.blockStateCalls.length > 256
         || payload.blockStateCalls.some(block => !block || typeof block !== "object" || Array.isArray(block)
           || Object.keys(block).some(key => key !== "calls") || !Array.isArray((block as { calls?: unknown }).calls)

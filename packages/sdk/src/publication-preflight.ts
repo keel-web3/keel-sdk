@@ -10,6 +10,7 @@ export interface KeelSimulationCall {
   readonly data: Hex;
   readonly value: Hex;
   readonly gas: Hex;
+  readonly nonce?: Hex;
   readonly gasPrice?: Hex;
   readonly maxFeePerGas?: Hex;
   readonly maxPriorityFeePerGas?: Hex;
@@ -74,9 +75,10 @@ const quantity = (value: unknown): bigint | undefined => typeof value === "strin
 const bytes = (value: unknown): value is Hex => typeof value === "string" && /^0x(?:[0-9a-f]{2})*$/iu.test(value);
 
 function validatedCall(value: KeelSimulationCall, maximumGas: bigint, transaction = false): KeelSimulationCall {
-  if (!value || typeof value !== "object" || Object.keys(value).some(key => !["from", "to", "data", "value", "gas", "gasPrice", "maxFeePerGas", "maxPriorityFeePerGas"].includes(key))) return failure("configuration-invalid", "Simulation accepts only exact planned calls, without state or code overrides.");
+  if (!value || typeof value !== "object" || Object.keys(value).some(key => !["from", "to", "data", "value", "gas", "nonce", "gasPrice", "maxFeePerGas", "maxPriorityFeePerGas"].includes(key))) return failure("configuration-invalid", "Simulation accepts only exact planned calls, without state or code overrides.");
   const gas = quantity(value.gas);
   if (!bytes(value.data) || quantity(value.value) === undefined || gas === undefined || gas <= 0n || gas > maximumGas) return failure("configuration-invalid", "A planned call has invalid bytes, value, or selected-chain gas bounds.");
+  if (value.nonce !== undefined && (!transaction || quantity(value.nonce) === undefined || BigInt(value.nonce) > 18_446_744_073_709_551_615n)) return failure("configuration-invalid", "An explicit transaction nonce must be a bounded canonical quantity.");
   const legacy = value.gasPrice !== undefined;
   const dynamic = value.maxFeePerGas !== undefined || value.maxPriorityFeePerGas !== undefined;
   if ((legacy && dynamic) || (transaction && !legacy && !dynamic)
@@ -84,7 +86,7 @@ function validatedCall(value: KeelSimulationCall, maximumGas: bigint, transactio
     || (dynamic && (quantity(value.maxFeePerGas) === undefined || quantity(value.maxPriorityFeePerGas) === undefined
       || BigInt(value.maxPriorityFeePerGas!) > BigInt(value.maxFeePerGas!)))) return failure("configuration-invalid", "Transaction simulation requires one explicit valid fee envelope; fee styles cannot be mixed.");
   const fees = legacy ? { gasPrice: value.gasPrice! } : dynamic ? { maxFeePerGas: value.maxFeePerGas!, maxPriorityFeePerGas: value.maxPriorityFeePerGas! } : {};
-  try { return Object.freeze({ from: getAddress(value.from), to: getAddress(value.to), data: value.data, value: value.value, gas: value.gas, ...fees }); }
+  try { return Object.freeze({ from: getAddress(value.from), to: getAddress(value.to), data: value.data, value: value.value, gas: value.gas, ...(value.nonce === undefined ? {} : { nonce: value.nonce }), ...fees }); }
   catch { return failure("configuration-invalid", "A planned call needs valid sender and target addresses."); }
 }
 function classifiedTransportFailure(error: unknown): never {
@@ -202,8 +204,21 @@ async function performPublicationSimulation(input: KeelPublicationSimulationInpu
   if (atomicContext && (preparationCalls.length !== 1 || preparationCalls[0]!.from.toLowerCase() !== preparationCalls[0]!.to.toLowerCase() || !preparationCalls[0]!.data.startsWith("0xe9ae5c53"))) return failure("configuration-invalid", "An atomic-wallet preflight requires its complete creator self-call program.");
   const simulate = async (calls: readonly KeelSimulationCall[], validation: boolean) => {
     if (!calls.length) return [];
-    const response = await request("eth_simulateV1", [{ blockStateCalls: calls.map(call => ({ calls: [call] })), validation, traceTransfers: false, returnFullTransactions: false }, block.number]);
+    const response = await request("eth_simulateV1", [{ blockStateCalls: calls.map(call => ({ calls: [call] })), validation, traceTransfers: false, returnFullTransactions: true }, block.number]);
     if (!Array.isArray(response) || response.length !== calls.length) return failure("rpc-unavailable", "The provider returned an incomplete publication simulation.");
+    // Every transport must prove the requested envelopes before any apparent
+    // execution failure is interpreted. A successful socket capacity probe is
+    // not evidence for these exact calls or an explicit HTTP override.
+    for (const [index, call] of calls.entries()) {
+      const transactions = record(response[index])?.transactions;
+      if (!Array.isArray(transactions) || transactions.length !== 1) return failure("unsupported-simulation", "The simulator did not return complete transaction envelopes.");
+      const transaction = record(transactions[0]);
+      const actualGas = quantity(transaction?.gas), requestedGas = BigInt(call.gas);
+      if (actualGas === undefined) return failure("unsupported-simulation", "The simulator omitted the exact transaction gas envelope.");
+      if (actualGas < requestedGas) return failure("provider-limit", "The simulator silently reduced the requested transaction gas. The exact prepared plan requires a compatible provider before wallet approval.", { requestedGasLimit: requestedGas.toString(), providerGasCap: actualGas.toString() });
+      if (actualGas !== requestedGas) return failure("unsupported-simulation", "The simulator changed the requested transaction gas envelope.");
+      if (call.nonce !== undefined && quantity(transaction?.nonce) !== BigInt(call.nonce)) return failure("unsupported-simulation", "The simulator omitted or changed the explicit transaction nonce.");
+    }
     return response.map((item, index) => {
       const parent = index === 0 ? block : record(response[index - 1]);
       const parentSlot = quantity(parent?.slotNumber);

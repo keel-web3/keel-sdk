@@ -8,6 +8,7 @@ import { createRecursiveUploadPlan, createUploadPlan } from "../packages/builder
 import { createIntegrity } from "../packages/protocol/dist/index.js";
 import { createMcpServer } from "../packages/mcp/dist/index.js";
 
+const { version: mcpVersion } = JSON.parse(await readFile(new URL("../packages/mcp/package.json", import.meta.url), "utf8"));
 const bytes = (value) => new TextEncoder().encode(value);
 const ONE_PIXEL_PNG = Buffer.from(
   "iVBORw0KGgoAAAANSUhEUgAAAAIAAAACCAYAAABytg0kAAAAFElEQVR4nGP8z8Dwn4GBgYGJAQoAHxcCAk+Uzr4AAAAASUVORK5CYII=",
@@ -79,13 +80,14 @@ test("MCP initializes, lists strict tools, and returns JSON-RPC parameter errors
     assert.equal(unsupportedInitialize?.error?.code, -32602);
     const initialized = await server.handle({ jsonrpc: "2.0", id: 4, method: "initialize", params: initializeParams });
     assert.equal(initialized?.result.serverInfo.name, "keel-mcp");
+    assert.equal(initialized?.result.serverInfo.version, mcpVersion);
     assert.deepEqual(Object.keys(initialized?.result.capabilities), ["tools", "prompts", "resources"]);
     assert.match(initialized?.result.instructions, /begin with keel-project-plan/iu);
     assert.match(initialized?.result.instructions, /keel-contract-workflow-preflight/iu);
     assert.match(initialized?.result.instructions, /registered canonical KEEL verification shell/iu);
     assert.match(initialized?.result.instructions, /one declared changed resource/iu);
     const listed = await server.handle({ jsonrpc: "2.0", id: 5, method: "tools/list", params: {} });
-    assert.deepEqual(listed?.result.tools.map((tool) => tool.name), ["keel-media-capabilities", "keel-media-candidate", "keel-media-compare", "keel-tezos-shell-prepare", "keel-tezos-publication-prepare", "keel-network-inspect", "keel-tezos-standard-route-plan", "keel-contract-workflow-preflight", "keel-contract-controls", "keel-engine-catalog", "keel-revision-plan", "keel-project-decisions", "keel-inline-reuse-plan", "keel-inline-publication-check", "keel-inline-token-audit", "keel-network-discover", "keel-network-check", "keel-rpc-check", "keel-editor-project-list", "keel-editor-project-read", "keel-editor-project-update", "keel-editor-project-open", "keel-layered-check", "keel-layered-select", "keel-layered-sample", "keel-layered-math", "keel-layered-reveal-plan", "keel-layered-direct-image-plan", "keel-svg-create", "keel-svg-inspect", "keel-svg-call-plan", "keel-creator-inline-prepare", "keel-layered-curation", "keel-token-matrix-prepare", "keel-metadata-prepare", "keel-prereveal-prepare", "keel-arena-match-prepare", "keel-arena-claim-prepare", "analyze", "media-optimize", "media-optimize-apply", "build", "verify", "cost", "upload-plan", "chain-plan", "ethereum-encode", "publish-plan", "module-resolve", "module-lock", "wallet-request-prepare", "wallet-link", "module-review-prepare", "fray-auction-intake", "fray-stage-project", "keel-chain-guide", "keel-library-search", "keel-onchain-data-prepare", "keel-endpoint-config", "keel-studio-capabilities", "keel-studio-project-intake", "keel-studio-connect", "keel-studio-access", "keel-studio-draft", "keel-studio-stage-project", "keel-creator-collection-prepare", "keel-shell-search", "keel-inline-prepare", "keel-shell-prepare", "keel-plugins-list"]);
+    assert.deepEqual(listed?.result.tools.map((tool) => tool.name), ["keel-media-capabilities", "keel-media-candidate", "keel-media-compare", "keel-signature-privacy-readiness", "keel-tezos-shell-prepare", "keel-tezos-publication-prepare", "keel-network-inspect", "keel-tezos-standard-route-plan", "keel-contract-workflow-preflight", "keel-contract-controls", "keel-engine-catalog", "keel-revision-plan", "keel-project-decisions", "keel-inline-reuse-plan", "keel-inline-publication-check", "keel-inline-token-audit", "keel-network-discover", "keel-network-check", "keel-rpc-check", "keel-editor-project-list", "keel-editor-project-read", "keel-editor-project-update", "keel-editor-project-open", "keel-layered-check", "keel-layered-select", "keel-layered-sample", "keel-layered-math", "keel-layered-reveal-plan", "keel-layered-direct-image-plan", "keel-svg-create", "keel-svg-inspect", "keel-svg-call-plan", "keel-creator-inline-prepare", "keel-layered-curation", "keel-token-matrix-prepare", "keel-metadata-prepare", "keel-prereveal-prepare", "keel-arena-match-prepare", "keel-arena-claim-prepare", "analyze", "media-optimize", "media-optimize-apply", "build", "verify", "cost", "upload-plan", "chain-plan", "ethereum-encode", "publish-plan", "module-resolve", "module-lock", "wallet-request-prepare", "wallet-link", "module-review-prepare", "fray-auction-intake", "fray-stage-project", "keel-chain-guide", "keel-library-search", "keel-onchain-data-prepare", "keel-endpoint-config", "keel-studio-capabilities", "keel-studio-project-intake", "keel-studio-connect", "keel-studio-access", "keel-studio-draft", "keel-studio-stage-project", "keel-creator-collection-prepare", "keel-shell-search", "keel-inline-prepare", "keel-shell-prepare", "keel-plugins-list"]);
     const revisionTool = listed?.result.tools.find((tool) => tool.name === "keel-revision-plan");
     assert.match(revisionTool?.description, /unchanged object ID.*reused/iu);
     assert.equal(revisionTool?.inputSchema.properties.changedResourceIds.maxItems, 1);
@@ -990,7 +992,7 @@ test("MCP CLI help, version, and self-test are explicit non-stdio modes", async 
     const help = execFileSync(process.execPath, [cli, "--help"], { encoding: "utf8" });
     assert.match(help, /^Usage: keel-mcp /u);
     assert.doesNotMatch(help, /^\s*\{\s*"jsonrpc"/u);
-    assert.equal(execFileSync(process.execPath, [cli, "--version"], { encoding: "utf8" }), "0.4.0\n");
+    assert.equal(execFileSync(process.execPath, [cli, "--version"], { encoding: "utf8" }), `${mcpVersion}\n`);
     const before = await readdir(directory);
     const first = execFileSync(process.execPath, [cli, "--self-test", "--workspace", directory], { encoding: "utf8" });
     const second = execFileSync(process.execPath, [cli, "--self-test", `--workspace=${directory}`], { encoding: "utf8" });
@@ -999,6 +1001,7 @@ test("MCP CLI help, version, and self-test are explicit non-stdio modes", async 
     assert.equal(first, second);
     const health = JSON.parse(first);
     assert.equal(health.status, "ok");
+    assert.equal(health.serverVersion, mcpVersion);
     assert.equal(health.protocolVersion, "2024-11-05");
     assert.equal(health.toolCount, health.toolNames.length);
     assert.equal(new Set(health.toolNames).size, health.toolCount);

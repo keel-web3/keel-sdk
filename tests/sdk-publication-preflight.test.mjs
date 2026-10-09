@@ -20,10 +20,10 @@ function fixture(change = {}) {
     if (request.method === "eth_simulateV1") {
       if (change.error) throw change.error;
       simulationPass++;
-      return request.params[0].blockStateCalls.map((_, index) => {
+      return request.params[0].blockStateCalls.map((item, index) => {
         const finalRead = simulationPass === 3 && index === request.params[0].blockStateCalls.length - 1;
         const gasUsed = finalRead ? change.readGas ?? change.gas ?? "0x186a0" : change.gas ?? "0x186a0";
-        return { ...(change.timestamp && !change.omitForkHeader ? { timestamp: `0x${(BigInt(change.timestamp) + BigInt(index + 1)).toString(16)}`, number: `0x${(BigInt(change.blockNumber ?? block.number) + BigInt(index + 1)).toString(16)}`, slotNumber: `0x${(index + 1).toString(16)}`, blockAccessListHash: block.hash,
+        return { transactions: item.calls.map(({ gas, nonce }) => ({ gas, ...(nonce === undefined ? {} : { nonce }) })), ...(change.timestamp && !change.omitForkHeader ? { timestamp: `0x${(BigInt(change.timestamp) + BigInt(index + 1)).toString(16)}`, number: `0x${(BigInt(change.blockNumber ?? block.number) + BigInt(index + 1)).toString(16)}`, slotNumber: `0x${(index + 1).toString(16)}`, blockAccessListHash: block.hash,
           hash: `0x${(index + 1).toString(16).padStart(64, "0")}`, parentHash: index === 0 ? block.hash : `0x${index.toString(16).padStart(64, "0")}` } : {}), calls: [{ status: change.revert === index || (change.strictRevert && request.params[0].validation) ? "0x0" : "0x1", ...(change.contradictoryError ? { error: { code: 3, message: "execution reverted SECRET" } } : {}), gasUsed,
           ...(change.omitMaximum ? {} : { maxUsedGas: finalRead ? gasUsed : change.maximumGas ?? gasUsed }),
           returnData: simulationPass === 3 && change.readerReturns && index > 0 && !finalRead ? change.readerReturns[index - 1] : finalRead ? change.storage ? encodeAbiParameters([{ type: "bool" }], [change.exists ?? true]) : encodeAbiParameters([{ type: "string" }], [change.metadata ?? expected]) : "0x" }] };
@@ -41,9 +41,9 @@ test("pre-funding simulation uses exact ordered calls without signing or state o
   const { maxFeePerGas, maxPriorityFeePerGas, ...discovery } = call;
   const bounded = { ...call, gas: "0x19a28" };
   assert.deepEqual(simulations.map(request => request.params), [
-    [{ blockStateCalls: [{ calls: [discovery] }], validation: false, traceTransfers: false, returnFullTransactions: false }, "0x12"],
-    [{ blockStateCalls: [{ calls: [bounded] }], validation: true, traceTransfers: false, returnFullTransactions: false }, "0x12"],
-    [{ blockStateCalls: [{ calls: [bounded] }, { calls: [{ ...call, gas: "0xf1b30" }] }], validation: false, traceTransfers: false, returnFullTransactions: false }, "0x12"],
+    [{ blockStateCalls: [{ calls: [discovery] }], validation: false, traceTransfers: false, returnFullTransactions: true }, "0x12"],
+    [{ blockStateCalls: [{ calls: [bounded] }], validation: true, traceTransfers: false, returnFullTransactions: true }, "0x12"],
+    [{ blockStateCalls: [{ calls: [bounded] }, { calls: [{ ...call, gas: "0xf1b30" }] }], validation: false, traceTransfers: false, returnFullTransactions: true }, "0x12"],
   ]);
   assert.equal(proof.validatedTransactionCalls, 1);
   assert.ok(f.requests.every(request => ["eth_chainId", "eth_getBlockByNumber", "eth_getCode", "eth_simulateV1"].includes(request.method)));
@@ -54,6 +54,72 @@ test("complete metadata oversize and invalid override-like fields fail before an
   await assert.rejects(simulateKeelPublicationBeforeFunding({ ...input(), expectedTokenURI: "x".repeat(2_000_001) }, f.transport), error => error.kind === "metadata-size-limit");
   await assert.rejects(simulateKeelPublicationBeforeFunding({ ...input(), metadataCall: { ...call, stateOverride: {} } }, f.transport), error => error.kind === "configuration-invalid");
   assert.equal(f.requests.length, 0);
+});
+
+function alteredEnvelopeTransport(pass, alter) {
+  const f = fixture();
+  let simulations = 0;
+  return { requests: f.requests, transport: { request: async request => {
+    const result = await f.transport.request(request);
+    if (request.method === "eth_simulateV1" && ++simulations === pass) alter(result, request);
+    return result;
+  } } };
+}
+
+test("every direct transport simulation phase rejects silent gas clamping before an apparent revert", async () => {
+  for (const pass of [1, 2, 3]) {
+    let requestedGas;
+    const f = alteredEnvelopeTransport(pass, (result, request) => {
+      requestedGas = BigInt(request.params[0].blockStateCalls[0].calls[0].gas);
+      result[0].transactions[0].gas = `0x${(requestedGas - 1n).toString(16)}`;
+      result[0].calls[0].status = "0x0";
+    });
+    await assert.rejects(simulateKeelPublicationBeforeFunding(input(), f.transport), error => {
+      assert.equal(error.kind, "provider-limit");
+      assert.deepEqual(error.diagnostic, { requestedGasLimit: requestedGas.toString(), providerGasCap: (requestedGas - 1n).toString() });
+      return true;
+    });
+    assert.equal(f.requests.filter(request => request.method === "eth_simulateV1").length, pass);
+  }
+});
+
+test("every direct transport simulation phase requires complete exact transaction envelopes", async () => {
+  const mutations = [
+    result => { delete result[0].transactions; },
+    result => { result[0].transactions = []; },
+    result => { result[0].transactions.push({ ...result[0].transactions[0] }); },
+    result => { result[0].transactions = [`0x${"dd".repeat(32)}`]; },
+    result => { delete result[0].transactions[0].gas; },
+    result => { result[0].transactions[0].gas = "0x00"; },
+    result => { result[0].transactions[0].gas = `0x${(BigInt(result[0].transactions[0].gas) + 1n).toString(16)}`; },
+  ];
+  for (const pass of [1, 2, 3]) for (const mutate of mutations) {
+    const f = alteredEnvelopeTransport(pass, result => { mutate(result); result[0].calls[0].status = "0x0"; });
+    await assert.rejects(simulateKeelPublicationBeforeFunding(input(), f.transport), error => error.kind === "unsupported-simulation");
+    assert.equal(f.requests.filter(request => request.method === "eth_simulateV1").length, pass);
+  }
+});
+
+test("all returned envelopes are checked before interpreting any execution failure", async () => {
+  const f = alteredEnvelopeTransport(1, result => {
+    result[0].calls[0].status = "0x0";
+    delete result[1].transactions;
+  });
+  await assert.rejects(simulateKeelPublicationBeforeFunding({ ...input(), preparationCalls: [call, { ...call, data: "0x5678" }] }, f.transport), error => error.kind === "unsupported-simulation");
+  assert.equal(f.requests.filter(request => request.method === "eth_simulateV1").length, 1);
+});
+
+test("every direct transport replay verifies the explicit atomic nonce before interpreting a revert", async () => {
+  const batch = { ...call, from: owner, to: owner, data: "0xe9ae5c530000", nonce: "0x5" };
+  for (const pass of [1, 2, 3]) for (const nonce of [undefined, "0x4", "0x6", "0x05", 5]) {
+    const f = alteredEnvelopeTransport(pass, result => {
+      if (nonce === undefined) delete result[0].transactions[0].nonce;
+      else result[0].transactions[0].nonce = nonce;
+      result[0].calls[0].status = "0x0";
+    });
+    await assert.rejects(simulateKeelPublicationBeforeFunding({ ...input(), transactionContext: "atomic-wallet", preparationCalls: [batch] }, f.transport), error => error.kind === "unsupported-simulation");
+    assert.equal(f.requests.filter(request => request.method === "eth_simulateV1").length, pass);
+  }
 });
 
 test("wrong chain, code, byte mismatch, revert, gas limit and reorg cannot produce a proof", async () => {
@@ -306,5 +372,18 @@ test("atomic wallet preflight validates its real fee envelope on every preparati
   assert.deepEqual(proof.transactionGasLimits, ["120000"]);
   for (const preparationCalls of [[call], [batch, batch]]) {
     await assert.rejects(simulateKeelPublicationBeforeFunding({ ...planned, preparationCalls }, fixture().transport), error => error.kind === "configuration-invalid");
+  }
+});
+
+test("explicit atomic nonce survives every replay and invalid nonce fails before RPC", async () => {
+  const f = fixture();
+  const batch = { ...call, from: owner, to: owner, data: "0xe9ae5c530000", nonce: "0x5" };
+  const planned = { ...input(), transactionContext: "atomic-wallet", preparationCalls: [batch] };
+  await simulateKeelPublicationBeforeFunding(planned, f.transport);
+  for (const request of f.requests.filter(item => item.method === "eth_simulateV1")) assert.equal(request.params[0].blockStateCalls[0].calls[0].nonce, "0x5");
+  for (const nonce of ["0x05", "5", "-1", "0x10000000000000000"]) {
+    const bad = fixture();
+    await assert.rejects(simulateKeelPublicationBeforeFunding({ ...planned, preparationCalls: [{ ...batch, nonce }] }, bad.transport), error => error.kind === "configuration-invalid");
+    assert.equal(bad.requests.length, 0);
   }
 });
