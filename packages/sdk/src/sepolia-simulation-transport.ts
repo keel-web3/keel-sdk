@@ -1,8 +1,9 @@
 import { createPublicClient, webSocket } from "viem";
 import { createPinnedKeelSepoliaSimulationTransport } from "./simulation-connection.js";
 
-/** Select version and gas capacity before sending project calldata. All probes
- * use the exact low-level socket retained for simulation, without reconnection. */
+/** Qualify public API and fork/envelope behavior before sending project calldata. All probes
+ * use modest gas on the exact retained socket, without reconnection. Full project
+ * capacity is verified separately by its exact simulation. */
 export function createKeelSepoliaSimulationTransport() {
   return createPinnedKeelSepoliaSimulationTransport(async () => {
     const client = createPublicClient({ transport: webSocket("wss://ethereum-sepolia-rpc.publicnode.com", {

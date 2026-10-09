@@ -61,6 +61,19 @@ export type KeelStudioReleaseWalletRejection =
   | { readonly kind: "wallet-policy-rejected"; readonly provider: "metamask"; readonly method: "eth_sendTransaction"; readonly code: -32602; readonly reason: "internal-account-data" }
   | { readonly kind: "user-rejected"; readonly provider: "metamask" | "eip1193"; readonly method: "eth_sendTransaction" | "wallet_sendCalls"; readonly code: 4001; readonly reason: "user-declined" }
   | { readonly kind: "dispatch-aborted"; readonly provider: "studio"; readonly method: "eth_sendTransaction" | "wallet_sendCalls"; readonly reason: "browser-journal-unavailable" };
+function checkedWalletRejection(rejection: KeelStudioReleaseWalletRejection): void {
+  if (!rejection || typeof rejection !== "object" || Array.isArray(rejection)
+    || Object.keys(rejection).some(key => !["kind", "provider", "method", "code", "reason"].includes(key))
+    || !(rejection.kind === "wallet-policy-rejected" && rejection.provider === "metamask" && rejection.method === "eth_sendTransaction"
+      && rejection.code === -32602 && rejection.reason === "internal-account-data"
+      || rejection.kind === "user-rejected" && ["metamask", "eip1193"].includes(rejection.provider)
+        && ["eth_sendTransaction", "wallet_sendCalls"].includes(rejection.method) && rejection.code === 4001 && rejection.reason === "user-declined"
+      || rejection.kind === "dispatch-aborted" && rejection.provider === "studio" && !("code" in rejection)
+        && ["eth_sendTransaction", "wallet_sendCalls"].includes(rejection.method) && rejection.reason === "browser-journal-unavailable")) {
+    throw new TypeError("Unknown wallet or transport errors cannot establish a rejected transaction.");
+  }
+}
+
 export interface KeelStudioReleaseWalletRejectionInput {
   readonly operationId: string; readonly attemptId: string; readonly expectedRevision: number; readonly chainId: number;
   readonly preparedDigest: string; readonly walletProofFingerprint: string;
@@ -189,6 +202,8 @@ export interface KeelStudioReleaseDiagnostics {
   readonly actions: readonly string[];
   readonly operations?: readonly Readonly<Record<string, unknown>>[];
   readonly recoveryInput?: Omit<KeelStudioReleaseWalletRejectionInput, "rejection">;
+  /** Owner-recorded outcome for recoveryInput; omit recovery when this is absent. */
+  readonly ownerRecordedRejection?: KeelStudioReleaseWalletRejection;
   readonly legacyObservationInput?: Omit<KeelStudioReleaseWalletRejectionInput, "rejection" | "attemptId">;
   readonly storageEvidence?: readonly {
     readonly resourceId: string;
@@ -442,17 +457,7 @@ export function createKeelStudioAgentDraftClient(options: KeelStudioAgentDraftCl
       || typeof input.walletProofFingerprint !== "string" || !hash.test(input.walletProofFingerprint)) {
       throw new TypeError("Wallet rejection recovery requires the exact saved operation, revision, chain, digest and proof fingerprint.");
     }
-    const rejection = input.rejection;
-    if (!rejection || typeof rejection !== "object" || Array.isArray(rejection)
-      || Object.keys(rejection).some(key => !["kind", "provider", "method", "code", "reason"].includes(key))
-      || !(rejection.kind === "wallet-policy-rejected" && rejection.provider === "metamask" && rejection.method === "eth_sendTransaction"
-        && rejection.code === -32602 && rejection.reason === "internal-account-data"
-        || rejection.kind === "user-rejected" && ["metamask", "eip1193"].includes(rejection.provider)
-          && ["eth_sendTransaction", "wallet_sendCalls"].includes(rejection.method) && rejection.code === 4001 && rejection.reason === "user-declined"
-        || rejection.kind === "dispatch-aborted" && rejection.provider === "studio" && !("code" in rejection)
-          && ["eth_sendTransaction", "wallet_sendCalls"].includes(rejection.method) && rejection.reason === "browser-journal-unavailable")) {
-      throw new TypeError("Unknown wallet or transport errors cannot establish a rejected transaction.");
-    }
+    checkedWalletRejection(input.rejection);
     const value = await studioAgentResponse<KeelStudioReleaseWalletRejectionRecovery>(await studioAgentRequest(options, `${releasePath(releaseId)}/wallet-rejection`, {
       method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify(input),
     }), [options.grantToken]);
@@ -480,6 +485,13 @@ export function createKeelStudioAgentDraftClient(options: KeelStudioAgentDraftCl
         || typeof recovery.walletProofFingerprint !== "string" || !/^0x[0-9a-f]{64}$/iu.test(recovery.walletProofFingerprint)) {
         throw new TypeError("Studio returned invalid wallet rejection recovery input.");
       }
+    }
+    if (value.ownerRecordedRejection !== undefined) {
+      if (value.recoveryInput === undefined || value.legacyObservationInput !== undefined
+        || value.status !== "resume-saved-operation" || value.code !== "wallet-recovery-required") {
+        throw new TypeError("Studio returned an owner-recorded rejection without its current recovery identity.");
+      }
+      checkedWalletRejection(value.ownerRecordedRejection);
     }
     if (value.metadataReadCall !== undefined) {
       if (!diagnosticOptions.includeReadCall) throw new TypeError("Studio returned private call data that was not requested.");

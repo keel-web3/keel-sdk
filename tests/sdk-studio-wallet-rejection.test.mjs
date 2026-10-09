@@ -60,7 +60,7 @@ test("portable recovery operation maps the diagnostic identity and explicit reje
   assert.equal(calls.length, 1);
 });
 
-test("diagnostic recovery input is revision-bound and never supplies a rejection on the user's behalf", async () => {
+test("diagnostic recovery identity remains compatible and cannot supply an unrecorded rejection", async () => {
   const { rejection: _rejection, ...recoveryInput } = input;
   const diagnostic = { schema: "keel-release-diagnostics@1", releaseId, revision: input.expectedRevision, chainId: input.chainId,
     recoveryInput, signing: "not-performed", submission: "not-performed", uploadedBytes: 0, changed: false };
@@ -79,4 +79,36 @@ test("SDK forwards a recorded dispatch abort without accepting a fabricated wall
   assert.equal(JSON.parse(f.calls[0].body).rejection.code, undefined);
   await assert.rejects(f.client.recoverWalletRejection(releaseId, { ...aborted, rejection: { ...aborted.rejection, code: 4001 } }));
   assert.equal(f.calls.length, 1);
+});
+
+
+test("SDK diagnosis supplies a bounded recorded outcome for a complete recovery round trip", async () => {
+  const { rejection, ...recoveryInput } = input;
+  const diagnostic = { schema: "keel-release-diagnostics@1", releaseId, revision: input.expectedRevision, chainId: input.chainId,
+    status: "resume-saved-operation", code: "wallet-recovery-required", recoveryInput, ownerRecordedRejection: rejection,
+    signing: "not-performed", submission: "not-performed", uploadedBytes: 0, changed: false };
+  const calls = [];
+  const client = createKeelStudioAgentDraftClient({ studioUrl: "https://studio.example", grantToken: "x".repeat(48),
+    fetchImplementation: async (url, init) => { calls.push({ url: String(url), ...init });
+      return Response.json(String(url).endsWith("/diagnostics") ? diagnostic : response); } });
+  const returned = await client.diagnose(releaseId);
+  assert.deepEqual(await client.recoverWalletRejection(returned.releaseId,
+    { ...returned.recoveryInput, rejection: returned.ownerRecordedRejection }), response);
+  assert.equal(calls.length, 2);
+  assert.deepEqual(JSON.parse(calls[1].body), input);
+  for (const mutation of [
+    { recoveryInput: undefined }, { status: "ready-for-review" }, { code: "other" },
+    { legacyObservationInput: recoveryInput },
+    { ownerRecordedRejection: null },
+    { ownerRecordedRejection: { ...rejection, code: 4001 } },
+    { ownerRecordedRejection: { ...rejection, token: "private" } },
+    { ownerRecordedRejection: { ...rejection, tokenHash: "private" } },
+    { ownerRecordedRejection: { ...rejection, message: "raw provider error" } },
+  ]) await assert.rejects(fixture({ ...diagnostic, ...mutation }).client.diagnose(releaseId));
+  const { ownerRecordedRejection: _recorded, ...pending } = diagnostic;
+  const blocked = fixture(pending), missing = await blocked.client.diagnose(releaseId);
+  assert.equal(missing.ownerRecordedRejection, undefined);
+  await assert.rejects(blocked.client.recoverWalletRejection(missing.releaseId,
+    { ...missing.recoveryInput, rejection: missing.ownerRecordedRejection }));
+  assert.equal(blocked.calls.length, 1, "missing observation never creates a recovery request");
 });
