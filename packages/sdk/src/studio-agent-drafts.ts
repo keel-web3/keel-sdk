@@ -1,3 +1,5 @@
+import { parseKeelStudioAgentProgress, parseKeelStudioAgentStateBinding, type KeelStudioAgentProgress, type KeelStudioAgentStateBinding, type KeelStudioAgentWorkspaceQuery, type KeelStudioAgentWorkspacePage } from "./studio-agent-guidance.js";
+export * from "./studio-agent-guidance.js";
 import { decodeFunctionData, keccak256, parseAbi, type Hex } from "viem";
 import { parseKeelExecutionAuthority, type KeelExecutionAuthorityView } from "./studio-execution-authority.js";
 import { parseKeelNamedProjectProfile, validateKeelNamedProfileCommand, type KeelNamedProjectProfile, type KeelNamedProfileCommand } from "./studio-project-profiles.js";
@@ -132,6 +134,7 @@ export interface KeelStudioAgentReleaseDraft {
 }
 
 export interface KeelStudioAgentReleaseView extends KeelStudioAgentReleaseDraft {
+  readonly agentProgress?: KeelStudioAgentProgress;
   readonly id: string;
   readonly revision: number;
   readonly status: string;
@@ -220,6 +223,7 @@ export interface KeelStudioReleaseDiagnostics {
 }
 
 export interface KeelStudioReleaseContinuation {
+  readonly agentProgress?: KeelStudioAgentProgress;
   readonly schema: "keel-release-continuation@1";
   readonly releaseId: string;
   readonly revision: number;
@@ -243,6 +247,8 @@ export interface KeelStudioStorageRecovery {
 }
 
 export interface KeelStudioAgentDraftWorkspace {
+  readonly pagination?: KeelStudioAgentWorkspacePage;
+  readonly ownerId?: string;
   readonly projects: readonly Readonly<Record<string, unknown>>[];
   readonly releases: readonly KeelStudioAgentReleaseView[];
 }
@@ -253,7 +259,7 @@ export interface KeelStudioAgentDraftClientOptions {
   readonly fetchImplementation?: typeof fetch;
 }
 
-const KEEL_STUDIO_AGENT_DRAFT_OPERATIONS = ["list", "read", "diagnose", "continue-publication", "cancel-review", "storage-recovery", "recover", "recover-wallet-rejection", "plan", "plan-edit", "defaults", "defaults-edit", "profiles", "profiles-edit", "profile-select", "conversation", "conversation-suggest", "prepare-review", "storage-review", "create", "update"] as const;
+const KEEL_STUDIO_AGENT_DRAFT_OPERATIONS = ["list", "read", "diagnose", "continue-publication", "cancel-review", "storage-recovery", "recover", "recover-wallet-rejection", "plan", "plan-edit", "defaults", "defaults-edit", "profiles", "profiles-edit", "profile-select", "conversation", "conversation-suggest", "prepare-review", "read-review", "storage-review", "create", "update"] as const;
 export type KeelStudioAgentDraftOperation = (typeof KEEL_STUDIO_AGENT_DRAFT_OPERATIONS)[number];
 
 /**
@@ -262,6 +268,10 @@ export type KeelStudioAgentDraftOperation = (typeof KEEL_STUDIO_AGENT_DRAFT_OPER
  * accepts no caller-supplied wallet, calldata, signing or submission fields.
  */
 export interface KeelStudioAgentDraftOperationConfig extends KeelStudioAgentDraftClientOptions {
+  readonly expectedState?: KeelStudioAgentStateBinding;
+  readonly expectedOperationId?: string;
+  readonly limit?: number;
+  readonly cursor?: string;
   readonly operation: KeelStudioAgentDraftOperation;
   readonly releaseId?: string;
   readonly draft?: KeelStudioAgentReleaseDraft;
@@ -289,11 +299,11 @@ export type KeelStudioAgentDraftOperationResult = KeelStudioReviewCancellation |
 
 export interface KeelStudioAgentDraftClient {
   readonly cancelReview: (releaseId: string, expectedRevision: number, operationId: string) => Promise<KeelStudioReviewCancellation>;
-  readonly list: () => Promise<KeelStudioAgentDraftWorkspace>;
-  readonly read: (releaseId: string) => Promise<KeelStudioAgentReleaseView>;
+  readonly list: (query?: KeelStudioAgentWorkspaceQuery) => Promise<KeelStudioAgentDraftWorkspace>;
+  readonly read: (releaseId: string, expectedState?: KeelStudioAgentStateBinding) => Promise<KeelStudioAgentReleaseView>;
   readonly recover: (releaseId: string, operationId: string, transactionHashes: readonly string[]) => Promise<KeelStudioReleaseRecovery>;
   readonly recoverWalletRejection: (releaseId: string, input: KeelStudioReleaseWalletRejectionInput) => Promise<KeelStudioReleaseWalletRejectionRecovery>;
-  readonly continuePublication: (releaseId: string, expectedRevision: number) => Promise<KeelStudioReleaseContinuation>;
+  readonly continuePublication: (releaseId: string, expectedRevision: number, options?: { readonly expectedOperationId?: string; readonly expectedState?: KeelStudioAgentStateBinding }) => Promise<KeelStudioReleaseContinuation>;
   readonly storageRecovery: (projectId: string) => Promise<KeelStudioStorageRecovery>;
   readonly diagnose: (releaseId: string, options?: { readonly includeReadCall?: boolean }) => Promise<KeelStudioReleaseDiagnostics>;
   readonly plan: (releaseId: string) => Promise<KeelStudioReleasePlanning>;
@@ -307,8 +317,9 @@ export interface KeelStudioAgentDraftClient {
   /** Fresh authenticated read on every call; never a process-wide preferences cache. */
   readonly effectiveBuildDefaults: (input?: Parameters<typeof resolveKeelBuildDefaults>[1]) => Promise<KeelEffectiveBuildDefaults>;
   readonly editDefaults: (command: KeelStudioDefaultsCommand) => Promise<KeelStudioDefaultsView>;
-  readonly prepareReview: (releaseId: string, expectedRevision: number) => Promise<KeelStudioReleaseWalletReview>;
-  readonly storageReview: (projectId: string) => Promise<KeelStudioStorageReview>;
+  readonly readReview: (releaseId: string, expectedRevision: number, operationId: string, expectedState?: KeelStudioAgentStateBinding) => Promise<KeelStudioReleaseWalletReview>;
+  readonly prepareReview: (releaseId: string, expectedRevision: number, expectedState?: KeelStudioAgentStateBinding) => Promise<KeelStudioReleaseWalletReview>;
+  readonly storageReview: (projectId: string, expectedState?: KeelStudioAgentStateBinding) => Promise<KeelStudioStorageReview>;
   readonly create: (draft: KeelStudioAgentReleaseDraft) => Promise<KeelStudioAgentReleaseView>;
   readonly update: (releaseId: string, draft: KeelStudioAgentReleaseDraft, expectedRevision: number) => Promise<KeelStudioAgentReleaseView>;
 }
@@ -346,7 +357,7 @@ export function validateKeelStudioAgentReleaseDraft(value: unknown): KeelStudioA
   const input = value as Record<string, unknown>;
   // A creator or agent commonly edits the object returned by `read`; accept
   // those read-only view fields and strip them from the update payload.
-  const allowed = new Set<string>([...RELEASE_DRAFT_FIELDS, "id", "revision", "status", "slug", "reviewUrl", "lastReadDiagnostic"]);
+  const allowed = new Set<string>([...RELEASE_DRAFT_FIELDS, "id", "revision", "status", "slug", "reviewUrl", "lastReadDiagnostic", "agentProgress"]);
   for (const key of Object.keys(input)) if (!allowed.has(key)) throw new TypeError(`Studio release draft.${key} is not supported.`);
   for (const key of RELEASE_DRAFT_FIELDS) if (!(key in input)) throw new TypeError(`Studio release draft.${key} is required.`);
 
@@ -418,18 +429,35 @@ function redactSensitiveMessage(message: string, secrets: readonly string[]): st
   }, message);
 }
 
+/** Structured failures carry recovery instructions, never wallet authority. */
+export class KeelStudioAgentError extends Error {
+  readonly status: number;
+  readonly code: string;
+  readonly retryable: boolean;
+  readonly nextAction: "refresh-status" | "reconnect" | "request-scope" | "retry" | "correct-input";
+  constructor(message: string, status: number, _details?: unknown, _secrets: readonly string[] = []) {
+    super(message); this.name = "KeelStudioAgentError"; this.status = status;
+    // Derive only known safe actions from HTTP status. Never propagate arbitrary server instructions or secrets.
+    this.code = ({ 401: "unauthenticated", 403: "permission-denied", 404: "not-found", 409: "stale-state", 422: "blocked" } as Record<number, string>)[status] ?? (status >= 500 ? "unavailable" : "invalid-request");
+    this.retryable = status === 429 || status >= 500;
+    this.nextAction = status === 401 ? "reconnect" : status === 403 ? "request-scope" : [404, 409, 422].includes(status) ? "refresh-status" : this.retryable ? "retry" : "correct-input";
+  }
+}
+const stateQuery = (state?: KeelStudioAgentStateBinding) => state === undefined ? "" : `expectedState=${encodeURIComponent(JSON.stringify(parseKeelStudioAgentStateBinding(state)))}`;
+const stateBody = (state?: KeelStudioAgentStateBinding) => state === undefined ? {} : { expectedState: parseKeelStudioAgentStateBinding(state) };
+
 export async function studioAgentResponse<T>(response: Response, secrets: readonly string[]): Promise<T> {
   let value: unknown;
   try {
     value = await response.json();
   } catch {
-    throw new Error(`KEEL Studio agent draft API returned HTTP ${response.status} without JSON.`);
+    throw new KeelStudioAgentError(`KEEL Studio agent draft API returned HTTP ${response.status} without JSON.`, response.status);
   }
   if (!response.ok) {
     const message = value !== null && typeof value === "object" && typeof (value as { error?: unknown }).error === "string"
       ? (value as { error: string }).error
       : `KEEL Studio agent draft API failed with HTTP ${response.status}.`;
-    throw new Error(redactSensitiveMessage(message, secrets));
+    throw new KeelStudioAgentError(redactSensitiveMessage(message, secrets), response.status, value, secrets);
   }
   return value as T;
 }
@@ -462,14 +490,25 @@ export function createKeelStudioAgentDraftClient(options: KeelStudioAgentDraftCl
     // Derive only the existing release route from the persisted server slug.
     // Never forward a token, caller-provided URL, or unsigned calldata in the link.
     const reviewUrl = endpoint(options.studioUrl ?? KEEL_STUDIO_URL, `/release/${encodeURIComponent(release.slug)}`).href;
-    return Object.freeze({ ...release, reviewUrl });
+    return Object.freeze({ ...release, ...(release.agentProgress === undefined ? {} : { agentProgress: parseKeelStudioAgentProgress(release.agentProgress, { releaseId: release.id, revision: release.revision }) }), reviewUrl });
   };
-  const list = async (): Promise<KeelStudioAgentDraftWorkspace> => {
-    const workspace = await studioAgentResponse<KeelStudioAgentDraftWorkspace>(await studioAgentRequest(options, "/api/agent/drafts", { cache: "no-store" }), [options.grantToken]);
-    return { ...workspace, releases: workspace.releases.map(reviewed) };
+  const list = async (query: KeelStudioAgentWorkspaceQuery = {}): Promise<KeelStudioAgentDraftWorkspace> => {
+    if (Object.keys(query).some(key => !["limit", "cursor", "projectId"].includes(key)) || query.limit !== undefined && (!Number.isSafeInteger(query.limit) || query.limit < 1 || query.limit > 100)
+      || query.cursor !== undefined && (typeof query.cursor !== "string" || query.cursor.length > 4096)
+      || query.projectId !== undefined && !/^[0-9a-f]{8}(?:-[0-9a-f]{4}){3}-[0-9a-f]{12}$/iu.test(query.projectId)) throw new TypeError("Invalid workspace page request.");
+    const params = new URLSearchParams(Object.entries(query).filter(([, value]) => value !== undefined).map(([key, value]) => [key, String(value)]));
+    const workspace = await studioAgentResponse<KeelStudioAgentDraftWorkspace>(await studioAgentRequest(options, `/api/agent/drafts${params.size ? `?${params}` : ""}`, { cache: "no-store" }), [options.grantToken]);
+    const page = workspace.pagination;
+    if (page && (!Number.isSafeInteger(page.limit) || page.limit < 1 || page.limit > 100 || typeof page.hasMore !== "boolean" || page.hasMore !== (page.nextCursor !== null)
+      || page.nextCursor !== null && (typeof page.nextCursor !== "string" || page.nextCursor.length > 4096) || page.order !== "created-desc-id-desc" || !Number.isFinite(Date.parse(page.snapshotAt)))) throw new TypeError("Invalid workspace pagination.");
+    if (workspace.ownerId !== undefined && [...workspace.projects, ...workspace.releases].some(item => {
+      const progress = item.agentProgress as KeelStudioAgentProgress | undefined;
+      return progress !== undefined && progress.binding?.ownerId !== workspace.ownerId;
+    })) throw new TypeError("Studio returned progress for another workspace owner.");
+    return { ...workspace, projects: workspace.projects.map(project => ({ ...project, ...(project.agentProgress === undefined ? {} : { agentProgress: parseKeelStudioAgentProgress(project.agentProgress, { projectId: String(project.id) }) }) })), releases: workspace.releases.map(reviewed) };
   };
-  const read = async (releaseId: string): Promise<KeelStudioAgentReleaseView> =>
-      reviewed(await studioAgentResponse(await studioAgentRequest(options, releasePath(releaseId), { cache: "no-store" }), [options.grantToken]));
+  const read = async (releaseId: string, expectedState?: KeelStudioAgentStateBinding): Promise<KeelStudioAgentReleaseView> =>
+      reviewed(await studioAgentResponse(await studioAgentRequest(options, `${releasePath(releaseId)}${expectedState ? `?${stateQuery(expectedState)}` : ""}`, { cache: "no-store" }), [options.grantToken]));
   const cancelReview = async (releaseId: string, expectedRevision: number, operationId: string): Promise<KeelStudioReviewCancellation> => {
     if (!Number.isSafeInteger(expectedRevision) || expectedRevision < 1 || typeof operationId !== "string" || !/^[0-9a-f]{8}(?:-[0-9a-f]{4}){3}-[0-9a-f]{12}$/iu.test(operationId)) throw new TypeError("Cancel review needs its exact saved revision and operation.");
     const value = await studioAgentResponse<KeelStudioReviewCancellation>(await studioAgentRequest(options, `${releasePath(releaseId)}/review/cancel`, {
@@ -480,10 +519,10 @@ export function createKeelStudioAgentDraftClient(options: KeelStudioAgentDraftCl
       || value.uploadedBytes !== 0 || value.signing !== "not-performed" || value.submission !== "not-performed") throw new TypeError("Studio did not verify cancellation of this exact unsubmitted review.");
     return value;
   };
-  const continuePublication = async (releaseId: string, expectedRevision: number): Promise<KeelStudioReleaseContinuation> => {
+  const continuePublication = async (releaseId: string, expectedRevision: number, continuation: { readonly expectedOperationId?: string; readonly expectedState?: KeelStudioAgentStateBinding } = {}): Promise<KeelStudioReleaseContinuation> => {
     if (!Number.isSafeInteger(expectedRevision) || expectedRevision < 1) throw new TypeError("Continue needs the current saved release revision.");
     const value = await studioAgentResponse<KeelStudioReleaseContinuation>(await studioAgentRequest(options, `${releasePath(releaseId)}/continue`, {
-      method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ expectedRevision }),
+      method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ expectedRevision, ...(continuation.expectedOperationId === undefined ? {} : { expectedOperationId: continuation.expectedOperationId }), ...stateBody(continuation.expectedState) }),
     }), [options.grantToken]);
     const actions = { "review-required": ["prepare-review"], "owner-observation-required": ["record-owner-observation"],
       pending: ["retry-saved-progress", "reconcile-wallet-response"], blocked: ["retry-saved-progress"], published: ["view-publication"] };
@@ -494,7 +533,7 @@ export function createKeelStudioAgentDraftClient(options: KeelStudioAgentDraftCl
       || value.diagnostic && (value.diagnostic.releaseId !== releaseId || value.diagnostic.revision !== expectedRevision || value.diagnostic.metadataReadCall !== undefined)) {
       throw new TypeError("Studio returned invalid saved publication progress.");
     }
-    return value;
+    return { ...value, ...(value.agentProgress === undefined ? {} : { agentProgress: parseKeelStudioAgentProgress(value.agentProgress, { releaseId, revision: expectedRevision }) }) };
   };
   const storageRecovery = async (projectId: string): Promise<KeelStudioStorageRecovery> => {
     if (typeof projectId !== "string" || !/^[0-9a-f]{8}(?:-[0-9a-f]{4}){3}-[0-9a-f]{12}$/iu.test(projectId)) throw new TypeError("Storage recovery needs the existing project ID.");
@@ -609,19 +648,25 @@ export function createKeelStudioAgentDraftClient(options: KeelStudioAgentDraftCl
     if (selected.snapshot.id !== profileId || selected.snapshot.revision !== expectedProfileRevision || value.signing !== "not-performed" || value.submission !== "not-performed") throw new TypeError("Studio returned another profile or an invalid selection receipt.");
     return selected;
   };
-  const prepareReview = async (releaseId: string, expectedRevision: number): Promise<KeelStudioReleaseWalletReview> => {
+  const walletReview = async (releaseId: string, expectedRevision: number, expectedState?: KeelStudioAgentStateBinding, operationId?: string): Promise<KeelStudioReleaseWalletReview> => {
     if (!/^[0-9a-f]{8}(?:-[0-9a-f]{4}){3}-[0-9a-f]{12}$/iu.test(releaseId) || !Number.isSafeInteger(expectedRevision) || expectedRevision < 1) throw new TypeError("Use the saved release UUID and current reviewed revision.");
-    const value = await studioAgentResponse<KeelStudioReleaseWalletReview>(await studioAgentRequest(options, `${releasePath(releaseId)}/review`, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ expectedRevision }) }), [options.grantToken]);
+    const value = await studioAgentResponse<KeelStudioReleaseWalletReview>(await studioAgentRequest(options, `${releasePath(releaseId)}/review${operationId ? `?revision=${expectedRevision}&operation=${encodeURIComponent(operationId)}&${stateQuery(expectedState)}` : ""}`, operationId ? { cache: "no-store" } : { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ expectedRevision, ...stateBody(expectedState) }) }), [options.grantToken]);
     const prepared = value.preparation;
     if (value.schema !== "keel-release-wallet-review@1" || value.releaseId !== releaseId || value.revision !== expectedRevision || value.signing !== "not-performed" || value.submission !== "not-performed"
       || !/^0x[0-9a-f]{40}$/iu.test(value.wallet) || !prepared || !/^[0-9a-f]{8}(?:-[0-9a-f]{4}){3}-[0-9a-f]{12}$/iu.test(prepared.operationId)
+      || operationId !== undefined && prepared.operationId !== operationId
       || !Number.isSafeInteger(prepared.chainId) || prepared.chainId < 1 || !Array.isArray(prepared.calls) || prepared.calls.length < 1 || prepared.calls.length > 8
       || !Array.from(prepared.calls).every(call => call && typeof call.kind === "string" && /^0x[0-9a-f]{40}$/iu.test(call.to) && /^0x(?:[0-9a-f]{2})*$/iu.test(call.data) && /^(?:0|[1-9][0-9]*|0x[0-9a-f]+)$/iu.test(call.value))) throw new TypeError("Studio returned another or invalid wallet-review identity.");
     return { ...value, ...(value.execution === undefined ? {} : { execution: parseKeelExecutionAuthority(value.execution, { releaseId, revision: expectedRevision, operationId: prepared.operationId, wallet: value.wallet }) }), reviewUrl: endpoint(options.studioUrl ?? KEEL_STUDIO_URL, `/studio/releases/${encodeURIComponent(releaseId)}/review?operation=${encodeURIComponent(prepared.operationId)}&revision=${expectedRevision}`).href };
   };
-  const storageReview = async (projectId: string): Promise<KeelStudioStorageReview> => {
+  const prepareReview = (releaseId: string, expectedRevision: number, expectedState?: KeelStudioAgentStateBinding) => walletReview(releaseId, expectedRevision, expectedState);
+  const readReview = (releaseId: string, expectedRevision: number, operationId: string, expectedState?: KeelStudioAgentStateBinding) => {
+    if (!/^[0-9a-f]{8}(?:-[0-9a-f]{4}){3}-[0-9a-f]{12}$/iu.test(operationId)) throw new TypeError("Read review needs the exact saved operation.");
+    return walletReview(releaseId, expectedRevision, expectedState, operationId);
+  };
+  const storageReview = async (projectId: string, expectedState?: KeelStudioAgentStateBinding): Promise<KeelStudioStorageReview> => {
     if (!/^[0-9a-f]{8}(?:-[0-9a-f]{4}){3}-[0-9a-f]{12}$/iu.test(projectId)) throw new TypeError("Use this project's Studio UUID.");
-    const value = await studioAgentResponse<KeelStudioStorageReview>(await studioAgentRequest(options, `/api/agent/projects/${encodeURIComponent(projectId)}/storage-review`, { method: "POST" }), [options.grantToken]);
+    const value = await studioAgentResponse<KeelStudioStorageReview>(await studioAgentRequest(options, `/api/agent/projects/${encodeURIComponent(projectId)}/storage-review`, { method: "POST", ...(expectedState === undefined ? {} : { headers: { "content-type": "application/json" }, body: JSON.stringify(stateBody(expectedState)) }) }), [options.grantToken]);
     if (value.projectId !== projectId || value.signing !== "not-performed" || value.submission !== "not-performed" || !["complete", "approval-required", "resume", "pending-approval-receipt", "blocked", "failed"].includes(value.status) || typeof value.walletApprovalRequired !== "boolean") throw new TypeError("Studio returned an unexpected storage review.");
     return { ...value, reviewUrl: endpoint(options.studioUrl ?? KEEL_STUDIO_URL, `/artifacts/${encodeURIComponent(projectId)}?studio=1`).href };
   };
@@ -642,7 +687,7 @@ export function createKeelStudioAgentDraftClient(options: KeelStudioAgentDraftCl
       body: JSON.stringify({ draft: validated, expectedRevision }),
     }), [options.grantToken]));
   };
-  return Object.freeze<KeelStudioAgentDraftClient>({ list, read, diagnose, continuePublication, cancelReview, storageRecovery, recover, recoverWalletRejection, profiles: () => profiles(), editProfiles: profiles, selectProfile, plan: releaseId => planning(releaseId), editPlan: planning, conversation: async releaseId => await conversation(releaseId) as KeelStudioReleaseConversation, suggest: async (releaseId, suggestion) => await conversation(releaseId, suggestion) as KeelStudioConversationSuggestionReceipt, defaults: () => defaults(), effectiveBuildDefaults: async input => resolveKeelBuildDefaults((await defaults()).profile, input), editDefaults: defaults, prepareReview, storageReview, create, update });
+  return Object.freeze<KeelStudioAgentDraftClient>({ list, read, diagnose, continuePublication, cancelReview, storageRecovery, recover, recoverWalletRejection, profiles: () => profiles(), editProfiles: profiles, selectProfile, plan: releaseId => planning(releaseId), editPlan: planning, conversation: async releaseId => await conversation(releaseId) as KeelStudioReleaseConversation, suggest: async (releaseId, suggestion) => await conversation(releaseId, suggestion) as KeelStudioConversationSuggestionReceipt, defaults: () => defaults(), effectiveBuildDefaults: async input => resolveKeelBuildDefaults((await defaults()).profile, input), editDefaults: defaults, prepareReview, readReview, storageReview, create, update });
 }
 
 function validatePlanningIdentity(command: { readonly commandId: string; readonly expectedRevision: number }): void {
@@ -680,18 +725,18 @@ function operationDraft(config: KeelStudioAgentDraftOperationConfig): KeelStudio
 /** Execute one explicitly configured, creator-scoped draft operation. */
 export async function executeKeelStudioAgentDraftOperation(config: KeelStudioAgentDraftOperationConfig): Promise<KeelStudioAgentDraftOperationResult> {
   if (config === null || typeof config !== "object" || !isDraftOperation(config.operation)) throw new TypeError("Studio agent draft operation is unsupported.");
-  const supported = new Set(["studioUrl", "grantToken", "operation", "releaseId", "projectId", "draft", "expectedRevision", "planningCommand", "defaultsCommand", "profileCommand", "profileSelection", "conversationCommand", "includeReadCall", "operationId", "transactionHashes", "recoveryInput", "fetchImplementation"]);
+  const supported = new Set(["studioUrl", "grantToken", "operation", "releaseId", "projectId", "draft", "expectedRevision", "planningCommand", "defaultsCommand", "profileCommand", "profileSelection", "conversationCommand", "includeReadCall", "operationId", "transactionHashes", "recoveryInput", "fetchImplementation", "expectedState", "expectedOperationId", "limit", "cursor"]);
   for (const key of Object.keys(config)) if (!supported.has(key)) throw new TypeError(`Studio agent draft configuration.${key} is not supported.`);
   const client = createKeelStudioAgentDraftClient(config);
   switch (config.operation) {
-    case "list": return client.list();
-    case "read": return client.read(operationReleaseId(config));
+    case "list": return client.list({ ...(config.limit === undefined ? {} : { limit: config.limit }), ...(config.cursor === undefined ? {} : { cursor: config.cursor }), ...(config.projectId === undefined ? {} : { projectId: config.projectId }) });
+    case "read": return client.read(operationReleaseId(config), config.expectedState);
     case "recover": return client.recover(operationReleaseId(config), config.operationId!, config.transactionHashes ?? []);
     case "recover-wallet-rejection": {
       if (!config.recoveryInput) throw new TypeError("recover-wallet-rejection requires the diagnostic recoveryInput and an explicitly confirmed typed wallet rejection.");
       return client.recoverWalletRejection(operationReleaseId(config), config.recoveryInput);
     }
-    case "continue-publication": return client.continuePublication(operationReleaseId(config), config.expectedRevision!);
+    case "continue-publication": return client.continuePublication(operationReleaseId(config), config.expectedRevision!, { ...(config.expectedOperationId === undefined ? {} : { expectedOperationId: config.expectedOperationId }), ...stateBody(config.expectedState) });
     case "cancel-review": return client.cancelReview(operationReleaseId(config), config.expectedRevision!, config.operationId!);
     case "storage-recovery": return client.storageRecovery(config.projectId!);
     case "diagnose": return client.diagnose(operationReleaseId(config), config.includeReadCall === undefined ? {} : { includeReadCall: config.includeReadCall });
@@ -715,10 +760,11 @@ export async function executeKeelStudioAgentDraftOperation(config: KeelStudioAge
       if (!config.defaultsCommand) throw new TypeError("defaults-edit requires an explicit defaultsCommand and preferences:write permission.");
       return client.editDefaults(config.defaultsCommand);
     }
-    case "prepare-review": return client.prepareReview(operationReleaseId(config), config.expectedRevision!);
+    case "read-review": return client.readReview(operationReleaseId(config), config.expectedRevision!, config.operationId!, config.expectedState);
+    case "prepare-review": return client.prepareReview(operationReleaseId(config), config.expectedRevision!, config.expectedState);
     case "storage-review": {
       if (!config.projectId) throw new TypeError("storage-review requires the creator's projectId.");
-      return client.storageReview(config.projectId);
+      return client.storageReview(config.projectId, config.expectedState);
     }
     case "plan-edit": {
       if (!config.planningCommand) throw new TypeError("plan-edit requires a typed planningCommand.");
