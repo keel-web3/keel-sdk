@@ -71,7 +71,7 @@ needed. This closes the original broker restart blocker.
 
 | Item | Proposed hard bound or behavior |
 | --- | --- |
-| Additional container memory | 768 MiB total for broker and one executor |
+| Additional container memory | 768 MiB total for broker and one executor; memory-swap equals memory, so no container swap |
 | CPU | At most 2 CPU cores, not a reservation |
 | PIDs | 64 |
 | Filesystem | Read-only image; 16 MiB noexec/nosuid temporary socket volume |
@@ -185,21 +185,39 @@ account, code or storage request was made. No retry, route change or fallback
 provider was attempted. This does not establish PublicNode proof capability or
 availability from the production host.
 
-## Approved public-only operator format probe
+## Operator findings and remaining deployment gates — 12:36 UTC
 
-The cloud route remains stopped after its first pre-HTTP failure. On the already
-approved operator route, use the reviewed script from this exact SDK commit:
+The operator reports four host CPUs, 4.93 GiB available RAM, 54.97 GiB available
+disk and no swap. Studio is capped at two CPUs and the proposed runner at two;
+together they can consume the host ceiling. Keep concurrency one and verify
+Studio responsiveness during the exact saved-plan check before activation.
+The actual Next process runs as UID:GID 999:999. Use that identity for the broker
+and socket directory; no new account is needed.
 
-```sh
-python3 scripts/qualify-public-proof-source.py --run-approved-public-probe --output /tmp/keel-public-proof-format.json
-```
+The dedicated 0700 directory and 0600 socket owned by 999:999 do not exist yet.
+Their creation and the new read-only Studio mount are new persistent IPC access
+and require exact approval before enablement. The broker's mount alone is
+writable. The proposed shared tmpfs is 16 MiB, noexec/nosuid, and contains only
+the socket and startup lock. Neither runtime receives additional host control.
 
-It performs at most nine serial requests to the fixed approved PublicNode Sepolia
-URL, waits one second between reads, bounds each response at 2 MiB and 15 seconds,
-and never follows redirects or retries. It uses only the fixed public test
-account and the public EIP-4788 system contract, a pinned header, two public
-system slots, parent linkage and a final canonical recheck. It stops on the first
-network, HTTP or RPC failure. Do not replace its addresses, slots or recipient.
-The mode-0600 local JSON file contains public responses for offline proof/code
-verification. Format success alone is not cryptographic verification, live plan
-qualification or publication. No probe is run automatically by builds or CI.
+No paid RPC is configured in the Studio environment or chain row. The first
+paced PublicNode request from the operator route returned HTTP 403, before any
+proof/code request. Both that route and the earlier blocked cloud route remain
+stopped: no retry, alternate route or provider substitution. The public-only
+format-probe script is retained as a reviewable qualification procedure, but
+must not be run against the denied route. No source is presently qualified.
+
+Minimum source capability: Sepolia eth_chainId, canonical eth_getBlockByNumber,
+eth_getBlockByHash, and eth_getProof/eth_getCode accepting the exact EIP-1898
+blockHash plus requireCanonical selector. Each proof requests at most one slot.
+Responses must fit 2 MiB and 15 seconds; reads are paced at least 250 ms apart,
+with preserved cooldown/access restrictions. Native execution has a 180-second
+wall bound and a 10,000-read ceiling. Actual plan throughput remains unmeasured.
+No eth_call, eth_simulateV1, submission endpoint or full node sync is required
+from this provider. A new paid account, credential or address/slot recipient
+needs separate explicit authorization; configuration alone does not supply it.
+
+The user removed the previous rollback image and old backup paths. Eleven data
+volumes were preserved. Reacquire and independently verify the existing rollback
+CI artifact (available until October 17) or reconstruct it in cloud before any
+rollout; do not claim a local rollback copy exists. Do no further VPS cleanup.

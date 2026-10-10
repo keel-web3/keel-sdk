@@ -21,7 +21,7 @@ const sock=join(directory,'socket');mkdirSync(sock,{mode:0o700});
 const socketPath=join(sock,'runner.sock');
 let digest;
 function start({name=container,expected=digest,wall='3s',binaryPath='/artifacts/executor',mode='ro',extra=[]}={}){
- return docker('run','--pull=never','-d','--name',name,'--init','--network','none','--memory','768m','--cpus','2','--pids-limit','64','--read-only','--cap-drop','ALL','--security-opt','no-new-privileges','--user',`${uid}:${process.getgid()}`,'-e','SECRET_FIXTURE=must-not-reach-child','-v',`${directory}:/artifacts:${mode}`,'-v',`${sock}:/run/keel-proof:rw`,'--entrypoint','/artifacts/runner',image,'--binary',binaryPath,'--sha256',expected,'--socket','/run/keel-proof/runner.sock','--uid',String(uid),'--wall-time',wall,...extra);
+ return docker('run','--pull=never','-d','--name',name,'--init','--network','none','--memory','768m','--memory-swap','768m','--cpus','2','--pids-limit','64','--read-only','--cap-drop','ALL','--security-opt','no-new-privileges','--user',`${uid}:${process.getgid()}`,'-e','SECRET_FIXTURE=must-not-reach-child','-v',`${directory}:/artifacts:${mode}`,'-v',`${sock}:/run/keel-proof:rw`,'--entrypoint','/artifacts/runner',image,'--binary',binaryPath,'--sha256',expected,'--socket','/run/keel-proof/runner.sock','--uid',String(uid),'--wall-time',wall,...extra);
 }
 async function waitSocket(){for(let i=0;i<100;i++){if(existsSync(socketPath))return;await delay(20);}throw new Error('runner socket did not appear');}
 function request(mode,{spawnExecutor=createIsolatedRunnerSpawner({socketPath,binarySha256:digest})}={}){

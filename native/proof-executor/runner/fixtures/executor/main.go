@@ -9,6 +9,7 @@ import (
 	"os"
 	"os/exec"
 	"runtime"
+	"runtime/debug"
 	"syscall"
 	"time"
 )
@@ -38,6 +39,10 @@ func main() {
 		return
 	}
 	if request.Mode == "memory" {
+		// Deliberately bypass Go's soft target in this synthetic fixture so the
+		// test proves the container's hard boundary, not garbage-collector pacing.
+		debug.SetGCPercent(-1)
+		debug.SetMemoryLimit(1 << 60)
 		var blocks [][]byte
 		for i := 0; i < 64; i++ {
 			block := make([]byte, 16*1024*1024)
