@@ -76,6 +76,9 @@ for each new check and adds the maintained index's candidates. Normal RPC
 environment configuration replaces defaults, so calling the ordinary Node
 resolver with one `KEEL_RPC_URL` would not restore this pool. An explicit
 `KEEL_PUBLICATION_SIMULATION_RPC_URL` remains a single-recipient override.
+`KEEL_PUBLICATION_SIMULATION_RPC_URLS` supplies a replacement candidate list
+through the existing resolver's one-to-six endpoint validation. Configure one
+form, not both; candidate configuration is distinct from private-data approval.
 
 For each candidate, qualify public chain/fork/header/fee/nonce/pre-refund
 behavior before any private calldata. Recheck the exact selected block hash.

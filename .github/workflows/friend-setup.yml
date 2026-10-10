@@ -33,7 +33,7 @@ jobs:
       - name: Record approved public-only HTTPS capacity (not private-plan proof)
         run: node scripts/probe-approved-sepolia-http.mjs
       - name: Record indexed public-only pool qualification (no project data)
-        run: node scripts/check-public-simulation-pool.mjs --public-only > public-simulation-pool-evidence.json
+        run: node scripts/check-public-simulation-pool.mjs --public-only | tee public-simulation-pool-evidence.json
       - uses: actions/upload-artifact@v4
         with:
           name: public-simulation-pool-evidence
