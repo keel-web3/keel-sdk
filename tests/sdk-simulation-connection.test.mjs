@@ -197,7 +197,12 @@ test('a disconnected retained socket fails the current check and permits a fully
 test('unknown provider errors expose only the failed public capability stage', async () => {
   const node = socket({ probeError: { code: 403, message: 'https://private-secret/' } });
   const t = createPinnedKeelSepoliaSimulationTransport(async () => node);
-  await assert.rejects(t.request(program), error => error.kind === 'rpc-unavailable' && error.diagnostic.stage === 'read-capacity' && !error.message.includes('private-secret'));
+  await assert.rejects(t.request(program), error => {
+    assert.equal(error.kind,'rpc-unavailable');assert.equal(error.diagnostic.stage,'read-capacity');
+    assert.equal(error.diagnostic.rpcMethod,'eth_simulateV1');assert.equal(error.diagnostic.rpcCode,403);
+    assert.equal(error.diagnostic.phase,'public-qualification');assert.equal(error.diagnostic.socketReadyState,1);
+    assert.doesNotMatch(JSON.stringify(error),/private-secret|https:/);return true;
+  });
   assert.equal(node.closed, 1); assert.equal(hasProgram(node), false);
 });
 
@@ -206,6 +211,19 @@ test('post-qualification program clamping is bounded, never lowers gas, and rema
   await assert.rejects(t.request(program),e=>e.kind==='provider-limit'&&e.diagnostic.providerGasCap==='50000000'&&e.diagnostic.connectionAttempts===3);
   assert.equal(nodes.length,3);for(const n of nodes){assert.equal(n.closed,1);assert.deepEqual(simulationRequests(n).at(-1).params,[{...program.params[0],returnFullTransactions:true},'0x12']);}
   await t.close();
+});
+
+test('unknown project RPC failures retain socket diagnostics and require a new fully qualified saved check', async()=>{
+  const nodes=[socket(),socket()];const request=nodes[0].requestAsync.bind(nodes[0]);let count=0;
+  nodes[0].requestAsync=async args=>args.body.method==='eth_simulateV1'&&args.body.params[0].blockStateCalls[0].calls[0].data==='0x1234'
+    ? {error:{code:-32098,message:'PRIVATE https://secret.invalid/0x1234',cause:{code:'ECONNRESET'}}} : request(args);
+  const t=createPinnedKeelSepoliaSimulationTransport(async()=>nodes[count++]);
+  await assert.rejects(t.request(program),error=>{
+    assert.equal(error.kind,'rpc-unavailable');assert.equal(error.diagnostic.rpcCode,-32098);assert.equal(error.diagnostic.transportCode,'ECONNRESET');
+    assert.equal(error.diagnostic.rpcMethod,'eth_simulateV1');assert.equal(error.diagnostic.phase,'project-request');assert.equal(error.diagnostic.socketReadyState,1);
+    assert.doesNotMatch(JSON.stringify(error),/PRIVATE|secret.invalid|0x1234/);return true;
+  });
+  assert.equal(count,1);assert.equal(nodes[0].closed,1);await t.request(program);assert.equal(count,2);assert.equal(hasProgram(nodes[1]),true);await t.close();
 });
 
 test('the incident 50m provider cap selects a compatible connection before sending the unchanged 200m program', async () => {

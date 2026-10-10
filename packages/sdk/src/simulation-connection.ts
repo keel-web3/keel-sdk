@@ -1,4 +1,4 @@
-import { KeelPublicationSimulationError, type KeelPreflightTransport } from "./publication-preflight.js";
+import { KeelPublicationSimulationError, keelSimulationTransportFailure, type KeelPreflightTransport } from "./publication-preflight.js";
 import { assertKeelAmsterdamSimulationHeader, resolveKeelTransactionGasPolicy } from "./transaction-gas-policy.js";
 
 export interface KeelSimulationSocket {
@@ -48,13 +48,15 @@ export function createPinnedKeelSepoliaSimulationTransport(connect: () => Promis
   const select = async (requiredGas?: bigint) => {
     let rpc: KeelSimulationSocket | undefined;
     let stage = "connection";
+    let method: string | undefined;
+    const qualifiedCall = (body: { readonly method: string; readonly params: readonly unknown[] }) => { method = body.method; return call(rpc!, body); };
     const unsupported = (message: string): never => { throw new KeelPublicationSimulationError("unsupported-simulation", message, { stage }); };
     try {
       rpc = await connect();
       stage = "chain";
-      if (quantity(await call(rpc, { method: "eth_chainId", params: [] })) !== 11155111n) throw new KeelPublicationSimulationError("wrong-chain", "The configured simulator did not return Sepolia.", { stage });
+      if (quantity(await qualifiedCall({ method: "eth_chainId", params: [] })) !== 11155111n) throw new KeelPublicationSimulationError("wrong-chain", "The configured simulator did not return Sepolia.", { stage });
       stage = "snapshot";
-      const block = object(await call(rpc, { method: "eth_getBlockByNumber", params: ["latest", false] }));
+      const block = object(await qualifiedCall({ method: "eth_getBlockByNumber", params: ["latest", false] }));
       const timestamp = quantity(block?.timestamp), limit = quantity(block?.gasLimit), number = quantity(block?.number), baseFee = quantity(block?.baseFeePerGas);
       if (timestamp === undefined || limit === undefined || limit <= 0n || number === undefined || baseFee === undefined
         || typeof block?.hash !== "string" || !/^0x[0-9a-f]{64}$/iu.test(block.hash)) unsupported("The simulator did not return a verifiable selected-chain snapshot.");
@@ -70,9 +72,9 @@ export function createPinnedKeelSepoliaSimulationTransport(connect: () => Promis
       // Read actual pinned public state; qualification and project calls are override-free.
       const sender = "0x0000000000000000000000000000000000000000";
       stage = "public-account";
-      const nonce = quantity(await call(rpc, { method: "eth_getTransactionCount", params: [sender, block!.number] }));
-      const balance = quantity(await call(rpc, { method: "eth_getBalance", params: [sender, block!.number] }));
-      const code = await call(rpc, { method: "eth_getCode", params: [sender, block!.number] });
+      const nonce = quantity(await qualifiedCall({ method: "eth_getTransactionCount", params: [sender, block!.number] }));
+      const balance = quantity(await qualifiedCall({ method: "eth_getBalance", params: [sender, block!.number] }));
+      const code = await qualifiedCall({ method: "eth_getCode", params: [sender, block!.number] });
       if (nonce === undefined || nonce >= 18_446_744_073_709_551_614n || balance === undefined || code !== "0x") unsupported("The fixed public qualification account did not return a usable pinned nonce, balance and empty code.");
       const gasPrice = `0x${(baseFee! * 2n + 1n).toString(16)}`;
       if (balance! < (probeGas + 21_000n) * BigInt(gasPrice)) unsupported("The fixed public qualification account lacks the observed balance for an override-free strict capacity check.");
@@ -82,7 +84,7 @@ export function createPinnedKeelSepoliaSimulationTransport(connect: () => Promis
       const probe = (validation: boolean, blocks = blockStateCalls) => ({ method: "eth_simulateV1", params: [{ blockStateCalls: blocks, validation, traceTransfers: false, returnFullTransactions: true }, block!.number] });
       for (const validation of [false, true]) {
         stage = validation ? "strict-capacity" : "read-capacity";
-        const request = probe(validation), evidence = await call(rpc, request);
+        const request = probe(validation), evidence = await qualifiedCall(request);
         assertKeelSimulationEnvelopes(request, evidence);
         let parent = block!;
         for (const [index, item] of (evidence as unknown[]).entries()) {
@@ -105,22 +107,22 @@ export function createPinnedKeelSepoliaSimulationTransport(connect: () => Promis
       // actually enabled. Demand the specified nonce-too-high rejection as well.
       stage = "strict-nonce";
       let rejectedNonce = false;
-      try { await call(rpc, probe(true, [{ calls: [{ ...empty, gas: "0x5208", nonce: nextNonce }] }])); }
+      try { await qualifiedCall(probe(true, [{ calls: [{ ...empty, gas: "0x5208", nonce: nextNonce }] }])); }
       catch (error) { if (object(error)?.code === -38011) rejectedNonce = true; else throw error; }
       if (!rejectedNonce) unsupported("The simulator did not enforce strict transaction nonce validation.");
       stage = "snapshot-recheck";
-      const current = object(await call(rpc, { method: "eth_getBlockByNumber", params: [block!.number, false] }));
+      const current = object(await qualifiedCall({ method: "eth_getBlockByNumber", params: [block!.number, false] }));
       if (current?.hash !== block!.hash || current?.number !== block!.number || current?.timestamp !== block!.timestamp || current?.gasLimit !== block!.gasLimit)
         throw new KeelPublicationSimulationError("chain-reorganized", "The selected simulator snapshot changed during qualification. Recheck from a current block.", { stage });
       if (closed) throw new KeelPublicationSimulationError("rpc-unavailable", "The pinned simulator transport was closed.");
       qualifiedProbeGas = probeGas;
       return rpc;
     } catch (error) {
+      const classified = keelSimulationTransportFailure(error, { ...(method === undefined ? {} : { method }), phase: "public-qualification", ...(rpc === undefined ? {} : { socketReadyState: rpc.socket.readyState }) });
       if (rpc) closeSocket(rpc);
-      if (error instanceof KeelPublicationSimulationError) throw error;
-      if (object(error)?.code === -32601) unsupported("The configured RPC does not support the required publication-simulation method.");
-      // Do not surface endpoint URLs, provider internals or arbitrary error text.
-      throw new KeelPublicationSimulationError("rpc-unavailable", "The configured simulator could not complete public capability qualification. No project calldata was sent.", { stage });
+      throw new KeelPublicationSimulationError(classified.kind, classified.kind === "rpc-unavailable"
+        ? "The configured simulator could not complete public capability qualification. No project calldata was sent." : classified.message,
+        { ...classified.diagnostic, stage });
     }
   };
   return {
@@ -168,8 +170,9 @@ export function createPinnedKeelSepoliaSimulationTransport(connect: () => Promis
           if (closed) throw new KeelPublicationSimulationError("rpc-unavailable", "The pinned simulator transport was closed.");
           return result;
         } catch (error) {
-          const unavailable = error instanceof KeelPublicationSimulationError && error.kind === "rpc-unavailable";
-          if (!gasClamp(error) && !unavailable) throw error;
+          const classifiedError = error instanceof KeelPublicationSimulationError ? error : keelSimulationTransportFailure(error, { method: exact.method, phase: "project-request", ...(rpc === undefined ? {} : { socketReadyState: rpc.socket.readyState }) });
+          const unavailable = classifiedError.kind === "rpc-unavailable";
+          if (!gasClamp(classifiedError) && !unavailable) throw classifiedError;
           if (rpc) retired.add(rpc);
           if (selected === candidate) {
             selected = undefined; qualifiedProbeGas = undefined;
@@ -179,12 +182,12 @@ export function createPinnedKeelSepoliaSimulationTransport(connect: () => Promis
           // not poison every subsequent saved-plan check. Do not replay this
           // request on an uncertain failure: a fresh check requalifies first.
           if (rpc && !acquired) closeSocket(rpc);
-          if (unavailable) throw error;
+          if (unavailable) throw classifiedError;
           // A symbolic block tag could select different state on replay. Keep
           // that request blocked, even though a later fresh read may requalify.
           if (attempt === 3 || rpc && quantity(tag) === undefined) throw new KeelPublicationSimulationError("provider-limit",
             "Compatible simulation capacity is temporarily unavailable after bounded checks. Retry the saved plan; no wallet request was sent and its gas limits were not reduced.",
-            { ...error.diagnostic, connectionAttempts: attempt });
+            { ...classifiedError.diagnostic, connectionAttempts: attempt });
         } finally {
           if (rpc && acquired) {
             const count = active.get(rpc)! - 1;
