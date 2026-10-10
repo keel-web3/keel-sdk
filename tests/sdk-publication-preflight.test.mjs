@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 import { encodeAbiParameters, encodeFunctionData, parseAbi, keccak256 } from "viem";
-import { simulateKeelPublicationBeforeFunding, simulateKeelStorageBeforeFunding, assertKeelFundingPreflight, keelFundingApprovalDigest } from "../packages/sdk/dist/publication-preflight.js";
+const { simulateKeelPublicationBeforeFunding, simulateKeelStorageBeforeFunding, assertKeelFundingPreflight, keelFundingApprovalDigest, keelSimulationTransportDiagnostic } = await import(process.env.KEEL_TEST_PUBLICATION_PREFLIGHT_MODULE ?? "../packages/sdk/dist/publication-preflight.js");
 
 const reader = `0x${"11".repeat(20)}`, owner = `0x${"22".repeat(20)}`;
 const block = { number: "0x12", hash: `0x${"aa".repeat(32)}`, timestamp: "0x68f00000", gasLimit: "0x1000000" };
@@ -9,6 +9,25 @@ const expected = "data:application/json,{\"name\":\"Exact work\"}";
 const call = { from: owner, to: reader, data: "0x1234", value: "0x0", gas: "0xf4240", maxFeePerGas: "0x1000000", maxPriorityFeePerGas: "0xf4240" };
 const input = () => ({ planFingerprint: `0x${"bb".repeat(32)}`, chainId: 11155111, reader, readerRuntimeCodeHash: keccak256("0x6000"), preparationCalls: [call], metadataCall: call,
   expectedTokenURI: expected, maximumTokenUriBytes: 2_000_000, maximumReadGas: 1_000_000n, collectionOverheadGas: 10_000n, maximumTransactionGas: 16_000_000n });
+
+test('unknown RPC failures retain method, numeric code and HTTP cause without exposing payloads or credentials', async()=>{
+  const error={name:'HttpRequestError',status:502,message:'https://SECRET.invalid/key?token=PRIVATE artwork 0x1234',body:'ARTWORK',cause:{code:-32098,message:'SECRET response body',data:'PRIVATE'}};
+  await assert.rejects(simulateKeelPublicationBeforeFunding(input(),fixture({error}).transport),failure=>{
+    assert.equal(failure.kind,'rpc-unavailable');
+    assert.equal(failure.diagnostic.rpcMethod,'eth_simulateV1');assert.equal(failure.diagnostic.phase,'publication-preflight');
+    assert.equal(failure.diagnostic.rpcCode,-32098);assert.equal(failure.diagnostic.httpStatus,502);
+    assert.equal(failure.diagnostic.errorClass,'HttpRequestError');assert.equal(failure.diagnostic.causeDepth,1);
+    assert.doesNotMatch(JSON.stringify(failure),/SECRET|PRIVATE|ARTWORK|0x1234|https:/);return true;
+  });
+});
+
+test('diagnostics bound cyclic causes and allow only enumerated names, methods, phases and transport codes',()=>{
+  const nested={name:'PRIVATE',code:'PRIVATE',status:999,message:'SECRET',diagnostic:{rpcMethod:'SECRET',phase:'PRIVATE',causeClass:'SECRET',socketReadyState:99,httpStatus:888,rpcCode:Infinity}};nested.cause=nested;
+  const d=keelSimulationTransportDiagnostic(nested,{method:'PRIVATE',phase:'SECRET',socketReadyState:2});
+  assert.equal(d.socketReadyState,2);assert.equal(d.causeDepth,0);assert.ok(JSON.stringify(d).length<400);assert.doesNotMatch(JSON.stringify(d),/SECRET|PRIVATE/);
+  const timeout=keelSimulationTransportDiagnostic({name:'Error',cause:{code:'ETIMEDOUT'}},{method:'eth_getBlockByNumber',phase:'public-qualification'});
+  assert.equal(timeout.transportFailure,'timeout');assert.equal(timeout.transportCode,'ETIMEDOUT');assert.equal(timeout.rpcMethod,'eth_getBlockByNumber');
+});
 function fixture(change = {}) {
   const requests = [];
   let blockReads = 0, simulationPass = 0;
@@ -385,5 +404,18 @@ test("explicit atomic nonce survives every replay and invalid nonce fails before
     const bad = fixture();
     await assert.rejects(simulateKeelPublicationBeforeFunding({ ...planned, preparationCalls: [{ ...batch, nonce }] }, bad.transport), error => error.kind === "configuration-invalid");
     assert.equal(bad.requests.length, 0);
+  }
+});
+
+
+test('close diagnostics allow only bounded codes, classified reasons and retry counts', () => {
+  const source = { name: 'Error', diagnostic: { socketCloseCode: 1009, socketCloseReason: 'message-too-large', connectionAttempts: 3 }, cause: { name: 'SocketClosedError' } };
+  const diagnostic = keelSimulationTransportDiagnostic(source);
+  assert.equal(diagnostic.socketCloseCode, 1009); assert.equal(diagnostic.socketCloseReason, 'message-too-large');
+  assert.equal(diagnostic.connectionAttempts, 3); assert.equal(diagnostic.transportFailure, 'connection-closed');
+  for (const value of [-1, 999, 5000, Infinity, 1009.1, '1009']) {
+    const rejected = keelSimulationTransportDiagnostic({ diagnostic: { socketCloseCode: value, socketCloseReason: 'PRIVATE https://secret.invalid', connectionAttempts: 4 } });
+    assert.equal(rejected.socketCloseCode, undefined); assert.equal(rejected.socketCloseReason, undefined); assert.equal(rejected.connectionAttempts, undefined);
+    assert.doesNotMatch(JSON.stringify(rejected), /PRIVATE|secret.invalid/);
   }
 });

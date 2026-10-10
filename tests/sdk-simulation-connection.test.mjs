@@ -1,8 +1,17 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import { createPinnedKeelSepoliaSimulationTransport, assertKeelSimulationEnvelopes } from '../packages/sdk/dist/simulation-connection.js';
+import { readFileSync } from 'node:fs';
+import { pathToFileURL } from 'node:url';
+import { createRequire } from 'node:module';
+import { once } from 'node:events';
+import {encodeAbiParameters,keccak256,createPublicClient,webSocket} from 'viem';
+import {encodeKeelAtomicWalletBatch} from '../packages/sdk/dist/release-wallet-batch.js';
+import {simulateKeelPublicationBeforeFunding} from '../packages/sdk/dist/publication-preflight.js';
+const { createPinnedKeelSepoliaSimulationTransport, assertKeelSimulationEnvelopes } = await import(process.env.KEEL_TEST_SIMULATION_CONNECTION_MODULE ? pathToFileURL(process.env.KEEL_TEST_SIMULATION_CONNECTION_MODULE).href : '../packages/sdk/dist/simulation-connection.js');
+const incident = JSON.parse(readFileSync(new URL('./fixtures/gatorrr-simulator-cap-20261009.json',import.meta.url),'utf8'));
+const incidentCap = '0x'+BigInt(incident.providerGasCap).toString(16);
 
-const gas = '0xbebc200';
+const gas = '0x'+BigInt(incident.requestedGasLimit).toString(16);
 const hash = n => `0x${BigInt(n).toString(16).padStart(64, '0')}`;
 const program = { method: 'eth_simulateV1', params: [{ blockStateCalls: [{ calls: [{ gas, data: '0x1234' }] }], validation: true }, '0x12'] };
 const snapshot = { number: '0x12', hash: hash(99), timestamp: '0x6ac79200', gasLimit: gas, baseFeePerGas: '0xf', slotNumber: '0xa' };
@@ -26,7 +35,7 @@ function socket(change = {}) {
       if (body.method === 'eth_getCode') return { result: change.code ?? '0x' };
       if (body.method === 'eth_simulateV1') {
         const payload = body.params[0];
-        const isProgram = payload.blockStateCalls[0].calls[0].data === '0x1234';
+        const isProgram = payload.blockStateCalls[0].calls[0].data !== '0x';
         const negative = !isProgram && payload.blockStateCalls.length === 1 && BigInt(payload.blockStateCalls[0].calls[0].nonce) === BigInt(change.nonce ?? '0x0') + 1n;
         if (negative && !change.ignoreNonce) return { error: change.negativeError ?? { code: -38011, message: 'nonce too high' } };
         if (!isProgram && change.probeError) return { error: change.probeError };
@@ -36,7 +45,7 @@ function socket(change = {}) {
           timestamp: `0x${(BigInt(snapshot.timestamp) + BigInt(12 * (index + 1))).toString(16)}`,
           hash: hash(index + 1), parentHash: index ? hash(index) : snapshot.hash,
           blockAccessListHash: hash(index + 10), slotNumber: `0x${(11 + index).toString(16)}`,
-          transactions: b.calls.map(c => ({ ...c, gas: isProgram ? change.programCap ?? c.gas : index ? c.gas : change.cap ?? c.gas })),
+          transactions: b.calls.map(c => { const cap=isProgram?change.programCap??change.cap:change.cap;return { ...c, gas: cap&&BigInt(cap)<BigInt(c.gas)?cap:c.gas }; }),
           calls: b.calls.map(() => ({ status: isProgram && change.revert ? '0x0' : '0x1', gasUsed: '0x2ee0', maxUsedGas: '0x2ee0', returnData: '0x' })),
         }));
         if (!isProgram && change.mutate && (!change.pass || probes === change.pass)) change.mutate(result, body);
@@ -51,12 +60,13 @@ const hasProgram = node => simulationRequests(node).some(r => r.params[0].blockS
 
 async function rejectedQualification(change, kind = 'unsupported-simulation') {
   const node = socket(change); let connections = 0;
-  const transport = createPinnedKeelSepoliaSimulationTransport(async () => { connections++; return node; });
+  const transport = createPinnedKeelSepoliaSimulationTransport(async () => { connections++; return connections === 1 ? node : socket(change); });
   await assert.rejects(transport.request(program), error => error.kind === kind);
-  // Failure is cached: no fresh socket, public probe or project attempt on retry.
+  // Unsupported evidence stays blocked. Transport unavailability permits a
+  // fresh qualification on the next check, never a project attempt without it.
   const requests = node.requests.length;
   await assert.rejects(transport.request(program), error => error.kind === kind);
-  assert.equal(connections, 1); assert.equal(node.requests.length, requests);
+  assert.equal(connections, kind === 'rpc-unavailable' ? 2 : 1); assert.equal(node.requests.length, requests);
   assert.equal(node.closed, 1); assert.equal(hasProgram(node), false);
   await transport.close();
   return node;
@@ -68,7 +78,7 @@ test('qualifies capabilities on one retained socket without admitting or rejecti
     const t = createPinnedKeelSepoliaSimulationTransport(async () => { connections++; return node; });
     assert.equal(t.qualifiedProbeGas, undefined);
     await t.request(program);
-    assert.equal(t.qualifiedProbeGas, 100_000n);
+    assert.equal(t.qualifiedProbeGas, 200_000_000n);
     assert.equal(connections, 1);
     assert.ok(node.requests.every(r => r.method !== 'web3_clientVersion'));
     assert.deepEqual(simulationRequests(node).map(r => r.params[0].validation), [false, true, true, true]);
@@ -100,8 +110,13 @@ test('qualification contains only public empty calls without any state or block 
   await t.close();
 });
 
-test('a clamped public control is rejected once before project data', async () => {
-  await rejectedQualification({ cap: '0x5208' }, 'provider-limit');
+test('public capacity qualification retries at most three connections, without project data, and a fresh read can retry', async () => {
+  const nodes=[];const t=createPinnedKeelSepoliaSimulationTransport(async()=>{const node=socket({cap:'0x2faf080'});nodes.push(node);return node;});
+  for(let read=1;read<=2;read++){
+    await assert.rejects(t.request(program),e=>e.kind==='provider-limit'&&e.diagnostic.providerGasCap==='50000000'&&e.diagnostic.connectionAttempts===3);
+    assert.equal(nodes.length,read*3);assert.ok(nodes.every(n=>n.closed===1&&!hasProgram(n)));
+  }
+  await t.close();
 });
 
 test('a client name and success status cannot replace exact full gas, nonce and fee envelopes', async () => {
@@ -156,27 +171,109 @@ test('wrong chain, invalid snapshot, reorg and missing method fail closed with n
   await rejectedQualification({ probeError: { code: -32601, message: 'private-url' } });
 });
 
+test('a fresh saved-plan check requalifies after an initial connection outage instead of caching its rejected promise', async()=>{
+  let attempts=0;const node=socket();
+  const t=createPinnedKeelSepoliaSimulationTransport(async()=>{if(++attempts===1)throw Error('synthetic temporary connection failure');return node;});
+  await assert.rejects(t.request(program),e=>e.kind==='rpc-unavailable'&&e.diagnostic.stage==='connection');
+  assert.equal(attempts,1);assert.equal(node.requests.length,0);
+  await t.request(program);assert.equal(attempts,2);assert.equal(hasProgram(node),true);await t.close();
+});
+
+test('unavailable public qualification never sends project data and a later check must fully qualify a new socket', async()=>{
+  const nodes=[socket({probeError:{code:-32000,message:'synthetic unavailable'}}),socket()];let attempts=0;
+  const t=createPinnedKeelSepoliaSimulationTransport(async()=>nodes[attempts++]);
+  await assert.rejects(t.request(program),e=>e.kind==='rpc-unavailable');
+  assert.equal(attempts,1);assert.equal(nodes[0].closed,1);assert.equal(hasProgram(nodes[0]),false);
+  await t.request(program);assert.equal(attempts,2);assert.equal(simulationRequests(nodes[1]).length,4);await t.close();
+});
+
+test('a disconnected retained socket automatically requalifies before sending the saved simulation', async()=>{
+  const nodes=[socket(),socket()];let attempts=0;
+  const t=createPinnedKeelSepoliaSimulationTransport(async()=>nodes[attempts++]);
+  await t.request({method:'eth_chainId',params:[]});nodes[0].socket.readyState=3;
+  await t.request(program);
+  assert.equal(attempts,2);assert.equal(hasProgram(nodes[0]),false);assert.equal(nodes[0].closed,1);
+  assert.equal(hasProgram(nodes[1]),true);await t.close();
+});
+
 test('unknown provider errors expose only the failed public capability stage', async () => {
   const node = socket({ probeError: { code: 403, message: 'https://private-secret/' } });
   const t = createPinnedKeelSepoliaSimulationTransport(async () => node);
-  await assert.rejects(t.request(program), error => error.kind === 'rpc-unavailable' && error.diagnostic.stage === 'read-capacity' && !error.message.includes('private-secret'));
+  await assert.rejects(t.request(program), error => {
+    assert.equal(error.kind,'rpc-unavailable');assert.equal(error.diagnostic.stage,'read-capacity');
+    assert.equal(error.diagnostic.rpcMethod,'eth_simulateV1');assert.equal(error.diagnostic.rpcCode,403);
+    assert.equal(error.diagnostic.phase,'public-qualification');assert.equal(error.diagnostic.socketReadyState,1);
+    assert.doesNotMatch(JSON.stringify(error),/private-secret|https:/);return true;
+  });
   assert.equal(node.closed, 1); assert.equal(hasProgram(node), false);
 });
 
-test('silent clamping of an actual program is provider-limit and never replays', async () => {
-  const node = socket({ programCap: '0x2faf080', revert: true }); let count = 0;
-  const t = createPinnedKeelSepoliaSimulationTransport(async () => { count++; return node; });
-  await assert.rejects(t.request(program), e => e.kind === 'provider-limit' && e.diagnostic.providerGasCap === '50000000');
-  assert.equal(count, 1); assert.equal(simulationRequests(node).length, 4);
+test('post-qualification program clamping is bounded, never lowers gas, and remains blocked if every connection clamps', async () => {
+  const nodes=[];const t=createPinnedKeelSepoliaSimulationTransport(async()=>{const node=socket({programCap:'0x2faf080',revert:true});nodes.push(node);return node;});
+  await assert.rejects(t.request(program),e=>e.kind==='provider-limit'&&e.diagnostic.providerGasCap==='50000000'&&e.diagnostic.connectionAttempts===3);
+  assert.equal(nodes.length,3);for(const n of nodes){assert.equal(n.closed,1);assert.deepEqual(simulationRequests(n).at(-1).params,[{...program.params[0],returnFullTransactions:true},'0x12']);}
   await t.close();
 });
 
-test('an actual program revert stays a revert and closed sockets never implicitly reconnect', async () => {
+test('unknown project RPC failures retain socket diagnostics and require a new fully qualified saved check', async()=>{
+ for(const failingMethod of ['eth_getBlockByNumber','eth_simulateV1']){
+  const nodes=[socket(),socket()];const request=nodes[0].requestAsync.bind(nodes[0]);let count=0;
+  let blockReads=0;
+  nodes[0].requestAsync=async args=>(failingMethod==='eth_getBlockByNumber'&&args.body.method===failingMethod&&++blockReads===3)||(failingMethod==='eth_simulateV1'&&args.body.method===failingMethod&&args.body.params[0].blockStateCalls[0].calls[0].data==='0x1234')
+    ? {error:{code:-32098,message:'PRIVATE https://secret.invalid/0x1234',cause:{code:'ECONNRESET'}}} : request(args);
+  const t=createPinnedKeelSepoliaSimulationTransport(async()=>nodes[count++]);
+  await assert.rejects(t.request(program),error=>{
+    assert.equal(error.kind,'rpc-unavailable');assert.equal(error.diagnostic.rpcCode,-32098);assert.equal(error.diagnostic.transportCode,'ECONNRESET');
+    assert.equal(error.diagnostic.rpcMethod,failingMethod);assert.equal(error.diagnostic.phase,'project-request');assert.equal(error.diagnostic.socketReadyState,1);
+    assert.doesNotMatch(JSON.stringify(error),/PRIVATE|secret.invalid|0x1234/);return true;
+  });
+  assert.equal(count,1);assert.equal(nodes[0].closed,1);await t.request(program);assert.equal(count,2);assert.equal(hasProgram(nodes[1]),true);await t.close();
+ }
+});
+
+test('the incident 50m provider cap selects a compatible connection before sending the unchanged 200m program', async () => {
+  const nodes=[socket({cap:incidentCap}),socket()];let count=0;
+  const t=createPinnedKeelSepoliaSimulationTransport(async()=>nodes[count++]);
+  assert.equal((await t.request(program))[0].calls[0].status,'0x1');
+  assert.equal(count,2);assert.equal(hasProgram(nodes[0]),false);assert.equal(nodes[0].closed,1);
+  assert.deepEqual(simulationRequests(nodes[1]).at(-1).params,[{...program.params[0],returnFullTransactions:true},'0x12']);
+  assert.equal(t.qualifiedProbeGas,200_000_000n);await t.close();assert.equal(nodes[1].closed,1);
+});
+
+test('a retained low-cap connection is replaced before replaying only the identical read-only simulation on the same snapshot', async () => {
+  const nodes=[socket({programCap:'0x2faf080'}),socket()];let count=0;
+  const t=createPinnedKeelSepoliaSimulationTransport(async()=>nodes[count++]);
+  await t.request({method:'eth_chainId',params:[]});assert.equal(count,1);assert.equal(nodes[0].closed,0);
+  assert.equal((await t.request(program))[0].calls[0].status,'0x1');assert.equal(count,2);
+  const sent=nodes.map(n=>simulationRequests(n).at(-1));assert.deepEqual(sent[0],sent[1]);
+  assert.ok(nodes.every(n=>!n.requests.some(r=>/send|sign/i.test(r.method))));
+  await t.close();assert.ok(nodes.every(n=>n.closed===1));
+});
+
+test('capacity recovery rejects a changed project snapshot and never sends the program to it', async () => {
+  const first=socket({programCap:'0x2faf080'}),other=socket();const original=other.requestAsync.bind(other);let reads=0;
+  other.requestAsync=async args=>{const response=await original(args);if(args.body.method==='eth_getBlockByNumber'&&++reads===3)return{result:{...response.result,hash:hash(777)}};return response;};
+  let count=0;const t=createPinnedKeelSepoliaSimulationTransport(async()=>[first,other][count++]);
+  await assert.rejects(t.request(program),e=>e.kind==='chain-reorganized');assert.equal(hasProgram(other),false);assert.equal(count,2);await t.close();
+});
+
+test('a symbolic latest snapshot cannot be replayed after project gas clamping', async () => {
+  const node=socket({programCap:'0x2faf080'});let count=0;const t=createPinnedKeelSepoliaSimulationTransport(async()=>{count++;return node;});
+  await assert.rejects(t.request({...program,params:[program.params[0],'latest']}),e=>e.kind==='provider-limit');assert.equal(count,1);assert.equal(node.closed,1);await t.close();
+});
+
+test('concurrent clamped reads share replacement qualification and do not close a socket while another read is in flight', async () => {
+  const nodes=[socket({programCap:'0x2faf080'}),socket()];let count=0;
+  const t=createPinnedKeelSepoliaSimulationTransport(async()=>nodes[count++]);
+  const results=await Promise.all([t.request(program),t.request(program)]);
+  assert.ok(results.every(r=>r[0].calls[0].status==='0x1'));assert.equal(count,2);assert.equal(nodes[0].closed,1);
+  await t.close();assert.equal(nodes[1].closed,1);
+});
+
+test('an actual program revert stays a revert without connection replacement', async () => {
   const node = socket({ revert: true }); let count = 0;
   const t = createPinnedKeelSepoliaSimulationTransport(async () => { count++; return node; });
   assert.equal((await t.request(program))[0].calls[0].status, '0x0');
-  node.socket.readyState = 3;
-  for (let i = 0; i < 2; i++) await assert.rejects(t.request(program), e => e.kind === 'rpc-unavailable');
   assert.equal(count, 1); assert.equal(simulationRequests(node).length, 4);
   await t.close();
 });
@@ -205,13 +302,239 @@ test('public account state must qualify without funding or synthetic overrides',
     await rejectedQualification(change);
 });
 
-test('public qualification uses observed nonzero nonce and records only its modest probe ceiling', async () => {
+test('public qualification uses observed nonzero nonce and records the exact selected-chain transaction ceiling', async () => {
   const node = socket({ nonce: '0x7' }); const t = createPinnedKeelSepoliaSimulationTransport(async () => node);
   await t.request(program);
   const probes = simulationRequests(node).slice(0, 3);
   assert.deepEqual(probes.map(r => r.params[0].blockStateCalls[0].calls[0].nonce), ['0x7', '0x7', '0x8']);
-  assert.deepEqual(probes.slice(0, 2).map(r => r.params[0].blockStateCalls[0].calls[0].gas), ['0x186a0', '0x186a0']);
-  assert.equal(t.qualifiedProbeGas, 100_000n);
+  assert.deepEqual(probes.slice(0, 2).map(r => r.params[0].blockStateCalls[0].calls[0].gas), [gas, gas]);
+  assert.equal(t.qualifiedProbeGas, 200_000_000n);
   assert.equal(simulationRequests(node).at(-1).params[0].blockStateCalls[0].calls[0].gas, gas);
   await t.close(); assert.equal(t.qualifiedProbeGas, undefined);
+});
+
+ test('capacity qualification follows the observed block limit without increasing it', async () => {
+  const bounded='0x5f5e100';const node=socket({snapshot:{gasLimit:bounded}});const t=createPinnedKeelSepoliaSimulationTransport(async()=>node);
+  const request={...program,params:[{...program.params[0],blockStateCalls:[{calls:[{gas:bounded,data:'0x1234'}]}]},'0x12']};
+  await t.request(request);assert.equal(t.qualifiedProbeGas,100_000_000n);
+  for(const r of simulationRequests(node))for(const b of r.params[0].blockStateCalls)for(const c of b.calls)assert.ok(BigInt(c.gas)<=100_000_000n);
+  await t.close();
+});
+
+ test('full preflight after capacity or closed-socket recovery still requires strict execution and complete exact metadata', async () => {
+  const owner='0x'+'11'.repeat(20),target='0x'+'22'.repeat(20),reader='0x'+'33'.repeat(20),expected='data:application/json,{"name":"Exact recovered fixture"}';
+  for(const recovery of ['capacity','closed-socket']) for(const failure of [undefined,'metadata','revert','nonce','maximum']) {
+    const nodes=[];
+    const t=createPinnedKeelSepoliaSimulationTransport(async()=>{
+      const index=nodes.length,n=socket(index===0&&recovery==='capacity'?{programCap:incidentCap}:{});
+      if(index===0&&recovery==='closed-socket')closeDuringProgram(n);
+      const original=n.requestAsync.bind(n);nodes.push(n);
+      n.requestAsync=async args=>{
+        const {body}=args;
+        if(body.method==='eth_getCode'&&body.params[0]===reader)return{result:'0x6000'};
+        const response=await original(args);
+        if(body.method==='eth_simulateV1'&&body.params[0].blockStateCalls[0].calls[0].data!=='0x'){
+          for(const [i,block] of response.result.entries()){
+            const metadata=body.params[0].blockStateCalls[i].calls[0].to===reader;
+            const used=metadata?'0x186a0':'0x'+BigInt(incident.successfulPreRefundGasUsed).toString(16);
+            block.calls=[{status:index===1&&failure==='revert'?'0x0':'0x1',gasUsed:used,maxUsedGas:used,returnData:metadata?encodeAbiParameters([{type:'string'}],[index===1&&failure==='metadata'?'wrong':expected]):'0x'}];
+            if(index===1&&failure==='nonce'&&!metadata)block.transactions[0].nonce='0x7';
+            if(index===1&&failure==='maximum')delete block.calls[0].maxUsedGas;
+          }
+        }
+        return response;
+      };return n;
+    });
+    await t.request({method:'eth_chainId',params:[]});assert.equal(nodes.length,1);
+    const prep={from:owner,to:owner,data:encodeKeelAtomicWalletBatch([{to:target,data:'0x1234',value:'0x0'}]),value:'0x0',nonce:'0x6',gas,maxFeePerGas:'0x1000000',maxPriorityFeePerGas:'0xf4240'};
+    const job={transactionContext:'atomic-wallet',planFingerprint:'0x'+'aa'.repeat(32),chainId:11155111,blockNumber:18n,reader,readerRuntimeCodeHash:keccak256('0x6000'),preparationCalls:[prep],metadataCall:{from:owner,to:reader,data:'0x1234',value:'0x0',gas:'0xf4240'},expectedTokenURI:expected,maximumTokenUriBytes:2_000_000,maximumReadGas:1_000_000n,collectionOverheadGas:10_000n,maximumTransactionGas:200_000_000n};
+    if(failure)await assert.rejects(simulateKeelPublicationBeforeFunding(job,t),e=>e.kind===({metadata:'metadata-mismatch',revert:'execution-reverted',nonce:'unsupported-simulation',maximum:'unsupported-simulation'})[failure]);
+    else {const proof=await simulateKeelPublicationBeforeFunding(job,t);assert.equal(proof.completeTokenUriBytes,Buffer.byteLength(expected));assert.equal(proof.transactionGasLimits[0],incident.successfulTransactionGasLimit);assert.equal(proof.validatedTransactionCalls,1);assert.equal(proof.signing,'not-performed');assert.equal(proof.submission,'not-performed');}
+    assert.equal(nodes.length,2);assert.ok(nodes.every(n=>n.requests.every(r=>['eth_chainId','eth_getBlockByNumber','eth_getTransactionCount','eth_getBalance','eth_getCode','eth_simulateV1'].includes(r.method))));
+    await t.close();assert.ok(nodes.every(n=>n.closed===1));
+  }
+});
+ test('closing during an in-flight simulation cannot release a late proof or reconnect', async () => {
+  const n=socket(),original=n.requestAsync.bind(n);let release,started;
+  const entered=new Promise(resolve=>{started=resolve});
+  n.requestAsync=async args=>{if(args.body.method==='eth_simulateV1'&&args.body.params[0].blockStateCalls[0].calls[0].data!=='0x'){started();await new Promise(resolve=>{release=resolve});}return original(args)};
+  let count=0;const t=createPinnedKeelSepoliaSimulationTransport(async()=>{count++;return n});const pending=t.request(program);await entered;await t.close();release();
+  await assert.rejects(pending,e=>e.kind==='rpc-unavailable');assert.equal(count,1);assert.equal(n.closed,1);
+});
+
+ test('caller mutation cannot change calldata or gas between capacity-recovery attempts', async () => {
+  const request=structuredClone(program),first=socket({programCap:incidentCap}),next=socket(),original=first.requestAsync.bind(first);let count=0;
+  first.requestAsync=async args=>{const result=await original(args);if(args.body.method==='eth_simulateV1'&&args.body.params[0].blockStateCalls[0].calls[0].data==='0x1234'){request.params[0].blockStateCalls[0].calls[0].gas='0x1';request.params[0].blockStateCalls[0].calls[0].data='0xffff';request.params[1]='latest';}return result;};
+  const t=createPinnedKeelSepoliaSimulationTransport(async()=>[first,next][count++]);await t.request(request);
+  for(const n of [first,next])assert.deepEqual(simulationRequests(n).at(-1).params,[{...program.params[0],returnFullTransactions:true},'0x12']);
+  assert.equal(count,2);await t.close();
+});
+
+ test('small valid plans do not require full block capacity from a 50m provider', async () => {
+  const n=socket({cap:incidentCap});let count=0;const t=createPinnedKeelSepoliaSimulationTransport(async()=>{count++;return n});
+  const request=structuredClone(program);request.params[0].blockStateCalls[0].calls[0].gas='0x493e0';await t.request(request);
+  assert.equal(count,1);assert.equal(t.qualifiedProbeGas,300_000n);assert.equal(simulationRequests(n).at(-1).params[0].blockStateCalls[0].calls[0].gas,'0x493e0');await t.close();
+});
+
+test('endpoint-cached socket factories cannot reselect the capped socket while another read is draining', {timeout:5000}, async () => {
+  const first=socket({programCap:incidentCap}),next=socket(),original=first.requestAsync.bind(first);let connections=0,releaseRead,entered;
+  const started=new Promise(resolve=>{entered=resolve});
+  first.requestAsync=async args=>{if(args.body.method==='eth_getCode'&&args.body.params[0]==='fixture-concurrent-reader'){entered();await new Promise(resolve=>{releaseRead=resolve});}return original(args)};
+  // viem's cache retains the socket until its close() deletes the cache entry.
+  const t=createPinnedKeelSepoliaSimulationTransport(async()=>{connections++;return first.closed?next:first;});
+  await t.request({method:'eth_chainId',params:[]});
+  const reader=t.request({method:'eth_getCode',params:['fixture-concurrent-reader','0x12']});await started;
+  const recovering=t.request(program);recovering.catch(()=>{});
+  try {await new Promise(resolve=>setTimeout(resolve,30));assert.equal(connections,1);assert.equal(first.closed,0);}
+  finally {releaseRead();}
+  await reader;assert.equal((await recovering)[0].calls[0].status,'0x1');assert.equal(connections,2);assert.equal(first.closed,1);await t.close();assert.equal(next.closed,1);
+});
+
+
+// The real event supplies only the error class/method/state, not a cause for
+// closure. Close codes/reasons below are synthetic privacy and recovery cases.
+const closedIncident = JSON.parse(readFileSync(new URL('./fixtures/retro-closed-simulation-socket-20261010.json', import.meta.url), 'utf8'));
+function closeDuringProgram(node, { code = 1006, reason = '', mutate } = {}) {
+  const original = node.requestAsync.bind(node), listeners = new Set();
+  node.socket.addEventListener = (type, listener) => { assert.equal(type, 'close'); listeners.add(listener); };
+  node.socket.removeEventListener = (_type, listener) => { listeners.delete(listener); };
+  node.requestAsync = async args => {
+    const response = await original(args);
+    if (args.body.method === closedIncident.diagnostic.rpcMethod && args.body.params[0].blockStateCalls[0].calls[0].data !== '0x') {
+      node.socket.readyState = closedIncident.diagnostic.socketReadyState;
+      for (const listener of listeners) listener({ code, reason });
+      mutate?.();
+      throw Object.assign(new Error('PRIVATE request and provider URL must not escape'), { name: closedIncident.diagnostic.errorClass });
+    }
+    return response;
+  };
+  return node;
+}
+
+test('live closed-socket incident automatically requalifies and repeats the exact immutable simulation within one check', async () => {
+  for (const validation of [false, true]) {
+    const request = structuredClone(program); request.params[0].validation = validation;
+    Object.assign(request.params[0].blockStateCalls[0].calls[0], { nonce: '0x6', maxFeePerGas: '0x1000000', maxPriorityFeePerGas: '0xf4240', value: '0x0' });
+    const expected = structuredClone(request); expected.params[0].returnFullTransactions = true;
+    const first = closeDuringProgram(socket(), { mutate: () => { request.params[0].blockStateCalls[0].calls[0].data = '0xffff'; request.params[1] = 'latest'; request.method = 'eth_sendTransaction'; } }), second = socket();
+    let connections = 0;
+    const transport = createPinnedKeelSepoliaSimulationTransport(async () => { connections++; return first.closed ? second : first; });
+    try {
+      assert.equal((await transport.request(request))[0].calls[0].status, '0x1');
+      assert.equal(connections, 2); assert.equal(first.closed, 1);
+      for (const node of [first, second]) assert.deepEqual(simulationRequests(node).at(-1), expected);
+      assert.equal(simulationRequests(second).length, 4, 'both public modes and strict-nonce rejection precede the replay');
+      assert.deepEqual(second.requests.at(-2), { method: 'eth_getBlockByNumber', params: ['0x12', false] });
+    } finally { await transport.close(); }
+  }
+});
+
+test('repeated closed-socket failures stop after three qualified attempts with bounded sanitized close evidence', async () => {
+  const nodes = [];
+  const transport = createPinnedKeelSepoliaSimulationTransport(async () => { const node = closeDuringProgram(socket(), { code: 1009, reason: 'message too big PRIVATE https://secret.invalid/artwork' }); nodes.push(node); return node; });
+  await assert.rejects(transport.request(program), error => {
+    assert.equal(error.kind, 'rpc-unavailable'); assert.equal(error.diagnostic.connectionAttempts, 3);
+    assert.equal(error.diagnostic.socketCloseCode, 1009); assert.equal(error.diagnostic.socketCloseReason, 'message-too-large');
+    assert.equal(error.diagnostic.rpcMethod, 'eth_simulateV1'); assert.equal(error.diagnostic.socketReadyState, 3);
+    assert.equal(error.diagnostic.providerGasCap, undefined); assert.equal(error.diagnostic.rpcCode, undefined);
+    assert.doesNotMatch(JSON.stringify(error), /PRIVATE|https:|secret.invalid|artwork|0x1234/); return true;
+  });
+  assert.equal(nodes.length, 3); assert.ok(nodes.every(node => node.closed === 1));
+  await transport.close();
+});
+
+test('closed-socket retry rejects changed snapshots and symbolic tags before any unsafe replay', async () => {
+  for (const symbolic of [false, true]) {
+    const first = closeDuringProgram(socket()), second = socket(); let connections = 0, reads = 0;
+    const original = second.requestAsync.bind(second);
+    second.requestAsync = async args => { const response = await original(args); if (args.body.method === 'eth_getBlockByNumber' && ++reads === 3) return { result: { ...response.result, hash: hash(777) } }; return response; };
+    const transport = createPinnedKeelSepoliaSimulationTransport(async () => [first, second][connections++]);
+    await assert.rejects(transport.request(symbolic ? { ...program, params: [program.params[0], 'latest'] } : program), error => error.kind === (symbolic ? 'rpc-unavailable' : 'chain-reorganized'));
+    assert.equal(connections, symbolic ? 1 : 2); assert.equal(hasProgram(second), false); await transport.close();
+  }
+});
+
+
+test('closed-socket recovery never admits writes/signing or turns an uncertain timeout into a replay', async () => {
+  let connections = 0;
+  const node = socket(), original = node.requestAsync.bind(node);
+  node.requestAsync = async args => {
+    if (args.body.method === 'eth_simulateV1' && args.body.params[0].blockStateCalls[0].calls[0].data !== '0x') throw { name: 'TimeoutError' };
+    return original(args);
+  };
+  const transport = createPinnedKeelSepoliaSimulationTransport(async () => { connections++; return node; });
+  for (const method of ['eth_sendTransaction', 'eth_sendRawTransaction', 'wallet_sendCalls', 'eth_sign', 'personal_sign'])
+    await assert.rejects(transport.request({ method, params: [] }), error => error.kind === 'configuration-invalid');
+  assert.equal(connections, 0);
+  await assert.rejects(transport.request(program), error => error.kind === 'rpc-unavailable' && error.diagnostic.transportFailure === 'timeout');
+  assert.equal(connections, 1); await transport.close();
+  // An ordinary read is snapshotted too: mutation while connecting must never
+  // turn its allowlisted method into a write after the admission check.
+  const read = { method: 'eth_chainId', params: [] }; let connected;
+  const fresh = socket(), immutable = createPinnedKeelSepoliaSimulationTransport(() => new Promise(resolve => { connected = resolve; }));
+  const pending = immutable.request(read); read.method = 'eth_sendTransaction'; connected(fresh);
+  assert.equal(await pending, '0xaa36a7'); assert.ok(fresh.requests.every(r => r.method !== 'eth_sendTransaction')); await immutable.close();
+});
+
+test('actual viem socket close events recover within one request and preserve only classified close evidence on exhaustion', { timeout: 10000 }, async () => {
+  // Exercise the installed viem/isows implementation against loopback only.
+  const viemRequire = createRequire(import.meta.resolve('viem'));
+  const { WebSocketServer } = createRequire(viemRequire.resolve('isows'))('ws');
+  const server = new WebSocketServer({ host: '127.0.0.1', port: 0 });
+  await once(server, 'listening');
+  let connections = 0, closeEveryProject = false;
+  const nodes = [];
+  server.on('connection', peer => {
+    const index = connections++, node = socket(); nodes.push(node);
+    peer.on('message', async raw => {
+      const body = JSON.parse(String(raw));
+      const response = await node.requestAsync({ body });
+      if (body.method === 'eth_simulateV1' && body.params[0].blockStateCalls[0].calls[0].data !== '0x' && (index === 0 || closeEveryProject)) {
+        peer.close(closeEveryProject ? 1009 : 1013, closeEveryProject ? 'message too big PRIVATE secret' : 'try again later'); return;
+      }
+      peer.send(JSON.stringify({ jsonrpc: '2.0', id: body.id, ...response }));
+    });
+  });
+  const url = `ws://127.0.0.1:${server.address().port}`;
+  const transport = createPinnedKeelSepoliaSimulationTransport(async () => createPublicClient({ transport: webSocket(url, { retryCount: 0, reconnect: false, keepAlive: false }) }).transport.getRpcClient());
+  try {
+    assert.equal((await transport.request(program))[0].calls[0].status, '0x1'); assert.equal(connections, 2);
+    assert.deepEqual(simulationRequests(nodes[0]).at(-1).params, simulationRequests(nodes[1]).at(-1).params);
+    closeEveryProject = true;
+    await assert.rejects(transport.request(program), error => {
+      assert.equal(error.kind, 'rpc-unavailable'); assert.equal(error.diagnostic.connectionAttempts, 3);
+      assert.equal(error.diagnostic.socketCloseCode, 1009); assert.equal(error.diagnostic.socketCloseReason, 'message-too-large');
+      assert.equal(error.diagnostic.socketReadyState, 3); assert.equal(error.diagnostic.errorClass, 'SocketClosedError');
+      assert.doesNotMatch(JSON.stringify(error), /PRIVATE|secret|127\.0\.0\.1|0x1234/); return true;
+    });
+    assert.equal(connections, 4, 'one retained and two replacement sockets in the second request');
+  } finally { await transport.close(); for (const peer of server.clients) peer.terminate(); await new Promise(resolve => server.close(resolve)); }
+});
+
+
+test('concurrent closed-socket simulations share one replacement after the cached socket drains', { timeout: 5000 }, async () => {
+  const first = closeDuringProgram(socket()), next = socket(), original = first.requestAsync.bind(first);
+  let connects = 0, release, started;
+  const entered = new Promise(resolve => { started = resolve; });
+  first.requestAsync = async args => {
+    if (args.body.method === 'eth_getCode' && args.body.params[0] === 'fixture-concurrent-reader') { started(); await new Promise(resolve => { release = resolve; }); }
+    return original(args);
+  };
+  const transport = createPinnedKeelSepoliaSimulationTransport(async () => { connects++; return first.closed ? next : first; });
+  await transport.request({ method: 'eth_chainId', params: [] });
+  const reader = transport.request({ method: 'eth_getCode', params: ['fixture-concurrent-reader', '0x12'] }); await entered;
+  const recovering = Promise.all([transport.request(program), transport.request(program)]); recovering.catch(() => {});
+  try { await new Promise(resolve => setTimeout(resolve, 20)); assert.equal(connects, 1); assert.equal(first.closed, 0); }
+  finally { release(); }
+  await reader; assert.ok((await recovering).every(result => result[0].calls[0].status === '0x1'));
+  assert.equal(connects, 2); assert.equal(first.closed, 1); await transport.close();
+});
+
+test('closed-socket replacement must qualify its chain and execution evidence before receiving project calls', async () => {
+  for (const change of [{ chain: '0x1' }, { ignoreNonce: true }, { mutate: result => { delete result[0].calls[0].maxUsedGas; } }]) {
+    const first = closeDuringProgram(socket()), second = socket(change); let connections = 0;
+    const transport = createPinnedKeelSepoliaSimulationTransport(async () => [first, second][connections++]);
+    await assert.rejects(transport.request(program), error => ['wrong-chain', 'unsupported-simulation'].includes(error.kind));
+    assert.equal(connections, 2); assert.equal(hasProgram(second), false); await transport.close();
+  }
 });
