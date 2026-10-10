@@ -89,8 +89,46 @@ function validatedCall(value: KeelSimulationCall, maximumGas: bigint, transactio
   try { return Object.freeze({ from: getAddress(value.from), to: getAddress(value.to), data: value.data, value: value.value, gas: value.gas, ...(value.nonce === undefined ? {} : { nonce: value.nonce }), ...fees }); }
   catch { return failure("configuration-invalid", "A planned call needs valid sender and target addresses."); }
 }
-function classifiedTransportFailure(error: unknown): never {
-  if (error instanceof KeelPublicationSimulationError) throw error;
+/** Fixed-field diagnostics only: never copy messages, URLs, params, response data or stacks. */
+export function keelSimulationTransportDiagnostic(error: unknown, context: {
+  readonly method?: string; readonly phase?: string; readonly socketReadyState?: number;
+} = {}): Readonly<Record<string, string | number>> {
+  const methods = ["eth_chainId", "eth_getBlockByNumber", "eth_getTransactionCount", "eth_getBalance", "eth_getCode", "eth_simulateV1"];
+  const phases = ["publication-preflight", "public-qualification", "project-request", "initial-storage"];
+  const classes = ["Error", "TypeError", "TimeoutError", "HttpRequestError", "WebSocketRequestError", "SocketClosedError", "RpcRequestError", "UnknownRpcError", "KeelPublicationSimulationError"];
+  const failures = ["timeout", "connection-reset", "connection-closed", "dns", "rate-limited", "http-error", "rpc-error", "unknown"];
+  const codes = ["ETIMEDOUT", "ECONNRESET", "ECONNREFUSED", "EPIPE", "ENOTFOUND", "EAI_AGAIN", "UND_ERR_CONNECT_TIMEOUT", "UND_ERR_SOCKET"];
+  const result: Record<string, string | number> = {};
+  const pick = (source: Record<string, unknown> | undefined) => {
+    if (!source) return;
+    for (const [key, values] of [["rpcMethod", methods], ["phase", phases], ["errorClass", classes], ["causeClass", classes], ["transportFailure", failures], ["transportCode", codes]] as const)
+      if (typeof source[key] === "string" && values.includes(source[key])) result[key] = source[key];
+    for (const [key, low, high] of [["rpcCode", -2147483648, 2147483647], ["httpStatus", 100, 599], ["socketReadyState", 0, 3], ["causeDepth", 0, 8]] as const)
+      if (typeof source[key] === "number" && Number.isInteger(source[key]) && source[key] >= low && source[key] <= high) result[key] = source[key];
+  };
+  const seen = new Set<unknown>();
+  for (let value = error, depth = 0; value && depth < 8 && !seen.has(value); depth++) {
+    seen.add(value); const item = record(value); if (!item) break;
+    const name = typeof item.name === "string" && classes.includes(item.name) ? item.name : "Error";
+    result[depth === 0 ? "errorClass" : "causeClass"] = name; result.causeDepth = depth;
+    pick(record(item.diagnostic));
+    if (typeof item.code === "number" && Number.isInteger(item.code) && Math.abs(item.code) <= 2147483647) result.rpcCode = item.code;
+    if (typeof item.status === "number" && Number.isInteger(item.status) && item.status >= 100 && item.status <= 599) result.httpStatus = item.status;
+    if (typeof item.code === "string" && codes.includes(item.code)) result.transportCode = item.code;
+    value = item.cause;
+  }
+  if (!result.transportFailure) result.transportFailure = result.errorClass === "TimeoutError" || result.causeClass === "TimeoutError" || ["ETIMEDOUT", "UND_ERR_CONNECT_TIMEOUT"].includes(String(result.transportCode)) ? "timeout"
+    : result.transportCode === "ECONNRESET" ? "connection-reset"
+    : ["ENOTFOUND", "EAI_AGAIN"].includes(String(result.transportCode)) ? "dns"
+    : ["ECONNREFUSED", "EPIPE", "UND_ERR_SOCKET"].includes(String(result.transportCode)) || result.errorClass === "SocketClosedError" ? "connection-closed"
+    : result.httpStatus === 429 ? "rate-limited" : result.httpStatus !== undefined ? "http-error" : result.rpcCode !== undefined ? "rpc-error" : "unknown";
+  pick({ rpcMethod: context.method, phase: context.phase, socketReadyState: context.socketReadyState });
+  return result;
+}
+
+export function keelSimulationTransportFailure(error: unknown, context: Parameters<typeof keelSimulationTransportDiagnostic>[1] = {}): KeelPublicationSimulationError {
+  const diagnostic = keelSimulationTransportDiagnostic(error, context);
+  if (error instanceof KeelPublicationSimulationError) return new KeelPublicationSimulationError(error.kind, error.message, { ...diagnostic, ...error.diagnostic });
   let cursor: unknown = error;
   const seen = new Set<unknown>();
   let unsupported = false, limited = false, reverted = false, insufficient = false;
@@ -108,11 +146,11 @@ function classifiedTransportFailure(error: unknown): never {
     limited ||= /gas limit (?:is )?(?:too high|exceeds|higher than)|exceeds (?:the )?(?:rpc|simulation) gas cap|maximum (?:simulation|response) size exceeded/iu.test(message);
     cursor = item.cause;
   }
-  if (reverted) return failure("execution-reverted", "A planned contract execution reverted or exhausted its gas bound. Resolve that failure before payment; do not infer a delivery-size limit.");
-  if (insufficient) return failure("insufficient-balance", "A planned transaction lacks the balance for its exact validated gas and value. Review the sender funding before payment; no transaction was submitted.");
-  if (unsupported) return failure("unsupported-simulation", "This RPC does not support the required read-only publication simulation. Choose a compatible configured provider before a new payment.");
-  if (limited || providerGasCap !== undefined) return failure("provider-limit", "The provider rejected the simulation at its configured limit. This does not prove that the artwork or its complete metadata is too large.", providerGasCap === undefined ? undefined : { providerGasCap: providerGasCap.toString() });
-  return failure("rpc-unavailable", "The publication simulation could not finish. Retry the same prepared plan; no transaction was submitted.");
+  if (reverted) return new KeelPublicationSimulationError("execution-reverted", "A planned contract execution reverted or exhausted its gas bound. Resolve that failure before payment; do not infer a delivery-size limit.", diagnostic);
+  if (insufficient) return new KeelPublicationSimulationError("insufficient-balance", "A planned transaction lacks the balance for its exact validated gas and value. Review the sender funding before payment; no transaction was submitted.", diagnostic);
+  if (unsupported) return new KeelPublicationSimulationError("unsupported-simulation", "This RPC does not support the required read-only publication simulation. Choose a compatible configured provider before a new payment.", diagnostic);
+  if (limited || providerGasCap !== undefined) return new KeelPublicationSimulationError("provider-limit", "The provider rejected the simulation at its configured limit. This does not prove that the artwork or its complete metadata is too large.", { ...diagnostic, ...(providerGasCap === undefined ? {} : { providerGasCap: providerGasCap.toString() }) });
+  return new KeelPublicationSimulationError("rpc-unavailable", "The publication simulation could not finish. Retry the same prepared plan; no transaction was submitted.", diagnostic);
 }
 
 /**
@@ -179,7 +217,7 @@ async function performPublicationSimulation(input: KeelPublicationSimulationInpu
   // Snapshot all inputs before the first asynchronous transport call.
   const identity = { ...identityBase, metadataDigest };
 
-  const request = async (method: string, params: readonly unknown[]) => { try { return await transport.request({ method, params }); } catch (error) { return classifiedTransportFailure(error); } };
+  const request = async (method: string, params: readonly unknown[]) => { try { return await transport.request({ method, params }); } catch (error) { throw keelSimulationTransportFailure(error, { method, phase: "publication-preflight" }); } };
   if (quantity(await request("eth_chainId", [])) !== BigInt(identity.chainId)) return failure("wrong-chain", "The configured RPC returned another chain. No payment can be prepared from this proof.");
   const block = record(await request("eth_getBlockByNumber", [identity.blockTag, false]));
   const blockNumber = quantity(block?.number), blockGasLimit = quantity(block?.gasLimit);
