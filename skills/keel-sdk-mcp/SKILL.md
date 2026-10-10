@@ -5,6 +5,13 @@ description: Build, modify, test, or use the KEEL SDK and MCP for module discove
 
 # KEEL SDK and MCP
 
+**Supported updates:** Local MCP uses the maintained `keel-web3/keel-sdk` `master`
+branch, not `codex/studio-agent-connect`. Inspect the active executable, source
+commit and tool capabilities; matching package versions do not prove current
+code. Follow `docs/FRIEND_QUICKSTART.md#update-an-existing-local-mcp` without
+discarding local changes, custom skills or workspace account pairing. Only the
+SDK checkout needs updating; hosted MCP requires no local repository update.
+
 **Account connection default:** Use `keel-studio-connect` (`start` → open its public `approveUrl` for the user → `complete`) before private draft/staging work. The SDK privately saves the approved scoped grant for this workspace and Studio origin. Do not ask for a key in chat or an environment file. The cross-platform terminal/browser helper is `pnpm studio:connect --window --workspace <project>`; manual import uses the hidden `--import-key` prompt. Desktop is entirely optional. Only the user approves account access and wallet actions. Read `docs/KEEL_STUDIO_WALLET_REVIEW.md`.
 
 **Website first:** Default to https://studio.onkeel.io for the full creator
