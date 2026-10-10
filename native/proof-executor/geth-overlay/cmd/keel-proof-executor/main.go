@@ -11,7 +11,9 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"runtime"
 	"sync"
+	"syscall"
 	"time"
 
 	"github.com/ethereum/go-ethereum/common"
@@ -97,6 +99,7 @@ func (w *wire) read(ctx context.Context, method string, params []any, out any) e
 	return json.Unmarshal(response.Result, out)
 }
 func run() error {
+	started := time.Now()
 	scanner := bufio.NewScanner(io.LimitReader(os.Stdin, 512*1024*1024))
 	scanner.Buffer(make([]byte, 64*1024), maxFrameBytes)
 	encoder := json.NewEncoder(os.Stdout)
@@ -144,9 +147,19 @@ func run() error {
 	if len(result) > 32*1024*1024 {
 		return errors.New("simulation output budget exceeded")
 	}
+	// The qualified artifact targets Linux. These are process high-water/cumulative
+	// measurements, not estimates derived from transaction gas envelopes.
+	if runtime.GOOS != "linux" {
+		return errors.New("unsupported measurement platform")
+	}
+	var usage syscall.Rusage
+	if err := syscall.Getrusage(syscall.RUSAGE_SELF, &usage); err != nil {
+		return err
+	}
 	return encoder.Encode(map[string]any{"type": "result", "result": result, "evidence": map[string]any{
 		"schema": "keel-proof-executor-evidence@1", "gethCommit": gethCommit, "requestSha256": requestDigest, "chainId": in.ChainID, "blockHash": in.BlockHash, "baseStateRoot": in.Header.Root,
 		"accountProofs": reader.AccountProofs, "storageProofs": reader.StorageProofs, "codeHashChecks": reader.CodeChecks, "witnessBytes": reader.WitnessBytes(), "readRequests": w.requests, "responseBytes": w.bytes,
+		"processPeakRSSBytes": usage.Maxrss * 1024, "processCPUMicroseconds": usage.Utime.Sec*1000000 + usage.Utime.Usec + usage.Stime.Sec*1000000 + usage.Stime.Usec, "nativeWallTimeMs": time.Since(started).Milliseconds(),
 		"gasBudget": l.GasBudget, "signing": "not-performed", "submission": "not-performed", "state": "ephemeral-proof-backed"}})
 }
 func main() {

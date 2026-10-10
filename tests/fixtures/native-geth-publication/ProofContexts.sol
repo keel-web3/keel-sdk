@@ -42,3 +42,19 @@ contract ProofContexts {
         }
     }
 }
+
+// Models the saved ERC-7579 atomic ABI on an already-delegated synthetic account.
+// This is not a claim about a live wallet's implementation or authorization.
+contract ProofBatch {
+    struct Call { address target; uint256 value; bytes callData; }
+    function execute(bytes32 mode, bytes calldata executionCalldata) external payable {
+        require(msg.sender == address(this), "self context required");
+        require(mode == bytes32(uint256(1) << 248), "atomic batch required");
+        Call[] memory calls = abi.decode(executionCalldata, (Call[]));
+        require(calls.length > 0 && calls.length <= 8, "call bound");
+        for (uint256 i; i < calls.length; i++) {
+            (bool ok, bytes memory result) = calls[i].target.call{value: calls[i].value}(calls[i].callData);
+            if (!ok) assembly { revert(add(result, 32), mload(result)) }
+        }
+    }
+}

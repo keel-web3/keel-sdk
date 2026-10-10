@@ -39,7 +39,7 @@ export async function createProofBackedSimulationTransport({ binaryPath, binaryS
     const read = (method,params) => ask(method,params,executionSignal);
     try {
       if (BigInt(await read('eth_chainId', [])) !== 11155111n) throw fail('State source returned another chain.');
-      const header = await read('eth_getBlockByNumber',[blockTag,false]);
+      const header = structuredClone(await read('eth_getBlockByNumber',[blockTag,false]));
       const fresh=()=>{const age=BigInt(Math.floor(now()/1000))-BigInt(header.timestamp);if(age>180n||age< -30n)throw fail('Pinned simulation snapshot is stale or in the future.');};
       if (header?.hash?.toLowerCase() !== block.hash.toLowerCase() || BigInt(header.number) !== block.number) throw fail('Pinned simulation block changed.');
       fresh();

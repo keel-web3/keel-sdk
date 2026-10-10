@@ -8,6 +8,7 @@ import { setTimeout as delay } from 'node:timers/promises';
 import solc from 'solc';
 import { encodeFunctionData, encodeAbiParameters, keccak256, toHex } from 'viem';
 import { createProofBackedSimulationTransport } from '../native/proof-executor/transport.mjs';
+import { encodeKeelAtomicWalletBatch } from '../packages/sdk/dist/release-wallet-batch.js';
 import { simulateKeelPublicationBeforeFunding } from '../packages/sdk/dist/publication-preflight.js';
 const image='ethereum/client-go@sha256:abf3605177f8bdcfce436985a8054cca4ae59256323a4ffb72c56c04f3d1fadd';
 const runnerImage='node@sha256:6c74791e557ce11fc957704f6d4fe134a7bc8d6f5ca4403205b2966bd488f6b3';
@@ -15,7 +16,7 @@ const build=process.env.KEEL_NATIVE_BUILD_DIR??'/tmp/keel-proof-executor-build';
 const binary=join(build,'keel-proof-executor'),binarySha256=createHash('sha256').update(readFileSync(binary)).digest('hex');
 const receipt=JSON.parse(readFileSync(join(build,'receipt.json'),'utf8'));assert.equal(receipt.binarySha256,binarySha256);
 const tmp=mkdtempSync(join(tmpdir(),'keel-proof-state-')),container=`keel-proof-state-${process.pid}`;
-const owner=`0x${'11'.repeat(20)}`,reader=`0x${'22'.repeat(20)}`,delegated=`0x${'44'.repeat(20)}`,contexts=`0x${'55'.repeat(20)}`;
+const owner=`0x${'11'.repeat(20)}`,reader=`0x${'22'.repeat(20)}`,delegated=`0x${'44'.repeat(20)}`,contexts=`0x${'55'.repeat(20)}`,batchImplementation=`0x${'66'.repeat(20)}`,batchOwner=`0x${'77'.repeat(20)}`;
 const expectedTokenURI='data:application/json,{"name":"Synthetic state sequence"}';
 const evidence={schema:'keel-proof-executor-differential@1',sourceCommit:execFileSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim(),receipt,synthetic:true,externalNetwork:'none',productionStateUsed:false,signing:'not-performed',submission:'not-performed',checks:[],executions:[]};
 const record=(name,data={})=>{evidence.checks.push({name,...data});console.log(`PASS ${name}`);};
@@ -27,6 +28,8 @@ const contextArtifact=compiled.contracts['ProofContexts.sol'].ProofContexts;
 const genesis=JSON.parse(readFileSync('tests/fixtures/native-geth-publication/genesis.json','utf8'));
 genesis.alloc[reader.slice(2)]={balance:'0x0',code:runtime};genesis.alloc[delegated.slice(2)]={balance:genesis.alloc[owner.slice(2)].balance,code:`0xef0100${reader.slice(2)}`};
 genesis.alloc[contexts.slice(2)]={balance:'0x0',code:`0x${contextArtifact.evm.deployedBytecode.object}`,storage:{[toHex(10000n,{size:32})]:toHex(1n,{size:32}),[toHex(10001n,{size:32})]:toHex(2n,{size:32})}};
+genesis.alloc[batchImplementation.slice(2)]={balance:'0x0',code:`0x${compiled.contracts['ProofContexts.sol'].ProofBatch.evm.deployedBytecode.object}`};
+genesis.alloc[batchOwner.slice(2)]={balance:genesis.alloc[owner.slice(2)].balance,code:`0xef0100${batchImplementation.slice(2)}`};
 writeFileSync(join(tmp,'genesis.json'),JSON.stringify(genesis));
 const data=(name,args=[])=>encodeFunctionData({abi:artifact.abi,functionName:name,args});
 const calls=Array.from({length:5},(_,i)=>({from:owner,to:reader,data:data('write',[100n]),value:'0x0',gas:toHex(200_000_000n),nonce:toHex(i),gasPrice:'0x30'}));
@@ -77,6 +80,10 @@ try{
  await compare('40-call saved-program-sized body above 3.85 MB retains every original 200M envelope',wide,result=>assert.ok(result.every(b=>b.calls[0].status==='0x1'&&BigInt(b.transactions[0].gas)===200_000_000n)));
  const plan={planFingerprint:`0x${'aa'.repeat(32)}`,chainId:11155111,blockNumber:0n,reader,readerRuntimeCodeHash:keccak256(runtime),preparationCalls:calls,assertions:calls.map((_,i)=>({callIndex:i,returnData:encodeAbiParameters([{type:'uint256'}],[BigInt((i+1)*100)])})),requiredReaderCalls:[{call:{from:owner,to:reader,data:data('read'),value:'0x0',gas:toHex(1_000_000n)},expectedReturn:encodeAbiParameters([{type:'uint256'}],[500n]),gasMargin:10_000n}],metadataCall:{from:owner,to:reader,data:data('tokenURI',[1n]),value:'0x0',gas:toHex(1_000_000n)},expectedTokenURI,maximumTokenUriBytes:2_000_000,maximumReadGas:1_000_000n,collectionOverheadGas:10_000n,maximumTransactionGas:200_000_000n};
  const proof=await simulateKeelPublicationBeforeFunding(plan,transport);assert.equal(proof.schema,'keel-publication-simulation@1');assert.equal(proof.signing,'not-performed');record('unchanged plan completes SDK discovery, strict replay, exact reader and tokenURI checks',{simulationFingerprint:proof.simulationFingerprint});
+ const atomic={...calls[0],from:batchOwner,to:batchOwner,data:encodeKeelAtomicWalletBatch(calls.map(({to,data,value})=>({to,data,value})))};
+ await compare('unchanged atomic ABI program on synthetic existing delegation matches Geth',[atomic],result=>assert.equal(result[0].calls[0].status,'0x1'));
+ const atomicProof=await simulateKeelPublicationBeforeFunding({...plan,transactionContext:'atomic-wallet',preparationCalls:[atomic],assertions:[{callIndex:0,returnData:'0x'}]},transport);
+ assert.equal(atomicProof.schema,'keel-publication-simulation@1');record('unchanged synthetic atomic plan completes every SDK phase with explicit nonce and fees');
  for(const [name,call] of [['nonce',{...calls[0],nonce:'0x5'}],['fee',{...calls[0],gasPrice:'0x0'}],['balance',{...calls[0],from:`0x${'33'.repeat(20)}`} ]]){
   await assert.rejects(transport.request({method:'eth_simulateV1',params:[payload([call]),'0x0']}));record(`strict invalid ${name} is rejected`);
  }
@@ -135,6 +142,8 @@ try{
  }
  assert.equal(BigInt(rpc('eth_getStorageAt',[reader,'0x0','0x0'])),0n);assert.equal(BigInt(rpc('eth_getTransactionCount',[owner,'0x0'])),0n);assert.equal(rpc('eth_getBlockByNumber',['0x0',false]).hash,base.hash);await transport.close();
  assert.ok(upstream.every(r=>!['eth_call','eth_simulateV1','eth_sendRawTransaction'].includes(r.method)));evidence.upstream={requestCount:upstream.length,methods:[...new Set(upstream.map(r=>r.method))]};
+ for(const execution of evidence.executions){assert.match(execution.requestSha256,/^[a-f0-9]{64}$/);assert.ok(execution.processPeakRSSBytes>0&&execution.processPeakRSSBytes<=768*1024*1024);assert.ok(execution.processCPUMicroseconds>0);assert.ok(execution.nativeWallTimeMs>=0&&execution.nativeWallTimeMs<=180000);}
+ evidence.resources={completedExecutions:evidence.executions.length,peakProcessRSSBytes:Math.max(...evidence.executions.map(e=>e.processPeakRSSBytes)),maximumNativeWallTimeMs:Math.max(...evidence.executions.map(e=>e.nativeWallTimeMs)),maximumReadRequests:Math.max(...evidence.executions.map(e=>e.readRequests)),maximumWitnessBytes:Math.max(...evidence.executions.map(e=>e.witnessBytes))};console.log(`RESOURCES ${JSON.stringify(evidence.resources)}`);
  record('canonical state, nonce and header unchanged; upstream received no execution or calldata',{processCount});
 }catch(error){evidence.failure={name:error.name,message:error.message,code:error.code,nativeDiagnostic:lastNativeDiagnostic};process.exitCode=1;console.error(error);if(lastNativeDiagnostic)console.error(lastNativeDiagnostic);}
 finally{if(process.env.KEEL_PROOF_EXECUTOR_EVIDENCE)writeFileSync(process.env.KEEL_PROOF_EXECUTOR_EVIDENCE,JSON.stringify(evidence,null,2)+'\n');if(started){try{docker('rm','-f',container);}catch{}}rmSync(tmp,{recursive:true,force:true});}

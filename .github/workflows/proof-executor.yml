@@ -44,6 +44,8 @@ jobs:
         run: |
           pnpm install --frozen-lockfile
           node scripts/build.mjs
+      - name: Verify native process protocol and provenance guards
+        run: node --test tests/proof-executor-transport.test.mjs
       - name: Compare sparse execution with native Geth in isolated containers
         env:
           KEEL_PROOF_EXECUTOR_EVIDENCE: proof-executor-evidence.json
