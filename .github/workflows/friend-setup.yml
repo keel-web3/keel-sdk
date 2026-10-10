@@ -19,6 +19,8 @@ jobs:
         run: pnpm setup:friend --skip-desktop
       - name: Exact simulation capacity and recovery
         run: node --test tests/sdk-simulation-connection.test.mjs tests/sdk-publication-preflight.test.mjs tests/transaction-gas-policy.test.mjs tests/sdk-release-wallet-batch.test.mjs tests/rpc-publication-simulation.test.mjs
+      - name: Record approved public-only HTTPS capacity (not private-plan proof)
+        run: node scripts/probe-approved-sepolia-http.mjs
       - name: Setup and network rejection tests
         run: pnpm setup:test
       - name: MCP and generator preparation

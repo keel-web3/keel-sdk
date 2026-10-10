@@ -93,6 +93,7 @@ function validatedCall(value: KeelSimulationCall, maximumGas: bigint, transactio
 export function keelSimulationTransportDiagnostic(error: unknown, context: {
   readonly method?: string; readonly phase?: string; readonly socketReadyState?: number;
   readonly socketCloseCode?: number; readonly socketCloseReason?: string;
+  readonly transport?: string;
 } = {}): Readonly<Record<string, string | number>> {
   const methods = ["eth_chainId", "eth_getBlockByNumber", "eth_getTransactionCount", "eth_getBalance", "eth_getCode", "eth_simulateV1"];
   const phases = ["publication-preflight", "public-qualification", "project-request", "initial-storage"];
@@ -100,13 +101,17 @@ export function keelSimulationTransportDiagnostic(error: unknown, context: {
   const failures = ["timeout", "connection-reset", "connection-closed", "dns", "rate-limited", "http-error", "rpc-error", "unknown"];
   const codes = ["ETIMEDOUT", "ECONNRESET", "ECONNREFUSED", "EPIPE", "ENOTFOUND", "EAI_AGAIN", "UND_ERR_CONNECT_TIMEOUT", "UND_ERR_SOCKET"];
   const closeReasons = ["empty", "message-too-large", "rate-limited", "timeout", "server-unavailable", "protocol-error", "policy-violation", "other"];
+  const stages = ["connection", "chain", "snapshot", "public-account", "read-capacity", "strict-capacity", "strict-nonce", "snapshot-recheck"];
+  const transports = ["websocket", "https"];
   const result: Record<string, string | number> = {};
   const pick = (source: Record<string, unknown> | undefined) => {
     if (!source) return;
-    for (const [key, values] of [["rpcMethod", methods], ["phase", phases], ["errorClass", classes], ["causeClass", classes], ["transportFailure", failures], ["transportCode", codes], ["socketCloseReason", closeReasons]] as const)
+    for (const [key, values] of [["rpcMethod", methods], ["phase", phases], ["stage", stages], ["transport", transports], ["errorClass", classes], ["causeClass", classes], ["transportFailure", failures], ["transportCode", codes], ["socketCloseReason", closeReasons]] as const)
       if (typeof source[key] === "string" && values.includes(source[key])) result[key] = source[key];
-    for (const [key, low, high] of [["rpcCode", -2147483648, 2147483647], ["httpStatus", 100, 599], ["socketReadyState", 0, 3], ["causeDepth", 0, 8], ["socketCloseCode", 1000, 4999], ["connectionAttempts", 1, 3]] as const)
+    for (const [key, low, high] of [["rpcCode", -2147483648, 2147483647], ["httpStatus", 100, 599], ["socketReadyState", 0, 3], ["causeDepth", 0, 8], ["socketCloseCode", 1000, 4999], ["connectionAttempts", 1, 3], ["requestPayloadBytes", 0, 1073741824], ["blockCount", 0, 1000000], ["callCount", 0, 1000000]] as const)
       if (typeof source[key] === "number" && Number.isInteger(source[key]) && source[key] >= low && source[key] <= high) result[key] = source[key];
+    for (const key of ["requestedGasLimit", "providerGasCap", "requiredProgramGas"])
+      if (typeof source[key] === "string" && /^[1-9]\d{0,19}$/u.test(source[key]) && BigInt(source[key]) <= 18_446_744_073_709_551_615n) result[key] = source[key];
   };
   const seen = new Set<unknown>();
   for (let value = error, depth = 0; value && depth < 8 && !seen.has(value); depth++) {
@@ -124,7 +129,7 @@ export function keelSimulationTransportDiagnostic(error: unknown, context: {
     : ["ENOTFOUND", "EAI_AGAIN"].includes(String(result.transportCode)) ? "dns"
     : ["ECONNREFUSED", "EPIPE", "UND_ERR_SOCKET"].includes(String(result.transportCode)) || result.errorClass === "SocketClosedError" || result.causeClass === "SocketClosedError" ? "connection-closed"
     : result.httpStatus === 429 ? "rate-limited" : result.httpStatus !== undefined ? "http-error" : result.rpcCode !== undefined ? "rpc-error" : "unknown";
-  pick({ rpcMethod: context.method, phase: context.phase, socketReadyState: context.socketReadyState, socketCloseCode: context.socketCloseCode, socketCloseReason: context.socketCloseReason });
+  pick({ rpcMethod: context.method, phase: context.phase, transport: context.transport, socketReadyState: context.socketReadyState, socketCloseCode: context.socketCloseCode, socketCloseReason: context.socketCloseReason });
   return result;
 }
 
@@ -151,7 +156,7 @@ export function keelSimulationTransportFailure(error: unknown, context: Paramete
   if (reverted) return new KeelPublicationSimulationError("execution-reverted", "A planned contract execution reverted or exhausted its gas bound. Resolve that failure before payment; do not infer a delivery-size limit.", diagnostic);
   if (insufficient) return new KeelPublicationSimulationError("insufficient-balance", "A planned transaction lacks the balance for its exact validated gas and value. Review the sender funding before payment; no transaction was submitted.", diagnostic);
   if (unsupported) return new KeelPublicationSimulationError("unsupported-simulation", "This RPC does not support the required read-only publication simulation. Choose a compatible configured provider before a new payment.", diagnostic);
-  if (limited || providerGasCap !== undefined) return new KeelPublicationSimulationError("provider-limit", "The provider rejected the simulation at its configured limit. This does not prove that the artwork or its complete metadata is too large.", { ...diagnostic, ...(providerGasCap === undefined ? {} : { providerGasCap: providerGasCap.toString() }) });
+  if (limited || providerGasCap !== undefined || diagnostic.httpStatus === 413) return new KeelPublicationSimulationError("provider-limit", "The provider rejected the simulation at its configured limit. This does not prove that the artwork or its complete metadata is too large.", { ...diagnostic, ...(providerGasCap === undefined ? {} : { providerGasCap: providerGasCap.toString() }) });
   return new KeelPublicationSimulationError("rpc-unavailable", "The publication simulation could not finish. Retry the same prepared plan; no transaction was submitted.", diagnostic);
 }
 

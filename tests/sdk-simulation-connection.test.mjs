@@ -4,7 +4,8 @@ import { readFileSync } from 'node:fs';
 import { pathToFileURL } from 'node:url';
 import { createRequire } from 'node:module';
 import { once } from 'node:events';
-import {encodeAbiParameters,keccak256,createPublicClient,webSocket} from 'viem';
+import { createServer } from 'node:http';
+import {encodeAbiParameters,keccak256,createPublicClient,webSocket,http} from 'viem';
 import {encodeKeelAtomicWalletBatch} from '../packages/sdk/dist/release-wallet-batch.js';
 import {simulateKeelPublicationBeforeFunding} from '../packages/sdk/dist/publication-preflight.js';
 const { createPinnedKeelSepoliaSimulationTransport, assertKeelSimulationEnvelopes } = await import(process.env.KEEL_TEST_SIMULATION_CONNECTION_MODULE ? pathToFileURL(process.env.KEEL_TEST_SIMULATION_CONNECTION_MODULE).href : '../packages/sdk/dist/simulation-connection.js');
@@ -429,17 +430,17 @@ test('live closed-socket incident automatically requalifies and repeats the exac
   }
 });
 
-test('repeated closed-socket failures stop after three qualified attempts with bounded sanitized close evidence', async () => {
+test('confirmed 1009 without an approved alternate transport stops without repeating the same oversized request', async () => {
   const nodes = [];
   const transport = createPinnedKeelSepoliaSimulationTransport(async () => { const node = closeDuringProgram(socket(), { code: 1009, reason: 'message too big PRIVATE https://secret.invalid/artwork' }); nodes.push(node); return node; });
   await assert.rejects(transport.request(program), error => {
-    assert.equal(error.kind, 'rpc-unavailable'); assert.equal(error.diagnostic.connectionAttempts, 3);
+    assert.equal(error.kind, 'provider-limit'); assert.equal(error.diagnostic.connectionAttempts, 1);
     assert.equal(error.diagnostic.socketCloseCode, 1009); assert.equal(error.diagnostic.socketCloseReason, 'message-too-large');
     assert.equal(error.diagnostic.rpcMethod, 'eth_simulateV1'); assert.equal(error.diagnostic.socketReadyState, 3);
     assert.equal(error.diagnostic.providerGasCap, undefined); assert.equal(error.diagnostic.rpcCode, undefined);
     assert.doesNotMatch(JSON.stringify(error), /PRIVATE|https:|secret.invalid|artwork|0x1234/); return true;
   });
-  assert.equal(nodes.length, 3); assert.ok(nodes.every(node => node.closed === 1));
+  assert.equal(nodes.length, 1); assert.ok(nodes.every(node => node.closed === 1));
   await transport.close();
 });
 
@@ -502,12 +503,12 @@ test('actual viem socket close events recover within one request and preserve on
     assert.deepEqual(simulationRequests(nodes[0]).at(-1).params, simulationRequests(nodes[1]).at(-1).params);
     closeEveryProject = true;
     await assert.rejects(transport.request(program), error => {
-      assert.equal(error.kind, 'rpc-unavailable'); assert.equal(error.diagnostic.connectionAttempts, 3);
+      assert.equal(error.kind, 'provider-limit'); assert.equal(error.diagnostic.connectionAttempts, 1);
       assert.equal(error.diagnostic.socketCloseCode, 1009); assert.equal(error.diagnostic.socketCloseReason, 'message-too-large');
       assert.equal(error.diagnostic.socketReadyState, 3); assert.equal(error.diagnostic.errorClass, 'SocketClosedError');
       assert.doesNotMatch(JSON.stringify(error), /PRIVATE|secret|127\.0\.0\.1|0x1234/); return true;
     });
-    assert.equal(connections, 4, 'one retained and two replacement sockets in the second request');
+    assert.equal(connections, 2, 'the retained oversized socket is not reopened');
   } finally { await transport.close(); for (const peer of server.clients) peer.terminate(); await new Promise(resolve => server.close(resolve)); }
 });
 
@@ -537,4 +538,135 @@ test('closed-socket replacement must qualify its chain and execution evidence be
     await assert.rejects(transport.request(program), error => ['wrong-chain', 'unsupported-simulation'].includes(error.kind));
     assert.equal(connections, 2); assert.equal(hasProgram(second), false); await transport.close();
   }
+});
+
+const sizeIncident = JSON.parse(readFileSync(new URL('./fixtures/retro-message-size-20261010.json', import.meta.url), 'utf8'));
+function httpConnection(node) {
+  return { protocol: 'https', requestAsync: args => node.requestAsync(args), close: () => node.close() };
+}
+
+test('production 1009 routes the whole immutable numbered request to qualified HTTP on the same approved recipient', async () => {
+  for (const validation of [false, true]) {
+    const request = structuredClone(program); request.params[0].validation = validation;
+    Object.assign(request.params[0].blockStateCalls[0].calls[0], { data: '0x' + 'ab'.repeat(600_000), nonce: '0x6', value: '0x12', gasPrice: '0x30' });
+    const exact = structuredClone(request); exact.params[0].returnFullTransactions = true;
+    const first = closeDuringProgram(socket(), { code: sizeIncident.diagnostic.socketCloseCode, reason: '', mutate: () => { request.params[1] = 'latest'; request.params[0].blockStateCalls[0].calls[0].data = '0x'; } });
+    const next = socket(), attempts = []; let ws = 0, https = 0;
+    const t = createPinnedKeelSepoliaSimulationTransport(async () => { ws++; return first; }, {
+      messageSizeFallback: async () => { https++; return httpConnection(next); }, onAttempt: d => attempts.push(d),
+    });
+    try {
+      await t.request(request);
+      assert.equal(ws, 1); assert.equal(https, 1); assert.equal(first.closed, 1);
+      assert.deepEqual(simulationRequests(first).at(-1), exact); assert.deepEqual(simulationRequests(next).at(-1), exact);
+      assert.deepEqual(simulationRequests(next).slice(0, 2).map(r => r.params[0].blockStateCalls[0].calls[0].gas), [gas, gas]);
+      assert.equal(attempts[0].socketCloseCode, 1009); assert.equal(attempts[0].requestPayloadBytes, Buffer.byteLength(JSON.stringify(exact)));
+      assert.equal(attempts[0].blockCount, 1); assert.equal(attempts[0].callCount, 1); assert.equal(attempts[0].transport, 'websocket');
+      assert.equal(attempts[0].requiredProgramGas, '200000000'); assert.equal(attempts[0].connectionAttempts, 1);
+      await t.request(exact); assert.equal(ws, 1); assert.equal(https, 1, 'later phases retain HTTP and never repeat the rejected WebSocket exchange');
+    } finally { await t.close(); }
+  }
+});
+
+test('message-size recovery blocks HTTP capacity, qualification, 413, timeout, missing envelope and changed snapshot without lowering or splitting', async () => {
+  for (const fault of ['capacity', 'chain', 'nonce', '413', 'timeout', 'envelope', 'snapshot']) {
+    const first = closeDuringProgram(socket(), { code: 1009 }); const nodes = [], attempts = [];
+    const t = createPinnedKeelSepoliaSimulationTransport(async () => first, {
+      onAttempt: d => attempts.push(d),
+      messageSizeFallback: async () => {
+        const n = socket(fault === 'capacity' ? { cap: incidentCap } : fault === 'chain' ? { chain: '0x1' } : fault === 'nonce' ? { ignoreNonce: true } : {});
+        nodes.push(n); const original = n.requestAsync.bind(n); let reads = 0;
+        n.requestAsync = async args => {
+          const response = await original(args);
+          if (args.body.method === 'eth_getBlockByNumber' && ++reads === 3 && fault === 'snapshot') response.result.hash = hash(777);
+          if (args.body.method === 'eth_simulateV1' && args.body.params[0].blockStateCalls[0].calls[0].data !== '0x') {
+            if (fault === '413') throw { name: 'HttpRequestError', status: 413, message: 'PRIVATE body' };
+            if (fault === 'timeout') throw { name: 'TimeoutError' };
+            if (fault === 'envelope') delete response.result[0].transactions;
+          }
+          return response;
+        }; return httpConnection(n);
+      },
+    });
+    try {
+      await assert.rejects(t.request(program), e => {
+        assert.equal(e.kind, ({ capacity: 'provider-limit', chain: 'wrong-chain', nonce: 'unsupported-simulation', '413': 'provider-limit', timeout: 'rpc-unavailable', envelope: 'unsupported-simulation', snapshot: 'chain-reorganized' })[fault]);
+        assert.equal(e.diagnostic.transport, 'https'); assert.equal(e.diagnostic.socketReadyState, undefined);
+        assert.doesNotMatch(JSON.stringify(e), /PRIVATE|0x1234/); return true;
+      });
+      assert.equal(nodes.length, fault === 'capacity' ? 2 : 1);
+      if (['capacity', 'chain', 'nonce', 'snapshot'].includes(fault)) assert.ok(nodes.every(n => !hasProgram(n)));
+      if (fault === 'capacity') {
+        assert.deepEqual(attempts.map(a => [a.connectionAttempts, a.transport]), [[1, 'websocket'], [2, 'https'], [3, 'https']]);
+        assert.equal(attempts[2].stage, 'read-capacity'); assert.equal(attempts[2].providerGasCap, '50000000'); assert.equal(attempts[2].requestedGasLimit, '200000000');
+      }
+    } finally { await t.close(); }
+  }
+});
+
+test('1009 recovery will not switch transports for symbolic state or after explicit close', async () => {
+  let fallback = 0;
+  const t = createPinnedKeelSepoliaSimulationTransport(async () => closeDuringProgram(socket(), { code: 1009 }), { messageSizeFallback: async () => { fallback++; return httpConnection(socket()); } });
+  await assert.rejects(t.request({ ...program, params: [program.params[0], 'latest'] }), e => e.kind === 'provider-limit');
+  await t.close(); await assert.rejects(t.request(program), e => e.kind === 'rpc-unavailable'); assert.equal(fallback, 0);
+});
+
+test('installed viem carries a large unchanged request from real WS 1009 to real HTTP with raw strict-nonce evidence', { timeout: 10000 }, async () => {
+  const viemRequire = createRequire(import.meta.resolve('viem'));
+  const { WebSocketServer } = createRequire(viemRequire.resolve('isows'))('ws');
+  const ws = new WebSocketServer({ host: '127.0.0.1', port: 0 }); await once(ws, 'listening');
+  const wsNode = socket(), httpNode = socket(), wire = []; let wsCount = 0;
+  ws.on('connection', peer => { wsCount++; peer.on('message', async raw => {
+    const body = JSON.parse(String(raw)); const response = await wsNode.requestAsync({ body });
+    if (body.method === 'eth_simulateV1' && body.params[0].blockStateCalls[0].calls[0].data !== '0x') { wire.push({ transport: 'websocket', body, bytes: Buffer.byteLength(raw) }); peer.close(1009, ''); return; }
+    peer.send(JSON.stringify({ jsonrpc: '2.0', id: body.id, ...response }));
+  }); });
+  const server = createServer(async (req, res) => {
+    const parts = []; for await (const part of req) parts.push(part); const raw = Buffer.concat(parts), body = JSON.parse(raw);
+    if (body.method === 'eth_simulateV1' && body.params[0].blockStateCalls[0].calls[0].data !== '0x') wire.push({ transport: 'https', body, bytes: raw.length });
+    const response = await httpNode.requestAsync({ body }); res.setHeader('Content-Type', 'application/json'); res.end(JSON.stringify({ jsonrpc: '2.0', id: body.id, ...response }));
+  }).listen(0, '127.0.0.1'); await once(server, 'listening');
+  const t = createPinnedKeelSepoliaSimulationTransport(async () => createPublicClient({ transport: webSocket(`ws://127.0.0.1:${ws.address().port}`, { retryCount: 0, reconnect: false, keepAlive: false }) }).transport.getRpcClient(), {
+    messageSizeFallback: async () => {
+      const client = createPublicClient({ transport: http(`http://127.0.0.1:${server.address().port}`, { raw: true, batch: false, retryCount: 0 }) });
+      return { protocol: 'https', close() {}, requestAsync: ({ body }) => client.request(body) };
+    },
+  });
+  try {
+    const request = structuredClone(program); request.params[0].blockStateCalls[0].calls[0].data = '0x' + 'cd'.repeat(600_000);
+    const result = await t.request(request); assert.equal(result[0].transactions[0].gas, gas);
+    assert.equal(wsCount, 1); assert.equal(wire.length, 2); assert.deepEqual(wire[0].body.params, wire[1].body.params);
+    assert.ok(wire.every(w => w.bytes > 1_200_000));
+    assert.equal(simulationRequests(httpNode).length, 4, 'read/strict capacity and negative nonce run before the full project');
+  } finally { await t.close(); for (const peer of ws.clients) peer.terminate(); await new Promise(resolve => ws.close(resolve)); await new Promise(resolve => server.close(resolve)); }
+});
+
+test('concurrent 1009 failures share the qualified HTTP replacement after the cached socket drains', { timeout: 5000 }, async () => {
+  const first = closeDuringProgram(socket(), { code: 1009 }), next = socket(), original = first.requestAsync.bind(first);
+  let ws = 0, https = 0, release, started;
+  const entered = new Promise(resolve => { started = resolve; });
+  first.requestAsync = async args => {
+    if (args.body.method === 'eth_getCode' && args.body.params[0] === 'fixture-concurrent-reader') { started(); await new Promise(resolve => { release = resolve; }); }
+    return original(args);
+  };
+  const t = createPinnedKeelSepoliaSimulationTransport(async () => { ws++; return first; }, { messageSizeFallback: async () => { https++; return httpConnection(next); }, onAttempt() { throw Error('observer cannot influence proof'); } });
+  await t.request({ method: 'eth_chainId', params: [] });
+  const read = t.request({ method: 'eth_getCode', params: ['fixture-concurrent-reader', '0x12'] }); await entered;
+  const simulations = Promise.all([t.request(program), t.request(program)]); simulations.catch(() => {});
+  try { await new Promise(resolve => setTimeout(resolve, 20)); assert.equal(https, 0); assert.equal(first.closed, 0); }
+  finally { release(); }
+  await read; await simulations; assert.equal(ws, 1); assert.equal(https, 1);
+  const count = next.requests.length;
+  for (const method of ['eth_sendTransaction', 'eth_sendRawTransaction', 'wallet_sendCalls', 'eth_sign']) await assert.rejects(t.request({ method, params: [] }), e => e.kind === 'configuration-invalid');
+  assert.equal(next.requests.length, count); await t.close();
+});
+
+test('explicit close during HTTP replay cannot release a late proof or reconnect', async () => {
+  const first = closeDuringProgram(socket(), { code: 1009 }), next = socket(), original = next.requestAsync.bind(next);
+  let release, started, httpCount = 0;
+  const entered = new Promise(resolve => { started = resolve; });
+  next.requestAsync = async args => { if (args.body.method === 'eth_simulateV1' && args.body.params[0].blockStateCalls[0].calls[0].data !== '0x') { started(); await new Promise(resolve => { release = resolve; }); } return original(args); };
+  const t = createPinnedKeelSepoliaSimulationTransport(async () => first, { messageSizeFallback: async () => { httpCount++; return httpConnection(next); } });
+  const pending = t.request(program); await entered; await t.close(); release();
+  await assert.rejects(pending, e => e.kind === 'rpc-unavailable'); assert.equal(httpCount, 1); assert.equal(next.closed, 1);
 });
