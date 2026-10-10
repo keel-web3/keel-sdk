@@ -8,6 +8,7 @@ import { setTimeout as delay } from 'node:timers/promises';
 import solc from 'solc';
 import { encodeFunctionData, encodeAbiParameters, keccak256, toHex } from 'viem';
 import { createProofBackedSimulationTransport } from '../native/proof-executor/transport.mjs';
+import { createApprovedProofStateReader } from '../native/proof-executor/state-reader.mjs';
 import { encodeKeelAtomicWalletBatch } from '../packages/sdk/dist/release-wallet-batch.js';
 import { simulateKeelPublicationBeforeFunding } from '../packages/sdk/dist/publication-preflight.js';
 const image='ethereum/client-go@sha256:abf3605177f8bdcfce436985a8054cca4ae59256323a4ffb72c56c04f3d1fadd';
@@ -37,7 +38,8 @@ const contextData=(name,args=[])=>encodeFunctionData({abi:contextArtifact.abi,fu
 const payload=(program,validation=true)=>({blockStateCalls:program.map(c=>({calls:[c]})),validation,traceTransfers:false,returnFullTransactions:true});
 const allowed=new Set(['web3_clientVersion','eth_chainId','eth_getBlockByNumber','eth_getBlockByHash','eth_getCode','eth_getProof','eth_getBalance','eth_getTransactionCount','eth_getStorageAt','eth_simulateV1']);
 function rpc(method,params=[]){assert.ok(allowed.has(method));writeFileSync(join(tmp,'request.json'),JSON.stringify({jsonrpc:'2.0',id:1,method,params}));const r=JSON.parse(docker('exec',container,'wget','-Y','off','-q','-O','-','--header=Content-Type: application/json','--post-file=/fixture/request.json','http://127.0.0.1:8545'));if(r.error)throw Object.assign(new Error(r.error.message),{code:r.error.code});return r.result;}
-let started=false,processCount=0,base,lastNativeDiagnostic='';
+let started=false,brokerStarted=false,socketVolumeCreated=false,processCount=0,base,lastNativeDiagnostic='';
+const brokerContainer=`${container}-broker`,socketVolume=`${container}-socket`;
 const upstream=[];
 const stateReader={request:async({method,params})=>{assert.ok(['eth_chainId','eth_getBlockByNumber','eth_getBlockByHash','eth_getProof','eth_getCode'].includes(method),'upstream execution forbidden');upstream.push({method,params});return rpc(method,params);}};
 function isolatedRunner(){processCount++;lastNativeDiagnostic='';const childName=`${container}-executor-${processCount}`,child=spawn('docker',['run','--name',childName,'--pull=never','--rm','-i','--network','none','--memory','768m','--cpus','2','--pids-limit','64','--read-only','--cap-drop','ALL','--security-opt','no-new-privileges','--user',`${process.getuid()}:${process.getgid()}`,'-e','GOMEMLIMIT=512MiB','-e','GOMAXPROCS=2','-v',`${binary}:/executor:ro`,'--entrypoint','/executor',runnerImage],{stdio:['pipe','pipe','pipe']});child.stderr.on('data',chunk=>{lastNativeDiagnostic=(lastNativeDiagnostic+chunk.toString()).slice(-8000);});const kill=child.kill.bind(child);child.kill=signal=>{try{docker('rm','-f',childName);}catch{}return kill(signal);};return child;}
@@ -89,6 +91,43 @@ try{
  await compare('unchanged atomic ABI program on synthetic existing delegation matches Geth',[atomic],result=>assert.equal(result[0].calls[0].status,'0x1'));
  const atomicProof=await simulateKeelPublicationBeforeFunding({...plan,transactionContext:'atomic-wallet',preparationCalls:[atomic],assertions:[{callIndex:0,returnData:'0x'}]},transport);
  assert.equal(atomicProof.schema,'keel-publication-simulation@1');record('unchanged synthetic atomic plan completes every SDK phase with explicit nonce and fees');
+ // Compose the actual SDK adapter, governed source pool, IPC client, isolated
+ // broker and native executor. Only the fetch socket is substituted: it returns
+ // the real fixture Geth responses and never reaches an external provider.
+ const runnerReceipt=JSON.parse(readFileSync(join(build,'runner-image-receipt.json'),'utf8'));
+ assert.equal(runnerReceipt.binarySha256,binarySha256);assert.equal(runnerReceipt.sdkCommit,receipt.sdkCommit);
+ docker('volume','create','--driver','local','--opt','type=tmpfs','--opt','device=tmpfs','--opt',`o=size=16m,uid=${process.getuid()},gid=${process.getgid()},mode=0700,noexec,nosuid`,socketVolume);socketVolumeCreated=true;
+ docker('run','--pull=never','-d','--name',brokerContainer,'--init','--network','none','--memory','768m','--cpus','2','--pids-limit','64','--read-only','--cap-drop','ALL','--security-opt','no-new-privileges','--user',`${process.getuid()}:${process.getgid()}`,'-v',`${socketVolume}:/run/keel-proof:rw`,runnerReceipt.imageId,'--sha256',binarySha256);brokerStarted=true;
+ await delay(100);
+ const brokerConfig=JSON.parse(docker('inspect',brokerContainer))[0];assert.equal(brokerConfig.Image,runnerReceipt.imageId);assert.equal(brokerConfig.Mounts.length,1);assert.equal(brokerConfig.Mounts[0].Destination,'/run/keel-proof');
+ const poolReads=[],poolAttempts=[],approvedURLs=['https://public.fixture.invalid','https://paid.fixture.invalid/SECRET'];
+ const fixtureFetch=async(url,init)=>{
+  const request=JSON.parse(init.body);poolReads.push({url,method:request.method,params:request.params});
+  assert.ok(['eth_chainId','eth_getBlockByNumber','eth_getBlockByHash','eth_getProof','eth_getCode'].includes(request.method));
+  if(url===approvedURLs[0]&&request.method==='eth_getProof')return new Response('',{status:429,headers:{'retry-after':'600'}});
+  assert.ok(approvedURLs.includes(url));return new Response(JSON.stringify({jsonrpc:'2.0',id:request.id,result:rpc(request.method,request.params)}));
+ };
+ const governedOptions={rpcUrls:approvedURLs,approvedStateRpcUrls:approvedURLs,block:{number:BigInt(base.number),hash:base.hash},fetchImpl:fixtureFetch,minIntervalMs:0,onAttempt:d=>poolAttempts.push(d)};
+ const spawnViaBroker=()=>{
+  const child=spawn('docker',['exec','-i','--user',`${process.getuid()}:${process.getgid()}`,`${container}-client`,'node','/client/runner-relay.mjs'],{stdio:['pipe','pipe','pipe']});
+  return child;
+ };
+ // A separate application-like container has only the read-only IPC mount and
+ // client code. It cannot access broker files, Docker, state data or the network.
+ docker('run','--pull=never','-d','--name',`${container}-client`,'--init','--network','none','--memory','128m','--pids-limit','32','--read-only','--cap-drop','ALL','--security-opt','no-new-privileges','--user',`${process.getuid()}:${process.getgid()}`,'-v',`${socketVolume}:/run/keel-proof:ro`,'-v',`${process.cwd()}/native/proof-executor:/client:ro`,'-e','KEEL_RUNNER_SOCKET=/run/keel-proof/runner.sock','-e',`KEEL_EXECUTOR_SHA256=${binarySha256}`,runnerImage,'sleep','600');
+ try{
+  for(const [name,p] of [['sequential',plan],['atomic',{...plan,transactionContext:'atomic-wallet',preparationCalls:[atomic],assertions:[{callIndex:0,returnData:'0x'}]}]]){
+   const governed=createApprovedProofStateReader(governedOptions),composed=await createProofBackedSimulationTransport({...options(),stateReader:governed,spawnExecutor:spawnViaBroker});
+   try{const result=await simulateKeelPublicationBeforeFunding(p,composed);assert.equal(result.schema,'keel-publication-simulation@1');assert.equal(result.signing,'not-performed');}
+   finally{await composed.close();governed.close();}
+   record(`real approved reader, IPC broker and native executor complete every SDK ${name} phase without altering original calls`);
+  }
+  assert.equal(poolReads.filter(r=>r.url===approvedURLs[0]&&r.method==='eth_getProof').length,1,'public cooldown survives fresh transports');
+  assert.ok(poolReads.some(r=>r.url===approvedURLs[1]&&r.method==='eth_getCode'));
+  assert.ok(poolReads.filter(r=>['eth_getCode','eth_getProof'].includes(r.method)).every(r=>{const a=r.params.at(-1);return a.blockHash===base.hash&&a.requireCanonical===true;}));
+  assert.ok(!JSON.stringify(poolAttempts).includes('SECRET'));
+  record('composed public overload uses only approved paid state reads, retains cooldown on reload and pins ordinary SDK code reads');
+ }finally{docker('rm','-f',`${container}-client`);docker('rm','-f',brokerContainer);brokerStarted=false;docker('volume','rm',socketVolume);socketVolumeCreated=false;}
  for(const [name,call] of [['nonce',{...calls[0],nonce:'0x5'}],['fee',{...calls[0],gasPrice:'0x0'}],['balance',{...calls[0],from:`0x${'33'.repeat(20)}`} ]]){
   await assert.rejects(transport.request({method:'eth_simulateV1',params:[payload([call]),'0x0']}));record(`strict invalid ${name} is rejected`);
  }
@@ -168,4 +207,4 @@ try{
  evidence.resources={completedExecutions:evidence.executions.length,peakProcessRSSBytes:Math.max(...evidence.executions.map(e=>e.processPeakRSSBytes)),maximumNativeWallTimeMs:Math.max(...evidence.executions.map(e=>e.nativeWallTimeMs)),maximumReadRequests:Math.max(...evidence.executions.map(e=>e.readRequests)),maximumWitnessBytes:Math.max(...evidence.executions.map(e=>e.witnessBytes))};console.log(`RESOURCES ${JSON.stringify(evidence.resources)}`);
  record('canonical state, nonce and header unchanged; upstream received no execution or calldata',{processCount});
 }catch(error){evidence.failure={name:error.name,message:error.message,code:error.code,nativeDiagnostic:lastNativeDiagnostic};process.exitCode=1;console.error(error);if(lastNativeDiagnostic)console.error(lastNativeDiagnostic);}
-finally{if(process.env.KEEL_PROOF_EXECUTOR_EVIDENCE)writeFileSync(process.env.KEEL_PROOF_EXECUTOR_EVIDENCE,JSON.stringify(evidence,null,2)+'\n');if(started){try{docker('rm','-f',container);}catch{}}rmSync(tmp,{recursive:true,force:true});}
+finally{if(process.env.KEEL_PROOF_EXECUTOR_EVIDENCE)writeFileSync(process.env.KEEL_PROOF_EXECUTOR_EVIDENCE,JSON.stringify(evidence,null,2)+'\n');if(brokerStarted){try{docker('rm','-f',`${container}-client`,brokerContainer);}catch{}}if(socketVolumeCreated){try{docker('volume','rm',socketVolume);}catch{}}if(started){try{docker('rm','-f',container);}catch{}}rmSync(tmp,{recursive:true,force:true});}

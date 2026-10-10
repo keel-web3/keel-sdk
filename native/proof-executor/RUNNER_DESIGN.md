@@ -7,20 +7,23 @@ execution binding, and the exact saved-plan acceptance run still need review.
 
 ## What is already measured
 
-SDK `3282b7633441471f832b18d9f07ecb6eefda03b9` passed cloud run
-[38049992731](https://github.com/keel-web3/keel-sdk/actions/runs/38049992731):
-34 native checks and 19 protocol guard tests. This includes the unchanged atomic
-ABI fixture through every SDK phase; it does not identify a live wallet runtime.
-Across 17 completed executions, peak process RSS was 61,329,408 bytes, maximum
-native wall time 67,354 ms, maximum read requests 1,336, and maximum witness size
-556,102 bytes. These synthetic measurements do not establish the actual plans'
-memory, elapsed time, read count, or a public provider's rate capacity.
+SDK `78188c2f90c5d4a7c393f07f2f97d2d53c3a064b` passed cloud run
+[38051601085](https://github.com/keel-web3/keel-sdk/actions/runs/38051601085):
+39 native differential checks and 29 protocol/state-reader tests. It exercised
+non-genesis canonical ancestors and both unchanged sequential and synthetic
+atomic plans through every SDK phase. The source pool and broker were not
+composed in that run; the broker branch adds that missing integration test.
+Across 18 completed executions, peak process RSS was 50,782,208 bytes, maximum
+native wall time 1,143 ms, maximum read requests 21, and maximum witness size
+9,502 bytes. These synthetic measurements do not establish either actual plan's
+memory, elapsed time, read count, or a provider's capacity.
 
-The native binary is 15,581,936 bytes with SHA-256
-`ead23878b45c3aa2cf895387a4498317357c5c2fa524ef031051614e39385b86`.
+That native binary is 15,586,440 bytes with SHA-256
+`db7308985cbb32eb6bbcbef95edf456786ca02519ac1f89cc6ad8edf5fd90307`.
 It embeds unchanged Geth `a579077007b98217c3e253a66e4b452ca0c32b96` plus the
-reviewable additive bridge. A file checksum alone does not prove which file a
-runner executed or establish process isolation.
+reviewable additive bridge. New broker builds have their own commit-specific
+receipt and immutable image archive; never reuse this earlier digest as the
+identity of a later artifact.
 
 ## Proposed process and artifact boundary
 
@@ -43,7 +46,8 @@ native result provenance. Client-supplied executable paths/arguments are refused
 Use one local Unix socket for the bidirectional bounded JSON-lines protocol.
 The broker accepts only the configured Studio UID using kernel peer credentials.
 The socket directory is mode 0700, the socket 0600, and the broker has the same
-unprivileged numeric UID as the approved application socket client. The actual
+unprivileged numeric UID as the approved application socket client. Studio mounts
+the socket directory read-only; only the broker mount is writable. The actual
 deployed UID must be inspected before choosing it. The executor receives only
 stdio and its executable descriptor, an empty credential environment plus fixed
 Go resource settings, and no provider URL or secret. Network namespace: none.
@@ -55,6 +59,13 @@ deadline, malformed framing or byte exhaustion kills the whole process group;
 the slot is released only after process exit has been observed. The broker
 reports the native exit status after output drains. A socket closure without
 that final status cannot complete a proof. Parent death must kill its child.
+
+A process-held, no-follow lock serializes startup in the private socket directory.
+After an unclean exit, recovery removes only the same owned socket inode whose
+connect attempt returns ECONNREFUSED. A live listener, ambiguous connection
+failure, changed inode, symlink or regular file is refused without unlinking it.
+The lock is released by the kernel on SIGKILL; no manual socket deletion is
+needed. This closes the original broker restart blocker.
 
 ## Exact proposed resource changes
 
@@ -173,3 +184,22 @@ The 2026-10-10 cloud PublicNode qualification attempt stopped on its first
 account, code or storage request was made. No retry, route change or fallback
 provider was attempted. This does not establish PublicNode proof capability or
 availability from the production host.
+
+## Approved public-only operator format probe
+
+The cloud route remains stopped after its first pre-HTTP failure. On the already
+approved operator route, use the reviewed script from this exact SDK commit:
+
+```sh
+python3 scripts/qualify-public-proof-source.py --run-approved-public-probe --output /tmp/keel-public-proof-format.json
+```
+
+It performs at most nine serial requests to the fixed approved PublicNode Sepolia
+URL, waits one second between reads, bounds each response at 2 MiB and 15 seconds,
+and never follows redirects or retries. It uses only the fixed public test
+account and the public EIP-4788 system contract, a pinned header, two public
+system slots, parent linkage and a final canonical recheck. It stops on the first
+network, HTTP or RPC failure. Do not replace its addresses, slots or recipient.
+The mode-0600 local JSON file contains public responses for offline proof/code
+verification. Format success alone is not cryptographic verification, live plan
+qualification or publication. No probe is run automatically by builds or CI.

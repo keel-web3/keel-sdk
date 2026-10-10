@@ -6,6 +6,7 @@ package main
 import (
 	"context"
 	"crypto/sha256"
+	"debug/elf"
 	"encoding/hex"
 	"encoding/json"
 	"errors"
@@ -18,6 +19,7 @@ import (
 	"os/signal"
 	"path/filepath"
 	"sync"
+	"sync/atomic"
 	"syscall"
 	"time"
 )
@@ -31,10 +33,24 @@ type executor struct {
 	digest string
 	uid    uint32
 	active chan struct{}
+	wall   time.Duration
+}
+
+func canonicalPath(path string) bool {
+	if !filepath.IsAbs(path) || filepath.Clean(path) != path {
+		return false
+	}
+	for current := path; current != "/"; current = filepath.Dir(current) {
+		info, err := os.Lstat(current)
+		if err != nil || info.Mode()&os.ModeSymlink != 0 {
+			return false
+		}
+	}
+	return true
 }
 
 func openExecutor(path, expected string) (*os.File, error) {
-	if len(expected) != 64 {
+	if !canonicalPath(path) || len(expected) != 64 {
 		return nil, errors.New("invalid binary identity")
 	}
 	if _, err := hex.DecodeString(expected); err != nil {
@@ -70,6 +86,15 @@ func openExecutor(path, expected string) (*os.File, error) {
 	if _, err := f.ReadAt(magic, 0); err != nil || string(magic) != "\x7fELF" {
 		return nil, errors.New("static ELF executor required")
 	}
+	program, err := elf.NewFile(f)
+	if err != nil {
+		return nil, errors.New("invalid executable")
+	}
+	for _, segment := range program.Progs {
+		if segment.Type == elf.PT_INTERP {
+			return nil, errors.New("dynamic executor refused")
+		}
+	}
 	ok = true
 	return f, nil
 }
@@ -104,6 +129,7 @@ func copyBounded(dst io.Writer, src io.Reader, limit int64) error {
 
 func (e *executor) serve(connection *net.UnixConn) {
 	defer connection.Close()
+	connection.SetDeadline(time.Now().Add(e.wall))
 	uid, err := peerUID(connection)
 	if err != nil || uid != e.uid {
 		return
@@ -115,11 +141,10 @@ func (e *executor) serve(connection *net.UnixConn) {
 		json.NewEncoder(connection).Encode(map[string]any{"type": "error", "category": "runner-busy"})
 		return
 	}
-	connection.SetDeadline(time.Now().Add(maxWall))
-	if err := json.NewEncoder(connection).Encode(map[string]any{"type": "runner", "schema": "keel-proof-runner@1", "binarySha256": e.digest, "maximumWallTimeMs": maxWall.Milliseconds(), "maximumConcurrency": 1}); err != nil {
+	if err := json.NewEncoder(connection).Encode(map[string]any{"type": "runner", "schema": "keel-proof-runner@1", "binarySha256": e.digest, "maximumWallTimeMs": e.wall.Milliseconds(), "maximumConcurrency": 1}); err != nil {
 		return
 	}
-	ctx, cancel := context.WithTimeout(context.Background(), maxWall)
+	ctx, cancel := context.WithTimeout(context.Background(), e.wall)
 	defer cancel()
 	cmd := exec.CommandContext(ctx, "/proc/self/fd/3")
 	cmd.Args = []string{"keel-proof-executor"}
@@ -162,35 +187,44 @@ func (e *executor) serve(connection *net.UnixConn) {
 		return
 	}
 	var streams sync.WaitGroup
-	streams.Add(2)
+	var failed, childDone atomic.Bool
+	stopIO := context.AfterFunc(ctx, func() { connection.Close(); inputWriter.Close(); output.Close(); diagnostics.Close() })
+	defer stopIO()
+	streams.Add(3)
 	go func() {
-		if copyBounded(inputWriter, connection, maxInput) != nil {
+		defer streams.Done()
+		_ = copyBounded(inputWriter, connection, maxInput)
+		inputWriter.Close()
+		if !childDone.Load() {
+			failed.Store(true)
 			cancel()
 		}
-		inputWriter.Close()
-		cancel()
 	}()
 	go func() {
 		defer streams.Done()
 		if copyBounded(connection, output, maxOutput) != nil {
+			failed.Store(true)
 			cancel()
-			connection.Close()
 		}
 	}()
 	go func() {
 		defer streams.Done()
 		if copyBounded(io.Discard, diagnostics, 64*1024) != nil {
+			failed.Store(true)
 			cancel()
 		}
 	}()
 	err = cmd.Wait()
-	// Descendants cannot retain pipes or a request slot after the direct child exits.
+	childDone.Store(true)
 	_ = syscall.Kill(-cmd.Process.Pid, syscall.SIGKILL)
+	connection.CloseRead()
 	streams.Wait()
 	code := 0
-	if err != nil {
+	if err != nil || failed.Load() || ctx.Err() != nil {
 		code = 1
 	}
+	stopIO()
+
 	json.NewEncoder(connection).Encode(map[string]any{"type": "runner-exit", "code": code})
 }
 
@@ -198,9 +232,10 @@ func main() {
 	binary := flag.String("binary", "/executor", "immutable executor path")
 	digest := flag.String("sha256", "", "expected executor SHA-256")
 	socket := flag.String("socket", "/run/keel-proof/runner.sock", "local Unix socket")
+	wall := flag.Duration("wall-time", maxWall, "bounded request deadline")
 	uid := flag.Uint("uid", uint(os.Getuid()), "approved local application UID")
 	flag.Parse()
-	if flag.NArg() != 0 || *uid > uint(^uint32(0)) || !filepath.IsAbs(*socket) || os.Getuid() == 0 {
+	if flag.NArg() != 0 || *uid > uint(^uint32(0)) || !filepath.IsAbs(*socket) || filepath.Clean(*socket) != *socket || filepath.Base(*socket) != "runner.sock" || *wall <= 0 || *wall > maxWall || os.Getuid() == 0 {
 		fmt.Fprintln(os.Stderr, "invalid unprivileged runner configuration")
 		os.Exit(1)
 	}
@@ -210,15 +245,17 @@ func main() {
 		os.Exit(1)
 	}
 	defer file.Close()
-	if info, err := os.Stat(filepath.Dir(*socket)); err != nil || !info.IsDir() || info.Mode().Perm() != 0700 {
+	if info, err := os.Lstat(filepath.Dir(*socket)); err != nil || !canonicalPath(filepath.Dir(*socket)) || !info.IsDir() || info.Mode().Perm() != 0700 || info.Sys().(*syscall.Stat_t).Uid != uint32(os.Getuid()) {
 		fmt.Fprintln(os.Stderr, "private socket directory required")
 		os.Exit(1)
 	}
-	// Never remove a pre-existing socket or file belonging to another process.
-	if _, err := os.Lstat(*socket); !os.IsNotExist(err) {
-		fmt.Fprintln(os.Stderr, "socket path already exists")
+	lock, err := prepareSocket(*socket)
+	if err != nil {
+		fmt.Fprintln(os.Stderr, err.Error())
 		os.Exit(1)
 	}
+	defer lock.Close()
+
 	listener, err := net.ListenUnix("unix", &net.UnixAddr{Name: *socket, Net: "unix"})
 	if err != nil {
 		fmt.Fprintln(os.Stderr, "socket unavailable")
@@ -231,12 +268,18 @@ func main() {
 	ctx, stop := signal.NotifyContext(context.Background(), syscall.SIGINT, syscall.SIGTERM)
 	defer stop()
 	go func() { <-ctx.Done(); listener.Close() }()
-	e := &executor{file: file, digest: *digest, uid: uint32(*uid), active: make(chan struct{}, 1)}
+	e := &executor{file: file, digest: *digest, uid: uint32(*uid), active: make(chan struct{}, 1), wall: *wall}
+	connections := make(chan struct{}, 8)
 	for {
 		connection, err := listener.AcceptUnix()
 		if err != nil {
 			return
 		}
-		go e.serve(connection)
+		select {
+		case connections <- struct{}{}:
+			go func() { defer func() { <-connections }(); e.serve(connection) }()
+		default:
+			connection.Close()
+		}
 	}
 }

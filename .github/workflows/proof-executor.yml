@@ -1,9 +1,9 @@
 name: Proof-backed executor candidate
 on:
   pull_request:
-    branches: [codex/rpc-fork-evaluation-20261010]
+    branches: [codex/rpc-fork-evaluation-20261010, codex/proof-backed-executor-20261010]
   push:
-    branches: [codex/proof-backed-executor-20261010]
+    branches: [codex/proof-backed-executor-20261010, codex/proof-runner-broker-20261010]
   workflow_dispatch:
 concurrency:
   group: proof-executor-${{ github.ref }}
@@ -29,12 +29,17 @@ jobs:
           cache: false
       - name: Compile the pinned Geth bridge
         run: node scripts/build-proof-executor.mjs
+      - name: Build and reload the immutable runner image
+        run: node scripts/build-proof-runner-image.mjs
       - uses: actions/upload-artifact@v4
         with:
           name: proof-executor-build
           path: |
             /tmp/keel-proof-executor-build/keel-proof-executor
+            /tmp/keel-proof-executor-build/keel-proof-runner
             /tmp/keel-proof-executor-build/receipt.json
+            /tmp/keel-proof-executor-build/runner-image-receipt.json
+            /tmp/keel-proof-executor-build/keel-proof-runner.tar
       - uses: pnpm/action-setup@v4
       - uses: actions/setup-node@v4
         with:
@@ -45,17 +50,25 @@ jobs:
           pnpm install --frozen-lockfile
           node scripts/build.mjs
       - name: Verify native process protocol and provenance guards
-        run: node --test tests/proof-executor-transport.test.mjs tests/proof-state-reader.test.mjs
+        run: node --test tests/proof-executor-transport.test.mjs tests/proof-state-reader.test.mjs tests/proof-runner-client.test.mjs
+      - name: Verify broker socket ownership under the Go race detector
+        working-directory: native/proof-executor/runner
+        env:
+          CGO_ENABLED: '1'
+        run: go test -race -count=1 ./...
       - name: Compare sparse execution with native Geth in isolated containers
         env:
           KEEL_PROOF_EXECUTOR_EVIDENCE: proof-executor-evidence.json
         run: |
           docker pull ethereum/client-go@sha256:abf3605177f8bdcfce436985a8054cca4ae59256323a4ffb72c56c04f3d1fadd
           docker pull node@sha256:6c74791e557ce11fc957704f6d4fe134a7bc8d6f5ca4403205b2966bd488f6b3
+          KEEL_RUNNER_EVIDENCE=proof-runner-evidence.json node scripts/verify-proof-runner.mjs
           node scripts/verify-proof-executor.mjs
       - uses: actions/upload-artifact@v4
         if: ${{ always() }}
         with:
           name: proof-executor-evidence
-          path: proof-executor-evidence.json
+          path: |
+            proof-executor-evidence.json
+            proof-runner-evidence.json
           if-no-files-found: warn
