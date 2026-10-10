@@ -57,7 +57,7 @@ export async function createProofBackedSimulationTransport({ binaryPath, binaryS
         child.once('close',code=>{tail.then(()=>{if(stopped)return;if(code!==0 || !finished || !pendingResult || buffer.length)finish(fail('Native simulation did not complete.'));else finish(undefined,pendingResult);}).catch(()=>finish(fail('Native simulation did not complete.')));});
         async function frame(message) {
           if(stopped)return;if(finished)throw fail('Native output followed a final result.');
-          if(message.type==='error') {if(Number.isInteger(message.rpcCode)&&message.rpcCode<0)throw new KeelRpcResponseError(message.rpcCode);throw fail('Authenticated local execution could not be completed.');}
+          if(message.type==='error') {if(message.category==='incomplete-witness')throw new KeelPublicationSimulationError('rpc-unavailable','Authenticated local execution needs additional proven trie nodes.',{nativeFailure:'incomplete-witness'});if(Number.isInteger(message.rpcCode)&&message.rpcCode<0)throw new KeelRpcResponseError(message.rpcCode);throw fail('Authenticated local execution could not be completed.');}
           if(message.type==='result') {
             const e=message.evidence;
             if(!Array.isArray(message.result)||message.result.length!==payload.blockStateCalls.length||e?.schema!=='keel-proof-executor-evidence@1'||e.gethCommit!==GETH_COMMIT||e.requestSha256!==requestSha256||e.chainId!==11155111||e.gasBudget!==limits.gasBudget||e.blockHash?.toLowerCase()!==block.hash.toLowerCase()||e.baseStateRoot!==header.stateRoot||e.signing!=='not-performed'||e.submission!=='not-performed'||e.readRequests!==count)throw fail('Native execution provenance mismatch.');

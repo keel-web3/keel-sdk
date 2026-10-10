@@ -20,6 +20,7 @@ import (
 	"github.com/ethereum/go-ethereum/core/types"
 	"github.com/ethereum/go-ethereum/internal/ethapi"
 	"github.com/ethereum/go-ethereum/internal/keelfork"
+	"github.com/ethereum/go-ethereum/trie"
 )
 
 const gethCommit = "a579077007b98217c3e253a66e4b452ca0c32b96"
@@ -172,11 +173,16 @@ func main() {
 	}()
 	if err := run(); err != nil {
 		code := 0
+		category := "native-execution-failed"
+		var missing *trie.MissingNodeError
+		if errors.As(err, &missing) {
+			category = "incomplete-witness"
+		}
 		if e, ok := err.(interface{ ErrorCode() int }); ok {
 			code = e.ErrorCode()
 		}
 		// No calldata, provider text, credential or underlying proof bytes in errors.
-		json.NewEncoder(os.Stdout).Encode(map[string]any{"type": "error", "category": "native-execution-failed", "rpcCode": code})
+		json.NewEncoder(os.Stdout).Encode(map[string]any{"type": "error", "category": category, "rpcCode": code})
 		fmt.Fprintln(os.Stderr, err.Error()) // Parent never forwards stderr to user-facing diagnostics.
 		os.Exit(1)
 	}

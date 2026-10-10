@@ -77,8 +77,8 @@ try{
  await compare('canonical storage deletion with complete witness and pre-refund gas match Geth',[contextCall('clear',[true])],result=>{
   assert.equal(result[0].calls[0].status,'0x1');assert.ok(BigInt(result[0].calls[0].maxUsedGas)>BigInt(result[0].calls[0].gasUsed));
  });
- await assert.rejects(transport.request({method:'eth_simulateV1',params:[payload([contextCall('clear',[false])]),'0x0']}));
- assert.match(lastNativeDiagnostic,/incomplete authenticated witness|missing trie node/);record('missing sibling witness rejects deletion without fabricating a state root');
+ await assert.rejects(transport.request({method:'eth_simulateV1',params:[payload([contextCall('clear',[false])]),'0x0']}),error=>error.diagnostic?.nativeFailure==='incomplete-witness');
+ record('missing sibling witness rejects deletion without fabricating a state root');
  const wide=Array.from({length:40},(_,i)=>contextCall('accept',[`0x${'ab'.repeat(50000)}`],i));
  assert.ok(Buffer.byteLength(JSON.stringify(payload(wide)))>=3_856_986);
  await compare('40-call saved-program-sized body above 3.85 MB retains every original 200M envelope',wide,result=>assert.ok(result.every(b=>b.calls[0].status==='0x1'&&BigInt(b.transactions[0].gas)===200_000_000n)));
