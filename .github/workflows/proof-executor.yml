@@ -1,5 +1,7 @@
 name: Proof-backed executor candidate
 on:
+  pull_request:
+    branches: [codex/rpc-fork-evaluation-20261010]
   push:
     branches: [codex/proof-backed-executor-20261010]
   workflow_dispatch:

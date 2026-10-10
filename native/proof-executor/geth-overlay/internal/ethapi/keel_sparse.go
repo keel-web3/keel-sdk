@@ -30,6 +30,7 @@ type KeelSparseBackend struct {
 	Headers       map[uint64]*types.Header
 	Timeout       time.Duration
 	engine        consensus.Engine
+	err           error
 }
 
 func (b *KeelSparseBackend) RPCEVMTimeout() time.Duration     { return b.Timeout }
@@ -38,7 +39,8 @@ func (b *KeelSparseBackend) CurrentHeader() *types.Header     { return types.Cop
 func (b *KeelSparseBackend) Engine() consensus.Engine         { return b.engine }
 func (b *KeelSparseBackend) HeaderByNumber(ctx context.Context, n rpc.BlockNumber) (*types.Header, error) {
 	if n < 0 || uint64(n) > b.Base.Number.Uint64() || b.Base.Number.Uint64()-uint64(n) > 256 {
-		return nil, errors.New("ancestor outside pinned block window")
+		b.err = errors.New("ancestor outside pinned block window")
+		return nil, b.err
 	}
 	parent := b.Base
 	for parent.Number.Uint64() > uint64(n) {
@@ -48,10 +50,12 @@ func (b *KeelSparseBackend) HeaderByNumber(ctx context.Context, n rpc.BlockNumbe
 			var err error
 			child, err = b.FetchAncestor(ctx, parent.ParentHash)
 			if err != nil {
+				b.err = err
 				return nil, err
 			}
 			if child == nil || child.Hash() != parent.ParentHash || child.Number.Uint64() != number {
-				return nil, errors.New("ancestor header mismatch")
+				b.err = errors.New("ancestor header mismatch")
+				return nil, b.err
 			}
 			b.Headers[number] = child
 		}
@@ -121,6 +125,9 @@ func KeelSparseSimulate(ctx context.Context, base *types.Header, s *state.StateD
 	result, err := sim.execute(ctx, opts.BlockStateCalls)
 	if err != nil {
 		return nil, err
+	}
+	if b.err != nil {
+		return nil, fmt.Errorf("missing authenticated ancestor: %w", b.err)
 	}
 	if err := s.Error(); err != nil {
 		return nil, fmt.Errorf("incomplete authenticated witness: %w", err)
