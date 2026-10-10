@@ -122,6 +122,35 @@ the current production UI, browser wallet, either private release, canonical
 receipt reconciliation, or a deployed collection. Earlier UI/service recovery
 coverage remains separate. Neither affected release is proven published.
 
+The optional `KEEL_NATIVE_FORK_COMPARISON=1` test also runs official Anvil
+v1.8.5 against the local synthetic Geth fork with zero generated accounts,
+mining disabled, and no block/gas overrides. It reproduces that release's
+hard-coded 50M `SIMULATE_GAS_CAP`: the original fork hash and 200M block limit
+remain intact, but a 200M request envelope is reduced to 50M and the SDK
+rejects the full plan. See the [pinned source](https://github.com/foundry-rs/foundry/blob/v1.8.5/crates/anvil/src/eth/backend/mem/mod.rs).
+Amsterdam support alone does not qualify this stock fork executor. A modified
+executor would need maintained capacity controls and additional canonical-state
+and native execution conformance before being considered a production option.
+
+## Prepared owned-node adapter
+
+`@keel/sdk/owned-simulation-transport` provides the opt-in Geth v1.17.8 profile.
+It snapshots the caller's configuration and requests, computes exact fixed-ID
+JSON-RPC wire bytes, and admits each entire program against a finite configured
+gas/body budget. The gas sum is conservative; no quote is treated as execution
+evidence. `node scripts/size-publication-simulation.mjs <local-file>` reports
+the same metrics offline for up to three exact SDK request phases, without
+printing or transmitting their contents.
+
+Before project execution it requires canonical Sepolia genesis, a reviewed
+client build, completed sync, a fresh head and the independently selected block.
+Existing strict public behavior qualification and complete SDK proof remain
+mandatory. It has no fallback recipient, disallows redirects, bounds response
+allocation, allows only read/simulation methods, and limits active simulations
+per endpoint per process. The Studio owned-mode configuration requires its URL
+and both explicit capacity settings; partial settings fail closed. The inert
+deployment template lives in `keel-site/apps/studio/ops/owned-simulator`.
+
 Operator evidence: `Keel-approved-HTTPS-capacity-and-request-bytes-20261010.json`,
 Library ID `libfile_f5bab7b274ac8191ace5697f7bc34c1c`; Gatorrr authorized
 regression: `tests/fixtures/gatorrr-simulator-cap-20261009.json`.

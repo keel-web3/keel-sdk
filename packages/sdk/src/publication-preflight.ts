@@ -102,7 +102,7 @@ export function keelSimulationTransportDiagnostic(error: unknown, context: {
   const codes = ["ETIMEDOUT", "ECONNRESET", "ECONNREFUSED", "EPIPE", "ENOTFOUND", "EAI_AGAIN", "UND_ERR_CONNECT_TIMEOUT", "UND_ERR_SOCKET"];
   const closeReasons = ["empty", "message-too-large", "rate-limited", "timeout", "server-unavailable", "protocol-error", "policy-violation", "other"];
   const stages = ["connection", "chain", "snapshot", "public-account", "read-capacity", "strict-capacity", "strict-nonce", "snapshot-recheck"];
-  const transports = ["websocket", "https"];
+  const transports = ["websocket", "https", "http"];
   const result: Record<string, string | number> = {};
   const pick = (source: Record<string, unknown> | undefined) => {
     if (!source) return;

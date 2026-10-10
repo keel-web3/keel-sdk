@@ -343,6 +343,10 @@
       "types": "./dist/publication-preflight.d.ts",
       "import": "./dist/publication-preflight.js"
     },
+    "./owned-simulation-transport": {
+      "types": "./dist/owned-simulation-transport.d.ts",
+      "import": "./dist/owned-simulation-transport.js"
+    },
     "./studio-project-intake": {
       "types": "./dist/studio-project-intake.d.ts",
       "import": "./dist/studio-project-intake.js"
