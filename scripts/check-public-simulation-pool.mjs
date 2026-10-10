@@ -45,7 +45,7 @@ for (const url of urls) {
   } catch (error) {
     const failure = keelSimulationTransportFailure(error);
     item.failure = { kind: failure.kind, diagnostic: keelSimulationTransportDiagnostic(failure) };
-  } finally { await transport.close(); }
+  } finally { item.providerStatus = pool.status(); await transport.close(); }
   report.candidates.push(item);
 }
 console.log(JSON.stringify(report, null, 2));

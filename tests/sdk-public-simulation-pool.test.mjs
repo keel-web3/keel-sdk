@@ -83,6 +83,18 @@ test('a larger aggregate sequence is publicly requalified even when its largest 
     assert.ok(f.requests.some(r=>r.index===0&&r.body.method==='eth_simulateV1'&&r.body.params[0].blockStateCalls.length===5&&r.body.params[0].blockStateCalls[0].calls[0].data==='0x'));
   }finally{await f.transport.close();}
 });
+test('Retro-sized synthetic 34/40-call requests keep every byte on aggregate-capacity replay',async()=>{
+  for(const count of [34,40]) {
+    const f=fixture([{aggregate:true},{}]);try{
+      const input=program();input.params[0].blockStateCalls=Array.from({length:count},(_,i)=>({calls:[{...call(i),data:`0x${'ab'.repeat(Math.ceil(1_928_493/count))}`}]}));
+      assert.ok(Buffer.byteLength(JSON.stringify(input))>3_856_986,'reproduce the authorized storage-prefix size lower bound with synthetic bytes');
+      const before=structuredClone(input);await f.transport.request(input);
+      assert.deepEqual(input,before);assert.deepEqual(f.privateRequests().map(r=>r.body.params),[before.params,before.params]);
+      const probes=f.requests.filter(r=>r.body.method==='eth_simulateV1'&&r.body.params[0].blockStateCalls.length===count&&r.body.params[0].blockStateCalls[0].calls[0].data==='0x');
+      assert.ok(probes.length>=4);assert.ok(probes.every(r=>r.body.params[0].blockStateCalls.reduce((n,b)=>n+BigInt(b.calls[0].gas),0n)===BigInt(count)*200_000_000n));
+    }finally{await f.transport.close();}
+  }
+});
 test('body limit and transport outage swap complete programs; specific capacity evidence survives pool exhaustion',async()=>{
   for(const http of [413,503]) {const f=fixture([{http},{}]);try{await f.transport.request(program());assert.deepEqual(f.privateRequests().map(r=>r.index),[0,1]);}finally{await f.transport.close();}}
   const f=fixture([{http:413},{unsupported:true}]);try{await assert.rejects(f.transport.request(program()),e=>e.kind==='provider-limit'&&e.diagnostic.httpStatus===413);}finally{await f.transport.close();}

@@ -134,7 +134,12 @@ export function createKeelPublicSepoliaSimulationPool(options: KeelPublicSimulat
       } catch (error) {
         await candidate.transport.close(); if (selected === candidate) selected = undefined;
         if (closed) throw new KeelPublicationSimulationError("rpc-unavailable", "The publication check was cancelled.");
-        const failure = keelSimulationTransportFailure(error, { method: "eth_simulateV1", phase: projectRequest ? "project-request" : "public-qualification" });
+        const classified = keelSimulationTransportFailure(error, { method: "eth_simulateV1", phase: projectRequest ? "project-request" : "public-qualification" });
+        const failure = new KeelPublicationSimulationError(classified.kind, classified.message, { ...classified.diagnostic,
+          // Conservative envelope sum, not measured execution gas. Bytes exclude
+          // only the pool-owned JSON-RPC id/version envelope.
+          requiredProgramGas: gasLimits.reduce((sum, gas) => sum + gas, 0n).toString(),
+          requestPayloadBytes: new TextEncoder().encode(JSON.stringify(exact)).byteLength, blockCount: blocks.length, callCount: blocks.length });
         // Never reinterpret a deterministic transaction validation error or an
         // execution revert as a reason to try another backend for success.
         const code = failure.diagnostic?.rpcCode;
