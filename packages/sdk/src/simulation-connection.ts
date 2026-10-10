@@ -154,23 +154,26 @@ export function createPinnedKeelSepoliaSimulationTransport(connect: () => Promis
         }) : select(requiredGas);
         let rpc: KeelSimulationSocket | undefined;
         let acquired = false;
+        let method = exact.method;
         try {
           rpc = await candidate;
           if (closed || rpc.socket.readyState !== 1) throw new KeelPublicationSimulationError("rpc-unavailable", "The pinned simulator connection closed. Recheck the saved plan before a wallet review.");
           active.set(rpc, (active.get(rpc) ?? 0) + 1); acquired = true;
           if (request.method === "eth_simulateV1" && quantity(tag) !== undefined) {
+            method = "eth_getBlockByNumber";
             const snapshot = object(await call(rpc, { method: "eth_getBlockByNumber", params: [tag, false] }));
             if (!snapshot || snapshot.number !== tag || typeof snapshot.hash !== "string" || !/^0x[0-9a-f]{64}$/iu.test(snapshot.hash)
               || snapshotHash !== undefined && snapshot.hash.toLowerCase() !== snapshotHash)
               throw new KeelPublicationSimulationError("chain-reorganized", "The replacement simulator could not verify the exact selected block. Recheck the saved plan.");
             snapshotHash = snapshot.hash.toLowerCase();
           }
+          method = exact.method;
           const result = await call(rpc, exact);
           if (request.method === "eth_simulateV1") assertKeelSimulationEnvelopes(exact, result);
           if (closed) throw new KeelPublicationSimulationError("rpc-unavailable", "The pinned simulator transport was closed.");
           return result;
         } catch (error) {
-          const classifiedError = error instanceof KeelPublicationSimulationError ? error : keelSimulationTransportFailure(error, { method: exact.method, phase: "project-request", ...(rpc === undefined ? {} : { socketReadyState: rpc.socket.readyState }) });
+          const classifiedError = error instanceof KeelPublicationSimulationError ? error : keelSimulationTransportFailure(error, { method, phase: "project-request", ...(rpc === undefined ? {} : { socketReadyState: rpc.socket.readyState }) });
           const unavailable = classifiedError.kind === "rpc-unavailable";
           if (!gasClamp(classifiedError) && !unavailable) throw classifiedError;
           if (rpc) retired.add(rpc);
