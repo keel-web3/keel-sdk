@@ -97,6 +97,12 @@ the same canonical block. Never split, continue from a simulated block hash,
 lower gas, override state, or retry a contract/transaction-validation failure
 to obtain success. A successful candidate stays selected. Cancellation stops
 selection, and a fresh review can retry after provider recovery.
+Invalid parameters (`-32602`), common `-32000` balance/nonce/intrinsic-gas
+rejections and ambiguous simulation RPC rejections remain terminal. Only a
+specific supported capability failure (missing method or observed provider
+capacity) can make an RPC rejection eligible for another complete replay.
+Provider messages remain sanitized; preserve numeric codes and fixed failure
+categories rather than replacing validation evidence with an outage.
 
 Public index membership does not authorize disclosure of unpublished calldata.
 Studio retains PublicNode as the previously approved private-data recipient;
@@ -111,6 +117,25 @@ output explicitly distinguishes capability evidence from private execution or
 publication proof. A network/proxy denial is not evidence of RPC incompatibility.
 CI runs public network probes only when explicitly dispatched, not on each PR
 update. Respect an observed rate limit before requesting another live probe.
+The v2 probe report uses the production selector itself with no approved private
+recipient. It records success only after both complete public sequences pass,
+including fresh head, linked headers, status, nonce, fees, unchanged envelopes
+and pre-refund evidence. It reports the observed empty-call gas separately from
+the conservative envelope sum. Large body capacity and private execution
+capacity remain explicitly untested even when this public qualification passes.
+
+The completed [CI run 38023296914](https://github.com/keel-web3/keel-sdk/actions/runs/38023296914)
+recorded the earlier v1 probe at `2026-10-10T04:14:41.294Z`. All three candidates
+reported canonical block `0xb54e55`, hash
+`0x27b176d311ee36a6f1f300a6f99772670579429fcce8a8d7e3883ed58560d013`,
+and a 199,999,428 gas limit. PublicNode returned 50,000,000 for the requested
+199,999,428 envelope and failed before project data. Tenderly entered the pool's
+rate-limited state on the first two-call public probe. 1RPC failed the pinned
+public-account `eth_getCode` read with `history-unavailable` before simulation.
+None reached the 40-call check, so this run establishes neither aggregate
+execution capacity nor large body capacity for any candidate. No new probes
+were run to extract this evidence. The report artifact is `11659790245`, ZIP
+SHA-256 `8ca7cf8cf669b9a42a232276a9f05d579b8650434c0e6c8a95504529052a7064`.
 
 ## Reproducible evidence and limits
 

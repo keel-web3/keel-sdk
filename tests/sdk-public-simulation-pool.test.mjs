@@ -4,6 +4,7 @@ import { encodeAbiParameters, keccak256 } from 'viem';
 import { createKeelRpcPool } from '../packages/sdk/dist/rpc.js';
 import { createKeelPublicSepoliaSimulationPool } from '../packages/sdk/dist/public-simulation-pool.js';
 import { simulateKeelPublicationBeforeFunding } from '../packages/sdk/dist/publication-preflight.js';
+import { probePublicSimulationCandidates } from '../scripts/check-public-simulation-pool.mjs';
 
 const hash = n => `0x${BigInt(n).toString(16).padStart(64,'0')}`;
 const zero = `0x${'0'.repeat(40)}`, owner = `0x${'11'.repeat(20)}`, reader = `0x${'22'.repeat(20)}`;
@@ -31,15 +32,24 @@ function fixture(faults=[{},{}], approved=urls.slice(0,faults.length)) {
     if(body.method==='eth_getCode') return respond(body.params[0]===zero?'0x':'0x6000');
     assert.equal(body.method,'eth_simulateV1');
     const blocks=body.params[0].blockStateCalls, privateCall=blocks[0].calls[0].data!=='0x';
+    if(!privateCall&&fault.publicHttp) return new Response('',{status:fault.publicHttp});
     if(!privateCall&&fault.unsupported) return error(-32601);
     if(!privateCall&&blocks.length===1&&blocks[0].calls[0].nonce==='0x1'&&!fault.ignoreNonce) return error(-38011);
-    if(privateCall&&fault.error) return error(fault.error);
+    if(privateCall&&fault.error) return error(fault.error,fault.message);
     if(privateCall&&fault.http) return new Response('',{status:fault.http});
     if(privateCall&&fault.wait) { fault.started?.(); await new Promise((resolve,reject)=>init.signal.addEventListener('abort',()=>reject(new Error('cancelled')),{once:true})); }
     const result=blocks.map((b,i)=>({number:`0x${(19+i).toString(16)}`,timestamp:`0x${(BigInt(snapshot.timestamp)+12n*BigInt(i+1)).toString(16)}`,hash:hash(i+1),parentHash:i?hash(i):snapshot.hash,
       blockAccessListHash:hash(i+10),slotNumber:`0x${(11+i).toString(16)}`,
       transactions:b.calls.map(c=>({...c,gas:!privateCall&&fault.cap&&BigInt(c.gas)>50000000n?'0x2faf080':!privateCall&&fault.sequenceCap&&blocks.length>=5&&i===4?'0x1':privateCall&&fault.aggregate&&i===4?'0x1':c.gas})),
       calls:b.calls.map(c=>({status:privateCall&&fault.revert?'0x0':'0x1',gasUsed:'0x5208',...(!privateCall&&fault.noPreRefund?{}:{maxUsedGas:'0x5208'}),returnData:!privateCall?'0x':c.data==='0xeeee'?encodeAbiParameters([{type:'string'}],[fault.metadata??tokenURI]):encodeAbiParameters([{type:'uint256'}],[c.data==='0xdddd'?500n:BigInt((i+1)*100)])}))}));
+    if(!privateCall&&blocks.length===40) {
+      if(fault.longStatus) result[39].calls[0].status='0x0';
+      if(fault.longHeader) result[39].parentHash=hash(500);
+      if(fault.longNonce) result[39].transactions[0].nonce='0x0';
+      if(fault.longFee) result[39].transactions[0].gasPrice='0x1';
+      if(fault.longGas) result[39].transactions[0].gas='0x5208';
+      if(fault.longPreRefund) delete result[39].calls[0].maxUsedGas;
+    }
     return respond(result);
   };
   const readTransport={request:async r=>r.method==='eth_chainId'?'0xaa36a7':r.method==='eth_getBlockByNumber'?snapshot:'0x6000'};
@@ -120,6 +130,25 @@ test('contract revert, transaction validation failure and exact metadata mismatc
     const f=fixture([fault,{}]);try{await assert.rejects(simulateKeelPublicationBeforeFunding(fullPlan(),f.transport));assert.ok(f.requests.every(r=>r.index===0));}finally{await f.transport.close();}
   }
 });
+test('invalid parameters, common server validation errors and ambiguous simulation rejections are terminal',async()=>{
+  for(const fault of [
+    {error:-32602,kind:'configuration-invalid'},
+    {error:-32000,message:'insufficient funds for gas * price + value SECRET',kind:'insufficient-balance'},
+    {error:-32000,message:'insufficient balance SECRET',kind:'insufficient-balance'},
+    {error:-32000,message:'nonce too low SECRET',kind:'configuration-invalid'},
+    {error:-32000,message:'nonce too high SECRET',kind:'configuration-invalid'},
+    {error:-32000,message:'intrinsic gas too low SECRET',kind:'configuration-invalid'},
+    {error:-32000,message:'max fee per gas less than block base fee SECRET',kind:'configuration-invalid'},
+    {error:-32000,message:'unknown server rejection SECRET',kind:'rpc-unavailable'},
+    {error:-32603,kind:'rpc-unavailable'},
+  ]) {
+    const f=fixture([fault,{}]);try{
+      await assert.rejects(simulateKeelPublicationBeforeFunding(fullPlan(),f.transport),e=>e.kind===fault.kind&&e.diagnostic.rpcCode===fault.error&&!/SECRET|PRIVATE|first.example/.test(JSON.stringify(e)));
+      assert.deepEqual(f.privateRequests().map(r=>r.index),[0],'a candidate that would pass must receive no project request');
+      assert.ok(f.requests.every(r=>r.index===0),'terminal rejection must stop selection entirely');
+    }finally{await f.transport.close();}
+  }
+});
 test('cancel stops an in-flight request without another recipient; a fresh saved-plan retry can pass',async()=>{
   let started;const begin=new Promise(resolve=>{started=resolve});const f=fixture([{wait:true,started},{}]);
   const pending=f.transport.request(program());await begin;await f.transport.close();await assert.rejects(pending,e=>e.kind==='rpc-unavailable');
@@ -132,4 +161,28 @@ test('input mutation, overrides, symbolic blocks and signing cannot alter or esc
       const p=program();change(p);const count=f.requests.length;await assert.rejects(f.transport.request(p),e=>e.kind==='configuration-invalid');assert.equal(f.requests.length,count);
     }
   }finally{await f.transport.close();}
+});
+test('public qualification report uses production complete-sequence checks and states its capacity limits',async()=>{
+  const f=fixture([{}]);try{
+    const report=await probePublicSimulationCandidates({rpcUrls:[urls[0]],fetchImpl:f.options.fetchImpl,minIntervalMs:0});
+    const item=report.candidates[0];
+    assert.equal(report.publicationVerified,false);assert.equal(report.privateProjectDataSent,false);
+    assert.equal(item.publicQualification,'passed');assert.equal(item.requestedEnvelopeSum,'8000000000');
+    assert.equal(item.observedPublicGasUsedSum,'840000');assert.equal(item.observedPublicMaxUsedGasSum,'840000');
+    assert.equal(item.largeRequestBodyCapacity,'not-tested');assert.equal(item.privateExecutionCapacity,'not-tested');
+    assert.ok(item.largestAcceptedPublicRequestBytes<3_856_986);
+    assert.deepEqual(item.publicProbes.map(p=>[p.blockCount,p.validation]),[[2,false],[2,true],[1,true],[40,false],[40,true]]);
+    assert.equal(f.privateRequests().length,0);
+  }finally{await f.transport.close();}
+});
+test('public report refuses stale heads and invalid full-sequence evidence, and stops after access or rate restrictions',async()=>{
+  for(const fault of [{stale:true},{future:true},{ignoreNonce:true},{longStatus:true},{longHeader:true},{longNonce:true},{longFee:true},{longGas:true},{longPreRefund:true},{publicHttp:429},{publicHttp:403}]) {
+    const f=fixture([fault]);try{
+      const report=await probePublicSimulationCandidates({rpcUrls:[urls[0]],fetchImpl:f.options.fetchImpl,minIntervalMs:0});
+      const item=report.candidates[0];assert.ok(item.failure);assert.equal(item.publicQualification,undefined);assert.equal(item.observedPublicGasUsedSum,undefined);
+      assert.equal(f.privateRequests().length,0);
+      if(fault.stale||fault.future) assert.equal(item.publicProbes.length,0);
+      if(fault.publicHttp) {assert.equal(item.publicProbes.length,1);assert.equal(item.publicProbes[0].httpStatus,fault.publicHttp);}
+    }finally{await f.transport.close();}
+  }
 });

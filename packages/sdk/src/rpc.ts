@@ -92,8 +92,11 @@ export class KeelRpcSetupError extends Error {
 }
 export class KeelRpcResponseError extends Error {
   readonly code: number;
-  constructor(readonly rpcCode: number, readonly data?: string, providerGasCap?: bigint, readonly status?: number) {
-    super(status === 413 ? "RPC request body too large." : providerGasCap === undefined ? rpcCode === 3 ? "RPC execution reverted." : "RPC rejected this read request." : `RPC gas cap: ${providerGasCap}`);
+  constructor(readonly rpcCode: number, readonly data?: string, providerGasCap?: bigint, readonly status?: number,
+    readonly simulationFailure?: "insufficient-balance" | "transaction-validation") {
+    super(status === 413 ? "RPC request body too large." : simulationFailure === "insufficient-balance" ? "RPC insufficient balance."
+      : simulationFailure === "transaction-validation" ? "RPC transaction validation failed."
+      : providerGasCap === undefined ? rpcCode === 3 ? "RPC execution reverted." : "RPC rejected this read request." : `RPC gas cap: ${providerGasCap}`);
     this.code = rpcCode;
     this.name = "KeelRpcResponseError";
   }
@@ -207,9 +210,14 @@ export function createKeelRpcPool(options: KeelRpcPoolOptions): KeelRpcPool {
           // key, request body, or arbitrary remote error message.
           const cap = /(?:gas cap|maximum allowed gas|gas limit too high[^\n]*?cap)\s*[:=(]\s*(0x[\da-f]+|\d+)/iu.exec(message)?.[1];
           if (cap && cap.length <= 20 && BigInt(cap) > 0n) throw new KeelRpcResponseError(code, undefined, BigInt(cap));
+          if (/insufficient funds|insufficient balance/iu.test(message)) throw new KeelRpcResponseError(code, undefined, undefined, undefined, "insufficient-balance");
+          if (/nonce too (?:low|high)|intrinsic gas too low|transaction validation|invalid transaction|fee cap less than block base fee|max fee per gas less than block base fee|tip above fee cap/iu.test(message))
+            throw new KeelRpcResponseError(code, undefined, undefined, undefined, "transaction-validation");
           // Simulation validation errors are execution evidence, not transport
           // outages. In particular qualification must observe nonce-too-high.
-          if (code === -32601 || code <= -38000 && code >= -38099) throw new KeelRpcResponseError(code);
+          // Preserve every remaining simulation rejection. Unknown server
+          // errors are ambiguous evidence, not permission to shop for success.
+          throw new KeelRpcResponseError(code);
         }
         if (code === -32602) throw new KeelRpcResponseError(code);
         throw new ProviderFailure("unavailable");

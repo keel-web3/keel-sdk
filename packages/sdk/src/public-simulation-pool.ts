@@ -153,8 +153,10 @@ export function createKeelPublicSepoliaSimulationPool(options: KeelPublicSimulat
         // Never reinterpret a deterministic transaction validation error or an
         // execution revert as a reason to try another backend for success.
         const code = failure.diagnostic?.rpcCode;
+        const retryableRpcRejection = code === undefined || code === -32601
+          || failure.kind === "provider-limit" && (failure.diagnostic?.providerGasCap !== undefined || failure.diagnostic?.httpStatus === 413);
         if (projectRequest && (!["provider-limit", "unsupported-simulation", "rpc-unavailable"].includes(failure.kind)
-          || typeof code === "number" && code <= -38000 && code >= -38099)) throw failure;
+          || !retryableRpcRejection || code === -32602 || typeof code === "number" && code <= -38000 && code >= -38099)) throw failure;
         rejected.add(index); lastFailure = failure;
         if (failure.kind === "provider-limit") capacityFailure ??= failure;
         try { options.onAttempt?.({ ...keelSimulationTransportDiagnostic(failure), candidateIndex: index, candidateCount: urls.length }); } catch { /* Diagnostic observers cannot alter proof. */ }
