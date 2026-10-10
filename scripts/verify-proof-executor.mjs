@@ -31,10 +31,10 @@ const calls=Array.from({length:5},(_,i)=>({from:owner,to:reader,data:data('write
 const payload=(program,validation=true)=>({blockStateCalls:program.map(c=>({calls:[c]})),validation,traceTransfers:false,returnFullTransactions:true});
 const allowed=new Set(['web3_clientVersion','eth_chainId','eth_getBlockByNumber','eth_getBlockByHash','eth_getCode','eth_getProof','eth_getBalance','eth_getTransactionCount','eth_getStorageAt','eth_simulateV1']);
 function rpc(method,params=[]){assert.ok(allowed.has(method));writeFileSync(join(tmp,'request.json'),JSON.stringify({jsonrpc:'2.0',id:1,method,params}));const r=JSON.parse(docker('exec',container,'wget','-Y','off','-q','-O','-','--header=Content-Type: application/json','--post-file=/fixture/request.json','http://127.0.0.1:8545'));if(r.error)throw Object.assign(new Error(r.error.message),{code:r.error.code});return r.result;}
-let started=false,processCount=0,base;
+let started=false,processCount=0,base,lastNativeDiagnostic='';
 const upstream=[];
 const stateReader={request:async({method,params})=>{assert.ok(['eth_chainId','eth_getBlockByNumber','eth_getBlockByHash','eth_getProof','eth_getCode'].includes(method),'upstream execution forbidden');upstream.push({method,params});return rpc(method,params);}};
-function isolatedRunner(){processCount++;return spawn('docker',['run','--pull=never','--rm','-i','--network','none','--memory','768m','--cpus','2','--pids-limit','64','--read-only','--cap-drop','ALL','--security-opt','no-new-privileges','--user',`${process.getuid()}:${process.getgid()}`,'-e','GOMEMLIMIT=512MiB','-e','GOMAXPROCS=2','-v',`${binary}:/executor:ro`,'--entrypoint','/executor',runnerImage],{stdio:['pipe','pipe','pipe']});}
+function isolatedRunner(){processCount++;lastNativeDiagnostic='';const child=spawn('docker',['run','--pull=never','--rm','-i','--network','none','--memory','768m','--cpus','2','--pids-limit','64','--read-only','--cap-drop','ALL','--security-opt','no-new-privileges','--user',`${process.getuid()}:${process.getgid()}`,'-e','GOMEMLIMIT=512MiB','-e','GOMAXPROCS=2','-v',`${binary}:/executor:ro`,'--entrypoint','/executor',runnerImage],{stdio:['pipe','pipe','pipe']});child.stderr.on('data',chunk=>{lastNativeDiagnostic=(lastNativeDiagnostic+chunk.toString()).slice(-8000);});return child;}
 const options=()=>({binaryPath:binary,binarySha256,spawnExecutor:isolatedRunner,stateReader,block:{number:0n,hash:base.hash},onEvidence:e=>evidence.executions.push(e),limits:{gasBudget:500_000_000,requests:5000,witnessBytes:32*1024*1024,responseBytes:128*1024*1024,wallTimeMs:180000}});
 try{
  docker('image','inspect',image);docker('image','inspect',runnerImage);
@@ -72,5 +72,5 @@ try{
  assert.equal(BigInt(rpc('eth_getStorageAt',[reader,'0x0','0x0'])),0n);assert.equal(BigInt(rpc('eth_getTransactionCount',[owner,'0x0'])),0n);assert.equal(rpc('eth_getBlockByNumber',['0x0',false]).hash,base.hash);await transport.close();
  assert.ok(upstream.every(r=>!['eth_call','eth_simulateV1','eth_sendRawTransaction'].includes(r.method)));evidence.upstream={requestCount:upstream.length,methods:[...new Set(upstream.map(r=>r.method))]};
  record('canonical state, nonce and header unchanged; upstream received no execution or calldata',{processCount});
-}catch(error){evidence.failure={name:error.name,message:error.message,code:error.code};process.exitCode=1;console.error(error);}
+}catch(error){evidence.failure={name:error.name,message:error.message,code:error.code,nativeDiagnostic:lastNativeDiagnostic};process.exitCode=1;console.error(error);if(lastNativeDiagnostic)console.error(lastNativeDiagnostic);}
 finally{if(process.env.KEEL_PROOF_EXECUTOR_EVIDENCE)writeFileSync(process.env.KEEL_PROOF_EXECUTOR_EVIDENCE,JSON.stringify(evidence,null,2)+'\n');if(started){try{docker('rm','-f',container);}catch{}}rmSync(tmp,{recursive:true,force:true});}

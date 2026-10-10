@@ -133,7 +133,7 @@ func KeelSparseSimulate(ctx context.Context, base *types.Header, s *state.StateD
 		return nil, fmt.Errorf("incomplete authenticated witness: %w", err)
 	}
 	for i, block := range result {
-		if block.Root() == (common.Hash{}) || len(block.Transactions()) != 1 || block.Transactions()[0].Gas() != uint64(*opts.BlockStateCalls[i].Calls[0].Gas) {
+		if block.Block.Root() == (common.Hash{}) || len(block.Block.Transactions()) != 1 || block.Block.Transactions()[0].Gas() != uint64(*opts.BlockStateCalls[i].Calls[0].Gas) {
 			return nil, errors.New("local resource cap changed an original envelope or root is absent")
 		}
 	}
