@@ -19,6 +19,17 @@ jobs:
         run: pnpm setup:friend --skip-desktop
       - name: Exact simulation capacity and recovery
         run: node --test tests/sdk-simulation-connection.test.mjs tests/sdk-publication-preflight.test.mjs tests/transaction-gas-policy.test.mjs tests/sdk-release-wallet-batch.test.mjs tests/rpc-publication-simulation.test.mjs
+      - name: Native Geth stateful publication validation (synthetic, isolated)
+        env:
+          KEEL_NATIVE_GETH_EVIDENCE: native-geth-publication-evidence.json
+        run: |
+          docker pull ethereum/client-go@sha256:abf3605177f8bdcfce436985a8054cca4ae59256323a4ffb72c56c04f3d1fadd
+          pnpm verify:publication-native
+      - uses: actions/upload-artifact@v4
+        with:
+          name: native-geth-publication-evidence
+          path: native-geth-publication-evidence.json
+          if-no-files-found: error
       - name: Record approved public-only HTTPS capacity (not private-plan proof)
         run: node scripts/probe-approved-sepolia-http.mjs
       - name: Setup and network rejection tests

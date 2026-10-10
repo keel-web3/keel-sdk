@@ -16,6 +16,7 @@
     "test:browser": "node scripts/test-browser.mjs",
     "check": "node scripts/check.mjs",
     "verify": "node scripts/verify.mjs",
+    "verify:publication-native": "node scripts/verify-native-geth-publication.mjs",
     "verify:doom-managed-local": "node scripts/verify-doom-managed-publication.mjs",
     "verify:three-one-of-one": "node examples/immutable-three-one-of-one/run.mjs",
     "mcp": "node packages/mcp/dist/cli.js",
