@@ -2,7 +2,9 @@ import assert from 'node:assert/strict';
 import test from 'node:test';
 import { readFileSync } from 'node:fs';
 import { pathToFileURL } from 'node:url';
-import {encodeAbiParameters,keccak256} from 'viem';
+import { createRequire } from 'node:module';
+import { once } from 'node:events';
+import {encodeAbiParameters,keccak256,createPublicClient,webSocket} from 'viem';
 import {encodeKeelAtomicWalletBatch} from '../packages/sdk/dist/release-wallet-batch.js';
 import {simulateKeelPublicationBeforeFunding} from '../packages/sdk/dist/publication-preflight.js';
 const { createPinnedKeelSepoliaSimulationTransport, assertKeelSimulationEnvelopes } = await import(process.env.KEEL_TEST_SIMULATION_CONNECTION_MODULE ? pathToFileURL(process.env.KEEL_TEST_SIMULATION_CONNECTION_MODULE).href : '../packages/sdk/dist/simulation-connection.js');
@@ -185,13 +187,13 @@ test('unavailable public qualification never sends project data and a later chec
   await t.request(program);assert.equal(attempts,2);assert.equal(simulationRequests(nodes[1]).length,4);await t.close();
 });
 
-test('a disconnected retained socket fails the current check and permits a fully qualified fresh check', async()=>{
+test('a disconnected retained socket automatically requalifies before sending the saved simulation', async()=>{
   const nodes=[socket(),socket()];let attempts=0;
   const t=createPinnedKeelSepoliaSimulationTransport(async()=>nodes[attempts++]);
   await t.request({method:'eth_chainId',params:[]});nodes[0].socket.readyState=3;
-  await assert.rejects(t.request(program),e=>e.kind==='rpc-unavailable');
-  assert.equal(attempts,1);assert.equal(hasProgram(nodes[0]),false);assert.equal(nodes[0].closed,1);
-  await t.request(program);assert.equal(attempts,2);assert.equal(hasProgram(nodes[1]),true);await t.close();
+  await t.request(program);
+  assert.equal(attempts,2);assert.equal(hasProgram(nodes[0]),false);assert.equal(nodes[0].closed,1);
+  assert.equal(hasProgram(nodes[1]),true);await t.close();
 });
 
 test('unknown provider errors expose only the failed public capability stage', async () => {
@@ -268,12 +270,10 @@ test('concurrent clamped reads share replacement qualification and do not close 
   await t.close();assert.equal(nodes[1].closed,1);
 });
 
-test('an actual program revert stays a revert and a disconnected socket fails the current check without replay', async () => {
+test('an actual program revert stays a revert without connection replacement', async () => {
   const node = socket({ revert: true }); let count = 0;
   const t = createPinnedKeelSepoliaSimulationTransport(async () => { count++; return node; });
   assert.equal((await t.request(program))[0].calls[0].status, '0x0');
-  node.socket.readyState = 3;
-  await assert.rejects(t.request(program), e => e.kind === 'rpc-unavailable');
   assert.equal(count, 1); assert.equal(simulationRequests(node).length, 4);
   await t.close();
 });
@@ -321,12 +321,14 @@ test('public qualification uses observed nonzero nonce and records the exact sel
   await t.close();
 });
 
- test('full preflight after retained-socket capacity recovery still requires strict execution and complete exact metadata', async () => {
+ test('full preflight after capacity or closed-socket recovery still requires strict execution and complete exact metadata', async () => {
   const owner='0x'+'11'.repeat(20),target='0x'+'22'.repeat(20),reader='0x'+'33'.repeat(20),expected='data:application/json,{"name":"Exact recovered fixture"}';
-  for(const failure of [undefined,'metadata','revert','nonce','maximum']) {
+  for(const recovery of ['capacity','closed-socket']) for(const failure of [undefined,'metadata','revert','nonce','maximum']) {
     const nodes=[];
     const t=createPinnedKeelSepoliaSimulationTransport(async()=>{
-      const index=nodes.length,n=socket(index===0?{programCap:incidentCap}:{}),original=n.requestAsync.bind(n);nodes.push(n);
+      const index=nodes.length,n=socket(index===0&&recovery==='capacity'?{programCap:incidentCap}:{});
+      if(index===0&&recovery==='closed-socket')closeDuringProgram(n);
+      const original=n.requestAsync.bind(n);nodes.push(n);
       n.requestAsync=async args=>{
         const {body}=args;
         if(body.method==='eth_getCode'&&body.params[0]===reader)return{result:'0x6000'};
@@ -386,4 +388,153 @@ test('endpoint-cached socket factories cannot reselect the capped socket while a
   try {await new Promise(resolve=>setTimeout(resolve,30));assert.equal(connections,1);assert.equal(first.closed,0);}
   finally {releaseRead();}
   await reader;assert.equal((await recovering)[0].calls[0].status,'0x1');assert.equal(connections,2);assert.equal(first.closed,1);await t.close();assert.equal(next.closed,1);
+});
+
+
+// The real event supplies only the error class/method/state, not a cause for
+// closure. Close codes/reasons below are synthetic privacy and recovery cases.
+const closedIncident = JSON.parse(readFileSync(new URL('./fixtures/retro-closed-simulation-socket-20261010.json', import.meta.url), 'utf8'));
+function closeDuringProgram(node, { code = 1006, reason = '', mutate } = {}) {
+  const original = node.requestAsync.bind(node), listeners = new Set();
+  node.socket.addEventListener = (type, listener) => { assert.equal(type, 'close'); listeners.add(listener); };
+  node.socket.removeEventListener = (_type, listener) => { listeners.delete(listener); };
+  node.requestAsync = async args => {
+    const response = await original(args);
+    if (args.body.method === closedIncident.diagnostic.rpcMethod && args.body.params[0].blockStateCalls[0].calls[0].data !== '0x') {
+      node.socket.readyState = closedIncident.diagnostic.socketReadyState;
+      for (const listener of listeners) listener({ code, reason });
+      mutate?.();
+      throw Object.assign(new Error('PRIVATE request and provider URL must not escape'), { name: closedIncident.diagnostic.errorClass });
+    }
+    return response;
+  };
+  return node;
+}
+
+test('live closed-socket incident automatically requalifies and repeats the exact immutable simulation within one check', async () => {
+  for (const validation of [false, true]) {
+    const request = structuredClone(program); request.params[0].validation = validation;
+    Object.assign(request.params[0].blockStateCalls[0].calls[0], { nonce: '0x6', maxFeePerGas: '0x1000000', maxPriorityFeePerGas: '0xf4240', value: '0x0' });
+    const expected = structuredClone(request); expected.params[0].returnFullTransactions = true;
+    const first = closeDuringProgram(socket(), { mutate: () => { request.params[0].blockStateCalls[0].calls[0].data = '0xffff'; request.params[1] = 'latest'; request.method = 'eth_sendTransaction'; } }), second = socket();
+    let connections = 0;
+    const transport = createPinnedKeelSepoliaSimulationTransport(async () => { connections++; return first.closed ? second : first; });
+    try {
+      assert.equal((await transport.request(request))[0].calls[0].status, '0x1');
+      assert.equal(connections, 2); assert.equal(first.closed, 1);
+      for (const node of [first, second]) assert.deepEqual(simulationRequests(node).at(-1), expected);
+      assert.equal(simulationRequests(second).length, 4, 'both public modes and strict-nonce rejection precede the replay');
+      assert.deepEqual(second.requests.at(-2), { method: 'eth_getBlockByNumber', params: ['0x12', false] });
+    } finally { await transport.close(); }
+  }
+});
+
+test('repeated closed-socket failures stop after three qualified attempts with bounded sanitized close evidence', async () => {
+  const nodes = [];
+  const transport = createPinnedKeelSepoliaSimulationTransport(async () => { const node = closeDuringProgram(socket(), { code: 1009, reason: 'message too big PRIVATE https://secret.invalid/artwork' }); nodes.push(node); return node; });
+  await assert.rejects(transport.request(program), error => {
+    assert.equal(error.kind, 'rpc-unavailable'); assert.equal(error.diagnostic.connectionAttempts, 3);
+    assert.equal(error.diagnostic.socketCloseCode, 1009); assert.equal(error.diagnostic.socketCloseReason, 'message-too-large');
+    assert.equal(error.diagnostic.rpcMethod, 'eth_simulateV1'); assert.equal(error.diagnostic.socketReadyState, 3);
+    assert.equal(error.diagnostic.providerGasCap, undefined); assert.equal(error.diagnostic.rpcCode, undefined);
+    assert.doesNotMatch(JSON.stringify(error), /PRIVATE|https:|secret.invalid|artwork|0x1234/); return true;
+  });
+  assert.equal(nodes.length, 3); assert.ok(nodes.every(node => node.closed === 1));
+  await transport.close();
+});
+
+test('closed-socket retry rejects changed snapshots and symbolic tags before any unsafe replay', async () => {
+  for (const symbolic of [false, true]) {
+    const first = closeDuringProgram(socket()), second = socket(); let connections = 0, reads = 0;
+    const original = second.requestAsync.bind(second);
+    second.requestAsync = async args => { const response = await original(args); if (args.body.method === 'eth_getBlockByNumber' && ++reads === 3) return { result: { ...response.result, hash: hash(777) } }; return response; };
+    const transport = createPinnedKeelSepoliaSimulationTransport(async () => [first, second][connections++]);
+    await assert.rejects(transport.request(symbolic ? { ...program, params: [program.params[0], 'latest'] } : program), error => error.kind === (symbolic ? 'rpc-unavailable' : 'chain-reorganized'));
+    assert.equal(connections, symbolic ? 1 : 2); assert.equal(hasProgram(second), false); await transport.close();
+  }
+});
+
+
+test('closed-socket recovery never admits writes/signing or turns an uncertain timeout into a replay', async () => {
+  let connections = 0;
+  const node = socket(), original = node.requestAsync.bind(node);
+  node.requestAsync = async args => {
+    if (args.body.method === 'eth_simulateV1' && args.body.params[0].blockStateCalls[0].calls[0].data !== '0x') throw { name: 'TimeoutError' };
+    return original(args);
+  };
+  const transport = createPinnedKeelSepoliaSimulationTransport(async () => { connections++; return node; });
+  for (const method of ['eth_sendTransaction', 'eth_sendRawTransaction', 'wallet_sendCalls', 'eth_sign', 'personal_sign'])
+    await assert.rejects(transport.request({ method, params: [] }), error => error.kind === 'configuration-invalid');
+  assert.equal(connections, 0);
+  await assert.rejects(transport.request(program), error => error.kind === 'rpc-unavailable' && error.diagnostic.transportFailure === 'timeout');
+  assert.equal(connections, 1); await transport.close();
+  // An ordinary read is snapshotted too: mutation while connecting must never
+  // turn its allowlisted method into a write after the admission check.
+  const read = { method: 'eth_chainId', params: [] }; let connected;
+  const fresh = socket(), immutable = createPinnedKeelSepoliaSimulationTransport(() => new Promise(resolve => { connected = resolve; }));
+  const pending = immutable.request(read); read.method = 'eth_sendTransaction'; connected(fresh);
+  assert.equal(await pending, '0xaa36a7'); assert.ok(fresh.requests.every(r => r.method !== 'eth_sendTransaction')); await immutable.close();
+});
+
+test('actual viem socket close events recover within one request and preserve only classified close evidence on exhaustion', { timeout: 10000 }, async () => {
+  // Exercise the installed viem/isows implementation against loopback only.
+  const viemRequire = createRequire(import.meta.resolve('viem'));
+  const { WebSocketServer } = createRequire(viemRequire.resolve('isows'))('ws');
+  const server = new WebSocketServer({ host: '127.0.0.1', port: 0 });
+  await once(server, 'listening');
+  let connections = 0, closeEveryProject = false;
+  const nodes = [];
+  server.on('connection', peer => {
+    const index = connections++, node = socket(); nodes.push(node);
+    peer.on('message', async raw => {
+      const body = JSON.parse(String(raw));
+      const response = await node.requestAsync({ body });
+      if (body.method === 'eth_simulateV1' && body.params[0].blockStateCalls[0].calls[0].data !== '0x' && (index === 0 || closeEveryProject)) {
+        peer.close(closeEveryProject ? 1009 : 1013, closeEveryProject ? 'message too big PRIVATE secret' : 'try again later'); return;
+      }
+      peer.send(JSON.stringify({ jsonrpc: '2.0', id: body.id, ...response }));
+    });
+  });
+  const url = `ws://127.0.0.1:${server.address().port}`;
+  const transport = createPinnedKeelSepoliaSimulationTransport(async () => createPublicClient({ transport: webSocket(url, { retryCount: 0, reconnect: false, keepAlive: false }) }).transport.getRpcClient());
+  try {
+    assert.equal((await transport.request(program))[0].calls[0].status, '0x1'); assert.equal(connections, 2);
+    assert.deepEqual(simulationRequests(nodes[0]).at(-1).params, simulationRequests(nodes[1]).at(-1).params);
+    closeEveryProject = true;
+    await assert.rejects(transport.request(program), error => {
+      assert.equal(error.kind, 'rpc-unavailable'); assert.equal(error.diagnostic.connectionAttempts, 3);
+      assert.equal(error.diagnostic.socketCloseCode, 1009); assert.equal(error.diagnostic.socketCloseReason, 'message-too-large');
+      assert.equal(error.diagnostic.socketReadyState, 3); assert.equal(error.diagnostic.errorClass, 'SocketClosedError');
+      assert.doesNotMatch(JSON.stringify(error), /PRIVATE|secret|127\.0\.0\.1|0x1234/); return true;
+    });
+    assert.equal(connections, 4, 'one retained and two replacement sockets in the second request');
+  } finally { await transport.close(); for (const peer of server.clients) peer.terminate(); await new Promise(resolve => server.close(resolve)); }
+});
+
+
+test('concurrent closed-socket simulations share one replacement after the cached socket drains', { timeout: 5000 }, async () => {
+  const first = closeDuringProgram(socket()), next = socket(), original = first.requestAsync.bind(first);
+  let connects = 0, release, started;
+  const entered = new Promise(resolve => { started = resolve; });
+  first.requestAsync = async args => {
+    if (args.body.method === 'eth_getCode' && args.body.params[0] === 'fixture-concurrent-reader') { started(); await new Promise(resolve => { release = resolve; }); }
+    return original(args);
+  };
+  const transport = createPinnedKeelSepoliaSimulationTransport(async () => { connects++; return first.closed ? next : first; });
+  await transport.request({ method: 'eth_chainId', params: [] });
+  const reader = transport.request({ method: 'eth_getCode', params: ['fixture-concurrent-reader', '0x12'] }); await entered;
+  const recovering = Promise.all([transport.request(program), transport.request(program)]); recovering.catch(() => {});
+  try { await new Promise(resolve => setTimeout(resolve, 20)); assert.equal(connects, 1); assert.equal(first.closed, 0); }
+  finally { release(); }
+  await reader; assert.ok((await recovering).every(result => result[0].calls[0].status === '0x1'));
+  assert.equal(connects, 2); assert.equal(first.closed, 1); await transport.close();
+});
+
+test('closed-socket replacement must qualify its chain and execution evidence before receiving project calls', async () => {
+  for (const change of [{ chain: '0x1' }, { ignoreNonce: true }, { mutate: result => { delete result[0].calls[0].maxUsedGas; } }]) {
+    const first = closeDuringProgram(socket()), second = socket(change); let connections = 0;
+    const transport = createPinnedKeelSepoliaSimulationTransport(async () => [first, second][connections++]);
+    await assert.rejects(transport.request(program), error => ['wrong-chain', 'unsupported-simulation'].includes(error.kind));
+    assert.equal(connections, 2); assert.equal(hasProgram(second), false); await transport.close();
+  }
 });

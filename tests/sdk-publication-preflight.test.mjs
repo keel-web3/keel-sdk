@@ -406,3 +406,16 @@ test("explicit atomic nonce survives every replay and invalid nonce fails before
     assert.equal(bad.requests.length, 0);
   }
 });
+
+
+test('close diagnostics allow only bounded codes, classified reasons and retry counts', () => {
+  const source = { name: 'Error', diagnostic: { socketCloseCode: 1009, socketCloseReason: 'message-too-large', connectionAttempts: 3 }, cause: { name: 'SocketClosedError' } };
+  const diagnostic = keelSimulationTransportDiagnostic(source);
+  assert.equal(diagnostic.socketCloseCode, 1009); assert.equal(diagnostic.socketCloseReason, 'message-too-large');
+  assert.equal(diagnostic.connectionAttempts, 3); assert.equal(diagnostic.transportFailure, 'connection-closed');
+  for (const value of [-1, 999, 5000, Infinity, 1009.1, '1009']) {
+    const rejected = keelSimulationTransportDiagnostic({ diagnostic: { socketCloseCode: value, socketCloseReason: 'PRIVATE https://secret.invalid', connectionAttempts: 4 } });
+    assert.equal(rejected.socketCloseCode, undefined); assert.equal(rejected.socketCloseReason, undefined); assert.equal(rejected.connectionAttempts, undefined);
+    assert.doesNotMatch(JSON.stringify(rejected), /PRIVATE|secret.invalid/);
+  }
+});
