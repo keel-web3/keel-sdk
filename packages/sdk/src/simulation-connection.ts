@@ -13,6 +13,8 @@ export interface KeelSimulationSocket {
 /** HTTP has no socket state; every simulation response is still independently verified. */
 export type KeelSimulationConnection = KeelSimulationSocket | (Omit<KeelSimulationSocket, "socket"> & { readonly protocol: "https"; readonly socket?: never });
 export interface KeelSimulationConnectionOptions {
+  /** Pool selection tries each distinct candidate once; legacy reconnect defaults to three. */
+  readonly maximumConnectionAttempts?: 1 | 2 | 3;
   /** The caller must supply an already approved endpoint. Used only after a confirmed WS 1009. */
   readonly messageSizeFallback?: () => Promise<KeelSimulationConnection>;
   /** Fixed-field failed-attempt evidence. An observer cannot change simulation behavior. */
@@ -45,7 +47,9 @@ export function assertKeelSimulationEnvelopes(request: { readonly params: readon
 /** Qualify behavior on the socket retained for project calldata, never client branding.
  * These fixed public probes are not a publication proof. Exact project calls still
  * undergo their own override-free fork, nonce, fee, gas and complete-return checks. */
-export function createPinnedKeelSepoliaSimulationTransport(connect: () => Promise<KeelSimulationConnection>, options: KeelSimulationConnectionOptions = {}): KeelPreflightTransport & { readonly qualifiedProbeGas: bigint | undefined; close(): Promise<void> } {
+export function createPinnedKeelSepoliaSimulationTransport(connect: () => Promise<KeelSimulationConnection>, options: KeelSimulationConnectionOptions = {}) {
+  const maximumAttempts = options.maximumConnectionAttempts ?? 3;
+  if (![1, 2, 3].includes(maximumAttempts)) throw new TypeError("Invalid bounded simulation attempts.");
   let selected: Promise<KeelSimulationConnection> | undefined;
   let closed = false;
   let useMessageSizeFallback = false;
@@ -162,7 +166,15 @@ export function createPinnedKeelSepoliaSimulationTransport(connect: () => Promis
   };
   return {
     get qualifiedProbeGas() { return closed ? undefined : qualifiedProbeGas; },
-    async request(request) {
+    /** Public constants only. This does not send or validate a project program. */
+    async qualify(requiredGas: bigint) {
+      if (closed || requiredGas <= 0n) throw new KeelPublicationSimulationError("configuration-invalid", "A positive public qualification envelope is required.");
+      if (selected && qualifiedProbeGas !== undefined && requiredGas > qualifiedProbeGas)
+        throw new KeelPublicationSimulationError("configuration-invalid", "A larger program needs a fresh qualified candidate.");
+      selected ??= select(requiredGas);
+      await selected;
+    },
+    async request(request: Parameters<KeelPreflightTransport["request"]>[0]) {
       if (closed) throw new KeelPublicationSimulationError("rpc-unavailable", "The pinned simulator transport was closed.");
       const exact = structuredClone(request.method === "eth_simulateV1" ? { ...request, params: [{ ...object(request.params[0]), returnFullTransactions: true }, ...request.params.slice(1)] } : request);
       if (!["eth_chainId", "eth_getBlockByNumber", "eth_getTransactionCount", "eth_getBalance", "eth_getCode", "eth_simulateV1"].includes(exact.method))
@@ -186,7 +198,7 @@ export function createPinnedKeelSepoliaSimulationTransport(connect: () => Promis
       const requestPayloadBytes = new TextEncoder().encode(JSON.stringify(exact)).length;
       const blockCount = Array.isArray(blocks) ? blocks.length : 0;
       const callCount = Array.isArray(blocks) ? blocks.reduce((sum, block) => sum + (Array.isArray(object(block)?.calls) ? (object(block)!.calls as unknown[]).length : 0), 0) : 0;
-      for (let attempt = 1; attempt <= 3; attempt++) {
+      for (let attempt = 1; attempt <= maximumAttempts; attempt++) {
         if (closed) throw new KeelPublicationSimulationError("rpc-unavailable", "The pinned simulator transport was closed.");
         // viem caches sockets by endpoint until close(). Do not ask the factory
         // for a replacement while a retired socket still has active readers.
@@ -235,7 +247,7 @@ export function createPinnedKeelSepoliaSimulationTransport(connect: () => Promis
             if (classifiedError.diagnostic?.socketCloseCode === 1009) {
               // Reopening this WebSocket repeats the same oversized exchange.
               // Change only the approved transport, then requalify all behavior.
-              if (!closed && classifiedError.diagnostic?.transport === "websocket" && options.messageSizeFallback && exact.method === "eth_simulateV1" && quantity(tag) !== undefined && attempt < 3) {
+              if (!closed && classifiedError.diagnostic?.transport === "websocket" && options.messageSizeFallback && exact.method === "eth_simulateV1" && quantity(tag) !== undefined && attempt < maximumAttempts) {
                 useMessageSizeFallback = true;
                 continue;
               }
@@ -245,14 +257,14 @@ export function createPinnedKeelSepoliaSimulationTransport(connect: () => Promis
               && [2, 3].includes(Number(classifiedError.diagnostic?.socketReadyState));
             if (closed || !closedConnection || exact.method !== "eth_simulateV1" || quantity(tag) === undefined)
               throw classifiedError;
-            if (attempt === 3) throw new KeelPublicationSimulationError("rpc-unavailable",
+            if (attempt === maximumAttempts) throw new KeelPublicationSimulationError("rpc-unavailable",
               "The simulation connection closed during bounded automatic recovery. Your saved plan is unchanged; no wallet request or transaction was sent.",
               { ...classifiedError.diagnostic, connectionAttempts: attempt });
             continue;
           }
           // A symbolic block tag could select different state on replay. Keep
           // that request blocked, even though a later fresh read may requalify.
-          if (attempt === 3 || rpc && quantity(tag) === undefined) throw new KeelPublicationSimulationError("provider-limit",
+          if (attempt === maximumAttempts || rpc && quantity(tag) === undefined) throw new KeelPublicationSimulationError("provider-limit",
             "Compatible simulation capacity is temporarily unavailable after bounded checks. Retry the saved plan; no wallet request was sent and its gas limits were not reduced.",
             { ...classifiedError.diagnostic, connectionAttempts: attempt });
         } finally {

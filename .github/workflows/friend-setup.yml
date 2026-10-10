@@ -18,7 +18,7 @@ jobs:
       - name: Fresh checkout setup without sibling repositories
         run: pnpm setup:friend --skip-desktop
       - name: Exact simulation capacity and recovery
-        run: node --test tests/sdk-simulation-connection.test.mjs tests/sdk-publication-preflight.test.mjs tests/transaction-gas-policy.test.mjs tests/sdk-release-wallet-batch.test.mjs tests/rpc-publication-simulation.test.mjs
+        run: node --test tests/sdk-simulation-connection.test.mjs tests/sdk-publication-preflight.test.mjs tests/sdk-public-simulation-pool.test.mjs tests/sdk-rpc.test.mjs tests/sdk-network-index.test.mjs tests/transaction-gas-policy.test.mjs tests/sdk-release-wallet-batch.test.mjs tests/rpc-publication-simulation.test.mjs
       - name: Native Geth stateful publication validation (synthetic, isolated)
         env:
           KEEL_NATIVE_GETH_EVIDENCE: native-geth-publication-evidence.json
@@ -31,7 +31,17 @@ jobs:
           path: native-geth-publication-evidence.json
           if-no-files-found: error
       - name: Record approved public-only HTTPS capacity (not private-plan proof)
+        if: ${{ github.event_name == 'workflow_dispatch' }}
         run: node scripts/probe-approved-sepolia-http.mjs
+      - name: Record indexed public-only pool qualification (no project data)
+        if: ${{ github.event_name == 'workflow_dispatch' }}
+        run: node scripts/check-public-simulation-pool.mjs --public-only | tee public-simulation-pool-evidence.json
+      - uses: actions/upload-artifact@v4
+        if: ${{ github.event_name == 'workflow_dispatch' }}
+        with:
+          name: public-simulation-pool-evidence
+          path: public-simulation-pool-evidence.json
+          if-no-files-found: error
       - name: Setup and network rejection tests
         run: pnpm setup:test
       - name: MCP and generator preparation
