@@ -92,8 +92,8 @@ export class KeelRpcSetupError extends Error {
 }
 export class KeelRpcResponseError extends Error {
   readonly code: number;
-  constructor(readonly rpcCode: number, readonly data?: string, providerGasCap?: bigint) {
-    super(providerGasCap === undefined ? rpcCode === 3 ? "RPC execution reverted." : "RPC rejected this read request." : `RPC gas cap: ${providerGasCap}`);
+  constructor(readonly rpcCode: number, readonly data?: string, providerGasCap?: bigint, readonly status?: number) {
+    super(status === 413 ? "RPC request body too large." : providerGasCap === undefined ? rpcCode === 3 ? "RPC execution reverted." : "RPC rejected this read request." : `RPC gas cap: ${providerGasCap}`);
     this.code = rpcCode;
     this.name = "KeelRpcResponseError";
   }
@@ -117,12 +117,17 @@ export interface KeelRpcRequest {
 export interface KeelRpcPool {
   request(input: KeelRpcRequest): Promise<unknown>;
   status(): readonly KeelRpcProviderStatus[];
+  /** Retain this pool's pacing, identity and cooldown state without per-call failover.
+   * Publication must qualify a candidate before sending it a complete program. */
+  pin(providerIndex: number): Pick<KeelRpcPool, "request" | "status">;
 }
 export interface KeelRpcPoolOptions {
   readonly rpcUrls: readonly string[];
   /** Omit only for discovery on explicitly supplied endpoints. First identity is pinned. */
   readonly chainId?: number;
   readonly timeoutMs?: number;
+  /** Complete publication simulations can take longer than ordinary reads. */
+  readonly simulationTimeoutMs?: number;
   readonly minIntervalMs?: number;
   readonly maxResponseBytes?: number;
   readonly allowLoopback?: boolean;
@@ -141,6 +146,7 @@ export function createKeelRpcPool(options: KeelRpcPoolOptions): KeelRpcPool {
   if (!Array.isArray(options.rpcUrls) || options.rpcUrls.length < 1 || options.rpcUrls.length > 6) throw new TypeError("RPC pool requires one to six endpoints.");
   if (options.chainId !== undefined && (!Number.isSafeInteger(options.chainId) || options.chainId < 1)) throw new TypeError("RPC pool requires a positive expected chain ID.");
   const timeoutMs = bound(options.timeoutMs, 8000, 100, 30000);
+  const simulationTimeoutMs = bound(options.simulationTimeoutMs, timeoutMs, 100, 90000);
   const minIntervalMs = bound(options.minIntervalMs, 250, 0, 10000);
   const maxBytes = bound(options.maxResponseBytes, 16 * 1024 * 1024, 1024, 64 * 1024 * 1024);
   const states = [...new Set(options.rpcUrls.map(url => normalizeKeelRpcUrl(url, options.allowLoopback)))].map(url => ({
@@ -165,7 +171,7 @@ export function createKeelRpcPool(options: KeelRpcPoolOptions): KeelRpcPool {
       if (state.cooldown > Date.now()) throw new ProviderFailure("rate-limited", state.cooldown - Date.now());
       state.nextAt = Date.now() + minIntervalMs;
       const controller = new AbortController();
-      timer = setTimeout(() => controller.abort(), timeoutMs);
+      timer = setTimeout(() => controller.abort(), method === "eth_simulateV1" ? simulationTimeoutMs : timeoutMs);
       const requestId = ++id;
       let response: Response;
       try { response = await fetcher(state.url, { method: "POST", headers: { "content-type": "application/json" },
@@ -177,6 +183,7 @@ export function createKeelRpcPool(options: KeelRpcPoolOptions): KeelRpcPool {
       const delay = Number.isFinite(rawDelay) ? Math.max(0, rawDelay) : 0;
       if (!response.ok) {
         await response.body?.cancel();
+        if (method === "eth_simulateV1" && response.status === 413) throw new KeelRpcResponseError(-32000, undefined, undefined, 413);
         throw new ProviderFailure(response.status === 429 ? "rate-limited" : [401, 403].includes(response.status) ? "access-denied" : "unavailable", delay);
       }
       if (!response.body) throw new ProviderFailure("invalid-response");
@@ -200,7 +207,9 @@ export function createKeelRpcPool(options: KeelRpcPoolOptions): KeelRpcPool {
           // key, request body, or arbitrary remote error message.
           const cap = /(?:gas cap|maximum allowed gas|gas limit too high[^\n]*?cap)\s*[:=(]\s*(0x[\da-f]+|\d+)/iu.exec(message)?.[1];
           if (cap && cap.length <= 20 && BigInt(cap) > 0n) throw new KeelRpcResponseError(code, undefined, BigInt(cap));
-          if (code === -32601 || code === -38014) throw new KeelRpcResponseError(code);
+          // Simulation validation errors are execution evidence, not transport
+          // outages. In particular qualification must observe nonce-too-high.
+          if (code === -32601 || code <= -38000 && code >= -38099) throw new KeelRpcResponseError(code);
         }
         if (code === -32602) throw new KeelRpcResponseError(code);
         throw new ProviderFailure("unavailable");
@@ -234,7 +243,7 @@ export function createKeelRpcPool(options: KeelRpcPoolOptions): KeelRpcPool {
     }
     await state.checking;
   }
-  return { status, async request(input) {
+  const request = async (input: KeelRpcRequest, pinnedIndex?: number): Promise<unknown> => {
     if (!READ_METHODS.has(input.method)) throw new TypeError("RPC pool supports read-only methods; wallet/signing/submission methods are refused.");
     const params = input.params ?? [];
     const simulation = input.method === "eth_simulateV1";
@@ -254,8 +263,8 @@ export function createKeelRpcPool(options: KeelRpcPoolOptions): KeelRpcPool {
     }
     input.signal?.throwIfAborted();
     let last: FailureReason = "unavailable", missing = false;
-    const start = cursor;
-    for (let i = 0; i < states.length; i++) {
+    const start = pinnedIndex ?? cursor;
+    for (let i = 0; i < (pinnedIndex === undefined ? states.length : 1); i++) {
       const index = (start + i) % states.length, state = states[index]!;
       if (state.disabled || state.cooldown > Date.now()) { last = state.reason ?? "rate-limited"; continue; }
       try {
@@ -278,6 +287,10 @@ export function createKeelRpcPool(options: KeelRpcPoolOptions): KeelRpcPool {
     if (missing && !input.requireResult) return null; // Pending/not-found is valid, never publication proof.
     const cooling = states.filter(s => !s.disabled).map(s => Math.max(0, s.cooldown - Date.now())).filter(ms => ms > 0);
     throw new KeelRpcSetupError(missing ? "history-unavailable" : last, status(), cooling.length ? Math.min(...cooling) : 0);
+  };
+  return { status, request, pin(providerIndex) {
+    if (!Number.isInteger(providerIndex) || providerIndex < 0 || providerIndex >= states.length) throw new RangeError("Invalid configured RPC provider index.");
+    return { request: input => request(input, providerIndex), status: () => [status()[providerIndex]!] };
   } };
 }
 

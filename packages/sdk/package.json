@@ -375,6 +375,10 @@
       "types": "./dist/transaction-gas-policy.d.ts",
       "import": "./dist/transaction-gas-policy.js"
     },
+    "./public-simulation-pool": {
+      "types": "./dist/public-simulation-pool.d.ts",
+      "import": "./dist/public-simulation-pool.js"
+    },
     "./sepolia-simulation-transport": {
       "types": "./dist/sepolia-simulation-transport.d.ts",
       "import": "./dist/sepolia-simulation-transport.js"

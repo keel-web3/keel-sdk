@@ -122,3 +122,13 @@ For a viem **read client**, use `custom({ request: input => pool.request(input) 
 refuses wallet/signing/submission methods; keep an explicitly authorized wallet
 client separate. Public RPC is transport evidence, not contract identity or
 browser verification: continue the selected-chain publication gates.
+
+Publication uses `createKeelPublicSepoliaSimulationPool` from
+`@keel/sdk/public-simulation-pool`. Supply the registry/index candidates, exact
+selected block, existing read transport, and explicit `approvedProjectRpcUrls`.
+It uses `pool.pin(index)` to retain the shared pool's pacing, cooldown and chain
+state without unqualified per-call swaps. Simulator validation codes, including
+nonce-too-high `-38011`, stay intact. Public qualification may reject a candidate
+for unsupported methods or capacity; deterministic project reverts and validation
+failures do not search other backends for a passing result. Complete sequences
+remain in one request. See [the capacity and proof boundary](KEEL_SIMULATION_EXECUTION_CAPACITY.md).

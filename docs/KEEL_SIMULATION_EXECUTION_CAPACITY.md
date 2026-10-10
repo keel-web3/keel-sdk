@@ -3,7 +3,8 @@
 The October 10 operator evidence establishes that the approved PublicNode
 HTTPS endpoint retained only 50,000,000 of the requested 200,000,000 gas in
 all three public qualification attempts. Private project data was not sent.
-Changing WebSocket to HTTPS does not resolve that execution limit.
+Changing WebSocket to HTTPS does not resolve that execution limit. This is
+evidence about that endpoint, not all public nodes.
 
 ## Three separate limits
 
@@ -62,42 +63,47 @@ the returned simulated block hash is not a persisted continuation handle.
 State overrides or mocked receipts would not satisfy the existing proof.
 Replaying growing prefixes also retains the same final aggregate requirement.
 
-Use an **owned, synced, fork-compatible Sepolia execution node** for the
-unchanged complete requests. Studio already supports
-`KEEL_PUBLICATION_SIMULATION_RPC_URL`, validates its chain and exact pinned
-block hash, and passes results through the same SDK proof gates. This route
-does not require changing transaction grouping, reducing actual gas,
-weakening the proof, or duplicating paid storage.
+Use the **maintained public RPC pool and capability-aware swap path**.
+`createKeelPublicSepoliaSimulationPool` uses the existing `createKeelRpcPool`
+through pinned candidate handles. Pacing, cooldowns, response bounds and
+chain checks remain in that shared implementation. The ordinary read pool
+must not silently swap providers underneath a simulation qualification.
 
-Before enabling that existing setting:
+The old Studio Sepolia branch ignored its supplied primary and the indexed
+pool, selecting one singleton PublicNode WebSocket. Its three attempts only
+reopened that host. The corrected factory resolves the selected `chains.rpcUrl`
+for each new check and adds the maintained index's candidates. Normal RPC
+environment configuration replaces defaults, so calling the ordinary Node
+resolver with one `KEEL_RPC_URL` would not restore this pool. An explicit
+`KEEL_PUBLICATION_SIMULATION_RPC_URL` remains a single-recipient override.
 
-- Confirm an owned canonical Sepolia execution node and its consensus/sync
-  infrastructure exist. The checked Studio runtime/Compose definitions
-  contain the app, Postgres and an RPC proxy, not Geth or Reth. Host-level
-  inventory outside those definitions remains an operator check.
-- Use a client version that implements the selected fork and reports full
-  transaction envelopes, linked block headers/BAL evidence, and pre-refund
-  `maxUsedGas`. Native Geth v1.17.8 passes the synthetic SDK regression.
-  This does not prove any currently hosted node is suitable or synced.
-- Set a finite RPC request budget covering the complete admitted program
-  as above. Set the HTTP body limit from actual final serialized requests
-  with room for the envelope, and a bounded execution timeout verified with
-  that program. The existing runtime RPC proxy has a 512 KiB body limit
-  and does not allow `eth_simulateV1`; use the dedicated server-side route.
-- Keep the node private to the server, bound concurrency and resource use,
-  and keep signing/submission outside the simulation interface. Approve any
-  new hosting expenditure or private-data recipient before provisioning or
-  transmission. No additional third-party provider is part of this design.
-- Qualify the exact selected block and full workload. A successful 200M
-  empty call is necessary for that discovery envelope but insufficient for
-  aggregate capacity. Run all three existing phases and recheck canonical
-  block/revision identity. Errors leave the prepared plan recoverable and
-  must never produce an approval proof.
+For each candidate, qualify public chain/fork/header/fee/nonce/pre-refund
+behavior before any private calldata. Recheck the exact selected block hash.
+Before **each** phase, execute a public empty-call sequence with every requested
+gas envelope and the same block count. This catches sequence clamping that a
+largest-call cache misses. These cheap calls do **not** establish the actual
+project's aggregate execution requirement or full payload-size acceptance.
+The exact discovery, strict bounded replay and complete reader/metadata replay
+must still pass, with every returned transaction envelope unchanged.
 
-If no owned synced node exists, provisioning and syncing one is the remaining
-infrastructure dependency. A local dev chain or a fork tool with altered
-limits cannot replace canonical-state validation. Do not send the private
-plan to another provider as an automatic fallback.
+After a provider capacity or transport failure, try each remaining eligible,
+approved candidate at most once, replaying the complete unchanged request from
+the same canonical block. Never split, continue from a simulated block hash,
+lower gas, override state, or retry a contract/transaction-validation failure
+to obtain success. A successful candidate stays selected. Cancellation stops
+selection, and a fresh review can retry after provider recovery.
+
+Public index membership does not authorize disclosure of unpublished calldata.
+Studio retains PublicNode as the previously approved private-data recipient;
+additional selected/indexed recipients require explicit operator configuration
+in `KEEL_PUBLICATION_SIMULATION_APPROVED_RPC_URLS`. Public-only probes may find
+compatible candidates first. An unapproved candidate receives no project calls.
+No node provisioning or sync is part of this correction.
+
+Run `node scripts/check-public-simulation-pool.mjs --public-only` to record the
+indexed candidates' public qualification and a 40-empty-call sequence. Its
+output explicitly distinguishes capability evidence from private execution or
+publication proof. A network/proxy denial is not evidence of RPC incompatibility.
 
 ## Reproducible evidence and limits
 
