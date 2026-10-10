@@ -65,10 +65,15 @@ export function createKeelPublicSepoliaSimulationPool(options: KeelPublicSimulat
       || nonce + BigInt(gasLimits.length) > 18_446_744_073_709_551_615n) unsupported();
     const policy = resolveKeelTransactionGasPolicy({ chainId: 11155111, blockTimestamp: timestamp!, blockGasLimit: blockGasLimit! });
     const gasPrice = baseFee! * 2n + 1n;
-    if (gasLimits.some(gas => gas < 21_000n || gas > policy.maximumTotalGas)) throw new KeelPublicationSimulationError("configuration-invalid", "The complete program exceeds selected-chain transaction gas bounds.");
-    // Conservative upfront-balance check for public constants only. Never fund or
-    // override this account; a missing probe precondition cannot grant a proof.
-    if (balance! < gasLimits.reduce((sum, gas) => sum + gas, 0n) * gasPrice) unsupported();
+    if (gasLimits.some(gas => gas < BigInt(policy.transactionBaseGas) || gas > policy.maximumTotalGas)) throw new KeelPublicationSimulationError("configuration-invalid", "The complete program exceeds selected-chain transaction gas bounds.");
+    // These code-free, zero-value self-calls burn only transaction base gas.
+    // A prior envelope is refunded; do not reserve every full envelope at once.
+    // This is a probe precondition only. Exact strict execution remains required.
+    const requiredProbeBalance = gasLimits.reduce((maximum, gas, index) => {
+      const upfront = (BigInt(index) * BigInt(policy.transactionBaseGas) + gas) * gasPrice;
+      return upfront > maximum ? upfront : maximum;
+    }, 0n);
+    if (balance! < requiredProbeBalance) unsupported();
     const blockStateCalls = gasLimits.map((gas, i) => ({ calls: [{ from: zero, to: zero, data: "0x", value: "0x0", gas: hex(gas), nonce: hex(nonce! + BigInt(i)), gasPrice: hex(gasPrice) }] }));
     for (const validation of [false, true]) {
       const result = await candidate.transport.request({ method: "eth_simulateV1", params: [{ blockStateCalls, validation, traceTransfers: false, returnFullTransactions: true }, blockTag] });
@@ -154,6 +159,8 @@ export function createKeelPublicSepoliaSimulationPool(options: KeelPublicSimulat
         // execution revert as a reason to try another backend for success.
         const code = failure.diagnostic?.rpcCode;
         const retryableRpcRejection = code === undefined || code === -32601
+          || ["rate-limited", "access-denied"].includes(String(failure.diagnostic?.transportFailure))
+            && typeof code === "number" && [-32005, 429, 401, 403].includes(code)
           || failure.kind === "provider-limit" && (failure.diagnostic?.providerGasCap !== undefined || failure.diagnostic?.httpStatus === 413);
         if (projectRequest && (!["provider-limit", "unsupported-simulation", "rpc-unavailable"].includes(failure.kind)
           || !retryableRpcRejection || code === -32602 || typeof code === "number" && code <= -38000 && code >= -38099)) throw failure;

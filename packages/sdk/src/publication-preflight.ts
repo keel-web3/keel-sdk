@@ -97,8 +97,8 @@ export function keelSimulationTransportDiagnostic(error: unknown, context: {
 } = {}): Readonly<Record<string, string | number>> {
   const methods = ["eth_chainId", "eth_getBlockByNumber", "eth_getTransactionCount", "eth_getBalance", "eth_getCode", "eth_simulateV1"];
   const phases = ["publication-preflight", "public-qualification", "project-request", "initial-storage"];
-  const classes = ["Error", "TypeError", "TimeoutError", "HttpRequestError", "WebSocketRequestError", "SocketClosedError", "RpcRequestError", "UnknownRpcError", "KeelPublicationSimulationError"];
-  const failures = ["timeout", "connection-reset", "connection-closed", "dns", "rate-limited", "http-error", "rpc-error", "unknown"];
+  const classes = ["Error", "TypeError", "TimeoutError", "HttpRequestError", "WebSocketRequestError", "SocketClosedError", "RpcRequestError", "UnknownRpcError", "KeelRpcSetupError", "KeelRpcResponseError", "KeelPublicationSimulationError"];
+  const failures = ["timeout", "connection-reset", "connection-closed", "dns", "rate-limited", "access-denied", "unavailable", "wrong-chain", "history-unavailable", "invalid-response", "http-error", "rpc-error", "unknown"];
   const codes = ["ETIMEDOUT", "ECONNRESET", "ECONNREFUSED", "EPIPE", "ENOTFOUND", "EAI_AGAIN", "UND_ERR_CONNECT_TIMEOUT", "UND_ERR_SOCKET"];
   const closeReasons = ["empty", "message-too-large", "rate-limited", "timeout", "server-unavailable", "protocol-error", "policy-violation", "other"];
   const stages = ["connection", "chain", "snapshot", "public-account", "read-capacity", "strict-capacity", "strict-nonce", "snapshot-recheck"];

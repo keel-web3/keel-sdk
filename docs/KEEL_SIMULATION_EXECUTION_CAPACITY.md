@@ -165,3 +165,12 @@ coverage remains separate. Neither affected release is proven published.
 Operator evidence: `Keel-approved-HTTPS-capacity-and-request-bytes-20261010.json`,
 Library ID `libfile_f5bab7b274ac8191ace5697f7bc34c1c`; Gatorrr authorized
 regression: `tests/fixtures/gatorrr-simulator-cap-20261009.json`.
+
+## Local execution using public state
+
+A synced owned node is not the only architecture. The
+[public-RPC-backed fork evaluation](KEEL_PUBLIC_RPC_FORK_EVALUATION.md) demonstrates
+local stateful execution with lazy pinned public reads, identifies stock Anvil's
+50M budget and sparse-root limitations, and distinguishes bounded discovery from
+proof of an unchanged original gas envelope. No local fork backend is enabled by
+this investigation.
