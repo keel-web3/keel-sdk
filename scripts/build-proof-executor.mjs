@@ -1,0 +1,14 @@
+import { execFileSync } from 'node:child_process';
+import { cpSync, mkdirSync, readFileSync, writeFileSync, existsSync } from 'node:fs';
+import { createHash } from 'node:crypto';
+import { resolve, join } from 'node:path';
+const gethCommit='a579077007b98217c3e253a66e4b452ca0c32b96';
+const root=process.cwd(),build=resolve(process.env.KEEL_NATIVE_BUILD_DIR??'/tmp/keel-proof-executor-build');
+const source=join(build,'geth'),binary=join(build,'keel-proof-executor');mkdirSync(build,{recursive:true});
+const run=(cmd,args,cwd=root)=>execFileSync(cmd,args,{cwd,stdio:'inherit',env:process.env});
+if(!existsSync(join(source,'.git')))run('git',['clone','--depth','1','--branch','v1.17.8','https://github.com/ethereum/go-ethereum.git',source]);
+const actual=execFileSync('git',['rev-parse','HEAD'],{cwd:source,encoding:'utf8'}).trim();if(actual!==gethCommit)throw new Error('Pinned Geth source mismatch.');
+cpSync(join(root,'native/proof-executor/geth-overlay'),source,{recursive:true});
+run(process.env.KEEL_GO_BINARY??'go',['build','-p','2','-trimpath','-o',binary,'./cmd/keel-proof-executor'],source);
+const receipt={schema:'keel-proof-executor-build@1',gethCommit,sdkCommit:execFileSync('git',['rev-parse','HEAD'],{cwd:root,encoding:'utf8'}).trim(),binarySha256:createHash('sha256').update(readFileSync(binary)).digest('hex'),binaryBytes:readFileSync(binary).length};
+writeFileSync(join(build,'receipt.json'),JSON.stringify(receipt,null,2)+'\n');console.log(JSON.stringify(receipt));

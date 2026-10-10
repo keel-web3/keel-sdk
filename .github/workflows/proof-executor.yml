@@ -1,0 +1,29 @@
+name: Proof-backed executor candidate
+on:
+  push:
+    branches: [codex/proof-backed-executor-20261010]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  differential:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    env:
+      GOMAXPROCS: '2'
+      GOGC: '50'
+      KEEL_NATIVE_BUILD_DIR: /tmp/keel-proof-executor-build
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version: '1.25.8'
+          cache: false
+      - name: Compile the pinned Geth bridge
+        run: node scripts/build-proof-executor.mjs
+      - uses: actions/upload-artifact@v4
+        with:
+          name: proof-executor-build
+          path: |
+            /tmp/keel-proof-executor-build/keel-proof-executor
+            /tmp/keel-proof-executor-build/receipt.json
