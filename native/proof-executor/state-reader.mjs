@@ -45,6 +45,10 @@ export function createApprovedProofStateReader({rpcUrls,approvedStateRpcUrls,blo
             if(method==='eth_getBlockByNumber'){selected=index;return header;}
           }
           const result=await pinned.request({method,params:p,signal:combined});
+          // Some EIP-1898 providers return null for an unknown/pruned hash.
+          // Missing pinned state is terminal, never an empty value or permission
+          // to ask another recipient for a replacement snapshot.
+          if(result===null||result===undefined)throw new KeelPublicationSimulationError('rpc-unavailable','The selected state block or proof is unavailable.');
           if(method==='eth_getBlockByNumber'&&(result?.hash?.toLowerCase()!==blockHash||result.number!==tag))throw new KeelPublicationSimulationError('chain-reorganized','The selected state block changed.');
           selected=index;return result;
         }catch(error){

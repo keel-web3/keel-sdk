@@ -1,7 +1,7 @@
 name: Proof-backed executor candidate
 on:
   pull_request:
-    branches: [codex/rpc-fork-evaluation-20261010, codex/proof-backed-executor-20261010, codex/proof-runner-broker-20261010]
+    branches: [codex/rpc-fork-evaluation-20261010, codex/proof-backed-executor-20261010, codex/proof-runner-broker-20261010, codex/proof-runner-integration-20261010]
   push:
     branches: [codex/proof-backed-executor-20261010, codex/proof-runner-broker-20261010, codex/proof-runner-integration-20261010]
   workflow_dispatch:
@@ -29,6 +29,11 @@ jobs:
           cache: false
       - name: Compile the pinned Geth bridge
         run: node scripts/build-proof-executor.mjs
+      - name: Verify captured public header and witnesses offline
+        env:
+          KEEL_PUBLIC_PROOF_FIXTURE: ${{ github.workspace }}/tests/fixtures/sepolia-public-proof-20261010.json
+        working-directory: /tmp/keel-proof-executor-build/geth
+        run: go test -count=1 -v ./internal/keelfork ./cmd/keel-proof-executor
       - name: Build and reload the immutable runner image
         run: node scripts/build-proof-runner-image.mjs
       - uses: actions/upload-artifact@v4

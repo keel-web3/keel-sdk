@@ -9,7 +9,7 @@ execFileSync('git',['diff','--exit-code','HEAD'],{cwd:root,stdio:'pipe'});
 const run=(cmd,args,cwd=root)=>execFileSync(cmd,args,{cwd,stdio:'inherit',env:process.env});
 if(!existsSync(join(source,'.git')))run('git',['clone','--depth','1','--branch','v1.17.8','https://github.com/ethereum/go-ethereum.git',source]);
 execFileSync('git',['diff','--exit-code','HEAD'],{cwd:source,stdio:'pipe'});
-const allowedOverlays=new Set(['cmd/keel-proof-executor/main.go','cmd/keel-proof-fixture/main.go','internal/ethapi/keel_sparse.go','internal/keelfork/reader.go']);
+const allowedOverlays=new Set(['cmd/keel-proof-executor/main.go','cmd/keel-proof-executor/public_fixture_test.go','cmd/keel-proof-fixture/main.go','internal/ethapi/keel_sparse.go','internal/keelfork/reader.go','internal/keelfork/reader_public_fixture_test.go']);
 const untracked=execFileSync('git',['ls-files','--others','--exclude-standard'],{cwd:source,encoding:'utf8'}).trim().split('\n').filter(Boolean);
 if(untracked.some(path=>!allowedOverlays.has(path)))throw new Error('Unexpected files in pinned engine checkout.');
 const actual=execFileSync('git',['rev-parse','HEAD'],{cwd:source,encoding:'utf8'}).trim();if(actual!==gethCommit)throw new Error('Pinned Geth source mismatch.');

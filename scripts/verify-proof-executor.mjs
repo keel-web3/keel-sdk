@@ -46,6 +46,29 @@ function isolatedRunner(){processCount++;lastNativeDiagnostic='';const childName
 const options=()=>({now:()=>Number(BigInt(base.timestamp))*1000,binaryPath:binary,binarySha256,spawnExecutor:isolatedRunner,stateReader,block:{number:BigInt(base.number),hash:base.hash},onEvidence:e=>evidence.executions.push(e),limits:{gasBudget:500_000_000,requests:5000,witnessBytes:32*1024*1024,responseBytes:128*1024*1024,wallTimeMs:180000}});
 try{
  docker('image','inspect',image);docker('image','inspect',runnerImage);
+ // Replay an operator-captured public header through the exact isolated binary.
+ // This deliberately supplies no uncaptured witnesses: reaching a pinned read
+ // proves header/fork compatibility, while a null response must yield no result.
+ const publicFixture=JSON.parse(readFileSync('tests/fixtures/sepolia-public-proof-20261010.json','utf8'));
+ for(const variant of ['captured','missing-access-list-hash','missing-slot-number','changed-slot-number']){
+  base=structuredClone(publicFixture.header);
+  if(variant==='missing-access-list-hash')delete base.blockAccessListHash;
+  if(variant==='missing-slot-number')delete base.slotNumber;
+  if(variant==='changed-slot-number')base.slotNumber=toHex(BigInt(base.slotNumber)+1n);
+  const reads=[],publicReader={request:async({method,params})=>{
+   if(method==='eth_chainId')return '0xaa36a7';
+   if(method==='eth_getBlockByNumber')return structuredClone(base);
+   reads.push({method,params});return null;
+  }};
+  const probe=await createProofBackedSimulationTransport({...options(),stateReader:publicReader,onEvidence:()=>assert.fail('Incomplete public witnesses cannot produce execution evidence.')});
+  try{await assert.rejects(probe.request({method:'eth_simulateV1',params:[payload([{from:publicFixture.address,to:publicFixture.address,data:'0x',value:'0x0',gas:'0x7530'}],false),base.number]}));}
+  finally{await probe.close();}
+  if(variant==='captured'){
+   assert.ok(reads.length>0,'The captured header must pass the actual native identity/fork gate.');
+   assert.ok(reads.every(r=>['eth_getProof','eth_getCode'].includes(r.method)&&r.params.at(-1).blockHash===base.hash&&r.params.at(-1).requireCanonical===true));
+  }else assert.equal(reads.length,0,'Changed Amsterdam header must fail before requesting state.');
+  record(`public captured Amsterdam header: ${variant} rejects missing or invalid evidence without a result`,{capturedBlockHash:publicFixture.header.hash,nativeStateRequests:reads.length,upstreamNetworkRequests:0});
+ }
  docker('run','--pull=never','--rm','--network','none','--user',`${process.getuid()}:${process.getgid()}`,'-v',`${tmp}:/fixture`,image,'--datadir','/fixture/data','--state.scheme','hash','--gcmode','archive','init','/fixture/genesis.json');
  const fixtureBinary=join(build,'keel-proof-fixture');
  const fixtureBlocks=execFileSync('docker',['run','--pull=never','--rm','-i','--network','none','--memory','768m','--memory-swap','768m','--cpus','2','--pids-limit','64','--read-only','--cap-drop','ALL','--security-opt','no-new-privileges','--user',`${process.getuid()}:${process.getgid()}`,'-v',`${fixtureBinary}:/fixture-generator:ro`,'--entrypoint','/fixture-generator',runnerImage],{input:readFileSync(join(tmp,'genesis.json')),timeout:60000,maxBuffer:8*1024*1024});

@@ -94,7 +94,19 @@ unproven values. Any future witness completion must remain authenticated, pinned
 and bounded. A valid program can therefore still fail closed on an incomplete
 witness; neither broad compatibility nor actual saved-plan success is claimed.
 
-No live proof-read capability, rate capacity or access pattern for an affected
-project has been tested. Account addresses and storage keys are information, even
+An operator supplied a public-only EIP-4788 fixture from the existing EthPandaOps
+Sepolia reader on 2026-10-10 (block 11886703). The fixture retains its exact
+23-field Amsterdam header, account/storage proofs and code. Cloud tests replay
+it through pinned Geth's canonical header hashing, Sepolia fork selection and
+the actual sparse reader; native process checks fail closed on missing witnesses
+and altered Amsterdam fields. The approved reader also rejects null pinned-state
+responses without substituting latest or another provider. No network is needed
+to replay these tests. This one public sample does not establish noncanonical
+fork rejection, independent consensus trust, arbitrary historical availability,
+throughput, or a complete public/private simulation. RPC account summary fields
+cannot override the account decoded from its Merkle proof.
+
+No rate capacity or access pattern for an affected project has been tested.
+Account addresses and storage keys are information, even
 when calldata stays local. Any real state acquisition must remain within the
 explicitly approved source/scope and stop on access/rate restrictions.

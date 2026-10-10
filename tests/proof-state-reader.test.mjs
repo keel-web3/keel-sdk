@@ -1,5 +1,6 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
+import { readFileSync } from 'node:fs';
 import { createApprovedProofStateReader } from '../native/proof-executor/state-reader.mjs';
 
 const urls=['https://public.example','https://paid.example/SECRET?key=PRIVATE'],hash=`0x${'11'.repeat(32)}`,address=`0x${'22'.repeat(20)}`,slot=`0x${'00'.repeat(32)}`;
@@ -60,4 +61,41 @@ test('wallet, execution, unpinned and overscoped reads are rejected before any n
   const f=fixture();
   for(const request of [{method:'eth_sendRawTransaction',params:['0x']},{method:'eth_call',params:[{data:'0xSECRET'},'latest']},{method:'eth_simulateV1',params:[]},{...read,params:[address,[slot],'latest']},{...read,params:[address,[slot,slot],read.params[2]]}])await assert.rejects(f.reader.request(request));
   assert.deepEqual(f.requests,[]);f.reader.close();
+});
+
+const publicFixture=JSON.parse(readFileSync(new URL('./fixtures/sepolia-public-proof-20261010.json',import.meta.url),'utf8'));
+for(const method of ['eth_getProof','eth_getCode','eth_getBlockByHash'])test(`captured public null response for ${method} fails closed without another recipient or latest fallback`,async()=>{
+  const calls=[],h=publicFixture.header;
+  assert.equal(publicFixture.unknownHashProof,null);assert.equal(publicFixture.unknownHashCode,null);
+  const fetchImpl=async(url,init)=>{
+    const q=JSON.parse(init.body);calls.push({url,...q});
+    const result=q.method==='eth_chainId'?'0xaa36a7':q.method==='eth_getBlockByNumber'?h:q.method==='eth_getProof'?publicFixture.unknownHashProof:q.method==='eth_getCode'?publicFixture.unknownHashCode:null;
+    return new Response(JSON.stringify({jsonrpc:'2.0',id:q.id,result}));
+  };
+  const reader=createApprovedProofStateReader({rpcUrls:urls,approvedStateRpcUrls:urls,block:{number:BigInt(h.number),hash:h.hash},fetchImpl,minIntervalMs:0});
+  const anchor={blockHash:h.hash,requireCanonical:true};
+  const params=method==='eth_getProof'?[publicFixture.address,[publicFixture.slot],anchor]:method==='eth_getCode'?[publicFixture.address,anchor]:[h.hash,false];
+  try{
+    await assert.rejects(reader.request({method,params}),e=>e.kind==='rpc-unavailable');
+    assert.ok(calls.every(c=>c.url===urls[0]));
+    assert.equal(calls.filter(c=>c.method===method).length,1);
+    assert.ok(calls.every(c=>!c.params.includes('latest')));
+  }finally{reader.close();}
+});
+test('the captured public header, proof and code survive approved-reader framing without dropping Amsterdam fields',async()=>{
+  const h=publicFixture.header,calls=[];
+  const fetchImpl=async(url,init)=>{
+    const q=JSON.parse(init.body);calls.push(q);
+    const result=q.method==='eth_chainId'?'0xaa36a7':q.method==='eth_getProof'?publicFixture.proof:q.method==='eth_getCode'?publicFixture.code:h;
+    return new Response(JSON.stringify({jsonrpc:'2.0',id:q.id,result}));
+  };
+  const reader=createApprovedProofStateReader({rpcUrls:[urls[0]],approvedStateRpcUrls:[urls[0]],block:{number:BigInt(h.number),hash:h.hash},fetchImpl,minIntervalMs:0});
+  const anchor={blockHash:h.hash,requireCanonical:true};
+  try{
+    assert.deepEqual(await reader.request({method:'eth_getBlockByNumber',params:[h.number,false]}),h);
+    assert.deepEqual(await reader.request({method:'eth_getProof',params:[publicFixture.address,[publicFixture.slot],anchor]}),publicFixture.proof);
+    assert.equal(await reader.request({method:'eth_getCode',params:[publicFixture.address,anchor]}),publicFixture.code);
+    assert.ok(h.blockAccessListHash&&h.slotNumber);
+    assert.ok(calls.every(c=>['eth_chainId','eth_getBlockByNumber','eth_getProof','eth_getCode'].includes(c.method)));
+  }finally{reader.close();}
 });
