@@ -18,12 +18,14 @@ jobs:
       - name: Fresh checkout setup without sibling repositories
         run: pnpm setup:friend --skip-desktop
       - name: Exact simulation capacity and recovery
-        run: node --test tests/sdk-simulation-connection.test.mjs tests/sdk-publication-preflight.test.mjs tests/transaction-gas-policy.test.mjs tests/sdk-release-wallet-batch.test.mjs tests/rpc-publication-simulation.test.mjs
+        run: node --test tests/sdk-simulation-connection.test.mjs tests/sdk-publication-preflight.test.mjs tests/sdk-owned-simulation-transport.test.mjs tests/transaction-gas-policy.test.mjs tests/sdk-release-wallet-batch.test.mjs tests/rpc-publication-simulation.test.mjs
       - name: Native Geth stateful publication validation (synthetic, isolated)
         env:
           KEEL_NATIVE_GETH_EVIDENCE: native-geth-publication-evidence.json
+          KEEL_NATIVE_FORK_COMPARISON: "1"
         run: |
           docker pull ethereum/client-go@sha256:abf3605177f8bdcfce436985a8054cca4ae59256323a4ffb72c56c04f3d1fadd
+          docker pull ghcr.io/foundry-rs/foundry@sha256:32c8ea9ef052a440cb1620175987a3f49eff8b068a0c6a3d09ebf7f5f9a0e043
           pnpm verify:publication-native
       - uses: actions/upload-artifact@v4
         with:

@@ -11,7 +11,7 @@ export interface KeelSimulationSocket {
   close(): void;
 }
 /** HTTP has no socket state; every simulation response is still independently verified. */
-export type KeelSimulationConnection = KeelSimulationSocket | (Omit<KeelSimulationSocket, "socket"> & { readonly protocol: "https"; readonly socket?: never });
+export type KeelSimulationConnection = KeelSimulationSocket | (Omit<KeelSimulationSocket, "socket"> & { readonly protocol: "http" | "https"; readonly socket?: never });
 export interface KeelSimulationConnectionOptions {
   /** The caller must supply an already approved endpoint. Used only after a confirmed WS 1009. */
   readonly messageSizeFallback?: () => Promise<KeelSimulationConnection>;
@@ -70,7 +70,7 @@ export function createPinnedKeelSepoliaSimulationTransport(connect: () => Promis
     rpc.socket?.addEventListener?.("close", listener);
     detachClose.set(rpc, () => { rpc.socket?.removeEventListener?.("close", listener); detachClose.delete(rpc); });
   };
-  const socketDiagnostic = (rpc: KeelSimulationConnection | undefined) => ({ transport: rpc?.socket ? "websocket" : rpc ? "https" : useMessageSizeFallback ? "https" : "websocket", ...(rpc?.socket ? { socketReadyState: rpc.socket.readyState, ...closeEvidence.get(rpc) } : {}) });
+  const socketDiagnostic = (rpc: KeelSimulationConnection | undefined) => ({ transport: rpc?.socket ? "websocket" : rpc && "protocol" in rpc ? rpc.protocol : useMessageSizeFallback ? "https" : "websocket", ...(rpc?.socket ? { socketReadyState: rpc.socket.readyState, ...closeEvidence.get(rpc) } : {}) });
   const active = new Map<KeelSimulationConnection, number>();
   const retired = new Set<KeelSimulationConnection>();
   const closedSockets = new WeakSet<KeelSimulationConnection>();

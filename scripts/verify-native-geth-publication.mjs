@@ -12,6 +12,7 @@ import { simulateKeelPublicationBeforeFunding } from "../packages/sdk/dist/publi
 // Official Geth v1.17.8, commit a579077007b98217c3e253a66e4b452ca0c32b96.
 // Pull explicitly before running. The test itself cannot download an image.
 const image = "ethereum/client-go@sha256:abf3605177f8bdcfce436985a8054cca4ae59256323a4ffb72c56c04f3d1fadd";
+const forkImage = "ghcr.io/foundry-rs/foundry@sha256:32c8ea9ef052a440cb1620175987a3f49eff8b068a0c6a3d09ebf7f5f9a0e043";
 const fixtureRoot = fileURLToPath(new URL("../tests/fixtures/native-geth-publication/", import.meta.url));
 const repositoryRoot = fileURLToPath(new URL("../", import.meta.url));
 const temporary = mkdtempSync(join(tmpdir(), "keel-native-publication-"));
@@ -24,6 +25,8 @@ const evidence = { schema: "keel-native-geth-publication-test@1", image, synthet
   sourceCommit: execFileSync("git", ["rev-parse", "HEAD"], { cwd: repositoryRoot, encoding: "utf8" }).trim(),
   network: "none", productionStateUsed: false, signing: "not-performed", submission: "not-performed", checks: [] };
 let started = false;
+let forkStarted = false;
+const forkContainer = `${container}-fork`;
 const docker = (...args) => execFileSync("docker", args, { encoding: "utf8", maxBuffer: 20 * 1024 * 1024, timeout: 60_000, stdio: ["ignore", "pipe", "pipe"] });
 const record = (name, details = {}) => { evidence.checks.push({ name, ...details }); console.log(`PASS ${name}`); };
 const source = readFileSync(join(fixtureRoot, "StateSequence.sol"), "utf8");
@@ -39,12 +42,12 @@ const calldata = (name, args = []) => encodeFunctionData({ abi: artifact.abi, fu
 const calls = [0, 1, 2, 3, 4].map(nonce => ({ from: owner, to: reader, data: calldata("write", [100n]),
   value: "0x0", gas: toHex(16_000_000n), nonce: toHex(nonce), gasPrice: "0x30" }));
 const allowedMethods = new Set(["web3_clientVersion", "eth_chainId", "eth_getBlockByNumber", "eth_getBlockByHash", "eth_getTransactionCount", "eth_getCode", "eth_call", "eth_simulateV1"]);
-function rpc(method, params) {
+function rpc(method, params, port = 8545) {
   assert.ok(allowedMethods.has(method), `Unexpected RPC method: ${method}`);
   writeFileSync(join(temporary, "request.json"), JSON.stringify({ jsonrpc: "2.0", id: 1, method, params }));
   // The only network access is loopback inside a --network none container.
   const response = JSON.parse(docker("exec", container, "wget", "-Y", "off", "-q", "-O", "-", "--header=Content-Type: application/json",
-    "--post-file=/fixture/request.json", "http://127.0.0.1:8545"));
+    "--post-file=/fixture/request.json", `http://127.0.0.1:${port}`));
   if (response.error) throw Object.assign(new Error(response.error.message), { code: response.error.code });
   return response.result;
 }
@@ -147,9 +150,32 @@ try {
   assert.equal(rpc("eth_getTransactionCount", [owner, "0x0"]), "0x0");
   assert.equal(rpc("eth_getBlockByNumber", ["latest", false]).hash, base.hash);
   record("all simulations leave canonical state, nonce and block unchanged");
+  if (process.env.KEEL_NATIVE_FORK_COMPARISON === "1") {
+    docker("image", "inspect", forkImage);
+    docker("run", "--pull=never", "-d", "--name", forkContainer, "--network", `container:${container}`, "--memory", "768m", "--cpus", "2",
+      // Clear proxying only inside the already network-disabled synthetic fixture.
+      "--env", "HTTP_PROXY=", "--env", "HTTPS_PROXY=", "--env", "ALL_PROXY=", "--env", "NO_PROXY=127.0.0.1,localhost",
+      "--entrypoint", "anvil", forkImage, "--accounts", "0", "--no-mining", "--enable-tx-gas-limit", "--fork-url", "http://127.0.0.1:8545",
+      "--fork-block-number", "0", "--host", "127.0.0.1", "--port", "8546");
+    forkStarted = true;
+    for (let attempt = 0; ; attempt++) {
+      try { rpc("eth_chainId", [], 8546); break; } catch (error) { if (attempt >= 80) throw error; await delay(100); }
+    }
+    assert.equal(JSON.parse(docker("inspect", forkContainer))[0].HostConfig.NetworkMode, `container:${JSON.parse(docker("inspect", container))[0].Id}`);
+    const forkBlock = rpc("eth_getBlockByNumber", ["0x0", false], 8546);
+    assert.equal(forkBlock.hash, base.hash);
+    assert.equal(forkBlock.gasLimit, base.gasLimit);
+    const forkProbe = rpc("eth_simulateV1", [{ blockStateCalls: [{ calls: [{ ...calls[0], to: owner, data: "0x", gas: toHex(selectedGasLimit) }] }], validation: true, traceTransfers: false, returnFullTransactions: true }, "0x0"], 8546);
+    assert.equal(BigInt(forkProbe[0].transactions[0].gas), 50_000_000n);
+    await assert.rejects(simulateKeelPublicationBeforeFunding(plan, { request: async ({ method, params }) => rpc(method, params, 8546) }), error => error.kind === "provider-limit");
+    record("stock Anvil 1.8.5 fork retains the base block but caps simulation gas at 50M", { image: forkImage,
+      clientVersion: rpc("web3_clientVersion", [], 8546), requestedGas: selectedGasLimit.toString(), returnedGas: "50000000", baseHashUnchanged: true, blockGasLimitUnchanged: true,
+      accountsCreated: 0, mining: false, productionStateUsed: false, qualifiedForPublication: false });
+  }
   if (process.env.KEEL_NATIVE_GETH_EVIDENCE) writeFileSync(process.env.KEEL_NATIVE_GETH_EVIDENCE, `${JSON.stringify(evidence, null, 2)}\n`);
   console.log(JSON.stringify({ passed: evidence.checks.length, image, synthetic: true, published: false }));
 } finally {
+  if (forkStarted) docker("rm", "-f", forkContainer);
   if (started) docker("rm", "-f", container);
   rmSync(temporary, { recursive: true, force: true });
 }

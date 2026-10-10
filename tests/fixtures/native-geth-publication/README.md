@@ -40,3 +40,14 @@ removes both afterward. Geth runs as the caller's UID to keep cleanup
 permissions correct. The evidence file is retained only when explicitly
 requested. The 500M RPC budget is sufficient for this synthetic fixture;
 it is not a recommended or verified production budget for Retro.
+
+To reproduce the stock fork-validator boundary, also pull the official Foundry
+v1.8.5 image
+`ghcr.io/foundry-rs/foundry@sha256:32c8ea9ef052a440cb1620175987a3f49eff8b068a0c6a3d09ebf7f5f9a0e043`
+and set `KEEL_NATIVE_FORK_COMPARISON=1`. Anvil runs in the same network-disabled
+namespace, forks only the local synthetic Geth block, generates zero accounts,
+does not mine, and enables transaction gas-limit checks. No gas-limit override
+is supplied. The pinned fork block hash and its 200M gas limit remain intact,
+but stock Anvil returns only 50M for the requested 200M simulation envelope.
+The SDK rejects the full program. This is a reproduced incompatibility, not
+a passing alternative validator or proof about any private project.
