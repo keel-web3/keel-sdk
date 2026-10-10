@@ -185,6 +185,13 @@ Sepolia publication preflight qualifies the simulator with bounded public empty 
 
 ### Discover and continue saved work
 
+Local MCP installs should use maintained SDK `master`; an older checkout can
+report the same package version while lacking these capabilities. Follow the
+[safe local update steps](FRIEND_QUICKSTART.md#update-an-existing-local-mcp),
+preserving custom skills, artwork paths and account pairing. Hosted MCP requires
+no local repository update. Inspect the running connection's tool schema after
+reload before deciding that a saved project is missing or unsupported.
+
 `client.list({ limit, cursor, projectId })` / MCP `keel-studio-draft` operation
 `list` returns projects and releases plus `pagination`. The default is 50 entries
 per collection, maximum 100. Follow `pagination.nextCursor` until null, preserving

@@ -41,6 +41,15 @@ existing graph objects before editing or wallet review. Complete-document
 Base64 prohibitions for new preparation do not authorize replacing an existing
 prepared Base64 copy binding.
 
+## Supported local MCP updates
+
+Use maintained `keel-web3/keel-sdk` `master` for local MCP. The historical
+`codex/studio-agent-connect` branch can report the same package versions while
+missing newer discovery. Inspect the active executable, source commit and tool
+schema, then follow `docs/FRIEND_QUICKSTART.md#update-an-existing-local-mcp`.
+Preserve local changes, custom skills, artwork paths and account pairing. Hosted
+MCP needs no local update; a local MCP update needs only the SDK checkout.
+
 ## Contract work is always a KEEL workflow
 
 When the request mentions a contract, collection, viewer, token metadata,
