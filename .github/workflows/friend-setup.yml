@@ -31,10 +31,13 @@ jobs:
           path: native-geth-publication-evidence.json
           if-no-files-found: error
       - name: Record approved public-only HTTPS capacity (not private-plan proof)
+        if: ${{ github.event_name == 'workflow_dispatch' }}
         run: node scripts/probe-approved-sepolia-http.mjs
       - name: Record indexed public-only pool qualification (no project data)
+        if: ${{ github.event_name == 'workflow_dispatch' }}
         run: node scripts/check-public-simulation-pool.mjs --public-only | tee public-simulation-pool-evidence.json
       - uses: actions/upload-artifact@v4
+        if: ${{ github.event_name == 'workflow_dispatch' }}
         with:
           name: public-simulation-pool-evidence
           path: public-simulation-pool-evidence.json

@@ -7,7 +7,7 @@ import { simulateKeelPublicationBeforeFunding } from '../packages/sdk/dist/publi
 
 const hash = n => `0x${BigInt(n).toString(16).padStart(64,'0')}`;
 const zero = `0x${'0'.repeat(40)}`, owner = `0x${'11'.repeat(20)}`, reader = `0x${'22'.repeat(20)}`;
-const gas = '0xbebc200', snapshot = { number:'0x12', hash:hash(99), timestamp:'0x6ac79200', gasLimit:gas, baseFeePerGas:'0xf', slotNumber:'0xa' };
+const gas = '0xbebc200', snapshot = { number:'0x12', hash:hash(99), timestamp:`0x${Math.floor(Date.now()/1000).toString(16)}`, gasLimit:gas, baseFeePerGas:'0xf', slotNumber:'0xa' };
 const urls = ['https://first.example/SECRET','https://second.example/PRIVATE','https://third.example'];
 const tokenURI = 'data:application/json,{"name":"Pool fixture"}';
 const call = (i=0) => ({from:owner,to:reader,data:'0xbeef',value:'0x0',gas,nonce:`0x${i.toString(16)}`,gasPrice:'0x30'});
@@ -25,7 +25,7 @@ function fixture(faults=[{},{}], approved=urls.slice(0,faults.length)) {
     const error=(code,message='SECRET provider error')=>Response.json({jsonrpc:'2.0',id:body.id,error:{code,message}});
     if(fault.rate) return new Response('',{status:429,headers:{'retry-after':'30'}});
     if(body.method==='eth_chainId') return respond(fault.chain?'0x1':'0xaa36a7');
-    if(body.method==='eth_getBlockByNumber') return respond(fault.pin&&body.params[0]!=='latest'?{...snapshot,hash:hash(1000)}:snapshot);
+    if(body.method==='eth_getBlockByNumber') return respond(fault.stale?{...snapshot,timestamp:'0x68f00000'}:fault.future?{...snapshot,timestamp:`0x${(BigInt(snapshot.timestamp)+600n).toString(16)}`}:fault.pin&&body.params[0]!=='latest'?{...snapshot,hash:hash(1000)}:snapshot);
     if(body.method==='eth_getBalance') return respond(`0x${'f'.repeat(32)}`);
     if(body.method==='eth_getTransactionCount') return respond('0x0');
     if(body.method==='eth_getCode') return respond(body.params[0]===zero?'0x':'0x6000');
@@ -57,7 +57,7 @@ test('pinned pool candidate cannot silently fail over during qualification; stri
   }
 });
 test('public capacity or unsupported candidate swaps before any private data; complete SDK proof survives selection',async()=>{
-  for(const fault of [{cap:true},{unsupported:true},{ignoreNonce:true},{noPreRefund:true},{rate:true},{chain:true},{pin:true}]) {
+  for(const fault of [{cap:true},{unsupported:true},{ignoreNonce:true},{noPreRefund:true},{rate:true},{chain:true},{pin:true},{stale:true},{future:true}]) {
     const f=fixture([fault,{}]);
     try { const proof=await simulateKeelPublicationBeforeFunding(fullPlan(),f.transport);
       assert.equal(proof.schema,'keel-publication-simulation@1');assert.equal(proof.signing,'not-performed');assert.equal(proof.submission,'not-performed');
@@ -65,6 +65,16 @@ test('public capacity or unsupported candidate swaps before any private data; co
       assert.deepEqual(f.privateRequests().map(r=>[r.body.params[0].validation,r.body.params[0].blockStateCalls.length]),[[false,5],[true,5],[false,7]]);
     } finally {await f.transport.close();}
   }
+});
+test('rate-limit cooldown persists across new review transports without sharing private proof state',async()=>{
+  const f=fixture([{rate:true},{cap:true}]), previous=globalThis.fetch;
+  globalThis.fetch=f.options.fetchImpl;
+  const options={...f.options,fetchImpl:undefined};
+  const first=createKeelPublicSepoliaSimulationPool(options);
+  try {await assert.rejects(first.request(program()));const before=f.requests.filter(r=>r.index===0).length;
+    const retry=createKeelPublicSepoliaSimulationPool(options);
+    try{await assert.rejects(retry.request(program()));assert.equal(f.requests.filter(r=>r.index===0).length,before,'a new review must honor the same Retry-After');}finally{await retry.close();}
+  }finally{globalThis.fetch=previous;await first.close();await f.transport.close();}
 });
 test('aggregate clamp after successful empty probes swaps the WHOLE unchanged request, never a continuation',async()=>{
   const f=fixture([{aggregate:true},{}]);

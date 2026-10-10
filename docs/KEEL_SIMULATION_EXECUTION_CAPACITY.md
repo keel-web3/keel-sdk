@@ -81,7 +81,9 @@ through the existing resolver's one-to-six endpoint validation. Configure one
 form, not both; candidate configuration is distinct from private-data approval.
 
 For each candidate, qualify public chain/fork/header/fee/nonce/pre-refund
-behavior before any private calldata. Recheck the exact selected block hash.
+behavior before any private calldata. Require a fresh head (within 180 seconds,
+at most 30 seconds ahead of server time), then recheck the exact selected block
+hash. Transport cooldowns persist across reviews; Retry does not reset a 429.
 Before **each** phase, execute a public empty-call sequence with every requested
 gas envelope and the same block count. This catches sequence clamping that a
 largest-call cache misses. These cheap calls do **not** establish the actual
@@ -107,6 +109,8 @@ Run `node scripts/check-public-simulation-pool.mjs --public-only` to record the
 indexed candidates' public qualification and a 40-empty-call sequence. Its
 output explicitly distinguishes capability evidence from private execution or
 publication proof. A network/proxy denial is not evidence of RPC incompatibility.
+CI runs public network probes only when explicitly dispatched, not on each PR
+update. Respect an observed rate limit before requesting another live probe.
 
 ## Reproducible evidence and limits
 

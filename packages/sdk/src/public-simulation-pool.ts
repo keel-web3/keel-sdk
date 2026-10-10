@@ -17,6 +17,10 @@ export interface KeelPublicSimulationPoolOptions {
 }
 const object = (value: unknown): Record<string, unknown> | undefined => value !== null && typeof value === "object" && !Array.isArray(value) ? value as Record<string, unknown> : undefined;
 const quantity = (value: unknown): bigint | undefined => typeof value === "string" && /^0x(?:0|[1-9a-f][0-9a-f]*)$/iu.test(value) ? BigInt(value) : undefined;
+// Retain the maintained pool's rate-limit cooldown across new reviews/reloads.
+// Test-injected fetchers are isolated; production candidates share only RPC
+// transport state, never a creator's proof, request, or selected block.
+const sharedPools = new Map<string, ReturnType<typeof createKeelRpcPool>>();
 
 /** Capability-aware selection over the existing RPC pool. Each candidate keeps
  * its own pacing/cooldowns and cannot swap underneath qualification or a request.
@@ -28,8 +32,10 @@ export function createKeelPublicSepoliaSimulationPool(options: KeelPublicSimulat
   if ([...approved].some(url => !urls.includes(url)) || typeof options.block.number !== "bigint" || options.block.number < 0n || !/^0x[0-9a-f]{64}$/iu.test(options.block.hash))
     throw new KeelPublicationSimulationError("configuration-invalid", "Publication needs explicit configured recipients and a selected block.");
   const block = { ...options.block }, blockTag = `0x${block.number.toString(16)}`;
-  const pool = createKeelRpcPool({ rpcUrls: urls, chainId: 11155111, timeoutMs: 30_000, simulationTimeoutMs: 90_000, maxResponseBytes: 64 * 1024 * 1024,
+  const poolKey = JSON.stringify([urls, options.minIntervalMs ?? 250]);
+  const pool = (!options.fetchImpl ? sharedPools.get(poolKey) : undefined) ?? createKeelRpcPool({ rpcUrls: urls, chainId: 11155111, timeoutMs: 30_000, simulationTimeoutMs: 90_000, maxResponseBytes: 64 * 1024 * 1024,
     ...(options.fetchImpl ? { fetchImpl: options.fetchImpl } : {}), ...(options.minIntervalMs === undefined ? {} : { minIntervalMs: options.minIntervalMs }) } satisfies KeelRpcPoolOptions);
+  if (!options.fetchImpl) { sharedPools.set(poolKey, pool); if (sharedPools.size > 16) sharedPools.delete(sharedPools.keys().next().value!); }
   const abort = new AbortController(), rejected = new Set<number>();
   type Candidate = { index: number; transport: ReturnType<typeof createPinnedKeelSepoliaSimulationTransport> };
   let selected: Candidate | undefined, cursor = 0, closed = false;
@@ -115,6 +121,10 @@ export function createKeelPublicSepoliaSimulationPool(options: KeelPublicSimulat
       if (rejected.has(index)) continue;
       let candidate = selected?.index === index ? selected : create(index), projectRequest = false;
       try {
+        const head = object(await pool.pin(index).request({ method: "eth_getBlockByNumber", params: ["latest", false], signal: abort.signal }));
+        const headTime = quantity(head?.timestamp), headNumber = quantity(head?.number), now = BigInt(Math.floor(Date.now() / 1000));
+        if (headTime === undefined || headNumber === undefined || headNumber < block.number || headTime + 180n < now || headTime > now + 30n)
+          throw new KeelPublicationSimulationError("rpc-unavailable", "The candidate does not have a fresh selected-chain head. The saved plan is unchanged.");
         if ((candidate.transport.qualifiedProbeGas ?? 0n) < requiredGas) {
           if (candidate.transport.qualifiedProbeGas !== undefined) { await candidate.transport.close(); selected = undefined; candidate = create(index); }
           await candidate.transport.qualify(requiredGas);
