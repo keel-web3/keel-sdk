@@ -18,7 +18,7 @@ jobs:
       - name: Fresh checkout setup without sibling repositories
         run: pnpm setup:friend --skip-desktop
       - name: Exact simulation capacity and recovery
-        run: node --test tests/sdk-simulation-connection.test.mjs tests/sdk-publication-preflight.test.mjs tests/sdk-public-simulation-pool.test.mjs tests/sdk-rpc.test.mjs tests/sdk-network-index.test.mjs tests/transaction-gas-policy.test.mjs tests/sdk-release-wallet-batch.test.mjs tests/rpc-publication-simulation.test.mjs
+        run: node --test tests/sdk-simulation-connection.test.mjs tests/sdk-publication-preflight.test.mjs tests/sdk-public-simulation-pool.test.mjs tests/sdk-rpc.test.mjs tests/sdk-network-index.test.mjs tests/mcp-selected-chain-routing.test.mjs tests/transaction-gas-policy.test.mjs tests/sdk-release-wallet-batch.test.mjs tests/rpc-publication-simulation.test.mjs
       - name: Native Geth stateful publication validation (synthetic, isolated)
         env:
           KEEL_NATIVE_GETH_EVIDENCE: native-geth-publication-evidence.json
