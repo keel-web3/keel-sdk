@@ -1,0 +1,16 @@
+{
+  "schema": "keel-simulation-incident@1",
+  "provenance": "Authorized operator diagnostic matched to one creator browser check on 2026-10-10; synthetic socket responses and calldata are used by regressions.",
+  "observedAt": "2026-10-10T00:42:44.979171769Z",
+  "deployedSite": "2245cf613e0027b044560c22597512422cd095d0",
+  "deployedSdk": "d6e92ca7d890a90878685f6a5eccc2649a60e830",
+  "diagnostic": {
+    "kind": "rpc-unavailable",
+    "errorClass": "SocketClosedError",
+    "rpcMethod": "eth_simulateV1",
+    "phase": "project-request",
+    "transportFailure": "connection-closed",
+    "socketReadyState": 3
+  },
+  "limits": "No close code/reason, numeric RPC code, HTTP status or provider gas cap was captured. The reason for closure is unknown. This is not publication evidence."
+}

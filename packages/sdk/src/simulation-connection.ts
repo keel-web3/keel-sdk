@@ -2,7 +2,11 @@ import { KeelPublicationSimulationError, keelSimulationTransportFailure, type Ke
 import { assertKeelAmsterdamSimulationHeader, resolveKeelTransactionGasPolicy } from "./transaction-gas-policy.js";
 
 export interface KeelSimulationSocket {
-  readonly socket: { readonly readyState: number };
+  readonly socket: {
+    readonly readyState: number;
+    addEventListener?(type: "close", listener: (event: { readonly code: number; readonly reason: string }) => void): void;
+    removeEventListener?(type: "close", listener: (event: { readonly code: number; readonly reason: string }) => void): void;
+  };
   requestAsync(input: { readonly body: { readonly method: string; readonly params: readonly unknown[] }; readonly timeout: number }): Promise<{ readonly result?: unknown; readonly error?: unknown }>;
   close(): void;
 }
@@ -37,12 +41,33 @@ export function createPinnedKeelSepoliaSimulationTransport(connect: () => Promis
   let selected: Promise<KeelSimulationSocket> | undefined;
   let closed = false;
   let qualifiedProbeGas: bigint | undefined;
+  const closeEvidence = new WeakMap<KeelSimulationSocket, { socketCloseCode?: number; socketCloseReason: string }>();
+  const detachClose = new WeakMap<KeelSimulationSocket, () => void>();
+  const observeClose = (rpc: KeelSimulationSocket) => {
+    // viem turns CloseEvent into SocketClosedError and discards code/reason.
+    // Retain only bounded numeric/enum evidence, never the provider's text.
+    const listener = (event: { readonly code: number; readonly reason: string }) => {
+      const reason = typeof event.reason === "string" && event.reason.length <= 123 ? event.reason.toLowerCase() : undefined;
+      const socketCloseReason = reason === "" ? "empty" : reason === undefined ? "other"
+        : /(?:message|frame|payload).{0,24}(?:too (?:large|big)|size limit)/u.test(reason) ? "message-too-large"
+        : /rate.?limit|too many requests/u.test(reason) ? "rate-limited"
+        : /timeout|timed out|idle/u.test(reason) ? "timeout"
+        : /overload|try again later|server restart/u.test(reason) ? "server-unavailable"
+        : /protocol error/u.test(reason) ? "protocol-error"
+        : /policy violation/u.test(reason) ? "policy-violation" : "other";
+      closeEvidence.set(rpc, { ...(Number.isInteger(event.code) && event.code >= 1000 && event.code <= 4999 ? { socketCloseCode: event.code } : {}), socketCloseReason });
+      detachClose.get(rpc)?.();
+    };
+    rpc.socket.addEventListener?.("close", listener);
+    detachClose.set(rpc, () => { rpc.socket.removeEventListener?.("close", listener); detachClose.delete(rpc); });
+  };
+  const socketDiagnostic = (rpc: KeelSimulationSocket | undefined) => rpc ? { socketReadyState: rpc.socket.readyState, ...closeEvidence.get(rpc) } : {};
   const active = new Map<KeelSimulationSocket, number>();
   const retired = new Set<KeelSimulationSocket>();
   const closedSockets = new WeakSet<KeelSimulationSocket>();
   const drainResolvers = new Map<KeelSimulationSocket, () => void>();
   let replacementReady: Promise<void> | undefined;
-  const closeSocket = (rpc: KeelSimulationSocket) => { if (!closedSockets.has(rpc)) { closedSockets.add(rpc); rpc.close(); } retired.delete(rpc); drainResolvers.get(rpc)?.(); drainResolvers.delete(rpc); };
+  const closeSocket = (rpc: KeelSimulationSocket) => { if (!closedSockets.has(rpc)) { closedSockets.add(rpc); detachClose.get(rpc)?.(); rpc.close(); } retired.delete(rpc); drainResolvers.get(rpc)?.(); drainResolvers.delete(rpc); };
   const gasClamp = (error: unknown): error is KeelPublicationSimulationError => error instanceof KeelPublicationSimulationError
     && error.kind === "provider-limit" && typeof error.diagnostic?.requestedGasLimit === "string" && typeof error.diagnostic?.providerGasCap === "string";
   const select = async (requiredGas?: bigint) => {
@@ -53,6 +78,7 @@ export function createPinnedKeelSepoliaSimulationTransport(connect: () => Promis
     const unsupported = (message: string): never => { throw new KeelPublicationSimulationError("unsupported-simulation", message, { stage }); };
     try {
       rpc = await connect();
+      observeClose(rpc);
       stage = "chain";
       if (quantity(await qualifiedCall({ method: "eth_chainId", params: [] })) !== 11155111n) throw new KeelPublicationSimulationError("wrong-chain", "The configured simulator did not return Sepolia.", { stage });
       stage = "snapshot";
@@ -118,7 +144,7 @@ export function createPinnedKeelSepoliaSimulationTransport(connect: () => Promis
       qualifiedProbeGas = probeGas;
       return rpc;
     } catch (error) {
-      const classified = keelSimulationTransportFailure(error, { ...(method === undefined ? {} : { method }), phase: "public-qualification", ...(rpc === undefined ? {} : { socketReadyState: rpc.socket.readyState }) });
+      const classified = keelSimulationTransportFailure(error, { ...(method === undefined ? {} : { method }), phase: "public-qualification", ...socketDiagnostic(rpc) });
       if (rpc) closeSocket(rpc);
       throw new KeelPublicationSimulationError(classified.kind, classified.kind === "rpc-unavailable"
         ? "The configured simulator could not complete public capability qualification. No project calldata was sent." : classified.message,
@@ -129,13 +155,15 @@ export function createPinnedKeelSepoliaSimulationTransport(connect: () => Promis
     get qualifiedProbeGas() { return closed ? undefined : qualifiedProbeGas; },
     async request(request) {
       if (closed) throw new KeelPublicationSimulationError("rpc-unavailable", "The pinned simulator transport was closed.");
-      const exact = request.method === "eth_simulateV1" ? structuredClone({ ...request, params: [{ ...object(request.params[0]), returnFullTransactions: true }, ...request.params.slice(1)] }) : request;
-      // Only a confirmed gas-clamp response can reselect this approved endpoint.
-      // Never lower gas, change calldata or replay a write. The full ephemeral
-      // program is self-contained; its exact numbered snapshot must also match.
-      const tag = request.method === "eth_simulateV1" ? exact.params[1] : undefined;
+      const exact = structuredClone(request.method === "eth_simulateV1" ? { ...request, params: [{ ...object(request.params[0]), returnFullTransactions: true }, ...request.params.slice(1)] } : request);
+      if (!["eth_chainId", "eth_getBlockByNumber", "eth_getTransactionCount", "eth_getBalance", "eth_getCode", "eth_simulateV1"].includes(exact.method))
+        throw new KeelPublicationSimulationError("configuration-invalid", "The publication simulator accepts only its read-only qualification and simulation methods.");
+      // A confirmed gas clamp or closed connection can reselect this approved
+      // endpoint. Only the unchanged, numbered-block ephemeral simulation can
+      // replay; it must independently verify its snapshot and complete result.
+      const tag = exact.method === "eth_simulateV1" ? exact.params[1] : undefined;
       let requiredGas: bigint | undefined;
-      const blocks = request.method === "eth_simulateV1" ? object(exact.params[0])?.blockStateCalls : undefined;
+      const blocks = exact.method === "eth_simulateV1" ? object(exact.params[0])?.blockStateCalls : undefined;
       if (Array.isArray(blocks)) for (const block of blocks) {
         const calls = object(block)?.calls;
         if (Array.isArray(calls)) for (const item of calls) {
@@ -157,9 +185,10 @@ export function createPinnedKeelSepoliaSimulationTransport(connect: () => Promis
         let method = exact.method;
         try {
           rpc = await candidate;
-          if (closed || rpc.socket.readyState !== 1) throw new KeelPublicationSimulationError("rpc-unavailable", "The pinned simulator connection closed. Recheck the saved plan before a wallet review.");
+          if (closed || rpc.socket.readyState !== 1 || retired.has(rpc)) throw new KeelPublicationSimulationError("rpc-unavailable", "The pinned simulator connection closed. Recheck the saved plan before a wallet review.",
+            rpc.socket.readyState === 2 || rpc.socket.readyState === 3 || retired.has(rpc) ? { transportFailure: "connection-closed" } : undefined);
           active.set(rpc, (active.get(rpc) ?? 0) + 1); acquired = true;
-          if (request.method === "eth_simulateV1" && quantity(tag) !== undefined) {
+          if (exact.method === "eth_simulateV1" && quantity(tag) !== undefined) {
             method = "eth_getBlockByNumber";
             const snapshot = object(await call(rpc, { method: "eth_getBlockByNumber", params: [tag, false] }));
             if (!snapshot || snapshot.number !== tag || typeof snapshot.hash !== "string" || !/^0x[0-9a-f]{64}$/iu.test(snapshot.hash)
@@ -169,11 +198,11 @@ export function createPinnedKeelSepoliaSimulationTransport(connect: () => Promis
           }
           method = exact.method;
           const result = await call(rpc, exact);
-          if (request.method === "eth_simulateV1") assertKeelSimulationEnvelopes(exact, result);
+          if (exact.method === "eth_simulateV1") assertKeelSimulationEnvelopes(exact, result);
           if (closed) throw new KeelPublicationSimulationError("rpc-unavailable", "The pinned simulator transport was closed.");
           return result;
         } catch (error) {
-          const classifiedError = error instanceof KeelPublicationSimulationError ? error : keelSimulationTransportFailure(error, { method, phase: "project-request", ...(rpc === undefined ? {} : { socketReadyState: rpc.socket.readyState }) });
+          const classifiedError = keelSimulationTransportFailure(error, { method, phase: "project-request", ...socketDiagnostic(rpc) });
           const unavailable = classifiedError.kind === "rpc-unavailable";
           if (!gasClamp(classifiedError) && !unavailable) throw classifiedError;
           if (rpc) retired.add(rpc);
@@ -181,11 +210,20 @@ export function createPinnedKeelSepoliaSimulationTransport(connect: () => Promis
             selected = undefined; qualifiedProbeGas = undefined;
             if (rpc) { const retiring = rpc; replacementReady = new Promise(resolve => { drainResolvers.set(retiring, resolve); }); }
           }
-          // A failed qualification promise or disconnected retained socket must
-          // not poison every subsequent saved-plan check. Do not replay this
-          // request on an uncertain failure: a fresh check requalifies first.
+          // Clear failed selections for future checks even when this request
+          // cannot recover. A socket closure is replayable only for this
+          // idempotent simulation; arbitrary RPC errors/timeouts remain blocked.
           if (rpc && !acquired) closeSocket(rpc);
-          if (unavailable) throw classifiedError;
+          if (unavailable) {
+            const closedConnection = classifiedError.diagnostic?.transportFailure === "connection-closed"
+              && [2, 3].includes(Number(classifiedError.diagnostic?.socketReadyState));
+            if (closed || !closedConnection || exact.method !== "eth_simulateV1" || quantity(tag) === undefined)
+              throw classifiedError;
+            if (attempt === 3) throw new KeelPublicationSimulationError("rpc-unavailable",
+              "The simulation connection closed during bounded automatic recovery. Your saved plan is unchanged; no wallet request or transaction was sent.",
+              { ...classifiedError.diagnostic, connectionAttempts: attempt });
+            continue;
+          }
           // A symbolic block tag could select different state on replay. Keep
           // that request blocked, even though a later fresh read may requalify.
           if (attempt === 3 || rpc && quantity(tag) === undefined) throw new KeelPublicationSimulationError("provider-limit",

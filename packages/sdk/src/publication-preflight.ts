@@ -92,18 +92,20 @@ function validatedCall(value: KeelSimulationCall, maximumGas: bigint, transactio
 /** Fixed-field diagnostics only: never copy messages, URLs, params, response data or stacks. */
 export function keelSimulationTransportDiagnostic(error: unknown, context: {
   readonly method?: string; readonly phase?: string; readonly socketReadyState?: number;
+  readonly socketCloseCode?: number; readonly socketCloseReason?: string;
 } = {}): Readonly<Record<string, string | number>> {
   const methods = ["eth_chainId", "eth_getBlockByNumber", "eth_getTransactionCount", "eth_getBalance", "eth_getCode", "eth_simulateV1"];
   const phases = ["publication-preflight", "public-qualification", "project-request", "initial-storage"];
   const classes = ["Error", "TypeError", "TimeoutError", "HttpRequestError", "WebSocketRequestError", "SocketClosedError", "RpcRequestError", "UnknownRpcError", "KeelPublicationSimulationError"];
   const failures = ["timeout", "connection-reset", "connection-closed", "dns", "rate-limited", "http-error", "rpc-error", "unknown"];
   const codes = ["ETIMEDOUT", "ECONNRESET", "ECONNREFUSED", "EPIPE", "ENOTFOUND", "EAI_AGAIN", "UND_ERR_CONNECT_TIMEOUT", "UND_ERR_SOCKET"];
+  const closeReasons = ["empty", "message-too-large", "rate-limited", "timeout", "server-unavailable", "protocol-error", "policy-violation", "other"];
   const result: Record<string, string | number> = {};
   const pick = (source: Record<string, unknown> | undefined) => {
     if (!source) return;
-    for (const [key, values] of [["rpcMethod", methods], ["phase", phases], ["errorClass", classes], ["causeClass", classes], ["transportFailure", failures], ["transportCode", codes]] as const)
+    for (const [key, values] of [["rpcMethod", methods], ["phase", phases], ["errorClass", classes], ["causeClass", classes], ["transportFailure", failures], ["transportCode", codes], ["socketCloseReason", closeReasons]] as const)
       if (typeof source[key] === "string" && values.includes(source[key])) result[key] = source[key];
-    for (const [key, low, high] of [["rpcCode", -2147483648, 2147483647], ["httpStatus", 100, 599], ["socketReadyState", 0, 3], ["causeDepth", 0, 8]] as const)
+    for (const [key, low, high] of [["rpcCode", -2147483648, 2147483647], ["httpStatus", 100, 599], ["socketReadyState", 0, 3], ["causeDepth", 0, 8], ["socketCloseCode", 1000, 4999], ["connectionAttempts", 1, 3]] as const)
       if (typeof source[key] === "number" && Number.isInteger(source[key]) && source[key] >= low && source[key] <= high) result[key] = source[key];
   };
   const seen = new Set<unknown>();
@@ -120,9 +122,9 @@ export function keelSimulationTransportDiagnostic(error: unknown, context: {
   if (!result.transportFailure) result.transportFailure = result.errorClass === "TimeoutError" || result.causeClass === "TimeoutError" || ["ETIMEDOUT", "UND_ERR_CONNECT_TIMEOUT"].includes(String(result.transportCode)) ? "timeout"
     : result.transportCode === "ECONNRESET" ? "connection-reset"
     : ["ENOTFOUND", "EAI_AGAIN"].includes(String(result.transportCode)) ? "dns"
-    : ["ECONNREFUSED", "EPIPE", "UND_ERR_SOCKET"].includes(String(result.transportCode)) || result.errorClass === "SocketClosedError" ? "connection-closed"
+    : ["ECONNREFUSED", "EPIPE", "UND_ERR_SOCKET"].includes(String(result.transportCode)) || result.errorClass === "SocketClosedError" || result.causeClass === "SocketClosedError" ? "connection-closed"
     : result.httpStatus === 429 ? "rate-limited" : result.httpStatus !== undefined ? "http-error" : result.rpcCode !== undefined ? "rpc-error" : "unknown";
-  pick({ rpcMethod: context.method, phase: context.phase, socketReadyState: context.socketReadyState });
+  pick({ rpcMethod: context.method, phase: context.phase, socketReadyState: context.socketReadyState, socketCloseCode: context.socketCloseCode, socketCloseReason: context.socketCloseReason });
   return result;
 }
 
