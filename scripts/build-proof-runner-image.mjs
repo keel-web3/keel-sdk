@@ -19,5 +19,5 @@ assert.deepEqual(inspect.Config.Entrypoint,['/runner']);assert.equal(inspect.Con
 docker('save','--output',archive,tag);docker('image','rm',tag);docker('load','--input',archive);
 assert.equal(JSON.parse(docker('image','inspect',tag))[0].Id,inspect.Id,'saved archive reload must restore the exact image');
 const digest=createHash('sha256');for await(const chunk of createReadStream(archive))digest.update(chunk);
-const imageReceipt={schema:'keel-proof-runner-image@1',...receipt,imageId:inspect.Id,imageBytes:inspect.Size,archiveSha256:digest.digest('hex'),archiveReloadVerified:true};
+const imageReceipt={...receipt,schema:'keel-proof-runner-image@1',imageId:inspect.Id,imageBytes:inspect.Size,archiveSha256:digest.digest('hex'),archiveReloadVerified:true};
 writeFileSync(join(build,'runner-image-receipt.json'),JSON.stringify(imageReceipt,null,2)+'\n');console.log(JSON.stringify(imageReceipt));
