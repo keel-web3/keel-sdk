@@ -104,6 +104,12 @@ export class KeelRpcResponseError extends Error {
 class ProviderFailure extends Error {
   constructor(readonly reason: FailureReason, readonly retryAfterMs = 0) { super(reason); }
 }
+class KeelRpcHttpRequestError extends Error {
+  constructor(readonly status: 400 | 422) {
+    super("RPC request parameters were rejected.");
+    this.name = "HttpRequestError";
+  }
+}
 export interface KeelRpcProviderStatus {
   readonly endpoint: string;
   readonly checkedChainId?: number;
@@ -187,6 +193,9 @@ export function createKeelRpcPool(options: KeelRpcPoolOptions): KeelRpcPool {
       if (!response.ok) {
         await response.body?.cancel();
         if (method === "eth_simulateV1" && response.status === 413) throw new KeelRpcResponseError(-32000, undefined, undefined, 413);
+        // A bad/unprocessable project request is not a provider outage. Keep
+        // its observed HTTP status without inventing an unobserved RPC code.
+        if (method === "eth_simulateV1" && (response.status === 400 || response.status === 422)) throw new KeelRpcHttpRequestError(response.status);
         throw new ProviderFailure(response.status === 429 ? "rate-limited" : [401, 403].includes(response.status) ? "access-denied" : "unavailable", delay);
       }
       if (!response.body) throw new ProviderFailure("invalid-response");
@@ -231,7 +240,7 @@ export function createKeelRpcPool(options: KeelRpcPoolOptions): KeelRpcPool {
         state.reason = error.reason;
         state.cooldown = Math.max(state.cooldown, Date.now() + Math.max(error.retryAfterMs, Math.min(30000, 1000 * 2 ** Math.min(5, state.failures))));
       }
-      if (error instanceof KeelRpcResponseError || error instanceof ProviderFailure) throw error;
+      if (error instanceof KeelRpcResponseError || error instanceof KeelRpcHttpRequestError || error instanceof ProviderFailure) throw error;
       throw new ProviderFailure("unavailable");
     } finally { if (timer !== undefined) clearTimeout(timer); release(); }
   }
@@ -285,7 +294,7 @@ export function createKeelRpcPool(options: KeelRpcPoolOptions): KeelRpcPool {
         return value;
       } catch (error) {
         input.signal?.throwIfAborted();
-        if (error instanceof KeelRpcResponseError) throw error;
+        if (error instanceof KeelRpcResponseError || error instanceof KeelRpcHttpRequestError) throw error;
         const failure = error instanceof ProviderFailure ? error : new ProviderFailure("unavailable");
         last = failure.reason; state.reason = last;
         if (["wrong-chain", "access-denied"].includes(last)) state.disabled = true;

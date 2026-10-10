@@ -149,6 +149,14 @@ test('invalid parameters, common server validation errors and ambiguous simulati
     }finally{await f.transport.close();}
   }
 });
+test('HTTP bad or unprocessable project requests are terminal without inventing an RPC error code',async()=>{
+  for(const http of [400,422]) {
+    const f=fixture([{http},{}]);try{
+      await assert.rejects(simulateKeelPublicationBeforeFunding(fullPlan(),f.transport),e=>e.kind==='configuration-invalid'&&e.diagnostic.httpStatus===http&&e.diagnostic.rpcCode===undefined);
+      assert.deepEqual(f.privateRequests().map(r=>r.index),[0]);assert.ok(f.requests.every(r=>r.index===0));
+    }finally{await f.transport.close();}
+  }
+});
 test('cancel stops an in-flight request without another recipient; a fresh saved-plan retry can pass',async()=>{
   let started;const begin=new Promise(resolve=>{started=resolve});const f=fixture([{wait:true,started},{}]);
   const pending=f.transport.request(program());await begin;await f.transport.close();await assert.rejects(pending,e=>e.kind==='rpc-unavailable');

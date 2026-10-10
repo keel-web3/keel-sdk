@@ -149,7 +149,7 @@ export function keelSimulationTransportFailure(error: unknown, context: Paramete
       if (raw && raw.length <= 20) { const cap = BigInt(raw); if (cap > 0n && (providerGasCap === undefined || cap < providerGasCap)) providerGasCap = cap; }
     }
     insufficient ||= item.code === -38014 || item.simulationFailure === "insufficient-balance" || /insufficient funds for (?:gas|transfer)|insufficient balance/iu.test(message);
-    invalid ||= item.code === -32602 || item.simulationFailure === "transaction-validation" || /transaction validation failed/iu.test(message);
+    invalid ||= item.code === -32602 || item.status === 400 || item.status === 422 || item.simulationFailure === "transaction-validation" || /transaction validation failed/iu.test(message);
     reverted ||= item.code === 3 || item.name === "ContractFunctionRevertedError" || /execution reverted|reverted with|out of gas/iu.test(message);
     limited ||= /gas limit (?:is )?(?:too high|exceeds|higher than)|exceeds (?:the )?(?:rpc|simulation) gas cap|maximum (?:simulation|response) size exceeded/iu.test(message);
     cursor = item.cause;

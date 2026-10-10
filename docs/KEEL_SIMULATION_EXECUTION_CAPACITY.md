@@ -101,6 +101,8 @@ Invalid parameters (`-32602`), common `-32000` balance/nonce/intrinsic-gas
 rejections and ambiguous simulation RPC rejections remain terminal. Only a
 specific supported capability failure (missing method or observed provider
 capacity) can make an RPC rejection eligible for another complete replay.
+HTTP 400/422 request rejections are terminal as well; their observed HTTP
+status is retained without inventing a JSON-RPC error code.
 Provider messages remain sanitized; preserve numeric codes and fixed failure
 categories rather than replacing validation evidence with an outage.
 
