@@ -15,27 +15,30 @@ const build=process.env.KEEL_NATIVE_BUILD_DIR??'/tmp/keel-proof-executor-build';
 const binary=join(build,'keel-proof-executor'),binarySha256=createHash('sha256').update(readFileSync(binary)).digest('hex');
 const receipt=JSON.parse(readFileSync(join(build,'receipt.json'),'utf8'));assert.equal(receipt.binarySha256,binarySha256);
 const tmp=mkdtempSync(join(tmpdir(),'keel-proof-state-')),container=`keel-proof-state-${process.pid}`;
-const owner=`0x${'11'.repeat(20)}`,reader=`0x${'22'.repeat(20)}`,delegated=`0x${'44'.repeat(20)}`;
+const owner=`0x${'11'.repeat(20)}`,reader=`0x${'22'.repeat(20)}`,delegated=`0x${'44'.repeat(20)}`,contexts=`0x${'55'.repeat(20)}`;
 const expectedTokenURI='data:application/json,{"name":"Synthetic state sequence"}';
 const evidence={schema:'keel-proof-executor-differential@1',sourceCommit:execFileSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim(),receipt,synthetic:true,externalNetwork:'none',productionStateUsed:false,signing:'not-performed',submission:'not-performed',checks:[],executions:[]};
 const record=(name,data={})=>{evidence.checks.push({name,...data});console.log(`PASS ${name}`);};
 const docker=(...args)=>execFileSync('docker',args,{encoding:'utf8',timeout:60000,maxBuffer:40*1024*1024,stdio:['ignore','pipe','pipe']});
-const compiled=JSON.parse(solc.compile(JSON.stringify({language:'Solidity',sources:{'StateSequence.sol':{content:readFileSync('tests/fixtures/native-geth-publication/StateSequence.sol','utf8')}},settings:{evmVersion:'osaka',optimizer:{enabled:true,runs:200},outputSelection:{'*':{'*':['abi','evm.deployedBytecode.object']}}}})));
+const compiled=JSON.parse(solc.compile(JSON.stringify({language:'Solidity',sources:Object.fromEntries(['StateSequence.sol','ProofContexts.sol'].map(name=>[name,{content:readFileSync(`tests/fixtures/native-geth-publication/${name}`,'utf8')}])),settings:{evmVersion:'osaka',optimizer:{enabled:true,runs:200},outputSelection:{'*':{'*':['abi','evm.deployedBytecode.object']}}}})));
 assert.deepEqual((compiled.errors??[]).filter(e=>e.severity==='error'),[]);
 const artifact=compiled.contracts['StateSequence.sol'].StateSequence,runtime=`0x${artifact.evm.deployedBytecode.object}`;
+const contextArtifact=compiled.contracts['ProofContexts.sol'].ProofContexts;
 const genesis=JSON.parse(readFileSync('tests/fixtures/native-geth-publication/genesis.json','utf8'));
 genesis.alloc[reader.slice(2)]={balance:'0x0',code:runtime};genesis.alloc[delegated.slice(2)]={balance:genesis.alloc[owner.slice(2)].balance,code:`0xef0100${reader.slice(2)}`};
+genesis.alloc[contexts.slice(2)]={balance:'0x0',code:`0x${contextArtifact.evm.deployedBytecode.object}`,storage:{[toHex(10000n,{size:32})]:toHex(1n,{size:32}),[toHex(10001n,{size:32})]:toHex(2n,{size:32})}};
 writeFileSync(join(tmp,'genesis.json'),JSON.stringify(genesis));
 const data=(name,args=[])=>encodeFunctionData({abi:artifact.abi,functionName:name,args});
 const calls=Array.from({length:5},(_,i)=>({from:owner,to:reader,data:data('write',[100n]),value:'0x0',gas:toHex(200_000_000n),nonce:toHex(i),gasPrice:'0x30'}));
+const contextData=(name,args=[])=>encodeFunctionData({abi:contextArtifact.abi,functionName:name,args});
 const payload=(program,validation=true)=>({blockStateCalls:program.map(c=>({calls:[c]})),validation,traceTransfers:false,returnFullTransactions:true});
 const allowed=new Set(['web3_clientVersion','eth_chainId','eth_getBlockByNumber','eth_getBlockByHash','eth_getCode','eth_getProof','eth_getBalance','eth_getTransactionCount','eth_getStorageAt','eth_simulateV1']);
 function rpc(method,params=[]){assert.ok(allowed.has(method));writeFileSync(join(tmp,'request.json'),JSON.stringify({jsonrpc:'2.0',id:1,method,params}));const r=JSON.parse(docker('exec',container,'wget','-Y','off','-q','-O','-','--header=Content-Type: application/json','--post-file=/fixture/request.json','http://127.0.0.1:8545'));if(r.error)throw Object.assign(new Error(r.error.message),{code:r.error.code});return r.result;}
 let started=false,processCount=0,base,lastNativeDiagnostic='';
 const upstream=[];
 const stateReader={request:async({method,params})=>{assert.ok(['eth_chainId','eth_getBlockByNumber','eth_getBlockByHash','eth_getProof','eth_getCode'].includes(method),'upstream execution forbidden');upstream.push({method,params});return rpc(method,params);}};
-function isolatedRunner(){processCount++;lastNativeDiagnostic='';const child=spawn('docker',['run','--pull=never','--rm','-i','--network','none','--memory','768m','--cpus','2','--pids-limit','64','--read-only','--cap-drop','ALL','--security-opt','no-new-privileges','--user',`${process.getuid()}:${process.getgid()}`,'-e','GOMEMLIMIT=512MiB','-e','GOMAXPROCS=2','-v',`${binary}:/executor:ro`,'--entrypoint','/executor',runnerImage],{stdio:['pipe','pipe','pipe']});child.stderr.on('data',chunk=>{lastNativeDiagnostic=(lastNativeDiagnostic+chunk.toString()).slice(-8000);});return child;}
-const options=()=>({binaryPath:binary,binarySha256,spawnExecutor:isolatedRunner,stateReader,block:{number:0n,hash:base.hash},onEvidence:e=>evidence.executions.push(e),limits:{gasBudget:500_000_000,requests:5000,witnessBytes:32*1024*1024,responseBytes:128*1024*1024,wallTimeMs:180000}});
+function isolatedRunner(){processCount++;lastNativeDiagnostic='';const childName=`${container}-executor-${processCount}`,child=spawn('docker',['run','--name',childName,'--pull=never','--rm','-i','--network','none','--memory','768m','--cpus','2','--pids-limit','64','--read-only','--cap-drop','ALL','--security-opt','no-new-privileges','--user',`${process.getuid()}:${process.getgid()}`,'-e','GOMEMLIMIT=512MiB','-e','GOMAXPROCS=2','-v',`${binary}:/executor:ro`,'--entrypoint','/executor',runnerImage],{stdio:['pipe','pipe','pipe']});child.stderr.on('data',chunk=>{lastNativeDiagnostic=(lastNativeDiagnostic+chunk.toString()).slice(-8000);});const kill=child.kill.bind(child);child.kill=signal=>{try{docker('rm','-f',childName);}catch{}return kill(signal);};return child;}
+const options=()=>({now:()=>Number(BigInt(base.timestamp))*1000,binaryPath:binary,binarySha256,spawnExecutor:isolatedRunner,stateReader,block:{number:0n,hash:base.hash},onEvidence:e=>evidence.executions.push(e),limits:{gasBudget:500_000_000,requests:5000,witnessBytes:32*1024*1024,responseBytes:128*1024*1024,wallTimeMs:180000}});
 try{
  docker('image','inspect',image);docker('image','inspect',runnerImage);
  docker('run','--pull=never','--rm','--network','none','--user',`${process.getuid()}:${process.getgid()}`,'-v',`${tmp}:/fixture`,image,'--datadir','/fixture/data','init','/fixture/genesis.json');
@@ -55,6 +58,23 @@ try{
  const bigResult=await transport.request({method:'eth_simulateV1',params:[bigPayload,'0x0']});assert.deepEqual(bigResult,rpc('eth_simulateV1',[bigPayload,'0x0']));assert.ok(BigInt(bigResult[0].calls[0].maxUsedGas)>140_000_000n);
  record('state-heavy atomic-sized original envelope above 140M matches Geth with real updated root',{gas:bigResult[0].transactions[0].gas,maximumUsedGas:bigResult[0].calls[0].maxUsedGas,stateRoot:bigResult[0].stateRoot});
  const delegatePayload=payload([{...calls[0],from:delegated,to:delegated,gas:toHex(16_000_000n)}]);assert.deepEqual(await transport.request({method:'eth_simulateV1',params:[delegatePayload,'0x0']}),rpc('eth_simulateV1',[delegatePayload,'0x0']));record('existing EIP-7702 delegation matches exact Geth output');
+ const compare=async(name,program,check=()=>{})=>{
+  const p=payload(program),reference=rpc('eth_simulateV1',[p,'0x0']);
+  const result=await transport.request({method:'eth_simulateV1',params:[p,'0x0']});
+  assert.deepEqual(result,reference);check(result);record(name,{inputBytes:Buffer.byteLength(JSON.stringify(p)),blocks:program.length});return result;
+ };
+ const contextCall=(name,args=[],i=0)=>({...calls[0],to:contexts,data:contextData(name,args),nonce:toHex(i)});
+ await compare('block context, canonical and simulated BLOCKHASH, CREATE and code/storage continuity match Geth',[
+  contextCall('context'),contextCall('create',[],1),contextCall('observeChild',[],2),contextCall('context',[],3),contextCall('createAndDestroy',[],4)
+ ],result=>{assert.ok(result.every(b=>b.calls[0].status==='0x1'));assert.equal(result[2].calls[0].returnData,encodeAbiParameters([{type:'uint256'}],[42n]));});
+ await compare('canonical storage deletion with complete witness and pre-refund gas match Geth',[contextCall('clear',[true])],result=>{
+  assert.equal(result[0].calls[0].status,'0x1');assert.ok(BigInt(result[0].calls[0].maxUsedGas)>BigInt(result[0].calls[0].gasUsed));
+ });
+ await assert.rejects(transport.request({method:'eth_simulateV1',params:[payload([contextCall('clear',[false])]),'0x0']}));
+ assert.match(lastNativeDiagnostic,/incomplete authenticated witness|missing trie node/);record('missing sibling witness rejects deletion without fabricating a state root');
+ const wide=Array.from({length:40},(_,i)=>contextCall('accept',[`0x${'ab'.repeat(50000)}`],i));
+ assert.ok(Buffer.byteLength(JSON.stringify(payload(wide)))>=3_856_986);
+ await compare('40-call saved-program-sized body above 3.85 MB retains every original 200M envelope',wide,result=>assert.ok(result.every(b=>b.calls[0].status==='0x1'&&BigInt(b.transactions[0].gas)===200_000_000n)));
  const plan={planFingerprint:`0x${'aa'.repeat(32)}`,chainId:11155111,blockNumber:0n,reader,readerRuntimeCodeHash:keccak256(runtime),preparationCalls:calls,assertions:calls.map((_,i)=>({callIndex:i,returnData:encodeAbiParameters([{type:'uint256'}],[BigInt((i+1)*100)])})),requiredReaderCalls:[{call:{from:owner,to:reader,data:data('read'),value:'0x0',gas:toHex(1_000_000n)},expectedReturn:encodeAbiParameters([{type:'uint256'}],[500n]),gasMargin:10_000n}],metadataCall:{from:owner,to:reader,data:data('tokenURI',[1n]),value:'0x0',gas:toHex(1_000_000n)},expectedTokenURI,maximumTokenUriBytes:2_000_000,maximumReadGas:1_000_000n,collectionOverheadGas:10_000n,maximumTransactionGas:200_000_000n};
  const proof=await simulateKeelPublicationBeforeFunding(plan,transport);assert.equal(proof.schema,'keel-publication-simulation@1');assert.equal(proof.signing,'not-performed');record('unchanged plan completes SDK discovery, strict replay, exact reader and tokenURI checks',{simulationFingerprint:proof.simulationFingerprint});
  for(const [name,call] of [['nonce',{...calls[0],nonce:'0x5'}],['fee',{...calls[0],gasPrice:'0x0'}],['balance',{...calls[0],from:`0x${'33'.repeat(20)}`} ]]){
@@ -69,6 +89,50 @@ try{
  await assert.rejects(transport.request({method:'eth_sendRawTransaction',params:['0x']}));
  const before=upstream.length;await assert.rejects(transport.request({method:'eth_simulateV1',params:[{...payload([calls[0]]),stateOverrides:{}},'0x0']}));assert.ok(upstream.slice(before).every(r=>r.method!=='eth_getProof'),'overrides rejected before state acquisition');record('signing and state overrides are refused');
  const controller=new AbortController();controller.abort();await assert.rejects(createProofBackedSimulationTransport({...options(),signal:controller.signal}).then(t=>t.request({method:'eth_simulateV1',params:[payload([calls[0]]),'0x0']})));record('cancelled request cannot start execution');
+ // These tests use fresh native processes and synthetic state only; they are not UI recovery receipts.
+ const tiny={...calls[0],data:data('write',[1n])},tinyRequest={method:'eth_simulateV1',params:[payload([tiny]),'0x0']};
+ const cancelled=new AbortController();let reachedRead,releaseRead;
+ const pendingRead=new Promise(resolve=>{reachedRead=resolve;}),blockedRead=new Promise(resolve=>{releaseRead=resolve;});
+ let blockedReads=0;
+ const inFlight=await createProofBackedSimulationTransport({...options(),signal:cancelled.signal,stateReader:{request:async input=>{
+  const result=await stateReader.request(input);if(input.method==='eth_getProof'){blockedReads++;reachedRead();await blockedRead;}return result;
+ }}});
+ const execution=inFlight.request(tinyRequest),rejected=assert.rejects(execution,/cancelled/);
+ await pendingRead;await assert.rejects(inFlight.request(tinyRequest),/already in progress/);cancelled.abort();await rejected;
+ const noProofCount=evidence.executions.length;releaseRead();await delay(30);
+ assert.equal(blockedReads,1);assert.equal(evidence.executions.length,noProofCount);await inFlight.close();
+ assert.equal(docker('ps','-aq','--filter',`name=^/${container}-executor-`).trim(),'');
+ record('in-flight cancellation kills the actual isolated process; late reads cannot publish proof');
+ const retry=await createProofBackedSimulationTransport(options());assert.deepEqual(await retry.request(tinyRequest),rpc('eth_simulateV1',tinyRequest.params));await retry.close();
+ const reload=await createProofBackedSimulationTransport(options());assert.deepEqual(await reload.request(tinyRequest),rpc('eth_simulateV1',tinyRequest.params));await reload.close();
+ record('retry and recreated transport start cleanly without persisting simulated writes');
+ const original=structuredClone(tinyRequest),mutable=structuredClone(tinyRequest),inProgress=transport.request(mutable);mutable.params[0].blockStateCalls[0].calls[0].data='0x';
+ assert.deepEqual(await inProgress,rpc('eth_simulateV1',original.params));record('caller mutation cannot alter the snapshotted native program');
+ for(const offset of [181000,-31000]){
+  const old=await createProofBackedSimulationTransport({...options(),now:()=>Number(BigInt(base.timestamp))*1000+offset}),before=processCount;
+  await assert.rejects(old.request(tinyRequest),/stale or in the future/);assert.equal(processCount,before);await old.close();
+ }record('stale and future snapshots fail before native state acquisition');
+ let clockReads=0;
+ const expires=await createProofBackedSimulationTransport({...options(),now:()=>Number(BigInt(base.timestamp))*1000+(clockReads++?181000:0)});
+ const evidenceBefore=evidence.executions.length;await assert.rejects(expires.request(tinyRequest),/stale/);assert.equal(evidence.executions.length,evidenceBefore);await expires.close();record('snapshot expiry during execution cannot emit a successful proof');
+ let blockReads=0;
+ const reorg=await createProofBackedSimulationTransport({...options(),stateReader:{request:async input=>{
+  const result=await stateReader.request(input);return input.method==='eth_getBlockByNumber'&&++blockReads>1?{...result,hash:`0x${'ff'.repeat(32)}`}:result;
+ }}});
+ await assert.rejects(reorg.request(tinyRequest),error=>error.kind==='chain-reorganized');await reorg.close();record('canonical reorg after execution discards the result');
+ const stalled=await createProofBackedSimulationTransport({...options(),limits:{...options().limits,wallTimeMs:30},stateReader:{request:async()=>new Promise(()=>{})}});
+ const timedAt=Date.now();await assert.rejects(stalled.request(tinyRequest),/deadline|timed out/);assert.ok(Date.now()-timedAt<2000);await stalled.close();record('deadline includes an unresponsive initial state source');
+ for(const [key,value] of [['requests',1],['witnessBytes',1],['responseBytes',1]]){
+  const bounded=await createProofBackedSimulationTransport({...options(),limits:{...options().limits,[key]:value}});await assert.rejects(bounded.request(tinyRequest));await bounded.close();record(`${key} quota exhaustion yields no passing execution`);
+ }
+ for(const status of [403,429]){
+  let attempted=0;
+  const denied=await createProofBackedSimulationTransport({...options(),stateReader:{request:async input=>{
+   if(input.method==='eth_getProof'){attempted++;throw Object.assign(new Error('SECRET provider URL, artwork or credential'),{status});}return stateReader.request(input);
+  }}});
+  await assert.rejects(denied.request(tinyRequest),error=>error.diagnostic?.httpStatus===status&&!JSON.stringify(error).includes('SECRET')&&!error.message.includes('SECRET'));
+  assert.equal(attempted,1);await denied.close();record(`state source HTTP ${status} stops once with sanitized diagnostic and no retry`);
+ }
  assert.equal(BigInt(rpc('eth_getStorageAt',[reader,'0x0','0x0'])),0n);assert.equal(BigInt(rpc('eth_getTransactionCount',[owner,'0x0'])),0n);assert.equal(rpc('eth_getBlockByNumber',['0x0',false]).hash,base.hash);await transport.close();
  assert.ok(upstream.every(r=>!['eth_call','eth_simulateV1','eth_sendRawTransaction'].includes(r.method)));evidence.upstream={requestCount:upstream.length,methods:[...new Set(upstream.map(r=>r.method))]};
  record('canonical state, nonce and header unchanged; upstream received no execution or calldata',{processCount});

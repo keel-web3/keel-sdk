@@ -5,6 +5,7 @@ package main
 import (
 	"bufio"
 	"context"
+	"crypto/sha256"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -102,6 +103,7 @@ func run() error {
 	if !scanner.Scan() {
 		return errors.New("missing simulation input")
 	}
+	requestDigest := fmt.Sprintf("%x", sha256.Sum256(scanner.Bytes()))
 	var in input
 	if err := json.Unmarshal(scanner.Bytes(), &in); err != nil {
 		return errors.New("invalid simulation input")
@@ -143,7 +145,7 @@ func run() error {
 		return errors.New("simulation output budget exceeded")
 	}
 	return encoder.Encode(map[string]any{"type": "result", "result": result, "evidence": map[string]any{
-		"schema": "keel-proof-executor-evidence@1", "gethCommit": gethCommit, "chainId": in.ChainID, "blockHash": in.BlockHash, "baseStateRoot": in.Header.Root,
+		"schema": "keel-proof-executor-evidence@1", "gethCommit": gethCommit, "requestSha256": requestDigest, "chainId": in.ChainID, "blockHash": in.BlockHash, "baseStateRoot": in.Header.Root,
 		"accountProofs": reader.AccountProofs, "storageProofs": reader.StorageProofs, "codeHashChecks": reader.CodeChecks, "witnessBytes": reader.WitnessBytes(), "readRequests": w.requests, "responseBytes": w.bytes,
 		"gasBudget": l.GasBudget, "signing": "not-performed", "submission": "not-performed", "state": "ephemeral-proof-backed"}})
 }
