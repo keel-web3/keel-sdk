@@ -214,16 +214,19 @@ test('post-qualification program clamping is bounded, never lowers gas, and rema
 });
 
 test('unknown project RPC failures retain socket diagnostics and require a new fully qualified saved check', async()=>{
+ for(const failingMethod of ['eth_getBlockByNumber','eth_simulateV1']){
   const nodes=[socket(),socket()];const request=nodes[0].requestAsync.bind(nodes[0]);let count=0;
-  nodes[0].requestAsync=async args=>args.body.method==='eth_simulateV1'&&args.body.params[0].blockStateCalls[0].calls[0].data==='0x1234'
+  let blockReads=0;
+  nodes[0].requestAsync=async args=>(failingMethod==='eth_getBlockByNumber'&&args.body.method===failingMethod&&++blockReads===3)||(failingMethod==='eth_simulateV1'&&args.body.method===failingMethod&&args.body.params[0].blockStateCalls[0].calls[0].data==='0x1234')
     ? {error:{code:-32098,message:'PRIVATE https://secret.invalid/0x1234',cause:{code:'ECONNRESET'}}} : request(args);
   const t=createPinnedKeelSepoliaSimulationTransport(async()=>nodes[count++]);
   await assert.rejects(t.request(program),error=>{
     assert.equal(error.kind,'rpc-unavailable');assert.equal(error.diagnostic.rpcCode,-32098);assert.equal(error.diagnostic.transportCode,'ECONNRESET');
-    assert.equal(error.diagnostic.rpcMethod,'eth_simulateV1');assert.equal(error.diagnostic.phase,'project-request');assert.equal(error.diagnostic.socketReadyState,1);
+    assert.equal(error.diagnostic.rpcMethod,failingMethod);assert.equal(error.diagnostic.phase,'project-request');assert.equal(error.diagnostic.socketReadyState,1);
     assert.doesNotMatch(JSON.stringify(error),/PRIVATE|secret.invalid|0x1234/);return true;
   });
   assert.equal(count,1);assert.equal(nodes[0].closed,1);await t.request(program);assert.equal(count,2);assert.equal(hasProgram(nodes[1]),true);await t.close();
+ }
 });
 
 test('the incident 50m provider cap selects a compatible connection before sending the unchanged 200m program', async () => {
