@@ -20,5 +20,8 @@ for(const path of allowedOverlays){
 }
 run(process.env.KEEL_GO_BINARY??'go',['build','-p','2','-trimpath','-o',binary,'./cmd/keel-proof-executor'],source);
 run(process.env.KEEL_GO_BINARY??'go',['build','-p','2','-trimpath','-o',join(build,'keel-proof-fixture'),'./cmd/keel-proof-fixture'],source);
+run(process.env.KEEL_GO_BINARY??'go',['build','-buildvcs=false','-trimpath','-o',join(build,'keel-proof-runner'),'.'],join(root,'native/proof-executor/runner'));
 const receipt={schema:'keel-proof-executor-build@1',gethCommit,sdkCommit:execFileSync('git',['rev-parse','HEAD'],{cwd:root,encoding:'utf8'}).trim(),binarySha256:createHash('sha256').update(readFileSync(binary)).digest('hex'),binaryBytes:readFileSync(binary).length,sourceTree:execFileSync('git',['rev-parse','HEAD^{tree}'],{cwd:root,encoding:'utf8'}).trim(),goVersion:execFileSync(process.env.KEEL_GO_BINARY??'go',['version'],{encoding:'utf8'}).trim()};
+receipt.brokerSha256=createHash('sha256').update(readFileSync(join(build,'keel-proof-runner'))).digest('hex');
+receipt.brokerBytes=readFileSync(join(build,'keel-proof-runner')).length;
 writeFileSync(join(build,'receipt.json'),JSON.stringify(receipt,null,2)+'\n');console.log(JSON.stringify(receipt));

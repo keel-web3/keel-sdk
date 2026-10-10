@@ -7,20 +7,23 @@ execution binding, and the exact saved-plan acceptance run still need review.
 
 ## What is already measured
 
-SDK `3282b7633441471f832b18d9f07ecb6eefda03b9` passed cloud run
-[38049992731](https://github.com/keel-web3/keel-sdk/actions/runs/38049992731):
-34 native checks and 19 protocol guard tests. This includes the unchanged atomic
-ABI fixture through every SDK phase; it does not identify a live wallet runtime.
-Across 17 completed executions, peak process RSS was 61,329,408 bytes, maximum
-native wall time 67,354 ms, maximum read requests 1,336, and maximum witness size
-556,102 bytes. These synthetic measurements do not establish the actual plans'
-memory, elapsed time, read count, or a public provider's rate capacity.
+SDK `78188c2f90c5d4a7c393f07f2f97d2d53c3a064b` passed cloud run
+[38051601085](https://github.com/keel-web3/keel-sdk/actions/runs/38051601085):
+39 native differential checks and 29 protocol/state-reader tests. It exercised
+non-genesis canonical ancestors and both unchanged sequential and synthetic
+atomic plans through every SDK phase. The source pool and broker were not
+composed in that run; the broker branch adds that missing integration test.
+Across 18 completed executions, peak process RSS was 50,782,208 bytes, maximum
+native wall time 1,143 ms, maximum read requests 21, and maximum witness size
+9,502 bytes. These synthetic measurements do not establish either actual plan's
+memory, elapsed time, read count, or a provider's capacity.
 
-The native binary is 15,581,936 bytes with SHA-256
-`ead23878b45c3aa2cf895387a4498317357c5c2fa524ef031051614e39385b86`.
+That native binary is 15,586,440 bytes with SHA-256
+`db7308985cbb32eb6bbcbef95edf456786ca02519ac1f89cc6ad8edf5fd90307`.
 It embeds unchanged Geth `a579077007b98217c3e253a66e4b452ca0c32b96` plus the
-reviewable additive bridge. A file checksum alone does not prove which file a
-runner executed or establish process isolation.
+reviewable additive bridge. New broker builds have their own commit-specific
+receipt and immutable image archive; never reuse this earlier digest as the
+identity of a later artifact.
 
 ## Proposed process and artifact boundary
 
@@ -43,7 +46,8 @@ native result provenance. Client-supplied executable paths/arguments are refused
 Use one local Unix socket for the bidirectional bounded JSON-lines protocol.
 The broker accepts only the configured Studio UID using kernel peer credentials.
 The socket directory is mode 0700, the socket 0600, and the broker has the same
-unprivileged numeric UID as the approved application socket client. The actual
+unprivileged numeric UID as the approved application socket client. Studio mounts
+the socket directory read-only; only the broker mount is writable. The actual
 deployed UID must be inspected before choosing it. The executor receives only
 stdio and its executable descriptor, an empty credential environment plus fixed
 Go resource settings, and no provider URL or secret. Network namespace: none.
@@ -56,11 +60,18 @@ the slot is released only after process exit has been observed. The broker
 reports the native exit status after output drains. A socket closure without
 that final status cannot complete a proof. Parent death must kill its child.
 
+A process-held, no-follow lock serializes startup in the private socket directory.
+After an unclean exit, recovery removes only the same owned socket inode whose
+connect attempt returns ECONNREFUSED. A live listener, ambiguous connection
+failure, changed inode, symlink or regular file is refused without unlinking it.
+The lock is released by the kernel on SIGKILL; no manual socket deletion is
+needed. This closes the original broker restart blocker.
+
 ## Exact proposed resource changes
 
 | Item | Proposed hard bound or behavior |
 | --- | --- |
-| Additional container memory | 768 MiB total for broker and one executor |
+| Additional container memory | 768 MiB total for broker and one executor; memory-swap equals memory, so no container swap |
 | CPU | At most 2 CPU cores, not a reservation |
 | PIDs | 64 |
 | Filesystem | Read-only image; 16 MiB noexec/nosuid temporary socket volume |
@@ -173,3 +184,40 @@ The 2026-10-10 cloud PublicNode qualification attempt stopped on its first
 account, code or storage request was made. No retry, route change or fallback
 provider was attempted. This does not establish PublicNode proof capability or
 availability from the production host.
+
+## Operator findings and remaining deployment gates — 12:36 UTC
+
+The operator reports four host CPUs, 4.93 GiB available RAM, 54.97 GiB available
+disk and no swap. Studio is capped at two CPUs and the proposed runner at two;
+together they can consume the host ceiling. Keep concurrency one and verify
+Studio responsiveness during the exact saved-plan check before activation.
+The actual Next process runs as UID:GID 999:999. Use that identity for the broker
+and socket directory; no new account is needed.
+
+The dedicated 0700 directory and 0600 socket owned by 999:999 do not exist yet.
+Their creation and the new read-only Studio mount are new persistent IPC access
+and require exact approval before enablement. The broker's mount alone is
+writable. The proposed shared tmpfs is 16 MiB, noexec/nosuid, and contains only
+the socket and startup lock. Neither runtime receives additional host control.
+
+No paid RPC is configured in the Studio environment or chain row. The first
+paced PublicNode request from the operator route returned HTTP 403, before any
+proof/code request. Both that route and the earlier blocked cloud route remain
+stopped: no retry, alternate route or provider substitution. The public-only
+format-probe script is retained as a reviewable qualification procedure, but
+must not be run against the denied route. No source is presently qualified.
+
+Minimum source capability: Sepolia eth_chainId, canonical eth_getBlockByNumber,
+eth_getBlockByHash, and eth_getProof/eth_getCode accepting the exact EIP-1898
+blockHash plus requireCanonical selector. Each proof requests at most one slot.
+Responses must fit 2 MiB and 15 seconds; reads are paced at least 250 ms apart,
+with preserved cooldown/access restrictions. Native execution has a 180-second
+wall bound and a 10,000-read ceiling. Actual plan throughput remains unmeasured.
+No eth_call, eth_simulateV1, submission endpoint or full node sync is required
+from this provider. A new paid account, credential or address/slot recipient
+needs separate explicit authorization; configuration alone does not supply it.
+
+The user removed the previous rollback image and old backup paths. Eleven data
+volumes were preserved. Reacquire and independently verify the existing rollback
+CI artifact (available until October 17) or reconstruct it in cloud before any
+rollout; do not claim a local rollback copy exists. Do no further VPS cleanup.
