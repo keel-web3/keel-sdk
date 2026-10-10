@@ -30,6 +30,19 @@ jobs:
           name: native-geth-publication-evidence
           path: native-geth-publication-evidence.json
           if-no-files-found: error
+      - name: Public-RPC-backed local fork differential (synthetic, network isolated)
+        env:
+          KEEL_FORK_EVIDENCE: public-rpc-fork-evidence.json
+        run: |
+          docker pull ghcr.io/foundry-rs/foundry@sha256:32c8ea9ef052a440cb1620175987a3f49eff8b068a0c6a3d09ebf7f5f9a0e043
+          docker pull node@sha256:6c74791e557ce11fc957704f6d4fe134a7bc8d6f5ca4403205b2966bd488f6b3
+          pnpm verify:public-rpc-fork
+      - uses: actions/upload-artifact@v4
+        if: ${{ always() }}
+        with:
+          name: public-rpc-fork-evidence
+          path: public-rpc-fork-evidence.json
+          if-no-files-found: error
       - name: Record approved public-only HTTPS capacity (not private-plan proof)
         if: ${{ github.event_name == 'workflow_dispatch' }}
         run: node scripts/probe-approved-sepolia-http.mjs

@@ -27,7 +27,7 @@ function fixture(faults=[{},{}], approved=urls.slice(0,faults.length)) {
     if(fault.rate) return new Response('',{status:429,headers:{'retry-after':'30'}});
     if(body.method==='eth_chainId') return respond(fault.chain?'0x1':'0xaa36a7');
     if(body.method==='eth_getBlockByNumber') return respond(fault.stale?{...snapshot,timestamp:'0x68f00000'}:fault.future?{...snapshot,timestamp:`0x${(BigInt(snapshot.timestamp)+600n).toString(16)}`}:fault.pin&&body.params[0]!=='latest'?{...snapshot,hash:hash(1000)}:snapshot);
-    if(body.method==='eth_getBalance') return respond(`0x${'f'.repeat(32)}`);
+    if(body.method==='eth_getBalance') return respond(fault.balance??`0x${'f'.repeat(32)}`);
     if(body.method==='eth_getTransactionCount') return respond('0x0');
     if(body.method==='eth_getCode') return respond(body.params[0]===zero?'0x':'0x6000');
     assert.equal(body.method,'eth_simulateV1');
@@ -36,12 +36,12 @@ function fixture(faults=[{},{}], approved=urls.slice(0,faults.length)) {
     if(!privateCall&&fault.unsupported) return error(-32601);
     if(!privateCall&&blocks.length===1&&blocks[0].calls[0].nonce==='0x1'&&!fault.ignoreNonce) return error(-38011);
     if(privateCall&&fault.error) return error(fault.error,fault.message);
-    if(privateCall&&fault.http) return new Response('',{status:fault.http});
+    if(privateCall&&fault.http) return fault.httpCode === undefined ? new Response('',{status:fault.http}) : Response.json({jsonrpc:'2.0',id:body.id,error:{code:fault.httpCode,message:'SECRET private payload'}},{status:fault.http});
     if(privateCall&&fault.wait) { fault.started?.(); await new Promise((resolve,reject)=>init.signal.addEventListener('abort',()=>reject(new Error('cancelled')),{once:true})); }
     const result=blocks.map((b,i)=>({number:`0x${(19+i).toString(16)}`,timestamp:`0x${(BigInt(snapshot.timestamp)+12n*BigInt(i+1)).toString(16)}`,hash:hash(i+1),parentHash:i?hash(i):snapshot.hash,
       blockAccessListHash:hash(i+10),slotNumber:`0x${(11+i).toString(16)}`,
       transactions:b.calls.map(c=>({...c,gas:!privateCall&&fault.cap&&BigInt(c.gas)>50000000n?'0x2faf080':!privateCall&&fault.sequenceCap&&blocks.length>=5&&i===4?'0x1':privateCall&&fault.aggregate&&i===4?'0x1':c.gas})),
-      calls:b.calls.map(c=>({status:privateCall&&fault.revert?'0x0':'0x1',gasUsed:'0x5208',...(!privateCall&&fault.noPreRefund?{}:{maxUsedGas:'0x5208'}),returnData:!privateCall?'0x':c.data==='0xeeee'?encodeAbiParameters([{type:'string'}],[fault.metadata??tokenURI]):encodeAbiParameters([{type:'uint256'}],[c.data==='0xdddd'?500n:BigInt((i+1)*100)])}))}));
+      calls:b.calls.map(c=>({status:privateCall&&fault.revert?'0x0':'0x1',gasUsed:fault.baseGas??'0x5208',...(!privateCall&&fault.noPreRefund?{}:{maxUsedGas:fault.baseGas??'0x5208'}),returnData:!privateCall?'0x':c.data==='0xeeee'?encodeAbiParameters([{type:'string'}],[fault.metadata??tokenURI]):encodeAbiParameters([{type:'uint256'}],[c.data==='0xdddd'?500n:BigInt((i+1)*100)])}))}));
     if(!privateCall&&blocks.length===40) {
       if(fault.longStatus) result[39].calls[0].status='0x0';
       if(fault.longHeader) result[39].parentHash=hash(500);
@@ -192,5 +192,43 @@ test('public report refuses stale heads and invalid full-sequence evidence, and 
       if(fault.stale||fault.future) assert.equal(item.publicProbes.length,0);
       if(fault.publicHttp) {assert.equal(item.publicProbes.length,1);assert.equal(item.publicProbes[0].httpStatus,fault.publicHttp);}
     }finally{await f.transport.close();}
+  }
+});
+
+// Captured operator categories, synthetic data only. Library evidence
+// libfile_bf7ede842b2081919bc7c130c019a4d6 (2026-10-10 10:29–10:34 UTC).
+test('rate/access diagnostics survive approved whole-program failover without shopping deterministic rejections',async()=>{
+  for(const fault of [{http:429,httpCode:-32005},{http:403},{error:-32005},{error:403}]) {
+    const f=fixture([fault,{}]), attempts=[];
+    const transport=createKeelPublicSepoliaSimulationPool({...f.options,onAttempt:d=>attempts.push(d)});
+    try {
+      const input=program();await transport.request(input);
+      assert.deepEqual(f.privateRequests().map(r=>r.body.params),[input.params,input.params]);
+      assert.equal(attempts.length,1);assert.equal(attempts[0].transportFailure,fault.http===403||fault.error===403?'access-denied':'rate-limited');
+      assert.equal(attempts[0].httpStatus,fault.http??200);assert.equal(attempts[0].rpcCode,fault.httpCode??fault.error);
+      assert.doesNotMatch(JSON.stringify(attempts),/SECRET|PRIVATE|first.example/);
+      await transport.request(input);assert.equal(f.privateRequests().filter(r=>r.index===0).length,1);
+    }finally{await transport.close();await f.transport.close();}
+  }
+  for(const code of [-32602,-38011,3,-32000,-32603]) {
+    const f=fixture([{http:429,httpCode:code},{}]);try{
+      await assert.rejects(f.transport.request(program()),e=>e.diagnostic.rpcCode===code&&e.diagnostic.httpStatus===429);
+      assert.ok(f.requests.every(r=>r.index===0),'explicit invalid-request evidence is terminal even on HTTP429');
+    }finally{await f.transport.close();}
+  }
+});
+
+test('public probes use Amsterdam base gas and sequential upfront balance without lowering project envelopes',async()=>{
+  const fixedPrice=31n;
+  for(const envelope of [12_000n,200_000_000n]) {
+    const exactBalance=(envelope+4n*12_000n)*fixedPrice;
+    const f=fixture([{balance:`0x${exactBalance.toString(16)}`,baseGas:'0x2ee0'}]);try{
+      const input=program();for(const b of input.params[0].blockStateCalls)b.calls[0].gas=`0x${envelope.toString(16)}`;
+      await f.transport.request(input);assert.deepEqual(f.privateRequests()[0].body.params,input.params);
+    }finally{await f.transport.close();}
+    const low=fixture([{balance:`0x${(exactBalance-1n).toString(16)}`,baseGas:'0x2ee0'}]);try{
+      const input=program();for(const b of input.params[0].blockStateCalls)b.calls[0].gas=`0x${envelope.toString(16)}`;
+      await assert.rejects(low.transport.request(input));assert.equal(low.privateRequests().length,0);
+    }finally{await low.transport.close();}
   }
 });

@@ -2,6 +2,8 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { mkdtemp, mkdir, writeFile, rm, stat } from 'node:fs/promises';
 import { spawnSync } from 'node:child_process';
+import { readFileSync } from 'node:fs';
+const operatorEvidence = JSON.parse(readFileSync(new URL('./fixtures/public-rpc-fork/operator-20261010.json', import.meta.url), 'utf8'));
 import { createKeelRpcPool, createKeelRpcFetch, KeelRpcSetupError, resolveKeelRpcConfiguration, normalizeKeelRpcUrl } from '../packages/sdk/dist/rpc.js';
 import { readKeelRpcConfiguration } from '../packages/sdk/dist/rpc-node.js';
 import { createMcpServer } from '../packages/mcp/dist/server.js';
@@ -160,4 +162,63 @@ test('an explicit chain-ID recheck is fresh and fails if the provider changes ne
   seen = '0x1';
   await assert.rejects(p.request({ method: 'eth_chainId' }), e => e instanceof KeelRpcSetupError && e.reason === 'wrong-chain');
   assert.equal(f.calls.length, 2);
+});
+
+test('operator 429/-32005 and chain-ID 403 diagnostics survive wrappers, cooldown and disabled-provider retries', async () => {
+  const { keelSimulationTransportDiagnostic } = await import('../packages/sdk/dist/publication-preflight.js');
+  for (const status of [operatorEvidence.tenderly.httpStatus, operatorEvidence.oneRpc.httpStatus]) {
+    const f = fixture((_url, body) => body.method === 'eth_chainId' && status === 429 ? chain
+      : status === 429 ? Response.json({ jsonrpc: '2.0', id: body.id, error: { code: -32005, message: 'SECRET rate limit', data: { url: urls[0] } } }, { status })
+      : new Response('<html>SECRET access restriction</html>', { status }));
+    const p = pool(f, { rpcUrls: [urls[0]] });
+    const request = { method: 'eth_simulateV1', params: [{ blockStateCalls: [{ calls: [{ to: `0x${'00'.repeat(20)}`, data: '0x' }] }], validation: false, traceTransfers: false, returnFullTransactions: true }, '0x1'] };
+    for (let attempt = 0; attempt < 2; attempt++) await assert.rejects(p.request(request), error => {
+      assert.ok(error instanceof KeelRpcSetupError);
+      const diagnostic = keelSimulationTransportDiagnostic(new Error('wrapper SECRET', { cause: error }));
+      assert.equal(diagnostic.httpStatus, status);
+      assert.equal(diagnostic.transportFailure, status === 429 ? 'rate-limited' : 'access-denied');
+      assert.equal(diagnostic.rpcCode, status === 429 ? -32005 : undefined);
+      assert.equal(diagnostic.causeClass, 'KeelRpcSetupError');
+      assert.doesNotMatch(JSON.stringify({ diagnostic, status: p.status() }), /SECRET|private-key|token=hidden/);
+      return true;
+    });
+    assert.equal(f.calls.length, status === 429 ? 2 : 1, 'no request is retried after rate/access restriction');
+    assert.equal(p.status()[0].disabled, status === 403);
+  }
+});
+
+test('non-OK diagnostics retain only bounded correlated integer codes, never an HTML or oversized error body', async () => {
+  const bodies = [
+    id => ({ jsonrpc: '2.0', id, error: { code: -32005, data: 'SECRET' } }),
+    id => ({ jsonrpc: '2.0', id: id + 1, error: { code: -32005 } }),
+    id => ({ jsonrpc: '2.0', id, error: { code: '-32005' } }),
+    id => ({ jsonrpc: '2.0', id, error: { code: 2 ** 40 } }),
+    id => ({ jsonrpc: '2.0', id, error: { code: -32005, data: 'SECRET'.repeat(3000) } }),
+  ];
+  for (const [index, body] of bodies.entries()) {
+    const f = fixture((_url, request) => Response.json(body(request.id), { status: 429 }));
+    await assert.rejects(pool(f, { rpcUrls: [urls[0]] }).request({ method: 'eth_chainId' }), error => {
+      assert.equal(error.diagnostic.httpStatus, 429);
+      assert.equal(error.diagnostic.rpcCode, index === 0 ? -32005 : undefined);
+      assert.doesNotMatch(JSON.stringify(error), /SECRET/); return true;
+    });
+  }
+});
+
+test('HTTP-200 RPC rate/access errors retain their observed status and code', async () => {
+  for (const code of [-32005, 429, 401, 403]) {
+    const f = fixture((_url, request) => Response.json({ jsonrpc: '2.0', id: request.id, error: { code, message: 'SECRET' } }));
+    await assert.rejects(pool(f, { rpcUrls: [urls[0]] }).request({ method: 'eth_chainId' }), error => {
+      assert.deepEqual(error.diagnostic, { httpStatus: 200, rpcCode: code, transportFailure: code === -32005 || code === 429 ? 'rate-limited' : 'access-denied' }); return true;
+    });
+  }
+});
+
+test('concurrent reads stop at the first access restriction after chain identity was cached', async () => {
+  const f = fixture((_url, request) => request.method === 'eth_chainId' ? chain : new Response('SECRET', { status: 403 }));
+  const p = pool(f, { rpcUrls: [urls[0]] });
+  await p.request({ method: 'eth_chainId' });
+  const results = await Promise.allSettled([p.request({ method: 'eth_blockNumber' }), p.request({ method: 'eth_blockNumber' })]);
+  assert.ok(results.every(r => r.status === 'rejected' && r.reason.diagnostic.httpStatus === 403));
+  assert.equal(f.calls.filter(c => c.method === 'eth_blockNumber').length, 1);
 });
