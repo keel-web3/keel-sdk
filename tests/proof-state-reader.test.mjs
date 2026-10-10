@@ -66,9 +66,10 @@ test('wallet, execution, unpinned and overscoped reads are rejected before any n
 const publicFixture=JSON.parse(readFileSync(new URL('./fixtures/sepolia-public-proof-20261010.json',import.meta.url),'utf8'));
 for(const method of ['eth_getProof','eth_getCode','eth_getBlockByHash'])test(`captured public null response for ${method} fails closed without another recipient or latest fallback`,async()=>{
   const calls=[],h=publicFixture.header;
+  assert.equal(publicFixture.unknownHashProof,null);assert.equal(publicFixture.unknownHashCode,null);
   const fetchImpl=async(url,init)=>{
     const q=JSON.parse(init.body);calls.push({url,...q});
-    const result=q.method==='eth_chainId'?'0xaa36a7':q.method==='eth_getBlockByNumber'?h:null;
+    const result=q.method==='eth_chainId'?'0xaa36a7':q.method==='eth_getBlockByNumber'?h:q.method==='eth_getProof'?publicFixture.unknownHashProof:q.method==='eth_getCode'?publicFixture.unknownHashCode:null;
     return new Response(JSON.stringify({jsonrpc:'2.0',id:q.id,result}));
   };
   const reader=createApprovedProofStateReader({rpcUrls:urls,approvedStateRpcUrls:urls,block:{number:BigInt(h.number),hash:h.hash},fetchImpl,minIntervalMs:0});
