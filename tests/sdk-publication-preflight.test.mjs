@@ -419,3 +419,13 @@ test('close diagnostics allow only bounded codes, classified reasons and retry c
     assert.doesNotMatch(JSON.stringify(rejected), /PRIVATE|secret.invalid/);
   }
 });
+
+test('capacity and size attempt diagnostics preserve only bounded numeric evidence and approved protocol/stage', () => {
+  const diagnostic = { requestedGasLimit: '200000000', providerGasCap: '50000000', requiredProgramGas: '200000000', requestPayloadBytes: 1200300, blockCount: 4, callCount: 20, stage: 'read-capacity', transport: 'https' };
+  const safe = keelSimulationTransportDiagnostic({ diagnostic });
+  for (const [key, value] of Object.entries(diagnostic)) assert.equal(safe[key], value);
+  for (const value of ['PRIVATE', '0x1234', '01', '-1', '18446744073709551616', 200000000, Infinity]) {
+    const rejected = keelSimulationTransportDiagnostic({ diagnostic: { requestedGasLimit: value, providerGasCap: value, requiredProgramGas: value, stage: 'PRIVATE', transport: 'https://SECRET', requestPayloadBytes: -1, blockCount: Infinity, callCount: 1.5 } });
+    for (const key of Object.keys(diagnostic)) assert.equal(rejected[key], undefined);
+  }
+});
