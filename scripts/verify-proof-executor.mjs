@@ -63,6 +63,7 @@ try{
  }
  const big={...calls[0],gas:toHex(170_000_000n),data:data('write',[1300n])},bigPayload=payload([big]);
  const bigResult=await transport.request({method:'eth_simulateV1',params:[bigPayload,'0x0']});assert.deepEqual(bigResult,rpc('eth_simulateV1',[bigPayload,'0x0']));assert.ok(BigInt(bigResult[0].calls[0].maxUsedGas)>140_000_000n);
+ assert.ok(evidence.executions.at(-1).readRequests<100,'proven empty base tries must not require a proof request per fresh storage slot');
  record('state-heavy atomic-sized original envelope above 140M matches Geth with real updated root',{gas:bigResult[0].transactions[0].gas,maximumUsedGas:bigResult[0].calls[0].maxUsedGas,stateRoot:bigResult[0].stateRoot});
  const delegatePayload=payload([{...calls[0],from:delegated,to:delegated,gas:toHex(16_000_000n)}]);assert.deepEqual(await transport.request({method:'eth_simulateV1',params:[delegatePayload,'0x0']}),rpc('eth_simulateV1',[delegatePayload,'0x0']));record('existing EIP-7702 delegation matches exact Geth output');
  const compare=async(name,program,check=()=>{})=>{
@@ -94,7 +95,7 @@ try{
  for(const fault of ['account-proof','storage-proof','code','read-outage']){
   let injected=false;
   const brokenReader={request:async input=>{const r=await stateReader.request(input);if(!injected&&((fault==='account-proof'||fault==='read-outage')&&input.method==='eth_getProof'||fault==='storage-proof'&&input.method==='eth_getProof'&&input.params[1].length>0||fault==='code'&&input.method==='eth_getCode')){injected=true;if(fault==='read-outage')throw new Error('SECRET upstream failed');const copy=structuredClone(r);if(fault==='account-proof')copy.accountProof[0]='0xc0';else if(fault==='storage-proof')copy.storageProof[0].value='0x1';else return '0x6000';return copy;}return r;}};
-  const broken=await createProofBackedSimulationTransport({...options(),stateReader:brokenReader});await assert.rejects(broken.request({method:'eth_simulateV1',params:[payload([calls[0]]),'0x0']}));assert.equal(injected,true);await broken.close();record(`invalid ${fault} yields no passing execution`);
+  const broken=await createProofBackedSimulationTransport({...options(),stateReader:brokenReader});await assert.rejects(broken.request({method:'eth_simulateV1',params:[payload([fault==='storage-proof'?contextCall('clear',[true]):calls[0]]),'0x0']}));assert.equal(injected,true);await broken.close();record(`invalid ${fault} yields no passing execution`);
  }
  const smallBudget=await createProofBackedSimulationTransport({...options(),limits:{...options().limits,gasBudget:50_000_000}});await assert.rejects(smallBudget.request({method:'eth_simulateV1',params:[payload([big]),'0x0']}));await smallBudget.close();record('local resource limits reject original envelopes instead of lowering them');
  await assert.rejects(transport.request({method:'eth_sendRawTransaction',params:['0x']}));

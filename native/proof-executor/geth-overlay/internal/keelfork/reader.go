@@ -203,6 +203,21 @@ func (r *Reader) Storage(addr common.Address, key common.Hash) (common.Hash, err
 	if value, ok := r.slots[addr][key]; ok {
 		return value, nil
 	}
+	account, known := r.accounts[addr]
+	if !known {
+		var err error
+		account, err = r.proof(addr, nil)
+		if err != nil {
+			return common.Hash{}, err
+		}
+	}
+	// A verified absent account or EmptyRootHash authenticates every base-state
+	// slot as zero. Do not query the provider once per fresh write to that trie.
+	// StateDB still carries subsequent writes; this Reader describes only Base.
+	if account == nil || account.Root == types.EmptyRootHash {
+		r.slots[addr][key] = common.Hash{}
+		return common.Hash{}, nil
+	}
 	if _, err := r.proof(addr, []common.Hash{key}); err != nil {
 		return common.Hash{}, err
 	}
