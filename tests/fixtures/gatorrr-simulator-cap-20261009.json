@@ -1,0 +1,18 @@
+{
+  "schema": "keel-simulator-cap-incident@1",
+  "provenance": "Authorized operator evidence libfile_48010e3ce49481918a7bac228dea81d4 and libfile_d911d2ca32508191bc7d9f29beb8ded1; intermittentProviderFailure and successful exact owner review. No project calldata or owner attestation is included.",
+  "projectId": "150485a1-78b5-425f-a0b7-093d4409fed5",
+  "releaseId": "dcd04c0e-a875-4b62-93c5-b7c325a0d789",
+  "revision": 34,
+  "operationId": "b33c59cd-c2fd-4bd1-818d-5123af3ec17b",
+  "chainId": 11155111,
+  "requestedGasLimit": "200000000",
+  "providerGasCap": "50000000",
+  "successfulTransactionGasLimit": "170135114",
+  "successfulPreRefundGasUsed": "141779261",
+  "completeTokenUriBytes": 655134,
+  "paidStorageJob": "10",
+  "paidStorageStatus": "complete",
+  "publicationTransactionHash": null,
+  "qualificationAndProgramTestResponses": "Synthetic deterministic sockets and calldata exercise the observed cap transition; they do not establish live publication."
+}
