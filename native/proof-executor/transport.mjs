@@ -105,7 +105,7 @@ export async function createProofBackedSimulationTransport({ binaryPath, binaryS
     }
     if(exact.method==='eth_chainId'&&exact.params.length===0)return ask(exact.method,exact.params);
     if(exact.method==='eth_getBlockByNumber'&&exact.params[0]===blockTag&&exact.params[1]===false&&exact.params.length===2)return ask(exact.method,exact.params);
-    if(exact.method==='eth_getCode'&&ADDRESS.test(exact.params[0])&&exact.params[1]===blockTag&&exact.params.length===2)return ask(exact.method,exact.params);
+    if(exact.method==='eth_getCode'&&ADDRESS.test(exact.params[0])&&exact.params[1]===blockTag&&exact.params.length===2)return ask(exact.method,[exact.params[0],{blockHash:block.hash,requireCanonical:true}]);
     throw fail('Native proof transport refuses this method or block.');
   },async close(){abort.abort();}};
 }

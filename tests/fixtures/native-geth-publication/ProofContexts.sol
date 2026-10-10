@@ -18,6 +18,8 @@ contract ProofContexts {
             address(this).balance, blockhash(block.number - 1));
     }
 
+    function historical(uint256 number) external view returns (bytes32) { return blockhash(number); }
+
     function create() external returns (address) {
         child = new ProofChild();
         return address(child);

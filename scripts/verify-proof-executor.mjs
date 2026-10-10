@@ -41,11 +41,15 @@ let started=false,processCount=0,base,lastNativeDiagnostic='';
 const upstream=[];
 const stateReader={request:async({method,params})=>{assert.ok(['eth_chainId','eth_getBlockByNumber','eth_getBlockByHash','eth_getProof','eth_getCode'].includes(method),'upstream execution forbidden');upstream.push({method,params});return rpc(method,params);}};
 function isolatedRunner(){processCount++;lastNativeDiagnostic='';const childName=`${container}-executor-${processCount}`,child=spawn('docker',['run','--name',childName,'--pull=never','--rm','-i','--network','none','--memory','768m','--cpus','2','--pids-limit','64','--read-only','--cap-drop','ALL','--security-opt','no-new-privileges','--user',`${process.getuid()}:${process.getgid()}`,'-e','GOMEMLIMIT=512MiB','-e','GOMAXPROCS=2','-v',`${binary}:/executor:ro`,'--entrypoint','/executor',runnerImage],{stdio:['pipe','pipe','pipe']});child.stderr.on('data',chunk=>{lastNativeDiagnostic=(lastNativeDiagnostic+chunk.toString()).slice(-8000);});const kill=child.kill.bind(child);child.kill=signal=>{try{docker('rm','-f',childName);}catch{}return kill(signal);};return child;}
-const options=()=>({now:()=>Number(BigInt(base.timestamp))*1000,binaryPath:binary,binarySha256,spawnExecutor:isolatedRunner,stateReader,block:{number:0n,hash:base.hash},onEvidence:e=>evidence.executions.push(e),limits:{gasBudget:500_000_000,requests:5000,witnessBytes:32*1024*1024,responseBytes:128*1024*1024,wallTimeMs:180000}});
+const options=()=>({now:()=>Number(BigInt(base.timestamp))*1000,binaryPath:binary,binarySha256,spawnExecutor:isolatedRunner,stateReader,block:{number:BigInt(base.number),hash:base.hash},onEvidence:e=>evidence.executions.push(e),limits:{gasBudget:500_000_000,requests:5000,witnessBytes:32*1024*1024,responseBytes:128*1024*1024,wallTimeMs:180000}});
 try{
  docker('image','inspect',image);docker('image','inspect',runnerImage);
- docker('run','--pull=never','--rm','--network','none','--user',`${process.getuid()}:${process.getgid()}`,'-v',`${tmp}:/fixture`,image,'--datadir','/fixture/data','init','/fixture/genesis.json');
- docker('run','--pull=never','-d','--name',container,'--network','none','--memory','768m','--cpus','2','--user',`${process.getuid()}:${process.getgid()}`,'-v',`${tmp}:/fixture`,image,'--datadir','/fixture/data','--networkid','31337','--nodiscover','--maxpeers','0','--cache','64','--ipcdisable','--http','--http.addr','127.0.0.1','--http.vhosts','localhost','--http.api','eth,net,web3','--rpc.gascap','500000000','--rpc.evmtimeout','30s','--rpc.http-body-limit','40');started=true;
+ docker('run','--pull=never','--rm','--network','none','--user',`${process.getuid()}:${process.getgid()}`,'-v',`${tmp}:/fixture`,image,'--datadir','/fixture/data','--state.scheme','hash','--gcmode','archive','init','/fixture/genesis.json');
+ const fixtureBinary=join(build,'keel-proof-fixture');
+ const fixtureBlocks=execFileSync('docker',['run','--pull=never','--rm','-i','--network','none','--memory','768m','--cpus','2','--pids-limit','64','--read-only','--cap-drop','ALL','--security-opt','no-new-privileges','--user',`${process.getuid()}:${process.getgid()}`,'-v',`${fixtureBinary}:/fixture-generator:ro`,'--entrypoint','/fixture-generator',runnerImage],{input:readFileSync(join(tmp,'genesis.json')),timeout:60000,maxBuffer:8*1024*1024});
+ writeFileSync(join(tmp,'empty-chain.rlp'),fixtureBlocks);
+ docker('run','--pull=never','--rm','--network','none','--memory','768m','--cpus','2','--user',`${process.getuid()}:${process.getgid()}`,'-v',`${tmp}:/fixture`,image,'--datadir','/fixture/data','--state.scheme','hash','--gcmode','archive','--cache','64','import','/fixture/empty-chain.rlp');
+ docker('run','--pull=never','-d','--name',container,'--network','none','--memory','768m','--cpus','2','--user',`${process.getuid()}:${process.getgid()}`,'-v',`${tmp}:/fixture`,image,'--datadir','/fixture/data','--state.scheme','hash','--gcmode','archive','--networkid','31337','--nodiscover','--maxpeers','0','--cache','64','--ipcdisable','--http','--http.addr','127.0.0.1','--http.vhosts','localhost','--http.api','eth,net,web3','--rpc.gascap','500000000','--rpc.evmtimeout','30s','--rpc.http-body-limit','40');started=true;
  for(let n=0;;n++){try{rpc('eth_chainId');break;}catch(e){if(n>=60)throw e;await delay(100);}}
  base=rpc('eth_getBlockByNumber',['0x0',false]);evidence.base=base;evidence.compiler=solc.version();
  const transport=await createProofBackedSimulationTransport(options());
@@ -141,6 +145,23 @@ try{
   assert.equal(attempted,1);await denied.close();record(`state source HTTP ${status} stops once with sanitized diagnostic and no retry`);
  }
  assert.equal(BigInt(rpc('eth_getStorageAt',[reader,'0x0','0x0'])),0n);assert.equal(BigInt(rpc('eth_getTransactionCount',[owner,'0x0'])),0n);assert.equal(rpc('eth_getBlockByNumber',['0x0',false]).hash,base.hash);await transport.close();
+ base=rpc('eth_getBlockByNumber',['0x4',false]);assert.equal(base.number,'0x4');evidence.nonGenesisBase=base;
+ const historyCall=contextCall('historical',[1n]),historyRequest={method:'eth_simulateV1',params:[payload([historyCall]),'0x4']};
+ const historical=await createProofBackedSimulationTransport(options()),historyStart=upstream.length;
+ const historyResult=await historical.request(historyRequest);assert.deepEqual(historyResult,rpc('eth_simulateV1',historyRequest.params));
+ assert.equal(historyResult[0].calls[0].returnData,rpc('eth_getBlockByNumber',['0x1',false]).hash);
+ const ancestorReads=upstream.slice(historyStart).filter(r=>r.method==='eth_getBlockByHash');assert.ok(ancestorReads.length>=2);
+ await historical.close();record('non-genesis canonical ancestor acquisition and historical BLOCKHASH match native Geth',{anchor:base.hash,ancestorReads:ancestorReads.length});
+ for(const fault of ['unavailable','wrong-root','wrong-number','wrong-parent']){
+  let changed=false;
+  const broken=await createProofBackedSimulationTransport({...options(),stateReader:{request:async input=>{
+   if(input.method==='eth_getBlockByHash'){
+    changed=true;if(fault==='unavailable')throw new Error('synthetic ancestor unavailable');
+    const h=await stateReader.request(input);return {...h,...(fault==='wrong-root'?{stateRoot:`0x${'ff'.repeat(32)}`}:fault==='wrong-number'?{number:'0xff'}:{parentHash:`0x${'ff'.repeat(32)}`})};
+   }return stateReader.request(input);
+  }}});
+  const before=evidence.executions.length;await assert.rejects(broken.request(historyRequest));assert.equal(changed,true);assert.equal(evidence.executions.length,before);await broken.close();record(`historical ancestor ${fault} cannot turn missing context into a passing zero hash`);
+ }
  assert.ok(upstream.every(r=>!['eth_call','eth_simulateV1','eth_sendRawTransaction'].includes(r.method)));evidence.upstream={requestCount:upstream.length,methods:[...new Set(upstream.map(r=>r.method))]};
  for(const execution of evidence.executions){assert.match(execution.requestSha256,/^[a-f0-9]{64}$/);assert.ok(execution.processPeakRSSBytes>0&&execution.processPeakRSSBytes<=768*1024*1024);assert.ok(execution.processCPUMicroseconds>0);assert.ok(execution.nativeWallTimeMs>=0&&execution.nativeWallTimeMs<=180000);}
  evidence.resources={completedExecutions:evidence.executions.length,peakProcessRSSBytes:Math.max(...evidence.executions.map(e=>e.processPeakRSSBytes)),maximumNativeWallTimeMs:Math.max(...evidence.executions.map(e=>e.nativeWallTimeMs)),maximumReadRequests:Math.max(...evidence.executions.map(e=>e.readRequests)),maximumWitnessBytes:Math.max(...evidence.executions.map(e=>e.witnessBytes))};console.log(`RESOURCES ${JSON.stringify(evidence.resources)}`);
