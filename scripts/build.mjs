@@ -6,6 +6,7 @@ run("node", ["scripts/build-keel-market-wallet.mjs"]);
 tsc("packages/protocol/tsconfig.json");
 tsc("packages/viewer/tsconfig.json");
 tsc("packages/sdk/tsconfig.json");
+run("node", ["packages/sdk/scripts/package-proof-runtime.mjs"]);
 run("node", ["packages/sdk/scripts/package-canonical-shell.mjs"]);
 run("node", ["packages/sdk/scripts/package-layered-runtime.mjs"]);
 tsc("packages/builder/tsconfig.json");

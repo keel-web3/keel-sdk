@@ -1,9 +1,9 @@
 name: Proof-backed executor candidate
 on:
   pull_request:
-    branches: [codex/rpc-fork-evaluation-20261010, codex/proof-backed-executor-20261010]
+    branches: [codex/rpc-fork-evaluation-20261010, codex/proof-backed-executor-20261010, codex/proof-runner-broker-20261010]
   push:
-    branches: [codex/proof-backed-executor-20261010, codex/proof-runner-broker-20261010]
+    branches: [codex/proof-backed-executor-20261010, codex/proof-runner-broker-20261010, codex/proof-runner-integration-20261010]
   workflow_dispatch:
 concurrency:
   group: proof-executor-${{ github.ref }}
@@ -50,7 +50,7 @@ jobs:
           pnpm install --frozen-lockfile
           node scripts/build.mjs
       - name: Verify native process protocol and provenance guards
-        run: node --test tests/proof-executor-transport.test.mjs tests/proof-state-reader.test.mjs tests/proof-runner-client.test.mjs
+        run: node --test tests/proof-executor-transport.test.mjs tests/proof-state-reader.test.mjs tests/proof-runner-client.test.mjs tests/proof-runtime-package.test.mjs
       - name: Verify broker socket ownership under the Go race detector
         working-directory: native/proof-executor/runner
         env:
