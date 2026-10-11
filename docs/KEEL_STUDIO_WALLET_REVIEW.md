@@ -182,3 +182,33 @@ Sepolia simulation must verify consistent compatible behavior. The public HTTP p
 An exact recovered full-revert receipt preserves the previous plan confirmation at the same draft revision when only platform infrastructure changed. Hosted Studio compares all terms, access phases and committed resources. Do not edit or restart an unchanged plan because a reader was updated; prepare a fresh exact wallet review, which still requires full-batch gas and collector metadata validation. Changed creator terms or resources require plan confirmation again.
 
 Sepolia publication preflight qualifies the simulator with bounded public empty calls, observed public account state and strict nonce controls on the exact retained socket before sending project calldata. For a known program, the public empty-call probe requests its required envelope within the observed selected-chain limit; ordinary reads use a modest control. Its actual execution is small, and small plans do not require full block capacity. The exact project simulation must still separately pass its requested gas and selected-fork limits. It checks the actual gas envelope on every simulation response. Silent RPC gas clamping is a provider limit, not a contract compatibility failure. A confirmed gas-envelope clamp permits at most three connection selections at the same approved endpoint. Each replacement must pass public qualification. An exact numbered project snapshot must match before repeating the unchanged, read-only ephemeral program. No gas reduction, state override, transaction write or new provider is permitted. Missing or enlarged envelopes, wrong-chain/fork/snapshot evidence, and genuine execution failures do not trigger this recovery. Exhaustion stays blocked; the next saved-plan read can try again. Never retry a genuine EVM revert to manufacture success. Use receipt recovery and a fresh complete Studio wallet review; Desktop is optional.
+
+Initial storage preparation can explicitly select `discoveryGasPolicy: "provider-capacity"`
+when its independent, unmeasured calls all start at the selected-chain maximum.
+A reported smaller provider capacity discards the rejected attempt and bounds
+the next whole-program discovery replay, with at most three capacity adjustments.
+If a shared provider budget initially gives each call an equal share, a call
+can exhaust that share even when the complete program fits. Discovery may
+redistribute unused allowance using verified successful-prefix pre-refund
+measurements. It first retains the later allowances; if necessary it reserves
+their selected-fork intrinsic floors and measures them on another complete
+replay. Allocation is bounded to twice the call count, within the observed
+shared budget and original chain ceilings. A call that still fails at its
+maximum remaining allowance stays blocked. This changes only unmeasured
+discovery allowances, never an atomic wallet program or an already-validated
+transaction. It does not retry a validated EVM failure or omit any call.
+The caller measures pre-refund maximum usage, retains the required transaction
+margin, and strictly validates every exact call with its real fees. Complete
+metadata and standalone-reader checks still run. If the margin cannot fit,
+execution reverts, or a method is unsupported, approval remains blocked and
+the saved funding amount is preserved. The proof records discovery ceilings
+and capacity/allocation attempts separately from final transaction gas limits.
+
+The simulation pool never rewrites calls or grants disclosure authority. It
+returns the largest reported capacity among existing approved recipients so
+discovery can requalify that exact envelope; an unapproved candidate cannot
+hide this capacity evidence. Creator storage-review, agent storage-review,
+and MCP `keel-studio-draft` storage review use the same Studio gate. The chain
+profile comes from the selected block's chain, timestamp and gas limit;
+unsupported EVM profiles remain blocked. Tezos uses its separate exact-operation
+simulation and fee model, never this EVM gas discovery policy.

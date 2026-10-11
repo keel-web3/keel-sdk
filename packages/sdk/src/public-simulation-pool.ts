@@ -150,14 +150,24 @@ export function createKeelPublicSepoliaSimulationPool(options: KeelPublicSimulat
       if (gas > requiredGas) requiredGas = gas;
       gasLimits.push(gas);
     }
-    let capacityFailure: KeelPublicationSimulationError | undefined, lastFailure: KeelPublicationSimulationError | undefined, awaitingApproval = false;
+    let capacityFailure: KeelPublicationSimulationError | undefined, approvedCapacityFailure: KeelPublicationSimulationError | undefined,
+      lastFailure: KeelPublicationSimulationError | undefined, awaitingApproval = false;
+    const retainApprovedCapacity = (index: number, cap: bigint, failure: KeelPublicationSimulationError) => {
+      if (approved.has(urls[index]!) && (!approvedCapacityFailure || cap > BigInt(approvedCapacityFailure.diagnostic!.providerGasCap!)))
+        approvedCapacityFailure = new KeelPublicationSimulationError(failure.kind, failure.message,
+          { ...failure.diagnostic, requestedGasLimit: requiredGas.toString(), providerGasCap: cap.toString() });
+    };
     const start = cursor;
     for (let offset = 0; offset < urls.length; offset++) {
       if (closed) throw new KeelPublicationSimulationError("rpc-unavailable", "The publication check was cancelled.");
       const index = (start + offset) % urls.length;
       if (rejected.has(index)) continue;
       const capacity = capacityRejected.get(index);
-      if (capacity && requiredGas > capacity.cap) { capacityFailure ??= capacity.failure; continue; }
+      if (capacity && requiredGas > capacity.cap) {
+        capacityFailure ??= capacity.failure;
+        retainApprovedCapacity(index, capacity.cap, capacity.failure);
+        continue;
+      }
       // A prior larger public read ceiling did not qualify this smaller request.
       // Reconnect and requalify its entire unchanged sequence; never change any
       // transaction or read here. Only the caller owns bounded read adaptation.
@@ -189,6 +199,10 @@ export function createKeelPublicSepoliaSimulationPool(options: KeelPublicSimulat
         if (closed) throw new KeelPublicationSimulationError("rpc-unavailable", "The publication check was cancelled.");
         const classified = keelSimulationTransportFailure(error, { method: "eth_simulateV1", phase: projectRequest ? "project-request" : "public-qualification" });
         const failure = new KeelPublicationSimulationError(classified.kind, classified.message, { ...classified.diagnostic,
+          // The nested transport calls every post-qualification request a
+          // project request, including this pool's public sequence probe.
+          // This boundary knows whether private calldata was actually sent.
+          phase: projectRequest ? "project-request" : "public-qualification",
           // Conservative envelope sum, not measured execution gas. Bytes exclude
           // only the pool-owned JSON-RPC id/version envelope.
           requiredProgramGas: gasLimits.reduce((sum, gas) => sum + gas, 0n).toString(),
@@ -204,13 +218,19 @@ export function createKeelPublicSepoliaSimulationPool(options: KeelPublicSimulat
         if (typeof reportedCap === "string" && /^[1-9]\d*$/u.test(reportedCap) && BigInt(reportedCap) < requiredGas) {
           const previous = capacityRejected.get(index);
           const cap = BigInt(reportedCap);
-          capacityRejected.set(index, { cap: previous && previous.cap < cap ? previous.cap : cap, failure });
+          const effectiveCap = previous && previous.cap < cap ? previous.cap : cap;
+          capacityRejected.set(index, { cap: effectiveCap, failure });
+          retainApprovedCapacity(index, effectiveCap, failure);
         } else rejected.add(index);
         lastFailure = failure;
         if (failure.kind === "provider-limit") capacityFailure ??= failure;
         try { options.onAttempt?.({ ...keelSimulationTransportDiagnostic(failure), candidateIndex: index, candidateCount: urls.length }); } catch { /* Diagnostic observers cannot alter proof. */ }
       }
     }
+    // Give the caller the largest reported capacity among approved recipients before
+    // asking for a new disclosure recipient. Only the caller may adapt an
+    // unmeasured discovery/read ceiling; this pool still replays exact requests.
+    if (approvedCapacityFailure) throw approvedCapacityFailure;
     if (awaitingApproval) throw new KeelPublicationSimulationError("configuration-invalid", "A candidate passed public simulation checks but is not approved for private project data. The saved plan is unchanged.", { recipientApprovalRequired: 1 });
     throw capacityFailure ?? lastFailure ?? new KeelPublicationSimulationError("rpc-unavailable", "The configured simulation pool is unavailable. Retry the saved plan after provider recovery.");
   };

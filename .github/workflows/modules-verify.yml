@@ -32,6 +32,7 @@ jobs:
       - uses: actions/checkout@v4
         with:
           path: keel-sdk
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
       - uses: actions/checkout@v4
         with:
           repository: Ravonus/keel-modules
@@ -54,6 +55,15 @@ jobs:
       - name: Build the toolchain
         working-directory: keel-sdk
         run: node scripts/build.mjs
+
+      - name: Install pinned media adapter
+        working-directory: keel-sdk
+        run: node packages/builder/node_modules/ffmpeg-static/install.js
+      - name: Verify wrapped shell offline behavior
+        working-directory: keel-sdk
+        env:
+          CHROMIUM_PATH: /usr/bin/google-chrome
+        run: node --test tests/sdk-verification-wrap-offline-browser.test.mjs
 
       # Every module rebuilds from its readable source to the exact bytes its
       # receipt claims. A module that does not reproduce fails here.

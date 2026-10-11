@@ -88,6 +88,66 @@ try {
   record("SDK refuses a provider-clamped 200M discovery envelope");
   await assert.rejects(simulateKeelPublicationBeforeFunding({ ...plan, preparationCalls: calls }, transport), error => error.kind === "provider-limit");
   record("SDK also refuses aggregate exhaustion when each discovery envelope is only 16M");
+  const emptySequence = simulate(Array.from({ length: 14 }, (_, i) => ({ ...calls[0], to: owner, data: "0x", nonce: toHex(i), gas: toHex(49_976_000n) })));
+  assert.ok(emptySequence.every(block => BigInt(block.calls[0].gasUsed) === 12_000n));
+  assert.equal(BigInt(emptySequence[3].transactions[0].gas), 49_964_000n);
+  record("native shared budget reproduces the 12000-gas public-probe decrement", { blocks: summary(emptySequence) });
+  const smallPlan = { ...plan, discoveryGasPolicy: "provider-capacity",
+    preparationCalls: Array.from({ length: 14 }, (_, i) => ({ ...plan.preparationCalls[0], data: calldata("write", [1n]), nonce: toHex(i) })),
+    assertions: Array.from({ length: 14 }, (_, i) => ({ callIndex: i, returnData: encodeAbiParameters([{ type: "uint256" }], [BigInt(i + 1)]) })),
+    requiredReaderCalls: [{ ...plan.requiredReaderCalls[0], expectedReturn: encodeAbiParameters([{ type: "uint256" }], [14n]) }],
+    metadataCall: { ...plan.metadataCall, data: calldata("tokenURIForCount", [14n]) },
+  };
+  const smallBefore = structuredClone(smallPlan), smallRequests = [];
+  const smallProof = await simulateKeelPublicationBeforeFunding(smallPlan, { request: async request => {
+    if (request.method === "eth_simulateV1") smallRequests.push(request.params);
+    return rpc(request.method, request.params);
+  } });
+  assert.deepEqual(smallPlan, smallBefore);
+  assert.equal(smallProof.validatedTransactionCalls, 14);
+  assert.equal(smallProof.completeTokenUriBytes, Buffer.byteLength(expectedTokenURI));
+  assert.equal(smallProof.discoveryGas.capacityAttempts.length, 2);
+  assert.ok(smallProof.discoveryGas.capacityAttempts[1].programGasBudget);
+  const smallStrict = smallRequests.find(([program]) => program.validation);
+  assert.ok(smallStrict);
+  assert.deepEqual(smallRequests.at(-1)[0].blockStateCalls.slice(0, 14), smallStrict[0].blockStateCalls);
+  assert.ok(smallProof.transactionGasLimits.every((gas, i) => BigInt(gas) > BigInt(smallProof.transactionGasUsed[i])));
+  record("14-call shared-budget discovery fully replays strict state and exact metadata without reducing measured margins", {
+    capacityAttempts: smallProof.discoveryGas.capacityAttempts, transactionGasLimits: smallProof.transactionGasLimits,
+    transactionGasUsed: smallProof.transactionGasUsed, completeTokenUriBytes: smallProof.completeTokenUriBytes,
+    phases: smallRequests.map(([program]) => ({ validation: program.validation, blocks: program.blockStateCalls.length })),
+  });
+  // Uneven synthetic state writes reproduce a carrier-style allocation
+  // boundary without including any creator payload or project state.
+  const unevenCounts = Array.from({ length: 14 }, (_, i) => i === 2 ? 60n : 1n);
+  let unevenTotal = 0n;
+  const unevenPlan = { ...smallPlan,
+    preparationCalls: smallPlan.preparationCalls.map((call, i) => ({ ...call, data: calldata("write", [unevenCounts[i]]) })),
+    assertions: unevenCounts.map((count, callIndex) => ({ callIndex, returnData: encodeAbiParameters([{ type: "uint256" }], [unevenTotal += count]) })),
+    requiredReaderCalls: [{ ...smallPlan.requiredReaderCalls[0], expectedReturn: encodeAbiParameters([{ type: "uint256" }], [73n]) }],
+    metadataCall: { ...smallPlan.metadataCall, data: calldata("tokenURIForCount", [73n]) },
+  };
+  const unevenBefore = structuredClone(unevenPlan), unevenRequests = [];
+  const unevenProof = await simulateKeelPublicationBeforeFunding(unevenPlan, { request: async request => {
+    if (request.method === "eth_simulateV1") unevenRequests.push(request.params);
+    return rpc(request.method, request.params);
+  } });
+  assert.deepEqual(unevenPlan, unevenBefore);
+  assert.equal(unevenProof.discoveryGas.allocationAttempts[0].callIndex, 2);
+  assert.equal(unevenProof.discoveryGas.allocationAttempts[0].strategy, "prefix-reuse");
+  assert.ok(BigInt(unevenProof.transactionGasUsed[2]) > BigInt(unevenProof.discoveryGas.capacityAttempts.at(-1).perCallGasLimit));
+  assert.ok(BigInt(unevenProof.transactionGasLimits[2]) > BigInt(unevenProof.transactionGasUsed[2]));
+  const unevenStrict = unevenRequests.find(([program]) => program.validation);
+  assert.deepEqual(unevenRequests.at(-1)[0].blockStateCalls.slice(0, 14), unevenStrict[0].blockStateCalls);
+  assert.equal(unevenProof.validatedTransactionCalls, 14);
+  assert.equal(unevenProof.completeTokenUriBytes, Buffer.byteLength(expectedTokenURI));
+  record("uneven 14-call discovery reallocates measured prefix slack before complete strict and metadata replay", {
+    allocationAttempts: unevenProof.discoveryGas.allocationAttempts,
+    transactionGasLimits: unevenProof.transactionGasLimits, transactionGasUsed: unevenProof.transactionGasUsed,
+    phases: unevenRequests.map(([program]) => ({ validation: program.validation, blocks: program.blockStateCalls.length })),
+  });
+  await assert.rejects(simulateKeelPublicationBeforeFunding({ ...plan, discoveryGasPolicy: "provider-capacity" }, transport), error => ["provider-limit", "execution-reverted"].includes(error.kind));
+  record("shared-budget discovery still refuses a program whose actual execution exceeds provider capacity");
   await start(200_000_000);
   const empty = simulate([{ ...calls[0], to: owner, data: "0x", gas: toHex(selectedGasLimit) }]);
   assert.equal(BigInt(empty[0].transactions[0].gas), selectedGasLimit);
