@@ -24,7 +24,13 @@ export async function observeOfflineShell(html, terminalState='verified', expect
   const proxy=createServer((request,response)=>{proxyRequests.push(request.url);response.writeHead(502);response.end();});
   proxy.on('connect',(request,socket)=>{proxyRequests.push(`CONNECT ${request.url}`);socket.end('HTTP/1.1 502 Blocked\r\nConnection: close\r\n\r\n');});
   proxy.listen(0,'127.0.0.1');await once(proxy,'listening');
-  const child=spawn(binary,['--headless','--no-sandbox','--disable-dev-shm-usage','--disable-background-networking','--disable-component-update','--disable-domain-reliability','--disable-sync','--disable-default-apps','--disable-extensions','--no-first-run','--no-default-browser-check','--host-resolver-rules=MAP * ~NOTFOUND, EXCLUDE 127.0.0.1, EXCLUDE localhost',`--proxy-server=http://127.0.0.1:${proxy.address().port}`,'--remote-debugging-port=0',`--user-data-dir=${profile}`,'about:blank'],{stdio:['ignore','ignore','pipe']});
+  // Browser services use the default network context, separate from the
+  // artwork's isolated context below. Block those without filtering domains
+  // out of the artwork observer or relying on startup timing.
+  const browserProxy=createServer((_request,response)=>{response.writeHead(502);response.end();});
+  browserProxy.on('connect',(_request,socket)=>socket.end('HTTP/1.1 502 Blocked\r\nConnection: close\r\n\r\n'));
+  browserProxy.listen(0,'127.0.0.1');await once(browserProxy,'listening');
+  const child=spawn(binary,['--headless','--no-sandbox','--disable-dev-shm-usage','--disable-background-networking','--disable-component-update','--disable-domain-reliability','--disable-sync','--disable-default-apps','--disable-extensions','--disable-features=OptimizationHints,NetworkTimeServiceQuerying,AimServerEligibilityEnabled,AimServerRequestOnStartupEnabled','--no-first-run','--no-default-browser-check','--host-resolver-rules=MAP * ~NOTFOUND, EXCLUDE 127.0.0.1, EXCLUDE localhost',`--proxy-server=http://127.0.0.1:${browserProxy.address().port}`,'--remote-debugging-port=0',`--user-data-dir=${profile}`,'about:blank'],{stdio:['ignore','ignore','pipe']});
   let socket,sequence=0;const pending=new Map(),attempts=[],errors=[];
   try {
     const endpoint=await new Promise((resolve,reject)=>{
@@ -61,13 +67,11 @@ export async function observeOfflineShell(html, terminalState='verified', expect
       }
       if(message.method==='Runtime.exceptionThrown')errors.push(message.params.exceptionDetails.text);
     });
-    const {targetId}=await command('Target.createTarget',{url:'about:blank'});
+    const {browserContextId}=await command('Target.createBrowserContext',{disposeOnDetach:true,proxyServer:`http://127.0.0.1:${proxy.address().port}`});
+    const {targetId}=await command('Target.createTarget',{url:'about:blank',browserContextId});
     const {sessionId}=await command('Target.attachToTarget',{targetId,flatten:true});
     await command('Page.enable',{},sessionId);await observeTarget(sessionId);
     await command('Page.addScriptToEvaluateOnNewDocument',{source:'window.__keelOfflineSignals=[];window.addEventListener("message",event=>{if(event.data?.keelOfflineProbe)window.__keelOfflineSignals.push(event.data.keelOfflineProbe);});'},sessionId);
-    // Fresh Chrome can attempt its own startup services before a page exists.
-    // They are blocked too; qualify page activity from navigation onward.
-    proxyRequests.length=0;
     await command('Page.navigate',{url:origin},sessionId);
     const expression=`({state:document.body?.dataset.verification,signals:window.__keelOfflineSignals,frames:document.querySelectorAll('iframe').length,loading:!!document.querySelector('#keel-status'),seal:!!document.querySelector('#verify-seal'),opaque:[...document.querySelectorAll('iframe')].every(f=>f.sandbox.contains('allow-scripts')&&!f.sandbox.contains('allow-same-origin'))})`;
     let result;
@@ -86,6 +90,7 @@ export async function observeOfflineShell(html, terminalState='verified', expect
     socket?.close();if(child.exitCode===null&&child.signalCode===null){child.kill('SIGKILL');await once(child,'exit').catch(()=>{});}
     server.closeAllConnections();await new Promise(resolve=>server.close(resolve));
     proxy.closeAllConnections();await new Promise(resolve=>proxy.close(resolve));
+    browserProxy.closeAllConnections();await new Promise(resolve=>browserProxy.close(resolve));
     await rm(profile,{recursive:true,force:true,maxRetries:10,retryDelay:100});
   }
 }

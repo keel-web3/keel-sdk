@@ -41,6 +41,18 @@ The browser gate also waits for the mounted opaque artwork to report successful
 execution of its embedded module. It observes child renderer targets and uses
 a deny-only loopback proxy because iframe requests can start before their CDP
 hooks attach. Separate top-level and opaque-frame negative controls prove
-requests are observed and blocked. Browser startup requests are blocked too;
-the zero-request assertion covers the page from navigation through verified
-module execution. A tampered graph must fail without mounting artwork.
+requests are observed and blocked. The artwork uses an isolated browser context
+with its own deny proxy. A separate default-context deny proxy blocks Chrome's
+background services, without excluding any destination from artwork accounting
+or relying on startup timing. The zero-request assertion covers the complete
+artwork context through verified module execution. A tampered graph must fail
+without mounting artwork.
+
+The first stronger browser gate (SDK run 38163037636) failed because Chrome's
+own account/AI eligibility connections were counted as artwork traffic. This
+was an introduced harness failure, not a production regression. A local
+Chromium NetLog identifies the AI request as `/async/folae` with no webpage
+origin as initiator. The test disables the browser's AI eligibility service
+and separates default-context traffic from the isolated artwork context.
+Both contexts remain blocked from external network access; no hostname is
+exempted from the artwork's zero-request assertion.
