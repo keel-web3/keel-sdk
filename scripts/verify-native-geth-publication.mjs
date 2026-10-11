@@ -1,5 +1,6 @@
 import assert from "node:assert/strict";
 import { execFileSync } from "node:child_process";
+import { createHash } from "node:crypto";
 import { mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
@@ -8,6 +9,8 @@ import { setTimeout as delay } from "node:timers/promises";
 import solc from "solc";
 import { encodeAbiParameters, encodeFunctionData, keccak256, toHex } from "viem";
 import { simulateKeelPublicationBeforeFunding } from "../packages/sdk/dist/publication-preflight.js";
+import { createKeelPublicSepoliaSimulationPool } from "../packages/sdk/dist/public-simulation-pool.js";
+import { createNativeGethRuntime } from "./lib/native-geth-runtime.mjs";
 
 // Official Geth v1.17.8, commit a579077007b98217c3e253a66e4b452ca0c32b96.
 // Pull explicitly before running. The test itself cannot download an image.
@@ -17,13 +20,29 @@ const repositoryRoot = fileURLToPath(new URL("../", import.meta.url));
 const temporary = mkdtempSync(join(tmpdir(), "keel-native-publication-"));
 const container = `keel-native-publication-${process.pid}`;
 const containerUser = `${process.getuid()}:${process.getgid()}`;
+// Optional cloud fallback when the existing Docker data filesystem is full.
+// The separately reviewed runtime bundle contains the byte-verified image
+// binary plus a fresh user/network-namespace launcher and bounded IPC helper.
+const nativeRuntime = process.env.KEEL_NATIVE_GETH_RUNTIME_DIR;
+const nativeEngine = nativeRuntime ? createNativeGethRuntime({ runtimeDirectory: nativeRuntime,
+  dataDirectory: join(temporary, "data"), ipcPath: join(temporary, "geth.ipc"), logPath: join(temporary, "geth.log") }) : undefined;
 const owner = `0x${"11".repeat(20)}`, reader = `0x${"22".repeat(20)}`;
 const expectedTokenURI = 'data:application/json,{"name":"Synthetic state sequence"}';
 const selectedGasLimit = 200_000_000n;
+const syntheticClock = Date.parse("2026-10-11T12:00:00Z");
+const actualDateNow = Date.now;
+const clockStarted = performance.now();
 const evidence = { schema: "keel-native-geth-publication-test@1", image, synthetic: true,
   sourceCommit: execFileSync("git", ["rev-parse", "HEAD"], { cwd: repositoryRoot, encoding: "utf8" }).trim(),
+  testedFileSha256: Object.fromEntries(["scripts/verify-native-geth-publication.mjs", "scripts/lib/native-geth-runtime.mjs", "packages/sdk/dist/rpc.js",
+    "packages/sdk/dist/publication-preflight.js", "packages/sdk/dist/public-simulation-pool.js", "packages/sdk/dist/simulation-connection.js"]
+    .map(path => [path, createHash("sha256").update(readFileSync(join(repositoryRoot, path))).digest("hex")])),
   network: "none", productionStateUsed: false, signing: "not-performed", submission: "not-performed", checks: [] };
 let started = false;
+if (nativeEngine) {
+  evidence.executionEngine = nativeEngine.evidence.executionEngine;
+  evidence.nativeRuntime = nativeEngine.evidence;
+} else evidence.executionEngine = "docker-network-none";
 const docker = (...args) => execFileSync("docker", args, { encoding: "utf8", maxBuffer: 20 * 1024 * 1024, timeout: 60_000, stdio: ["ignore", "pipe", "pipe"] });
 const record = (name, details = {}) => { evidence.checks.push({ name, ...details }); console.log(`PASS ${name}`); };
 const source = readFileSync(join(fixtureRoot, "StateSequence.sol"), "utf8");
@@ -33,23 +52,38 @@ assert.deepEqual((compiled.errors ?? []).filter(error => error.severity === "err
 const artifact = compiled.contracts["StateSequence.sol"].StateSequence;
 const runtime = `0x${artifact.evm.deployedBytecode.object}`;
 const genesis = JSON.parse(readFileSync(join(fixtureRoot, "genesis.json"), "utf8"));
+// The pool checks head freshness against Date.now. Keep both clocks fixed after
+// Amsterdam activation; this is not a real Sepolia block or a head override.
+genesis.timestamp = toHex(BigInt(syntheticClock / 1000));
+// Only synthetic genesis funding: the shared pool's public zero-address probe
+// must prove strict nonce/fee validation without any per-request state override.
+genesis.alloc["0".repeat(40)] = { balance: genesis.alloc[owner.slice(2)].balance };
 genesis.alloc[reader.slice(2)] = { balance: "0x0", code: runtime };
 writeFileSync(join(temporary, "genesis.json"), JSON.stringify(genesis));
 const calldata = (name, args = []) => encodeFunctionData({ abi: artifact.abi, functionName: name, args });
 const calls = [0, 1, 2, 3, 4].map(nonce => ({ from: owner, to: reader, data: calldata("write", [100n]),
   value: "0x0", gas: toHex(16_000_000n), nonce: toHex(nonce), gasPrice: "0x30" }));
-const allowedMethods = new Set(["web3_clientVersion", "eth_chainId", "eth_getBlockByNumber", "eth_getBlockByHash", "eth_getTransactionCount", "eth_getCode", "eth_call", "eth_simulateV1"]);
+const allowedMethods = new Set(["web3_clientVersion", "eth_chainId", "eth_getBlockByNumber", "eth_getBlockByHash", "eth_getTransactionCount", "eth_getBalance", "eth_getCode", "eth_call", "eth_simulateV1"]);
 function rpc(method, params) {
   assert.ok(allowedMethods.has(method), `Unexpected RPC method: ${method}`);
-  writeFileSync(join(temporary, "request.json"), JSON.stringify({ jsonrpc: "2.0", id: 1, method, params }));
+  const request = JSON.stringify({ jsonrpc: "2.0", id: 1, method, params });
+  writeFileSync(join(temporary, "request.json"), request);
   // The only network access is loopback inside a --network none container.
-  const response = JSON.parse(docker("exec", container, "wget", "-Y", "off", "-q", "-O", "-", "--header=Content-Type: application/json",
-    "--post-file=/fixture/request.json", "http://127.0.0.1:8545"));
-  if (response.error) throw Object.assign(new Error(response.error.message), { code: response.error.code });
+  const response = nativeEngine ? nativeEngine.rawRequest(method, params)
+    : JSON.parse(docker("exec", container, "wget", "-Y", "off", "-q", "-O", "-", "--header=Content-Type: application/json",
+      "--post-file=/fixture/request.json", "http://127.0.0.1:8545"));
+  if (response.error) throw Object.assign(new Error(response.error.message), { code: response.error.code, data: response.error.data });
   return response.result;
 }
+async function stop() {
+  if (!started) return;
+  if (nativeEngine) await nativeEngine.stop();
+  else docker("rm", "-f", container);
+  started = false;
+}
 async function start(budget) {
-  if (started) { docker("rm", "-f", container); started = false; }
+  await stop();
+  if (nativeEngine) { await nativeEngine.start(budget); started = true; return; }
   docker("run", "--pull=never", "-d", "--name", container, "--network", "none", "--user", containerUser, "--memory", "768m", "--cpus", "2", "-v", `${temporary}:/fixture`, image,
     "--datadir", "/fixture/data", "--networkid", "31337", "--syncmode", "full", "--nodiscover", "--maxpeers", "0", "--cache", "64", "--ipcdisable",
     "--http", "--http.addr", "127.0.0.1", "--http.vhosts", "localhost", "--http.api", "eth,net,web3", "--rpc.gascap", String(budget), "--rpc.evmtimeout", "30s", "--rpc.http-body-limit", "16");
@@ -70,9 +104,82 @@ const plan = { planFingerprint: `0x${"aa".repeat(32)}`, chainId: 11155111, block
   metadataCall: { from: owner, to: reader, data: calldata("tokenURI", [1n]), value: "0x0", gas: toHex(1_000_000n) },
   expectedTokenURI, maximumTokenUriBytes: 2_000_000, maximumReadGas: 1_000_000n, collectionOverheadGas: 10_000n, maximumTransactionGas: selectedGasLimit };
 const transport = { request: async ({ method, params }) => rpc(method, params) };
+const syntheticEndpoints = ["https://approved-a.native.invalid", "https://approved-b.native.invalid"];
+function nativePool(base, { endpoints = syntheticEndpoints, approved = endpoints, beforeNative } = {}) {
+  const requests = [];
+  const pool = createKeelPublicSepoliaSimulationPool({ rpcUrls: endpoints, approvedProjectRpcUrls: approved,
+    readTransport: transport, block: { number: 0n, hash: base.hash }, minIntervalMs: 0,
+    fetchImpl: async (url, init) => {
+      assert.ok(endpoints.includes(url), "Only synthetic endpoint labels may reach the local adapter");
+      assert.equal(init.method, "POST"); assert.equal(init.redirect, "error");
+      const body = JSON.parse(init.body);
+      const project = body.method === "eth_simulateV1" && body.params[0].blockStateCalls.some(block =>
+        block.calls.some(call => call.data !== "0x" || call.from?.toLowerCase() === owner));
+      const entry = { endpoint: url, method: body.method, params: structuredClone(body.params), project };
+      requests.push(entry);
+      // Fault hooks may only inject failure/delay. Every successful JSON-RPC
+      // envelope and result below comes unchanged from the isolated real Geth.
+      const interrupted = await beforeNative?.(entry);
+      if (interrupted !== undefined) {
+        assert.ok(interrupted instanceof Response && !interrupted.ok, "Fault hooks cannot fabricate a successful response");
+        entry.httpStatus = interrupted.status;
+        return interrupted;
+      }
+      try {
+        const result = rpc(body.method, body.params);
+        entry.result = result;
+        return Response.json({ jsonrpc: "2.0", id: body.id, result });
+      } catch (error) {
+        assert.equal(typeof error.code, "number", "A Docker/adapter failure must not become an invented RPC rejection");
+        entry.rpcCode = error.code;
+        return Response.json({ jsonrpc: "2.0", id: body.id, error: { code: error.code, message: error.message,
+          ...(error.data === undefined ? {} : { data: error.data }) } });
+      }
+    },
+  });
+  return { pool, requests };
+}
+const projectRequests = fixture => fixture.requests.filter(request => request.project);
+const poolProof = async (fixture, input = plan) => {
+  try { return await simulateKeelPublicationBeforeFunding(input, fixture.pool); }
+  finally { await fixture.pool.close(); }
+};
+function assertNativePoolProof(fixture, proof, expected = plan) {
+  const projects = projectRequests(fixture).filter(request => request.result !== undefined);
+  assert.equal(proof.state, "ephemeral-simulation");
+  assert.equal(proof.signing, "not-performed"); assert.equal(proof.submission, "not-performed");
+  assert.equal(proof.completeTokenUriBytes, Buffer.byteLength(expected.expectedTokenURI));
+  assert.equal(proof.validatedTransactionCalls, expected.preparationCalls.length);
+  assert.deepEqual(projects.map(request => request.params[0].validation), [false, true, false]);
+  // SDK discovery intentionally omits fees; the strict replay must preserve
+  // the original fee-bound calls, with only their measured gas envelopes changed.
+  assert.deepEqual(projects[0].params[0].blockStateCalls.map(block => block.calls[0]), expected.preparationCalls
+    .map(({ gasPrice, maxFeePerGas, maxPriorityFeePerGas, ...call }) => call));
+  assert.deepEqual(projects[1].params[0].blockStateCalls.map(({ calls: [call] }) => { const { gas, ...rest } = call; return rest; }),
+    expected.preparationCalls.map(({ gas, ...call }) => call));
+  assert.deepEqual(projects[1].params[0].blockStateCalls, projects[2].params[0].blockStateCalls.slice(0, expected.preparationCalls.length));
+  for (const request of projects) {
+    assert.equal(request.params[1], "0x0");
+    assert.deepEqual(request.result.map(block => block.calls[0].status), request.result.map(() => "0x1"));
+    assert.deepEqual(request.result.map(block => block.transactions[0].gas), request.params[0].blockStateCalls.map(block => block.calls[0].gas));
+  }
+  const fullReturn = projects.at(-1).result.at(-1).calls[0].returnData;
+  assert.equal(fullReturn, encodeAbiParameters([{ type: "string" }], [expected.expectedTokenURI]));
+  return { phases: projects.map(request => ({ endpoint: request.endpoint, validation: request.params[0].validation,
+    blocks: request.params[0].blockStateCalls.length })), fullReturnHash: keccak256(fullReturn),
+    completeTokenUriBytes: proof.completeTokenUriBytes, transactionGasUsed: proof.transactionGasUsed,
+    simulationFingerprint: proof.simulationFingerprint };
+}
 try {
-  docker("image", "inspect", image);
-  docker("run", "--pull=never", "--rm", "--network", "none", "--user", containerUser, "-v", `${temporary}:/fixture`, image, "--datadir", "/fixture/data", "init", "/fixture/genesis.json");
+  Date.now = () => syntheticClock + Math.floor(performance.now() - clockStarted);
+  evidence.syntheticClock = new Date(syntheticClock).toISOString();
+  evidence.clockAdvancement = "elapsed-monotonic-time";
+  evidence.syntheticFundedProbe = `0x${"0".repeat(40)}`;
+  if (nativeEngine) nativeEngine.init(join(temporary, "genesis.json"));
+  else {
+    docker("image", "inspect", image);
+    docker("run", "--pull=never", "--rm", "--network", "none", "--user", containerUser, "-v", `${temporary}:/fixture`, image, "--datadir", "/fixture/data", "init", "/fixture/genesis.json");
+  }
   await start(50_000_000);
   evidence.clientVersion = rpc("web3_clientVersion", []);
   evidence.compiler = solc.version();
@@ -203,6 +310,97 @@ try {
   record("native strict validation rejects a fee envelope below base fee");
   await assert.rejects(simulateKeelPublicationBeforeFunding({ ...plan, maximumTransactionGas: selectedGasLimit + 1n }, transport), error => error.kind === "configuration-invalid");
   record("selected-chain transaction cap remains enforced");
+  const initialPool = nativePool(base);
+  const initialPoolProof = await poolProof(initialPool);
+  record("deployed shared pool completes real native qualification, stateful strict replay and the full metadata return",
+    assertNativePoolProof(initialPool, initialPoolProof));
+
+  let injected503 = false;
+  const recovering = nativePool(base, { beforeNative: entry => {
+    if (entry.project && entry.endpoint === syntheticEndpoints[0] && !injected503) {
+      injected503 = true; return new Response("Synthetic transport outage", { status: 503 });
+    }
+  } });
+  const recovered = await poolProof(recovering);
+  const recoveryRequests = projectRequests(recovering);
+  assert.equal(recoveryRequests.filter(request => request.endpoint === syntheticEndpoints[0]).length, 1);
+  assert.equal(recoveryRequests.filter(request => request.endpoint === syntheticEndpoints[1]).length, 3);
+  assert.equal(recoveryRequests[0].httpStatus, 503);
+  assert.deepEqual(recoveryRequests[0].params, recoveryRequests[1].params);
+  assert.ok(recovering.requests.filter(request => request.endpoint === syntheticEndpoints[1] && !request.project)
+    .some(request => request.rpcCode === -38011), "Replacement must prove native strict nonce enforcement before project replay");
+  record("shared pool recovers synthetic HTTP 503 by requalifying and replaying the whole unchanged program on the second approved label",
+    { ...assertNativePoolProof(recovering, recovered), observedHttpStatus: recoveryRequests[0].httpStatus,
+      unchangedProgramHash: keccak256(toHex(JSON.stringify(recoveryRequests[0].params))) });
+
+  const unapproved = nativePool(base, { endpoints: [syntheticEndpoints[0]], approved: [] });
+  await assert.rejects(poolProof(unapproved), error => error.kind === "configuration-invalid" && error.diagnostic?.recipientApprovalRequired === 1);
+  assert.equal(projectRequests(unapproved).length, 0);
+  assert.ok(unapproved.requests.some(request => request.rpcCode === -38011));
+  record("native capability success never sends a project to an unapproved endpoint label");
+
+  const reverting = nativePool(base);
+  const revertingPlan = { ...plan, preparationCalls: [{ ...calls[0], data: calldata("tokenURIForCount", [1n]) }], assertions: [] };
+  await assert.rejects(poolProof(reverting, revertingPlan), error => error.kind === "execution-reverted" && error.diagnostic?.callIndex === 0);
+  assert.equal(projectRequests(reverting).length, 1);
+  assert.equal(reverting.requests.some(request => request.endpoint === syntheticEndpoints[1]), false);
+  const nativeRevert = projectRequests(reverting)[0].result[0].calls[0];
+  assert.equal(nativeRevert.status, "0x0"); assert.equal(nativeRevert.error.code, 3);
+  record("real EVM revert remains terminal without shopping for a passing backend", {
+    rpcCode: nativeRevert.error.code, gasUsed: BigInt(nativeRevert.gasUsed).toString(), maxUsedGas: BigInt(nativeRevert.maxUsedGas).toString(),
+    returnDataHash: keccak256(nativeRevert.returnData),
+  });
+
+  const mismatch = nativePool(base);
+  await assert.rejects(poolProof(mismatch, { ...plan, expectedTokenURI: `${expectedTokenURI}wrong` }), error => error.kind === "metadata-mismatch");
+  assert.equal(mismatch.requests.some(request => request.endpoint === syntheticEndpoints[1]), false);
+  assert.equal(projectRequests(mismatch).at(-1).result.at(-1).calls[0].returnData,
+    encodeAbiParameters([{ type: "string" }], [expectedTokenURI]));
+  record("shared pool's real complete metadata result cannot satisfy different expected bytes");
+
+  let releaseCancelled, reachedCancelled;
+  const cancellationGate = new Promise(resolve => { releaseCancelled = resolve; });
+  const cancellationReached = new Promise(resolve => { reachedCancelled = resolve; });
+  const cancelled = nativePool(base, { beforeNative: async entry => {
+    if (entry.project) { reachedCancelled(); await cancellationGate; }
+  } });
+  const cancelledRun = simulateKeelPublicationBeforeFunding(plan, cancelled.pool);
+  // Attach rejection handling before closing, then allow the synthetic fetcher
+  // to return a late *real* native result, which must never become a proof.
+  const refusedCancellation = assert.rejects(cancelledRun, error => error.kind === "rpc-unavailable");
+  await cancellationReached;
+  const independent = nativePool(base);
+  assertNativePoolProof(independent, await poolProof(independent));
+  await cancelled.pool.close();
+  releaseCancelled();
+  await refusedCancellation;
+  assert.equal(projectRequests(cancelled).length, 1);
+  assert.equal(cancelled.requests.some(request => request.endpoint === syntheticEndpoints[1]), false);
+  assert.ok(projectRequests(cancelled)[0].result, "Cancellation fixture must actually return the late native result");
+  const reloaded = nativePool(base);
+  record("cancellation discards late native success without poisoning an independent or reloaded saved-plan check",
+    assertNativePoolProof(reloaded, await poolProof(reloaded)));
+
+  let single503 = false;
+  const singleRecipient = nativePool(base, { endpoints: [syntheticEndpoints[0]], beforeNative: entry => {
+    if (entry.project && !single503) { single503 = true; return new Response("Synthetic one-recipient outage", { status: 503 }); }
+  } });
+  let singleProof;
+  try { singleProof = await poolProof(singleRecipient); }
+  catch (error) {
+    const failure = { kind: error.kind, diagnostic: error.diagnostic,
+      privateRequests: projectRequests(singleRecipient).length, synthetic: true, signing: "not-performed", submission: "not-performed" };
+    console.error("SINGLE_RECIPIENT_503_FAILURE", JSON.stringify(failure));
+    if (process.env.KEEL_NATIVE_GETH_EVIDENCE) writeFileSync(process.env.KEEL_NATIVE_GETH_EVIDENCE,
+      `${JSON.stringify({ ...evidence, status: "failed", failedCheck: "single-approved-recipient-503-recovery", failure }, null, 2)}\n`);
+    throw error;
+  }
+  const singleRequests = projectRequests(singleRecipient);
+  assert.equal(singleRequests[0].httpStatus, 503);
+  assert.deepEqual(singleRequests[0].params, singleRequests[1].params);
+  assert.equal(singleRequests.length, 4, "Only one bounded retry may precede normal strict/read phases");
+  record("a single approved recipient recovers one observed HTTP 503 automatically through complete native requalification and replay",
+    assertNativePoolProof(singleRecipient, singleProof));
   assert.equal(BigInt(rpc("eth_call", [{ to: reader, data: calldata("read") }, "0x0"])), 0n);
   assert.equal(rpc("eth_getTransactionCount", [owner, "0x0"]), "0x0");
   assert.equal(rpc("eth_getBlockByNumber", ["latest", false]).hash, base.hash);
@@ -210,6 +408,7 @@ try {
   if (process.env.KEEL_NATIVE_GETH_EVIDENCE) writeFileSync(process.env.KEEL_NATIVE_GETH_EVIDENCE, `${JSON.stringify(evidence, null, 2)}\n`);
   console.log(JSON.stringify({ passed: evidence.checks.length, image, synthetic: true, published: false }));
 } finally {
-  if (started) docker("rm", "-f", container);
+  Date.now = actualDateNow;
+  await stop();
   rmSync(temporary, { recursive: true, force: true });
 }
