@@ -4,7 +4,7 @@ import { encodeAbiParameters, keccak256 } from 'viem';
 import { createKeelRpcPool } from '../packages/sdk/dist/rpc.js';
 import { createKeelPublicSepoliaSimulationPool } from '../packages/sdk/dist/public-simulation-pool.js';
 import { simulateKeelPublicationBeforeFunding } from '../packages/sdk/dist/publication-preflight.js';
-import { probePublicSimulationCandidates } from '../scripts/check-public-simulation-pool.mjs';
+import { APPROVED_PUBLICNODE_SEPOLIA_URL, probePublicSimulationCandidates, publicProbeOptions, publicProbeExitCode } from '../scripts/check-public-simulation-pool.mjs';
 
 const hash = n => `0x${BigInt(n).toString(16).padStart(64,'0')}`;
 const zero = `0x${'0'.repeat(40)}`, owner = `0x${'11'.repeat(20)}`, reader = `0x${'22'.repeat(20)}`;
@@ -194,4 +194,31 @@ test('public report refuses stale heads and invalid full-sequence evidence, and 
       if(fault.publicHttp) {assert.equal(item.publicProbes.length,1);assert.equal(item.publicProbes[0].httpStatus,fault.publicHttp);}
     }finally{await f.transport.close();}
   }
+});
+
+test('the approved CLI pins PublicNode and rejects URL overrides before probing', () => {
+  assert.deepEqual(publicProbeOptions(['--public-only', '--approved-publicnode-only', '--require-qualified']), {
+    rpcUrls: ['https://ethereum-sepolia-rpc.publicnode.com'], requireQualified: true,
+  });
+  assert.equal(APPROVED_PUBLICNODE_SEPOLIA_URL, 'https://ethereum-sepolia-rpc.publicnode.com');
+  assert.deepEqual(publicProbeOptions(['--public-only']), { requireQualified: false });
+  for (const args of [[], ['--approved-publicnode-only'], ['--public-only', '--public-only'],
+    ['--public-only', '--rpc-url=https://unapproved.invalid'], ['--public-only', 'https://unapproved.invalid']]) {
+    assert.throws(() => publicProbeOptions(args));
+  }
+});
+test('live gate fails on unavailable or incomplete qualification while retaining public-only evidence', async () => {
+  for (const fault of [{}, { publicHttp: 403 }, { publicHttp: 429 }, { longGas: true }, { longNonce: true }]) {
+    const f = fixture([fault]);
+    try {
+      const report = await probePublicSimulationCandidates({ rpcUrls: [urls[0]], fetchImpl: f.options.fetchImpl, minIntervalMs: 0 });
+      assert.equal(publicProbeExitCode(report, true), Object.keys(fault).length ? 1 : 0);
+      assert.equal(publicProbeExitCode(report, false), 0);
+      assert.equal(report.publicationVerified, false);
+      assert.equal(report.privateProjectDataSent, false);
+      assert.equal(f.privateRequests().length, 0);
+    } finally { await f.transport.close(); }
+  }
+  assert.equal(publicProbeExitCode({ candidates: [] }, true), 1);
+  assert.equal(publicProbeExitCode({ candidates: [{ publicQualification: 'passed', failure: { kind: 'rpc-unavailable' } }] }, true), 1);
 });
