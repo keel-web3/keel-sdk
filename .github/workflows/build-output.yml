@@ -1,0 +1,49 @@
+name: SDK package provenance
+on:
+  push:
+    branches: [codex/clean-package-builds-20261011]
+  pull_request:
+    paths: [scripts/build.mjs, scripts/build-output.mjs, tests/build-output.test.mjs, .github/workflows/build-output.yml]
+permissions:
+  contents: read
+jobs:
+  rebuild:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10.15.0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22.23.1
+      - run: pnpm install --frozen-lockfile
+      - run: node --test tests/build-output.test.mjs
+      - name: Compare clean build with a stale checkout rebuild
+        shell: bash
+        run: |
+          node scripts/build.mjs
+          mkdir first-packs second-packs
+          for package in protocol viewer sdk builder; do
+            (cd "packages/$package" && pnpm pack --pack-destination ../../first-packs)
+          done
+          mkdir -p packages/sdk/dist/proof-runtime
+          printf 'throw new Error("stale runtime");\n' > packages/sdk/dist/proof-runtime/runner-client.js
+          node scripts/build.mjs
+          for package in protocol viewer sdk builder; do
+            (cd "packages/$package" && pnpm pack --pack-destination ../../second-packs)
+          done
+          python3 - <<'PY'
+          import pathlib,hashlib,tarfile
+          for p in sorted(pathlib.Path('first-packs').glob('*.tgz')):
+              first=p.read_bytes();second=(pathlib.Path('second-packs')/p.name).read_bytes()
+              assert first==second, f'Rebuild changed package: {p.name}'
+              with tarfile.open(p) as t:
+                  assert not any(m.name.endswith('proof-runtime/runner-client.js') for m in t)
+              print(p.name, hashlib.sha256(first).hexdigest(), 'clean/rebuild identical')
+          PY
+          git diff --exit-code
+      - name: Run publication transport and wallet boundary regressions
+        run: node --test tests/sdk-simulation-connection.test.mjs tests/sdk-publication-preflight.test.mjs tests/sdk-public-simulation-pool.test.mjs tests/sdk-rpc.test.mjs tests/sdk-network-index.test.mjs tests/mcp-selected-chain-routing.test.mjs tests/transaction-gas-policy.test.mjs tests/sdk-release-wallet-batch.test.mjs tests/rpc-publication-simulation.test.mjs tests/sdk-intrinsic-validation-evidence.test.mjs
