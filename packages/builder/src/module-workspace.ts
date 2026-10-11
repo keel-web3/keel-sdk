@@ -524,6 +524,8 @@ export interface KeelModuleCatalog {
 export interface IndexKeelWorkspaceOptions {
   /** Fallback repository URL for manifests that carry none (the keel-modules shape). */
   readonly repositoryUrl?: string;
+  /** Preserve an explicitly selected legacy host catalog format. New catalogs default to Base90. */
+  readonly runtimeEncoding?: "base64" | "base90";
 }
 
 export interface IndexKeelWorkspaceResult {
@@ -609,7 +611,9 @@ async function catalogEntry(module: KeelWorkspaceModule, options: IndexKeelWorks
     deployed: deployments.length > 0,
     provenance: "vendored",
     origin: null,
-    runtime: await prepareKeelModuleRuntime(new Uint8Array(shippedBytes), { format: recipe.options.format, entry: recipe.entry }),
+    runtime: options.runtimeEncoding === "base64"
+      ? { encoding: "base64", data: shippedBytes.toString("base64"), format: recipe.options.format, entry: recipe.entry }
+      : await prepareKeelModuleRuntime(new Uint8Array(shippedBytes), { format: recipe.options.format, entry: recipe.entry }),
   };
 }
 
@@ -677,6 +681,9 @@ async function registrationCatalogEntry(
  * id and the file layout is stable, so a rebuild-free re-index is a no-op diff.
  */
 export async function indexKeelWorkspace(root: string, options: IndexKeelWorkspaceOptions = {}): Promise<IndexKeelWorkspaceResult> {
+  if (options.runtimeEncoding !== undefined && options.runtimeEncoding !== "base64" && options.runtimeEncoding !== "base90") {
+    throw new TypeError("Catalog runtime encoding must be base64 or base90.");
+  }
   const resolvedRoot = path.resolve(root);
   const modules = await discoverKeelWorkspaceModules(resolvedRoot, { allowEmpty: true });
   const publishers = await discoverKeelWorkspacePublishers(resolvedRoot);
