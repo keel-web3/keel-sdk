@@ -4,6 +4,8 @@ import { createKeelPublicSepoliaSimulationPool } from "../packages/sdk/dist/publ
 import { keelSimulationTransportFailure, keelSimulationTransportDiagnostic } from "../packages/sdk/dist/publication-preflight.js";
 import { resolveKeelTransactionGasPolicy } from "../packages/sdk/dist/transaction-gas-policy.js";
 
+export const APPROVED_PUBLICNODE_SEPOLIA_URL = "https://ethereum-sepolia-rpc.publicnode.com";
+
 const zero = `0x${"0".repeat(40)}`, hex = n => `0x${BigInt(n).toString(16)}`;
 /** Explicit operator diagnostic only. No retries, project bytes, or private recipient approval.
  * Use the production selector's complete public qualification so report success
@@ -71,7 +73,27 @@ export async function probePublicSimulationCandidates({ rpcUrls = resolveKeelRpc
   }
   return report;
 }
+/** Choose the recipient before any network request. Do not accept arbitrary URLs. */
+export function publicProbeOptions(args) {
+  const allowed = new Set(["--public-only", "--approved-publicnode-only", "--require-qualified"]);
+  if (new Set(args).size !== args.length || args.some(arg => !allowed.has(arg)) || !args.includes("--public-only")) {
+    throw new Error("Use --public-only [--approved-publicnode-only] [--require-qualified]; only public empty calls are sent.");
+  }
+  return {
+    ...(args.includes("--approved-publicnode-only") ? { rpcUrls: [APPROVED_PUBLICNODE_SEPOLIA_URL] } : {}),
+    requireQualified: args.includes("--require-qualified"),
+  };
+}
+
+export function publicProbeExitCode(report, requireQualified) {
+  if (!requireQualified) return 0; // An explicit observational diagnostic, not a gate.
+  return report.candidates.length > 0 && report.candidates.every(candidate =>
+    candidate.publicQualification === "passed" && !candidate.failure) ? 0 : 1;
+}
+
 if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
-  if (process.argv.slice(2).join(" ") !== "--public-only") throw new Error("Use --public-only: this command probes only the maintained indexed endpoints with public empty calls.");
-  console.log(JSON.stringify(await probePublicSimulationCandidates(), null, 2));
+  const { requireQualified, ...options } = publicProbeOptions(process.argv.slice(2));
+  const report = await probePublicSimulationCandidates(options);
+  console.log(JSON.stringify(report, null, 2));
+  process.exitCode = publicProbeExitCode(report, requireQualified);
 }
