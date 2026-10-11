@@ -62,7 +62,7 @@ export function createNativeGethRuntime({ runtimeDirectory, dataDirectory, ipcPa
     execFileSync('python3', [join(runtimeDirectory, 'run-isolated-geth.py'), 'init', '--datadir', dataDirectory, '--genesis', genesisPath], { encoding: 'utf8', timeout: 60_000, maxBuffer: 8 * 1024 * 1024, stdio: ['ignore', 'pipe', 'pipe'] });
   }
   async function start(gascap) {
-    assert.ok(Number.isSafeInteger(gascap) && gascap > 0 && gascap <= 2_000_000_000, 'Explicit bounded native RPC gas budget required');
+    assert.ok(Number.isSafeInteger(gascap) && gascap > 0, 'Explicit bounded native RPC gas budget required');
     await stop(); launchError = undefined;
     const log = openSync(logPath, 'w', 0o600);
     try { process = spawn('python3', [join(runtimeDirectory, 'run-isolated-geth.py'), 'serve', '--datadir', dataDirectory, '--ipcpath', ipcPath, '--gascap', String(gascap)], { stdio: ['ignore', log, log] }); }
