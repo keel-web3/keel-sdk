@@ -9,6 +9,8 @@ test('SDK publication references expose an existing REDLINE token without claimi
  const uri81=refs.find(ref=>ref.transport.payload==='uri81-block-v1');
  assert.equal(uri81.collection,'0x8c5731dc35301fA5c222e82bd5405414BDc45Ca2');
  assert.equal(uri81.uriCompatibility.tokenURI.strictURICompatible,true);
+ assert.equal(uri81.managedRoute.manager,'0x560AeEFAE5e9a9cC94198B25Dc359C1579763DB6');
+ assert.equal(uri81.managedRoute.inspectionTool,'keel-manager-modules-inspect');
  assert.ok(refs.some(ref=>ref.collection==='0xAe73eC8A4867C3886E8987371f0D57943f0f6BDB'));
  assert.equal(refs[0].authenticatedThisRun,false);
  assert.equal(refs[0].verification,'requires-selected-chain-readback');
@@ -40,4 +42,8 @@ test('core MCP handshake and policy declare URI81, automatic compression and man
  assert.match(init.result.instructions,/URI81 applies to both compressed and uncompressed/);
  assert.match(init.result.instructions,/keel-inline-reuse-plan/);
  assert.match(init.result.instructions,/Compression never makes Base90 URI-safe/);
+ assert.match(init.result.instructions,/Before declaring a KEEL route immutable/);
+ const list=await server.handle({jsonrpc:'2.0',id:2,method:'tools/list',params:{}});
+ assert.ok(list.result.tools.some(tool=>tool.name==='keel-manager-modules-inspect'));
+ assert.ok(list.result.tools.some(tool=>tool.name==='keel-manager-module-replacement-prepare'));
 });

@@ -48,11 +48,12 @@ export async function searchKeelPublicationReferences(input: {
         tokenURI: { byteLength: tokenURI.byteLength, sha256: tokenURI.sha256 },
         mintTransaction: reference.mintTransaction, shellId: reference.shellId, records,
         transport: reference.transport, uriCompatibility: reference.uriCompatibility,
+        managedRoute: reference.managedRoute,
       };
       if (!JSON.stringify(candidate).toLowerCase().includes(query)) continue;
       matches.push({ ...candidate, source: "publication-reference-manifest", sourcePath,
         verification: "requires-selected-chain-readback", authenticatedThisRun: false,
-        next: "Read the exact tokenURI, resolve committed modules and reuse unchanged object IDs through keel-inline-reuse-plan. Do not infer absence from an empty index." });
+        next: "Read the exact tokenURI, inspect any managedRoute with keel-manager-modules-inspect, resolve committed modules and reuse unchanged object IDs through keel-inline-reuse-plan. Do not infer absence from an empty index." });
       if (matches.length >= limit) return matches;
     }
   }
