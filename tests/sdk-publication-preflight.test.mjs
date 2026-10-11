@@ -540,3 +540,46 @@ test('discovery retries only strictly smaller explicit capacity evidence and sto
   assert.deepEqual(source,before); assert.equal(calls.length,4);
   assert.deepEqual(calls.map(s=>s.map(c=>c.data)),Array.from({length:4},()=>['0x1234','0x5678']));
 });
+
+test('reverted execution retains exact pinned and returned evidence without raw error data or an inferred inner cause', async () => {
+  const revertData = '0x534543524554';
+  const f = alteredEnvelopeTransport(1, result => {
+    result[0].calls[0] = { status: '0x0', gasUsed: '0x100', maxUsedGas: '0x110', returnData: revertData,
+      error: { code: 3, message: 'PRIVATE execution error', data: revertData } };
+  });
+  await assert.rejects(simulateKeelPublicationBeforeFunding(input(), f.transport), error => {
+    assert.equal(error.kind, 'execution-reverted');
+    assert.deepEqual(Object.fromEntries(['callIndex','requestedGasLimit','returnedGasLimit','gasUsed','maxUsedGas','rpcCode','pinnedBlockNumber','pinnedBlockHash','readerRuntimeCodeHash','revertDataBytes','revertDataHash'].map(k => [k,error.diagnostic[k]])), {
+      callIndex: 0, requestedGasLimit: '1000000', returnedGasLimit: '1000000', gasUsed: '256', maxUsedGas: '272', rpcCode: 3,
+      pinnedBlockNumber: '18', pinnedBlockHash: block.hash, readerRuntimeCodeHash: keccak256('0x6000'), revertDataBytes: 6, revertDataHash: keccak256(revertData),
+    });
+    assert.equal(error.diagnostic.phase, 'ephemeral-execution');
+    assert.equal(error.diagnostic.planFingerprint, input().planFingerprint);
+    assert.doesNotMatch(JSON.stringify(error), /PRIVATE|534543524554|out of gas/); return true;
+  });
+});
+
+test('provider failure reason survives the publication boundary with bounded response evidence only', async () => {
+  const transportError = Object.assign(new Error('SECRET https://private.invalid'), { name: 'KeelRpcSetupError', reason: 'invalid-response', diagnostic: {
+    transportFailure: 'invalid-response', failureReason: 'invalid-response', responseFailure: 'response-too-large', responseBytes: 16777217, maximumResponseBytes: 16777216,
+    body: 'PRIVATE', endpoint: 'SECRET', approval: '0x1234',
+  } });
+  await assert.rejects(simulateKeelPublicationBeforeFunding(input(), fixture({ error: transportError }).transport), error => {
+    assert.equal(error.kind, 'rpc-unavailable'); assert.equal(error.diagnostic.failureReason, 'invalid-response');
+    assert.equal(error.diagnostic.transportFailure, 'invalid-response'); assert.equal(error.diagnostic.responseFailure, 'response-too-large');
+    assert.equal(error.diagnostic.responseBytes, 16777217); assert.equal(error.diagnostic.maximumResponseBytes, 16777216);
+    assert.equal(error.diagnostic.pinnedBlockHash, block.hash); assert.doesNotMatch(JSON.stringify(error), /PRIVATE|SECRET|0x1234|https:|artwork.*too large/); return true;
+  });
+  const rejected = keelSimulationTransportDiagnostic({ diagnostic: { failureReason: 'SECRET', responseFailure: 'PRIVATE', responseBytes: Infinity,
+    maximumResponseBytes: -1, gasUsed: '-1', pinnedBlockHash: 'SECRET', target: 'PRIVATE', selector: 'https://secret.invalid' } });
+  for (const key of ['failureReason','responseFailure','responseBytes','maximumResponseBytes','gasUsed','pinnedBlockHash','target','selector']) assert.equal(rejected[key], undefined);
+});
+
+
+test('direct estimate reverts retain only error code and revert digest, including empty revert data', () => {
+  for (const data of ['0x', '0xdeadbeef']) {
+    const diagnostic = keelSimulationTransportDiagnostic({ code: 3, data, message: 'PRIVATE' }, { method: 'eth_estimateGas', phase: 'project-estimate' });
+    assert.equal(diagnostic.rpcCode, 3); assert.equal(diagnostic.revertDataBytes, (data.length - 2) / 2);
+    assert.equal(diagnostic.revertDataHash, keccak256(data)); assert.doesNotMatch(JSON.stringify(diagnostic), /PRIVATE|deadbeef/);
+  }
+});

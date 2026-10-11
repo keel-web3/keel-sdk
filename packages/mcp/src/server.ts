@@ -1,5 +1,6 @@
 import { STUDIO_RELEASE_RECOVERY_GUIDANCE } from "./studio-wallet-guidance.js";
 import { findKeelRpcSetupError } from "@keel/sdk/rpc";
+import { keelSimulationTransportDiagnostic } from "@keel/sdk/publication-preflight";
 import { KeelNetworkIndexError } from '@keel/sdk/network-index';
 import { PREPARED_COPY_GUIDANCE, COPY_PUBLICATION_GUIDANCE, BINARY_PAYLOAD_GUIDANCE } from "./prepared-copy-guidance.js";
 import { STUDIO_WALLET_GUIDANCE } from "./studio-wallet-guidance.js";
@@ -84,7 +85,7 @@ function toolError(error: unknown): ToolCallResult {
     return { content: [{ type: 'text', text: JSON.stringify(structuredContent) }], structuredContent, isError: true };
   }
   const setup = findKeelRpcSetupError(error);
-  if (setup) { const structuredContent = { code: setup.code, reason: setup.reason, retryAfterMs: setup.retryAfterMs, providers: setup.providers, setup: setup.setup, signing: "not-performed", submission: "not-performed" };
+  if (setup) { const structuredContent = { code: setup.code, reason: setup.reason, diagnostic: keelSimulationTransportDiagnostic(setup), retryAfterMs: setup.retryAfterMs, providers: setup.providers, setup: setup.setup, signing: "not-performed", submission: "not-performed" };
     return { content: [{ type: "text", text: JSON.stringify(structuredContent) }], structuredContent, isError: true }; }
   const text = errorText(error);
   return { content: [{ type: "text", text }], isError: true };
