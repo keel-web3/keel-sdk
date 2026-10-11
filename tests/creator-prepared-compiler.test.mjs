@@ -1,7 +1,8 @@
 import {compileKeelCreatorPreparedPublication} from '../packages/sdk/dist/creator-prepared-compiler.js';
 import test from 'node:test';import assert from 'node:assert/strict';
 import {parseAbi,keccak256,encodeFunctionResult,decodeFunctionData,toHex,stringToHex,sha256} from 'viem';
-import {prepareKeelAuthenticatedCreatorInline,prepareKeelCreatorInline,buildKeelNetworkIndex,keelHoldAbi} from '../packages/sdk/dist/index.js';
+import {prepareKeelAuthenticatedCreatorInline,prepareKeelCreatorInline,prepareKeelDenseCopyFragment,decodeKeelInlineDataURI,buildKeelNetworkIndex,keelHoldAbi} from '../packages/sdk/dist/index.js';
+import {createKeelManagedObjectPlan} from '../packages/sdk/dist/native-managed.js';
 const names=['KeelHold','KeelCreatorFactory','KeelArtifactTokenRenderer','KeelMintRouteRegistry','KeelRawTokenURIBuilder','KeelRawInlineShellRegistry','KeelRawFragmentValidationRegistry','KeelArtifactRegistry'];
 const address=n=>'0x'+n.toString(16).padStart(40,'0'), hash=n=>'0x'+n.toString(16).padStart(64,'0');
 const addresses=Object.fromEntries(names.map((n,i)=>[n,address(i+1)]));
@@ -18,6 +19,14 @@ const abi=parseAbi([...keelHoldAbi,
  'function contextURI(bytes) pure returns(bytes)', 'function percentEscape(bytes) pure returns(bytes)']);
 async function fixture(bad={}){
  const plan=await prepareKeelCreatorInline({...publication,chainId:31337,store:addresses.KeelHold});
+ if(bad.legacyShell){
+  const {readFile}=await import('node:fs/promises');
+  const uri=await readFile(new URL('../deployments/creator-inline-20261005/minted-token.uri',import.meta.url),'utf8');
+  const metadata=JSON.parse(new TextDecoder().decode(decodeKeelInlineDataURI(uri,'application/json')));
+  const html=new TextDecoder().decode(decodeKeelInlineDataURI(metadata.animation_url,'text/html'));
+  const bytes=prepareKeelDenseCopyFragment(html.slice(html.indexOf('];queueMicrotask')));
+  plan.shell.suffix={id:'legacy-shell-suffix',bytes,...await createKeelManagedObjectPlan(bytes,{hold:addresses.KeelHold,mediaType:'application/vnd.keel.token-uri-raw-percent-fragment',compression:'none'})};
+ }
  const objects=new Map([plan.shell.prefix,plan.shell.suffix].map(o=>[o.objectId,o]));const preparedObjects=new Map(plan.objects.map(o=>[o.objectId,o]));const requests=[];
  const pool={status:()=>[],request:async req=>{requests.push(req);
   if(req.method==='eth_chainId')return '0x7a69';if(req.method==='eth_blockNumber')return '0x2';
@@ -113,4 +122,10 @@ test('managed payload above 512KiB preserves its exact prepared graph under fee-
  assert.ok(writes.filter(s=>s.functionName==='castSlugsFor').every(s=>s.args[1].length===1));
  assert.ok(result.journal.steps.filter(s=>s.phase==='validate').length>10);
  assert.ok(BigInt(result.platformFee)>0n);
+});
+
+test('legacy registered carriage fails before quoting or publishing fresh payloads',async()=>{
+ const f=await fixture({legacyShell:true});
+ await assert.rejects(()=>compileKeelCreatorPreparedPublication({pool:f.pool,index,publication,...config}),error=>error.code==='KEEL_REGISTERED_CARRIAGE_MISMATCH');
+ assert.ok(!f.requests.some(request=>request.method==='eth_sendRawTransaction'));
 });

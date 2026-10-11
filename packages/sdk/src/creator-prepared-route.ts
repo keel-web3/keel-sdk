@@ -7,7 +7,7 @@ import type { KeelRpcPool } from "./rpc.js";
 import { prepareKeelCreatorInline } from "./creator-prepared-inline.js";
 import { createKeelManagedObjectPlan } from "./native-managed.js";
 import { decodeKeelPreparedDenseCopyFragment } from "./dense-transport.js";
-import { inspectKeelInlinePayloadCarriage } from "./inline-transport-audit.js";
+import { inspectKeelInlinePayloadCarriage, inspectKeelPreparedDenseCopyDocument } from "./inline-transport-audit.js";
 
 const ABI = parseAbi([
   "function preparedCopyBuilder() view returns(address)",
@@ -85,11 +85,14 @@ export async function prepareKeelAuthenticatedCreatorInline(input: {
     return object;
   };
   const [prefix, suffix] = await Promise.all([registered(shell[0], "registered-shell-prefix"), registered(shell[1], "registered-shell-suffix")]);
-  const plan = await prepareKeelCreatorInline({ ...input.publication, chainId: target.chainId, store: target.store });
   const decode = (bytes: Uint8Array) => new TextDecoder("utf-8", { fatal: true }).decode(decodeKeelPreparedDenseCopyFragment(bytes));
+  const plan = await prepareKeelCreatorInline({ ...input.publication, chainId: target.chainId, store: target.store });
   const html = decode(prefix.bytes) + decode(plan.preparedBodyBytes) + decode(suffix.bytes);
+  // Authenticate the registered decoder before quoting or publishing new payloads.
+  const registeredShell = inspectKeelPreparedDenseCopyDocument(html);
+  if (registeredShell?.transportProfile !== "uri81-block-v1") throw Object.assign(new TypeError("Registered shell uses a legacy carriage; fresh preparation requires an authenticated URI81 shell. Reuse existing bindings unchanged; do not replace the shell or upload engines."), { code: "KEEL_REGISTERED_CARRIAGE_MISMATCH" });
   const audit = inspectKeelInlinePayloadCarriage(new TextEncoder().encode(html));
-  if (audit.preparedDenseCopy?.transportProfile !== "base90-v1" || audit.payloadCount !== plan.resources.length) throw new TypeError("Registered shell does not match the prepared payload profile.");
+  if (audit.preparedDenseCopy?.transportProfile !== "uri81-block-v1" || audit.payloadCount !== plan.resources.length) throw new TypeError("Registered shell does not match the prepared payload profile.");
   const preparedBytesBeforeLiveEnvelope = plan.preparedBytesBeforeLiveEnvelope - plan.shell.prefix.bytes.length - plan.shell.suffix.bytes.length + prefix.bytes.length + suffix.bytes.length;
   if (preparedBytesBeforeLiveEnvelope + 65_536 > 2_000_000) throw new RangeError("Registered prepared Inline exceeds the complete URI reserve.");
   const canonicalBlock = await input.pool.request({ method: "eth_getBlockByNumber", params: [block, false] }) as { hash?: unknown };

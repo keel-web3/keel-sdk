@@ -85,7 +85,7 @@ async function poll(read, accept, label, timeout = 10_000) {
 
 
 // Synthetic bindings exercise browser bytes only; this is not chain authentication.
-test('default Brotli/Base90 COPY survives both escaped data URI layers in Chrome and blocks a changed payload', { timeout: 60000 }, async () => {
+test('default Brotli/URI81 COPY survives both escaped data URI layers in Chrome and blocks a changed payload', { timeout: 60000 }, async () => {
   const source = Buffer.from('<!doctype html><p>Hello🔥%#</p><script>top.postMessage({tag:"keel-brotli-byte-proof",value:"Hello🔥%#"},"*")</script>' + '<!--compressed-->' .repeat(100));
   const payload = prepareKeelDensePayload(source);
   assert.equal(payload.compression, 'brotli');
@@ -126,7 +126,7 @@ test('default Brotli/Base90 COPY survives both escaped data URI layers in Chrome
       const origin = 'http://127.0.0.1:' + server.address().port;
       const read = async () => (await browser.send('Runtime.evaluate', { expression: 'document.getElementById("proof")?.textContent', returnByValue: true }, sessionId)).result.value;
       await browser.send('Page.navigate', { url: origin + '/valid' }, sessionId);
-      try { await poll(read, value => value === 'Hello🔥%#', 'Brotli/Base90 artwork', 10000); } catch(error) { const snapshots=[]; for(const context of contexts.values()){try{const result=await browser.send('Runtime.evaluate',{contextId:context.contextId,expression:'JSON.stringify({url:location.protocol,status:document.getElementById("keel-status")?.textContent,body:document.body?.textContent.slice(0,300),crypto:!!crypto.subtle,context:!!globalThis.__KEEL_CONTEXT__,frames:document.querySelectorAll("iframe").length})',returnByValue:true},context.sessionId);snapshots.push(result.result.value);}catch{}} throw new Error(error.message+'; '+JSON.stringify({problems,snapshots})); }
+      try { await poll(read, value => value === 'Hello🔥%#', 'Brotli/URI81 artwork', 10000); } catch(error) { const snapshots=[]; for(const context of contexts.values()){try{const result=await browser.send('Runtime.evaluate',{contextId:context.contextId,expression:'JSON.stringify({url:location.protocol,status:document.getElementById("keel-status")?.textContent,body:document.body?.textContent.slice(0,300),crypto:!!crypto.subtle,context:!!globalThis.__KEEL_CONTEXT__,frames:document.querySelectorAll("iframe").length})',returnByValue:true},context.sessionId);snapshots.push(result.result.value);}catch{}} throw new Error(error.message+'; '+JSON.stringify({problems,snapshots})); }
       await browser.send('Page.navigate', { url: origin + '/changed' }, sessionId);
       await new Promise(resolve => setTimeout(resolve, 2500));
       assert.equal(await read(), 'pending');

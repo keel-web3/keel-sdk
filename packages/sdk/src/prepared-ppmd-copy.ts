@@ -14,7 +14,7 @@ const utf8=(s:string)=>new TextEncoder().encode(s);
  * Compressors run at preparation time and must replay the exact source bytes. */
 export async function buildKeelPreparedPpmdCopyShell(input: {
   readonly embeddedContainerDelivery:{readonly chainId:number;readonly store:string};
-  readonly binaryPayloadCarriage?: "base90" | "uri81";
+  readonly binaryPayloadCarriage?: "uri81";
   readonly items:readonly KeelStandaloneViewerItem[];
   readonly fitViewport?:{readonly width:number;readonly height:number};
   readonly optionalMarketplaceInfo?:import("./marketplace-reader.js").KeelShellMarketplaceConfig;
@@ -22,9 +22,9 @@ export async function buildKeelPreparedPpmdCopyShell(input: {
   readonly gzipCompressor?:(bytes:Uint8Array)=>Uint8Array|Promise<Uint8Array>;
 }) {
   if(!Array.isArray(input.items)||!input.items.length||input.items.length>128||typeof input.ppmdCompressor!=="function")throw new TypeError("PPMd boot requires bounded descriptors and a build-time compressor");
-  const carriage=input.binaryPayloadCarriage??"base90";
-  if(!["base90","uri81"].includes(carriage))throw new TypeError("Shared PPMd COPY requires Base90 or URI81 carriage");
-  const transportProfile=carriage==="base90"?"base90-v1":"uri81-block-v1";
+  const carriage=input.binaryPayloadCarriage??"uri81";
+  if(carriage!=="uri81")throw new TypeError("Fresh shared PPMd COPY requires URI81; reuse legacy Base90 objects unchanged");
+  const transportProfile="uri81-block-v1";
   const canonical=await buildCompactInlineKeelShell({codecProfile:"ppmd-js",binaryPayloadCarriage:carriage,decoderDelivery:"preloaded",contextCarriage:"columns-v1",embeddedContainerDelivery:input.embeddedContainerDelivery,...(input.fitViewport?{fitViewport:input.fitViewport}:{}),...(input.optionalMarketplaceInfo?{optionalMarketplaceInfo:input.optionalMarketplaceInfo}:{})});
   const raw=Buffer.from(canonical.suffix).toString(),close=raw.lastIndexOf("</script>");
   if(!raw.startsWith("];")||close<2)throw new TypeError("Missing canonical boot boundaries");
