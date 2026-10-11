@@ -131,6 +131,9 @@ test('MCP loads workspace providers and returns redacted structured setup instru
     const failed = (await call(4,'keel-rpc-check')).result;
     assert.equal(failed.isError, true); assert.equal(failed.structuredContent.code, 'rpc.setup-required');
     assert.equal(failed.structuredContent.setup.action, 'ask-user-to-configure-rpc');
+    assert.equal(failed.structuredContent.diagnostic.httpStatus, 429);
+    assert.equal(failed.structuredContent.diagnostic.failureReason, 'rate-limited');
+    assert.equal(failed.structuredContent.diagnostic.transportFailure, 'rate-limited');
     assert.ok(failed.structuredContent.retryAfterMs > 19000); assert.doesNotMatch(JSON.stringify(failed), /secret-api-key/u);
   } finally { globalThis.fetch = previous; await rm(root, { recursive: true, force: true }); }
 });

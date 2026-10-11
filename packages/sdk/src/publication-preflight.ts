@@ -100,23 +100,30 @@ export function keelSimulationTransportDiagnostic(error: unknown, context: {
   readonly transport?: string;
 } = {}): Readonly<Record<string, string | number>> {
   const methods = ["eth_chainId", "eth_getBlockByNumber", "eth_getTransactionCount", "eth_getBalance", "eth_getCode", "eth_estimateGas", "eth_simulateV1"];
-  const phases = ["publication-preflight", "public-qualification", "project-estimate", "project-request", "initial-storage"];
-  const classes = ["Error", "TypeError", "TimeoutError", "HttpRequestError", "WebSocketRequestError", "SocketClosedError", "RpcRequestError", "UnknownRpcError", "KeelPublicationSimulationError"];
-  const failures = ["timeout", "connection-reset", "connection-closed", "dns", "rate-limited", "http-error", "rpc-error", "unknown"];
+  const phases = ["publication-preflight", "public-qualification", "project-estimate", "project-request", "initial-storage", "ephemeral-execution", "transaction-validation"];
+  const classes = ["Error", "TypeError", "TimeoutError", "HttpRequestError", "WebSocketRequestError", "SocketClosedError", "RpcRequestError", "UnknownRpcError", "KeelPublicationSimulationError", "KeelRpcSetupError", "KeelRpcResponseError"];
+  const failures = ["timeout", "connection-reset", "connection-closed", "dns", "rate-limited", "http-error", "rpc-error", "invalid-response", "unknown"];
   const codes = ["ETIMEDOUT", "ECONNRESET", "ECONNREFUSED", "EPIPE", "ENOTFOUND", "EAI_AGAIN", "UND_ERR_CONNECT_TIMEOUT", "UND_ERR_SOCKET"];
   const closeReasons = ["empty", "message-too-large", "rate-limited", "timeout", "server-unavailable", "protocol-error", "policy-violation", "other"];
   const stages = ["connection", "chain", "snapshot", "public-account", "read-capacity", "strict-capacity", "strict-nonce", "snapshot-recheck"];
   const transports = ["websocket", "https"];
   const transactionValidation = ["intrinsic-gas"];
+  const failureReasons = ["rate-limited", "unavailable", "wrong-chain", "access-denied", "history-unavailable", "invalid-response"];
+  const responseFailures = ["missing-body", "response-too-large", "invalid-json", "invalid-envelope", "missing-result"];
   const result: Record<string, string | number> = {};
   const pick = (source: Record<string, unknown> | undefined) => {
     if (!source) return;
-    for (const [key, values] of [["rpcMethod", methods], ["phase", phases], ["stage", stages], ["transport", transports], ["errorClass", classes], ["causeClass", classes], ["transportFailure", failures], ["transportCode", codes], ["socketCloseReason", closeReasons], ["transactionValidation", transactionValidation]] as const)
+    for (const [key, values] of [["rpcMethod", methods], ["phase", phases], ["stage", stages], ["transport", transports], ["errorClass", classes], ["causeClass", classes], ["transportFailure", failures], ["transportCode", codes], ["socketCloseReason", closeReasons], ["transactionValidation", transactionValidation], ["failureReason", failureReasons], ["responseFailure", responseFailures]] as const)
       if (typeof source[key] === "string" && values.includes(source[key])) result[key] = source[key];
-    for (const [key, low, high] of [["rpcCode", -2147483648, 2147483647], ["httpStatus", 100, 599], ["socketReadyState", 0, 3], ["causeDepth", 0, 8], ["socketCloseCode", 1000, 4999], ["connectionAttempts", 1, 3], ["requestPayloadBytes", 0, 1073741824], ["blockCount", 0, 1000000], ["callCount", 0, 1000000], ["blockIndex", 0, 255], ["callIndex", 0, 65535]] as const)
+    for (const [key, low, high] of [["rpcCode", -2147483648, 2147483647], ["httpStatus", 100, 599], ["socketReadyState", 0, 3], ["causeDepth", 0, 8], ["socketCloseCode", 1000, 4999], ["connectionAttempts", 1, 3], ["requestPayloadBytes", 0, 1073741824], ["blockCount", 0, 1000000], ["callCount", 0, 1000000], ["blockIndex", 0, 255], ["callIndex", 0, 65535], ["responseBytes", 0, 1073741824], ["maximumResponseBytes", 0, 1073741824], ["revertDataBytes", 0, 1073741824]] as const)
       if (typeof source[key] === "number" && Number.isInteger(source[key]) && source[key] >= low && source[key] <= high) result[key] = source[key];
-    for (const key of ["requestedGasLimit", "providerGasCap", "requiredProgramGas"])
-      if (typeof source[key] === "string" && /^[1-9]\d{0,19}$/u.test(source[key]) && BigInt(source[key]) <= 18_446_744_073_709_551_615n) result[key] = source[key];
+    for (const key of ["requestedGasLimit", "providerGasCap", "requiredProgramGas", "returnedGasLimit", "gasUsed", "maxUsedGas", "pinnedBlockNumber"])
+      if (typeof source[key] === "string" && /^(?:0|[1-9]\d{0,19})$/u.test(source[key]) && BigInt(source[key]) <= 18_446_744_073_709_551_615n
+        && (source[key] !== "0" || ["gasUsed", "maxUsedGas", "pinnedBlockNumber"].includes(key))) result[key] = source[key];
+    for (const key of ["pinnedBlockHash", "readerRuntimeCodeHash", "revertDataHash", "planFingerprint"])
+      if (typeof source[key] === "string" && /^0x[0-9a-f]{64}$/iu.test(source[key])) result[key] = source[key].toLowerCase();
+    if (typeof source.target === "string" && /^0x[0-9a-f]{40}$/iu.test(source.target)) result.target = source.target;
+    if (typeof source.selector === "string" && /^0x[0-9a-f]{8}$/iu.test(source.selector)) result.selector = source.selector.toLowerCase();
   };
   const seen = new Set<unknown>();
   for (let value = error, depth = 0; value && depth < 8 && !seen.has(value); depth++) {
@@ -124,7 +131,12 @@ export function keelSimulationTransportDiagnostic(error: unknown, context: {
     const name = typeof item.name === "string" && classes.includes(item.name) ? item.name : "Error";
     result[depth === 0 ? "errorClass" : "causeClass"] = name; result.causeDepth = depth;
     pick(record(item.diagnostic));
+    if (typeof item.reason === "string" && failureReasons.includes(item.reason)) result.failureReason = item.reason;
     if (typeof item.code === "number" && Number.isInteger(item.code) && Math.abs(item.code) <= 2147483647) result.rpcCode = item.code;
+    if (item.code === 3 && bytes(item.data)) {
+      result.revertDataBytes = (item.data.length - 2) / 2;
+      if (item.data.length <= 4_000_002) result.revertDataHash = keccak256(item.data);
+    }
     if (typeof item.status === "number" && Number.isInteger(item.status) && item.status >= 100 && item.status <= 599) result.httpStatus = item.status;
     if (typeof item.code === "string" && codes.includes(item.code)) result.transportCode = item.code;
     value = item.cause;
@@ -240,12 +252,17 @@ async function performPublicationSimulation(input: KeelPublicationSimulationInpu
   // Snapshot all inputs before the first asynchronous transport call.
   const identity = { ...identityBase, metadataDigest };
 
-  const request = async (method: string, params: readonly unknown[]) => { try { return await transport.request({ method, params }); } catch (error) { throw keelSimulationTransportFailure(error, { method, phase: "publication-preflight" }); } };
+  let pinnedDiagnostic: Readonly<Record<string, string | number>> = { planFingerprint: identity.planFingerprint };
+  const request = async (method: string, params: readonly unknown[]) => { try { return await transport.request({ method, params }); } catch (error) {
+    const classified = keelSimulationTransportFailure(error, { method, phase: "publication-preflight" });
+    throw new KeelPublicationSimulationError(classified.kind, classified.message, { ...classified.diagnostic, ...pinnedDiagnostic });
+  } };
   if (quantity(await request("eth_chainId", [])) !== BigInt(identity.chainId)) return failure("wrong-chain", "The configured RPC returned another chain. No payment can be prepared from this proof.");
   const block = record(await request("eth_getBlockByNumber", [identity.blockTag, false]));
   const blockNumber = quantity(block?.number), blockGasLimit = quantity(block?.gasLimit);
   if (blockNumber === undefined || blockGasLimit === undefined || typeof block?.hash !== "string" || !/^0x[0-9a-f]{64}$/iu.test(block.hash)) return failure("rpc-unavailable", "The simulation needs a verifiable selected-chain block.");
   if (identity.blockTag !== "latest" && blockNumber !== BigInt(identity.blockTag)) return failure("rpc-unavailable", "The provider returned another block than the exact requested simulation snapshot.");
+  pinnedDiagnostic = { planFingerprint: identity.planFingerprint, pinnedBlockNumber: blockNumber.toString(), pinnedBlockHash: block.hash.toLowerCase(), readerRuntimeCodeHash: identity.runtimeCodeHash };
   const blockTimestamp = quantity(block.timestamp);
   if (blockTimestamp === undefined) return failure("rpc-unavailable", "The simulation needs the actual selected-chain timestamp for its transaction gas rules.");
   let transactionPolicy;
@@ -293,7 +310,23 @@ async function performPublicationSimulation(input: KeelPublicationSimulationInpu
       const results = record(item)?.calls;
       if (!Array.isArray(results) || results.length !== 1) return failure("rpc-unavailable", "A planned call is missing from the simulation result.");
       const result = record(results[0]);
-      if (result?.status === "0x0") return failure("execution-reverted", `Planned simulation call ${index + 1} reverted. Its contract failure must be resolved before payment; it is not a delivery-size diagnosis.`, { callIndex: index, target: calls[index]!.to, selector: calls[index]!.data.slice(0, 10), requestedGasLimit: BigInt(calls[index]!.gas).toString(), phase: validation ? "transaction-validation" : "ephemeral-execution" });
+      if (result?.status === "0x0") {
+        // Preserve the returned evidence without guessing the inner revert cause.
+        // Raw messages/bytes can contain creator data and never enter diagnostics.
+        const rawError = record(result.error);
+        const returnedGas = quantity(record((record(item)?.transactions as unknown[])[0])?.gas);
+        const gasUsed = quantity(result.gasUsed), maxUsedGas = quantity(result.maxUsedGas);
+        const revertData = bytes(rawError?.data) ? rawError.data : bytes(result.returnData) ? result.returnData : undefined;
+        return failure("execution-reverted", `Planned simulation call ${index + 1} reverted. Its contract failure must be resolved before payment; it is not a delivery-size diagnosis.`, keelSimulationTransportDiagnostic({ diagnostic: {
+          ...pinnedDiagnostic, callIndex: index, target: calls[index]!.to, selector: calls[index]!.data.slice(0, 10),
+          requestedGasLimit: BigInt(calls[index]!.gas).toString(), phase: validation ? "transaction-validation" : "ephemeral-execution",
+          ...(returnedGas === undefined ? {} : { returnedGasLimit: returnedGas.toString() }),
+          ...(gasUsed === undefined ? {} : { gasUsed: gasUsed.toString() }), ...(maxUsedGas === undefined ? {} : { maxUsedGas: maxUsedGas.toString() }),
+          ...(typeof rawError?.code === "number" ? { rpcCode: rawError.code } : {}),
+          ...(revertData === undefined ? {} : { revertDataBytes: (revertData.length - 2) / 2,
+            ...(revertData.length > 4_000_002 ? {} : { revertDataHash: keccak256(revertData) }) }),
+        } }));
+      }
       const gasUsed = quantity(result?.gasUsed);
       if (result?.status !== "0x1" || result.error !== undefined || gasUsed === undefined || gasUsed > BigInt(calls[index]!.gas) || !bytes(result.returnData)) return failure("rpc-unavailable", "The provider returned invalid execution evidence.");
       const assertion = assertions.find(assertion => assertion.callIndex === index);
