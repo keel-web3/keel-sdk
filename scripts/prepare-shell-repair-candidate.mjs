@@ -1,4 +1,5 @@
-import { mkdir, writeFile } from 'node:fs/promises';
+import { mkdir, readFile, writeFile } from 'node:fs/promises';
+import { execFileSync } from 'node:child_process';
 import { resolve } from 'node:path';
 import { createHash } from 'node:crypto';
 import { DEFAULT_KEEL_VERIFICATION_PRESENTATION } from '../packages/protocol/dist/index.js';
@@ -9,6 +10,9 @@ import { encodeAbiParameters, encodeFunctionData, parseAbi, keccak256, concatHex
 
 // Offline preparation only. No provider, signer, environment credentials or RPC.
 const output = resolve(process.argv[2] ?? '/tmp/keel-shell-repair-candidate');
+const sourceSdkCommit = execFileSync('git', ['rev-parse', 'HEAD'], { cwd: new URL('..', import.meta.url), encoding: 'utf8' }).trim();
+if (process.argv[3] === undefined || process.argv[3] !== sourceSdkCommit) throw new Error('Pass the exact expected SDK checkout commit as the third argument; build that checkout before generating.');
+const generatorSha256 = createHash('sha256').update(await readFile(new URL(import.meta.url))).digest('hex');
 const chainId = 11155111, store = '0x0a4f31d5ab08029e4c68f6f3227d9fa3a2d66267', builder = '0x63a172ae55a6c7413a2f80be9de9cd9cb106973d';
 const keeper = '0x404A6bd65EF48AE85Da7b0E9358715a34A401b05';
 const sha = bytes => '0x'+createHash('sha256').update(bytes).digest('hex');
@@ -51,7 +55,7 @@ for(const [lane,graph] of [['registered',registered],['compact',compact]]) for(c
 const metadata=await object('shell-metadata',manifest.bytes,'application/json');
 const registration={chainId,from:keeper,to:builder,value:'0x0',data:encodeFunctionData({abi,functionName:'setShell',args:[KEEL_INLINE_PROTECTION_SHELL_ID,sides['registered-prefix'].objectId,sides['registered-suffix'].objectId,2,metadata.objectId]})};
 const fragment = ({objectId,digest,byteLength,storedByteLength,mediaType}) => ({objectId,digest,byteLength,storedByteLength,mediaType});
-const report={schema:'keel-canonical-shell-repair-candidate@1',status:'unsigned-unverified-onchain',chainId,store,builder,keeper,shellId:KEEL_INLINE_PROTECTION_SHELL_ID,authoredPresentationRevision:3,observedRegistryRevision:5,sourceSdkCommit:'d4c5b2add21c1340f8782bcf286f4268afb12b9f',sourceEvidence:'libfile_696d74f5c3fc8191bc86542d38681e76',objects,registration,
+const report={schema:'keel-canonical-shell-repair-candidate@1',status:'unsigned-unverified-onchain',chainId,store,builder,keeper,shellId:KEEL_INLINE_PROTECTION_SHELL_ID,authoredPresentationRevision:3,observedRegistryRevision:5,sourceSdkCommit,generatorSha256,sourceEvidence:'libfile_696d74f5c3fc8191bc86542d38681e76',objects,registration,
   cataloguePatch:{shell:{shellId:KEEL_INLINE_PROTECTION_SHELL_ID,metadataObjectId:metadata.objectId,prefix:fragment(sides['registered-prefix']),suffix:fragment(sides['registered-suffix'])},compact:{shell:{prefix:fragment(sides['compact-prefix']),suffix:fragment(sides['compact-suffix'])}}},
   requiredBeforeApproval:['Re-read chain identity, canonical block, keeper, builder/store runtime and registry revision; reject changes.', 'Read selected Hold limits, fees, systems-active and exact existing object/slug bytes. Reuse existing verified bytes and preserve all old objects. Never blindly submit candidateUploads.', 'Quote and simulate each missing storage operation at exact current chain transaction capacity, retaining the same journal on unknown/pending results.', 'Verify uploaded object receipts and full bytes, then simulate this exact setShell from the actual keeper. The prior 540577-gas estimate used OLD commitments and is not this repair quote.', 'Request precise keeper approval for this registration and separate owner approval for any storage payment; no approval is implied by this artifact.'],
   requiredAfterRegistration:['Verify canonical keeper transaction receipt, incremented shell revision, exact prefix/suffix/metadata commitments and full bytes.', 'Update only verified shell fields in the existing catalogue; retain all modules, compact builder identity and deployment receipt.', 'Re-run Studio fresh readiness, complete tokenURI/offline browser byte checks and the original owned fixture.'],
