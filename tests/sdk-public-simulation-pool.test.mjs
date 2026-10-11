@@ -133,6 +133,7 @@ test('contract revert, transaction validation failure and exact metadata mismatc
 test('invalid parameters, common server validation errors and ambiguous simulation rejections are terminal',async()=>{
   for(const fault of [
     {error:-32602,kind:'configuration-invalid'},
+    {error:-38013,kind:'configuration-invalid'},
     {error:-32000,message:'insufficient funds for gas * price + value SECRET',kind:'insufficient-balance'},
     {error:-32000,message:'insufficient balance SECRET',kind:'insufficient-balance'},
     {error:-32000,message:'nonce too low SECRET',kind:'configuration-invalid'},
