@@ -35,7 +35,8 @@ const clockStarted = performance.now();
 const evidence = { schema: "keel-native-geth-publication-test@1", image, synthetic: true,
   sourceCommit: execFileSync("git", ["rev-parse", "HEAD"], { cwd: repositoryRoot, encoding: "utf8" }).trim(),
   testedFileSha256: Object.fromEntries(["scripts/verify-native-geth-publication.mjs", "scripts/lib/native-geth-runtime.mjs", "packages/sdk/dist/rpc.js",
-    "packages/sdk/dist/publication-preflight.js", "packages/sdk/dist/public-simulation-pool.js", "packages/sdk/dist/simulation-connection.js"]
+    "packages/sdk/dist/publication-preflight.js", "packages/sdk/dist/public-simulation-pool.js", "packages/sdk/dist/simulation-connection.js",
+    "packages/sdk/dist/transaction-gas-policy.js"]
     .map(path => [path, createHash("sha256").update(readFileSync(join(repositoryRoot, path))).digest("hex")])),
   network: "none", productionStateUsed: false, signing: "not-performed", submission: "not-performed", checks: [] };
 let started = false;
@@ -223,6 +224,44 @@ try {
     capacityAttempts: smallProof.discoveryGas.capacityAttempts, transactionGasLimits: smallProof.transactionGasLimits,
     transactionGasUsed: smallProof.transactionGasUsed, completeTokenUriBytes: smallProof.completeTokenUriBytes,
     phases: smallRequests.map(([program]) => ({ validation: program.validation, blocks: program.blockStateCalls.length })),
+  });
+  // A valid ABI call with synthetic zero padding has a calldata floor above
+  // cap/N. Reserve that floor before allocating the remaining discovery gas.
+  const paddedData = calldata("write", [1n]).padEnd(2 + 69_316 * 2, "0");
+  const paddedPlan = { ...smallPlan, preparationCalls: smallPlan.preparationCalls.map((call, index) =>
+    index === 0 ? { ...call, data: paddedData } : call) };
+  const paddedBefore = structuredClone(paddedPlan), paddedPool = nativePool(base, { endpoints: [syntheticEndpoints[0]] });
+  const paddedProof = await poolProof(paddedPool, paddedPlan);
+  assert.deepEqual(paddedPlan, paddedBefore);
+  assert.equal(paddedProof.completeTokenUriBytes, Buffer.byteLength(expectedTokenURI));
+  assert.ok(BigInt(paddedProof.discoveryGas.effectiveGasLimits[0]) >= 4_451_224n);
+  assert.ok(BigInt(paddedProof.transactionGasUsed[0]) >= 4_451_224n);
+  const paddedProjects = projectRequests(paddedPool);
+  assert.equal(paddedProjects.length, 3);
+  assert.equal(paddedProjects[0].params[0].blockStateCalls[0].calls[0].data, paddedData);
+  assert.deepEqual(paddedProjects[2].params[0].blockStateCalls.slice(0, 14), paddedProjects[1].params[0].blockStateCalls);
+  assert.equal(paddedProjects[2].result.at(-1).calls[0].returnData, encodeAbiParameters([{ type: "string" }], [expectedTokenURI]));
+  record("unequal calldata floors retain exact native calls through shared-pool discovery, strict replay and complete metadata", {
+    calldataBytes: 69_316, minimumCallGas: "4451224", effectiveGasLimits: paddedProof.discoveryGas.effectiveGasLimits,
+    transactionGasUsed: paddedProof.transactionGasUsed, capacityAttempts: paddedProof.discoveryGas.capacityAttempts,
+  });
+  const impossiblePlan = { ...smallPlan, preparationCalls: Array.from({ length: 45 }, (_, index) =>
+    ({ ...smallPlan.preparationCalls[0], data: paddedData, nonce: toHex(index) })), assertions: [],
+    requiredReaderCalls: [{ ...smallPlan.requiredReaderCalls[0], expectedReturn: encodeAbiParameters([{ type: "uint256" }], [45n]) }],
+    metadataCall: { ...smallPlan.metadataCall, data: calldata("tokenURIForCount", [45n]) } };
+  const impossibleBefore = structuredClone(impossiblePlan), impossiblePool = nativePool(base, { endpoints: [syntheticEndpoints[0]] });
+  let impossibleDiagnostic;
+  await assert.rejects(poolProof(impossiblePool, impossiblePlan), error => {
+    assert.equal(error.kind, "provider-limit"); assert.equal(error.diagnostic.stage, "discovery-minimum");
+    assert.equal(error.diagnostic.minimumProgramGas, "200305080");
+    assert.ok(BigInt(error.diagnostic.providerGasCap) < 50_000_000n);
+    impossibleDiagnostic = error.diagnostic; return true;
+  });
+  assert.deepEqual(impossiblePlan, impossibleBefore);
+  assert.equal(projectRequests(impossiblePool).length, 0);
+  record("native numeric capacity evidence rejects impossible aggregate calldata minima before any private project request", {
+    syntheticCalls: 45, minimumProgramGas: impossibleDiagnostic.minimumProgramGas,
+    observedProviderGasCap: impossibleDiagnostic.providerGasCap, projectRequests: 0,
   });
   // Uneven synthetic state writes reproduce a carrier-style allocation
   // boundary without including any creator payload or project state.

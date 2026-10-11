@@ -37,6 +37,10 @@ to the same network-disabled Geth. Every successful JSON-RPC result comes
 unchanged from Geth; fault hooks may inject only an HTTP failure or a delay.
 The tests cover:
 
+- A valid 69,316-byte zero-padded fixture call whose calldata minimum exceeds
+  an equal share of the observed budget; the complete strict/read replay passes.
+- An impossible aggregate calldata minimum, refused after real numeric public
+  capacity evidence and before any project call is disclosed.
 - Full public capability qualification, strict stateful execution, standalone
   reader assertion and byte-for-byte complete metadata verification.
 - A synthetic HTTP 503 followed by fresh qualification and a whole-program

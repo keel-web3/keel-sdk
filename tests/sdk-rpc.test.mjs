@@ -164,3 +164,27 @@ test('an explicit chain-ID recheck is fresh and fails if the provider changes ne
   await assert.rejects(p.request({ method: 'eth_chainId' }), e => e instanceof KeelRpcSetupError && e.reason === 'wrong-chain');
   assert.equal(f.calls.length, 2);
 });
+
+test('MCP error mapper shares bounded intrinsic-minimum diagnostics without exposing injected private fields', async () => {
+  const root = await mkdtemp('/tmp/keel-rpc-mcp-minimum-');
+  try {
+    const diagnostic = { stage: 'discovery-minimum', providerGasCap: '50000000', minimumProgramGas: '124157048',
+      intrinsicProgramGas: '124150056', calldataFloorGas: '123469056', largestMinimumCallGas: '4451224' };
+    // Exercise the maintained error boundary through an explicit local synthetic
+    // plugin; this is mapper parity, not an actual Studio publication attempt.
+    const moduleUrl = new URL('../packages/sdk/dist/rpc.js', import.meta.url).href;
+    const plugin = root + '/minimum-fixture.mjs';
+    await writeFile(plugin, `import {KeelRpcSetupError} from ${JSON.stringify(moduleUrl)};
+export const keelPlugin = {apiVersion:1,id:'test/minimum-diagnostics',version:'1.0.0',tools:[{
+ descriptor:{name:'test-minimum-diagnostics',description:'Synthetic safe diagnostic boundary',inputSchema:{type:'object',properties:{},additionalProperties:false}},
+ run(){throw new KeelRpcSetupError('unavailable',[],0,${JSON.stringify({ ...diagnostic, rawData: 'SECRET calldata', url: 'https://PRIVATE.invalid', message: 'PRIVATE provider response' })});}
+}]};`);
+    const server = await createMcpServer({ workspaceRoot: root, pluginConfig: false, plugins: [plugin] });
+    await server.handle({ jsonrpc:'2.0',id:1,method:'initialize',params:{protocolVersion:'2024-11-05',capabilities:{},clientInfo:{name:'minimum-test',version:'1'}} });
+    const result = (await server.handle({ jsonrpc:'2.0',id:2,method:'tools/call',params:{name:'test-minimum-diagnostics',arguments:{}} })).result;
+    assert.equal(result.isError, true);
+    for (const [key, value] of Object.entries(diagnostic)) assert.equal(result.structuredContent.diagnostic[key], value);
+    assert.equal(result.structuredContent.signing, 'not-performed'); assert.equal(result.structuredContent.submission, 'not-performed');
+    assert.doesNotMatch(JSON.stringify(result), /SECRET|PRIVATE|rawData/);
+  } finally { await rm(root, { recursive: true, force: true }); }
+});
