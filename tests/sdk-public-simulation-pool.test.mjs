@@ -74,6 +74,110 @@ function fixture(faults=[{},{}], approved=urls.slice(0,faults.length)) {
   return {requests,privateRequests,options,transport:createKeelPublicSepoliaSimulationPool(options)};
 }
 
+function singleRecipientTransient({ fault, repeat = false, requestTimeoutMs, onAttempt, beforeResponse } = {}) {
+  const f = fixture([{}]);
+  let privateAttempts = 0;
+  const transport = createKeelPublicSepoliaSimulationPool({ ...f.options,
+    ...(requestTimeoutMs === undefined ? {} : { requestTimeoutMs }), ...(onAttempt ? { onAttempt } : {}),
+    fetchImpl: async (url, init) => {
+      const body = JSON.parse(init.body);
+      const project = body.method === 'eth_simulateV1' && body.params[0].blockStateCalls[0].calls[0].data !== '0x';
+      if (project) {
+        privateAttempts++;
+        if (fault && (privateAttempts === 1 || repeat)) {
+          f.requests.push({ index: 0, body, wire: init.body });
+          if (fault instanceof Error) throw fault;
+          return new Response('SECRET transport body', { status: fault });
+        }
+        await beforeResponse?.({ body, init });
+      }
+      return f.options.fetchImpl(url, init);
+    },
+  });
+  return { ...f, transport, privateAttempts: () => privateAttempts };
+}
+
+test('one approved recipient automatically recovers an observed transient failure with fresh qualification and the complete immutable program', async () => {
+  for (const fault of [502, 503, 504, Object.assign(new Error('SECRET socket timeout'), { code: 'ETIMEDOUT' }), Object.assign(new Error('SECRET socket reset'), { code: 'ECONNRESET' })]) {
+    const f = singleRecipientTransient({ fault }), input = fullPlan(), before = structuredClone(input);
+    try {
+      const proof = await simulateKeelPublicationBeforeFunding(input, f.transport);
+      assert.equal(proof.state, 'ephemeral-simulation'); assert.equal(proof.submission, 'not-performed');
+      assert.equal(proof.completeTokenUriBytes, Buffer.byteLength(tokenURI));
+      assert.deepEqual(input, before); assert.equal(f.privateAttempts(), 4);
+      const projects = f.privateRequests();
+      assert.deepEqual(projects[0].body.params, projects[1].body.params);
+      assert.deepEqual(projects.map(request => request.index), [0, 0, 0, 0]);
+      const between = f.requests.slice(f.requests.indexOf(projects[0]) + 1, f.requests.indexOf(projects[1]));
+      assert.ok(between.some(request => request.body.method === 'eth_chainId'));
+      assert.ok(between.some(request => request.body.method === 'eth_simulateV1' && request.body.params[0].validation
+        && request.body.params[0].blockStateCalls.length === 1 && request.body.params[0].blockStateCalls[0].calls[0].nonce === '0x1'));
+    } finally { await f.transport.close(); }
+  }
+});
+
+test('same-recipient recovery is attempted at most once and never infers an outage from an unknown failure', async () => {
+  const repeat = singleRecipientTransient({ fault: 503, repeat: true });
+  try {
+    await assert.rejects(repeat.transport.request(program()), error => error.kind === 'rpc-unavailable' && error.diagnostic.httpStatus === 503);
+    assert.equal(repeat.privateAttempts(), 2);
+  } finally { await repeat.transport.close(); }
+  for (const fault of [new Error('SECRET unknown'), Object.assign(new Error('SECRET dns'), { code: 'ENOTFOUND' }), 500, 400, 422]) {
+    const f = singleRecipientTransient({ fault });
+    try { await assert.rejects(f.transport.request(program())); assert.equal(f.privateAttempts(), 1); }
+    finally { await f.transport.close(); }
+  }
+});
+
+test('a cooldown that cannot fit the whole-request deadline returns the observed failure without retry', async () => {
+  const f = singleRecipientTransient({ fault: 503, requestTimeoutMs: 100 });
+  try {
+    await assert.rejects(f.transport.request(program()), error => error.kind === 'rpc-unavailable' && error.diagnostic.httpStatus === 503);
+    assert.equal(f.privateAttempts(), 1);
+  } finally { await f.transport.close(); }
+  for (const requestTimeoutMs of [0, 99, 120001, NaN, Infinity])
+    assert.throws(() => createKeelPublicSepoliaSimulationPool({ ...fixture([{}]).options, requestTimeoutMs }), /bounded deadline/);
+});
+
+test('cancellation during the recovery cooldown prevents fresh qualification and a second project request', async () => {
+  let reached;
+  const retrying = new Promise(resolve => { reached = resolve; });
+  const f = singleRecipientTransient({ fault: 503, onAttempt: diagnostic => { if (diagnostic.sameRecipientRetry === 1) reached(); } });
+  const run = f.transport.request(program());
+  const refused = assert.rejects(run, error => error.kind === 'rpc-unavailable' && /cancelled/.test(error.message));
+  await retrying; const count = f.requests.length;
+  await f.transport.close(); await refused;
+  assert.equal(f.privateAttempts(), 1); assert.equal(f.requests.length, count);
+});
+
+test('the complete request deadline discards a late response even when the provider ignores abort', async () => {
+  let release, reached;
+  const gate = new Promise(resolve => { release = resolve; });
+  const entered = new Promise(resolve => { reached = resolve; });
+  const f = singleRecipientTransient({ requestTimeoutMs: 100, beforeResponse: async () => { reached(); await gate; } });
+  const run = f.transport.request(program());
+  const refused = assert.rejects(run, error => error.kind === 'rpc-unavailable' && error.diagnostic.transportFailure === 'timeout');
+  await entered; await refused; release();
+  await new Promise(resolve => setImmediate(resolve));
+  await assert.rejects(f.transport.request(program()), error => error.kind === 'rpc-unavailable' && /cancelled/.test(error.message));
+  assert.equal(f.privateAttempts(), 1); await f.transport.close();
+});
+
+test('a recovered request shares its original deadline and cannot receive a second full timeout budget', async () => {
+  let release, reached;
+  const gate = new Promise(resolve => { release = resolve; });
+  const entered = new Promise(resolve => { reached = resolve; });
+  const f = singleRecipientTransient({ fault: 503, requestTimeoutMs: 2_200,
+    beforeResponse: async () => { reached(); await gate; } });
+  const run = f.transport.request(program());
+  const refused = assert.rejects(run, error => error.kind === 'rpc-unavailable' && error.diagnostic.transportFailure === 'timeout');
+  await entered; await refused;
+  assert.equal(f.privateAttempts(), 2);
+  release(); await new Promise(resolve => setImmediate(resolve));
+  await assert.rejects(f.transport.request(program()), error => /cancelled/.test(error.message));
+  assert.equal(f.privateAttempts(), 2); await f.transport.close();
+});
+
 test('pinned pool candidate cannot silently fail over during qualification; strict nonce and balance errors retain codes',async()=>{
   for(const code of [-38011,-38014,-38010]) {
     const seen=[];

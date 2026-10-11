@@ -105,7 +105,7 @@ export function keelSimulationTransportDiagnostic(error: unknown, context: {
   const failures = ["timeout", "connection-reset", "connection-closed", "dns", "rate-limited", "http-error", "rpc-error", "invalid-response", "unknown"];
   const codes = ["ETIMEDOUT", "ECONNRESET", "ECONNREFUSED", "EPIPE", "ENOTFOUND", "EAI_AGAIN", "UND_ERR_CONNECT_TIMEOUT", "UND_ERR_SOCKET"];
   const closeReasons = ["empty", "message-too-large", "rate-limited", "timeout", "server-unavailable", "protocol-error", "policy-violation", "other"];
-  const stages = ["connection", "chain", "snapshot", "public-account", "read-capacity", "strict-capacity", "strict-nonce", "snapshot-recheck"];
+  const stages = ["connection", "chain", "snapshot", "public-account", "read-capacity", "strict-capacity", "strict-nonce", "snapshot-recheck", "discovery-minimum"];
   const transports = ["websocket", "https"];
   const transactionValidation = ["intrinsic-gas"];
   const failureReasons = ["rate-limited", "unavailable", "wrong-chain", "access-denied", "history-unavailable", "invalid-response"];
@@ -117,9 +117,9 @@ export function keelSimulationTransportDiagnostic(error: unknown, context: {
       if (typeof source[key] === "string" && values.includes(source[key])) result[key] = source[key];
     for (const [key, low, high] of [["rpcCode", -2147483648, 2147483647], ["httpStatus", 100, 599], ["socketReadyState", 0, 3], ["causeDepth", 0, 8], ["socketCloseCode", 1000, 4999], ["connectionAttempts", 1, 3], ["requestPayloadBytes", 0, 1073741824], ["blockCount", 0, 1000000], ["callCount", 0, 1000000], ["blockIndex", 0, 255], ["callIndex", 0, 65535], ["responseBytes", 0, 1073741824], ["maximumResponseBytes", 0, 1073741824], ["revertDataBytes", 0, 1073741824]] as const)
       if (typeof source[key] === "number" && Number.isInteger(source[key]) && source[key] >= low && source[key] <= high) result[key] = source[key];
-    for (const key of ["requestedGasLimit", "providerGasCap", "requiredProgramGas", "returnedGasLimit", "gasUsed", "maxUsedGas", "pinnedBlockNumber"])
+    for (const key of ["requestedGasLimit", "providerGasCap", "requiredProgramGas", "returnedGasLimit", "gasUsed", "maxUsedGas", "pinnedBlockNumber", "minimumProgramGas", "intrinsicProgramGas", "calldataFloorGas", "largestMinimumCallGas"])
       if (typeof source[key] === "string" && /^(?:0|[1-9]\d{0,19})$/u.test(source[key]) && BigInt(source[key]) <= 18_446_744_073_709_551_615n
-        && (source[key] !== "0" || ["gasUsed", "maxUsedGas", "pinnedBlockNumber"].includes(key))) result[key] = source[key];
+        && (source[key] !== "0" || ["gasUsed", "maxUsedGas", "pinnedBlockNumber", "minimumProgramGas", "intrinsicProgramGas", "calldataFloorGas", "largestMinimumCallGas"].includes(key))) result[key] = source[key];
     for (const key of ["pinnedBlockHash", "readerRuntimeCodeHash", "revertDataHash", "planFingerprint"])
       if (typeof source[key] === "string" && /^0x[0-9a-f]{64}$/iu.test(source[key])) result[key] = source[key].toLowerCase();
     if (typeof source.target === "string" && /^0x[0-9a-f]{40}$/iu.test(source.target)) result.target = source.target;
@@ -346,26 +346,36 @@ async function performPublicationSimulation(input: KeelPublicationSimulationInpu
   let discoveryCeiling = BigInt(identity.maximumTransactionGas);
   let discoveryCalls = discoveryBase;
   let sharedDiscoveryBudget: bigint | undefined;
-  const discoveryCapacityAttempts: { readonly requestedGas: string; readonly providerGasCap: string; readonly programGasBudget?: string; readonly perCallGasLimit?: string }[] = [];
+  const discoveryCapacityAttempts: { readonly requestedGas: string; readonly providerGasCap: string; readonly programGasBudget?: string; readonly perCallGasLimit?: string; readonly perCallGasLimits?: readonly string[] }[] = [];
   const discoveryAllocationAttempts: { readonly callIndex: number; readonly previousGasLimit: string; readonly nextGasLimit: string; readonly programGasBudget: string; readonly strategy: "prefix-reuse" | "remaining-budget" }[] = [];
   const maximizedDiscoveryCalls = new Set<number>();
-  const minimumDiscoveryGas = discoveryBase.map(call => {
+  let totalCalldataFloorGas = 0n;
+  const intrinsicDiscoveryGas = discoveryBase.map(call => {
     let regular = 0n, floor = 0n;
     for (let offset = 2; offset < call.data.length; offset += 2) {
       const zero = call.data.slice(offset, offset + 2) === "00";
       regular += BigInt(zero ? transactionPolicy.zeroCalldataGas : transactionPolicy.nonzeroCalldataGas);
       floor += BigInt(zero ? transactionPolicy.zeroCalldataFloorGas : transactionPolicy.nonzeroCalldataFloorGas);
     }
-    const intrinsic = BigInt(transactionPolicy.transactionBaseGas + transactionPolicy.recipientAccessGas) + (regular > floor ? regular : floor);
-    // The maintained public sequence qualifier conservatively requires 21000
-    // even on the selected fork's cheaper empty-call path.
-    return intrinsic > 21_000n ? intrinsic : 21_000n;
+    totalCalldataFloorGas += floor;
+    const external = call.from.toLowerCase() !== call.to.toLowerCase();
+    // EIP-2780 charges recipient access only for an external call, and its
+    // value-transfer charge only for an external nonzero-value call. Calls here
+    // always have a recipient; contract-creation transactions are not accepted.
+    const base = transactionPolicy.transactionBaseGas + (external ? transactionPolicy.recipientAccessGas : 0)
+      + (external && BigInt(call.value) !== 0n ? transactionPolicy.valueTransferGas : 0);
+    return BigInt(base) + (regular > floor ? regular : floor);
   });
+  // The maintained public sequence qualifier conservatively requires 21000
+  // even on the selected fork's cheaper empty-call path. Keep this allocation
+  // minimum distinct from actual transaction intrinsic gas in diagnostics.
+  const minimumDiscoveryGas = intrinsicDiscoveryGas.map(intrinsic => intrinsic > 21_000n ? intrinsic : 21_000n);
+  const minimumProgramGas = minimumDiscoveryGas.reduce((sum, gas) => sum + gas, 0n);
   let gasDiscovery;
   for (;;) {
     try { gasDiscovery = await simulate(discoveryCalls, atomicContext); break; }
     catch (error) {
-      // Equal shares are only an initial discovery allocation. A carrier CREATE
+      // Minimum-preserving shares are only an initial discovery allocation. A carrier CREATE
       // can exhaust its share while lighter calls leave most of the observed
       // shared budget unused. Replay the COMPLETE original program after moving
       // that unused discovery allowance; a repeated genuine revert still fails.
@@ -420,15 +430,30 @@ async function performPublicationSimulation(input: KeelPublicationSimulationInpu
       // the entire program; measured margins and strict validation still gate it.
       const shareBudget = typeof blockIndex === "number" && Number.isInteger(blockIndex)
         && blockIndex > 0 && blockIndex < discoveryCalls.length;
-      sharedDiscoveryBudget = shareBudget ? BigInt(reported) : undefined;
-      discoveryCeiling = shareBudget ? BigInt(reported) / BigInt(discoveryCalls.length) : BigInt(reported);
-      if (discoveryCeiling <= 0n) throw error;
+      const capacity = BigInt(reported);
+      const largestMinimumCallGas = minimumDiscoveryGas.reduce((maximum, gas) => gas > maximum ? gas : maximum, 0n);
+      const requiredMinimum = shareBudget ? minimumProgramGas : largestMinimumCallGas;
+      if (requiredMinimum > capacity) return failure("provider-limit", "The exact program's transaction and calldata minimum exceeds the observed simulation capacity. The saved plan is unchanged; no approval was prepared.",
+        { ...keelSimulationTransportDiagnostic(error), ...pinnedDiagnostic, stage: "discovery-minimum",
+          requestedGasLimit: requiredMinimum.toString(), providerGasCap: reported,
+          minimumProgramGas: minimumProgramGas.toString(), intrinsicProgramGas: intrinsicDiscoveryGas.reduce((sum, gas) => sum + gas, 0n).toString(),
+          calldataFloorGas: totalCalldataFloorGas.toString(), largestMinimumCallGas: largestMinimumCallGas.toString(), callCount: discoveryBase.length });
+      sharedDiscoveryBudget = shareBudget ? capacity : undefined;
+      // Reserve every call's actual selected-fork minimum before sharing only
+      // the remaining unmeasured allowance. Integer division may leave <N gas
+      // unused; it must never push the sum over the observed shared budget.
+      const extra = shareBudget ? (capacity - minimumProgramGas) / BigInt(discoveryBase.length) : 0n;
+      const allocations = minimumDiscoveryGas.map(minimum => shareBudget ? minimum + extra : capacity);
+      if (allocations.some((gas, index) => gas > BigInt(discoveryBase[index]!.gas))) throw error;
+      discoveryCeiling = allocations.reduce((maximum, gas) => gas > maximum ? gas : maximum, 0n);
+      const uniform = allocations.every(gas => gas === discoveryCeiling);
       discoveryCapacityAttempts.push({ requestedGas: requested, providerGasCap: reported,
-        ...(shareBudget ? { programGasBudget: reported, perCallGasLimit: discoveryCeiling.toString() } : {}) });
+        ...(shareBudget ? { programGasBudget: reported, ...(uniform ? { perCallGasLimit: discoveryCeiling.toString() }
+          : { perCallGasLimits: allocations.map(gas => gas.toString()) }) } : {}) });
       // Discard every result of the rejected attempt. Re-run the entire exact
-      // dependent program at the explicitly reported discovery ceiling. No
+      // dependent program at the explicitly reported discovery capacity. No
       // validated transaction, fee, nonce, recipient, value or call order changes.
-      discoveryCalls = discoveryBase.map(call => ({ ...call, gas: `0x${discoveryCeiling.toString(16)}` as Hex }));
+      discoveryCalls = discoveryBase.map((call, index) => ({ ...call, gas: `0x${allocations[index]!.toString(16)}` as Hex }));
     }
   }
   const boundedCalls = preparationCalls.map((call, index) => {

@@ -13,6 +13,8 @@ export interface KeelPublicSimulationPoolOptions {
   readonly block: { readonly number: bigint; readonly hash: string };
   readonly fetchImpl?: typeof fetch;
   readonly minIntervalMs?: number;
+  /** Entire qualification + project request deadline; callers may only lower the 120s bound. */
+  readonly requestTimeoutMs?: number;
   readonly onAttempt?: (diagnostic: Readonly<Record<string, string | number>>) => void;
 }
 const object = (value: unknown): Record<string, unknown> | undefined => value !== null && typeof value === "object" && !Array.isArray(value) ? value as Record<string, unknown> : undefined;
@@ -27,6 +29,9 @@ const sharedPools = new Map<string, ReturnType<typeof createKeelRpcPool>>();
  * Every simulation contains its complete ordered state sequence. Public probes
  * establish compatibility, not the private program's aggregate execution budget. */
 export function createKeelPublicSepoliaSimulationPool(options: KeelPublicSimulationPoolOptions): KeelPreflightTransport & { close(): Promise<void> } {
+  const requestTimeoutMs = options.requestTimeoutMs ?? 120_000;
+  if (!Number.isSafeInteger(requestTimeoutMs) || requestTimeoutMs < 100 || requestTimeoutMs > 120_000)
+    throw new KeelPublicationSimulationError("configuration-invalid", "The complete simulation request needs a bounded deadline of at most 120 seconds.");
   const urls = [...new Set(options.rpcUrls.map(url => normalizeKeelRpcUrl(url)))];
   const approved = new Set(options.approvedProjectRpcUrls.map(url => normalizeKeelRpcUrl(url)));
   if ([...approved].some(url => !urls.includes(url)) || typeof options.block.number !== "bigint" || options.block.number < 0n || !/^0x[0-9a-f]{64}$/iu.test(options.block.hash))
@@ -88,7 +93,7 @@ export function createKeelPublicSepoliaSimulationPool(options: KeelPublicSimulat
       }
     }
   };
-  const request = async (exact: Parameters<KeelPreflightTransport["request"]>[0]) => {
+  const request = async (exact: Parameters<KeelPreflightTransport["request"]>[0], deadlineAt: number) => {
     if (closed) throw new KeelPublicationSimulationError("rpc-unavailable", "The publication check was cancelled.");
     if (!["eth_chainId", "eth_getBlockByNumber", "eth_getTransactionCount", "eth_getBalance", "eth_getCode", "eth_estimateGas", "eth_simulateV1"].includes(exact.method))
       throw new KeelPublicationSimulationError("configuration-invalid", "Publication transport accepts only reads and ephemeral simulation.");
@@ -152,6 +157,7 @@ export function createKeelPublicSepoliaSimulationPool(options: KeelPublicSimulat
     }
     let capacityFailure: KeelPublicationSimulationError | undefined, approvedCapacityFailure: KeelPublicationSimulationError | undefined,
       lastFailure: KeelPublicationSimulationError | undefined, awaitingApproval = false;
+    let sameRecipientRetried = false;
     const retainApprovedCapacity = (index: number, cap: bigint, failure: KeelPublicationSimulationError) => {
       if (approved.has(urls[index]!) && (!approvedCapacityFailure || cap > BigInt(approvedCapacityFailure.diagnostic!.providerGasCap!)))
         approvedCapacityFailure = new KeelPublicationSimulationError(failure.kind, failure.message,
@@ -192,6 +198,7 @@ export function createKeelPublicSepoliaSimulationPool(options: KeelPublicSimulat
         if (!approved.has(urls[index]!)) { awaitingApproval = true; await candidate.transport.close(); continue; }
         projectRequest = true;
         const result = await candidate.transport.request(exact);
+        if (closed) throw new KeelPublicationSimulationError("rpc-unavailable", "The publication check was cancelled.");
         selected = candidate; cursor = index;
         return result;
       } catch (error) {
@@ -214,6 +221,36 @@ export function createKeelPublicSepoliaSimulationPool(options: KeelPublicSimulat
           || failure.kind === "provider-limit" && (failure.diagnostic?.providerGasCap !== undefined || failure.diagnostic?.httpStatus === 413);
         if (projectRequest && (!["provider-limit", "unsupported-simulation", "rpc-unavailable"].includes(failure.kind)
           || !retryableRpcRejection || code === -32602 || typeof code === "number" && code <= -38000 && code >= -38099)) throw failure;
+        // Prefer an available approved alternative, as before. If none remains,
+        // one explicitly observed transient failure may retry this same approved
+        // recipient after its cooldown. Unknown errors and contract/RPC rejections
+        // never enter this path. Qualification and the entire immutable program
+        // run again; no previous ephemeral state or successful suffix is reused.
+        const health = pool.status();
+        const hasAlternative = urls.some((url, i) => i !== index && approved.has(url) && !rejected.has(i)
+          && !health[i]?.disabled && (health[i]?.retryAfterMs ?? 0) === 0
+          && (!capacityRejected.has(i) || requiredGas <= capacityRejected.get(i)!.cap));
+        const observedTransient = failure.kind === "rpc-unavailable" && code === undefined
+          && ([502, 503, 504].includes(Number(failure.diagnostic?.httpStatus))
+            || ["timeout", "connection-reset"].includes(String(failure.diagnostic?.transportFailure)));
+        const cooldown = health[index]?.retryAfterMs ?? 0;
+        if (projectRequest && approved.has(urls[index]!) && !hasAlternative && !sameRecipientRetried && observedTransient
+          && cooldown <= 5_000 && deadlineAt - performance.now() > cooldown + 1_000) {
+          sameRecipientRetried = true;
+          try { options.onAttempt?.({ ...keelSimulationTransportDiagnostic(failure), candidateIndex: index, candidateCount: urls.length,
+            sameRecipientRetry: 1, recoveryWaitMs: cooldown }); } catch { /* Observers cannot alter proof. */ }
+          if (closed) throw new KeelPublicationSimulationError("rpc-unavailable", "The publication check was cancelled.");
+          await new Promise<void>((resolve, reject) => {
+            const cancelled = () => { clearTimeout(timer); abort.signal.removeEventListener("abort", cancelled);
+              reject(new KeelPublicationSimulationError("rpc-unavailable", "The publication check was cancelled.")); };
+            const timer = setTimeout(() => { abort.signal.removeEventListener("abort", cancelled); resolve(); }, cooldown);
+            abort.signal.addEventListener("abort", cancelled, { once: true });
+            if (abort.signal.aborted) cancelled();
+          });
+          if (closed) throw new KeelPublicationSimulationError("rpc-unavailable", "The publication check was cancelled.");
+          offset--; // The next iteration creates and fully qualifies this same candidate.
+          continue;
+        }
         const reportedCap = failure.kind === "provider-limit" ? failure.diagnostic?.providerGasCap : undefined;
         if (typeof reportedCap === "string" && /^[1-9]\d*$/u.test(reportedCap) && BigInt(reportedCap) < requiredGas) {
           const previous = capacityRejected.get(index);
@@ -234,6 +271,20 @@ export function createKeelPublicSepoliaSimulationPool(options: KeelPublicSimulat
     if (awaitingApproval) throw new KeelPublicationSimulationError("configuration-invalid", "A candidate passed public simulation checks but is not approved for private project data. The saved plan is unchanged.", { recipientApprovalRequired: 1 });
     throw capacityFailure ?? lastFailure ?? new KeelPublicationSimulationError("rpc-unavailable", "The configured simulation pool is unavailable. Retry the saved plan after provider recovery.");
   };
-  return { request(input) { const exact = structuredClone(input); const pending = tail.then(() => request(exact)); tail = pending.catch(() => undefined); return pending; },
+  return { request(input) {
+    const exact = structuredClone(input);
+    const pending = tail.then(async () => {
+      let timer: ReturnType<typeof setTimeout> | undefined;
+      const deadlineAt = performance.now() + requestTimeoutMs;
+      const timeout = new Promise<never>((_, reject) => { timer = setTimeout(() => {
+        const failure = new KeelPublicationSimulationError("rpc-unavailable", "The publication check exceeded its bounded time budget. The saved plan is unchanged.",
+          { transportFailure: "timeout", phase: "publication-preflight" });
+        closed = true; abort.abort(failure); void selected?.transport.close(); reject(failure);
+      }, requestTimeoutMs); });
+      try { return await Promise.race([request(exact, deadlineAt), timeout]); }
+      finally { if (timer !== undefined) clearTimeout(timer); }
+    });
+    tail = pending.catch(() => undefined); return pending;
+  },
     async close() { closed = true; abort.abort(); await selected?.transport.close(); } };
 }

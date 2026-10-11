@@ -583,3 +583,109 @@ test('direct estimate reverts retain only error code and revert digest, includin
     assert.equal(diagnostic.revertDataHash, keccak256(data)); assert.doesNotMatch(JSON.stringify(diagnostic), /PRIVATE|deadbeef/);
   }
 });
+
+// Only exact authorized calldata LENGTHS are retained from the Retro capture.
+// Payloads below are synthetic zero bytes, not creator data or a live replay.
+const retroPreparationLengths = [3300,68,69316,69316,69316,69316,69316,69316,69316,64612,69316,69316,69316,69316,69316,69316,66692,69316,69316,69316,69316,69316,69316,64612,69316,69316,69316,69316,69316,54180,2212,1188,1092,484,580,1188,1028,484,484,36,420,68,2212,100,580];
+const intrinsicForZeroBytes = (length, amsterdam = true) => BigInt(amsterdam ? 15000 + length * 64 : 21000 + length * 10);
+const minimumForZeroBytes = (length, amsterdam = true) => { const intrinsic = intrinsicForZeroBytes(length, amsterdam); return intrinsic > 21000n ? intrinsic : 21000n; };
+function minimumDiscoveryFixture(lengths, { budget = 50_000_000n, amsterdam = true, missingNumericCap = false, fundedFirst = false } = {}) {
+  const base = fixture({ ...(amsterdam ? { timestamp: '0x6acf6e00' } : {}), blockGas: '0xbebc200' });
+  const source = { ...input(), discoveryGasPolicy: 'provider-capacity', maximumTransactionGas: 200_000_000n,
+    preparationCalls: lengths.map((length, index) => ({ ...call, gas: '0xbebc200', data: `0x${'00'.repeat(length)}`, value: fundedFirst && index === 0 ? '0x1' : '0x0' })) };
+  // Pre-Amsterdam transactions retain their separately selected chain cap.
+  if (!amsterdam) { source.maximumTransactionGas = 16_000_000n; source.preparationCalls = source.preparationCalls.map(call => ({ ...call, gas: '0xf42400' })); }
+  const requests = [];
+  const transport = { request: async request => {
+    if (request.method !== 'eth_simulateV1') return base.transport.request(request);
+    requests.push(structuredClone(request));
+    const calls = request.params[0].blockStateCalls.map(block => block.calls[0]);
+    if (requests.length === 1) {
+      if (missingNumericCap) throw new KeelPublicationSimulationError('provider-limit', 'Synthetic HTTP capacity refusal', { httpStatus: 413 });
+      return calls.map((call, index) => ({ transactions: [{ gas: index === 1 ? `0x${budget.toString(16)}` : call.gas }], calls: [] }));
+    }
+    for (let index = 0; index < lengths.length; index++) {
+      assert.ok(BigInt(calls[index].gas) >= minimumForZeroBytes(lengths[index], amsterdam), `call ${index} fell below its selected-fork minimum`);
+      assert.ok(BigInt(calls[index].gas) <= BigInt(source.preparationCalls[index].gas));
+    }
+    const result = await base.transport.request(request);
+    for (let index = 0; index < lengths.length; index++) {
+      const used = minimumForZeroBytes(lengths[index], amsterdam);
+      result[index].calls[0].gasUsed = `0x${used.toString(16)}`;
+      result[index].calls[0].maxUsedGas = `0x${used.toString(16)}`;
+    }
+    return result;
+  } };
+  return { source, requests, transport };
+}
+
+test('Retro exact 45 calldata lengths reject an observed shared budget below their selected-fork minimum before resubmission', async () => {
+  const f = minimumDiscoveryFixture(retroPreparationLengths, { fundedFirst: true }), before = structuredClone(f.source);
+  await assert.rejects(simulateKeelPublicationBeforeFunding(f.source, f.transport), error => {
+    assert.equal(error.kind, 'provider-limit');
+    assert.equal(error.diagnostic.providerGasCap, '50000000');
+    assert.equal(error.diagnostic.minimumProgramGas, '124157048');
+    assert.equal(error.diagnostic.intrinsicProgramGas, '124150056');
+    assert.equal(error.diagnostic.calldataFloorGas, '123469056');
+    assert.equal(error.diagnostic.largestMinimumCallGas, '4451224');
+    assert.equal(error.diagnostic.stage, 'discovery-minimum');
+    assert.equal(error.diagnostic.planFingerprint, f.source.planFingerprint);
+    assert.doesNotMatch(JSON.stringify(error.diagnostic), /0x00000000/);
+    return true;
+  });
+  assert.equal(f.requests.length, 1); assert.deepEqual(f.source, before);
+});
+
+test('unequal calldata minima share an observed sufficient budget without changing calldata or measured strict envelopes', async () => {
+  const f = minimumDiscoveryFixture([69316,68,36], { budget: 8_000_000n }), before = structuredClone(f.source);
+  const proof = await simulateKeelPublicationBeforeFunding(f.source, f.transport);
+  assert.equal(proof.completeTokenUriBytes, Buffer.byteLength(expected));
+  assert.equal(proof.state, 'ephemeral-simulation'); assert.equal(proof.submission, 'not-performed');
+  const discovery = f.requests[1].params[0].blockStateCalls.map(block => block.calls[0]);
+  const allocated = discovery.reduce((sum, call) => sum + BigInt(call.gas), 0n);
+  assert.ok(allocated <= 8_000_000n && allocated > 7_999_997n);
+  assert.ok(BigInt(discovery[0].gas) >= 4_451_224n);
+  assert.deepEqual(discovery.map(call => call.data), before.preparationCalls.map(call => call.data));
+  const strict = f.requests[2].params[0].blockStateCalls.map(block => block.calls[0]);
+  assert.deepEqual(strict.map(call => call.gas), proof.transactionGasLimits.map(gas => `0x${BigInt(gas).toString(16)}`));
+  assert.deepEqual(f.requests[3].params[0].blockStateCalls.slice(0, 3).map(block => block.calls[0]), strict);
+  assert.deepEqual(f.source, before);
+});
+
+test('minimum discovery allocation uses the selected fork and never infers a numeric budget from HTTP status', async () => {
+  const oldFork = minimumDiscoveryFixture([69316,68,36], { budget: 1_000_000n, amsterdam: false });
+  const proof = await simulateKeelPublicationBeforeFunding(oldFork.source, oldFork.transport);
+  assert.equal(proof.transactionGasPolicy.profile, 'ethereum-pre-amsterdam');
+  assert.equal(proof.completeTokenUriBytes, Buffer.byteLength(expected));
+  const unknown = minimumDiscoveryFixture(retroPreparationLengths, { missingNumericCap: true });
+  await assert.rejects(simulateKeelPublicationBeforeFunding(unknown.source, unknown.transport), error => {
+    assert.equal(error.kind, 'provider-limit'); assert.equal(error.diagnostic.httpStatus, 413);
+    assert.equal(error.diagnostic.minimumProgramGas, undefined); assert.equal(error.diagnostic.providerGasCap, undefined); return true;
+  });
+  assert.equal(unknown.requests.length, 1);
+  const atomic = minimumDiscoveryFixture([69316,68]);
+  atomic.source.transactionContext = 'atomic-wallet';
+  await assert.rejects(simulateKeelPublicationBeforeFunding(atomic.source, atomic.transport), error => error.kind === 'configuration-invalid');
+  assert.equal(atomic.requests.length, 0);
+});
+
+
+test('discovery minima distinguish EIP-2780 self-calls, recipient access, nonzero value and bounded diagnostics', async () => {
+  const f = minimumDiscoveryFixture([1000,1000,1000], { budget: 239_999n });
+  f.source.preparationCalls[0] = { ...f.source.preparationCalls[0], to: owner, value: '0x1' };
+  f.source.preparationCalls[1] = { ...f.source.preparationCalls[1], value: '0x1' };
+  await assert.rejects(simulateKeelPublicationBeforeFunding(f.source, f.transport), error => {
+    assert.equal(error.kind, 'provider-limit');
+    const safe = keelSimulationTransportDiagnostic(error);
+    assert.equal(safe.minimumProgramGas, '240000'); assert.equal(safe.intrinsicProgramGas, '240000');
+    assert.equal(safe.calldataFloorGas, '192000'); assert.equal(safe.largestMinimumCallGas, '85000');
+    assert.equal(safe.stage, 'discovery-minimum'); return true;
+  });
+  assert.equal(f.requests.length, 1);
+  const keys = ['minimumProgramGas', 'intrinsicProgramGas', 'calldataFloorGas', 'largestMinimumCallGas'];
+  for (const value of ['SECRET', '-1', '01', '18446744073709551616', 1, Infinity]) {
+    const safe = keelSimulationTransportDiagnostic({ diagnostic: Object.fromEntries(keys.map(key => [key, value])) });
+    for (const key of keys) assert.equal(safe[key], undefined);
+  }
+  assert.equal(keelSimulationTransportDiagnostic({ diagnostic: { calldataFloorGas: '0' } }).calldataFloorGas, '0');
+});

@@ -6,7 +6,8 @@ test('Sepolia activation changes total bounds without raising the regular execut
  const before=policy(11155111,KEEL_SEPOLIA_AMSTERDAM_TIMESTAMP-1n), after=policy(11155111,KEEL_SEPOLIA_AMSTERDAM_TIMESTAMP);
  assert.equal(before.maximumTotalGas,16_777_216n);assert.equal(before.separateStateGas,false);
  assert.equal(after.maximumTotalGas,200_000_000n);assert.equal(after.maximumExecutionGas,16_777_216n);assert.equal(after.separateStateGas,true);
- assert.equal(after.transactionBaseGas,12000);assert.equal(after.recipientAccessGas,3000);
+ assert.equal(after.transactionBaseGas,12000);assert.equal(after.recipientAccessGas,3000);assert.equal(after.valueTransferGas,6000);
+ assert.equal(before.valueTransferGas,0);
  assert.equal(after.zeroCalldataFloorGas,64);assert.equal(after.nonzeroCalldataFloorGas,64);
  assert.equal(policy(11155111,KEEL_SEPOLIA_AMSTERDAM_TIMESTAMP,9_000_000_000n).maximumTotalGas,4_294_967_295n);
 });
