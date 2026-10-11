@@ -90,8 +90,44 @@ export function createKeelPublicSepoliaSimulationPool(options: KeelPublicSimulat
   };
   const request = async (exact: Parameters<KeelPreflightTransport["request"]>[0]) => {
     if (closed) throw new KeelPublicationSimulationError("rpc-unavailable", "The publication check was cancelled.");
-    if (!["eth_chainId", "eth_getBlockByNumber", "eth_getTransactionCount", "eth_getBalance", "eth_getCode", "eth_simulateV1"].includes(exact.method))
+    if (!["eth_chainId", "eth_getBlockByNumber", "eth_getTransactionCount", "eth_getBalance", "eth_getCode", "eth_estimateGas", "eth_simulateV1"].includes(exact.method))
       throw new KeelPublicationSimulationError("configuration-invalid", "Publication transport accepts only reads and ephemeral simulation.");
+    if (exact.method === "eth_estimateGas") {
+      const call = object(exact.params[0]);
+      if (exact.params.length !== 2 || exact.params[1] !== blockTag || !call
+        || Object.keys(call).some(key => !["from", "to", "data", "value", "nonce", "gasPrice", "maxFeePerGas", "maxPriorityFeePerGas"].includes(key))
+        || ![call.from, call.to].every(value => typeof value === "string" && /^0x[0-9a-f]{40}$/iu.test(value))
+        || typeof call.data !== "string" || !/^0x(?:[0-9a-f]{2})*$/iu.test(call.data)
+        || quantity(call.value) === undefined || quantity(call.nonce) === undefined
+        || (call.gasPrice === undefined
+          ? quantity(call.maxFeePerGas) === undefined || quantity(call.maxPriorityFeePerGas) === undefined
+          : quantity(call.gasPrice) === undefined || call.maxFeePerGas !== undefined || call.maxPriorityFeePerGas !== undefined))
+        throw new KeelPublicationSimulationError("configuration-invalid", "Estimate the complete fee-bound transaction at its selected numbered block without overrides.");
+      // Estimation executes unpublished calldata too. Never route it through the
+      // ordinary reader or an unapproved public-pool candidate. An estimate is
+      // only a discovery bound; it grants no simulation qualification or proof.
+      const index = urls.findIndex(url => approved.has(url));
+      if (index < 0) throw new KeelPublicationSimulationError("configuration-invalid", "A publication estimate needs an approved project-data recipient.", { recipientApprovalRequired: 1 });
+      const pinned = pool.pin(index);
+      try {
+        const snapshot = object(await pinned.request({ method: "eth_getBlockByNumber", params: [blockTag, false], signal: abort.signal }));
+        if (snapshot?.number !== blockTag || typeof snapshot.hash !== "string" || snapshot.hash.toLowerCase() !== block.hash.toLowerCase())
+          throw new KeelPublicationSimulationError("chain-reorganized", "The estimate provider did not match the exact selected block.");
+        const head = object(await pinned.request({ method: "eth_getBlockByNumber", params: ["latest", false], signal: abort.signal }));
+        const time = quantity(head?.timestamp), number = quantity(head?.number), now = BigInt(Math.floor(Date.now() / 1000));
+        if (time === undefined || number === undefined || number < block.number || time + 180n < now || time > now + 30n)
+          throw new KeelPublicationSimulationError("rpc-unavailable", "The estimate provider does not have a fresh selected-chain head.");
+        const result = await pinned.request({ ...exact, signal: abort.signal });
+        if (closed) throw new KeelPublicationSimulationError("rpc-unavailable", "The publication check was cancelled.");
+        if (quantity(result) === undefined || quantity(result)! <= 0n)
+          throw new KeelPublicationSimulationError("configuration-invalid", "The provider omitted a positive transaction estimate.");
+        return result;
+      } catch (error) {
+        if (closed) throw new KeelPublicationSimulationError("rpc-unavailable", "The publication check was cancelled.");
+        const failure = keelSimulationTransportFailure(error, { method: "eth_estimateGas", phase: "project-estimate" });
+        throw new KeelPublicationSimulationError(failure.kind, failure.message, failure.diagnostic);
+      }
+    }
     if (exact.method !== "eth_simulateV1") {
       const result = await options.readTransport.request(exact);
       if (closed) throw new KeelPublicationSimulationError("rpc-unavailable", "The publication check was cancelled.");

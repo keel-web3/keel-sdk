@@ -31,6 +31,7 @@ function fixture(faults=[{},{}], approved=urls.slice(0,faults.length)) {
     if(body.method==='eth_getBalance') return respond(`0x${'f'.repeat(32)}`);
     if(body.method==='eth_getTransactionCount') return respond('0x0');
     if(body.method==='eth_getCode') return respond(body.params[0]===zero?'0x':'0x6000');
+    if(body.method==='eth_estimateGas') return fault.error ? error(fault.error,fault.message) : respond(fault.estimate ?? '0x3d0900');
     assert.equal(body.method,'eth_simulateV1');
     const blocks=body.params[0].blockStateCalls, privateCall=blocks[0].calls[0].data!=='0x';
     if(!privateCall&&fault.publicHttp) return new Response('',{status:fault.publicHttp});
@@ -277,4 +278,55 @@ test('the complete metadata read adapts its rejected ceiling while preserving ex
     assert.equal(proof.verification, 'collector-metadata');
     assert.equal(proof.completeTokenUriBytes, Buffer.byteLength(tokenURI));
   } finally { await f.transport.close(); }
+});
+
+const estimateRequest = () => ({ method:'eth_estimateGas', params:[{from:owner,to:reader,data:'0xbeef',value:'0x0',nonce:'0x5',maxFeePerGas:'0x30',maxPriorityFeePerGas:'0x1'},snapshot.number] });
+test('complete-transaction estimates disclose only to an approved pinned recipient and grant no capacity proof', async () => {
+  const f = fixture([{}, {cap:true}], [urls[1]]);
+  f.options.readTransport.request = async () => { throw Error('ordinary read provider must receive no estimate'); };
+  try {
+    const request=estimateRequest(), before=structuredClone(request);
+    assert.equal(await f.transport.request(request), '0x3d0900');
+    assert.deepEqual(request,before);
+    assert.ok(f.requests.every(r=>r.index===1));
+    assert.deepEqual(f.requests.at(-1).body.params,before.params);
+    assert.equal(f.requests.some(r=>r.body.method==='eth_simulateV1'),false);
+    await assert.rejects(f.transport.request(program()), e=>e.kind==='configuration-invalid'||e.kind==='provider-limit');
+    assert.equal(f.privateRequests().length,0,'successful estimate cannot bypass exact simulation capacity or recipient approval');
+  } finally { await f.transport.close(); }
+});
+test('estimation rejects an unapproved recipient, changed snapshot, wrong chain and stale head before any project calldata', async () => {
+  for(const [fault,approved] of [[{},[]],[{pin:true},[urls[0]]],[{chain:true},[urls[0]]],[{stale:true},[urls[0]]]]) {
+    const f=fixture([fault],approved);
+    try {await assert.rejects(f.transport.request(estimateRequest()));assert.equal(f.requests.some(r=>r.body.method==='eth_estimateGas'),false);}
+    finally {await f.transport.close();}
+  }
+});
+test('estimate reverts and malformed results never fall through to a different recipient or fallback gas', async () => {
+  for(const fault of [{error:3},{error:-32601},{estimate:'0x0'},{estimate:'0x00'}]) {
+    const f=fixture([fault,{}]);
+    try {await assert.rejects(f.transport.request(estimateRequest()));assert.ok(f.requests.every(r=>r.index===0));}
+    finally {await f.transport.close();}
+  }
+});
+test('estimation accepts only exact fee-bound numbered-block requests without state overrides or a caller gas clamp', async () => {
+  for(const mutate of [r=>r.params.push({}),r=>r.params[1]='latest',r=>r.params[0].gas='0x2faf080',r=>delete r.params[0].nonce,r=>r.params[0].gasPrice='0x1',r=>r.params[0].data='0x123']) {
+    const f=fixture();try {const r=estimateRequest();mutate(r);await assert.rejects(f.transport.request(r),e=>e.kind==='configuration-invalid');assert.equal(f.requests.length,0);}
+    finally {await f.transport.close();}
+  }
+});
+
+test('cancellation discards a late estimate even when the provider ignores abort', async () => {
+  const f=fixture([{}]); let release, started;
+  const gate=new Promise(resolve=>{started=resolve;});
+  const original=f.options.fetchImpl;
+  const rpc=createKeelPublicSepoliaSimulationPool({...f.options,fetchImpl:async(url,init)=>{
+    if(JSON.parse(init.body).method==='eth_estimateGas') { started(); await new Promise(resolve=>{release=resolve;}); }
+    return original(url,init);
+  }});
+  try {
+    const pending=rpc.request(estimateRequest()); await gate; await rpc.close(); release();
+    await assert.rejects(pending,e=>e.kind==='rpc-unavailable');
+    await assert.rejects(rpc.request(estimateRequest()),e=>e.kind==='rpc-unavailable');
+  } finally {await rpc.close();await f.transport.close();}
 });
