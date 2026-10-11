@@ -7,10 +7,10 @@ modular files for the modern creator renderer. Compression, carriage, escaping
 and the decoder shell are automatic. The SDK keeps separate HTML, JavaScript,
 CSS and asset files; the viewer reconstructs their exact bytes before execution.
 
-New files use Brotli when it saves bytes, otherwise none, followed by Base90-v1
+New files use Brotli when it saves bytes, otherwise none, followed by URI81 (uri81-block-v1)
 and the escaping required by JSON, HTML, data URIs and the deployed COPY reader.
 The shell's boot literals use gzip and Base64. Browser-native `DecompressionStream`
-unpacks that gzip boot; the embedded decoder handles Base90 and Brotli. The full
+unpacks that gzip boot; the embedded decoder handles URI81 and Brotli. The full
 HTML and metadata receive no whole-document Base64 wrapper. Module metadata
 reports the actual encoding, compression and encryption, including `none`.
 Existing packages keep their committed codec and object IDs; use
@@ -66,7 +66,7 @@ const plan = await prepareKeelCreatorInline({
    bytes exist. Use the existing fee-aware `prepareKeelWeld` wallet calls for
    initWeld, carrier casts, weld, seal and harness registration. The plan's
    bytes are prepared UTF-8/ASCII and use Hold compression `none`; Brotli is
-   inside the committed Base90 payload. Do not also upload compressed binaries.
+   inside the committed URI81 payload. Do not also upload compressed binaries.
 3. Complete public source read-back and the raw fragment validation cache.
    Use `validateImage` for the poster's complete data URI. Larger fragments may
    require multiple bounded validation transactions before their digest is cached.
@@ -91,4 +91,4 @@ The Sepolia instance reuses the owner-governed tester storage policy. Protocol
 fees there are zero; transaction gas is still payable. This profile does not
 change production governance or imply post-quantum wallet signatures. Optional
 private payloads retain their declared encryption profile; public modules are
-not encrypted merely because they are compressed or Base90 encoded.
+not encrypted merely because they are compressed or URI81 encoded.

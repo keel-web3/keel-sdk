@@ -632,7 +632,9 @@ function exactBase64Bytes(value: string, label: string): Uint8Array {
 
 export function decodeKeelInlineGraphFragment(bytes: Uint8Array, mediaType: string): Uint8Array {
   if (mediaType === "application/vnd.keel.token-uri-raw-percent-fragment") {
-    return exactPercentPayloadBytes(exactPercentPayloadBytes(bytes, "Inline metadata fragment"), "Inline HTML fragment");
+    // URI81 registrations also copy the three RFC-valid URI literals that the
+    // older writer escapes. Decode either registration without rewriting it.
+    return exactPercentPayloadBytes(exactPercentPayloadBytes(bytes, "Inline metadata fragment", true), "Inline HTML fragment", true);
   }
   const outer = exactBase64Bytes(decoder.decode(bytes), "Published Inline fragment");
   if (mediaType === "application/vnd.keel.token-uri-percent-fragment") {
@@ -911,7 +913,7 @@ function alignedPercentPayload(bytes: Uint8Array): Uint8Array {
   return encoder.encode(payload);
 }
 
-function exactPercentPayloadBytes(payload: Uint8Array, label: string): Uint8Array {
+function exactPercentPayloadBytes(payload: Uint8Array, label: string, allowURI81Literals = false): Uint8Array {
   const output: number[] = [];
   for (let at = 0; at < payload.byteLength; at += 1) {
     const byte = payload[at]!;
@@ -923,10 +925,16 @@ function exactPercentPayloadBytes(payload: Uint8Array, label: string): Uint8Arra
       at += 2;
       continue;
     }
-    if (!isDataUriLiteralByte(byte)) throw new TypeError(`${label} contains an unsafe literal byte.`);
+    if (!isDataUriLiteralByte(byte) && !(allowURI81Literals && (byte === 0x3f || byte === 0x27 || byte === 0x26))) {
+      throw new TypeError(`${label} contains an unsafe literal byte.`);
+    }
     output.push(byte);
   }
   return new Uint8Array(output);
+}
+
+function isRawPercentReadLiteralByte(byte: number): boolean {
+  return isDataUriLiteralByte(byte) || byte === 0x3f || byte === 0x27 || byte === 0x26;
 }
 
 /**
@@ -1032,7 +1040,7 @@ function assertMarketplaceSafeDataURI(value: string, label: string): void {
   }
   for (let at = 0; at < payload.length; at += 1) {
     const character = payload.charCodeAt(at);
-    if (isDataUriLiteralByte(character)) continue;
+    if (isRawPercentReadLiteralByte(character)) continue;
     if (character === 0x25 && /^[0-9a-f]{2}$/iu.test(payload.slice(at + 1, at + 3))) {
       at += 2;
       continue;
@@ -1795,8 +1803,8 @@ export async function buildKeelInlineRawPercentTokenURIGraph(
         throw new TypeError(`Inline ${part.role} reusable object is not a raw-percent fragment.`);
       }
       bytes = published.bytes.slice();
-      escapedHtmlBytes = exactPercentPayloadBytes(bytes, `Published raw-percent Inline ${part.role}`);
-      decodedHtmlBytes = exactPercentPayloadBytes(escapedHtmlBytes, `Published raw-percent decoded ${part.role}`);
+      escapedHtmlBytes = exactPercentPayloadBytes(bytes, `Published raw-percent Inline ${part.role}`, true);
+      decodedHtmlBytes = exactPercentPayloadBytes(escapedHtmlBytes, `Published raw-percent decoded ${part.role}`, true);
     } else {
       decodedHtmlBytes = part.bytes.slice();
       escapedHtmlBytes = compactPercentPayload(decodedHtmlBytes);
@@ -1826,8 +1834,8 @@ export async function buildKeelInlineRawPercentTokenURIGraph(
   if (fragmentBytes.byteLength > maxTokenURIBytes) {
     throw new RangeError(`The raw-percent Inline tokenURI stream is ${fragmentBytes.byteLength.toLocaleString()} bytes, above the reviewed ${maxTokenURIBytes.toLocaleString()}-byte public-read ceiling.`);
   }
-  const escapedHtmlBytes = exactPercentPayloadBytes(fragmentBytes, "Raw-percent metadata middle");
-  const htmlBytes = exactPercentPayloadBytes(escapedHtmlBytes, "Raw-percent HTML stream");
+  const escapedHtmlBytes = exactPercentPayloadBytes(fragmentBytes, "Raw-percent metadata middle", true);
+  const htmlBytes = exactPercentPayloadBytes(escapedHtmlBytes, "Raw-percent HTML stream", true);
   if (!exactBytes(htmlBytes, concat(htmlParts))) {
     throw new Error("Raw-percent Inline fragments do not reconstruct the exact source HTML.");
   }
@@ -2299,10 +2307,11 @@ export async function buildKeelPreparedOneOfOneTokenURI(input: {
     const encodedPrefix = compactPercentPayload(encoder.encode(prefixRaw));
     const encodedSuffix = compactPercentPayload(encoder.encode(suffixRaw));
     const tokenURIPayload = concat([encodedPrefix, presentationFragmentBytes, encodedSuffix]);
-    const tokenJSON = decoder.decode(exactPercentPayloadBytes(tokenURIPayload, "Prepared raw-percent token JSON"));
+    const tokenJSON = decoder.decode(exactPercentPayloadBytes(tokenURIPayload, "Prepared raw-percent token JSON", true));
     const animationMiddle = decoder.decode(exactPercentPayloadBytes(
       presentationFragmentBytes,
       "Prepared raw-percent animation middle",
+      true,
     ));
     const expectedJSON = `${prefixRaw}${animationMiddle}${suffixRaw}`;
     if (tokenJSON !== expectedJSON) throw new Error("Prepared raw-percent fragments changed the exact token JSON bytes.");

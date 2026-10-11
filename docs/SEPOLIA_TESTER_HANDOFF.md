@@ -123,3 +123,12 @@ The earlier REDLINE mint at `0xAe73eC8A4867C3886E8987371f0D57943f0f6BDB`, token
 1, remains recorded in [the reference manifest](../deployments/redline-sepolia-reference.json)
 with its existing Base90/PPMd and gzip/Base64 shell boot. Preserve that immutable
 revision rather than migrating its stored format as part of a fresh game mint.
+
+
+## Existing REDLINE URI81 reuse reference
+
+The SDK also discovers [redline-sepolia-reference-uri81.json](../deployments/redline-sepolia-reference-uri81.json). This independently registered REDLINE route is distinct from the historical creator-inline-20261005 factory route; never substitute its registry into that immutable renderer.
+
+At block 11892646, the existing collection `0x8c5731dc35301fA5c222e82bd5405414BDc45Ca2`, token 1, returned 1,000,126 bytes with URI81 and an actual read estimate of 6,822,229 gas. Shell revision 2 reused the unchanged `0x59b9c53563f0c9bef5035d533bea31621c3d545b202463d4ee4285eec745bad1` engine carrier. All 28 resources, thirteen contract runtime commitments, their deployment receipts, and the current COPY order were authenticated. These measurements describe the existing game, not the pending WIP trailer. Reauthenticate current state before publication.
+
+The core existing-object decoder accepts the registered URI81 literal grammar, including `?`, apostrophe and `&`, while retaining strict escaping, length and SHA checks. Older prepared objects remain exact; no source or stored object is rewritten. `keel-inline-reuse-plan` must return zero new stored bytes and no upload plan for that assembly-only baseline. A WIP still needs compatible runtime exports, declared trailer changes, complete returned-token/browser evidence and its own mint receipt.
