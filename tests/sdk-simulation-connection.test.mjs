@@ -161,7 +161,7 @@ test('both qualification modes require valid pre-refund gas and success evidence
 test('validation:true success must be corroborated by nonce-too-high rejection', async () => {
   await rejectedQualification({ ignoreNonce: true });
   for (const negativeError of [{ code: -32601 }, { code: -38013 }, { code: 403, message: 'private-url' }])
-    await rejectedQualification({ negativeError }, negativeError.code === -32601 ? 'unsupported-simulation' : 'rpc-unavailable');
+    await rejectedQualification({ negativeError }, negativeError.code === -32601 ? 'unsupported-simulation' : negativeError.code === -38013 ? 'configuration-invalid' : 'rpc-unavailable');
 });
 
 test('wrong chain, invalid snapshot, reorg and missing method fail closed with no reconnect', async () => {
@@ -277,6 +277,20 @@ test('an actual program revert stays a revert without connection replacement', a
   assert.equal((await t.request(program))[0].calls[0].status, '0x0');
   assert.equal(count, 1); assert.equal(simulationRequests(node).length, 4);
   await t.close();
+});
+
+test('raw intrinsic rejection does not retry, replace a qualified connection or become a nonce proof', async () => {
+  const node = socket(); const request = node.requestAsync.bind(node); let connections = 0, projects = 0;
+  node.requestAsync = async args => {
+    if (args.body.method === 'eth_simulateV1' && args.body.params[0].blockStateCalls[0].calls[0].data === '0x1234') {
+      projects++; return { error: { code: -38013, message: 'intrinsic gas too low PRIVATE' } };
+    }
+    return request(args);
+  };
+  const transport = createPinnedKeelSepoliaSimulationTransport(async () => { connections++; return node; });
+  await assert.rejects(transport.request(program), error => error.kind === 'configuration-invalid' && error.diagnostic.transactionValidation === 'intrinsic-gas');
+  assert.equal(projects, 1); assert.equal(connections, 1); assert.equal(node.closed, 0);
+  await transport.close();
 });
 
 test('explicit close prevents new selection and close during selection does not leak a socket', async () => {

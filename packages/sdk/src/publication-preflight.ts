@@ -103,10 +103,11 @@ export function keelSimulationTransportDiagnostic(error: unknown, context: {
   const closeReasons = ["empty", "message-too-large", "rate-limited", "timeout", "server-unavailable", "protocol-error", "policy-violation", "other"];
   const stages = ["connection", "chain", "snapshot", "public-account", "read-capacity", "strict-capacity", "strict-nonce", "snapshot-recheck"];
   const transports = ["websocket", "https"];
+  const transactionValidation = ["intrinsic-gas"];
   const result: Record<string, string | number> = {};
   const pick = (source: Record<string, unknown> | undefined) => {
     if (!source) return;
-    for (const [key, values] of [["rpcMethod", methods], ["phase", phases], ["stage", stages], ["transport", transports], ["errorClass", classes], ["causeClass", classes], ["transportFailure", failures], ["transportCode", codes], ["socketCloseReason", closeReasons]] as const)
+    for (const [key, values] of [["rpcMethod", methods], ["phase", phases], ["stage", stages], ["transport", transports], ["errorClass", classes], ["causeClass", classes], ["transportFailure", failures], ["transportCode", codes], ["socketCloseReason", closeReasons], ["transactionValidation", transactionValidation]] as const)
       if (typeof source[key] === "string" && values.includes(source[key])) result[key] = source[key];
     for (const [key, low, high] of [["rpcCode", -2147483648, 2147483647], ["httpStatus", 100, 599], ["socketReadyState", 0, 3], ["causeDepth", 0, 8], ["socketCloseCode", 1000, 4999], ["connectionAttempts", 1, 3], ["requestPayloadBytes", 0, 1073741824], ["blockCount", 0, 1000000], ["callCount", 0, 1000000]] as const)
       if (typeof source[key] === "number" && Number.isInteger(source[key]) && source[key] >= low && source[key] <= high) result[key] = source[key];
@@ -138,7 +139,7 @@ export function keelSimulationTransportFailure(error: unknown, context: Paramete
   if (error instanceof KeelPublicationSimulationError) return new KeelPublicationSimulationError(error.kind, error.message, { ...diagnostic, ...error.diagnostic });
   let cursor: unknown = error;
   const seen = new Set<unknown>();
-  let unsupported = false, limited = false, reverted = false, insufficient = false, invalid = false;
+  let unsupported = false, limited = false, reverted = false, insufficient = false, invalid = false, intrinsic = false;
   let providerGasCap: bigint | undefined;
   for (let depth = 0; depth < 8 && cursor && !seen.has(cursor); depth++) {
     seen.add(cursor); const item = record(cursor); if (!item) break;
@@ -149,6 +150,10 @@ export function keelSimulationTransportFailure(error: unknown, context: Paramete
       if (raw && raw.length <= 20) { const cap = BigInt(raw); if (cap > 0n && (providerGasCap === undefined || cap < providerGasCap)) providerGasCap = cap; }
     }
     insufficient ||= item.code === -38014 || item.simulationFailure === "insufficient-balance" || /insufficient funds for (?:gas|transfer)|insufficient balance/iu.test(message);
+    // Geth's intrinsic-validation code is preserved by raw transports even when
+    // they do not supply the RPC pool's simulationFailure marker. It is not an
+    // outage or evidence that one particular call has an undersized envelope.
+    intrinsic ||= item.code === -38013 || /intrinsic gas too low/iu.test(message);
     invalid ||= item.code === -32602 || item.status === 400 || item.status === 422 || item.simulationFailure === "transaction-validation" || /transaction validation failed/iu.test(message);
     reverted ||= item.code === 3 || item.name === "ContractFunctionRevertedError" || /execution reverted|reverted with|out of gas/iu.test(message);
     limited ||= /gas limit (?:is )?(?:too high|exceeds|higher than)|exceeds (?:the )?(?:rpc|simulation) gas cap|maximum (?:simulation|response) size exceeded/iu.test(message);
@@ -156,6 +161,7 @@ export function keelSimulationTransportFailure(error: unknown, context: Paramete
   }
   if (reverted) return new KeelPublicationSimulationError("execution-reverted", "A planned contract execution reverted or exhausted its gas bound. Resolve that failure before payment; do not infer a delivery-size limit.", diagnostic);
   if (insufficient) return new KeelPublicationSimulationError("insufficient-balance", "A planned transaction lacks the balance for its exact validated gas and value. Review the sender funding before payment; no transaction was submitted.", diagnostic);
+  if (intrinsic) return new KeelPublicationSimulationError("configuration-invalid", "The simulator rejected transaction validation. Its intrinsic-gas response does not identify a faulty call or prove the saved gas limit is too low. The exact plan and simulator evidence need review before approval; no transaction was submitted.", { ...diagnostic, transactionValidation: "intrinsic-gas" });
   if (invalid) return new KeelPublicationSimulationError("configuration-invalid", "The simulator rejected the planned transaction parameters. Correct the saved plan before payment; no transaction was submitted.", diagnostic);
   if (unsupported) return new KeelPublicationSimulationError("unsupported-simulation", "This RPC does not support the required read-only publication simulation. Choose a compatible configured provider before a new payment.", diagnostic);
   if (limited || providerGasCap !== undefined || diagnostic.httpStatus === 413) return new KeelPublicationSimulationError("provider-limit", "The provider rejected the simulation at its configured limit. This does not prove that the artwork or its complete metadata is too large.", { ...diagnostic, ...(providerGasCap === undefined ? {} : { providerGasCap: providerGasCap.toString() }) });
