@@ -211,6 +211,25 @@
         "digest": "0x2695a497a0e9b57fe9c7b9c215df4d59da06ba6febb6ff45749025a2d4dc48ec",
         "byteLength": 16073
       }
+    },
+    {
+      "contract": "ERC1967Proxy",
+      "address": "0x560AeEFAE5e9a9cC94198B25Dc359C1579763DB6",
+      "txHash": "0x189798d00ed2829cc1c640515fe2fd76b12da443c6dc492bbee36d0f58280ddf",
+      "block": "11831477",
+      "runtimeCodeHash": "0x46a010df31eb642b47284650e80051e8f6239a0c995003d230b437810bc4b9b4",
+      "runtimeIntegrity": {
+        "algorithm": "sha256",
+        "digest": "0x257725b3197c327ba0c61bc82c91d399b51be675971f186578c13e6b55cb0714",
+        "byteLength": 76
+      },
+      "source": "REDLINE public deployment journal",
+      "scope": "application-reference",
+      "verification": {
+        "status": "receipt-and-runtime-verified",
+        "blockNumber": "11852174",
+        "blockHash": "0xeb2e2fad4c45da995b345234478b78bfd6b618436676f771af3425fb938c29bb"
+      }
     }
   ],
   "evidence": {
@@ -218,5 +237,18 @@
     "checkedAt": "2026-10-11T15:41:26.704Z",
     "chainWrites": 0
   },
-  "revisionCaveat": "Follow-latest shell: reauthenticate current URI, shell revision, source identities and composer before use. This reference is the published game, not the pending WIP trailer."
+  "revisionCaveat": "Follow-latest shell: reauthenticate current URI, shell revision, source identities and composer before use. This reference is the published game, not the pending WIP trailer.",
+  "managedRoute": {
+    "manager": "0x560AeEFAE5e9a9cC94198B25Dc359C1579763DB6",
+    "moduleId": "0x8b822ec80d377753f8bc64d48821d9b5ffbbaae7f8a619da6ab9bd29dcd58158",
+    "consumer": "0xa44e9A599f11315F4179fE132d65283f94874794",
+    "composer": "0x0f028b96DF836e8691f2327097156922FbFd561B",
+    "composerRevision": "1",
+    "composerCodeHash": "0x40a8f01adda4a2087a8a02683c375c0d501f2cf953e6e4df96cd551835b4ac3d",
+    "composerCodeHashAlgorithm": "keccak256",
+    "replacementTool": "keel-manager-module-replacement-prepare",
+    "inspectionTool": "keel-manager-modules-inspect",
+    "status": "requires-selected-chain-consumer-binding-readback",
+    "store": "0xD820e337692A6Eb7a4878e42ce88CBCFF49B55CF"
+  }
 }
