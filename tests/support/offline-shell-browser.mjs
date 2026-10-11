@@ -1,0 +1,68 @@
+import assert from 'node:assert/strict';
+import {spawn} from 'node:child_process';
+import {once} from 'node:events';
+import {mkdtemp,rm,stat} from 'node:fs/promises';
+import {createServer} from 'node:http';
+import {tmpdir} from 'node:os';
+import path from 'node:path';
+
+/** Isolated browser, loopback fixture only. External page requests are blocked
+ * before transmission and recorded, so a negative control tests the observer. */
+export async function observeOfflineShell(html, terminalState='verified') {
+  let binary;
+  for (const candidate of [process.env.KEEL_CHROME_HEADLESS_SHELL,process.env.CHROMIUM_PATH,'/usr/bin/google-chrome','/usr/bin/chromium'].filter(Boolean)) {
+    if(await stat(candidate).then(s=>s.isFile(),()=>false)){binary=candidate;break;}
+  }
+  assert.ok(binary,'An installed Chromium is required; this check must not skip');
+  const profile=await mkdtemp(path.join(tmpdir(),'keel-offline-shell-'));
+  const server=createServer((_request,response)=>{response.setHeader('content-type','text/html; charset=utf-8');response.end(html);});
+  server.listen(0,'127.0.0.1');await once(server,'listening');
+  const origin=`http://127.0.0.1:${server.address().port}`;
+  const child=spawn(binary,['--headless','--no-sandbox','--disable-dev-shm-usage','--disable-background-networking','--disable-component-update','--disable-domain-reliability','--disable-sync','--disable-default-apps','--disable-extensions','--no-first-run','--no-default-browser-check','--host-resolver-rules=MAP * ~NOTFOUND, EXCLUDE 127.0.0.1, EXCLUDE localhost','--remote-debugging-port=0',`--user-data-dir=${profile}`,'about:blank'],{stdio:['ignore','ignore','pipe']});
+  let socket,sequence=0;const pending=new Map(),attempts=[],errors=[];
+  try {
+    const endpoint=await new Promise((resolve,reject)=>{
+      let stderr='';const timer=setTimeout(()=>reject(new Error('Chromium debugging endpoint timed out')),10000);
+      child.on('error',error=>{clearTimeout(timer);reject(error);});
+      child.stderr.on('data',chunk=>{stderr+=chunk.toString();const match=/DevTools listening on (ws:\/\/127\.0\.0\.1:\d+\/\S+)/u.exec(stderr);if(match){clearTimeout(timer);resolve(match[1]);}});
+      child.on('exit',code=>{clearTimeout(timer);reject(new Error(`Chromium exited before qualification: ${code}`));});
+    });
+    socket=new WebSocket(endpoint);await new Promise((resolve,reject)=>{socket.addEventListener('open',resolve,{once:true});socket.addEventListener('error',reject,{once:true});});
+    const command=(method,params={},sessionId)=>new Promise((resolve,reject)=>{
+      const id=++sequence;const timer=setTimeout(()=>{pending.delete(id);reject(new Error(`CDP ${method} timed out`));},10000);
+      pending.set(id,{resolve:value=>{clearTimeout(timer);resolve(value);},reject:error=>{clearTimeout(timer);reject(error);}});
+      socket.send(JSON.stringify({id,method,params,...(sessionId?{sessionId}:{})}));
+    });
+    socket.addEventListener('message',event=>{
+      const message=JSON.parse(event.data);
+      if(message.id){const request=pending.get(message.id);pending.delete(message.id);message.error?request?.reject(new Error(message.error.message)):request?.resolve(message.result);return;}
+      if(message.method==='Fetch.requestPaused'){
+        const {requestId,request}=message.params;
+        const allowed=new URL(request.url).origin===origin;
+        if(!allowed)attempts.push(request.url);
+        void command(allowed?'Fetch.continueRequest':'Fetch.failRequest',{requestId,...(allowed?{}:{errorReason:'BlockedByClient'})},message.sessionId).catch(error=>errors.push(error.message));
+      }
+      if(message.method==='Runtime.exceptionThrown')errors.push(message.params.exceptionDetails.text);
+    });
+    const {targetId}=await command('Target.createTarget',{url:'about:blank'});
+    const {sessionId}=await command('Target.attachToTarget',{targetId,flatten:true});
+    await command('Page.enable',{},sessionId);await command('Runtime.enable',{},sessionId);
+    await command('Fetch.enable',{patterns:[{urlPattern:'http*',requestStage:'Request'}]},sessionId);
+    await command('Page.navigate',{url:origin},sessionId);
+    const expression=`({state:document.body?.dataset.verification,frames:document.querySelectorAll('iframe').length,loading:!!document.querySelector('#keel-status'),seal:!!document.querySelector('#verify-seal'),opaque:[...document.querySelectorAll('iframe')].every(f=>f.sandbox.contains('allow-scripts')&&!f.sandbox.contains('allow-same-origin'))})`;
+    let result;
+    const deadline=Date.now()+15000;
+    do {
+      result=(await command('Runtime.evaluate',{expression,returnByValue:true},sessionId)).result.value;
+      if(result?.state===terminalState)break;
+      await new Promise(resolve=>setTimeout(resolve,50));
+    }while(Date.now()<deadline);
+    assert.equal(result?.state,terminalState,'The complete shell must reach the expected verification outcome');
+    await new Promise(resolve=>setTimeout(resolve,100));
+    return {...result,externalRequests:attempts,errors};
+  }finally{
+    for(const request of pending.values())request.reject(new Error('Browser qualification closed'));
+    socket?.close();if(child.exitCode===null&&child.signalCode===null){child.kill('SIGKILL');await once(child,'exit').catch(()=>{});}
+    server.closeAllConnections();await new Promise(resolve=>server.close(resolve));await rm(profile,{recursive:true,force:true,maxRetries:10,retryDelay:100});
+  }
+}

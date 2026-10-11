@@ -5,6 +5,7 @@ const TEST_ROOT = resolve(import.meta.dirname, "../tests");
 
 /** Requires a real installed headless browser and therefore stays out of the default unit gate. */
 export const BROWSER_TEST_FILES = Object.freeze([
+  "tests/sdk-verification-wrap-offline-browser.test.mjs",
   "tests/sdk-prepared-dense-copy-browser.test.mjs",
   "tests/sdk-verification-shell-browser.test.mjs",
   "tests/sdk-verification-shell-large-graph-browser.test.mjs",

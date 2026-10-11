@@ -433,13 +433,19 @@ test("wrapInVerificationShell returns a self-contained document and a review-onl
   assert.match(result.html, /keel-verification-presentation@1/u);
   assert.match(result.html, /id="verify-seal"/u);
 
-  // Aliases resolve out of the embedded verified graph, and the produced
-  // document contains no absolute URL at all: nothing to fetch, nothing to
-  // swap, no CDN fallback for a resource the envelope already commits to.
+  // Every content byte is committed inline. Canonical proof UI anchors may
+  // contain explorer/gallery URLs; their presence is not a resource fetch.
+  // The required offline-browser CI gate observes requests and tests tampering.
   const asset = result.envelope.items.find((item) => item.id === "palette");
   assert.deepEqual(asset.aliases, ["/content/palette.js"]);
   assert.equal(asset.integrity.digest, (await createIntegrity(assetBytes)).digest);
-  assert.deepEqual(result.html.match(/https?:\/\/[^\s"'`)<]+/gu), null, "the wrapped document must not reach off chain");
+  assert.equal(result.envelope.deliveryProfile, "embedded-assembled");
+  assert.equal(result.envelope.rpcUrls, undefined);
+  assert.equal(result.envelope.rpcUrl, undefined);
+  for (const item of result.envelope.items) {
+    assert.ok(item.embedded);
+    for (const key of ["external", "onchain", "store", "objectId"]) assert.equal(item[key], undefined);
+  }
 
   // The plan is review-only from every angle, and carries no signature anywhere.
   assert.equal(result.publishPlan.plan.status, "review-only");
