@@ -48,11 +48,15 @@ or relying on startup timing. The zero-request assertion covers the complete
 artwork context through verified module execution. A tampered graph must fail
 without mounting artwork.
 
-The first stronger browser gate (SDK run 38163037636) failed because Chrome's
-own account/AI eligibility connections were counted as artwork traffic. This
-was an introduced harness failure, not a production regression. A local
-Chromium NetLog identifies the AI request as `/async/folae` with no webpage
-origin as initiator. The test disables the browser's AI eligibility service
-and separates default-context traffic from the isolated artwork context.
-Both contexts remain blocked from external network access; no hostname is
-exempted from the artwork's zero-request assertion.
+The stronger browser gate (SDK runs 38163037636 and 38163574098) failed because
+Chrome's own account/AI eligibility connections were counted as artwork traffic.
+This was an introduced harness failure, not a production regression. A local
+Chromium NetLog identifies the AI request as `/async/folae` with `not an origin`
+as initiator. Browser-feature switches differed across installed Chrome builds.
+The final test flushes and parses Chromium's complete NetLog and attributes
+external page requests by their initiator, alongside the CDP observer. Opaque
+and unknown initiators remain page requests; only the explicit browser-service
+initiator is distinguished. A separate assertion proves a page request to the
+same Google hostname is never exempted. The real opaque-frame negative control
+must retain page attribution. Both contexts remain blocked from external
+network access; there is no hostname exception or startup-timing window.
