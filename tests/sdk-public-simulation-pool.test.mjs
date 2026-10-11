@@ -42,7 +42,7 @@ function fixture(faults=[{},{}], approved=urls.slice(0,faults.length)) {
     if(privateCall&&fault.wait) { fault.started?.(); await new Promise((resolve,reject)=>init.signal.addEventListener('abort',()=>reject(new Error('cancelled')),{once:true})); }
     const result=blocks.map((b,i)=>({number:`0x${(19+i).toString(16)}`,timestamp:`0x${(BigInt(snapshot.timestamp)+12n*BigInt(i+1)).toString(16)}`,hash:hash(i+1),parentHash:i?hash(i):snapshot.hash,
       blockAccessListHash:hash(i+10),slotNumber:`0x${(11+i).toString(16)}`,
-      transactions:b.calls.map(c=>({...c,gas:!privateCall&&fault.cap&&BigInt(c.gas)>50000000n?'0x2faf080':!privateCall&&fault.sequenceCap&&blocks.length>=5&&i===4?'0x1':privateCall&&fault.aggregate&&i===4?'0x1':c.gas})),
+      transactions:b.calls.map(c=>({...c,gas:fault.cap&&BigInt(c.gas)>(fault.capacityGas??50000000n)?`0x${(fault.capacityGas??50000000n).toString(16)}`:!privateCall&&fault.sequenceCap&&blocks.length>=5&&i===4?'0x1':privateCall&&fault.aggregate&&i===4?'0x1':c.gas})),
       calls:b.calls.map(c=>({status:privateCall&&fault.revert?'0x0':'0x1',gasUsed:'0x5208',...(!privateCall&&fault.noPreRefund?{}:{maxUsedGas:'0x5208'}),returnData:!privateCall?'0x':c.data==='0xeeee'?encodeAbiParameters([{type:'string'}],[fault.metadata??tokenURI]):encodeAbiParameters([{type:'uint256'}],[c.data==='0xdddd'?500n:BigInt((i+1)*100)])}))}));
     if(!privateCall&&blocks.length===40) {
       if(fault.longStatus) result[39].calls[0].status='0x0';
@@ -123,7 +123,7 @@ test('body limit and transport outage swap complete programs; specific capacity 
 });
 test('public qualification never grants disclosure to another indexed recipient',async()=>{
   const f=fixture([{cap:true},{}],[urls[0]]);
-  try {await assert.rejects(f.transport.request(program()),e=>e.kind==='configuration-invalid'&&e.diagnostic.recipientApprovalRequired===1);
+  try {await assert.rejects(f.transport.request(program()),e=>e.kind==='provider-limit'&&e.diagnostic.providerGasCap==='50000000');
     assert.equal(f.privateRequests().length,0);assert.ok(f.requests.some(r=>r.index===1&&r.body.method==='eth_simulateV1'));
   }finally{await f.transport.close();}
 });
@@ -328,5 +328,60 @@ test('cancellation discards a late estimate even when the provider ignores abort
     const pending=rpc.request(estimateRequest()); await gate; await rpc.close(); release();
     await assert.rejects(pending,e=>e.kind==='rpc-unavailable');
     await assert.rejects(rpc.request(estimateRequest()),e=>e.kind==='rpc-unavailable');
+  } finally {await rpc.close();await f.transport.close();}
+});
+
+
+test('initial-storage capacity discovery requalifies the existing approved provider and validates the whole program without a new recipient', async () => {
+  for (const faults of [[{cap:true}], [{cap:true},{}]]) {
+    const f=fixture(faults,[urls[0]]), input={...fullPlan(),discoveryGasPolicy:'provider-capacity'}, before=structuredClone(input);
+    try {
+      const proof=await simulateKeelPublicationBeforeFunding(input,f.transport);
+      assert.deepEqual(input,before);
+      assert.deepEqual(proof.discoveryGas.capacityAttempts,[{requestedGas:'200000000',providerGasCap:'50000000'}]);
+      assert.ok(proof.discoveryGas.effectiveGasLimits.every(g=>'50000000'===g));
+      assert.ok(proof.transactionGasLimits.every(g=>BigInt(g)<50000000n));
+      assert.equal(proof.completeTokenUriBytes,Buffer.byteLength(tokenURI));
+      assert.ok(f.privateRequests().every(r=>r.index===0),'only the existing approved recipient receives project data');
+      assert.deepEqual(f.privateRequests().map(r=>[r.body.params[0].validation,r.body.params[0].blockStateCalls.length]),[[false,5],[true,5],[false,7]]);
+      const strict=f.privateRequests()[1].body.params[0].blockStateCalls;
+      assert.deepEqual(f.privateRequests()[2].body.params[0].blockStateCalls.slice(0,5),strict);
+      assert.ok(f.requests.some(r=>r.index===0&&r.body.method==='eth_simulateV1'&&r.body.params[0].blockStateCalls.length===5&&r.body.params[0].blockStateCalls[0].calls[0].data==='0x'&&r.body.params[0].blockStateCalls[0].calls[0].gas==='0x2faf080'));
+    } finally {await f.transport.close();}
+  }
+});
+test('dynamic discovery never turns unsupported approved methods into approval for another recipient', async () => {
+  const f=fixture([{unsupported:true},{}],[urls[0]]);
+  try {
+    await assert.rejects(simulateKeelPublicationBeforeFunding({...fullPlan(),discoveryGasPolicy:'provider-capacity'},f.transport),e=>e.kind==='configuration-invalid'&&e.diagnostic.recipientApprovalRequired===1);
+    assert.equal(f.privateRequests().length,0);
+  } finally {await f.transport.close();}
+});
+
+test('discovery chooses the largest approved reported capacity and cached rejection describes the current request', async () => {
+  const f=fixture([{cap:true},{cap:true,capacityGas:80000000n}]);
+  try {
+    await assert.rejects(f.transport.request(program()),e=>e.kind==='provider-limit'&&e.diagnostic.requestedGasLimit==='200000000'&&e.diagnostic.providerGasCap==='80000000');
+    const input=fullPlan(); input.maximumTransactionGas=100000000n;
+    input.preparationCalls=input.preparationCalls.map(c=>({...c,gas:'0x5f5e100'}));input.discoveryGasPolicy='provider-capacity';
+    const proof=await simulateKeelPublicationBeforeFunding(input,f.transport);
+    assert.deepEqual(proof.discoveryGas.capacityAttempts,[{requestedGas:'100000000',providerGasCap:'80000000'}]);
+    assert.ok(f.privateRequests().every(r=>r.index===1));
+    assert.equal(proof.completeTokenUriBytes,Buffer.byteLength(tokenURI));
+  } finally {await f.transport.close();}
+});
+
+test('cancelling adapted discovery discards late success without strict replay or a wallet proof', async () => {
+  const f=fixture([{cap:true}]);let started,release;
+  const gate=new Promise(resolve=>{started=resolve;});const original=f.options.fetchImpl;
+  const rpc=createKeelPublicSepoliaSimulationPool({...f.options,fetchImpl:async(url,init)=>{
+    const body=JSON.parse(init.body);
+    if(body.method==='eth_simulateV1'&&body.params[0].blockStateCalls[0].calls[0].data!=='0x') {started();await new Promise(resolve=>{release=resolve;});}
+    return original(url,init);
+  }});
+  try {
+    const pending=simulateKeelPublicationBeforeFunding({...fullPlan(),discoveryGasPolicy:'provider-capacity'},rpc);
+    await gate;await rpc.close();release();await assert.rejects(pending,e=>e.kind==='rpc-unavailable');
+    assert.equal(f.privateRequests().length,1);assert.equal(f.privateRequests()[0].body.params[0].validation,false);
   } finally {await rpc.close();await f.transport.close();}
 });

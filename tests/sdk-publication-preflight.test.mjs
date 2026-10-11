@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 import { encodeAbiParameters, encodeFunctionData, parseAbi, keccak256 } from "viem";
-const { simulateKeelPublicationBeforeFunding, simulateKeelStorageBeforeFunding, assertKeelFundingPreflight, keelFundingApprovalDigest, keelSimulationTransportDiagnostic } = await import(process.env.KEEL_TEST_PUBLICATION_PREFLIGHT_MODULE ?? "../packages/sdk/dist/publication-preflight.js");
+const { simulateKeelPublicationBeforeFunding, simulateKeelStorageBeforeFunding, assertKeelFundingPreflight, keelFundingApprovalDigest, keelSimulationTransportDiagnostic, KeelPublicationSimulationError } = await import(process.env.KEEL_TEST_PUBLICATION_PREFLIGHT_MODULE ?? "../packages/sdk/dist/publication-preflight.js");
 
 const reader = `0x${"11".repeat(20)}`, owner = `0x${"22".repeat(20)}`;
 const block = { number: "0x12", hash: `0x${"aa".repeat(32)}`, timestamp: "0x68f00000", gasLimit: "0x1000000" };
@@ -428,4 +428,112 @@ test('capacity and size attempt diagnostics preserve only bounded numeric eviden
     const rejected = keelSimulationTransportDiagnostic({ diagnostic: { requestedGasLimit: value, providerGasCap: value, requiredProgramGas: value, stage: 'PRIVATE', transport: 'https://SECRET', requestPayloadBytes: -1, blockCount: Infinity, callCount: 1.5 } });
     for (const key of Object.keys(diagnostic)) assert.equal(rejected[key], undefined);
   }
+});
+
+
+// These are synthetic wire fixtures. No current project/provider acceptance is
+// claimed; the exact full successful sequence must still be checked live.
+function capacityDiscoveryFixture({ cap = 150_000n, measured = 100_000n, chainId = 11155111, unsupported = false, revert = false, strictRevert = false, metadataMismatch = false, omitMaximum = false } = {}) {
+  const f = fixture({ chainId: `0x${chainId.toString(16)}`, gas: `0x${measured.toString(16)}`, maximumGas: `0x${measured.toString(16)}`, ...(revert ? { revert: 0 } : {}), strictRevert, omitMaximum, ...(metadataMismatch ? { metadata: 'wrong complete metadata' } : {}) });
+  const requests = [];
+  return { requests, transport: { request: async request => {
+    requests.push(structuredClone(request));
+    if (request.method === 'eth_simulateV1') {
+      if (unsupported) throw { code: -32601, message: 'unsupported' };
+      const calls = request.params[0].blockStateCalls.map(block => block.calls[0]);
+      if (calls.some(call => BigInt(call.gas) > cap)) return calls.map(call => ({ transactions: [{ gas: `0x${(BigInt(call.gas) > cap ? cap : BigInt(call.gas)).toString(16)}` }], calls: [{ status: '0x0' }] }));
+    }
+    return f.transport.request(request);
+  } } };
+}
+function capacityDiscoveryInput(chainId = 11155111) {
+  const source = input();
+  return { ...source, chainId, discoveryGasPolicy: 'provider-capacity', preparationCalls: [
+    { ...call, gas: `0x${source.maximumTransactionGas.toString(16)}`, data: '0x1234' },
+    { ...call, gas: `0x${source.maximumTransactionGas.toString(16)}`, data: '0x5678' },
+  ] };
+}
+for (const chainId of [1, 11155111]) test(`selected EVM chain ${chainId} discovers sufficient provider capacity below the chain maximum and strictly validates the complete program`, async () => {
+  const f = capacityDiscoveryFixture({ chainId }), original = capacityDiscoveryInput(chainId), before = structuredClone(original);
+  const proof = await simulateKeelPublicationBeforeFunding(original, f.transport);
+  assert.deepEqual(original, before);
+  assert.equal(proof.transactionGasPolicy.maximumTotalGas, '16777216');
+  assert.deepEqual(proof.discoveryGas, { policy: 'provider-capacity', initialGasLimits: ['16000000', '16000000'], effectiveGasLimits: ['150000', '150000'], capacityAttempts: [{ requestedGas: '16000000', providerGasCap: '150000' }] });
+  assert.deepEqual(proof.transactionGasLimits, ['105000', '105000']);
+  const runs = f.requests.filter(r => r.method === 'eth_simulateV1');
+  const program = r => r.params[0].blockStateCalls.map(b => b.calls[0]);
+  const strip = ({ gas, gasPrice, maxFeePerGas, maxPriorityFeePerGas, ...c }) => c;
+  for (const r of runs) assert.deepEqual(program(r).slice(0, 2).map(strip), original.preparationCalls.map(strip));
+  const strict = runs.filter(r => r.params[0].validation);
+  assert.equal(strict.length, 1);
+  assert.deepEqual(program(strict[0]), original.preparationCalls.map(c => ({ ...c, gas: '0x19a28' })));
+  assert.deepEqual(program(runs.at(-1)).slice(0, 2), program(strict[0]));
+  assert.equal(proof.completeTokenUriBytes, Buffer.byteLength(expected));
+  assert.equal(proof.signing, 'not-performed'); assert.equal(proof.submission, 'not-performed');
+});
+test('discovery cannot shrink the measured transaction margin to fit an insufficient provider', async () => {
+  const f = capacityDiscoveryFixture({ cap: 102_000n });
+  await assert.rejects(simulateKeelPublicationBeforeFunding(capacityDiscoveryInput(), f.transport), e => e.kind === 'provider-limit' && e.diagnostic.requestedGasLimit === '105000' && e.diagnostic.providerGasCap === '102000');
+  assert.equal(f.requests.filter(r => r.method === 'eth_simulateV1' && r.params[0].validation).length, 0);
+});
+test('successful capacity discovery never accepts or retries a silently clamped strict transaction', async () => {
+  const f = capacityDiscoveryFixture();
+  let strictRequests = 0;
+  const transport = { request: async request => {
+    const result = await f.transport.request(request);
+    if (request.method === 'eth_simulateV1' && request.params[0].validation) {
+      strictRequests++;
+      result[0].transactions[0].gas = '0x186a0';
+    }
+    return result;
+  } };
+  const source = capacityDiscoveryInput(), before = structuredClone(source);
+  await assert.rejects(simulateKeelPublicationBeforeFunding(source, transport), error =>
+    error.kind === 'provider-limit' && error.diagnostic.requestedGasLimit === '105000'
+      && error.diagnostic.providerGasCap === '100000');
+  assert.deepEqual(source, before);
+  assert.equal(strictRequests, 1);
+  assert.equal(f.requests.filter(request => request.method === 'eth_simulateV1').length, 3);
+});
+test('insufficient execution capacity, unsupported methods, missing pre-refund data, strict failure and wrong complete metadata remain blocked', async () => {
+  for (const [options, kind] of [[{ cap: 80_000n, revert: true }, 'execution-reverted'], [{ unsupported: true }, 'unsupported-simulation'], [{ omitMaximum: true }, 'unsupported-simulation'], [{ strictRevert: true }, 'execution-reverted'], [{ metadataMismatch: true }, 'metadata-mismatch']]) {
+    const f = capacityDiscoveryFixture(options), original = capacityDiscoveryInput(), before = structuredClone(original);
+    await assert.rejects(simulateKeelPublicationBeforeFunding(original, f.transport), e => e.kind === kind);
+    assert.deepEqual(original, before);
+    if (options.unsupported) assert.equal(f.requests.filter(r => r.method === 'eth_simulateV1').length, 1);
+  }
+});
+test('capacity discovery is explicit and cannot alter an atomic wallet, measured envelope, unknown policy or unsupported chain', async () => {
+  for (const change of [{ transactionContext: 'atomic-wallet' }, { preparationCalls: [call] }, { discoveryGasPolicy: 'guess' }, { chainId: 31337 }]) {
+    const source = { ...capacityDiscoveryInput(), ...change }, f = capacityDiscoveryFixture({ chainId: source.chainId });
+    await assert.rejects(simulateKeelPublicationBeforeFunding(source, f.transport), e => e.kind === 'configuration-invalid');
+    assert.equal(f.requests.filter(r => r.method === 'eth_simulateV1').length, 0);
+  }
+});
+
+test('discovery retries only strictly smaller explicit capacity evidence and stops after three adjustments', async () => {
+  for (const diagnostic of [{ providerGasCap:'100000' }, { requestedGasLimit:'1',providerGasCap:'100000' },
+    { requestedGasLimit:'16000000',providerGasCap:'0' }, { requestedGasLimit:'16000000',providerGasCap:'16000000' },
+    { requestedGasLimit:'16000000',providerGasCap:'0x186a0' }, { requestedGasLimit:'16000000',providerGasCap:'0100000' },
+    { requestedGasLimit:'16000000',providerGasCap:'18446744073709551616' }, undefined]) {
+    const base=fixture(); let simulations=0;
+    const transport={request:async r=>{
+      if(r.method!=='eth_simulateV1') return base.transport.request(r);
+      simulations++; throw new KeelPublicationSimulationError('provider-limit','synthetic capacity',diagnostic);
+    }};
+    await assert.rejects(simulateKeelPublicationBeforeFunding(capacityDiscoveryInput(),transport),e=>e.kind==='provider-limit');
+    assert.equal(simulations,1);
+  }
+  const base=fixture(), calls=[];
+  const transport={request:async r=>{
+    if(r.method!=='eth_simulateV1') return base.transport.request(r);
+    assert.equal(r.params[0].validation,false);
+    const sequence=r.params[0].blockStateCalls.map(b=>b.calls[0]);calls.push(sequence);
+    const requested=BigInt(sequence[0].gas);
+    throw new KeelPublicationSimulationError('provider-limit','synthetic changing capacity',{requestedGasLimit:String(requested),providerGasCap:String(requested/2n)});
+  }};
+  const source=capacityDiscoveryInput(),before=structuredClone(source);
+  await assert.rejects(simulateKeelPublicationBeforeFunding(source,transport),e=>e.kind==='provider-limit');
+  assert.deepEqual(source,before); assert.equal(calls.length,4);
+  assert.deepEqual(calls.map(s=>s.map(c=>c.data)),Array.from({length:4},()=>['0x1234','0x5678']));
 });
