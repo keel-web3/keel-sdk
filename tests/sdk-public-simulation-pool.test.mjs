@@ -1,5 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
+import { readFile } from 'node:fs/promises';
 import { encodeAbiParameters, keccak256 } from 'viem';
 import { createKeelRpcPool } from '../packages/sdk/dist/rpc.js';
 import { createKeelPublicSepoliaSimulationPool } from '../packages/sdk/dist/public-simulation-pool.js';
@@ -221,4 +222,20 @@ test('live gate fails on unavailable or incomplete qualification while retaining
   }
   assert.equal(publicProbeExitCode({ candidates: [] }, true), 1);
   assert.equal(publicProbeExitCode({ candidates: [{ publicQualification: 'passed', failure: { kind: 'rpc-unavailable' } }] }, true), 1);
+});
+test('the recorded 2026-10-11 PublicNode clamp remains a failed capability gate, not publication evidence', async () => {
+  const evidence = JSON.parse(await readFile(new URL('./fixtures/publicnode-sepolia-capacity-20261011.json', import.meta.url), 'utf8'));
+  assert.equal(publicProbeExitCode(evidence.report, true), 1);
+  assert.equal(evidence.report.candidates.length, 1);
+  const candidate = evidence.report.candidates[0];
+  assert.equal(candidate.endpoint, APPROVED_PUBLICNODE_SEPOLIA_URL);
+  assert.equal(candidate.publicProbes.length, 1);
+  assert.equal(candidate.publicProbes[0].validation, false);
+  assert.equal(candidate.publicProbes[0].requestedGas[0], '199804689');
+  assert.equal(candidate.publicProbes[0].returnedGas[0], '50000000');
+  assert.equal(candidate.failure.kind, 'provider-limit');
+  assert.equal(evidence.privatePlanVerified, false);
+  assert.equal(evidence.report.publicationVerified, false);
+  assert.equal(evidence.canonicalPublicationReceipt, null);
+  assert.equal(evidence.deployedCollection, null);
 });

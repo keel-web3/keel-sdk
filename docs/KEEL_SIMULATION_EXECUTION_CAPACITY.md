@@ -151,6 +151,16 @@ SHA-256 `8ca7cf8cf669b9a42a232276a9f05d579b8650434c0e6c8a95504529052a7064`.
 
 ## Reproducible evidence and limits
 
+The restricted [2026-10-11 cloud run](https://github.com/keel-web3/keel-sdk/actions/runs/38140241723)
+used PublicNode only at block `0xb5744b`. Its first public discovery probe
+requested the exact 199,804,689-gas chain envelope; the returned transaction
+carried 50,000,000 gas. The gate failed with `provider-limit` before strict
+qualification, the 40-call program, or project data. The
+[recorded report](../tests/fixtures/publicnode-sepolia-capacity-20261011.json)
+includes its source commit and artifact provenance. The regression verifies
+failure reporting against that observed report; it does not replay a live RPC
+or establish the cause of a creator's current publication failure.
+
 Run `pnpm verify:publication-native`; see the
 [fixture provenance and setup](../tests/fixtures/native-geth-publication/README.md).
 The official pinned Geth image runs with Docker networking disabled. Five
