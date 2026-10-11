@@ -24,3 +24,15 @@ registered-shell migration. A rebuilt image must identify its exact new SDK
 and Site source pair, pass the broader SDK workflow and the image's own checks,
 and preserve the preceding verified image. No live project simulation,
 deployment, signing or publication is established by these tests.
+
+Installing the adapter activated a previously skipped sixth check:
+`motion preview preserves two distinct frames in a real AVIF sequence`.
+Run 38162105946 passed all five original failures but this check decoded 16
+bytes instead of 32. The same failure reproduces on unchanged base e6165b2
+with the pinned adapter. The generated AVIF contains a primary still image
+and a separate timed sequence; automatic ffmpeg stream selection chose the
+still image. The test now selects both streams explicitly, verifies the
+primary red frame, then verifies both red and blue sequence frames using
+passthrough timestamps. The encoder and all content bytes are unchanged.
+Both SDK qualification workflows explicitly check out the PR head that the
+image pins, making the tested source identity independent of a merge ref.
