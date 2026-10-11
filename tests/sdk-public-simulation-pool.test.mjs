@@ -51,13 +51,14 @@ function fixture(faults=[{},{}], approved=urls.slice(0,faults.length)) {
       let remaining=privateCall&&body.params[0].validation&&fault.strictBudget!==undefined?fault.strictBudget:fault.sharedBudget;
       for(const [i,b] of blocks.entries()) for(const [j,c] of b.calls.entries()) {
         const requested=BigInt(c.gas),allowed=requested<remaining?requested:remaining;
-        const demand=privateCall?fault.projectGas??21000n:12000n,used=demand<allowed?demand:allowed;
+        const demand=privateCall?(fault.projectGasByCall?.[i]??fault.projectGas??21000n):12000n,used=demand<allowed?demand:allowed;
         result[i].transactions[j].gas=`0x${allowed.toString(16)}`;
         Object.assign(result[i].calls[j],{gasUsed:`0x${used.toString(16)}`,maxUsedGas:`0x${used.toString(16)}`});
         if(demand>allowed) Object.assign(result[i].calls[j],{status:'0x0',returnData:'0x',error:{code:-32000,message:'synthetic out of gas'}});
         remaining-=used;
       }
     }
+    if(privateCall&&fault.missingProjectMaximumAt!==undefined)delete result[fault.missingProjectMaximumAt].calls[0].maxUsedGas;
     if(!privateCall&&blocks.length===40) {
       if(fault.longStatus) result[39].calls[0].status='0x0';
       if(fault.longHeader) result[39].parentHash=hash(500);
@@ -401,6 +402,86 @@ test('cancelling adapted discovery discards late success without strict replay o
 });
 
 const sharedBudgetPlan=()=>{const source=fullPlan();return {...source,discoveryGasPolicy:'provider-capacity',preparationCalls:Array.from({length:14},(_,i)=>call(i)),assertions:[]};};
+test('uneven carrier demand reuses measured prefix allowance and fully replays the same program',async()=>{
+  // Deliberately uneven synthetic demands; native Geth separately checks EVM execution.
+  const f=fixture([{sharedBudget:50000000n,projectGasByCall:[2000000n,150000n,5500000n]}]);
+  const input=sharedBudgetPlan(),before=structuredClone(input);
+  try {
+    const proof=await simulateKeelPublicationBeforeFunding(input,f.transport);
+    assert.deepEqual(input,before);
+    assert.equal(proof.discoveryGas.allocationAttempts.length,1);
+    assert.equal(proof.discoveryGas.allocationAttempts[0].callIndex,2);
+    assert.equal(proof.discoveryGas.allocationAttempts[0].strategy,'prefix-reuse');
+    assert.ok(BigInt(proof.discoveryGas.effectiveGasLimits[2])>5500000n);
+    assert.ok(BigInt(proof.transactionGasLimits[2])>5500000n);
+    assert.equal(proof.completeTokenUriBytes,Buffer.byteLength(tokenURI));
+    const sent=f.privateRequests();
+    assert.deepEqual(sent.map(r=>r.body.params[0].validation),[false,false,true,false]);
+    const identity=c=>{const {gas,gasPrice,maxFeePerGas,maxPriorityFeePerGas,...rest}=c;return rest;};
+    for(const r of sent)assert.deepEqual(r.body.params[0].blockStateCalls.slice(0,14).map(b=>identity(b.calls[0])),before.preparationCalls.map(identity));
+    assert.deepEqual(sent.at(-1).body.params[0].blockStateCalls.slice(0,14),sent.at(-2).body.params[0].blockStateCalls);
+  }finally{await f.transport.close();}
+});
+test('a first-call demand larger than its equal share can borrow only observed remaining discovery capacity',async()=>{
+  const f=fixture([{sharedBudget:50000000n,projectGasByCall:[9000000n]}]);
+  try{
+    const proof=await simulateKeelPublicationBeforeFunding(sharedBudgetPlan(),f.transport);
+    assert.equal(proof.discoveryGas.allocationAttempts[0].callIndex,0);
+    assert.equal(proof.discoveryGas.allocationAttempts[0].strategy,'remaining-budget');
+    assert.ok(BigInt(proof.discoveryGas.allocationAttempts[0].nextGasLimit)<=50000000n);
+    assert.equal(proof.validatedTransactionCalls,14);
+  }finally{await f.transport.close();}
+});
+test('a genuine contract revert still refuses approval after bounded same-program allocation checks',async()=>{
+  const f=fixture([{sharedBudget:50000000n,revert:true}]);
+  try{
+    await assert.rejects(simulateKeelPublicationBeforeFunding(sharedBudgetPlan(),f.transport),e=>e.kind==='execution-reverted');
+    const sent=f.privateRequests();assert.equal(sent.length,2);
+    assert.ok(sent.every(r=>r.body.params[0].validation===false));
+  }finally{await f.transport.close();}
+});
+test('later calls recover from reserved intrinsic floors through bounded complete discovery replays',async()=>{
+  const demands=[9000000n,1000000n,8000000n,1000000n,6000000n,...Array(9).fill(100000n)];
+  const f=fixture([{sharedBudget:50000000n,projectGasByCall:demands}]);
+  try{
+    const proof=await simulateKeelPublicationBeforeFunding(sharedBudgetPlan(),f.transport);
+    assert.ok(proof.discoveryGas.allocationAttempts.length>1);
+    assert.ok(proof.discoveryGas.allocationAttempts.length<=28);
+    assert.equal(proof.validatedTransactionCalls,14);
+    for(const [i,gas] of proof.transactionGasLimits.entries())assert.ok(BigInt(gas)>demands[i]);
+    for(const request of f.privateRequests().filter(r=>!r.body.params[0].validation).slice(1,-1)){
+      assert.equal(request.body.params[0].blockStateCalls.length,14);
+      const total=request.body.params[0].blockStateCalls.reduce((sum,b)=>sum+BigInt(b.calls[0].gas),0n);
+      assert.ok(total<=50000000n);
+    }
+    assert.equal(proof.completeTokenUriBytes,Buffer.byteLength(tokenURI));
+  }finally{await f.transport.close();}
+});
+test('missing pre-refund evidence prevents allocation and a later metadata mismatch still blocks it',async()=>{
+  for(const [fault,kind] of [[{missingProjectMaximumAt:1},'execution-reverted'],[{metadata:'wrong whole URI'},'metadata-mismatch']]){
+    const f=fixture([{sharedBudget:50000000n,projectGasByCall:[2000000n,150000n,5500000n],...fault}]);
+    try{
+      await assert.rejects(simulateKeelPublicationBeforeFunding(sharedBudgetPlan(),f.transport),e=>e.kind===kind);
+      if(fault.missingProjectMaximumAt!==undefined)assert.equal(f.privateRequests().length,1);
+      else assert.ok(f.privateRequests().some(r=>r.body.params[0].validation));
+    }finally{await f.transport.close();}
+  }
+});
+test('cancellation during budget redistribution discards late results and never reaches strict approval',async()=>{
+  const f=fixture([{sharedBudget:50000000n,projectGasByCall:[2000000n,150000n,5500000n]}]);
+  let count=0,started,release;const gate=new Promise(resolve=>{started=resolve;});
+  const transport=createKeelPublicSepoliaSimulationPool({...f.options,fetchImpl:async(url,init)=>{
+    const body=JSON.parse(init.body);
+    if(body.method==='eth_simulateV1'&&body.params[0].blockStateCalls[0].calls[0].data!=='0x'&&++count===2){started();await new Promise(resolve=>{release=resolve;});}
+    return f.options.fetchImpl(url,init);
+  }});
+  try{
+    const pending=simulateKeelPublicationBeforeFunding(sharedBudgetPlan(),transport);
+    await gate;await transport.close();release();
+    await assert.rejects(pending,e=>e.kind==='rpc-unavailable');
+    assert.equal(f.privateRequests().length,2);assert.ok(f.privateRequests().every(r=>r.body.params[0].validation===false));
+  }finally{await transport.close();await f.transport.close();}
+});
 test('paid estimate uses the explicit approved pool entry point, not the legacy simulation-only factory',async()=>{
   const legacy=createKeelSepoliaSimulationTransport(),f=fixture([{}],[urls[0]]),request=estimateRequest();
   try {
@@ -450,7 +531,8 @@ test('shared discovery never reduces a measured margin, accepts a strict clamp o
     const f=fixture([{sharedBudget:50000000n,...fault}],[urls[0]]),source=sharedBudgetPlan(),before=structuredClone(source);
     try {await assert.rejects(simulateKeelPublicationBeforeFunding(source,f.transport),e=>e.kind===kind);assert.deepEqual(source,before);
       assert.ok(f.privateRequests().filter(r=>r.body.params[0].validation).length<=1);
-      if(fault.projectGas)assert.equal(f.privateRequests().some(r=>r.body.params[0].validation),false);
+      if(fault.projectGas)for(const request of f.privateRequests().filter(r=>r.body.params[0].validation))
+        assert.ok(request.body.params[0].blockStateCalls.every(block=>BigInt(block.calls[0].gas)>fault.projectGas), 'strict replay preserves every measured margin');
     }finally{await f.transport.close();}
   }
 });

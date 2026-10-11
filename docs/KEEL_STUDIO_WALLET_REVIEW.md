@@ -186,14 +186,23 @@ Sepolia publication preflight qualifies the simulator with bounded public empty 
 Initial storage preparation can explicitly select `discoveryGasPolicy: "provider-capacity"`
 when its independent, unmeasured calls all start at the selected-chain maximum.
 A reported smaller provider capacity discards the rejected attempt and bounds
-the next whole-program discovery replay, with at most three adjustments. It
-does not resize an atomic wallet program or an already-validated transaction.
+the next whole-program discovery replay, with at most three capacity adjustments.
+If a shared provider budget initially gives each call an equal share, a call
+can exhaust that share even when the complete program fits. Discovery may
+redistribute unused allowance using verified successful-prefix pre-refund
+measurements. It first retains the later allowances; if necessary it reserves
+their selected-fork intrinsic floors and measures them on another complete
+replay. Allocation is bounded to twice the call count, within the observed
+shared budget and original chain ceilings. A call that still fails at its
+maximum remaining allowance stays blocked. This changes only unmeasured
+discovery allowances, never an atomic wallet program or an already-validated
+transaction. It does not retry a validated EVM failure or omit any call.
 The caller measures pre-refund maximum usage, retains the required transaction
 margin, and strictly validates every exact call with its real fees. Complete
 metadata and standalone-reader checks still run. If the margin cannot fit,
 execution reverts, or a method is unsupported, approval remains blocked and
 the saved funding amount is preserved. The proof records discovery ceilings
-and attempts separately from final transaction gas limits.
+and capacity/allocation attempts separately from final transaction gas limits.
 
 The simulation pool never rewrites calls or grants disclosure authority. It
 returns the largest reported capacity among existing approved recipients so
