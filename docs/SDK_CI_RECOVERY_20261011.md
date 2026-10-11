@@ -36,3 +36,11 @@ primary red frame, then verifies both red and blue sequence frames using
 passthrough timestamps. The encoder and all content bytes are unchanged.
 Both SDK qualification workflows explicitly check out the PR head that the
 image pins, making the tested source identity independent of a merge ref.
+
+The browser gate also waits for the mounted opaque artwork to report successful
+execution of its embedded module. It observes child renderer targets and uses
+a deny-only loopback proxy because iframe requests can start before their CDP
+hooks attach. Separate top-level and opaque-frame negative controls prove
+requests are observed and blocked. Browser startup requests are blocked too;
+the zero-request assertion covers the page from navigation through verified
+module execution. A tampered graph must fail without mounting artwork.
