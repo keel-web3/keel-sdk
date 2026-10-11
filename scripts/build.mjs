@@ -1,5 +1,10 @@
 import "./workspace-links.mjs";
-import { run, tsc } from "./run.mjs";
+import { root, run, tsc } from "./run.mjs";
+import { cleanBuildOutputs } from "./build-output.mjs";
+
+// TypeScript does not remove output for deleted/renamed source modules.
+// Rebuilding a checkout must package the current source, not prior branches.
+await cleanBuildOutputs(root);
 
 run("node", ["scripts/build-keel-market-wallet.mjs"]);
 
