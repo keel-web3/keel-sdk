@@ -315,3 +315,18 @@ test('estimation accepts only exact fee-bound numbered-block requests without st
     finally {await f.transport.close();}
   }
 });
+
+test('cancellation discards a late estimate even when the provider ignores abort', async () => {
+  const f=fixture([{}]); let release, started;
+  const gate=new Promise(resolve=>{started=resolve;});
+  const original=f.options.fetchImpl;
+  const rpc=createKeelPublicSepoliaSimulationPool({...f.options,fetchImpl:async(url,init)=>{
+    if(JSON.parse(init.body).method==='eth_estimateGas') { started(); await new Promise(resolve=>{release=resolve;}); }
+    return original(url,init);
+  }});
+  try {
+    const pending=rpc.request(estimateRequest()); await gate; await rpc.close(); release();
+    await assert.rejects(pending,e=>e.kind==='rpc-unavailable');
+    await assert.rejects(rpc.request(estimateRequest()),e=>e.kind==='rpc-unavailable');
+  } finally {await rpc.close();await f.transport.close();}
+});

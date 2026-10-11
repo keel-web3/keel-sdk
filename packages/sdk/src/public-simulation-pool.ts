@@ -118,6 +118,7 @@ export function createKeelPublicSepoliaSimulationPool(options: KeelPublicSimulat
         if (time === undefined || number === undefined || number < block.number || time + 180n < now || time > now + 30n)
           throw new KeelPublicationSimulationError("rpc-unavailable", "The estimate provider does not have a fresh selected-chain head.");
         const result = await pinned.request({ ...exact, signal: abort.signal });
+        if (closed) throw new KeelPublicationSimulationError("rpc-unavailable", "The publication check was cancelled.");
         if (quantity(result) === undefined || quantity(result)! <= 0n)
           throw new KeelPublicationSimulationError("configuration-invalid", "The provider omitted a positive transaction estimate.");
         return result;
