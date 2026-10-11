@@ -113,7 +113,7 @@ export function keelSimulationTransportDiagnostic(error: unknown, context: {
     if (!source) return;
     for (const [key, values] of [["rpcMethod", methods], ["phase", phases], ["stage", stages], ["transport", transports], ["errorClass", classes], ["causeClass", classes], ["transportFailure", failures], ["transportCode", codes], ["socketCloseReason", closeReasons], ["transactionValidation", transactionValidation]] as const)
       if (typeof source[key] === "string" && values.includes(source[key])) result[key] = source[key];
-    for (const [key, low, high] of [["rpcCode", -2147483648, 2147483647], ["httpStatus", 100, 599], ["socketReadyState", 0, 3], ["causeDepth", 0, 8], ["socketCloseCode", 1000, 4999], ["connectionAttempts", 1, 3], ["requestPayloadBytes", 0, 1073741824], ["blockCount", 0, 1000000], ["callCount", 0, 1000000]] as const)
+    for (const [key, low, high] of [["rpcCode", -2147483648, 2147483647], ["httpStatus", 100, 599], ["socketReadyState", 0, 3], ["causeDepth", 0, 8], ["socketCloseCode", 1000, 4999], ["connectionAttempts", 1, 3], ["requestPayloadBytes", 0, 1073741824], ["blockCount", 0, 1000000], ["callCount", 0, 1000000], ["blockIndex", 0, 255], ["callIndex", 0, 65535]] as const)
       if (typeof source[key] === "number" && Number.isInteger(source[key]) && source[key] >= low && source[key] <= high) result[key] = source[key];
     for (const key of ["requestedGasLimit", "providerGasCap", "requiredProgramGas"])
       if (typeof source[key] === "string" && /^[1-9]\d{0,19}$/u.test(source[key]) && BigInt(source[key]) <= 18_446_744_073_709_551_615n) result[key] = source[key];
@@ -276,7 +276,7 @@ async function performPublicationSimulation(input: KeelPublicationSimulationInpu
       const transaction = record(transactions[0]);
       const actualGas = quantity(transaction?.gas), requestedGas = BigInt(call.gas);
       if (actualGas === undefined) return failure("unsupported-simulation", "The simulator omitted the exact transaction gas envelope.");
-      if (actualGas < requestedGas) return failure("provider-limit", "The simulator silently reduced the requested transaction gas. The exact prepared plan requires a compatible provider before wallet approval.", { requestedGasLimit: requestedGas.toString(), providerGasCap: actualGas.toString() });
+      if (actualGas < requestedGas) return failure("provider-limit", "The simulator silently reduced the requested transaction gas. The exact prepared plan requires a compatible provider before wallet approval.", { requestedGasLimit: requestedGas.toString(), providerGasCap: actualGas.toString(), blockIndex: index, callIndex: 0 });
       if (actualGas !== requestedGas) return failure("unsupported-simulation", "The simulator changed the requested transaction gas envelope.");
       if (call.nonce !== undefined && quantity(transaction?.nonce) !== BigInt(call.nonce)) return failure("unsupported-simulation", "The simulator omitted or changed the explicit transaction nonce.");
     }
@@ -307,7 +307,7 @@ async function performPublicationSimulation(input: KeelPublicationSimulationInpu
   const discoveryBase = atomicContext ? preparationCalls : preparationCalls.map(({ gasPrice: _legacy, maxFeePerGas: _cap, maxPriorityFeePerGas: _tip, ...call }) => call);
   let discoveryCeiling = BigInt(identity.maximumTransactionGas);
   let discoveryCalls = discoveryBase;
-  const discoveryCapacityAttempts: { readonly requestedGas: string; readonly providerGasCap: string }[] = [];
+  const discoveryCapacityAttempts: { readonly requestedGas: string; readonly providerGasCap: string; readonly programGasBudget?: string; readonly perCallGasLimit?: string }[] = [];
   let gasDiscovery;
   for (;;) {
     try { gasDiscovery = await simulate(discoveryCalls, atomicContext); break; }
@@ -318,8 +318,19 @@ async function performPublicationSimulation(input: KeelPublicationSimulationInpu
       if (typeof requested !== "string" || typeof reported !== "string" || !/^[1-9]\d{0,19}$/u.test(requested)
         || !/^[1-9]\d{0,19}$/u.test(reported) || BigInt(requested) !== discoveryCeiling
         || BigInt(reported) >= discoveryCeiling) throw error;
-      discoveryCapacityAttempts.push({ requestedGas: requested, providerGasCap: reported });
-      discoveryCeiling = BigInt(reported);
+      const blockIndex = error.diagnostic?.blockIndex;
+      // A later simulated block may receive only the shared RPC budget left
+      // after earlier calls. Treating that remainder as a fresh per-call cap
+      // produces a slowly descending retry loop (e.g. 50M minus 12k per probe).
+      // Only these explicitly unmeasured independent calls may instead share
+      // the observed remaining budget. Discard the failed response and replay
+      // the entire program; measured margins and strict validation still gate it.
+      const shareBudget = typeof blockIndex === "number" && Number.isInteger(blockIndex)
+        && blockIndex > 0 && blockIndex < discoveryCalls.length;
+      discoveryCeiling = shareBudget ? BigInt(reported) / BigInt(discoveryCalls.length) : BigInt(reported);
+      if (discoveryCeiling <= 0n) throw error;
+      discoveryCapacityAttempts.push({ requestedGas: requested, providerGasCap: reported,
+        ...(shareBudget ? { programGasBudget: reported, perCallGasLimit: discoveryCeiling.toString() } : {}) });
       // Discard every result of the rejected attempt. Re-run the entire exact
       // dependent program at the explicitly reported discovery ceiling. No
       // validated transaction, fee, nonce, recipient, value or call order changes.

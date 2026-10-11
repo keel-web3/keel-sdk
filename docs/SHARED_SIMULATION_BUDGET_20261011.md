@@ -1,0 +1,31 @@
+# Shared simulation budget recovery
+
+After Site `917f71f7f8c11f9344f818d36039ea1a3dcb2253` / SDK `eb7af68a71a861faac39ae498a2c33dc9fc39ac2` deployed, the authorized operator reported an unchanged 14-call new-project check and one bounded retry requesting 49,976,000 gas but receiving 49,964,000. The queued request was 23,370 bytes. `requiredProgramGas=699664000` is fourteen requested envelopes added together, not measured execution. No wallet approval or payment was created. The sanitized source and limits are in `tests/fixtures/owned-shared-capacity-20261011.json`. Full Library materialization failed in the source cloud; this report does not claim to have inspected the raw production response.
+
+## Reproduction and cause in source
+
+Upstream Geth `internal/ethapi/simulate.go` maintains one `gasBudget` across all simulated blocks: it caps a call to the remaining budget and subtracts `UsedGas` after execution. Source: https://github.com/ethereum/go-ethereum/blob/master/internal/ethapi/simulate.go (`gasBudget`, `processBlock`, `sanitizeCall`). A numeric limit returned for a later call can therefore be a remainder, not a new independent allowance for every call.
+
+A synthetic 50M shared budget with 12,000 gas per empty public call reproduces the operator's exact numbers on independently compiled unchanged `eb7af68`: sequence probes at 50,000,000, 49,988,000 and 49,976,000 end with returned 49,964,000. No project request is sent in that reproduction. The pool's public sequence probe receives an inner `project-request` diagnostic from the lower transport, and the wrapper previously preserved that misleading phase. The matching reproduction supports the shared-budget explanation for the live failure but does not prove its provider configuration or original response index.
+
+## Correction
+
+Envelope failures now retain bounded block/call indexes, and the pool reports whether it was qualifying public constants or sending the actual project program. When a later block clamps an explicitly unmeasured independent discovery program, the caller uses the reported remainder as a conservative budget shared equally across that program. For fourteen calls after a 49,988,000 remainder, each discovery limit becomes 3,570,571, whose sum stays below the observed remainder. The failed response is discarded. The complete ordered program must then execute with every requested envelope preserved.
+
+This does not alter a reviewed transaction. Successful discovery must still supply pre-refund `maxUsedGas`; each actual transaction retains its measured margin and passes strict transaction validation, full-program replay, exact complete metadata/reader assertions and canonical snapshot checks. A measured margin that exceeds the discovery allowance remains blocked. A program that fails within this conservative allocation has no proof; that alone is not evidence that its actual total can never fit another allocation/provider. Unknown or changed limits still exhaust the existing bounded retry budget. Atomic wallet programs, already measured envelopes and callers without the explicit discovery policy cannot enter this path.
+
+No calldata, value, nonce, fee, operation order, paid storage, release revision, ownership, supply or asset representation is changed. No state/code/balance override, request splitting, partial-state continuation, wallet request or transaction is introduced.
+
+## Separate paid six-call estimate
+
+The operator's paid-program probe used `createKeelSepoliaSimulationTransport` and received the method allowlist error for `eth_estimateGas` before disclosure. That factory is the older simulation-only socket adapter. Deployed Studio does not use it for this estimate: `apps/studio/src/server/chain/publication-simulation.ts` selects `createKeelPublicSepoliaSimulationPool` on Sepolia. Its existing explicit estimate branch pins a numbered block, requires nonce/fees, verifies fresh chain state and only sends to an approved project recipient. The ordinary read endpoint and other indexed public candidates are not implicitly approved for unpublished calldata.
+
+Use the installed approved pool API or the authenticated application's existing-operation review read; do not broaden the legacy adapter guard or route around recipient checks. SDK tests demonstrate both factory contracts, and Site tests run the actual Site factory with the real SDK pool and only injected wire responses. A successful estimate still grants no simulation proof. The paid program's expired 141,779,261 used / 170,135,114 limit and its 655,134-byte expected tokenURI are historical/current-content evidence respectively, not fresh acceptance. No atomic gas clipping, fee removal or independent-call substitution is permitted.
+
+## Reproducible coverage
+
+`tests/sdk-public-simulation-pool.test.mjs` covers shared-budget discovery of fourteen ordered calls, exact observed decrement, correct public/protected-data diagnostic phase, fresh strict validation, complete metadata equality, cached-cap retry, measured-margin refusal, actual execution failure, strict clamp rejection, wrong metadata and the two estimate factories. `tests/sdk-publication-preflight.test.mjs` retains atomic/unknown-policy refusal and every-phase clamp checks. Socket/recovery and selected-fork suites remain required.
+
+For a built deployed baseline, set `KEEL_TEST_PUBLIC_SIMULATION_POOL_MODULE` and `KEEL_TEST_PUBLICATION_PREFLIGHT_MODULE` to its absolute module URLs, then run `node --test --test-name-pattern='shared cross-block|public multi-block' tests/sdk-public-simulation-pool.test.mjs`. Both regressions fail on unchanged `eb7af68` and pass on the correction. Fixtures are synthetic and have smaller calldata than the production request; they are not actual saved-plan acceptance.
+
+The isolated native Geth workflow additionally exercises the 12,000 decrement and fourteen dependent storage calls with complete returned metadata under a 50M shared budget, and preserves refusal of genuinely over-budget programs. Its fixture runs without network access or production state. Cloud workflow results and exact candidate image identities must be recorded separately after execution. Actual saved-plan acceptance still requires the operator's unchanged original plans through the approved recipients; neither affected project is claimed published.

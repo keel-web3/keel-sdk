@@ -3,8 +3,9 @@ import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';
 import { encodeAbiParameters, keccak256 } from 'viem';
 import { createKeelRpcPool } from '../packages/sdk/dist/rpc.js';
-import { createKeelPublicSepoliaSimulationPool } from '../packages/sdk/dist/public-simulation-pool.js';
-import { simulateKeelPublicationBeforeFunding } from '../packages/sdk/dist/publication-preflight.js';
+import { createKeelSepoliaSimulationTransport } from '../packages/sdk/dist/sepolia-simulation-transport.js';
+const { createKeelPublicSepoliaSimulationPool } = await import(process.env.KEEL_TEST_PUBLIC_SIMULATION_POOL_MODULE ?? '../packages/sdk/dist/public-simulation-pool.js');
+const { simulateKeelPublicationBeforeFunding } = await import(process.env.KEEL_TEST_PUBLICATION_PREFLIGHT_MODULE ?? '../packages/sdk/dist/publication-preflight.js');
 import { APPROVED_PUBLICNODE_SEPOLIA_URL, probePublicSimulationCandidates, publicProbeOptions, publicProbeExitCode } from '../scripts/check-public-simulation-pool.mjs';
 
 const hash = n => `0x${BigInt(n).toString(16).padStart(64,'0')}`;
@@ -44,6 +45,19 @@ function fixture(faults=[{},{}], approved=urls.slice(0,faults.length)) {
       blockAccessListHash:hash(i+10),slotNumber:`0x${(11+i).toString(16)}`,
       transactions:b.calls.map(c=>({...c,gas:fault.cap&&BigInt(c.gas)>(fault.capacityGas??50000000n)?`0x${(fault.capacityGas??50000000n).toString(16)}`:!privateCall&&fault.sequenceCap&&blocks.length>=5&&i===4?'0x1':privateCall&&fault.aggregate&&i===4?'0x1':c.gas})),
       calls:b.calls.map(c=>({status:privateCall&&fault.revert?'0x0':'0x1',gasUsed:'0x5208',...(!privateCall&&fault.noPreRefund?{}:{maxUsedGas:'0x5208'}),returnData:!privateCall?'0x':c.data==='0xeeee'?encodeAbiParameters([{type:'string'}],[fault.metadata??tokenURI]):encodeAbiParameters([{type:'uint256'}],[c.data==='0xdddd'?500n:BigInt((i+1)*100)])}))}));
+    if(fault.sharedBudget!==undefined) {
+      // Geth's gasBudget is shared across blocks, and consumes used gas after
+      // each call. These are synthetic responses, not captured project bytes.
+      let remaining=privateCall&&body.params[0].validation&&fault.strictBudget!==undefined?fault.strictBudget:fault.sharedBudget;
+      for(const [i,b] of blocks.entries()) for(const [j,c] of b.calls.entries()) {
+        const requested=BigInt(c.gas),allowed=requested<remaining?requested:remaining;
+        const demand=privateCall?fault.projectGas??21000n:12000n,used=demand<allowed?demand:allowed;
+        result[i].transactions[j].gas=`0x${allowed.toString(16)}`;
+        Object.assign(result[i].calls[j],{gasUsed:`0x${used.toString(16)}`,maxUsedGas:`0x${used.toString(16)}`});
+        if(demand>allowed) Object.assign(result[i].calls[j],{status:'0x0',returnData:'0x',error:{code:-32000,message:'synthetic out of gas'}});
+        remaining-=used;
+      }
+    }
     if(!privateCall&&blocks.length===40) {
       if(fault.longStatus) result[39].calls[0].status='0x0';
       if(fault.longHeader) result[39].parentHash=hash(500);
@@ -384,4 +398,59 @@ test('cancelling adapted discovery discards late success without strict replay o
     await gate;await rpc.close();release();await assert.rejects(pending,e=>e.kind==='rpc-unavailable');
     assert.equal(f.privateRequests().length,1);assert.equal(f.privateRequests()[0].body.params[0].validation,false);
   } finally {await rpc.close();await f.transport.close();}
+});
+
+const sharedBudgetPlan=()=>{const source=fullPlan();return {...source,discoveryGasPolicy:'provider-capacity',preparationCalls:Array.from({length:14},(_,i)=>call(i)),assertions:[]};};
+test('paid estimate uses the explicit approved pool entry point, not the legacy simulation-only factory',async()=>{
+  const legacy=createKeelSepoliaSimulationTransport(),f=fixture([{}],[urls[0]]),request=estimateRequest();
+  try {
+    await assert.rejects(legacy.request(request),e=>e.kind==='configuration-invalid'&&/read-only qualification and simulation methods/u.test(e.message));
+    assert.equal(await f.transport.request(request),'0x3d0900');
+    const sent=f.requests.filter(r=>r.body.method==='eth_estimateGas');assert.equal(sent.length,1);assert.equal(sent[0].index,0);
+    assert.deepEqual(sent[0].body.params,request.params);
+    assert.equal(f.privateRequests().length,0,'an estimate is not a simulation proof');
+  }finally{await legacy.close();await f.transport.close();}
+});
+test('a shared cross-block budget cannot masquerade as a fresh per-call ceiling during 14-call discovery', async()=>{
+  const f=fixture([{sharedBudget:50000000n}],[urls[0]]),source=sharedBudgetPlan(),before=structuredClone(source);
+  try {
+    const proof=await simulateKeelPublicationBeforeFunding(source,f.transport);
+    assert.deepEqual(source,before);
+    assert.deepEqual(proof.discoveryGas.capacityAttempts,[{requestedGas:'200000000',providerGasCap:'50000000'},
+      {requestedGas:'50000000',providerGasCap:'49988000',programGasBudget:'49988000',perCallGasLimit:'3570571'}]);
+    assert.ok(proof.discoveryGas.effectiveGasLimits.every(g=>g==='3570571'));
+    const sent=f.privateRequests();assert.deepEqual(sent.map(r=>[r.body.params[0].validation,r.body.params[0].blockStateCalls.length]),[[false,14],[true,14],[false,16]]);
+    const calls=r=>r.body.params[0].blockStateCalls.map(b=>b.calls[0]);
+    const withoutGas=({gas,gasPrice,maxFeePerGas,maxPriorityFeePerGas,...c})=>c;
+    for(const r of sent)assert.deepEqual(calls(r).slice(0,14).map(withoutGas),source.preparationCalls.map(withoutGas));
+    assert.deepEqual(calls(sent[2]).slice(0,14),calls(sent[1]));
+    assert.ok(calls(sent[1]).every(c=>BigInt(c.gas)>21000n),'measured margin is retained');
+    assert.equal(proof.completeTokenUriBytes,Buffer.byteLength(tokenURI));
+    assert.equal(proof.signing,'not-performed');assert.equal(proof.submission,'not-performed');
+    // A later read on the same pool uses cached remaining capacity, but still
+    // replays discovery, strict validation and exact complete metadata.
+    await simulateKeelPublicationBeforeFunding(source,f.transport);
+    assert.equal(f.privateRequests().length,6);
+  } finally {await f.transport.close();}
+});
+test('public multi-block clamp diagnostics identify the probe and position, before any private disclosure',async()=>{
+  const seen=[],f=fixture([{sharedBudget:50000000n}],[urls[0]]);
+  const transport=createKeelPublicSepoliaSimulationPool({...f.options,onAttempt:d=>seen.push(d)});
+  try {
+    const request=program();request.params[0].blockStateCalls=Array.from({length:14},(_,i)=>({calls:[{...call(i),gas:'0x2fa92c0'}]}));
+    assert.equal(BigInt(request.params[0].blockStateCalls[0].calls[0].gas),49976000n);
+    await assert.rejects(transport.request(request),e=>e.kind==='provider-limit'&&e.diagnostic.phase==='public-qualification'
+      &&e.diagnostic.blockIndex===3&&e.diagnostic.callIndex===0&&e.diagnostic.requestedGasLimit==='49976000'&&e.diagnostic.providerGasCap==='49964000');
+    assert.equal(f.privateRequests().length,0);assert.equal(seen.at(-1).phase,'public-qualification');assert.equal(seen.at(-1).blockIndex,3);
+    assert.equal(seen.at(-1).requiredProgramGas,'699664000');
+  }finally{await transport.close();await f.transport.close();}
+});
+test('shared discovery never reduces a measured margin, accepts a strict clamp or ignores complete metadata',async()=>{
+  for(const [fault,kind] of [[{projectGas:3500000n},'provider-limit'],[{projectGas:4000000n},'execution-reverted'],[{strictBudget:25000n},'provider-limit'],[{metadata:'different'},'metadata-mismatch']]) {
+    const f=fixture([{sharedBudget:50000000n,...fault}],[urls[0]]),source=sharedBudgetPlan(),before=structuredClone(source);
+    try {await assert.rejects(simulateKeelPublicationBeforeFunding(source,f.transport),e=>e.kind===kind);assert.deepEqual(source,before);
+      assert.ok(f.privateRequests().filter(r=>r.body.params[0].validation).length<=1);
+      if(fault.projectGas)assert.equal(f.privateRequests().some(r=>r.body.params[0].validation),false);
+    }finally{await f.transport.close();}
+  }
 });

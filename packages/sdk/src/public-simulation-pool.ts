@@ -199,6 +199,10 @@ export function createKeelPublicSepoliaSimulationPool(options: KeelPublicSimulat
         if (closed) throw new KeelPublicationSimulationError("rpc-unavailable", "The publication check was cancelled.");
         const classified = keelSimulationTransportFailure(error, { method: "eth_simulateV1", phase: projectRequest ? "project-request" : "public-qualification" });
         const failure = new KeelPublicationSimulationError(classified.kind, classified.message, { ...classified.diagnostic,
+          // The nested transport calls every post-qualification request a
+          // project request, including this pool's public sequence probe.
+          // This boundary knows whether private calldata was actually sent.
+          phase: projectRequest ? "project-request" : "public-qualification",
           // Conservative envelope sum, not measured execution gas. Bytes exclude
           // only the pool-owned JSON-RPC id/version envelope.
           requiredProgramGas: gasLimits.reduce((sum, gas) => sum + gas, 0n).toString(),

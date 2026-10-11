@@ -95,7 +95,7 @@ test("every direct transport simulation phase rejects silent gas clamping before
     });
     await assert.rejects(simulateKeelPublicationBeforeFunding(input(), f.transport), error => {
       assert.equal(error.kind, "provider-limit");
-      assert.deepEqual(error.diagnostic, { requestedGasLimit: requestedGas.toString(), providerGasCap: (requestedGas - 1n).toString() });
+      assert.deepEqual(error.diagnostic, { requestedGasLimit: requestedGas.toString(), providerGasCap: (requestedGas - 1n).toString(), blockIndex: 0, callIndex: 0 });
       return true;
     });
     assert.equal(f.requests.filter(request => request.method === "eth_simulateV1").length, pass);

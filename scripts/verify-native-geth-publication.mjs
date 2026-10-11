@@ -88,6 +88,37 @@ try {
   record("SDK refuses a provider-clamped 200M discovery envelope");
   await assert.rejects(simulateKeelPublicationBeforeFunding({ ...plan, preparationCalls: calls }, transport), error => error.kind === "provider-limit");
   record("SDK also refuses aggregate exhaustion when each discovery envelope is only 16M");
+  const emptySequence = simulate(Array.from({ length: 14 }, (_, i) => ({ ...calls[0], to: owner, data: "0x", nonce: toHex(i), gas: toHex(49_976_000n) })));
+  assert.ok(emptySequence.every(block => BigInt(block.calls[0].gasUsed) === 12_000n));
+  assert.equal(BigInt(emptySequence[3].transactions[0].gas), 49_964_000n);
+  record("native shared budget reproduces the 12000-gas public-probe decrement", { blocks: summary(emptySequence) });
+  const smallPlan = { ...plan, discoveryGasPolicy: "provider-capacity",
+    preparationCalls: Array.from({ length: 14 }, (_, i) => ({ ...plan.preparationCalls[0], data: calldata("write", [1n]), nonce: toHex(i) })),
+    assertions: Array.from({ length: 14 }, (_, i) => ({ callIndex: i, returnData: encodeAbiParameters([{ type: "uint256" }], [BigInt(i + 1)]) })),
+    requiredReaderCalls: [{ ...plan.requiredReaderCalls[0], expectedReturn: encodeAbiParameters([{ type: "uint256" }], [14n]) }],
+    metadataCall: { ...plan.metadataCall, data: calldata("tokenURIForCount", [14n]) },
+  };
+  const smallBefore = structuredClone(smallPlan), smallRequests = [];
+  const smallProof = await simulateKeelPublicationBeforeFunding(smallPlan, { request: async request => {
+    if (request.method === "eth_simulateV1") smallRequests.push(request.params);
+    return rpc(request.method, request.params);
+  } });
+  assert.deepEqual(smallPlan, smallBefore);
+  assert.equal(smallProof.validatedTransactionCalls, 14);
+  assert.equal(smallProof.completeTokenUriBytes, Buffer.byteLength(expectedTokenURI));
+  assert.equal(smallProof.discoveryGas.capacityAttempts.length, 2);
+  assert.ok(smallProof.discoveryGas.capacityAttempts[1].programGasBudget);
+  const smallStrict = smallRequests.find(([program]) => program.validation);
+  assert.ok(smallStrict);
+  assert.deepEqual(smallRequests.at(-1)[0].blockStateCalls.slice(0, 14), smallStrict[0].blockStateCalls);
+  assert.ok(smallProof.transactionGasLimits.every((gas, i) => BigInt(gas) > BigInt(smallProof.transactionGasUsed[i])));
+  record("14-call shared-budget discovery fully replays strict state and exact metadata without reducing measured margins", {
+    capacityAttempts: smallProof.discoveryGas.capacityAttempts, transactionGasLimits: smallProof.transactionGasLimits,
+    transactionGasUsed: smallProof.transactionGasUsed, completeTokenUriBytes: smallProof.completeTokenUriBytes,
+    phases: smallRequests.map(([program]) => ({ validation: program.validation, blocks: program.blockStateCalls.length })),
+  });
+  await assert.rejects(simulateKeelPublicationBeforeFunding({ ...plan, discoveryGasPolicy: "provider-capacity" }, transport), error => ["provider-limit", "execution-reverted"].includes(error.kind));
+  record("shared-budget discovery still refuses a program whose actual execution exceeds provider capacity");
   await start(200_000_000);
   const empty = simulate([{ ...calls[0], to: owner, data: "0x", gas: toHex(selectedGasLimit) }]);
   assert.equal(BigInt(empty[0].transactions[0].gas), selectedGasLimit);
