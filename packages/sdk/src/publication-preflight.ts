@@ -99,8 +99,8 @@ export function keelSimulationTransportDiagnostic(error: unknown, context: {
   readonly socketCloseCode?: number; readonly socketCloseReason?: string;
   readonly transport?: string;
 } = {}): Readonly<Record<string, string | number>> {
-  const methods = ["eth_chainId", "eth_getBlockByNumber", "eth_getTransactionCount", "eth_getBalance", "eth_getCode", "eth_simulateV1"];
-  const phases = ["publication-preflight", "public-qualification", "project-request", "initial-storage"];
+  const methods = ["eth_chainId", "eth_getBlockByNumber", "eth_getTransactionCount", "eth_getBalance", "eth_getCode", "eth_estimateGas", "eth_simulateV1"];
+  const phases = ["publication-preflight", "public-qualification", "project-estimate", "project-request", "initial-storage"];
   const classes = ["Error", "TypeError", "TimeoutError", "HttpRequestError", "WebSocketRequestError", "SocketClosedError", "RpcRequestError", "UnknownRpcError", "KeelPublicationSimulationError"];
   const failures = ["timeout", "connection-reset", "connection-closed", "dns", "rate-limited", "http-error", "rpc-error", "unknown"];
   const codes = ["ETIMEDOUT", "ECONNRESET", "ECONNREFUSED", "EPIPE", "ENOTFOUND", "EAI_AGAIN", "UND_ERR_CONNECT_TIMEOUT", "UND_ERR_SOCKET"];

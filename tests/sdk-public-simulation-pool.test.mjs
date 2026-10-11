@@ -454,3 +454,18 @@ test('shared discovery never reduces a measured margin, accepts a strict clamp o
     }finally{await f.transport.close();}
   }
 });
+test('shared discovery and a rejected 60M public-read ceiling preserve the strictly measured transactions',async()=>{
+  const f=fixture([{sharedBudget:50000000n}],[urls[0]]),source=sharedBudgetPlan();
+  source.maximumReadGas=60000000n;source.metadataCall={...source.metadataCall,gas:'0x3938700'};
+  const before=structuredClone(source);
+  try {
+    const proof=await simulateKeelPublicationBeforeFunding(source,f.transport);
+    assert.deepEqual(source,before);assert.equal(proof.readBoundaryAttempts.length,3);
+    assert.equal(proof.effectiveReadGasLimit,'49685000');
+    const sent=f.privateRequests(),strict=sent.find(r=>r.body.params[0].validation).body.params[0].blockStateCalls;
+    const replay=sent.filter(r=>r.body.params[0].blockStateCalls.length===16);
+    assert.equal(replay.length,2);
+    for(const request of replay)assert.deepEqual(request.body.params[0].blockStateCalls.slice(0,14),strict);
+    assert.equal(proof.completeTokenUriBytes,Buffer.byteLength(tokenURI));
+  }finally{await f.transport.close();}
+});

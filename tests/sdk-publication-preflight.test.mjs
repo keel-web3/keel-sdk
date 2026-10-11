@@ -27,6 +27,9 @@ test('diagnostics bound cyclic causes and allow only enumerated names, methods, 
   assert.equal(d.socketReadyState,2);assert.equal(d.causeDepth,0);assert.ok(JSON.stringify(d).length<400);assert.doesNotMatch(JSON.stringify(d),/SECRET|PRIVATE/);
   const timeout=keelSimulationTransportDiagnostic({name:'Error',cause:{code:'ETIMEDOUT'}},{method:'eth_getBlockByNumber',phase:'public-qualification'});
   assert.equal(timeout.transportFailure,'timeout');assert.equal(timeout.transportCode,'ETIMEDOUT');assert.equal(timeout.rpcMethod,'eth_getBlockByNumber');
+  const estimate=keelSimulationTransportDiagnostic({name:'Error',diagnostic:{blockIndex:3,callIndex:0}},{method:'eth_estimateGas',phase:'project-estimate'});
+  assert.equal(estimate.rpcMethod,'eth_estimateGas');assert.equal(estimate.phase,'project-estimate');assert.equal(estimate.blockIndex,3);assert.equal(estimate.callIndex,0);
+  const invalid=keelSimulationTransportDiagnostic({diagnostic:{blockIndex:256,callIndex:-1}});assert.equal(invalid.blockIndex,undefined);assert.equal(invalid.callIndex,undefined);
 });
 function fixture(change = {}) {
   const requests = [];
