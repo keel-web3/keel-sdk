@@ -239,3 +239,42 @@ test('the recorded 2026-10-11 PublicNode clamp remains a failed capability gate,
   assert.equal(evidence.canonicalPublicationReceipt, null);
   assert.equal(evidence.deployedCollection, null);
 });
+
+test('a lower explicit envelope requalifies after a larger cap rejection without rewriting any calls', async () => {
+  const f = fixture([{cap:true}]);
+  try {
+    const tooLarge = program();
+    await assert.rejects(f.transport.request(tooLarge), error => error.kind === 'provider-limit' && error.diagnostic.providerGasCap === '50000000');
+    assert.equal(f.privateRequests().length, 0);
+    const requestsAfterFailure = f.requests.length;
+    await assert.rejects(f.transport.request(tooLarge), error => error.kind === 'provider-limit');
+    assert.equal(f.requests.length, requestsAfterFailure, 'same oversized request stays rejected');
+    const smaller = program();
+    for (const block of smaller.params[0].blockStateCalls) block.calls[0].gas = '0x2faf080';
+    await f.transport.request(smaller);
+    assert.equal(f.privateRequests().length, 1);
+    assert.deepEqual(f.privateRequests()[0].body.params, smaller.params);
+    const publicRequalification = f.requests.slice(requestsAfterFailure).filter(request => request.body.method === 'eth_simulateV1' && request.body.params[0].blockStateCalls[0].calls[0].data === '0x');
+    assert.ok(publicRequalification.some(request => request.body.params[0].validation === true));
+    assert.ok(publicRequalification.some(request => request.body.params[0].blockStateCalls.length === smaller.params[0].blockStateCalls.length));
+  } finally { await f.transport.close(); }
+});
+
+test('the complete metadata read adapts its rejected ceiling while preserving exact transactions', async () => {
+  const f = fixture([{cap:true}]);
+  try {
+    const input = fullPlan();
+    for (const call of input.preparationCalls) call.gas = '0x989680';
+    input.maximumReadGas = 60000000n; input.metadataCall.gas = '0x3938700';
+    const proof = await simulateKeelPublicationBeforeFunding(input, f.transport);
+    assert.equal(proof.requestedReadGasLimit, '60000000');
+    assert.equal(proof.effectiveReadGasLimit, '50000000');
+    assert.deepEqual(proof.readBoundaryAttempts, [{requestedGas:'60000000', providerGasCap:'50000000'}]);
+    const requests = f.privateRequests();
+    assert.deepEqual(requests.map(request => request.body.params[0].blockStateCalls.length), [5,5,7]);
+    const validated = requests[1].body.params[0].blockStateCalls;
+    assert.deepEqual(requests[2].body.params[0].blockStateCalls.slice(0,5), validated);
+    assert.equal(proof.verification, 'collector-metadata');
+    assert.equal(proof.completeTokenUriBytes, Buffer.byteLength(tokenURI));
+  } finally { await f.transport.close(); }
+});

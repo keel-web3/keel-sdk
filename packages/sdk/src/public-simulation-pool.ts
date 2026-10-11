@@ -37,6 +37,7 @@ export function createKeelPublicSepoliaSimulationPool(options: KeelPublicSimulat
     ...(options.fetchImpl ? { fetchImpl: options.fetchImpl } : {}), ...(options.minIntervalMs === undefined ? {} : { minIntervalMs: options.minIntervalMs }) } satisfies KeelRpcPoolOptions);
   if (!options.fetchImpl) { sharedPools.set(poolKey, pool); if (sharedPools.size > 16) sharedPools.delete(sharedPools.keys().next().value!); }
   const abort = new AbortController(), rejected = new Set<number>();
+  const capacityRejected = new Map<number, { cap: bigint; failure: KeelPublicationSimulationError }>();
   type Candidate = { index: number; transport: ReturnType<typeof createPinnedKeelSepoliaSimulationTransport> };
   let selected: Candidate | undefined, cursor = 0, closed = false;
   // One ordered stream per publication transport. Separate publications retain
@@ -119,6 +120,12 @@ export function createKeelPublicSepoliaSimulationPool(options: KeelPublicSimulat
       if (closed) throw new KeelPublicationSimulationError("rpc-unavailable", "The publication check was cancelled.");
       const index = (start + offset) % urls.length;
       if (rejected.has(index)) continue;
+      const capacity = capacityRejected.get(index);
+      if (capacity && requiredGas > capacity.cap) { capacityFailure ??= capacity.failure; continue; }
+      // A prior larger public read ceiling did not qualify this smaller request.
+      // Reconnect and requalify its entire unchanged sequence; never change any
+      // transaction or read here. Only the caller owns bounded read adaptation.
+
       let candidate = selected?.index === index ? selected : create(index), projectRequest = false;
       try {
         const head = object(await pool.pin(index).request({ method: "eth_getBlockByNumber", params: ["latest", false], signal: abort.signal }));
@@ -157,7 +164,13 @@ export function createKeelPublicSepoliaSimulationPool(options: KeelPublicSimulat
           || failure.kind === "provider-limit" && (failure.diagnostic?.providerGasCap !== undefined || failure.diagnostic?.httpStatus === 413);
         if (projectRequest && (!["provider-limit", "unsupported-simulation", "rpc-unavailable"].includes(failure.kind)
           || !retryableRpcRejection || code === -32602 || typeof code === "number" && code <= -38000 && code >= -38099)) throw failure;
-        rejected.add(index); lastFailure = failure;
+        const reportedCap = failure.kind === "provider-limit" ? failure.diagnostic?.providerGasCap : undefined;
+        if (typeof reportedCap === "string" && /^[1-9]\d*$/u.test(reportedCap) && BigInt(reportedCap) < requiredGas) {
+          const previous = capacityRejected.get(index);
+          const cap = BigInt(reportedCap);
+          capacityRejected.set(index, { cap: previous && previous.cap < cap ? previous.cap : cap, failure });
+        } else rejected.add(index);
+        lastFailure = failure;
         if (failure.kind === "provider-limit") capacityFailure ??= failure;
         try { options.onAttempt?.({ ...keelSimulationTransportDiagnostic(failure), candidateIndex: index, candidateCount: urls.length }); } catch { /* Diagnostic observers cannot alter proof. */ }
       }
