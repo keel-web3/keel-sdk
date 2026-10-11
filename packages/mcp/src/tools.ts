@@ -720,7 +720,7 @@ function parseOnchainReads(value: unknown): readonly KeelOnchainRead[] {
  * fact in the response rather than a claim in a comment.
  */
 async function onchainDataTool(context: ToolContext, value: unknown): Promise<unknown> {
-  const input = record(value, ["rpcUrl", "reads", "record", "blockTag", "globalName", "moduleId", "version"], "On-chain data arguments");
+  const input = record(value, ["chainId", "rpcUrl", "reads", "record", "blockTag", "globalName", "moduleId", "version"], "On-chain data arguments");
   const seedInput = input.record === undefined ? undefined : record(input.record, ["address", "recordId", "batchSize"], "Seed record");
   const seedBatchSize = seedInput === undefined ? undefined : optionalNumber(seedInput, "batchSize");
   const seedRecord = seedInput === undefined ? undefined : {
@@ -730,7 +730,8 @@ async function onchainDataTool(context: ToolContext, value: unknown): Promise<un
   };
   const reads = seedRecord && Array.isArray(input.reads) && input.reads.length === 0 ? [] : parseOnchainReads(input.reads);
   const explicitRpc = optionalString(input, "rpcUrl") ?? process.env.KEEL_ONCHAIN_RPC_URL;
-  const rpc = await mcpRpc(context, explicitRpc === undefined ? {} : { rpcUrl: explicitRpc }, true);
+  const chainId = optionalNumber(input, "chainId");
+  const rpc = await mcpRpc(context, { ...(explicitRpc === undefined ? {} : { rpcUrl: explicitRpc }), ...(chainId === undefined ? {} : { chainId }) }, true);
   const blockTag = optionalString(input, "blockTag");
   const globalName = optionalString(input, "globalName");
   const moduleId = optionalString(input, "moduleId") ?? "keel/onchain-data";
@@ -788,11 +789,12 @@ async function onchainDataTool(context: ToolContext, value: unknown): Promise<un
 }
 
 async function endpointConfigTool(context: ToolContext, value: unknown): Promise<unknown> {
-  const input = record(value, ["studioUrl", "publicRpcUrl", "indexerUrl"], "KEEL endpoint arguments");
+  const input = record(value, ["chainId", "studioUrl", "publicRpcUrl", "indexerUrl"], "KEEL endpoint arguments");
   const studioUrl = optionalString(input, "studioUrl");
   const publicRpcUrl = optionalString(input, "publicRpcUrl");
   const indexerUrl = optionalString(input, "indexerUrl");
-  const rpc = await mcpRpc(context, publicRpcUrl === undefined ? {} : { rpcUrl: publicRpcUrl });
+  const chainId = optionalNumber(input, "chainId");
+  const rpc = await mcpRpc(context, { ...(publicRpcUrl === undefined ? {} : { rpcUrl: publicRpcUrl }), ...(chainId === undefined ? {} : { chainId }) });
   const endpoints = resolveKeelEndpoints({
     ...(studioUrl === undefined ? {} : { studioUrl }),
     publicRpcUrl: rpc.rpcUrl,

@@ -115,6 +115,9 @@ export type KeelStudioReleaseAccessMode = "public" | "allowlist" | "holder" | "c
 
 export interface KeelStudioAgentReleaseDraft {
   readonly artifactId: string | null;
+  /** Exact selected EVM chain. Omission preserves legacy draft compatibility;
+   * a display label never grants deployment or publication capability. */
+  readonly chainId?: number | null;
   readonly title: string;
   readonly description: string;
   readonly story: string;
@@ -346,9 +349,12 @@ export function validateKeelStudioAgentReleaseDraft(value: unknown): KeelStudioA
   const input = value as Record<string, unknown>;
   // A creator or agent commonly edits the object returned by `read`; accept
   // those read-only view fields and strip them from the update payload.
-  const allowed = new Set<string>([...RELEASE_DRAFT_FIELDS, "id", "revision", "status", "slug", "reviewUrl", "lastReadDiagnostic"]);
+  const allowed = new Set<string>([...RELEASE_DRAFT_FIELDS, "chainId", "id", "revision", "status", "slug", "reviewUrl", "lastReadDiagnostic"]);
   for (const key of Object.keys(input)) if (!allowed.has(key)) throw new TypeError(`Studio release draft.${key} is not supported.`);
   for (const key of RELEASE_DRAFT_FIELDS) if (!(key in input)) throw new TypeError(`Studio release draft.${key} is required.`);
+  if (input.chainId !== undefined && input.chainId !== null && (!Number.isSafeInteger(input.chainId) || Number(input.chainId) < 1)) {
+    throw new TypeError("Studio release draft.chainId must be a positive safe integer or null.");
+  }
 
   const title = boundedDraftText(input.title, "Studio release draft.title", 140).trim();
   if (title.length === 0) throw new TypeError("Studio release draft.title must not be empty.");
@@ -375,6 +381,7 @@ export function validateKeelStudioAgentReleaseDraft(value: unknown): KeelStudioA
 
   return Object.freeze({
     artifactId,
+    ...(input.chainId === undefined ? {} : { chainId: input.chainId as number | null }),
     title,
     description,
     story,

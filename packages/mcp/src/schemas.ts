@@ -414,6 +414,7 @@ const onchainRead: JsonSchema = object({
   pick: integer("Take one member of a multi-value return instead of the whole tuple.", 0, 31),
 }, ["name", "address", "signature", "returns"]);
 const onchainData: JsonSchema = object({
+  chainId: integer("Selected EVM chain. The shared RPC pool verifies it before contract reads; a different-chain fallback is refused.", 1),
   rpcUrl: string("Optional JSON-RPC endpoint. Omit to resolve KEEL_ONCHAIN_RPC_URL, then the configured public RPC. HTTP is accepted only on a loopback host, which is how a local anvil is reached.", 512),
   reads: { type: "array", items: onchainRead, minItems: 0, maxItems: 64, description: "Additional values this artwork needs. Can be empty when record is supplied." },
   record: object({
@@ -427,6 +428,7 @@ const onchainData: JsonSchema = object({
   version: string("Inline module version recorded with the fragment. Defaults to 1.0.0.", 32),
 }, ["reads"]);
 const endpointConfig: JsonSchema = object({
+  chainId: integer("Selected EVM chain; resolves this chain's configured/indexed providers without changing the workspace default.", 1),
   studioUrl: string("Optional credential-free HTTPS Studio origin.", 512),
   publicRpcUrl: string("Optional credential-free HTTPS public wallet/browser RPC origin.", 512),
   indexerUrl: string("Optional credential-free HTTPS indexer origin.", 512),
