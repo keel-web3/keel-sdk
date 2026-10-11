@@ -32,3 +32,10 @@ switching the public catalog to Base90 records. Older deployed Studio parsers
 accept only Base64 runtime records. The new module catalog stays on the refresh
 branch until that consumer migration is verified. Source/build verification,
 consumer deployment and chain publication remain separate gates.
+
+For a catalog consumed by those existing Studio versions, run
+`keel module index --runtime-encoding base64`. The explicit option preserves
+the legacy catalog representation while retaining the same receipt and output
+digest checks. Omitting it still selects Base90 for new catalogs; unsupported
+values fail before writing a catalog. The `modules-verify` workflow pins this
+repository's Base64 choice rather than silently migrating its consumers.
