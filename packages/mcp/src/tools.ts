@@ -662,12 +662,12 @@ async function chainGuideTool(_context: ToolContext, value: unknown): Promise<un
   return chainGuide(value);
 }
 
-async function keelLibrarySearchTool(_context: ToolContext, value: unknown): Promise<unknown> {
+async function keelLibrarySearchTool(context: ToolContext, value: unknown): Promise<unknown> {
   const input = record(value, ["studioUrl", "query", "limit"], "Keel index search arguments");
   const query = requiredString(input, "query");
   const studioUrl = optionalString(input, "studioUrl");
   const limit = optionalNumber(input, "limit");
-  return searchKeelIndexes({ query, ...(studioUrl === undefined ? {} : { studioUrl }), ...(limit === undefined ? {} : { limit }) });
+  return searchKeelIndexes({ query, workspaceRoot: context.workspace.root, ...(studioUrl === undefined ? {} : { studioUrl }), ...(limit === undefined ? {} : { limit }) });
 }
 
 async function studioCapabilitiesTool(_context: ToolContext, value: unknown): Promise<unknown> {
@@ -1489,7 +1489,7 @@ export const TOOL_DEFINITIONS: readonly ToolDefinition[] = [
   tool("fray-auction-intake", "Collect the title, description, chain, and one of exactly four Fray auction presets before emitting a user-approved API and wallet handoff; no signing or submission occurs.", TOOL_SCHEMAS.frayAuctionIntake, frayAuctionIntakeTool),
   tool("fray-stage-project", "Upload bounded source bytes to the configured Fray Studio temporary project store, prepare still/video previews, preflight the fee, and return a wallet-facing handoff; no signing or submission occurs.", TOOL_SCHEMAS.frayStageProject, frayStageProjectTool),
   tool("keel-chain-guide", "List wallet connection profiles and human faucet links; these do not establish KEEL deployments. Use keel-network-discover for deployed networks; the MCP server never claims faucet funds or moves wallet assets.", TOOL_SCHEMAS.chainGuide, chainGuideTool),
-  tool("keel-library-search", "Search configured Keel Studio Keel indexes for exact reusable library/module candidates; metadata only, no carrier bytes are fetched.", TOOL_SCHEMAS.keelLibrarySearch, keelLibrarySearchTool),
+  tool("keel-library-search", "Search configured Studio indexes and SDK/workspace publication-reference manifests for reusable candidates. References require selected-chain readback; empty indexes never authorize replacement engine uploads. Metadata only.", TOOL_SCHEMAS.keelLibrarySearch, keelLibrarySearchTool),
   tool("keel-onchain-data-prepare", "Turn declared contract reads into artwork variables. With record, automatically discover its KEEL seed profile and expose KEEL.data.token without individual field declarations; the contract must advertise IKeelMintSeededData. Each declared read becomes one eth_call, the answers are frozen into a canonical pack, and the tool returns the init fragment that publishes them as a frozen global before any runtime or render module runs, so creator code reads KEEL.data.<name> instead of fetching at draw time and finding undefined. Static return types only: a dynamic return needs an offset table, and guessing it would hand back a plausible wrong number. Arguments are decimal or 0x-hex text because a uint256 does not survive a JSON number. An omitted rpcUrl resolves KEEL_ONCHAIN_RPC_URL, then environment or private workspace RPC configuration, then the index/config-selected network public RPC pool; loopback HTTP is accepted so a local anvil is the ordinary target while a work is being built. The returned fragment is executed before it is returned, so the published values are checked, not assumed. Read-only: eth_call plus chain identity and head. No signing or submission occurs, no state is written, and no wallet is touched.", TOOL_SCHEMAS.onchainData, onchainDataTool),
   tool("keel-endpoint-config", "Resolve the hosted Studio website (https://studio.onkeel.io by default; Desktop is optional), indexer settings and the index/config-selected network RPC pool with explicit input, environment or private workspace configuration. Keyed RPC paths/query strings are redacted in the response; deployment index may be fetched; no wallet request occurs.", TOOL_SCHEMAS.endpointConfig, endpointConfigTool),
   tool("keel-studio-capabilities", "Inspect a Studio's supported chains, zero-spend sandbox, staging, authorization, and MSP readiness before any upload or wallet action.", TOOL_SCHEMAS.studioCapabilities, studioCapabilitiesTool),

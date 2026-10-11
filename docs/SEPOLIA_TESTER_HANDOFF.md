@@ -1,3 +1,5 @@
+> Fresh SDK/MCP dense preparation now uses URI81. The Base90 deployment evidence below remains historical; it does not prove an authenticated URI81 registration. Existing objects stay unchanged, and fresh publication rejects a mismatched registered profile before uploading or signing.
+
 # Ethereum Sepolia tester handoff
 
 Use the normal [network discovery/configuration workflow](KEEL_NETWORK_DISCOVERY.md):
@@ -34,8 +36,8 @@ The factory's four implementations and seed-block archive are also recorded.
 The older `KeelFactory` and legacy Base64 renderer route are separate APIs.
 
 The reusable verification shell uses **gzip/Base64 boot** with its embedded
-**Base90/Brotli decoder**. Fresh packages default to Brotli when smaller, then
-Base90 and parser/COPY-reader escaping. Prepared payloads are copied during
+**Base90/Brotli decoder**. That historical deployment used Brotli when smaller, then
+Base90 and parser/COPY-reader escaping. Fresh packages now use URI81. Prepared payloads are copied during
 tokenURI, with no runtime payload encoder or whole-document Base64 wrapper.
 Public modules declare `encryption: none`; optional private envelopes keep their
 actual encryption profile. Existing REDLINE PPMd packages retain their codec.

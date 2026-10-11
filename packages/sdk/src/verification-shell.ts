@@ -970,7 +970,7 @@ function compactInlineRuntime(
     });
     const frame = document.createElement("iframe");
     frame.title = "Verified KEEL work";
-    frame.sandbox.add("allow-scripts", "allow-pointer-lock");
+    frame.sandbox.add("allow-scripts", "allow-pointer-lock", "allow-downloads");
     frame.referrerPolicy = "no-referrer";
     const directMedia = entry.mediaType.startsWith("image/") || entry.mediaType.startsWith("video/") || entry.mediaType === "model/gltf-binary";
     const assetDisplay = directMedia

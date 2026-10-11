@@ -3,11 +3,11 @@ import assert from 'node:assert/strict';
 import { createIntegrity, sealKeelContent, describeKeelSealed, openKeelContent } from '../packages/protocol/dist/index.js';
 import { prepareKeelModuleRuntime, decodeKeelModuleRuntime } from '../packages/sdk/dist/module-runtime.js';
 
-test('new module runtime defaults to Brotli plus Base90, exposes actual transport, and reconstructs its exact output', async () => {
+test('new module runtime defaults to Brotli plus URI81, exposes actual transport, and reconstructs its exact output', async () => {
   const bytes = Buffer.from('export const value="</script> % # 🌊";\n'.repeat(100));
   const digest = (await createIntegrity(bytes)).digest;
   const runtime = await prepareKeelModuleRuntime(bytes, { format: 'esm', entry: 'src/index.ts' });
-  assert.equal(runtime.encoding, 'base90');
+  assert.equal(runtime.encoding, 'uri81');
   assert.equal(runtime.compression, 'brotli');
   assert.equal(runtime.encryption, 'none');
   assert.deepEqual(Buffer.from(await decodeKeelModuleRuntime(JSON.parse(JSON.stringify(runtime)), digest)), bytes);
@@ -39,4 +39,12 @@ test('sealed encryption metadata names the symmetric primitives without attestin
   assert.equal((await openKeelContent(sealed.envelope, { kind: 'raw-key', key })).text, 'private package '.repeat(100));
   const corrupted = sealed.envelope.slice(); corrupted[corrupted.length - 1] ^= 1;
   await assert.rejects(openKeelContent(corrupted, { kind: 'raw-key', key }));
+});
+
+test('legacy Base90 module records still verify and decode; profile mislabeling fails',async()=>{
+ const {encodeKeelDenseTransport}=await import('../packages/sdk/dist/dense-transport.js');
+ const bytes=Buffer.from('existing public module');const integrity=await createIntegrity(bytes);
+ const legacy={schema:'keel-module-runtime@2',encoding:'base90',transportProfile:'base90-v1',encryption:'none',compression:'none',format:'esm',entry:'index.js',storedIntegrity:integrity,decodedIntegrity:integrity,data:encodeKeelDenseTransport(bytes,'base90-v1')};
+ assert.deepEqual(Buffer.from(await decodeKeelModuleRuntime(legacy,integrity.digest)),bytes);
+ await assert.rejects(decodeKeelModuleRuntime({...legacy,encoding:'uri81'},integrity.digest),/transport/);
 });

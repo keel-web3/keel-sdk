@@ -8,11 +8,11 @@ test('COPY fragment preparation round-trips URI-valid characters rejected by dep
  assert.doesNotMatch(Buffer.from(prepared).toString(),/[?&']/);
  assert.equal(Buffer.from(decodeKeelPreparedDenseCopyFragment(prepared)).toString(),source);
 });
-test('fresh preparation compresses with Brotli before Base90 and nested escaping; incompressible and explicit none stay uncompressed',async()=>{
+test('fresh preparation compresses with Brotli before URI81 and nested escaping; incompressible and explicit none stay uncompressed',async()=>{
  const {brotliDecompressSync}=await import('node:zlib');
  const source=Buffer.from('Hello world🔥%#"</script>\0'.repeat(100));
  const prepared=prepareKeelDensePayload(source);
- assert.equal(prepared.compression,'brotli');assert.equal(prepared.transportProfile,'base90-v1');
+ assert.equal(prepared.compression,'brotli');assert.equal(prepared.transportProfile,'uri81-block-v1');
  assert.ok(prepared.compressedBytes.length<source.length);
  const json=Buffer.from(decodeKeelPreparedDenseCopyFragment(prepared.preparedBytes)).toString();
  const dense=JSON.parse('"'+json+'"');assert.equal(dense,prepared.storedDense);
@@ -23,17 +23,17 @@ test('fresh preparation compresses with Brotli before Base90 and nested escaping
  const raw=prepareKeelDensePayload(source,{compression:'none'});assert.equal(raw.compression,'none');assert.deepEqual(Buffer.from(raw.compressedBytes),source);
  assert.throws(()=>prepareKeelDensePayload(source,{compression:'gzip'}),/compression/);
 });
-async function fixture(carriage='base90'){
+async function fixture(carriage='uri81'){
  const shell=await buildKeelPreparedDenseCopyShell({codecProfile:'lzma-js',embeddedContainerDelivery:delivery,binaryPayloadCarriage:carriage});const profile={base90:'base90-v1',base91:'base91-v1','base90-block':'base90-block-v2',uri81:'uri81-block-v1'}[carriage];
  const bytes=randomBytes(4096),pack={containerId:'0x'+'22'.repeat(32),objectId:'0x'+'33'.repeat(32),storedIntegrity:{algorithm:'sha256',digest:sha(bytes),byteLength:bytes.length},storedDense:encodeKeelDenseTransport(bytes,profile)};
  const item={id:'example',onchain:{containerId:pack.containerId,offset:0}};
  const body=Buffer.from(shell.prefix).toString()+serializeKeelDenseTransportJSON(pack)+Buffer.from(shell.containerBridge).toString()+','+serializeKeelDenseTransportJSON(item)+Buffer.from(shell.suffix).toString();return{shell,bytes,profile,pack,body};
 }
-test('prepared dense shell defaults to escaped Base90 and rejects incompatible explicit choices',async()=>{
- const shell=await buildKeelPreparedDenseCopyShell({embeddedContainerDelivery:delivery});assert.equal(shell.payloadPreparation,'build-time');assert.equal(shell.contractOperation,'verified-copy');assert.equal(shell.resourceProfile,'embedded-shared-containers-base90@1');assert.equal(shell.shellBootEncoding,'base64');assert.equal(shell.codecProfile,'brotli-js');assert.ok(shell.supportedCodecs.includes('brotli'));
- for(const binaryPayloadCarriage of ['as-is','base64'])await assert.rejects(buildKeelPreparedDenseCopyShell({embeddedContainerDelivery:delivery,binaryPayloadCarriage}),/dense payload format/);
+test('prepared dense shell defaults to URI81 and rejects incompatible explicit choices',async()=>{
+ const shell=await buildKeelPreparedDenseCopyShell({embeddedContainerDelivery:delivery});assert.equal(shell.payloadPreparation,'build-time');assert.equal(shell.contractOperation,'verified-copy');assert.equal(shell.resourceProfile,'embedded-shared-containers-uri81@1');assert.equal(shell.shellBootEncoding,'base64');assert.equal(shell.codecProfile,'brotli-js');assert.ok(shell.supportedCodecs.includes('brotli'));
+ for(const binaryPayloadCarriage of ['as-is','base64','base90','base91','base90-block'])await assert.rejects(buildKeelPreparedDenseCopyShell({embeddedContainerDelivery:delivery,binaryPayloadCarriage}),/URI81/);
 });
-for(const carriage of ['base90','base91','base90-block','uri81'])test(`${carriage}: inspect literal shell framing and exact packed commitments without execution`,async()=>{
+for(const carriage of ['uri81'])test(`${carriage}: inspect literal shell framing and exact packed commitments without execution`,async()=>{
  const f=await fixture(carriage),unwrapped=inspectKeelPreparedDenseCopyDocument(f.body);assert.equal(unwrapped.transportProfile,f.profile);assert.match(unwrapped.html,/globalThis\.__KEEL_EMBEDDED_CONTAINERS__/);const audit=inspectKeelInlinePayloadCarriage(Buffer.from(f.body));assert.equal(audit.payloadCount,1);assert.equal(audit.packedPayloadBytes,f.bytes.length);assert.equal(audit.payloads[0].encoding,'dense');assert.equal(audit.preparedDenseCopy.contractOperation,'verified-copy');assertKeelFreshPayloadCarriage(Buffer.from(f.body));assertKeelFreshPayloadAudit(audit);
  const changed=f.body.replace(f.pack.storedIntegrity.digest,'0x'+'00'.repeat(32));assert.throws(()=>inspectKeelInlinePayloadCarriage(Buffer.from(changed)),/stored commitment/);
  const invalid=structuredClone(audit);invalid.preparedDenseCopy.payloadPreparation='read-time';assert.throws(()=>assertKeelFreshPayloadAudit(invalid),/prepared dense COPY audit/);
@@ -109,10 +109,29 @@ test('an oversized compression candidate cannot invalidate a legal raw carrier',
 });
 
 test('auto rejects a smaller compressed binary when its exact paid escaped carrier is larger',()=>{
- const source=Buffer.from('010106030202060007050703020601020606030003060502030201020201020702070607040300','hex');
- const options={transportProfile:'base91-v1'};
+ const source=Buffer.from('06020501060606040501000401010307000506030302000405060707000701010602','hex');
+ const options={};
  const compressed=prepareKeelDensePayload(source,{...options,compression:'brotli'});
  const raw=prepareKeelDensePayload(source,{...options,compression:'none'});
  assert.ok(compressed.compressedBytes.length<source.length);assert.ok(compressed.preparedBytes.length>raw.preparedBytes.length);
  assert.equal(prepareKeelDensePayload(source,options).compression,'none');
+});
+
+test("fresh preparation rejects legacy transports even when compression is enabled",()=>{
+ const source=Buffer.from("compressible source ".repeat(100));
+ for(const compression of ["auto","brotli","none"])for(const transportProfile of ["base90-v1","base91-v1","base90-block-v2"])assert.throws(()=>prepareKeelDensePayload(source,{compression,transportProfile}),/Fresh prepared COPY uses URI81/);
+});
+
+test('the historical Base90 token still decodes but cannot pass a fresh-publication audit',async()=>{
+ const {readFile}=await import('node:fs/promises');
+ const uri=await readFile(new URL('../deployments/creator-inline-20261005/minted-token.uri',import.meta.url),'utf8');
+ const metadata=JSON.parse(new TextDecoder().decode(decodeKeelInlineDataURI(uri,'application/json')));
+ const html=decodeKeelInlineDataURI(metadata.animation_url,'text/html');
+ const audit=inspectKeelInlinePayloadCarriage(html);
+ assert.equal(audit.preparedDenseCopy.transportProfile,'base90-v1');
+ assert.ok(audit.payloadCount>0);assert.equal(audit.requiresExistingPreparedReuse,true);
+ assert.throws(()=>assertKeelFreshPayloadAudit(audit),/fresh payload/);
+ assert.throws(()=>assertKeelFreshPayloadCarriage(html),/Legacy Base90/);
+ const forged=structuredClone(audit);forged.requiresExistingPreparedReuse=false;for(const payload of forged.payloads)payload.requiresExistingPreparedReuse=false;
+ assert.throws(()=>assertKeelFreshPayloadAudit(forged),/URI81/);
 });

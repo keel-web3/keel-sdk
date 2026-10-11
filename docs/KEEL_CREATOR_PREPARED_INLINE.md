@@ -1,3 +1,5 @@
+> Fresh SDK preparation now uses URI81. The creator-inline-20261005 deployment below is historical Base90 evidence. It must not be claimed as URI81 registration: fresh plans must authenticate a matching registered profile, and a mismatch stops before writes. Existing bindings stay unchanged.
+
 # Modern creator prepared Inline
 
 `prepareKeelCreatorInline` and MCP `keel-creator-inline-prepare` prepare fresh

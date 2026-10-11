@@ -176,7 +176,7 @@ export function inspectKeelInlinePayloadCarriage(htmlBytes: Uint8Array) {
         id: typeof item.id === "string" ? item.id : typeof item.objectId === "string" ? item.objectId : "container",
         mediaType, encoding, compression: typeof payload.compression === "string" ? payload.compression : "container-bound",
         binaryBytes: bytes.length, textCarriageBytes: encoder.encode(text).length,
-        directImage, requiresExistingPreparedReuse: encoding !== "text" && encoding !== "dense" && !directImage,
+        directImage, requiresExistingPreparedReuse: encoding === "dense" ? preparedDenseCopy!.transportProfile !== "uri81-block-v1" : encoding !== "text" && !directImage,
         ...(encoding === "dense" ? {transportProfile: preparedDenseCopy!.transportProfile} : {}),
       }));
     }
@@ -195,7 +195,7 @@ export function inspectKeelInlinePayloadCarriage(htmlBytes: Uint8Array) {
 export function assertKeelFreshPayloadCarriage(html: Uint8Array): void {
   const audit = inspectKeelInlinePayloadCarriage(html);
   if (audit.requiresExistingPreparedReuse) throw new TypeError(
-    "Fresh Inline forbids new storedBase64/storedHex body copies. Use raw UTF-8 text or exact existing prepared COPY; incompatible binary needs a verified reader recipe, not an encoding fallback.");
+    "Fresh Inline uses URI81 for dense payloads and forbids new storedBase64/storedHex body copies. Legacy Base90/91 require exact existing-object reuse. Use raw UTF-8 text or exact existing prepared COPY; incompatible binary needs a verified reader recipe, not an encoding fallback.");
 }
 
 /** Check the serialized audit again when reading a digest-bound review plan.
@@ -207,7 +207,7 @@ export function assertKeelFreshPayloadAudit(value: unknown): void {
       || audit.requiresExistingPreparedReuse !== false || !Array.isArray(audit.payloads) || audit.payloads.length > 16_384
       || audit.payloadCount !== audit.payloads.length) throw new TypeError("Invalid fresh payload carriage audit.");
   const prepared = audit.preparedDenseCopy === undefined ? undefined : object(audit.preparedDenseCopy);
-  if (prepared && (Object.keys(prepared).some(key => !["transportProfile","shellBootEncoding","shellBootCompression","payloadPreparation","contractOperation"].includes(key)) || !["base90-v1","base91-v1","base90-block-v2","uri81-block-v1"].includes(prepared.transportProfile as string) || prepared.shellBootEncoding !== "base64" || prepared.shellBootCompression !== undefined && prepared.shellBootCompression !== "gzip" && prepared.shellBootCompression !== "none" && prepared.shellBootCompression !== "ppmd" || prepared.payloadPreparation !== "build-time" || prepared.contractOperation !== "verified-copy")) throw new TypeError("Invalid prepared dense COPY audit.");
+  if (prepared && (Object.keys(prepared).some(key => !["transportProfile","shellBootEncoding","shellBootCompression","payloadPreparation","contractOperation"].includes(key)) || prepared.transportProfile !== "uri81-block-v1" || prepared.shellBootEncoding !== "base64" || prepared.shellBootCompression !== undefined && prepared.shellBootCompression !== "gzip" && prepared.shellBootCompression !== "none" && prepared.shellBootCompression !== "ppmd" || prepared.payloadPreparation !== "build-time" || prepared.contractOperation !== "verified-copy")) throw new TypeError("Invalid prepared dense COPY audit; fresh payloads require URI81.");
   let binary = 0, carried = 0;
   for (const value of audit.payloads) {
     const payload = object(value);
