@@ -1,6 +1,13 @@
-# Version-pinned shell repair qualification
+# Version-pinned optional shell migration qualification
 
-The repair is regenerated in a clean checkout of deployed SDK
+The observed owned-upload HTTP 400 is an application presentation-literal gate,
+not evidence of an incompatible deployed contract. The Site compatibility
+correction removes that visual-default gate while retaining authenticated
+registered bytes and actual reader capability checks. This five-object package
+is therefore an optional presentation migration, not an established required
+repair. Do not upload it solely because the old gate rejected revision 2.
+
+The candidate is regenerated in a clean checkout of deployed SDK
 `c5a51cc45ca03fd48a8f49255aa096d751b8b571`, built with Node 22.23.1 and pnpm
 10.15.0. The generator now requires the expected checkout commit and records
 its own SHA-256; it no longer hardcodes the routing branch's SDK provenance.
@@ -52,7 +59,7 @@ compact builder and modules; registration uses payload mode 2 with the legacy
 registered prefix/suffix and new metadata object.
 
 Before approval, the operator must refresh chain/block/runtime/keeper evidence,
-read limits and fees, authenticate existing objects/slugs, quote and fully
+qualify the exact legacy limits and fee profile below, authenticate existing objects/slugs, quote and fully
 simulate only missing storage operations, then simulate this exact registration
 from the keeper. The old 540577-gas estimate used old commitments and is not a
 repair quote. After registration, verify canonical receipts and full bytes,
@@ -60,3 +67,33 @@ apply only the verified shell catalogue fields, and run real tokenURI readback,
 direct data-URI browser acceptance and the same saved owned project. No live
 contract execution, registration, wallet signing or publication is certified
 by this offline qualification.
+
+## Exact legacy Hold runtime
+
+`scripts/verify-legacy-hold-profile.mjs` independently recompiles historical
+contracts commit `6d64c56ad7222e5f02b6590b6d91669235568da7` with its original
+solc 0.8.36, Prague, viaIR, optimizer 200 and metadata-disabled settings. It
+reproduces exactly 6,922 runtime bytes and keccak256
+`0x077e7511ef8deb6d2c1d56041ee230a1f6ffac4b861bf264c37346835653e0e5`, matching
+the authorized operator read and public deployment report for the Hold above.
+This is an offline reproduction against supplied chain evidence, not a fresh
+cloud chain observation.
+
+```sh
+node scripts/verify-legacy-hold-profile.mjs /path/to/keel-contracts /tmp/legacy-hold-audit
+```
+
+The exact runtime has fixed limits of 23,000 bytes per slug, three slugs per
+batch, 128 direct children and depth 16. Storage writes are nonpayable; this
+legacy Hold has no protocol storage fee, seal intent, manager, fee exemption
+or pause API. Network gas and any separate managed-service fee are not zero
+by implication. Modern manager or seal-fee getter reverts must not be treated
+as a runtime profile for an arbitrary contract. Require the exact code hash,
+fresh canonical evidence and the reproduced ABI before using this profile.
+
+The operator's 770,124,356 sum of individual cast estimates excludes welds and
+registration, so it is not a complete quote. Full sequential simulation under
+the exact Amsterdam capacity policy remains unqualified. The two tested RPCs
+reported `eth_simulateV1` unavailable; this does not establish availability of
+the separately approved PublicNode endpoint. No lower gas envelope, new
+provider, invented modern policy or wallet approval is supplied by this audit.
