@@ -6,12 +6,12 @@
   "tokenId": "1",
   "mintTransaction": "0xc08a0cd6f230cd3b6f0074360224134acddfd9e25e86b96d77c71cfbb1fc5364",
   "link": "https://onchainchecker.xyz/collection/sepolia/0x3F562678f56E46B47D42DC6251727ECF7Bd33ca2/1",
-  "blockNumber": "11896802",
-  "blockHash": "0xb085543c3dedad59292a183185018a91232cc9b435ee5e50fcf7dddc23f8c223",
+  "blockNumber": "11899558",
+  "blockHash": "0x65898c0fb901131f5f808c2ecfac208762cd18ab0c08c12e40c6ce0343108eaa",
   "tokenURI": {
-    "byteLength": 1046266,
-    "sha256": "0xa3d6d29312af7269bb14140743eae0ba4f9f966bb2cc5ba7f9089496cd76c7f2",
-    "matchesPublication": "live-canonical-shell-3-composer-7"
+    "byteLength": 1059131,
+    "sha256": "0xda871690f9928179ccc72bb6c5c073f37981853921ff0da60ef50925eef0ccbe",
+    "matchesPublication": "live-canonical-shell-3-composer-7-performance-20261012"
   },
   "transport": {
     "payload": "uri81-block-v1",
@@ -37,7 +37,6 @@
     "containers": 5,
     "resourceRPCs": 0,
     "items": [
-      null,
       {
         "aliases": [
           "trailer.module-runtime",
@@ -125,20 +124,20 @@
             "id": "0x81b2f7dd74f35026abd38011370afe409c80b1d7f578672ffbf3d78dd5914a06"
           },
           {
-            "id": "0x9181321a516c0762bfcc6642bffe91a8a8805062bb1f8adb777fb60e28db61ef",
+            "id": "0xf849f6070e2a506c007fd9bb1d6942c619f03fed0067cf0f4ddc45db1e9c5259",
             "chainId": 11155111,
             "store": "0xD820e337692A6Eb7a4878e42ce88CBCFF49B55CF",
-            "objectId": "0xfabb7e3f7f8b5ba6a28567831426de2f3633b81c2b7f82d357245706eb9b797d",
+            "objectId": "0x86d02a8a8fdd647f79fa22d7e3751c327e38241455695bb980af7db5bb4cb50d",
             "compression": "brotli",
             "storedIntegrity": {
               "algorithm": "sha256",
-              "digest": "0xb949cf9a5ffcf3823ff9640a090563c25a725f0932933eadc60ba96e7230dbc8",
-              "byteLength": 58262
+              "digest": "0xe3032eabbe241ba58531bc89c0d9c5b5c6d1dc2334e8bb8c3c44aed657edc7b7",
+              "byteLength": 68448
             },
             "integrity": {
               "algorithm": "sha256",
-              "digest": "0x70312b8c498839214ca2f1660f140b50136dd0f85a1891e4a69d35a55699cccc",
-              "byteLength": 262367
+              "digest": "0x16dd04ae390dcf5bbe0282b358abf7899906a5e8b535958b38d98b18b85c85cc",
+              "byteLength": 296355
             }
           }
         ]
@@ -1411,12 +1410,12 @@
         "id": "trailer.player",
         "integrity": {
           "algorithm": "sha256",
-          "digest": "0x7ff0ae647829bce4a0ada2ec0fb19c2f3d8ad6dd6913b64530576275f9d106a2",
-          "byteLength": 19295
+          "digest": "0xa7c0368b76df5c802abcf32403331a2079ca8f6e8863eb28f1ccb436fa99cdfe",
+          "byteLength": 27351
         },
         "mediaType": "text/javascript",
         "onchain": {
-          "containerId": "0x9181321a516c0762bfcc6642bffe91a8a8805062bb1f8adb777fb60e28db61ef",
+          "containerId": "0xf849f6070e2a506c007fd9bb1d6942c619f03fed0067cf0f4ddc45db1e9c5259",
           "offset": 0
         },
         "role": "module"
@@ -1429,13 +1428,13 @@
         "id": "trailer.adapter",
         "integrity": {
           "algorithm": "sha256",
-          "byteLength": 18944,
-          "digest": "0xebc11e638cf1a81d75790e957736b5b0c81508da6e3566f73d4bc2dbe1b5a6d9"
+          "digest": "0x2d5874995854ec2f972c6397ff47f8b2f91b2e3ed0976c38c2f77a827dc682c5",
+          "byteLength": 20721
         },
         "mediaType": "text/javascript",
         "onchain": {
-          "containerId": "0x81b2f7dd74f35026abd38011370afe409c80b1d7f578672ffbf3d78dd5914a06",
-          "offset": 105557
+          "containerId": "0xf849f6070e2a506c007fd9bb1d6942c619f03fed0067cf0f4ddc45db1e9c5259",
+          "offset": 27351
         },
         "role": "asset"
       },
@@ -1452,8 +1451,8 @@
         },
         "mediaType": "text/html",
         "onchain": {
-          "containerId": "0x9181321a516c0762bfcc6642bffe91a8a8805062bb1f8adb777fb60e28db61ef",
-          "offset": 19295
+          "containerId": "0xf849f6070e2a506c007fd9bb1d6942c619f03fed0067cf0f4ddc45db1e9c5259",
+          "offset": 48072
         },
         "role": "entrypoint"
       },
@@ -1494,26 +1493,26 @@
         "role": "asset"
       },
       {
-        "id": "engine.capture.offline",
-        "mediaType": "text/javascript",
-        "role": "module",
         "aliases": [
           "engine.capture.offline",
           "engine.capture.offline.js"
         ],
+        "id": "engine.capture.offline",
         "integrity": {
           "algorithm": "sha256",
-          "digest": "0xdbf6fdde3fe8e8a90a456d678c6ec1f9c81d404101479204e5a9db78527dad94",
-          "byteLength": 236294
+          "digest": "0x816669904d6f0fe9b939b1fb8851f4efe102395eb260853b366bd6f1e9fd5609",
+          "byteLength": 241505
         },
+        "mediaType": "text/javascript",
         "onchain": {
-          "containerId": "0x9181321a516c0762bfcc6642bffe91a8a8805062bb1f8adb777fb60e28db61ef",
-          "offset": 26073
-        }
+          "containerId": "0xf849f6070e2a506c007fd9bb1d6942c619f03fed0067cf0f4ddc45db1e9c5259",
+          "offset": 54850
+        },
+        "role": "module"
       }
     ]
   },
-  "readGasEstimate": "6919357",
+  "readGasEstimate": "7078594",
   "shellId": "0x14fbf5986c636c08a0bd9f919fe45905deba37d3271dcbfebbdee171f8a85882",
   "shell": {
     "address": "0xEEB9A431632b597bac3d5Dc2B4C901C608DA0f79",
@@ -1797,8 +1796,10 @@
         "codeHash": "0x86eac3a188dab20f5ae537a12e40ef3ee25f6064b81c051e09c75643be865e41"
       }
     ],
-    "blockNumber": "11896802",
-    "blockHash": "0xb085543c3dedad59292a183185018a91232cc9b435ee5e50fcf7dddc23f8c223"
+    "blockNumber": "11899558",
+    "blockHash": "0x65898c0fb901131f5f808c2ecfac208762cd18ab0c08c12e40c6ce0343108eaa",
+    "bodyRevision": "4",
+    "tableRevision": "4"
   },
   "revisionCaveat": "Follow-latest shell and manager: authenticate the selected-chain return and source identities before reuse. This is the approved one-minute WIP trailer; the reused engine object remains byte-identical.",
   "composerVerification": {
@@ -1807,7 +1808,7 @@
     "unboundFragments": "SHA-256 checked on every read",
     "sourceArtifact": "docs/media/redline-wip-20261009/onchain-r2/sepolia/shared-upgrade/reader-gas-fix/authenticated-headers/artifacts/KeelEvmPreparedCarrierInlineComposer.json",
     "selectedChainCompleteReturnSimulation": true,
-    "publicReadGas": "16540601",
+    "publicReadGas": "7021699",
     "active": "0x23Ec9Fd2402F7876471A9970cf91708F29992D7D",
     "revision": "7",
     "runtimeCodeHash": "0x86eac3a188dab20f5ae537a12e40ef3ee25f6064b81c051e09c75643be865e41",
@@ -1828,16 +1829,18 @@
     "fps": 60
   },
   "source": {
-    "engineCommit": "62931ce",
-    "engineBranch": "main",
-    "newEngineExport": "@keel-engine/capture/offline"
+    "engineCommit": "7228599",
+    "engineBranch": "codex/trailer-smooth-playback",
+    "newEngineExport": "@keel-engine/capture/offline",
+    "trailerCommit": "75475bf",
+    "sdkCommit": "8b26589",
+    "candidateCommitment": "0xa2dde4fe0abb0cdf0d85f297583a27d8bcca08c32a0ee84fee6c9ccede5b3878"
   },
   "activationTransactions": [
-    "0xfb507830b391e930afb16435e2d4f048ea4355b39e6efca2ac1a7614a23e9995",
-    "0xb427dfc07ab874ad8964b4c0f245a0fd9226946373571871553f3231da869a02",
-    "0xe03f2783221111f7aaae494540225ac318abe345796243dc3abdd0b1249f778e"
+    "0x1b49f6e7b3ca6e1445ff5884df37a25edf64accebc941d57339ba3150bac02ff",
+    "0x0c693a32dcba10326e46040584538ce4cdaf54fd6d0080946fce505f6c45bbcb"
   ],
-  "readGas": "6863716",
+  "readGas": "7021699",
   "optionalPackedReader": {
     "schema": "redline-compact-descriptor-matrix-public@1",
     "pass": true,
@@ -1905,5 +1908,199 @@
     "packedTableReadPercent": 22.779115773791737,
     "packedTableSetupPercent": 23.739400958193347,
     "measurement": "Osaka EVM gas rules on Sepolia state; component comparisons"
+  },
+  "performanceUpdate": {
+    "checkedAt": "2026-10-12T14:46:58.764Z",
+    "player": {
+      "objectId": "0x86d02a8a8fdd647f79fa22d7e3751c327e38241455695bb980af7db5bb4cb50d",
+      "storedIntegrity": {
+        "algorithm": "sha256",
+        "digest": "0x149e6797ef559e698ea2c65b073339563a4f54b8c675afe0519b4ce7cba64a03",
+        "byteLength": 86461
+      },
+      "integrity": {
+        "algorithm": "sha256",
+        "digest": "0x149e6797ef559e698ea2c65b073339563a4f54b8c675afe0519b4ce7cba64a03",
+        "byteLength": 86461
+      },
+      "slugIds": [
+        "0xb1e635b908b0ba349e198a088e4f28725ace086bfe7eeb41cfb40bd110a94da5",
+        "0x3533d6a55526106a3daa02a3574914de35a2a1c039d1d9f9c13e195bc631c6ef",
+        "0xa08c2a526ec9deccb7170c899bb8febb25feed1ff8488ca7bdf0e9f339fac1e3",
+        "0x39f36d239e3e2f45cc629eabddc0268a49e97d0916c959e0b749f9cb683c8224"
+      ],
+      "slugCount": 4,
+      "mediaType": "application/vnd.keel.token-uri-raw-percent-fragment",
+      "store": "0xD820e337692A6Eb7a4878e42ce88CBCFF49B55CF",
+      "builder": "0x4957B01a17aF3ff45e09a494ADf58a9B9151C582",
+      "record": {
+        "digest": "0x149e6797ef559e698ea2c65b073339563a4f54b8c675afe0519b4ce7cba64a03",
+        "indexDigest": "0x78e1bed2d6b330da2a7cc41fd943e4df62388960e17bc3f6ebd4f09a7ad57ae8",
+        "descriptorPointer": "0x5A62Ae9Da18965010fb6fD731d50960A450135EC",
+        "byteLength": "86461",
+        "storedByteLength": "86461",
+        "slugCount": 4,
+        "compression": 0,
+        "composite": false,
+        "exists": true,
+        "mediaType": "application/vnd.keel.token-uri-raw-percent-fragment"
+      },
+      "readBackBlockNumber": "11899551"
+    },
+    "descriptors": {
+      "objectId": "0x8aff68dccb9f5112bc0818b8558b8f65f93c2ac104a9efaedb0d90369904c949",
+      "storedIntegrity": {
+        "algorithm": "sha256",
+        "digest": "0x43e9ad0d414e013b0d3a8c32168e8e172b01586f830ede2fc8fe4fc1ca80e52a",
+        "byteLength": 13471
+      },
+      "integrity": {
+        "algorithm": "sha256",
+        "digest": "0x43e9ad0d414e013b0d3a8c32168e8e172b01586f830ede2fc8fe4fc1ca80e52a",
+        "byteLength": 13471
+      },
+      "slugIds": [
+        "0x0a89f4c4f6b85d6213ebb3a20d6487416deaa3d9409939b0a3f93ef18e0c9e6e"
+      ],
+      "slugCount": 1,
+      "mediaType": "application/vnd.keel.token-uri-raw-percent-fragment",
+      "store": "0xD820e337692A6Eb7a4878e42ce88CBCFF49B55CF",
+      "builder": "0x4957B01a17aF3ff45e09a494ADf58a9B9151C582",
+      "record": {
+        "digest": "0x43e9ad0d414e013b0d3a8c32168e8e172b01586f830ede2fc8fe4fc1ca80e52a",
+        "indexDigest": "0x197ce27b6b39f7aec9d0befd58e4a2c6a2e1a8e329e26954787d6a490ea700ff",
+        "descriptorPointer": "0x196688653d19575205DeC6d295A36e3C85ebcc16",
+        "byteLength": "13471",
+        "storedByteLength": "13471",
+        "slugCount": 1,
+        "compression": 0,
+        "composite": false,
+        "exists": true,
+        "mediaType": "application/vnd.keel.token-uri-raw-percent-fragment"
+      },
+      "readBackBlockNumber": "11899551"
+    },
+    "table": {
+      "objectId": "0x32b46494df80907abe6571012afde946db474afae87621b0e4573d305cbaee43",
+      "storedIntegrity": {
+        "algorithm": "sha256",
+        "digest": "0x61fec7962a6ca3e860ac7a26aa3decb0bc063ee8093638bc6073026adabaf46a",
+        "byteLength": 704
+      },
+      "integrity": {
+        "algorithm": "sha256",
+        "digest": "0x61fec7962a6ca3e860ac7a26aa3decb0bc063ee8093638bc6073026adabaf46a",
+        "byteLength": 704
+      },
+      "slugIds": [
+        "0x20650953b49c1976fe950c9ce207cff921fe8782ca43d558c247c0cf8a1e0765"
+      ],
+      "slugCount": 1,
+      "mediaType": "application/vnd.keel.inline-prepared-container-table",
+      "store": "0xD820e337692A6Eb7a4878e42ce88CBCFF49B55CF",
+      "builder": "0x4957B01a17aF3ff45e09a494ADf58a9B9151C582",
+      "record": {
+        "digest": "0x61fec7962a6ca3e860ac7a26aa3decb0bc063ee8093638bc6073026adabaf46a",
+        "indexDigest": "0x98176255c5a08719134ead1484d5806d3729b0eec80233498e00305413200d5e",
+        "descriptorPointer": "0x596215a0c5cEa044Fb82f9a045aabA2DAd86A513",
+        "byteLength": "704",
+        "storedByteLength": "704",
+        "slugCount": 1,
+        "compression": 0,
+        "composite": false,
+        "exists": true,
+        "mediaType": "application/vnd.keel.inline-prepared-container-table"
+      },
+      "readBackBlockNumber": "11899554"
+    },
+    "engineReuploads": 0,
+    "mp4UploadBytes": 0,
+    "desktopBrowser": {
+      "readyMs": 8774.123291,
+      "encodingMs": 33478.60000002384,
+      "encodedFrames": 3600,
+      "sound": true,
+      "saveMp4": true,
+      "mp4Bytes": 145925091,
+      "handoffErrorSeconds": 0.044980666666667446
+    },
+    "transactions": [
+      {
+        "hash": "0x6a168ef4a84ff2f3a0211814ff90dffb931a979332c3b1472b4cff65be85fb0c",
+        "blockNumber": "11899532",
+        "gasUsed": "257779"
+      },
+      {
+        "hash": "0xaac4eb9017b09a1dc574c9927fbeafb63a1ec529438a39434273ebfb4d4ebc6f",
+        "blockNumber": "11899533",
+        "gasUsed": "35980784"
+      },
+      {
+        "hash": "0x1777abd30163f4fc974810d9ac0fd2a2d65694c68d10c29658c0f3901bebb660",
+        "blockNumber": "11899534",
+        "gasUsed": "35980784"
+      },
+      {
+        "hash": "0x73ad936c47ed57cc3254815c048d9384200bbe1e1639665825b6e6650a32a660",
+        "blockNumber": "11899535",
+        "gasUsed": "35980784"
+      },
+      {
+        "hash": "0x520d80ab0589affbe8b072da36c368c16b7d42fedb69cd7b6d9de424db906dd0",
+        "blockNumber": "11899536",
+        "gasUsed": "28096803"
+      },
+      {
+        "hash": "0x96ce2f690365e5c063108a092ad9a5a2869236a4817d916c22b6f6339f543a21",
+        "blockNumber": "11899537",
+        "gasUsed": "154825"
+      },
+      {
+        "hash": "0xd940867c1483cee18fda26ef38cd47cac9be69d4006cd1d3681bcdf3383e38e9",
+        "blockNumber": "11899543",
+        "gasUsed": "257779"
+      },
+      {
+        "hash": "0xc96400034bb62f1b92fe406d3599847d7b62d9cea4a9c58cefac8d1ff855e23e",
+        "blockNumber": "11899544",
+        "gasUsed": "21808857"
+      },
+      {
+        "hash": "0x398814382e2a4f0a2ab13a8d63af0830af1086d609f99a19cffd2f55bd697a83",
+        "blockNumber": "11899545",
+        "gasUsed": "154825"
+      },
+      {
+        "hash": "0x06dec3491ca6b37f448eeb254d810af08d3ff469f9dc3166d8fe6303fba7a2ec",
+        "blockNumber": "11899552",
+        "gasUsed": "257779"
+      },
+      {
+        "hash": "0x96f8e973fdfdd888e627cb4bf34f64a376dc9f43fe6538fc868af5af61d89191",
+        "blockNumber": "11899553",
+        "gasUsed": "2045587"
+      },
+      {
+        "hash": "0x8d0dd9dc693ba97beefca3bc32423967dd9c2b4f9259fc743c5d8ffdd73cc964",
+        "blockNumber": "11899554",
+        "gasUsed": "154825"
+      },
+      {
+        "hash": "0x4d5d33d950ec99ad8a45fbdf69899d1f1d5fe4e23e27b091c9e0880ea9612ab4",
+        "blockNumber": "11899556",
+        "gasUsed": "2581399"
+      },
+      {
+        "hash": "0x1b49f6e7b3ca6e1445ff5884df37a25edf64accebc941d57339ba3150bac02ff",
+        "blockNumber": "11899557",
+        "gasUsed": "760669"
+      },
+      {
+        "hash": "0x0c693a32dcba10326e46040584538ce4cdaf54fd6d0080946fce505f6c45bbcb",
+        "blockNumber": "11899558",
+        "gasUsed": "5370215"
+      }
+    ],
+    "spendWei": "169849201004801"
   }
 }
