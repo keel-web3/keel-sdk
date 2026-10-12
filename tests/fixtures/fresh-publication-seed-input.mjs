@@ -30,7 +30,8 @@ export function syntheticHoldProof(nonce = 7n) {
   return { stateRoot: keccak256(leaf), witness: { accounts: [{ address: HOLD, code, codeHash, storageHash,
     nonce: toHex(nonce), balance: '0x0', accountProof: [leaf], storageProof: [] }] } };
 }
-export function syntheticCapture({ nextJobId = 17n, creatorNonce = 3n, stateRoot, includeCreationCode = true } = {}) {
+export function syntheticCapture({ nextJobId = 17n, creatorNonce = 3n, stateRoot, includeCreationCode = true, chunkCount = 29 } = {}) {
+  if (![29,85].includes(chunkCount)) throw Error('Synthetic fixture supports explicit small or saved-Retro-shaped chunk counts');
   const header = sealHeader(stateRoot), config = { name: 'Synthetic seed arithmetic', symbol: 'SYNTH', admin: OWNER,
     royaltyReceiver: OWNER, royaltyBps: 0, maxSupply: 1n, mintManager: `0x${'33'.repeat(20)}`, keelIndex: `0x${'44'.repeat(20)}` };
   const deployerBytes = Buffer.from(runtimes[DEPLOYER].slice(2), 'hex');
@@ -41,12 +42,14 @@ export function syntheticCapture({ nextJobId = 17n, creatorNonce = 3n, stateRoot
   const salt = keccak256(encodeAbiParameters(['address','uint256','string','string'].map(type => ({type})), [OWNER,creatorNonce,config.name,config.symbol]));
   const scopedSalt = keccak256(encodeAbiParameters([{type:'address'},{type:'bytes32'}], [FACTORY,salt]));
   const predicted = getContractAddress({opcode:'CREATE2',from:DEPLOYER,salt:scopedSalt,bytecode:concatHex([creation,constructor])}).toLowerCase();
-  const chunks = Array.from({length:29}, (_, index) => toHex(index + 1, {size:1}));
+  const chunks = Array.from({length:chunkCount}, (_, index) => toHex(index + 1, {size:1}));
+  const perBatch = chunkCount === 85 ? 3 : 1;
+  const batches = Array.from({length:29}, (_, index) => chunks.slice(index * perBatch, (index + 1) * perBatch));
   const operations = chunks.slice(0,8).map(bytes => encodeFunctionData({abi:holdAbi,functionName:'weldObject',args:[[keccak256(bytes)],keccak256(bytes),1n,0,'text/plain']}));
   const call = (to,data,from = OWNER) => ({from,to,data,value:'0x0',gas:'0x2625a00'});
   const preparationCalls = [call(JOB, encodeFunctionData({abi:jobAbi,functionName:'openJob',args:[hash('05'),EXECUTOR,1_700_000_000n,chunks.map(keccak256),operations.map(keccak256),[HOLD]]})),
     call(JOB,encodeFunctionData({abi:jobAbi,functionName:'fundExecutor',args:[nextJobId,123n]})),
-    ...chunks.map(bytes => call(JOB,encodeFunctionData({abi:jobAbi,functionName:'executeCarrier',args:[nextJobId,[bytes]]}),EXECUTOR)),
+    ...batches.map(bytes => call(JOB,encodeFunctionData({abi:jobAbi,functionName:'executeCarrier',args:[nextJobId,bytes]}),EXECUTOR)),
     ...operations.map(data => call(JOB,encodeFunctionData({abi:jobAbi,functionName:'executeOperation',args:[nextJobId,HOLD,0n,data]}),EXECUTOR)),
     call(JOB,encodeFunctionData({abi:jobAbi,functionName:'completeJob',args:[nextJobId]}),EXECUTOR),
     call(FACTORY,encodeFunctionData({abi:factoryAbi,functionName:'castDie',args:[config]})),

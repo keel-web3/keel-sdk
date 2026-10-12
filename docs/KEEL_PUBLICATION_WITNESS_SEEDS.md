@@ -39,12 +39,13 @@ Neither a syntactically valid seed nor a complete initial seed response proves
 the complete native program. The builder always reports `closure.complete:false`,
 `currentFreshnessEstablished:false` and `approvalReady:false`.
 
-The collector currently allows at most 64 accounts per explicit bounded input.
-A proved Hold nonce can yield more than 64 conditional creation targets. The
-builder retains all required targets; the collector rejects that oversized
-input. Complete-inventory partition and merge require a separately reviewed
-same-pin workflow. Do not truncate the targets, increase limits silently, or
-describe partial seed collection as complete access closure.
+The original collector retains its 64-account / 1,024-slot page bounds. A
+proved Hold nonce can yield more than 64 conditional creation targets. Use the
+explicit [complete-inventory workflow](KEEL_STATE_WITNESS_INVENTORY.md) to bind
+and partition that whole inventory without dropping accounts. Its independent
+merge revalidates every raw response and proof, rejects missing/duplicate pages,
+and enforces one total time/byte budget. Complete inventory coverage remains
+different from native access closure; the latter is not inferred from a seed.
 
 Default tests generate synthetic headers, source inputs and account proofs.
 `tests/fixtures/publication-witness-layout-runtimes.json` contains only public

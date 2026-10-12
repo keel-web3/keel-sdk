@@ -3,7 +3,7 @@ import { closeSync, constants, fstatSync, openSync, readSync, writeFileSync } fr
 import { isAbsolute } from 'node:path';
 import { collectCapturedStateWitness, validateCapturedStateSeed } from './captured-state-witness.mjs';
 
-function readBounded(path, maximum) {
+export function readBounded(path, maximum) {
   assert.ok(isAbsolute(path), 'Use absolute input paths');
   // Opening the descriptor first binds the bytes read to this regular file.
   const fd = openSync(path, constants.O_RDONLY | constants.O_NOFOLLOW);
