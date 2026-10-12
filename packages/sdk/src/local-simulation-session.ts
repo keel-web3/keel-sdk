@@ -8,6 +8,17 @@ export interface KeelLocalSessionClient {
   request(command: Readonly<Record<string, unknown>>, options: { readonly signal: AbortSignal }): Promise<unknown>;
   close(): Promise<void>;
 }
+export type KeelLocalMissingDependency =
+  | { readonly kind: "missing-witness"; readonly stage: number; readonly access: { readonly kind: string; readonly address: string; readonly slot?: string } }
+  | { readonly kind: "missing-header"; readonly stage: number; readonly ancestorNumber?: string; readonly ancestorHash?: string };
+export interface KeelLocalWitnessResolution {
+  /** Bind the complete request and collect a canonical initial witness before
+   * any native process starts. This callback cannot change the request. */
+  prepare(input: { readonly program: Readonly<Record<string, unknown>>; readonly programDigest: string; readonly canonicalHash: string; readonly signal: AbortSignal }): Promise<void>;
+  /** Authenticate exactly the structured missing dependency at the same pin.
+   * The failed process has already exited; a fresh process replays from stage0. */
+  resolve(input: { readonly dependency: KeelLocalMissingDependency; readonly programDigest: string; readonly canonicalHash: string; readonly signal: AbortSignal }): Promise<void>;
+}
 export interface KeelLocalSessionEvidence {
   readonly schema: "keel-local-simulation-session@1";
   readonly canonicalHash: string;
@@ -31,6 +42,7 @@ export interface KeelLocalSimulationOptions {
   readonly signal?: AbortSignal;
   readonly requestTimeoutMs?: number;
   readonly onSession?: (evidence: KeelLocalSessionEvidence) => void;
+  readonly witnessResolution?: KeelLocalWitnessResolution;
 }
 const record = (value: unknown): Record<string, unknown> | undefined => value !== null && typeof value === "object" && !Array.isArray(value) ? value as Record<string, unknown> : undefined;
 const digest = (value: unknown): value is string => typeof value === "string" && /^0x[0-9a-f]{64}$/iu.test(value);
@@ -38,6 +50,22 @@ const quantity = (value: unknown): value is string => typeof value === "string" 
 const unavailable = () => new KeelPublicationSimulationError("rpc-unavailable", "The local publication check ended before complete verification. The saved plan is unchanged.");
 const invalid = (message: string) => new KeelPublicationSimulationError("configuration-invalid", message);
 const incompatible = () => new KeelPublicationSimulationError("unsupported-simulation", "The local engine did not return complete, bound stage evidence.");
+class MissingDependency extends Error {
+  constructor(readonly dependency: KeelLocalMissingDependency) { super("Authenticated native execution needs additional canonical state."); }
+}
+function missingDependency(value: unknown, stage: unknown): KeelLocalMissingDependency | undefined {
+  const item = record(value);
+  if (!item || !Number.isSafeInteger(stage) || item.stage !== stage) return;
+  if (item.kind === "missing-witness") {
+    const access = record(item.access);
+    const kinds = ["CreateAccount", "CreateContract", "SubBalance", "AddBalance", "GetBalance", "GetNonce", "SetNonce", "GetCodeHash", "GetCode", "SetCode", "GetCodeSize", "GetState", "SetState", "GetTransientState", "SetTransientState", "SelfDestruct", "HasSelfDestructed", "Exist", "Touch", "IsNewContract", "Empty", "GetStateAndCommittedState"];
+    if (!access || !kinds.includes(String(access.kind)) || typeof access.address !== "string" || !/^0x[0-9a-f]{40}$/iu.test(access.address)
+      || (access.slot !== undefined && !digest(access.slot))) return;
+    return { kind: "missing-witness", stage: stage as number, access: { kind: String(access.kind), address: access.address.toLowerCase(), ...(access.slot === undefined ? {} : { slot: String(access.slot).toLowerCase() }) } };
+  }
+  if (item.kind === "missing-header" && ((quantity(item.ancestorNumber) && item.ancestorHash === undefined) || (digest(item.ancestorHash) && item.ancestorNumber === undefined)))
+    return { kind: "missing-header", stage: stage as number, ...(item.ancestorNumber === undefined ? { ancestorHash: String(item.ancestorHash).toLowerCase() } : { ancestorNumber: String(item.ancestorNumber) }) };
+}
 
 export function createKeelLocalSimulationTransport(options: KeelLocalSimulationOptions): KeelPreflightTransport & { close(): Promise<void> } {
   const timeout = options.requestTimeoutMs ?? 120_000;
@@ -112,6 +140,10 @@ export function createKeelLocalSimulationTransport(options: KeelLocalSimulationO
         const code = record(envelope.error)?.code;
         if (code === "session-stale") throw new KeelPublicationSimulationError("chain-reorganized", "The local stage binding or checkpoint changed.");
         if (code === "session-closed") throw unavailable();
+        if (options.witnessResolution && code === "native-stage-failed" && type === "stage") {
+          const dependency = missingDependency(record(envelope.error)?.diagnostic, extra.index);
+          if (dependency) throw new MissingDependency(dependency);
+        }
         throw new KeelPublicationSimulationError("unsupported-simulation", "The local engine stopped without complete authenticated execution evidence.");
       }
       const value = record(envelope.result);
@@ -139,29 +171,44 @@ export function createKeelLocalSimulationTransport(options: KeelLocalSimulationO
       const programJSON = JSON.stringify(program);
       if (new TextEncoder().encode(programJSON).length > 8 * 1024 * 1024) throw invalid("The local program exceeds its explicit request byte bound.");
       await canonical();
-      const opening = options.createClient();
-      // If cancellation wins while the process starts, dispose the late client.
-      void opening.then(value => { if (closed || abort.signal.aborted) void closeClient(value).catch(() => {}); }, () => {});
-      client = await bounded(opening); clients.add(client);
-      identity = { sessionId: `keel-session-${++serial}`, programDigest: keccak256(stringToHex(programJSON)), canonicalHash: pin.hash };
-      const begun = await command("begin", { programJSON });
-      if (begun.nextIndex !== 0 || begun.stageCount !== blocks.length || begun.checkpoint !== pin.hash || begun.status !== "open" || begun.acceptance !== false) throw incompatible();
-      let checkpoint = pin.hash;
-      const results: unknown[] = [];
-      for (let index = 0; index < blocks.length; index++) {
-        const stage = await command("stage", { index, expectedCheckpoint: checkpoint }, true);
-        if (stage.index !== index || stage.previousCheckpoint !== checkpoint || !digest(stage.checkpoint) || !record(stage.result)) throw incompatible();
-        results.push(stage.result); checkpoint = stage.checkpoint;
+      const programDigest = keccak256(stringToHex(programJSON));
+      if (options.witnessResolution) await bounded(options.witnessResolution.prepare({ program: JSON.parse(programJSON) as Record<string, unknown>, programDigest, canonicalHash: pin.hash, signal: abort.signal }));
+      // One outer timer covers initial collection, every missing-proof recovery
+      // and all clean replays. No partial native state or gas changes cross it.
+      for (let resolutionRound = 0; ; resolutionRound++) {
+        try {
+          check();
+          const opening = options.createClient();
+          // If cancellation wins while the process starts, dispose the late client.
+          void opening.then(value => { if (closed || abort.signal.aborted) void closeClient(value).catch(() => {}); }, () => {});
+          client = await bounded(opening); clients.add(client);
+          identity = { sessionId: `keel-session-${++serial}`, programDigest, canonicalHash: pin.hash };
+          const begun = await command("begin", { programJSON });
+          if (begun.nextIndex !== 0 || begun.stageCount !== blocks.length || begun.checkpoint !== pin.hash || begun.status !== "open" || begun.acceptance !== false) throw incompatible();
+          let checkpoint = pin.hash;
+          const results: unknown[] = [];
+          for (let index = 0; index < blocks.length; index++) {
+            const stage = await command("stage", { index, expectedCheckpoint: checkpoint }, true);
+            if (stage.index !== index || stage.previousCheckpoint !== checkpoint || !digest(stage.checkpoint) || !record(stage.result)) throw incompatible();
+            results.push(stage.result); checkpoint = stage.checkpoint;
+          }
+          const finished = await command("finish");
+          if (finished.status !== "completed" || finished.acceptance !== false || finished.stageCount !== blocks.length || finished.checkpoint !== checkpoint
+            || finished.fullWitnessComplete !== true || finished.headerHistoryComplete !== true || finished.stickyStateError !== false
+            || !Array.isArray(finished.results) || JSON.stringify(finished.results) !== JSON.stringify(results)) throw incompatible();
+          await canonical(); check();
+          options.onSession?.(Object.freeze({ schema: "keel-local-simulation-session@1", canonicalHash: pin.hash,
+            programDigest: String(identity.programDigest), stages: blocks.length, finalCheckpoint: checkpoint,
+            fullWitnessComplete: true, headerHistoryComplete: true, stickyStateError: false, acceptance: false }));
+          return results;
+        } catch (error) {
+          if (!(error instanceof MissingDependency) || !options.witnessResolution || resolutionRound >= 64) throw error instanceof MissingDependency ? incompatible() : error;
+          if (client) { const failedClient = client; client = undefined; clients.delete(failedClient); await bounded(closeClient(failedClient)); }
+          await canonical(); check();
+          await bounded(options.witnessResolution.resolve({ dependency: error.dependency, programDigest, canonicalHash: pin.hash, signal: abort.signal }));
+          await canonical(); check();
+        }
       }
-      const finished = await command("finish");
-      if (finished.status !== "completed" || finished.acceptance !== false || finished.stageCount !== blocks.length || finished.checkpoint !== checkpoint
-        || finished.fullWitnessComplete !== true || finished.headerHistoryComplete !== true || finished.stickyStateError !== false
-        || !Array.isArray(finished.results) || JSON.stringify(finished.results) !== JSON.stringify(results)) throw incompatible();
-      await canonical(); check();
-      options.onSession?.(Object.freeze({ schema: "keel-local-simulation-session@1", canonicalHash: pin.hash,
-        programDigest: String(identity.programDigest), stages: blocks.length, finalCheckpoint: checkpoint,
-        fullWitnessComplete: true, headerHistoryComplete: true, stickyStateError: false, acceptance: false }));
-      return results;
     } catch (error) {
       primaryFailure = true; throw error;
     } finally {

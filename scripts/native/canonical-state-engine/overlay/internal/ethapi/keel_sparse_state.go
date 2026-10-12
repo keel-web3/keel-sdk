@@ -67,10 +67,12 @@ type KeelSparseStageResult struct {
 	Accesses   []KeelStateAccess `json:"accesses"`
 }
 type KeelWitnessError struct {
-	Stage  int              `json:"stage"`
-	Kind   string           `json:"kind"`
-	Access *KeelStateAccess `json:"access,omitempty"`
-	Cause  string           `json:"cause"`
+	Stage          int              `json:"stage"`
+	Kind           string           `json:"kind"`
+	Access         *KeelStateAccess `json:"access,omitempty"`
+	Cause          string           `json:"cause"`
+	AncestorNumber *hexutil.Uint64  `json:"ancestorNumber,omitempty"`
+	AncestorHash   *common.Hash     `json:"ancestorHash,omitempty"`
 }
 
 func (e *KeelWitnessError) Error() string {
@@ -96,7 +98,8 @@ func (b *keelSparseBackend) HeaderByNumber(_ context.Context, n rpc.BlockNumber)
 	if h := b.ancestors[uint64(n)]; h != nil {
 		return types.CopyHeader(h), nil
 	}
-	panic(&KeelWitnessError{Stage: -1, Kind: "missing-header", Cause: fmt.Sprintf("Canonical ancestor %d was not supplied", n)})
+	number := hexutil.Uint64(n)
+	panic(&KeelWitnessError{Stage: -1, Kind: "missing-header", AncestorNumber: &number, Cause: fmt.Sprintf("Canonical ancestor %d was not supplied", n)})
 }
 func (b *keelSparseBackend) HeaderByHash(_ context.Context, hash common.Hash) (*types.Header, error) {
 	for _, h := range b.ancestors {
@@ -104,7 +107,7 @@ func (b *keelSparseBackend) HeaderByHash(_ context.Context, hash common.Hash) (*
 			return types.CopyHeader(h), nil
 		}
 	}
-	panic(&KeelWitnessError{Stage: -1, Kind: "missing-header", Cause: "Canonical ancestor hash was not supplied: " + hash.Hex()})
+	panic(&KeelWitnessError{Stage: -1, Kind: "missing-header", AncestorHash: &hash, Cause: "Canonical ancestor hash was not supplied: " + hash.Hex()})
 }
 
 type KeelSparseSession struct {

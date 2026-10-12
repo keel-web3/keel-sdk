@@ -189,6 +189,9 @@ func TestKeelSparseMissingHeaderRollsBackStage(t *testing.T) {
 	if _, err = s.Step(context.Background()); err == nil {
 		t.Fatal("Missing ancestor was silently zero")
 	}
+	if diagnostic, ok := err.(*KeelWitnessError); !ok || diagnostic.Kind != "missing-header" || (diagnostic.AncestorNumber == nil && diagnostic.AncestorHash == nil) {
+		t.Fatalf("Missing structured ancestor dependency: %#v", err)
+	}
 	if s.next != 0 || s.sim.state.GetNonce(keelTestOwner) != before || s.sim.state.Error() != nil {
 		t.Fatal("Failed stage mutated retained state")
 	}

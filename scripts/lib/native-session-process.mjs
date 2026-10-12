@@ -1,12 +1,30 @@
 import assert from 'node:assert/strict';
 import { spawn } from 'node:child_process';
 import { createHash } from 'node:crypto';
-import { lstatSync, readFileSync, readlinkSync, realpathSync } from 'node:fs';
-import { isAbsolute } from 'node:path';
+import { lstatSync, readFileSync, readlinkSync, realpathSync, mkdtempSync, writeFileSync, rmSync } from 'node:fs';
+import { isAbsolute, join } from 'node:path';
+import { tmpdir } from 'node:os';
 import { setTimeout as delay } from 'node:timers/promises';
 
 const sha = value => createHash('sha256').update(value).digest('hex');
 const MAX_COMMAND = 2 * 8 * 1024 * 1024 + 4096, MAX_RESPONSE = 128 * 1024 * 1024;
+
+/** One fresh private witness file per replay, removed only after confirmed
+ * process exit. Failure preserves it for diagnosis; no shared source is edited. */
+export function createCanonicalNativeProcessFactory({ binaryPath, binarySHA256, timeoutMs = 60_000, onProcess } = {}) {
+  return async input => {
+    const directory = mkdtempSync(join(tmpdir(), 'keel-native-witness-'));
+    const inputPath = join(directory, 'canonical-witness.json'), bytes = JSON.stringify(input);
+    writeFileSync(inputPath, bytes, { flag: 'wx', mode: 0o600 });
+    const client = await createNativeProcessClient({ binaryPath, binarySHA256, inputPath, inputSHA256: sha(bytes), timeoutMs });
+    try { onProcess?.(client.evidence); } catch (error) { await client.close(); rmSync(directory, { recursive: true }); throw error; }
+    let closing;
+    return { evidence: client.evidence, request: (...args) => client.request(...args), close: () => closing ??= (async () => {
+      await client.close(); assert.equal(client.evidence.exitConfirmed, true);
+      rmSync(directory, { recursive: true });
+    })() };
+  };
+}
 
 /** Network-isolated native diagnostic process, not an RPC provider. A reviewed native
  * build/hash and immutable witness file are required explicitly by the caller. */

@@ -62,13 +62,13 @@
     },
     {
       "path": "overlay/internal/ethapi/keel_sparse_state.go",
-      "bytes": 15153,
-      "sha256": "e4e44d6def407213a3cc3278d49b29b0b789f32cd96a1eb738aa7d7db7426503"
+      "bytes": 15392,
+      "sha256": "39176cd9978b7ba25d34a8ad729b9866f8ff9455a41b10ce3bd6d835fb12e8a5"
     },
     {
       "path": "overlay/internal/ethapi/keel_sparse_state_test.go",
-      "bytes": 17708,
-      "sha256": "2f46b7232d7f44401a2436e3d3bb83fbce93b1895be71e521059734604e472cc"
+      "bytes": 17938,
+      "sha256": "f55021715afdfff9e4997783a9535a6d77832bedfd8c1b0ac0bef7d2d1e7a49c"
     },
     {
       "path": "simulate.patch",

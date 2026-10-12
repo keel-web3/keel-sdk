@@ -72,6 +72,7 @@ export const DETERMINISTIC_TEST_FILES = Object.freeze([
   "tests/sdk-fresh-publication-witness-seeds.test.mjs",
   "tests/sdk-fresh-public-proof.test.mjs",
   "tests/sdk-local-simulation-session.test.mjs",
+  "tests/sdk-native-witness-resolver.test.mjs",
   "tests/sdk-native-session-process.test.mjs",
   "tests/sdk-intrinsic-validation-evidence.test.mjs",
   "tests/mcp-selected-chain-routing.test.mjs",

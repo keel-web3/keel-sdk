@@ -77,6 +77,41 @@ test('native missing witness or execution error produces no partial success',asy
  const h=setup({before:body=>body.type==='stage'?{id:body.id,error:{code:'native-stage-failed',message:'missing authenticated trie node'}}:undefined});
  await assert.rejects(h.transport.request(request()),e=>e.kind==='unsupported-simulation');assert.equal(h.clients[0].closed,1);assert.equal(h.commands.filter(x=>x.type==='finish').length,0);
 });
+const missing = body => ({id:body.id,error:{code:'native-stage-failed',diagnostic:{kind:'missing-witness',stage:body.index,access:{kind:'GetState',address:`0x${'22'.repeat(20)}`,slot:hash(7)}}}});
+test('structured missing state closes failed process, resolves proof, and replays identical complete program from stage zero',async()=>{
+ let resolved=0,prepared=0;const h=setup({before(body){if(body.type==='stage'&&body.index===1&&!resolved)return missing(body);},options:{witnessResolution:{
+  async prepare(ctx){prepared++;assert.equal(ctx.canonicalHash,pin.hash);},async resolve(ctx){assert.equal(h.clients[0].closed,1);assert.equal(ctx.dependency.stage,1);resolved++;}
+ }}});
+ const original=request();await h.transport.request(original);assert.equal(prepared,1);assert.equal(resolved,1);assert.equal(h.clients.length,2);
+ assert.ok(h.clients.every(c=>c.closed===1));const begins=h.commands.filter(c=>c.type==='begin');assert.equal(begins[0].programJSON,begins[1].programJSON);
+ assert.deepEqual(h.commands.filter(c=>c.type==='stage').map(c=>c.index),[0,1,0,1]);assert.equal(h.evidence.length,1);
+});
+test('structured ancestor dependency uses the same shared recovery callback',async()=>{
+ let resolved=0;const h=setup({before(body){if(body.type==='stage'&&!resolved)return {id:body.id,error:{code:'native-stage-failed',diagnostic:{kind:'missing-header',stage:body.index,ancestorNumber:'0x0'}}};},options:{witnessResolution:{async prepare(){},async resolve(ctx){assert.equal(ctx.dependency.ancestorNumber,'0x0');resolved++;}}}});
+ await h.transport.request(request());assert.equal(resolved,1);assert.equal(h.clients.length,2);
+});
+test('wrong-stage, unstructured and malformed dependency diagnostics never expand proof reads',async()=>{
+ for(const change of [d=>d.stage=9,d=>delete d.access,d=>d.access.address='bad',d=>d.access.kind='invented',d=>{d.kind='missing-header';delete d.access;},d=>d.access.slot='0x1']){
+  let reads=0;const h=setup({before(body){if(body.type!=='stage')return;const value=missing(body);change(value.error.diagnostic);return value;},options:{witnessResolution:{async prepare(){},async resolve(){reads++;}}}});
+  await assert.rejects(h.transport.request(request()),e=>e.kind==='unsupported-simulation');assert.equal(reads,0);assert.equal(h.clients.length,1);
+ }
+});
+test('proof resolver failure cannot return partial execution or restart state',async()=>{
+ const h=setup({before:body=>body.type==='stage'?missing(body):undefined,options:{witnessResolution:{async prepare(){},async resolve(){throw Error('Proof root mismatch');}}}});
+ await assert.rejects(h.transport.request(request()),/Proof root mismatch/);assert.equal(h.clients.length,1);assert.equal(h.clients[0].closed,1);assert.equal(h.evidence.length,0);
+});
+test('missing-state restart count is bounded independently of provider behavior',async()=>{
+ let rounds=0;const h=setup({before:body=>body.type==='stage'?missing(body):undefined,options:{witnessResolution:{async prepare(){},async resolve(){rounds++;}}}});
+ await assert.rejects(h.transport.request(request()),e=>e.kind==='unsupported-simulation');assert.equal(rounds,64);assert.equal(h.clients.length,65);assert.ok(h.clients.every(c=>c.closed===1));
+});
+test('failed-process cleanup must finish before any additional proof query',async()=>{
+ let queries=0;const h=setup({clientHook:()=>({async close(){throw Error('Cannot confirm exit');},async request(body){if(body.type==='stage')return missing(body);return {id:body.id,result:{sessionId:body.sessionId,programDigest:body.programDigest,canonicalHash:body.canonicalHash,nextIndex:0,stageCount:2,checkpoint:pin.hash,status:'open',acceptance:false}};}}),options:{witnessResolution:{async prepare(){},async resolve(){queries++;}}}});
+ await assert.rejects(h.transport.request(request()),/Cannot confirm exit/);assert.equal(queries,0);assert.equal(h.evidence.length,0);
+});
+test('request deadline includes a pending dependency resolver and leaves no live process',async()=>{
+ const h=setup({before:body=>body.type==='stage'?missing(body):undefined,options:{requestTimeoutMs:100,witnessResolution:{async prepare(){},resolve(){return new Promise(()=>{});}}}});
+ await assert.rejects(h.transport.request(request()),e=>e.kind==='rpc-unavailable');assert.equal(h.clients[0].closed,1);assert.equal(h.evidence.length,0);
+});
 test('wrong native digest, stale checkpoint and missing final stage all reject',async()=>{
  for(const change of [r=>r.programDigest=hash(55),r=>r.previousCheckpoint=hash(55),r=>r.index=9]){
   const h=setup({before:body=>{if(body.type!=='stage')return;const r={sessionId:body.sessionId,programDigest:body.programDigest,canonicalHash:body.canonicalHash,index:body.index,previousCheckpoint:body.expectedCheckpoint,checkpoint:hash(10),result:{}};change(r);return {id:body.id,result:r};}});

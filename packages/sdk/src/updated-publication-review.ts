@@ -148,6 +148,17 @@ export interface KeelUpdatedReviewPromotionInput {
   readonly fees?: KeelUpdatedReviewFees;
   readonly reconciliation: KeelUpdatedReviewReconciliation;
   readonly choice?: KeelUpdatedReviewChoice;
+  /** Server-derived deadline-only renewal evidence. It is not owner consent,
+   * never marks old approvals unissued, and never authorizes a transaction. */
+  readonly automaticRenewal?: {
+    readonly schema: "keel-automatic-expiry-renewal@1";
+    readonly candidateDigest: Hex;
+    readonly reviewDigest: Hex;
+    readonly sourceSnapshotDigest: Hex;
+    readonly originalPlanDigest: Hex;
+    readonly originalOutputDigest: Hex;
+    readonly refreshedOutputDigest: Hex;
+  };
 }
 export type KeelUpdatedReviewPromotionDecision =
   | { readonly status: "preserve-funded-job"; readonly jobId: string; readonly walletApprovalRequired: false }
@@ -289,6 +300,19 @@ export function keelUpdatedPublicationReviewDigest(input: {
   readonly reconciliation: KeelUpdatedReviewReconciliation;
 }): Hex { return hash(input); }
 
+/** Economic quotes/fees and the expired deadline are refreshed, while every
+ * persisted creator output and storage byte remains bound. Wallet review of
+ * the new exact amount/fees remains mandatory at the normal approval boundary. */
+export function keelUpdatedPublicationOutputDigest(input: Pick<KeelUpdatedPublicationReviewInput,
+  "artifact" | "release" | "owner" | "executor" | "chainId" | "publicationJob" | "storeAddress" |
+  "carrierBatches" | "operations" | "publicationsDigest" | "expectedTokenURIHash">): Hex {
+  return hash({ schema: "keel-publication-output@1", artifact: input.artifact, release: input.release,
+    owner: input.owner.toLowerCase(), executor: input.executor.toLowerCase(), chainId: input.chainId,
+    publicationJob: input.publicationJob.toLowerCase(), storeAddress: input.storeAddress.toLowerCase(),
+    carrierBatches: input.carrierBatches, operations: input.operations,
+    publicationsDigest: input.publicationsDigest, expectedTokenURIHash: input.expectedTokenURIHash });
+}
+
 /** Does not authorize a transaction. A ready result permits only the existing
  * locked, durable-before-wallet approval boundary to consider this review. */
 export function classifyKeelUpdatedPublicationReviewPromotion(input: KeelUpdatedReviewPromotionInput): KeelUpdatedReviewPromotionDecision {
@@ -346,6 +370,17 @@ export function classifyKeelUpdatedPublicationReviewPromotion(input: KeelUpdated
     || fees.fundingValueWei !== simulation.fundingValueWei || fees.fundingTransactionGasLimit !== simulation.fundingTransactionGasLimit
     || fees.maxFeePerGas !== simulation.maxFeePerGas || fees.maxPriorityFeePerGas !== simulation.maxPriorityFeePerGas) return blocked("fee-review-stale-or-mismatched");
   const reviewDigest = keelUpdatedPublicationReviewDigest({ candidateDigest: candidate.candidateDigest, simulation, fees, reconciliation });
+  const renewal = input.automaticRenewal;
+  if (renewal !== undefined) {
+    if (input.choice !== undefined || renewal.schema !== "keel-automatic-expiry-renewal@1"
+      || !sameHash(renewal.candidateDigest, candidate.candidateDigest) || !sameHash(renewal.reviewDigest, reviewDigest)
+      || !sameHash(renewal.sourceSnapshotDigest, candidate.snapshotDigest) || !sameHash(renewal.originalPlanDigest, candidate.originalPlanDigest))
+      return blocked("automatic-renewal-binding-mismatch");
+    const expected = keelUpdatedPublicationOutputDigest(candidate);
+    if (!bytes32(renewal.originalOutputDigest) || !sameHash(renewal.originalOutputDigest, expected)
+      || !sameHash(renewal.refreshedOutputDigest, expected)) return blocked("changed-output-review-required");
+    return Object.freeze({ status: "ready-for-normal-approval-boundary", candidateDigest: candidate.candidateDigest, reviewDigest, walletApprovalRequired: false, approvalReady: false });
+  }
   const choice = input.choice;
   if (!choice || choice.action !== "use-this-updated-review" || !sameHash(choice.candidateDigest, candidate.candidateDigest)
     || !sameHash(choice.reviewDigest, reviewDigest) || !sameHash(choice.owner, candidate.owner) || !positive(choice.chosenAt)
