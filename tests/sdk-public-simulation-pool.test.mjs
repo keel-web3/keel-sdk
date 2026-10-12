@@ -163,19 +163,44 @@ test('the complete request deadline discards a late response even when the provi
   assert.equal(f.privateAttempts(), 1); await f.transport.close();
 });
 
-test('a recovered request shares its original deadline and cannot receive a second full timeout budget', async () => {
-  let release, reached;
+test('a recovered request shares its original deadline and cannot receive a second full timeout budget', async (t) => {
+  // Both clocks and timer delivery describe one deterministic request lifetime.
+  // Real CI qualification must not consume the tiny recovery-eligibility margin
+  // between the 1s cooldown, 1s minimum remaining budget and this 2.2s deadline.
+  t.mock.timers.enable({ apis: ['Date', 'setTimeout'], now: Number(BigInt(snapshot.timestamp)) * 1000 });
+  let elapsed = 0;
+  t.mock.method(performance, 'now', () => elapsed);
+  const advance = async ms => { elapsed += ms; t.mock.timers.tick(ms); await new Promise(resolve => setImmediate(resolve)); };
+  let release, reached, recovering;
   const gate = new Promise(resolve => { release = resolve; });
   const entered = new Promise(resolve => { reached = resolve; });
+  const retrying = new Promise(resolve => { recovering = resolve; });
+  let recoveryWait;
   const f = singleRecipientTransient({ fault: 503, requestTimeoutMs: 2_200,
+    onAttempt: diagnostic => { if (diagnostic.sameRecipientRetry === 1) { recoveryWait = diagnostic.recoveryWaitMs; recovering(); } },
     beforeResponse: async () => { reached(); await gate; } });
-  const run = f.transport.request(program());
-  const refused = assert.rejects(run, error => error.kind === 'rpc-unavailable' && error.diagnostic.transportFailure === 'timeout');
-  await entered; await refused;
-  assert.equal(f.privateAttempts(), 2);
-  release(); await new Promise(resolve => setImmediate(resolve));
-  await assert.rejects(f.transport.request(program()), error => /cancelled/.test(error.message));
-  assert.equal(f.privateAttempts(), 2); await f.transport.close();
+  const input = program(); let settled = false;
+  // Handle an unexpected early outcome immediately; waiting for a request that
+  // never started must not leave an assertion rejection unobserved.
+  const outcome = f.transport.request(input).then(value => ({ value }), error => ({ error })).then(result => { settled = true; return result; });
+  const requireGate = async signal => assert.equal(await Promise.race([signal.then(() => true), outcome.then(() => false)]), true, 'request ended before the expected recovery boundary');
+  try {
+    await requireGate(retrying);
+    assert.equal(recoveryWait, 1_000);
+    await advance(recoveryWait - 1); assert.equal(f.privateAttempts(), 1);
+    await advance(1); await requireGate(entered);
+    assert.equal(f.privateAttempts(), 2);
+    await advance(2_199 - elapsed); assert.equal(settled, false, 'original deadline has not elapsed');
+    await advance(1);
+    const result = await outcome;
+    assert.equal(result.error?.kind, 'rpc-unavailable');
+    assert.equal(result.error.diagnostic.transportFailure, 'timeout');
+    assert.equal(elapsed, 2_200, 'recovery must not restart the complete-request clock');
+    release(); await new Promise(resolve => setImmediate(resolve));
+    assert.deepEqual(f.privateRequests().map(request => request.body.params), [input.params, input.params]);
+    await assert.rejects(f.transport.request(program()), error => /cancelled/.test(error.message));
+    assert.equal(f.privateAttempts(), 2);
+  } finally { release(); await f.transport.close(); }
 });
 
 test('pinned pool candidate cannot silently fail over during qualification; strict nonce and balance errors retain codes',async()=>{
