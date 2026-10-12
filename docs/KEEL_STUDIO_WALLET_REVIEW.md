@@ -212,3 +212,27 @@ and MCP `keel-studio-draft` storage review use the same Studio gate. The chain
 profile comes from the selected block's chain, timestamp and gas limit;
 unsupported EVM profiles remain blocked. Tezos uses its separate exact-operation
 simulation and fee model, never this EVM gas discovery policy.
+
+## Review an expired plan with unknown wallet history
+
+An old plan with no transaction hash may still have reached a wallet. Do not
+mark it never-issued, clear its history or create a replacement release. Studio
+can prepare a separate unsigned updated review for the same project, release,
+stored bytes and operations. Preparing, retrying or cancelling this review
+preserves the original journals, including unequal archived histories.
+
+The SDK updated-review policy binds the original snapshot, every historical
+funding identity, the proposed deadline and the complete expected tokenURI.
+Selection requires complete canonical funding history from the authenticated
+contract deployment, exact expired funding calls against the immutable runtime,
+full-program simulation with complete metadata equality, current fees, and an
+explicit creator choice of that exact review. A pending, unknown or funded
+history cannot authorize another payment. Even a successful selection returns
+no wallet request; Studio subsequently uses its normal fresh approval boundary.
+
+Hosted MCP `keel_updated_review_read`, `keel_updated_review_check` and
+`keel_updated_review_cancel` share the creator UI's service and return its
+review URL. An agent cannot choose the new review or claim that an old wallet
+prompt was closed. The creator selects it in Studio; a stale or changed review
+must be checked again. These checks do not establish successful publication:
+that still requires the canonical receipt, deployed collection and exact readback.

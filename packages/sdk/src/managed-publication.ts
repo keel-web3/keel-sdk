@@ -2415,3 +2415,4 @@ export function keelExecutorGasLimit(estimate: bigint, maximumGas?: bigint): big
   return maximumGas !== undefined && padded > maximumGas ? maximumGas : padded;
 }
 export * from "./managed-publication-recovery.js";
+export * from "./updated-publication-review.js";
