@@ -1,3 +1,5 @@
+import { executeKeelStudioAgentDraftOperation } from "@keel/sdk/studio-agent-drafts";
+import { STUDIO_PRIVATE_TOOL_DEFINITIONS } from "./studio-private-tools.js";
 import { SIGNATURE_PRIVACY_TOOL_DEFINITIONS } from "./signature-privacy-tools.js";
 import { MEDIA_EDIT_TOOL_DEFINITIONS } from "./media-edit-tools.js";
 import { startStudioConnection, getStudioConnection, completeStudioConnection, loadStudioAgentToken, type StudioConnectionScope } from "@keel/sdk/studio-connection-node";
@@ -62,7 +64,6 @@ import {
   fetchStudioCapabilities,
   buildKeelModuleReviewRequest,
   prepareKeelStudioProjectIntake,
-  executeKeelStudioAgentDraftOperation,
   prepareKeelCreatorCollectionWalletReview,
   buildKeelCreatorShellFreezeCall,
   buildKeelCreatorShellRegistrationCall,
@@ -871,9 +872,9 @@ async function studioAccessTool(context: ToolContext, value: unknown): Promise<u
 }
 
 async function studioDraftTool(context: ToolContext, value: unknown): Promise<unknown> {
-  const input = record(value, ["studioUrl", "operation", "releaseId", "projectId", "expectedRevision", "draft", "planningCommand", "defaultsCommand", "profileCommand", "profileSelection", "conversationCommand", "includeReadCall", "operationId", "transactionHashes", "recoveryInput"], "Studio draft arguments");
+  const input = record(value, ["studioUrl", "operation", "releaseId", "projectId", "expectedRevision", "draft", "planningCommand", "defaultsCommand", "profileCommand", "profileSelection", "conversationCommand", "includeReadCall", "operationId", "transactionHashes", "recoveryInput", "reviewCandidate", "artifactRevision", "releaseRevision"], "Studio draft arguments");
   const operation = requiredString(input, "operation");
-  if (!["list", "read", "diagnose", "continue-publication", "cancel-review", "storage-recovery", "recover", "recover-wallet-rejection", "plan", "plan-edit", "defaults", "defaults-edit", "profiles", "profiles-edit", "profile-select", "conversation", "conversation-suggest", "prepare-review", "storage-review", "create", "update"].includes(operation)) throw new TypeError("operation must be list, read, diagnose, continue-publication, cancel-review, storage-recovery, recover, recover-wallet-rejection, plan, plan-edit, defaults, defaults-edit, conversation, conversation-suggest, prepare-review, storage-review, create, or update.");
+  if (!["capture-program", "resume-review", "updated-review-read", "updated-review-check", "updated-review-cancel", "list", "read", "diagnose", "continue-publication", "cancel-review", "storage-recovery", "recover", "recover-wallet-rejection", "plan", "plan-edit", "defaults", "defaults-edit", "profiles", "profiles-edit", "profile-select", "conversation", "conversation-suggest", "prepare-review", "storage-review", "create", "update"].includes(operation)) throw new TypeError("operation must be list, read, diagnose, continue-publication, cancel-review, storage-recovery, recover, recover-wallet-rejection, plan, plan-edit, defaults, defaults-edit, conversation, conversation-suggest, prepare-review, storage-review, create, or update.");
   const configuredStudioUrl = optionalString(input, "studioUrl");
   const studioUrl = resolveKeelEndpoints({
     ...(configuredStudioUrl === undefined ? {} : { studioUrl: configuredStudioUrl }),
@@ -884,10 +885,14 @@ async function studioDraftTool(context: ToolContext, value: unknown): Promise<un
   return executeKeelStudioAgentDraftOperation({
     studioUrl,
     grantToken: token,
+    ...(context.signal ? { signal: context.signal } : {}),
     ...(input.operationId === undefined ? {} : { operationId: requiredString(input, "operationId") }),
     ...(input.transactionHashes === undefined ? {} : { transactionHashes: input.transactionHashes as string[] }),
     ...(input.recoveryInput === undefined ? {} : { recoveryInput: input.recoveryInput as never }),
-    operation: operation as "list" | "read" | "diagnose" | "continue-publication" | "cancel-review" | "storage-recovery" | "recover" | "recover-wallet-rejection" | "plan" | "plan-edit" | "defaults" | "defaults-edit" | "profiles" | "profiles-edit" | "profile-select" | "conversation" | "conversation-suggest" | "prepare-review" | "storage-review" | "create" | "update",
+    ...(input.artifactRevision === undefined ? {} : { artifactRevision: optionalNumber(input, "artifactRevision")! }),
+    ...(input.releaseRevision === undefined ? {} : { releaseRevision: optionalNumber(input, "releaseRevision")! }),
+    ...(input.reviewCandidate === undefined ? {} : { reviewCandidate: input.reviewCandidate as never }),
+    operation: operation as "capture-program" | "resume-review" | "updated-review-read" | "updated-review-check" | "updated-review-cancel" | "list" | "read" | "diagnose" | "continue-publication" | "cancel-review" | "storage-recovery" | "recover" | "recover-wallet-rejection" | "plan" | "plan-edit" | "defaults" | "defaults-edit" | "profiles" | "profiles-edit" | "profile-select" | "conversation" | "conversation-suggest" | "prepare-review" | "storage-review" | "create" | "update",
     ...(input.includeReadCall === undefined ? {} : { includeReadCall: optionalBoolean(input, "includeReadCall")! }),
     ...(input.conversationCommand === undefined ? {} : { conversationCommand: input.conversationCommand as never }),
     ...(input.profileCommand === undefined ? {} : { profileCommand: input.profileCommand as never }),
@@ -1456,6 +1461,7 @@ async function tezosPublicationPrepareTool(_context: ToolContext, value: unknown
 
 export const TOOL_DEFINITIONS: readonly ToolDefinition[] = [
   ...MEDIA_EDIT_TOOL_DEFINITIONS,
+  ...STUDIO_PRIVATE_TOOL_DEFINITIONS,
   ...SIGNATURE_PRIVACY_TOOL_DEFINITIONS,
   tool("keel-tezos-shell-prepare", "Prepare native Tezos shell registration, update, or permanent freeze parameters with explicit network and sender. Read-only preparation: no RPC, signing, submission, or default-shell replacement. Receipt-backed selected-chain object and registry checks are still required.", tezosShellPrepareSchema, async (_context, value) => prepareKeelTezosShell(value as KeelTezosShellPrepareInput)),
   tool("keel-tezos-publication-prepare", "Prepare one exact receipt-bound Tezos KEEL one-of-one publication call using the standard Hold, Index, and FA2 modules. The public route is ordinary FA2/TZIP-12 token_metadata with onchfs:// or another selected carrier; the KEEL JSON/harness route is compatibility-only. Review-only: no private key, origination, signing, submission, or fake address is accepted.", tezosPublicationPrepareSchema, tezosPublicationPrepareTool),

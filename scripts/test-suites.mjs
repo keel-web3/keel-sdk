@@ -184,6 +184,7 @@ export const DETERMINISTIC_TEST_FILES = Object.freeze([
   "tests/mcp-media-optimization.test.mjs",
   "tests/mcp-plugins.test.mjs",
   "tests/mcp-studio-draft.test.mjs",
+  "tests/mcp-studio-private.test.mjs",
   "tests/mcp-studio-wallet-rejection.test.mjs",
   "tests/mcp.test.mjs",
   "tests/media-optimization.test.mjs",
