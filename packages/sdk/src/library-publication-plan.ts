@@ -536,7 +536,7 @@ export async function buildKeelLibraryPublicationPlan(input: KeelLibraryPublicat
     throw new RangeError(`The manifest requires ${slugIds.length} leaf chunks; flat KeelHold objects support at most ${KEEL_LIBRARY_MAX_LEAF_SLUGS}. Composite objects are not available in this publication plan.`);
   }
   const manifestObjectId = predictObjectId(slugIds, manifestIntegrity.digest as Hex, canonicalManifestBytes.byteLength, "application/vnd.keel.library+json");
-  const manifestUri = `oca-onchain://${chainId}/${contracts.hold}/${manifestObjectId}`;
+  const manifestUri = `keel-onchain://${chainId}/${contracts.hold}/${manifestObjectId}`;
   const policyTuple = {
     mode: MODE_CODE[policyInputValue.mode],
     payout: policyInputValue.payout,
