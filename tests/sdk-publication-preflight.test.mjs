@@ -348,6 +348,27 @@ test("Amsterdam discovery success cannot bypass strict execution-dimension rejec
  assert.ok(f.requests.some(r=>r.method==="eth_simulateV1"&&r.params[0].validation));
 });
 
+test("Amsterdam discovery and replay preserve the exact fees, calldata, gas and nonce", async () => {
+ const exact={...call,nonce:"0x9"};
+ const f=fixture({timestamp:"0x6ac51fe0"});
+ const transport={request:request=>{
+  if(request.method==="eth_simulateV1"){
+   const first=request.params[0].blockStateCalls[0].calls[0];
+   assert.equal(first.maxFeePerGas,exact.maxFeePerGas);
+   assert.equal(first.maxPriorityFeePerGas,exact.maxPriorityFeePerGas);
+   assert.equal(first.nonce,exact.nonce);
+   assert.equal(first.data,exact.data);
+   assert.equal(first.gas,exact.gas);
+  }
+  return f.transport.request(request);
+ }};
+ const proof=await simulateKeelPublicationBeforeFunding({...input(),preparationCalls:[exact]},transport);
+ assert.equal(proof.verification,"collector-metadata");
+ const phases=f.requests.filter(r=>r.method==="eth_simulateV1");
+ assert.deepEqual(phases.map(r=>r.params[0].validation),[false,true,false]);
+ assert.ok(phases.every(r=>r.params[0].blockStateCalls[0].calls[0].maxFeePerGas===exact.maxFeePerGas));
+});
+
 test("Amsterdam retains the total transaction budget when execution consumption omits fresh state", async () => {
  const f=fixture({timestamp:"0x6ac51fe0",gas:"0x186a0",maximumGas:"0x1e848"});
  const transport={request:async request=>{

@@ -243,7 +243,9 @@ async function performPublicationSimulation(input: KeelPublicationSimulationInpu
   };
   // Discover pre-refund execution gas without reserving the entire network cap
   // at a nonzero fee. No state/balance override and no transaction is submitted.
-  const gasDiscovery = await simulate(atomicContext ? preparationCalls : preparationCalls.map(({ gasPrice: _legacy, maxFeePerGas: _cap, maxPriorityFeePerGas: _tip, ...call }) => call), atomicContext);
+  // Preserve the explicit fee envelope for Amsterdam state-gas discovery. Keep
+  // the same calldata, nonce and budgets; strict transaction validation follows.
+  const gasDiscovery = await simulate(atomicContext || transactionPolicy.separateStateGas ? preparationCalls : preparationCalls.map(({ gasPrice: _legacy, maxFeePerGas: _cap, maxPriorityFeePerGas: _tip, ...call }) => call), atomicContext);
   const boundedCalls = preparationCalls.map((call, index) => {
     const maximumUsedGas = gasDiscovery[index]!.maximumUsedGas;
     if (maximumUsedGas === undefined || maximumUsedGas <= 0n) return failure("unsupported-simulation", "This provider does not report pre-refund call gas. A compatible simulator is required before funding.");
