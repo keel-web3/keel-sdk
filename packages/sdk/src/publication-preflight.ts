@@ -18,6 +18,10 @@ export interface KeelSimulationCall {
 export interface KeelPublicationSimulationInput {
   /** Server-owned identity of the exact prepared source, release, defaults, and quote. */
   readonly transactionContext?: "atomic-wallet";
+  /** Opt-in for unmeasured independent storage calls whose initial gas is the
+   * selected-chain maximum. A provider-reported ceiling may bound discovery
+   * only; measured transaction margins and strict validation remain mandatory. */
+  readonly discoveryGasPolicy?: "provider-capacity";
   readonly planFingerprint: string;
   readonly chainId: number;
   readonly blockNumber?: bigint;
@@ -95,23 +99,31 @@ export function keelSimulationTransportDiagnostic(error: unknown, context: {
   readonly socketCloseCode?: number; readonly socketCloseReason?: string;
   readonly transport?: string;
 } = {}): Readonly<Record<string, string | number>> {
-  const methods = ["eth_chainId", "eth_getBlockByNumber", "eth_getTransactionCount", "eth_getBalance", "eth_getCode", "eth_simulateV1"];
-  const phases = ["publication-preflight", "public-qualification", "project-request", "initial-storage"];
-  const classes = ["Error", "TypeError", "TimeoutError", "HttpRequestError", "WebSocketRequestError", "SocketClosedError", "RpcRequestError", "UnknownRpcError", "KeelPublicationSimulationError"];
-  const failures = ["timeout", "connection-reset", "connection-closed", "dns", "rate-limited", "http-error", "rpc-error", "unknown"];
+  const methods = ["eth_chainId", "eth_getBlockByNumber", "eth_getTransactionCount", "eth_getBalance", "eth_getCode", "eth_estimateGas", "eth_simulateV1"];
+  const phases = ["publication-preflight", "public-qualification", "project-estimate", "project-request", "initial-storage", "ephemeral-execution", "transaction-validation"];
+  const classes = ["Error", "TypeError", "TimeoutError", "HttpRequestError", "WebSocketRequestError", "SocketClosedError", "RpcRequestError", "UnknownRpcError", "KeelPublicationSimulationError", "KeelRpcSetupError", "KeelRpcResponseError"];
+  const failures = ["timeout", "connection-reset", "connection-closed", "dns", "rate-limited", "http-error", "rpc-error", "invalid-response", "unknown"];
   const codes = ["ETIMEDOUT", "ECONNRESET", "ECONNREFUSED", "EPIPE", "ENOTFOUND", "EAI_AGAIN", "UND_ERR_CONNECT_TIMEOUT", "UND_ERR_SOCKET"];
   const closeReasons = ["empty", "message-too-large", "rate-limited", "timeout", "server-unavailable", "protocol-error", "policy-violation", "other"];
-  const stages = ["connection", "chain", "snapshot", "public-account", "read-capacity", "strict-capacity", "strict-nonce", "snapshot-recheck"];
+  const stages = ["connection", "chain", "snapshot", "public-account", "read-capacity", "strict-capacity", "strict-nonce", "snapshot-recheck", "discovery-minimum"];
   const transports = ["websocket", "https"];
+  const transactionValidation = ["intrinsic-gas"];
+  const failureReasons = ["rate-limited", "unavailable", "wrong-chain", "access-denied", "history-unavailable", "invalid-response"];
+  const responseFailures = ["missing-body", "response-too-large", "invalid-json", "invalid-envelope", "missing-result"];
   const result: Record<string, string | number> = {};
   const pick = (source: Record<string, unknown> | undefined) => {
     if (!source) return;
-    for (const [key, values] of [["rpcMethod", methods], ["phase", phases], ["stage", stages], ["transport", transports], ["errorClass", classes], ["causeClass", classes], ["transportFailure", failures], ["transportCode", codes], ["socketCloseReason", closeReasons]] as const)
+    for (const [key, values] of [["rpcMethod", methods], ["phase", phases], ["stage", stages], ["transport", transports], ["errorClass", classes], ["causeClass", classes], ["transportFailure", failures], ["transportCode", codes], ["socketCloseReason", closeReasons], ["transactionValidation", transactionValidation], ["failureReason", failureReasons], ["responseFailure", responseFailures]] as const)
       if (typeof source[key] === "string" && values.includes(source[key])) result[key] = source[key];
-    for (const [key, low, high] of [["rpcCode", -2147483648, 2147483647], ["httpStatus", 100, 599], ["socketReadyState", 0, 3], ["causeDepth", 0, 8], ["socketCloseCode", 1000, 4999], ["connectionAttempts", 1, 3], ["requestPayloadBytes", 0, 1073741824], ["blockCount", 0, 1000000], ["callCount", 0, 1000000]] as const)
+    for (const [key, low, high] of [["rpcCode", -2147483648, 2147483647], ["httpStatus", 100, 599], ["socketReadyState", 0, 3], ["causeDepth", 0, 8], ["socketCloseCode", 1000, 4999], ["connectionAttempts", 1, 3], ["requestPayloadBytes", 0, 1073741824], ["blockCount", 0, 1000000], ["callCount", 0, 1000000], ["blockIndex", 0, 255], ["callIndex", 0, 65535], ["responseBytes", 0, 1073741824], ["maximumResponseBytes", 0, 1073741824], ["revertDataBytes", 0, 1073741824]] as const)
       if (typeof source[key] === "number" && Number.isInteger(source[key]) && source[key] >= low && source[key] <= high) result[key] = source[key];
-    for (const key of ["requestedGasLimit", "providerGasCap", "requiredProgramGas"])
-      if (typeof source[key] === "string" && /^[1-9]\d{0,19}$/u.test(source[key]) && BigInt(source[key]) <= 18_446_744_073_709_551_615n) result[key] = source[key];
+    for (const key of ["requestedGasLimit", "providerGasCap", "requiredProgramGas", "returnedGasLimit", "gasUsed", "maxUsedGas", "pinnedBlockNumber", "minimumProgramGas", "intrinsicProgramGas", "calldataFloorGas", "largestMinimumCallGas"])
+      if (typeof source[key] === "string" && /^(?:0|[1-9]\d{0,19})$/u.test(source[key]) && BigInt(source[key]) <= 18_446_744_073_709_551_615n
+        && (source[key] !== "0" || ["gasUsed", "maxUsedGas", "pinnedBlockNumber", "minimumProgramGas", "intrinsicProgramGas", "calldataFloorGas", "largestMinimumCallGas"].includes(key))) result[key] = source[key];
+    for (const key of ["pinnedBlockHash", "readerRuntimeCodeHash", "revertDataHash", "planFingerprint"])
+      if (typeof source[key] === "string" && /^0x[0-9a-f]{64}$/iu.test(source[key])) result[key] = source[key].toLowerCase();
+    if (typeof source.target === "string" && /^0x[0-9a-f]{40}$/iu.test(source.target)) result.target = source.target;
+    if (typeof source.selector === "string" && /^0x[0-9a-f]{8}$/iu.test(source.selector)) result.selector = source.selector.toLowerCase();
   };
   const seen = new Set<unknown>();
   for (let value = error, depth = 0; value && depth < 8 && !seen.has(value); depth++) {
@@ -119,7 +131,12 @@ export function keelSimulationTransportDiagnostic(error: unknown, context: {
     const name = typeof item.name === "string" && classes.includes(item.name) ? item.name : "Error";
     result[depth === 0 ? "errorClass" : "causeClass"] = name; result.causeDepth = depth;
     pick(record(item.diagnostic));
+    if (typeof item.reason === "string" && failureReasons.includes(item.reason)) result.failureReason = item.reason;
     if (typeof item.code === "number" && Number.isInteger(item.code) && Math.abs(item.code) <= 2147483647) result.rpcCode = item.code;
+    if (item.code === 3 && bytes(item.data)) {
+      result.revertDataBytes = (item.data.length - 2) / 2;
+      if (item.data.length <= 4_000_002) result.revertDataHash = keccak256(item.data);
+    }
     if (typeof item.status === "number" && Number.isInteger(item.status) && item.status >= 100 && item.status <= 599) result.httpStatus = item.status;
     if (typeof item.code === "string" && codes.includes(item.code)) result.transportCode = item.code;
     value = item.cause;
@@ -138,7 +155,7 @@ export function keelSimulationTransportFailure(error: unknown, context: Paramete
   if (error instanceof KeelPublicationSimulationError) return new KeelPublicationSimulationError(error.kind, error.message, { ...diagnostic, ...error.diagnostic });
   let cursor: unknown = error;
   const seen = new Set<unknown>();
-  let unsupported = false, limited = false, reverted = false, insufficient = false, invalid = false;
+  let unsupported = false, limited = false, reverted = false, insufficient = false, invalid = false, intrinsic = false;
   let providerGasCap: bigint | undefined;
   for (let depth = 0; depth < 8 && cursor && !seen.has(cursor); depth++) {
     seen.add(cursor); const item = record(cursor); if (!item) break;
@@ -149,6 +166,10 @@ export function keelSimulationTransportFailure(error: unknown, context: Paramete
       if (raw && raw.length <= 20) { const cap = BigInt(raw); if (cap > 0n && (providerGasCap === undefined || cap < providerGasCap)) providerGasCap = cap; }
     }
     insufficient ||= item.code === -38014 || item.simulationFailure === "insufficient-balance" || /insufficient funds for (?:gas|transfer)|insufficient balance/iu.test(message);
+    // Geth's intrinsic-validation code is preserved by raw transports even when
+    // they do not supply the RPC pool's simulationFailure marker. It is not an
+    // outage or evidence that one particular call has an undersized envelope.
+    intrinsic ||= item.code === -38013 || /intrinsic gas too low/iu.test(message);
     invalid ||= item.code === -32602 || item.status === 400 || item.status === 422 || item.simulationFailure === "transaction-validation" || /transaction validation failed/iu.test(message);
     reverted ||= item.code === 3 || item.name === "ContractFunctionRevertedError" || /execution reverted|reverted with|out of gas/iu.test(message);
     limited ||= /gas limit (?:is )?(?:too high|exceeds|higher than)|exceeds (?:the )?(?:rpc|simulation) gas cap|maximum (?:simulation|response) size exceeded/iu.test(message);
@@ -156,6 +177,7 @@ export function keelSimulationTransportFailure(error: unknown, context: Paramete
   }
   if (reverted) return new KeelPublicationSimulationError("execution-reverted", "A planned contract execution reverted or exhausted its gas bound. Resolve that failure before payment; do not infer a delivery-size limit.", diagnostic);
   if (insufficient) return new KeelPublicationSimulationError("insufficient-balance", "A planned transaction lacks the balance for its exact validated gas and value. Review the sender funding before payment; no transaction was submitted.", diagnostic);
+  if (intrinsic) return new KeelPublicationSimulationError("configuration-invalid", "The simulator rejected transaction validation. Its intrinsic-gas response does not identify a faulty call or prove the saved gas limit is too low. The exact plan and simulator evidence need review before approval; no transaction was submitted.", { ...diagnostic, transactionValidation: "intrinsic-gas" });
   if (invalid) return new KeelPublicationSimulationError("configuration-invalid", "The simulator rejected the planned transaction parameters. Correct the saved plan before payment; no transaction was submitted.", diagnostic);
   if (unsupported) return new KeelPublicationSimulationError("unsupported-simulation", "This RPC does not support the required read-only publication simulation. Choose a compatible configured provider before a new payment.", diagnostic);
   if (limited || providerGasCap !== undefined || diagnostic.httpStatus === 413) return new KeelPublicationSimulationError("provider-limit", "The provider rejected the simulation at its configured limit. This does not prove that the artwork or its complete metadata is too large.", { ...diagnostic, ...(providerGasCap === undefined ? {} : { providerGasCap: providerGasCap.toString() }) });
@@ -198,6 +220,10 @@ async function performPublicationSimulation(input: KeelPublicationSimulationInpu
   const completeBytes = new TextEncoder().encode(input.expectedTokenURI).byteLength;
   if (completeBytes > input.maximumTokenUriBytes) return failure("metadata-size-limit", "The complete prepared tokenURI exceeds this delivery mode's byte limit. Review a supported Hybrid or IPFS route before paying for new storage.");
   const preparationCalls = input.preparationCalls.map(call => validatedCall(call, input.maximumTransactionGas, true));
+  if (input.discoveryGasPolicy !== undefined && (input.discoveryGasPolicy !== "provider-capacity"
+    || input.transactionContext !== undefined || preparationCalls.length === 0
+    || preparationCalls.some(call => BigInt(call.gas) !== input.maximumTransactionGas)))
+    return failure("configuration-invalid", "Capacity-bound discovery requires unmeasured independent calls at the selected-chain maximum; it cannot change a wallet or validated transaction envelope.");
   const observationCalls = (input.observationCalls ?? []).map(call => validatedCall(call, input.maximumTransactionGas));
   if (input.requiredReaderCalls !== undefined && !Array.isArray(input.requiredReaderCalls)) return failure("configuration-invalid", "Required reader checks must be exact calls and return bytes.");
   const requiredReaderCalls = (input.requiredReaderCalls ?? []).map(check => {
@@ -220,18 +246,23 @@ async function performPublicationSimulation(input: KeelPublicationSimulationInpu
   if (metadataCall.to.toLowerCase() !== metadataTarget.toLowerCase()) return failure("configuration-invalid", "The final simulation call must target the exact planned metadata contract.");
   const expectedReturn = expectation.kind === "storage-only" ? encodeAbiParameters([{ type: "bool" }], [true]).toLowerCase() : encodeAbiParameters([{ type: "string" }], [input.expectedTokenURI]).toLowerCase();
   const identityBase = { readPolicy: "keel-inline-read-policy@1", policyGasCeiling: KEEL_INLINE_SAFE_RPC_GAS.toString(), policyTokenUriByteCeiling: KEEL_INLINE_MAX_TOKEN_URI_BYTES, planFingerprint: input.planFingerprint, chainId: input.chainId, reader, runtimeCodeHash: input.readerRuntimeCodeHash.toLowerCase(),
-    transactionContext: input.transactionContext ?? "independent-transactions", completeTokenUriBytes: completeBytes, maximumTokenUriBytes: input.maximumTokenUriBytes, maximumReadGas: input.maximumReadGas.toString(), collectionOverheadGas: input.collectionOverheadGas.toString(), maximumTransactionGas: input.maximumTransactionGas.toString(), preparationCalls, observationCalls, requiredReaderCalls, metadataTarget, metadataCall, assertions,
+    transactionContext: input.transactionContext ?? "independent-transactions", discoveryGasPolicy: input.discoveryGasPolicy ?? "fixed-envelopes", completeTokenUriBytes: completeBytes, maximumTokenUriBytes: input.maximumTokenUriBytes, maximumReadGas: input.maximumReadGas.toString(), collectionOverheadGas: input.collectionOverheadGas.toString(), maximumTransactionGas: input.maximumTransactionGas.toString(), preparationCalls, observationCalls, requiredReaderCalls, metadataTarget, metadataCall, assertions,
     blockTag: input.blockNumber === undefined ? "latest" : `0x${input.blockNumber.toString(16)}`, expectation, validation: "transactions-then-public-read" };
   const metadataDigest = (await createIntegrity(new TextEncoder().encode(input.expectedTokenURI))).digest;
   // Snapshot all inputs before the first asynchronous transport call.
   const identity = { ...identityBase, metadataDigest };
 
-  const request = async (method: string, params: readonly unknown[]) => { try { return await transport.request({ method, params }); } catch (error) { throw keelSimulationTransportFailure(error, { method, phase: "publication-preflight" }); } };
+  let pinnedDiagnostic: Readonly<Record<string, string | number>> = { planFingerprint: identity.planFingerprint };
+  const request = async (method: string, params: readonly unknown[]) => { try { return await transport.request({ method, params }); } catch (error) {
+    const classified = keelSimulationTransportFailure(error, { method, phase: "publication-preflight" });
+    throw new KeelPublicationSimulationError(classified.kind, classified.message, { ...classified.diagnostic, ...pinnedDiagnostic });
+  } };
   if (quantity(await request("eth_chainId", [])) !== BigInt(identity.chainId)) return failure("wrong-chain", "The configured RPC returned another chain. No payment can be prepared from this proof.");
   const block = record(await request("eth_getBlockByNumber", [identity.blockTag, false]));
   const blockNumber = quantity(block?.number), blockGasLimit = quantity(block?.gasLimit);
   if (blockNumber === undefined || blockGasLimit === undefined || typeof block?.hash !== "string" || !/^0x[0-9a-f]{64}$/iu.test(block.hash)) return failure("rpc-unavailable", "The simulation needs a verifiable selected-chain block.");
   if (identity.blockTag !== "latest" && blockNumber !== BigInt(identity.blockTag)) return failure("rpc-unavailable", "The provider returned another block than the exact requested simulation snapshot.");
+  pinnedDiagnostic = { planFingerprint: identity.planFingerprint, pinnedBlockNumber: blockNumber.toString(), pinnedBlockHash: block.hash.toLowerCase(), readerRuntimeCodeHash: identity.runtimeCodeHash };
   const blockTimestamp = quantity(block.timestamp);
   if (blockTimestamp === undefined) return failure("rpc-unavailable", "The simulation needs the actual selected-chain timestamp for its transaction gas rules.");
   let transactionPolicy;
@@ -247,9 +278,13 @@ async function performPublicationSimulation(input: KeelPublicationSimulationInpu
   // Transaction validity and public-call gas budgets are different. First validate
   // every real transaction; then replay those exact calls in eth_call semantics to
   // observe the result with its configured public read budget. No overrides apply.
-  const atomicContext = input.transactionContext === "atomic-wallet";
+  const atomicContext = identity.transactionContext === "atomic-wallet";
   if (atomicContext && (preparationCalls.length !== 1 || preparationCalls[0]!.from.toLowerCase() !== preparationCalls[0]!.to.toLowerCase() || !preparationCalls[0]!.data.startsWith("0xe9ae5c53"))) return failure("configuration-invalid", "An atomic-wallet preflight requires its complete creator self-call program.");
+  // Provisional successful-prefix measurements may redistribute only an
+  // explicitly unmeasured discovery budget. They never authorize a transaction.
+  let discoveryPrefixMaximumGas: bigint[] = [];
   const simulate = async (calls: readonly KeelSimulationCall[], validation: boolean) => {
+    discoveryPrefixMaximumGas = [];
     if (!calls.length) return [];
     const response = await request("eth_simulateV1", [{ blockStateCalls: calls.map(call => ({ calls: [call] })), validation, traceTransfers: false, returnFullTransactions: true }, block.number]);
     if (!Array.isArray(response) || response.length !== calls.length) return failure("rpc-unavailable", "The provider returned an incomplete publication simulation.");
@@ -262,7 +297,7 @@ async function performPublicationSimulation(input: KeelPublicationSimulationInpu
       const transaction = record(transactions[0]);
       const actualGas = quantity(transaction?.gas), requestedGas = BigInt(call.gas);
       if (actualGas === undefined) return failure("unsupported-simulation", "The simulator omitted the exact transaction gas envelope.");
-      if (actualGas < requestedGas) return failure("provider-limit", "The simulator silently reduced the requested transaction gas. The exact prepared plan requires a compatible provider before wallet approval.", { requestedGasLimit: requestedGas.toString(), providerGasCap: actualGas.toString() });
+      if (actualGas < requestedGas) return failure("provider-limit", "The simulator silently reduced the requested transaction gas. The exact prepared plan requires a compatible provider before wallet approval.", { requestedGasLimit: requestedGas.toString(), providerGasCap: actualGas.toString(), blockIndex: index, callIndex: 0 });
       if (actualGas !== requestedGas) return failure("unsupported-simulation", "The simulator changed the requested transaction gas envelope.");
       if (call.nonce !== undefined && quantity(transaction?.nonce) !== BigInt(call.nonce)) return failure("unsupported-simulation", "The simulator omitted or changed the explicit transaction nonce.");
     }
@@ -275,13 +310,30 @@ async function performPublicationSimulation(input: KeelPublicationSimulationInpu
       const results = record(item)?.calls;
       if (!Array.isArray(results) || results.length !== 1) return failure("rpc-unavailable", "A planned call is missing from the simulation result.");
       const result = record(results[0]);
-      if (result?.status === "0x0") return failure("execution-reverted", `Planned simulation call ${index + 1} reverted. Its contract failure must be resolved before payment; it is not a delivery-size diagnosis.`, { callIndex: index, target: calls[index]!.to, selector: calls[index]!.data.slice(0, 10), requestedGasLimit: BigInt(calls[index]!.gas).toString(), phase: validation ? "transaction-validation" : "ephemeral-execution" });
+      if (result?.status === "0x0") {
+        // Preserve the returned evidence without guessing the inner revert cause.
+        // Raw messages/bytes can contain creator data and never enter diagnostics.
+        const rawError = record(result.error);
+        const returnedGas = quantity(record((record(item)?.transactions as unknown[])[0])?.gas);
+        const gasUsed = quantity(result.gasUsed), maxUsedGas = quantity(result.maxUsedGas);
+        const revertData = bytes(rawError?.data) ? rawError.data : bytes(result.returnData) ? result.returnData : undefined;
+        return failure("execution-reverted", `Planned simulation call ${index + 1} reverted. Its contract failure must be resolved before payment; it is not a delivery-size diagnosis.`, keelSimulationTransportDiagnostic({ diagnostic: {
+          ...pinnedDiagnostic, callIndex: index, target: calls[index]!.to, selector: calls[index]!.data.slice(0, 10),
+          requestedGasLimit: BigInt(calls[index]!.gas).toString(), phase: validation ? "transaction-validation" : "ephemeral-execution",
+          ...(returnedGas === undefined ? {} : { returnedGasLimit: returnedGas.toString() }),
+          ...(gasUsed === undefined ? {} : { gasUsed: gasUsed.toString() }), ...(maxUsedGas === undefined ? {} : { maxUsedGas: maxUsedGas.toString() }),
+          ...(typeof rawError?.code === "number" ? { rpcCode: rawError.code } : {}),
+          ...(revertData === undefined ? {} : { revertDataBytes: (revertData.length - 2) / 2,
+            ...(revertData.length > 4_000_002 ? {} : { revertDataHash: keccak256(revertData) }) }),
+        } }));
+      }
       const gasUsed = quantity(result?.gasUsed);
       if (result?.status !== "0x1" || result.error !== undefined || gasUsed === undefined || gasUsed > BigInt(calls[index]!.gas) || !bytes(result.returnData)) return failure("rpc-unavailable", "The provider returned invalid execution evidence.");
       const assertion = assertions.find(assertion => assertion.callIndex === index);
       if (assertion && result.returnData.toLowerCase() !== assertion.returnData) return failure("metadata-mismatch", `Planned simulation call ${index + 1} did not return its required verification bytes.`);
       const maximumUsedGas = quantity(result.maxUsedGas);
       if (result.maxUsedGas !== undefined && (maximumUsedGas === undefined || maximumUsedGas < gasUsed || maximumUsedGas > BigInt(calls[index]!.gas))) return failure("rpc-unavailable", "The provider returned contradictory pre-refund gas evidence.");
+      if (!validation && maximumUsedGas !== undefined && maximumUsedGas > 0n && discoveryPrefixMaximumGas.length === index) discoveryPrefixMaximumGas.push(maximumUsedGas);
       const header = record(item);
       return { gasUsed, maximumUsedGas, returnData: result.returnData.toLowerCase(),
         ...(transactionPolicy.separateStateGas ? { forkHeader: { hash: String(header?.hash), parentHash: String(header?.parentHash),
@@ -290,11 +342,128 @@ async function performPublicationSimulation(input: KeelPublicationSimulationInpu
   };
   // Discover pre-refund execution gas without reserving the entire network cap
   // at a nonzero fee. No state/balance override and no transaction is submitted.
-  const gasDiscovery = await simulate(atomicContext ? preparationCalls : preparationCalls.map(({ gasPrice: _legacy, maxFeePerGas: _cap, maxPriorityFeePerGas: _tip, ...call }) => call), atomicContext);
+  const discoveryBase = atomicContext ? preparationCalls : preparationCalls.map(({ gasPrice: _legacy, maxFeePerGas: _cap, maxPriorityFeePerGas: _tip, ...call }) => call);
+  let discoveryCeiling = BigInt(identity.maximumTransactionGas);
+  let discoveryCalls = discoveryBase;
+  let sharedDiscoveryBudget: bigint | undefined;
+  const discoveryCapacityAttempts: { readonly requestedGas: string; readonly providerGasCap: string; readonly programGasBudget?: string; readonly perCallGasLimit?: string; readonly perCallGasLimits?: readonly string[] }[] = [];
+  const discoveryAllocationAttempts: { readonly callIndex: number; readonly previousGasLimit: string; readonly nextGasLimit: string; readonly programGasBudget: string; readonly strategy: "prefix-reuse" | "remaining-budget" }[] = [];
+  const maximizedDiscoveryCalls = new Set<number>();
+  let totalCalldataFloorGas = 0n;
+  const intrinsicDiscoveryGas = discoveryBase.map(call => {
+    let regular = 0n, floor = 0n;
+    for (let offset = 2; offset < call.data.length; offset += 2) {
+      const zero = call.data.slice(offset, offset + 2) === "00";
+      regular += BigInt(zero ? transactionPolicy.zeroCalldataGas : transactionPolicy.nonzeroCalldataGas);
+      floor += BigInt(zero ? transactionPolicy.zeroCalldataFloorGas : transactionPolicy.nonzeroCalldataFloorGas);
+    }
+    totalCalldataFloorGas += floor;
+    const external = call.from.toLowerCase() !== call.to.toLowerCase();
+    // EIP-2780 charges recipient access only for an external call, and its
+    // value-transfer charge only for an external nonzero-value call. Calls here
+    // always have a recipient; contract-creation transactions are not accepted.
+    const base = transactionPolicy.transactionBaseGas + (external ? transactionPolicy.recipientAccessGas : 0)
+      + (external && BigInt(call.value) !== 0n ? transactionPolicy.valueTransferGas : 0);
+    return BigInt(base) + (regular > floor ? regular : floor);
+  });
+  // The maintained public sequence qualifier conservatively requires 21000
+  // even on the selected fork's cheaper empty-call path. Keep this allocation
+  // minimum distinct from actual transaction intrinsic gas in diagnostics.
+  const minimumDiscoveryGas = intrinsicDiscoveryGas.map(intrinsic => intrinsic > 21_000n ? intrinsic : 21_000n);
+  const minimumProgramGas = minimumDiscoveryGas.reduce((sum, gas) => sum + gas, 0n);
+  let gasDiscovery;
+  for (;;) {
+    try { gasDiscovery = await simulate(discoveryCalls, atomicContext); break; }
+    catch (error) {
+      // Minimum-preserving shares are only an initial discovery allocation. A carrier CREATE
+      // can exhaust its share while lighter calls leave most of the observed
+      // shared budget unused. Replay the COMPLETE original program after moving
+      // that unused discovery allowance; a repeated genuine revert still fails.
+      // Never apply this to an atomic wallet, a measured envelope or strict replay.
+      const index = error instanceof KeelPublicationSimulationError ? error.diagnostic?.callIndex : undefined;
+      if (identity.discoveryGasPolicy === "provider-capacity" && sharedDiscoveryBudget !== undefined
+        && error instanceof KeelPublicationSimulationError && error.kind === "execution-reverted"
+        && error.diagnostic?.phase === "ephemeral-execution" && typeof index === "number" && Number.isInteger(index)
+        && index >= 0 && index < discoveryCalls.length && discoveryPrefixMaximumGas.length === index
+        && discoveryAllocationAttempts.length < 2 * discoveryCalls.length && !maximizedDiscoveryCalls.has(index)) {
+        const prefix = discoveryPrefixMaximumGas.map((maximum, i) => {
+          const desired = keelExecutorGasLimit(maximum, BigInt(discoveryBase[i]!.gas));
+          return desired > minimumDiscoveryGas[i]! ? desired : minimumDiscoveryGas[i]!;
+        });
+        const prefixTotal = prefix.reduce((sum, gas) => sum + gas, 0n);
+        const current = BigInt(discoveryCalls[index]!.gas);
+        let suffix = discoveryCalls.slice(index + 1).map(call => BigInt(call.gas));
+        let available = sharedDiscoveryBudget - prefixTotal - suffix.reduce((sum, gas) => sum + gas, 0n);
+        let strategy: "prefix-reuse" | "remaining-budget" = "prefix-reuse";
+        // Prefer reusing measured prefix slack without starving later calls.
+        // Otherwise reserve every later call's selected-fork intrinsic floor;
+        // any later failure is another bounded full-program discovery replay.
+        if (available < (current * 120n + 99n) / 100n) {
+          suffix = minimumDiscoveryGas.slice(index + 1);
+          available = sharedDiscoveryBudget - prefixTotal - suffix.reduce((sum, gas) => sum + gas, 0n);
+          strategy = "remaining-budget";
+        }
+        const originalMaximum = BigInt(discoveryBase[index]!.gas);
+        const next = available < originalMaximum ? available : originalMaximum;
+        if (next > current && next >= minimumDiscoveryGas[index]!
+          && prefix.every((gas, i) => gas <= BigInt(discoveryBase[i]!.gas))
+          && suffix.every((gas, i) => gas <= BigInt(discoveryBase[index + 1 + i]!.gas))) {
+          if (strategy === "remaining-budget") maximizedDiscoveryCalls.add(index);
+          discoveryAllocationAttempts.push({ callIndex: index, previousGasLimit: current.toString(), nextGasLimit: next.toString(), programGasBudget: sharedDiscoveryBudget.toString(), strategy });
+          const allocations = [...prefix, next, ...suffix];
+          discoveryCalls = discoveryBase.map((call, i) => ({ ...call, gas: `0x${allocations[i]!.toString(16)}` as Hex }));
+          continue;
+        }
+      }
+      if (identity.discoveryGasPolicy !== "provider-capacity" || !(error instanceof KeelPublicationSimulationError)
+        || error.kind !== "provider-limit" || discoveryCapacityAttempts.length >= 3 || discoveryAllocationAttempts.length > 0) throw error;
+      const requested = error.diagnostic?.requestedGasLimit, reported = error.diagnostic?.providerGasCap;
+      if (typeof requested !== "string" || typeof reported !== "string" || !/^[1-9]\d{0,19}$/u.test(requested)
+        || !/^[1-9]\d{0,19}$/u.test(reported) || BigInt(requested) !== discoveryCeiling
+        || BigInt(reported) >= discoveryCeiling) throw error;
+      const blockIndex = error.diagnostic?.blockIndex;
+      // A later simulated block may receive only the shared RPC budget left
+      // after earlier calls. Treating that remainder as a fresh per-call cap
+      // produces a slowly descending retry loop (e.g. 50M minus 12k per probe).
+      // Only these explicitly unmeasured independent calls may instead share
+      // the observed remaining budget. Discard the failed response and replay
+      // the entire program; measured margins and strict validation still gate it.
+      const shareBudget = typeof blockIndex === "number" && Number.isInteger(blockIndex)
+        && blockIndex > 0 && blockIndex < discoveryCalls.length;
+      const capacity = BigInt(reported);
+      const largestMinimumCallGas = minimumDiscoveryGas.reduce((maximum, gas) => gas > maximum ? gas : maximum, 0n);
+      const requiredMinimum = shareBudget ? minimumProgramGas : largestMinimumCallGas;
+      if (requiredMinimum > capacity) return failure("provider-limit", "The exact program's transaction and calldata minimum exceeds the observed simulation capacity. The saved plan is unchanged; no approval was prepared.",
+        { ...keelSimulationTransportDiagnostic(error), ...pinnedDiagnostic, stage: "discovery-minimum",
+          requestedGasLimit: requiredMinimum.toString(), providerGasCap: reported,
+          minimumProgramGas: minimumProgramGas.toString(), intrinsicProgramGas: intrinsicDiscoveryGas.reduce((sum, gas) => sum + gas, 0n).toString(),
+          calldataFloorGas: totalCalldataFloorGas.toString(), largestMinimumCallGas: largestMinimumCallGas.toString(), callCount: discoveryBase.length });
+      sharedDiscoveryBudget = shareBudget ? capacity : undefined;
+      // Reserve every call's actual selected-fork minimum before sharing only
+      // the remaining unmeasured allowance. Integer division may leave <N gas
+      // unused; it must never push the sum over the observed shared budget.
+      const extra = shareBudget ? (capacity - minimumProgramGas) / BigInt(discoveryBase.length) : 0n;
+      const allocations = minimumDiscoveryGas.map(minimum => shareBudget ? minimum + extra : capacity);
+      if (allocations.some((gas, index) => gas > BigInt(discoveryBase[index]!.gas))) throw error;
+      discoveryCeiling = allocations.reduce((maximum, gas) => gas > maximum ? gas : maximum, 0n);
+      const uniform = allocations.every(gas => gas === discoveryCeiling);
+      discoveryCapacityAttempts.push({ requestedGas: requested, providerGasCap: reported,
+        ...(shareBudget ? { programGasBudget: reported, ...(uniform ? { perCallGasLimit: discoveryCeiling.toString() }
+          : { perCallGasLimits: allocations.map(gas => gas.toString()) }) } : {}) });
+      // Discard every result of the rejected attempt. Re-run the entire exact
+      // dependent program at the explicitly reported discovery capacity. No
+      // validated transaction, fee, nonce, recipient, value or call order changes.
+      discoveryCalls = discoveryBase.map((call, index) => ({ ...call, gas: `0x${allocations[index]!.toString(16)}` as Hex }));
+    }
+  }
   const boundedCalls = preparationCalls.map((call, index) => {
     const maximumUsedGas = gasDiscovery[index]!.maximumUsedGas;
     if (maximumUsedGas === undefined || maximumUsedGas <= 0n) return failure("unsupported-simulation", "This provider does not report pre-refund call gas. A compatible simulator is required before funding.");
     const desired = atomicContext ? (maximumUsedGas * 120n + 99n) / 100n : keelExecutorGasLimit(maximumUsedGas, BigInt(call.gas));
+    const capacity = sharedDiscoveryBudget ?? discoveryCeiling;
+    if (discoveryCapacityAttempts.length > 0 && desired > capacity)
+      return failure("provider-limit", "The measured storage transaction including its required margin exceeds the provider's verified discovery capacity. Saved funding is unchanged; no approval was prepared.",
+        { requestedGasLimit: desired.toString(), providerGasCap: capacity.toString() });
     return { ...call, gas: `0x${(desired > BigInt(call.gas) ? BigInt(call.gas) : desired).toString(16)}` as Hex };
   });
   const transactions = await simulate(boundedCalls, true);
@@ -341,7 +510,10 @@ async function performPublicationSimulation(input: KeelPublicationSimulationInpu
   const canonical = record(await request("eth_getBlockByNumber", [block.number, false]));
   if (canonical?.hash !== block.hash) return failure("chain-reorganized", "The chain changed during the preflight. Recheck the same prepared plan before payment.");
   const transactionForkHeaders = transactions.flatMap(result => result.forkHeader ? [result.forkHeader] : []);
-  const simulationFingerprint = (await createIntegrity(new TextEncoder().encode(canonicalJson({ ...identity, transactionGasPolicy, transactionForkHeaders, validatedTransactionCalls: boundedCalls, effectiveReadGas: effectiveReadGas.toString(), readBoundaryAttempts })))).digest;
+  const discoveryGas = { policy: identity.discoveryGasPolicy, initialGasLimits: preparationCalls.map(call => BigInt(call.gas).toString()),
+    effectiveGasLimits: discoveryCalls.map(call => BigInt(call.gas).toString()), capacityAttempts: discoveryCapacityAttempts,
+    ...(discoveryAllocationAttempts.length > 0 ? { allocationAttempts: discoveryAllocationAttempts } : {}) };
+  const simulationFingerprint = (await createIntegrity(new TextEncoder().encode(canonicalJson({ ...identity, transactionGasPolicy, transactionForkHeaders, discoveryGas, validatedTransactionCalls: boundedCalls, effectiveReadGas: effectiveReadGas.toString(), readBoundaryAttempts })))).digest;
   return Object.freeze({ schema: "keel-publication-simulation@1" as const, readPolicy: identity.readPolicy, policyGasCeiling: identity.policyGasCeiling, policyTokenUriByteCeiling: identity.policyTokenUriByteCeiling, planFingerprint: identity.planFingerprint, simulationFingerprint,
     chainId: identity.chainId, transactionGasPolicy, transactionForkHeaders, reader, metadataTarget, ephemeralContextCalls: observationCalls.length, requiredReaderChecks: requiredReaderCalls.length,
     requiredReaderProofs: requiredReaderCalls.map((check, index) => ({ reader: check.call.to, selector: check.call.data.slice(0, 10), calldataDigest: keccak256(check.call.data),
@@ -349,6 +521,7 @@ async function performPublicationSimulation(input: KeelPublicationSimulationInpu
       gasUsed: observations[boundedCalls.length + index]!.gasUsed.toString(), gasLimit: BigInt(calls[boundedCalls.length + index]!.gas).toString(), gasMargin: check.gasMargin })),
     metadataCallGasLimit: BigInt(calls.at(-1)!.gas).toString(), collectionGasMargin: identity.collectionOverheadGas,
     requestedReadGasLimit: identity.maximumReadGas, effectiveReadGasLimit: effectiveReadGas.toString(), readBoundaryAttempts,
+    discoveryGas,
     mintEligibilityVerified: false as const, readerRuntimeCodeHash: identity.runtimeCodeHash, blockNumber: blockNumber.toString(), blockHash: block.hash,
     observationPolicy: "eth-call" as const, verification: expectation.kind,
     ...(expectation.kind === "collector-metadata" ? { completeTokenUriBytes: completeBytes, metadataDigest, abiReturnBytes: (expectedReturn.length - 2) / 2, abiReturnDigest: keccak256(expectedReturn as Hex), maximumAbiReturnBytes: 64 + Math.ceil(identity.maximumTokenUriBytes / 32) * 32, assemblyReadGas: readGas.toString(), collectionReadGas: collectionReadGas.toString() }

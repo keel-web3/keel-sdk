@@ -1,0 +1,48 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:keel:native-original-program-gate:1",
+  "title": "Private original publication native gate manifest",
+  "type": "object",
+  "required": ["schema", "gethImage", "cases"],
+  "properties": {
+    "schema": { "const": "keel-native-original-program-gate@1" },
+    "gethImage": { "const": "ethereum/client-go@sha256:abf3605177f8bdcfce436985a8054cca4ae59256323a4ffb72c56c04f3d1fadd" },
+    "cases": {
+      "type": "array", "minItems": 3, "maxItems": 3,
+      "items": {
+        "type": "object", "required": ["id", "capture", "expectedURI", "snapshot", "rpcGasCap"],
+        "properties": {
+          "id": { "enum": ["retro-45", "owned-14", "paid-6-atomic"] },
+          "capture": { "$ref": "#/$defs/file" },
+          "expectedURI": { "$ref": "#/$defs/file" },
+          "rpcGasCap": { "type": "integer", "minimum": 1, "maximum": 9007199254740991 },
+          "snapshot": {
+            "type": "object", "required": ["mode", "witness"],
+            "properties": {
+              "mode": { "enum": ["canonical-datadir", "proof-reconstruction"] },
+              "witness": { "$ref": "#/$defs/file" },
+              "datadir": {
+                "type": "object", "required": ["path", "files"],
+                "properties": {
+                  "path": { "type": "string", "minLength": 1 },
+                  "files": { "type": "array", "minItems": 1, "items": { "$ref": "#/$defs/file" } }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "$defs": {
+    "file": {
+      "type": "object", "required": ["path", "bytes", "sha256"],
+      "properties": {
+        "path": { "type": "string", "minLength": 1 },
+        "bytes": { "type": "integer", "minimum": 0 },
+        "sha256": { "type": "string", "pattern": "^[0-9a-f]{64}$" }
+      }
+    }
+  },
+  "$comment": "Executable validation additionally requires every case exactly once, original identities/counts/known calldata commitments, safe relative paths, file hashes, RLP header binding and EIP-1186 account/storage proof verification. JSON Schema success alone never qualifies native acceptance."
+}

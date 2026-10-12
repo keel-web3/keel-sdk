@@ -226,8 +226,11 @@ const studioConnect: JsonSchema = object({
 }, ["operation"]);
 const studioDraft: JsonSchema = object({
   studioUrl: string("Optional HTTPS Studio URL; KEEL_STUDIO_URL is used otherwise.", 512),
-  operation: { type: "string", enum: ["list", "read", "diagnose", "continue-publication", "cancel-review", "storage-recovery", "recover", "recover-wallet-rejection", "plan", "plan-edit", "defaults", "defaults-edit", "profiles", "profiles-edit", "profile-select", "conversation", "conversation-suggest", "prepare-review", "storage-review", "create", "update"] },
+  operation: { type: "string", enum: ["capture-program", "resume-review", "updated-review-read", "updated-review-check", "updated-review-cancel", "list", "read", "diagnose", "continue-publication", "cancel-review", "storage-recovery", "recover", "recover-wallet-rejection", "plan", "plan-edit", "defaults", "defaults-edit", "profiles", "profiles-edit", "profile-select", "conversation", "conversation-suggest", "prepare-review", "storage-review", "create", "update"] },
   releaseId: string("Required for read, diagnose, plan, plan-edit, prepare-review, conversation, conversation-suggest, or update.", 128),
+  artifactRevision: integer("Exact original project revision for capture-program.", 1),
+  releaseRevision: integer("Exact original release revision for capture-program.", 1),
+  reviewCandidate: { type: "object", properties: { candidateId: {type:"string"}, candidateDigest: {type:"string"}, version:{type:"integer",minimum:1} }, required:["candidateId","candidateDigest","version"], additionalProperties:false },
   projectId: string("Required for storage-review or storage-recovery; uses the owner-scoped project and never signs or submits.", 128),
   operationId: string("For recover or cancel-review: the exact existing operation UUID.", 128),
   transactionHashes: { type: "array", items: { type: "string", pattern: "^0x[0-9a-fA-F]{64}$" }, minItems: 1, maxItems: 1, description: "For recover: the failed atomic wallet transaction, never new calldata." },
@@ -414,6 +417,7 @@ const onchainRead: JsonSchema = object({
   pick: integer("Take one member of a multi-value return instead of the whole tuple.", 0, 31),
 }, ["name", "address", "signature", "returns"]);
 const onchainData: JsonSchema = object({
+  chainId: integer("Selected EVM chain. The shared RPC pool verifies it before contract reads; a different-chain fallback is refused.", 1),
   rpcUrl: string("Optional JSON-RPC endpoint. Omit to resolve KEEL_ONCHAIN_RPC_URL, then the configured public RPC. HTTP is accepted only on a loopback host, which is how a local anvil is reached.", 512),
   reads: { type: "array", items: onchainRead, minItems: 0, maxItems: 64, description: "Additional values this artwork needs. Can be empty when record is supplied." },
   record: object({
@@ -427,6 +431,7 @@ const onchainData: JsonSchema = object({
   version: string("Inline module version recorded with the fragment. Defaults to 1.0.0.", 32),
 }, ["reads"]);
 const endpointConfig: JsonSchema = object({
+  chainId: integer("Selected EVM chain; resolves this chain's configured/indexed providers without changing the workspace default.", 1),
   studioUrl: string("Optional credential-free HTTPS Studio origin.", 512),
   publicRpcUrl: string("Optional credential-free HTTPS public wallet/browser RPC origin.", 512),
   indexerUrl: string("Optional credential-free HTTPS indexer origin.", 512),

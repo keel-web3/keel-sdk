@@ -16,7 +16,11 @@ test('motion preview preserves two distinct frames in a real AVIF sequence',asyn
   const dir=await mkdtemp(path.join(tmpdir(),'keel-avif-test-'));
   try{
     const file=path.join(dir,'preview.avif');await writeFile(file,avif);
-    const decoded=execFileSync(encoder.binary,['-v','error','-i',file,'-f','rawvideo','-pix_fmt','rgba','pipe:1']);
+    // The AVIF contains both its primary still image (v:0) and the timed
+    // sequence (v:1). The decoder's automatic selection picks the still.
+    const primary=execFileSync(encoder.binary,['-v','error','-i',file,'-map','0:v:0','-f','rawvideo','-pix_fmt','rgba','pipe:1']);
+    assert.equal(primary.length,16);assert.ok(primary[0]>200&&primary[2]<40);
+    const decoded=execFileSync(encoder.binary,['-v','error','-i',file,'-map','0:v:1','-fps_mode','passthrough','-f','rawvideo','-pix_fmt','rgba','pipe:1']);
     assert.equal(decoded.length,32);assert.ok(decoded[0]>200&&decoded[2]<40);assert.ok(decoded[16]<40&&decoded[18]>200);
   }finally{await rm(dir,{recursive:true,force:true});}
 });

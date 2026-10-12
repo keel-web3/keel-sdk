@@ -1,0 +1,32 @@
+{
+  "schema": "keel-sanitized-simulation-incident@1",
+  "evidence": "Authorized operator messages after corrected production deployment; Library libfile_3303f9761b588191bb534ca8b7c89f6d version 4, 592149 bytes, SHA256 8ef025bb939fc961915b9c7a04e759829223d603ba7230fb493298de3ca8d494. Supported cloud materialization failed; numeric facts below are from the messages, not a claim of inspected complete Library bytes.",
+  "siteSource": "917f71f7f8c11f9344f818d36039ea1a3dcb2253",
+  "sdkSource": "eb7af68a71a861faac39ae498a2c33dc9fc39ac2",
+  "failureAt": "2026-10-11T19:02:17Z",
+  "unchangedRetry": "Same reported result after one bounded saved-plan retry",
+  "diagnostic": {
+    "rpcMethod": "eth_simulateV1",
+    "phase": "project-request",
+    "transport": "https",
+    "requestedGasLimit": "49976000",
+    "providerGasCap": "49964000",
+    "requiredProgramGas": "699664000",
+    "requestPayloadBytes": 23370,
+    "blockCount": 14,
+    "callCount": 14,
+    "connectionAttempts": 1
+  },
+  "approvalPayload": false,
+  "walletApprovalRequired": false,
+  "paidAtomicProgram": false,
+  "offlineReproduction": {
+    "responseModel": "Synthetic shared cross-block RPC budget, 50000000 total and 12000 used by each public empty call, as modeled from upstream Geth gasBudget; not captured PublicNode responses",
+    "unfixedSequenceProbeLimits": ["50000000", "49988000", "49976000"],
+    "unfixedFinalReturnedGas": "49964000",
+    "privateRequestsBeforeFailure": 0,
+    "misleadingNestedPhase": "project-request",
+    "upstreamSource": "https://github.com/ethereum/go-ethereum/blob/master/internal/ethapi/simulate.go"
+  },
+  "limits": "The equal numeric reproduction supports the shared-budget explanation, but exact live raw response/index and provider configuration were not inspected. Required program gas is a sum of requested envelopes, not measured execution. The separate paid six-call program has no fresh acceptance; its operator probe used the legacy simulation-only factory for eth_estimateGas, whereas deployed Site uses the explicit approved-recipient pool. No paid storage, release state, signature or transaction changed in this source task."
+}

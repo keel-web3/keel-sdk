@@ -1,10 +1,12 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
+import { readFile } from 'node:fs/promises';
 import { encodeAbiParameters, keccak256 } from 'viem';
 import { createKeelRpcPool } from '../packages/sdk/dist/rpc.js';
-import { createKeelPublicSepoliaSimulationPool } from '../packages/sdk/dist/public-simulation-pool.js';
-import { simulateKeelPublicationBeforeFunding } from '../packages/sdk/dist/publication-preflight.js';
-import { probePublicSimulationCandidates } from '../scripts/check-public-simulation-pool.mjs';
+import { createKeelSepoliaSimulationTransport } from '../packages/sdk/dist/sepolia-simulation-transport.js';
+const { createKeelPublicSepoliaSimulationPool } = await import(process.env.KEEL_TEST_PUBLIC_SIMULATION_POOL_MODULE ?? '../packages/sdk/dist/public-simulation-pool.js');
+const { simulateKeelPublicationBeforeFunding } = await import(process.env.KEEL_TEST_PUBLICATION_PREFLIGHT_MODULE ?? '../packages/sdk/dist/publication-preflight.js');
+import { APPROVED_PUBLICNODE_SEPOLIA_URL, probePublicSimulationCandidates, publicProbeOptions, publicProbeExitCode } from '../scripts/check-public-simulation-pool.mjs';
 
 const hash = n => `0x${BigInt(n).toString(16).padStart(64,'0')}`;
 const zero = `0x${'0'.repeat(40)}`, owner = `0x${'11'.repeat(20)}`, reader = `0x${'22'.repeat(20)}`;
@@ -30,6 +32,7 @@ function fixture(faults=[{},{}], approved=urls.slice(0,faults.length)) {
     if(body.method==='eth_getBalance') return respond(`0x${'f'.repeat(32)}`);
     if(body.method==='eth_getTransactionCount') return respond('0x0');
     if(body.method==='eth_getCode') return respond(body.params[0]===zero?'0x':'0x6000');
+    if(body.method==='eth_estimateGas') return fault.error ? error(fault.error,fault.message) : respond(fault.estimate ?? '0x3d0900');
     assert.equal(body.method,'eth_simulateV1');
     const blocks=body.params[0].blockStateCalls, privateCall=blocks[0].calls[0].data!=='0x';
     if(!privateCall&&fault.publicHttp) return new Response('',{status:fault.publicHttp});
@@ -40,8 +43,22 @@ function fixture(faults=[{},{}], approved=urls.slice(0,faults.length)) {
     if(privateCall&&fault.wait) { fault.started?.(); await new Promise((resolve,reject)=>init.signal.addEventListener('abort',()=>reject(new Error('cancelled')),{once:true})); }
     const result=blocks.map((b,i)=>({number:`0x${(19+i).toString(16)}`,timestamp:`0x${(BigInt(snapshot.timestamp)+12n*BigInt(i+1)).toString(16)}`,hash:hash(i+1),parentHash:i?hash(i):snapshot.hash,
       blockAccessListHash:hash(i+10),slotNumber:`0x${(11+i).toString(16)}`,
-      transactions:b.calls.map(c=>({...c,gas:!privateCall&&fault.cap&&BigInt(c.gas)>50000000n?'0x2faf080':!privateCall&&fault.sequenceCap&&blocks.length>=5&&i===4?'0x1':privateCall&&fault.aggregate&&i===4?'0x1':c.gas})),
+      transactions:b.calls.map(c=>({...c,gas:fault.cap&&BigInt(c.gas)>(fault.capacityGas??50000000n)?`0x${(fault.capacityGas??50000000n).toString(16)}`:!privateCall&&fault.sequenceCap&&blocks.length>=5&&i===4?'0x1':privateCall&&fault.aggregate&&i===4?'0x1':c.gas})),
       calls:b.calls.map(c=>({status:privateCall&&fault.revert?'0x0':'0x1',gasUsed:'0x5208',...(!privateCall&&fault.noPreRefund?{}:{maxUsedGas:'0x5208'}),returnData:!privateCall?'0x':c.data==='0xeeee'?encodeAbiParameters([{type:'string'}],[fault.metadata??tokenURI]):encodeAbiParameters([{type:'uint256'}],[c.data==='0xdddd'?500n:BigInt((i+1)*100)])}))}));
+    if(fault.sharedBudget!==undefined) {
+      // Geth's gasBudget is shared across blocks, and consumes used gas after
+      // each call. These are synthetic responses, not captured project bytes.
+      let remaining=privateCall&&body.params[0].validation&&fault.strictBudget!==undefined?fault.strictBudget:fault.sharedBudget;
+      for(const [i,b] of blocks.entries()) for(const [j,c] of b.calls.entries()) {
+        const requested=BigInt(c.gas),allowed=requested<remaining?requested:remaining;
+        const demand=privateCall?(fault.projectGasByCall?.[i]??fault.projectGas??21000n):12000n,used=demand<allowed?demand:allowed;
+        result[i].transactions[j].gas=`0x${allowed.toString(16)}`;
+        Object.assign(result[i].calls[j],{gasUsed:`0x${used.toString(16)}`,maxUsedGas:`0x${used.toString(16)}`});
+        if(demand>allowed) Object.assign(result[i].calls[j],{status:'0x0',returnData:'0x',error:{code:-32000,message:'synthetic out of gas'}});
+        remaining-=used;
+      }
+    }
+    if(privateCall&&fault.missingProjectMaximumAt!==undefined)delete result[fault.missingProjectMaximumAt].calls[0].maxUsedGas;
     if(!privateCall&&blocks.length===40) {
       if(fault.longStatus) result[39].calls[0].status='0x0';
       if(fault.longHeader) result[39].parentHash=hash(500);
@@ -56,6 +73,135 @@ function fixture(faults=[{},{}], approved=urls.slice(0,faults.length)) {
   const options={rpcUrls:urls.slice(0,faults.length),approvedProjectRpcUrls:approved,readTransport,block:{number:18n,hash:snapshot.hash},fetchImpl,minIntervalMs:0};
   return {requests,privateRequests,options,transport:createKeelPublicSepoliaSimulationPool(options)};
 }
+
+function singleRecipientTransient({ fault, repeat = false, requestTimeoutMs, onAttempt, beforeResponse } = {}) {
+  const f = fixture([{}]);
+  let privateAttempts = 0;
+  const transport = createKeelPublicSepoliaSimulationPool({ ...f.options,
+    ...(requestTimeoutMs === undefined ? {} : { requestTimeoutMs }), ...(onAttempt ? { onAttempt } : {}),
+    fetchImpl: async (url, init) => {
+      const body = JSON.parse(init.body);
+      const project = body.method === 'eth_simulateV1' && body.params[0].blockStateCalls[0].calls[0].data !== '0x';
+      if (project) {
+        privateAttempts++;
+        if (fault && (privateAttempts === 1 || repeat)) {
+          f.requests.push({ index: 0, body, wire: init.body });
+          if (fault instanceof Error) throw fault;
+          return new Response('SECRET transport body', { status: fault });
+        }
+        await beforeResponse?.({ body, init });
+      }
+      return f.options.fetchImpl(url, init);
+    },
+  });
+  return { ...f, transport, privateAttempts: () => privateAttempts };
+}
+
+test('one approved recipient automatically recovers an observed transient failure with fresh qualification and the complete immutable program', async () => {
+  for (const fault of [502, 503, 504, Object.assign(new Error('SECRET socket timeout'), { code: 'ETIMEDOUT' }), Object.assign(new Error('SECRET socket reset'), { code: 'ECONNRESET' })]) {
+    const f = singleRecipientTransient({ fault }), input = fullPlan(), before = structuredClone(input);
+    try {
+      const proof = await simulateKeelPublicationBeforeFunding(input, f.transport);
+      assert.equal(proof.state, 'ephemeral-simulation'); assert.equal(proof.submission, 'not-performed');
+      assert.equal(proof.completeTokenUriBytes, Buffer.byteLength(tokenURI));
+      assert.deepEqual(input, before); assert.equal(f.privateAttempts(), 4);
+      const projects = f.privateRequests();
+      assert.deepEqual(projects[0].body.params, projects[1].body.params);
+      assert.deepEqual(projects.map(request => request.index), [0, 0, 0, 0]);
+      const between = f.requests.slice(f.requests.indexOf(projects[0]) + 1, f.requests.indexOf(projects[1]));
+      assert.ok(between.some(request => request.body.method === 'eth_chainId'));
+      assert.ok(between.some(request => request.body.method === 'eth_simulateV1' && request.body.params[0].validation
+        && request.body.params[0].blockStateCalls.length === 1 && request.body.params[0].blockStateCalls[0].calls[0].nonce === '0x1'));
+    } finally { await f.transport.close(); }
+  }
+});
+
+test('same-recipient recovery is attempted at most once and never infers an outage from an unknown failure', async () => {
+  const repeat = singleRecipientTransient({ fault: 503, repeat: true });
+  try {
+    await assert.rejects(repeat.transport.request(program()), error => error.kind === 'rpc-unavailable' && error.diagnostic.httpStatus === 503);
+    assert.equal(repeat.privateAttempts(), 2);
+  } finally { await repeat.transport.close(); }
+  for (const fault of [new Error('SECRET unknown'), Object.assign(new Error('SECRET dns'), { code: 'ENOTFOUND' }), 500, 400, 422]) {
+    const f = singleRecipientTransient({ fault });
+    try { await assert.rejects(f.transport.request(program())); assert.equal(f.privateAttempts(), 1); }
+    finally { await f.transport.close(); }
+  }
+});
+
+test('a cooldown that cannot fit the whole-request deadline returns the observed failure without retry', async () => {
+  const f = singleRecipientTransient({ fault: 503, requestTimeoutMs: 100 });
+  try {
+    await assert.rejects(f.transport.request(program()), error => error.kind === 'rpc-unavailable' && error.diagnostic.httpStatus === 503);
+    assert.equal(f.privateAttempts(), 1);
+  } finally { await f.transport.close(); }
+  for (const requestTimeoutMs of [0, 99, 120001, NaN, Infinity])
+    assert.throws(() => createKeelPublicSepoliaSimulationPool({ ...fixture([{}]).options, requestTimeoutMs }), /bounded deadline/);
+});
+
+test('cancellation during the recovery cooldown prevents fresh qualification and a second project request', async () => {
+  let reached;
+  const retrying = new Promise(resolve => { reached = resolve; });
+  const f = singleRecipientTransient({ fault: 503, onAttempt: diagnostic => { if (diagnostic.sameRecipientRetry === 1) reached(); } });
+  const run = f.transport.request(program());
+  const refused = assert.rejects(run, error => error.kind === 'rpc-unavailable' && /cancelled/.test(error.message));
+  await retrying; const count = f.requests.length;
+  await f.transport.close(); await refused;
+  assert.equal(f.privateAttempts(), 1); assert.equal(f.requests.length, count);
+});
+
+test('the complete request deadline discards a late response even when the provider ignores abort', async () => {
+  let release, reached;
+  const gate = new Promise(resolve => { release = resolve; });
+  const entered = new Promise(resolve => { reached = resolve; });
+  const f = singleRecipientTransient({ requestTimeoutMs: 100, beforeResponse: async () => { reached(); await gate; } });
+  const run = f.transport.request(program());
+  const refused = assert.rejects(run, error => error.kind === 'rpc-unavailable' && error.diagnostic.transportFailure === 'timeout');
+  await entered; await refused; release();
+  await new Promise(resolve => setImmediate(resolve));
+  await assert.rejects(f.transport.request(program()), error => error.kind === 'rpc-unavailable' && /cancelled/.test(error.message));
+  assert.equal(f.privateAttempts(), 1); await f.transport.close();
+});
+
+test('a recovered request shares its original deadline and cannot receive a second full timeout budget', async (t) => {
+  // Both clocks and timer delivery describe one deterministic request lifetime.
+  // Real CI qualification must not consume the tiny recovery-eligibility margin
+  // between the 1s cooldown, 1s minimum remaining budget and this 2.2s deadline.
+  t.mock.timers.enable({ apis: ['Date', 'setTimeout'], now: Number(BigInt(snapshot.timestamp)) * 1000 });
+  let elapsed = 0;
+  t.mock.method(performance, 'now', () => elapsed);
+  const advance = async ms => { elapsed += ms; t.mock.timers.tick(ms); await new Promise(resolve => setImmediate(resolve)); };
+  let release, reached, recovering;
+  const gate = new Promise(resolve => { release = resolve; });
+  const entered = new Promise(resolve => { reached = resolve; });
+  const retrying = new Promise(resolve => { recovering = resolve; });
+  let recoveryWait;
+  const f = singleRecipientTransient({ fault: 503, requestTimeoutMs: 2_200,
+    onAttempt: diagnostic => { if (diagnostic.sameRecipientRetry === 1) { recoveryWait = diagnostic.recoveryWaitMs; recovering(); } },
+    beforeResponse: async () => { reached(); await gate; } });
+  const input = program(); let settled = false;
+  // Handle an unexpected early outcome immediately; waiting for a request that
+  // never started must not leave an assertion rejection unobserved.
+  const outcome = f.transport.request(input).then(value => ({ value }), error => ({ error })).then(result => { settled = true; return result; });
+  const requireGate = async signal => assert.equal(await Promise.race([signal.then(() => true), outcome.then(() => false)]), true, 'request ended before the expected recovery boundary');
+  try {
+    await requireGate(retrying);
+    assert.equal(recoveryWait, 1_000);
+    await advance(recoveryWait - 1); assert.equal(f.privateAttempts(), 1);
+    await advance(1); await requireGate(entered);
+    assert.equal(f.privateAttempts(), 2);
+    await advance(2_199 - elapsed); assert.equal(settled, false, 'original deadline has not elapsed');
+    await advance(1);
+    const result = await outcome;
+    assert.equal(result.error?.kind, 'rpc-unavailable');
+    assert.equal(result.error.diagnostic.transportFailure, 'timeout');
+    assert.equal(elapsed, 2_200, 'recovery must not restart the complete-request clock');
+    release(); await new Promise(resolve => setImmediate(resolve));
+    assert.deepEqual(f.privateRequests().map(request => request.body.params), [input.params, input.params]);
+    await assert.rejects(f.transport.request(program()), error => /cancelled/.test(error.message));
+    assert.equal(f.privateAttempts(), 2);
+  } finally { release(); await f.transport.close(); }
+});
 
 test('pinned pool candidate cannot silently fail over during qualification; strict nonce and balance errors retain codes',async()=>{
   for(const code of [-38011,-38014,-38010]) {
@@ -121,7 +267,7 @@ test('body limit and transport outage swap complete programs; specific capacity 
 });
 test('public qualification never grants disclosure to another indexed recipient',async()=>{
   const f=fixture([{cap:true},{}],[urls[0]]);
-  try {await assert.rejects(f.transport.request(program()),e=>e.kind==='configuration-invalid'&&e.diagnostic.recipientApprovalRequired===1);
+  try {await assert.rejects(f.transport.request(program()),e=>e.kind==='provider-limit'&&e.diagnostic.providerGasCap==='50000000');
     assert.equal(f.privateRequests().length,0);assert.ok(f.requests.some(r=>r.index===1&&r.body.method==='eth_simulateV1'));
   }finally{await f.transport.close();}
 });
@@ -133,6 +279,7 @@ test('contract revert, transaction validation failure and exact metadata mismatc
 test('invalid parameters, common server validation errors and ambiguous simulation rejections are terminal',async()=>{
   for(const fault of [
     {error:-32602,kind:'configuration-invalid'},
+    {error:-38013,kind:'configuration-invalid'},
     {error:-32000,message:'insufficient funds for gas * price + value SECRET',kind:'insufficient-balance'},
     {error:-32000,message:'insufficient balance SECRET',kind:'insufficient-balance'},
     {error:-32000,message:'nonce too low SECRET',kind:'configuration-invalid'},
@@ -193,4 +340,343 @@ test('public report refuses stale heads and invalid full-sequence evidence, and 
       if(fault.publicHttp) {assert.equal(item.publicProbes.length,1);assert.equal(item.publicProbes[0].httpStatus,fault.publicHttp);}
     }finally{await f.transport.close();}
   }
+});
+
+test('the approved CLI pins PublicNode and rejects URL overrides before probing', () => {
+  assert.deepEqual(publicProbeOptions(['--public-only', '--approved-publicnode-only', '--require-qualified']), {
+    rpcUrls: ['https://ethereum-sepolia-rpc.publicnode.com'], requireQualified: true,
+  });
+  assert.equal(APPROVED_PUBLICNODE_SEPOLIA_URL, 'https://ethereum-sepolia-rpc.publicnode.com');
+  assert.deepEqual(publicProbeOptions(['--public-only']), { requireQualified: false });
+  for (const args of [[], ['--approved-publicnode-only'], ['--public-only', '--public-only'],
+    ['--public-only', '--rpc-url=https://unapproved.invalid'], ['--public-only', 'https://unapproved.invalid']]) {
+    assert.throws(() => publicProbeOptions(args));
+  }
+});
+test('live gate fails on unavailable or incomplete qualification while retaining public-only evidence', async () => {
+  for (const fault of [{}, { publicHttp: 403 }, { publicHttp: 429 }, { longGas: true }, { longNonce: true }]) {
+    const f = fixture([fault]);
+    try {
+      const report = await probePublicSimulationCandidates({ rpcUrls: [urls[0]], fetchImpl: f.options.fetchImpl, minIntervalMs: 0 });
+      assert.equal(publicProbeExitCode(report, true), Object.keys(fault).length ? 1 : 0);
+      assert.equal(publicProbeExitCode(report, false), 0);
+      assert.equal(report.publicationVerified, false);
+      assert.equal(report.privateProjectDataSent, false);
+      assert.equal(f.privateRequests().length, 0);
+    } finally { await f.transport.close(); }
+  }
+  assert.equal(publicProbeExitCode({ candidates: [] }, true), 1);
+  assert.equal(publicProbeExitCode({ candidates: [{ publicQualification: 'passed', failure: { kind: 'rpc-unavailable' } }] }, true), 1);
+});
+test('the recorded 2026-10-11 PublicNode clamp remains a failed capability gate, not publication evidence', async () => {
+  const evidence = JSON.parse(await readFile(new URL('./fixtures/publicnode-sepolia-capacity-20261011.json', import.meta.url), 'utf8'));
+  assert.equal(publicProbeExitCode(evidence.report, true), 1);
+  assert.equal(evidence.report.candidates.length, 1);
+  const candidate = evidence.report.candidates[0];
+  assert.equal(candidate.endpoint, APPROVED_PUBLICNODE_SEPOLIA_URL);
+  assert.equal(candidate.publicProbes.length, 1);
+  assert.equal(candidate.publicProbes[0].validation, false);
+  assert.equal(candidate.publicProbes[0].requestedGas[0], '199804689');
+  assert.equal(candidate.publicProbes[0].returnedGas[0], '50000000');
+  assert.equal(candidate.failure.kind, 'provider-limit');
+  assert.equal(evidence.privatePlanVerified, false);
+  assert.equal(evidence.report.publicationVerified, false);
+  assert.equal(evidence.canonicalPublicationReceipt, null);
+  assert.equal(evidence.deployedCollection, null);
+});
+
+test('a lower explicit envelope requalifies after a larger cap rejection without rewriting any calls', async () => {
+  const f = fixture([{cap:true}]);
+  try {
+    const tooLarge = program();
+    await assert.rejects(f.transport.request(tooLarge), error => error.kind === 'provider-limit' && error.diagnostic.providerGasCap === '50000000');
+    assert.equal(f.privateRequests().length, 0);
+    const requestsAfterFailure = f.requests.length;
+    await assert.rejects(f.transport.request(tooLarge), error => error.kind === 'provider-limit');
+    assert.equal(f.requests.length, requestsAfterFailure, 'same oversized request stays rejected');
+    const smaller = program();
+    for (const block of smaller.params[0].blockStateCalls) block.calls[0].gas = '0x2faf080';
+    await f.transport.request(smaller);
+    assert.equal(f.privateRequests().length, 1);
+    assert.deepEqual(f.privateRequests()[0].body.params, smaller.params);
+    const publicRequalification = f.requests.slice(requestsAfterFailure).filter(request => request.body.method === 'eth_simulateV1' && request.body.params[0].blockStateCalls[0].calls[0].data === '0x');
+    assert.ok(publicRequalification.some(request => request.body.params[0].validation === true));
+    assert.ok(publicRequalification.some(request => request.body.params[0].blockStateCalls.length === smaller.params[0].blockStateCalls.length));
+  } finally { await f.transport.close(); }
+});
+
+test('the complete metadata read adapts its rejected ceiling while preserving exact transactions', async () => {
+  const f = fixture([{cap:true}]);
+  try {
+    const input = fullPlan();
+    for (const call of input.preparationCalls) call.gas = '0x989680';
+    input.maximumReadGas = 60000000n; input.metadataCall.gas = '0x3938700';
+    const proof = await simulateKeelPublicationBeforeFunding(input, f.transport);
+    assert.equal(proof.requestedReadGasLimit, '60000000');
+    assert.equal(proof.effectiveReadGasLimit, '50000000');
+    assert.deepEqual(proof.readBoundaryAttempts, [{requestedGas:'60000000', providerGasCap:'50000000'}]);
+    const requests = f.privateRequests();
+    assert.deepEqual(requests.map(request => request.body.params[0].blockStateCalls.length), [5,5,7]);
+    const validated = requests[1].body.params[0].blockStateCalls;
+    assert.deepEqual(requests[2].body.params[0].blockStateCalls.slice(0,5), validated);
+    assert.equal(proof.verification, 'collector-metadata');
+    assert.equal(proof.completeTokenUriBytes, Buffer.byteLength(tokenURI));
+  } finally { await f.transport.close(); }
+});
+
+const estimateRequest = () => ({ method:'eth_estimateGas', params:[{from:owner,to:reader,data:'0xbeef',value:'0x0',nonce:'0x5',maxFeePerGas:'0x30',maxPriorityFeePerGas:'0x1'},snapshot.number] });
+test('complete-transaction estimates disclose only to an approved pinned recipient and grant no capacity proof', async () => {
+  const f = fixture([{}, {cap:true}], [urls[1]]);
+  f.options.readTransport.request = async () => { throw Error('ordinary read provider must receive no estimate'); };
+  try {
+    const request=estimateRequest(), before=structuredClone(request);
+    assert.equal(await f.transport.request(request), '0x3d0900');
+    assert.deepEqual(request,before);
+    assert.ok(f.requests.every(r=>r.index===1));
+    assert.deepEqual(f.requests.at(-1).body.params,before.params);
+    assert.equal(f.requests.some(r=>r.body.method==='eth_simulateV1'),false);
+    await assert.rejects(f.transport.request(program()), e=>e.kind==='configuration-invalid'||e.kind==='provider-limit');
+    assert.equal(f.privateRequests().length,0,'successful estimate cannot bypass exact simulation capacity or recipient approval');
+  } finally { await f.transport.close(); }
+});
+test('estimation rejects an unapproved recipient, changed snapshot, wrong chain and stale head before any project calldata', async () => {
+  for(const [fault,approved] of [[{},[]],[{pin:true},[urls[0]]],[{chain:true},[urls[0]]],[{stale:true},[urls[0]]]]) {
+    const f=fixture([fault],approved);
+    try {await assert.rejects(f.transport.request(estimateRequest()));assert.equal(f.requests.some(r=>r.body.method==='eth_estimateGas'),false);}
+    finally {await f.transport.close();}
+  }
+});
+test('estimate reverts and malformed results never fall through to a different recipient or fallback gas', async () => {
+  for(const fault of [{error:3},{error:-32601},{estimate:'0x0'},{estimate:'0x00'}]) {
+    const f=fixture([fault,{}]);
+    try {await assert.rejects(f.transport.request(estimateRequest()));assert.ok(f.requests.every(r=>r.index===0));}
+    finally {await f.transport.close();}
+  }
+});
+test('estimation accepts only exact fee-bound numbered-block requests without state overrides or a caller gas clamp', async () => {
+  for(const mutate of [r=>r.params.push({}),r=>r.params[1]='latest',r=>r.params[0].gas='0x2faf080',r=>delete r.params[0].nonce,r=>r.params[0].gasPrice='0x1',r=>r.params[0].data='0x123']) {
+    const f=fixture();try {const r=estimateRequest();mutate(r);await assert.rejects(f.transport.request(r),e=>e.kind==='configuration-invalid');assert.equal(f.requests.length,0);}
+    finally {await f.transport.close();}
+  }
+});
+
+test('cancellation discards a late estimate even when the provider ignores abort', async () => {
+  const f=fixture([{}]); let release, started;
+  const gate=new Promise(resolve=>{started=resolve;});
+  const original=f.options.fetchImpl;
+  const rpc=createKeelPublicSepoliaSimulationPool({...f.options,fetchImpl:async(url,init)=>{
+    if(JSON.parse(init.body).method==='eth_estimateGas') { started(); await new Promise(resolve=>{release=resolve;}); }
+    return original(url,init);
+  }});
+  try {
+    const pending=rpc.request(estimateRequest()); await gate; await rpc.close(); release();
+    await assert.rejects(pending,e=>e.kind==='rpc-unavailable');
+    await assert.rejects(rpc.request(estimateRequest()),e=>e.kind==='rpc-unavailable');
+  } finally {await rpc.close();await f.transport.close();}
+});
+
+
+test('initial-storage capacity discovery requalifies the existing approved provider and validates the whole program without a new recipient', async () => {
+  for (const faults of [[{cap:true}], [{cap:true},{}]]) {
+    const f=fixture(faults,[urls[0]]), input={...fullPlan(),discoveryGasPolicy:'provider-capacity'}, before=structuredClone(input);
+    try {
+      const proof=await simulateKeelPublicationBeforeFunding(input,f.transport);
+      assert.deepEqual(input,before);
+      assert.deepEqual(proof.discoveryGas.capacityAttempts,[{requestedGas:'200000000',providerGasCap:'50000000'}]);
+      assert.ok(proof.discoveryGas.effectiveGasLimits.every(g=>'50000000'===g));
+      assert.ok(proof.transactionGasLimits.every(g=>BigInt(g)<50000000n));
+      assert.equal(proof.completeTokenUriBytes,Buffer.byteLength(tokenURI));
+      assert.ok(f.privateRequests().every(r=>r.index===0),'only the existing approved recipient receives project data');
+      assert.deepEqual(f.privateRequests().map(r=>[r.body.params[0].validation,r.body.params[0].blockStateCalls.length]),[[false,5],[true,5],[false,7]]);
+      const strict=f.privateRequests()[1].body.params[0].blockStateCalls;
+      assert.deepEqual(f.privateRequests()[2].body.params[0].blockStateCalls.slice(0,5),strict);
+      assert.ok(f.requests.some(r=>r.index===0&&r.body.method==='eth_simulateV1'&&r.body.params[0].blockStateCalls.length===5&&r.body.params[0].blockStateCalls[0].calls[0].data==='0x'&&r.body.params[0].blockStateCalls[0].calls[0].gas==='0x2faf080'));
+    } finally {await f.transport.close();}
+  }
+});
+test('dynamic discovery never turns unsupported approved methods into approval for another recipient', async () => {
+  const f=fixture([{unsupported:true},{}],[urls[0]]);
+  try {
+    await assert.rejects(simulateKeelPublicationBeforeFunding({...fullPlan(),discoveryGasPolicy:'provider-capacity'},f.transport),e=>e.kind==='configuration-invalid'&&e.diagnostic.recipientApprovalRequired===1);
+    assert.equal(f.privateRequests().length,0);
+  } finally {await f.transport.close();}
+});
+
+test('discovery chooses the largest approved reported capacity and cached rejection describes the current request', async () => {
+  const f=fixture([{cap:true},{cap:true,capacityGas:80000000n}]);
+  try {
+    await assert.rejects(f.transport.request(program()),e=>e.kind==='provider-limit'&&e.diagnostic.requestedGasLimit==='200000000'&&e.diagnostic.providerGasCap==='80000000');
+    const input=fullPlan(); input.maximumTransactionGas=100000000n;
+    input.preparationCalls=input.preparationCalls.map(c=>({...c,gas:'0x5f5e100'}));input.discoveryGasPolicy='provider-capacity';
+    const proof=await simulateKeelPublicationBeforeFunding(input,f.transport);
+    assert.deepEqual(proof.discoveryGas.capacityAttempts,[{requestedGas:'100000000',providerGasCap:'80000000'}]);
+    assert.ok(f.privateRequests().every(r=>r.index===1));
+    assert.equal(proof.completeTokenUriBytes,Buffer.byteLength(tokenURI));
+  } finally {await f.transport.close();}
+});
+
+test('cancelling adapted discovery discards late success without strict replay or a wallet proof', async () => {
+  const f=fixture([{cap:true}]);let started,release;
+  const gate=new Promise(resolve=>{started=resolve;});const original=f.options.fetchImpl;
+  const rpc=createKeelPublicSepoliaSimulationPool({...f.options,fetchImpl:async(url,init)=>{
+    const body=JSON.parse(init.body);
+    if(body.method==='eth_simulateV1'&&body.params[0].blockStateCalls[0].calls[0].data!=='0x') {started();await new Promise(resolve=>{release=resolve;});}
+    return original(url,init);
+  }});
+  try {
+    const pending=simulateKeelPublicationBeforeFunding({...fullPlan(),discoveryGasPolicy:'provider-capacity'},rpc);
+    await gate;await rpc.close();release();await assert.rejects(pending,e=>e.kind==='rpc-unavailable');
+    assert.equal(f.privateRequests().length,1);assert.equal(f.privateRequests()[0].body.params[0].validation,false);
+  } finally {await rpc.close();await f.transport.close();}
+});
+
+const sharedBudgetPlan=()=>{const source=fullPlan();return {...source,discoveryGasPolicy:'provider-capacity',preparationCalls:Array.from({length:14},(_,i)=>call(i)),assertions:[]};};
+test('uneven carrier demand reuses measured prefix allowance and fully replays the same program',async()=>{
+  // Deliberately uneven synthetic demands; native Geth separately checks EVM execution.
+  const f=fixture([{sharedBudget:50000000n,projectGasByCall:[2000000n,150000n,5500000n]}]);
+  const input=sharedBudgetPlan(),before=structuredClone(input);
+  try {
+    const proof=await simulateKeelPublicationBeforeFunding(input,f.transport);
+    assert.deepEqual(input,before);
+    assert.equal(proof.discoveryGas.allocationAttempts.length,1);
+    assert.equal(proof.discoveryGas.allocationAttempts[0].callIndex,2);
+    assert.equal(proof.discoveryGas.allocationAttempts[0].strategy,'prefix-reuse');
+    assert.ok(BigInt(proof.discoveryGas.effectiveGasLimits[2])>5500000n);
+    assert.ok(BigInt(proof.transactionGasLimits[2])>5500000n);
+    assert.equal(proof.completeTokenUriBytes,Buffer.byteLength(tokenURI));
+    const sent=f.privateRequests();
+    assert.deepEqual(sent.map(r=>r.body.params[0].validation),[false,false,true,false]);
+    const identity=c=>{const {gas,gasPrice,maxFeePerGas,maxPriorityFeePerGas,...rest}=c;return rest;};
+    for(const r of sent)assert.deepEqual(r.body.params[0].blockStateCalls.slice(0,14).map(b=>identity(b.calls[0])),before.preparationCalls.map(identity));
+    assert.deepEqual(sent.at(-1).body.params[0].blockStateCalls.slice(0,14),sent.at(-2).body.params[0].blockStateCalls);
+  }finally{await f.transport.close();}
+});
+test('a first-call demand larger than its equal share can borrow only observed remaining discovery capacity',async()=>{
+  const f=fixture([{sharedBudget:50000000n,projectGasByCall:[9000000n]}]);
+  try{
+    const proof=await simulateKeelPublicationBeforeFunding(sharedBudgetPlan(),f.transport);
+    assert.equal(proof.discoveryGas.allocationAttempts[0].callIndex,0);
+    assert.equal(proof.discoveryGas.allocationAttempts[0].strategy,'remaining-budget');
+    assert.ok(BigInt(proof.discoveryGas.allocationAttempts[0].nextGasLimit)<=50000000n);
+    assert.equal(proof.validatedTransactionCalls,14);
+  }finally{await f.transport.close();}
+});
+test('a genuine contract revert still refuses approval after bounded same-program allocation checks',async()=>{
+  const f=fixture([{sharedBudget:50000000n,revert:true}]);
+  try{
+    await assert.rejects(simulateKeelPublicationBeforeFunding(sharedBudgetPlan(),f.transport),e=>e.kind==='execution-reverted');
+    const sent=f.privateRequests();assert.equal(sent.length,2);
+    assert.ok(sent.every(r=>r.body.params[0].validation===false));
+  }finally{await f.transport.close();}
+});
+test('later calls recover from reserved intrinsic floors through bounded complete discovery replays',async()=>{
+  const demands=[9000000n,1000000n,8000000n,1000000n,6000000n,...Array(9).fill(100000n)];
+  const f=fixture([{sharedBudget:50000000n,projectGasByCall:demands}]);
+  try{
+    const proof=await simulateKeelPublicationBeforeFunding(sharedBudgetPlan(),f.transport);
+    assert.ok(proof.discoveryGas.allocationAttempts.length>1);
+    assert.ok(proof.discoveryGas.allocationAttempts.length<=28);
+    assert.equal(proof.validatedTransactionCalls,14);
+    for(const [i,gas] of proof.transactionGasLimits.entries())assert.ok(BigInt(gas)>demands[i]);
+    for(const request of f.privateRequests().filter(r=>!r.body.params[0].validation).slice(1,-1)){
+      assert.equal(request.body.params[0].blockStateCalls.length,14);
+      const total=request.body.params[0].blockStateCalls.reduce((sum,b)=>sum+BigInt(b.calls[0].gas),0n);
+      assert.ok(total<=50000000n);
+    }
+    assert.equal(proof.completeTokenUriBytes,Buffer.byteLength(tokenURI));
+  }finally{await f.transport.close();}
+});
+test('missing pre-refund evidence prevents allocation and a later metadata mismatch still blocks it',async()=>{
+  for(const [fault,kind] of [[{missingProjectMaximumAt:1},'execution-reverted'],[{metadata:'wrong whole URI'},'metadata-mismatch']]){
+    const f=fixture([{sharedBudget:50000000n,projectGasByCall:[2000000n,150000n,5500000n],...fault}]);
+    try{
+      await assert.rejects(simulateKeelPublicationBeforeFunding(sharedBudgetPlan(),f.transport),e=>e.kind===kind);
+      if(fault.missingProjectMaximumAt!==undefined)assert.equal(f.privateRequests().length,1);
+      else assert.ok(f.privateRequests().some(r=>r.body.params[0].validation));
+    }finally{await f.transport.close();}
+  }
+});
+test('cancellation during budget redistribution discards late results and never reaches strict approval',async()=>{
+  const f=fixture([{sharedBudget:50000000n,projectGasByCall:[2000000n,150000n,5500000n]}]);
+  let count=0,started,release;const gate=new Promise(resolve=>{started=resolve;});
+  const transport=createKeelPublicSepoliaSimulationPool({...f.options,fetchImpl:async(url,init)=>{
+    const body=JSON.parse(init.body);
+    if(body.method==='eth_simulateV1'&&body.params[0].blockStateCalls[0].calls[0].data!=='0x'&&++count===2){started();await new Promise(resolve=>{release=resolve;});}
+    return f.options.fetchImpl(url,init);
+  }});
+  try{
+    const pending=simulateKeelPublicationBeforeFunding(sharedBudgetPlan(),transport);
+    await gate;await transport.close();release();
+    await assert.rejects(pending,e=>e.kind==='rpc-unavailable');
+    assert.equal(f.privateRequests().length,2);assert.ok(f.privateRequests().every(r=>r.body.params[0].validation===false));
+  }finally{await transport.close();await f.transport.close();}
+});
+test('paid estimate uses the explicit approved pool entry point, not the legacy simulation-only factory',async()=>{
+  const legacy=createKeelSepoliaSimulationTransport(),f=fixture([{}],[urls[0]]),request=estimateRequest();
+  try {
+    await assert.rejects(legacy.request(request),e=>e.kind==='configuration-invalid'&&/read-only qualification and simulation methods/u.test(e.message));
+    assert.equal(await f.transport.request(request),'0x3d0900');
+    const sent=f.requests.filter(r=>r.body.method==='eth_estimateGas');assert.equal(sent.length,1);assert.equal(sent[0].index,0);
+    assert.deepEqual(sent[0].body.params,request.params);
+    assert.equal(f.privateRequests().length,0,'an estimate is not a simulation proof');
+  }finally{await legacy.close();await f.transport.close();}
+});
+test('a shared cross-block budget cannot masquerade as a fresh per-call ceiling during 14-call discovery', async()=>{
+  const f=fixture([{sharedBudget:50000000n}],[urls[0]]),source=sharedBudgetPlan(),before=structuredClone(source);
+  try {
+    const proof=await simulateKeelPublicationBeforeFunding(source,f.transport);
+    assert.deepEqual(source,before);
+    assert.deepEqual(proof.discoveryGas.capacityAttempts,[{requestedGas:'200000000',providerGasCap:'50000000'},
+      {requestedGas:'50000000',providerGasCap:'49988000',programGasBudget:'49988000',perCallGasLimit:'3570571'}]);
+    assert.ok(proof.discoveryGas.effectiveGasLimits.every(g=>g==='3570571'));
+    const sent=f.privateRequests();assert.deepEqual(sent.map(r=>[r.body.params[0].validation,r.body.params[0].blockStateCalls.length]),[[false,14],[true,14],[false,16]]);
+    const calls=r=>r.body.params[0].blockStateCalls.map(b=>b.calls[0]);
+    const withoutGas=({gas,gasPrice,maxFeePerGas,maxPriorityFeePerGas,...c})=>c;
+    for(const r of sent)assert.deepEqual(calls(r).slice(0,14).map(withoutGas),source.preparationCalls.map(withoutGas));
+    assert.deepEqual(calls(sent[2]).slice(0,14),calls(sent[1]));
+    assert.ok(calls(sent[1]).every(c=>BigInt(c.gas)>21000n),'measured margin is retained');
+    assert.equal(proof.completeTokenUriBytes,Buffer.byteLength(tokenURI));
+    assert.equal(proof.signing,'not-performed');assert.equal(proof.submission,'not-performed');
+    // A later read on the same pool uses cached remaining capacity, but still
+    // replays discovery, strict validation and exact complete metadata.
+    await simulateKeelPublicationBeforeFunding(source,f.transport);
+    assert.equal(f.privateRequests().length,6);
+  } finally {await f.transport.close();}
+});
+test('public multi-block clamp diagnostics identify the probe and position, before any private disclosure',async()=>{
+  const seen=[],f=fixture([{sharedBudget:50000000n}],[urls[0]]);
+  const transport=createKeelPublicSepoliaSimulationPool({...f.options,onAttempt:d=>seen.push(d)});
+  try {
+    const request=program();request.params[0].blockStateCalls=Array.from({length:14},(_,i)=>({calls:[{...call(i),gas:'0x2fa92c0'}]}));
+    assert.equal(BigInt(request.params[0].blockStateCalls[0].calls[0].gas),49976000n);
+    await assert.rejects(transport.request(request),e=>e.kind==='provider-limit'&&e.diagnostic.phase==='public-qualification'
+      &&e.diagnostic.blockIndex===3&&e.diagnostic.callIndex===0&&e.diagnostic.requestedGasLimit==='49976000'&&e.diagnostic.providerGasCap==='49964000');
+    assert.equal(f.privateRequests().length,0);assert.equal(seen.at(-1).phase,'public-qualification');assert.equal(seen.at(-1).blockIndex,3);
+    assert.equal(seen.at(-1).requiredProgramGas,'699664000');
+  }finally{await transport.close();await f.transport.close();}
+});
+test('shared discovery never reduces a measured margin, accepts a strict clamp or ignores complete metadata',async()=>{
+  for(const [fault,kind] of [[{projectGas:3500000n},'provider-limit'],[{projectGas:4000000n},'execution-reverted'],[{strictBudget:25000n},'provider-limit'],[{metadata:'different'},'metadata-mismatch']]) {
+    const f=fixture([{sharedBudget:50000000n,...fault}],[urls[0]]),source=sharedBudgetPlan(),before=structuredClone(source);
+    try {await assert.rejects(simulateKeelPublicationBeforeFunding(source,f.transport),e=>e.kind===kind);assert.deepEqual(source,before);
+      assert.ok(f.privateRequests().filter(r=>r.body.params[0].validation).length<=1);
+      if(fault.projectGas)for(const request of f.privateRequests().filter(r=>r.body.params[0].validation))
+        assert.ok(request.body.params[0].blockStateCalls.every(block=>BigInt(block.calls[0].gas)>fault.projectGas), 'strict replay preserves every measured margin');
+    }finally{await f.transport.close();}
+  }
+});
+test('shared discovery and a rejected 60M public-read ceiling preserve the strictly measured transactions',async()=>{
+  const f=fixture([{sharedBudget:50000000n}],[urls[0]]),source=sharedBudgetPlan();
+  source.maximumReadGas=60000000n;source.metadataCall={...source.metadataCall,gas:'0x3938700'};
+  const before=structuredClone(source);
+  try {
+    const proof=await simulateKeelPublicationBeforeFunding(source,f.transport);
+    assert.deepEqual(source,before);assert.equal(proof.readBoundaryAttempts.length,3);
+    assert.equal(proof.effectiveReadGasLimit,'49685000');
+    const sent=f.privateRequests(),strict=sent.find(r=>r.body.params[0].validation).body.params[0].blockStateCalls;
+    const replay=sent.filter(r=>r.body.params[0].blockStateCalls.length===16);
+    assert.equal(replay.length,2);
+    for(const request of replay)assert.deepEqual(request.body.params[0].blockStateCalls.slice(0,14),strict);
+    assert.equal(proof.completeTokenUriBytes,Buffer.byteLength(tokenURI));
+  }finally{await f.transport.close();}
 });

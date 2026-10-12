@@ -18,9 +18,17 @@ contract StateSequence {
     }
 
     function tokenURI(uint256) external view returns (string memory) {
+        return checkedTokenURI(500);
+    }
+
+    function tokenURIForCount(uint256 count) external view returns (string memory) {
+        return checkedTokenURI(count);
+    }
+
+    function checkedTokenURI(uint256 count) private view returns (string memory) {
         uint256 cursor;
         assembly { cursor := sload(0) }
-        require(cursor == 500, "incomplete sequence");
+        require(cursor == count, "incomplete sequence");
         return 'data:application/json,{"name":"Synthetic state sequence"}';
     }
 }

@@ -177,8 +177,114 @@ server-issued website review link for the existing connected wallet; do not
 build a new signing page or ask for keys in chat. Receipts and public read-back,
 not a prepared link, establish publication success.
 
-Sepolia simulation must verify consistent compatible behavior. The public HTTP pool can return contradictory results for the same pinned request. Hosted Studio first uses a persistent WebSocket qualified by public API and fork/envelope behavior before any project calldata is sent. A confirmed WebSocket 1009 changes to HTTPS on the same approved PublicNode Sepolia host, with the same full public qualification, exact numbered snapshot, gas envelopes and complete project verification. HTTP capacity is not assumed, and a reverted program is never retried to obtain success. SDK integrations can use `createKeelSepoliaSimulationTransport()` and close it when finished. The full atomic transaction is validated against the selected fork; collector metadata has its separate public-read budget. See `docs/SIMULATOR_CAPACITY_RECOVERY.md` for evidence and transport limits.
+Sepolia simulation must verify consistent compatible behavior. Hosted Studio uses the SDK `createKeelPublicSepoliaSimulationPool()` HTTPS path, resolving the configured and indexed candidates for each check. Each candidate must pass public chain, snapshot, fork, nonce, gas-envelope and complete-sequence qualification before receiving project calldata; only explicitly approved project-data recipients may receive it. The pool retains pacing and provider cooldowns across reviews, and bounded recovery replays the complete unchanged numbered-block program. A reverted program is never retried on another backend to obtain success. The full atomic transaction is validated against the selected fork; collector metadata has its separate public-read budget. The legacy `createKeelSepoliaSimulationTransport()` WebSocket API remains available to direct SDK integrations, including its qualified same-recipient HTTPS recovery after a confirmed 1009, but is not the current Studio default. Close either transport when finished. See `docs/SIMULATOR_CAPACITY_RECOVERY.md` for evidence and transport limits.
 
 An exact recovered full-revert receipt preserves the previous plan confirmation at the same draft revision when only platform infrastructure changed. Hosted Studio compares all terms, access phases and committed resources. Do not edit or restart an unchanged plan because a reader was updated; prepare a fresh exact wallet review, which still requires full-batch gas and collector metadata validation. Changed creator terms or resources require plan confirmation again.
 
-Sepolia publication preflight qualifies the simulator with bounded public empty calls, observed public account state and strict nonce controls on the exact retained socket before sending project calldata. For a known program, the public empty-call probe requests its required envelope within the observed selected-chain limit; ordinary reads use a modest control. Its actual execution is small, and small plans do not require full block capacity. The exact project simulation must still separately pass its requested gas and selected-fork limits. It checks the actual gas envelope on every simulation response. Silent RPC gas clamping is a provider limit, not a contract compatibility failure. A confirmed gas-envelope clamp permits at most three connection selections at the same approved endpoint. Each replacement must pass public qualification. An exact numbered project snapshot must match before repeating the unchanged, read-only ephemeral program. No gas reduction, state override, transaction write or new provider is permitted. Missing or enlarged envelopes, wrong-chain/fork/snapshot evidence, and genuine execution failures do not trigger this recovery. Exhaustion stays blocked; the next saved-plan read can try again. Never retry a genuine EVM revert to manufacture success. Use receipt recovery and a fresh complete Studio wallet review; Desktop is optional.
+For direct SDK integrations, the legacy socket API qualifies the simulator with bounded public empty calls, observed public account state and strict nonce controls on the exact retained socket before sending project calldata. For a known program, the public empty-call probe requests its required envelope within the observed selected-chain limit; ordinary reads use a modest control. Its actual execution is small, and small plans do not require full block capacity. The exact project simulation must still separately pass its requested gas and selected-fork limits. It checks the actual gas envelope on every simulation response. Silent RPC gas clamping is a provider limit, not a contract compatibility failure. A confirmed gas-envelope clamp permits at most three connection selections at the same approved endpoint. Each replacement must pass public qualification. An exact numbered project snapshot must match before repeating the unchanged, read-only ephemeral program. No gas reduction, state override, transaction write or new provider is permitted. Missing or enlarged envelopes, wrong-chain/fork/snapshot evidence, and genuine execution failures do not trigger this recovery. Exhaustion stays blocked; the next saved-plan read can try again. Never retry a genuine EVM revert to manufacture success. Use receipt recovery and a fresh complete Studio wallet review; Desktop is optional.
+
+Initial storage preparation can explicitly select `discoveryGasPolicy: "provider-capacity"`
+when its independent, unmeasured calls all start at the selected-chain maximum.
+A reported smaller provider capacity discards the rejected attempt and bounds
+the next whole-program discovery replay, with at most three capacity adjustments.
+If a shared provider budget initially gives each call an equal share, a call
+can exhaust that share even when the complete program fits. Discovery may
+redistribute unused allowance using verified successful-prefix pre-refund
+measurements. It first retains the later allowances; if necessary it reserves
+their selected-fork intrinsic floors and measures them on another complete
+replay. Allocation is bounded to twice the call count, within the observed
+shared budget and original chain ceilings. A call that still fails at its
+maximum remaining allowance stays blocked. This changes only unmeasured
+discovery allowances, never an atomic wallet program or an already-validated
+transaction. It does not retry a validated EVM failure or omit any call.
+The caller measures pre-refund maximum usage, retains the required transaction
+margin, and strictly validates every exact call with its real fees. Complete
+metadata and standalone-reader checks still run. If the margin cannot fit,
+execution reverts, or a method is unsupported, approval remains blocked and
+the saved funding amount is preserved. The proof records discovery ceilings
+and capacity/allocation attempts separately from final transaction gas limits.
+
+The simulation pool never rewrites calls or grants disclosure authority. It
+returns the largest reported capacity among existing approved recipients so
+discovery can requalify that exact envelope; an unapproved candidate cannot
+hide this capacity evidence. Creator storage-review, agent storage-review,
+and MCP `keel-studio-draft` storage review use the same Studio gate. The chain
+profile comes from the selected block's chain, timestamp and gas limit;
+unsupported EVM profiles remain blocked. Tezos uses its separate exact-operation
+simulation and fee model, never this EVM gas discovery policy.
+
+## Review an expired plan with unknown wallet history
+
+An old plan with no transaction hash may still have reached a wallet. Do not
+mark it never-issued, clear its history or create a replacement release. Studio
+can prepare a separate unsigned updated review for the same project, release,
+stored bytes and operations. Preparing, retrying or cancelling this review
+preserves the original journals, including unequal archived histories.
+
+The SDK updated-review policy binds the original snapshot, every historical
+funding identity, the proposed deadline and the complete expected tokenURI.
+Selection requires complete canonical funding history from the authenticated
+contract deployment, exact expired funding calls against the immutable runtime,
+full-program simulation with complete metadata equality, current fees, and an
+explicit creator choice of that exact review. A pending, unknown or funded
+history cannot authorize another payment. Even a successful selection returns
+no wallet request; Studio subsequently uses its normal fresh approval boundary.
+
+Hosted MCP `keel_updated_review_read`, `keel_updated_review_check` and
+`keel_updated_review_cancel` share the creator UI's service and return its
+review URL. An agent cannot choose the new review or claim that an old wallet
+prompt was closed. The creator selects it in Studio; a stale or changed review
+must be checked again. These checks do not establish successful publication:
+that still requires the canonical receipt, deployed collection and exact readback.
+
+
+## Authenticated creation, unchanged capture and resume
+
+Studio verifies its signed creator session before mounting the project wizard.
+A connected wallet address alone is insufficient. Account expiry or cancellation
+suspends the exact in-memory File objects; signing in as the same account restores
+them. Files are never persisted to browser storage by this recovery mechanism.
+Reload recovery still requires reselecting local files. Project creation checks
+the existing actor again before preparation or allocating an upload job.
+
+`createKeelStudioAgentDraftClient` uses the existing origin-bound scoped grant:
+`createProject(FormData, signal)`, `importProject(input, signal)`,
+`mediaCapabilities(signal)` and `media("frame" | "export", input, signal)` call
+thin adapters over Studio's maintained parsing/preparation services. Media uses
+`bytesBase64`, the explicit recipe and optional fileName/mediaType/projectId/timeMs.
+A 401 returns `KeelStudioApiError` with status and code, without resubmitting bytes.
+Local MCP exposes these as `keel-studio-project` and `keel-studio-media`, reading
+bounded workspace paths only after loading the approved connection. The existing
+local media tools remain available for entirely local work.
+
+`captureProgram(projectId, {artifactRevision, releaseRevision}, signal)` reads the
+original complete unsigned program through the same assembly as initial-storage
+validation. It preserves the original deadline, including an expired deadline,
+and returns the complete input, its digest, source snapshot and canonical pin.
+It does not renew a plan or attest successful simulation. Remote MCP exposes
+`keel_publication_program_capture`; local `keel-studio-draft` uses
+`operation: "capture-program"` with the two revisions. Private calldata must stay
+with the creator and already approved simulation recipients.
+
+`updatedReview(projectId, "read" | "check" | "cancel", candidate?, signal)` calls
+the same recovery service as the UI. Cancel requires the exact candidate ID,
+digest and version. It preserves paid storage and the original wallet history.
+An unchanged renewal still requires canonical history, complete simulation and
+fresh fees; missing hashes are not proof of an absent wallet approval.
+
+`resumeReview(releaseId, expectedRevision, operationId, signal)` reads the existing
+review without preparing another operation. The returned identity must match all
+three values. The local draft operation is `resume-review`; remote MCP uses
+`keel_release_review_resume`. Creator wallet approval remains separate from the
+draft grant. No deployment signer API or key access is implied by these methods.
+
+Remote MCP prepare/resume tools attach the `ui://keel-studio/publication-review`
+resource following the [MCP Apps resource contract](https://modelcontextprotocol.io/extensions/apps/overview).
+It checks the same operation before opening Studio through the host, refreshes
+that identity after returning, and cancels only the exact saved review. The UI
+has no direct network or wallet access. Stale revisions, host errors, cancelled
+requests and replayed terminal results cannot substitute a new review.
+Local MCP forwards [cancellation notifications](https://modelcontextprotocol.io/specification/2025-06-18/basic/utilities/cancellation)
+to active SDK requests; cancelled calls emit no late success response. A cancelled
+HTTP request does not prove an already committed write was rolled back: reconcile
+the same idempotency key or operation before retrying.

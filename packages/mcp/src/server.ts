@@ -1,5 +1,6 @@
 import { STUDIO_RELEASE_RECOVERY_GUIDANCE } from "./studio-wallet-guidance.js";
 import { findKeelRpcSetupError } from "@keel/sdk/rpc";
+import { keelSimulationTransportDiagnostic } from "@keel/sdk/publication-preflight";
 import { KeelNetworkIndexError } from '@keel/sdk/network-index';
 import { PREPARED_COPY_GUIDANCE, COPY_PUBLICATION_GUIDANCE, BINARY_PAYLOAD_GUIDANCE } from "./prepared-copy-guidance.js";
 import { STUDIO_WALLET_GUIDANCE } from "./studio-wallet-guidance.js";
@@ -84,7 +85,7 @@ function toolError(error: unknown): ToolCallResult {
     return { content: [{ type: 'text', text: JSON.stringify(structuredContent) }], structuredContent, isError: true };
   }
   const setup = findKeelRpcSetupError(error);
-  if (setup) { const structuredContent = { code: setup.code, reason: setup.reason, retryAfterMs: setup.retryAfterMs, providers: setup.providers, setup: setup.setup, signing: "not-performed", submission: "not-performed" };
+  if (setup) { const structuredContent = { code: setup.code, reason: setup.reason, diagnostic: keelSimulationTransportDiagnostic(setup), retryAfterMs: setup.retryAfterMs, providers: setup.providers, setup: setup.setup, signing: "not-performed", submission: "not-performed" };
     return { content: [{ type: "text", text: JSON.stringify(structuredContent) }], structuredContent, isError: true }; }
   const text = errorText(error);
   return { content: [{ type: "text", text }], isError: true };
@@ -137,6 +138,7 @@ export async function createMcpServer(options: { readonly workspaceRoot?: string
   const plugins = await loadMcpPlugins(options, [...TOOL_DEFINITIONS, info]);
   const tools = [...TOOL_DEFINITIONS, info, ...plugins.flatMap(plugin => plugin.tools)];
   const instructions = [MCP_INSTRUCTIONS, ...plugins.map(plugin => plugin.instructions ?? "")].join(" ");
+  const active = new Map<string | number | null, AbortController>();
   let initialized = false;
   let stopped = false;
   return {
@@ -147,7 +149,15 @@ export async function createMcpServer(options: { readonly workspaceRoot?: string
       } catch (error) {
         return { jsonrpc: "2.0", id: null, error: { code: -32600, message: errorText(error) } };
       }
-      if (request.method === "notifications/initialized" || request.method === "$/cancelRequest") return undefined;
+      if (request.method === "notifications/initialized") return undefined;
+      if (request.method === "notifications/cancelled" || request.method === "$/cancelRequest") {
+        if (request.id === undefined && request.params && typeof request.params === "object" && !Array.isArray(request.params)) {
+          const params = request.params as Record<string, unknown>;
+          const target = request.method === "notifications/cancelled" ? params.requestId : params.id;
+          if (typeof target === "string" || typeof target === "number") active.get(target)?.abort(new DOMException("Request cancelled; reconcile the same saved operation before retrying.", "AbortError"));
+        }
+        return undefined;
+      }
       if (["initialize", "shutdown", "ping", "tools/list", "tools/call", "prompts/list", "prompts/get", "resources/list", "resources/read"].includes(request.method) && request.id === undefined) {
         return { jsonrpc: "2.0", id: null, error: { code: -32600, message: `${request.method} requires a request id.` } };
       }
@@ -183,6 +193,7 @@ export async function createMcpServer(options: { readonly workspaceRoot?: string
           return rpcError(request.id, -32602, errorText(error));
         }
         stopped = true;
+        for (const controller of active.values()) controller.abort(new DOMException("MCP server stopped", "AbortError"));
         return response(request.id, null);
       }
       if (request.method === "tools/list") {
@@ -209,12 +220,16 @@ export async function createMcpServer(options: { readonly workspaceRoot?: string
         if (typeof params.name !== "string" || params.name.length === 0) return rpcError(request.id, -32602, "tools/call requires a tool name.");
         const tool = tools.find(entry => entry.descriptor.name === params.name);
         if (tool === undefined) return response(request.id, toolError(new Error(`Unknown MCP tool: ${params.name}.`)));
+        if (active.has(request.id!)) return rpcError(request.id, -32600, "This request id is already active.");
+        const controller = new AbortController(); active.set(request.id!, controller);
         try {
-          const result = await tool.run({ workspace }, params.arguments ?? {});
+          const result = await tool.run({ workspace, signal: controller.signal }, params.arguments ?? {});
+          controller.signal.throwIfAborted();
           return response(request.id, toolResult(result));
         } catch (error) {
+          if (controller.signal.aborted) return undefined;
           return response(request.id, toolError(error));
-        }
+        } finally { active.delete(request.id!); }
       }
       if (request.method === "prompts/list") {
         try {

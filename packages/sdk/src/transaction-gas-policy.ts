@@ -11,6 +11,7 @@ export interface KeelTransactionGasPolicy {
   readonly separateStateGas: boolean;
   readonly transactionBaseGas: number;
   readonly recipientAccessGas: number;
+  readonly valueTransferGas: number;
   readonly zeroCalldataGas: number;
   readonly nonzeroCalldataGas: number;
   readonly zeroCalldataFloorGas: number;
@@ -23,7 +24,7 @@ export function resolveKeelTransactionGasPolicy(input: { readonly chainId: numbe
   const total = amsterdam ? 4_294_967_295n : 16_777_216n;
   return Object.freeze({ profile: amsterdam ? "sepolia-amsterdam" : "ethereum-pre-amsterdam", chainId: input.chainId, blockTimestamp: input.blockTimestamp,
     maximumExecutionGas: 16_777_216n, maximumTotalGas: input.blockGasLimit < total ? input.blockGasLimit : total,
-    separateStateGas: amsterdam, transactionBaseGas: amsterdam ? 12_000 : 21_000, recipientAccessGas: amsterdam ? 3_000 : 0,
+    separateStateGas: amsterdam, transactionBaseGas: amsterdam ? 12_000 : 21_000, recipientAccessGas: amsterdam ? 3_000 : 0, valueTransferGas: amsterdam ? 6_000 : 0,
     zeroCalldataGas: 4, nonzeroCalldataGas: 16,
     zeroCalldataFloorGas: amsterdam ? 64 : 10, nonzeroCalldataFloorGas: amsterdam ? 64 : 40 });
 }
