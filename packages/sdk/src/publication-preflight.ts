@@ -340,9 +340,10 @@ async function performPublicationSimulation(input: KeelPublicationSimulationInpu
           timestamp: String(header?.timestamp), blockAccessListHash: String(header?.blockAccessListHash), ...(header?.slotNumber === undefined ? {} : { slotNumber: String(header.slotNumber) }) } } : {}) };
     });
   };
-  // Discover pre-refund execution gas without reserving the entire network cap
-  // at a nonzero fee. No state/balance override and no transaction is submitted.
-  const discoveryBase = atomicContext ? preparationCalls : preparationCalls.map(({ gasPrice: _legacy, maxFeePerGas: _cap, maxPriorityFeePerGas: _tip, ...call }) => call);
+  // Atomic transactions and Amsterdam state-gas discovery need their exact
+  // fee envelope. Legacy independent discovery stays fee-free before strict replay.
+  // No state/balance override or transaction submission is introduced.
+  const discoveryBase = atomicContext || transactionPolicy.separateStateGas ? preparationCalls : preparationCalls.map(({ gasPrice: _legacy, maxFeePerGas: _cap, maxPriorityFeePerGas: _tip, ...call }) => call);
   let discoveryCeiling = BigInt(identity.maximumTransactionGas);
   let discoveryCalls = discoveryBase;
   let sharedDiscoveryBudget: bigint | undefined;
