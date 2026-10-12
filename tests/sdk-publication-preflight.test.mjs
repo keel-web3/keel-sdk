@@ -21,12 +21,17 @@ function fixture(change = {}) {
       if (change.error) throw change.error;
       simulationPass++;
       return request.params[0].blockStateCalls.map((item, index) => {
-        const finalRead = simulationPass === 3 && index === request.params[0].blockStateCalls.length - 1;
-        const gasUsed = finalRead ? change.readGas ?? change.gas ?? "0x186a0" : change.gas ?? "0x186a0";
+        const offset=request.params[0].blockStateCalls.slice(0,index).reduce((n,b)=>n+b.calls.length,0);
+        const total=request.params[0].blockStateCalls.reduce((n,b)=>n+b.calls.length,0);
         return { transactions: item.calls.map(({ gas, nonce }) => ({ gas, ...(nonce === undefined ? {} : { nonce }) })), ...(change.timestamp && !change.omitForkHeader ? { timestamp: `0x${(BigInt(change.timestamp) + BigInt(index + 1)).toString(16)}`, number: `0x${(BigInt(change.blockNumber ?? block.number) + BigInt(index + 1)).toString(16)}`, slotNumber: `0x${(index + 1).toString(16)}`, blockAccessListHash: block.hash,
-          hash: `0x${(index + 1).toString(16).padStart(64, "0")}`, parentHash: index === 0 ? block.hash : `0x${index.toString(16).padStart(64, "0")}` } : {}), calls: [{ status: change.revert === index || (change.strictRevert && request.params[0].validation) ? "0x0" : "0x1", ...(change.contradictoryError ? { error: { code: 3, message: "execution reverted SECRET" } } : {}), gasUsed,
-          ...(change.omitMaximum ? {} : { maxUsedGas: finalRead ? gasUsed : change.maximumGas ?? gasUsed }),
-          returnData: simulationPass === 3 && change.readerReturns && index > 0 && !finalRead ? change.readerReturns[index - 1] : finalRead ? change.storage ? encodeAbiParameters([{ type: "bool" }], [change.exists ?? true]) : encodeAbiParameters([{ type: "string" }], [change.metadata ?? expected]) : "0x" }] };
+          hash: `0x${(index + 1).toString(16).padStart(64, "0")}`, parentHash: index === 0 ? block.hash : `0x${index.toString(16).padStart(64, "0")}` } : {}), calls: item.calls.map((call,j)=>{
+          const at=offset+j,finalRead=simulationPass===3&&at===total-1;
+          const gasUsed=finalRead?change.readGas??change.gas??"0x186a0":change.gas??"0x186a0";
+          return {status:change.revert===at||(change.strictRevert&&request.params[0].validation)?"0x0":"0x1",...(change.contradictoryError?{error:{code:3,message:"execution reverted SECRET"}}:{}),gasUsed,
+            ...(change.omitMaximum?{}:{maxUsedGas:finalRead?gasUsed:change.maximumGas??gasUsed}),
+            returnData:simulationPass===3&&change.readerReturns&&at>0&&!finalRead?change.readerReturns[at-1]:finalRead?change.storage?encodeAbiParameters([{type:"bool"}],[change.exists??true]):encodeAbiParameters([{type:"string"}],[change.metadata??expected]):"0x"};
+        }) };
+
       });
     }
     throw new Error(`Unexpected method ${request.method}`);
@@ -425,4 +430,25 @@ test("explicit atomic nonce survives every replay and invalid nonce fails before
     await assert.rejects(simulateKeelPublicationBeforeFunding({ ...planned, preparationCalls: [{ ...batch, nonce }] }, bad.transport), error => error.kind === "configuration-invalid");
     assert.equal(bad.requests.length, 0);
   }
+});
+
+
+test("Amsterdam packs distinct exact transactions into bounded linked blocks without overrides",async()=>{
+ const f=fixture({timestamp:"0x6ac51fe0",blockGas:"0xbebc200"});
+ const preparationCalls=Array.from({length:5},(_,n)=>({...call,data:"0x"+String(n+10).padStart(4,"0"),nonce:"0x"+n.toString(16),gas:"0x"+(90_000_000n).toString(16)}));
+ const proof=await simulateKeelPublicationBeforeFunding({...input(),preparationCalls,maximumTransactionGas:200_000_000n},f.transport);
+ assert.equal(proof.validatedTransactionCalls,5);assert.equal(proof.simulatedCalls,6);
+ for(const request of f.requests.filter(r=>r.method==="eth_simulateV1")){
+  const blocks=request.params[0].blockStateCalls;assert.deepEqual(blocks.map(b=>b.calls.length),request.params[0].validation||blocks.flatMap(b=>b.calls).length===5?[2,2,1]:[2,2,2]);
+  for(const b of blocks){assert.equal(b.blockOverrides,undefined);assert(BigInt(b.calls.reduce((n,c)=>n+BigInt(c.gas),0n))<=200_000_000n);}
+  assert.deepEqual(blocks.flatMap(b=>b.calls).slice(0,5),preparationCalls);
+ }
+ assert.equal(proof.transactionForkHeaders.length,5);assert.equal(proof.transactionForkHeaders[0].hash,proof.transactionForkHeaders[1].hash);
+});
+
+test("Amsterdam rejects a missing or clamped envelope within a packed block",async()=>{
+ for(const mutate of [result=>result[0].transactions.pop(),result=>result[0].transactions[1].gas="0x1",result=>result[0].calls.pop()]){
+  const f=fixture({timestamp:"0x6ac51fe0",blockGas:"0xbebc200"}),transport={request:async r=>{const result=await f.transport.request(r);if(r.method==="eth_simulateV1")mutate(result);return result;}};
+  await assert.rejects(simulateKeelPublicationBeforeFunding({...input(),preparationCalls:[call,{...call,data:"0x5678"}]},transport),e=>["unsupported-simulation","provider-limit","rpc-unavailable"].includes(e.kind));
+ }
 });

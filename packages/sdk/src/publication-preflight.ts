@@ -204,30 +204,44 @@ async function performPublicationSimulation(input: KeelPublicationSimulationInpu
   if (atomicContext && (preparationCalls.length !== 1 || preparationCalls[0]!.from.toLowerCase() !== preparationCalls[0]!.to.toLowerCase() || !preparationCalls[0]!.data.startsWith("0xe9ae5c53"))) return failure("configuration-invalid", "An atomic-wallet preflight requires its complete creator self-call program.");
   const simulate = async (calls: readonly KeelSimulationCall[], validation: boolean) => {
     if (!calls.length) return [];
-    const response = await request("eth_simulateV1", [{ blockStateCalls: calls.map(call => ({ calls: [call] })), validation, traceTransfers: false, returnFullTransactions: true }, block.number]);
-    if (!Array.isArray(response) || response.length !== calls.length) return failure("rpc-unavailable", "The provider returned an incomplete publication simulation.");
+    // Distinct transactions can share a block. Packing bounded envelopes avoids
+    // inventing a long run of empty blocks whose base fee decays to zero. Never
+    // override fees, balances, state, timestamps or the actual block gas limit.
+    const groups: KeelSimulationCall[][] = [];
+    let allowance = 0n;
+    for (const call of calls) {
+      const gas = BigInt(call.gas);
+      if (!transactionPolicy.separateStateGas || !groups.length || allowance + gas > blockGasLimit) {
+        groups.push([]); allowance = 0n;
+      }
+      groups.at(-1)!.push(call); allowance += gas;
+    }
+    const response = await request("eth_simulateV1", [{ blockStateCalls: groups.map(group => ({ calls: group })), validation, traceTransfers: false, returnFullTransactions: true }, block.number]);
+    if (!Array.isArray(response) || response.length !== groups.length) return failure("rpc-unavailable", "The provider returned an incomplete publication simulation.");
+    const entries = response.flatMap((item, blockIndex) => {
+      const parent = blockIndex === 0 ? block : record(response[blockIndex - 1]);
+      const parentSlot = quantity(parent?.slotNumber);
+      try { assertKeelAmsterdamSimulationHeader(transactionPolicy, item, { hash: String(parent?.hash), number: quantity(parent?.number) ?? -1n,
+        timestamp: quantity(parent?.timestamp) ?? -1n, ...(parentSlot === undefined ? {} : { slotNumber: parentSlot }) }); }
+      catch { return failure("unsupported-simulation", "This simulator did not return fork-correct block evidence linked to the selected snapshot."); }
+      const transactions = record(item)?.transactions, results = record(item)?.calls;
+      if (!Array.isArray(transactions) || transactions.length !== groups[blockIndex]!.length) return failure("unsupported-simulation", "The simulator did not return complete transaction envelopes.");
+      if (!Array.isArray(results) || results.length !== groups[blockIndex]!.length) return failure("rpc-unavailable", "A planned call is missing from the simulation result.");
+      return results.map((result, index) => ({ result, transaction: record(transactions[index]), header: record(item) }));
+    });
     // Every transport must prove the requested envelopes before any apparent
     // execution failure is interpreted. A successful socket capacity probe is
     // not evidence for these exact calls or an explicit HTTP override.
     for (const [index, call] of calls.entries()) {
-      const transactions = record(response[index])?.transactions;
-      if (!Array.isArray(transactions) || transactions.length !== 1) return failure("unsupported-simulation", "The simulator did not return complete transaction envelopes.");
-      const transaction = record(transactions[0]);
+      const transaction = entries[index]!.transaction;
       const actualGas = quantity(transaction?.gas), requestedGas = BigInt(call.gas);
       if (actualGas === undefined) return failure("unsupported-simulation", "The simulator omitted the exact transaction gas envelope.");
       if (actualGas < requestedGas) return failure("provider-limit", "The simulator silently reduced the requested transaction gas. The exact prepared plan requires a compatible provider before wallet approval.", { requestedGasLimit: requestedGas.toString(), providerGasCap: actualGas.toString() });
       if (actualGas !== requestedGas) return failure("unsupported-simulation", "The simulator changed the requested transaction gas envelope.");
       if (call.nonce !== undefined && quantity(transaction?.nonce) !== BigInt(call.nonce)) return failure("unsupported-simulation", "The simulator omitted or changed the explicit transaction nonce.");
     }
-    return response.map((item, index) => {
-      const parent = index === 0 ? block : record(response[index - 1]);
-      const parentSlot = quantity(parent?.slotNumber);
-      try { assertKeelAmsterdamSimulationHeader(transactionPolicy, item, { hash: String(parent?.hash), number: quantity(parent?.number) ?? -1n,
-        timestamp: quantity(parent?.timestamp) ?? -1n, ...(parentSlot === undefined ? {} : { slotNumber: parentSlot }) }); }
-      catch { return failure("unsupported-simulation", "This simulator did not return fork-correct block evidence linked to the selected snapshot."); }
-      const results = record(item)?.calls;
-      if (!Array.isArray(results) || results.length !== 1) return failure("rpc-unavailable", "A planned call is missing from the simulation result.");
-      const result = record(results[0]);
+    return entries.map((entry, index) => {
+      const result = record(entry.result);
       if (result?.status === "0x0") return failure("execution-reverted", `Planned simulation call ${index + 1} reverted. Its contract failure must be resolved before payment; it is not a delivery-size diagnosis.`, { callIndex: index, target: calls[index]!.to, selector: calls[index]!.data.slice(0, 10), requestedGasLimit: BigInt(calls[index]!.gas).toString(), phase: validation ? "transaction-validation" : "ephemeral-execution" });
       const gasUsed = quantity(result?.gasUsed);
       if (result?.status !== "0x1" || result.error !== undefined || gasUsed === undefined || gasUsed > BigInt(calls[index]!.gas) || !bytes(result.returnData)) return failure("rpc-unavailable", "The provider returned invalid execution evidence.");
@@ -235,7 +249,7 @@ async function performPublicationSimulation(input: KeelPublicationSimulationInpu
       if (assertion && result.returnData.toLowerCase() !== assertion.returnData) return failure("metadata-mismatch", `Planned simulation call ${index + 1} did not return its required verification bytes.`);
       const maximumUsedGas = quantity(result.maxUsedGas);
       if (result.maxUsedGas !== undefined && (maximumUsedGas === undefined || maximumUsedGas < gasUsed || maximumUsedGas > BigInt(calls[index]!.gas))) return failure("rpc-unavailable", "The provider returned contradictory pre-refund gas evidence.");
-      const header = record(item);
+      const header = entry.header;
       return { gasUsed, maximumUsedGas, returnData: result.returnData.toLowerCase(),
         ...(transactionPolicy.separateStateGas ? { forkHeader: { hash: String(header?.hash), parentHash: String(header?.parentHash),
           timestamp: String(header?.timestamp), blockAccessListHash: String(header?.blockAccessListHash), ...(header?.slotNumber === undefined ? {} : { slotNumber: String(header.slotNumber) }) } } : {}) };
