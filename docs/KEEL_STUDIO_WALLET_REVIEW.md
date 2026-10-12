@@ -236,3 +236,55 @@ review URL. An agent cannot choose the new review or claim that an old wallet
 prompt was closed. The creator selects it in Studio; a stale or changed review
 must be checked again. These checks do not establish successful publication:
 that still requires the canonical receipt, deployed collection and exact readback.
+
+
+## Authenticated creation, unchanged capture and resume
+
+Studio verifies its signed creator session before mounting the project wizard.
+A connected wallet address alone is insufficient. Account expiry or cancellation
+suspends the exact in-memory File objects; signing in as the same account restores
+them. Files are never persisted to browser storage by this recovery mechanism.
+Reload recovery still requires reselecting local files. Project creation checks
+the existing actor again before preparation or allocating an upload job.
+
+`createKeelStudioAgentDraftClient` uses the existing origin-bound scoped grant:
+`createProject(FormData, signal)`, `importProject(input, signal)`,
+`mediaCapabilities(signal)` and `media("frame" | "export", input, signal)` call
+thin adapters over Studio's maintained parsing/preparation services. Media uses
+`bytesBase64`, the explicit recipe and optional fileName/mediaType/projectId/timeMs.
+A 401 returns `KeelStudioApiError` with status and code, without resubmitting bytes.
+Local MCP exposes these as `keel-studio-project` and `keel-studio-media`, reading
+bounded workspace paths only after loading the approved connection. The existing
+local media tools remain available for entirely local work.
+
+`captureProgram(projectId, {artifactRevision, releaseRevision}, signal)` reads the
+original complete unsigned program through the same assembly as initial-storage
+validation. It preserves the original deadline, including an expired deadline,
+and returns the complete input, its digest, source snapshot and canonical pin.
+It does not renew a plan or attest successful simulation. Remote MCP exposes
+`keel_publication_program_capture`; local `keel-studio-draft` uses
+`operation: "capture-program"` with the two revisions. Private calldata must stay
+with the creator and already approved simulation recipients.
+
+`updatedReview(projectId, "read" | "check" | "cancel", candidate?, signal)` calls
+the same recovery service as the UI. Cancel requires the exact candidate ID,
+digest and version. It preserves paid storage and the original wallet history.
+An unchanged renewal still requires canonical history, complete simulation and
+fresh fees; missing hashes are not proof of an absent wallet approval.
+
+`resumeReview(releaseId, expectedRevision, operationId, signal)` reads the existing
+review without preparing another operation. The returned identity must match all
+three values. The local draft operation is `resume-review`; remote MCP uses
+`keel_release_review_resume`. Creator wallet approval remains separate from the
+draft grant. No deployment signer API or key access is implied by these methods.
+
+Remote MCP prepare/resume tools attach the `ui://keel-studio/publication-review`
+resource following the [MCP Apps resource contract](https://modelcontextprotocol.io/extensions/apps/overview).
+It checks the same operation before opening Studio through the host, refreshes
+that identity after returning, and cancels only the exact saved review. The UI
+has no direct network or wallet access. Stale revisions, host errors, cancelled
+requests and replayed terminal results cannot substitute a new review.
+Local MCP forwards [cancellation notifications](https://modelcontextprotocol.io/specification/2025-06-18/basic/utilities/cancellation)
+to active SDK requests; cancelled calls emit no late success response. A cancelled
+HTTP request does not prove an already committed write was rolled back: reconcile
+the same idempotency key or operation before retrying.

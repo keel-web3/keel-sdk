@@ -226,8 +226,11 @@ const studioConnect: JsonSchema = object({
 }, ["operation"]);
 const studioDraft: JsonSchema = object({
   studioUrl: string("Optional HTTPS Studio URL; KEEL_STUDIO_URL is used otherwise.", 512),
-  operation: { type: "string", enum: ["list", "read", "diagnose", "continue-publication", "cancel-review", "storage-recovery", "recover", "recover-wallet-rejection", "plan", "plan-edit", "defaults", "defaults-edit", "profiles", "profiles-edit", "profile-select", "conversation", "conversation-suggest", "prepare-review", "storage-review", "create", "update"] },
+  operation: { type: "string", enum: ["capture-program", "resume-review", "updated-review-read", "updated-review-check", "updated-review-cancel", "list", "read", "diagnose", "continue-publication", "cancel-review", "storage-recovery", "recover", "recover-wallet-rejection", "plan", "plan-edit", "defaults", "defaults-edit", "profiles", "profiles-edit", "profile-select", "conversation", "conversation-suggest", "prepare-review", "storage-review", "create", "update"] },
   releaseId: string("Required for read, diagnose, plan, plan-edit, prepare-review, conversation, conversation-suggest, or update.", 128),
+  artifactRevision: integer("Exact original project revision for capture-program.", 1),
+  releaseRevision: integer("Exact original release revision for capture-program.", 1),
+  reviewCandidate: { type: "object", properties: { candidateId: {type:"string"}, candidateDigest: {type:"string"}, version:{type:"integer",minimum:1} }, required:["candidateId","candidateDigest","version"], additionalProperties:false },
   projectId: string("Required for storage-review or storage-recovery; uses the owner-scoped project and never signs or submits.", 128),
   operationId: string("For recover or cancel-review: the exact existing operation UUID.", 128),
   transactionHashes: { type: "array", items: { type: "string", pattern: "^0x[0-9a-fA-F]{64}$" }, minItems: 1, maxItems: 1, description: "For recover: the failed atomic wallet transaction, never new calldata." },

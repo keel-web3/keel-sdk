@@ -106,6 +106,7 @@ export interface Workspace {
 }
 
 export interface ToolContext {
+  readonly signal?: AbortSignal;
   readonly workspace: Workspace;
 }
 

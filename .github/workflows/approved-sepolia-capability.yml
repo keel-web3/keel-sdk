@@ -3,12 +3,13 @@ name: Approved Sepolia capability
 on:
   workflow_dispatch:
   push:
-    branches: [codex/live-publication-evidence-20261011, codex/mcp-selected-chain-routing-20261010]
+    branches: [codex/live-publication-evidence-20261011, codex/mcp-selected-chain-routing-20261010, codex/canonical-staged-simulation-20261012]
     paths:
       - .github/workflows/approved-sepolia-capability.yml
       - scripts/check-public-simulation-pool.mjs
       - packages/sdk/src/public-simulation-pool.ts
       - packages/sdk/src/transaction-gas-policy.ts
+      - scripts/lib/fresh-public-proof.mjs
 
 permissions:
   contents: read
@@ -19,6 +20,7 @@ concurrency:
 
 jobs:
   public-capability:
+    if: ${{ github.ref != 'refs/heads/codex/canonical-staged-simulation-20261012' }}
     runs-on: ubuntu-24.04
     timeout-minutes: 15
     steps:
@@ -59,6 +61,46 @@ jobs:
         with:
           name: approved-publicnode-capability-${{ github.sha }}
           path: public-capability-evidence/
+          if-no-files-found: error
+          retention-days: 7
+      - name: Tracked source unchanged
+        if: ${{ always() }}
+        run: git diff --exit-code
+
+  fresh-public-proof:
+    if: ${{ github.ref == 'refs/heads/codex/canonical-staged-simulation-20261012' }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10.15.0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22.23.1
+      - run: pnpm install --frozen-lockfile
+      - name: Offline proof-control qualification
+        run: node --test tests/sdk-fresh-public-proof.test.mjs
+      - name: Exactly five approved public reads, no project input or simulation
+        run: |
+          mkdir -p public-proof-evidence
+          git rev-parse HEAD > public-proof-evidence/source-commit.txt
+          node scripts/lib/fresh-public-proof.mjs --output "$PWD/public-proof-evidence/report.json"
+      - name: Preserve bounded public diagnostic in existing job logs
+        if: ${{ always() }}
+        run: |
+          if [ -f public-proof-evidence/report.json ]; then
+            sha256sum public-proof-evidence/report.json
+            cat public-proof-evidence/report.json
+          fi
+      - uses: actions/upload-artifact@v4
+        if: ${{ always() }}
+        with:
+          name: approved-public-proof-${{ github.sha }}
+          path: public-proof-evidence/
           if-no-files-found: error
           retention-days: 7
       - name: Tracked source unchanged

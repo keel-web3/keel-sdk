@@ -144,13 +144,19 @@ interface UploadErrorBody {
   readonly error?: string;
 }
 
+export class KeelStudioUploadError extends Error {
+  override readonly name = "KeelStudioUploadError";
+  constructor(message: string, readonly status: number) { super(message); }
+}
+
 function result(value: unknown, status: number): KeelStudioArtifactUploadResult {
+  if ((status < 200 || status >= 300) && (typeof value !== "object" || value === null)) throw new KeelStudioUploadError(`KEEL Studio upload returned HTTP ${status} without a JSON result.`, status);
   if (typeof value !== "object" || value === null) {
     throw new Error(`KEEL Studio upload returned HTTP ${status} without a JSON result.`);
   }
   const body = value as UploadErrorBody & { readonly id?: unknown };
   if (status < 200 || status >= 300) {
-    throw new Error(body.error ?? `KEEL Studio upload failed with HTTP ${status}.`);
+    throw new KeelStudioUploadError(body.error ?? `KEEL Studio upload failed with HTTP ${status}.`, status);
   }
   if (typeof body.id !== "string" || body.id.length === 0) {
     throw new Error("KEEL Studio upload did not return an artifact ID.");
@@ -160,8 +166,9 @@ function result(value: unknown, status: number): KeelStudioArtifactUploadResult 
 
 /**
  * Uploads an artifact to KEEL Studio without performing any wallet or chain
- * action. Browser callers use their signed creator session; agents use the
- * server-side write token and an explicit creatorAddress form field.
+ * action. Creation requires the browser's signed creator session. An address
+ * or operator header alone is not authentication. Headless callers use
+ * createKeelStudioAgentDraftClient().createProject with a creator-approved grant.
  */
 export async function uploadKeelStudioArtifact(
   input: UploadKeelStudioArtifactInput,
@@ -178,7 +185,7 @@ export async function uploadKeelStudioArtifact(
       ? {}
       : { headers: { "x-keel-studio-write-token": input.writeToken } }),
   });
-  return result(await response.json(), response.status);
+  return result(await response.json().catch(() => undefined), response.status);
 }
 
 function safeProjectPath(value: string): string {

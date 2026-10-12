@@ -25,6 +25,29 @@ const baseDraft = {
   page: {},
 };
 
+test("headless creation and media preserve exact inputs, cancellation and typed authentication errors", async () => {
+  const { createKeelStudioAgentDraftClient, KeelStudioApiError } = await import(MODULE);
+  const requests = [], token = "x".repeat(48), controller = new AbortController();
+  let denied = false;
+  const client = createKeelStudioAgentDraftClient({ grantToken: token, fetchImplementation: async (url, init) => {
+    requests.push({ url: String(url), ...init });
+    assert.equal(new Headers(init.headers).get("authorization"), `Bearer ${token}`);
+    assert.equal(init.redirect, "error");
+    return denied ? Response.json({ error: `Expired ${token}`, code: "authentication-required" }, { status: 401 }) : Response.json({ id: "same-project", sourcePreserved: true });
+  } });
+  const form = new FormData(); form.set("idempotencyKey", "same-original-request"); form.set("files", new File([new Uint8Array([0,1,255])], "original.bin"));
+  await client.createProject(form, controller.signal);
+  assert.equal(requests[0].body, form); assert.equal(requests[0].signal, controller.signal);
+  assert.equal(requests[0].url, "https://studio.onkeel.io/api/agent/projects");
+  const input = { bytesBase64: "AAH/", recipe: { mode: "original" } };
+  await client.media("export", input, controller.signal);
+  assert.deepEqual(JSON.parse(requests[1].body), input); assert.equal(requests[1].signal, controller.signal);
+  denied = true;
+  await assert.rejects(client.createProject(form), error => error instanceof KeelStudioApiError && error.status === 401 && error.code === "authentication-required" && !error.message.includes(token));
+  await assert.rejects(client.media("unexpected", input), /frame or export/);
+  assert.equal(requests.length, 3, "No automatic resend of original files after authentication failure");
+});
+
 test("shared planning reads and edits the same release revision without signing or trusting supplied URLs", async () => {
   const { createKeelStudioAgentDraftClient } = await import(MODULE);
   const releaseId = "11111111-1111-4111-8111-111111111111";
@@ -112,7 +135,7 @@ test("agent draft client covers every Studio release type without wallet or publ
     },
   });
 
-  assert.deepEqual(Object.keys(client).sort(), ["cancelReview", "continuePublication", "conversation", "create", "defaults", "diagnose", "editDefaults", "editPlan", "editProfiles", "effectiveBuildDefaults", "list", "plan", "prepareReview", "profiles", "read", "recover", "recoverWalletRejection", "selectProfile", "storageRecovery", "storageReview", "suggest", "update"]);
+  assert.deepEqual(Object.keys(client).sort(), ["cancelReview", "captureProgram", "continuePublication", "conversation", "create", "createProject", "defaults", "diagnose", "editDefaults", "editPlan", "editProfiles", "effectiveBuildDefaults", "importProject", "list", "media", "mediaCapabilities", "plan", "prepareReview", "profiles", "read", "recover", "recoverWalletRejection", "resumeReview", "selectProfile", "storageRecovery", "storageReview", "suggest", "update", "updatedReview"]);
   for (const releaseType of KEEL_STUDIO_RELEASE_TYPES) {
     const supply = releaseType === "open-edition" ? "open" : releaseType === "one-of-one" ? "1" : "100";
     const created = await client.create({ ...baseDraft, releaseType, supply, title: `Agent ${releaseType}` });
@@ -326,4 +349,65 @@ test("storage recovery exposes bounded next steps without owner observation inpu
   assert.equal((await executeKeelStudioAgentDraftOperation(config)).status, "owner-observation-required");
   response = { ...response, observationInput: {} };
   await assert.rejects(executeKeelStudioAgentDraftOperation(config), /invalid storage recovery evidence/u);
+});
+
+test("saved-program capture verifies exact revisions and complete serialized program digest without accepting a simulation", async () => {
+  const { createKeelStudioAgentDraftClient } = await import(MODULE);
+  const { keccak256, stringToHex } = await import("viem");
+  const projectId = "11111111-1111-4111-8111-111111111111";
+  const sdkInput = { preparationCalls: [{ data: "0x1234" }, { data: "0xabcd" }], expectedTokenURI: "complete original URI" };
+  const evidence = { schema: "keel-initial-storage-program@1", artifactId: projectId, artifactRevision: 2, releaseRevision: 7, sdkInput,
+    sourceSnapshotDigest: `0x${"ab".repeat(32)}`, programDigest: keccak256(stringToHex(JSON.stringify(sdkInput))),
+    originalPreserved: true, simulationAccepted: false, walletApprovalRequired: false, signing: "not-performed", submission: "not-performed", uploadedBytes: 0 };
+  const requests = [], abort = new AbortController(); let response = evidence;
+  const client = createKeelStudioAgentDraftClient({ grantToken: "x".repeat(48), fetchImplementation: async (url, init) => { requests.push({ url: String(url), ...init }); return Response.json(response); } });
+  const value = await client.captureProgram(projectId, { artifactRevision: 2, releaseRevision: 7 }, abort.signal);
+  assert.deepEqual(value, evidence); assert.equal(requests[0].body, undefined); assert.equal(requests[0].signal, abort.signal);
+  assert.match(requests[0].url, /publication-program\?artifactRevision=2&releaseRevision=7$/);
+  response = { ...evidence, sdkInput: { ...sdkInput, expectedTokenURI: "truncated" } };
+  await assert.rejects(client.captureProgram(projectId, { artifactRevision: 2, releaseRevision: 7 }), /incomplete saved program/);
+  response = { ...evidence, simulationAccepted: true };
+  await assert.rejects(client.captureProgram(projectId, { artifactRevision: 2, releaseRevision: 7 }), /incomplete saved program/);
+  response = { ...evidence, releaseRevision: 8 };
+  await assert.rejects(client.captureProgram(projectId, { artifactRevision: 2, releaseRevision: 7 }), /incomplete saved program/);
+});
+
+test("resume uses read-only exact operation and rejects a replacement operation or stale revision", async () => {
+  const { createKeelStudioAgentDraftClient } = await import(MODULE);
+  const releaseId = "11111111-1111-4111-8111-111111111111", operationId = "22222222-2222-4222-8222-222222222222";
+  const review = { schema: "keel-release-wallet-review@1", releaseId, revision: 7, wallet: `0x${"1".repeat(40)}`, signing: "not-performed", submission: "not-performed",
+    preparation: { operationId, chainId: 11155111, calls: [{ kind: "publish", to: `0x${"2".repeat(40)}`, data: "0xabcd", value: "0" }] } };
+  let value = review; const requests = [], abort = new AbortController();
+  const client = createKeelStudioAgentDraftClient({ grantToken: "x".repeat(48), fetchImplementation: async (url, init) => { requests.push({ url: String(url), ...init }); return Response.json(value); } });
+  const saved = await client.resumeReview(releaseId, 7, operationId, abort.signal);
+  assert.equal(saved.reviewUrl, `https://studio.onkeel.io/studio/releases/${releaseId}/review?operation=${operationId}&revision=7`);
+  assert.equal(requests[0].method, undefined); assert.equal(requests[0].body, undefined); assert.equal(requests[0].signal, abort.signal);
+  value = { ...review, preparation: { ...review.preparation, operationId: releaseId } };
+  await assert.rejects(client.resumeReview(releaseId, 7, operationId), /wallet-review identity/);
+  value = { ...review, revision: 8 };
+  await assert.rejects(client.resumeReview(releaseId, 7, operationId), /wallet-review identity/);
+});
+
+test("updated review retries the same project and exact candidate cancellation without supplied replacement programs", async () => {
+  const { createKeelStudioAgentDraftClient } = await import(MODULE);
+  const project = "11111111-1111-4111-8111-111111111111", candidate = { candidateId: "22222222-2222-4222-8222-222222222222", candidateDigest: `0x${"ab".repeat(32)}`, version: 3 };
+  const calls = [], controller = new AbortController();
+  const client = createKeelStudioAgentDraftClient({ grantToken: "x".repeat(48), fetchImplementation: async (url, init) => { calls.push({ url: String(url), ...init }); return Response.json({ updatedReview: null }); } });
+  await client.updatedReview(project); await client.updatedReview(project, "check", undefined, controller.signal); await client.updatedReview(project, "cancel", candidate);
+  assert.equal(calls[0].method, undefined); assert.equal(calls[1].signal, controller.signal);
+  assert.deepEqual(JSON.parse(calls[1].body), { action: "check" }); assert.deepEqual(JSON.parse(calls[2].body), { action: "cancel", ...candidate });
+  assert.ok(calls.every(call => call.url === `https://studio.onkeel.io/api/studio/agent/projects/${project}/updated-review`));
+  await assert.rejects(client.updatedReview(project, "cancel"), /exact saved candidate/);
+  await assert.rejects(client.updatedReview(project, "check", candidate), /replacement candidate/); assert.equal(calls.length, 3);
+});
+
+test("browser upload keeps authentication status for both JSON and HTML 401 replies without retry", async () => {
+  const { uploadKeelStudioArtifact, KeelStudioUploadError } = await import("../packages/sdk/dist/studio-upload.js");
+  for (const json of [false, true]) {
+    let requests = 0; const formData = new FormData(); formData.set("idempotencyKey", "original-request-key");
+    await assert.rejects(uploadKeelStudioArtifact({ endpoint: "https://studio.example/api/artifacts", formData, fetchImplementation: async (_url, init) => {
+      requests++; assert.equal(init.body, formData); return json ? Response.json({ error: "Sign in" }, { status: 401 }) : new Response("<html>Sign in</html>", { status: 401 });
+    } }), error => error instanceof KeelStudioUploadError && error.status === 401);
+    assert.equal(requests, 1); assert.equal(formData.get("idempotencyKey"), "original-request-key");
+  }
 });

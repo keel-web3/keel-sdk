@@ -8,6 +8,7 @@ import {
   classifyKeelUpdatedPublicationReviewPromotion as promote,
   keelUpdatedPublicationReviewDigest as reviewDigest,
   keelUpdatedPublicationFundingCallDigest as fundingDigest,
+  keelUpdatedPublicationOutputDigest as outputDigest,
 } from "../packages/sdk/dist/managed-publication.js";
 
 const hash = n => `0x${n.toString(16).padStart(2, "0").repeat(32)}`;
@@ -57,6 +58,15 @@ function evidence(candidate = create(input())) {
 }
 function choose(value) {
   return { ...value, choice: { ...value.choice, reviewDigest: reviewDigest({ candidateDigest: value.candidate.candidateDigest, simulation: value.simulation, fees: value.fees, reconciliation: value.reconciliation }) } };
+}
+function automatic(value = evidence()) {
+  const { choice, ...rest } = value;
+  return { ...rest, automaticRenewal: {
+    schema: "keel-automatic-expiry-renewal@1", candidateDigest: value.candidate.candidateDigest,
+    reviewDigest: reviewDigest({ candidateDigest: value.candidate.candidateDigest, simulation: value.simulation, fees: value.fees, reconciliation: value.reconciliation }),
+    sourceSnapshotDigest: value.candidate.snapshotDigest, originalPlanDigest: value.candidate.originalPlanDigest,
+    originalOutputDigest: outputDigest(value.candidate), refreshedOutputDigest: outputDigest(value.candidate),
+  } };
 }
 function blocked(value, reason) {
   const result = promote(value); assert.equal(result.status, "blocked"); assert.equal(result.walletApprovalRequired, false);
@@ -214,4 +224,47 @@ test("malformed or reordered identity/evidence is never promoted", () => {
   const original = input(); original.history[2].occurrences.push(original.history[1].occurrences[0]); assert.throws(() => create(original));
   const value = evidence(); value.reconciliation.journals.reverse(); blocked(choose(value), "prior-funding-call-not-proven-expired");
   blocked({ ...evidence(), reconciliation: undefined }, "historical-funding-unknown");
+});
+
+test("automatic unchanged expiry renewal retains unknown provenance and normal wallet approval", () => {
+  const value = automatic(), before = structuredClone(value), result = promote(value);
+  assert.equal(result.status, "ready-for-normal-approval-boundary");
+  assert.equal(result.approvalReady, false); assert.equal(result.walletApprovalRequired, false);
+  assert.equal(value.choice, undefined); assert.deepEqual(value, before);
+  assert.ok(value.candidate.history.every(item => item.issuance === "unknown"));
+});
+
+test("automatic renewal binds source, candidate, original plan, complete output and fresh quote", () => {
+  for (const key of ["candidateDigest", "reviewDigest", "sourceSnapshotDigest", "originalPlanDigest"]) {
+    const value = automatic(); value.automaticRenewal[key] = hash(99);
+    blocked(value, "automatic-renewal-binding-mismatch");
+  }
+  for (const key of ["originalOutputDigest", "refreshedOutputDigest"]) {
+    const value = automatic(); value.automaticRenewal[key] = hash(99);
+    blocked(value, "changed-output-review-required");
+  }
+  blocked({ ...automatic(), choice: evidence().choice }, "automatic-renewal-binding-mismatch");
+  const value = evidence(); value.simulation.fundingValueWei = value.fees.fundingValueWei = "67890";
+  assert.equal(promote(automatic(value)).status, "ready-for-normal-approval-boundary");
+  const stale = automatic(); stale.fees.fundingValueWei = stale.simulation.fundingValueWei = "67890";
+  blocked(stale, "automatic-renewal-binding-mismatch");
+});
+
+test("automatic renewal never bypasses paid, pending, unknown, stale or incomplete validation", () => {
+  assert.equal(promote(automatic({ ...evidence(), reconciliation: { status: "funded", jobId: "10" } })).status, "preserve-funded-job");
+  for (const status of ["pending", "unknown"]) blocked(automatic({ ...evidence(), reconciliation: { status } }), `historical-funding-${status}`);
+  blocked({ ...automatic(), currentSnapshotDigest: hash(99) }, "saved-snapshot-changed");
+  blocked({ ...automatic(), simulation: undefined }, "complete-simulation-and-fees-required");
+  const stale = automatic(); stale.simulation.expiresAt = now;
+  blocked(stale, "complete-simulation-stale-or-mismatched");
+});
+
+test("material output digest includes storage bytes, targets, values, revisions and the whole URI hash", () => {
+  const original = input(), expected = outputDigest(original);
+  assert.equal(outputDigest({ ...original, deadline: "9999999999", canonicalBlock: { ...block, number: "1" } }), expected);
+  for (const change of [x => x.carrierBatches[0].reverse(), x => x.operations[0].target = owner,
+    x => x.operations[0].value = "1", x => x.operations[0].data = "0xff", x => x.artifact.revision++,
+    x => x.release.revision++, x => x.publicationsDigest = hash(99), x => x.expectedTokenURIHash = hash(99)]) {
+    const value = structuredClone(original); change(value); assert.notEqual(outputDigest(value), expected);
+  }
 });
