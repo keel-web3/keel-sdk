@@ -1,0 +1,80 @@
+{
+  "schema": "keel-canonical-native-engine-source@1",
+  "upstream": {
+    "repository": "https://github.com/ethereum/go-ethereum",
+    "commit": "a579077007b98217c3e253a66e4b452ca0c32b96",
+    "archiveUrl": "https://codeload.github.com/ethereum/go-ethereum/tar.gz/a579077007b98217c3e253a66e4b452ca0c32b96",
+    "archiveSHA256": "e9248c692a1725113ccbc5ad78dc93b6efa80201bafc4473e2133c7cf90a96d3",
+    "archiveBytes": 22557951
+  },
+  "toolchain": {
+    "version": "go1.26.9",
+    "archiveUrl": "https://go.dev/dl/go1.26.9.linux-amd64.tar.gz",
+    "archiveSHA256": "42d158b4d8f7b61ac0a830567c940a86098fb7aac52e467a5ebec03ef5cc2f8d",
+    "archiveBytes": 66935201,
+    "compilerSHA256": "e90c4e12df236ea0c2e7536fd68da8a47fc0b585c19588bf6c1a70cfc296a0f9"
+  },
+  "sourceFiles": [
+    {
+      "path": "COPYING",
+      "bytes": 35149,
+      "sha256": "3972dc9744f6499f0f9b2dbf76696f2ae7ad8af9b23dde66d6af86c9dfb36986"
+    },
+    {
+      "path": "COPYING.LESSER",
+      "bytes": 7651,
+      "sha256": "da7eabb7bafdf7d3ae5e9f223aa5bdc1eece45ac569dc21b3b037520b4464768"
+    },
+    {
+      "path": "GO-LICENSE",
+      "bytes": 1453,
+      "sha256": "911f8f5782931320f5b8d1160a76365b83aea6447ee6c04fa6d5591467db9dad"
+    },
+    {
+      "path": "README.md",
+      "bytes": 5488,
+      "sha256": "21d56d3a32d55663a08ec040d5073f232c250bf434be0e5912818028a23c16c2"
+    },
+    {
+      "path": "build.py",
+      "bytes": 4716,
+      "sha256": "548ff38156d942034463c5fa0ffa65a8ce49f6d071897a1025a06ccebe264cd1"
+    },
+    {
+      "path": "overlay/cmd/keel-sparse/main.go",
+      "bytes": 1775,
+      "sha256": "cff3a49625b0726a3d37a9134cb7431d1039ae0a7218f734beac430aa16feb8d"
+    },
+    {
+      "path": "overlay/internal/ethapi/keel_session_protocol.go",
+      "bytes": 10514,
+      "sha256": "7c3f7188f9cf289849debfa5e6827a3d513a5681dae8f965ce9adc91baa5ad23"
+    },
+    {
+      "path": "overlay/internal/ethapi/keel_session_protocol_test.go",
+      "bytes": 8850,
+      "sha256": "867b00adec3434e2439515f0d97cbf8f690dd0e97b5797cb1fcde698dd60acfb"
+    },
+    {
+      "path": "overlay/internal/ethapi/keel_sparse_guard.go",
+      "bytes": 4434,
+      "sha256": "00db4ade4aa7ea2a3a2a8f2c1577af15e10a33ed1586785542127e3e7455733a"
+    },
+    {
+      "path": "overlay/internal/ethapi/keel_sparse_state.go",
+      "bytes": 15153,
+      "sha256": "e4e44d6def407213a3cc3278d49b29b0b789f32cd96a1eb738aa7d7db7426503"
+    },
+    {
+      "path": "overlay/internal/ethapi/keel_sparse_state_test.go",
+      "bytes": 17708,
+      "sha256": "2f46b7232d7f44401a2436e3d3bb83fbce93b1895be71e521059734604e472cc"
+    },
+    {
+      "path": "simulate.patch",
+      "bytes": 1150,
+      "sha256": "11f27336273afbc882fe75c6cd7987f04e400a43f962558ed3bf0f873c5c4db7"
+    }
+  ],
+  "scope": "Sparse authenticated state + complete original-program native access closure. No provider or publication acceptance."
+}
