@@ -66,4 +66,15 @@ suffix digest, exact full return, and original resource integrity. A local
 review still requires selected-chain receipts, complete RPC read-back, and
 browser proof before publication is called complete.
 
-`prepareKeelDensePayload(sourceBytes)` prepares a fresh carrier: beneficial Brotli compression, Base90 encoding, script-safe JSON and both percent layers. Upload only `preparedBytes`; `compressedBytes` is local descriptor/verification material, not a second upload. The helper returns separate decoded, compressed and prepared commitments and byte lengths. Explicit `compression: "none"` disables compression; `"brotli"` preserves an explicit codec choice even if larger. This helper does not register a composer, authenticate chain bytes or migrate existing native objects.
+`prepareKeelDensePayload(sourceBytes)` prepares a fresh carrier: beneficial Brotli compression, URI81 encoding, script-safe JSON and both percent layers. Upload only `preparedBytes`; `compressedBytes` is local descriptor/verification material, not a second upload. The helper returns separate decoded, compressed and prepared commitments and byte lengths. Explicit `compression: "none"` disables compression; `"brotli"` preserves an explicit codec choice even if larger. This helper does not register a composer, authenticate chain bytes or migrate existing native objects.
+
+For an existing shared PPMd boot, `resourceCodecs: ["ppmd", "brotli"]` includes
+both browser decoders in the same verified boot. This allows fresh beneficial
+Brotli resources alongside exact unchanged PPMd engine carriers. It does not
+recompress or migrate those engines. `descriptorSource: "body-or-fallback"`
+retains published fallback descriptors while accepting separately committed
+new body descriptors. The combined boot needs its own authenticated canonical
+shell revision, complete read-back and browser proof before publication.
+Omitting `resourceCodecs` preserves the PPMd-only output.
+
+The body-or-fallback boot uses an isolated classic decoder script and the bundled standard SHA-256 implementation. It avoids Chromium dynamic-module crashes from large data documents and verifies boot bytes without requiring a secure-context Web Crypto API. Existing fixed-descriptor boots retain their original loading grammar.

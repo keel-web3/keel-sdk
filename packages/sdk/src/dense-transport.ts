@@ -213,13 +213,18 @@ export function toKeelDenseTransportDataURL(kind: "html" | "metadata", text: str
   return `data:${kind === "html" ? "text/html" : "application/json"};charset=utf-8,${encoded}`;
 }
 
-/** COPY preparation also supports the deployed stricter reader grammar.
- * URI-valid question marks, apostrophes and ampersands are escaped at build
- * time so existing registered readers can copy the same exact source bytes. */
-export function prepareKeelDenseCopyFragment(text: string): Uint8Array {
+/** Fresh COPY uses the URI81 reader alphabet. Older readers can request their
+ * stricter literal grammar explicitly; existing prepared objects stay unchanged. */
+export function prepareKeelDenseCopyFragment(text: string, options: {
+  readonly readerGrammar?: "uri81" | "legacy-strict";
+} = {}): Uint8Array {
   if (typeof text !== "string") throw new TypeError("Prepared COPY requires UTF-8 text.");
-  const escape = (value: string) => toKeelDenseTransportDataURL("html", value).split(",").slice(1).join(",")
-    .replaceAll("?", "%3F").replaceAll("'", "%27").replaceAll("&", "%26");
+  const grammar = options.readerGrammar ?? "uri81";
+  if (grammar !== "uri81" && grammar !== "legacy-strict") throw new TypeError("Unsupported COPY reader grammar.");
+  const escape = (value: string) => {
+    const encoded = toKeelDenseTransportDataURL("html", value).split(",").slice(1).join(",");
+    return grammar === "legacy-strict" ? encoded.replaceAll("?", "%3F").replaceAll("'", "%27").replaceAll("&", "%26") : encoded;
+  };
   return new TextEncoder().encode(escape(JSON.stringify(escape(text)).slice(1, -1)));
 }
 

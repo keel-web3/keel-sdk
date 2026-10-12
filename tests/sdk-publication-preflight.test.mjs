@@ -347,6 +347,24 @@ test("Amsterdam discovery success cannot bypass strict execution-dimension rejec
  await assert.rejects(simulateKeelPublicationBeforeFunding(input(),f.transport),error=>error.kind==="execution-reverted");
  assert.ok(f.requests.some(r=>r.method==="eth_simulateV1"&&r.params[0].validation));
 });
+
+test("Amsterdam retains the total transaction budget when execution consumption omits fresh state", async () => {
+ const f=fixture({timestamp:"0x6ac51fe0",gas:"0x186a0",maximumGas:"0x1e848"});
+ const transport={request:async request=>{
+  const result=await f.transport.request(request);
+  if(request.method==="eth_simulateV1"&&request.params[0].validation&&BigInt(request.params[0].blockStateCalls[0].calls[0].gas)<200000n){
+   result[0].calls[0].status="0x0";result[0].calls[0].error={code:3,message:"execution reverted",data:"0x"};
+  }
+  return result;
+ }};
+ const proof=await simulateKeelPublicationBeforeFunding(input(),transport);
+ assert.equal(BigInt(proof.transactionGasLimits[0]),BigInt(call.gas));
+ assert.ok(BigInt(proof.transactionGasLimits[0])<=BigInt(call.gas));
+ assert.ok(f.requests.filter(r=>r.method==="eth_simulateV1").every(r=>r.params[0].blockStateCalls.every(b=>BigInt(b.calls[0].gas)<=1000000n)));
+ const limited=fixture({timestamp:"0x6ac51fe0",gas:"0x186a0",maximumGas:"0x1e848"});
+ const capped=await simulateKeelPublicationBeforeFunding({...input(),preparationCalls:[{...call,gas:"0x1fbd0"}]},limited.transport);
+ assert.equal(capped.transactionGasLimits[0],"130000");
+});
 test("missing selected-block timestamp fails before any simulation", async () => {
  const f=fixture({omitTimestamp:true});
  await assert.rejects(simulateKeelPublicationBeforeFunding(input(),f.transport),error=>error.kind==="rpc-unavailable");
