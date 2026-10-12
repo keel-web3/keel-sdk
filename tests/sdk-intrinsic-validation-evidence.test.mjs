@@ -24,14 +24,38 @@ function restore(value) {
 }
 const recorded = restore(archive.record);
 
-test('real sixteen-call discovery replays exactly and raw strict -38013 remains a terminal blocked validation', async () => {
+test('historical sixteen-call transcript retains its fee-free discovery and raw strict rejection', () => {
+  const discovery = recorded.requests.at(-2), strict = recorded.requests.at(-1);
+  const withoutFees = ({ gasPrice: _legacy, maxFeePerGas: _cap, maxPriorityFeePerGas: _tip, ...call }) =>
+    ({ ...call, from: call.from.toLowerCase(), to: call.to.toLowerCase() });
+  assert.equal(discovery.params[0].validation, false);
+  assert.equal(discovery.response.result.length, 16);
+  assert.deepEqual(discovery.params[0].blockStateCalls.map(block => withoutFees(block.calls[0])), recorded.input.preparationCalls.map(withoutFees));
+  assert.equal(strict.params[0].validation, true);
+  assert.equal(strict.params[0].blockStateCalls.length, 16);
+  assert.deepEqual(strict.response.error, { code: -38013, message: 'intrinsic gas too low' });
+  assert.equal(strict.response.result, undefined);
+});
+
+test('current Amsterdam fees preserve the recorded non-fee program and fixture strict -38013 stays terminal', async () => {
   const input = structuredClone(recorded.input);
   for (const key of ['blockNumber', 'maximumReadGas', 'maximumTransactionGas']) input[key] = BigInt(input[key]);
+  const before = structuredClone(recorded.requests);
   let cursor = 0;
   await assert.rejects(simulateKeelStorageBeforeFunding(input, { request: async request => {
     const actual = recorded.requests[cursor++];
     assert.ok(actual, 'No extra replay or public-read proof is allowed after strict rejection.');
-    assert.deepEqual(request, { method: actual.method, params: actual.params });
+    const expected = structuredClone({ method: actual.method, params: actual.params });
+    if (expected.method === 'eth_simulateV1' && expected.params[0].validation === false) {
+      for (const [index, block] of expected.params[0].blockStateCalls.entries()) {
+        for (const key of ['gasPrice', 'maxFeePerGas', 'maxPriorityFeePerGas']) {
+          if (input.preparationCalls[index][key] !== undefined) block.calls[0][key] = input.preparationCalls[index][key];
+        }
+      }
+    }
+    assert.deepEqual(request, expected);
+    // The archived responses are fixture inputs for terminal-error handling.
+    // They do not attest how the provider answers this changed fee envelope.
     if (actual.response.error) throw Object.assign(new Error(actual.response.error.message), { code: actual.response.error.code });
     return structuredClone(actual.response.result);
   } }), error => {
@@ -41,6 +65,7 @@ test('real sixteen-call discovery replays exactly and raw strict -38013 remains 
     assert.doesNotMatch(error.message, /Retry the same prepared plan|Correct the saved plan/);
     return true;
   });
+  assert.deepEqual(recorded.requests, before);
   assert.equal(cursor, recorded.requests.length);
   assert.equal(recorded.requests.at(-2).params[0].validation, false);
   assert.equal(recorded.requests.at(-2).response.result.length, 16);

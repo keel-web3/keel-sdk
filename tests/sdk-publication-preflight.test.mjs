@@ -410,6 +410,41 @@ test("explicit atomic nonce survives every replay and invalid nonce fails before
   }
 });
 
+for (const fork of [
+  { name: "pre-Amsterdam", timestamp: undefined, separateStateGas: false },
+  { name: "Amsterdam", timestamp: "0x6ac51fe0", separateStateGas: true },
+]) for (const atomic of [false, true]) for (const fee of [
+  { name: "EIP-1559", fields: { maxFeePerGas: "0x1000000", maxPriorityFeePerGas: "0xf4240" } },
+  { name: "legacy", fields: { gasPrice: "0x1000000" } },
+]) test(`publication fee envelope: ${fork.name}, ${atomic ? "atomic" : "independent"}, ${fee.name}`, async () => {
+  const { maxFeePerGas: _cap, maxPriorityFeePerGas: _tip, ...base } = call;
+  const exact = { ...base, ...fee.fields, nonce: "0x9",
+    ...(atomic ? { from: owner, to: owner, data: "0xe9ae5c530000" } : {}) };
+  const planned = { ...input(), preparationCalls: [exact],
+    ...(atomic ? { transactionContext: "atomic-wallet" } : {}) };
+  const before = structuredClone(planned);
+  const f = fixture({ timestamp: fork.timestamp });
+  const proof = await simulateKeelPublicationBeforeFunding(planned, f.transport);
+  const phases = f.requests.filter(request => request.method === "eth_simulateV1");
+  assert.deepEqual(phases.map(request => request.params[0].validation), [atomic, true, false]);
+  const phaseCalls = phases.map(request => request.params[0].blockStateCalls[0].calls[0]);
+  for (const [index, replay] of phaseCalls.entries()) {
+    for (const field of ["from", "to", "data", "value", "nonce"]) assert.equal(replay[field], exact[field]);
+    for (const field of ["gasPrice", "maxFeePerGas", "maxPriorityFeePerGas"]) {
+      // Legacy independent discovery is fee-free; strict/review replay always
+      // preserves the exact fees. Amsterdam discovery needs those same fees.
+      assert.equal(replay[field], index === 0 && !atomic && !fork.separateStateGas ? undefined : exact[field]);
+    }
+  }
+  assert.equal(phaseCalls[0].gas, exact.gas);
+  assert.equal(BigInt(phaseCalls[1].gas), BigInt(proof.transactionGasLimits[0]));
+  assert.equal(phaseCalls[2].gas, phaseCalls[1].gas);
+  assert.ok(BigInt(phaseCalls[1].gas) > 0n && BigInt(phaseCalls[1].gas) <= BigInt(exact.gas));
+  assert.deepEqual(planned, before);
+  assert.equal(proof.verification, "collector-metadata");
+  assert.equal(proof.submission, "not-performed");
+});
+
 
 test('close diagnostics allow only bounded codes, classified reasons and retry counts', () => {
   const source = { name: 'Error', diagnostic: { socketCloseCode: 1009, socketCloseReason: 'message-too-large', connectionAttempts: 3 }, cause: { name: 'SocketClosedError' } };
