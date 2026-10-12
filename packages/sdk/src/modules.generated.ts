@@ -290,14 +290,20 @@ export const KEEL_MODULES: readonly KeelModule[] = [
       "KeelSVGRenderer.sol",
       "interfaces/IKeelSVGRenderer.sol",
       "KeelRawInlineShellRegistry.sol",
-      "interfaces/IKeelRawInlineShellRegistry.sol"
+      "interfaces/IKeelRawInlineShellRegistry.sol",
+      "KeelLegacyHoldRawTokenURIBuilder.sol",
+      "KeelEvmPreparedCarrierInlineComposer.sol",
+      "interfaces/IKeelBinaryInlineComposer.sol",
+      "libraries/KeelPreparedContainerTable.sol"
     ],
     "deployable": [
       "KeelHarnessBuilder",
       "KeelPercentTokenURIBuilder",
       "KeelObjectURIBuilder",
       "KeelRawTokenURIBuilder",
-      "KeelRawInlineShellRegistry"
+      "KeelRawInlineShellRegistry",
+      "KeelLegacyHoldRawTokenURIBuilder",
+      "KeelEvmPreparedCarrierInlineComposer"
     ]
   },
   {
