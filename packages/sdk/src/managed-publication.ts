@@ -2416,3 +2416,4 @@ export function keelExecutorGasLimit(estimate: bigint, maximumGas?: bigint): big
 }
 export * from "./managed-publication-recovery.js";
 export * from "./updated-publication-review.js";
+export * from "./publication-action.js";
