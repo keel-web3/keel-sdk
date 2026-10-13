@@ -4,7 +4,7 @@ const sha=bytes=>'0x'+createHash('sha256').update(bytes).digest('hex');
 const delivery={chainId:11155111,store:'0x1111111111111111111111111111111111111111'};
 test('COPY fragment preparation round-trips URI-valid characters rejected by deployed older readers',()=>{
  const source='? & \' " # % 🔥 </script>';
- const prepared=prepareKeelDenseCopyFragment(source);
+ const prepared=prepareKeelDenseCopyFragment(source,{readerGrammar:"legacy-strict"});
  assert.doesNotMatch(Buffer.from(prepared).toString(),/[?&']/);
  assert.equal(Buffer.from(decodeKeelPreparedDenseCopyFragment(prepared)).toString(),source);
 });
@@ -108,13 +108,14 @@ test('an oversized compression candidate cannot invalidate a legal raw carrier',
  assert.throws(()=>prepareKeelDensePayload(source,{compression:'brotli',brotliQuality:0}),/stored-carrier/);
 });
 
-test('auto rejects a smaller compressed binary when its exact paid escaped carrier is larger',()=>{
+test('URI81 removes the legacy escaping penalty and selects the smaller paid carrier',()=>{
  const source=Buffer.from('06020501060606040501000401010307000506030302000405060707000701010602','hex');
  const options={};
  const compressed=prepareKeelDensePayload(source,{...options,compression:'brotli'});
  const raw=prepareKeelDensePayload(source,{...options,compression:'none'});
- assert.ok(compressed.compressedBytes.length<source.length);assert.ok(compressed.preparedBytes.length>raw.preparedBytes.length);
- assert.equal(prepareKeelDensePayload(source,options).compression,'none');
+ assert.ok(compressed.compressedBytes.length<source.length);
+ assert.equal(raw.preparedBytes.length,43);assert.equal(compressed.preparedBytes.length,32);
+ assert.equal(prepareKeelDensePayload(source,options).compression,'brotli');
 });
 
 test("fresh preparation rejects legacy transports even when compression is enabled",()=>{

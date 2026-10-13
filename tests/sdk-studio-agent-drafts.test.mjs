@@ -112,7 +112,7 @@ test("agent draft client covers every Studio release type without wallet or publ
     },
   });
 
-  assert.deepEqual(Object.keys(client).sort(), ["cancelReview", "continuePublication", "conversation", "create", "defaults", "diagnose", "editDefaults", "editPlan", "editProfiles", "effectiveBuildDefaults", "list", "plan", "prepareReview", "profiles", "read", "recover", "recoverWalletRejection", "selectProfile", "storageRecovery", "storageReview", "suggest", "update"]);
+  assert.deepEqual(Object.keys(client).sort(), ["cancelReview", "continuePublication", "conversation", "create", "defaults", "diagnose", "editDefaults", "editPlan", "editProfiles", "effectiveBuildDefaults", "list", "plan", "prepareReview", "profiles", "read", "readReview", "recover", "recoverWalletRejection", "selectProfile", "storageRecovery", "storageReview", "suggest", "update"]);
   for (const releaseType of KEEL_STUDIO_RELEASE_TYPES) {
     const supply = releaseType === "open-edition" ? "open" : releaseType === "one-of-one" ? "1" : "100";
     const created = await client.create({ ...baseDraft, releaseType, supply, title: `Agent ${releaseType}` });
@@ -254,7 +254,19 @@ test("exact owner-review preparation binds the saved revision and derives a safe
   assert.equal((await executeKeelStudioAgentDraftOperation({ ...config, operation: "prepare-review", releaseId, expectedRevision: 7 })).preparation.operationId, operationId);
   await assert.rejects(client.prepareReview(releaseId, 0), /revision/u);
   await assert.rejects(executeKeelStudioAgentDraftOperation({ ...config, operation: "prepare-review", releaseId, expectedRevision: 7, wallet: "override" }), /wallet is not supported/u);
-  assert.equal(requests.length, 2);
+  const saved = await client.readReview(releaseId, 7, operationId);
+  assert.equal(saved.reviewUrl, result.reviewUrl);
+  const request = requests[2], url = new URL(request.url);
+  assert.equal(url.pathname, `/api/agent/drafts/${releaseId}/review`);
+  assert.equal(url.searchParams.get("revision"), "7");
+  assert.equal(url.searchParams.get("operation"), operationId);
+  assert.equal(request.method, undefined);
+  assert.equal(request.body, undefined);
+  assert.equal(request.cache, "no-store");
+  assert.throws(() => client.readReview(releaseId, 7, "../other"), /exact saved operation/u);
+  current = { ...answer, preparation: { ...answer.preparation, operationId: releaseId } };
+  await assert.rejects(client.readReview(releaseId, 7, operationId), /invalid wallet-review identity/u);
+  assert.equal(requests.length, 4);
   for (const bad of [{ revision: 8 }, { releaseId: operationId }, { signing: "performed" }, { preparation: { ...answer.preparation, operationId: "../other" } }, { preparation: { ...answer.preparation, calls: [null] } }]) {
     current = { ...answer, ...bad }; await assert.rejects(client.prepareReview(releaseId, 7), /invalid wallet-review identity/u);
   }

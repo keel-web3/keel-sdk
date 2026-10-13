@@ -33,7 +33,7 @@ test("the registered default shell bundles the one canonical protected K chrome 
   assert.match(suffix, /__KEEL_CONTENT__/u);
   assert.match(suffix, /__KEEL_ENTRY__/u);
   assert.match(suffix, /configurable:\s*!1|configurable:false/u);
-  assert.match(suffix, /sandbox\.add\("allow-scripts",\s*"allow-pointer-lock"\)/u);
+  assert.match(suffix, /sandbox\.add\("allow-scripts",\s*"allow-pointer-lock",\s*"allow-downloads"\)/u);
   assert.doesNotMatch(shell, /allow-same-origin/u);
   assert.doesNotMatch(shell, /XMLHttpRequest|ethereum\.request|requestAccounts/iu);
   // Explicit external descriptors may fetch; the child still has no network.

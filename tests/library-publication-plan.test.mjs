@@ -82,6 +82,9 @@ test("Library publication plan is deterministic and keeps operations unsigned", 
   assert.equal(first.plan.operations.filter((operation) => operation.function === "weldObject(bytes32[],bytes32,uint64,uint8,string)").length, 1);
   assert.equal(first.plan.operations.find((operation) => operation.function === "weldObject(bytes32[],bytes32,uint64,uint8,string)").args.slugIds.length, 1);
   assert.equal(first.plan.assetKind, 0);
+  const manifestUri = `keel-onchain://31337/${HOLD}/${first.plan.manifest.storageObjectId}`;
+  assert.equal(first.plan.manifest.storageUri, manifestUri);
+  assert.equal(first.plan.operations.find((operation) => operation.kind === "graph-create").args.manifestURI, manifestUri);
   assert.equal((await verifyKeelLibraryPublicationPlanEnvelope(first)).valid, true);
 });
 

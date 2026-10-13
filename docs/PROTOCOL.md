@@ -204,9 +204,9 @@ A compatible token may expose:
   "image": "...",
   "animation_url": "...",
   "external_url": "...",
-  "oca_schema": "keel-manifest@2",
-  "oca_manifest": "...",
-  "oca_manifest_digest": "0x..."
+  "keel_schema": "keel-manifest@2",
+  "keel_manifest": "...",
+  "keel_manifest_digest": "0x..."
 }
 ```
 
