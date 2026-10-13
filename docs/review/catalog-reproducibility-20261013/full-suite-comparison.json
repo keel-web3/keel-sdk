@@ -1,0 +1,23 @@
+{
+  "baseline": {
+    "tests": "1730",
+    "pass": "1659",
+    "fail": "1",
+    "cancelled": "0",
+    "skipped": "70"
+  },
+  "repair": {
+    "tests": "1731",
+    "pass": "1660",
+    "fail": "1",
+    "cancelled": "0",
+    "skipped": "70"
+  },
+  "onlyAddedTest": "catalog runtime selection preserves legacy bytes and the URI81 default",
+  "sameAllOtherTestNames": true,
+  "failureTitles": [
+    "motion preview preserves two distinct frames in a real AVIF sequence"
+  ],
+  "failureIdenticalExceptDurationNumberAndCheckoutPath": true,
+  "normalizedFailure": "not ok <n> - motion preview preserves two distinct frames in a real AVIF sequence\n  ---\n  type: 'test'\n  location: '<sdk>/tests/thumbnail-sequence.test.mjs:10:1'\n  failureType: 'testCodeFailure'\n  error: |-\n    Expected values to be strictly equal:\n    \n    16 !== 32\n    \n  code: 'ERR_ASSERTION'\n  name: 'AssertionError'\n  expected: 32\n  actual: 16\n  operator: 'strictEqual'\n  stack: |-\n    TestContext.<anonymous> (file://<sdk>/tests/thumbnail-sequence.test.mjs:20:12)\n    async Test.run (node:internal/test_runner/test:1054:7)\n    async startSubtestAfterBootstrap (node:internal/test_runner/harness:296:3)\n  ...\n"
+}

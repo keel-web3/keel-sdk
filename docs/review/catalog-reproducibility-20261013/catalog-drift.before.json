@@ -1,0 +1,105 @@
+{
+  "diffExitCode": 1,
+  "baselineSha256": "01bbf8e96dab4c263fe3896ac2720fb7b58944aa6e3bf75f03dd8d1d7d1face0",
+  "generatedSha256": "3ccb7c092f08c4b1d44276bb9de947ac237c6f195426969f88bc5722a2e6d47c",
+  "modules": [
+    {
+      "id": "audio-envelope",
+      "beforeEncoding": "base64",
+      "afterEncoding": "uri81",
+      "afterCompression": "brotli",
+      "otherFieldsIdentical": true
+    },
+    {
+      "id": "flash-edition",
+      "beforeEncoding": "base64",
+      "afterEncoding": "uri81",
+      "afterCompression": "brotli",
+      "otherFieldsIdentical": true
+    },
+    {
+      "id": "frame-clock",
+      "beforeEncoding": "base64",
+      "afterEncoding": "uri81",
+      "afterCompression": "brotli",
+      "otherFieldsIdentical": true
+    },
+    {
+      "id": "glow-field",
+      "beforeEncoding": "base64",
+      "afterEncoding": "uri81",
+      "afterCompression": "brotli",
+      "otherFieldsIdentical": true
+    },
+    {
+      "id": "hotkeys",
+      "beforeEncoding": "base64",
+      "afterEncoding": "uri81",
+      "afterCompression": "brotli",
+      "otherFieldsIdentical": true
+    },
+    {
+      "id": "noise2d",
+      "beforeEncoding": "base64",
+      "afterEncoding": "uri81",
+      "afterCompression": "brotli",
+      "otherFieldsIdentical": true
+    },
+    {
+      "id": "orbit-camera",
+      "beforeEncoding": "base64",
+      "afterEncoding": "uri81",
+      "afterCompression": "brotli",
+      "otherFieldsIdentical": true
+    },
+    {
+      "id": "palette",
+      "beforeEncoding": "base64",
+      "afterEncoding": "uri81",
+      "afterCompression": "brotli",
+      "otherFieldsIdentical": true
+    },
+    {
+      "id": "ruffle-loader",
+      "beforeEncoding": "base64",
+      "afterEncoding": "uri81",
+      "afterCompression": "brotli",
+      "otherFieldsIdentical": true
+    },
+    {
+      "id": "seeded-random",
+      "beforeEncoding": "base64",
+      "afterEncoding": "uri81",
+      "afterCompression": "brotli",
+      "otherFieldsIdentical": true
+    },
+    {
+      "id": "shader-uniforms",
+      "beforeEncoding": "base64",
+      "afterEncoding": "uri81",
+      "afterCompression": "brotli",
+      "otherFieldsIdentical": true
+    },
+    {
+      "id": "sprite-sheet",
+      "beforeEncoding": "base64",
+      "afterEncoding": "uri81",
+      "afterCompression": "brotli",
+      "otherFieldsIdentical": true
+    },
+    {
+      "id": "thumbnail-capture",
+      "beforeEncoding": "base64",
+      "afterEncoding": "uri81",
+      "afterCompression": "brotli",
+      "otherFieldsIdentical": true
+    },
+    {
+      "id": "verified-assets",
+      "beforeEncoding": "base64",
+      "afterEncoding": "uri81",
+      "afterCompression": "brotli",
+      "otherFieldsIdentical": true
+    }
+  ]
+}
