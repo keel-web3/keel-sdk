@@ -1,8 +1,15 @@
+import { KeelStudioAgentError } from "@keel/sdk/studio-agent-drafts";
+import { STUDIO_RELEASE_RECOVERY_GUIDANCE } from "./studio-wallet-guidance.js";
+import { findKeelRpcSetupError } from "@keel/sdk/rpc";
+import { KeelNetworkIndexError } from '@keel/sdk/network-index';
 import { PREPARED_COPY_GUIDANCE, COPY_PUBLICATION_GUIDANCE, BINARY_PAYLOAD_GUIDANCE } from "./prepared-copy-guidance.js";
+import { STUDIO_WALLET_GUIDANCE } from "./studio-wallet-guidance.js";
 import { createWorkspace } from "./paths.js";
 import { getFrayAuctionReviewPrompt, getKeelAssetReviewPrompt, getKeelDraftRepairPrompt, getKeelProjectPlanPrompt, PROMPT_DEFINITIONS } from "./prompts.js";
 import { getMcpResource, McpResourceNotFoundError, RESOURCE_DEFINITIONS } from "./resources.js";
-import { toolByName, TOOL_DEFINITIONS } from "./tools.js";
+import { TOOL_DEFINITIONS } from "./tools.js";
+import { loadMcpPlugins, type McpPluginOptions } from "./plugins.js";
+import type { ToolDefinition } from "./types.js";
 import {
   MCP_PROTOCOL_VERSION,
   MCP_SERVER_NAME,
@@ -73,18 +80,35 @@ function toolResult(value: unknown): ToolCallResult {
 }
 
 function toolError(error: unknown): ToolCallResult {
+  if (error instanceof KeelStudioAgentError) {
+    const structuredContent = { error: error.message, code: error.code, status: error.status, retryable: error.retryable, nextAction: error.nextAction, signing: "not-performed", submission: "not-performed" };
+    return { content: [{ type: "text", text: JSON.stringify(structuredContent) }], structuredContent, isError: true };
+  }
+  if (error instanceof KeelNetworkIndexError) {
+    const structuredContent = { code: error.code, setup: error.setup, signing: 'not-performed', submission: 'not-performed' };
+    return { content: [{ type: 'text', text: JSON.stringify(structuredContent) }], structuredContent, isError: true };
+  }
+  const setup = findKeelRpcSetupError(error);
+  if (setup) { const structuredContent = { code: setup.code, reason: setup.reason, retryAfterMs: setup.retryAfterMs, providers: setup.providers, setup: setup.setup, signing: "not-performed", submission: "not-performed" };
+    return { content: [{ type: "text", text: JSON.stringify(structuredContent) }], structuredContent, isError: true }; }
   const text = errorText(error);
   return { content: [{ type: "text", text }], isError: true };
 }
 
 const MCP_INSTRUCTIONS = [
+  "Use the execution explanation returned by plan and prepare-review. Studio also works without an agent. Keep requested signer, creator account, contract authority, artwork creator, current owner, fee payer and recipient distinct. Agent grants never authorize signing. Unsupported delegated or agent-owned paths require explicit supported setup; never create credentials, fund wallets or grant permissions from a draft instruction.",
+  STUDIO_RELEASE_RECOVERY_GUIDANCE,
+  "For a blocked existing Studio release, use keel-studio-draft operation=diagnose before changing any files. Check actual scopes and retry recoverable reads yourself. When the complete metadata read fails, set includeReadCall=true to obtain its exact private calldata, pinned block/runtime hashes, byte commitments and gas attempts; do not infer its cost from stored game size. This evidence never authorizes sending private inputs to a new provider or creating a wallet transaction. Preserve the exact artifact, object IDs and receipts. Do not infer size from an RPC error, assume KEEL staff must fix an owner-controlled operation, or stage the artwork again. Offer Hybrid/IPFS only for a demonstrated Inline capability limit and only when that route is actually configured. New transactions remain explicitly owner-reviewed.",
+  STUDIO_WALLET_GUIDANCE,
+  "Start chain-dependent work with keel-network-discover. The configured KEEL public deployment index tells you where KEEL is actually deployed and which creator instance is active. Resolve selection from explicit input, .keel/config.json or KEEL_CHAIN_ID/KEEL_DEPLOYMENT_INSTANCE; respect the index default otherwise. Wallet/faucet catalogs do not prove KEEL deployments. Run keel-network-check before publication. RPC defaults come from the selected indexed network; private .keel/rpc.json and KEEL_RPC_URL(S) override them. Respect chain checks, rate-limit cooldowns and pacing. If a tool returns rpc.setup-required, explain the failure, ask which provider the user prefers, and help configure Alchemy, Infura or QuickNode for the selected chain with pnpm rpc:configure. Rerun pnpm rpc:check and the failed verification. Never ask for wallet keys, seed phrases or API keys in chat; never bypass missing receipts, use a stale index silently, or substitute a different chain.",
+  "Before declaring a KEEL route immutable or deploying replacement infrastructure, run keel-manager-modules-inspect with the selected Hold or existing managed collection. KeelManager selects replaceable modules through configureModule inside executeGovernance; the active address, code hash, revision and freeze state are authoritative. Discover manager bindings from the actual consuming presentation route. Use keel-manager-module-replacement-prepare for exact unsigned governance preparation. Replacing a directory entry does not rewrite unrelated immutable contract addresses. Require compatibility and existing artwork/resource byte parity and expected tokenURI context, and reuse all unchanged engine objects.",
   PREPARED_COPY_GUIDANCE,
   COPY_PUBLICATION_GUIDANCE,
   BINARY_PAYLOAD_GUIDANCE,
   "Assume creators are not developers: automatically inventory assets, preserve originals, discover reusable objects and measure storage/compression choices.",
   "Default to separate HTML, CSS, individual JavaScript ES modules and assets; never flatten unless explicitly requested.",
   "For every request phrased as make a contract, put it onchain, make an NFT, publish a viewer, deploy, or release—even when an ABI, address, old journal, or approval is supplied—automatically call keel-contract-workflow-preflight, read the target README/docs, inspect the exact selected chain, and search its module catalog before editing or wallet review. Missing evidence is a hard stop.",
-  "Every collector-facing viewer uses the registered canonical KEEL verification shell; never author or replace it.",
+  "Default to the registered canonical KEEL verification shell. Preserve an explicitly chosen creator-owned shell without claiming canonical protection. Discover existing registered shells before authoring a compatible custom shell; keep shell choice separate from compression and delivery. Use existing shell preparation and owner-reviewed transaction primitives, never a locally invented replacement labeled as canonical.",
   "New collector Inline defaults to raw-percent metadata and HTML; existing bound prepared carriages retain their exact bytes. Keep HTML, CSS, JavaScript modules, and assets separate. Prepare the exact supplied image carriage once at build time as data:image/<type>;base64,<payload>, publish one receipt-bound ASCII payload or complete URI, and make the contract/viewer copy header/payload/footer only. Never publish raw image bytes plus a second encoded copy, and never Base64-encode or decode media during tokenURI.",
   "GIF is direct data:image/gif;base64 from the exact high-quality source GIF, never an SVG wrapper, generated substitute, silent resize/re-encode or placeholder. IPFS, HTTP, web3://, resolver matrices and newly chosen complete-HTML Base64 require an explicit reviewed exception. Existing registered Base64 fragments are copied without migration.",
   "Before staging or publishing, unpack every embedded gzip/deflate resource and scan its decoded bytes for concrete http(s), IPFS, Arweave, web3 or keel-onchain locators. A URL sentinel used only for an injected onchain content reader is still an external dependency and must be replaced with a path/identifier. Allow only the SVG namespace literal http://www.w3.org/2000/svg; fail closed on any other locator.",
@@ -113,8 +137,12 @@ function initializeParams(value: unknown): void {
   }
 }
 
-export async function createMcpServer(options: { readonly workspaceRoot?: string } = {}): Promise<McpServer> {
+export async function createMcpServer(options: { readonly workspaceRoot?: string } & McpPluginOptions = {}): Promise<McpServer> {
   const workspace = await createWorkspace(options.workspaceRoot ?? ".");
+  const info: ToolDefinition = { descriptor: { name: "keel-plugins-list", description: "List explicitly installed local KEEL plugins, versions, entries and tool names.", inputSchema: { type: "object", properties: {}, additionalProperties: false } }, async run(_context, input) { emptyParams(input, "keel-plugins-list"); return { schema: "keel-plugins@1", plugins: plugins.map(({id,version,entry,tools}) => ({id,version,entry,tools:tools.map(t=>t.descriptor.name)})) }; } };
+  const plugins = await loadMcpPlugins(options, [...TOOL_DEFINITIONS, info]);
+  const tools = [...TOOL_DEFINITIONS, info, ...plugins.flatMap(plugin => plugin.tools)];
+  const instructions = [MCP_INSTRUCTIONS, ...plugins.map(plugin => plugin.instructions ?? "")].join(" ");
   let initialized = false;
   let stopped = false;
   return {
@@ -149,7 +177,7 @@ export async function createMcpServer(options: { readonly workspaceRoot?: string
           protocolVersion: MCP_PROTOCOL_VERSION,
           capabilities: { tools: { listChanged: false }, prompts: { listChanged: false }, resources: { subscribe: false, listChanged: false } },
           serverInfo: { name: MCP_SERVER_NAME, version: MCP_SERVER_VERSION },
-          instructions: MCP_INSTRUCTIONS,
+          instructions,
         });
       }
       if (stopped) return rpcError(request.id, -32000, "MCP server is stopped.");
@@ -172,7 +200,7 @@ export async function createMcpServer(options: { readonly workspaceRoot?: string
         } catch (error) {
           return rpcError(request.id, -32602, errorText(error));
         }
-        return response(request.id, { tools: TOOL_DEFINITIONS.map((entry) => entry.descriptor) });
+        return response(request.id, { tools: tools.map((entry) => entry.descriptor) });
       }
       if (request.method === "tools/call") {
         let params: Record<string, unknown>;
@@ -185,7 +213,7 @@ export async function createMcpServer(options: { readonly workspaceRoot?: string
           return rpcError(request.id, -32602, errorText(error));
         }
         if (typeof params.name !== "string" || params.name.length === 0) return rpcError(request.id, -32602, "tools/call requires a tool name.");
-        const tool = toolByName(params.name);
+        const tool = tools.find(entry => entry.descriptor.name === params.name);
         if (tool === undefined) return response(request.id, toolError(new Error(`Unknown MCP tool: ${params.name}.`)));
         try {
           const result = await tool.run({ workspace }, params.arguments ?? {});

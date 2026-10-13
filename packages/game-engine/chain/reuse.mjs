@@ -11,9 +11,16 @@ export async function slotProgram(bytes) {
   const slot = JSON.parse(new TextDecoder().decode(bytes).trim().slice(1));
   const { embedded, ...metadata } = slot;
   if (!embedded || !['none', 'gzip', 'deflate'].includes(embedded.compression)) throw Error('Unsupported shared module slot.');
-  const stored = Buffer.from(embedded.storedBase64, 'base64');
-  if (stored.toString('base64') !== embedded.storedBase64) throw Error('Invalid shared module Base64.');
-  const decoded = embedded.compression === 'gzip' ? gunzipSync(stored) : embedded.compression === 'deflate' ? inflateSync(stored) : stored;
+  if (Object.keys(embedded).some(key => !['storedText', 'storedBase64', 'compression', 'storedIntegrity'].includes(key))) throw Error('Unsupported shared module payload field.');
+  const text = embedded.storedText !== undefined;
+  const base64 = embedded.storedBase64 !== undefined;
+  if (text === base64 || (text && (typeof embedded.storedText !== 'string' || embedded.compression !== 'none'))
+      || (base64 && typeof embedded.storedBase64 !== 'string')) throw Error('Invalid shared module payload.');
+  const stored = text ? Buffer.from(embedded.storedText, 'utf8') : Buffer.from(embedded.storedBase64, 'base64');
+  if (text && new TextDecoder('utf-8', { fatal: true, ignoreBOM: true }).decode(stored) !== embedded.storedText) throw Error('Invalid shared module UTF-8.');
+  if (base64 && stored.toString('base64') !== embedded.storedBase64) throw Error('Invalid shared module Base64.');
+  const options = { maxOutputLength: Math.max(1, slot.integrity.byteLength) };
+  const decoded = embedded.compression === 'gzip' ? gunzipSync(stored, options) : embedded.compression === 'deflate' ? inflateSync(stored, options) : stored;
   const integrity = await createIntegrity(decoded);
   if (canonicalJson(integrity) !== canonicalJson(slot.integrity)) throw Error('Shared module decoded integrity mismatch.');
   if (embedded.storedIntegrity && canonicalJson(await createIntegrity(stored)) !== canonicalJson(embedded.storedIntegrity)) throw Error('Shared module stored integrity mismatch.');

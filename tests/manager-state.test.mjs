@@ -5,7 +5,7 @@ import { keelManagerAbi } from '../packages/sdk/dist/abi.js';
 import { ABIS } from '../packages/sdk/dist/abis/keel-artifacts.generated.js';
 
 const abi = parseAbi(keelManagerAbi);
-const normalize = item => JSON.parse(JSON.stringify(item.type === 'event' ? { anonymous: false, ...item, inputs: item.inputs.map(input => ({ indexed: false, ...input })) } : item, (key, value) => key === 'internalType' ? undefined : value));
+const normalize = item => JSON.parse(JSON.stringify(item.type === 'event' ? { anonymous: false, ...item, inputs: item.inputs.map(input => ({ indexed: false, ...input })) } : item, (key, value) => key === 'internalType' || key === 'name' && value === '' ? undefined : value));
 
 test('grouped read inputs and outputs match the generated ABI', () => {
   for (const name of ['governanceState', 'executionPolicyState', 'automationKeyState', 'governanceEpoch', 'executionMode']) {
@@ -23,6 +23,12 @@ test('retired tiny getters are absent from both public ABIs', () => {
   for (const name of retired) {
     assert.ok(!abi.some(entry => entry.name === name), name);
     assert.ok(!ABIS.KeelManager.some(entry => entry.name === name), name);
+  }
+});
+
+test('public ABI exposes the existing governed module replacement directory exactly', () => {
+  for (const name of ['module', 'resolveModule', 'configureModule', 'freezeModule', 'ModuleConfigured', 'ModuleFrozen']) {
+    assert.deepEqual(normalize(abi.find(entry => entry.name === name)), normalize(ABIS.KeelManager.find(entry => entry.name === name)), name);
   }
 });
 

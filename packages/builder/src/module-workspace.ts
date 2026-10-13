@@ -30,6 +30,7 @@ import { createKeelModuleTypes } from "./module-types.js";
 
 import { mkdir, readFile, readdir, stat, writeFile } from "node:fs/promises";
 import path from "node:path";
+import { prepareKeelModuleRuntime, type KeelModuleRuntime } from "@keel/sdk/module-runtime";
 import {
   createIntegrity,
   utf8ToBytes,
@@ -476,7 +477,7 @@ export interface KeelModuleCatalogEntry {
   readonly types?: Awaited<ReturnType<typeof createKeelModuleTypes>>;
   /** Settings declared in keel.module.json, shown to whoever includes the module. */
   readonly inputs?: KeelModuleInputManifest;
-  readonly runtime?: { readonly encoding: "base64"; readonly data: string; readonly format: string; readonly entry: string };
+  readonly runtime?: KeelModuleRuntime;
   readonly outputDigest: Hex;
   readonly receiptDigest: Hex;
   readonly disposition: KeelSourceReceipt["disposition"];
@@ -608,7 +609,7 @@ async function catalogEntry(module: KeelWorkspaceModule, options: IndexKeelWorks
     deployed: deployments.length > 0,
     provenance: "vendored",
     origin: null,
-    runtime: { encoding: "base64", data: shippedBytes.toString("base64"), format: recipe.options.format, entry: recipe.entry },
+    runtime: await prepareKeelModuleRuntime(new Uint8Array(shippedBytes), { format: recipe.options.format, entry: recipe.entry }),
   };
 }
 
@@ -720,6 +721,7 @@ export async function indexKeelWorkspace(root: string, options: IndexKeelWorkspa
   };
   const catalogPath = path.join(resolvedRoot, KEEL_MODULE_CATALOG_FILE);
   await mkdir(path.dirname(catalogPath), { recursive: true });
-  await writeFile(catalogPath, `${JSON.stringify(catalog, null, 2)}\n`);
+  const json = JSON.stringify(catalog, null, 2).replaceAll("<", "\\u003c").replaceAll(">", "\\u003e").replaceAll("&", "\\u0026").replaceAll("\u2028", "\\u2028").replaceAll("\u2029", "\\u2029");
+  await writeFile(catalogPath, `${json}\n`);
   return { catalogPath, catalog };
 }

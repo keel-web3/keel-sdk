@@ -1,0 +1,20 @@
+{
+  "schema": "keel-network-config@1",
+  "indexUrl": "https://studio.onkeel.io/deployments/networks.json",
+  "defaultChainId": 11155111,
+  "legacySepoliaChainId": 11155111,
+  "networks": [
+    {
+      "chainId": 11155111,
+      "name": "Ethereum Sepolia",
+      "environment": "testnet",
+      "explorerUrl": "https://sepolia.etherscan.io",
+      "defaultInstance": "creator-inline-20261005",
+      "rpcUrls": [
+        "https://ethereum-sepolia-rpc.publicnode.com",
+        "https://sepolia.gateway.tenderly.co",
+        "https://public.1rpc.io/sepolia"
+      ]
+    }
+  ]
+}

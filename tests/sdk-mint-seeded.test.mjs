@@ -198,7 +198,7 @@ test("MCP record preparation discovers fields without individual read declaratio
       result: item.method === "eth_chainId" ? "0x7a69" : item.method === "eth_blockNumber" ? "0x2a"
         : await call(item.params[0].data) });
     const body = Array.isArray(rpc) ? await Promise.all(rpc.map(respond)) : await respond(rpc);
-    return { ok: true, json: async () => body };
+    return Response.json(body);
   };
   try {
     const server = await createMcpServer({ workspaceRoot: "." });
@@ -233,7 +233,7 @@ test("data module pins the snapshot and initializes a deeply frozen object befor
       return { jsonrpc: "2.0", id: item.id, result };
     };
     const body = Array.isArray(rpc) ? await Promise.all(rpc.map(respond)) : await respond(rpc);
-    return { ok: true, json: async () => body };
+    return Response.json(body);
   };
   const layer = await readOnchainData({ rpcUrl: "http://127.0.0.1:8545", reads: [], record, fetchImpl });
   assert.deepEqual(new Set(tags), new Set(["0x2a"]));

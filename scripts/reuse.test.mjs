@@ -34,3 +34,21 @@ test('shared slots compare decoded code despite different valid gzip streams', a
   corrupt.embedded.storedBase64 = corrupt.embedded.storedBase64.replace(/=+$/, '');
   if (corrupt.embedded.storedBase64 !== JSON.parse(first.toString().slice(1)).embedded.storedBase64) await assert.rejects(slotProgram(Buffer.from(',' + JSON.stringify(corrupt))), /Base64/);
 });
+
+test('shared UTF-8 COPY slots preserve BOM and reject ambiguous or lossy text', async () => {
+  const source = Buffer.from('\ufeffconst label = "🔥 % # ? &";\n');
+  const fragment = await buildKeelInlineModuleFragment({ moduleId: 'test/text', version: '1', mediaType: 'text/javascript', decodedBytes: source, compression: 'none' });
+  assert.deepEqual((await slotProgram(fragment.bytes)).decoded, source);
+  const item = structuredClone(fragment.item);
+  item.embedded.storedBase64 = source.toString('base64');
+  await assert.rejects(slotProgram(Buffer.from(',' + JSON.stringify(item))), /payload/);
+  delete item.embedded.storedBase64;
+  item.embedded.storedHex = source.toString('hex');
+  await assert.rejects(slotProgram(Buffer.from(',' + JSON.stringify(item))), /payload field/);
+  delete item.embedded.storedHex;
+  item.embedded.storedText = '\ud800';
+  await assert.rejects(slotProgram(Buffer.from(',' + JSON.stringify(item))), /UTF-8/);
+  item.embedded.storedText = source.toString();
+  item.embedded.compression = 'gzip';
+  await assert.rejects(slotProgram(Buffer.from(',' + JSON.stringify(item))), /payload/);
+});

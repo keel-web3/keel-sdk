@@ -1,5 +1,12 @@
 # KEEL SDK
 
+**Use the [Studio website](https://studio.onkeel.io) by default.** It handles
+the creator workflow and review/signing with the user's existing wallet.
+Agents connect to the user's Studio account, prepare drafts, and return the
+website review link. KEEL Desktop is entirely optional; it is not required
+for minting, publication, or wallet review. See the
+[Studio wallet-review workflow](docs/KEEL_STUDIO_WALLET_REVIEW.md).
+
 Payload storage defaults to **Compact** across SDK/MCP/editor/Studio. **Raw** keeps supplied bytes and manual control. See [shared storage defaults](docs/KEEL_PAYLOAD_STORAGE.md) before preparing binary or interpreting tokenURI sizes.
 
 KEEL is a toolkit for storing browser-native artwork as immutable object graphs,
@@ -76,17 +83,25 @@ chain/store. Fresh MCP preparation accepts compact COPY only; selecting a
 carriage or setting an environment variable does not unlock a new wrapper.
 The prototype and test map is in [Prepared COPY assembly](docs/KEEL_PREPARED_COPY_ASSEMBLY.md).
 
-## Try the SDK, agent and visual editor
+## Try the SDK and agent with Studio
+
+For Ethereum Sepolia, start with the [current deployment handoff](docs/SEPOLIA_TESTER_HANDOFF.md)
+and [machine-readable manifest](deployments/ethereum-sepolia.json). The modern
+creator factory/renderer route requires its own verified deployment pair; the
+older `KeelFactory` is not a substitute. Run `pnpm sepolia:verify` to refresh
+the recorded contract receipts and runtime commitments without signing.
 
 Start with [the friend quickstart](docs/FRIEND_QUICKSTART.md). One command builds
-the SDK/MCP/editor, fetches the pinned public engine, and connects an artwork
-folder to the agent skills. Local Anvil testing and read-only Sepolia checks
+the SDK/MCP, fetches the pinned public engine, and connects an artwork
+folder to the agent skills. Studio provides the creator workspace and wallet review;
+Desktop is optional and builds only with `pnpm setup:friend --desktop`. Local Anvil testing and read-only Sepolia checks
 are separate commands; no developer checkout or private credentials are required.
 
 ```sh
-git clone https://github.com/keel-web3/keel-sdk.git
+git clone --branch codex/studio-agent-connect https://github.com/keel-web3/keel-sdk.git
 cd keel-sdk
 pnpm setup:friend
+pnpm studio:connect --window --workspace .keel-workspace
 ```
 
 ## Start here
@@ -357,3 +372,47 @@ and outstanding wallet, provider, publication and release gates.
 ## Runtime module discovery
 
 See [runtime module discovery and reuse](docs/KEEL_RUNTIME_MODULE_DISCOVERY.md) for the shared SDK/API/MCP lookup, unverified module sandbox, coverage limits, and browser MP4 encoding workflow. Empty catalog results never authorize rebuilding an existing module.
+
+The canonical verifier follows the OnKEEL brand and supports bounded app panels through the [protected shell API](docs/KEEL_SHELL_APPLICATION_API.md). App data cannot override KEEL proof results.
+
+Public Sepolia verification uses a checked PublicNode/Tenderly/1RPC pool with rate-limit and history failover. Run `pnpm rpc:check`; private provider setup and agent recovery are documented in [RPC setup](docs/KEEL_RPC_SETUP.md).
+
+Deployment availability and active creator targets come from the [public network index and workspace configuration](docs/KEEL_NETWORK_DISCOVERY.md). Use `pnpm network:discover` / `pnpm network:check` or MCP `keel-network-discover` / `keel-network-check`; wallet chain catalogs are not KEEL deployment evidence.
+
+### Connect an agent to your Studio account
+
+After building the SDK, run `pnpm studio:connect --window --workspace /path/to/project`.
+Approve the code and permissions in Studio; the SDK saves the key privately and
+local MCP draft/staging tools use it automatically. Agents can instead use
+`keel-studio-connect` (`start`, open `approveUrl`, then `complete`). No environment
+file or Desktop app is required. [Connection and wallet review](docs/KEEL_STUDIO_WALLET_REVIEW.md).
+
+## Recover a failed paid release
+
+Keep the existing release, artifact, storage objects, metadata, owner and supply.
+Do not reupload, create a replacement release, switch delivery or retry unchanged calldata.
+A successful standalone tokenURI read is not proof that the complete wallet transaction fits.
+`InvalidPresentation()` can hide an envelope validator exhausting execution gas;
+removing a duplicate preview URI alone does not repair an over-budget reader.
+
+Run `keel-studio-draft` with `operation: "diagnose"` first (`drafts:read`).
+For one fully reverted atomic receipt, use `operation: "recover"`, the saved
+`releaseId`, `operationId` and `transactionHashes: [failedHash]` (`drafts:write`).
+The SDK client method is `client.recover(releaseId, operationId, [failedHash])`;
+the hosted MCP equivalent is `keel_release_recover`. Studio verifies the exact
+creator, selected chain, ordered calls and canonical receipt, retains the old
+operation, and unlocks another review without uploading, signing or submitting.
+Pending, unknown, mismatched or partially successful batches stay preserved.
+Then diagnose that same release. Prepare a new Studio website review only when
+the actual complete atomic wallet program passes selected-fork transaction
+validation and the final tokenURI matches the expected bytes. Keep regular
+execution gas, state gas and public read budgets separate. A platform reader
+deployment needs its own approval and deployed runtime proof; an agent cannot
+fix missing infrastructure by requesting another creator signature.
+
+Hosted Studio handles the entire workflow. Desktop is optional. Return the
+server-issued website review link for the existing connected wallet; do not
+build a new signing page or ask for keys in chat. Receipts and public read-back,
+not a prepared link, establish publication success.
+
+Sepolia simulation must use a consistent compatible provider. The public HTTP pool can return contradictory results for the same pinned request. Hosted Studio uses a persistent compatible Geth connection, chosen before any project calldata is sent, and never retries a reverted program to obtain success. SDK integrations can use `createKeelSepoliaSimulationTransport()` and close it when finished. The full atomic transaction is validated against the selected fork; collector metadata has its separate public-read budget.

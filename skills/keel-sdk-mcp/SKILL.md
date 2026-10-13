@@ -5,6 +5,16 @@ description: Build, modify, test, or use the KEEL SDK and MCP for module discove
 
 # KEEL SDK and MCP
 
+**Account connection default:** Use `keel-studio-connect` (`start` → open its public `approveUrl` for the user → `complete`) before private draft/staging work. The SDK privately saves the approved scoped grant for this workspace and Studio origin. Do not ask for a key in chat or an environment file. The cross-platform terminal/browser helper is `pnpm studio:connect --window --workspace <project>`; manual import uses the hidden `--import-key` prompt. Desktop is entirely optional. Only the user approves account access and wallet actions. Read `docs/KEEL_STUDIO_WALLET_REVIEW.md`.
+
+**Website first:** Default to https://studio.onkeel.io for the full creator
+workflow and wallet review through the user's existing Studio account.
+KEEL Desktop is entirely optional. Never require installing/building Desktop,
+setting up another wallet, or a separate signing page for a supported Studio
+workflow. Return the staged project's `handoffUrl` or draft's `reviewUrl`;
+the user opens it in the website and approves with their connected wallet.
+Read `docs/KEEL_STUDIO_WALLET_REVIEW.md`; agent keys never authorize signing.
+
 **Payload storage default:** Default payloadStorage is compact across SDK, MCP, editor and Studio. Store native bytes once; compare supported lossless codecs and keep none when compression does not save bytes. Raw is an explicit persisted choice that keeps supplied bytes unchanged and disables automatic compression; it is separate from viewer=none, Inline/Hybrid delivery and prepared URI carriage. Reuse unchanged onchain object IDs and publish changed resources only. For native compressed binary, use the registered reader/composer profile in docs/KEEL_BINARY_RESOURCE_DELIVERY.md, not a second stored Base64/hex copy. Contract return encoding and storage are different boundaries: read-time Base64 or hex output does not prove another paid stored copy. Fresh prepared-COPY UTF-8 text uses storedText/none with exact byte verification; its guard does not validate native binary composers. Read docs/KEEL_PAYLOAD_STORAGE.md and audit source, new/reused stored bytes, complete tokenURI bytes and call gas separately. Raw does not bypass byte integrity or selected-chain receipt/read-back checks. Canonical-shell evidence is required when the verification shell is selected or canonical protection is claimed; it is not required for explicit creator-owned HTML.
 
 **Shell choice:** Shell choice is independent of payload storage. Default to the registered KEEL verification shell. If a creator explicitly selects viewer=none, preserve their creator-owned HTML shell and direct-artifact presentation through handoff, preview, preparation and publication; do not insert or label it as canonical protection. The same native-byte/no-duplicate storage policy applies to both. Existing explicit creator shell registration/selection APIs remain available for reusable custom shells.
@@ -86,3 +96,44 @@ authentication, registered runtime and browser proof remain separate. Report
 the full returned size separately from compressed/stored bytes; 900 KB is not
 a universal promise. Direct wallet programs must call the same check; the
 SDK/MCP cannot intercept arbitrary programs.
+
+**Dense Inline boundary:** Read docs/KEEL_PREPARED_DENSE_COPY.md before preparing fresh binary COPY content. Fresh bulk payloads default to URI81 text (uri81-block-v1), for compressed and uncompressed bytes, with the compact Brotli decoder available by default; only the compressed shell boot uses Base64 literals. Apply strict URI escaping at both data URI layers and script-safe JSON serialization. Default preparation is buildKeelPreparedDenseCopyShell with omitted binaryPayloadCarriage and codecProfile; preserve compatible explicit LZMA and PPMd compression choices. Base90/91 remain for unchanged legacy decoding/reuse only, not fresh uploads. Do not apply whole-document Base64, blanket punctuation escaping or an unused encoded sibling upload. Optional PPMd and column descriptors require matching registered revisions; local fixture IDs are not chain receipts. Price the complete returned tokenURI and verify exact offline replay.
+
+## Canonical shell integrations
+
+Use the shared protected shell and `docs/KEEL_SHELL_APPLICATION_API.md`. The artwork client `__KEEL_SHELL__` supports data-only App panels and read-only verification/catalog calls. Keep protected proof state distinct from creator claims. The default retains auto-hide and one OnKEEL header with Proof, Token, Files, System and App pages. Token metadata, attributes, checked manifests, modules, plugins and external sources must show their actual provenance; do not invent missing declarations or execute manifest plugins.
+
+
+### Optional information and prereveal modules
+
+Keep Inline delivery unchanged when adding optional RPC information. Reuse the
+governed KEEL RPC reader for marketplace/commitment enrichment; denial, offline
+nodes or stale listing data must not delay artwork or change protected file
+verification. Show only fresh token-specific listings; retain OnKEEL gallery.
+For hidden-art/trait/seed-rule commitments use the optional `@keel/sdk/pre-reveal`
+module and `keel-prereveal-prepare`, with separate private proof output. Read
+`docs/KEEL_PREREVEAL.md`: pin the original registry revision and runtime, do not
+mix its salted SHA-256 proof with OZ metadata leaves, do not publish salts/keys
+early, and do not claim a recipe or burn-rule hash proves final pixels or a burn.
+Reuse native sealed/layered envelopes and compact attribute pages. Enable this
+feature only when the creator chooses a prereveal; it adds no required network
+dependency or authority to the canonical file proof.
+
+### RPC failures and provider setup
+
+Start chain-dependent work with `keel-network-discover`, then `keel-network-check`.
+The configured public index establishes recorded deployments, selected chain and
+active creator instance; wallet/faucet lists and source modules do not. Respect
+`.keel/config.json` and `KEEL_CHAIN_ID`/`KEEL_DEPLOYMENT_INSTANCE`/`KEEL_NETWORK_INDEX_URL`.
+Read-only tools default to the selected indexed network public RPC pool, with per-provider pacing, rate-limit cooldowns and bounded failover.
+Use `keel-rpc-check`; a successful chain-ID read alone does not prove historical
+receipt access. If a tool returns `rpc.setup-required`, explain its reason and
+retry-after, ask which provider the user prefers, and help set up an endpoint for the selected chain
+with Alchemy, Infura or QuickNode. From the SDK checkout, run
+`pnpm rpc:configure --workspace /path/to/artwork` to save private local settings,
+then `pnpm rpc:check --workspace /path/to/artwork` and the exact failed check.
+Read `docs/KEEL_RPC_SETUP.md`. Never request wallet keys, seed phrases or RPC API
+keys in chat; keep keyed URLs out of Git, logs and artwork. Do not bypass missing
+receipts or change chains. No browser minting page is implied by this workflow.
+
+Read [KEEL_NETWORK_DISCOVERY.md](../../docs/KEEL_NETWORK_DISCOVERY.md) for normal network discovery, configuration and selected-chain verification.

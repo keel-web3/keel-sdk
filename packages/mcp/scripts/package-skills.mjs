@@ -10,12 +10,17 @@ await cp(new URL("../../../skills/fray-keel-agent/", import.meta.url), new URL("
 
 // Bundle the exact documents referenced by the distributed skill.
 const documents = [
+  'KEEL_NETWORK_DISCOVERY.md',
+  'KEEL_RPC_SETUP.md',
+  'KEEL_STUDIO_WALLET_REVIEW.md',
   'KEEL_PREPARED_COPY_ASSEMBLY.md',
+  'KEEL_PREPARED_DENSE_COPY.md',
   'KEEL_INLINE_PAYLOAD_BOUNDARIES.md',
   'KEEL_PAYLOAD_STORAGE.md',
   'KEEL_BINARY_RESOURCE_DELIVERY.md',
   'KEEL_DENSE_TRANSPORT.md',
   'KEEL_PRESENTATION.md',
+  'KEEL_SHELL_APPLICATION_API.md',
   'KEEL_OBJECT_STORAGE_FOR_CHEAP_READS.md',
 ];
 const documentOutput = new URL('../dist/docs/', import.meta.url);

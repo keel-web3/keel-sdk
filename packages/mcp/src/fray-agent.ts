@@ -1,3 +1,5 @@
+import { loadStudioAgentToken } from "@keel/sdk/studio-connection-node";
+import { KEEL_STUDIO_URL } from "@keel/sdk";
 import { canonicalJson, createIntegrity, utf8ToBytes } from "@keel/protocol";
 import {
   searchKeelRuntimeModules,
@@ -13,6 +15,7 @@ import {
   type FrayAuctionPresetKey,
 } from "@keel/sdk";
 import { createHash } from "node:crypto";
+import { searchKeelPublicationReferences } from "./publication-references.js";
 
 export const FRAY_AGENT_PROTOCOL = "fray-keel-agent@1" as const;
 export const FRAY_APPROVAL_REQUEST_PROTOCOL = "fray-approval-request@1" as const;
@@ -204,6 +207,7 @@ export interface FrayPreviewCapture {
 }
 
 export interface FrayStageProjectInput {
+  readonly workspace?: string;
   readonly studioUrl?: string;
   readonly sourcePath: string;
   readonly sourceFileName: string;
@@ -393,7 +397,7 @@ export async function prepareFrayAuctionIntake(value: unknown): Promise<unknown>
  * wallet-facing handoff. The agent token is only used for this server-to-server
  * upload; it never has wallet authority and is never returned. */
 export async function stageFrayProject(input: FrayStageProjectInput): Promise<unknown> {
-  const base = safeStudioBase(input.studioUrl ?? process.env.KEEL_STUDIO_URL ?? process.env.FRAY_STUDIO_URL);
+  const base = safeStudioBase(input.studioUrl ?? process.env.KEEL_STUDIO_URL ?? process.env.FRAY_STUDIO_URL ?? KEEL_STUDIO_URL);
   if (base === undefined) {
     return {
       schema: FRAY_AGENT_PROTOCOL,
@@ -402,13 +406,13 @@ export async function stageFrayProject(input: FrayStageProjectInput): Promise<un
       wallet: { signing: "not-performed", submission: "not-performed" },
     };
   }
-  const token = process.env.FRAY_STUDIO_AGENT_TOKEN;
+  const token = await loadStudioAgentToken({ ...(input.workspace ? { workspace: input.workspace } : {}), studioUrl: base }).catch(() => undefined);
   if (token === undefined || token.length < 32) {
     return {
       schema: FRAY_AGENT_PROTOCOL,
       status: "unconfigured",
       studioUrl: base,
-      message: "FRAY_STUDIO_AGENT_TOKEN is not configured. No source bytes were uploaded.",
+      message: "Connect with keel-studio-connect first. No source bytes were uploaded.",
       wallet: { signing: "not-performed", submission: "not-performed" },
     };
   }
@@ -675,33 +679,40 @@ function libraryCandidate(value: Record<string, unknown>): Record<string, unknow
   };
 }
 
-export async function searchKeelIndexes(input: { readonly studioUrl?: string; readonly query: string; readonly limit?: number }): Promise<unknown> {
+export async function searchKeelIndexes(input: { readonly studioUrl?: string; readonly query: string; readonly limit?: number; readonly workspaceRoot?: string }): Promise<unknown> {
   const query = boundedText(input.query, "query", 160);
   if (query === undefined) throw new TypeError("query is required.");
   const base = safeStudioBase(input.studioUrl ?? process.env.KEEL_STUDIO_URL ?? resolveKeelEndpoints().studioUrl);
   if (base === undefined) return { schema: FRAY_AGENT_PROTOCOL, status: "unconfigured", query, message: "Set KEEL_STUDIO_URL or pass studioUrl to search a live Keel index. No carrier bytes were fetched." };
   const limit = Math.min(100, Math.max(1, Math.trunc(input.limit ?? 20)));
   const encoded = encodeURIComponent(query);
-  const [libraryResult, moduleResult] = await Promise.allSettled([
+  const [libraryResult, moduleResult, referenceResult] = await Promise.allSettled([
     readJson(`${base}/api/library?q=${encoded}`, "Keel Library index"),
     searchKeelRuntimeModules({ studioUrl: base, query }),
+    searchKeelPublicationReferences({ query, limit, ...(input.workspaceRoot ? { workspaceRoot: input.workspaceRoot } : {}) }),
   ]);
   const library = libraryResult.status === "fulfilled" ? arrayField(libraryResult.value, "assets").slice(0, limit).map(libraryCandidate) : [];
   const modules = moduleResult.status === "fulfilled" ? moduleResult.value.modules.slice(0, limit) : [];
+  const publicationReferences = referenceResult.status === "fulfilled" ? referenceResult.value : [];
   const errors = [
+    ...(referenceResult.status === "rejected" ? ["publication references: " + String(referenceResult.reason)] : []),
     ...(moduleResult.status === "fulfilled" ? moduleResult.value.sources.filter(source => !source.complete).map(source => `${source.source}: ${source.error}`) : []),
     ...(libraryResult.status === "rejected" ? [`library: ${libraryResult.reason instanceof Error ? libraryResult.reason.message : String(libraryResult.reason)}`] : []),
     ...(moduleResult.status === "rejected" ? [`modules: ${moduleResult.reason instanceof Error ? moduleResult.reason.message : String(moduleResult.reason)}`] : []),
   ];
-  const total = library.length + modules.length;
+  const total = library.length + modules.length + publicationReferences.length;
   return {
     schema: FRAY_AGENT_PROTOCOL,
-    status: libraryResult.status === "rejected" && moduleResult.status === "rejected" ? "unavailable" : errors.length > 0 ? "partial" : "ok",
+    status: libraryResult.status === "rejected" && moduleResult.status === "rejected" && publicationReferences.length === 0 ? "unavailable" : errors.length > 0 ? "partial" : "ok",
     studioUrl: base,
     query,
     library,
     modules,
-    reuse: errors.length > 0
+    publicationReferences,
+    discoveryCoverage: "indexes and bounded local reference manifests; not an exhaustive chain scan",
+    reuse: publicationReferences.length > 0
+      ? { status: "reference-candidate", action: "read-the-bound-token-graph-on-the-selected-chain-and-run-keel-inline-reuse-plan-before-any-new-upload", unchangedEngineUploads: 0 }
+      : errors.length > 0
       ? { status: "incomplete-search", action: "retry-unavailable-indexes-before-deciding-reuse" }
       : total === 0
       ? { status: "not-indexed", action: "resolve-selected-chain-object-id-or-hash-before-proposing-new-bytes" }
@@ -720,5 +731,6 @@ export function chainGuide(value: unknown): unknown {
   if (family !== undefined && family !== "ethereum" && family !== "tezos") throw new TypeError("family must be ethereum or tezos.");
   const network = boundedText(input.network, "network", 64)?.toLowerCase();
   const profiles = FRAY_CHAIN_PROFILES.filter((profile) => (family === undefined || profile.family === family) && (network === undefined || profile.network === network || String(profile.chainId) === network));
-  return { schema: FRAY_AGENT_PROTOCOL, status: profiles.length === 0 ? "not-found" : "ok", chains: profiles, faucetAction: "show-links-only" };
+  return { schema: FRAY_AGENT_PROTOCOL, status: profiles.length === 0 ? "not-found" : "ok", chains: profiles,
+    catalogPurpose: 'wallet-connectivity-and-faucet-help', deploymentEvidence: 'not-established-by-this-catalog', deploymentDiscoveryTool: 'keel-network-discover', faucetAction: "show-links-only" };
 }

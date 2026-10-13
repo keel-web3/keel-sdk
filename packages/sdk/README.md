@@ -1,5 +1,10 @@
 # `@keel/sdk`
 
+Use https://studio.onkeel.io for the default creator and wallet-review flow.
+The SDK creates account-scoped Studio drafts and returns `reviewUrl`; the
+user reviews and signs in the website with their existing wallet. Desktop is
+optional. See [Studio wallet review](../../docs/KEEL_STUDIO_WALLET_REVIEW.md).
+
 Framework-neutral types, validation, ABIs, and EIP-712 helpers for the Keel contracts. The package deliberately does not depend on a wallet stack; its output can be passed to viem, ethers, wagmi, a relayer, or a smart-account client.
 
 ## Choose Inline, Hybrid, or IPFS without changing storage

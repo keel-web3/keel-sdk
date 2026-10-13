@@ -102,13 +102,13 @@ test("MCP staging binds source, chain, and full economics in one verified envelo
     server.once("error", reject);
     server.listen(0, "127.0.0.1", resolve);
   });
-  const previousUrl = process.env.FRAY_STUDIO_URL;
-  const previousToken = process.env.FRAY_STUDIO_AGENT_TOKEN;
+  const previousUrl = process.env.KEEL_STUDIO_URL;
+  const previousToken = process.env.KEEL_STUDIO_AGENT_TOKEN;
   try {
     const address = server.address();
     assert.ok(address && typeof address === "object");
-    process.env.FRAY_STUDIO_URL = `http://127.0.0.1:${address.port}`;
-    process.env.FRAY_STUDIO_AGENT_TOKEN = "t".repeat(48);
+    process.env.KEEL_STUDIO_URL = `http://127.0.0.1:${address.port}`;
+    process.env.KEEL_STUDIO_AGENT_TOKEN = "keel_agent_" + "t".repeat(48);
     const sourceBytes = new TextEncoder().encode("exact art bytes");
     const result = await stageFrayProject({
       sourcePath: "art.html",
@@ -155,10 +155,10 @@ test("MCP staging binds source, chain, and full economics in one verified envelo
       previewCapture: { still: { mode: "settle" }, video: { enabled: false, mode: "settle", durationMs: 3_000, fps: 12 } },
     }), /releaseOutcome must match/u);
   } finally {
-    if (previousUrl === undefined) delete process.env.FRAY_STUDIO_URL;
-    else process.env.FRAY_STUDIO_URL = previousUrl;
-    if (previousToken === undefined) delete process.env.FRAY_STUDIO_AGENT_TOKEN;
-    else process.env.FRAY_STUDIO_AGENT_TOKEN = previousToken;
+    if (previousUrl === undefined) delete process.env.KEEL_STUDIO_URL;
+    else process.env.KEEL_STUDIO_URL = previousUrl;
+    if (previousToken === undefined) delete process.env.KEEL_STUDIO_AGENT_TOKEN;
+    else process.env.KEEL_STUDIO_AGENT_TOKEN = previousToken;
     await new Promise((resolve) => server.close(resolve));
   }
 });
@@ -199,13 +199,13 @@ test("MCP staging uses verified resumable chunks when the Studio offers them", a
     server.once("error", reject);
     server.listen(0, "127.0.0.1", resolve);
   });
-  const previousUrl = process.env.FRAY_STUDIO_URL;
-  const previousToken = process.env.FRAY_STUDIO_AGENT_TOKEN;
+  const previousUrl = process.env.KEEL_STUDIO_URL;
+  const previousToken = process.env.KEEL_STUDIO_AGENT_TOKEN;
   try {
     const address = server.address();
     assert.ok(address && typeof address === "object");
-    process.env.FRAY_STUDIO_URL = `http://127.0.0.1:${address.port}`;
-    process.env.FRAY_STUDIO_AGENT_TOKEN = "t".repeat(48);
+    process.env.KEEL_STUDIO_URL = `http://127.0.0.1:${address.port}`;
+    process.env.KEEL_STUDIO_AGENT_TOKEN = "keel_agent_" + "t".repeat(48);
     const sourceBytes = new TextEncoder().encode("resumable art bytes");
     const result = await stageFrayProject({
       sourcePath: "art.png",
@@ -229,10 +229,10 @@ test("MCP staging uses verified resumable chunks when the Studio offers them", a
     assert.equal(completed.uploadToken, uploadToken);
     assert.equal(completed.stage.sourceBytesBase64, undefined);
   } finally {
-    if (previousUrl === undefined) delete process.env.FRAY_STUDIO_URL;
-    else process.env.FRAY_STUDIO_URL = previousUrl;
-    if (previousToken === undefined) delete process.env.FRAY_STUDIO_AGENT_TOKEN;
-    else process.env.FRAY_STUDIO_AGENT_TOKEN = previousToken;
+    if (previousUrl === undefined) delete process.env.KEEL_STUDIO_URL;
+    else process.env.KEEL_STUDIO_URL = previousUrl;
+    if (previousToken === undefined) delete process.env.KEEL_STUDIO_AGENT_TOKEN;
+    else process.env.KEEL_STUDIO_AGENT_TOKEN = previousToken;
     await new Promise((resolve) => server.close(resolve));
   }
 });

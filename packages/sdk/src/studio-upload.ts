@@ -1,3 +1,4 @@
+import { parseKeelSelectedProjectProfile, type KeelSelectedProjectProfile } from "./studio-project-defaults.js";
 import { resolveKeelShell, resolveKeelPayloadStorage, type KeelPayloadStorageMode } from "@keel/protocol";
 import {
   defaultKeelStudioPublicationIntent,
@@ -89,6 +90,8 @@ export interface StageKeelStudioProjectInput {
    * read directly from its immutable contract source.
    */
   readonly viewer?: "keel-verification-shell" | "none";
+  /** Editable intent only. Unsupported readers block before storage funding. */
+  readonly mediaSlots?: {readonly image?: {readonly resourceId:string;readonly presentation:"direct"|"keel-shell";readonly delivery:"onchain"|"ipfs"|"hosted"}|null;readonly animation_url?: {readonly resourceId:string;readonly presentation:"direct"|"keel-shell";readonly delivery:"onchain"|"ipfs"|"hosted"}|null};
   readonly files: readonly KeelStudioStagedProjectFile[];
   readonly reusableModule?: {
     readonly resourcePaths: readonly string[];
@@ -97,6 +100,7 @@ export interface StageKeelStudioProjectInput {
     readonly accessMode?: "open" | "paid" | "license" | "subscription" | "request" | "special";
     readonly tags?: readonly string[];
   };
+  readonly projectProfile?: KeelSelectedProjectProfile;
   readonly releaseIntent?: {
     readonly schema: "keel-release-intent@1";
     readonly chainId: number;
@@ -215,6 +219,21 @@ function stageComponents(files: readonly KeelStudioStagedProjectFile[], paths: r
   });
 }
 
+/** Validate metadata-slot intent before transmitting a stage request. */
+export function parseKeelStudioMediaSlots(value:unknown):NonNullable<StageKeelStudioProjectInput["mediaSlots"]> {
+  if(!value || typeof value!=="object" || Array.isArray(value) || Object.keys(value).some(key=>key!=="image" && key!=="animation_url"))throw new TypeError("Invalid metadata slot choices.");
+  const result:Record<string,unknown>={};
+  for(const [key,slot] of Object.entries(value)) {
+    if(slot===null){result[key]=null;continue;}
+    if(!slot || typeof slot!=="object" || Array.isArray(slot) || Object.keys(slot).length!==3 || Object.keys(slot).some(name=>!["resourceId","presentation","delivery"].includes(name)))throw new TypeError("Invalid metadata slot choice.");
+    const selected=slot as Record<string,unknown>;
+    if(typeof selected.resourceId!=="string" || !selected.resourceId.trim() || selected.resourceId.length>1024 || /[\u0000-\u001f\u007f]/u.test(selected.resourceId) || !["direct","keel-shell"].includes(String(selected.presentation)) || !["onchain","ipfs","hosted"].includes(String(selected.delivery)) || key==="image" && selected.presentation!=="direct")throw new TypeError("Invalid metadata slot choice.");
+    result[key]={resourceId:selected.resourceId,presentation:selected.presentation,delivery:selected.delivery};
+  }
+  if(result.image===null && result.animation_url===null)throw new TypeError("At least one metadata slot must present the media.");
+  return result as NonNullable<StageKeelStudioProjectInput["mediaSlots"]>;
+}
+
 /**
  * Stages a creator-editable project and returns a secret continuation URL.
  * This is an off-chain upload only: it neither requests a wallet signature nor
@@ -227,8 +246,12 @@ export async function stageKeelStudioProject(
   if (title.length < 2 || title.length > 160) throw new RangeError("Staged project title must contain from 2 through 160 characters.");
   if (input.agentToken.length < 32) throw new TypeError("KEEL Studio agent token must contain at least 32 characters.");
   if (input.files.length < 1 || input.files.length > 256) throw new RangeError("Stage from 1 through 256 project files.");
-  const payloadStorage = resolveKeelPayloadStorage(input.payloadStorage);
-  const viewer = resolveKeelShell(input.viewer);
+  const projectProfile = input.projectProfile === undefined ? undefined : parseKeelSelectedProjectProfile(input.projectProfile);
+  const payloadStorage = resolveKeelPayloadStorage(input.payloadStorage ?? projectProfile?.snapshot.configuration.payloadStorage);
+  const mediaSlots=input.mediaSlots===undefined?undefined:parseKeelStudioMediaSlots(input.mediaSlots);
+  const onlyFile=input.files.length===1?input.files[0]:undefined;
+  const originalImage=onlyFile?.mediaType.startsWith("image/") && !["image/webp","image/avif"].includes(onlyFile.mediaType);
+  const viewer = resolveKeelShell(input.viewer ?? projectProfile?.snapshot.configuration.viewer ?? (originalImage && input.publicationIntent===undefined ? "none" : undefined));
   if (viewer !== KEEL_VERIFICATION_SHELL && viewer !== "none") throw new TypeError("viewer must be keel-verification-shell or none.");
   if (viewer === "none" && input.publicationIntent !== undefined) {
     throw new TypeError("An artifact-only project cannot also require the KEEL verification shell.");
@@ -248,9 +271,11 @@ export async function stageKeelStudioProject(
     storageStrategy: input.storageStrategy,
     payloadStorage,
     viewer,
+    ...(mediaSlots===undefined?{}:{mediaSlots}),
     marketplaceExportMode: input.marketplaceExportMode ?? "recursive",
     components,
     ...(input.reusableModule === undefined ? {} : { reusableModule: input.reusableModule }),
+    ...(projectProfile === undefined ? {} : { projectProfile }),
     ...(input.releaseIntent === undefined ? {} : { releaseIntent: input.releaseIntent }),
     ...(publicationIntent === undefined ? {} : { publicationIntent }),
     ...(input.flashRuntime === undefined ? {} : { flashRuntime: input.flashRuntime }),

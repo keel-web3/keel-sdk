@@ -31,7 +31,7 @@ export type KeelStudioProjectIntakeResult =
       readonly releaseIntent?: {
         readonly schema: "keel-release-intent@1";
         readonly chainId: number;
-        readonly mode: "release";
+        readonly mode: "release" | "art-only";
         readonly collection: { readonly mode: "choose-in-studio" };
         readonly release: {
           readonly type: "one-of-one" | "open-edition" | "limited-edition";
@@ -52,6 +52,16 @@ function bounded(value: string | undefined, maximum: number): string | undefined
   if (result === undefined || result === "") return undefined;
   if (result.length > maximum || /[\u0000-\u001f\u007f]/u.test(result)) throw new TypeError("Project text is not bounded printable text.");
   return result;
+}
+
+/** Explicit preservation intent. The v1 wire's inactive release fields never authorize or create a collectible. */
+export function createKeelStudioStorageOnlyIntent(chainId: number) {
+  if (!Number.isSafeInteger(chainId) || chainId < 1) throw new TypeError("Storage-only intent needs its selected chain.");
+  return {
+    schema: "keel-release-intent@1", chainId, mode: "art-only", collection: { mode: "choose-in-studio" },
+    release: { type: "one-of-one", supply: "1", saleMechanism: "fixed-price", priceEth: "0", accessMode: "public", startsAt: null, endsAt: null },
+    status: "editable-draft", wallet: { approvalRequiredNow: false, transactionSubmitted: false },
+  } as const;
 }
 
 /**
@@ -93,7 +103,8 @@ export function prepareKeelStudioProjectIntake(input: KeelStudioProjectIntakeInp
   if (questions.length > 0) return Object.freeze({ status: "needs-input", questions: Object.freeze(questions) });
 
   if (input.outcome === "storage-only") {
-    return Object.freeze({ status: "ready", title: title!, description: description!, outcome: "storage-only" });
+    return Object.freeze({ status: "ready", title: title!, description: description!, outcome: "storage-only",
+      ...(input.chainId === undefined ? {} : { releaseIntent: createKeelStudioStorageOnlyIntent(input.chainId) }) });
   }
 
   const type = input.release!.type!;

@@ -126,30 +126,150 @@ export function redactEndpoint(url) {
  * @param keelHold  the store `haulObject` reads from
  * @param hosts       the governed list; endpoints outside it are dropped, not
  *                    used and reported afterwards
+ * @param expectedChainId optional positive safe integer; every endpoint must
+ *                    prove this identity before it can serve artwork reads
+ * @param timeoutMs   deadline for each HTTP request, including its JSON body
  */
-export function createKeelChain({ rpc, keelHold, hosts = KEEL_VIEW_RPC_HOSTS, listRevision = 0, listEpoch = 0, fetchImpl }) {
+export function createKeelChain({ rpc, keelHold, hosts = KEEL_VIEW_RPC_HOSTS, listRevision = 0, listEpoch = 0, fetchImpl, expectedChainId, timeoutMs = 8000 }) {
+  if (expectedChainId !== undefined && (!Number.isSafeInteger(expectedChainId) || expectedChainId < 1)) {
+    throw new TypeError("expectedChainId must be a positive safe integer");
+  }
+  if (!Number.isSafeInteger(timeoutMs) || timeoutMs < 1 || timeoutMs > 30000) {
+    throw new TypeError("timeoutMs must be an integer between 1 and 30000");
+  }
   const candidates = (Array.isArray(rpc) ? rpc : [rpc]).filter((url) => typeof url === "string" && url.length > 0);
   const endpoints = candidates.filter((url) => rpcHostAllowed(url, hosts));
   const rejected = candidates.filter((url) => !rpcHostAllowed(url, hosts));
   const request = fetchImpl ?? ((...args) => fetch(...args));
+  const identities = new Map();
   let servedBy = null;
   let reads = 0;
+  let nextId = 0;
+  let pinnedBlock = null;
+  let pinning = null;
 
-  async function rpcCall(method, params) {
-    let last = null;
-    for (const endpoint of endpoints) {
-      try {
+  const validBlock = (block) => block !== null && typeof block === "object" && !Array.isArray(block)
+    && typeof block.number === "string" && /^0x(?:0|[1-9a-f][0-9a-f]*)$/iu.test(block.number)
+    && typeof block.hash === "string" && /^0x[0-9a-f]{64}$/iu.test(block.hash);
+
+  async function send(endpoint, method, params) {
+    const controller = new AbortController();
+    const id = ++nextId;
+    let timedOut = false;
+    let timer;
+    // Race the complete request, not only fetch: a body or injected transport
+    // may stall without observing AbortSignal. Late results never become reads.
+    const deadline = new Promise((_, reject) => {
+      timer = setTimeout(() => {
+        timedOut = true;
+        reject(new Error("RPC timeout"));
+        controller.abort();
+      }, timeoutMs);
+    });
+    try {
+      return await Promise.race([deadline, (async () => {
         const response = await request(endpoint, {
           method: "POST",
           headers: { "content-type": "application/json" },
-          body: JSON.stringify({ jsonrpc: "2.0", id: 1, method, params }),
+          body: JSON.stringify({ jsonrpc: "2.0", id, method, params }),
+          redirect: "error",
+          signal: controller.signal,
         });
+        if (response?.ok !== true || response.redirected) throw new Error("RPC HTTP failure");
         const body = await response.json();
-        if (body.error || typeof body.result !== "string") throw new Error("node returned no result");
+        if (body === null || typeof body !== "object" || Array.isArray(body)
+          || body.jsonrpc !== "2.0" || body.id !== id || "error" in body
+          || (method === "eth_getBlockByNumber" ? !validBlock(body.result) : typeof body.result !== "string")
+          || (["eth_call", "eth_getCode"].includes(method) && !/^0x(?:[0-9a-f]{2})*$/iu.test(body.result))) {
+          throw new Error("RPC invalid response");
+        }
+        return body.result;
+      })()]);
+    } catch {
+      // Fetch/JSON/provider error text can contain API keys or the entire URL.
+      controller.abort();
+      throw new Error(`RPC request ${timedOut ? "timed out" : "failed"} (${redactEndpoint(endpoint)})`);
+    } finally {
+      clearTimeout(timer);
+    }
+  }
+
+  async function checkChain(endpoint, force) {
+    let state = identities.get(endpoint);
+    if (!state) {
+      state = { chainId: null, checking: null, wrongChain: false, blockHash: null, checkingBlock: null, wrongBlock: false };
+      identities.set(endpoint, state);
+    }
+    const wrongNetwork = () => new Error(`Wrong artwork network (${redactEndpoint(endpoint)})`);
+    if (state.wrongChain) throw wrongNetwork();
+    if (state.checking) return state.checking;
+    if (!force && state.chainId !== null) return state.chainId;
+    if (!state.checking) {
+      // A native chunk fan-out shares one check for this exact endpoint.
+      state.checking = (async () => {
+        const result = await send(endpoint, "eth_chainId", []);
+        if (!/^0x[0-9a-f]+$/iu.test(result)) throw new Error(`Invalid RPC chain identity (${redactEndpoint(endpoint)})`);
+        if (BigInt(result) !== BigInt(expectedChainId)) {
+          state.wrongChain = true;
+          throw wrongNetwork();
+        }
+        state.chainId = result;
+        return result;
+      })().finally(() => { state.checking = null; });
+    }
+    return state.checking;
+  }
+
+  async function checkBlock(endpoint) {
+    const state = identities.get(endpoint);
+    const wrongBlock = () => new Error(`Wrong artwork block (${redactEndpoint(endpoint)})`);
+    if (state.wrongBlock) throw wrongBlock();
+    if (state.blockHash === pinnedBlock.hash) return;
+    if (!state.checkingBlock) {
+      state.checkingBlock = (async () => {
+        const block = await send(endpoint, "eth_getBlockByNumber", [pinnedBlock.number, false]);
+        if (BigInt(block.number) !== BigInt(pinnedBlock.number) || block.hash.toLowerCase() !== pinnedBlock.hash) {
+          state.wrongBlock = true;
+          throw wrongBlock();
+        }
+        state.blockHash = pinnedBlock.hash;
+      })().finally(() => { state.checkingBlock = null; });
+    }
+    await state.checkingBlock;
+  }
+
+  async function pinBlock() {
+    if (expectedChainId === undefined) throw new TypeError("pinBlock requires expectedChainId");
+    if (pinnedBlock) return pinnedBlock;
+    if (!pinning) {
+      pinning = (async () => {
+        const block = await rpcCall("eth_getBlockByNumber", ["latest", false]);
+        pinnedBlock = Object.freeze({ number: block.number, hash: block.hash.toLowerCase() });
+        return pinnedBlock;
+      })().finally(() => { pinning = null; });
+    }
+    return pinning;
+  }
+
+  async function rpcCall(method, params) {
+    const pinnedRead = pinnedBlock !== null && (method === "eth_call" || method === "eth_getCode");
+    // EIP-1898 binds the read itself to the verified hash, even if the provider
+    // reorganizes after its header check. Unsupported nodes fail over; never
+    // silently downgrade a pinned read to a numeric block or latest.
+    if (pinnedRead) params = [params[0], { blockHash: pinnedBlock.hash, requireCanonical: true }, ...params.slice(2)];
+    let last = null;
+    for (const endpoint of endpoints) {
+      try {
+        const chainId = expectedChainId === undefined ? null : await checkChain(endpoint, method === "eth_chainId");
+        if (pinnedRead) await checkBlock(endpoint);
+        const result = chainId !== null && method === "eth_chainId" ? chainId : await send(endpoint, method, params);
         servedBy = endpoint;
         reads += 1;
-        return body.result;
+        return result;
       } catch (error) {
+        // A provider that failed must prove its network again before reuse.
+        const state = identities.get(endpoint);
+        if (state) { state.chainId = null; state.blockHash = null; }
         last = error;
       }
     }
@@ -164,9 +284,12 @@ export function createKeelChain({ rpc, keelHold, hosts = KEEL_VIEW_RPC_HOSTS, li
     /** Shared transport for bounded native chunk reads and chain checks. */
     request: rpcCall,
 
+    /** Await before artwork reads; requires matching headers and EIP-1898 reads. */
+    pinBlock,
+
     /** An arbitrary read, shaped like the contract call it is. */
-    call(to, data) {
-      return rpcCall("eth_call", [{ to, data }, "latest"]);
+    call(to, data, blockTag = "latest") {
+      return rpcCall("eth_call", [{ to, data }, blockTag]);
     },
 
     /**
@@ -194,6 +317,7 @@ export function createKeelChain({ rpc, keelHold, hosts = KEEL_VIEW_RPC_HOSTS, li
         listRevision,
         listEpoch,
         reads,
+        ...(pinnedBlock === null ? {} : { pinnedBlock }),
       };
     },
   };

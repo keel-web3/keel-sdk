@@ -1,3 +1,4 @@
+import { after } from "node:test";
 import assert from "node:assert/strict";
 import { mkdtemp, rm, writeFile } from "node:fs/promises";
 import os from "node:os";
@@ -5,8 +6,14 @@ import path from "node:path";
 import test from "node:test";
 
 import { createMcpServer } from "../packages/mcp/dist/index.js";
+import { pathToFileURL } from "node:url";
+const recoveryServer = process.env.KEEL_PACKED_MCP_ENTRY ? (await import(pathToFileURL(process.env.KEEL_PACKED_MCP_ENTRY).href)).createMcpServer : createMcpServer;
 
 const initializeParams = { protocolVersion: "2024-11-05", capabilities: {}, clientInfo: { name: "draft-test", version: "1" } };
+const previousStudioOrigin = process.env.KEEL_STUDIO_URL;
+process.env.KEEL_STUDIO_URL = "https://studio.example";
+after(() => { if (previousStudioOrigin === undefined) delete process.env.KEEL_STUDIO_URL; else process.env.KEEL_STUDIO_URL = previousStudioOrigin; });
+
 const token = `keel_agent_${"d".repeat(48)}`;
 const draft = {
   artifactId: null,
@@ -30,7 +37,7 @@ async function call(server, id, args) {
   return server.handle({ jsonrpc: "2.0", id, method: "tools/call", params: { name: "keel-studio-draft", arguments: args } });
 }
 
-test("MCP edits Studio drafts with an environment-only grant and optimistic revision", async () => {
+test("MCP edits Studio drafts with an origin-bound environment override and optimistic revision", async () => {
   const previousToken = process.env.KEEL_STUDIO_AGENT_TOKEN;
   const previousFetch = globalThis.fetch;
   const requests = [];
@@ -67,7 +74,7 @@ test("MCP edits Studio drafts with an environment-only grant and optimistic revi
   }
 });
 
-test("MCP never accepts a draft key in tool arguments and fails closed without the environment grant", async () => {
+test("MCP never accepts a draft key in tool arguments and fails closed without an approved connection", async () => {
   const previousToken = process.env.KEEL_STUDIO_AGENT_TOKEN;
   delete process.env.KEEL_STUDIO_AGENT_TOKEN;
   try {
@@ -75,7 +82,7 @@ test("MCP never accepts a draft key in tool arguments and fails closed without t
     await server.handle({ jsonrpc: "2.0", id: 1, method: "initialize", params: initializeParams });
     const missing = await call(server, 2, { studioUrl: "https://studio.example", operation: "list" });
     assert.equal(missing?.result.isError, true);
-    assert.match(missing?.result.content[0].text, /KEEL_STUDIO_AGENT_TOKEN/u);
+    assert.match(missing?.result.content[0].text, /keel-studio-connect/u);
     const exposed = await call(server, 3, { studioUrl: "https://studio.example", operation: "list", grantToken: token });
     assert.equal(exposed?.result.isError, true);
     assert.match(exposed?.result.content[0].text, /grantToken is not supported/u);
@@ -126,7 +133,7 @@ test("MCP stages an image-only KEEL shell project without uploading a local view
     });
     assert.equal(result?.result.structuredContent.fileCount, 1);
     assert.equal(result?.result.structuredContent.wallet.signing, "not-performed");
-    assert.equal("viewer" in metadata, false);
+    assert.equal(metadata.viewer, "keel-verification-shell");
     assert.deepEqual(metadata.components.map(({ path: filePath, role }) => [filePath, role]), [["signal.webp", "image"]]);
     assert.equal(metadata.publicationIntent.viewer.mode, "keel-sandbox");
     assert.equal(metadata.components.some(({ path: filePath }) => filePath === "viewer.js" || filePath === "index.html"), false);
@@ -231,4 +238,118 @@ test("MCP rejects a locally declared KEEL shell before staging while allowing cr
     else process.env.KEEL_STUDIO_AGENT_TOKEN = previousToken;
     await rm(root, { recursive: true, force: true });
   }
+});
+
+test("portable MCP forwards explicit defaults operations through the same account-scoped endpoint", async () => {
+  const previousToken = process.env.KEEL_STUDIO_AGENT_TOKEN, previousFetch = globalThis.fetch;
+  process.env.KEEL_STUDIO_AGENT_TOKEN = token;
+  const requests = [], command = { commandId: "11111111-1111-4111-8111-111111111111", expectedRevision: 0, scope: { kind: "global" }, values: { delivery: "inline" } };
+  globalThis.fetch = async (url, init) => {
+    requests.push({ url: String(url), init });
+    return Response.json({ schema: "keel-studio-defaults-view@1", profile: { schema: "keel-studio-default-profile@1", revision: 0, askToSave: false, global: {}, byMedia: {} }, signing: "not-performed" });
+  };
+  try {
+    const server = await createMcpServer();
+    await server.handle({ jsonrpc: "2.0", id: 1, method: "initialize", params: initializeParams });
+    for (const args of [{ operation: "defaults" }, { operation: "defaults-edit", defaultsCommand: command }]) {
+      const response = await call(server, 2, args); assert.notEqual(response?.result.isError, true, response?.result.content?.[0]?.text);
+      assert.equal(response?.result.structuredContent.signing, "not-performed");
+    }
+    assert.deepEqual(requests.map(request => request.url), ["https://studio.example/api/agent/project-defaults", "https://studio.example/api/agent/project-defaults"]);
+    assert.deepEqual(JSON.parse(requests[1].init.body), command);
+    const unsupported = await call(server, 3, { operation: "defaults-edit", defaultsCommand: { ...command, signingKey: "forbidden" } });
+    assert.equal(unsupported?.result.isError, true); assert.equal(requests.length, 2);
+  } finally { globalThis.fetch = previousFetch; if (previousToken === undefined) delete process.env.KEEL_STUDIO_AGENT_TOKEN; else process.env.KEEL_STUDIO_AGENT_TOKEN = previousToken; }
+});
+
+test("portable MCP reads and shares reviewable conversation forms without model execution or plan mutation", async () => {
+  const previousToken = process.env.KEEL_STUDIO_AGENT_TOKEN, previousFetch = globalThis.fetch;
+  process.env.KEEL_STUDIO_AGENT_TOKEN = token;
+  const releaseId = "11111111-1111-4111-8111-111111111111", requests = [];
+  const suggestion = { commandId: "22222222-2222-4222-8222-222222222222", expectedRevision: 3, message: "A suggested title", answers: { title: "The proposal" } };
+  globalThis.fetch = async (url, init) => { requests.push({ url: String(url), init }); return Response.json(init.method === "POST"
+    ? { schema: "keel-release-conversation-suggestion@1", releaseId, revision: 3, turn: { id: suggestion.commandId }, signing: "not-performed", submission: "not-performed" }
+    : { schema: "keel-release-conversation@1", releaseId, revision: 3, turns: [], bridge: { configured: false, online: false }, editable: true, planningUrl: "https://untrusted.example" }); };
+  try {
+    const server = await createMcpServer(); await server.handle({ jsonrpc: "2.0", id: 1, method: "initialize", params: initializeParams });
+    for (const args of [{ operation: "conversation", releaseId }, { operation: "conversation-suggest", releaseId, conversationCommand: suggestion }]) {
+      const result = await call(server, 2, args); assert.notEqual(result?.result.isError, true, result?.result.content?.[0]?.text);
+      assert.equal(result?.result.structuredContent.planningUrl, `https://studio.example/studio/releases/${releaseId}/plan`);
+    }
+    assert.ok(requests.every(request => request.url === `https://studio.example/api/agent/drafts/${releaseId}/conversation`));
+    assert.equal(requests[1].init.method, "POST"); assert.deepEqual(JSON.parse(requests[1].init.body), suggestion);
+    const forbidden = await call(server, 3, { operation: "conversation-suggest", releaseId, conversationCommand: { ...suggestion, transaction: { data: "0x" } } });
+    assert.equal(forbidden?.result.isError, true); assert.equal(requests.length, 2);
+  } finally { globalThis.fetch = previousFetch; if (previousToken === undefined) delete process.env.KEEL_STUDIO_AGENT_TOKEN; else process.env.KEEL_STUDIO_AGENT_TOKEN = previousToken; }
+});
+
+test("portable MCP prepares the same owner review and never accepts caller wallet or calldata", async () => {
+  const previousToken = process.env.KEEL_STUDIO_AGENT_TOKEN, previousFetch = globalThis.fetch;
+  const releaseId = "11111111-1111-4111-8111-111111111111", operationId = "22222222-2222-4222-8222-222222222222";
+  let requests = 0;
+  process.env.KEEL_STUDIO_AGENT_TOKEN = token;
+  globalThis.fetch = async (url, init) => {
+    requests++; assert.equal(String(url), `https://studio.example/api/agent/drafts/${releaseId}/review`); assert.equal(init.method, "POST"); assert.deepEqual(JSON.parse(init.body), { expectedRevision: 3 });
+    return Response.json({ schema: "keel-release-wallet-review@1", releaseId, revision: 3, wallet: `0x${"33".repeat(20)}`, preparation: { operationId, chainId: 11155111,
+      calls: [{ kind: "create-drop", to: `0x${"44".repeat(20)}`, data: "0x1234", value: "0x0" }] }, signing: "not-performed", submission: "not-performed" });
+  };
+  try {
+    const server = await createMcpServer(); await server.handle({ jsonrpc: "2.0", id: 1, method: "initialize", params: initializeParams });
+    const answer = await call(server, 2, { operation: "prepare-review", releaseId, expectedRevision: 3 });
+    assert.notEqual(answer.result.isError, true); assert.equal(answer.result.structuredContent.schema, "keel-release-wallet-review@1"); assert.equal(answer.result.structuredContent.reviewUrl, `https://studio.example/studio/releases/${releaseId}/review?operation=${operationId}&revision=3`);
+    assert.equal(answer.result.structuredContent.submission, "not-performed");
+    const rejected = await call(server, 3, { operation: "prepare-review", releaseId, expectedRevision: 3, wallet: "attacker", data: "0x1234" });
+    assert.equal(rejected.result.isError, true); assert.equal(requests, 1);
+  } finally { globalThis.fetch = previousFetch; if (previousToken === undefined) delete process.env.KEEL_STUDIO_AGENT_TOKEN; else process.env.KEEL_STUDIO_AGENT_TOKEN = previousToken; }
+});
+
+test("portable MCP forwards explicit read-call diagnosis without accepting wallet commands", async () => {
+  const previousToken = process.env.KEEL_STUDIO_AGENT_TOKEN, previousFetch = globalThis.fetch;
+  process.env.KEEL_STUDIO_AGENT_TOKEN = token; const requests = [];
+  globalThis.fetch = async (url, init = {}) => { requests.push({url: String(url), init}); return Response.json({schema:'keel-release-diagnostics@1',releaseId:'release-existing',signing:'not-performed',submission:'not-performed',uploadedBytes:0,changed:false}); };
+  try {
+    const server = await createMcpServer(); await server.handle({jsonrpc:'2.0',id:1,method:'initialize',params:initializeParams});
+    const result = await call(server, 2, {studioUrl:'https://studio.example',operation:'diagnose',releaseId:'release-existing',includeReadCall:true});
+    assert.equal(result.result.isError, undefined, JSON.stringify(result));
+    assert.equal(result.result.structuredContent.signing, 'not-performed'); assert.equal(requests.length,1);
+    assert.equal(requests[0].url,'https://studio.example/api/agent/drafts/release-existing/diagnostics?includeReadCall=true'); assert.equal(requests[0].init.method, undefined);
+    const denied = await call(server,3,{studioUrl:'https://studio.example',operation:'diagnose',releaseId:'release-existing',includeReadCall:true,sendTransaction:true});
+    assert.equal(denied.result.isError,true); assert.equal(requests.length,1);
+  } finally { globalThis.fetch=previousFetch; if(previousToken === undefined) delete process.env.KEEL_STUDIO_AGENT_TOKEN; else process.env.KEEL_STUDIO_AGENT_TOKEN=previousToken; }
+});
+
+test("registered portable MCP continues the paid release, preserves unknown outcomes, and cancels only an exact review", async () => {
+  const previousToken=process.env.KEEL_STUDIO_AGENT_TOKEN, previousFetch=globalThis.fetch;
+  process.env.KEEL_STUDIO_AGENT_TOKEN=token;
+  const releaseId='dcd04c0e-a875-4b62-93c5-b7c325a0d789',operationId='0f851190-776d-4133-a1d4-b28f745e7af4';
+  const projectId='150485a1-78b5-425f-a0b7-093d4409fed5', requests=[];
+  let status='owner-observation-required';
+  globalThis.fetch=async(url,init={})=>{
+    requests.push({url:String(url),method:init.method,body:init.body?JSON.parse(init.body):undefined});
+    assert.equal(new Headers(init.headers).get('authorization'),`Bearer ${token}`);
+    if(String(url).endsWith('/continue'))return Response.json({schema:'keel-release-continuation@1',releaseId,revision:34,status,
+      nextAction:status==='owner-observation-required'?'record-owner-observation':'prepare-review',message:'Preserve job 10 and the existing release',
+      reviewPath:`/studio/releases/${releaseId}`,storagePreserved:true,uploadedBytes:0,signing:'not-performed',submission:'not-performed'});
+    if(String(url).endsWith('/preview-replan/legacy'))return Response.json({status:'not-applicable',message:'Keep paid storage job 10',ownerPath:`/studio/projects/${projectId}/recovery`,nextActions:[]});
+    if(String(url).endsWith('/review/cancel'))return Response.json({schema:'keel-release-review-cancelled@1',releaseId,operationId,revision:34,status:'draft',nextAction:'plan',storagePreserved:true,uploadedBytes:0,signing:'not-performed',submission:'not-performed'});
+    throw Error('Unexpected endpoint '+url);
+  };
+  try{
+    const server=await recoveryServer();await server.handle({jsonrpc:'2.0',id:1,method:'initialize',params:initializeParams});
+    const listed=await server.handle({jsonrpc:'2.0',id:2,method:'tools/list'});
+    const tool=listed.result.tools.find(t=>t.name==='keel-studio-draft');
+    for(const op of ['continue-publication','storage-recovery','cancel-review','prepare-review','recover'])assert.ok(tool.inputSchema.properties.operation.enum.includes(op),op);
+    const unknown=await call(server,3,{operation:'continue-publication',releaseId,expectedRevision:34});
+    assert.equal(unknown.result.structuredContent.status,'owner-observation-required');
+    assert.equal(unknown.result.structuredContent.uploadedBytes,0);assert.equal(requests.length,1);
+    const spoof=await call(server,4,{operation:'continue-publication',releaseId,expectedRevision:34,ownerRecordedRejection:{code:-32602}});
+    assert.equal(spoof.result.isError,true);assert.equal(requests.length,1);
+    // Separate transport fixture: server has independently verified a saved rejection.
+    status='review-required';assert.equal((await call(server,5,{operation:'continue-publication',releaseId,expectedRevision:34})).result.structuredContent.nextAction,'prepare-review');
+    const cancelled=await call(server,6,{operation:'cancel-review',releaseId,expectedRevision:34,operationId});
+    assert.equal(cancelled.result.structuredContent.status,'draft');
+    assert.deepEqual(requests.at(-1).body,{expectedRevision:34,operationId});
+    assert.equal((await call(server,7,{operation:'storage-recovery',projectId})).result.structuredContent.status,'not-applicable');
+    assert.ok(requests.every(r=>!r.url.includes('/deployment/')&&!r.url.includes('/upload')));
+  }finally{globalThis.fetch=previousFetch;if(previousToken===undefined)delete process.env.KEEL_STUDIO_AGENT_TOKEN;else process.env.KEEL_STUDIO_AGENT_TOKEN=previousToken;}
 });

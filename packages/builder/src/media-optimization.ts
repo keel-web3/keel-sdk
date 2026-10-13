@@ -24,6 +24,8 @@ const GLTF_TRANSFORM_VERSION = "4.4.2";
  * closed instead of trusting install.js' environment-configurable download.
  */
 const FFMPEG_STATIC_EXECUTABLE_SHA256: Readonly<Record<string, Hex>> = {
+  // Official ffmpeg-static b6.1.1 release asset SHA-256, verified against GitHub release metadata.
+  "linux-x64": "0xe7e7fb30477f717e6f55f9180a70386c62677ef8a4d4d1a5d948f4098aa3eb99",
   "darwin-arm64": "0xa90e3db6a3fd35f6074b013f948b1aa45b31c6375489d39e572bea3f18336584",
 };
 const localRequire = createRequire(import.meta.url);

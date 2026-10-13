@@ -21,6 +21,31 @@ governance and discovery root around those contracts:
 This keeps permanent collector data immutable while letting governance repair
 the authority logic or select a replacement module.
 
+Agents must inspect the manager before concluding that a deployment needs to
+be replaced. `keel-manager-modules-inspect` accepts the selected Hold, manager,
+or an existing managed collection. A collection resolves its actual
+`presentationModule`, `composerManager` and `composerModuleId`; the inspection
+checks the directory revision, freeze state, `resolveModule`, runtime code hash
+and governor quorum at one pinned chain block. Publication references expose
+these bindings under `managedRoute`. Index metadata alone is not live proof.
+
+`prepareKeelManagerModuleReplacement` and MCP
+`keel-manager-module-replacement-prepare` prepare the existing
+`configureModule(id, replacement, runtimeCodeHash)` self-call through
+`executeGovernance`. They require the reviewed current address/revision,
+reject frozen or changed records and check the deployed EIP-712 digest.
+`buildKeelManagerModuleReplacementCall` verifies governor signatures and
+refreshes the nonce, epoch, module record and replacement runtime before
+returning calldata. These helpers never sign, deploy or submit transactions.
+Consumer compatibility, storage layout, exact existing artwork/resource parity and expected tokenURI context and
+read-gas checks precede signing; the governance receipt and manager readback
+confirm the replacement. Unchanged engine objects remain in Hold.
+
+A manager can replace modules whose consumers follow its directory. Its
+pointer does not rewrite addresses embedded in an unrelated immutable factory
+or a renderer configured once. Discovery must distinguish these routes and
+inspect the actual consumer instead of treating either model as universal.
+
 ## Quorum
 
 Both chains use `ceil(2 * governorCount / 3)`, with 3 to 32 governors. Examples:

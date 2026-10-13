@@ -1,3 +1,4 @@
+import { keelRpcReaderTransport } from "./rpc.js";
 import { createHash } from "node:crypto";
 
 import {
@@ -49,7 +50,7 @@ export interface KeelOnchainRead {
 }
 
 export interface KeelOnchainDataOptions {
-  readonly rpcUrl: string;
+  readonly rpcUrl?: string;
   readonly reads: readonly KeelOnchainRead[];
   /** Block to read at. Defaults to `latest`; pin it for a reproducible build. */
   readonly blockTag?: string;
@@ -193,11 +194,12 @@ function decodeWord(type: string, word: string): KeelDataValue {
 
 /** Read every declared value from a chain. Works against a local anvil. */
 export async function readOnchainData(options: KeelOnchainDataOptions): Promise<KeelOnchainDataLayer> {
-  const call = options.fetchImpl ?? fetch;
+  const transport = options.fetchImpl ? { rpcUrl: options.rpcUrl ?? resolveKeelEndpoints().publicRpcUrl, fetchImpl: options.fetchImpl } : keelRpcReaderTransport(options.rpcUrl);
+  const call = transport.fetchImpl;
   const blockTag = options.blockTag ?? "latest";
   let id = 0;
   const rpc = async (method: string, params: readonly unknown[], probe = false): Promise<string> => {
-    const response = await call(options.rpcUrl, {
+    const response = await call(transport.rpcUrl, {
       method: "POST",
       headers: { "content-type": "application/json" },
       body: JSON.stringify({ jsonrpc: "2.0", id: (id += 1), method, params }),
@@ -249,7 +251,7 @@ export async function readOnchainData(options: KeelOnchainDataOptions): Promise<
       }
       const requests = data.map(input => ({ jsonrpc: "2.0", id: (id += 1), method: "eth_call",
         params: [{ to: record.address, data: input }, readBlockTag] }));
-      const response = await call(options.rpcUrl, { method: "POST", headers: { "content-type": "application/json" },
+      const response = await call(transport.rpcUrl, { method: "POST", headers: { "content-type": "application/json" },
         body: JSON.stringify(requests) });
       if (!response.ok) throw new Error(`Seed-data batch failed: HTTP ${response.status}`);
       const body = await response.json();
@@ -433,13 +435,10 @@ export interface ResolvedKeelOnchainRpc {
  * Decide which chain to read, so a caller does not have to pass a URL it does
  * not have yet.
  *
- * Why this is not `resolveKeelEndpoints`: that resolver answers "where do
- * collectors read this work", and so it refuses anything but a credential-free
- * HTTPS origin. Building a data layer is the opposite situation -- the normal
- * case is a local anvil on plain HTTP, which is exactly the URL the public
- * resolver is right to reject. So loopback HTTP is allowed here and nowhere
- * else, and the public resolver is still what answers when nothing local is
- * configured.
+ * Explicit loopback HTTP is supported for local Anvil. Public Sepolia defaults
+ * and HTTPS provider paths come from the shared endpoint configuration. Private
+ * Node workspace settings are loaded by @keel/sdk/rpc-node and MCP, not embedded
+ * into browser artwork.
  */
 export function resolveKeelOnchainRpcUrl(
   explicit?: string,

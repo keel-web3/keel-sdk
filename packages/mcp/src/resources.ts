@@ -3,11 +3,13 @@ import { PREPARED_COPY_POLICY } from "./prepared-copy-guidance.js";
 import type { McpResource, McpResourceReadResult } from "./types.js";
 import { KEEL_ENGINE_CATALOG } from "@keel/sdk/engine";
 import { ARENA_RESOURCE_DEFINITION, ARENA_RESOURCE_TEXT } from "./arena-tools.js";
+import { STUDIO_WALLET_POLICY } from "./studio-wallet-guidance.js";
 
 export const KEEL_WORKFLOW_RESOURCE = "keel://mcp/workflow" as const;
 export const KEEL_LIMITS_RESOURCE = "keel://mcp/limits" as const;
 export const KEEL_PUBLICATION_MODES_RESOURCE = "keel://mcp/publication-modes" as const;
 export const KEEL_PROJECT_ROUTES_RESOURCE = "keel://mcp/project-routes" as const;
+export const KEEL_STUDIO_WALLET_REVIEW_RESOURCE = "keel://mcp/studio-wallet-review" as const;
 const MAX_RESOURCE_BYTES = 64 * 1024;
 
 export class McpResourceNotFoundError extends Error {
@@ -20,6 +22,7 @@ export class McpResourceNotFoundError extends Error {
 const resourceJson = (value: unknown): string => `${JSON.stringify(value)}\n`;
 
 const RESOURCE_TEXT: Readonly<Record<string, string>> = {
+  [KEEL_STUDIO_WALLET_REVIEW_RESOURCE]: resourceJson(STUDIO_WALLET_POLICY),
   "keel://mcp/svg-renderer": resourceJson({
     ...KEEL_ENGINE_CATALOG.svgRenderer,
     usage: { create: { tool: "keel-svg-create", inputs: ["preset or recipeJson", "tokenId (optional)"] }, inspect: { tool: "keel-svg-inspect", inputs: ["svg"] }, read: { tool: "keel-svg-call-plan", inputs: ["chainId", "address", "tokenId"] } },
@@ -28,11 +31,22 @@ const RESOURCE_TEXT: Readonly<Record<string, string>> = {
   }),
   "keel://mcp/engine": resourceJson(KEEL_ENGINE_CATALOG),
   ...ARENA_RESOURCE_TEXT,
+  "keel://mcp/prereveal": resourceJson({
+    protocol: "keel-prereveal@1", optional: true, tool: "keel-prereveal-prepare",
+    modes: ["assets", "attributes", "seeded", "encrypted"],
+    storage: "One salted allocation root; native encrypted assets and compact trait assignments remain separate reusable modules.",
+    private: "Keep proof salts and allocation inputs outside public staging. Use separate public/private output directories. Never pass encryption keys through MCP.",
+    publication: "Use the registered selected-chain root registry, runtime hash and fixed original revision. The generic salted proof is different from registry.verify's OZ metadata leaf; never mix protocols.",
+    proof: "Exact bytes, attribute assignment, generator recipe, actual minted seed and generator replay are separate scopes. A burn-rule hash is not a burn-event proof.",
+    delivery: "Inline remains inline. Optional RPC denial does not change file verification or artwork. Missing keys retain the creator's prereveal placeholder.",
+    guide: "docs/KEEL_PREREVEAL.md",
+  }),
   [KEEL_WORKFLOW_RESOURCE]: resourceJson({
     schema: "keel-mcp-resource@1",
     kind: "offline-workflow",
+    walletReview: STUDIO_WALLET_POLICY,
     payloadStorage: KEEL_PAYLOAD_STORAGE_POLICY,
-    contractFirst: ["keel-contract-workflow-preflight", "keel-engine-catalog", "keel-network-inspect", "keel-library-search", "edge-case-resolution", "keel-contract-controls", "wallet-review"],
+    contractFirst: ["keel-network-discover", "keel-network-check", "keel-contract-workflow-preflight", "keel-engine-catalog", "keel-network-inspect", "keel-library-search", "edge-case-resolution", "keel-contract-controls", "wallet-review"],
     steps: ["studio-capabilities", "analyze", "media-optimize", "media-optimize-apply", "cost", "keel-revision-plan", "upload-plan", "build", "verify", "module-resolve", "module-lock", "studio-stage-project", "studio-draft", "chain-plan", "ethereum-encode", "publish-plan", "wallet-request-prepare", "wallet-link"],
     repair: {
       prompt: "keel-draft-repair",
@@ -181,7 +195,7 @@ const RESOURCE_TEXT: Readonly<Record<string, string>> = {
       },
       resourceDeliveryProfiles: {
         embeddedAssembled: "Inline: all bytes arrive in the tokenURI response; no runtime RPC. Existing prepared-carriage default is unchanged.",
-        denseBinaryTransport: "Explicit optional SDK binaryPayloadCarriage:'base90' / 'base91', with bounded shell decoder and storedDense payloads. base90-v1 is a versioned KEEL alphabet/pair-code variant, not standard basE91. Preserve native compressed storage, measure full wrapper/decoder cost, and require the matching selected-chain registered composer/shell before publication; local capability is not a live registered route. See docs/KEEL_DENSE_TRANSPORT.md.",
+        denseBinaryTransport: "Fresh prepared dense COPY defaults to Brotli plus binaryPayloadCarriage:'uri81' and uri81-block-v1; keep none when compression does not save bytes. The default prepared shell carries a compact Brotli/URI81 decoder with gzip/Base64 shell boot. Module runtime records report encoding, transportProfile, compression and encryption; open modules use encryption:none. Compression does not make a binary alphabet URI-safe. Fresh compressed and uncompressed payloads both use URI81; Base90/91 are retained for unchanged legacy objects only. Both JSON/HTML framing layers require strict escaping. Measure the complete return and require the matching selected-chain registered composer/shell before publication; local capability is not a live registered route. See docs/KEEL_DENSE_TRANSPORT.md.",
         embeddedSharedContainers: "Optional canonical embedded-shared-containers@1: the EVM composer reads raw compressed Hold packs but emits Base64 in its return. This is an expanding text carriage, not unchanged binary. SDK native return defaults to as-is and rejects this profile without an explicit creator-authorized binaryPayloadCarriage:'base64' choice. Never use it for a no-Base64/no-hex request. The offline shell checks table/stored/decoded/member SHA before mounting; selected-chain registration and full return/browser proof are still required.",
         onchainRecursive: "Hybrid: a governed browser RPC reader resolves native binary objects. keel-inline-prepare rejects this profile; changing a delivery label cannot make a fixed contract assemble the bytes.",
       },
@@ -231,6 +245,7 @@ const RESOURCE_TEXT: Readonly<Record<string, string>> = {
       viewerNone: "Explicit creator-owned self-contained HTML shell/direct artifact, independently releasable and contract-readable through raw-artifact policy. Persist viewer=none separately from Compact/Raw; never label its own shell as canonical protection.",
       agentScope: "For the default verification path, agents supply creator resources/modules and reuse the registered KEEL shell. With explicit viewer=none they may build creator-owned self-contained HTML, preserving that choice without canonical claims.",
       creatorHtml: "Creator-authored HTML is content in the verification shell by default; explicit viewer=none makes it the creator-owned presentation shell.",
+      applicationAPI: "The canonical OnKEEL-themed shell exposes artwork __KEEL_SHELL__ and SDK createKeelShellClient: putPanel/removePanel, read-only verification and catalog(), open/close. The default Proof/Token/Files/System/App surface includes metadata and attributes, module/import/compression details, checked manifests, declared plugins and external sources; absent declarations are explicit. The original seal auto-hide is retained. Data-only panels appear in App; they cannot modify proof status, checks or identity. Evidence badges require exact passed resource ID/digest matches and certify file bytes only. Reuse this API instead of forking the shell. See docs/KEEL_SHELL_APPLICATION_API.md.",
       catalogFailure: "Fail when the chosen reader, builder or Hold lacks selected-chain evidence. Require canonical shell evidence for the verification choice only. Never silently switch shell, storage, carriage, or Inline/Hybrid delivery.",
       existingGraphRevision: "Studio derives this state without asking the creator. For assembly-only reuse call keel-inline-reuse-plan first, with zero source uploads. For declared source changes call keel-revision-plan before upload-plan. A follow-latest graph publishes and activates the next version without rewriting token presentation; a pinned graph may update only its small binding. Any undeclared resource, reused-byte upload, or digest mismatch is blocked before wallet review.",
     },
@@ -264,12 +279,14 @@ const RESOURCE_TEXT: Readonly<Record<string, string>> = {
 };
 
 export const RESOURCE_DEFINITIONS: readonly McpResource[] = [
+  { uri: KEEL_STUDIO_WALLET_REVIEW_RESOURCE, name: "keel-studio-wallet-review", description: "Default hosted Studio account and existing-wallet review workflow; desktop is optional.", mimeType: "application/json" },
   { uri: "keel://mcp/engine", name: "keel-engine", description: "Shared SDK and desktop collection, mint, permission, storage and module inventory.", mimeType: "application/json" },
   { uri: "keel://mcp/svg-renderer", name: "keel-svg-renderer", description: "Contract-generated SVGs, hidden proof provenance, SDK/MCP/editor usage and verification boundaries.", mimeType: "application/json" },
   { uri: KEEL_WORKFLOW_RESOURCE, name: "keel-workflow", description: "Machine-readable offline analyze-to-review workflow.", mimeType: "application/json" },
   { uri: KEEL_LIMITS_RESOURCE, name: "keel-limits", description: "Machine-readable MCP and planner safety limits.", mimeType: "application/json" },
   { uri: KEEL_PROJECT_ROUTES_RESOURCE, name: "keel-project-routes", description: "Machine-readable intent, artifact/runtime, token, sale, and auction routing without duplicated contract logic.", mimeType: "application/json" },
   { uri: KEEL_PUBLICATION_MODES_RESOURCE, name: "keel-publication-modes", description: "Machine-readable KEEL storage modes, readiness, and accounting boundaries.", mimeType: "application/json" },
+  {uri: "keel://mcp/prereveal", name: "Optional commitments and reveal", description: "Salted hidden-art/trait/seed-rule commitments, native encryption and honest reveal proof scopes.", mimeType: "application/json"},
   ARENA_RESOURCE_DEFINITION,
 ];
 

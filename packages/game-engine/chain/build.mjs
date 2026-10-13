@@ -1,7 +1,6 @@
-import { gzipSync } from "node:zlib";
-import { resolveKeelPayloadStorage } from "@keel/protocol";
-// Builds for publishing: a game's KEEL document (exactly what `keel-game
-// document` writes, Tone and keel-audio included for audio games), and the
+import { canonicalJson, createIntegrity, resolveKeelPayloadStorage } from "@keel/protocol";
+// Builds for publishing: a game's KEEL document with exact UTF-8 COPY slots
+// (Tone and keel-audio included for audio games), and the
 // engine release -- every engine module as the same KEEL module slot a game
 // document carries, so the objects an engine release publishes are the very
 // objects every game's root points at.
@@ -13,6 +12,36 @@ import { existsSync } from "node:fs";
 import { join, resolve } from "node:path";
 import { pathToFileURL } from "node:url";
 import { buildKeelInlineLocalDocument, buildKeelInlineModuleFragment, buildKeelInlineShellFragments } from "@keel/sdk/inline-viewer-graph";
+import { slotProgram } from "./reuse.mjs";
+
+// The pinned engine's local-preview builder gzip-encodes its module slots and
+// predates payloadStorage. Fresh raw-percent COPY supports exact UTF-8 slots,
+// so prepare those from verified decoded bytes before any publication plan.
+// This applies only to a newly built document; published slots are reconciled
+// afterwards by reusePublishedSlots and never passed through this preparation.
+async function freshCopyDocument(doc, payloadStorage) {
+  const parts = [];
+  const storedLengths = new Map();
+  for (const part of doc.document.parts) {
+    if (part.role !== "module") { parts.push(part); continue; }
+    const { metadata, decoded } = await slotProgram(part.bytes);
+    const item = JSON.parse(metadata);
+    const module = await buildKeelInlineModuleFragment({
+      moduleId: part.moduleId, version: part.moduleVersion, mediaType: item.mediaType,
+      aliases: item.aliases, decodedBytes: decoded, compression: "none", payloadStorage,
+      execution: part.execution, phase: part.phase, weight: part.weight,
+    });
+    const { embedded: _embedded, ...preparedMetadata } = module.item;
+    if (canonicalJson(preparedMetadata) !== metadata) throw new Error(`Fresh COPY preparation changed module metadata: ${part.moduleId}`);
+    parts.push({ ...part, bytes: module.bytes, byteLength: module.bytes.length, integrity: module.integrity });
+    storedLengths.set(part.moduleId, decoded.length);
+  }
+  const rootBytes = new Uint8Array(Buffer.concat(parts.map(part => part.bytes)));
+  return { ...doc, html: rootBytes,
+    modules: doc.modules.map(module => ({ ...module, ...(storedLengths.has(module.id) ? { stored: storedLengths.get(module.id) } : {}) })),
+    document: { ...doc.document, parts, rootBytes, byteLength: rootBytes.length, rootIntegrity: await createIntegrity(rootBytes) },
+  };
+}
 
 /**
  * The engine's own build (its packages/keel) and root, found the way
@@ -40,11 +69,13 @@ export function engineBuilds(engine) {
     return new Set([...workspace.filter((w) => w.origin === "engine").map((w) => w.manifest.id), KEEL_TONE_15.id, KEEL_AUDIO_RUNTIME.id]);
   };
 
-  /** A game's document, as `keel-game document <id>` builds it. */
+  /** A game's source and shell, prepared for the raw-percent COPY reader. */
   const buildGame = async ({ project, projects, gameId, workspace, minify = true, entryExport = "main", audio = entryExport === "main", shell, payloadStorage }) => {
+    payloadStorage = resolveKeelPayloadStorage(payloadStorage);
     const ws = workspace ?? await workspaceOf(projects ?? [project]);
     const withAudio = audio && keel.closureOf(gameId, ws).some((m) => m.manifest.id === "keel/audio") && existsSync(vendor);
-    const doc = await keel.buildGameDocument(gameId, ws, { minify, entryExport, payloadStorage: resolveKeelPayloadStorage(payloadStorage), ...(shell ? { shell } : {}), ...(withAudio ? { pageScripts: await keel.keelAudioScripts(vendor) } : {}) });
+    const local = await keel.buildGameDocument(gameId, ws, { minify, entryExport, payloadStorage, ...(shell ? { shell } : {}), ...(withAudio ? { pageScripts: await keel.keelAudioScripts(vendor) } : {}) });
+    const doc = await freshCopyDocument(local, payloadStorage);
     return { doc, workspace: ws, engineModuleIds: await engineModuleIds(ws) };
   };
 
@@ -55,14 +86,13 @@ export function engineBuilds(engine) {
    */
   const buildEngineRelease = async ({ workspace, minify = true, shell, payloadStorage } = {}) => {
     payloadStorage = resolveKeelPayloadStorage(payloadStorage);
-    const compression = (bytes) => payloadStorage === "raw" || gzipSync(bytes, { level: 9 }).byteLength >= bytes.byteLength ? "none" : "gzip";
     const ws = workspace ?? await workspaceOf([]);
     const modules = [];
     const failed = [];
     const reports = [];
     if (existsSync(vendor)) {
       for (const p of await keel.keelAudioScripts(vendor)) {
-        modules.push(await buildKeelInlineModuleFragment({ moduleId: p.id, version: p.version, mediaType: "text/javascript", ...(p.aliases ? { aliases: p.aliases } : {}), decodedBytes: p.bytes, compression: compression(p.bytes), execution: "classic", phase: "runtime", weight: p.weight }));
+        modules.push(await buildKeelInlineModuleFragment({ moduleId: p.id, version: p.version, mediaType: "text/javascript", ...(p.aliases ? { aliases: p.aliases } : {}), decodedBytes: p.bytes, compression: "none", payloadStorage, execution: "classic", phase: "runtime", weight: p.weight }));
         reports.push({ id: p.id, version: p.version, kind: "page-script", bytes: p.bytes.byteLength });
       }
     }
@@ -74,14 +104,15 @@ export function engineBuilds(engine) {
       try {
         const b = typeof keel.buildVerifiedModule === "function" ? await keel.buildVerifiedModule(mod, ws, root) : await keel.bundleModule(mod, ws, { minify });
         if (b.outputDigest) verified.push(b);
-        modules.push(await buildKeelInlineModuleFragment({ moduleId: b.manifest.id, version: b.manifest.version, mediaType: "text/javascript", decodedBytes: b.bytes, compression: compression(b.bytes), execution: "classic", phase: b.manifest.phase, weight: b.manifest.weight }));
+        modules.push(await buildKeelInlineModuleFragment({ moduleId: b.manifest.id, version: b.manifest.version, mediaType: "text/javascript", decodedBytes: b.bytes, compression: "none", payloadStorage, execution: "classic", phase: b.manifest.phase, weight: b.manifest.weight }));
         reports.push({ id: b.manifest.id, version: b.manifest.version, kind: b.manifest.kind, bytes: b.bytes.byteLength, ...(b.outputDigest ? { digest: b.outputDigest } : {}) });
       } catch (error) {
         failed.push({ id: mod.manifest.id, version: mod.manifest.version, error: String(error?.message ?? error).split("\n")[0] });
       }
     }
-    const document = await buildKeelInlineLocalDocument({ shell: shell ?? await buildKeelInlineShellFragments(), modules, entry: { id: "keel-engine/release", mediaType: "text/javascript", source: new TextEncoder().encode("void 0;\n"), compression: "none" } });
-    return { doc: { document, modules: reports }, engineModuleIds: new Set(reports.map((r) => r.id)), failed, verified };
+    const selectedShell = shell ?? await buildKeelInlineShellFragments();
+    const document = await buildKeelInlineLocalDocument({ shell: selectedShell, payloadStorage, modules, entry: { id: "keel-engine/release", mediaType: "text/javascript", source: new TextEncoder().encode("void 0;\n"), compression: "none" } });
+    return { doc: { document, modules: reports }, shell: selectedShell, engineModuleIds: new Set(reports.map((r) => r.id)), failed, verified };
   };
 
   return { root, source: engine.source ?? null, keel, workspaceOf, engineModuleIds, buildGame, buildEngineRelease };

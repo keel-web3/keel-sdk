@@ -12,7 +12,7 @@
 //
 // Nothing here holds a key: callers pass a viem wallet client (the practice
 // chain's unlocked anvil account, or a wallet the owner connects).
-import { buildKeelInlineRawPercentTokenURIGraph } from "@keel/sdk/inline-viewer-graph";
+import { buildKeelInlineLocalDocument, buildKeelInlineRawPercentTokenURIGraph } from "@keel/sdk/inline-viewer-graph";
 import { createKeelManagedCompositePlan, createKeelManagedObjectPlan } from "@keel/sdk/native-publication";
 import { encodeFunctionData, toHex } from "viem";
 import { builderAbi, holdAbi } from "./contracts.mjs";
@@ -32,6 +32,16 @@ export function shareOf(part, engineModuleIds) {
   return "game";
 }
 
+async function planPart({ fragment, part, index, engineModuleIds, hold }) {
+  const plan = await createKeelManagedObjectPlan(fragment.bytes, { hold, mediaType: RAW_PERCENT, compression: "none" });
+  return {
+    index, role: fragment.role, share: shareOf(part, engineModuleIds),
+    ...(part.moduleId ? { moduleId: part.moduleId, version: part.moduleVersion } : {}),
+    byteLength: fragment.bytes.byteLength, digest: plan.digest, objectId: plan.objectId,
+    chunks: plan.chunks, operations: plan.operations,
+  };
+}
+
 /**
  * Plan a built game (buildGameDocument's result) as KeelHold objects.
  * `engineModuleIds`: the ids of modules that come from the engine, not the project.
@@ -45,14 +55,7 @@ export async function planGame({ doc, engineModuleIds, hold, gameId }) {
   for (let index = 0; index < graph.parts.length; index += 1) {
     const fragment = graph.parts[index];
     const part = source[index];
-    const plan = await createKeelManagedObjectPlan(fragment.bytes, { hold, mediaType: RAW_PERCENT, compression: "none" });
-    const moduleId = part.moduleId;
-    parts.push({
-      index, role: fragment.role, share: shareOf(part, engineModuleIds),
-      ...(moduleId ? { moduleId, version: part.moduleVersion ?? versions.get(moduleId) } : {}),
-      byteLength: fragment.bytes.byteLength, digest: plan.digest, objectId: plan.objectId,
-      chunks: plan.chunks, operations: plan.operations,
-    });
+    parts.push(await planPart({ fragment, part: { ...part, moduleVersion: part.moduleVersion ?? versions.get(part.moduleId) }, index, engineModuleIds, hold }));
   }
   const root = createKeelManagedCompositePlan(parts.map((p) => p.objectId), graph.fragmentBytes, { hold, mediaType: RAW_PERCENT });
   return {
@@ -60,6 +63,35 @@ export async function planGame({ doc, engineModuleIds, hold, gameId }) {
     root: { objectId: root.objectId, digest: root.digest, byteLength: Number(root.byteLength), operation: root.operation },
     htmlByteLength: graph.htmlBytes.byteLength, htmlDigest: graph.htmlIntegrity.digest, parts,
   };
+}
+
+/** A release is a catalogue of reusable slots, not a tokenURI containing every
+ * engine module. Check each slot in a document with the selected shell, then plan
+ * only its shared objects. Actual games still pass the full-document guard. */
+export async function planEngineRelease({ doc, shell, engineModuleIds, hold }) {
+  const modules = doc.document.parts.filter(part => part.role === "module");
+  const planned = new Map();
+  const key = part => `${part.role}:${part.moduleId ?? ""}`;
+  for (const part of modules.length ? modules : [null]) {
+    const module = part && {
+      schema: "keel-inline-module-fragment@1", moduleId: part.moduleId, version: part.moduleVersion,
+      execution: part.execution, phase: part.phase, weight: part.weight,
+      item: JSON.parse(new TextDecoder().decode(part.bytes).trim().slice(1)),
+      bytes: part.bytes, integrity: part.integrity,
+    };
+    const document = await buildKeelInlineLocalDocument({ shell, modules: module ? [module] : [],
+      entry: { id: "keel-engine/release", mediaType: "text/javascript", source: new TextEncoder().encode("void 0;\n"), compression: "none" },
+    });
+    const graph = await buildKeelInlineRawPercentTokenURIGraph(document);
+    for (let index = 0; index < document.parts.length; index += 1) {
+      const source = document.parts[index];
+      if (shareOf(source, engineModuleIds) === "game" || planned.has(key(source))) continue;
+      planned.set(key(source), await planPart({ fragment: graph.parts[index], part: source, index, engineModuleIds, hold }));
+    }
+  }
+  const parts = doc.document.parts.filter(part => shareOf(part, engineModuleIds) !== "game")
+    .map((part, index) => ({ ...planned.get(key(part)), index }));
+  return { schema: "keel-game-engine-publication-plan@1", gameId: "keel-engine/release", hold, mediaType: RAW_PERCENT, parts };
 }
 
 /** A plan's size by share: bytes, chunks and objects (what would be stored with nothing on chain yet). */
@@ -95,7 +127,7 @@ export async function missingOnChain({ publicClient, plan }) {
     for (const chunk of part.chunks) if ((await read("slugPointer", [chunk.id])) === ZERO) chunks.push(chunk);
     parts.push({ part, exists: false, chunks });
   }
-  return { parts, rootExists: await read("objectExists", [plan.root.objectId]) };
+  return { parts, rootExists: plan.root ? await read("objectExists", [plan.root.objectId]) : true };
 }
 
 /**

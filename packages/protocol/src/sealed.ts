@@ -12,8 +12,9 @@
  *
  * Only symmetric primitives are used (AES-256-GCM, HKDF-SHA-256,
  * PBKDF2-HMAC-SHA-256, SHA-256), all from Web Crypto. There is no public-key
- * math in the content path for a quantum computer to break; Grover's search
- * leaves AES-256 and SHA-256 with roughly 128-bit security.
+ * key establishment in the content path. Generic quantum key search against
+ * AES-256 has roughly 128-bit query complexity. Unlock-secret entropy still
+ * bounds confidentiality; hash collision strength is a separate property.
  *
  * Envelope bytes:
  *
@@ -72,6 +73,16 @@ export const KEEL_REVEAL_MAX_TEXT_BYTES = 1024 * 1024;
 export const KEEL_MERKLE_REVEAL_MAX_ITEMS = 10_000;
 
 export const KEEL_SEALED_PROTOCOL = "keel-sealed@1" as const;
+/** Algorithm facts, not an attestation of password or authenticator strength. */
+export const KEEL_SEALED_ENCRYPTION_PROFILE = Object.freeze({
+  cipher: "AES-256-GCM" as const,
+  keyBits: 256 as const,
+  tagBits: 128 as const,
+  keyWrapping: "AES-256-GCM" as const,
+  keyEstablishment: "symmetric-only" as const,
+  quantumResistanceScope: "symmetric-content-and-key-wrapping" as const,
+  unlockSecretStrength: "not-attested" as const,
+});
 /** Media type for a stored envelope; the sealed content's own type is inside the header. */
 export const KEEL_SEALED_MEDIA_TYPE = "application/vnd.keel.sealed" as const;
 export const KEEL_SEALED_FRAME_VERSION = 1;
@@ -328,6 +339,9 @@ export interface KeelSealedDescription {
   readonly mediaType: string;
   readonly byteLength: number;
   readonly compression: KeelSealedCompression;
+  readonly encoding: "native-binary";
+  readonly encryption: typeof KEEL_SEALED_ENCRYPTION_PROFILE;
+  readonly keyDerivation: readonly ("HKDF-SHA-256" | "PBKDF2-HMAC-SHA-256")[];
   readonly contentKeyFingerprint: Hex;
   readonly hasCommitment: boolean;
   readonly slots: readonly KeelSealedSlotSummary[];
@@ -1091,6 +1105,9 @@ export function describeKeelSealed(envelope: Uint8Array): KeelSealedDescription 
     mediaType: header.content.mediaType,
     byteLength: header.content.byteLength,
     compression: header.content.compression,
+    encoding: "native-binary",
+    encryption: KEEL_SEALED_ENCRYPTION_PROFILE,
+    keyDerivation: header.slots.some(slot => slot.kind === "passphrase") ? ["HKDF-SHA-256", "PBKDF2-HMAC-SHA-256"] : ["HKDF-SHA-256"],
     contentKeyFingerprint: bytesToHex(fromBase64Url(header.content.keyCommitment, "Sealed key commitment", KEY_BYTES)),
     hasCommitment: header.content.commitment !== undefined,
     slots: header.slots.map((slot, index): KeelSealedSlotSummary => {

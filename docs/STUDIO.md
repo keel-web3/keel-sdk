@@ -193,3 +193,5 @@ PLAYWRIGHT_BASE_URL=http://localhost:3000 pnpm --filter @keel/studio test:e2e:ke
 - Use multiple RPC endpoints and monitor finality/reorg depth.
 - Transfer all on-chain roles to intended multisigs or timelocks.
 - Run exact compilation, Foundry, fuzz/invariant, static analysis, and an independent audit.
+
+Collector lists, token/social conditions, own signers and diagnostics use the scoped Studio access API: see [STUDIO_ACCESS.md](STUDIO_ACCESS.md). Request access scopes explicitly; use the website for wallet review. Desktop remains optional.

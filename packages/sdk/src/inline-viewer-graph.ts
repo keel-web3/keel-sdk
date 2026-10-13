@@ -31,6 +31,7 @@ import {
   KEEL_ASSET_DISPLAY_MODULE_ID,
   KEEL_ASSET_DISPLAY_MODULE_VERSION,
   keelAssetDisplayKind,
+  keelAssetDisplayModuleRevision,
   keelAssetDisplayModuleBytes,
   type KeelAssetDisplayKind,
   type KeelAssetDisplayMediaType,
@@ -631,7 +632,9 @@ function exactBase64Bytes(value: string, label: string): Uint8Array {
 
 export function decodeKeelInlineGraphFragment(bytes: Uint8Array, mediaType: string): Uint8Array {
   if (mediaType === "application/vnd.keel.token-uri-raw-percent-fragment") {
-    return exactPercentPayloadBytes(exactPercentPayloadBytes(bytes, "Inline metadata fragment"), "Inline HTML fragment");
+    // URI81 registrations also copy the three RFC-valid URI literals that the
+    // older writer escapes. Decode either registration without rewriting it.
+    return exactPercentPayloadBytes(exactPercentPayloadBytes(bytes, "Inline metadata fragment", true), "Inline HTML fragment", true);
   }
   const outer = exactBase64Bytes(decoder.decode(bytes), "Published Inline fragment");
   if (mediaType === "application/vnd.keel.token-uri-percent-fragment") {
@@ -910,7 +913,7 @@ function alignedPercentPayload(bytes: Uint8Array): Uint8Array {
   return encoder.encode(payload);
 }
 
-function exactPercentPayloadBytes(payload: Uint8Array, label: string): Uint8Array {
+function exactPercentPayloadBytes(payload: Uint8Array, label: string, allowURI81Literals = false): Uint8Array {
   const output: number[] = [];
   for (let at = 0; at < payload.byteLength; at += 1) {
     const byte = payload[at]!;
@@ -922,10 +925,16 @@ function exactPercentPayloadBytes(payload: Uint8Array, label: string): Uint8Arra
       at += 2;
       continue;
     }
-    if (!isDataUriLiteralByte(byte)) throw new TypeError(`${label} contains an unsafe literal byte.`);
+    if (!isDataUriLiteralByte(byte) && !(allowURI81Literals && (byte === 0x3f || byte === 0x27 || byte === 0x26))) {
+      throw new TypeError(`${label} contains an unsafe literal byte.`);
+    }
     output.push(byte);
   }
   return new Uint8Array(output);
+}
+
+function isRawPercentReadLiteralByte(byte: number): boolean {
+  return isDataUriLiteralByte(byte) || byte === 0x3f || byte === 0x27 || byte === 0x26;
 }
 
 /**
@@ -1031,7 +1040,7 @@ function assertMarketplaceSafeDataURI(value: string, label: string): void {
   }
   for (let at = 0; at < payload.length; at += 1) {
     const character = payload.charCodeAt(at);
-    if (isDataUriLiteralByte(character)) continue;
+    if (isRawPercentReadLiteralByte(character)) continue;
     if (character === 0x25 && /^[0-9a-f]{2}$/iu.test(payload.slice(at + 1, at + 3))) {
       at += 2;
       continue;
@@ -1085,6 +1094,7 @@ async function exactFragment(bytes: Uint8Array): Promise<KeelInlineFragmentBytes
 export async function buildKeelInlineShellFragments(input: {
   readonly repositoryRoot?: string;
   readonly codecProfile?: KeelInlineCodecProfile;
+  readonly optionalMarketplaceInfo?: import("./marketplace-reader.js").KeelShellMarketplaceConfig;
 } = {}): Promise<KeelInlineShellFragments> {
   const shell = await buildCompactInlineKeelShell(input);
   return {
@@ -1170,19 +1180,32 @@ function isNormalMediaEntry(mediaType: string): mediaType is KeelAssetDisplayMed
 }
 
 async function assertCanonicalAssetDisplayModule(module: KeelInlineModuleFragment): Promise<void> {
-  const expected = module.item.embedded?.compression === "gzip"
-    ? await buildKeelInlineModuleFragment({
-        moduleId: KEEL_ASSET_DISPLAY_MODULE_ID,
-        version: KEEL_ASSET_DISPLAY_MODULE_VERSION,
-        mediaType: "text/javascript",
-        aliases: [KEEL_ASSET_DISPLAY_MODULE_ID],
-        decodedBytes: keelAssetDisplayModuleBytes(),
-        compression: "gzip",
-        execution: "classic",
-        phase: "render",
-        weight: 0,
-      })
-    : await buildKeelInlineAssetDisplayModuleFragment();
+  const revision = keelAssetDisplayModuleRevision(module.version);
+  const embedded = module.item.embedded;
+  if (revision === undefined || embedded === undefined || !["none", "gzip"].includes(embedded.compression)) {
+    throw new TypeError("Direct media requires the exact registered keel.asset-display module in a supported canonical revision.");
+  }
+  const stored = embedded.storedText !== undefined
+    ? encoder.encode(embedded.storedText)
+    : exactBase64Bytes(embedded.storedBase64 ?? "", "Canonical asset-display payload");
+  const decoded = embedded.compression === "gzip"
+    ? new Uint8Array(gunzipSync(stored, {maxOutputLength: revision.byteLength}))
+    : stored;
+  const decodedHash=createHash("sha256"); decodedHash.update(decoded);
+  if (decoded.byteLength !== revision.byteLength || "0x" + decodedHash.digest("hex") !== revision.digest) {
+    throw new TypeError("Direct media asset-display bytes do not match their canonical revision.");
+  }
+  const expected = await buildKeelInlineModuleFragment({
+    moduleId: KEEL_ASSET_DISPLAY_MODULE_ID,
+    version: revision.version,
+    mediaType: "text/javascript",
+    aliases: [KEEL_ASSET_DISPLAY_MODULE_ID],
+    decodedBytes: decoded,
+    compression: embedded.compression as "none" | "gzip",
+    execution: "classic",
+    phase: "render",
+    weight: 0,
+  });
   if (
     module.moduleId !== expected.moduleId
     || module.version !== expected.version
@@ -1780,8 +1803,8 @@ export async function buildKeelInlineRawPercentTokenURIGraph(
         throw new TypeError(`Inline ${part.role} reusable object is not a raw-percent fragment.`);
       }
       bytes = published.bytes.slice();
-      escapedHtmlBytes = exactPercentPayloadBytes(bytes, `Published raw-percent Inline ${part.role}`);
-      decodedHtmlBytes = exactPercentPayloadBytes(escapedHtmlBytes, `Published raw-percent decoded ${part.role}`);
+      escapedHtmlBytes = exactPercentPayloadBytes(bytes, `Published raw-percent Inline ${part.role}`, true);
+      decodedHtmlBytes = exactPercentPayloadBytes(escapedHtmlBytes, `Published raw-percent decoded ${part.role}`, true);
     } else {
       decodedHtmlBytes = part.bytes.slice();
       escapedHtmlBytes = compactPercentPayload(decodedHtmlBytes);
@@ -1811,8 +1834,8 @@ export async function buildKeelInlineRawPercentTokenURIGraph(
   if (fragmentBytes.byteLength > maxTokenURIBytes) {
     throw new RangeError(`The raw-percent Inline tokenURI stream is ${fragmentBytes.byteLength.toLocaleString()} bytes, above the reviewed ${maxTokenURIBytes.toLocaleString()}-byte public-read ceiling.`);
   }
-  const escapedHtmlBytes = exactPercentPayloadBytes(fragmentBytes, "Raw-percent metadata middle");
-  const htmlBytes = exactPercentPayloadBytes(escapedHtmlBytes, "Raw-percent HTML stream");
+  const escapedHtmlBytes = exactPercentPayloadBytes(fragmentBytes, "Raw-percent metadata middle", true);
+  const htmlBytes = exactPercentPayloadBytes(escapedHtmlBytes, "Raw-percent HTML stream", true);
   if (!exactBytes(htmlBytes, concat(htmlParts))) {
     throw new Error("Raw-percent Inline fragments do not reconstruct the exact source HTML.");
   }
@@ -2284,10 +2307,11 @@ export async function buildKeelPreparedOneOfOneTokenURI(input: {
     const encodedPrefix = compactPercentPayload(encoder.encode(prefixRaw));
     const encodedSuffix = compactPercentPayload(encoder.encode(suffixRaw));
     const tokenURIPayload = concat([encodedPrefix, presentationFragmentBytes, encodedSuffix]);
-    const tokenJSON = decoder.decode(exactPercentPayloadBytes(tokenURIPayload, "Prepared raw-percent token JSON"));
+    const tokenJSON = decoder.decode(exactPercentPayloadBytes(tokenURIPayload, "Prepared raw-percent token JSON", true));
     const animationMiddle = decoder.decode(exactPercentPayloadBytes(
       presentationFragmentBytes,
       "Prepared raw-percent animation middle",
+      true,
     ));
     const expectedJSON = `${prefixRaw}${animationMiddle}${suffixRaw}`;
     if (tokenJSON !== expectedJSON) throw new Error("Prepared raw-percent fragments changed the exact token JSON bytes.");

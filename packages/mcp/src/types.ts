@@ -1,6 +1,6 @@
 export const MCP_PROTOCOL_VERSION = "2024-11-05" as const;
 export const MCP_SERVER_NAME = "keel-mcp" as const;
-export const MCP_SERVER_VERSION = "0.4.0" as const;
+export const MCP_SERVER_VERSION = "0.4.2" as const;
 
 export type JsonRpcId = string | number | null;
 
@@ -102,6 +102,7 @@ export interface Workspace {
   resolveExistingDirectory(pathValue: string): Promise<string>;
   resolveOutputDirectory(pathValue: string): Promise<string>;
   writeJson(pathValue: string, value: unknown): Promise<string>;
+  writeBytes(pathValue: string, value: Uint8Array, options?: { readonly private?: boolean }): Promise<string>;
 }
 
 export interface ToolContext {

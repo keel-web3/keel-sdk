@@ -1,11 +1,20 @@
 # `@keel/mcp`
 
+**Default to the [Studio website](https://studio.onkeel.io) and the user's
+existing wallet. KEEL Desktop is entirely optional.** Use
+`keel-studio-stage-project` and `keel-studio-draft` to prepare work in the
+user's approved Studio account and return `handoffUrl` / `reviewUrl`. The
+website handles verification, preparation, transaction review and publication.
+Do not build another signing page for this supported flow. Read
+`keel://mcp/studio-wallet-review` or the
+[wallet-review guide](../../docs/KEEL_STUDIO_WALLET_REVIEW.md).
+
 A stdio MCP server for the headless Keel/Keel builder and Fray agent
 workflow. It exposes strict local planning tools, conversational Fray auction
 intake, supported-testnet/faucet guidance, and an optional bounded search of an
 explicit Keel Studio Keel index. It never signs, submits, claims faucet funds,
 or mutates a wallet or chain; wallet output is a canonical request envelope for
-a separate user-approved wallet UI.
+the user-approved wallet review in the Studio website by default.
 
 Inline preparation defaults to the SDK's compact raw-percent graph. Omit the
 carriage override and repositoryRoot: the packaged canonical shell supplies local
@@ -437,3 +446,33 @@ See [runtime module discovery and reuse](../../docs/KEEL_RUNTIME_MODULE_DISCOVER
 ### Native SVG tools
 
 `keel-svg-create` prepares an ordinary SVG renderer from a preset or recipe, with preview and Solidity export. `keel-svg-inspect` checks SVG structure and hidden provenance locally; `keel-svg-call-plan` prepares a read-only contract call. Neither tool claims verification from embedded labels. See [SVG renderer, SDK and editor integration](../../docs/KEEL_SVG_RENDERER.md).
+
+## Optional local plugins
+
+`keel-mcp` loads explicitly installed plugins from `~/.keel/plugins.json`. No project file, remote URL or npm package is automatically executed. Plugins are trusted local code with the same permissions as the server; the workspace helper scopes tool file operations but is not a code sandbox. Restart the MCP host after installing or removing a plugin.
+
+```sh
+# In the engine checkout; writes only the named user registry.
+node tools/plugins.mjs install ./packages/react
+node tools/plugins.mjs install /path/to/private/keel-trailer
+keel-mcp --workspace /path/to/project --self-test
+# Temporary invocation without changing the registry:
+keel-mcp --no-plugins --plugin /path/to/plugin/src/mcp.mjs
+```
+
+`keel-plugins-list` returns installed plugin identities, versions, paths and tools. Configuration schema: `{ "schema": "keel-plugins@1", "plugins": [{ "id": "keel/react", "entry": "/absolute/path/src/mcp.mjs", "enabled": true }] }`. Set `KEEL_MCP_PLUGIN_CONFIG` or `--plugin-config` for an isolated registry; `--no-plugins` disables the default registry. Invalid manifests, API versions, identities and duplicate tool names stop startup with an actionable error. No private trailer dependency is carried by the SDK.
+
+An entry exports `keelPlugin = { apiVersion: 1, id, version, instructions?, tools }`; each tool supplies `descriptor: { name, description, inputSchema: { type: "object", ... } }` and `async run({ workspace }, input)`. Public TypeScript interfaces are exported from `@keel/mcp`. Keep plugin input validation, media requirements and machine-load handling inside its package.
+
+Read-only Ethereum tools may omit `rpcUrl` for the public Sepolia pool or private workspace/env settings. `keel-rpc-check` verifies access and optional receipt history. Exhaustion returns structured `rpc.setup-required` instructions to help configure Alchemy, Infura or QuickNode. See [RPC setup](../../docs/KEEL_RPC_SETUP.md); API keys stay local and no wallet key is needed.
+
+## Connect your agent to Studio
+
+Run `pnpm studio:connect --window --workspace /path/to/project` in the SDK checkout,
+or call `keel-studio-connect` with `operation=start`, open `approveUrl` for the user,
+and call `operation=complete` after approval. Local drafts and staging then use
+the privately saved key automatically. No environment file or Desktop app is
+required. See [the account connection guide](../../docs/KEEL_STUDIO_WALLET_REVIEW.md).
+`--connection-status` prints metadata only; `--import-key` uses a hidden prompt.
+
+Sepolia publication preflight checks the simulator version and transaction capacity with public empty calls on the same retained socket before sending project calldata. Every actual simulation returns its transaction gas envelope; silent RPC gas clamping is a provider limit, not a contract compatibility failure. Never retry a failed program on another backend to manufacture success. Use Hosted Studio receipt recovery and a fresh complete review; Desktop remains optional.

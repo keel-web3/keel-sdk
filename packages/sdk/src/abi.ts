@@ -1969,6 +1969,12 @@ export const vaultRunLootExtractionAbi = [
 ] as const;
 
 export const keelManagerAbi = [
+  "function module(bytes32 moduleId) view returns ((address active,uint64 revision,bool frozen,bytes32 codeHash))",
+  "function resolveModule(bytes32 moduleId) view returns (address active)",
+  "function configureModule(bytes32 moduleId,address activeModule,bytes32 expectedCodeHash)",
+  "function freezeModule(bytes32 moduleId)",
+  "event ModuleConfigured(bytes32 indexed moduleId,address indexed previousModule,address indexed activeModule,uint64 revision,bytes32 codeHash)",
+  "event ModuleFrozen(bytes32 indexed moduleId,address indexed activeModule,uint64 revision)",
   "function systemPauseState() view returns (uint192 flags,uint64 revision)",
   "function pauseSystems(uint192 mask)",
   "function resumeSystems(uint192 mask,uint64 expectedRevision)",

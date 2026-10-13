@@ -1,11 +1,15 @@
 {
   "name": "@keel/sdk",
-  "version": "0.3.0",
+  "version": "0.3.2",
   "description": "Typed campaign builders, EIP-712 payloads, ABIs, and signer-policy helpers for Keel contracts.",
   "type": "module",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "exports": {
+    "./module-runtime": {
+      "types": "./dist/module-runtime.d.ts",
+      "import": "./dist/module-runtime.js"
+    },
     "./decoders/node": {
       "types": "./dist/decoders/node.d.ts",
       "import": "./dist/decoders/node.js"
@@ -294,6 +298,86 @@
     "./module/jsx-dev-runtime": {
       "types": "./dist/module/jsx-runtime.d.ts",
       "import": "./dist/module/jsx-runtime.js"
+    },
+    "./marketplace-reader": {
+      "types": "./dist/marketplace-reader.d.ts",
+      "import": "./dist/marketplace-reader.js"
+    },
+    "./pre-reveal": {
+      "types": "./dist/pre-reveal.d.ts",
+      "import": "./dist/pre-reveal.js"
+    },
+    "./rpc": {
+      "types": "./dist/rpc.d.ts",
+      "import": "./dist/rpc.js"
+    },
+    "./rpc-node": {
+      "types": "./dist/rpc-node.d.ts",
+      "import": "./dist/rpc-node.js"
+    },
+    "./network-index": {
+      "types": "./dist/network-index.d.ts",
+      "import": "./dist/network-index.js"
+    },
+    "./network-node": {
+      "types": "./dist/network-node.d.ts",
+      "import": "./dist/network-node.js"
+    },
+    "./network-verification": {
+      "types": "./dist/network-verification.d.ts",
+      "import": "./dist/network-verification.js"
+    },
+    "./studio-connection-node": {
+      "types": "./dist/studio-connection-node.d.ts",
+      "import": "./dist/studio-connection-node.js"
+    },
+    "./studio-access": {
+      "types": "./dist/studio-access.d.ts",
+      "import": "./dist/studio-access.js"
+    },
+    "./studio-project-planner": {
+      "types": "./dist/studio-project-planner.d.ts",
+      "import": "./dist/studio-project-planner.js"
+    },
+    "./publication-preflight": {
+      "types": "./dist/publication-preflight.d.ts",
+      "import": "./dist/publication-preflight.js"
+    },
+    "./studio-project-intake": {
+      "types": "./dist/studio-project-intake.d.ts",
+      "import": "./dist/studio-project-intake.js"
+    },
+    "./studio-project-defaults": {
+      "types": "./dist/studio-project-defaults.d.ts",
+      "import": "./dist/studio-project-defaults.js"
+    },
+    "./studio-project-profiles": {
+      "types": "./dist/studio-project-profiles.d.ts",
+      "import": "./dist/studio-project-profiles.js"
+    },
+    "./studio-execution-authority": {
+      "types": "./dist/studio-execution-authority.d.ts",
+      "import": "./dist/studio-execution-authority.js"
+    },
+    "./rpc-read-manifest": {
+      "types": "./dist/rpc-read-manifest.d.ts",
+      "import": "./dist/rpc-read-manifest.js"
+    },
+    "./signature-privacy": {
+      "types": "./dist/signature-privacy.d.ts",
+      "import": "./dist/signature-privacy.js"
+    },
+    "./release-wallet-batch": {
+      "types": "./dist/release-wallet-batch.d.ts",
+      "import": "./dist/release-wallet-batch.js"
+    },
+    "./transaction-gas-policy": {
+      "types": "./dist/transaction-gas-policy.d.ts",
+      "import": "./dist/transaction-gas-policy.js"
+    },
+    "./sepolia-simulation-transport": {
+      "types": "./dist/sepolia-simulation-transport.d.ts",
+      "import": "./dist/sepolia-simulation-transport.js"
     }
   },
   "files": [
@@ -315,6 +399,7 @@
     "@keel/viewer": "workspace:*",
     "@noble/hashes": "1.8.0",
     "esbuild": "0.28.2",
+    "terser": "5.44.0",
     "viem": "^2.38.0"
   },
   "devDependencies": {

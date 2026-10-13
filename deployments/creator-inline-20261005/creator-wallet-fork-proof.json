@@ -1,0 +1,11 @@
+{
+  "status": "creator-own-wallet-mint-and-exact-readback-verified",
+  "chainId": 31337,
+  "creator": "0xe46EdF1E2A43E05c84e4Fb7C1391C0A1a7e87940",
+  "platformWalletUsed": false,
+  "collection": "0x6de3139D1F2b5FB7a7361262194c6D719336E859",
+  "tokenId": "1",
+  "mintTransaction": "0x2af76016c6283a22a4fdbb8820a800fbc7846e2d1e14e96e752f5fb860e7b2a6",
+  "automaticPreparation": true,
+  "completeTokenURIBytes": 193049
+}

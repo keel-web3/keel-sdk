@@ -102,7 +102,7 @@ test("MCP rejects padded raw LZMA labeled as a prepared Base64 body", async t =>
 
 test("handshake, preflight, resource and tool discovery expose the same copy policy", async t => {
   const { dir, server, init, call } = await fixture(t);
-  assert.match(init.result.instructions, /^Existing onchain objects come first/);
+  assert.match(init.result.instructions, /Existing onchain objects come first/);
   assert.match(init.result.instructions, /preparedTokenURI\/preEncodedTokenURI/);
   await mkdir(path.join(dir, "docs"));
   await writeFile(path.join(dir, "README.md"), "Test workspace");
@@ -125,7 +125,7 @@ test("handshake, preflight, resource and tool discovery expose the same copy pol
 test("distributed MCP skill includes its exact prepared-copy documentation", async () => {
   const skill = await readFile(new URL("../packages/mcp/dist/skills/keel-sdk-mcp/SKILL.md", import.meta.url), "utf8");
   assert.match(skill, /\.\.\/\.\.\/docs\/KEEL_PREPARED_COPY_ASSEMBLY\.md/);
-  for (const name of ["KEEL_PREPARED_COPY_ASSEMBLY.md", "KEEL_PRESENTATION.md", "KEEL_OBJECT_STORAGE_FOR_CHEAP_READS.md"]) {
+  for (const name of ["KEEL_PREPARED_DENSE_COPY.md", "KEEL_PREPARED_COPY_ASSEMBLY.md", "KEEL_PRESENTATION.md", "KEEL_OBJECT_STORAGE_FOR_CHEAP_READS.md"]) {
     const packaged = await readFile(new URL(`../packages/mcp/dist/docs/${name}`, import.meta.url));
     const canonical = await readFile(new URL(`../docs/${name}`, import.meta.url));
     assert.deepEqual(packaged, canonical, name);

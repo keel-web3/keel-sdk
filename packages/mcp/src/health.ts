@@ -1,3 +1,4 @@
+import type { McpPluginOptions } from "./plugins.js";
 import { createMcpServer } from "./server.js";
 import {
   MCP_PROTOCOL_VERSION,
@@ -41,8 +42,8 @@ function toolNames(value: unknown): readonly string[] {
   return names;
 }
 
-export async function runMcpSelfTest(workspaceRoot = "."): Promise<McpSelfTestResult> {
-  const server = await createMcpServer({ workspaceRoot });
+export async function runMcpSelfTest(workspaceRoot = ".", options: McpPluginOptions = {}): Promise<McpSelfTestResult> {
+  const server = await createMcpServer({ workspaceRoot, ...options });
   resultObject(await server.handle({ jsonrpc: "2.0", id: 1, method: "initialize", params: INITIALIZE_PARAMS }), "initialize");
   resultObject(await server.handle({ jsonrpc: "2.0", id: 2, method: "ping", params: {} }), "ping");
   const listed = resultObject(await server.handle({ jsonrpc: "2.0", id: 3, method: "tools/list", params: {} }), "tools/list");

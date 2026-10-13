@@ -51,6 +51,35 @@ test('raw-percent and percent infer exact existing carriages without repadding',
  }
 });
 
+test('existing URI81 registrations retain RFC-valid literals and exact object bytes',async()=>{
+ const {KEEL_URI81_ALPHABET,toKeelDenseTransportDataURL}=await import('../packages/sdk/dist/dense-transport.js');
+ const text='<script>globalThis.carrier='+JSON.stringify(KEEL_URI81_ALPHABET)+';</script>';
+ const escape=(s,kind)=>toKeelDenseTransportDataURL(kind,s).split(',').slice(1).join(',');
+ const prepared=bytes(escape(escape(text,'html'),'metadata'));
+ assert.ok(Buffer.from(prepared).toString().includes("?"));
+ assert.ok(Buffer.from(prepared).toString().includes("&"));
+ assert.ok(Buffer.from(prepared).toString().includes("'"));
+ const {existingParts}=await fixture();
+ existingParts[1]={...existingParts[1],bytes:prepared,integrity:integrity(prepared),carrier:{...existingParts[1].carrier,storedByteLength:prepared.length}};
+ const inspected=await inspect(existingParts);
+ assert.equal(inspected.newSourcePublicationBytes,0);
+ assert.deepEqual(inspected.root.parts[1].bytes,bytes(text));
+ const graph=await sdk.buildKeelInlineTokenURIGraph(inspected.root,{existingParts,existingObjectReuse:scope});
+ assert.deepEqual(graph.parts[1].bytes,prepared);
+ assert.equal(graph.creatorPublicationBytes,0);
+ const full=await sdk.buildKeelPreparedOneOfOneTokenURI({graph,chainId:scope.chainId,collection:scope.store,
+  collectionName:'URI81 reuse',description:'Exact registered carrier',manifestURI:'',manifestDigest:integrity(prepared).digest,
+  presentationPolicy:'raw-artifact',
+  imageURI:sdk.buildKeelInlineImageURI(bytes('<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16"><rect width="16" height="16" fill="blue"/></svg>'),'image/svg+xml')});
+ const metadata=JSON.parse(decodeURIComponent(full.tokenURI.split(',').slice(1).join(',')));
+ assert.ok(decodeURIComponent(metadata.animation_url.split(',').slice(1).join(',')).includes(text));
+ for(const bad of ['#','[',']','"','\\','<','>','%zz','%3f','%']) {
+  const altered=clone(existingParts);const b=bytes('A'+bad+'B');
+  altered[1]={...altered[1],bytes:b,integrity:integrity(b),carrier:{...altered[1].carrier,storedByteLength:b.length}};
+  await assert.rejects(inspect(altered),/unsafe literal|percent escape/);
+ }
+});
+
 test('full shell plus prepared body media infers follow-latest and preserves body IDs',async()=>{
  const {existingParts}=await fixture('pinned');
  for(const p of existingParts.slice(1,-1))p.carrier.mediaType='application/vnd.keel.token-uri-base64-body-fragment';
