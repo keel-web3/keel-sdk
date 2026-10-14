@@ -3,3 +3,4 @@
 export * from "./creator-prepared-route.js";
 export * from "./creator-prepared-compiler.js";
 export * from "./creator-publication-journal.js";
+export * from "./prepared-inline-sources.js";

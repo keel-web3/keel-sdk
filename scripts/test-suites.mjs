@@ -7,6 +7,7 @@ const TEST_ROOT = resolve(import.meta.dirname, "../tests");
 export const BROWSER_TEST_FILES = Object.freeze([
   "tests/sdk-verification-wrap-offline-browser.test.mjs",
   "tests/sdk-prepared-dense-copy-browser.test.mjs",
+  "tests/sdk-studio-plan-viewer-browser.test.mjs",
   "tests/sdk-verification-shell-browser.test.mjs",
   "tests/sdk-verification-shell-large-graph-browser.test.mjs",
   "tests/link-assembly-browser.test.mjs",
@@ -60,6 +61,10 @@ export const DETERMINISTIC_TEST_FILES = Object.freeze([
   "tests/creator-publication-journal.test.mjs",
   "tests/rpc-publication-simulation.test.mjs",
   "tests/creator-prepared-compiler.test.mjs",
+  "tests/sdk-studio-plan-near-uri-limit.test.mjs",
+  "tests/sdk-studio-plan-public-read.test.mjs",
+  "tests/sdk-studio-plan-source-read.test.mjs",
+  "tests/sdk-studio-plan-upload-contract.test.mjs",
   "tests/mcp-studio-wallet-default.test.mjs",
   "tests/sdk-network-index.test.mjs",
   "tests/sdk-rpc.test.mjs",

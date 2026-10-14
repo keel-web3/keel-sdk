@@ -1,0 +1,114 @@
+{
+  "sourceHead": "cb09f0b1c33b5b278e6366b4214e5199afa0e060",
+  "results": [
+    {
+      "package": "protocol",
+      "command": [
+        "node",
+        "node_modules/typescript/bin/tsc",
+        "-p",
+        "packages/protocol/tsconfig.json",
+        "--noEmit"
+      ],
+      "exitCode": 0,
+      "elapsedSeconds": 16.384
+    },
+    {
+      "package": "viewer",
+      "command": [
+        "node",
+        "node_modules/typescript/bin/tsc",
+        "-p",
+        "packages/viewer/tsconfig.json",
+        "--noEmit"
+      ],
+      "exitCode": 0,
+      "elapsedSeconds": 14.48
+    },
+    {
+      "package": "sdk",
+      "command": [
+        "node",
+        "node_modules/typescript/bin/tsc",
+        "-p",
+        "packages/sdk/tsconfig.json",
+        "--noEmit"
+      ],
+      "exitCode": 0,
+      "elapsedSeconds": 251.288
+    },
+    {
+      "package": "builder",
+      "command": [
+        "node",
+        "node_modules/typescript/bin/tsc",
+        "-p",
+        "packages/builder/tsconfig.json",
+        "--noEmit"
+      ],
+      "exitCode": 0,
+      "elapsedSeconds": 46.816
+    },
+    {
+      "package": "ethereum-adapter",
+      "command": [
+        "node",
+        "node_modules/typescript/bin/tsc",
+        "-p",
+        "packages/ethereum-adapter/tsconfig.json",
+        "--noEmit"
+      ],
+      "exitCode": 0,
+      "elapsedSeconds": 60.473
+    },
+    {
+      "package": "mcp",
+      "command": [
+        "node",
+        "node_modules/typescript/bin/tsc",
+        "-p",
+        "packages/mcp/tsconfig.json",
+        "--noEmit"
+      ],
+      "exitCode": 0,
+      "elapsedSeconds": 40.609
+    },
+    {
+      "package": "sprite-codex",
+      "command": [
+        "node",
+        "node_modules/typescript/bin/tsc",
+        "-p",
+        "packages/sprite-codex/tsconfig.json",
+        "--noEmit"
+      ],
+      "exitCode": 0,
+      "elapsedSeconds": 33.626
+    },
+    {
+      "package": "studio-core",
+      "command": [
+        "node",
+        "node_modules/typescript/bin/tsc",
+        "-p",
+        "packages/studio-core/tsconfig.json",
+        "--noEmit"
+      ],
+      "exitCode": 0,
+      "elapsedSeconds": 50.056
+    },
+    {
+      "package": "sandbox-sdk",
+      "command": [
+        "node",
+        "node_modules/typescript/bin/tsc",
+        "-p",
+        "packages/sandbox-sdk/tsconfig.json",
+        "--noEmit"
+      ],
+      "exitCode": 0,
+      "elapsedSeconds": 80.018
+    }
+  ],
+  "phase": "Initial resumed-source check, preceding the final snapshot and descriptor-order fixes. Final SDK emit and MCP check are listed separately."
+}

@@ -1,0 +1,52 @@
+{
+  "runtime": {
+    "node": "22.23.1",
+    "typescript": "5.9.3",
+    "chromium": "151.0.7922.173"
+  },
+  "workingDirectory": "SDK checkout root",
+  "commands": [
+    {
+      "command": "node node_modules/typescript/bin/tsc -p packages/sdk/tsconfig.json",
+      "exitCode": 0,
+      "qualification": "Normal TypeScript package build with JS/declaration emit after final outer-auth fix; no clean."
+    },
+    {
+      "command": "node node_modules/typescript/bin/tsc -p packages/mcp/tsconfig.json --noEmit",
+      "exitCode": 0
+    },
+    {
+      "command": "node --test --test-concurrency=2 tests/copy-publication-enforcement.test.mjs tests/creator-prepared-inline.test.mjs tests/creator-prepared-route.test.mjs tests/creator-prepared-compiler.test.mjs tests/creator-owned-shell.test.mjs tests/sdk-inline-existing-object-reuse.test.mjs tests/mcp-prepared-copy.test.mjs tests/sdk-studio-plan-near-uri-limit.test.mjs tests/sdk-studio-plan-public-read.test.mjs tests/sdk-studio-plan-source-read.test.mjs tests/sdk-studio-plan-upload-contract.test.mjs tests/test-suite-classification.test.mjs",
+      "exitCode": 0,
+      "tests": 75,
+      "pass": 75,
+      "fail": 0,
+      "skipped": 0,
+      "cancelled": 0
+    },
+    {
+      "command": "KEEL_BROWSER_STARTUP_TIMEOUT_MS=30000 node --test --test-concurrency=1 tests/sdk-studio-plan-viewer-browser.test.mjs tests/sdk-verification-wrap-offline-browser.test.mjs",
+      "exitCode": 0,
+      "tests": 5,
+      "pass": 5,
+      "fail": 0,
+      "skipped": 0,
+      "cancelled": 0
+    }
+  ],
+  "probes": {
+    "canonicalShellComponents": {
+      "verified": 3,
+      "byteIdenticalToBaseline": true
+    },
+    "actualMcpAdapters": {
+      "cases": 3,
+      "pass": 3,
+      "fixtureRequests": 1
+    }
+  },
+  "sourceFrozen": true,
+  "signing": "not-performed",
+  "submission": "not-performed",
+  "deployment": "not-performed"
+}

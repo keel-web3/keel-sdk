@@ -5,6 +5,12 @@ modular files for the modern creator renderer. Compression, carriage, escaping
 and the decoder shell are automatic. The SDK keeps separate HTML, JavaScript,
 CSS and asset files; the viewer reconstructs their exact bytes before execution.
 
+Fresh preparation retains original source bytes and inventory order while emitting
+JavaScript module descriptors in dependency-first playback order for the existing
+registered loader. Its supported static imports, side-effect imports and named
+re-exports resolve against declared IDs and aliases. Unsupported cyclic or
+undeclared imports fail before storage planning; they do not select another shell.
+
 New files use Brotli when it saves bytes, otherwise none, followed by Base90-v1
 and the escaping required by JSON, HTML, data URIs and the deployed COPY reader.
 The shell's boot literals use gzip and Base64. Browser-native `DecompressionStream`
@@ -82,6 +88,11 @@ const plan = await prepareKeelCreatorInline({
 
 The unsigned plan does not sign or submit. Use the normal SDK/wallet publication
 workflow; preparation never bypasses source, URI, browser or wallet gates.
+`preparedBytesBeforeLiveEnvelope` is a proven fragment lower bound. Its 65,536-byte
+envelope reserve is reported as `provisionalTokenURIBudget`, not used to reject a
+potentially fitting work. The compiler and complete-return check still reject
+an actual complete URI above 2,000,000 bytes or an incompatible selected-chain
+read. A source-only plan retains `completeTokenURIBytes: null`.
 Complete Inline defaults at or below 2,000,000 returned bytes when the selected
 chain's call fits. An over-limit plan fails instead of silently selecting Hybrid.
 

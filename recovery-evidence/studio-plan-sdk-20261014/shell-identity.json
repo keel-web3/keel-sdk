@@ -1,0 +1,20 @@
+{
+  "componentsVerified": 3,
+  "canonicalShellUnchanged": true,
+  "hashes": {
+    "prefix": {
+      "bytes": 107,
+      "sha256": "4c8a95566a16a19875b1f054abf5e1ecc319f92ae46ae46ac67fa39f7837d4c4"
+    },
+    "containerBridge": {
+      "bytes": 33,
+      "sha256": "b6ddb358a5a3bb50191323545c6341cf949f6b233b18852fecf25dd566c0fa5f"
+    },
+    "suffix": {
+      "bytes": 188877,
+      "sha256": "1bd5af10fa7af8efc5b82a4a26a841580e7f4ebcdb3e7e51721fb1d557f54529"
+    }
+  },
+  "qualification": "Local approved-baseline byte identity, not current selected-chain registry authentication.",
+  "baselineCommit": "cb09f0b1c33b5b278e6366b4214e5199afa0e060"
+}

@@ -17,7 +17,9 @@ export function pageRequestsFromNetLog(log,origin) {
 
 /** Isolated browser, loopback fixture only. External page requests are blocked
  * before transmission and recorded, so a negative control tests the observer. */
-export async function observeOfflineShell(html, terminalState='verified', expectedSignal) {
+export async function observeOfflineShell(html, terminalState='verified', expectedSignal, options={}) {
+  const startupTimeout=Number(process.env.KEEL_BROWSER_STARTUP_TIMEOUT_MS??10000);
+  assert.ok(Number.isSafeInteger(startupTimeout)&&startupTimeout>0&&startupTimeout<=60000,'Browser startup timeout must be bounded to 60 seconds');
   let binary;
   for (const candidate of [process.env.KEEL_CHROME_HEADLESS_SHELL,process.env.CHROMIUM_PATH,'/usr/bin/google-chrome','/usr/bin/chromium'].filter(Boolean)) {
     if(await stat(candidate).then(s=>s.isFile(),()=>false)){binary=candidate;break;}
@@ -40,11 +42,11 @@ export async function observeOfflineShell(html, terminalState='verified', expect
   browserProxy.on('connect',(_request,socket)=>socket.end('HTTP/1.1 502 Blocked\r\nConnection: close\r\n\r\n'));
   browserProxy.listen(0,'127.0.0.1');await once(browserProxy,'listening');
   const netlogPath=path.join(profile,'network.json');
-  const child=spawn(binary,['--headless','--no-sandbox','--disable-dev-shm-usage','--disable-background-networking','--disable-component-update','--disable-domain-reliability','--disable-sync','--disable-default-apps','--disable-extensions','--no-first-run','--no-default-browser-check','--host-resolver-rules=MAP * ~NOTFOUND, EXCLUDE 127.0.0.1, EXCLUDE localhost',`--proxy-server=http://127.0.0.1:${browserProxy.address().port}`,'--remote-debugging-port=0',`--log-net-log=${netlogPath}`,`--user-data-dir=${profile}`,'about:blank'],{stdio:['ignore','ignore','pipe']});
+  const child=spawn(binary,['--headless','--no-sandbox','--disable-dev-shm-usage','--disable-background-networking','--disable-client-side-phishing-detection','--disable-features=OptimizationHints,MediaRouter,AutofillServerCommunication,PreconnectToSearch,SearchEnginePreconnect','--safebrowsing-disable-auto-update','--disable-component-update','--disable-domain-reliability','--disable-sync','--disable-default-apps','--disable-extensions','--no-first-run','--no-default-browser-check','--host-resolver-rules=MAP * ~NOTFOUND, EXCLUDE 127.0.0.1, EXCLUDE localhost',`--proxy-server=http://127.0.0.1:${browserProxy.address().port}`,'--remote-debugging-port=0',`--log-net-log=${netlogPath}`,`--user-data-dir=${profile}`,'about:blank'],{stdio:['ignore','ignore','pipe']});
   let socket,sequence=0;const pending=new Map(),attempts=[],errors=[];
   try {
     const endpoint=await new Promise((resolve,reject)=>{
-      let stderr='';const timer=setTimeout(()=>reject(new Error('Chromium debugging endpoint timed out')),10000);
+      let stderr='';const timer=setTimeout(()=>reject(new Error('Chromium debugging endpoint timed out')),startupTimeout);
       child.on('error',error=>{clearTimeout(timer);reject(error);});
       child.stderr.on('data',chunk=>{stderr+=chunk.toString();const match=/DevTools listening on (ws:\/\/127\.0\.0\.1:\d+\/\S+)/u.exec(stderr);if(match){clearTimeout(timer);resolve(match[1]);}});
       child.on('exit',code=>{clearTimeout(timer);reject(new Error(`Chromium exited before qualification: ${code}`));});
@@ -81,7 +83,13 @@ export async function observeOfflineShell(html, terminalState='verified', expect
     const {targetId}=await command('Target.createTarget',{url:'about:blank',browserContextId});
     const {sessionId}=await command('Target.attachToTarget',{targetId,flatten:true});
     await command('Page.enable',{},sessionId);await observeTarget(sessionId);
-    await command('Page.addScriptToEvaluateOnNewDocument',{source:'window.__keelOfflineSignals=[];window.addEventListener("message",event=>{if(event.data?.keelOfflineProbe)window.__keelOfflineSignals.push(event.data.keelOfflineProbe);});'},sessionId);
+    // Prepared boot replaces the document with document.open/write. That clears
+    // window event listeners; retain the test observer without changing artwork
+    // bytes, decoder behavior, verification, or the browser's network policy.
+    const observer=options.retainSignalsAcrossDocumentOpen
+      ? '(()=>{window.__keelOfflineSignals=[];const record=event=>{if(event.data?.keelOfflineProbe)window.__keelOfflineSignals.push(event.data.keelOfflineProbe)};window.addEventListener("message",record);const open=Document.prototype.open;Document.prototype.open=function(...args){const result=open.apply(this,args);window.addEventListener("message",record);return result;};})();'
+      : 'window.__keelOfflineSignals=[];window.addEventListener("message",event=>{if(event.data?.keelOfflineProbe)window.__keelOfflineSignals.push(event.data.keelOfflineProbe);});';
+    await command('Page.addScriptToEvaluateOnNewDocument',{source:observer},sessionId);
     await command('Page.navigate',{url:origin},sessionId);
     const expression=`({state:document.body?.dataset.verification,signals:window.__keelOfflineSignals,frames:document.querySelectorAll('iframe').length,loading:!!document.querySelector('#keel-status'),seal:!!document.querySelector('#verify-seal'),opaque:[...document.querySelectorAll('iframe')].every(f=>f.sandbox.contains('allow-scripts')&&!f.sandbox.contains('allow-same-origin'))})`;
     let result;

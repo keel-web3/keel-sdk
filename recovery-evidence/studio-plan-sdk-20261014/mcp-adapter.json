@@ -1,0 +1,9 @@
+{
+  "cases": 3,
+  "pass": 3,
+  "fixtureRequests": 1,
+  "signing": "not-performed",
+  "submission": "not-performed",
+  "qualification": "Local in-process actual MCP adapter with synthetic grant and mocked Studio fetch; no live account or publication proof.",
+  "baselineCommit": "cb09f0b1c33b5b278e6366b4214e5199afa0e060"
+}

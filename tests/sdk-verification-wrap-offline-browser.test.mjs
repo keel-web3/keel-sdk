@@ -12,7 +12,7 @@ test('network attribution keeps opaque and unknown initiators and never exempts 
   assert.throws(()=>pageRequestsFromNetLog({constants:{},events:[]},'http://localhost'));
 });
 
-test('maintained wrapper renders committed modules without external requests and rejects tampering before mounting', {timeout:60000}, async()=>{
+test('maintained wrapper renders committed modules without external requests and rejects tampering before mounting', {timeout:180000}, async()=>{
   const result=await wrapInVerificationShell({repositoryRoot:process.cwd(),title:'Offline wrapper assurance',
     entry:{mediaType:'text/html',source:'<!doctype html><html><body><canvas></canvas><script type="module">import {color} from "/content/palette.js";document.body.style.background=color;parent.postMessage({keelOfflineProbe:"palette-loaded"},"*");</script></body></html>'},
     assets:[{id:'palette',mediaType:'text/javascript',aliases:['/content/palette.js'],bytes:new TextEncoder().encode('export const color="#d7ff63";')}]});
