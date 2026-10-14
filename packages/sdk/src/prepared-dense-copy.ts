@@ -1,3 +1,4 @@
+import { keelPreparedDenseCopyBootSuffix } from "./prepared-dense-framing.js";
 import { gzipSync, gunzipSync, brotliCompressSync, brotliDecompressSync, constants } from "node:zlib";
 import { createHash } from "node:crypto";
 import { transform } from "esbuild";
@@ -62,12 +63,13 @@ export async function buildKeelPreparedDenseCopyShell(input: Parameters<typeof b
   readonly gzipCompressor?: (bytes: Uint8Array) => Uint8Array | Promise<Uint8Array>;
 }) {
   const { context, shellBootCompression = "gzip", itemDescriptorCarriage = "json", gzipCompressor, ...options } = input;
+  if (options.legacyPreparedDenseDelivery && (context !== undefined || itemDescriptorCarriage !== "json" || options.binaryPayloadCarriage !== undefined)) throw new TypeError("Legacy prepared COPY uses the actual appended collection context and its distinct Base90 descriptor profile.");
   if (!["json","columns-v1"].includes(itemDescriptorCarriage)) throw new TypeError("Unknown descriptor carriage");
   if (gzipCompressor && shellBootCompression !== "gzip") throw new TypeError("Gzip compressor requires gzip boot");
   if (shellBootCompression !== "gzip" && shellBootCompression !== "none") throw new TypeError("Unsupported shell boot compression.");
   const carriage = options.binaryPayloadCarriage ?? "base90";
   if (!["base90", "base91", "base90-block", "uri81"].includes(carriage)) throw new TypeError("Prepared dense COPY requires an explicit dense payload format.");
-  const canonical = await buildCompactInlineKeelShell({ ...options, codecProfile: options.codecProfile ?? "brotli-js", binaryPayloadCarriage: carriage });
+  const canonical = await buildCompactInlineKeelShell({ ...options, codecProfile: options.codecProfile ?? "brotli-js", ...(options.legacyPreparedDenseDelivery ? {} : { binaryPayloadCarriage: carriage }) });
   if (!canonical.containerBridge) throw new TypeError("Prepared dense COPY requires embedded container delivery.");
   const prefix = Buffer.from('<!doctype html><html><head><meta charset="utf-8"></head><body><script>'
     + (context ? 'globalThis.__KEEL_CONTEXT__=' + serializeKeelDenseTransportJSON(context) + ';' : '')
@@ -85,12 +87,7 @@ export async function buildKeelPreparedDenseCopyShell(input: Parameters<typeof b
   const canonicalSuffix=unpack?Buffer.concat([Buffer.from('];'+unpack),canonical.suffix.subarray(2)]):canonical.suffix;
   const suffix64 = await pack(canonicalSuffix);
   const bridge = Buffer.from(canonical.containerBridge).toString("utf8");
-  const suffix = Buffer.from('];queueMicrotask(async()=>{const safe=v=>JSON.stringify(v).replace(/<(?=\\/script|script|!--)/giu,"\\\\u003c").replaceAll("\\u2028","\\\\u2028").replaceAll("\\u2029","\\\\u2029");'
-    + (shellBootCompression === "gzip"
-      ? 'const bootCompression="gzip";const utf8=async s=>new TextDecoder().decode(await new Response(new Blob([Uint8Array.from(atob(s),c=>c.charCodeAt(0))]).stream().pipeThrough(new DecompressionStream("gzip"))).arrayBuffer());'
-      : 'const utf8=s=>new TextDecoder().decode(Uint8Array.from(atob(s),c=>c.charCodeAt(0)));')
-    + 'const html=(await utf8(' + JSON.stringify(prefix64) + '))+safe(__KEEL_PREPARED_DENSE_PACKS__).slice(1,-1)+' + JSON.stringify(bridge)
-    + '+safe(globalThis.__KEEL_ITEMS__).slice(5,-1)+(await utf8(' + JSON.stringify(suffix64) + '));document.open();document.write(html);document.close()});</script></body></html>');
+  const suffix = Buffer.from(keelPreparedDenseCopyBootSuffix(prefix64, suffix64, bridge, shellBootCompression, !!options.legacyPreparedDenseDelivery));
   const commitment = (bytes: Uint8Array) => { const hash = createHash("sha256"); hash.update(bytes); return {algorithm: "sha256" as const, digest: `0x${hash.digest("hex")}` as const, byteLength: bytes.byteLength}; };
   return { ...canonical, prefix, suffix, prefixIntegrity: commitment(prefix), suffixIntegrity: commitment(suffix), canonicalPrefixIntegrity: canonical.prefixIntegrity,
     canonicalSuffixIntegrity: commitment(canonicalSuffix), shellBootEncoding: "base64" as const, shellBootCompression, itemDescriptorCarriage,
