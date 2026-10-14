@@ -658,6 +658,28 @@ test("sandbox wraps doctype-only HTML so CSP cannot be skipped", async () => {
   assert.ok(sandbox.html.includes("<html>"));
 });
 
+test("source playback can preserve literal reader aliases without changing the verified gateway or sandbox", async () => {
+  const value = await manifest();
+  value.resources[0] = await inline("viewer", "entrypoint", "text/html",
+    '<!doctype html><script>globalThis.image=__KEEL_CONTENT__.bytes("poster.png");globalThis.moduleText=__KEEL_CONTENT__.text("p5");</script>', true);
+  value.resources[1].aliases = [...value.resources[1].aliases, "poster.png", "p5"];
+  const artifact = await resolveArtifact(value);
+  const normal = createSandboxDocument(artifact);
+  const source = createSandboxDocument(artifact, { materializeResourceUrls: false });
+  assert.equal(normal.html.includes('__KEEL_CONTENT__.bytes("poster.png")'), false);
+  assert.equal(normal.html.includes('__KEEL_CONTENT__.text("p5")'), false);
+  assert.ok(source.html.includes('__KEEL_CONTENT__.bytes("poster.png")'));
+  assert.ok(source.html.includes('__KEEL_CONTENT__.text("p5")'));
+  assert.equal(source.csp, normal.csp);
+  assert.deepEqual(source.sandboxTokens, normal.sandboxTokens);
+  const gateway = createVerifiedContentGateway(artifact);
+  for (const alias of ["poster.png", "p5"]) {
+    const result = gateway.resolve(alias);
+    assert.equal(result.status, 200);
+    assert.deepEqual(result.body, artifact.resources.get("image").bytes);
+  }
+});
+
 test("sandbox materializes static virtual routes and blocks all raw creator networking", async () => {
   const artifact = await resolveArtifact(await manifest());
   const sandbox = createSandboxDocument(artifact);

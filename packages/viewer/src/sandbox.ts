@@ -42,6 +42,7 @@ interface Materializer {
   readonly cache: Map<string, string>;
   readonly artifact: ResolvedArtifact;
   readonly aliasMap: ReadonlyMap<string, string>;
+  readonly materializeResourceUrls: boolean;
 }
 
 function materializeResource(materializer: Materializer, id: string, active: ReadonlySet<string>): string | undefined {
@@ -70,6 +71,7 @@ function materializeResource(materializer: Materializer, id: string, active: Rea
 }
 
 function replaceResourceUrls(input: string, materializer: Materializer, active: ReadonlySet<string>): string {
+  if (!materializer.materializeResourceUrls) return input;
   let output = input;
   const aliases = [...materializer.aliasMap.keys()].sort((left, right) => right.length - left.length);
   for (const alias of aliases) {
@@ -904,7 +906,7 @@ function mediaDataUrl(resource: ResolvedResource): string {
 export function createSandboxDocument(artifact: ResolvedArtifact, options: SandboxOptions = {}): SandboxDocument {
   const warnings: string[] = [];
   const gateway = createVerifiedContentGateway(artifact);
-  const materializer: Materializer = { artifact, warnings, cache: new Map(), aliasMap: aliasMap(artifact) };
+  const materializer: Materializer = { artifact, warnings, cache: new Map(), aliasMap: aliasMap(artifact), materializeResourceUrls: options.materializeResourceUrls !== false };
   const mode = artifact.manifest.entrypoint.mode;
   const entry = artifact.entrypoint;
   const capabilities = resolveCapabilities(artifact, options.capabilityCeiling);
