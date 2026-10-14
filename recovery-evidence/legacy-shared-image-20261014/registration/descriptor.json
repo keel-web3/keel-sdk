@@ -1,0 +1,68 @@
+{
+  "profile": "keel.legacy-prepared-dense-shared-image@1",
+  "shellId": "0x23d9e794f357e45faa652d38af73844f452295a12300b5a0ffe2ea32edda7e0e",
+  "chainId": 11155111,
+  "bodySchema": "keel.legacy-prepared-dense-packs-and-native-image@1",
+  "contextSchema": "keel-context@1:legacy-six-fields",
+  "payloadMode": 2,
+  "requiredRegistry": "Distinct shell identity; existing canonical follow-latest head unchanged",
+  "requiredProgramBuilder": "KeelLegacySharedImageTokenURIBuilder or independently authenticated compatible capability",
+  "programProfile": "keel.legacy-shared-image-copy-program@1",
+  "programMediaType": "application/vnd.keel.legacy-shared-image-copy-program",
+  "builderSourceSHA256": "0x1124ed40b6cac46da59e72f1fe1aae5fd75717218fd8433054d77b963db1b6a0",
+  "builderRuntimeCodeHash": null,
+  "constructorBindings": null,
+  "selectedChainRegistrationVerified": false,
+  "registrationTransactions": "not-created",
+  "signing": "not-performed",
+  "submission": "not-performed",
+  "storePolicy": "Standard builder requires modern Hold requireHarness and seal policy APIs; recorded historical Hold runtime0x077e7511ef8deb6d2c1d56041ee230a1f6ffac4b861bf264c37346835653e0e5 requires a separately authenticated compatible adapter. Missing APIs never authorize it.",
+  "decoderIntegrity": {
+    "algorithm": "sha256",
+    "digest": "0x8f754844d73d726d0152178876bbfc77527ba9bc1ce5b50ed78d72ec40d169ba",
+    "byteLength": 160385
+  },
+  "transportDecoderIntegrity": {
+    "algorithm": "sha256",
+    "digest": "0x55bd265657e4f950d59723f9739c490881410e0c26c0d17793abe3679cca1392",
+    "byteLength": 3928
+  },
+  "canonicalPrefixIntegrity": {
+    "algorithm": "sha256",
+    "digest": "0xf15a55cc1567a24f9aab872d8a419ab285e51642314b90bee386bc6d9b1873e0",
+    "byteLength": 15118
+  },
+  "canonicalSuffixIntegrity": {
+    "algorithm": "sha256",
+    "digest": "0x099d7e06ccb7c4ac618521735f81d1bc1c07ebf8eea6f747e7a888254ebc9c85",
+    "byteLength": 315260
+  },
+  "fragments": {
+    "prefix": {
+      "rawPath": "prefix.raw.html.txt",
+      "rawByteLength": 107,
+      "rawSHA256": "0x4c8a95566a16a19875b1f054abf5e1ecc319f92ae46ae46ac67fa39f7837d4c4",
+      "paddingBytes": 1,
+      "paddedRawSHA256": "0xfb7f6dbaa77a65221e0a89d4d6d4382c2ed290fcba31524b563557444f2a3d34",
+      "preparedPath": "prefix.mode2.preencoded.txt",
+      "preparedByteLength": 192,
+      "preparedSHA256": "0x12056a22409156c0f498ddda102b85525d4e9d0836a8c601d842bc7071364a20",
+      "compactPath": "prefix.compact.raw-percent.fragment",
+      "compactByteLength": 187,
+      "compactSHA256": "0x544649250d343c45e02cc47cffbfc5e663fc61bb696724fb82d033b086b684be"
+    },
+    "suffix": {
+      "rawPath": "suffix.raw.html.txt",
+      "rawByteLength": 190288,
+      "rawSHA256": "0x820a3a0b30106b56daccb1bb070084f06585808a0a29c50ae83171a6b479ac72",
+      "paddingBytes": 8,
+      "paddedRawSHA256": "0x95e364d99c104a4cb454e823f4f2869413672e8304bdad3fff9424feacd226a3",
+      "preparedPath": "suffix.mode2.preencoded.txt",
+      "preparedByteLength": 338304,
+      "preparedSHA256": "0xb8d1829c864300e222425183a8ea274bb16a1bcfd5ab26929a25c16e6420b975",
+      "compactPath": "suffix.compact.raw-percent.fragment",
+      "compactByteLength": 190572,
+      "compactSHA256": "0xa89e204c5d44fefef67b1401a659b7afde69c3260b34c8e402c39abac94ad4a8"
+    }
+  }
+}

@@ -7,6 +7,7 @@ const TEST_ROOT = resolve(import.meta.dirname, "../tests");
 export const BROWSER_TEST_FILES = Object.freeze([
   "tests/sdk-verification-wrap-offline-browser.test.mjs",
   "tests/sdk-prepared-dense-copy-browser.test.mjs",
+  "tests/sdk-legacy-prepared-dense-browser.test.mjs",
   "tests/sdk-studio-plan-viewer-browser.test.mjs",
   "tests/sdk-verification-shell-browser.test.mjs",
   "tests/sdk-verification-shell-large-graph-browser.test.mjs",
@@ -37,6 +38,14 @@ export const SIBLING_CONFORMANCE_TEST_FILES = Object.freeze([
   "tests/studio-structure-check.test.mjs",
 ]);
 
+/** Compiled local EVM proofs require an already cached Docker Geth image and
+ * the exact local contracts checkout. The combined reader proof also uses an
+ * installed Chromium. No public-network access or signed transactions occur. */
+export const LOCAL_EVM_TEST_FILES = Object.freeze([
+  "tests/sdk-legacy-shared-image-evm-browser.test.mjs",
+  "tests/sdk-legacy-shared-image-hold-policy.test.mjs",
+]);
+
 /** No node:test file is allowed to perform live-chain or public-network work in the ordinary gate. */
 export const LIVE_TEST_FILES = Object.freeze([]);
 
@@ -52,6 +61,10 @@ export const TEST_FILES_ON_DISK = Object.freeze(readdirSync(TEST_ROOT)
  * its execution boundary.
  */
 export const DETERMINISTIC_TEST_FILES = Object.freeze([
+  "tests/sdk-simulation-capacity-policy.test.mjs",
+  "tests/sdk-legacy-prepared-dense-copy.test.mjs",
+  "tests/sdk-legacy-shared-image.test.mjs",
+  "tests/sdk-legacy-shared-image-core.test.mjs",
   "tests/acceptance-boundary-properties.test.mjs",
   "tests/acceptance-media-fixture-parity.test.mjs",
   "tests/acceptance-mcp-route-guards.test.mjs",
@@ -326,6 +339,7 @@ export function validateTestSuiteClassification(testFiles = TEST_FILES_ON_DISK) 
     ...DETERMINISTIC_TEST_FILES,
     ...SIBLING_CONFORMANCE_TEST_FILES,
     ...BROWSER_TEST_FILES,
+    ...LOCAL_EVM_TEST_FILES,
     ...LIVE_TEST_FILES,
   ];
   const duplicates = classified.filter((file, index) => classified.indexOf(file) !== index);
