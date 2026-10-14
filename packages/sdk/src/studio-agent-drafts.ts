@@ -86,6 +86,8 @@ export interface KeelStudioReleaseWalletRejectionRecovery {
 }
 
 export interface KeelStudioStorageReview {
+  readonly automaticContinuation?: true;
+  readonly nextPublication?: KeelStudioReleaseContinuation;
   readonly projectId: string;
   readonly status: "complete" | "approval-required" | "resume" | "pending-approval-receipt" | "blocked" | "failed";
   readonly walletApprovalRequired: boolean;
@@ -226,9 +228,12 @@ export interface KeelStudioReleaseContinuation {
   readonly schema: "keel-release-continuation@1";
   readonly releaseId: string;
   readonly revision: number;
-  readonly status: "review-required" | "owner-observation-required" | "pending" | "blocked" | "published";
+  readonly status: "review-required" | "wallet-approval-required" | "owner-observation-required" | "pending" | "blocked" | "published";
   readonly message: string;
-  readonly nextAction: "prepare-review" | "record-owner-observation" | "reconcile-wallet-response" | "retry-saved-progress" | "view-publication";
+  readonly nextAction: "prepare-review" | "approve-wallet" | "record-owner-observation" | "reconcile-wallet-response" | "retry-saved-progress" | "view-publication";
+  readonly approval?: { readonly operationId: string; readonly preparedDigest: string; readonly reviewPath: string };
+  readonly automaticContinuation?: true;
+  readonly reviewUrl?: string;
   readonly reviewPath: string;
   readonly diagnostic?: KeelStudioReleaseDiagnostics;
   readonly storagePreserved: true;
@@ -497,6 +502,27 @@ export function studioAgentRequest(options: KeelStudioAgentDraftClientOptions, p
  * Creates a wallet-neutral client for creator-authorized draft work. It cannot
  * sign, submit or cancel a chain operation. Continuation can reconcile already saved receipts. prepareReview saves only an unsigned owner-review operation through Studio.
  */
+function reviewedPublicationContinuation(value: KeelStudioReleaseContinuation, releaseId: string, expectedRevision: number, studioUrl: string | URL): KeelStudioReleaseContinuation {
+    const actions = { "review-required": ["prepare-review"], "wallet-approval-required": ["approve-wallet"], "owner-observation-required": ["record-owner-observation"],
+      pending: ["retry-saved-progress", "reconcile-wallet-response"], blocked: ["retry-saved-progress"], published: ["view-publication"] };
+    if (!value || value.schema !== "keel-release-continuation@1" || value.releaseId !== releaseId || value.revision !== expectedRevision
+      || "preparation" in value || "walletAttempt" in value
+      || !Object.hasOwn(actions, value.status) || !actions[value.status].includes(value.nextAction)
+      || value.reviewPath !== `/studio/releases/${encodeURIComponent(releaseId)}` || typeof value.message !== "string"
+      || value.storagePreserved !== true || value.uploadedBytes !== 0 || value.signing !== "not-performed" || value.submission !== "not-performed"
+      || value.diagnostic && (value.diagnostic.releaseId !== releaseId || value.diagnostic.revision !== expectedRevision || value.diagnostic.metadataReadCall !== undefined)) {
+      throw new TypeError("Studio returned invalid saved publication progress.");
+    }
+    if (value.status === "wallet-approval-required") {
+      const approval = value.approval;
+      if (!approval || !/^[0-9a-f]{8}(?:-[0-9a-f]{4}){3}-[0-9a-f]{12}$/iu.test(approval.operationId)
+        || !/^0x[0-9a-f]{64}$/iu.test(approval.preparedDigest)
+        || approval.reviewPath !== `/studio/releases/${releaseId}/review?operation=${approval.operationId}&revision=${expectedRevision}`) throw new TypeError("Studio returned an invalid next wallet approval identity.");
+      return { ...value, reviewUrl: endpoint(studioUrl, approval.reviewPath).href };
+    }
+    return value;
+}
+
 export function createKeelStudioAgentDraftClient(options: KeelStudioAgentDraftClientOptions) {
   if (options === null || typeof options !== "object") throw new TypeError("KEEL Studio agent draft client options are required.");
   if (typeof options.grantToken !== "string" || options.grantToken.length < 48) throw new TypeError("KEEL Studio agent draft grant is invalid.");
@@ -551,16 +577,7 @@ export function createKeelStudioAgentDraftClient(options: KeelStudioAgentDraftCl
     const value = await studioAgentResponse<KeelStudioReleaseContinuation>(await studioAgentRequest(options, `${releasePath(releaseId)}/continue`, {
       method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ expectedRevision }),
     }), [options.grantToken]);
-    const actions = { "review-required": ["prepare-review"], "owner-observation-required": ["record-owner-observation"],
-      pending: ["retry-saved-progress", "reconcile-wallet-response"], blocked: ["retry-saved-progress"], published: ["view-publication"] };
-    if (!value || value.schema !== "keel-release-continuation@1" || value.releaseId !== releaseId || value.revision !== expectedRevision
-      || !Object.hasOwn(actions, value.status) || !actions[value.status].includes(value.nextAction)
-      || value.reviewPath !== `/studio/releases/${encodeURIComponent(releaseId)}` || typeof value.message !== "string"
-      || value.storagePreserved !== true || value.uploadedBytes !== 0 || value.signing !== "not-performed" || value.submission !== "not-performed"
-      || value.diagnostic && (value.diagnostic.releaseId !== releaseId || value.diagnostic.revision !== expectedRevision || value.diagnostic.metadataReadCall !== undefined)) {
-      throw new TypeError("Studio returned invalid saved publication progress.");
-    }
-    return value;
+    return reviewedPublicationContinuation(value, releaseId, expectedRevision, options.studioUrl ?? KEEL_STUDIO_URL);
   };
   const storageRecovery = async (projectId: string): Promise<KeelStudioStorageRecovery> => {
     if (typeof projectId !== "string" || !/^[0-9a-f]{8}(?:-[0-9a-f]{4}){3}-[0-9a-f]{12}$/iu.test(projectId)) throw new TypeError("Storage recovery needs the existing project ID.");
@@ -705,7 +722,9 @@ export function createKeelStudioAgentDraftClient(options: KeelStudioAgentDraftCl
     if (!/^[0-9a-f]{8}(?:-[0-9a-f]{4}){3}-[0-9a-f]{12}$/iu.test(projectId)) throw new TypeError("Use this project's Studio UUID.");
     const value = await studioAgentResponse<KeelStudioStorageReview>(await studioAgentRequest(options, `/api/agent/projects/${encodeURIComponent(projectId)}/storage-review`, { method: "POST" }), [options.grantToken]);
     if (value.projectId !== projectId || value.signing !== "not-performed" || value.submission !== "not-performed" || !["complete", "approval-required", "resume", "pending-approval-receipt", "blocked", "failed"].includes(value.status) || typeof value.walletApprovalRequired !== "boolean") throw new TypeError("Studio returned an unexpected storage review.");
-    return { ...value, reviewUrl: endpoint(options.studioUrl ?? KEEL_STUDIO_URL, `/artifacts/${encodeURIComponent(projectId)}?studio=1`).href };
+    const next = value.nextPublication;
+    if (next && (!/^[0-9a-f]{8}(?:-[0-9a-f]{4}){3}-[0-9a-f]{12}$/iu.test(next.releaseId) || !Number.isSafeInteger(next.revision) || next.revision < 1)) throw new TypeError("Studio returned an invalid next release identity.");
+    return { ...value, ...(next ? { nextPublication: reviewedPublicationContinuation(next, next.releaseId, next.revision, options.studioUrl ?? KEEL_STUDIO_URL) } : {}), reviewUrl: endpoint(options.studioUrl ?? KEEL_STUDIO_URL, `/artifacts/${encodeURIComponent(projectId)}?studio=1`).href };
   };
   const create = async (draft: KeelStudioAgentReleaseDraft): Promise<KeelStudioAgentReleaseView> => {
     const validated = validateKeelStudioAgentReleaseDraft(draft);

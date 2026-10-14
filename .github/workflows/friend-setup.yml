@@ -22,7 +22,7 @@ jobs:
       - name: Exact simulation capacity and recovery
         run: node --test tests/sdk-simulation-connection.test.mjs tests/sdk-publication-preflight.test.mjs tests/sdk-public-simulation-pool.test.mjs tests/sdk-rpc.test.mjs tests/sdk-network-index.test.mjs tests/mcp-selected-chain-routing.test.mjs tests/transaction-gas-policy.test.mjs tests/sdk-release-wallet-batch.test.mjs tests/rpc-publication-simulation.test.mjs tests/sdk-intrinsic-validation-evidence.test.mjs
       - name: Authenticated Studio and MCP parity
-        run: node --test tests/sdk-studio-agent-drafts.test.mjs tests/mcp-studio-private.test.mjs tests/mcp-studio-draft.test.mjs tests/mcp.test.mjs
+        run: node --test tests/publication-action.test.mjs tests/sdk-studio-agent-drafts.test.mjs tests/mcp-studio-private.test.mjs tests/mcp-studio-draft.test.mjs tests/mcp.test.mjs
       - name: Native Geth stateful publication validation (synthetic, isolated)
         env:
           KEEL_NATIVE_GETH_EVIDENCE: native-geth-publication-evidence.json

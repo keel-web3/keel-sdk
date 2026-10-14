@@ -328,7 +328,7 @@ test("registered portable MCP continues the paid release, preserves unknown outc
     requests.push({url:String(url),method:init.method,body:init.body?JSON.parse(init.body):undefined});
     assert.equal(new Headers(init.headers).get('authorization'),`Bearer ${token}`);
     if(String(url).endsWith('/continue'))return Response.json({schema:'keel-release-continuation@1',releaseId,revision:34,status,
-      nextAction:status==='owner-observation-required'?'record-owner-observation':'prepare-review',message:'Preserve job 10 and the existing release',
+      nextAction:status==='owner-observation-required'?'record-owner-observation':status==='wallet-approval-required'?'approve-wallet':'prepare-review',...(status==='wallet-approval-required'?{approval:{operationId,preparedDigest:'0x'+'aa'.repeat(32),reviewPath:`/studio/releases/${releaseId}/review?operation=${operationId}&revision=34`}}:{}),message:'Preserve job 10 and the existing release',
       reviewPath:`/studio/releases/${releaseId}`,storagePreserved:true,uploadedBytes:0,signing:'not-performed',submission:'not-performed'});
     if(String(url).endsWith('/preview-replan/legacy'))return Response.json({status:'not-applicable',message:'Keep paid storage job 10',ownerPath:`/studio/projects/${projectId}/recovery`,nextActions:[]});
     if(String(url).endsWith('/review/cancel'))return Response.json({schema:'keel-release-review-cancelled@1',releaseId,operationId,revision:34,status:'draft',nextAction:'plan',storagePreserved:true,uploadedBytes:0,signing:'not-performed',submission:'not-performed'});
@@ -345,7 +345,7 @@ test("registered portable MCP continues the paid release, preserves unknown outc
     const spoof=await call(server,4,{operation:'continue-publication',releaseId,expectedRevision:34,ownerRecordedRejection:{code:-32602}});
     assert.equal(spoof.result.isError,true);assert.equal(requests.length,1);
     // Separate transport fixture: server has independently verified a saved rejection.
-    status='review-required';assert.equal((await call(server,5,{operation:'continue-publication',releaseId,expectedRevision:34})).result.structuredContent.nextAction,'prepare-review');
+    status='wallet-approval-required';const ready=(await call(server,5,{operation:'continue-publication',releaseId,expectedRevision:34})).result.structuredContent;assert.equal(ready.nextAction,'approve-wallet');assert.equal(new URL(ready.reviewUrl).pathname,`/studio/releases/${releaseId}/review`);
     const cancelled=await call(server,6,{operation:'cancel-review',releaseId,expectedRevision:34,operationId});
     assert.equal(cancelled.result.structuredContent.status,'draft');
     assert.deepEqual(requests.at(-1).body,{expectedRevision:34,operationId});

@@ -334,6 +334,13 @@ test("bounded Continue uses the exact existing revision and refuses mismatched, 
   assert.equal(new URL(requests[0].url).pathname, `/api/agent/drafts/${releaseId}/continue`);
   assert.deepEqual(JSON.parse(requests[0].init.body), { expectedRevision: 34 });
   for (patch of [{ revision: 35 }, { releaseId: "wrong" }, { status: "ready" }, { nextAction: "sign" }, { uploadedBytes: 1 }, { signing: "performed" }, { storagePreserved: false }, { reviewPath: "https://untrusted.example" }, { diagnostic: { releaseId, revision: 34, metadataReadCall: {} } }]) await assert.rejects(client.continuePublication(releaseId, 34), /invalid saved publication progress/u);
+  const operationId = "66666666-6666-4666-8666-666666666666", preparedDigest = "0x" + "aa".repeat(32);
+  patch = { status: "wallet-approval-required", nextAction: "approve-wallet", approval: { operationId, preparedDigest, reviewPath: `/studio/releases/${releaseId}/review?operation=${operationId}&revision=34` } };
+  const approved = await client.continuePublication(releaseId, 34);
+  assert.equal(approved.status, "wallet-approval-required"); assert.equal(new URL(approved.reviewUrl).pathname, `/studio/releases/${releaseId}/review`);
+  for (const injected of [{ preparation: { calls: [] } }, { walletAttempt: { token: "private" } }, { approval: { ...patch.approval, reviewPath: "https://foreign.example" } }]) {
+    const valid = patch; patch = { ...patch, ...injected }; await assert.rejects(client.continuePublication(releaseId, 34)); patch = valid;
+  }
   const before = requests.length;
   await assert.rejects(client.continuePublication(releaseId, 0));
   assert.equal(requests.length, before);

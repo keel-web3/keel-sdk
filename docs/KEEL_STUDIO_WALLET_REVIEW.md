@@ -288,3 +288,12 @@ Local MCP forwards [cancellation notifications](https://modelcontextprotocol.io/
 to active SDK requests; cancelled calls emit no late success response. A cancelled
 HTTP request does not prove an already committed write was rolled back: reconcile
 the same idempotency key or operation before retrying.
+
+
+### One primary publication action
+
+Studio Publish, creator and agent continuation APIs, SDK `continuePublication` / `storageReview`, and hosted MCP use the same `advanceKeelPublicationAction` state machine. Each request reads durable state before and after an effect. A lost response does not authorize replay. Publication identity binds the creator, selected chain, project bytes and saved release revision; changing that identity stops the current action. Database locks and persisted wallet-attempt boundaries prevent concurrent tabs or retries from opening a second funding request. Agents prepare unsigned task-specific approval handoffs; only the owner's existing wallet signs.
+
+The action verifies retained onchain references by selected-chain/store identity, full decoded byte length and SHA-256 before reuse. It reconciles all journal history before that readback can authorize a renewed review. Unknown issuance remains unknown in the archived records; missing hashes are never proof of no payment. Unchanged expired programs renew only after immutable deadline rules and complete canonical opening history establish that their original calls can no longer fund a job. Local wallet records are archived with that server reconciliation, rather than silently discarded.
+
+Canonical complete funding or atomic release reverts permit a fresh unsigned review in the same action. Pending, replaced, partially successful or unverifiable receipts preserve the original operation. Already paid storage resumes its saved job and cursors; completing storage continues the project's unique existing release in the same page. Missing creator choices and genuine chain, capability, authority, configuration or integrity prerequisites remain precise in-place requirements. No diagnostic or CI result establishes a deployed collection or a successful mint.
