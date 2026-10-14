@@ -29,3 +29,18 @@ test('simulation failure type and numeric provider gas cap survive without leaki
   await assert.rejects(p.request({method:'eth_simulateV1',params:params()}),result=>{assert.equal(result.code,error.code);assert.doesNotMatch(result.message,/secret-key|private-key/);if(error.code===-32000)assert.match(result.message,/16777216/);return true;});
  }
 });
+
+test('shared request exhaustion retains only typed bounded need/remaining and never mislabels an ambiguous per-call cap', async () => {
+ for (const message of ['RPC gas cap exhausted: need 2000000, remaining 0 SECRET https://rpc/private', 'maximum allowed gas: 50000000 SECRET https://rpc/private', 'RPC gas cap: 50000000 SECRET https://rpc/private']) {
+  const pool=createKeelRpcPool({rpcUrls:['https://rpc.example'],chainId:11155111,minIntervalMs:0,fetchImpl:async(_u,init)=>{
+   const body=JSON.parse(init.body);return Response.json(body.method==='eth_chainId'?{jsonrpc:'2.0',id:body.id,result:'0xaa36a7'}:{jsonrpc:'2.0',id:body.id,error:{code:-32000,message}});
+  }});
+  await assert.rejects(pool.request({method:'eth_simulateV1',params:params()}),error=>{
+   assert.equal(error.code,-32000);assert.doesNotMatch(JSON.stringify(error),/SECRET|private|https/);assert.doesNotMatch(error.message,/SECRET|private|https/);
+   assert.equal(Object.isFrozen(error.diagnostic),true);
+   if(message.startsWith('RPC gas cap exhausted'))assert.deepEqual(error.diagnostic,{gasCapacityScope:'request',requestedRequestGas:'2000000',remainingRequestGas:'0'});
+   else assert.equal(error.diagnostic.gasCapacityScope,message.startsWith('RPC')?'request':'unknown');
+   return true;
+  });
+ }
+});

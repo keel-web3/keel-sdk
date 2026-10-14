@@ -1,5 +1,6 @@
 import { KeelPublicationSimulationError, keelSimulationTransportDiagnostic, keelSimulationTransportFailure, type KeelPreflightTransport } from "./publication-preflight.js";
 import { assertKeelAmsterdamSimulationHeader, resolveKeelTransactionGasPolicy } from "./transaction-gas-policy.js";
+import { keelSimulationChainDefaults } from "./simulation-capacity-policy.js";
 
 export interface KeelSimulationSocket {
   readonly socket: {
@@ -13,6 +14,7 @@ export interface KeelSimulationSocket {
 /** HTTP has no socket state; every simulation response is still independently verified. */
 export type KeelSimulationConnection = KeelSimulationSocket | (Omit<KeelSimulationSocket, "socket"> & { readonly protocol: "https"; readonly socket?: never });
 export interface KeelSimulationConnectionOptions {
+  readonly chainId?: number;
   /** Pool selection tries each distinct candidate once; legacy reconnect defaults to three. */
   readonly maximumConnectionAttempts?: 1 | 2 | 3;
   /** The caller must supply an already approved endpoint. Used only after a confirmed WS 1009. */
@@ -38,7 +40,7 @@ export function assertKeelSimulationEnvelopes(request: { readonly params: readon
     for (const [i, planned] of calls.entries()) {
       const requested = quantity(object(planned)?.gas), actual = quantity(object(transactions[i])?.gas);
       if (requested === undefined || actual === undefined) throw new KeelPublicationSimulationError("unsupported-simulation", "The simulator omitted the exact transaction gas envelope.");
-      if (actual < requested) throw new KeelPublicationSimulationError("provider-limit", "The simulator silently reduced the requested transaction gas. Your saved plan is unchanged; use a compatible provider before wallet approval.", { requestedGasLimit: requested.toString(), providerGasCap: actual.toString(), blockIndex: index, callIndex: i });
+      if (actual < requested) throw new KeelPublicationSimulationError("provider-limit", "The simulator silently reduced the requested transaction gas. Your saved plan is unchanged; use a compatible provider before wallet approval.", { requestedGasLimit: requested.toString(), providerGasCap: actual.toString(), gasCapacityScope: "envelope", blockIndex: index, callIndex: i });
       if (actual !== requested) throw new KeelPublicationSimulationError("unsupported-simulation", "The simulator changed the requested transaction gas envelope.");
     }
   }
@@ -47,7 +49,9 @@ export function assertKeelSimulationEnvelopes(request: { readonly params: readon
 /** Qualify behavior on the socket retained for project calldata, never client branding.
  * These fixed public probes are not a publication proof. Exact project calls still
  * undergo their own override-free fork, nonce, fee, gas and complete-return checks. */
-export function createPinnedKeelSepoliaSimulationTransport(connect: () => Promise<KeelSimulationConnection>, options: KeelSimulationConnectionOptions = {}) {
+export function createPinnedKeelSimulationTransport(connect: () => Promise<KeelSimulationConnection>, options: KeelSimulationConnectionOptions & { readonly chainId: number }) {
+  const chainId = options.chainId;
+  keelSimulationChainDefaults(chainId);
   const maximumAttempts = options.maximumConnectionAttempts ?? 3;
   if (![1, 2, 3].includes(maximumAttempts)) throw new TypeError("Invalid bounded simulation attempts.");
   let selected: Promise<KeelSimulationConnection> | undefined;
@@ -93,13 +97,13 @@ export function createPinnedKeelSepoliaSimulationTransport(connect: () => Promis
       rpc = await (useMessageSizeFallback ? options.messageSizeFallback!() : connect());
       observeClose(rpc);
       stage = "chain";
-      if (quantity(await qualifiedCall({ method: "eth_chainId", params: [] })) !== 11155111n) throw new KeelPublicationSimulationError("wrong-chain", "The configured simulator did not return Sepolia.", { stage });
+      if (quantity(await qualifiedCall({ method: "eth_chainId", params: [] })) !== BigInt(chainId)) throw new KeelPublicationSimulationError("wrong-chain", "The configured simulator did not return the selected chain.", { stage });
       stage = "snapshot";
       const block = object(await qualifiedCall({ method: "eth_getBlockByNumber", params: ["latest", false] }));
       const timestamp = quantity(block?.timestamp), limit = quantity(block?.gasLimit), number = quantity(block?.number), baseFee = quantity(block?.baseFeePerGas);
       if (timestamp === undefined || limit === undefined || limit <= 0n || number === undefined || baseFee === undefined
         || typeof block?.hash !== "string" || !/^0x[0-9a-f]{64}$/iu.test(block.hash)) unsupported("The simulator did not return a verifiable selected-chain snapshot.");
-      const policy = resolveKeelTransactionGasPolicy({ chainId: 11155111, blockTimestamp: timestamp!, blockGasLimit: limit! });
+      const policy = resolveKeelTransactionGasPolicy({ chainId, blockTimestamp: timestamp!, blockGasLimit: limit! });
       // When the program is known, qualify its required envelope (bounded by
       // the selected chain), not only a 100k control. Small plans should not
       // require a provider's full block capacity. Every actual response is
@@ -184,11 +188,13 @@ export function createPinnedKeelSepoliaSimulationTransport(connect: () => Promis
       // replay; it must independently verify its snapshot and complete result.
       const tag = exact.method === "eth_simulateV1" ? exact.params[1] : undefined;
       let requiredGas: bigint | undefined;
+      let requestedEnvelopeGas = 0n;
       const blocks = exact.method === "eth_simulateV1" ? object(exact.params[0])?.blockStateCalls : undefined;
       if (Array.isArray(blocks)) for (const block of blocks) {
         const calls = object(block)?.calls;
         if (Array.isArray(calls)) for (const item of calls) {
           const gas = quantity(object(item)?.gas);
+          if (gas !== undefined && gas > 0n) requestedEnvelopeGas += gas;
           if (gas !== undefined && gas > 0n && (requiredGas === undefined || gas > requiredGas)) requiredGas = gas;
         }
       }
@@ -230,7 +236,8 @@ export function createPinnedKeelSepoliaSimulationTransport(connect: () => Promis
         } catch (error) {
           const classified = keelSimulationTransportFailure(error, { method, phase: "project-request", ...socketDiagnostic(rpc) });
           const classifiedError = new KeelPublicationSimulationError(classified.kind, classified.message, { ...classified.diagnostic, connectionAttempts: attempt,
-            requestPayloadBytes, blockCount, callCount, ...(requiredGas === undefined ? {} : { requiredProgramGas: requiredGas.toString() }) });
+            requestPayloadBytes, blockCount, callCount, ...(requiredGas === undefined ? {} : {
+              requiredProgramGas: requestedEnvelopeGas.toString(), requestedEnvelopeGas: requestedEnvelopeGas.toString(), largestTransactionGas: requiredGas.toString() }) });
           try { options.onAttempt?.(keelSimulationTransportDiagnostic(classifiedError)); } catch { /* Observability never grants or blocks a proof. */ }
           const unavailable = classifiedError.kind === "rpc-unavailable";
           if (!gasClamp(classifiedError) && !unavailable) throw classifiedError;
@@ -278,4 +285,10 @@ export function createPinnedKeelSepoliaSimulationTransport(connect: () => Promis
     },
     async close() { if (closed) return; closed = true; for (const rpc of retired) closeSocket(rpc); if (selected) await selected.then(closeSocket, () => undefined); },
   };
+}
+
+/** Backwards-compatible selected-Sepolia entry point. */
+export function createPinnedKeelSepoliaSimulationTransport(connect: () => Promise<KeelSimulationConnection>, options: KeelSimulationConnectionOptions = {}) {
+  if (options.chainId !== undefined && options.chainId !== 11155111) throw new KeelPublicationSimulationError("configuration-invalid", "Use the chain-keyed simulation transport for another network.");
+  return createPinnedKeelSimulationTransport(connect, { ...options, chainId: 11155111 });
 }

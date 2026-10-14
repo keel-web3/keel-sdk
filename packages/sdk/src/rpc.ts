@@ -106,13 +106,16 @@ export class KeelRpcSetupError extends Error {
 }
 export class KeelRpcResponseError extends Error {
   readonly code: number;
+  readonly diagnostic?: Readonly<{ gasCapacityScope: "request" | "unknown"; requestedRequestGas?: string; remainingRequestGas?: string }>;
   constructor(readonly rpcCode: number, readonly data?: string, providerGasCap?: bigint, readonly status?: number,
-    readonly simulationFailure?: "insufficient-balance" | "transaction-validation") {
+    readonly simulationFailure?: "insufficient-balance" | "transaction-validation",
+    capacityDiagnostic?: { readonly gasCapacityScope: "request" | "unknown"; readonly requestedRequestGas?: string; readonly remainingRequestGas?: string }) {
     super(status === 413 ? "RPC request body too large." : simulationFailure === "insufficient-balance" ? "RPC insufficient balance."
       : simulationFailure === "transaction-validation" ? "RPC transaction validation failed."
       : providerGasCap === undefined ? rpcCode === 3 ? "RPC execution reverted." : "RPC rejected this read request." : `RPC gas cap: ${providerGasCap}`);
     this.code = rpcCode;
     this.name = "KeelRpcResponseError";
+    if (capacityDiagnostic || providerGasCap !== undefined) this.diagnostic = Object.freeze({ ...(capacityDiagnostic ?? { gasCapacityScope: "unknown" as const }) });
   }
 }
 class ProviderFailure extends Error {
@@ -257,8 +260,14 @@ export function createKeelRpcPool(options: KeelRpcPoolOptions): KeelRpcPool {
         if (method === "eth_simulateV1") {
           // Preserve typed failure evidence while never exposing a provider URL,
           // key, request body, or arbitrary remote error message.
+          const exhausted = /RPC gas cap exhausted:\s*need\s+(\d{1,20}),\s*remaining\s+(\d{1,20})(?!\d)/iu.exec(message);
+          if (exhausted && BigInt(exhausted[1]!) <= 18_446_744_073_709_551_615n && BigInt(exhausted[2]!) <= 18_446_744_073_709_551_615n)
+            throw new KeelRpcResponseError(code, undefined, undefined, undefined, undefined,
+              { gasCapacityScope: "request", requestedRequestGas: BigInt(exhausted[1]!).toString(), remainingRequestGas: BigInt(exhausted[2]!).toString() });
           const cap = /(?:gas cap|maximum allowed gas|gas limit too high[^\n]*?cap)\s*[:=(]\s*(0x[\da-f]+|\d+)/iu.exec(message)?.[1];
-          if (cap && cap.length <= 20 && BigInt(cap) > 0n) throw new KeelRpcResponseError(code, undefined, BigInt(cap));
+          if (cap && cap.length <= 20 && BigInt(cap) > 0n && BigInt(cap) <= 18_446_744_073_709_551_615n)
+            throw new KeelRpcResponseError(code, undefined, BigInt(cap), undefined, undefined,
+              { gasCapacityScope: /(?:rpc|global|request|simulation) gas cap/iu.test(message) ? "request" : "unknown" });
           if (/insufficient funds|insufficient balance/iu.test(message)) throw new KeelRpcResponseError(code, undefined, undefined, undefined, "insufficient-balance");
           if (/nonce too (?:low|high)|intrinsic gas too low|transaction validation|invalid transaction|fee cap less than block base fee|max fee per gas less than block base fee|tip above fee cap/iu.test(message))
             throw new KeelRpcResponseError(code, undefined, undefined, undefined, "transaction-validation");

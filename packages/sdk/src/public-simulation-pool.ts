@@ -1,9 +1,12 @@
 import { createKeelRpcPool, KeelRpcResponseError, normalizeKeelRpcUrl, type KeelRpcPoolOptions } from "./rpc.js";
-import { createPinnedKeelSepoliaSimulationTransport } from "./simulation-connection.js";
+import { createPinnedKeelSimulationTransport } from "./simulation-connection.js";
 import { KeelPublicationSimulationError, keelSimulationTransportDiagnostic, keelSimulationTransportFailure, type KeelPreflightTransport } from "./publication-preflight.js";
 import { assertKeelAmsterdamSimulationHeader, resolveKeelTransactionGasPolicy } from "./transaction-gas-policy.js";
+import { KEEL_SIMULATION_CAPABILITY_MAXIMUM_AGE_MS, keelSimulationChainDefaults, keelSimulationProviderCapacityFailure, measureKeelSimulationProgram, measureKeelSimulationExecution,
+  snapshotKeelSimulationProviderLimits, type KeelMeasuredSimulationProviderCapability, type KeelSimulationProviderLimits } from "./simulation-capacity-policy.js";
 
 export interface KeelPublicSimulationPoolOptions {
+  readonly chainId?: number;
   /** Selected registry endpoint followed by the maintained indexed public pool. */
   readonly rpcUrls: readonly string[];
   /** Explicit recipients for project data; membership in a public index is not approval. */
@@ -16,6 +19,12 @@ export interface KeelPublicSimulationPoolOptions {
   /** Entire qualification + project request deadline; callers may only lower the 120s bound. */
   readonly requestTimeoutMs?: number;
   readonly onAttempt?: (diagnostic: Readonly<Record<string, string | number>>) => void;
+  /** Facts measured by the operator, for configured recipients only. */
+  readonly providerCapabilities?: readonly KeelMeasuredSimulationProviderCapability[];
+  /** Measured facts expire; callers may only lower the five-minute maximum. */
+  readonly capabilityMaximumAgeMs?: number;
+  /** Exact request and response gas metrics, never a publication proof. */
+  readonly onMeasurement?: (measurement: Readonly<Record<string, string | number>>) => void;
 }
 const object = (value: unknown): Record<string, unknown> | undefined => value !== null && typeof value === "object" && !Array.isArray(value) ? value as Record<string, unknown> : undefined;
 const quantity = (value: unknown): bigint | undefined => typeof value === "string" && /^0x(?:0|[1-9a-f][0-9a-f]*)$/iu.test(value) ? BigInt(value) : undefined;
@@ -28,7 +37,8 @@ const sharedPools = new Map<string, ReturnType<typeof createKeelRpcPool>>();
  * its own pacing/cooldowns and cannot swap underneath qualification or a request.
  * Every simulation contains its complete ordered state sequence. Public probes
  * establish compatibility, not the private program's aggregate execution budget. */
-export function createKeelPublicSepoliaSimulationPool(options: KeelPublicSimulationPoolOptions): KeelPreflightTransport & { close(): Promise<void> } {
+export function createKeelPublicSimulationPool(options: KeelPublicSimulationPoolOptions & { readonly chainId: number }): KeelPreflightTransport & { close(): Promise<void> } {
+  const chainId = options.chainId, defaults = keelSimulationChainDefaults(chainId);
   const requestTimeoutMs = options.requestTimeoutMs ?? 120_000;
   if (!Number.isSafeInteger(requestTimeoutMs) || requestTimeoutMs < 100 || requestTimeoutMs > 120_000)
     throw new KeelPublicationSimulationError("configuration-invalid", "The complete simulation request needs a bounded deadline of at most 120 seconds.");
@@ -37,26 +47,45 @@ export function createKeelPublicSepoliaSimulationPool(options: KeelPublicSimulat
   if ([...approved].some(url => !urls.includes(url)) || typeof options.block.number !== "bigint" || options.block.number < 0n || !/^0x[0-9a-f]{64}$/iu.test(options.block.hash))
     throw new KeelPublicationSimulationError("configuration-invalid", "Publication needs explicit configured recipients and a selected block.");
   const block = { ...options.block }, blockTag = `0x${block.number.toString(16)}`;
-  const poolKey = JSON.stringify([urls, options.minIntervalMs ?? 250]);
-  const pool = (!options.fetchImpl ? sharedPools.get(poolKey) : undefined) ?? createKeelRpcPool({ rpcUrls: urls, chainId: 11155111, timeoutMs: 30_000, simulationTimeoutMs: 90_000, maxResponseBytes: 64 * 1024 * 1024,
+  const readTransport = options.readTransport, onAttempt = options.onAttempt, onMeasurement = options.onMeasurement;
+  const capabilityMaximumAgeMs = options.capabilityMaximumAgeMs ?? KEEL_SIMULATION_CAPABILITY_MAXIMUM_AGE_MS;
+  if (!Number.isSafeInteger(capabilityMaximumAgeMs) || capabilityMaximumAgeMs < 0 || capabilityMaximumAgeMs > KEEL_SIMULATION_CAPABILITY_MAXIMUM_AGE_MS)
+    throw new KeelPublicationSimulationError("configuration-invalid", "Measured capacity facts must expire within five minutes.");
+  const capabilities = new Map<number, { readonly limits: Readonly<KeelSimulationProviderLimits>; readonly expiresAt: number }>();
+  const limitsFor = (index: number) => { const value = capabilities.get(index); return value && Date.now() <= value.expiresAt ? value.limits : undefined; };
+  if (options.providerCapabilities !== undefined && (!Array.isArray(options.providerCapabilities) || options.providerCapabilities.length > urls.length))
+    throw new KeelPublicationSimulationError("configuration-invalid", "Measured capabilities must identify existing configured providers.");
+  for (const profile of options.providerCapabilities ?? []) {
+    if (!profile || profile.chainId !== chainId || typeof profile.rpcUrl !== "string" || typeof profile.measuredAt !== "string"
+      || !/^\d{4}-\d\d-\d\dT\d\d:\d\d:\d\d(?:\.\d{3})?Z$/u.test(profile.measuredAt) || !Number.isFinite(Date.parse(profile.measuredAt))
+      || Date.parse(profile.measuredAt) > Date.now()
+      || new Date(profile.measuredAt).toISOString().replace(/\.000Z$/u, "Z") !== profile.measuredAt.replace(/\.000Z$/u, "Z"))
+      throw new KeelPublicationSimulationError("configuration-invalid", "A measured capacity profile needs the exact selected chain and observation time.");
+    const index = urls.indexOf(normalizeKeelRpcUrl(profile.rpcUrl));
+    if (index < 0 || capabilities.has(index)) throw new KeelPublicationSimulationError("configuration-invalid", "Capacity profiles cannot add recipients or repeat a provider.");
+    capabilities.set(index, { limits: snapshotKeelSimulationProviderLimits(profile.limits), expiresAt: Date.parse(profile.measuredAt) + capabilityMaximumAgeMs });
+  }
+  const poolKey = JSON.stringify([chainId, urls, options.minIntervalMs ?? 250]);
+  const pool = (!options.fetchImpl ? sharedPools.get(poolKey) : undefined) ?? createKeelRpcPool({ rpcUrls: urls, chainId, timeoutMs: 30_000, simulationTimeoutMs: 90_000, maxResponseBytes: 64 * 1024 * 1024,
     ...(options.fetchImpl ? { fetchImpl: options.fetchImpl } : {}), ...(options.minIntervalMs === undefined ? {} : { minIntervalMs: options.minIntervalMs }) } satisfies KeelRpcPoolOptions);
   if (!options.fetchImpl) { sharedPools.set(poolKey, pool); if (sharedPools.size > 16) sharedPools.delete(sharedPools.keys().next().value!); }
   const abort = new AbortController(), rejected = new Set<number>();
-  const capacityRejected = new Map<number, { cap: bigint; failure: KeelPublicationSimulationError }>();
-  type Candidate = { index: number; transport: ReturnType<typeof createPinnedKeelSepoliaSimulationTransport> };
+  const capacityRejected = new Map<number, { cap: bigint; scope: string; expiresAt: number; failure: KeelPublicationSimulationError }>();
+  const capacityFor = (index: number) => { const value = capacityRejected.get(index); return value && Date.now() <= value.expiresAt ? value : undefined; };
+  type Candidate = { index: number; transport: ReturnType<typeof createPinnedKeelSimulationTransport> };
   let selected: Candidate | undefined, cursor = 0, closed = false;
   // One ordered stream per publication transport. Separate publications retain
   // their own snapshot and cancellation; no shared process singleton can poison them.
   let tail: Promise<unknown> = Promise.resolve();
   const create = (index: number): Candidate => {
     const pinned = pool.pin(index);
-    const transport = createPinnedKeelSepoliaSimulationTransport(async () => ({ protocol: "https", close() {}, async requestAsync({ body }) {
+    const transport = createPinnedKeelSimulationTransport(async () => ({ protocol: "https", close() {}, async requestAsync({ body }) {
       try { return { result: await pinned.request({ ...body, signal: abort.signal }) }; }
       catch (error) {
         if (error instanceof KeelRpcResponseError) return { error };
         throw error;
       }
-    } }), { maximumConnectionAttempts: 1 });
+    } }), { chainId, maximumConnectionAttempts: 1 });
     return { index, transport };
   };
   const qualifySequence = async (candidate: Candidate, snapshot: Record<string, unknown>, gasLimits: readonly bigint[]) => {
@@ -69,7 +98,7 @@ export function createKeelPublicSepoliaSimulationPool(options: KeelPublicSimulat
     const unsupported = (): never => { throw new KeelPublicationSimulationError("unsupported-simulation", "The public complete-sequence check did not return exact fork and transaction evidence."); };
     if (nonce === undefined || balance === undefined || baseFee === undefined || timestamp === undefined || blockGasLimit === undefined || code !== "0x"
       || nonce + BigInt(gasLimits.length) > 18_446_744_073_709_551_615n) unsupported();
-    const policy = resolveKeelTransactionGasPolicy({ chainId: 11155111, blockTimestamp: timestamp!, blockGasLimit: blockGasLimit! });
+    const policy = resolveKeelTransactionGasPolicy({ chainId, blockTimestamp: timestamp!, blockGasLimit: blockGasLimit! });
     const gasPrice = baseFee! * 2n + 1n;
     if (gasLimits.some(gas => gas < 21_000n || gas > policy.maximumTotalGas)) throw new KeelPublicationSimulationError("configuration-invalid", "The complete program exceeds selected-chain transaction gas bounds.");
     // Conservative upfront-balance check for public constants only. Never fund or
@@ -134,7 +163,7 @@ export function createKeelPublicSepoliaSimulationPool(options: KeelPublicSimulat
       }
     }
     if (exact.method !== "eth_simulateV1") {
-      const result = await options.readTransport.request(exact);
+      const result = await readTransport.request(exact);
       if (closed) throw new KeelPublicationSimulationError("rpc-unavailable", "The publication check was cancelled.");
       if (exact.method === "eth_getBlockByNumber" && exact.params[0] === blockTag
         && (object(result)?.hash !== block.hash || object(result)?.number !== blockTag))
@@ -142,7 +171,7 @@ export function createKeelPublicSepoliaSimulationPool(options: KeelPublicSimulat
       return result;
     }
     const program = object(exact.params[0]), blocks = program?.blockStateCalls;
-    if (exact.params.length !== 2 || exact.params[1] !== blockTag || !program || !Array.isArray(blocks) || !blocks.length || blocks.length > 256
+    if (exact.params.length !== 2 || exact.params[1] !== blockTag || !program || !Array.isArray(blocks) || !blocks.length || blocks.length > defaults.maximumBlocks
       || Object.keys(program).some(key => !["blockStateCalls", "validation", "traceTransfers", "returnFullTransactions"].includes(key))
       || typeof program.validation !== "boolean" || program.traceTransfers !== false || program.returnFullTransactions !== true)
       throw new KeelPublicationSimulationError("configuration-invalid", "Keep the complete override-free simulation at its selected numbered block.");
@@ -155,20 +184,41 @@ export function createKeelPublicSepoliaSimulationPool(options: KeelPublicSimulat
       if (gas > requiredGas) requiredGas = gas;
       gasLimits.push(gas);
     }
+    const measurement = measureKeelSimulationProgram(exact);
+    const metrics = { chainId, callCount: measurement.callCount, blockCount: measurement.blockCount, calldataBytes: measurement.calldataBytes,
+      requestPayloadBytes: measurement.requestPayloadBytes, requestedEnvelopeGas: measurement.requestedEnvelopeGas.toString(),
+      largestTransactionGas: measurement.largestTransactionGas.toString(), largestBlockEnvelopeGas: measurement.largestBlockEnvelopeGas.toString() };
+    try { onMeasurement?.(Object.freeze({ ...metrics, gasMeasurement: "requested-envelopes" })); } catch { /* Metrics cannot alter proof. */ }
     let capacityFailure: KeelPublicationSimulationError | undefined, approvedCapacityFailure: KeelPublicationSimulationError | undefined,
       lastFailure: KeelPublicationSimulationError | undefined, awaitingApproval = false;
     let sameRecipientRetried = false;
     const retainApprovedCapacity = (index: number, cap: bigint, failure: KeelPublicationSimulationError) => {
       if (approved.has(urls[index]!) && (!approvedCapacityFailure || cap > BigInt(approvedCapacityFailure.diagnostic!.providerGasCap!)))
         approvedCapacityFailure = new KeelPublicationSimulationError(failure.kind, failure.message,
-          { ...failure.diagnostic, requestedGasLimit: requiredGas.toString(), providerGasCap: cap.toString() });
+          { ...failure.diagnostic, ...(failure.diagnostic?.gasCapacityScope === "request" ? {} : { requestedGasLimit: requiredGas.toString() }), providerGasCap: cap.toString() });
     };
     const start = cursor;
-    for (let offset = 0; offset < urls.length; offset++) {
+    const order = Array.from({ length: urls.length }, (_, offset) => (start + offset) % urls.length);
+    // Prefer measured request headroom among already-approved candidates. Unknown
+    // providers keep their original slots; neither an index nor a capacity fact
+    // authorizes disclosure. No universal 50M RPC default is assumed.
+    const ranked = order.flatMap(index => { const cap = limitsFor(index)?.requestGasCap; return approved.has(urls[index]!) && cap !== undefined ? [{ index, cap }] : []; })
+      .sort((a, b) => a.cap === b.cap ? 0 : a.cap > b.cap ? -1 : 1).map(value => value.index);
+    let rank = 0;
+    for (let i = 0; i < order.length; i++) if (ranked.includes(order[i]!)) order[i] = ranked[rank++]!;
+    for (let offset = 0; offset < order.length; offset++) {
       if (closed) throw new KeelPublicationSimulationError("rpc-unavailable", "The publication check was cancelled.");
-      const index = (start + offset) % urls.length;
+      const index = order[offset]!;
       if (rejected.has(index)) continue;
-      const capacity = capacityRejected.get(index);
+      const profileFailure = keelSimulationProviderCapacityFailure(measurement, limitsFor(index) ?? {});
+      if (profileFailure) {
+        capacityFailure ??= profileFailure; lastFailure = profileFailure;
+        const cap = profileFailure.diagnostic?.providerGasCap;
+        if (typeof cap === "string") retainApprovedCapacity(index, BigInt(cap), profileFailure);
+        try { onAttempt?.({ ...keelSimulationTransportDiagnostic(profileFailure), candidateIndex: index, candidateCount: urls.length }); } catch { /* Metrics cannot alter proof. */ }
+        continue;
+      }
+      const capacity = capacityFor(index);
       if (capacity && requiredGas > capacity.cap) {
         capacityFailure ??= capacity.failure;
         retainApprovedCapacity(index, capacity.cap, capacity.failure);
@@ -200,6 +250,10 @@ export function createKeelPublicSepoliaSimulationPool(options: KeelPublicSimulat
         const result = await candidate.transport.request(exact);
         if (closed) throw new KeelPublicationSimulationError("rpc-unavailable", "The publication check was cancelled.");
         selected = candidate; cursor = index;
+        const execution = measureKeelSimulationExecution(exact, result);
+        if (execution) try { onMeasurement?.(Object.freeze({ ...metrics, candidateIndex: index, gasMeasurement: "simulation-response",
+          measuredGasUsed: execution.gasUsed.toString(), measuredMaxUsedGas: execution.maxUsedGas.toString(), requiredRequestGas: execution.requiredRequestGas.toString(),
+          requiredBlockGas: execution.requiredBlockGas.toString() })); } catch { /* Response metrics do not grant proof. */ }
         return result;
       } catch (error) {
         await candidate.transport.close(); if (selected === candidate) selected = undefined;
@@ -209,18 +263,24 @@ export function createKeelPublicSepoliaSimulationPool(options: KeelPublicSimulat
           // The nested transport calls every post-qualification request a
           // project request, including this pool's public sequence probe.
           // This boundary knows whether private calldata was actually sent.
-          phase: projectRequest ? "project-request" : "public-qualification",
           // Conservative envelope sum, not measured execution gas. Bytes exclude
           // only the pool-owned JSON-RPC id/version envelope.
           requiredProgramGas: gasLimits.reduce((sum, gas) => sum + gas, 0n).toString(),
-          requestPayloadBytes: new TextEncoder().encode(JSON.stringify(exact)).byteLength, blockCount: blocks.length, callCount: blocks.length });
+          ...metrics, phase: projectRequest ? "project-request" : "public-qualification" });
         // Never reinterpret a deterministic transaction validation error or an
         // execution revert as a reason to try another backend for success.
         const code = failure.diagnostic?.rpcCode;
+        const requestCapacityEvidence = failure.kind === "provider-limit" && (failure.diagnostic?.httpStatus === 413
+          || failure.diagnostic?.gasCapacityScope === "request" && (failure.diagnostic?.providerGasCap !== undefined
+            || failure.diagnostic?.requestedRequestGas !== undefined && failure.diagnostic?.remainingRequestGas !== undefined));
+        // -38026 is Geth's client limit, also used for non-gas limits. Only
+        // separately authenticated request-capacity evidence permits fallback.
+        const clientCapacityRejection = code === -38026 && requestCapacityEvidence;
         const retryableRpcRejection = code === undefined || code === -32601
-          || failure.kind === "provider-limit" && (failure.diagnostic?.providerGasCap !== undefined || failure.diagnostic?.httpStatus === 413);
+          || failure.kind === "provider-limit" && (failure.diagnostic?.providerGasCap !== undefined || failure.diagnostic?.httpStatus === 413
+            || failure.diagnostic?.gasCapacityScope === "request" && failure.diagnostic?.requestedRequestGas !== undefined && failure.diagnostic?.remainingRequestGas !== undefined);
         if (projectRequest && (!["provider-limit", "unsupported-simulation", "rpc-unavailable"].includes(failure.kind)
-          || !retryableRpcRejection || code === -32602 || typeof code === "number" && code <= -38000 && code >= -38099)) throw failure;
+          || !retryableRpcRejection || code === -32602 || typeof code === "number" && code <= -38000 && code >= -38099 && !clientCapacityRejection)) throw failure;
         // Prefer an available approved alternative, as before. If none remains,
         // one explicitly observed transient failure may retry this same approved
         // recipient after its cooldown. Unknown errors and contract/RPC rejections
@@ -229,7 +289,8 @@ export function createKeelPublicSepoliaSimulationPool(options: KeelPublicSimulat
         const health = pool.status();
         const hasAlternative = urls.some((url, i) => i !== index && approved.has(url) && !rejected.has(i)
           && !health[i]?.disabled && (health[i]?.retryAfterMs ?? 0) === 0
-          && (!capacityRejected.has(i) || requiredGas <= capacityRejected.get(i)!.cap));
+          && !keelSimulationProviderCapacityFailure(measurement, limitsFor(i) ?? {})
+          && requiredGas <= (capacityFor(i)?.cap ?? requiredGas));
         const observedTransient = failure.kind === "rpc-unavailable" && code === undefined
           && ([502, 503, 504].includes(Number(failure.diagnostic?.httpStatus))
             || ["timeout", "connection-reset"].includes(String(failure.diagnostic?.transportFailure)));
@@ -237,7 +298,7 @@ export function createKeelPublicSepoliaSimulationPool(options: KeelPublicSimulat
         if (projectRequest && approved.has(urls[index]!) && !hasAlternative && !sameRecipientRetried && observedTransient
           && cooldown <= 5_000 && deadlineAt - performance.now() > cooldown + 1_000) {
           sameRecipientRetried = true;
-          try { options.onAttempt?.({ ...keelSimulationTransportDiagnostic(failure), candidateIndex: index, candidateCount: urls.length,
+          try { onAttempt?.({ ...keelSimulationTransportDiagnostic(failure), candidateIndex: index, candidateCount: urls.length,
             sameRecipientRetry: 1, recoveryWaitMs: cooldown }); } catch { /* Observers cannot alter proof. */ }
           if (closed) throw new KeelPublicationSimulationError("rpc-unavailable", "The publication check was cancelled.");
           await new Promise<void>((resolve, reject) => {
@@ -252,16 +313,22 @@ export function createKeelPublicSepoliaSimulationPool(options: KeelPublicSimulat
           continue;
         }
         const reportedCap = failure.kind === "provider-limit" ? failure.diagnostic?.providerGasCap : undefined;
-        if (typeof reportedCap === "string" && /^[1-9]\d*$/u.test(reportedCap) && BigInt(reportedCap) < requiredGas) {
-          const previous = capacityRejected.get(index);
+        if (typeof reportedCap === "string" && /^[1-9]\d*$/u.test(reportedCap)) {
+          const previous = capacityFor(index);
           const cap = BigInt(reportedCap);
-          const effectiveCap = previous && previous.cap < cap ? previous.cap : cap;
-          capacityRejected.set(index, { cap: effectiveCap, failure });
+          const scope = String(failure.diagnostic?.gasCapacityScope ?? "unknown");
+          const effectiveCap = previous && previous.scope === scope && previous.cap < cap ? previous.cap : cap;
+          // A cumulative cap above each individual call remains a request fact,
+          // not a permanently rejected candidate or a fresh per-call allowance.
+          // A later envelope clamp is a remaining allowance for THIS sequence,
+          // not a reusable per-call capacity for a different smaller program.
+          if (scope !== "envelope" || failure.diagnostic?.blockIndex === 0 && failure.diagnostic?.callIndex === 0)
+            capacityRejected.set(index, { cap: effectiveCap, scope, expiresAt: Date.now() + capabilityMaximumAgeMs, failure });
           retainApprovedCapacity(index, effectiveCap, failure);
-        } else rejected.add(index);
+        } else if (failure.kind !== "provider-limit") rejected.add(index);
         lastFailure = failure;
         if (failure.kind === "provider-limit") capacityFailure ??= failure;
-        try { options.onAttempt?.({ ...keelSimulationTransportDiagnostic(failure), candidateIndex: index, candidateCount: urls.length }); } catch { /* Diagnostic observers cannot alter proof. */ }
+        try { onAttempt?.({ ...keelSimulationTransportDiagnostic(failure), candidateIndex: index, candidateCount: urls.length }); } catch { /* Diagnostic observers cannot alter proof. */ }
       }
     }
     // Give the caller the largest reported capacity among approved recipients before
@@ -287,4 +354,10 @@ export function createKeelPublicSepoliaSimulationPool(options: KeelPublicSimulat
     tail = pending.catch(() => undefined); return pending;
   },
     async close() { closed = true; abort.abort(); await selected?.transport.close(); } };
+}
+
+/** Legacy Sepolia entry point; new callers pass their selected chain explicitly. */
+export function createKeelPublicSepoliaSimulationPool(options: KeelPublicSimulationPoolOptions): KeelPreflightTransport & { close(): Promise<void> } {
+  if (options.chainId !== undefined && options.chainId !== 11155111) throw new KeelPublicationSimulationError("configuration-invalid", "Use the chain-keyed simulation pool for another network.");
+  return createKeelPublicSimulationPool({ ...options, chainId: 11155111 });
 }

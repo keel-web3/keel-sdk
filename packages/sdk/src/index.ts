@@ -154,3 +154,5 @@ export * from "./creator-prepared-compiler.js";
 export * from "./release-wallet-batch.js";
 
 export { createKeelSepoliaSimulationTransport } from "./sepolia-simulation-transport.js";
+export * from "./public-simulation-pool.js";
+export * from "./simulation-capacity-policy.js";

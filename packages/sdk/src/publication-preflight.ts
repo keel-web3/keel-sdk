@@ -113,13 +113,15 @@ export function keelSimulationTransportDiagnostic(error: unknown, context: {
   const result: Record<string, string | number> = {};
   const pick = (source: Record<string, unknown> | undefined) => {
     if (!source) return;
-    for (const [key, values] of [["rpcMethod", methods], ["phase", phases], ["stage", stages], ["transport", transports], ["errorClass", classes], ["causeClass", classes], ["transportFailure", failures], ["transportCode", codes], ["socketCloseReason", closeReasons], ["transactionValidation", transactionValidation], ["failureReason", failureReasons], ["responseFailure", responseFailures]] as const)
-      if (typeof source[key] === "string" && values.includes(source[key])) result[key] = source[key];
+    for (const [key, values] of [["rpcMethod", methods], ["phase", phases], ["stage", stages], ["transport", transports], ["errorClass", classes], ["causeClass", classes], ["transportFailure", failures], ["transportCode", codes], ["socketCloseReason", closeReasons], ["transactionValidation", transactionValidation], ["failureReason", failureReasons], ["responseFailure", responseFailures], ["gasCapacityScope", ["request", "transaction", "block", "envelope", "unknown", "request-bytes", "request-blocks"]], ["capacitySource", ["measured-profile"]]] as const)
+      if (typeof source[key] === "string" && (values as readonly string[]).includes(source[key])) result[key] = source[key];
     for (const [key, low, high] of [["rpcCode", -2147483648, 2147483647], ["httpStatus", 100, 599], ["socketReadyState", 0, 3], ["causeDepth", 0, 8], ["socketCloseCode", 1000, 4999], ["connectionAttempts", 1, 3], ["requestPayloadBytes", 0, 1073741824], ["blockCount", 0, 1000000], ["callCount", 0, 1000000], ["blockIndex", 0, 255], ["callIndex", 0, 65535], ["responseBytes", 0, 1073741824], ["maximumResponseBytes", 0, 1073741824], ["revertDataBytes", 0, 1073741824]] as const)
       if (typeof source[key] === "number" && Number.isInteger(source[key]) && source[key] >= low && source[key] <= high) result[key] = source[key];
-    for (const key of ["requestedGasLimit", "providerGasCap", "requiredProgramGas", "returnedGasLimit", "gasUsed", "maxUsedGas", "pinnedBlockNumber", "minimumProgramGas", "intrinsicProgramGas", "calldataFloorGas", "largestMinimumCallGas"])
+    for (const [key, maximum] of [["chainId", Number.MAX_SAFE_INTEGER], ["calldataBytes", 1_073_741_824], ["requiredCapacity", 1_073_741_824], ["providerCapacity", 1_073_741_824]] as const)
+      if (typeof source[key] === "number" && Number.isSafeInteger(source[key]) && source[key] >= 0 && source[key] <= maximum) result[key] = source[key];
+    for (const key of ["requestedGasLimit", "providerGasCap", "requiredProgramGas", "returnedGasLimit", "gasUsed", "maxUsedGas", "pinnedBlockNumber", "minimumProgramGas", "intrinsicProgramGas", "calldataFloorGas", "largestMinimumCallGas", "requestedEnvelopeGas", "largestTransactionGas", "largestBlockEnvelopeGas", "requestedRequestGas", "remainingRequestGas"])
       if (typeof source[key] === "string" && /^(?:0|[1-9]\d{0,19})$/u.test(source[key]) && BigInt(source[key]) <= 18_446_744_073_709_551_615n
-        && (source[key] !== "0" || ["gasUsed", "maxUsedGas", "pinnedBlockNumber", "minimumProgramGas", "intrinsicProgramGas", "calldataFloorGas", "largestMinimumCallGas"].includes(key))) result[key] = source[key];
+        && (source[key] !== "0" || ["gasUsed", "maxUsedGas", "pinnedBlockNumber", "minimumProgramGas", "intrinsicProgramGas", "calldataFloorGas", "largestMinimumCallGas", "remainingRequestGas"].includes(key))) result[key] = source[key];
     for (const key of ["pinnedBlockHash", "readerRuntimeCodeHash", "revertDataHash", "planFingerprint"])
       if (typeof source[key] === "string" && /^0x[0-9a-f]{64}$/iu.test(source[key])) result[key] = source[key].toLowerCase();
     if (typeof source.target === "string" && /^0x[0-9a-f]{40}$/iu.test(source.target)) result.target = source.target;
@@ -155,12 +157,22 @@ export function keelSimulationTransportFailure(error: unknown, context: Paramete
   if (error instanceof KeelPublicationSimulationError) return new KeelPublicationSimulationError(error.kind, error.message, { ...diagnostic, ...error.diagnostic });
   let cursor: unknown = error;
   const seen = new Set<unknown>();
-  let unsupported = false, limited = false, reverted = false, insufficient = false, invalid = false, intrinsic = false;
+  let unsupported = false, limited = diagnostic.gasCapacityScope === "request" && diagnostic.requestedRequestGas !== undefined && diagnostic.remainingRequestGas !== undefined,
+    reverted = false, insufficient = false, invalid = false, intrinsic = false;
   let providerGasCap: bigint | undefined;
+  let gasCapacityScope: "request" | undefined;
   for (let depth = 0; depth < 8 && cursor && !seen.has(cursor); depth++) {
     seen.add(cursor); const item = record(cursor); if (!item) break;
     unsupported ||= item.code === -32601 || item.code === 4200;
     const message = [item.message, item.shortMessage, item.details].filter(value => typeof value === "string").join(" ");
+    // Geth's shared request budget can fail without reporting the original cap.
+    // Keep need/remaining separate; neither is a per-transaction gas ceiling.
+    const exhausted = /RPC gas cap exhausted:\s*need\s+(\d{1,20}),\s*remaining\s+(\d{1,20})/iu.exec(message);
+    if (exhausted && BigInt(exhausted[1]!) <= 18_446_744_073_709_551_615n && BigInt(exhausted[2]!) <= 18_446_744_073_709_551_615n) {
+      limited = true; gasCapacityScope = "request";
+      Object.assign(diagnostic, { requestedRequestGas: exhausted[1], remainingRequestGas: exhausted[2] });
+    }
+    if (diagnostic.gasCapacityScope !== "unknown" && /(?:rpc|global|request|simulation) gas cap/iu.test(message)) gasCapacityScope = "request";
     for (const match of message.matchAll(/(?:gas cap|maximum allowed gas|gas limit too high[^\n]*?cap)\s*[:=(]\s*(0x[\da-f]+|\d+)/giu)) {
       const raw = match[1];
       if (raw && raw.length <= 20) { const cap = BigInt(raw); if (cap > 0n && (providerGasCap === undefined || cap < providerGasCap)) providerGasCap = cap; }
@@ -180,7 +192,7 @@ export function keelSimulationTransportFailure(error: unknown, context: Paramete
   if (intrinsic) return new KeelPublicationSimulationError("configuration-invalid", "The simulator rejected transaction validation. Its intrinsic-gas response does not identify a faulty call or prove the saved gas limit is too low. The exact plan and simulator evidence need review before approval; no transaction was submitted.", { ...diagnostic, transactionValidation: "intrinsic-gas" });
   if (invalid) return new KeelPublicationSimulationError("configuration-invalid", "The simulator rejected the planned transaction parameters. Correct the saved plan before payment; no transaction was submitted.", diagnostic);
   if (unsupported) return new KeelPublicationSimulationError("unsupported-simulation", "This RPC does not support the required read-only publication simulation. Choose a compatible configured provider before a new payment.", diagnostic);
-  if (limited || providerGasCap !== undefined || diagnostic.httpStatus === 413) return new KeelPublicationSimulationError("provider-limit", "The provider rejected the simulation at its configured limit. This does not prove that the artwork or its complete metadata is too large.", { ...diagnostic, ...(providerGasCap === undefined ? {} : { providerGasCap: providerGasCap.toString() }) });
+  if (limited || providerGasCap !== undefined || diagnostic.httpStatus === 413) return new KeelPublicationSimulationError("provider-limit", "The provider rejected the unchanged complete simulation at its configured limit. Retry a compatible approved provider; no transaction was submitted.", { ...diagnostic, ...(gasCapacityScope === undefined ? {} : { gasCapacityScope }), ...(providerGasCap === undefined ? {} : { providerGasCap: providerGasCap.toString() }) });
   return new KeelPublicationSimulationError("rpc-unavailable", "The publication simulation could not finish. Retry the same prepared plan; no transaction was submitted.", diagnostic);
 }
 
