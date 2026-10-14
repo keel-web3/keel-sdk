@@ -4,7 +4,7 @@ import { readFile } from 'node:fs/promises';
 import { encodeAbiParameters, keccak256 } from 'viem';
 import { createKeelRpcPool } from '../packages/sdk/dist/rpc.js';
 import { createKeelSepoliaSimulationTransport } from '../packages/sdk/dist/sepolia-simulation-transport.js';
-const { createKeelPublicSepoliaSimulationPool } = await import(process.env.KEEL_TEST_PUBLIC_SIMULATION_POOL_MODULE ?? '../packages/sdk/dist/public-simulation-pool.js');
+const { createKeelPublicSepoliaSimulationPool, createKeelPublicSimulationPool } = await import(process.env.KEEL_TEST_PUBLIC_SIMULATION_POOL_MODULE ?? '../packages/sdk/dist/public-simulation-pool.js');
 const { simulateKeelPublicationBeforeFunding } = await import(process.env.KEEL_TEST_PUBLICATION_PREFLIGHT_MODULE ?? '../packages/sdk/dist/publication-preflight.js');
 import { APPROVED_PUBLICNODE_SEPOLIA_URL, probePublicSimulationCandidates, publicProbeOptions, publicProbeExitCode } from '../scripts/check-public-simulation-pool.mjs';
 
@@ -679,4 +679,260 @@ test('shared discovery and a rejected 60M public-read ceiling preserve the stric
     for(const request of replay)assert.deepEqual(request.body.params[0].blockStateCalls.slice(0,14),strict);
     assert.equal(proof.completeTokenUriBytes,Buffer.byteLength(tokenURI));
   }finally{await f.transport.close();}
+});
+
+const capability = (index, limits, chainId = 11155111) => ({ chainId, rpcUrl: urls[index], measuredAt: new Date().toISOString(), limits });
+const variableProgram = (count, envelope = 4450000n, size = 2) => {
+  const input = program();
+  input.params[0].blockStateCalls = Array.from({ length: count }, (_, i) => ({ calls: [{ ...call(i), gas: `0x${envelope.toString(16)}`, data: `0x${'ab'.repeat(size + i % 3)}` }] }));
+  return input;
+};
+
+test('chain-keyed configured pool qualifies Ethereum and Sepolia without sharing a chain identity', async () => {
+  for (const chainId of [1, 11155111]) {
+    const f = fixture([{}]), chainHex = `0x${chainId.toString(16)}`;
+    const transport = createKeelPublicSimulationPool({ ...f.options, chainId,
+      readTransport: { request: async request => request.method === 'eth_chainId' ? chainHex : f.options.readTransport.request(request) },
+      fetchImpl: async (url, init) => {
+        const body = JSON.parse(init.body);
+        if (body.method === 'eth_chainId') { f.requests.push({ index: 0, body, wire: init.body }); return Response.json({ jsonrpc: '2.0', id: body.id, result: chainHex }); }
+        return f.options.fetchImpl(url, init);
+      },
+    });
+    const input = variableProgram(7, 2000000n), before = structuredClone(input);
+    try {
+      assert.equal((await transport.request(input)).length, 7);
+      assert.deepEqual(f.privateRequests()[0].body.params, before.params);
+      assert.deepEqual(input, before);
+      assert.ok(f.requests.filter(r => r.body.method === 'eth_simulateV1' && r.body.params[0].blockStateCalls[0].calls[0].data === '0x').some(r => r.body.params[0].validation));
+    } finally { await transport.close(); await f.transport.close(); }
+  }
+  const f = fixture([{}]);
+  try {
+    assert.throws(() => createKeelPublicSimulationPool({ ...f.options, chainId: 8453 }), /explicitly registered/);
+    assert.throws(() => createKeelPublicSepoliaSimulationPool({ ...f.options, chainId: 1 }), /chain-keyed/);
+    assert.equal(f.requests.length, 0);
+  } finally { await f.transport.close(); }
+});
+
+test('measured profiles prefer approved request headroom while retaining every dependent call and byte', async () => {
+  const f = fixture([{ sharedBudget: 50000000n, projectGas: 2000000n }, { sharedBudget: 100000000n, projectGas: 2000000n }]);
+  const metrics = [], transport = createKeelPublicSimulationPool({ ...f.options, chainId: 11155111,
+    providerCapabilities: [capability(0, { requestGasCap: 50000000n }), capability(1, { requestGasCap: 100000000n })],
+    onMeasurement: value => { assert.equal(Object.isFrozen(value), true); metrics.push(value); },
+  });
+  const input = variableProgram(30), before = structuredClone(input);
+  try {
+    assert.equal((await transport.request(input)).length, 30);
+    assert.deepEqual(f.privateRequests().map(r => r.index), [1]);
+    assert.deepEqual(f.privateRequests()[0].body.params, before.params); assert.deepEqual(input, before);
+    assert.equal(metrics[0].requestedEnvelopeGas, '133500000');
+    assert.equal(metrics[1].gasMeasurement, 'simulation-response');
+    assert.equal(metrics[1].measuredGasUsed, '60000000'); assert.equal(metrics[1].requiredRequestGas, '62450000');
+    assert.doesNotMatch(JSON.stringify(metrics), /SECRET|PRIVATE|0xabab|https/);
+  } finally { await transport.close(); await f.transport.close(); }
+});
+
+test('cumulative exhaustion falls back as a complete ordered program despite each call fitting the request cap', async () => {
+  for (const count of [7, 29, 30, 31, 65]) {
+    const f = fixture([{ sharedBudget: 10000000n, projectGas: 2000000n }, { sharedBudget: 200000000n, projectGas: 2000000n }]);
+    const attempts = [], transport = createKeelPublicSimulationPool({ ...f.options, chainId: 11155111, onAttempt: d => attempts.push(d) });
+    const input = variableProgram(count, 4450000n, count * 11), before = structuredClone(input);
+    try {
+      assert.equal((await transport.request(input)).length, count);
+      const projects = f.privateRequests(); assert.deepEqual(projects.map(r => r.index), [0, 1]);
+      for (const r of projects) assert.deepEqual(r.body.params, before.params);
+      assert.deepEqual(input, before); assert.equal(attempts[0].blockCount, count);
+      assert.equal(attempts[0].largestTransactionGas, '4450000'); assert.equal(attempts[0].requestedEnvelopeGas, String(BigInt(count) * 4450000n));
+      assert.equal(attempts[0].phase, 'project-request'); assert.equal(attempts[0].gasCapacityScope, 'envelope');
+    } finally { await transport.close(); await f.transport.close(); }
+  }
+});
+
+test('a gas-envelope sum above a measured Geth request cap still permits a cheap complete program', async () => {
+  const f = fixture([{ sharedBudget: 50000000n }]), transport = createKeelPublicSimulationPool({ ...f.options, chainId: 11155111,
+    providerCapabilities: [capability(0, { requestGasCap: 50000000n, transactionGasCap: 5000000n, blockGasCap: 10000000n })],
+  });
+  try { assert.equal((await transport.request(variableProgram(65))).length, 65); assert.equal(f.privateRequests().length, 1); }
+  finally { await transport.close(); await f.transport.close(); }
+});
+
+test('distinct provider transaction, block, byte and block-count limits select another approved full-program validator', async () => {
+  for (const limits of [{ transactionGasCap: 4000000n }, { blockGasCap: 4000000n }, { maximumRequestBytes: 1000 }, { maximumBlocks: 6 }]) {
+    const f = fixture([{}, {}]), attempts = [], transport = createKeelPublicSimulationPool({ ...f.options, chainId: 11155111,
+      providerCapabilities: [capability(0, limits)], onAttempt: d => attempts.push(d),
+    });
+    const input = variableProgram(7, 4450000n, 500);
+    try {
+      assert.equal((await transport.request(input)).length, 7); assert.deepEqual(f.privateRequests().map(r => r.index), [1]);
+      assert.deepEqual(f.privateRequests()[0].body.params, input.params);
+      assert.equal(attempts[0].capacitySource, 'measured-profile'); assert.equal(attempts[0].callCount, 7);
+      assert.doesNotMatch(JSON.stringify(attempts), /SECRET|PRIVATE|https|0xabab/);
+    } finally { await transport.close(); await f.transport.close(); }
+  }
+});
+
+test('profiles cannot approve an indexed recipient or silently change chain or mutable limits', async () => {
+  const f = fixture([{ sharedBudget: 10000000n, projectGas: 2000000n }, {}], [urls[0]]);
+  const limits = { requestGasCap: 200000000n }, profiles = [capability(1, limits)];
+  const transport = createKeelPublicSimulationPool({ ...f.options, chainId: 11155111, providerCapabilities: profiles });
+  limits.requestGasCap = 1n; profiles[0].chainId = 1; profiles[0].rpcUrl = 'https://private-recipient.example';
+  f.options.approvedProjectRpcUrls.push(urls[1]);
+  try {
+    await assert.rejects(transport.request(variableProgram(30)), error => error.kind === 'provider-limit' || error.diagnostic.recipientApprovalRequired === 1);
+    assert.deepEqual(f.privateRequests().map(r => r.index), [0]);
+  } finally { await transport.close(); await f.transport.close(); }
+  const clean = fixture([{}]);
+  try {
+    for (const providerCapabilities of [[capability(0, {}, 1)], [{ ...capability(0, {}), rpcUrl: 'https://not-configured.example' }],
+      [capability(0, {}), capability(0, {})], [{ ...capability(0, {}), measuredAt: 'bad date' }]])
+      assert.throws(() => createKeelPublicSimulationPool({ ...clean.options, chainId: 11155111, providerCapabilities }), /capacity|Capacity|capabilities|capability/);
+  } finally { await clean.transport.close(); }
+});
+
+test('a measured high-capacity backend still refuses stale heads, changed pins and wrong chain before project disclosure', async () => {
+  for (const fault of [{ stale: true }, { pin: true }, { chain: true }]) {
+    const f = fixture([fault]), transport = createKeelPublicSimulationPool({ ...f.options, chainId: 11155111,
+      providerCapabilities: [capability(0, { requestGasCap: 200000000n })],
+    });
+    try { await assert.rejects(transport.request(variableProgram(30))); assert.equal(f.privateRequests().length, 0); }
+    finally { await transport.close(); await f.transport.close(); }
+  }
+});
+
+test('no compatible validator reports an honest infrastructure failure and leaves large content and strict gas intact', async () => {
+  const f = fixture([{ sharedBudget: 50000000n, projectGas: 2000000n }]);
+  const transport = createKeelPublicSimulationPool({ ...f.options, chainId: 11155111, providerCapabilities: [capability(0, { requestGasCap: 50000000n })] });
+  const input = variableProgram(30, 4450000n, 32768), before = structuredClone(input);
+  try {
+    await assert.rejects(transport.request(input), error => error.kind === 'provider-limit' && error.diagnostic.phase === 'project-request'
+      && error.diagnostic.callCount === 30 && error.diagnostic.largestTransactionGas === '4450000');
+    assert.deepEqual(input, before); assert.deepEqual(f.privateRequests()[0].body.params, before.params);
+    assert.ok(Buffer.byteLength(JSON.stringify(input)) > 1900000); assert.equal(f.privateRequests().length, 1);
+  } finally { await transport.close(); await f.transport.close(); }
+});
+
+test('a later cumulative remainder does not disable the same provider for a smaller unchanged program', async () => {
+  const f = fixture([{ sharedBudget: 10000000n, projectGas: 2000000n }]);
+  const transport = createKeelPublicSimulationPool({ ...f.options, chainId: 11155111 });
+  try {
+    await assert.rejects(transport.request(variableProgram(7)), error => error.kind === 'provider-limit' && error.diagnostic.blockIndex > 0);
+    const smaller = variableProgram(2);
+    assert.equal((await transport.request(smaller)).length, 2);
+    assert.deepEqual(f.privateRequests().at(-1).body.params, smaller.params);
+  } finally { await transport.close(); await f.transport.close(); }
+});
+
+test('explicit request-budget exhaustion falls back without guessing the cap or splitting dependent state', async () => {
+  for (const code of [-32000, -38026]) {
+  const f = fixture([{}, {}]), attempts = [];
+  const transport = createKeelPublicSimulationPool({ ...f.options, chainId: 11155111, onAttempt: d => attempts.push(d),
+    fetchImpl: async (url, init) => {
+      const body = JSON.parse(init.body);
+      if (url === urls[0] && body.method === 'eth_simulateV1' && body.params[0].blockStateCalls[0].calls[0].data !== '0x') {
+        f.requests.push({ index: 0, body, wire: init.body });
+        return Response.json({ jsonrpc: '2.0', id: body.id, error: { code, message: 'SECRET RPC gas cap exhausted: need 2000000, remaining 0' } });
+      }
+      return f.options.fetchImpl(url, init);
+    },
+  });
+  const input = variableProgram(30), before = structuredClone(input);
+  try {
+    assert.equal((await transport.request(input)).length, 30);
+    assert.deepEqual(f.privateRequests().map(r => r.index), [0, 1]);
+    for (const r of f.privateRequests()) assert.deepEqual(r.body.params, before.params);
+    assert.equal(attempts[0].gasCapacityScope, 'request'); assert.equal(attempts[0].remainingRequestGas, '0');
+    assert.equal(attempts[0].providerGasCap, undefined); assert.doesNotMatch(JSON.stringify(attempts), /SECRET|PRIVATE|https?:\/\//);
+  } finally { await transport.close(); await f.transport.close(); }
+  }
+});
+
+test('stale measured capacity does not disable an intrinsically valid program after a provider upgrade', async () => {
+  const f = fixture([{}]);
+  const transport = createKeelPublicSimulationPool({ ...f.options, chainId: 11155111, providerCapabilities: [{
+    ...capability(0, { transactionGasCap: 1n, requestGasCap: 1n, maximumRequestBytes: 1, maximumBlocks: 1 }),
+    measuredAt: new Date(Date.now() - 300001).toISOString(),
+  }] });
+  const input = variableProgram(30), before = structuredClone(input);
+  try { assert.equal((await transport.request(input)).length, 30); assert.deepEqual(f.privateRequests()[0].body.params, before.params); }
+  finally { await transport.close(); await f.transport.close(); }
+  const clean = fixture([{}]);
+  try {
+    assert.throws(() => createKeelPublicSimulationPool({ ...clean.options, chainId: 11155111,
+      providerCapabilities: [{ ...capability(0, {}), measuredAt: new Date(Date.now() + 60000).toISOString() }],
+    }), /observation time/);
+    for (const capabilityMaximumAgeMs of [-1, 300001, Infinity])
+      assert.throws(() => createKeelPublicSimulationPool({ ...clean.options, chainId: 11155111, capabilityMaximumAgeMs }), /expire/);
+  } finally { await clean.transport.close(); }
+});
+
+test('profiles that expire during a reused transport cause fresh exact qualification on the next phase', async t => {
+  t.mock.timers.enable({ apis: ['Date'], now: Number(BigInt(snapshot.timestamp)) * 1000 });
+  const f = fixture([{}]), transport = createKeelPublicSimulationPool({ ...f.options, chainId: 11155111,
+    providerCapabilities: [capability(0, { transactionGasCap: 1000000n })], capabilityMaximumAgeMs: 1000,
+  });
+  try {
+    await assert.rejects(transport.request(variableProgram(7)), error => error.kind === 'provider-limit' && error.diagnostic.capacitySource === 'measured-profile');
+    assert.equal(f.privateRequests().length, 0); t.mock.timers.tick(1001);
+    assert.equal((await transport.request(variableProgram(7))).length, 7); assert.equal(f.privateRequests().length, 1);
+  } finally { await transport.close(); await f.transport.close(); }
+});
+
+test('fallback replays dependent state from the beginning, never a successful-prefix continuation', async () => {
+  const count = 7, f = fixture([{ sharedBudget: 10000000n, projectGas: 2000000n }, {}]);
+  const input = variableProgram(count);
+  input.params[0].blockStateCalls.forEach((block, i) => { block.calls[0].data = `0xab${i.toString(16).padStart(2, '0')}`; });
+  const transport = createKeelPublicSimulationPool({ ...f.options, chainId: 11155111,
+    fetchImpl: async (url, init) => {
+      const body = JSON.parse(init.body), blocks = body.params[0]?.blockStateCalls;
+      if (body.method === 'eth_simulateV1' && blocks[0].calls[0].data !== '0x') {
+        // One fresh ephemeral fixture state per request. Every call consumes
+        // state created by its predecessor; a suffix or reorder is a revert.
+        let state = 0;
+        for (const block of blocks) {
+          if (block.calls[0].data !== `0xab${state.toString(16).padStart(2, '0')}`)
+            return Response.json({ jsonrpc: '2.0', id: body.id, error: { code: 3, message: 'fixture dependent state missing' } });
+          state++;
+        }
+        assert.equal(state, count);
+      }
+      return f.options.fetchImpl(url, init);
+    },
+  });
+  try {
+    assert.equal((await transport.request(input)).length, count); assert.deepEqual(f.privateRequests().map(r => r.index), [0, 1]);
+    for (const r of f.privateRequests()) assert.deepEqual(r.body.params, input.params);
+  } finally { await transport.close(); await f.transport.close(); }
+});
+
+test('an observed earlier provider cap also expires and requalifies after infrastructure recovery', async t => {
+  t.mock.timers.enable({ apis: ['Date'], now: Number(BigInt(snapshot.timestamp)) * 1000 });
+  const fault = { cap: true }, f = fixture([fault]), transport = createKeelPublicSimulationPool({ ...f.options, chainId: 11155111, capabilityMaximumAgeMs: 1000 });
+  try {
+    await assert.rejects(transport.request(program()), error => error.kind === 'provider-limit');
+    assert.equal(f.privateRequests().length, 0); fault.cap = false; t.mock.timers.tick(1001);
+    assert.equal((await transport.request(program())).length, 5); assert.equal(f.privateRequests().length, 1);
+  } finally { await transport.close(); await f.transport.close(); }
+});
+
+test('only typed request-capacity evidence permits -38026 fallback; transaction validation and ambiguous client errors remain terminal', async () => {
+  for (const fault of [
+    { error: -38026, message: 'too many blocks SECRET' },
+    { error: -38026, message: 'maximum allowed gas: 50000000 SECRET' },
+    { error: -38011, message: 'RPC gas cap: 50000000 SECRET' },
+    { error: -38013, message: 'RPC gas cap: 50000000 SECRET' },
+  ]) {
+    const f = fixture([fault, {}]), transport = createKeelPublicSimulationPool({ ...f.options, chainId: 11155111 });
+    try {
+      await assert.rejects(transport.request(variableProgram(30)), error => error.diagnostic.rpcCode === fault.error);
+      assert.deepEqual(f.privateRequests().map(r => r.index), [0]); assert.ok(f.requests.every(r => r.index === 0));
+    } finally { await transport.close(); await f.transport.close(); }
+  }
+  const f = fixture([{ error: -38026, message: 'RPC gas cap: 50000000 SECRET' }, {}]);
+  const transport = createKeelPublicSimulationPool({ ...f.options, chainId: 11155111 });
+  const input = variableProgram(30);
+  try {
+    assert.equal((await transport.request(input)).length, 30); assert.deepEqual(f.privateRequests().map(r => r.index), [0, 1]);
+    for (const r of f.privateRequests()) assert.deepEqual(r.body.params, input.params);
+  } finally { await transport.close(); await f.transport.close(); }
 });
