@@ -1,3 +1,4 @@
+import { createKeelLegacySharedImageReader, KEEL_LEGACY_SHARED_IMAGE_PROFILE } from "./legacy-shared-image-reader.js";
 import { createHash } from "node:crypto";
 import { brotliCompressSync, brotliDecompressSync, constants, deflateSync, gzipSync } from "node:zlib";
 import { canonicalJson, resolveKeelPayloadStorage, type KeelPayloadStorageMode } from "@keel/protocol";
@@ -18,6 +19,7 @@ const commitment = (value: Uint8Array) => Object.freeze({ algorithm: "sha256" as
 const concat = (parts: readonly Uint8Array[]) => Uint8Array.from(Buffer.concat(parts));
 /** Distinct registry identity: never replace the canonical follow-latest shell head. */
 export const KEEL_LEGACY_PREPARED_DENSE_SHELL_ID = keccak256(stringToHex("keel.shell.legacy-prepared-dense-copy@1"));
+export const KEEL_LEGACY_SHARED_IMAGE_SHELL_ID = keccak256(stringToHex("keel.shell.legacy-prepared-dense-shared-image@1"));
 export const KEEL_LEGACY_PREPARED_LEAF_DECODED_BYTES = 512 * 1024;
 export type KeelLegacyPreparedDenseResource = {
   readonly id: string; readonly aliases?: readonly string[]; readonly role: "entrypoint" | "module" | "asset" | "data";
@@ -36,6 +38,8 @@ export async function buildKeelLegacyPreparedDenseDocument(input: {
   readonly modules?: readonly KeelInlineModuleFragment[];
   readonly entryId: string;
   readonly posterResourceId?: string;
+  /** Explicit dual consumer: native image stored once, new compatible reader injects its return-only Base64 slot. */
+  readonly sharedCollectorImageResourceId?: string;
   readonly compression?: "auto" | "brotli" | "none" | "gzip" | "deflate";
   readonly brotliQuality?: number;
   readonly shellBootCompression?: "gzip" | "none";
@@ -48,7 +52,7 @@ export async function buildKeelLegacyPreparedDenseDocument(input: {
       || !Number.isSafeInteger(limits.maximumDecodedSourceBytes) || limits.maximumDecodedSourceBytes < 1 || limits.maximumDecodedSourceBytes > 512 * 1024 * 1024) throw new TypeError("Invalid host source limits.");
   if (!Array.isArray(input.resources) || !input.resources.length || input.resources.length > limits.maximumResources) throw new RangeError("Legacy prepared sources exceed the configured upload file limit.");
   // Capture every caller value before shell-building awaits.
-  const chainId = input.chainId, entryId = input.entryId, posterResourceId = input.posterResourceId;
+  const chainId = input.chainId, entryId = input.entryId, posterResourceId = input.posterResourceId, sharedImageId = input.sharedCollectorImageResourceId;
   const compression = input.compression ?? "auto", quality = input.brotliQuality;
   const shellBootCompression = input.shellBootCompression;
   const resources = input.resources.map(resource => ({ ...resource, bytes: Uint8Array.from(resource.bytes), aliases: [...resource.aliases ?? [resource.id]],
@@ -65,6 +69,9 @@ export async function buildKeelLegacyPreparedDenseDocument(input: {
   if (resources.filter(resource => resource.role === "entrypoint").length !== 1 || resources.find(resource => resource.id === entryId)?.role !== "entrypoint"
       || resources.find(resource => resource.id === entryId)?.mediaType !== "text/html"
       || posterResourceId !== undefined && !resources.some(resource => resource.id === posterResourceId && resource.mediaType.startsWith("image/"))) throw new TypeError("Legacy prepared source entry/poster identity is invalid.");
+  const sharedImage = sharedImageId === undefined ? undefined : resources.find(resource => resource.id === sharedImageId);
+  if (sharedImageId !== undefined && (!sharedImage || sharedImage.role !== "asset" || !["image/png", "image/jpeg", "image/gif", "image/webp", "image/avif"].includes(sharedImage.mediaType)
+      || sharedImage.bytes.length > 2_000_000 || sharedImage.storedBytes !== undefined || !["auto", "none"].includes(sharedImage.compression ?? compression))) throw new TypeError("Shared collector image requires one exact native supported raster within the complete Inline bound; explicit compressed streams require their compatible image reader.");
   const packs = new Map<string, KeelLegacyPreparedDensePack>();
   const descriptors: KeelLegacyPreparedDenseItem[] = [];
   const measurements: Array<{ id: string; compression: string; sourceBytes: number; segments: number }> = [];
@@ -94,6 +101,11 @@ export async function buildKeelLegacyPreparedDenseDocument(input: {
     }
   }
   for (const resource of resources) {
+    if (resource.id === sharedImageId) {
+      descriptors.push({ id: resource.id, aliases: resource.aliases, role: resource.role, mediaType: resource.mediaType, integrity: commitment(resource.bytes),
+        embedded: { compression: "none", storedBase64: Buffer.from(resource.bytes).toString("base64") } } as unknown as KeelLegacyPreparedDenseItem);
+      measurements.push({ id: resource.id, compression: "native-shared-image", sourceBytes: resource.bytes.length, segments: 0 }); continue;
+    }
     const selected = resource.compression ?? compression;
     const segments: KeelLegacyPreparedDensePack[] = [];
     if (resource.storedBytes !== undefined) {
@@ -111,9 +123,9 @@ export async function buildKeelLegacyPreparedDenseDocument(input: {
     measurements.push({ id: resource.id, compression: selected, sourceBytes: resource.bytes.length, segments: segments.length });
   }
   // Shared reader validation rejects conflicting IDs/aliases/codec commitments before generating a shell.
-  const reader = createKeelLegacyPreparedDenseReader({ items: [...modules.map(module => module.item), ...descriptors], payloads: [...packs.values()], decodeTransport: () => { throw new Error("Build validation does not decode."); },
+  const reader = (sharedImage ? createKeelLegacySharedImageReader : createKeelLegacyPreparedDenseReader)({ items: [...modules.map(module => module.item), ...descriptors], payloads: [...packs.values()], decodeTransport: () => { throw new Error("Build validation does not decode."); },
     verify: async value => value, decompress: async (_codec, value) => value });
-  const shell = await buildKeelPreparedDenseCopyShell({ legacyPreparedDenseDelivery: { chainId }, ...(shellBootCompression === undefined ? {} : { shellBootCompression }) });
+  const shell = await buildKeelPreparedDenseCopyShell({ legacyPreparedDenseDelivery: { chainId, ...(sharedImage ? { sharedImage: true } : {}) }, ...(shellBootCompression === undefined ? {} : { shellBootCompression }) });
   const parts: KeelInlineDocumentPart[] = [];
   const add = (kind: "existing" | "creator", role: "shell-prefix" | "shell-suffix" | "asset", value: Uint8Array) => {
     parts.push({ kind, role, bytes: value, byteLength: value.length, integrity: commitment(value) } as KeelInlineDocumentPart);
@@ -131,18 +143,33 @@ export async function buildKeelLegacyPreparedDenseDocument(input: {
     parts.push({ kind: "existing", role: "module", moduleId: module.moduleId, moduleVersion: module.version, execution: module.execution, phase: module.phase, weight: module.weight,
       bytes: Uint8Array.from(module.bytes), byteLength: module.bytes.length, integrity: module.integrity });
   }
-  add("creator", "asset", bytes("," + descriptors.map(serializeKeelDenseTransportJSON).join(",")));
+  let sharedImageDocumentPartIndex: number | undefined;
+  if (!sharedImage) add("creator", "asset", bytes("," + descriptors.map(serializeKeelDenseTransportJSON).join(",")));
+  else {
+    // Isolate only the return-time native image transform. Every original descriptor stays in order.
+    const serialized = "," + descriptors.map(serializeKeelDenseTransportJSON).join(",");
+    const imageText = Buffer.from(sharedImage.bytes).toString("base64");
+    const marker = '"storedBase64":"' + imageText + '"';
+    const at = serialized.indexOf(marker);
+    if (at < 0 || serialized.indexOf(marker, at + marker.length) >= 0) throw new TypeError("Ambiguous shared image slot.");
+    const start = at + '"storedBase64":"'.length;
+    add("creator", "asset", bytes(serialized.slice(0, start)));
+    sharedImageDocumentPartIndex = parts.length;
+    add("creator", "asset", bytes(imageText));
+    add("creator", "asset", bytes(serialized.slice(start + imageText.length)));
+  }
   add("existing", "shell-suffix", Uint8Array.from(shell.suffix));
   const rootBytes = concat(parts.map(part => part.bytes));
   assertKeelFreshPayloadCarriage(rootBytes);
   const document: KeelInlineLocalDocument = { schema: "keel-inline-local-document@1", rootBytes, rootIntegrity: commitment(rootBytes), byteLength: rootBytes.length, parts };
-  return { protocol: KEEL_LEGACY_PREPARED_DENSE_PROFILE, document, resources: descriptors, entryId, ...(posterResourceId === undefined ? {} : { posterResourceId }),
+  return { protocol: sharedImage ? KEEL_LEGACY_SHARED_IMAGE_PROFILE : KEEL_LEGACY_PREPARED_DENSE_PROFILE, document,
+    ...(sharedImage ? { sharedCollectorImage: { resourceId: sharedImage.id, mediaType: sharedImage.mediaType, bytes: Uint8Array.from(sharedImage.bytes), integrity: commitment(sharedImage.bytes), documentPartIndex: sharedImageDocumentPartIndex! } } : {}), resources: descriptors, entryId, ...(posterResourceId === undefined ? {} : { posterResourceId }),
     payloadStorage: "compact" as const, sourceLimits: Object.freeze(limits),
-    shellRegistration: { profile: KEEL_LEGACY_PREPARED_DENSE_PROFILE, shellId: KEEL_LEGACY_PREPARED_DENSE_SHELL_ID, resourceProfile: shell.resourceProfile,
+    shellRegistration: { profile: sharedImage ? KEEL_LEGACY_SHARED_IMAGE_PROFILE : KEEL_LEGACY_PREPARED_DENSE_PROFILE, shellId: sharedImage ? KEEL_LEGACY_SHARED_IMAGE_SHELL_ID : KEEL_LEGACY_PREPARED_DENSE_SHELL_ID, resourceProfile: shell.resourceProfile,
       prefix: Uint8Array.from(shell.prefix), suffix: Uint8Array.from(shell.suffix), prefixIntegrity: shell.prefixIntegrity, suffixIntegrity: shell.suffixIntegrity,
       canonicalPrefixIntegrity: shell.canonicalPrefixIntegrity, canonicalSuffixIntegrity: shell.canonicalSuffixIntegrity,
       decoderIntegrity: shell.decoderIntegrity, transportDecoderIntegrity: shell.transportDecoderIntegrity,
-      bodySchema: "keel.legacy-prepared-dense-packs-and-segments@1" as const,
+      bodySchema: sharedImage ? "keel.legacy-prepared-dense-packs-and-native-image@1" as const : "keel.legacy-prepared-dense-packs-and-segments@1" as const,
       contextSchema: "keel-context@1:legacy-six-fields" as const, selectedChainRegistrationVerified: false as const },
     optimization: { sourceBytes, physicalPayloadCount: packs.size, logicalResourceCount: resources.length, leafDecodedBytes: KEEL_LEGACY_PREPARED_LEAF_DECODED_BYTES,
       compressedPayloadBytes: physical.reduce((sum, pack) => sum + pack.storedIntegrity.byteLength, 0),
@@ -153,9 +180,9 @@ export async function buildKeelLegacyPreparedDenseDocument(input: {
 /** Local replay of the actual prepared body; selected-chain authentication remains separate. */
 export async function readKeelLegacyPreparedDenseSources(input: { readonly htmlBytes: Uint8Array }) {
   const inspected = inspectKeelPreparedDenseCopyDocument(text(input.htmlBytes));
-  if (!inspected || inspected.legacyPreparedProfile !== KEEL_LEGACY_PREPARED_DENSE_PROFILE) throw new TypeError("Expected the distinct legacy prepared dense profile.");
+  if (!inspected || ![KEEL_LEGACY_PREPARED_DENSE_PROFILE, KEEL_LEGACY_SHARED_IMAGE_PROFILE].includes(inspected.legacyPreparedProfile!)) throw new TypeError("Expected the distinct legacy prepared dense profile.");
   const items = inspected.items.filter(value => value !== null) as unknown as readonly KeelLegacyPreparedDenseItem[];
-  const reader = createKeelLegacyPreparedDenseReader({ items, payloads: readKeelInlineJSONArray(inspected.html, "globalThis.__KEEL_EMBEDDED_CONTAINERS__=") as readonly KeelLegacyPreparedDensePack[],
+  const reader = (inspected.legacyPreparedProfile === KEEL_LEGACY_SHARED_IMAGE_PROFILE ? createKeelLegacySharedImageReader : createKeelLegacyPreparedDenseReader)({ items, payloads: readKeelInlineJSONArray(inspected.html, "globalThis.__KEEL_EMBEDDED_CONTAINERS__=") as readonly KeelLegacyPreparedDensePack[],
     decodeTransport: (value, byteLength) => decodeKeelDenseTransport(value, { profile: "base90-v1", byteLength }),
     verify: async (value, expected, label) => { const actual = commitment(value); if (actual.byteLength !== expected.byteLength || actual.digest !== expected.digest) throw new TypeError(`${label} SHA-256 or length mismatch.`); return value; },
     decompress: async (codec, value, byteLength) => codec === "none" ? value : codec === "brotli" ? decodeBrotli(value, { decodedByteLength: byteLength })

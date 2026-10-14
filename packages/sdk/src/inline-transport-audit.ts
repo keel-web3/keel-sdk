@@ -1,3 +1,4 @@
+import { createKeelLegacySharedImageReader, KEEL_LEGACY_SHARED_IMAGE_PROFILE } from "./legacy-shared-image-reader.js";
 import { gunzipSync } from "node:zlib";
 import {createPpmdTask} from "./decoders/vendor/ppmd.js";
 import { unpackKeelInlineDescriptors } from "./inline-descriptor-columns.js";
@@ -129,7 +130,7 @@ export function inspectKeelPreparedDenseCopyDocument(html: string) {
   let expandedItems=items;
   if(compactContext||innerContext){const context=object(JSON.parse((compactContext??innerContext)![1]!));expandedItems=unpackKeelInlineDescriptors(items,context.chainId as number,context.store as string);if(compactContext)items=expandedItems;}
   if (!packs.length || items[0] !== null || items.length < 2) throw new TypeError("Incomplete prepared dense COPY resources.");
-  const legacyPreparedProfile = suffix.startsWith('];const __KEEL_LEGACY_DENSE_PROFILE__="keel.legacy-prepared-dense-copy@1";') ? KEEL_LEGACY_PREPARED_DENSE_PROFILE : undefined;
+  const legacyPreparedProfile = suffix.startsWith('];const __KEEL_LEGACY_DENSE_PROFILE__="keel.legacy-prepared-dense-shared-image@1";') ? KEEL_LEGACY_SHARED_IMAGE_PROFILE : suffix.startsWith('];const __KEEL_LEGACY_DENSE_PROFILE__="keel.legacy-prepared-dense-copy@1";') ? KEEL_LEGACY_PREPARED_DENSE_PROFILE : undefined;
   if (legacyPreparedProfile) {
     if (!html.startsWith('<!doctype html><html><head><meta charset="utf-8"></head><body><script>const __KEEL_PREPARED_DENSE_PACKS__=[')
         || compactContext || innerContext || profiles[0] !== "base90-v1"
@@ -156,7 +157,7 @@ export function inspectKeelPreparedDenseCopyDocument(html: string) {
         : `<script>const j=atob("${contextBytes.toString("base64")}"),c=Object.freeze(JSON.parse(j));__KEEL_CONTEXT__=c;__KEEL_ONCHAIN_CONTEXT__=Object.freeze({json:j});KEEL_SEED=c.derivedTokenSeed??c.tokenSeed??c.seed</script>`;
       if (tail !== expectedTail) throw new TypeError("Legacy prepared context tail has changed or contains extra code.");
     }
-    createKeelLegacyPreparedDenseReader({ items: expandedItems.filter(value => value !== null) as unknown as readonly KeelStandaloneViewerItem[], payloads: packs as readonly KeelLegacyPreparedDensePack[],
+    (legacyPreparedProfile === KEEL_LEGACY_SHARED_IMAGE_PROFILE ? createKeelLegacySharedImageReader : createKeelLegacyPreparedDenseReader)({ items: expandedItems.filter(value => value !== null) as unknown as readonly KeelStandaloneViewerItem[], payloads: packs as readonly KeelLegacyPreparedDensePack[],
       decodeTransport: () => { throw new Error("Static inspection does not execute a decoder."); }, verify: async bytes => bytes, decompress: async (_codec, bytes) => bytes });
   }
   return { html: prefix + serializeKeelDenseTransportJSON(packs).slice(1,-1) + bridge + serializeKeelDenseTransportJSON(items).slice(5,-1) + suffix,
@@ -240,7 +241,7 @@ export function assertKeelPreparedCollectorInlineMetadata(metadata: Readonly<Rec
   if (typeof animation === "string" && animation.startsWith("data:text/html;charset=utf-8,")) {
     const html = decoder.decode(decodeKeelInlineDataURI(animation, "text/html"));
     const prepared = inspectKeelPreparedDenseCopyDocument(html);
-    if (prepared?.legacyPreparedProfile === KEEL_LEGACY_PREPARED_DENSE_PROFILE) {
+    if ((prepared?.legacyPreparedProfile === KEEL_LEGACY_PREPARED_DENSE_PROFILE || prepared?.legacyPreparedProfile === KEEL_LEGACY_SHARED_IMAGE_PROFILE)) {
       const innerAnimation = "data:text/html;charset=utf-8," + encodeURIComponent(prepared.html);
       assertKeelCollectorInlineMetadata({ ...metadata, animation_url: innerAnimation }); return;
     }
@@ -258,7 +259,7 @@ export function assertKeelFreshPayloadAudit(value: unknown): void {
       || audit.payloadCount !== audit.payloads.length) throw new TypeError("Invalid fresh payload carriage audit.");
   const prepared = audit.preparedDenseCopy === undefined ? undefined : object(audit.preparedDenseCopy);
   if (prepared && (Object.keys(prepared).some(key => !["transportProfile","shellBootEncoding","shellBootCompression","payloadPreparation","contractOperation","legacyPreparedProfile"].includes(key)) || !["base90-v1","base91-v1","base90-block-v2","uri81-block-v1"].includes(prepared.transportProfile as string) || prepared.shellBootEncoding !== "base64" || prepared.shellBootCompression !== undefined && prepared.shellBootCompression !== "gzip" && prepared.shellBootCompression !== "none" && prepared.shellBootCompression !== "ppmd" || prepared.payloadPreparation !== "build-time" || prepared.contractOperation !== "verified-copy"
-      || prepared.legacyPreparedProfile !== undefined && (prepared.legacyPreparedProfile !== KEEL_LEGACY_PREPARED_DENSE_PROFILE || prepared.transportProfile !== "base90-v1" || !["gzip","none"].includes(String(prepared.shellBootCompression))))) throw new TypeError("Invalid prepared dense COPY audit.");
+      || prepared.legacyPreparedProfile !== undefined && ((prepared.legacyPreparedProfile !== KEEL_LEGACY_PREPARED_DENSE_PROFILE && prepared.legacyPreparedProfile !== KEEL_LEGACY_SHARED_IMAGE_PROFILE) || prepared.transportProfile !== "base90-v1" || !["gzip","none"].includes(String(prepared.shellBootCompression))))) throw new TypeError("Invalid prepared dense COPY audit.");
   let binary = 0, carried = 0;
   for (const value of audit.payloads) {
     const payload = object(value);
@@ -272,7 +273,7 @@ export function assertKeelFreshPayloadAudit(value: unknown): void {
       && ["image/png", "image/gif", "image/jpeg", "image/webp", "image/avif"].includes(imageMedia)
       && payload.textCarriageBytes === Math.ceil((payload.binaryBytes as number) / 3) * 4;
     const dense = payload.encoding === "dense" && prepared !== undefined && payload.transportProfile === prepared.transportProfile
-      && (prepared.legacyPreparedProfile === KEEL_LEGACY_PREPARED_DENSE_PROFILE ? ["none","brotli","gzip","deflate"].includes(String(payload.compression)) : payload.compression === "container-bound") && payload.directImage === false;
+      && ((prepared.legacyPreparedProfile === KEEL_LEGACY_PREPARED_DENSE_PROFILE || prepared.legacyPreparedProfile === KEEL_LEGACY_SHARED_IMAGE_PROFILE) ? ["none","brotli","gzip","deflate"].includes(String(payload.compression)) : payload.compression === "container-bound") && payload.directImage === false;
     if (!rawText && !image && !dense) throw new TypeError("Fresh payload audit contains a newly encoded body.");
     binary += payload.binaryBytes as number; carried += payload.textCarriageBytes as number;
   }

@@ -1140,7 +1140,7 @@ export async function buildCompactInlineKeelShell(input: {
   /** EVM-assembled compressed packs; the response contains every byte and never exposes a browser RPC transport. */
   readonly embeddedContainerDelivery?: { readonly chainId: number; readonly store: string };
   /** Distinct registered reader for the legacy six-field prepared token context. */
-  readonly legacyPreparedDenseDelivery?: { readonly chainId: number };
+  readonly legacyPreparedDenseDelivery?: { readonly chainId: number; readonly sharedImage?: boolean };
   /** Optional RPC information only. Never changes embedded artwork delivery or the proof. */
   readonly optionalMarketplaceInfo?: KeelShellMarketplaceConfig;
   /** Contain an authored viewport without moving scene controls. */
@@ -1286,8 +1286,12 @@ export async function buildCompactInlineKeelShell(input: {
     const withResolve = withReader.replace(/(const resolve = async \(item[^\n]*?\{)/u, `$1\n    return (await (legacyReader ??= initializeLegacyReader())).resolve(item);`);
     const disabled = withResolve.replace("if (enabled) {", "if (false) {");
     if (withReader === runtimeSource || withResolve === withReader || disabled === withResolve) throw new Error("Canonical legacy prepared reader hooks are missing.");
-    runtimeSource = disabled;
-    binaryReaderImport = `import {createKeelLegacyPreparedDenseReader,validateKeelLegacyPreparedContext} from ${JSON.stringify(fileURLToPath(new URL("./legacy-prepared-dense-reader.js", import.meta.url)))};`;
+    if (input.legacyPreparedDenseDelivery.sharedImage) {
+      const shared = disabled.replace(/(const replaceAliases = [\s\S]*?let output = )text;/u, '$1replaceKeelSharedImageCSSAliases(text, aliases);');
+      if (shared === disabled) throw new Error("Shared-image CSS alias hook is missing.");
+      runtimeSource = shared;
+    } else runtimeSource = disabled;
+    binaryReaderImport = `import {${input.legacyPreparedDenseDelivery.sharedImage ? "createKeelLegacySharedImageReader as createKeelLegacyPreparedDenseReader,replaceKeelSharedImageCSSAliases" : "createKeelLegacyPreparedDenseReader"},validateKeelLegacyPreparedContext} from ${JSON.stringify(fileURLToPath(new URL(input.legacyPreparedDenseDelivery.sharedImage ? "./legacy-shared-image-reader.js" : "./legacy-prepared-dense-reader.js", import.meta.url)))};`;
   }
   if (input.fitViewport) {
     const {width, height} = input.fitViewport;
@@ -1321,10 +1325,10 @@ export async function buildCompactInlineKeelShell(input: {
   const runtime = runtimeBuild.outputFiles[0]?.text;
   if (runtime === undefined) throw new Error("Compact KEEL Inline runtime produced no JavaScript.");
   const prefix = utf8ToBytes(('<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><style>*{box-sizing:border-box}html,body,#keel-stage,iframe{width:100%;height:100%;margin:0;border:0;overflow:hidden;background:#0c0d10}body{position:relative;overflow:clip!important}[hidden]{display:none!important}'+KEEL_LOADING_CSS+'</style></head><body data-verification="pending"><div id="keel-stage"></div>'+KEEL_LOADING_MARKUP+'<script>globalThis.__KEEL_ITEMS__=[null').replace("globalThis.__KEEL_ITEMS__=[null", input.embeddedContainerDelivery || input.legacyPreparedDenseDelivery ? "globalThis.__KEEL_EMBEDDED_CONTAINERS__=[" : "globalThis.__KEEL_ITEMS__=[null"));
-  const suffix = utf8ToBytes(`];${input.legacyPreparedDenseDelivery ? 'const __KEEL_LEGACY_DENSE_PROFILE__="keel.legacy-prepared-dense-copy@1";' : ""}${runtime}</script></body></html>`);
+  const suffix = utf8ToBytes(`];${input.legacyPreparedDenseDelivery ? 'const __KEEL_LEGACY_DENSE_PROFILE__="' + (input.legacyPreparedDenseDelivery.sharedImage ? 'keel.legacy-prepared-dense-shared-image@1' : 'keel.legacy-prepared-dense-copy@1') + '";' : ""}${runtime}</script></body></html>`);
   const [prefixIntegrity, suffixIntegrity] = await Promise.all([sha256Integrity(prefix), sha256Integrity(suffix)]);
   const containerBridge = input.embeddedContainerDelivery || input.legacyPreparedDenseDelivery ? utf8ToBytes("];globalThis.__KEEL_ITEMS__=[null") : undefined;
-  return { prefix, suffix, prefixIntegrity, suffixIntegrity, ...(containerBridge ? { resourceProfile: input.legacyPreparedDenseDelivery ? "legacy-prepared-dense-copy@1" as const : transportProfile === "uri81-block-v1" ? "embedded-shared-containers-uri81@1" as const : transportProfile === "base90-block-v2" ? "embedded-shared-containers-base90-block@2" as const : transportProfile === "base90-v1" ? "embedded-shared-containers-base90@1" as const : transportProfile === "base91-v1" ? "embedded-shared-containers-base91@1" as const : "embedded-shared-containers@1" as const, containerBridge,
+  return { prefix, suffix, prefixIntegrity, suffixIntegrity, ...(containerBridge ? { resourceProfile: input.legacyPreparedDenseDelivery ? input.legacyPreparedDenseDelivery.sharedImage ? "legacy-prepared-dense-shared-image@1" as const : "legacy-prepared-dense-copy@1" as const : transportProfile === "uri81-block-v1" ? "embedded-shared-containers-uri81@1" as const : transportProfile === "base90-block-v2" ? "embedded-shared-containers-base90-block@2" as const : transportProfile === "base90-v1" ? "embedded-shared-containers-base90@1" as const : transportProfile === "base91-v1" ? "embedded-shared-containers-base91@1" as const : "embedded-shared-containers@1" as const, containerBridge,
     containerBridgeIntegrity: await sha256Integrity(containerBridge) } : {}), deliveryProfile: input.onchainDelivery ? "onchain-recursive" : "embedded-assembled", codecProfile, supportedCodecs: ["none", "gzip", "deflate", ...codecs], ...(decoderModule ? { decoderIntegrity: decoderModule.integrity } : {}), ...(transportModule ? { transportDecoderIntegrity: transportModule.integrity } : {}) };
 }
 
