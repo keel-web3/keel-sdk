@@ -158,3 +158,5 @@ export * from "./release-wallet-batch.js";
 export { createKeelSepoliaSimulationTransport } from "./sepolia-simulation-transport.js";
 export * from "./public-simulation-pool.js";
 export * from "./simulation-capacity-policy.js";
+
+export * from "./legacy-shared-image-program.js";

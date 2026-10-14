@@ -8,6 +8,7 @@ export function mountArtifact(
 ): MountedArtifact {
   const sandboxDocument = createSandboxDocument(artifact, {
     ...(options.runtimeContext === undefined ? {} : { runtimeContext: options.runtimeContext }),
+    ...(options.materializeResourceUrls === undefined ? {} : { materializeResourceUrls: options.materializeResourceUrls }),
     ...(options.consumer === true ? { consumer: true } : {}),
   });
   const iframe = globalThis.document.createElement("iframe");

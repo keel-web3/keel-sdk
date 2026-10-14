@@ -1,0 +1,159 @@
+{
+  "schema": "keel-legacy-shared-image-local-qualification@1",
+  "fixedProductionSourceCommit": "bb6ff59d61f0773693a4acccb6db2272f25a372f",
+  "baseSDKCommit": "3a2fab4695604461f9e61acd6bbe262e8bc72d41",
+  "status": "local-qualified; selected-chain and production unqualified",
+  "fullMonorepoSuiteRun": false,
+  "fixedSDKCoreManifestSHA256": "4f095d04d00ae37efb5b6f08117727da94b950e1791a654b4523bfdf5909eb46",
+  "fixedFilesChecked": 922,
+  "fixedFileChanges": [],
+  "gates": {
+    "focusedSDK": {
+      "passed": 102,
+      "failed": 0,
+      "skipped": 0,
+      "log": "focused-final.log"
+    },
+    "sixExistingProfiles": {
+      "passed": 1,
+      "profiles": 6,
+      "failed": 0,
+      "skipped": 0,
+      "log": "six-profile-identity-final.log"
+    },
+    "suiteClassificationAndSimulationPolicy": {
+      "passed": 10,
+      "failed": 0,
+      "skipped": 0,
+      "log": "classification-final.log"
+    },
+    "sdkNoEmitTypecheck": {
+      "exitCode": 0,
+      "log": "final-typecheck.log"
+    },
+    "actualCollectionReaderAndBrowser": {
+      "passed": 1,
+      "failed": 0,
+      "skipped": 0,
+      "log": "evm-browser-v2.log",
+      "proof": "evm-browser-v2-proof.json",
+      "storagePolicyAdapter": "synthetic LocalHold; actual collection/image module/new reader"
+    },
+    "actualModernHoldPolicy": {
+      "passed": 1,
+      "failed": 0,
+      "skipped": 0,
+      "log": "actual-hold-policy-final.log",
+      "proof": "actual-hold-policy-final-proof.json",
+      "actualContractsSourceCommit": "8ab7327b9765b36ab4d3596994e194b991030ae3",
+      "syntheticAdapters": [
+        "governance/pause authority",
+        "fee treasury"
+      ]
+    }
+  },
+  "unsignedRegistration": {
+    "descriptor": "registration/descriptor.json",
+    "selectedChainRegistrationVerified": false
+  },
+  "knownProductionGates": [
+    "Authenticate compatible selected-chain reader and exact runtime/bindings; the standard builder requires modern Hold policy APIs and is not compatible with the recorded historical Hold without a separately reviewed adapter.",
+    "Stage exact required storage policy calls/allowances without changing object IDs; the actual modern Hold proof is not a proof of the Site historical openJob sequence.",
+    "Restore authorized creator drafts:read and drafts:write for real retained-draft end-to-end validation.",
+    "Reconcile and run the complete actual release/read-back and approval path; no real publication or mint is verified."
+  ],
+  "signing": "not-performed",
+  "submission": "not-performed",
+  "productionDeployment": "not-performed",
+  "evidence": {
+    "STATUS.md": {
+      "bytes": 2349,
+      "sha256": "aacb7441422f1cc418f8b31684270e0260f3bcd3d5777a67453a6529b843f055"
+    },
+    "actual-hold-policy-final-proof.json": {
+      "bytes": 13748,
+      "sha256": "d15738ad5459a5fac9d9a112277bfa1e552e2ae57d04035623547eaa534ebad9"
+    },
+    "actual-hold-policy-final.log": {
+      "bytes": 12157,
+      "sha256": "df02e16c8bc832dec62e1170de485490e29a1d0811c045c7322a61ce46685951"
+    },
+    "actual-hold-policy-v1.log": {
+      "bytes": 11660,
+      "sha256": "6c6f61f7c699cfbba289fa3dcde1fbf19189c29f133f12d167bb6758301a8434"
+    },
+    "classification-final.log": {
+      "bytes": 2687,
+      "sha256": "4c94e556845b4bf24e8a007e46a7454c6dacf634afc6596f2cd4c32be2bc7f54"
+    },
+    "classification-first-run-failed.log": {
+      "bytes": 4233,
+      "sha256": "5f1e2817085f71c88247f6465213df690c8fd70d88f691962be9469d3e1ff2fe"
+    },
+    "final-after.json": {
+      "bytes": 139,
+      "sha256": "88ed2675462a926c5805e07df3b36528dffe776d0bbb6a183253558c21d57d42"
+    },
+    "final-typecheck.log": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "focused-final.log": {
+      "bytes": 23844,
+      "sha256": "e12d02b1d692940c210d39ac7af746f4de12522fb0b50b20066be9eb86966c2b"
+    },
+    "focused-first-run-failed.log": {
+      "bytes": 24390,
+      "sha256": "9b17bbed0dca5da8fc79bc5e21f6a946378292d3ff6c723b429f6ca5b33e28f7"
+    },
+    "registration/descriptor.json": {
+      "bytes": 3311,
+      "sha256": "b5a84b4e2b255e45a9817c318398de5312a555090f98c176dfc4ca33504b21e7"
+    },
+    "registration/generate.mjs": {
+      "bytes": 3205,
+      "sha256": "85844f05f26a0a08943627b9c7fe37d264802aedc7c5b20d3bf93062f05af2a8"
+    },
+    "registration/prefix.compact.raw-percent.fragment": {
+      "bytes": 187,
+      "sha256": "544649250d343c45e02cc47cffbfc5e663fc61bb696724fb82d033b086b684be"
+    },
+    "registration/prefix.mode2.preencoded.txt": {
+      "bytes": 192,
+      "sha256": "12056a22409156c0f498ddda102b85525d4e9d0836a8c601d842bc7071364a20"
+    },
+    "registration/prefix.raw.html.txt": {
+      "bytes": 107,
+      "sha256": "4c8a95566a16a19875b1f054abf5e1ecc319f92ae46ae46ac67fa39f7837d4c4"
+    },
+    "registration/suffix.compact.raw-percent.fragment": {
+      "bytes": 190572,
+      "sha256": "a89e204c5d44fefef67b1401a659b7afde69c3260b34c8e402c39abac94ad4a8"
+    },
+    "registration/suffix.mode2.preencoded.txt": {
+      "bytes": 338304,
+      "sha256": "b8d1829c864300e222425183a8ea274bb16a1bcfd5ab26929a25c16e6420b975"
+    },
+    "registration/suffix.raw.html.txt": {
+      "bytes": 190288,
+      "sha256": "820a3a0b30106b56daccb1bb070084f06585808a0a29c50ae83171a6b479ac72"
+    },
+    "six-profile-identity-final.log": {
+      "bytes": 2261,
+      "sha256": "a22702057de84d10bd6282835181b22e813e806409ff26fd242b252fc63f693c"
+    }
+  },
+  "testSourceSHA256": {
+    "tests/sdk-legacy-shared-image-core.test.mjs": "3bdcfb697fd0aa3ff080b2ba1bcbfe11f9a11b7c6972633c0308340087db8e12",
+    "tests/sdk-legacy-shared-image-hold-policy.test.mjs": "41b0274b2289346385870117856bb3c3959306e85503fff334cbd38e75d9c309",
+    "tests/sdk-legacy-shared-image-evm-browser.test.mjs": "f83147b15a3c28591e6f5a50374412ca0e7ebb4029d9e35e8591a23bb87a20e5",
+    "tests/sdk-legacy-shared-image.test.mjs": "9a25274557a4ef225dbd2f568ea09f3105a0d1b216c35fa0191afd79ba313a48",
+    "tests/support/shared-image-contracts.mjs": "7caa83cfc94101dbdc0fde683883f9c7725db44f05e0fdadf6076e32a5d5f0d9",
+    "tests/support/legacy-shared-image-fixture.mjs": "62d85a913830a770841d19347473c960f6c3658f631fb7b1833015b01a5ed4cf",
+    "tests/fixtures/legacy-shared-image/LocalHold.sol": "3267ebe0a5cc12c2e175acfd609ac62a3ab308332d30deb20b244cad208b506c",
+    "tests/fixtures/legacy-shared-image/PolicyAdapters.sol": "f9e4ffacf9a5fdf81a601fb9862cb99d344a2f5c1ca959cca212b28145ef1920",
+    "scripts/test-suites.mjs": "e0898fb9fb7b9a046909a92e0378a3bb3b2af41258ab86b5866b130529b5360e",
+    "scripts/test-local-evm.mjs": "9217e4dff1dd7ebb7289da048a85dc2e45ac6adac738226aee78284f34922501",
+    "scripts/verify-legacy-shared-image-profile-identity.mjs": "6f57831b30f09e2911982a64517c35edefa27b992cdf7058f61ec0ef4056f2cb"
+  }
+}
