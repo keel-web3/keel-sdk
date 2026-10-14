@@ -26,7 +26,7 @@ export interface JsonRpcResponse {
 
 export interface JsonSchema {
   readonly default?: unknown;
-  readonly type?: "object" | "string" | "number" | "integer" | "boolean" | "array";
+  readonly type?: "object" | "string" | "number" | "integer" | "boolean" | "array" | "null";
   readonly properties?: Readonly<Record<string, JsonSchema>>;
   readonly pattern?: string;
   readonly required?: readonly string[];

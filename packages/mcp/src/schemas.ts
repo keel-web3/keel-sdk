@@ -280,6 +280,10 @@ const studioStageProject: JsonSchema = object({
   storageStrategy: { type: "string", enum: ["local", "onchain", "hybrid"] },
   marketplaceExportMode: { type: "string", enum: ["recursive", "packed", "hybrid", "onchfs"] },
   viewer: { type: "string", enum: [...KEEL_SHELL_CHOICES], default: KEEL_DEFAULT_SHELL, description: "Default: registered KEEL verification shell. Explicit none: preserve creator-owned self-contained HTML with raw-artifact presentation and no canonical protection claim. Independent of payloadStorage. Both choices preserve immutable source, contract retrieval, and selected-chain checks." },
+  mediaSlots: object({
+    image: { oneOf: [{ type: "null" }, object({ resourceId: string("Exact creator resource identity.", 1024), presentation: { type: "string", enum: ["direct"] }, delivery: { type: "string", enum: ["onchain", "ipfs", "hosted"] } }, ["resourceId", "presentation", "delivery"])] },
+    animation_url: { oneOf: [{ type: "null" }, object({ resourceId: string("Exact creator resource identity.", 1024), presentation: { type: "string", enum: ["direct", "keel-shell"] }, delivery: { type: "string", enum: ["onchain", "ipfs", "hosted"] } }, ["resourceId", "presentation", "delivery"])] },
+  }, []),
   files: { type: "array", items: studioStageFile, minItems: 1, maxItems: 256 },
   reusableModule: studioReusableModule,
   projectProfile: { type: "object", description: "Copied snapshot and defaults returned by keel-studio-draft profile-select. Keep it with the private project; explicit project values take precedence." },

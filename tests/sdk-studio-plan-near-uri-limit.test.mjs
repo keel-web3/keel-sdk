@@ -1,0 +1,31 @@
+import assert from 'node:assert/strict';
+import test from 'node:test';
+import {createIntegrity} from '../packages/protocol/dist/index.js';
+import {prepareKeelCreatorInline,prepareKeelDensePayload,prepareKeelDenseCopyFragment,assessKeelCreatorPreparedInlineBudget,assertKeelPreparedCopyRead,toKeelDenseTransportDataURL} from '../packages/sdk/dist/index.js';
+
+const store='0x'+'11'.repeat(20),poster={mediaType:'image/png',bytes:Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+jR1sAAAAASUVORK5CYII=','base64')};
+test('near-limit source preparation keeps a provisional reserve while the exact complete URI and gas gate remain decisive', {timeout:120000},async()=>{
+ const empty=await prepareKeelCreatorInline({chainId:31337,store,resources:[{id:'index.html',role:'entrypoint',mediaType:'text/html',bytes:Buffer.from('<!doctype html><!-- -->')}],poster,compression:'none'});
+ const fixed=empty.preparedBytesBeforeLiveEnvelope-empty.resources[0].carrier.bytes.length;
+ const ratio=prepareKeelDensePayload(Buffer.from('a'.repeat(12288)),{compression:'none'}).preparedBytes.length/12288;
+ const target=1_945_000, count=Math.floor((target-fixed)/ratio)-64;
+ assert.ok(count>0);
+ const source=Buffer.from('<!doctype html><!--'+ 'a'.repeat(count)+'-->');
+ const plan=await prepareKeelCreatorInline({chainId:31337,store,resources:[{id:'index.html',role:'entrypoint',mediaType:'text/html',bytes:source}],poster,compression:'none'});
+ assert.ok(plan.preparedBytesBeforeLiveEnvelope>2_000_000-65_536);
+ assert.ok(plan.provisionalTokenURIBudget.estimatedCompleteTokenURIBytes>2_000_000);
+ assert.equal(plan.provisionalTokenURIBudget.status,'provisional-unmeasured');assert.equal(plan.completeTokenURIBytes,null);
+ const graphBytes=Buffer.concat([plan.shell.prefix,...plan.objects.slice(0,plan.request.bodyObjectIds.length),plan.shell.suffix].map(object=>Buffer.from(object.bytes)));
+ const context={protocol:'keel-context@3',chainId:'31337',collection:'0x'+'22'.repeat(20),tokenId:'1',composerAddress:'0x'+'33'.repeat(20),composerCodeHash:'0x'+'44'.repeat(32),composerRevision:'1',containerTableObjectId:plan.table.objectId,containerTableDigest:plan.table.digest,presentationDigest:'0x'+'55'.repeat(32),presentationDigestType:'keccak256:keel.creator-prepared-copy-presentation@1'};
+ const contextFragment=Buffer.from(prepareKeelDenseCopyFragment('<script>globalThis.__KEEL_CONTEXT__='+JSON.stringify(context)+';</script>')).toString('utf8');
+ const escape=text=>toKeelDenseTransportDataURL('metadata',text).split(',').slice(1).join(',');
+ const uri=name=>'data:application/json;charset=utf-8,'+escape('{"name":'+JSON.stringify(name)+',"description":"","image":"')+plan.posterURI+escape('","animation_url":"data:text/html;charset=utf-8,')+graphBytes.toString('utf8')+contextFragment+escape('","keel_schema":"keel-inline-raw-percent-token-uri@1"}');
+ const expected=uri('Near limit fixture');assert.ok(Buffer.byteLength(expected)<=2_000_000);
+ const input={chainId:31337,store,mediaType:graphBytes.length?plan.shell.prefix.mediaType:'',graphBytes,graphIntegrity:await createIntegrity(graphBytes),expectedTokenURI:expected,returnedTokenURI:expected,callGasLimit:30_000_000n,blockGasLimit:60_000_000n};
+ const check=await assertKeelPreparedCopyRead(input);
+ assert.equal(check.completeTokenURIBytes,Buffer.byteLength(expected));assert.equal(check.selectedChainReadAuthenticated,false);
+ const oversized=uri('x'.repeat(2_000_001-Buffer.byteLength(uri(''))));assert.equal(Buffer.byteLength(oversized),2_000_001);
+ await assert.rejects(assertKeelPreparedCopyRead({...input,expectedTokenURI:oversized,returnedTokenURI:oversized}),/byte limit/);
+ await assert.rejects(assertKeelPreparedCopyRead({...input,callGasLimit:60_000_001n}),/gas boundary/);
+ assert.throws(()=>assessKeelCreatorPreparedInlineBudget(2_000_001),/fragments alone/);
+});

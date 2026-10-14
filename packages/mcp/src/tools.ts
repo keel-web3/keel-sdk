@@ -907,7 +907,7 @@ async function studioDraftTool(context: ToolContext, value: unknown): Promise<un
 }
 
 async function studioStageProjectTool(context: ToolContext, value: unknown): Promise<unknown> {
-  const input = record(value, ["studioUrl", "title", "description", "storageStrategy", "payloadStorage", "marketplaceExportMode", "viewer", "files", "reusableModule", "releaseIntent", "projectProfile"], "Studio stage project arguments");
+  const input = record(value, ["studioUrl", "title", "description", "storageStrategy", "payloadStorage", "marketplaceExportMode", "viewer", "mediaSlots", "files", "reusableModule", "releaseIntent", "projectProfile"], "Studio stage project arguments");
   const configuredStudioUrl = optionalString(input, "studioUrl");
   const studioUrl = resolveKeelEndpoints({ ...(configuredStudioUrl === undefined ? {} : { studioUrl: configuredStudioUrl }) }, process.env).studioUrl;
   const token = await loadStudioAgentToken({ workspace: context.workspace.root, studioUrl });
@@ -978,6 +978,7 @@ async function studioStageProjectTool(context: ToolContext, value: unknown): Pro
     ...(input.payloadStorage === undefined ? {} : { payloadStorage: resolveKeelPayloadStorage(input.payloadStorage) }),
     ...(marketplaceExportMode === undefined ? {} : { marketplaceExportMode: marketplaceExportMode as "recursive" | "packed" | "hybrid" | "onchfs" }),
     ...(viewer === undefined ? {} : { viewer: viewer as "keel-verification-shell" | "none" }),
+    ...(input.mediaSlots === undefined ? {} : { mediaSlots: input.mediaSlots as NonNullable<StageKeelStudioProjectInput["mediaSlots"]> }),
     files,
     ...(reusableModule === undefined ? {} : { reusableModule }),
     ...(input.projectProfile === undefined ? {} : { projectProfile: input.projectProfile as never }),

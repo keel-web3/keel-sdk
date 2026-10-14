@@ -2,12 +2,13 @@ import { createHash } from "node:crypto";
 import { parseAbi, encodeFunctionData, decodeFunctionResult, hexToBytes, keccak256, stringToHex, type Abi, type Hex } from "viem";
 import { keelHoldAbi } from "./abi.js";
 import { verifyKeelIndexedCreator } from "./network-verification.js";
-import { resolveKeelCreatorTarget, type KeelNetworkIndex, type KeelNetworkSelection } from "./network-index.js";
+import { parseKeelNetworkIndex, resolveKeelCreatorTarget, type KeelNetworkIndex, type KeelNetworkSelection } from "./network-index.js";
 import type { KeelRpcPool } from "./rpc.js";
-import { prepareKeelCreatorInline } from "./creator-prepared-inline.js";
+import { prepareKeelCreatorInline, assessKeelCreatorPreparedInlineBudget } from "./creator-prepared-inline.js";
 import { createKeelManagedObjectPlan } from "./native-managed.js";
 import { decodeKeelPreparedDenseCopyFragment } from "./dense-transport.js";
 import { inspectKeelInlinePayloadCarriage } from "./inline-transport-audit.js";
+import { readKeelPreparedInlineSources } from "./prepared-inline-sources.js";
 
 const ABI = parseAbi([
   "function preparedCopyBuilder() view returns(address)",
@@ -39,12 +40,30 @@ export async function prepareKeelAuthenticatedCreatorInline(input: {
   readonly selection?: KeelNetworkSelection;
   readonly publication: Omit<Parameters<typeof prepareKeelCreatorInline>[0], "chainId" | "store" | "readSlug">;
 }) {
-  const selection = input.selection ?? {};
-  const target = resolveKeelCreatorTarget(input.index, selection);
-  const infrastructure = await verifyKeelIndexedCreator(input.pool, input.index, selection);
+  // Infrastructure authentication must not suspend before the caller's source,
+  // policy and selected deployment become one immutable preparation request.
+  const pool = input.pool;
+  const index = parseKeelNetworkIndex(input.index);
+  const selection = { ...(input.selection ?? {}) };
+  const declared = input.publication;
+  if (!Array.isArray(declared.resources) || !declared.resources.length || declared.resources.length > 40) throw new RangeError("Creator publication supports 1..40 modular resources.");
+  let sourceBytes = 0;
+  for (const resource of declared.resources) {
+    if (!(resource.bytes instanceof Uint8Array) || !resource.bytes.length
+      || resource.aliases !== undefined && (!Array.isArray(resource.aliases) || resource.aliases.length > 32)) throw new TypeError("Invalid creator publication source or aliases.");
+    sourceBytes += resource.bytes.length;
+    if (sourceBytes > 32 * 1024 * 1024) throw new RangeError("Creator publication exceeds its decoded source byte bound.");
+  }
+  if (!(declared.poster.bytes instanceof Uint8Array) || !declared.poster.bytes.length || declared.poster.bytes.length > 2_000_000) throw new RangeError("Creator publication poster exceeds the complete Inline byte bound.");
+  const publication = { ...declared,
+    resources: declared.resources.map(resource => ({ ...resource, ...(resource.aliases === undefined ? {} : { aliases: [...resource.aliases] }), bytes: Uint8Array.from(resource.bytes) })),
+    poster: { ...declared.poster, bytes: Uint8Array.from(declared.poster.bytes) },
+  };
+  const target = resolveKeelCreatorTarget(index, selection);
+  const infrastructure = await verifyKeelIndexedCreator(pool, index, selection);
   const block = `0x${BigInt(infrastructure.blockNumber).toString(16)}`;
   const read = async (address: Hex, name: string, args: readonly unknown[] = [], abi: Abi = ABI): Promise<unknown> => {
-    const data = await input.pool.request({ method: "eth_call", params: [{ to: address, data: encodeFunctionData({ abi, functionName: name, args }) }, block] });
+    const data = await pool.request({ method: "eth_call", params: [{ to: address, data: encodeFunctionData({ abi, functionName: name, args }) }, block] });
     if (typeof data !== "string" || !/^0x[0-9a-f]*$/iu.test(data)) throw new Error(`Invalid ${name} read.`);
     return decodeFunctionResult({ abi, functionName: name, data: data as Hex });
   };
@@ -66,7 +85,7 @@ export async function prepareKeelAuthenticatedCreatorInline(input: {
   if (typeof shellId !== "string" || !/^0x[0-9a-f]{64}$/iu.test(shellId)
     || shellId !== keccak256(stringToHex("keel.shell.inline-raw-percent-protection@1"))
     || await read(registry, "creatorManagedShell", [shellId]) !== false) throw new TypeError("Prepared creator shell is not registered.");
-  const revision = input.publication.shellRevision ?? 1n;
+  const revision = publication.shellRevision ?? 1n;
   const shell = await read(registry, "shellRevision", [shellId, revision]) as readonly unknown[];
   if (!Array.isArray(shell) || shell[2] !== 3 || shell[3] !== true) throw new TypeError("Prepared creator shell revision is unavailable or incompatible.");
   const registered = async (objectId: unknown, id: string) => {
@@ -85,16 +104,23 @@ export async function prepareKeelAuthenticatedCreatorInline(input: {
     return object;
   };
   const [prefix, suffix] = await Promise.all([registered(shell[0], "registered-shell-prefix"), registered(shell[1], "registered-shell-suffix")]);
-  const plan = await prepareKeelCreatorInline({ ...input.publication, chainId: target.chainId, store: target.store });
+  const plan = await prepareKeelCreatorInline({ ...publication, chainId: target.chainId, store: target.store });
   const decode = (bytes: Uint8Array) => new TextDecoder("utf-8", { fatal: true }).decode(decodeKeelPreparedDenseCopyFragment(bytes));
   const html = decode(prefix.bytes) + decode(plan.preparedBodyBytes) + decode(suffix.bytes);
   const audit = inspectKeelInlinePayloadCarriage(new TextEncoder().encode(html));
-  if (audit.preparedDenseCopy?.transportProfile !== "base90-v1" || audit.payloadCount !== plan.resources.length) throw new TypeError("Registered shell does not match the prepared payload profile.");
+  if (audit.preparedDenseCopy?.transportProfile !== "base90-v1" || audit.payloadCount !== plan.optimization.physicalPayloadCount) throw new TypeError("Registered shell does not match the prepared payload profile.");
+  const sources = await readKeelPreparedInlineSources({ htmlBytes: new TextEncoder().encode(html), chainId: target.chainId, store: plan.store, tableDigest: plan.table.digest });
+  const originalSources = new Map(plan.resources.map(resource => [resource.id, resource]));
+  if (sources.resources.length !== plan.resources.length || sources.resources.some(resource => {
+    const original = originalSources.get(resource.id);
+    return original === undefined || resource.integrity.digest !== original.sourceIntegrity.digest || resource.integrity.byteLength !== original.sourceIntegrity.byteLength
+      || resource.role !== original.descriptor.role || resource.mediaType !== original.descriptor.mediaType || JSON.stringify(resource.aliases) !== JSON.stringify(original.descriptor.aliases);
+  })) throw new TypeError("Registered prepared source replay differs from the original resources.");
   const preparedBytesBeforeLiveEnvelope = plan.preparedBytesBeforeLiveEnvelope - plan.shell.prefix.bytes.length - plan.shell.suffix.bytes.length + prefix.bytes.length + suffix.bytes.length;
-  if (preparedBytesBeforeLiveEnvelope + 65_536 > 2_000_000) throw new RangeError("Registered prepared Inline exceeds the complete URI reserve.");
-  const canonicalBlock = await input.pool.request({ method: "eth_getBlockByNumber", params: [block, false] }) as { hash?: unknown };
+  const provisionalTokenURIBudget = assessKeelCreatorPreparedInlineBudget(preparedBytesBeforeLiveEnvelope);
+  const canonicalBlock = await pool.request({ method: "eth_getBlockByNumber", params: [block, false] }) as { hash?: unknown };
   if (!same(canonicalBlock?.hash, String(infrastructure.blockHash))) throw new TypeError("Prepared route block was reorganized during authentication.");
-  return { ...plan, shell: { ...plan.shell, prefix, suffix }, preparedBytesBeforeLiveEnvelope,
+  return { ...plan, shell: { ...plan.shell, prefix, suffix }, preparedBytesBeforeLiveEnvelope, provisionalTokenURIBudget,
     optimization: { ...plan.optimization, shellPreparedBytes: prefix.bytes.length + suffix.bytes.length },
     route: { factory: target.factory, renderer: target.renderer, builder, registry, validation, instance: target.instance,
       shellId, shellRevision: revision, authenticatedBlockNumber: infrastructure.blockNumber, authenticatedBlockHash: infrastructure.blockHash },

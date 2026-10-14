@@ -1,0 +1,286 @@
+{
+  "recordedAt": "2026-10-14T17:59:21.519833+00:00",
+  "baselineCommit": "cb09f0b1c33b5b278e6366b4214e5199afa0e060",
+  "candidateIdentity": "Commit containing this evidence directory; source hashes below identify the exact qualified contents.",
+  "sourceDiffSHA256": "8dfb2084052addef9b4d4b33e3d6350589628ea43ecc16cc5315302d1cb27bbf",
+  "sourceFiles": [
+    {
+      "path": "docs/KEEL_CREATOR_PREPARED_INLINE.md",
+      "bytes": 5713,
+      "sha256": "1dd25951953af4b3996792cd848b84c4ab0fb181e0a615b47fca5e6d2cff73fb"
+    },
+    {
+      "path": "packages/mcp/src/creator-inline-tools.ts",
+      "bytes": 7944,
+      "sha256": "26f767f92756acf4c500ed4a005e04788c29dcdf64fc7754154cdd411f4fa2e3"
+    },
+    {
+      "path": "packages/mcp/src/schemas.ts",
+      "bytes": 41191,
+      "sha256": "ccaca7a73eaa8d61df1227ef6409307ee4f527df3adf3a5124480bd0994f2eb5"
+    },
+    {
+      "path": "packages/mcp/src/tools.ts",
+      "bytes": 106096,
+      "sha256": "5f6aca4935ffb1f442e47b1d12596a7ba07c86806b3402ba176f7302d4d394c7"
+    },
+    {
+      "path": "packages/mcp/src/types.ts",
+      "bytes": 3616,
+      "sha256": "748c91a046ee5921ed442b440b500e0066b26f5828183e27b7ef9e7f1e615262"
+    },
+    {
+      "path": "packages/sdk/src/creator-prepared-inline.ts",
+      "bytes": 18286,
+      "sha256": "9002357447ac505178f183815c2928ed8ab4753ac0f0110c6b175f63b1686312"
+    },
+    {
+      "path": "packages/sdk/src/creator-prepared-publication.ts",
+      "bytes": 353,
+      "sha256": "193ddf8248718e502a3bde3f0f88fc7b3447ec63030f179974ba7b62d13861b8"
+    },
+    {
+      "path": "packages/sdk/src/creator-prepared-route.ts",
+      "bytes": 11212,
+      "sha256": "3897bbc3a1a461c288ab87c8e67075acd34e9f225f8a5045d384ceb69deb397d"
+    },
+    {
+      "path": "packages/sdk/src/index.ts",
+      "bytes": 4987,
+      "sha256": "9744002869efdb2c61b2287dcbd55b7726ac3e81e503b0ae750fe9543e6e8f9e"
+    },
+    {
+      "path": "packages/sdk/src/prepared-inline-sources.ts",
+      "bytes": 5542,
+      "sha256": "3abc9ccd208ecbe4f7bd93814d2fe60489a09989ec4ea9b2b60bcc87ab61d545"
+    },
+    {
+      "path": "packages/sdk/src/studio-upload.ts",
+      "bytes": 17648,
+      "sha256": "3d51852eef653c6802b264b954f365c7f72d3565c1d83d697b11b9782622308e"
+    },
+    {
+      "path": "scripts/test-suites.mjs",
+      "bytes": 14251,
+      "sha256": "f77496ff05be55fe9500a76449e7885faa961fe170beb6af3d23a2fcb8c06b52"
+    },
+    {
+      "path": "tests/creator-prepared-route.test.mjs",
+      "bytes": 8939,
+      "sha256": "bad888783e58eda45f503409072b54587f5c8cd7a5aaaea1b05af38fed095416"
+    },
+    {
+      "path": "tests/sdk-studio-plan-near-uri-limit.test.mjs",
+      "bytes": 3853,
+      "sha256": "9b0d134fe49dddf4250c9a425d00c596f1cbaa711657d96adf78edf358d86987"
+    },
+    {
+      "path": "tests/sdk-studio-plan-public-read.test.mjs",
+      "bytes": 3359,
+      "sha256": "efd2e8487842800e21878a3dbc9022fa3079982686b3de33ada8c930602c3a74"
+    },
+    {
+      "path": "tests/sdk-studio-plan-source-read.test.mjs",
+      "bytes": 13523,
+      "sha256": "b1e10e731dab8720d67ae28c0a52f7db9f1f571e49e75281e8c33b1ddb485897"
+    },
+    {
+      "path": "tests/sdk-studio-plan-upload-contract.test.mjs",
+      "bytes": 2612,
+      "sha256": "012fefd4f868ed5458659f7e62d68fb3c050bd494d26a81be6c394a00b3316e3"
+    },
+    {
+      "path": "tests/sdk-studio-plan-viewer-browser.test.mjs",
+      "bytes": 6563,
+      "sha256": "ad2a3068d8c886a4fb2340933d141e3532abf56ac66a867583ace26928f98a30"
+    },
+    {
+      "path": "tests/sdk-verification-wrap-offline-browser.test.mjs",
+      "bytes": 3869,
+      "sha256": "9806a250d5af17ea3066ff9cc439d318b38434420b27b0ed142a84ebdbb34279"
+    },
+    {
+      "path": "tests/support/offline-shell-browser.mjs",
+      "bytes": 9956,
+      "sha256": "5214bd5b401be54dd2adef9d950d39452dccce7b07e946244e7e0ad7bc9d4e03"
+    }
+  ],
+  "generatedModuleHashes": [
+    {
+      "source": "packages/mcp/src/creator-inline-tools.ts",
+      "outputs": [
+        {
+          "path": "packages/mcp/dist/creator-inline-tools.js",
+          "bytes": 7955,
+          "sha256": "7b83f430d5feba4775b0d0194b5b6ebf4cc19df8fec902bd64b5b72826a1c1d8",
+          "fresh": true
+        },
+        {
+          "path": "packages/mcp/dist/creator-inline-tools.d.ts",
+          "bytes": 181,
+          "sha256": "3a95dde3a7674c09e8c352bc5c5ed451cfc66deb361896a4719907e84a73c042",
+          "fresh": true
+        }
+      ]
+    },
+    {
+      "source": "packages/mcp/src/schemas.ts",
+      "outputs": [
+        {
+          "path": "packages/mcp/dist/schemas.js",
+          "bytes": 41645,
+          "sha256": "a1c79816746ad6667b00349e8cecefc5d0958a586aec08952cc760009fb42be8",
+          "fresh": true
+        },
+        {
+          "path": "packages/mcp/dist/schemas.d.ts",
+          "bytes": 1358,
+          "sha256": "f45bfedf30b7fdcafa7b59325f1e8b59d14c704aa5b5d5b6a9614f92b47b303a",
+          "fresh": true
+        }
+      ]
+    },
+    {
+      "source": "packages/mcp/src/tools.ts",
+      "outputs": [
+        {
+          "path": "packages/mcp/dist/tools.js",
+          "bytes": 104999,
+          "sha256": "9b3425671ab9243d66ac9aae9088f0bc39fe1a86958869403e492530b4c2f0c6",
+          "fresh": true
+        },
+        {
+          "path": "packages/mcp/dist/tools.d.ts",
+          "bytes": 229,
+          "sha256": "b811034f6a884706f0cc77cae5546f0624571bbb47336edaf394d07ced90ce14",
+          "fresh": true
+        }
+      ]
+    },
+    {
+      "source": "packages/mcp/src/types.ts",
+      "outputs": [
+        {
+          "path": "packages/mcp/dist/types.js",
+          "bytes": 169,
+          "sha256": "ac8fe6c975b3688e626154c8f5fc1083ed23562395770c390a04a622578fe0d4",
+          "fresh": true
+        },
+        {
+          "path": "packages/mcp/dist/types.d.ts",
+          "bytes": 3833,
+          "sha256": "ddf0157c6261187f1827084f86cd9ac406be1b661b28a7003a4e2efd82dde89a",
+          "fresh": true
+        }
+      ]
+    },
+    {
+      "source": "packages/sdk/src/creator-prepared-inline.ts",
+      "outputs": [
+        {
+          "path": "packages/sdk/dist/creator-prepared-inline.js",
+          "bytes": 17625,
+          "sha256": "16a7a45456a227a7f5023df44df38c82cf55c8968f6e32e92a80700f10f321dc",
+          "fresh": true
+        },
+        {
+          "path": "packages/sdk/dist/creator-prepared-inline.d.ts",
+          "bytes": 12100,
+          "sha256": "2bc61968c9798b81164e44093f9e069062f6324a7aba99c89fe2b517c4f8e059",
+          "fresh": true
+        }
+      ]
+    },
+    {
+      "source": "packages/sdk/src/creator-prepared-publication.ts",
+      "outputs": [
+        {
+          "path": "packages/sdk/dist/creator-prepared-publication.js",
+          "bytes": 409,
+          "sha256": "3083e2a6d03e30d08e0197ce8f94b4f7efb18787026d5ee218c9c82fa0f7a909",
+          "fresh": true
+        },
+        {
+          "path": "packages/sdk/dist/creator-prepared-publication.d.ts",
+          "bytes": 411,
+          "sha256": "e909de40393b046897d2f78a0f2915207153158b66b5865e8cd663de7dc80e6e",
+          "fresh": true
+        }
+      ]
+    },
+    {
+      "source": "packages/sdk/src/creator-prepared-route.ts",
+      "outputs": [
+        {
+          "path": "packages/sdk/dist/creator-prepared-route.js",
+          "bytes": 11159,
+          "sha256": "d12e8d30f9f07360e6d0aac324b954a5653b854fdceb816f42b653e7d7aa8780",
+          "fresh": true
+        },
+        {
+          "path": "packages/sdk/dist/creator-prepared-route.d.ts",
+          "bytes": 10606,
+          "sha256": "466a241cfd574b526fcc1b09243aaec4dd5f4650f9ca51ccec0373cebb634494",
+          "fresh": true
+        }
+      ]
+    },
+    {
+      "source": "packages/sdk/src/index.ts",
+      "outputs": [
+        {
+          "path": "packages/sdk/dist/index.js",
+          "bytes": 4798,
+          "sha256": "1eb0b11d4f998fc6c58fb56f4130d681ee29bea7f33abd707fb47a02af16fff3",
+          "fresh": true
+        },
+        {
+          "path": "packages/sdk/dist/index.d.ts",
+          "bytes": 4918,
+          "sha256": "a256fc8c6030c597168a7b64dbcb2f44c64c88a65682b55f2cf35c07498a0953",
+          "fresh": true
+        }
+      ]
+    },
+    {
+      "source": "packages/sdk/src/prepared-inline-sources.ts",
+      "outputs": [
+        {
+          "path": "packages/sdk/dist/prepared-inline-sources.js",
+          "bytes": 5255,
+          "sha256": "425fb486e7bcf50e1414de023ed2efdf9c8bae67b9fca0535c6782f4a9ca6c03",
+          "fresh": true
+        },
+        {
+          "path": "packages/sdk/dist/prepared-inline-sources.d.ts",
+          "bytes": 1861,
+          "sha256": "dfcc3ad447eae56de5557ebd217153e11e42372d7efadbc219103f3dfe09fe5b",
+          "fresh": true
+        }
+      ]
+    },
+    {
+      "source": "packages/sdk/src/studio-upload.ts",
+      "outputs": [
+        {
+          "path": "packages/sdk/dist/studio-upload.js",
+          "bytes": 12201,
+          "sha256": "0515af294c0ea5548bc9eae8368dc4eec4b3ff61d6e206156299be6a538d34dc",
+          "fresh": true
+        },
+        {
+          "path": "packages/sdk/dist/studio-upload.d.ts",
+          "bytes": 7228,
+          "sha256": "2f1a7cc595cb8366993efb1c1036504d1b497dcb2af585a728e721a6d5b8c1ef",
+          "fresh": true
+        }
+      ]
+    }
+  ],
+  "canonicalRuntime": {
+    "path": "packages/sdk/src/verification-shell.ts",
+    "sha256": "46573447f549f3f4ac37bae857fcbed2e859bc2d7ea991ac8e762a0dec0338f5",
+    "baselineByteIdentical": true
+  },
+  "qualification": "Local source/build/unit/browser evidence only. No selected-chain publication or actual creator artwork acceptance."
+}
