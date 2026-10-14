@@ -28,6 +28,15 @@ export function encodeKeelLegacySharedImageCopyProgram(input: {
       || input.fragments[at] !== null || !["image/png","image/jpeg","image/gif","image/webp","image/avif"].includes(image.mediaType)
       || image.bytes.length < 1 || image.bytes.length > 2_000_000 || image.integrity.byteLength !== image.bytes.length || hash(image.bytes) !== image.integrity.digest
       || Buffer.from(graph.parts[at]!.bytes).toString("utf8") !== Buffer.from(image.bytes).toString("base64")) throw new TypeError("Invalid exact shared native-image program binding.");
+  let renderedLength = 0;
+  for (const part of graph.parts) {
+    if (!(part.bytes instanceof Uint8Array) || part.bytes.length > 2_000_000 - renderedLength) throw new TypeError("Prepared graph exceeds the complete Inline bound.");
+    renderedLength += part.bytes.length;
+  }
+  const rendered = Uint8Array.from(Buffer.concat(graph.parts.map(part => part.bytes)));
+  if (renderedLength !== graph.fragmentBytes.length || graph.fragmentIntegrity.algorithm !== "sha256"
+      || graph.fragmentIntegrity.byteLength !== renderedLength || !valid(graph.fragmentIntegrity.digest)
+      || hash(rendered) !== graph.fragmentIntegrity.digest || !Buffer.from(rendered).equals(Buffer.from(graph.fragmentBytes))) throw new TypeError("Prepared graph rendered commitment differs from its exact parts.");
   const ids: Hex[] = [], digests: Hex[] = [], modes: number[] = [];
   for (let index = 0; index < graph.parts.length; index++) {
     if (index === at) { ids.push(input.imageObjectId); digests.push(image.integrity.digest); modes.push(1); continue; }
@@ -48,6 +57,8 @@ export function encodeKeelLegacySharedImageCopyProgram(input: {
 export async function readKeelLegacySharedImageCopyProgram(input: { readonly bytes: Uint8Array;
   readonly readObject: (objectId: Hex) => Promise<Uint8Array> }) {
   const [tag, length, digest, imageId, imageDigest, imageLength, ids, digests, modes] = decodeAbiParameters(parameters, `0x${Buffer.from(input.bytes).toString("hex")}`);
+  const canonical = hexToBytes(encodeAbiParameters(parameters, [tag, length, digest, imageId, imageDigest, imageLength, ids, digests, modes]));
+  if (!Buffer.from(canonical).equals(Buffer.from(input.bytes))) throw new TypeError("Noncanonical shared image program ABI.");
   if (tag !== KEEL_LEGACY_SHARED_IMAGE_PROGRAM_TAG || length < 1n || length > 2_000_000n || imageLength < 1n || imageLength > 2_000_000n
       || !valid(imageId) || !valid(imageDigest) || !valid(digest) || !ids.length || ids.length > 128 || ids.length !== digests.length || ids.length !== modes.length
       || modes.filter(mode => mode === 1).length !== 1 || modes.some(mode => mode !== 0 && mode !== 1)) throw new TypeError("Unsupported or malformed shared image program.");

@@ -20,6 +20,10 @@ test('encoded image upload, unknown image binding and tampered source objects fa
  const f=await sharedFixture();
  const bad=[...f.fragments];bad[f.program.imagePartIndex]={objectId:f.imageObjectId,digest:sha(poster)};
  assert.throws(()=>encodeKeelLegacySharedImageCopyProgram({graph:f.graph,sharedCollectorImage:f.built.sharedCollectorImage,imageObjectId:f.imageObjectId,fragments:bad}),/binding/);
+ let reads=0;
+ await assert.rejects(readKeelLegacySharedImageCopyProgram({bytes:Buffer.concat([f.program.bytes,Buffer.alloc(32)]),readObject:async()=>{reads++;return poster;}}),/Noncanonical/);assert.equal(reads,0);
+ const malformed={...f.graph,fragmentIntegrity:{...f.graph.fragmentIntegrity,digest:'0x'+'99'.repeat(32)}};
+ assert.throws(()=>encodeKeelLegacySharedImageCopyProgram({graph:malformed,sharedCollectorImage:f.built.sharedCollectorImage,imageObjectId:f.imageObjectId,fragments:f.fragments}),/rendered commitment/);
  await assert.rejects(readKeelLegacySharedImageCopyProgram({bytes:f.program.bytes,readObject:async id=>id===f.imageObjectId?Buffer.from('tampered'):f.objects.get(id).bytes}),/SHA-256/);
  const p=[{type:'bytes32'},{type:'uint256'},{type:'bytes32'},{type:'bytes32'},{type:'bytes32'},{type:'uint256'},{type:'bytes32[]'},{type:'bytes32[]'},{type:'uint8[]'}];
  const fields=[...decodeAbiParameters(p,'0x'+Buffer.from(f.program.bytes).toString('hex'))];fields[3]='0x'+'ff'.repeat(32);

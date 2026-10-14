@@ -1157,7 +1157,7 @@ export async function buildCompactInlineKeelShell(input: {
   readonly codecProfile: "native" | "brotli-js" | "lzma-js" | "brotli-lzma-js" | "ppmd-js";
   readonly supportedCodecs: readonly ("none" | "gzip" | "deflate" | "brotli" | "lzma" | "ppmd")[];
   readonly decoderIntegrity?: Sha256Integrity;
-  readonly resourceProfile?: "embedded-shared-containers@1" | "embedded-shared-containers-base90@1" | "embedded-shared-containers-base91@1" | "embedded-shared-containers-base90-block@2" | "embedded-shared-containers-uri81@1" | "legacy-prepared-dense-copy@1";
+  readonly resourceProfile?: "embedded-shared-containers@1" | "embedded-shared-containers-base90@1" | "embedded-shared-containers-base91@1" | "embedded-shared-containers-base90-block@2" | "embedded-shared-containers-uri81@1" | "legacy-prepared-dense-copy@1" | "legacy-prepared-dense-shared-image@1";
   readonly transportDecoderIntegrity?: Sha256Integrity;
   readonly containerBridge?: Uint8Array;
   readonly containerBridgeIntegrity?: Sha256Integrity;
