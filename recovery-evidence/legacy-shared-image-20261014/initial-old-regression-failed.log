@@ -1,0 +1,128 @@
+TAP version 13
+# Subtest: default Compact uses actual compatible Brotli/Dense legacy envelope and preserves exact source/poster
+not ok 1 - default Compact uses actual compatible Brotli/Dense legacy envelope and preserves exact source/poster
+  ---
+  duration_ms: 973.057093
+  type: 'test'
+  location: '/tmp/keel-shared-image-20261014/keel-sdk/tests/sdk-legacy-prepared-dense-copy.test.mjs:22:1'
+  failureType: 'testCodeFailure'
+  error: 'Collector Inline animation_url does not contain the registered canonical KEEL verification shell.'
+  code: 'ERR_TEST_FAILURE'
+  name: 'TypeError'
+  stack: |-
+    assertKeelCollectorInlineMetadata (file:///tmp/keel-shared-image-20261014/keel-sdk/packages/sdk/dist/collector-policy.js:191:15)
+    assertKeelPreparedCollectorInlineMetadata (file:///tmp/keel-shared-image-20261014/keel-sdk/packages/sdk/dist/inline-transport-audit.js:317:5)
+    buildKeelPreparedOneOfOneTokenURI (file:///tmp/keel-shared-image-20261014/keel-sdk/packages/sdk/dist/inline-viewer-graph.js:1773:13)
+    async finish (file:///tmp/keel-shared-image-20261014/keel-sdk/tests/sdk-legacy-prepared-dense-copy.test.mjs:17:20)
+    async TestContext.<anonymous> (file:///tmp/keel-shared-image-20261014/keel-sdk/tests/sdk-legacy-prepared-dense-copy.test.mjs:24:16)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async startSubtestAfterBootstrap (node:internal/test_runner/harness:296:3)
+  ...
+# Subtest: auto keeps nonbeneficial exact bytes; explicit codec choices and Raw are preserved
+not ok 2 - auto keeps nonbeneficial exact bytes; explicit codec choices and Raw are preserved
+  ---
+  duration_ms: 634.193558
+  type: 'test'
+  location: '/tmp/keel-shared-image-20261014/keel-sdk/tests/sdk-legacy-prepared-dense-copy.test.mjs:41:1'
+  failureType: 'testCodeFailure'
+  error: 'Expected the distinct legacy prepared dense profile.'
+  code: 'ERR_TEST_FAILURE'
+  name: 'TypeError'
+  stack: |-
+    readKeelLegacyPreparedDenseSources (file:///tmp/keel-shared-image-20261014/keel-sdk/packages/sdk/dist/legacy-prepared-dense-copy.js:189:15)
+    TestContext.<anonymous> (file:///tmp/keel-shared-image-20261014/keel-sdk/tests/sdk-legacy-prepared-dense-copy.test.mjs:49:24)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: 40/41,128/129,256 and configured1024 logical resources retain IDs/order without expanding the64-part root
+not ok 3 - 40/41,128/129,256 and configured1024 logical resources retain IDs/order without expanding the64-part root
+  ---
+  duration_ms: 465.404981
+  type: 'test'
+  location: '/tmp/keel-shared-image-20261014/keel-sdk/tests/sdk-legacy-prepared-dense-copy.test.mjs:58:1'
+  failureType: 'testCodeFailure'
+  error: 'Expected the distinct legacy prepared dense profile.'
+  code: 'ERR_TEST_FAILURE'
+  name: 'TypeError'
+  stack: |-
+    readKeelLegacyPreparedDenseSources (file:///tmp/keel-shared-image-20261014/keel-sdk/packages/sdk/dist/legacy-prepared-dense-copy.js:189:15)
+    TestContext.<anonymous> (file:///tmp/keel-shared-image-20261014/keel-sdk/tests/sdk-legacy-prepared-dense-copy.test.mjs:64:24)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: large sources are segmented without changing original identity or adding an aggregate32MiB limit
+not ok 4 - large sources are segmented without changing original identity or adding an aggregate32MiB limit
+  ---
+  duration_ms: 2012.582817
+  type: 'test'
+  location: '/tmp/keel-shared-image-20261014/keel-sdk/tests/sdk-legacy-prepared-dense-copy.test.mjs:69:1'
+  failureType: 'testCodeFailure'
+  error: 'Expected the distinct legacy prepared dense profile.'
+  code: 'ERR_TEST_FAILURE'
+  name: 'TypeError'
+  stack: |-
+    readKeelLegacyPreparedDenseSources (file:///tmp/keel-shared-image-20261014/keel-sdk/packages/sdk/dist/legacy-prepared-dense-copy.js:189:15)
+    TestContext.<anonymous> (file:///tmp/keel-shared-image-20261014/keel-sdk/tests/sdk-legacy-prepared-dense-copy.test.mjs:73:22)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: new profile rejects changed outer execution, missing/context impersonation and conflicting namespaces
+not ok 5 - new profile rejects changed outer execution, missing/context impersonation and conflicting namespaces
+  ---
+  duration_ms: 356.367991
+  type: 'test'
+  location: '/tmp/keel-shared-image-20261014/keel-sdk/tests/sdk-legacy-prepared-dense-copy.test.mjs:75:1'
+  failureType: 'testCodeFailure'
+  error: 'Collector Inline animation_url does not contain the registered canonical KEEL verification shell.'
+  code: 'ERR_TEST_FAILURE'
+  name: 'TypeError'
+  stack: |-
+    assertKeelCollectorInlineMetadata (file:///tmp/keel-shared-image-20261014/keel-sdk/packages/sdk/dist/collector-policy.js:191:15)
+    assertKeelPreparedCollectorInlineMetadata (file:///tmp/keel-shared-image-20261014/keel-sdk/packages/sdk/dist/inline-transport-audit.js:317:5)
+    buildKeelPreparedOneOfOneTokenURI (file:///tmp/keel-shared-image-20261014/keel-sdk/packages/sdk/dist/inline-viewer-graph.js:1773:13)
+    async finish (file:///tmp/keel-shared-image-20261014/keel-sdk/tests/sdk-legacy-prepared-dense-copy.test.mjs:17:20)
+    async TestContext.<anonymous> (file:///tmp/keel-shared-image-20261014/keel-sdk/tests/sdk-legacy-prepared-dense-copy.test.mjs:76:83)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: existing registered text modules keep exact fragment bytes and data/module playback order
+not ok 6 - existing registered text modules keep exact fragment bytes and data/module playback order
+  ---
+  duration_ms: 220.072198
+  type: 'test'
+  location: '/tmp/keel-shared-image-20261014/keel-sdk/tests/sdk-legacy-prepared-dense-copy.test.mjs:84:1'
+  failureType: 'testCodeFailure'
+  error: 'Expected the distinct legacy prepared dense profile.'
+  code: 'ERR_TEST_FAILURE'
+  name: 'TypeError'
+  stack: |-
+    readKeelLegacyPreparedDenseSources (file:///tmp/keel-shared-image-20261014/keel-sdk/packages/sdk/dist/legacy-prepared-dense-copy.js:189:15)
+    TestContext.<anonymous> (file:///tmp/keel-shared-image-20261014/keel-sdk/tests/sdk-legacy-prepared-dense-copy.test.mjs:89:22)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: existing compressed bytes stay exact and new512KiB leaves retain mixed none/Brotli selection
+not ok 7 - existing compressed bytes stay exact and new512KiB leaves retain mixed none/Brotli selection
+  ---
+  duration_ms: 224.43346
+  type: 'test'
+  location: '/tmp/keel-shared-image-20261014/keel-sdk/tests/sdk-legacy-prepared-dense-copy.test.mjs:94:1'
+  failureType: 'testCodeFailure'
+  error: 'Expected the distinct legacy prepared dense profile.'
+  code: 'ERR_TEST_FAILURE'
+  name: 'TypeError'
+  stack: |-
+    readKeelLegacyPreparedDenseSources (file:///tmp/keel-shared-image-20261014/keel-sdk/packages/sdk/dist/legacy-prepared-dense-copy.js:189:15)
+    TestContext.<anonymous> (file:///tmp/keel-shared-image-20261014/keel-sdk/tests/sdk-legacy-prepared-dense-copy.test.mjs:100:39)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+1..7
+# tests 7
+# suites 0
+# pass 0
+# fail 7
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 6191.161915
