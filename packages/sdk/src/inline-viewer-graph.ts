@@ -1,4 +1,4 @@
-import { assertKeelFreshPayloadCarriage } from "./inline-transport-audit.js";
+import { assertKeelFreshPayloadCarriage, assertKeelPreparedCollectorInlineMetadata as assertKeelCollectorInlineMetadata } from "./inline-transport-audit.js";
 /**
  * Node-only planner for a modular Inline KEEL viewer.
  *
@@ -24,7 +24,7 @@ import { gzipSync, gunzip, gunzipSync, inflate, inflateSync, brotliDecompress, b
 import { encodeAbiParameters, getAddress, keccak256, stringToHex } from "viem";
 
 import { KEEL_INLINE_MAX_TOKEN_URI_BYTES, keelWeb3ObjectURI, resolveKeelInlineCarriage, type KeelInlineCarriage } from "./presentation.js";
-import { assertKeelCollectorInlineMetadata, assertKeelInlineImageBytes, prepareKeelInlineImageCarriage, type KeelPresentationPolicy } from "./collector-policy.js";
+import { assertKeelInlineImageBytes, prepareKeelInlineImageCarriage, type KeelPresentationPolicy } from "./collector-policy.js";
 import { KEEL_CREATIVE_RUNTIME_CATALOG } from './creative-runtime-catalog.js';
 import {
   KEEL_ASSET_DISPLAY_MEDIA_TYPES,

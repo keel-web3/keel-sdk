@@ -124,6 +124,8 @@ export * from "./inline-token-read.js";
 export * from "./dense-transport.js";
 
 export * from "./prepared-dense-copy.js";
+export * from "./legacy-prepared-dense-copy.js";
+export * from "./legacy-prepared-dense-reader.js";
 export * from "./creator-prepared-inline.js";
 export * from "./module-runtime.js";
 export * from "./inline-descriptor-columns.js";

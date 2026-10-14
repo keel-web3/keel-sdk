@@ -1,0 +1,67 @@
+{
+  "profile": "keel.legacy-prepared-dense-copy@1",
+  "shellId": "0xc26655fca9b6eb800e2009d6707abeb7f8b8dfb0d52c5a5c5a89563c169df904",
+  "chainId": 11155111,
+  "requiredRegistry": "KeelHarnessBuilder:distinct shell ID; keeper/platform-authority governed",
+  "payloadMode": 2,
+  "fragments": {
+    "prefix": {
+      "rawPath": "prefix.raw.html.txt",
+      "rawByteLength": 107,
+      "rawSHA256": "0x4c8a95566a16a19875b1f054abf5e1ecc319f92ae46ae46ac67fa39f7837d4c4",
+      "paddingBytes": 1,
+      "paddedRawSHA256": "0xfb7f6dbaa77a65221e0a89d4d6d4382c2ed290fcba31524b563557444f2a3d34",
+      "preparedPath": "prefix.mode2.preencoded.txt",
+      "preparedByteLength": 192,
+      "preparedSHA256": "0x12056a22409156c0f498ddda102b85525d4e9d0836a8c601d842bc7071364a20",
+      "mediaType": "application/vnd.keel.token-uri-base64-fragment"
+    },
+    "suffix": {
+      "rawPath": "suffix.raw.html.txt",
+      "rawByteLength": 189600,
+      "rawSHA256": "0xcb0785880cfeebef638072aca567ec4c0ba1bb7cf49e20f58f01548fbfa8cd7e",
+      "paddingBytes": 3,
+      "paddedRawSHA256": "0x71cf5af7b25e1d8e349cf4075ff48777aca232678726debbd58b15e37cacdaf8",
+      "preparedPath": "suffix.mode2.preencoded.txt",
+      "preparedByteLength": 337072,
+      "preparedSHA256": "0xf12e817ba5411f53488e09bbdfd56e38afe7174319ea0393889bc1116bccb6c4",
+      "mediaType": "application/vnd.keel.token-uri-base64-fragment"
+    }
+  },
+  "decoderIntegrity": {
+    "algorithm": "sha256",
+    "digest": "0x8f754844d73d726d0152178876bbfc77527ba9bc1ce5b50ed78d72ec40d169ba",
+    "byteLength": 160385
+  },
+  "transportDecoderIntegrity": {
+    "algorithm": "sha256",
+    "digest": "0x55bd265657e4f950d59723f9739c490881410e0c26c0d17793abe3679cca1392",
+    "byteLength": 3928
+  },
+  "canonicalPrefixIntegrity": {
+    "algorithm": "sha256",
+    "digest": "0xf15a55cc1567a24f9aab872d8a419ab285e51642314b90bee386bc6d9b1873e0",
+    "byteLength": 15118
+  },
+  "canonicalSuffixIntegrity": {
+    "algorithm": "sha256",
+    "digest": "0xedeff399ce6920ef4f92e879728c2b2f9b7fd0f693d61e699308f5d5c83c218b",
+    "byteLength": 313860
+  },
+  "bodySchema": "keel.legacy-prepared-dense-packs-and-segments@1",
+  "contextSchema": "keel-context@1:legacy-six-fields",
+  "sourceLeafDecodedBytes": 524288,
+  "maximumConfiguredResources": 1024,
+  "maximumConfiguredSourceBytes": 536870912,
+  "selectedChainRegistrationVerified": false,
+  "registrationTransactions": "not-created",
+  "signing": "not-performed",
+  "submission": "not-performed",
+  "canonicalExistingShellHead": "must-remain-unchanged",
+  "notes": [
+    "Only reusable shell fragments are encoded for the mode2 registry. This is not a Base64 payload/body publication route.",
+    "Normal new legacy release graph stays full pinned raw-percent COPY with the existing public-drop compiler.",
+    "Authenticate actual selected-chain builder/store, registered exact fragment records, receipt/readback, revision and metadata before enabling this reader.",
+    "Alignment padding is disclosed separately; raw builder artifacts use exact unpadded source fragments."
+  ]
+}

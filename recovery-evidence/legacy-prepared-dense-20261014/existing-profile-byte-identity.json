@@ -1,0 +1,70 @@
+{
+  "referenceCommit": "3fb92a6d235bd77e9ba022a9543d1c1917c25abf",
+  "rows": [
+    {
+      "input": {},
+      "prefixSHA256": "0x4a5405a5794aa91206ef4cebebee127d8917735d4d33546a0bbf8c6bead9a58e",
+      "suffixSHA256": "0x71e27b6cc8c5b5620d6428512ed8d55605f136dc7bed51367b3359f2113d99ef",
+      "prefixIdentical": true,
+      "suffixIdentical": true
+    },
+    {
+      "input": {
+        "codecProfile": "brotli-js"
+      },
+      "prefixSHA256": "0x4a5405a5794aa91206ef4cebebee127d8917735d4d33546a0bbf8c6bead9a58e",
+      "suffixSHA256": "0xe15aa71c91a4b31818b8765fb7842e65c4ccd8fffb4c8d8717e00f5fc3a6cfd5",
+      "prefixIdentical": true,
+      "suffixIdentical": true
+    },
+    {
+      "input": {
+        "codecProfile": "lzma-js"
+      },
+      "prefixSHA256": "0x4a5405a5794aa91206ef4cebebee127d8917735d4d33546a0bbf8c6bead9a58e",
+      "suffixSHA256": "0xadf88d8bc3ed95545a1acf6f91c884ef5b5197a309b3905edb9877237eaec1c4",
+      "prefixIdentical": true,
+      "suffixIdentical": true
+    },
+    {
+      "input": {
+        "codecProfile": "brotli-js",
+        "embeddedContainerDelivery": {
+          "chainId": 11155111,
+          "store": "0x1111111111111111111111111111111111111111"
+        },
+        "binaryPayloadCarriage": "base90"
+      },
+      "prefixSHA256": "0xf15a55cc1567a24f9aab872d8a419ab285e51642314b90bee386bc6d9b1873e0",
+      "suffixSHA256": "0x9fc8d5d257df0b3f9ef0316421e020a22cdd9e51deccc02a2f9e5bb75a4798a6",
+      "prefixIdentical": true,
+      "suffixIdentical": true
+    },
+    {
+      "input": {
+        "embeddedContainerDelivery": {
+          "chainId": 11155111,
+          "store": "0x1111111111111111111111111111111111111111"
+        },
+        "shellBootCompression": "gzip"
+      },
+      "prefixSHA256": "0x4c8a95566a16a19875b1f054abf5e1ecc319f92ae46ae46ac67fa39f7837d4c4",
+      "suffixSHA256": "0x7f5ab7d080b9c45057ca20019ad2a10f603532274c9d550c9be9465aa787caa1",
+      "prefixIdentical": true,
+      "suffixIdentical": true
+    },
+    {
+      "input": {
+        "embeddedContainerDelivery": {
+          "chainId": 11155111,
+          "store": "0x1111111111111111111111111111111111111111"
+        },
+        "shellBootCompression": "none"
+      },
+      "prefixSHA256": "0x4c8a95566a16a19875b1f054abf5e1ecc319f92ae46ae46ac67fa39f7837d4c4",
+      "suffixSHA256": "0x6a42fa6b9bf225983ec28579e81c09f42417eb7008ba84e7d79f380538c52369",
+      "prefixIdentical": true,
+      "suffixIdentical": true
+    }
+  ]
+}

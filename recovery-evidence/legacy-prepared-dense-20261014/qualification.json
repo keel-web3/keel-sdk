@@ -1,0 +1,287 @@
+{
+  "baseCommit": "3fb92a6d235bd77e9ba022a9543d1c1917c25abf",
+  "implementationState": "frozen local source; commit recorded separately after evidence preparation",
+  "nodeVersion": "v22.23.1",
+  "sourceAndEmittedArtifacts": [
+    {
+      "path": "packages/sdk/src/index.ts",
+      "bytes": 5181,
+      "sha256": "30251b0891f93b8c4a03d3a5c1be3ed7c4772b45d9ecaa96d63ac39f0319aa1f",
+      "javascript": {
+        "path": "packages/sdk/dist/index.js",
+        "sha256": "ced25841e556ecea34844243ec026ed4376f1c397e6b2fe8334f034a0b2e8359"
+      },
+      "declaration": {
+        "path": "packages/sdk/dist/index.d.ts",
+        "sha256": "b9463d2f5393dee2da95f749a636a7be9d3ac145009d7f2cf0cbacb37374ff84"
+      }
+    },
+    {
+      "path": "packages/sdk/src/inline-transport-audit.ts",
+      "bytes": 28295,
+      "sha256": "c5f5c74f906f4deec29d0b49c859656ac5db5c1f3cae7df80f14926f0f18cd9c",
+      "javascript": {
+        "path": "packages/sdk/dist/inline-transport-audit.js",
+        "sha256": "a7ead5e3214e16283e944af4813f043f6606a1c4ad2dfc751439c337a807cb66"
+      },
+      "declaration": {
+        "path": "packages/sdk/dist/inline-transport-audit.d.ts",
+        "sha256": "717b18053c9383086eca306e5a4d1f9bb3b40188e4e2ab83faec5306bb160ba7"
+      }
+    },
+    {
+      "path": "packages/sdk/src/inline-viewer-graph.ts",
+      "bytes": 128771,
+      "sha256": "b8a12fcc704cf08d8510bb1a9449a4927fd8c8c4ce98e030dfd20af451637a8a",
+      "javascript": {
+        "path": "packages/sdk/dist/inline-viewer-graph.js",
+        "sha256": "4d41971206c6e6adf58cb496208a3cdd40c51ad8dfb384c5662d70c2d55d04b1"
+      },
+      "declaration": {
+        "path": "packages/sdk/dist/inline-viewer-graph.d.ts",
+        "sha256": "f0bcd3fc6ceb6f7925cb10086d76e25a912882c190b4735163473548270be37f"
+      }
+    },
+    {
+      "path": "packages/sdk/src/legacy-prepared-dense-copy.ts",
+      "bytes": 16522,
+      "sha256": "8841bd52b0b6316398734afb5ab5127d81dfc26f77c03d1a8af198d9fa9eebad",
+      "javascript": {
+        "path": "packages/sdk/dist/legacy-prepared-dense-copy.js",
+        "sha256": "67d8ef8ebbb44be9a1f69ddad65d557f5575590abd8eaabe10a8eb596e954313"
+      },
+      "declaration": {
+        "path": "packages/sdk/dist/legacy-prepared-dense-copy.d.ts",
+        "sha256": "0d4bc35571652edbd8c600b0458f03de32b39106af37078fbb61de08e89cf1e7"
+      }
+    },
+    {
+      "path": "packages/sdk/src/legacy-prepared-dense-reader.ts",
+      "bytes": 12398,
+      "sha256": "e25710a2d9c299894d0ecf1664b52ad3bbfac030789ab2e252a71e9545217303",
+      "javascript": {
+        "path": "packages/sdk/dist/legacy-prepared-dense-reader.js",
+        "sha256": "5fb122454d9978d97b082b9b34a5409feb4eefbfb067aa547acaeb4bebe9cd02"
+      },
+      "declaration": {
+        "path": "packages/sdk/dist/legacy-prepared-dense-reader.d.ts",
+        "sha256": "c1c9dda132d1f417eb0a3e97244f066ae10c463c248cd501768e872100fcfaf3"
+      }
+    },
+    {
+      "path": "packages/sdk/src/prepared-dense-copy.ts",
+      "bytes": 8842,
+      "sha256": "3c2bb20804bd19c5819cecbaa730ceb0159176bfa5f9e32a4d1789e45fd6afc7",
+      "javascript": {
+        "path": "packages/sdk/dist/prepared-dense-copy.js",
+        "sha256": "48c59f1b3fbfd39e439997c7d3a6ee775213f3b9cdad1988e1ad8e70e68c1a79"
+      },
+      "declaration": {
+        "path": "packages/sdk/dist/prepared-dense-copy.d.ts",
+        "sha256": "5088e97514b62676fa54e4bc3e6720c988a0a536fb57b0c1942485e275f88ad9"
+      }
+    },
+    {
+      "path": "packages/sdk/src/prepared-dense-framing.ts",
+      "bytes": 1263,
+      "sha256": "c537145b5413b01318c2a54054349677f5783e55e084bb660507f45a97b5ba02",
+      "javascript": {
+        "path": "packages/sdk/dist/prepared-dense-framing.js",
+        "sha256": "92b6ac460b20037ef77c661f9a58cb82937889cad3393f9a1e71ea76267bd38e"
+      },
+      "declaration": {
+        "path": "packages/sdk/dist/prepared-dense-framing.d.ts",
+        "sha256": "316aefd7178e4bdd39a1130ac73f43623a7e4c7a25016fc9d9ed0365a190ff92"
+      }
+    },
+    {
+      "path": "packages/sdk/src/verification-shell.ts",
+      "bytes": 113382,
+      "sha256": "2c3d626343d6e65fa9ca74f42850e887d01a14178f49ad984377676207af4cbf",
+      "javascript": {
+        "path": "packages/sdk/dist/verification-shell.js",
+        "sha256": "33f0a6a05c579a8254ce412798458c69545ca20dd1f23a81b772246d4396f15a"
+      },
+      "declaration": {
+        "path": "packages/sdk/dist/verification-shell.d.ts",
+        "sha256": "a39753646c7a49bd6a3d83bcd924583a034dd8a378cf6550da7f2619bf26c137"
+      }
+    }
+  ],
+  "unchangedPackagedAssets": [
+    {
+      "path": "packages/sdk/dist/assets/keel-verification-chrome.js",
+      "sha256": "e8adffa099db16ee1740f338c8766d0cb48032752055c5aed48ec6b5df8a22e6",
+      "referenceSHA256": "e8adffa099db16ee1740f338c8766d0cb48032752055c5aed48ec6b5df8a22e6",
+      "byteIdenticalToQualifiedReference": true
+    },
+    {
+      "path": "packages/sdk/dist/managed-shell-runtime.js",
+      "sha256": "fb9e4c4515f68695127d1f0475bc6ca0ad21c065b858aa915676f3bf412bf36b",
+      "referenceSHA256": "fb9e4c4515f68695127d1f0475bc6ca0ad21c065b858aa915676f3bf412bf36b",
+      "byteIdenticalToQualifiedReference": true
+    },
+    {
+      "path": "packages/sdk/dist/managed-shell-runtime.d.ts",
+      "sha256": "bdaae96865fdc6999391082789e9649e034f5816f7500b9586cbaeb4c92cb3a2",
+      "referenceSHA256": "bdaae96865fdc6999391082789e9649e034f5816f7500b9586cbaeb4c92cb3a2",
+      "byteIdenticalToQualifiedReference": true
+    }
+  ],
+  "commands": [
+    {
+      "command": "node node_modules/typescript/bin/tsc -p packages/sdk/tsconfig.json --incremental --pretty false",
+      "exitCode": 0,
+      "log": "sdk-tsc.log"
+    },
+    {
+      "command": "node --test tests/sdk-legacy-prepared-dense-copy.test.mjs",
+      "exitCode": 0,
+      "tests": 7,
+      "pass": 7,
+      "fail": 0,
+      "skip": 0,
+      "log": "sdk-focused.tap"
+    },
+    {
+      "command": "node --test tests/sdk-legacy-prepared-dense-browser.test.mjs",
+      "exitCode": 0,
+      "tests": 4,
+      "pass": 4,
+      "fail": 0,
+      "skip": 0,
+      "log": "chromium-full-return.tap"
+    },
+    {
+      "command": "node --test --test-concurrency=2 tests/sdk-prepared-dense-copy.test.mjs tests/sdk-inline-viewer-graph.test.mjs tests/inline-payload-carriage.test.mjs tests/copy-publication-enforcement.test.mjs tests/sdk-inline-decoder-profiles.test.mjs tests/sdk-inline-existing-object-reuse.test.mjs tests/sdk-payload-storage.test.mjs",
+      "exitCode": 1,
+      "tests": 54,
+      "pass": 52,
+      "fail": 2,
+      "skip": 0,
+      "failure": "Two file startup failures: absent relative protocol/MCP dist in isolated worktree; no behavior case in those files executed.",
+      "log": "existing-regressions-initial-startup-failures.tap"
+    },
+    {
+      "command": "node --test tests/inline-payload-carriage.test.mjs tests/copy-publication-enforcement.test.mjs",
+      "exitCode": 0,
+      "tests": 26,
+      "pass": 26,
+      "fail": 0,
+      "skip": 0,
+      "log": "copy-mcp-regressions-restored.tap"
+    }
+  ],
+  "dependencyRestoration": {
+    "protocolDist": "qualified protocol dist symlink; source unchanged",
+    "mcpDist": "1.5MiB byte-identical copy of qualified MCP dist; no MCP source diff e6ad880..3fb92; per-worktree @keel/sdk dependency points at this candidate",
+    "mainWorkspaceAliasesOrDistChanged": false,
+    "temporaryViewerSourceSymlink": "read-only for existing repositoryRoot checks; removed after completion"
+  },
+  "limits": {
+    "entireSdkSuiteRun": false,
+    "studioCompilerRunByThisAgent": false,
+    "selectedChainRegistrationVerified": false,
+    "softwareDeployed": false,
+    "walletSigned": false,
+    "broadcast": false,
+    "paidMetadataImageArtworkDeduplication": "not proved; normal Studio must resolve or block shared-poster case"
+  },
+  "evidenceFiles": [
+    {
+      "path": ".gitattributes",
+      "bytes": 70,
+      "sha256": "3441fd749ff9ca2b1db76c4cd3c4c4799157c5a14e244c20b06928a19466c521"
+    },
+    {
+      "path": "README.md",
+      "bytes": 4036,
+      "sha256": "616244851eeac0859e7d8aedd5a6bafaf91e66006667ff4abf6bc9f302c4a6db"
+    },
+    {
+      "path": "chromium-full-return.tap",
+      "bytes": 1557,
+      "sha256": "fd03c34b266fd2a1ccd8c76da74ec89e24b2ce42c2b9e7d7dac99c61eab56063"
+    },
+    {
+      "path": "chromium-initial-proxy-assertion-failure.tap",
+      "bytes": 2492,
+      "sha256": "a686542749e0c77f7112cab4fcf9230834b43f64ac4fd5a564830cefbdb0e526"
+    },
+    {
+      "path": "copy-mcp-regressions-restored.tap",
+      "bytes": 5974,
+      "sha256": "ad7125c7bb7de242366c388388b8864dd5730119e4fecc30e3b3b643a8fb68a0"
+    },
+    {
+      "path": "existing-compressed-streams-focused.tap",
+      "bytes": 380,
+      "sha256": "8c75f870a844e2a92507812838c6f4bc54b96981b51da2350925280363213268"
+    },
+    {
+      "path": "existing-profile-byte-identity.json",
+      "bytes": 2443,
+      "sha256": "dac90f688d0547887c6edfd894922cad5b0e7be4ca9b6c38958065ccbb2e3d72"
+    },
+    {
+      "path": "existing-regressions-initial-startup-failures.tap",
+      "bytes": 15085,
+      "sha256": "cba7fd869d9d3838d00027cf001c1afd2417e610942310b89f8fcee03472d4bf"
+    },
+    {
+      "path": "registration/descriptor.json",
+      "bytes": 3061,
+      "sha256": "33903429e6cde34e9e92ce2bbbce74bf3abb0dc0c8b3fa796ca467979da5f215"
+    },
+    {
+      "path": "registration/prefix.mode2.preencoded.txt",
+      "bytes": 192,
+      "sha256": "12056a22409156c0f498ddda102b85525d4e9d0836a8c601d842bc7071364a20"
+    },
+    {
+      "path": "registration/prefix.raw.html.txt",
+      "bytes": 107,
+      "sha256": "4c8a95566a16a19875b1f054abf5e1ecc319f92ae46ae46ac67fa39f7837d4c4"
+    },
+    {
+      "path": "registration/suffix.mode2.preencoded.txt",
+      "bytes": 337072,
+      "sha256": "f12e817ba5411f53488e09bbdfd56e38afe7174319ea0393889bc1116bccb6c4"
+    },
+    {
+      "path": "registration/suffix.raw.html.txt",
+      "bytes": 189600,
+      "sha256": "cb0785880cfeebef638072aca567ec4c0ba1bb7cf49e20f58f01548fbfa8cd7e"
+    },
+    {
+      "path": "sdk-focused.tap",
+      "bytes": 1971,
+      "sha256": "afe9d478b51dd02c5e111f3ff003afaf47a62ce409f23d99a8adf550515dac68"
+    },
+    {
+      "path": "sdk-initial-integration-failures.tap",
+      "bytes": 5493,
+      "sha256": "61a2d17d890d870b3a27656ad2933f603a3027837463f443d5941d500a0f1f37"
+    },
+    {
+      "path": "sdk-interim-module-check-failure.tap",
+      "bytes": 2441,
+      "sha256": "4886f4230adb77e2bcd280477c6bd68d292bd0d6ec4c1ad19a8ef3571bcb5ddf"
+    },
+    {
+      "path": "sdk-tsc.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  ],
+  "testSourceFiles": [
+    {
+      "path": "tests/sdk-legacy-prepared-dense-copy.test.mjs",
+      "sha256": "4e09c2b4252579780898a6034395981270b5fff483911941ac79463b5e38e109"
+    },
+    {
+      "path": "tests/sdk-legacy-prepared-dense-browser.test.mjs",
+      "sha256": "130c12b50fe66d393236aec8befda8d5d0c0be3cad20e11fc2b93f163225f35a"
+    }
+  ]
+}
