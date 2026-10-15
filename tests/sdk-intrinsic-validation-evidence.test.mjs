@@ -37,7 +37,7 @@ test('historical sixteen-call transcript retains its fee-free discovery and raw 
   assert.equal(strict.response.result, undefined);
 });
 
-test('current Amsterdam fees preserve the recorded non-fee program and fixture strict -38013 stays terminal', async () => {
+test('current Amsterdam total allowances and fees preserve calldata and fixture strict -38013 stays terminal', async () => {
   const input = structuredClone(recorded.input);
   for (const key of ['blockNumber', 'maximumReadGas', 'maximumTransactionGas']) input[key] = BigInt(input[key]);
   const before = structuredClone(recorded.requests);
@@ -46,8 +46,12 @@ test('current Amsterdam fees preserve the recorded non-fee program and fixture s
     const actual = recorded.requests[cursor++];
     assert.ok(actual, 'No extra replay or public-read proof is allowed after strict rejection.');
     const expected = structuredClone({ method: actual.method, params: actual.params });
-    if (expected.method === 'eth_simulateV1' && expected.params[0].validation === false) {
+    if (expected.method === 'eth_simulateV1') {
       for (const [index, block] of expected.params[0].blockStateCalls.entries()) {
+        // Amsterdam separates state gas from execution maxUsedGas. Current
+        // strict replay keeps the input's complete bounded total allowance;
+        // the archived execution-only margin is historical fixture evidence.
+        block.calls[0].gas = input.preparationCalls[index].gas;
         for (const key of ['gasPrice', 'maxFeePerGas', 'maxPriorityFeePerGas']) {
           if (input.preparationCalls[index][key] !== undefined) block.calls[0][key] = input.preparationCalls[index][key];
         }

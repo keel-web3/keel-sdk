@@ -48,3 +48,21 @@ test('read-review sends the exact saved operation and rejects an operation subst
   returned=id(4);const ready=await client.readReview(id(3),34,id(4),binding);assert.match(ready.reviewUrl,/operation=00000000-0000-4000-8000-000000000004&revision=34$/);
   assert.equal(calls[1].init.method,undefined);assert.deepEqual(JSON.parse(new URL(calls[1].url).searchParams.get('expectedState')),binding);
 });
+
+test('wallet approval continuation preserves exact guidance and refuses cross-release progress', async () => {
+  let changed = false;
+  const approved = { operationId: id(4), preparedDigest: `0x${'bb'.repeat(32)}`, reviewPath: `/studio/releases/${id(3)}/review?operation=${id(4)}&revision=34` };
+  const client = createKeelStudioAgentDraftClient({ studioUrl: 'https://studio.example', grantToken: token, fetchImplementation: async () => {
+    const actual = structuredClone(progress);
+    if (changed) actual.binding.releaseId = id(9);
+    return Response.json({ schema: 'keel-release-continuation@1', releaseId: id(3), revision: 34,
+      status: 'wallet-approval-required', nextAction: 'approve-wallet', approval: approved,
+      reviewPath: `/studio/releases/${id(3)}`, message: 'Review the exact saved operation', storagePreserved: true,
+      uploadedBytes: 0, signing: 'not-performed', submission: 'not-performed', agentProgress: actual });
+  } });
+  const result = await client.continuePublication(id(3), 34, { expectedOperationId: id(4), expectedState: binding });
+  assert.equal(result.reviewUrl, 'https://studio.example' + approved.reviewPath);
+  assert.deepEqual(result.agentProgress, progress);
+  changed = true;
+  await assert.rejects(client.continuePublication(id(3), 34, { expectedState: binding }));
+});
