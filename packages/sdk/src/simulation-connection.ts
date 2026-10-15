@@ -41,7 +41,7 @@ export function assertKeelSimulationEnvelopes(request: { readonly params: readon
     for (const [i, planned] of calls.entries()) {
       const requested = quantity(object(planned)?.gas), actual = quantity(object(transactions[i])?.gas);
       if (requested === undefined || actual === undefined) throw new KeelPublicationSimulationError("unsupported-simulation", "The simulator omitted the exact transaction gas envelope.");
-      if (actual < requested) throw new KeelPublicationSimulationError("provider-limit", "The simulator silently reduced the requested transaction gas. Your saved plan is unchanged; use a compatible provider before wallet approval.", { requestedGasLimit: requested.toString(), providerGasCap: actual.toString(), gasCapacityScope: "envelope", blockIndex: index, callIndex: i });
+      if (actual < requested) throw new KeelPublicationSimulationError("provider-limit", "The simulator silently reduced the requested transaction gas. Your saved plan is unchanged; use a compatible provider before wallet approval.", { requestedGasLimit: requested.toString(), returnedGasLimit: actual.toString(), providerGasCap: actual.toString(), gasCapacityScope: "envelope", blockIndex: index, callIndex: i });
       if (actual !== requested) throw new KeelPublicationSimulationError("unsupported-simulation", "The simulator changed the requested transaction gas envelope.");
     }
   }

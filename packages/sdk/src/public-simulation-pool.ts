@@ -109,6 +109,7 @@ export function createKeelPublicSimulationPool(options: KeelPublicSimulationPool
     capabilities.set(index, { limits: snapshotKeelSimulationProviderLimits(profile.limits), expiresAt: Date.parse(profile.measuredAt) + capabilityMaximumAgeMs });
   }
   const schedulers = urls.map(url => sharedKeelProviderRequestScheduler(url, { chainId, minIntervalMs: options.minIntervalMs ?? 250, maximumRetryDelayMs: 5_000 }, options.fetchImpl));
+  const candidateDiagnostic = (index: number) => ({ providerId: schedulers[index]!.providerId, candidateIndex: index, candidateCount: urls.length });
   const activeObservations = new Map<number, KeelProviderRequestEvent>();
   const notify = (event: KeelProviderRequestEvent) => { try { const pending = options.observe?.(Object.freeze(event)); if (pending) void Promise.resolve(pending).catch(() => undefined); } catch { /* Evidence cannot alter proof. */ } };
   // Each owner keeps a separate parser/identity cache and private observer. Only
@@ -235,7 +236,7 @@ export function createKeelPublicSimulationPool(options: KeelPublicSimulationPool
       } catch (error) {
         if (closed) throw new KeelPublicationSimulationError("rpc-unavailable", "The publication check was cancelled.");
         const failure = keelSimulationTransportFailure(error, { method: "eth_estimateGas", phase: "project-estimate" });
-        const wrapped = new KeelPublicationSimulationError(failure.kind, failure.message, failure.diagnostic);
+        const wrapped = new KeelPublicationSimulationError(failure.kind, failure.message, { ...failure.diagnostic, ...candidateDiagnostic(index) });
         inheritKeelProviderScheduledFailure(wrapped, error); throw wrapped;
       }
     }
@@ -287,8 +288,10 @@ export function createKeelPublicSimulationPool(options: KeelPublicSimulationPool
       if (closed) throw new KeelPublicationSimulationError("rpc-unavailable", "The publication check was cancelled.");
       const index = order[offset]!;
       if (rejected.has(index)) continue;
-      const profileFailure = keelSimulationProviderCapacityFailure(measurement, limitsFor(index) ?? {});
-      if (profileFailure) {
+      const profileRejection = keelSimulationProviderCapacityFailure(measurement, limitsFor(index) ?? {});
+      if (profileRejection) {
+        const profileFailure = new KeelPublicationSimulationError(profileRejection.kind, profileRejection.message,
+          { ...profileRejection.diagnostic, ...candidateDiagnostic(index), phase: "publication-preflight" });
         capacityFailure ??= profileFailure; lastFailure = profileFailure;
         const cap = profileFailure.diagnostic?.providerGasCap;
         if (typeof cap === "string") retainApprovedCapacity(index, BigInt(cap), profileFailure);
@@ -343,7 +346,7 @@ export function createKeelPublicSimulationPool(options: KeelPublicSimulationPool
           // Conservative envelope sum, not measured execution gas. Bytes exclude
           // only the pool-owned JSON-RPC id/version envelope.
           requiredProgramGas: gasLimits.reduce((sum, gas) => sum + gas, 0n).toString(),
-          ...metrics, phase: projectRequest ? "project-request" : "public-qualification" });
+          ...metrics, ...candidateDiagnostic(index), phase: projectRequest ? "project-request" : "public-qualification" });
         inheritKeelProviderScheduledFailure(failure, error);
         // Never reinterpret a deterministic transaction validation error or an
         // execution revert as a reason to try another backend for success.
