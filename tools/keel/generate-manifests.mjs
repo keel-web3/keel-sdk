@@ -153,7 +153,7 @@ function main() {
       verify: {
         build: "forge build",
         test: `forge test --match-path 'test/${TIER_OF.get(m.id)}/${m.id}/*'`,
-        static: "node scripts/solidity-static-check.mjs",
+        static: m.kind === "module" ? "pnpm structure:check" : "node scripts/solidity-static-check.mjs",
         sizeLimitBytes: 24576,
       },
     };
