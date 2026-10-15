@@ -7,10 +7,19 @@ export const KEEL_TEZOS_MODULES: readonly KeelTezosModule[] = [
     "sources": "src/modules/keel-anchors/tezos",
     "contracts": [
       "keel_btc_header_chain.py",
+      "keel_eth_attachment_registry.py",
+      "keel_eth_hash_verifier.py",
+      "keel_eth_light_client.py",
+      "keel_eth_proof_controller.py",
       "keel_eth_state_proof.py"
     ],
     "deployable": [
       "KeelBtcHeaderChain",
+      "KeelEthAccountProof",
+      "KeelEthAttachmentRegistry",
+      "KeelEthHashVerifier",
+      "KeelEthLightClient",
+      "KeelEthProofController",
       "KeelEthStateProof"
     ]
   },
