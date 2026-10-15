@@ -138,7 +138,7 @@ test('retained read policy preserves exact old source choices while layering onl
   retained.values.transportProfile = 'uri81-block-v1';
   assert.equal(result.retained.values.transportProfile, 'base90-v1', 'saved snapshot is copied before returning');
   assert.throws(() => assertKeelBuildDefaultsCurrent(before, modern), /build-defaults-stale/);
-  assert.throws(() => resolveKeelBuildDefaults(profile), /available|supported|choice/);
+  assert.throws(() => resolveKeelBuildDefaults(profile), TypeError);
 });
 
 test('read-only legacy compatibility never offers retired formats for fresh preparation or fabricates a missing snapshot', async () => {

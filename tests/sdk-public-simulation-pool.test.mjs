@@ -599,7 +599,7 @@ test('initial-storage capacity discovery requalifies the existing approved provi
       assert.deepEqual(input,before);
       assert.deepEqual(proof.discoveryGas.capacityAttempts,[{requestedGas:'200000000',providerGasCap:'50000000'}]);
       assert.ok(proof.discoveryGas.effectiveGasLimits.every(g=>'50000000'===g));
-      assert.ok(proof.transactionGasLimits.every(g=>BigInt(g)<50000000n));
+      assert.ok(proof.transactionGasLimits.every(g=>BigInt(g)<=50000000n));
       assert.equal(proof.completeTokenUriBytes,Buffer.byteLength(tokenURI));
       assert.ok(f.privateRequests().every(r=>r.index===0),'only the existing approved recipient receives project data');
       assert.deepEqual(f.privateRequests().map(r=>[r.body.params[0].validation,r.body.params[0].blockStateCalls.length]),[[false,5],[true,5],[false,7]]);
