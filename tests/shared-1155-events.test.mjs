@@ -1,3 +1,5 @@
+import { canonicalAbiEntries, readCompiledContractAbi } from "./abi-conformance.mjs";
+import { fileURLToPath } from "node:url";
 import nodeTest from 'node:test';
 import { siblingTest } from "./sibling-repository.mjs";
 const test = siblingTest(nodeTest, "keel-contracts");
@@ -17,7 +19,7 @@ const read=p=>JSON.parse(readFileSync(new URL(p,import.meta.url)));
 test('shared1155 compiler, checked-in and SDK ABI match',()=>{
  const recorded=read('../../keel-contracts/modules/keel-die/abi/KeelShared1155.json');
  assert.deepEqual(abi,recorded);
- assert.deepEqual(recorded,read('../../keel-contracts/out/KeelShared1155.sol/KeelShared1155.json').abi);
+ assert.deepEqual(canonicalAbiEntries(recorded),canonicalAbiEntries(readCompiledContractAbi(fileURLToPath(new URL('../../keel-contracts', import.meta.url)), 'KeelShared1155')));
 });
 
 test('shared collection creation decodes the reordered name and indexed owner',()=>{
