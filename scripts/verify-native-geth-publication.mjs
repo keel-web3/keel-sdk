@@ -11,6 +11,7 @@ import { encodeAbiParameters, encodeFunctionData, keccak256, toHex } from "viem"
 import { simulateKeelPublicationBeforeFunding } from "../packages/sdk/dist/publication-preflight.js";
 import { createKeelPublicSepoliaSimulationPool } from "../packages/sdk/dist/public-simulation-pool.js";
 import { createNativeGethRuntime } from "./lib/native-geth-runtime.mjs";
+import { measureNativeFixtureRequestCapacity } from "./lib/native-geth-capacity-fixture.mjs";
 
 // Official Geth v1.17.8, commit a579077007b98217c3e253a66e4b452ca0c32b96.
 // Pull explicitly before running. The test itself cannot download an image.
@@ -34,7 +35,7 @@ const actualDateNow = Date.now;
 const clockStarted = performance.now();
 const evidence = { schema: "keel-native-geth-publication-test@1", image, synthetic: true,
   sourceCommit: execFileSync("git", ["rev-parse", "HEAD"], { cwd: repositoryRoot, encoding: "utf8" }).trim(),
-  testedFileSha256: Object.fromEntries(["scripts/verify-native-geth-publication.mjs", "scripts/lib/native-geth-runtime.mjs", "packages/sdk/dist/rpc.js",
+  testedFileSha256: Object.fromEntries(["scripts/verify-native-geth-publication.mjs", "scripts/lib/native-geth-runtime.mjs", "scripts/lib/native-geth-capacity-fixture.mjs", "packages/sdk/dist/rpc.js",
     "packages/sdk/dist/publication-preflight.js", "packages/sdk/dist/public-simulation-pool.js", "packages/sdk/dist/simulation-connection.js",
     "packages/sdk/dist/transaction-gas-policy.js"]
     .map(path => [path, createHash("sha256").update(readFileSync(join(repositoryRoot, path))).digest("hex")])),
@@ -106,10 +107,13 @@ const plan = { planFingerprint: `0x${"aa".repeat(32)}`, chainId: 11155111, block
   expectedTokenURI, maximumTokenUriBytes: 2_000_000, maximumReadGas: 1_000_000n, collectionOverheadGas: 10_000n, maximumTransactionGas: selectedGasLimit };
 const transport = { request: async ({ method, params }) => rpc(method, params) };
 const syntheticEndpoints = ["https://approved-a.native.invalid", "https://approved-b.native.invalid"];
-function nativePool(base, { endpoints = syntheticEndpoints, approved = endpoints, beforeNative } = {}) {
+function nativePool(base, { endpoints = syntheticEndpoints, approved = endpoints, beforeNative, measuredRequestCapacity } = {}) {
+  if (measuredRequestCapacity) assert.equal(measuredRequestCapacity.evidence.blockHash, base.hash, "Measured capacity belongs to this exact synthetic snapshot");
   const requests = [];
   const pool = createKeelPublicSepoliaSimulationPool({ rpcUrls: endpoints, approvedProjectRpcUrls: approved,
     readTransport: transport, block: { number: 0n, hash: base.hash }, minIntervalMs: 0,
+    ...(measuredRequestCapacity ? { providerCapabilities: endpoints.map(rpcUrl => ({ chainId: 11155111, rpcUrl,
+      measuredAt: measuredRequestCapacity.measuredAt, limits: { requestGasCap: measuredRequestCapacity.requestGasCap } })) } : {}),
     fetchImpl: async (url, init) => {
       assert.ok(endpoints.includes(url), "Only synthetic endpoint labels may reach the local adapter");
       assert.equal(init.method, "POST"); assert.equal(init.redirect, "error");
@@ -205,16 +209,23 @@ try {
     requiredReaderCalls: [{ ...plan.requiredReaderCalls[0], expectedReturn: encodeAbiParameters([{ type: "uint256" }], [14n]) }],
     metadataCall: { ...plan.metadataCall, data: calldata("tokenURIForCount", [14n]) },
   };
-  const smallBefore = structuredClone(smallPlan), smallRequests = [];
-  const smallProof = await simulateKeelPublicationBeforeFunding(smallPlan, { request: async request => {
-    if (request.method === "eth_simulateV1") smallRequests.push(request.params);
-    return rpc(request.method, request.params);
-  } });
+  const smallBefore = structuredClone(smallPlan);
+  await assert.rejects(simulateKeelPublicationBeforeFunding(smallPlan, transport), error =>
+    error.kind === "provider-limit" && error.diagnostic?.stage === "discovery-capacity-scope");
+  assert.deepEqual(smallPlan, smallBefore);
+  record("unscoped later project remainder cannot authorize whole-request discovery allocation");
+  const measuredRequestCapacity = await measureNativeFixtureRequestCapacity({ rpc, configuredGasCap: 50_000_000n,
+    block: base, account: owner, gasPrice: calls[0].gasPrice });
+  record("controlled 50M request cap is corroborated by real public empty-call envelopes and strict nonce rejection", measuredRequestCapacity.evidence);
+  const smallFixture = nativePool(base, { endpoints: [syntheticEndpoints[0]], measuredRequestCapacity });
+  const smallProof = await poolProof(smallFixture, smallPlan);
+  const smallRequests = projectRequests(smallFixture).map(request => request.params);
   assert.deepEqual(smallPlan, smallBefore);
   assert.equal(smallProof.validatedTransactionCalls, 14);
   assert.equal(smallProof.completeTokenUriBytes, Buffer.byteLength(expectedTokenURI));
-  assert.equal(smallProof.discoveryGas.capacityAttempts.length, 2);
-  assert.ok(smallProof.discoveryGas.capacityAttempts[1].programGasBudget);
+  assert.equal(smallProof.discoveryGas.capacityAttempts.length, 1);
+  assert.equal(smallProof.discoveryGas.capacityAttempts[0].programGasBudget, "50000000");
+  assert.deepEqual(smallRequests.map(([program]) => program.validation), [false, true, false]);
   const smallStrict = smallRequests.find(([program]) => program.validation);
   assert.ok(smallStrict);
   assert.deepEqual(smallRequests.at(-1)[0].blockStateCalls.slice(0, 14), smallStrict[0].blockStateCalls);
@@ -229,7 +240,7 @@ try {
   const paddedData = calldata("write", [1n]).padEnd(2 + 69_316 * 2, "0");
   const paddedPlan = { ...smallPlan, preparationCalls: smallPlan.preparationCalls.map((call, index) =>
     index === 0 ? { ...call, data: paddedData } : call) };
-  const paddedBefore = structuredClone(paddedPlan), paddedPool = nativePool(base, { endpoints: [syntheticEndpoints[0]] });
+  const paddedBefore = structuredClone(paddedPlan), paddedPool = nativePool(base, { endpoints: [syntheticEndpoints[0]], measuredRequestCapacity });
   const paddedProof = await poolProof(paddedPool, paddedPlan);
   assert.deepEqual(paddedPlan, paddedBefore);
   assert.equal(paddedProof.completeTokenUriBytes, Buffer.byteLength(expectedTokenURI));
@@ -248,12 +259,12 @@ try {
     ({ ...smallPlan.preparationCalls[0], data: paddedData, nonce: toHex(index) })), assertions: [],
     requiredReaderCalls: [{ ...smallPlan.requiredReaderCalls[0], expectedReturn: encodeAbiParameters([{ type: "uint256" }], [45n]) }],
     metadataCall: { ...smallPlan.metadataCall, data: calldata("tokenURIForCount", [45n]) } };
-  const impossibleBefore = structuredClone(impossiblePlan), impossiblePool = nativePool(base, { endpoints: [syntheticEndpoints[0]] });
+  const impossibleBefore = structuredClone(impossiblePlan), impossiblePool = nativePool(base, { endpoints: [syntheticEndpoints[0]], measuredRequestCapacity });
   let impossibleDiagnostic;
   await assert.rejects(poolProof(impossiblePool, impossiblePlan), error => {
     assert.equal(error.kind, "provider-limit"); assert.equal(error.diagnostic.stage, "discovery-minimum");
     assert.equal(error.diagnostic.minimumProgramGas, "200305080");
-    assert.ok(BigInt(error.diagnostic.providerGasCap) < 50_000_000n);
+    assert.equal(error.diagnostic.providerGasCap, "50000000");
     impossibleDiagnostic = error.diagnostic; return true;
   });
   assert.deepEqual(impossiblePlan, impossibleBefore);
@@ -272,11 +283,10 @@ try {
     requiredReaderCalls: [{ ...smallPlan.requiredReaderCalls[0], expectedReturn: encodeAbiParameters([{ type: "uint256" }], [73n]) }],
     metadataCall: { ...smallPlan.metadataCall, data: calldata("tokenURIForCount", [73n]) },
   };
-  const unevenBefore = structuredClone(unevenPlan), unevenRequests = [];
-  const unevenProof = await simulateKeelPublicationBeforeFunding(unevenPlan, { request: async request => {
-    if (request.method === "eth_simulateV1") unevenRequests.push(request.params);
-    return rpc(request.method, request.params);
-  } });
+  const unevenBefore = structuredClone(unevenPlan);
+  const unevenFixture = nativePool(base, { endpoints: [syntheticEndpoints[0]], measuredRequestCapacity });
+  const unevenProof = await poolProof(unevenFixture, unevenPlan);
+  const unevenRequests = projectRequests(unevenFixture).map(request => request.params);
   assert.deepEqual(unevenPlan, unevenBefore);
   assert.equal(unevenProof.discoveryGas.allocationAttempts[0].callIndex, 2);
   assert.equal(unevenProof.discoveryGas.allocationAttempts[0].strategy, "prefix-reuse");
@@ -445,6 +455,11 @@ try {
   record("all simulations leave canonical state, nonce and block unchanged");
   if (process.env.KEEL_NATIVE_GETH_EVIDENCE) writeFileSync(process.env.KEEL_NATIVE_GETH_EVIDENCE, `${JSON.stringify(evidence, null, 2)}\n`);
   console.log(JSON.stringify({ passed: evidence.checks.length, image, synthetic: true, published: false }));
+} catch (error) {
+  if (process.env.KEEL_NATIVE_GETH_EVIDENCE) writeFileSync(process.env.KEEL_NATIVE_GETH_EVIDENCE,
+    `${JSON.stringify({ ...evidence, status: "failed", failure: { name: error.name, message: error.message,
+      ...(error.kind === undefined ? {} : { kind: error.kind }), ...(error.diagnostic === undefined ? {} : { diagnostic: error.diagnostic }) } }, null, 2)}\n`);
+  throw error;
 } finally {
   Date.now = actualDateNow;
   await stop();
