@@ -600,7 +600,7 @@ export function createKeelStudioAgentDraftClient(options: KeelStudioAgentDraftCl
     return { ...workspace, projects: workspace.projects.map(project => ({ ...project, ...(project.agentProgress === undefined ? {} : { agentProgress: parseKeelStudioAgentProgress(project.agentProgress, { projectId: String(project.id) }) }) })), releases: workspace.releases.map(reviewed) };
   };
   const read = async (releaseId: string, expectedState?: KeelStudioAgentStateBinding): Promise<KeelStudioAgentReleaseView> =>
-      reviewed(await studioAgentResponse(await studioAgentRequest(options, `${releasePath(releaseId)}${expectedState ? `?${stateQuery(expectedState)}` : ""}`, { cache: "no-store" }), [options.grantToken]));
+      reviewed(await studioAgentResponse(await studioAgentRequest(options, `${releasePath(releaseId)}${expectedState === undefined ? "" : `?${stateQuery(expectedState)}`}`, { cache: "no-store" }), [options.grantToken]));
   const cancelReview = async (releaseId: string, expectedRevision: number, operationId: string): Promise<KeelStudioReviewCancellation> => {
     if (!Number.isSafeInteger(expectedRevision) || expectedRevision < 1 || typeof operationId !== "string" || !/^[0-9a-f]{8}(?:-[0-9a-f]{4}){3}-[0-9a-f]{12}$/iu.test(operationId)) throw new TypeError("Cancel review needs its exact saved revision and operation.");
     const value = await studioAgentResponse<KeelStudioReviewCancellation>(await studioAgentRequest(options, `${releasePath(releaseId)}/review/cancel`, {
@@ -831,6 +831,7 @@ export async function executeKeelStudioAgentDraftOperation(config: KeelStudioAge
   for (const key of Object.keys(config)) if (!supported.has(key)) throw new TypeError(`Studio agent draft configuration.${key} is not supported.`);
   if (Object.hasOwn(config, "expectedState") && !["read", "read-review", "continue-publication", "prepare-review", "storage-review"].includes(config.operation)) throw new TypeError("expectedState is not supported for this Studio operation; read current saved state before continuing.");
   if (Object.hasOwn(config, "expectedOperationId") && config.operation !== "continue-publication") throw new TypeError("expectedOperationId is not supported for this Studio operation; use the exact saved operation API.");
+  const expectedState = Object.hasOwn(config, "expectedState") ? parseKeelStudioAgentStateBinding(config.expectedState) : undefined;
   const client = createKeelStudioAgentDraftClient(config);
   switch (config.operation) {
     case "capture-program": return client.captureProgram(config.projectId!, { artifactRevision: config.artifactRevision!, releaseRevision: config.releaseRevision! });
@@ -839,13 +840,13 @@ export async function executeKeelStudioAgentDraftOperation(config: KeelStudioAge
     case "updated-review-check": return client.updatedReview(config.projectId!, "check");
     case "updated-review-cancel": return client.updatedReview(config.projectId!, "cancel", config.reviewCandidate);
     case "list": return client.list({ ...(config.limit === undefined ? {} : { limit: config.limit }), ...(config.cursor === undefined ? {} : { cursor: config.cursor }), ...(config.projectId === undefined ? {} : { projectId: config.projectId }) });
-    case "read": return client.read(operationReleaseId(config), config.expectedState);
+    case "read": return client.read(operationReleaseId(config), expectedState);
     case "recover": return client.recover(operationReleaseId(config), config.operationId!, config.transactionHashes ?? []);
     case "recover-wallet-rejection": {
       if (!config.recoveryInput) throw new TypeError("recover-wallet-rejection requires the diagnostic recoveryInput and an explicitly confirmed typed wallet rejection.");
       return client.recoverWalletRejection(operationReleaseId(config), config.recoveryInput);
     }
-    case "continue-publication": return client.continuePublication(operationReleaseId(config), config.expectedRevision!, { ...(config.expectedOperationId === undefined ? {} : { expectedOperationId: config.expectedOperationId }), ...stateBody(config.expectedState) });
+    case "continue-publication": return client.continuePublication(operationReleaseId(config), config.expectedRevision!, { ...(config.expectedOperationId === undefined ? {} : { expectedOperationId: config.expectedOperationId }), ...stateBody(expectedState) });
     case "cancel-review": return client.cancelReview(operationReleaseId(config), config.expectedRevision!, config.operationId!);
     case "storage-recovery": return client.storageRecovery(config.projectId!);
     case "diagnose": return client.diagnose(operationReleaseId(config), config.includeReadCall === undefined ? {} : { includeReadCall: config.includeReadCall });
@@ -869,11 +870,11 @@ export async function executeKeelStudioAgentDraftOperation(config: KeelStudioAge
       if (!config.defaultsCommand) throw new TypeError("defaults-edit requires an explicit defaultsCommand and preferences:write permission.");
       return client.editDefaults(config.defaultsCommand);
     }
-    case "read-review": return client.readReview(operationReleaseId(config), config.expectedRevision!, config.operationId!, config.expectedState);
-    case "prepare-review": return client.prepareReview(operationReleaseId(config), config.expectedRevision!, config.expectedState);
+    case "read-review": return client.readReview(operationReleaseId(config), config.expectedRevision!, config.operationId!, expectedState);
+    case "prepare-review": return client.prepareReview(operationReleaseId(config), config.expectedRevision!, expectedState);
     case "storage-review": {
       if (!config.projectId) throw new TypeError("storage-review requires the creator's projectId.");
-      return client.storageReview(config.projectId, config.expectedState);
+      return client.storageReview(config.projectId, expectedState);
     }
     case "plan-edit": {
       if (!config.planningCommand) throw new TypeError("plan-edit requires a typed planningCommand.");

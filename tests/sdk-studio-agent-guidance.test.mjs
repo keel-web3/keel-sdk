@@ -95,3 +95,21 @@ test('supported dispatcher state preconditions reach the server unchanged and se
     assert.deepEqual(actual, binding);
   }
 });
+
+test('provided falsey state constraints are invalid rather than silently omitted', async () => {
+  const { executeKeelStudioAgentDraftOperation } = await import('../packages/sdk/dist/studio-agent-drafts.js');
+  let requests = 0;
+  const options = { studioUrl: 'https://studio.example', grantToken: token,
+    fetchImplementation: async () => { requests++; return Response.json(release); } };
+  const client = createKeelStudioAgentDraftClient(options);
+  for (const expectedState of [null, false, '', 0]) {
+    await assert.rejects(client.read(id(3), expectedState));
+    for (const operation of ['read', 'read-review', 'continue-publication', 'prepare-review', 'storage-review']) {
+      await assert.rejects(executeKeelStudioAgentDraftOperation({ ...options, operation, releaseId: id(3), projectId: id(2),
+        expectedRevision: 34, operationId: id(4), expectedState }));
+    }
+  }
+  assert.equal(requests, 0);
+  await client.read(id(3));
+  assert.equal(requests, 1, 'omission preserves the existing unconditioned read API');
+});
