@@ -262,7 +262,7 @@ test("catalog transport is explicit, byte exact and leaves receipt and deploymen
   const root = await scaffoldWorkspace(t);
   await runCli(["module", "build", "--all", "--root", root]);
   const modern = (await indexKeelWorkspace(root)).catalog;
-  assert.ok(modern.modules.every(entry => entry.runtime.encoding === "base90"));
+  assert.ok(modern.modules.every(entry => entry.runtime.encoding === "uri81"));
   await runCli(["module", "index", "--root", root, "--runtime-encoding", "base64"]);
   const catalogPath = path.join(root, "catalog/catalog.json");
   const legacyText = await readFile(catalogPath, "utf8");
@@ -279,9 +279,9 @@ test("catalog transport is explicit, byte exact and leaves receipt and deploymen
   await indexKeelWorkspace(root, { runtimeEncoding: "base64" });
   assert.equal(await readFile(catalogPath, "utf8"), legacyText);
   for (const args of [["--runtime-encoding"], ["--runtime-encoding", "hex"]]) {
-    await assert.rejects(runCli(["module", "index", "--root", root, ...args]), /must be base64 or base90/u);
+    await assert.rejects(runCli(["module", "index", "--root", root, ...args]), /must be uri81 or base64/u);
   }
-  await assert.rejects(indexKeelWorkspace(root, { runtimeEncoding: "hex" }), /must be base64 or base90/u);
+  await assert.rejects(indexKeelWorkspace(root, { runtimeEncoding: "hex" }), /must be uri81 or base64/u);
   assert.equal(await readFile(catalogPath, "utf8"), legacyText);
   await writeFile(path.join(root, "modules/greeter/dist/greeter.min.js"), "export const tampered = true;\n");
   await assert.rejects(indexKeelWorkspace(root, { runtimeEncoding: "base64" }), /no longer match/u);
