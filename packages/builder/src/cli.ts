@@ -114,7 +114,7 @@ Commands:
   keel module test <dir> [--json]
   keel module test --all [--root <workspace>] [--json]
   keel module compact <dir> --candidate <file> [--json]
-  keel module index [--root <workspace>] [--repository <url>] [--runtime-encoding <base64|base90>] [--json]
+  keel module index [--root <workspace>] [--repository <url>] [--runtime-encoding uri81|base64] [--json]
   keel module observe --file <script.js> --out <discovery.html>
   keel module infer --file <script.js> --observation <json> --name <id> --out <new-package-directory>
   keel module editor [--root <project>] [--entry src/art.ts] [--includes keel.includes.json] [--watch]
@@ -414,8 +414,8 @@ async function main(): Promise<void> {
       if (verb === "index") {
         const repositoryUrl = flag(args, "repository");
         const runtimeEncoding = args.flags["runtime-encoding"];
-        if (runtimeEncoding !== undefined && runtimeEncoding !== "base64" && runtimeEncoding !== "base90") {
-          throw new TypeError("--runtime-encoding must be base64 or base90.");
+        if (runtimeEncoding !== undefined && runtimeEncoding !== "uri81" && runtimeEncoding !== "base64") {
+          throw new TypeError("--runtime-encoding must be uri81 or base64.");
         }
         const result = await indexKeelWorkspace(workspaceRoot, {
           ...(repositoryUrl === undefined ? {} : { repositoryUrl }),

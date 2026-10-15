@@ -82,6 +82,8 @@ jobs:
       # clean checkout must produce a byte-identical catalog. If this diff is
       # non-empty the published catalog is not reproducible, which is the
       # property that lets a stranger check it by regenerating it.
+      # keel-modules explicitly retains Base64 for its approved Studio consumers;
+      # new SDK catalogs keep the default URI81/Brotli preparation.
       - name: Catalog is byte reproducible
         working-directory: keel-sdk
         run: |

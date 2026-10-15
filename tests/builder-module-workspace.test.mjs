@@ -334,6 +334,57 @@ test("keel module index writes the keel-module-catalog@3 the site reads", async 
   await assert.rejects(() => runCli(["module", "index", "--root", root]), /no longer match/u);
 });
 
+test("catalog runtime selection preserves legacy bytes and the URI81 default", async (t) => {
+  const root = await scaffoldWorkspace(t);
+  await runCli(["module", "build", "--all", "--root", root]);
+  const catalogPath = path.join(root, "catalog/catalog.json");
+  await runCli(["module", "index", "--root", root]);
+  const defaultText = await readFile(catalogPath, "utf8");
+  const defaults = JSON.parse(defaultText);
+  await runCli(["module", "index", "--root", root, "--runtime-encoding", "uri81"]);
+  assert.equal(await readFile(catalogPath, "utf8"), defaultText);
+
+  await runCli(["module", "index", "--root", root, "--runtime-encoding", "base64"]);
+  const legacyText = await readFile(catalogPath, "utf8");
+  const legacy = JSON.parse(legacyText);
+  for (const [index, entry] of legacy.modules.entries()) {
+    const dense = defaults.modules[index];
+    const shipped = await readFile(path.join(root, "modules", entry.id, "dist", `${entry.id}.min.js`));
+    assert.equal(dense.runtime.encoding, "uri81");
+    assert.deepEqual(entry.runtime, {
+      encoding: "base64", data: shipped.toString("base64"), format: "esm", entry: "src/index.ts",
+    });
+    for (const runtime of [dense.runtime, entry.runtime]) {
+      assert.deepEqual(Buffer.from(await decodeKeelModuleRuntime(runtime, entry.outputDigest)), shipped);
+    }
+    const { runtime: denseRuntime, ...denseEntry } = dense;
+    const { runtime: legacyRuntime, ...legacyEntry } = entry;
+    assert.deepEqual(legacyEntry, denseEntry, "transport selection must preserve every source/receipt/deployment field");
+  }
+  await indexKeelWorkspace(root, { runtimeEncoding: "base64" });
+  assert.equal(await readFile(catalogPath, "utf8"), legacyText);
+
+  for (const value of ["base90", "gzip", ""]) {
+    await assert.rejects(
+      () => runCli(["module", "index", "--root", root, "--runtime-encoding", value]),
+      /runtime-encoding must be uri81 or base64/u,
+    );
+  }
+  await assert.rejects(
+    () => runCli(["module", "index", "--root", root, "--runtime-encoding"]),
+    /runtime-encoding must be uri81 or base64/u,
+  );
+  await assert.rejects(indexKeelWorkspace(root, { runtimeEncoding: "base90" }), /runtimeEncoding must be uri81 or base64/u);
+  assert.equal(await readFile(catalogPath, "utf8"), legacyText, "invalid selection must leave the catalog intact");
+
+  await writeFile(path.join(root, "modules/greeter/dist/greeter.min.js"), "export const tampered = true;\n");
+  await assert.rejects(
+    () => runCli(["module", "index", "--root", root, "--runtime-encoding", "base64"]),
+    /no longer match/u,
+  );
+  assert.equal(await readFile(catalogPath, "utf8"), legacyText);
+});
+
 /**
  * A publisher is a person or an organisation. Requiring somebody to invent an
  * org before they can publish a module would be a made-up hurdle, so a user

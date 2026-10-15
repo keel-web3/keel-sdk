@@ -61,6 +61,8 @@ export const TEST_FILES_ON_DISK = Object.freeze(readdirSync(TEST_ROOT)
  * its execution boundary.
  */
 export const DETERMINISTIC_TEST_FILES = Object.freeze([
+  "tests/viewer-chunk-store-cancellation.test.mjs",
+  "tests/sdk-tezos-catalog.test.mjs",
   "tests/sdk-simulation-capacity-policy.test.mjs",
   "tests/sdk-legacy-prepared-dense-copy.test.mjs",
   "tests/sdk-legacy-shared-image.test.mjs",
