@@ -66,3 +66,32 @@ test('wallet approval continuation preserves exact guidance and refuses cross-re
   changed = true;
   await assert.rejects(client.continuePublication(id(3), 34, { expectedState: binding }));
 });
+
+test('unsupported dispatcher identity preconditions fail before creating a client or fetching', async () => {
+  const { executeKeelStudioAgentDraftOperation } = await import('../packages/sdk/dist/studio-agent-drafts.js');
+  let requests = 0;
+  const config = { grantToken: 'invalid-token', fetchImplementation: async () => { requests++; return Response.json({}); } };
+  for (const operation of ['create', 'update', 'plan-edit', 'defaults-edit', 'profiles-edit', 'profile-select', 'capture-program', 'resume-review', 'updated-review-check', 'cancel-review', 'recover', 'list']) {
+    await assert.rejects(executeKeelStudioAgentDraftOperation({ ...config, operation, expectedState: binding }), /expectedState is not supported/);
+  }
+  for (const operation of ['read', 'create', 'update', 'prepare-review', 'storage-review']) {
+    await assert.rejects(executeKeelStudioAgentDraftOperation({ ...config, operation, expectedOperationId: id(4) }), /expectedOperationId is not supported/);
+  }
+  assert.equal(requests, 0);
+});
+
+test('supported dispatcher state preconditions reach the server unchanged and server rejection cannot be bypassed', async () => {
+  const { executeKeelStudioAgentDraftOperation } = await import('../packages/sdk/dist/studio-agent-drafts.js');
+  const requests = [];
+  for (const operation of ['read', 'read-review', 'continue-publication', 'prepare-review', 'storage-review']) {
+    await assert.rejects(executeKeelStudioAgentDraftOperation({ studioUrl: 'https://studio.example', grantToken: token,
+      operation, releaseId: id(3), projectId: id(2), expectedRevision: 34, operationId: id(4), expectedState: binding,
+      fetchImplementation: async (url, init) => { requests.push({ url: String(url), init }); return Response.json({ error: 'State precondition not supported by this server' }, { status: 400 }); },
+    }), error => error instanceof KeelStudioAgentError && error.status === 400);
+  }
+  assert.equal(requests.length, 5);
+  for (const { url, init } of requests) {
+    const actual = init.method === 'POST' ? JSON.parse(init.body).expectedState : JSON.parse(new URL(url).searchParams.get('expectedState'));
+    assert.deepEqual(actual, binding);
+  }
+});

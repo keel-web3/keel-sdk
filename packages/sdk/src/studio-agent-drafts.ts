@@ -829,6 +829,8 @@ export async function executeKeelStudioAgentDraftOperation(config: KeelStudioAge
   if (config === null || typeof config !== "object" || !isDraftOperation(config.operation)) throw new TypeError("Studio agent draft operation is unsupported.");
   const supported = new Set(["studioUrl", "grantToken", "operation", "releaseId", "projectId", "draft", "expectedRevision", "planningCommand", "defaultsCommand", "profileCommand", "profileSelection", "conversationCommand", "includeReadCall", "operationId", "transactionHashes", "recoveryInput", "reviewCandidate", "artifactRevision", "releaseRevision", "signal", "fetchImplementation", "expectedState", "expectedOperationId", "limit", "cursor"]);
   for (const key of Object.keys(config)) if (!supported.has(key)) throw new TypeError(`Studio agent draft configuration.${key} is not supported.`);
+  if (Object.hasOwn(config, "expectedState") && !["read", "read-review", "continue-publication", "prepare-review", "storage-review"].includes(config.operation)) throw new TypeError("expectedState is not supported for this Studio operation; read current saved state before continuing.");
+  if (Object.hasOwn(config, "expectedOperationId") && config.operation !== "continue-publication") throw new TypeError("expectedOperationId is not supported for this Studio operation; use the exact saved operation API.");
   const client = createKeelStudioAgentDraftClient(config);
   switch (config.operation) {
     case "capture-program": return client.captureProgram(config.projectId!, { artifactRevision: config.artifactRevision!, releaseRevision: config.releaseRevision! });
