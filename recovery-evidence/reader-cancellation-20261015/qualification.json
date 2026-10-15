@@ -1,0 +1,90 @@
+{
+  "schema": "keel-viewer-reader-cancellation-fix@1",
+  "capturedUTC": "2026-10-15T01:02:18.130872+00:00",
+  "sourceBase": "3a99b6f9a71c2c618688d029172af1101f0e75d5",
+  "commit": "991e0f5dbd53127575efb18cd652cb64db61add7",
+  "branch": "codex/reader-cancellation-20261015",
+  "checkout": "/tmp/keel-reader-cancellation-20261015/keel-sdk",
+  "sourceFiles": {
+    "packages/viewer/src/chunk-store.ts": "776cbf660249d2b5ed0ff34d1f9bb76e000a81bd71806c2df9a9e4009b05e5e6",
+    "tests/viewer-chunk-store-cancellation.test.mjs": "a73b7f2708436ff7e3a0b86feb13f3a5040c412f29106b38ce9ddf13cc3319e8"
+  },
+  "tests": {
+    "newRegressions": {
+      "pass": 12,
+      "fail": 0,
+      "skipped": 0
+    },
+    "existingReaderDescriptorRegressions": {
+      "pass": 2,
+      "fail": 0,
+      "skipped": 0
+    },
+    "fullViewerPlusNewSuite": {
+      "pass": 80,
+      "fail": 0,
+      "skipped": 0
+    },
+    "initialBaselineControl": {
+      "cases": 10,
+      "pass": 2,
+      "fail": 8,
+      "scope": "before source fix; two additional gzip/digest cases added afterward"
+    },
+    "viewerTypeScriptBuildExit": 0,
+    "gitDiffCheckExit": 0
+  },
+  "frozenBuildSDKDistFilesRechecked": 1245,
+  "frozenBuildDistUnchanged": true,
+  "noProductionOrNetworkActions": true,
+  "behavior": [
+    "Active ancestor detected before pending-cache reuse; verified shared DAG leaf remains reused once",
+    "Single listener per traversal races metadata, pagination, carriers, decompression and digest waits against cancellation",
+    "Preserves exact AbortSignal.reason, suppresses descriptor fallback after abort, discards late success/failure",
+    "Default gzip still verifies; aborted stream is cancelled and listener removed after completion"
+  ],
+  "limits": [
+    "Uncooperative adapter work cannot be forcibly stopped; its late result is discarded and no further reader phase starts",
+    "This does not change viem HTTP body timeout implementation or reader graph byte/page policies",
+    "Confirmed live502 cause is ObjectMissing(bytes32), reported0.654seconds; these reader defects are independent followup hardening",
+    "Only source and tests committed; own built viewer dist is ignored and frozen deployment SDK/app/archives remain unchanged"
+  ],
+  "rawLogs": {
+    "viewer-suite-final.log": {
+      "sha256": "df5e508c81ea1944146406ba83654dbebc77c36b33279552481f938d9a11a8e2",
+      "bytes": 18176
+    },
+    "tsc-final.log": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "viewer-suite.log": {
+      "sha256": "87afaf6246440974f3396a7abfad92d88a03e675a4362d16d78901bdc56a24bf",
+      "bytes": 18171
+    },
+    "existing-reader-regressions.log": {
+      "sha256": "78e34549b1aa2454174f9624c6f14d0bca63f4610b1a5328a66334b4db937931",
+      "bytes": 526
+    },
+    "regressions-final.log": {
+      "sha256": "0fc1f113ae9a26c4c39e164b376395da35b61fa1de6b758b1f0054c483c2a7cc",
+      "bytes": 2775
+    },
+    "regressions.log": {
+      "sha256": "017767d50c9e00b87e81a78ee6cf38c281d4459f44f505e8585d965c999bfc85",
+      "bytes": 2354
+    },
+    "tsc.log": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "baseline-regressions.log": {
+      "sha256": "180683ffab629cd0f30f878f2cefd32620d7daf4dc1f9157354cb7b6a5d0ad76",
+      "bytes": 8233
+    },
+    "baseline-tsc.log": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    }
+  }
+}
