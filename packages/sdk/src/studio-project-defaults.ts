@@ -228,11 +228,11 @@ function retainedBuildSnapshot(value: KeelEffectiveBuildDefaults): KeelEffective
   const fields = new Map(KEEL_BUILD_DEFAULT_FIELDS.map(field => [field.id, field]));
   for (const [key, value] of Object.entries(values)) {
     const field = fields.get(key);
-    if (!field || (key === "transportProfile" ? !["uri81-block-v1", "base90-v1", "base91-v1", "base90-block-v2"].includes(String(value))
+    if (!field || (key === "transportProfile" ? typeof value !== "string" || !["uri81-block-v1", "base90-v1", "base91-v1", "base90-block-v2"].includes(value)
       : validateKeelPlanValue(field, value) !== undefined)) throw new TypeError("Invalid retained build policy value.");
   }
   if (Object.keys(rawSources).length !== Object.keys(values).length || Object.keys(rawSources).some(key => !Object.hasOwn(values, key))
-    || Object.keys(values).some(key => !["system", "account", "media", "project", "build", "contract"].includes(String(rawSources[key])))) throw new TypeError("Invalid retained build policy sources.");
+    || Object.keys(values).some(key => typeof rawSources[key] !== "string" || !["system", "account", "media", "project", "build", "contract"].includes(rawSources[key] as string))) throw new TypeError("Invalid retained build policy sources.");
   return Object.freeze({ schema: "keel-effective-build-defaults@1", revision: Number(input.revision), values,
     sources: Object.freeze({ ...rawSources }) as KeelEffectiveBuildDefaults["sources"], requiresFullReadValidation: true });
 }

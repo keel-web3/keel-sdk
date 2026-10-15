@@ -164,8 +164,10 @@ test('retained policy rejects corrupt snapshots, provenance and read bounds with
   for (const retained of [
     { ...valid, schema: 'unverified' }, { ...valid, revision: -1 }, { ...valid, requiresFullReadValidation: false },
     { ...valid, values: { ...valid.values, transportProfile: 'invented-native-route' } },
+    { ...valid, values: { ...valid.values, transportProfile: ['base90-v1'] } },
     { ...valid, values: { ...valid.values, maxReadGas: 0 } },
     { ...valid, sources: { ...valid.sources, transportProfile: 'wallet' } },
+    { ...valid, sources: { ...valid.sources, transportProfile: ['system'] } },
     { ...valid, sources: {} }, { ...valid, signing: 'allowed' },
   ]) {
     const before = structuredClone(retained);
