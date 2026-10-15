@@ -624,7 +624,7 @@ test('direct estimate reverts retain only error code and revert digest, includin
 const retroPreparationLengths = [3300,68,69316,69316,69316,69316,69316,69316,69316,64612,69316,69316,69316,69316,69316,69316,66692,69316,69316,69316,69316,69316,69316,64612,69316,69316,69316,69316,69316,54180,2212,1188,1092,484,580,1188,1028,484,484,36,420,68,2212,100,580];
 const intrinsicForZeroBytes = (length, amsterdam = true) => BigInt(amsterdam ? 15000 + length * 64 : 21000 + length * 10);
 const minimumForZeroBytes = (length, amsterdam = true) => { const intrinsic = intrinsicForZeroBytes(length, amsterdam); return intrinsic > 21000n ? intrinsic : 21000n; };
-function minimumDiscoveryFixture(lengths, { budget = 50_000_000n, amsterdam = true, missingNumericCap = false, fundedFirst = false } = {}) {
+function minimumDiscoveryFixture(lengths, { budget = 50_000_000n, amsterdam = true, missingNumericCap = false, fundedFirst = false, explicitWholeRequest = true } = {}) {
   const base = fixture({ ...(amsterdam ? { timestamp: '0x6acf6e00' } : {}), blockGas: '0xbebc200' });
   const source = { ...input(), discoveryGasPolicy: 'provider-capacity', maximumTransactionGas: 200_000_000n,
     preparationCalls: lengths.map((length, index) => ({ ...call, gas: '0xbebc200', data: `0x${'00'.repeat(length)}`, value: fundedFirst && index === 0 ? '0x1' : '0x0' })) };
@@ -637,6 +637,9 @@ function minimumDiscoveryFixture(lengths, { budget = 50_000_000n, amsterdam = tr
     const calls = request.params[0].blockStateCalls.map(block => block.calls[0]);
     if (requests.length === 1) {
       if (missingNumericCap) throw new KeelPublicationSimulationError('provider-limit', 'Synthetic HTTP capacity refusal', { httpStatus: 413 });
+      if (explicitWholeRequest) throw new KeelPublicationSimulationError('provider-limit', 'Synthetic measured whole-request capacity', {
+        gasCapacityScope: 'request', capacitySource: 'measured-profile', requestedGasLimit: BigInt(calls[0].gas).toString(), providerGasCap: budget.toString(),
+      });
       return calls.map((call, index) => ({ transactions: [{ gas: index === 1 ? `0x${budget.toString(16)}` : call.gas }], calls: [] }));
     }
     for (let index = 0; index < lengths.length; index++) {
@@ -654,7 +657,7 @@ function minimumDiscoveryFixture(lengths, { budget = 50_000_000n, amsterdam = tr
   return { source, requests, transport };
 }
 
-test('Retro exact 45 calldata lengths reject an observed shared budget below their selected-fork minimum before resubmission', async () => {
+test('45 synthetic calldata lengths reject an explicit measured whole-request budget below their selected-fork minimum before resubmission', async () => {
   const f = minimumDiscoveryFixture(retroPreparationLengths, { fundedFirst: true }), before = structuredClone(f.source);
   await assert.rejects(simulateKeelPublicationBeforeFunding(f.source, f.transport), error => {
     assert.equal(error.kind, 'provider-limit');
@@ -671,7 +674,7 @@ test('Retro exact 45 calldata lengths reject an observed shared budget below the
   assert.equal(f.requests.length, 1); assert.deepEqual(f.source, before);
 });
 
-test('unequal calldata minima share an observed sufficient budget without changing calldata or measured strict envelopes', async () => {
+test('unequal calldata minima share an explicit measured whole-request budget without changing calldata or measured strict envelopes', async () => {
   const f = minimumDiscoveryFixture([69316,68,36], { budget: 8_000_000n }), before = structuredClone(f.source);
   const proof = await simulateKeelPublicationBeforeFunding(f.source, f.transport);
   assert.equal(proof.completeTokenUriBytes, Buffer.byteLength(expected));
@@ -723,4 +726,36 @@ test('discovery minima distinguish EIP-2780 self-calls, recipient access, nonzer
     for (const key of keys) assert.equal(safe[key], undefined);
   }
   assert.equal(keelSimulationTransportDiagnostic({ diagnostic: { calldataFloorGas: '0' } }).calldataFloorGas, '0');
+});
+
+
+test('later envelope remainder never becomes a whole-request budget or a repeated descending clamp retry', async () => {
+  const f = minimumDiscoveryFixture(retroPreparationLengths, { explicitWholeRequest: false, fundedFirst: true });
+  const before = structuredClone(f.source), attempts = [];
+  const transport = { request: async request => {
+    if (request.method !== 'eth_simulateV1') return f.transport.request(request);
+    attempts.push(structuredClone(request));
+    const calls = request.params[0].blockStateCalls.map(block => block.calls[0]);
+    const clampIndex = attempts.length === 1 ? 0 : 1;
+    const cap = attempts.length === 1 ? 50_000_000n : 49_988_000n;
+    return calls.map((call, index) => ({ transactions: [{ gas: index === clampIndex ? `0x${cap.toString(16)}` : call.gas }], calls: [] }));
+  } };
+  await assert.rejects(simulateKeelPublicationBeforeFunding(f.source, transport), error => {
+    assert.equal(error.kind, 'provider-limit');
+    assert.equal(error.diagnostic.stage, 'discovery-capacity-scope');
+    assert.equal(error.diagnostic.providerGasCap, '49988000');
+    assert.equal(error.diagnostic.gasCapacityScope, 'envelope');
+    assert.equal(error.diagnostic.minimumProgramGas, '124157048');
+    assert.match(error.message, /without a verified whole-request gas limit/);
+    assert.doesNotMatch(error.message, /minimum exceeds/);
+    return true;
+  });
+  assert.equal(attempts.length, 2);
+  assert.deepEqual(f.source, before);
+  for (const attempt of attempts) {
+    assert.equal(attempt.params[0].validation, false);
+    const calls = attempt.params[0].blockStateCalls.map(block => block.calls[0]);
+    assert.equal(calls.length, before.preparationCalls.length);
+    assert.deepEqual(calls.map(({ gas, ...call }) => call), before.preparationCalls.map(({ gas, ...call }) => call));
+  }
 });

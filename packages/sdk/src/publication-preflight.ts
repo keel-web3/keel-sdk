@@ -105,7 +105,7 @@ export function keelSimulationTransportDiagnostic(error: unknown, context: {
   const failures = ["timeout", "connection-reset", "connection-closed", "dns", "rate-limited", "http-error", "rpc-error", "invalid-response", "unknown"];
   const codes = ["ETIMEDOUT", "ECONNRESET", "ECONNREFUSED", "EPIPE", "ENOTFOUND", "EAI_AGAIN", "UND_ERR_CONNECT_TIMEOUT", "UND_ERR_SOCKET"];
   const closeReasons = ["empty", "message-too-large", "rate-limited", "timeout", "server-unavailable", "protocol-error", "policy-violation", "other"];
-  const stages = ["connection", "chain", "snapshot", "public-account", "read-capacity", "strict-capacity", "strict-nonce", "snapshot-recheck", "discovery-minimum"];
+  const stages = ["connection", "chain", "snapshot", "public-account", "read-capacity", "strict-capacity", "strict-nonce", "snapshot-recheck", "discovery-minimum", "discovery-capacity-scope"];
   const transports = ["websocket", "https"];
   const transactionValidation = ["intrinsic-gas"];
   const failureReasons = ["rate-limited", "unavailable", "wrong-chain", "access-denied", "history-unavailable", "invalid-response"];
@@ -435,16 +435,22 @@ async function performPublicationSimulation(input: KeelPublicationSimulationInpu
         || !/^[1-9]\d{0,19}$/u.test(reported) || BigInt(requested) !== discoveryCeiling
         || BigInt(reported) >= discoveryCeiling) throw error;
       const blockIndex = error.diagnostic?.blockIndex;
-      // A later simulated block may receive only the shared RPC budget left
-      // after earlier calls. Treating that remainder as a fresh per-call cap
-      // produces a slowly descending retry loop (e.g. 50M minus 12k per probe).
-      // Only these explicitly unmeasured independent calls may instead share
-      // the observed remaining budget. Discard the failed response and replay
-      // the entire program; measured margins and strict validation still gate it.
-      const shareBudget = typeof blockIndex === "number" && Number.isInteger(blockIndex)
+      // A later envelope can contain only the remainder after preceding
+      // execution. Its value does not authenticate the whole-request budget.
+      // Only an explicit fresh measured request-capacity fact permits aggregate
+      // minimum comparison or allocation across independent discovery calls.
+      const laterEnvelope = typeof blockIndex === "number" && Number.isInteger(blockIndex)
         && blockIndex > 0 && blockIndex < discoveryCalls.length;
+      const scope = error.diagnostic?.gasCapacityScope;
+      const shareBudget = scope === "request" && error.diagnostic?.capacitySource === "measured-profile";
       const capacity = BigInt(reported);
       const largestMinimumCallGas = minimumDiscoveryGas.reduce((maximum, gas) => gas > maximum ? gas : maximum, 0n);
+      if (laterEnvelope && !shareBudget && scope !== "transaction" && scope !== "block")
+        return failure("provider-limit", "The simulator reduced a later transaction envelope without a verified whole-request gas limit. The saved plan is unchanged; no wallet approval was prepared.",
+          { ...keelSimulationTransportDiagnostic(error), ...pinnedDiagnostic, stage: "discovery-capacity-scope",
+            gasCapacityScope: scope ?? "envelope", minimumProgramGas: minimumProgramGas.toString(),
+            intrinsicProgramGas: intrinsicDiscoveryGas.reduce((sum, gas) => sum + gas, 0n).toString(),
+            calldataFloorGas: totalCalldataFloorGas.toString(), largestMinimumCallGas: largestMinimumCallGas.toString(), callCount: discoveryBase.length });
       const requiredMinimum = shareBudget ? minimumProgramGas : largestMinimumCallGas;
       if (requiredMinimum > capacity) return failure("provider-limit", "The exact program's transaction and calldata minimum exceeds the observed simulation capacity. The saved plan is unchanged; no approval was prepared.",
         { ...keelSimulationTransportDiagnostic(error), ...pinnedDiagnostic, stage: "discovery-minimum",
