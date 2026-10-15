@@ -25,7 +25,7 @@ function fixture(faults=[{},{}], approved=urls.slice(0,faults.length)) {
     const index=urls.indexOf(url), fault=faults[index], body=JSON.parse(init.body);
     requests.push({index,body,wire:init.body});
     const respond=(result)=>Response.json({jsonrpc:'2.0',id:body.id,result});
-    const error=(code,message='SECRET provider error')=>Response.json({jsonrpc:'2.0',id:body.id,error:{code,message}});
+    const error=(code,message='SECRET provider error')=>Response.json({jsonrpc:'2.0',id:body.id,error:{code,message,...(fault.errorData === undefined ? {} : { data: fault.errorData })}});
     if(fault.rate) return new Response('',{status:429,headers:{'retry-after':'30'}});
     if(body.method==='eth_chainId') return respond(fault.chain?'0x1':'0xaa36a7');
     if(body.method==='eth_getBlockByNumber') return respond(fault.stale?{...snapshot,timestamp:'0x68f00000'}:fault.future?{...snapshot,timestamp:`0x${(BigInt(snapshot.timestamp)+600n).toString(16)}`}:fault.pin&&body.params[0]!=='latest'?{...snapshot,hash:hash(1000)}:snapshot);
@@ -149,7 +149,7 @@ test('distinct queued programs have an explicit bound and cancellation drains th
 });
 
 test('private provider evidence preserves original RPC payload while public errors remain redacted', async () => {
-  const f = fixture([{ error: -32602, message: 'owner-private exact rejection SECRET' }]);
+  const f = fixture([{ error: -32602, message: 'owner-private exact rejection SECRET', errorData: { reason: 'owner-private exact diagnostic data', callIndex: 2 } }]);
   const events = [], attempts = [], transport = createKeelPublicSepoliaSimulationPool({ ...f.options, observe(event) {
     events.push(event);
     // Deliberate observer mutation affects only an evidence snapshot.
@@ -162,10 +162,30 @@ test('private provider evidence preserves original RPC payload while public erro
     });
     const failure = events.find(event => event.type === 'rpc-error' && event.rawResponse?.error?.message === 'owner-private exact rejection SECRET');
     assert.ok(failure); assert.equal(failure.method, 'eth_simulateV1');
+    assert.deepEqual(failure.rawResponse.error.data, { reason: 'owner-private exact diagnostic data', callIndex: 2 });
     assert.deepEqual(failure.request.params, program().params);
     assert.doesNotMatch(JSON.stringify(events.map(({ request, rawResponse, error, ...safe }) => safe)), /SECRET|https:/);
     assert.doesNotMatch(JSON.stringify(attempts), /SECRET|https:/);
   } finally { await transport.close(); await f.transport.close(); }
+});
+
+test('private raw provider responses never cross observer ownership through shared negative capability cache', async () => {
+  const f = fixture([{}]), ownerA = [], ownerB = [];
+  let wireCalls = 0;
+  const fetchImpl = async (url, init) => {
+    wireCalls++; const body = JSON.parse(init.body);
+    if (body.method === 'eth_simulateV1') return new Response('OWNER_A_ONLY_RAW_DENIAL', { status: 403 });
+    return f.options.fetchImpl(url, init);
+  };
+  const a = createKeelPublicSepoliaSimulationPool({ ...f.options, fetchImpl, observe: event => ownerA.push(event) });
+  const b = createKeelPublicSepoliaSimulationPool({ ...f.options, fetchImpl, observe: event => ownerB.push(event) });
+  try {
+    await assert.rejects(a.request(program())); const before = wireCalls;
+    await assert.rejects(b.request(program())); assert.equal(wireCalls, before);
+    assert.ok(ownerA.some(event => event.rawResponse?.body === 'OWNER_A_ONLY_RAW_DENIAL'));
+    assert.doesNotMatch(JSON.stringify(ownerB), /OWNER_A_ONLY/);
+    assert.ok(ownerB.some(event => event.type === 'capability-cache'));
+  } finally { await a.close(); await b.close(); await f.transport.close(); }
 });
 
 test('an observed429 retries only after cooldown and full public qualification, preserving every call', async () => {

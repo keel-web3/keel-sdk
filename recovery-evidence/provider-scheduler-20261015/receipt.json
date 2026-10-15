@@ -1,0 +1,45 @@
+{
+  "baseline": "3a99b6f9a71c2c618688d029172af1101f0e75d5",
+  "sourceCommit": "cbb9dbefd553cff608f9fd59e4d1eb2cbac69177",
+  "tests": {
+    "related-final.log": {
+      "total": 139,
+      "passed": 139,
+      "failed": 0,
+      "skipped": 0
+    },
+    "actual-pool-private-boundary-final.log": {
+      "total": 3,
+      "passed": 3,
+      "failed": 0,
+      "skipped": 0,
+      "note": "Strengthened raw error.data and added actual cross-owner observer control after the full run."
+    }
+  },
+  "typecheck": {
+    "intermediateExit": 0,
+    "finalSource": "Reserved for the combined serialized root check; not claimed here."
+  },
+  "sourceFiles": {
+    "packages/sdk/src/provider-request-scheduler.ts": {
+      "bytes": 20646,
+      "sha256": "59ecafa699df7bd5a18fa6ce37da4784db15bd7f0c8c8692996b88952d8f0105"
+    },
+    "packages/sdk/src/public-simulation-pool.ts": {
+      "bytes": 39678,
+      "sha256": "40d13ee3b68f8bd0a4763198e798ea29169699ff3ca17b489761d850300f25da"
+    },
+    "packages/sdk/src/rpc.ts": {
+      "bytes": 33238,
+      "sha256": "5472388ffdb701e1b5cf0f077999349f44414e888a2a260338ad1f112e0403e1"
+    },
+    "packages/sdk/src/simulation-connection.ts": {
+      "bytes": 25039,
+      "sha256": "b8fd585a90e8af169c66a359514c3fa88c97e65b15057dca9812e80add081db2"
+    }
+  },
+  "productionReady": false,
+  "nativeEnabled": false,
+  "deployed": false,
+  "walletActions": false
+}
