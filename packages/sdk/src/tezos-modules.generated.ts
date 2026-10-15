@@ -1,17 +1,28 @@
 // Generated from keel-contracts module manifests by script/tezos/generate-sdk-catalog.mjs.
 // Source availability only; this catalogue makes no deployment or behavioral-parity claim.
-export interface KeelTezosModule { readonly id: string; readonly sources: string; readonly contracts: readonly string[]; readonly deployable: readonly string[]; }
+// Shared declarations are inherited source components, not origination targets.
+export interface KeelTezosModule { readonly id: string; readonly sources: string; readonly contracts: readonly string[]; readonly deployable: readonly string[]; readonly shared?: readonly string[]; }
 export const KEEL_TEZOS_MODULES: readonly KeelTezosModule[] = [
   {
     "id": "keel-anchors",
     "sources": "src/modules/keel-anchors/tezos",
     "contracts": [
       "keel_btc_header_chain.py",
+      "keel_eth_attachment_registry.py",
+      "keel_eth_hash_verifier.py",
+      "keel_eth_light_client.py",
+      "keel_eth_proof_controller.py",
       "keel_eth_state_proof.py"
     ],
     "deployable": [
       "KeelBtcHeaderChain",
-      "KeelEthStateProof"
+      "KeelEthAccountProof",
+      "KeelEthAttachmentRegistry",
+      "KeelEthHashVerifier",
+      "KeelEthLightClient",
+      "KeelEthProofController",
+      "KeelEthStateProof",
+      "KeelGovernedEthAttachmentRegistry"
     ]
   },
   {
@@ -75,10 +86,14 @@ export const KEEL_TEZOS_MODULES: readonly KeelTezosModule[] = [
     "id": "keel-die",
     "sources": "src/modules/keel-die/tezos",
     "contracts": [
-      "keel_collection_fa2.py"
+      "keel_collection_fa2.py",
+      "keel_fa2_nft.py"
     ],
     "deployable": [
       "KeelCollectionFA2"
+    ],
+    "shared": [
+      "KeelNFTLedger"
     ]
   },
   {

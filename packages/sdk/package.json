@@ -55,6 +55,10 @@
       "types": "./dist/managed-publication.d.ts",
       "import": "./dist/managed-publication.js"
     },
+    "./creator-prepared-publication": {
+      "types": "./dist/creator-prepared-publication.d.ts",
+      "import": "./dist/creator-prepared-publication.js"
+    },
     "./revision-publication": {
       "types": "./dist/revision-publication.d.ts",
       "import": "./dist/revision-publication.js"
@@ -374,6 +378,10 @@
     "./transaction-gas-policy": {
       "types": "./dist/transaction-gas-policy.d.ts",
       "import": "./dist/transaction-gas-policy.js"
+    },
+    "./public-simulation-pool": {
+      "types": "./dist/public-simulation-pool.d.ts",
+      "import": "./dist/public-simulation-pool.js"
     },
     "./sepolia-simulation-transport": {
       "types": "./dist/sepolia-simulation-transport.d.ts",

@@ -82,7 +82,8 @@ async function prepareResource(asset: NormalizedStudioAsset, payloadStorage: Kee
     || asset.mediaType === "application/vnd.keel.token-uri-base64-fragment"
     || asset.mediaType === "application/vnd.keel.token-uri-percent-fragment"
     || asset.mediaType === "application/vnd.keel.token-uri-raw-percent-fragment"
-    || asset.mediaType === "application/vnd.keel.token-uri-base64-body-fragment";
+    || asset.mediaType === "application/vnd.keel.token-uri-base64-body-fragment"
+    || asset.mediaType === "application/vnd.keel.legacy-shared-image-copy-program";
   let selected: { compression: import("@keel/protocol").Compression; bytes: Uint8Array } = { compression: "none", bytes: asset.bytes.slice() };
   if (!contractReadable && payloadStorage !== "raw" && compression !== "none") {
     const compressed = new Uint8Array(await brotliCompressAsync(asset.bytes, { params: {
@@ -268,6 +269,7 @@ function ensureEntrypoint(
     "application/vnd.keel.token-uri-percent-fragment",
     "application/vnd.keel.token-uri-raw-percent-fragment",
     "application/vnd.keel.token-uri-base64-body-fragment",
+    "application/vnd.keel.legacy-shared-image-copy-program",
   ]);
   const selected = assets.find((asset) => asset.entrypoint && (asset.mediaType === "text/html" || inlineGraphMediaTypes.has(asset.mediaType))) ??
     assets.find((asset) => asset.mediaType === "text/html");

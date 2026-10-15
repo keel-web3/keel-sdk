@@ -5,7 +5,10 @@ const TEST_ROOT = resolve(import.meta.dirname, "../tests");
 
 /** Requires a real installed headless browser and therefore stays out of the default unit gate. */
 export const BROWSER_TEST_FILES = Object.freeze([
+  "tests/sdk-verification-wrap-offline-browser.test.mjs",
   "tests/sdk-prepared-dense-copy-browser.test.mjs",
+  "tests/sdk-legacy-prepared-dense-browser.test.mjs",
+  "tests/sdk-studio-plan-viewer-browser.test.mjs",
   "tests/sdk-verification-shell-browser.test.mjs",
   "tests/sdk-verification-shell-large-graph-browser.test.mjs",
   "tests/link-assembly-browser.test.mjs",
@@ -35,6 +38,14 @@ export const SIBLING_CONFORMANCE_TEST_FILES = Object.freeze([
   "tests/studio-structure-check.test.mjs",
 ]);
 
+/** Compiled local EVM proofs require an already cached Docker Geth image and
+ * the exact local contracts checkout. The combined reader proof also uses an
+ * installed Chromium. No public-network access or signed transactions occur. */
+export const LOCAL_EVM_TEST_FILES = Object.freeze([
+  "tests/sdk-legacy-shared-image-evm-browser.test.mjs",
+  "tests/sdk-legacy-shared-image-hold-policy.test.mjs",
+]);
+
 /** No node:test file is allowed to perform live-chain or public-network work in the ordinary gate. */
 export const LIVE_TEST_FILES = Object.freeze([]);
 
@@ -50,6 +61,14 @@ export const TEST_FILES_ON_DISK = Object.freeze(readdirSync(TEST_ROOT)
  * its execution boundary.
  */
 export const DETERMINISTIC_TEST_FILES = Object.freeze([
+  "tests/native-geth-capacity-fixture.test.mjs",
+  "tests/sdk-provider-request-scheduler.test.mjs",
+  "tests/viewer-chunk-store-cancellation.test.mjs",
+  "tests/sdk-tezos-catalog.test.mjs",
+  "tests/sdk-simulation-capacity-policy.test.mjs",
+  "tests/sdk-legacy-prepared-dense-copy.test.mjs",
+  "tests/sdk-legacy-shared-image.test.mjs",
+  "tests/sdk-legacy-shared-image-core.test.mjs",
   "tests/mcp-publication-references.test.mjs",
   "tests/sdk-manager-modules.test.mjs",
   "tests/sdk-ppmd-body-descriptors.test.mjs",
@@ -65,10 +84,26 @@ export const DETERMINISTIC_TEST_FILES = Object.freeze([
   "tests/creator-publication-journal.test.mjs",
   "tests/rpc-publication-simulation.test.mjs",
   "tests/creator-prepared-compiler.test.mjs",
+  "tests/sdk-studio-plan-near-uri-limit.test.mjs",
+  "tests/sdk-studio-plan-public-read.test.mjs",
+  "tests/sdk-studio-plan-source-read.test.mjs",
+  "tests/sdk-studio-plan-upload-contract.test.mjs",
   "tests/mcp-studio-wallet-default.test.mjs",
   "tests/sdk-network-index.test.mjs",
   "tests/sdk-rpc.test.mjs",
+  "tests/rpc-failure-diagnostics.test.mjs",
   "tests/sdk-publication-preflight.test.mjs",
+  "tests/sdk-public-simulation-pool.test.mjs",
+  "tests/sdk-captured-publication-fixture.test.mjs",
+  "tests/sdk-captured-state-witness.test.mjs",
+  "tests/sdk-captured-state-inventory.test.mjs",
+  "tests/sdk-fresh-publication-witness-seeds.test.mjs",
+  "tests/sdk-fresh-public-proof.test.mjs",
+  "tests/sdk-local-simulation-session.test.mjs",
+  "tests/sdk-native-witness-resolver.test.mjs",
+  "tests/sdk-native-session-process.test.mjs",
+  "tests/sdk-intrinsic-validation-evidence.test.mjs",
+  "tests/mcp-selected-chain-routing.test.mjs",
   "tests/sdk-simulation-connection.test.mjs",
   "tests/transaction-gas-policy.test.mjs",
   "tests/managed-shell-loader.test.mjs",
@@ -155,6 +190,7 @@ export const DETERMINISTIC_TEST_FILES = Object.freeze([
   "tests/keel-browser-alias-resolution.test.mjs",
   "tests/keel-browser-sha256.test.mjs",
   "tests/keel-build-recipe.test.mjs",
+  "tests/build-output.test.mjs",
   "tests/keel-content-cache.test.mjs",
   "tests/keel-corpus.test.mjs",
   "tests/keel-creator-collection-cli.test.mjs",
@@ -176,6 +212,7 @@ export const DETERMINISTIC_TEST_FILES = Object.freeze([
   "tests/mcp-media-optimization.test.mjs",
   "tests/mcp-plugins.test.mjs",
   "tests/mcp-studio-draft.test.mjs",
+  "tests/mcp-studio-private.test.mjs",
   "tests/mcp-studio-wallet-rejection.test.mjs",
   "tests/mcp.test.mjs",
   "tests/media-optimization.test.mjs",
@@ -207,6 +244,9 @@ export const DETERMINISTIC_TEST_FILES = Object.freeze([
   "tests/sdk-keel-audio-runtime.test.mjs",
   "tests/sdk-keel721-abi-parity.test.mjs",
   "tests/sdk-managed-publication.test.mjs",
+  "tests/managed-publication-recovery.test.mjs",
+  "tests/publication-action.test.mjs",
+  "tests/updated-publication-review.test.mjs",
   "tests/sdk-media-revision-reuse.test.mjs",
   "tests/sdk-module-browser.test.mjs",
   "tests/sdk-module-catalog.test.mjs",
@@ -309,6 +349,7 @@ export function validateTestSuiteClassification(testFiles = TEST_FILES_ON_DISK) 
     ...DETERMINISTIC_TEST_FILES,
     ...SIBLING_CONFORMANCE_TEST_FILES,
     ...BROWSER_TEST_FILES,
+    ...LOCAL_EVM_TEST_FILES,
     ...LIVE_TEST_FILES,
   ];
   const duplicates = classified.filter((file, index) => classified.indexOf(file) !== index);

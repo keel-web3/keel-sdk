@@ -46,3 +46,39 @@ test('wrong runtime, binding, codec revision, cached digest or shell bytes fail 
   const f=await fixture(bad);await assert.rejects(prepareKeelAuthenticatedCreatorInline({pool:f.pool,index,publication}));
  }
 });
+
+test('authentication awaits cannot replace original publication bytes, aliases, poster or policy',async()=>{
+ const f=await fixture(),aliases=['./index.html'];
+ const original=Buffer.from(publication.resources[0].bytes),originalPoster=Buffer.from(publication.poster.bytes);
+ const mutable={...publication,description:'Original terms',compression:'none',resources:[{...publication.resources[0],aliases,bytes:Buffer.from(original)}],poster:{mediaType:publication.poster.mediaType,bytes:Buffer.from(originalPoster)}};
+ let enter,release,first=true;
+ const entered=new Promise(resolve=>{enter=resolve;}),held=new Promise(resolve=>{release=resolve;});
+ const pool={status:()=>[],request:async request=>{if(first){first=false;enter();await held;}return f.pool.request(request);}};
+ const input={pool,index,publication:mutable};
+ const pending=prepareKeelAuthenticatedCreatorInline(input);await entered;
+ mutable.resources[0].bytes.fill(32);aliases[0]='./changed.html';mutable.poster.bytes.fill(0);
+ mutable.description='Changed terms';mutable.compression='brotli';mutable.payloadStorage='raw';mutable.viewer='none';
+ input.publication={...mutable,resources:[]};release();
+ const plan=await pending;
+ assert.equal(plan.request.description,'Original terms');assert.equal(plan.payloadStorage,'compact');assert.equal(plan.viewer,'keel-verification-shell');
+ assert.equal(plan.resources[0].compression,'none');assert.deepEqual(plan.resources[0].descriptor.aliases,['./index.html']);
+ assert.equal(plan.resources[0].sourceIntegrity.digest,'0x'+(await import('node:crypto')).createHash('sha256').update(original).digest('hex'));
+ assert.equal(plan.posterURI,'data:image/png;base64,'+originalPoster.toString('base64'));
+ assert.equal(plan.route.authenticatedBlockHash,blockHash);
+ assert.ok(f.requests.every(request=>!['eth_sendTransaction','eth_sendRawTransaction'].includes(request.method)));
+});
+
+test('authentication awaits retain the entry pool, selected instance and immutable deployment records',async()=>{
+ const f=await fixture(),mutableIndex=structuredClone(index),selection={chainId:31337,instance:'prepared-test'};
+ let enter,release,first=true;
+ const entered=new Promise(resolve=>{enter=resolve;}),held=new Promise(resolve=>{release=resolve;});
+ const pool={status:()=>[],request:async request=>{if(first){first=false;enter();await held;}return f.pool.request(request);}};
+ const input={pool,index:mutableIndex,selection,publication};
+ const pending=prepareKeelAuthenticatedCreatorInline(input);await entered;
+ mutableIndex.networks[0].deployments.find(deployment=>deployment.contract==='KeelRawTokenURIBuilder').address=address(888);
+ selection.chainId=1;selection.instance='unapproved';input.pool={status:()=>[],request:async()=>{throw Error('Replacement pool must never be called');}};
+ input.index={schema:'unapproved',defaultChainId:1,networks:[]};release();
+ const plan=await pending;
+ assert.equal(plan.chainId,31337);assert.equal(plan.route.builder,addresses.KeelRawTokenURIBuilder);assert.equal(plan.route.instance,'prepared-test');
+ assert.equal(plan.route.authenticatedBlockHash,blockHash);
+});

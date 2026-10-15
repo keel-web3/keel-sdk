@@ -48,3 +48,68 @@ test('read-review sends the exact saved operation and rejects an operation subst
   returned=id(4);const ready=await client.readReview(id(3),34,id(4),binding);assert.match(ready.reviewUrl,/operation=00000000-0000-4000-8000-000000000004&revision=34$/);
   assert.equal(calls[1].init.method,undefined);assert.deepEqual(JSON.parse(new URL(calls[1].url).searchParams.get('expectedState')),binding);
 });
+
+test('wallet approval continuation preserves exact guidance and refuses cross-release progress', async () => {
+  let changed = false;
+  const approved = { operationId: id(4), preparedDigest: `0x${'bb'.repeat(32)}`, reviewPath: `/studio/releases/${id(3)}/review?operation=${id(4)}&revision=34` };
+  const client = createKeelStudioAgentDraftClient({ studioUrl: 'https://studio.example', grantToken: token, fetchImplementation: async () => {
+    const actual = structuredClone(progress);
+    if (changed) actual.binding.releaseId = id(9);
+    return Response.json({ schema: 'keel-release-continuation@1', releaseId: id(3), revision: 34,
+      status: 'wallet-approval-required', nextAction: 'approve-wallet', approval: approved,
+      reviewPath: `/studio/releases/${id(3)}`, message: 'Review the exact saved operation', storagePreserved: true,
+      uploadedBytes: 0, signing: 'not-performed', submission: 'not-performed', agentProgress: actual });
+  } });
+  const result = await client.continuePublication(id(3), 34, { expectedOperationId: id(4), expectedState: binding });
+  assert.equal(result.reviewUrl, 'https://studio.example' + approved.reviewPath);
+  assert.deepEqual(result.agentProgress, progress);
+  changed = true;
+  await assert.rejects(client.continuePublication(id(3), 34, { expectedState: binding }));
+});
+
+test('unsupported dispatcher identity preconditions fail before creating a client or fetching', async () => {
+  const { executeKeelStudioAgentDraftOperation } = await import('../packages/sdk/dist/studio-agent-drafts.js');
+  let requests = 0;
+  const config = { grantToken: 'invalid-token', fetchImplementation: async () => { requests++; return Response.json({}); } };
+  for (const operation of ['create', 'update', 'plan-edit', 'defaults-edit', 'profiles-edit', 'profile-select', 'capture-program', 'resume-review', 'updated-review-check', 'cancel-review', 'recover', 'list']) {
+    await assert.rejects(executeKeelStudioAgentDraftOperation({ ...config, operation, expectedState: binding }), /expectedState is not supported/);
+  }
+  for (const operation of ['read', 'create', 'update', 'prepare-review', 'storage-review']) {
+    await assert.rejects(executeKeelStudioAgentDraftOperation({ ...config, operation, expectedOperationId: id(4) }), /expectedOperationId is not supported/);
+  }
+  assert.equal(requests, 0);
+});
+
+test('supported dispatcher state preconditions reach the server unchanged and server rejection cannot be bypassed', async () => {
+  const { executeKeelStudioAgentDraftOperation } = await import('../packages/sdk/dist/studio-agent-drafts.js');
+  const requests = [];
+  for (const operation of ['read', 'read-review', 'continue-publication', 'prepare-review', 'storage-review']) {
+    await assert.rejects(executeKeelStudioAgentDraftOperation({ studioUrl: 'https://studio.example', grantToken: token,
+      operation, releaseId: id(3), projectId: id(2), expectedRevision: 34, operationId: id(4), expectedState: binding,
+      fetchImplementation: async (url, init) => { requests.push({ url: String(url), init }); return Response.json({ error: 'State precondition not supported by this server' }, { status: 400 }); },
+    }), error => error instanceof KeelStudioAgentError && error.status === 400);
+  }
+  assert.equal(requests.length, 5);
+  for (const { url, init } of requests) {
+    const actual = init.method === 'POST' ? JSON.parse(init.body).expectedState : JSON.parse(new URL(url).searchParams.get('expectedState'));
+    assert.deepEqual(actual, binding);
+  }
+});
+
+test('provided falsey state constraints are invalid rather than silently omitted', async () => {
+  const { executeKeelStudioAgentDraftOperation } = await import('../packages/sdk/dist/studio-agent-drafts.js');
+  let requests = 0;
+  const options = { studioUrl: 'https://studio.example', grantToken: token,
+    fetchImplementation: async () => { requests++; return Response.json(release); } };
+  const client = createKeelStudioAgentDraftClient(options);
+  for (const expectedState of [null, false, '', 0]) {
+    await assert.rejects(client.read(id(3), expectedState));
+    for (const operation of ['read', 'read-review', 'continue-publication', 'prepare-review', 'storage-review']) {
+      await assert.rejects(executeKeelStudioAgentDraftOperation({ ...options, operation, releaseId: id(3), projectId: id(2),
+        expectedRevision: 34, operationId: id(4), expectedState }));
+    }
+  }
+  assert.equal(requests, 0);
+  await client.read(id(3));
+  assert.equal(requests, 1, 'omission preserves the existing unconditioned read API');
+});

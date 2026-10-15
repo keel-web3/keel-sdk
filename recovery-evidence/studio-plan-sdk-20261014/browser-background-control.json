@@ -1,0 +1,16 @@
+{
+  "fixture": "Minimal HTML with no scripts/images/assets/artwork",
+  "state": "verified",
+  "signals": [],
+  "frames": 0,
+  "loading": false,
+  "seal": false,
+  "opaque": true,
+  "externalRequests": [],
+  "proxyRequests": [
+    "CONNECT www.google.com:443"
+  ],
+  "pageNetworkRequests": [],
+  "errors": [],
+  "baselineCommit": "cb09f0b1c33b5b278e6366b4214e5199afa0e060"
+}

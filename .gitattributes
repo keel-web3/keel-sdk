@@ -1,0 +1,2 @@
+# Unified-diff context intentionally contains a space before upstream Go tabs.
+scripts/native/canonical-state-engine/simulate.patch -whitespace

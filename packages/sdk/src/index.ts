@@ -118,11 +118,14 @@ export * from "./inline-delivery-profile.js";
 export * from "./prepared-copy-publication.js";
 
 export * from "./inline-transport-audit.js";
+export * from "./prepared-inline-sources.js";
 export * from "./inline-token-read.js";
 
 export * from "./dense-transport.js";
 
 export * from "./prepared-dense-copy.js";
+export * from "./legacy-prepared-dense-copy.js";
+export * from "./legacy-prepared-dense-reader.js";
 export * from "./creator-prepared-inline.js";
 export * from "./module-runtime.js";
 export * from "./inline-descriptor-columns.js";
@@ -154,3 +157,7 @@ export * from "./creator-prepared-compiler.js";
 export * from "./release-wallet-batch.js";
 
 export { createKeelSepoliaSimulationTransport } from "./sepolia-simulation-transport.js";
+export * from "./public-simulation-pool.js";
+export * from "./simulation-capacity-policy.js";
+
+export * from "./legacy-shared-image-program.js";

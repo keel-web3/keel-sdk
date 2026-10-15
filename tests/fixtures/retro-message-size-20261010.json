@@ -1,0 +1,21 @@
+{
+  "schema": "keel-sanitized-simulation-incident@1",
+  "evidence": "Authorized production operator capture, 2026-10-10 01:54–01:57 UTC; Library libfile_22276310c754819192740f6a9d6638d0",
+  "siteSource": "4e24517ae0ecb33d48af6ffe650c8e955fbd4bf0",
+  "sdkSource": "4c62dd0d8c15db50c0f14d761a76105ae64c1e67",
+  "failureAt": "2026-10-10T01:55:07.338Z",
+  "diagnostic": {
+    "rpcMethod": "eth_simulateV1",
+    "phase": "project-request",
+    "errorClass": "SocketClosedError",
+    "socketReadyState": 3,
+    "socketCloseCode": 1009,
+    "socketCloseReason": "empty",
+    "connectionAttempts": 3
+  },
+  "laterFailures": [
+    { "at": "2026-10-10T01:55:20.453Z", "kind": "provider-limit", "phase": "public-qualification", "socketReadyState": 1, "connectionAttempts": 3 },
+    { "at": "2026-10-10T01:55:35.801Z", "kind": "provider-limit", "phase": "public-qualification", "socketReadyState": 1, "connectionAttempts": 3 }
+  ],
+  "limits": "No serialized request/response, byte count, gas-cap value or individual attempt history was captured. 1009 establishes message-size rejection; request versus response is unresolved. Test payloads and responses are synthetic. Neither deployment nor publication success is proved."
+}

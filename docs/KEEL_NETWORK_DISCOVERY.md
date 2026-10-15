@@ -1,5 +1,29 @@
 # Deployment index and chain configuration
 
+`keel-endpoint-config` and `keel-onchain-data-prepare` accept an exact `chainId`,
+as do discovery and RPC checks. Explicit selection uses the existing shared
+resolver and pool; it does not reuse a differently scoped `.keel/rpc.json`.
+Each candidate must answer the selected chain identity before contract reads.
+Configured public or paid provider URLs remain local and are redacted in tool
+results. Bounded retry, cooldown, cancellation and pinned simulation behavior
+remain properties of the shared SDK pool, not a second MCP transport.
+
+Hosted `keel-studio-draft` create/update accepts `draft.chainId`. Preserve it
+alongside the human-readable label. Studio persists the selected chain and
+rejects disagreement with saved project storage before publication. Older
+drafts may omit it and derive their chain from verified project storage.
+Review and diagnostics use that owner-scoped Studio record, its configured
+server transports and existing operation/revision; a local agent RPC setting
+is never transmitted to Studio or used to replay private review calldata.
+`pending` and `unknown` remain reconciliation states, never proof to resend or
+repay storage. A scoped agent grant authorizes preparation, never wallet signing.
+
+Collector host governance is a separate boundary: a configured provider or
+deployment-index entry does not add it to an artwork's governed host list.
+Hypothetical preview estimates, declared provider capacity and connected-wallet
+capabilities do not establish measured full-program simulation. Tezos source
+or wallet support still does not establish a deployed publisher.
+
 KEEL's deployment index tells SDK/MCP agents which chains have recorded KEEL
 contracts. A wallet network list, faucet guide or available source code does
 not establish a deployment. The current index advertises Ethereum Sepolia

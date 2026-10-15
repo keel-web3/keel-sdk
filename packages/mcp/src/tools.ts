@@ -1,3 +1,5 @@
+import { executeKeelStudioAgentDraftOperation } from "@keel/sdk/studio-agent-drafts";
+import { STUDIO_PRIVATE_TOOL_DEFINITIONS } from "./studio-private-tools.js";
 import { SIGNATURE_PRIVACY_TOOL_DEFINITIONS } from "./signature-privacy-tools.js";
 import { MEDIA_EDIT_TOOL_DEFINITIONS } from "./media-edit-tools.js";
 import { startStudioConnection, getStudioConnection, completeStudioConnection, loadStudioAgentToken, type StudioConnectionScope } from "@keel/sdk/studio-connection-node";
@@ -62,7 +64,6 @@ import {
   fetchStudioCapabilities,
   buildKeelModuleReviewRequest,
   prepareKeelStudioProjectIntake,
-  executeKeelStudioAgentDraftOperation,
   prepareKeelCreatorCollectionWalletReview,
   buildKeelCreatorShellFreezeCall,
   buildKeelCreatorShellRegistrationCall,
@@ -720,7 +721,7 @@ function parseOnchainReads(value: unknown): readonly KeelOnchainRead[] {
  * fact in the response rather than a claim in a comment.
  */
 async function onchainDataTool(context: ToolContext, value: unknown): Promise<unknown> {
-  const input = record(value, ["rpcUrl", "reads", "record", "blockTag", "globalName", "moduleId", "version"], "On-chain data arguments");
+  const input = record(value, ["chainId", "rpcUrl", "reads", "record", "blockTag", "globalName", "moduleId", "version"], "On-chain data arguments");
   const seedInput = input.record === undefined ? undefined : record(input.record, ["address", "recordId", "batchSize"], "Seed record");
   const seedBatchSize = seedInput === undefined ? undefined : optionalNumber(seedInput, "batchSize");
   const seedRecord = seedInput === undefined ? undefined : {
@@ -730,7 +731,8 @@ async function onchainDataTool(context: ToolContext, value: unknown): Promise<un
   };
   const reads = seedRecord && Array.isArray(input.reads) && input.reads.length === 0 ? [] : parseOnchainReads(input.reads);
   const explicitRpc = optionalString(input, "rpcUrl") ?? process.env.KEEL_ONCHAIN_RPC_URL;
-  const rpc = await mcpRpc(context, explicitRpc === undefined ? {} : { rpcUrl: explicitRpc }, true);
+  const chainId = optionalNumber(input, "chainId");
+  const rpc = await mcpRpc(context, { ...(explicitRpc === undefined ? {} : { rpcUrl: explicitRpc }), ...(chainId === undefined ? {} : { chainId }) }, true);
   const blockTag = optionalString(input, "blockTag");
   const globalName = optionalString(input, "globalName");
   const moduleId = optionalString(input, "moduleId") ?? "keel/onchain-data";
@@ -788,11 +790,12 @@ async function onchainDataTool(context: ToolContext, value: unknown): Promise<un
 }
 
 async function endpointConfigTool(context: ToolContext, value: unknown): Promise<unknown> {
-  const input = record(value, ["studioUrl", "publicRpcUrl", "indexerUrl"], "KEEL endpoint arguments");
+  const input = record(value, ["chainId", "studioUrl", "publicRpcUrl", "indexerUrl"], "KEEL endpoint arguments");
   const studioUrl = optionalString(input, "studioUrl");
   const publicRpcUrl = optionalString(input, "publicRpcUrl");
   const indexerUrl = optionalString(input, "indexerUrl");
-  const rpc = await mcpRpc(context, publicRpcUrl === undefined ? {} : { rpcUrl: publicRpcUrl });
+  const chainId = optionalNumber(input, "chainId");
+  const rpc = await mcpRpc(context, { ...(publicRpcUrl === undefined ? {} : { rpcUrl: publicRpcUrl }), ...(chainId === undefined ? {} : { chainId }) });
   const endpoints = resolveKeelEndpoints({
     ...(studioUrl === undefined ? {} : { studioUrl }),
     publicRpcUrl: rpc.rpcUrl,
@@ -869,9 +872,9 @@ async function studioAccessTool(context: ToolContext, value: unknown): Promise<u
 }
 
 async function studioDraftTool(context: ToolContext, value: unknown): Promise<unknown> {
-  const input = record(value, ["studioUrl", "operation", "releaseId", "projectId", "expectedRevision", "draft", "planningCommand", "defaultsCommand", "profileCommand", "profileSelection", "conversationCommand", "includeReadCall", "operationId", "transactionHashes", "recoveryInput", "expectedState", "expectedOperationId", "limit", "cursor"], "Studio draft arguments");
+  const input = record(value, ["studioUrl", "operation", "releaseId", "projectId", "expectedRevision", "draft", "planningCommand", "defaultsCommand", "profileCommand", "profileSelection", "conversationCommand", "includeReadCall", "operationId", "transactionHashes", "recoveryInput", "reviewCandidate", "artifactRevision", "releaseRevision", "expectedState", "expectedOperationId", "limit", "cursor"], "Studio draft arguments");
   const operation = requiredString(input, "operation");
-  if (!["list", "read", "diagnose", "continue-publication", "cancel-review", "storage-recovery", "recover", "recover-wallet-rejection", "plan", "plan-edit", "defaults", "defaults-edit", "profiles", "profiles-edit", "profile-select", "conversation", "conversation-suggest", "prepare-review", "read-review", "storage-review", "create", "update"].includes(operation)) throw new TypeError("operation must be list, read, diagnose, continue-publication, cancel-review, storage-recovery, recover, recover-wallet-rejection, plan, plan-edit, defaults, defaults-edit, conversation, conversation-suggest, prepare-review, storage-review, create, or update.");
+  if (!["capture-program", "resume-review", "updated-review-read", "updated-review-check", "updated-review-cancel", "list", "read", "diagnose", "continue-publication", "cancel-review", "storage-recovery", "recover", "recover-wallet-rejection", "plan", "plan-edit", "defaults", "defaults-edit", "profiles", "profiles-edit", "profile-select", "conversation", "conversation-suggest", "prepare-review", "read-review", "storage-review", "create", "update"].includes(operation)) throw new TypeError("operation must be list, read, diagnose, continue-publication, cancel-review, storage-recovery, recover, recover-wallet-rejection, plan, plan-edit, defaults, defaults-edit, conversation, conversation-suggest, prepare-review, storage-review, create, or update.");
   const configuredStudioUrl = optionalString(input, "studioUrl");
   const studioUrl = resolveKeelEndpoints({
     ...(configuredStudioUrl === undefined ? {} : { studioUrl: configuredStudioUrl }),
@@ -886,10 +889,14 @@ async function studioDraftTool(context: ToolContext, value: unknown): Promise<un
     ...(input.limit === undefined ? {} : { limit: optionalNumber(input, "limit")! }),
     ...(input.cursor === undefined ? {} : { cursor: requiredString(input, "cursor") }),
     grantToken: token,
+    ...(context.signal ? { signal: context.signal } : {}),
     ...(input.operationId === undefined ? {} : { operationId: requiredString(input, "operationId") }),
     ...(input.transactionHashes === undefined ? {} : { transactionHashes: input.transactionHashes as string[] }),
     ...(input.recoveryInput === undefined ? {} : { recoveryInput: input.recoveryInput as never }),
-    operation: operation as "list" | "read" | "diagnose" | "continue-publication" | "cancel-review" | "storage-recovery" | "recover" | "recover-wallet-rejection" | "plan" | "plan-edit" | "defaults" | "defaults-edit" | "profiles" | "profiles-edit" | "profile-select" | "conversation" | "conversation-suggest" | "prepare-review" | "read-review" | "storage-review" | "create" | "update",
+    ...(input.artifactRevision === undefined ? {} : { artifactRevision: optionalNumber(input, "artifactRevision")! }),
+    ...(input.releaseRevision === undefined ? {} : { releaseRevision: optionalNumber(input, "releaseRevision")! }),
+    ...(input.reviewCandidate === undefined ? {} : { reviewCandidate: input.reviewCandidate as never }),
+    operation: operation as "capture-program" | "resume-review" | "updated-review-read" | "updated-review-check" | "updated-review-cancel" | "list" | "read" | "diagnose" | "continue-publication" | "cancel-review" | "storage-recovery" | "recover" | "recover-wallet-rejection" | "plan" | "plan-edit" | "defaults" | "defaults-edit" | "profiles" | "profiles-edit" | "profile-select" | "conversation" | "conversation-suggest" | "prepare-review" | "read-review" | "storage-review" | "create" | "update",
     ...(input.includeReadCall === undefined ? {} : { includeReadCall: optionalBoolean(input, "includeReadCall")! }),
     ...(input.conversationCommand === undefined ? {} : { conversationCommand: input.conversationCommand as never }),
     ...(input.profileCommand === undefined ? {} : { profileCommand: input.profileCommand as never }),
@@ -904,7 +911,7 @@ async function studioDraftTool(context: ToolContext, value: unknown): Promise<un
 }
 
 async function studioStageProjectTool(context: ToolContext, value: unknown): Promise<unknown> {
-  const input = record(value, ["studioUrl", "title", "description", "storageStrategy", "payloadStorage", "marketplaceExportMode", "viewer", "files", "reusableModule", "releaseIntent", "projectProfile"], "Studio stage project arguments");
+  const input = record(value, ["studioUrl", "title", "description", "storageStrategy", "payloadStorage", "marketplaceExportMode", "viewer", "mediaSlots", "files", "reusableModule", "releaseIntent", "projectProfile"], "Studio stage project arguments");
   const configuredStudioUrl = optionalString(input, "studioUrl");
   const studioUrl = resolveKeelEndpoints({ ...(configuredStudioUrl === undefined ? {} : { studioUrl: configuredStudioUrl }) }, process.env).studioUrl;
   const token = await loadStudioAgentToken({ workspace: context.workspace.root, studioUrl });
@@ -975,6 +982,7 @@ async function studioStageProjectTool(context: ToolContext, value: unknown): Pro
     ...(input.payloadStorage === undefined ? {} : { payloadStorage: resolveKeelPayloadStorage(input.payloadStorage) }),
     ...(marketplaceExportMode === undefined ? {} : { marketplaceExportMode: marketplaceExportMode as "recursive" | "packed" | "hybrid" | "onchfs" }),
     ...(viewer === undefined ? {} : { viewer: viewer as "keel-verification-shell" | "none" }),
+    ...(input.mediaSlots === undefined ? {} : { mediaSlots: input.mediaSlots as NonNullable<StageKeelStudioProjectInput["mediaSlots"]> }),
     files,
     ...(reusableModule === undefined ? {} : { reusableModule }),
     ...(input.projectProfile === undefined ? {} : { projectProfile: input.projectProfile as never }),
@@ -1458,6 +1466,7 @@ async function tezosPublicationPrepareTool(_context: ToolContext, value: unknown
 
 export const TOOL_DEFINITIONS: readonly ToolDefinition[] = [
   ...MEDIA_EDIT_TOOL_DEFINITIONS,
+  ...STUDIO_PRIVATE_TOOL_DEFINITIONS,
   ...SIGNATURE_PRIVACY_TOOL_DEFINITIONS,
   tool("keel-tezos-shell-prepare", "Prepare native Tezos shell registration, update, or permanent freeze parameters with explicit network and sender. Read-only preparation: no RPC, signing, submission, or default-shell replacement. Receipt-backed selected-chain object and registry checks are still required.", tezosShellPrepareSchema, async (_context, value) => prepareKeelTezosShell(value as KeelTezosShellPrepareInput)),
   tool("keel-tezos-publication-prepare", "Prepare one exact receipt-bound Tezos KEEL one-of-one publication call using the standard Hold, Index, and FA2 modules. The public route is ordinary FA2/TZIP-12 token_metadata with onchfs:// or another selected carrier; the KEEL JSON/harness route is compatibility-only. Review-only: no private key, origination, signing, submission, or fake address is accepted.", tezosPublicationPrepareSchema, tezosPublicationPrepareTool),
@@ -1496,7 +1505,7 @@ export const TOOL_DEFINITIONS: readonly ToolDefinition[] = [
   tool("keel-studio-project-intake", "Ask only for missing project decisions, then return either storage-only preparation or an editable release/listing intent. No upload, signature, wallet request, or transaction occurs.", TOOL_SCHEMAS.studioProjectIntake, studioProjectIntakeTool),
   tool("keel-studio-connect", "Connect this workspace to the user’s Studio account without copying keys. start returns a public approveUrl and code: open it for the user, who signs in and approves permissions. complete collects and privately saves the approved key; status never returns secrets. Draft/staging tools automatically use the saved connection. Never approve access for the user. No Desktop app or wallet transaction is required.", TOOL_SCHEMAS.studioConnect, studioConnectTool),
   tool("keel-studio-access", "Read, revision-safely update or test the creator's access list with access:read/access:write. Supports named ALL/ANY audience groups, access or benefit-only audiences, provider readiness, durable verifiable raffles, unsigned benefit activation, automatic conditions and agent-managed custom rules, plus pending EIP-712 packets for a caller-owned signer. Read the current Studio access schema before editing. Never send a private key. approve submits only the configured signer's exact signature; it sends no transaction.", { type: "object", properties: { operation: { type: "string", enum: ["read", "update", "test", "requests", "approve", "providers", "raffle-status", "raffle-prepare", "raffle-record", "raffle-confirm", "raffle-draw", "raffle-cancel", "benefits", "benefit-prepare"] }, releaseId: { type: "string", pattern: "^[0-9a-f-]{36}$" }, studioUrl: { type: "string" }, input: { type: "object" } }, required: ["operation"], additionalProperties: false }, studioAccessTool),
-  tool("keel-studio-draft", "List with limit/cursor/projectId and follow pagination.nextCursor until null. Read a saved release and consume agentProgress: binding, progress, blockers and nextActions. Forward expectedState, expectedRevision and expectedOperationId together. Reconcile existing wallet attempts before preparing; unknown/pending outcomes cannot unlock replacement. read-review validates one exact saved operation without creating another. Only return a ready owner wallet page from successful prepare-review/read-review. Create a website wallet-review route by creating a private release draft in the user's Studio account, or list/read/diagnose/revision-safely edit it. After the shared plan is confirmed, use prepare-review with releaseId and expectedRevision to save the exact unsigned owner action and return its pinned reviewUrl. The creator still reviews and signs in Studio. Use conversation/conversation-suggest with separate conversations:read/conversations:write grants to read the in-editor chat or share typed owner-reviewable forms. For creator-directed defaults use defaults/defaults-edit with separate preferences:read/preferences:write grants; existing projects retain their pinned settings. Default to plan and plan-edit: ask the returned next question, preserve explicit answers and revision, and share the returned planningUrl for focused creator edits through their scoped key. Use continue-publication with releaseId and expectedRevision to automatically reconcile existing recorded rejection or receipt evidence through the same service as Publish. This bounded action returns the exact next step and never signs, submits, prepares an operation, or infers a missing owner observation. Use cancel-review with releaseId, expectedRevision and operationId to edit an exact safely unsubmitted review; pending or unknown attempts remain locked. For blocked legacy storage use storage-recovery with the existing projectId, then the returned bounded next action. Diagnose reruns read-only compatibility checks on the same release and returns receipt-aware recovery actions without creating a chain operation or uploading files. After the owner has recorded a confirmed wallet rejection through Studio, use recover-wallet-rejection with releaseId and the exact recoveryInput from diagnose, setting its rejection to the returned ownerRecordedRejection. If ownerRecordedRejection is absent, keep the operation blocked and ask the owner to record the actual outcome in Studio; never invent a rejection code. An agent cannot assert a new rejection. This uses the existing drafts:write grant and preserves the same operation; A missing hash does not prove rejection. Returns reviewUrl for the creator to open in their browser and publish with their existing connected wallet. KEEL Desktop and a separate signing page are not required. This tool does not sign or submit a chain action.", TOOL_SCHEMAS.studioDraft, studioDraftTool),
+  tool("keel-studio-draft", "Create a website wallet-review route by creating a private release draft in the user's Studio account, or list/read/diagnose/revision-safely edit it. Use continue-publication with releaseId and expectedRevision for the same primary Publish action as Studio: reconcile saved receipts, repair verified failures, renew an unchanged expired review and prepare its next real unsigned wallet operation in one request. The result returns a task-specific owner approval URL. Use prepare-review only for an explicitly requested standalone plan or review. The creator still reviews and signs in Studio. Unknown or pending outcomes cannot unlock a replacement; reconcile current state first. List supports limit/cursor/projectId pagination. Preserve agentProgress expectedState and expectedOperationId for continuation; use read-review for an exact saved operation. Use conversation/conversation-suggest with separate conversations:read/conversations:write grants to read the in-editor chat or share typed owner-reviewable forms. For creator-directed defaults use defaults/defaults-edit with separate preferences:read/preferences:write grants; existing projects retain their pinned settings. Use plan and plan-edit when the creator explicitly asks for a plan; preserve explicit answers and the saved revision. If publication needs missing creator choices, gather those choices in the same Studio action. Use continue-publication with releaseId and expectedRevision to automatically reconcile existing recorded rejection or receipt evidence through the same service as Publish. This bounded action prepares the next valid unsigned operation after reconciliation. It never signs an owner call or infers a missing owner observation. Existing approved storage jobs resume by their canonical cursors without another payment. Use cancel-review with releaseId, expectedRevision and operationId to edit an exact safely unsubmitted review; pending or unknown attempts remain locked. Use storage-review with the existing projectId for the same automatic storage continuation and the unique existing release handoff. storage-recovery remains a read-only diagnostic. Diagnose reruns read-only compatibility checks on the same release and returns receipt-aware recovery actions without creating a chain operation or uploading files. After the owner has recorded a confirmed wallet rejection through Studio, use recover-wallet-rejection with releaseId and the exact recoveryInput from diagnose, setting its rejection to the returned ownerRecordedRejection. If ownerRecordedRejection is absent, keep the operation blocked and ask the owner to record the actual outcome in Studio; never invent a rejection code. An agent cannot assert a new rejection. This uses the existing drafts:write grant and preserves the same operation; A missing hash does not prove rejection. Returns reviewUrl for the creator to open in their browser and publish with their existing connected wallet. KEEL Desktop and a separate signing page are not required. This tool does not sign or submit a chain action.", TOOL_SCHEMAS.studioDraft, studioDraftTool),
   tool("keel-studio-stage-project", "Stage bounded creator resources/modules and return the server-issued Studio handoff. Omitted viewer selects Studio's canonical KEEL Inline graph for later preparation; `none` is the explicit raw-artifact route with no viewer and does not prevent a later release or mint. Automatic compact preparation requires the exact selected-chain KeelRawTokenURIBuilder and canonical raw-percent shell fragments with receipts/read-back; Studio must never fall back to legacy Base64 carriage silently. A direct image, video, or self-contained GLB resolves to registered shell plus registered keel.asset-display@1 plus the creator media entry, never zero modules or a generated index.html. Legacy protector getters and NoProtector do not determine default Inline readiness. Creator HTML is content, never a replacement shell, and agents must not upload a locally manufactured KEEL shell, protected-harness wrapper, or local wrapper when the catalog is incomplete. Studio must fail closed for an incomplete selected-chain catalog during preparation. The scoped key is loaded from the private Studio connection or an existing environment override; no wallet signature or chain action occurs.", TOOL_SCHEMAS.studioStageProject, studioStageProjectTool),
   tool("keel-creator-collection-prepare", "Prepare one exact EIP-5792 KeelCreatorFactory batch plus its durable recovery envelope. This never signs or submits. Missing or ambiguous factory/renderer deployments stop before any wallet approval.", TOOL_SCHEMAS.creatorCollectionPrepare, creatorCollectionPrepareTool),
   tool("keel-shell-search", "Search the read-back-verified shell catalogue by creator, name, version, or tags. Returns top/bottom object pointers and metadata only; it never fetches carrier bytes, signs, or submits.", TOOL_SCHEMAS.shellSearch, shellSearchTool),

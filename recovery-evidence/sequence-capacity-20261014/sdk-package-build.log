@@ -1,0 +1,4 @@
+
+> @keel/sdk@0.3.2 build
+> tsc -p tsconfig.json && node scripts/package-canonical-shell.mjs && node scripts/package-layered-runtime.mjs && node scripts/package-storage-policy.mjs && node ../mint-queue/build.mjs
+

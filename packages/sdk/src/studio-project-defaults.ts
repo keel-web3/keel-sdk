@@ -1,3 +1,4 @@
+import { keccak256, stringToHex, type Hex } from "viem";
 import { parseKeelProjectProfileSnapshot, parseKeelNamedProjectProfile, type KeelProjectProfileSnapshot, type KeelNamedProjectProfile } from "./studio-project-profiles.js";
 import { KEEL_DEFAULT_RPC_READ_CONCURRENCY } from "./rpc-read-manifest.js";
 import { compileKeelPlanMatrix, validateKeelPlanValue, type KeelPlanAnswers, type KeelPlanDefaults, type KeelPlanMatrix, type KeelPlanValue } from "./studio-project-planner.js";
@@ -161,22 +162,34 @@ export interface KeelEffectiveBuildDefaults {
   readonly sources: Readonly<Record<string, "system" | "account" | "media" | "project" | "build" | "contract">>;
   readonly requiresFullReadValidation: true;
 }
-/** Fetch the authoritative profile before calling. Project/build overrides stay explicit. */
-export function resolveKeelBuildDefaults(profile: KeelStudioDefaultProfile, input: {
+export interface KeelBuildDefaultsInput {
   readonly mediaType?: string;
   readonly project?: KeelPlanAnswers;
   readonly build?: KeelPlanAnswers;
   readonly constraints?: { readonly maxReadGas?: number; readonly maxOutputBytes?: number; readonly transportProfiles?: readonly string[] };
-} = {}): KeelEffectiveBuildDefaults {
+}
+/** Fetch the authoritative profile before calling. Project/build overrides stay explicit. */
+export function resolveKeelBuildDefaults(profile: KeelStudioDefaultProfile, input: KeelBuildDefaultsInput = {}): KeelEffectiveBuildDefaults {
+  return resolveBuildDefaultsGeneration(profile, input);
+}
+
+// Only the retained assertion may request a historical generation. This is not
+// exposed as a fresh-choice resolver, and it returns no policy until exact
+// saved revision, values and their provenance have been compared.
+function resolveBuildDefaultsGeneration(profile: KeelStudioDefaultProfile, input: KeelBuildDefaultsInput,
+  retained?: KeelEffectiveBuildDefaults): KeelEffectiveBuildDefaults {
   const current = parseKeelStudioDefaultProfile(profile);
-  const values: Record<string, KeelPlanValue> = { compression: "auto", brotliQuality: 11, transportProfile: "uri81-block-v1", payloadStorage: "compact", hybridFallback: false, rpcMaxConcurrentReads: KEEL_DEFAULT_RPC_READ_CONCURRENCY };
+  const values: Record<string, KeelPlanValue> = { compression: "auto", brotliQuality: 11,
+    transportProfile: retained?.sources.transportProfile === "system" ? retained.values.transportProfile! : "uri81-block-v1",
+    payloadStorage: "compact", hybridFallback: false, rpcMaxConcurrentReads: KEEL_DEFAULT_RPC_READ_CONCURRENCY };
   const sources: Record<string, "system" | "account" | "media" | "project" | "build" | "contract"> = Object.fromEntries(Object.keys(values).map(key => [key, "system"]));
   const fields = new Map(KEEL_BUILD_DEFAULT_FIELDS.map(field => [field.id, field]));
   for (const [source, layer] of [["account", current.global], ["media", current.byMedia[input.mediaType ?? ""]], ["project", input.project], ["build", input.build]] as const) {
     for (const [key, value] of Object.entries(layer ?? {})) {
       const field = fields.get(key);
       if (!field) { if (source === "build") throw new TypeError("Unsupported explicit build setting."); continue; }
-      const issue = validateKeelPlanValue(field, value);
+      const issue = retained && key === "transportProfile" && typeof value === "string"
+        && ["uri81-block-v1", "base90-v1", "base91-v1", "base90-block-v2"].includes(value) ? undefined : validateKeelPlanValue(field, value);
       if (issue) throw new TypeError(issue.message);
       values[key] = copyValue(value); sources[key] = source;
     }
@@ -192,6 +205,94 @@ export function resolveKeelBuildDefaults(profile: KeelStudioDefaultProfile, inpu
   if (input.constraints?.transportProfiles && !input.constraints.transportProfiles.includes(String(values.transportProfile))) throw new TypeError("The selected prepared encoding is not supported by the registered reader.");
   return Object.freeze({ schema: "keel-effective-build-defaults@1", revision: current.revision, values: Object.freeze(values), sources: Object.freeze(sources), requiresFullReadValidation: true });
 }
+/** Read-only limits for exact saved bytes. This is not a fresh build selection,
+ * an unchanged-funding attestation, or permission to write retired carriage. */
+export interface KeelRetainedBuildReadPolicy {
+  readonly schema: "keel-retained-build-read-policy@1";
+  readonly currentRevision: number;
+  readonly retained: KeelEffectiveBuildDefaults | null;
+  /** Local consistency identity of the exact saved values and their sources;
+   * callers must authenticate that snapshot independently. */
+  readonly retainedPolicyDigest: Hex | null;
+  readonly readLimits: Readonly<{ readonly rpcMaxConcurrentReads: number; readonly maxReadGas?: number; readonly maxOutputBytes?: number }>;
+  readonly readSources: Readonly<Record<string, "system" | "account" | "media" | "project" | "build" | "contract">>;
+  readonly requiresFullReadValidation: true;
+}
+
+function retainedBuildSnapshot(value: KeelEffectiveBuildDefaults): KeelEffectiveBuildDefaults {
+  const input = object(value);
+  if (Object.keys(input).some(key => !["schema", "revision", "values", "sources", "requiresFullReadValidation"].includes(key))
+    || input.schema !== "keel-effective-build-defaults@1" || !Number.isSafeInteger(input.revision) || Number(input.revision) < 0
+    || input.requiresFullReadValidation !== true) throw new TypeError("Invalid retained build policy snapshot.");
+  const values = answers(input.values), rawSources = object(input.sources);
+  const fields = new Map(KEEL_BUILD_DEFAULT_FIELDS.map(field => [field.id, field]));
+  for (const [key, value] of Object.entries(values)) {
+    const field = fields.get(key);
+    if (!field || (key === "transportProfile" ? typeof value !== "string" || !["uri81-block-v1", "base90-v1", "base91-v1", "base90-block-v2"].includes(value)
+      : validateKeelPlanValue(field, value) !== undefined)) throw new TypeError("Invalid retained build policy value.");
+  }
+  if (Object.keys(rawSources).length !== Object.keys(values).length || Object.keys(rawSources).some(key => !Object.hasOwn(values, key))
+    || Object.keys(values).some(key => typeof rawSources[key] !== "string" || !["system", "account", "media", "project", "build", "contract"].includes(rawSources[key] as string))) throw new TypeError("Invalid retained build policy sources.");
+  return Object.freeze({ schema: "keel-effective-build-defaults@1", revision: Number(input.revision), values,
+    sources: Object.freeze({ ...rawSources }) as KeelEffectiveBuildDefaults["sources"], requiresFullReadValidation: true });
+}
+
+/** Resolve only current RPC/read ceilings for retained paid-byte readback. Saved
+ * transport, compression, source choices and provenance remain exact; none are
+ * selected from current fresh defaults. A missing saved snapshot stays null. */
+export function resolveKeelRetainedBuildReadPolicy(profile: KeelStudioDefaultProfile, input: {
+  readonly retained?: KeelEffectiveBuildDefaults;
+  readonly mediaType?: string;
+  readonly project?: KeelPlanAnswers;
+  readonly build?: KeelPlanAnswers;
+  readonly constraints?: { readonly maxReadGas?: number; readonly maxOutputBytes?: number };
+} = {}): KeelRetainedBuildReadPolicy {
+  const current = parseKeelStudioDefaultProfile(profile);
+  const retained = input.retained === undefined ? null : retainedBuildSnapshot(input.retained);
+  const readKeys = ["rpcMaxConcurrentReads", "maxReadGas", "maxOutputBytes"] as const;
+  const values: Record<string, number> = { rpcMaxConcurrentReads: KEEL_DEFAULT_RPC_READ_CONCURRENCY };
+  const sources: Record<string, KeelEffectiveBuildDefaults["sources"][string]> = { rpcMaxConcurrentReads: "system" };
+  const fields = new Map(KEEL_BUILD_DEFAULT_FIELDS.map(field => [field.id, field]));
+  for (const [source, rawLayer] of [["account", current.global], ["media", current.byMedia[input.mediaType ?? ""]], ["project", input.project], ["build", input.build]] as const) {
+    const layer = rawLayer === undefined ? {} : answers(rawLayer);
+    for (const key of readKeys) {
+      const value = layer[key];
+      if (value === undefined) continue;
+      const issue = validateKeelPlanValue(fields.get(key)!, value);
+      if (issue) throw new TypeError(issue.message);
+      values[key] = Number(value); sources[key] = source;
+    }
+  }
+  for (const key of ["maxReadGas", "maxOutputBytes"] as const) {
+    const ceiling = input.constraints?.[key];
+    if (ceiling === undefined) continue;
+    if (!Number.isSafeInteger(ceiling) || ceiling < 1) throw new TypeError("Invalid registered reader limit.");
+    if (values[key] === undefined || values[key]! > ceiling) { values[key] = ceiling; sources[key] = "contract"; }
+  }
+  const sorted = (record: Readonly<Record<string, unknown>>) => Object.keys(record).sort().map(key => [key, record[key]]);
+  const retainedPolicyDigest = retained === null ? null : keccak256(stringToHex(JSON.stringify({ schema: retained.schema,
+    revision: retained.revision, values: sorted(retained.values), sources: sorted(retained.sources), requiresFullReadValidation: true })));
+  return Object.freeze({ schema: "keel-retained-build-read-policy@1", currentRevision: current.revision, retained, retainedPolicyDigest,
+    readLimits: Object.freeze({ rpcMaxConcurrentReads: values.rpcMaxConcurrentReads!,
+      ...(values.maxReadGas === undefined ? {} : { maxReadGas: values.maxReadGas }),
+      ...(values.maxOutputBytes === undefined ? {} : { maxOutputBytes: values.maxOutputBytes }) }),
+    readSources: Object.freeze(sources), requiresFullReadValidation: true });
+}
+
+/** Validate the exact saved generation during reconciliation of an existing
+ * operation. Only an old system transport default is pinned to its saved value;
+ * explicit current choices, revision, other settings and provenance must match.
+ * This assertion grants no new-source write, receipt or wallet authority. */
+export function assertKeelRetainedBuildDefaultsCurrent(profile: KeelStudioDefaultProfile,
+  input: KeelBuildDefaultsInput & { readonly retained: KeelEffectiveBuildDefaults }): KeelEffectiveBuildDefaults {
+  const retained = retainedBuildSnapshot(input.retained);
+  const current = resolveBuildDefaultsGeneration(profile, input, retained);
+  const comparable = (record: Readonly<Record<string, unknown>>) => JSON.stringify(Object.keys(record).sort().map(key => [key, record[key]]));
+  if (retained.revision !== current.revision || comparable(retained.values) !== comparable(current.values)
+    || comparable(retained.sources) !== comparable(current.sources)) throw new Error("build-defaults-stale: the retained source policy or its saved provenance changed; reconcile and review before funding");
+  return retained;
+}
+
 /** Call immediately before funding; a stale build must be rebuilt and reviewed. */
 export function assertKeelBuildDefaultsCurrent(prepared: KeelEffectiveBuildDefaults, current: KeelEffectiveBuildDefaults): void {
   const comparable = (values: KeelPlanAnswers) => JSON.stringify(Object.keys(values).sort().map(key => [key, values[key]]));

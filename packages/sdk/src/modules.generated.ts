@@ -473,6 +473,7 @@ export const KEEL_MODULES: readonly KeelModule[] = [
     "contracts": [
       "KEEL721.sol",
       "KEEL721Deployer.sol",
+      "KeelCreationCodeCarrier.sol",
       "Keel721Initialization.sol",
       "Keel721Presentation.sol",
       "Keel721State.sol",
@@ -535,6 +536,7 @@ export const KEEL_MODULES: readonly KeelModule[] = [
     "deployable": [
       "KEEL721",
       "KEEL721Deployer",
+      "KeelCreationCodeCarrier",
       "Keel721Initialization",
       "Keel721MetadataFormatting",
       "Keel721Presentation",
@@ -732,6 +734,7 @@ export const KEEL_MODULES: readonly KeelModule[] = [
       "KeelIpfsCidVerifier.sol",
       "KeelNodeRegistry.sol",
       "interfaces/IKeelAnchorProofBackend.sol",
+      "interfaces/IVerifyProofAggregation.sol",
       "interfaces/IKeelAnchorProofVerifier.sol",
       "interfaces/IKeelAnchoredChainQueries.sol",
       "interfaces/IKeelSettlementSource.sol",
@@ -799,7 +802,8 @@ export const KEEL_MODULES: readonly KeelModule[] = [
     "deps": [
       "keel-hold",
       "keel-artifacts",
-      "keel-kernel"
+      "keel-kernel",
+      "keel-die"
     ],
     "contracts": [
       "KeelIPControl.sol",
@@ -881,7 +885,8 @@ export const KEEL_MODULES: readonly KeelModule[] = [
     "repo": "keel-web3/keel-cross-chain-mint",
     "deps": [
       "keel-kernel",
-      "keel-mint-access"
+      "keel-mint-access",
+      "keel-ip-control"
     ],
     "contracts": [
       "KeelCrossChainMintBridge.sol"

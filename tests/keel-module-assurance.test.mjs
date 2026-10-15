@@ -433,11 +433,19 @@ test("wrapInVerificationShell returns a self-contained document and a review-onl
   assert.match(result.html, /keel-verification-presentation@1/u);
   assert.match(result.html, /id="verify-seal"/u);
 
-  // Assets resolve from the verified graph. Explicit navigation links in the
-  // chrome do not authorize automatic off-chain resource loading.
+  // Every content byte is committed inline. Canonical proof UI anchors may
+  // contain explorer/gallery URLs; their presence is not a resource fetch.
+  // The required offline-browser CI gate observes requests and tests tampering.
   const asset = result.envelope.items.find((item) => item.id === "palette");
   assert.deepEqual(asset.aliases, ["/content/palette.js"]);
   assert.equal(asset.integrity.digest, (await createIntegrity(assetBytes)).digest);
+  assert.equal(result.envelope.deliveryProfile, "embedded-assembled");
+  assert.equal(result.envelope.rpcUrls, undefined);
+  assert.equal(result.envelope.rpcUrl, undefined);
+  for (const item of result.envelope.items) {
+    assert.ok(item.embedded);
+    for (const key of ["external", "onchain", "store", "objectId"]) assert.equal(item[key], undefined);
+  }
   const inlineMetadata = (html) => ({
     image: `data:image/svg+xml,${encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg"/>')}`,
     animation_url: `data:text/html;charset=utf-8,${encodeURIComponent(html)}`,

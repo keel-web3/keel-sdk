@@ -1,0 +1,52 @@
+TAP version 13
+# Subtest: default Compact uses actual compatible Brotli/Dense legacy envelope and preserves exact source/poster
+ok 1 - default Compact uses actual compatible Brotli/Dense legacy envelope and preserves exact source/poster
+  ---
+  duration_ms: 3773.608582
+  type: 'test'
+  ...
+# Subtest: auto keeps nonbeneficial exact bytes; explicit codec choices and Raw are preserved
+ok 2 - auto keeps nonbeneficial exact bytes; explicit codec choices and Raw are preserved
+  ---
+  duration_ms: 10444.159442
+  type: 'test'
+  ...
+# Subtest: 40/41,128/129,256 and configured1024 logical resources retain IDs/order without expanding the64-part root
+ok 3 - 40/41,128/129,256 and configured1024 logical resources retain IDs/order without expanding the64-part root
+  ---
+  duration_ms: 11899.531046
+  type: 'test'
+  ...
+# Subtest: large sources are segmented without changing original identity or adding an aggregate32MiB limit
+ok 4 - large sources are segmented without changing original identity or adding an aggregate32MiB limit
+  ---
+  duration_ms: 3207.530423
+  type: 'test'
+  ...
+# Subtest: new profile rejects changed outer execution, missing/context impersonation and conflicting namespaces
+ok 5 - new profile rejects changed outer execution, missing/context impersonation and conflicting namespaces
+  ---
+  duration_ms: 856.234669
+  type: 'test'
+  ...
+# Subtest: existing registered text modules keep exact fragment bytes and data/module playback order
+ok 6 - existing registered text modules keep exact fragment bytes and data/module playback order
+  ---
+  duration_ms: 420.286556
+  type: 'test'
+  ...
+# Subtest: existing compressed bytes stay exact and new512KiB leaves retain mixed none/Brotli selection
+ok 7 - existing compressed bytes stay exact and new512KiB leaves retain mixed none/Brotli selection
+  ---
+  duration_ms: 4271.965402
+  type: 'test'
+  ...
+1..7
+# tests 7
+# suites 0
+# pass 7
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 42981.638679

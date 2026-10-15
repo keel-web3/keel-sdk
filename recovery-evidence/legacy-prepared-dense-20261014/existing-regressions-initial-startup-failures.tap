@@ -1,0 +1,376 @@
+TAP version 13
+# node:internal/modules/esm/resolve:275
+#     throw new ERR_MODULE_NOT_FOUND(
+#           ^
+# Error [ERR_MODULE_NOT_FOUND]: Cannot find module '/workspace/keel-legacy-carriage-20261014/keel-sdk/packages/protocol/dist/index.js' imported from /workspace/keel-legacy-carriage-20261014/keel-sdk/tests/copy-publication-enforcement.test.mjs
+#     at finalizeResolution (node:internal/modules/esm/resolve:275:11)
+#     at moduleResolve (node:internal/modules/esm/resolve:861:10)
+#     at defaultResolve (node:internal/modules/esm/resolve:985:11)
+#     at \#cachedDefaultResolve (node:internal/modules/esm/loader:747:20)
+#     at ModuleLoader.resolve (node:internal/modules/esm/loader:724:38)
+#     at ModuleLoader.getModuleJobForImport (node:internal/modules/esm/loader:320:38)
+#     at ModuleJob._link (node:internal/modules/esm/module_job:182:49) {
+#   code: 'ERR_MODULE_NOT_FOUND',
+#   url: 'file:///workspace/keel-legacy-carriage-20261014/keel-sdk/packages/protocol/dist/index.js'
+# }
+# Node.js v22.23.1
+# Subtest: tests/copy-publication-enforcement.test.mjs
+not ok 1 - tests/copy-publication-enforcement.test.mjs
+  ---
+  duration_ms: 5650.215918
+  type: 'test'
+  location: '/workspace/keel-legacy-carriage-20261014/keel-sdk/tests/copy-publication-enforcement.test.mjs:1:1'
+  failureType: 'testCodeFailure'
+  exitCode: 1
+  signal: ~
+  error: 'test failed'
+  code: 'ERR_TEST_FAILURE'
+  ...
+# node:internal/modules/esm/resolve:275
+#     throw new ERR_MODULE_NOT_FOUND(
+#           ^
+# Error [ERR_MODULE_NOT_FOUND]: Cannot find module '/workspace/keel-legacy-carriage-20261014/keel-sdk/packages/protocol/dist/index.js' imported from /workspace/keel-legacy-carriage-20261014/keel-sdk/tests/inline-payload-carriage.test.mjs
+#     at finalizeResolution (node:internal/modules/esm/resolve:275:11)
+#     at moduleResolve (node:internal/modules/esm/resolve:861:10)
+#     at defaultResolve (node:internal/modules/esm/resolve:985:11)
+#     at \#cachedDefaultResolve (node:internal/modules/esm/loader:747:20)
+#     at ModuleLoader.resolve (node:internal/modules/esm/loader:724:38)
+#     at ModuleLoader.getModuleJobForImport (node:internal/modules/esm/loader:320:38)
+#     at ModuleJob._link (node:internal/modules/esm/module_job:182:49) {
+#   code: 'ERR_MODULE_NOT_FOUND',
+#   url: 'file:///workspace/keel-legacy-carriage-20261014/keel-sdk/packages/protocol/dist/index.js'
+# }
+# Node.js v22.23.1
+# Subtest: tests/inline-payload-carriage.test.mjs
+not ok 2 - tests/inline-payload-carriage.test.mjs
+  ---
+  duration_ms: 7941.698737
+  type: 'test'
+  location: '/workspace/keel-legacy-carriage-20261014/keel-sdk/tests/inline-payload-carriage.test.mjs:1:1'
+  failureType: 'testCodeFailure'
+  exitCode: 1
+  signal: ~
+  error: 'test failed'
+  code: 'ERR_TEST_FAILURE'
+  ...
+# Subtest: default shell rejects undeclared codecs in modules, entry and asset
+ok 3 - default shell rejects undeclared codecs in modules, entry and asset
+  ---
+  duration_ms: 3279.124771
+  type: 'test'
+  ...
+# Subtest: each official opt-in profile composes only its declared verified slots
+ok 4 - each official opt-in profile composes only its declared verified slots
+  ---
+  duration_ms: 1916.027332
+  type: 'test'
+  ...
+# Subtest: LZMA precompression must reconstruct exact final source and survive wrapping rules
+ok 5 - LZMA precompression must reconstruct exact final source and survive wrapping rules
+  ---
+  duration_ms: 359.235187
+  type: 'test'
+  ...
+# Subtest: nested compressed locator scanning uses commitments and refuses expansion past its cap
+ok 6 - nested compressed locator scanning uses commitments and refuses expansion past its cap
+  ---
+  duration_ms: 1541.388729
+  type: 'test'
+  ...
+# Subtest: prepared aligned Base64 is inferred and copied exactly, with zero new source bytes
+ok 7 - prepared aligned Base64 is inferred and copied exactly, with zero new source bytes
+  ---
+  duration_ms: 1289.044372
+  type: 'test'
+  ...
+# Subtest: raw-percent and percent infer exact existing carriages without repadding
+ok 8 - raw-percent and percent infer exact existing carriages without repadding
+  ---
+  duration_ms: 570.39599
+  type: 'test'
+  ...
+# Subtest: full shell plus prepared body media infers follow-latest and preserves body IDs
+ok 9 - full shell plus prepared body media infers follow-latest and preserves body IDs
+  ---
+  duration_ms: 256.399512
+  type: 'test'
+  ...
+# Subtest: explicit mismatching carriage and direct helper fail before fresh encoding
+ok 10 - explicit mismatching carriage and direct helper fail before fresh encoding
+  ---
+  duration_ms: 376.276644
+  type: 'test'
+  ...
+# Subtest: assembly-only requires every ordered part and forbids creator or unused parts
+ok 11 - assembly-only requires every ordered part and forbids creator or unused parts
+  ---
+  duration_ms: 123.457396
+  type: 'test'
+  ...
+# Subtest: selected-chain store and nonzero exact object IDs are mandatory
+ok 12 - selected-chain store and nonzero exact object IDs are mandatory
+  ---
+  duration_ms: 97.732478
+  type: 'test'
+  ...
+# Subtest: unsupported raw binary and mixed prepared media never transcode
+ok 13 - unsupported raw binary and mixed prepared media never transcode
+  ---
+  duration_ms: 55.956102
+  type: 'test'
+  ...
+# Subtest: stored SHA, exact lengths and compression are checked before assembly
+ok 14 - stored SHA, exact lengths and compression are checked before assembly
+  ---
+  duration_ms: 53.695966
+  type: 'test'
+  ...
+# Subtest: source edits, root edits and local unpadded source cannot hide behind old receipts
+ok 15 - source edits, root edits and local unpadded source cannot hide behind old receipts
+  ---
+  duration_ms: 107.095168
+  type: 'test'
+  ...
+# Subtest: shell order, exact Base64 alignment and inconsistent immutable IDs fail closed
+ok 16 - shell order, exact Base64 alignment and inconsistent immutable IDs fail closed
+  ---
+  duration_ms: 168.671534
+  type: 'test'
+  ...
+# Subtest: inspection clones Buffer-backed bytes rather than exposing caller aliasing
+ok 17 - inspection clones Buffer-backed bytes rather than exposing caller aliasing
+  ---
+  duration_ms: 96.114383
+  type: 'test'
+  ...
+# Subtest: ordinary default and explicit local carriage outputs remain byte-identical
+ok 18 - ordinary default and explicit local carriage outputs remain byte-identical
+  ---
+  duration_ms: 90.202351
+  type: 'test'
+  ...
+# Subtest: async digest suspension cannot change selected chain, future receipts, order or carriage
+ok 19 - async digest suspension cannot change selected chain, future receipts, order or carriage
+  ---
+  duration_ms: 15.139437
+  type: 'test'
+  ...
+# Subtest: async digest suspension compares root against its entry-time snapshot
+ok 20 - async digest suspension compares root against its entry-time snapshot
+  ---
+  duration_ms: 39.746795
+  type: 'test'
+  ...
+# Subtest: receipt module identity and execution labels cannot silently override the root
+ok 21 - receipt module identity and execution labels cannot silently override the root
+  ---
+  duration_ms: 101.238809
+  type: 'test'
+  ...
+# Subtest: Inline creator bytes reject hidden external URL sentinels before packing
+ok 22 - Inline creator bytes reject hidden external URL sentinels before packing
+  ---
+  duration_ms: 10.071587
+  type: 'test'
+  ...
+# Subtest: Inline locator check distinguishes minified ar variables from Arweave references
+ok 23 - Inline locator check distinguishes minified ar variables from Arweave references
+  ---
+  duration_ms: 1.481405
+  type: 'test'
+  ...
+# Subtest: inline SVG image carriage avoids double Base64 while retaining exact bytes
+ok 24 - inline SVG image carriage avoids double Base64 while retaining exact bytes
+  ---
+  duration_ms: 121.685507
+  type: 'test'
+  ...
+# Subtest: collector Inline rejects off-chain resources while allowing navigation links and protocol text
+ok 25 - collector Inline rejects off-chain resources while allowing navigation links and protocol text
+  ---
+  duration_ms: 5.68725
+  type: 'test'
+  ...
+# Subtest: composable Base64 fragments equal one traditional outer encoding across UTF-8 boundaries
+ok 26 - composable Base64 fragments equal one traditional outer encoding across UTF-8 boundaries
+  ---
+  duration_ms: 18.621919
+  type: 'test'
+  ...
+# Subtest: hundreds of reordered composable JSON fragments remain one deterministic Base64 stream
+ok 27 - hundreds of reordered composable JSON fragments remain one deterministic Base64 stream
+  ---
+  duration_ms: 113.672724
+  type: 'test'
+  ...
+# Subtest: inline JSON escaping closes script parser hazards before byte alignment
+ok 28 - inline JSON escaping closes script parser hazards before byte alignment
+  ---
+  duration_ms: 2.55661
+  type: 'test'
+  ...
+# Subtest: composable Base64 rejects malformed Unicode and padded non-terminal fragments
+ok 29 - composable Base64 rejects malformed Unicode and padded non-terminal fragments
+  ---
+  duration_ms: 1.191784
+  type: 'test'
+  ...
+# Subtest: Gzip Inline graph reuses shell and p5 fragments and publishes only creator bytes
+ok 30 - Gzip Inline graph reuses shell and p5 fragments and publishes only creator bytes
+  ---
+  duration_ms: 4009.379957
+  type: 'test'
+  ...
+# Subtest: historical compressed assets remain exact locally while fresh Inline rejects encoded body copies
+ok 31 - historical compressed assets remain exact locally while fresh Inline rejects encoded body copies
+  ---
+  duration_ms: 223.99037
+  type: 'test'
+  ...
+# Subtest: canonical Inline publication has one shell top, ordered middle, and one shell bottom
+ok 32 - canonical Inline publication has one shell top, ordered middle, and one shell bottom
+  ---
+  duration_ms: 281.044283
+  type: 'test'
+  ...
+# Subtest: creator HTML is one verified middle slot inside the canonical shell
+ok 33 - creator HTML is one verified middle slot inside the canonical shell
+  ---
+  duration_ms: 261.404005
+  type: 'test'
+  ...
+# Subtest: normal media uses the registered shell and asset-display module without a creator wrapper
+ok 34 - normal media uses the registered shell and asset-display module without a creator wrapper
+  ---
+  duration_ms: 544.598982
+  type: 'test'
+  ...
+# Subtest: normal-media default compact graphs accept only the registered shell and display module
+ok 35 - normal-media default compact graphs accept only the registered shell and display module
+  ---
+  duration_ms: 1342.558712
+  type: 'test'
+  ...
+# Subtest: published canonical fragments survive platform-specific module recompression
+ok 36 - published canonical fragments survive platform-specific module recompression
+  ---
+  duration_ms: 589.770566
+  type: 'test'
+  ...
+# Subtest: fresh Base64 encoding requires acknowledgement and ignores the environment bypass
+ok 37 - fresh Base64 encoding requires acknowledgement and ignores the environment bypass
+  ---
+  duration_ms: 12.656704
+  type: 'test'
+  ...
+# Subtest: default saver keeps raw text unchanged through SDK, publication reuse, and metadata
+ok 38 - default saver keeps raw text unchanged through SDK, publication reuse, and metadata
+  ---
+  duration_ms: 3691.380121
+  type: 'test'
+  ...
+# Subtest: COPY fragment preparation round-trips URI-valid characters rejected by deployed older readers
+ok 39 - COPY fragment preparation round-trips URI-valid characters rejected by deployed older readers
+  ---
+  duration_ms: 3.309273
+  type: 'test'
+  ...
+# Subtest: fresh preparation compresses with Brotli before Base90 and nested escaping; incompressible and explicit none stay uncompressed
+ok 40 - fresh preparation compresses with Brotli before Base90 and nested escaping; incompressible and explicit none stay uncompressed
+  ---
+  duration_ms: 60.905569
+  type: 'test'
+  ...
+# Subtest: prepared dense shell defaults to escaped Base90 and rejects incompatible explicit choices
+ok 41 - prepared dense shell defaults to escaped Base90 and rejects incompatible explicit choices
+  ---
+  duration_ms: 640.550885
+  type: 'test'
+  ...
+# Subtest: base90: inspect literal shell framing and exact packed commitments without execution
+ok 42 - base90: inspect literal shell framing and exact packed commitments without execution
+  ---
+  duration_ms: 657.485331
+  type: 'test'
+  ...
+# Subtest: base91: inspect literal shell framing and exact packed commitments without execution
+ok 43 - base91: inspect literal shell framing and exact packed commitments without execution
+  ---
+  duration_ms: 469.540145
+  type: 'test'
+  ...
+# Subtest: base90-block: inspect literal shell framing and exact packed commitments without execution
+ok 44 - base90-block: inspect literal shell framing and exact packed commitments without execution
+  ---
+  duration_ms: 637.226109
+  type: 'test'
+  ...
+# Subtest: uri81: inspect literal shell framing and exact packed commitments without execution
+ok 45 - uri81: inspect literal shell framing and exact packed commitments without execution
+  ---
+  duration_ms: 798.829951
+  type: 'test'
+  ...
+# Subtest: question marks and following markup survive both URL parsers byte for byte
+ok 46 - question marks and following markup survive both URL parsers byte for byte
+  ---
+  duration_ms: 176.541657
+  type: 'test'
+  ...
+# Subtest: prepared body is readable through standard metadata and HTML data URIs
+ok 47 - prepared body is readable through standard metadata and HTML data URIs
+  ---
+  duration_ms: 403.129025
+  type: 'test'
+  ...
+# Subtest: gzip shell boot restores the exact canonical document in a browser-compatible environment
+ok 48 - gzip shell boot restores the exact canonical document in a browser-compatible environment
+  ---
+  duration_ms: 997.756575
+  type: 'test'
+  ...
+# Subtest: publication inspection accepts byte-preserving query normalization and rejects byte loss
+ok 49 - publication inspection accepts byte-preserving query normalization and rejects byte loss
+  ---
+  duration_ms: 1.250439
+  type: 'test'
+  ...
+# Subtest: prepared fragment decodes JSON escapes and both percent layers exactly
+ok 50 - prepared fragment decodes JSON escapes and both percent layers exactly
+  ---
+  duration_ms: 4.240363
+  type: 'test'
+  ...
+# Subtest: default compression quality is pinned and auto compares exact paid carrier bytes
+ok 51 - default compression quality is pinned and auto compares exact paid carrier bytes
+  ---
+  duration_ms: 121.770929
+  type: 'test'
+  ...
+# Subtest: large decoded sources may compress into bounded stored carriers without encoding an illegal raw baseline
+ok 52 - large decoded sources may compress into bounded stored carriers without encoding an illegal raw baseline
+  ---
+  duration_ms: 314.913679
+  type: 'test'
+  ...
+# Subtest: an oversized compression candidate cannot invalidate a legal raw carrier
+ok 53 - an oversized compression candidate cannot invalidate a legal raw carrier
+  ---
+  duration_ms: 24946.670356
+  type: 'test'
+  ...
+# Subtest: auto rejects a smaller compressed binary when its exact paid escaped carrier is larger
+ok 54 - auto rejects a smaller compressed binary when its exact paid escaped carrier is larger
+  ---
+  duration_ms: 204.342736
+  type: 'test'
+  ...
+1..54
+# tests 54
+# suites 0
+# pass 52
+# fail 2
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 68538.283379

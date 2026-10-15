@@ -1,3 +1,5 @@
+import { canonicalAbiEntries, readCompiledContractAbi } from "./abi-conformance.mjs";
+import { fileURLToPath } from "node:url";
 import nodeTest from 'node:test';
 import { siblingTest } from "./sibling-repository.mjs";
 const test = siblingTest(nodeTest, "keel-contracts");
@@ -74,7 +76,7 @@ test('SDK router ABI exactly matches the current checked-in contract ABI', () =>
 });
 
 test('SDK router ABI exactly matches the current compiled contract ABI', () => {
-  assert.deepEqual(abi,read('../../keel-contracts/out/KeelMintRouteRegistry.sol/KeelMintRouteRegistry.json').abi);
+  assert.deepEqual(canonicalAbiEntries(abi),canonicalAbiEntries(readCompiledContractAbi(fileURLToPath(new URL('../../keel-contracts', import.meta.url)), 'KeelMintRouteRegistry')));
 });
 
 test('SDK decodes actual router receipts using generated and human ABIs', () => {

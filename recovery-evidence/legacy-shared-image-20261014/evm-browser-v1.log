@@ -1,0 +1,32 @@
+TAP version 13
+# Subtest: compiled shared-image reader + normal KeelRouted721/image module returns and executes exact artwork with one stored native image
+not ok 1 - compiled shared-image reader + normal KeelRouted721/image module returns and executes exact artwork with one stored native image
+  ---
+  duration_ms: 88382.121482
+  type: 'test'
+  location: '/tmp/keel-shared-image-20261014/keel-sdk/tests/sdk-legacy-shared-image-evm-browser.test.mjs:19:1'
+  failureType: 'testCodeFailure'
+  error: |-
+    store COPY frame: {"message":"execution reverted","code":3,"data":"0x"}
+    
+    '0x0' !== '0x1'
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: '0x1'
+  actual: '0x0'
+  operator: 'strictEqual'
+  stack: |-
+    TestContext.<anonymous> (file:///tmp/keel-shared-image-20261014/keel-sdk/tests/sdk-legacy-shared-image-evm-browser.test.mjs:87:48)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async startSubtestAfterBootstrap (node:internal/test_runner/harness:296:3)
+  ...
+1..1
+# tests 1
+# suites 0
+# pass 0
+# fail 1
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 90730.847447

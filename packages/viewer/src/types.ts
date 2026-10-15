@@ -592,6 +592,9 @@ export interface RuntimeStakeObjectContext {
 
 export interface SandboxOptions {
   readonly runtimeContext?: RuntimeContext;
+  /** Preserve literal source strings while retaining the verified content gateway.
+   * Static resource URL materialization is enabled by default. */
+  readonly materializeResourceUrls?: boolean;
   /** Consumer/gallery presentation: remove embedded editor chrome. */
   readonly consumer?: boolean;
   /**
@@ -616,6 +619,8 @@ export interface MountOptions {
    */
   readonly deterministicViewport?: "scale" | "fixed" | "host";
   readonly runtimeContext?: RuntimeContext;
+  /** Preserve source reader aliases; static URL materialization defaults to enabled. */
+  readonly materializeResourceUrls?: boolean;
   /** Consumer/gallery presentation: remove embedded editor chrome. */
   readonly consumer?: boolean;
 }

@@ -9,6 +9,13 @@ export const KEEL_STUDIO_ARTIFACT_UPLOAD_PROTOCOL = "keel-studio-artifact-upload
 
 export interface KeelStudioArtifactUploadResult {
   readonly id: string;
+  readonly preparation?: {
+    readonly route: "creator-prepared-copy";
+    readonly status: "source-staged" | "prepared";
+    readonly sourceRevision: `0x${string}`;
+    readonly reviewPath: string;
+    readonly publicationReady: false;
+  };
 }
 
 export interface UploadKeelStudioArtifactInput {
@@ -144,24 +151,42 @@ interface UploadErrorBody {
   readonly error?: string;
 }
 
+export class KeelStudioUploadError extends Error {
+  override readonly name = "KeelStudioUploadError";
+  constructor(message: string, readonly status: number) { super(message); }
+}
+
 function result(value: unknown, status: number): KeelStudioArtifactUploadResult {
+  if ((status < 200 || status >= 300) && (typeof value !== "object" || value === null)) throw new KeelStudioUploadError(`KEEL Studio upload returned HTTP ${status} without a JSON result.`, status);
   if (typeof value !== "object" || value === null) {
     throw new Error(`KEEL Studio upload returned HTTP ${status} without a JSON result.`);
   }
-  const body = value as UploadErrorBody & { readonly id?: unknown };
+  const body = value as UploadErrorBody & { readonly id?: unknown; readonly preparation?: unknown };
   if (status < 200 || status >= 300) {
-    throw new Error(body.error ?? `KEEL Studio upload failed with HTTP ${status}.`);
+    throw new KeelStudioUploadError(body.error ?? `KEEL Studio upload failed with HTTP ${status}.`, status);
   }
   if (typeof body.id !== "string" || body.id.length === 0) {
     throw new Error("KEEL Studio upload did not return an artifact ID.");
   }
-  return Object.freeze({ id: body.id });
+  if (body.preparation === undefined) return Object.freeze({ id: body.id });
+  const preparation = body.preparation;
+  if (!preparation || typeof preparation !== "object" || Array.isArray(preparation)) throw new TypeError("Invalid Studio preparation result.");
+  const prepared = preparation as Record<string, unknown>;
+  const keys = ["route", "status", "sourceRevision", "reviewPath", "publicationReady"];
+  if (Object.keys(prepared).length !== keys.length || Object.keys(prepared).some(key => !keys.includes(key))
+    || prepared.route !== "creator-prepared-copy" || !["source-staged", "prepared"].includes(String(prepared.status))
+    || typeof prepared.sourceRevision !== "string" || !/^0x[0-9a-f]{64}$/u.test(prepared.sourceRevision)
+    || prepared.publicationReady !== false || typeof prepared.reviewPath !== "string" || prepared.reviewPath.length > 2048
+    || !prepared.reviewPath.startsWith("/") || prepared.reviewPath.startsWith("//") || /[\u0000-\u001f\u007f\\]/u.test(prepared.reviewPath)
+    || new URL(prepared.reviewPath, "https://studio.invalid").origin !== "https://studio.invalid") throw new TypeError("Invalid Studio preparation result.");
+  return Object.freeze({ id: body.id, preparation: Object.freeze(prepared) as NonNullable<KeelStudioArtifactUploadResult["preparation"]> });
 }
 
 /**
  * Uploads an artifact to KEEL Studio without performing any wallet or chain
- * action. Browser callers use their signed creator session; agents use the
- * server-side write token and an explicit creatorAddress form field.
+ * action. Creation requires the browser's signed creator session. An address
+ * or operator header alone is not authentication. Headless callers use
+ * createKeelStudioAgentDraftClient().createProject with a creator-approved grant.
  */
 export async function uploadKeelStudioArtifact(
   input: UploadKeelStudioArtifactInput,
@@ -178,7 +203,7 @@ export async function uploadKeelStudioArtifact(
       ? {}
       : { headers: { "x-keel-studio-write-token": input.writeToken } }),
   });
-  return result(await response.json(), response.status);
+  return result(await response.json().catch(() => undefined), response.status);
 }
 
 function safeProjectPath(value: string): string {

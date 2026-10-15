@@ -1,0 +1,2 @@
+# Keep raw TAP diagnostic whitespace byte-for-byte.
+*.tap -whitespace

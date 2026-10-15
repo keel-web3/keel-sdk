@@ -1,0 +1,490 @@
+TAP version 13
+# Subtest: recursive reader rejects self cycles before cached-promise reuse
+ok 1 - recursive reader rejects self cycles before cached-promise reuse
+  ---
+  duration_ms: 7.554314
+  type: 'test'
+  ...
+# Subtest: recursive reader rejects two-object cycles before cached-promise reuse
+ok 2 - recursive reader rejects two-object cycles before cached-promise reuse
+  ---
+  duration_ms: 2.181238
+  type: 'test'
+  ...
+# Subtest: recursive reader preserves verified shared DAG bytes and reads a reused leaf once
+ok 3 - recursive reader preserves verified shared DAG bytes and reads a reused leaf once
+  ---
+  duration_ms: 42.484091
+  type: 'test'
+  ...
+# Subtest: pre-aborted reads preserve the exact reason without starting a client operation
+ok 4 - pre-aborted reads preserve the exact reason without starting a client operation
+  ---
+  duration_ms: 0.391972
+  type: 'test'
+  ...
+# Subtest: abort settles an uncooperative metadata read and discards its late response
+ok 5 - abort settles an uncooperative metadata read and discards its late response
+  ---
+  duration_ms: 6.583866
+  type: 'test'
+  ...
+# Subtest: cancelled pointer pagination preserves the abort reason and does not start descriptor fallback
+ok 6 - cancelled pointer pagination preserves the abort reason and does not start descriptor fallback
+  ---
+  duration_ms: 2.690395
+  type: 'test'
+  ...
+# Subtest: abort settles pending decompression and discards a late valid result
+ok 7 - abort settles pending decompression and discards a late valid result
+  ---
+  duration_ms: 2.291044
+  type: 'test'
+  ...
+# Subtest: abort settles pending decompression and discards a late failure
+ok 8 - abort settles pending decompression and discards a late failure
+  ---
+  duration_ms: 1.592651
+  type: 'test'
+  ...
+# Subtest: decompression that aborts while returning bytes cannot report a successful read
+ok 9 - decompression that aborts while returning bytes cannot report a successful read
+  ---
+  duration_ms: 0.898929
+  type: 'test'
+  ...
+# Subtest: default gzip decoding still verifies the exact decoded payload
+ok 10 - default gzip decoding still verifies the exact decoded payload
+  ---
+  duration_ms: 183.394254
+  type: 'test'
+  ...
+# Subtest: abort interrupts a pending custom digest without accepting a late valid hash
+ok 11 - abort interrupts a pending custom digest without accepting a late valid hash
+  ---
+  duration_ms: 3.454255
+  type: 'test'
+  ...
+# Subtest: carrier fanout shares one abort listener and starts no further reads after cancellation
+ok 12 - carrier fanout shares one abort listener and starts no further reads after cancellation
+  ---
+  duration_ms: 36.696133
+  type: 'test'
+  ...
+# Subtest: sprite emitter identity matches the Solidity fixed-width event seed vector
+ok 13 - sprite emitter identity matches the Solidity fixed-width event seed vector
+  ---
+  duration_ms: 99.81509
+  type: 'test'
+  ...
+# Subtest: viewer root exports URI source policy for application consumers
+ok 14 - viewer root exports URI source policy for application consumers
+  ---
+  duration_ms: 8.27362
+  type: 'test'
+  ...
+# Subtest: viewer decodes the one canonical Inline graph as its HTML entrypoint
+ok 15 - viewer decodes the one canonical Inline graph as its HTML entrypoint
+  ---
+  duration_ms: 308.571461
+  type: 'test'
+  ...
+# Subtest: viewer decodes a compact percent Inline graph without an inner Base64 document
+ok 16 - viewer decodes a compact percent Inline graph without an inner Base64 document
+  ---
+  duration_ms: 572.918508
+  type: 'test'
+  ...
+# Subtest: stake objects gate the staked entrypoint and expose global/token counters
+ok 17 - stake objects gate the staked entrypoint and expose global/token counters
+  ---
+  duration_ms: 157.77893
+  type: 'test'
+  ...
+# Subtest: official Ethereum and Tezos stake readers expose identical map, character, and global accounting
+ok 18 - official Ethereum and Tezos stake readers expose identical map, character, and global accounting
+  ---
+  duration_ms: 85.680804
+  type: 'test'
+  ...
+# Subtest: IP-control readers keep Ethereum and Tezos license/policy reads on their exact registries
+ok 19 - IP-control readers keep Ethereum and Tezos license/policy reads on their exact registries
+  ---
+  duration_ms: 9.417246
+  type: 'test'
+  ...
+# Subtest: resolver verifies all resources and creates an audit trail
+ok 20 - resolver verifies all resources and creates an audit trail
+  ---
+  duration_ms: 7.450696
+  type: 'test'
+  ...
+# Subtest: resolver fails closed until an exact Library policy and graph binding grants access
+ok 21 - resolver fails closed until an exact Library policy and graph binding grants access
+  ---
+  duration_ms: 18.323556
+  type: 'test'
+  ...
+# Subtest: resolver rejects a corrupt source and uses the next verified fallback
+ok 22 - resolver rejects a corrupt source and uses the next verified fallback
+  ---
+  duration_ms: 3.741963
+  type: 'test'
+  ...
+# Subtest: verified gateway exposes only committed aliases and never falls through to the network
+ok 23 - verified gateway exposes only committed aliases and never falls through to the network
+  ---
+  duration_ms: 3.226667
+  type: 'test'
+  ...
+# Subtest: Fetch API gateway adapter serves only verified manifest-scoped routes
+ok 24 - Fetch API gateway adapter serves only verified manifest-scoped routes
+  ---
+  duration_ms: 70.778787
+  type: 'test'
+  ...
+# Subtest: marketplace API verifies exact bytes and committed optimized derivatives
+ok 25 - marketplace API verifies exact bytes and committed optimized derivatives
+  ---
+  duration_ms: 14.098307
+  type: 'test'
+  ...
+# Subtest: sandbox injects the small immutable Keel caller API
+ok 26 - sandbox injects the small immutable Keel caller API
+  ---
+  duration_ms: 4.759817
+  type: 'test'
+  ...
+# Subtest: host capabilityCeiling clamps sandbox browser capabilities without touching composition
+ok 27 - host capabilityCeiling clamps sandbox browser capabilities without touching composition
+  ---
+  duration_ms: 5.664346
+  type: 'test'
+  ...
+# Subtest: declared external URLs become local verified aliases instead of runtime network permissions
+ok 28 - declared external URLs become local verified aliases instead of runtime network permissions
+  ---
+  duration_ms: 10.728686
+  type: 'test'
+  ...
+# Subtest: sandbox wraps doctype-only HTML so CSP cannot be skipped
+ok 29 - sandbox wraps doctype-only HTML so CSP cannot be skipped
+  ---
+  duration_ms: 3.011154
+  type: 'test'
+  ...
+# Subtest: source playback can preserve literal reader aliases without changing the verified gateway or sandbox
+ok 30 - source playback can preserve literal reader aliases without changing the verified gateway or sandbox
+  ---
+  duration_ms: 7.097283
+  type: 'test'
+  ...
+# Subtest: sandbox materializes static virtual routes and blocks all raw creator networking
+ok 31 - sandbox materializes static virtual routes and blocks all raw creator networking
+  ---
+  duration_ms: 2.002014
+  type: 'test'
+  ...
+# Subtest: sandbox exposes only a validated pinned Keel chain context
+ok 32 - sandbox exposes only a validated pinned Keel chain context
+  ---
+  duration_ms: 401.539176
+  type: 'test'
+  ...
+# Subtest: viewer verification host state is ordered while an optional child handshake stays non-fatal
+ok 33 - viewer verification host state is ordered while an optional child handshake stays non-fatal
+  ---
+  duration_ms: 1.878636
+  type: 'test'
+  ...
+# Subtest: viewer verification host transition space never verifies before the first valid ready
+ok 34 - viewer verification host transition space never verifies before the first valid ready
+  ---
+  duration_ms: 140.606138
+  type: 'test'
+  ...
+# Subtest: recursive KeelHold reader verifies leaf and composite objects
+ok 35 - recursive KeelHold reader verifies leaf and composite objects
+  ---
+  duration_ms: 12.057602
+  type: 'test'
+  ...
+# Subtest: recursive KeelHold reader falls back to verified immutable descriptors
+ok 36 - recursive KeelHold reader falls back to verified immutable descriptors
+  ---
+  duration_ms: 8.620103
+  type: 'test'
+  ...
+# Subtest: manifest loader verifies RFC 8785 JSON and resolves relative resources
+ok 37 - manifest loader verifies RFC 8785 JSON and resolves relative resources
+  ---
+  duration_ms: 14.400078
+  type: 'test'
+  ...
+# Subtest: manifest loader resolves a canonical KeelIndex URI directly from KeelHold without HTTP
+ok 38 - manifest loader resolves a canonical KeelIndex URI directly from KeelHold without HTTP
+  ---
+  duration_ms: 4.539589
+  type: 'test'
+  ...
+# Subtest: registry adapter performs explicit active and confirmation contract calls
+ok 39 - registry adapter performs explicit active and confirmation contract calls
+  ---
+  duration_ms: 0.6749
+  type: 'test'
+  ...
+# Subtest: registry resolution enforces contract -> manifest -> resource commitment chain
+ok 40 - registry resolution enforces contract -> manifest -> resource commitment chain
+  ---
+  duration_ms: 15.798451
+  type: 'test'
+  ...
+# Subtest: registry-trusted manifests cannot mount through an unanchored resolver path
+ok 41 - registry-trusted manifests cannot mount through an unanchored resolver path
+  ---
+  duration_ms: 1.403932
+  type: 'test'
+  ...
+# Subtest: sandbox recursively materializes nested text resource references
+ok 42 - sandbox recursively materializes nested text resource references
+  ---
+  duration_ms: 2.972561
+  type: 'test'
+  ...
+# Subtest: sandbox resolves creator imports through committed module file aliases
+ok 43 - sandbox resolves creator imports through committed module file aliases
+  ---
+  duration_ms: 3.424683
+  type: 'test'
+  ...
+# Subtest: sandbox enables WebAssembly only when explicitly declared
+ok 44 - sandbox enables WebAssembly only when explicitly declared
+  ---
+  duration_ms: 2.864578
+  type: 'test'
+  ...
+# Subtest: sandbox mounts manifest-declared Flash through verified Ruffle resources without a nested SWF frame
+ok 45 - sandbox mounts manifest-declared Flash through verified Ruffle resources without a nested SWF frame
+  ---
+  duration_ms: 46.203521
+  type: 'test'
+  ...
+# Subtest: portable viewer mirrors are hash verified and launch templates remain host-independent
+ok 46 - portable viewer mirrors are hash verified and launch templates remain host-independent
+  ---
+  duration_ms: 2.571024
+  type: 'test'
+  ...
+# Subtest: Electron guard denies all renderer egress below the iframe sandbox
+ok 47 - Electron guard denies all renderer egress below the iframe sandbox
+  ---
+  duration_ms: 0.400853
+  type: 'test'
+  ...
+# Subtest: Harness return order preserves distinct revisions through the viewer (tuple)
+ok 48 - Harness return order preserves distinct revisions through the viewer (tuple)
+  ---
+  duration_ms: 13.695731
+  type: 'test'
+  ...
+# Subtest: Harness return order preserves distinct revisions through the viewer (named)
+ok 49 - Harness return order preserves distinct revisions through the viewer (named)
+  ---
+  duration_ms: 4.453044
+  type: 'test'
+  ...
+# Subtest: Keel link decoding covers every locator and its own compression tags
+ok 50 - Keel link decoding covers every locator and its own compression tags
+  ---
+  duration_ms: 37.773648
+  type: 'test'
+  ...
+# Subtest: Keel reads the chain by default and never touches the declared mirror
+ok 51 - Keel reads the chain by default and never touches the declared mirror
+  ---
+  duration_ms: 3.745003
+  type: 'test'
+  ...
+# Subtest: Keel native binding overrides a caller requesting a remote mirror
+ok 52 - Keel native binding overrides a caller requesting a remote mirror
+  ---
+  duration_ms: 3.317825
+  type: 'test'
+  ...
+# Subtest: Keel live injection pins reads while exposing only manifest-declared context fields
+ok 53 - Keel live injection pins reads while exposing only manifest-declared context fields
+  ---
+  duration_ms: 4.64341
+  type: 'test'
+  ...
+# Subtest: production Keel receipt injection consumes one pinned current onchain inspection
+ok 54 - production Keel receipt injection consumes one pinned current onchain inspection
+  ---
+  duration_ms: 6.709108
+  type: 'test'
+  ...
+# Subtest: production Keel receipt injection surfaces stale, revoked, changed, red, and content-only states
+ok 55 - production Keel receipt injection surfaces stale, revoked, changed, red, and content-only states
+  ---
+  duration_ms: 12.079224
+  type: 'test'
+  ...
+# Subtest: production Keel receipt injection rejects a missing or substituted receipt
+ok 56 - production Keel receipt injection rejects a missing or substituted receipt
+  ---
+  duration_ms: 15.481351
+  type: 'test'
+  ...
+# Subtest: direct Keel character resolution injects the committed onchain recipe without a host overlay
+ok 57 - direct Keel character resolution injects the committed onchain recipe without a host overlay
+  ---
+  duration_ms: 22.093829
+  type: 'test'
+  ...
+# Subtest: one collection-scoped Keel viewer resolves each anchored character without a per-token manifest
+ok 58 - one collection-scoped Keel viewer resolves each anchored character without a per-token manifest
+  ---
+  duration_ms: 14.667191
+  type: 'test'
+  ...
+# Subtest: direct Keel map resolution injects the staked runtime recipe and map seed without Studio state
+ok 59 - direct Keel map resolution injects the staked runtime recipe and map seed without Studio state
+  ---
+  duration_ms: 9.241385
+  type: 'test'
+  ...
+# Subtest: Keel replay requires the contract-derived seed and a pinned exact viewer snapshot
+ok 60 - Keel replay requires the contract-derived seed and a pinned exact viewer snapshot
+  ---
+  duration_ms: 17.293957
+  type: 'test'
+  ...
+# Subtest: Keel exact equipment overlays a manifest resource only after loadout and source agreement
+ok 61 - Keel exact equipment overlays a manifest resource only after loadout and source agreement
+  ---
+  duration_ms: 4.872299
+  type: 'test'
+  ...
+# Subtest: recursive plugin verifier binds manifest, graph, trust, runtime code, installed wallet bytes, and intents
+ok 62 - recursive plugin verifier binds manifest, graph, trust, runtime code, installed wallet bytes, and intents
+  ---
+  duration_ms: 14.371116
+  type: 'test'
+  ...
+# Subtest: recursive plugin verifier rejects a host wallet build not pinned by the sanctioned graph
+ok 63 - recursive plugin verifier rejects a host wallet build not pinned by the sanctioned graph
+  ---
+  duration_ms: 20.068335
+  type: 'test'
+  ...
+# Subtest: plugin frame parser accepts only symbolic session-bound market intents
+ok 64 - plugin frame parser accepts only symbolic session-bound market intents
+  ---
+  duration_ms: 0.893471
+  type: 'test'
+  ...
+# Subtest: editor preview decodes the default saver without adding a Base64 document
+ok 65 - editor preview decodes the default saver without adding a Base64 document
+  ---
+  duration_ms: 8.857941
+  type: 'test'
+  ...
+# Subtest: published read requires manifest enablement before any chain read
+ok 66 - published read requires manifest enablement before any chain read
+  ---
+  duration_ms: 11.521464
+  type: 'test'
+  ...
+# Subtest: published read preserves host denial before verification networking
+ok 67 - published read preserves host denial before verification networking
+  ---
+  duration_ms: 7.08618
+  type: 'test'
+  ...
+# Subtest: published view verifies registry and pins target, selector and block
+ok 68 - published view verifies registry and pins target, selector and block
+  ---
+  duration_ms: 10.598609
+  type: 'test'
+  ...
+# Subtest: a post-verification manifest toggle cannot enable network reads
+ok 69 - a post-verification manifest toggle cannot enable network reads
+  ---
+  duration_ms: 3.97159
+  type: 'test'
+  ...
+# Subtest: native plugin marker matches the deployed registry protocol domain
+ok 70 - native plugin marker matches the deployed registry protocol domain
+  ---
+  duration_ms: 0.24408
+  type: 'test'
+  ...
+# Subtest: native revision cannot reconnect declared remote or foreign-chain sources: {"gatewayTransport":"preferred"}
+ok 71 - native revision cannot reconnect declared remote or foreign-chain sources: {"gatewayTransport":"preferred"}
+  ---
+  duration_ms: 5.656885
+  type: 'test'
+  ...
+# Subtest: native revision cannot reconnect declared remote or foreign-chain sources: {"gatewayTransport":"fallback"}
+ok 72 - native revision cannot reconnect declared remote or foreign-chain sources: {"gatewayTransport":"fallback"}
+  ---
+  duration_ms: 8.27203
+  type: 'test'
+  ...
+# Subtest: native revision cannot reconnect declared remote or foreign-chain sources: {"sourcePreference":"hybrid-first"}
+ok 73 - native revision cannot reconnect declared remote or foreign-chain sources: {"sourcePreference":"hybrid-first"}
+  ---
+  duration_ms: 5.0011
+  type: 'test'
+  ...
+# Subtest: native binding rejects a URL added after the revision manifest was committed
+ok 74 - native binding rejects a URL added after the revision manifest was committed
+  ---
+  duration_ms: 2.239646
+  type: 'test'
+  ...
+# Subtest: native binding snapshots declarations before asynchronous chain reads
+ok 75 - native binding snapshots declarations before asynchronous chain reads
+  ---
+  duration_ms: 2.264151
+  type: 'test'
+  ...
+# Subtest: viewer resolves a pinned child Harness base before resource binding
+ok 76 - viewer resolves a pinned child Harness base before resource binding
+  ---
+  duration_ms: 3.518504
+  type: 'test'
+  ...
+# Subtest: viewer resolves a pinned child Harness fork before resource binding
+ok 77 - viewer resolves a pinned child Harness fork before resource binding
+  ---
+  duration_ms: 2.065612
+  type: 'test'
+  ...
+# Subtest: logical release disclosure reads the pinned token (token manifest)
+ok 78 - logical release disclosure reads the pinned token (token manifest)
+  ---
+  duration_ms: 6.813
+  type: 'test'
+  ...
+# Subtest: logical release disclosure reads the pinned token (collection manifest)
+ok 79 - logical release disclosure reads the pinned token (collection manifest)
+  ---
+  duration_ms: 3.203271
+  type: 'test'
+  ...
+# Subtest: sandbox rejects forged supply labels and mismatched snapshot identity
+ok 80 - sandbox rejects forged supply labels and mismatched snapshot identity
+  ---
+  duration_ms: 3.947208
+  type: 'test'
+  ...
+1..80
+# tests 80
+# suites 0
+# pass 80
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 21458.19543

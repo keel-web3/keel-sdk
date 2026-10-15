@@ -1,0 +1,35 @@
+{
+  "reproducedAndFixed": [
+    {
+      "case": "Fresh modular playback ordering",
+      "observed": "Actual browser failed because game.js ran before imported math.js; answer binding was undefined.",
+      "fix": "Dependency-first emitted descriptors; original source/inventory/physical pack order and canonical runtime preserved. Unsupported cycles/undeclared imports reject early."
+    },
+    {
+      "case": "Buffer mutation during storage read",
+      "observed": "A pending source changed42 to77 through Buffer.slice aliasing.",
+      "fix": "True early source copies."
+    },
+    {
+      "case": "Poster and policy mutation during storage read",
+      "observed": "Changed poster/MIME/chain/policy affected pending preparation.",
+      "fix": "Early source/alias/poster/scalar snapshots."
+    },
+    {
+      "case": "Publication replacement during authentication",
+      "observed": "Actual outer authenticated route consumed changed Raw/source policy after its first RPC awaited.",
+      "fix": "Bounded outer-entry publication snapshot, captured pool, frozen parsed index, copied selection; two pending-auth regressions."
+    },
+    {
+      "case": "Test discovery",
+      "observed": "Five new suites were unclassified, failing3 classification checks.",
+      "fix": "Four deterministic and one actual browser suite explicitly classified."
+    }
+  ],
+  "harnessIssues": {
+    "transientEmit": "A custom NodeNext transpile briefly created CommonJS; repaired and superseded by final normal TypeScript build. Import-startup failures are not production behavioral failures.",
+    "browserStartup": "Loaded environment exceeded initial10-second Chrome startup; configurable bounded startup deadline used. Per-observation verification assertions remain unchanged.",
+    "browserBackground": "Scriptless/no-assets control also produced denied Google CONNECT. Every proxy observation remains logged. Artwork CDP and origin-attributed netlog assertions stay strict; unknown/opaque initiators and actual blocked main/child requests are tested without hostname exemptions.",
+    "legacyWrapperDependency": "Legacy wrapper test required the already-installed sibling Studio Brotli decoder through an ignored local dependency alias. No dependency version or source was substituted."
+  }
+}

@@ -1,0 +1,622 @@
+TAP version 13
+# Subtest: shared planner no longer auto-acknowledges a fresh Base64 carriage
+ok 1 - shared planner no longer auto-acknowledges a fresh Base64 carriage
+  ---
+  duration_ms: 1914.80406
+  type: 'test'
+  ...
+# Subtest: environment configuration cannot bypass fresh encoding review
+ok 2 - environment configuration cannot bypass fresh encoding review
+  ---
+  duration_ms: 1.389707
+  type: 'test'
+  ...
+# Subtest: complete compact COPY retains exact prepared bytes and binds the plan
+ok 3 - complete compact COPY retains exact prepared bytes and binds the plan
+  ---
+  duration_ms: 1174.638702
+  type: 'test'
+  ...
+# Subtest: complete pinned COPY retains exact prepared bytes and binds the plan
+ok 4 - complete pinned COPY retains exact prepared bytes and binds the plan
+  ---
+  duration_ms: 480.079181
+  type: 'test'
+  ...
+# Subtest: complete percent COPY retains exact prepared bytes and binds the plan
+ok 5 - complete percent COPY retains exact prepared bytes and binds the plan
+  ---
+  duration_ms: 968.973086
+  type: 'test'
+  ...
+# Subtest: SDK refuses a prepared viewer plan with missing full-return evidence
+ok 6 - SDK refuses a prepared viewer plan with missing full-return evidence
+  ---
+  duration_ms: 1606.927082
+  type: 'test'
+  ...
+# Subtest: SDK stops a different return, transport or source before producing a plan
+ok 7 - SDK stops a different return, transport or source before producing a plan
+  ---
+  duration_ms: 1152.111991
+  type: 'test'
+  ...
+# Subtest: COPY checks are commitment-bound and cannot be stripped or moved to another chain/store
+ok 8 - COPY checks are commitment-bound and cannot be stripped or moved to another chain/store
+  ---
+  duration_ms: 640.686879
+  type: 'test'
+  ...
+# Subtest: read caps use the selected chain boundary and never stand in for authenticated gas proof
+ok 9 - read caps use the selected chain boundary and never stand in for authenticated gas proof
+  ---
+  duration_ms: 634.909973
+  type: 'test'
+  ...
+# Subtest: fresh MCP cannot select an alternative carriage under another presentation label
+ok 10 - fresh MCP cannot select an alternative carriage under another presentation label
+  ---
+  duration_ms: 713.602377
+  type: 'test'
+  ...
+# Subtest: MCP publish-plan requires evidence, reruns the SDK gate and rejects file tampering
+ok 11 - MCP publish-plan requires evidence, reruns the SDK gate and rejects file tampering
+  ---
+  duration_ms: 1519.503092
+  type: 'test'
+  ...
+# Subtest: publication rejects browser-tolerated unescaped outer metadata
+ok 12 - publication rejects browser-tolerated unescaped outer metadata
+  ---
+  duration_ms: 588.260572
+  type: 'test'
+  ...
+# Subtest: publication rejects unescaped animation even when outer metadata is escaped
+ok 13 - publication rejects unescaped animation even when outer metadata is escaped
+  ---
+  duration_ms: 669.971791
+  type: 'test'
+  ...
+# Subtest: MCP publication check rejects unescaped characters at either URI boundary
+ok 14 - MCP publication check rejects unescaped characters at either URI boundary
+  ---
+  duration_ms: 1831.298457
+  type: 'test'
+  ...
+# Subtest: creator files automatically become modular Brotli/Base90 COPY objects with exact table commitments
+ok 15 - creator files automatically become modular Brotli/Base90 COPY objects with exact table commitments
+  ---
+  duration_ms: 2056.128299
+  type: 'test'
+  ...
+# Subtest: missing or duplicate entrypoints, empty resources and unsupported bindings reject before publication
+ok 16 - missing or duplicate entrypoints, empty resources and unsupported bindings reject before publication
+  ---
+  duration_ms: 2.338829
+  type: 'test'
+  ...
+# Subtest: address spelling cannot change registered shell bytes or container commitments
+ok 17 - address spelling cannot change registered shell bytes or container commitments
+  ---
+  duration_ms: 3410.948439
+  type: 'test'
+  ...
+# Subtest: shared creator compression default and explicit Off retain resource identity and account for decoder overhead
+ok 18 - shared creator compression default and explicit Off retain resource identity and account for decoder overhead
+  ---
+  duration_ms: 3603.732405
+  type: 'test'
+  ...
+# Subtest: fresh text is byte-identical through the stored slot, script JSON and both URI layers
+ok 19 - fresh text is byte-identical through the stored slot, script JSON and both URI layers
+  ---
+  duration_ms: 96.072081
+  type: 'test'
+  ...
+# Subtest: fresh canonical graph refuses hidden compressed Base64 body under raw-percent outer HTML
+ok 20 - fresh canonical graph refuses hidden compressed Base64 body under raw-percent outer HTML
+  ---
+  duration_ms: 3904.570922
+  type: 'test'
+  ...
+# Subtest: audit measures base64 inflation while fresh publication rejects it
+ok 21 - audit measures base64 inflation while fresh publication rejects it
+  ---
+  duration_ms: 37.71083
+  type: 'test'
+  ...
+# Subtest: audit measures hex inflation while fresh publication rejects it
+ok 22 - audit measures hex inflation while fresh publication rejects it
+  ---
+  duration_ms: 33.518702
+  type: 'test'
+  ...
+# Subtest: a compressed child cannot bypass the body policy by claiming to be an image
+ok 23 - a compressed child cannot bypass the body policy by claiming to be an image
+  ---
+  duration_ms: 1.65621
+  type: 'test'
+  ...
+# Subtest: actual direct image carriage retains original bytes
+ok 24 - actual direct image carriage retains original bytes
+  ---
+  duration_ms: 1.705605
+  type: 'test'
+  ...
+# Subtest: audit rejects headers and URL delimiters that would make native decoding differ
+ok 25 - audit rejects headers and URL delimiters that would make native decoding differ
+  ---
+  duration_ms: 1.787945
+  type: 'test'
+  ...
+# Subtest: text byte corruption, conflicting representations and false compression fail
+ok 26 - text byte corruption, conflicting representations and false compression fail
+  ---
+  duration_ms: 14.920597
+  type: 'test'
+  ...
+# Subtest: serialized fresh-plan audit derives representation policy and totals instead of trusting flags
+ok 27 - serialized fresh-plan audit derives representation policy and totals instead of trusting flags
+  ---
+  duration_ms: 7.918463
+  type: 'test'
+  ...
+# Subtest: public audit pins the full call to a block, rechecks identity and never signs or submits
+ok 28 - public audit pins the full call to a block, rechecks identity and never signs or submits
+  ---
+  duration_ms: 277.768736
+  type: 'test'
+  ...
+# Subtest: public read rejects chain drift, block drift, ABI corruption and oversize before evidence
+ok 29 - public read rejects chain drift, block drift, ABI corruption and oversize before evidence
+  ---
+  duration_ms: 428.607226
+  type: 'test'
+  ...
+# Subtest: MCP exposes the body rule and a read-only public-token audit, and blocks explicit encoded preparation
+ok 30 - MCP exposes the body rule and a read-only public-token audit, and blocks explicit encoded preparation
+  ---
+  duration_ms: 14.865195
+  type: 'test'
+  ...
+# Subtest: one shared default and explicit Raw reject stale/invalid overrides
+ok 31 - one shared default and explicit Raw reject stale/invalid overrides
+  ---
+  duration_ms: 2.166843
+  type: 'test'
+  ...
+# Subtest: flat and recursive plans store native bytes once; Raw is byte-identical
+ok 32 - flat and recursive plans store native bytes once; Raw is byte-identical
+  ---
+  duration_ms: 547.819391
+  type: 'test'
+  ...
+# Subtest: Studio-core records the effective mode and preserves supplied binary/UTF-8
+ok 33 - Studio-core records the effective mode and preserves supplied binary/UTF-8
+  ---
+  duration_ms: 42.404883
+  type: 'test'
+  ...
+# Subtest: SDK handoff carries storage and shell choices independently
+ok 34 - SDK handoff carries storage and shell choices independently
+  ---
+  duration_ms: 129.472054
+  type: 'test'
+  ...
+# Subtest: Inline local slots honor Raw, no-growth Compact, and parent Raw precedence
+ok 35 - Inline local slots honor Raw, no-growth Compact, and parent Raw precedence
+  ---
+  duration_ms: 1900.13638
+  type: 'test'
+  ...
+# Subtest: MCP handshake, tool schemas, and native upload planning share the real default
+ok 36 - MCP handshake, tool schemas, and native upload planning share the real default
+  ---
+  duration_ms: 227.61744
+  type: 'test'
+  ...
+# Subtest: standard basE91 known vector and distinct versioned Base90 alphabet
+ok 37 - standard basE91 known vector and distinct versioned Base90 alphabet
+  ---
+  duration_ms: 42.259685
+  type: 'test'
+  ...
+# Subtest: all single-byte values, all pairs and variable-bit tail lengths round-trip
+ok 38 - all single-byte values, all pairs and variable-bit tail lengths round-trip
+  ---
+  duration_ms: 3701.300401
+  type: 'test'
+  ...
+# Subtest: foreign characters, invalid profiles, truncated/oversized output and dirty tail fail closed
+ok 39 - foreign characters, invalid profiles, truncated/oversized output and dirty tail fail closed
+  ---
+  duration_ms: 15.117647
+  type: 'test'
+  ...
+# Subtest: optional browser module reconstructs bytes without Buffer, atob or compression dependencies
+ok 40 - optional browser module reconstructs bytes without Buffer, atob or compression dependencies
+  ---
+  duration_ms: 121.633926
+  type: 'test'
+  ...
+# Subtest: paired wrapper survives both URI/JSON layers, closes script sentinels and preserves Unicode
+ok 41 - paired wrapper survives both URI/JSON layers, closes script sentinels and preserves Unicode
+  ---
+  duration_ms: 120.125962
+  type: 'test'
+  ...
+# Subtest: Base90 punctuation gets strict URI escaping through both layers
+ok 42 - Base90 punctuation gets strict URI escaping through both layers
+  ---
+  duration_ms: 25.288404
+  type: 'test'
+  ...
+# Subtest: strict URI audit flags browser-tolerated characters and malformed escapes
+ok 43 - strict URI audit flags browser-tolerated characters and malformed escapes
+  ---
+  duration_ms: 4.609371
+  type: 'test'
+  ...
+# Subtest: default Compact uses actual compatible Brotli/Dense legacy envelope and preserves exact source/poster
+ok 44 - default Compact uses actual compatible Brotli/Dense legacy envelope and preserves exact source/poster
+  ---
+  duration_ms: 1421.728021
+  type: 'test'
+  ...
+# Subtest: auto keeps nonbeneficial exact bytes; explicit codec choices and Raw are preserved
+ok 45 - auto keeps nonbeneficial exact bytes; explicit codec choices and Raw are preserved
+  ---
+  duration_ms: 10139.605269
+  type: 'test'
+  ...
+# Subtest: 40/41,128/129,256 and configured1024 logical resources retain IDs/order without expanding the64-part root
+ok 46 - 40/41,128/129,256 and configured1024 logical resources retain IDs/order without expanding the64-part root
+  ---
+  duration_ms: 19801.319902
+  type: 'test'
+  ...
+# Subtest: large sources are segmented without changing original identity or adding an aggregate32MiB limit
+ok 47 - large sources are segmented without changing original identity or adding an aggregate32MiB limit
+  ---
+  duration_ms: 5227.068708
+  type: 'test'
+  ...
+# Subtest: new profile rejects changed outer execution, missing/context impersonation and conflicting namespaces
+ok 48 - new profile rejects changed outer execution, missing/context impersonation and conflicting namespaces
+  ---
+  duration_ms: 1065.03606
+  type: 'test'
+  ...
+# Subtest: existing registered text modules keep exact fragment bytes and data/module playback order
+ok 49 - existing registered text modules keep exact fragment bytes and data/module playback order
+  ---
+  duration_ms: 868.255673
+  type: 'test'
+  ...
+# Subtest: existing compressed bytes stay exact and new512KiB leaves retain mixed none/Brotli selection
+ok 50 - existing compressed bytes stay exact and new512KiB leaves retain mixed none/Brotli selection
+  ---
+  duration_ms: 3453.009831
+  type: 'test'
+  ...
+# Subtest: new explicit shared-image program remains the uncompressed Studio entrypoint and image bytes exist once
+ok 51 - new explicit shared-image program remains the uncompressed Studio entrypoint and image bytes exist once
+  ---
+  duration_ms: 3096.544116
+  type: 'test'
+  ...
+# Subtest: shared native image program retains the exact complete original resource table and stores image payload once
+ok 52 - shared native image program retains the exact complete original resource table and stores image payload once
+  ---
+  duration_ms: 1164.154484
+  type: 'test'
+  ...
+# Subtest: encoded image upload, unknown image binding and tampered source objects fail closed
+ok 53 - encoded image upload, unknown image binding and tampered source objects fail closed
+  ---
+  duration_ms: 1133.966159
+  type: 'test'
+  ...
+# Subtest: CSS url grammar handles escaped filenames, quotes and escaped parentheses without changing unrelated text
+ok 54 - CSS url grammar handles escaped filenames, quotes and escaped parentheses without changing unrelated text
+  ---
+  duration_ms: 4.443415
+  type: 'test'
+  ...
+# Subtest: explicit Raw/compressed image choices and unsupported metadata bindings remain explicit
+ok 55 - explicit Raw/compressed image choices and unsupported metadata bindings remain explicit
+  ---
+  duration_ms: 2.754104
+  type: 'test'
+  ...
+# Subtest: COPY fragment preparation round-trips URI-valid characters rejected by deployed older readers
+ok 56 - COPY fragment preparation round-trips URI-valid characters rejected by deployed older readers
+  ---
+  duration_ms: 38.002205
+  type: 'test'
+  ...
+# Subtest: fresh preparation compresses with Brotli before Base90 and nested escaping; incompressible and explicit none stay uncompressed
+ok 57 - fresh preparation compresses with Brotli before Base90 and nested escaping; incompressible and explicit none stay uncompressed
+  ---
+  duration_ms: 107.168049
+  type: 'test'
+  ...
+# Subtest: prepared dense shell defaults to escaped Base90 and rejects incompatible explicit choices
+ok 58 - prepared dense shell defaults to escaped Base90 and rejects incompatible explicit choices
+  ---
+  duration_ms: 781.625771
+  type: 'test'
+  ...
+# Subtest: base90: inspect literal shell framing and exact packed commitments without execution
+ok 59 - base90: inspect literal shell framing and exact packed commitments without execution
+  ---
+  duration_ms: 397.461281
+  type: 'test'
+  ...
+# Subtest: base91: inspect literal shell framing and exact packed commitments without execution
+ok 60 - base91: inspect literal shell framing and exact packed commitments without execution
+  ---
+  duration_ms: 272.616104
+  type: 'test'
+  ...
+# Subtest: base90-block: inspect literal shell framing and exact packed commitments without execution
+ok 61 - base90-block: inspect literal shell framing and exact packed commitments without execution
+  ---
+  duration_ms: 257.983722
+  type: 'test'
+  ...
+# Subtest: uri81: inspect literal shell framing and exact packed commitments without execution
+ok 62 - uri81: inspect literal shell framing and exact packed commitments without execution
+  ---
+  duration_ms: 917.626393
+  type: 'test'
+  ...
+# Subtest: question marks and following markup survive both URL parsers byte for byte
+ok 63 - question marks and following markup survive both URL parsers byte for byte
+  ---
+  duration_ms: 293.040984
+  type: 'test'
+  ...
+# Subtest: prepared body is readable through standard metadata and HTML data URIs
+ok 64 - prepared body is readable through standard metadata and HTML data URIs
+  ---
+  duration_ms: 650.023307
+  type: 'test'
+  ...
+# Subtest: gzip shell boot restores the exact canonical document in a browser-compatible environment
+ok 65 - gzip shell boot restores the exact canonical document in a browser-compatible environment
+  ---
+  duration_ms: 1320.972357
+  type: 'test'
+  ...
+# Subtest: publication inspection accepts byte-preserving query normalization and rejects byte loss
+ok 66 - publication inspection accepts byte-preserving query normalization and rejects byte loss
+  ---
+  duration_ms: 1.891146
+  type: 'test'
+  ...
+# Subtest: prepared fragment decodes JSON escapes and both percent layers exactly
+ok 67 - prepared fragment decodes JSON escapes and both percent layers exactly
+  ---
+  duration_ms: 6.592969
+  type: 'test'
+  ...
+# Subtest: default compression quality is pinned and auto compares exact paid carrier bytes
+ok 68 - default compression quality is pinned and auto compares exact paid carrier bytes
+  ---
+  duration_ms: 112.735083
+  type: 'test'
+  ...
+# Subtest: large decoded sources may compress into bounded stored carriers without encoding an illegal raw baseline
+ok 69 - large decoded sources may compress into bounded stored carriers without encoding an illegal raw baseline
+  ---
+  duration_ms: 481.428992
+  type: 'test'
+  ...
+# Subtest: an oversized compression candidate cannot invalidate a legal raw carrier
+ok 70 - an oversized compression candidate cannot invalidate a legal raw carrier
+  ---
+  duration_ms: 22574.423775
+  type: 'test'
+  ...
+# Subtest: auto rejects a smaller compressed binary when its exact paid escaped carrier is larger
+ok 71 - auto rejects a smaller compressed binary when its exact paid escaped carrier is larger
+  ---
+  duration_ms: 4.778012
+  type: 'test'
+  ...
+# Subtest: studio-core creates safe names and compression summaries
+ok 72 - studio-core creates safe names and compression summaries
+  ---
+  duration_ms: 9.160476
+  type: 'test'
+  ...
+# Subtest: canonical Inline graph is the entrypoint and never generates a replacement index.html
+ok 73 - canonical Inline graph is the entrypoint and never generates a replacement index.html
+  ---
+  duration_ms: 66.361259
+  type: 'test'
+  ...
+# Subtest: compact percent Inline graph stays the exact uncompressed entrypoint
+ok 74 - compact percent Inline graph stays the exact uncompressed entrypoint
+  ---
+  duration_ms: 10.348696
+  type: 'test'
+  ...
+# Subtest: studio-core wrapper uses virtual content paths only
+ok 75 - studio-core wrapper uses virtual content paths only
+  ---
+  duration_ms: 2.181117
+  type: 'test'
+  ...
+# Subtest: ordinary Keel modules select the creator media renderer without owning verification
+ok 76 - ordinary Keel modules select the creator media renderer without owning verification
+  ---
+  duration_ms: 1.39703
+  type: 'test'
+  ...
+# Subtest: SWF-only projects fail closed with a Ruffle requirement instead of a blocked nested frame
+ok 77 - SWF-only projects fail closed with a Ruffle requirement instead of a blocked nested frame
+  ---
+  duration_ms: 0.886973
+  type: 'test'
+  ...
+# Subtest: manifest-declared Flash runtime generates an in-sandbox Ruffle entrypoint
+ok 78 - manifest-declared Flash runtime generates an in-sandbox Ruffle entrypoint
+  ---
+  duration_ms: 214.013053
+  type: 'test'
+  ...
+# Subtest: studio-core emits a valid strict manifest
+ok 79 - studio-core emits a valid strict manifest
+  ---
+  duration_ms: 10.826995
+  type: 'test'
+  ...
+# Subtest: studio-core requires a verified image fallback for an HTML entrypoint
+ok 80 - studio-core requires a verified image fallback for an HTML entrypoint
+  ---
+  duration_ms: 4.326895
+  type: 'test'
+  ...
+# Subtest: studio-core rejects an explicit non-image fallback
+ok 81 - studio-core rejects an explicit non-image fallback
+  ---
+  duration_ms: 2.937176
+  type: 'test'
+  ...
+# Subtest: studio-core uses an image entrypoint as its own fallback
+ok 82 - studio-core uses an image entrypoint as its own fallback
+  ---
+  duration_ms: 19.663201
+  type: 'test'
+  ...
+# Subtest: ordinary media remains the direct entrypoint for the reusable KEEL asset-display module
+ok 83 - ordinary media remains the direct entrypoint for the reusable KEEL asset-display module
+  ---
+  duration_ms: 28.884827
+  type: 'test'
+  ...
+# Subtest: studio-core detects parent-hash reorgs
+ok 84 - studio-core detects parent-hash reorgs
+  ---
+  duration_ms: 1.205552
+  type: 'test'
+  ...
+# Subtest: studio-core prepares and verifies exact decoded and compressed bytes
+ok 85 - studio-core prepares and verifies exact decoded and compressed bytes
+  ---
+  duration_ms: 33.831509
+  type: 'test'
+  ...
+# Subtest: studio-core keeps the HTML entrypoint contract-readable for inline presentation
+ok 86 - studio-core keeps the HTML entrypoint contract-readable for inline presentation
+  ---
+  duration_ms: 3.860938
+  type: 'test'
+  ...
+# Subtest: studio-core exposes both stable IDs and real file paths to verified viewers
+ok 87 - studio-core exposes both stable IDs and real file paths to verified viewers
+  ---
+  duration_ms: 8.985117
+  type: 'test'
+  ...
+# Subtest: studio-core can explicitly prepare a frozen immutable 1/1 artifact
+ok 88 - studio-core can explicitly prepare a frozen immutable 1/1 artifact
+  ---
+  duration_ms: 24.717273
+  type: 'test'
+  ...
+# Subtest: studio-core keeps the existing creator revision default when immutable is omitted
+ok 89 - studio-core keeps the existing creator revision default when immutable is omitted
+  ---
+  duration_ms: 8.835577
+  type: 'test'
+  ...
+# Subtest: studio-core rejects immutable revisions other than the canonical 1/1 shape
+ok 90 - studio-core rejects immutable revisions other than the canonical 1/1 shape
+  ---
+  duration_ms: 7.042406
+  type: 'test'
+  ...
+# Subtest: studio-core automatically packs a complete OBJKT ZIP from resolved Keel resources
+ok 91 - studio-core automatically packs a complete OBJKT ZIP from resolved Keel resources
+  ---
+  duration_ms: 21.49182
+  type: 'test'
+  ...
+# Subtest: studio-core hybrid ZIP accepts only a self-verifying Keel entrypoint
+ok 92 - studio-core hybrid ZIP accepts only a self-verifying Keel entrypoint
+  ---
+  duration_ms: 6.481782
+  type: 'test'
+  ...
+# Subtest: studio-core rejects uncommitted insecure remote transports
+ok 93 - studio-core rejects uncommitted insecure remote transports
+  ---
+  duration_ms: 5.424718
+  type: 'test'
+  ...
+# Subtest: generated composite entrypoints omit the fictional local file source
+ok 94 - generated composite entrypoints omit the fictional local file source
+  ---
+  duration_ms: 50.233688
+  type: 'test'
+  ...
+# Subtest: pre-encoded tokenURI fragments remain exact uncompressed contract-readable bytes
+ok 95 - pre-encoded tokenURI fragments remain exact uncompressed contract-readable bytes
+  ---
+  duration_ms: 8.578415
+  type: 'test'
+  ...
+# Subtest: Keel stores an independently compressed module graph and materializes a directory without ZIP
+ok 96 - Keel stores an independently compressed module graph and materializes a directory without ZIP
+  ---
+  duration_ms: 25.867505
+  type: 'test'
+  ...
+# Subtest: Studio builds one multi-chunk OnchFS directory with Keel bindings to the same bytes
+ok 97 - Studio builds one multi-chunk OnchFS directory with Keel bindings to the same bytes
+  ---
+  duration_ms: 779.780815
+  type: 'test'
+  ...
+# Subtest: delivery planning uses measured OnchFS limits and moves larger directories to IPFS without changing storage
+ok 98 - delivery planning uses measured OnchFS limits and moves larger directories to IPFS without changing storage
+  ---
+  duration_ms: 5.788559
+  type: 'test'
+  ...
+# Subtest: cross-chain Module Catalog merges byte-identical carriers and rejects version collisions
+ok 99 - cross-chain Module Catalog merges byte-identical carriers and rejects version collisions
+  ---
+  duration_ms: 9.052096
+  type: 'test'
+  ...
+# Subtest: built-in media profiles create exact WebP derivative receipts
+ok 100 - built-in media profiles create exact WebP derivative receipts
+  ---
+  duration_ms: 79.230746
+  type: 'test'
+  ...
+# Subtest: prepared manifests commit generated media derivatives and exact output resources
+ok 101 - prepared manifests commit generated media derivatives and exact output resources
+  ---
+  duration_ms: 39.561977
+  type: 'test'
+  ...
+# Subtest: default raw-percent saver survives editor preparation without compression or a generated wrapper
+ok 102 - default raw-percent saver survives editor preparation without compression or a generated wrapper
+  ---
+  duration_ms: 9.795738
+  type: 'test'
+  ...
+1..102
+# tests 102
+# suites 0
+# pass 102
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 104928.102176

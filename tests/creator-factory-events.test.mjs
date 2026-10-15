@@ -1,3 +1,5 @@
+import { canonicalAbiEntries, readCompiledContractAbi } from "./abi-conformance.mjs";
+import { fileURLToPath } from "node:url";
 import nodeTest from 'node:test';
 import { siblingTest } from "./sibling-repository.mjs";
 const test = siblingTest(nodeTest, "keel-contracts");
@@ -16,8 +18,8 @@ const encode=(types,values)=>encodeAbiParameters(types.map(type=>({type})),value
 
 test('factory generated SDK ABI matches compiled and recorded schemas',()=>{
  const recorded=JSON.parse(readFileSync(new URL('../../keel-contracts/modules/keel-die/abi/KeelCreatorFactory.json',import.meta.url)));
- const compiled=JSON.parse(readFileSync(new URL('../../keel-contracts/out/KeelCreatorFactory.sol/KeelCreatorFactory.json',import.meta.url))).abi;
- assert.deepEqual(abi,recorded);assert.deepEqual(recorded,compiled);
+ const compiled=readCompiledContractAbi(fileURLToPath(new URL('../../keel-contracts', import.meta.url)), 'KeelCreatorFactory');
+ assert.deepEqual(abi,recorded);assert.deepEqual(canonicalAbiEntries(recorded),canonicalAbiEntries(compiled));
 });
 test('registration decodes every field for dedicated, shared and external collections',()=>{
  for(const [standard,deployment,sharedCollectionId,mintCompatible] of [[0,0,0n,true],[1,1,9n,true],[0,2,0n,false]]){

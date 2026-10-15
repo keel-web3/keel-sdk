@@ -1,0 +1,309 @@
+{
+  "schema": "keel-shared-image-actual-hold-policy@1",
+  "synthetic": true,
+  "network": "none",
+  "image": "ethereum/client-go@sha256:abf3605177f8bdcfce436985a8054cca4ae59256323a4ffb72c56c04f3d1fadd",
+  "compiler": "0.8.36+commit.8a079791.Emscripten.clang",
+  "contractSources": {
+    "/tmp/keel-shared-image-20261014/keel-sdk/packages/sdk/contracts/KeelLegacySharedImageTokenURIBuilder.sol": "1124ed40b6cac46da59e72f1fe1aae5fd75717218fd8433054d77b963db1b6a0",
+    "/tmp/keel-shared-image-20261014/keel-sdk/tests/fixtures/legacy-shared-image/LocalHold.sol": "3267ebe0a5cc12c2e175acfd609ac62a3ab308332d30deb20b244cad208b506c",
+    "/tmp/keel-shared-image-20261014/keel-sdk/tests/fixtures/legacy-shared-image/PolicyAdapters.sol": "f9e4ffacf9a5fdf81a601fb9862cb99d344a2f5c1ca959cca212b28145ef1920",
+    "/workspace/keel-contracts/src/modules/keel-hold/interfaces/IKeelHold.sol": "a8167ab1856d74db0844070861551787c105877554d43d98f3a56508ab76a0b8",
+    "/workspace/keel-contracts/src/modules/keel-hold/KeelHold.sol": "6a12b204baa5ed15f559bf7e9e6514ea37ff9cad010e1cf489871ddf9c23ed99",
+    "/workspace/keel-contracts/src/modules/keel-harness/KeelRawTokenURIBuilder.sol": "1b3a7b1a80bf71694bdcaf6b1d084f4c92838764740f0e65c9158bf8b90bb88e",
+    "/workspace/keel-contracts/src/modules/keel-hold/libraries/KeelSealValidation.sol": "0320e567b4cb4c7222c9fc79b7bf4363b45e349d0603dff99f06af186edb3f5c",
+    "/workspace/keel-contracts/src/modules/keel-harness/interfaces/IKeelRawTokenURIBuilder.sol": "4419c0eb4383bc42b071de5c4c3637dc40571fcf0312d41166b5f0139126f48d",
+    "/workspace/keel-single-action-20261013/keel-sdk/node_modules/.pnpm/@openzeppelin+contracts@5.6.1/node_modules/@openzeppelin/contracts/utils/Base64.sol": "1c143572893f50f04fe8e507d89f9997cd3242102ba4200c8de0803ecbaf8cec",
+    "/workspace/keel-contracts/src/modules/keel-kernel/libraries/KeelUriEscape.sol": "d8331df58fb10ee213275c9fb416cb07e9964983b7a205ca2b39a018c9303b3b",
+    "/workspace/keel-contracts/src/modules/keel-hold/interfaces/IKeelHoldErrors.sol": "047b1d1d7da4ac736ef27377b55c0abc8f7a7a7df26e58bb5ef9e5ccf4eb4f53",
+    "/workspace/keel-single-action-20261013/keel-sdk/node_modules/.pnpm/@openzeppelin+contracts@5.6.1/node_modules/@openzeppelin/contracts/utils/Strings.sol": "e318709bbe73a7831d64c1351e8bdc43780b245f25191234e361e6ab9b98c67b",
+    "/workspace/keel-contracts/src/modules/keel-kernel/interfaces/IKeelPlatformFeeErrors.sol": "2d4875cac5cfb3f0a7070e888d8bd8c578da685d544da8d36e9411fcc3205016",
+    "/workspace/keel-contracts/src/modules/keel-kernel/libraries/KeelTokenURIEnvelope.sol": "0268829a8ad1aa2702be5134f430fd8f3fc1e6cae314dbe5b52a4e019b93b499",
+    "/workspace/keel-contracts/src/modules/keel-kernel/libraries/KeelPause.sol": "5a4d2c2964527cdaaf576a6335a34438b7867bc30f41e6256e3214623517b122",
+    "/workspace/keel-contracts/src/modules/keel-kernel/libraries/KeelGovernance.sol": "1fd4c3fbc8fe8c0fb3803baba91cc47e5c9d8d042a37ade928d6b6f2761b8634",
+    "/workspace/keel-contracts/src/modules/keel-kernel/libraries/KeelPlatformFees.sol": "2eb44281f12a72343c9862be63cd32b7c73504b470a0fe3d8659537be4a0a794",
+    "/workspace/keel-contracts/src/modules/keel-hold/interfaces/IKeelHoldEvents.sol": "9edde4c17483efdc11c463c221f508aafda3233d9f7bcbf4071feecf794ea099",
+    "/workspace/keel-contracts/src/modules/keel-hold/libraries/KeelHoldMetadata.sol": "7eb20fba63f61a62c863b0ca07c5feda778dbb7b96bfa19f25a4186741969bca",
+    "/workspace/keel-contracts/src/modules/keel-hold/interfaces/IKeelHoldHarness.sol": "5899a8e326e26f030ab0ec24e4acd08ab8fcc40e1ef274c5805bb9659096beed",
+    "/workspace/keel-contracts/src/modules/keel-hold/Ingot.sol": "d5af6fdffb0f4c31400a225822775399c32699ef4627788f52e511ddfe93fb70",
+    "/workspace/keel-contracts/src/modules/keel-hold/interfaces/IKeelHoldSeal.sol": "0a4480b35b4133f2aba98d6f635b17fbd3e2073e98b2c2c674ee7b89f0215bfd",
+    "/workspace/keel-contracts/src/modules/keel-hold/interfaces/IKeelHoldLimits.sol": "b8611bcfe7ec6b8e3a195aeb526d3d91d47880a21119ead7321abf3c50ed0259",
+    "/workspace/keel-single-action-20261013/keel-sdk/node_modules/.pnpm/@openzeppelin+contracts@5.6.1/node_modules/@openzeppelin/contracts/utils/math/SafeCast.sol": "5779bc848bde39f1ad7bc02b4f708a0040888e0083b1a33f119cd94639350134",
+    "/workspace/keel-single-action-20261013/keel-sdk/node_modules/.pnpm/@openzeppelin+contracts@5.6.1/node_modules/@openzeppelin/contracts/utils/math/Math.sol": "bdfdbe133991c0c78042957ff5cd97167926fcaf6d15664f3835a076cb066457",
+    "/workspace/keel-single-action-20261013/keel-sdk/node_modules/.pnpm/@openzeppelin+contracts@5.6.1/node_modules/@openzeppelin/contracts/utils/math/SignedMath.sol": "1ed50b1056af886752f0fb48a0165d381e69bb4a4b18b893b066dc144a7e08d7",
+    "/workspace/keel-single-action-20261013/keel-sdk/node_modules/.pnpm/@openzeppelin+contracts@5.6.1/node_modules/@openzeppelin/contracts/utils/Bytes.sol": "3ce9120a27934c75a074cb785d3a88868069ef6529dbe4dc6b845af0836f3c70",
+    "/workspace/keel-contracts/src/modules/keel-kernel/interfaces/IKeelGovernanceErrors.sol": "fa85725b69e555fdc4cf7710f00006b1591da89b1b77aedfa49430f447889a2a",
+    "/workspace/keel-single-action-20261013/keel-sdk/node_modules/.pnpm/@openzeppelin+contracts@5.6.1/node_modules/@openzeppelin/contracts/token/ERC20/IERC20.sol": "01b6f5c4fa45fd38822b286ecef6daf983d27306dd6362496fa71b3e4600b72c",
+    "/workspace/keel-single-action-20261013/keel-sdk/node_modules/.pnpm/@openzeppelin+contracts@5.6.1/node_modules/@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol": "c2394cb2a327f234711da34884947f4aa0f6dd2791d1d6303a0c7acfaf81bca3",
+    "/workspace/keel-single-action-20261013/keel-sdk/node_modules/.pnpm/@openzeppelin+contracts@5.6.1/node_modules/@openzeppelin/contracts/utils/Panic.sol": "270fc8401c1a13fae6a7a4a2dd6e381b95d658896701e51f0d3e2688acab3dec",
+    "/workspace/keel-single-action-20261013/keel-sdk/node_modules/.pnpm/@openzeppelin+contracts@5.6.1/node_modules/@openzeppelin/contracts/interfaces/IERC1363.sol": "9c3a75a925a6dac9e88b03cddc58d42fe3131b0aaaad84408521f3f7af2f991b",
+    "/workspace/keel-single-action-20261013/keel-sdk/node_modules/.pnpm/@openzeppelin+contracts@5.6.1/node_modules/@openzeppelin/contracts/interfaces/IERC20.sol": "0158e2d3e0e28bedd99eec13dcf1a8aa3a70a5b7e4bb2ad709609c95fcc740d1",
+    "/workspace/keel-single-action-20261013/keel-sdk/node_modules/.pnpm/@openzeppelin+contracts@5.6.1/node_modules/@openzeppelin/contracts/interfaces/IERC165.sol": "dfb3f56fa928a7c6cae41a7ce2c86b9210fa18d33fa26389099d66a0fa790368",
+    "/workspace/keel-single-action-20261013/keel-sdk/node_modules/.pnpm/@openzeppelin+contracts@5.6.1/node_modules/@openzeppelin/contracts/utils/introspection/IERC165.sol": "9055c2994b37dea1a41b7b7926dcb510f05dbe2540b0aafc5fbee9558fffd0ca"
+  },
+  "actualContracts": [
+    "KeelHold",
+    "KeelRawTokenURIBuilder",
+    "KeelLegacySharedImageTokenURIBuilder"
+  ],
+  "syntheticAdapters": [
+    "PolicyManager governance/pause",
+    "PolicyTreasury fee recipient"
+  ],
+  "selectedChainBindingVerified": false,
+  "historicalHoldCompatible": false,
+  "signing": "not-performed",
+  "submission": "not-performed",
+  "containerId": "3a2ae86d0b95e7b329001af289d1208037c01da6dbaedc4815273357745067de",
+  "clientVersion": "Geth/v1.17.8-stable-a5790770/linux-amd64/go1.27.1",
+  "sequence": [
+    {
+      "name": "construct PolicyManager",
+      "status": "0x1",
+      "gasUsed": "0xec703"
+    },
+    {
+      "name": "construct PolicyTreasury",
+      "status": "0x1",
+      "gasUsed": "0x588bd"
+    },
+    {
+      "name": "construct KeelHold",
+      "status": "0x1",
+      "gasUsed": "0x18c54af"
+    },
+    {
+      "name": "construct KeelRawTokenURIBuilder",
+      "status": "0x1",
+      "gasUsed": "0x1435bbc"
+    },
+    {
+      "name": "construct KeelLegacySharedImageTokenURIBuilder",
+      "status": "0x1",
+      "gasUsed": "0xb8f32a"
+    },
+    {
+      "name": "construct MissingPolicyAPIs",
+      "status": "0x1",
+      "gasUsed": "0x33ed5"
+    },
+    {
+      "name": "construct KeelLegacySharedImageTokenURIBuilder",
+      "status": "0x1",
+      "gasUsed": "0xb8f336"
+    },
+    {
+      "name": "prepay exact one-carrier object intent",
+      "status": "0x1",
+      "gasUsed": "0x5c67a"
+    },
+    {
+      "name": "cast within exact new-carrier allowance",
+      "status": "0x1",
+      "gasUsed": "0x6ebad"
+    },
+    {
+      "name": "weld exact committed object",
+      "status": "0x1",
+      "gasUsed": "0x81b61"
+    },
+    {
+      "name": "prepay exact one-carrier object intent",
+      "status": "0x1",
+      "gasUsed": "0x447fa"
+    },
+    {
+      "name": "cast within exact new-carrier allowance",
+      "status": "0x1",
+      "gasUsed": "0x59407"
+    },
+    {
+      "name": "weld exact committed object",
+      "status": "0x1",
+      "gasUsed": "0x91a2a"
+    },
+    {
+      "name": "prepay exact one-carrier object intent",
+      "status": "0x1",
+      "gasUsed": "0x447ee"
+    },
+    {
+      "name": "cast within exact new-carrier allowance",
+      "status": "0x1",
+      "gasUsed": "0x59a01"
+    },
+    {
+      "name": "weld exact committed object",
+      "status": "0x1",
+      "gasUsed": "0x91a2a"
+    },
+    {
+      "name": "prepay exact one-carrier object intent",
+      "status": "0x1",
+      "gasUsed": "0x447fa"
+    },
+    {
+      "name": "cast within exact new-carrier allowance",
+      "status": "0x1",
+      "gasUsed": "0x151ea1"
+    },
+    {
+      "name": "weld exact committed object",
+      "status": "0x1",
+      "gasUsed": "0x92642"
+    },
+    {
+      "name": "seal program descriptor only",
+      "status": "0x1",
+      "gasUsed": "0xdb8d"
+    },
+    {
+      "name": "program owns one descriptor slug",
+      "status": "0x1",
+      "gasUsed": "0x61c1"
+    },
+    {
+      "name": "program sealed",
+      "status": "0x1",
+      "gasUsed": "0x4609"
+    },
+    {
+      "name": "raw dependency remains unsealed",
+      "status": "0x1",
+      "gasUsed": "0x4609"
+    },
+    {
+      "name": "raw dependency remains unsealed",
+      "status": "0x1",
+      "gasUsed": "0x4609"
+    },
+    {
+      "name": "raw dependency remains unsealed",
+      "status": "0x1",
+      "gasUsed": "0x45fd"
+    },
+    {
+      "name": "raw native dependency readable without seal",
+      "status": "0x1",
+      "gasUsed": "0x7829"
+    },
+    {
+      "name": "register exact program renderer pair",
+      "status": "0x1",
+      "gasUsed": "0x2b5c8"
+    },
+    {
+      "name": "authenticated exact pair",
+      "status": "0x1",
+      "gasUsed": "0x7fd3"
+    },
+    {
+      "name": "program reads unsealed exact dependencies",
+      "status": "0x1",
+      "gasUsed": "0x29284"
+    },
+    {
+      "name": "only exact intent and one harness fees",
+      "status": "0x1",
+      "gasUsed": "0x4398"
+    }
+  ],
+  "zeroGlobalViewerPolicyQualified": true,
+  "exemptIntentAndSealQualified": true,
+  "rootDescriptorSlugCount": 1,
+  "abiDependencyCount": 3,
+  "dependenciesSealed": [
+    false,
+    false,
+    false
+  ],
+  "paidIntentCount": 4,
+  "totalIntentWei": "32",
+  "programHarnessWei": "11",
+  "totalTreasuryWei": "43",
+  "controls": [
+    {
+      "name": "nonzero global intent fees reject free cast",
+      "status": "0x0",
+      "error": {
+        "message": "execution reverted",
+        "code": 3,
+        "data": "0x7c6f2b81"
+      }
+    },
+    {
+      "name": "unregistered nonzero-fee renderer pair is rejected",
+      "status": "0x0",
+      "error": {
+        "message": "execution reverted",
+        "code": 3,
+        "data": "0xd060b8b14dc77f9c6fcfde3b3eba66f6b8a75feae21b0f2a03a2536bf64e729a1d068e1c000000000000000000000000e52dd5d8bab96cacde411df0f1fc4d5075eb563c"
+      }
+    },
+    {
+      "name": "missing policy selector does not authorize standard reader",
+      "status": "0x0",
+      "error": {
+        "message": "execution reverted",
+        "code": 3,
+        "data": "0x"
+      }
+    },
+    {
+      "name": "seal rejects counting ABI dependencies as program slugs",
+      "status": "0x0",
+      "error": {
+        "message": "execution reverted",
+        "code": 3,
+        "data": "0x6381ba1600000000000000000000000000000000000000000000000000000000000000010000000000000000000000000000000000000000000000000000000000000004"
+      }
+    },
+    {
+      "name": "fee exemption does not permit free casting under nonzero global fees",
+      "status": "0x0",
+      "error": {
+        "message": "execution reverted",
+        "code": 3,
+        "data": "0x7c6f2b81"
+      }
+    },
+    {
+      "name": "exempt quote zero still requires exact pair under nonzero viewer policy",
+      "status": "0x0",
+      "error": {
+        "message": "execution reverted",
+        "code": 3,
+        "data": "0xd060b8b14dc77f9c6fcfde3b3eba66f6b8a75feae21b0f2a03a2536bf64e729a1d068e1c0000000000000000000000002da29a7e159cc10c16dc978a9bbd25e6c5e60277"
+      }
+    },
+    {
+      "name": "one-carrier intent cannot pay for fresh ABI dependency uploads",
+      "status": "0x0",
+      "error": {
+        "message": "execution reverted",
+        "code": 3,
+        "data": "0x6ce29bf600000000000000000000000000000000000000000000000000000000000000020000000000000000000000000000000000000000000000000000000000000001"
+      }
+    },
+    {
+      "name": "zero viewer fee still cannot bypass root seal policy",
+      "status": "0x0",
+      "error": {
+        "message": "execution reverted",
+        "code": 3,
+        "data": "0xcf8a111e2ea9b29d8a55decfd5a3fc4e9ef0f48294cf1775233a91f16d7e89bb52abb1d3"
+      }
+    },
+    {
+      "name": "fee-exempt newly welded object still needs a seal",
+      "status": "0x0",
+      "error": {
+        "message": "execution reverted",
+        "code": 3,
+        "data": "0xcf8a111e977370e4753f00f732b1cae67763c3d7d3d77f9a82223d7772e41553f7e256bf"
+      }
+    }
+  ],
+  "exemptPairRegistrationSucceeded": true,
+  "status": "actual-modern-hold-policy-qualified"
+}

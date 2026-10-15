@@ -1,0 +1,16 @@
+node:internal/modules/run_main:123
+    triggerUncaughtException(
+    ^
+
+AssertionError [ERR_ASSERTION]: The mounted artwork must execute its committed module
+    at observeOfflineShell (file:///tmp/keel-shared-image-20261014/keel-sdk/tests/support/offline-shell-browser.mjs:103:30)
+    at async file:///tmp/keel-shared-image-20261014/browser-probe.mjs:7:28 {
+  generatedMessage: false,
+  code: 'ERR_ASSERTION',
+  actual: false,
+  expected: true,
+  operator: '==',
+  diff: 'simple'
+}
+
+Node.js v22.23.1

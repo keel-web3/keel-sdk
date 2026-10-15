@@ -32,6 +32,7 @@ jobs:
       - uses: actions/checkout@v4
         with:
           path: keel-sdk
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
       - uses: actions/checkout@v4
         with:
           repository: Ravonus/keel-modules
@@ -55,6 +56,15 @@ jobs:
         working-directory: keel-sdk
         run: node scripts/build.mjs
 
+      - name: Install pinned media adapter
+        working-directory: keel-sdk
+        run: node packages/builder/node_modules/ffmpeg-static/install.js
+      - name: Verify wrapped shell offline behavior
+        working-directory: keel-sdk
+        env:
+          CHROMIUM_PATH: /usr/bin/google-chrome
+        run: node --test tests/sdk-verification-wrap-offline-browser.test.mjs
+
       # Every module rebuilds from its readable source to the exact bytes its
       # receipt claims. A module that does not reproduce fails here.
       - name: Reproduce every module
@@ -72,11 +82,14 @@ jobs:
       # clean checkout must produce a byte-identical catalog. If this diff is
       # non-empty the published catalog is not reproducible, which is the
       # property that lets a stranger check it by regenerating it.
+      # keel-modules explicitly retains Base64 for its approved Studio consumers;
+      # new SDK catalogs keep the default URI81/Brotli preparation.
       - name: Catalog is byte reproducible
         working-directory: keel-sdk
         run: |
           node packages/builder/dist/cli.js module index \
             --root ../keel-modules \
+            --runtime-encoding base64 \
             --repository https://github.com/Ravonus/keel-modules
           git -C ../keel-modules diff --exit-code catalog/catalog.json
 

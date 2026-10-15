@@ -1,3 +1,4 @@
+import { collectMigrationTableNames, hasAuthenticatedProjectDelegate } from "./studio-structure-policy.mjs";
 import { execFileSync } from "node:child_process";
 import { access, readFile, readdir } from "node:fs/promises";
 import { createRequire } from "node:module";
@@ -121,9 +122,9 @@ const migrationDirectory = path.join(studio, "drizzle");
 const migrationFiles = (await readdir(migrationDirectory)).filter((name) => name.endsWith(".sql")).sort();
 const migration = (await Promise.all(migrationFiles.map((name) => readFile(path.join(migrationDirectory, name), "utf8")))).join("\n");
 const tableNames = [...schema.matchAll(/pgTable\(\s*["']([^"']+)["']/gu)].map((match) => match[1]);
+const declaredTables = collectMigrationTableNames(migration);
 for (const table of tableNames) {
-  const escaped = table.replace(/[.*+?^${}()|[\]\\]/gu, "\\$&");
-  if (!new RegExp(`CREATE TABLE(?: IF NOT EXISTS)? "${escaped}"`, "u").test(migration)) {
+  if (!declaredTables.has(table)) {
     console.error(`Drizzle migration is missing table ${table}.`);
     issueCount += 1;
   }
@@ -137,8 +138,6 @@ for (const enumName of enumNames) {
 }
 
 const protectedPostRoutes = new Map([
-  ["src/app/api/artifacts/route.ts", ["assertSameOriginRequest(request.headers)", "resolveArtifactCreator(request"]],
-  ["src/app/api/artifacts/import/route.ts", ["assertStudioWriteAccess(request.headers)"]],
   ["src/app/api/deployment/[artifactId]/complete/route.ts", ["assertArtifactPublicationAccess(request, artifactId)"]],
   ["src/app/api/indexer/run/route.ts", ["assertStudioWriteAccess(request.headers)"]],
 ]);
@@ -146,6 +145,17 @@ for (const [relative, requiredGuards] of protectedPostRoutes) {
   const source = await readFile(path.join(studio, relative), "utf8");
   if (!requiredGuards.every((guard) => source.includes(guard))) {
     console.error(`Mutating route ${relative} is missing its expected write or creator guard.`);
+    issueCount += 1;
+  }
+}
+for (const [relative, handlerSpecifier] of [
+  ["src/app/api/artifacts/route.ts", "~/server/http/create-project-request"],
+  ["src/app/api/artifacts/import/route.ts", "~/server/http/import-project-request"],
+]) {
+  const routeSource = await readFile(path.join(studio, relative), "utf8");
+  const handlerSource = await readFile(path.join(studio, "src", `${handlerSpecifier.slice(2)}.ts`), "utf8");
+  if (!hasAuthenticatedProjectDelegate(ts, routeSource, handlerSource, handlerSpecifier)) {
+    console.error(`Mutating route ${relative} must delegate the canonical creator session to its auth-before-input handler.`);
     issueCount += 1;
   }
 }

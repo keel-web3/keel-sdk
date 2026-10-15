@@ -24,7 +24,10 @@ test("wrapInVerificationShell wraps an art entry in the canonical shell with a r
   assert.match(result.html, /data-keel-seal="stamp"/u);
   assert.match(result.html, /keel-verification-presentation@1/u);
   assert.match(result.html, /id="keel-verification-envelope"/u);
-  assert.match(result.html, /Opening the work/u);
+  // October 5 introduced the maintained accessible first-paint loader.
+  assert.match(result.html, /id="keel-status" data-stage="boot" role="status" aria-live="polite"/u);
+  assert.match(result.html, /id="keel-loading-copy"/u);
+  assert.match(result.html, />Opening the work<\/p>/u);
   // No CDN or network escape hatch: assets are committed inline in the graph.
   assert.doesNotMatch(result.html, /https:\/\/cdn\./u);
 

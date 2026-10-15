@@ -1,6 +1,7 @@
 /** Read-only preparation/verification RPC. Collector host governance stays separate. */
 import { redactRpcUrl, remoteUrlAllowed } from "@keel/protocol";
 import { KEEL_BUNDLED_NETWORK_INDEX, KEEL_NETWORK_CONFIGURATION, type KeelNetworkIndex } from './network-index.js';
+import { snapshotKeelProviderPrivateError } from "./provider-request-scheduler.js";
 
 /** Compatibility export. Network selection/defaults live in networks.config.json and the index. */
 export const KEEL_SEPOLIA_PUBLIC_RPC_URLS: readonly string[] = KEEL_BUNDLED_NETWORK_INDEX.networks.find(n => n.chainId === KEEL_NETWORK_CONFIGURATION.legacySepoliaChainId)!.rpcUrls.map(u => normalizeKeelRpcUrl(u));
@@ -82,24 +83,70 @@ export function resolveKeelRpcConfiguration(
 }
 
 type FailureReason = "rate-limited" | "unavailable" | "wrong-chain" | "access-denied" | "history-unavailable" | "invalid-response";
+/** Fixed observations only. Never retain provider messages, URLs, bodies or arbitrary causes. */
+export interface KeelRpcFailureDiagnostic {
+  readonly failureReason?: FailureReason;
+  readonly transportFailure?: "timeout" | "connection-reset" | "connection-closed" | "dns" | "rate-limited" | "http-error" | "rpc-error" | "invalid-response" | "unknown";
+  readonly transportCode?: "ETIMEDOUT" | "ECONNRESET" | "ECONNREFUSED" | "EPIPE" | "ENOTFOUND" | "EAI_AGAIN" | "UND_ERR_CONNECT_TIMEOUT" | "UND_ERR_SOCKET";
+  readonly responseFailure?: "missing-body" | "response-too-large" | "invalid-json" | "invalid-envelope" | "missing-result";
+  readonly httpStatus?: number;
+  readonly rpcCode?: number;
+  readonly responseBytes?: number;
+  readonly maximumResponseBytes?: number;
+}
 export class KeelRpcSetupError extends Error {
   readonly code = "rpc.setup-required";
   readonly setup = KEEL_RPC_PROVIDER_SETUP;
-  constructor(readonly reason: FailureReason, readonly providers: readonly KeelRpcProviderStatus[], readonly retryAfterMs = 0) {
+  readonly diagnostic: Readonly<KeelRpcFailureDiagnostic>;
+  constructor(readonly reason: FailureReason, readonly providers: readonly KeelRpcProviderStatus[], readonly retryAfterMs = 0,
+    diagnostic: KeelRpcFailureDiagnostic = {}) {
     super(`RPC verification unavailable (${reason}). Public/configured endpoints were exhausted. Run pnpm rpc:configure and pnpm rpc:check; ask the user to choose a provider for the selected chain, such as Alchemy, Infura or QuickNode. No wallet key is needed.`);
     this.name = "KeelRpcSetupError";
+    this.diagnostic = Object.freeze({ ...diagnostic, failureReason: reason });
   }
 }
 export class KeelRpcResponseError extends Error {
   readonly code: number;
-  constructor(readonly rpcCode: number, readonly data?: string, providerGasCap?: bigint) {
-    super(providerGasCap === undefined ? rpcCode === 3 ? "RPC execution reverted." : "RPC rejected this read request." : `RPC gas cap: ${providerGasCap}`);
+  readonly diagnostic?: Readonly<{ gasCapacityScope: "request" | "unknown"; requestedRequestGas?: string; remainingRequestGas?: string }>;
+  constructor(readonly rpcCode: number, readonly data?: string, providerGasCap?: bigint, readonly status?: number,
+    readonly simulationFailure?: "insufficient-balance" | "transaction-validation",
+    capacityDiagnostic?: { readonly gasCapacityScope: "request" | "unknown"; readonly requestedRequestGas?: string; readonly remainingRequestGas?: string }) {
+    super(status === 413 ? "RPC request body too large." : simulationFailure === "insufficient-balance" ? "RPC insufficient balance."
+      : simulationFailure === "transaction-validation" ? "RPC transaction validation failed."
+      : providerGasCap === undefined ? rpcCode === 3 ? "RPC execution reverted." : "RPC rejected this read request." : `RPC gas cap: ${providerGasCap}`);
     this.code = rpcCode;
     this.name = "KeelRpcResponseError";
+    if (capacityDiagnostic || providerGasCap !== undefined) this.diagnostic = Object.freeze({ ...(capacityDiagnostic ?? { gasCapacityScope: "unknown" as const }) });
   }
 }
 class ProviderFailure extends Error {
-  constructor(readonly reason: FailureReason, readonly retryAfterMs = 0) { super(reason); }
+  readonly diagnostic: Readonly<KeelRpcFailureDiagnostic>;
+  constructor(readonly reason: FailureReason, readonly retryAfterMs = 0, diagnostic: KeelRpcFailureDiagnostic = {}) {
+    super(reason);
+    this.diagnostic = Object.freeze({ ...diagnostic, failureReason: reason });
+  }
+}
+function networkFailure(error: unknown, timedOut: boolean): ProviderFailure {
+  const codes = ["ETIMEDOUT", "ECONNRESET", "ECONNREFUSED", "EPIPE", "ENOTFOUND", "EAI_AGAIN", "UND_ERR_CONNECT_TIMEOUT", "UND_ERR_SOCKET"] as const;
+  let transportCode: KeelRpcFailureDiagnostic["transportCode"];
+  const seen = new Set<unknown>();
+  for (let value = error, depth = 0; value && typeof value === "object" && depth < 8 && !seen.has(value); depth++) {
+    seen.add(value);
+    const item = value as { code?: unknown; cause?: unknown };
+    if (typeof item.code === "string" && (codes as readonly string[]).includes(item.code)) transportCode = item.code as typeof codes[number];
+    value = item.cause;
+  }
+  const transportFailure = timedOut || transportCode === "ETIMEDOUT" || transportCode === "UND_ERR_CONNECT_TIMEOUT" ? "timeout"
+    : transportCode === "ECONNRESET" ? "connection-reset"
+    : transportCode === "ENOTFOUND" || transportCode === "EAI_AGAIN" ? "dns"
+    : transportCode === "ECONNREFUSED" || transportCode === "EPIPE" || transportCode === "UND_ERR_SOCKET" ? "connection-closed" : "unknown";
+  return new ProviderFailure("unavailable", 0, { transportFailure, ...(transportCode === undefined ? {} : { transportCode }) });
+}
+class KeelRpcHttpRequestError extends Error {
+  constructor(readonly status: 400 | 422) {
+    super("RPC request parameters were rejected.");
+    this.name = "HttpRequestError";
+  }
 }
 export interface KeelRpcProviderStatus {
   readonly endpoint: string;
@@ -117,16 +164,33 @@ export interface KeelRpcRequest {
 export interface KeelRpcPool {
   request(input: KeelRpcRequest): Promise<unknown>;
   status(): readonly KeelRpcProviderStatus[];
+  /** Retain this pool's pacing, identity and cooldown state without per-call failover.
+   * Publication must qualify a candidate before sending it a complete program. */
+  pin(providerIndex: number): Pick<KeelRpcPool, "request" | "status">;
 }
 export interface KeelRpcPoolOptions {
   readonly rpcUrls: readonly string[];
   /** Omit only for discovery on explicitly supplied endpoints. First identity is pinned. */
   readonly chainId?: number;
   readonly timeoutMs?: number;
+  /** Complete publication simulations can take longer than ordinary reads. */
+  readonly simulationTimeoutMs?: number;
   readonly minIntervalMs?: number;
   readonly maxResponseBytes?: number;
   readonly allowLoopback?: boolean;
   readonly fetchImpl?: typeof fetch;
+  /** Owner-private evidence only. No endpoint or headers are supplied. Persisting
+   * callers must redact credential echoes in arbitrary provider text. */
+  readonly onPrivateResponse?: (event: KeelRpcPrivateObservation) => void | Promise<void>;
+}
+export interface KeelRpcPrivateObservation {
+  readonly providerIndex: number;
+  readonly request: { readonly method: string; readonly params: readonly unknown[] };
+  readonly elapsedMs: number;
+  readonly httpStatus?: number;
+  readonly retryAfterMs?: number;
+  readonly response?: unknown;
+  readonly error?: unknown;
 }
 const READ_METHODS = new Set(["eth_chainId", "eth_blockNumber", "eth_getBlockByNumber", "eth_getBlockByHash", "eth_getCode", "eth_getBalance", "eth_getTransactionCount", "eth_getTransactionReceipt", "eth_getTransactionByHash", "eth_call", "eth_simulateV1", "eth_estimateGas", "eth_gasPrice", "eth_maxPriorityFeePerGas", "eth_feeHistory", "eth_getLogs", "eth_getStorageAt", "eth_getProof", "net_version", "web3_clientVersion"]);
 function pause(ms: number, signal?: AbortSignal): Promise<void> {
@@ -141,11 +205,13 @@ export function createKeelRpcPool(options: KeelRpcPoolOptions): KeelRpcPool {
   if (!Array.isArray(options.rpcUrls) || options.rpcUrls.length < 1 || options.rpcUrls.length > 6) throw new TypeError("RPC pool requires one to six endpoints.");
   if (options.chainId !== undefined && (!Number.isSafeInteger(options.chainId) || options.chainId < 1)) throw new TypeError("RPC pool requires a positive expected chain ID.");
   const timeoutMs = bound(options.timeoutMs, 8000, 100, 30000);
+  const simulationTimeoutMs = bound(options.simulationTimeoutMs, timeoutMs, 100, 90000);
   const minIntervalMs = bound(options.minIntervalMs, 250, 0, 10000);
   const maxBytes = bound(options.maxResponseBytes, 16 * 1024 * 1024, 1024, 64 * 1024 * 1024);
   const states = [...new Set(options.rpcUrls.map(url => normalizeKeelRpcUrl(url, options.allowLoopback)))].map(url => ({
     url, disabled: false, cooldown: 0, nextAt: 0, failures: 0, chainId: undefined as number | undefined,
-    checkedAt: 0, checking: undefined as Promise<void> | undefined, reason: undefined as FailureReason | undefined, tail: Promise.resolve(),
+    checkedAt: 0, checking: undefined as Promise<void> | undefined, reason: undefined as FailureReason | undefined,
+    diagnostic: undefined as KeelRpcFailureDiagnostic | undefined, tail: Promise.resolve(),
   }));
   const fetcher = options.fetchImpl ?? fetch;
   let expectedChain = options.chainId, cursor = 0, id = 0;
@@ -157,65 +223,118 @@ export function createKeelRpcPool(options: KeelRpcPoolOptions): KeelRpcPool {
     state.tail = new Promise<void>(r => { release = r; });
     await prior;
     let timer: ReturnType<typeof setTimeout> | undefined;
+    let timedOut = false;
+    const started = performance.now();
+    const privatelyObserve = (fields: Omit<KeelRpcPrivateObservation, "providerIndex" | "request" | "elapsedMs">) => {
+      if (!options.onPrivateResponse) return;
+      try {
+        // A separate snapshot prevents an observer from modifying proof inputs
+        // or a response that has not yet completed validation.
+        const event = structuredClone({ providerIndex: states.indexOf(state), request: { method, params }, elapsedMs: performance.now() - started, ...fields,
+          ...(fields.error === undefined ? {} : { error: snapshotKeelProviderPrivateError(fields.error) }) });
+        const pending = options.onPrivateResponse(Object.freeze(event));
+        if (pending) void Promise.resolve(pending).catch(() => undefined);
+      } catch { /* Evidence collection cannot alter RPC behavior. */ }
+    };
     try {
       signal?.throwIfAborted();
-      if (state.disabled) throw new ProviderFailure(state.reason ?? "unavailable");
-      if (state.cooldown > Date.now()) throw new ProviderFailure("rate-limited", state.cooldown - Date.now());
+      if (state.disabled) throw new ProviderFailure(state.reason ?? "unavailable", 0, state.diagnostic);
+      if (state.cooldown > Date.now()) throw new ProviderFailure("rate-limited", state.cooldown - Date.now(), state.diagnostic);
       if (state.nextAt > Date.now()) await pause(state.nextAt - Date.now(), signal);
-      if (state.cooldown > Date.now()) throw new ProviderFailure("rate-limited", state.cooldown - Date.now());
+      if (state.cooldown > Date.now()) throw new ProviderFailure("rate-limited", state.cooldown - Date.now(), state.diagnostic);
       state.nextAt = Date.now() + minIntervalMs;
       const controller = new AbortController();
-      timer = setTimeout(() => controller.abort(), timeoutMs);
+      timer = setTimeout(() => { timedOut = true; controller.abort(); }, method === "eth_simulateV1" ? simulationTimeoutMs : timeoutMs);
       const requestId = ++id;
       let response: Response;
       try { response = await fetcher(state.url, { method: "POST", headers: { "content-type": "application/json" },
         body: JSON.stringify({ jsonrpc: "2.0", id: requestId, method, params }),
         redirect: "error", signal: signal === undefined ? controller.signal : AbortSignal.any([controller.signal, signal]) }); }
-      catch { signal?.throwIfAborted(); throw new ProviderFailure("unavailable"); }
+      catch (error) { privatelyObserve({ error }); signal?.throwIfAborted(); throw networkFailure(error, timedOut); }
       const header = response.headers.get("retry-after");
       const rawDelay = header === null ? 0 : /^\d+(?:\.\d+)?$/u.test(header) ? Number(header) * 1000 : Date.parse(header) - Date.now();
       const delay = Number.isFinite(rawDelay) ? Math.max(0, rawDelay) : 0;
       if (!response.ok) {
-        await response.body?.cancel();
-        throw new ProviderFailure(response.status === 429 ? "rate-limited" : [401, 403].includes(response.status) ? "access-denied" : "unavailable", delay);
+        if (options.onPrivateResponse && response.body) {
+          const reader = response.body.getReader(), parts: Uint8Array[] = [];
+          let size = 0, truncated = false;
+          try {
+            for (;;) { const part = await reader.read(); if (part.done) break;
+              if (size + part.value.byteLength > maxBytes) { truncated = true; break; }
+              parts.push(part.value); size += part.value.byteLength; }
+            const bytes = new Uint8Array(size); let offset = 0;
+            for (const part of parts) { bytes.set(part, offset); offset += part.byteLength; }
+            privatelyObserve({ httpStatus: response.status, retryAfterMs: delay,
+              response: { body: new TextDecoder().decode(bytes), truncated, maximumResponseBytes: maxBytes } });
+          } catch (error) { privatelyObserve({ httpStatus: response.status, retryAfterMs: delay, error }); }
+          finally { await reader.cancel().catch(() => undefined); reader.releaseLock(); }
+        }
+        await response.body?.cancel().catch(() => undefined);
+        if (method === "eth_simulateV1" && response.status === 413) throw new KeelRpcResponseError(-32000, undefined, undefined, 413);
+        // A bad/unprocessable project request is not a provider outage. Keep
+        // its observed HTTP status without inventing an unobserved RPC code.
+        if (method === "eth_simulateV1" && (response.status === 400 || response.status === 422)) throw new KeelRpcHttpRequestError(response.status);
+        throw new ProviderFailure(response.status === 429 ? "rate-limited" : [401, 403].includes(response.status) ? "access-denied" : "unavailable", delay,
+          { httpStatus: response.status, transportFailure: response.status === 429 ? "rate-limited" : "http-error" });
       }
-      if (!response.body) throw new ProviderFailure("invalid-response");
+      const invalidResponse = (responseFailure: NonNullable<KeelRpcFailureDiagnostic["responseFailure"]>, size?: number) =>
+        new ProviderFailure("invalid-response", 0, { transportFailure: "invalid-response", responseFailure,
+          ...(size === undefined ? {} : { responseBytes: Math.min(size, 1073741824) }), maximumResponseBytes: maxBytes });
+      if (!response.body) throw invalidResponse("missing-body");
       const reader = response.body.getReader(); const parts: Uint8Array[] = []; let size = 0;
       try { for (;;) { const v = await reader.read(); if (v.done) break; size += v.value.byteLength;
-        if (size > maxBytes) throw new ProviderFailure("invalid-response"); parts.push(v.value); }
+        if (size > maxBytes) throw invalidResponse("response-too-large", size); parts.push(v.value); }
       } finally { await reader.cancel().catch(() => undefined); reader.releaseLock(); }
       const bytes = new Uint8Array(size); let offset = 0; for (const part of parts) { bytes.set(part, offset); offset += part.length; }
       let body: { jsonrpc?: unknown; id?: unknown; result?: unknown; error?: { code?: unknown; message?: unknown; data?: unknown } };
-      try { body = JSON.parse(new TextDecoder("utf-8", { fatal: true }).decode(bytes)); } catch { throw new ProviderFailure("invalid-response"); }
-      if (body === null || typeof body !== "object" || body.jsonrpc !== "2.0" || body.id !== requestId) throw new ProviderFailure("invalid-response");
+      try { body = JSON.parse(new TextDecoder("utf-8", { fatal: true }).decode(bytes)); } catch (error) {
+        privatelyObserve({ httpStatus: response.status, retryAfterMs: delay, response: { bodyBytes: bytes, body: new TextDecoder().decode(bytes), responseBytes: size, responseFailure: "invalid-json" }, error });
+        throw invalidResponse("invalid-json", size);
+      }
+      privatelyObserve({ httpStatus: response.status, retryAfterMs: delay, response: body });
+      if (body === null || typeof body !== "object" || body.jsonrpc !== "2.0" || body.id !== requestId) throw invalidResponse("invalid-envelope", size);
       if (body.error !== undefined) {
-        const code = typeof body.error?.code === "number" ? body.error.code : -32603;
+        const code = typeof body.error?.code === "number" && Number.isInteger(body.error.code) && Math.abs(body.error.code) <= 2147483647 ? body.error.code : -32603;
         const message = typeof body.error?.message === "string" ? body.error.message : "";
-        if (code === 429 || code === -32005 || /rate.?limit|too many requests|quota|compute units|usage.?limit/iu.test(message)) throw new ProviderFailure("rate-limited", delay);
-        if (/missing trie|historical|pruned|state.*unavailable|header not found/iu.test(message)) throw new ProviderFailure("history-unavailable");
+        if (code === 429 || code === -32005 || /rate.?limit|too many requests|quota|compute units|usage.?limit/iu.test(message)) throw new ProviderFailure("rate-limited", delay, { transportFailure: "rate-limited", rpcCode: code });
+        if (/missing trie|historical|pruned|state.*unavailable|header not found/iu.test(message)) throw new ProviderFailure("history-unavailable", 0, { transportFailure: "rpc-error", rpcCode: code });
         if (code === 3 || /execution reverted/iu.test(message)) throw new KeelRpcResponseError(3, typeof body.error.data === "string" && /^0x[0-9a-f]*$/iu.test(body.error.data) ? body.error.data : undefined);
-        if ([401, 403].includes(code) || /api.?key|unauthorized|authentication|access denied/iu.test(message)) throw new ProviderFailure("access-denied");
+        if ([401, 403].includes(code) || /api.?key|unauthorized|authentication|access denied/iu.test(message)) throw new ProviderFailure("access-denied", 0, { transportFailure: "rpc-error", rpcCode: code });
         if (method === "eth_simulateV1") {
           // Preserve typed failure evidence while never exposing a provider URL,
           // key, request body, or arbitrary remote error message.
+          const exhausted = /RPC gas cap exhausted:\s*need\s+(\d{1,20}),\s*remaining\s+(\d{1,20})(?!\d)/iu.exec(message);
+          if (exhausted && BigInt(exhausted[1]!) <= 18_446_744_073_709_551_615n && BigInt(exhausted[2]!) <= 18_446_744_073_709_551_615n)
+            throw new KeelRpcResponseError(code, undefined, undefined, undefined, undefined,
+              { gasCapacityScope: "request", requestedRequestGas: BigInt(exhausted[1]!).toString(), remainingRequestGas: BigInt(exhausted[2]!).toString() });
           const cap = /(?:gas cap|maximum allowed gas|gas limit too high[^\n]*?cap)\s*[:=(]\s*(0x[\da-f]+|\d+)/iu.exec(message)?.[1];
-          if (cap && cap.length <= 20 && BigInt(cap) > 0n) throw new KeelRpcResponseError(code, undefined, BigInt(cap));
-          if (code === -32601 || code === -38014) throw new KeelRpcResponseError(code);
+          if (cap && cap.length <= 20 && BigInt(cap) > 0n && BigInt(cap) <= 18_446_744_073_709_551_615n)
+            throw new KeelRpcResponseError(code, undefined, BigInt(cap), undefined, undefined,
+              { gasCapacityScope: /(?:rpc|global|request|simulation) gas cap/iu.test(message) ? "request" : "unknown" });
+          if (/insufficient funds|insufficient balance/iu.test(message)) throw new KeelRpcResponseError(code, undefined, undefined, undefined, "insufficient-balance");
+          if (/nonce too (?:low|high)|intrinsic gas too low|transaction validation|invalid transaction|fee cap less than block base fee|max fee per gas less than block base fee|tip above fee cap/iu.test(message))
+            throw new KeelRpcResponseError(code, undefined, undefined, undefined, "transaction-validation");
+          // Simulation validation errors are execution evidence, not transport
+          // outages. In particular qualification must observe nonce-too-high.
+          // Preserve every remaining simulation rejection. Unknown server
+          // errors are ambiguous evidence, not permission to shop for success.
+          throw new KeelRpcResponseError(code);
         }
         if (code === -32602) throw new KeelRpcResponseError(code);
-        throw new ProviderFailure("unavailable");
+        throw new ProviderFailure("unavailable", 0, { transportFailure: "rpc-error", rpcCode: code });
       }
-      if (!Object.hasOwn(body, "result")) throw new ProviderFailure("invalid-response");
+      if (!Object.hasOwn(body, "result")) throw invalidResponse("missing-result", size);
       return body.result;
     } catch (error) {
       signal?.throwIfAborted();
       // Set cooldown before releasing the queue so concurrent reads cannot race a 429.
       if (error instanceof ProviderFailure && error.reason === "rate-limited") {
         state.reason = error.reason;
+        state.diagnostic = error.diagnostic;
         state.cooldown = Math.max(state.cooldown, Date.now() + Math.max(error.retryAfterMs, Math.min(30000, 1000 * 2 ** Math.min(5, state.failures))));
       }
-      if (error instanceof KeelRpcResponseError || error instanceof ProviderFailure) throw error;
-      throw new ProviderFailure("unavailable");
+      if (error instanceof KeelRpcResponseError || error instanceof KeelRpcHttpRequestError || error instanceof ProviderFailure) throw error;
+      throw networkFailure(error, timedOut);
     } finally { if (timer !== undefined) clearTimeout(timer); release(); }
   }
   async function checkChain(state: typeof states[number], signal?: AbortSignal, force = false): Promise<void> {
@@ -234,7 +353,7 @@ export function createKeelRpcPool(options: KeelRpcPoolOptions): KeelRpcPool {
     }
     await state.checking;
   }
-  return { status, async request(input) {
+  const request = async (input: KeelRpcRequest, pinnedIndex?: number): Promise<unknown> => {
     if (!READ_METHODS.has(input.method)) throw new TypeError("RPC pool supports read-only methods; wallet/signing/submission methods are refused.");
     const params = input.params ?? [];
     const simulation = input.method === "eth_simulateV1";
@@ -253,31 +372,36 @@ export function createKeelRpcPool(options: KeelRpcPoolOptions): KeelRpcPool {
       }
     }
     input.signal?.throwIfAborted();
-    let last: FailureReason = "unavailable", missing = false;
-    const start = cursor;
-    for (let i = 0; i < states.length; i++) {
+    let last: FailureReason = "unavailable", missing = false, lastDiagnostic: KeelRpcFailureDiagnostic | undefined;
+    const start = pinnedIndex ?? cursor;
+    for (let i = 0; i < (pinnedIndex === undefined ? states.length : 1); i++) {
       const index = (start + i) % states.length, state = states[index]!;
-      if (state.disabled || state.cooldown > Date.now()) { last = state.reason ?? "rate-limited"; continue; }
+      if (state.disabled || state.cooldown > Date.now()) { last = state.reason ?? "rate-limited"; lastDiagnostic = state.diagnostic; continue; }
       try {
         await checkChain(state, input.signal, input.method === "eth_chainId");
         const value = input.method === "eth_chainId" ? `0x${state.chainId!.toString(16)}` : await send(state, input.method, params, input.signal);
         if (value === null && (input.requireResult || ["eth_getTransactionReceipt", "eth_getTransactionByHash", "eth_getBlockByHash", "eth_getBlockByNumber"].includes(input.method))) {
-          missing = true; state.reason = "history-unavailable"; last = "history-unavailable"; continue;
+          missing = true; state.reason = "history-unavailable"; last = "history-unavailable"; state.diagnostic = undefined; lastDiagnostic = undefined; continue;
         }
-        cursor = index; state.failures = 0; state.reason = undefined;
+        cursor = index; state.failures = 0; state.reason = undefined; state.diagnostic = undefined;
         return value;
       } catch (error) {
         input.signal?.throwIfAborted();
-        if (error instanceof KeelRpcResponseError) throw error;
-        const failure = error instanceof ProviderFailure ? error : new ProviderFailure("unavailable");
+        if (error instanceof KeelRpcResponseError || error instanceof KeelRpcHttpRequestError) throw error;
+        const failure = error instanceof ProviderFailure ? error : networkFailure(error, false);
         last = failure.reason; state.reason = last;
+        state.diagnostic = failure.diagnostic; lastDiagnostic = failure.diagnostic;
         if (["wrong-chain", "access-denied"].includes(last)) state.disabled = true;
         if (last !== "history-unavailable") state.cooldown = Date.now() + Math.max(failure.retryAfterMs, Math.min(30000, 1000 * 2 ** Math.min(5, state.failures++)));
       }
     }
     if (missing && !input.requireResult) return null; // Pending/not-found is valid, never publication proof.
     const cooling = states.filter(s => !s.disabled).map(s => Math.max(0, s.cooldown - Date.now())).filter(ms => ms > 0);
-    throw new KeelRpcSetupError(missing ? "history-unavailable" : last, status(), cooling.length ? Math.min(...cooling) : 0);
+    throw new KeelRpcSetupError(missing ? "history-unavailable" : last, status(), cooling.length ? Math.min(...cooling) : 0, lastDiagnostic);
+  };
+  return { status, request, pin(providerIndex) {
+    if (!Number.isInteger(providerIndex) || providerIndex < 0 || providerIndex >= states.length) throw new RangeError("Invalid configured RPC provider index.");
+    return { request: input => request(input, providerIndex), status: () => [status()[providerIndex]!] };
   } };
 }
 

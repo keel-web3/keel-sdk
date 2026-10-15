@@ -132,6 +132,8 @@ function hasEmbeddedViewerSource(item: KeelStandaloneViewerItem): boolean {
 }
 
 export interface KeelStandaloneViewerItem {
+  /** Immutable prepared COPY payload identity; this does not claim a Hold object or receipt. */
+  readonly preparedCopy?: { readonly segments: readonly { readonly packId: Hex }[] };
   readonly containerBindings?: readonly KeelOnchainContainerBinding[];
   readonly backgroundColor?: string;
   readonly id: string;
@@ -1137,6 +1139,8 @@ export async function buildCompactInlineKeelShell(input: {
   };
   /** EVM-assembled compressed packs; the response contains every byte and never exposes a browser RPC transport. */
   readonly embeddedContainerDelivery?: { readonly chainId: number; readonly store: string };
+  /** Distinct registered reader for the legacy six-field prepared token context. */
+  readonly legacyPreparedDenseDelivery?: { readonly chainId: number; readonly sharedImage?: boolean };
   /** Optional RPC information only. Never changes embedded artwork delivery or the proof. */
   readonly optionalMarketplaceInfo?: KeelShellMarketplaceConfig;
   /** Contain an authored viewport without moving scene controls. */
@@ -1153,7 +1157,7 @@ export async function buildCompactInlineKeelShell(input: {
   readonly codecProfile: "native" | "brotli-js" | "lzma-js" | "brotli-lzma-js" | "ppmd-js";
   readonly supportedCodecs: readonly ("none" | "gzip" | "deflate" | "brotli" | "lzma" | "ppmd")[];
   readonly decoderIntegrity?: Sha256Integrity;
-  readonly resourceProfile?: "embedded-shared-containers@1" | "embedded-shared-containers-base90@1" | "embedded-shared-containers-base91@1" | "embedded-shared-containers-base90-block@2" | "embedded-shared-containers-uri81@1";
+  readonly resourceProfile?: "embedded-shared-containers@1" | "embedded-shared-containers-base90@1" | "embedded-shared-containers-base91@1" | "embedded-shared-containers-base90-block@2" | "embedded-shared-containers-uri81@1" | "legacy-prepared-dense-copy@1" | "legacy-prepared-dense-shared-image@1";
   readonly transportDecoderIntegrity?: Sha256Integrity;
   readonly containerBridge?: Uint8Array;
   readonly containerBridgeIntegrity?: Sha256Integrity;
@@ -1162,6 +1166,9 @@ export async function buildCompactInlineKeelShell(input: {
   readonly prefixIntegrity: Sha256Integrity;
   readonly suffixIntegrity: Sha256Integrity;
 }> {
+  if (input.legacyPreparedDenseDelivery && (!Number.isSafeInteger(input.legacyPreparedDenseDelivery.chainId) || input.legacyPreparedDenseDelivery.chainId <= 0
+      || input.embeddedContainerDelivery || input.onchainDelivery || input.binaryPayloadCarriage !== undefined || input.contextCarriage !== undefined || input.decoderDelivery !== undefined
+      || input.optionalMarketplaceInfo)) throw new TypeError("Legacy prepared dense delivery needs its own selected-chain, offline reader profile.");
   if (input.binaryPayloadCarriage !== undefined && !["as-is", "base64", "base90", "base91", "base90-block", "uri81"].includes(input.binaryPayloadCarriage)) throw new TypeError("Invalid binary payload carriage.");
   if (input.binaryPayloadCarriage !== undefined && !input.embeddedContainerDelivery) throw new TypeError("Binary payload carriage requires an embedded container profile.");
   if (input.embeddedContainerDelivery && input.onchainDelivery) throw new TypeError("Select exactly one KEEL delivery profile.");
@@ -1179,7 +1186,7 @@ export async function buildCompactInlineKeelShell(input: {
     for(const endpoint of config.rpcUrls)assertKeelRpcUrl(endpoint,config.rpcHosts);
     if((input.embeddedContainerDelivery?.chainId??input.onchainDelivery?.chainId??config.chainId)!==config.chainId)throw new TypeError("Optional marketplace reads must use the artwork's chain");
   }
-  const installedViewReader = input.embeddedContainerDelivery ? { integrity: { digest: `0x${"0".repeat(64)}` } } : await buildPublishedViewReaderModule();
+  const installedViewReader = input.embeddedContainerDelivery || input.legacyPreparedDenseDelivery ? { integrity: { digest: `0x${"0".repeat(64)}` } } : await buildPublishedViewReaderModule();
   // Packaged canonical source makes the default independent of the consumer's cwd.
   const verificationChromePath = fileURLToPath(new URL("./assets/keel-verification-chrome.js", import.meta.url));
   const canonical = await readFile(verificationChromePath);
@@ -1196,10 +1203,10 @@ export async function buildCompactInlineKeelShell(input: {
     ...(codecProfile === "ppmd-js" ? ["ppmd" as const] : []),
   ];
   const decoderModule = codecs.length ? await buildKeelDecoderModule({ codecs }) : undefined;
-  const transportProfile = input.binaryPayloadCarriage === "uri81" ? "uri81-block-v1" : input.binaryPayloadCarriage === "base90-block" ? "base90-block-v2" : input.binaryPayloadCarriage === "base90" ? "base90-v1" : input.binaryPayloadCarriage === "base91" ? "base91-v1" : undefined;
+  const transportProfile = input.legacyPreparedDenseDelivery ? "base90-v1" : input.binaryPayloadCarriage === "uri81" ? "uri81-block-v1" : input.binaryPayloadCarriage === "base90-block" ? "base90-block-v2" : input.binaryPayloadCarriage === "base90" ? "base90-v1" : input.binaryPayloadCarriage === "base91" ? "base91-v1" : undefined;
   const transportModule = transportProfile ? await buildKeelDenseTransportDecoder(transportProfile) : undefined;
   let runtimeSource = compactInlineRuntime.toString();
-  if (decoderModule || input.onchainDelivery || input.embeddedContainerDelivery) {
+  if (decoderModule || input.onchainDelivery || input.embeddedContainerDelivery || input.legacyPreparedDenseDelivery) {
     const replacement = `const decompress = async (compression, bytes, decodedByteLength) => {
       if (!Number.isSafeInteger(decodedByteLength) || decodedByteLength < 0 || decodedByteLength > 32 * 1024 * 1024) throw new RangeError("Committed decoded length exceeds shell limit.");
       if (compression === "none") return bytes;
@@ -1266,6 +1273,26 @@ export async function buildCompactInlineKeelShell(input: {
     runtimeSource = disabledPublishedReader;
     binaryReaderImport = `import {createKeelEmbeddedContainerReader} from ${JSON.stringify(fileURLToPath(new URL("./embedded-container-reader.js", import.meta.url)))};import {validateKeelEmbeddedContainerContext,unpackKeelEmbeddedContainerContext} from ${JSON.stringify(fileURLToPath(new URL("./embedded-container-context.js", import.meta.url)))};`;
   }
+  if (input.legacyPreparedDenseDelivery) {
+    const marker = "const resolve = async (item";
+    const prelude = `let legacyReader;
+    const initializeLegacyReader = async () => {
+      if(document.readyState === "loading")await new Promise(done=>document.addEventListener("DOMContentLoaded",done,{once:true}));
+      validateKeelLegacyPreparedContext(globals.__KEEL_CONTEXT__,${input.legacyPreparedDenseDelivery.chainId});
+      return createKeelLegacyPreparedDenseReader({items,payloads:globalThis.__KEEL_EMBEDDED_CONTAINERS__,verify,decompress,
+        transportProfile:"base90-v1",decodeTransport:(text,byteLength)=>KEEL_DENSE_TRANSPORT.decodeKeelDenseTransport(text,{profile:"base90-v1",byteLength})});
+    };\n`;
+    const withReader = runtimeSource.replace(marker, prelude + marker);
+    const withResolve = withReader.replace(/(const resolve = async \(item[^\n]*?\{)/u, `$1\n    return (await (legacyReader ??= initializeLegacyReader())).resolve(item);`);
+    const disabled = withResolve.replace("if (enabled) {", "if (false) {");
+    if (withReader === runtimeSource || withResolve === withReader || disabled === withResolve) throw new Error("Canonical legacy prepared reader hooks are missing.");
+    if (input.legacyPreparedDenseDelivery.sharedImage) {
+      const shared = disabled.replace(/(const replaceAliases = [\s\S]*?let output = )text;/u, '$1replaceKeelSharedImageCSSAliases(text, aliases);');
+      if (shared === disabled) throw new Error("Shared-image CSS alias hook is missing.");
+      runtimeSource = shared;
+    } else runtimeSource = disabled;
+    binaryReaderImport = `import {${input.legacyPreparedDenseDelivery.sharedImage ? "createKeelLegacySharedImageReader as createKeelLegacyPreparedDenseReader,replaceKeelSharedImageCSSAliases" : "createKeelLegacyPreparedDenseReader"},validateKeelLegacyPreparedContext} from ${JSON.stringify(fileURLToPath(new URL(input.legacyPreparedDenseDelivery.sharedImage ? "./legacy-shared-image-reader.js" : "./legacy-prepared-dense-reader.js", import.meta.url)))};`;
+  }
   if (input.fitViewport) {
     const {width, height} = input.fitViewport;
     const hook = "stage.replaceChildren(frame);";
@@ -1297,11 +1324,11 @@ export async function buildCompactInlineKeelShell(input: {
   });
   const runtime = runtimeBuild.outputFiles[0]?.text;
   if (runtime === undefined) throw new Error("Compact KEEL Inline runtime produced no JavaScript.");
-  const prefix = utf8ToBytes(('<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><style>*{box-sizing:border-box}html,body,#keel-stage,iframe{width:100%;height:100%;margin:0;border:0;overflow:hidden;background:#0c0d10}body{position:relative;overflow:clip!important}[hidden]{display:none!important}'+KEEL_LOADING_CSS+'</style></head><body data-verification="pending"><div id="keel-stage"></div>'+KEEL_LOADING_MARKUP+'<script>globalThis.__KEEL_ITEMS__=[null').replace("globalThis.__KEEL_ITEMS__=[null", input.embeddedContainerDelivery ? "globalThis.__KEEL_EMBEDDED_CONTAINERS__=[" : "globalThis.__KEEL_ITEMS__=[null"));
-  const suffix = utf8ToBytes(`];${runtime}</script></body></html>`);
+  const prefix = utf8ToBytes(('<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><style>*{box-sizing:border-box}html,body,#keel-stage,iframe{width:100%;height:100%;margin:0;border:0;overflow:hidden;background:#0c0d10}body{position:relative;overflow:clip!important}[hidden]{display:none!important}'+KEEL_LOADING_CSS+'</style></head><body data-verification="pending"><div id="keel-stage"></div>'+KEEL_LOADING_MARKUP+'<script>globalThis.__KEEL_ITEMS__=[null').replace("globalThis.__KEEL_ITEMS__=[null", input.embeddedContainerDelivery || input.legacyPreparedDenseDelivery ? "globalThis.__KEEL_EMBEDDED_CONTAINERS__=[" : "globalThis.__KEEL_ITEMS__=[null"));
+  const suffix = utf8ToBytes(`];${input.legacyPreparedDenseDelivery ? 'const __KEEL_LEGACY_DENSE_PROFILE__="' + (input.legacyPreparedDenseDelivery.sharedImage ? 'keel.legacy-prepared-dense-shared-image@1' : 'keel.legacy-prepared-dense-copy@1') + '";' : ""}${runtime}</script></body></html>`);
   const [prefixIntegrity, suffixIntegrity] = await Promise.all([sha256Integrity(prefix), sha256Integrity(suffix)]);
-  const containerBridge = input.embeddedContainerDelivery ? utf8ToBytes("];globalThis.__KEEL_ITEMS__=[null") : undefined;
-  return { prefix, suffix, prefixIntegrity, suffixIntegrity, ...(containerBridge ? { resourceProfile: transportProfile === "uri81-block-v1" ? "embedded-shared-containers-uri81@1" as const : transportProfile === "base90-block-v2" ? "embedded-shared-containers-base90-block@2" as const : transportProfile === "base90-v1" ? "embedded-shared-containers-base90@1" as const : transportProfile === "base91-v1" ? "embedded-shared-containers-base91@1" as const : "embedded-shared-containers@1" as const, containerBridge,
+  const containerBridge = input.embeddedContainerDelivery || input.legacyPreparedDenseDelivery ? utf8ToBytes("];globalThis.__KEEL_ITEMS__=[null") : undefined;
+  return { prefix, suffix, prefixIntegrity, suffixIntegrity, ...(containerBridge ? { resourceProfile: input.legacyPreparedDenseDelivery ? input.legacyPreparedDenseDelivery.sharedImage ? "legacy-prepared-dense-shared-image@1" as const : "legacy-prepared-dense-copy@1" as const : transportProfile === "uri81-block-v1" ? "embedded-shared-containers-uri81@1" as const : transportProfile === "base90-block-v2" ? "embedded-shared-containers-base90-block@2" as const : transportProfile === "base90-v1" ? "embedded-shared-containers-base90@1" as const : transportProfile === "base91-v1" ? "embedded-shared-containers-base91@1" as const : "embedded-shared-containers@1" as const, containerBridge,
     containerBridgeIntegrity: await sha256Integrity(containerBridge) } : {}), deliveryProfile: input.onchainDelivery ? "onchain-recursive" : "embedded-assembled", codecProfile, supportedCodecs: ["none", "gzip", "deflate", ...codecs], ...(decoderModule ? { decoderIntegrity: decoderModule.integrity } : {}), ...(transportModule ? { transportDecoderIntegrity: transportModule.integrity } : {}) };
 }
 

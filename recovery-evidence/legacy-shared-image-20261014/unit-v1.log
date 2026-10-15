@@ -1,0 +1,76 @@
+TAP version 13
+# Subtest: default Compact uses actual compatible Brotli/Dense legacy envelope and preserves exact source/poster
+ok 1 - default Compact uses actual compatible Brotli/Dense legacy envelope and preserves exact source/poster
+  ---
+  duration_ms: 1134.858224
+  type: 'test'
+  ...
+# Subtest: auto keeps nonbeneficial exact bytes; explicit codec choices and Raw are preserved
+ok 2 - auto keeps nonbeneficial exact bytes; explicit codec choices and Raw are preserved
+  ---
+  duration_ms: 1737.832149
+  type: 'test'
+  ...
+# Subtest: 40/41,128/129,256 and configured1024 logical resources retain IDs/order without expanding the64-part root
+ok 3 - 40/41,128/129,256 and configured1024 logical resources retain IDs/order without expanding the64-part root
+  ---
+  duration_ms: 3303.187416
+  type: 'test'
+  ...
+# Subtest: large sources are segmented without changing original identity or adding an aggregate32MiB limit
+ok 4 - large sources are segmented without changing original identity or adding an aggregate32MiB limit
+  ---
+  duration_ms: 1943.561636
+  type: 'test'
+  ...
+# Subtest: new profile rejects changed outer execution, missing/context impersonation and conflicting namespaces
+ok 5 - new profile rejects changed outer execution, missing/context impersonation and conflicting namespaces
+  ---
+  duration_ms: 385.908463
+  type: 'test'
+  ...
+# Subtest: existing registered text modules keep exact fragment bytes and data/module playback order
+ok 6 - existing registered text modules keep exact fragment bytes and data/module playback order
+  ---
+  duration_ms: 256.196861
+  type: 'test'
+  ...
+# Subtest: existing compressed bytes stay exact and new512KiB leaves retain mixed none/Brotli selection
+ok 7 - existing compressed bytes stay exact and new512KiB leaves retain mixed none/Brotli selection
+  ---
+  duration_ms: 911.174287
+  type: 'test'
+  ...
+# Subtest: shared native image program retains the exact complete original resource table and stores image payload once
+ok 8 - shared native image program retains the exact complete original resource table and stores image payload once
+  ---
+  duration_ms: 940.731523
+  type: 'test'
+  ...
+# Subtest: encoded image upload, unknown image binding and tampered source objects fail closed
+ok 9 - encoded image upload, unknown image binding and tampered source objects fail closed
+  ---
+  duration_ms: 472.807423
+  type: 'test'
+  ...
+# Subtest: CSS url grammar handles escaped filenames, quotes and escaped parentheses without changing unrelated text
+ok 10 - CSS url grammar handles escaped filenames, quotes and escaped parentheses without changing unrelated text
+  ---
+  duration_ms: 2.42531
+  type: 'test'
+  ...
+# Subtest: explicit Raw/compressed image choices and unsupported metadata bindings remain explicit
+ok 11 - explicit Raw/compressed image choices and unsupported metadata bindings remain explicit
+  ---
+  duration_ms: 1.141958
+  type: 'test'
+  ...
+1..11
+# tests 11
+# suites 0
+# pass 11
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 10568.799327

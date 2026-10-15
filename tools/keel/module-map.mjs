@@ -105,7 +105,7 @@ export const MODULES = [
     title: "Kernel",
     summary: "Admin/access primitives and encoding helpers every other module is allowed to import.",
     deps: [],
-    devDeps: ["keel-artifacts", "keel-die"],
+    devDeps: ["keel-artifacts", "keel-die", "keel-hold", "keel-harness", "keel-mint-access", "keel-market"],
     contracts: ["SafeAdminAccessControl.sol","libraries/JsonEscape.sol","libraries/KeelCodeIdentity.sol","libraries/KeelUriEscape.sol","KeelFeeTreasury.sol","libraries/KeelPlatformFees.sol","libraries/KeelGovernance.sol","KeelAccessGroups.sol","KeelLocalPause.sol","libraries/KeelPause.sol","libraries/KeelTokenURIEnvelope.sol","libraries/KeelMintSeeded.sol","libraries/KeelMintSeededBatches.sol","interfaces/IKeelMintSeededBatchErrors.sol","interfaces/IKeelMintSeededErrors.sol","interfaces/IKeelMintSeededData.sol","interfaces/IKeelVrfV2Plus.sol","interfaces/IKeelGovernanceErrors.sol","interfaces/IKeelPlatformFeeErrors.sol","interfaces/IKeelFeeTreasuryErrors.sol","interfaces/IKeelFeeTreasuryEvents.sol","interfaces/IKeelAccessGroupErrors.sol","interfaces/IKeelAccessGroupEvents.sol","KeelRecoveryGroups.sol","interfaces/IKeelRecoveryErrors.sol","interfaces/IKeelMetadataRelay.sol","libraries/KeelMetadataSubscriptions.sol","libraries/KeelRawStringReturn.sol","KeelAuthority.sol","interfaces/IKeelAuthorityErrors.sol"],
   },
   {
@@ -125,7 +125,7 @@ export const MODULES = [
     title: "Storage",
     summary: "Immutable content-addressed chunk storage and the artifact registry that activates revisions.",
     deps: ["keel-kernel"],
-    devDeps: ["keel-harness", "keel-die", "keel-artifacts"],
+    devDeps: ["keel-harness", "keel-die", "keel-artifacts", "keel-publication"],
     contracts: ["KeelHold.sol","Ingot.sol","KeelIndex.sol","interfaces/IKeelHold.sol","interfaces/IKeelHoldLimits.sol","interfaces/IKeelHoldSeal.sol","libraries/KeelSealValidation.sol","libraries/KeelCastDispatch.sol","interfaces/IKeelIndex.sol","interfaces/IKeelHoldHarness.sol","interfaces/IKeelHoldEvents.sol","libraries/KeelHoldMetadata.sol","interfaces/IKeelHoldErrors.sol","interfaces/IKeelIndexErrors.sol","interfaces/IKeelIndexEvents.sol","interfaces/IKeelIndexMetadataReceiver.sol"],
   },
   {
@@ -135,7 +135,7 @@ export const MODULES = [
     title: "Object model",
     summary: "The Keel object graph: objects, viewers, links, seeds, and the manager that fronts them.",
     deps: ["keel-hold","keel-kernel"],
-    devDeps: ["keel-die","keel-harness"],
+    devDeps: ["keel-die", "keel-harness", "keel-creator-identity"],
     contracts: ["KeelArtifactRegistry.sol","KeelManager.sol","KeelTestOwnerManager.sol","KeelManagerProxy.sol","KeelHarnessRegistry.sol","KeelLinkRegistry.sol","KeelSeedRegistry.sol","interfaces/IKeelMintSeedSource.sol","interfaces/IKeelSeedRegistryErrors.sol","interfaces/IKeelSeedRegistryEvents.sol","interfaces/IKeelArtifactRegistry.sol","interfaces/IKeelManager.sol","interfaces/IKeelArtifactRevisionPolicy.sol","interfaces/IKeelHarnessRegistry.sol","interfaces/IKeelHarnessRegistryErrors.sol","interfaces/IKeelHarnessRegistryEvents.sol","KeelManagerRecovery.sol","KeelManagerRpcPolicy.sol","interfaces/IKeelManagerErrors.sol","interfaces/IKeelManagerEvents.sol","interfaces/IKeelManagerRecoveryErrors.sol","interfaces/IKeelManagerRecoveryEvents.sol","interfaces/IKeelManagerRpcErrors.sol","interfaces/IKeelManagerRpcEvents.sol","interfaces/IKeelManagerTypes.sol","libraries/KeelManagerGovernorState.sol","KeelLinkURIBuilder.sol","interfaces/IKeelLinkURIBuilder.sol","interfaces/IKeelLinkURIBuilderErrors.sol","interfaces/IKeelLinkRegistryErrors.sol","interfaces/IKeelLinkRegistryEvents.sol","KeelRawFragmentValidationRegistry.sol","KeelRawFragmentRevisionPolicy.sol","KeelRawImageRevisionPolicy.sol","KeelArtifactFragmentResolver.sol","KeelRegisteredArtifactFragmentResolver.sol","interfaces/IKeelArtifactFragmentResolver.sol","interfaces/IKeelRawCanonicalShellRegistry.sol","interfaces/IKeelRawFragmentRevisionPolicy.sol","interfaces/IKeelRawFragmentValidationRegistry.sol","interfaces/IKeelRawFragmentValidationRegistryEvents.sol","interfaces/IKeelRawImageRevisionPolicy.sol","interfaces/IKeelRevisionedRawTokenURIBuilder.sol"],
   },
   {
@@ -179,6 +179,7 @@ export const MODULES = [
     contracts: [
       "KEEL721.sol",
       "KEEL721Deployer.sol",
+      "KeelCreationCodeCarrier.sol",
       "Keel721Initialization.sol",
       "Keel721Presentation.sol",
       "Keel721State.sol",
@@ -277,7 +278,7 @@ export const MODULES = [
     summary: "Cross-chain and off-chain anchoring: portable commitments, permissionless L2 state proofs, and zk verification backends.",
     deps: ["keel-kernel", "keel-codecs", "keel-artifacts", "keel-graph", "keel-hold"],
     devDeps: ["keel-crucible"],
-    contracts: ["KeelProofUpgradeController.sol","KeelAttestedAnchorRegistry.sol","KeelPortableAnchorRegistry.sol","KeelAnchorReplicationBridge.sol","KeelL2AnchorVerifier.sol","KeelL2StateVerifier.sol","KeelSettlementRegistry.sol","KeelZkAnchorVerifier.sol","KeelZkVerifyProofBackend.sol","KeelZkVerifyProofVerifier.sol","KeelSp1GatewayProofBackend.sol","KeelSp1GatewayProofVerifier.sol","KeelIpfsCidVerifier.sol","KeelNodeRegistry.sol","interfaces/IKeelAnchorProofBackend.sol","interfaces/IKeelAnchorProofVerifier.sol","interfaces/IKeelAnchoredChainQueries.sol","interfaces/IKeelSettlementSource.sol","vendor/sp1/ISP1Verifier.sol","vendor/sp1/v5.0.0/Groth16Verifier.sol","vendor/sp1/v5.0.0/SP1VerifierGroth16.sol","libraries/KeelAnchorTextValidation.sol"],
+    contracts: ["KeelProofUpgradeController.sol","KeelAttestedAnchorRegistry.sol","KeelPortableAnchorRegistry.sol","KeelAnchorReplicationBridge.sol","KeelL2AnchorVerifier.sol","KeelL2StateVerifier.sol","KeelSettlementRegistry.sol","KeelZkAnchorVerifier.sol","KeelZkVerifyProofBackend.sol","KeelZkVerifyProofVerifier.sol","KeelSp1GatewayProofBackend.sol","KeelSp1GatewayProofVerifier.sol","KeelIpfsCidVerifier.sol","KeelNodeRegistry.sol","interfaces/IKeelAnchorProofBackend.sol","interfaces/IVerifyProofAggregation.sol","interfaces/IKeelAnchorProofVerifier.sol","interfaces/IKeelAnchoredChainQueries.sol","interfaces/IKeelSettlementSource.sol","vendor/sp1/ISP1Verifier.sol","vendor/sp1/v5.0.0/Groth16Verifier.sol","vendor/sp1/v5.0.0/SP1VerifierGroth16.sol","libraries/KeelAnchorTextValidation.sol"],
   },
   {
     id: "keel-crucible",
@@ -295,7 +296,7 @@ export const MODULES = [
     group: "provenance",
     title: "IP control",
     summary: "On-chain IP rights control, wrapped-721 custody, and the executor that acts on granted rights.",
-    deps: ["keel-hold", "keel-artifacts", "keel-kernel"],
+    deps: ["keel-hold", "keel-artifacts", "keel-kernel", "keel-die"],
     devDeps: [],
     contracts: ["KeelIPControl.sol","KeelIPActionExecutor.sol","KeelIPWrapped721.sol","interfaces/IKeelIPControl.sol","interfaces/IKeelIPMintTarget.sol"],
   },
@@ -325,7 +326,7 @@ export const MODULES = [
     group: "token",
     title: "Optional cross-chain mint bridge",
     summary: "Optional attested cross-chain mint requests; not required for storage, publication, or local minting.",
-    deps: ["keel-kernel", "keel-mint-access"],
+    deps: ["keel-kernel", "keel-mint-access", "keel-ip-control"],
     devDeps: ["keel-die", "keel-anchors", "keel-artifacts", "keel-hold"],
     contracts: ["KeelCrossChainMintBridge.sol"],
   },
@@ -346,7 +347,7 @@ export const MODULES = [
     title: "Stake objects",
     summary: "Configurable ERC-721 staking custody, frozen terms, and optional token-bound accounts.",
     deps: ["keel-artifacts", "keel-kernel"],
-    devDeps: [],
+    devDeps: ["keel-die", "keel-presentation"],
     contracts: ["KeelStakeObjectManager.sol","interfaces/IKeelStakeObjectErrors.sol","interfaces/IKeelStakeObjectEvents.sol","interfaces/IKeelTokenBoundAccountRegistry.sol"],
   },
   {
