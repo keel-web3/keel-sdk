@@ -1,0 +1,927 @@
+{
+  "schema": "keel-qualified-saved-release-regression-fixture@1",
+  "baselineCommit": "da9b402bf95b8f19c4f2a120708dc45092e8335c",
+  "synthetic": true,
+  "scope": "Exact policy outputs and saved-review wire transcripts emitted by qualified SDK source. Synthetic identities and calls; no actual creator project, chain reconciliation, simulation or mint evidence.",
+  "producer": "Actual qualified TypeScript source bundled with esbuild 0.28.2; no production data or chain evidence.",
+  "sourceManifest": {
+    "packages/sdk/src/studio-project-defaults.ts": {
+      "byteLength": 16649,
+      "sha256": "0e5e612e2211a8e9f0bbd790459b5756b2f7dc1a087852b196f7cd13e2c15d0a"
+    },
+    "packages/sdk/src/studio-agent-drafts.ts": {
+      "byteLength": 66119,
+      "sha256": "06a496e28c512758ac8b5544cef0eb583bcfb6f47a27d2711da32169a8b24cc5"
+    },
+    "packages/sdk/src/studio-upload.ts": {
+      "byteLength": 16112,
+      "sha256": "520e960dfadfd92e0f7210a0c56e9929904f661b79cfb58e987723364a534e2f"
+    },
+    "packages/sdk/src/updated-publication-review.ts": {
+      "byteLength": 27582,
+      "sha256": "04edc7345c54b2acf619f79d6a364c1227a6c3e0c2c21e08f3ac9160a6648875"
+    },
+    "packages/sdk/src/managed-publication-recovery.ts": {
+      "byteLength": 5086,
+      "sha256": "e91100a96315339f43421bba6444a8019ea8cea3473d3a282f0af2402b946811"
+    }
+  },
+  "policies": [
+    {
+      "id": "historical-system-default",
+      "profile": {
+        "schema": "keel-studio-default-profile@1",
+        "revision": 0,
+        "askToSave": false,
+        "global": {},
+        "byMedia": {}
+      },
+      "input": {},
+      "saved": {
+        "schema": "keel-effective-build-defaults@1",
+        "revision": 0,
+        "values": {
+          "compression": "auto",
+          "brotliQuality": 11,
+          "transportProfile": "base90-v1",
+          "payloadStorage": "compact",
+          "hybridFallback": false,
+          "rpcMaxConcurrentReads": 4
+        },
+        "sources": {
+          "compression": "system",
+          "brotliQuality": "system",
+          "transportProfile": "system",
+          "payloadStorage": "system",
+          "hybridFallback": "system",
+          "rpcMaxConcurrentReads": "system"
+        },
+        "requiresFullReadValidation": true
+      }
+    },
+    {
+      "id": "account-base90-v1",
+      "profile": {
+        "schema": "keel-studio-default-profile@1",
+        "revision": 3,
+        "askToSave": false,
+        "global": {
+          "transportProfile": "base90-v1"
+        },
+        "byMedia": {}
+      },
+      "input": {
+        "mediaType": "image/png"
+      },
+      "saved": {
+        "schema": "keel-effective-build-defaults@1",
+        "revision": 3,
+        "values": {
+          "compression": "auto",
+          "brotliQuality": 11,
+          "transportProfile": "base90-v1",
+          "payloadStorage": "compact",
+          "hybridFallback": false,
+          "rpcMaxConcurrentReads": 4
+        },
+        "sources": {
+          "compression": "system",
+          "brotliQuality": "system",
+          "transportProfile": "account",
+          "payloadStorage": "system",
+          "hybridFallback": "system",
+          "rpcMaxConcurrentReads": "system"
+        },
+        "requiresFullReadValidation": true
+      }
+    },
+    {
+      "id": "media-base90-v1",
+      "profile": {
+        "schema": "keel-studio-default-profile@1",
+        "revision": 3,
+        "askToSave": false,
+        "global": {},
+        "byMedia": {
+          "image/png": {
+            "transportProfile": "base90-v1"
+          }
+        }
+      },
+      "input": {
+        "mediaType": "image/png"
+      },
+      "saved": {
+        "schema": "keel-effective-build-defaults@1",
+        "revision": 3,
+        "values": {
+          "compression": "auto",
+          "brotliQuality": 11,
+          "transportProfile": "base90-v1",
+          "payloadStorage": "compact",
+          "hybridFallback": false,
+          "rpcMaxConcurrentReads": 4
+        },
+        "sources": {
+          "compression": "system",
+          "brotliQuality": "system",
+          "transportProfile": "media",
+          "payloadStorage": "system",
+          "hybridFallback": "system",
+          "rpcMaxConcurrentReads": "system"
+        },
+        "requiresFullReadValidation": true
+      }
+    },
+    {
+      "id": "project-base90-v1",
+      "profile": {
+        "schema": "keel-studio-default-profile@1",
+        "revision": 3,
+        "askToSave": false,
+        "global": {},
+        "byMedia": {}
+      },
+      "input": {
+        "mediaType": "image/png",
+        "project": {
+          "transportProfile": "base90-v1"
+        }
+      },
+      "saved": {
+        "schema": "keel-effective-build-defaults@1",
+        "revision": 3,
+        "values": {
+          "compression": "auto",
+          "brotliQuality": 11,
+          "transportProfile": "base90-v1",
+          "payloadStorage": "compact",
+          "hybridFallback": false,
+          "rpcMaxConcurrentReads": 4
+        },
+        "sources": {
+          "compression": "system",
+          "brotliQuality": "system",
+          "transportProfile": "project",
+          "payloadStorage": "system",
+          "hybridFallback": "system",
+          "rpcMaxConcurrentReads": "system"
+        },
+        "requiresFullReadValidation": true
+      }
+    },
+    {
+      "id": "build-base90-v1",
+      "profile": {
+        "schema": "keel-studio-default-profile@1",
+        "revision": 3,
+        "askToSave": false,
+        "global": {},
+        "byMedia": {}
+      },
+      "input": {
+        "mediaType": "image/png",
+        "build": {
+          "transportProfile": "base90-v1"
+        }
+      },
+      "saved": {
+        "schema": "keel-effective-build-defaults@1",
+        "revision": 3,
+        "values": {
+          "compression": "auto",
+          "brotliQuality": 11,
+          "transportProfile": "base90-v1",
+          "payloadStorage": "compact",
+          "hybridFallback": false,
+          "rpcMaxConcurrentReads": 4
+        },
+        "sources": {
+          "compression": "system",
+          "brotliQuality": "system",
+          "transportProfile": "build",
+          "payloadStorage": "system",
+          "hybridFallback": "system",
+          "rpcMaxConcurrentReads": "system"
+        },
+        "requiresFullReadValidation": true
+      }
+    },
+    {
+      "id": "account-base91-v1",
+      "profile": {
+        "schema": "keel-studio-default-profile@1",
+        "revision": 3,
+        "askToSave": false,
+        "global": {
+          "transportProfile": "base91-v1"
+        },
+        "byMedia": {}
+      },
+      "input": {
+        "mediaType": "image/png"
+      },
+      "saved": {
+        "schema": "keel-effective-build-defaults@1",
+        "revision": 3,
+        "values": {
+          "compression": "auto",
+          "brotliQuality": 11,
+          "transportProfile": "base91-v1",
+          "payloadStorage": "compact",
+          "hybridFallback": false,
+          "rpcMaxConcurrentReads": 4
+        },
+        "sources": {
+          "compression": "system",
+          "brotliQuality": "system",
+          "transportProfile": "account",
+          "payloadStorage": "system",
+          "hybridFallback": "system",
+          "rpcMaxConcurrentReads": "system"
+        },
+        "requiresFullReadValidation": true
+      }
+    },
+    {
+      "id": "media-base91-v1",
+      "profile": {
+        "schema": "keel-studio-default-profile@1",
+        "revision": 3,
+        "askToSave": false,
+        "global": {},
+        "byMedia": {
+          "image/png": {
+            "transportProfile": "base91-v1"
+          }
+        }
+      },
+      "input": {
+        "mediaType": "image/png"
+      },
+      "saved": {
+        "schema": "keel-effective-build-defaults@1",
+        "revision": 3,
+        "values": {
+          "compression": "auto",
+          "brotliQuality": 11,
+          "transportProfile": "base91-v1",
+          "payloadStorage": "compact",
+          "hybridFallback": false,
+          "rpcMaxConcurrentReads": 4
+        },
+        "sources": {
+          "compression": "system",
+          "brotliQuality": "system",
+          "transportProfile": "media",
+          "payloadStorage": "system",
+          "hybridFallback": "system",
+          "rpcMaxConcurrentReads": "system"
+        },
+        "requiresFullReadValidation": true
+      }
+    },
+    {
+      "id": "project-base91-v1",
+      "profile": {
+        "schema": "keel-studio-default-profile@1",
+        "revision": 3,
+        "askToSave": false,
+        "global": {},
+        "byMedia": {}
+      },
+      "input": {
+        "mediaType": "image/png",
+        "project": {
+          "transportProfile": "base91-v1"
+        }
+      },
+      "saved": {
+        "schema": "keel-effective-build-defaults@1",
+        "revision": 3,
+        "values": {
+          "compression": "auto",
+          "brotliQuality": 11,
+          "transportProfile": "base91-v1",
+          "payloadStorage": "compact",
+          "hybridFallback": false,
+          "rpcMaxConcurrentReads": 4
+        },
+        "sources": {
+          "compression": "system",
+          "brotliQuality": "system",
+          "transportProfile": "project",
+          "payloadStorage": "system",
+          "hybridFallback": "system",
+          "rpcMaxConcurrentReads": "system"
+        },
+        "requiresFullReadValidation": true
+      }
+    },
+    {
+      "id": "build-base91-v1",
+      "profile": {
+        "schema": "keel-studio-default-profile@1",
+        "revision": 3,
+        "askToSave": false,
+        "global": {},
+        "byMedia": {}
+      },
+      "input": {
+        "mediaType": "image/png",
+        "build": {
+          "transportProfile": "base91-v1"
+        }
+      },
+      "saved": {
+        "schema": "keel-effective-build-defaults@1",
+        "revision": 3,
+        "values": {
+          "compression": "auto",
+          "brotliQuality": 11,
+          "transportProfile": "base91-v1",
+          "payloadStorage": "compact",
+          "hybridFallback": false,
+          "rpcMaxConcurrentReads": 4
+        },
+        "sources": {
+          "compression": "system",
+          "brotliQuality": "system",
+          "transportProfile": "build",
+          "payloadStorage": "system",
+          "hybridFallback": "system",
+          "rpcMaxConcurrentReads": "system"
+        },
+        "requiresFullReadValidation": true
+      }
+    },
+    {
+      "id": "account-base90-block-v2",
+      "profile": {
+        "schema": "keel-studio-default-profile@1",
+        "revision": 3,
+        "askToSave": false,
+        "global": {
+          "transportProfile": "base90-block-v2"
+        },
+        "byMedia": {}
+      },
+      "input": {
+        "mediaType": "image/png"
+      },
+      "saved": {
+        "schema": "keel-effective-build-defaults@1",
+        "revision": 3,
+        "values": {
+          "compression": "auto",
+          "brotliQuality": 11,
+          "transportProfile": "base90-block-v2",
+          "payloadStorage": "compact",
+          "hybridFallback": false,
+          "rpcMaxConcurrentReads": 4
+        },
+        "sources": {
+          "compression": "system",
+          "brotliQuality": "system",
+          "transportProfile": "account",
+          "payloadStorage": "system",
+          "hybridFallback": "system",
+          "rpcMaxConcurrentReads": "system"
+        },
+        "requiresFullReadValidation": true
+      }
+    },
+    {
+      "id": "media-base90-block-v2",
+      "profile": {
+        "schema": "keel-studio-default-profile@1",
+        "revision": 3,
+        "askToSave": false,
+        "global": {},
+        "byMedia": {
+          "image/png": {
+            "transportProfile": "base90-block-v2"
+          }
+        }
+      },
+      "input": {
+        "mediaType": "image/png"
+      },
+      "saved": {
+        "schema": "keel-effective-build-defaults@1",
+        "revision": 3,
+        "values": {
+          "compression": "auto",
+          "brotliQuality": 11,
+          "transportProfile": "base90-block-v2",
+          "payloadStorage": "compact",
+          "hybridFallback": false,
+          "rpcMaxConcurrentReads": 4
+        },
+        "sources": {
+          "compression": "system",
+          "brotliQuality": "system",
+          "transportProfile": "media",
+          "payloadStorage": "system",
+          "hybridFallback": "system",
+          "rpcMaxConcurrentReads": "system"
+        },
+        "requiresFullReadValidation": true
+      }
+    },
+    {
+      "id": "project-base90-block-v2",
+      "profile": {
+        "schema": "keel-studio-default-profile@1",
+        "revision": 3,
+        "askToSave": false,
+        "global": {},
+        "byMedia": {}
+      },
+      "input": {
+        "mediaType": "image/png",
+        "project": {
+          "transportProfile": "base90-block-v2"
+        }
+      },
+      "saved": {
+        "schema": "keel-effective-build-defaults@1",
+        "revision": 3,
+        "values": {
+          "compression": "auto",
+          "brotliQuality": 11,
+          "transportProfile": "base90-block-v2",
+          "payloadStorage": "compact",
+          "hybridFallback": false,
+          "rpcMaxConcurrentReads": 4
+        },
+        "sources": {
+          "compression": "system",
+          "brotliQuality": "system",
+          "transportProfile": "project",
+          "payloadStorage": "system",
+          "hybridFallback": "system",
+          "rpcMaxConcurrentReads": "system"
+        },
+        "requiresFullReadValidation": true
+      }
+    },
+    {
+      "id": "build-base90-block-v2",
+      "profile": {
+        "schema": "keel-studio-default-profile@1",
+        "revision": 3,
+        "askToSave": false,
+        "global": {},
+        "byMedia": {}
+      },
+      "input": {
+        "mediaType": "image/png",
+        "build": {
+          "transportProfile": "base90-block-v2"
+        }
+      },
+      "saved": {
+        "schema": "keel-effective-build-defaults@1",
+        "revision": 3,
+        "values": {
+          "compression": "auto",
+          "brotliQuality": 11,
+          "transportProfile": "base90-block-v2",
+          "payloadStorage": "compact",
+          "hybridFallback": false,
+          "rpcMaxConcurrentReads": 4
+        },
+        "sources": {
+          "compression": "system",
+          "brotliQuality": "system",
+          "transportProfile": "build",
+          "payloadStorage": "system",
+          "hybridFallback": "system",
+          "rpcMaxConcurrentReads": "system"
+        },
+        "requiresFullReadValidation": true
+      }
+    },
+    {
+      "id": "account-uri81-block-v1",
+      "profile": {
+        "schema": "keel-studio-default-profile@1",
+        "revision": 3,
+        "askToSave": false,
+        "global": {
+          "transportProfile": "uri81-block-v1"
+        },
+        "byMedia": {}
+      },
+      "input": {
+        "mediaType": "image/png"
+      },
+      "saved": {
+        "schema": "keel-effective-build-defaults@1",
+        "revision": 3,
+        "values": {
+          "compression": "auto",
+          "brotliQuality": 11,
+          "transportProfile": "uri81-block-v1",
+          "payloadStorage": "compact",
+          "hybridFallback": false,
+          "rpcMaxConcurrentReads": 4
+        },
+        "sources": {
+          "compression": "system",
+          "brotliQuality": "system",
+          "transportProfile": "account",
+          "payloadStorage": "system",
+          "hybridFallback": "system",
+          "rpcMaxConcurrentReads": "system"
+        },
+        "requiresFullReadValidation": true
+      }
+    },
+    {
+      "id": "media-uri81-block-v1",
+      "profile": {
+        "schema": "keel-studio-default-profile@1",
+        "revision": 3,
+        "askToSave": false,
+        "global": {},
+        "byMedia": {
+          "image/png": {
+            "transportProfile": "uri81-block-v1"
+          }
+        }
+      },
+      "input": {
+        "mediaType": "image/png"
+      },
+      "saved": {
+        "schema": "keel-effective-build-defaults@1",
+        "revision": 3,
+        "values": {
+          "compression": "auto",
+          "brotliQuality": 11,
+          "transportProfile": "uri81-block-v1",
+          "payloadStorage": "compact",
+          "hybridFallback": false,
+          "rpcMaxConcurrentReads": 4
+        },
+        "sources": {
+          "compression": "system",
+          "brotliQuality": "system",
+          "transportProfile": "media",
+          "payloadStorage": "system",
+          "hybridFallback": "system",
+          "rpcMaxConcurrentReads": "system"
+        },
+        "requiresFullReadValidation": true
+      }
+    },
+    {
+      "id": "project-uri81-block-v1",
+      "profile": {
+        "schema": "keel-studio-default-profile@1",
+        "revision": 3,
+        "askToSave": false,
+        "global": {},
+        "byMedia": {}
+      },
+      "input": {
+        "mediaType": "image/png",
+        "project": {
+          "transportProfile": "uri81-block-v1"
+        }
+      },
+      "saved": {
+        "schema": "keel-effective-build-defaults@1",
+        "revision": 3,
+        "values": {
+          "compression": "auto",
+          "brotliQuality": 11,
+          "transportProfile": "uri81-block-v1",
+          "payloadStorage": "compact",
+          "hybridFallback": false,
+          "rpcMaxConcurrentReads": 4
+        },
+        "sources": {
+          "compression": "system",
+          "brotliQuality": "system",
+          "transportProfile": "project",
+          "payloadStorage": "system",
+          "hybridFallback": "system",
+          "rpcMaxConcurrentReads": "system"
+        },
+        "requiresFullReadValidation": true
+      }
+    },
+    {
+      "id": "build-uri81-block-v1",
+      "profile": {
+        "schema": "keel-studio-default-profile@1",
+        "revision": 3,
+        "askToSave": false,
+        "global": {},
+        "byMedia": {}
+      },
+      "input": {
+        "mediaType": "image/png",
+        "build": {
+          "transportProfile": "uri81-block-v1"
+        }
+      },
+      "saved": {
+        "schema": "keel-effective-build-defaults@1",
+        "revision": 3,
+        "values": {
+          "compression": "auto",
+          "brotliQuality": 11,
+          "transportProfile": "uri81-block-v1",
+          "payloadStorage": "compact",
+          "hybridFallback": false,
+          "rpcMaxConcurrentReads": 4
+        },
+        "sources": {
+          "compression": "system",
+          "brotliQuality": "system",
+          "transportProfile": "build",
+          "payloadStorage": "system",
+          "hybridFallback": "system",
+          "rpcMaxConcurrentReads": "system"
+        },
+        "requiresFullReadValidation": true
+      }
+    },
+    {
+      "id": "retained-raw-over-compression-with-exact-read-ceilings",
+      "profile": {
+        "schema": "keel-studio-default-profile@1",
+        "revision": 5,
+        "askToSave": false,
+        "global": {
+          "transportProfile": "base90-block-v2",
+          "compression": "brotli",
+          "maxReadGas": 50000000,
+          "maxOutputBytes": 2000000
+        },
+        "byMedia": {
+          "image/png": {
+            "brotliQuality": 9,
+            "rpcMaxConcurrentReads": 3
+          }
+        }
+      },
+      "input": {
+        "mediaType": "image/png",
+        "project": {
+          "payloadStorage": "raw"
+        },
+        "build": {
+          "maxOutputBytes": 1900000
+        },
+        "constraints": {
+          "maxReadGas": 40000000,
+          "maxOutputBytes": 2000000,
+          "transportProfiles": [
+            "base90-block-v2"
+          ]
+        }
+      },
+      "saved": {
+        "schema": "keel-effective-build-defaults@1",
+        "revision": 5,
+        "values": {
+          "compression": "none",
+          "brotliQuality": 9,
+          "transportProfile": "base90-block-v2",
+          "payloadStorage": "raw",
+          "hybridFallback": false,
+          "rpcMaxConcurrentReads": 3,
+          "maxReadGas": 40000000,
+          "maxOutputBytes": 1900000
+        },
+        "sources": {
+          "compression": "project",
+          "brotliQuality": "media",
+          "transportProfile": "account",
+          "payloadStorage": "project",
+          "hybridFallback": "system",
+          "rpcMaxConcurrentReads": "media",
+          "maxReadGas": "contract",
+          "maxOutputBytes": "build"
+        },
+        "requiresFullReadValidation": true
+      }
+    }
+  ],
+  "source": {
+    "release": {
+      "id": "11111111-1111-4111-8111-111111111111",
+      "revision": 7,
+      "artifactId": "22222222-2222-4222-8222-222222222222",
+      "status": "ready",
+      "slug": "saved-release-fixture",
+      "title": "Saved original source",
+      "description": "Synthetic saved release response; no production project data.",
+      "story": "",
+      "releaseType": "one-of-one",
+      "accessMode": "public",
+      "supply": "1",
+      "priceEth": "0.1",
+      "maxPerTransaction": 1,
+      "maxPerWallet": 1,
+      "startsAt": null,
+      "endsAt": null,
+      "networkLabel": "Sepolia",
+      "payoutAddress": null,
+      "page": {},
+      "chainId": 11155111
+    }
+  },
+  "reviewOperations": [
+    {
+      "operation": "read",
+      "response": {
+        "id": "11111111-1111-4111-8111-111111111111",
+        "revision": 7,
+        "artifactId": "22222222-2222-4222-8222-222222222222",
+        "status": "ready",
+        "slug": "saved-release-fixture",
+        "title": "Saved original source",
+        "description": "Synthetic saved release response; no production project data.",
+        "story": "",
+        "releaseType": "one-of-one",
+        "accessMode": "public",
+        "supply": "1",
+        "priceEth": "0.1",
+        "maxPerTransaction": 1,
+        "maxPerWallet": 1,
+        "startsAt": null,
+        "endsAt": null,
+        "networkLabel": "Sepolia",
+        "payoutAddress": null,
+        "page": {},
+        "chainId": 11155111
+      },
+      "wire": {
+        "url": "https://studio.example.invalid/api/agent/drafts/11111111-1111-4111-8111-111111111111",
+        "method": "GET",
+        "body": null
+      },
+      "output": {
+        "id": "11111111-1111-4111-8111-111111111111",
+        "revision": 7,
+        "artifactId": "22222222-2222-4222-8222-222222222222",
+        "status": "ready",
+        "slug": "saved-release-fixture",
+        "title": "Saved original source",
+        "description": "Synthetic saved release response; no production project data.",
+        "story": "",
+        "releaseType": "one-of-one",
+        "accessMode": "public",
+        "supply": "1",
+        "priceEth": "0.1",
+        "maxPerTransaction": 1,
+        "maxPerWallet": 1,
+        "startsAt": null,
+        "endsAt": null,
+        "networkLabel": "Sepolia",
+        "payoutAddress": null,
+        "page": {},
+        "chainId": 11155111,
+        "reviewUrl": "https://studio.example.invalid/release/saved-release-fixture"
+      }
+    },
+    {
+      "operation": "prepareReview",
+      "response": {
+        "schema": "keel-release-wallet-review@1",
+        "releaseId": "11111111-1111-4111-8111-111111111111",
+        "revision": 7,
+        "wallet": "0x1111111111111111111111111111111111111111",
+        "signing": "not-performed",
+        "submission": "not-performed",
+        "preparation": {
+          "operationId": "33333333-3333-4333-8333-333333333333",
+          "chainId": 11155111,
+          "calls": [
+            {
+              "kind": "publish",
+              "to": "0x2222222222222222222222222222222222222222",
+              "data": "0xabcd",
+              "value": "0"
+            }
+          ]
+        }
+      },
+      "wire": {
+        "url": "https://studio.example.invalid/api/agent/drafts/11111111-1111-4111-8111-111111111111/review",
+        "method": "POST",
+        "body": "{\"expectedRevision\":7}"
+      },
+      "output": {
+        "schema": "keel-release-wallet-review@1",
+        "releaseId": "11111111-1111-4111-8111-111111111111",
+        "revision": 7,
+        "wallet": "0x1111111111111111111111111111111111111111",
+        "signing": "not-performed",
+        "submission": "not-performed",
+        "preparation": {
+          "operationId": "33333333-3333-4333-8333-333333333333",
+          "chainId": 11155111,
+          "calls": [
+            {
+              "kind": "publish",
+              "to": "0x2222222222222222222222222222222222222222",
+              "data": "0xabcd",
+              "value": "0"
+            }
+          ]
+        },
+        "reviewUrl": "https://studio.example.invalid/studio/releases/11111111-1111-4111-8111-111111111111/review?operation=33333333-3333-4333-8333-333333333333&revision=7"
+      }
+    },
+    {
+      "operation": "resumeReview",
+      "response": {
+        "schema": "keel-release-wallet-review@1",
+        "releaseId": "11111111-1111-4111-8111-111111111111",
+        "revision": 7,
+        "wallet": "0x1111111111111111111111111111111111111111",
+        "signing": "not-performed",
+        "submission": "not-performed",
+        "preparation": {
+          "operationId": "33333333-3333-4333-8333-333333333333",
+          "chainId": 11155111,
+          "calls": [
+            {
+              "kind": "publish",
+              "to": "0x2222222222222222222222222222222222222222",
+              "data": "0xabcd",
+              "value": "0"
+            }
+          ]
+        }
+      },
+      "wire": {
+        "url": "https://studio.example.invalid/api/agent/drafts/11111111-1111-4111-8111-111111111111/review?operation=33333333-3333-4333-8333-333333333333&revision=7",
+        "method": "GET",
+        "body": null
+      },
+      "output": {
+        "schema": "keel-release-wallet-review@1",
+        "releaseId": "11111111-1111-4111-8111-111111111111",
+        "revision": 7,
+        "wallet": "0x1111111111111111111111111111111111111111",
+        "signing": "not-performed",
+        "submission": "not-performed",
+        "preparation": {
+          "operationId": "33333333-3333-4333-8333-333333333333",
+          "chainId": 11155111,
+          "calls": [
+            {
+              "kind": "publish",
+              "to": "0x2222222222222222222222222222222222222222",
+              "data": "0xabcd",
+              "value": "0"
+            }
+          ]
+        },
+        "reviewUrl": "https://studio.example.invalid/studio/releases/11111111-1111-4111-8111-111111111111/review?operation=33333333-3333-4333-8333-333333333333&revision=7"
+      }
+    },
+    {
+      "operation": "continuePublication",
+      "response": {
+        "schema": "keel-release-continuation@1",
+        "releaseId": "11111111-1111-4111-8111-111111111111",
+        "revision": 7,
+        "status": "review-required",
+        "nextAction": "prepare-review",
+        "message": "Review the saved release.",
+        "reviewPath": "/studio/releases/11111111-1111-4111-8111-111111111111",
+        "storagePreserved": true,
+        "uploadedBytes": 0,
+        "signing": "not-performed",
+        "submission": "not-performed"
+      },
+      "wire": {
+        "url": "https://studio.example.invalid/api/agent/drafts/11111111-1111-4111-8111-111111111111/continue",
+        "method": "POST",
+        "body": "{\"expectedRevision\":7}"
+      },
+      "output": {
+        "schema": "keel-release-continuation@1",
+        "releaseId": "11111111-1111-4111-8111-111111111111",
+        "revision": 7,
+        "status": "review-required",
+        "nextAction": "prepare-review",
+        "message": "Review the saved release.",
+        "reviewPath": "/studio/releases/11111111-1111-4111-8111-111111111111",
+        "storagePreserved": true,
+        "uploadedBytes": 0,
+        "signing": "not-performed",
+        "submission": "not-performed"
+      }
+    }
+  ]
+}
