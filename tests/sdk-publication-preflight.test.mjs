@@ -759,3 +759,34 @@ test('later envelope remainder never becomes a whole-request budget or a repeate
     assert.deepEqual(calls.map(({ gas, ...call }) => call), before.preparationCalls.map(({ gas, ...call }) => call));
   }
 });
+
+test("private observer retains exact ordered calls, all provider errors and selected-fork gas provenance", async () => {
+  const events = [], error = { code: -32000, message: "original provider failure", data: "0xdeadbeef" };
+  await assert.rejects(simulateKeelPublicationBeforeFunding({ ...input(), diagnostics: event => events.push(event) }, fixture({ error }).transport));
+  const program = events.find(event => event.kind === "exact-program");
+  assert.deepEqual(program.orderedCalls[0], call);
+  assert.equal(program.planFingerprint, input().planFingerprint);
+  const arithmetic = events.find(event => event.kind === "gas-arithmetic");
+  assert.ok(arithmetic.perCall[0].intrinsicGas > 0n);
+  assert.equal(arithmetic.minimumProgramGas, arithmetic.perCall.reduce((sum, item) => sum + item.allocationMinimumGas, 0n));
+  assert.deepEqual(events.find(event => event.kind === "rpc-error").error, error);
+  assert.ok(events.some(event => event.kind === "rpc-request" && event.method === "eth_simulateV1"));
+  assert.equal(events.some(event => event.kind === "phase-complete"), false);
+});
+test("private instrumentation cannot turn incomplete simulation into success or mutate proof identity", async () => {
+  const first = await simulateKeelPublicationBeforeFunding(input(), fixture().transport);
+  const events = [];
+  const second = await simulateKeelPublicationBeforeFunding({ ...input(), diagnostics: event => { events.push(event); throw new Error("private sink unavailable"); } }, fixture().transport);
+  assert.equal(first.simulationFingerprint, second.simulationFingerprint);
+  assert.ok(events.some(event => event.kind === "measured-gas"));
+  assert.ok(events.some(event => event.kind === "phase-complete" && event.completedCalls === event.totalCalls));
+});
+
+test("private observers cannot mutate exact calls or provider response proof", async () => {
+  const first = await simulateKeelPublicationBeforeFunding(input(), fixture().transport);
+  const second = await simulateKeelPublicationBeforeFunding({ ...input(), diagnostics: event => {
+    if (event.kind === "exact-program") event.orderedCalls[0].data = "0xdead";
+    if (event.kind === "rpc-response" && Array.isArray(event.response)) event.response[0].calls[0].returnData = "0xdead";
+  } }, fixture().transport);
+  assert.equal(second.simulationFingerprint, first.simulationFingerprint);
+});
