@@ -4,7 +4,7 @@ import { spawnSync } from 'node:child_process';
 import { existsSync, readFileSync, readlinkSync } from 'node:fs';
 import { platform, machine, release } from 'node:os';
 
-if (process.argv.length !== 2) throw new Error('This probe accepts no arguments or project input.');
+if (process.argv.slice(2).length !== 0) throw new Error('This probe accepts no arguments or project input.');
 const read = path => { try { return readFileSync(path, 'utf8').trim(); } catch { return null; } };
 const facts = {};
 for (const line of (read('/proc/self/status') ?? '').split('\n')) {
