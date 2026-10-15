@@ -1,0 +1,82 @@
+TAP version 13
+# Subtest: recursive reader rejects self cycles before cached-promise reuse
+ok 1 - recursive reader rejects self cycles before cached-promise reuse
+  ---
+  duration_ms: 21.871748
+  type: 'test'
+  ...
+# Subtest: recursive reader rejects two-object cycles before cached-promise reuse
+ok 2 - recursive reader rejects two-object cycles before cached-promise reuse
+  ---
+  duration_ms: 1.370874
+  type: 'test'
+  ...
+# Subtest: recursive reader preserves verified shared DAG bytes and reads a reused leaf once
+ok 3 - recursive reader preserves verified shared DAG bytes and reads a reused leaf once
+  ---
+  duration_ms: 54.361991
+  type: 'test'
+  ...
+# Subtest: pre-aborted reads preserve the exact reason without starting a client operation
+ok 4 - pre-aborted reads preserve the exact reason without starting a client operation
+  ---
+  duration_ms: 1.596253
+  type: 'test'
+  ...
+# Subtest: abort settles an uncooperative metadata read and discards its late response
+ok 5 - abort settles an uncooperative metadata read and discards its late response
+  ---
+  duration_ms: 6.492478
+  type: 'test'
+  ...
+# Subtest: cancelled pointer pagination preserves the abort reason and does not start descriptor fallback
+ok 6 - cancelled pointer pagination preserves the abort reason and does not start descriptor fallback
+  ---
+  duration_ms: 3.01288
+  type: 'test'
+  ...
+# Subtest: abort settles pending decompression and discards a late valid result
+ok 7 - abort settles pending decompression and discards a late valid result
+  ---
+  duration_ms: 9.018482
+  type: 'test'
+  ...
+# Subtest: abort settles pending decompression and discards a late failure
+ok 8 - abort settles pending decompression and discards a late failure
+  ---
+  duration_ms: 2.356918
+  type: 'test'
+  ...
+# Subtest: decompression that aborts while returning bytes cannot report a successful read
+ok 9 - decompression that aborts while returning bytes cannot report a successful read
+  ---
+  duration_ms: 2.287521
+  type: 'test'
+  ...
+# Subtest: default gzip decoding still verifies the exact decoded payload
+ok 10 - default gzip decoding still verifies the exact decoded payload
+  ---
+  duration_ms: 42.607339
+  type: 'test'
+  ...
+# Subtest: abort interrupts a pending custom digest without accepting a late valid hash
+ok 11 - abort interrupts a pending custom digest without accepting a late valid hash
+  ---
+  duration_ms: 5.096309
+  type: 'test'
+  ...
+# Subtest: carrier fanout shares one abort listener and starts no further reads after cancellation
+ok 12 - carrier fanout shares one abort listener and starts no further reads after cancellation
+  ---
+  duration_ms: 6.886307
+  type: 'test'
+  ...
+1..12
+# tests 12
+# suites 0
+# pass 12
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 521.410718
