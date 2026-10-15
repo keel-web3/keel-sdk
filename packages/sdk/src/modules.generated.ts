@@ -802,7 +802,8 @@ export const KEEL_MODULES: readonly KeelModule[] = [
     "deps": [
       "keel-hold",
       "keel-artifacts",
-      "keel-kernel"
+      "keel-kernel",
+      "keel-die"
     ],
     "contracts": [
       "KeelIPControl.sol",
@@ -884,7 +885,8 @@ export const KEEL_MODULES: readonly KeelModule[] = [
     "repo": "keel-web3/keel-cross-chain-mint",
     "deps": [
       "keel-kernel",
-      "keel-mint-access"
+      "keel-mint-access",
+      "keel-ip-control"
     ],
     "contracts": [
       "KeelCrossChainMintBridge.sol"
