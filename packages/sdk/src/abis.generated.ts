@@ -13,7 +13,7 @@ export const ABI_CONTRACTS: Readonly<Record<string, readonly string[]>> = {
   "keel-creator-identity": ["KeelAttributionRegistry","KeelCreatorCommitmentRegistry","KeelCreatorProfileRegistry"],
   "keel-mint-access": ["FrayAuctionIssuer","KeelMintGate","KeelMintQueue","KeelMintRewardEntropy","KeelMintRouteRegistry","KeelOneMintBatch","KeelQueueAccess","KeelQueueDemand","KeelQueueLotteryEngine","KeelQueueLotteryPool","KeelQueuePriority","KeelQueueReadAdapter","KeelRewardClaims","OneMintController","OpenOneMintController"],
   "keel-market": ["KeelMarket"],
-  "keel-anchors": ["KeelAnchorReplicationBridge","KeelAnchorTextValidation","KeelAttestedAnchorRegistry","KeelIpfsCidVerifier","KeelL2AnchorVerifier","KeelL2StateVerifier","KeelNodeRegistry","KeelPortableAnchorRegistry","KeelProofUpgradeController","KeelSettlementRegistry","KeelSp1GatewayProofBackend","KeelSp1GatewayProofVerifier","KeelZkAnchorVerifier","KeelZkVerifyProofBackend","KeelZkVerifyProofVerifier"],
+  "keel-anchors": ["KeelAnchorReplicationBridge","KeelAnchorTextValidation","KeelAttestedAnchorRegistry","KeelIpfsCidVerifier","KeelL2AnchorVerifier","KeelL2StateVerifier","KeelNodeRegistry","KeelPortableAnchorRegistry","KeelProofUpgradeController","KeelSettlementRegistry","KeelSignedAnchorVerifier","KeelSp1GatewayProofBackend","KeelSp1GatewayProofVerifier","KeelZkAnchorVerifier","KeelZkVerifyProofBackend","KeelZkVerifyProofVerifier"],
   "keel-crucible": ["KeelCollectionAttestationRegistry","KeelCollectionVerificationRegistry","KeelCommunityReplicationRegistry"],
   "keel-ip-control": ["KeelIPActionExecutor","KeelIPControl","KeelIPWrapped721"],
   "keel-sleeve": ["KeelMetadataRelay","KeelSleeve","KeelStoredTokenJSON","KeelTokenMatrix"],

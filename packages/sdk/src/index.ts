@@ -100,6 +100,7 @@ export * from "./mint-pricing.js";
 
 export * from "./one-mint-coupons.js";
 export * from "./bitcoin-proof.js";
+export * from "./signed-anchor.js";
 
 export * from "./ethereum-tezos-proof.js";
 

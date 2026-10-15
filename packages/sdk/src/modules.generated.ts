@@ -708,7 +708,7 @@ export const KEEL_MODULES: readonly KeelModule[] = [
     "title": "Anchors",
     "group": "provenance",
     "visibility": "private",
-    "summary": "Cross-chain and off-chain anchoring: portable commitments, permissionless L2 state proofs, and zk verification backends.",
+    "summary": "Content anchoring through signed attestations, authenticated state proofs and optional zk verification backends.",
     "version": "0.3.0",
     "repo": "keel-web3/keel-anchors",
     "deps": [
@@ -721,6 +721,7 @@ export const KEEL_MODULES: readonly KeelModule[] = [
     "contracts": [
       "KeelProofUpgradeController.sol",
       "KeelAttestedAnchorRegistry.sol",
+      "KeelSignedAnchorVerifier.sol",
       "KeelPortableAnchorRegistry.sol",
       "KeelAnchorReplicationBridge.sol",
       "KeelL2AnchorVerifier.sol",
@@ -747,6 +748,7 @@ export const KEEL_MODULES: readonly KeelModule[] = [
       "KeelProofUpgradeController",
       "KeelAnchorReplicationBridge",
       "KeelAttestedAnchorRegistry",
+      "KeelSignedAnchorVerifier",
       "KeelIpfsCidVerifier",
       "KeelL2AnchorVerifier",
       "KeelL2StateVerifier",

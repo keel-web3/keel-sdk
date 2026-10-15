@@ -275,10 +275,10 @@ export const MODULES = [
     kind: "module",
     group: "provenance",
     title: "Anchors",
-    summary: "Cross-chain and off-chain anchoring: portable commitments, permissionless L2 state proofs, and zk verification backends.",
+    summary: "Content anchoring through signed attestations, authenticated state proofs and optional zk verification backends.",
     deps: ["keel-kernel", "keel-codecs", "keel-artifacts", "keel-graph", "keel-hold"],
     devDeps: ["keel-crucible"],
-    contracts: ["KeelProofUpgradeController.sol","KeelAttestedAnchorRegistry.sol","KeelPortableAnchorRegistry.sol","KeelAnchorReplicationBridge.sol","KeelL2AnchorVerifier.sol","KeelL2StateVerifier.sol","KeelSettlementRegistry.sol","KeelZkAnchorVerifier.sol","KeelZkVerifyProofBackend.sol","KeelZkVerifyProofVerifier.sol","KeelSp1GatewayProofBackend.sol","KeelSp1GatewayProofVerifier.sol","KeelIpfsCidVerifier.sol","KeelNodeRegistry.sol","interfaces/IKeelAnchorProofBackend.sol","interfaces/IVerifyProofAggregation.sol","interfaces/IKeelAnchorProofVerifier.sol","interfaces/IKeelAnchoredChainQueries.sol","interfaces/IKeelSettlementSource.sol","vendor/sp1/ISP1Verifier.sol","vendor/sp1/v5.0.0/Groth16Verifier.sol","vendor/sp1/v5.0.0/SP1VerifierGroth16.sol","libraries/KeelAnchorTextValidation.sol"],
+    contracts: ["KeelProofUpgradeController.sol","KeelAttestedAnchorRegistry.sol","KeelSignedAnchorVerifier.sol","KeelPortableAnchorRegistry.sol","KeelAnchorReplicationBridge.sol","KeelL2AnchorVerifier.sol","KeelL2StateVerifier.sol","KeelSettlementRegistry.sol","KeelZkAnchorVerifier.sol","KeelZkVerifyProofBackend.sol","KeelZkVerifyProofVerifier.sol","KeelSp1GatewayProofBackend.sol","KeelSp1GatewayProofVerifier.sol","KeelIpfsCidVerifier.sol","KeelNodeRegistry.sol","interfaces/IKeelAnchorProofBackend.sol","interfaces/IVerifyProofAggregation.sol","interfaces/IKeelAnchorProofVerifier.sol","interfaces/IKeelAnchoredChainQueries.sol","interfaces/IKeelSettlementSource.sol","vendor/sp1/ISP1Verifier.sol","vendor/sp1/v5.0.0/Groth16Verifier.sol","vendor/sp1/v5.0.0/SP1VerifierGroth16.sol","libraries/KeelAnchorTextValidation.sol"],
   },
   {
     id: "keel-crucible",

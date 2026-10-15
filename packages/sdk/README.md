@@ -460,3 +460,9 @@ batch; unrelated minters do not share pending requests.
 ### Contract SVG renderer
 
 Use `@keel/sdk/svg-renderer-authoring` to create editable designs, deterministic previews and reusable Solidity renderers. Use `@keel/sdk/svg-renderer` to read native contract SVGs, inspect hidden proof provenance and compare complete SVG bytes against finalized contract output. See [the renderer guide](../../docs/KEEL_SVG_RENDERER.md).
+
+## Signed anchor approvals
+
+[Signed anchor preparation](../../docs/KEEL_SIGNED_ANCHORS.md) explains the offline
+service API, source-observer responsibility, EIP-712 binding, relay calldata and
+native Tezos receipt boundary.
