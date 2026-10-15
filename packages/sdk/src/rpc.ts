@@ -1,6 +1,7 @@
 /** Read-only preparation/verification RPC. Collector host governance stays separate. */
 import { redactRpcUrl, remoteUrlAllowed } from "@keel/protocol";
 import { KEEL_BUNDLED_NETWORK_INDEX, KEEL_NETWORK_CONFIGURATION, type KeelNetworkIndex } from './network-index.js';
+import { snapshotKeelProviderPrivateError } from "./provider-request-scheduler.js";
 
 /** Compatibility export. Network selection/defaults live in networks.config.json and the index. */
 export const KEEL_SEPOLIA_PUBLIC_RPC_URLS: readonly string[] = KEEL_BUNDLED_NETWORK_INDEX.networks.find(n => n.chainId === KEEL_NETWORK_CONFIGURATION.legacySepoliaChainId)!.rpcUrls.map(u => normalizeKeelRpcUrl(u));
@@ -178,6 +179,18 @@ export interface KeelRpcPoolOptions {
   readonly maxResponseBytes?: number;
   readonly allowLoopback?: boolean;
   readonly fetchImpl?: typeof fetch;
+  /** Owner-private evidence only. No endpoint or headers are supplied. Persisting
+   * callers must redact credential echoes in arbitrary provider text. */
+  readonly onPrivateResponse?: (event: KeelRpcPrivateObservation) => void | Promise<void>;
+}
+export interface KeelRpcPrivateObservation {
+  readonly providerIndex: number;
+  readonly request: { readonly method: string; readonly params: readonly unknown[] };
+  readonly elapsedMs: number;
+  readonly httpStatus?: number;
+  readonly retryAfterMs?: number;
+  readonly response?: unknown;
+  readonly error?: unknown;
 }
 const READ_METHODS = new Set(["eth_chainId", "eth_blockNumber", "eth_getBlockByNumber", "eth_getBlockByHash", "eth_getCode", "eth_getBalance", "eth_getTransactionCount", "eth_getTransactionReceipt", "eth_getTransactionByHash", "eth_call", "eth_simulateV1", "eth_estimateGas", "eth_gasPrice", "eth_maxPriorityFeePerGas", "eth_feeHistory", "eth_getLogs", "eth_getStorageAt", "eth_getProof", "net_version", "web3_clientVersion"]);
 function pause(ms: number, signal?: AbortSignal): Promise<void> {
@@ -211,6 +224,18 @@ export function createKeelRpcPool(options: KeelRpcPoolOptions): KeelRpcPool {
     await prior;
     let timer: ReturnType<typeof setTimeout> | undefined;
     let timedOut = false;
+    const started = performance.now();
+    const privatelyObserve = (fields: Omit<KeelRpcPrivateObservation, "providerIndex" | "request" | "elapsedMs">) => {
+      if (!options.onPrivateResponse) return;
+      try {
+        // A separate snapshot prevents an observer from modifying proof inputs
+        // or a response that has not yet completed validation.
+        const event = structuredClone({ providerIndex: states.indexOf(state), request: { method, params }, elapsedMs: performance.now() - started, ...fields,
+          ...(fields.error === undefined ? {} : { error: snapshotKeelProviderPrivateError(fields.error) }) });
+        const pending = options.onPrivateResponse(Object.freeze(event));
+        if (pending) void Promise.resolve(pending).catch(() => undefined);
+      } catch { /* Evidence collection cannot alter RPC behavior. */ }
+    };
     try {
       signal?.throwIfAborted();
       if (state.disabled) throw new ProviderFailure(state.reason ?? "unavailable", 0, state.diagnostic);
@@ -225,11 +250,25 @@ export function createKeelRpcPool(options: KeelRpcPoolOptions): KeelRpcPool {
       try { response = await fetcher(state.url, { method: "POST", headers: { "content-type": "application/json" },
         body: JSON.stringify({ jsonrpc: "2.0", id: requestId, method, params }),
         redirect: "error", signal: signal === undefined ? controller.signal : AbortSignal.any([controller.signal, signal]) }); }
-      catch (error) { signal?.throwIfAborted(); throw networkFailure(error, timedOut); }
+      catch (error) { privatelyObserve({ error }); signal?.throwIfAborted(); throw networkFailure(error, timedOut); }
       const header = response.headers.get("retry-after");
       const rawDelay = header === null ? 0 : /^\d+(?:\.\d+)?$/u.test(header) ? Number(header) * 1000 : Date.parse(header) - Date.now();
       const delay = Number.isFinite(rawDelay) ? Math.max(0, rawDelay) : 0;
       if (!response.ok) {
+        if (options.onPrivateResponse && response.body) {
+          const reader = response.body.getReader(), parts: Uint8Array[] = [];
+          let size = 0, truncated = false;
+          try {
+            for (;;) { const part = await reader.read(); if (part.done) break;
+              if (size + part.value.byteLength > maxBytes) { truncated = true; break; }
+              parts.push(part.value); size += part.value.byteLength; }
+            const bytes = new Uint8Array(size); let offset = 0;
+            for (const part of parts) { bytes.set(part, offset); offset += part.byteLength; }
+            privatelyObserve({ httpStatus: response.status, retryAfterMs: delay,
+              response: { body: new TextDecoder().decode(bytes), truncated, maximumResponseBytes: maxBytes } });
+          } catch (error) { privatelyObserve({ httpStatus: response.status, retryAfterMs: delay, error }); }
+          finally { await reader.cancel().catch(() => undefined); reader.releaseLock(); }
+        }
         await response.body?.cancel().catch(() => undefined);
         if (method === "eth_simulateV1" && response.status === 413) throw new KeelRpcResponseError(-32000, undefined, undefined, 413);
         // A bad/unprocessable project request is not a provider outage. Keep
@@ -248,7 +287,11 @@ export function createKeelRpcPool(options: KeelRpcPoolOptions): KeelRpcPool {
       } finally { await reader.cancel().catch(() => undefined); reader.releaseLock(); }
       const bytes = new Uint8Array(size); let offset = 0; for (const part of parts) { bytes.set(part, offset); offset += part.length; }
       let body: { jsonrpc?: unknown; id?: unknown; result?: unknown; error?: { code?: unknown; message?: unknown; data?: unknown } };
-      try { body = JSON.parse(new TextDecoder("utf-8", { fatal: true }).decode(bytes)); } catch { throw invalidResponse("invalid-json", size); }
+      try { body = JSON.parse(new TextDecoder("utf-8", { fatal: true }).decode(bytes)); } catch (error) {
+        privatelyObserve({ httpStatus: response.status, retryAfterMs: delay, response: { bodyBytes: bytes, body: new TextDecoder().decode(bytes), responseBytes: size, responseFailure: "invalid-json" }, error });
+        throw invalidResponse("invalid-json", size);
+      }
+      privatelyObserve({ httpStatus: response.status, retryAfterMs: delay, response: body });
       if (body === null || typeof body !== "object" || body.jsonrpc !== "2.0" || body.id !== requestId) throw invalidResponse("invalid-envelope", size);
       if (body.error !== undefined) {
         const code = typeof body.error?.code === "number" && Number.isInteger(body.error.code) && Math.abs(body.error.code) <= 2147483647 ? body.error.code : -32603;

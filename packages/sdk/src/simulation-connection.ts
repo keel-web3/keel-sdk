@@ -1,6 +1,7 @@
 import { KeelPublicationSimulationError, keelSimulationTransportDiagnostic, keelSimulationTransportFailure, type KeelPreflightTransport } from "./publication-preflight.js";
 import { assertKeelAmsterdamSimulationHeader, resolveKeelTransactionGasPolicy } from "./transaction-gas-policy.js";
 import { keelSimulationChainDefaults } from "./simulation-capacity-policy.js";
+import { inheritKeelProviderScheduledFailure } from "./provider-request-scheduler.js";
 
 export interface KeelSimulationSocket {
   readonly socket: {
@@ -163,9 +164,11 @@ export function createPinnedKeelSimulationTransport(connect: () => Promise<KeelS
     } catch (error) {
       const classified = keelSimulationTransportFailure(error, { ...(method === undefined ? {} : { method }), phase: "public-qualification", ...socketDiagnostic(rpc) });
       if (rpc) closeSocket(rpc);
-      throw new KeelPublicationSimulationError(classified.kind, classified.kind === "rpc-unavailable"
+      const failure = new KeelPublicationSimulationError(classified.kind, classified.kind === "rpc-unavailable"
         ? "The configured simulator could not complete public capability qualification. No project calldata was sent." : classified.message,
         { ...classified.diagnostic, stage });
+      inheritKeelProviderScheduledFailure(failure, error);
+      throw failure;
     }
   };
   return {
@@ -238,6 +241,7 @@ export function createPinnedKeelSimulationTransport(connect: () => Promise<KeelS
           const classifiedError = new KeelPublicationSimulationError(classified.kind, classified.message, { ...classified.diagnostic, connectionAttempts: attempt,
             requestPayloadBytes, blockCount, callCount, ...(requiredGas === undefined ? {} : {
               requiredProgramGas: requestedEnvelopeGas.toString(), requestedEnvelopeGas: requestedEnvelopeGas.toString(), largestTransactionGas: requiredGas.toString() }) });
+          inheritKeelProviderScheduledFailure(classifiedError, error);
           try { options.onAttempt?.(keelSimulationTransportDiagnostic(classifiedError)); } catch { /* Observability never grants or blocks a proof. */ }
           const unavailable = classifiedError.kind === "rpc-unavailable";
           if (!gasClamp(classifiedError) && !unavailable) throw classifiedError;

@@ -4,7 +4,7 @@ import { readFile } from 'node:fs/promises';
 import { encodeAbiParameters, keccak256 } from 'viem';
 import { createKeelRpcPool } from '../packages/sdk/dist/rpc.js';
 import { createKeelSepoliaSimulationTransport } from '../packages/sdk/dist/sepolia-simulation-transport.js';
-const { createKeelPublicSepoliaSimulationPool, createKeelPublicSimulationPool } = await import(process.env.KEEL_TEST_PUBLIC_SIMULATION_POOL_MODULE ?? '../packages/sdk/dist/public-simulation-pool.js');
+const { createKeelPublicSepoliaSimulationPool, createKeelPublicSimulationPool, createKeelScheduledReadTransport } = await import(process.env.KEEL_TEST_PUBLIC_SIMULATION_POOL_MODULE ?? '../packages/sdk/dist/public-simulation-pool.js');
 const { simulateKeelPublicationBeforeFunding } = await import(process.env.KEEL_TEST_PUBLICATION_PREFLIGHT_MODULE ?? '../packages/sdk/dist/publication-preflight.js');
 import { APPROVED_PUBLICNODE_SEPOLIA_URL, probePublicSimulationCandidates, publicProbeOptions, publicProbeExitCode } from '../scripts/check-public-simulation-pool.mjs';
 
@@ -96,6 +96,95 @@ function singleRecipientTransient({ fault, repeat = false, requestTimeoutMs, onA
   });
   return { ...f, transport, privateAttempts: () => privateAttempts };
 }
+
+test('explicit configured primary reads share candidate admission without rerouting or adding retries', async () => {
+  const f = fixture([{}]), events = [];
+  let release, entered;
+  const gate = new Promise(resolve => { release = resolve; }), started = new Promise(resolve => { entered = resolve; });
+  const primary = createKeelScheduledReadTransport({ request: async exact => { assert.equal(exact.method, 'eth_getCode'); entered(); await gate; return '0x6000'; } },
+    { chainId: 11155111, rpcUrl: urls[0], minIntervalMs: 0, fetchImpl: f.options.fetchImpl, observe: event => events.push(event) });
+  const read = primary.request({ method: 'eth_getCode', params: [reader, snapshot.number] }); await started;
+  const simulation = f.transport.request(program()); void simulation.catch(() => undefined);
+  await new Promise(resolve => setImmediate(resolve)); assert.equal(f.requests.length, 0);
+  release(); assert.equal(await read, '0x6000'); assert.equal((await simulation).length, 5);
+  assert.ok(events.some(event => event.type === 'request-start'));
+  await assert.rejects(primary.request(program()), /read-only methods/);
+  const original = Object.assign(new Error('private execution revert'), { code: 3 }); let calls = 0;
+  const failing = createKeelScheduledReadTransport({ request: async () => { calls++; throw original; } }, { chainId: 11155111, rpcUrl: urls[0], minIntervalMs: 0, fetchImpl: f.options.fetchImpl });
+  await assert.rejects(failing.request({ method: 'eth_getCode', params: [reader, snapshot.number] }), error => error === original); assert.equal(calls, 1);
+  await f.transport.close();
+});
+
+test('duplicate in-progress requests share one exact program and settled results are never cached', async () => {
+  const f = fixture([{}]);
+  try {
+    const input = program(), before = structuredClone(input);
+    const first = f.transport.request(input), second = f.transport.request(structuredClone(input));
+    assert.equal(first, second);
+    await Promise.all([first, second]); assert.equal(f.privateRequests().length, 1);
+    assert.deepEqual(input, before);
+    await f.transport.request(input); assert.equal(f.privateRequests().length, 2);
+    for (const sent of f.privateRequests()) assert.deepEqual(sent.body.params, before.params);
+  } finally { await f.transport.close(); }
+});
+
+test('distinct queued programs have an explicit bound and cancellation drains them without more dispatch', async () => {
+  let reached;
+  const entered = new Promise(resolve => { reached = resolve; });
+  const f = fixture([{ wait: true, started: () => reached() }]);
+  const first = f.transport.request(program());
+  // Install rejection handlers before cancelling the active request.
+  const pending = [first];
+  const outcomes = first.catch(() => undefined);
+  await entered;
+  for (let index = 1; index < 16; index++) {
+    const exact = program(); exact.params[0].blockStateCalls[0].calls[0].data = `0x${index.toString(16).padStart(4, '0')}`;
+    const request = f.transport.request(exact); void request.catch(() => undefined); pending.push(request);
+  }
+  const extra = program(); extra.params[0].blockStateCalls[0].calls[0].data = '0xffff';
+  await assert.rejects(f.transport.request(extra), error => error.name === 'KeelProviderQueueFullError');
+  await f.transport.close(); await outcomes;
+  assert.ok((await Promise.allSettled(pending)).every(outcome => outcome.status === 'rejected'));
+  assert.equal(f.privateRequests().length, 1);
+});
+
+test('private provider evidence preserves original RPC payload while public errors remain redacted', async () => {
+  const f = fixture([{ error: -32602, message: 'owner-private exact rejection SECRET' }]);
+  const events = [], attempts = [], transport = createKeelPublicSepoliaSimulationPool({ ...f.options, observe(event) {
+    events.push(event);
+    // Deliberate observer mutation affects only an evidence snapshot.
+    if (event.rawResponse?.error) event.rawResponse.error.code = 123456;
+    return Promise.reject(new Error('private persistence unavailable'));
+  }, onAttempt: diagnostic => attempts.push(diagnostic) });
+  try {
+    await assert.rejects(transport.request(program()), error => {
+      assert.equal(error.diagnostic.rpcCode, -32602); assert.doesNotMatch(JSON.stringify(error), /SECRET|owner-private|https:/); return true;
+    });
+    const failure = events.find(event => event.type === 'rpc-error' && event.rawResponse?.error?.message === 'owner-private exact rejection SECRET');
+    assert.ok(failure); assert.equal(failure.method, 'eth_simulateV1');
+    assert.deepEqual(failure.request.params, program().params);
+    assert.doesNotMatch(JSON.stringify(events.map(({ request, rawResponse, error, ...safe }) => safe)), /SECRET|https:/);
+    assert.doesNotMatch(JSON.stringify(attempts), /SECRET|https:/);
+  } finally { await transport.close(); await f.transport.close(); }
+});
+
+test('an observed429 retries only after cooldown and full public qualification, preserving every call', async () => {
+  const f = fixture([{}]), events = []; let failures = 0;
+  const transport = createKeelPublicSepoliaSimulationPool({ ...f.options, observe: event => events.push(event), fetchImpl: async (url, init) => {
+    const body = JSON.parse(init.body), privateCall = body.method === 'eth_simulateV1' && body.params[0].blockStateCalls[0].calls[0].data !== '0x';
+    if (privateCall && failures++ === 0) { f.requests.push({ index: 0, body, wire: init.body }); return new Response('owner-private rate body', { status: 429, headers: { 'Retry-After': '0.01' } }); }
+    return f.options.fetchImpl(url, init);
+  } });
+  try {
+    const exact = program(); assert.equal((await transport.request(exact)).length, 5);
+    const requests = f.privateRequests(); assert.equal(requests.length, 2);
+    assert.deepEqual(requests[0].body.params, requests[1].body.params);
+    const between = f.requests.slice(f.requests.indexOf(requests[0]) + 1, f.requests.indexOf(requests[1]));
+    assert.ok(between.some(request => request.body.method === 'eth_simulateV1' && request.body.params[0].blockStateCalls.length === 1 && request.body.params[0].validation));
+    assert.ok(events.some(event => event.type === 'retry-wait' && event.retryAfterMs >= 900));
+    assert.ok(events.some(event => event.type === 'rpc-error' && event.httpStatus === 429 && event.rawResponse.body === 'owner-private rate body'));
+  } finally { await transport.close(); await f.transport.close(); }
+});
 
 test('one approved recipient automatically recovers an observed transient failure with fresh qualification and the complete immutable program', async () => {
   for (const fault of [502, 503, 504, Object.assign(new Error('SECRET socket timeout'), { code: 'ETIMEDOUT' }), Object.assign(new Error('SECRET socket reset'), { code: 'ECONNRESET' })]) {

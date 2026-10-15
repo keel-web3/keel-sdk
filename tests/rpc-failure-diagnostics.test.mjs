@@ -21,6 +21,30 @@ function safe(error) {
 }
 const simulate = pool => pool.request({ method: 'eth_simulateV1', params });
 
+test('owner-private evidence retains bounded invalidUTF8/JSON bytes before public normalization', async () => {
+  const events = [], bytes = new Uint8Array([0x7b, 0x22, 0x80, 0x22, 0x3a]);
+  const p = createKeelRpcPool({ rpcUrls: [urls[0]], chainId: 11155111, minIntervalMs: 0, onPrivateResponse: event => events.push(event), fetchImpl: async (_url, init) => {
+    const request = JSON.parse(init.body);
+    return request.method === 'eth_chainId' ? Response.json({ jsonrpc: '2.0', id: request.id, result: '0xaa36a7' }) : new Response(bytes);
+  } });
+  await assert.rejects(p.pin(0).request({ method: 'eth_getCode', params: ['0x'+'11'.repeat(20), '0x12'] }), error => safe(error) && error.diagnostic.responseFailure === 'invalid-json');
+  const event = events.find(item => item.response?.responseFailure === 'invalid-json');
+  assert.ok(event); assert.deepEqual(event.response.bodyBytes, bytes); assert.equal(event.response.responseBytes, bytes.byteLength);
+  assert.equal(event.httpStatus, 200); assert.equal(event.request.method, 'eth_getCode');
+  assert.doesNotMatch(JSON.stringify(events), /private-path|private-key|https:/);
+});
+
+test('private network error snapshots retain custom fields but cannot mutate the original', async () => {
+  const original = Object.assign(new Error('owner-private transport text'), { code: 'ECONNRESET', cause: { detail: 'owner-private detail' } });
+  const events = [];
+  const p = createKeelRpcPool({ rpcUrls: [urls[0]], chainId: 11155111, minIntervalMs: 0, onPrivateResponse(event) {
+    events.push(event); if (event.error) { event.error.code = 'MUTATED'; event.error.cause.detail = 'MUTATED'; }
+  }, fetchImpl: async () => { throw original; } });
+  await assert.rejects(p.pin(0).request({ method: 'eth_getCode', params: [] }), error => safe(error) && error.diagnostic.transportFailure === 'connection-reset');
+  assert.equal(original.code, 'ECONNRESET'); assert.equal(original.cause.detail, 'owner-private detail');
+  assert.ok(events.some(event => event.error?.message === 'owner-private transport text'));
+});
+
 test('pinned HTTP status and rate-limit evidence survive exhaustion and cooldown without a retry or private text', async () => {
   for (const [status, reason, transportFailure] of [[503, 'unavailable', 'http-error'], [429, 'rate-limited', 'rate-limited'], [403, 'access-denied', 'http-error']]) {
     const f = fixture(() => new Response('secret-body', { status, headers: { 'retry-after': '20' } }));

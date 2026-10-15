@@ -1,4 +1,7 @@
 import { createKeelRpcPool, KeelRpcResponseError, normalizeKeelRpcUrl, type KeelRpcPoolOptions } from "./rpc.js";
+import { sharedKeelProviderRequestScheduler, isKeelProviderScheduledFailure, isKeelProviderDeadlineFailure, inheritKeelProviderScheduledFailure, KeelProviderQueueFullError, type KeelProviderRequestEvent, type KeelProviderRequestObserver } from "./provider-request-scheduler.js";
+export { createKeelProviderRequestScheduler, sharedKeelProviderRequestScheduler, KeelProviderQueueFullError,
+  type KeelProviderRequestEvent, type KeelProviderRequestObserver, type KeelProviderRequestSchedulerOptions } from "./provider-request-scheduler.js";
 import { createPinnedKeelSimulationTransport } from "./simulation-connection.js";
 import { KeelPublicationSimulationError, keelSimulationTransportDiagnostic, keelSimulationTransportFailure, type KeelPreflightTransport } from "./publication-preflight.js";
 import { assertKeelAmsterdamSimulationHeader, resolveKeelTransactionGasPolicy } from "./transaction-gas-policy.js";
@@ -25,13 +28,35 @@ export interface KeelPublicSimulationPoolOptions {
   readonly capabilityMaximumAgeMs?: number;
   /** Exact request and response gas metrics, never a publication proof. */
   readonly onMeasurement?: (measurement: Readonly<Record<string, string | number>>) => void;
+  /** Owner-private progress and complete provider evidence. Arbitrary error/body
+   * text must be credential-redacted by the private persistence layer. */
+  readonly observe?: KeelProviderRequestObserver;
 }
 const object = (value: unknown): Record<string, unknown> | undefined => value !== null && typeof value === "object" && !Array.isArray(value) ? value as Record<string, unknown> : undefined;
 const quantity = (value: unknown): bigint | undefined => typeof value === "string" && /^0x(?:0|[1-9a-f][0-9a-f]*)$/iu.test(value) ? BigInt(value) : undefined;
-// Retain the maintained pool's rate-limit cooldown across new reviews/reloads.
-// Test-injected fetchers are isolated; production candidates share only RPC
-// transport state, never a creator's proof, request, or selected block.
-const sharedPools = new Map<string, ReturnType<typeof createKeelRpcPool>>();
+
+/** Admit the caller's existing configured reader without discovering an endpoint,
+ * changing recipients or adding a retry layer. The server must supply the exact
+ * configured identity and disable any lower-layer retries it owns separately. */
+export function createKeelScheduledReadTransport(readTransport: KeelPreflightTransport, options: {
+  readonly chainId: number; readonly rpcUrl: string; readonly minIntervalMs?: number;
+  readonly fetchImpl?: typeof fetch; readonly signal?: AbortSignal; readonly observe?: KeelProviderRequestObserver;
+  readonly requestTimeoutMs?: number;
+}): KeelPreflightTransport {
+  const url = normalizeKeelRpcUrl(options.rpcUrl);
+  const timeoutMs = options.requestTimeoutMs ?? 120_000;
+  if (!Number.isSafeInteger(timeoutMs) || timeoutMs < 100 || timeoutMs > 120_000) throw new TypeError("Scheduled reads need a bounded deadline of at most 120 seconds.");
+  const scheduler = sharedKeelProviderRequestScheduler(url, { chainId: options.chainId, minIntervalMs: options.minIntervalMs ?? 250, maximumRetryDelayMs: 5_000 }, options.fetchImpl);
+  const methods = new Set(["eth_chainId", "eth_blockNumber", "eth_getBlockByNumber", "eth_getBlockByHash", "eth_getCode", "eth_getBalance", "eth_getTransactionCount",
+    "eth_getTransactionReceipt", "eth_getTransactionByHash", "eth_call", "eth_gasPrice", "eth_maxPriorityFeePerGas", "eth_feeHistory", "eth_getLogs", "eth_getStorageAt", "eth_getProof", "net_version", "web3_clientVersion"]);
+  return { request(input) {
+    if (!methods.has(input.method)) return Promise.reject(new TypeError("Configured reader admission accepts read-only methods; publication simulation uses its qualified transport."));
+    const exact = structuredClone(input);
+    if (new TextEncoder().encode(JSON.stringify(exact)).length > 512 * 1024) return Promise.reject(new TypeError("Configured reader admission needs a bounded read request."));
+    return scheduler.run({ method: exact.method, retryMode: "caller", deadlineAt: performance.now() + timeoutMs,
+      ...(options.signal === undefined ? {} : { signal: options.signal }), ...(options.observe === undefined ? {} : { observe: options.observe }) }, () => readTransport.request(exact));
+  } };
+}
 
 /** Capability-aware selection over the existing RPC pool. Each candidate keeps
  * its own pacing/cooldowns and cannot swap underneath qualification or a request.
@@ -65,11 +90,46 @@ export function createKeelPublicSimulationPool(options: KeelPublicSimulationPool
     if (index < 0 || capabilities.has(index)) throw new KeelPublicationSimulationError("configuration-invalid", "Capacity profiles cannot add recipients or repeat a provider.");
     capabilities.set(index, { limits: snapshotKeelSimulationProviderLimits(profile.limits), expiresAt: Date.parse(profile.measuredAt) + capabilityMaximumAgeMs });
   }
-  const poolKey = JSON.stringify([chainId, urls, options.minIntervalMs ?? 250]);
-  const pool = (!options.fetchImpl ? sharedPools.get(poolKey) : undefined) ?? createKeelRpcPool({ rpcUrls: urls, chainId, timeoutMs: 30_000, simulationTimeoutMs: 90_000, maxResponseBytes: 64 * 1024 * 1024,
-    ...(options.fetchImpl ? { fetchImpl: options.fetchImpl } : {}), ...(options.minIntervalMs === undefined ? {} : { minIntervalMs: options.minIntervalMs }) } satisfies KeelRpcPoolOptions);
-  if (!options.fetchImpl) { sharedPools.set(poolKey, pool); if (sharedPools.size > 16) sharedPools.delete(sharedPools.keys().next().value!); }
+  const schedulers = urls.map(url => sharedKeelProviderRequestScheduler(url, { chainId, minIntervalMs: options.minIntervalMs ?? 250, maximumRetryDelayMs: 5_000 }, options.fetchImpl));
+  const activeObservations = new Map<number, KeelProviderRequestEvent>();
+  const notify = (event: KeelProviderRequestEvent) => { try { const pending = options.observe?.(Object.freeze(event)); if (pending) void Promise.resolve(pending).catch(() => undefined); } catch { /* Evidence cannot alter proof. */ } };
+  // Each owner keeps a separate parser/identity cache and private observer. Only
+  // admission/cooldown/capability availability is shared, never owner evidence.
+  const pool = createKeelRpcPool({ rpcUrls: urls, chainId, timeoutMs: 30_000, simulationTimeoutMs: 90_000, maxResponseBytes: 64 * 1024 * 1024,
+    ...(options.fetchImpl ? { fetchImpl: options.fetchImpl } : {}), ...(options.minIntervalMs === undefined ? {} : { minIntervalMs: options.minIntervalMs }),
+    ...(options.observe ? { onPrivateResponse(event) {
+      const active = activeObservations.get(event.providerIndex);
+      if (active) notify({ ...active, type: event.error !== undefined || object(event.response)?.error !== undefined || (event.httpStatus ?? 200) >= 400 ? "rpc-error" : "rpc-response",
+        elapsedMs: event.elapsedMs, request: event.request,
+        ...(event.response === undefined ? {} : { rawResponse: event.response }), ...(event.error === undefined ? {} : { error: event.error }),
+        ...(event.httpStatus === undefined ? {} : { httpStatus: event.httpStatus }), ...(event.retryAfterMs === undefined ? {} : { retryAfterMs: event.retryAfterMs }) });
+    } } : {}) } satisfies KeelRpcPoolOptions);
   const abort = new AbortController(), rejected = new Set<number>();
+  let operationDeadlineAt: number | undefined;
+  let publicQualificationDepth = 0;
+  const duringPublicQualification = async <T>(operation: () => Promise<T>): Promise<T> => {
+    publicQualificationDepth++;
+    try { return await operation(); } finally { publicQualificationDepth--; }
+  };
+  const scheduledRequest = (index: number, body: { readonly method: string; readonly params?: readonly unknown[] }) => schedulers[index]!.run({ method: body.method,
+    // A public-only capability report stops after an observed restriction. It
+    // grants no private-data approval and must not automatically probe again.
+    ...(approved.size === 0 ? { maximumAttempts: 1 as const } : {}),
+    // This phase is established by our qualification control flow, never by
+    // inspecting whether caller-supplied calldata resembles public constants.
+    ...(body.method === "eth_simulateV1" && publicQualificationDepth === 0 ? { retryMode: "caller" as const } : {}),
+    signal: abort.signal, ...(operationDeadlineAt === undefined ? {} : { deadlineAt: operationDeadlineAt }), observe(event) {
+      if (event.type === "request-start") activeObservations.set(index, event);
+      notify(event);
+    } }, async (signal, context) => {
+      const pinned = pool.pin(index);
+      if (body.method === "eth_estimateGas" && context.attempt > 1) {
+        const snapshot = object(await pinned.request({ method: "eth_getBlockByNumber", params: [blockTag, false], signal }));
+        if (snapshot?.number !== blockTag || typeof snapshot.hash !== "string" || snapshot.hash.toLowerCase() !== block.hash.toLowerCase())
+          throw new KeelPublicationSimulationError("chain-reorganized", "The estimate provider's selected block changed during bounded recovery.");
+      }
+      return pinned.request({ ...body, signal });
+    });
   const capacityRejected = new Map<number, { cap: bigint; scope: string; expiresAt: number; failure: KeelPublicationSimulationError }>();
   const capacityFor = (index: number) => { const value = capacityRejected.get(index); return value && Date.now() <= value.expiresAt ? value : undefined; };
   type Candidate = { index: number; transport: ReturnType<typeof createPinnedKeelSimulationTransport> };
@@ -78,9 +138,8 @@ export function createKeelPublicSimulationPool(options: KeelPublicSimulationPool
   // their own snapshot and cancellation; no shared process singleton can poison them.
   let tail: Promise<unknown> = Promise.resolve();
   const create = (index: number): Candidate => {
-    const pinned = pool.pin(index);
     const transport = createPinnedKeelSimulationTransport(async () => ({ protocol: "https", close() {}, async requestAsync({ body }) {
-      try { return { result: await pinned.request({ ...body, signal: abort.signal }) }; }
+      try { return { result: await scheduledRequest(index, body) }; }
       catch (error) {
         if (error instanceof KeelRpcResponseError) return { error };
         throw error;
@@ -142,16 +201,15 @@ export function createKeelPublicSimulationPool(options: KeelPublicSimulationPool
       // only a discovery bound; it grants no simulation qualification or proof.
       const index = urls.findIndex(url => approved.has(url));
       if (index < 0) throw new KeelPublicationSimulationError("configuration-invalid", "A publication estimate needs an approved project-data recipient.", { recipientApprovalRequired: 1 });
-      const pinned = pool.pin(index);
       try {
-        const snapshot = object(await pinned.request({ method: "eth_getBlockByNumber", params: [blockTag, false], signal: abort.signal }));
+        const snapshot = object(await scheduledRequest(index, { method: "eth_getBlockByNumber", params: [blockTag, false] }));
         if (snapshot?.number !== blockTag || typeof snapshot.hash !== "string" || snapshot.hash.toLowerCase() !== block.hash.toLowerCase())
           throw new KeelPublicationSimulationError("chain-reorganized", "The estimate provider did not match the exact selected block.");
-        const head = object(await pinned.request({ method: "eth_getBlockByNumber", params: ["latest", false], signal: abort.signal }));
+        const head = object(await scheduledRequest(index, { method: "eth_getBlockByNumber", params: ["latest", false] }));
         const time = quantity(head?.timestamp), number = quantity(head?.number), now = BigInt(Math.floor(Date.now() / 1000));
         if (time === undefined || number === undefined || number < block.number || time + 180n < now || time > now + 30n)
           throw new KeelPublicationSimulationError("rpc-unavailable", "The estimate provider does not have a fresh selected-chain head.");
-        const result = await pinned.request({ ...exact, signal: abort.signal });
+        const result = await scheduledRequest(index, exact);
         if (closed) throw new KeelPublicationSimulationError("rpc-unavailable", "The publication check was cancelled.");
         if (quantity(result) === undefined || quantity(result)! <= 0n)
           throw new KeelPublicationSimulationError("configuration-invalid", "The provider omitted a positive transaction estimate.");
@@ -159,7 +217,8 @@ export function createKeelPublicSimulationPool(options: KeelPublicSimulationPool
       } catch (error) {
         if (closed) throw new KeelPublicationSimulationError("rpc-unavailable", "The publication check was cancelled.");
         const failure = keelSimulationTransportFailure(error, { method: "eth_estimateGas", phase: "project-estimate" });
-        throw new KeelPublicationSimulationError(failure.kind, failure.message, failure.diagnostic);
+        const wrapped = new KeelPublicationSimulationError(failure.kind, failure.message, failure.diagnostic);
+        inheritKeelProviderScheduledFailure(wrapped, error); throw wrapped;
       }
     }
     if (exact.method !== "eth_simulateV1") {
@@ -230,13 +289,13 @@ export function createKeelPublicSimulationPool(options: KeelPublicSimulationPool
 
       let candidate = selected?.index === index ? selected : create(index), projectRequest = false;
       try {
-        const head = object(await pool.pin(index).request({ method: "eth_getBlockByNumber", params: ["latest", false], signal: abort.signal }));
+        const head = object(await scheduledRequest(index, { method: "eth_getBlockByNumber", params: ["latest", false] }));
         const headTime = quantity(head?.timestamp), headNumber = quantity(head?.number), now = BigInt(Math.floor(Date.now() / 1000));
         if (headTime === undefined || headNumber === undefined || headNumber < block.number || headTime + 180n < now || headTime > now + 30n)
           throw new KeelPublicationSimulationError("rpc-unavailable", "The candidate does not have a fresh selected-chain head. The saved plan is unchanged.");
         if ((candidate.transport.qualifiedProbeGas ?? 0n) < requiredGas) {
           if (candidate.transport.qualifiedProbeGas !== undefined) { await candidate.transport.close(); selected = undefined; candidate = create(index); }
-          await candidate.transport.qualify(requiredGas);
+          await duringPublicQualification(() => candidate.transport.qualify(requiredGas));
         }
         const snapshot = object(await candidate.transport.request({ method: "eth_getBlockByNumber", params: [blockTag, false] }));
         if (snapshot?.number !== blockTag || typeof snapshot.hash !== "string" || snapshot.hash.toLowerCase() !== block.hash.toLowerCase())
@@ -244,7 +303,7 @@ export function createKeelPublicSimulationPool(options: KeelPublicSimulationPool
         // Recheck every phase's entire envelope sequence, including larger
         // aggregate requests on an already-selected candidate. Empty calls cannot
         // prove the real program's gas use; the unchanged full replay still must.
-        await qualifySequence(candidate, snapshot, gasLimits);
+        await duringPublicQualification(() => qualifySequence(candidate, snapshot, gasLimits));
         if (!approved.has(urls[index]!)) { awaitingApproval = true; await candidate.transport.close(); continue; }
         projectRequest = true;
         const result = await candidate.transport.request(exact);
@@ -267,6 +326,7 @@ export function createKeelPublicSimulationPool(options: KeelPublicSimulationPool
           // only the pool-owned JSON-RPC id/version envelope.
           requiredProgramGas: gasLimits.reduce((sum, gas) => sum + gas, 0n).toString(),
           ...metrics, phase: projectRequest ? "project-request" : "public-qualification" });
+        inheritKeelProviderScheduledFailure(failure, error);
         // Never reinterpret a deterministic transaction validation error or an
         // execution revert as a reason to try another backend for success.
         const code = failure.diagnostic?.rpcCode;
@@ -276,7 +336,8 @@ export function createKeelPublicSimulationPool(options: KeelPublicSimulationPool
         // -38026 is Geth's client limit, also used for non-gas limits. Only
         // separately authenticated request-capacity evidence permits fallback.
         const clientCapacityRejection = code === -38026 && requestCapacityEvidence;
-        const retryableRpcRejection = code === undefined || code === -32601
+        const rateRejection = failure.diagnostic?.transportFailure === "rate-limited" && (code === undefined || code === 429 || code === -32005);
+        const retryableRpcRejection = code === undefined || code === -32601 || rateRejection
           || failure.kind === "provider-limit" && (failure.diagnostic?.providerGasCap !== undefined || failure.diagnostic?.httpStatus === 413
             || failure.diagnostic?.gasCapacityScope === "request" && failure.diagnostic?.requestedRequestGas !== undefined && failure.diagnostic?.remainingRequestGas !== undefined);
         if (projectRequest && (!["provider-limit", "unsupported-simulation", "rpc-unavailable"].includes(failure.kind)
@@ -286,16 +347,16 @@ export function createKeelPublicSimulationPool(options: KeelPublicSimulationPool
         // recipient after its cooldown. Unknown errors and contract/RPC rejections
         // never enter this path. Qualification and the entire immutable program
         // run again; no previous ephemeral state or successful suffix is reused.
-        const health = pool.status();
+        const health = pool.status().map((status, index) => ({ ...status, retryAfterMs: Math.max(status.retryAfterMs, schedulers[index]!.status().retryAfterMs) }));
         const hasAlternative = urls.some((url, i) => i !== index && approved.has(url) && !rejected.has(i)
           && !health[i]?.disabled && (health[i]?.retryAfterMs ?? 0) === 0
           && !keelSimulationProviderCapacityFailure(measurement, limitsFor(i) ?? {})
           && requiredGas <= (capacityFor(i)?.cap ?? requiredGas));
-        const observedTransient = failure.kind === "rpc-unavailable" && code === undefined
-          && ([502, 503, 504].includes(Number(failure.diagnostic?.httpStatus))
-            || ["timeout", "connection-reset"].includes(String(failure.diagnostic?.transportFailure)));
+        const observedTransient = failure.kind === "rpc-unavailable" && (code === undefined || rateRejection)
+          && ([429, 502, 503, 504].includes(Number(failure.diagnostic?.httpStatus))
+            || ["timeout", "connection-reset", "rate-limited"].includes(String(failure.diagnostic?.transportFailure)));
         const cooldown = health[index]?.retryAfterMs ?? 0;
-        if (projectRequest && approved.has(urls[index]!) && !hasAlternative && !sameRecipientRetried && observedTransient
+        if (projectRequest && approved.has(urls[index]!) && !hasAlternative && !sameRecipientRetried && observedTransient && !isKeelProviderScheduledFailure(error)
           && cooldown <= 5_000 && deadlineAt - performance.now() > cooldown + 1_000) {
           sameRecipientRetried = true;
           try { onAttempt?.({ ...keelSimulationTransportDiagnostic(failure), candidateIndex: index, candidateCount: urls.length,
@@ -338,19 +399,34 @@ export function createKeelPublicSimulationPool(options: KeelPublicSimulationPool
     if (awaitingApproval) throw new KeelPublicationSimulationError("configuration-invalid", "A candidate passed public simulation checks but is not approved for private project data. The saved plan is unchanged.", { recipientApprovalRequired: 1 });
     throw capacityFailure ?? lastFailure ?? new KeelPublicationSimulationError("rpc-unavailable", "The configured simulation pool is unavailable. Retry the saved plan after provider recovery.");
   };
+  const inFlight = new Map<string, Promise<unknown>>();
+  let inFlightBytes = 0, pendingCount = 0, pendingBytes = 0;
   return { request(input) {
     const exact = structuredClone(input);
-    const pending = tail.then(async () => {
-      let timer: ReturnType<typeof setTimeout> | undefined;
-      const deadlineAt = performance.now() + requestTimeoutMs;
-      const timeout = new Promise<never>((_, reject) => { timer = setTimeout(() => {
+    const key = JSON.stringify(exact), existing = inFlight.get(key);
+    if (existing) return existing;
+    const bytes = new TextEncoder().encode(key).length;
+    if (pendingCount >= 16 || pendingBytes + bytes > 64 * 1024 * 1024) return Promise.reject(new KeelProviderQueueFullError());
+    pendingCount++; pendingBytes += bytes;
+    let timer: ReturnType<typeof setTimeout> | undefined;
+    const deadlineAt = performance.now() + requestTimeoutMs;
+    const timeout = new Promise<never>((_, reject) => { timer = setTimeout(() => {
         const failure = new KeelPublicationSimulationError("rpc-unavailable", "The publication check exceeded its bounded time budget. The saved plan is unchanged.",
           { transportFailure: "timeout", phase: "publication-preflight" });
         closed = true; abort.abort(failure); void selected?.transport.close(); reject(failure);
       }, requestTimeoutMs); });
-      try { return await Promise.race([request(exact, deadlineAt), timeout]); }
-      finally { if (timer !== undefined) clearTimeout(timer); }
+    const operation = tail.then(() => { operationDeadlineAt = deadlineAt; return request(exact, deadlineAt); });
+    const pending = Promise.race([operation, timeout]).catch(error => {
+      if (isKeelProviderDeadlineFailure(error)) { closed = true; abort.abort(error); void selected?.transport.close(); }
+      throw error;
+    }).finally(() => {
+      if (timer !== undefined) clearTimeout(timer);
+      pendingCount--; pendingBytes -= bytes;
+      if (inFlight.get(key) === pending) { inFlight.delete(key); inFlightBytes -= bytes; }
     });
+    // Exact duplicate clicks share only this owner's in-progress result at the
+    // same block. Settled results and requests from other owners are never reused.
+    if (inFlight.size < 16 && inFlightBytes + bytes <= 16 * 1024 * 1024) { inFlight.set(key, pending); inFlightBytes += bytes; }
     tail = pending.catch(() => undefined); return pending;
   },
     async close() { closed = true; abort.abort(); await selected?.transport.close(); } };
