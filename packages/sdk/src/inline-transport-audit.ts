@@ -214,7 +214,9 @@ export function inspectKeelInlinePayloadCarriage(htmlBytes: Uint8Array) {
         id: typeof item.id === "string" ? item.id : typeof item.objectId === "string" ? item.objectId : "container",
         mediaType, encoding, compression: typeof payload.compression === "string" ? payload.compression : "container-bound",
         binaryBytes: bytes.length, textCarriageBytes: encoder.encode(text).length,
-        directImage, requiresExistingPreparedReuse: encoding === "dense" ? preparedDenseCopy!.transportProfile !== "uri81-block-v1" : encoding !== "text" && !directImage,
+        directImage, requiresExistingPreparedReuse: encoding === "dense" ? preparedDenseCopy!.transportProfile !== "uri81-block-v1"
+          && preparedDenseCopy!.legacyPreparedProfile !== KEEL_LEGACY_PREPARED_DENSE_PROFILE
+          && preparedDenseCopy!.legacyPreparedProfile !== KEEL_LEGACY_SHARED_IMAGE_PROFILE : encoding !== "text" && !directImage,
         ...(encoding === "dense" ? {transportProfile: preparedDenseCopy!.transportProfile} : {}),
       }));
     }
