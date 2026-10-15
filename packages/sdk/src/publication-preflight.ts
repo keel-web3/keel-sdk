@@ -118,13 +118,15 @@ export function keelSimulationTransportDiagnostic(error: unknown, context: {
     if (!source) return;
     for (const [key, values] of [["rpcMethod", methods], ["phase", phases], ["stage", stages], ["transport", transports], ["errorClass", classes], ["causeClass", classes], ["transportFailure", failures], ["transportCode", codes], ["socketCloseReason", closeReasons], ["transactionValidation", transactionValidation], ["failureReason", failureReasons], ["responseFailure", responseFailures], ["gasCapacityScope", ["request", "transaction", "block", "envelope", "unknown", "request-bytes", "request-blocks"]], ["capacitySource", ["measured-profile"]]] as const)
       if (typeof source[key] === "string" && (values as readonly string[]).includes(source[key])) result[key] = source[key];
-    for (const [key, low, high] of [["rpcCode", -2147483648, 2147483647], ["httpStatus", 100, 599], ["socketReadyState", 0, 3], ["causeDepth", 0, 8], ["socketCloseCode", 1000, 4999], ["connectionAttempts", 1, 3], ["requestPayloadBytes", 0, 1073741824], ["blockCount", 0, 1000000], ["callCount", 0, 1000000], ["blockIndex", 0, 255], ["callIndex", 0, 65535], ["responseBytes", 0, 1073741824], ["maximumResponseBytes", 0, 1073741824], ["revertDataBytes", 0, 1073741824]] as const)
+    for (const [key, low, high] of [["rpcCode", -2147483648, 2147483647], ["httpStatus", 100, 599], ["socketReadyState", 0, 3], ["causeDepth", 0, 8], ["socketCloseCode", 1000, 4999], ["connectionAttempts", 1, 3], ["candidateIndex", 0, 1000000], ["candidateCount", 1, 1000000], ["requestPayloadBytes", 0, 1073741824], ["blockCount", 0, 1000000], ["callCount", 0, 1000000], ["blockIndex", 0, 255], ["callIndex", 0, 65535], ["responseBytes", 0, 1073741824], ["maximumResponseBytes", 0, 1073741824], ["revertDataBytes", 0, 1073741824]] as const)
       if (typeof source[key] === "number" && Number.isInteger(source[key]) && source[key] >= low && source[key] <= high) result[key] = source[key];
     for (const [key, maximum] of [["chainId", Number.MAX_SAFE_INTEGER], ["calldataBytes", 1_073_741_824], ["requiredCapacity", 1_073_741_824], ["providerCapacity", 1_073_741_824]] as const)
       if (typeof source[key] === "number" && Number.isSafeInteger(source[key]) && source[key] >= 0 && source[key] <= maximum) result[key] = source[key];
-    for (const key of ["requestedGasLimit", "providerGasCap", "requiredProgramGas", "returnedGasLimit", "gasUsed", "maxUsedGas", "pinnedBlockNumber", "minimumProgramGas", "intrinsicProgramGas", "calldataFloorGas", "largestMinimumCallGas", "requestedEnvelopeGas", "largestTransactionGas", "largestBlockEnvelopeGas", "requestedRequestGas", "remainingRequestGas"])
+    for (const key of ["requestedGasLimit", "discoveryRequestedGasLimit", "providerGasCap", "requiredProgramGas", "returnedGasLimit", "gasUsed", "maxUsedGas", "pinnedBlockNumber", "minimumProgramGas", "intrinsicProgramGas", "calldataFloorGas", "largestMinimumCallGas", "requestedEnvelopeGas", "largestTransactionGas", "largestBlockEnvelopeGas", "requestedRequestGas", "remainingRequestGas"])
       if (typeof source[key] === "string" && /^(?:0|[1-9]\d{0,19})$/u.test(source[key]) && BigInt(source[key]) <= 18_446_744_073_709_551_615n
         && (source[key] !== "0" || ["gasUsed", "maxUsedGas", "pinnedBlockNumber", "minimumProgramGas", "intrinsicProgramGas", "calldataFloorGas", "largestMinimumCallGas", "remainingRequestGas"].includes(key))) result[key] = source[key];
+    // The existing scheduler identity is opaque and contains no endpoint text.
+    if (typeof source.providerId === "string" && /^provider-[1-9]\d{0,14}$/u.test(source.providerId)) result.providerId = source.providerId;
     for (const key of ["pinnedBlockHash", "readerRuntimeCodeHash", "revertDataHash", "planFingerprint"])
       if (typeof source[key] === "string" && /^0x[0-9a-f]{64}$/iu.test(source[key])) result[key] = source[key].toLowerCase();
     if (typeof source.target === "string" && /^0x[0-9a-f]{40}$/iu.test(source.target)) result.target = source.target;
@@ -328,7 +330,7 @@ async function performPublicationSimulation(input: KeelPublicationSimulationInpu
       const transaction = record(transactions[0]);
       const actualGas = quantity(transaction?.gas), requestedGas = BigInt(call.gas);
       if (actualGas === undefined) return failure("unsupported-simulation", "The simulator omitted the exact transaction gas envelope.");
-      if (actualGas < requestedGas) return failure("provider-limit", "The simulator silently reduced the requested transaction gas. The exact prepared plan requires a compatible provider before wallet approval.", { requestedGasLimit: requestedGas.toString(), providerGasCap: actualGas.toString(), blockIndex: index, callIndex: 0 });
+      if (actualGas < requestedGas) return failure("provider-limit", "The simulator silently reduced the requested transaction gas. The exact prepared plan requires a compatible provider before wallet approval.", { requestedGasLimit: requestedGas.toString(), returnedGasLimit: actualGas.toString(), providerGasCap: actualGas.toString(), blockIndex: index, callIndex: 0 });
       if (actualGas !== requestedGas) return failure("unsupported-simulation", "The simulator changed the requested transaction gas envelope.");
       if (call.nonce !== undefined && quantity(transaction?.nonce) !== BigInt(call.nonce)) return failure("unsupported-simulation", "The simulator omitted or changed the explicit transaction nonce.");
     }
@@ -484,7 +486,7 @@ async function performPublicationSimulation(input: KeelPublicationSimulationInpu
       const requiredMinimum = shareBudget ? minimumProgramGas : largestMinimumCallGas;
       if (requiredMinimum > capacity) return failure("provider-limit", "The exact program's transaction and calldata minimum exceeds the observed simulation capacity. The saved plan is unchanged; no approval was prepared.",
         { ...keelSimulationTransportDiagnostic(error), ...pinnedDiagnostic, stage: "discovery-minimum",
-          requestedGasLimit: requiredMinimum.toString(), providerGasCap: reported,
+          requestedGasLimit: requiredMinimum.toString(), discoveryRequestedGasLimit: requested, providerGasCap: reported,
           minimumProgramGas: minimumProgramGas.toString(), intrinsicProgramGas: intrinsicDiscoveryGas.reduce((sum, gas) => sum + gas, 0n).toString(),
           calldataFloorGas: totalCalldataFloorGas.toString(), largestMinimumCallGas: largestMinimumCallGas.toString(), callCount: discoveryBase.length });
       sharedDiscoveryBudget = shareBudget ? capacity : undefined;

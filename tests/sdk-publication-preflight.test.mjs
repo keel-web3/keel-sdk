@@ -98,7 +98,7 @@ test("every direct transport simulation phase rejects silent gas clamping before
     });
     await assert.rejects(simulateKeelPublicationBeforeFunding(input(), f.transport), error => {
       assert.equal(error.kind, "provider-limit");
-      assert.deepEqual(error.diagnostic, { requestedGasLimit: requestedGas.toString(), providerGasCap: (requestedGas - 1n).toString(), blockIndex: 0, callIndex: 0 });
+      assert.deepEqual(error.diagnostic, { requestedGasLimit: requestedGas.toString(), returnedGasLimit: (requestedGas - 1n).toString(), providerGasCap: (requestedGas - 1n).toString(), blockIndex: 0, callIndex: 0 });
       return true;
     });
     assert.equal(f.requests.filter(request => request.method === "eth_simulateV1").length, pass);
@@ -486,6 +486,20 @@ test('capacity and size attempt diagnostics preserve only bounded numeric eviden
   }
 });
 
+test('selected provider diagnostics preserve opaque identity and observed envelopes without leaking endpoint text', () => {
+  const diagnostic = { providerId: 'provider-42', candidateIndex: 0, candidateCount: 2,
+    discoveryRequestedGasLimit: '200000000', returnedGasLimit: '50000000', phase: 'public-qualification' };
+  const safe = keelSimulationTransportDiagnostic({ diagnostic });
+  for (const [key, value] of Object.entries(diagnostic)) assert.equal(safe[key], value);
+  for (const providerId of ['https://secret.invalid/key?token=PRIVATE', 'provider-0', 'provider-01', 'provider-1/SECRET', 'provider-1000000000000000']) {
+    assert.equal(keelSimulationTransportDiagnostic({ diagnostic: { providerId } }).providerId, undefined);
+  }
+  for (const value of [-1, Infinity, 1.5, '1', 1000001]) {
+    const rejected = keelSimulationTransportDiagnostic({ diagnostic: { candidateIndex: value, candidateCount: value } });
+    assert.equal(rejected.candidateIndex, undefined); assert.equal(rejected.candidateCount, undefined);
+  }
+});
+
 
 // These are synthetic wire fixtures. No current project/provider acceptance is
 // claimed; the exact full successful sequence must still be checked live.
@@ -680,6 +694,7 @@ test('45 synthetic calldata lengths reject an explicit measured whole-request bu
   await assert.rejects(simulateKeelPublicationBeforeFunding(f.source, f.transport), error => {
     assert.equal(error.kind, 'provider-limit');
     assert.equal(error.diagnostic.providerGasCap, '50000000');
+    assert.equal(error.diagnostic.discoveryRequestedGasLimit, String(BigInt(f.source.preparationCalls[0].gas)));
     assert.equal(error.diagnostic.minimumProgramGas, '124157048');
     assert.equal(error.diagnostic.intrinsicProgramGas, '124150056');
     assert.equal(error.diagnostic.calldataFloorGas, '123469056');

@@ -858,6 +858,50 @@ test('measured profiles prefer approved request headroom while retaining every d
   } finally { await transport.close(); await f.transport.close(); }
 });
 
+test('selected capacity failure keeps its originating provider rather than the last failed candidate', async () => {
+  const f = fixture([{ cap: true, capacityGas: 50000000n }, { cap: true, capacityGas: 40000000n }]);
+  const attempts = [], events = [], transport = createKeelPublicSimulationPool({ ...f.options, chainId: 11155111,
+    onAttempt: value => attempts.push(value), observe: event => events.push(event),
+  });
+  try {
+    await assert.rejects(transport.request(program()), error => {
+      assert.equal(error.kind, 'provider-limit');
+      assert.equal(attempts.at(-1).candidateIndex, 1);
+      const safe = error.diagnostic;
+      assert.equal(safe.candidateIndex, 0); assert.equal(safe.candidateCount, 2);
+      assert.equal(safe.providerId, attempts[0].providerId);
+      assert.ok(events.some(event => event.providerId === safe.providerId));
+      assert.equal(safe.providerGasCap, '50000000'); assert.equal(safe.returnedGasLimit, '50000000');
+      assert.equal(safe.requestedGasLimit, '200000000'); assert.equal(safe.requestedEnvelopeGas, '1000000000');
+      assert.equal(safe.phase, 'public-qualification'); assert.equal(safe.gasCapacityScope, 'envelope');
+      assert.doesNotMatch(JSON.stringify(safe), /SECRET|PRIVATE|https:\/\//);
+      return true;
+    });
+    assert.equal(f.privateRequests().length, 0);
+  } finally { await transport.close(); await f.transport.close(); }
+});
+
+test('measured capacity rejection identifies its selected provider without inventing a returned envelope', async () => {
+  const f = fixture([{}, {}]), attempts = [];
+  const transport = createKeelPublicSimulationPool({ ...f.options, chainId: 11155111,
+    providerCapabilities: [capability(0, { transactionGasCap: 4000000n }), capability(1, { transactionGasCap: 3000000n })],
+    onAttempt: value => attempts.push(value),
+  });
+  try {
+    await assert.rejects(transport.request(variableProgram(7)), error => {
+      assert.equal(error.kind, 'provider-limit'); assert.equal(attempts.at(-1).candidateIndex, 1);
+      assert.equal(error.diagnostic.candidateIndex, 0); assert.equal(error.diagnostic.candidateCount, 2);
+      assert.equal(error.diagnostic.providerId, attempts[0].providerId);
+      assert.match(error.diagnostic.providerId, /^provider-[1-9]\d*$/);
+      assert.equal(error.diagnostic.phase, 'publication-preflight');
+      assert.equal(error.diagnostic.capacitySource, 'measured-profile');
+      assert.equal(error.diagnostic.returnedGasLimit, undefined);
+      return true;
+    });
+    assert.equal(f.requests.length, 0);
+  } finally { await transport.close(); await f.transport.close(); }
+});
+
 test('cumulative exhaustion falls back as a complete ordered program despite each call fitting the request cap', async () => {
   for (const count of [7, 29, 30, 31, 65]) {
     const f = fixture([{ sharedBudget: 10000000n, projectGas: 2000000n }, { sharedBudget: 200000000n, projectGas: 2000000n }]);
