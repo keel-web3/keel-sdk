@@ -29,12 +29,15 @@ export const KEEL_TEZOS_MODULES: readonly KeelTezosModule[] = [
     "id": "keel-artifacts",
     "sources": "src/modules/keel-artifacts/tezos",
     "contracts": [
+      "keel_access_controller.py",
       "keel_artifact_registry.py",
       "keel_harness_registry.py",
       "keel_immutable_checkpoint.py",
       "keel_link_registry.py",
       "keel_manager.py",
-      "keel_seed_registry.py"
+      "keel_manager_types.py",
+      "keel_seed_registry.py",
+      "keel_signature_authority.py"
     ],
     "deployable": [
       "KeelAccessController",
