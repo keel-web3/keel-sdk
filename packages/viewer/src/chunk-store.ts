@@ -59,6 +59,7 @@ export interface RecursiveChunkReaderOptions {
 
 interface ReadContext {
   readonly signal: AbortSignal;
+  readonly wait: <T>(read: () => T | Promise<T>) => Promise<T>;
   readonly client: KeelHoldReadClient;
   readonly options: Required<
     Pick<RecursiveChunkReaderOptions, "pageSize" | "maxDepth" | "maxNodes" | "maxDecodedBytes" | "maxStoredBytes" | "maxConcurrentReads">
@@ -71,6 +72,26 @@ interface ReadContext {
   readonly active: Set<string>;
   nodes: number;
   decodedBytes: number;
+}
+
+/** Share cancellation across all adapters with one listener per traversal. */
+function createReadAbortGate(signal: AbortSignal) {
+  let onAbort!: () => void;
+  const aborted = new Promise<never>((_resolve, reject) => {
+    onAbort = () => reject(signal.reason);
+    signal.addEventListener("abort", onAbort, { once: true });
+  });
+  return {
+    async wait<T>(read: () => T | Promise<T>): Promise<T> {
+      const result = await Promise.race([aborted, Promise.resolve().then(() => {
+        signal.throwIfAborted();
+        return read();
+      })]);
+      signal.throwIfAborted();
+      return result;
+    },
+    dispose(): void { signal.removeEventListener("abort", onAbort); },
+  };
 }
 
 function safeNumber(value: bigint | number, label: string): number {
@@ -99,6 +120,7 @@ async function readStreamWithLimit(
   stream: ReadableStream<Uint8Array>,
   maximum: number,
   signal: AbortSignal,
+  wait: ReadContext["wait"],
 ): Promise<Uint8Array> {
   const reader = stream.getReader();
   const chunks: Uint8Array[] = [];
@@ -106,13 +128,14 @@ async function readStreamWithLimit(
   try {
     for (;;) {
       if (signal.aborted) throw signal.reason ?? new Error("KeelHold read aborted.");
-      const result = await reader.read();
+      const result = await wait(() => reader.read());
       if (result.done) break;
       total += result.value.byteLength;
       if (total > maximum) throw new RangeError(`Decompressed object exceeds ${maximum} bytes.`);
       chunks.push(result.value);
     }
   } finally {
+    if (signal.aborted) void reader.cancel(signal.reason).catch(() => undefined);
     reader.releaseLock();
   }
   return concatBytes(chunks);
@@ -123,11 +146,12 @@ async function defaultDecompress(
   bytes: Uint8Array,
   maximum: number,
   signal: AbortSignal,
+  wait: ReadContext["wait"],
 ): Promise<Uint8Array> {
   if (compression === "brotli") throw new Error("Brotli requires a decompress adapter.");
   if (typeof globalThis.DecompressionStream !== "function") throw new Error("DecompressionStream is unavailable.");
   const stream = new Blob([toBufferSource(bytes)]).stream().pipeThrough(new DecompressionStream(compression));
-  return readStreamWithLimit(stream, maximum, signal);
+  return readStreamWithLimit(stream, maximum, signal, wait);
 }
 
 async function decompress(
@@ -136,9 +160,10 @@ async function decompress(
   options: RecursiveChunkReaderOptions,
   maximum: number,
   signal: AbortSignal,
+  wait: ReadContext["wait"],
 ): Promise<Uint8Array> {
   if (compression === "none") return bytes;
-  return options.decompress?.(compression, bytes) ?? defaultDecompress(compression, bytes, maximum, signal);
+  return wait(() => options.decompress?.(compression, bytes) ?? defaultDecompress(compression, bytes, maximum, signal, wait));
 }
 
 function objectKey(request: OnchainObjectRequest): string {
@@ -166,7 +191,7 @@ async function descriptorReferences(
 ): Promise<readonly Hex[]> {
   const pointer = record.descriptorPointer;
   if (pointer === undefined) throw new Error("KeelHold does not expose descriptor fallback data.");
-  const code = await context.client.getCode({ chainId: request.chainId, address: pointer }, context.signal);
+  const code = await context.wait(() => context.client.getCode({ chainId: request.chainId, address: pointer }, context.signal));
   if (code.byteLength < KEEL_HOLD_DESCRIPTOR_HEADER_BYTES + 1 || code[0] !== 0) throw new Error(`Invalid KeelHold descriptor bytecode at ${pointer}.`);
   const descriptor = code.subarray(1);
   const magic = bytesHex(descriptor.subarray(0, 4));
@@ -211,13 +236,14 @@ async function pageIds(
       if (context.signal.aborted) throw context.signal.reason;
       const limit = Math.min(context.options.pageSize, count - offset);
       const pageRequest = { ...request, offset, limit };
-      const page = await context.client.getObjectPartIds(pageRequest, context.signal);
+      const page = await context.wait(() => context.client.getObjectPartIds(pageRequest, context.signal));
       if (page.length === 0 && limit !== 0) throw new Error(`KeelHold returned an empty page at offset ${offset}.`);
       result.push(...page);
     }
     if (result.length !== count) throw new Error(`KeelHold returned ${result.length} IDs; expected ${count}.`);
     return result;
   } catch (error) {
+    context.signal.throwIfAborted();
     if (record.descriptorPointer === undefined) throw error;
     return descriptorReferences(context, request, record);
   }
@@ -234,13 +260,14 @@ async function pagePointers(
     for (let offset = 0; offset < count; offset += context.options.pageSize) {
       if (context.signal.aborted) throw context.signal.reason;
       const limit = Math.min(context.options.pageSize, count - offset);
-      const page = await context.client.getObjectSlugPointers({ ...request, offset, limit }, context.signal);
+      const page = await context.wait(() => context.client.getObjectSlugPointers({ ...request, offset, limit }, context.signal));
       if (page.length === 0 && limit !== 0) throw new Error(`KeelHold returned an empty pointer page at offset ${offset}.`);
       result.push(...page);
     }
     if (result.length !== count) throw new Error(`KeelHold returned ${result.length} pointers; expected ${count}.`);
     return result;
   } catch (error) {
+    context.signal.throwIfAborted();
     if (record.descriptorPointer === undefined) throw error;
     return descriptorReferences(context, request, record);
   }
@@ -260,7 +287,7 @@ async function readCarriers(
       if (context.signal.aborted) throw context.signal.reason;
       const pointer = pointers[index];
       if (pointer === undefined) throw new Error(`Missing KeelHold carrier pointer ${index}.`);
-      const code = await context.client.getCode({ chainId: request.chainId, address: pointer }, context.signal);
+      const code = await context.wait(() => context.client.getCode({ chainId: request.chainId, address: pointer }, context.signal));
       if (code.byteLength <= 1 || code[0] !== 0) throw new Error(`Invalid immutable carrier bytecode at ${pointer}.`);
       result[index] = code.slice(1);
     }
@@ -283,7 +310,7 @@ async function haulObjectUncached(
   if (context.active.has(key)) throw new Error(`KeelHold object cycle at ${request.objectId}.`);
   context.active.add(key);
   try {
-    const record = await context.client.getObject(request, context.signal);
+    const record = await context.wait(() => context.client.getObject(request, context.signal));
     const expectedBytes = safeNumber(record.byteLength, "object byteLength");
     const storedBytes = safeNumber(record.storedByteLength, "object storedByteLength");
     const count = safeNumber(record.chunkCount, "object child count");
@@ -313,6 +340,7 @@ async function haulObjectUncached(
         context.options,
         expectedBytes,
         context.signal,
+        context.wait,
       );
     }
 
@@ -322,7 +350,7 @@ async function haulObjectUncached(
     }
     context.decodedBytes += decoded.byteLength;
     if (context.options.verifyObjectDigests ?? true) {
-      const verified = await verifyIntegrity(
+      const verified = await context.wait(() => verifyIntegrity(
         decoded,
         {
           algorithm: context.options.digestAlgorithm ?? "sha256",
@@ -330,7 +358,7 @@ async function haulObjectUncached(
           byteLength: expectedBytes,
         },
         context.options.customDigest,
-      );
+      ));
       if (!verified) throw new Error(`Object digest mismatch for ${request.objectId}.`);
     }
     return decoded;
@@ -340,7 +368,10 @@ async function haulObjectUncached(
 }
 
 function haulObject(context: ReadContext, request: OnchainObjectRequest, depth: number): Promise<Uint8Array> {
+  context.signal.throwIfAborted();
   const key = objectKey(request);
+  // A pending ancestor is a cycle, not a reusable shared DAG result.
+  if (context.active.has(key)) return Promise.reject(new Error(`KeelHold object cycle at ${request.objectId}.`));
   const cached = context.cache.get(key);
   if (cached !== undefined) return cached;
   const pending = haulObjectUncached(context, request, depth);
@@ -372,8 +403,11 @@ export function createKeelHoldObjectReader(
   if (maxConcurrentReads > 64) throw new RangeError("maxConcurrentReads cannot exceed 64.");
 
   return async (request, signal) => {
+    signal.throwIfAborted();
+    const gate = createReadAbortGate(signal);
     const context: ReadContext = {
       signal,
+      wait: gate.wait,
       client,
       options: {
         pageSize,
@@ -392,6 +426,10 @@ export function createKeelHoldObjectReader(
       nodes: 0,
       decodedBytes: 0,
     };
-    return haulObject(context, request, 0);
+    try {
+      return await gate.wait(() => haulObject(context, request, 0));
+    } finally {
+      gate.dispose();
+    }
   };
 }
