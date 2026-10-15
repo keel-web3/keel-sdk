@@ -14,10 +14,11 @@ export function canonicalAbiEntries(abi) {
 
 /** An explicit test harness may supply actual compiler outputs and retain its
  * receipt separately. The default remains the canonical sibling out directory. */
-export function readCompiledContractAbi(contractsRoot, name) {
+export function readCompiledContractArtifact(contractsRoot, name) {
   if (!/^[A-Za-z_][A-Za-z0-9_]*$/u.test(name)) throw new TypeError('Invalid compiled contract name.');
   const directory = process.env.KEEL_CONTRACTS_ARTIFACTS_DIR ?? path.join(contractsRoot, 'out');
   const artifact = JSON.parse(readFileSync(path.resolve(directory, `${name}.sol`, `${name}.json`), 'utf8'));
   if (!Array.isArray(artifact.abi)) throw new TypeError('The actual compiler artifact has no ABI.');
-  return artifact.abi;
+  return artifact;
 }
+export const readCompiledContractAbi = (contractsRoot, name) => readCompiledContractArtifact(contractsRoot, name).abi;

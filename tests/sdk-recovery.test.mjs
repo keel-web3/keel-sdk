@@ -1,3 +1,5 @@
+import { readCompiledContractArtifact } from "./abi-conformance.mjs";
+import { fileURLToPath } from "node:url";
 import nodeTest from 'node:test';
 import { siblingTest } from "./sibling-repository.mjs";
 const test = siblingTest(nodeTest, "keel-contracts");
@@ -23,8 +25,8 @@ test('recovery SDK agrees with deployed contracts and relays cold-only upgrades'
  const accounts=Array.from({length:9},(_,i)=>privateKeyToAccount(toHex(BigInt(i+1),{size:32}))).sort((a,b)=>BigInt(a.address)<BigInt(b.address)?-1:1);
  const sender=accounts[8],cold=accounts[7],wallet=createWalletClient({account:sender,chain,transport:http(chain.rpcUrls.default.http[0])});
  await client.request({method:'anvil_setBalance',params:[sender.address,toHex(100n*10n**18n)]});
- const artifact=name=>JSON.parse(readFileSync(new URL(`../../keel-contracts/out/${name}.sol/${name}.json`,import.meta.url)));
- const deploy=async(name,args=[])=>{const a=artifact(name);const tx=await wallet.deployContract({abi:a.abi,bytecode:a.bytecode.object,args});const r=await client.waitForTransactionReceipt({hash:tx});assert.equal(r.status,'success');return r.contractAddress;};
+ const artifact=name=>readCompiledContractArtifact(fileURLToPath(new URL("../../keel-contracts",import.meta.url)),name);
+ const deploy=async(name,args=[])=>{const a=artifact(name);const tx=await wallet.deployContract({abi:a.abi,bytecode:a.bytecode.object.startsWith("0x")?a.bytecode.object:`0x${a.bytecode.object}`,args});const r=await client.waitForTransactionReceipt({hash:tx});assert.equal(r.status,'success');return r.contractAddress;};
  const receipts=[];
  const send=async call=>{const hash=await wallet.sendTransaction({to:call.target,data:call.data,value:call.value});const r=await client.waitForTransactionReceipt({hash});assert.equal(r.status,'success');receipts.push({selector:call.data.slice(0,10),gasUsed:r.gasUsed.toString()});return r;};
  const sign=async plan=>Promise.all(plan.requests.flatMap(request=>request.members.slice(0,Number(request.threshold)).map(async address=>{
