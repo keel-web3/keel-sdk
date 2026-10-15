@@ -85,3 +85,6 @@ diagnostics keep their existing fixed-field whitelist.
 Admission and unit tests do not prove provider capacity, transaction readiness or
 production compatibility. The exact saved candidate still needs complete private
 capture and unchanged dependent-program replay through the supported deployment.
+
+
+Studio publication scopes also admit their existing configured primary and read-fallback clients. The factory records each client's actual configured recipient when it is constructed, retains its normal cache TTL, disables lower-layer publication-read retries, and creates owner-specific admission wrappers outside that cache. A later registry lookup never guesses an existing client's recipient. Normal viewer reads retain their prior policy. The explicit configured-recipient identity option only keys admission for a caller-supplied read transport; it opens no connection, changes no recipient, and does not alter the public simulation recipient allowlist or qualify a publication proof. It preserves existing local/private HTTP read transports. Standalone estimates need their explicit read-only option and still cannot enable eth_simulateV1. Studio permits a bounded 16 MiB serialized read request for full URI/ABI inputs; the generic helper keeps its 512 KiB default and 32 MiB supported maximum.

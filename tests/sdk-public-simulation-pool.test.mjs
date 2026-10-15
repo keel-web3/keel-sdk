@@ -1045,3 +1045,63 @@ test('only typed request-capacity evidence permits -38026 fallback; transaction 
     for (const r of f.privateRequests()) assert.deepEqual(r.body.params, input.params);
   } finally { await transport.close(); await f.transport.close(); }
 });
+
+
+test('configured reader standalone estimates require explicit admission and never enable stateful simulation', async () => {
+  const calls = [], transport = { request: async exact => { calls.push(structuredClone(exact)); return '0x5208'; } };
+  const options = { chainId: 11155111, rpcUrl: 'https://existing-reader-estimate.example/rpc', minIntervalMs: 0 };
+  const estimate = { method: 'eth_estimateGas', params: [{ to: reader, data: '0x1234' }, snapshot.number] };
+  await assert.rejects(createKeelScheduledReadTransport(transport, options).request(estimate), /read-only methods/);
+  assert.equal(calls.length, 0);
+  const admitted = createKeelScheduledReadTransport(transport, { ...options, allowEstimateGas: true });
+  assert.equal(await admitted.request(estimate), '0x5208');
+  assert.deepEqual(calls, [estimate]);
+  await assert.rejects(admitted.request(program()), /read-only methods/);
+  assert.equal(calls.length, 1);
+});
+
+
+test('existing configured loopback and full reader calldata require explicit bounded admission without rerouting', async () => {
+  const calls = [], transport = { request: async exact => { calls.push(structuredClone(exact)); return '0x'; } };
+  const options = { chainId: 31337, rpcUrl: 'http://127.0.0.1:8545', minIntervalMs: 0 };
+  assert.throws(() => createKeelScheduledReadTransport(transport, options), /HTTPS/);
+  const small = createKeelScheduledReadTransport(transport, { ...options, allowLoopback: true });
+  const request = { method: 'eth_call', params: [{ to: reader, data: '0x' + 'ab'.repeat(270000) }, 'latest'] };
+  await assert.rejects(small.request(request), /bounded read request/);
+  assert.equal(calls.length, 0);
+  const admitted = createKeelScheduledReadTransport(transport, { ...options, allowLoopback: true, maximumRequestBytes: 16 * 1024 * 1024 });
+  assert.equal(await admitted.request(request), '0x');
+  assert.deepEqual(calls, [request]);
+  assert.throws(() => createKeelScheduledReadTransport(transport, { ...options, allowLoopback: true, rpcUrl: 'http://unapproved-remote.example/rpc' }), /HTTPS/);
+  assert.throws(() => createKeelScheduledReadTransport(transport, { ...options, allowLoopback: true, maximumRequestBytes: 32 * 1024 * 1024 + 1 }), /bounded request size/);
+});
+
+
+test('explicit existing server transport identities preserve private HTTP reads without opening or disclosing a route', async () => {
+  const events = [], calls = [], request = { method: 'eth_getCode', params: [reader, snapshot.number] };
+  const options = { chainId: 31337, rpcUrl: 'http://USER_SENTINEL:PASS_SENTINEL@anvil:8545/rpc?token=TOKEN_SENTINEL', minIntervalMs: 0 };
+  const existing = { request: async exact => { calls.push(structuredClone(exact)); return '0x6000'; } };
+  assert.throws(() => createKeelScheduledReadTransport(existing, options), /HTTPS/);
+  const admitted = createKeelScheduledReadTransport(existing, { ...options, configuredRecipient: true, observe: event => events.push(event),
+    fetchImpl: async () => { throw new Error('admission must not open another transport'); } });
+  assert.equal(await admitted.request(request), '0x6000');
+  assert.deepEqual(calls, [request]);
+  assert.doesNotMatch(JSON.stringify(events), /anvil|http:|USER_SENTINEL|PASS_SENTINEL|TOKEN_SENTINEL/);
+  await assert.rejects(admitted.request(program()), /read-only methods/);
+  assert.equal(calls.length, 1);
+});
+
+
+test('configured root URLs keep distinct credential identities without exposing them to observers', async () => {
+  const identifiers = [];
+  for (const user of ['USER_A', 'USER_B']) {
+    const events = [];
+    const admitted = createKeelScheduledReadTransport({ request: async () => '0x1' }, { chainId: 31337,
+      rpcUrl: `http://${user}:PASS_SENTINEL@anvil:8545/`, configuredRecipient: true, minIntervalMs: 0, observe: event => events.push(event) });
+    assert.equal(await admitted.request({ method: 'eth_chainId', params: [] }), '0x1');
+    identifiers.push(events.find(event => event.providerId)?.providerId);
+    assert.doesNotMatch(JSON.stringify(events), /USER_A|USER_B|PASS_SENTINEL|anvil/);
+  }
+  assert.ok(identifiers.every(Boolean));
+  assert.notEqual(identifiers[0], identifiers[1]);
+});

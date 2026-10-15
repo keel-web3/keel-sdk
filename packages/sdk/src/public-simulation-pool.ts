@@ -42,17 +42,35 @@ export function createKeelScheduledReadTransport(readTransport: KeelPreflightTra
   readonly chainId: number; readonly rpcUrl: string; readonly minIntervalMs?: number;
   readonly fetchImpl?: typeof fetch; readonly signal?: AbortSignal; readonly observe?: KeelProviderRequestObserver;
   readonly requestTimeoutMs?: number;
+  /** Preserve an existing configured reader's standalone estimate path. This
+   * grants no simulation capability or publication proof. */
+  readonly allowEstimateGas?: boolean;
+  readonly allowLoopback?: boolean;
+  /** An existing server-owned read transport already selected this recipient.
+   * Its URL identifies admission only; this helper never opens or changes it. */
+  readonly configuredRecipient?: boolean;
+  readonly maximumRequestBytes?: number;
 }): KeelPreflightTransport {
-  const url = normalizeKeelRpcUrl(options.rpcUrl);
+  let url: string;
+  if (options.configuredRecipient === true) {
+    let configured: URL;
+    try { configured = new URL(options.rpcUrl); } catch { throw new TypeError("Configured read admission needs its existing HTTP transport identity."); }
+    if (!["http:", "https:"].includes(configured.protocol)) throw new TypeError("Configured read admission needs its existing HTTP transport identity.");
+    configured.hash = "";
+    url = configured.pathname === "/" && !configured.search && !configured.username && !configured.password ? configured.origin : configured.href;
+  } else url = normalizeKeelRpcUrl(options.rpcUrl, options.allowLoopback);
   const timeoutMs = options.requestTimeoutMs ?? 120_000;
   if (!Number.isSafeInteger(timeoutMs) || timeoutMs < 100 || timeoutMs > 120_000) throw new TypeError("Scheduled reads need a bounded deadline of at most 120 seconds.");
+  const maximumRequestBytes = options.maximumRequestBytes ?? 512 * 1024;
+  if (!Number.isSafeInteger(maximumRequestBytes) || maximumRequestBytes < 1024 || maximumRequestBytes > 32 * 1024 * 1024) throw new RangeError("Configured reader admission needs an explicit bounded request size.");
   const scheduler = sharedKeelProviderRequestScheduler(url, { chainId: options.chainId, minIntervalMs: options.minIntervalMs ?? 250, maximumRetryDelayMs: 5_000 }, options.fetchImpl);
   const methods = new Set(["eth_chainId", "eth_blockNumber", "eth_getBlockByNumber", "eth_getBlockByHash", "eth_getCode", "eth_getBalance", "eth_getTransactionCount",
     "eth_getTransactionReceipt", "eth_getTransactionByHash", "eth_call", "eth_gasPrice", "eth_maxPriorityFeePerGas", "eth_feeHistory", "eth_getLogs", "eth_getStorageAt", "eth_getProof", "net_version", "web3_clientVersion"]);
+  if (options.allowEstimateGas === true) methods.add("eth_estimateGas");
   return { request(input) {
     if (!methods.has(input.method)) return Promise.reject(new TypeError("Configured reader admission accepts read-only methods; publication simulation uses its qualified transport."));
     const exact = structuredClone(input);
-    if (new TextEncoder().encode(JSON.stringify(exact)).length > 512 * 1024) return Promise.reject(new TypeError("Configured reader admission needs a bounded read request."));
+    if (new TextEncoder().encode(JSON.stringify(exact)).length > maximumRequestBytes) return Promise.reject(new TypeError("Configured reader admission needs a bounded read request."));
     return scheduler.run({ method: exact.method, retryMode: "caller", deadlineAt: performance.now() + timeoutMs,
       ...(options.signal === undefined ? {} : { signal: options.signal }), ...(options.observe === undefined ? {} : { observe: options.observe }) }, () => readTransport.request(exact));
   } };
