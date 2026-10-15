@@ -1,10 +1,20 @@
 import { createKeelRpcPool, KeelRpcResponseError, normalizeKeelRpcUrl, type KeelRpcPoolOptions } from "./rpc.js";
 import { createPinnedKeelSimulationTransport } from "./simulation-connection.js";
+import { createKeelLocalSimulationTransport, type KeelLocalSimulationOptions, type KeelLocalWitnessResolution } from "./local-simulation-session.js";
+
 import { KeelPublicationSimulationError, keelSimulationTransportDiagnostic, keelSimulationTransportFailure, type KeelPreflightTransport } from "./publication-preflight.js";
 import { assertKeelAmsterdamSimulationHeader, resolveKeelTransactionGasPolicy } from "./transaction-gas-policy.js";
-import { KEEL_SIMULATION_CAPABILITY_MAXIMUM_AGE_MS, keelSimulationChainDefaults, keelSimulationProviderCapacityFailure, measureKeelSimulationProgram, measureKeelSimulationExecution,
+import { KEEL_SIMULATION_CAPABILITY_MAXIMUM_AGE_MS, keelSimulationChainDefaults, keelSimulationProviderCapacityFailure, measureKeelSimulationProgram, measureKeelSimulationExecution, measureKeelSimulationIntrinsicGas,
   snapshotKeelSimulationProviderLimits, type KeelMeasuredSimulationProviderCapability, type KeelSimulationProviderLimits } from "./simulation-capacity-policy.js";
 
+/** Explicit, reviewed native capability. No process, witness source or recipient
+ * is selected by the SDK; ordinary provider exhaustion cannot enable it. */
+export interface KeelAuthenticatedLocalSimulationCapability {
+  readonly stateRoot: string;
+  readonly createClient: KeelLocalSimulationOptions["createClient"];
+  readonly witnessResolution: KeelLocalWitnessResolution;
+  readonly onSession?: KeelLocalSimulationOptions["onSession"];
+}
 export interface KeelPublicSimulationPoolOptions {
   readonly chainId?: number;
   /** Selected registry endpoint followed by the maintained indexed public pool. */
@@ -25,6 +35,9 @@ export interface KeelPublicSimulationPoolOptions {
   readonly capabilityMaximumAgeMs?: number;
   /** Exact request and response gas metrics, never a publication proof. */
   readonly onMeasurement?: (measurement: Readonly<Record<string, string | number>>) => void;
+  /** Optional authenticated native session for the unchanged complete program,
+   * only after a typed capacity refusal by an already-approved provider. */
+  readonly authenticatedLocalSession?: KeelAuthenticatedLocalSimulationCapability;
 }
 const object = (value: unknown): Record<string, unknown> | undefined => value !== null && typeof value === "object" && !Array.isArray(value) ? value as Record<string, unknown> : undefined;
 const quantity = (value: unknown): bigint | undefined => typeof value === "string" && /^0x(?:0|[1-9a-f][0-9a-f]*)$/iu.test(value) ? BigInt(value) : undefined;
@@ -48,6 +61,15 @@ export function createKeelPublicSimulationPool(options: KeelPublicSimulationPool
     throw new KeelPublicationSimulationError("configuration-invalid", "Publication needs explicit configured recipients and a selected block.");
   const block = { ...options.block }, blockTag = `0x${block.number.toString(16)}`;
   const readTransport = options.readTransport, onAttempt = options.onAttempt, onMeasurement = options.onMeasurement;
+  const suppliedLocal = options.authenticatedLocalSession;
+  if (suppliedLocal && (chainId !== 11155111 || !/^0x[0-9a-f]{64}$/iu.test(suppliedLocal.stateRoot)
+    || typeof suppliedLocal.createClient !== "function" || typeof suppliedLocal.witnessResolution?.prepare !== "function"
+    || typeof suppliedLocal.witnessResolution?.resolve !== "function"))
+    throw new KeelPublicationSimulationError("configuration-invalid", "Authenticated local simulation needs a selected Sepolia state root, reviewed native client and complete witness resolver.");
+  const localCapability = suppliedLocal ? { stateRoot: suppliedLocal.stateRoot, createClient: suppliedLocal.createClient,
+    witnessResolution: { prepare: suppliedLocal.witnessResolution.prepare, resolve: suppliedLocal.witnessResolution.resolve },
+    ...(suppliedLocal.onSession ? { onSession: suppliedLocal.onSession } : {}) } : undefined;
+
   const capabilityMaximumAgeMs = options.capabilityMaximumAgeMs ?? KEEL_SIMULATION_CAPABILITY_MAXIMUM_AGE_MS;
   if (!Number.isSafeInteger(capabilityMaximumAgeMs) || capabilityMaximumAgeMs < 0 || capabilityMaximumAgeMs > KEEL_SIMULATION_CAPABILITY_MAXIMUM_AGE_MS)
     throw new KeelPublicationSimulationError("configuration-invalid", "Measured capacity facts must expire within five minutes.");
@@ -74,6 +96,25 @@ export function createKeelPublicSimulationPool(options: KeelPublicSimulationPool
   const capacityFor = (index: number) => { const value = capacityRejected.get(index); return value && Date.now() <= value.expiresAt ? value : undefined; };
   type Candidate = { index: number; transport: ReturnType<typeof createPinnedKeelSimulationTransport> };
   let selected: Candidate | undefined, cursor = 0, closed = false;
+  let local: ReturnType<typeof createKeelLocalSimulationTransport> | undefined, localSelected = false;
+  const localReplay = async (exact: Parameters<KeelPreflightTransport["request"]>[0]) => {
+    if (closed || abort.signal.aborted || !localCapability)
+      throw new KeelPublicationSimulationError("rpc-unavailable", "The publication check was cancelled or has no authenticated local capability.");
+    local ??= createKeelLocalSimulationTransport({ readTransport, block: { ...block, stateRoot: localCapability.stateRoot },
+      createClient: localCapability.createClient, witnessResolution: localCapability.witnessResolution,
+      ...(localCapability.onSession ? { onSession: localCapability.onSession } : {}), signal: abort.signal, requestTimeoutMs });
+    // Each call creates a fresh native session from this same canonical pin.
+    // No public prefix/result is reused, and an atomic outer call stays intact.
+    const result = await local.request(exact);
+    if (closed) throw new KeelPublicationSimulationError("rpc-unavailable", "The publication check was cancelled.");
+    localSelected = true;
+    return result;
+  };
+  const typedCapacity = (failure: KeelPublicationSimulationError) => failure.kind === "provider-limit"
+    && (failure.diagnostic?.httpStatus === 413 || failure.diagnostic?.capacitySource === "measured-profile"
+      || typeof failure.diagnostic?.providerGasCap === "string" && /^[1-9]\d{0,19}$/u.test(failure.diagnostic.providerGasCap)
+      || failure.diagnostic?.gasCapacityScope === "request" && failure.diagnostic?.requestedRequestGas !== undefined && failure.diagnostic?.remainingRequestGas !== undefined);
+
   // One ordered stream per publication transport. Separate publications retain
   // their own snapshot and cancellation; no shared process singleton can poison them.
   let tail: Promise<unknown> = Promise.resolve();
@@ -185,10 +226,25 @@ export function createKeelPublicSimulationPool(options: KeelPublicSimulationPool
       gasLimits.push(gas);
     }
     const measurement = measureKeelSimulationProgram(exact);
+    // Only fresh, explicitly measured WHOLE-request caps can use this lower
+    // bound. An envelope clamp or remaining allowance never supplies that fact.
+    let intrinsic: ReturnType<typeof measureKeelSimulationIntrinsicGas> | undefined;
+    if (urls.some((_url, index) => limitsFor(index)?.requestGasCap !== undefined)) {
+      const header = object(await readTransport.request({ method: "eth_getBlockByNumber", params: [blockTag, false] }));
+      if (header?.number !== blockTag || typeof header.hash !== "string" || header.hash.toLowerCase() !== block.hash.toLowerCase())
+        throw new KeelPublicationSimulationError("chain-reorganized", "The measured request-capacity check did not match the exact selected block.");
+      const timestamp = quantity(header.timestamp), blockGasLimit = quantity(header.gasLimit);
+      if (timestamp === undefined || blockGasLimit === undefined)
+        throw new KeelPublicationSimulationError("rpc-unavailable", "The measured capacity check needs the exact selected-fork header.");
+      intrinsic = measureKeelSimulationIntrinsicGas(exact, resolveKeelTransactionGasPolicy({ chainId, blockTimestamp: timestamp, blockGasLimit }));
+    }
+
     const metrics = { chainId, callCount: measurement.callCount, blockCount: measurement.blockCount, calldataBytes: measurement.calldataBytes,
       requestPayloadBytes: measurement.requestPayloadBytes, requestedEnvelopeGas: measurement.requestedEnvelopeGas.toString(),
       largestTransactionGas: measurement.largestTransactionGas.toString(), largestBlockEnvelopeGas: measurement.largestBlockEnvelopeGas.toString() };
     try { onMeasurement?.(Object.freeze({ ...metrics, gasMeasurement: "requested-envelopes" })); } catch { /* Metrics cannot alter proof. */ }
+    if (localSelected) return localReplay(exact);
+    let approvedLocalCapacityFailure: KeelPublicationSimulationError | undefined;
     let capacityFailure: KeelPublicationSimulationError | undefined, approvedCapacityFailure: KeelPublicationSimulationError | undefined,
       lastFailure: KeelPublicationSimulationError | undefined, awaitingApproval = false;
     let sameRecipientRetried = false;
@@ -210,9 +266,10 @@ export function createKeelPublicSimulationPool(options: KeelPublicSimulationPool
       if (closed) throw new KeelPublicationSimulationError("rpc-unavailable", "The publication check was cancelled.");
       const index = order[offset]!;
       if (rejected.has(index)) continue;
-      const profileFailure = keelSimulationProviderCapacityFailure(measurement, limitsFor(index) ?? {});
+      const profileFailure = keelSimulationProviderCapacityFailure(measurement, limitsFor(index) ?? {}, undefined, intrinsic);
       if (profileFailure) {
         capacityFailure ??= profileFailure; lastFailure = profileFailure;
+        if (approved.has(urls[index]!) && typedCapacity(profileFailure)) approvedLocalCapacityFailure ??= profileFailure;
         const cap = profileFailure.diagnostic?.providerGasCap;
         if (typeof cap === "string") retainApprovedCapacity(index, BigInt(cap), profileFailure);
         try { onAttempt?.({ ...keelSimulationTransportDiagnostic(profileFailure), candidateIndex: index, candidateCount: urls.length }); } catch { /* Metrics cannot alter proof. */ }
@@ -221,6 +278,7 @@ export function createKeelPublicSimulationPool(options: KeelPublicSimulationPool
       const capacity = capacityFor(index);
       if (capacity && requiredGas > capacity.cap) {
         capacityFailure ??= capacity.failure;
+        if (approved.has(urls[index]!) && typedCapacity(capacity.failure)) approvedLocalCapacityFailure ??= capacity.failure;
         retainApprovedCapacity(index, capacity.cap, capacity.failure);
         continue;
       }
@@ -289,7 +347,7 @@ export function createKeelPublicSimulationPool(options: KeelPublicSimulationPool
         const health = pool.status();
         const hasAlternative = urls.some((url, i) => i !== index && approved.has(url) && !rejected.has(i)
           && !health[i]?.disabled && (health[i]?.retryAfterMs ?? 0) === 0
-          && !keelSimulationProviderCapacityFailure(measurement, limitsFor(i) ?? {})
+          && !keelSimulationProviderCapacityFailure(measurement, limitsFor(i) ?? {}, undefined, intrinsic)
           && requiredGas <= (capacityFor(i)?.cap ?? requiredGas));
         const observedTransient = failure.kind === "rpc-unavailable" && code === undefined
           && ([502, 503, 504].includes(Number(failure.diagnostic?.httpStatus))
@@ -312,6 +370,7 @@ export function createKeelPublicSimulationPool(options: KeelPublicSimulationPool
           offset--; // The next iteration creates and fully qualifies this same candidate.
           continue;
         }
+        if (approved.has(urls[index]!) && typedCapacity(failure)) approvedLocalCapacityFailure ??= failure;
         const reportedCap = failure.kind === "provider-limit" ? failure.diagnostic?.providerGasCap : undefined;
         if (typeof reportedCap === "string" && /^[1-9]\d*$/u.test(reportedCap)) {
           const previous = capacityFor(index);
@@ -334,6 +393,11 @@ export function createKeelPublicSimulationPool(options: KeelPublicSimulationPool
     // Give the caller the largest reported capacity among approved recipients before
     // asking for a new disclosure recipient. Only the caller may adapt an
     // unmeasured discovery/read ceiling; this pool still replays exact requests.
+    if (approvedLocalCapacityFailure && localCapability) {
+      if (closed) throw new KeelPublicationSimulationError("rpc-unavailable", "The publication check was cancelled.");
+      try { onAttempt?.({ ...keelSimulationTransportDiagnostic(approvedLocalCapacityFailure), localSessionFallback: 1 }); } catch { /* Observers cannot grant proof. */ }
+      return localReplay(exact);
+    }
     if (approvedCapacityFailure) throw approvedCapacityFailure;
     if (awaitingApproval) throw new KeelPublicationSimulationError("configuration-invalid", "A candidate passed public simulation checks but is not approved for private project data. The saved plan is unchanged.", { recipientApprovalRequired: 1 });
     throw capacityFailure ?? lastFailure ?? new KeelPublicationSimulationError("rpc-unavailable", "The configured simulation pool is unavailable. Retry the saved plan after provider recovery.");
@@ -346,14 +410,14 @@ export function createKeelPublicSimulationPool(options: KeelPublicSimulationPool
       const timeout = new Promise<never>((_, reject) => { timer = setTimeout(() => {
         const failure = new KeelPublicationSimulationError("rpc-unavailable", "The publication check exceeded its bounded time budget. The saved plan is unchanged.",
           { transportFailure: "timeout", phase: "publication-preflight" });
-        closed = true; abort.abort(failure); void selected?.transport.close(); reject(failure);
+        closed = true; abort.abort(failure); void selected?.transport.close(); void local?.close(); reject(failure);
       }, requestTimeoutMs); });
       try { return await Promise.race([request(exact, deadlineAt), timeout]); }
       finally { if (timer !== undefined) clearTimeout(timer); }
     });
     tail = pending.catch(() => undefined); return pending;
   },
-    async close() { closed = true; abort.abort(); await selected?.transport.close(); } };
+    async close() { closed = true; abort.abort(); await Promise.all([selected?.transport.close(), local?.close()]); } };
 }
 
 /** Legacy Sepolia entry point; new callers pass their selected chain explicitly. */

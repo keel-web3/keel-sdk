@@ -1,0 +1,50 @@
+{
+  "schema": "keel-sanitized-simulation-capacity-incident@1",
+  "source": "Owner-provided incident handoff; relevant metadata read through native Library text. Private reference identifiers are intentionally excluded.",
+  "selectedChainId": 11155111,
+  "callCount": 45,
+  "calldataBytes": 1929204,
+  "requestPayloadBytes": 3868374,
+  "initialRequestedEnvelopeGas": "9000000000",
+  "secondRequestedEnvelopeGas": "2250000000",
+  "observedEnvelopeClamp": {
+    "gasCapacityScope": "envelope",
+    "blockIndex": 1,
+    "requestedGasLimit": "50000000",
+    "providerGasCap": "49988000"
+  },
+  "verifiedWholeRequestGasCap": null,
+  "reportedSelectedForkMinimum": {
+    "minimumProgramGas": "124157048",
+    "intrinsicProgramGas": "124150056",
+    "calldataFloorGas": "123469056",
+    "largestMinimumCallGas": "4451224"
+  },
+  "timing": {
+    "candidateCreatedAt": "2026-10-15T00:45:55.288Z",
+    "candidateSavedAt": "2026-10-15T00:47:43.124Z",
+    "creationToSaveMs": 107836,
+    "firstMeasurementAt": "2026-10-15T00:47:14.235378158Z",
+    "finalFailureAt": "2026-10-15T00:47:41.630690020Z",
+    "recordedSimulationSpanMs": 27395.311862,
+    "httpRequestStartedAt": null
+  },
+  "retainedStorageMetadata": {
+    "carrierBatches": 29,
+    "chunks": 85,
+    "storedBytes": 1906806,
+    "operations": 8,
+    "operationCalldataBytes": 4992
+  },
+  "qualification": {
+    "full45WireRetained": false,
+    "fullProviderResponseRetained": false,
+    "allFundingAndControlCallsRetained": false,
+    "actualCalldataAvailable": false,
+    "canonicalCompleteWitnessAvailable": false,
+    "actualProgramReconstructed": false,
+    "nativeAcceptance": false,
+    "signing": false,
+    "submission": false
+  }
+}

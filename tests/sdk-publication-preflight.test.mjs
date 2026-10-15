@@ -1,5 +1,6 @@
 import assert from "node:assert/strict";
 import test from "node:test";
+import { readFile } from "node:fs/promises";
 import { encodeAbiParameters, encodeFunctionData, parseAbi, keccak256 } from "viem";
 const { simulateKeelPublicationBeforeFunding, simulateKeelStorageBeforeFunding, assertKeelFundingPreflight, keelFundingApprovalDigest, keelSimulationTransportDiagnostic, KeelPublicationSimulationError } = await import(process.env.KEEL_TEST_PUBLICATION_PREFLIGHT_MODULE ?? "../packages/sdk/dist/publication-preflight.js");
 
@@ -656,13 +657,22 @@ function minimumDiscoveryFixture(lengths, { budget = 50_000_000n, amsterdam = tr
 
 test('Retro exact 45 calldata lengths reject an observed shared budget below their selected-fork minimum before resubmission', async () => {
   const f = minimumDiscoveryFixture(retroPreparationLengths, { fundedFirst: true }), before = structuredClone(f.source);
+  const incident = JSON.parse(await readFile(new URL('./fixtures/simulation-capacity-incident-20261015.json', import.meta.url), 'utf8'));
+  assert.equal(f.source.preparationCalls.length, incident.callCount);
+  assert.equal(retroPreparationLengths.reduce((sum, bytes) => sum + bytes, 0), incident.calldataBytes);
+  // Exact lengths and selected-fork minima are metadata-backed. The zero-byte
+  // model is NOT the unavailable original45-call wire or native execution.
+  assert.equal(incident.qualification.actualCalldataAvailable, false);
+  assert.equal(incident.verifiedWholeRequestGasCap, null);
+  assert.equal(incident.observedEnvelopeClamp.gasCapacityScope, 'envelope');
+
   await assert.rejects(simulateKeelPublicationBeforeFunding(f.source, f.transport), error => {
     assert.equal(error.kind, 'provider-limit');
     assert.equal(error.diagnostic.providerGasCap, '50000000');
-    assert.equal(error.diagnostic.minimumProgramGas, '124157048');
-    assert.equal(error.diagnostic.intrinsicProgramGas, '124150056');
-    assert.equal(error.diagnostic.calldataFloorGas, '123469056');
-    assert.equal(error.diagnostic.largestMinimumCallGas, '4451224');
+    assert.equal(error.diagnostic.minimumProgramGas, incident.reportedSelectedForkMinimum.minimumProgramGas);
+    assert.equal(error.diagnostic.intrinsicProgramGas, incident.reportedSelectedForkMinimum.intrinsicProgramGas);
+    assert.equal(error.diagnostic.calldataFloorGas, incident.reportedSelectedForkMinimum.calldataFloorGas);
+    assert.equal(error.diagnostic.largestMinimumCallGas, incident.reportedSelectedForkMinimum.largestMinimumCallGas);
     assert.equal(error.diagnostic.stage, 'discovery-minimum');
     assert.equal(error.diagnostic.planFingerprint, f.source.planFingerprint);
     assert.doesNotMatch(JSON.stringify(error.diagnostic), /0x00000000/);

@@ -1,4 +1,5 @@
 import { KeelPublicationSimulationError, type KeelPreflightTransport } from "./publication-preflight.js";
+import type { KeelTransactionGasPolicy } from "./transaction-gas-policy.js";
 
 /** Protocol defaults are keyed by chain. They are not claims about an RPC's
  * configured gas cap. Unknown chains need a reviewed transaction-gas profile. */
@@ -73,6 +74,31 @@ export function measureKeelSimulationProgram(request: Parameters<KeelPreflightTr
   return Object.freeze({ blockCount: blocks.length, callCount, calldataBytes, requestPayloadBytes: new TextEncoder().encode(JSON.stringify(request)).byteLength,
     requestedEnvelopeGas, largestTransactionGas, largestBlockEnvelopeGas });
 }
+/** Actual selected-fork transaction/calldata lower bound, not execution usage
+ * or the conservative 21000 allocation used by public qualification probes. */
+export function measureKeelSimulationIntrinsicGas(request: Parameters<KeelPreflightTransport["request"]>[0], policy: KeelTransactionGasPolicy) {
+  measureKeelSimulationProgram(request);
+  const blocks = object(request.params[0])!.blockStateCalls as readonly { readonly calls: readonly Record<string, unknown>[] }[];
+  let intrinsicProgramGas = 0n, largestIntrinsicCallGas = 0n, calldataFloorGas = 0n;
+  for (const block of blocks) for (const call of block.calls) {
+    if (![call.from, call.to].every(value => typeof value === "string" && /^0x[0-9a-f]{40}$/iu.test(value)) || quantity(call.value) === undefined)
+      throw new KeelPublicationSimulationError("configuration-invalid", "Intrinsic measurement requires exact transaction identities and value.");
+    const data = call.data as string;
+    let regular = 0n, floor = 0n;
+    for (let offset = 2; offset < data.length; offset += 2) {
+      const zero = data.slice(offset, offset + 2) === "00";
+      regular += BigInt(zero ? policy.zeroCalldataGas : policy.nonzeroCalldataGas);
+      floor += BigInt(zero ? policy.zeroCalldataFloorGas : policy.nonzeroCalldataFloorGas);
+    }
+    const external = (call.from as string).toLowerCase() !== (call.to as string).toLowerCase();
+    const base = BigInt(policy.transactionBaseGas + (external ? policy.recipientAccessGas : 0)
+      + (external && quantity(call.value)! !== 0n ? policy.valueTransferGas : 0));
+    const intrinsic = base + (regular > floor ? regular : floor);
+    intrinsicProgramGas += intrinsic; calldataFloorGas += floor;
+    if (intrinsic > largestIntrinsicCallGas) largestIntrinsicCallGas = intrinsic;
+  }
+  return Object.freeze({ intrinsicProgramGas, largestIntrinsicCallGas, calldataFloorGas });
+}
 /** Response metrics are not a publication proof. The caller still authenticates
  * headers, exact returns, state, nonce/fees and the complete strict replay. */
 export function measureKeelSimulationExecution(request: Parameters<KeelPreflightTransport["request"]>[0], result: unknown) {
@@ -101,7 +127,8 @@ export function measureKeelSimulationExecution(request: Parameters<KeelPreflight
 /** A known infrastructure limit may exclude a backend, never modify the program.
  * An envelope sum above requestGasCap alone is not a reason to exclude it. */
 export function keelSimulationProviderCapacityFailure(measurement: KeelSimulationProgramMeasurement, limits: KeelSimulationProviderLimits,
-  execution?: ReturnType<typeof measureKeelSimulationExecution>): KeelPublicationSimulationError | undefined {
+  execution?: ReturnType<typeof measureKeelSimulationExecution>,
+  intrinsic?: ReturnType<typeof measureKeelSimulationIntrinsicGas>): KeelPublicationSimulationError | undefined {
   const gas = execution?.requiredRequestGas ?? measurement.largestTransactionGas;
   const dimensions = [
     ["transaction", measurement.largestTransactionGas, limits.transactionGasCap],
@@ -111,7 +138,13 @@ export function keelSimulationProviderCapacityFailure(measurement: KeelSimulatio
     ["request", gas, limits.requestGasCap],
   ] as const;
   const base = { callCount: measurement.callCount, blockCount: measurement.blockCount, calldataBytes: measurement.calldataBytes,
-    requestPayloadBytes: measurement.requestPayloadBytes, requestedEnvelopeGas: measurement.requestedEnvelopeGas.toString(), requiredProgramGas: measurement.requestedEnvelopeGas.toString() };
+    requestPayloadBytes: measurement.requestPayloadBytes, requestedEnvelopeGas: measurement.requestedEnvelopeGas.toString(), requiredProgramGas: measurement.requestedEnvelopeGas.toString(),
+    largestTransactionGas: measurement.largestTransactionGas.toString(), largestBlockEnvelopeGas: measurement.largestBlockEnvelopeGas.toString() };
+  if (intrinsic && limits.requestGasCap !== undefined && intrinsic.intrinsicProgramGas > limits.requestGasCap)
+    return new KeelPublicationSimulationError("provider-limit", "The exact selected-fork transaction and calldata floor exceeds this provider's measured whole-request capacity.",
+      { ...base, gasCapacityScope: "request", requestedGasLimit: intrinsic.intrinsicProgramGas.toString(), providerGasCap: limits.requestGasCap.toString(),
+        intrinsicProgramGas: intrinsic.intrinsicProgramGas.toString(), minimumProgramGas: intrinsic.intrinsicProgramGas.toString(),
+        calldataFloorGas: intrinsic.calldataFloorGas.toString(), largestMinimumCallGas: intrinsic.largestIntrinsicCallGas.toString(), capacitySource: "measured-profile" });
   for (const [scope, required, cap] of dimensions) if (cap !== undefined && required > cap)
     return new KeelPublicationSimulationError("provider-limit", "The configured provider lacks capacity for the unchanged complete program. Retry through a compatible approved provider; no transaction was submitted.",
       { ...base, gasCapacityScope: scope, requestedGasLimit: required.toString(), providerGasCap: cap.toString(), capacitySource: "measured-profile" });
