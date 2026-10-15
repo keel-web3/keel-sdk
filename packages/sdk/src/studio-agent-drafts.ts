@@ -757,9 +757,12 @@ export function createKeelStudioAgentDraftClient(options: KeelStudioAgentDraftCl
     if (!value || value.schema !== "keel-initial-storage-program@1" || value.artifactId !== projectId || value.artifactRevision !== expected.artifactRevision || value.releaseRevision !== expected.releaseRevision || value.originalPreserved !== true || value.simulationAccepted !== false || value.walletApprovalRequired !== false || value.signing !== "not-performed" || value.submission !== "not-performed" || value.uploadedBytes !== 0 || !value.sdkInput || typeof value.sdkInput !== "object" || Array.isArray(value.sdkInput) || !/^0x[0-9a-f]{64}$/iu.test(value.sourceSnapshotDigest) || value.programDigest !== keccak256(stringToHex(JSON.stringify(value.sdkInput)))) throw new TypeError("Studio returned another or incomplete saved program. No publication proof was accepted.");
     return value;
   };
-  const readReview: KeelStudioAgentDraftClient["readReview"] = async (releaseId, expectedRevision, operationId, expectedState) => {
-    reviewIdentity(releaseId, expectedRevision, operationId);
-    return checkedReview(await studioAgentResponse(await studioAgentRequest(options, `${releasePath(releaseId)}/review?operation=${encodeURIComponent(operationId)}&revision=${expectedRevision}&${stateQuery(expectedState)}`, { cache: "no-store" }), [options.grantToken]), releaseId, expectedRevision, operationId);
+  const readReview: KeelStudioAgentDraftClient["readReview"] = (releaseId, expectedRevision, operationId, expectedState) => {
+    reviewIdentity(releaseId, expectedRevision);
+    if (!/^[0-9a-f]{8}(?:-[0-9a-f]{4}){3}-[0-9a-f]{12}$/iu.test(operationId)) throw new TypeError("Read review needs the exact saved operation.");
+    const path = `${releasePath(releaseId)}/review?operation=${encodeURIComponent(operationId)}&revision=${expectedRevision}&${stateQuery(expectedState)}`;
+    return studioAgentRequest(options, path, { cache: "no-store" }).then(response => studioAgentResponse<KeelStudioReleaseWalletReview>(response, [options.grantToken]))
+      .then(value => checkedReview(value, releaseId, expectedRevision, operationId));
   };
   const storageReview = async (projectId: string, expectedState?: KeelStudioAgentStateBinding): Promise<KeelStudioStorageReview> => {
     if (!/^[0-9a-f]{8}(?:-[0-9a-f]{4}){3}-[0-9a-f]{12}$/iu.test(projectId)) throw new TypeError("Use this project's Studio UUID.");

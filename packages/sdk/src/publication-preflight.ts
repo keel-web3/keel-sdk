@@ -510,9 +510,11 @@ async function performPublicationSimulation(input: KeelPublicationSimulationInpu
     if (maximumUsedGas === undefined || maximumUsedGas <= 0n) return failure("unsupported-simulation", "This provider does not report pre-refund call gas. A compatible simulator is required before funding.");
     // Amsterdam meters execution and fresh state separately. maxUsedGas is
     // execution consumption, so it cannot replace a total transaction budget.
-    // Preserve the caller's bounded total allowance and validate that exact
-    // fee/gas envelope. Legacy and atomic execution margins remain unchanged.
-    const desired = transactionPolicy.separateStateGas ? BigInt(call.gas)
+    // Preserve the exact total allowance that passed whole-program discovery,
+    // including any explicitly measured provider-capacity allocation. Do not
+    // replace a total allowance with execution-only maxUsedGas. Atomic programs
+    // never receive discovery reallocation; strict fee/gas validation still runs.
+    const desired = transactionPolicy.separateStateGas ? BigInt(discoveryCalls[index]!.gas)
       : atomicContext ? (maximumUsedGas * 120n + 99n) / 100n
       : keelExecutorGasLimit(maximumUsedGas, BigInt(call.gas));
     const capacity = sharedDiscoveryBudget ?? discoveryCeiling;
