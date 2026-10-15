@@ -1,6 +1,6 @@
 # Prepared COPY is the default for existing KEEL objects
 
-For new binary collector Inline work, use [prepared dense COPY](KEEL_PREPARED_DENSE_COPY.md): Base90 preparation occurs before upload and tokenURI only copies. Explicit transport migration of existing native objects is a separately quoted source of new storage; it is not zero-upload assembly-only reuse.
+For new binary collector Inline work, use [prepared dense COPY](KEEL_PREPARED_DENSE_COPY.md): URI81 preparation occurs before upload and tokenURI only copies. Explicit transport migration of existing native objects is a separately quoted source of new storage; it is not zero-upload assembly-only reuse.
 
 Shared default and creator control: read [KEEL_PAYLOAD_STORAGE.md](KEEL_PAYLOAD_STORAGE.md). Native stored bytes and transient return encoding are separate; the prepared-COPY guard applies to prepared-COPY storage, not every native-composer response.
 

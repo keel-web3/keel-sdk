@@ -8,8 +8,8 @@ import { prepareKeelDensePayload } from "./prepared-dense-copy.js";
 interface KeelModuleByteIntegrity { readonly algorithm: "sha256"; readonly digest: string; readonly byteLength: number; }
 export interface KeelDenseModuleRuntime {
   readonly schema: "keel-module-runtime@2";
-  readonly encoding: "base90";
-  readonly transportProfile: "base90-v1";
+  readonly encoding: "uri81" | "base90";
+  readonly transportProfile: "uri81-block-v1" | "base90-v1";
   readonly compression: "brotli" | "none";
   readonly encryption: "none";
   readonly data: string;
@@ -31,7 +31,7 @@ export async function prepareKeelModuleRuntime(bytes: Uint8Array, options: { rea
   if (bytes.length > LIMIT) throw new RangeError("Module runtime exceeds its byte bound.");
   const payload = prepareKeelDensePayload(bytes, options.compression === undefined ? {} : { compression: options.compression });
   const runtime: KeelDenseModuleRuntime = {
-    schema: "keel-module-runtime@2", encoding: "base90", transportProfile: "base90-v1",
+    schema: "keel-module-runtime@2", encoding: "uri81", transportProfile: "uri81-block-v1",
     compression: payload.compression, encryption: "none", data: payload.storedDense,
     format: options.format, entry: options.entry,
     decodedIntegrity: payload.decodedIntegrity, storedIntegrity: payload.storedIntegrity,
@@ -50,7 +50,7 @@ export async function decodeKeelModuleRuntime(runtime: KeelModuleRuntime, expect
     if (decoded.length > LIMIT || decoded.toString("base64") !== runtime.data) throw new TypeError("Invalid legacy module Base64.");
     bytes = new Uint8Array(decoded);
   } else {
-    if (runtime.schema !== "keel-module-runtime@2" || runtime.encoding !== "base90" || runtime.transportProfile !== "base90-v1" || runtime.encryption !== "none" || !["none", "brotli"].includes(runtime.compression)) throw new TypeError("Unsupported module runtime transport.");
+    if (runtime.schema !== "keel-module-runtime@2" || !(runtime.encoding === "uri81" && runtime.transportProfile === "uri81-block-v1" || runtime.encoding === "base90" && runtime.transportProfile === "base90-v1") || runtime.encryption !== "none" || !["none", "brotli"].includes(runtime.compression)) throw new TypeError("Unsupported module runtime transport.");
     for (const integrity of [runtime.storedIntegrity, runtime.decodedIntegrity]) {
       if (integrity.algorithm !== "sha256" || !/^0x[0-9a-f]{64}$/u.test(integrity.digest) || !Number.isSafeInteger(integrity.byteLength) || integrity.byteLength < 0 || integrity.byteLength > LIMIT) throw new TypeError("Invalid module runtime byte commitment.");
     }

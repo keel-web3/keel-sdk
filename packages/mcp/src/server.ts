@@ -1,3 +1,4 @@
+import { KeelStudioAgentError } from "@keel/sdk/studio-agent-drafts";
 import { STUDIO_RELEASE_RECOVERY_GUIDANCE } from "./studio-wallet-guidance.js";
 import { findKeelRpcSetupError } from "@keel/sdk/rpc";
 import { keelSimulationTransportDiagnostic } from "@keel/sdk/publication-preflight";
@@ -80,6 +81,10 @@ function toolResult(value: unknown): ToolCallResult {
 }
 
 function toolError(error: unknown): ToolCallResult {
+  if (error instanceof KeelStudioAgentError) {
+    const structuredContent = { error: error.message, code: error.code, status: error.status, retryable: error.retryable, nextAction: error.nextAction, signing: "not-performed", submission: "not-performed" };
+    return { content: [{ type: "text", text: JSON.stringify(structuredContent) }], structuredContent, isError: true };
+  }
   if (error instanceof KeelNetworkIndexError) {
     const structuredContent = { code: error.code, setup: error.setup, signing: 'not-performed', submission: 'not-performed' };
     return { content: [{ type: 'text', text: JSON.stringify(structuredContent) }], structuredContent, isError: true };
@@ -97,6 +102,7 @@ const MCP_INSTRUCTIONS = [
   "For a blocked existing Studio release, use keel-studio-draft operation=diagnose before changing any files. Check actual scopes and retry recoverable reads yourself. When the complete metadata read fails, set includeReadCall=true to obtain its exact private calldata, pinned block/runtime hashes, byte commitments and gas attempts; do not infer its cost from stored game size. This evidence never authorizes sending private inputs to a new provider or creating a wallet transaction. Preserve the exact artifact, object IDs and receipts. Do not infer size from an RPC error, assume KEEL staff must fix an owner-controlled operation, or stage the artwork again. Offer Hybrid/IPFS only for a demonstrated Inline capability limit and only when that route is actually configured. New transactions remain explicitly owner-reviewed.",
   STUDIO_WALLET_GUIDANCE,
   "Start chain-dependent work with keel-network-discover. The configured KEEL public deployment index tells you where KEEL is actually deployed and which creator instance is active. Resolve selection from explicit input, .keel/config.json or KEEL_CHAIN_ID/KEEL_DEPLOYMENT_INSTANCE; respect the index default otherwise. Wallet/faucet catalogs do not prove KEEL deployments. Run keel-network-check before publication. RPC defaults come from the selected indexed network; private .keel/rpc.json and KEEL_RPC_URL(S) override them. Respect chain checks, rate-limit cooldowns and pacing. If a tool returns rpc.setup-required, explain the failure, ask which provider the user prefers, and help configure Alchemy, Infura or QuickNode for the selected chain with pnpm rpc:configure. Rerun pnpm rpc:check and the failed verification. Never ask for wallet keys, seed phrases or API keys in chat; never bypass missing receipts, use a stale index silently, or substitute a different chain.",
+  "Before declaring a KEEL route immutable or deploying replacement infrastructure, run keel-manager-modules-inspect with the selected Hold or existing managed collection. KeelManager selects replaceable modules through configureModule inside executeGovernance; the active address, code hash, revision and freeze state are authoritative. Discover manager bindings from the actual consuming presentation route. Use keel-manager-module-replacement-prepare for exact unsigned governance preparation. Replacing a directory entry does not rewrite unrelated immutable contract addresses. Require compatibility and existing artwork/resource byte parity and expected tokenURI context, and reuse all unchanged engine objects.",
   PREPARED_COPY_GUIDANCE,
   COPY_PUBLICATION_GUIDANCE,
   BINARY_PAYLOAD_GUIDANCE,

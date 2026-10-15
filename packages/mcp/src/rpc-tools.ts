@@ -3,6 +3,7 @@ import { createKeelNodeRpc } from '@keel/sdk/rpc-node';
 import { discoverKeelNodeNetworks } from '@keel/sdk/network-node';
 import { resolveKeelCreatorTarget, type KeelNetworkSelection, type KeelNetworkIndex } from '@keel/sdk/network-index';
 import { verifyKeelIndexedCreator } from '@keel/sdk/network-verification';
+import { inspectKeelManagerModules, prepareKeelManagerModuleReplacement, type KeelManagerModuleInspectionInput } from '@keel/sdk';
 import { redactRpcUrl } from '@keel/protocol';
 import type { ToolContext, ToolDefinition, Workspace } from './types.js';
 
@@ -28,6 +29,21 @@ const discoverySchema = { type: 'object', additionalProperties: false, propertie
   chainId: { type: 'integer', minimum: 1 }, instance: { type: 'string', minLength: 1, maxLength: 256 },
   indexUrl: { type: 'string', minLength: 1, maxLength: 2048 },
 } } as const;
+const managerProperties = {
+  chainId: { type: 'integer', minimum: 1 }, rpcUrl: { type: 'string', maxLength: 2048 },
+  manager: { type: 'string', pattern: '^0x[0-9a-fA-F]{40}$' }, store: { type: 'string', pattern: '^0x[0-9a-fA-F]{40}$' },
+  collection: { type: 'string', pattern: '^0x[0-9a-fA-F]{40}$' }, consumer: { type: 'string', pattern: '^0x[0-9a-fA-F]{40}$' },
+} as const;
+const managerInput = (value: unknown, extra: readonly string[] = []) => {
+  if (!value || typeof value !== 'object' || Array.isArray(value)) throw new TypeError('Supply an exact manager inspection target.');
+  const v = value as Record<string, unknown>;
+  if (Object.keys(v).some(key => ![...Object.keys(managerProperties), ...extra].includes(key)) || !Number.isSafeInteger(v.chainId) || Number(v.chainId) < 1
+    || !['manager', 'store', 'collection', 'consumer'].some(key => v[key] !== undefined)) throw new TypeError('Choose the selected chain and a manager, Hold or managed consumer.');
+  for (const key of ['manager', 'store', 'collection', 'consumer']) if (v[key] !== undefined && (typeof v[key] !== 'string' || !/^0x[0-9a-fA-F]{40}$/u.test(v[key]))) throw new TypeError('Invalid manager target address.');
+  if (v.rpcUrl !== undefined && typeof v.rpcUrl !== 'string') throw new TypeError('Invalid RPC URL.');
+  return v;
+};
+const jsonSafe = (value: unknown) => JSON.parse(JSON.stringify(value, (_key, item) => typeof item === 'bigint' ? item.toString() : item));
 function selectionInput(value: unknown): KeelNetworkSelection {
   if (!value || typeof value !== 'object' || Array.isArray(value)) throw new TypeError('Supply a network selection object.');
   const v = value as Record<string, unknown>;
@@ -36,6 +52,36 @@ function selectionInput(value: unknown): KeelNetworkSelection {
   return v as KeelNetworkSelection;
 }
 export const RPC_TOOL_DEFINITIONS: readonly ToolDefinition[] = [{
+  descriptor: { name: 'keel-manager-modules-inspect',
+    description: 'Read existing KeelManager replacement records on the selected chain. Supply Hold to discover its manager, or an existing managed collection to follow presentationModule/composerManager/composerModuleId. Supply moduleIds from publication-reference managedRoute bindings to inspect other entries; this is not whole-directory enumeration and empty results do not establish absence. Checks resolveModule against committed runtime code hashes and returns revisions, freeze state and governance quorum at one pinned block. Use this before concluding a route is immutable or proposing infrastructure deployment. A plain immutable contract does not follow an unrelated manager pointer. No keys, signing or writes.',
+    inputSchema: { type: 'object', additionalProperties: false, required: ['chainId'], properties: { ...managerProperties,
+      moduleIds: { type: 'array', maxItems: 64, items: { type: 'string', pattern: '^0x[0-9a-fA-F]{64}$' } },
+    } },
+  },
+  async run(context, value) {
+    const v = managerInput(value, ['moduleIds']);
+    const rpc = await mcpRpc(context, { chainId: Number(v.chainId), ...(v.rpcUrl ? { rpcUrl: v.rpcUrl as string } : {}) });
+    const { rpcUrl: _rpcUrl, ...input } = v;
+    return jsonSafe(await inspectKeelManagerModules(rpc.pool, input as unknown as KeelManagerModuleInspectionInput));
+  },
+}, {
+  descriptor: { name: 'keel-manager-module-replacement-prepare',
+    description: 'Prepare the existing manager configureModule self-call through executeGovernance. Requires exact prior active address/revision and the reviewed replacement runtime hash; rejects frozen or stale records and checks the deployed EIP-712 signing digest. Returns an unsigned quorum request, never deploys, signs or submits. Verify consuming route compatibility, storage layout, existing artwork/resource byte parity and expected tokenURI context and read gas before signing. Unchanged engines stay in Hold.',
+    inputSchema: { type: 'object', additionalProperties: false, required: ['chainId', 'moduleId', 'replacement', 'replacementCodeHash', 'expectedCurrent', 'expectedRevision'], properties: {
+      ...managerProperties, moduleId: { type: 'string', pattern: '^0x[0-9a-fA-F]{64}$' }, replacement: { type: 'string', pattern: '^0x[0-9a-fA-F]{40}$' },
+      replacementCodeHash: { type: 'string', pattern: '^0x[0-9a-fA-F]{64}$' }, expectedCurrent: { type: 'string', pattern: '^0x[0-9a-fA-F]{40}$' },
+      expectedRevision: { type: 'string', pattern: '^(0|[1-9][0-9]{0,19})$' }, deadline: { type: 'string', pattern: '^[1-9][0-9]{0,19}$' },
+    } },
+  },
+  async run(context, value) {
+    const v = managerInput(value, ['moduleId', 'replacement', 'replacementCodeHash', 'expectedCurrent', 'expectedRevision', 'deadline']);
+    if (typeof v.expectedRevision !== 'string' || !/^(0|[1-9][0-9]{0,19})$/u.test(v.expectedRevision) || BigInt(v.expectedRevision) >= 1n << 64n
+      || v.deadline !== undefined && (typeof v.deadline !== 'string' || !/^[1-9][0-9]{0,19}$/u.test(v.deadline))) throw new TypeError('Use exact uint64 decimal revision/deadline strings.');
+    const rpc = await mcpRpc(context, { chainId: Number(v.chainId), ...(v.rpcUrl ? { rpcUrl: v.rpcUrl as string } : {}) });
+    const { rpcUrl: _rpcUrl, ...input } = v;
+    return jsonSafe(await prepareKeelManagerModuleReplacement(rpc.pool, { ...input, expectedRevision: BigInt(v.expectedRevision), ...(v.deadline ? { deadline: BigInt(v.deadline as string) } : {}) } as Parameters<typeof prepareKeelManagerModuleReplacement>[1]));
+  },
+}, {
   descriptor: { name: 'keel-network-discover', inputSchema: discoverySchema,
     description: 'Discover where KEEL is actually deployed from its configured public deployment index. Resolve selected chain and active creator instance using explicit input, .keel/config.json and environment configuration. Returns recorded contracts, public RPC pools and missing verification gates. Wallet/faucet network catalogs are not deployment evidence. Metadata only; no wallet or signing.' },
   async run(context, value) {

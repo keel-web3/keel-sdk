@@ -1,3 +1,5 @@
+> Fresh SDK preparation now uses URI81. The creator-inline-20261005 deployment below is historical Base90 evidence. It must not be claimed as URI81 registration: fresh plans must authenticate a matching registered profile, and a mismatch stops before writes. Existing bindings stay unchanged.
+
 # Modern creator prepared Inline
 
 `prepareKeelCreatorInline` and MCP `keel-creator-inline-prepare` prepare fresh
@@ -11,10 +13,10 @@ registered loader. Its supported static imports, side-effect imports and named
 re-exports resolve against declared IDs and aliases. Unsupported cyclic or
 undeclared imports fail before storage planning; they do not select another shell.
 
-New files use Brotli when it saves bytes, otherwise none, followed by Base90-v1
+New files use Brotli when it saves bytes, otherwise none, followed by URI81 (uri81-block-v1)
 and the escaping required by JSON, HTML, data URIs and the deployed COPY reader.
 The shell's boot literals use gzip and Base64. Browser-native `DecompressionStream`
-unpacks that gzip boot; the embedded decoder handles Base90 and Brotli. The full
+unpacks that gzip boot; the embedded decoder handles URI81 and Brotli. The full
 HTML and metadata receive no whole-document Base64 wrapper. Module metadata
 reports the actual encoding, compression and encryption, including `none`.
 Existing packages keep their committed codec and object IDs; use
@@ -70,7 +72,7 @@ const plan = await prepareKeelCreatorInline({
    bytes exist. Use the existing fee-aware `prepareKeelWeld` wallet calls for
    initWeld, carrier casts, weld, seal and harness registration. The plan's
    bytes are prepared UTF-8/ASCII and use Hold compression `none`; Brotli is
-   inside the committed Base90 payload. Do not also upload compressed binaries.
+   inside the committed URI81 payload. Do not also upload compressed binaries.
 3. Complete public source read-back and the raw fragment validation cache.
    Use `validateImage` for the poster's complete data URI. Larger fragments may
    require multiple bounded validation transactions before their digest is cached.
@@ -100,4 +102,4 @@ The Sepolia instance reuses the owner-governed tester storage policy. Protocol
 fees there are zero; transaction gas is still payable. This profile does not
 change production governance or imply post-quantum wallet signatures. Optional
 private payloads retain their declared encryption profile; public modules are
-not encrypted merely because they are compressed or Base90 encoded.
+not encrypted merely because they are compressed or URI81 encoded.

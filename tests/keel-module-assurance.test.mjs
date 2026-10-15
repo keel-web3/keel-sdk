@@ -26,7 +26,7 @@ import { gzipSync } from "node:zlib";
 
 import { canonicalJson, createIntegrity, keelBuildRecipeDigest, utf8ToBytes } from "../packages/protocol/dist/index.js";
 import { createKeelBuildRecipe, verifyKeelBuildRecipe } from "../packages/builder/dist/index.js";
-import { wrapInVerificationShell } from "../packages/sdk/dist/index.js";
+import { assertKeelCollectorInlineMetadata, wrapInVerificationShell } from "../packages/sdk/dist/index.js";
 
 const execFileAsync = promisify(execFile);
 const repositoryRoot = fileURLToPath(new URL("..", import.meta.url));
@@ -446,6 +446,16 @@ test("wrapInVerificationShell returns a self-contained document and a review-onl
     assert.ok(item.embedded);
     for (const key of ["external", "onchain", "store", "objectId"]) assert.equal(item[key], undefined);
   }
+  const inlineMetadata = (html) => ({
+    image: `data:image/svg+xml,${encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg"/>')}`,
+    animation_url: `data:text/html;charset=utf-8,${encodeURIComponent(html)}`,
+  });
+  assert.doesNotThrow(() => assertKeelCollectorInlineMetadata(inlineMetadata(result.html)));
+  assert.match(result.html, /sandbox="allow-scripts allow-pointer-lock"/u);
+  assert.doesNotMatch(result.html, /allow-same-origin/u);
+  assert.throws(() => assertKeelCollectorInlineMetadata(inlineMetadata(
+    result.html + '<script src="https://untrusted.example/asset.js"></script>',
+  )), /external or relative resource/u);
 
   // The plan is review-only from every angle, and carries no signature anywhere.
   assert.equal(result.publishPlan.plan.status, "review-only");

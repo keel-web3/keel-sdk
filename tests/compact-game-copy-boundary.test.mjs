@@ -74,7 +74,7 @@ test('Compact game COPY rejects encoded module bytes before object/chunk plannin
   const compact = await buildDocument('compact');
   assert.equal(compact.module.item.embedded.compression, 'gzip');
   assert.deepEqual(new Uint8Array(Buffer.from(compact.module.item.embedded.storedBase64, 'base64')), new Uint8Array(gzipSync(bytes, { level: 9 })));
-  await assert.rejects(planGame({ ...parameters, doc: compact.doc }), /Fresh Inline forbids new storedBase64\/storedHex body copies/);
+  await assert.rejects(planGame({ ...parameters, doc: compact.doc }), /Fresh Inline .*forbids new storedBase64\/storedHex body copies/);
   assert.deepEqual(observation.calls, { objects: 0, composites: 0, chunkBytes: 0 });
 
   // The control proves both the planner observation and COPY path execute normally.
@@ -165,7 +165,7 @@ test('maintained fresh game and release producers use the same exact UTF-8 COPY 
     const full = await planGame({ ...parameters, doc: release.doc, gameId: 'keel-engine/release' });
     assert.equal(inventory.root, undefined, 'the release never publishes an all-catalogue token root');
     assert.deepEqual(inventory.parts.map(part => part.objectId), full.parts.filter(part => part.share !== 'game').map(part => part.objectId));
-    await assert.rejects(planEngineRelease({ ...parameters, shell, doc: legacy }), /Fresh Inline forbids/,
+    await assert.rejects(planEngineRelease({ ...parameters, shell, doc: legacy }), /Fresh Inline .*forbids/,
       'existing encoded slots must not be silently migrated or exempted from the publication guard');
   } finally { await rm(root, { recursive: true, force: true }); }
 });

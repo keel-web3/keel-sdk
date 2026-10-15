@@ -101,9 +101,9 @@ test('fresh build defaults layer explicit overrides, hard reader bounds and Raw 
   const buildMatrix = { schema: 'keel-studio-plan-matrix@1', capabilityRevision: 'build', fields: KEEL_BUILD_DEFAULT_FIELDS };
   let profile = updateKeelStudioDefaultProfile(createKeelStudioDefaultProfile(), buildMatrix, { expectedRevision: 0, scope: { kind: 'global' }, values: { compression: 'brotli', brotliQuality: 7, maxReadGas: 9000000 } });
   profile = updateKeelStudioDefaultProfile(profile, buildMatrix, { expectedRevision: 1, scope: { kind: 'media', mediaType: 'image/png' }, values: { brotliQuality: 8 } });
-  const current = resolveKeelBuildDefaults(profile, { mediaType: 'image/png', project: { brotliQuality: 9 }, build: { brotliQuality: 10 }, constraints: { maxReadGas: 2000000, maxOutputBytes: 2000000, transportProfiles: ['base90-v1'] } });
+  const current = resolveKeelBuildDefaults(profile, { mediaType: 'image/png', project: { brotliQuality: 9 }, build: { brotliQuality: 10 }, constraints: { maxReadGas: 2000000, maxOutputBytes: 2000000, transportProfiles: ['uri81-block-v1'] } });
   assert.equal(current.values.brotliQuality, 10); assert.equal(current.sources.brotliQuality, 'build');
-  assert.equal(current.values.maxReadGas, 2000000); assert.equal(current.requiresFullReadValidation, true);
+  assert.equal(current.values.transportProfile, "uri81-block-v1"); assert.equal(current.values.maxReadGas, 2000000); assert.equal(current.requiresFullReadValidation, true);
   assert.equal(resolveKeelBuildDefaults(profile, { build: { payloadStorage: 'raw', compression: 'brotli' } }).values.compression, 'none');
   assert.throws(() => resolveKeelBuildDefaults(profile, { constraints: { transportProfiles: ['unknown'] } }), /registered reader/);
   assert.throws(() => updateKeelStudioDefaultProfile(profile, buildMatrix, { expectedRevision: 2, scope: { kind: 'global' }, values: { multistage: true } }), /cannot become a default/);

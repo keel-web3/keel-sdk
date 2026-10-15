@@ -508,7 +508,13 @@ async function performPublicationSimulation(input: KeelPublicationSimulationInpu
   const boundedCalls = preparationCalls.map((call, index) => {
     const maximumUsedGas = gasDiscovery[index]!.maximumUsedGas;
     if (maximumUsedGas === undefined || maximumUsedGas <= 0n) return failure("unsupported-simulation", "This provider does not report pre-refund call gas. A compatible simulator is required before funding.");
-    const desired = atomicContext ? (maximumUsedGas * 120n + 99n) / 100n : keelExecutorGasLimit(maximumUsedGas, BigInt(call.gas));
+    // Amsterdam meters execution and fresh state separately. maxUsedGas is
+    // execution consumption, so it cannot replace a total transaction budget.
+    // Preserve the caller's bounded total allowance and validate that exact
+    // fee/gas envelope. Legacy and atomic execution margins remain unchanged.
+    const desired = transactionPolicy.separateStateGas ? BigInt(call.gas)
+      : atomicContext ? (maximumUsedGas * 120n + 99n) / 100n
+      : keelExecutorGasLimit(maximumUsedGas, BigInt(call.gas));
     const capacity = sharedDiscoveryBudget ?? discoveryCeiling;
     if (discoveryCapacityAttempts.length > 0 && desired > capacity)
       return failure("provider-limit", "The measured storage transaction including its required margin exceeds the provider's verified discovery capacity. Saved funding is unchanged; no approval was prepared.",

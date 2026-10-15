@@ -6,10 +6,10 @@ import { prepareKeelCreatorInline, buildKeelCreatorPreparedCopyBindingCall, KEEL
 const store='0xd820e337692a6eb7a4878e42ce88cbcff49b55cf';
 const poster={mediaType:'image/png',bytes:Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+jR1sAAAAASUVORK5CYII=','base64')};
 const resources=[{id:'game.html',role:'entrypoint',mediaType:'text/html',bytes:Buffer.from('<!doctype html><p>Hello🔥</p><script src="game.js"></script>'+('<!--compression-->' .repeat(100)))},{id:'game.js',role:'module',mediaType:'text/javascript',bytes:Buffer.from('globalThis.gameReady=true;'.repeat(100))}];
-test('creator files automatically become modular Brotli/Base90 COPY objects with exact table commitments',async()=>{
+test('creator files automatically become modular Brotli/URI81 COPY objects with exact table commitments',async()=>{
  const plan=await prepareKeelCreatorInline({chainId:11155111,store,resources,poster});
  assert.equal(plan.resources.length,2);assert.equal(plan.objects.length,8);assert.equal(plan.request.bodyObjectIds.length,6);
- for(const r of plan.resources){assert.equal(r.compression,'brotli');assert.equal(r.encoding,'base90-v1');assert.equal(r.encryption,'none');assert.ok(plan.objects.some(o=>o.objectId===r.carrier.objectId));assert.equal(r.binding.objectId,r.carrier.objectId);}
+ for(const r of plan.resources){assert.equal(r.compression,'brotli');assert.equal(r.encoding,'uri81-block-v1');assert.equal(r.encryption,'none');assert.ok(plan.objects.some(o=>o.objectId===r.carrier.objectId));assert.equal(r.binding.objectId,r.carrier.objectId);}
  const html=[plan.shell.prefix,...plan.objects.slice(0,6),plan.shell.suffix].map(o=>Buffer.from(decodeKeelPreparedDenseCopyFragment(o.bytes)).toString()).join('');
  const audit=inspectKeelInlinePayloadCarriage(Buffer.from(html));assert.equal(audit.payloadCount,2);assert.equal(audit.preparedDenseCopy.contractOperation,'verified-copy');
  assert.equal(plan.completeTokenURIBytes,null);assert.ok(plan.requiredGates.includes('keel-inline-publication-check'));

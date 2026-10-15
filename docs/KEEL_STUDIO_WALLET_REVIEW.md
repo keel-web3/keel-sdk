@@ -297,3 +297,35 @@ Studio Publish, creator and agent continuation APIs, SDK `continuePublication` /
 The action verifies retained onchain references by selected-chain/store identity, full decoded byte length and SHA-256 before reuse. It reconciles all journal history before that readback can authorize a renewed review. Unknown issuance remains unknown in the archived records; missing hashes are never proof of no payment. Unchanged expired programs renew only after immutable deadline rules and complete canonical opening history establish that their original calls can no longer fund a job. Local wallet records are archived with that server reconciliation, rather than silently discarded.
 
 Canonical complete funding or atomic release reverts permit a fresh unsigned review in the same action. Pending, replaced, partially successful or unverifiable receipts preserve the original operation. Already paid storage resumes its saved job and cursors; completing storage continues the project's unique existing release in the same page. Missing creator choices and genuine chain, capability, authority, configuration or integrity prerequisites remain precise in-place requirements. No diagnostic or CI result establishes a deployed collection or a successful mint.
+
+### Discover and continue saved work
+
+`client.list({ limit, cursor, projectId })` / MCP `keel-studio-draft` operation
+`list` returns projects and releases plus `pagination`. The default is 50 entries
+per collection, maximum 100. Follow `pagination.nextCursor` until null, preserving
+the project filter. Cursors belong to the authenticated owner and snapshot;
+concurrent new entries appear on the next fresh listing.
+
+Read the chosen release with operation `read`. Its additive `agentProgress`
+contains the current owner/project/release revisions, manifest digest, unresolved
+operation, saved storage counters, blockers and `nextActions`. These records are
+not a fresh chain check. Preserve every action's `expectedState`, `expectedRevision`
+and `expectedOperationId`. The SDK validates cross-object tool instructions and
+controlled owner paths before returning them. Hosted MCP uses the tool name in
+`nextActions`; portable MCP uses `keel-studio-draft` with the action's `operation`
+and `arguments`. Never execute actions whose `allowed` is false.
+
+For existing wallet attempts, use `continue-publication` first. A missing hash
+never proves rejection. Pending, unknown, permission, stale-state and unavailable
+results do not authorize a replacement. A successful continuation returns updated
+guidance; reread status if anything changed. Operation `read-review` validates an
+exact saved operation; `prepare-review` prepares the current confirmed plan.
+Only their successful server-issued `reviewUrl` is a ready owner wallet handoff.
+The agent never signs, submits, records invented owner testimony or funds storage.
+
+`KeelStudioAgentError` exposes `status`, `code`, `retryable` and a bounded
+`nextAction`. Portable MCP preserves those fields in structured error content.
+HTTP 409 requires refreshing the same saved object, not retrying stale arguments.
+These additive capabilities require a Studio deployment with agent progress and
+pagination support. An older server may omit `agentProgress` and `pagination`;
+absence of guidance does not establish safety or publication.

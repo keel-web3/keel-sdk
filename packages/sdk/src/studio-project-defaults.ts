@@ -148,7 +148,7 @@ export const KEEL_BUILD_DEFAULT_FIELDS: readonly import("./studio-project-planne
   { id: "rpcMaxConcurrentReads", label: "Parallel native RPC reads", kind: "integer", minimum: 1, maximum: 64, required: false, allowDefault: true, explanation: "Bounded Hybrid carrier reads. This does not change delivery, authorize a provider or set transaction gas." },
   { id: "compression", label: "Lossless compression", kind: "choice", required: false, allowDefault: true, choices: ["auto", "brotli", "none"].map(value => ({ value, label: value, status: "available" as const })) },
   { id: "brotliQuality", label: "Brotli quality", kind: "integer", minimum: 0, maximum: 11, required: false, allowDefault: true },
-  { id: "transportProfile", label: "Prepared payload encoding", kind: "choice", required: false, allowDefault: true, choices: ["base90-v1", "base91-v1", "base90-block-v2", "uri81-block-v1"].map(value => ({ value, label: value, status: "available" as const })) },
+  { id: "transportProfile", label: "Prepared payload encoding", kind: "choice", required: false, allowDefault: true, choices: ["uri81-block-v1"].map(value => ({ value, label: value, status: "available" as const })) },
   { id: "payloadStorage", label: "Payload storage", kind: "choice", required: false, allowDefault: true, choices: ["compact", "raw"].map(value => ({ value, label: value, status: "available" as const })) },
   { id: "maxReadGas", label: "Maximum complete-read gas", kind: "integer", minimum: 1, maximum: Number.MAX_SAFE_INTEGER, required: false, allowDefault: true },
   { id: "maxOutputBytes", label: "Maximum complete tokenURI bytes", kind: "integer", minimum: 1, maximum: Number.MAX_SAFE_INTEGER, required: false, allowDefault: true },
@@ -169,7 +169,7 @@ export function resolveKeelBuildDefaults(profile: KeelStudioDefaultProfile, inpu
   readonly constraints?: { readonly maxReadGas?: number; readonly maxOutputBytes?: number; readonly transportProfiles?: readonly string[] };
 } = {}): KeelEffectiveBuildDefaults {
   const current = parseKeelStudioDefaultProfile(profile);
-  const values: Record<string, KeelPlanValue> = { compression: "auto", brotliQuality: 11, transportProfile: "base90-v1", payloadStorage: "compact", hybridFallback: false, rpcMaxConcurrentReads: KEEL_DEFAULT_RPC_READ_CONCURRENCY };
+  const values: Record<string, KeelPlanValue> = { compression: "auto", brotliQuality: 11, transportProfile: "uri81-block-v1", payloadStorage: "compact", hybridFallback: false, rpcMaxConcurrentReads: KEEL_DEFAULT_RPC_READ_CONCURRENCY };
   const sources: Record<string, "system" | "account" | "media" | "project" | "build" | "contract"> = Object.fromEntries(Object.keys(values).map(key => [key, "system"]));
   const fields = new Map(KEEL_BUILD_DEFAULT_FIELDS.map(field => [field.id, field]));
   for (const [source, layer] of [["account", current.global], ["media", current.byMedia[input.mediaType ?? ""]], ["project", input.project], ["build", input.build]] as const) {

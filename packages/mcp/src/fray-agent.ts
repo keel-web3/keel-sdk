@@ -15,6 +15,7 @@ import {
   type FrayAuctionPresetKey,
 } from "@keel/sdk";
 import { createHash } from "node:crypto";
+import { searchKeelPublicationReferences } from "./publication-references.js";
 
 export const FRAY_AGENT_PROTOCOL = "fray-keel-agent@1" as const;
 export const FRAY_APPROVAL_REQUEST_PROTOCOL = "fray-approval-request@1" as const;
@@ -678,33 +679,40 @@ function libraryCandidate(value: Record<string, unknown>): Record<string, unknow
   };
 }
 
-export async function searchKeelIndexes(input: { readonly studioUrl?: string; readonly query: string; readonly limit?: number }): Promise<unknown> {
+export async function searchKeelIndexes(input: { readonly studioUrl?: string; readonly query: string; readonly limit?: number; readonly workspaceRoot?: string }): Promise<unknown> {
   const query = boundedText(input.query, "query", 160);
   if (query === undefined) throw new TypeError("query is required.");
   const base = safeStudioBase(input.studioUrl ?? process.env.KEEL_STUDIO_URL ?? resolveKeelEndpoints().studioUrl);
   if (base === undefined) return { schema: FRAY_AGENT_PROTOCOL, status: "unconfigured", query, message: "Set KEEL_STUDIO_URL or pass studioUrl to search a live Keel index. No carrier bytes were fetched." };
   const limit = Math.min(100, Math.max(1, Math.trunc(input.limit ?? 20)));
   const encoded = encodeURIComponent(query);
-  const [libraryResult, moduleResult] = await Promise.allSettled([
+  const [libraryResult, moduleResult, referenceResult] = await Promise.allSettled([
     readJson(`${base}/api/library?q=${encoded}`, "Keel Library index"),
     searchKeelRuntimeModules({ studioUrl: base, query }),
+    searchKeelPublicationReferences({ query, limit, ...(input.workspaceRoot ? { workspaceRoot: input.workspaceRoot } : {}) }),
   ]);
   const library = libraryResult.status === "fulfilled" ? arrayField(libraryResult.value, "assets").slice(0, limit).map(libraryCandidate) : [];
   const modules = moduleResult.status === "fulfilled" ? moduleResult.value.modules.slice(0, limit) : [];
+  const publicationReferences = referenceResult.status === "fulfilled" ? referenceResult.value : [];
   const errors = [
+    ...(referenceResult.status === "rejected" ? ["publication references: " + String(referenceResult.reason)] : []),
     ...(moduleResult.status === "fulfilled" ? moduleResult.value.sources.filter(source => !source.complete).map(source => `${source.source}: ${source.error}`) : []),
     ...(libraryResult.status === "rejected" ? [`library: ${libraryResult.reason instanceof Error ? libraryResult.reason.message : String(libraryResult.reason)}`] : []),
     ...(moduleResult.status === "rejected" ? [`modules: ${moduleResult.reason instanceof Error ? moduleResult.reason.message : String(moduleResult.reason)}`] : []),
   ];
-  const total = library.length + modules.length;
+  const total = library.length + modules.length + publicationReferences.length;
   return {
     schema: FRAY_AGENT_PROTOCOL,
-    status: libraryResult.status === "rejected" && moduleResult.status === "rejected" ? "unavailable" : errors.length > 0 ? "partial" : "ok",
+    status: libraryResult.status === "rejected" && moduleResult.status === "rejected" && publicationReferences.length === 0 ? "unavailable" : errors.length > 0 ? "partial" : "ok",
     studioUrl: base,
     query,
     library,
     modules,
-    reuse: errors.length > 0
+    publicationReferences,
+    discoveryCoverage: "indexes and bounded local reference manifests; not an exhaustive chain scan",
+    reuse: publicationReferences.length > 0
+      ? { status: "reference-candidate", action: "read-the-bound-token-graph-on-the-selected-chain-and-run-keel-inline-reuse-plan-before-any-new-upload", unchangedEngineUploads: 0 }
+      : errors.length > 0
       ? { status: "incomplete-search", action: "retry-unavailable-indexes-before-deciding-reuse" }
       : total === 0
       ? { status: "not-indexed", action: "resolve-selected-chain-object-id-or-hash-before-proposing-new-bytes" }

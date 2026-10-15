@@ -4,13 +4,13 @@ import { createHash } from "node:crypto";
 import { transform } from "esbuild";
 import { unpackKeelInlineDescriptors } from "./inline-descriptor-columns.js";
 import { buildCompactInlineKeelShell } from "./verification-shell.js";
-import { encodeKeelDenseTransport, serializeKeelDenseTransportJSON, prepareKeelDenseCopyFragment, type KeelDenseTransportProfile } from "./dense-transport.js";
+import { encodeKeelDenseTransport, serializeKeelDenseTransportJSON, prepareKeelDenseCopyFragment, } from "./dense-transport.js";
 
 /** Prepare one fresh COPY carrier. Only preparedBytes is uploaded; the local
  * compressed bytes supply the source commitment for the container descriptor. */
 export function prepareKeelDensePayload(source: Uint8Array, options: {
   readonly compression?: "auto" | "brotli" | "none";
-  readonly transportProfile?: KeelDenseTransportProfile;
+  readonly transportProfile?: "uri81-block-v1";
   /** Pinned build-time quality; independent of process environment. */
   readonly brotliQuality?: number;
 } = {}) {
@@ -19,9 +19,10 @@ export function prepareKeelDensePayload(source: Uint8Array, options: {
   if (!["auto", "brotli", "none"].includes(requested)) throw new TypeError("Unsupported fresh dense payload compression.");
   const quality = options.brotliQuality ?? 11;
   if (!Number.isInteger(quality) || quality < 0 || quality > 11) throw new RangeError("Brotli quality must be an integer from 0 through 11.");
+  const transportProfile = options.transportProfile ?? "uri81-block-v1";
+  if (transportProfile !== "uri81-block-v1") throw new TypeError("Fresh prepared COPY uses URI81. Reuse existing Base90/91 objects unchanged instead of preparing new legacy carriers.");
   const original = Buffer.from(source);
   const candidate = requested === "none" ? original : brotliCompressSync(original, { params: { [constants.BROTLI_PARAM_QUALITY as number]: quality } });
-  const transportProfile = options.transportProfile ?? "base90-v1";
   const prepare = (bytes: Uint8Array) => {
     const dense = encodeKeelDenseTransport(bytes, transportProfile);
     return { dense, bytes: prepareKeelDenseCopyFragment(serializeKeelDenseTransportJSON(dense).slice(1, -1)) };
@@ -67,8 +68,8 @@ export async function buildKeelPreparedDenseCopyShell(input: Parameters<typeof b
   if (!["json","columns-v1"].includes(itemDescriptorCarriage)) throw new TypeError("Unknown descriptor carriage");
   if (gzipCompressor && shellBootCompression !== "gzip") throw new TypeError("Gzip compressor requires gzip boot");
   if (shellBootCompression !== "gzip" && shellBootCompression !== "none") throw new TypeError("Unsupported shell boot compression.");
-  const carriage = options.binaryPayloadCarriage ?? "base90";
-  if (!["base90", "base91", "base90-block", "uri81"].includes(carriage)) throw new TypeError("Prepared dense COPY requires an explicit dense payload format.");
+  const carriage = options.binaryPayloadCarriage ?? "uri81";
+  if (!options.legacyPreparedDenseDelivery && carriage !== "uri81") throw new TypeError("Fresh prepared COPY requires URI81; legacy Base90/91 objects must be reused unchanged.");
   const canonical = await buildCompactInlineKeelShell({ ...options, codecProfile: options.codecProfile ?? "brotli-js", ...(options.legacyPreparedDenseDelivery ? {} : { binaryPayloadCarriage: carriage }) });
   if (!canonical.containerBridge) throw new TypeError("Prepared dense COPY requires embedded container delivery.");
   const prefix = Buffer.from('<!doctype html><html><head><meta charset="utf-8"></head><body><script>'
