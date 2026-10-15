@@ -70,7 +70,13 @@ function fixture(faults=[{},{}], approved=urls.slice(0,faults.length)) {
     return respond(result);
   };
   const readTransport={request:async r=>r.method==='eth_chainId'?'0xaa36a7':r.method==='eth_getBlockByNumber'?snapshot:'0x6000'};
-  const options={rpcUrls:urls.slice(0,faults.length),approvedProjectRpcUrls:approved,readTransport,block:{number:18n,hash:snapshot.hash},fetchImpl,minIntervalMs:0};
+  // A synthetic whole-request measurement is explicit. `sharedBudget` alone
+  // only changes fake execution and never authenticates a reusable capacity fact.
+  const providerCapabilities=faults.flatMap((fault,index)=>fault.measuredRequestGasCap===undefined?[]:[{
+    chainId:11155111,rpcUrl:urls[index],measuredAt:new Date().toISOString(),limits:{requestGasCap:fault.measuredRequestGasCap},
+  }]);
+  const options={rpcUrls:urls.slice(0,faults.length),approvedProjectRpcUrls:approved,readTransport,block:{number:18n,hash:snapshot.hash},fetchImpl,minIntervalMs:0,
+    ...(providerCapabilities.length?{providerCapabilities}:{}),};
   return {requests,privateRequests,options,transport:createKeelPublicSepoliaSimulationPool(options)};
 }
 
@@ -641,8 +647,8 @@ test('cancelling adapted discovery discards late success without strict replay o
 
 const sharedBudgetPlan=()=>{const source=fullPlan();return {...source,discoveryGasPolicy:'provider-capacity',preparationCalls:Array.from({length:14},(_,i)=>call(i)),assertions:[]};};
 test('uneven carrier demand reuses measured prefix allowance and fully replays the same program',async()=>{
-  // Deliberately uneven synthetic demands; native Geth separately checks EVM execution.
-  const f=fixture([{sharedBudget:50000000n,projectGasByCall:[2000000n,150000n,5500000n]}]);
+  // Synthetic demands exercise allocation; this is not actual-program or native-execution evidence.
+  const f=fixture([{sharedBudget:50000000n,measuredRequestGasCap:50000000n,projectGasByCall:[2000000n,150000n,5500000n]}]);
   const input=sharedBudgetPlan(),before=structuredClone(input);
   try {
     const proof=await simulateKeelPublicationBeforeFunding(input,f.transport);
@@ -661,7 +667,7 @@ test('uneven carrier demand reuses measured prefix allowance and fully replays t
   }finally{await f.transport.close();}
 });
 test('a first-call demand larger than its equal share can borrow only observed remaining discovery capacity',async()=>{
-  const f=fixture([{sharedBudget:50000000n,projectGasByCall:[9000000n]}]);
+  const f=fixture([{sharedBudget:50000000n,measuredRequestGasCap:50000000n,projectGasByCall:[9000000n]}]);
   try{
     const proof=await simulateKeelPublicationBeforeFunding(sharedBudgetPlan(),f.transport);
     assert.equal(proof.discoveryGas.allocationAttempts[0].callIndex,0);
@@ -671,7 +677,7 @@ test('a first-call demand larger than its equal share can borrow only observed r
   }finally{await f.transport.close();}
 });
 test('a genuine contract revert still refuses approval after bounded same-program allocation checks',async()=>{
-  const f=fixture([{sharedBudget:50000000n,revert:true}]);
+  const f=fixture([{sharedBudget:50000000n,measuredRequestGasCap:50000000n,revert:true}]);
   try{
     await assert.rejects(simulateKeelPublicationBeforeFunding(sharedBudgetPlan(),f.transport),e=>e.kind==='execution-reverted');
     const sent=f.privateRequests();assert.equal(sent.length,2);
@@ -680,7 +686,7 @@ test('a genuine contract revert still refuses approval after bounded same-progra
 });
 test('later calls recover from reserved intrinsic floors through bounded complete discovery replays',async()=>{
   const demands=[9000000n,1000000n,8000000n,1000000n,6000000n,...Array(9).fill(100000n)];
-  const f=fixture([{sharedBudget:50000000n,projectGasByCall:demands}]);
+  const f=fixture([{sharedBudget:50000000n,measuredRequestGasCap:50000000n,projectGasByCall:demands}]);
   try{
     const proof=await simulateKeelPublicationBeforeFunding(sharedBudgetPlan(),f.transport);
     assert.ok(proof.discoveryGas.allocationAttempts.length>1);
@@ -697,7 +703,7 @@ test('later calls recover from reserved intrinsic floors through bounded complet
 });
 test('missing pre-refund evidence prevents allocation and a later metadata mismatch still blocks it',async()=>{
   for(const [fault,kind] of [[{missingProjectMaximumAt:1},'execution-reverted'],[{metadata:'wrong whole URI'},'metadata-mismatch']]){
-    const f=fixture([{sharedBudget:50000000n,projectGasByCall:[2000000n,150000n,5500000n],...fault}]);
+    const f=fixture([{sharedBudget:50000000n,measuredRequestGasCap:50000000n,projectGasByCall:[2000000n,150000n,5500000n],...fault}]);
     try{
       await assert.rejects(simulateKeelPublicationBeforeFunding(sharedBudgetPlan(),f.transport),e=>e.kind===kind);
       if(fault.missingProjectMaximumAt!==undefined)assert.equal(f.privateRequests().length,1);
@@ -706,7 +712,7 @@ test('missing pre-refund evidence prevents allocation and a later metadata misma
   }
 });
 test('cancellation during budget redistribution discards late results and never reaches strict approval',async()=>{
-  const f=fixture([{sharedBudget:50000000n,projectGasByCall:[2000000n,150000n,5500000n]}]);
+  const f=fixture([{sharedBudget:50000000n,measuredRequestGasCap:50000000n,projectGasByCall:[2000000n,150000n,5500000n]}]);
   let count=0,started,release;const gate=new Promise(resolve=>{started=resolve;});
   const transport=createKeelPublicSepoliaSimulationPool({...f.options,fetchImpl:async(url,init)=>{
     const body=JSON.parse(init.body);
@@ -730,14 +736,14 @@ test('paid estimate uses the explicit approved pool entry point, not the legacy 
     assert.equal(f.privateRequests().length,0,'an estimate is not a simulation proof');
   }finally{await legacy.close();await f.transport.close();}
 });
-test('a shared cross-block budget cannot masquerade as a fresh per-call ceiling during 14-call discovery', async()=>{
-  const f=fixture([{sharedBudget:50000000n}],[urls[0]]),source=sharedBudgetPlan(),before=structuredClone(source);
+test('an explicit measured whole-request budget bounds every complete 14-call discovery replay', async()=>{
+  const f=fixture([{sharedBudget:50000000n,measuredRequestGasCap:50000000n}],[urls[0]]),source=sharedBudgetPlan(),before=structuredClone(source);
   try {
     const proof=await simulateKeelPublicationBeforeFunding(source,f.transport);
     assert.deepEqual(source,before);
-    assert.deepEqual(proof.discoveryGas.capacityAttempts,[{requestedGas:'200000000',providerGasCap:'50000000'},
-      {requestedGas:'50000000',providerGasCap:'49988000',programGasBudget:'49988000',perCallGasLimit:'3570571'}]);
-    assert.ok(proof.discoveryGas.effectiveGasLimits.every(g=>g==='3570571'));
+    assert.deepEqual(proof.discoveryGas.capacityAttempts,[{requestedGas:'200000000',providerGasCap:'50000000',
+      programGasBudget:'50000000',perCallGasLimit:'3571428'}]);
+    assert.ok(proof.discoveryGas.effectiveGasLimits.every(g=>g==='3571428'));
     const sent=f.privateRequests();assert.deepEqual(sent.map(r=>[r.body.params[0].validation,r.body.params[0].blockStateCalls.length]),[[false,14],[true,14],[false,16]]);
     const calls=r=>r.body.params[0].blockStateCalls.map(b=>b.calls[0]);
     const withoutGas=({gas,gasPrice,maxFeePerGas,maxPriorityFeePerGas,...c})=>c;
@@ -746,11 +752,21 @@ test('a shared cross-block budget cannot masquerade as a fresh per-call ceiling 
     assert.ok(calls(sent[1]).every(c=>BigInt(c.gas)>21000n),'measured margin is retained');
     assert.equal(proof.completeTokenUriBytes,Buffer.byteLength(tokenURI));
     assert.equal(proof.signing,'not-performed');assert.equal(proof.submission,'not-performed');
-    // A later read on the same pool uses cached remaining capacity, but still
+    // A later check uses the same explicit measured whole-request profile, but still
     // replays discovery, strict validation and exact complete metadata.
     await simulateKeelPublicationBeforeFunding(source,f.transport);
     assert.equal(f.privateRequests().length,6);
   } finally {await f.transport.close();}
+});
+test('an unprofiled later envelope remainder cannot authorize whole-request allocation',async()=>{
+  const f=fixture([{sharedBudget:50000000n}],[urls[0]]),source=sharedBudgetPlan(),before=structuredClone(source);
+  try{
+    await assert.rejects(simulateKeelPublicationBeforeFunding(source,f.transport),e=>e.kind==='provider-limit'
+      &&e.diagnostic.stage==='discovery-capacity-scope'&&e.diagnostic.gasCapacityScope==='envelope'
+      &&e.diagnostic.blockIndex===1&&e.diagnostic.providerGasCap==='49988000'
+      &&e.diagnostic.capacitySource!=='measured-profile');
+    assert.deepEqual(source,before);assert.equal(f.privateRequests().length,0);
+  }finally{await f.transport.close();}
 });
 test('public multi-block clamp diagnostics identify the probe and position, before any private disclosure',async()=>{
   const seen=[],f=fixture([{sharedBudget:50000000n}],[urls[0]]);
@@ -766,7 +782,7 @@ test('public multi-block clamp diagnostics identify the probe and position, befo
 });
 test('shared discovery never reduces a measured margin, accepts a strict clamp or ignores complete metadata',async()=>{
   for(const [fault,kind] of [[{projectGas:3500000n},'provider-limit'],[{projectGas:4000000n},'execution-reverted'],[{strictBudget:25000n},'provider-limit'],[{metadata:'different'},'metadata-mismatch']]) {
-    const f=fixture([{sharedBudget:50000000n,...fault}],[urls[0]]),source=sharedBudgetPlan(),before=structuredClone(source);
+    const f=fixture([{sharedBudget:50000000n,measuredRequestGasCap:50000000n,...fault}],[urls[0]]),source=sharedBudgetPlan(),before=structuredClone(source);
     try {await assert.rejects(simulateKeelPublicationBeforeFunding(source,f.transport),e=>e.kind===kind);assert.deepEqual(source,before);
       assert.ok(f.privateRequests().filter(r=>r.body.params[0].validation).length<=1);
       if(fault.projectGas)for(const request of f.privateRequests().filter(r=>r.body.params[0].validation))
@@ -775,7 +791,7 @@ test('shared discovery never reduces a measured margin, accepts a strict clamp o
   }
 });
 test('shared discovery and a rejected 60M public-read ceiling preserve the strictly measured transactions',async()=>{
-  const f=fixture([{sharedBudget:50000000n}],[urls[0]]),source=sharedBudgetPlan();
+  const f=fixture([{sharedBudget:50000000n,measuredRequestGasCap:50000000n}],[urls[0]]),source=sharedBudgetPlan();
   source.maximumReadGas=60000000n;source.metadataCall={...source.metadataCall,gas:'0x3938700'};
   const before=structuredClone(source);
   try {
