@@ -104,7 +104,7 @@ tokenURI audit is EVM-only for now and the clearance says so.
 
 Input: `rpcUrl` + `contract` + `tokenId` (+ optional expected `chainId`) for a
 live read, or `tokenUri` / `tokenUriPath` for prepared bytes. The live read is a
-single `eth_call` capped at 30,000,000 gas at a pinned block; `eth_estimateGas`
+single `eth_call` capped at 60,000,000 gas at a pinned block; `eth_estimateGas`
 is reported but never trusted, because nodes can truncate large returns. It
 decodes the `data:application/json` URI (raw-percent or base64) and every
 embedded `data:` URI, unpacks gzip/deflate slots, and fails closed on any
@@ -113,7 +113,7 @@ allowed literal is `http://www.w3.org/2000/svg`), an `image` that is not an
 onchain `data:image`, an HTML viewer that does not match its persisted shell
 choice (exact pinned canonical prefix/suffix by default; explicit `viewer: "none"`
 audits self-contained creator HTML without canonical-protection claims), complete-HTML
-Base64, relative resource tags, reads above 30M gas and tokenURI over 2 MB.
+Base64, relative resource tags, reads above 60M gas and tokenURI over 2 MB.
 Inside the canonical shell the audit parses the graph
 (`__KEEL_ITEMS__`), unpacks each item, checks it against its committed sha256,
 and scans it as its own media type. A packed creator entry document may load
@@ -155,7 +155,7 @@ clearance.
   EIP-55 checksummed (normalized to lowercase; a bad checksum is refused).
 - The preflight reads KEEL's own `docs/KEEL_*.md` from the package when the
   target repository does not vendor them (`keelDocuments`).
-- The public read cap is one constant, `KEEL_INLINE_SAFE_RPC_GAS` = 30,000,000,
+- The public read cap is one constant, `KEEL_INLINE_SAFE_RPC_GAS` = 60,000,000,
   used by network inspection, the Tezos route and the audit.
 
 ### Selected-block transaction gas

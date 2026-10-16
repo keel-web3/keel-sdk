@@ -19,7 +19,7 @@ export const EVIDENCE_DIRECTORY = ".keel-mcp";
 export const PREFLIGHT_RECEIPT_SCHEMA = "keel-contract-workflow-receipt@1" as const;
 export const TOKEN_STANDARD_AUDIT_SCHEMA = "keel-token-standard-audit@1" as const;
 export const STANDARDS_CLEARANCE_SCHEMA = "keel-standards-clearance@1" as const;
-/** Public-read ceiling for tokenURI (the SDK's documented 30M public-RPC safety cap, one constant everywhere). */
+/** Public-read ceiling for tokenURI (the SDK's documented 60M public-RPC safety cap, one constant everywhere). */
 export const TOKEN_URI_READ_GAS_LIMIT = Number(KEEL_INLINE_SAFE_RPC_GAS);
 export const TOKEN_URI_MAX_BYTES = 2_000_000;
 export const EVIDENCE_TTL_MS = 24 * 60 * 60 * 1000;
@@ -746,14 +746,14 @@ export interface LiveRead {
 }
 
 /**
- * Read tokenURI exactly the way a marketplace must be able to: one eth_call capped at 30M gas at a pinned block.
+ * Read tokenURI exactly the way a marketplace must be able to: one eth_call capped at 60M gas at a pinned block.
  * eth_estimateGas is reported but never trusted as the gate -- some nodes truncate or under-report large returns.
  */
 export async function readTokenUri(rpcUrl: string, contract: string, tokenId: bigint): Promise<LiveRead> {
   const chainId = Number(BigInt(String(await rpc(rpcUrl, "eth_chainId", []))));
   const block = String(await rpc(rpcUrl, "eth_blockNumber", []));
   const call = { to: contract, data: tokenUriCalldata(tokenId) };
-  const estimateNote = "eth_estimateGas is advisory: nodes can silently truncate or undercount large string returns. The gate is the eth_call capped at 30,000,000 gas.";
+  const estimateNote = "eth_estimateGas is advisory: nodes can silently truncate or undercount large string returns. The gate is the eth_call capped at 60,000,000 gas.";
   let estimatedGas: number | undefined;
   try {
     estimatedGas = Number(BigInt(String(await rpc(rpcUrl, "eth_estimateGas", [call, block]))));
@@ -765,7 +765,7 @@ export async function readTokenUri(rpcUrl: string, contract: string, tokenId: bi
   try {
     result = await rpc(rpcUrl, "eth_call", [{ ...call, gas: `0x${TOKEN_URI_READ_GAS_LIMIT.toString(16)}` }, block]);
   } catch (capped) {
-    // Distinguish "needs more than 30M" from "reverts": retry at the node's own (higher) cap.
+    // Distinguish "needs more than 60M" from "reverts": retry at the node's own (higher) cap.
     try {
       await rpc(rpcUrl, "eth_call", [call, block]);
       return { ...base, failure: { code: "read-gas-exceeds-limit", detail: `tokenURI(${tokenId}) fails within ${TOKEN_URI_READ_GAS_LIMIT} gas but succeeds with the node's higher cap.` } };
