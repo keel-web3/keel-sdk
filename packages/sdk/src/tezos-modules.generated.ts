@@ -7,14 +7,18 @@ export const KEEL_TEZOS_MODULES: readonly KeelTezosModule[] = [
     "id": "keel-anchors",
     "sources": "src/modules/keel-anchors/tezos",
     "contracts": [
+      "keel_anchor_receipt_registry.py",
+      "keel_anchor_types.py",
       "keel_btc_header_chain.py",
       "keel_eth_attachment_registry.py",
       "keel_eth_hash_verifier.py",
       "keel_eth_light_client.py",
       "keel_eth_proof_controller.py",
-      "keel_eth_state_proof.py"
+      "keel_eth_state_proof.py",
+      "keel_signed_anchor_verifier.py"
     ],
     "deployable": [
+      "KeelAnchorReceiptRegistry",
       "KeelBtcHeaderChain",
       "KeelEthAccountProof",
       "KeelEthAttachmentRegistry",
@@ -22,19 +26,23 @@ export const KEEL_TEZOS_MODULES: readonly KeelTezosModule[] = [
       "KeelEthLightClient",
       "KeelEthProofController",
       "KeelEthStateProof",
-      "KeelGovernedEthAttachmentRegistry"
+      "KeelGovernedEthAttachmentRegistry",
+      "KeelSignedAnchorVerifier"
     ]
   },
   {
     "id": "keel-artifacts",
     "sources": "src/modules/keel-artifacts/tezos",
     "contracts": [
+      "keel_access_controller.py",
       "keel_artifact_registry.py",
       "keel_harness_registry.py",
       "keel_immutable_checkpoint.py",
       "keel_link_registry.py",
       "keel_manager.py",
-      "keel_seed_registry.py"
+      "keel_manager_types.py",
+      "keel_seed_registry.py",
+      "keel_signature_authority.py"
     ],
     "deployable": [
       "KeelAccessController",
