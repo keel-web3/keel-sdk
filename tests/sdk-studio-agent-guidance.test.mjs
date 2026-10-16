@@ -24,8 +24,21 @@ test('SDK paginates and forwards exact current state without signing; stale erro
   }});
   assert.equal((await client.list({limit:7,cursor:'old',projectId:id(2)})).pagination.nextCursor,'next');
   assert.equal(new URL(calls[0].url).searchParams.get('cursor'),'old');
+  assert.equal(new Headers(calls[0].init.headers).get('x-keel-agent-discovery'),'1');
   await client.read(id(3),binding);assert.deepEqual(JSON.parse(new URL(calls[1].url).searchParams.get('expectedState')),binding);
+  assert.equal(new Headers(calls[1].init.headers).get('x-keel-agent-discovery'),'1');
   for(const [code,next] of [[403,'request-scope'],[409,'refresh-status'],[503,'retry']]){status=code;await assert.rejects(client.read(id(3)),e=>e instanceof KeelStudioAgentError&&e.status===code&&e.nextAction===next&&!e.message.includes(token));}
+});
+test('SDK negotiates default discovery and accepts a complete legacy server response', async () => {
+  const calls=[];
+  const legacyRelease={id:id(3),revision:34,slug:'fixture'};
+  const client=createKeelStudioAgentDraftClient({studioUrl:'https://studio.example',grantToken:token,fetchImplementation:async(url,init)=>{
+    calls.push({url:String(url),init});return Response.json(new URL(url).pathname==='/api/agent/drafts'
+      ? {projects:Array.from({length:123},(_,n)=>({id:id(n+10)})),releases:[legacyRelease]}:legacyRelease);
+  }});
+  assert.equal((await client.list()).projects.length,123);assert.equal((await client.read(id(3))).agentProgress,undefined);
+  assert.ok(calls.every(call=>new Headers(call.init.headers).get('x-keel-agent-discovery')==='1'));
+  assert.ok(calls.every(call=>new URL(call.url).search===''));
 });
 test('portable MCP advertises pagination/bindings/read-review and follows returned continuation arguments', async () => {
   const previous={fetch:globalThis.fetch,token:process.env.KEEL_STUDIO_AGENT_TOKEN,url:process.env.KEEL_STUDIO_URL};const calls=[];let fail=false;
