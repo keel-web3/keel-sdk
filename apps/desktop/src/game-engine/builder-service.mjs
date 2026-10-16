@@ -72,6 +72,9 @@ export class GameBuilderService extends GameEngineService {
   reference() { return this.cached('builder-reference', () => this.call('reference')); }
   importFile(input) { return this.call('importFile', input); }
   sample(name) { return this.call('sample', { name }); }
+  redesignReference() { return this.cached('redesign-reference', () => this.call('redesignReference')); }
+  redesignSource(input) { return this.call('redesignSource', input); }
+  redesignPreview(input) { return this.call('redesignPreview', input); }
   async closeBuild(projectId, name) {
     const key = builderKey(projectId, name);
     this.logs.delete(key); this.frames.delete(key);
