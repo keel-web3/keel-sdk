@@ -51,3 +51,14 @@ test('simulated Amsterdam headers must advance block number, timestamp and known
  const before=policy(11155111,KEEL_SEPOLIA_AMSTERDAM_TIMESTAMP-1n);
  assert.throws(()=>assertKeelAmsterdamSimulationHeader(before,header,parent),/crossed/);
 });
+
+
+import { keelTransactionGasCap } from '../packages/sdk/dist/tx-gas.js';
+test('offline planning bounds do not masquerade as selected-fork transaction qualification', () => {
+ const offline=keelTransactionGasCap({chainId:11155111});
+ assert.equal(offline.gasCap,16_777_216);assert.equal(offline.profileResolved,false);
+ const actual=keelTransactionGasCap({chainId:11155111,blockTimestamp:KEEL_SEPOLIA_AMSTERDAM_TIMESTAMP,blockGasLimit:50_000_000n});
+ assert.equal(actual.gasCap,50_000_000);assert.equal(actual.executionGasCap,16_777_216);assert.equal(actual.source,'sepolia-amsterdam');
+ assert.throws(()=>keelTransactionGasCap({chainId:31337,blockTimestamp:KEEL_SEPOLIA_AMSTERDAM_TIMESTAMP,blockGasLimit:50_000_000n}),/registered/);
+ assert.throws(()=>keelTransactionGasCap({chainId:11155111,blockTimestamp:KEEL_SEPOLIA_AMSTERDAM_TIMESTAMP}),/requires/);
+});

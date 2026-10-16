@@ -162,3 +162,4 @@ export * from "./public-simulation-pool.js";
 export * from "./simulation-capacity-policy.js";
 
 export * from "./legacy-shared-image-program.js";
+export * from "./tx-gas.js";

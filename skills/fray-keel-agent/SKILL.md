@@ -57,8 +57,12 @@ deployment, or release—even when it comes from an already detailed project
 context—do this automatically before editing or deploying:
 
 1. Read the target repository's `README.md` and the relevant `docs/` files for
-   architecture, contracts, modules, presentation, and the named edge case.
-2. Read `keel://mcp/engine` or call `keel-engine-catalog`.
+   architecture, contracts, modules, presentation, and the named edge case,
+   then call `keel-contract-workflow-preflight` and keep its `receipt.id`.
+2. Read `keel://mcp/engine` or call `keel-engine-catalog`. Proof-of-work mints
+   use the `mined-hash` mint system and upgradeable controllers use the
+   `module-router-controller` pattern; follow their `checks` exactly instead of
+   hand-rolling a design.
 3. Inspect the exact selected chain with `keel-network-inspect`.
 4. Search the selected-chain module/library catalog with `keel-library-search`.
 5. Resolve existing collections, proxies, graph revisions, shell/builder
@@ -381,3 +385,7 @@ For exact reverted-receipt recovery, Hosted Studio preserves an existing plan co
 Sepolia publication preflight probes the simulator version and transaction capacity using public empty calls on the exact retained socket before sending project calldata. It checks the actual gas envelope on every simulation response. Silent RPC gas clamping is a provider limit, not a contract compatibility failure. Never replay a failed program on another backend to manufacture success. Use receipt recovery and a fresh complete Studio wallet review; Desktop is optional.
 
 Before declaring an EVM module immutable or replacing infrastructure, run `keel-manager-modules-inspect` with the selected Hold or actual managed collection. Follow `presentationModule`, `composerManager` and `composerModuleId`; the manager selects replacements using `configureModule` through `executeGovernance`. Use `keel-manager-module-replacement-prepare` for unsigned preparation and verify consumer compatibility, existing artwork/resource byte parity and expected tokenURI context and read gas before signing. Publication references expose these bindings under `managedRoute`. Preserve unchanged engine objects.
+
+## Contract workflow evidence
+
+Contract preparation preflight returns a content-addressed receipt. Run the token standard audit for token, collection, metadata or viewer work and pass `standards: { preflightReceipt, auditDigest }` to wallet-request tools. Preserve explicit viewer=none and Compact/Raw choices; canonical protection checks apply to the verification-shell route. Use the actual selected-chain transaction policy, keeping total and execution gas distinct. Preparation never signs or broadcasts.

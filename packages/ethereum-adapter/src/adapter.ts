@@ -15,6 +15,8 @@ export const CHUNK_STORE_MAX_OBJECT_BYTES = 256 * 1024 * 1024;
 export const CHUNK_STORE_MAX_DEPTH = 8 as const;
 const MAX_OPERATIONS = 16_384;
 const MAX_RESULT_BYTES = 256 * 1024;
+/** Upper bound for a file-delivered result: every stored byte appears twice as hex (args + calldata) plus framing. */
+const MAX_STREAMED_RESULT_BYTES = 1536 * 1024 * 1024;
 
 const ADDRESS = /^0x[0-9a-fA-F]{40}$/u;
 const DIGEST = /^0x[0-9a-f]{64}$/u;
@@ -99,6 +101,11 @@ export interface EthereumKeelHoldInput {
   readonly chunks: Readonly<Record<string, Uint8Array>>;
   readonly target: { readonly family: "ethereum" | "tezos"; readonly chainId?: number; readonly address: string };
   readonly codecs?: EthereumAdapterCodecs;
+  /**
+   * Response budget for the unsigned descriptors. Defaults to 256 KiB for inline callers; a caller that streams the
+   * result to a file (the MCP does) raises it so large-but-valid uploads are never deferred as result-too-large.
+   */
+  readonly maxResultBytes?: number;
 }
 
 export interface UnsignedKeelHoldCall {
@@ -516,7 +523,9 @@ export async function prepareEthereumKeelHoldOperations(input: EthereumKeelHoldI
     }
     if (operations.length === 0 || operations.length > MAX_OPERATIONS) throw new RangeError("KeelHold operation count exceeds the adapter limit.");
     const result: EthereumAdapterReady = { status: "ready-for-review", family: "ethereum", chainReady: false, source, operations, signing: "not-performed", submission: "not-performed", caveat: "Unsigned calldata only; no RPC, simulation, signing, or submission was performed." };
-    if (new TextEncoder().encode(canonicalJson(result)).byteLength > MAX_RESULT_BYTES) return deferred("ethereum", "result-too-large", "Unsigned operation descriptors exceed the adapter response limit.", source);
+    const resultLimit = input.maxResultBytes ?? MAX_RESULT_BYTES;
+    if (!Number.isSafeInteger(resultLimit) || resultLimit < 1 || resultLimit > MAX_STREAMED_RESULT_BYTES) throw new RangeError(`maxResultBytes must be 1 through ${MAX_STREAMED_RESULT_BYTES}.`);
+    if (new TextEncoder().encode(canonicalJson(result)).byteLength > resultLimit) return deferred("ethereum", "result-too-large", "Unsigned operation descriptors exceed the adapter response limit.", source);
     return result;
   } catch (error) {
     const message = error instanceof Error ? error.message : String(error);

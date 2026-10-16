@@ -1,6 +1,8 @@
 import { verifyIntegrity, type Hex, type Integrity } from "@keel/protocol";
 import { decompressBytes } from "@keel/builder";
 import path from "node:path";
+import { deliverResult } from "./large-output.js";
+import { KEEL_CAST_MAX_SLUGS, KEEL_CAST_TARGET_GAS, KEEL_EIP7825_TX_GAS_CAP, keelCastGasEstimate, keelGasLimit, keelMinimumTransactions, keelWeldCompositeGasEstimate, keelWeldObjectGasEstimate } from "@keel/sdk";
 import type { Workspace } from "./types.js";
 
 const MAX_PLAN_BYTES = 4 * 1024 * 1024;
@@ -9,7 +11,6 @@ const MAX_TOTAL_DECODED_BYTES = 256 * 1024 * 1024;
 const MAX_SLUG_BYTES = 23_000;
 const MAX_OBJECTS = 512;
 const MAX_OPERATIONS = 16_384;
-const MAX_DESCRIPTOR_RESPONSE_BYTES = 256 * 1024;
 
 type Family = "ethereum" | "tezos";
 type Compression = "none" | "gzip" | "deflate" | "brotli";
@@ -184,9 +185,22 @@ function operationTarget(input: Record<string, unknown>): { readonly family: Fam
   throw new TypeError("family must be ethereum or tezos.");
 }
 
+/**
+ * Order-preserving gas packing (EIP-7825): a group closes when one more slug would pass KeelHold's 3-slug batch or
+ * the per-transaction packing target. A single slug that cannot fit is refused here, not at the wallet.
+ */
 function chunkGroups(chunks: readonly Chunk[]): readonly Chunk[][] {
   const groups: Chunk[][] = [];
-  for (let index = 0; index < chunks.length; index += 3) groups.push([...chunks.slice(index, index + 3)]);
+  let current: Chunk[] = [];
+  for (const chunk of chunks) {
+    if (keelCastGasEstimate([chunk.byteLength]) > KEEL_CAST_TARGET_GAS) throw new RangeError(`transaction-gas-cap-exceeded: a ${chunk.byteLength}-byte slug cannot be cast under the per-transaction cap.`);
+    if (current.length === KEEL_CAST_MAX_SLUGS || keelCastGasEstimate([...current, chunk].map((item) => item.byteLength)) > KEEL_CAST_TARGET_GAS) {
+      groups.push(current);
+      current = [];
+    }
+    current.push(chunk);
+  }
+  if (current.length) groups.push(current);
   return groups;
 }
 
@@ -359,7 +373,9 @@ async function validatePlan(workspace: Workspace, planDirectory: string, value: 
 
 export async function createChainOperationPlan(workspace: Workspace, value: unknown): Promise<unknown> {
   const input = object(value, "chain-plan arguments");
-  exact(input, ["plan", "family", "chainId", "network", "target"], "chain-plan arguments");
+  exact(input, ["plan", "family", "chainId", "network", "target", "out"], "chain-plan arguments");
+  const outValue = input.out;
+  if (outValue !== undefined && (typeof outValue !== "string" || !outValue.endsWith(".json") || outValue.startsWith("/") || outValue.split("/").includes(".."))) throw new TypeError("out must be a workspace-relative .json path.");
   const target = operationTarget(input);
   if (target.family === "tezos") throw new Error("Tezos chain operation planning requires a contract-specific adapter and is not emitted by this offline planner.");
   const planPath = text(input.plan, "plan");
@@ -368,6 +384,23 @@ export async function createChainOperationPlan(workspace: Workspace, value: unkn
   const plan = await validatePlan(workspace, planDirectory, JSON.parse(new TextDecoder("utf-8", { fatal: true }).decode(loaded.bytes)) as unknown);
   const operations = plan.schema === "keel-upload-plan@2" ? flatOperations(plan) : recursiveOperations(plan);
   if (operations.length === 0 || operations.length > MAX_OPERATIONS) throw new RangeError(`chain operation plan exceeds ${MAX_OPERATIONS} operations.`);
+  // Per-operation gas (kept beside the descriptors so the SDK envelope stays canonical).
+  let slugsSinceWeld = 0;
+  const gas = operations.map((operation, index) => {
+    let estimatedGas: number;
+    if (operation.kind === "castSlugs") {
+      const lengths = operation.chunkByteLengths as number[];
+      slugsSinceWeld += lengths.length;
+      estimatedGas = keelCastGasEstimate(lengths);
+    } else if (operation.kind === "weldObject") {
+      estimatedGas = keelWeldObjectGasEstimate(slugsSinceWeld);
+      slugsSinceWeld = 0;
+    } else estimatedGas = keelWeldCompositeGasEstimate(Array.isArray(operation.partObjectIds) ? operation.partObjectIds.length : 2);
+    const limit = keelGasLimit(estimatedGas);
+    if (!limit.fits) throw new RangeError(`transaction-gas-cap-exceeded: operation ${index} needs ~${estimatedGas} gas.`);
+    return { index, kind: operation.kind, estimatedGas, gasLimit: limit.gasLimit };
+  });
+  const totalEstimatedGas = gas.reduce((total, entry) => total + entry.estimatedGas, 0);
   const result = {
     schema: "keel-chain-operation-plan@1",
     status: "review-only",
@@ -377,14 +410,23 @@ export async function createChainOperationPlan(workspace: Workspace, value: unkn
     target: { family: target.family, network: target.network, address: target.target },
     sourcePlan: { path: planPath, schema: plan.schema, objectName: plan.objectName, mediaType: plan.mediaType, integrity: plan.integrity },
     operations,
+    gas,
+    transactions: { count: operations.length, totalEstimatedGas, gasCap: KEEL_EIP7825_TX_GAS_CAP, minimumPossible: keelMinimumTransactions(totalEstimatedGas), maxSlugsPerCast: KEEL_CAST_MAX_SLUGS, weldBatching: "unavailable: one weld per KeelHold call" },
     encoding: "deferred-contract-abi",
     walletApproval: "required",
     signing: "not-performed",
     submission: "not-performed",
     caveat: "Operation descriptors are verified against local chunk files; a wallet or chain adapter must encode, review, sign, and submit them.",
   };
-  if (new TextEncoder().encode(JSON.stringify(result)).byteLength > MAX_DESCRIPTOR_RESPONSE_BYTES) {
-    throw new RangeError(`chain operation plan response exceeds the ${MAX_DESCRIPTOR_RESPONSE_BYTES}-byte MCP detail limit; use a smaller plan or a dedicated adapter.`);
-  }
-  return result;
+  // A plan too large to return inline is written in full (path + sha256), never refused into a hand-built fallback.
+  return deliverResult(workspace, result, {
+    outPath: typeof outValue === "string" ? outValue : path.join(planDirectory, `${path.basename(planPath, ".json")}.chain-plan.json`),
+    force: typeof outValue === "string",
+    summary: (value) => ({
+      schema: value.schema, status: value.status, materialized: value.materialized, descriptorMaterialized: value.descriptorMaterialized,
+      chainReady: value.chainReady, target: value.target, sourcePlan: value.sourcePlan, operationCount: value.operations.length,
+      encoding: value.encoding, walletApproval: value.walletApproval, signing: value.signing, submission: value.submission, transactions: value.transactions,
+      next: "Pass delivery.path to publish-plan as chainPlanPath.",
+    }),
+  });
 }

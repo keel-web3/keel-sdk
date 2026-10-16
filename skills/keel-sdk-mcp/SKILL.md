@@ -144,3 +144,7 @@ keys in chat; keep keyed URLs out of Git, logs and artwork. Do not bypass missin
 receipts or change chains. No browser minting page is implied by this workflow.
 
 Read [KEEL_NETWORK_DISCOVERY.md](../../docs/KEEL_NETWORK_DISCOVERY.md) for normal network discovery, configuration and selected-chain verification.
+
+## Contract workflow evidence
+
+Contract preparation preflight returns a content-addressed receipt. Run the token standard audit for token, collection, metadata or viewer work and pass `standards: { preflightReceipt, auditDigest }` to wallet-request tools. Preserve explicit viewer=none and Compact/Raw choices; canonical protection checks apply to the verification-shell route. Use the actual selected-chain transaction policy, keeping total and execution gas distinct. Preparation never signs or broadcasts.

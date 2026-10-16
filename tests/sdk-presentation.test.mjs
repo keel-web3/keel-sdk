@@ -87,8 +87,10 @@ test("Inline accepts a plain boot shell and does not forbid compressed child res
 });
 
 test("Inline read gas follows the selected chain while retaining a bounded maximum", () => {
+  assert.equal(KEEL_INLINE_SAFE_RPC_GAS, 30_000_000n);
+  assert.equal(keelInlineReadGasLimit(20_000_000n), 20_000_000n);
   assert.equal(keelInlineReadGasLimit(30_000_000n), 30_000_000n);
-  assert.equal(keelInlineReadGasLimit(45_000_000n), 45_000_000n);
+  assert.equal(keelInlineReadGasLimit(45_000_000n), KEEL_INLINE_SAFE_RPC_GAS);
   assert.equal(keelInlineReadGasLimit(90_000_000n), KEEL_INLINE_SAFE_RPC_GAS);
   assert.throws(() => keelInlineReadGasLimit(0n), /must be positive/u);
 });
