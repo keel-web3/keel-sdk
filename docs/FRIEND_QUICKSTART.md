@@ -21,7 +21,7 @@ is separate: macOS is the currently exercised Desktop platform; Linux needs
 Electron GUI libraries and a display. Native Windows Desktop/Anvil setup is not certified.
 
 ```sh
-git clone --branch codex/studio-agent-connect https://github.com/keel-web3/keel-sdk.git
+git clone --branch master https://github.com/keel-web3/keel-sdk.git
 cd keel-sdk
 pnpm setup:friend
 ```
@@ -65,18 +65,76 @@ automatically. No `.env` file or Desktop app is required. Agents can use
 `keel-studio-connect` with `start`, open `approveUrl` for you, then call `complete`
 after approval. Wallet signatures and transaction approvals remain yours.
 
-## Update to the latest test release
+## Update an existing local MCP
 
-From the SDK folder:
+First inspect the agent's active KEEL connection. A hosted MCP connection is
+updated on the server; it needs no repository update. Reload it and inspect its
+advertised tools. A local Node/stdio connection runs the `keel-sdk` checkout named
+in its executable arguments. Update that checkout only; `keel-contracts`,
+`keel-site` and Desktop are not required for a local MCP update.
+
+The maintained branch is `master` in `keel-web3/keel-sdk`. The old installation
+branch `codex/studio-agent-connect` is not an update lane. For example, its commit
+`66c83ca6c46fc2e8d1a6c86eb678dab8dfa47c1c` and maintained commit
+`7c8eb4ca5c1f879d75d03294bdb7de748052ba8f` both report SDK `0.3.2` / MCP `0.4.2`,
+but only the latter contains the merged owner-bound discovery/guidance changes
+from [PR 20](https://github.com/keel-web3/keel-sdk/pull/20). These are historical
+comparison commits, not pins for future installs. Verify source and capabilities
+instead of treating a matching package version as an update check.
+
+From the configured SDK checkout, inspect before changing it:
 
 ```sh
-git pull
-pnpm setup:friend
+git remote get-url origin
+git status --short
+git branch --show-current
+git log -1 --format='%H %s'
+git fetch origin master
+git log -1 --format='%H %s' origin/master
 ```
 
-Setup fetches and links the engine commit the SDK now pins, and rebuilds the SDK,
-MCP. Your artwork folders and agent settings are kept. Reload your agent's MCP
-connection afterwards. Add `--desktop` if you also want to rebuild the optional editor.
+Confirm `origin` is the intended `keel-web3/keel-sdk` repository. When the tree is
+clean and local `master` has no unmerged local commits, use `git switch master`
+and `git merge --ff-only origin/master`. If no local `master` exists, use
+`git switch --track origin/master`. Stop on any conflict; do not reset, clean,
+force-pull, or discard local work. `git pull` on the old branch will not switch
+it to maintained code.
+
+For a customized, dirty or diverged checkout, leave it intact and create a
+separate maintained worktree (choose unused branch/directory names):
+
+```sh
+git worktree add -b keel-sdk-maintained ../keel-sdk-maintained origin/master
+cd ../keel-sdk-maintained
+```
+
+Build and reconnect to the **same absolute artwork workspace** that the agent
+already uses:
+
+```sh
+pnpm setup:friend --skip-engine --workspace /absolute/path/to/art
+pnpm studio:connection-status --workspace /absolute/path/to/art
+```
+
+Setup rebuilds SDK/MCP and runs its discovery self-test. `--skip-engine` avoids
+the optional engine fetch; omit it when the artwork needs that engine. Setup
+preserves customized agent settings and existing skill copies, and reports paths
+needing a merge. Inspect the generated `.keel/codex.toml` or `.keel/mcp.json` and
+merge only the KEEL server entry into customized settings. Compare the maintained
+`skills/` with the workspace's `.agents/skills/` and `.claude/skills/`; merge KEEL
+guidance while retaining custom instructions. Existing skill copies are not
+automatically refreshed.
+
+Keep the same artwork path and Studio origin so the private workspace pairing
+remains applicable. Do not delete credentials, copy a key into chat, or reconnect
+merely because code changed. Only an absent, expired or insufficient grant needs
+the normal owner-approved connection flow. Reload the agent's MCP process after
+building and verify its executable path and available `keel-studio-draft`
+operations. Use `list`, then `read` on the same saved release and inspect its
+owner/revision-bound `agentProgress` and `nextActions`; see
+[saved-work discovery](KEEL_STUDIO_WALLET_REVIEW.md#discover-and-continue-saved-work).
+An older hosted server can still omit these fields; report that server boundary
+instead of restaging artwork, buying storage again or inventing a safe action.
 
 ## Pixel engine: part of the SDK
 

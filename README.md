@@ -98,11 +98,16 @@ Desktop is optional and builds only with `pnpm setup:friend --desktop`. Local An
 are separate commands; no developer checkout or private credentials are required.
 
 ```sh
-git clone --branch codex/studio-agent-connect https://github.com/keel-web3/keel-sdk.git
+git clone --branch master https://github.com/keel-web3/keel-sdk.git
 cd keel-sdk
 pnpm setup:friend
 pnpm studio:connect --window --workspace .keel-workspace
 ```
+
+`master` is the maintained local SDK/MCP lane. Existing installs, including
+`codex/studio-agent-connect`, should follow the [safe update steps](docs/FRIEND_QUICKSTART.md#update-an-existing-local-mcp).
+Check the source commit and advertised tools: package versions alone can match
+across older and maintained code. Hosted MCP users do not need a local checkout.
 
 ## Start here
 
