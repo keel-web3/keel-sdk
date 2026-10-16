@@ -64,7 +64,7 @@ function fixture(faults=[{},{}], approved=urls.slice(0,faults.length)) {
       if(fault.longHeader) result[39].parentHash=hash(500);
       if(fault.longNonce) result[39].transactions[0].nonce='0x0';
       if(fault.longFee) result[39].transactions[0].gasPrice='0x1';
-      if(fault.longGas) result[39].transactions[0].gas='0x5208';
+      if(fault.longGas) result[39].transactions[0].gas='0x5209';
       if(fault.longPreRefund) delete result[39].calls[0].maxUsedGas;
     }
     return respond(result);
@@ -372,7 +372,7 @@ test('Retro-sized synthetic 34/40-call requests keep every byte on aggregate-cap
       const before=structuredClone(input);await f.transport.request(input);
       assert.deepEqual(input,before);assert.deepEqual(f.privateRequests().map(r=>r.body.params),[before.params,before.params]);
       const probes=f.requests.filter(r=>r.body.method==='eth_simulateV1'&&r.body.params[0].blockStateCalls.length===count&&r.body.params[0].blockStateCalls[0].calls[0].data==='0x');
-      assert.ok(probes.length>=4);assert.ok(probes.every(r=>r.body.params[0].blockStateCalls.reduce((n,b)=>n+BigInt(b.calls[0].gas),0n)===BigInt(count)*200_000_000n));
+      assert.ok(probes.length>=4);assert.ok(probes.every(r=>r.body.params[0].blockStateCalls.reduce((n,b)=>n+BigInt(b.calls[0].gas),0n)===BigInt(count)*21_000n));
     }finally{await f.transport.close();}
   }
 });
@@ -605,7 +605,7 @@ test('initial-storage capacity discovery requalifies the existing approved provi
       assert.deepEqual(f.privateRequests().map(r=>[r.body.params[0].validation,r.body.params[0].blockStateCalls.length]),[[false,5],[true,5],[false,7]]);
       const strict=f.privateRequests()[1].body.params[0].blockStateCalls;
       assert.deepEqual(f.privateRequests()[2].body.params[0].blockStateCalls.slice(0,5),strict);
-      assert.ok(f.requests.some(r=>r.index===0&&r.body.method==='eth_simulateV1'&&r.body.params[0].blockStateCalls.length===5&&r.body.params[0].blockStateCalls[0].calls[0].data==='0x'&&r.body.params[0].blockStateCalls[0].calls[0].gas==='0x2faf080'));
+      assert.ok(f.requests.some(r=>r.index===0&&r.body.method==='eth_simulateV1'&&r.body.params[0].blockStateCalls.length===5&&r.body.params[0].blockStateCalls[0].calls[0].data==='0x'&&r.body.params[0].blockStateCalls[0].calls[0].gas==='0x5208'));
     } finally {await f.transport.close();}
   }
 });
@@ -763,20 +763,20 @@ test('an unprofiled later envelope remainder cannot authorize whole-request allo
   try{
     await assert.rejects(simulateKeelPublicationBeforeFunding(source,f.transport),e=>e.kind==='provider-limit'
       &&e.diagnostic.stage==='discovery-capacity-scope'&&e.diagnostic.gasCapacityScope==='envelope'
-      &&e.diagnostic.blockIndex===1&&e.diagnostic.providerGasCap==='49988000'
+      &&e.diagnostic.blockIndex===1&&e.diagnostic.providerGasCap==='49979000'&&e.diagnostic.phase==='project-request'
       &&e.diagnostic.capacitySource!=='measured-profile');
-    assert.deepEqual(source,before);assert.equal(f.privateRequests().length,0);
+    assert.deepEqual(source,before);assert.equal(f.privateRequests().length,1);
   }finally{await f.transport.close();}
 });
-test('public multi-block clamp diagnostics identify the probe and position, before any private disclosure',async()=>{
+test('project multi-block clamp diagnostics retain the exact request and cumulative position',async()=>{
   const seen=[],f=fixture([{sharedBudget:50000000n}],[urls[0]]);
   const transport=createKeelPublicSepoliaSimulationPool({...f.options,onAttempt:d=>seen.push(d)});
   try {
     const request=program();request.params[0].blockStateCalls=Array.from({length:14},(_,i)=>({calls:[{...call(i),gas:'0x2fa92c0'}]}));
     assert.equal(BigInt(request.params[0].blockStateCalls[0].calls[0].gas),49976000n);
-    await assert.rejects(transport.request(request),e=>e.kind==='provider-limit'&&e.diagnostic.phase==='public-qualification'
-      &&e.diagnostic.blockIndex===3&&e.diagnostic.callIndex===0&&e.diagnostic.requestedGasLimit==='49976000'&&e.diagnostic.providerGasCap==='49964000');
-    assert.equal(f.privateRequests().length,0);assert.equal(seen.at(-1).phase,'public-qualification');assert.equal(seen.at(-1).blockIndex,3);
+    await assert.rejects(transport.request(request),e=>e.kind==='provider-limit'&&e.diagnostic.phase==='project-request'
+      &&e.diagnostic.blockIndex===2&&e.diagnostic.callIndex===0&&e.diagnostic.requestedGasLimit==='49976000'&&e.diagnostic.providerGasCap==='49958000');
+    assert.equal(f.privateRequests().length,1);assert.equal(seen.at(-1).phase,'project-request');assert.equal(seen.at(-1).blockIndex,2);
     assert.equal(seen.at(-1).requiredProgramGas,'699664000');
   }finally{await transport.close();await f.transport.close();}
 });
@@ -796,7 +796,7 @@ test('shared discovery and a rejected 60M public-read ceiling preserve the stric
   const before=structuredClone(source);
   try {
     const proof=await simulateKeelPublicationBeforeFunding(source,f.transport);
-    assert.deepEqual(source,before);assert.equal(proof.readBoundaryAttempts.length,3);
+    assert.deepEqual(source,before);assert.equal(proof.readBoundaryAttempts.length,2); // No extra adjustment for an oversized empty public control.
     assert.equal(proof.effectiveReadGasLimit,'49685000');
     const sent=f.privateRequests(),strict=sent.find(r=>r.body.params[0].validation).body.params[0].blockStateCalls;
     const replay=sent.filter(r=>r.body.params[0].blockStateCalls.length===16);

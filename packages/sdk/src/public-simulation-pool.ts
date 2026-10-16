@@ -180,8 +180,14 @@ export function createKeelPublicSimulationPool(options: KeelPublicSimulationPool
     if (gasLimits.some(gas => gas < 21_000n || gas > policy.maximumTotalGas)) throw new KeelPublicationSimulationError("configuration-invalid", "The complete program exceeds selected-chain transaction gas bounds.");
     // Conservative upfront-balance check for public constants only. Never fund or
     // override this account; a missing probe precondition cannot grant a proof.
-    if (balance! < gasLimits.reduce((sum, gas) => sum + gas, 0n) * gasPrice) unsupported();
-    const blockStateCalls = gasLimits.map((gas, i) => ({ calls: [{ from: zero, to: zero, data: "0x", value: "0x0", gas: hex(gas), nonce: hex(nonce! + BigInt(i)), gasPrice: hex(gasPrice) }] }));
+    // This sequence proves fork, nonce and fee behavior, not aggregate project
+    // capacity. Repeating each unmeasured maximum can exhaust an RPC's shared
+    // allowance even when these empty calls use very little gas. The separate
+    // single-call probe still checks the required maximum, and every project
+    // response must preserve its exact original transaction envelopes.
+    const publicSequenceGasLimits = gasLimits.map(() => 21_000n);
+    if (balance! < publicSequenceGasLimits.reduce((sum, gas) => sum + gas, 0n) * gasPrice) unsupported();
+    const blockStateCalls = publicSequenceGasLimits.map((gas, i) => ({ calls: [{ from: zero, to: zero, data: "0x", value: "0x0", gas: hex(gas), nonce: hex(nonce! + BigInt(i)), gasPrice: hex(gasPrice) }] }));
     for (const validation of [false, true]) {
       const result = await candidate.transport.request({ method: "eth_simulateV1", params: [{ blockStateCalls, validation, traceTransfers: false, returnFullTransactions: true }, blockTag] });
       if (!Array.isArray(result) || result.length !== gasLimits.length) unsupported();
@@ -194,7 +200,7 @@ export function createKeelPublicSimulationPool(options: KeelPublicSimulationPool
         try { assertKeelAmsterdamSimulationHeader(policy, value, { hash: String(parent.hash), number: quantity(parent.number) ?? -1n,
           timestamp: quantity(parent.timestamp) ?? -1n, ...(slot === undefined ? {} : { slotNumber: slot }) }); } catch { unsupported(); }
         if (!header || call?.status !== "0x1" || call.error !== undefined || call.returnData !== "0x" || used === undefined || used <= 0n
-          || maximum === undefined || maximum < used || maximum > gasLimits[i]! || quantity(tx?.nonce) !== nonce! + BigInt(i) || quantity(tx?.gasPrice) !== gasPrice) unsupported();
+          || maximum === undefined || maximum < used || maximum > publicSequenceGasLimits[i]! || quantity(tx?.nonce) !== nonce! + BigInt(i) || quantity(tx?.gasPrice) !== gasPrice) unsupported();
         parent = header!;
       }
     }
@@ -318,9 +324,9 @@ export function createKeelPublicSimulationPool(options: KeelPublicSimulationPool
         const snapshot = object(await candidate.transport.request({ method: "eth_getBlockByNumber", params: [blockTag, false] }));
         if (snapshot?.number !== blockTag || typeof snapshot.hash !== "string" || snapshot.hash.toLowerCase() !== block.hash.toLowerCase())
           throw new KeelPublicationSimulationError("chain-reorganized", "The candidate did not match the exact selected block.");
-        // Recheck every phase's entire envelope sequence, including larger
-        // aggregate requests on an already-selected candidate. Empty calls cannot
-        // prove the real program's gas use; the unchanged full replay still must.
+        // Recheck the complete ordered public sequence for every phase. Its small
+        // control envelopes cannot prove project capacity; the unchanged project
+        // request below must independently preserve every original gas envelope.
         await duringPublicQualification(() => qualifySequence(candidate, snapshot, gasLimits));
         if (!approved.has(urls[index]!)) { awaitingApproval = true; await candidate.transport.close(); continue; }
         projectRequest = true;
