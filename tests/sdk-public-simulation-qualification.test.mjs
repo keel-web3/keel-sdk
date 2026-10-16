@@ -48,7 +48,7 @@ async function run(create,scenario){const env=fixture(scenario),pool=create(env.
 test('fixed qualifier uses bounded public sequence and preserves exact project request',async()=>{
  const {env,result}=await run(fixedPool);assert.equal(result.length,45);assert.equal(env.sent.length,1);
  assert.deepEqual({method:env.sent[0].method,params:env.sent[0].params},env.request);
- assert.ok(env.publicSequences.some(sequence=>sequence.length===45&&sequence.every(gas=>gas===21000n)));
+ assert.ok(env.publicSequences.some(sequence=>sequence.length===45&&sequence.every(gas=>gas===12000n)));
 });
 test('actual project cumulative clamping still fails with project-request evidence',async()=>{
  const env=fixture({privateCap:50000000n}),pool=fixedPool(env.options);

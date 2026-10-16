@@ -372,7 +372,7 @@ test('Retro-sized synthetic 34/40-call requests keep every byte on aggregate-cap
       const before=structuredClone(input);await f.transport.request(input);
       assert.deepEqual(input,before);assert.deepEqual(f.privateRequests().map(r=>r.body.params),[before.params,before.params]);
       const probes=f.requests.filter(r=>r.body.method==='eth_simulateV1'&&r.body.params[0].blockStateCalls.length===count&&r.body.params[0].blockStateCalls[0].calls[0].data==='0x');
-      assert.ok(probes.length>=4);assert.ok(probes.every(r=>r.body.params[0].blockStateCalls.reduce((n,b)=>n+BigInt(b.calls[0].gas),0n)===BigInt(count)*21_000n));
+      assert.ok(probes.length>=4);assert.ok(probes.every(r=>r.body.params[0].blockStateCalls.reduce((n,b)=>n+BigInt(b.calls[0].gas),0n)===BigInt(count)*12_000n));
     }finally{await f.transport.close();}
   }
 });
@@ -438,7 +438,7 @@ test('public qualification report uses production complete-sequence checks and s
     const item=report.candidates[0];
     assert.equal(report.publicationVerified,false);assert.equal(report.privateProjectDataSent,false);
     assert.equal(item.publicQualification,'passed');assert.equal(item.requestedEnvelopeSum,'8000000000');
-    assert.equal(item.observedPublicGasUsedSum,'840000');assert.equal(item.observedPublicMaxUsedGasSum,'840000');
+    assert.equal(item.observedPublicGasUsedSum,'480000');assert.equal(item.observedPublicMaxUsedGasSum,'480000');
     assert.equal(item.largeRequestBodyCapacity,'not-tested');assert.equal(item.privateExecutionCapacity,'not-tested');
     assert.ok(item.largestAcceptedPublicRequestBytes<3_856_986);
     assert.deepEqual(item.publicProbes.map(p=>[p.blockCount,p.validation]),[[2,false],[2,true],[1,true],[40,false],[40,true]]);
@@ -605,7 +605,7 @@ test('initial-storage capacity discovery requalifies the existing approved provi
       assert.deepEqual(f.privateRequests().map(r=>[r.body.params[0].validation,r.body.params[0].blockStateCalls.length]),[[false,5],[true,5],[false,7]]);
       const strict=f.privateRequests()[1].body.params[0].blockStateCalls;
       assert.deepEqual(f.privateRequests()[2].body.params[0].blockStateCalls.slice(0,5),strict);
-      assert.ok(f.requests.some(r=>r.index===0&&r.body.method==='eth_simulateV1'&&r.body.params[0].blockStateCalls.length===5&&r.body.params[0].blockStateCalls[0].calls[0].data==='0x'&&r.body.params[0].blockStateCalls[0].calls[0].gas==='0x5208'));
+      assert.ok(f.requests.some(r=>r.index===0&&r.body.method==='eth_simulateV1'&&r.body.params[0].blockStateCalls.length===5&&r.body.params[0].blockStateCalls[0].calls[0].data==='0x'&&r.body.params[0].blockStateCalls[0].calls[0].gas==='0x2ee0'));
     } finally {await f.transport.close();}
   }
 });
@@ -1191,7 +1191,10 @@ test('rate/access diagnostics survive approved whole-program failover without sh
 test('public probes use bounded Amsterdam base gas without lowering exact project envelopes',async()=>{
   const fixedPrice=31n;
   for(const envelope of [12_000n,200_000_000n]) {
-    const exactBalance=5n*12_000n*fixedPrice;
+    const sequenceGas=5n*12_000n;
+    // The existing single-capacity qualifier also includes its 21k follow-up call.
+    const capacityProbeGas=envelope+21_000n;
+    const exactBalance=(capacityProbeGas>sequenceGas?capacityProbeGas:sequenceGas)*fixedPrice;
     const f=fixture([{balance:`0x${exactBalance.toString(16)}`,baseGas:'0x2ee0'}]);try{
       const input=program();for(const b of input.params[0].blockStateCalls)b.calls[0].gas=`0x${envelope.toString(16)}`;
       await f.transport.request(input);assert.deepEqual(f.privateRequests()[0].body.params,input.params);

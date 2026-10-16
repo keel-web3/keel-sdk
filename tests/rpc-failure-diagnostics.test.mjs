@@ -103,7 +103,7 @@ test('response failures distinguish missing body, byte bound, parse error, stale
 test('classified RPC rate limits retain the numeric code, not remote error data', async () => {
   const f = fixture(({ body }) => Response.json({ jsonrpc: '2.0', id: body.id, error: { code: -32005, message: 'remote-secret quota', data: 'secret-body' } }));
   await assert.rejects(simulate(f.pool.pin(0)), error => {
-    safe(error); assert.deepEqual(error.diagnostic, { failureReason: 'rate-limited', transportFailure: 'rate-limited', rpcCode: -32005 }); return true;
+    safe(error); assert.deepEqual(error.diagnostic, { failureReason: 'rate-limited', transportFailure: 'rate-limited', httpStatus: 200, rpcCode: -32005 }); return true;
   });
 });
 
