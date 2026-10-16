@@ -415,7 +415,10 @@ export const KEEL_MODULES: readonly KeelModule[] = [
       "KeelRawInlineShellRegistry.sol",
       "interfaces/IKeelRawInlineShellRegistry.sol",
       "libraries/KeelHarnessFailureFormatting.sol",
-      "KeelLegacyHoldRawTokenURIBuilder.sol"
+      "KeelLegacyHoldRawTokenURIBuilder.sol",
+      "KeelEvmPreparedCarrierInlineComposer.sol",
+      "interfaces/IKeelBinaryInlineComposer.sol",
+      "libraries/KeelPreparedContainerTable.sol"
     ],
     "deployable": [
       "KeelHarnessBuilder",
@@ -424,7 +427,8 @@ export const KEEL_MODULES: readonly KeelModule[] = [
       "KeelRawTokenURIBuilder",
       "KeelRawInlineShellRegistry",
       "KeelHarnessFailureFormatting",
-      "KeelLegacyHoldRawTokenURIBuilder"
+      "KeelLegacyHoldRawTokenURIBuilder",
+      "KeelEvmPreparedCarrierInlineComposer"
     ]
   },
   {
