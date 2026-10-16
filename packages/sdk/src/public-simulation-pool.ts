@@ -178,7 +178,7 @@ export function createKeelPublicSimulationPool(options: KeelPublicSimulationPool
       || nonce + BigInt(gasLimits.length) > 18_446_744_073_709_551_615n) unsupported();
     const policy = resolveKeelTransactionGasPolicy({ chainId, blockTimestamp: timestamp!, blockGasLimit: blockGasLimit! });
     const gasPrice = baseFee! * 2n + 1n;
-    if (gasLimits.some(gas => gas < 21_000n || gas > policy.maximumTotalGas)) throw new KeelPublicationSimulationError("configuration-invalid", "The complete program exceeds selected-chain transaction gas bounds.");
+    if (gasLimits.some(gas => gas < BigInt(policy.transactionBaseGas) || gas > policy.maximumTotalGas)) throw new KeelPublicationSimulationError("configuration-invalid", "The complete program exceeds selected-chain transaction gas bounds.");
     // Conservative upfront-balance check for public constants only. Never fund or
     // override this account; a missing probe precondition cannot grant a proof.
     // This sequence proves fork, nonce and fee behavior, not aggregate project
@@ -186,7 +186,7 @@ export function createKeelPublicSimulationPool(options: KeelPublicSimulationPool
     // allowance even when these empty calls use very little gas. The separate
     // single-call probe still checks the required maximum, and every project
     // response must preserve its exact original transaction envelopes.
-    const publicSequenceGasLimits = gasLimits.map(() => 21_000n);
+    const publicSequenceGasLimits = gasLimits.map(() => BigInt(policy.transactionBaseGas));
     if (balance! < publicSequenceGasLimits.reduce((sum, gas) => sum + gas, 0n) * gasPrice) unsupported();
     const blockStateCalls = publicSequenceGasLimits.map((gas, i) => ({ calls: [{ from: zero, to: zero, data: "0x", value: "0x0", gas: hex(gas), nonce: hex(nonce! + BigInt(i)), gasPrice: hex(gasPrice) }] }));
     for (const validation of [false, true]) {
@@ -364,7 +364,8 @@ export function createKeelPublicSimulationPool(options: KeelPublicSimulationPool
         // separately authenticated request-capacity evidence permits fallback.
         const clientCapacityRejection = code === -38026 && requestCapacityEvidence;
         const rateRejection = failure.diagnostic?.transportFailure === "rate-limited" && (code === undefined || code === 429 || code === -32005);
-        const retryableRpcRejection = code === undefined || code === -32601 || rateRejection
+        const accessRejection = failure.diagnostic?.failureReason === "access-denied" && (code === undefined || code === 401 || code === 403);
+        const retryableRpcRejection = code === undefined || code === -32601 || rateRejection || accessRejection
           || failure.kind === "provider-limit" && (failure.diagnostic?.providerGasCap !== undefined || failure.diagnostic?.httpStatus === 413
             || failure.diagnostic?.gasCapacityScope === "request" && failure.diagnostic?.requestedRequestGas !== undefined && failure.diagnostic?.remainingRequestGas !== undefined);
         if (projectRequest && (!["provider-limit", "unsupported-simulation", "rpc-unavailable"].includes(failure.kind)

@@ -61,6 +61,11 @@ export const TEST_FILES_ON_DISK = Object.freeze(readdirSync(TEST_ROOT)
  * its execution boundary.
  */
 export const DETERMINISTIC_TEST_FILES = Object.freeze([
+  "tests/proof-executor-transport.test.mjs",
+  "tests/proof-runner-client.test.mjs",
+  "tests/proof-runtime-package.test.mjs",
+  "tests/proof-state-reader.test.mjs",
+  "tests/sdk-owned-simulation-transport.test.mjs",
   "tests/sdk-public-simulation-qualification.test.mjs",
   "tests/signed-anchor.test.mjs",
   "tests/sdk-saved-release-differential.test.mjs",

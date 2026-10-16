@@ -390,6 +390,10 @@
     "./sepolia-simulation-transport": {
       "types": "./dist/sepolia-simulation-transport.d.ts",
       "import": "./dist/sepolia-simulation-transport.js"
+    },
+    "./proof-simulation-node": {
+      "types": "./dist/proof-simulation-node.d.ts",
+      "import": "./dist/proof-simulation-node.js"
     }
   },
   "files": [
@@ -398,7 +402,7 @@
   ],
   "scripts": {
     "clean": "rm -rf dist",
-    "build": "tsc -p tsconfig.json && node scripts/package-canonical-shell.mjs && node scripts/package-layered-runtime.mjs && node scripts/package-storage-policy.mjs && node ../mint-queue/build.mjs"
+    "build": "tsc -p tsconfig.json && node scripts/package-proof-runtime.mjs && node scripts/package-canonical-shell.mjs && node scripts/package-layered-runtime.mjs && node scripts/package-storage-policy.mjs && node ../mint-queue/build.mjs"
   },
   "engines": {
     "node": ">=22"

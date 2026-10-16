@@ -152,6 +152,7 @@ export interface KeelRpcProviderStatus {
   readonly endpoint: string;
   readonly checkedChainId?: number;
   readonly reason?: FailureReason;
+  readonly diagnostic?: KeelRpcFailureDiagnostic;
   readonly retryAfterMs: number;
   readonly disabled: boolean;
 }
@@ -217,6 +218,7 @@ export function createKeelRpcPool(options: KeelRpcPoolOptions): KeelRpcPool {
   let expectedChain = options.chainId, cursor = 0, id = 0;
   const status = (): readonly KeelRpcProviderStatus[] => states.map(s => ({ endpoint: redactRpcUrl(s.url),
     ...(s.chainId === undefined ? {} : { checkedChainId: s.chainId }), ...(s.reason === undefined ? {} : { reason: s.reason }),
+    ...(s.diagnostic === undefined ? {} : { diagnostic: s.diagnostic }),
     retryAfterMs: Math.max(0, s.cooldown - Date.now()), disabled: s.disabled }));
   async function send(state: typeof states[number], method: string, params: readonly unknown[], signal?: AbortSignal): Promise<unknown> {
     const prior = state.tail; let release!: () => void;
@@ -255,17 +257,29 @@ export function createKeelRpcPool(options: KeelRpcPoolOptions): KeelRpcPool {
       const rawDelay = header === null ? 0 : /^\d+(?:\.\d+)?$/u.test(header) ? Number(header) * 1000 : Date.parse(header) - Date.now();
       const delay = Number.isFinite(rawDelay) ? Math.max(0, rawDelay) : 0;
       if (!response.ok) {
-        if (options.onPrivateResponse && response.body) {
+        // Read once for both the explicitly private observer and safe numeric
+        // diagnostics. Public diagnostics never retain provider text or fields.
+        let rpcCode: number | undefined;
+        if (response.body) {
           const reader = response.body.getReader(), parts: Uint8Array[] = [];
+          const captureLimit = options.onPrivateResponse ? maxBytes : Math.min(maxBytes, 16 * 1024);
           let size = 0, truncated = false;
           try {
             for (;;) { const part = await reader.read(); if (part.done) break;
-              if (size + part.value.byteLength > maxBytes) { truncated = true; break; }
+              if (size + part.value.byteLength > captureLimit) { truncated = true; break; }
               parts.push(part.value); size += part.value.byteLength; }
             const bytes = new Uint8Array(size); let offset = 0;
             for (const part of parts) { bytes.set(part, offset); offset += part.byteLength; }
             privatelyObserve({ httpStatus: response.status, retryAfterMs: delay,
               response: { body: new TextDecoder().decode(bytes), truncated, maximumResponseBytes: maxBytes } });
+            if (!truncated && size <= 16 * 1024) {
+              try {
+                const body = JSON.parse(new TextDecoder("utf-8", { fatal: true }).decode(bytes));
+                const code = body?.error?.code;
+                if (body?.jsonrpc === "2.0" && body.id === requestId && Number.isInteger(code)
+                  && code >= -2147483648 && code <= 2147483647) rpcCode = code;
+              } catch { /* Keep observed HTTP status when the body is not valid RPC. */ }
+            }
           } catch (error) { privatelyObserve({ httpStatus: response.status, retryAfterMs: delay, error }); }
           finally { await reader.cancel().catch(() => undefined); reader.releaseLock(); }
         }
@@ -275,7 +289,8 @@ export function createKeelRpcPool(options: KeelRpcPoolOptions): KeelRpcPool {
         // its observed HTTP status without inventing an unobserved RPC code.
         if (method === "eth_simulateV1" && (response.status === 400 || response.status === 422)) throw new KeelRpcHttpRequestError(response.status);
         throw new ProviderFailure(response.status === 429 ? "rate-limited" : [401, 403].includes(response.status) ? "access-denied" : "unavailable", delay,
-          { httpStatus: response.status, transportFailure: response.status === 429 ? "rate-limited" : "http-error" });
+          { httpStatus: response.status, transportFailure: response.status === 429 ? "rate-limited" : "http-error",
+            ...(rpcCode === undefined ? {} : { rpcCode }) });
       }
       const invalidResponse = (responseFailure: NonNullable<KeelRpcFailureDiagnostic["responseFailure"]>, size?: number) =>
         new ProviderFailure("invalid-response", 0, { transportFailure: "invalid-response", responseFailure,
@@ -296,10 +311,10 @@ export function createKeelRpcPool(options: KeelRpcPoolOptions): KeelRpcPool {
       if (body.error !== undefined) {
         const code = typeof body.error?.code === "number" && Number.isInteger(body.error.code) && Math.abs(body.error.code) <= 2147483647 ? body.error.code : -32603;
         const message = typeof body.error?.message === "string" ? body.error.message : "";
-        if (code === 429 || code === -32005 || /rate.?limit|too many requests|quota|compute units|usage.?limit/iu.test(message)) throw new ProviderFailure("rate-limited", delay, { transportFailure: "rate-limited", rpcCode: code });
-        if (/missing trie|historical|pruned|state.*unavailable|header not found/iu.test(message)) throw new ProviderFailure("history-unavailable", 0, { transportFailure: "rpc-error", rpcCode: code });
+        if (code === 429 || code === -32005 || /rate.?limit|too many requests|quota|compute units|usage.?limit/iu.test(message)) throw new ProviderFailure("rate-limited", delay, { transportFailure: "rate-limited", httpStatus: response.status, rpcCode: code });
+        if (/missing trie|historical|pruned|state.*unavailable|header not found/iu.test(message)) throw new ProviderFailure("history-unavailable", 0, { transportFailure: "rpc-error", httpStatus: response.status, rpcCode: code });
         if (code === 3 || /execution reverted/iu.test(message)) throw new KeelRpcResponseError(3, typeof body.error.data === "string" && /^0x[0-9a-f]*$/iu.test(body.error.data) ? body.error.data : undefined);
-        if ([401, 403].includes(code) || /api.?key|unauthorized|authentication|access denied/iu.test(message)) throw new ProviderFailure("access-denied", 0, { transportFailure: "rpc-error", rpcCode: code });
+        if ([401, 403].includes(code) || /api.?key|unauthorized|authentication|access denied/iu.test(message)) throw new ProviderFailure("access-denied", 0, { transportFailure: "rpc-error", httpStatus: response.status, rpcCode: code });
         if (method === "eth_simulateV1") {
           // Preserve typed failure evidence while never exposing a provider URL,
           // key, request body, or arbitrary remote error message.
@@ -327,7 +342,10 @@ export function createKeelRpcPool(options: KeelRpcPoolOptions): KeelRpcPool {
       return body.result;
     } catch (error) {
       signal?.throwIfAborted();
-      // Set cooldown before releasing the queue so concurrent reads cannot race a 429.
+      // Set restrictions before releasing the queue so concurrent reads cannot race a 429/403.
+      if (error instanceof ProviderFailure && error.reason === "access-denied") {
+        state.disabled = true; state.reason = error.reason; state.diagnostic = error.diagnostic;
+      }
       if (error instanceof ProviderFailure && error.reason === "rate-limited") {
         state.reason = error.reason;
         state.diagnostic = error.diagnostic;
