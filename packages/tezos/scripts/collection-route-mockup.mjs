@@ -220,8 +220,10 @@ try {
   expect("holder set_token_metadata refused by default", refusedBy(() => apply("metadata-authority", "holder set_token_metadata (refused)", holderEdit.operations[0], "bootstrap2"), "UNAUTHORIZED_PRESENTATION_EDITOR"), true);
   const rewrite = route.prepareKeelTezosTokenMetadata({ network, creator, collection, tokens: [{ tokenId: 2, name: "KEEL Route #2 (rewritten)", html, previewSvg: svg }] });
   apply("metadata-authority", "creator rewrite token 2", rewrite.operations[0]);
-  apply("metadata-authority", "creator enables holder editing", route.prepareKeelTezosMintGateAction({ network, creator, action: "set-holder-metadata-editing", collection, enabled: true }).operation);
   const holderFreeze = route.prepareKeelTezosTokenMetadata({ network, creator: collector, collection, freeze: true, tokens: [{ tokenId: 4, name: "Holder edit #4", html, previewSvg: svg }] });
+  const holderFreezeOnly = holderFreeze.operations.find((operation) => operation.parameters.entrypoint === "freeze_token_metadata");
+  expect("holder freeze_token_metadata refused by default", refusedBy(() => apply("metadata-authority", "holder freeze_token_metadata (refused)", holderFreezeOnly, "bootstrap2"), "UNAUTHORIZED_PRESENTATION_EDITOR"), true);
+  apply("metadata-authority", "creator enables holder editing", route.prepareKeelTezosMintGateAction({ network, creator, action: "set-holder-metadata-editing", collection, enabled: true }).operation);
   for (const operation of holderFreeze.operations) apply("metadata-authority", `holder ${operation.parameters.entrypoint} token 4`, operation, "bootstrap2");
   apply("metadata-authority", "creator disables holder editing", route.prepareKeelTezosMintGateAction({ network, creator, action: "set-holder-metadata-editing", collection, enabled: false }).operation);
   const frozenRewrite = route.prepareKeelTezosTokenMetadata({ network, creator, collection, tokens: [{ tokenId: 4, name: "Creator after freeze", html, previewSvg: svg }] });

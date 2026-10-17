@@ -187,7 +187,7 @@ const RESOURCE_TEXT: Readonly<Record<string, string>> = {
         tools: ["keel-tezos-collection-originate-prepare", "keel-tezos-hold-resources-prepare", "keel-tezos-presentation-bind-prepare", "keel-tezos-mint-gate-prepare", "keel-tezos-mint-prepare", "keel-tezos-token-metadata-prepare", "keel-tezos-readback-check"],
         contracts: ["KeelHoldOnchFS", "KeelIndex", "KeelPresentationStateRegistry", "KeelCreatorProfileRegistry", "KeelCollectionFA2", "OneMintController"],
         metadata: "TZIP-12 token_metadata with TZIP-21 fields; artifactUri/displayUri are raw-percent data: URIs or onchfs:// Hold files, never KEEL pointers.",
-        metadataEditing: "Creator administrators rewrite token metadata until a token is frozen. Holder editing is off unless the creator enables it (set-holder-metadata-editing); a holder may still freeze their own token.",
+        metadataEditing: "Creator administrators rewrite token metadata until a token is frozen. Holder editing and freezing are off unless the creator enables them (set-holder-metadata-editing).",
       },
     },
     presentation: {

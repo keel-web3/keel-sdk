@@ -124,7 +124,7 @@ export const TEZOS_COLLECTION_TOOL_DEFINITIONS: readonly ToolDefinition[] = [
       type: "object", additionalProperties: false, required: ["network", "creator", "maxSupply"],
       properties: {
         network: NETWORK, creator: ADDRESS, maxSupply: NATURAL,
-        holderMetadataEditing: { type: "boolean", default: false, description: "Let holders rewrite their own token metadata. Default false: only the creator's administrators edit; a holder may still freeze their own token." },
+        holderMetadataEditing: { type: "boolean", default: false, description: "Let holders rewrite and freeze their own token metadata. Default false: only the creator's administrators edit or freeze." },
         royalty: { ...ROYALTY, description: "Collection default royalty in basis points (ERC-2981 counterpart). The KEEL market reads it through royalty_info; the result includes the matching TZIP-21 token-metadata royalties." },
         collectionMetadata: { type: "object", additionalProperties: false, required: ["name"], properties: { name: { type: "string", minLength: 1, maxLength: 256 }, description: { type: "string" }, version: { type: "string" }, homepage: { type: "string" }, authors: { type: "array", items: { type: "string" } }, license: { type: "object", additionalProperties: false, required: ["name"], properties: { name: { type: "string" }, details: { type: "string" } } }, interfaces: { type: "array", items: { type: "string" } } } },
         artifactsDir: { type: "string", description: "Workspace directory holding collection_route_<contract>/step_001_cont_0_contract.json." },

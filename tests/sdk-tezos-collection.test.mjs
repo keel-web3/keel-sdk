@@ -167,6 +167,7 @@ test("mint gate prepares price, supply, allowlist and a paused start with a pred
   assert.equal(holders.operation.parameters.entrypoint, "set_token_owner_can_edit");
   assert.deepEqual(holders.operation.parameters.value, { prim: "False" });
   assert.equal(holders.metadataEditing.holders, false);
+  assert.equal(holders.metadataEditing.holderFreeze, false, "holders cannot freeze unless the creator opts in");
   assert.throws(() => prepareKeelTezosMintGateAction({ network, creator, action: "set-holder-metadata-editing", collection, enabled: "no" }), /boolean/u);
   const renamed = prepareKeelTezosMintGateAction({ network, creator, action: "set-collection-metadata", collection, collectionMetadata: { name: "Renamed" } });
   assert.equal(renamed.operation.parameters.entrypoint, "set_contract_metadata");

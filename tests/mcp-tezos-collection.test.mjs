@@ -61,7 +61,7 @@ test("MCP plans, originates, stores, binds, gates, mints and writes metadata rev
   assert.equal(originate.isError, undefined, JSON.stringify(originate));
   const collectionEntry = originate.structuredContent.stages[1].operations.find((entry) => entry.artifact === "collection");
   assert.equal(collectionEntry.operation.kind, "origination");
-  assert.deepEqual(originate.structuredContent.collection.metadataEditing, { creator: true, holders: false, holderFreeze: true });
+  assert.deepEqual(originate.structuredContent.collection.metadataEditing, { creator: true, holders: false, holderFreeze: false });
   const holders = await call("keel-tezos-mint-gate-prepare", { network, creator, action: "set-holder-metadata-editing", collection, enabled: true });
   assert.equal(holders.isError, undefined, JSON.stringify(holders));
   assert.equal(holders.structuredContent.operation.parameters.entrypoint, "set_token_owner_can_edit");

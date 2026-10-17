@@ -422,7 +422,8 @@ export function buildKeelTezosContractMetadata(metadata: KeelTezosContractMetada
  * Initial KeelCollectionFA2 storage, field for field with the compiled record
  * (`keel_collection_fa2.py` over the shared `keel_fa2_nft.py` KeelNFTLedger).
  * Holder metadata editing is off unless the creator explicitly enables it:
- * administrators rewrite token metadata, holders may only freeze their own token.
+ * administrators rewrite and freeze token metadata; holders edit or freeze their
+ * own token only while the creator allows it.
  * An optional default royalty is what `royalty_info` reports to the KEEL market.
  */
 /** A collection-wide default royalty, as ERC-2981 `_setDefaultRoyalty`: basis points of the sale price. */
@@ -619,7 +620,7 @@ export function prepareKeelTezosCollectionOriginations(input: KeelTezosCollectio
     expectedSender: creator,
     signing: "not-performed" as const,
     submission: "not-performed" as const,
-    collection: { maxSupply: maxSupply.toString(), contractMetadata: JSON.parse(metadataJson) as unknown, metadataEditing: { creator: true, holders: holderMetadataEditing, holderFreeze: true }, royalty: royalty === undefined ? null : { ...royalty, tokenMetadataRoyalties: keelTezosRoyaltyTokenMetadata(royalty) } },
+    collection: { maxSupply: maxSupply.toString(), contractMetadata: JSON.parse(metadataJson) as unknown, metadataEditing: { creator: true, holders: holderMetadataEditing, holderFreeze: holderMetadataEditing }, royalty: royalty === undefined ? null : { ...royalty, tokenMetadataRoyalties: keelTezosRoyaltyTokenMetadata(royalty) } },
     stages: [
       { id: "originate-foundation", purpose: "Originate the Hold (OnchFS), the revision Index, the presentation-state registry and, when no shared registry is bound, a creator-profile registry.", requiresReceipts: [] as string[], operations: foundation },
       { id: "originate-collection", purpose: "Originate the FA2 collection against the Index receipt and the OneMint gate against the creator-profile registry receipt.", requiresReceipts: ["index", "creatorProfile"], operations: dependent },
@@ -1030,7 +1031,7 @@ export function prepareKeelTezosMintGateAction(input: { readonly network: string
     case "set-holder-metadata-editing":
       if (typeof input.enabled !== "boolean") throw new TypeError("enabled must be a boolean.");
       operation = call("collection", assertContract(input.collection, "collection"), "set_token_owner_can_edit", mBool(input.enabled));
-      detail = { metadataEditing: { creator: true, holders: input.enabled, holderFreeze: true } };
+      detail = { metadataEditing: { creator: true, holders: input.enabled, holderFreeze: input.enabled } };
       break;
     case "set-collection-metadata": {
       const json = buildKeelTezosContractMetadata(input.collectionMetadata);
@@ -1256,7 +1257,7 @@ export function prepareKeelTezosTokenMetadata(input: { readonly network: string;
     batches: groupKeelTezosOperations(operations),
     signing: "not-performed" as const,
     submission: "not-performed" as const,
-    metadataEditing: { creator: "rewrite until frozen", holders: "only when token_owner_can_edit is enabled", holderFreeze: "a holder may permanently freeze their own token" },
+    metadataEditing: { creator: "rewrite until frozen", holders: "only when token_owner_can_edit is enabled", holderFreeze: "only when token_owner_can_edit is enabled" },
     caveat: "Administrators rewrite token metadata until that token is frozen; holders edit only when the creator enables token_owner_can_edit. Read it back with the `token_metadata` view and compare tokenInfoSha256 before announcing the token.",
   };
 }
