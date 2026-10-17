@@ -78,6 +78,16 @@ Each item names the contract and the entrypoint. None of these blocks a NOCTURNE
 - Tezos indexers and marketplaces read the stored `token_metadata` big_map; they do not evaluate a view.
 - A token whose metadata must reflect live state (for example, a NOCTURNES cart generation) has to rewrite its metadata through `set_token_metadata` when that state changes. The FA2 allows this for an administrator until `freeze_token_metadata`.
 - The rewrite is a prepared call (`keel-tezos-token-metadata-prepare`), not a renderer contract.
+- **Metadata state = live read + small creator-only trait rewrites.** One Studio call, two adapters. On EVM, `tokenURI` reads the state directly. On Tezos:
+  - the token's HTML reads the state live: `@keel/sdk/tezos-live-state` (`prepareKeelTezosLiveState`) and the MCP tool `keel-tezos-live-state-prepare`. The metadata stays static. The HTML embeds a JSON snapshot taken at publish time, then reads declared big_map keys (`expr…` hash computed at prepare time) or views from an explicit public RPC list, with optional TzKT.
+  - the traits a marketplace lists are rewritten by the creator inside the triggering call's own operation group: `prepareKeelTezosStateRewrite`. The group is atomic, so the state change and its listed traits land together.
+  - Creator-only editor model: `token_owner_can_edit` stays off, and the triggering contract is never made an FA2 administrator. `checkKeelTezosStateRewriteAuthority` reads both before signing.
+  - Costs and refusals are measured by `packages/tezos/scripts/live-state-cost-mockup.mjs` (Octez mockup, parity contracts):
+    - the trait rewrite inside the triggering group adds about 0.0017 ꜩ (7,166 gas) to the call alone;
+    - a same-size small `token_info` rewrite costs about 0.0018 ꜩ per token, with no burn;
+    - a creator batch fits 84 rewrites per operation group (100 tokens: 2 groups, about 0.117 ꜩ);
+    - an inline-HTML rewrite costs about 0.017 ꜩ per token;
+    - the cart contract's own internal rewrite and a holder's rewrite are both refused with `UNAUTHORIZED_PRESENTATION_EDITOR`.
 
 ## 3. Mockup: end to end with costs
 

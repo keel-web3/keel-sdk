@@ -109,6 +109,19 @@ export const KEEL_CHAIN_CAPABILITIES: readonly KeelChainCapability[] = Object.fr
     open: "Field-level edit permissions (permission gates and creator-defined editable fields with onchain validation, on both chains) are owned by the keel-field-permissions work, stacked on this branch. Until then the creator is the only default editor.",
   },
   {
+    id: "collection.token-metadata.live-state",
+    area: "collection",
+    studioCall: "Show changing token state (metadata state)",
+    status: "partial",
+    evm: evm(["KEEL721", "KeelIndex"], "tokenURI is computed when read, so the token and every marketplace see current state with no metadata write."),
+    tezos: tez(
+      ["KeelCollectionFA2"],
+      "The token's HTML reads state live (tezos-live-state: frozen snapshot, then public RPC reads). Listing-visible traits are rewritten by the creator in the triggering call's own atomic operation group (prepareKeelTezosStateRewrite). token_owner_can_edit stays off and the triggering contract is never an FA2 administrator.",
+    ),
+    userVisibleDifference: "Marketplace traits on Tezos change when the creator's group carries the rewrite; a change triggered by another account shows live in the HTML and reaches listed traits at the creator's next rewrite.",
+    open: "Indexers read stored token_metadata and never evaluate a view, so a state change that the creator does not sign leaves listed traits behind until the creator's next batch. Scoped trait writers (a holder, wallet or contract granted named fields) belong to collection.token-metadata.field-permissions.",
+  },
+  {
     id: "collection.contract-metadata",
     area: "collection",
     studioCall: "Update collection metadata",
