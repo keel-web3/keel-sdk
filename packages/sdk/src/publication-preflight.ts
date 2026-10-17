@@ -139,7 +139,7 @@ export function keelSimulationTransportDiagnostic(error: unknown, context: {
     result[depth === 0 ? "errorClass" : "causeClass"] = name; result.causeDepth = depth;
     pick(record(item.diagnostic));
     if (typeof item.reason === "string" && failureReasons.includes(item.reason)) result.failureReason = item.reason;
-    if (typeof item.code === "number" && Number.isInteger(item.code) && Math.abs(item.code) <= 2147483647) result.rpcCode = item.code;
+    if (typeof item.code === "number" && Number.isInteger(item.code) && item.code >= -2147483648 && item.code <= 2147483647) result.rpcCode = item.code;
     if (item.code === 3 && bytes(item.data)) {
       result.revertDataBytes = (item.data.length - 2) / 2;
       if (item.data.length <= 4_000_002) result.revertDataHash = keccak256(item.data);
@@ -197,6 +197,7 @@ export function keelSimulationTransportFailure(error: unknown, context: Paramete
   if (intrinsic) return new KeelPublicationSimulationError("configuration-invalid", "The simulator rejected transaction validation. Its intrinsic-gas response does not identify a faulty call or prove the saved gas limit is too low. The exact plan and simulator evidence need review before approval; no transaction was submitted.", { ...diagnostic, transactionValidation: "intrinsic-gas" });
   if (invalid) return new KeelPublicationSimulationError("configuration-invalid", "The simulator rejected the planned transaction parameters. Correct the saved plan before payment; no transaction was submitted.", diagnostic);
   if (unsupported) return new KeelPublicationSimulationError("unsupported-simulation", "This RPC does not support the required read-only publication simulation. Choose a compatible configured provider before a new payment.", diagnostic);
+  if (diagnostic.gasCapacityScope === "request-bytes") return new KeelPublicationSimulationError("provider-limit", "The simulation provider rejected the complete request because its body is too large. A compatible approved provider is required before payment. The saved plan and receipts are preserved; no transaction was submitted.", diagnostic);
   if (limited || providerGasCap !== undefined || diagnostic.httpStatus === 413) return new KeelPublicationSimulationError("provider-limit", "The provider rejected the unchanged complete simulation at its configured limit. Retry a compatible approved provider; no transaction was submitted.", { ...diagnostic, ...(gasCapacityScope === undefined ? {} : { gasCapacityScope }), ...(providerGasCap === undefined ? {} : { providerGasCap: providerGasCap.toString() }) });
   return new KeelPublicationSimulationError("rpc-unavailable", "The publication simulation could not finish. Retry the same prepared plan; no transaction was submitted.", diagnostic);
 }
