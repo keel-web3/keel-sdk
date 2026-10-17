@@ -35,6 +35,7 @@ export const SIBLING_CONFORMANCE_TEST_FILES = Object.freeze([
   "tests/seed-registry-wire.test.mjs",
   "tests/shared-1155-events.test.mjs",
   "tests/studio-structure-check.test.mjs",
+  "tests/field-permissions-vectors.test.mjs",
 ]);
 
 /** No node:test file is allowed to perform live-chain or public-network work in the ordinary gate. */
@@ -52,6 +53,7 @@ export const TEST_FILES_ON_DISK = Object.freeze(readdirSync(TEST_ROOT)
  * its execution boundary.
  */
 export const DETERMINISTIC_TEST_FILES = Object.freeze([
+  "tests/field-permissions.test.mjs",
   "tests/signed-anchor.test.mjs",
   "tests/sdk-tezos-catalog.test.mjs",
   "tests/mcp-publication-references.test.mjs",

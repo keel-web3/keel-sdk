@@ -526,12 +526,14 @@ export const KEEL_TEZOS_MODULES: readonly KeelTezosModule[] = [
         "freeze_contract_metadata",
         "freeze_default_presentation",
         "freeze_token_metadata",
+        "patch_token_attributes",
         "release_capacity",
         "remove_administrator",
         "reserve_capacity",
         "set_contract_metadata",
         "set_default_presentation",
         "set_default_royalty",
+        "set_field_writer",
         "set_keel_index",
         "set_minter",
         "set_token_json",
@@ -562,6 +564,75 @@ export const KEEL_TEZOS_MODULES: readonly KeelTezosModule[] = [
         "token_metadata_frozen",
         "token_owner_can_edit",
         "total_supply"
+      ]
+    }
+  },
+  {
+    "id": "keel-fields",
+    "sources": "src/modules/keel-fields/tezos",
+    "contracts": [
+      "keel_field_reader.py",
+      "keel_field_registry.py",
+      "keel_field_validators.py"
+    ],
+    "deployable": [
+      "KeelFieldReader",
+      "KeelFieldRegistry",
+      "KeelFieldValidatorRegistry",
+      "KeelFieldIncreaseOnlyValidator"
+    ],
+    "entrypoints": {
+      "KeelFieldIncreaseOnlyValidator": [],
+      "KeelFieldReader": [],
+      "KeelFieldRegistry": [
+        "cancel_grant_nonces",
+        "claim_space",
+        "clear_pointer",
+        "disable_rule",
+        "edit",
+        "freeze_fields",
+        "freeze_schema",
+        "freeze_token_fields",
+        "set_accounts",
+        "set_metadata_patch",
+        "set_paused",
+        "set_pointer",
+        "set_rule",
+        "set_schema",
+        "set_validators",
+        "transfer_space_admin"
+      ],
+      "KeelFieldValidatorRegistry": [
+        "accept_governance",
+        "approve",
+        "retire",
+        "transfer_governance"
+      ]
+    },
+    "views": {
+      "KeelFieldIncreaseOnlyValidator": [
+        "validate_field"
+      ],
+      "KeelFieldReader": [
+        "attributes_json",
+        "check_compatible",
+        "decode_schema",
+        "fields_json",
+        "render"
+      ],
+      "KeelFieldRegistry": [
+        "field_of",
+        "field_value",
+        "merkle_leaf",
+        "nonce_used",
+        "render_inputs",
+        "schema_of",
+        "signing_payload",
+        "space_of",
+        "token_words"
+      ],
+      "KeelFieldValidatorRegistry": [
+        "is_approved"
       ]
     }
   },

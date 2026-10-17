@@ -138,6 +138,10 @@
     "./tezos-live-state": {
       "types": "./dist/tezos-live-state.d.ts",
       "import": "./dist/tezos-live-state.js"
+      },
+    "./field-permissions": {
+      "types": "./dist/field-permissions.d.ts",
+      "import": "./dist/field-permissions.js"
     },
     "./chain-capability-map": {
       "types": "./dist/chain-capability-map.d.ts",

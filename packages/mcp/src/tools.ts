@@ -12,6 +12,7 @@ import { LAYERED_TOOL_DEFINITIONS } from './layered-tools.js';
 import { SVG_TOOL_DEFINITIONS } from './svg-tools.js';
 import { TEZOS_COLLECTION_TOOL_DEFINITIONS } from './tezos-collection-tools.js';
 import { TEZOS_LIVE_STATE_TOOL_DEFINITIONS } from './tezos-live-state-tools.js';
+import { FIELD_PERMISSION_TOOL_DEFINITIONS } from './field-permission-tools.js';
 import { CREATOR_INLINE_TOOL_DEFINITIONS } from './creator-inline-tools.js';
 import { resolveKeelInlineCarriage } from "@keel/sdk/presentation";
 import {
@@ -1465,6 +1466,7 @@ export const TOOL_DEFINITIONS: readonly ToolDefinition[] = [
   tool("keel-tezos-publication-prepare", "Prepare one exact receipt-bound Tezos KEEL one-of-one publication call using the standard Hold, Index, and FA2 modules. The public route is ordinary FA2/TZIP-12 token_metadata with onchfs:// or another selected carrier; the KEEL JSON/harness route is compatibility-only. Review-only: no private key, origination, signing, submission, or fake address is accepted.", tezosPublicationPrepareSchema, tezosPublicationPrepareTool),
   ...TEZOS_COLLECTION_TOOL_DEFINITIONS,
   ...TEZOS_LIVE_STATE_TOOL_DEFINITIONS,
+  ...FIELD_PERMISSION_TOOL_DEFINITIONS,
   ...ENGINE_TOOL_DEFINITIONS,
   ...EDITOR_TOOL_DEFINITIONS,
   ...LAYERED_TOOL_DEFINITIONS,
