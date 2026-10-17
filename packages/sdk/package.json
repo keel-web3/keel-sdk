@@ -131,6 +131,10 @@
       "types": "./dist/tezos-modules.generated.d.ts",
       "import": "./dist/tezos-modules.generated.js"
     },
+    "./tezos-collection": {
+      "types": "./dist/tezos-collection.d.ts",
+      "import": "./dist/tezos-collection.js"
+    },
     "./shell-registry": {
       "types": "./dist/shell-registry.d.ts",
       "import": "./dist/shell-registry.js"
