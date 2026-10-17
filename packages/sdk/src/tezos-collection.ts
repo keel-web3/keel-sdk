@@ -423,8 +423,40 @@ export function buildKeelTezosContractMetadata(metadata: KeelTezosContractMetada
  * (`keel_collection_fa2.py` over the shared `keel_fa2_nft.py` KeelNFTLedger).
  * Holder metadata editing is off unless the creator explicitly enables it:
  * administrators rewrite token metadata, holders may only freeze their own token.
+ * An optional default royalty is what `royalty_info` reports to the KEEL market.
  */
-export function buildKeelTezosCollectionFA2Storage(input: { readonly administrator: string; readonly keelIndex: string; readonly maxSupply: number | string | bigint; readonly contractMetadataJson?: string; readonly holderMetadataEditing?: boolean }): TezosMichelineValue {
+/** A collection-wide default royalty, as ERC-2981 `_setDefaultRoyalty`: basis points of the sale price. */
+export interface KeelTezosRoyalty {
+  readonly receiver: string;
+  /** 1..10000 basis points. */
+  readonly bps: number;
+}
+
+function royaltyConfig(value: KeelTezosRoyalty, label: string): { receiver: string; bps: number } {
+  assertObject(value, label);
+  const receiver = assertAddress(value.receiver, `${label}.receiver`);
+  if (receiver === KEEL_TEZOS_BURN_ADDRESS) throw new TypeError(`${label}.receiver cannot be the burn address.`);
+  if (!Number.isSafeInteger(value.bps) || value.bps < 1 || value.bps > 10_000) throw new RangeError(`${label}.bps must be 1..10000.`);
+  return { receiver, bps: value.bps };
+}
+
+function royaltyValue(value: KeelTezosRoyalty | null | undefined, label: string): TezosMichelineValue {
+  if (value === undefined || value === null) return mNone;
+  const config = royaltyConfig(value, label);
+  return mSome(mPair([mString(config.receiver), mInt(config.bps)]));
+}
+
+/**
+ * The TZIP-21 `royalties` token-metadata field for the same royalty, so Tezos
+ * marketplaces that read token metadata and the KEEL market that reads
+ * `royalty_info` see one split.
+ */
+export function keelTezosRoyaltyTokenMetadata(value: KeelTezosRoyalty): { readonly decimals: 4; readonly shares: Readonly<Record<string, number>> } {
+  const config = royaltyConfig(value, "royalty");
+  return { decimals: 4, shares: { [config.receiver]: config.bps } };
+}
+
+export function buildKeelTezosCollectionFA2Storage(input: { readonly administrator: string; readonly keelIndex: string; readonly maxSupply: number | string | bigint; readonly contractMetadataJson?: string; readonly holderMetadataEditing?: boolean; readonly defaultRoyalty?: KeelTezosRoyalty }): TezosMichelineValue {
   const administrator = assertAddress(input.administrator, "administrator");
   if (administrator === KEEL_TEZOS_BURN_ADDRESS) throw new TypeError("administrator cannot be the burn address.");
   const keelIndex = assertAddress(input.keelIndex, "keelIndex");
@@ -436,6 +468,7 @@ export function buildKeelTezosCollectionFA2Storage(input: { readonly administrat
     [mString(administrator)], // administrators
     mBool(false), // contract_metadata_frozen
     mPair([mBytes(""), mBytes(""), mBytes(""), mBool(false)]), // default_presentation
+    royaltyValue(input.defaultRoyalty, "defaultRoyalty"), // default_royalty
     mString(keelIndex), // keel_index
     EMPTY, // ledger
     mInt(maxSupply), // max_supply
@@ -511,6 +544,8 @@ export interface KeelTezosCollectionOriginationsInput {
   readonly collectionMetadata?: KeelTezosContractMetadata;
   /** Let holders rewrite their own token metadata. Default false: only the creator's administrators edit. */
   readonly holderMetadataEditing?: boolean;
+  /** Collection-wide default royalty (ERC-2981 counterpart). Omitted means none. */
+  readonly royalty?: KeelTezosRoyalty;
   /** Compiled code per route contract; route contracts without code are reported as unresolved. */
   readonly code: Partial<Record<"hold" | "index" | "collection" | "presentation" | "creatorProfile" | "oneMint", KeelTezosCompiledCode>>;
   /** Receipt-backed addresses already known (for example a shared KEEL creator-profile registry). */
@@ -544,6 +579,7 @@ export function prepareKeelTezosCollectionOriginations(input: KeelTezosCollectio
   const metadataJson = buildKeelTezosContractMetadata(input.collectionMetadata);
   if (input.holderMetadataEditing !== undefined && typeof input.holderMetadataEditing !== "boolean") throw new TypeError("holderMetadataEditing must be a boolean.");
   const holderMetadataEditing = input.holderMetadataEditing === true;
+  const royalty = input.royalty === undefined ? undefined : royaltyConfig(input.royalty, "royalty");
   const bindings = input.bindings ?? {};
   for (const [name, address] of Object.entries(bindings)) if (address !== undefined) assertContract(address, `bindings.${name}`);
   const code = input.code ?? {};
@@ -571,7 +607,7 @@ export function prepareKeelTezosCollectionOriginations(input: KeelTezosCollectio
     ...(bindings.creatorProfile === undefined ? [entry("creatorProfile", ["manager"], () => buildKeelTezosCreatorProfileStorage({ manager: bindings.manager as string }))] : []),
   ];
   const dependent = [
-    entry("collection", ["index"], () => buildKeelTezosCollectionFA2Storage({ administrator: creator, keelIndex: bindings.index as string, maxSupply, contractMetadataJson: metadataJson, holderMetadataEditing })),
+    entry("collection", ["index"], () => buildKeelTezosCollectionFA2Storage({ administrator: creator, keelIndex: bindings.index as string, maxSupply, contractMetadataJson: metadataJson, holderMetadataEditing, ...(royalty === undefined ? {} : { defaultRoyalty: royalty }) })),
     entry("oneMint", ["creatorProfile"], () => buildKeelTezosOneMintStorage({ creatorProfileRegistry: bindings.creatorProfile as string })),
   ];
   return {
@@ -583,7 +619,7 @@ export function prepareKeelTezosCollectionOriginations(input: KeelTezosCollectio
     expectedSender: creator,
     signing: "not-performed" as const,
     submission: "not-performed" as const,
-    collection: { maxSupply: maxSupply.toString(), contractMetadata: JSON.parse(metadataJson) as unknown, metadataEditing: { creator: true, holders: holderMetadataEditing, holderFreeze: true } },
+    collection: { maxSupply: maxSupply.toString(), contractMetadata: JSON.parse(metadataJson) as unknown, metadataEditing: { creator: true, holders: holderMetadataEditing, holderFreeze: true }, royalty: royalty === undefined ? null : { ...royalty, tokenMetadataRoyalties: keelTezosRoyaltyTokenMetadata(royalty) } },
     stages: [
       { id: "originate-foundation", purpose: "Originate the Hold (OnchFS), the revision Index, the presentation-state registry and, when no shared registry is bound, a creator-profile registry.", requiresReceipts: [] as string[], operations: foundation },
       { id: "originate-collection", purpose: "Originate the FA2 collection against the Index receipt and the OneMint gate against the creator-profile registry receipt.", requiresReceipts: ["index", "creatorProfile"], operations: dependent },
@@ -799,8 +835,9 @@ export function prepareKeelTezosPresentationBinding(input: KeelTezosPresentation
     const byteLength = natural(policy.byteLength, "presentationPolicy.byteLength", { positive: true });
     if (byteLength > maxBytes) throw new TypeError("presentationPolicy.byteLength exceeds maxBytes.");
     if (policy.create !== false) {
+      // Value kinds mirror the EVM registry's ValueKind; a resource or harness revision is `binary`.
       operations.push(call("presentation", registry, "create_policy", mPair([
-        mText(authority), mSome(mString(collection)), mBool(false), mInt(maxBytes), mText(policy.mediaType), mNone, mBytes(policyId), mBytes(salt), mInt(natural(policy.tokenId ?? 0, "presentationPolicy.tokenId")), mText(updateKind), mText("keel-object"),
+        mText(authority), mSome(mString(collection)), mBool(false), mInt(maxBytes), mText(policy.mediaType), mNone, mBytes(policyId), mBytes(salt), mInt(natural(policy.tokenId ?? 0, "presentationPolicy.tokenId")), mText(updateKind), mText("binary"),
       ])));
     }
     operations.push(call("presentation", registry, "append_resource_revision", mPair([
@@ -907,8 +944,9 @@ export function prepareKeelTezosMintGate(input: KeelTezosMintGateInput) {
     if (typeof profile.metadataUri !== "string" || profile.metadataUri.length === 0 || utf8(profile.metadataUri).length > 2_048) throw new TypeError("creatorProfile.metadataUri must be 1-2,048 bytes.");
     operations.push({
       kind: "transaction", amount: "0", destination: registry,
+      // Unset object ID and organization are bytes32 zero, as in the EVM registry; empty bytes are refused.
       parameters: { entrypoint: "create_profile", value: mPair([
-        mBytes(sha256Hex(utf8(profile.username.normalize("NFC").toLowerCase()))), mText(profile.metadataUri), mString(KEEL_TEZOS_BURN_ADDRESS), mBytes(""), mBytes(""), mInt(0), mString(assertAddress(profile.recoveryAddress ?? KEEL_TEZOS_BURN_ADDRESS, "creatorProfile.recoveryAddress")),
+        mBytes(sha256Hex(utf8(profile.username.normalize("NFC").toLowerCase()))), mText(profile.metadataUri), mString(KEEL_TEZOS_BURN_ADDRESS), mBytes("00".repeat(32)), mBytes("00".repeat(32)), mInt(0), mString(assertAddress(profile.recoveryAddress ?? KEEL_TEZOS_BURN_ADDRESS, "creatorProfile.recoveryAddress")),
       ]) },
     });
     assertKeelTezosEntrypoint("KeelCreatorProfileRegistry", "create_profile");
@@ -959,18 +997,20 @@ export type KeelTezosMintGateAction =
   | { readonly action: "set-minter"; readonly collection: string; readonly account: string; readonly enabled: boolean }
   | { readonly action: "set-holder-metadata-editing"; readonly collection: string; readonly enabled: boolean }
   | { readonly action: "set-collection-metadata"; readonly collection: string; readonly collectionMetadata: KeelTezosContractMetadata }
-  | { readonly action: "freeze-collection-metadata"; readonly collection: string };
+  | { readonly action: "freeze-collection-metadata"; readonly collection: string }
+  | { readonly action: "set-default-royalty"; readonly collection: string; readonly royalty: KeelTezosRoyalty }
+  | { readonly action: "remove-default-royalty"; readonly collection: string };
 
 /**
  * One governed mint-gate or collection change: pause/unpause/close a drop, change supply or
- * allowlist, withdraw proceeds, grant a minter, let holders edit their own token metadata, or
- * replace / permanently freeze the collection's TZIP-16 metadata.
+ * allowlist, withdraw proceeds, grant a minter, let holders edit their own token metadata,
+ * replace / permanently freeze the collection's TZIP-16 metadata, or set its default royalty.
  */
 export function prepareKeelTezosMintGateAction(input: { readonly network: string; readonly creator: string; /** Required for every drop action (not set-minter or set-holder-metadata-editing). */ readonly oneMint?: string } & KeelTezosMintGateAction) {
   assertObject(input, "mint gate action");
   const network = assertNetwork(input.network);
   const creator = assertAddress(input.creator, "creator");
-  const collectionAction = input.action === "set-minter" || input.action === "set-holder-metadata-editing" || input.action === "set-collection-metadata" || input.action === "freeze-collection-metadata";
+  const collectionAction = input.action === "set-minter" || input.action === "set-holder-metadata-editing" || input.action === "set-collection-metadata" || input.action === "freeze-collection-metadata" || input.action === "set-default-royalty" || input.action === "remove-default-royalty";
   const oneMint = collectionAction ? "" : assertContract(input.oneMint, "oneMint");
   let operation: TezosTransactionOperation;
   let detail: Record<string, unknown> = {};
@@ -999,6 +1039,16 @@ export function prepareKeelTezosMintGateAction(input: { readonly network: string
       break;
     }
     case "freeze-collection-metadata": operation = call("collection", assertContract(input.collection, "collection"), "freeze_contract_metadata", mUnit); break;
+    case "set-default-royalty": {
+      const royalty = royaltyConfig(input.royalty, "royalty");
+      operation = call("collection", assertContract(input.collection, "collection"), "set_default_royalty", royaltyValue(royalty, "royalty"));
+      detail = { royalty: { ...royalty, tokenMetadataRoyalties: keelTezosRoyaltyTokenMetadata(royalty) } };
+      break;
+    }
+    case "remove-default-royalty":
+      operation = call("collection", assertContract(input.collection, "collection"), "set_default_royalty", mNone);
+      detail = { royalty: null };
+      break;
     default: throw new TypeError("Unsupported Tezos mint-gate action.");
   }
   return { schema: KEEL_TEZOS_COLLECTION_ROUTE, step: "mint-gate-action" as const, status: "review-only" as const, family: "tezos" as const, network, expectedSender: creator, action: input.action, operation, ...detail, signing: "not-performed" as const, submission: "not-performed" as const };
@@ -1273,6 +1323,8 @@ export interface KeelTezosPublicationCheckInput {
   readonly expectedObjects?: readonly string[];
   /** Expected `token_owner_can_edit`; omitted means the creator-only default (false). */
   readonly expectedHolderMetadataEditing?: boolean;
+  /** Expected default royalty (`null` for none); omitted skips the check. */
+  readonly expectedRoyalty?: KeelTezosRoyalty | null;
   readonly fetchImpl?: typeof fetch;
 }
 
@@ -1328,6 +1380,19 @@ export async function checkKeelTezosCollectionPublication(input: KeelTezosPublic
     const result = micheline(await view(collection, "token_owner_can_edit", mUnit));
     return { ok: result.prim === (expected ? "True" : "False"), detail: { holderMetadataEditing: result.prim === "True", expected } };
   });
+  if (input.expectedRoyalty !== undefined) {
+    const expected = input.expectedRoyalty === null ? null : royaltyConfig(input.expectedRoyalty, "expectedRoyalty");
+    await record("default-royalty", async () => {
+      assertKeelTezosView("KeelCollectionFA2", "royalty_info");
+      // At a 10000-mutez price the amount equals the basis points exactly.
+      const result = micheline(await view(collection, "royalty_info", mPair([mInt(0), mInt(10_000)])));
+      if (result.prim === "None") return { ok: expected === null, detail: { royalty: null, expected } };
+      const pair = micheline(((result.args as unknown[] | undefined) ?? [])[0]);
+      const [receiver, amount] = ((pair.args as unknown[] | undefined) ?? []).map((item) => micheline(item));
+      const actual = { receiver: receiver?.string, bps: Number(amount?.int) };
+      return { ok: expected !== null && actual.receiver === expected.receiver && actual.bps === expected.bps, detail: { royalty: actual, expected } };
+    });
+  }
   if (input.expectedManifestDigest !== undefined) {
     await record("default-presentation", async () => {
       assertKeelTezosView("KeelCollectionFA2", "default_presentation");

@@ -65,6 +65,10 @@ test("MCP plans, originates, stores, binds, gates, mints and writes metadata rev
   const holders = await call("keel-tezos-mint-gate-prepare", { network, creator, action: "set-holder-metadata-editing", collection, enabled: true });
   assert.equal(holders.isError, undefined, JSON.stringify(holders));
   assert.equal(holders.structuredContent.operation.parameters.entrypoint, "set_token_owner_can_edit");
+  const royalty = await call("keel-tezos-mint-gate-prepare", { network, creator, action: "set-default-royalty", collection, royalty: { receiver: creator, bps: 500 } });
+  assert.equal(royalty.structuredContent.operation.parameters.entrypoint, "set_default_royalty");
+  const removed = await call("keel-tezos-mint-gate-prepare", { network, creator, action: "remove-default-royalty", collection });
+  assert.deepEqual(removed.structuredContent.operation.parameters.value, { prim: "None" });
   assert.deepEqual(holders.structuredContent.operation.parameters.value, { prim: "True" });
   assert.equal(originate.structuredContent.signing, "not-performed");
 
@@ -118,7 +122,7 @@ test("MCP read-back verifies a collection against a loopback Tezos RPC", async (
       if (request.url.endsWith("/chain_id")) body = network;
       else if (request.url.endsWith("/header")) body = { level: 42 };
       else if (request.url.endsWith("/script")) body = { code: [] };
-      else body = { data: { total_supply: { int: "1" }, is_minter: { prim: "True" }, token_owner_can_edit: { prim: "False" }, token_metadata: { prim: "Pair", args: [{ int: "1" }, tokenMap] } }[JSON.parse(raw).view] };
+      else body = { data: { total_supply: { int: "1" }, is_minter: { prim: "True" }, token_owner_can_edit: { prim: "False" }, royalty_info: { prim: "None" }, token_metadata: { prim: "Pair", args: [{ int: "1" }, tokenMap] } }[JSON.parse(raw).view] };
       response.setHeader("content-type", "application/json");
       response.end(JSON.stringify(body));
     });
@@ -132,6 +136,8 @@ test("MCP read-back verifies a collection against a loopback Tezos RPC", async (
   const tampered = await call("keel-tezos-readback-check", { network, rpcUrl, collection, expectedTokens: [{ tokenId: 1, tokenInfoSha256: "00".repeat(32) }] });
   assert.equal(tampered.structuredContent.publicationVerified, false);
   // A collection that lets holders edit is not the creator-only collection the caller expects.
+  const noRoyalty = await call("keel-tezos-readback-check", { network, rpcUrl, collection, expectNoRoyalty: true });
+  assert.equal(noRoyalty.structuredContent.checks.find((check) => check.name === "default-royalty").ok, true);
   const holderEditable = await call("keel-tezos-readback-check", { network, rpcUrl, collection, expectedHolderMetadataEditing: true });
   assert.equal(holderEditable.structuredContent.publicationVerified, false);
   assert.equal(holderEditable.structuredContent.checks.find((check) => check.name === "metadata-editing-authority").ok, false);

@@ -123,16 +123,18 @@ try {
     oneMint: { code: loadCode("collection_route_one_mint") },
   };
   const collectionMetadata = { name: "KEEL Route Mockup", description: "Offline mockup of the KEEL Tezos creator-collection route.", version: "1" };
+  // A 5% default royalty, set at origination as ERC-2981 does in the EVM constructor.
+  const royalty = { receiver: listed2, bps: 500 };
 
   // 1. Foundation originations. The creator-profile manager must be an originated KT1; the mockup uses the Hold.
-  let plan = route.prepareKeelTezosCollectionOriginations({ network, creator, maxSupply: 100, collectionMetadata, code: { hold: code.hold, index: code.index, presentation: code.presentation } });
+  let plan = route.prepareKeelTezosCollectionOriginations({ network, creator, maxSupply: 100, collectionMetadata, royalty, code: { hold: code.hold, index: code.index, presentation: code.presentation } });
   const byKey = (stage, key) => plan.stages[stage].operations.find((entry) => entry.artifact === key);
   const hold = originate("originate", byKey(0, "hold"), "hold");
   const index = originate("originate", byKey(0, "index"), "index");
   const presentation = originate("originate", byKey(0, "presentation"), "presentation");
-  plan = route.prepareKeelTezosCollectionOriginations({ network, creator, maxSupply: 100, collectionMetadata, code, bindings: { hold, index, presentation, manager: hold } });
+  plan = route.prepareKeelTezosCollectionOriginations({ network, creator, maxSupply: 100, collectionMetadata, royalty, code, bindings: { hold, index, presentation, manager: hold } });
   const creatorProfile = originate("originate", byKey(0, "creatorProfile"), "creator_profile");
-  plan = route.prepareKeelTezosCollectionOriginations({ network, creator, maxSupply: 100, collectionMetadata, code, bindings: { hold, index, presentation, creatorProfile } });
+  plan = route.prepareKeelTezosCollectionOriginations({ network, creator, maxSupply: 100, collectionMetadata, royalty, code, bindings: { hold, index, presentation, creatorProfile } });
   const collection = originate("originate", byKey(1, "collection"), "collection");
   const oneMint = originate("originate", byKey(1, "oneMint"), "one_mint");
 
@@ -233,9 +235,20 @@ try {
   expect("contract metadata frozen", view(collection, "contract_metadata_frozen", "Unit"), "True");
   expect("set_contract_metadata refused after the weld", refusedBy(() => apply("metadata-authority", "creator set_contract_metadata (refused)", rename.operation), "CONTRACT_METADATA_FROZEN"), true);
 
+  // 6c. Default royalty: what the KEEL market discovers through royalty_info. Creator-only.
+  const royaltyOf = (price) => view(collection, "royalty_info", `(Pair 1 ${price})`);
+  expect("origination royalty_info pays 5% of 2 tez", /^\(?Some \(Pair "(\w+)" 100000\)\)?$/u.exec(royaltyOf(2_000_000))?.[1], listed2);
+  const holderRoyalty = route.prepareKeelTezosMintGateAction({ network, creator: collector, action: "set-default-royalty", collection, royalty: { receiver: collector, bps: 1000 } });
+  expect("holder set_default_royalty refused", refusedBy(() => apply("royalty", "holder set_default_royalty (refused)", holderRoyalty.operation, "bootstrap2"), "ADMIN_ONLY"), true);
+  apply("royalty", "creator remove-default-royalty", route.prepareKeelTezosMintGateAction({ network, creator, action: "remove-default-royalty", collection }).operation);
+  expect("removed royalty reports None", royaltyOf(2_000_000), "None");
+  const finalRoyalty = { receiver: listed, bps: 750 };
+  apply("royalty", "creator set-default-royalty 7.5%", route.prepareKeelTezosMintGateAction({ network, creator, action: "set-default-royalty", collection, royalty: finalRoyalty }).operation);
+  expect("royalty_info rounds down like ERC-2981", /^\(?Some \(Pair "(\w+)" 1\)\)?$/u.exec(royaltyOf(19))?.[1], listed);
+
   // 7. Read-back through the SDK checker, served by the mockup RPC.
   const check = await route.checkKeelTezosCollectionPublication({
-    network, rpcUrl: "http://localhost:8732", collection, oneMint, hold, index, fetchImpl: mockupFetch,
+    network, rpcUrl: "http://localhost:8732", collection, oneMint, hold, index, fetchImpl: mockupFetch, expectedRoyalty: finalRoyalty,
     expectedManifestDigest: renderer.decodedSha256, expectedObjects: resources.resources.map((resource) => resource.objectId),
     expectedTokens: [...metadata.tokens, holderFreeze.tokens[0]].map((token) => ({ tokenId: token.tokenId, tokenInfo: token.tokenInfo, tokenInfoSha256: token.tokenInfoSha256 })),
   });

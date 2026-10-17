@@ -23,6 +23,7 @@ import type { JsonSchema, ToolContext, ToolDefinition } from "./types.js";
 const NETWORK: JsonSchema = { type: "string", pattern: "^Net[1-9A-HJ-NP-Za-km-z]{12}$", description: "Exact selected Tezos chain identity (Net...)." };
 const ADDRESS: JsonSchema = { type: "string", pattern: "^(?:tz[1-4]|KT1)[1-9A-HJ-NP-Za-km-z]{33}$" };
 const KT1: JsonSchema = { type: "string", pattern: "^KT1[1-9A-HJ-NP-Za-km-z]{33}$" };
+const ROYALTY: JsonSchema = { type: "object", additionalProperties: false, required: ["receiver", "bps"], properties: { receiver: ADDRESS, bps: { type: "integer", minimum: 1, maximum: 10000 } } };
 const DIGEST: JsonSchema = { type: "string", pattern: "^(?:0x)?[0-9a-fA-F]{64}$" };
 const NATURAL: JsonSchema = { anyOf: [{ type: "integer", minimum: 0 }, { type: "string", pattern: "^(?:0|[1-9][0-9]*)$" }] };
 const ALLOWLIST: JsonSchema = { type: "array", maxItems: 65_536, items: { type: "object", additionalProperties: false, required: ["account", "allowance"], properties: { account: ADDRESS, allowance: { type: "integer", minimum: 1 } } } };
@@ -124,6 +125,7 @@ export const TEZOS_COLLECTION_TOOL_DEFINITIONS: readonly ToolDefinition[] = [
       properties: {
         network: NETWORK, creator: ADDRESS, maxSupply: NATURAL,
         holderMetadataEditing: { type: "boolean", default: false, description: "Let holders rewrite their own token metadata. Default false: only the creator's administrators edit; a holder may still freeze their own token." },
+        royalty: { ...ROYALTY, description: "Collection default royalty in basis points (ERC-2981 counterpart). The KEEL market reads it through royalty_info; the result includes the matching TZIP-21 token-metadata royalties." },
         collectionMetadata: { type: "object", additionalProperties: false, required: ["name"], properties: { name: { type: "string", minLength: 1, maxLength: 256 }, description: { type: "string" }, version: { type: "string" }, homepage: { type: "string" }, authors: { type: "array", items: { type: "string" } }, license: { type: "object", additionalProperties: false, required: ["name"], properties: { name: { type: "string" }, details: { type: "string" } } }, interfaces: { type: "array", items: { type: "string" } } } },
         artifactsDir: { type: "string", description: "Workspace directory holding collection_route_<contract>/step_001_cont_0_contract.json." },
         codeSha256: { type: "object", description: "Optional expected SHA-256 of each compiled code array, keyed by hold/index/collection/presentation/creatorProfile/oneMint." },
@@ -132,7 +134,7 @@ export const TEZOS_COLLECTION_TOOL_DEFINITIONS: readonly ToolDefinition[] = [
     },
     async (context, value) => {
       const args = input(value, "the Tezos origination tool");
-      return prepareKeelTezosCollectionOriginations({ network: args.network, creator: args.creator, maxSupply: args.maxSupply, ...(args.holderMetadataEditing === undefined ? {} : { holderMetadataEditing: args.holderMetadataEditing }), ...(args.collectionMetadata === undefined ? {} : { collectionMetadata: args.collectionMetadata }), code: await compiledCode(context, args), ...(args.bindings === undefined ? {} : { bindings: args.bindings }) });
+      return prepareKeelTezosCollectionOriginations({ network: args.network, creator: args.creator, maxSupply: args.maxSupply, ...(args.holderMetadataEditing === undefined ? {} : { holderMetadataEditing: args.holderMetadataEditing }), ...(args.royalty === undefined ? {} : { royalty: args.royalty }), ...(args.collectionMetadata === undefined ? {} : { collectionMetadata: args.collectionMetadata }), code: await compiledCode(context, args), ...(args.bindings === undefined ? {} : { bindings: args.bindings }) });
     },
   ),
   tool(
@@ -169,12 +171,13 @@ export const TEZOS_COLLECTION_TOOL_DEFINITIONS: readonly ToolDefinition[] = [
   ),
   tool(
     "keel-tezos-mint-gate-prepare",
-    "Configure the Tezos mint gate (OneMintController): creator profile, FA2 minter capability, create_drop with price (mutez), supply, per-transaction/per-wallet limits and contiguous public/merkle-allowlist/premint stages, merkle roots and an optional paused start. With `action` it prepares one governed change instead: pause, unpause, close, set-supply, set-merkle-root, withdraw, set-minter, set-holder-metadata-editing (creator opt-in for holder metadata edits), set-collection-metadata or freeze-collection-metadata (TZIP-16). Review-only.",
+    "Configure the Tezos mint gate (OneMintController): creator profile, FA2 minter capability, create_drop with price (mutez), supply, per-transaction/per-wallet limits and contiguous public/merkle-allowlist/premint stages, merkle roots and an optional paused start. With `action` it prepares one governed change instead: pause, unpause, close, set-supply, set-merkle-root, withdraw, set-minter, set-holder-metadata-editing (creator opt-in for holder metadata edits), set-collection-metadata or freeze-collection-metadata (TZIP-16), set-default-royalty or remove-default-royalty. Review-only.",
     {
       type: "object", additionalProperties: false, required: ["network", "creator"],
       properties: {
         network: NETWORK, creator: ADDRESS, oneMint: KT1, collection: KT1,
-        action: { type: "string", enum: ["pause", "unpause", "close", "set-supply", "set-merkle-root", "withdraw", "set-minter", "set-holder-metadata-editing", "set-collection-metadata", "freeze-collection-metadata"] },
+        action: { type: "string", enum: ["pause", "unpause", "close", "set-supply", "set-merkle-root", "withdraw", "set-minter", "set-holder-metadata-editing", "set-collection-metadata", "freeze-collection-metadata", "set-default-royalty", "remove-default-royalty"] },
+        royalty: ROYALTY,
         collectionMetadata: { type: "object", additionalProperties: false, required: ["name"], properties: { name: { type: "string", minLength: 1, maxLength: 256 }, description: { type: "string" }, version: { type: "string" }, homepage: { type: "string" }, authors: { type: "array", items: { type: "string" } }, license: { type: "object", additionalProperties: false, required: ["name"], properties: { name: { type: "string" }, details: { type: "string" } } }, interfaces: { type: "array", items: { type: "string" } } } },
         dropId: DIGEST, stageIndex: { type: "integer", minimum: 0 }, allowlist: ALLOWLIST, recipient: ADDRESS, account: ADDRESS, enabled: { type: "boolean" },
         supply: { anyOf: [NATURAL, { type: "string", enum: ["open"] }] }, maxPerTransaction: { type: "integer", minimum: 1 }, maxPerWallet: { type: "integer", minimum: 1 }, payout: ADDRESS, metadataDigest: DIGEST,
@@ -226,15 +229,19 @@ export const TEZOS_COLLECTION_TOOL_DEFINITIONS: readonly ToolDefinition[] = [
   ),
   tool(
     "keel-tezos-readback-check",
-    "Read the selected Tezos network (public RPC, optional TzKT) and verify a published KEEL collection: chain identity, originated contracts, total_supply, OneMint minter capability, creator-only metadata editing (token_owner_can_edit), default_presentation digest, Hold objects, and decoded token_metadata (self-contained artifactUri/displayUri, exact token_info or its SHA-256). Read-only GETs and view simulations; no signing or submission.",
+    "Read the selected Tezos network (public RPC, optional TzKT) and verify a published KEEL collection: chain identity, originated contracts, total_supply, OneMint minter capability, creator-only metadata editing (token_owner_can_edit), default royalty (royalty_info), default_presentation digest, Hold objects, and decoded token_metadata (self-contained artifactUri/displayUri, exact token_info or its SHA-256). Read-only GETs and view simulations; no signing or submission.",
     {
       type: "object", additionalProperties: false, required: ["network", "rpcUrl", "collection"],
       properties: {
         network: NETWORK, rpcUrl: { type: "string", minLength: 1, maxLength: 2048 }, tzktUrl: { type: "string", minLength: 1, maxLength: 2048 },
-        collection: KT1, oneMint: KT1, hold: KT1, index: KT1, expectedManifestDigest: DIGEST, expectedHolderMetadataEditing: { type: "boolean", default: false }, expectedObjects: { type: "array", maxItems: 64, items: DIGEST },
+        collection: KT1, oneMint: KT1, hold: KT1, index: KT1, expectedManifestDigest: DIGEST, expectedHolderMetadataEditing: { type: "boolean", default: false }, expectedRoyalty: ROYALTY, expectNoRoyalty: { type: "boolean", description: "Require that the collection reports no default royalty." }, expectedObjects: { type: "array", maxItems: 64, items: DIGEST },
         expectedTokens: { type: "array", maxItems: 64, items: { type: "object", additionalProperties: false, required: ["tokenId"], properties: { tokenId: { type: "integer", minimum: 1 }, tokenInfo: { type: "object" }, tokenInfoSha256: DIGEST } } },
       },
     },
-    async (_context, value) => checkKeelTezosCollectionPublication(input(value, "the Tezos read-back tool") as never),
+    async (_context, value) => {
+      const { expectNoRoyalty, ...args } = input(value, "the Tezos read-back tool");
+      if (expectNoRoyalty === true && args.expectedRoyalty !== undefined) throw new TypeError("Pass expectedRoyalty or expectNoRoyalty, not both.");
+      return checkKeelTezosCollectionPublication({ ...args, ...(expectNoRoyalty === true ? { expectedRoyalty: null } : {}) } as never);
+    },
   ),
 ];
