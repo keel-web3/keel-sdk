@@ -344,6 +344,12 @@ export function createKeelPublicSimulationPool(options: KeelPublicSimulationPool
       } catch (error) {
         await candidate.transport.close(); if (selected === candidate) selected = undefined;
         if (closed) throw new KeelPublicationSimulationError("rpc-unavailable", "The publication check was cancelled.");
+        if (isKeelProviderDeadlineFailure(error)) {
+          const failure = new KeelPublicationSimulationError("rpc-unavailable", "The publication check exceeded its bounded time budget. The saved plan is unchanged.",
+            { transportFailure: "timeout", phase: "publication-preflight", ...metrics, ...candidateDiagnostic(index) });
+          inheritKeelProviderScheduledFailure(failure, error);
+          throw failure;
+        }
         const classified = keelSimulationTransportFailure(error, { method: "eth_simulateV1", phase: projectRequest ? "project-request" : "public-qualification" });
         const failure = new KeelPublicationSimulationError(classified.kind, classified.message, { ...classified.diagnostic,
           // The nested transport calls every post-qualification request a
@@ -357,7 +363,7 @@ export function createKeelPublicSimulationPool(options: KeelPublicSimulationPool
         // Never reinterpret a deterministic transaction validation error or an
         // execution revert as a reason to try another backend for success.
         const code = failure.diagnostic?.rpcCode;
-        const requestCapacityEvidence = failure.kind === "provider-limit" && (failure.diagnostic?.httpStatus === 413
+        const requestCapacityEvidence = failure.kind === "provider-limit" && (failure.diagnostic?.httpStatus === 413 || failure.diagnostic?.gasCapacityScope === "request-bytes"
           || failure.diagnostic?.gasCapacityScope === "request" && (failure.diagnostic?.providerGasCap !== undefined
             || failure.diagnostic?.requestedRequestGas !== undefined && failure.diagnostic?.remainingRequestGas !== undefined));
         // -38026 is Geth's client limit, also used for non-gas limits. Only
@@ -366,7 +372,7 @@ export function createKeelPublicSimulationPool(options: KeelPublicSimulationPool
         const rateRejection = failure.diagnostic?.transportFailure === "rate-limited" && (code === undefined || code === 429 || code === -32005);
         const accessRejection = failure.diagnostic?.failureReason === "access-denied" && (code === undefined || code === 401 || code === 403);
         const retryableRpcRejection = code === undefined || code === -32601 || rateRejection || accessRejection
-          || failure.kind === "provider-limit" && (failure.diagnostic?.providerGasCap !== undefined || failure.diagnostic?.httpStatus === 413
+          || failure.kind === "provider-limit" && (failure.diagnostic?.providerGasCap !== undefined || failure.diagnostic?.httpStatus === 413 || failure.diagnostic?.gasCapacityScope === "request-bytes"
             || failure.diagnostic?.gasCapacityScope === "request" && failure.diagnostic?.requestedRequestGas !== undefined && failure.diagnostic?.remainingRequestGas !== undefined);
         if (projectRequest && (!["provider-limit", "unsupported-simulation", "rpc-unavailable"].includes(failure.kind)
           || !retryableRpcRejection || code === -32602 || typeof code === "number" && code <= -38000 && code >= -38099 && !clientCapacityRejection)) throw failure;

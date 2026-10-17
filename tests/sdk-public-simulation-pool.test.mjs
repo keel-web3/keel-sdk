@@ -35,10 +35,13 @@ function fixture(faults=[{},{}], approved=urls.slice(0,faults.length)) {
     if(body.method==='eth_estimateGas') return fault.error ? error(fault.error,fault.message) : respond(fault.estimate ?? '0x3d0900');
     assert.equal(body.method,'eth_simulateV1');
     const blocks=body.params[0].blockStateCalls, privateCall=blocks[0].calls[0].data!=='0x';
+    if(privateCall && fault.maximumRequestBytes !== undefined && Buffer.byteLength(init.body)>fault.maximumRequestBytes)
+      return new Response('Synthetic request body size limit reached.',{status:503});
     if(!privateCall&&fault.publicHttp) return new Response('',{status:fault.publicHttp});
     if(!privateCall&&fault.unsupported) return error(-32601);
     if(!privateCall&&blocks.length===1&&blocks[0].calls[0].nonce==='0x1'&&!fault.ignoreNonce) return error(-38011);
     if(privateCall&&fault.error) return error(fault.error,fault.message);
+    if(privateCall&&fault.httpResponse) return fault.httpResponse(body,init);
     if(privateCall&&fault.http) return fault.httpCode === undefined ? new Response('',{status:fault.http}) : Response.json({jsonrpc:'2.0',id:body.id,error:{code:fault.httpCode,message:'SECRET private payload'}},{status:fault.http});
     if(privateCall&&fault.wait) { fault.started?.(); await new Promise((resolve,reject)=>init.signal.addEventListener('abort',()=>reject(new Error('cancelled')),{once:true})); }
     const result=blocks.map((b,i)=>({number:`0x${(19+i).toString(16)}`,timestamp:`0x${(BigInt(snapshot.timestamp)+12n*BigInt(i+1)).toString(16)}`,hash:hash(i+1),parentHash:i?hash(i):snapshot.hash,
@@ -1204,4 +1207,126 @@ test('public probes use bounded Amsterdam base gas without lowering exact projec
       await assert.rejects(low.transport.request(input));assert.equal(low.privateRequests().length,0);
     }finally{await low.transport.close();}
   }
+});
+
+// Synthetic HTTP boundaries only. These limits do not claim a live provider cap.
+test('200 small calls succeed while a fixed 45-call program fails only after its serialized bytes cross the synthetic HTTP boundary', async () => {
+  const f = fixture([{ maximumRequestBytes: 262_144 }]);
+  const padded = (count, bytes = 0) => {
+    const exact = program();
+    exact.params[0].blockStateCalls = Array.from({ length: count }, (_, index) => ({ calls: [{ ...call(index), gas: '0xf4240' }] }));
+    exact.params[0].blockStateCalls[0].calls[0].data = '0xbeef' + '00'.repeat(bytes);
+    return exact;
+  };
+  try {
+    assert.equal((await f.transport.request(padded(200))).length, 200);
+    assert.equal((await f.transport.request(padded(45, 110_000))).length, 45);
+    const smaller = f.privateRequests().at(-1);
+    assert.ok(Buffer.byteLength(smaller.wire) < 262_144);
+    const large = padded(45, 524_288), original = structuredClone(large);
+    await assert.rejects(f.transport.request(large), error => {
+      const oversized = f.privateRequests().filter(request => Buffer.byteLength(request.wire) > 262_144);
+      console.info(JSON.stringify({ kind: 'synthetic-production-size-path', failureKind: error.kind,
+        httpStatus: error.diagnostic.httpStatus, gasCapacityScope: error.diagnostic.gasCapacityScope,
+        projectAttempts: oversized.length, requestBytes: oversized.map(request => Buffer.byteLength(request.wire)),
+        callsPerAttempt: oversized.map(request => request.body.params[0].blockStateCalls.length) }));
+      assert.equal(error.kind, 'provider-limit');
+      assert.equal(error.diagnostic.httpStatus, 503);
+      assert.equal(error.diagnostic.gasCapacityScope, 'request-bytes');
+      assert.ok(error.diagnostic.requestPayloadBytes > 1_048_576);
+      assert.doesNotMatch(error.message, /SECRET|PRIVATE|https:/);
+      return true;
+    });
+    assert.deepEqual(large, original);
+    const attempts = f.privateRequests().filter(request => Buffer.byteLength(request.wire) > 262_144);
+    assert.equal(attempts.length, 1, 'An explicit body-size rejection must not retry the same oversized request as a transient outage');
+    for (const attempt of attempts) {
+      assert.equal(attempt.body.params[0].blockStateCalls.length, 45);
+      assert.deepEqual(attempt.body.params, original.params);
+      assert.ok(Buffer.byteLength(attempt.wire) > 1_048_576);
+    }
+    assert.ok(f.requests.every(request => !request.body.method.includes('send')));
+  } finally { await f.transport.close(); }
+});
+
+test('exact serialized HTTP boundary keeps every dependent call and permits only approved identical-program failover', async () => {
+  const f = fixture([{}, {}]);
+  const exact = program(), before = structuredClone(exact), wires = [];
+  let limit;
+  const pool = createKeelPublicSepoliaSimulationPool({ ...f.options, fetchImpl: async (url, init) => {
+    const body = JSON.parse(init.body);
+    if (body.method === 'eth_simulateV1' && body.params[0].blockStateCalls[0].calls[0].data !== '0x') {
+      const size = Buffer.byteLength(init.body);
+      wires.push({ url, size, body });
+      // The first actual serialized wire sets this synthetic boundary one byte below itself.
+      if (limit === undefined) limit = size - 1;
+      if (url === urls[0] && size > limit) return new Response('', { status: 413 });
+    }
+    return f.options.fetchImpl(url, init);
+  } });
+  try {
+    assert.equal((await pool.request(exact)).length, 5);
+    assert.equal(wires.length, 2);
+    assert.equal(wires[0].size, limit + 1);
+    assert.equal(wires[1].url, urls[1]);
+    for (const wire of wires) assert.deepEqual(wire.body.params, before.params);
+    assert.deepEqual(exact, before);
+  } finally { await pool.close(); await f.transport.close(); }
+});
+
+
+test('HTTP503 byte capacity permits only approved identical 45-call fallback and never a same-recipient retry', async () => {
+  for (const rpcCode of [undefined,-32000,-38026]) {
+    const f=fixture([{httpResponse:body=>rpcCode===undefined?new Response('request body too large',{status:503}):Response.json({jsonrpc:'2.0',id:body.id,error:{code:rpcCode,message:'request body too large'}},{status:503})},{},{}],[urls[0],urls[2]]);
+    const attempts=[],pool=createKeelPublicSepoliaSimulationPool({...f.options,onAttempt:d=>attempts.push(d)});
+    const input=program(); input.params[0].blockStateCalls=Array.from({length:45},(_,i)=>({calls:[{...call(i),gas:'0xf4240'}]}));
+    const before=structuredClone(input);
+    try {
+      assert.equal((await pool.request(input)).length,45);
+      assert.deepEqual(f.privateRequests().map(r=>r.index),[0,2]);
+      for(const r of f.privateRequests())assert.deepEqual(r.body.params,before.params);
+      assert.deepEqual(input,before);assert.equal(attempts.length,1);
+      assert.equal(attempts[0].gasCapacityScope,'request-bytes');assert.equal(attempts[0].httpStatus,503);
+      assert.equal(attempts[0].sameRecipientRetry,undefined);
+    } finally {await pool.close();await f.transport.close();}
+  }
+});
+
+test('HTTP503 deterministic RPC rejections never shop for another provider despite capacity prose', async () => {
+  for(const code of [3,-32602,-38011,-38013]) {
+    const f=fixture([{httpResponse:body=>Response.json({jsonrpc:'2.0',id:body.id,error:{code,message:'request body too large'}},{status:503})},{}]);
+    try {
+      await assert.rejects(f.transport.request(program()),error=>error.diagnostic.rpcCode===code&&error.diagnostic.gasCapacityScope===undefined);
+      assert.deepEqual(f.privateRequests().map(r=>r.index),[0]);
+      assert.ok(f.requests.every(r=>r.index===0));
+    }finally{await f.transport.close();}
+  }
+});
+
+test('cancelling after a body-capacity rejection prevents fallback dispatch', async () => {
+  const f=fixture([{httpResponse:()=>new Response('request body too large',{status:503})},{}]);
+  let pool;pool=createKeelPublicSepoliaSimulationPool({...f.options,onAttempt:()=>{void pool.close();}});
+  try {
+    await assert.rejects(pool.request(program()),error=>/cancelled/.test(error.message));
+    assert.deepEqual(f.privateRequests().map(r=>r.index),[0]);
+  }finally{await pool.close();await f.transport.close();}
+});
+
+test('body-capacity fallback shares the complete-request deadline and discards a late unchanged response', async () => {
+  let entered;
+  const secondStarted=new Promise(resolve=>{entered=resolve;});
+  const f=fixture([{httpResponse:()=>new Response('request body too large',{status:503})},{}]);
+  const pool=createKeelPublicSepoliaSimulationPool({...f.options,requestTimeoutMs:150,fetchImpl:async(url,init)=>{
+    const body=JSON.parse(init.body),privateCall=body.method==='eth_simulateV1'&&body.params[0].blockStateCalls[0].calls[0].data!=='0x';
+    if(url===urls[1]&&privateCall){entered();await new Promise(resolve=>setTimeout(resolve,200));}
+    return f.options.fetchImpl(url,init);
+  }});
+  const input=program(),before=structuredClone(input),started=performance.now();
+  try {
+    const refusal=assert.rejects(pool.request(input),error=>/exceeded its bounded time budget/.test(error.message));
+    await secondStarted;await refusal;assert.ok(performance.now()-started<300);
+    await new Promise(resolve=>setTimeout(resolve,220));
+    assert.deepEqual(f.privateRequests().map(r=>r.index),[0,1]);
+    for(const r of f.privateRequests())assert.deepEqual(r.body.params,before.params);
+  }finally{await pool.close();await f.transport.close();}
 });
