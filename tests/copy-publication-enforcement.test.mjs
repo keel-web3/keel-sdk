@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { mkdtemp, writeFile, rm } from "node:fs/promises";
+import { mkdir, mkdtemp, writeFile, rm } from "node:fs/promises";
 import path from "node:path";
 import { createIntegrity } from "../packages/protocol/dist/index.js";
 import {
@@ -117,6 +117,9 @@ test("read caps use the selected chain boundary and never stand in for authentic
 async function mcp(t) {
   const dir = await mkdtemp(path.join("/tmp", "keel-copy-enforcement-"));
   t.after(() => rm(dir, { recursive: true, force: true }));
+  await writeFile(path.join(dir, "README.md"), "# Local prepared COPY fixture\nSynthetic review only; no signing or submission.\n");
+  await mkdir(path.join(dir, "docs"));
+  await writeFile(path.join(dir, "docs", "ARCHITECTURE.md"), "# Fixture architecture\nThe standards preflight and exact returned-byte gate both precede a publish review.\n");
   const server = await createMcpServer({ workspaceRoot: dir });
   await server.handle({ jsonrpc: "2.0", id: 1, method: "initialize", params: { protocolVersion: "2024-11-05", capabilities: {}, clientInfo: { name: "copy-gate", version: "1" } } });
   let id = 2;
@@ -147,11 +150,18 @@ test("MCP publish-plan requires evidence, reruns the SDK gate and rejects file t
   const checked = await f.call("keel-inline-publication-check", { ...f.files, chainId, store, mediaType: f.graph.mediaType, digest: f.graph.fragmentIntegrity.digest, byteLength: f.graph.fragmentBytes.length });
   assert.equal(checked.isError, undefined, JSON.stringify(checked));
   assert.equal(checked.structuredContent.chainReady, false);
-  const accepted = await f.call("publish-plan", { ...plan, preparedCopy: f.files });
+  const missing = await f.call("publish-plan", { ...plan, preparedCopy: f.files });
+  assert.equal(missing.isError, true);
+  assert.equal(missing.structuredContent.code, "standards-evidence-required");
+  const preflight = await f.call("keel-contract-workflow-preflight", {});
+  assert.equal(preflight.isError, undefined, JSON.stringify(preflight));
+  const standards = { preflightReceipt: preflight.structuredContent.receipt.id };
+  const accepted = await f.call("publish-plan", { ...plan, preparedCopy: f.files, standards });
   assert.equal(accepted.isError, undefined, JSON.stringify(accepted));
   assert.equal(accepted.structuredContent.envelope.plan.preparedCopy.requiredBuilder, "KeelRawTokenURIBuilder");
+  assert.equal(accepted.structuredContent.standards.preflightReceipt.id, standards.preflightReceipt);
   await writeFile(path.join(f.dir, "returned.uri"), f.prepared.tokenURI + "extra transport");
-  const tampered = await f.call("publish-plan", { ...plan, preparedCopy: f.files });
+  const tampered = await f.call("publish-plan", { ...plan, preparedCopy: f.files, standards });
   assert.equal(tampered.isError, true);
   assert.match(tampered.content[0].text, /differs from canonical/);
 });
