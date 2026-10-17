@@ -135,6 +135,10 @@
       "types": "./dist/tezos-collection.d.ts",
       "import": "./dist/tezos-collection.js"
     },
+    "./chain-capability-map": {
+      "types": "./dist/chain-capability-map.d.ts",
+      "import": "./dist/chain-capability-map.js"
+    },
     "./shell-registry": {
       "types": "./dist/shell-registry.d.ts",
       "import": "./dist/shell-registry.js"

@@ -64,6 +64,7 @@ export * from "./tezos-publication.js";
 export * from "./tezos-standard.js";
 export * from "./tezos-modules.generated.js";
 export * from "./tezos-collection.js";
+export * from "./chain-capability-map.js";
 
 export * from "./network-inspection.js";
 
