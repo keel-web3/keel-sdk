@@ -139,7 +139,7 @@ export const TEZOS_COLLECTION_TOOL_DEFINITIONS: readonly ToolDefinition[] = [
   ),
   tool(
     "keel-tezos-hold-resources-prepare",
-    "Prepare KeelHoldOnchFS writes for creator resources: content-addressed write_chunk, create_file (exact OnchFS CID and HPACK metadata), weld_object (KEEL SHA-256 object id) and optionally create_directory. Returns onchfs:// URIs, object ids and operation batches sized under the Tezos operation limit. Native bytes are stored once. Review-only.",
+    "Prepare KeelHoldOnchFS writes for creator resources: content-addressed write_chunk, create_file (exact OnchFS CID and HPACK metadata), weld_object (object id = sha256(PACK(descriptor)), committing every descriptor field) and optionally create_directory. Returns onchfs:// URIs, object ids and operation batches sized under the Tezos operation limit. Native bytes are stored once. Review-only.",
     {
       type: "object", additionalProperties: false, required: ["network", "creator", "hold", "resources"],
       properties: {

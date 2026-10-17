@@ -312,6 +312,39 @@ function packBytes(value: Uint8Array): Uint8Array {
 const packPair = (left: Uint8Array, right: Uint8Array): Uint8Array => concatBytes([Uint8Array.of(0x07, 0x07), left, right]);
 const packed = (body: Uint8Array): Uint8Array => concatBytes([Uint8Array.of(0x05), body]);
 
+/** The KeelHoldOnchFS object descriptor that `weld_object` commits to. Digests are 32-byte hex; labels are UTF-8. */
+export interface KeelTezosOnchfsObjectDescriptor {
+  readonly fileCid: string;
+  readonly manifestSha256: string;
+  readonly storedSha256: string;
+  readonly storedByteLength: number | string | bigint;
+  readonly decodedSha256: string;
+  readonly decodedByteLength: number | string | bigint;
+  readonly mediaType: string;
+  readonly compression: string;
+}
+
+/**
+ * KeelHoldOnchFS object id: sha256(PACK(object_descriptor)), matching the `predict_object_id`
+ * view. Every descriptor field is committed (the manifest through its digest), as EVM KeelHold
+ * hashes its descriptor, so an object id can never be bound to other bytes.
+ */
+export function keelTezosOnchfsObjectId(descriptor: KeelTezosOnchfsObjectDescriptor): string {
+  const fields = [
+    packBytes(bytesOf(digest32(descriptor.fileCid, "fileCid"))),
+    packBytes(bytesOf(digest32(descriptor.manifestSha256, "manifestSha256"))),
+    packBytes(bytesOf(digest32(descriptor.storedSha256, "storedSha256"))),
+    packNat(natural(descriptor.storedByteLength, "storedByteLength")),
+    packBytes(bytesOf(digest32(descriptor.decodedSha256, "decodedSha256"))),
+    packNat(natural(descriptor.decodedByteLength, "decodedByteLength")),
+    packBytes(utf8(descriptor.mediaType)),
+    packBytes(utf8(descriptor.compression)),
+  ];
+  let body = fields[fields.length - 1] as Uint8Array;
+  for (let index = fields.length - 2; index >= 0; index -= 1) body = packPair(fields[index] as Uint8Array, body);
+  return sha256Hex(packed(body));
+}
+
 /** OneMint merkle leaf: sha256(sha256(PACK(Pair account allowance))), matching the `merkle_leaf` view. */
 export function keelTezosOneMintMerkleLeaf(account: string, allowance: bigint | number | string): string {
   const body = packed(packPair(packBytes(keelTezosAddressBytes(account, "allowlist account")), packNat(natural(allowance, "allowance", { positive: true }))));
@@ -730,11 +763,12 @@ export function prepareKeelTezosHoldResources(input: KeelTezosHoldResourcesInput
     files.push(call("hold", hold, "create_file", mPair([pointers.map(mBytes), mBytes(hexOf(metadata))])));
     const manifest = JSON.stringify({ compression, decodedByteLength, decodedSha256, fileCid, mediaType: resource.mediaType, name: resource.name, schema: "keel.tezos.object@1", storedByteLength: stored.length, storedSha256 });
     const manifestHex = hexOf(utf8(manifest));
-    const objectId = sha256Hex(utf8(manifest));
+    const manifestSha256 = sha256Hex(utf8(manifest));
+    const objectId = keelTezosOnchfsObjectId({ fileCid, manifestSha256, storedSha256, storedByteLength: stored.length, decodedSha256, decodedByteLength, mediaType: resource.mediaType, compression });
     welds.push(call("hold", hold, "weld_object", mPair([
-      mText(compression), mInt(decodedByteLength), mBytes(decodedSha256), mBytes(fileCid), mBytes(manifestHex), mBytes(objectId), mText(resource.mediaType), mBytes(objectId), mInt(stored.length), mBytes(storedSha256),
+      mText(compression), mInt(decodedByteLength), mBytes(decodedSha256), mBytes(fileCid), mBytes(manifestHex), mBytes(manifestSha256), mText(resource.mediaType), mBytes(objectId), mInt(stored.length), mBytes(storedSha256),
     ])));
-    return { name: resource.name, mediaType: resource.mediaType, compression, objectId, fileCid, onchfsUri: `onchfs://${fileCid}`, storedByteLength: stored.length, storedSha256, decodedByteLength, decodedSha256, chunkCount: pointers.length, chunkPointers: pointers, metadataHex: hexOf(metadata) };
+    return { name: resource.name, mediaType: resource.mediaType, compression, objectId, manifestSha256, fileCid, onchfsUri: `onchfs://${fileCid}`, storedByteLength: stored.length, storedSha256, decodedByteLength, decodedSha256, chunkCount: pointers.length, chunkPointers: pointers, metadataHex: hexOf(metadata) };
   });
   const directoryEntries: Record<string, string> = Object.fromEntries(resources.map((resource) => [resource.name, resource.fileCid]));
   const directoryCid = input.directory === true ? keelTezosOnchfsDirectoryCid(directoryEntries) : undefined;

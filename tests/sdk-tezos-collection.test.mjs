@@ -20,6 +20,7 @@ import {
   keelTezosOneMintMerkleLeaf,
   keelTezosOnchfsDirectoryCid,
   keelTezosOnchfsFileCid,
+  keelTezosOnchfsObjectId,
   planKeelTezosCollectionLaunch,
   planKeelTezosStandardRoute,
   predictKeelTezosOneMintDropId,
@@ -115,6 +116,14 @@ test("Hold resources match OnchFS CIDs, dedupe chunks, and fit operation batches
   assert.equal(plan.storage.newChunkCount, Math.ceil(html.length / 16384));
   assert.equal(first.objectId.length, 64);
   assert.notEqual(first.objectId, second.objectId);
+  // The weld carries the descriptor-bound id KeelHoldOnchFS requires, not the manifest digest.
+  assert.equal(first.objectId, keelTezosOnchfsObjectId({ ...first, storedByteLength: first.storedByteLength }));
+  assert.notEqual(first.objectId, first.manifestSha256);
+  const weld = plan.operations.find((operation) => operation.parameters.entrypoint === "weld_object");
+  const flat = (value) => (value.prim === "Pair" ? [value.args[0], ...flat(value.args[1])] : [value]);
+  const weldArgs = flat(weld.parameters.value);
+  assert.deepEqual(weldArgs[7], { bytes: first.objectId });
+  assert.deepEqual(weldArgs[5], { bytes: first.manifestSha256 });
   assert.deepEqual(plan.operations.map((operation) => operation.parameters.entrypoint).filter((name, position, all) => all.indexOf(name) === position), ["write_chunk", "create_file", "weld_object", "create_directory"]);
   for (const batch of plan.batches) assert.ok(batch.length > 0);
   // Exact vectors cross-checked against the official onchfs@0.1.0 library and the Octez mockup.

@@ -37,8 +37,11 @@ export const KEEL_TEZOS_MODULES: readonly KeelTezosModule[] = [
         "retire_verifier"
       ],
       "KeelBtcHeaderChain": [
+        "attach_receipt",
         "lock_configuration",
         "seed_anchor",
+        "set_policy",
+        "set_receipt_registry",
         "submit_headers",
         "verify_inscription"
       ],
@@ -85,7 +88,10 @@ export const KEEL_TEZOS_MODULES: readonly KeelTezosModule[] = [
         "anchor_of",
         "best",
         "is_anchor",
-        "is_verified"
+        "is_verified",
+        "receipt_of",
+        "source_status",
+        "verification_profile"
       ],
       "KeelEthAccountProof": [
         "verify_account"
@@ -762,6 +768,7 @@ export const KEEL_TEZOS_MODULES: readonly KeelTezosModule[] = [
         "haul_object",
         "haul_slug",
         "predict_harness_id",
+        "predict_object_id",
         "read_chunk",
         "read_directory",
         "read_file"
@@ -804,7 +811,12 @@ export const KEEL_TEZOS_MODULES: readonly KeelTezosModule[] = [
         "set_execution_config"
       ],
       "KeelIPBackpackFA2": [
-        "mint_to_backpack"
+        "balance_of",
+        "deposit_to_backpack",
+        "mint_to_backpack",
+        "transfer",
+        "update_operators",
+        "withdraw_from_backpack"
       ],
       "KeelIPControl": [
         "create_policy",
@@ -840,8 +852,13 @@ export const KEEL_TEZOS_MODULES: readonly KeelTezosModule[] = [
         "signature_payload"
       ],
       "KeelIPBackpackFA2": [
+        "backpack_balance",
         "backpack_id",
         "get_balance",
+        "get_total_balance",
+        "owner_of",
+        "token_backpack",
+        "token_metadata",
         "token_provenance"
       ],
       "KeelIPControl": [
