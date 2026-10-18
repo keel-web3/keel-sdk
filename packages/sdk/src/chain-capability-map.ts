@@ -560,11 +560,11 @@ export const KEEL_CHAIN_CAPABILITIES: readonly KeelChainCapability[] = Object.fr
     status: "partial",
     evm: evm(["KeelCollectionVerificationRegistry", "KeelCollectionAttestationRegistry", "KeelCommunityReplicationRegistry"], "Receipts read the collection's hook or audited adapter; anyone seals the observation with the block hash, checked by blockhash(). Replication revisions live in KeelArtifactRegistry."),
     tezos: tez(
-      ["KeelCollectionVerificationRegistry", "KeelCollectionAttestationRegistry", "KeelCommunityReplicationRegistry"],
-      "Receipts read the hook's keel_verification_state view or the adapter's inspect view. Only an auditor seals the observation. Replication revisions are kept locally under the same rules: a creator-bound first revision, then in-order appends by editors until frozen.",
+      ["KeelCollectionVerificationRegistry", "KeelCollectionVerificationInspector", "KeelCollectionAttestationRegistry", "KeelCommunityReplicationRegistry"],
+      "Receipts read the hook's keel_verification_state view or the adapter's inspect view, through a stateless inspector the registry pins at origination; every registry call stays on the registry. Only an auditor seals the observation. Replication revisions are kept locally under the same rules: a creator-bound first revision, then in-order appends by editors until frozen.",
     ),
     userVisibleDifference: "On Tezos an auditor seals each observation, because Michelson cannot read a past block hash; on EVM anyone can.",
-    open: "KeelCollectionVerificationRegistry and KeelCommunityReplicationRegistry compile above the 32,768-byte operation limit (42,526 and 45,763 binary Micheline bytes), so neither can be originated until each is split.",
+    open: "KeelCommunityReplicationRegistry compiles above the 32,768-byte operation limit (45,763 binary Micheline bytes), so it cannot be originated until it is split. The verification registry is split and originates at 27,946 forged bytes in the Octez mockup.",
   },
   {
     id: "identity.graph",
@@ -573,11 +573,11 @@ export const KEEL_CHAIN_CAPABILITIES: readonly KeelChainCapability[] = Object.fr
     status: "partial",
     evm: evm(["KeelGraphRegistry", "KeelLibraryRegistry", "KeelPluginRegistry", "KeelModuleReviewRegistry"], "Manifests, libraries and reviews. Only purchaseAccess takes payment. A token gate probes balanceOf(address), and a failed probe counts as zero."),
     tezos: tez(
-      ["KeelGraphRegistry", "KeelLibraryRegistry", "KeelPluginRegistry", "KeelModuleReviewRegistry"],
-      "Manifests, libraries and reviews. Only purchase_access takes tez. A token gate names an FA2 token ID and reads the TZIP-12 get_balance(owner, token_id) -> nat view; publication refuses a token whose view does not answer, and a later missing view counts as zero. The proof views check ordinary access first, as on EVM.",
+      ["KeelGraphRegistry", "KeelLibraryRegistry", "KeelLibraryAccessRegistry", "KeelPluginRegistry", "KeelModuleReviewRegistry"],
+      "Manifests, libraries and reviews. The library is two contracts: assets and policies, and acquisitions; resolveKeelTezosCall routes each library call. Only purchase_access takes tez. A token gate names an FA2 token ID and reads the TZIP-12 get_balance(owner, token_id) -> nat view; publication refuses a token whose view does not answer, and a later missing view counts as zero. The proof views check ordinary access first, as on EVM.",
     ),
     userVisibleDifference: "A Tezos token gate names one FA2 token ID, because FA2 balances are per token; an EVM gate reads balanceOf(account) across the contract. A gate token without the FA2 view is refused at publication (GATE_TOKEN_VIEW).",
-    open: "KeelLibraryRegistry compiles above the 32,768-byte operation limit (51,686 binary Micheline bytes), so it cannot be originated until it is split.",
+    open: "A Tezos token gate covers one FA2 token ID. Gating on any token of an FA2 contract needs a view that FA2 does not standardise.",
   },
   // ── Anchors and proofs ───────────────────────────────────────────────────
   {

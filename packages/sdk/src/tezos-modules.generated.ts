@@ -2,7 +2,8 @@
 // Source availability only; this catalogue makes no deployment or behavioral-parity claim.
 // Shared declarations are inherited source components, not origination targets.
 // Entrypoints and views include methods inherited from shared source components.
-export interface KeelTezosModule { readonly id: string; readonly sources: string; readonly contracts: readonly string[]; readonly deployable: readonly string[]; readonly shared?: readonly string[]; readonly entrypoints: Readonly<Record<string, readonly string[]>>; readonly views: Readonly<Record<string, readonly string[]>>; }
+// Splits name the pieces, in origination order, that together implement one EVM contract.
+export interface KeelTezosModule { readonly id: string; readonly sources: string; readonly contracts: readonly string[]; readonly deployable: readonly string[]; readonly shared?: readonly string[]; readonly splits?: Readonly<Record<string, readonly string[]>>; readonly entrypoints: Readonly<Record<string, readonly string[]>>; readonly views: Readonly<Record<string, readonly string[]>>; }
 export const KEEL_TEZOS_MODULES: readonly KeelTezosModule[] = [
   {
     "id": "keel-anchors",
@@ -421,9 +422,16 @@ export const KEEL_TEZOS_MODULES: readonly KeelTezosModule[] = [
     "deployable": [
       "KeelCollectionAttestationRegistry",
       "KeelCollectionVerificationHookBase",
+      "KeelCollectionVerificationInspector",
       "KeelCollectionVerificationRegistry",
       "KeelCommunityReplicationRegistry"
     ],
+    "splits": {
+      "KeelCollectionVerificationRegistry": [
+        "KeelCollectionVerificationInspector",
+        "KeelCollectionVerificationRegistry"
+      ]
+    },
     "entrypoints": {
       "KeelCollectionAttestationRegistry": [
         "revoke",
@@ -433,6 +441,7 @@ export const KEEL_TEZOS_MODULES: readonly KeelTezosModule[] = [
         "submit"
       ],
       "KeelCollectionVerificationHookBase": [],
+      "KeelCollectionVerificationInspector": [],
       "KeelCollectionVerificationRegistry": [
         "observe_token_uri",
         "record_approved",
@@ -476,13 +485,19 @@ export const KEEL_TEZOS_MODULES: readonly KeelTezosModule[] = [
         "keel_verification_protocol",
         "keel_verification_state"
       ],
+      "KeelCollectionVerificationInspector": [
+        "inspect"
+      ],
       "KeelCollectionVerificationRegistry": [
+        "adapter_identity",
         "approved_evidence_root",
         "inspect_current",
+        "inspection_witnesses",
         "last_receipt",
         "latest_receipt",
         "policy",
         "policy_id",
+        "portable_anchor",
         "presentation_content_digest",
         "receipt",
         "receipt_current"
@@ -573,10 +588,17 @@ export const KEEL_TEZOS_MODULES: readonly KeelTezosModule[] = [
     ],
     "deployable": [
       "KeelGraphRegistry",
+      "KeelLibraryAccessRegistry",
       "KeelLibraryRegistry",
       "KeelModuleReviewRegistry",
       "KeelPluginRegistry"
     ],
+    "splits": {
+      "KeelLibraryRegistry": [
+        "KeelLibraryRegistry",
+        "KeelLibraryAccessRegistry"
+      ]
+    },
     "entrypoints": {
       "KeelGraphRegistry": [
         "accept_publisher",
@@ -587,20 +609,22 @@ export const KEEL_TEZOS_MODULES: readonly KeelTezosModule[] = [
         "promote_minimum_tier",
         "publish_version"
       ],
-      "KeelLibraryRegistry": [
-        "accept_controller",
-        "activate_policy",
-        "begin_controller_transfer",
+      "KeelLibraryAccessRegistry": [
         "claim_allowlist_access",
-        "close_asset",
-        "freeze_asset",
-        "index_asset",
-        "promote_minimum_tier",
-        "publish_policy",
         "purchase_access",
         "resolve_access_request",
         "submit_access_request",
         "withdraw"
+      ],
+      "KeelLibraryRegistry": [
+        "accept_controller",
+        "activate_policy",
+        "begin_controller_transfer",
+        "close_asset",
+        "freeze_asset",
+        "index_asset",
+        "promote_minimum_tier",
+        "publish_policy"
       ],
       "KeelModuleReviewRegistry": [
         "deprecate_module",
@@ -633,12 +657,10 @@ export const KEEL_TEZOS_MODULES: readonly KeelTezosModule[] = [
         "predict_graph_id",
         "version_of"
       ],
-      "KeelLibraryRegistry": [
+      "KeelLibraryAccessRegistry": [
         "access_request",
-        "active_policy",
         "allowlist_claimed",
         "allowlist_leaf",
-        "asset",
         "credit_of",
         "entitlement",
         "grant_count",
@@ -647,10 +669,18 @@ export const KEEL_TEZOS_MODULES: readonly KeelTezosModule[] = [
         "has_access_at_policy",
         "has_access_with_proof",
         "has_access_with_proof_at_policy",
+        "total_credit_liability"
+      ],
+      "KeelLibraryRegistry": [
+        "active_policy",
+        "asset",
+        "asset_opt",
+        "check_asset",
+        "check_policy",
         "policy",
         "policy_commitment",
-        "predict_asset_id",
-        "total_credit_liability"
+        "policy_opt",
+        "predict_asset_id"
       ],
       "KeelModuleReviewRegistry": [
         "bindings_match",

@@ -54,6 +54,7 @@ export const TEST_FILES_ON_DISK = Object.freeze(readdirSync(TEST_ROOT)
 export const DETERMINISTIC_TEST_FILES = Object.freeze([
   "tests/signed-anchor.test.mjs",
   "tests/sdk-tezos-catalog.test.mjs",
+  "tests/sdk-tezos-split-registries.test.mjs",
   "tests/mcp-publication-references.test.mjs",
   "tests/sdk-manager-modules.test.mjs",
   "tests/sdk-ppmd-body-descriptors.test.mjs",
