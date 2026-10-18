@@ -527,6 +527,7 @@ export const KEEL_TEZOS_MODULES: readonly KeelTezosModule[] = [
         "campaign_state",
         "last_campaign_id",
         "last_content_object_id",
+        "may_advance_carrier_policy",
         "predict_artifact_id",
         "predict_campaign_id",
         "predict_content_object_id",
