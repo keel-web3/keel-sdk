@@ -13,6 +13,14 @@ import {
   type KeelTezosHoldResourceInput,
 } from "@keel/sdk/tezos-collection";
 import { prepareKeelTezosHarnessTreeAction } from "@keel/sdk/tezos-harness-tree";
+import { buildKeelTezosAccountExecute, prepareKeelTezosTokenBoundAccount } from "@keel/sdk/tezos-token-bound-account";
+import {
+  buildKeelTezosAutomationCapabilityAction,
+  buildKeelTezosAutomationExecution,
+  buildKeelTezosAutomationKeyActions,
+  buildKeelTezosAutomationPolicyAction,
+  keelTezosAutomationSigningPayload,
+} from "@keel/sdk/tezos-automation";
 import type { JsonSchema, ToolContext, ToolDefinition } from "./types.js";
 
 /**
@@ -265,6 +273,61 @@ export const TEZOS_COLLECTION_TOOL_DEFINITIONS: readonly ToolDefinition[] = [
       },
     },
     async (_context, value) => prepareKeelTezosHarnessTreeAction(input(value, "the Tezos harness tree tool") as never),
+  ),
+  tool(
+    "keel-tezos-automation-prepare",
+    "Prepare execution automation on KeelAccessController, EVM's executeAutomation. key, policy and grant return governance actions for a manager proposal: key switches a 30-day tz1/tz2/tz3 key on the controller and, when signatureAuthority is given, on KeelSignatureAuthority in one lambda; policy sets an Automation-tier (1) policy; grant names one exact (target, payload), since native targets take keel_manage(bytes). signing-payload returns the bytes the key signs for its current nonce (read it with the automation_key_state view); execute returns the relayer's transaction with the signature. KT1 signers are refused (no ERC-1271 on Tezos). Never signs or submits.",
+    {
+      type: "object", additionalProperties: false, required: ["network", "controller", "action"],
+      properties: {
+        network: NETWORK, controller: KT1,
+        action: {
+          type: "object", additionalProperties: false, required: ["kind"],
+          properties: {
+            kind: { type: "string", enum: ["key", "policy", "grant", "signing-payload", "execute"] },
+            signatureAuthority: KT1, publicKey: { type: "string", pattern: "^(?:edpk|sppk|p2pk)[1-9A-HJ-NP-Za-km-z]+$" },
+            signer: ADDRESS, enabled: { type: "boolean" }, validAfter: NATURAL, validUntil: NATURAL, maxAmount: NATURAL,
+            call: { type: "object", additionalProperties: false, required: ["target", "payload"], properties: { target: KT1, payload: { type: "string", pattern: "^0x(?:[0-9a-fA-F]{2})*$" }, amount: NATURAL } },
+            nonce: NATURAL, deadline: NATURAL, signature: { type: "string", pattern: "^(?:edsig|spsig1|p2sig|sig)[1-9A-HJ-NP-Za-km-z]+$" },
+          },
+        },
+      },
+    },
+    async (_context, value) => {
+      const { network, controller, action } = input(value, "the Tezos automation tool");
+      const { kind, ...rest } = action;
+      const plain = (result: unknown) => ({ schema: "keel.tezos-automation@1", family: "tezos", network, controller, kind, result, signing: "not-performed", submission: "not-performed" });
+      if (kind === "key") return plain(buildKeelTezosAutomationKeyActions({ controller, ...rest } as never));
+      if (kind === "policy") return plain(buildKeelTezosAutomationPolicyAction({ controller, ...rest } as never));
+      if (kind === "grant") return plain(buildKeelTezosAutomationCapabilityAction({ controller, ...rest } as never));
+      if (kind === "signing-payload") return plain(keelTezosAutomationSigningPayload({ network, controller, ...rest } as never));
+      return plain(buildKeelTezosAutomationExecution({ controller, ...rest } as never));
+    },
+  ),
+  tool(
+    "keel-tezos-token-bound-account-prepare",
+    "Prepare a native token-bound account call, the Tezos side of ERC-6551. create: the registry's create_account for (host FA2, token, salt), open to any sender, no tez, a repeat is a no-op; the address is read back from the registry's account view, since Tezos has no counterfactual address. execute: the host owner's execute lambda that sends tez and moves FA2 tokens the account holds, in the order given (ERC-6551 execute with operation 0; operations 1 to 3 return KEEL_CHAIN_CAPABILITY_UNSUPPORTED). Review-only.",
+    {
+      type: "object", additionalProperties: false, required: ["network", "action"],
+      properties: {
+        network: NETWORK,
+        action: {
+          type: "object", additionalProperties: false, required: ["kind"],
+          properties: {
+            kind: { type: "string", enum: ["create", "execute"] },
+            registry: KT1, tokenContract: KT1, tokenId: NATURAL, salt: { type: "string", pattern: "^0x(?:[0-9a-fA-F]{2}){0,32}$" },
+            account: KT1, attach: NATURAL, operation: { type: "integer", minimum: 0, maximum: 255 },
+            calls: { type: "array", minItems: 1, maxItems: 32, items: { type: "object", additionalProperties: false, required: ["kind", "to"],
+              properties: { kind: { type: "string", enum: ["value", "fa2"] }, to: ADDRESS, amount: NATURAL, fa2: KT1, tokenId: NATURAL } } },
+          },
+        },
+      },
+    },
+    async (_context, value) => {
+      const { network, action } = input(value, "the Tezos token-bound account tool");
+      if (action.kind === "create") return prepareKeelTezosTokenBoundAccount({ network, ...action } as never);
+      return { schema: "keel.tezos-token-bound-account@1", family: "tezos", network, ...buildKeelTezosAccountExecute(action as never) };
+    },
   ),
   tool(
     "keel-tezos-token-metadata-prepare",

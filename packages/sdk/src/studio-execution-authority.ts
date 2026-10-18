@@ -45,7 +45,7 @@ export const KEEL_EXECUTION_ROUTES = Object.freeze({
   },
   "manager-automation": {
     title: "Bounded manager automation",
-    rule: "KeelManager automation checks an active key, exact target/selector policy, validity window, value limits, key generation, signature and nonce. The relayer and automation signer are separate identities.",
+    rule: "Manager automation checks an active key, an exact Automation-tier policy (target/selector on EVM KeelManager, target/payload on the Tezos KeelAccessController), validity window, value limits, key generation, signature and nonce. The relayer and automation signer are separate identities.",
     delegated: "configuration-required" as const,
     reason: "Verify the deployed manager and its current key, policy and grant before preparing a typed request. Native-value limits do not bound ERC-20 or NFT transfers. No key setup, spending allowance or automation grant is performed here.",
     source,

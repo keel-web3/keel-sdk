@@ -388,6 +388,11 @@ function encodeMicheline(node: TezosMichelineValue): number[] {
   throw new TypeError("PACK of a primitive with more than two arguments is not supported here.");
 }
 
+/** Michelson `PACK` of Micheline already in PACK's optimized form (addresses, keys and chain IDs as bytes). */
+export function packKeelTezosMicheline(node: TezosMichelineValue): Uint8Array {
+  return Uint8Array.from([0x05, ...encodeMicheline(node)]);
+}
+
 /** Michelson `PACK` of a value of the declared (comparable) type: 0x05 followed by the binary Micheline. */
 export function packKeelTezosLiveKey(type: KeelTezosLiveType, value: KeelTezosLiveValue): Uint8Array {
   assertLiveType(type, 0, true, "key type");

@@ -279,6 +279,14 @@
       "types": "./dist/tezos-pause.d.ts",
       "import": "./dist/tezos-pause.js"
     },
+    "./tezos-automation": {
+      "types": "./dist/tezos-automation.d.ts",
+      "import": "./dist/tezos-automation.js"
+    },
+    "./tezos-token-bound-account": {
+      "types": "./dist/tezos-token-bound-account.d.ts",
+      "import": "./dist/tezos-token-bound-account.js"
+    },
     "./hold-events": {
       "types": "./dist/hold-events.d.ts",
       "import": "./dist/hold-events.js"

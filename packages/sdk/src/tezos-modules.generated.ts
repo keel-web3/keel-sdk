@@ -180,8 +180,11 @@ export const KEEL_TEZOS_MODULES: readonly KeelTezosModule[] = [
     },
     "entrypoints": {
       "KeelAccessController": [
+        "configure_automation_capability",
+        "configure_automation_key",
         "configure_policy",
         "configure_role",
+        "execute_automation",
         "execute_role",
         "finish_execution",
         "pause",
@@ -264,6 +267,9 @@ export const KEEL_TEZOS_MODULES: readonly KeelTezosModule[] = [
     },
     "views": {
       "KeelAccessController": [
+        "automation_capability",
+        "automation_key_state",
+        "automation_signing_payload",
         "capability_key_of",
         "role_security"
       ],
@@ -1226,10 +1232,13 @@ export const KEEL_TEZOS_MODULES: readonly KeelTezosModule[] = [
     "id": "keel-stake",
     "sources": "src/modules/keel-stake/tezos",
     "contracts": [
-      "keel_stake_object_manager.py"
+      "keel_stake_object_manager.py",
+      "keel_token_bound_account.py"
     ],
     "deployable": [
-      "KeelStakeObjectManager"
+      "KeelStakeObjectManager",
+      "KeelTokenBoundAccountRegistry",
+      "KeelTokenBoundAccount"
     ],
     "entrypoints": {
       "KeelStakeObjectManager": [
@@ -1242,6 +1251,13 @@ export const KEEL_TEZOS_MODULES: readonly KeelTezosModule[] = [
         "unstake",
         "verify_stake_escrow",
         "verify_unstake_delivery"
+      ],
+      "KeelTokenBoundAccount": [
+        "default",
+        "execute"
+      ],
+      "KeelTokenBoundAccountRegistry": [
+        "create_account"
       ]
     },
     "views": {
@@ -1256,6 +1272,15 @@ export const KEEL_TEZOS_MODULES: readonly KeelTezosModule[] = [
         "stake_object_frozen",
         "stake_object_runtime",
         "stake_object_state"
+      ],
+      "KeelTokenBoundAccount": [
+        "is_valid_signer",
+        "owner",
+        "state",
+        "token"
+      ],
+      "KeelTokenBoundAccountRegistry": [
+        "account"
       ]
     }
   }

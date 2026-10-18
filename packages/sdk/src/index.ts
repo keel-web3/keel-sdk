@@ -79,6 +79,8 @@ export * from "./treasury.js";
 
 export * from "./admin-pauses.js";
 export * from "./tezos-pause.js";
+export * from "./tezos-automation.js";
+export * from "./tezos-token-bound-account.js";
 
 export * from "./hold-events.js";
 

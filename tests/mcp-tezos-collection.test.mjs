@@ -161,6 +161,48 @@ test("MCP prepares harness tree calls on the piece that holds them", async (t) =
   assert.equal(refused.isError, true);
 });
 
+test("MCP prepares automation keys, grants, the signing payload and the relayer call", async (t) => {
+  const { call } = await fixture(t);
+  const controller = "KT1BNnzhtsMKUG7t72phZN8BG2W6TwPUQsYt";
+  const target = "KT1RJ6PbjHpwc3M5rw5s2Nbmefwbuwbdxton";
+  const signer = "tz1KqTpEZ7Yob7QbPE4Hy4Wo8fHG8LhKxZSx";
+  const managed = { target, payload: "0x05002a", amount: 2 };
+  const key = await call("keel-tezos-automation-prepare", { network, controller, action: { kind: "key", publicKey: "edpkuBknW28nW72KG6RoHtYW7p12T6GKc7nAbwYX5m8Wd9sDVC9yav", validUntil: 87400, enabled: true } });
+  assert.equal(key.isError, undefined, JSON.stringify(key));
+  assert.equal(key.structuredContent.result.signer, signer);
+  assert.equal(key.structuredContent.result.actions[0].operation.parameters.entrypoint, "configure_automation_key");
+  const grant = await call("keel-tezos-automation-prepare", { network, controller, action: { kind: "grant", signer, call: { target, payload: "0x05002a" }, validAfter: 1000, validUntil: 4600, maxAmount: 3, enabled: true } });
+  assert.equal(grant.structuredContent.result.operation.parameters.entrypoint, "configure_automation_capability");
+  const payload = await call("keel-tezos-automation-prepare", { network, controller, action: { kind: "signing-payload", signer, call: managed, nonce: 0, deadline: 1200 } });
+  assert.match(payload.structuredContent.result, /^0x05/u);
+  const execute = await call("keel-tezos-automation-prepare", { network, controller, action: { kind: "execute", signer, call: managed, deadline: 1200, signature: "edsigtaLvXR5xFtiGkKFegQXhWnxxsBYPCk4DJvYU8hb5xSdxQjppPgdtE77E6CXQrm9obabM7ycWNNVAq1r65RzKo7yMSD4yAz" } });
+  assert.equal(execute.structuredContent.result.operation.parameters.entrypoint, "execute_automation");
+  assert.equal(execute.structuredContent.signing, "not-performed");
+  const contractSigner = await call("keel-tezos-automation-prepare", { network, controller, action: { kind: "signing-payload", signer: target, call: managed, nonce: 0, deadline: 1200 } });
+  assert.equal(contractSigner.isError, true);
+});
+
+test("MCP prepares token-bound account creation and owner execution, refusing delegate calls", async (t) => {
+  const { call } = await fixture(t);
+  const accountRegistry = "KT1BNnzhtsMKUG7t72phZN8BG2W6TwPUQsYt";
+  const created = await call("keel-tezos-token-bound-account-prepare", { network, action: { kind: "create", registry: accountRegistry, tokenContract: collection, tokenId: 1, salt: "0x01" } });
+  assert.equal(created.isError, undefined, JSON.stringify(created));
+  assert.equal(created.structuredContent.operation.destination, accountRegistry);
+  assert.equal(created.structuredContent.operation.parameters.entrypoint, "create_account");
+  assert.equal(created.structuredContent.readBack.view, "account");
+  assert.equal(created.structuredContent.signing, "not-performed");
+  const account = "KT1RJ6PbjHpwc3M5rw5s2Nbmefwbuwbdxton";
+  const executed = await call("keel-tezos-token-bound-account-prepare", { network, action: { kind: "execute", account, calls: [{ kind: "value", to: collector, amount: 5 }, { kind: "fa2", fa2: collection, tokenId: 2, to: collector }] } });
+  assert.equal(executed.isError, undefined, JSON.stringify(executed));
+  assert.equal(executed.structuredContent.operation.destination, account);
+  assert.equal(executed.structuredContent.operation.parameters.entrypoint, "execute");
+  assert.equal(executed.structuredContent.authorization, "host-owner");
+  const delegated = await call("keel-tezos-token-bound-account-prepare", { network, action: { kind: "execute", account, operation: 1, calls: [{ kind: "value", to: collector, amount: 5 }] } });
+  assert.equal(delegated.isError, true);
+  assert.equal(delegated.structuredContent.code, "KEEL_CHAIN_CAPABILITY_UNSUPPORTED");
+  assert.equal(delegated.structuredContent.capability, "stake.token-bound-account.delegate-call");
+});
+
 test("MCP prepares seeded-collection calls and returns the typed refusal for EVM-only seed modes", async (t) => {
   const { call } = await fixture(t);
   const configure = await call("keel-tezos-seed-action-prepare", { network, sender: creator, collection, action: { kind: "configure", profile: { reveal: "immediate", mode: "derived" } } });
