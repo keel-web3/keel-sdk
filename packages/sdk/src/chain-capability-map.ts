@@ -502,9 +502,9 @@ export const KEEL_CHAIN_CAPABILITIES: readonly KeelChainCapability[] = Object.fr
     studioCall: "Stake into an object",
     status: "partial",
     evm: evm(["KeelStakeObjectManager"], "Escrow staking against host NFTs, lockups, freeze, STAKING pause."),
-    tezos: tez(["KeelStakeObjectManager"], "Escrow staking with verified delivery, lockups and freeze."),
+    tezos: tez(["KeelStakeObjectManager"], "Escrow staking with verified delivery, lockups, freeze and the shared STAKING pause."),
     userVisibleDifference: false,
-    open: "Shared manager pause and per-object staked collections.",
+    open: "Per-object staked collections.",
   },
   {
     id: "stake.token-bound-account",
@@ -544,9 +544,9 @@ export const KEEL_CHAIN_CAPABILITIES: readonly KeelChainCapability[] = Object.fr
     studioCall: "Emergency pause",
     status: "partial",
     evm: evm(["KeelManager", "KeelLocalPause"], "Shared pause bits checked by every module."),
-    tezos: tez(["KeelAccessController", "KeelSignatureAuthority", "KeelMintGate", "KeelCrossChainMintAttestor"], "Per-contract pause."),
+    tezos: tez(["KeelManager", "KeelAccessController"], "EVM's bits, masks and revision in KeelManager; admins stop through the access controller and governance resumes. Artifact publication, harness writes and staking check it."),
     userVisibleDifference: false,
-    open: "A shared native pause domain.",
+    open: "Hold, market, mint, collection, treasury and IP modules still use their per-contract pauses.",
   },
   {
     id: "authority.access-groups",

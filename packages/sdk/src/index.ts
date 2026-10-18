@@ -78,6 +78,7 @@ export * from "./hold-publication.js";
 export * from "./treasury.js";
 
 export * from "./admin-pauses.js";
+export * from "./tezos-pause.js";
 
 export * from "./hold-events.js";
 

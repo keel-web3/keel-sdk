@@ -185,6 +185,7 @@ export const KEEL_TEZOS_MODULES: readonly KeelTezosModule[] = [
         "execute_role",
         "finish_execution",
         "pause",
+        "pause_systems",
         "unpause"
       ],
       "KeelArtifactRegistry": [
@@ -241,7 +242,9 @@ export const KEEL_TEZOS_MODULES: readonly KeelTezosModule[] = [
         "expire_governor_reconfiguration",
         "finish_governance_execution",
         "freeze_module",
+        "pause_systems",
         "propose",
+        "resume_systems",
         "schedule_governor_change"
       ],
       "KeelSeedRegistry": [
@@ -341,9 +344,11 @@ export const KEEL_TEZOS_MODULES: readonly KeelTezosModule[] = [
         "banner",
         "governance_threshold",
         "module",
+        "require_systems_active",
         "resolve_module",
         "rpc_host_count",
-        "rpc_host_list"
+        "rpc_host_list",
+        "system_pause_state"
       ],
       "KeelSeedRegistry": [
         "compute_seed_set_commitment",
