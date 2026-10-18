@@ -253,6 +253,7 @@ export const KEEL_TEZOS_MODULES: readonly KeelTezosModule[] = [
         "pause",
         "pause_systems",
         "propose",
+        "propose_with_value",
         "recover_governors",
         "resume_systems",
         "schedule_governor_change",

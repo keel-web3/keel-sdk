@@ -232,6 +232,26 @@ test("MCP prepares manager pause and cold recovery, refusing the EVM-only upgrad
   assert.equal(contractKey.isError, true);
 });
 
+test("MCP prepares a valued governance action whose executing approval alone attaches the value", async (t) => {
+  const { call } = await fixture(t);
+  const manager = "KT1RJ6PbjHpwc3M5rw5s2Nbmefwbuwbdxton";
+  const sink = "KT1BNnzhtsMKUG7t72phZN8BG2W6TwPUQsYt";
+  const calls = [21, 22].map((tag, index) => ({ destination: sink, entrypoint: "receive_value", parameterType: { prim: "nat" }, value: { int: String(tag) }, amount: index + 2 }));
+  const first = await call("keel-tezos-governance-prepare", { network, manager, calls, deadline: 2000, governorCount: 4 });
+  assert.equal(first.isError, undefined, JSON.stringify(first));
+  assert.equal(first.structuredContent.value, "5");
+  assert.equal(first.structuredContent.threshold, 3);
+  assert.equal(first.structuredContent.proposal.parameters.entrypoint, "propose_with_value");
+  assert.match(first.structuredContent.approvals, /next_proposal_id/u);
+  assert.equal(first.structuredContent.errors.KEEL_INCORRECT_VALUE, "IncorrectValue");
+  assert.equal(first.structuredContent.signing, "not-performed");
+  const second = await call("keel-tezos-governance-prepare", { network, manager, calls, deadline: 2000, governorCount: 4, proposalId: 0 });
+  assert.deepEqual(second.structuredContent.approvals.map((a) => [a.executes, a.operation.amount]), [[false, "0"], [true, "5"]]);
+  const overflow = await call("keel-tezos-governance-prepare", { network, manager, deadline: 2000, governorCount: 4,
+    calls: [{ ...calls[0], amount: "9223372036854775808" }] });
+  assert.equal(overflow.isError, true);
+});
+
 test("MCP prepares seeded-collection calls and returns the typed refusal for EVM-only seed modes", async (t) => {
   const { call } = await fixture(t);
   const configure = await call("keel-tezos-seed-action-prepare", { network, sender: creator, collection, action: { kind: "configure", profile: { reveal: "immediate", mode: "derived" } } });

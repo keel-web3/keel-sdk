@@ -291,6 +291,10 @@
       "types": "./dist/tezos-recovery.d.ts",
       "import": "./dist/tezos-recovery.js"
     },
+    "./tezos-governance": {
+      "types": "./dist/tezos-governance.d.ts",
+      "import": "./dist/tezos-governance.js"
+    },
     "./hold-events": {
       "types": "./dist/hold-events.d.ts",
       "import": "./dist/hold-events.js"

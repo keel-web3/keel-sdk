@@ -38,6 +38,7 @@ import {
   keelTezosRecoveryDigest,
   keelTezosRecoveryGroupId,
 } from "@keel/sdk/tezos-recovery";
+import { buildKeelTezosGovernanceApprovals, buildKeelTezosGovernanceProposal, keelTezosGovernanceThreshold, KEEL_TEZOS_GOVERNANCE_ERRORS } from "@keel/sdk/tezos-governance";
 import type { JsonSchema, ToolContext, ToolDefinition } from "./types.js";
 
 /**
@@ -395,6 +396,36 @@ export const TEZOS_COLLECTION_TOOL_DEFINITIONS: readonly ToolDefinition[] = [
       const payload = keelTezosRecoveryActionPayload({ network, registry: rest.registry, groupId: rest.groupId, resource: rest.resource ?? rest.manager,
         scope: rest.scope ?? KEEL_TEZOS_MANAGER_RECOVERY_SCOPE, actionHash, nonce: rest.nonce ?? 0, revision: rest.revision ?? 0, deadline: rest.deadline });
       return prepared({ actionHash, payload, digest: keelTezosRecoveryDigest(payload) });
+    },
+  ),
+  tool(
+    "keel-tezos-governance-prepare",
+    "Prepare a Tezos KeelManager governance action, EVM executeGovernance(Call(target, value, data)). Give the calls in order (destination, entrypoint, Micheline parameterType and value, mutez amount); the tool writes the governance lambda that makes exactly those calls and forwards exactly their total value, the propose (zero value) or propose_with_value operation, and the later governors' approvals. Only the approval that reaches the two-thirds threshold executes the action and attaches the value; a wrong amount fails KEEL_INCORRECT_VALUE (EVM IncorrectValue). Counters EVM stores as uint64 fail KEEL_COUNTER_OVERFLOW (EVM Panic(0x11)). Never signs or submits.",
+    {
+      type: "object", additionalProperties: false, required: ["network", "manager", "calls", "deadline", "governorCount"],
+      properties: {
+        network: NETWORK, manager: KT1, deadline: NATURAL, proposalId: NATURAL,
+        governorCount: { type: "integer", minimum: 3, maximum: 32 },
+        calls: {
+          type: "array", minItems: 1, maxItems: 32,
+          items: {
+            type: "object", additionalProperties: false, required: ["destination", "parameterType", "value"],
+            properties: { destination: ADDRESS, entrypoint: { type: "string", pattern: "^[A-Za-z0-9_]{1,31}$" }, parameterType: {}, value: {}, amount: NATURAL },
+          },
+        },
+      },
+    },
+    async (_context, value) => {
+      const args = input(value, "the Tezos governance tool");
+      const proposal = buildKeelTezosGovernanceProposal({ manager: args.manager, calls: args.calls, deadline: args.deadline });
+      const approvals = args.proposalId === undefined ? undefined
+        : buildKeelTezosGovernanceApprovals({ manager: args.manager, proposalId: args.proposalId, value: proposal.value, governorCount: args.governorCount });
+      return {
+        schema: "keel.tezos-governance@1", family: "tezos", network: args.network,
+        threshold: keelTezosGovernanceThreshold(args.governorCount), value: proposal.value.toString(), lambda: proposal.lambda, proposal: proposal.operation,
+        ...(approvals === undefined ? { approvals: "Read next_proposal_id from the manager's storage before proposing (it becomes this proposal's id), then call again with proposalId." } : { approvals }),
+        errors: KEEL_TEZOS_GOVERNANCE_ERRORS, signing: "not-performed", submission: "not-performed",
+      };
     },
   ),
   tool(
