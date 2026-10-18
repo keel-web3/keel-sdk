@@ -365,7 +365,7 @@ export const KEEL_CHAIN_CAPABILITIES: readonly KeelChainCapability[] = Object.fr
     studioCall: "Compose a harness or token fork",
     status: "parity",
     evm: evm(["KeelHarnessRegistry"], "Exact-version harness trees and token forks."),
-    tezos: tez(["KeelHarnessRegistry"], "Flat harnesses and token forks; tree capabilities open."),
+    tezos: tez(["KeelHarnessRegistry"], "Flat harnesses and token forks under EVM's edit and fork policy codes; tree capabilities open."),
     userVisibleDifference: false,
     open: "Native harness trees.",
   },
