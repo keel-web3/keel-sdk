@@ -574,10 +574,10 @@ export const KEEL_CHAIN_CAPABILITIES: readonly KeelChainCapability[] = Object.fr
     evm: evm(["KeelGraphRegistry", "KeelLibraryRegistry", "KeelPluginRegistry", "KeelModuleReviewRegistry"], "Manifests, libraries and reviews. Only purchaseAccess takes payment. A token gate probes balanceOf(address), and a failed probe counts as zero."),
     tezos: tez(
       ["KeelGraphRegistry", "KeelLibraryRegistry", "KeelPluginRegistry", "KeelModuleReviewRegistry"],
-      "Manifests, libraries and reviews. Only purchase_access takes tez. A token gate reads a get_balance(address) -> nat view, and a missing view counts as zero. The proof views check ordinary access first, as on EVM.",
+      "Manifests, libraries and reviews. Only purchase_access takes tez. A token gate names an FA2 token ID and reads the TZIP-12 get_balance(owner, token_id) -> nat view; publication refuses a token whose view does not answer, and a later missing view counts as zero. The proof views check ordinary access first, as on EVM.",
     ),
-    userVisibleDifference: "A Tezos token gate needs a contract with a get_balance(address) -> nat view. A standard FA2 get_balance takes (owner, token_id), so it reads as zero.",
-    open: "KeelLibraryRegistry compiles above the 32,768-byte operation limit (51,062 binary Micheline bytes), so it cannot be originated until it is split. An FA2 token gate also needs a token ID in the policy.",
+    userVisibleDifference: "A Tezos token gate names one FA2 token ID, because FA2 balances are per token; an EVM gate reads balanceOf(account) across the contract. A gate token without the FA2 view is refused at publication (GATE_TOKEN_VIEW).",
+    open: "KeelLibraryRegistry compiles above the 32,768-byte operation limit (51,686 binary Micheline bytes), so it cannot be originated until it is split.",
   },
   // ── Anchors and proofs ───────────────────────────────────────────────────
   {
