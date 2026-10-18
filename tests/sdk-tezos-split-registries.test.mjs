@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { isKeelTezosSplit, keelTezosPiecesOf, resolveKeelTezosCall } from '../packages/sdk/dist/index.js';
+import { isKeelTezosSplit, keelTezosPiecesOf, keelTezosSplitBindings, resolveKeelTezosCall } from '../packages/sdk/dist/index.js';
 
 // Every call each contract had on Tezos before it was split, from the catalogue
 // generated at that time. Studio keeps making these calls by name.
@@ -18,6 +18,15 @@ const BEFORE_SPLIT = {
       'register_collection_identity', 'register_portable_anchor', 'revoke', 'seal_observation', 'set_policy'],
     views: ['approved_evidence_root', 'inspect_current', 'last_receipt', 'latest_receipt', 'policy', 'policy_id',
       'presentation_content_digest', 'receipt', 'receipt_current'],
+  },
+  KeelCommunityReplicationRegistry: {
+    entrypoints: ['bind_object_revision', 'claim_carrier', 'claim_slugs', 'create_campaign', 'enable_external_carriers',
+      'finalize_evm_carrier', 'record_artifact_revision', 'release_carrier_claim', 'release_slug_claim', 'replace_campaign',
+      'review_carrier_proof', 'set_artifact_editor', 'set_artifact_frozen', 'set_campaign_enabled', 'submit_carrier_proof',
+      'submit_slug', 'submit_slugs', 'validate_revision_append'],
+    views: ['campaign_carrier_status', 'campaign_contributor_stats', 'campaign_current', 'campaign_state', 'carrier_proof',
+      'carrier_task', 'global_contributor_stats', 'last_campaign_id', 'last_content_object_id', 'predict_artifact_id',
+      'predict_campaign_id', 'predict_carrier_proof_digest', 'predict_content_object_id', 'required_carrier_mask', 'slug_task'],
   },
 };
 
@@ -53,6 +62,24 @@ test('the verification registry keeps every call; the inspector is originated fi
   for (const name of [...BEFORE_SPLIT.KeelCollectionVerificationRegistry.entrypoints, ...BEFORE_SPLIT.KeelCollectionVerificationRegistry.views]) {
     assert.equal(resolveKeelTezosCall('KeelCollectionVerificationRegistry', name).contract, 'KeelCollectionVerificationRegistry', name);
   }
+});
+
+test('the replication split puts contributor work on the work registry, bound once after origination', () => {
+  assert.deepEqual(keelTezosPiecesOf('KeelCommunityReplicationRegistry'),
+    ['KeelCommunityReplicationRegistry', 'KeelReplicationWorkRegistry']);
+  const work = ['claim_slugs', 'release_slug_claim', 'submit_slug', 'submit_slugs', 'claim_carrier', 'release_carrier_claim',
+    'submit_carrier_proof', 'review_carrier_proof', 'slug_task', 'carrier_task', 'carrier_proof', 'global_contributor_stats',
+    'campaign_contributor_stats', 'campaign_carrier_status', 'predict_carrier_proof_digest'];
+  const { entrypoints, views } = BEFORE_SPLIT.KeelCommunityReplicationRegistry;
+  for (const name of [...entrypoints, ...views]) {
+    const expected = work.includes(name) ? 'KeelReplicationWorkRegistry' : 'KeelCommunityReplicationRegistry';
+    assert.equal(resolveKeelTezosCall('KeelCommunityReplicationRegistry', name).contract, expected, name);
+  }
+  assert.deepEqual(keelTezosSplitBindings('KeelCommunityReplicationRegistry'),
+    [{ on: 'KeelCommunityReplicationRegistry', entrypoint: 'bind_work', argument: 'KeelReplicationWorkRegistry' }]);
+  assert.deepEqual(keelTezosSplitBindings('KeelLibraryRegistry'), []);
+  assert.deepEqual(keelTezosSplitBindings('KeelGraphRegistry'), []);
+  assert.throws(() => keelTezosSplitBindings('KeelNoSuchRegistry'), /not a catalogued Tezos KEEL deployable/u);
 });
 
 test('an unsplit contract is its own single piece, and unknown calls fail closed', () => {

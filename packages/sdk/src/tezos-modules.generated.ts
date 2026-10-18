@@ -3,7 +3,8 @@
 // Shared declarations are inherited source components, not origination targets.
 // Entrypoints and views include methods inherited from shared source components.
 // Splits name the pieces, in origination order, that together implement one EVM contract.
-export interface KeelTezosModule { readonly id: string; readonly sources: string; readonly contracts: readonly string[]; readonly deployable: readonly string[]; readonly shared?: readonly string[]; readonly splits?: Readonly<Record<string, readonly string[]>>; readonly entrypoints: Readonly<Record<string, readonly string[]>>; readonly views: Readonly<Record<string, readonly string[]>>; }
+// Bindings are one-time calls, after every piece is originated, that wire one piece to another.
+export interface KeelTezosModule { readonly id: string; readonly sources: string; readonly contracts: readonly string[]; readonly deployable: readonly string[]; readonly shared?: readonly string[]; readonly splits?: Readonly<Record<string, readonly string[]>>; readonly bindings?: Readonly<Record<string, readonly { readonly on: string; readonly entrypoint: string; readonly argument: string }[]>>; readonly entrypoints: Readonly<Record<string, readonly string[]>>; readonly views: Readonly<Record<string, readonly string[]>>; }
 export const KEEL_TEZOS_MODULES: readonly KeelTezosModule[] = [
   {
     "id": "keel-anchors",
@@ -424,12 +425,26 @@ export const KEEL_TEZOS_MODULES: readonly KeelTezosModule[] = [
       "KeelCollectionVerificationHookBase",
       "KeelCollectionVerificationInspector",
       "KeelCollectionVerificationRegistry",
-      "KeelCommunityReplicationRegistry"
+      "KeelCommunityReplicationRegistry",
+      "KeelReplicationWorkRegistry"
     ],
     "splits": {
       "KeelCollectionVerificationRegistry": [
         "KeelCollectionVerificationInspector",
         "KeelCollectionVerificationRegistry"
+      ],
+      "KeelCommunityReplicationRegistry": [
+        "KeelCommunityReplicationRegistry",
+        "KeelReplicationWorkRegistry"
+      ]
+    },
+    "bindings": {
+      "KeelCommunityReplicationRegistry": [
+        {
+          "on": "KeelCommunityReplicationRegistry",
+          "entrypoint": "bind_work",
+          "argument": "KeelReplicationWorkRegistry"
+        }
       ]
     },
     "entrypoints": {
@@ -455,23 +470,27 @@ export const KEEL_TEZOS_MODULES: readonly KeelTezosModule[] = [
       ],
       "KeelCommunityReplicationRegistry": [
         "bind_object_revision",
-        "claim_carrier",
-        "claim_slugs",
+        "bind_work",
         "create_campaign",
         "enable_external_carriers",
         "finalize_evm_carrier",
         "record_artifact_revision",
-        "release_carrier_claim",
-        "release_slug_claim",
         "replace_campaign",
-        "review_carrier_proof",
         "set_artifact_editor",
         "set_artifact_frozen",
         "set_campaign_enabled",
+        "validate_revision_append"
+      ],
+      "KeelReplicationWorkRegistry": [
+        "claim_carrier",
+        "claim_slugs",
+        "open_campaign_work",
+        "release_carrier_claim",
+        "release_slug_claim",
+        "review_carrier_proof",
         "submit_carrier_proof",
         "submit_slug",
-        "submit_slugs",
-        "validate_revision_append"
+        "submit_slugs"
       ]
     },
     "views": {
@@ -503,20 +522,29 @@ export const KEEL_TEZOS_MODULES: readonly KeelTezosModule[] = [
         "receipt_current"
       ],
       "KeelCommunityReplicationRegistry": [
-        "campaign_carrier_status",
-        "campaign_contributor_stats",
+        "active_campaign",
         "campaign_current",
         "campaign_state",
-        "carrier_proof",
-        "carrier_task",
-        "global_contributor_stats",
         "last_campaign_id",
         "last_content_object_id",
         "predict_artifact_id",
         "predict_campaign_id",
-        "predict_carrier_proof_digest",
         "predict_content_object_id",
+        "proof_verifier",
         "required_carrier_mask",
+        "work_registry"
+      ],
+      "KeelReplicationWorkRegistry": [
+        "accepted_carrier_mask",
+        "campaign_carrier_status",
+        "campaign_contributor_stats",
+        "carrier_proof",
+        "carrier_task",
+        "completed_slugs",
+        "global_contributor_stats",
+        "object_required_carrier_mask",
+        "predict_carrier_proof_digest",
+        "replication_registry",
         "slug_task"
       ]
     }

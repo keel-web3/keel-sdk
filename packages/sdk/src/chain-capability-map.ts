@@ -560,11 +560,11 @@ export const KEEL_CHAIN_CAPABILITIES: readonly KeelChainCapability[] = Object.fr
     status: "partial",
     evm: evm(["KeelCollectionVerificationRegistry", "KeelCollectionAttestationRegistry", "KeelCommunityReplicationRegistry"], "Receipts read the collection's hook or audited adapter; anyone seals the observation with the block hash, checked by blockhash(). Replication revisions live in KeelArtifactRegistry."),
     tezos: tez(
-      ["KeelCollectionVerificationRegistry", "KeelCollectionVerificationInspector", "KeelCollectionAttestationRegistry", "KeelCommunityReplicationRegistry"],
-      "Receipts read the hook's keel_verification_state view or the adapter's inspect view, through a stateless inspector the registry pins at origination; every registry call stays on the registry. Only an auditor seals the observation. Replication revisions are kept locally under the same rules: a creator-bound first revision, then in-order appends by editors until frozen.",
+      ["KeelCollectionVerificationRegistry", "KeelCollectionVerificationInspector", "KeelCollectionAttestationRegistry", "KeelCommunityReplicationRegistry", "KeelReplicationWorkRegistry"],
+      "Receipts read the hook's keel_verification_state view or the adapter's inspect view, through a stateless inspector the registry pins at origination; every registry call stays on the registry. Only an auditor seals the observation. Replication is two contracts: campaigns, lineages and admission, and contributor work (slugs, carriers, stats), bound once by the deployer (keelTezosSplitBindings); resolveKeelTezosCall routes each call. Replication revisions are kept locally under the same rules: a creator-bound first revision, then in-order appends by editors until frozen.",
     ),
     userVisibleDifference: "On Tezos an auditor seals each observation, because Michelson cannot read a past block hash; on EVM anyone can.",
-    open: "KeelCommunityReplicationRegistry compiles above the 32,768-byte operation limit (45,763 binary Micheline bytes), so it cannot be originated until it is split. The verification registry is split and originates at 27,946 forged bytes in the Octez mockup.",
+    open: "Two replication campaign rules differ from EVM. A campaign is current by whether its target revision exists on EVM, but by whether the object has any revision on Tezos, so a Tezos campaign for the next revision is stale at once. Admission is blocked by an enabled prior campaign that is current on EVM, but by any enabled prior campaign that still holds the revision on Tezos. All three registries now originate in the Octez mockup.",
   },
   {
     id: "identity.graph",

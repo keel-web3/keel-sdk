@@ -7,6 +7,10 @@
  * calling the EVM contract's calls by name; this module says which Tezos piece
  * holds each one, and in what order the pieces are originated.
  *
+ * Some pieces cannot take each other's address at origination. A binding is
+ * the one-time call, made by the deployer once every piece is originated, that
+ * wires them; until it is made, calls that need the other piece fail closed.
+ *
  * The table is the generated catalogue, not a hand-kept list: every entrypoint
  * and view of a split lives on exactly one piece, which the catalogue generator
  * checks. Nothing here signs, submits or reads a chain.
@@ -21,6 +25,14 @@ export interface KeelTezosCallTarget {
   readonly name: string;
 }
 
+export interface KeelTezosSplitBinding {
+  /** The piece that receives the call. */
+  readonly on: string;
+  readonly entrypoint: string;
+  /** The piece whose address is the call's argument. */
+  readonly argument: string;
+}
+
 interface Surface {
   readonly entrypoints: ReadonlySet<string>;
   readonly views: ReadonlySet<string>;
@@ -28,6 +40,7 @@ interface Surface {
 
 const SURFACES = new Map<string, Surface>();
 const SPLITS = new Map<string, readonly string[]>();
+const BINDINGS = new Map<string, readonly KeelTezosSplitBinding[]>();
 for (const module of KEEL_TEZOS_MODULES) {
   for (const contract of module.deployable) {
     SURFACES.set(contract, {
@@ -36,6 +49,9 @@ for (const module of KEEL_TEZOS_MODULES) {
     });
   }
   for (const [contract, pieces] of Object.entries(module.splits ?? {})) SPLITS.set(contract, Object.freeze([...pieces]));
+  for (const [contract, steps] of Object.entries(module.bindings ?? {})) {
+    BINDINGS.set(contract, Object.freeze(steps.map((step) => Object.freeze({ ...step }))));
+  }
 }
 
 /**
@@ -48,6 +64,15 @@ export function keelTezosPiecesOf(contract: string): readonly string[] {
   if (pieces !== undefined) return pieces;
   if (SURFACES.has(contract)) return Object.freeze([contract]);
   throw new Error(`${contract} is not a catalogued Tezos KEEL deployable.`);
+}
+
+/**
+ * The one-time calls that wire a split's pieces after every piece is
+ * originated, in order. Empty when the pieces need no wiring.
+ */
+export function keelTezosSplitBindings(contract: string): readonly KeelTezosSplitBinding[] {
+  keelTezosPiecesOf(contract);
+  return BINDINGS.get(contract) ?? Object.freeze([]);
 }
 
 /** True when Tezos implements this KEEL contract as more than one contract. */
