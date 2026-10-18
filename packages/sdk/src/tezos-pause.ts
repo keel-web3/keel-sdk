@@ -69,7 +69,7 @@ export function decodeKeelTezosPauseState(value: TezosMichelineValue) {
     allMintsPaused: (flags & keelPausePresets.allMints) === keelPausePresets.allMints };
 }
 
-const { chunking, viewers, mintIP, publication, market, staking } = keelPauseBits;
+const { chunking, viewers, mint721, mintAdmin, mintCampaign, mintOne, mintCrossChain, mintIP, publication, market, staking } = keelPauseBits;
 
 /**
  * The shared pause bits each native write checks first, keyed `Contract.entrypoint`.
@@ -77,9 +77,12 @@ const { chunking, viewers, mintIP, publication, market, staking } = keelPauseBit
  * listed (cancels, reclaims, withdrawals, reads) are never stopped, as on EVM.
  * Each contract asks its own authority: KeelArtifactRegistry its manager, the
  * harness registries their artifact registry's manager, the holds, the stake
- * manager and the IP executor their fixed administrator, and the market the
- * pause authority fixed at origination. An implicit-account authority means
- * the contract is not stopped, as a codeless authority on EVM.
+ * manager and the IP executor their fixed administrator, and the market,
+ * collections, mint gate, OneMint and cross-chain attestor the pause authority
+ * fixed at origination. An implicit-account authority means the contract is not
+ * stopped, as a codeless authority on EVM. OneMint checks MINT_ONE as soon as a
+ * mint is decoded (EVM's batch checkout does too; its single-drop paths check at
+ * delivery), so the same stopped bit refuses the same mints on both chains.
  */
 export const KEEL_TEZOS_PAUSE_GATES: Readonly<Record<string, bigint>> = Object.freeze({
   "KeelArtifactRegistry.forge_artifact": publication,
@@ -111,7 +114,39 @@ export const KEEL_TEZOS_PAUSE_GATES: Readonly<Record<string, bigint>> = Object.f
   "KeelMarket.accept_bid": market,
   "KeelIPActionExecutor.execute_remint": mintIP,
   "KeelIPActionExecutor.execute_mint_to_backpack": mintIP,
+  "KeelCollectionFA2.strike": mint721,
+  "KeelCollectionFA2.strike_unreserved": mint721,
+  "KeelCollectionFA2.set_default_presentation": viewers,
+  "KeelCollectionFA2.set_token_metadata": viewers,
+  "KeelCollectionFA2.set_token_json": viewers,
+  "KeelCollectionFA2.set_contract_metadata": viewers,
+  "KeelCollectionFA2.set_keel_index": viewers,
+  "KeelSeededCollectionFA2.strike": mint721,
+  "KeelSeededCollectionFA2.strike_unreserved": mint721,
+  "KeelSeededCollectionFA2.strike_with_data": mint721,
+  "KeelSeededCollectionFA2.set_default_presentation": viewers,
+  "KeelSeededCollectionFA2.set_token_metadata": viewers,
+  "KeelSeededCollectionFA2.set_token_json": viewers,
+  "KeelSeededCollectionFA2.set_contract_metadata": viewers,
+  "KeelSeededCollectionFA2.set_keel_index": viewers,
+  "KeelMintGate.mint": mintCampaign,
+  "OneMintController.public_mint": mintOne,
+  "OneMintController.allowlist_mint": mintOne,
+  "OneMintController.merkle_mint": mintOne,
+  "OneMintController.claim_mint": mintOne,
+  "OneMintController.admin_strike": mintAdmin | mintOne,
+  "KeelCrossChainMintAttestor.submit_cross_mint": mintCrossChain,
 });
+
+/**
+ * Bits the Tezos manager stores, as EVM's does, that no native contract checks:
+ * MINT_1155 (no multi-edition collection), MINT_AUCTION (no auction issuer),
+ * COLLECTIONS (no creator factory; creators originate collections directly) and
+ * TREASURY (no pooled treasury; contracts pay their recipients at once). Studio
+ * shows them in the state and says that, on Tezos, they stop nothing.
+ */
+export const KEEL_TEZOS_PAUSE_UNGATED_BITS: bigint =
+  keelPauseBits.mint1155 | keelPauseBits.mintAuction | keelPauseBits.collections | keelPauseBits.treasury;
 
 /** The pause bits a native call checks first, or 0n when no shared stop applies to it. */
 export function keelTezosPauseGate(contract: string, entrypoint: string): bigint {

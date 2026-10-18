@@ -492,9 +492,14 @@ export function keelTezosRoyaltyTokenMetadata(value: KeelTezosRoyalty): { readon
   return { decimals: 4, shares: { [config.receiver]: config.bps } };
 }
 
-export function buildKeelTezosCollectionFA2Storage(input: { readonly administrator: string; readonly keelIndex: string; readonly maxSupply: number | string | bigint; readonly contractMetadataJson?: string; readonly holderMetadataEditing?: boolean; readonly defaultRoyalty?: KeelTezosRoyalty }): TezosMichelineValue {
+/**
+ * KeelCollectionFA2 storage. `pauseAuthority` is EVM KEEL721's `_pauseAuthority`, fixed at
+ * origination: the KEEL manager for a Studio collection, or the administrator by default.
+ */
+export function buildKeelTezosCollectionFA2Storage(input: { readonly administrator: string; readonly keelIndex: string; readonly maxSupply: number | string | bigint; readonly contractMetadataJson?: string; readonly holderMetadataEditing?: boolean; readonly defaultRoyalty?: KeelTezosRoyalty; readonly pauseAuthority?: string }): TezosMichelineValue {
   const administrator = assertAddress(input.administrator, "administrator");
   if (administrator === KEEL_TEZOS_BURN_ADDRESS) throw new TypeError("administrator cannot be the burn address.");
+  const pauseAuthority = input.pauseAuthority === undefined ? administrator : assertAddress(input.pauseAuthority, "pauseAuthority");
   const keelIndex = assertAddress(input.keelIndex, "keelIndex");
   const maxSupply = natural(input.maxSupply, "maxSupply", { positive: true });
   if (input.holderMetadataEditing !== undefined && typeof input.holderMetadataEditing !== "boolean") throw new TypeError("holderMetadataEditing must be a boolean.");
@@ -513,6 +518,7 @@ export function buildKeelTezosCollectionFA2Storage(input: { readonly administrat
     mInt(1), // next_token_id
     EMPTY, // operators
     EMPTY, // owner_balances
+    mString(pauseAuthority), // pause_authority
     mBool(false), // presentation_frozen
     EMPTY, // reserved_capacity
     EMPTY, // token_jsons
@@ -605,20 +611,20 @@ export function buildKeelTezosSeededCollectionFA2Storage(input: Parameters<typeo
   let node = buildKeelTezosCollectionFA2Storage(input) as { prim?: string; args?: TezosMichelineValue[] };
   while (node.prim === "Pair" && node.args !== undefined) { base.push(node.args[0] as TezosMichelineValue); node = node.args[1] as typeof node; }
   base.push(node as TezosMichelineValue);
-  if (base.length !== 21) throw new Error("Unexpected KeelCollectionFA2 storage shape.");
+  if (base.length !== 22) throw new Error("Unexpected KeelCollectionFA2 storage shape.");
   // Alphabetical: ... reserved_capacity, seed_*, token_jsons ... token_owners, token_seed_batch, total_reserved_capacity.
   const unset: KeelTezosEntropyProfile = { useVrf: false, lockUntilReveal: false, futureBlockDelay: "0", sourceGas: "0", source: null, transferStorage: 0, mode: 0 };
   return mPair([
-    ...base.slice(0, 15),
+    ...base.slice(0, 16),
     mInt(0), // seed_batch_count
     EMPTY, // seed_batches
     EMPTY, // seed_cache
     mBool(false), // seed_configured
     EMPTY, // seed_draws
     entropyProfileValue(unset), // seed_profile, set once by configure_seed_profile
-    ...base.slice(15, 20),
+    ...base.slice(16, 21),
     EMPTY, // token_seed_batch
-    base[20] as TezosMichelineValue, // total_reserved_capacity
+    base[21] as TezosMichelineValue, // total_reserved_capacity
   ]);
 }
 
@@ -697,20 +703,28 @@ export function buildKeelTezosCreatorProfileStorage(input: { readonly manager: s
   return mPair([EMPTY, mString(assertContract(input.manager, "manager")), EMPTY, EMPTY]);
 }
 
-export function buildKeelTezosOneMintStorage(input: { readonly creatorProfileRegistry: string }): TezosMichelineValue {
+/**
+ * OneMintController storage. `pauseAuthority` stands in for EVM's route registry: the KEEL
+ * manager whose MINT_ONE and MINT_ADMIN bits stop this controller. An implicit account
+ * opts out of the shared pause, as a codeless authority does on EVM.
+ */
+export function buildKeelTezosOneMintStorage(input: { readonly creatorProfileRegistry: string; readonly pauseAuthority: string }): TezosMichelineValue {
   const registry = assertContract(input.creatorProfileRegistry, "creatorProfileRegistry");
-  return mPair([EMPTY, EMPTY, mString(registry), EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY]);
+  const pauseAuthority = assertAddress(input.pauseAuthority, "pauseAuthority");
+  return mPair([EMPTY, EMPTY, mString(registry), EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, mString(pauseAuthority), EMPTY, EMPTY, EMPTY, EMPTY, EMPTY]);
 }
 
-export function buildKeelTezosMintGateStorage(input: { readonly administrator: string; readonly creatorProfileRegistry: string; readonly platformSigner?: string; readonly platformFeeRecipient?: string; readonly platformFeeBps?: number }): TezosMichelineValue {
+/** KeelMintGate storage. `pauseAuthority` (default: the administrator) is fixed; MINT_CAMPAIGN stops `mint`. */
+export function buildKeelTezosMintGateStorage(input: { readonly administrator: string; readonly creatorProfileRegistry: string; readonly platformSigner?: string; readonly platformFeeRecipient?: string; readonly platformFeeBps?: number; readonly pauseAuthority?: string }): TezosMichelineValue {
   const administrator = assertAddress(input.administrator, "administrator");
+  const pauseAuthority = input.pauseAuthority === undefined ? administrator : assertAddress(input.pauseAuthority, "pauseAuthority");
   const registry = assertContract(input.creatorProfileRegistry, "creatorProfileRegistry");
   const fee = natural(input.platformFeeBps ?? 0, "platformFeeBps", { max: 2_000n });
   if (fee !== 0n && (input.platformSigner === undefined || input.platformFeeRecipient === undefined)) throw new TypeError("A platform fee requires a platform signer and fee recipient.");
   if (input.platformSigner !== undefined && !/^tz[1-4]/u.test(input.platformSigner)) throw new TypeError("platformSigner must be a tz key hash.");
   return mPair([
     EMPTY, mString(administrator), EMPTY, [mString(administrator)], EMPTY, EMPTY, EMPTY, mString(registry), EMPTY, EMPTY, EMPTY,
-    mBool(false), EMPTY, mInt(fee),
+    mString(pauseAuthority), mBool(false), EMPTY, mInt(fee),
     input.platformFeeRecipient === undefined ? mNone : mSome(mString(assertAddress(input.platformFeeRecipient, "platformFeeRecipient"))),
     input.platformSigner === undefined ? mNone : mSome(mString(assertAddress(input.platformSigner, "platformSigner"))),
     EMPTY,
@@ -779,6 +793,9 @@ export function prepareKeelTezosCollectionOriginations(input: KeelTezosCollectio
   const bindings = input.bindings ?? {};
   for (const [name, address] of Object.entries(bindings)) if (address !== undefined) assertContract(address, `bindings.${name}`);
   const code = input.code ?? {};
+  // EVM: a Studio collection and its OneMint answer to the KEEL manager through the route registry.
+  // Tezos names the manager directly; without one, the creator (an implicit account) opts out.
+  const pauseAuthority = bindings.manager ?? creator;
   const entropyProfile = input.entropyProfile === undefined ? undefined : buildKeelTezosEntropyProfile(input.entropyProfile);
   const collectionKey = entropyProfile === undefined ? "collection" as const : "entropyCollection" as const;
   const codes = Object.fromEntries((["hold", "index", collectionKey, "presentation", "creatorProfile", "oneMint"] as const).map((key) => [key, verifyCode(key, code[key])]));
@@ -805,8 +822,8 @@ export function prepareKeelTezosCollectionOriginations(input: KeelTezosCollectio
     ...(bindings.creatorProfile === undefined ? [entry("creatorProfile", ["manager"], () => buildKeelTezosCreatorProfileStorage({ manager: bindings.manager as string }))] : []),
   ];
   const dependent = [
-    entry(collectionKey, ["index"], () => (entropyProfile === undefined ? buildKeelTezosCollectionFA2Storage : buildKeelTezosSeededCollectionFA2Storage)({ administrator: creator, keelIndex: bindings.index as string, maxSupply, contractMetadataJson: metadataJson, holderMetadataEditing, ...(royalty === undefined ? {} : { defaultRoyalty: royalty }) })),
-    entry("oneMint", ["creatorProfile"], () => buildKeelTezosOneMintStorage({ creatorProfileRegistry: bindings.creatorProfile as string })),
+    entry(collectionKey, ["index"], () => (entropyProfile === undefined ? buildKeelTezosCollectionFA2Storage : buildKeelTezosSeededCollectionFA2Storage)({ administrator: creator, keelIndex: bindings.index as string, maxSupply, contractMetadataJson: metadataJson, holderMetadataEditing, pauseAuthority, ...(royalty === undefined ? {} : { defaultRoyalty: royalty }) })),
+    entry("oneMint", ["creatorProfile"], () => buildKeelTezosOneMintStorage({ creatorProfileRegistry: bindings.creatorProfile as string, pauseAuthority })),
   ];
   return {
     schema: KEEL_TEZOS_COLLECTION_ROUTE,
@@ -817,6 +834,9 @@ export function prepareKeelTezosCollectionOriginations(input: KeelTezosCollectio
     expectedSender: creator,
     signing: "not-performed" as const,
     submission: "not-performed" as const,
+    pause: { authority: pauseAuthority, shared: bindings.manager !== undefined,
+      note: bindings.manager !== undefined ? "The collection and OneMint stop when this KEEL manager stops MINT_721, MINT_ONE, MINT_ADMIN or VIEWERS, as on EVM."
+        : "No KEEL manager is bound, so the shared pause cannot stop this collection or its OneMint. Bind `manager` for EVM's behaviour." },
     collection: { maxSupply: maxSupply.toString(), contractMetadata: JSON.parse(metadataJson) as unknown, metadataEditing: { creator: true, holders: holderMetadataEditing, holderFreeze: holderMetadataEditing }, royalty: royalty === undefined ? null : { ...royalty, tokenMetadataRoyalties: keelTezosRoyaltyTokenMetadata(royalty) } },
     stages: [
       { id: "originate-foundation", purpose: "Originate the Hold (OnchFS), the revision Index, the presentation-state registry and, when no shared registry is bound, a creator-profile registry.", requiresReceipts: [] as string[], operations: foundation },

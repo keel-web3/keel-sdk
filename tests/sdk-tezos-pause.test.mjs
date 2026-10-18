@@ -11,6 +11,12 @@ import {
   decodeKeelTezosPauseState,
   KEEL_TEZOS_MODULES,
   KEEL_TEZOS_PAUSE_GATES,
+  KEEL_TEZOS_PAUSE_UNGATED_BITS,
+  buildKeelTezosCollectionFA2Storage,
+  buildKeelTezosMintGateStorage,
+  buildKeelTezosOneMintStorage,
+  buildKeelTezosSeededCollectionFA2Storage,
+  prepareKeelTezosCollectionOriginations,
   keelPauseBits,
   keelTezosPauseGate,
   keelTezosPausedFor,
@@ -94,4 +100,57 @@ siblingSource('the module gate vectors use the SDK gates on both chains', () => 
   }
   const lanes = new Set(['KeelHold', 'KeelHoldOnchFS', 'KeelMarket', 'KeelIPActionExecutor']);
   for (const key of Object.keys(KEEL_TEZOS_PAUSE_GATES)) if (lanes.has(key.split('.')[0])) assert.ok(named.has(key), key);
+});
+
+siblingSource('the collection and mint-lane gate vectors use the SDK gates on both chains', () => {
+  const fixture = JSON.parse(readFileSync(new URL('../../keel-contracts/test/fixtures/parity/system-pause-collections.json', import.meta.url), 'utf8'));
+  const named = new Set();
+  for (const gate of [...fixture.gates, ...fixture.delivery]) for (const name of gate.tezos) {
+    const [contract, entrypoint] = name.split('.');
+    const mask = BigInt(gate.mask);
+    // Each fixture bit stops the call; OneMint's admin strike checks MINT_ADMIN and MINT_ONE together.
+    assert.equal(keelTezosPauseGate(contract, entrypoint) & mask, mask, name);
+    named.add(name);
+  }
+  for (const entry of fixture.open) for (const name of entry.tezos) {
+    const [contract, entrypoint] = name.split('.');
+    assert.equal(keelTezosPauseGate(contract, entrypoint), 0n, name);
+  }
+  const lanes = new Set(['KeelCollectionFA2', 'KeelMintGate', 'OneMintController', 'KeelCrossChainMintAttestor']);
+  for (const key of Object.keys(KEEL_TEZOS_PAUSE_GATES)) if (lanes.has(key.split('.')[0])) assert.ok(named.has(key), key);
+  // The seeded collection inherits every collection gate.
+  for (const [key, mask] of Object.entries(KEEL_TEZOS_PAUSE_GATES)) {
+    if (key.startsWith('KeelCollectionFA2.')) assert.equal(KEEL_TEZOS_PAUSE_GATES[key.replace('KeelCollectionFA2', 'KeelSeededCollectionFA2')], mask, key);
+  }
+  const ungated = { MINT_1155: 'mint1155', MINT_AUCTION: 'mintAuction', COLLECTIONS: 'collections' };
+  for (const entry of fixture.noTezosTarget) if (ungated[entry.bit]) assert.notEqual(KEEL_TEZOS_PAUSE_UNGATED_BITS & keelPauseBits[ungated[entry.bit]], 0n, entry.bit);
+});
+
+nodeTest('no native gate checks a bit Tezos has nothing to stop for', () => {
+  for (const [key, mask] of Object.entries(KEEL_TEZOS_PAUSE_GATES)) assert.equal(mask & KEEL_TEZOS_PAUSE_UNGATED_BITS, 0n, key);
+  assert.equal(KEEL_TEZOS_PAUSE_UNGATED_BITS, keelPauseBits.mint1155 | keelPauseBits.mintAuction | keelPauseBits.collections | keelPauseBits.treasury);
+});
+
+nodeTest('collections and mint lanes store the pause authority EVM fixes at deployment', () => {
+  const creator = 'tz1KqTpEZ7Yob7QbPE4Hy4Wo8fHG8LhKxZSx';
+  const comb = (node) => { const out = []; while (node.prim === 'Pair' && node.args.length === 2) { out.push(node.args[0]); node = node.args[1]; } out.push(node); return out; };
+  const collection = comb(buildKeelTezosCollectionFA2Storage({ administrator: creator, keelIndex: MANAGER, maxSupply: 10 }));
+  assert.equal(collection.length, 22);
+  assert.deepEqual(collection[13], { string: creator });
+  assert.deepEqual(comb(buildKeelTezosCollectionFA2Storage({ administrator: creator, keelIndex: MANAGER, maxSupply: 10, pauseAuthority: MANAGER }))[13], { string: MANAGER });
+  const seeded = comb(buildKeelTezosSeededCollectionFA2Storage({ administrator: creator, keelIndex: MANAGER, maxSupply: 10, pauseAuthority: MANAGER }));
+  assert.equal(seeded.length, 29);
+  assert.deepEqual(seeded[13], { string: MANAGER });
+  const oneMint = comb(buildKeelTezosOneMintStorage({ creatorProfileRegistry: CONTROLLER, pauseAuthority: MANAGER }));
+  assert.equal(oneMint.length, 15);
+  assert.deepEqual(oneMint[9], { string: MANAGER });
+  assert.throws(() => buildKeelTezosOneMintStorage({ creatorProfileRegistry: CONTROLLER }), TypeError);
+  const gate = comb(buildKeelTezosMintGateStorage({ administrator: creator, creatorProfileRegistry: CONTROLLER }));
+  assert.equal(gate.length, 18);
+  assert.deepEqual(gate[11], { string: creator });
+  assert.deepEqual(comb(buildKeelTezosMintGateStorage({ administrator: creator, creatorProfileRegistry: CONTROLLER, pauseAuthority: MANAGER }))[11], { string: MANAGER });
+  const shared = prepareKeelTezosCollectionOriginations({ network: 'NetXdQprcVkpaWU', creator, maxSupply: 10, bindings: { manager: MANAGER } });
+  assert.deepEqual([shared.pause.authority, shared.pause.shared], [MANAGER, true]);
+  const alone = prepareKeelTezosCollectionOriginations({ network: 'NetXdQprcVkpaWU', creator, maxSupply: 10 });
+  assert.deepEqual([alone.pause.authority, alone.pause.shared], [creator, false]);
 });

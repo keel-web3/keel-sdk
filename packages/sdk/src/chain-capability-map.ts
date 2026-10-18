@@ -542,11 +542,10 @@ export const KEEL_CHAIN_CAPABILITIES: readonly KeelChainCapability[] = Object.fr
     id: "authority.pause",
     area: "authority",
     studioCall: "Emergency pause",
-    status: "partial",
+    status: "adapter-different",
     evm: evm(["KeelManager", "KeelLocalPause"], "Shared pause bits checked by every module."),
-    tezos: tez(["KeelManager", "KeelAccessController"], "EVM's bits, masks and revision in KeelManager; admins stop through the access controller and governance resumes. Artifact publication, harness writes, staking, the holds, the market and licensed IP mints check it first, in EVM's entrypoints (KEEL_TEZOS_PAUSE_GATES). Tezos has no pooled treasury, so TREASURY is stored but stops nothing."),
+    tezos: tez(["KeelManager", "KeelAccessController"], "EVM's bits, masks and revision in KeelManager; admins stop through the access controller and governance resumes. Artifact publication, harness writes, staking, the holds, the market, licensed IP mints, collections, the mint gate, OneMint and the cross-chain attestor check it in EVM's entrypoints (KEEL_TEZOS_PAUSE_GATES), each against the authority fixed at origination. Tezos has no route registry, so each mint lane names the manager itself; OneMint checks MINT_ONE as soon as a mint is decoded, as EVM's batch checkout does. MINT_1155, MINT_AUCTION, COLLECTIONS and TREASURY have no Tezos contract to stop (KEEL_TEZOS_PAUSE_UNGATED_BITS), so they are stored but stop nothing."),
     userVisibleDifference: false,
-    open: "Mint lanes, collections and the creator factory still use their per-contract pauses.",
   },
   {
     id: "authority.access-groups",

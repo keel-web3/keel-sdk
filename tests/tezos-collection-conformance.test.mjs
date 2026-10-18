@@ -49,7 +49,7 @@ test("SDK origination storage equals the SmartPy-compiled initial storage", {
     collection: buildKeelTezosCollectionFA2Storage({ administrator: ADMIN, keelIndex: DEPENDENCY, maxSupply: 100 }),
     presentation: buildKeelTezosPresentationStateStorage(),
     creator_profile: buildKeelTezosCreatorProfileStorage({ manager: DEPENDENCY }),
-    one_mint: buildKeelTezosOneMintStorage({ creatorProfileRegistry: DEPENDENCY }),
+    one_mint: buildKeelTezosOneMintStorage({ creatorProfileRegistry: DEPENDENCY, pauseAuthority: DEPENDENCY }),
     mint_gate: buildKeelTezosMintGateStorage({ administrator: ADMIN, creatorProfileRegistry: DEPENDENCY }),
   };
   for (const [name, storage] of Object.entries(cases)) assert.deepEqual(storage, compiled(name), name);
