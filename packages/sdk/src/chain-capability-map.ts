@@ -314,9 +314,9 @@ export const KEEL_CHAIN_CAPABILITIES: readonly KeelChainCapability[] = Object.fr
     studioCall: "Mint from a token on another chain",
     status: "adapter-different",
     evm: evm(["KeelCrossChainMintBridge"], "The holder requests; a fixed forwarder reports once the anchor is verified."),
-    tezos: tez(["KeelCrossChainMintAttestor"], "A threshold of registered attestors confirms the request."),
+    tezos: tez(["KeelCrossChainMintAttestor"], "A threshold of registered attestors confirms the request. As on EVM, the exact revision must be held on this chain, the source token is the replay key, each route names its target, and the lock freezes the report source."),
     userVisibleDifference: false,
-    open: "The trust models differ (forwarder workflow vs attestor threshold); the review discloses both.",
+    open: "The trust models differ (forwarder workflow vs attestor threshold); CROSS_CHAIN_MINT_RULES.md discloses both. Tezos has no shared mint-route registry.",
   },
   // ── Storage and publication ──────────────────────────────────────────────
   {

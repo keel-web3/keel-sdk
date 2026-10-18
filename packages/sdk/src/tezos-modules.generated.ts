@@ -393,7 +393,6 @@ export const KEEL_TEZOS_MODULES: readonly KeelTezosModule[] = [
         "retire_attestor",
         "set_administrator",
         "set_min_threshold_floor",
-        "set_mint_target",
         "set_route",
         "submit_cross_mint",
         "unpause"
@@ -402,13 +401,14 @@ export const KEEL_TEZOS_MODULES: readonly KeelTezosModule[] = [
     "views": {
       "KeelCrossChainMintAttestor": [
         "active_attestor_count",
+        "artifact_registry",
         "attestor",
         "authorization_payload",
         "current_epoch",
         "is_attestor_active",
         "min_threshold_floor",
-        "mint_target",
         "nonce_used",
+        "route",
         "route_enabled",
         "source_token_minted"
       ]
