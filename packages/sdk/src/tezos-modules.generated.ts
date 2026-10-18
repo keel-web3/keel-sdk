@@ -184,10 +184,13 @@ export const KEEL_TEZOS_MODULES: readonly KeelTezosModule[] = [
       "KeelAccessController": [
         "configure_automation_capability",
         "configure_automation_key",
+        "configure_entrypoint_policy",
         "configure_policy",
         "configure_role",
         "execute_automation",
+        "execute_automation_entrypoint",
         "execute_role",
+        "execute_role_entrypoint",
         "finish_execution",
         "pause",
         "pause_manager",
@@ -286,6 +289,10 @@ export const KEEL_TEZOS_MODULES: readonly KeelTezosModule[] = [
         "automation_key_state",
         "automation_signing_payload",
         "capability_key_of",
+        "entrypoint_capability",
+        "entrypoint_capability_key",
+        "entrypoint_lambdas_of",
+        "entrypoint_signing_payload",
         "role_security"
       ],
       "KeelArtifactRegistry": [

@@ -612,7 +612,16 @@ export const KEEL_CHAIN_CAPABILITIES: readonly KeelChainCapability[] = Object.fr
     studioCall: "Let a short-lived key run one approved action",
     status: "adapter-different",
     evm: evm(["KeelManager"], "executeAutomation: a 30-day key signs an exact (target, selector) call that governance granted at the Automation tier, within the grant's window and value caps, for the signer's current nonce; any relayer submits it."),
-    tezos: tez(["KeelAccessController"], "execute_automation runs EVM's checks in EVM's order on the role lane's latch: a 30-day key, an Automation-tier (1) policy and a grant of the current key generation, inside its window and value caps, signed over the controller, chain and nonce; any relayer submits it. A grant names one exact (target, payload), because native targets take keel_manage(bytes) instead of selectors. Only tz1, tz2 and tz3 keys sign (KeelTezosAutomationSignerError for a KT1, which has no ERC-1271). buildKeelTezosAutomationKeyActions switches the key on the controller and KeelSignatureAuthority in one governance lambda. A manager recovery retires every key, as EVM's recovery epoch does."),
+    tezos: tez(["KeelAccessController"], "execute_automation runs EVM's checks in EVM's order on the role lane's latch: a 30-day key, an Automation-tier (1) policy and a grant of the current key generation, inside its window and value caps, signed over the controller, chain and nonce; any relayer submits it. A grant names one exact (target, payload), for a keel_manage(bytes) target; execute_automation_entrypoint covers a whole typed entrypoint with free arguments, as EVM's (target, selector) grant does (authority.entrypoint-capabilities). Only tz1, tz2 and tz3 keys sign (KeelTezosAutomationSignerError for a KT1, which has no ERC-1271). buildKeelTezosAutomationKeyActions switches the key on the controller and KeelSignatureAuthority in one governance lambda. A manager recovery retires every key, as EVM's recovery epoch does."),
+    userVisibleDifference: false,
+  },
+  {
+    id: "authority.entrypoint-capabilities",
+    area: "authority",
+    studioCall: "Let a role or automation key call one function with any arguments",
+    status: "adapter-different",
+    evm: evm(["KeelManager"], "configureExecutionPolicy keys a policy by (target, selector) with a minimum tier and value cap; executeRole and executeAutomation then call that selector with any arguments. It refuses accounts without code, the zero selector, manager functions other than pauseSystems, approveSignature and revokeSignature, and nine authority selectors."),
+    tezos: tez(["KeelAccessController"], "configure_entrypoint_policy keys a policy by (target, entrypoint, parameter type); the controller writes the typed adapter and probe lambdas itself, typechecks the target with the probe and stores the UNPACKed adapter, so execute_role_entrypoint and execute_automation_entrypoint call that entrypoint with any PACKed arguments in EVM's check order. The target sees the controller as caller. It refuses the controller, every manager entrypoint but pause_systems, and the KEEL modules' authority entrypoint names. prepareKeelTezosEntrypointCapability refuses the same before building a call (tezos-entrypoint-capability.ts)."),
     userVisibleDifference: false,
   },
   {

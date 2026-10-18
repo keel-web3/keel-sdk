@@ -295,6 +295,10 @@
       "types": "./dist/tezos-governance.d.ts",
       "import": "./dist/tezos-governance.js"
     },
+    "./tezos-entrypoint-capability": {
+      "types": "./dist/tezos-entrypoint-capability.d.ts",
+      "import": "./dist/tezos-entrypoint-capability.js"
+    },
     "./hold-events": {
       "types": "./dist/hold-events.d.ts",
       "import": "./dist/hold-events.js"

@@ -252,6 +252,27 @@ test("MCP prepares a valued governance action whose executing approval alone att
   assert.equal(overflow.isError, true);
 });
 
+test("MCP prepares entrypoint capabilities that match the shared golden vector and refuses authority entrypoints", async (t) => {
+  const { call } = await fixture(t);
+  const controller = "KT1Tezooo1zzSmartPyzzSTATiCzzzyfC8eF";
+  const capability = { target: "KT1Tezooo2zzSmartPyzzSTATiCzzzwqqQ4H", entrypoint: "set_value", parameterType: "nat" };
+  const key = "0x99361ba6d5ce37ddf232c5c3a9bb2c4684ea49df86a31f35ff5813443f7ed9bb";
+  const policy = await call("keel-tezos-entrypoint-capability-prepare", { network, controller, capability, action: { kind: "policy", minimumTier: 2, maxAmount: 5 } });
+  assert.equal(policy.isError, undefined, JSON.stringify(policy));
+  assert.equal(policy.structuredContent.capabilityKey, key);
+  assert.equal(policy.structuredContent.governanceCall.entrypoint, "configure_entrypoint_policy");
+  assert.equal(policy.structuredContent.signing, "not-performed");
+  const payload = await call("keel-tezos-entrypoint-capability-prepare", { network: "NetXdQprcVkpaWU", controller, capability,
+    action: { kind: "automation-payload", args: 42, amount: 2, signer: "tz1KqTpEZ7Yob7QbPE4Hy4Wo8fHG8LhKxZSx", nonce: 0, deadline: 1200 } });
+  assert.equal(payload.isError, undefined, JSON.stringify(payload));
+  assert.match(payload.structuredContent.payload, /^0x0507070a000000236b65656c/u);
+  const role = await call("keel-tezos-entrypoint-capability-prepare", { network, controller, capability, action: { kind: "role", args: 42, amount: 2 } });
+  assert.equal(role.structuredContent.operation.parameters.entrypoint, "execute_role_entrypoint");
+  const protectedName = await call("keel-tezos-entrypoint-capability-prepare", { network, controller,
+    capability: { ...capability, entrypoint: "set_administrator", parameterType: "address" }, action: { kind: "policy", minimumTier: 3, maxAmount: 0 } });
+  assert.equal(protectedName.isError, true);
+});
+
 test("MCP prepares seeded-collection calls and returns the typed refusal for EVM-only seed modes", async (t) => {
   const { call } = await fixture(t);
   const configure = await call("keel-tezos-seed-action-prepare", { network, sender: creator, collection, action: { kind: "configure", profile: { reveal: "immediate", mode: "derived" } } });

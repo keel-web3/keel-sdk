@@ -39,6 +39,14 @@ import {
   keelTezosRecoveryGroupId,
 } from "@keel/sdk/tezos-recovery";
 import { buildKeelTezosGovernanceApprovals, buildKeelTezosGovernanceProposal, keelTezosGovernanceThreshold, KEEL_TEZOS_GOVERNANCE_ERRORS } from "@keel/sdk/tezos-governance";
+import {
+  buildKeelTezosAutomationEntrypointCall,
+  buildKeelTezosRoleEntrypointCall,
+  keelTezosAutomationEntrypointPayload,
+  packKeelTezosEntrypointArgs,
+  prepareKeelTezosEntrypointCapability,
+  KEEL_TEZOS_ENTRYPOINT_CAPABILITY_ERRORS,
+} from "@keel/sdk/tezos-entrypoint-capability";
 import type { JsonSchema, ToolContext, ToolDefinition } from "./types.js";
 
 /**
@@ -426,6 +434,49 @@ export const TEZOS_COLLECTION_TOOL_DEFINITIONS: readonly ToolDefinition[] = [
         ...(approvals === undefined ? { approvals: "Read next_proposal_id from the manager's storage before proposing (it becomes this proposal's id), then call again with proposalId." } : { approvals }),
         errors: KEEL_TEZOS_GOVERNANCE_ERRORS, signing: "not-performed", submission: "not-performed",
       };
+    },
+  ),
+  tool(
+    "keel-tezos-entrypoint-capability-prepare",
+    "Prepare a Tezos entrypoint capability, EVM configureExecutionPolicy(target, selector) with executeRole and executeAutomation. A capability is (target KT1, entrypoint, parameter type); one policy covers any arguments. action.kind policy returns the capability key, the adapter and probe lambdas the KeelAccessController writes itself, and the configure_entrypoint_policy call to pass to keel-tezos-governance-prepare; it refuses the controller, manager entrypoints other than pause_systems and authority entrypoints (set_administrator and the like) before building anything. role returns execute_role_entrypoint with the PACKed arguments and exact amount. automation-payload returns the bytes an automation key signs for its current nonce; automation returns the relayer's execute_automation_entrypoint call for a signature the caller supplies. The target sees the controller as caller. Never signs or submits.",
+    {
+      type: "object", additionalProperties: false, required: ["network", "controller", "capability", "action"],
+      properties: {
+        network: NETWORK, controller: KT1,
+        capability: {
+          type: "object", additionalProperties: false, required: ["target", "entrypoint", "parameterType"],
+          properties: { target: KT1, entrypoint: { type: "string", minLength: 1, maxLength: 31 }, parameterType: {} },
+        },
+        action: {
+          type: "object", required: ["kind"],
+          properties: {
+            kind: { enum: ["policy", "role", "automation-payload", "automation"] },
+            manager: KT1, minimumTier: { type: "integer", minimum: 0, maximum: 3 }, maxAmount: NATURAL, enabled: { type: "boolean" },
+            args: {}, amount: NATURAL, signer: { type: "string", pattern: "^tz[123][1-9A-HJ-NP-Za-km-z]{33}$" }, nonce: NATURAL, deadline: NATURAL,
+            signature: { type: "string", minLength: 1, maxLength: 256 },
+          },
+        },
+      },
+    },
+    async (_context, value) => {
+      const args = input(value, "the Tezos entrypoint capability tool");
+      const capability = { ...args.capability, controller: args.controller };
+      const action = args.action as Record<string, any>;
+      const base = { schema: "keel.tezos-entrypoint-capability@1", family: "tezos", network: args.network, kind: action.kind, errors: KEEL_TEZOS_ENTRYPOINT_CAPABILITY_ERRORS };
+      if (action.kind === "policy") {
+        const prepared = prepareKeelTezosEntrypointCapability({ ...capability, manager: action.manager, minimumTier: action.minimumTier, maxAmount: action.maxAmount ?? 0, enabled: action.enabled ?? true });
+        return { ...base, ...prepared, next: "Pass governanceCall to keel-tezos-governance-prepare; the manager's governors approve it." };
+      }
+      if (action.kind === "role") return { ...base, ...buildKeelTezosRoleEntrypointCall({ ...capability, args: action.args, amount: action.amount }) };
+      const role = buildKeelTezosRoleEntrypointCall({ ...capability, args: action.args, amount: action.amount });
+      if (action.kind === "automation-payload") {
+        return {
+          ...base, capabilityKey: role.capabilityKey, args: packKeelTezosEntrypointArgs(capability, action.args),
+          payload: keelTezosAutomationEntrypointPayload({ network: args.network, controller: args.controller, signer: action.signer, capabilityKey: role.capabilityKey, args: role.args, amount: action.amount, nonce: action.nonce, deadline: action.deadline }),
+          next: "The automation key signs these bytes (Raw); this tool never signs. Read the signer's nonce from automation_nonces first.", signing: "not-performed", submission: "not-performed",
+        };
+      }
+      return { ...base, capabilityKey: role.capabilityKey, ...buildKeelTezosAutomationEntrypointCall({ controller: args.controller, signer: action.signer, capabilityKey: role.capabilityKey, args: role.args, amount: action.amount, deadline: action.deadline, signature: action.signature }) };
     },
   ),
   tool(
