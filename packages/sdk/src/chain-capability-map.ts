@@ -375,7 +375,7 @@ export const KEEL_CHAIN_CAPABILITIES: readonly KeelChainCapability[] = Object.fr
     studioCall: "Reveal external renditions",
     status: "parity",
     evm: evm(["KeelLinkRegistry"], "Committed 1..3 fidelity links."),
-    tezos: tez(["KeelLinkRegistry"], "Same commitment and refusals."),
+    tezos: tez(["KeelLinkRegistry"], "The same enum codes, commitment and refusals, checked by shared vectors; link_uri and link_for_presentation keep the canonical-shell rule for mutable locators."),
     userVisibleDifference: false,
   },
   // ── Presentation ─────────────────────────────────────────────────────────

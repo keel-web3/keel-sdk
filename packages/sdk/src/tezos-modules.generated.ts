@@ -290,7 +290,9 @@ export const KEEL_TEZOS_MODULES: readonly KeelTezosModule[] = [
         "fidelity_link",
         "link_by_id",
         "link_exists",
+        "link_for_presentation",
         "link_set",
+        "link_uri",
         "predict_link_id"
       ],
       "KeelManager": [
