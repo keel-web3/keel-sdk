@@ -1,5 +1,6 @@
 import { keccak256, sha256 } from "viem";
 
+import { KeelChainCapabilityError, resolveKeelChainCapability } from "./chain-capability-map.js";
 import { KEEL_TEZOS_MODULES } from "./tezos-modules.generated.js";
 import type { TezosMichelineValue, TezosOperationDetailsBase, TezosTransactionOperation } from "./tezos-publication.js";
 
@@ -29,6 +30,7 @@ export const KEEL_TEZOS_COLLECTION_ROUTE_CONTRACTS = Object.freeze({
   hold: { module: "keel-hold", contract: "KeelHoldOnchFS", source: "keel_hold_onchfs.py" },
   index: { module: "keel-hold", contract: "KeelIndex", source: "keel_index.py" },
   collection: { module: "keel-die", contract: "KeelCollectionFA2", source: "keel_collection_fa2.py" },
+  entropyCollection: { module: "keel-die", contract: "KeelSeededCollectionFA2", source: "keel_seeded_collection_fa2.py" },
   presentation: { module: "keel-presentation", contract: "KeelPresentationStateRegistry", source: "keel_presentation_state.py" },
   creatorProfile: { module: "keel-creator-identity", contract: "KeelCreatorProfileRegistry", source: "keel_creator_profile.py" },
   oneMint: { module: "keel-mint-access", contract: "OneMintController", source: "keel_mint_gate.py" },
@@ -522,6 +524,161 @@ export function buildKeelTezosCollectionFA2Storage(input: { readonly administrat
   ]);
 }
 
+// ---------------------------------------------------------------------------
+// Seeded collection: EVM KeelCreatorSeeded721A's profile on KeelSeededCollectionFA2
+// ---------------------------------------------------------------------------
+
+/**
+ * The same choices as EVM's `buildKeelCreatorSeedProfile`, named for Tezos.
+ * `provider` is any contract with `batch_entropy` that calls `fulfill_seed_batch`
+ * (EVM's IKeelSeedVrf surface); `source` is a static `mint_entropy` view.
+ */
+export interface KeelTezosEntropyProfileInput {
+  readonly reveal?: "immediate" | "provider" | "future-block";
+  readonly provider?: string;
+  readonly source?: string;
+  /** Recorded and validated as on EVM; Tezos views have no per-call gas cap. */
+  readonly sourceGas?: number | string | bigint;
+  readonly futureBlockDelay?: number | string | bigint;
+  readonly mode?: "derived" | "shared";
+  readonly storageOnTransfer?: "full-seed" | "reference";
+  readonly sealedTransfers?: "locked" | "allowed";
+}
+
+export interface KeelTezosEntropyProfile {
+  readonly useVrf: boolean;
+  readonly lockUntilReveal: boolean;
+  readonly futureBlockDelay: "0";
+  readonly sourceGas: string;
+  readonly source: string | null;
+  readonly transferStorage: 0 | 1;
+  readonly mode: 0 | 1;
+}
+
+const UINT32_MAX = (1n << 32n) - 1n;
+
+function unsupportedOnTezos(capability: string): never {
+  const resolution = resolveKeelChainCapability(capability, "tezos");
+  if (resolution.supported) throw new Error(`${capability} is unexpectedly supported on Tezos.`);
+  throw new KeelChainCapabilityError(capability, "tezos", resolution.closest);
+}
+
+/**
+ * Validate a seed profile with EVM's rules. A future-block reveal throws
+ * KeelChainCapabilityError, since Michelson cannot read block hashes.
+ */
+export function buildKeelTezosEntropyProfile(input: KeelTezosEntropyProfileInput = {}): KeelTezosEntropyProfile {
+  assertObject(input, "entropyProfile");
+  const reveal = input.reveal ?? (input.provider === undefined ? "immediate" : "provider");
+  const mode = input.mode ?? "derived";
+  const storage = input.storageOnTransfer ?? "full-seed";
+  const transfers = input.sealedTransfers ?? "locked";
+  if (!["derived", "shared"].includes(mode) || !["full-seed", "reference"].includes(storage) || !["locked", "allowed"].includes(transfers)) throw new TypeError("Invalid seed mode or transfer policy.");
+  const delay = input.futureBlockDelay === undefined ? 0n : natural(input.futureBlockDelay, "futureBlockDelay", { max: UINT32_MAX });
+  // EVM checks the provider rules first: a provider profile with a delay is invalid on both chains.
+  if (reveal === "provider" && delay !== 0n) throw new RangeError("A provider profile has no future-block delay.");
+  if (reveal === "future-block" || delay !== 0n) unsupportedOnTezos("collection.seed-future-block");
+  if (reveal !== "immediate" && reveal !== "provider") throw new TypeError("reveal must be immediate or provider.");
+  const lockUntilReveal = transfers === "locked";
+  const transferStorage = storage === "full-seed" ? 1 as const : 0 as const;
+  const seedMode = mode === "derived" ? 1 as const : 0 as const;
+  if (reveal === "provider") {
+    if (input.source !== undefined) throw new RangeError("A provider profile has no static source.");
+    if (input.sourceGas !== undefined && natural(input.sourceGas, "sourceGas") !== 0n) throw new RangeError("A provider profile has no static-call gas budget.");
+    return Object.freeze({ useVrf: true, lockUntilReveal, futureBlockDelay: "0", sourceGas: "0", source: assertContract(input.provider, "provider"), transferStorage, mode: seedMode });
+  }
+  if (input.provider !== undefined) throw new RangeError("An immediate profile has no provider.");
+  const source = input.source === undefined ? null : assertContract(input.source, "source");
+  const sourceGas = natural(input.sourceGas ?? (source === null ? 0 : 100_000), "sourceGas", { max: UINT32_MAX });
+  if ((source === null) !== (sourceGas === 0n)) throw new RangeError("Source and its gas budget must both be enabled or disabled.");
+  return Object.freeze({ useVrf: false, lockUntilReveal, futureBlockDelay: "0", sourceGas: sourceGas.toString(), source, transferStorage, mode: seedMode });
+}
+
+function entropyProfileValue(profile: KeelTezosEntropyProfile): TezosMichelineValue {
+  return mPair([mBool(profile.useVrf), mBool(profile.lockUntilReveal), mInt(profile.futureBlockDelay), mInt(profile.sourceGas),
+    profile.source === null ? mNone : mSome(mString(profile.source)), mInt(profile.transferStorage), mInt(profile.mode)]);
+}
+
+/** KeelSeededCollectionFA2 storage: the collection's fields with the seed fields in their comb order. */
+export function buildKeelTezosSeededCollectionFA2Storage(input: Parameters<typeof buildKeelTezosCollectionFA2Storage>[0]): TezosMichelineValue {
+  const base: TezosMichelineValue[] = [];
+  let node = buildKeelTezosCollectionFA2Storage(input) as { prim?: string; args?: TezosMichelineValue[] };
+  while (node.prim === "Pair" && node.args !== undefined) { base.push(node.args[0] as TezosMichelineValue); node = node.args[1] as typeof node; }
+  base.push(node as TezosMichelineValue);
+  if (base.length !== 21) throw new Error("Unexpected KeelCollectionFA2 storage shape.");
+  // Alphabetical: ... reserved_capacity, seed_*, token_jsons ... token_owners, token_seed_batch, total_reserved_capacity.
+  const unset: KeelTezosEntropyProfile = { useVrf: false, lockUntilReveal: false, futureBlockDelay: "0", sourceGas: "0", source: null, transferStorage: 0, mode: 0 };
+  return mPair([
+    ...base.slice(0, 15),
+    mInt(0), // seed_batch_count
+    EMPTY, // seed_batches
+    EMPTY, // seed_cache
+    mBool(false), // seed_configured
+    EMPTY, // seed_draws
+    entropyProfileValue(unset), // seed_profile, set once by configure_seed_profile
+    ...base.slice(15, 20),
+    EMPTY, // token_seed_batch
+    base[20] as TezosMichelineValue, // total_reserved_capacity
+  ]);
+}
+
+export type KeelTezosSeedAction =
+  | { readonly kind: "configure"; readonly profile: KeelTezosEntropyProfileInput }
+  | { readonly kind: "reveal"; readonly batchId: number | string | bigint }
+  | { readonly kind: "mint"; readonly recipient: string; readonly quantity: number | string | bigint; readonly data?: string }
+  | { readonly kind: "buy-credits" | "request" | "deliver" };
+
+/**
+ * Tezos counterpart of `buildKeelSeedAction` for KeelSeededCollectionFA2:
+ * configure the profile once, mint a batch with its data, or reveal a batch.
+ * The Chainlink VRF actions throw KeelChainCapabilityError.
+ */
+export function prepareKeelTezosSeedAction(input: { readonly network: string; readonly sender: string; readonly collection: string; readonly action: KeelTezosSeedAction }) {
+  assertObject(input, "seed action");
+  const network = assertNetwork(input.network);
+  const sender = assertAddress(input.sender, "sender");
+  const collection = assertContract(input.collection, "collection");
+  const action = input.action;
+  let operation: TezosTransactionOperation;
+  let consequence: string;
+  let detail: Record<string, unknown> = {};
+  switch (action?.kind) {
+    case "configure": {
+      const profile = buildKeelTezosEntropyProfile(action.profile);
+      operation = call("entropyCollection", collection, "configure_seed_profile", entropyProfileValue(profile));
+      consequence = "Fix this collection's seed profile once, before any mint or reservation. Minting is refused until it is set.";
+      detail = { profile };
+      break;
+    }
+    case "mint": {
+      const quantity = natural(action.quantity, "quantity", { positive: true, max: 500n });
+      operation = call("entropyCollection", collection, "strike_with_data", mPair([mString(assertAddress(action.recipient, "recipient")), mInt(quantity), mBytes(hexValue(action.data ?? "", "data"))]));
+      consequence = "Mint one batch; its commitment covers the recipient, quantity and Keccak-256 of the data.";
+      break;
+    }
+    case "reveal":
+      operation = call("entropyCollection", collection, "reveal_seed_batch", mInt(natural(action.batchId, "batchId")));
+      consequence = "Finalize this batch from its original commitment. A provider batch needs the provider's word first.";
+      break;
+    case "buy-credits":
+    case "request":
+    case "deliver":
+      return unsupportedOnTezos("collection.seed-chainlink-vrf");
+    default: throw new TypeError("Unknown seed action.");
+  }
+  return { schema: KEEL_TEZOS_COLLECTION_ROUTE, step: "seed-action" as const, status: "review-only" as const, family: "tezos" as const, network, expectedSender: sender, action: action.kind, operation, consequence, ...detail,
+    readback: ["seed_draw", "token_seed", "seed_batch_id", "seed_materialized"], signing: "not-performed" as const, submission: "not-performed" as const };
+}
+
+/** Decode a `seed_draw` value; Tezos uses EVM's encoding but has no future-block draws. */
+export function decodeKeelTezosSeedDraw(draw: bigint | string) {
+  const value = natural(draw, "draw");
+  if (value === 0n) return Object.freeze({ provider: false, revealed: true });
+  if (value === 1n << 65n) return Object.freeze({ provider: true, revealed: false });
+  if (value === ((1n << 65n) | (1n << 64n))) return Object.freeze({ provider: true, revealed: true });
+  throw new RangeError("Invalid Tezos seed draw.");
+}
+
 export function buildKeelTezosHoldOnchFSStorage(input: { readonly administrator: string }): TezosMichelineValue {
   return mPair([mString(assertAddress(input.administrator, "administrator")), EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, mNone]);
 }
@@ -581,7 +738,12 @@ export interface KeelTezosCollectionOriginationsInput {
   /** Collection-wide default royalty (ERC-2981 counterpart). Omitted means none. */
   readonly royalty?: KeelTezosRoyalty;
   /** Compiled code per route contract; route contracts without code are reported as unresolved. */
-  readonly code: Partial<Record<"hold" | "index" | "collection" | "presentation" | "creatorProfile" | "oneMint", KeelTezosCompiledCode>>;
+  readonly code: Partial<Record<"hold" | "index" | "collection" | "entropyCollection" | "presentation" | "creatorProfile" | "oneMint", KeelTezosCompiledCode>>;
+  /**
+   * Per-token seeds (EVM KeelCreatorSeeded721A). Originates KeelSeededCollectionFA2 from
+   * `code.entropyCollection` and stages configure_seed_profile once its receipt is known.
+   */
+  readonly entropyProfile?: KeelTezosEntropyProfileInput;
   /** Receipt-backed addresses already known (for example a shared KEEL creator-profile registry). */
   readonly bindings?: Partial<Record<"hold" | "index" | "presentation" | "creatorProfile" | "manager", string>>;
 }
@@ -617,10 +779,12 @@ export function prepareKeelTezosCollectionOriginations(input: KeelTezosCollectio
   const bindings = input.bindings ?? {};
   for (const [name, address] of Object.entries(bindings)) if (address !== undefined) assertContract(address, `bindings.${name}`);
   const code = input.code ?? {};
-  const codes = Object.fromEntries((["hold", "index", "collection", "presentation", "creatorProfile", "oneMint"] as const).map((key) => [key, verifyCode(key, code[key])]));
+  const entropyProfile = input.entropyProfile === undefined ? undefined : buildKeelTezosEntropyProfile(input.entropyProfile);
+  const collectionKey = entropyProfile === undefined ? "collection" as const : "entropyCollection" as const;
+  const codes = Object.fromEntries((["hold", "index", collectionKey, "presentation", "creatorProfile", "oneMint"] as const).map((key) => [key, verifyCode(key, code[key])]));
 
   type Entry = { label: string; artifact: string; contract: string; dependsOn: string[]; operation: TezosOperationDetailsBase | null; unresolvedBindings?: string[]; codeSha256?: string; storageSha256?: string };
-  const entry = (key: "hold" | "index" | "collection" | "presentation" | "creatorProfile" | "oneMint", dependsOn: string[], storage: () => TezosMichelineValue): Entry => {
+  const entry = (key: "hold" | "index" | "collection" | "entropyCollection" | "presentation" | "creatorProfile" | "oneMint", dependsOn: string[], storage: () => TezosMichelineValue): Entry => {
     const contract = KEEL_TEZOS_COLLECTION_ROUTE_CONTRACTS[key].contract;
     const unresolved = dependsOn.filter((name) => bindings[name as keyof typeof bindings] === undefined);
     const script = codes[key];
@@ -641,7 +805,7 @@ export function prepareKeelTezosCollectionOriginations(input: KeelTezosCollectio
     ...(bindings.creatorProfile === undefined ? [entry("creatorProfile", ["manager"], () => buildKeelTezosCreatorProfileStorage({ manager: bindings.manager as string }))] : []),
   ];
   const dependent = [
-    entry("collection", ["index"], () => buildKeelTezosCollectionFA2Storage({ administrator: creator, keelIndex: bindings.index as string, maxSupply, contractMetadataJson: metadataJson, holderMetadataEditing, ...(royalty === undefined ? {} : { defaultRoyalty: royalty }) })),
+    entry(collectionKey, ["index"], () => (entropyProfile === undefined ? buildKeelTezosCollectionFA2Storage : buildKeelTezosSeededCollectionFA2Storage)({ administrator: creator, keelIndex: bindings.index as string, maxSupply, contractMetadataJson: metadataJson, holderMetadataEditing, ...(royalty === undefined ? {} : { defaultRoyalty: royalty }) })),
     entry("oneMint", ["creatorProfile"], () => buildKeelTezosOneMintStorage({ creatorProfileRegistry: bindings.creatorProfile as string })),
   ];
   return {
@@ -657,6 +821,14 @@ export function prepareKeelTezosCollectionOriginations(input: KeelTezosCollectio
     stages: [
       { id: "originate-foundation", purpose: "Originate the Hold (OnchFS), the revision Index, the presentation-state registry and, when no shared registry is bound, a creator-profile registry.", requiresReceipts: [] as string[], operations: foundation },
       { id: "originate-collection", purpose: "Originate the FA2 collection against the Index receipt and the OneMint gate against the creator-profile registry receipt.", requiresReceipts: ["index", "creatorProfile"], operations: dependent },
+      ...(entropyProfile === undefined ? [] : [{
+        id: "configure-seed-profile",
+        purpose: "Fix the seed profile once, as EVM's factory does at creation. The collection refuses every mint until this applies.",
+        requiresReceipts: ["collection"],
+        operations: [{ label: "configure_seed_profile", artifact: "entropyCollection", contract: "KeelSeededCollectionFA2", dependsOn: ["collection"], operation: null, unresolvedBindings: ["collection"],
+          prepare: { sdk: "prepareKeelTezosSeedAction", action: { kind: "configure", profile: input.entropyProfile } } }],
+        profile: entropyProfile,
+      }]),
     ],
     addressBindings: ["hold", "index", "presentation", "creatorProfile", "collection", "oneMint"].map((name) => ({ name, source: bindings[name as keyof typeof bindings] === undefined ? "operation-receipt" as const : "supplied-binding" as const, ...(bindings[name as keyof typeof bindings] === undefined ? {} : { address: bindings[name as keyof typeof bindings] }) })),
     caveat: "Origination parameters only. Simulate each operation group with the creator's wallet on the selected network, read the KT1 from the applied receipt, and pass it back as a binding for the next stage.",

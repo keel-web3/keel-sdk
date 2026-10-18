@@ -183,13 +183,37 @@ export const KEEL_CHAIN_CAPABILITIES: readonly KeelChainCapability[] = Object.fr
     id: "collection.seeded-mint",
     area: "collection",
     studioCall: "Mint with a per-token seed",
+    status: "adapter-different",
+    evm: evm(["KeelCreatorSeeded721A", "KeelMintSeeded721A"], "Per-token bytes32 seed committed at mint, revealed immediately or by a provider."),
+    tezos: tez(["KeelSeededCollectionFA2", "KeelSeedRegistry"], "Same profile, batches, Shared/Derived token seeds, provider settlement, lock and FullSeed cache. The batch commitment uses level and timestamp in place of prevrandao; the SDK stages configure_seed_profile right after origination."),
+    // Seeds are random on both chains, so a chain-local commitment input is not a visible difference;
+    // the derivation from a batch seed is byte-identical (test/fixtures/parity/seeded-collection.json).
+    userVisibleDifference: false,
+  },
+  {
+    id: "collection.seed-future-block",
+    area: "collection",
+    studioCall: "Reveal a seed from future block hashes",
     status: "evm-only",
-    evm: evm(["KeelMintSeeded721A", "KeelCreatorSeeded721A", "KeelSeedVrfAdapter"], "Per-token bytes32 seed revealed immediately, by future block or by VRF."),
-    tezos: tez(["KeelSeedRegistry"], "Harness-level seed sets revealed against a committed digest."),
-    userVisibleDifference: "Tezos tokens derive seeds from the published seed set, not a per-token seed stored at mint.",
+    evm: evm(["KeelCreatorSeeded721A", "KeelSeedBlockArchive"], "The batch waits for the hashes of target and target + 1."),
+    tezos: null,
+    userVisibleDifference: "Tezos refuses a profile with futureBlockDelay > 0.",
     closest: {
-      behaviour: "publish_mint_seed_set against the harness revision's committed digest.",
-      reason: "Optional per-token seed storage in the native collection is still open.",
+      behaviour: "A provider profile: any contract with batch_entropy and fulfill_seed_batch settles the batch.",
+      reason: "Michelson cannot read block hashes, so FUTURE_BLOCK_SEED_UNAVAILABLE is returned.",
+    },
+  },
+  {
+    id: "collection.seed-chainlink-vrf",
+    area: "collection",
+    studioCall: "Buy, request or deliver Chainlink VRF randomness",
+    status: "evm-only",
+    evm: evm(["KeelSeedVrfAdapter"], "Prepaid credits, coordinator requests and delivery to the collection."),
+    tezos: null,
+    userVisibleDifference: "Tezos has no Chainlink VRF adapter or credits.",
+    closest: {
+      behaviour: "Provider mode: the provider contract calls fulfill_seed_batch, or anyone reveals once batch_entropy is ready.",
+      reason: "Chainlink VRF is not deployed on Tezos.",
     },
   },
   {
@@ -642,6 +666,29 @@ export function resolveKeelChainCapability(id: string, family: KeelChainFamily):
   const adapter = family === "ethereum" ? capability.evm : capability.tezos;
   if (!unsupported && adapter !== null) return { supported: true, capability, adapter };
   return { supported: false, code: "KEEL_CHAIN_CAPABILITY_UNSUPPORTED", capability, family, closest: capability.closest! };
+}
+
+/** Thrown when a Studio call names a capability the selected chain cannot run. */
+export class KeelChainCapabilityError extends Error {
+  readonly code = "KEEL_CHAIN_CAPABILITY_UNSUPPORTED" as const;
+  readonly capability: string;
+  readonly family: KeelChainFamily;
+  readonly closest: KeelChainClosestBehaviour;
+
+  constructor(capability: string, family: KeelChainFamily, closest: KeelChainClosestBehaviour) {
+    super(`${capability} is not available on ${family}. Closest: ${closest.behaviour} (${closest.reason})`);
+    this.name = "KeelChainCapabilityError";
+    this.capability = capability;
+    this.family = family;
+    this.closest = closest;
+  }
+}
+
+/** Throws KeelChainCapabilityError unless `family` supports the capability; returns its adapter. */
+export function assertKeelChainCapability(id: string, family: KeelChainFamily): KeelChainAdapter {
+  const resolution = resolveKeelChainCapability(id, family);
+  if (!resolution.supported) throw new KeelChainCapabilityError(id, family, resolution.closest);
+  return resolution.adapter;
 }
 
 /** Counts for reports: how many capabilities sit at each status. */

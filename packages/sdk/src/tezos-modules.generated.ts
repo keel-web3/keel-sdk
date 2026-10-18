@@ -557,10 +557,12 @@ export const KEEL_TEZOS_MODULES: readonly KeelTezosModule[] = [
     "sources": "src/modules/keel-die/tezos",
     "contracts": [
       "keel_collection_fa2.py",
-      "keel_fa2_nft.py"
+      "keel_fa2_nft.py",
+      "keel_seeded_collection_fa2.py"
     ],
     "deployable": [
-      "KeelCollectionFA2"
+      "KeelCollectionFA2",
+      "KeelSeededCollectionFA2"
     ],
     "shared": [
       "KeelNFTLedger"
@@ -587,6 +589,32 @@ export const KEEL_TEZOS_MODULES: readonly KeelTezosModule[] = [
         "strike_unreserved",
         "transfer",
         "update_operators"
+      ],
+      "KeelSeededCollectionFA2": [
+        "add_administrator",
+        "balance_of",
+        "configure_seed_profile",
+        "freeze_contract_metadata",
+        "freeze_default_presentation",
+        "freeze_token_metadata",
+        "fulfill_seed_batch",
+        "release_capacity",
+        "remove_administrator",
+        "reserve_capacity",
+        "reveal_seed_batch",
+        "set_contract_metadata",
+        "set_default_presentation",
+        "set_default_royalty",
+        "set_keel_index",
+        "set_minter",
+        "set_token_json",
+        "set_token_metadata",
+        "set_token_owner_can_edit",
+        "strike",
+        "strike_unreserved",
+        "strike_with_data",
+        "transfer",
+        "update_operators"
       ]
     },
     "views": {
@@ -607,6 +635,35 @@ export const KEEL_TEZOS_MODULES: readonly KeelTezosModule[] = [
         "token_metadata",
         "token_metadata_frozen",
         "token_owner_can_edit",
+        "total_supply"
+      ],
+      "KeelSeededCollectionFA2": [
+        "administrator_count",
+        "contract_metadata_frozen",
+        "default_presentation",
+        "get_balance",
+        "get_total_balance",
+        "is_administrator",
+        "is_minter",
+        "keel_index",
+        "keel_mint_seeded_profile",
+        "keel_mint_seeded_seed",
+        "keel_mint_seeded_word",
+        "owner_of",
+        "presentation_frozen",
+        "reserved_capacity_of",
+        "royalty_info",
+        "seed_batch_id",
+        "seed_configured",
+        "seed_draw",
+        "seed_materialized",
+        "seed_profile",
+        "seed_vrf_requestable",
+        "token_json",
+        "token_metadata",
+        "token_metadata_frozen",
+        "token_owner_can_edit",
+        "token_seed",
         "total_supply"
       ]
     }

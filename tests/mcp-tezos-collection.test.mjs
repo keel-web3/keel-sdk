@@ -142,3 +142,23 @@ test("MCP read-back verifies a collection against a loopback Tezos RPC", async (
   assert.equal(holderEditable.structuredContent.publicationVerified, false);
   assert.equal(holderEditable.structuredContent.checks.find((check) => check.name === "metadata-editing-authority").ok, false);
 });
+
+test("MCP prepares seeded-collection calls and returns the typed refusal for EVM-only seed modes", async (t) => {
+  const { call } = await fixture(t);
+  const configure = await call("keel-tezos-seed-action-prepare", { network, sender: creator, collection, action: { kind: "configure", profile: { reveal: "immediate", mode: "derived" } } });
+  assert.equal(configure.isError, undefined, JSON.stringify(configure));
+  assert.equal(configure.structuredContent.operation.parameters.entrypoint, "configure_seed_profile");
+  assert.equal(configure.structuredContent.signing, "not-performed");
+  const mint = await call("keel-tezos-seed-action-prepare", { network, sender: creator, collection, action: { kind: "mint", recipient: collector, quantity: 2, data: "0x01" } });
+  assert.equal(mint.structuredContent.operation.parameters.entrypoint, "strike_with_data");
+  const vrf = await call("keel-tezos-seed-action-prepare", { network, sender: creator, collection, action: { kind: "request" } });
+  assert.equal(vrf.isError, true);
+  assert.equal(vrf.structuredContent.code, "KEEL_CHAIN_CAPABILITY_UNSUPPORTED");
+  assert.equal(vrf.structuredContent.capability, "collection.seed-chainlink-vrf");
+  const future = await call("keel-tezos-collection-originate-prepare", { network, creator, maxSupply: 10, artifactsDir: "targets", bindings: { index, creatorProfile: registry }, entropyProfile: { reveal: "future-block" } });
+  assert.equal(future.structuredContent.code, "KEEL_CHAIN_CAPABILITY_UNSUPPORTED");
+  assert.match(future.structuredContent.closest.behaviour, /provider/u);
+  const seeded = await call("keel-tezos-collection-originate-prepare", { network, creator, maxSupply: 10, artifactsDir: "targets", bindings: { index, creatorProfile: registry }, entropyProfile: { reveal: "immediate" } });
+  assert.equal(seeded.isError, undefined, JSON.stringify(seeded));
+  assert.equal(seeded.structuredContent.stages.at(-1).id, "configure-seed-profile");
+});

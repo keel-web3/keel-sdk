@@ -88,6 +88,12 @@ function toolError(error: unknown): ToolCallResult {
     const structuredContent = { code: error.code, setup: error.setup, signing: 'not-performed', submission: 'not-performed' };
     return { content: [{ type: 'text', text: JSON.stringify(structuredContent) }], structuredContent, isError: true };
   }
+  const capability = error as { code?: unknown; capability?: unknown; family?: unknown; closest?: unknown; message?: unknown };
+  if (error instanceof Error && capability.code === "KEEL_CHAIN_CAPABILITY_UNSUPPORTED") {
+    // Typed refusal for a capability the selected chain cannot run, with the closest secure behaviour.
+    const structuredContent = { error: error.message, code: capability.code, capability: capability.capability, family: capability.family, closest: capability.closest, signing: "not-performed", submission: "not-performed" };
+    return { content: [{ type: "text", text: JSON.stringify(structuredContent) }], structuredContent, isError: true };
+  }
   const setup = findKeelRpcSetupError(error);
   if (setup) { const structuredContent = { code: setup.code, reason: setup.reason, retryAfterMs: setup.retryAfterMs, providers: setup.providers, setup: setup.setup, signing: "not-performed", submission: "not-performed" };
     return { content: [{ type: "text", text: JSON.stringify(structuredContent) }], structuredContent, isError: true }; }

@@ -7,6 +7,7 @@ import {
   prepareKeelTezosMintGate,
   prepareKeelTezosMintGateAction,
   prepareKeelTezosPresentationBinding,
+  prepareKeelTezosSeedAction,
   prepareKeelTezosTokenMetadata,
   type KeelTezosCompiledCode,
   type KeelTezosHoldResourceInput,
@@ -53,6 +54,7 @@ const COMPILED_DIRECTORIES = {
   hold: "collection_route_hold",
   index: "collection_route_index",
   collection: "collection_route_collection",
+  entropyCollection: "collection_route_seeded_collection",
   presentation: "collection_route_presentation",
   creatorProfile: "collection_route_creator_profile",
   oneMint: "collection_route_one_mint",
@@ -83,6 +85,20 @@ async function resourceBytes(context: ToolContext, resource: Record<string, any>
   if (!/^(?:[0-9a-fA-F]{2})+$/u.test(hex)) throw new TypeError(`resources[${index}].hex must be even-length hex.`);
   return Uint8Array.from(hex.match(/../gu) as string[], (byte) => Number.parseInt(byte, 16));
 }
+
+const ENTROPY_PROFILE: JsonSchema = {
+  type: "object", additionalProperties: false,
+  description: "Per-token seeds, as EVM's KeelCreatorSeeded721A profile. future-block is refused on Tezos with KEEL_CHAIN_CAPABILITY_UNSUPPORTED (Michelson cannot read block hashes); use a provider instead.",
+  properties: {
+    reveal: { type: "string", enum: ["immediate", "provider", "future-block"] },
+    provider: { ...KT1, description: "Provider contract with batch_entropy that calls fulfill_seed_batch." },
+    source: { ...KT1, description: "Static entropy source with a mint_entropy view (immediate profiles)." },
+    sourceGas: NATURAL, futureBlockDelay: NATURAL,
+    mode: { type: "string", enum: ["derived", "shared"] },
+    storageOnTransfer: { type: "string", enum: ["full-seed", "reference"] },
+    sealedTransfers: { type: "string", enum: ["locked", "allowed"] },
+  },
+};
 
 const STAGE: JsonSchema = {
   type: "object", additionalProperties: false, required: ["kind", "startTime", "endTime"],
@@ -130,11 +146,12 @@ export const TEZOS_COLLECTION_TOOL_DEFINITIONS: readonly ToolDefinition[] = [
         artifactsDir: { type: "string", description: "Workspace directory holding collection_route_<contract>/step_001_cont_0_contract.json." },
         codeSha256: { type: "object", description: "Optional expected SHA-256 of each compiled code array, keyed by hold/index/collection/presentation/creatorProfile/oneMint." },
         bindings: { type: "object", additionalProperties: false, properties: { hold: KT1, index: KT1, presentation: KT1, creatorProfile: KT1, manager: KT1 } },
+        entropyProfile: { ...ENTROPY_PROFILE, description: `${ENTROPY_PROFILE.description as string} Originates KeelSeededCollectionFA2 and stages configure_seed_profile after its receipt.` },
       },
     },
     async (context, value) => {
       const args = input(value, "the Tezos origination tool");
-      return prepareKeelTezosCollectionOriginations({ network: args.network, creator: args.creator, maxSupply: args.maxSupply, ...(args.holderMetadataEditing === undefined ? {} : { holderMetadataEditing: args.holderMetadataEditing }), ...(args.royalty === undefined ? {} : { royalty: args.royalty }), ...(args.collectionMetadata === undefined ? {} : { collectionMetadata: args.collectionMetadata }), code: await compiledCode(context, args), ...(args.bindings === undefined ? {} : { bindings: args.bindings }) });
+      return prepareKeelTezosCollectionOriginations({ network: args.network, creator: args.creator, maxSupply: args.maxSupply, ...(args.entropyProfile === undefined ? {} : { entropyProfile: args.entropyProfile }), ...(args.holderMetadataEditing === undefined ? {} : { holderMetadataEditing: args.holderMetadataEditing }), ...(args.royalty === undefined ? {} : { royalty: args.royalty }), ...(args.collectionMetadata === undefined ? {} : { collectionMetadata: args.collectionMetadata }), code: await compiledCode(context, args), ...(args.bindings === undefined ? {} : { bindings: args.bindings }) });
     },
   ),
   tool(
@@ -201,6 +218,25 @@ export const TEZOS_COLLECTION_TOOL_DEFINITIONS: readonly ToolDefinition[] = [
       },
     },
     async (_context, value) => prepareKeelTezosMint(input(value, "the Tezos mint tool") as never),
+  ),
+  tool(
+    "keel-tezos-seed-action-prepare",
+    "Prepare one KeelSeededCollectionFA2 seed call, the Tezos counterpart of the EVM seed actions: configure (set the seed profile once, before any mint), mint (strike_with_data; the batch commits to the data's Keccak-256) or reveal (finalize a batch; a provider batch needs its word). buy-credits, request and deliver are Chainlink VRF calls and return KEEL_CHAIN_CAPABILITY_UNSUPPORTED on Tezos. Review-only.",
+    {
+      type: "object", additionalProperties: false, required: ["network", "sender", "collection", "action"],
+      properties: {
+        network: NETWORK, sender: ADDRESS, collection: KT1,
+        action: {
+          type: "object", additionalProperties: false, required: ["kind"],
+          properties: {
+            kind: { type: "string", enum: ["configure", "mint", "reveal", "buy-credits", "request", "deliver"] },
+            profile: ENTROPY_PROFILE, recipient: ADDRESS, quantity: { type: "integer", minimum: 1, maximum: 500 },
+            data: { type: "string", pattern: "^(?:0x)?(?:[0-9a-fA-F]{2})*$" }, batchId: NATURAL,
+          },
+        },
+      },
+    },
+    async (_context, value) => prepareKeelTezosSeedAction(input(value, "the Tezos seed action tool") as never),
   ),
   tool(
     "keel-tezos-token-metadata-prepare",

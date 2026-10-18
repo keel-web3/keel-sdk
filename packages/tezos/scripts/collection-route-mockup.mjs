@@ -71,7 +71,7 @@ function apply(step, label, operation, from = "bootstrap1") {
 
 function originate(step, entry, alias) {
   if (entry.operation === null) throw new Error(`${entry.contract} is unresolved: ${entry.unresolvedBindings}`);
-  const directory = `collection_route_${{ creatorProfile: "creator_profile", oneMint: "one_mint" }[entry.artifact] ?? entry.artifact}`;
+  const directory = `collection_route_${{ creatorProfile: "creator_profile", oneMint: "one_mint", entropyCollection: "seeded_collection" }[entry.artifact] ?? entry.artifact}`;
   const compiled = JSON.parse(execFileSync("cat", [path.join(TARGETS, directory, "step_001_cont_0_contract.json")], { encoding: "utf8", maxBuffer: 64 * 1024 * 1024 }));
   if (JSON.stringify(compiled) !== JSON.stringify(entry.operation.script.code)) throw new Error(`${alias} code differs from the prepared origination.`);
   const output = client("originate", "contract", alias, "transferring", "0", "from", "bootstrap1", "running", `/targets/${directory}/step_001_cont_0_contract.tz`, "--init", michelson(entry.operation.script.storage), "--burn-cap", "100", "--force");
@@ -259,6 +259,28 @@ try {
 
   apply("mint-gate-action", "pause", route.prepareKeelTezosMintGateAction({ network, creator, oneMint, action: "pause", dropId: drop.drop.predictedDropId }).operation);
   apply("mint-gate-action", "withdraw proceeds", route.prepareKeelTezosMintGateAction({ network, creator, oneMint, action: "withdraw" }).operation);
+
+  // 8. Seeded collection: EVM KeelCreatorSeeded721A's profile on KeelSeededCollectionFA2, prepared by the SDK.
+  const seededPlan = route.prepareKeelTezosCollectionOriginations({ network, creator, maxSupply: 100, code: { ...code, entropyCollection: { code: loadCode("collection_route_seeded_collection") } },
+    bindings: { hold, index, presentation, creatorProfile }, entropyProfile: { mode: "derived", sealedTransfers: "allowed", storageOnTransfer: "full-seed" } });
+  const seededEntry = seededPlan.stages[1].operations.find((entry) => entry.artifact === "entropyCollection");
+  expect("seeded plan stages configure_seed_profile after the receipt", seededPlan.stages[2]?.id, "configure-seed-profile");
+  const seeded = originate("seeded", seededEntry, "seeded_collection");
+  const seededAction = (action, sender = creator) => route.prepareKeelTezosSeedAction({ network, sender, collection: seeded, action }).operation;
+  apply("seeded", "set_minter", route.prepareKeelTezosMintGateAction({ network, creator, action: "set-minter", collection: seeded, account: creator, enabled: true }).operation);
+  expect("an unconfigured seeded collection refuses mints", refusedBy(() => apply("seeded", "strike_with_data before the profile (refused)", seededAction({ kind: "mint", recipient: collector, quantity: 1 })), "INVALID_SEED_PROFILE"), true);
+  apply("seeded", "configure_seed_profile (immediate, derived)", seededAction(seededPlan.stages[2].operations[0].prepare.action));
+  expect("seed_configured after the profile", view(seeded, "seed_configured", "Unit"), "True");
+  apply("seeded", "strike_with_data x3", seededAction({ kind: "mint", recipient: collector, quantity: 3, data: "6b65656c" }));
+  expect("an immediate batch is revealed at mint", JSON.stringify(route.decodeKeelTezosSeedDraw(view(seeded, "seed_draw", "0"))), JSON.stringify({ provider: false, revealed: true }));
+  const seeds = [1, 2, 3].map((token) => view(seeded, "token_seed", String(token)));
+  expect("derived token seeds are distinct 32-byte words", new Set(seeds).size === 3 && seeds.every((seed) => /^0x[0-9a-f]{64}$/u.test(seed)), true);
+  expect("keel_mint_seeded_seed reads token_seed", view(seeded, "keel_mint_seeded_seed", "2"), seeds[1]);
+  apply("seeded", "reveal_seed_batch on an immediate batch", seededAction({ kind: "reveal", batchId: 0 }, collector), "bootstrap2");
+  const move = { kind: "transaction", amount: "0", destination: seeded, parameters: { entrypoint: "transfer", value: [{ prim: "Pair", args: [{ string: collector }, [{ prim: "Pair", args: [{ string: listed }, { prim: "Pair", args: [{ int: "2" }, { int: "1" }] }] }]] }] } };
+  apply("seeded", "transfer token 2 (FullSeed cache)", move, "bootstrap2");
+  expect("the transfer materializes token 2", view(seeded, "seed_materialized", "2"), "True");
+  expect("the materialized seed is unchanged", view(seeded, "token_seed", "2"), seeds[1]);
 
   const totals = {};
   for (const record of receipts) {
