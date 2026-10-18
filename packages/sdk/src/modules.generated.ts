@@ -2,7 +2,7 @@
 // Source: packages/contracts/modules/*/keel.module.json and */deployments/*.json
 
 /** Reusable protocol infrastructure. Each module ships as its own repository. */
-export type KeelModuleId = "keel-managed-modules" | "keel-kernel" | "keel-codecs" | "keel-hold" | "keel-artifacts" | "keel-graph" | "keel-harness" | "keel-presentation" | "keel-die" | "keel-creator-identity" | "keel-mint-access" | "keel-market" | "keel-anchors" | "keel-crucible" | "keel-ip-control" | "keel-sleeve" | "keel-web3-url" | "keel-cross-chain-mint" | "keel-publication" | "keel-stake";
+export type KeelModuleId = "keel-managed-modules" | "keel-kernel" | "keel-codecs" | "keel-hold" | "keel-artifacts" | "keel-graph" | "keel-harness" | "keel-presentation" | "keel-fields" | "keel-die" | "keel-creator-identity" | "keel-mint-access" | "keel-market" | "keel-anchors" | "keel-crucible" | "keel-ip-control" | "keel-sleeve" | "keel-web3-url" | "keel-cross-chain-mint" | "keel-publication" | "keel-stake";
 
 /**
  * Concrete products built on the modules. Apps consume modules exactly as an
@@ -454,6 +454,38 @@ export const KEEL_MODULES: readonly KeelModule[] = [
     ]
   },
   {
+    "id": "keel-fields",
+    "kind": "module",
+    "title": "Field permissions",
+    "group": "token",
+    "visibility": "private",
+    "summary": "Creator-defined, user-editable token fields: KF v1 schema and codec, composable permission gates (wallets, Merkle, signed grants, token and cross-collection owners, contract callers), onchain validation and bit-packed reads.",
+    "version": "0.3.0",
+    "repo": "keel-web3/keel-fields",
+    "deps": [
+      "keel-kernel"
+    ],
+    "contracts": [
+      "KeelFieldIncreaseOnlyValidator.sol",
+      "KeelFieldReader.sol",
+      "KeelFieldRegistry.sol",
+      "KeelFieldValidatorRegistry.sol",
+      "interfaces/IKeelFieldErrors.sol",
+      "interfaces/IKeelFieldEvents.sol",
+      "interfaces/IKeelFieldReader.sol",
+      "interfaces/IKeelFieldValidator.sol",
+      "interfaces/IKeelFieldValidatorRegistry.sol",
+      "libraries/KeelFieldBinding.sol",
+      "libraries/KeelFieldCodec.sol"
+    ],
+    "deployable": [
+      "KeelFieldIncreaseOnlyValidator",
+      "KeelFieldReader",
+      "KeelFieldRegistry",
+      "KeelFieldValidatorRegistry"
+    ]
+  },
+  {
     "id": "keel-die",
     "kind": "module",
     "title": "Token base",
@@ -468,7 +500,8 @@ export const KEEL_MODULES: readonly KeelModule[] = [
       "keel-presentation",
       "keel-artifacts",
       "keel-hold",
-      "keel-codecs"
+      "keel-codecs",
+      "keel-fields"
     ],
     "contracts": [
       "KEEL721.sol",
