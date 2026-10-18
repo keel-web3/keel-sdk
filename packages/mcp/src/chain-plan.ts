@@ -361,7 +361,7 @@ export async function createChainOperationPlan(workspace: Workspace, value: unkn
   const input = object(value, "chain-plan arguments");
   exact(input, ["plan", "family", "chainId", "network", "target"], "chain-plan arguments");
   const target = operationTarget(input);
-  if (target.family === "tezos") throw new Error("Tezos chain operation planning requires a contract-specific adapter and is not emitted by this offline planner.");
+  if (target.family === "tezos") throw new Error("Tezos operations are not emitted from an EVM upload plan. Route Tezos collections through keel-tezos-collection-launch-plan: keel-tezos-hold-resources-prepare (KeelHoldOnchFS chunks, files and objects), keel-tezos-collection-originate-prepare, keel-tezos-presentation-bind-prepare, keel-tezos-mint-gate-prepare, keel-tezos-mint-prepare, keel-tezos-token-metadata-prepare and keel-tezos-readback-check.");
   const planPath = text(input.plan, "plan");
   const loaded = await workspace.readFile(planPath, MAX_PLAN_BYTES);
   const planDirectory = path.dirname(planPath);

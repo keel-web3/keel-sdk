@@ -181,6 +181,14 @@ const RESOURCE_TEXT: Readonly<Record<string, string>> = {
       presentationGate: "Measure the complete inline return. Use Inline only when the canonical shell, builder, public-read size, and read-gas checks pass; otherwise use the RPC-backed Hybrid presentation.",
       hybridStorageRule: "Hybrid changes the reader path, not storage: immutable artwork and shell resources remain native OnchFS bytes onchain. It is not IPFS.",
       excludedOptionalModules: ["keel-crucible"],
+      collectionRoute: {
+        schema: "keel.tezos.collection-route@1",
+        plan: "keel-tezos-collection-launch-plan",
+        tools: ["keel-tezos-collection-originate-prepare", "keel-tezos-hold-resources-prepare", "keel-tezos-presentation-bind-prepare", "keel-tezos-mint-gate-prepare", "keel-tezos-mint-prepare", "keel-tezos-token-metadata-prepare", "keel-tezos-readback-check"],
+        contracts: ["KeelHoldOnchFS", "KeelIndex", "KeelPresentationStateRegistry", "KeelCreatorProfileRegistry", "KeelCollectionFA2", "OneMintController"],
+        metadata: "TZIP-12 token_metadata with TZIP-21 fields; artifactUri/displayUri are raw-percent data: URIs or onchfs:// Hold files, never KEEL pointers.",
+        metadataEditing: "Creator administrators rewrite token metadata until a token is frozen. Holder editing and freezing are off unless the creator enables them (set-holder-metadata-editing).",
+      },
     },
     presentation: {
       storageIndependent: true,

@@ -1,0 +1,90 @@
+# MOCKUP-ONLY stand-in for a cart registry (NOCTURNES Genesis `nocturnes_physical.py` record_ shape, reduced).
+# Used by live-state-cost-mockup.mjs to price the two ways a token can show changing state:
+#   supersede              record a new generation + emit cart_superseded            (design A: the only write)
+#   supersede_and_rewrite  the same, plus rewrite that token's FA2 `attributes` in   (design B: same operation)
+#                          the same operation through an internal set_token_metadata
+#   add_image_and_rewrite  bump a global image count and rewrite every listed token  (design B: one-call batch)
+# The rewrite reads the FA2's own `token_metadata` view, replaces only the "attributes" entry, and calls
+# set_token_metadata. Under KEEL's creator-only editor model the stub is never an FA2 administrator, so these
+# internal rewrites are refused; the mockup rewrites traits in the creator's own operation group instead, and
+# uses add_image_and_rewrite with an empty list as a plain image record. Never deployed anywhere but the Octez mockup.
+parameter (or (or (pair %supersede nat bytes) (pair %supersede_and_rewrite nat bytes)) (list %add_image_and_rewrite nat));
+storage (pair (address %fa2) (pair (nat %image_count) (pair (big_map %generation_count nat nat) (big_map %generations (pair nat nat) bytes))));
+code {
+       # REC: record generation g = count + 1 for token t with cart hash h. -> (g, storage')
+       LAMBDA
+         (pair (pair nat bytes) (pair address (pair nat (pair (big_map nat nat) (big_map (pair nat nat) bytes)))))
+         (pair nat (pair address (pair nat (pair (big_map nat nat) (big_map (pair nat nat) bytes)))))
+         { UNPAIR ; UNPAIR ;
+           DIG 2 ; UNPAIR 4 ;
+           DIG 2 ;
+           DUP ; DUP 6 ; GET ;
+           IF_NONE { PUSH nat 1 } { PUSH nat 1 ; ADD } ;
+           SWAP ;
+           DUP 2 ; SOME ; DUP 7 ; UPDATE ;
+           DIG 4 ; DIG 6 ; SOME ; DUP 4 ; DUP 8 ; PAIR ; UPDATE ;
+           DIG 3 ; DIG 4 ; SWAP ; DIG 3 ; DUG 2 ; PAIR 4 ;
+           DIG 2 ; DROP ; SWAP ; PAIR } ;
+       # RW: (t, (g, (images, fa2))) -> set_token_metadata with attributes rebuilt from g and images.
+       LAMBDA
+         (pair nat (pair nat (pair nat address)))
+         operation
+         { UNPAIR 4 ;
+           DIG 2 ;
+           DUP ; INT ; EQ ;
+           IF { DROP ; PUSH bytes 0x30 }
+              { PUSH bytes 0x ; SWAP ; PUSH bool True ;
+                LOOP { PUSH nat 10 ; SWAP ; EDIV ; IF_NONE { PUSH string "DIV" ; FAILWITH } {} ; UNPAIR ;
+                       SWAP ; PUSH nat 48 ; ADD ; BYTES ; DIG 2 ; SWAP ; CONCAT ; SWAP ; DUP ; INT ; NEQ } ;
+                DROP } ;
+           PUSH bytes 0x227d5d ; SWAP ; CONCAT ;
+           PUSH bytes 0x227d2c7b226e616d65223a22496d61676573222c2276616c7565223a22 ; CONCAT ;
+           DIG 2 ;
+           DUP ; INT ; EQ ;
+           IF { DROP ; PUSH bytes 0x30 }
+              { PUSH bytes 0x ; SWAP ; PUSH bool True ;
+                LOOP { PUSH nat 10 ; SWAP ; EDIV ; IF_NONE { PUSH string "DIV" ; FAILWITH } {} ; UNPAIR ;
+                       SWAP ; PUSH nat 48 ; ADD ; BYTES ; DIG 2 ; SWAP ; CONCAT ; SWAP ; DUP ; INT ; NEQ } ;
+                DROP } ;
+           CONCAT ;
+           PUSH bytes 0x5b7b226e616d65223a2247656e65726174696f6e222c2276616c7565223a22 ; CONCAT ;
+           DUP 3 ; DUP 3 ; VIEW "token_metadata" (pair nat (map string bytes)) ;
+           IF_NONE { PUSH string "NO_TOKEN_METADATA" ; FAILWITH } {} ; CDR ;
+           SWAP ; SOME ; PUSH string "attributes" ; UPDATE ;
+           SWAP ; PAIR ;
+           SWAP ; CONTRACT %set_token_metadata (pair nat (map string bytes)) ;
+           IF_NONE { PUSH string "NO_FA2" ; FAILWITH } {} ;
+           PUSH mutez 0 ; DIG 2 ; TRANSFER_TOKENS } ;
+       DIG 2 ; UNPAIR ;
+       IF_LEFT
+         { IF_LEFT
+             { # supersede
+               DIG 2 ; DROP ;
+               DUP ; CAR ; DUG 3 ;
+               PAIR ; EXEC ;
+               UNPAIR ; PUSH int -1 ; ADD ; ABS ;
+               DIG 2 ; PAIR ; EMIT %cart_superseded (pair nat nat) ;
+               NIL operation ; SWAP ; CONS ; PAIR }
+             { # supersede_and_rewrite
+               DUP ; CAR ; DUG 4 ;
+               PAIR ; DIG 2 ; SWAP ; EXEC ;
+               UNPAIR ;
+               DUP 2 ; UNPAIR 4 ; DIG 3 ; DROP ; DIG 2 ; DROP ;
+               SWAP ; PAIR ; DUP 2 ; PAIR ; DUP 5 ; PAIR ;
+               DIG 3 ; SWAP ; EXEC ;
+               SWAP ; PUSH int -1 ; ADD ; ABS ;
+               DIG 3 ; PAIR ; EMIT %cart_superseded (pair nat nat) ;
+               NIL operation ; SWAP ; CONS ; SWAP ; CONS ; PAIR } }
+         { # add_image_and_rewrite
+           DIG 3 ; DROP ;
+           SWAP ; UNPAIR 4 ; SWAP ; PUSH nat 1 ; ADD ; SWAP ; PAIR 4 ;
+           NIL operation ; DIG 2 ;
+           ITER { DUP 3 ; UNPAIR 4 ; DIG 3 ; DROP ;
+                  DIG 2 ; DUP 4 ; GET ; IF_NONE { PUSH nat 1 } {} ;
+                  DUG 2 ;
+                  SWAP ; PAIR ; SWAP ; PAIR ; SWAP ; PAIR ;
+                  DUP 4 ; SWAP ; EXEC ;
+                  CONS } ;
+           DIG 2 ; DROP ; PAIR } } ;
+view "generation_of" nat nat { UNPAIR ; SWAP ; GET 5 ; SWAP ; GET ; IF_NONE { PUSH nat 0 } {} } ;
+view "image_count" unit nat { CDR ; GET 3 } ;

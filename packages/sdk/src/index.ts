@@ -63,6 +63,9 @@ export * from "./tezos-shell.js";
 export * from "./tezos-publication.js";
 export * from "./tezos-standard.js";
 export * from "./tezos-modules.generated.js";
+export * from "./tezos-collection.js";
+export * from "./tezos-live-state.js";
+export * from "./chain-capability-map.js";
 
 export * from "./network-inspection.js";
 
@@ -100,6 +103,7 @@ export * from "./mint-pricing.js";
 
 export * from "./one-mint-coupons.js";
 export * from "./bitcoin-proof.js";
+export * from "./signed-anchor.js";
 
 export * from "./ethereum-tezos-proof.js";
 

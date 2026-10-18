@@ -21,6 +21,8 @@ export const SIBLING_CONFORMANCE_TEST_FILES = Object.freeze([
   "tests/keel-rpc-policy.test.mjs",
   "tests/sdk-keel721-compiled-abi.test.mjs",
   "tests/tezos-view-agreement.test.mjs",
+  "tests/tezos-collection-conformance.test.mjs",
+  "tests/sdk-chain-capability-map.test.mjs",
   "tests/mcp-arena.test.mjs",
   "tests/creator-1155-events.test.mjs",
   "tests/creator-factory-events.test.mjs",
@@ -50,6 +52,8 @@ export const TEST_FILES_ON_DISK = Object.freeze(readdirSync(TEST_ROOT)
  * its execution boundary.
  */
 export const DETERMINISTIC_TEST_FILES = Object.freeze([
+  "tests/signed-anchor.test.mjs",
+  "tests/sdk-tezos-catalog.test.mjs",
   "tests/mcp-publication-references.test.mjs",
   "tests/sdk-manager-modules.test.mjs",
   "tests/sdk-ppmd-body-descriptors.test.mjs",
@@ -230,6 +234,11 @@ export const DETERMINISTIC_TEST_FILES = Object.freeze([
   "tests/sdk-studio-project-intake.test.mjs",
   "tests/sdk-studio-publication.test.mjs",
   "tests/sdk-tezos-publication.test.mjs",
+  "tests/sdk-tezos-collection.test.mjs",
+  "tests/mcp-tezos-collection.test.mjs",
+  "tests/sdk-tezos-live-state.test.mjs",
+  "tests/mcp-tezos-live-state.test.mjs",
+  "tests/sdk-fray-upload.test.mjs",
   "tests/sdk-three-container-harness.test.mjs",
   "tests/sdk-three-module.test.mjs",
   "tests/sdk-three-scene-publication.test.mjs",

@@ -1,6 +1,7 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import { assertValidManifest, createIntegrity } from "../packages/protocol/dist/index.js";
+import { keelTezosOnchfsObjectId } from "../packages/sdk/dist/index.js";
 import {
   buildKeelTezosRecursiveObject,
   buildKeelDirectory,
@@ -726,6 +727,11 @@ test("Studio builds one multi-chunk OnchFS directory with Keel bindings to the s
     assert.ok(binding, `missing Keel binding for ${file.path}`);
     assert.equal(binding.decodedIntegrity.digest, file.integrity.digest);
     assert.equal(binding.decodedIntegrity.byteLength, file.bytes.byteLength);
+  }
+  // Each weld carries the id KeelHoldOnchFS derives: sha256(PACK(descriptor)), not the manifest digest.
+  for (const object of first.document.keelObjects) {
+    assert.equal(object.objectId, keelTezosOnchfsObjectId(object));
+    assert.notEqual(object.objectId, object.manifestSha256);
   }
   assert.notEqual(new TextDecoder("ascii").decode(directory.files[0].bytes.subarray(0, 2)), "PK");
 });
