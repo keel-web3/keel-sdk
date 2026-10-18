@@ -544,9 +544,9 @@ export const KEEL_CHAIN_CAPABILITIES: readonly KeelChainCapability[] = Object.fr
     studioCall: "Emergency pause",
     status: "partial",
     evm: evm(["KeelManager", "KeelLocalPause"], "Shared pause bits checked by every module."),
-    tezos: tez(["KeelManager", "KeelAccessController"], "EVM's bits, masks and revision in KeelManager; admins stop through the access controller and governance resumes. Artifact publication, harness writes and staking check it."),
+    tezos: tez(["KeelManager", "KeelAccessController"], "EVM's bits, masks and revision in KeelManager; admins stop through the access controller and governance resumes. Artifact publication, harness writes, staking, the holds, the market and licensed IP mints check it first, in EVM's entrypoints (KEEL_TEZOS_PAUSE_GATES). Tezos has no pooled treasury, so TREASURY is stored but stops nothing."),
     userVisibleDifference: false,
-    open: "Hold, market, mint, collection, treasury and IP modules still use their per-contract pauses.",
+    open: "Mint lanes, collections and the creator factory still use their per-contract pauses.",
   },
   {
     id: "authority.access-groups",

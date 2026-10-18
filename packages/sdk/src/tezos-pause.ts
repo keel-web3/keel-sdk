@@ -10,7 +10,7 @@
  * submits or reads a chain.
  */
 
-import { keelPauseControls, keelPausePresets } from "./admin-pauses.js";
+import { keelPauseBits, keelPauseControls, keelPausePresets } from "./admin-pauses.js";
 import { keelTezosAddressBytes } from "./tezos-collection.js";
 import type { TezosMichelineValue, TezosTransactionOperation } from "./tezos-publication.js";
 
@@ -67,4 +67,59 @@ export function decodeKeelTezosPauseState(value: TezosMichelineValue) {
   if (flags < 0n || (flags & ~keelPausePresets.all) !== 0n || revision < 0n || revision > UINT64_MAX) throw new RangeError("Invalid Tezos pause state.");
   return { flags, revision, controls: keelPauseControls.map((control) => ({ ...control, paused: (flags & control.mask) !== 0n })),
     allMintsPaused: (flags & keelPausePresets.allMints) === keelPausePresets.allMints };
+}
+
+const { chunking, viewers, mintIP, publication, market, staking } = keelPauseBits;
+
+/**
+ * The shared pause bits each native write checks first, keyed `Contract.entrypoint`.
+ * They are EVM's bits for the EVM function each entrypoint mirrors. Writes not
+ * listed (cancels, reclaims, withdrawals, reads) are never stopped, as on EVM.
+ * Each contract asks its own authority: KeelArtifactRegistry its manager, the
+ * harness registries their artifact registry's manager, the holds, the stake
+ * manager and the IP executor their fixed administrator, and the market the
+ * pause authority fixed at origination. An implicit-account authority means
+ * the contract is not stopped, as a codeless authority on EVM.
+ */
+export const KEEL_TEZOS_PAUSE_GATES: Readonly<Record<string, bigint>> = Object.freeze({
+  "KeelArtifactRegistry.forge_artifact": publication,
+  "KeelArtifactRegistry.forge_artifact_for": publication,
+  "KeelArtifactRegistry.forge_with_revision_policy": publication,
+  "KeelArtifactRegistry.append_artifact_revision": publication,
+  "KeelHarnessRegistry.forge_harness": viewers,
+  "KeelHarnessRegistry.forge_harness_for": viewers,
+  "KeelHarnessRegistry.append_harness_revision": viewers,
+  "KeelHarnessRegistry.append_harness_selections": viewers,
+  "KeelHarnessRegistry.fork_harness_for_token": viewers,
+  "KeelHarnessRegistry.activate_fork": viewers,
+  "KeelHarnessTreeRegistry.forge_harness_tree": viewers,
+  "KeelHarnessTreeRegistry.forge_harness_tree_for": viewers,
+  "KeelHarnessTreeRegistry.append_harness_tree": viewers,
+  "KeelHarnessTreeRegistry.fork_harness_tree_for_token": viewers,
+  "KeelStakeObjectManager.stake": staking,
+  "KeelHold.cast_slug": chunking,
+  "KeelHoldOnchFS.write_chunk": chunking,
+  "KeelHoldOnchFS.create_file": chunking,
+  "KeelHoldOnchFS.create_directory": chunking,
+  "KeelHoldOnchFS.weld_object": publication,
+  "KeelHoldOnchFS.forge_harness": viewers,
+  "KeelMarket.register_escrow_listing": market,
+  "KeelMarket.list": market,
+  "KeelMarket.update_listing": market,
+  "KeelMarket.buy": market,
+  "KeelMarket.place_bid": market,
+  "KeelMarket.accept_bid": market,
+  "KeelIPActionExecutor.execute_remint": mintIP,
+  "KeelIPActionExecutor.execute_mint_to_backpack": mintIP,
+});
+
+/** The pause bits a native call checks first, or 0n when no shared stop applies to it. */
+export function keelTezosPauseGate(contract: string, entrypoint: string): bigint {
+  return KEEL_TEZOS_PAUSE_GATES[`${contract}.${entrypoint}`] ?? 0n;
+}
+
+/** The controls that would stop a native call under the given flags, for Studio to name before it signs. */
+export function keelTezosPausedFor(contract: string, entrypoint: string, flags: bigint) {
+  const blocked = keelTezosPauseGate(contract, entrypoint) & flags;
+  return keelPauseControls.filter((control) => (control.mask & blocked) !== 0n);
 }

@@ -9,7 +9,11 @@ import {
   buildKeelTezosPauseAction,
   buildKeelTezosResumeAction,
   decodeKeelTezosPauseState,
+  KEEL_TEZOS_MODULES,
+  KEEL_TEZOS_PAUSE_GATES,
   keelPauseBits,
+  keelTezosPauseGate,
+  keelTezosPausedFor,
   keelPausePresets,
 } from '../packages/sdk/dist/index.js';
 import { keccak256, stringToHex } from 'viem';
@@ -61,4 +65,33 @@ siblingSource('the shared pause vectors use the SDK bits and error names on both
     if (step.tezos) assert.equal(KEEL_TEZOS_PAUSE_ERRORS[step.tezos], step.evm, step.label);
     else assert.equal(step.evm, '', step.label);
   }
+});
+
+nodeTest('every native pause gate names a cataloged entrypoint and an EVM bit', () => {
+  const entrypoints = new Map();
+  for (const module of KEEL_TEZOS_MODULES) for (const [contract, names] of Object.entries(module.entrypoints)) entrypoints.set(contract, new Set([...(entrypoints.get(contract) ?? []), ...names]));
+  for (const [key, mask] of Object.entries(KEEL_TEZOS_PAUSE_GATES)) {
+    const [contract, entrypoint] = key.split('.');
+    assert.ok(entrypoints.get(contract)?.has(entrypoint), key);
+    assert.ok(mask > 0n && (mask & ~keelPausePresets.all) === 0n, key);
+  }
+  assert.equal(keelTezosPauseGate('KeelMarket', 'cancel_listing'), 0n);
+  assert.deepEqual(keelTezosPausedFor('KeelMarket', 'buy', keelPausePresets.all).map((control) => control.id), ['market']);
+  assert.deepEqual(keelTezosPausedFor('KeelMarket', 'buy', keelPauseBits.chunking), []);
+});
+
+siblingSource('the module gate vectors use the SDK gates on both chains', () => {
+  const fixture = JSON.parse(readFileSync(new URL('../../keel-contracts/test/fixtures/parity/system-pause-modules.json', import.meta.url), 'utf8'));
+  const named = new Set();
+  for (const gate of fixture.gates) for (const name of gate.tezos) {
+    const [contract, entrypoint] = name.split('.');
+    assert.equal(keelTezosPauseGate(contract, entrypoint), BigInt(gate.mask), name);
+    named.add(name);
+  }
+  for (const entry of fixture.open) for (const name of entry.tezos) {
+    const [contract, entrypoint] = name.split('.');
+    assert.equal(keelTezosPauseGate(contract, entrypoint), 0n, name);
+  }
+  const lanes = new Set(['KeelHold', 'KeelHoldOnchFS', 'KeelMarket', 'KeelIPActionExecutor']);
+  for (const key of Object.keys(KEEL_TEZOS_PAUSE_GATES)) if (lanes.has(key.split('.')[0])) assert.ok(named.has(key), key);
 });
