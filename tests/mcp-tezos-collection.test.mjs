@@ -203,6 +203,35 @@ test("MCP prepares token-bound account creation and owner execution, refusing de
   assert.equal(delegated.structuredContent.capability, "stake.token-bound-account.delegate-call");
 });
 
+test("MCP prepares manager pause and cold recovery, refusing the EVM-only upgrade path", async (t) => {
+  const { call } = await fixture(t);
+  // The shared golden vector from keel-contracts test/fixtures/parity/manager-recovery.json (SmartPy and Octez agree).
+  const golden = {"network": "NetXdQprcVkpaWU", "registry": "KT1Tezooo3zzSmartPyzzSTATiCzzzseJjWC", "manager": "KT1TezoooozzSmartPyzzSTATiCzzzwwBFA1", "creator": "tz1KqTpEZ7Yob7QbPE4Hy4Wo8fHG8LhKxZSx", "salt": "0x0000000000000000000000000000000000000000000000000000000000000001", "groupId": "0x2633ce75040906c626e62aaa22cd4f8f36e465d851fb6aaf44d303f9e5bc3998", "members": ["tz1KqTpEZ7Yob7QbPE4Hy4Wo8fHG8LhKxZSx"], "governors": ["tz1KqTpEZ7Yob7QbPE4Hy4Wo8fHG8LhKxZSx", "tz1VSUr8wwNhLAzempoch5d6hLRiTh8Cjcjb", "tz1aSkwEot3L2kmUvcoxzjMomb9mvBNuzFK6"], "bindingRevision": 1, "deadline": 100000, "actionPayload": "0x0507070a0000001d6b65656c2e74657a6f732e7265636f766572792e616374696f6e2e763107070a0000001601d1371b91c7491542e97deee96091e28a80b233590007070a000000047a06a77007070a000000202633ce75040906c626e62aaa22cd4f8f36e465d851fb6aaf44d303f9e5bc399807070a0000001601d1371b91fdbd07c8855659c84652230be0eaecd50007070a00000020cd155e9e01018fa80a056c2b4c6416622d952ab7f8cc515c7aeb00a6309595f107070a00000020eda274b83e9d75af519fbf67d63e328f09ffda3da2bf1bc3ae4f42e6bfeca8ed070700000707000000a09a0c", "digest": "0x4c9173be876dfaf2f6d54b1f6a6e206a84dd2a20fb6cc443b50e8d41eef4cb54", "acceptancePayload": "0x0507070a000000216b65656c2e74657a6f732e7265636f766572792e616363657074616e63652e763107070a0000001601d1371b91c7491542e97deee96091e28a80b233590007070a000000047a06a77007070a000000204c9173be876dfaf2f6d54b1f6a6e206a84dd2a20fb6cc443b50e8d41eef4cb540a000000150002298c03ed7d454a101eb7022bc95f7e5f41ac78"};
+  const pause = await call("keel-tezos-recovery-prepare", { network, action: { kind: "pause", controller: "KT1BNnzhtsMKUG7t72phZN8BG2W6TwPUQsYt" } });
+  assert.equal(pause.isError, undefined, JSON.stringify(pause));
+  assert.equal(pause.structuredContent.operation.parameters.entrypoint, "pause_manager");
+  assert.equal(pause.structuredContent.signing, "not-performed");
+  const group = await call("keel-tezos-recovery-prepare", { network, action: { kind: "create-group", registry: golden.registry, creator: golden.creator,
+    salt: golden.salt, members: golden.members, verifyKeys: false, deadline: golden.deadline } });
+  assert.equal(group.isError, undefined, JSON.stringify(group));
+  assert.equal(group.structuredContent.groupId, golden.groupId);
+  assert.equal(group.structuredContent.operation.parameters.entrypoint, "create_group");
+  const payload = await call("keel-tezos-recovery-prepare", { network: golden.network, action: { kind: "payload", payload: "action", registry: golden.registry,
+    manager: golden.manager, groupId: golden.groupId, governors: golden.governors, bindingRevision: golden.bindingRevision, deadline: golden.deadline } });
+  assert.equal(payload.structuredContent.payload, golden.actionPayload);
+  assert.equal(payload.structuredContent.digest, golden.digest);
+  const acceptance = await call("keel-tezos-recovery-prepare", { network: golden.network, action: { kind: "payload", payload: "acceptance", registry: golden.registry,
+    digest: golden.digest, signer: golden.creator } });
+  assert.equal(acceptance.structuredContent.payload, golden.acceptancePayload);
+  const upgrade = await call("keel-tezos-recovery-prepare", { network, action: { kind: "upgrade" } });
+  assert.equal(upgrade.isError, true);
+  assert.equal(upgrade.structuredContent.code, "KEEL_CHAIN_CAPABILITY_UNSUPPORTED");
+  assert.equal(upgrade.structuredContent.capability, "authority.recovery.upgrade");
+  const contractKey = await call("keel-tezos-recovery-prepare", { network, action: { kind: "create-group", registry: golden.registry, creator: golden.creator,
+    salt: golden.salt, members: [golden.registry], verifyKeys: false, deadline: 1 } });
+  assert.equal(contractKey.isError, true);
+});
+
 test("MCP prepares seeded-collection calls and returns the typed refusal for EVM-only seed modes", async (t) => {
   const { call } = await fixture(t);
   const configure = await call("keel-tezos-seed-action-prepare", { network, sender: creator, collection, action: { kind: "configure", profile: { reveal: "immediate", mode: "derived" } } });

@@ -21,6 +21,23 @@ import {
   buildKeelTezosAutomationPolicyAction,
   keelTezosAutomationSigningPayload,
 } from "@keel/sdk/tezos-automation";
+import {
+  KEEL_TEZOS_MANAGER_RECOVERY_SCOPE,
+  buildKeelTezosBindRecoveryGroups,
+  buildKeelTezosManagerConfigureBackup,
+  buildKeelTezosManagerPause,
+  buildKeelTezosManagerRecovery,
+  buildKeelTezosManagerUnpause,
+  buildKeelTezosRecoveryCreateGroup,
+  buildKeelTezosRecoveryRotateGroup,
+  buildKeelTezosRecoveryUpgrade,
+  keelTezosManagerRecoveryActionHash,
+  keelTezosRecoveryAcceptancePayload,
+  keelTezosRecoveryActionPayload,
+  keelTezosRecoveryBoundActionHash,
+  keelTezosRecoveryDigest,
+  keelTezosRecoveryGroupId,
+} from "@keel/sdk/tezos-recovery";
 import type { JsonSchema, ToolContext, ToolDefinition } from "./types.js";
 
 /**
@@ -36,6 +53,8 @@ const KT1: JsonSchema = { type: "string", pattern: "^KT1[1-9A-HJ-NP-Za-km-z]{33}
 const ROYALTY: JsonSchema = { type: "object", additionalProperties: false, required: ["receiver", "bps"], properties: { receiver: ADDRESS, bps: { type: "integer", minimum: 1, maximum: 10000 } } };
 const DIGEST: JsonSchema = { type: "string", pattern: "^(?:0x)?[0-9a-fA-F]{64}$" };
 const HARNESS_ID: JsonSchema = { type: "string", pattern: "^(?:0x)?[0-9a-fA-F]{64}$" };
+const SIGNATURES: JsonSchema = { type: "array", maxItems: 32, items: { type: "object", additionalProperties: false, required: ["publicKey", "signature"], properties: {
+  publicKey: { type: "string", pattern: "^(?:edpk|sppk|p2pk)[1-9A-HJ-NP-Za-km-z]+$" }, signature: { type: "string", pattern: "^(?:edsig|spsig1|p2sig|sig)[1-9A-HJ-NP-Za-km-z]+$" } } } };
 const NATURAL: JsonSchema = { anyOf: [{ type: "integer", minimum: 0 }, { type: "string", pattern: "^(?:0|[1-9][0-9]*)$" }] };
 const ALLOWLIST: JsonSchema = { type: "array", maxItems: 65_536, items: { type: "object", additionalProperties: false, required: ["account", "allowance"], properties: { account: ADDRESS, allowance: { type: "integer", minimum: 1 } } } };
 const SECRET = /(?:private|secret|mnemonic|seed|passphrase)/iu;
@@ -327,6 +346,55 @@ export const TEZOS_COLLECTION_TOOL_DEFINITIONS: readonly ToolDefinition[] = [
       const { network, action } = input(value, "the Tezos token-bound account tool");
       if (action.kind === "create") return prepareKeelTezosTokenBoundAccount({ network, ...action } as never);
       return { schema: "keel.tezos-token-bound-account@1", family: "tezos", network, ...buildKeelTezosAccountExecute(action as never) };
+    },
+  ),
+  tool(
+    "keel-tezos-recovery-prepare",
+    "Prepare the manager's operational pause and cold-key recovery, EVM's KeelManagerProxy pause/unpause, KeelRecoveryGroups and recoverGovernors. pause: an Admin's pause_manager on the access controller; unpause and bind: governance actions on the manager. create-group/rotate-group: KeelRecoveryGroups rosters (one key or three to 32, tz1/tz2/tz3 only). configure-backup: enrol, replace or remove the manager's cold group (governance before the first enrolment, any relayer with the cold quorum after). recover: the cold quorum's approvals plus every incoming governor's acceptance; the manager comes back paused and old roles, automation keys and signature approvals retire. payload: the exact bytes a cold key signs (action) or an incoming key accepts (acceptance), and their digest; read the group's nonce and revision with the registry's group view. upgrade: EVM upgradeWithBackup, which returns KEEL_CHAIN_CAPABILITY_UNSUPPORTED (the native manager has no script upgrade). Never signs or submits.",
+    {
+      type: "object", additionalProperties: false, required: ["network", "action"],
+      properties: {
+        network: NETWORK,
+        action: {
+          type: "object", additionalProperties: false, required: ["kind"],
+          properties: {
+            kind: { type: "string", enum: ["pause", "unpause", "bind", "create-group", "rotate-group", "configure-backup", "recover", "payload", "upgrade"] },
+            manager: KT1, controller: KT1, registry: KT1, groupId: DIGEST, nextGroup: DIGEST, salt: DIGEST, creator: ADDRESS,
+            members: { type: "array", minItems: 1, maxItems: 32, items: ADDRESS },
+            governors: { type: "array", minItems: 3, maxItems: 32, items: ADDRESS },
+            verifyKeys: { type: "boolean" }, enrolled: { type: "boolean" }, expectedRevision: NATURAL, deadline: NATURAL,
+            approvals: SIGNATURES, acceptances: SIGNATURES, currentApprovals: SIGNATURES, incomingApprovals: SIGNATURES,
+            payload: { type: "string", enum: ["action", "acceptance"] }, resource: ADDRESS, scope: DIGEST, actionHash: DIGEST,
+            bindingRevision: NATURAL, nonce: NATURAL, revision: NATURAL, digest: DIGEST, signer: ADDRESS,
+          },
+        },
+      },
+    },
+    async (_context, value) => {
+      const { network, action } = input(value, "the Tezos recovery tool");
+      const { kind, ...rest } = action;
+      const prepared = (result: Record<string, unknown>) => ({ schema: "keel.tezos-recovery@1", family: "tezos", network, kind, ...result, signing: "not-performed", submission: "not-performed" });
+      if (kind === "upgrade") buildKeelTezosRecoveryUpgrade();
+      if (kind === "pause") return prepared(buildKeelTezosManagerPause(rest as never));
+      if (kind === "unpause") return prepared(buildKeelTezosManagerUnpause(rest as never));
+      if (kind === "bind") return prepared(buildKeelTezosBindRecoveryGroups(rest as never));
+      if (kind === "create-group") {
+        const groupId = keelTezosRecoveryGroupId({ creator: rest.creator, salt: rest.salt });
+        return prepared({ groupId, ...buildKeelTezosRecoveryCreateGroup(rest as never) });
+      }
+      if (kind === "rotate-group") return prepared(buildKeelTezosRecoveryRotateGroup(rest as never));
+      if (kind === "configure-backup") return prepared(buildKeelTezosManagerConfigureBackup({ ...rest, enrolled: rest.enrolled === true } as never));
+      if (kind === "recover") return prepared(buildKeelTezosManagerRecovery(rest as never));
+      if (rest.payload === "acceptance") {
+        return prepared({ payload: keelTezosRecoveryAcceptancePayload({ network, registry: rest.registry, digest: rest.digest, signer: rest.signer }) });
+      }
+      // A manager recovery signs the bound action: the governors' hash folded with the binding revision.
+      const actionHash = rest.governors !== undefined
+        ? keelTezosRecoveryBoundActionHash(rest.bindingRevision ?? 0, keelTezosManagerRecoveryActionHash(rest.governors))
+        : rest.actionHash;
+      const payload = keelTezosRecoveryActionPayload({ network, registry: rest.registry, groupId: rest.groupId, resource: rest.resource ?? rest.manager,
+        scope: rest.scope ?? KEEL_TEZOS_MANAGER_RECOVERY_SCOPE, actionHash, nonce: rest.nonce ?? 0, revision: rest.revision ?? 0, deadline: rest.deadline });
+      return prepared({ actionHash, payload, digest: keelTezosRecoveryDigest(payload) });
     },
   ),
   tool(

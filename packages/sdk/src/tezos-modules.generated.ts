@@ -149,6 +149,7 @@ export const KEEL_TEZOS_MODULES: readonly KeelTezosModule[] = [
       "keel_link_registry.py",
       "keel_manager.py",
       "keel_manager_types.py",
+      "keel_recovery_groups.py",
       "keel_seed_registry.py",
       "keel_signature_authority.py"
     ],
@@ -160,6 +161,7 @@ export const KEEL_TEZOS_MODULES: readonly KeelTezosModule[] = [
       "KeelImmutableCheckpointRegistry",
       "KeelLinkRegistry",
       "KeelManager",
+      "KeelRecoveryGroups",
       "KeelSeedRegistry",
       "KeelSignatureAuthority"
     ],
@@ -188,6 +190,7 @@ export const KEEL_TEZOS_MODULES: readonly KeelTezosModule[] = [
         "execute_role",
         "finish_execution",
         "pause",
+        "pause_manager",
         "pause_systems",
         "unpause"
       ],
@@ -239,16 +242,27 @@ export const KEEL_TEZOS_MODULES: readonly KeelTezosModule[] = [
         "accept_governor_reconfiguration",
         "activate_governor_change",
         "approve",
+        "bind_recovery_groups",
         "cancel_governor_reconfiguration",
+        "configure_backup",
         "configure_module",
         "configure_rpc_host_list",
         "expire_governor_reconfiguration",
         "finish_governance_execution",
         "freeze_module",
+        "pause",
         "pause_systems",
         "propose",
+        "recover_governors",
         "resume_systems",
-        "schedule_governor_change"
+        "schedule_governor_change",
+        "unpause"
+      ],
+      "KeelRecoveryGroups": [
+        "authorize_bound",
+        "configure_binding",
+        "create_group",
+        "rotate_group"
       ],
       "KeelSeedRegistry": [
         "publish_mint_seed_set",
@@ -349,12 +363,24 @@ export const KEEL_TEZOS_MODULES: readonly KeelTezosModule[] = [
       "KeelManager": [
         "banner",
         "governance_threshold",
+        "lane_state",
         "module",
         "require_systems_active",
         "resolve_module",
         "rpc_host_count",
         "rpc_host_list",
         "system_pause_state"
+      ],
+      "KeelRecoveryGroups": [
+        "acceptance_payload",
+        "action_payload",
+        "binding",
+        "binding_hash",
+        "bound_payload",
+        "check_bound",
+        "group",
+        "roster_payload",
+        "verify_new_keys"
       ],
       "KeelSeedRegistry": [
         "compute_seed_set_commitment",
