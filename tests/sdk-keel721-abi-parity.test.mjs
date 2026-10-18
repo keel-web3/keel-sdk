@@ -5,6 +5,7 @@ import {
   KEEL721_CAMPAIGN_CREATOR_ROLE,
   KEEL721_PRESENTATION_ROLE,
   keel721Abi,
+  keel721FieldBindingAbi,
 } from "../packages/sdk/dist/index.js";
 import { ABIS as keelDieAbis } from "../packages/sdk/dist/abis/keel-die.generated.js";
 
@@ -16,7 +17,8 @@ test("canonical KEEL721 human-readable ABI exactly tracks compiled functions and
     .filter((item) => item.type === "function" || item.type === "event")
     .map(itemKey)
     .sort();
-  const exported = parseAbi(keel721Abi).map(itemKey).sort();
+  // The field-binding entries live beside keel721Abi so the canonical shell bytes stay fixed.
+  const exported = parseAbi([...keel721Abi, ...keel721FieldBindingAbi]).map(itemKey).sort();
   assert.deepEqual(exported, compiled);
 });
 

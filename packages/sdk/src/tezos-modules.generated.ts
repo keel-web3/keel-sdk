@@ -571,6 +571,7 @@ export const KEEL_TEZOS_MODULES: readonly KeelTezosModule[] = [
     "id": "keel-fields",
     "sources": "src/modules/keel-fields/tezos",
     "contracts": [
+      "keel_field_codec.py",
       "keel_field_reader.py",
       "keel_field_registry.py",
       "keel_field_validators.py"

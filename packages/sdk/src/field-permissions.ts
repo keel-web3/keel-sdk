@@ -1328,3 +1328,15 @@ export function prepareKeelFieldEdit(input: Target & {
   }
   return envelope(t.chain, "field-edit", [call], { mask: edit.mask.toString(), values: edit.values, fields: edit.fields, ...(input.editor ? { expectedSender: input.editor } : {}) });
 }
+
+/**
+ * KEEL721's field-binding surface (admin `setFieldReader`, `FieldReaderSet`).
+ *
+ * Kept out of `keel721Abi` on purpose: the canonical shell embeds the digest of the
+ * published-view reader bundle, and that bundle carries `keel721Abi`, so adding these
+ * entries there would change the registered shell bytes. Combine the two when encoding.
+ */
+export const keel721FieldBindingAbi = [
+  "function setFieldReader(address reader)",
+  "event FieldReaderSet(address indexed reader,address indexed registry)",
+] as const;
