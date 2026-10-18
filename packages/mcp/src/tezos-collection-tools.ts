@@ -12,6 +12,7 @@ import {
   type KeelTezosCompiledCode,
   type KeelTezosHoldResourceInput,
 } from "@keel/sdk/tezos-collection";
+import { prepareKeelTezosHarnessTreeAction } from "@keel/sdk/tezos-harness-tree";
 import type { JsonSchema, ToolContext, ToolDefinition } from "./types.js";
 
 /**
@@ -26,6 +27,7 @@ const ADDRESS: JsonSchema = { type: "string", pattern: "^(?:tz[1-4]|KT1)[1-9A-HJ
 const KT1: JsonSchema = { type: "string", pattern: "^KT1[1-9A-HJ-NP-Za-km-z]{33}$" };
 const ROYALTY: JsonSchema = { type: "object", additionalProperties: false, required: ["receiver", "bps"], properties: { receiver: ADDRESS, bps: { type: "integer", minimum: 1, maximum: 10000 } } };
 const DIGEST: JsonSchema = { type: "string", pattern: "^(?:0x)?[0-9a-fA-F]{64}$" };
+const HARNESS_ID: JsonSchema = { type: "string", pattern: "^(?:0x)?[0-9a-fA-F]{64}$" };
 const NATURAL: JsonSchema = { anyOf: [{ type: "integer", minimum: 0 }, { type: "string", pattern: "^(?:0|[1-9][0-9]*)$" }] };
 const ALLOWLIST: JsonSchema = { type: "array", maxItems: 65_536, items: { type: "object", additionalProperties: false, required: ["account", "allowance"], properties: { account: ADDRESS, allowance: { type: "integer", minimum: 1 } } } };
 const SECRET = /(?:private|secret|mnemonic|seed|passphrase)/iu;
@@ -237,6 +239,32 @@ export const TEZOS_COLLECTION_TOOL_DEFINITIONS: readonly ToolDefinition[] = [
       },
     },
     async (_context, value) => prepareKeelTezosSeedAction(input(value, "the Tezos seed action tool") as never),
+  ),
+  tool(
+    "keel-tezos-harness-tree-prepare",
+    "Prepare one harness tree call with EVM's payload: bind (the registry manager binds the tree registry once), register-keys, set-limits, forge (a branch over 1..128 { key, revision } children; creator set means the publication job's forge_harness_tree_for), append, fork (a token tree fork) or append-selections (reuse the parent leaf's IDs with new revisions). Tezos splits KeelHarnessRegistry in two; the call is routed to the piece that holds it, and the tree digest equals EVM's. Keys are read back with harness_key_of. Review-only.",
+    {
+      type: "object", additionalProperties: false, required: ["network", "sender", "harnessRegistry", "treeRegistry", "action"],
+      properties: {
+        network: NETWORK, sender: ADDRESS, harnessRegistry: KT1, treeRegistry: KT1,
+        action: {
+          type: "object", additionalProperties: false, required: ["kind"],
+          properties: {
+            kind: { type: "string", enum: ["bind", "register-keys", "set-limits", "forge", "append", "fork", "append-selections"] },
+            harnessIds: { type: "array", minItems: 1, maxItems: 128, items: HARNESS_ID },
+            maxDepth: NATURAL, maxObjects: NATURAL,
+            salt: { type: "string", pattern: "^(?:0x)?(?:[0-9a-fA-F]{2}){1,32}$" }, collection: KT1, creator: ADDRESS,
+            editPolicy: { type: "integer", minimum: 0, maximum: 255 }, forkPolicy: { type: "integer", minimum: 0, maximum: 255 },
+            children: { type: "array", minItems: 1, maxItems: 128, items: { type: "object", additionalProperties: false, required: ["key", "revision"],
+              properties: { key: { type: "integer", minimum: 1, maximum: 4294967295 }, revision: { type: "integer", minimum: 1, maximum: 4294967295 } } } },
+            harnessId: HARNESS_ID, expectedParent: NATURAL, tokenId: NATURAL, baseRevision: NATURAL, expectedForkParent: NATURAL,
+            revisions: { type: "array", minItems: 1, maxItems: 128, items: NATURAL },
+            manifestDigest: HARNESS_ID, entropySetDigest: HARNESS_ID,
+          },
+        },
+      },
+    },
+    async (_context, value) => prepareKeelTezosHarnessTreeAction(input(value, "the Tezos harness tree tool") as never),
   ),
   tool(
     "keel-tezos-token-metadata-prepare",

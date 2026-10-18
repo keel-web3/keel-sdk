@@ -135,6 +135,10 @@
       "types": "./dist/tezos-collection.d.ts",
       "import": "./dist/tezos-collection.js"
     },
+    "./tezos-harness-tree": {
+      "types": "./dist/tezos-harness-tree.d.ts",
+      "import": "./dist/tezos-harness-tree.js"
+    },
     "./tezos-live-state": {
       "types": "./dist/tezos-live-state.d.ts",
       "import": "./dist/tezos-live-state.js"

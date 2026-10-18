@@ -65,6 +65,7 @@ export * from "./tezos-standard.js";
 export * from "./tezos-modules.generated.js";
 export * from "./tezos-collection.js";
 export * from "./tezos-split-registries.js";
+export * from "./tezos-harness-tree.js";
 export * from "./tezos-live-state.js";
 export * from "./chain-capability-map.js";
 

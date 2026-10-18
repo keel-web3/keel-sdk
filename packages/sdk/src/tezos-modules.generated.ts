@@ -144,6 +144,7 @@ export const KEEL_TEZOS_MODULES: readonly KeelTezosModule[] = [
       "keel_access_controller.py",
       "keel_artifact_registry.py",
       "keel_harness_registry.py",
+      "keel_harness_tree_registry.py",
       "keel_immutable_checkpoint.py",
       "keel_link_registry.py",
       "keel_manager.py",
@@ -155,12 +156,28 @@ export const KEEL_TEZOS_MODULES: readonly KeelTezosModule[] = [
       "KeelAccessController",
       "KeelArtifactRegistry",
       "KeelHarnessRegistry",
+      "KeelHarnessTreeRegistry",
       "KeelImmutableCheckpointRegistry",
       "KeelLinkRegistry",
       "KeelManager",
       "KeelSeedRegistry",
       "KeelSignatureAuthority"
     ],
+    "splits": {
+      "KeelHarnessRegistry": [
+        "KeelHarnessRegistry",
+        "KeelHarnessTreeRegistry"
+      ]
+    },
+    "bindings": {
+      "KeelHarnessRegistry": [
+        {
+          "on": "KeelHarnessRegistry",
+          "entrypoint": "bind_tree_registry",
+          "argument": "KeelHarnessTreeRegistry"
+        }
+      ]
+    },
     "entrypoints": {
       "KeelAccessController": [
         "configure_policy",
@@ -185,13 +202,26 @@ export const KEEL_TEZOS_MODULES: readonly KeelTezosModule[] = [
       "KeelHarnessRegistry": [
         "activate_fork",
         "append_harness_revision",
+        "append_harness_selections",
+        "bind_tree_registry",
         "cancel_pending_fork",
         "forge_harness",
         "forge_harness_for",
         "fork_harness_for_token",
         "freeze_harness",
         "freeze_token_fork",
+        "record_tree_fork",
+        "record_tree_revision",
         "set_publication_job"
+      ],
+      "KeelHarnessTreeRegistry": [
+        "append_harness_tree",
+        "forge_harness_tree",
+        "forge_harness_tree_for",
+        "fork_harness_tree_for_token",
+        "register_harness_key",
+        "register_harness_keys",
+        "set_tree_limits"
       ],
       "KeelImmutableCheckpointRegistry": [
         "append_checkpoint_slug",
@@ -265,6 +295,7 @@ export const KEEL_TEZOS_MODULES: readonly KeelTezosModule[] = [
         "harness_revision_commitment",
         "harness_revision_exists",
         "harness_revision_publisher",
+        "harness_seed_context",
         "harness_slots",
         "keel_index",
         "latest_harness_revision",
@@ -273,7 +304,18 @@ export const KEEL_TEZOS_MODULES: readonly KeelTezosModule[] = [
         "publication_job",
         "token_fork_lineage",
         "token_fork_revision",
-        "token_fork_selections"
+        "token_fork_selections",
+        "tree_registry"
+      ],
+      "KeelHarnessTreeRegistry": [
+        "harness_id_of",
+        "harness_key_of",
+        "harness_node",
+        "harness_registry",
+        "harness_tree",
+        "token_fork_tree",
+        "tree_control",
+        "tree_keel_index"
       ],
       "KeelImmutableCheckpointRegistry": [
         "get_checkpoint",

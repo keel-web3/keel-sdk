@@ -143,6 +143,24 @@ test("MCP read-back verifies a collection against a loopback Tezos RPC", async (
   assert.equal(holderEditable.structuredContent.checks.find((check) => check.name === "metadata-editing-authority").ok, false);
 });
 
+test("MCP prepares harness tree calls on the piece that holds them", async (t) => {
+  const { call } = await fixture(t);
+  const tree = "KT1BNnzhtsMKUG7t72phZN8BG2W6TwPUQsYt";
+  const digest = `0x${"11".repeat(32)}`;
+  const forged = await call("keel-tezos-harness-tree-prepare", { network, sender: creator, harnessRegistry: registry, treeRegistry: tree,
+    action: { kind: "forge", salt: "0x01", collection, editPolicy: 0, forkPolicy: 1, children: [{ key: 1, revision: 1 }, { key: 2, revision: 1 }], manifestDigest: digest, entropySetDigest: digest } });
+  assert.equal(forged.isError, undefined, JSON.stringify(forged));
+  assert.equal(forged.structuredContent.operation.destination, tree);
+  assert.equal(forged.structuredContent.operation.parameters.entrypoint, "forge_harness_tree");
+  assert.equal(forged.structuredContent.treeDigest, "0xaf3c157af65142cf4a2f8cde2e5c6d24530e78cf8ec7c2c94d556f5ff65b398d");
+  assert.equal(forged.structuredContent.signing, "not-performed");
+  const selections = await call("keel-tezos-harness-tree-prepare", { network, sender: creator, harnessRegistry: registry, treeRegistry: tree,
+    action: { kind: "append-selections", harnessId: `0x${"ab".repeat(32)}`, expectedParent: 1, revisions: [2, 1], manifestDigest: digest, entropySetDigest: digest } });
+  assert.equal(selections.structuredContent.operation.destination, registry);
+  const refused = await call("keel-tezos-harness-tree-prepare", { network, sender: creator, harnessRegistry: registry, treeRegistry: tree, action: { kind: "set-limits", maxDepth: 1, maxObjects: 1 } });
+  assert.equal(refused.isError, true);
+});
+
 test("MCP prepares seeded-collection calls and returns the typed refusal for EVM-only seed modes", async (t) => {
   const { call } = await fixture(t);
   const configure = await call("keel-tezos-seed-action-prepare", { network, sender: creator, collection, action: { kind: "configure", profile: { reveal: "immediate", mode: "derived" } } });
