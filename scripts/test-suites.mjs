@@ -163,6 +163,7 @@ export const DETERMINISTIC_TEST_FILES = Object.freeze([
   "tests/sdk-onchain-shell-profile.test.mjs",
   "tests/sdk-prepared-dense-copy.test.mjs",
   "tests/sdk-prepare-dense-payload.test.mjs",
+  "tests/sdk-published-reader-identity.test.mjs",
   "tests/sdk-module-runtime.test.mjs",
   "tests/sdk-resource-decoders.test.mjs",
   "tests/stored-text-runtime.test.mjs",
