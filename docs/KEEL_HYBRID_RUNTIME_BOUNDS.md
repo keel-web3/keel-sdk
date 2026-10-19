@@ -34,6 +34,11 @@ read-only progress and resume of transient failures at the original pin; explici
 document cancellation/pagehide is terminal for that loader instance. No paid
 operation is retried by these APIs.
 
+Progress does not change the existing visual loading status. The optional
+pagehide listener is installed in supported browsers; a DOM/VM without window
+events can still exercise mounting and integrity checks. Each request retains
+its own deadline/abort handling regardless of that optional lifecycle hook.
+
 The managed bridge bytes change for newly prepared loaders. Existing embedded
 loaders do not acquire new code when this SDK is installed. The registered
 canonical document and URI81 inline fragment generators are separate artifacts;
