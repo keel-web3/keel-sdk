@@ -23,6 +23,10 @@ structured RPC failures fail closed without retry or another recipient. Fully
 read plain-text HTTP transport messages without execution/denial markers retain
 transport fallback; correlated rate-limit envelopes retain bounded same-endpoint
 retry. No error body is interpreted as successful contract execution.
+The same rule applies to JSON-RPC errors carried inside HTTP 200 responses:
+custom revert spellings are terminal, and an unknown non-null error is not a
+transport success. Only bounded, correlated, flat provider-capacity errors are
+eligible for capacity retries; nested or contradictory errors fail closed.
 
 Chunk reconstruction uses iterative traversal, bounded leaf workers, and the
 existing depth, node, stored-byte and decoded-byte limits. It preserves ordering,

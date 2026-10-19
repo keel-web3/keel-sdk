@@ -55,6 +55,23 @@ test('browser fully correlated rate-limit envelope retries the same pinned opera
   let reads=0;const f=setup(q=>q.method==='eth_chainId'?'0x7a69':q.method==='eth_getBlockByNumber'?block:++reads===1?Response.json({jsonrpc:'2.0',id:q.id,error:{code:-32005,message:'rate limit'}},{status:429,headers:{'retry-after':'0'}}):'0x6000',{maxRetries:1,retryDelayMs:1});
   await f.chain.pinBlock();assert.equal(await f.chain.call(store,'0x1234'),'0x6000');const calls=f.calls.filter(q=>q.method==='eth_call');assert.equal(calls.length,2);assert.ok(calls.every(q=>q.url===urls[0]));assert.deepEqual(calls[0].params,calls[1].params);
 });
+for(const error of [
+  {code:-32000,message:'VM Exception while processing transaction: revert CustomError()',data:'0xdeadbeef'},
+  {code:-32000,message:'opaque contract failure',data:'0xdeadbeef'},
+  {code:-32005,message:'execution reverted',data:'0xdeadbeef'},
+  {code:-32005,message:'rate limit',data:{cause:{code:3,message:'revert CustomError()'}}},
+  {code:-32005,message:'x'.repeat(2049)},
+  {code:403,message:'PRIVATE provider text'},
+  'opaque failure',
+])test('browser HTTP200 errors cannot fall through to successful alternate execution: '+JSON.stringify(error).slice(0,100),async()=>{
+  const f=setup((q,url)=>q.method==='eth_chainId'?'0x7a69':url===urls[0]?Response.json({jsonrpc:'2.0',id:q.id,error}):'0x6000',{maxRetries:2,retryDelayMs:1});
+  await assert.rejects(f.chain.call(store,'0x1234'),e=>e.terminal===true&&!/PRIVATE|deadbeef|CustomError/.test(e.message));
+  assert.equal(f.calls.filter(q=>q.method==='eth_call').length,1);assert.ok(f.calls.every(q=>q.url===urls[0]));const before=f.calls.length;await assert.rejects(f.chain.call(store,'0x1234'));assert.equal(f.calls.length,before);
+});
+test('browser HTTP200 correlated capacity error retains bounded exact pinned retry',async()=>{
+  let reads=0;const f=setup(q=>q.method==='eth_chainId'?'0x7a69':q.method==='eth_getBlockByNumber'?block:++reads===1?Response.json({jsonrpc:'2.0',id:q.id,error:{code:-32005,message:'rate limit'}}):'0x6000',{maxRetries:1,retryDelayMs:1});
+  await f.chain.pinBlock();assert.equal(await f.chain.call(store,'0x1234'),'0x6000');const calls=f.calls.filter(q=>q.method==='eth_call');assert.equal(calls.length,2);assert.ok(calls.every(q=>q.url===urls[0]));assert.deepEqual(calls[0].params,calls[1].params);
+});
 test('pinned cache and in-flight identity include every execution argument and snapshot mutable inputs before awaiting',async()=>{
   const slot='0x'+'00'.repeat(32),value=n=>'0x'+n.toString(16).padStart(64,'0');
   const override=n=>({[store]:{stateDiff:{[slot]:value(n)}}});

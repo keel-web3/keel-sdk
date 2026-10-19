@@ -52,6 +52,23 @@ test('governed fully correlated rate-limit envelope retries only the same exact 
   let reads=0;const f=fixture(q=>++reads===1?Response.json({jsonrpc:'2.0',id:q.id,error:{code:-32005,message:'rate limit'}},{status:429,headers:{'retry-after':'0'}}):'0x6000',{maxRetries:1,retryDelayMs:1});
   assert.equal(await f.client.call(call),'0x6000');assert.equal(f.calls.length,2);assert.ok(f.calls.every(q=>q.url===urls[0]));assert.deepEqual(f.calls[0].params,f.calls[1].params);
 });
+for(const error of [
+  {code:-32000,message:'VM Exception while processing transaction: revert CustomError()',data:'0xdeadbeef'},
+  {code:-32000,message:'opaque contract failure',data:'0xdeadbeef'},
+  {code:-32005,message:'execution reverted',data:'0xdeadbeef'},
+  {code:-32005,message:'rate limit',data:{cause:{code:3,message:'revert CustomError()'}}},
+  {code:-32005,message:'x'.repeat(2049)},
+  {code:403,message:'PRIVATE provider text'},
+  'opaque failure',
+])test('governed HTTP200 errors cannot fall through to successful alternate execution: '+JSON.stringify(error).slice(0,100),async()=>{
+  const f=fixture((q,url)=>url===urls[0]?Response.json({jsonrpc:'2.0',id:q.id,error}):'0x6000',{maxRetries:2,retryDelayMs:1});
+  await assert.rejects(f.client.call(call),e=>e.terminal===true&&!/PRIVATE|deadbeef|CustomError/.test(e.message));
+  assert.equal(f.calls.length,1);await assert.rejects(f.client.call(call),e=>e.terminal===true);assert.equal(f.calls.length,1);
+});
+test('governed HTTP200 correlated capacity error retains bounded exact-operation retry',async()=>{
+  let reads=0;const f=fixture(q=>++reads===1?Response.json({jsonrpc:'2.0',id:q.id,error:{code:-32005,message:'rate limit'}}):'0x6000',{maxRetries:1,retryDelayMs:1});
+  assert.equal(await f.client.call(call),'0x6000');assert.equal(f.calls.length,2);assert.ok(f.calls.every(q=>q.url===urls[0]));assert.deepEqual(f.calls[0].params,f.calls[1].params);
+});
 test('governed reader limits physical fanout and retries only transient failures with identical calls',async()=>{
   let active=0,maximum=0,attempt=0;
   const f=fixture(async()=>{active++;maximum=Math.max(active,maximum);await new Promise(r=>setTimeout(r,1));active--;return ++attempt===1?new Response('',{status:429,headers:{'retry-after':'0'}}):'0x6000';},{maxConcurrentReads:2,maxRetries:1,retryDelayMs:1});
