@@ -1,0 +1,531 @@
+TAP version 13
+# Subtest: governed SDK reader treats 401 as sticky terminal without fallback
+ok 1 - governed SDK reader treats 401 as sticky terminal without fallback
+  ---
+  duration_ms: 22.266208
+  type: 'test'
+  ...
+# Subtest: governed SDK reader treats 403 as sticky terminal without fallback
+ok 2 - governed SDK reader treats 403 as sticky terminal without fallback
+  ---
+  duration_ms: 0.328125
+  type: 'test'
+  ...
+# Subtest: governed reader retains genuine nested revert inside HTTP 200
+ok 3 - governed reader retains genuine nested revert inside HTTP 200
+  ---
+  duration_ms: 1.823333
+  type: 'test'
+  ...
+# Subtest: governed reader retains genuine nested revert inside HTTP 503
+ok 4 - governed reader retains genuine nested revert inside HTTP 503
+  ---
+  duration_ms: 0.439791
+  type: 'test'
+  ...
+# Subtest: governed thrown wrapper never becomes fallback: {"status":403}
+ok 5 - governed thrown wrapper never becomes fallback: {"status":403}
+  ---
+  duration_ms: 0.371875
+  type: 'test'
+  ...
+# Subtest: governed thrown wrapper never becomes fallback: {"status":503,"cause":{"code":3,"message":"execution reverted SECRET"}}
+ok 6 - governed thrown wrapper never becomes fallback: {"status":503,"cause":{"code":3,"message":"execution reverted SECRET"}}
+  ---
+  duration_ms: 0.105916
+  type: 'test'
+  ...
+# Subtest: governed incomplete/oversized error envelope fails closed without retry or another recipient: 80086
+ok 7 - governed incomplete/oversized error envelope fails closed without retry or another recipient: 80086
+  ---
+  duration_ms: 0.43
+  type: 'test'
+  ...
+# Subtest: governed incomplete/oversized error envelope fails closed without retry or another recipient: 9
+ok 8 - governed incomplete/oversized error envelope fails closed without retry or another recipient: 9
+  ---
+  duration_ms: 0.386625
+  type: 'test'
+  ...
+# Subtest: governed incomplete/oversized error envelope fails closed without retry or another recipient: 65537
+ok 9 - governed incomplete/oversized error envelope fails closed without retry or another recipient: 65537
+  ---
+  duration_ms: 0.694125
+  type: 'test'
+  ...
+# Subtest: governed incomplete HTTP error stream times out fail-closed while preserving its physical lease
+ok 10 - governed incomplete HTTP error stream times out fail-closed while preserving its physical lease
+  ---
+  duration_ms: 21.595292
+  type: 'test'
+  ...
+# Subtest: governed full plain-text transport bodies retain fallback below/at the unchanged 64KiB cap
+ok 11 - governed full plain-text transport bodies retain fallback below/at the unchanged 64KiB cap
+  ---
+  duration_ms: 2.869083
+  type: 'test'
+  ...
+# Subtest: governed bounded malformed JSON media type and unknown RPC failures remain fail-closed
+ok 12 - governed bounded malformed JSON media type and unknown RPC failures remain fail-closed
+  ---
+  duration_ms: 1.01675
+  type: 'test'
+  ...
+# Subtest: governed fully correlated rate-limit envelope retries only the same exact operation
+ok 13 - governed fully correlated rate-limit envelope retries only the same exact operation
+  ---
+  duration_ms: 2.473458
+  type: 'test'
+  ...
+# Subtest: governed HTTP200 errors cannot fall through to successful alternate execution: {"code":-32000,"message":"VM Exception while processing transaction: revert CustomError()","data":"0
+ok 14 - governed HTTP200 errors cannot fall through to successful alternate execution: {"code":-32000,"message":"VM Exception while processing transaction: revert CustomError()","data":"0
+  ---
+  duration_ms: 0.254708
+  type: 'test'
+  ...
+# Subtest: governed HTTP200 errors cannot fall through to successful alternate execution: {"code":-32000,"message":"opaque contract failure","data":"0xdeadbeef"}
+ok 15 - governed HTTP200 errors cannot fall through to successful alternate execution: {"code":-32000,"message":"opaque contract failure","data":"0xdeadbeef"}
+  ---
+  duration_ms: 0.20125
+  type: 'test'
+  ...
+# Subtest: governed HTTP200 errors cannot fall through to successful alternate execution: {"code":-32005,"message":"execution reverted","data":"0xdeadbeef"}
+ok 16 - governed HTTP200 errors cannot fall through to successful alternate execution: {"code":-32005,"message":"execution reverted","data":"0xdeadbeef"}
+  ---
+  duration_ms: 0.117792
+  type: 'test'
+  ...
+# Subtest: governed HTTP200 errors cannot fall through to successful alternate execution: {"code":-32005,"message":"rate limit","data":{"cause":{"code":3,"message":"revert CustomError()"}}}
+ok 17 - governed HTTP200 errors cannot fall through to successful alternate execution: {"code":-32005,"message":"rate limit","data":{"cause":{"code":3,"message":"revert CustomError()"}}}
+  ---
+  duration_ms: 0.118417
+  type: 'test'
+  ...
+# Subtest: governed HTTP200 errors cannot fall through to successful alternate execution: {"code":-32005,"message":"xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+ok 18 - governed HTTP200 errors cannot fall through to successful alternate execution: {"code":-32005,"message":"xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+  ---
+  duration_ms: 0.166667
+  type: 'test'
+  ...
+# Subtest: governed HTTP200 errors cannot fall through to successful alternate execution: {"code":403,"message":"PRIVATE provider text"}
+ok 19 - governed HTTP200 errors cannot fall through to successful alternate execution: {"code":403,"message":"PRIVATE provider text"}
+  ---
+  duration_ms: 0.094417
+  type: 'test'
+  ...
+# Subtest: governed HTTP200 errors cannot fall through to successful alternate execution: "opaque failure"
+ok 20 - governed HTTP200 errors cannot fall through to successful alternate execution: "opaque failure"
+  ---
+  duration_ms: 0.176333
+  type: 'test'
+  ...
+# Subtest: governed HTTP200 correlated capacity error retains bounded exact-operation retry
+ok 21 - governed HTTP200 correlated capacity error retains bounded exact-operation retry
+  ---
+  duration_ms: 2.637834
+  type: 'test'
+  ...
+# Subtest: governed reader limits physical fanout and retries only transient failures with identical calls
+ok 22 - governed reader limits physical fanout and retries only transient failures with identical calls
+  ---
+  duration_ms: 42.717833
+  type: 'test'
+  ...
+# Subtest: governed reader cancellation rejects its queue and dispatches no hidden reads
+ok 23 - governed reader cancellation rejects its queue and dispatches no hidden reads
+  ---
+  duration_ms: 0.645666
+  type: 'test'
+  ...
+# Subtest: governed reader rejects a timed-out uncooperative fetch while retaining the physical lease
+ok 24 - governed reader rejects a timed-out uncooperative fetch while retaining the physical lease
+  ---
+  duration_ms: 21.476042
+  type: 'test'
+  ...
+# Subtest: HTTP 401 is sticky terminal and never reaches another recipient
+ok 25 - HTTP 401 is sticky terminal and never reaches another recipient
+  ---
+  duration_ms: 15.211709
+  type: 'test'
+  ...
+# Subtest: HTTP 403 is sticky terminal and never reaches another recipient
+ok 26 - HTTP 403 is sticky terminal and never reaches another recipient
+  ---
+  duration_ms: 0.540416
+  type: 'test'
+  ...
+# Subtest: a genuine contract revert is terminal, never retried or switched to a provider returning success
+ok 27 - a genuine contract revert is terminal, never retried or switched to a provider returning success
+  ---
+  duration_ms: 0.531833
+  type: 'test'
+  ...
+# Subtest: thrown HTTP wrappers retain terminal denial/revert semantics: {"status":403}
+ok 28 - thrown HTTP wrappers retain terminal denial/revert semantics: {"status":403}
+  ---
+  duration_ms: 0.543
+  type: 'test'
+  ...
+# Subtest: thrown HTTP wrappers retain terminal denial/revert semantics: {"status":503,"cause":{"code":3,"message":"execution reverted SECRET"}}
+ok 29 - thrown HTTP wrappers retain terminal denial/revert semantics: {"status":503,"cause":{"code":3,"message":"execution reverted SECRET"}}
+  ---
+  duration_ms: 0.580709
+  type: 'test'
+  ...
+# Subtest: browser incomplete/oversized error envelope fails closed without retry or another recipient: 80086
+ok 30 - browser incomplete/oversized error envelope fails closed without retry or another recipient: 80086
+  ---
+  duration_ms: 0.768291
+  type: 'test'
+  ...
+# Subtest: browser incomplete/oversized error envelope fails closed without retry or another recipient: 9
+ok 31 - browser incomplete/oversized error envelope fails closed without retry or another recipient: 9
+  ---
+  duration_ms: 0.643291
+  type: 'test'
+  ...
+# Subtest: browser incomplete/oversized error envelope fails closed without retry or another recipient: 65537
+ok 32 - browser incomplete/oversized error envelope fails closed without retry or another recipient: 65537
+  ---
+  duration_ms: 0.294375
+  type: 'test'
+  ...
+# Subtest: browser incomplete HTTP error stream times out fail-closed without another dispatch
+ok 33 - browser incomplete HTTP error stream times out fail-closed without another dispatch
+  ---
+  duration_ms: 17.413791
+  type: 'test'
+  ...
+# Subtest: browser full plain-text transport bodies retain fallback below/at the unchanged 64KiB cap
+ok 34 - browser full plain-text transport bodies retain fallback below/at the unchanged 64KiB cap
+  ---
+  duration_ms: 3.201792
+  type: 'test'
+  ...
+# Subtest: browser bounded malformed JSON media type and unknown RPC failures remain fail-closed
+ok 35 - browser bounded malformed JSON media type and unknown RPC failures remain fail-closed
+  ---
+  duration_ms: 0.881708
+  type: 'test'
+  ...
+# Subtest: browser fully correlated rate-limit envelope retries the same pinned operation
+ok 36 - browser fully correlated rate-limit envelope retries the same pinned operation
+  ---
+  duration_ms: 2.203292
+  type: 'test'
+  ...
+# Subtest: browser HTTP200 errors cannot fall through to successful alternate execution: {"code":-32000,"message":"VM Exception while processing transaction: revert CustomError()","data":"0
+ok 37 - browser HTTP200 errors cannot fall through to successful alternate execution: {"code":-32000,"message":"VM Exception while processing transaction: revert CustomError()","data":"0
+  ---
+  duration_ms: 0.374875
+  type: 'test'
+  ...
+# Subtest: browser HTTP200 errors cannot fall through to successful alternate execution: {"code":-32000,"message":"opaque contract failure","data":"0xdeadbeef"}
+ok 38 - browser HTTP200 errors cannot fall through to successful alternate execution: {"code":-32000,"message":"opaque contract failure","data":"0xdeadbeef"}
+  ---
+  duration_ms: 0.377792
+  type: 'test'
+  ...
+# Subtest: browser HTTP200 errors cannot fall through to successful alternate execution: {"code":-32005,"message":"execution reverted","data":"0xdeadbeef"}
+ok 39 - browser HTTP200 errors cannot fall through to successful alternate execution: {"code":-32005,"message":"execution reverted","data":"0xdeadbeef"}
+  ---
+  duration_ms: 0.21575
+  type: 'test'
+  ...
+# Subtest: browser HTTP200 errors cannot fall through to successful alternate execution: {"code":-32005,"message":"rate limit","data":{"cause":{"code":3,"message":"revert CustomError()"}}}
+ok 40 - browser HTTP200 errors cannot fall through to successful alternate execution: {"code":-32005,"message":"rate limit","data":{"cause":{"code":3,"message":"revert CustomError()"}}}
+  ---
+  duration_ms: 0.249542
+  type: 'test'
+  ...
+# Subtest: browser HTTP200 errors cannot fall through to successful alternate execution: {"code":-32005,"message":"xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+ok 41 - browser HTTP200 errors cannot fall through to successful alternate execution: {"code":-32005,"message":"xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+  ---
+  duration_ms: 0.182416
+  type: 'test'
+  ...
+# Subtest: browser HTTP200 errors cannot fall through to successful alternate execution: {"code":403,"message":"PRIVATE provider text"}
+ok 42 - browser HTTP200 errors cannot fall through to successful alternate execution: {"code":403,"message":"PRIVATE provider text"}
+  ---
+  duration_ms: 0.187667
+  type: 'test'
+  ...
+# Subtest: browser HTTP200 errors cannot fall through to successful alternate execution: "opaque failure"
+ok 43 - browser HTTP200 errors cannot fall through to successful alternate execution: "opaque failure"
+  ---
+  duration_ms: 0.161
+  type: 'test'
+  ...
+# Subtest: browser HTTP200 correlated capacity error retains bounded exact pinned retry
+ok 44 - browser HTTP200 correlated capacity error retains bounded exact pinned retry
+  ---
+  duration_ms: 2.416667
+  type: 'test'
+  ...
+# Subtest: pinned cache and in-flight identity include every execution argument and snapshot mutable inputs before awaiting
+ok 45 - pinned cache and in-flight identity include every execution argument and snapshot mutable inputs before awaiting
+  ---
+  duration_ms: 0.642166
+  type: 'test'
+  ...
+# Subtest: a large logical sequence dispatches only a bounded physical active window
+ok 46 - a large logical sequence dispatches only a bounded physical active window
+  ---
+  duration_ms: 59.745792
+  type: 'test'
+  ...
+# Subtest: Retry-After retries the same pinned read and completed identical reads resume from bounded cache
+ok 47 - Retry-After retries the same pinned read and completed identical reads resume from bounded cache
+  ---
+  duration_ms: 1.951458
+  type: 'test'
+  ...
+# Subtest: cancellation rejects queued work without dispatching it
+ok 48 - cancellation rejects queued work without dispatching it
+  ---
+  duration_ms: 0.348542
+  type: 'test'
+  ...
+# Subtest: a timed-out uncooperative physical read retains its slot, fails boundedly and ignores its late success
+ok 49 - a timed-out uncooperative physical read retains its slot, fails boundedly and ignores its late success
+  ---
+  duration_ms: 16.369959
+  type: 'test'
+  ...
+# Subtest: the host list accepts exactly what the contract accepts
+ok 50 - the host list accepts exactly what the contract accepts
+  ---
+  duration_ms: 1.147334
+  type: 'test'
+  ...
+# Subtest: the digest preimage is byte-identical to the one KeelManager hashes
+ok 51 - the digest preimage is byte-identical to the one KeelManager hashes
+  ---
+  duration_ms: 2.914834
+  type: 'test'
+  ...
+# Subtest: a list written by a rotated-out roster reads as stale rather than as policy
+ok 52 - a list written by a rotated-out roster reads as stale rather than as policy
+  ---
+  duration_ms: 0.327166
+  type: 'test'
+  ...
+# Subtest: an empty RPC list denies, where an empty gateway allowlist would not
+ok 53 - an empty RPC list denies, where an empty gateway allowlist would not
+  ---
+  duration_ms: 0.139375
+  type: 'test'
+  ...
+# Subtest: endpoint matching is remoteUrlAllowed's, not a second opinion
+ok 54 - endpoint matching is remoteUrlAllowed's, not a second opinion
+  ---
+  duration_ms: 0.2025
+  type: 'test'
+  ...
+# Subtest: the sealed-document mirror agrees with remoteUrlAllowed on every vector
+ok 55 - the sealed-document mirror agrees with remoteUrlAllowed on every vector
+  ---
+  duration_ms: 0.75275
+  type: 'test'
+  ...
+# Subtest: a rejected endpoint is reported by origin, never with its key
+ok 56 - a rejected endpoint is reported by origin, never with its key
+  ---
+  duration_ms: 0.117959
+  type: 'test'
+  ...
+# Subtest: a client cannot be built around an endpoint governance has not blessed
+ok 57 - a client cannot be built around an endpoint governance has not blessed
+  ---
+  duration_ms: 0.330375
+  type: 'test'
+  ...
+# Subtest: haulObject reads like a contract call and decodes what the node returns
+ok 58 - haulObject reads like a contract call and decodes what the node returns
+  ---
+  duration_ms: 10.624917
+  type: 'test'
+  ...
+# Subtest: Ethereum readers derive haulObject's selector from the live KeelHold signature
+ok 59 - Ethereum readers derive haulObject's selector from the live KeelHold signature
+  ---
+  duration_ms: 2.056
+  type: 'test'
+  ...
+# Subtest: failover moves to the next endpoint and the disclosure names the one that answered
+ok 60 - failover moves to the next endpoint and the disclosure names the one that answered
+  ---
+  duration_ms: 1.169916
+  type: 'test'
+  ...
+# Subtest: a node that answers with other bytes is caught, and the answer names it
+ok 61 - a node that answers with other bytes is caught, and the answer names it
+  ---
+  duration_ms: 3.144583
+  type: 'test'
+  ...
+# Subtest: a Tezos client reads the same objects through the same call
+ok 62 - a Tezos client reads the same objects through the same call
+  ---
+  duration_ms: 0.49725
+  type: 'test'
+  ...
+# Subtest: decoders refuse a truncated or absent object instead of returning a short one
+ok 63 - decoders refuse a truncated or absent object instead of returning a short one
+  ---
+  duration_ms: 0.165291
+  type: 'test'
+  ...
+# Subtest: the genesis list is a usable default and covers both families
+ok 64 - the genesis list is a usable default and covers both families
+  ---
+  duration_ms: 0.054334
+  type: 'test'
+  ...
+# (node:86621) ExperimentalWarning: The MockTimers API is an experimental feature and might change at any time
+# (Use `node --trace-warnings ...` to show where the warning was created)
+# Subtest: legacy clients retain one-read behavior and optional explicit block tags
+ok 65 - legacy clients retain one-read behavior and optional explicit block tags
+  ---
+  duration_ms: 13.130834
+  type: 'test'
+  ...
+# Subtest: concurrent artwork reads share one endpoint chain check before reading
+ok 66 - concurrent artwork reads share one endpoint chain check before reading
+  ---
+  duration_ms: 0.933208
+  type: 'test'
+  ...
+# Subtest: failover never reads a wrong-chain provider after an earlier endpoint passed identity
+ok 67 - failover never reads a wrong-chain provider after an earlier endpoint passed identity
+  ---
+  duration_ms: 1.977167
+  type: 'test'
+  ...
+# Subtest: concurrent wrong-chain failure shares the fallback identity check
+ok 68 - concurrent wrong-chain failure shares the fallback identity check
+  ---
+  duration_ms: 0.546917
+  type: 'test'
+  ...
+# Subtest: explicit identity checks are fresh and transient read failures invalidate prior identity
+ok 69 - explicit identity checks are fresh and transient read failures invalidate prior identity
+  ---
+  duration_ms: 0.696875
+  type: 'test'
+  ...
+# Subtest: malformed chain identities cannot authorize a contract read
+ok 70 - malformed chain identities cannot authorize a contract read
+  ---
+  duration_ms: 0.543416
+  type: 'test'
+  ...
+# Subtest: concurrent reads wait for an explicit identity recheck instead of using cached trust
+ok 71 - concurrent reads wait for an explicit identity recheck instead of using cached trust
+  ---
+  duration_ms: 1.707709
+  type: 'test'
+  ...
+# Subtest: malformed contract/code byte strings are rejected before ABI consumers see them
+ok 72 - malformed contract/code byte strings are rejected before ABI consumers see them
+  ---
+  duration_ms: 1.225958
+  type: 'test'
+  ...
+# Subtest: HTTP failures, redirects, malformed JSON and invalid JSON-RPC envelopes fail over safely
+not ok 73 - HTTP failures, redirects, malformed JSON and invalid JSON-RPC envelopes fail over safely
+  ---
+  duration_ms: 3.89475
+  type: 'test'
+  location: '/Users/ravonus/dev/wt/studio-native-beacon-witness-20261019/sdk-nonstandard-read/tests/managed-shell-rpc-chain.test.mjs:134:1'
+  failureType: 'testCodeFailure'
+  error: 'RPC request failed (https://one.example/…)'
+  code: 'unclassified-rpc-error'
+  stack: |-
+    fault (file:///Users/ravonus/dev/wt/studio-native-beacon-witness-20261019/sdk-nonstandard-read/packages/viewer/src/keel-rpc-view.js:161:81)
+    file:///Users/ravonus/dev/wt/studio-native-beacon-witness-20261019/sdk-nonstandard-read/packages/viewer/src/keel-rpc-view.js:268:20
+  ...
+# Subtest: timeouts cover stalled fetch and JSON bodies, abort requests and ignore late identity results
+    # Subtest: stalled fetch
+    ok 1 - stalled fetch
+      ---
+      duration_ms: 1.2505
+      type: 'test'
+      ...
+    # Subtest: stalled JSON body
+    ok 2 - stalled JSON body
+      ---
+      duration_ms: 0.303875
+      type: 'test'
+      ...
+    1..2
+ok 74 - timeouts cover stalled fetch and JSON bodies, abort requests and ignore late identity results
+  ---
+  duration_ms: 1.824042
+  type: 'test'
+  ...
+# Subtest: exhaustion and disclosure never expose provider keys or error bodies
+ok 75 - exhaustion and disclosure never expose provider keys or error bodies
+  ---
+  duration_ms: 0.681708
+  type: 'test'
+  ...
+# Subtest: a stalled artwork request fails over only after the fallback proves chain and block
+ok 76 - a stalled artwork request fails over only after the fallback proves chain and block
+  ---
+  duration_ms: 0.672083
+  type: 'test'
+  ...
+# Subtest: pinBlock shares one immutable header and concurrent reads share its endpoint check
+ok 77 - pinBlock shares one immutable header and concurrent reads share its endpoint check
+  ---
+  duration_ms: 0.334833
+  type: 'test'
+  ...
+# Subtest: pinned failover verifies chain and matching block number/hash before every new provider
+ok 78 - pinned failover verifies chain and matching block number/hash before every new provider
+  ---
+  duration_ms: 0.430708
+  type: 'test'
+  ...
+# Subtest: incompatible EIP-1898 providers fail over without numeric or latest downgrade
+not ok 79 - incompatible EIP-1898 providers fail over without numeric or latest downgrade
+  ---
+  duration_ms: 0.270292
+  type: 'test'
+  location: '/Users/ravonus/dev/wt/studio-native-beacon-witness-20261019/sdk-nonstandard-read/tests/managed-shell-rpc-chain.test.mjs:260:1'
+  failureType: 'testCodeFailure'
+  error: 'RPC request failed (https://one.example/…)'
+  code: 'unclassified-rpc-error'
+  stack: |-
+    fault (file:///Users/ravonus/dev/wt/studio-native-beacon-witness-20261019/sdk-nonstandard-read/packages/viewer/src/keel-rpc-view.js:161:81)
+    file:///Users/ravonus/dev/wt/studio-native-beacon-witness-20261019/sdk-nonstandard-read/packages/viewer/src/keel-rpc-view.js:268:20
+  ...
+# Subtest: missing, malformed or mismatched pinned headers fail closed without artwork reads
+ok 80 - missing, malformed or mismatched pinned headers fail closed without artwork reads
+  ---
+  duration_ms: 2.003166
+  type: 'test'
+  ...
+# Subtest: invalid transport options and denied hosts fail before requests
+ok 81 - invalid transport options and denied hosts fail before requests
+  ---
+  duration_ms: 0.269375
+  type: 'test'
+  ...
+# Subtest: managed runtime opts into endpoint identity/block pinning and retains root integrity gates
+ok 82 - managed runtime opts into endpoint identity/block pinning and retains root integrity gates
+  ---
+  duration_ms: 6.841917
+  type: 'test'
+  ...
+1..82
+# tests 84
+# suites 0
+# pass 82
+# fail 2
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 272.187583
