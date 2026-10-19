@@ -1,0 +1,54 @@
+{
+  "schema": "keel-implementer-evidence-manifest@1",
+  "sourceCommit": "e0e6033a93099e312c5c2c6d0f6f22adc7097f40",
+  "files": {
+    "README.md": {
+      "bytes": 5030,
+      "sha256": "eea1b0a05ea8ac686a836abc62a6f63d91054d79d5da99f39f82379605e862ab"
+    },
+    "acceptance-audit.mjs": {
+      "bytes": 4550,
+      "sha256": "f15235b97dea10889e2beba124de7c88b3045ab5805628918faf03560810ad6a"
+    },
+    "acceptance.json": {
+      "bytes": 1699,
+      "sha256": "d997e711d1defbeecde2326c8a68629fcf81e5a8e0826656569d3f3f8cfb0e90"
+    },
+    "anvil.json": {
+      "bytes": 4955,
+      "sha256": "f6bfb1424488c1df25158e4a161740051e0fde072d3e6e53fc27fc5b62b6fd6f"
+    },
+    "anvil.log": {
+      "bytes": 589,
+      "sha256": "d88d779ac373ddbe3e1547162bcf8d403ddb210da26032461d82ff394d80f82c"
+    },
+    "artifacts.json": {
+      "bytes": 4292,
+      "sha256": "fdea7d9bf0795f88cf55d77c9f23b2375db9e01844f1a9045a5296227d0dbc9b"
+    },
+    "baseline-606-red.log": {
+      "bytes": 13127,
+      "sha256": "98e2fabc84ee10da50871a88fff8524ecee3d8fb4818702a3a411781cc427261"
+    },
+    "environment.json": {
+      "bytes": 9126,
+      "sha256": "b9953e2312b095e7f29145d3e3fffeeea1218867f0893cc138ad78aec11993a7"
+    },
+    "focused.log": {
+      "bytes": 55907,
+      "sha256": "8c3e198e4e31a00d9f6d52c78279200b3f42267bb085cbe6bf29f627438e1315"
+    },
+    "full.log": {
+      "bytes": 577547,
+      "sha256": "7e5012dbb6a07e4f136db105a8080f0fad8b6175260dd3f2620303caba18adb7"
+    },
+    "original-bug-auditor.log": {
+      "bytes": 506,
+      "sha256": "9c4c8556ce658ba33c3fcbbfbb404cf19f0701588dac7a675aae93a1d25d047c"
+    },
+    "original-review-auditor-identity.json": {
+      "bytes": 396,
+      "sha256": "b6d993387d7a1a188b0b9f2c61e882d03dc3959230131a8835c8c89e32312bba"
+    }
+  }
+}
