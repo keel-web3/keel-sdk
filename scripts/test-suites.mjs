@@ -43,6 +43,7 @@ export const SIBLING_CONFORMANCE_TEST_FILES = Object.freeze([
  * the exact local contracts checkout. The combined reader proof also uses an
  * installed Chromium. No public-network access or signed transactions occur. */
 export const LOCAL_EVM_TEST_FILES = Object.freeze([
+  "tests/nonstandard-read-anvil.test.mjs",
   "tests/sdk-legacy-shared-image-evm-browser.test.mjs",
   "tests/sdk-legacy-shared-image-hold-policy.test.mjs",
 ]);
@@ -62,6 +63,10 @@ export const TEST_FILES_ON_DISK = Object.freeze(readdirSync(TEST_ROOT)
  * its execution boundary.
  */
 export const DETERMINISTIC_TEST_FILES = Object.freeze([
+  "tests/nonstandard-read-policy.test.mjs",
+  "tests/governed-rpc-boundaries.test.mjs",
+  "tests/hybrid-chunk-resume.test.mjs",
+  "tests/hybrid-runtime-boundaries.test.mjs",
   "tests/sdk-shell-installation-parity.test.mjs",
   "tests/proof-executor-transport.test.mjs",
   "tests/proof-runner-client.test.mjs",
