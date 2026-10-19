@@ -27,6 +27,12 @@ The same rule applies to JSON-RPC errors carried inside HTTP 200 responses:
 custom revert spellings are terminal, and an unknown non-null error is not a
 transport success. Only bounded, correlated, flat provider-capacity errors are
 eligible for capacity retries; nested or contradictory errors fail closed.
+One pre-execution exception preserves provider compatibility for an exact
+`eth_call`/`eth_getCode` EIP-1898 hash selector with `requireCanonical: true`:
+a correlated, flat `-32602` invalid-parameters error without data/cause/unknown
+fields may select another provider using that identical selector. Denial/revert
+classification takes priority. No chain-ID or unpinned exception, numeric/latest
+downgrade, or new provider is introduced.
 
 Chunk reconstruction uses iterative traversal, bounded leaf workers, and the
 existing depth, node, stored-byte and decoded-byte limits. It preserves ordering,

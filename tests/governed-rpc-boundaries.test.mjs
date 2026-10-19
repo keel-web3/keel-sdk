@@ -69,6 +69,23 @@ test('governed HTTP200 correlated capacity error retains bounded exact-operation
   let reads=0;const f=fixture(q=>++reads===1?Response.json({jsonrpc:'2.0',id:q.id,error:{code:-32005,message:'rate limit'}}):'0x6000',{maxRetries:1,retryDelayMs:1});
   assert.equal(await f.client.call(call),'0x6000');assert.equal(f.calls.length,2);assert.ok(f.calls.every(q=>q.url===urls[0]));assert.deepEqual(f.calls[0].params,f.calls[1].params);
 });
+test('governed unsupported-selector fallback is restricted to exact canonical hash reads',async()=>{
+  const selector={blockHash:'0x'+'ab'.repeat(32),requireCanonical:true};
+  for(const status of [200,400]){
+    const f=fixture((q,url)=>q.method==='eth_chainId'?'0x7a69':url===urls[0]?Response.json({jsonrpc:'2.0',id:q.id,error:{code:-32602,message:'unsupported EIP-1898'}},{status}):'0x6000',{verifyChainId:true});
+    assert.equal(await f.client.call({...call,block:selector}),'0x6000');const calls=f.calls.filter(q=>q.method==='eth_call');assert.equal(calls.length,2);assert.deepEqual(calls[0].params,calls[1].params);assert.deepEqual(calls[1].params[1],selector);
+  }
+  for(const extra of [{data:'0xdeadbeef'},{cause:{code:3}},{other:'unknown'}]){
+    const f=fixture(q=>Response.json({jsonrpc:'2.0',id:q.id,error:{code:-32602,message:'unsupported',...extra}}));
+    await assert.rejects(f.client.call({...call,block:selector}),e=>e.terminal===true);assert.equal(f.calls.length,1);
+  }
+  for(const block of ['latest',{...selector,requireCanonical:false},{...selector,blockNumber:'0x1'},Object.create(selector)]){
+    const f=fixture(q=>Response.json({jsonrpc:'2.0',id:q.id,error:{code:-32602,message:'unsupported'}}));
+    await assert.rejects(f.client.call({...call,block}),e=>e.terminal===true);assert.equal(f.calls.length,1);
+  }
+  const f=fixture(q=>Response.json({jsonrpc:'2.0',id:q.id,error:{code:-32602,message:'unsupported'}}),{verifyChainId:true});
+  await assert.rejects(f.client.call({...call,block:selector}),e=>e.terminal===true);assert.equal(f.calls.length,1);assert.equal(f.calls[0].method,'eth_chainId');
+});
 test('governed reader limits physical fanout and retries only transient failures with identical calls',async()=>{
   let active=0,maximum=0,attempt=0;
   const f=fixture(async()=>{active++;maximum=Math.max(active,maximum);await new Promise(r=>setTimeout(r,1));active--;return ++attempt===1?new Response('',{status:429,headers:{'retry-after':'0'}}):'0x6000';},{maxConcurrentReads:2,maxRetries:1,retryDelayMs:1});
