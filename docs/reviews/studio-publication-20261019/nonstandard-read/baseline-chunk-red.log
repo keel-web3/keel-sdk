@@ -1,0 +1,137 @@
+TAP version 13
+# Subtest: terminal page failure cannot trigger descriptor or alternate read: {"status":401}
+not ok 1 - terminal page failure cannot trigger descriptor or alternate read: {"status":401}
+  ---
+  duration_ms: 1.405625
+  type: 'test'
+  location: '/Users/ravonus/dev/wt/studio-native-beacon-witness-20261019/sdk-nonstandard-read/tests/hybrid-chunk-resume.test.mjs:10:95'
+  failureType: 'testCodeFailure'
+  error: |-
+    Expected values to be strictly equal:
+    
+    1 !== 0
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: 0
+  actual: 1
+  operator: 'strictEqual'
+  stack: |-
+    TestContext.<anonymous> (file:///Users/ravonus/dev/wt/studio-native-beacon-witness-20261019/sdk-nonstandard-read/tests/hybrid-chunk-resume.test.mjs:13:77)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async startSubtestAfterBootstrap (node:internal/test_runner/harness:296:3)
+  ...
+# Subtest: terminal page failure cannot trigger descriptor or alternate read: {"cause":{"httpStatus":403}}
+not ok 2 - terminal page failure cannot trigger descriptor or alternate read: {"cause":{"httpStatus":403}}
+  ---
+  duration_ms: 0.277375
+  type: 'test'
+  location: '/Users/ravonus/dev/wt/studio-native-beacon-witness-20261019/sdk-nonstandard-read/tests/hybrid-chunk-resume.test.mjs:10:95'
+  failureType: 'testCodeFailure'
+  error: |-
+    Expected values to be strictly equal:
+    
+    1 !== 0
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: 0
+  actual: 1
+  operator: 'strictEqual'
+  stack: |-
+    TestContext.<anonymous> (file:///Users/ravonus/dev/wt/studio-native-beacon-witness-20261019/sdk-nonstandard-read/tests/hybrid-chunk-resume.test.mjs:13:77)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: terminal page failure cannot trigger descriptor or alternate read: {"cause":{"code":3}}
+not ok 3 - terminal page failure cannot trigger descriptor or alternate read: {"cause":{"code":3}}
+  ---
+  duration_ms: 0.166042
+  type: 'test'
+  location: '/Users/ravonus/dev/wt/studio-native-beacon-witness-20261019/sdk-nonstandard-read/tests/hybrid-chunk-resume.test.mjs:10:95'
+  failureType: 'testCodeFailure'
+  error: |-
+    Expected values to be strictly equal:
+    
+    1 !== 0
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: 0
+  actual: 1
+  operator: 'strictEqual'
+  stack: |-
+    TestContext.<anonymous> (file:///Users/ravonus/dev/wt/studio-native-beacon-witness-20261019/sdk-nonstandard-read/tests/hybrid-chunk-resume.test.mjs:13:77)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: terminal page failure cannot trigger descriptor or alternate read: {"terminal":true}
+not ok 4 - terminal page failure cannot trigger descriptor or alternate read: {"terminal":true}
+  ---
+  duration_ms: 0.1315
+  type: 'test'
+  location: '/Users/ravonus/dev/wt/studio-native-beacon-witness-20261019/sdk-nonstandard-read/tests/hybrid-chunk-resume.test.mjs:10:95'
+  failureType: 'testCodeFailure'
+  error: |-
+    Expected values to be strictly equal:
+    
+    1 !== 0
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: 0
+  actual: 1
+  operator: 'strictEqual'
+  stack: |-
+    TestContext.<anonymous> (file:///Users/ravonus/dev/wt/studio-native-beacon-witness-20261019/sdk-nonstandard-read/tests/hybrid-chunk-resume.test.mjs:13:77)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: failed traversal resumes completed verified children only at the same pin and commitment; outputs never alias cache
+not ok 5 - failed traversal resumes completed verified children only at the same pin and commitment; outputs never alias cache
+  ---
+  duration_ms: 5.612375
+  type: 'test'
+  location: '/Users/ravonus/dev/wt/studio-native-beacon-witness-20261019/sdk-nonstandard-read/tests/hybrid-chunk-resume.test.mjs:15:1'
+  failureType: 'testCodeFailure'
+  error: |-
+    Expected values to be strictly equal:
+    
+    2 !== 1
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: 1
+  actual: 2
+  operator: 'strictEqual'
+  stack: |-
+    TestContext.<anonymous> (file:///Users/ravonus/dev/wt/studio-native-beacon-witness-20261019/sdk-nonstandard-read/tests/hybrid-chunk-resume.test.mjs:27:104)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: cache storage/metadata is bounded and cancellation of one traversal cannot poison a later consumer
+not ok 6 - cache storage/metadata is bounded and cancellation of one traversal cannot poison a later consumer
+  ---
+  duration_ms: 0.851166
+  type: 'test'
+  location: '/Users/ravonus/dev/wt/studio-native-beacon-witness-20261019/sdk-nonstandard-read/tests/hybrid-chunk-resume.test.mjs:38:1'
+  failureType: 'testCodeFailure'
+  error: 'Missing expected exception.'
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected:
+  operator: 'throws'
+  stack: |-
+    TestContext.<anonymous> (file:///Users/ravonus/dev/wt/studio-native-beacon-witness-20261019/sdk-nonstandard-read/tests/hybrid-chunk-resume.test.mjs:43:10)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+1..6
+# tests 6
+# suites 0
+# pass 0
+# fail 6
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 43.982083

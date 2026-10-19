@@ -1,15 +1,19 @@
+import { KEEL_SMART_INLINE_ASSET_MAX_BYTES, planKeelSmartAssetPresentation, resolveKeelTokenURIReadBounds, assertKeelNonstandardTokenURIIdentity, sha256Hex, hashKeelSmartAssetPresentationPlan, measureKeelSmartAssetPresentation, type KeelExplicitNonstandardReadPolicy, type KeelSmartAssetPresentationPlan } from "@keel/protocol";
 /** Browser-safe intent planning. This is not a storage receipt or payment approval. */
 export type KeelMediaSlotDelivery = "onchain" | "ipfs" | "hosted";
-export const KEEL_STANDALONE_VIEWER_MAX_BYTES = 1_000_000;
-export const KEEL_INLINE_IMAGE_DEFAULT_MAX_BYTES = 500_000;
+/** @deprecated Use the smart asset boundaries, which distinguish direct from split-read delivery. */
+export const KEEL_STANDALONE_VIEWER_MAX_BYTES = KEEL_SMART_INLINE_ASSET_MAX_BYTES;
+export const KEEL_INLINE_IMAGE_DEFAULT_MAX_BYTES = KEEL_SMART_INLINE_ASSET_MAX_BYTES;
 /** Unknown sizes keep verification enabled until actual source bytes are known. */
 export function defaultKeelImageViewer(mediaType: string, byteLength?: number): "none" | "keel-verification-shell" {
   if (byteLength !== undefined && (!Number.isSafeInteger(byteLength) || byteLength < 0)) throw new TypeError("Media byte length must be a nonnegative integer.");
-  return mediaType.split(";", 1)[0]!.trim().toLowerCase().startsWith("image/") && byteLength !== undefined && byteLength > KEEL_STANDALONE_VIEWER_MAX_BYTES ? "none" : "keel-verification-shell";
+  const mime=mediaType.split(";",1)[0]!.trim().toLowerCase();
+  return planKeelSmartAssetPresentation({source:{resourceId:"source",mediaType:mime,...(byteLength===undefined?{}:{byteLength})},
+    execution:mime === "image/svg+xml" ? "unknown" : /^(?:text\/(?:html|javascript|ecmascript)|application\/(?:javascript|ecmascript|wasm|xhtml\+xml))$/u.test(mime) ? "script" : "static"}).viewer;
 }
 export function defaultKeelImageDelivery(byteLength?: number): KeelMediaSlotDelivery {
   if (byteLength !== undefined && (!Number.isSafeInteger(byteLength) || byteLength < 0)) throw new TypeError("Image byte length must be a nonnegative integer.");
-  return byteLength !== undefined && byteLength >= KEEL_INLINE_IMAGE_DEFAULT_MAX_BYTES ? "hosted" : "onchain";
+  return "onchain"; // Hosted previews require the explicit external-preview choice, never a size heuristic.
 }
 export interface KeelMediaSlotSelection {
   readonly resourceId: string;
@@ -46,7 +50,7 @@ function selection(value: KeelMediaSlotSelection | null): KeelMediaSlotSelection
   if (!value || typeof value !== "object" || Object.keys(value).some(key => !["resourceId","presentation","delivery"].includes(key)) || !["direct","keel-shell"].includes(value.presentation)) throw new TypeError("Invalid metadata slot choice.");
   return {resourceId:resource(value.resourceId),presentation:value.presentation,delivery:delivery(value.delivery)};
 }
-/** Measured standalone images above 1 MB use direct display; smaller or unknown
+/** Static media above the decimal 500KB boundary through 2MB use direct display; smaller or unknown
  * images use the verifier. A thumbnail is always a distinct resource.
  * Only an explicitly selected candidate switches the source to that candidate. */
 export function planKeelMediaSlots(input: {
@@ -70,7 +74,7 @@ export function planKeelMediaSlots(input: {
   applicable.sort((a,b)=>(Number(a.mediaType!==undefined)*2+Number(a.collectionType!==undefined))-(Number(b.mediaType!==undefined)*2+Number(b.collectionType!==undefined)));
   for(const value of applicable) {if(value.imageDelivery!==undefined)imageDelivery=delivery(value.imageDelivery);if(value.animationDelivery!==undefined)animationDelivery=delivery(value.animationDelivery);}
   const encoded=input.selectedCandidateResourceId===undefined ? undefined : resource(input.selectedCandidateResourceId);
-  const directImage=defaultViewer === "none" && encoded===undefined;
+  const directImage=defaultViewer === "none" && mime.startsWith("image/") && encoded===undefined;
   const thumbnail=input.thumbnailResourceId===undefined ? undefined : resource(input.thumbnailResourceId);
   if(thumbnail!==undefined && (thumbnail===source || thumbnail===encoded)) throw new TypeError("A thumbnail must be a separately selected resource; full media is not copied into both slots automatically.");
   let image:KeelMediaSlotSelection|null=directImage ? {resourceId:source,presentation:"direct",delivery:imageDelivery} : thumbnail ? {resourceId:thumbnail,presentation:"direct",delivery:imageDelivery} : null;
@@ -88,6 +92,42 @@ export function planKeelMediaSlots(input: {
  * attached to this exact plan after the selected chain's actual read check. */
 export function assertKeelMediaSlotReadFit(plan:KeelMediaSlotPlan, evidence:{readonly planKey:string;readonly completeTokenUriBytes:number;readonly maxTokenUriBytes:number;readonly selectedChainReadPassed:boolean}):void {
   if(evidence.planKey!==plan.planKey || !Number.isSafeInteger(evidence.completeTokenUriBytes) || evidence.completeTokenUriBytes<1 || !Number.isSafeInteger(evidence.maxTokenUriBytes) || evidence.maxTokenUriBytes<1 || evidence.completeTokenUriBytes>Math.min(evidence.maxTokenUriBytes,2_000_000) || evidence.selectedChainReadPassed!==true) throw new Error("The exact complete metadata slots need a successful selected-chain read within the standard 2 MB tokenURI limit before funding. Larger embedded media requires a separately supported nonstandard route and explicit marketplace compatibility review.");
+}
+
+/** Explicit larger-return companion to the unchanged synchronous standard gate.
+ * Matrix plan, actual full return and exact policy remain separate from this
+ * legacy slot key. No provider capability or simulation proof is invented. */
+export async function assertKeelNonstandardMediaSlotReadFit(plan: KeelMediaSlotPlan, evidence: {
+  readonly planKey: string;
+  readonly publicationPlan: KeelSmartAssetPresentationPlan;
+  readonly tokenURI: string;
+  readonly selectedChainReadPassed: boolean;
+  readonly nonstandardReadPolicy: KeelExplicitNonstandardReadPolicy;
+}): Promise<void> {
+  const slots = structuredClone(plan), snapshot = structuredClone(evidence);
+  if (snapshot.planKey !== slots.planKey || snapshot.selectedChainReadPassed !== true
+    || typeof snapshot.tokenURI !== "string") throw new TypeError("The exact complete metadata slots require their selected-chain read and publication review identity.");
+  const policy = resolveKeelTokenURIReadBounds(snapshot.nonstandardReadPolicy).nonstandardReadPolicy;
+  if (!policy) throw new TypeError("An exact nonstandard read policy is required.");
+  const publication = snapshot.publicationPlan;
+  const expected = (slot: "image" | "animation") => {
+    const selected = publication[slot];
+    if (!selected || selected.delivery === "omitted") return null;
+    const shell = selected.delivery.endsWith("shell");
+    const delivery: KeelMediaSlotDelivery = selected.delivery === "ipfs-shell" || selected.delivery === "external" && selected.uri?.startsWith("ipfs:") ? "ipfs"
+      : selected.delivery === "hosted-shell" || selected.delivery === "external" ? "hosted" : "onchain";
+    return { resourceId: selected.resourceId, presentation: shell ? "keel-shell" : "direct", delivery };
+  };
+  for (const [legacy, smart] of [[slots.image, expected("image")], [slots.animation_url, expected("animation")]] as const) {
+    if ((legacy ?? null) === null ? smart !== null : !smart || legacy!.resourceId !== smart.resourceId || legacy!.presentation !== smart.presentation || legacy!.delivery !== smart.delivery) throw new TypeError("The legacy slots contradict the selected publication matrix.");
+  }
+  const context = publication.contextIdentity;
+  if (!context || publication.source.digest !== policy.identity.sourceDigest || publication.capabilities?.identity?.chainId !== policy.identity.chainId
+    || ["projectId", "revision", "defaultsRevision"].some(key => context[key as keyof typeof context] !== policy.identity[key as keyof typeof context])) throw new TypeError("The nonstandard slot review has a stale source, chain or revision.");
+  if (await hashKeelSmartAssetPresentationPlan(publication) !== policy.identity.planDigest.replace(/^sha256:/u, "0x")) throw new TypeError("The nonstandard read policy belongs to a different selected publication plan.");
+  const measured = await measureKeelSmartAssetPresentation(publication, () => snapshot.tokenURI);
+  if (measured.hardBlockers.length || await sha256Hex(new TextEncoder().encode(measured.measurementKey)) !== policy.identity.measurementDigest.replace(/^sha256:/u, "0x")) throw new TypeError("The nonstandard slot review has a stale or invalid complete measurement.");
+  assertKeelNonstandardTokenURIIdentity(policy, { chainId: policy.identity.chainId, byteLength: measured.completeTokenUriBytes, digest: measured.tokenUriDigest });
 }
 
 export { planKeelInitialMediaBudget, KEEL_STANDARD_INITIAL_METADATA_BYTES, type KeelInitialMetadataSlots, type KeelInitialMediaBudgetInput } from "./initial-media-budget.js";

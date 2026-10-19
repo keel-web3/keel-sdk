@@ -1,0 +1,58 @@
+{
+  "schema": "keel-implementer-evidence-manifest@1",
+  "sourceCommit": "606479dff9d26e9af011001182e0dd91dab65f7c",
+  "files": {
+    "README.md": {
+      "bytes": 7318,
+      "sha256": "20f6559f0effd847be5dabe0b921ef576ea91d88916144741d9402453e399a6e"
+    },
+    "baseline-browser-red.log": {
+      "bytes": 4698,
+      "sha256": "1f215afb610f1f7bfbd7183452192d1664dd453b1f056413f2680d34b8ac4579"
+    },
+    "baseline-chunk-red.log": {
+      "bytes": 5549,
+      "sha256": "baf39513bf63a08c70ccffc633981680fac9240087ca88a46ecf29fb943bc4ee"
+    },
+    "baseline-governed-red.log": {
+      "bytes": 4702,
+      "sha256": "a916f95999ec016da4d7c4b0324e8b9ca39bb12aceb172f58fd3049e973c685c"
+    },
+    "compare-runtime-artifacts.mjs": {
+      "bytes": 3785,
+      "sha256": "934b60b0dff5162bf63c805ae6cdf4e25dd61ffe54ea3d55a9cd6d115189ccd1"
+    },
+    "environment.json": {
+      "bytes": 9126,
+      "sha256": "ecb80eb18a10b230b45f6fe1a91186a6ebd13e1681685a945ae830d0f30bbcbc"
+    },
+    "fixture-baseline-red.log": {
+      "bytes": 29370,
+      "sha256": "57ac81e68b010abf73611bb75b668260219d4e9a41dfd87164855ddd5cb39890"
+    },
+    "local-anvil-read.json": {
+      "bytes": 4955,
+      "sha256": "9c82e3cc9dd2a19f18ef52aeb9b1e2ab5a25c69d98a1a480bc4ef85d2924836a"
+    },
+    "local-anvil-read.log": {
+      "bytes": 589,
+      "sha256": "d280236f8d1c603d3d869f7cf2b540508d33184656143735740e22b95bb5c30d"
+    },
+    "runtime-7f-full-red.log": {
+      "bytes": 575137,
+      "sha256": "eee43a3a33db500232a8268111bdb5218094145958627ebed75b14788823bfcb"
+    },
+    "runtime-artifacts.json": {
+      "bytes": 4292,
+      "sha256": "58c45d8cfa4833119024c6938bc27b5d099bcfd2168923767af7fc10dea3dc54"
+    },
+    "runtime-final-focused.log": {
+      "bytes": 52048,
+      "sha256": "3bca93c7180cacd1c9674d7abce7102c35a4a30d7216905795523ffd6df9c37f"
+    },
+    "runtime-final-full.log": {
+      "bytes": 573707,
+      "sha256": "522005c0272763044262a0c1dfee9585c87484aa6caeaaca5d07f56248d09401"
+    }
+  }
+}

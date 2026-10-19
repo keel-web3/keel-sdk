@@ -1,0 +1,7 @@
+
+> keel-sdk@0.3.0 build /Users/ravonus/dev/wt/studio-native-beacon-witness-20261019/sdk-nonstandard-read
+> node scripts/build.mjs
+
+Built immutable Wagmi wallet runtime: 139212 bytes, sha256 0xd74a0ffa495787ba1b510a7e39cbba5f4ff1530c1149acd17f252f348be0bc0c
+Packaged reviewed native proof transport into /Users/ravonus/dev/wt/studio-native-beacon-witness-20261019/sdk-nonstandard-read/packages/sdk/dist/proof-runtime/
+

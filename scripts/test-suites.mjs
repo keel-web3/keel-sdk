@@ -43,6 +43,7 @@ export const SIBLING_CONFORMANCE_TEST_FILES = Object.freeze([
  * the exact local contracts checkout. The combined reader proof also uses an
  * installed Chromium. No public-network access or signed transactions occur. */
 export const LOCAL_EVM_TEST_FILES = Object.freeze([
+  "tests/nonstandard-read-anvil.test.mjs",
   "tests/sdk-legacy-shared-image-evm-browser.test.mjs",
   "tests/sdk-legacy-shared-image-hold-policy.test.mjs",
 ]);
@@ -62,6 +63,10 @@ export const TEST_FILES_ON_DISK = Object.freeze(readdirSync(TEST_ROOT)
  * its execution boundary.
  */
 export const DETERMINISTIC_TEST_FILES = Object.freeze([
+  "tests/nonstandard-read-policy.test.mjs",
+  "tests/governed-rpc-boundaries.test.mjs",
+  "tests/hybrid-chunk-resume.test.mjs",
+  "tests/hybrid-runtime-boundaries.test.mjs",
   "tests/sdk-shell-installation-parity.test.mjs",
   "tests/proof-executor-transport.test.mjs",
   "tests/proof-runner-client.test.mjs",
@@ -76,6 +81,7 @@ export const DETERMINISTIC_TEST_FILES = Object.freeze([
   "tests/viewer-chunk-store-cancellation.test.mjs",
   "tests/sdk-tezos-catalog.test.mjs",
   "tests/sdk-simulation-capacity-policy.test.mjs",
+  "tests/sdk-prepared-envelope-capability.test.mjs",
   "tests/sdk-legacy-prepared-dense-copy.test.mjs",
   "tests/sdk-legacy-shared-image.test.mjs",
   "tests/sdk-legacy-shared-image-core.test.mjs",
@@ -85,6 +91,9 @@ export const DETERMINISTIC_TEST_FILES = Object.freeze([
   "tests/sdk-ppmd-brotli-reuse.test.mjs",
   "tests/sdk-studio-agent-guidance.test.mjs",
   "tests/sdk-uri81-copy-literals.test.mjs",
+  "tests/sdk-uri81-reader-grammar.test.mjs",
+  "tests/smart-presentation-policy.test.mjs",
+  "tests/sdk-smart-presentation.test.mjs",
   "tests/acceptance-boundary-properties.test.mjs",
   "tests/acceptance-media-fixture-parity.test.mjs",
   "tests/acceptance-mcp-route-guards.test.mjs",

@@ -29,9 +29,12 @@ export * from "./keel-frozen-dataset.js";
 export * from "./capability-policy.js";
 export * from "./remote-url-policy.js";
 export * from "./keel-rpc-policy.js";
+export * from "./nonstandard-read-policy.js";
 export * from "./keel-rpc.js";
 export * from "./wake-uri.js";
 export * from "./harness-tree.js";
 
 export * from "./keel-release-policy.js";
 export * from "./bitcoin-proof.js";
+
+export * from "./smart-presentation.js";

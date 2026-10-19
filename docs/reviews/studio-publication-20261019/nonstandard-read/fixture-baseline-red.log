@@ -1,0 +1,673 @@
+TAP version 13
+# Subtest: compiler emits exact paid calls, predicted factory binding, mint route and full URI but no wallet request
+ok 1 - compiler emits exact paid calls, predicted factory binding, mint route and full URI but no wallet request
+  ---
+  duration_ms: 241.823
+  type: 'test'
+  ...
+# Subtest: compiler rejects existing collections and mint manager drift before payment
+ok 2 - compiler rejects existing collections and mint manager drift before payment
+  ---
+  duration_ms: 537.519667
+  type: 'test'
+  ...
+# Subtest: compiler rejects missing transaction fees and invalid gas/URI bounds
+ok 3 - compiler rejects missing transaction fees and invalid gas/URI bounds
+  ---
+  duration_ms: 186.685667
+  type: 'test'
+  ...
+# Subtest: journal identity binds source, settings, exact fee quote and all source calls
+ok 4 - journal identity binds source, settings, exact fee quote and all source calls
+  ---
+  duration_ms: 308.085209
+  type: 'test'
+  ...
+# Subtest: exact cached validation is reused, while changed source calls change journal identity
+ok 5 - exact cached validation is reused, while changed source calls change journal identity
+  ---
+  duration_ms: 478.514167
+  type: 'test'
+  ...
+# Subtest: managed payload above 512KiB preserves its exact prepared graph under fee-aware publication
+ok 6 - managed payload above 512KiB preserves its exact prepared graph under fee-aware publication
+  ---
+  duration_ms: 415.844708
+  type: 'test'
+  ...
+# Subtest: legacy registered carriage fails before quoting or publishing fresh payloads
+ok 7 - legacy registered carriage fails before quoting or publishing fresh payloads
+  ---
+  duration_ms: 151.227875
+  type: 'test'
+  ...
+# {"schema":"keel-synthetic-complete-publication-program@1","sourceFixture":"Deterministic 735649-byte binary, not the private Retro GIF","syntheticContractReads":true,"selectedChainAuthenticated":false,"phaseCounts":{"upload":80,"validate":33,"create-collection":1,"bind":1,"mint-route":2,"mint":1},"calls":118,"sourceBytes":736875,"newStoredBytes":876661,"reusedStoredBytes":0,"completeTokenURIBytes":1066324,"completeTokenURISha256":"0xe8659f8867fb3cd056ad6d86b965e4dffc30bc61b390ce4be13e188d6a2c7633","serializedHttpRequestBytes":1810982,"simulationAccepted":false,"browserVerified":false,"actualRetroAcceptance":false,"signing":"not-performed","submission":"not-performed"}
+# Subtest: large synthetic source produces a complete immutable publication program through mint and exact metadata, not just a storage prefix
+ok 8 - large synthetic source produces a complete immutable publication program through mint and exact metadata, not just a storage prefix
+  ---
+  duration_ms: 2856.207084
+  type: 'test'
+  ...
+# Subtest: fresh above-target compilation measures before exact acknowledgement; unchanged calls then require full simulation before wallet
+ok 9 - fresh above-target compilation measures before exact acknowledgement; unchanged calls then require full simulation before wallet
+  ---
+  duration_ms: 1437.354958
+  type: 'test'
+  ...
+# Subtest: fresh creator journal exposes no wallet request until every remaining transaction and full read passes
+ok 10 - fresh creator journal exposes no wallet request until every remaining transaction and full read passes
+  ---
+  duration_ms: 109.767875
+  type: 'test'
+  ...
+# Subtest: verified receipts survive resume and exclude successful uploads from later replay
+ok 11 - verified receipts survive resume and exclude successful uploads from later replay
+  ---
+  duration_ms: 53.681917
+  type: 'test'
+  ...
+# Subtest: a persisted unknown wallet outcome blocks duplicate requests until rejection or exact receipt
+ok 12 - a persisted unknown wallet outcome blocks duplicate requests until rejection or exact receipt
+  ---
+  duration_ms: 52.16975
+  type: 'test'
+  ...
+# Subtest: standard read bounds stay exactly 2M and 60M; ABI/padding/hex/JSON are counted independently
+ok 13 - standard read bounds stay exactly 2M and 60M; ABI/padding/hex/JSON are counted independently
+  ---
+  duration_ms: 0.791166
+  type: 'test'
+  ...
+# Subtest: only the exact acknowledged identity and physical bounds can authorize above-target inspection
+ok 14 - only the exact acknowledged identity and physical bounds can authorize above-target inspection
+  ---
+  duration_ms: 39.028167
+  type: 'test'
+  ...
+# Subtest: policy snapshots cannot be mutated during the first async digest and decoder limits remain separate
+not ok 15 - policy snapshots cannot be mutated during the first async digest and decoder limits remain separate
+  ---
+  duration_ms: 53.652167
+  type: 'test'
+  location: '/Users/ravonus/dev/wt/studio-native-beacon-witness-20261019/sdk-integrated-smart/tests/nonstandard-read-policy.test.mjs:52:1'
+  failureType: 'testCodeFailure'
+  error: |-
+    The input did not match the regular expression /inspection limit/. Input:
+    
+    'TypeError: Inline image is not a PNG source.'
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected:
+  actual:
+  error: 'Inline image is not a PNG source.'
+  name: 'TypeError'
+  stack: |-
+    assertKeelInlineImageBytes (file:///Users/ravonus/dev/wt/studio-native-beacon-witness-20261019/sdk-integrated-smart/packages/sdk/dist/collector-policy.js:31:23)
+    auditKeelInlineTokenURI (file:///Users/ravonus/dev/wt/studio-native-beacon-witness-20261019/sdk-integrated-smart/packages/sdk/dist/inline-transport-audit.js:375:5)
+    async waitForActual (node:assert:644:5)
+    async Function.rejects (node:assert:767:25)
+    async TestContext.<anonymous> (file:///Users/ravonus/dev/wt/studio-native-beacon-witness-20261019/sdk-integrated-smart/tests/nonstandard-read-policy.test.mjs:58:3)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  operator: 'rejects'
+  stack: |-
+    async TestContext.<anonymous> (file:///Users/ravonus/dev/wt/studio-native-beacon-witness-20261019/sdk-integrated-smart/tests/nonstandard-read-policy.test.mjs:58:3)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: unsigned budget permits preparation before final measurement and does not become read authority
+ok 16 - unsigned budget permits preparation before final measurement and does not become read authority
+  ---
+  duration_ms: 1.679375
+  type: 'test'
+  ...
+# Subtest: unknown RPC failures retain method, numeric code and HTTP cause without exposing payloads or credentials
+ok 17 - unknown RPC failures retain method, numeric code and HTTP cause without exposing payloads or credentials
+  ---
+  duration_ms: 7.849334
+  type: 'test'
+  ...
+# Subtest: diagnostics bound cyclic causes and allow only enumerated names, methods, phases and transport codes
+ok 18 - diagnostics bound cyclic causes and allow only enumerated names, methods, phases and transport codes
+  ---
+  duration_ms: 0.438458
+  type: 'test'
+  ...
+# Subtest: pre-funding simulation uses exact ordered calls without signing or state overrides and verifies full bytes
+ok 19 - pre-funding simulation uses exact ordered calls without signing or state overrides and verifies full bytes
+  ---
+  duration_ms: 2.4085
+  type: 'test'
+  ...
+# Subtest: complete metadata oversize and invalid override-like fields fail before any RPC
+ok 20 - complete metadata oversize and invalid override-like fields fail before any RPC
+  ---
+  duration_ms: 0.883916
+  type: 'test'
+  ...
+# Subtest: every direct transport simulation phase rejects silent gas clamping before an apparent revert
+ok 21 - every direct transport simulation phase rejects silent gas clamping before an apparent revert
+  ---
+  duration_ms: 3.780625
+  type: 'test'
+  ...
+# Subtest: every direct transport simulation phase requires complete exact transaction envelopes
+ok 22 - every direct transport simulation phase requires complete exact transaction envelopes
+  ---
+  duration_ms: 6.703709
+  type: 'test'
+  ...
+# Subtest: all returned envelopes are checked before interpreting any execution failure
+ok 23 - all returned envelopes are checked before interpreting any execution failure
+  ---
+  duration_ms: 0.454583
+  type: 'test'
+  ...
+# Subtest: every direct transport replay verifies the explicit atomic nonce before interpreting a revert
+ok 24 - every direct transport replay verifies the explicit atomic nonce before interpreting a revert
+  ---
+  duration_ms: 3.1365
+  type: 'test'
+  ...
+# Subtest: wrong chain, code, byte mismatch, revert, gas limit and reorg cannot produce a proof
+ok 25 - wrong chain, code, byte mismatch, revert, gas limit and reorg cannot produce a proof
+  ---
+  duration_ms: 1.349583
+  type: 'test'
+  ...
+# Subtest: unsupported and capped providers remain explicit unavailable evidence without secrets or automatic fallback
+ok 26 - unsupported and capped providers remain explicit unavailable evidence without secrets or automatic fallback
+  ---
+  duration_ms: 1.552333
+  type: 'test'
+  ...
+# Subtest: proof fingerprint changes with the exact plan, calldata and complete metadata
+ok 27 - proof fingerprint changes with the exact plan, calldata and complete metadata
+  ---
+  duration_ms: 1.124625
+  type: 'test'
+  ...
+# Subtest: the wallet-boundary guard rejects missing, expired or changed funding evidence
+ok 28 - the wallet-boundary guard rejects missing, expired or changed funding evidence
+  ---
+  duration_ms: 1.506333
+  type: 'test'
+  ...
+# Subtest: explicit storage-only simulation verifies its predicted object without claiming collector metadata readiness
+ok 29 - explicit storage-only simulation verifies its predicted object without claiming collector metadata readiness
+  ---
+  duration_ms: 1.039083
+  type: 'test'
+  ...
+# Subtest: public metadata read gas is independent of the transaction cap while every planned transaction stays validated
+ok 30 - public metadata read gas is independent of the transaction cap while every planned transaction stays validated
+  ---
+  duration_ms: 0.477958
+  type: 'test'
+  ...
+# Subtest: ephemeral mint context is excluded from validated wallet transactions and bound to the exact collection target
+ok 31 - ephemeral mint context is excluded from validated wallet transactions and bound to the exact collection target
+  ---
+  duration_ms: 0.577041
+  type: 'test'
+  ...
+# Subtest: a provider cannot substitute the pinned block or contradict success with an execution error
+ok 32 - a provider cannot substitute the pinned block or contradict success with an execution error
+  ---
+  duration_ms: 0.3975
+  type: 'test'
+  ...
+# Subtest: transaction validation cannot rely on zero-fee RPC defaults or a malformed mixed fee envelope
+ok 33 - transaction validation cannot rely on zero-fee RPC defaults or a malformed mixed fee envelope
+  ---
+  duration_ms: 0.174958
+  type: 'test'
+  ...
+# Subtest: validated gas envelopes use pre-refund maximum gas and reject absent or contradictory evidence
+ok 34 - validated gas envelopes use pre-refund maximum gas and reject absent or contradictory evidence
+  ---
+  duration_ms: 4.296875
+  type: 'test'
+  ...
+# Subtest: required standalone reader gates are bounded, byte-verified and included in proof identity
+ok 35 - required standalone reader gates are bounded, byte-verified and included in proof identity
+  ---
+  duration_ms: 1.781292
+  type: 'test'
+  ...
+# Subtest: read replay retries only an explicit smaller provider ceiling and records it without changing transactions
+ok 36 - read replay retries only an explicit smaller provider ceiling and records it without changing transactions
+  ---
+  duration_ms: 0.4955
+  type: 'test'
+  ...
+# Subtest: callers cannot raise shared Inline gas/output ceilings to manufacture preflight success
+ok 37 - callers cannot raise shared Inline gas/output ceilings to manufacture preflight success
+  ---
+  duration_ms: 0.121875
+  type: 'test'
+  ...
+# Subtest: asynchronous caller mutation cannot raise snapshotted read limits or output policy
+ok 38 - asynchronous caller mutation cannot raise snapshotted read limits or output policy
+  ---
+  duration_ms: 0.36375
+  type: 'test'
+  ...
+# Subtest: nested execution must actually succeed with its margin reserved, not merely report low consumed gas
+ok 39 - nested execution must actually succeed with its margin reserved, not merely report low consumed gas
+  ---
+  duration_ms: 0.330709
+  type: 'test'
+  ...
+# Subtest: reserved reader allowance honors smaller per-call gas and rejects impossible margins before RPC
+ok 40 - reserved reader allowance honors smaller per-call gas and rejects impossible margins before RPC
+  ---
+  duration_ms: 0.415042
+  type: 'test'
+  ...
+# Subtest: provider-cap retries reserve the standalone margin again at the reduced ceiling
+ok 41 - provider-cap retries reserve the standalone margin again at the reduced ceiling
+  ---
+  duration_ms: 0.478
+  type: 'test'
+  ...
+# Subtest: Amsterdam accepts high aggregate only through bounded strict fork validation and fingerprints its policy
+ok 42 - Amsterdam accepts high aggregate only through bounded strict fork validation and fingerprints its policy
+  ---
+  duration_ms: 0.626292
+  type: 'test'
+  ...
+# Subtest: Amsterdam simulation without linked current-fork block headers cannot issue funding proof
+ok 43 - Amsterdam simulation without linked current-fork block headers cannot issue funding proof
+  ---
+  duration_ms: 0.281584
+  type: 'test'
+  ...
+# Subtest: Amsterdam discovery success cannot bypass strict execution-dimension rejection
+ok 44 - Amsterdam discovery success cannot bypass strict execution-dimension rejection
+  ---
+  duration_ms: 0.2825
+  type: 'test'
+  ...
+# Subtest: Amsterdam retains the total transaction budget when execution consumption omits fresh state
+ok 45 - Amsterdam retains the total transaction budget when execution consumption omits fresh state
+  ---
+  duration_ms: 0.729875
+  type: 'test'
+  ...
+# Subtest: missing selected-block timestamp fails before any simulation
+ok 46 - missing selected-block timestamp fails before any simulation
+  ---
+  duration_ms: 0.207459
+  type: 'test'
+  ...
+# Subtest: a synthetic future sequence crossing the selected fork must replan instead of reusing old policy
+ok 47 - a synthetic future sequence crossing the selected fork must replan instead of reusing old policy
+  ---
+  duration_ms: 0.220291
+  type: 'test'
+  ...
+# Subtest: atomic wallet preflight validates its real fee envelope on every preparation replay
+ok 48 - atomic wallet preflight validates its real fee envelope on every preparation replay
+  ---
+  duration_ms: 0.664166
+  type: 'test'
+  ...
+# Subtest: explicit atomic nonce survives every replay and invalid nonce fails before RPC
+ok 49 - explicit atomic nonce survives every replay and invalid nonce fails before RPC
+  ---
+  duration_ms: 0.435042
+  type: 'test'
+  ...
+# Subtest: publication fee envelope: pre-Amsterdam, independent, EIP-1559
+ok 50 - publication fee envelope: pre-Amsterdam, independent, EIP-1559
+  ---
+  duration_ms: 0.601833
+  type: 'test'
+  ...
+# Subtest: publication fee envelope: pre-Amsterdam, independent, legacy
+ok 51 - publication fee envelope: pre-Amsterdam, independent, legacy
+  ---
+  duration_ms: 0.328584
+  type: 'test'
+  ...
+# Subtest: publication fee envelope: pre-Amsterdam, atomic, EIP-1559
+ok 52 - publication fee envelope: pre-Amsterdam, atomic, EIP-1559
+  ---
+  duration_ms: 0.615209
+  type: 'test'
+  ...
+# Subtest: publication fee envelope: pre-Amsterdam, atomic, legacy
+ok 53 - publication fee envelope: pre-Amsterdam, atomic, legacy
+  ---
+  duration_ms: 0.581791
+  type: 'test'
+  ...
+# Subtest: publication fee envelope: Amsterdam, independent, EIP-1559
+ok 54 - publication fee envelope: Amsterdam, independent, EIP-1559
+  ---
+  duration_ms: 0.411792
+  type: 'test'
+  ...
+# Subtest: publication fee envelope: Amsterdam, independent, legacy
+ok 55 - publication fee envelope: Amsterdam, independent, legacy
+  ---
+  duration_ms: 0.351042
+  type: 'test'
+  ...
+# Subtest: publication fee envelope: Amsterdam, atomic, EIP-1559
+ok 56 - publication fee envelope: Amsterdam, atomic, EIP-1559
+  ---
+  duration_ms: 0.382542
+  type: 'test'
+  ...
+# Subtest: publication fee envelope: Amsterdam, atomic, legacy
+ok 57 - publication fee envelope: Amsterdam, atomic, legacy
+  ---
+  duration_ms: 0.4135
+  type: 'test'
+  ...
+# Subtest: close diagnostics allow only bounded codes, classified reasons and retry counts
+ok 58 - close diagnostics allow only bounded codes, classified reasons and retry counts
+  ---
+  duration_ms: 0.260834
+  type: 'test'
+  ...
+# Subtest: capacity and size attempt diagnostics preserve only bounded numeric evidence and approved protocol/stage
+ok 59 - capacity and size attempt diagnostics preserve only bounded numeric evidence and approved protocol/stage
+  ---
+  duration_ms: 0.263667
+  type: 'test'
+  ...
+# Subtest: selected provider diagnostics preserve opaque identity and observed envelopes without leaking endpoint text
+ok 60 - selected provider diagnostics preserve opaque identity and observed envelopes without leaking endpoint text
+  ---
+  duration_ms: 0.224875
+  type: 'test'
+  ...
+# Subtest: selected EVM chain 1 discovers sufficient provider capacity below the chain maximum and strictly validates the complete program
+ok 61 - selected EVM chain 1 discovers sufficient provider capacity below the chain maximum and strictly validates the complete program
+  ---
+  duration_ms: 1.143291
+  type: 'test'
+  ...
+# Subtest: selected EVM chain 11155111 discovers sufficient provider capacity below the chain maximum and strictly validates the complete program
+ok 62 - selected EVM chain 11155111 discovers sufficient provider capacity below the chain maximum and strictly validates the complete program
+  ---
+  duration_ms: 0.735209
+  type: 'test'
+  ...
+# Subtest: discovery cannot shrink the measured transaction margin to fit an insufficient provider
+ok 63 - discovery cannot shrink the measured transaction margin to fit an insufficient provider
+  ---
+  duration_ms: 0.449625
+  type: 'test'
+  ...
+# Subtest: successful capacity discovery never accepts or retries a silently clamped strict transaction
+ok 64 - successful capacity discovery never accepts or retries a silently clamped strict transaction
+  ---
+  duration_ms: 0.536958
+  type: 'test'
+  ...
+# Subtest: insufficient execution capacity, unsupported methods, missing pre-refund data, strict failure and wrong complete metadata remain blocked
+ok 65 - insufficient execution capacity, unsupported methods, missing pre-refund data, strict failure and wrong complete metadata remain blocked
+  ---
+  duration_ms: 1.785
+  type: 'test'
+  ...
+# Subtest: capacity discovery is explicit and cannot alter an atomic wallet, measured envelope, unknown policy or unsupported chain
+ok 66 - capacity discovery is explicit and cannot alter an atomic wallet, measured envelope, unknown policy or unsupported chain
+  ---
+  duration_ms: 0.440916
+  type: 'test'
+  ...
+# Subtest: discovery retries only strictly smaller explicit capacity evidence and stops after three adjustments
+ok 67 - discovery retries only strictly smaller explicit capacity evidence and stops after three adjustments
+  ---
+  duration_ms: 2.072166
+  type: 'test'
+  ...
+# Subtest: reverted execution retains exact pinned and returned evidence without raw error data or an inferred inner cause
+ok 68 - reverted execution retains exact pinned and returned evidence without raw error data or an inferred inner cause
+  ---
+  duration_ms: 0.4565
+  type: 'test'
+  ...
+# Subtest: provider failure reason survives the publication boundary with bounded response evidence only
+ok 69 - provider failure reason survives the publication boundary with bounded response evidence only
+  ---
+  duration_ms: 0.354625
+  type: 'test'
+  ...
+# Subtest: direct estimate reverts retain only error code and revert digest, including empty revert data
+ok 70 - direct estimate reverts retain only error code and revert digest, including empty revert data
+  ---
+  duration_ms: 0.117375
+  type: 'test'
+  ...
+# Subtest: 45 synthetic calldata lengths reject an explicit measured whole-request budget below their selected-fork minimum before resubmission
+ok 71 - 45 synthetic calldata lengths reject an explicit measured whole-request budget below their selected-fork minimum before resubmission
+  ---
+  duration_ms: 33.767084
+  type: 'test'
+  ...
+# Subtest: unequal calldata minima share an explicit measured whole-request budget without changing calldata or measured strict envelopes
+ok 72 - unequal calldata minima share an explicit measured whole-request budget without changing calldata or measured strict envelopes
+  ---
+  duration_ms: 4.639291
+  type: 'test'
+  ...
+# Subtest: minimum discovery allocation uses the selected fork and never infers a numeric budget from HTTP status
+ok 73 - minimum discovery allocation uses the selected fork and never infers a numeric budget from HTTP status
+  ---
+  duration_ms: 31.701709
+  type: 'test'
+  ...
+# Subtest: discovery minima distinguish EIP-2780 self-calls, recipient access, nonzero value and bounded diagnostics
+ok 74 - discovery minima distinguish EIP-2780 self-calls, recipient access, nonzero value and bounded diagnostics
+  ---
+  duration_ms: 0.622334
+  type: 'test'
+  ...
+# Subtest: later envelope remainder never becomes a whole-request budget or a repeated descending clamp retry
+ok 75 - later envelope remainder never becomes a whole-request budget or a repeated descending clamp retry
+  ---
+  duration_ms: 32.149667
+  type: 'test'
+  ...
+# Subtest: private observer retains exact ordered calls, all provider errors and selected-fork gas provenance
+ok 76 - private observer retains exact ordered calls, all provider errors and selected-fork gas provenance
+  ---
+  duration_ms: 0.821417
+  type: 'test'
+  ...
+# Subtest: private instrumentation cannot turn incomplete simulation into success or mutate proof identity
+ok 77 - private instrumentation cannot turn incomplete simulation into success or mutate proof identity
+  ---
+  duration_ms: 0.870792
+  type: 'test'
+  ...
+# Subtest: private observers cannot mutate exact calls or provider response proof
+ok 78 - private observers cannot mutate exact calls or provider response proof
+  ---
+  duration_ms: 0.734041
+  type: 'test'
+  ...
+# Subtest: local chain funding simulation requires and fingerprints its explicit verified Osaka profile
+ok 79 - local chain funding simulation requires and fingerprints its explicit verified Osaka profile
+  ---
+  duration_ms: 1.019167
+  type: 'test'
+  ...
+# Subtest: actual decimal thresholds use above, with source and metadata boundaries separate
+ok 80 - actual decimal thresholds use above, with source and metadata boundaries separate
+  ---
+  duration_ms: 3.444875
+  type: 'test'
+  ...
+# Subtest: matrix exposes maintained alternatives and never calls a local numeric estimate chain-ready
+ok 81 - matrix exposes maintained alternatives and never calls a local numeric estimate chain-ready
+  ---
+  duration_ms: 0.480958
+  type: 'test'
+  ...
+# Subtest: real prefix/cap arithmetic rejects old duplication and chooses another qualified layout
+ok 82 - real prefix/cap arithmetic rejects old duplication and chooses another qualified layout
+  ---
+  duration_ms: 1.1975
+  type: 'test'
+  ...
+# Subtest: explicit layout remains selected even when a different layout is recommended
+ok 83 - explicit layout remains selected even when a different layout is recommended
+  ---
+  duration_ms: 0.223
+  type: 'test'
+  ...
+# Subtest: scripts always require a registered verifier and script MIME overrides a static caller label
+ok 84 - scripts always require a registered verifier and script MIME overrides a static caller label
+  ---
+  duration_ms: 0.349666
+  type: 'test'
+  ...
+# Subtest: actual inspection catches MIME lies, active SVG and undecidable PDF without claiming security approval
+ok 85 - actual inspection catches MIME lies, active SVG and undecidable PDF without claiming security approval
+  ---
+  duration_ms: 0.879667
+  type: 'test'
+  ...
+# Subtest: all non-script media use same size policy and direct playback retains a separate usable poster
+ok 86 - all non-script media use same size policy and direct playback retains a separate usable poster
+  ---
+  duration_ms: 1.758292
+  type: 'test'
+  ...
+# Subtest: missing and unsupported actual capabilities stay blocked, regardless of defaults
+ok 87 - missing and unsupported actual capabilities stay blocked, regardless of defaults
+  ---
+  duration_ms: 0.357917
+  type: 'test'
+  ...
+# Subtest: nonstandard size is a compatibility review and exact actual output ceilings remain hard
+ok 88 - nonstandard size is a compatibility review and exact actual output ceilings remain hard
+  ---
+  duration_ms: 0.642
+  type: 'test'
+  ...
+# Subtest: execution/state/read limits cannot be acknowledged away
+ok 89 - execution/state/read limits cannot be acknowledged away
+  ---
+  duration_ms: 0.857875
+  type: 'test'
+  ...
+# Subtest: external preview is explicit HTTPS/IPFS and does not become the source commitment
+ok 90 - external preview is explicit HTTPS/IPFS and does not become the source commitment
+  ---
+  duration_ms: 0.420083
+  type: 'test'
+  ...
+# Subtest: verifier-only is explicit and warns that marketplace grids have no image
+ok 91 - verifier-only is explicit and warns that marketplace grids have no image
+  ---
+  duration_ms: 0.247709
+  type: 'test'
+  ...
+# Subtest: actual chosen rendering counts UTF8, preserves image bytes and commits the embedded program
+ok 92 - actual chosen rendering counts UTF8, preserves image bytes and commits the embedded program
+  ---
+  duration_ms: 4.867458
+  type: 'test'
+  ...
+# Subtest: actual metadata/image identity failures remain hard and do not invoke an alternate provider
+ok 93 - actual metadata/image identity failures remain hard and do not invoke an alternate provider
+  ---
+  duration_ms: 2.461291
+  type: 'test'
+  ...
+# Subtest: image plus hybrid over target suggests smaller slot choices without silently dropping either
+ok 94 - image plus hybrid over target suggests smaller slot choices without silently dropping either
+  ---
+  duration_ms: 21.757541
+  type: 'test'
+  ...
+# Subtest: only measured embedded verifier alone over target suggests IPFS/hosted, without forcing a change
+ok 95 - only measured embedded verifier alone over target suggests IPFS/hosted, without forcing a change
+  ---
+  duration_ms: 29.577709
+  type: 'test'
+  ...
+# Subtest: explicit nonstandard acknowledgement does not bypass a measured qualified provider ceiling
+ok 96 - explicit nonstandard acknowledgement does not bypass a measured qualified provider ceiling
+  ---
+  duration_ms: 21.918208
+  type: 'test'
+  ...
+# Subtest: plan identity binds source, preview, preferences, exact chain code and context/default revision
+ok 97 - plan identity binds source, preview, preferences, exact chain code and context/default revision
+  ---
+  duration_ms: 1.224209
+  type: 'test'
+  ...
+# Subtest: async matrix snapshots source and actual candidates; missing adapters are never fake successes
+ok 98 - async matrix snapshots source and actual candidates; missing adapters are never fake successes
+  ---
+  duration_ms: 1.610125
+  type: 'test'
+  ...
+# Subtest: malformed quantities, unknown axes and unsupported pairs fail closed
+ok 99 - malformed quantities, unknown axes and unsupported pairs fail closed
+  ---
+  duration_ms: 0.303292
+  type: 'test'
+  ...
+# Subtest: exact native source references bind the plan and actual metadata cannot switch paid object IDs
+ok 100 - exact native source references bind the plan and actual metadata cannot switch paid object IDs
+  ---
+  duration_ms: 2.011958
+  type: 'test'
+  ...
+# Subtest: candidate measurements distinguish actual outer expansion from native source and inline image budgets
+ok 101 - candidate measurements distinguish actual outer expansion from native source and inline image budgets
+  ---
+  duration_ms: 0.277416
+  type: 'test'
+  ...
+# Subtest: review regression: actual original outer image contribution warns even below the inner image URI target
+ok 102 - review regression: actual original outer image contribution warns even below the inner image URI target
+  ---
+  duration_ms: 32.264
+  type: 'test'
+  ...
+# Subtest: outer contribution retains the actual percent grammar, escaped keys, whitespace and nested metadata
+ok 103 - outer contribution retains the actual percent grammar, escaped keys, whitespace and nested metadata
+  ---
+  duration_ms: 2.389417
+  type: 'test'
+  ...
+# Subtest: review regression: unrelated metadata does not turn a 44-byte hybrid program into an external-delivery recommendation
+ok 104 - review regression: unrelated metadata does not turn a 44-byte hybrid program into an external-delivery recommendation
+  ---
+  duration_ms: 32.741958
+  type: 'test'
+  ...
+# Subtest: encoded URI expansion alone cannot be relabeled a larger decoded embedded program in provisional or actual checks
+ok 105 - encoded URI expansion alone cannot be relabeled a larger decoded embedded program in provisional or actual checks
+  ---
+  duration_ms: 34.035333
+  type: 'test'
+  ...
+# Subtest: duplicate image properties are rejected rather than measuring an earlier value and validating a later one
+ok 106 - duplicate image properties are rejected rather than measuring an earlier value and validating a later one
+  ---
+  duration_ms: 1.206708
+  type: 'test'
+  ...
+1..106
+# tests 106
+# suites 0
+# pass 105
+# fail 1
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 6928.344875

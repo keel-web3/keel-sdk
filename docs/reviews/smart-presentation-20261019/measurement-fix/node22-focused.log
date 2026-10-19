@@ -1,0 +1,418 @@
+TAP version 13
+# Subtest: original images and GIF use only image without changing source or adding shell
+ok 1 - original images and GIF use only image without changing source or adding shell
+  ---
+  duration_ms: 2.717208
+  type: 'test'
+  ...
+# Subtest: small WebP and AVIF default to shell animation with no duplicate full-size image
+ok 2 - small WebP and AVIF default to shell animation with no duplicate full-size image
+  ---
+  duration_ms: 0.453875
+  type: 'test'
+  ...
+# Subtest: explicit candidate changes animation resource only and thumbnail is separately configured
+ok 3 - explicit candidate changes animation resource only and thumbnail is separately configured
+  ---
+  duration_ms: 0.466792
+  type: 'test'
+  ...
+# Subtest: defaults filter asset and collection; independent explicit delivery choices win
+ok 4 - defaults filter asset and collection; independent explicit delivery choices win
+  ---
+  duration_ms: 0.470375
+  type: 'test'
+  ...
+# Subtest: both slots require explicit selection and exact complete read proof
+ok 5 - both slots require explicit selection and exact complete read proof
+  ---
+  duration_ms: 0.40925
+  type: 'test'
+  ...
+# Subtest: decimal 500KB and 2MB asset recommendations apply to image formats while unknown lengths retain verification
+ok 6 - decimal 500KB and 2MB asset recommendations apply to image formats while unknown lengths retain verification
+  ---
+  duration_ms: 6.705334
+  type: 'test'
+  ...
+# Subtest: collector images never silently switch to hosted by size and explicit delivery still wins
+ok 7 - collector images never silently switch to hosted by size and explicit delivery still wins
+  ---
+  duration_ms: 1.303125
+  type: 'test'
+  ...
+# Subtest: a permissive caller limit cannot label a greater-than-2MB full initial tokenURI as standard compatible
+ok 8 - a permissive caller limit cannot label a greater-than-2MB full initial tokenURI as standard compatible
+  ---
+  duration_ms: 0.194583
+  type: 'test'
+  ...
+# Subtest: SVG without actual source inspection retains verification; explicit direct slots remain explicit
+ok 9 - SVG without actual source inspection retains verification; explicit direct slots remain explicit
+  ---
+  duration_ms: 0.479875
+  type: 'test'
+  ...
+# Subtest: SDK staging and protocol expose the same presets and exact new-source recommendation
+ok 10 - SDK staging and protocol expose the same presets and exact new-source recommendation
+  ---
+  duration_ms: 11.783958
+  type: 'test'
+  ...
+# Subtest: all choice fields survive SDK/API staging without becoming wallet authority
+ok 11 - all choice fields survive SDK/API staging without becoming wallet authority
+  ---
+  duration_ms: 0.640791
+  type: 'test'
+  ...
+# Subtest: explicit retained viewer choices stay selected and actual script sources keep shell defaults
+ok 12 - explicit retained viewer choices stay selected and actual script sources keep shell defaults
+  ---
+  duration_ms: 0.819708
+  type: 'test'
+  ...
+# Subtest: Blob reads snapshot source and project choices before awaiting caller-controlled bytes
+ok 13 - Blob reads snapshot source and project choices before awaiting caller-controlled bytes
+  ---
+  duration_ms: 0.454208
+  type: 'test'
+  ...
+# Subtest: saved preferences use existing revisioned defaults and never persist a per-project URL
+ok 14 - saved preferences use existing revisioned defaults and never persist a per-project URL
+  ---
+  duration_ms: 0.521417
+  type: 'test'
+  ...
+# Subtest: MCP staging schema consumes canonical enum values rather than a separate policy
+ok 15 - MCP staging schema consumes canonical enum values rather than a separate policy
+  ---
+  duration_ms: 0.063583
+  type: 'test'
+  ...
+# Subtest: explicit defaults are off by default and media scope overrides global without crossing into other media
+ok 16 - explicit defaults are off by default and media scope overrides global without crossing into other media
+  ---
+  duration_ms: 2.372833
+  type: 'test'
+  ...
+# Subtest: changing a saved profile never changes existing pinned plans; invalidated capabilities reopen questions
+ok 17 - changing a saved profile never changes existing pinned plans; invalidated capabilities reopen questions
+  ---
+  duration_ms: 0.440958
+  type: 'test'
+  ...
+# Subtest: saving requires a defaultable field and supported value, never arbitrary authority or project identity
+ok 18 - saving requires a defaultable field and supported value, never arbitrary authority or project identity
+  ---
+  duration_ms: 0.205
+  type: 'test'
+  ...
+# Subtest: untrusted profiles are bounded and copied; unknown saved keys never enter a project
+ok 19 - untrusted profiles are bounded and copied; unknown saved keys never enter a project
+  ---
+  duration_ms: 0.377917
+  type: 'test'
+  ...
+# Subtest: integer defaults respect answer-derived bounds before a project can become ready
+ok 20 - integer defaults respect answer-derived bounds before a project can become ready
+  ---
+  duration_ms: 0.203625
+  type: 'test'
+  ...
+# Subtest: portable draft client uses the same typed preferences API without broadening grants or accepting signing fields
+ok 21 - portable draft client uses the same typed preferences API without broadening grants or accepting signing fields
+  ---
+  duration_ms: 19.09625
+  type: 'test'
+  ...
+# Subtest: removing the last media value reclaims capacity, including older invisible empty buckets
+ok 22 - removing the last media value reclaims capacity, including older invisible empty buckets
+  ---
+  duration_ms: 0.734292
+  type: 'test'
+  ...
+# Subtest: fresh build defaults layer explicit overrides, hard reader bounds and Raw semantics
+ok 23 - fresh build defaults layer explicit overrides, hard reader bounds and Raw semantics
+  ---
+  duration_ms: 0.44275
+  type: 'test'
+  ...
+# Subtest: retained read policy preserves exact old source choices while layering only current read limits
+ok 24 - retained read policy preserves exact old source choices while layering only current read limits
+  ---
+  duration_ms: 2.9215
+  type: 'test'
+  ...
+# Subtest: read-only legacy compatibility never offers retired formats for fresh preparation or fabricates a missing snapshot
+ok 25 - read-only legacy compatibility never offers retired formats for fresh preparation or fabricates a missing snapshot
+  ---
+  duration_ms: 0.437625
+  type: 'test'
+  ...
+# Subtest: retained policy rejects corrupt snapshots, provenance and read bounds without rewriting them
+ok 26 - retained policy rejects corrupt snapshots, provenance and read bounds without rewriting them
+  ---
+  duration_ms: 0.484667
+  type: 'test'
+  ...
+# Subtest: retained generation tolerates only the unchanged historical system transport default
+ok 27 - retained generation tolerates only the unchanged historical system transport default
+  ---
+  duration_ms: 0.24175
+  type: 'test'
+  ...
+# Subtest: retained generation validates exact legacy account, media, project and build choices without exposing fresh availability
+ok 28 - retained generation validates exact legacy account, media, project and build choices without exposing fresh availability
+  ---
+  duration_ms: 0.242666
+  type: 'test'
+  ...
+# Subtest: agent staging preserves exact component declarations and never invokes a wallet
+ok 29 - agent staging preserves exact component declarations and never invokes a wallet
+  ---
+  duration_ms: 159.864
+  type: 'test'
+  ...
+# Subtest: agent staging defaults projects to the reusable KEEL verification shell
+ok 30 - agent staging defaults projects to the reusable KEEL verification shell
+  ---
+  duration_ms: 1.53325
+  type: 'test'
+  ...
+# Subtest: agent staging preserves standard image, video, and model roles without manufacturing a viewer
+ok 31 - agent staging preserves standard image, video, and model roles without manufacturing a viewer
+  ---
+  duration_ms: 0.457625
+  type: 'test'
+  ...
+# Subtest: agent staging keeps an artifact release independent from the explicit no-shell choice
+ok 32 - agent staging keeps an artifact release independent from the explicit no-shell choice
+  ---
+  duration_ms: 1.212708
+  type: 'test'
+  ...
+# Subtest: agent staging rejects a locally declared KEEL shell but preserves creator HTML content
+ok 33 - agent staging rejects a locally declared KEEL shell but preserves creator HTML content
+  ---
+  duration_ms: 2.167542
+  type: 'test'
+  ...
+# Subtest: agent staging fails closed on ambiguous paths, weak tokens, and invalid responses
+ok 34 - agent staging fails closed on ambiguous paths, weak tokens, and invalid responses
+  ---
+  duration_ms: 0.943458
+  type: 'test'
+  ...
+# Subtest: the p5 handoff example requires exact same-chain carrier bindings and never embeds module bytes
+ok 35 - the p5 handoff example requires exact same-chain carrier bindings and never embeds module bytes
+  ---
+  duration_ms: 49.717334
+  type: 'test'
+  ...
+# Subtest: compressed p5 modules verify through the Studio object gateway before staging
+ok 36 - compressed p5 modules verify through the Studio object gateway before staging
+  ---
+  duration_ms: 2.071875
+  type: 'test'
+  ...
+# Subtest: Studio module verification fails closed on wrong bytes, lengths, and unsafe origins
+ok 37 - Studio module verification fails closed on wrong bytes, lengths, and unsafe origins
+  ---
+  duration_ms: 0.588917
+  type: 'test'
+  ...
+# Subtest: SDK image staging shares original/GIF no-shell defaults and retains explicit media-slot choices
+ok 38 - SDK image staging shares original/GIF no-shell defaults and retains explicit media-slot choices
+  ---
+  duration_ms: 1.409
+  type: 'test'
+  ...
+# Subtest: actual decimal thresholds use above, with source and metadata boundaries separate
+ok 39 - actual decimal thresholds use above, with source and metadata boundaries separate
+  ---
+  duration_ms: 3.503
+  type: 'test'
+  ...
+# Subtest: matrix exposes maintained alternatives and never calls a local numeric estimate chain-ready
+ok 40 - matrix exposes maintained alternatives and never calls a local numeric estimate chain-ready
+  ---
+  duration_ms: 0.481208
+  type: 'test'
+  ...
+# Subtest: real prefix/cap arithmetic rejects old duplication and chooses another qualified layout
+ok 41 - real prefix/cap arithmetic rejects old duplication and chooses another qualified layout
+  ---
+  duration_ms: 1.18975
+  type: 'test'
+  ...
+# Subtest: explicit layout remains selected even when a different layout is recommended
+ok 42 - explicit layout remains selected even when a different layout is recommended
+  ---
+  duration_ms: 0.254333
+  type: 'test'
+  ...
+# Subtest: scripts always require a registered verifier and script MIME overrides a static caller label
+ok 43 - scripts always require a registered verifier and script MIME overrides a static caller label
+  ---
+  duration_ms: 0.363292
+  type: 'test'
+  ...
+# Subtest: actual inspection catches MIME lies, active SVG and undecidable PDF without claiming security approval
+ok 44 - actual inspection catches MIME lies, active SVG and undecidable PDF without claiming security approval
+  ---
+  duration_ms: 0.889958
+  type: 'test'
+  ...
+# Subtest: all non-script media use same size policy and direct playback retains a separate usable poster
+ok 45 - all non-script media use same size policy and direct playback retains a separate usable poster
+  ---
+  duration_ms: 2.397375
+  type: 'test'
+  ...
+# Subtest: missing and unsupported actual capabilities stay blocked, regardless of defaults
+ok 46 - missing and unsupported actual capabilities stay blocked, regardless of defaults
+  ---
+  duration_ms: 0.637167
+  type: 'test'
+  ...
+# Subtest: nonstandard size is a compatibility review and exact actual output ceilings remain hard
+ok 47 - nonstandard size is a compatibility review and exact actual output ceilings remain hard
+  ---
+  duration_ms: 0.695292
+  type: 'test'
+  ...
+# Subtest: execution/state/read limits cannot be acknowledged away
+ok 48 - execution/state/read limits cannot be acknowledged away
+  ---
+  duration_ms: 0.614125
+  type: 'test'
+  ...
+# Subtest: external preview is explicit HTTPS/IPFS and does not become the source commitment
+ok 49 - external preview is explicit HTTPS/IPFS and does not become the source commitment
+  ---
+  duration_ms: 0.402292
+  type: 'test'
+  ...
+# Subtest: verifier-only is explicit and warns that marketplace grids have no image
+ok 50 - verifier-only is explicit and warns that marketplace grids have no image
+  ---
+  duration_ms: 0.273708
+  type: 'test'
+  ...
+# Subtest: actual chosen rendering counts UTF8, preserves image bytes and commits the embedded program
+ok 51 - actual chosen rendering counts UTF8, preserves image bytes and commits the embedded program
+  ---
+  duration_ms: 5.453042
+  type: 'test'
+  ...
+# Subtest: actual metadata/image identity failures remain hard and do not invoke an alternate provider
+ok 52 - actual metadata/image identity failures remain hard and do not invoke an alternate provider
+  ---
+  duration_ms: 1.882167
+  type: 'test'
+  ...
+# Subtest: image plus hybrid over target suggests smaller slot choices without silently dropping either
+ok 53 - image plus hybrid over target suggests smaller slot choices without silently dropping either
+  ---
+  duration_ms: 22.041667
+  type: 'test'
+  ...
+# Subtest: only measured embedded verifier alone over target suggests IPFS/hosted, without forcing a change
+ok 54 - only measured embedded verifier alone over target suggests IPFS/hosted, without forcing a change
+  ---
+  duration_ms: 27.352375
+  type: 'test'
+  ...
+# Subtest: explicit nonstandard acknowledgement does not bypass a measured qualified provider ceiling
+ok 55 - explicit nonstandard acknowledgement does not bypass a measured qualified provider ceiling
+  ---
+  duration_ms: 19.270083
+  type: 'test'
+  ...
+# Subtest: plan identity binds source, preview, preferences, exact chain code and context/default revision
+ok 56 - plan identity binds source, preview, preferences, exact chain code and context/default revision
+  ---
+  duration_ms: 1.163083
+  type: 'test'
+  ...
+# Subtest: async matrix snapshots source and actual candidates; missing adapters are never fake successes
+ok 57 - async matrix snapshots source and actual candidates; missing adapters are never fake successes
+  ---
+  duration_ms: 1.355875
+  type: 'test'
+  ...
+# Subtest: malformed quantities, unknown axes and unsupported pairs fail closed
+ok 58 - malformed quantities, unknown axes and unsupported pairs fail closed
+  ---
+  duration_ms: 0.27425
+  type: 'test'
+  ...
+# Subtest: exact native source references bind the plan and actual metadata cannot switch paid object IDs
+ok 59 - exact native source references bind the plan and actual metadata cannot switch paid object IDs
+  ---
+  duration_ms: 1.732917
+  type: 'test'
+  ...
+# Subtest: candidate measurements distinguish actual outer expansion from native source and inline image budgets
+ok 60 - candidate measurements distinguish actual outer expansion from native source and inline image budgets
+  ---
+  duration_ms: 0.277
+  type: 'test'
+  ...
+# Subtest: review regression: actual original outer image contribution warns even below the inner image URI target
+ok 61 - review regression: actual original outer image contribution warns even below the inner image URI target
+  ---
+  duration_ms: 31.091042
+  type: 'test'
+  ...
+# Subtest: outer contribution retains the actual percent grammar, escaped keys, whitespace and nested metadata
+ok 62 - outer contribution retains the actual percent grammar, escaped keys, whitespace and nested metadata
+  ---
+  duration_ms: 1.701292
+  type: 'test'
+  ...
+# Subtest: review regression: unrelated metadata does not turn a 44-byte hybrid program into an external-delivery recommendation
+ok 63 - review regression: unrelated metadata does not turn a 44-byte hybrid program into an external-delivery recommendation
+  ---
+  duration_ms: 30.93725
+  type: 'test'
+  ...
+# Subtest: encoded URI expansion alone cannot be relabeled a larger decoded embedded program in provisional or actual checks
+ok 64 - encoded URI expansion alone cannot be relabeled a larger decoded embedded program in provisional or actual checks
+  ---
+  duration_ms: 28.53475
+  type: 'test'
+  ...
+# Subtest: duplicate image properties are rejected rather than measuring an earlier value and validating a later one
+ok 65 - duplicate image properties are rejected rather than measuring an earlier value and validating a later one
+  ---
+  duration_ms: 0.996917
+  type: 'test'
+  ...
+# Subtest: [test gate] every suite is classified and browser/live checks stay outside the deterministic default
+ok 66 - [test gate] every suite is classified and browser/live checks stay outside the deterministic default
+  ---
+  duration_ms: 47.547458
+  type: 'test'
+  ...
+# Subtest: [test gate] a newly added test is unclassified until its execution boundary is reviewed
+ok 67 - [test gate] a newly added test is unclassified until its execution boundary is reviewed
+  ---
+  duration_ms: 8.459917
+  type: 'test'
+  ...
+# Subtest: [test gate] a removed test leaves a stale manifest entry instead of crashing validation
+ok 68 - [test gate] a removed test leaves a stale manifest entry instead of crashing validation
+  ---
+  duration_ms: 7.839375
+  type: 'test'
+  ...
+1..68
+# tests 68
+# suites 0
+# pass 68
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 280.965791

@@ -1,4 +1,4 @@
-import { KEEL_DEFAULT_PAYLOAD_STORAGE, KEEL_PAYLOAD_STORAGE_MODES, KEEL_DEFAULT_SHELL, KEEL_SHELL_CHOICES } from "@keel/protocol";
+import { KEEL_ASSET_PRESENTATION_PREFERENCES, KEEL_ASSET_PRESENTATION_CANDIDATE_IDS, KEEL_ASSET_PRESENTATION_FALLBACK_DELIVERIES, KEEL_DEFAULT_PAYLOAD_STORAGE, KEEL_PAYLOAD_STORAGE_MODES, KEEL_DEFAULT_SHELL, KEEL_SHELL_CHOICES } from "@keel/protocol";
 import { COPY_READ_SCHEMA } from "./copy-read-tool.js";
 import type { JsonSchema } from "./types.js";
 
@@ -293,6 +293,11 @@ const studioReusableModule: JsonSchema = object({
   tags: { type: "array", items: string("Reusable-module search tag.", 64), minItems: 0, maxItems: 24 },
 }, ["resourcePaths", "assetType", "license"]);
 const studioStageProject: JsonSchema = object({
+  assetPresentation: { type: "string", enum: [...KEEL_ASSET_PRESENTATION_PREFERENCES], default: "automatic", description: "Shared candidate matrix: default registered verifier; static media above 500,000 bytes recommends native direct display, above 2,000,000 recommends RPC verification. These are recommendations, independent of actual encoded image/metadata and selected-chain constraints. Explicit slot layouts are preserved. The 2 MB complete metadata target is a compatibility warning; larger metadata requires explicit understanding and an actual supported read policy/full simulation. Nothing authorizes a payment." },
+  assetPresentationSelection: { type: "string", enum: [...KEEL_ASSET_PRESENTATION_CANDIDATE_IDS], description: "Explicit maintained metadata-slot pair; unavailable selected-chain capabilities remain blocked." },
+  fallbackDelivery: { type: "string", enum: [...KEEL_ASSET_PRESENTATION_FALLBACK_DELIVERIES], description: "Preferred IPFS or hosted alternative if the embedded verifier alone exceeds compatibility targets; never silently drops an image or moves content." },
+  nonstandardCompatibilityAcknowledged: { type: "boolean", description: "Creator understands that larger metadata may not load in outside readers. Exact limits, review and wallet approval still apply." },
+  externalPreviewUri: string("Explicit project-only HTTPS/IPFS preview URL. Required for external-preview; never invented or saved as a global URL default.", 2048),
   payloadStorage: { type: "string", enum: [...KEEL_PAYLOAD_STORAGE_MODES], default: KEEL_DEFAULT_PAYLOAD_STORAGE, description: "Compact stores losslessly compressed native bytes once. Raw preserves supplied bytes without automatic compression. Independent of viewer and Inline/Hybrid delivery; never store a second Base64/hex copy just for the shell." },
   studioUrl: string("Optional HTTPS Studio URL; KEEL_STUDIO_URL is used otherwise.", 512),
   title: string("Project title.", 160),

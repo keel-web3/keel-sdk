@@ -1,3 +1,4 @@
+import { resolveKeelPreparationReadBounds } from "@keel/protocol";
 import { createHash } from "node:crypto";
 import { parseAbi, encodeFunctionData, decodeFunctionResult, hexToBytes, keccak256, stringToHex, type Abi, type Hex } from "viem";
 import { keelHoldAbi } from "./abi.js";
@@ -38,7 +39,7 @@ export async function prepareKeelAuthenticatedCreatorInline(input: {
   readonly pool: KeelRpcPool;
   readonly index: KeelNetworkIndex;
   readonly selection?: KeelNetworkSelection;
-  readonly publication: Omit<Parameters<typeof prepareKeelCreatorInline>[0], "chainId" | "store" | "readSlug">;
+  readonly publication: Omit<Parameters<typeof prepareKeelCreatorInline>[0], "chainId" | "store" | "readSlug" | "readerGrammar">;
 }) {
   // Infrastructure authentication must not suspend before the caller's source,
   // policy and selected deployment become one immutable preparation request.
@@ -46,6 +47,8 @@ export async function prepareKeelAuthenticatedCreatorInline(input: {
   const index = parseKeelNetworkIndex(input.index);
   const selection = { ...(input.selection ?? {}) };
   const declared = input.publication;
+  const readBounds = resolveKeelPreparationReadBounds(declared);
+  if (Object.hasOwn(declared, "readerGrammar")) throw new TypeError("Authenticated preparation derives reader grammar from the registered profile; callers cannot override it.");
   if (!Array.isArray(declared.resources) || !declared.resources.length || declared.resources.length > 40) throw new RangeError("Creator publication supports 1..40 modular resources.");
   let sourceBytes = 0;
   for (const resource of declared.resources) {
@@ -55,7 +58,7 @@ export async function prepareKeelAuthenticatedCreatorInline(input: {
     if (sourceBytes > 32 * 1024 * 1024) throw new RangeError("Creator publication exceeds its decoded source byte bound.");
   }
   if (!(declared.poster.bytes instanceof Uint8Array) || !declared.poster.bytes.length || declared.poster.bytes.length > 2_000_000) throw new RangeError("Creator publication poster exceeds the complete Inline byte bound.");
-  const publication = { ...declared,
+  const publication = { ...declared, ...(readBounds.nonstandardReadPolicy === undefined ? {} : { nonstandardReadPolicy: readBounds.nonstandardReadPolicy }), ...(readBounds.preparationReadBudget === undefined ? {} : { preparationReadBudget: readBounds.preparationReadBudget }),
     resources: declared.resources.map(resource => ({ ...resource, ...(resource.aliases === undefined ? {} : { aliases: [...resource.aliases] }), bytes: Uint8Array.from(resource.bytes) })),
     poster: { ...declared.poster, bytes: Uint8Array.from(declared.poster.bytes) },
   };
@@ -88,6 +91,39 @@ export async function prepareKeelAuthenticatedCreatorInline(input: {
   const revision = publication.shellRevision ?? 1n;
   const shell = await read(registry, "shellRevision", [shellId, revision]) as readonly unknown[];
   if (!Array.isArray(shell) || shell[2] !== 3 || shell[3] !== true) throw new TypeError("Prepared creator shell revision is unavailable or incompatible.");
+  // The registry authority commits the profile; index receipts and runtime reads
+  // bind its reader identity. A local SDK default must not reinterpret old code.
+  if (typeof shell[4] !== "string" || !/^0x[0-9a-f]{64}$/iu.test(shell[4])) throw new TypeError("Registered shell metadata identity is missing.");
+  const metadataRecord = await read(target.store, "getObject", [shell[4]], HOLD) as Record<string, unknown>;
+  if (!metadataRecord || metadataRecord.exists !== true || metadataRecord.compression !== 0
+    || metadataRecord.mediaType !== "application/json" || typeof metadataRecord.digest !== "string"
+    || typeof metadataRecord.byteLength !== "bigint" || metadataRecord.byteLength < 1n || metadataRecord.byteLength > 65536n
+    || metadataRecord.byteLength !== metadataRecord.storedByteLength) throw new TypeError("Registered reader profile metadata is unavailable or incompatible.");
+  await read(builder, "requireRegistration", [shell[4]]);
+  const metadataRaw = await read(target.store, "haulObject", [shell[4]], HOLD);
+  if (typeof metadataRaw !== "string" || metadataRaw.length > 2 + 65536 * 2
+    || !/^0x(?:[0-9a-f]{2})*$/iu.test(metadataRaw)) throw new TypeError("Invalid registered reader profile bytes.");
+  const metadataBytes = hexToBytes(metadataRaw as Hex);
+  if (BigInt(metadataBytes.length) !== metadataRecord.byteLength || !same(hash(metadataBytes), metadataRecord.digest)) throw new TypeError("Registered reader profile digest mismatch.");
+  const metadata: unknown = JSON.parse(new TextDecoder("utf-8", { fatal: true }).decode(metadataBytes));
+  if (!metadata || typeof metadata !== "object" || Array.isArray(metadata)) throw new TypeError("Invalid registered reader profile metadata.");
+  const manifest = metadata as Record<string, unknown>;
+  if (["base90-v1", "base91-v1"].includes(String(manifest.transport)) || ["base90", "base91"].includes(String(manifest.binaryPayloadCarriage))) {
+    throw Object.assign(new TypeError("Registered shell uses a legacy carriage; fresh preparation requires an authenticated URI81 shell. Reuse existing bindings unchanged."), { code: "KEEL_REGISTERED_CARRIAGE_MISMATCH" });
+  }
+  const profile = manifest.readerProfile as Record<string, unknown> | undefined;
+  const readerCodeHash = infrastructure.contracts.find(contract => same(contract.address, builder))?.runtimeCodeHash;
+  if (!profile || typeof profile !== "object" || Array.isArray(profile)
+    || profile.protocol !== "keel.prepared-reader-profile@1" || profile.chainId !== target.chainId
+    || !same(profile.store, target.store) || !same(profile.reader, builder)
+    || typeof readerCodeHash !== "string" || !same(profile.runtimeCodeHash, readerCodeHash)
+    || profile.transportProfile !== "uri81-block-v1"
+    || !["uri81", "legacy-strict"].includes(String(profile.readerGrammar))) throw new TypeError("Registered reader grammar is missing or does not match its authenticated deployment.");
+  const readerGrammar = profile.readerGrammar as "uri81" | "legacy-strict";
+  // This immutable selected-chain reader was independently probed with all three
+  // excluded literals. Metadata cannot relabel it as the wider URI81 grammar.
+  if (readerCodeHash.toLowerCase() === "0x4751a10e95fce5b2c195cf16dac31b4b3bbce11bc8b8671feb6ef11c2977ae44"
+    && readerGrammar !== "legacy-strict") throw new TypeError("Registered reader grammar conflicts with its immutable bytecode.");
   const registered = async (objectId: unknown, id: string) => {
     if (typeof objectId !== "string" || !/^0x[0-9a-f]{64}$/iu.test(objectId)) throw new TypeError("Invalid registered shell object.");
     const record = await read(target.store, "getObject", [objectId], HOLD) as Record<string, unknown>;
@@ -105,7 +141,7 @@ export async function prepareKeelAuthenticatedCreatorInline(input: {
   };
   const [prefix, suffix] = await Promise.all([registered(shell[0], "registered-shell-prefix"), registered(shell[1], "registered-shell-suffix")]);
   const decode = (bytes: Uint8Array) => new TextDecoder("utf-8", { fatal: true }).decode(decodeKeelPreparedDenseCopyFragment(bytes));
-  const plan = await prepareKeelCreatorInline({ ...publication, chainId: target.chainId, store: target.store });
+  const plan = await prepareKeelCreatorInline({ ...publication, chainId: target.chainId, store: target.store, readerGrammar });
   const html = decode(prefix.bytes) + decode(plan.preparedBodyBytes) + decode(suffix.bytes);
   // Authenticate the registered decoder before quoting or publishing new payloads.
   const registeredShell = inspectKeelPreparedDenseCopyDocument(html);
@@ -120,13 +156,14 @@ export async function prepareKeelAuthenticatedCreatorInline(input: {
       || resource.role !== original.descriptor.role || resource.mediaType !== original.descriptor.mediaType || JSON.stringify(resource.aliases) !== JSON.stringify(original.descriptor.aliases);
   })) throw new TypeError("Registered prepared source replay differs from the original resources.");
   const preparedBytesBeforeLiveEnvelope = plan.preparedBytesBeforeLiveEnvelope - plan.shell.prefix.bytes.length - plan.shell.suffix.bytes.length + prefix.bytes.length + suffix.bytes.length;
-  const provisionalTokenURIBudget = assessKeelCreatorPreparedInlineBudget(preparedBytesBeforeLiveEnvelope);
+  const provisionalTokenURIBudget = assessKeelCreatorPreparedInlineBudget(preparedBytesBeforeLiveEnvelope, publication.nonstandardReadPolicy, publication.preparationReadBudget);
   const canonicalBlock = await pool.request({ method: "eth_getBlockByNumber", params: [block, false] }) as { hash?: unknown };
   if (!same(canonicalBlock?.hash, String(infrastructure.blockHash))) throw new TypeError("Prepared route block was reorganized during authentication.");
   return { ...plan, shell: { ...plan.shell, prefix, suffix }, preparedBytesBeforeLiveEnvelope, provisionalTokenURIBudget,
     optimization: { ...plan.optimization, shellPreparedBytes: prefix.bytes.length + suffix.bytes.length },
     route: { factory: target.factory, renderer: target.renderer, builder, registry, validation, instance: target.instance,
-      shellId, shellRevision: revision, authenticatedBlockNumber: infrastructure.blockNumber, authenticatedBlockHash: infrastructure.blockHash },
+      shellId, shellRevision: revision, readerGrammar, readerProfileMetadataObjectId: shell[4], readerProfileMetadataDigest: metadataRecord.digest,
+      authenticatedBlockNumber: infrastructure.blockNumber, authenticatedBlockHash: infrastructure.blockHash },
     // Authentication of deployment and sources does not simulate a new token.
     prepaymentSimulation: "required" as const, infrastructure };
 }

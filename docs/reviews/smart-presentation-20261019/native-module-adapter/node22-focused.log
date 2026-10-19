@@ -1,0 +1,46 @@
+TAP version 13
+# Subtest: binds the module on the collection, then sends scoped image references to the shared module
+ok 1 - binds the module on the collection, then sends scoped image references to the shared module
+  ---
+  duration_ms: 6.0485
+  type: 'test'
+  ...
+# Subtest: supports standard templates, exact URIs and explicit KEEL fallback
+ok 2 - supports standard templates, exact URIs and explicit KEEL fallback
+  ---
+  duration_ms: 1.090333
+  type: 'test'
+  ...
+# Subtest: large URIs remain buildable and size advice counts UTF-8 bytes
+ok 3 - large URIs remain buildable and size advice counts UTF-8 bytes
+  ---
+  duration_ms: 2.079833
+  type: 'test'
+  ...
+# Subtest: rejects invalid references and unsafe IDs without restricting image payload size
+ok 4 - rejects invalid references and unsafe IDs without restricting image payload size
+  ---
+  duration_ms: 0.140834
+  type: 'test'
+  ...
+# Subtest: native media adapter encodes every actual module route and keeps primary and poster references separate
+ok 5 - native media adapter encodes every actual module route and keeps primary and poster references separate
+  ---
+  duration_ms: 1.008667
+  type: 'test'
+  ...
+# Subtest: native adapter cannot omit the image by accident, reuse an empty source or smuggle a fallback object
+ok 6 - native adapter cannot omit the image by accident, reuse an empty source or smuggle a fallback object
+  ---
+  duration_ms: 0.13425
+  type: 'test'
+  ...
+1..6
+# tests 6
+# suites 0
+# pass 6
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 224.945708

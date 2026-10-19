@@ -130,12 +130,15 @@ export function redactEndpoint(url) {
  *                    prove this identity before it can serve artwork reads
  * @param timeoutMs   deadline for each HTTP request, including its JSON body
  */
-export function createKeelChain({ rpc, keelHold, hosts = KEEL_VIEW_RPC_HOSTS, listRevision = 0, listEpoch = 0, fetchImpl, expectedChainId, timeoutMs = 8000 }) {
+export function createKeelChain({ rpc, keelHold, hosts = KEEL_VIEW_RPC_HOSTS, listRevision = 0, listEpoch = 0, fetchImpl, expectedChainId, timeoutMs = 8000, signal, maxConcurrentReads = 4, maxRetries = 0, retryDelayMs = 250, maxResponseBytes = 32 * 1024 * 1024, maxCacheBytes = 32 * 1024 * 1024 }) {
   if (expectedChainId !== undefined && (!Number.isSafeInteger(expectedChainId) || expectedChainId < 1)) {
     throw new TypeError("expectedChainId must be a positive safe integer");
   }
   if (!Number.isSafeInteger(timeoutMs) || timeoutMs < 1 || timeoutMs > 30000) {
     throw new TypeError("timeoutMs must be an integer between 1 and 30000");
+  }
+  for (const [name, value, maximum] of [["maxConcurrentReads", maxConcurrentReads, 64], ["maxRetries", maxRetries, 3], ["retryDelayMs", retryDelayMs, 5000], ["maxResponseBytes", maxResponseBytes, Number.MAX_SAFE_INTEGER], ["maxCacheBytes", maxCacheBytes, Number.MAX_SAFE_INTEGER]]) {
+    if (!Number.isSafeInteger(value) || value < (name === "maxRetries" || name === "maxCacheBytes" ? 0 : 1) || value > maximum) throw new TypeError(`Invalid ${name}`);
   }
   const candidates = (Array.isArray(rpc) ? rpc : [rpc]).filter((url) => typeof url === "string" && url.length > 0);
   const endpoints = candidates.filter((url) => rpcHostAllowed(url, hosts));
@@ -152,45 +155,153 @@ export function createKeelChain({ rpc, keelHold, hosts = KEEL_VIEW_RPC_HOSTS, li
     && typeof block.number === "string" && /^0x(?:0|[1-9a-f][0-9a-f]*)$/iu.test(block.number)
     && typeof block.hash === "string" && /^0x[0-9a-f]{64}$/iu.test(block.hash);
 
-  async function send(endpoint, method, params) {
-    const controller = new AbortController();
-    const id = ++nextId;
-    let timedOut = false;
-    let timer;
-    // Race the complete request, not only fetch: a body or injected transport
-    // may stall without observing AbortSignal. Late results never become reads.
-    const deadline = new Promise((_, reject) => {
-      timer = setTimeout(() => {
-        timedOut = true;
-        reject(new Error("RPC timeout"));
-        controller.abort();
-      }, timeoutMs);
-    });
-    try {
-      return await Promise.race([deadline, (async () => {
-        const response = await request(endpoint, {
-          method: "POST",
-          headers: { "content-type": "application/json" },
-          body: JSON.stringify({ jsonrpc: "2.0", id, method, params }),
-          redirect: "error",
-          signal: controller.signal,
-        });
-        if (response?.ok !== true || response.redirected) throw new Error("RPC HTTP failure");
-        const body = await response.json();
-        if (body === null || typeof body !== "object" || Array.isArray(body)
-          || body.jsonrpc !== "2.0" || body.id !== id || "error" in body
-          || (method === "eth_getBlockByNumber" ? !validBlock(body.result) : typeof body.result !== "string")
-          || (["eth_call", "eth_getCode"].includes(method) && !/^0x(?:[0-9a-f]{2})*$/iu.test(body.result))) {
-          throw new Error("RPC invalid response");
+  let terminalError = null, active = 0, abandoned = 0, head = null, tail = null, cachedBytes = 0;
+  const controllers = new Set(), pendingCancellations = new Set(), cooldown = new Map(), cache = new Map(), inflight = new Map();
+  let cacheGeneration = 0;
+  const fault = (endpoint, code, terminal = false, extra = {}) => Object.assign(new Error(`RPC request ${code === "timeout" ? "timed out" : "failed"} (${redactEndpoint(endpoint)})`), { code, terminal, ...extra });
+  function drain() {
+    while (head && (terminalError || signal?.aborted || active < maxConcurrentReads || abandoned && active >= maxConcurrentReads)) {
+      const item = head; head = item.next; if (!head) tail = null;
+      if (terminalError || signal?.aborted || abandoned && active >= maxConcurrentReads) { item.reject(terminalError ?? signal?.reason ?? Object.assign(new Error("RPC timed-out physical window is still occupied; resume after it settles."), { code: "timeout", noFallback: true })); continue; }
+      active++; let released = false;
+      item.resolve(() => { if (!released) { released = true; active--; drain(); } });
+    }
+  }
+  function acquire() {
+    if (terminalError || signal?.aborted) return Promise.reject(terminalError ?? signal.reason ?? new Error("RPC cancelled"));
+    if (abandoned && active >= maxConcurrentReads) return Promise.reject(Object.assign(new Error("RPC timed-out physical window is still occupied; resume after it settles."), { code: "timeout", noFallback: true }));
+    if (active < maxConcurrentReads && !head) { active++; let released = false; return () => { if (!released) { released = true; active--; drain(); } }; }
+    return new Promise((resolve, reject) => { const item = { resolve, reject, next: null }; if (tail) tail.next = item; else head = item; tail = item; drain(); });
+  }
+  function cancelPending(reason) {
+    for (const cancel of pendingCancellations) cancel(reason);
+    for (const controller of controllers) controller.abort(reason);
+    while (head) { const item = head; head = item.next; item.reject(reason); } tail = null;
+  }
+  const abort = () => { cancelPending(signal?.reason ?? new Error("RPC cancelled")); drain(); };
+  signal?.addEventListener("abort", abort, { once: true });
+  const stop = error => { terminalError = error; cancelPending(error); drain(); return error; };
+  function semanticFailure(value) {
+    const work = [[value, 0]]; let examined = 0;
+    while (work.length && examined++ < 32) {
+      const [node, depth] = work.pop(); if (!node || typeof node !== "object" || depth > 6) continue;
+      const message = typeof node.message === "string" ? node.message.slice(0, 2048) : "";
+      if (node.code === 3 || /\brevert(?:ed|ing)?\b/iu.test(message)) return "execution-reverted";
+      if ([401, 403].includes(node.code) || [401, 403].includes(node.status) || [401, 403].includes(node.httpStatus) || /^(?:unauthori[sz]ed|forbidden|access denied)\b/iu.test(message)) return "access-denied";
+      for (const key of ["cause", "error", "data"]) { const child = node[key]; if (Array.isArray(child)) for (const entry of child.slice(0, 8)) work.push([entry, depth + 1]); else if (child && typeof child === "object") work.push([child, depth + 1]); }
+    }
+    return null;
+  }
+  function isCapacityRpcError(body, id) {
+    if (!body || typeof body !== "object" || Array.isArray(body) || body.jsonrpc !== "2.0" || body.id !== id
+      || !Object.keys(body).every(key => ["jsonrpc", "id", "error"].includes(key))) return false;
+    const error = body.error;
+    if (!error || typeof error !== "object" || Array.isArray(error) || ![-32005, 429].includes(error.code)
+      || typeof error.message !== "string" || error.message.length > 2048
+      || !Object.keys(error).every(key => ["code", "message", "data"].includes(key))
+      || error.data !== null && typeof error.data === "object") return false;
+    if (typeof error.data === "string" && (error.data.length > 4096 || semanticFailure({ message: error.data }))) return false;
+    return semanticFailure(error) === null;
+  }
+  function isUnsupportedPinnedRpcError(body, id, method, params) {
+    if (!["eth_call", "eth_getCode"].includes(method) || !body || typeof body !== "object" || Array.isArray(body)) return false;
+    const error = body.error, selector = params?.[1];
+    return body.jsonrpc === "2.0" && body.id === id && Object.keys(body).every(key => ["jsonrpc", "id", "error"].includes(key))
+      && !!error && typeof error === "object" && !Array.isArray(error) && error.code === -32602 && typeof error.message === "string" && error.message.length <= 2048
+      && Object.keys(error).every(key => ["code", "message"].includes(key)) && semanticFailure(error) === null
+      && !!selector && typeof selector === "object" && !Array.isArray(selector) && selector.requireCanonical === true
+      && typeof selector.blockHash === "string" && /^0x[0-9a-f]{64}$/iu.test(selector.blockHash)
+      && Object.keys(selector).every(key => ["blockHash", "requireCanonical"].includes(key));
+  }
+  function httpErrorFailure(text, contentType, id, method, params) {
+    const sample = text.trim();
+    if (/json/iu.test(contentType) || /^[\[{]/u.test(sample)) {
+      let body; try { body = JSON.parse(sample); } catch { return "unclassified-http-error"; }
+      const semantic = semanticFailure(body); if (semantic) return semantic;
+      if (!body || typeof body !== "object" || Array.isArray(body) || body.jsonrpc !== "2.0" || body.id !== id) return "unclassified-http-error";
+      if (!Object.hasOwn(body, "error") && Object.hasOwn(body, "result")) return null;
+      if (isCapacityRpcError(body, id) || isUnsupportedPinnedRpcError(body, id, method, params)) return null;
+      return "unclassified-http-error";
+    }
+    if (/\b(?:unauthori[sz]ed|forbidden|access denied)\b/iu.test(sample)) return "access-denied";
+    if (/\b(?:revert(?:ed|ing)?|execution failed)\b/iu.test(sample)) return "execution-reverted";
+    return null; // Complete bounded plain-text HTTP transport failure.
+  }
+  async function pause(ms) {
+    if (signal?.aborted) throw signal.reason;
+    await new Promise((resolve, reject) => { const onAbort = () => { clearTimeout(timer); reject(signal.reason); }; const timer = setTimeout(() => { signal?.removeEventListener("abort", onAbort); resolve(); }, ms); signal?.addEventListener("abort", onAbort, { once: true }); });
+  }
+  async function sendOnce(endpoint, method, params) {
+    const lease = acquire(), release = typeof lease === "function" ? lease : await lease;
+    if (terminalError || signal?.aborted) { release(); throw terminalError ?? signal.reason; }
+    const controller = new AbortController(), id = ++nextId; controllers.add(controller);
+    let timer, timedOut = false, physicallySettled = false, abandonedLease = false, cancel, errorBodyPending = false;
+    const markAbandoned = () => { if (!physicallySettled && !abandonedLease) { abandonedLease = true; abandoned++; } };
+    const cancelled = new Promise((_, reject) => { cancel = reason => { markAbandoned(); reject(reason?.terminal ? reason : Object.assign(new Error("RPC client request cancelled"), { code: "cancelled", noFallback: true })); }; pendingCancellations.add(cancel); });
+    const deadline = new Promise((_, reject) => { timer = setTimeout(() => { timedOut = true; markAbandoned(); controller.abort(); drain(); reject(errorBodyPending ? stop(fault(endpoint, "unclassified-http-error", true)) : fault(endpoint, "timeout", false, { noFallback: active >= maxConcurrentReads })); }, timeoutMs); });
+    // Release the physical slot only when fetch AND the response body settle.
+    // An injected transport ignoring abort cannot create unbounded hidden reads.
+    const physical = (async () => {
+      const response = await request(endpoint, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ jsonrpc: "2.0", id, method, params }), redirect: "error", signal: controller.signal });
+      if ([401, 403].includes(response?.status)) throw stop(fault(endpoint, "access-denied", true));
+      if (response?.ok !== true || response.redirected) {
+        if (response?.ok !== true) {
+        errorBodyPending = true;
+        if (response.body?.getReader) {
+          const reader = response.body.getReader(); let bytes = 0, sample = "";
+          try { const decoder = new TextDecoder("utf-8", { fatal: true }); for (;;) { const next = await reader.read(); if (next.done) break; bytes += next.value.byteLength; if (bytes > 65536) throw stop(fault(endpoint, "unclassified-http-error", true)); sample += decoder.decode(next.value, { stream: true }); } sample += decoder.decode();
+            const reason = httpErrorFailure(sample, response.headers?.get?.("content-type") ?? "", id, method, params); if (reason) throw stop(fault(endpoint, reason, true));
+            errorBodyPending = false;
+          } catch (error) { if (error?.terminal) throw error; throw stop(fault(endpoint, "unclassified-http-error", true)); } finally { await reader.cancel().catch(() => {}); reader.releaseLock(); }
+        } else {
+          const reason = response.body === null ? httpErrorFailure("", response.headers?.get?.("content-type") ?? "", id) : "unclassified-http-error";
+          if (reason) throw stop(fault(endpoint, reason, true));
+          errorBodyPending = false;
         }
-        return body.result;
-      })()]);
-    } catch {
-      // Fetch/JSON/provider error text can contain API keys or the entire URL.
-      controller.abort();
-      throw new Error(`RPC request ${timedOut ? "timed out" : "failed"} (${redactEndpoint(endpoint)})`);
-    } finally {
-      clearTimeout(timer);
+        }
+        const text = response?.headers?.get?.("retry-after");
+        const retryAfterMs = text && /^\d+(?:\.\d+)?$/u.test(text) ? Number(text) * 1000 : text ? Math.max(0, Date.parse(text) - Date.now()) : 0;
+        if (response?.status === 429 && Number.isFinite(retryAfterMs)) cooldown.set(endpoint, Date.now() + retryAfterMs);
+        await response?.body?.cancel?.().catch(() => {});
+        throw fault(endpoint, "http", false, { retryable: [429, 502, 503, 504].includes(response?.status), retryAfterMs: Number.isFinite(retryAfterMs) ? retryAfterMs : 0 });
+      }
+      let body;
+      if (response.body?.getReader) {
+        const reader = response.body.getReader(), decoder = new TextDecoder("utf-8", { fatal: true }), chunks = []; let bytes = 0;
+        try { for (;;) { const next = await reader.read(); if (next.done) break; bytes += next.value.byteLength; if (bytes > maxResponseBytes) throw fault(endpoint, "response-too-large", false, { noFallback: true }); chunks.push(decoder.decode(next.value, { stream: true })); } chunks.push(decoder.decode()); body = JSON.parse(chunks.join("")); }
+        finally { await reader.cancel().catch(() => {}); reader.releaseLock(); }
+      } else { body = await response.json(); if (new TextEncoder().encode(JSON.stringify(body)).length > maxResponseBytes) throw fault(endpoint, "response-too-large", false, { noFallback: true }); }
+      const semantic = semanticFailure(body?.error);
+      if (semantic) throw stop(fault(endpoint, semantic, true));
+      if (body?.error !== undefined && body.error !== null) {
+        if (isCapacityRpcError(body, id)) throw fault(endpoint, "rate-limited", false, { retryable: true });
+        if (isUnsupportedPinnedRpcError(body, id, method, params)) throw fault(endpoint, "unsupported-block-selector");
+        throw stop(fault(endpoint, "unclassified-rpc-error", true));
+      }
+      if (body === null || typeof body !== "object" || Array.isArray(body) || body.jsonrpc !== "2.0" || body.id !== id || "error" in body
+        || (method === "eth_getBlockByNumber" ? !validBlock(body.result) : typeof body.result !== "string")
+        || (["eth_call", "eth_getCode"].includes(method) && !/^0x(?:[0-9a-f]{2})*$/iu.test(body.result))) throw fault(endpoint, "invalid-response");
+      return body.result;
+    })();
+    const settled = () => { physicallySettled = true; if (abandonedLease) abandoned--; release(); };
+    void physical.then(settled, settled);
+    try { return await Promise.race([deadline, physical, cancelled]); }
+    catch (error) { controller.abort(); if (signal?.aborted) throw signal.reason; const semantic = semanticFailure(error); if (semantic) throw stop(fault(endpoint, semantic, true)); if (errorBodyPending && !error?.terminal) throw stop(fault(endpoint, "unclassified-http-error", true)); if (error?.terminal || error?.code) throw error; throw fault(endpoint, timedOut ? "timeout" : "transport"); }
+    finally { clearTimeout(timer); controllers.delete(controller); pendingCancellations.delete(cancel); }
+  }
+  async function send(endpoint, method, params) {
+    for (let attempt = 0; ; attempt++) {
+      if (terminalError) throw terminalError;
+      const remaining = (cooldown.get(endpoint) ?? 0) - Date.now();
+      if (remaining > 5000) throw fault(endpoint, "rate-limited", false, { noFallback: true, retryAfterMs: remaining });
+      if (remaining > 0) await pause(remaining);
+      try { return await sendOnce(endpoint, method, params); }
+      catch (error) {
+        if (error?.terminal || error?.noFallback || signal?.aborted || attempt >= maxRetries || !(error?.retryable || error?.code === "timeout" || error?.code === "transport")) throw error;
+        const delay = Math.max(error.retryAfterMs ?? 0, retryDelayMs * 2 ** attempt);
+        if (delay > 5000) throw Object.assign(error, { noFallback: true });
+        await pause(delay);
+      }
     }
   }
 
@@ -251,7 +362,8 @@ export function createKeelChain({ rpc, keelHold, hosts = KEEL_VIEW_RPC_HOSTS, li
     return pinning;
   }
 
-  async function rpcCall(method, params) {
+  async function rpcCallUncached(method, params) {
+    if (terminalError || signal?.aborted) throw terminalError ?? signal.reason;
     const pinnedRead = pinnedBlock !== null && (method === "eth_call" || method === "eth_getCode");
     // EIP-1898 binds the read itself to the verified hash, even if the provider
     // reorganizes after its header check. Unsupported nodes fail over; never
@@ -271,15 +383,42 @@ export function createKeelChain({ rpc, keelHold, hosts = KEEL_VIEW_RPC_HOSTS, li
         const state = identities.get(endpoint);
         if (state) { state.chainId = null; state.blockHash = null; }
         last = error;
+        if (error?.terminal || error?.noFallback || signal?.aborted) throw error;
       }
     }
     throw last ?? new Error("no permitted RPC endpoint");
+  }
+
+  function rpcCall(method, params = []) {
+    if (terminalError || signal?.aborted) return Promise.reject(terminalError ?? signal.reason);
+    // Bind the key and physical operation to one immutable JSON snapshot before
+    // chain qualification, queueing, deduplication or any other async boundary.
+    try { params = JSON.parse(JSON.stringify(params)); if (!Array.isArray(params)) throw new TypeError(); }
+    catch { return Promise.reject(new TypeError("RPC parameters must be a JSON-serializable array.")); }
+    const pinnedRead = pinnedBlock && ["eth_call", "eth_getCode"].includes(method);
+    if (pinnedRead) params = [params[0], { blockHash: pinnedBlock.hash, requireCanonical: true }, ...params.slice(2)];
+    const key = pinnedRead ? JSON.stringify([expectedChainId, pinnedBlock.hash, method, params]) : null;
+    if (!key || maxCacheBytes === 0) return rpcCallUncached(method, params);
+    if (cache.has(key)) { const entry = cache.get(key); cache.delete(key); cache.set(key, entry); return Promise.resolve(entry.value); }
+    if (inflight.has(key)) return inflight.get(key);
+    const generation = cacheGeneration;
+    const pending = rpcCallUncached(method, params).then(value => {
+      const bytes = value.length * 2 + key.length * 2 + 128;
+      if (generation === cacheGeneration && bytes <= maxCacheBytes) { while (cachedBytes + bytes > maxCacheBytes && cache.size) { const first = cache.keys().next().value; cachedBytes -= cache.get(first).bytes; cache.delete(first); } cache.set(key, { value, bytes }); cachedBytes += bytes; }
+      return value;
+    }).finally(() => inflight.delete(key));
+    inflight.set(key, pending); return pending;
   }
 
   return {
     get endpointCount() {
       return endpoints.length;
     },
+
+    /** Drop unverified transport replies after an integrity failure; verified object resume cache is separate. */
+    clearReadCache() { cache.clear(); cachedBytes = 0; cacheGeneration++; },
+    /** Explicit all-client cancellation. Use an exclusive client per work/owner. */
+    cancelPending(reason = new Error("RPC client cancelled")) { cancelPending(reason); },
 
     /** Shared transport for bounded native chunk reads and chain checks. */
     request: rpcCall,
@@ -317,6 +456,7 @@ export function createKeelChain({ rpc, keelHold, hosts = KEEL_VIEW_RPC_HOSTS, li
         listRevision,
         listEpoch,
         reads,
+        activeRequests: active, physicalRequests: nextId, cachedBytes,
         ...(pinnedBlock === null ? {} : { pinnedBlock }),
       };
     },

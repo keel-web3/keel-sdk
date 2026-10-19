@@ -1,0 +1,56 @@
+{
+  "schema": "keel-implementer-evidence-manifest@1",
+  "sourceCommit": "f159f32cf73b8ca144972d4cb11f109a522fcbe8",
+  "fixtureCorrectionApplied": false,
+  "fullSuiteResult": "PENDING_ROOT_POLL",
+  "files": {
+    "README.md": {
+      "bytes": 3756,
+      "sha256": "412de2a98b298183ff534282567691cf4a6895f3fc3ef43d780384696ac57512"
+    },
+    "anvil.json": {
+      "bytes": 4955,
+      "sha256": "31569b63db754dde6c8e512892d5ef7023bb5cb60eb541b6cebdeb31b26cdc33"
+    },
+    "anvil.log": {
+      "bytes": 588,
+      "sha256": "bb07f7e6f2c02a5a2bd75132f9d6e6b6c678017184c6a4694fc542a391237383"
+    },
+    "artifacts.json": {
+      "bytes": 4292,
+      "sha256": "f84cd5e0779f9bbad917af4b3b7e31e8812d38e6e4b97eeeab5fa170b77d405f"
+    },
+    "boundary-tests.log": {
+      "bytes": 14312,
+      "sha256": "ca1882d2b3df47d6d2c5e0337d1947a6116396c8f3f8a718d243d02222d26123"
+    },
+    "environment.json": {
+      "bytes": 9126,
+      "sha256": "c29b1214111d1c61c6e8611fdab34b276b6908f08cb01d366113e0b953b50566"
+    },
+    "first-focused-semantic-conflicts.log": {
+      "bytes": 22624,
+      "sha256": "fac3d1932041fe4f73650858366f2fe7b629c6b286dbb537d1152ab4b3621a08"
+    },
+    "independent-e0-red.json": {
+      "bytes": 1556,
+      "sha256": "a58ce040e2aca7623c9e8be5e8506ef492a2ba06145a09e3100586db7d03d33f"
+    },
+    "legacy-tests.log": {
+      "bytes": 5230,
+      "sha256": "f7c04c063540365934112d14a71871719e4e198fa0ef29888b7887b42e1b38cf"
+    },
+    "prior-acceptance.json": {
+      "bytes": 1699,
+      "sha256": "5a3c6681b76cb8c683c0e58d0326c33ee4abaed95b48514b60da830c63668407"
+    },
+    "proposed-fixture-correction.patch": {
+      "bytes": 978,
+      "sha256": "a3d884984e6b5daf16ecf964233150a5791738c18345c5326f7999c65af214d7"
+    },
+    "source-build.log": {
+      "bytes": 418,
+      "sha256": "04f7723315dbcac256b7b0bb2b7662f6fce5c597622bdee80429c17083b80262"
+    }
+  }
+}

@@ -1,5 +1,5 @@
 import { parseKeelSelectedProjectProfile, type KeelSelectedProjectProfile } from "./studio-project-defaults.js";
-import { resolveKeelShell, resolveKeelPayloadStorage, type KeelPayloadStorageMode } from "@keel/protocol";
+import { resolveKeelShell, resolveKeelPayloadStorage, classifyKeelAssetExecution, planKeelSmartAssetPresentation, resolveKeelAssetPresentationSelection, parseKeelAssetPresentationPreference, parseKeelExternalPreviewUri, parseKeelPresentationFallbackDelivery, KEEL_ASSET_PRESENTATION_CANDIDATE_IDS, type KeelPresentationFallbackDelivery, type KeelAssetPresentationCandidateId, type KeelAssetPresentationPreference, type KeelPayloadStorageMode } from "@keel/protocol";
 import {
   defaultKeelStudioPublicationIntent,
   type KeelStudioPublicationIntent,
@@ -84,6 +84,12 @@ export interface KeelStudioStagedProjectFile {
 }
 
 export interface StageKeelStudioProjectInput {
+  /** New-project routing choice. A preview URL is project-specific and never an account default. */
+  readonly assetPresentation?: KeelAssetPresentationPreference;
+  readonly externalPreviewUri?: string;
+  readonly fallbackDelivery?: KeelPresentationFallbackDelivery;
+  readonly assetPresentationSelection?: KeelAssetPresentationCandidateId;
+  readonly nonstandardCompatibilityAcknowledged?: boolean;
   readonly payloadStorage?: KeelPayloadStorageMode;
   readonly studioUrl: string | URL;
   readonly agentToken: string;
@@ -267,25 +273,47 @@ export function parseKeelStudioMediaSlots(value:unknown):NonNullable<StageKeelSt
 export async function stageKeelStudioProject(
   input: StageKeelStudioProjectInput,
 ): Promise<KeelStudioProjectHandoffResult> {
+  input = { ...input, files: input.files.map(file => ({ ...file, bytes: file.bytes instanceof Uint8Array ? file.bytes.slice() : file.bytes })),
+    ...(input.projectProfile===undefined?{}:{projectProfile:structuredClone(input.projectProfile)}),
+    ...(input.releaseIntent===undefined?{}:{releaseIntent:structuredClone(input.releaseIntent)}),
+    ...(input.publicationIntent===undefined?{}:{publicationIntent:structuredClone(input.publicationIntent)}),
+    ...(input.reusableModule===undefined?{}:{reusableModule:structuredClone(input.reusableModule)}),
+    ...(input.mediaSlots===undefined?{}:{mediaSlots:structuredClone(input.mediaSlots)}),
+    ...(input.flashRuntime===undefined?{}:{flashRuntime:structuredClone(input.flashRuntime)}) };
+  const files = input.files;
   const title = input.title.trim();
   if (title.length < 2 || title.length > 160) throw new RangeError("Staged project title must contain from 2 through 160 characters.");
   if (input.agentToken.length < 32) throw new TypeError("KEEL Studio agent token must contain at least 32 characters.");
-  if (input.files.length < 1 || input.files.length > 256) throw new RangeError("Stage from 1 through 256 project files.");
+  if (files.length < 1 || files.length > 256) throw new RangeError("Stage from 1 through 256 project files.");
   const projectProfile = input.projectProfile === undefined ? undefined : parseKeelSelectedProjectProfile(input.projectProfile);
   const payloadStorage = resolveKeelPayloadStorage(input.payloadStorage ?? projectProfile?.snapshot.configuration.payloadStorage);
   const mediaSlots=input.mediaSlots===undefined?undefined:parseKeelStudioMediaSlots(input.mediaSlots);
-  const onlyFile=input.files.length===1?input.files[0]:undefined;
-  const originalImage=onlyFile?.mediaType.startsWith("image/") && !["image/webp","image/avif"].includes(onlyFile.mediaType);
-  const viewer = resolveKeelShell(input.viewer ?? projectProfile?.snapshot.configuration.viewer ?? (originalImage && input.publicationIntent===undefined ? "none" : undefined));
+  const assetPresentation=parseKeelAssetPresentationPreference(input.assetPresentation ?? "automatic");
+  const fallbackDelivery=input.fallbackDelivery===undefined?undefined:parseKeelPresentationFallbackDelivery(input.fallbackDelivery);
+  if(input.assetPresentationSelection!==undefined && !KEEL_ASSET_PRESENTATION_CANDIDATE_IDS.includes(input.assetPresentationSelection))throw new TypeError("Unsupported explicit presentation layout.");
+  if(input.nonstandardCompatibilityAcknowledged!==undefined && typeof input.nonstandardCompatibilityAcknowledged!=="boolean")throw new TypeError("Invalid compatibility preference.");
+  const externalPreviewUri=input.externalPreviewUri===undefined?undefined:parseKeelExternalPreviewUri(input.externalPreviewUri);
+
+  const onlyFile=files.length===1?files[0]:undefined;
+  const onlyFileBytes=onlyFile===undefined?undefined:onlyFile.bytes instanceof Uint8Array?onlyFile.bytes:new Uint8Array(await onlyFile.bytes.arrayBuffer());
+  const automaticViewer=onlyFile===undefined?undefined:planKeelSmartAssetPresentation({
+    source:{resourceId:onlyFile.path,mediaType:onlyFile.mediaType,byteLength:onlyFileBytes!.byteLength},
+    execution:classifyKeelAssetExecution({mediaType:onlyFile.mediaType,bytes:onlyFileBytes!,declaredScript:onlyFile.format!=="asset"}),
+    assetPresentation,...(input.assetPresentationSelection===undefined?{}:{selection:resolveKeelAssetPresentationSelection(input.assetPresentationSelection,onlyFile.mediaType)}),
+    ...(fallbackDelivery===undefined?{}:{fallbackDelivery}),...(externalPreviewUri===undefined?{}:{externalPreviewUri}),
+  }).viewer;
+  const explicitSlotViewer = mediaSlots?.animation_url?.presentation === "keel-shell" ? "keel-verification-shell"
+    : mediaSlots?.animation_url === null && mediaSlots.image != null ? "none" : undefined;
+  const viewer = resolveKeelShell(input.viewer ?? projectProfile?.snapshot.configuration.viewer ?? explicitSlotViewer ?? automaticViewer);
   if (viewer !== KEEL_VERIFICATION_SHELL && viewer !== "none") throw new TypeError("viewer must be keel-verification-shell or none.");
   if (viewer === "none" && input.publicationIntent !== undefined) {
     throw new TypeError("An artifact-only project cannot also require the KEEL verification shell.");
   }
 
-  const paths = input.files.map((file) => safeProjectPath(file.path));
+  const paths = files.map((file) => safeProjectPath(file.path));
   if (new Set(paths).size !== paths.length) throw new TypeError("Staged project paths must be unique.");
   const form = new FormData();
-  const components = stageComponents(input.files, paths, viewer === "none");
+  const components = stageComponents(files, paths, viewer === "none");
   const publicationIntent = viewer === "none"
     ? undefined
     : input.publicationIntent ?? defaultKeelStudioPublicationIntent();
@@ -296,6 +324,11 @@ export async function stageKeelStudioProject(
     storageStrategy: input.storageStrategy,
     payloadStorage,
     viewer,
+    assetPresentation,
+    ...(fallbackDelivery===undefined?{}:{fallbackDelivery}),
+    ...(input.assetPresentationSelection===undefined?{}:{assetPresentationSelection:input.assetPresentationSelection}),
+    ...(input.nonstandardCompatibilityAcknowledged===undefined?{}:{nonstandardCompatibilityAcknowledged:input.nonstandardCompatibilityAcknowledged}),
+    ...(externalPreviewUri===undefined?{}:{externalPreviewUri}),
     ...(mediaSlots===undefined?{}:{mediaSlots}),
     marketplaceExportMode: input.marketplaceExportMode ?? "recursive",
     components,
@@ -305,7 +338,7 @@ export async function stageKeelStudioProject(
     ...(publicationIntent === undefined ? {} : { publicationIntent }),
     ...(input.flashRuntime === undefined ? {} : { flashRuntime: input.flashRuntime }),
   }));
-  input.files.forEach((file, index) => {
+  files.forEach((file, index) => {
     const blob = file.bytes instanceof Blob ? file.bytes : new Blob([Uint8Array.from(file.bytes).buffer], { type: file.mediaType });
     form.append("files", blob, paths[index]);
   });

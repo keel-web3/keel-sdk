@@ -1,0 +1,34 @@
+{
+  "schema": "keel-smart-measurement-fix-implementer-receipt@1",
+  "baseCommit": "aa8f6a27cc931a786a721db4e69d85e4d04419e3",
+  "node": "v22.22.1",
+  "environment": "macOS arm64 isolated sdk-smart-presentation worktree",
+  "sourceSHA256": "781dda202efb49063b3012276d982eff7f8705a7f72775fccdc3c84405d587c8",
+  "tsc": [
+    "packages/protocol/tsconfig.json",
+    "packages/sdk/tsconfig.json"
+  ],
+  "testCommand": "node --test tests/smart-presentation-policy.test.mjs tests/sdk-smart-presentation.test.mjs tests/media-slot-plan.test.mjs tests/sdk-studio-project-handoff.test.mjs tests/sdk-studio-project-defaults.test.mjs tests/test-suite-classification.test.mjs",
+  "tests": {
+    "pass": 68,
+    "fail": 0,
+    "skipped": 0
+  },
+  "finding1": {
+    "imageUriBytes": 1749990,
+    "encodedImageSlotBytes": 1750025,
+    "encodedImageValueBytes": 1750002,
+    "completeTokenUriBytes": 1750255,
+    "standardsCompatible": false,
+    "actualURIUnchanged": true
+  },
+  "finding2": {
+    "embeddedProgramBytes": 44,
+    "embeddedAnimationUriBytes": 93,
+    "completeVerifierOnlyMetadataBytes": 2000259,
+    "externalRecommendations": 0
+  },
+  "qualification": "Implementer-only focused source result; independent review/rerun, integrated build, actual chain simulation and live release gates remain required.",
+  "signatures": 0,
+  "broadcasts": 0
+}

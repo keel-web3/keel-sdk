@@ -5,7 +5,7 @@ import { buildKeelPreparedDenseCopyShell, prepareKeelDensePayload } from "./prep
 import { prepareKeelDenseCopyFragment, serializeKeelDenseTransportJSON } from "./dense-transport.js";
 import { assertKeelInlineImageBytes } from "./collector-policy.js";
 import { normalizedAddress, uint } from "./validation.js";
-import { resolveKeelPayloadStorage, resolveKeelShell, type KeelPayloadStorageMode } from "@keel/protocol";
+import { resolveKeelPayloadStorage, resolveKeelShell, type KeelPayloadStorageMode, resolveKeelPreparationReadBounds, type KeelTokenURIPreparationBudget, type KeelExplicitNonstandardReadPolicy } from "@keel/protocol";
 
 const MEDIA = "application/vnd.keel.token-uri-raw-percent-fragment";
 
@@ -51,8 +51,9 @@ function creatorModulePlaybackOrder(resources: readonly {
 
 /** Only committed fragments are a proven lower bound before token context is
  * available. An envelope reserve is an estimate, never the final size gate. */
-export function assessKeelCreatorPreparedInlineBudget(preparedFragmentBytes: number) {
-  if (!Number.isSafeInteger(preparedFragmentBytes) || preparedFragmentBytes < 0 || preparedFragmentBytes > 2_000_000) throw new RangeError("Prepared Inline fragments alone exceed the complete URI byte limit.");
+export function assessKeelCreatorPreparedInlineBudget(preparedFragmentBytes: number, nonstandardReadPolicy?: KeelExplicitNonstandardReadPolicy, preparationReadBudget?: KeelTokenURIPreparationBudget) {
+  const maximum = resolveKeelPreparationReadBounds({ ...(nonstandardReadPolicy === undefined ? {} : { nonstandardReadPolicy }), ...(preparationReadBudget === undefined ? {} : { preparationReadBudget }) }).maximumTokenUriBytes;
+  if (!Number.isSafeInteger(preparedFragmentBytes) || preparedFragmentBytes < 0 || preparedFragmentBytes > maximum) throw new RangeError("Prepared Inline fragments alone exceed the complete URI byte limit.");
   return Object.freeze({ status: "provisional-unmeasured" as const, preparedFragmentBytes,
     reservedEnvelopeBytes: 65_536, estimatedCompleteTokenURIBytes: preparedFragmentBytes + 65_536,
     completeTokenURIBytes: null, requiresCompleteRead: true as const });
@@ -67,12 +68,16 @@ export const KEEL_CREATOR_PREPARED_COPY_ABI = parseAbi([
  * selected-chain readback, complete URI, call gas and offline browser behavior. */
 export async function prepareKeelCreatorInline(input: {
   readonly chainId: number;
+  readonly nonstandardReadPolicy?: KeelExplicitNonstandardReadPolicy;
+  readonly preparationReadBudget?: KeelTokenURIPreparationBudget;
   readonly store: Address;
   readonly payloadStorage?: KeelPayloadStorageMode;
   readonly viewer?: "keel-verification-shell" | "none";
   /** Default shared by all resources; per-resource explicit choices win. */
   readonly compression?: "auto" | "brotli" | "none";
   readonly brotliQuality?: number;
+  /** Low-level byte planning only; authenticated preparation derives this from the registered profile. */
+  readonly readerGrammar?: "uri81" | "legacy-strict";
   readonly resources: readonly {
     readonly id: string; readonly aliases?: readonly string[];
     readonly role: "entrypoint" | "module" | "asset";
@@ -84,6 +89,8 @@ export async function prepareKeelCreatorInline(input: {
   readonly shellRevision?: bigint;
   readonly readSlug?: (id: Hex) => Promise<Uint8Array | null>;
 }) {
+  const readBounds = resolveKeelPreparationReadBounds(input);
+  input = { ...input, ...(readBounds.nonstandardReadPolicy === undefined ? {} : { nonstandardReadPolicy: readBounds.nonstandardReadPolicy }), ...(readBounds.preparationReadBudget === undefined ? {} : { preparationReadBudget: readBounds.preparationReadBudget }) };
   const payloadStorage = resolveKeelPayloadStorage(input.payloadStorage);
   if (payloadStorage === "raw") throw new TypeError("Raw storage preserves supplied bytes. Fresh dense COPY requires Compact and cannot substitute an encoded carrier for Raw; select its compatible native reader.");
   if (resolveKeelShell(input.viewer) !== "keel-verification-shell") throw new TypeError("This prepared route requires the registered verification shell. Preserve viewer=none through its creator-owned shell route.");
@@ -95,6 +102,8 @@ export async function prepareKeelCreatorInline(input: {
   const chainId = input.chainId;
   const compression = input.compression ?? "auto";
   const brotliQuality = input.brotliQuality;
+  const readerGrammar = input.readerGrammar ?? "uri81";
+  if (readerGrammar !== "uri81" && readerGrammar !== "legacy-strict") throw new TypeError("Unsupported prepared COPY reader grammar.");
   const readSlug = input.readSlug;
   const posterBytes = Uint8Array.from(input.poster.bytes);
   const posterMediaType = input.poster.mediaType;
@@ -137,7 +146,8 @@ export async function prepareKeelCreatorInline(input: {
     if (resource.role === "entrypoint" && resource.mediaType !== "text/html") throw new TypeError("The creator entrypoint must be HTML.");
     const source = resource.bytes.slice();
     if (/^(?:text\/|application\/(?:javascript|json))/u.test(resource.mediaType)) new TextDecoder("utf-8", { fatal: true, ignoreBOM: true }).decode(source);
-    const payload = prepareKeelDensePayload(source, { compression: resource.compression ?? compression, ...(brotliQuality === undefined ? {} : { brotliQuality }) });
+    const payload = prepareKeelDensePayload(source, { compression: resource.compression ?? compression, readerGrammar,
+      ...(brotliQuality === undefined ? {} : { brotliQuality }) });
     const carrier = await object(resource.id + ":payload", payload.preparedBytes);
     const binding = await buildKeelOnchainContainerBinding({ chainId, store, objectId: carrier.objectId, compression: payload.compression, bytes: source, storedBytes: payload.compressedBytes });
     const previousBinding = carrierBindings.get(carrier.objectId);
@@ -164,8 +174,8 @@ export async function prepareKeelCreatorInline(input: {
     const slot = serializeKeelDenseTransportJSON(resource.pack.storedDense).slice(1, -1);
     const at = text.indexOf('"storedDense":"') + '"storedDense":"'.length;
     if (text.slice(at, at + slot.length) !== slot) throw new TypeError("Invalid prepared pack slot.");
-    const head = await object(resource.id + ":header", prepareKeelDenseCopyFragment((i ? "," : "") + text.slice(0, at)));
-    const tail = await object(resource.id + ":descriptor", prepareKeelDenseCopyFragment(text.slice(at + slot.length) + (i === physicalResources.length - 1 ? new TextDecoder().decode(shell.containerBridge) + "," + descriptors.map(serializeKeelDenseTransportJSON).join(",") : "")));
+    const head = await object(resource.id + ":header", prepareKeelDenseCopyFragment((i ? "," : "") + text.slice(0, at), { readerGrammar }));
+    const tail = await object(resource.id + ":descriptor", prepareKeelDenseCopyFragment(text.slice(at + slot.length) + (i === physicalResources.length - 1 ? new TextDecoder().decode(shell.containerBridge) + "," + descriptors.map(serializeKeelDenseTransportJSON).join(",") : ""), { readerGrammar }));
     objects.push(head, resource.carrier, tail);
     body.push(head, resource.carrier, tail);
   }
@@ -175,15 +185,15 @@ export async function prepareKeelCreatorInline(input: {
   const posterURI = `data:${posterMediaType};base64,${Buffer.from(posterBytes).toString("base64")}`;
   const image = await object("poster-carriage", new TextEncoder().encode(posterURI));
   objects.push(table, image);
-  const prefix = await object("registered-shell-prefix", prepareKeelDenseCopyFragment(new TextDecoder().decode(shell.prefix)));
-  const suffix = await object("registered-shell-suffix", prepareKeelDenseCopyFragment(new TextDecoder().decode(shell.suffix)));
+  const prefix = await object("registered-shell-prefix", prepareKeelDenseCopyFragment(new TextDecoder().decode(shell.prefix), { readerGrammar }));
+  const suffix = await object("registered-shell-suffix", prepareKeelDenseCopyFragment(new TextDecoder().decode(shell.suffix), { readerGrammar }));
   const preparedBodyBytes = new Uint8Array(body.reduce((n, p) => n + p.bytes.length, 0));
   let offset = 0; for (const p of body) { preparedBodyBytes.set(p.bytes, offset); offset += p.bytes.length; }
   const preparedBytes = prefix.bytes.length + preparedBodyBytes.length + suffix.bytes.length + image.bytes.length;
   // The final metadata/context can only be measured once collection/token bindings exist.
-  const provisionalTokenURIBudget = assessKeelCreatorPreparedInlineBudget(preparedBytes);
+  const provisionalTokenURIBudget = assessKeelCreatorPreparedInlineBudget(preparedBytes, input.nonstandardReadPolicy, readBounds.preparationReadBudget);
   return {
-    protocol: "keel.creator-prepared-inline@1" as const, chainId, store, payloadStorage, viewer: "keel-verification-shell" as const,
+    protocol: "keel.creator-prepared-inline@1" as const, chainId, store, payloadStorage, readerGrammar, viewer: "keel-verification-shell" as const,
     status: "review-only" as const, signing: "not-performed" as const, submission: "not-performed" as const,
     shell: { revision: shellRevision, prefix, suffix, requiredRegistration: "keel.shell.inline-raw-percent-protection@1" as const, bootEncoding: shell.shellBootEncoding, bootCompression: shell.shellBootCompression },
     resources, objects, preparedBodyBytes, table, image, posterURI, playbackModuleOrder,

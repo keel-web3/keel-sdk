@@ -1,0 +1,140 @@
+TAP version 13
+# (node:91258) ExperimentalWarning: The MockTimers API is an experimental feature and might change at any time
+# (Use `node --trace-warnings ...` to show where the warning was created)
+# Subtest: legacy clients retain one-read behavior and optional explicit block tags
+ok 1 - legacy clients retain one-read behavior and optional explicit block tags
+  ---
+  duration_ms: 10.809583
+  type: 'test'
+  ...
+# Subtest: concurrent artwork reads share one endpoint chain check before reading
+ok 2 - concurrent artwork reads share one endpoint chain check before reading
+  ---
+  duration_ms: 0.874208
+  type: 'test'
+  ...
+# Subtest: failover never reads a wrong-chain provider after an earlier endpoint passed identity
+ok 3 - failover never reads a wrong-chain provider after an earlier endpoint passed identity
+  ---
+  duration_ms: 1.976292
+  type: 'test'
+  ...
+# Subtest: concurrent wrong-chain failure shares the fallback identity check
+ok 4 - concurrent wrong-chain failure shares the fallback identity check
+  ---
+  duration_ms: 0.537667
+  type: 'test'
+  ...
+# Subtest: explicit identity checks are fresh and transient read failures invalidate prior identity
+ok 5 - explicit identity checks are fresh and transient read failures invalidate prior identity
+  ---
+  duration_ms: 0.605334
+  type: 'test'
+  ...
+# Subtest: malformed chain identities cannot authorize a contract read
+ok 6 - malformed chain identities cannot authorize a contract read
+  ---
+  duration_ms: 0.52125
+  type: 'test'
+  ...
+# Subtest: concurrent reads wait for an explicit identity recheck instead of using cached trust
+ok 7 - concurrent reads wait for an explicit identity recheck instead of using cached trust
+  ---
+  duration_ms: 0.673917
+  type: 'test'
+  ...
+# Subtest: malformed contract/code byte strings are rejected before ABI consumers see them
+ok 8 - malformed contract/code byte strings are rejected before ABI consumers see them
+  ---
+  duration_ms: 1.085875
+  type: 'test'
+  ...
+# Subtest: HTTP failures, redirects, malformed JSON and invalid JSON-RPC envelopes fail over safely
+not ok 9 - HTTP failures, redirects, malformed JSON and invalid JSON-RPC envelopes fail over safely
+  ---
+  duration_ms: 3.300625
+  type: 'test'
+  location: '/Users/ravonus/dev/wt/studio-native-beacon-witness-20261019/sdk-nonstandard-read/tests/managed-shell-rpc-chain.test.mjs:134:1'
+  failureType: 'testCodeFailure'
+  error: 'RPC request failed (https://one.example/…)'
+  code: 'unclassified-rpc-error'
+  stack: |-
+    fault (file:///Users/ravonus/dev/wt/studio-native-beacon-witness-20261019/sdk-nonstandard-read/packages/viewer/src/keel-rpc-view.js:161:81)
+    file:///Users/ravonus/dev/wt/studio-native-beacon-witness-20261019/sdk-nonstandard-read/packages/viewer/src/keel-rpc-view.js:279:20
+  ...
+# Subtest: timeouts cover stalled fetch and JSON bodies, abort requests and ignore late identity results
+    # Subtest: stalled fetch
+    ok 1 - stalled fetch
+      ---
+      duration_ms: 0.7715
+      type: 'test'
+      ...
+    # Subtest: stalled JSON body
+    ok 2 - stalled JSON body
+      ---
+      duration_ms: 0.24175
+      type: 'test'
+      ...
+    1..2
+ok 10 - timeouts cover stalled fetch and JSON bodies, abort requests and ignore late identity results
+  ---
+  duration_ms: 1.215792
+  type: 'test'
+  ...
+# Subtest: exhaustion and disclosure never expose provider keys or error bodies
+ok 11 - exhaustion and disclosure never expose provider keys or error bodies
+  ---
+  duration_ms: 0.540166
+  type: 'test'
+  ...
+# Subtest: a stalled artwork request fails over only after the fallback proves chain and block
+ok 12 - a stalled artwork request fails over only after the fallback proves chain and block
+  ---
+  duration_ms: 0.575375
+  type: 'test'
+  ...
+# Subtest: pinBlock shares one immutable header and concurrent reads share its endpoint check
+ok 13 - pinBlock shares one immutable header and concurrent reads share its endpoint check
+  ---
+  duration_ms: 0.288541
+  type: 'test'
+  ...
+# Subtest: pinned failover verifies chain and matching block number/hash before every new provider
+ok 14 - pinned failover verifies chain and matching block number/hash before every new provider
+  ---
+  duration_ms: 0.381833
+  type: 'test'
+  ...
+# Subtest: incompatible EIP-1898 providers fail over without numeric or latest downgrade
+ok 15 - incompatible EIP-1898 providers fail over without numeric or latest downgrade
+  ---
+  duration_ms: 1.5095
+  type: 'test'
+  ...
+# Subtest: missing, malformed or mismatched pinned headers fail closed without artwork reads
+ok 16 - missing, malformed or mismatched pinned headers fail closed without artwork reads
+  ---
+  duration_ms: 0.819917
+  type: 'test'
+  ...
+# Subtest: invalid transport options and denied hosts fail before requests
+ok 17 - invalid transport options and denied hosts fail before requests
+  ---
+  duration_ms: 0.185417
+  type: 'test'
+  ...
+# Subtest: managed runtime opts into endpoint identity/block pinning and retains root integrity gates
+ok 18 - managed runtime opts into endpoint identity/block pinning and retains root integrity gates
+  ---
+  duration_ms: 5.117583
+  type: 'test'
+  ...
+1..18
+# tests 20
+# suites 0
+# pass 19
+# fail 1
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 63.609

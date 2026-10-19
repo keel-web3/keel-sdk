@@ -1,0 +1,47 @@
+{
+  "schema": "keel-runtime-review-correction-acceptance@1",
+  "sourceCommit": "e0e6033a93099e312c5c2c6d0f6f22adc7097f40",
+  "environment": {
+    "node": "v22.22.1",
+    "zlib": "1.3.1-e00f703"
+  },
+  "scope": "Implementer test with actual SDK/source transports and in-memory HTTP doubles; no public network, EVM, browser, signature or original-program proof",
+  "reviewBaseline": {
+    "siteEvidenceCommit": "ece35e3d5d642174cfbfcc509fdfe42d554e40f9",
+    "oldRuntimeSource": "606479dff9d26e9af011001182e0dd91dab65f7c"
+  },
+  "sourceHashes": {
+    "protocol": "5a363cc7233069dacac35cc320b6d9dadb0376cb57e95cd8b407df98b55c8b6e",
+    "viewer": "eb24cdba8917b6f648ccaef550bf6fa028085a8c79435ba8c11491b1e86ed3dc"
+  },
+  "results": [
+    {
+      "case": "protocol oversized genuine RPC revert",
+      "status": "PASS",
+      "errorCode": "transport.unclassified-http-error",
+      "terminal": true,
+      "errorBodyBytes": 80086,
+      "executionDispatches": 1,
+      "alternateRecipientDispatches": 0
+    },
+    {
+      "case": "viewer oversized genuine RPC revert",
+      "status": "PASS",
+      "errorCode": "unclassified-http-error",
+      "terminal": true,
+      "errorBodyBytes": 80086,
+      "executionDispatches": 1,
+      "alternateRecipientDispatches": 0
+    },
+    {
+      "case": "full pinned execution-argument identity and pre-await snapshot",
+      "status": "PASS",
+      "first": "0x6001",
+      "second": "0x6002",
+      "physicalCalls": 2,
+      "firstOverrideSHA256": "42720ebcf7c986184548f72bd119cc84b7b4489ab491ba6c5dcfa645eaf8f259",
+      "secondOverrideSHA256": "5ed30ba55a95be45ee9c2874ab5af15e36d3c65d432ed6d7a7d20ac8766c0638",
+      "immutableInputSnapshot": true
+    }
+  ]
+}

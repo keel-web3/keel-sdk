@@ -12,7 +12,10 @@ const abi=parseAbi([...keelHoldAbi,
  'function requireRegistration(bytes32) view', 'function metadataRenderer() view returns(address)', 'function preparedCopyBuilder() view returns(address)', 'function preparedCopyShellRegistry() view returns(address)', 'function preparedCopyValidationRegistry() view returns(address)', 'function artifactRegistry() view returns(address)', 'function manager() view returns(address)', 'function platformAuthority() view returns(address)', 'function rawFragmentValidationRegistry() view returns(address)', 'function RAW_INLINE_PROTECTION_SHELL_ID() view returns(bytes32)', 'function creatorManagedShell(bytes32) view returns(bool)', 'function shellRevision(bytes32,uint64) view returns(bytes32,bytes32,uint8,bool,bytes32)', 'function builder() view returns(address)', 'function verifiedDigest(bytes32) view returns(bytes32)', 'function keelHold() view returns(address)']);
 async function fixture(bad={}){
  const plan=await prepareKeelCreatorInline({...publication,chainId:31337,store:addresses.KeelHold});
- const objects=new Map([plan.shell.prefix,plan.shell.suffix].map(o=>[o.objectId,o]));const requests=[];
+ const metadataBytes=Buffer.from(JSON.stringify({readerProfile:{protocol:'keel.prepared-reader-profile@1',chainId:31337,store:addresses.KeelHold,reader:addresses.KeelRawTokenURIBuilder,runtimeCodeHash:keccak256(code),transportProfile:'uri81-block-v1',readerGrammar:'uri81'}}));
+ const {createKeelManagedObjectPlan}=await import('../packages/sdk/dist/native-managed.js');
+ const metadata={bytes:metadataBytes,...await createKeelManagedObjectPlan(metadataBytes,{hold:addresses.KeelHold,mediaType:'application/json',compression:'none'})};
+ const objects=new Map([plan.shell.prefix,plan.shell.suffix,metadata].map(o=>[o.objectId,o]));const requests=[];
  const pool={status:()=>[],request:async req=>{requests.push(req);
   if(req.method==='eth_chainId')return '0x7a69';if(req.method==='eth_blockNumber')return '0x2';
   if(req.method==='eth_getBlockByNumber')return {number:'0x2',hash:blockHash};
@@ -25,12 +28,12 @@ async function fixture(bad={}){
   else if(name==='manager'||name==='platformAuthority')result=address(999);
   else if(name==='RAW_INLINE_PROTECTION_SHELL_ID')result=keccak256(stringToHex('keel.shell.inline-raw-percent-protection@1'));
   else if(name==='creatorManagedShell')result=false;
-  else if(name==='shellRevision')result=[plan.shell.prefix.objectId,plan.shell.suffix.objectId,bad.mode?2:3,true,hash(501)];
+  else if(name==='shellRevision')result=[plan.shell.prefix.objectId,plan.shell.suffix.objectId,bad.mode?2:3,true,metadata.objectId];
   else {const object=objects.get(call.args[0]);assert.ok(object);
    if(name==='requireRegistration'&&bad.registration)throw Error('not registered');
    if(name==='verifiedDigest')result=bad.digest?hash(777):object.digest;
    if(name==='haulObject')result=toHex(bad.bytes?Uint8Array.of(1):object.bytes);
-   if(name==='getObject')result={digest:object.digest,indexDigest:hash(0),descriptorPointer:address(1),byteLength:BigInt(object.bytes.length),storedByteLength:BigInt(object.bytes.length),chunkCount:1,compression:0,composite:false,exists:true,mediaType:'application/vnd.keel.token-uri-raw-percent-fragment'};
+   if(name==='getObject')result={digest:object.digest,indexDigest:hash(0),descriptorPointer:address(1),byteLength:BigInt(object.bytes.length),storedByteLength:BigInt(object.bytes.length),chunkCount:1,compression:0,composite:false,exists:true,mediaType:object.mediaType??'application/vnd.keel.token-uri-raw-percent-fragment'};
   }
   return encodeFunctionResult({abi,functionName:name,result});
  }};return {pool,plan,requests};

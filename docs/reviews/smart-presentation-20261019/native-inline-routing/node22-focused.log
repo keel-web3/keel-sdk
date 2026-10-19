@@ -1,0 +1,304 @@
+TAP version 13
+# Subtest: original images and GIF use only image without changing source or adding shell
+ok 1 - original images and GIF use only image without changing source or adding shell
+  ---
+  duration_ms: 3.706666
+  type: 'test'
+  ...
+# Subtest: small WebP and AVIF default to shell animation with no duplicate full-size image
+ok 2 - small WebP and AVIF default to shell animation with no duplicate full-size image
+  ---
+  duration_ms: 0.400291
+  type: 'test'
+  ...
+# Subtest: explicit candidate changes animation resource only and thumbnail is separately configured
+ok 3 - explicit candidate changes animation resource only and thumbnail is separately configured
+  ---
+  duration_ms: 0.516125
+  type: 'test'
+  ...
+# Subtest: defaults filter asset and collection; independent explicit delivery choices win
+ok 4 - defaults filter asset and collection; independent explicit delivery choices win
+  ---
+  duration_ms: 0.499792
+  type: 'test'
+  ...
+# Subtest: both slots require explicit selection and exact complete read proof
+ok 5 - both slots require explicit selection and exact complete read proof
+  ---
+  duration_ms: 0.845791
+  type: 'test'
+  ...
+# Subtest: decimal 500KB and 2MB asset recommendations apply to image formats while unknown lengths retain verification
+ok 6 - decimal 500KB and 2MB asset recommendations apply to image formats while unknown lengths retain verification
+  ---
+  duration_ms: 6.474708
+  type: 'test'
+  ...
+# Subtest: collector images never silently switch to hosted by size and explicit delivery still wins
+ok 7 - collector images never silently switch to hosted by size and explicit delivery still wins
+  ---
+  duration_ms: 1.52275
+  type: 'test'
+  ...
+# Subtest: a permissive caller limit cannot label a greater-than-2MB full initial tokenURI as standard compatible
+ok 8 - a permissive caller limit cannot label a greater-than-2MB full initial tokenURI as standard compatible
+  ---
+  duration_ms: 0.250625
+  type: 'test'
+  ...
+# Subtest: SVG without actual source inspection retains verification; explicit direct slots remain explicit
+ok 9 - SVG without actual source inspection retains verification; explicit direct slots remain explicit
+  ---
+  duration_ms: 0.487541
+  type: 'test'
+  ...
+# Subtest: explicit above-target slot gate binds actual matrix, source, revisions and full return without changing standard guard
+ok 10 - explicit above-target slot gate binds actual matrix, source, revisions and full return without changing standard guard
+  ---
+  duration_ms: 70.054875
+  type: 'test'
+  ...
+# Subtest: SDK staging and protocol expose the same presets and exact new-source recommendation
+ok 11 - SDK staging and protocol expose the same presets and exact new-source recommendation
+  ---
+  duration_ms: 12.5275
+  type: 'test'
+  ...
+# Subtest: all choice fields survive SDK/API staging without becoming wallet authority
+ok 12 - all choice fields survive SDK/API staging without becoming wallet authority
+  ---
+  duration_ms: 0.664542
+  type: 'test'
+  ...
+# Subtest: explicit retained viewer choices stay selected and actual script sources keep shell defaults
+ok 13 - explicit retained viewer choices stay selected and actual script sources keep shell defaults
+  ---
+  duration_ms: 0.82375
+  type: 'test'
+  ...
+# Subtest: Blob reads snapshot source and project choices before awaiting caller-controlled bytes
+ok 14 - Blob reads snapshot source and project choices before awaiting caller-controlled bytes
+  ---
+  duration_ms: 0.459166
+  type: 'test'
+  ...
+# Subtest: saved preferences use existing revisioned defaults and never persist a per-project URL
+ok 15 - saved preferences use existing revisioned defaults and never persist a per-project URL
+  ---
+  duration_ms: 0.442541
+  type: 'test'
+  ...
+# Subtest: MCP staging schema consumes canonical enum values rather than a separate policy
+ok 16 - MCP staging schema consumes canonical enum values rather than a separate policy
+  ---
+  duration_ms: 0.049583
+  type: 'test'
+  ...
+# Subtest: actual decimal thresholds use above, with source and metadata boundaries separate
+ok 17 - actual decimal thresholds use above, with source and metadata boundaries separate
+  ---
+  duration_ms: 4.633625
+  type: 'test'
+  ...
+# Subtest: matrix exposes maintained alternatives and never calls a local numeric estimate chain-ready
+ok 18 - matrix exposes maintained alternatives and never calls a local numeric estimate chain-ready
+  ---
+  duration_ms: 0.832917
+  type: 'test'
+  ...
+# Subtest: real prefix/cap arithmetic rejects old duplication and chooses another qualified layout
+ok 19 - real prefix/cap arithmetic rejects old duplication and chooses another qualified layout
+  ---
+  duration_ms: 0.925666
+  type: 'test'
+  ...
+# Subtest: explicit layout remains selected even when a different layout is recommended
+ok 20 - explicit layout remains selected even when a different layout is recommended
+  ---
+  duration_ms: 0.227584
+  type: 'test'
+  ...
+# Subtest: scripts always require a registered verifier and script MIME overrides a static caller label
+ok 21 - scripts always require a registered verifier and script MIME overrides a static caller label
+  ---
+  duration_ms: 0.345375
+  type: 'test'
+  ...
+# Subtest: actual inspection catches MIME lies, active SVG and undecidable PDF without claiming security approval
+ok 22 - actual inspection catches MIME lies, active SVG and undecidable PDF without claiming security approval
+  ---
+  duration_ms: 1.128833
+  type: 'test'
+  ...
+# Subtest: all non-script media use same size policy and direct playback retains a separate usable poster
+ok 23 - all non-script media use same size policy and direct playback retains a separate usable poster
+  ---
+  duration_ms: 1.974958
+  type: 'test'
+  ...
+# Subtest: missing and unsupported actual capabilities stay blocked, regardless of defaults
+ok 24 - missing and unsupported actual capabilities stay blocked, regardless of defaults
+  ---
+  duration_ms: 0.318459
+  type: 'test'
+  ...
+# Subtest: nonstandard size is a compatibility review and exact actual output ceilings remain hard
+ok 25 - nonstandard size is a compatibility review and exact actual output ceilings remain hard
+  ---
+  duration_ms: 0.776709
+  type: 'test'
+  ...
+# Subtest: execution/state/read limits cannot be acknowledged away
+ok 26 - execution/state/read limits cannot be acknowledged away
+  ---
+  duration_ms: 0.724792
+  type: 'test'
+  ...
+# Subtest: external preview is explicit HTTPS/IPFS and does not become the source commitment
+ok 27 - external preview is explicit HTTPS/IPFS and does not become the source commitment
+  ---
+  duration_ms: 0.460291
+  type: 'test'
+  ...
+# Subtest: verifier-only is explicit and warns that marketplace grids have no image
+ok 28 - verifier-only is explicit and warns that marketplace grids have no image
+  ---
+  duration_ms: 0.284875
+  type: 'test'
+  ...
+# Subtest: actual chosen rendering counts UTF8, preserves image bytes and commits the embedded program
+ok 29 - actual chosen rendering counts UTF8, preserves image bytes and commits the embedded program
+  ---
+  duration_ms: 5.970375
+  type: 'test'
+  ...
+# Subtest: actual metadata/image identity failures remain hard and do not invoke an alternate provider
+ok 30 - actual metadata/image identity failures remain hard and do not invoke an alternate provider
+  ---
+  duration_ms: 2.303917
+  type: 'test'
+  ...
+# Subtest: image plus hybrid over target suggests smaller slot choices without silently dropping either
+ok 31 - image plus hybrid over target suggests smaller slot choices without silently dropping either
+  ---
+  duration_ms: 26.526875
+  type: 'test'
+  ...
+# Subtest: only measured embedded verifier alone over target suggests IPFS/hosted, without forcing a change
+ok 32 - only measured embedded verifier alone over target suggests IPFS/hosted, without forcing a change
+  ---
+  duration_ms: 46.023959
+  type: 'test'
+  ...
+# Subtest: explicit nonstandard acknowledgement does not bypass a measured qualified provider ceiling
+ok 33 - explicit nonstandard acknowledgement does not bypass a measured qualified provider ceiling
+  ---
+  duration_ms: 22.668208
+  type: 'test'
+  ...
+# Subtest: plan identity binds source, preview, preferences, exact chain code and context/default revision
+ok 34 - plan identity binds source, preview, preferences, exact chain code and context/default revision
+  ---
+  duration_ms: 1.4205
+  type: 'test'
+  ...
+# Subtest: async matrix snapshots source and actual candidates; missing adapters are never fake successes
+ok 35 - async matrix snapshots source and actual candidates; missing adapters are never fake successes
+  ---
+  duration_ms: 1.613791
+  type: 'test'
+  ...
+# Subtest: malformed quantities, unknown axes and unsupported pairs fail closed
+ok 36 - malformed quantities, unknown axes and unsupported pairs fail closed
+  ---
+  duration_ms: 0.356542
+  type: 'test'
+  ...
+# Subtest: exact native source references bind the plan and actual metadata cannot switch paid object IDs
+ok 37 - exact native source references bind the plan and actual metadata cannot switch paid object IDs
+  ---
+  duration_ms: 1.854875
+  type: 'test'
+  ...
+# Subtest: candidate measurements distinguish actual outer expansion from native source and inline image budgets
+ok 38 - candidate measurements distinguish actual outer expansion from native source and inline image budgets
+  ---
+  duration_ms: 0.275417
+  type: 'test'
+  ...
+# Subtest: review regression: actual original outer image contribution warns even below the inner image URI target
+ok 39 - review regression: actual original outer image contribution warns even below the inner image URI target
+  ---
+  duration_ms: 39.393833
+  type: 'test'
+  ...
+# Subtest: outer contribution retains the actual percent grammar, escaped keys, whitespace and nested metadata
+ok 40 - outer contribution retains the actual percent grammar, escaped keys, whitespace and nested metadata
+  ---
+  duration_ms: 1.771416
+  type: 'test'
+  ...
+# Subtest: review regression: unrelated metadata does not turn a 44-byte hybrid program into an external-delivery recommendation
+ok 41 - review regression: unrelated metadata does not turn a 44-byte hybrid program into an external-delivery recommendation
+  ---
+  duration_ms: 35.54175
+  type: 'test'
+  ...
+# Subtest: encoded URI expansion preserves decoded integrity while offering external compatibility choices
+ok 42 - encoded URI expansion preserves decoded integrity while offering external compatibility choices
+  ---
+  duration_ms: 44.441
+  type: 'test'
+  ...
+# Subtest: duplicate image properties are rejected rather than measuring an earlier value and validating a later one
+ok 43 - duplicate image properties are rejected rather than measuring an earlier value and validating a later one
+  ---
+  duration_ms: 1.217083
+  type: 'test'
+  ...
+# Subtest: encoded verifier property uses the original outer grammar and suggests external delivery only for its own carried bytes
+ok 44 - encoded verifier property uses the original outer grammar and suggests external delivery only for its own carried bytes
+  ---
+  duration_ms: 127.716667
+  type: 'test'
+  ...
+# Subtest: animation contribution preserves original JSON escaping, Unicode and canonical Base64 outer grammar
+ok 45 - animation contribution preserves original JSON escaping, Unicode and canonical Base64 outer grammar
+  ---
+  duration_ms: 2.047708
+  type: 'test'
+  ...
+# Subtest: actual encoded verifier soft-target boundaries remain explicit choices without a hard size prohibition
+ok 46 - actual encoded verifier soft-target boundaries remain explicit choices without a hard size prohibition
+  ---
+  duration_ms: 58.636375
+  type: 'test'
+  ...
+# Subtest: medium image recommendation keeps exact original bytes instead of a separate generated poster
+ok 47 - medium image recommendation keeps exact original bytes instead of a separate generated poster
+  ---
+  duration_ms: 10.763
+  type: 'test'
+  ...
+# Subtest: inline native nonimage playback requires exact qualified MIME, independent poster and both measured commitments
+ok 48 - inline native nonimage playback requires exact qualified MIME, independent poster and both measured commitments
+  ---
+  duration_ms: 1.53475
+  type: 'test'
+  ...
+# Subtest: native references are never automatically selected when safe inline layouts are unknown or unsupported
+ok 49 - native references are never automatically selected when safe inline layouts are unknown or unsupported
+  ---
+  duration_ms: 1.036042
+  type: 'test'
+  ...
+1..49
+# tests 49
+# suites 0
+# pass 49
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 503.707083

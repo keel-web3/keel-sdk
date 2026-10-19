@@ -1,7 +1,6 @@
 import { assertKeelFreshPayloadAudit } from "./inline-transport-audit.js";
 import { assertKeelPreparedCopyRead, keelPreparedCopyBuilder, type KeelPreparedCopyReadCheck, type KeelPreparedCopyPublishEvidence } from "./prepared-copy-publication.js";
-import { KEEL_INLINE_MAX_TOKEN_URI_BYTES, keelInlineReadGasLimit } from "./presentation.js";
-import { canonicalJson, createIntegrity, utf8ToBytes, type Hex, type Integrity } from "@keel/protocol";
+import { canonicalJson, createIntegrity, utf8ToBytes, type Hex, type Integrity, resolveKeelTokenURIReadBounds, assertKeelNonstandardTokenURIIdentity, type KeelExplicitNonstandardReadPolicy } from "@keel/protocol";
 
 export const KEEL_PUBLISH_PLAN_PROTOCOL = "keel-publish-plan@1" as const;
 /** Backward-compatible name for callers that used the review-plan wording. */
@@ -302,7 +301,7 @@ function copyCheck(value: unknown, source: KeelPublishReviewSource, target: Keel
     return undefined;
   }
   const check = object(value, "prepared COPY publication check");
-  exact(check, ["schema", "policy", "chainId", "store", "mediaType", "requiredBuilder", "readOperation", "graphIntegrity", "tokenURIIntegrity", "completeTokenURIBytes", "payloadCarriage", "callGasLimit", "blockGasLimit", "selectedChainReadAuthenticated", "caveat"], "prepared COPY publication check");
+  exact(check, ["schema", "policy", "chainId", "store", "mediaType", "requiredBuilder", "readOperation", "graphIntegrity", "tokenURIIntegrity", "completeTokenURIBytes", "payloadCarriage", "callGasLimit", "blockGasLimit", "selectedChainReadAuthenticated", "caveat", "nonstandardReadPolicy"], "prepared COPY publication check");
   if (check.schema !== "keel-prepared-copy-read-check@1" || check.policy !== "prepared-copy"
       || check.chainId !== target.chainId || check.store !== target.address || check.mediaType !== source.mediaType
       || check.requiredBuilder !== keelPreparedCopyBuilder(source.mediaType) || check.readOperation !== "copy-prepared-fragments"
@@ -310,9 +309,12 @@ function copyCheck(value: unknown, source: KeelPublishReviewSource, target: Keel
   if (!sameIntegrity(digest(check.graphIntegrity, "COPY graph commitment"), source.integrity)) throw new TypeError("Prepared COPY check changes the source commitment.");
   assertKeelFreshPayloadAudit(check.payloadCarriage);
   const uri = digest(check.tokenURIIntegrity, "COPY URI commitment");
-  if (check.completeTokenURIBytes !== uri.byteLength || uri.byteLength > KEEL_INLINE_MAX_TOKEN_URI_BYTES) throw new RangeError("Prepared COPY check has an invalid complete return length.");
+  const nonstandardReadPolicy = check.nonstandardReadPolicy as KeelExplicitNonstandardReadPolicy | undefined;
+  const readBounds = resolveKeelTokenURIReadBounds(nonstandardReadPolicy);
+  assertKeelNonstandardTokenURIIdentity(nonstandardReadPolicy, { chainId: target.chainId, ...uri });
+  if (check.completeTokenURIBytes !== uri.byteLength || uri.byteLength > readBounds.maximumTokenUriBytes) throw new RangeError("Prepared COPY check has an invalid complete return length.");
   for (const key of ["callGasLimit", "blockGasLimit"] as const) if (typeof check[key] !== "string" || !/^[1-9][0-9]{0,77}$/u.test(check[key] as string)) throw new TypeError("Prepared COPY check has an invalid gas boundary.");
-  if (BigInt(check.callGasLimit as string) > keelInlineReadGasLimit(BigInt(check.blockGasLimit as string))) throw new RangeError("Prepared COPY check exceeds the selected-chain read boundary.");
+  if (BigInt(check.callGasLimit as string) > (BigInt(check.blockGasLimit as string) < readBounds.maximumReadGas ? BigInt(check.blockGasLimit as string) : readBounds.maximumReadGas)) throw new RangeError("Prepared COPY check exceeds the selected-chain read boundary.");
   text(check.caveat, "prepared COPY check.caveat", 512);
   return { ...check, graphIntegrity: source.integrity, tokenURIIntegrity: uri } as unknown as KeelPreparedCopyReadCheck;
 }

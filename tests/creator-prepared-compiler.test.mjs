@@ -1,8 +1,11 @@
+import {createKeelLocalTestChainGasProfile} from '../packages/sdk/dist/transaction-gas-policy.js';
 import {compileKeelCreatorPreparedPublication} from '../packages/sdk/dist/creator-prepared-compiler.js';
 import test from 'node:test';import assert from 'node:assert/strict';
 import {parseAbi,keccak256,encodeFunctionResult,decodeFunctionData,toHex,stringToHex,sha256} from 'viem';
 import {prepareKeelAuthenticatedCreatorInline,prepareKeelCreatorInline,prepareKeelDenseCopyFragment,decodeKeelInlineDataURI,buildKeelNetworkIndex,keelHoldAbi} from '../packages/sdk/dist/index.js';
 import {createKeelManagedObjectPlan} from '../packages/sdk/dist/native-managed.js';
+import {createKeelExplicitNonstandardReadPolicy,keelNonstandardReadAcknowledgementKey,keelTokenURIRpcResponseBytes} from '../packages/protocol/dist/index.js';
+import {attachKeelCreatorPublicationReadPolicy,beginKeelCreatorPublicationWalletAttempt,prepareKeelCreatorPublicationWalletStep} from '../packages/sdk/dist/creator-publication-journal.js';
 const names=['KeelHold','KeelCreatorFactory','KeelArtifactTokenRenderer','KeelMintRouteRegistry','KeelRawTokenURIBuilder','KeelRawInlineShellRegistry','KeelRawFragmentValidationRegistry','KeelArtifactRegistry'];
 const address=n=>'0x'+n.toString(16).padStart(40,'0'), hash=n=>'0x'+n.toString(16).padStart(64,'0');
 const addresses=Object.fromEntries(names.map((n,i)=>[n,address(i+1)]));
@@ -27,7 +30,9 @@ async function fixture(bad={}){
   const bytes=prepareKeelDenseCopyFragment(html.slice(html.indexOf('];queueMicrotask')));
   plan.shell.suffix={id:'legacy-shell-suffix',bytes,...await createKeelManagedObjectPlan(bytes,{hold:addresses.KeelHold,mediaType:'application/vnd.keel.token-uri-raw-percent-fragment',compression:'none'})};
  }
- const objects=new Map([plan.shell.prefix,plan.shell.suffix].map(o=>[o.objectId,o]));const preparedObjects=new Map(plan.objects.map(o=>[o.objectId,o]));const requests=[];
+ const metadataBytes=Buffer.from(JSON.stringify({readerProfile:{protocol:'keel.prepared-reader-profile@1',chainId:31337,store:addresses.KeelHold,reader:addresses.KeelRawTokenURIBuilder,runtimeCodeHash:keccak256(code),transportProfile:'uri81-block-v1',readerGrammar:'uri81'}}));
+ const metadata={bytes:metadataBytes,...await createKeelManagedObjectPlan(metadataBytes,{hold:addresses.KeelHold,mediaType:'application/json',compression:'none'})};
+ const objects=new Map([plan.shell.prefix,plan.shell.suffix,metadata].map(o=>[o.objectId,o]));const preparedObjects=new Map(plan.objects.map(o=>[o.objectId,o]));const requests=[];
  const pool={status:()=>[],request:async req=>{requests.push(req);
   if(req.method==='eth_chainId')return '0x7a69';if(req.method==='eth_blockNumber')return '0x2';
   if(req.method==='eth_getBlockByNumber')return {number:'0x2',hash:bad.reorg&&requests.filter(r=>r.method==='eth_getBlockByNumber').length>1?hash(123):blockHash};
@@ -40,7 +45,7 @@ async function fixture(bad={}){
   else if(name==='manager'||name==='platformAuthority')result=address(999);
   else if(name==='RAW_INLINE_PROTECTION_SHELL_ID')result=keccak256(stringToHex('keel.shell.inline-raw-percent-protection@1'));
   else if(name==='creatorManagedShell')result=false;
-  else if(name==='shellRevision')result=[plan.shell.prefix.objectId,plan.shell.suffix.objectId,bad.mode?2:3,true,hash(501)];
+  else if(name==='shellRevision')result=[plan.shell.prefix.objectId,plan.shell.suffix.objectId,bad.mode?2:3,true,metadata.objectId];
   else if(name==='creatorNonces')result=3n;
   else if(name==='nextCollectionId')result=5n;
   else if(name==='predictNextCollectionAddress')result=address(800);
@@ -65,7 +70,7 @@ async function fixture(bad={}){
    if(name==='requireRegistration'&&bad.registration)throw Error('not registered');
    if(name==='verifiedDigest')result=bad.digest?hash(777):object.digest;
    if(name==='haulObject')result=toHex(bad.bytes?Uint8Array.of(1):object.bytes);
-   if(name==='getObject')result={digest:object.digest,indexDigest:hash(0),descriptorPointer:address(1),byteLength:BigInt(object.bytes.length),storedByteLength:BigInt(object.bytes.length),chunkCount:1,compression:0,composite:false,exists:true,mediaType:'application/vnd.keel.token-uri-raw-percent-fragment'};
+   if(name==='getObject')result={digest:object.digest,indexDigest:hash(0),descriptorPointer:address(1),byteLength:BigInt(object.bytes.length),storedByteLength:BigInt(object.bytes.length),chunkCount:1,compression:0,composite:false,exists:true,mediaType:object.mediaType??'application/vnd.keel.token-uri-raw-percent-fragment'};
   }
   return encodeFunctionResult({abi,functionName:name,result});
  }};return {pool,plan,requests};
@@ -150,4 +155,40 @@ test('large synthetic source produces a complete immutable publication program t
  const evidence={schema:'keel-synthetic-complete-publication-program@1',sourceFixture:'Deterministic 735649-byte binary, not the private Retro GIF',syntheticContractReads:true,selectedChainAuthenticated:false,phaseCounts:Object.fromEntries([...new Set(steps.map(step=>step.phase))].map(phase=>[phase,steps.filter(step=>step.phase===phase).length])),calls:steps.length,sourceBytes:result.sourceBytes,newStoredBytes:result.newStoredBytes,reusedStoredBytes:result.reusedStoredBytes,completeTokenURIBytes:result.completeTokenURIBytes,completeTokenURISha256:result.expectedTokenURISha256,serializedHttpRequestBytes:Buffer.byteLength(JSON.stringify(wire)),simulationAccepted:false,browserVerified:false,actualRetroAcceptance:false,signing:'not-performed',submission:'not-performed'};
  if(process.env.KEEL_SYNTHETIC_PUBLICATION_EVIDENCE){const {writeFile}=await import('node:fs/promises');await writeFile(process.env.KEEL_SYNTHETIC_PUBLICATION_EVIDENCE,JSON.stringify({...evidence,program:{steps,simulation:result.journal.simulation}},(_key,value)=>typeof value==='bigint'?value.toString():value,2)+'\n');}
  console.log(JSON.stringify(evidence));
+});
+
+test('fresh above-target compilation measures before exact acknowledgement; unchanged calls then require full simulation before wallet',async()=>{
+ // Deterministic, valid PNG fixture. This is not the incident asset or live proof.
+ const {deflateSync}=await import('node:zlib');
+ const crc=bytes=>{let value=0xffffffff;for(const byte of bytes){value^=byte;for(let i=0;i<8;i++)value=value&1?(value>>>1)^0xedb88320:value>>>1;}return (value^0xffffffff)>>>0;};
+ const chunk=(kind,data)=>{const type=Buffer.from(kind),size=Buffer.alloc(4),check=Buffer.alloc(4);size.writeUInt32BE(data.length);check.writeUInt32BE(crc(Buffer.concat([type,data])));return Buffer.concat([size,type,data,check]);};
+ const ihdr=Buffer.alloc(13);ihdr.writeUInt32BE(720,0);ihdr.writeUInt32BE(720,4);ihdr[8]=8;ihdr[9]=2;
+ const pixels=Buffer.alloc(720*(1+720*3));let seed=0x12345678;
+ for(let row=0;row<720;row++)for(let col=1;col<=720*3;col++){seed^=seed<<13;seed^=seed>>>17;seed^=seed<<5;pixels[row*(1+720*3)+col]=seed&255;}
+ const png=Buffer.concat([Buffer.from('89504e470d0a1a0a','hex'),chunk('IHDR',ihdr),chunk('IDAT',deflateSync(pixels)),chunk('IEND',Buffer.alloc(0))]);
+ const preparationReadBudget={schema:'keel-token-uri-preparation-budget@1',chainId:31337,projectId:config.identity.id,revision:config.identity.sourceRevision,defaultsRevision:config.identity.settingsRevision,sourceDigest:sha256(publication.resources[0].bytes),planDigest:sha256(stringToHex('selected inline plan')),maximumTokenUriBytes:4_000_000,maximumReadGas:'50000000'};
+ const candidate={...publication,preparationReadBudget,poster:{mediaType:'image/png',bytes:png}};
+ const f=await fixture({publication:candidate});
+ const localTestChainProfile=createKeelLocalTestChainGasProfile({environment:'test',rpcUrl:'http://127.0.0.1:18545',clientVersion:'anvil/v1.8.5',nodeInfo:{hardFork:'Osaka',network:'ethereum',environment:{chainId:31337,gasLimit:'0xbebc200'},forkConfig:{forkUrl:null}},genesis:{number:'0x0',hash:hash(1001),gasLimit:'0xbebc200'}});
+ const compiled=await compileKeelCreatorPreparedPublication({pool:f.pool,index,publication:candidate,...config,localTestChainProfile,gas:{...config.gas,maximumTokenUriBytes:4_000_000}});
+ assert.ok(compiled.completeTokenURIBytes>2_000_000);assert.equal(compiled.approval,undefined);
+ assert.equal(compiled.journal.simulation.nonstandardReadPolicy,undefined);
+ const expected=compiled.journal.simulation.expectedTokenURI;
+ const identity={chainId:31337,projectId:config.identity.id,revision:config.identity.sourceRevision,defaultsRevision:config.identity.settingsRevision,sourceDigest:preparationReadBudget.sourceDigest,planDigest:preparationReadBudget.planDigest,measurementDigest:sha256(stringToHex(JSON.stringify({tokenUriDigest:compiled.expectedTokenURISha256,completeTokenUriBytes:compiled.completeTokenURIBytes}))),tokenUriDigest:compiled.expectedTokenURISha256,completeTokenUriBytes:compiled.completeTokenURIBytes};
+ const limits={maximumTokenUriBytes:4_000_000,maximumRpcResponseBytes:keelTokenURIRpcResponseBytes(4_000_000),maximumReadGas:'50000000'};
+ const policy=createKeelExplicitNonstandardReadPolicy({identity,limits,acknowledgementKey:keelNonstandardReadAcknowledgementKey({identity,limits})});
+ const actor={actorId:config.identity.actorId,owner:config.identity.owner,sourceRevision:config.identity.sourceRevision,settingsRevision:config.identity.settingsRevision};
+ function simulation(journal){let pass=0;const requests=[];return {requests,request:async q=>{requests.push(q);if(q.method==='eth_chainId')return '0x7a69';if(q.method==='eth_getBlockByNumber')return {number:'0x2',hash:blockHash,timestamp:'0x1',gasLimit:'0xbebc200'};if(q.method==='eth_getCode')return q.params[0].toLowerCase()===address(800)?'0x':code;if(q.method==='eth_simulateV1'){pass++;return q.params[0].blockStateCalls.map((item,i)=>({transactions:item.calls.map(({gas,nonce})=>({gas,...(nonce===undefined?{}:{nonce})})),calls:[{status:'0x1',gasUsed:'0x16e360',maxUsedGas:'0x16e360',returnData:pass===3&&i===q.params[0].blockStateCalls.length-1?encodeFunctionResult({abi:parseAbi(['function tokenURI(uint256) view returns(string)']),functionName:'tokenURI',result:expected}):journal.simulation.assertions?.find(a=>a.callIndex===i)?.returnData??'0x'}]}));}throw Error(q.method);}};}
+ await assert.rejects(prepareKeelCreatorPublicationWalletStep(compiled.journal,actor,simulation(compiled.journal)),error=>error.kind==='configuration-invalid');
+ const reviewed=attachKeelCreatorPublicationReadPolicy(compiled.journal,policy);
+ assert.deepEqual(reviewed.steps,compiled.journal.steps);assert.notEqual(reviewed.fingerprint,compiled.journal.fingerprint);
+ assert.deepEqual(reviewed.simulation.metadataCall,compiled.journal.simulation.metadataCall);
+ for(const field of ['revision','defaultsRevision','sourceDigest','planDigest','projectId']){const changed=structuredClone(policy);changed.identity[field]=field.endsWith('Digest')?hash(998):'changed';changed.acknowledgementKey=keelNonstandardReadAcknowledgementKey(changed);assert.throws(()=>attachKeelCreatorPublicationReadPolicy(compiled.journal,changed),/identity|revision|project|source|defaults/);}
+ assert.throws(()=>attachKeelCreatorPublicationReadPolicy(beginKeelCreatorPublicationWalletAttempt(compiled.journal,'attempt',Date.now()),policy),/unfunded/);
+ const rpc=simulation(reviewed),wallet=await prepareKeelCreatorPublicationWalletStep(reviewed,actor,rpc);
+ assert.equal(wallet.status,'approval-required');assert.equal(wallet.proof.completeTokenUriBytes,compiled.completeTokenURIBytes);
+ assert.deepEqual(wallet.proof.nonstandardReadPolicy,policy);
+ assert.equal(rpc.requests.filter(q=>q.method==='eth_simulateV1').length,3);
+ assert.ok(wallet.proof.validatedTransactionCalls>0);
+ assert.equal(wallet.signing,'not-performed');assert.equal(wallet.submission,'not-performed');
 });

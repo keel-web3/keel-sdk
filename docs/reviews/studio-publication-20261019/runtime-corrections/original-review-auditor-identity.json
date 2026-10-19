@@ -1,0 +1,7 @@
+{
+  "sourceSiteCommit": "ece35e3d5d642174cfbfcc509fdfe42d554e40f9",
+  "path": "docs/reviews/studio-publication-20261019/review/runtime-606-adversarial-audit.mjs",
+  "sha256": "84283f13cdc76e650a5f206cc0aacf3a373101e0393ec3e764afe6b148db0264",
+  "unchangedRunExitCode": 1,
+  "expectedReason": "Original script asserts faulty success at first case; corrected transport returns terminal failure."
+}

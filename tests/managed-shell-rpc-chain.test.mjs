@@ -144,7 +144,7 @@ test('HTTP failures, redirects, malformed JSON and invalid JSON-RPC envelopes fa
     request => Response.json({ jsonrpc: '2.0', id: request.id }),
     request => Response.json({ jsonrpc: '2.0', id: request.id, result: 11155111 }),
     request => Response.json({ jsonrpc: '2.0', id: request.id, result: chainHex, error: null }),
-    request => Response.json({ jsonrpc: '2.0', id: request.id, error: { code: -32000, message: 'PRIVATE_KEY SECRET' } }),
+    request => Response.json({ jsonrpc: '2.0', id: request.id, error: { code: -32005, message: 'PRIVATE_KEY SECRET' } }),
   ];
   for (const response of invalid) {
     const { chain, calls } = fixture((url, request) => url === urls[0] ? response(request) : request.method === 'eth_chainId' ? chainHex : '0x6000');
