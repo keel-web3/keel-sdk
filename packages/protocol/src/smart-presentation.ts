@@ -48,6 +48,9 @@ export interface KeelSmartPresentationCapabilities {
   readonly shellInline: KeelPresentationQualification;
   readonly shellHybrid: KeelPresentationQualification;
   readonly externalPresentation?: KeelPresentationQualification;
+  /** MIME support comes from the qualified module/renderer profile, never a source label alone. */
+  readonly inlineImageTypes?: readonly string[];
+  readonly inlineMediaTypes?: readonly string[];
   readonly identity?: {
     readonly chainId: number;
     readonly blockNumber: string;
@@ -151,13 +154,13 @@ export function classifyKeelAssetExecution(input: { readonly mediaType: string; 
 }
 
 export const KEEL_ASSET_IMAGE_DELIVERIES = ["inline", "external", "onchain-reference", "omitted"] as const;
-export const KEEL_ASSET_ANIMATION_DELIVERIES = ["inline-shell", "hybrid-shell", "ipfs-shell", "hosted-shell", "onchain-reference", "omitted"] as const;
+export const KEEL_ASSET_ANIMATION_DELIVERIES = ["inline-shell", "hybrid-shell", "ipfs-shell", "hosted-shell", "inline-media", "onchain-reference", "omitted"] as const;
 export const KEEL_ASSET_PRESENTATION_FALLBACK_DELIVERIES = KEEL_PRESENTATION_FALLBACK_DELIVERIES;
 export interface KeelAssetPresentationSelection {
   readonly image: (typeof KEEL_ASSET_IMAGE_DELIVERIES)[number];
   readonly animation: (typeof KEEL_ASSET_ANIMATION_DELIVERIES)[number];
 }
-export const KEEL_ASSET_PRESENTATION_CANDIDATE_IDS = ["canonical-inline", "canonical-hybrid", "external-preview-inline", "external-preview-hybrid", "direct-onchain-asset", "image-only-inline", "hybrid-verifier-only", "ipfs-presentation", "hosted-presentation"] as const;
+export const KEEL_ASSET_PRESENTATION_CANDIDATE_IDS = ["canonical-inline", "canonical-hybrid", "external-preview-inline", "external-preview-hybrid", "direct-onchain-asset", "image-only-inline", "media-only-inline", "hybrid-verifier-only", "ipfs-presentation", "hosted-presentation"] as const;
 export type KeelAssetPresentationCandidateId = (typeof KEEL_ASSET_PRESENTATION_CANDIDATE_IDS)[number];
 const layouts: Readonly<Record<KeelAssetPresentationCandidateId, KeelAssetPresentationSelection>> = {
   "canonical-inline": { image: "inline", animation: "inline-shell" },
@@ -166,6 +169,7 @@ const layouts: Readonly<Record<KeelAssetPresentationCandidateId, KeelAssetPresen
   "external-preview-hybrid": { image: "external", animation: "hybrid-shell" },
   "direct-onchain-asset": { image: "onchain-reference", animation: "onchain-reference" },
   "image-only-inline": { image: "inline", animation: "omitted" },
+  "media-only-inline": { image: "inline", animation: "inline-media" },
   "hybrid-verifier-only": { image: "omitted", animation: "hybrid-shell" },
   "ipfs-presentation": { image: "external", animation: "ipfs-shell" },
   "hosted-presentation": { image: "external", animation: "hosted-shell" },
@@ -215,9 +219,13 @@ export function planKeelSmartAssetPresentation(input: KeelSmartAssetPresentation
   }
   const capabilities = input.capabilities === undefined ? undefined : JSON.parse(JSON.stringify(input.capabilities)) as KeelSmartPresentationCapabilities;
   if (capabilities) {
-    record(capabilities, ["directAsset", "shellInline", "shellHybrid", "externalPresentation", "identity"], "presentation capabilities");
+    record(capabilities, ["directAsset", "shellInline", "shellHybrid", "externalPresentation", "inlineImageTypes", "inlineMediaTypes", "identity"], "presentation capabilities");
     for (const key of ["directAsset", "shellInline", "shellHybrid"] as const) if (!["qualified", "unsupported", "unknown"].includes(capabilities[key])) throw new TypeError("Invalid presentation qualification.");
     if (capabilities.externalPresentation !== undefined && !["qualified", "unsupported", "unknown"].includes(capabilities.externalPresentation)) throw new TypeError("Invalid external presentation qualification.");
+    for (const key of ["inlineImageTypes", "inlineMediaTypes"] as const) if (capabilities[key] !== undefined) {
+      const types = capabilities[key]!;
+      if (!Array.isArray(types) || types.length > 64 || new Set(types).size !== types.length || types.some(mime => typeof mime !== "string" || !/^[a-z0-9][a-z0-9!#$&^_.+-]*\/[a-z0-9][a-z0-9!#$&^_.+-]*$/u.test(mime))) throw new TypeError("Invalid qualified inline renderer MIME profile.");
+    }
     if (capabilities.identity) {
       const identity = capabilities.identity; record(identity, ["chainId", "blockNumber", "blockHash", "factory", "creationCodeHash", "reader", "runtimeCodeHash"], "qualified chain identity");
       if (!Number.isSafeInteger(identity.chainId) || identity.chainId < 1 || !/^(?:0x[0-9a-f]+|\d+)$/iu.test(identity.blockNumber) || !/^0x[0-9a-f]{64}$/iu.test(identity.blockHash)) throw new TypeError("Invalid qualified chain identity.");
@@ -232,13 +240,18 @@ export function planKeelSmartAssetPresentation(input: KeelSmartAssetPresentation
     if (!KEEL_ASSET_IMAGE_DELIVERIES.includes(explicit.image) || !KEEL_ASSET_ANIMATION_DELIVERIES.includes(explicit.animation)) throw new TypeError("Unsupported presentation selection.");
   }
   if (input.candidateMeasurements) record(input.candidateMeasurements, KEEL_ASSET_PRESENTATION_CANDIDATE_IDS, "candidate measurements");
-  const isImage = original.mediaType.startsWith("image/"), imageSource = preview ?? (isImage ? original : undefined);
+  const isImage = original.mediaType.startsWith("image/");
   const initialMeasurements = measurementsOf(input.measurements);
   const candidates = KEEL_ASSET_PRESENTATION_CANDIDATE_IDS.map(id => {
     const layout = { ...layouts[id] };
+    const imageSource = isImage && (id === "image-only-inline" || id === "direct-onchain-asset") ? original : preview ?? (isImage ? original : undefined);
     if (id === "direct-onchain-asset" && isImage) layout.animation = "omitted";
     const measured = input.candidateMeasurements?.[id] === undefined ? id === "canonical-inline" ? { ...initialMeasurements } : {} : measurementsOf(input.candidateMeasurements[id]);
     const hardBlockers: string[] = [], compatibilityWarnings: string[] = [], remainingChecks: string[] = [];
+    if (id === "media-only-inline" && isImage) hardBlockers.push("inline-media-requires-nonimage-source");
+    if (id === "media-only-inline" && !capabilities?.inlineMediaTypes?.includes(original.mediaType)) hardBlockers.push("qualified-inline-media-renderer-required");
+    if (id === "image-only-inline" && !capabilities?.inlineImageTypes?.includes(imageSource?.mediaType ?? "")) hardBlockers.push("qualified-inline-image-renderer-required");
+    if (id === "direct-onchain-asset") compatibilityWarnings.push("native-object-references-may-not-load-in-marketplace-grids");
     if (original.byteLength === 0) hardBlockers.push("empty-source");
     if (capabilities?.identity && [original, preview].some(value => value?.onchain !== undefined && value.onchain.chainId !== capabilities.identity!.chainId)) hardBlockers.push("source-reference-chain-mismatch");
     const shell = layout.animation.endsWith("shell"), hybrid = layout.animation === "hybrid-shell", external = layout.animation === "ipfs-shell" || layout.animation === "hosted-shell";
@@ -269,7 +282,7 @@ export function planKeelSmartAssetPresentation(input: KeelSmartAssetPresentation
     const animation = { resourceId: original.resourceId, commitment: original, delivery: layout.animation,
       ...(layout.animation === "onchain-reference" && original.onchain !== undefined ? { uri: nativeReferenceURI(original) } : {}),
       ...(external ? { uri: externalPresentation?.delivery === delivery ? externalPresentation!.animationUri : null } : {}) };
-    const route = id === "direct-onchain-asset" ? "direct-onchain-asset" : id === "image-only-inline" ? "image-only" : external ? "external-presentation" : hybrid ? "canonical-shell-hybrid" : "canonical-shell-inline";
+    const route = id === "direct-onchain-asset" ? "direct-onchain-asset" : id === "image-only-inline" ? "image-only" : id === "media-only-inline" ? "inline-media" : external ? "external-presentation" : hybrid ? "canonical-shell-hybrid" : "canonical-shell-inline";
     return { id, selection: layout, route, image, animation, viewer: shell ? "keel-verification-shell" as const : "none" as const,
       mode: external ? "external" as const : hybrid ? "hybrid" as const : shell ? "inline" as const : "direct" as const,
       measurements: measured, measurementBasis: "provisional-local-measurements" as const, standardsCompatible: measured.completeTokenUriBytes === undefined ? null : Number(measured.completeTokenUriBytes) <= KEEL_SMART_TOKEN_URI_MAX_BYTES && !compatibilityWarnings.includes("inline-image-above-compatibility-target"),
@@ -281,8 +294,8 @@ export function planKeelSmartAssetPresentation(input: KeelSmartAssetPresentation
   const preferred: KeelAssetPresentationCandidateId[] = assetPresentation === "external-preview" ? large ? ["external-preview-hybrid", "external-preview-inline"] : ["external-preview-inline", "external-preview-hybrid"]
     : assetPresentation === "inline-image-hybrid-verifier" ? ["canonical-hybrid"]
     : large ? ["canonical-hybrid", "external-preview-hybrid", "direct-onchain-asset", "canonical-inline"]
-    : intermediate && execution === "static" ? ["direct-onchain-asset", "canonical-inline", "canonical-hybrid", "external-preview-hybrid"]
-    : ["canonical-inline", "canonical-hybrid", "direct-onchain-asset", "external-preview-hybrid"];
+    : intermediate && execution === "static" ? [isImage ? "image-only-inline" : "media-only-inline", "canonical-inline", "canonical-hybrid", "external-preview-hybrid"]
+    : ["canonical-inline", "canonical-hybrid", isImage ? "image-only-inline" : "media-only-inline", "external-preview-hybrid", "direct-onchain-asset"];
   const usable = (id: KeelAssetPresentationCandidateId) => candidates.find(c => c.id === id)!;
   const qualified = preferred.map(usable).filter(c => c.hardBlockers.length === 0);
   const recommended = qualified.find(c => c.measurementComplete && c.standardsCompatible) ?? qualified.find(c => c.standardsCompatible !== false) ?? qualified[0] ?? usable(preferred[0]!);
@@ -407,12 +420,23 @@ export async function measureKeelSmartAssetPresentation(plan: KeelSmartAssetPres
   else if (typeof metadata.animation_url !== "string" || !metadata.animation_url) hardBlockers.push("chosen-animation-required");
   let embeddedAnimationIntegrity: { digest: `0x${string}`; byteLength: number } | null = null, embeddedAnimationUriBytes: number | null = null;
   let encodedAnimationSlotBytes: number | null = null, encodedAnimationValueBytes: number | null = null;
+  let inlineMediaIntegrity: { digest: `0x${string}`; byteLength: number } | null = null;
   if (plan.animation.delivery === "inline-shell" || plan.animation.delivery === "hybrid-shell") {
     if (typeof metadata.animation_url !== "string" || !/^data:text\/html[;,]/iu.test(metadata.animation_url)) hardBlockers.push("registered-animation-shell-required");
     else { const bytes = decodeDataURI(metadata.animation_url); embeddedAnimationIntegrity = { digest: await sha256Hex(bytes), byteLength: bytes.length }; embeddedAnimationUriBytes = new TextEncoder().encode(metadata.animation_url).length;
       const contribution = encodedMemberContribution(tokenURI, json, "animation_url");
       if (contribution) { encodedAnimationSlotBytes = contribution.encodedSlotBytes; encodedAnimationValueBytes = contribution.encodedValueBytes; }
       if ((encodedAnimationSlotBytes ?? embeddedAnimationUriBytes) > KEEL_SMART_TOKEN_URI_MAX_BYTES) compatibilityWarnings.push("embedded-verifier-above-compatibility-target");
+    }
+  } else if (plan.animation.delivery === "inline-media") {
+    if (typeof metadata.animation_url !== "string" || !metadata.animation_url.startsWith(`data:${plan.source.mediaType};`) && !metadata.animation_url.startsWith(`data:${plan.source.mediaType},`)) hardBlockers.push("inline-native-media-required");
+    else {
+      const bytes = decodeDataURI(metadata.animation_url);
+      inlineMediaIntegrity = { digest: await sha256Hex(bytes), byteLength: bytes.length };
+      if (bytes.length !== plan.source.byteLength || inlineMediaIntegrity.digest !== plan.source.digest) hardBlockers.push("inline-native-media-source-changed");
+      embeddedAnimationUriBytes = new TextEncoder().encode(metadata.animation_url).length;
+      const contribution = encodedMemberContribution(tokenURI, json, "animation_url");
+      if (contribution) { encodedAnimationSlotBytes = contribution.encodedSlotBytes; encodedAnimationValueBytes = contribution.encodedValueBytes; }
     }
   } else if ((plan.animation.delivery === "ipfs-shell" || plan.animation.delivery === "hosted-shell") && metadata.animation_url !== plan.animation.uri) hardBlockers.push("external-presentation-selection-changed");
   let imageUriBytes: number | null = null, encodedImageSlotBytes: number | null = null, encodedImageValueBytes: number | null = null;
@@ -439,12 +463,12 @@ export async function measureKeelSmartAssetPresentation(plan: KeelSmartAssetPres
   const standardsCompatible = completeTokenUriBytes <= KEEL_SMART_TOKEN_URI_MAX_BYTES && (plan.image?.delivery !== "inline" || (imageUriBytes ?? 0) <= KEEL_SMART_INLINE_IMAGE_URI_MAX_BYTES && (encodedImageSlotBytes ?? 0) <= KEEL_SMART_INLINE_IMAGE_URI_MAX_BYTES);
   const compatibilityReviewRequired = !standardsCompatible && !plan.nonstandardCompatibilityAcknowledged || plan.image === null && !plan.omittedGridImageAcknowledged;
   const result = { schema: "keel-smart-presentation-return-measurement@1" as const, planKey: plan.planKey, acknowledgementKey: plan.acknowledgementKey,
-    tokenURI, completeTokenUriBytes, imageUriBytes, encodedImageSlotBytes, encodedImageValueBytes, encodedAnimationSlotBytes, encodedAnimationValueBytes, embeddedAnimationIntegrity, embeddedAnimationUriBytes, standardsCompatible, measurementBasis: "actual-rendered-complete-return" as const,
+    tokenURI, completeTokenUriBytes, imageUriBytes, encodedImageSlotBytes, encodedImageValueBytes, encodedAnimationSlotBytes, encodedAnimationValueBytes, inlineMediaIntegrity, embeddedAnimationIntegrity, embeddedAnimationUriBytes, standardsCompatible, measurementBasis: "actual-rendered-complete-return" as const,
     hardBlockers: [...new Set(hardBlockers)], compatibilityWarnings: [...new Set(compatibilityWarnings)], recommendations,
     tokenUriDigest: await sha256Hex(new TextEncoder().encode(tokenURI)),
     status: hardBlockers.length ? "blocked" as const : compatibilityReviewRequired ? "compatibility-review-required" as const : "requires-selected-chain-simulation" as const,
     publicationReady: false as const, requiresExactFullSimulation: true as const };
-  return freeze({ ...result, measurementKey: canonicalJson({ tokenUriDigest: result.tokenUriDigest, completeTokenUriBytes, imageUriBytes, encodedImageSlotBytes, encodedImageValueBytes, encodedAnimationSlotBytes, encodedAnimationValueBytes, embeddedAnimationIntegrity, embeddedAnimationUriBytes, selectedPlanKey: plan.planKey, standardsCompatible, hardBlockers: result.hardBlockers, compatibilityWarnings: result.compatibilityWarnings }) });
+  return freeze({ ...result, measurementKey: canonicalJson({ tokenUriDigest: result.tokenUriDigest, completeTokenUriBytes, imageUriBytes, encodedImageSlotBytes, encodedImageValueBytes, encodedAnimationSlotBytes, encodedAnimationValueBytes, inlineMediaIntegrity, embeddedAnimationIntegrity, embeddedAnimationUriBytes, selectedPlanKey: plan.planKey, standardsCompatible, hardBlockers: result.hardBlockers, compatibilityWarnings: result.compatibilityWarnings }) });
 }
 /** Measure only supported candidate adapters. Unavailable layouts stay visibly unqualified. */
 export async function measureKeelSmartPresentationMatrix(input: KeelSmartAssetPresentationInput,
