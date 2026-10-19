@@ -159,7 +159,7 @@ func run() error {
 	}
 	return encoder.Encode(map[string]any{"type": "result", "result": result, "evidence": map[string]any{
 		"schema": "keel-proof-executor-evidence@1", "gethCommit": gethCommit, "requestSha256": requestDigest, "chainId": in.ChainID, "blockHash": in.BlockHash, "baseStateRoot": in.Header.Root,
-		"accountProofs": reader.AccountProofs, "storageProofs": reader.StorageProofs, "codeHashChecks": reader.CodeChecks, "witnessBytes": reader.WitnessBytes(), "readRequests": w.requests, "responseBytes": w.bytes,
+		"accountProofs": reader.AccountProofs, "storageProofs": reader.StorageProofs, "codeHashChecks": reader.CodeChecks, "witnessBytes": reader.WitnessBytes(), "witnessClosureProofs": reader.WitnessClosureProofs(), "readRequests": w.requests, "responseBytes": w.bytes,
 		"processPeakRSSBytes": usage.Maxrss * 1024, "processCPUMicroseconds": usage.Utime.Sec*1000000 + usage.Utime.Usec + usage.Stime.Sec*1000000 + usage.Stime.Usec, "nativeWallTimeMs": time.Since(started).Milliseconds(),
 		"gasBudget": l.GasBudget, "signing": "not-performed", "submission": "not-performed", "state": "ephemeral-proof-backed"}})
 }

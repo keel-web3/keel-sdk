@@ -6,6 +6,7 @@ package keelfork
 import (
 	"bytes"
 	"context"
+	"encoding/binary"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -19,9 +20,11 @@ import (
 	"github.com/ethereum/go-ethereum/crypto"
 	"github.com/ethereum/go-ethereum/ethdb"
 	"github.com/ethereum/go-ethereum/ethdb/memorydb"
+	"github.com/ethereum/go-ethereum/params"
 	"github.com/ethereum/go-ethereum/rlp"
 	"github.com/ethereum/go-ethereum/trie"
 	"github.com/ethereum/go-ethereum/triedb"
+	"github.com/ethereum/go-ethereum/triedb/database"
 )
 
 type ReadFunc func(context.Context, string, []any, any) error
@@ -38,6 +41,8 @@ type Reader struct {
 	err                                      error
 	bytes, maxBytes                          uint64
 	AccountProofs, StorageProofs, CodeChecks uint64
+	closureProofs                            uint64
+	closureSeen                              map[common.Hash]bool
 }
 
 type proofResponse struct {
@@ -53,13 +58,147 @@ type proofResponse struct {
 func NewReader(ctx context.Context, base *types.Header, read ReadFunc, maxBytes uint64) (*Reader, *state.StateDB, error) {
 	disk := rawdb.NewMemoryDatabase()
 	r := &Reader{ctx: ctx, read: read, base: types.CopyHeader(base), disk: disk, maxBytes: maxBytes,
-		accounts: make(map[common.Address]*types.StateAccount), slots: make(map[common.Address]map[common.Hash]common.Hash), codes: make(map[common.Hash][]byte)}
+		accounts: make(map[common.Address]*types.StateAccount), slots: make(map[common.Address]map[common.Hash]common.Hash), codes: make(map[common.Hash][]byte), closureSeen: make(map[common.Hash]bool)}
 	db := state.NewMPTDatabase(triedb.NewDatabase(disk, triedb.HashDefaults), state.NewCodeDB(disk))
-	s, err := state.NewWithReader(base.Root, db, r)
+	s, err := state.NewWithReader(base.Root, &witnessDatabase{Database: db, reader: r}, r)
 	return r, s, err
 }
+
+// Keep Geth's real StateTrie and its normal mutation/copy semantics. Resolve a
+// missing authenticated node at the database boundary, before Geth sees an
+// error. No EVM call, state transition, or gas accounting is retried.
+type witnessDatabase struct {
+	state.Database
+	reader *Reader
+}
+
+func (db *witnessDatabase) OpenStorageTrie(stateRoot common.Hash, address common.Address, root common.Hash, self state.Trie) (state.Trie, error) {
+	if address != params.BeaconRootsAddress {
+		return db.Database.OpenStorageTrie(stateRoot, address, root, self)
+	}
+	return trie.NewStateTrie(trie.StorageTrieID(stateRoot, crypto.Keccak256Hash(address.Bytes()), root), &witnessNodeDatabase{NodeDatabase: db.TrieDB(), reader: db.reader})
+}
+
+type witnessNodeDatabase struct {
+	database.NodeDatabase
+	reader *Reader
+}
+
+func (db *witnessNodeDatabase) NodeReader(root common.Hash) (database.NodeReader, error) {
+	base, err := db.NodeDatabase.NodeReader(root)
+	if err != nil {
+		return nil, err
+	}
+	return &witnessNodeReader{NodeReader: base, reader: db.reader}, nil
+}
+
+type witnessNodeReader struct {
+	database.NodeReader
+	reader *Reader
+}
+
+func (n *witnessNodeReader) Node(owner common.Hash, path []byte, hash common.Hash) ([]byte, error) {
+	blob, err := n.NodeReader.Node(owner, path, hash)
+	if err != nil || len(blob) != 0 {
+		return blob, err
+	}
+	return n.reader.completeBeaconWitness(owner, path, hash)
+}
+
+const beaconHistorySlots = 8191
+const maxClosureMatches = 8
+const maxClosureProofs = 32
+
+// A finite canonical-contract key domain helps locate a proof; it is not proof
+// authority. Only proofs verified against the ORIGINAL header root can add
+// nodes. This remains true after the live trie has accumulated in-memory writes.
+func (r *Reader) completeBeaconWitness(owner common.Hash, path []byte, hash common.Hash) ([]byte, error) {
+	r.mu.Lock()
+	defer r.mu.Unlock()
+	if r.err != nil {
+		return nil, r.err
+	}
+	if err := r.ctx.Err(); err != nil {
+		return nil, r.fail(err)
+	}
+	if owner != crypto.Keccak256Hash(params.BeaconRootsAddress.Bytes()) || hash == (common.Hash{}) || len(path) == 0 || len(path) > 64 {
+		return nil, errors.New("unsupported missing witness identity")
+	}
+	for _, nibble := range path {
+		if nibble > 15 {
+			return nil, errors.New("invalid missing witness path")
+		}
+	}
+	account := r.accounts[params.BeaconRootsAddress]
+	if account == nil || common.BytesToHash(account.CodeHash) != crypto.Keccak256Hash(params.BeaconRootsCode) {
+		return nil, errors.New("missing canonical beacon account proof")
+	}
+	if r.closureSeen[hash] {
+		return nil, errors.New("repeated missing witness node")
+	}
+	r.closureSeen[hash] = true
+	var candidates []common.Hash
+	for i := uint64(0); i < 2*beaconHistorySlots; i++ {
+		if i%128 == 0 {
+			if err := r.ctx.Err(); err != nil {
+				return nil, r.fail(err)
+			}
+		}
+		var key common.Hash
+		binary.BigEndian.PutUint64(key[24:], i)
+		hashed := crypto.Keccak256Hash(key[:])
+		matches := true
+		for j, nibble := range path {
+			actual := hashed[j/2] >> 4
+			if j%2 != 0 {
+				actual = hashed[j/2] & 15
+			}
+			if actual != nibble {
+				matches = false
+				break
+			}
+		}
+		if matches {
+			candidates = append(candidates, key)
+			if len(candidates) > maxClosureMatches {
+				return nil, errors.New("missing witness candidate budget exceeded")
+			}
+		}
+	}
+	if len(candidates) == 0 {
+		return nil, errors.New("unknown missing witness preimage")
+	}
+	for _, key := range candidates {
+		if r.closureProofs >= maxClosureProofs {
+			return nil, errors.New("missing witness proof budget exceeded")
+		}
+		if err := r.ctx.Err(); err != nil {
+			return nil, r.fail(err)
+		}
+		// Count attempted reads, including failures. The wire broker also retains its
+		// existing cumulative read/response/wall limits; verify retains byte limits.
+		r.closureProofs++
+		if _, err := r.proof(params.BeaconRootsAddress, []common.Hash{key}); err != nil {
+			return nil, err
+		}
+		blob := rawdb.ReadLegacyTrieNode(r.disk, hash)
+		if len(blob) != 0 {
+			if crypto.Keccak256Hash(blob) != hash {
+				return nil, r.fail(errors.New("missing witness node hash mismatch"))
+			}
+			return blob, nil
+		}
+	}
+	return nil, errors.New("authenticated witness completion made no progress")
+}
+
 func (r *Reader) Error() error         { r.mu.Lock(); defer r.mu.Unlock(); return r.err }
 func (r *Reader) WitnessBytes() uint64 { r.mu.Lock(); defer r.mu.Unlock(); return r.bytes }
+func (r *Reader) WitnessClosureProofs() uint64 {
+	r.mu.Lock()
+	defer r.mu.Unlock()
+	return r.closureProofs
+}
 func (r *Reader) fail(err error) error {
 	if r.err == nil {
 		r.err = err
