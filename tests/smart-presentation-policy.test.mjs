@@ -134,3 +134,45 @@ test('candidate measurements distinguish actual outer expansion from native sour
  const plan=choose(x,hybrid);assert.equal(plan.standardsCompatible,false);assert.equal(plan.source.byteLength,130296);assert.ok(plan.compatibilityWarnings.includes('complete-metadata-above-standard-target'));
  assert.equal(plan.candidates.find(c=>c.id==='hybrid-verifier-only').standardsCompatible,true);
 });
+
+test('review regression: actual original outer image contribution warns even below the inner image URI target',async()=>{
+ const bytes=Buffer.alloc(1312476);png.copy(bytes);const uri='data:image/png;base64,'+bytes.toString('base64');
+ const plan=choose({...input(),preview:{...image,byteLength:bytes.length,digest:digest(bytes)}},hybrid);
+ const metadata={name:'Same metadata',image:uri,animation_url:htmlURI('<!doctype html><p>exact verifier program</p>')};
+ const full=jsonURI(metadata),{image:ignored,...withoutImage}=metadata;
+ const measured=await p.measureKeelSmartAssetPresentation(plan,()=>full);
+ assert.equal(measured.imageUriBytes,1749990);assert.equal(measured.encodedImageSlotBytes,1750025);assert.equal(measured.encodedImageValueBytes,1750002);
+ assert.equal(measured.encodedImageSlotBytes,Buffer.byteLength(full)-Buffer.byteLength(jsonURI(withoutImage)));
+ assert.equal(measured.encodedImageValueBytes,Buffer.byteLength(full)-Buffer.byteLength(jsonURI({...metadata,image:''})));
+ assert.equal(measured.completeTokenUriBytes,1750255);assert.equal(measured.standardsCompatible,false);assert.equal(measured.status,'compatibility-review-required');assert.ok(measured.compatibilityWarnings.includes('inline-image-above-compatibility-target'));
+ assert.equal(measured.hardBlockers.length,0);assert.equal(measured.tokenURI,full);assert.equal(measured.tokenUriDigest,digest(Buffer.from(full)));assert.equal(plan.preview.digest,digest(bytes));
+});
+test('outer contribution retains the actual percent grammar, escaped keys, whitespace and nested metadata',async()=>{
+ const plan=choose(input(),hybrid),value=JSON.stringify(imageURI),tail=' "description":"🌊 exact", "nested":{"image":"untouched","values":[1,{"x":"a,b"}]}, "animation_url":'+JSON.stringify(htmlURI('Exact program'))+' }';
+ const original='{"\\u0069mage" : '+value+','+tail;
+ const encode=json=>'data:application/json;charset=utf-8,'+encodeURIComponent(json).replaceAll('%3A',':').replaceAll('%2C',',').replaceAll('%2F','/').replaceAll('%22','%22').replaceAll('%7B','%7b');
+ const full=encode(original),without=encode('{'+tail),empty=encode('{"\\u0069mage" : "",'+tail),measured=await p.measureKeelSmartAssetPresentation(plan,()=>full);
+ assert.equal(measured.encodedImageSlotBytes,Buffer.byteLength(full)-Buffer.byteLength(without));assert.equal(measured.encodedImageValueBytes,Buffer.byteLength(full)-Buffer.byteLength(empty));assert.equal(measured.tokenURI,full);assert.equal(measured.hardBlockers.length,0);
+ const base64=json=>'data:application/json;base64,'+Buffer.from(json).toString('base64');const b=await p.measureKeelSmartAssetPresentation(plan,()=>base64(original));
+ assert.equal(b.encodedImageSlotBytes,Buffer.byteLength(base64(original))-Buffer.byteLength(base64('{'+tail)));assert.equal(b.encodedImageValueBytes,Buffer.byteLength(base64(original))-Buffer.byteLength(base64('{"\\u0069mage" : "",'+tail)));assert.equal(b.tokenURI,base64(original));
+});
+test('review regression: unrelated metadata does not turn a 44-byte hybrid program into an external-delivery recommendation',async()=>{
+ const program='<!doctype html><p>exact verifier program</p>',padding='x'.repeat(2000000);
+ const matrix=await p.measureKeelSmartPresentationMatrix({...input(),selection:hybrid},candidate=>{
+  if(candidate.id==='canonical-hybrid')return jsonURI({name:'Same metadata',image:imageURI,animation_url:htmlURI(program),description:padding});
+  if(candidate.id==='hybrid-verifier-only')return jsonURI({name:'Same metadata',animation_url:htmlURI(program),description:padding});return null;
+ });
+ const measured=matrix.results.find(row=>row.candidateId==='hybrid-verifier-only').measurement;
+ assert.equal(measured.embeddedAnimationIntegrity.byteLength,44);assert.equal(measured.embeddedAnimationUriBytes,93);assert.equal(measured.completeTokenUriBytes,2000259);
+ assert.equal(matrix.recommendations.some(row=>['ipfs-presentation','hosted-presentation'].includes(row.candidateId)),false);
+ assert.ok(matrix.recommendations.every(row=>row.code!=='measured-embedded-verifier-alone-above-target'));assert.equal(matrix.publicationReady,false);
+});
+test('encoded URI expansion alone cannot be relabeled a larger decoded embedded program in provisional or actual checks',async()=>{
+ const x={...input(),candidateMeasurements:{'canonical-hybrid':{completeTokenUriBytes:2500000,embeddedAnimationUriBytes:2100000,embeddedProgramBytes:700000}}};const plan=choose(x,hybrid);
+ assert.equal(plan.suggestions.some(row=>['ipfs-presentation','hosted-presentation'].includes(row.candidateId)),false);
+ const measured=await p.measureKeelSmartAssetPresentation(plan,()=>render({animation_url:htmlURI(' '.repeat(700000))}));
+ assert.equal(measured.embeddedAnimationIntegrity.byteLength,700000);assert.ok(measured.embeddedAnimationUriBytes>2000000);assert.equal(measured.recommendations.some(row=>['ipfs-presentation','hosted-presentation'].includes(row.candidateId)),false);assert.equal(measured.status,'compatibility-review-required');
+});
+test('duplicate image properties are rejected rather than measuring an earlier value and validating a later one',async()=>{
+ const plan=choose(input(),hybrid);const uri='data:application/json,'+encodeURIComponent('{"image":1,"image":'+JSON.stringify(imageURI)+',"animation_url":'+JSON.stringify(htmlURI('Exact'))+'}');await assert.rejects(p.measureKeelSmartAssetPresentation(plan,()=>uri),/unambiguous|Duplicate/);
+});
