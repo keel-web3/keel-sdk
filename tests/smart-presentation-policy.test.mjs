@@ -176,3 +176,35 @@ test('encoded URI expansion alone cannot be relabeled a larger decoded embedded 
 test('duplicate image properties are rejected rather than measuring an earlier value and validating a later one',async()=>{
  const plan=choose(input(),hybrid);const uri='data:application/json,'+encodeURIComponent('{"image":1,"image":'+JSON.stringify(imageURI)+',"animation_url":'+JSON.stringify(htmlURI('Exact'))+'}');await assert.rejects(p.measureKeelSmartAssetPresentation(plan,()=>uri),/unambiguous|Duplicate/);
 });
+
+test('encoded verifier property uses the original outer grammar and suggests external delivery only for its own carried bytes',async()=>{
+ const program=' '.repeat(700000),animation=htmlURI(program),metadata={name:'Same metadata',animation_url:animation,description:''};
+ const full=jsonURI(metadata),{animation_url:unused,...without}=metadata;
+ const matrix=await p.measureKeelSmartPresentationMatrix({...input(),selection:hybrid},candidate=>candidate.id==='canonical-hybrid'?jsonURI({...metadata,image:imageURI}):candidate.id==='hybrid-verifier-only'?full:null);
+ const measured=matrix.results.find(row=>row.candidateId==='hybrid-verifier-only').measurement;
+ assert.equal(measured.embeddedAnimationIntegrity.byteLength,700000);assert.equal(measured.embeddedAnimationUriBytes,2100029);
+ assert.equal(measured.encodedAnimationSlotBytes,3500070);assert.equal(measured.encodedAnimationSlotBytes,Buffer.byteLength(full)-Buffer.byteLength(jsonURI(without)));
+ assert.ok(measured.compatibilityWarnings.includes('embedded-verifier-above-compatibility-target'));assert.equal(measured.status,'compatibility-review-required');assert.equal(measured.hardBlockers.length,0);
+ assert.ok(matrix.recommendations.some(row=>row.candidateId==='ipfs-presentation'));assert.equal(matrix.publicationReady,false);assert.equal(measured.tokenURI,full);
+ const plan=choose({...input(),fallbackDelivery:'hosted',nonstandardCompatibilityAcknowledged:true},hybrid),ack=await p.measureKeelSmartAssetPresentation(plan,()=>jsonURI({...metadata,image:imageURI}));
+ assert.equal(ack.status,'requires-selected-chain-simulation');assert.ok(ack.recommendations.some(row=>row.candidateId==='hosted-presentation'));assert.equal(ack.publicationReady,false);
+});
+test('animation contribution preserves original JSON escaping, Unicode and canonical Base64 outer grammar',async()=>{
+ const plan=choose(input(),hybrid),program=htmlURI('Exact 🌊 program'),value=JSON.stringify(program),prefix=' { "name":"🌊", "\\u0061nimation_url" : ',tail=', "image":'+JSON.stringify(imageURI)+' }',original=prefix+value+tail;
+ const percent=s=>'data:application/json,'+encodeURIComponent(s),base64=s=>'data:application/json;base64,'+Buffer.from(s).toString('base64');
+ for(const wrap of [percent,base64]){
+  const full=wrap(original),without=wrap(' { "name":"🌊"'+tail),empty=wrap(prefix+'""'+tail);
+  const measured=await p.measureKeelSmartAssetPresentation(plan,()=>full);
+  assert.equal(measured.encodedAnimationSlotBytes,Buffer.byteLength(full)-Buffer.byteLength(without));assert.equal(measured.encodedAnimationValueBytes,Buffer.byteLength(full)-Buffer.byteLength(empty));assert.equal(measured.tokenURI,full);
+ }
+ const duplicated=percent('{"image":'+JSON.stringify(imageURI)+',"animation_url":"first","animation_url":'+value+'}');
+ await assert.rejects(p.measureKeelSmartAssetPresentation(plan,()=>duplicated),/Duplicate metadata animation_url/);
+});
+test('actual encoded verifier soft-target boundaries remain explicit choices without a hard size prohibition',async()=>{
+ for(const [length,expected] of [[399985,1999995],[399986,2000000],[399987,2000005]]){
+  const full=jsonURI({name:'Same metadata',animation_url:htmlURI(' '.repeat(length)),description:''});
+  const plan=choose({...input(),selection:{image:'omitted',animation:'hybrid-shell'},omittedGridImageAcknowledged:true,nonstandardCompatibilityAcknowledged:true},{image:'omitted',animation:'hybrid-shell'});
+  const measured=await p.measureKeelSmartAssetPresentation(plan,()=>full);
+  assert.equal(measured.encodedAnimationSlotBytes,expected);assert.equal(measured.compatibilityWarnings.includes('embedded-verifier-above-compatibility-target'),expected>2000000);assert.equal(measured.hardBlockers.length,0);assert.equal(measured.status,'requires-selected-chain-simulation');
+ }
+});

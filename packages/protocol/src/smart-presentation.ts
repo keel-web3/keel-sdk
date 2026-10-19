@@ -27,6 +27,8 @@ export interface KeelSmartPresentationMeasurements {
   readonly completeTokenUriBytes?: number;
   readonly maximumTokenUriBytes?: number;
   readonly embeddedAnimationUriBytes?: number;
+  /** Actual animation contribution under the original outer URI/JSON grammar. */
+  readonly encodedAnimationSlotBytes?: number;
   readonly embeddedProgramBytes?: number;
   /** Payload bytes duplicated into persistent literal metadata, not return-memory encoding. */
   readonly literalMediaPrefixBytes?: number;
@@ -180,7 +182,7 @@ function freeze<T>(value: T): T {
 }
 function measurementsOf(input: KeelSmartPresentationMeasurements | undefined) {
   const result: Record<string, number | string> = {};
-  const byteKeys = ["imageUriBytes", "encodedImageSlotBytes", "completeTokenUriBytes", "maximumTokenUriBytes", "embeddedAnimationUriBytes", "embeddedProgramBytes", "literalMediaPrefixBytes", "prefixBytes", "suffixBytes", "maxEnvelopeBytes"];
+  const byteKeys = ["imageUriBytes", "encodedImageSlotBytes", "completeTokenUriBytes", "maximumTokenUriBytes", "embeddedAnimationUriBytes", "encodedAnimationSlotBytes", "embeddedProgramBytes", "literalMediaPrefixBytes", "prefixBytes", "suffixBytes", "maxEnvelopeBytes"];
   const gasKeys = ["executionGas", "maxExecutionGas", "stateGas", "maxStateGas", "readGas", "maxReadGas"];
   if (input !== undefined) {
     const values = record(input, [...byteKeys, ...gasKeys], "presentation measurements");
@@ -291,7 +293,7 @@ export function planKeelSmartAssetPresentation(input: KeelSmartAssetPresentation
   if (Number(selected.measurements.completeTokenUriBytes ?? 0) > KEEL_SMART_TOKEN_URI_MAX_BYTES && selected.selection.animation === "hybrid-shell") {
     if (execution === "static") suggestions.push({ candidateId: "image-only-inline", code: "review-image-only-to-save-space" });
     suggestions.push({ candidateId: "hybrid-verifier-only", code: "review-verifier-without-inline-grid-image" });
-    if (Number(selected.measurements.embeddedProgramBytes ?? 0) > KEEL_SMART_TOKEN_URI_MAX_BYTES) {
+    if (Number(selected.measurements.encodedAnimationSlotBytes ?? selected.measurements.embeddedAnimationUriBytes ?? 0) > KEEL_SMART_TOKEN_URI_MAX_BYTES) {
       suggestions.push({ candidateId: fallbackDelivery === "hosted" ? "hosted-presentation" : "ipfs-presentation", code: "embedded-verifier-alone-above-standard-target" });
       if (fallbackDelivery === undefined) suggestions.push({ code: "choose-ipfs-or-hosted-if-external-presentation-is-desired" });
     }
@@ -350,8 +352,8 @@ function stringMemberSpan(json: string, member: string) {
     whitespace(); const start = cursor, end = valueEnd(start); cursor = end; whitespace();
     const comma = json[cursor] === "," ? cursor : null;
     if (key === member) {
-      if (selected !== null) throw new TypeError("Duplicate metadata image members cannot be measured unambiguously.");
-      if (json[start] !== '"') throw new TypeError("Metadata image must be one unambiguous string member.");
+      if (selected !== null) throw new TypeError(`Duplicate metadata ${member} members cannot be measured unambiguously.`);
+      if (json[start] !== '"') throw new TypeError(`Metadata ${member} must be one unambiguous string member.`);
       selected = { memberStart: previousComma ?? keyStart, memberEnd: previousComma === null && comma !== null ? comma + 1 : end, valueStart: start, valueEnd: end };
     }
     if (comma === null) break;
@@ -361,8 +363,8 @@ function stringMemberSpan(json: string, member: string) {
 }
 /** Measure original percent spans or the original JSON bytes under its canonical
  * Base64 grammar. No alternate JSON serialization or URI escaping is introduced. */
-function encodedImageContribution(uri: string, json: string) {
-  const span = stringMemberSpan(json, "image"); if (!span) return null;
+function encodedMemberContribution(uri: string, json: string, member: string) {
+  const span = stringMemberSpan(json, member); if (!span) return null;
   const comma = uri.indexOf(","), body = uri.slice(comma + 1), utf8 = new TextEncoder();
   if (/;base64$/iu.test(uri.slice(0, comma))) {
     const raw = utf8.encode(json);
@@ -370,7 +372,7 @@ function encodedImageContribution(uri: string, json: string) {
     const memberBytes = utf8.encode(json.slice(span.memberStart, span.memberEnd)).length;
     const valueBytes = utf8.encode(json.slice(span.valueStart + 1, span.valueEnd - 1)).length;
     const encodedLength = (bytes: number) => 4 * Math.ceil(bytes / 3);
-    return { encodedImageSlotBytes: body.length - encodedLength(raw.length - memberBytes), encodedImageValueBytes: body.length - encodedLength(raw.length - valueBytes) };
+    return { encodedSlotBytes: body.length - encodedLength(raw.length - memberBytes), encodedValueBytes: body.length - encodedLength(raw.length - valueBytes) };
   }
   const positions = [...new Set([span.memberStart, span.memberEnd, span.valueStart + 1, span.valueEnd - 1])].map(position => ({ position, byteOffset: utf8.encode(json.slice(0, position)).length })).sort((a, b) => a.byteOffset - b.byteOffset);
   const offsets = new Map<number, number>(); let rawOffset = 0, decodedBytes = 0;
@@ -383,7 +385,7 @@ function encodedImageContribution(uri: string, json: string) {
     offsets.set(target.position, rawOffset);
   }
   const size = (start: number, end: number) => utf8.encode(body.slice(offsets.get(start)!, offsets.get(end)!)).length;
-  return { encodedImageSlotBytes: size(span.memberStart, span.memberEnd), encodedImageValueBytes: size(span.valueStart + 1, span.valueEnd - 1) };
+  return { encodedSlotBytes: size(span.memberStart, span.memberEnd), encodedValueBytes: size(span.valueStart + 1, span.valueEnd - 1) };
 }
 
 /** The renderer must assemble the complete chosen return, including every embedded instruction.
@@ -404,15 +406,20 @@ export async function measureKeelSmartAssetPresentation(plan: KeelSmartAssetPres
   if (plan.animation.delivery === "omitted") { if (metadata.animation_url !== undefined && metadata.animation_url !== null && metadata.animation_url !== "") hardBlockers.push("omitted-animation-selection-changed"); }
   else if (typeof metadata.animation_url !== "string" || !metadata.animation_url) hardBlockers.push("chosen-animation-required");
   let embeddedAnimationIntegrity: { digest: `0x${string}`; byteLength: number } | null = null, embeddedAnimationUriBytes: number | null = null;
+  let encodedAnimationSlotBytes: number | null = null, encodedAnimationValueBytes: number | null = null;
   if (plan.animation.delivery === "inline-shell" || plan.animation.delivery === "hybrid-shell") {
     if (typeof metadata.animation_url !== "string" || !/^data:text\/html[;,]/iu.test(metadata.animation_url)) hardBlockers.push("registered-animation-shell-required");
-    else { const bytes = decodeDataURI(metadata.animation_url); embeddedAnimationIntegrity = { digest: await sha256Hex(bytes), byteLength: bytes.length }; embeddedAnimationUriBytes = new TextEncoder().encode(metadata.animation_url).length; }
+    else { const bytes = decodeDataURI(metadata.animation_url); embeddedAnimationIntegrity = { digest: await sha256Hex(bytes), byteLength: bytes.length }; embeddedAnimationUriBytes = new TextEncoder().encode(metadata.animation_url).length;
+      const contribution = encodedMemberContribution(tokenURI, json, "animation_url");
+      if (contribution) { encodedAnimationSlotBytes = contribution.encodedSlotBytes; encodedAnimationValueBytes = contribution.encodedValueBytes; }
+      if ((encodedAnimationSlotBytes ?? embeddedAnimationUriBytes) > KEEL_SMART_TOKEN_URI_MAX_BYTES) compatibilityWarnings.push("embedded-verifier-above-compatibility-target");
+    }
   } else if ((plan.animation.delivery === "ipfs-shell" || plan.animation.delivery === "hosted-shell") && metadata.animation_url !== plan.animation.uri) hardBlockers.push("external-presentation-selection-changed");
   let imageUriBytes: number | null = null, encodedImageSlotBytes: number | null = null, encodedImageValueBytes: number | null = null;
   if (typeof metadata.image === "string") {
     imageUriBytes = new TextEncoder().encode(metadata.image).length;
-    const contribution = encodedImageContribution(tokenURI, json);
-    if (contribution) { encodedImageSlotBytes = contribution.encodedImageSlotBytes; encodedImageValueBytes = contribution.encodedImageValueBytes; }
+    const contribution = encodedMemberContribution(tokenURI, json, "image");
+    if (contribution) { encodedImageSlotBytes = contribution.encodedSlotBytes; encodedImageValueBytes = contribution.encodedValueBytes; }
     if (plan.image?.delivery === "inline") {
       if (!metadata.image.startsWith(`data:${plan.image.commitment.mediaType};`) && !metadata.image.startsWith(`data:${plan.image.commitment.mediaType},`)) hardBlockers.push("inline-grid-image-required");
       else { const bytes = decodeDataURI(metadata.image); if (bytes.length !== plan.image.commitment.byteLength || await sha256Hex(bytes) !== plan.image.commitment.digest) hardBlockers.push("inline-image-source-changed"); }
@@ -427,17 +434,17 @@ export async function measureKeelSmartAssetPresentation(plan: KeelSmartAssetPres
   if (completeTokenUriBytes > KEEL_SMART_TOKEN_URI_MAX_BYTES && plan.animation.delivery === "hybrid-shell") {
     if (plan.execution === "static") recommendations.push({ candidateId: "image-only-inline", code: "review-image-only-to-save-space" });
     recommendations.push({ candidateId: "hybrid-verifier-only", code: "review-verifier-without-inline-grid-image" });
-    if ((embeddedAnimationIntegrity?.byteLength ?? 0) > KEEL_SMART_TOKEN_URI_MAX_BYTES) recommendations.push({ candidateId: plan.fallbackDelivery === "hosted" ? "hosted-presentation" : "ipfs-presentation", code: "embedded-verifier-alone-above-standard-target" });
+    if ((encodedAnimationSlotBytes ?? embeddedAnimationUriBytes ?? 0) > KEEL_SMART_TOKEN_URI_MAX_BYTES) recommendations.push({ candidateId: plan.fallbackDelivery === "hosted" ? "hosted-presentation" : "ipfs-presentation", code: "embedded-verifier-alone-above-standard-target" });
   }
   const standardsCompatible = completeTokenUriBytes <= KEEL_SMART_TOKEN_URI_MAX_BYTES && (plan.image?.delivery !== "inline" || (imageUriBytes ?? 0) <= KEEL_SMART_INLINE_IMAGE_URI_MAX_BYTES && (encodedImageSlotBytes ?? 0) <= KEEL_SMART_INLINE_IMAGE_URI_MAX_BYTES);
   const compatibilityReviewRequired = !standardsCompatible && !plan.nonstandardCompatibilityAcknowledged || plan.image === null && !plan.omittedGridImageAcknowledged;
   const result = { schema: "keel-smart-presentation-return-measurement@1" as const, planKey: plan.planKey, acknowledgementKey: plan.acknowledgementKey,
-    tokenURI, completeTokenUriBytes, imageUriBytes, encodedImageSlotBytes, encodedImageValueBytes, embeddedAnimationIntegrity, embeddedAnimationUriBytes, standardsCompatible, measurementBasis: "actual-rendered-complete-return" as const,
+    tokenURI, completeTokenUriBytes, imageUriBytes, encodedImageSlotBytes, encodedImageValueBytes, encodedAnimationSlotBytes, encodedAnimationValueBytes, embeddedAnimationIntegrity, embeddedAnimationUriBytes, standardsCompatible, measurementBasis: "actual-rendered-complete-return" as const,
     hardBlockers: [...new Set(hardBlockers)], compatibilityWarnings: [...new Set(compatibilityWarnings)], recommendations,
     tokenUriDigest: await sha256Hex(new TextEncoder().encode(tokenURI)),
     status: hardBlockers.length ? "blocked" as const : compatibilityReviewRequired ? "compatibility-review-required" as const : "requires-selected-chain-simulation" as const,
     publicationReady: false as const, requiresExactFullSimulation: true as const };
-  return freeze({ ...result, measurementKey: canonicalJson({ tokenUriDigest: result.tokenUriDigest, completeTokenUriBytes, imageUriBytes, encodedImageSlotBytes, encodedImageValueBytes, embeddedAnimationIntegrity, embeddedAnimationUriBytes, selectedPlanKey: plan.planKey, standardsCompatible, hardBlockers: result.hardBlockers, compatibilityWarnings: result.compatibilityWarnings }) });
+  return freeze({ ...result, measurementKey: canonicalJson({ tokenUriDigest: result.tokenUriDigest, completeTokenUriBytes, imageUriBytes, encodedImageSlotBytes, encodedImageValueBytes, encodedAnimationSlotBytes, encodedAnimationValueBytes, embeddedAnimationIntegrity, embeddedAnimationUriBytes, selectedPlanKey: plan.planKey, standardsCompatible, hardBlockers: result.hardBlockers, compatibilityWarnings: result.compatibilityWarnings }) });
 }
 /** Measure only supported candidate adapters. Unavailable layouts stay visibly unqualified. */
 export async function measureKeelSmartPresentationMatrix(input: KeelSmartAssetPresentationInput,
@@ -459,7 +466,7 @@ export async function measureKeelSmartPresentationMatrix(input: KeelSmartAssetPr
   if (chosen && chosen.completeTokenUriBytes > KEEL_SMART_TOKEN_URI_MAX_BYTES && plan.animation.delivery === "hybrid-shell") {
     if (imageOnly && imageOnly.hardBlockers.length === 0 && imageOnly.completeTokenUriBytes <= KEEL_SMART_TOKEN_URI_MAX_BYTES) recommendations.push({ candidateId: "image-only-inline", code: "measured-image-only-within-standard-target", completeTokenUriBytes: imageOnly.completeTokenUriBytes });
     if (withoutImage && withoutImage.hardBlockers.length === 0) recommendations.push({ candidateId: "hybrid-verifier-only", code: withoutImage.completeTokenUriBytes <= KEEL_SMART_TOKEN_URI_MAX_BYTES ? "measured-verifier-without-grid-image-within-target" : "measured-verifier-only-metadata-above-target", completeTokenUriBytes: withoutImage.completeTokenUriBytes });
-    if (withoutImage && (withoutImage.embeddedAnimationIntegrity?.byteLength ?? 0) > KEEL_SMART_TOKEN_URI_MAX_BYTES) recommendations.push({ candidateId: plan.fallbackDelivery === "hosted" ? "hosted-presentation" : "ipfs-presentation", code: "review-external-presentation-after-measured-verifier-only", completeTokenUriBytes: withoutImage.completeTokenUriBytes });
+    if (withoutImage && (withoutImage.encodedAnimationSlotBytes ?? withoutImage.embeddedAnimationUriBytes ?? 0) > KEEL_SMART_TOKEN_URI_MAX_BYTES) recommendations.push({ candidateId: plan.fallbackDelivery === "hosted" ? "hosted-presentation" : "ipfs-presentation", code: "review-external-presentation-after-measured-verifier-only", completeTokenUriBytes: withoutImage.completeTokenUriBytes });
   }
   return freeze({ schema: "keel-smart-presentation-matrix-measurement@1" as const, planKey: plan.planKey, results, recommendations, publicationReady: false as const });
 }
