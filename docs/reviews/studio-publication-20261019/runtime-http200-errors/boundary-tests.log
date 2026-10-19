@@ -1,0 +1,316 @@
+TAP version 13
+# Subtest: governed SDK reader treats 401 as sticky terminal without fallback
+ok 1 - governed SDK reader treats 401 as sticky terminal without fallback
+  ---
+  duration_ms: 9.61175
+  type: 'test'
+  ...
+# Subtest: governed SDK reader treats 403 as sticky terminal without fallback
+ok 2 - governed SDK reader treats 403 as sticky terminal without fallback
+  ---
+  duration_ms: 0.2785
+  type: 'test'
+  ...
+# Subtest: governed reader retains genuine nested revert inside HTTP 200
+ok 3 - governed reader retains genuine nested revert inside HTTP 200
+  ---
+  duration_ms: 1.302167
+  type: 'test'
+  ...
+# Subtest: governed reader retains genuine nested revert inside HTTP 503
+ok 4 - governed reader retains genuine nested revert inside HTTP 503
+  ---
+  duration_ms: 0.325292
+  type: 'test'
+  ...
+# Subtest: governed thrown wrapper never becomes fallback: {"status":403}
+ok 5 - governed thrown wrapper never becomes fallback: {"status":403}
+  ---
+  duration_ms: 0.345417
+  type: 'test'
+  ...
+# Subtest: governed thrown wrapper never becomes fallback: {"status":503,"cause":{"code":3,"message":"execution reverted SECRET"}}
+ok 6 - governed thrown wrapper never becomes fallback: {"status":503,"cause":{"code":3,"message":"execution reverted SECRET"}}
+  ---
+  duration_ms: 0.104875
+  type: 'test'
+  ...
+# Subtest: governed incomplete/oversized error envelope fails closed without retry or another recipient: 80086
+ok 7 - governed incomplete/oversized error envelope fails closed without retry or another recipient: 80086
+  ---
+  duration_ms: 0.399084
+  type: 'test'
+  ...
+# Subtest: governed incomplete/oversized error envelope fails closed without retry or another recipient: 9
+ok 8 - governed incomplete/oversized error envelope fails closed without retry or another recipient: 9
+  ---
+  duration_ms: 0.337708
+  type: 'test'
+  ...
+# Subtest: governed incomplete/oversized error envelope fails closed without retry or another recipient: 65537
+ok 9 - governed incomplete/oversized error envelope fails closed without retry or another recipient: 65537
+  ---
+  duration_ms: 0.542792
+  type: 'test'
+  ...
+# Subtest: governed incomplete HTTP error stream times out fail-closed while preserving its physical lease
+ok 10 - governed incomplete HTTP error stream times out fail-closed while preserving its physical lease
+  ---
+  duration_ms: 21.140416
+  type: 'test'
+  ...
+# Subtest: governed full plain-text transport bodies retain fallback below/at the unchanged 64KiB cap
+ok 11 - governed full plain-text transport bodies retain fallback below/at the unchanged 64KiB cap
+  ---
+  duration_ms: 2.678542
+  type: 'test'
+  ...
+# Subtest: governed bounded malformed JSON media type and unknown RPC failures remain fail-closed
+ok 12 - governed bounded malformed JSON media type and unknown RPC failures remain fail-closed
+  ---
+  duration_ms: 0.715375
+  type: 'test'
+  ...
+# Subtest: governed fully correlated rate-limit envelope retries only the same exact operation
+ok 13 - governed fully correlated rate-limit envelope retries only the same exact operation
+  ---
+  duration_ms: 2.144458
+  type: 'test'
+  ...
+# Subtest: governed HTTP200 errors cannot fall through to successful alternate execution: {"code":-32000,"message":"VM Exception while processing transaction: revert CustomError()","data":"0
+ok 14 - governed HTTP200 errors cannot fall through to successful alternate execution: {"code":-32000,"message":"VM Exception while processing transaction: revert CustomError()","data":"0
+  ---
+  duration_ms: 0.27625
+  type: 'test'
+  ...
+# Subtest: governed HTTP200 errors cannot fall through to successful alternate execution: {"code":-32000,"message":"opaque contract failure","data":"0xdeadbeef"}
+ok 15 - governed HTTP200 errors cannot fall through to successful alternate execution: {"code":-32000,"message":"opaque contract failure","data":"0xdeadbeef"}
+  ---
+  duration_ms: 0.2015
+  type: 'test'
+  ...
+# Subtest: governed HTTP200 errors cannot fall through to successful alternate execution: {"code":-32005,"message":"execution reverted","data":"0xdeadbeef"}
+ok 16 - governed HTTP200 errors cannot fall through to successful alternate execution: {"code":-32005,"message":"execution reverted","data":"0xdeadbeef"}
+  ---
+  duration_ms: 0.118375
+  type: 'test'
+  ...
+# Subtest: governed HTTP200 errors cannot fall through to successful alternate execution: {"code":-32005,"message":"rate limit","data":{"cause":{"code":3,"message":"revert CustomError()"}}}
+ok 17 - governed HTTP200 errors cannot fall through to successful alternate execution: {"code":-32005,"message":"rate limit","data":{"cause":{"code":3,"message":"revert CustomError()"}}}
+  ---
+  duration_ms: 0.105292
+  type: 'test'
+  ...
+# Subtest: governed HTTP200 errors cannot fall through to successful alternate execution: {"code":-32005,"message":"xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+ok 18 - governed HTTP200 errors cannot fall through to successful alternate execution: {"code":-32005,"message":"xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+  ---
+  duration_ms: 0.728208
+  type: 'test'
+  ...
+# Subtest: governed HTTP200 errors cannot fall through to successful alternate execution: {"code":403,"message":"PRIVATE provider text"}
+ok 19 - governed HTTP200 errors cannot fall through to successful alternate execution: {"code":403,"message":"PRIVATE provider text"}
+  ---
+  duration_ms: 0.1595
+  type: 'test'
+  ...
+# Subtest: governed HTTP200 errors cannot fall through to successful alternate execution: "opaque failure"
+ok 20 - governed HTTP200 errors cannot fall through to successful alternate execution: "opaque failure"
+  ---
+  duration_ms: 0.115208
+  type: 'test'
+  ...
+# Subtest: governed HTTP200 correlated capacity error retains bounded exact-operation retry
+ok 21 - governed HTTP200 correlated capacity error retains bounded exact-operation retry
+  ---
+  duration_ms: 0.997708
+  type: 'test'
+  ...
+# Subtest: governed unsupported-selector fallback is restricted to exact canonical hash reads
+ok 22 - governed unsupported-selector fallback is restricted to exact canonical hash reads
+  ---
+  duration_ms: 1.298875
+  type: 'test'
+  ...
+# Subtest: governed reader limits physical fanout and retries only transient failures with identical calls
+ok 23 - governed reader limits physical fanout and retries only transient failures with identical calls
+  ---
+  duration_ms: 36.77575
+  type: 'test'
+  ...
+# Subtest: governed reader cancellation rejects its queue and dispatches no hidden reads
+ok 24 - governed reader cancellation rejects its queue and dispatches no hidden reads
+  ---
+  duration_ms: 0.528875
+  type: 'test'
+  ...
+# Subtest: governed reader rejects a timed-out uncooperative fetch while retaining the physical lease
+ok 25 - governed reader rejects a timed-out uncooperative fetch while retaining the physical lease
+  ---
+  duration_ms: 20.905958
+  type: 'test'
+  ...
+# Subtest: HTTP 401 is sticky terminal and never reaches another recipient
+ok 26 - HTTP 401 is sticky terminal and never reaches another recipient
+  ---
+  duration_ms: 11.140542
+  type: 'test'
+  ...
+# Subtest: HTTP 403 is sticky terminal and never reaches another recipient
+ok 27 - HTTP 403 is sticky terminal and never reaches another recipient
+  ---
+  duration_ms: 0.486042
+  type: 'test'
+  ...
+# Subtest: a genuine contract revert is terminal, never retried or switched to a provider returning success
+ok 28 - a genuine contract revert is terminal, never retried or switched to a provider returning success
+  ---
+  duration_ms: 0.503583
+  type: 'test'
+  ...
+# Subtest: thrown HTTP wrappers retain terminal denial/revert semantics: {"status":403}
+ok 29 - thrown HTTP wrappers retain terminal denial/revert semantics: {"status":403}
+  ---
+  duration_ms: 0.534125
+  type: 'test'
+  ...
+# Subtest: thrown HTTP wrappers retain terminal denial/revert semantics: {"status":503,"cause":{"code":3,"message":"execution reverted SECRET"}}
+ok 30 - thrown HTTP wrappers retain terminal denial/revert semantics: {"status":503,"cause":{"code":3,"message":"execution reverted SECRET"}}
+  ---
+  duration_ms: 0.569709
+  type: 'test'
+  ...
+# Subtest: browser incomplete/oversized error envelope fails closed without retry or another recipient: 80086
+ok 31 - browser incomplete/oversized error envelope fails closed without retry or another recipient: 80086
+  ---
+  duration_ms: 0.702375
+  type: 'test'
+  ...
+# Subtest: browser incomplete/oversized error envelope fails closed without retry or another recipient: 9
+ok 32 - browser incomplete/oversized error envelope fails closed without retry or another recipient: 9
+  ---
+  duration_ms: 0.612833
+  type: 'test'
+  ...
+# Subtest: browser incomplete/oversized error envelope fails closed without retry or another recipient: 65537
+ok 33 - browser incomplete/oversized error envelope fails closed without retry or another recipient: 65537
+  ---
+  duration_ms: 0.286708
+  type: 'test'
+  ...
+# Subtest: browser incomplete HTTP error stream times out fail-closed without another dispatch
+ok 34 - browser incomplete HTTP error stream times out fail-closed without another dispatch
+  ---
+  duration_ms: 16.637792
+  type: 'test'
+  ...
+# Subtest: browser full plain-text transport bodies retain fallback below/at the unchanged 64KiB cap
+ok 35 - browser full plain-text transport bodies retain fallback below/at the unchanged 64KiB cap
+  ---
+  duration_ms: 2.589542
+  type: 'test'
+  ...
+# Subtest: browser bounded malformed JSON media type and unknown RPC failures remain fail-closed
+ok 36 - browser bounded malformed JSON media type and unknown RPC failures remain fail-closed
+  ---
+  duration_ms: 0.821458
+  type: 'test'
+  ...
+# Subtest: browser fully correlated rate-limit envelope retries the same pinned operation
+ok 37 - browser fully correlated rate-limit envelope retries the same pinned operation
+  ---
+  duration_ms: 2.938125
+  type: 'test'
+  ...
+# Subtest: browser HTTP200 errors cannot fall through to successful alternate execution: {"code":-32000,"message":"VM Exception while processing transaction: revert CustomError()","data":"0
+ok 38 - browser HTTP200 errors cannot fall through to successful alternate execution: {"code":-32000,"message":"VM Exception while processing transaction: revert CustomError()","data":"0
+  ---
+  duration_ms: 0.27825
+  type: 'test'
+  ...
+# Subtest: browser HTTP200 errors cannot fall through to successful alternate execution: {"code":-32000,"message":"opaque contract failure","data":"0xdeadbeef"}
+ok 39 - browser HTTP200 errors cannot fall through to successful alternate execution: {"code":-32000,"message":"opaque contract failure","data":"0xdeadbeef"}
+  ---
+  duration_ms: 0.172209
+  type: 'test'
+  ...
+# Subtest: browser HTTP200 errors cannot fall through to successful alternate execution: {"code":-32005,"message":"execution reverted","data":"0xdeadbeef"}
+ok 40 - browser HTTP200 errors cannot fall through to successful alternate execution: {"code":-32005,"message":"execution reverted","data":"0xdeadbeef"}
+  ---
+  duration_ms: 0.138917
+  type: 'test'
+  ...
+# Subtest: browser HTTP200 errors cannot fall through to successful alternate execution: {"code":-32005,"message":"rate limit","data":{"cause":{"code":3,"message":"revert CustomError()"}}}
+ok 41 - browser HTTP200 errors cannot fall through to successful alternate execution: {"code":-32005,"message":"rate limit","data":{"cause":{"code":3,"message":"revert CustomError()"}}}
+  ---
+  duration_ms: 0.205084
+  type: 'test'
+  ...
+# Subtest: browser HTTP200 errors cannot fall through to successful alternate execution: {"code":-32005,"message":"xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+ok 42 - browser HTTP200 errors cannot fall through to successful alternate execution: {"code":-32005,"message":"xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+  ---
+  duration_ms: 0.17675
+  type: 'test'
+  ...
+# Subtest: browser HTTP200 errors cannot fall through to successful alternate execution: {"code":403,"message":"PRIVATE provider text"}
+ok 43 - browser HTTP200 errors cannot fall through to successful alternate execution: {"code":403,"message":"PRIVATE provider text"}
+  ---
+  duration_ms: 0.123208
+  type: 'test'
+  ...
+# Subtest: browser HTTP200 errors cannot fall through to successful alternate execution: "opaque failure"
+ok 44 - browser HTTP200 errors cannot fall through to successful alternate execution: "opaque failure"
+  ---
+  duration_ms: 0.123125
+  type: 'test'
+  ...
+# Subtest: browser HTTP200 correlated capacity error retains bounded exact pinned retry
+ok 45 - browser HTTP200 correlated capacity error retains bounded exact pinned retry
+  ---
+  duration_ms: 1.248875
+  type: 'test'
+  ...
+# Subtest: browser unsupported-selector exception cannot cover unrelated, unpinned or augmented RPC errors
+ok 46 - browser unsupported-selector exception cannot cover unrelated, unpinned or augmented RPC errors
+  ---
+  duration_ms: 1.766791
+  type: 'test'
+  ...
+# Subtest: pinned cache and in-flight identity include every execution argument and snapshot mutable inputs before awaiting
+ok 47 - pinned cache and in-flight identity include every execution argument and snapshot mutable inputs before awaiting
+  ---
+  duration_ms: 0.528833
+  type: 'test'
+  ...
+# Subtest: a large logical sequence dispatches only a bounded physical active window
+ok 48 - a large logical sequence dispatches only a bounded physical active window
+  ---
+  duration_ms: 48.62825
+  type: 'test'
+  ...
+# Subtest: Retry-After retries the same pinned read and completed identical reads resume from bounded cache
+ok 49 - Retry-After retries the same pinned read and completed identical reads resume from bounded cache
+  ---
+  duration_ms: 1.842459
+  type: 'test'
+  ...
+# Subtest: cancellation rejects queued work without dispatching it
+ok 50 - cancellation rejects queued work without dispatching it
+  ---
+  duration_ms: 0.293875
+  type: 'test'
+  ...
+# Subtest: a timed-out uncooperative physical read retains its slot, fails boundedly and ignores its late success
+ok 51 - a timed-out uncooperative physical read retains its slot, fails boundedly and ignores its late success
+  ---
+  duration_ms: 16.716083
+  type: 'test'
+  ...
+1..51
+# tests 51
+# suites 0
+# pass 51
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 142.861375
