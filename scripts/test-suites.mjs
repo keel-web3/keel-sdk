@@ -76,6 +76,7 @@ export const DETERMINISTIC_TEST_FILES = Object.freeze([
   "tests/viewer-chunk-store-cancellation.test.mjs",
   "tests/sdk-tezos-catalog.test.mjs",
   "tests/sdk-simulation-capacity-policy.test.mjs",
+  "tests/sdk-prepared-envelope-capability.test.mjs",
   "tests/sdk-legacy-prepared-dense-copy.test.mjs",
   "tests/sdk-legacy-shared-image.test.mjs",
   "tests/sdk-legacy-shared-image-core.test.mjs",
