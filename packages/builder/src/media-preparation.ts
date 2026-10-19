@@ -154,17 +154,17 @@ async function decodeMovie(binary: string, cwd: string, input: string, signal?:A
   const frames = stdout.split("\n").filter(line => /^0,/.test(line)).map(line => line.split(",").map(s=>s.trim()));
   if (!frames.length || frames.length > MAX_FRAMES || width*height*frames.length > MAX_MOVIE_PIXELS) throw new RangeError("Movie exceeds the bounded full-frame verification budget.");
   let timingFrames = frames, timingBase = tb;
-  if (avifSequence) {
-    // The rawvideo encoder used for decoded hashes can replace AV1 packet
+  {
+    // The rawvideo encoder used for decoded hashes can replace video packet
     // durations with its guessed frame rate. Read the exact muxed sequence
     // timeline separately and require a one-to-one match to decoded frames.
     const packets = await ffmpegRun(binary,cwd,["-protocol_whitelist","file,pipe","-threads","2","-i",input,"-map",videoMap,"-c:v","copy","-an","-frames:v",String(MAX_FRAMES+1),"-f","framehash","-hash","sha256","pipe:1"],signal);
     const packetBase = /^#tb 0:\s*(\d+)\/(\d+)/mu.exec(packets.stdout);
-    timingFrames = packets.stdout.split("\n").filter(line => /^0,/.test(line)).map(line => line.split(",").map(s=>s.trim()));
-    if (!packetBase || timingFrames.length !== frames.length) throw new Error("The AVIF packet timeline does not match every decoded frame.");
+    timingFrames = packets.stdout.split("\n").filter(line => /^0,/.test(line)).map(line => line.split(",").map(s=>s.trim())).sort((left,right) => Number(left[2])-Number(right[2]));
+    if (!packetBase || timingFrames.length !== frames.length) throw new Error("The movie packet timeline does not match every decoded frame.");
     timingBase = Number(packetBase[1])/Number(packetBase[2])*1000;
     const firstPacket = Number(timingFrames[0]![2]), firstDecoded = Number(frames[0]![2]);
-    if (timingFrames.some((frame,index) => Math.abs((Number(frame[2])-firstPacket)*timingBase - (Number(frames[index]![2])-firstDecoded)*tb) >= 0.51)) throw new Error("The AVIF packet timestamps do not match decoded frames.");
+    if (timingFrames.some((frame,index) => Math.abs((Number(frame[2])-firstPacket)*timingBase - (Number(frames[index]![2])-firstDecoded)*tb) >= 0.51)) throw new Error("The movie packet timestamps do not match decoded frames.");
   }
   const first = Number(timingFrames[0]![2]), times = timingFrames.map(f => (Number(f[2])-first)*timingBase), delays = timingFrames.map(f => Number(f[3])*timingBase);
   if (times.some(n=>!Number.isFinite(n)) || delays.some(n=>!Number.isFinite(n)||n<=0)) throw new Error("Movie frame timing is incomplete.");
@@ -218,14 +218,22 @@ async function movieCandidate(bytes: Uint8Array, recipe: KeelMediaEditRecipe, si
     else if (recipe.format === "avif") args.push("-c:v","libaom-av1","-crf",recipe.mode === "lossless" ? "0":crf,"-cpu-used","6","-pix_fmt",recipe.mode === "lossless" ? "gbrp":"yuv444p","-threads","2");
     else if (recipe.format === "webm") args.push("-c:v","libvpx-vp9","-lossless",recipe.mode === "lossless" ? "1":"0","-crf",recipe.mode === "lossless" ? "0":crf,"-b:v","0","-threads","2");
     else args.push("-c:v",recipe.mode === "lossless" ? "libx264rgb":"libx264","-crf",recipe.mode === "lossless" ? "0":crf,"-preset","medium","-threads","2");
-    // AV1 encoders can infer the final packet duration from the preceding
-    // timestamp. Commit every verified source delay explicitly to the muxer.
-    if (recipe.format === "avif") args.push("-bsf:v", "setts=duration='" + source.info.frameDurationsMs.map((duration,index) => `eq(N,${index})*${duration}/1000/TB`).join("+") + "'");
     const outputName = `candidate.${recipe.format}`; args.push("-n",outputName);
     await ffmpegRun(runtime.binary,dir,args,signal);
     const info = await stat(path.join(dir,outputName)); if (info.size>MAX_BYTES) throw new RangeError("Candidate exceeds the output byte budget.");
-    const output = new Uint8Array(await readFile(path.join(dir,outputName))); bounded(output);
-    const candidate = recipe.format === "webp" ? await decodeImage(output) : await decodeMovie(runtime.binary,dir,outputName,signal);
+    let output = new Uint8Array(await readFile(path.join(dir,outputName))); bounded(output);
+    let candidate = recipe.format === "webp" ? await decodeImage(output) : await decodeMovie(runtime.binary,dir,outputName,signal);
+    if (recipe.format !== "webp" && !sameTimeline(source.info,candidate.info)) {
+      // Some encoders infer the last duration from the preceding timestamp.
+      // Remux the encoded packets without changing their media bytes, assigning
+      // the exact verified source delay at each presentation timestamp.
+      const durations = source.info.frameDurationsMs.map((duration,index) => `eq(PTS,round(${source.info.frameTimesMs[index]!}/1000/TB))*${duration}/1000/TB`).join("+");
+      const corrected = `timed.${recipe.format}`;
+      await ffmpegRun(runtime.binary,dir,["-loglevel","error","-protocol_whitelist","file,pipe","-threads","2","-i",outputName,"-map",candidate.videoMap!,"-map","0:a?","-c","copy","-bsf:v",`setts=duration='${durations}'`,"-n",corrected],signal);
+      if ((await stat(path.join(dir,corrected))).size>MAX_BYTES) throw new RangeError("Candidate exceeds the output byte budget.");
+      output = new Uint8Array(await readFile(path.join(dir,corrected))); bounded(output);
+      candidate = await decodeMovie(runtime.binary,dir,corrected,signal);
+    }
     if (!sameTimeline(source.info,candidate.info) || source.info.width !== candidate.info.width || source.info.height !== candidate.info.height) throw new Error(`Movie ${recipe.format} candidate changed frames, timing or dimensions; original retained.`);
     if (!recipe.noSound && source.info.hasAudio !== candidate.info.hasAudio) throw new Error("Movie candidate changed audio presence; original retained.");
     if (recipe.mode === "lossless" && source.hashes.some((v,i)=>candidate.hashes[i]!==v)) throw new Error("Movie candidate failed full decoded pixel-losslessness verification; original retained.");
