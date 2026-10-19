@@ -47,3 +47,25 @@ test("rejects invalid references and unsafe IDs without restricting image payloa
   assert.throws(() => call({ kind: "uri", tokenId: -1, prefix: "ipfs://x" }), /non-negative/);
   assert.throws(() => call({ kind: "image", store, objectId: "0x12" }), /bytes32/);
 });
+
+test('native media adapter encodes every actual module route and keeps primary and poster references separate',async()=>{
+ const {buildKeelNativeMediaPresentationCall,keelNativeMediaPresentationAbi,KEEL_NATIVE_MEDIA_PRESENTATION_ROUTES}=await import('../packages/sdk/dist/keel721-presentation.js');
+ assert.deepEqual(KEEL_NATIVE_MEDIA_PRESENTATION_ROUTES,['native-fallback','image-only-inline','media-with-poster-inline','embedded-program','direct-reference']);
+ for(const [route,index] of KEEL_NATIVE_MEDIA_PRESENTATION_ROUTES.map((route,index)=>[route,index])){
+  const source=index===0?undefined:{store,objectId};
+  const result=buildKeelNativeMediaPresentationCall({collection,module,route,source,tokenId:7n});
+  const decoded=decodeFunctionData({abi:keelNativeMediaPresentationAbi,data:result.data});
+  assert.equal(decoded.functionName,'setNativeMediaSource');assert.deepEqual(decoded.args,[collection,7n,index,source?.store??'0x0000000000000000000000000000000000000000',source?.objectId??'0x'+'0'.repeat(64),false]);
+  assert.equal(result.to,module);assert.equal(result.value,0n);assert.equal((result.data.length-2)/2,196);
+ }
+ const poster=call({kind:'image',store,objectId:'0x'+'cd'.repeat(32)});
+ assert.notEqual(poster.data,buildKeelNativeMediaPresentationCall({collection,module,route:'media-with-poster-inline',source:{store,objectId}}).data);
+ const omitted=buildKeelNativeMediaPresentationCall({collection,module,route:'embedded-program',source:{store,objectId},omitImage:true});
+ assert.equal(decodeFunctionData({abi:keelNativeMediaPresentationAbi,data:omitted.data}).args[5],true);
+});
+test('native adapter cannot omit the image by accident, reuse an empty source or smuggle a fallback object',async()=>{
+ const {buildKeelNativeMediaPresentationCall}=await import('../packages/sdk/dist/keel721-presentation.js');
+ const base={collection,module,route:'image-only-inline',source:{store,objectId}};
+ for(const change of [{route:'unknown'},{source:undefined},{omitImage:true},{route:'native-fallback'},{tokenId:-1},{module:'0x0000000000000000000000000000000000000000'},{source:{store,objectId:'0x12'}}])assert.throws(()=>buildKeelNativeMediaPresentationCall({...base,...change}));
+ assert.throws(()=>buildKeelNativeMediaPresentationCall({...base,omitImage:'false'}),/explicit boolean/);
+});
