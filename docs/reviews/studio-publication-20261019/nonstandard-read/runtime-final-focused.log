@@ -1,0 +1,1304 @@
+TAP version 13
+# Subtest: shared planner no longer auto-acknowledges a fresh Base64 carriage
+ok 1 - shared planner no longer auto-acknowledges a fresh Base64 carriage
+  ---
+  duration_ms: 29.6635
+  type: 'test'
+  ...
+# Subtest: environment configuration cannot bypass fresh encoding review
+ok 2 - environment configuration cannot bypass fresh encoding review
+  ---
+  duration_ms: 0.160125
+  type: 'test'
+  ...
+# Subtest: complete compact COPY retains exact prepared bytes and binds the plan
+ok 3 - complete compact COPY retains exact prepared bytes and binds the plan
+  ---
+  duration_ms: 75.323625
+  type: 'test'
+  ...
+# Subtest: complete pinned COPY retains exact prepared bytes and binds the plan
+ok 4 - complete pinned COPY retains exact prepared bytes and binds the plan
+  ---
+  duration_ms: 42.721625
+  type: 'test'
+  ...
+# Subtest: complete percent COPY retains exact prepared bytes and binds the plan
+ok 5 - complete percent COPY retains exact prepared bytes and binds the plan
+  ---
+  duration_ms: 56.792125
+  type: 'test'
+  ...
+# Subtest: SDK refuses a prepared viewer plan with missing full-return evidence
+ok 6 - SDK refuses a prepared viewer plan with missing full-return evidence
+  ---
+  duration_ms: 35.576541
+  type: 'test'
+  ...
+# Subtest: SDK stops a different return, transport or source before producing a plan
+ok 7 - SDK stops a different return, transport or source before producing a plan
+  ---
+  duration_ms: 36.862083
+  type: 'test'
+  ...
+# Subtest: COPY checks are commitment-bound and cannot be stripped or moved to another chain/store
+ok 8 - COPY checks are commitment-bound and cannot be stripped or moved to another chain/store
+  ---
+  duration_ms: 40.633792
+  type: 'test'
+  ...
+# Subtest: read caps use the selected chain boundary and never stand in for authenticated gas proof
+ok 9 - read caps use the selected chain boundary and never stand in for authenticated gas proof
+  ---
+  duration_ms: 36.438375
+  type: 'test'
+  ...
+# Subtest: fresh MCP cannot select an alternative carriage under another presentation label
+ok 10 - fresh MCP cannot select an alternative carriage under another presentation label
+  ---
+  duration_ms: 146.6655
+  type: 'test'
+  ...
+# Subtest: MCP publish-plan requires evidence, reruns the SDK gate and rejects file tampering
+ok 11 - MCP publish-plan requires evidence, reruns the SDK gate and rejects file tampering
+  ---
+  duration_ms: 89.873209
+  type: 'test'
+  ...
+# Subtest: publication rejects browser-tolerated unescaped outer metadata
+ok 12 - publication rejects browser-tolerated unescaped outer metadata
+  ---
+  duration_ms: 33.651125
+  type: 'test'
+  ...
+# Subtest: publication rejects unescaped animation even when outer metadata is escaped
+ok 13 - publication rejects unescaped animation even when outer metadata is escaped
+  ---
+  duration_ms: 31.826417
+  type: 'test'
+  ...
+# Subtest: MCP publication check rejects unescaped characters at either URI boundary
+ok 14 - MCP publication check rejects unescaped characters at either URI boundary
+  ---
+  duration_ms: 72.562042
+  type: 'test'
+  ...
+# Subtest: compiler emits exact paid calls, predicted factory binding, mint route and full URI but no wallet request
+ok 15 - compiler emits exact paid calls, predicted factory binding, mint route and full URI but no wallet request
+  ---
+  duration_ms: 348.2015
+  type: 'test'
+  ...
+# Subtest: compiler rejects existing collections and mint manager drift before payment
+ok 16 - compiler rejects existing collections and mint manager drift before payment
+  ---
+  duration_ms: 594.128625
+  type: 'test'
+  ...
+# Subtest: compiler rejects missing transaction fees and invalid gas/URI bounds
+ok 17 - compiler rejects missing transaction fees and invalid gas/URI bounds
+  ---
+  duration_ms: 188.815791
+  type: 'test'
+  ...
+# Subtest: journal identity binds source, settings, exact fee quote and all source calls
+ok 18 - journal identity binds source, settings, exact fee quote and all source calls
+  ---
+  duration_ms: 303.409041
+  type: 'test'
+  ...
+# Subtest: exact cached validation is reused, while changed source calls change journal identity
+ok 19 - exact cached validation is reused, while changed source calls change journal identity
+  ---
+  duration_ms: 452.825875
+  type: 'test'
+  ...
+# Subtest: managed payload above 512KiB preserves its exact prepared graph under fee-aware publication
+ok 20 - managed payload above 512KiB preserves its exact prepared graph under fee-aware publication
+  ---
+  duration_ms: 408.04275
+  type: 'test'
+  ...
+# Subtest: legacy registered carriage fails before quoting or publishing fresh payloads
+ok 21 - legacy registered carriage fails before quoting or publishing fresh payloads
+  ---
+  duration_ms: 150.584375
+  type: 'test'
+  ...
+# {"schema":"keel-synthetic-complete-publication-program@1","sourceFixture":"Deterministic 735649-byte binary, not the private Retro GIF","syntheticContractReads":true,"selectedChainAuthenticated":false,"phaseCounts":{"upload":80,"validate":33,"create-collection":1,"bind":1,"mint-route":2,"mint":1},"calls":118,"sourceBytes":736875,"newStoredBytes":876661,"reusedStoredBytes":0,"completeTokenURIBytes":1066324,"completeTokenURISha256":"0xe8659f8867fb3cd056ad6d86b965e4dffc30bc61b390ce4be13e188d6a2c7633","serializedHttpRequestBytes":1810982,"simulationAccepted":false,"browserVerified":false,"actualRetroAcceptance":false,"signing":"not-performed","submission":"not-performed"}
+# Subtest: large synthetic source produces a complete immutable publication program through mint and exact metadata, not just a storage prefix
+ok 22 - large synthetic source produces a complete immutable publication program through mint and exact metadata, not just a storage prefix
+  ---
+  duration_ms: 2785.035208
+  type: 'test'
+  ...
+# Subtest: fresh above-target compilation measures before exact acknowledgement; unchanged calls then require full simulation before wallet
+ok 23 - fresh above-target compilation measures before exact acknowledgement; unchanged calls then require full simulation before wallet
+  ---
+  duration_ms: 1427.053292
+  type: 'test'
+  ...
+# Subtest: fresh creator journal exposes no wallet request until every remaining transaction and full read passes
+ok 24 - fresh creator journal exposes no wallet request until every remaining transaction and full read passes
+  ---
+  duration_ms: 155.877541
+  type: 'test'
+  ...
+# Subtest: verified receipts survive resume and exclude successful uploads from later replay
+ok 25 - verified receipts survive resume and exclude successful uploads from later replay
+  ---
+  duration_ms: 115.304042
+  type: 'test'
+  ...
+# Subtest: a persisted unknown wallet outcome blocks duplicate requests until rejection or exact receipt
+ok 26 - a persisted unknown wallet outcome blocks duplicate requests until rejection or exact receipt
+  ---
+  duration_ms: 93.054666
+  type: 'test'
+  ...
+# Subtest: governed SDK reader treats 401 as sticky terminal without fallback
+ok 27 - governed SDK reader treats 401 as sticky terminal without fallback
+  ---
+  duration_ms: 44.00025
+  type: 'test'
+  ...
+# Subtest: governed SDK reader treats 403 as sticky terminal without fallback
+ok 28 - governed SDK reader treats 403 as sticky terminal without fallback
+  ---
+  duration_ms: 0.2865
+  type: 'test'
+  ...
+# Subtest: governed reader retains genuine nested revert inside HTTP 200
+ok 29 - governed reader retains genuine nested revert inside HTTP 200
+  ---
+  duration_ms: 1.749625
+  type: 'test'
+  ...
+# Subtest: governed reader retains genuine nested revert inside HTTP 503
+ok 30 - governed reader retains genuine nested revert inside HTTP 503
+  ---
+  duration_ms: 0.347791
+  type: 'test'
+  ...
+# Subtest: governed thrown wrapper never becomes fallback: {"status":403}
+ok 31 - governed thrown wrapper never becomes fallback: {"status":403}
+  ---
+  duration_ms: 0.348083
+  type: 'test'
+  ...
+# Subtest: governed thrown wrapper never becomes fallback: {"status":503,"cause":{"code":3,"message":"execution reverted SECRET"}}
+ok 32 - governed thrown wrapper never becomes fallback: {"status":503,"cause":{"code":3,"message":"execution reverted SECRET"}}
+  ---
+  duration_ms: 0.109833
+  type: 'test'
+  ...
+# Subtest: governed reader limits physical fanout and retries only transient failures with identical calls
+ok 33 - governed reader limits physical fanout and retries only transient failures with identical calls
+  ---
+  duration_ms: 105.171917
+  type: 'test'
+  ...
+# Subtest: governed reader cancellation rejects its queue and dispatches no hidden reads
+ok 34 - governed reader cancellation rejects its queue and dispatches no hidden reads
+  ---
+  duration_ms: 0.887792
+  type: 'test'
+  ...
+# Subtest: governed reader rejects a timed-out uncooperative fetch while retaining the physical lease
+ok 35 - governed reader rejects a timed-out uncooperative fetch while retaining the physical lease
+  ---
+  duration_ms: 21.263666
+  type: 'test'
+  ...
+# Subtest: terminal page failure cannot trigger descriptor or alternate read: {"status":401}
+ok 36 - terminal page failure cannot trigger descriptor or alternate read: {"status":401}
+  ---
+  duration_ms: 1.074334
+  type: 'test'
+  ...
+# Subtest: terminal page failure cannot trigger descriptor or alternate read: {"cause":{"httpStatus":403}}
+ok 37 - terminal page failure cannot trigger descriptor or alternate read: {"cause":{"httpStatus":403}}
+  ---
+  duration_ms: 0.252042
+  type: 'test'
+  ...
+# Subtest: terminal page failure cannot trigger descriptor or alternate read: {"cause":{"code":3}}
+ok 38 - terminal page failure cannot trigger descriptor or alternate read: {"cause":{"code":3}}
+  ---
+  duration_ms: 0.202125
+  type: 'test'
+  ...
+# Subtest: terminal page failure cannot trigger descriptor or alternate read: {"terminal":true}
+ok 39 - terminal page failure cannot trigger descriptor or alternate read: {"terminal":true}
+  ---
+  duration_ms: 0.103125
+  type: 'test'
+  ...
+# Subtest: failed traversal resumes completed verified children only at the same pin and commitment; outputs never alias cache
+ok 40 - failed traversal resumes completed verified children only at the same pin and commitment; outputs never alias cache
+  ---
+  duration_ms: 29.767541
+  type: 'test'
+  ...
+# Subtest: cache storage/metadata is bounded and cancellation of one traversal cannot poison a later consumer
+ok 41 - cache storage/metadata is bounded and cancellation of one traversal cannot poison a later consumer
+  ---
+  duration_ms: 2.772792
+  type: 'test'
+  ...
+# Subtest: one failed worker stops sibling dispatch while another traversal remains usable
+ok 42 - one failed worker stops sibling dispatch while another traversal remains usable
+  ---
+  duration_ms: 2.296917
+  type: 'test'
+  ...
+# Subtest: HTTP 401 is sticky terminal and never reaches another recipient
+ok 43 - HTTP 401 is sticky terminal and never reaches another recipient
+  ---
+  duration_ms: 24.26275
+  type: 'test'
+  ...
+# Subtest: HTTP 403 is sticky terminal and never reaches another recipient
+ok 44 - HTTP 403 is sticky terminal and never reaches another recipient
+  ---
+  duration_ms: 0.542
+  type: 'test'
+  ...
+# Subtest: a genuine contract revert is terminal, never retried or switched to a provider returning success
+ok 45 - a genuine contract revert is terminal, never retried or switched to a provider returning success
+  ---
+  duration_ms: 0.521375
+  type: 'test'
+  ...
+# Subtest: thrown HTTP wrappers retain terminal denial/revert semantics: {"status":403}
+ok 46 - thrown HTTP wrappers retain terminal denial/revert semantics: {"status":403}
+  ---
+  duration_ms: 0.5175
+  type: 'test'
+  ...
+# Subtest: thrown HTTP wrappers retain terminal denial/revert semantics: {"status":503,"cause":{"code":3,"message":"execution reverted SECRET"}}
+ok 47 - thrown HTTP wrappers retain terminal denial/revert semantics: {"status":503,"cause":{"code":3,"message":"execution reverted SECRET"}}
+  ---
+  duration_ms: 0.5625
+  type: 'test'
+  ...
+# Subtest: a large logical sequence dispatches only a bounded physical active window
+ok 48 - a large logical sequence dispatches only a bounded physical active window
+  ---
+  duration_ms: 99.055667
+  type: 'test'
+  ...
+# Subtest: Retry-After retries the same pinned read and completed identical reads resume from bounded cache
+ok 49 - Retry-After retries the same pinned read and completed identical reads resume from bounded cache
+  ---
+  duration_ms: 4.368125
+  type: 'test'
+  ...
+# Subtest: cancellation rejects queued work without dispatching it
+ok 50 - cancellation rejects queued work without dispatching it
+  ---
+  duration_ms: 0.519584
+  type: 'test'
+  ...
+# Subtest: a timed-out uncooperative physical read retains its slot, fails boundedly and ignores its late success
+ok 51 - a timed-out uncooperative physical read retains its slot, fails boundedly and ignores its late success
+  ---
+  duration_ms: 18.198458
+  type: 'test'
+  ...
+# Subtest: fresh text is byte-identical through the stored slot, script JSON and both URI layers
+ok 52 - fresh text is byte-identical through the stored slot, script JSON and both URI layers
+  ---
+  duration_ms: 6.14125
+  type: 'test'
+  ...
+# Subtest: fresh canonical graph refuses hidden compressed Base64 body under raw-percent outer HTML
+ok 53 - fresh canonical graph refuses hidden compressed Base64 body under raw-percent outer HTML
+  ---
+  duration_ms: 42.826708
+  type: 'test'
+  ...
+# Subtest: audit measures base64 inflation while fresh publication rejects it
+ok 54 - audit measures base64 inflation while fresh publication rejects it
+  ---
+  duration_ms: 1.620875
+  type: 'test'
+  ...
+# Subtest: audit measures hex inflation while fresh publication rejects it
+ok 55 - audit measures hex inflation while fresh publication rejects it
+  ---
+  duration_ms: 1.141958
+  type: 'test'
+  ...
+# Subtest: a compressed child cannot bypass the body policy by claiming to be an image
+ok 56 - a compressed child cannot bypass the body policy by claiming to be an image
+  ---
+  duration_ms: 0.204541
+  type: 'test'
+  ...
+# Subtest: actual direct image carriage retains original bytes
+ok 57 - actual direct image carriage retains original bytes
+  ---
+  duration_ms: 0.246291
+  type: 'test'
+  ...
+# Subtest: audit rejects headers and URL delimiters that would make native decoding differ
+ok 58 - audit rejects headers and URL delimiters that would make native decoding differ
+  ---
+  duration_ms: 0.805666
+  type: 'test'
+  ...
+# Subtest: text byte corruption, conflicting representations and false compression fail
+ok 59 - text byte corruption, conflicting representations and false compression fail
+  ---
+  duration_ms: 0.435084
+  type: 'test'
+  ...
+# Subtest: serialized fresh-plan audit derives representation policy and totals instead of trusting flags
+ok 60 - serialized fresh-plan audit derives representation policy and totals instead of trusting flags
+  ---
+  duration_ms: 0.478
+  type: 'test'
+  ...
+# Subtest: public audit pins the full call to a block, rechecks identity and never signs or submits
+ok 61 - public audit pins the full call to a block, rechecks identity and never signs or submits
+  ---
+  duration_ms: 10.577792
+  type: 'test'
+  ...
+# Subtest: public read rejects chain drift, block drift, ABI corruption and oversize before evidence
+ok 62 - public read rejects chain drift, block drift, ABI corruption and oversize before evidence
+  ---
+  duration_ms: 24.682042
+  type: 'test'
+  ...
+# Subtest: MCP exposes the body rule and a read-only public-token audit, and blocks explicit encoded preparation
+ok 63 - MCP exposes the body rule and a read-only public-token audit, and blocks explicit encoded preparation
+  ---
+  duration_ms: 118.426917
+  type: 'test'
+  ...
+# Subtest: the host list accepts exactly what the contract accepts
+ok 64 - the host list accepts exactly what the contract accepts
+  ---
+  duration_ms: 0.976708
+  type: 'test'
+  ...
+# Subtest: the digest preimage is byte-identical to the one KeelManager hashes
+ok 65 - the digest preimage is byte-identical to the one KeelManager hashes
+  ---
+  duration_ms: 33.73525
+  type: 'test'
+  ...
+# Subtest: a list written by a rotated-out roster reads as stale rather than as policy
+ok 66 - a list written by a rotated-out roster reads as stale rather than as policy
+  ---
+  duration_ms: 0.409333
+  type: 'test'
+  ...
+# Subtest: an empty RPC list denies, where an empty gateway allowlist would not
+ok 67 - an empty RPC list denies, where an empty gateway allowlist would not
+  ---
+  duration_ms: 0.144
+  type: 'test'
+  ...
+# Subtest: endpoint matching is remoteUrlAllowed's, not a second opinion
+ok 68 - endpoint matching is remoteUrlAllowed's, not a second opinion
+  ---
+  duration_ms: 0.185667
+  type: 'test'
+  ...
+# Subtest: the sealed-document mirror agrees with remoteUrlAllowed on every vector
+ok 69 - the sealed-document mirror agrees with remoteUrlAllowed on every vector
+  ---
+  duration_ms: 0.703
+  type: 'test'
+  ...
+# Subtest: a rejected endpoint is reported by origin, never with its key
+ok 70 - a rejected endpoint is reported by origin, never with its key
+  ---
+  duration_ms: 0.120917
+  type: 'test'
+  ...
+# Subtest: a client cannot be built around an endpoint governance has not blessed
+ok 71 - a client cannot be built around an endpoint governance has not blessed
+  ---
+  duration_ms: 0.326875
+  type: 'test'
+  ...
+# Subtest: haulObject reads like a contract call and decodes what the node returns
+ok 72 - haulObject reads like a contract call and decodes what the node returns
+  ---
+  duration_ms: 9.490916
+  type: 'test'
+  ...
+# Subtest: Ethereum readers derive haulObject's selector from the live KeelHold signature
+ok 73 - Ethereum readers derive haulObject's selector from the live KeelHold signature
+  ---
+  duration_ms: 2.104125
+  type: 'test'
+  ...
+# Subtest: failover moves to the next endpoint and the disclosure names the one that answered
+ok 74 - failover moves to the next endpoint and the disclosure names the one that answered
+  ---
+  duration_ms: 0.931625
+  type: 'test'
+  ...
+# Subtest: a node that answers with other bytes is caught, and the answer names it
+ok 75 - a node that answers with other bytes is caught, and the answer names it
+  ---
+  duration_ms: 4.599167
+  type: 'test'
+  ...
+# Subtest: a Tezos client reads the same objects through the same call
+ok 76 - a Tezos client reads the same objects through the same call
+  ---
+  duration_ms: 0.656584
+  type: 'test'
+  ...
+# Subtest: decoders refuse a truncated or absent object instead of returning a short one
+ok 77 - decoders refuse a truncated or absent object instead of returning a short one
+  ---
+  duration_ms: 0.186583
+  type: 'test'
+  ...
+# Subtest: the genesis list is a usable default and covers both families
+ok 78 - the genesis list is a usable default and covers both families
+  ---
+  duration_ms: 0.06125
+  type: 'test'
+  ...
+# Subtest: governed provider failover remains transport configuration around exact native object references
+ok 79 - governed provider failover remains transport configuration around exact native object references
+  ---
+  duration_ms: 1.326125
+  type: 'test'
+  ...
+# Subtest: loader refuses ambiguous, ungoverned, duplicate and unbounded transport configurations
+ok 80 - loader refuses ambiguous, ungoverned, duplicate and unbounded transport configurations
+  ---
+  duration_ms: 0.418834
+  type: 'test'
+  ...
+# Subtest: portable loader reuses canonical governed transport and bounded native graph reader
+ok 81 - portable loader reuses canonical governed transport and bounded native graph reader
+  ---
+  duration_ms: 7.395208
+  type: 'test'
+  ...
+# Subtest: the bundled managed runtime verifies native bytes at a pinned hash and mounts the existing shell
+ok 82 - the bundled managed runtime verifies native bytes at a pinned hash and mounts the existing shell
+  ---
+  duration_ms: 65.552291
+  type: 'test'
+  ...
+# Subtest: the bundled managed runtime never mounts corrupt native object bytes
+ok 83 - the bundled managed runtime never mounts corrupt native object bytes
+  ---
+  duration_ms: 55.767666
+  type: 'test'
+  ...
+# (node:58310) ExperimentalWarning: The MockTimers API is an experimental feature and might change at any time
+# (Use `node --trace-warnings ...` to show where the warning was created)
+# Subtest: legacy clients retain one-read behavior and optional explicit block tags
+ok 84 - legacy clients retain one-read behavior and optional explicit block tags
+  ---
+  duration_ms: 31.455416
+  type: 'test'
+  ...
+# Subtest: concurrent artwork reads share one endpoint chain check before reading
+ok 85 - concurrent artwork reads share one endpoint chain check before reading
+  ---
+  duration_ms: 1.06525
+  type: 'test'
+  ...
+# Subtest: failover never reads a wrong-chain provider after an earlier endpoint passed identity
+ok 86 - failover never reads a wrong-chain provider after an earlier endpoint passed identity
+  ---
+  duration_ms: 3.559417
+  type: 'test'
+  ...
+# Subtest: concurrent wrong-chain failure shares the fallback identity check
+ok 87 - concurrent wrong-chain failure shares the fallback identity check
+  ---
+  duration_ms: 0.600666
+  type: 'test'
+  ...
+# Subtest: explicit identity checks are fresh and transient read failures invalidate prior identity
+ok 88 - explicit identity checks are fresh and transient read failures invalidate prior identity
+  ---
+  duration_ms: 0.656
+  type: 'test'
+  ...
+# Subtest: malformed chain identities cannot authorize a contract read
+ok 89 - malformed chain identities cannot authorize a contract read
+  ---
+  duration_ms: 0.556959
+  type: 'test'
+  ...
+# Subtest: concurrent reads wait for an explicit identity recheck instead of using cached trust
+ok 90 - concurrent reads wait for an explicit identity recheck instead of using cached trust
+  ---
+  duration_ms: 0.299833
+  type: 'test'
+  ...
+# Subtest: malformed contract/code byte strings are rejected before ABI consumers see them
+ok 91 - malformed contract/code byte strings are rejected before ABI consumers see them
+  ---
+  duration_ms: 3.3575
+  type: 'test'
+  ...
+# Subtest: HTTP failures, redirects, malformed JSON and invalid JSON-RPC envelopes fail over safely
+ok 92 - HTTP failures, redirects, malformed JSON and invalid JSON-RPC envelopes fail over safely
+  ---
+  duration_ms: 4.429875
+  type: 'test'
+  ...
+# Subtest: timeouts cover stalled fetch and JSON bodies, abort requests and ignore late identity results
+    # Subtest: stalled fetch
+    ok 1 - stalled fetch
+      ---
+      duration_ms: 1.494542
+      type: 'test'
+      ...
+    # Subtest: stalled JSON body
+    ok 2 - stalled JSON body
+      ---
+      duration_ms: 0.270167
+      type: 'test'
+      ...
+    1..2
+ok 93 - timeouts cover stalled fetch and JSON bodies, abort requests and ignore late identity results
+  ---
+  duration_ms: 3.102459
+  type: 'test'
+  ...
+# Subtest: exhaustion and disclosure never expose provider keys or error bodies
+ok 94 - exhaustion and disclosure never expose provider keys or error bodies
+  ---
+  duration_ms: 0.6665
+  type: 'test'
+  ...
+# Subtest: a stalled artwork request fails over only after the fallback proves chain and block
+ok 95 - a stalled artwork request fails over only after the fallback proves chain and block
+  ---
+  duration_ms: 0.656125
+  type: 'test'
+  ...
+# Subtest: pinBlock shares one immutable header and concurrent reads share its endpoint check
+ok 96 - pinBlock shares one immutable header and concurrent reads share its endpoint check
+  ---
+  duration_ms: 0.32475
+  type: 'test'
+  ...
+# Subtest: pinned failover verifies chain and matching block number/hash before every new provider
+ok 97 - pinned failover verifies chain and matching block number/hash before every new provider
+  ---
+  duration_ms: 0.44925
+  type: 'test'
+  ...
+# Subtest: incompatible EIP-1898 providers fail over without numeric or latest downgrade
+ok 98 - incompatible EIP-1898 providers fail over without numeric or latest downgrade
+  ---
+  duration_ms: 4.326417
+  type: 'test'
+  ...
+# Subtest: missing, malformed or mismatched pinned headers fail closed without artwork reads
+ok 99 - missing, malformed or mismatched pinned headers fail closed without artwork reads
+  ---
+  duration_ms: 0.900167
+  type: 'test'
+  ...
+# Subtest: invalid transport options and denied hosts fail before requests
+ok 100 - invalid transport options and denied hosts fail before requests
+  ---
+  duration_ms: 0.226042
+  type: 'test'
+  ...
+# Subtest: managed runtime opts into endpoint identity/block pinning and retains root integrity gates
+ok 101 - managed runtime opts into endpoint identity/block pinning and retains root integrity gates
+  ---
+  duration_ms: 11.227875
+  type: 'test'
+  ...
+# Subtest: standard read bounds stay exactly 2M and 60M; ABI/padding/hex/JSON are counted independently
+ok 102 - standard read bounds stay exactly 2M and 60M; ABI/padding/hex/JSON are counted independently
+  ---
+  duration_ms: 0.724417
+  type: 'test'
+  ...
+# Subtest: only the exact acknowledged identity and physical bounds can authorize above-target inspection
+ok 103 - only the exact acknowledged identity and physical bounds can authorize above-target inspection
+  ---
+  duration_ms: 96.209708
+  type: 'test'
+  ...
+# Subtest: policy snapshots cannot be mutated during the first async digest and decoder limits remain separate
+ok 104 - policy snapshots cannot be mutated during the first async digest and decoder limits remain separate
+  ---
+  duration_ms: 63.656375
+  type: 'test'
+  ...
+# Subtest: unsigned budget permits preparation before final measurement and does not become read authority
+ok 105 - unsigned budget permits preparation before final measurement and does not become read authority
+  ---
+  duration_ms: 3.611667
+  type: 'test'
+  ...
+# Subtest: prepared aligned Base64 is inferred and copied exactly, with zero new source bytes
+ok 106 - prepared aligned Base64 is inferred and copied exactly, with zero new source bytes
+  ---
+  duration_ms: 42.850584
+  type: 'test'
+  ...
+# Subtest: raw-percent and percent infer exact existing carriages without repadding
+ok 107 - raw-percent and percent infer exact existing carriages without repadding
+  ---
+  duration_ms: 80.286291
+  type: 'test'
+  ...
+# Subtest: existing URI81 registrations retain RFC-valid literals and exact object bytes
+ok 108 - existing URI81 registrations retain RFC-valid literals and exact object bytes
+  ---
+  duration_ms: 36.16375
+  type: 'test'
+  ...
+# Subtest: full shell plus prepared body media infers follow-latest and preserves body IDs
+ok 109 - full shell plus prepared body media infers follow-latest and preserves body IDs
+  ---
+  duration_ms: 8.492875
+  type: 'test'
+  ...
+# Subtest: explicit mismatching carriage and direct helper fail before fresh encoding
+ok 110 - explicit mismatching carriage and direct helper fail before fresh encoding
+  ---
+  duration_ms: 13.484959
+  type: 'test'
+  ...
+# Subtest: assembly-only requires every ordered part and forbids creator or unused parts
+ok 111 - assembly-only requires every ordered part and forbids creator or unused parts
+  ---
+  duration_ms: 8.26025
+  type: 'test'
+  ...
+# Subtest: selected-chain store and nonzero exact object IDs are mandatory
+ok 112 - selected-chain store and nonzero exact object IDs are mandatory
+  ---
+  duration_ms: 13.733791
+  type: 'test'
+  ...
+# Subtest: unsupported raw binary and mixed prepared media never transcode
+ok 113 - unsupported raw binary and mixed prepared media never transcode
+  ---
+  duration_ms: 17.146958
+  type: 'test'
+  ...
+# Subtest: stored SHA, exact lengths and compression are checked before assembly
+ok 114 - stored SHA, exact lengths and compression are checked before assembly
+  ---
+  duration_ms: 13.574958
+  type: 'test'
+  ...
+# Subtest: source edits, root edits and local unpadded source cannot hide behind old receipts
+ok 115 - source edits, root edits and local unpadded source cannot hide behind old receipts
+  ---
+  duration_ms: 19.022417
+  type: 'test'
+  ...
+# Subtest: shell order, exact Base64 alignment and inconsistent immutable IDs fail closed
+ok 116 - shell order, exact Base64 alignment and inconsistent immutable IDs fail closed
+  ---
+  duration_ms: 8.981208
+  type: 'test'
+  ...
+# Subtest: inspection clones Buffer-backed bytes rather than exposing caller aliasing
+ok 117 - inspection clones Buffer-backed bytes rather than exposing caller aliasing
+  ---
+  duration_ms: 2.798084
+  type: 'test'
+  ...
+# Subtest: ordinary default and explicit local carriage outputs remain byte-identical
+ok 118 - ordinary default and explicit local carriage outputs remain byte-identical
+  ---
+  duration_ms: 11.367916
+  type: 'test'
+  ...
+# Subtest: async digest suspension cannot change selected chain, future receipts, order or carriage
+ok 119 - async digest suspension cannot change selected chain, future receipts, order or carriage
+  ---
+  duration_ms: 8.690292
+  type: 'test'
+  ...
+# Subtest: async digest suspension compares root against its entry-time snapshot
+ok 120 - async digest suspension compares root against its entry-time snapshot
+  ---
+  duration_ms: 6.442417
+  type: 'test'
+  ...
+# Subtest: receipt module identity and execution labels cannot silently override the root
+ok 121 - receipt module identity and execution labels cannot silently override the root
+  ---
+  duration_ms: 9.296417
+  type: 'test'
+  ...
+# Subtest: Inline creator bytes reject hidden external URL sentinels before packing
+ok 122 - Inline creator bytes reject hidden external URL sentinels before packing
+  ---
+  duration_ms: 1.816208
+  type: 'test'
+  ...
+# Subtest: Inline locator check distinguishes minified ar variables from Arweave references
+ok 123 - Inline locator check distinguishes minified ar variables from Arweave references
+  ---
+  duration_ms: 3.058083
+  type: 'test'
+  ...
+# Subtest: inline SVG image carriage avoids double Base64 while retaining exact bytes
+ok 124 - inline SVG image carriage avoids double Base64 while retaining exact bytes
+  ---
+  duration_ms: 12.122625
+  type: 'test'
+  ...
+# Subtest: collector Inline rejects off-chain resources while allowing navigation links and protocol text
+ok 125 - collector Inline rejects off-chain resources while allowing navigation links and protocol text
+  ---
+  duration_ms: 0.875875
+  type: 'test'
+  ...
+# Subtest: composable Base64 fragments equal one traditional outer encoding across UTF-8 boundaries
+ok 126 - composable Base64 fragments equal one traditional outer encoding across UTF-8 boundaries
+  ---
+  duration_ms: 45.990542
+  type: 'test'
+  ...
+# Subtest: hundreds of reordered composable JSON fragments remain one deterministic Base64 stream
+ok 127 - hundreds of reordered composable JSON fragments remain one deterministic Base64 stream
+  ---
+  duration_ms: 54.748208
+  type: 'test'
+  ...
+# Subtest: inline JSON escaping closes script parser hazards before byte alignment
+ok 128 - inline JSON escaping closes script parser hazards before byte alignment
+  ---
+  duration_ms: 0.197916
+  type: 'test'
+  ...
+# Subtest: composable Base64 rejects malformed Unicode and padded non-terminal fragments
+ok 129 - composable Base64 rejects malformed Unicode and padded non-terminal fragments
+  ---
+  duration_ms: 0.251083
+  type: 'test'
+  ...
+# Subtest: Gzip Inline graph reuses shell and p5 fragments and publishes only creator bytes
+ok 130 - Gzip Inline graph reuses shell and p5 fragments and publishes only creator bytes
+  ---
+  duration_ms: 342.447625
+  type: 'test'
+  ...
+# Subtest: historical compressed assets remain exact locally while fresh Inline rejects encoded body copies
+ok 131 - historical compressed assets remain exact locally while fresh Inline rejects encoded body copies
+  ---
+  duration_ms: 20.390041
+  type: 'test'
+  ...
+# Subtest: canonical Inline publication has one shell top, ordered middle, and one shell bottom
+ok 132 - canonical Inline publication has one shell top, ordered middle, and one shell bottom
+  ---
+  duration_ms: 23.342667
+  type: 'test'
+  ...
+# Subtest: creator HTML is one verified middle slot inside the canonical shell
+ok 133 - creator HTML is one verified middle slot inside the canonical shell
+  ---
+  duration_ms: 19.194166
+  type: 'test'
+  ...
+# Subtest: normal media uses the registered shell and asset-display module without a creator wrapper
+ok 134 - normal media uses the registered shell and asset-display module without a creator wrapper
+  ---
+  duration_ms: 38.086125
+  type: 'test'
+  ...
+# Subtest: normal-media default compact graphs accept only the registered shell and display module
+ok 135 - normal-media default compact graphs accept only the registered shell and display module
+  ---
+  duration_ms: 100.650875
+  type: 'test'
+  ...
+# Subtest: published canonical fragments survive platform-specific module recompression
+ok 136 - published canonical fragments survive platform-specific module recompression
+  ---
+  duration_ms: 52.315583
+  type: 'test'
+  ...
+# Subtest: fresh Base64 encoding requires acknowledgement and ignores the environment bypass
+ok 137 - fresh Base64 encoding requires acknowledgement and ignores the environment bypass
+  ---
+  duration_ms: 0.214208
+  type: 'test'
+  ...
+# Subtest: default saver keeps raw text unchanged through SDK, publication reuse, and metadata
+ok 138 - default saver keeps raw text unchanged through SDK, publication reuse, and metadata
+  ---
+  duration_ms: 122.827792
+  type: 'test'
+  ...
+# Subtest: unknown RPC failures retain method, numeric code and HTTP cause without exposing payloads or credentials
+ok 139 - unknown RPC failures retain method, numeric code and HTTP cause without exposing payloads or credentials
+  ---
+  duration_ms: 7.382416
+  type: 'test'
+  ...
+# Subtest: diagnostics bound cyclic causes and allow only enumerated names, methods, phases and transport codes
+ok 140 - diagnostics bound cyclic causes and allow only enumerated names, methods, phases and transport codes
+  ---
+  duration_ms: 0.450666
+  type: 'test'
+  ...
+# Subtest: pre-funding simulation uses exact ordered calls without signing or state overrides and verifies full bytes
+ok 141 - pre-funding simulation uses exact ordered calls without signing or state overrides and verifies full bytes
+  ---
+  duration_ms: 15.184375
+  type: 'test'
+  ...
+# Subtest: complete metadata oversize and invalid override-like fields fail before any RPC
+ok 142 - complete metadata oversize and invalid override-like fields fail before any RPC
+  ---
+  duration_ms: 0.706042
+  type: 'test'
+  ...
+# Subtest: every direct transport simulation phase rejects silent gas clamping before an apparent revert
+ok 143 - every direct transport simulation phase rejects silent gas clamping before an apparent revert
+  ---
+  duration_ms: 5.315291
+  type: 'test'
+  ...
+# Subtest: every direct transport simulation phase requires complete exact transaction envelopes
+ok 144 - every direct transport simulation phase requires complete exact transaction envelopes
+  ---
+  duration_ms: 73.609333
+  type: 'test'
+  ...
+# Subtest: all returned envelopes are checked before interpreting any execution failure
+ok 145 - all returned envelopes are checked before interpreting any execution failure
+  ---
+  duration_ms: 0.576959
+  type: 'test'
+  ...
+# Subtest: every direct transport replay verifies the explicit atomic nonce before interpreting a revert
+ok 146 - every direct transport replay verifies the explicit atomic nonce before interpreting a revert
+  ---
+  duration_ms: 8.66625
+  type: 'test'
+  ...
+# Subtest: wrong chain, code, byte mismatch, revert, gas limit and reorg cannot produce a proof
+ok 147 - wrong chain, code, byte mismatch, revert, gas limit and reorg cannot produce a proof
+  ---
+  duration_ms: 4.656125
+  type: 'test'
+  ...
+# Subtest: unsupported and capped providers remain explicit unavailable evidence without secrets or automatic fallback
+ok 148 - unsupported and capped providers remain explicit unavailable evidence without secrets or automatic fallback
+  ---
+  duration_ms: 4.50925
+  type: 'test'
+  ...
+# Subtest: proof fingerprint changes with the exact plan, calldata and complete metadata
+ok 149 - proof fingerprint changes with the exact plan, calldata and complete metadata
+  ---
+  duration_ms: 9.396292
+  type: 'test'
+  ...
+# Subtest: the wallet-boundary guard rejects missing, expired or changed funding evidence
+ok 150 - the wallet-boundary guard rejects missing, expired or changed funding evidence
+  ---
+  duration_ms: 5.749042
+  type: 'test'
+  ...
+# Subtest: explicit storage-only simulation verifies its predicted object without claiming collector metadata readiness
+ok 151 - explicit storage-only simulation verifies its predicted object without claiming collector metadata readiness
+  ---
+  duration_ms: 3.361625
+  type: 'test'
+  ...
+# Subtest: public metadata read gas is independent of the transaction cap while every planned transaction stays validated
+ok 152 - public metadata read gas is independent of the transaction cap while every planned transaction stays validated
+  ---
+  duration_ms: 1.794834
+  type: 'test'
+  ...
+# Subtest: ephemeral mint context is excluded from validated wallet transactions and bound to the exact collection target
+ok 153 - ephemeral mint context is excluded from validated wallet transactions and bound to the exact collection target
+  ---
+  duration_ms: 1.105833
+  type: 'test'
+  ...
+# Subtest: a provider cannot substitute the pinned block or contradict success with an execution error
+ok 154 - a provider cannot substitute the pinned block or contradict success with an execution error
+  ---
+  duration_ms: 4.845833
+  type: 'test'
+  ...
+# Subtest: transaction validation cannot rely on zero-fee RPC defaults or a malformed mixed fee envelope
+ok 155 - transaction validation cannot rely on zero-fee RPC defaults or a malformed mixed fee envelope
+  ---
+  duration_ms: 0.817
+  type: 'test'
+  ...
+# Subtest: validated gas envelopes use pre-refund maximum gas and reject absent or contradictory evidence
+ok 156 - validated gas envelopes use pre-refund maximum gas and reject absent or contradictory evidence
+  ---
+  duration_ms: 3.045
+  type: 'test'
+  ...
+# Subtest: required standalone reader gates are bounded, byte-verified and included in proof identity
+ok 157 - required standalone reader gates are bounded, byte-verified and included in proof identity
+  ---
+  duration_ms: 3.779917
+  type: 'test'
+  ...
+# Subtest: read replay retries only an explicit smaller provider ceiling and records it without changing transactions
+ok 158 - read replay retries only an explicit smaller provider ceiling and records it without changing transactions
+  ---
+  duration_ms: 0.780041
+  type: 'test'
+  ...
+# Subtest: callers cannot raise shared Inline gas/output ceilings to manufacture preflight success
+ok 159 - callers cannot raise shared Inline gas/output ceilings to manufacture preflight success
+  ---
+  duration_ms: 0.966333
+  type: 'test'
+  ...
+# Subtest: asynchronous caller mutation cannot raise snapshotted read limits or output policy
+ok 160 - asynchronous caller mutation cannot raise snapshotted read limits or output policy
+  ---
+  duration_ms: 0.534542
+  type: 'test'
+  ...
+# Subtest: nested execution must actually succeed with its margin reserved, not merely report low consumed gas
+ok 161 - nested execution must actually succeed with its margin reserved, not merely report low consumed gas
+  ---
+  duration_ms: 0.372792
+  type: 'test'
+  ...
+# Subtest: reserved reader allowance honors smaller per-call gas and rejects impossible margins before RPC
+ok 162 - reserved reader allowance honors smaller per-call gas and rejects impossible margins before RPC
+  ---
+  duration_ms: 0.434917
+  type: 'test'
+  ...
+# Subtest: provider-cap retries reserve the standalone margin again at the reduced ceiling
+ok 163 - provider-cap retries reserve the standalone margin again at the reduced ceiling
+  ---
+  duration_ms: 1.686041
+  type: 'test'
+  ...
+# Subtest: Amsterdam accepts high aggregate only through bounded strict fork validation and fingerprints its policy
+ok 164 - Amsterdam accepts high aggregate only through bounded strict fork validation and fingerprints its policy
+  ---
+  duration_ms: 1.237833
+  type: 'test'
+  ...
+# Subtest: Amsterdam simulation without linked current-fork block headers cannot issue funding proof
+ok 165 - Amsterdam simulation without linked current-fork block headers cannot issue funding proof
+  ---
+  duration_ms: 0.305292
+  type: 'test'
+  ...
+# Subtest: Amsterdam discovery success cannot bypass strict execution-dimension rejection
+ok 166 - Amsterdam discovery success cannot bypass strict execution-dimension rejection
+  ---
+  duration_ms: 0.311
+  type: 'test'
+  ...
+# Subtest: Amsterdam retains the total transaction budget when execution consumption omits fresh state
+ok 167 - Amsterdam retains the total transaction budget when execution consumption omits fresh state
+  ---
+  duration_ms: 1.93525
+  type: 'test'
+  ...
+# Subtest: missing selected-block timestamp fails before any simulation
+ok 168 - missing selected-block timestamp fails before any simulation
+  ---
+  duration_ms: 0.622292
+  type: 'test'
+  ...
+# Subtest: a synthetic future sequence crossing the selected fork must replan instead of reusing old policy
+ok 169 - a synthetic future sequence crossing the selected fork must replan instead of reusing old policy
+  ---
+  duration_ms: 0.355958
+  type: 'test'
+  ...
+# Subtest: atomic wallet preflight validates its real fee envelope on every preparation replay
+ok 170 - atomic wallet preflight validates its real fee envelope on every preparation replay
+  ---
+  duration_ms: 2.203167
+  type: 'test'
+  ...
+# Subtest: explicit atomic nonce survives every replay and invalid nonce fails before RPC
+ok 171 - explicit atomic nonce survives every replay and invalid nonce fails before RPC
+  ---
+  duration_ms: 1.711667
+  type: 'test'
+  ...
+# Subtest: publication fee envelope: pre-Amsterdam, independent, EIP-1559
+ok 172 - publication fee envelope: pre-Amsterdam, independent, EIP-1559
+  ---
+  duration_ms: 2.111291
+  type: 'test'
+  ...
+# Subtest: publication fee envelope: pre-Amsterdam, independent, legacy
+ok 173 - publication fee envelope: pre-Amsterdam, independent, legacy
+  ---
+  duration_ms: 1.201334
+  type: 'test'
+  ...
+# Subtest: publication fee envelope: pre-Amsterdam, atomic, EIP-1559
+ok 174 - publication fee envelope: pre-Amsterdam, atomic, EIP-1559
+  ---
+  duration_ms: 0.864
+  type: 'test'
+  ...
+# Subtest: publication fee envelope: pre-Amsterdam, atomic, legacy
+ok 175 - publication fee envelope: pre-Amsterdam, atomic, legacy
+  ---
+  duration_ms: 1.430917
+  type: 'test'
+  ...
+# Subtest: publication fee envelope: Amsterdam, independent, EIP-1559
+ok 176 - publication fee envelope: Amsterdam, independent, EIP-1559
+  ---
+  duration_ms: 1.456041
+  type: 'test'
+  ...
+# Subtest: publication fee envelope: Amsterdam, independent, legacy
+ok 177 - publication fee envelope: Amsterdam, independent, legacy
+  ---
+  duration_ms: 1.3775
+  type: 'test'
+  ...
+# Subtest: publication fee envelope: Amsterdam, atomic, EIP-1559
+ok 178 - publication fee envelope: Amsterdam, atomic, EIP-1559
+  ---
+  duration_ms: 0.971625
+  type: 'test'
+  ...
+# Subtest: publication fee envelope: Amsterdam, atomic, legacy
+ok 179 - publication fee envelope: Amsterdam, atomic, legacy
+  ---
+  duration_ms: 0.873959
+  type: 'test'
+  ...
+# Subtest: close diagnostics allow only bounded codes, classified reasons and retry counts
+ok 180 - close diagnostics allow only bounded codes, classified reasons and retry counts
+  ---
+  duration_ms: 0.743375
+  type: 'test'
+  ...
+# Subtest: capacity and size attempt diagnostics preserve only bounded numeric evidence and approved protocol/stage
+ok 181 - capacity and size attempt diagnostics preserve only bounded numeric evidence and approved protocol/stage
+  ---
+  duration_ms: 0.315875
+  type: 'test'
+  ...
+# Subtest: selected provider diagnostics preserve opaque identity and observed envelopes without leaking endpoint text
+ok 182 - selected provider diagnostics preserve opaque identity and observed envelopes without leaking endpoint text
+  ---
+  duration_ms: 0.263583
+  type: 'test'
+  ...
+# Subtest: selected EVM chain 1 discovers sufficient provider capacity below the chain maximum and strictly validates the complete program
+ok 183 - selected EVM chain 1 discovers sufficient provider capacity below the chain maximum and strictly validates the complete program
+  ---
+  duration_ms: 2.630292
+  type: 'test'
+  ...
+# Subtest: selected EVM chain 11155111 discovers sufficient provider capacity below the chain maximum and strictly validates the complete program
+ok 184 - selected EVM chain 11155111 discovers sufficient provider capacity below the chain maximum and strictly validates the complete program
+  ---
+  duration_ms: 4.274
+  type: 'test'
+  ...
+# Subtest: discovery cannot shrink the measured transaction margin to fit an insufficient provider
+ok 185 - discovery cannot shrink the measured transaction margin to fit an insufficient provider
+  ---
+  duration_ms: 1.464667
+  type: 'test'
+  ...
+# Subtest: successful capacity discovery never accepts or retries a silently clamped strict transaction
+ok 186 - successful capacity discovery never accepts or retries a silently clamped strict transaction
+  ---
+  duration_ms: 2.117042
+  type: 'test'
+  ...
+# Subtest: insufficient execution capacity, unsupported methods, missing pre-refund data, strict failure and wrong complete metadata remain blocked
+ok 187 - insufficient execution capacity, unsupported methods, missing pre-refund data, strict failure and wrong complete metadata remain blocked
+  ---
+  duration_ms: 8.656459
+  type: 'test'
+  ...
+# Subtest: capacity discovery is explicit and cannot alter an atomic wallet, measured envelope, unknown policy or unsupported chain
+ok 188 - capacity discovery is explicit and cannot alter an atomic wallet, measured envelope, unknown policy or unsupported chain
+  ---
+  duration_ms: 1.970083
+  type: 'test'
+  ...
+# Subtest: discovery retries only strictly smaller explicit capacity evidence and stops after three adjustments
+ok 189 - discovery retries only strictly smaller explicit capacity evidence and stops after three adjustments
+  ---
+  duration_ms: 11.969208
+  type: 'test'
+  ...
+# Subtest: reverted execution retains exact pinned and returned evidence without raw error data or an inferred inner cause
+ok 190 - reverted execution retains exact pinned and returned evidence without raw error data or an inferred inner cause
+  ---
+  duration_ms: 0.819583
+  type: 'test'
+  ...
+# Subtest: provider failure reason survives the publication boundary with bounded response evidence only
+ok 191 - provider failure reason survives the publication boundary with bounded response evidence only
+  ---
+  duration_ms: 2.250458
+  type: 'test'
+  ...
+# Subtest: direct estimate reverts retain only error code and revert digest, including empty revert data
+ok 192 - direct estimate reverts retain only error code and revert digest, including empty revert data
+  ---
+  duration_ms: 0.395083
+  type: 'test'
+  ...
+# Subtest: 45 synthetic calldata lengths reject an explicit measured whole-request budget below their selected-fork minimum before resubmission
+ok 193 - 45 synthetic calldata lengths reject an explicit measured whole-request budget below their selected-fork minimum before resubmission
+  ---
+  duration_ms: 87.736583
+  type: 'test'
+  ...
+# Subtest: unequal calldata minima share an explicit measured whole-request budget without changing calldata or measured strict envelopes
+ok 194 - unequal calldata minima share an explicit measured whole-request budget without changing calldata or measured strict envelopes
+  ---
+  duration_ms: 6.267334
+  type: 'test'
+  ...
+# Subtest: minimum discovery allocation uses the selected fork and never infers a numeric budget from HTTP status
+ok 195 - minimum discovery allocation uses the selected fork and never infers a numeric budget from HTTP status
+  ---
+  duration_ms: 53.251083
+  type: 'test'
+  ...
+# Subtest: discovery minima distinguish EIP-2780 self-calls, recipient access, nonzero value and bounded diagnostics
+ok 196 - discovery minima distinguish EIP-2780 self-calls, recipient access, nonzero value and bounded diagnostics
+  ---
+  duration_ms: 1.446584
+  type: 'test'
+  ...
+# Subtest: later envelope remainder never becomes a whole-request budget or a repeated descending clamp retry
+ok 197 - later envelope remainder never becomes a whole-request budget or a repeated descending clamp retry
+  ---
+  duration_ms: 48.160958
+  type: 'test'
+  ...
+# Subtest: private observer retains exact ordered calls, all provider errors and selected-fork gas provenance
+ok 198 - private observer retains exact ordered calls, all provider errors and selected-fork gas provenance
+  ---
+  duration_ms: 1.495708
+  type: 'test'
+  ...
+# Subtest: private instrumentation cannot turn incomplete simulation into success or mutate proof identity
+ok 199 - private instrumentation cannot turn incomplete simulation into success or mutate proof identity
+  ---
+  duration_ms: 3.228542
+  type: 'test'
+  ...
+# Subtest: private observers cannot mutate exact calls or provider response proof
+ok 200 - private observers cannot mutate exact calls or provider response proof
+  ---
+  duration_ms: 4.4395
+  type: 'test'
+  ...
+# Subtest: local chain funding simulation requires and fingerprints its explicit verified Osaka profile
+ok 201 - local chain funding simulation requires and fingerprints its explicit verified Osaka profile
+  ---
+  duration_ms: 2.240375
+  type: 'test'
+  ...
+# Subtest: recursive reader rejects self cycles before cached-promise reuse
+ok 202 - recursive reader rejects self cycles before cached-promise reuse
+  ---
+  duration_ms: 1.297791
+  type: 'test'
+  ...
+# Subtest: recursive reader rejects two-object cycles before cached-promise reuse
+ok 203 - recursive reader rejects two-object cycles before cached-promise reuse
+  ---
+  duration_ms: 0.1925
+  type: 'test'
+  ...
+# Subtest: recursive reader preserves verified shared DAG bytes and reads a reused leaf once
+ok 204 - recursive reader preserves verified shared DAG bytes and reads a reused leaf once
+  ---
+  duration_ms: 7.218959
+  type: 'test'
+  ...
+# Subtest: pre-aborted reads preserve the exact reason without starting a client operation
+ok 205 - pre-aborted reads preserve the exact reason without starting a client operation
+  ---
+  duration_ms: 0.161292
+  type: 'test'
+  ...
+# Subtest: abort settles an uncooperative metadata read and discards its late response
+ok 206 - abort settles an uncooperative metadata read and discards its late response
+  ---
+  duration_ms: 0.648458
+  type: 'test'
+  ...
+# Subtest: cancelled pointer pagination preserves the abort reason and does not start descriptor fallback
+ok 207 - cancelled pointer pagination preserves the abort reason and does not start descriptor fallback
+  ---
+  duration_ms: 0.585
+  type: 'test'
+  ...
+# Subtest: abort settles pending decompression and discards a late valid result
+ok 208 - abort settles pending decompression and discards a late valid result
+  ---
+  duration_ms: 0.644417
+  type: 'test'
+  ...
+# Subtest: abort settles pending decompression and discards a late failure
+ok 209 - abort settles pending decompression and discards a late failure
+  ---
+  duration_ms: 0.764667
+  type: 'test'
+  ...
+# Subtest: decompression that aborts while returning bytes cannot report a successful read
+ok 210 - decompression that aborts while returning bytes cannot report a successful read
+  ---
+  duration_ms: 0.539792
+  type: 'test'
+  ...
+# Subtest: default gzip decoding still verifies the exact decoded payload
+ok 211 - default gzip decoding still verifies the exact decoded payload
+  ---
+  duration_ms: 7.688
+  type: 'test'
+  ...
+# Subtest: abort interrupts a pending custom digest without accepting a late valid hash
+ok 212 - abort interrupts a pending custom digest without accepting a late valid hash
+  ---
+  duration_ms: 0.623625
+  type: 'test'
+  ...
+# Subtest: carrier fanout shares one abort listener and starts no further reads after cancellation
+ok 213 - carrier fanout shares one abort listener and starts no further reads after cancellation
+  ---
+  duration_ms: 3.677042
+  type: 'test'
+  ...
+1..213
+# tests 215
+# suites 0
+# pass 215
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 7119.768334
