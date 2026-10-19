@@ -1,15 +1,19 @@
+import { KEEL_SMART_INLINE_ASSET_MAX_BYTES, planKeelSmartAssetPresentation } from "@keel/protocol";
 /** Browser-safe intent planning. This is not a storage receipt or payment approval. */
 export type KeelMediaSlotDelivery = "onchain" | "ipfs" | "hosted";
-export const KEEL_STANDALONE_VIEWER_MAX_BYTES = 1_000_000;
-export const KEEL_INLINE_IMAGE_DEFAULT_MAX_BYTES = 500_000;
+/** @deprecated Use the smart asset boundaries, which distinguish direct from split-read delivery. */
+export const KEEL_STANDALONE_VIEWER_MAX_BYTES = KEEL_SMART_INLINE_ASSET_MAX_BYTES;
+export const KEEL_INLINE_IMAGE_DEFAULT_MAX_BYTES = KEEL_SMART_INLINE_ASSET_MAX_BYTES;
 /** Unknown sizes keep verification enabled until actual source bytes are known. */
 export function defaultKeelImageViewer(mediaType: string, byteLength?: number): "none" | "keel-verification-shell" {
   if (byteLength !== undefined && (!Number.isSafeInteger(byteLength) || byteLength < 0)) throw new TypeError("Media byte length must be a nonnegative integer.");
-  return mediaType.split(";", 1)[0]!.trim().toLowerCase().startsWith("image/") && byteLength !== undefined && byteLength > KEEL_STANDALONE_VIEWER_MAX_BYTES ? "none" : "keel-verification-shell";
+  const mime=mediaType.split(";",1)[0]!.trim().toLowerCase();
+  return planKeelSmartAssetPresentation({source:{resourceId:"source",mediaType:mime,...(byteLength===undefined?{}:{byteLength})},
+    execution:mime === "image/svg+xml" ? "unknown" : /^(?:text\/(?:html|javascript|ecmascript)|application\/(?:javascript|ecmascript|wasm|xhtml\+xml))$/u.test(mime) ? "script" : "static"}).viewer;
 }
 export function defaultKeelImageDelivery(byteLength?: number): KeelMediaSlotDelivery {
   if (byteLength !== undefined && (!Number.isSafeInteger(byteLength) || byteLength < 0)) throw new TypeError("Image byte length must be a nonnegative integer.");
-  return byteLength !== undefined && byteLength >= KEEL_INLINE_IMAGE_DEFAULT_MAX_BYTES ? "hosted" : "onchain";
+  return "onchain"; // Hosted previews require the explicit external-preview choice, never a size heuristic.
 }
 export interface KeelMediaSlotSelection {
   readonly resourceId: string;
@@ -46,7 +50,7 @@ function selection(value: KeelMediaSlotSelection | null): KeelMediaSlotSelection
   if (!value || typeof value !== "object" || Object.keys(value).some(key => !["resourceId","presentation","delivery"].includes(key)) || !["direct","keel-shell"].includes(value.presentation)) throw new TypeError("Invalid metadata slot choice.");
   return {resourceId:resource(value.resourceId),presentation:value.presentation,delivery:delivery(value.delivery)};
 }
-/** Measured standalone images above 1 MB use direct display; smaller or unknown
+/** Static media above the decimal 500KB boundary through 2MB use direct display; smaller or unknown
  * images use the verifier. A thumbnail is always a distinct resource.
  * Only an explicitly selected candidate switches the source to that candidate. */
 export function planKeelMediaSlots(input: {
@@ -70,7 +74,7 @@ export function planKeelMediaSlots(input: {
   applicable.sort((a,b)=>(Number(a.mediaType!==undefined)*2+Number(a.collectionType!==undefined))-(Number(b.mediaType!==undefined)*2+Number(b.collectionType!==undefined)));
   for(const value of applicable) {if(value.imageDelivery!==undefined)imageDelivery=delivery(value.imageDelivery);if(value.animationDelivery!==undefined)animationDelivery=delivery(value.animationDelivery);}
   const encoded=input.selectedCandidateResourceId===undefined ? undefined : resource(input.selectedCandidateResourceId);
-  const directImage=defaultViewer === "none" && encoded===undefined;
+  const directImage=defaultViewer === "none" && mime.startsWith("image/") && encoded===undefined;
   const thumbnail=input.thumbnailResourceId===undefined ? undefined : resource(input.thumbnailResourceId);
   if(thumbnail!==undefined && (thumbnail===source || thumbnail===encoded)) throw new TypeError("A thumbnail must be a separately selected resource; full media is not copied into both slots automatically.");
   let image:KeelMediaSlotSelection|null=directImage ? {resourceId:source,presentation:"direct",delivery:imageDelivery} : thumbnail ? {resourceId:thumbnail,presentation:"direct",delivery:imageDelivery} : null;
