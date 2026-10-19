@@ -2,8 +2,37 @@
  * Sepolia activation: EIP-7773. Amsterdam: EIP-8037, EIP-7976 and EIP-2780.
  * Never derive the fork from wall-clock time or from a successful estimate. */
 export const KEEL_SEPOLIA_AMSTERDAM_TIMESTAMP = 1_791_294_816n;
+/** Explicit non-production fixture evidence, never an unknown-chain fallback.
+ * Only trusted development/test configuration may supply the node observations. */
+export interface KeelLocalTestChainGasProfile {
+  readonly schema: "keel-local-test-chain-gas-profile@1";
+  readonly chainId: 31337;
+  readonly hardfork: "Osaka";
+  readonly clientVersion: "anvil/v1.8.5";
+  readonly genesisHash: string;
+  readonly blockGasLimit: string;
+}
+const localProfiles = new WeakSet<object>();
+export function createKeelLocalTestChainGasProfile(input: { readonly environment: string; readonly rpcUrl: string;
+  readonly clientVersion: unknown; readonly nodeInfo: unknown; readonly genesis: unknown }): KeelLocalTestChainGasProfile {
+  const record = (value: unknown): Record<string, unknown> => value !== null && typeof value === "object" && !Array.isArray(value) ? value as Record<string, unknown> : {};
+  const quantity = (value: unknown) => typeof value === "string" && /^0x(?:0|[1-9a-f][0-9a-f]*)$/iu.test(value) ? BigInt(value) : undefined;
+  const url = new URL(input.rpcUrl), node = record(input.nodeInfo), environment = record(node.environment), genesis = record(input.genesis);
+  const gasLimit = quantity(environment.gasLimit);
+  if (!["development", "test"].includes(input.environment) || url.protocol !== "http:" || url.hostname !== "127.0.0.1" || !url.port
+    || url.username || url.password || url.pathname !== "/" || url.search || url.hash
+    || input.clientVersion !== "anvil/v1.8.5" || node.hardFork !== "Osaka" || node.network !== "ethereum"
+    || environment.chainId !== 31337 || record(node.forkConfig).forkUrl !== null
+    || gasLimit === undefined || gasLimit <= 0n || quantity(genesis.number) !== 0n || quantity(genesis.gasLimit) !== gasLimit
+    || typeof genesis.hash !== "string" || !/^0x[0-9a-f]{64}$/iu.test(genesis.hash)) {
+    throw new TypeError("Local gas profiles require an explicit development/test loopback Anvil1.8.5 Osaka chain31337 with verified genesis and gas limits.");
+  }
+  const profile = Object.freeze({ schema: "keel-local-test-chain-gas-profile@1" as const, chainId: 31337 as const, hardfork: "Osaka" as const,
+    clientVersion: "anvil/v1.8.5" as const, genesisHash: genesis.hash.toLowerCase(), blockGasLimit: gasLimit.toString() });
+  localProfiles.add(profile); return profile;
+}
 export interface KeelTransactionGasPolicy {
-  readonly profile: "ethereum-pre-amsterdam" | "sepolia-amsterdam";
+  readonly profile: "ethereum-pre-amsterdam" | "sepolia-amsterdam" | "local-anvil-osaka";
   readonly chainId: number;
   readonly blockTimestamp: bigint;
   readonly maximumExecutionGas: bigint;
@@ -17,12 +46,16 @@ export interface KeelTransactionGasPolicy {
   readonly zeroCalldataFloorGas: number;
   readonly nonzeroCalldataFloorGas: number;
 }
-export function resolveKeelTransactionGasPolicy(input: { readonly chainId: number; readonly blockTimestamp: bigint; readonly blockGasLimit: bigint }): KeelTransactionGasPolicy {
+export function resolveKeelTransactionGasPolicy(input: { readonly chainId: number; readonly blockTimestamp: bigint; readonly blockGasLimit: bigint; readonly localTestChainProfile?: KeelLocalTestChainGasProfile | undefined }): KeelTransactionGasPolicy {
   if (typeof input.blockTimestamp !== "bigint" || input.blockTimestamp < 0n || typeof input.blockGasLimit !== "bigint" || input.blockGasLimit <= 0n) throw new TypeError("Transaction gas policy requires the actual selected-chain block timestamp and gas limit.");
-  if (input.chainId !== 1 && input.chainId !== 11_155_111) throw new TypeError("This chain needs an explicitly registered transaction gas profile.");
+  const local = input.localTestChainProfile;
+  if (local !== undefined && (input.chainId !== 31337 || !localProfiles.has(local) || input.blockGasLimit > BigInt(local.blockGasLimit))) throw new TypeError("The explicit local transaction gas profile does not match this chain or block.");
+  if (input.chainId !== 1 && input.chainId !== 11_155_111 && !(input.chainId === 31337 && local !== undefined)) throw new TypeError("This chain needs an explicitly registered transaction gas profile.");
   const amsterdam = input.chainId === 11_155_111 && input.blockTimestamp >= KEEL_SEPOLIA_AMSTERDAM_TIMESTAMP;
   const total = amsterdam ? 4_294_967_295n : 16_777_216n;
-  return Object.freeze({ profile: amsterdam ? "sepolia-amsterdam" : "ethereum-pre-amsterdam", chainId: input.chainId, blockTimestamp: input.blockTimestamp,
+  // Anvil's simulator/txpool can accept larger envelopes. The local fixture
+  // deliberately admits only the conservative 2^24 subset; no public-chain claim.
+  return Object.freeze({ profile: local ? "local-anvil-osaka" : amsterdam ? "sepolia-amsterdam" : "ethereum-pre-amsterdam", chainId: input.chainId, blockTimestamp: input.blockTimestamp,
     maximumExecutionGas: 16_777_216n, maximumTotalGas: input.blockGasLimit < total ? input.blockGasLimit : total,
     separateStateGas: amsterdam, transactionBaseGas: amsterdam ? 12_000 : 21_000, recipientAccessGas: amsterdam ? 3_000 : 0, valueTransferGas: amsterdam ? 6_000 : 0,
     zeroCalldataGas: 4, nonzeroCalldataGas: 16,

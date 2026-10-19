@@ -7,6 +7,8 @@ export interface CanonicalSolidityArtifact {
   readonly abi: readonly unknown[];
   readonly bytecode: `0x${string}`;
   readonly deployedBytecode: `0x${string}`;
+  readonly linkReferences: Readonly<Record<string, Readonly<Record<string, readonly { readonly start: number; readonly length: number }[]>>>>;
+  readonly deployedLinkReferences: Readonly<Record<string, Readonly<Record<string, readonly { readonly start: number; readonly length: number }[]>>>>;
   readonly immutableReferences: Readonly<Record<string, unknown>>;
   readonly methodIdentifiers: Readonly<Record<string, string>>;
   readonly metadata: string;
@@ -34,5 +36,9 @@ export const SOLIDITY_COMPILER_SETTINGS: {
 };
 export function compileCanonicalSolidityArtifacts(
   repositoryRoot?: string,
-  options?: { readonly contractNames?: readonly string[] },
+  options?: {
+    readonly contractNames?: readonly string[];
+    readonly sourceNames?: readonly string[];
+    readonly contractsRoot?: string;
+  },
 ): Promise<CanonicalSolidityCompilation>;

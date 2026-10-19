@@ -1,7 +1,7 @@
 import { emitKeelPublicationDiagnostic, type KeelPublicationDiagnosticObserver } from "./publication-diagnostics.js";
 import { KEEL_INLINE_MAX_TOKEN_URI_BYTES, KEEL_INLINE_SAFE_RPC_GAS } from "./presentation.js";
 import { keelExecutorGasLimit } from "./managed-publication.js";
-import { resolveKeelTransactionGasPolicy, assertKeelAmsterdamSimulationHeader } from "./transaction-gas-policy.js";
+import { resolveKeelTransactionGasPolicy, assertKeelAmsterdamSimulationHeader, type KeelLocalTestChainGasProfile } from "./transaction-gas-policy.js";
 import { canonicalJson, createIntegrity } from "@keel/protocol";
 import { encodeAbiParameters, encodeFunctionData, parseAbi, getAddress, keccak256, stringToHex, type Hex } from "viem";
 
@@ -17,6 +17,7 @@ export interface KeelSimulationCall {
   readonly maxPriorityFeePerGas?: Hex;
 }
 export interface KeelPublicationSimulationInput {
+  readonly localTestChainProfile?: KeelLocalTestChainGasProfile | undefined;
   /** Owner-private full evidence consumer; excluded from proof identity. */
   readonly diagnostics?: KeelPublicationDiagnosticObserver | undefined;
   /** Server-owned identity of the exact prepared source, release, defaults, and quote. */
@@ -264,7 +265,7 @@ async function performPublicationSimulation(input: KeelPublicationSimulationInpu
   if (metadataCall.to.toLowerCase() !== metadataTarget.toLowerCase()) return failure("configuration-invalid", "The final simulation call must target the exact planned metadata contract.");
   const expectedReturn = expectation.kind === "storage-only" ? encodeAbiParameters([{ type: "bool" }], [true]).toLowerCase() : encodeAbiParameters([{ type: "string" }], [input.expectedTokenURI]).toLowerCase();
   const identityBase = { readPolicy: "keel-inline-read-policy@1", policyGasCeiling: KEEL_INLINE_SAFE_RPC_GAS.toString(), policyTokenUriByteCeiling: KEEL_INLINE_MAX_TOKEN_URI_BYTES, planFingerprint: input.planFingerprint, chainId: input.chainId, reader, runtimeCodeHash: input.readerRuntimeCodeHash.toLowerCase(),
-    transactionContext: input.transactionContext ?? "independent-transactions", discoveryGasPolicy: input.discoveryGasPolicy ?? "fixed-envelopes", completeTokenUriBytes: completeBytes, maximumTokenUriBytes: input.maximumTokenUriBytes, maximumReadGas: input.maximumReadGas.toString(), collectionOverheadGas: input.collectionOverheadGas.toString(), maximumTransactionGas: input.maximumTransactionGas.toString(), preparationCalls, observationCalls, requiredReaderCalls, metadataTarget, metadataCall, assertions,
+    transactionContext: input.transactionContext ?? "independent-transactions", ...(input.localTestChainProfile === undefined ? {} : { localTestChainProfile: input.localTestChainProfile }), discoveryGasPolicy: input.discoveryGasPolicy ?? "fixed-envelopes", completeTokenUriBytes: completeBytes, maximumTokenUriBytes: input.maximumTokenUriBytes, maximumReadGas: input.maximumReadGas.toString(), collectionOverheadGas: input.collectionOverheadGas.toString(), maximumTransactionGas: input.maximumTransactionGas.toString(), preparationCalls, observationCalls, requiredReaderCalls, metadataTarget, metadataCall, assertions,
     blockTag: input.blockNumber === undefined ? "latest" : `0x${input.blockNumber.toString(16)}`, expectation, validation: "transactions-then-public-read" };
   const metadataDigest = (await createIntegrity(new TextEncoder().encode(input.expectedTokenURI))).digest;
   // Snapshot all inputs before the first asynchronous transport call.
@@ -298,7 +299,7 @@ async function performPublicationSimulation(input: KeelPublicationSimulationInpu
   const blockTimestamp = quantity(block.timestamp);
   if (blockTimestamp === undefined) return failure("rpc-unavailable", "The simulation needs the actual selected-chain timestamp for its transaction gas rules.");
   let transactionPolicy;
-  try { transactionPolicy = resolveKeelTransactionGasPolicy({ chainId: identity.chainId, blockTimestamp, blockGasLimit }); }
+  try { transactionPolicy = resolveKeelTransactionGasPolicy({ chainId: identity.chainId, blockTimestamp, blockGasLimit, localTestChainProfile: identity.localTestChainProfile }); }
   catch { return failure("configuration-invalid", "This selected chain needs an explicitly registered transaction gas profile."); }
   if (BigInt(identity.maximumTransactionGas) > transactionPolicy.maximumTotalGas) return failure("configuration-invalid", "The configured total transaction envelope exceeds the selected fork or block limit.");
   const transactionGasPolicy = { profile: transactionPolicy.profile, blockTimestamp: blockTimestamp.toString(),

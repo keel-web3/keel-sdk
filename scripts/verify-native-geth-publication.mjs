@@ -452,6 +452,21 @@ try {
   assert.equal(singleRequests.length, 4, "Only one bounded retry may precede normal strict/read phases");
   record("a single approved recipient recovers one observed HTTP 503 automatically through complete native requalification and replay",
     assertNativePoolProof(singleRecipient, singleProof));
+  const heavyPlan = { ...plan,
+    preparationCalls: Array.from({ length: 200 }, (_, index) => ({ ...plan.preparationCalls[0], nonce: toHex(index) })),
+    assertions: Array.from({ length: 200 }, (_, index) => ({ callIndex: index, returnData: encodeAbiParameters([{ type: "uint256" }], [BigInt((index + 1) * 100)]) })),
+    requiredReaderCalls: [{ ...plan.requiredReaderCalls[0], expectedReturn: encodeAbiParameters([{ type: "uint256" }], [20_000n]) }],
+    metadataCall: { ...plan.metadataCall, data: calldata("tokenURIForCount", [20_000n]) } };
+  await assert.rejects(poolProof(nativePool(base), heavyPlan), error => error.kind === "configuration-invalid" && error.diagnostic?.rpcCode === -38013);
+  record("200 heavy native calls reject the original over-capacity sequence without rewriting or splitting its program");
+  const longPlan = { ...plan,
+    preparationCalls: Array.from({ length: 200 }, (_, index) => ({ ...plan.preparationCalls[0], nonce: toHex(index), data: calldata("write", [1n]) })),
+    assertions: Array.from({ length: 200 }, (_, index) => ({ callIndex: index, returnData: encodeAbiParameters([{ type: "uint256" }], [BigInt(index + 1)]) })),
+    requiredReaderCalls: [{ ...plan.requiredReaderCalls[0], expectedReturn: encodeAbiParameters([{ type: "uint256" }], [200n]) }],
+    metadataCall: { ...plan.metadataCall, data: calldata("tokenURIForCount", [200n]) } };
+  const longFixture = nativePool(base);
+  record("200 dependent native writes retain every nonce, state assertion and full metadata through discovery and strict replay",
+    assertNativePoolProof(longFixture, await poolProof(longFixture, longPlan), longPlan));
   assert.equal(BigInt(rpc("eth_call", [{ to: reader, data: calldata("read") }, "0x0"])), 0n);
   assert.equal(rpc("eth_getTransactionCount", [owner, "0x0"]), "0x0");
   assert.equal(rpc("eth_getBlockByNumber", ["latest", false]).hash, base.hash);

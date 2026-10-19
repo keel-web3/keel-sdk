@@ -823,3 +823,14 @@ test("private observers cannot mutate exact calls or provider response proof", a
   } }, fixture().transport);
   assert.equal(second.simulationFingerprint, first.simulationFingerprint);
 });
+
+import { createKeelLocalTestChainGasProfile } from '../packages/sdk/dist/transaction-gas-policy.js';
+test('local chain funding simulation requires and fingerprints its explicit verified Osaka profile',async()=>{
+ const selected={chainId:'0x7a69',blockGas:'0xbebc200',timestamp:'0x6ad3bfa5',omitForkHeader:true};
+ await assert.rejects(simulateKeelPublicationBeforeFunding({...input(),chainId:31337},fixture(selected).transport),error=>error.kind==='configuration-invalid'&&/registered/.test(error.message));
+ const localTestChainProfile=createKeelLocalTestChainGasProfile({environment:'test',rpcUrl:'http://127.0.0.1:18545',clientVersion:'anvil/v1.8.5',nodeInfo:{hardFork:'Osaka',network:'ethereum',environment:{chainId:31337,gasLimit:'0xbebc200'},forkConfig:{forkUrl:null}},genesis:{number:'0x0',hash:'0x'+'71'.repeat(32),gasLimit:'0xbebc200'}});
+ const localInput={...input(),chainId:31337,localTestChainProfile};const proof=await simulateKeelPublicationBeforeFunding(localInput,fixture(selected).transport);
+ assert.equal(proof.transactionGasPolicy.profile,'local-anvil-osaka');assert.equal(proof.transactionGasPolicy.maximumTotalGas,'16777216');
+ await assert.rejects(simulateKeelPublicationBeforeFunding({...localInput,maximumTransactionGas:16777217n},fixture(selected).transport),error=>error.kind==='configuration-invalid'&&/envelope/.test(error.message));
+ const objectId=`0x${'ee'.repeat(32)}`; const storage=await simulateKeelStorageBeforeFunding({...localInput,expectedObjectId:objectId,metadataCall:{...call,data:encodeFunctionData({abi:parseAbi(['function objectExists(bytes32) view returns(bool)']),functionName:'objectExists',args:[objectId]})}},fixture({...selected,storage:true}).transport);assert.equal(storage.transactionGasPolicy.profile,'local-anvil-osaka');
+});

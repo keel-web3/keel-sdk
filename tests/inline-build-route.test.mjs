@@ -25,3 +25,16 @@ test('unavailable Inline gives actionable alternatives without confusing deliver
   assert.deepEqual(error.decision.offchainPayloads,[]);
  }
 });
+
+test('binary media selects beneficial lossless compression while explicit Off and Raw retain exact storage policy',()=>{
+ const bytes=Buffer.alloc(735649);for(let i=0;i<bytes.length;i++)bytes[i]=(i*17+(i%31))%256;
+ const resources=[{id:'original.gif',bytes}],before=Buffer.from(bytes);
+ const plan=resolveKeelInlineBuildRoute({resources});
+ assert.equal(plan.route,'creator-prepared-copy');assert.equal(plan.resources[0].compression,'brotli');
+ assert.ok(plan.compressedBytes<plan.sourceBytes);assert.deepEqual(bytes,before);
+ assert.throws(()=>assertKeelInlineBuildRoute({resources,publicationPath:'legacy-collection-harness'}),/KEEL_INLINE_DELIVERY_PLAN_REQUIRED/);
+ for(const options of [{compression:'none'},{payloadStorage:'raw'}]) {
+  const exact=assertKeelInlineBuildRoute({resources,...options,publicationPath:'legacy-collection-harness'});
+  assert.equal(exact.resources[0].compression,'none');assert.equal(exact.compressedBytes,bytes.length);
+ }
+});

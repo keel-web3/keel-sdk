@@ -2,7 +2,7 @@ import { readFileSync } from "node:fs";
 import { readFile, readdir } from "node:fs/promises";
 import path from "node:path";
 
-import { root } from "./run.mjs";
+import { contractsRoot as canonicalContractsRoot, root } from "./run.mjs";
 
 export const EIP170_MAX_RUNTIME_BYTES = 24_576;
 export const SOLIDITY_COMPILER_SETTINGS = Object.freeze({
@@ -53,18 +53,30 @@ export async function compileCanonicalSolidityArtifacts(
     options.sourceNames === undefined
       ? undefined
       : new Set(options.sourceNames);
-  const contractsRoot = path.join(repositoryRoot, "packages", "contracts");
+  const contractsRoot = path.resolve(options.contractsRoot ?? canonicalContractsRoot);
   const sourceRoot = path.join(contractsRoot, "src");
   const sources = {};
   for (const file of await filesBelow(sourceRoot)) {
     const key = path.relative(contractsRoot, file).split(path.sep).join("/");
     if (selectedSourceNames !== undefined && !selectedSourceNames.has(key)) continue;
+    if (selectedSourceNames === undefined && selectedContractNames !== undefined
+      && !selectedContractNames.has(path.basename(file, ".sol"))) continue;
     sources[key] = { content: await readFile(file, "utf8") };
   }
+  if (selectedContractNames !== undefined && selectedSourceNames === undefined) {
+    const found = new Set(Object.keys(sources).map(name => path.basename(name, ".sol")));
+    const missing = [...selectedContractNames].filter(name => !found.has(name));
+    if (missing.length) throw new Error(`Canonical Solidity target source files were not found: ${missing.join(", ")}.`);
+  }
+
+  const remappings = await readFile(path.join(contractsRoot, "remappings.txt"), "utf8")
+    .then(value => value.split(/\r?\n/u).map(line => line.trim()).filter(line => line && !line.startsWith("#")))
+    .catch(error => { if (error.code === "ENOENT") return []; throw error; });
 
   const importCallback = (importPath) => {
     const candidates = [
       path.join(contractsRoot, importPath),
+      path.join(contractsRoot, "node_modules", importPath),
       path.join(repositoryRoot, "node_modules", importPath),
     ];
     for (const candidate of candidates) {
@@ -80,6 +92,7 @@ export async function compileCanonicalSolidityArtifacts(
     language: "Solidity",
     sources,
     settings: {
+      remappings,
       optimizer: {
         enabled: true,
         runs: SOLIDITY_COMPILER_SETTINGS.optimizerRuns,
@@ -91,16 +104,16 @@ export async function compileCanonicalSolidityArtifacts(
         appendCBOR: SOLIDITY_COMPILER_SETTINGS.appendCBOR,
       },
       outputSelection: {
-        "*": {
-          "*": [
+        "*": Object.fromEntries([...(selectedContractNames ?? ["*"])].map(name => [name, [
             "abi",
             "metadata",
             "evm.bytecode.object",
+            "evm.bytecode.linkReferences",
             "evm.deployedBytecode.object",
+            "evm.deployedBytecode.linkReferences",
             "evm.deployedBytecode.immutableReferences",
             "evm.methodIdentifiers",
-          ],
-        },
+          ]])),
       },
     },
   };
@@ -146,6 +159,8 @@ export async function compileCanonicalSolidityArtifacts(
         abi: artifact.abi,
         bytecode: `0x${bytecode}`,
         deployedBytecode: `0x${deployedBytecode}`,
+        linkReferences: artifact.evm?.bytecode?.linkReferences ?? {},
+        deployedLinkReferences: artifact.evm?.deployedBytecode?.linkReferences ?? {},
         immutableReferences:
           artifact.evm?.deployedBytecode?.immutableReferences ?? {},
         methodIdentifiers: artifact.evm?.methodIdentifiers ?? {},
