@@ -1,4 +1,4 @@
-import { KEEL_SMART_INLINE_ASSET_MAX_BYTES, planKeelSmartAssetPresentation } from "@keel/protocol";
+import { KEEL_SMART_INLINE_ASSET_MAX_BYTES, planKeelSmartAssetPresentation, resolveKeelTokenURIReadBounds, assertKeelNonstandardTokenURIIdentity, sha256Hex, hashKeelSmartAssetPresentationPlan, measureKeelSmartAssetPresentation, type KeelExplicitNonstandardReadPolicy, type KeelSmartAssetPresentationPlan } from "@keel/protocol";
 /** Browser-safe intent planning. This is not a storage receipt or payment approval. */
 export type KeelMediaSlotDelivery = "onchain" | "ipfs" | "hosted";
 /** @deprecated Use the smart asset boundaries, which distinguish direct from split-read delivery. */
@@ -92,6 +92,42 @@ export function planKeelMediaSlots(input: {
  * attached to this exact plan after the selected chain's actual read check. */
 export function assertKeelMediaSlotReadFit(plan:KeelMediaSlotPlan, evidence:{readonly planKey:string;readonly completeTokenUriBytes:number;readonly maxTokenUriBytes:number;readonly selectedChainReadPassed:boolean}):void {
   if(evidence.planKey!==plan.planKey || !Number.isSafeInteger(evidence.completeTokenUriBytes) || evidence.completeTokenUriBytes<1 || !Number.isSafeInteger(evidence.maxTokenUriBytes) || evidence.maxTokenUriBytes<1 || evidence.completeTokenUriBytes>Math.min(evidence.maxTokenUriBytes,2_000_000) || evidence.selectedChainReadPassed!==true) throw new Error("The exact complete metadata slots need a successful selected-chain read within the standard 2 MB tokenURI limit before funding. Larger embedded media requires a separately supported nonstandard route and explicit marketplace compatibility review.");
+}
+
+/** Explicit larger-return companion to the unchanged synchronous standard gate.
+ * Matrix plan, actual full return and exact policy remain separate from this
+ * legacy slot key. No provider capability or simulation proof is invented. */
+export async function assertKeelNonstandardMediaSlotReadFit(plan: KeelMediaSlotPlan, evidence: {
+  readonly planKey: string;
+  readonly publicationPlan: KeelSmartAssetPresentationPlan;
+  readonly tokenURI: string;
+  readonly selectedChainReadPassed: boolean;
+  readonly nonstandardReadPolicy: KeelExplicitNonstandardReadPolicy;
+}): Promise<void> {
+  const slots = structuredClone(plan), snapshot = structuredClone(evidence);
+  if (snapshot.planKey !== slots.planKey || snapshot.selectedChainReadPassed !== true
+    || typeof snapshot.tokenURI !== "string") throw new TypeError("The exact complete metadata slots require their selected-chain read and publication review identity.");
+  const policy = resolveKeelTokenURIReadBounds(snapshot.nonstandardReadPolicy).nonstandardReadPolicy;
+  if (!policy) throw new TypeError("An exact nonstandard read policy is required.");
+  const publication = snapshot.publicationPlan;
+  const expected = (slot: "image" | "animation") => {
+    const selected = publication[slot];
+    if (!selected || selected.delivery === "omitted") return null;
+    const shell = selected.delivery.endsWith("shell");
+    const delivery: KeelMediaSlotDelivery = selected.delivery === "ipfs-shell" || selected.delivery === "external" && selected.uri?.startsWith("ipfs:") ? "ipfs"
+      : selected.delivery === "hosted-shell" || selected.delivery === "external" ? "hosted" : "onchain";
+    return { resourceId: selected.resourceId, presentation: shell ? "keel-shell" : "direct", delivery };
+  };
+  for (const [legacy, smart] of [[slots.image, expected("image")], [slots.animation_url, expected("animation")]] as const) {
+    if ((legacy ?? null) === null ? smart !== null : !smart || legacy!.resourceId !== smart.resourceId || legacy!.presentation !== smart.presentation || legacy!.delivery !== smart.delivery) throw new TypeError("The legacy slots contradict the selected publication matrix.");
+  }
+  const context = publication.contextIdentity;
+  if (!context || publication.source.digest !== policy.identity.sourceDigest || publication.capabilities?.identity?.chainId !== policy.identity.chainId
+    || ["projectId", "revision", "defaultsRevision"].some(key => context[key as keyof typeof context] !== policy.identity[key as keyof typeof context])) throw new TypeError("The nonstandard slot review has a stale source, chain or revision.");
+  if (await hashKeelSmartAssetPresentationPlan(publication) !== policy.identity.planDigest.replace(/^sha256:/u, "0x")) throw new TypeError("The nonstandard read policy belongs to a different selected publication plan.");
+  const measured = await measureKeelSmartAssetPresentation(publication, () => snapshot.tokenURI);
+  if (measured.hardBlockers.length || await sha256Hex(new TextEncoder().encode(measured.measurementKey)) !== policy.identity.measurementDigest.replace(/^sha256:/u, "0x")) throw new TypeError("The nonstandard slot review has a stale or invalid complete measurement.");
+  assertKeelNonstandardTokenURIIdentity(policy, { chainId: policy.identity.chainId, byteLength: measured.completeTokenUriBytes, digest: measured.tokenUriDigest });
 }
 
 export { planKeelInitialMediaBudget, KEEL_STANDARD_INITIAL_METADATA_BYTES, type KeelInitialMetadataSlots, type KeelInitialMediaBudgetInput } from "./initial-media-budget.js";
