@@ -40,10 +40,11 @@ export class KeelPreparedEnvelopeCapabilityError extends Error {
 
 const factoryABI = parseAbi(["function collectionDeployer() view returns (address)"]);
 const deployerABI = parseAbi(["function creationCodeHash() view returns (bytes32)"]);
-const legacyFactories = new Set([
-  "0x94e68d15c76da5116dc8df155e7498518f822668f375624d66af18479c25d432",
-  "0x7b8a96cdbfd228ba5aa5f3582d355c85a54cf8ac74e3a67f49d0087e547918ac",
-  "0x61c7e4a3fa32dffba5488467c1260afc88cd98b7eba6ddc509b205711c64e6a9",
+// These exact legacy runtimes embed the selected-chain cached EIP712 domain.
+const legacyFactories = new Map([
+  ["0x94e68d15c76da5116dc8df155e7498518f822668f375624d66af18479c25d432", 3937],
+  ["0x7b8a96cdbfd228ba5aa5f3582d355c85a54cf8ac74e3a67f49d0087e547918ac", 3949],
+  ["0x61c7e4a3fa32dffba5488467c1260afc88cd98b7eba6ddc509b205711c64e6a9", 3937],
 ]);
 const legacyCreations = new Set([
   "0x0182d140506795efa1e8e009f9eae5b04fe3bc5a179387fa366c6118be563f0f",
@@ -119,7 +120,7 @@ export async function qualifyKeelPreparedEnvelope(input: KeelPreparedEnvelopeInp
       { chainId: chainId, factory, prefixBytes, suffixBytes, blockNumber: String(block.number),
         blockHash: block.hash, ...(creationHash ? { collectionCreationCodeHash: creationHash } : {}), reason });
   };
-  if (!Number.isSafeInteger(chainId) || chainId !== 11155111) fail("unregistered chain capability");
+  if (!Number.isSafeInteger(chainId) || chainId <= 0) fail("invalid chain identity");
   if (block.number < 0n || !/^0x[0-9a-f]{64}$/iu.test(block.hash)) fail("invalid pinned block");
   if (prefixBytes === 0 || suffixBytes === 0) fail("empty prepared envelope fragment");
   let qualification: KeelPreparedEnvelopeQualification | undefined;
@@ -131,9 +132,13 @@ export async function qualifyKeelPreparedEnvelope(input: KeelPreparedEnvelopeInp
     };
     await pin();
     const factoryCode = asBytes(await read(() => adapter.getCode({ address: factory, blockNumber: block.number, ...options })));
-    const legacyFactory = legacyFactories.has(keccak256(factoryCode));
+    const legacyDomainOffset = legacyFactories.get(keccak256(factoryCode));
+    const legacyFactory = legacyDomainOffset !== undefined;
     const maintainedFactory = factoryCode.length === 4563 && maskedHash(factoryCode, factoryImmutableStarts, 32) === factoryTemplateHash;
     if (!legacyFactory && !maintainedFactory) fail("unknown factory runtime");
+    if (legacyDomainOffset !== undefined && BigInt(word(factoryCode, legacyDomainOffset)) !== BigInt(chainId)) {
+      fail("legacy factory cached chain/domain mismatch");
+    }
     if (maintainedFactory) {
       const expectedImmutables: Readonly<Record<number, string>> = {
         3665: domainSeparator(chainId, factory),

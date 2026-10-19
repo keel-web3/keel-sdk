@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
-import { keccak256, padHex } from 'viem';
+import { encodeAbiParameters, keccak256, padHex, stringToBytes, toHex } from 'viem';
 import { qualifyKeelPreparedEnvelope, KeelPreparedEnvelopeCapabilityError } from '../packages/sdk/dist/prepared-envelope-capability.js';
 
 const fixtures = JSON.parse(readFileSync(new URL('./fixtures/prepared-envelope-capability.json', import.meta.url)));
@@ -12,7 +12,7 @@ function setup(fixture = clone('legacy'), options = {}) {
   let pins = 0;
   const record = (kind, request = {}) => { requests.push({ kind, ...request }); options.onRead?.(requests); };
   const read = {
-    async getChainId(request) { record('chain', request); return options.wrongChain ? 1 : 11155111; },
+    async getChainId(request) { record('chain', request); return options.providerChain ?? (options.wrongChain ? 1 : 11155111); },
     async getBlock(number, request) {
       record('block', { number, ...request }); pins++;
       return { ...block, ...(options.reorg && pins === 2 ? { hash: `0x${'ab'.repeat(32)}` } : {}) };
@@ -66,6 +66,29 @@ test('source-qualified maintained template accepts exact large envelope only as 
   const result = await qualifyKeelPreparedEnvelope(setup(clone('maintained')).input);
   assert.equal(result.prefixBytes, 256001); assert.equal(result.suffixBytes, 2042);
   assert.equal(result.capability.prefixMaxBytes, null); assert.equal(result.requiresFullSimulation, true);
+});
+function maintainedOnChain(chainId) {
+  const fixture = clone('maintained'), key = fixture.factory.toLowerCase();
+  const domain = keccak256(encodeAbiParameters([{ type: 'bytes32' }, { type: 'bytes32' }, { type: 'bytes32' }, { type: 'uint256' }, { type: 'address' }], [
+    keccak256(stringToBytes('EIP712Domain(string name,string version,uint256 chainId,address verifyingContract)')),
+    keccak256(stringToBytes('Keel Factory')), keccak256(stringToBytes('1')), BigInt(chainId), fixture.factory,
+  ]));
+  fixture.codeByAddress[key] = replace(replace(fixture.codeByAddress[key], 3848, padHex(toHex(chainId), { size: 32 })), 3665, domain);
+  return fixture;
+}
+test('exact maintained constructor templates qualify local31337 and mainnet1 with their actual domain and provider', async () => {
+  for (const chainId of [31337, 1]) {
+    const result = await qualifyKeelPreparedEnvelope(setup(maintainedOnChain(chainId), { providerChain: chainId, input: { chainId } }).input);
+    assert.equal(result.chainId, chainId); assert.equal(result.capability.prefixMaxBytes, null); assert.equal(result.requiresFullSimulation, true);
+  }
+});
+test('cross-chain constructor/provider/domain mismatches and unsafe chain numbers reject', async () => {
+  await rejects(qualifyKeelPreparedEnvelope(setup(maintainedOnChain(31337), { input: { chainId: 31337 } }).input), 'KEEL_PREPARED_ENVELOPE_UNQUALIFIED', /provider chain/);
+  await rejects(qualifyKeelPreparedEnvelope(setup(maintainedOnChain(1), { providerChain: 31337, input: { chainId: 31337 } }).input), 'KEEL_PREPARED_ENVELOPE_UNQUALIFIED', /immutable mismatch/);
+  await rejects(qualifyKeelPreparedEnvelope(setup(clone('legacy'), { providerChain: 1, input: { chainId: 1 } }).input), 'KEEL_PREPARED_ENVELOPE_UNQUALIFIED', /cached chain\/domain mismatch/);
+  for (const chainId of [0, -1, 1.5, NaN, Infinity, Number.MAX_SAFE_INTEGER + 1]) {
+    await rejects(qualifyKeelPreparedEnvelope(setup(undefined, { input: { chainId } }).input), 'KEEL_PREPARED_ENVELOPE_UNQUALIFIED', /chain identity/);
+  }
 });
 test('other authenticated historical factory versions retain the same real small-envelope boundary', async () => {
   for (const fixture of fixtures.otherLegacy) {
