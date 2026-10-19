@@ -1,0 +1,295 @@
+TAP version 13
+# Subtest: actual decimal thresholds use above, with source and metadata boundaries separate
+not ok 1 - actual decimal thresholds use above, with source and metadata boundaries separate
+  ---
+  duration_ms: 2.868125
+  type: 'test'
+  location: '/Users/ravonus/dev/wt/studio-native-beacon-witness-20261019/sdk-smart-presentation/tests/smart-presentation-policy.test.mjs:18:1'
+  failureType: 'testCodeFailure'
+  error: |-
+    Expected values to be strictly equal:
+    + actual - expected
+    
+    + 'canonical-inline'
+    - 'direct-onchain-asset'
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: 'direct-onchain-asset'
+  actual: 'canonical-inline'
+  operator: 'strictEqual'
+  stack: |-
+    TestContext.<anonymous> (file:///Users/ravonus/dev/wt/studio-native-beacon-witness-20261019/sdk-smart-presentation/tests/smart-presentation-policy.test.mjs:21:49)
+    Test.runInAsyncScope (node:async_hooks:214:14)
+    Test.run (node:internal/test_runner/test:1047:25)
+    Test.start (node:internal/test_runner/test:944:17)
+    startSubtestAfterBootstrap (node:internal/test_runner/harness:296:17)
+  ...
+# Subtest: matrix exposes maintained alternatives and never calls a local numeric estimate chain-ready
+not ok 2 - matrix exposes maintained alternatives and never calls a local numeric estimate chain-ready
+  ---
+  duration_ms: 0.300125
+  type: 'test'
+  location: '/Users/ravonus/dev/wt/studio-native-beacon-witness-20261019/sdk-smart-presentation/tests/smart-presentation-policy.test.mjs:24:1'
+  failureType: 'testCodeFailure'
+  error: |-
+    Expected values to be strictly equal:
+    
+    10 !== 9
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: 9
+  actual: 10
+  operator: 'strictEqual'
+  stack: |-
+    TestContext.<anonymous> (file:///Users/ravonus/dev/wt/studio-native-beacon-witness-20261019/sdk-smart-presentation/tests/smart-presentation-policy.test.mjs:25:62)
+    Test.runInAsyncScope (node:async_hooks:214:14)
+    Test.run (node:internal/test_runner/test:1047:25)
+    Test.processPendingSubtests (node:internal/test_runner/test:744:18)
+    Test.postRun (node:internal/test_runner/test:1173:19)
+    Test.run (node:internal/test_runner/test:1101:12)
+    async startSubtestAfterBootstrap (node:internal/test_runner/harness:296:3)
+  ...
+# Subtest: real prefix/cap arithmetic rejects old duplication and chooses another qualified layout
+ok 3 - real prefix/cap arithmetic rejects old duplication and chooses another qualified layout
+  ---
+  duration_ms: 1.43575
+  type: 'test'
+  ...
+# Subtest: explicit layout remains selected even when a different layout is recommended
+not ok 4 - explicit layout remains selected even when a different layout is recommended
+  ---
+  duration_ms: 0.261459
+  type: 'test'
+  location: '/Users/ravonus/dev/wt/studio-native-beacon-witness-20261019/sdk-smart-presentation/tests/smart-presentation-policy.test.mjs:36:1'
+  failureType: 'testCodeFailure'
+  error: |-
+    Expected values to be strictly equal:
+    + actual - expected
+    
+    + 'canonical-inline'
+    - 'direct-onchain-asset'
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: 'direct-onchain-asset'
+  actual: 'canonical-inline'
+  operator: 'strictEqual'
+  stack: |-
+    TestContext.<anonymous> (file:///Users/ravonus/dev/wt/studio-native-beacon-witness-20261019/sdk-smart-presentation/tests/smart-presentation-policy.test.mjs:37:154)
+    Test.runInAsyncScope (node:async_hooks:214:14)
+    Test.run (node:internal/test_runner/test:1047:25)
+    Test.processPendingSubtests (node:internal/test_runner/test:744:18)
+    Test.postRun (node:internal/test_runner/test:1173:19)
+    Test.run (node:internal/test_runner/test:1101:12)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: scripts always require a registered verifier and script MIME overrides a static caller label
+ok 5 - scripts always require a registered verifier and script MIME overrides a static caller label
+  ---
+  duration_ms: 0.368916
+  type: 'test'
+  ...
+# Subtest: actual inspection catches MIME lies, active SVG and undecidable PDF without claiming security approval
+ok 6 - actual inspection catches MIME lies, active SVG and undecidable PDF without claiming security approval
+  ---
+  duration_ms: 0.765333
+  type: 'test'
+  ...
+# Subtest: all non-script media use same size policy and direct playback retains a separate usable poster
+not ok 7 - all non-script media use same size policy and direct playback retains a separate usable poster
+  ---
+  duration_ms: 0.219166
+  type: 'test'
+  location: '/Users/ravonus/dev/wt/studio-native-beacon-witness-20261019/sdk-smart-presentation/tests/smart-presentation-policy.test.mjs:51:1'
+  failureType: 'testCodeFailure'
+  error: |-
+    Expected values to be strictly equal:
+    + actual - expected
+    
+    + 'canonical-inline'
+    - 'direct-onchain-asset'
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: 'direct-onchain-asset'
+  actual: 'canonical-inline'
+  operator: 'strictEqual'
+  stack: |-
+    TestContext.<anonymous> (file:///Users/ravonus/dev/wt/studio-native-beacon-witness-20261019/sdk-smart-presentation/tests/smart-presentation-policy.test.mjs:54:10)
+    Test.runInAsyncScope (node:async_hooks:214:14)
+    Test.run (node:internal/test_runner/test:1047:25)
+    Test.processPendingSubtests (node:internal/test_runner/test:744:18)
+    Test.postRun (node:internal/test_runner/test:1173:19)
+    Test.run (node:internal/test_runner/test:1101:12)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: missing and unsupported actual capabilities stay blocked, regardless of defaults
+ok 8 - missing and unsupported actual capabilities stay blocked, regardless of defaults
+  ---
+  duration_ms: 0.458375
+  type: 'test'
+  ...
+# Subtest: nonstandard size is a compatibility review and exact actual output ceilings remain hard
+ok 9 - nonstandard size is a compatibility review and exact actual output ceilings remain hard
+  ---
+  duration_ms: 0.658083
+  type: 'test'
+  ...
+# Subtest: execution/state/read limits cannot be acknowledged away
+ok 10 - execution/state/read limits cannot be acknowledged away
+  ---
+  duration_ms: 0.606916
+  type: 'test'
+  ...
+# Subtest: external preview is explicit HTTPS/IPFS and does not become the source commitment
+ok 11 - external preview is explicit HTTPS/IPFS and does not become the source commitment
+  ---
+  duration_ms: 0.547
+  type: 'test'
+  ...
+# Subtest: verifier-only is explicit and warns that marketplace grids have no image
+ok 12 - verifier-only is explicit and warns that marketplace grids have no image
+  ---
+  duration_ms: 0.265625
+  type: 'test'
+  ...
+# Subtest: actual chosen rendering counts UTF8, preserves image bytes and commits the embedded program
+ok 13 - actual chosen rendering counts UTF8, preserves image bytes and commits the embedded program
+  ---
+  duration_ms: 5.0485
+  type: 'test'
+  ...
+# Subtest: actual metadata/image identity failures remain hard and do not invoke an alternate provider
+ok 14 - actual metadata/image identity failures remain hard and do not invoke an alternate provider
+  ---
+  duration_ms: 2.119542
+  type: 'test'
+  ...
+# Subtest: image plus hybrid over target suggests smaller slot choices without silently dropping either
+ok 15 - image plus hybrid over target suggests smaller slot choices without silently dropping either
+  ---
+  duration_ms: 21.670958
+  type: 'test'
+  ...
+# Subtest: only measured embedded verifier alone over target suggests IPFS/hosted, without forcing a change
+ok 16 - only measured embedded verifier alone over target suggests IPFS/hosted, without forcing a change
+  ---
+  duration_ms: 40.189
+  type: 'test'
+  ...
+# Subtest: explicit nonstandard acknowledgement does not bypass a measured qualified provider ceiling
+ok 17 - explicit nonstandard acknowledgement does not bypass a measured qualified provider ceiling
+  ---
+  duration_ms: 20.308542
+  type: 'test'
+  ...
+# Subtest: plan identity binds source, preview, preferences, exact chain code and context/default revision
+ok 18 - plan identity binds source, preview, preferences, exact chain code and context/default revision
+  ---
+  duration_ms: 1.09375
+  type: 'test'
+  ...
+# Subtest: async matrix snapshots source and actual candidates; missing adapters are never fake successes
+ok 19 - async matrix snapshots source and actual candidates; missing adapters are never fake successes
+  ---
+  duration_ms: 1.157708
+  type: 'test'
+  ...
+# Subtest: malformed quantities, unknown axes and unsupported pairs fail closed
+ok 20 - malformed quantities, unknown axes and unsupported pairs fail closed
+  ---
+  duration_ms: 0.292334
+  type: 'test'
+  ...
+# Subtest: exact native source references bind the plan and actual metadata cannot switch paid object IDs
+not ok 21 - exact native source references bind the plan and actual metadata cannot switch paid object IDs
+  ---
+  duration_ms: 0.333083
+  type: 'test'
+  location: '/Users/ravonus/dev/wt/studio-native-beacon-witness-20261019/sdk-smart-presentation/tests/smart-presentation-policy.test.mjs:125:1'
+  failureType: 'testCodeFailure'
+  error: |-
+    Expected values to be strictly equal:
+    + actual - expected
+    
+    + undefined
+    - 'web3://0x7777777777777777777777777777777777777777:11155111/haulObject/0x8888888888888888888888888888888888888888888888888888888888888888?mime.type=image%2Fpng'
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: 'web3://0x7777777777777777777777777777777777777777:11155111/haulObject/0x8888888888888888888888888888888888888888888888888888888888888888?mime.type=image%2Fpng'
+  operator: 'strictEqual'
+  stack: |-
+    TestContext.<anonymous> (file:///Users/ravonus/dev/wt/studio-native-beacon-witness-20261019/sdk-smart-presentation/tests/smart-presentation-policy.test.mjs:127:56)
+    Test.runInAsyncScope (node:async_hooks:214:14)
+    Test.run (node:internal/test_runner/test:1047:25)
+    Test.processPendingSubtests (node:internal/test_runner/test:744:18)
+    Test.postRun (node:internal/test_runner/test:1173:19)
+    Test.run (node:internal/test_runner/test:1101:12)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: candidate measurements distinguish actual outer expansion from native source and inline image budgets
+ok 22 - candidate measurements distinguish actual outer expansion from native source and inline image budgets
+  ---
+  duration_ms: 0.177791
+  type: 'test'
+  ...
+# Subtest: review regression: actual original outer image contribution warns even below the inner image URI target
+ok 23 - review regression: actual original outer image contribution warns even below the inner image URI target
+  ---
+  duration_ms: 34.058667
+  type: 'test'
+  ...
+# Subtest: outer contribution retains the actual percent grammar, escaped keys, whitespace and nested metadata
+ok 24 - outer contribution retains the actual percent grammar, escaped keys, whitespace and nested metadata
+  ---
+  duration_ms: 1.717375
+  type: 'test'
+  ...
+# Subtest: review regression: unrelated metadata does not turn a 44-byte hybrid program into an external-delivery recommendation
+ok 25 - review regression: unrelated metadata does not turn a 44-byte hybrid program into an external-delivery recommendation
+  ---
+  duration_ms: 31.473375
+  type: 'test'
+  ...
+# Subtest: encoded URI expansion preserves decoded integrity while offering external compatibility choices
+ok 26 - encoded URI expansion preserves decoded integrity while offering external compatibility choices
+  ---
+  duration_ms: 40.18625
+  type: 'test'
+  ...
+# Subtest: duplicate image properties are rejected rather than measuring an earlier value and validating a later one
+ok 27 - duplicate image properties are rejected rather than measuring an earlier value and validating a later one
+  ---
+  duration_ms: 0.86975
+  type: 'test'
+  ...
+# Subtest: encoded verifier property uses the original outer grammar and suggests external delivery only for its own carried bytes
+ok 28 - encoded verifier property uses the original outer grammar and suggests external delivery only for its own carried bytes
+  ---
+  duration_ms: 122.341375
+  type: 'test'
+  ...
+# Subtest: animation contribution preserves original JSON escaping, Unicode and canonical Base64 outer grammar
+ok 29 - animation contribution preserves original JSON escaping, Unicode and canonical Base64 outer grammar
+  ---
+  duration_ms: 1.640834
+  type: 'test'
+  ...
+# Subtest: actual encoded verifier soft-target boundaries remain explicit choices without a hard size prohibition
+ok 30 - actual encoded verifier soft-target boundaries remain explicit choices without a hard size prohibition
+  ---
+  duration_ms: 53.435708
+  type: 'test'
+  ...
+1..30
+# tests 30
+# suites 0
+# pass 25
+# fail 5
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 430.547125

@@ -208,3 +208,25 @@ test('actual encoded verifier soft-target boundaries remain explicit choices wit
   assert.equal(measured.encodedAnimationSlotBytes,expected);assert.equal(measured.compatibilityWarnings.includes('embedded-verifier-above-compatibility-target'),expected>2000000);assert.equal(measured.hardBlockers.length,0);assert.equal(measured.status,'requires-selected-chain-simulation');
  }
 });
+
+test('medium image recommendation keeps exact original bytes instead of a separate generated poster',async()=>{
+ const original=Buffer.alloc(500001);png.copy(original);const source={resourceId:'exact-original.png',mediaType:'image/png',byteLength:original.length,digest:digest(original)};
+ const plan=p.planKeelSmartAssetPresentation({...input(),source,capabilities:{...capabilities,inlineImageTypes:['image/png']}});
+ assert.equal(plan.selectedCandidateId,'image-only-inline');assert.equal(plan.image.resourceId,source.resourceId);assert.equal(plan.image.commitment.digest,source.digest);assert.equal(plan.animation.delivery,'omitted');
+ const actual=jsonURI({image:'data:image/png;base64,'+original.toString('base64')});
+ const measured=await p.measureKeelSmartAssetPresentation(plan,()=>actual);assert.equal(measured.hardBlockers.length,0);assert.equal(measured.tokenURI,actual);
+ const replaced=await p.measureKeelSmartAssetPresentation(plan,()=>jsonURI({image:imageURI}));assert.ok(replaced.hardBlockers.includes('inline-image-source-changed'));
+ const advanced=choose({...input(),source},{image:'onchain-reference',animation:'omitted'});assert.equal(advanced.selectedCandidateId,'direct-onchain-asset');assert.ok(advanced.compatibilityWarnings.includes('native-object-references-may-not-load-in-marketplace-grids'));
+});
+test('inline native nonimage playback requires exact qualified MIME, independent poster and both measured commitments',async()=>{
+ const media=Buffer.from('RIFF0000WAVEexact native audio'),source={resourceId:'exact.wav',mediaType:'audio/wav',byteLength:media.length,digest:digest(media)};
+ const selection={image:'inline',animation:'inline-media'},caps={...capabilities,inlineMediaTypes:['audio/wav']};
+ const plan=choose({...input(),source,capabilities:caps},selection);assert.equal(plan.selectedCandidateId,'media-only-inline');assert.equal(plan.image.resourceId,image.resourceId);
+ const actual=jsonURI({image:imageURI,animation_url:'data:audio/wav;base64,'+media.toString('base64')});
+ const measured=await p.measureKeelSmartAssetPresentation(plan,()=>actual);assert.equal(measured.hardBlockers.length,0);assert.equal(measured.inlineMediaIntegrity.digest,source.digest);assert.equal(measured.encodedAnimationSlotBytes,Buffer.byteLength(actual)-Buffer.byteLength(jsonURI({image:imageURI})));
+ const changed=await p.measureKeelSmartAssetPresentation(plan,()=>jsonURI({image:imageURI,animation_url:'data:audio/wav;base64,'+Buffer.from('different').toString('base64')}));assert.ok(changed.hardBlockers.includes('inline-native-media-source-changed'));
+ assert.ok(choose({...input(),source},selection).hardBlockers.includes('qualified-inline-media-renderer-required'));
+ assert.ok(choose({...input(),source,preview:undefined,capabilities:caps},selection).hardBlockers.includes('usable-grid-image-required'));
+ assert.ok(choose({...input(),source:{...source,mediaType:'text/html'},execution:'static',capabilities:caps},selection).hardBlockers.includes('script-requires-registered-verifier'));
+ assert.equal(measured.publicationReady,false);
+});
