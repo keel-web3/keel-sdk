@@ -167,11 +167,11 @@ test('review regression: unrelated metadata does not turn a 44-byte hybrid progr
  assert.equal(matrix.recommendations.some(row=>['ipfs-presentation','hosted-presentation'].includes(row.candidateId)),false);
  assert.ok(matrix.recommendations.every(row=>row.code!=='measured-embedded-verifier-alone-above-target'));assert.equal(matrix.publicationReady,false);
 });
-test('encoded URI expansion alone cannot be relabeled a larger decoded embedded program in provisional or actual checks',async()=>{
+test('encoded URI expansion preserves decoded integrity while offering external compatibility choices',async()=>{
  const x={...input(),candidateMeasurements:{'canonical-hybrid':{completeTokenUriBytes:2500000,embeddedAnimationUriBytes:2100000,embeddedProgramBytes:700000}}};const plan=choose(x,hybrid);
- assert.equal(plan.suggestions.some(row=>['ipfs-presentation','hosted-presentation'].includes(row.candidateId)),false);
+ assert.equal(plan.suggestions.some(row=>['ipfs-presentation','hosted-presentation'].includes(row.candidateId)),true);
  const measured=await p.measureKeelSmartAssetPresentation(plan,()=>render({animation_url:htmlURI(' '.repeat(700000))}));
- assert.equal(measured.embeddedAnimationIntegrity.byteLength,700000);assert.ok(measured.embeddedAnimationUriBytes>2000000);assert.equal(measured.recommendations.some(row=>['ipfs-presentation','hosted-presentation'].includes(row.candidateId)),false);assert.equal(measured.status,'compatibility-review-required');
+ assert.equal(measured.embeddedAnimationIntegrity.byteLength,700000);assert.ok(measured.embeddedAnimationUriBytes>2000000);assert.equal(measured.recommendations.some(row=>['ipfs-presentation','hosted-presentation'].includes(row.candidateId)),true);assert.equal(measured.status,'compatibility-review-required');
 });
 test('duplicate image properties are rejected rather than measuring an earlier value and validating a later one',async()=>{
  const plan=choose(input(),hybrid);const uri='data:application/json,'+encodeURIComponent('{"image":1,"image":'+JSON.stringify(imageURI)+',"animation_url":'+JSON.stringify(htmlURI('Exact'))+'}');await assert.rejects(p.measureKeelSmartAssetPresentation(plan,()=>uri),/unambiguous|Duplicate/);
