@@ -16,6 +16,8 @@ export interface KeelProviderRequestEvent {
   /** Private observer only: the exact original failure, never a public UI field. */
   readonly error?: unknown;
   readonly request?: { readonly method: string; readonly params: readonly unknown[] };
+  /** Actual serialized request body measured by the dispatching RPC transport. */
+  readonly requestWireBytes?: number;
   readonly rawResponse?: unknown;
   readonly httpStatus?: number;
   readonly status?: "available" | "unsupported" | "access-denied" | "cooldown";

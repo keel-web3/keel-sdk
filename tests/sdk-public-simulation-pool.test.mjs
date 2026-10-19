@@ -173,6 +173,8 @@ test('private provider evidence preserves original RPC payload while public erro
     assert.ok(failure); assert.equal(failure.method, 'eth_simulateV1');
     assert.deepEqual(failure.rawResponse.error.data, { reason: 'owner-private exact diagnostic data', callIndex: 2 });
     assert.deepEqual(failure.request.params, program().params);
+    assert.equal(failure.requestWireBytes, Buffer.byteLength(f.privateRequests()[0].wire));
+    assert.ok(failure.requestWireBytes > Buffer.byteLength(JSON.stringify(failure.request)));
     assert.doesNotMatch(JSON.stringify(events.map(({ request, rawResponse, error, ...safe }) => safe)), /SECRET|https:/);
     assert.doesNotMatch(JSON.stringify(attempts), /SECRET|https:/);
   } finally { await transport.close(); await f.transport.close(); }
