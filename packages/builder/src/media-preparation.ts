@@ -39,7 +39,7 @@ export interface KeelMediaCandidate {
   readonly warnings: readonly string[];
 }
 function animatedAvif(bytes:Uint8Array) { return new TextDecoder("latin1").decode(bytes.subarray(4,40)).includes("avis"); }
-interface Decoded { info: KeelMediaInfo; hashes: readonly string[]; rgba?:Uint8Array; }
+interface Decoded { info: KeelMediaInfo; hashes: readonly string[]; rgba?:Uint8Array; videoMap?:string; }
 function hash(bytes: Uint8Array) { const h = createHash("sha256"); h.update(bytes); return h.digest("hex"); }
 function bounded(bytes: Uint8Array) { if (!(bytes instanceof Uint8Array) || bytes.byteLength < 1 || bytes.byteLength > MAX_BYTES) throw new RangeError(`Media must contain 1–${MAX_BYTES} bytes.`); }
 function geometry(recipe: KeelMediaEditRecipe) { return recipe.crop !== undefined || recipe.width !== undefined || recipe.height !== undefined || (recipe.rotate ?? 0) !== 0 || (recipe.layers?.length ?? 0) > 0; }
@@ -129,13 +129,18 @@ async function ffmpegRun(binary: string, cwd: string, args: string[], signal?:Ab
 }
 async function decodeMovie(binary: string, cwd: string, input: string, signal?:AbortSignal): Promise<Decoded> {
   signal?.throwIfAborted();
-  const videoMap = animatedAvif(new Uint8Array(await readFile(path.join(cwd,input)))) ? "0:v:1" : "0:v:0";
-  const probe = await ffmpegRun(binary,cwd,["-protocol_whitelist","file,pipe","-threads","2","-i",input,"-t","0","-map",videoMap,"-an","-f","null","-"],signal);
-  const dims = /Video:[^\n]*?\b(\d{1,5})x(\d{1,5})\b/u.exec(probe.stderr);
-  if (!dims || Number(dims[1])*Number(dims[2]) > MAX_PIXELS || Math.max(Number(dims[1]),Number(dims[2])) > 8192) throw new Error("Movie dimensions are unavailable or exceed the decode budget.");
+  const avifSequence = animatedAvif(new Uint8Array(await readFile(path.join(cwd,input))));
+  // The pinned platform builds expose AVIF sequences either as the sole video
+  // stream or after a primary-image stream. Probe the actual container first.
+  const probe = await ffmpegRun(binary,cwd,["-protocol_whitelist","file,pipe","-threads","2","-i",input,"-t","0","-map","0:v:0","-an","-f","null","-"],signal);
   const videoStreams=probe.stderr.split("Output #")[0]!.split("\n").filter(line=>/^\s*Stream #.*Video:/u.test(line));
-  if (videoStreams.length > (videoMap === "0:v:1" ? 2 : 1)) throw new Error("Multiple video streams need an explicit stream-selection recipe; none are silently discarded.");
-  const duration=/Duration:\s*(\d+):(\d+):(\d+(?:\.\d+)?)/u.exec(probe.stderr), rate=/,\s*([\d.]+) fps/u.exec(videoStreams[0] ?? "");
+  if (!videoStreams.length || videoStreams.length > (avifSequence ? 2 : 1)) throw new Error("Multiple video streams need an explicit stream-selection recipe; none are silently discarded.");
+  const videoIndex = avifSequence && videoStreams.length === 2 ? 1 : 0;
+  const videoMap = `0:v:${videoIndex}`;
+  const selectedStream = videoStreams[videoIndex]!;
+  const dims = /Video:[^\n]*?\b(\d{1,5})x(\d{1,5})\b/u.exec(selectedStream);
+  if (!dims || Number(dims[1])*Number(dims[2]) > MAX_PIXELS || Math.max(Number(dims[1]),Number(dims[2])) > 8192) throw new Error("Movie dimensions are unavailable or exceed the decode budget.");
+  const duration=/Duration:\s*(\d+):(\d+):(\d+(?:\.\d+)?)/u.exec(probe.stderr), rate=/,\s*([\d.]+) fps/u.exec(selectedStream);
   if (duration && rate) {
     const expectedFrames=(Number(duration[1])*3600+Number(duration[2])*60+Number(duration[3]))*Number(rate[1]);
     if (expectedFrames>MAX_FRAMES+1 || expectedFrames*Number(dims[1])*Number(dims[2])>MAX_MOVIE_PIXELS) throw new RangeError("Movie exceeds the bounded duration/frame decode budget.");
@@ -148,11 +153,24 @@ async function decodeMovie(binary: string, cwd: string, input: string, signal?:A
   const tb = Number(timebase[1])/Number(timebase[2])*1000;
   const frames = stdout.split("\n").filter(line => /^0,/.test(line)).map(line => line.split(",").map(s=>s.trim()));
   if (!frames.length || frames.length > MAX_FRAMES || width*height*frames.length > MAX_MOVIE_PIXELS) throw new RangeError("Movie exceeds the bounded full-frame verification budget.");
-  const first = Number(frames[0]![2]), times = frames.map(f => (Number(f[2])-first)*tb), delays = frames.map(f => Number(f[3])*tb);
+  let timingFrames = frames, timingBase = tb;
+  {
+    // The rawvideo encoder used for decoded hashes can replace video packet
+    // durations with its guessed frame rate. Read the exact muxed sequence
+    // timeline separately and require a one-to-one match to decoded frames.
+    const packets = await ffmpegRun(binary,cwd,["-protocol_whitelist","file,pipe","-threads","2","-i",input,"-map",videoMap,"-c:v","copy","-an","-frames:v",String(MAX_FRAMES+1),"-f","framehash","-hash","sha256","pipe:1"],signal);
+    const packetBase = /^#tb 0:\s*(\d+)\/(\d+)/mu.exec(packets.stdout);
+    timingFrames = packets.stdout.split("\n").filter(line => /^0,/.test(line)).map(line => line.split(",").map(s=>s.trim())).sort((left,right) => Number(left[2])-Number(right[2]));
+    if (!packetBase || timingFrames.length !== frames.length) throw new Error("The movie packet timeline does not match every decoded frame.");
+    timingBase = Number(packetBase[1])/Number(packetBase[2])*1000;
+    const firstPacket = Number(timingFrames[0]![2]), firstDecoded = Number(frames[0]![2]);
+    if (timingFrames.some((frame,index) => Math.abs((Number(frame[2])-firstPacket)*timingBase - (Number(frames[index]![2])-firstDecoded)*tb) >= 0.51)) throw new Error("The movie packet timestamps do not match decoded frames.");
+  }
+  const first = Number(timingFrames[0]![2]), times = timingFrames.map(f => (Number(f[2])-first)*timingBase), delays = timingFrames.map(f => Number(f[3])*timingBase);
   if (times.some(n=>!Number.isFinite(n)) || delays.some(n=>!Number.isFinite(n)||n<=0)) throw new Error("Movie frame timing is incomplete.");
   // RGBA8 hashes must never be misrepresented as verification of HDR or high-depth source samples.
   if (/Video:[^\n]*(?:yuv\w*p(?:9|10|12|14|16)|gbrp(?:9|10|12|14|16)|rgba64|rgb48|bt2020|smpte2084|arib-std-b67)/iu.test(stderr)) throw new Error("High-depth/HDR movie edits need a color-preserving adapter. Original bytes remain supported.");
-  return {info:{width,height,durationMs:times.at(-1)!+delays.at(-1)!,frameCount:frames.length,animated:frames.length>1,hasAudio:/Stream #.*Audio:/u.test(stderr),frameTimesMs:times,frameDurationsMs:delays},hashes:frames.map(f=>f[5]!)};
+  return {info:{width,height,durationMs:times.at(-1)!+delays.at(-1)!,frameCount:frames.length,animated:frames.length>1,hasAudio:/Stream #.*Audio:/u.test(stderr),frameTimesMs:times,frameDurationsMs:delays},hashes:frames.map(f=>f[5]!),videoMap};
 }
 function assertSingleFileMedia(bytes:Uint8Array) {
   const ascii = new TextDecoder("latin1").decode(bytes.subarray(0,32));
@@ -193,7 +211,7 @@ async function movieCandidate(bytes: Uint8Array, recipe: KeelMediaEditRecipe, si
     if (decodedImage) await writeFile(path.join(dir,"source.rgba"),decodedImage.rgba!,{flag:"wx"});
     if (["webp","avif"].includes(recipe.format) && source.info.hasAudio && !recipe.noSound) throw new Error("Image output cannot retain audio. Enable No sound explicitly or keep a movie/original output.");
     if (geometry(recipe)) throw new Error("Movie geometry editing is not yet verified by this adapter; preserve original geometry or use an explicit image edit.");
-    const args = ["-loglevel","error","-protocol_whitelist","file,pipe","-threads","2",...(variableImageTiming ? ["-i","timeline.apng"] : decodedImage ? ["-f","rawvideo","-pixel_format","rgba","-video_size",`${source.info.width}x${source.info.height}`,"-framerate",`1000/${imageDelay}`,"-i","source.rgba"] : ["-i","source"]),"-map",animatedAvif(bytes)?"0:v:1":"0:v:0","-vsync","0","-enc_time_base","-1"];
+    const args = ["-loglevel","error","-protocol_whitelist","file,pipe","-threads","2",...(variableImageTiming ? ["-i","timeline.apng"] : decodedImage ? ["-f","rawvideo","-pixel_format","rgba","-video_size",`${source.info.width}x${source.info.height}`,"-framerate",`1000/${imageDelay}`,"-i","source.rgba"] : ["-i","source"]),"-map",source.videoMap ?? "0:v:0","-vsync","0","-enc_time_base","-1"];
     if (recipe.noSound || ["webp","avif"].includes(recipe.format)) args.push("-an"); else args.push("-map","0:a?","-c:a","copy");
     const crf = String(Math.round((100-recipe.quality)*0.51));
     if (recipe.format === "webp") args.push("-c:v","libwebp_anim","-lossless",recipe.mode === "lossless" ? "1":"0","-quality",String(recipe.quality),"-loop","0");
@@ -203,8 +221,19 @@ async function movieCandidate(bytes: Uint8Array, recipe: KeelMediaEditRecipe, si
     const outputName = `candidate.${recipe.format}`; args.push("-n",outputName);
     await ffmpegRun(runtime.binary,dir,args,signal);
     const info = await stat(path.join(dir,outputName)); if (info.size>MAX_BYTES) throw new RangeError("Candidate exceeds the output byte budget.");
-    const output = new Uint8Array(await readFile(path.join(dir,outputName))); bounded(output);
-    const candidate = recipe.format === "webp" ? await decodeImage(output) : await decodeMovie(runtime.binary,dir,outputName,signal);
+    let output = new Uint8Array(await readFile(path.join(dir,outputName))); bounded(output);
+    let candidate = recipe.format === "webp" ? await decodeImage(output) : await decodeMovie(runtime.binary,dir,outputName,signal);
+    if (recipe.format !== "webp" && !sameTimeline(source.info,candidate.info)) {
+      // Some encoders infer the last duration from the preceding timestamp.
+      // Remux the encoded packets without changing their media bytes, assigning
+      // the exact verified source delay at each presentation timestamp.
+      const durations = source.info.frameDurationsMs.map((duration,index) => `eq(PTS,round(${source.info.frameTimesMs[index]!}/1000/TB))*${duration}/1000/TB`).join("+");
+      const corrected = `timed.${recipe.format}`;
+      await ffmpegRun(runtime.binary,dir,["-loglevel","error","-protocol_whitelist","file,pipe","-threads","2","-i",outputName,"-map",candidate.videoMap!,"-map","0:a?","-c","copy","-bsf:v",`setts=duration='${durations}'`,"-n",corrected],signal);
+      if ((await stat(path.join(dir,corrected))).size>MAX_BYTES) throw new RangeError("Candidate exceeds the output byte budget.");
+      output = new Uint8Array(await readFile(path.join(dir,corrected))); bounded(output);
+      candidate = await decodeMovie(runtime.binary,dir,corrected,signal);
+    }
     if (!sameTimeline(source.info,candidate.info) || source.info.width !== candidate.info.width || source.info.height !== candidate.info.height) throw new Error(`Movie ${recipe.format} candidate changed frames, timing or dimensions; original retained.`);
     if (!recipe.noSound && source.info.hasAudio !== candidate.info.hasAudio) throw new Error("Movie candidate changed audio presence; original retained.");
     if (recipe.mode === "lossless" && source.hashes.some((v,i)=>candidate.hashes[i]!==v)) throw new Error("Movie candidate failed full decoded pixel-losslessness verification; original retained.");
@@ -251,7 +280,7 @@ async function readFrame(bytes:Uint8Array,timeMs:number, signal?:AbortSignal):Pr
   try {
     await writeFile(path.join(dir,"source"),bytes,{flag:"wx"});
     const decoded=await decodeMovie(runtime.binary,dir,"source",signal), index=frameAt(decoded.info,timeMs);
-    await ffmpegRun(runtime.binary,dir,["-loglevel","error","-protocol_whitelist","file,pipe","-threads","2","-i","source","-map",animatedAvif(bytes)?"0:v:1":"0:v:0","-vf",`select=eq(n\\,${index})`,"-vsync","0","-frames:v","1","-threads","2","-n","frame.png"],signal);
+    await ffmpegRun(runtime.binary,dir,["-loglevel","error","-protocol_whitelist","file,pipe","-threads","2","-i","source","-map",decoded.videoMap ?? "0:v:0","-vf",`select=eq(n\\,${index})`,"-vsync","0","-frames:v","1","-threads","2","-n","frame.png"],signal);
     return {bytes:new Uint8Array(await readFile(path.join(dir,"frame.png"))),info:decoded.info,frameTimeMs:decoded.info.frameTimesMs[index]!};
   } finally {await rm(dir,{recursive:true,force:true});}
 }

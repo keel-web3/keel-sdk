@@ -261,9 +261,9 @@ export function planKeelProject(value: unknown = {}) {
   const nextTools = intent.mintSystem === "fray-auction" ? ["fray-auction-intake", "keel-library-search", "fray-stage-project"]
     : intent.outcome === "explore" ? ["analyze", "keel-library-search"]
     : [
-      ...(intent.family === "tezos" ? ["keel-tezos-standard-route-plan"] : []),
+      ...(intent.family === "tezos" ? ["keel-tezos-standard-route-plan", "keel-tezos-collection-launch-plan"] : []),
       "keel-studio-capabilities", "analyze", "cost", "keel-library-search",
-      ...(intent.family === "tezos" ? ["keel-tezos-publication-prepare"] : intent.storage === "inline" ? ["keel-inline-prepare"] : ["upload-plan"]), "keel-studio-stage-project",
+      ...(intent.family === "tezos" ? ["keel-tezos-collection-originate-prepare", "keel-tezos-hold-resources-prepare", "keel-tezos-presentation-bind-prepare", "keel-tezos-mint-gate-prepare", "keel-tezos-mint-prepare", "keel-tezos-token-metadata-prepare", "keel-tezos-readback-check", "keel-tezos-publication-prepare"] : intent.storage === "inline" ? ["keel-inline-prepare"] : ["upload-plan"]), "keel-studio-stage-project",
     ];
   return {
     schema: "keel-engine-plan@1" as const,

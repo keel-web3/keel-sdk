@@ -2,6 +2,8 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 const { createKeelRpcPool, KeelRpcSetupError } = await import(process.env.KEEL_TEST_RPC_MODULE ?? '../packages/sdk/dist/rpc.js');
 
+const { keelSimulationTransportFailure } = await import('../packages/sdk/dist/publication-preflight.js');
+
 const urls = ['https://first.example/private-path?key=private-key', 'https://second.example'];
 const params = [{ blockStateCalls: [{ calls: [{ from: '0x'+'11'.repeat(20), to: '0x'+'22'.repeat(20), data: '0x', gas: '0x100000', value: '0x0' }] }], validation: false, traceTransfers: false, returnFullTransactions: true }, '0x12'];
 function fixture(handler, options = {}) {
@@ -144,4 +146,135 @@ test('a complete multi-megabyte 45-call program reaches the pinned transport unc
   });
   assert.equal(f.calls.filter(call => call.body.method === 'eth_simulateV1').length, 1);
   assert.deepEqual(f.calls.at(-1).body.params, original);
+});
+
+
+test('bounded explicit HTTP body-size evidence is actionable capacity without an invented RPC code', async () => {
+  const messages = [
+    'Synthetic request body size limit reached.',
+    'Provider response: request body too large',
+    '<html><title>Request Entity Too Large</title></html>',
+    JSON.stringify({ message: 'request body exceeds the maximum allowed size', private: 'remote-secret' }),
+    JSON.stringify({ error: { message: 'Payload too large', private: 'remote-secret' } }),
+  ];
+  for (const text of messages) {
+    const f = fixture(() => new Response(text, { status: 503 }));
+    await assert.rejects(simulate(f.pool.pin(0)), error => {
+      const failure = keelSimulationTransportFailure(error);
+      assert.equal(failure.kind, 'provider-limit');
+      assert.equal(failure.diagnostic.httpStatus, 503);
+      assert.equal(failure.diagnostic.gasCapacityScope, 'request-bytes');
+      assert.equal(failure.diagnostic.rpcCode, undefined);
+      assert.match(failure.message, /body is too large.*compatible approved provider.*saved plan and receipts/);
+      assert.doesNotMatch(JSON.stringify(failure), /remote-secret|private-key|private-path/);
+      return true;
+    });
+    assert.equal(f.calls.length, 2);
+  }
+});
+
+test('generic, malformed, reflected, stale and oversized HTTP bodies never invent request-size evidence', async () => {
+  const cases = [
+    () => new Response('Service temporarily unavailable', { status: 503 }),
+    () => new Response('Request body size limit not reached. Response body too large.', { status: 503 }),
+    () => new Response('{"message":"request body too large"', { status: 503 }),
+    () => new Response('request body too large', { status: 503, headers: { 'content-type': 'application/json' } }),
+    () => new Response(JSON.stringify({ reflectedRequest: { message: 'request body too large' } }), { status: 503 }),
+    () => new Response(JSON.stringify([{ message: 'request body too large' }]), { status: 503 }),
+    ({body}) => Response.json({ jsonrpc:'2.0', id:body.id+1, error:{code:-32000,message:'request body too large'} }, {status:503}),
+    () => new Response(new Uint8Array([...Buffer.from('request body too large'), 0x80]), {status:503}),
+    () => new Response('request body too large'+' '.repeat(16*1024), {status:503}),
+    () => new Response(' '.repeat(16*1024)+'request body too large', {status:503}),
+  ];
+  for (const handler of cases) for (const observe of [false, true]) {
+    const privateEvents=[];
+    const f = fixture(handler, observe ? { onPrivateResponse:event=>privateEvents.push(event) } : {});
+    await assert.rejects(simulate(f.pool.pin(0)), error => {
+      const failure = keelSimulationTransportFailure(error);
+      assert.equal(failure.kind, 'rpc-unavailable');
+      assert.equal(failure.diagnostic.httpStatus, 503);
+      assert.equal(failure.diagnostic.gasCapacityScope, undefined);
+      return safe(error);
+    });
+  }
+});
+
+test('HTTP JSON-RPC execution and validation evidence outranks body-size wording', async () => {
+  for (const [code,kind] of [[3,'execution-reverted'],[-32602,'configuration-invalid'],[-38011,'rpc-unavailable'],[-38013,'configuration-invalid']]) {
+    const f = fixture(({body}) => Response.json({ jsonrpc:'2.0', id:body.id, error:{code,message:'request body too large remote-secret'} }, {status:503}));
+    await assert.rejects(simulate(f.pool.pin(0)), error => {
+      const failure = keelSimulationTransportFailure(error);
+      assert.equal(failure.kind,kind); assert.equal(failure.diagnostic.rpcCode,code);
+      assert.equal(failure.diagnostic.httpStatus,503); assert.equal(failure.diagnostic.gasCapacityScope,undefined);
+      assert.doesNotMatch(JSON.stringify(failure),/remote-secret/); return true;
+    });
+  }
+  for (const status of [200,503]) for (const code of [-32000,-32603,-38026]) {
+    const f=fixture(({body})=>Response.json({jsonrpc:'2.0',id:body.id,error:{code,message:'request body too large'}},{status}));
+    await assert.rejects(simulate(f.pool.pin(0)), error=>{
+      const failure=keelSimulationTransportFailure(error);
+      assert.equal(failure.kind,'provider-limit'); assert.equal(failure.diagnostic.gasCapacityScope,'request-bytes');
+      assert.equal(failure.diagnostic.rpcCode,code); assert.equal(failure.diagnostic.httpStatus,status); return true;
+    });
+  }
+});
+
+test('aborted or timed-out HTTP error-body reads do not establish request capacity', async () => {
+  for (const cancel of [false,true]) {
+    const controller=new AbortController(); let started;
+    const entered=new Promise(resolve=>{started=resolve;});
+    const f=fixture(({init})=>new Response(new ReadableStream({start(stream){
+      stream.enqueue(Buffer.from('request body too large'));
+      init.signal.addEventListener('abort',()=>stream.error(init.signal.reason),{once:true}); started();
+    }}),{status:503}),{simulationTimeoutMs:100});
+    const run=f.pool.pin(0).request({method:'eth_simulateV1',params,signal:controller.signal});
+    const check=assert.rejects(run,error=>{
+      if(cancel) return error===controller.signal.reason;
+      const failure=keelSimulationTransportFailure(error);
+      assert.equal(failure.kind,'rpc-unavailable'); assert.equal(failure.diagnostic.transportFailure,'timeout');
+      assert.equal(failure.diagnostic.gasCapacityScope,undefined); return true;
+    });
+    await entered; if(cancel)controller.abort(new Error('local test cancellation')); await check;
+  }
+});
+
+test('response-payload and negated request-size wording never establish outgoing body capacity', async () => {
+  for (const text of ['Response payload too large', 'Response: payload too large', 'Result: payload too large', 'The response entity is too big', 'Not a request body too large error', 'No request body size limit reached']) {
+    const f=fixture(()=>new Response(text,{status:503}));
+    await assert.rejects(simulate(f.pool.pin(0)),error=>{
+      const failure=keelSimulationTransportFailure(error);
+      assert.equal(failure.kind,'rpc-unavailable');assert.equal(failure.diagnostic.gasCapacityScope,undefined);return true;
+    });
+  }
+});
+
+test('complete capacity-detail envelope bound applies equally to HTTP200 and HTTP503 RPC errors', async () => {
+  for(const status of [200,503]) {
+    const f=fixture(({body})=>Response.json({jsonrpc:'2.0',id:body.id,error:{code:-32000,message:'request body too large'},padding:'x'.repeat(16*1024)},{status}));
+    await assert.rejects(simulate(f.pool.pin(0)),error=>{
+      const failure=keelSimulationTransportFailure(error);assert.notEqual(failure.kind,'provider-limit');
+      assert.equal(failure.diagnostic.gasCapacityScope,undefined);return true;
+    });
+  }
+});
+
+test('complete HTTP capacity details accept exactly16KiB and reject one additional byte independently of private capture', async () => {
+  for(const observe of [false,true]) for(const extra of [0,1]) {
+    const text='request body too large'.padEnd(16*1024+extra,' ');
+    const f=fixture(()=>new Response(text,{status:503}),observe?{onPrivateResponse:()=>{}}:{});
+    await assert.rejects(simulate(f.pool.pin(0)),error=>{
+      const failure=keelSimulationTransportFailure(error);
+      assert.equal(failure.kind,extra?'rpc-unavailable':'provider-limit');
+      assert.equal(failure.diagnostic.gasCapacityScope,extra?undefined:'request-bytes');return true;
+    });
+  }
+});
+
+test('HTTP error parsing preserves the lowest signed32-bit observed RPC code without inventing another code', async () => {
+  const f=fixture(({body})=>Response.json({jsonrpc:'2.0',id:body.id,error:{code:-2147483648,message:'request body too large'}},{status:503}));
+  await assert.rejects(simulate(f.pool.pin(0)),error=>{
+    const failure=keelSimulationTransportFailure(error);
+    assert.equal(failure.diagnostic.rpcCode,-2147483648);assert.equal(failure.diagnostic.gasCapacityScope,undefined);
+    assert.notEqual(failure.kind,'provider-limit');return true;
+  });
 });

@@ -69,3 +69,22 @@ test('animated layers fail closed rather than silently ignoring composition',asy
  const rgba=Buffer.alloc(4*8*4,255); for(let p=0;p<16;p++)rgba[p*4]=0; const bytes=await sharp(rgba,{raw:{width:4,height:8,channels:4,pageHeight:4}}).gif({delay:[100,200]}).toBuffer();
  await assert.rejects(prepareMediaCandidate({bytes:new Uint8Array(bytes),recipe:{...lossless,layers:[{left:0,top:0,width:2,height:2,opacity:1,rotate:0}]}}),/animated.*geometry/);
 });
+
+
+test('an animated AVIF reimport preserves the verified sequence stream, both frames and exact timing',async()=>{
+ const rgba=Buffer.alloc(4*4*4*2);
+ for(let pixel=0;pixel<32;pixel++){rgba[pixel*4+(pixel<16?0:1)]=255;rgba[pixel*4+3]=255;}
+ const gif=new Uint8Array(await sharp(rgba,{raw:{width:4,height:8,channels:4,pageHeight:4}}).gif({delay:[120,240],loop:0}).toBuffer());
+ const avif=await prepareMediaCandidate({bytes:gif,recipe:{...lossless,format:'avif'}});
+ const snapshot=avif.bytes.slice();
+ const movie=await prepareMediaCandidate({bytes:avif.bytes,mediaType:'image/avif',recipe:{...lossless,format:'mp4'}});
+ assert.deepEqual(avif.bytes,snapshot);
+ assert.equal(movie.sourceInfo.frameCount,2);assert.equal(movie.candidateInfo.frameCount,2);
+ assert.deepEqual(movie.sourceInfo.frameDurationsMs,[120,240]);assert.deepEqual(movie.candidateInfo.frameDurationsMs,[120,240]);
+ assert.equal(movie.verification.losslessPixelsVerified,true);
+ for(const timeMs of [0,150]){
+  const compared=await compareMediaFrames({bytes:avif.bytes,recipe:{...lossless,format:'mp4'},timeMs});
+  assert.deepEqual(await sharp(compared.originalFrame).ensureAlpha().raw().toBuffer(),await sharp(compared.processedFrame).ensureAlpha().raw().toBuffer());
+  assert.equal(compared.sourceFrameTimeMs,timeMs===0?0:120);assert.equal(compared.candidateFrameTimeMs,compared.sourceFrameTimeMs);
+ }
+});

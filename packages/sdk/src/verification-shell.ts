@@ -1110,16 +1110,33 @@ function compactInlineRuntime(
   if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",start,{once:true});else start();
 }
 
-/** Build the two small reusable halves for the composable Inline lane. */
+/** Immutable registered-reader build identity. This is a package commitment,
+ * not selected-chain registration evidence; callers still authenticate that. */
+export const KEEL_PUBLISHED_VIEW_READER_V1 = Object.freeze({
+  algorithm: "sha256" as const,
+  digest: "0x978e5fed29103cc72a2272f908421f14a587009d959aa40d3a1853af130bae1a" as Hex,
+  byteLength: 251050,
+});
+
+/** Reuse the exact reader bytes used by the maintained canonical shell. */
+export async function buildPublishedViewReaderModule() {
+  const source = new Uint8Array(await readFile(new URL("./assets/keel-published-view-reader-v1.js", import.meta.url)));
+  const integrity = await sha256Integrity(source);
+  if (integrity.digest !== KEEL_PUBLISHED_VIEW_READER_V1.digest || integrity.byteLength !== KEEL_PUBLISHED_VIEW_READER_V1.byteLength) throw new Error("The immutable KEEL published reader package failed its digest or byte-length check.");
+  return { id: "keel.published-view-reader", source, integrity };
+}
+
+/** Review-only candidate from current source. A changed digest requires its
+ * own authenticated selected-chain module version before publication. */
 let publishedViewReaderBuild: Promise<{ id: string; source: Uint8Array; integrity: Sha256Integrity }> | undefined;
-export function buildPublishedViewReaderModule() {
+export function buildCurrentPublishedViewReaderModule() {
   return publishedViewReaderBuild ??= (async () => {
     const sourcePath = fileURLToPath(new URL("./fray-content-view-runtime.js", import.meta.url));
     const bundled = await build({ bundle: true, minify: true, platform: "browser", format: "iife", target: ["es2022"], write: false,
       stdin: { contents: `import {resolveInlinePublishedContent} from ${JSON.stringify(sourcePath)};Object.defineProperty(globalThis,"__KEEL_PUBLISHED_VIEW_READER__",{value:resolveInlinePublishedContent,writable:false,configurable:false});`,
         resolveDir: path.dirname(sourcePath), sourcefile: "keel-published-view-reader.js", loader: "js" } });
     const source = utf8ToBytes(bundled.outputFiles[0]!.text);
-    return { id: "keel.published-view-reader", source, integrity: await sha256Integrity(source) };
+    return { id: "keel.published-view-reader", source, integrity: await sha256Integrity(source), reviewOnly: true as const, selectedChainRegistrationRequired: true as const };
   })();
 }
 

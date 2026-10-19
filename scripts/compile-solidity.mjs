@@ -1,10 +1,10 @@
 import { mkdir, rm, writeFile } from "node:fs/promises";
 import path from "node:path";
 
-import { root } from "./run.mjs";
+import { contractsRoot, root } from "./run.mjs";
 import { compileCanonicalSolidityArtifacts, SOLIDITY_COMPILER_SETTINGS } from "./solidity-compiler.mjs";
 
-const artifactsRoot = path.join(root, "packages", "contracts", "artifacts");
+const artifactsRoot = path.resolve(process.env.KEEL_CONTRACTS_ARTIFACTS_DIR || path.join(contractsRoot, "artifacts"));
 const compiled = await compileCanonicalSolidityArtifacts(root);
 for (const diagnostic of compiled.diagnostics) {
   const line = diagnostic.formattedMessage ?? diagnostic.message;

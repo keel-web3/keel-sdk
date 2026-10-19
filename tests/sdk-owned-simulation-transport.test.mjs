@@ -17,13 +17,15 @@ const program = (count = 2) => ({ method: "eth_simulateV1", params: [{ blockStat
 
 async function endpoint(change = {}) {
   const received = [];
+  // A selected block's timestamp is immutable even when HTTP requests span seconds.
+  const timestamp = `0x${(BigInt(Math.floor((change.now?.() ?? Date.now()) / 1000)) - 12n).toString(16)}`;
   const server = createServer(async (request, response) => {
     let text = ""; for await (const part of request) text += part;
     const body = JSON.parse(text); received.push({ text, body });
     if (change.onRequest) await change.onRequest(body);
     if (change.httpStatus) { response.writeHead(change.httpStatus, change.headers ?? {}); response.end("private-secret"); return; }
     const result = value => response.end(JSON.stringify({ jsonrpc: "2.0", id: body.id, result: value }));
-    const snapshot = { number: "0x2a", hash: block.hash, timestamp: `0x${(BigInt(Math.floor(Date.now() / 1000)) - 12n).toString(16)}`, gasLimit: call.gas, baseFeePerGas: "0xf", ...change.snapshot };
+    const snapshot = { number: "0x2a", hash: block.hash, timestamp, gasLimit: call.gas, baseFeePerGas: "0xf", ...change.snapshot };
     if (body.method === "eth_chainId") return result(change.chain ?? "0xaa36a7");
     if (body.method === "web3_clientVersion") return result(change.version ?? "Geth/v1.17.8-stable-a5790770/linux-amd64/go1.27.1");
     if (body.method === "eth_syncing") return result(change.syncing ?? false);
@@ -147,6 +149,32 @@ test("unavailable endpoint and redirect cannot send the plan to another recipien
     } finally { await transport.close(); await e.close(); }
   }
   await other.close();
+});
+
+test("selected-block timestamps stay immutable while the fixture clock crosses seconds", async () => {
+  let now = Date.now();
+  const e = await endpoint({ now: () => now, onRequest: () => { now += 1_000; } }), transport = e.transport();
+  try {
+    assert.equal((await transport.request(program())).length, 2);
+    const first = await transport.request({ method: "eth_getBlockByNumber", params: ["0x2a", false] });
+    now += 1_000;
+    const later = await transport.request({ method: "eth_getBlockByNumber", params: ["0x2a", false] });
+    assert.deepEqual(later, first);
+  } finally { await transport.close(); await e.close(); }
+});
+
+test("a real selected-block timestamp change still blocks qualification before private calldata", async () => {
+  const timestamp = BigInt(Math.floor(Date.now() / 1000)) - 12n;
+  const snapshot = { timestamp: `0x${timestamp.toString(16)}` };
+  let pinnedReads = 0;
+  const e = await endpoint({ snapshot, onRequest: body => {
+    if (body.method === "eth_getBlockByNumber" && body.params[0] === "0x2a" && ++pinnedReads === 2)
+      snapshot.timestamp = `0x${(timestamp + 1n).toString(16)}`;
+  } }), transport = e.transport();
+  try {
+    await assert.rejects(transport.request(program()), error => error.kind === "chain-reorganized" && /snapshot changed during qualification/u.test(error.message));
+    assert.ok(e.received.every(({ body }) => body.method !== "eth_simulateV1" || body.params[0].blockStateCalls.every(block => block.calls.every(call => call.data === "0x"))));
+  } finally { await transport.close(); await e.close(); }
 });
 
 test("cancel aborts an active check and releases capacity for a fresh attempt", async () => {

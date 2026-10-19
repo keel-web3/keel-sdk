@@ -1,4 +1,4 @@
-import { resolveKeelTransactionGasPolicy } from "./transaction-gas-policy.js";
+import { resolveKeelTransactionGasPolicy, type KeelLocalTestChainGasProfile } from "./transaction-gas-policy.js";
 
 /** Conservative offline bound; an authenticated selected-block policy may admit a larger total gas limit.
  * Execution gas remains bounded independently. Public read budgets are separate. */
@@ -15,10 +15,10 @@ export const KEEL_CAST_MAX_SLUGS = 3;
 
 /** Resolve actual selected-chain total gas rules when a block snapshot is supplied.
  * Offline estimates without a snapshot use a conservative bound and are not chain qualification. */
-export function keelTransactionGasCap(input: { readonly chainId?: number; readonly blockTimestamp?: bigint; readonly blockGasLimit?: bigint | number } = {}) {
+export function keelTransactionGasCap(input: { readonly chainId?: number; readonly blockTimestamp?: bigint; readonly blockGasLimit?: bigint | number; readonly localTestChainProfile?: KeelLocalTestChainGasProfile | undefined } = {}) {
   if (input.blockTimestamp !== undefined) {
     if (input.chainId === undefined || input.blockGasLimit === undefined) throw new TypeError("Selected gas policy requires chainId, blockTimestamp and blockGasLimit.");
-    const policy = resolveKeelTransactionGasPolicy({ chainId: input.chainId, blockTimestamp: input.blockTimestamp, blockGasLimit: BigInt(input.blockGasLimit) });
+    const policy = resolveKeelTransactionGasPolicy({ chainId: input.chainId, blockTimestamp: input.blockTimestamp, blockGasLimit: BigInt(input.blockGasLimit), localTestChainProfile: input.localTestChainProfile });
     const cap = Number(policy.maximumTotalGas);
     return { gasCap: cap, executionGasCap: Number(policy.maximumExecutionGas), source: policy.profile,
       targetGas: Math.floor((cap * 100) / KEEL_TX_GAS_MARGIN_PERCENT), profileResolved: true };

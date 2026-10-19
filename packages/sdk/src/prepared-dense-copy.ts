@@ -94,3 +94,37 @@ export async function buildKeelPreparedDenseCopyShell(input: Parameters<typeof b
     canonicalSuffixIntegrity: commitment(canonicalSuffix), shellBootEncoding: "base64" as const, shellBootCompression, itemDescriptorCarriage,
     payloadPreparation: "build-time" as const, contractOperation: "verified-copy" as const };
 }
+
+
+/** Prepare a new, authorized dense COPY payload once at build time. This is
+ * local byte preparation, not selected-chain registration or upload approval.
+ * The caller stores one chosen representation; existing objects need reuse.
+ * Gzip is deterministic and selected only when it saves bytes. No decoder or
+ * shell is manufactured here, and tokenURI never performs this conversion.
+ */
+export function prepareKeelGzipDensePayload(bytes: Uint8Array, options: {
+  readonly compression?: "auto" | "none";
+  readonly transportProfile?: "uri81-block-v1";
+} = {}) {
+  if (!(bytes instanceof Uint8Array)) throw new TypeError("Dense COPY payload must be bytes.");
+  if (bytes.byteLength > 4 * 1024 * 1024) throw new RangeError("Dense COPY payload exceeds its byte bound.");
+  if (options.compression !== undefined && options.compression !== "auto" && options.compression !== "none") {
+    throw new TypeError("Unsupported dense COPY payload compression.");
+  }
+  const source = Buffer.from(bytes);
+  const gzip = options.compression === "none" ? null : gzipSync(source, { level: 9 });
+  const compression = gzip && gzip.byteLength < source.byteLength ? "gzip" as const : "none" as const;
+  const compressedBytes = compression === "gzip" ? gzip! : source;
+  if (compression === "gzip" && !gunzipSync(compressedBytes, { maxOutputLength: source.byteLength }).equals(source)) {
+    throw new TypeError("Dense COPY compression changed source bytes.");
+  }
+  const transportProfile = options.transportProfile ?? "uri81-block-v1";
+  if (transportProfile !== "uri81-block-v1") throw new TypeError("Fresh prepared COPY uses the URI81 transport profile.");
+  const storedDense = encodeKeelDenseTransport(compressedBytes, transportProfile);
+  const integrity = (value: Uint8Array) => {
+    const hash = createHash("sha256"); hash.update(value);
+    return { algorithm: "sha256" as const, digest: `0x${hash.digest("hex")}` as const, byteLength: value.byteLength };
+  };
+  return { compression, compressedBytes, storedDense, transportProfile,
+    sourceIntegrity: integrity(source), storedIntegrity: integrity(compressedBytes) };
+}

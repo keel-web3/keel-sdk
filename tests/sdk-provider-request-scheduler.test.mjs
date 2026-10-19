@@ -158,3 +158,14 @@ test('deadlines include queue waits and refuse already-expired work', async () =
   await assert.rejects(scheduler.run({ method: 'eth_getCode', deadlineAt: performance.now() - 1 }, async () => { executed = true; }), error => error.name === 'TimeoutError');
   assert.equal(executed, false);
 });
+
+test('an explicit HTTP503 request-byte capacity refusal never retries or creates shared outage cooldown', async () => {
+  const scheduler=create(settings), events=[];
+  const original=Object.assign(new Error('fixed capacity refusal'),{diagnostic:{httpStatus:503,gasCapacityScope:'request-bytes'}});
+  let calls=0;
+  await assert.rejects(scheduler.run({method:'eth_simulateV1',observe:event=>events.push(event)},async()=>{calls++;throw original;}),error=>error===original);
+  assert.equal(calls,1);assert.equal(scheduler.status().retryAfterMs,0);
+  assert.equal(events.filter(event=>event.type==='retry-wait').length,0);
+  assert.equal(await scheduler.run({method:'eth_getCode'},async()=>{calls++;return '0x6000';}),'0x6000');
+  assert.equal(calls,2);
+});

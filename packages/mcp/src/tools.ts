@@ -13,6 +13,8 @@ import { ARENA_TOOL_DEFINITIONS } from './arena-tools.js';
 import { LAYERED_TOOL_DEFINITIONS } from './layered-tools.js';
 import { SVG_TOOL_DEFINITIONS } from './svg-tools.js';
 import { CREATOR_INLINE_TOOL_DEFINITIONS } from './creator-inline-tools.js';
+import { TEZOS_COLLECTION_TOOL_DEFINITIONS } from './tezos-collection-tools.js';
+import { TEZOS_LIVE_STATE_TOOL_DEFINITIONS } from './tezos-live-state-tools.js';
 import { resolveKeelInlineCarriage } from "@keel/sdk/presentation";
 import {
   prepareKeelTezosShell,
@@ -1831,6 +1833,8 @@ export const TOOL_DEFINITIONS: readonly ToolDefinition[] = [
     return prepared !== null && typeof prepared === "object" && !Array.isArray(prepared) ? { ...prepared, standards: clearance } : { prepared, standards: clearance };
   }),
   tool("keel-tezos-publication-prepare", "Prepare one exact receipt-bound Tezos KEEL one-of-one publication call using the standard Hold, Index, and FA2 modules. The public route is ordinary FA2/TZIP-12 token_metadata with onchfs:// or another selected carrier; the KEEL JSON/harness route is compatibility-only. Requires standards.preflightReceipt. Review-only: no private key, origination, signing, submission, or fake address is accepted.", tezosPublicationPrepareSchema, tezosPublicationPrepareTool),
+  ...TEZOS_COLLECTION_TOOL_DEFINITIONS,
+  ...TEZOS_LIVE_STATE_TOOL_DEFINITIONS,
   ...ENGINE_TOOL_DEFINITIONS,
   tool("keel-token-standard-audit", "HARD GATE for tokens, collections, metadata and viewers. Reads tokenURI live (rpcUrl + contract + tokenId: one eth_call capped at 30M gas at a pinned block; eth_estimateGas is advisory only) or audits prepared bytes (tokenUri / tokenUriPath). Decodes the data: JSON (raw-percent or base64) and every embedded data: URI, unpacking gzip/deflate, and FAILS CLOSED on any http(s), ipfs, ar/arweave, web3:// or keel-onchain locator (only http://www.w3.org/2000/svg is allowed), an image that is not an onchain data:image, an HTML viewer that does not match its persisted shell choice (canonical verification by default; explicit viewer=none preserves creator-owned self-contained HTML), complete-HTML Base64, reads above 30M gas or tokenURI over 2 MB. Returns verdict, exact findings and a digest; pass the digest as standards.auditDigest. A waiver must be an explicit exception {codes, reason, reviewer}. Writes only its record under .keel-mcp/audits/.", TOOL_SCHEMAS.tokenStandardAudit, tokenStandardAuditTool),
   ...EDITOR_TOOL_DEFINITIONS,

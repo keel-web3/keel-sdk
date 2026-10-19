@@ -16,6 +16,8 @@ export interface KeelProviderRequestEvent {
   /** Private observer only: the exact original failure, never a public UI field. */
   readonly error?: unknown;
   readonly request?: { readonly method: string; readonly params: readonly unknown[] };
+  /** Actual serialized request body measured by the dispatching RPC transport. */
+  readonly requestWireBytes?: number;
   readonly rawResponse?: unknown;
   readonly httpStatus?: number;
   readonly status?: "available" | "unsupported" | "access-denied" | "cooldown";
@@ -57,6 +59,9 @@ function classify(error: unknown): Failure {
     const item = record(value), diagnostic = record(item?.diagnostic);
     const status = item?.status ?? diagnostic?.httpStatus;
     const code = item?.rpcCode ?? diagnostic?.rpcCode ?? item?.code;
+    // Capacity is a property of this complete request, not transient provider
+    // availability. Never retry it or poison shared health with an HTTP503.
+    if (diagnostic?.gasCapacityScope === "request-bytes") return { retryable: false, retryAfterMs: 0 };
     if (status === 401 || status === 403 || code === 401 || code === 403 || item?.reason === "access-denied") return { retryable: false, retryAfterMs: 0, permanent: "access-denied", httpStatus: status === 401 || code === 401 ? 401 : 403 };
     if (code === -32601) return { retryable: false, retryAfterMs: 0, permanent: "unsupported", rpcCode: -32601 };
     const delay = typeof item?.retryAfterMs === "number" && Number.isFinite(item.retryAfterMs) ? Math.max(0, item.retryAfterMs) : 0;

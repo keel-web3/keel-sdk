@@ -1,5 +1,16 @@
 /** Browser-safe intent planning. This is not a storage receipt or payment approval. */
 export type KeelMediaSlotDelivery = "onchain" | "ipfs" | "hosted";
+export const KEEL_STANDALONE_VIEWER_MAX_BYTES = 1_000_000;
+export const KEEL_INLINE_IMAGE_DEFAULT_MAX_BYTES = 500_000;
+/** Unknown sizes keep verification enabled until actual source bytes are known. */
+export function defaultKeelImageViewer(mediaType: string, byteLength?: number): "none" | "keel-verification-shell" {
+  if (byteLength !== undefined && (!Number.isSafeInteger(byteLength) || byteLength < 0)) throw new TypeError("Media byte length must be a nonnegative integer.");
+  return mediaType.split(";", 1)[0]!.trim().toLowerCase().startsWith("image/") && byteLength !== undefined && byteLength > KEEL_STANDALONE_VIEWER_MAX_BYTES ? "none" : "keel-verification-shell";
+}
+export function defaultKeelImageDelivery(byteLength?: number): KeelMediaSlotDelivery {
+  if (byteLength !== undefined && (!Number.isSafeInteger(byteLength) || byteLength < 0)) throw new TypeError("Image byte length must be a nonnegative integer.");
+  return byteLength !== undefined && byteLength >= KEEL_INLINE_IMAGE_DEFAULT_MAX_BYTES ? "hosted" : "onchain";
+}
 export interface KeelMediaSlotSelection {
   readonly resourceId: string;
   readonly presentation: "direct" | "keel-shell";
@@ -35,26 +46,31 @@ function selection(value: KeelMediaSlotSelection | null): KeelMediaSlotSelection
   if (!value || typeof value !== "object" || Object.keys(value).some(key => !["resourceId","presentation","delivery"].includes(key)) || !["direct","keel-shell"].includes(value.presentation)) throw new TypeError("Invalid metadata slot choice.");
   return {resourceId:resource(value.resourceId),presentation:value.presentation,delivery:delivery(value.delivery)};
 }
-/** Original JPEG/PNG/GIF/etc. occupies image only. WebP/AVIF and other media
- * use animation_url + KEEL shell. A thumbnail is always a distinct resource.
+/** Measured standalone images above 1 MB use direct display; smaller or unknown
+ * images use the verifier. A thumbnail is always a distinct resource.
  * Only an explicitly selected candidate switches the source to that candidate. */
 export function planKeelMediaSlots(input: {
   readonly sourceResourceId: string;
   readonly mediaType: string;
+  readonly sourceByteLength?: number;
   readonly collectionType?: string;
   readonly selectedCandidateResourceId?: string;
   readonly thumbnailResourceId?: string;
+  readonly thumbnailByteLength?: number;
   readonly defaults?: readonly KeelMediaSlotDefault[];
   readonly explicit?: KeelMediaSlotChoices;
 }): KeelMediaSlotPlan {
   const source=resource(input.sourceResourceId), mime=input.mediaType.split(";",1)[0]!.trim().toLowerCase();
-  let imageDelivery:KeelMediaSlotDelivery="onchain", animationDelivery:KeelMediaSlotDelivery="onchain";
+  const defaultViewer = defaultKeelImageViewer(mime, input.sourceByteLength);
+  if (input.thumbnailByteLength !== undefined && (!Number.isSafeInteger(input.thumbnailByteLength) || input.thumbnailByteLength < 0)) throw new TypeError("Thumbnail byte length must be a nonnegative integer.");
+  const imageBytes = input.thumbnailResourceId === undefined ? input.sourceByteLength : input.thumbnailByteLength;
+  let imageDelivery:KeelMediaSlotDelivery=defaultKeelImageDelivery(imageBytes), animationDelivery:KeelMediaSlotDelivery="onchain";
   // Global < collection < exact asset type < exact asset+collection. Explicit choices win below.
   const applicable=(input.defaults ?? []).filter(value=>(value.mediaType === undefined || value.mediaType === mime) && (value.collectionType === undefined || value.collectionType === input.collectionType));
   applicable.sort((a,b)=>(Number(a.mediaType!==undefined)*2+Number(a.collectionType!==undefined))-(Number(b.mediaType!==undefined)*2+Number(b.collectionType!==undefined)));
   for(const value of applicable) {if(value.imageDelivery!==undefined)imageDelivery=delivery(value.imageDelivery);if(value.animationDelivery!==undefined)animationDelivery=delivery(value.animationDelivery);}
   const encoded=input.selectedCandidateResourceId===undefined ? undefined : resource(input.selectedCandidateResourceId);
-  const directImage=mime.startsWith("image/") && mime!=="image/webp" && mime!=="image/avif" && encoded===undefined;
+  const directImage=defaultViewer === "none" && encoded===undefined;
   const thumbnail=input.thumbnailResourceId===undefined ? undefined : resource(input.thumbnailResourceId);
   if(thumbnail!==undefined && (thumbnail===source || thumbnail===encoded)) throw new TypeError("A thumbnail must be a separately selected resource; full media is not copied into both slots automatically.");
   let image:KeelMediaSlotSelection|null=directImage ? {resourceId:source,presentation:"direct",delivery:imageDelivery} : thumbnail ? {resourceId:thumbnail,presentation:"direct",delivery:imageDelivery} : null;
@@ -71,5 +87,7 @@ export function planKeelMediaSlots(input: {
 /** Gate complete metadata, never media-payload savings alone. Evidence must be
  * attached to this exact plan after the selected chain's actual read check. */
 export function assertKeelMediaSlotReadFit(plan:KeelMediaSlotPlan, evidence:{readonly planKey:string;readonly completeTokenUriBytes:number;readonly maxTokenUriBytes:number;readonly selectedChainReadPassed:boolean}):void {
-  if(evidence.planKey!==plan.planKey || !Number.isSafeInteger(evidence.completeTokenUriBytes) || evidence.completeTokenUriBytes<1 || !Number.isSafeInteger(evidence.maxTokenUriBytes) || evidence.maxTokenUriBytes<1 || evidence.completeTokenUriBytes>evidence.maxTokenUriBytes || evidence.selectedChainReadPassed!==true) throw new Error("The exact complete metadata slots need a successful selected-chain read within the tokenURI limit before funding.");
+  if(evidence.planKey!==plan.planKey || !Number.isSafeInteger(evidence.completeTokenUriBytes) || evidence.completeTokenUriBytes<1 || !Number.isSafeInteger(evidence.maxTokenUriBytes) || evidence.maxTokenUriBytes<1 || evidence.completeTokenUriBytes>Math.min(evidence.maxTokenUriBytes,2_000_000) || evidence.selectedChainReadPassed!==true) throw new Error("The exact complete metadata slots need a successful selected-chain read within the standard 2 MB tokenURI limit before funding. Larger embedded media requires a separately supported nonstandard route and explicit marketplace compatibility review.");
 }
+
+export { planKeelInitialMediaBudget, KEEL_STANDARD_INITIAL_METADATA_BYTES, type KeelInitialMetadataSlots, type KeelInitialMediaBudgetInput } from "./initial-media-budget.js";
