@@ -1335,7 +1335,10 @@ export async function buildCompactInlineKeelShell(input: {
     stdin: {
       contents: `${input.optionalMarketplaceInfo ? `import {startKeelShellMarketplaceInfo} from ${JSON.stringify(fileURLToPath(new URL("./marketplace-reader.js",import.meta.url)))};` : ""}${binaryReaderImport}${input.decoderDelivery === "preloaded" ? "const KEEL_RESOURCE_DECODERS=globalThis.__KEEL_BOOT_RESOURCE_DECODERS__,KEEL_DENSE_TRANSPORT=globalThis.__KEEL_BOOT_DENSE_TRANSPORT__;" : (transportModule?.javascript ?? "")+(decoderModule?.javascript ?? "")}${input.onchainDelivery || input.embeddedContainerDelivery ? "" : 'import {keccak_256} from "@noble/hashes/sha3";'}import { mountKeelVerification } from ${JSON.stringify(verificationChromePath)};import {createKeelShellClient} from ${JSON.stringify(fileURLToPath(new URL("./verification-shell-client.js", import.meta.url)))};import {buildKeelShellCatalog} from ${JSON.stringify(fileURLToPath(new URL("./verification-shell-catalog.js", import.meta.url)))};import {normalizeKeelLoadingManifest} from ${JSON.stringify(fileURLToPath(new URL("./verification-shell-loading.js", import.meta.url)))};(${runtimeSource})(mountKeelVerification,${JSON.stringify(installedViewReader.integrity.digest)},${input.onchainDelivery || input.embeddedContainerDelivery ? "undefined" : "keccak_256"},createKeelShellClient,buildKeelShellCatalog,normalizeKeelLoadingManifest${input.optionalMarketplaceInfo ? `,{config:${JSON.stringify(input.optionalMarketplaceInfo)},start:startKeelShellMarketplaceInfo}` : ""})`,
       resolveDir: repositoryRoot,
-      sourcefile: "keel-inline-runtime.js",
+      // A virtual root keeps esbuild's license grouping independent of whether
+      // this SDK lives in a workspace or under node_modules. Canonical bytes
+      // must retain their existing identity after a portable npm installation.
+      sourcefile: "/keel-inline-runtime.js",
       loader: "js",
     },
   });
