@@ -27,6 +27,11 @@ export interface KeelPreparedEnvelopeQualification {
   readonly suffixBytes: number;
   readonly requiresFullSimulation: true;
 }
+export type KeelRouted721FactoryInput = Omit<KeelPreparedEnvelopeInput, "encodedPrefix" | "encodedSuffix">;
+export type KeelRouted721FactoryQualification = Omit<KeelPreparedEnvelopeQualification, "prefixBytes" | "suffixBytes" | "capability"> & {
+  readonly scope: "routed721-factory";
+  readonly moduleHooks: true;
+};
 export type KeelPreparedEnvelopeFailureCode = "KEEL_PREPARED_ENVELOPE_LIMIT" | "KEEL_PREPARED_ENVELOPE_UNQUALIFIED";
 export class KeelPreparedEnvelopeCapabilityError extends Error {
   readonly phase = "prepared-presentation";
@@ -100,7 +105,11 @@ function shortString(value: string): string {
 /** Qualifies the actual deployed collection constructor, not the current source ABI.
  * No payload is transmitted. This is capability preflight, never execution proof.
  */
-export async function qualifyKeelPreparedEnvelope(input: KeelPreparedEnvelopeInput): Promise<KeelPreparedEnvelopeQualification> {
+async function qualifyFactory(
+  input: KeelRouted721FactoryInput,
+  envelope?: Pick<KeelPreparedEnvelopeInput, "encodedPrefix" | "encodedSuffix">,
+  requireMaintained = false,
+): Promise<KeelPreparedEnvelopeQualification> {
   const factory = getAddress(input.factory);
   const chainId = input.chainId;
   const block = { ...input.block };
@@ -110,8 +119,8 @@ export async function qualifyKeelPreparedEnvelope(input: KeelPreparedEnvelopeInp
   checkAbort();
   const options = signal === undefined ? {} : { signal: signal };
   const read = async <T>(fn: () => Promise<T>): Promise<T> => { checkAbort(); const value = await fn(); checkAbort(); return value; };
-  const prefixBytes = asBytes(input.encodedPrefix).length;
-  const suffixBytes = asBytes(input.encodedSuffix).length;
+  const prefixBytes = envelope === undefined ? 0 : asBytes(envelope.encodedPrefix).length;
+  const suffixBytes = envelope === undefined ? 0 : asBytes(envelope.encodedSuffix).length;
   let creationHash: string | undefined;
   const fail = (reason: string): never => {
     throw new KeelPreparedEnvelopeCapabilityError("KEEL_PREPARED_ENVELOPE_UNQUALIFIED",
@@ -122,7 +131,7 @@ export async function qualifyKeelPreparedEnvelope(input: KeelPreparedEnvelopeInp
   };
   if (!Number.isSafeInteger(chainId) || chainId <= 0) fail("invalid chain identity");
   if (block.number < 0n || !/^0x[0-9a-f]{64}$/iu.test(block.hash)) fail("invalid pinned block");
-  if (prefixBytes === 0 || suffixBytes === 0) fail("empty prepared envelope fragment");
+  if (envelope !== undefined && (prefixBytes === 0 || suffixBytes === 0)) fail("empty prepared envelope fragment");
   let qualification: KeelPreparedEnvelopeQualification | undefined;
   try {
     if (await read(() => adapter.getChainId(options)) !== chainId) fail("provider chain mismatch");
@@ -136,6 +145,7 @@ export async function qualifyKeelPreparedEnvelope(input: KeelPreparedEnvelopeInp
     const legacyFactory = legacyDomainOffset !== undefined;
     const maintainedFactory = factoryCode.length === 4563 && maskedHash(factoryCode, factoryImmutableStarts, 32) === factoryTemplateHash;
     if (!legacyFactory && !maintainedFactory) fail("unknown factory runtime");
+    if (requireMaintained && !maintainedFactory) fail("maintained Routed721 factory required for presentation module hooks");
     if (legacyDomainOffset !== undefined && BigInt(word(factoryCode, legacyDomainOffset)) !== BigInt(chainId)) {
       fail("legacy factory cached chain/domain mismatch");
     }
@@ -206,4 +216,19 @@ export async function qualifyKeelPreparedEnvelope(input: KeelPreparedEnvelopeInp
         blockHash: block.hash, collectionCreationCodeHash: creationHash!, limitBytes: limit, reason: "deployed envelope fragment limit" });
   }
   return qualified;
+}
+
+/** Qualifies an actual prepared envelope, preserving the historical fragment
+ * boundary as well as complete deployed factory/deployer/carrier identity. */
+export async function qualifyKeelPreparedEnvelope(input: KeelPreparedEnvelopeInput): Promise<KeelPreparedEnvelopeQualification> {
+  return qualifyFactory(input, input);
+}
+
+/** Authenticate the actual maintained factory and its immutable constructor
+ * carriers before preparing native module hooks. A matching ABI/getter/catalog
+ * hash alone is insufficient. No envelope is supplied, measured or approved;
+ * the exact native publication still requires complete simulation. */
+export async function qualifyKeelRouted721Factory(input: KeelRouted721FactoryInput): Promise<KeelRouted721FactoryQualification> {
+  const { prefixBytes: _prefixBytes, suffixBytes: _suffixBytes, capability: _capability, ...factory } = await qualifyFactory(input, undefined, true);
+  return { ...factory, scope: "routed721-factory", moduleHooks: true };
 }

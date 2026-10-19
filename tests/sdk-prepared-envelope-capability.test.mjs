@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { encodeAbiParameters, keccak256, padHex, stringToBytes, toHex } from 'viem';
-import { qualifyKeelPreparedEnvelope, KeelPreparedEnvelopeCapabilityError } from '../packages/sdk/dist/prepared-envelope-capability.js';
+import { qualifyKeelPreparedEnvelope, qualifyKeelRouted721Factory, KeelPreparedEnvelopeCapabilityError } from '../packages/sdk/dist/prepared-envelope-capability.js';
 
 const fixtures = JSON.parse(readFileSync(new URL('./fixtures/prepared-envelope-capability.json', import.meta.url)));
 const clone = name => structuredClone(fixtures[name]);
@@ -168,4 +168,48 @@ test('provider error credentials and payload are never copied into capability di
     assert.doesNotMatch(JSON.stringify(error) + error.message, /secret|apiKey|https:|private/);
     return true;
   });
+});
+
+const factoryInput = ({ encodedPrefix: _prefix, encodedSuffix: _suffix, ...input }) => input;
+test('native module factory qualification authenticates every maintained dependency without an envelope claim', async () => {
+  const f = setup(clone('maintained'));
+  const result = await qualifyKeelRouted721Factory(factoryInput(f.input));
+  assert.equal(result.scope, 'routed721-factory');
+  assert.equal(result.moduleHooks, true);
+  assert.equal(result.requiresFullSimulation, true);
+  assert.equal(result.factory.toLowerCase(), f.fixture.factory.toLowerCase());
+  assert.equal(result.collectionCreationCodeHash, f.fixture.creationHash);
+  assert.equal('prefixBytes' in result, false);
+  assert.equal('suffixBytes' in result, false);
+  assert.equal('capability' in result, false);
+  const readCodes = f.requests.filter(request => request.kind === 'code').map(request => request.address.toLowerCase());
+  assert.deepEqual(new Set(readCodes), new Set(Object.keys(f.fixture.codeByAddress)));
+});
+test('native module admission rejects a lying getter before invoking it or preparing calls', async () => {
+  const fixture = clone('maintained'); fixture.codeByAddress[fixture.factory.toLowerCase()] = '0x6000';
+  const f = setup(fixture);
+  await rejects(qualifyKeelRouted721Factory(factoryInput(f.input)), 'KEEL_PREPARED_ENVELOPE_UNQUALIFIED', /unknown factory runtime/);
+  assert.equal(f.requests.filter(request => request.kind === 'call').length, 0);
+  assert.equal(f.requests.filter(request => request.kind === 'code').length, 1);
+});
+test('known legacy factories remain valid for old envelopes but cannot attest native module hooks', async () => {
+  for (const fixture of [clone('legacy'), ...structuredClone(fixtures.otherLegacy)]) {
+    const f = setup(fixture);
+    await rejects(qualifyKeelRouted721Factory(factoryInput(f.input)), 'KEEL_PREPARED_ENVELOPE_UNQUALIFIED', /maintained Routed721/);
+  }
+});
+test('native factory qualification rejects mutations in actual factory, deployer, carrier and library code', async () => {
+  for (const address of Object.keys(clone('maintained').codeByAddress)) {
+    const fixture = clone('maintained'), original = fixture.codeByAddress[address];
+    fixture.codeByAddress[address] = replace(original, 0, toHex(Number.parseInt(original.slice(2, 4), 16) ^ 1, { size: 1 }));
+    await rejects(qualifyKeelRouted721Factory(factoryInput(setup(fixture).input)), 'KEEL_PREPARED_ENVELOPE_UNQUALIFIED');
+  }
+});
+test('native factory qualification preserves selected chain, canonical pin and cancellation boundaries', async () => {
+  await rejects(qualifyKeelRouted721Factory(factoryInput(setup(clone('maintained'), { wrongChain: true }).input)), 'KEEL_PREPARED_ENVELOPE_UNQUALIFIED', /provider chain/);
+  await rejects(qualifyKeelRouted721Factory(factoryInput(setup(clone('maintained'), { reorg: true }).input)), 'KEEL_PREPARED_ENVELOPE_UNQUALIFIED', /pinned block/);
+  const controller = new AbortController();
+  const f = setup(clone('maintained'), { input: { signal: controller.signal }, onRead: requests => { if (requests.length === 3) controller.abort(); } });
+  await assert.rejects(qualifyKeelRouted721Factory(factoryInput(f.input)), { name: 'AbortError' });
+  assert.equal(f.requests.length, 3);
 });
