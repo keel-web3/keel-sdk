@@ -7,6 +7,7 @@ import (
 	"errors"
 	"math/big"
 	"os"
+	"strings"
 	"testing"
 
 	"github.com/ethereum/go-ethereum/common"
@@ -203,5 +204,90 @@ func TestUntrustedAccountSummaryCannotOverrideProvenBalance(t *testing.T) {
 	a, err := r.Account(f.Address)
 	if err != nil || a == nil || !a.Balance.IsZero() || a.Nonce != 1 {
 		t.Fatal("untrusted RPC summary changed proven state")
+	}
+}
+
+func TestCapturedPublicZeroSlotQuantityKey(t *testing.T) {
+	f := loadPublicFixture(t)
+	if f.Slot != (common.Hash{}) {
+		t.Fatal("the unchanged historical public fixture must authenticate slot zero")
+	}
+	// EthPandaOps returns QUANTITY 0x0 even when the requested slot is DATA32.
+	// Preserve every authenticated proof node and value from the real snapshot.
+	r := fixtureReader(t, f, fixtureHeader(t, f), func(_ string, p map[string]any) {
+		for _, item := range p["storageProof"].([]any) {
+			item.(map[string]any)["key"] = "0x0"
+		}
+	}, false)
+	value, err := r.Storage(f.Address, f.Slot)
+	if err != nil || r.Error() != nil {
+		t.Fatalf("valid quantity key rejected before authenticating its original proof: %v", err)
+	}
+	var original proofResponse
+	if err := json.Unmarshal(f.Proof, &original); err != nil {
+		t.Fatal(err)
+	}
+	if len(original.StorageProof) != 1 || original.StorageProof[0].Value == nil || value != common.BigToHash(original.StorageProof[0].Value.ToInt()) {
+		t.Fatal("quantity key changed the proven storage value")
+	}
+	if r.StorageProofs != 1 {
+		t.Fatal("the storage proof was not authenticated")
+	}
+}
+
+func TestStorageProofKeyEncodings(t *testing.T) {
+	for _, encoded := range []string{"0x0", "0x00", "0x" + strings.Repeat("0", 64)} {
+		key, err := decodeStorageProofKey(encoded)
+		if err != nil || key != (common.Hash{}) {
+			t.Fatalf("zero key %q: %v", encoded, err)
+		}
+	}
+	for _, encoded := range []string{"0xabc", "0x0abc", "0x" + strings.Repeat("0", 61) + "abc"} {
+		key, err := decodeStorageProofKey(encoded)
+		if err != nil || key != common.HexToHash("0x0abc") {
+			t.Fatalf("nonzero key %q: %v", encoded, err)
+		}
+	}
+	for _, encoded := range []string{"", "0x", "0x-1", "-0x1", "0xg", "0x1z", "abc", " 0x0", "0x1" + strings.Repeat("0", 64)} {
+		if _, err := decodeStorageProofKey(encoded); err == nil {
+			t.Fatalf("invalid or overflowing key %q accepted", encoded)
+		}
+	}
+}
+
+func TestCapturedQuantityProofStillRejectsInvalidEvidence(t *testing.T) {
+	for _, kind := range []string{"empty-key", "overflow-key", "negative-key", "nonhex-key", "foreign-slot", "duplicate-slot", "missing-proof-node", "invalid-value"} {
+		t.Run(kind, func(t *testing.T) {
+			f := loadPublicFixture(t)
+			r := fixtureReader(t, f, fixtureHeader(t, f), func(_ string, p map[string]any) {
+				proofs := p["storageProof"].([]any)
+				if len(proofs) == 0 {
+					return
+				}
+				item := proofs[0].(map[string]any)
+				item["key"] = "0x0"
+				switch kind {
+				case "empty-key":
+					item["key"] = "0x"
+				case "overflow-key":
+					item["key"] = "0x1" + strings.Repeat("0", 64)
+				case "negative-key":
+					item["key"] = "0x-1"
+				case "nonhex-key":
+					item["key"] = "0xg"
+				case "foreign-slot":
+					item["key"] = "0x1"
+				case "duplicate-slot":
+					p["storageProof"] = append(proofs, item)
+				case "missing-proof-node":
+					item["proof"] = item["proof"].([]any)[1:]
+				case "invalid-value":
+					item["value"] = "0xffffffffffffffff"
+				}
+			}, false)
+			if _, err := r.Storage(f.Address, f.Slot); err == nil || r.Error() == nil {
+				t.Fatal("invalid quantity-key proof was accepted")
+			}
+		})
 	}
 }

@@ -86,6 +86,28 @@ try{
   assert.ok(result.every(b=>BigInt(b.transactions[0].gas)===200_000_000n));
   record(`full five-call original 200M envelopes match Geth byte-for-byte, validation=${validation}`,{roots:result.map(b=>b.stateRoot),totalGasUsed:result.reduce((s,b)=>s+BigInt(b.calls[0].gasUsed),0n).toString()});
  }
+ // The actual configured Sepolia source returns EIP-1186 storage keys as
+ // QUANTITY even for DATA32 requests. Re-encode only that unauthenticated key
+ // label; retain every real reference proof node, value, account and code byte.
+ const quantityProofAccounts=new Set(),quantityKeys=[];
+ const quantityReader={request:async input=>{
+  const result=await stateReader.request(input);
+  if(input.method!=='eth_getProof')return result;
+  const exact=structuredClone(result);quantityProofAccounts.add(input.params[0].toLowerCase());
+  for(const item of exact.storageProof){item.key=toHex(BigInt(item.key));quantityKeys.push(item.key);}
+  return exact;
+ }};
+ const quantityTransport=await createProofBackedSimulationTransport({...options(),stateReader:quantityReader});
+ try{
+  const p=payload(calls,true),reference=rpc('eth_simulateV1',[p,'0x0']);
+  assert.deepEqual(await quantityTransport.request({method:'eth_simulateV1',params:[p,'0x0']}),reference,
+   'quantity proof keys must retain every native Geth result/header/root/hash/receipt/transaction field');
+  assert.ok(quantityKeys.includes('0x0'),'the full EVM replay must authenticate a quantity-encoded zero slot');
+  for(const address of ['0x00000961ef480eb55e80d19ad83579a64c007002','0x0000bbddc7ce488642fb579f8b00f3a590007251'])
+   assert.ok(quantityProofAccounts.has(address),'both real genesis request system contracts must be authenticated');
+  record('quantity-encoded EIP-1186 keys preserve full Geth parity and both request system contracts',
+   {quantityKeys:quantityKeys.length,zeroSlotProven:true,systemContractsAuthenticated:2});
+ }finally{await quantityTransport.close();}
  const big={...calls[0],gas:toHex(170_000_000n),data:data('write',[1300n])},bigPayload=payload([big]);
  const bigResult=await transport.request({method:'eth_simulateV1',params:[bigPayload,'0x0']});assert.deepEqual(bigResult,rpc('eth_simulateV1',[bigPayload,'0x0']));assert.ok(BigInt(bigResult[0].calls[0].maxUsedGas)>140_000_000n);
  assert.ok(evidence.executions.at(-1).readRequests<100,'proven empty base tries must not require a proof request per fresh storage slot');

@@ -108,6 +108,23 @@ func cloneAccount(a *types.StateAccount) *types.StateAccount {
 	copy.CodeHash = common.CopyBytes(a.CodeHash)
 	return &copy
 }
+
+// EIP-1186 storage keys may use QUANTITY encoding, including odd-width 0x0.
+// Preserve existing byte-padded responses too; both identify the same uint256.
+func decodeStorageProofKey(encoded string) (common.Hash, error) {
+	if len(encoded) < 3 || len(encoded) > 66 {
+		return common.Hash{}, errors.New("storage proof key outside uint256 range")
+	}
+	if len(encoded)%2 != 0 {
+		encoded = encoded[:2] + "0" + encoded[2:]
+	}
+	raw, err := hexutil.Decode(encoded)
+	if err != nil {
+		return common.Hash{}, err
+	}
+	return common.BytesToHash(raw), nil
+}
+
 func (r *Reader) proof(addr common.Address, keys []common.Hash) (*types.StateAccount, error) {
 	var response proofResponse
 	slots := make([]string, len(keys))
@@ -151,8 +168,8 @@ func (r *Reader) proof(addr common.Address, keys []common.Hash) (*types.StateAcc
 		r.slots[addr] = make(map[common.Hash]common.Hash)
 	}
 	for i, item := range response.StorageProof {
-		keyBytes, err := hexutil.Decode(item.Key)
-		if err != nil || len(keyBytes) > 32 || common.BytesToHash(keyBytes) != keys[i] {
+		key, err := decodeStorageProofKey(item.Key)
+		if err != nil || key != keys[i] {
 			return nil, r.fail(errors.New("storage proof key mismatch"))
 		}
 		encoded, err := r.verify(root, crypto.Keccak256(keys[i][:]), item.Proof)
