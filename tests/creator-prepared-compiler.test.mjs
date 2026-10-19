@@ -27,7 +27,9 @@ async function fixture(bad={}){
   const bytes=prepareKeelDenseCopyFragment(html.slice(html.indexOf('];queueMicrotask')));
   plan.shell.suffix={id:'legacy-shell-suffix',bytes,...await createKeelManagedObjectPlan(bytes,{hold:addresses.KeelHold,mediaType:'application/vnd.keel.token-uri-raw-percent-fragment',compression:'none'})};
  }
- const objects=new Map([plan.shell.prefix,plan.shell.suffix].map(o=>[o.objectId,o]));const preparedObjects=new Map(plan.objects.map(o=>[o.objectId,o]));const requests=[];
+ const metadataBytes=Buffer.from(JSON.stringify({readerProfile:{protocol:'keel.prepared-reader-profile@1',chainId:31337,store:addresses.KeelHold,reader:addresses.KeelRawTokenURIBuilder,runtimeCodeHash:keccak256(code),transportProfile:'uri81-block-v1',readerGrammar:'uri81'}}));
+ const metadata={bytes:metadataBytes,...await createKeelManagedObjectPlan(metadataBytes,{hold:addresses.KeelHold,mediaType:'application/json',compression:'none'})};
+ const objects=new Map([plan.shell.prefix,plan.shell.suffix,metadata].map(o=>[o.objectId,o]));const preparedObjects=new Map(plan.objects.map(o=>[o.objectId,o]));const requests=[];
  const pool={status:()=>[],request:async req=>{requests.push(req);
   if(req.method==='eth_chainId')return '0x7a69';if(req.method==='eth_blockNumber')return '0x2';
   if(req.method==='eth_getBlockByNumber')return {number:'0x2',hash:bad.reorg&&requests.filter(r=>r.method==='eth_getBlockByNumber').length>1?hash(123):blockHash};
@@ -40,7 +42,7 @@ async function fixture(bad={}){
   else if(name==='manager'||name==='platformAuthority')result=address(999);
   else if(name==='RAW_INLINE_PROTECTION_SHELL_ID')result=keccak256(stringToHex('keel.shell.inline-raw-percent-protection@1'));
   else if(name==='creatorManagedShell')result=false;
-  else if(name==='shellRevision')result=[plan.shell.prefix.objectId,plan.shell.suffix.objectId,bad.mode?2:3,true,hash(501)];
+  else if(name==='shellRevision')result=[plan.shell.prefix.objectId,plan.shell.suffix.objectId,bad.mode?2:3,true,metadata.objectId];
   else if(name==='creatorNonces')result=3n;
   else if(name==='nextCollectionId')result=5n;
   else if(name==='predictNextCollectionAddress')result=address(800);
@@ -65,7 +67,7 @@ async function fixture(bad={}){
    if(name==='requireRegistration'&&bad.registration)throw Error('not registered');
    if(name==='verifiedDigest')result=bad.digest?hash(777):object.digest;
    if(name==='haulObject')result=toHex(bad.bytes?Uint8Array.of(1):object.bytes);
-   if(name==='getObject')result={digest:object.digest,indexDigest:hash(0),descriptorPointer:address(1),byteLength:BigInt(object.bytes.length),storedByteLength:BigInt(object.bytes.length),chunkCount:1,compression:0,composite:false,exists:true,mediaType:'application/vnd.keel.token-uri-raw-percent-fragment'};
+   if(name==='getObject')result={digest:object.digest,indexDigest:hash(0),descriptorPointer:address(1),byteLength:BigInt(object.bytes.length),storedByteLength:BigInt(object.bytes.length),chunkCount:1,compression:0,composite:false,exists:true,mediaType:object.mediaType??'application/vnd.keel.token-uri-raw-percent-fragment'};
   }
   return encodeFunctionResult({abi,functionName:name,result});
  }};return {pool,plan,requests};
