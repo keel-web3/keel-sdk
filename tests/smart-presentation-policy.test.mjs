@@ -6,7 +6,7 @@ const digest = bytes => '0x'+createHash('sha256').update(bytes).digest('hex');
 const png = Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+jR1sAAAAASUVORK5CYII=', 'base64');
 const image = {resourceId:'preview',mediaType:'image/png',byteLength:png.length,digest:digest(png)};
 const hash = n => '0x'+n.repeat(64), address=n=>'0x'+n.repeat(40);
-const capabilities = {directAsset:'qualified',shellInline:'qualified',shellHybrid:'qualified',externalPresentation:'qualified',identity:{chainId:11155111,blockNumber:'11949136',blockHash:hash('1'),factory:address('2'),creationCodeHash:hash('3'),reader:address('4'),runtimeCodeHash:hash('5')}};
+const capabilities = {directAsset:'qualified',shellInline:'qualified',shellHybrid:'qualified',externalPresentation:'qualified',inlineImageTypes:['image/png','image/gif','image/jpeg','image/webp','image/avif'],inlineMediaTypes:['audio/wav','audio/mpeg','video/mp4','model/gltf-binary','text/plain'],identity:{chainId:11155111,blockNumber:'11949136',blockHash:hash('1'),factory:address('2'),creationCodeHash:hash('3'),reader:address('4'),runtimeCodeHash:hash('5')}};
 const input = (size=100) => ({source:{resourceId:'original.gif',mediaType:'image/gif',byteLength:size,digest:hash('a')},preview:image,execution:'static',capabilities,contextIdentity:{projectId:'project',revision:'1',defaultsRevision:'0'}});
 const choose=(x,selection)=>p.planKeelSmartAssetPresentation({...x,selection});
 const hybrid = {image:'inline',animation:'hybrid-shell'};
@@ -18,23 +18,23 @@ const render = (extra={}) => jsonURI({name:'Exact 🌊',image:imageURI,animation
 test('actual decimal thresholds use above, with source and metadata boundaries separate',()=>{
  assert.equal(p.KEEL_SMART_INLINE_ASSET_MAX_BYTES,500000);assert.equal(p.KEEL_SMART_SPLIT_ASSET_THRESHOLD_BYTES,2000000);
  for(const n of [499999,500000])assert.equal(p.planKeelSmartAssetPresentation(input(n)).selectedCandidateId,'canonical-inline');
- for(const n of [500001,1999999,2000000])assert.equal(p.planKeelSmartAssetPresentation(input(n)).selectedCandidateId,'direct-onchain-asset');
+ for(const n of [500001,1999999,2000000])assert.equal(p.planKeelSmartAssetPresentation(input(n)).selectedCandidateId,'image-only-inline');
  assert.equal(p.planKeelSmartAssetPresentation(input(2000001)).selectedCandidateId,'canonical-hybrid');
 });
 test('matrix exposes maintained alternatives and never calls a local numeric estimate chain-ready',()=>{
- const plan=p.planKeelSmartAssetPresentation(input());assert.equal(plan.candidates.length,9);assert.equal(plan.publicationReady,false);
+ const plan=p.planKeelSmartAssetPresentation(input());assert.equal(plan.candidates.length,10);assert.equal(plan.publicationReady,false);
  for(const c of plan.candidates){assert.equal(c.publicationReady,false);assert.equal(c.measurementBasis,'provisional-local-measurements');assert.equal(c.measurementComplete,false);assert.equal(c.standardsCompatible,null);}
 });
 test('real prefix/cap arithmetic rejects old duplication and chooses another qualified layout',()=>{
  const x={...input(130296),measurements:{prefixBytes:256001,suffixBytes:2042,maxEnvelopeBytes:32768,literalMediaPrefixBytes:255863}};
  assert.equal(p.planKeelSmartAssetPresentation(x).selectedCandidateId,'canonical-hybrid');
- const direct=p.planKeelSmartAssetPresentation({...x,capabilities:{...capabilities,shellHybrid:'unsupported'}});assert.equal(direct.selectedCandidateId,'direct-onchain-asset');
+ const direct=p.planKeelSmartAssetPresentation({...x,capabilities:{...capabilities,shellHybrid:'unsupported'}});assert.equal(direct.selectedCandidateId,'image-only-inline');
  assert.ok(direct.candidates[0].hardBlockers.includes('deployed-envelope-limit'));
  assert.equal(p.planKeelSmartAssetPresentation({...x,measurements:{prefixBytes:100,suffixBytes:100,maxEnvelopeBytes:32768,literalMediaPrefixBytes:0}}).selectedCandidateId,'canonical-inline');
  assert.equal(direct.source.byteLength,130296);assert.deepEqual(direct.preview,image);
 });
 test('explicit layout remains selected even when a different layout is recommended',()=>{
- const plan=choose(input(1000000),hybrid);assert.equal(plan.selectedCandidateId,'canonical-hybrid');assert.equal(plan.selectionSource,'explicit');assert.equal(plan.recommendedCandidateId,'direct-onchain-asset');
+ const plan=choose(input(1000000),hybrid);assert.equal(plan.selectedCandidateId,'canonical-hybrid');assert.equal(plan.selectionSource,'explicit');assert.equal(plan.recommendedCandidateId,'image-only-inline');
 });
 test('scripts always require a registered verifier and script MIME overrides a static caller label',()=>{
  const x={...input(1000000),source:{...input().source,mediaType:'text/javascript'},execution:'static'};
@@ -51,7 +51,7 @@ test('actual inspection catches MIME lies, active SVG and undecidable PDF withou
 test('all non-script media use same size policy and direct playback retains a separate usable poster',()=>{
  for(const mediaType of ['video/mp4','audio/mpeg','model/gltf-binary','application/pdf','text/plain']){
   const x={...input(500001),source:{...input(500001).source,mediaType}};const plan=p.planKeelSmartAssetPresentation(x);
-  assert.equal(plan.selectedCandidateId,'direct-onchain-asset');assert.equal(plan.animation.delivery,'onchain-reference');assert.equal(plan.image.resourceId,'preview');assert.equal(plan.status,'requires-validation');
+  if(mediaType==='application/pdf'){assert.equal(plan.selectedCandidateId,'canonical-inline');assert.ok(plan.candidates.find(c=>c.id==='media-only-inline').hardBlockers.includes('qualified-inline-media-renderer-required'));}else{assert.equal(plan.selectedCandidateId,'media-only-inline');assert.equal(plan.animation.delivery,'inline-media');}assert.equal(plan.image.resourceId,'preview');assert.equal(plan.status,'requires-validation');
   const missing=p.planKeelSmartAssetPresentation({...x,preview:undefined});assert.equal(missing.status,'blocked');assert.ok(missing.hardBlockers.includes('usable-grid-image-required'));
  }
 });
@@ -124,7 +124,7 @@ test('malformed quantities, unknown axes and unsupported pairs fail closed',()=>
 });
 test('exact native source references bind the plan and actual metadata cannot switch paid object IDs',async()=>{
  const onchain={chainId:11155111,store:address('7'),objectId:hash('8')},x={...input(500001),preview:undefined,source:{...image,resourceId:'original',byteLength:500001,onchain}};
- const plan=p.planKeelSmartAssetPresentation(x);assert.equal(plan.image.uri,`web3://${address('7')}:11155111/haulObject/${hash('8')}?mime.type=image%2Fpng`);
+ const plan=choose(x,{image:"onchain-reference",animation:"omitted"});assert.equal(plan.image.uri,`web3://${address('7')}:11155111/haulObject/${hash('8')}?mime.type=image%2Fpng`);
  const right=await p.measureKeelSmartAssetPresentation(plan,()=>jsonURI({image:plan.image.uri}));assert.equal(right.hardBlockers.length,0);
  const wrong=await p.measureKeelSmartAssetPresentation(plan,()=>jsonURI({image:plan.image.uri.replace(hash('8'),hash('9'))}));assert.ok(wrong.hardBlockers.includes('native-image-reference-changed'));
  const cross=p.planKeelSmartAssetPresentation({...x,source:{...x.source,onchain:{...onchain,chainId:1}}});assert.equal(cross.status,'blocked');
@@ -225,8 +225,17 @@ test('inline native nonimage playback requires exact qualified MIME, independent
  const actual=jsonURI({image:imageURI,animation_url:'data:audio/wav;base64,'+media.toString('base64')});
  const measured=await p.measureKeelSmartAssetPresentation(plan,()=>actual);assert.equal(measured.hardBlockers.length,0);assert.equal(measured.inlineMediaIntegrity.digest,source.digest);assert.equal(measured.encodedAnimationSlotBytes,Buffer.byteLength(actual)-Buffer.byteLength(jsonURI({image:imageURI})));
  const changed=await p.measureKeelSmartAssetPresentation(plan,()=>jsonURI({image:imageURI,animation_url:'data:audio/wav;base64,'+Buffer.from('different').toString('base64')}));assert.ok(changed.hardBlockers.includes('inline-native-media-source-changed'));
- assert.ok(choose({...input(),source},selection).hardBlockers.includes('qualified-inline-media-renderer-required'));
+ assert.ok(choose({...input(),source,capabilities:{...capabilities,inlineMediaTypes:undefined}},selection).hardBlockers.includes('qualified-inline-media-renderer-required'));
  assert.ok(choose({...input(),source,preview:undefined,capabilities:caps},selection).hardBlockers.includes('usable-grid-image-required'));
  assert.ok(choose({...input(),source:{...source,mediaType:'text/html'},execution:'static',capabilities:caps},selection).hardBlockers.includes('script-requires-registered-verifier'));
  assert.equal(measured.publicationReady,false);
+});
+
+test('native references are never automatically selected when safe inline layouts are unknown or unsupported',()=>{
+ for(const n of [100,500001,2000001])for(const directAsset of ['qualified','unknown']){
+  const plan=p.planKeelSmartAssetPresentation({...input(n),capabilities:{...capabilities,directAsset,shellInline:'unknown',shellHybrid:'unsupported',inlineImageTypes:undefined,inlineMediaTypes:undefined}});
+  assert.notEqual(plan.selectedCandidateId,'direct-onchain-asset');assert.equal(plan.status,'blocked');
+ }
+ const other=p.planKeelSmartAssetPresentation({...input(2000001),capabilities:{...capabilities,shellHybrid:'unsupported'}});assert.equal(other.selectedCandidateId,'canonical-inline');
+ const explicit=choose(input(2000001),{image:'onchain-reference',animation:'omitted'});assert.equal(explicit.selectedCandidateId,'direct-onchain-asset');assert.equal(explicit.selectionSource,'explicit');
 });
