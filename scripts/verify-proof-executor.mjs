@@ -17,7 +17,7 @@ const build=process.env.KEEL_NATIVE_BUILD_DIR??'/tmp/keel-proof-executor-build';
 const binary=join(build,'keel-proof-executor'),binarySha256=createHash('sha256').update(readFileSync(binary)).digest('hex');
 const receipt=JSON.parse(readFileSync(join(build,'receipt.json'),'utf8'));assert.equal(receipt.binarySha256,binarySha256);
 const tmp=mkdtempSync(join(tmpdir(),'keel-proof-state-')),container=`keel-proof-state-${process.pid}`;
-const owner=`0x${'11'.repeat(20)}`,reader=`0x${'22'.repeat(20)}`,delegated=`0x${'44'.repeat(20)}`,contexts=`0x${'55'.repeat(20)}`,batchImplementation=`0x${'66'.repeat(20)}`,batchOwner=`0x${'77'.repeat(20)}`;
+const owner=`0x${'11'.repeat(20)}`,reader=`0x${'22'.repeat(20)}`,delegated=`0x${'44'.repeat(20)}`,contexts=`0x${'55'.repeat(20)}`,batchImplementation=`0x${'66'.repeat(20)}`,batchOwner=`0x${'77'.repeat(20)}`,quantityTarget=`0x${'88'.repeat(20)}`;
 const expectedTokenURI='data:application/json,{"name":"Synthetic state sequence"}';
 const evidence={schema:'keel-proof-executor-differential@1',sourceCommit:execFileSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim(),receipt,synthetic:true,externalNetwork:'none',productionStateUsed:false,signing:'not-performed',submission:'not-performed',checks:[],executions:[]};
 const record=(name,data={})=>{evidence.checks.push({name,...data});console.log(`PASS ${name}`);};
@@ -31,6 +31,7 @@ genesis.alloc[reader.slice(2)]={balance:'0x0',code:runtime};genesis.alloc[delega
 genesis.alloc[contexts.slice(2)]={balance:'0x0',code:`0x${contextArtifact.evm.deployedBytecode.object}`,storage:{[toHex(10000n,{size:32})]:toHex(1n,{size:32}),[toHex(10001n,{size:32})]:toHex(2n,{size:32})}};
 genesis.alloc[batchImplementation.slice(2)]={balance:'0x0',code:`0x${compiled.contracts['ProofContexts.sol'].ProofBatch.evm.deployedBytecode.object}`};
 genesis.alloc[batchOwner.slice(2)]={balance:genesis.alloc[owner.slice(2)].balance,code:`0xef0100${batchImplementation.slice(2)}`};
+genesis.alloc[quantityTarget.slice(2)]={balance:'0x0',code:runtime,storage:{[toHex(0n,{size:32})]:toHex(7n,{size:32})}};
 writeFileSync(join(tmp,'genesis.json'),JSON.stringify(genesis));
 const data=(name,args=[])=>encodeFunctionData({abi:artifact.abi,functionName:name,args});
 const calls=Array.from({length:5},(_,i)=>({from:owner,to:reader,data:data('write',[100n]),value:'0x0',gas:toHex(200_000_000n),nonce:toHex(i),gasPrice:'0x30'}));
@@ -89,24 +90,26 @@ try{
  // The actual configured Sepolia source returns EIP-1186 storage keys as
  // QUANTITY even for DATA32 requests. Re-encode only that unauthenticated key
  // label; retain every real reference proof node, value, account and code byte.
- const quantityProofAccounts=new Set(),quantityKeys=[];
+ const quantityProofAccounts=new Set(),quantityKeys=[],quantityTargetKeys=[];
  const quantityReader={request:async input=>{
   const result=await stateReader.request(input);
   if(input.method!=='eth_getProof')return result;
   const exact=structuredClone(result);quantityProofAccounts.add(input.params[0].toLowerCase());
-  for(const item of exact.storageProof){item.key=toHex(BigInt(item.key));quantityKeys.push(item.key);}
+  for(const item of exact.storageProof){item.key=toHex(BigInt(item.key));quantityKeys.push(item.key);
+   if(input.params[0].toLowerCase()===quantityTarget.toLowerCase())quantityTargetKeys.push(item.key);}
   return exact;
  }};
  const quantityTransport=await createProofBackedSimulationTransport({...options(),stateReader:quantityReader});
  try{
-  const p=payload(calls,true),reference=rpc('eth_simulateV1',[p,'0x0']);
+  const p=payload(calls.map(call=>({...call,to:quantityTarget})),true),reference=rpc('eth_simulateV1',[p,'0x0']);
   assert.deepEqual(await quantityTransport.request({method:'eth_simulateV1',params:[p,'0x0']}),reference,
    'quantity proof keys must retain every native Geth result/header/root/hash/receipt/transaction field');
   assert.ok(quantityKeys.includes('0x0'),'the full EVM replay must authenticate a quantity-encoded zero slot');
+  assert.ok(quantityTargetKeys.includes('0x0'),'the separate nonempty target trie must authenticate its original zero slot');
   for(const address of ['0x00000961ef480eb55e80d19ad83579a64c007002','0x0000bbddc7ce488642fb579f8b00f3a590007251'])
    assert.ok(quantityProofAccounts.has(address),'both real genesis request system contracts must be authenticated');
   record('quantity-encoded EIP-1186 keys preserve full Geth parity and both request system contracts',
-   {quantityKeys:quantityKeys.length,zeroSlotProven:true,systemContractsAuthenticated:2});
+   {quantityKeys:quantityKeys.length,zeroSlotProven:true,quantityTarget,quantityTargetSlotZeroProven:true,systemContractsAuthenticated:2});
  }finally{await quantityTransport.close();}
  const big={...calls[0],gas:toHex(170_000_000n),data:data('write',[1300n])},bigPayload=payload([big]);
  const bigResult=await transport.request({method:'eth_simulateV1',params:[bigPayload,'0x0']});assert.deepEqual(bigResult,rpc('eth_simulateV1',[bigPayload,'0x0']));assert.ok(BigInt(bigResult[0].calls[0].maxUsedGas)>140_000_000n);
