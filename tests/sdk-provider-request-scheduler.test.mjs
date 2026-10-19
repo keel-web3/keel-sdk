@@ -1,6 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { pathToFileURL } from 'node:url';
+import { getEventListeners } from 'node:events';
 const modulePath = process.env.KEEL_TEST_PROVIDER_SCHEDULER_MODULE;
 const { createKeelProviderRequestScheduler: create, sharedKeelProviderRequestScheduler: shared, KeelProviderQueueFullError } = await import(modulePath ? pathToFileURL(modulePath).href : '../packages/sdk/dist/provider-request-scheduler.js');
 const settings = { chainId: 11155111, minIntervalMs: 0, baseRetryDelayMs: 4, maximumRetryDelayMs: 100, circuitFailureThreshold: 3, circuitCooldownMs: 12, random: () => 0 };
@@ -168,4 +169,94 @@ test('an explicit HTTP503 request-byte capacity refusal never retries or creates
   assert.equal(events.filter(event=>event.type==='retry-wait').length,0);
   assert.equal(await scheduler.run({method:'eth_getCode'},async()=>{calls++;return '0x6000';}),'0x6000');
   assert.equal(calls,2);
+});
+
+test('a long physical read consumes the start interval without adding a second pause after completion', async t => {
+  t.mock.timers.enable({ apis: ['Date', 'setTimeout'], now: 10_000 });
+  const scheduler = create({ ...settings, minIntervalMs: 250, maximumRetryDelayMs: 5_000 }), held = gate(), starts = [];
+  let active = 0, peak = 0;
+  const first = scheduler.run({ method: 'eth_getLogs' }, async () => {
+    starts.push(Date.now()); active++; peak = Math.max(peak, active);
+    await held.promise; active--; return 'first';
+  });
+  await tick();
+  const second = scheduler.run({ method: 'eth_getLogs' }, async () => {
+    starts.push(Date.now()); active++; peak = Math.max(peak, active); active--; return 'second';
+  });
+  await tick();
+  t.mock.timers.tick(500); await tick();
+  assert.deepEqual(starts, [10_000]);
+  assert.equal(scheduler.status().activeRequests, 1);
+  held.resolve(); assert.equal(await first, 'first'); await tick();
+  assert.deepEqual(starts, [10_000, 10_500]);
+  assert.ok(starts[1] - starts[0] >= 250);
+  assert.equal(await second, 'second'); assert.equal(peak, 1);
+  assert.equal(scheduler.status().activeRequests, 0); assert.equal(scheduler.status().queuedRequests, 0);
+});
+
+test('short physical reads still wait for the exact shared minimum start interval', async t => {
+  t.mock.timers.enable({ apis: ['Date', 'setTimeout'], now: 10_000 });
+  const scheduler = create({ ...settings, minIntervalMs: 250, maximumRetryDelayMs: 5_000 }), starts = [];
+  await scheduler.run({ method: 'eth_getCode' }, async () => { starts.push(Date.now()); return 'first'; });
+  const second = scheduler.run({ method: 'eth_getCode' }, async () => { starts.push(Date.now()); return 'second'; });
+  await tick();
+  t.mock.timers.tick(249); await tick(); assert.deepEqual(starts, [10_000]);
+  t.mock.timers.tick(1); await tick();
+  assert.equal(await second, 'second'); assert.deepEqual(starts, [10_000, 10_250]);
+});
+
+test('an aborted physical read holds its slot through settlement without an additional completion pause or listener leak', async t => {
+  t.mock.timers.enable({ apis: ['Date', 'setTimeout'], now: 10_000 });
+  const scheduler = create({ ...settings, minIntervalMs: 250, maximumRetryDelayMs: 5_000 }), held = gate(), controller = new AbortController();
+  const reason = new Error('bounded history cancelled'), starts = [], signals = [];
+  const first = scheduler.run({ method: 'eth_getLogs', signal: controller.signal }, signal => {
+    signals.push(signal); starts.push(Date.now()); return held.promise;
+  });
+  const firstRejected = assert.rejects(first, error => error === reason);
+  await tick(); controller.abort(reason); await firstRejected;
+  const second = scheduler.run({ method: 'eth_getLogs' }, async signal => {
+    signals.push(signal); starts.push(Date.now()); return 'second';
+  });
+  await tick(); t.mock.timers.tick(500); await tick();
+  assert.deepEqual(starts, [10_000]); assert.equal(scheduler.status().activeRequests, 1);
+  held.resolve('late result discarded'); await tick();
+  assert.deepEqual(starts, [10_000, 10_500]); assert.equal(await second, 'second');
+  assert.equal(scheduler.status().activeRequests, 0);
+  for (const signal of signals) assert.equal(getEventListeners(signal, 'abort').length, 0);
+});
+
+test('queued work never dispatches after either access-denial status at nonzero pacing', async t => {
+  t.mock.timers.enable({ apis: ['Date', 'setTimeout'], now: 10_000 });
+  for (const status of [401, 403]) {
+    const scheduler = create({ ...settings, minIntervalMs: 250, maximumRetryDelayMs: 5_000 }), original = failure(status), held = gate();
+    let calls = 0, physicalSignal;
+    const first = scheduler.run({ method: 'eth_getLogs' }, async signal => {
+      physicalSignal = signal; calls++; await held.promise; throw original;
+    });
+    const firstRejected = assert.rejects(first, error => error === original);
+    await tick();
+    const second = scheduler.run({ method: 'eth_getCode' }, async () => { calls++; return 'must not dispatch'; });
+    const secondRejected = assert.rejects(second, error => error.reason === 'access-denied' && error.diagnostic.httpStatus === status);
+    await tick(); held.resolve(); await firstRejected;
+    t.mock.timers.tick(250); await tick(); await secondRejected;
+    assert.equal(calls, 1); assert.equal(scheduler.status().activeRequests, 0); assert.equal(scheduler.status().queuedRequests, 0);
+    assert.equal(getEventListeners(physicalSignal, 'abort').length, 0);
+  }
+});
+
+test('a queued request deadline removes admission and cannot dispatch after the physical owner settles', async t => {
+  t.mock.timers.enable({ apis: ['Date', 'setTimeout'], now: 10_000 });
+  const scheduler = create({ ...settings, minIntervalMs: 250, maximumRetryDelayMs: 5_000 }), held = gate();
+  let calls = 0, physicalSignal;
+  const first = scheduler.run({ method: 'eth_getLogs' }, signal => { physicalSignal = signal; calls++; return held.promise; });
+  await tick();
+  const second = scheduler.run({ method: 'eth_getCode', deadlineAt: performance.now() + 50 }, async () => { calls++; return 'must not dispatch'; });
+  const secondRejected = assert.rejects(second, error => error.name === 'TimeoutError');
+  await tick(); assert.equal(scheduler.status().queuedRequests, 1);
+  t.mock.timers.tick(51); await tick(); await secondRejected;
+  assert.equal(scheduler.status().queuedRequests, 0); assert.equal(calls, 1);
+  held.resolve('first'); assert.equal(await first, 'first'); await tick();
+  t.mock.timers.tick(500); await tick();
+  assert.equal(calls, 1); assert.equal(scheduler.status().activeRequests, 0);
+  assert.equal(getEventListeners(physicalSignal, 'abort').length, 0);
 });
