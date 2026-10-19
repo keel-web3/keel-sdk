@@ -186,11 +186,22 @@ export function createKeelChain({ rpc, keelHold, hosts = KEEL_VIEW_RPC_HOSTS, li
     while (work.length && examined++ < 32) {
       const [node, depth] = work.pop(); if (!node || typeof node !== "object" || depth > 6) continue;
       const message = typeof node.message === "string" ? node.message.slice(0, 2048) : "";
-      if (node.code === 3 || /\bexecution reverted\b/iu.test(message)) return "execution-reverted";
-      if ([401, 403].includes(node.status) || [401, 403].includes(node.httpStatus) || /^(?:unauthori[sz]ed|forbidden|access denied)\b/iu.test(message)) return "access-denied";
+      if (node.code === 3 || /\brevert(?:ed|ing)?\b/iu.test(message)) return "execution-reverted";
+      if ([401, 403].includes(node.code) || [401, 403].includes(node.status) || [401, 403].includes(node.httpStatus) || /^(?:unauthori[sz]ed|forbidden|access denied)\b/iu.test(message)) return "access-denied";
       for (const key of ["cause", "error", "data"]) { const child = node[key]; if (Array.isArray(child)) for (const entry of child.slice(0, 8)) work.push([entry, depth + 1]); else if (child && typeof child === "object") work.push([child, depth + 1]); }
     }
     return null;
+  }
+  function isCapacityRpcError(body, id) {
+    if (!body || typeof body !== "object" || Array.isArray(body) || body.jsonrpc !== "2.0" || body.id !== id
+      || !Object.keys(body).every(key => ["jsonrpc", "id", "error"].includes(key))) return false;
+    const error = body.error;
+    if (!error || typeof error !== "object" || Array.isArray(error) || ![-32005, 429].includes(error.code)
+      || typeof error.message !== "string" || error.message.length > 2048
+      || !Object.keys(error).every(key => ["code", "message", "data"].includes(key))
+      || error.data !== null && typeof error.data === "object") return false;
+    if (typeof error.data === "string" && (error.data.length > 4096 || semanticFailure({ message: error.data }))) return false;
+    return semanticFailure(error) === null;
   }
   function httpErrorFailure(text, contentType, id) {
     const sample = text.trim();
@@ -199,10 +210,7 @@ export function createKeelChain({ rpc, keelHold, hosts = KEEL_VIEW_RPC_HOSTS, li
       const semantic = semanticFailure(body); if (semantic) return semantic;
       if (!body || typeof body !== "object" || Array.isArray(body) || body.jsonrpc !== "2.0" || body.id !== id) return "unclassified-http-error";
       if (!Object.hasOwn(body, "error") && Object.hasOwn(body, "result")) return null;
-      const error = body.error;
-      if (error && typeof error === "object" && !Array.isArray(error) && [-32005, 429].includes(error.code)
-        && Object.keys(error).every(key => ["code", "message", "data"].includes(key))
-        && (error.data === undefined || error.data === null || typeof error.data !== "object")) return null;
+      if (isCapacityRpcError(body, id)) return null;
       return "unclassified-http-error";
     }
     if (/\b(?:unauthori[sz]ed|forbidden|access denied)\b/iu.test(sample)) return "access-denied";
@@ -255,6 +263,10 @@ export function createKeelChain({ rpc, keelHold, hosts = KEEL_VIEW_RPC_HOSTS, li
       } else { body = await response.json(); if (new TextEncoder().encode(JSON.stringify(body)).length > maxResponseBytes) throw fault(endpoint, "response-too-large", false, { noFallback: true }); }
       const semantic = semanticFailure(body?.error);
       if (semantic) throw stop(fault(endpoint, semantic, true));
+      if (body?.error !== undefined && body.error !== null) {
+        if (isCapacityRpcError(body, id)) throw fault(endpoint, "rate-limited", false, { retryable: true });
+        throw stop(fault(endpoint, "unclassified-rpc-error", true));
+      }
       if (body === null || typeof body !== "object" || Array.isArray(body) || body.jsonrpc !== "2.0" || body.id !== id || "error" in body
         || (method === "eth_getBlockByNumber" ? !validBlock(body.result) : typeof body.result !== "string")
         || (["eth_call", "eth_getCode"].includes(method) && !/^0x(?:[0-9a-f]{2})*$/iu.test(body.result))) throw fault(endpoint, "invalid-response");

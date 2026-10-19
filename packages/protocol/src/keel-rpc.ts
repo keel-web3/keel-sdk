@@ -94,11 +94,23 @@ function terminalRpcFailure(value: unknown): "rpc.execution-reverted" | "transpo
   for (let count = 0; work.length && count < 32; count++) {
     const node = work.shift(); if (!node || typeof node !== "object") continue;
     const e = node as Record<string, unknown>, message = typeof e.message === "string" ? e.message.slice(0, 2048) : "";
-    if (e.code === 3 || /\bexecution reverted\b/iu.test(message)) return "rpc.execution-reverted";
-    if (e.status === 401 || e.status === 403 || e.httpStatus === 401 || e.httpStatus === 403 || /^(?:unauthori[sz]ed|forbidden|access denied)\b/iu.test(message)) return "transport.access-denied";
+    if (e.code === 3 || /\brevert(?:ed|ing)?\b/iu.test(message)) return "rpc.execution-reverted";
+    if (e.code === 401 || e.code === 403 || e.status === 401 || e.status === 403 || e.httpStatus === 401 || e.httpStatus === 403 || /^(?:unauthori[sz]ed|forbidden|access denied)\b/iu.test(message)) return "transport.access-denied";
     for (const key of ["cause", "error", "data"]) { const child = e[key]; if (Array.isArray(child)) work.push(...child.slice(0, 8)); else if (child && typeof child === "object") work.push(child); }
   }
   return undefined;
+}
+
+function isCapacityRpcError(value: unknown, requestId: unknown): boolean {
+  if (!value || typeof value !== "object" || Array.isArray(value)) return false;
+  const body = value as Record<string, unknown>, error = body.error as Record<string, unknown> | null;
+  if (body.jsonrpc !== "2.0" || body.id !== requestId || !Object.keys(body).every(key => ["jsonrpc", "id", "error"].includes(key))
+    || !error || typeof error !== "object" || Array.isArray(error) || ![-32005, 429].includes(error.code as number)
+    || typeof error.message !== "string" || error.message.length > 2048
+    || !Object.keys(error).every(key => ["code", "message", "data"].includes(key))
+    || error.data !== null && typeof error.data === "object") return false;
+  if (typeof error.data === "string" && (error.data.length > 4096 || terminalRpcFailure({ message: error.data }))) return false;
+  return terminalRpcFailure(error) === undefined;
 }
 
 /** A fully read error body may be a transport message, never a partial RPC envelope. */
@@ -111,12 +123,9 @@ function httpErrorFailure(text: string, contentType: string, requestId: unknown)
     if (reason) return reason;
     if (!body || typeof body !== "object" || Array.isArray(body) || body.jsonrpc !== "2.0" || body.id !== requestId) return "transport.unclassified-http-error";
     if (!Object.hasOwn(body, "error") && Object.hasOwn(body, "result")) return undefined;
-    const error = body.error as Record<string, unknown> | null;
     // Recognized capacity errors remain retryable. Arbitrary structured errors
     // can be contract failures even without the conventional code/message.
-    if (error && typeof error === "object" && !Array.isArray(error) && [-32005, 429].includes(error.code as number)
-      && Object.keys(error).every(key => ["code", "message", "data"].includes(key))
-      && (error.data === undefined || error.data === null || typeof error.data !== "object")) return undefined;
+    if (isCapacityRpcError(body, requestId)) return undefined;
     return "transport.unclassified-http-error";
   }
   if (/\b(?:unauthori[sz]ed|forbidden|access denied)\b/iu.test(sample)) return "transport.access-denied";
@@ -434,6 +443,10 @@ export function createKeelRpcClient(options: KeelRpcClientOptions): KeelRpcClien
     };
     const reason = terminalRpcFailure(body?.error);
     if (reason) { terminal = new KeelRpcError("The exact RPC operation was denied or reverted.", reason, redactRpcUrl(endpoint), true); drain(); throw terminal; }
+    if (body?.error !== undefined && body.error !== null) {
+      if (isCapacityRpcError(body, 1)) throw Object.assign(new KeelRpcError("RPC provider capacity is unavailable.", "rpc.rate-limited", redactRpcUrl(endpoint)), { retryable: true });
+      terminal = new KeelRpcError("The exact RPC error cannot be classified as a provider capacity failure.", "rpc.unclassified-error", redactRpcUrl(endpoint), true); drain(); throw terminal;
+    }
     if (body?.jsonrpc !== "2.0" || body.id !== 1 || body.error !== undefined || !Object.hasOwn(body, "result")) {
       throw new KeelRpcError(`${method} returned an invalid response.`, "rpc.error", redactRpcUrl(endpoint));
     }
