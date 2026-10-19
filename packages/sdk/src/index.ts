@@ -45,6 +45,8 @@ export * from "./data-layer.js";
 export * from "./onchain-data.js";
 export * from "./inline-viewer-graph.js";
 export * from "./token-matrix.js";
+export * from "./collector-metadata.js";
+export * from "./verification-shell-loading.js";
 export * from "./frozen-dataset.js";
 export * from "./module-review.js";
 export * from "./modules.js";
@@ -59,6 +61,8 @@ export * from "./tezos-shell.js";
 export * from "./tezos-publication.js";
 export * from "./tezos-standard.js";
 export * from "./tezos-modules.generated.js";
+export * from "./tezos-collection.js";
+export * from "./tezos-live-state.js";
 
 export * from "./network-inspection.js";
 
@@ -119,3 +123,14 @@ export * from "./inline-token-read.js";
 export * from "./dense-transport.js";
 
 export * from "./prepared-dense-copy.js";
+export * from "./inline-descriptor-columns.js";
+
+export * from "./prepared-ppmd-copy.js";
+
+export { createKeelShellClient } from "./verification-shell-client.js";
+export type { KeelApplicationPanel, KeelShellClient, KeelShellSnapshot, KeelMarketplaceDirectory } from "./verification-shell-client.js";
+
+export {buildKeelShellCatalog,type KeelShellCatalog} from "./verification-shell-catalog.js";
+
+export * from "./marketplace-reader.js";
+export * from "./pre-reveal.js";

@@ -7,6 +7,7 @@ import {
   planKeelAssetPresentation,
   type KeelPresentationMode,
 } from "./presentation.js";
+import { KEEL_TEZOS_COLLECTION_ROUTE, KEEL_TEZOS_COLLECTION_ROUTE_CONTRACTS, KEEL_TEZOS_COLLECTION_ROUTE_SDK, KEEL_TEZOS_COLLECTION_ROUTE_TOOLS } from "./tezos-collection.js";
 
 /**
  * The default Tezos compatibility lane.  These are the same KEEL roles used
@@ -153,6 +154,13 @@ export function planKeelTezosStandardRoute(input: KeelTezosStandardRouteInput) {
         requires: ["verified canonical shell", "native OnchFS object read-back", "declared RPC reader", "direct contract retrieval beside the viewer"],
         networkPresentationDependency: true,
       },
+    },
+    collectionRoute: {
+      schema: KEEL_TEZOS_COLLECTION_ROUTE,
+      note: "A multi-token collection (originate, Hold resources, presentation binding, mint gate, mint, TZIP-21 metadata, read-back) is prepared through these tools and SDK functions, in order.",
+      tools: KEEL_TEZOS_COLLECTION_ROUTE_TOOLS,
+      sdk: KEEL_TEZOS_COLLECTION_ROUTE_SDK,
+      contracts: KEEL_TEZOS_COLLECTION_ROUTE_CONTRACTS,
     },
     publication: {
       signing: "not-performed" as const,

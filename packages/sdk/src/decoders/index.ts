@@ -4,6 +4,7 @@
  */
 import { createBrotliTask } from './vendor/brotli.js';
 import { createLzmaTask } from './vendor/lzma.js';
+import { createPpmdTask } from './vendor/ppmd.js';
 
 export interface KeelDecodeOptions {
   readonly decodedByteLength: number;
@@ -16,8 +17,8 @@ export interface KeelDecodeOptions {
   /** A real task boundary, never merely a resolved Promise. */
   readonly yieldTask?: () => Promise<void>;
 }
-export type KeelDecodeCodec = 'brotli' | 'lzma';
-interface DecodeTask { readonly done: boolean; readonly bytes: Uint8Array; step(work: number): void; }
+export type KeelDecodeCodec = 'brotli' | 'lzma' | 'ppmd';
+interface DecodeTask { readonly done: boolean; readonly bytes: Uint8Array; step(work: number): void; dispose?(): void; }
 function integer(value: number, label: string, maximum: number): number {
   if (!Number.isSafeInteger(value) || value < 0 || value > maximum) throw new RangeError(`${label} exceeds decoder bounds`);
   return value;
@@ -54,7 +55,7 @@ async function decode(factory: (bytes: Uint8Array, options: Record<string, unkno
     }
     checkAbort();
     return task.bytes;
-  } finally { channel?.port1.close(); channel?.port2.close(); }
+  } finally { task.dispose?.(); channel?.port1.close(); channel?.port2.close(); }
 }
 export const decodeBrotli = (bytes: Uint8Array, options: KeelDecodeOptions): Promise<Uint8Array> => {
   if (options.dictionary) throw new TypeError('Raw Brotli dictionaries require a verified protocol and decoder profile not enabled here');
@@ -64,9 +65,21 @@ export const decodeLzma = (bytes: Uint8Array, options: KeelDecodeOptions): Promi
   if (options.dictionary) throw new TypeError('LZMA-alone has no external dictionary dependency');
   return decode(createLzmaTask, bytes, options);
 };
+// PPMd uses a larger model; serialize jobs so concurrent resources never multiply
+// its workspace. Release each arena after completion, failure or cancellation.
+let ppmdPending: Promise<unknown> | undefined;
+export const decodePpmd = (bytes: Uint8Array, options: KeelDecodeOptions): Promise<Uint8Array> => {
+ if (options.dictionary) throw new TypeError('PPMd has no external dictionary dependency');
+ const run=()=>decode(createPpmdTask,bytes,options);
+ const result=ppmdPending ? ppmdPending.then(run,run) : run();
+ ppmdPending=result;
+ void result.finally(()=>{if(ppmdPending===result)ppmdPending=undefined;}).catch(()=>{});
+ return result;
+};
 export const decodeKeelResource = (codec: KeelDecodeCodec, bytes: Uint8Array, options: KeelDecodeOptions): Promise<Uint8Array> => {
   if (codec === 'brotli') return decodeBrotli(bytes, options);
   if (codec === 'lzma') return decodeLzma(bytes, options);
+  if (codec === 'ppmd') return decodePpmd(bytes, options);
   throw new TypeError(`Unsupported KEEL decoder codec: ${String(codec)}`);
 };
 

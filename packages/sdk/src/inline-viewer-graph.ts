@@ -1086,6 +1086,7 @@ async function exactFragment(bytes: Uint8Array): Promise<KeelInlineFragmentBytes
 export async function buildKeelInlineShellFragments(input: {
   readonly repositoryRoot?: string;
   readonly codecProfile?: KeelInlineCodecProfile;
+  readonly optionalMarketplaceInfo?: import("./marketplace-reader.js").KeelShellMarketplaceConfig;
 } = {}): Promise<KeelInlineShellFragments> {
   const shell = await buildCompactInlineKeelShell(input);
   return {
