@@ -259,8 +259,9 @@ export function createKeelProviderRequestScheduler(options: KeelProviderRequestS
           } finally {
             // A hostile/nonconforming transport may ignore abort. End the
             // caller's wait, but keep its physical slot until it really settles.
-            const physicallyFinished = () => { nextAt = Math.max(nextAt, Date.now() + minIntervalMs); release(); };
-            if (physicalOperation) void physicalOperation.then(physicallyFinished, physicallyFinished); else release();
+            // nextAt already bounds request starts. A slow physical read can
+            // consume that interval; completion must not impose a second one.
+            if (physicalOperation) void physicalOperation.then(release, release); else release();
           }
         }
         throw new KeelProviderAvailabilityError(lastFailure ?? { retryable: false, retryAfterMs: 0 });
