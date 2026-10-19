@@ -1,0 +1,124 @@
+{
+  "schema": "keel-local-nonstandard-read@1",
+  "sourceCommit": "e0e6033a93099e312c5c2c6d0f6f22adc7097f40",
+  "solc": "0.8.36+commit.8a079791.Emscripten.clang",
+  "anvil": "anvil Version: 1.7.1",
+  "setup": "LOCAL anvil_setCode synthetic fixture initialization; no transaction, creation receipt or production capacity claim",
+  "runtimeBytes": 954,
+  "runtimeSHA256": "0xf646a8ca54a9b733c90e382446750c096e13445e0a424b2af11a4c88da65710e",
+  "sourceSHA256": "0x4fe17f35296111fdafbf6a4f23bbf12258409e70ed43b1c1ba77cdbe1571552e",
+  "expectedTokenURISHA256": "0x56a06f013796448e185b7794f78c566104902d2780ee92c72b4eb84a4c4c52dc",
+  "completeTokenURIBytes": 2050429,
+  "physicalReads": [
+    {
+      "method": "eth_chainId",
+      "requestBytes": 59,
+      "responseBytes": 42,
+      "responseSHA256": "0x82ecccd9b61f57b995f83d15e57ee9dd56691d7110ed2bd8c209a6a7f6b2fd56",
+      "httpStatus": 200
+    },
+    {
+      "method": "eth_getBlockByNumber",
+      "requestBytes": 82,
+      "responseBytes": 1754,
+      "responseSHA256": "0xb458ae31f0d63f4d8bcffaefd689cc9fa937dfc7368a9748058477d29c75584c",
+      "httpStatus": 200
+    },
+    {
+      "method": "eth_getCode",
+      "requestBytes": 109,
+      "responseBytes": 1946,
+      "responseSHA256": "0x4e5628286edf4e1cb889c7f8dce4a87f7095f7fdb6d5a3e5c9b860f9709fb819",
+      "httpStatus": 200
+    },
+    {
+      "method": "eth_call",
+      "params": [
+        {
+          "to": "0x4545454545454545454545454545454545454545",
+          "data": "0xc87b56dd0000000000000000000000000000000000000000000000000000000000000001",
+          "gas": "0x3938700"
+        },
+        "0x0"
+      ],
+      "requestBytes": 215,
+      "responseBytes": 4101030,
+      "responseSHA256": "0x465ebe1ba442bc7369cb970047f0e03dced0d41b7c6fb52148ce5054e9fdbd12",
+      "httpStatus": 200
+    },
+    {
+      "method": "eth_chainId",
+      "requestBytes": 59,
+      "responseBytes": 42,
+      "responseSHA256": "0x82ecccd9b61f57b995f83d15e57ee9dd56691d7110ed2bd8c209a6a7f6b2fd56",
+      "httpStatus": 200
+    },
+    {
+      "method": "eth_getBlockByNumber",
+      "requestBytes": 82,
+      "responseBytes": 1754,
+      "responseSHA256": "0xb458ae31f0d63f4d8bcffaefd689cc9fa937dfc7368a9748058477d29c75584c",
+      "httpStatus": 200
+    },
+    {
+      "method": "eth_getCode",
+      "requestBytes": 109,
+      "responseBytes": 1946,
+      "responseSHA256": "0x4e5628286edf4e1cb889c7f8dce4a87f7095f7fdb6d5a3e5c9b860f9709fb819",
+      "httpStatus": 200
+    },
+    {
+      "method": "eth_call",
+      "params": [
+        {
+          "to": "0x4545454545454545454545454545454545454545",
+          "data": "0xc87b56dd0000000000000000000000000000000000000000000000000000000000000001",
+          "gas": "0x3938700"
+        },
+        "0x0"
+      ],
+      "requestBytes": 215,
+      "responseBytes": 4101030,
+      "responseSHA256": "0x465ebe1ba442bc7369cb970047f0e03dced0d41b7c6fb52148ce5054e9fdbd12",
+      "httpStatus": 200
+    },
+    {
+      "method": "eth_getBlockByNumber",
+      "requestBytes": 79,
+      "responseBytes": 1754,
+      "responseSHA256": "0x4573191601e5150b908535f75df50a82344fbf70b1b0a545bdc95fa8fb1a67f7",
+      "httpStatus": 200
+    },
+    {
+      "method": "eth_chainId",
+      "requestBytes": 59,
+      "responseBytes": 42,
+      "responseSHA256": "0x4881fa03caef60ea560508c3dafdea185eee526f6464523fa3bf154cf30c3cba",
+      "httpStatus": 200
+    }
+  ],
+  "policy": {
+    "schema": "keel-explicit-nonstandard-read@1",
+    "identity": {
+      "chainId": 31337,
+      "projectId": "local-capacity",
+      "revision": "1",
+      "defaultsRevision": "1",
+      "sourceDigest": "0x4fe17f35296111fdafbf6a4f23bbf12258409e70ed43b1c1ba77cdbe1571552e",
+      "planDigest": "0x31bfb048ede3a60975d80bbd7eedd0fb333de74c9dd40afcb9641a365cd4c422",
+      "measurementDigest": "0x6b797543514b8a74e6fd24e6c200fcc51462eb431a32c83c7cfc3bf7c73750b8",
+      "tokenUriDigest": "0x56a06f013796448e185b7794f78c566104902d2780ee92c72b4eb84a4c4c52dc",
+      "completeTokenUriBytes": 2050429
+    },
+    "limits": {
+      "maximumTokenUriBytes": 2050429,
+      "maximumRpcResponseBytes": 4105088,
+      "maximumReadGas": "60000000"
+    },
+    "acknowledgementKey": "{\"identity\":{\"chainId\":31337,\"completeTokenUriBytes\":2050429,\"defaultsRevision\":\"1\",\"measurementDigest\":\"0x6b797543514b8a74e6fd24e6c200fcc51462eb431a32c83c7cfc3bf7c73750b8\",\"planDigest\":\"0x31bfb048ede3a60975d80bbd7eedd0fb333de74c9dd40afcb9641a365cd4c422\",\"projectId\":\"local-capacity\",\"revision\":\"1\",\"sourceDigest\":\"0x4fe17f35296111fdafbf6a4f23bbf12258409e70ed43b1c1ba77cdbe1571552e\",\"tokenUriDigest\":\"0x56a06f013796448e185b7794f78c566104902d2780ee92c72b4eb84a4c4c52dc\"},\"limits\":{\"maximumReadGas\":\"60000000\",\"maximumRpcResponseBytes\":4105088,\"maximumTokenUriBytes\":2050429},\"schema\":\"keel-explicit-nonstandard-read@1\"}"
+  },
+  "signatures": 0,
+  "broadcasts": 0,
+  "originalIncidentTested": false,
+  "status": "PASS_ACTUAL_LOCAL_EVM_READ_ONLY"
+}

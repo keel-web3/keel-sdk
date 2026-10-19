@@ -1,0 +1,20 @@
+node:internal/modules/run_main:123
+    triggerUncaughtException(
+    ^
+
+AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
++ actual - expected
+
++ undefined
+- '0x6000'
+
+    at file:///Users/ravonus/dev/wt/studio-publication-20261019/review/docs/reviews/studio-publication-20261019/review/runtime-606-adversarial-audit.mjs:28:10 {
+  generatedMessage: true,
+  code: 'ERR_ASSERTION',
+  actual: undefined,
+  expected: '0x6000',
+  operator: 'strictEqual',
+  diff: 'simple'
+}
+
+Node.js v22.22.1
