@@ -1,0 +1,70 @@
+TAP version 13
+# Subtest: original images and GIF use only image without changing source or adding shell
+ok 1 - original images and GIF use only image without changing source or adding shell
+  ---
+  duration_ms: 2.614792
+  type: 'test'
+  ...
+# Subtest: small WebP and AVIF default to shell animation with no duplicate full-size image
+ok 2 - small WebP and AVIF default to shell animation with no duplicate full-size image
+  ---
+  duration_ms: 0.398792
+  type: 'test'
+  ...
+# Subtest: explicit candidate changes animation resource only and thumbnail is separately configured
+ok 3 - explicit candidate changes animation resource only and thumbnail is separately configured
+  ---
+  duration_ms: 0.46525
+  type: 'test'
+  ...
+# Subtest: defaults filter asset and collection; independent explicit delivery choices win
+ok 4 - defaults filter asset and collection; independent explicit delivery choices win
+  ---
+  duration_ms: 0.465708
+  type: 'test'
+  ...
+# Subtest: both slots require explicit selection and exact complete read proof
+ok 5 - both slots require explicit selection and exact complete read proof
+  ---
+  duration_ms: 0.397958
+  type: 'test'
+  ...
+# Subtest: decimal 500KB and 2MB asset recommendations apply to image formats while unknown lengths retain verification
+ok 6 - decimal 500KB and 2MB asset recommendations apply to image formats while unknown lengths retain verification
+  ---
+  duration_ms: 5.38575
+  type: 'test'
+  ...
+# Subtest: collector images never silently switch to hosted by size and explicit delivery still wins
+ok 7 - collector images never silently switch to hosted by size and explicit delivery still wins
+  ---
+  duration_ms: 1.284042
+  type: 'test'
+  ...
+# Subtest: a permissive caller limit cannot label a greater-than-2MB full initial tokenURI as standard compatible
+ok 8 - a permissive caller limit cannot label a greater-than-2MB full initial tokenURI as standard compatible
+  ---
+  duration_ms: 0.183334
+  type: 'test'
+  ...
+# Subtest: SVG without actual source inspection retains verification; explicit direct slots remain explicit
+ok 9 - SVG without actual source inspection retains verification; explicit direct slots remain explicit
+  ---
+  duration_ms: 0.445916
+  type: 'test'
+  ...
+# Subtest: explicit above-target slot gate binds actual matrix, source, revisions and full return without changing standard guard
+ok 10 - explicit above-target slot gate binds actual matrix, source, revisions and full return without changing standard guard
+  ---
+  duration_ms: 69.364166
+  type: 'test'
+  ...
+1..10
+# tests 10
+# suites 0
+# pass 10
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 131.826042
