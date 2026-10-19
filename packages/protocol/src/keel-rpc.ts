@@ -82,10 +82,23 @@ export class KeelRpcError extends Error {
     message: string,
     readonly code: string,
     readonly endpoint?: string,
+    readonly terminal = false,
   ) {
     super(message);
     this.name = "KeelRpcError";
   }
+}
+
+function terminalRpcFailure(value: unknown): "rpc.execution-reverted" | "transport.access-denied" | undefined {
+  const work: unknown[] = [value];
+  for (let count = 0; work.length && count < 32; count++) {
+    const node = work.shift(); if (!node || typeof node !== "object") continue;
+    const e = node as Record<string, unknown>, message = typeof e.message === "string" ? e.message.slice(0, 2048) : "";
+    if (e.code === 3 || /\bexecution reverted\b/iu.test(message)) return "rpc.execution-reverted";
+    if (e.status === 401 || e.status === 403 || e.httpStatus === 401 || e.httpStatus === 403 || /^(?:unauthori[sz]ed|forbidden|access denied)\b/iu.test(message)) return "transport.access-denied";
+    for (const key of ["cause", "error", "data"]) { const child = e[key]; if (Array.isArray(child)) work.push(...child.slice(0, 8)); else if (child && typeof child === "object") work.push(child); }
+  }
+  return undefined;
 }
 
 export interface KeelRpcClientOptions {
@@ -108,6 +121,9 @@ export interface KeelRpcClientOptions {
   readonly allowPrivateNetworkHosts?: boolean;
   readonly fetchImpl?: typeof fetch;
   readonly timeoutMs?: number;
+  readonly maxConcurrentReads?: number;
+  readonly maxRetries?: number;
+  readonly retryDelayMs?: number;
   readonly maxResponseBytes?: number;
   /** Tezos read depth. Ignored on Ethereum. */
   readonly confirmations?: number;
@@ -126,6 +142,8 @@ export interface KeelRpcDisclosure {
   readonly hostListEpoch?: number;
   readonly hostListStale?: boolean;
   readonly reads: number;
+  /** Includes chain checks, retries and failed physical requests. */
+  readonly physicalRequests: number;
 }
 
 export interface KeelEthCall {
@@ -253,36 +271,72 @@ export function createKeelRpcClient(options: KeelRpcClientOptions): KeelRpcClien
     ? undefined
     : (options.hostList as KeelRpcHostList);
 
+  const maximum = options.maxConcurrentReads ?? 4, retries = options.maxRetries ?? 0, retryDelay = options.retryDelayMs ?? 250;
+  if (!Number.isSafeInteger(maximum) || maximum < 1 || maximum > 64 || !Number.isSafeInteger(retries) || retries < 0 || retries > 3 || !Number.isSafeInteger(retryDelay) || retryDelay < 1 || retryDelay > 5000) throw new TypeError("Invalid bounded RPC window/retry policy.");
+  if (!Number.isSafeInteger(maxResponseBytes) || maxResponseBytes < 1 || !Number.isSafeInteger(maxResponseBytes * 2 + 1024) || !Number.isSafeInteger(timeoutMs) || timeoutMs < 1) throw new TypeError("Invalid RPC response/deadline bounds.");
+  let terminal: KeelRpcError | undefined, active = 0, abandoned = 0;
+  type Pending = { readonly run: () => void; readonly reject: (error: unknown) => void; next: Pending | undefined };
+  let first: Pending | undefined, lastPending: Pending | undefined;
+  function drain(): void {
+    while (first && (terminal || options.signal?.aborted || active < maximum || abandoned > 0 && active >= maximum)) {
+      const item = first; first = item.next; if (!first) lastPending = undefined;
+      if (terminal || options.signal?.aborted || abandoned > 0 && active >= maximum) item.reject(terminal ?? new KeelRpcError("RPC request aborted or waiting for a timed-out physical read to settle.", options.signal?.aborted ? "transport.aborted" : "transport.timeout")); else item.run();
+    }
+  }
+  options.signal?.addEventListener("abort", drain, { once: true });
   const checkedChains = new Map<string, Promise<void>>();
   let servedBy: string | undefined;
-  let reads = 0;
+  let reads = 0, physicalRequests = 0;
 
   async function attempt<T>(run: (endpoint: string) => Promise<T>): Promise<T> {
+    if (terminal) throw terminal;
     let last: unknown;
     for (const endpoint of endpoints) {
-      try {
-        if (options.verifyChainId) await checkChain(endpoint);
-        const value = await run(endpoint);
-        servedBy = endpoint;
-        reads += 1;
-        return value;
-      } catch (error) {
-        last = error;
-        if (options.signal?.aborted) throw error;
+      for (let retry = 0; ; retry++) {
+        try {
+          if (terminal) throw terminal;
+          if (options.verifyChainId) await checkChain(endpoint);
+          const value = await run(endpoint); servedBy = endpoint; reads += 1; return value;
+        } catch (error) {
+          last = error;
+          if (terminal || options.signal?.aborted) throw terminal ?? error;
+          const transient = error as { retryable?: boolean; retryAfterMs?: number; code?: string; noFallback?: boolean };
+          if (transient.noFallback) throw error;
+          if (retry >= retries || !(transient.retryable || transient.code === "transport.timeout")) break;
+          const delay = Math.max(transient.retryAfterMs ?? 0, retryDelay * 2 ** retry);
+          if (delay > 5000) throw error; // Respect a longer Retry-After; caller can resume later.
+          await new Promise<void>((resolve, reject) => {
+            const abort = () => { clearTimeout(timer); reject(new KeelRpcError("RPC request aborted.", "transport.aborted")); };
+            const timer = setTimeout(() => { options.signal?.removeEventListener("abort", abort); resolve(); }, delay);
+            options.signal?.addEventListener("abort", abort, { once: true });
+          });
+        }
       }
     }
-    throw last instanceof Error
-      ? last
-      : new KeelRpcError("Every RPC endpoint failed.", "transport.exhausted");
+    throw last instanceof Error ? last : new KeelRpcError("Every RPC endpoint failed.", "transport.exhausted");
   }
 
-  async function request(endpoint: string, path: string, body?: unknown): Promise<unknown> {
+  function request(endpoint: string, path: string, body?: unknown): Promise<unknown> {
+    if (terminal || options.signal?.aborted) return Promise.reject(terminal ?? new KeelRpcError("RPC request aborted.", "transport.aborted"));
+    if (abandoned && active >= maximum) return Promise.reject(Object.assign(new KeelRpcError("RPC timed-out physical window is occupied; resume after it settles.", "transport.timeout"), { noFallback: true }));
+    return new Promise((resolve, reject) => {
+      const run = () => {
+        active++; let timedOut = false;
+        const timer = setTimeout(() => { timedOut = true; abandoned++; reject(Object.assign(new KeelRpcError("RPC request timed out.", "transport.timeout", redactRpcUrl(endpoint)), { noFallback: active >= maximum })); drain(); }, timeoutMs + 5);
+        void requestPhysical(endpoint, path, body).then(resolve, reject).finally(() => { clearTimeout(timer); if (timedOut) abandoned--; active--; drain(); });
+      };
+      if (active < maximum && !first) run(); else { const item: Pending = { run, reject, next: undefined }; if (lastPending) lastPending.next = item; else first = item; lastPending = item; }
+    });
+  }
+
+  async function requestPhysical(endpoint: string, path: string, body?: unknown): Promise<unknown> {
     if (options.signal?.aborted) throw new KeelRpcError("RPC request aborted.", "transport.aborted");
     const controller = new AbortController();
     const timer = setTimeout(() => controller.abort(), timeoutMs);
     const onAbort = (): void => controller.abort();
     options.signal?.addEventListener("abort", onAbort, { once: true });
     try {
+      physicalRequests++;
       const response = await doFetch(`${endpoint}${path}`, {
         ...(body === undefined
           ? { method: "GET" }
@@ -291,11 +345,25 @@ export function createKeelRpcClient(options: KeelRpcClientOptions): KeelRpcClien
         redirect: "error",
       });
       if (!response.ok) {
-        throw new KeelRpcError(
-          `HTTP ${response.status} from ${redactRpcUrl(endpoint)}.`,
-          "transport.http",
-          redactRpcUrl(endpoint),
-        );
+        const denied = response.status === 401 || response.status === 403;
+        if (!denied && response.body) {
+          const reader = response.body.getReader(), chunks: Uint8Array[] = []; let size = 0;
+          try {
+            for (;;) { const next = await reader.read(); if (next.done) break; size += next.value.byteLength; if (size > 65536) break; chunks.push(next.value); }
+            if (size <= 65536) {
+              const bytes = new Uint8Array(size); let at = 0; for (const chunk of chunks) { bytes.set(chunk, at); at += chunk.length; }
+              const reason = terminalRpcFailure(JSON.parse(new TextDecoder("utf-8", { fatal: true }).decode(bytes)));
+              if (reason) { terminal = new KeelRpcError("The exact RPC operation was denied or reverted.", reason, redactRpcUrl(endpoint), true); drain(); throw terminal; }
+            }
+          } catch (error) { if (error instanceof KeelRpcError && error.terminal) throw error; }
+          finally { await reader.cancel().catch(() => undefined); reader.releaseLock(); }
+        }
+        const error = new KeelRpcError(`HTTP ${response.status} from ${redactRpcUrl(endpoint)}.`, denied ? "transport.access-denied" : "transport.http", redactRpcUrl(endpoint), denied);
+        if (denied) { terminal = error; drain(); }
+        const after = response.headers.get("retry-after");
+        const retryAfterMs = after && /^\d+(?:\.\d+)?$/u.test(after) ? Number(after) * 1000 : after ? Math.max(0, Date.parse(after) - Date.now()) : 0;
+        await response.body?.cancel().catch(() => undefined);
+        throw Object.assign(error, { retryable: [429, 502, 503, 504].includes(response.status), retryAfterMs: Number.isFinite(retryAfterMs) ? retryAfterMs : 0 });
       }
       // Enforce the cap while reading, before allocating an unbounded string.
       // ABI hex has two ASCII characters per byte plus its JSON envelope.
@@ -319,6 +387,12 @@ export function createKeelRpcClient(options: KeelRpcClientOptions): KeelRpcClien
         await reader.cancel().catch(() => undefined);
         reader.releaseLock();
       }
+    } catch (error) {
+      const reason = terminalRpcFailure(error);
+      if (reason && !options.signal?.aborted) { terminal = new KeelRpcError("The exact RPC operation was denied or reverted.", reason, redactRpcUrl(endpoint), true); drain(); throw terminal; }
+      if (error instanceof KeelRpcError) throw error;
+      if (options.signal?.aborted) throw new KeelRpcError("RPC request aborted.", "transport.aborted");
+      throw new KeelRpcError("RPC request failed.", controller.signal.aborted ? "transport.timeout" : "transport.failed", redactRpcUrl(endpoint));
     } finally {
       clearTimeout(timer);
       options.signal?.removeEventListener("abort", onAbort);
@@ -327,8 +401,10 @@ export function createKeelRpcClient(options: KeelRpcClientOptions): KeelRpcClien
 
   async function jsonRpcResult(endpoint: string, method: string, params: readonly unknown[]): Promise<unknown> {
     const body = (await request(endpoint, "", { jsonrpc: "2.0", id: 1, method, params })) as {
-      jsonrpc?: string; id?: unknown; result?: unknown; error?: { message?: string };
+      jsonrpc?: string; id?: unknown; result?: unknown; error?: { message?: string; code?: number };
     };
+    const reason = terminalRpcFailure(body?.error);
+    if (reason) { terminal = new KeelRpcError("The exact RPC operation was denied or reverted.", reason, redactRpcUrl(endpoint), true); drain(); throw terminal; }
     if (body?.jsonrpc !== "2.0" || body.id !== 1 || body.error !== undefined || !Object.hasOwn(body, "result")) {
       throw new KeelRpcError(`${method} returned an invalid response.`, "rpc.error", redactRpcUrl(endpoint));
     }
@@ -462,7 +538,7 @@ export function createKeelRpcClient(options: KeelRpcClientOptions): KeelRpcClien
               hostListEpoch: list.epoch,
               hostListStale: list.epoch !== list.currentEpoch,
             }),
-        reads,
+        reads, physicalRequests,
       };
     },
   };
