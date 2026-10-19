@@ -72,6 +72,16 @@ test('browser HTTP200 correlated capacity error retains bounded exact pinned ret
   let reads=0;const f=setup(q=>q.method==='eth_chainId'?'0x7a69':q.method==='eth_getBlockByNumber'?block:++reads===1?Response.json({jsonrpc:'2.0',id:q.id,error:{code:-32005,message:'rate limit'}}):'0x6000',{maxRetries:1,retryDelayMs:1});
   await f.chain.pinBlock();assert.equal(await f.chain.call(store,'0x1234'),'0x6000');const calls=f.calls.filter(q=>q.method==='eth_call');assert.equal(calls.length,2);assert.ok(calls.every(q=>q.url===urls[0]));assert.deepEqual(calls[0].params,calls[1].params);
 });
+test('browser unsupported-selector exception cannot cover unrelated, unpinned or augmented RPC errors',async()=>{
+  for(const extra of [{data:'0xdeadbeef'},{cause:{code:3}},{other:'unknown'}]){
+    const f=setup(q=>q.method==='eth_chainId'?'0x7a69':q.method==='eth_getBlockByNumber'?block:Response.json({jsonrpc:'2.0',id:q.id,error:{code:-32602,message:'unsupported',...extra}}));
+    await f.chain.pinBlock();await assert.rejects(f.chain.call(store,'0x1234'),e=>e.terminal===true);assert.equal(f.calls.filter(q=>q.method==='eth_call').length,1);assert.ok(f.calls.every(q=>q.url===urls[0]));
+  }
+  const f=setup(q=>q.method==='eth_chainId'?'0x7a69':Response.json({jsonrpc:'2.0',id:q.id,error:{code:-32602,message:'unsupported'}}));
+  await assert.rejects(f.chain.call(store,'0x1234'),e=>e.terminal===true);assert.equal(f.calls.filter(q=>q.method==='eth_call').length,1);assert.ok(f.calls.every(q=>q.url===urls[0]));
+  const identity=setup(q=>Response.json({jsonrpc:'2.0',id:q.id,error:{code:-32602,message:'unsupported'}}));
+  await assert.rejects(identity.chain.call(store,'0x1234'),e=>e.terminal===true);assert.equal(identity.calls.length,1);assert.equal(identity.calls[0].method,'eth_chainId');
+});
 test('pinned cache and in-flight identity include every execution argument and snapshot mutable inputs before awaiting',async()=>{
   const slot='0x'+'00'.repeat(32),value=n=>'0x'+n.toString(16).padStart(64,'0');
   const override=n=>({[store]:{stateDiff:{[slot]:value(n)}}});

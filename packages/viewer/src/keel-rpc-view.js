@@ -203,14 +203,24 @@ export function createKeelChain({ rpc, keelHold, hosts = KEEL_VIEW_RPC_HOSTS, li
     if (typeof error.data === "string" && (error.data.length > 4096 || semanticFailure({ message: error.data }))) return false;
     return semanticFailure(error) === null;
   }
-  function httpErrorFailure(text, contentType, id) {
+  function isUnsupportedPinnedRpcError(body, id, method, params) {
+    if (!["eth_call", "eth_getCode"].includes(method) || !body || typeof body !== "object" || Array.isArray(body)) return false;
+    const error = body.error, selector = params?.[1];
+    return body.jsonrpc === "2.0" && body.id === id && Object.keys(body).every(key => ["jsonrpc", "id", "error"].includes(key))
+      && !!error && typeof error === "object" && !Array.isArray(error) && error.code === -32602 && typeof error.message === "string" && error.message.length <= 2048
+      && Object.keys(error).every(key => ["code", "message"].includes(key)) && semanticFailure(error) === null
+      && !!selector && typeof selector === "object" && !Array.isArray(selector) && selector.requireCanonical === true
+      && typeof selector.blockHash === "string" && /^0x[0-9a-f]{64}$/iu.test(selector.blockHash)
+      && Object.keys(selector).every(key => ["blockHash", "requireCanonical"].includes(key));
+  }
+  function httpErrorFailure(text, contentType, id, method, params) {
     const sample = text.trim();
     if (/json/iu.test(contentType) || /^[\[{]/u.test(sample)) {
       let body; try { body = JSON.parse(sample); } catch { return "unclassified-http-error"; }
       const semantic = semanticFailure(body); if (semantic) return semantic;
       if (!body || typeof body !== "object" || Array.isArray(body) || body.jsonrpc !== "2.0" || body.id !== id) return "unclassified-http-error";
       if (!Object.hasOwn(body, "error") && Object.hasOwn(body, "result")) return null;
-      if (isCapacityRpcError(body, id)) return null;
+      if (isCapacityRpcError(body, id) || isUnsupportedPinnedRpcError(body, id, method, params)) return null;
       return "unclassified-http-error";
     }
     if (/\b(?:unauthori[sz]ed|forbidden|access denied)\b/iu.test(sample)) return "access-denied";
@@ -240,7 +250,7 @@ export function createKeelChain({ rpc, keelHold, hosts = KEEL_VIEW_RPC_HOSTS, li
         if (response.body?.getReader) {
           const reader = response.body.getReader(); let bytes = 0, sample = "";
           try { const decoder = new TextDecoder("utf-8", { fatal: true }); for (;;) { const next = await reader.read(); if (next.done) break; bytes += next.value.byteLength; if (bytes > 65536) throw stop(fault(endpoint, "unclassified-http-error", true)); sample += decoder.decode(next.value, { stream: true }); } sample += decoder.decode();
-            const reason = httpErrorFailure(sample, response.headers?.get?.("content-type") ?? "", id); if (reason) throw stop(fault(endpoint, reason, true));
+            const reason = httpErrorFailure(sample, response.headers?.get?.("content-type") ?? "", id, method, params); if (reason) throw stop(fault(endpoint, reason, true));
             errorBodyPending = false;
           } catch (error) { if (error?.terminal) throw error; throw stop(fault(endpoint, "unclassified-http-error", true)); } finally { await reader.cancel().catch(() => {}); reader.releaseLock(); }
         } else {
@@ -265,6 +275,7 @@ export function createKeelChain({ rpc, keelHold, hosts = KEEL_VIEW_RPC_HOSTS, li
       if (semantic) throw stop(fault(endpoint, semantic, true));
       if (body?.error !== undefined && body.error !== null) {
         if (isCapacityRpcError(body, id)) throw fault(endpoint, "rate-limited", false, { retryable: true });
+        if (isUnsupportedPinnedRpcError(body, id, method, params)) throw fault(endpoint, "unsupported-block-selector");
         throw stop(fault(endpoint, "unclassified-rpc-error", true));
       }
       if (body === null || typeof body !== "object" || Array.isArray(body) || body.jsonrpc !== "2.0" || body.id !== id || "error" in body

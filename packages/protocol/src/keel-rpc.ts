@@ -113,8 +113,19 @@ function isCapacityRpcError(value: unknown, requestId: unknown): boolean {
   return terminalRpcFailure(error) === undefined;
 }
 
+function isUnsupportedPinnedRpcError(value: unknown, requestId: unknown, method?: string, params?: readonly unknown[]): boolean {
+  if (!["eth_call", "eth_getCode"].includes(method ?? "") || !value || typeof value !== "object" || Array.isArray(value)) return false;
+  const body = value as Record<string, unknown>, error = body.error as Record<string, unknown> | null, selector = params?.[1] as Record<string, unknown> | null;
+  return body.jsonrpc === "2.0" && body.id === requestId && Object.keys(body).every(key => ["jsonrpc", "id", "error"].includes(key))
+    && !!error && typeof error === "object" && !Array.isArray(error) && error.code === -32602 && typeof error.message === "string" && error.message.length <= 2048
+    && Object.keys(error).every(key => ["code", "message"].includes(key)) && terminalRpcFailure(error) === undefined
+    && !!selector && typeof selector === "object" && !Array.isArray(selector) && selector.requireCanonical === true
+    && typeof selector.blockHash === "string" && /^0x[0-9a-f]{64}$/iu.test(selector.blockHash)
+    && Object.keys(selector).every(key => ["blockHash", "requireCanonical"].includes(key));
+}
+
 /** A fully read error body may be a transport message, never a partial RPC envelope. */
-function httpErrorFailure(text: string, contentType: string, requestId: unknown): string | undefined {
+function httpErrorFailure(text: string, contentType: string, requestId: unknown, method?: string, params?: readonly unknown[]): string | undefined {
   const sample = text.trim();
   if (/json/iu.test(contentType) || /^[\[{]/u.test(sample)) {
     let body: Record<string, unknown>;
@@ -125,7 +136,7 @@ function httpErrorFailure(text: string, contentType: string, requestId: unknown)
     if (!Object.hasOwn(body, "error") && Object.hasOwn(body, "result")) return undefined;
     // Recognized capacity errors remain retryable. Arbitrary structured errors
     // can be contract failures even without the conventional code/message.
-    if (isCapacityRpcError(body, requestId)) return undefined;
+    if (isCapacityRpcError(body, requestId) || isUnsupportedPinnedRpcError(body, requestId, method, params)) return undefined;
     return "transport.unclassified-http-error";
   }
   if (/\b(?:unauthori[sz]ed|forbidden|access denied)\b/iu.test(sample)) return "transport.access-denied";
@@ -385,7 +396,8 @@ export function createKeelRpcClient(options: KeelRpcClientOptions): KeelRpcClien
           try {
             for (;;) { const next = await reader.read(); if (next.done) break; size += next.value.byteLength; if (size > 65536) throw unclassified(); chunks.push(next.value); }
             const bytes = new Uint8Array(size); let at = 0; for (const chunk of chunks) { bytes.set(chunk, at); at += chunk.length; }
-            const reason = httpErrorFailure(new TextDecoder("utf-8", { fatal: true }).decode(bytes), response.headers.get("content-type") ?? "", (body as { id?: unknown } | undefined)?.id);
+            const rpc = body as { id?: unknown; method?: string; params?: readonly unknown[] } | undefined;
+            const reason = httpErrorFailure(new TextDecoder("utf-8", { fatal: true }).decode(bytes), response.headers.get("content-type") ?? "", rpc?.id, rpc?.method, rpc?.params);
             if (reason) { terminal = new KeelRpcError("The exact RPC error cannot be treated as transport success.", reason, redactRpcUrl(endpoint), true); drain(); throw terminal; }
             state.errorBodyPending = false;
           } catch (error) { if (error instanceof KeelRpcError && error.terminal) throw error; throw unclassified(); }
@@ -438,6 +450,9 @@ export function createKeelRpcClient(options: KeelRpcClientOptions): KeelRpcClien
   }
 
   async function jsonRpcResult(endpoint: string, method: string, params: readonly unknown[]): Promise<unknown> {
+    // Qualify only the fields actually serialized on the wire, not inherited or
+    // subsequently mutated caller properties used by a selector exception.
+    params = JSON.parse(JSON.stringify(params)) as readonly unknown[];
     const body = (await request(endpoint, "", { jsonrpc: "2.0", id: 1, method, params })) as {
       jsonrpc?: string; id?: unknown; result?: unknown; error?: { message?: string; code?: number };
     };
@@ -445,6 +460,7 @@ export function createKeelRpcClient(options: KeelRpcClientOptions): KeelRpcClien
     if (reason) { terminal = new KeelRpcError("The exact RPC operation was denied or reverted.", reason, redactRpcUrl(endpoint), true); drain(); throw terminal; }
     if (body?.error !== undefined && body.error !== null) {
       if (isCapacityRpcError(body, 1)) throw Object.assign(new KeelRpcError("RPC provider capacity is unavailable.", "rpc.rate-limited", redactRpcUrl(endpoint)), { retryable: true });
+      if (isUnsupportedPinnedRpcError(body, 1, method, params)) throw new KeelRpcError("RPC provider rejected the exact canonical block selector.", "rpc.unsupported-block-selector", redactRpcUrl(endpoint));
       terminal = new KeelRpcError("The exact RPC error cannot be classified as a provider capacity failure.", "rpc.unclassified-error", redactRpcUrl(endpoint), true); drain(); throw terminal;
     }
     if (body?.jsonrpc !== "2.0" || body.id !== 1 || body.error !== undefined || !Object.hasOwn(body, "result")) {
