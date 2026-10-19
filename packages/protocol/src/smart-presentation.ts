@@ -1,4 +1,4 @@
-import { decodeBase64 } from "./bytes.js";
+import { decodeBase64, encodeBase64 } from "./bytes.js";
 import { canonicalJson } from "./canonical.js";
 import { sha256Hex } from "./integrity.js";
 
@@ -27,6 +27,7 @@ export interface KeelSmartPresentationMeasurements {
   readonly completeTokenUriBytes?: number;
   readonly maximumTokenUriBytes?: number;
   readonly embeddedAnimationUriBytes?: number;
+  readonly embeddedProgramBytes?: number;
   /** Payload bytes duplicated into persistent literal metadata, not return-memory encoding. */
   readonly literalMediaPrefixBytes?: number;
   readonly prefixBytes?: number;
@@ -179,7 +180,7 @@ function freeze<T>(value: T): T {
 }
 function measurementsOf(input: KeelSmartPresentationMeasurements | undefined) {
   const result: Record<string, number | string> = {};
-  const byteKeys = ["imageUriBytes", "encodedImageSlotBytes", "completeTokenUriBytes", "maximumTokenUriBytes", "embeddedAnimationUriBytes", "literalMediaPrefixBytes", "prefixBytes", "suffixBytes", "maxEnvelopeBytes"];
+  const byteKeys = ["imageUriBytes", "encodedImageSlotBytes", "completeTokenUriBytes", "maximumTokenUriBytes", "embeddedAnimationUriBytes", "embeddedProgramBytes", "literalMediaPrefixBytes", "prefixBytes", "suffixBytes", "maxEnvelopeBytes"];
   const gasKeys = ["executionGas", "maxExecutionGas", "stateGas", "maxStateGas", "readGas", "maxReadGas"];
   if (input !== undefined) {
     const values = record(input, [...byteKeys, ...gasKeys], "presentation measurements");
@@ -290,7 +291,7 @@ export function planKeelSmartAssetPresentation(input: KeelSmartAssetPresentation
   if (Number(selected.measurements.completeTokenUriBytes ?? 0) > KEEL_SMART_TOKEN_URI_MAX_BYTES && selected.selection.animation === "hybrid-shell") {
     if (execution === "static") suggestions.push({ candidateId: "image-only-inline", code: "review-image-only-to-save-space" });
     suggestions.push({ candidateId: "hybrid-verifier-only", code: "review-verifier-without-inline-grid-image" });
-    if (Number(selected.measurements.embeddedAnimationUriBytes ?? 0) > KEEL_SMART_TOKEN_URI_MAX_BYTES) {
+    if (Number(selected.measurements.embeddedProgramBytes ?? 0) > KEEL_SMART_TOKEN_URI_MAX_BYTES) {
       suggestions.push({ candidateId: fallbackDelivery === "hosted" ? "hosted-presentation" : "ipfs-presentation", code: "embedded-verifier-alone-above-standard-target" });
       if (fallbackDelivery === undefined) suggestions.push({ code: "choose-ipfs-or-hosted-if-external-presentation-is-desired" });
     }
@@ -319,6 +320,72 @@ function decodeDataURI(uri: string): Uint8Array {
   const comma = uri.indexOf(","); if (comma < 0) throw new TypeError("Malformed complete data URI.");
   return /;base64$/iu.test(uri.slice(0, comma)) ? decodeBase64(uri.slice(comma + 1)) : new TextEncoder().encode(decodeURIComponent(uri.slice(comma + 1)));
 }
+/** Find a top-level member in the original JSON, retaining spelling and whitespace. */
+function stringMemberSpan(json: string, member: string) {
+  let cursor = 0, previousComma: number | null = null;
+  const whitespace = () => { while (cursor < json.length && /\s/u.test(json[cursor]!)) cursor++; };
+  const stringEnd = (start: number) => {
+    let index = start + 1;
+    while (index < json.length) { const char = json[index++]!; if (char === "\\") index++; else if (char === '"') return index; }
+    throw new TypeError("Malformed metadata string.");
+  };
+  const valueEnd = (start: number) => {
+    if (json[start] === '"') return stringEnd(start);
+    if (json[start] !== "{" && json[start] !== "[") { let end = start; while (end < json.length && !/[\s,}\]]/u.test(json[end]!)) end++; return end; }
+    const stack: string[] = [json[start]!]; let index = start + 1;
+    while (stack.length && index < json.length) {
+      const char = json[index]!;
+      if (char === '"') { index = stringEnd(index); continue; }
+      if (char === "{" || char === "[") stack.push(char); else if (char === "}" || char === "]") stack.pop();
+      index++;
+    }
+    return index;
+  };
+  whitespace(); if (json[cursor++] !== "{") throw new TypeError("Metadata must be an object.");
+  let selected: { memberStart: number; memberEnd: number; valueStart: number; valueEnd: number } | null = null;
+  whitespace();
+  while (json[cursor] !== "}") {
+    const keyStart = cursor, keyEnd = stringEnd(keyStart), key = JSON.parse(json.slice(keyStart, keyEnd)) as string;
+    cursor = keyEnd; whitespace(); if (json[cursor++] !== ":") throw new TypeError("Malformed metadata member.");
+    whitespace(); const start = cursor, end = valueEnd(start); cursor = end; whitespace();
+    const comma = json[cursor] === "," ? cursor : null;
+    if (key === member) {
+      if (selected !== null) throw new TypeError("Duplicate metadata image members cannot be measured unambiguously.");
+      if (json[start] !== '"') throw new TypeError("Metadata image must be one unambiguous string member.");
+      selected = { memberStart: previousComma ?? keyStart, memberEnd: previousComma === null && comma !== null ? comma + 1 : end, valueStart: start, valueEnd: end };
+    }
+    if (comma === null) break;
+    previousComma = comma; cursor++; whitespace();
+  }
+  return selected;
+}
+/** Measure original percent spans or the original JSON bytes under its canonical
+ * Base64 grammar. No alternate JSON serialization or URI escaping is introduced. */
+function encodedImageContribution(uri: string, json: string) {
+  const span = stringMemberSpan(json, "image"); if (!span) return null;
+  const comma = uri.indexOf(","), body = uri.slice(comma + 1), utf8 = new TextEncoder();
+  if (/;base64$/iu.test(uri.slice(0, comma))) {
+    const raw = utf8.encode(json);
+    if (body !== encodeBase64(raw)) throw new TypeError("Noncanonical outer Base64 cannot be measured without changing its grammar.");
+    const memberBytes = utf8.encode(json.slice(span.memberStart, span.memberEnd)).length;
+    const valueBytes = utf8.encode(json.slice(span.valueStart + 1, span.valueEnd - 1)).length;
+    const encodedLength = (bytes: number) => 4 * Math.ceil(bytes / 3);
+    return { encodedImageSlotBytes: body.length - encodedLength(raw.length - memberBytes), encodedImageValueBytes: body.length - encodedLength(raw.length - valueBytes) };
+  }
+  const positions = [...new Set([span.memberStart, span.memberEnd, span.valueStart + 1, span.valueEnd - 1])].map(position => ({ position, byteOffset: utf8.encode(json.slice(0, position)).length })).sort((a, b) => a.byteOffset - b.byteOffset);
+  const offsets = new Map<number, number>(); let rawOffset = 0, decodedBytes = 0;
+  for (const target of positions) {
+    while (decodedBytes < target.byteOffset) {
+      if (body[rawOffset] === "%") { decodedBytes++; rawOffset += 3; }
+      else { const code = body.codePointAt(rawOffset)!; decodedBytes += code < 0x80 ? 1 : code < 0x800 ? 2 : code < 0x10000 ? 3 : 4; rawOffset += code > 0xffff ? 2 : 1; }
+    }
+    if (decodedBytes !== target.byteOffset) throw new TypeError("Metadata span splits an encoded code point.");
+    offsets.set(target.position, rawOffset);
+  }
+  const size = (start: number, end: number) => utf8.encode(body.slice(offsets.get(start)!, offsets.get(end)!)).length;
+  return { encodedImageSlotBytes: size(span.memberStart, span.memberEnd), encodedImageValueBytes: size(span.valueStart + 1, span.valueEnd - 1) };
+}
+
 /** The renderer must assemble the complete chosen return, including every embedded instruction.
  * Compatibility targets are warnings; actual qualified reader/gas limits remain hard gates. */
 export async function measureKeelSmartAssetPresentation(plan: KeelSmartAssetPresentationPlan, renderTokenURI: (plan: KeelSmartAssetPresentationPlan) => string | Promise<string>) {
@@ -327,8 +394,8 @@ export async function measureKeelSmartAssetPresentation(plan: KeelSmartAssetPres
   await hashKeelSmartAssetPresentationPlan(plan);
   if (typeof tokenURI !== "string" || !/^data:application\/json(?:[;,])/iu.test(tokenURI)) throw new TypeError("Render the actual complete JSON metadata data URI.");
   const completeTokenUriBytes = new TextEncoder().encode(tokenURI).length;
-  let metadata: Record<string, unknown>;
-  try { metadata = JSON.parse(new TextDecoder("utf-8", { fatal: true }).decode(decodeDataURI(tokenURI))) as Record<string, unknown>; }
+  let metadata: Record<string, unknown>, json: string;
+  try { json = new TextDecoder("utf-8", { fatal: true, ignoreBOM: true }).decode(decodeDataURI(tokenURI)); metadata = JSON.parse(json) as Record<string, unknown>; }
   catch { throw new TypeError("Malformed complete metadata encoding."); }
   if (!metadata || Array.isArray(metadata) || typeof metadata !== "object") throw new TypeError("Malformed complete metadata JSON.");
   const hardBlockers = [...plan.hardBlockers], compatibilityWarnings: string[] = [];
@@ -341,13 +408,15 @@ export async function measureKeelSmartAssetPresentation(plan: KeelSmartAssetPres
     if (typeof metadata.animation_url !== "string" || !/^data:text\/html[;,]/iu.test(metadata.animation_url)) hardBlockers.push("registered-animation-shell-required");
     else { const bytes = decodeDataURI(metadata.animation_url); embeddedAnimationIntegrity = { digest: await sha256Hex(bytes), byteLength: bytes.length }; embeddedAnimationUriBytes = new TextEncoder().encode(metadata.animation_url).length; }
   } else if ((plan.animation.delivery === "ipfs-shell" || plan.animation.delivery === "hosted-shell") && metadata.animation_url !== plan.animation.uri) hardBlockers.push("external-presentation-selection-changed");
-  let imageUriBytes: number | null = null;
+  let imageUriBytes: number | null = null, encodedImageSlotBytes: number | null = null, encodedImageValueBytes: number | null = null;
   if (typeof metadata.image === "string") {
     imageUriBytes = new TextEncoder().encode(metadata.image).length;
+    const contribution = encodedImageContribution(tokenURI, json);
+    if (contribution) { encodedImageSlotBytes = contribution.encodedImageSlotBytes; encodedImageValueBytes = contribution.encodedImageValueBytes; }
     if (plan.image?.delivery === "inline") {
       if (!metadata.image.startsWith(`data:${plan.image.commitment.mediaType};`) && !metadata.image.startsWith(`data:${plan.image.commitment.mediaType},`)) hardBlockers.push("inline-grid-image-required");
       else { const bytes = decodeDataURI(metadata.image); if (bytes.length !== plan.image.commitment.byteLength || await sha256Hex(bytes) !== plan.image.commitment.digest) hardBlockers.push("inline-image-source-changed"); }
-      if (imageUriBytes > KEEL_SMART_INLINE_IMAGE_URI_MAX_BYTES) compatibilityWarnings.push("inline-image-above-compatibility-target");
+      if (imageUriBytes > KEEL_SMART_INLINE_IMAGE_URI_MAX_BYTES || (encodedImageSlotBytes ?? 0) > KEEL_SMART_INLINE_IMAGE_URI_MAX_BYTES) compatibilityWarnings.push("inline-image-above-compatibility-target");
     } else if (plan.image?.delivery === "onchain-reference" && plan.image.uri !== undefined && metadata.image !== plan.image.uri) hardBlockers.push("native-image-reference-changed");
     else if (plan.image?.delivery === "external" && metadata.image !== plan.image.uri) hardBlockers.push("external-preview-selection-changed");
   }
@@ -358,17 +427,17 @@ export async function measureKeelSmartAssetPresentation(plan: KeelSmartAssetPres
   if (completeTokenUriBytes > KEEL_SMART_TOKEN_URI_MAX_BYTES && plan.animation.delivery === "hybrid-shell") {
     if (plan.execution === "static") recommendations.push({ candidateId: "image-only-inline", code: "review-image-only-to-save-space" });
     recommendations.push({ candidateId: "hybrid-verifier-only", code: "review-verifier-without-inline-grid-image" });
-    if ((embeddedAnimationUriBytes ?? 0) > KEEL_SMART_TOKEN_URI_MAX_BYTES) recommendations.push({ candidateId: plan.fallbackDelivery === "hosted" ? "hosted-presentation" : "ipfs-presentation", code: "embedded-verifier-alone-above-standard-target" });
+    if ((embeddedAnimationIntegrity?.byteLength ?? 0) > KEEL_SMART_TOKEN_URI_MAX_BYTES) recommendations.push({ candidateId: plan.fallbackDelivery === "hosted" ? "hosted-presentation" : "ipfs-presentation", code: "embedded-verifier-alone-above-standard-target" });
   }
-  const standardsCompatible = completeTokenUriBytes <= KEEL_SMART_TOKEN_URI_MAX_BYTES && (plan.image?.delivery !== "inline" || (imageUriBytes ?? 0) <= KEEL_SMART_INLINE_IMAGE_URI_MAX_BYTES);
+  const standardsCompatible = completeTokenUriBytes <= KEEL_SMART_TOKEN_URI_MAX_BYTES && (plan.image?.delivery !== "inline" || (imageUriBytes ?? 0) <= KEEL_SMART_INLINE_IMAGE_URI_MAX_BYTES && (encodedImageSlotBytes ?? 0) <= KEEL_SMART_INLINE_IMAGE_URI_MAX_BYTES);
   const compatibilityReviewRequired = !standardsCompatible && !plan.nonstandardCompatibilityAcknowledged || plan.image === null && !plan.omittedGridImageAcknowledged;
   const result = { schema: "keel-smart-presentation-return-measurement@1" as const, planKey: plan.planKey, acknowledgementKey: plan.acknowledgementKey,
-    tokenURI, completeTokenUriBytes, imageUriBytes, embeddedAnimationIntegrity, embeddedAnimationUriBytes, standardsCompatible, measurementBasis: "actual-rendered-complete-return" as const,
+    tokenURI, completeTokenUriBytes, imageUriBytes, encodedImageSlotBytes, encodedImageValueBytes, embeddedAnimationIntegrity, embeddedAnimationUriBytes, standardsCompatible, measurementBasis: "actual-rendered-complete-return" as const,
     hardBlockers: [...new Set(hardBlockers)], compatibilityWarnings: [...new Set(compatibilityWarnings)], recommendations,
     tokenUriDigest: await sha256Hex(new TextEncoder().encode(tokenURI)),
     status: hardBlockers.length ? "blocked" as const : compatibilityReviewRequired ? "compatibility-review-required" as const : "requires-selected-chain-simulation" as const,
     publicationReady: false as const, requiresExactFullSimulation: true as const };
-  return freeze({ ...result, measurementKey: canonicalJson({ tokenUriDigest: result.tokenUriDigest, completeTokenUriBytes, imageUriBytes, embeddedAnimationIntegrity, embeddedAnimationUriBytes, selectedPlanKey: plan.planKey, standardsCompatible, hardBlockers: result.hardBlockers, compatibilityWarnings: result.compatibilityWarnings }) });
+  return freeze({ ...result, measurementKey: canonicalJson({ tokenUriDigest: result.tokenUriDigest, completeTokenUriBytes, imageUriBytes, encodedImageSlotBytes, encodedImageValueBytes, embeddedAnimationIntegrity, embeddedAnimationUriBytes, selectedPlanKey: plan.planKey, standardsCompatible, hardBlockers: result.hardBlockers, compatibilityWarnings: result.compatibilityWarnings }) });
 }
 /** Measure only supported candidate adapters. Unavailable layouts stay visibly unqualified. */
 export async function measureKeelSmartPresentationMatrix(input: KeelSmartAssetPresentationInput,
@@ -389,8 +458,8 @@ export async function measureKeelSmartPresentationMatrix(input: KeelSmartAssetPr
   const recommendations: { candidateId: KeelAssetPresentationCandidateId; code: string; completeTokenUriBytes: number }[] = [];
   if (chosen && chosen.completeTokenUriBytes > KEEL_SMART_TOKEN_URI_MAX_BYTES && plan.animation.delivery === "hybrid-shell") {
     if (imageOnly && imageOnly.hardBlockers.length === 0 && imageOnly.completeTokenUriBytes <= KEEL_SMART_TOKEN_URI_MAX_BYTES) recommendations.push({ candidateId: "image-only-inline", code: "measured-image-only-within-standard-target", completeTokenUriBytes: imageOnly.completeTokenUriBytes });
-    if (withoutImage && withoutImage.hardBlockers.length === 0) recommendations.push({ candidateId: "hybrid-verifier-only", code: withoutImage.completeTokenUriBytes <= KEEL_SMART_TOKEN_URI_MAX_BYTES ? "measured-verifier-without-grid-image-within-target" : "measured-embedded-verifier-alone-above-target", completeTokenUriBytes: withoutImage.completeTokenUriBytes });
-    if (withoutImage && withoutImage.completeTokenUriBytes > KEEL_SMART_TOKEN_URI_MAX_BYTES) recommendations.push({ candidateId: plan.fallbackDelivery === "hosted" ? "hosted-presentation" : "ipfs-presentation", code: "review-external-presentation-after-measured-verifier-only", completeTokenUriBytes: withoutImage.completeTokenUriBytes });
+    if (withoutImage && withoutImage.hardBlockers.length === 0) recommendations.push({ candidateId: "hybrid-verifier-only", code: withoutImage.completeTokenUriBytes <= KEEL_SMART_TOKEN_URI_MAX_BYTES ? "measured-verifier-without-grid-image-within-target" : "measured-verifier-only-metadata-above-target", completeTokenUriBytes: withoutImage.completeTokenUriBytes });
+    if (withoutImage && (withoutImage.embeddedAnimationIntegrity?.byteLength ?? 0) > KEEL_SMART_TOKEN_URI_MAX_BYTES) recommendations.push({ candidateId: plan.fallbackDelivery === "hosted" ? "hosted-presentation" : "ipfs-presentation", code: "review-external-presentation-after-measured-verifier-only", completeTokenUriBytes: withoutImage.completeTokenUriBytes });
   }
   return freeze({ schema: "keel-smart-presentation-matrix-measurement@1" as const, planKey: plan.planKey, results, recommendations, publicationReady: false as const });
 }
