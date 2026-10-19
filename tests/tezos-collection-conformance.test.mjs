@@ -31,8 +31,31 @@ test("the generated Tezos catalogue is current with the contract sources", { ski
   for (const { contract, source, module } of Object.values(KEEL_TEZOS_COLLECTION_ROUTE_CONTRACTS)) {
     const text = readFileSync(resolve(CONTRACTS, "src/modules", module, "tezos", source), "utf8");
     assert.match(text, new RegExp(`class ${contract}\\(`, "u"));
+    const inventory = JSON.parse(execFileSync("python3", [resolve(CONTRACTS, "script/tezos/source-inventory.py")], { encoding: "utf8" }));
+    const declarations = new Map(inventory.flatMap((item) => item.contracts.map((declaration) => [declaration.name, { ...declaration, source: item.source }])));
+    const assertHierarchy = (className, visiting = new Set()) => {
+      assert.equal(visiting.has(className), false, `Cyclic native inheritance at ${className}`);
+      const declaration = declarations.get(className);
+      assert.ok(declaration, `Missing native declaration ${className}`);
+      for (const base of declaration.bases.filter((name) => name !== "sp.Contract")) assertHierarchy(base.split(".").at(-1), new Set(visiting).add(className));
+    };
+    assertHierarchy(contract);
+    const inheritedMethod = (className, methodName, visiting = new Set()) => {
+      assert.equal(visiting.has(className), false, `Cyclic native inheritance at ${className}`);
+      const declaration = declarations.get(className);
+      assert.ok(declaration, `Missing native declaration ${className}`);
+      const bases = declaration.bases.filter((base) => base !== "sp.Contract").map((base) => base.split(".").at(-1));
+      for (const base of bases) assert.ok(declarations.has(base), `Missing base ${className}.${base}`);
+      const own = declaration.methods.find((method) => method.name === methodName);
+      if (own) {
+        assert.equal(own.kind, "entrypoint", `${className}.${methodName} has the wrong decorator`);
+        assert.match(readFileSync(resolve(CONTRACTS, declaration.source), "utf8"), new RegExp(`def ${methodName}\\(`, "u"));
+        return true;
+      }
+      return bases.some((base) => inheritedMethod(base, methodName, new Set(visiting).add(className)));
+    };
     const entrypoints = KEEL_TEZOS_MODULES.find((item) => item.id === module).entrypoints[contract];
-    for (const name of entrypoints) assert.match(text, new RegExp(`def ${name}\\(`, "u"), `${contract}.${name}`);
+    for (const name of entrypoints) assert.ok(inheritedMethod(contract, name), `${contract}.${name} is absent from its exact source inheritance`);
   }
 });
 
