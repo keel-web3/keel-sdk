@@ -17,6 +17,12 @@ default. Retries use the same endpoint and exact pinned parameters. HTTP 429
 honors Retry-After, with at most five seconds of internal waiting; a longer
 browser cooldown is retained for a later resume. HTTP 401/403 and genuine
 contract reverts are sticky terminal errors, including nested HTTP error bodies.
+Non-success HTTP bodies must finish within the existing 64 KiB diagnostic cap
+and deadline. Oversized, incomplete, malformed JSON, invalid UTF-8 and unknown
+structured RPC failures fail closed without retry or another recipient. Fully
+read plain-text HTTP transport messages without execution/denial markers retain
+transport fallback; correlated rate-limit envelopes retain bounded same-endpoint
+retry. No error body is interpreted as successful contract execution.
 
 Chunk reconstruction uses iterative traversal, bounded leaf workers, and the
 existing depth, node, stored-byte and decoded-byte limits. It preserves ordering,
@@ -29,7 +35,10 @@ Optional resume caching requires an exact block hash. Completed, verified object
 copies are keyed by chain, store, object ID, block hash and full content metadata.
 The bounded LRU includes key and payload storage, never retains failed promises,
 and never serves mutable latest-state reads. Transport caching is separately
-bounded and invalidated after an integrity failure. The managed loader exposes
+bounded and invalidated after an integrity failure. Transport calls snapshot all
+JSON parameters before the first async boundary; the cache key includes the
+entire normalized execution argument list, including state and block overrides.
+The managed loader exposes
 read-only progress and resume of transient failures at the original pin; explicit
 document cancellation/pagehide is terminal for that loader instance. No paid
 operation is retried by these APIs.

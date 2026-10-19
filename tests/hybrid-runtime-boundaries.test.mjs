@@ -28,6 +28,49 @@ for(const cause of [{status:403},{status:503,cause:{code:3,message:'execution re
   await assert.rejects(f.chain.call(store,'0x'),e=>e.terminal===true&&!/SECRET/.test(e.message));
   assert.equal(f.calls.filter(q=>q.method==='eth_call').length,1);assert.ok(f.calls.every(q=>q.url===urls[0]));
 });
+for(const body of [JSON.stringify({jsonrpc:'2.0',id:1,error:{code:3,message:'execution reverted',data:'0x'+'ab'.repeat(40_000)}}),'{"error":','x'.repeat(65_537)])test('browser incomplete/oversized error envelope fails closed without retry or another recipient: '+body.length,async()=>{
+  const f=setup(q=>q.method==='eth_chainId'?'0x7a69':new Response(body,{status:503}),{maxRetries:2,retryDelayMs:1});
+  await assert.rejects(f.chain.call(store,'0x1234'),e=>e.terminal===true);
+  const before=f.calls.length;await assert.rejects(f.chain.call(store,'0x1234'),e=>e.terminal===true);
+  assert.equal(f.calls.length,before);assert.equal(f.calls.filter(q=>q.method==='eth_call').length,1);assert.ok(f.calls.every(q=>q.url===urls[0]));
+});
+test('browser incomplete HTTP error stream times out fail-closed without another dispatch',async t=>{
+  let stream;const f=setup((q,url)=>q.method==='eth_chainId'?'0x7a69':url===urls[0]?new Response(new ReadableStream({start(c){stream=c;c.enqueue(new TextEncoder().encode('{"error":'));}}),{status:503}):'0x6000',{timeoutMs:15,maxConcurrentReads:4});
+  t.after(()=>{try{stream.close();}catch{}});
+  await assert.rejects(f.chain.call(store,'0x1234'),e=>e.terminal===true);
+  assert.equal(f.calls.filter(q=>q.method==='eth_call').length,1);assert.ok(f.calls.every(q=>q.url===urls[0]));
+});
+test('browser full plain-text transport bodies retain fallback below/at the unchanged 64KiB cap',async()=>{
+  for(const bytes of [65_535,65_536]){
+    const f=setup((q,url)=>q.method==='eth_chainId'?'0x7a69':url===urls[0]?new Response('x'.repeat(bytes),{status:503}):'0x6000');
+    assert.equal(await f.chain.call(store,'0x1234'),'0x6000');assert.equal(f.calls.filter(q=>q.method==='eth_call').length,2);
+  }
+});
+test('browser bounded malformed JSON media type and unknown RPC failures remain fail-closed',async()=>{
+  for(const response of [()=>new Response('nope',{status:503,headers:{'content-type':'application/json'}}),q=>Response.json({jsonrpc:'2.0',id:q.id,error:{code:-32000,message:'unknown custom failure',data:'0x4a11abec'}},{status:503}),()=>new Response(Uint8Array.of(255),{status:503})]){
+    const f=setup(q=>q.method==='eth_chainId'?'0x7a69':response(q));await assert.rejects(f.chain.call(store,'0x1234'),e=>e.terminal===true);assert.equal(f.calls.filter(q=>q.method==='eth_call').length,1);assert.ok(f.calls.every(q=>q.url===urls[0]));
+  }
+});
+test('browser fully correlated rate-limit envelope retries the same pinned operation',async()=>{
+  let reads=0;const f=setup(q=>q.method==='eth_chainId'?'0x7a69':q.method==='eth_getBlockByNumber'?block:++reads===1?Response.json({jsonrpc:'2.0',id:q.id,error:{code:-32005,message:'rate limit'}},{status:429,headers:{'retry-after':'0'}}):'0x6000',{maxRetries:1,retryDelayMs:1});
+  await f.chain.pinBlock();assert.equal(await f.chain.call(store,'0x1234'),'0x6000');const calls=f.calls.filter(q=>q.method==='eth_call');assert.equal(calls.length,2);assert.ok(calls.every(q=>q.url===urls[0]));assert.deepEqual(calls[0].params,calls[1].params);
+});
+test('pinned cache and in-flight identity include every execution argument and snapshot mutable inputs before awaiting',async()=>{
+  const slot='0x'+'00'.repeat(32),value=n=>'0x'+n.toString(16).padStart(64,'0');
+  const override=n=>({[store]:{stateDiff:{[slot]:value(n)}}});
+  const f=setup(q=>q.method==='eth_chainId'?'0x7a69':q.method==='eth_getBlockByNumber'?block:q.params[3]?.number??q.params[2][store].stateDiff[slot]);
+  await f.chain.pinBlock();
+  const params=[{to:store,data:'0x1234'},'latest',override(1)];
+  const pending=f.chain.request('eth_call',params);
+  params[0].data='0x9999';params[2][store].stateDiff[slot]=value(9);
+  assert.equal(await pending,value(1));
+  assert.deepEqual(await Promise.all([f.chain.request('eth_call',[{to:store,data:'0x1234'},'latest',override(2)]),f.chain.request('eth_call',[{to:store,data:'0x1234'},'latest',override(3)])]),[value(2),value(3)]);
+  assert.equal(await f.chain.request('eth_call',[{to:store,data:'0x1234'},'latest',override(1)]),value(1));
+  assert.equal(await f.chain.request('eth_call',[{to:store,data:'0x1234'},'latest',override(1),{number:'0x1235'}]),'0x1235');
+  const calls=f.calls.filter(q=>q.method==='eth_call');assert.equal(calls.length,4);
+  assert.equal(calls[0].params[0].data,'0x1234');assert.equal(calls[0].params[2][store].stateDiff[slot],value(1));
+  assert.ok(calls.every(q=>q.params[1].blockHash===block.hash&&q.params[1].requireCanonical===true));
+});
 test('a large logical sequence dispatches only a bounded physical active window',async()=>{
   let active=0,maximum=0;
   const f=setup(async q=>{active++;maximum=Math.max(active,maximum);await new Promise(r=>setTimeout(r,1));active--;return q.method==='eth_chainId'?'0x7a69':'0x6000';},{maxConcurrentReads:3});

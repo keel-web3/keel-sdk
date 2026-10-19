@@ -101,6 +101,29 @@ function terminalRpcFailure(value: unknown): "rpc.execution-reverted" | "transpo
   return undefined;
 }
 
+/** A fully read error body may be a transport message, never a partial RPC envelope. */
+function httpErrorFailure(text: string, contentType: string, requestId: unknown): string | undefined {
+  const sample = text.trim();
+  if (/json/iu.test(contentType) || /^[\[{]/u.test(sample)) {
+    let body: Record<string, unknown>;
+    try { body = JSON.parse(sample) as Record<string, unknown>; } catch { return "transport.unclassified-http-error"; }
+    const reason = terminalRpcFailure(body);
+    if (reason) return reason;
+    if (!body || typeof body !== "object" || Array.isArray(body) || body.jsonrpc !== "2.0" || body.id !== requestId) return "transport.unclassified-http-error";
+    if (!Object.hasOwn(body, "error") && Object.hasOwn(body, "result")) return undefined;
+    const error = body.error as Record<string, unknown> | null;
+    // Recognized capacity errors remain retryable. Arbitrary structured errors
+    // can be contract failures even without the conventional code/message.
+    if (error && typeof error === "object" && !Array.isArray(error) && [-32005, 429].includes(error.code as number)
+      && Object.keys(error).every(key => ["code", "message", "data"].includes(key))
+      && (error.data === undefined || error.data === null || typeof error.data !== "object")) return undefined;
+    return "transport.unclassified-http-error";
+  }
+  if (/\b(?:unauthori[sz]ed|forbidden|access denied)\b/iu.test(sample)) return "transport.access-denied";
+  if (/\b(?:revert(?:ed|ing)?|execution failed)\b/iu.test(sample)) return "rpc.execution-reverted";
+  return undefined; // Complete bounded plain-text HTTP transport failure.
+}
+
 export interface KeelRpcClientOptions {
   readonly family: KeelRpcFamily;
   /** Tried in order; the first that answers wins. */
@@ -321,15 +344,15 @@ export function createKeelRpcClient(options: KeelRpcClientOptions): KeelRpcClien
     if (abandoned && active >= maximum) return Promise.reject(Object.assign(new KeelRpcError("RPC timed-out physical window is occupied; resume after it settles.", "transport.timeout"), { noFallback: true }));
     return new Promise((resolve, reject) => {
       const run = () => {
-        active++; let timedOut = false;
-        const timer = setTimeout(() => { timedOut = true; abandoned++; reject(Object.assign(new KeelRpcError("RPC request timed out.", "transport.timeout", redactRpcUrl(endpoint)), { noFallback: active >= maximum })); drain(); }, timeoutMs + 5);
-        void requestPhysical(endpoint, path, body).then(resolve, reject).finally(() => { clearTimeout(timer); if (timedOut) abandoned--; active--; drain(); });
+        active++; let timedOut = false; const state = { errorBodyPending: false };
+        const timer = setTimeout(() => { timedOut = true; abandoned++; if (state.errorBodyPending) { terminal = new KeelRpcError("RPC HTTP error body could not be completely classified.", "transport.unclassified-http-error", redactRpcUrl(endpoint), true); reject(terminal); } else reject(Object.assign(new KeelRpcError("RPC request timed out.", "transport.timeout", redactRpcUrl(endpoint)), { noFallback: active >= maximum })); drain(); }, timeoutMs + 5);
+        void requestPhysical(endpoint, path, body, state).then(resolve, reject).finally(() => { clearTimeout(timer); if (timedOut) abandoned--; active--; drain(); });
       };
       if (active < maximum && !first) run(); else { const item: Pending = { run, reject, next: undefined }; if (lastPending) lastPending.next = item; else first = item; lastPending = item; }
     });
   }
 
-  async function requestPhysical(endpoint: string, path: string, body?: unknown): Promise<unknown> {
+  async function requestPhysical(endpoint: string, path: string, body: unknown, state: { errorBodyPending: boolean }): Promise<unknown> {
     if (options.signal?.aborted) throw new KeelRpcError("RPC request aborted.", "transport.aborted");
     const controller = new AbortController();
     const timer = setTimeout(() => controller.abort(), timeoutMs);
@@ -346,17 +369,22 @@ export function createKeelRpcClient(options: KeelRpcClientOptions): KeelRpcClien
       });
       if (!response.ok) {
         const denied = response.status === 401 || response.status === 403;
+        state.errorBodyPending = !denied;
+        const unclassified = (): KeelRpcError => { terminal = new KeelRpcError("RPC HTTP error body could not be completely classified.", "transport.unclassified-http-error", redactRpcUrl(endpoint), true); drain(); return terminal; };
         if (!denied && response.body) {
           const reader = response.body.getReader(), chunks: Uint8Array[] = []; let size = 0;
           try {
-            for (;;) { const next = await reader.read(); if (next.done) break; size += next.value.byteLength; if (size > 65536) break; chunks.push(next.value); }
-            if (size <= 65536) {
-              const bytes = new Uint8Array(size); let at = 0; for (const chunk of chunks) { bytes.set(chunk, at); at += chunk.length; }
-              const reason = terminalRpcFailure(JSON.parse(new TextDecoder("utf-8", { fatal: true }).decode(bytes)));
-              if (reason) { terminal = new KeelRpcError("The exact RPC operation was denied or reverted.", reason, redactRpcUrl(endpoint), true); drain(); throw terminal; }
-            }
-          } catch (error) { if (error instanceof KeelRpcError && error.terminal) throw error; }
+            for (;;) { const next = await reader.read(); if (next.done) break; size += next.value.byteLength; if (size > 65536) throw unclassified(); chunks.push(next.value); }
+            const bytes = new Uint8Array(size); let at = 0; for (const chunk of chunks) { bytes.set(chunk, at); at += chunk.length; }
+            const reason = httpErrorFailure(new TextDecoder("utf-8", { fatal: true }).decode(bytes), response.headers.get("content-type") ?? "", (body as { id?: unknown } | undefined)?.id);
+            if (reason) { terminal = new KeelRpcError("The exact RPC error cannot be treated as transport success.", reason, redactRpcUrl(endpoint), true); drain(); throw terminal; }
+            state.errorBodyPending = false;
+          } catch (error) { if (error instanceof KeelRpcError && error.terminal) throw error; throw unclassified(); }
           finally { await reader.cancel().catch(() => undefined); reader.releaseLock(); }
+        }
+        if (!denied && !response.body) {
+          if (httpErrorFailure("", response.headers.get("content-type") ?? "", (body as { id?: unknown } | undefined)?.id)) throw unclassified();
+          state.errorBodyPending = false;
         }
         const error = new KeelRpcError(`HTTP ${response.status} from ${redactRpcUrl(endpoint)}.`, denied ? "transport.access-denied" : "transport.http", redactRpcUrl(endpoint), denied);
         if (denied) { terminal = error; drain(); }
@@ -390,6 +418,7 @@ export function createKeelRpcClient(options: KeelRpcClientOptions): KeelRpcClien
     } catch (error) {
       const reason = terminalRpcFailure(error);
       if (reason && !options.signal?.aborted) { terminal = new KeelRpcError("The exact RPC operation was denied or reverted.", reason, redactRpcUrl(endpoint), true); drain(); throw terminal; }
+      if (state.errorBodyPending && !options.signal?.aborted && !(error instanceof KeelRpcError && error.terminal)) { terminal = new KeelRpcError("RPC HTTP error body could not be completely classified.", "transport.unclassified-http-error", redactRpcUrl(endpoint), true); drain(); throw terminal; }
       if (error instanceof KeelRpcError) throw error;
       if (options.signal?.aborted) throw new KeelRpcError("RPC request aborted.", "transport.aborted");
       throw new KeelRpcError("RPC request failed.", controller.signal.aborted ? "transport.timeout" : "transport.failed", redactRpcUrl(endpoint));

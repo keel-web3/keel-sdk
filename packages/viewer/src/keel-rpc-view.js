@@ -192,6 +192,23 @@ export function createKeelChain({ rpc, keelHold, hosts = KEEL_VIEW_RPC_HOSTS, li
     }
     return null;
   }
+  function httpErrorFailure(text, contentType, id) {
+    const sample = text.trim();
+    if (/json/iu.test(contentType) || /^[\[{]/u.test(sample)) {
+      let body; try { body = JSON.parse(sample); } catch { return "unclassified-http-error"; }
+      const semantic = semanticFailure(body); if (semantic) return semantic;
+      if (!body || typeof body !== "object" || Array.isArray(body) || body.jsonrpc !== "2.0" || body.id !== id) return "unclassified-http-error";
+      if (!Object.hasOwn(body, "error") && Object.hasOwn(body, "result")) return null;
+      const error = body.error;
+      if (error && typeof error === "object" && !Array.isArray(error) && [-32005, 429].includes(error.code)
+        && Object.keys(error).every(key => ["code", "message", "data"].includes(key))
+        && (error.data === undefined || error.data === null || typeof error.data !== "object")) return null;
+      return "unclassified-http-error";
+    }
+    if (/\b(?:unauthori[sz]ed|forbidden|access denied)\b/iu.test(sample)) return "access-denied";
+    if (/\b(?:revert(?:ed|ing)?|execution failed)\b/iu.test(sample)) return "execution-reverted";
+    return null; // Complete bounded plain-text HTTP transport failure.
+  }
   async function pause(ms) {
     if (signal?.aborted) throw signal.reason;
     await new Promise((resolve, reject) => { const onAbort = () => { clearTimeout(timer); reject(signal.reason); }; const timer = setTimeout(() => { signal?.removeEventListener("abort", onAbort); resolve(); }, ms); signal?.addEventListener("abort", onAbort, { once: true }); });
@@ -200,21 +217,29 @@ export function createKeelChain({ rpc, keelHold, hosts = KEEL_VIEW_RPC_HOSTS, li
     const lease = acquire(), release = typeof lease === "function" ? lease : await lease;
     if (terminalError || signal?.aborted) { release(); throw terminalError ?? signal.reason; }
     const controller = new AbortController(), id = ++nextId; controllers.add(controller);
-    let timer, timedOut = false, physicallySettled = false, abandonedLease = false, cancel;
+    let timer, timedOut = false, physicallySettled = false, abandonedLease = false, cancel, errorBodyPending = false;
     const markAbandoned = () => { if (!physicallySettled && !abandonedLease) { abandonedLease = true; abandoned++; } };
     const cancelled = new Promise((_, reject) => { cancel = reason => { markAbandoned(); reject(reason?.terminal ? reason : Object.assign(new Error("RPC client request cancelled"), { code: "cancelled", noFallback: true })); }; pendingCancellations.add(cancel); });
-    const deadline = new Promise((_, reject) => { timer = setTimeout(() => { timedOut = true; markAbandoned(); controller.abort(); drain(); reject(fault(endpoint, "timeout", false, { noFallback: active >= maxConcurrentReads })); }, timeoutMs); });
+    const deadline = new Promise((_, reject) => { timer = setTimeout(() => { timedOut = true; markAbandoned(); controller.abort(); drain(); reject(errorBodyPending ? stop(fault(endpoint, "unclassified-http-error", true)) : fault(endpoint, "timeout", false, { noFallback: active >= maxConcurrentReads })); }, timeoutMs); });
     // Release the physical slot only when fetch AND the response body settle.
     // An injected transport ignoring abort cannot create unbounded hidden reads.
     const physical = (async () => {
       const response = await request(endpoint, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ jsonrpc: "2.0", id, method, params }), redirect: "error", signal: controller.signal });
       if ([401, 403].includes(response?.status)) throw stop(fault(endpoint, "access-denied", true));
       if (response?.ok !== true || response.redirected) {
+        if (response?.ok !== true) {
+        errorBodyPending = true;
         if (response.body?.getReader) {
           const reader = response.body.getReader(); let bytes = 0, sample = "";
-          try { const decoder = new TextDecoder("utf-8", { fatal: true }); for (;;) { const next = await reader.read(); if (next.done) break; bytes += next.value.byteLength; if (bytes > 65536) break; sample += decoder.decode(next.value, { stream: true }); } sample += decoder.decode();
-            if (bytes <= 65536) { const reason = semanticFailure(JSON.parse(sample)?.error); if (reason) throw stop(fault(endpoint, reason, true)); }
-          } catch (error) { if (error?.terminal) throw error; } finally { await reader.cancel().catch(() => {}); reader.releaseLock(); }
+          try { const decoder = new TextDecoder("utf-8", { fatal: true }); for (;;) { const next = await reader.read(); if (next.done) break; bytes += next.value.byteLength; if (bytes > 65536) throw stop(fault(endpoint, "unclassified-http-error", true)); sample += decoder.decode(next.value, { stream: true }); } sample += decoder.decode();
+            const reason = httpErrorFailure(sample, response.headers?.get?.("content-type") ?? "", id); if (reason) throw stop(fault(endpoint, reason, true));
+            errorBodyPending = false;
+          } catch (error) { if (error?.terminal) throw error; throw stop(fault(endpoint, "unclassified-http-error", true)); } finally { await reader.cancel().catch(() => {}); reader.releaseLock(); }
+        } else {
+          const reason = response.body === null ? httpErrorFailure("", response.headers?.get?.("content-type") ?? "", id) : "unclassified-http-error";
+          if (reason) throw stop(fault(endpoint, reason, true));
+          errorBodyPending = false;
+        }
         }
         const text = response?.headers?.get?.("retry-after");
         const retryAfterMs = text && /^\d+(?:\.\d+)?$/u.test(text) ? Number(text) * 1000 : text ? Math.max(0, Date.parse(text) - Date.now()) : 0;
@@ -238,7 +263,7 @@ export function createKeelChain({ rpc, keelHold, hosts = KEEL_VIEW_RPC_HOSTS, li
     const settled = () => { physicallySettled = true; if (abandonedLease) abandoned--; release(); };
     void physical.then(settled, settled);
     try { return await Promise.race([deadline, physical, cancelled]); }
-    catch (error) { controller.abort(); if (signal?.aborted) throw signal.reason; const semantic = semanticFailure(error); if (semantic) throw stop(fault(endpoint, semantic, true)); if (error?.terminal || error?.code) throw error; throw fault(endpoint, timedOut ? "timeout" : "transport"); }
+    catch (error) { controller.abort(); if (signal?.aborted) throw signal.reason; const semantic = semanticFailure(error); if (semantic) throw stop(fault(endpoint, semantic, true)); if (errorBodyPending && !error?.terminal) throw stop(fault(endpoint, "unclassified-http-error", true)); if (error?.terminal || error?.code) throw error; throw fault(endpoint, timedOut ? "timeout" : "transport"); }
     finally { clearTimeout(timer); controllers.delete(controller); pendingCancellations.delete(cancel); }
   }
   async function send(endpoint, method, params) {
@@ -341,9 +366,15 @@ export function createKeelChain({ rpc, keelHold, hosts = KEEL_VIEW_RPC_HOSTS, li
     throw last ?? new Error("no permitted RPC endpoint");
   }
 
-  function rpcCall(method, params) {
+  function rpcCall(method, params = []) {
     if (terminalError || signal?.aborted) return Promise.reject(terminalError ?? signal.reason);
-    const key = pinnedBlock && ["eth_call", "eth_getCode"].includes(method) ? JSON.stringify([expectedChainId, pinnedBlock.hash, method, params[0]]) : null;
+    // Bind the key and physical operation to one immutable JSON snapshot before
+    // chain qualification, queueing, deduplication or any other async boundary.
+    try { params = JSON.parse(JSON.stringify(params)); if (!Array.isArray(params)) throw new TypeError(); }
+    catch { return Promise.reject(new TypeError("RPC parameters must be a JSON-serializable array.")); }
+    const pinnedRead = pinnedBlock && ["eth_call", "eth_getCode"].includes(method);
+    if (pinnedRead) params = [params[0], { blockHash: pinnedBlock.hash, requireCanonical: true }, ...params.slice(2)];
+    const key = pinnedRead ? JSON.stringify([expectedChainId, pinnedBlock.hash, method, params]) : null;
     if (!key || maxCacheBytes === 0) return rpcCallUncached(method, params);
     if (cache.has(key)) { const entry = cache.get(key); cache.delete(key); cache.set(key, entry); return Promise.resolve(entry.value); }
     if (inflight.has(key)) return inflight.get(key);
