@@ -11,7 +11,7 @@ const abi=parseAbi([
  await new Promise(r=>setTimeout(r,0));
  const c=globalThis.__KEEL_MANAGED_SHELL__;
  const controller=new AbortController();
- addEventListener('pagehide',()=>controller.abort(new Error('Artwork loading cancelled')),{once:true});
+ globalThis.addEventListener?.('pagehide',()=>controller.abort(new Error('Artwork loading cancelled')),{once:true});
  const progress={state:'loading',completedObjects:0,decodedBytes:0};
  const chain=createKeelChain({signal:controller.signal,maxRetries:2,maxConcurrentReads:c.maxConcurrentReads??4,rpc:c.rpcUrls??c.rpcUrl,hosts:c.rpcHosts,keelHold:c.store,expectedChainId:c.chainId,listRevision:c.rpcHostListRevision??0,listEpoch:c.rpcHostListEpoch??0});
  if(Number(BigInt(await chain.request('eth_chainId',[])))!==c.chainId)throw Error('Wrong artwork network');
@@ -22,7 +22,7 @@ const abi=parseAbi([
   getObjectSlugPointers:r=>call('getObjectSlugPointers',[r.objectId,BigInt(r.offset),BigInt(r.limit)]),
   getObjectPartIds:r=>call('getObjectPartIds',[r.objectId,BigInt(r.offset),BigInt(r.limit)]),
   getCode:async r=>hexToBytes(await chain.request('eth_getCode',[r.address,'latest'])),
- },{maxConcurrentReads:c.maxConcurrentReads??4,cacheBlockHash:pin.hash,onProgress:value=>{Object.assign(progress,value);const node=document.getElementById('keel-loader-status');if(node)node.textContent='Loading onchain artwork… '+value.completedObjects+' verified objects'}});
+ },{maxConcurrentReads:c.maxConcurrentReads??4,cacheBlockHash:pin.hash,onProgress:value=>{Object.assign(progress,value)}});
  let running=null;
  const mount=()=>running??(running=(async()=>{
  const bytes=await read({chainId:c.chainId,store:c.store,objectId:c.objectId},controller.signal);
