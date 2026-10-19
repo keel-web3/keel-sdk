@@ -1,4 +1,5 @@
 import { createHash } from "node:crypto";
+import { resolveKeelPreparationReadBounds, assertKeelNonstandardTokenURIIdentity, type KeelExplicitNonstandardReadPolicy } from "@keel/protocol";
 import { decodeEventLog, encodeFunctionData, getAddress, keccak256, parseAbi, type Hex } from "viem";
 import { buildKeelCreatorPreparedCopyBindingCall } from "./creator-prepared-inline.js";
 import type { prepareKeelAuthenticatedCreatorInline } from "./creator-prepared-route.js";
@@ -64,7 +65,7 @@ export function createKeelCreatorPublicationJournal(input: {
   if(!renderer)throw new TypeError("Prepared renderer is not authenticated.");
   const snapshot={schema:"keel.creator-prepared-publication-journal@1" as const,id:input.id,actorId:input.actorId,owner,
     sourceRevision:input.sourceRevision,settingsRevision:input.settingsRevision,chainId:input.prepared.chainId,collection,tokenId:input.tokenId.toString(),route:input.prepared.route,runtime,
-    steps:structuredClone(input.steps),simulation:{...structuredClone(input.simulation),chainId:input.prepared.chainId,reader:input.prepared.route.renderer,readerRuntimeCodeHash:renderer.codeHash,metadataTarget:collection}};
+    steps:structuredClone(input.steps),simulation:{...structuredClone(input.simulation),...(input.simulation.localTestChainProfile===undefined?{}:{localTestChainProfile:input.simulation.localTestChainProfile}),chainId:input.prepared.chainId,reader:input.prepared.route.renderer,readerRuntimeCodeHash:renderer.codeHash,metadataTarget:collection}};
   return {...snapshot,fingerprint:digest(snapshot),receipts:[]};
 }
 
@@ -73,6 +74,26 @@ function assertJournal(journal:KeelCreatorPublicationJournal){
   if(journal.schema!=="keel.creator-prepared-publication-journal@1"||digest(snapshot)!==fingerprint||receipts.length>journal.steps.length)throw new TypeError("Prepared publication journal identity changed.");
   receipts.forEach((receipt,index)=>{if(receipt.stepId!==journal.steps[index]?.id)throw new TypeError("Publication receipts are not an ordered completed prefix.");});
   if(walletAttempt && (walletAttempt.stepId!==journal.steps[receipts.length]?.id || !/^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$/u.test(walletAttempt.id) || !Number.isFinite(Date.parse(walletAttempt.createdAt))))throw new TypeError("Invalid pending publication wallet attempt.");
+}
+
+/** After displaying the exact measured compatibility warning, attach only to
+ * the original unfunded journal. Calls stay byte-identical; a new fingerprint
+ * invalidates any prior proof. The returned journal still needs full simulation. */
+export function attachKeelCreatorPublicationReadPolicy(journal: KeelCreatorPublicationJournal, policy: KeelExplicitNonstandardReadPolicy): KeelCreatorPublicationJournal {
+  const snapshot = { ...structuredClone(journal), simulation: { ...structuredClone(journal.simulation), ...(journal.simulation.localTestChainProfile === undefined ? {} : { localTestChainProfile: journal.simulation.localTestChainProfile }) } };
+  assertJournal(snapshot);
+  const allowed = ["schema","id","actorId","owner","sourceRevision","settingsRevision","fingerprint","chainId","collection","tokenId","route","runtime","steps","receipts","simulation"];
+  if (Object.keys(snapshot).some(key => !allowed.includes(key)) || snapshot.receipts.length || snapshot.walletAttempt) throw new TypeError("Nonstandard review can attach only to an unfunded journal without a wallet attempt or unknown submission state.");
+  if (!snapshot.simulation.preparationReadBudget) throw new TypeError("Nonstandard review requires the original unsigned preparation budget.");
+  const bounds = resolveKeelPreparationReadBounds({ preparationReadBudget: snapshot.simulation.preparationReadBudget, nonstandardReadPolicy: policy });
+  const identity = bounds.nonstandardReadPolicy!.identity;
+  if (identity.projectId !== snapshot.id || identity.revision !== snapshot.sourceRevision || identity.defaultsRevision !== snapshot.settingsRevision || identity.chainId !== snapshot.chainId
+    || snapshot.simulation.maximumTokenUriBytes > bounds.maximumTokenUriBytes || snapshot.simulation.maximumReadGas > bounds.maximumReadGas) throw new TypeError("Nonstandard review no longer matches the exact journal revisions, chain or requested read bounds.");
+  const uri = snapshot.simulation.expectedTokenURI;
+  assertKeelNonstandardTokenURIIdentity(bounds.nonstandardReadPolicy, { chainId: snapshot.chainId, byteLength: Buffer.byteLength(uri), digest: `0x${createHash("sha256").update(uri).digest("hex")}` });
+  const { fingerprint: _old, receipts: _empty, ...next } = snapshot;
+  const updated = { ...next, simulation: { ...snapshot.simulation, nonstandardReadPolicy: bounds.nonstandardReadPolicy! } };
+  return { ...updated, fingerprint: digest(updated), receipts: [] };
 }
 async function verifyReceipt(journal:KeelCreatorPublicationJournal,step:KeelCreatorPublicationStep,transactionHash:Hex,transport:KeelPreflightTransport){
   const [rawTx,rawReceipt]=await Promise.all([transport.request({method:"eth_getTransactionByHash",params:[transactionHash]}),transport.request({method:"eth_getTransactionReceipt",params:[transactionHash]})]);

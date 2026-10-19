@@ -16,6 +16,8 @@ import {
   toPercentDataUrl,
   type Hex,
   type Integrity,
+  resolveKeelPreparationReadBounds,
+  type KeelTokenURIPreparationBudget, type KeelExplicitNonstandardReadPolicy,
 } from "@keel/protocol";
 import { promisify } from "node:util";
 import { createHash } from "node:crypto";
@@ -266,6 +268,8 @@ export interface KeelInlineExistingObjectReusePart extends KeelPublishedInlineFr
 }
 
 export interface KeelInlineExistingObjectReuseOptions {
+  readonly nonstandardReadPolicy?: KeelExplicitNonstandardReadPolicy;
+  readonly preparationReadBudget?: KeelTokenURIPreparationBudget;
   readonly existingParts?: readonly KeelPublishedInlineFragment[];
   readonly existingObjectReuse?: KeelInlineExistingObjectReuse;
 }
@@ -677,10 +681,13 @@ async function assertPublishedFragmentIntegrity(fragment: KeelPublishedInlineFra
  * instead of silently transcoding or republishing them.
  */
 export async function inspectKeelInlineExistingObjectReuse(input: {
+  readonly nonstandardReadPolicy?: KeelExplicitNonstandardReadPolicy;
+  readonly preparationReadBudget?: KeelTokenURIPreparationBudget;
   readonly existingObjectReuse: KeelInlineExistingObjectReuse;
   readonly existingParts: readonly KeelInlineExistingObjectReusePart[];
   readonly carriage?: KeelInlineCarriage;
 }): Promise<KeelInlineExistingObjectReuseInspection> {
+  const readBounds = resolveKeelPreparationReadBounds(input);
   const scope = { ...input.existingObjectReuse };
   const requestedCarriage = input.carriage;
   if (scope?.mode !== "assembly-only" || !Number.isSafeInteger(scope.chainId) || scope.chainId <= 0
@@ -713,8 +720,8 @@ export async function inspectKeelInlineExistingObjectReuse(input: {
       throw new TypeError(`Existing Inline part ${index} has an invalid selected-chain object or SHA-256 commitment.`);
     }
     storedBytes += source.bytes.byteLength;
-    if (storedBytes > KEEL_INLINE_MAX_TOKEN_URI_BYTES) {
-      throw new RangeError("Existing prepared bytes exceed the 2,000,000-byte public-read ceiling.");
+    if (storedBytes > readBounds.maximumTokenUriBytes) {
+      throw new RangeError(`Existing prepared bytes exceed the ${readBounds.maximumTokenUriBytes.toLocaleString()}-byte selected public-read ceiling.`);
     }
     const published = source;
     await assertPublishedFragmentIntegrity(published, `Existing Inline ${source.role}`);
@@ -773,7 +780,7 @@ async function inspectExistingGraphReuse(
   if (root.parts.some(part => part.kind !== "existing") || options.existingParts?.length !== root.parts.length) {
     throw new TypeError("Assembly-only reuse requires an exact published object for every ordered part; new source publication is forbidden.");
   }
-  const inspected = await inspectKeelInlineExistingObjectReuse({ existingObjectReuse: options.existingObjectReuse,
+  const inspected = await inspectKeelInlineExistingObjectReuse({ existingObjectReuse: options.existingObjectReuse, ...(options.nonstandardReadPolicy === undefined ? {} : { nonstandardReadPolicy: options.nonstandardReadPolicy }), ...(options.preparationReadBudget === undefined ? {} : { preparationReadBudget: options.preparationReadBudget }),
     existingParts: options.existingParts.map((part, index) => ({ ...root.parts[index]!, ...part, role: root.parts[index]!.role })),
     ...(carriage === undefined ? {} : { carriage }) });
   for (let index = 0; index < root.parts.length; index += 1) {
@@ -1587,6 +1594,8 @@ export async function buildKeelInlinePreEncodedTokenURIGraph(
   root: KeelInlineGraphDocument,
   options: KeelInlineExistingObjectReuseOptions & KeelLegacyCarriageOptions = {},
 ): Promise<KeelInlinePreEncodedTokenURIGraph> {
+  const readBounds = resolveKeelPreparationReadBounds(options);
+  options = { ...options, ...(readBounds.nonstandardReadPolicy === undefined ? {} : { nonstandardReadPolicy: readBounds.nonstandardReadPolicy }), ...(readBounds.preparationReadBudget === undefined ? {} : { preparationReadBudget: readBounds.preparationReadBudget }) };
   const reuse = await inspectExistingGraphReuse(root, options, "pinned");
   if (reuse === undefined) assertLegacyCarriageAllowed("buildKeelInlinePreEncodedTokenURIGraph", options);
   else { root = reuse.root; options = { ...options, existingParts: reuse.existingParts }; }
@@ -1641,8 +1650,8 @@ export async function buildKeelInlinePreEncodedTokenURIGraph(
   }
 
   const fragmentBytes = concat(fragments.map((fragment) => fragment.bytes));
-  if (fragmentBytes.byteLength > KEEL_INLINE_MAX_TOKEN_URI_BYTES) {
-    throw new RangeError(`The prepared Inline tokenURI stream is ${fragmentBytes.byteLength.toLocaleString()} bytes, above KEEL's ${KEEL_INLINE_MAX_TOKEN_URI_BYTES.toLocaleString()}-byte public-read limit.`);
+  if (fragmentBytes.byteLength > readBounds.maximumTokenUriBytes) {
+    throw new RangeError(`The prepared Inline tokenURI stream is ${fragmentBytes.byteLength.toLocaleString()} bytes, above KEEL's ${readBounds.maximumTokenUriBytes.toLocaleString()}-byte public-read limit.`);
   }
   if (/=/u.test(decoder.decode(fragmentBytes))) {
     throw new Error("Reusable Inline tokenURI fragments must be unpadded Base64 for exact concatenation.");
@@ -1688,6 +1697,8 @@ export async function buildKeelInlineEscapedTokenURIGraph(
     readonly maxTokenURIBytes?: number;
   } = {},
 ): Promise<KeelInlineEscapedTokenURIGraph> {
+  const readBounds = resolveKeelPreparationReadBounds(options);
+  options = { ...options, ...(readBounds.nonstandardReadPolicy === undefined ? {} : { nonstandardReadPolicy: readBounds.nonstandardReadPolicy }), ...(readBounds.preparationReadBudget === undefined ? {} : { preparationReadBudget: readBounds.preparationReadBudget }) };
   const reuse = await inspectExistingGraphReuse(root, options, "percent");
   if (reuse === undefined) assertLegacyCarriageAllowed("buildKeelInlineEscapedTokenURIGraph", options);
   else { root = reuse.root; options = { ...options, existingParts: reuse.existingParts }; }
@@ -1739,8 +1750,8 @@ export async function buildKeelInlineEscapedTokenURIGraph(
     throw new TypeError("Inline graph contains unused canonical published escaped fragments.");
   }
   const fragmentBytes = concat(fragments.map((fragment) => fragment.bytes));
-  const maxTokenURIBytes = options.maxTokenURIBytes ?? KEEL_INLINE_MAX_TOKEN_URI_BYTES;
-  if (!Number.isSafeInteger(maxTokenURIBytes) || maxTokenURIBytes <= 0) {
+  const maxTokenURIBytes = options.maxTokenURIBytes ?? readBounds.maximumTokenUriBytes;
+  if (!Number.isSafeInteger(maxTokenURIBytes) || maxTokenURIBytes <= 0 || readBounds.nonstandardReadPolicy !== undefined && maxTokenURIBytes > readBounds.maximumTokenUriBytes) {
     throw new RangeError("The escaped Inline tokenURI public-read ceiling must be a positive safe integer.");
   }
   if (fragmentBytes.byteLength > maxTokenURIBytes) {
@@ -1780,6 +1791,8 @@ export async function buildKeelInlineRawPercentTokenURIGraph(
     readonly maxTokenURIBytes?: number;
   } = {},
 ): Promise<KeelInlineRawPercentTokenURIGraph> {
+  const readBounds = resolveKeelPreparationReadBounds(options);
+  options = { ...options, ...(readBounds.nonstandardReadPolicy === undefined ? {} : { nonstandardReadPolicy: readBounds.nonstandardReadPolicy }), ...(readBounds.preparationReadBudget === undefined ? {} : { preparationReadBudget: readBounds.preparationReadBudget }) };
   const reuse = await inspectExistingGraphReuse(root, options, "raw-percent");
   if (reuse !== undefined) { root = reuse.root; options = { ...options, existingParts: reuse.existingParts }; }
   if (reuse === undefined) assertKeelFreshPayloadCarriage(root.rootBytes);
@@ -1827,8 +1840,8 @@ export async function buildKeelInlineRawPercentTokenURIGraph(
     throw new TypeError("Inline graph contains unused canonical published raw-percent fragments.");
   }
   const fragmentBytes = concat(fragments.map((fragment) => fragment.bytes));
-  const maxTokenURIBytes = options.maxTokenURIBytes ?? KEEL_INLINE_MAX_TOKEN_URI_BYTES;
-  if (!Number.isSafeInteger(maxTokenURIBytes) || maxTokenURIBytes <= 0) {
+  const maxTokenURIBytes = options.maxTokenURIBytes ?? readBounds.maximumTokenUriBytes;
+  if (!Number.isSafeInteger(maxTokenURIBytes) || maxTokenURIBytes <= 0 || readBounds.nonstandardReadPolicy !== undefined && maxTokenURIBytes > readBounds.maximumTokenUriBytes) {
     throw new RangeError("The raw-percent tokenURI public-read ceiling must be a positive safe integer.");
   }
   if (fragmentBytes.byteLength > maxTokenURIBytes) {
@@ -1862,6 +1875,8 @@ export async function buildKeelInlineRawPercentTokenURIGraph(
  * only; chain bindings and the resolver's token mapping still require read-back.
  */
 export async function buildKeelWeb3TokenJSONGraph(input: {
+  readonly nonstandardReadPolicy?: KeelExplicitNonstandardReadPolicy;
+  readonly preparationReadBudget?: KeelTokenURIPreparationBudget;
   readonly document: KeelInlineGraphDocument;
   readonly metadata: Readonly<Record<string, unknown>>;
   readonly imageURI: string;
@@ -1874,6 +1889,7 @@ export async function buildKeelWeb3TokenJSONGraph(input: {
   /** External image resolvers are an explicit existing-collection route. */
   readonly presentationPolicy?: KeelPresentationPolicy;
 }) {
+  const readBounds = resolveKeelPreparationReadBounds(input);
   if (!/^(0|[1-9][0-9]*)$/u.test(input.tokenId) || BigInt(input.tokenId) >= 1n << 256n) {
     throw new TypeError("tokenId must be a canonical uint256 decimal string.");
   }
@@ -1995,8 +2011,8 @@ export async function buildKeelWeb3TokenJSONGraph(input: {
     { role: "metadata-suffix", sourceKind: "creator", bytes: encoder.encode('"}') },
   ];
   const bytes = concat(parts.map(part => part.bytes));
-  if (bytes.length > KEEL_INLINE_MAX_TOKEN_URI_BYTES) {
-    throw new RangeError(`Complete web3 JSON is ${bytes.length} bytes, above KEEL's ${KEEL_INLINE_MAX_TOKEN_URI_BYTES}-byte public-read limit.`);
+  if (bytes.length > readBounds.maximumTokenUriBytes) {
+    throw new RangeError(`Complete web3 JSON is ${bytes.length} bytes, above KEEL's ${readBounds.maximumTokenUriBytes}-byte public-read limit.`);
   }
   const metadata = JSON.parse(decoder.decode(bytes)) as Record<string, unknown>;
   if (JSON.stringify(metadata) !== JSON.stringify({ ...preserved, image: imageURI,
@@ -2037,13 +2053,15 @@ export async function buildKeelInlineTokenURIGraph(
   root: KeelInlineGraphDocument,
   options: KeelInlineExistingObjectReuseOptions & KeelLegacyCarriageOptions & { readonly maxTokenURIBytes?: number; readonly carriage?: KeelInlineCarriage } = {},
 ) {
+  const readBounds = resolveKeelPreparationReadBounds(options);
+  options = { ...options, ...(readBounds.nonstandardReadPolicy === undefined ? {} : { nonstandardReadPolicy: readBounds.nonstandardReadPolicy }), ...(readBounds.preparationReadBudget === undefined ? {} : { preparationReadBudget: readBounds.preparationReadBudget }) };
   const reuse = await inspectExistingGraphReuse(root, options, options.carriage);
   const carriage = reuse?.carriage ?? resolveKeelInlineCarriage(options.carriage);
   if (reuse === undefined) assertKeelFreshPayloadCarriage(root.rootBytes);
   if (reuse !== undefined) {
     root = reuse.root;
     // The strict check has cloned all receipt bytes. Do not inspect/transform them twice.
-    options = { existingParts: reuse.existingParts,
+    options = { existingParts: reuse.existingParts, ...(readBounds.nonstandardReadPolicy === undefined ? {} : { nonstandardReadPolicy: readBounds.nonstandardReadPolicy }), ...(readBounds.preparationReadBudget === undefined ? {} : { preparationReadBudget: readBounds.preparationReadBudget }),
       ...(options.maxTokenURIBytes === undefined ? {} : { maxTokenURIBytes: options.maxTokenURIBytes }),
       ...(options.carriage === undefined ? {} : { carriage: options.carriage }) };
   }
@@ -2051,7 +2069,7 @@ export async function buildKeelInlineTokenURIGraph(
   // Selecting a carriage is not a reviewed encoding exception. Exact existing
   // objects were already checked above; fresh encoding requires acknowledgement.
   if (reuse === undefined) assertLegacyCarriageAllowed("buildKeelInlineTokenURIGraph", options);
-  const legacy = { ...(options.existingParts === undefined ? {} : { existingParts: options.existingParts }), legacyCarriage: "acknowledged" as const };
+  const legacy = { ...(readBounds.nonstandardReadPolicy === undefined ? {} : { nonstandardReadPolicy: readBounds.nonstandardReadPolicy }), ...(readBounds.preparationReadBudget === undefined ? {} : { preparationReadBudget: readBounds.preparationReadBudget }), ...(options.existingParts === undefined ? {} : { existingParts: options.existingParts }), legacyCarriage: "acknowledged" as const };
   if (carriage === "percent") return buildKeelInlineEscapedTokenURIGraph(root, legacy);
   if (carriage === "pinned") return buildKeelInlinePreEncodedTokenURIGraph(root, legacy);
   return buildKeelInlineFollowLatestTokenURIBodyGraph(root, legacy);
@@ -2094,6 +2112,8 @@ export async function buildKeelInlineFollowLatestTokenURIBodyGraph(
   root: KeelInlineGraphDocument,
   options: KeelInlineExistingObjectReuseOptions & KeelLegacyCarriageOptions = {},
 ): Promise<KeelInlinePreEncodedTokenURIBodyGraph> {
+  const readBounds = resolveKeelPreparationReadBounds(options);
+  options = { ...options, ...(readBounds.nonstandardReadPolicy === undefined ? {} : { nonstandardReadPolicy: readBounds.nonstandardReadPolicy }), ...(readBounds.preparationReadBudget === undefined ? {} : { preparationReadBudget: readBounds.preparationReadBudget }) };
   const reuse = await inspectExistingGraphReuse(root, options, "follow-latest");
   if (reuse === undefined) assertLegacyCarriageAllowed("buildKeelInlineFollowLatestTokenURIBodyGraph", options);
   const full = await buildKeelInlinePreEncodedTokenURIGraph(reuse?.root ?? root, reuse === undefined ? options
@@ -2109,8 +2129,8 @@ export async function buildKeelInlineFollowLatestTokenURIBodyGraph(
   }
   const fragmentBytes = concat(parts.map((part) => part.bytes));
   const htmlBytes = concat(parts.map((part) => part.decodedHtmlBytes));
-  if (fragmentBytes.byteLength > KEEL_INLINE_MAX_TOKEN_URI_BYTES) {
-    throw new RangeError(`The prepared Inline body stream is ${fragmentBytes.byteLength.toLocaleString()} bytes, above KEEL's ${KEEL_INLINE_MAX_TOKEN_URI_BYTES.toLocaleString()}-byte public-read limit.`);
+  if (fragmentBytes.byteLength > readBounds.maximumTokenUriBytes) {
+    throw new RangeError(`The prepared Inline body stream is ${fragmentBytes.byteLength.toLocaleString()} bytes, above KEEL's ${readBounds.maximumTokenUriBytes.toLocaleString()}-byte public-read limit.`);
   }
   const decodedMiddle = Buffer.from(decoder.decode(fragmentBytes), "base64").toString("utf8");
   const decodedBody = exactBase64Bytes(decodedMiddle, "Pre-encoded Inline body stream");
@@ -2431,8 +2451,11 @@ export async function buildKeelPublishedInlineNormalMediaTokenURIGraph(input: {
  * copy of the original HTML. Public-chain read-back remains a separate gate. */
 export async function buildKeelCreatorOwnedInlineDocument(input: {
   readonly source: Uint8Array;
+  readonly nonstandardReadPolicy?: KeelExplicitNonstandardReadPolicy;
+  readonly preparationReadBudget?: KeelTokenURIPreparationBudget;
   readonly payloadStorage?: KeelPayloadStorageMode;
 }): Promise<{ readonly root: KeelInlineLocalDocument; readonly graph: KeelInlineRawPercentTokenURIGraph }> {
+  const readBounds = resolveKeelPreparationReadBounds(input);
   resolveKeelPayloadStorage(input.payloadStorage);
   if (!(input.source instanceof Uint8Array) || input.source.byteLength === 0) {
     throw new TypeError("A creator-owned shell needs nonempty UTF-8 HTML.");
@@ -2456,7 +2479,7 @@ export async function buildKeelCreatorOwnedInlineDocument(input: {
   const sourceIntegrity = await createIntegrity(source);
   const escapedHtmlBytes = compactPercentPayload(source);
   const fragmentBytes = compactPercentPayload(escapedHtmlBytes);
-  if (fragmentBytes.byteLength > KEEL_INLINE_MAX_TOKEN_URI_BYTES) {
+  if (fragmentBytes.byteLength > readBounds.maximumTokenUriBytes) {
     throw new RangeError("The creator-owned Inline carriage exceeds the public-read byte ceiling.");
   }
   const fragmentIntegrity = await createIntegrity(fragmentBytes);
