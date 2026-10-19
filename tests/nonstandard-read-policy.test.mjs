@@ -54,7 +54,7 @@ test('policy snapshots cannot be mutated during the first async digest and decod
   policy.identity.revision='changed';policy.limits.maximumTokenUriBytes=1;
   const result=await pending;assert.equal(result.nonstandardReadPolicy.identity.revision,'source-1');
   const html='data:text/html;charset=utf-8,'+'x'.repeat(2_000_001);
-  const largeHTML='data:application/json;charset=utf-8,'+encodeURIComponent(JSON.stringify({animation_url:html,image:'data:image/png;base64,AA=='}));
+  const largeHTML='data:application/json;charset=utf-8,'+encodeURIComponent(JSON.stringify({animation_url:html,image:'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+jR1sAAAAASUVORK5CYII='}));
   await assert.rejects(auditKeelInlineTokenURI(largeHTML,{nonstandardReadPolicy:policyFor(largeHTML)}),/inspection limit/);
 });
 test('unsigned budget permits preparation before final measurement and does not become read authority',()=>{
