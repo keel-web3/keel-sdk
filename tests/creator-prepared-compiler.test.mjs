@@ -18,7 +18,7 @@ const abi=parseAbi([...keelHoldAbi,
  'function validationProgress(bytes32) view returns(bytes32,uint64,uint8)', 'function imageValidationProgress(bytes32) view returns(bytes32,uint64,uint8)',
  'function contextURI(bytes) pure returns(bytes)', 'function percentEscape(bytes) pure returns(bytes)']);
 async function fixture(bad={}){
- const plan=await prepareKeelCreatorInline({...publication,chainId:31337,store:addresses.KeelHold});
+ const plan=await prepareKeelCreatorInline({...(bad.publication??publication),chainId:31337,store:addresses.KeelHold});
  if(bad.legacyShell){
   const {readFile}=await import('node:fs/promises');
   const uri=await readFile(new URL('../deployments/creator-inline-20261005/minted-token.uri',import.meta.url),'utf8');
@@ -128,4 +128,26 @@ test('legacy registered carriage fails before quoting or publishing fresh payloa
  const f=await fixture({legacyShell:true});
  await assert.rejects(()=>compileKeelCreatorPreparedPublication({pool:f.pool,index,publication,...config}),error=>error.code==='KEEL_REGISTERED_CARRIAGE_MISMATCH');
  assert.ok(!f.requests.some(request=>request.method==='eth_sendRawTransaction'));
+});
+
+test('large synthetic source produces a complete immutable publication program through mint and exact metadata, not just a storage prefix',async()=>{
+ const source=Buffer.alloc(735649);let seed=104729;
+ for(let i=0;i<source.length;i++){seed^=seed<<13;seed^=seed>>>17;seed^=seed<<5;source[i]=i%8===0?0:seed&255;}
+ const candidate={...publication,resources:[...publication.resources,{id:'synthetic.bin',role:'asset',mediaType:'application/octet-stream',bytes:source}]};
+ const f=await fixture({publication:candidate});
+ const result=await compileKeelCreatorPreparedPublication({pool:f.pool,index,publication:candidate,...config});
+ const steps=result.journal.steps;
+ assert.equal(result.status,'compiled-awaiting-simulation');assert.equal(result.journal.receipts.length,0);
+ assert.equal(steps.filter(step=>step.phase==='mint').length,1);
+ assert.ok(steps.some(step=>step.phase==='bind'));
+ assert.ok(steps.some(step=>step.phase==='upload'));
+ assert.ok(result.completeTokenURIBytes<=2000000);
+ const wire={jsonrpc:'2.0',id:2,method:'eth_simulateV1',params:[{blockStateCalls:steps.map(step=>({calls:[step.call]})),validation:true,traceTransfers:false,returnFullTransactions:true},'0x2']};
+ assert.equal(wire.params[0].blockStateCalls.length,steps.length);
+ const expected=result.journal.simulation.expectedTokenURI;
+ assert.equal(Buffer.byteLength(expected),result.completeTokenURIBytes);
+ assert.ok(f.requests.every(request=>!request.method.includes('send')));
+ const evidence={schema:'keel-synthetic-complete-publication-program@1',sourceFixture:'Deterministic 735649-byte binary, not the private Retro GIF',syntheticContractReads:true,selectedChainAuthenticated:false,phaseCounts:Object.fromEntries([...new Set(steps.map(step=>step.phase))].map(phase=>[phase,steps.filter(step=>step.phase===phase).length])),calls:steps.length,sourceBytes:result.sourceBytes,newStoredBytes:result.newStoredBytes,reusedStoredBytes:result.reusedStoredBytes,completeTokenURIBytes:result.completeTokenURIBytes,completeTokenURISha256:result.expectedTokenURISha256,serializedHttpRequestBytes:Buffer.byteLength(JSON.stringify(wire)),simulationAccepted:false,browserVerified:false,actualRetroAcceptance:false,signing:'not-performed',submission:'not-performed'};
+ if(process.env.KEEL_SYNTHETIC_PUBLICATION_EVIDENCE){const {writeFile}=await import('node:fs/promises');await writeFile(process.env.KEEL_SYNTHETIC_PUBLICATION_EVIDENCE,JSON.stringify({...evidence,program:{steps,simulation:result.journal.simulation}},(_key,value)=>typeof value==='bigint'?value.toString():value,2)+'\n');}
+ console.log(JSON.stringify(evidence));
 });

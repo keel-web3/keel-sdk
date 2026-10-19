@@ -78,3 +78,10 @@ strict flags, process isolation/exit evidence and explicit
 `actualRetroAcceptance: false` / `actualPaidAcceptance: false`. Complete native
 wire responses remain in the chosen private output directory. No actual creator
 capture or private metadata belongs in this source tree.
+
+
+## Explicit disposable Osaka profile
+
+The optional `createKeelLocalTestChainGasProfile` API accepts trusted development/test configuration and observations from an HTTP loopback Anvil **1.8.5**, chain **31337**, **Osaka**, without a remote fork. Verify `eth_chainId`, `web3_clientVersion`, `anvil_nodeInfo`, and block zero through the maintained recipient. The factory checks the hardfork, chain, genesis identity, and matching reported block gas limits. Pass the resulting immutable profile explicitly to selected-block planning and funding simulation; there is no global registration or unknown-chain fallback. Copied/unverified profile objects are rejected. Production applications must reject local profile configuration before querying the node; Studio does this for its actual runtime mode, configured chain, matching server/wallet RPC and loopback app origin.
+
+The profile uses a conservative total/execution envelope of 16,777,216 gas, capped by the actual block. The measured fixture has a 200,000,000 block limit; EOA estimates were 21,000 base, 21,320 for 32 zero bytes and 22,280 for 32 nonzero bytes (the 10/40 EIP7623 floor). Anvil's simulator **and transaction pool** accepted a gas limit of 16,777,217, so this fixture does not qualify public-chain fork-limit enforcement. SDK planning and simulation and Studio executor/approval boundaries enforce the narrower bound themselves. Keep all fixture receipts and synthetic pricing labeled separately from a project publication and real network qualification.
