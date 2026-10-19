@@ -54,3 +54,40 @@ export function reviewKeel721URI(value: string, warningBytes: number | null = 32
       : [],
   };
 }
+
+/** Existing Routed721 hook with optional native media. These calls are unsigned
+ * encodings, not runtime/registration/receipt/read-budget qualification. */
+export const KEEL_NATIVE_MEDIA_PRESENTATION_ROUTES = ["native-fallback", "image-only-inline", "media-with-poster-inline", "embedded-program", "direct-reference"] as const;
+export type KeelNativeMediaPresentationRoute = (typeof KEEL_NATIVE_MEDIA_PRESENTATION_ROUTES)[number];
+export const keelNativeMediaPresentationAbi = parseAbi([
+  "function setNativeMediaSource(address collection,uint256 tokenId,uint8 route,address store,bytes32 objectId,bool omitImage)",
+  "function nativeMediaSources(address collection,uint256 tokenId) view returns(bytes32 objectId,address store,uint8 route,bool omitImage,bool configured)",
+  "event NativeMediaSourceSet(bool omitImage,uint8 route,address store,bytes32 indexed objectId,address indexed collection,uint256 indexed tokenId)",
+]);
+/** Native source must be the actual uncompressed Hold record. Never replace an
+ * existing encoded descriptor's identity with the decoded artwork's hash. The
+ * contract rechecks its live record/bytes; the publication gate still needs the
+ * actual registered runtime/library/profile, source readback and full program. */
+export function buildKeelNativeMediaPresentationCall(input: {
+  readonly collection: Address;
+  readonly module: Address;
+  readonly tokenId?: bigint | number;
+  readonly route: KeelNativeMediaPresentationRoute;
+  readonly source?: { readonly store: Address; readonly objectId: Hex };
+  /** Only an explicit embedded-program selection can omit the grid image. */
+  readonly omitImage?: boolean;
+}) {
+  const collection = normalizedAddress(input.collection, ZERO_ADDRESS, "collection");
+  const module = normalizedAddress(input.module, ZERO_ADDRESS, "module");
+  if (collection === ZERO_ADDRESS || module === ZERO_ADDRESS) throw new TypeError("collection and module must be non-zero.");
+  const route = KEEL_NATIVE_MEDIA_PRESENTATION_ROUTES.indexOf(input.route);
+  if (route < 0) throw new TypeError("Unsupported native media presentation route.");
+  if (input.omitImage !== undefined && typeof input.omitImage !== "boolean") throw new TypeError("omitImage must be an explicit boolean.");
+  const omitImage = input.omitImage === true;
+  if (omitImage && input.route !== "embedded-program") throw new TypeError("Only an explicit embedded program can omit its grid image.");
+  const store = normalizedAddress(input.source?.store, ZERO_ADDRESS, "store");
+  const objectId = normalizedBytes32(input.source?.objectId, ZERO_BYTES32, "objectId");
+  if (route === 0 ? store !== ZERO_ADDRESS || objectId !== ZERO_BYTES32 : store === ZERO_ADDRESS || objectId === ZERO_BYTES32) throw new TypeError("Native fallback clears the source; every other route requires its exact native store and object ID.");
+  return { to: module, value: 0n, data: encodeFunctionData({ abi: keelNativeMediaPresentationAbi,
+    functionName: "setNativeMediaSource", args: [collection, uint(input.tokenId, 0n, "tokenId"), route, store, objectId, omitImage] }) };
+}
