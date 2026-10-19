@@ -293,9 +293,9 @@ export function planKeelSmartAssetPresentation(input: KeelSmartAssetPresentation
   const intermediate = (original.byteLength ?? 0) > KEEL_SMART_INLINE_ASSET_MAX_BYTES && !large;
   const preferred: KeelAssetPresentationCandidateId[] = assetPresentation === "external-preview" ? large ? ["external-preview-hybrid", "external-preview-inline"] : ["external-preview-inline", "external-preview-hybrid"]
     : assetPresentation === "inline-image-hybrid-verifier" ? ["canonical-hybrid"]
-    : large ? ["canonical-hybrid", "external-preview-hybrid", "direct-onchain-asset", "canonical-inline"]
+    : large ? ["canonical-hybrid", "external-preview-hybrid", "canonical-inline"]
     : intermediate && execution === "static" ? [isImage ? "image-only-inline" : "media-only-inline", "canonical-inline", "canonical-hybrid", "external-preview-hybrid"]
-    : ["canonical-inline", "canonical-hybrid", isImage ? "image-only-inline" : "media-only-inline", "external-preview-hybrid", "direct-onchain-asset"];
+    : ["canonical-inline", "canonical-hybrid", isImage ? "image-only-inline" : "media-only-inline", "external-preview-hybrid"];
   const usable = (id: KeelAssetPresentationCandidateId) => candidates.find(c => c.id === id)!;
   const qualified = preferred.map(usable).filter(c => c.hardBlockers.length === 0);
   const recommended = qualified.find(c => c.measurementComplete && c.standardsCompatible) ?? qualified.find(c => c.standardsCompatible !== false) ?? qualified[0] ?? usable(preferred[0]!);
