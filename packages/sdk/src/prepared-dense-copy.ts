@@ -11,6 +11,8 @@ import { encodeKeelDenseTransport, serializeKeelDenseTransportJSON, prepareKeelD
 export function prepareKeelDensePayload(source: Uint8Array, options: {
   readonly compression?: "auto" | "brotli" | "none";
   readonly transportProfile?: "uri81-block-v1";
+  /** Authenticated immutable readers may require stricter percent literals. */
+  readonly readerGrammar?: "uri81" | "legacy-strict";
   /** Pinned build-time quality; independent of process environment. */
   readonly brotliQuality?: number;
 } = {}) {
@@ -25,7 +27,8 @@ export function prepareKeelDensePayload(source: Uint8Array, options: {
   const candidate = requested === "none" ? original : brotliCompressSync(original, { params: { [constants.BROTLI_PARAM_QUALITY as number]: quality } });
   const prepare = (bytes: Uint8Array) => {
     const dense = encodeKeelDenseTransport(bytes, transportProfile);
-    return { dense, bytes: prepareKeelDenseCopyFragment(serializeKeelDenseTransportJSON(dense).slice(1, -1)) };
+    return { dense, bytes: prepareKeelDenseCopyFragment(serializeKeelDenseTransportJSON(dense).slice(1, -1),
+      options.readerGrammar === undefined ? {} : { readerGrammar: options.readerGrammar }) };
   };
   // The decoded source bound is larger than the dense stored-carrier bound.
   // An unavailable raw alternative must not reject a valid compressed carrier.

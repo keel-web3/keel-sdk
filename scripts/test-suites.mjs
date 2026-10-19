@@ -86,6 +86,7 @@ export const DETERMINISTIC_TEST_FILES = Object.freeze([
   "tests/sdk-ppmd-brotli-reuse.test.mjs",
   "tests/sdk-studio-agent-guidance.test.mjs",
   "tests/sdk-uri81-copy-literals.test.mjs",
+  "tests/sdk-uri81-reader-grammar.test.mjs",
   "tests/acceptance-boundary-properties.test.mjs",
   "tests/acceptance-media-fixture-parity.test.mjs",
   "tests/acceptance-mcp-route-guards.test.mjs",
