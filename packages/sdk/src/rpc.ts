@@ -246,9 +246,10 @@ export interface KeelRpcPoolOptions {
 export interface KeelRpcPrivateObservation {
   readonly providerIndex: number;
   readonly request: { readonly method: string; readonly params: readonly unknown[] };
+  /** Actual serialized UTF-8 HTTP body, including transport-owned jsonrpc/id.
+   * Absent unless a body was prepared for dispatch; never a provider limit. */
+  readonly requestWireBytes?: number;
   readonly elapsedMs: number;
-  /** Exact UTF-8 POST body bytes, including JSON-RPC version and transport ID. */
-  readonly httpRequestBytes?: number;
   readonly httpStatus?: number;
   readonly retryAfterMs?: number;
   readonly response?: unknown;
@@ -287,14 +288,15 @@ export function createKeelRpcPool(options: KeelRpcPoolOptions): KeelRpcPool {
     await prior;
     let timer: ReturnType<typeof setTimeout> | undefined;
     let timedOut = false;
+    let requestWireBytes: number | undefined;
     const started = performance.now();
-    let httpRequestBytes: number | undefined;
     const privatelyObserve = (fields: Omit<KeelRpcPrivateObservation, "providerIndex" | "request" | "elapsedMs">) => {
       if (!options.onPrivateResponse) return;
       try {
         // A separate snapshot prevents an observer from modifying proof inputs
         // or a response that has not yet completed validation.
-        const event = structuredClone({ providerIndex: states.indexOf(state), request: { method, params }, elapsedMs: performance.now() - started, ...(httpRequestBytes === undefined ? {} : { httpRequestBytes }), ...fields,
+        const event = structuredClone({ providerIndex: states.indexOf(state), request: { method, params }, elapsedMs: performance.now() - started,
+          ...(requestWireBytes === undefined ? {} : { requestWireBytes }), ...fields,
           ...(fields.error === undefined ? {} : { error: snapshotKeelProviderPrivateError(fields.error) }) });
         const pending = options.onPrivateResponse(Object.freeze(event));
         if (pending) void Promise.resolve(pending).catch(() => undefined);
@@ -310,11 +312,11 @@ export function createKeelRpcPool(options: KeelRpcPoolOptions): KeelRpcPool {
       const controller = new AbortController();
       timer = setTimeout(() => { timedOut = true; controller.abort(); }, method === "eth_simulateV1" ? simulationTimeoutMs : timeoutMs);
       const requestId = ++id;
-      const serializedRequest = JSON.stringify({ jsonrpc: "2.0", id: requestId, method, params });
-      httpRequestBytes = new TextEncoder().encode(serializedRequest).byteLength;
+      const requestBody = JSON.stringify({ jsonrpc: "2.0", id: requestId, method, params });
+      if (options.onPrivateResponse) requestWireBytes = new TextEncoder().encode(requestBody).byteLength;
       let response: Response;
       try { response = await fetcher(state.url, { method: "POST", headers: { "content-type": "application/json" },
-        body: serializedRequest,
+        body: requestBody,
         redirect: "error", signal: signal === undefined ? controller.signal : AbortSignal.any([controller.signal, signal]) }); }
       catch (error) { privatelyObserve({ error }); signal?.throwIfAborted(); throw networkFailure(error, timedOut); }
       const header = response.headers.get("retry-after");

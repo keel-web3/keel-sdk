@@ -21,11 +21,11 @@ test('owner-private evidence measures exact UTF-8 wire bytes including changing 
   for (let i = 0; i < 11; i++) await pool.pin(0).request({ method: 'web3_clientVersion', params: ['日本語 🎨', i] });
   assert.equal(sent.length, observed.length);
   for (let i = 0; i < sent.length; i++) {
-    assert.equal(observed[i].httpRequestBytes, Buffer.byteLength(sent[i], 'utf8'));
+    assert.equal(observed[i].requestWireBytes, Buffer.byteLength(sent[i], 'utf8'));
     assert.deepEqual(observed[i].request.params, JSON.parse(sent[i]).params);
   }
   assert.ok(sent.some(body => JSON.parse(body).id === 10));
-  assert.ok(sent.at(-1).length < observed.at(-1).httpRequestBytes);
+  assert.ok(sent.at(-1).length < observed.at(-1).requestWireBytes);
 });
 
 test('actual loopback HTTP body admission distinguishes immediately below, at and above each fixture limit', async t => {
@@ -64,7 +64,7 @@ test('actual loopback HTTP body admission distinguishes immediately below, at an
         assert.equal(received, target);
         assert.equal(simulationRequests, 1);
         assert.deepEqual(receivedParams, params);
-        assert.equal(events.find(event => event.request.method === 'eth_simulateV1').httpRequestBytes, target);
+        assert.equal(events.find(event => event.request.method === 'eth_simulateV1').requestWireBytes, target);
       } finally { await new Promise((resolve, reject) => server.close(error => error ? reject(error) : resolve())); }
     });
   }

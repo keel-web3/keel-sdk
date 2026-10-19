@@ -120,6 +120,7 @@ export function createKeelPublicSimulationPool(options: KeelPublicSimulationPool
       const active = activeObservations.get(event.providerIndex);
       if (active) notify({ ...active, type: event.error !== undefined || object(event.response)?.error !== undefined || (event.httpStatus ?? 200) >= 400 ? "rpc-error" : "rpc-response",
         elapsedMs: event.elapsedMs, request: event.request,
+        ...(event.requestWireBytes === undefined ? {} : { requestWireBytes: event.requestWireBytes }),
         ...(event.response === undefined ? {} : { rawResponse: event.response }), ...(event.error === undefined ? {} : { error: event.error }),
         ...(event.httpStatus === undefined ? {} : { httpStatus: event.httpStatus }), ...(event.retryAfterMs === undefined ? {} : { retryAfterMs: event.retryAfterMs }) });
     } } : {}) } satisfies KeelRpcPoolOptions);
