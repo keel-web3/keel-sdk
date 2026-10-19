@@ -155,7 +155,7 @@ class KeelRpcHttpRequestError extends Error {
 // Only complete, bounded provider error details may establish request capacity.
 // A large outgoing request or a generic 503 is not evidence of a byte limit.
 const HTTP_ERROR_CLASSIFICATION_BYTES = 16 * 1024;
-function explicitRequestBytesRejection(message: string): boolean {
+export function isKeelRpcRequestBytesRejection(message: string): boolean {
   if (message.length > HTTP_ERROR_CLASSIFICATION_BYTES || new TextEncoder().encode(message).byteLength > HTTP_ERROR_CLASSIFICATION_BYTES) return false;
   const pattern = /\b(?:request(?:[ \t]+(?:body|payload|entity))?|payload)[ \t]+(?:(?:is|was)[ \t]+)?too[ \t]+(?:large|big)\b|\brequest[ \t]+(?:body|payload)[ \t]+size[ \t]+limit[ \t]+(?:reached|exceeded)\b|\b(?:request[ \t]+(?:body|payload)(?:[ \t]+size)?|content[ -]length)[ \t]+exceeds[ \t]+(?:the[ \t]+)?(?:maximum|limit|allowed)\b/giu;
   for (const match of message.matchAll(pattern)) {
@@ -196,7 +196,7 @@ function rejectRpcError(method: string, error: { code?: unknown; message?: unkno
       throw new KeelRpcResponseError(code, undefined, undefined, status, "transaction-validation");
     // Only generic server/client-capacity codes can carry a byte-limit
     // refusal. Deterministic parameter, nonce and execution errors win.
-    if (capacityDetailsAllowed && [-32000, -32603, -38026].includes(code) && explicitRequestBytesRejection(message))
+    if (capacityDetailsAllowed && [-32000, -32603, -38026].includes(code) && isKeelRpcRequestBytesRejection(message))
       throw new KeelRpcHttpRequestError(status, true, code);
     // Simulation validation errors are execution evidence, not transport
     // outages. In particular qualification must observe nonce-too-high.
@@ -247,6 +247,8 @@ export interface KeelRpcPrivateObservation {
   readonly providerIndex: number;
   readonly request: { readonly method: string; readonly params: readonly unknown[] };
   readonly elapsedMs: number;
+  /** Exact UTF-8 POST body bytes, including JSON-RPC version and transport ID. */
+  readonly httpRequestBytes?: number;
   readonly httpStatus?: number;
   readonly retryAfterMs?: number;
   readonly response?: unknown;
@@ -286,12 +288,13 @@ export function createKeelRpcPool(options: KeelRpcPoolOptions): KeelRpcPool {
     let timer: ReturnType<typeof setTimeout> | undefined;
     let timedOut = false;
     const started = performance.now();
+    let httpRequestBytes: number | undefined;
     const privatelyObserve = (fields: Omit<KeelRpcPrivateObservation, "providerIndex" | "request" | "elapsedMs">) => {
       if (!options.onPrivateResponse) return;
       try {
         // A separate snapshot prevents an observer from modifying proof inputs
         // or a response that has not yet completed validation.
-        const event = structuredClone({ providerIndex: states.indexOf(state), request: { method, params }, elapsedMs: performance.now() - started, ...fields,
+        const event = structuredClone({ providerIndex: states.indexOf(state), request: { method, params }, elapsedMs: performance.now() - started, ...(httpRequestBytes === undefined ? {} : { httpRequestBytes }), ...fields,
           ...(fields.error === undefined ? {} : { error: snapshotKeelProviderPrivateError(fields.error) }) });
         const pending = options.onPrivateResponse(Object.freeze(event));
         if (pending) void Promise.resolve(pending).catch(() => undefined);
@@ -307,9 +310,11 @@ export function createKeelRpcPool(options: KeelRpcPoolOptions): KeelRpcPool {
       const controller = new AbortController();
       timer = setTimeout(() => { timedOut = true; controller.abort(); }, method === "eth_simulateV1" ? simulationTimeoutMs : timeoutMs);
       const requestId = ++id;
+      const serializedRequest = JSON.stringify({ jsonrpc: "2.0", id: requestId, method, params });
+      httpRequestBytes = new TextEncoder().encode(serializedRequest).byteLength;
       let response: Response;
       try { response = await fetcher(state.url, { method: "POST", headers: { "content-type": "application/json" },
-        body: JSON.stringify({ jsonrpc: "2.0", id: requestId, method, params }),
+        body: serializedRequest,
         redirect: "error", signal: signal === undefined ? controller.signal : AbortSignal.any([controller.signal, signal]) }); }
       catch (error) { privatelyObserve({ error }); signal?.throwIfAborted(); throw networkFailure(error, timedOut); }
       const header = response.headers.get("retry-after");
@@ -347,9 +352,9 @@ export function createKeelRpcPool(options: KeelRpcPoolOptions): KeelRpcPool {
                   } else if (body && typeof body === "object" && !Array.isArray(body) && !Object.hasOwn(body, "jsonrpc")) {
                     const message = typeof body.message === "string" ? body.message : typeof body.error === "string" ? body.error
                       : typeof body.error?.message === "string" ? body.error.message : "";
-                    requestBytesRejection = explicitRequestBytesRejection(message);
+                    requestBytesRejection = isKeelRpcRequestBytesRejection(message);
                   }
-                } else requestBytesRejection = explicitRequestBytesRejection(text);
+                } else requestBytesRejection = isKeelRpcRequestBytesRejection(text);
               } catch { /* Incomplete/invalid error text cannot establish capacity. */ }
             }
           } catch (error) {
