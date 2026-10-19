@@ -198,6 +198,14 @@ function measurementsOf(input: KeelSmartPresentationMeasurements | undefined) {
   }
   return result;
 }
+/** A compact alternative must preserve the original media and have a qualified
+ * adapter. A nonimage poster alone is not a replacement for its playback. */
+function compactNativeAlternative(execution: KeelAssetExecution, mediaType: string,
+  candidates: readonly { readonly id: KeelAssetPresentationCandidateId; readonly hardBlockers: readonly string[] }[]) {
+  if (execution !== "static") return undefined;
+  const id = mediaType.startsWith("image/") ? "image-only-inline" : "media-only-inline";
+  return candidates.find(candidate => candidate.id === id && candidate.hardBlockers.length === 0)?.id;
+}
 /** Candidate policy is review data. Only an actual selected-chain adapter can qualify a layout. */
 export function planKeelSmartAssetPresentation(input: KeelSmartAssetPresentationInput) {
   record(input, ["contextIdentity", "source", "preview", "execution", "assetPresentation", "externalPreviewUri", "fallbackDelivery", "externalPresentation", "measurements", "candidateMeasurements", "capabilities", "selection", "nonstandardCompatibilityAcknowledged", "omittedGridImageAcknowledged"], "smart presentation input");
@@ -304,7 +312,8 @@ export function planKeelSmartAssetPresentation(input: KeelSmartAssetPresentation
   const selectionSource = explicit ? "explicit" as const : assetPresentation === "automatic" ? "recommended" as const : "preset" as const;
   const suggestions: { candidateId?: KeelAssetPresentationCandidateId; code: string }[] = [];
   if (Number(selected.measurements.completeTokenUriBytes ?? 0) > KEEL_SMART_TOKEN_URI_MAX_BYTES && selected.selection.animation === "hybrid-shell") {
-    if (execution === "static") suggestions.push({ candidateId: "image-only-inline", code: "review-image-only-to-save-space" });
+    const compact = compactNativeAlternative(execution, original.mediaType, candidates);
+    if (compact) suggestions.push({ candidateId: compact, code: compact === "image-only-inline" ? "review-image-only-to-save-space" : "review-inline-media-to-save-space" });
     suggestions.push({ candidateId: "hybrid-verifier-only", code: "review-verifier-without-inline-grid-image" });
     if (Number(selected.measurements.encodedAnimationSlotBytes ?? selected.measurements.embeddedAnimationUriBytes ?? 0) > KEEL_SMART_TOKEN_URI_MAX_BYTES) {
       suggestions.push({ candidateId: fallbackDelivery === "hosted" ? "hosted-presentation" : "ipfs-presentation", code: "embedded-verifier-alone-above-standard-target" });
@@ -456,7 +465,8 @@ export async function measureKeelSmartAssetPresentation(plan: KeelSmartAssetPres
   if (plan.measurements.maximumTokenUriBytes !== undefined && completeTokenUriBytes > Number(plan.measurements.maximumTokenUriBytes)) hardBlockers.push("actual-reader-output-limit");
   const recommendations: { candidateId?: KeelAssetPresentationCandidateId; code: string }[] = [];
   if (completeTokenUriBytes > KEEL_SMART_TOKEN_URI_MAX_BYTES && plan.animation.delivery === "hybrid-shell") {
-    if (plan.execution === "static") recommendations.push({ candidateId: "image-only-inline", code: "review-image-only-to-save-space" });
+    const compact = compactNativeAlternative(plan.execution, plan.source.mediaType, plan.candidates);
+    if (compact) recommendations.push({ candidateId: compact, code: compact === "image-only-inline" ? "review-image-only-to-save-space" : "review-inline-media-to-save-space" });
     recommendations.push({ candidateId: "hybrid-verifier-only", code: "review-verifier-without-inline-grid-image" });
     if ((encodedAnimationSlotBytes ?? embeddedAnimationUriBytes ?? 0) > KEEL_SMART_TOKEN_URI_MAX_BYTES) recommendations.push({ candidateId: plan.fallbackDelivery === "hosted" ? "hosted-presentation" : "ipfs-presentation", code: "embedded-verifier-alone-above-standard-target" });
   }
@@ -485,10 +495,11 @@ export async function measureKeelSmartPresentationMatrix(input: KeelSmartAssetPr
     results.push({ candidateId: candidate.id, status: measurement.status, measurement });
   }
   const actual = (id: KeelAssetPresentationCandidateId) => results.find(result => result.candidateId === id && "measurement" in result)?.measurement;
-  const chosen = actual(plan.selectedCandidateId), withoutImage = actual("hybrid-verifier-only"), imageOnly = actual("image-only-inline");
+  const compactId = compactNativeAlternative(plan.execution, plan.source.mediaType, plan.candidates);
+  const chosen = actual(plan.selectedCandidateId), withoutImage = actual("hybrid-verifier-only"), compact = compactId === undefined ? undefined : actual(compactId);
   const recommendations: { candidateId: KeelAssetPresentationCandidateId; code: string; completeTokenUriBytes: number }[] = [];
   if (chosen && chosen.completeTokenUriBytes > KEEL_SMART_TOKEN_URI_MAX_BYTES && plan.animation.delivery === "hybrid-shell") {
-    if (imageOnly && imageOnly.hardBlockers.length === 0 && imageOnly.completeTokenUriBytes <= KEEL_SMART_TOKEN_URI_MAX_BYTES) recommendations.push({ candidateId: "image-only-inline", code: "measured-image-only-within-standard-target", completeTokenUriBytes: imageOnly.completeTokenUriBytes });
+    if (compactId && compact && compact.hardBlockers.length === 0 && compact.completeTokenUriBytes <= KEEL_SMART_TOKEN_URI_MAX_BYTES) recommendations.push({ candidateId: compactId, code: compactId === "image-only-inline" ? "measured-image-only-within-standard-target" : "measured-inline-media-within-standard-target", completeTokenUriBytes: compact.completeTokenUriBytes });
     if (withoutImage && withoutImage.hardBlockers.length === 0) recommendations.push({ candidateId: "hybrid-verifier-only", code: withoutImage.completeTokenUriBytes <= KEEL_SMART_TOKEN_URI_MAX_BYTES ? "measured-verifier-without-grid-image-within-target" : "measured-verifier-only-metadata-above-target", completeTokenUriBytes: withoutImage.completeTokenUriBytes });
     if (withoutImage && (withoutImage.encodedAnimationSlotBytes ?? withoutImage.embeddedAnimationUriBytes ?? 0) > KEEL_SMART_TOKEN_URI_MAX_BYTES) recommendations.push({ candidateId: plan.fallbackDelivery === "hosted" ? "hosted-presentation" : "ipfs-presentation", code: "review-external-presentation-after-measured-verifier-only", completeTokenUriBytes: withoutImage.completeTokenUriBytes });
   }

@@ -239,3 +239,35 @@ test('native references are never automatically selected when safe inline layout
  const other=p.planKeelSmartAssetPresentation({...input(2000001),capabilities:{...capabilities,shellHybrid:'unsupported'}});assert.equal(other.selectedCandidateId,'canonical-inline');
  const explicit=choose(input(2000001),{image:'onchain-reference',animation:'omitted'});assert.equal(explicit.selectedCandidateId,'direct-onchain-asset');assert.equal(explicit.selectionSource,'explicit');
 });
+
+
+test('oversized hybrid alternatives retain qualified nonimage playback rather than only its poster',async()=>{
+ for(const mediaType of ['video/mp4','audio/mpeg','model/gltf-binary','text/plain']){
+  const bytes=Buffer.from('the exact complete original media');
+  const x={...input(),source:{resourceId:'original-media',mediaType,byteLength:bytes.length,digest:digest(bytes)},candidateMeasurements:{'canonical-hybrid':{completeTokenUriBytes:2000001,imageUriBytes:100,encodedImageSlotBytes:100}}};
+  const plan=choose(x,hybrid);
+  assert.deepEqual(plan.suggestions.map(row=>row.candidateId),['media-only-inline','hybrid-verifier-only']);
+  const measured=await p.measureKeelSmartAssetPresentation(plan,()=>render({padding:'x'.repeat(2000000)}));
+  assert.deepEqual(measured.recommendations.map(row=>row.candidateId),['media-only-inline','hybrid-verifier-only']);
+  const matrix=await p.measureKeelSmartPresentationMatrix({...x,selection:hybrid},candidate=>{
+   if(candidate.id==='canonical-hybrid')return render({padding:'x'.repeat(2000000)});
+   if(candidate.id==='media-only-inline')return jsonURI({image:imageURI,animation_url:'data:'+mediaType+';base64,'+bytes.toString('base64')});
+   return null;
+  });
+  assert.equal(matrix.recommendations[0].candidateId,'media-only-inline');
+  assert.equal(matrix.recommendations[0].code,'measured-inline-media-within-standard-target');
+  const media=matrix.results.find(row=>row.candidateId==='media-only-inline').measurement;
+  assert.deepEqual(media.inlineMediaIntegrity,{digest:digest(bytes),byteLength:bytes.length});
+  assert.ok(matrix.recommendations.every(row=>row.candidateId!=='image-only-inline'));
+ }
+});
+
+test('hybrid space suggestions never offer an unqualified native media or image adapter',async()=>{
+ for(const [mediaType,rendererKey] of [['application/pdf','inlineMediaTypes'],['image/gif','inlineImageTypes']]){
+  const x={...input(),source:{...input().source,mediaType},capabilities:{...capabilities,[rendererKey]:[]},candidateMeasurements:{'canonical-hybrid':{completeTokenUriBytes:2000001,imageUriBytes:100,encodedImageSlotBytes:100}}};
+  const plan=choose(x,hybrid);
+  assert.deepEqual(plan.suggestions.map(row=>row.candidateId),['hybrid-verifier-only']);
+  const measured=await p.measureKeelSmartAssetPresentation(plan,()=>render({padding:'x'.repeat(2000000)}));
+  assert.deepEqual(measured.recommendations.map(row=>row.candidateId),['hybrid-verifier-only']);
+ }
+});
