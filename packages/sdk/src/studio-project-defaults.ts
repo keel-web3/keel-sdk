@@ -1,5 +1,6 @@
 import { keccak256, stringToHex, type Hex } from "viem";
 import { parseKeelProjectProfileSnapshot, parseKeelNamedProjectProfile, type KeelProjectProfileSnapshot, type KeelNamedProjectProfile } from "./studio-project-profiles.js";
+import { KEEL_ASSET_PRESENTATION_PREFERENCES, KEEL_PRESENTATION_FALLBACK_DELIVERIES, KEEL_ASSET_PRESENTATION_CANDIDATE_IDS } from "@keel/protocol";
 import { KEEL_DEFAULT_RPC_READ_CONCURRENCY } from "./rpc-read-manifest.js";
 import { compileKeelPlanMatrix, validateKeelPlanValue, type KeelPlanAnswers, type KeelPlanDefaults, type KeelPlanMatrix, type KeelPlanValue } from "./studio-project-planner.js";
 
@@ -146,6 +147,10 @@ export function parseKeelSelectedProjectProfile(input: unknown): KeelSelectedPro
 
 /** Shared private build choices. Contract limits are hard ceilings, never preferences. */
 export const KEEL_BUILD_DEFAULT_FIELDS: readonly import("./studio-project-planner.js").KeelPlanField[] = [
+  { id: "assetPresentationSelection", label: "Preferred artwork layout", kind: "choice", required: false, allowDefault: true, choices: KEEL_ASSET_PRESENTATION_CANDIDATE_IDS.map(value => ({ value, label: value, status: "available" as const })), explanation: "An explicit saved slot pair stays selected, but every work still needs its own supported reader, measurements and exact review." },
+  { id: "nonstandardCompatibilityAcknowledged", label: "Allow reviewing larger metadata", kind: "boolean", required: false, allowDefault: true, explanation: "Understand that metadata beyond the 2 MB compatibility target may not load in outside readers. This grants no transaction or payment authority and cannot exceed an actual reader/provider limit." },
+  { id: "fallbackDelivery", label: "Presentation beyond the embedded read limit", kind: "choice", required: false, allowDefault: true, choices: KEEL_PRESENTATION_FALLBACK_DELIVERIES.map(value => ({ value, label: value, status: "available" as const })), explanation: "Preferred external delivery if an embedded verifier alone exceeds the compatibility target and the creator selects an external alternative. This preference does not authorize charges or invent a URL." },
+  { id: "assetPresentation", label: "Artwork presentation", kind: "choice", required: false, allowDefault: true, choices: KEEL_ASSET_PRESENTATION_PREFERENCES.map(value => ({ value, label: value, status: "available" as const })), explanation: "Keep automatic routing, use an explicitly supplied external grid preview, or pair an inline image with the RPC verification shell. Source bytes stay onchain unchanged; every complete metadata return still needs validation." },
   { id: "rpcMaxConcurrentReads", label: "Parallel native RPC reads", kind: "integer", minimum: 1, maximum: 64, required: false, allowDefault: true, explanation: "Bounded Hybrid carrier reads. This does not change delivery, authorize a provider or set transaction gas." },
   { id: "compression", label: "Lossless compression", kind: "choice", required: false, allowDefault: true, choices: ["auto", "brotli", "none"].map(value => ({ value, label: value, status: "available" as const })) },
   { id: "brotliQuality", label: "Brotli quality", kind: "integer", minimum: 0, maximum: 11, required: false, allowDefault: true },
@@ -181,7 +186,8 @@ function resolveBuildDefaultsGeneration(profile: KeelStudioDefaultProfile, input
   const current = parseKeelStudioDefaultProfile(profile);
   const values: Record<string, KeelPlanValue> = { compression: "auto", brotliQuality: 11,
     transportProfile: retained?.sources.transportProfile === "system" ? retained.values.transportProfile! : "uri81-block-v1",
-    payloadStorage: "compact", hybridFallback: false, rpcMaxConcurrentReads: KEEL_DEFAULT_RPC_READ_CONCURRENCY };
+    payloadStorage: "compact", hybridFallback: false, rpcMaxConcurrentReads: KEEL_DEFAULT_RPC_READ_CONCURRENCY,
+    ...(retained && retained.values.assetPresentation === undefined ? {} : { assetPresentation: "automatic" }) };
   const sources: Record<string, "system" | "account" | "media" | "project" | "build" | "contract"> = Object.fromEntries(Object.keys(values).map(key => [key, "system"]));
   const fields = new Map(KEEL_BUILD_DEFAULT_FIELDS.map(field => [field.id, field]));
   for (const [source, layer] of [["account", current.global], ["media", current.byMedia[input.mediaType ?? ""]], ["project", input.project], ["build", input.build]] as const) {

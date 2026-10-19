@@ -35,3 +35,5 @@ export * from "./harness-tree.js";
 
 export * from "./keel-release-policy.js";
 export * from "./bitcoin-proof.js";
+
+export * from "./smart-presentation.js";
