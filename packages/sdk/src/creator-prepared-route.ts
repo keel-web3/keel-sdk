@@ -1,3 +1,4 @@
+import { resolveKeelPreparationReadBounds } from "@keel/protocol";
 import { createHash } from "node:crypto";
 import { parseAbi, encodeFunctionData, decodeFunctionResult, hexToBytes, keccak256, stringToHex, type Abi, type Hex } from "viem";
 import { keelHoldAbi } from "./abi.js";
@@ -46,6 +47,7 @@ export async function prepareKeelAuthenticatedCreatorInline(input: {
   const index = parseKeelNetworkIndex(input.index);
   const selection = { ...(input.selection ?? {}) };
   const declared = input.publication;
+  const readBounds = resolveKeelPreparationReadBounds(declared);
   if (Object.hasOwn(declared, "readerGrammar")) throw new TypeError("Authenticated preparation derives reader grammar from the registered profile; callers cannot override it.");
   if (!Array.isArray(declared.resources) || !declared.resources.length || declared.resources.length > 40) throw new RangeError("Creator publication supports 1..40 modular resources.");
   let sourceBytes = 0;
@@ -56,7 +58,7 @@ export async function prepareKeelAuthenticatedCreatorInline(input: {
     if (sourceBytes > 32 * 1024 * 1024) throw new RangeError("Creator publication exceeds its decoded source byte bound.");
   }
   if (!(declared.poster.bytes instanceof Uint8Array) || !declared.poster.bytes.length || declared.poster.bytes.length > 2_000_000) throw new RangeError("Creator publication poster exceeds the complete Inline byte bound.");
-  const publication = { ...declared,
+  const publication = { ...declared, ...(readBounds.nonstandardReadPolicy === undefined ? {} : { nonstandardReadPolicy: readBounds.nonstandardReadPolicy }), ...(readBounds.preparationReadBudget === undefined ? {} : { preparationReadBudget: readBounds.preparationReadBudget }),
     resources: declared.resources.map(resource => ({ ...resource, ...(resource.aliases === undefined ? {} : { aliases: [...resource.aliases] }), bytes: Uint8Array.from(resource.bytes) })),
     poster: { ...declared.poster, bytes: Uint8Array.from(declared.poster.bytes) },
   };
@@ -154,7 +156,7 @@ export async function prepareKeelAuthenticatedCreatorInline(input: {
       || resource.role !== original.descriptor.role || resource.mediaType !== original.descriptor.mediaType || JSON.stringify(resource.aliases) !== JSON.stringify(original.descriptor.aliases);
   })) throw new TypeError("Registered prepared source replay differs from the original resources.");
   const preparedBytesBeforeLiveEnvelope = plan.preparedBytesBeforeLiveEnvelope - plan.shell.prefix.bytes.length - plan.shell.suffix.bytes.length + prefix.bytes.length + suffix.bytes.length;
-  const provisionalTokenURIBudget = assessKeelCreatorPreparedInlineBudget(preparedBytesBeforeLiveEnvelope);
+  const provisionalTokenURIBudget = assessKeelCreatorPreparedInlineBudget(preparedBytesBeforeLiveEnvelope, publication.nonstandardReadPolicy, publication.preparationReadBudget);
   const canonicalBlock = await pool.request({ method: "eth_getBlockByNumber", params: [block, false] }) as { hash?: unknown };
   if (!same(canonicalBlock?.hash, String(infrastructure.blockHash))) throw new TypeError("Prepared route block was reorganized during authentication.");
   return { ...plan, shell: { ...plan.shell, prefix, suffix }, preparedBytesBeforeLiveEnvelope, provisionalTokenURIBudget,

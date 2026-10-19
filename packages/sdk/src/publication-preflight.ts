@@ -1,8 +1,7 @@
 import { emitKeelPublicationDiagnostic, type KeelPublicationDiagnosticObserver } from "./publication-diagnostics.js";
-import { KEEL_INLINE_MAX_TOKEN_URI_BYTES, KEEL_INLINE_SAFE_RPC_GAS } from "./presentation.js";
 import { keelExecutorGasLimit } from "./managed-publication.js";
 import { resolveKeelTransactionGasPolicy, assertKeelAmsterdamSimulationHeader, type KeelLocalTestChainGasProfile } from "./transaction-gas-policy.js";
-import { canonicalJson, createIntegrity } from "@keel/protocol";
+import { canonicalJson, createIntegrity, resolveKeelTokenURIReadBounds, assertKeelNonstandardTokenURIIdentity, type KeelTokenURIPreparationBudget, resolveKeelPreparationReadBounds, type KeelExplicitNonstandardReadPolicy } from "@keel/protocol";
 import { encodeAbiParameters, encodeFunctionData, parseAbi, getAddress, keccak256, stringToHex, type Hex } from "viem";
 
 export interface KeelSimulationCall {
@@ -17,6 +16,8 @@ export interface KeelSimulationCall {
   readonly maxPriorityFeePerGas?: Hex;
 }
 export interface KeelPublicationSimulationInput {
+  readonly nonstandardReadPolicy?: KeelExplicitNonstandardReadPolicy;
+  readonly preparationReadBudget?: KeelTokenURIPreparationBudget;
   readonly localTestChainProfile?: KeelLocalTestChainGasProfile | undefined;
   /** Owner-private full evidence consumer; excluded from proof identity. */
   readonly diagnostics?: KeelPublicationDiagnosticObserver | undefined;
@@ -235,7 +236,12 @@ async function performPublicationSimulation(input: KeelPublicationSimulationInpu
     || (input.blockNumber !== undefined && (typeof input.blockNumber !== "bigint" || input.blockNumber < 0n))
     || input.maximumReadGas <= 0n || input.maximumTransactionGas <= 0n || input.collectionOverheadGas < 0n
     || !Array.isArray(input.preparationCalls) || input.preparationCalls.length > 255 || (input.observationCalls !== undefined && !Array.isArray(input.observationCalls)) || typeof input.expectedTokenURI !== "string") return failure("configuration-invalid", "The exact publication fingerprint, network, reader, and measured-read limits are required.");
-  if (input.maximumReadGas > KEEL_INLINE_SAFE_RPC_GAS || input.maximumTokenUriBytes > KEEL_INLINE_MAX_TOKEN_URI_BYTES) return failure("configuration-invalid", "Inline simulation cannot exceed the shared SDK read-gas and complete-metadata policy ceilings.");
+  let readBounds: ReturnType<typeof resolveKeelTokenURIReadBounds>;
+  try { readBounds = resolveKeelTokenURIReadBounds(input.nonstandardReadPolicy); } catch { return failure("configuration-invalid", "The exact nonstandard compatibility acknowledgement is missing, invalid or stale."); }
+  if (input.maximumReadGas > readBounds.maximumReadGas || input.maximumTokenUriBytes > readBounds.maximumTokenUriBytes) return failure("configuration-invalid", "Inline simulation cannot exceed its exact selected reader/provider bounds.");
+  let preparationBounds: ReturnType<typeof resolveKeelPreparationReadBounds>;
+  try { preparationBounds = resolveKeelPreparationReadBounds(input); } catch { return failure("configuration-invalid", "The unsigned preparation identity or bounds changed before exact read review."); }
+  if (readBounds.nonstandardReadPolicy !== undefined && preparationBounds.preparationReadBudget === undefined) return failure("configuration-invalid", "Above-target funding simulation requires the original unsigned project/source/defaults preparation budget.");
   const completeBytes = new TextEncoder().encode(input.expectedTokenURI).byteLength;
   if (completeBytes > input.maximumTokenUriBytes) return failure("metadata-size-limit", "The complete prepared tokenURI exceeds this delivery mode's byte limit. Review a supported Hybrid or IPFS route before paying for new storage.");
   const preparationCalls = input.preparationCalls.map(call => validatedCall(call, input.maximumTransactionGas, true));
@@ -264,10 +270,11 @@ async function performPublicationSimulation(input: KeelPublicationSimulationInpu
   try { reader = getAddress(input.reader); metadataTarget = getAddress(input.metadataTarget ?? input.reader); } catch { return failure("configuration-invalid", "The selected reader address is invalid."); }
   if (metadataCall.to.toLowerCase() !== metadataTarget.toLowerCase()) return failure("configuration-invalid", "The final simulation call must target the exact planned metadata contract.");
   const expectedReturn = expectation.kind === "storage-only" ? encodeAbiParameters([{ type: "bool" }], [true]).toLowerCase() : encodeAbiParameters([{ type: "string" }], [input.expectedTokenURI]).toLowerCase();
-  const identityBase = { readPolicy: "keel-inline-read-policy@1", policyGasCeiling: KEEL_INLINE_SAFE_RPC_GAS.toString(), policyTokenUriByteCeiling: KEEL_INLINE_MAX_TOKEN_URI_BYTES, planFingerprint: input.planFingerprint, chainId: input.chainId, reader, runtimeCodeHash: input.readerRuntimeCodeHash.toLowerCase(),
+  const identityBase = { readPolicy: "keel-inline-read-policy@1", policyGasCeiling: readBounds.maximumReadGas.toString(), policyTokenUriByteCeiling: readBounds.maximumTokenUriBytes, ...(readBounds.nonstandardReadPolicy === undefined ? {} : { nonstandardReadPolicy: readBounds.nonstandardReadPolicy }), ...(preparationBounds.preparationReadBudget === undefined ? {} : { preparationReadBudget: preparationBounds.preparationReadBudget }), planFingerprint: input.planFingerprint, chainId: input.chainId, reader, runtimeCodeHash: input.readerRuntimeCodeHash.toLowerCase(),
     transactionContext: input.transactionContext ?? "independent-transactions", ...(input.localTestChainProfile === undefined ? {} : { localTestChainProfile: input.localTestChainProfile }), discoveryGasPolicy: input.discoveryGasPolicy ?? "fixed-envelopes", completeTokenUriBytes: completeBytes, maximumTokenUriBytes: input.maximumTokenUriBytes, maximumReadGas: input.maximumReadGas.toString(), collectionOverheadGas: input.collectionOverheadGas.toString(), maximumTransactionGas: input.maximumTransactionGas.toString(), preparationCalls, observationCalls, requiredReaderCalls, metadataTarget, metadataCall, assertions,
     blockTag: input.blockNumber === undefined ? "latest" : `0x${input.blockNumber.toString(16)}`, expectation, validation: "transactions-then-public-read" };
   const metadataDigest = (await createIntegrity(new TextEncoder().encode(input.expectedTokenURI))).digest;
+  try { assertKeelNonstandardTokenURIIdentity(readBounds.nonstandardReadPolicy, { chainId: input.chainId, byteLength: completeBytes, digest: metadataDigest }); } catch { return failure("configuration-invalid", "Nonstandard read review changed after the exact URI measurement or chain selection."); }
   // Snapshot all inputs before the first asynchronous transport call.
   const identity = { ...identityBase, metadataDigest };
 
@@ -581,7 +588,7 @@ async function performPublicationSimulation(input: KeelPublicationSimulationInpu
     effectiveGasLimits: discoveryCalls.map(call => BigInt(call.gas).toString()), capacityAttempts: discoveryCapacityAttempts,
     ...(discoveryAllocationAttempts.length > 0 ? { allocationAttempts: discoveryAllocationAttempts } : {}) };
   const simulationFingerprint = (await createIntegrity(new TextEncoder().encode(canonicalJson({ ...identity, transactionGasPolicy, transactionForkHeaders, discoveryGas, validatedTransactionCalls: boundedCalls, effectiveReadGas: effectiveReadGas.toString(), readBoundaryAttempts })))).digest;
-  return Object.freeze({ schema: "keel-publication-simulation@1" as const, readPolicy: identity.readPolicy, policyGasCeiling: identity.policyGasCeiling, policyTokenUriByteCeiling: identity.policyTokenUriByteCeiling, planFingerprint: identity.planFingerprint, simulationFingerprint,
+  return Object.freeze({ schema: "keel-publication-simulation@1" as const, readPolicy: identity.readPolicy, ...(identity.nonstandardReadPolicy === undefined ? {} : { nonstandardReadPolicy: identity.nonstandardReadPolicy }), ...(identity.preparationReadBudget === undefined ? {} : { preparationReadBudget: identity.preparationReadBudget }), policyGasCeiling: identity.policyGasCeiling, policyTokenUriByteCeiling: identity.policyTokenUriByteCeiling, planFingerprint: identity.planFingerprint, simulationFingerprint,
     chainId: identity.chainId, transactionGasPolicy, transactionForkHeaders, reader, metadataTarget, ephemeralContextCalls: observationCalls.length, requiredReaderChecks: requiredReaderCalls.length,
     requiredReaderProofs: requiredReaderCalls.map((check, index) => ({ reader: check.call.to, selector: check.call.data.slice(0, 10), calldataDigest: keccak256(check.call.data),
       returnDigest: keccak256(check.expectedReturn as Hex), returnBytes: (check.expectedReturn.length - 2) / 2,

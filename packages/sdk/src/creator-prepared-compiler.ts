@@ -6,7 +6,8 @@ import { buildKeelCreatorERC721ACall, buildKeelCreatorAdminMintCall, buildKeelCr
 import { prepareKeelWeld } from "./hold-publication.js";
 import { keelHoldAbi } from "./abi.js";
 import { resolveKeelCreatorTarget } from "./network-index.js";
-import type { KeelSimulationCall } from "./publication-preflight.js";
+import { resolveKeelPreparationReadBounds } from "@keel/protocol";
+import type { KeelSimulationCall, KeelPublicationSimulationInput } from "./publication-preflight.js";
 
 const ABI = parseAbi([
   "function creatorNonces(address) view returns(uint256)", "function nextCollectionId() view returns(uint256)",
@@ -26,6 +27,7 @@ const same = (a: unknown,b: string) => typeof a === "string" && a.toLowerCase() 
 const utf8 = (value: Uint8Array) => new TextDecoder("utf-8",{fatal:true}).decode(value);
 type AuthInput = Parameters<typeof prepareKeelAuthenticatedCreatorInline>[0];
 export interface KeelCreatorPreparedCompilerInput extends AuthInput {
+  readonly localTestChainProfile?: KeelPublicationSimulationInput["localTestChainProfile"];
   readonly identity: { readonly id: string; readonly actorId: string; readonly owner: Hex; readonly sourceRevision: string; readonly settingsRevision: string };
   readonly collection: { readonly name: string; readonly symbol: string; readonly royaltyReceiver: Hex; readonly royaltyBps: bigint; readonly metadataDigest: Hex };
   readonly recipient: Hex;
@@ -43,10 +45,12 @@ export async function compileKeelCreatorPreparedPublication(input: KeelCreatorPr
   const owner=getAddress(input.identity.owner), recipient=getAddress(input.recipient);
   if(owner===ZERO||recipient===ZERO)throw new TypeError("Creator and mint recipient must be nonzero.");
   const {maximumTransactionGas,maximumReadGas,collectionOverheadGas,maximumTokenUriBytes}=input.gas;
-  if(maximumTransactionGas<=0n||maximumReadGas<=0n||collectionOverheadGas<0n||!Number.isSafeInteger(maximumTokenUriBytes)||maximumTokenUriBytes<1||maximumTokenUriBytes>2_000_000)throw new TypeError("Explicit selected-chain transaction and separate read limits are required.");
+  const readBounds=resolveKeelPreparationReadBounds(input.publication);
+  if(maximumTransactionGas<=0n||maximumReadGas<=0n||collectionOverheadGas<0n||!Number.isSafeInteger(maximumTokenUriBytes)||maximumTokenUriBytes<1||maximumTokenUriBytes>readBounds.maximumTokenUriBytes||maximumReadGas>readBounds.maximumReadGas)throw new TypeError("Explicit selected-chain transaction and separate read limits are required.");
   const fees = input.gas.gasPrice!==undefined ? {gasPrice:input.gas.gasPrice} : {maxFeePerGas:input.gas.maxFeePerGas,maxPriorityFeePerGas:input.gas.maxPriorityFeePerGas};
   if(Object.values(fees).some(v=>typeof v!=="string"||!/^0x(?:0|[1-9a-f][0-9a-f]*)$/iu.test(v))||("maxFeePerGas" in fees&&BigInt(fees.maxPriorityFeePerGas!)>BigInt(fees.maxFeePerGas!)))throw new TypeError("Exact valid transaction fees are required.");
   const prepared=await prepareKeelAuthenticatedCreatorInline(input), target=resolveKeelCreatorTarget(input.index,input.selection);
+  if(readBounds.preparationReadBudget && (readBounds.preparationReadBudget.chainId!==prepared.chainId||readBounds.preparationReadBudget.projectId!==input.identity.id||readBounds.preparationReadBudget.revision!==input.identity.sourceRevision||readBounds.preparationReadBudget.defaultsRevision!==input.identity.settingsRevision))throw new TypeError("Preparation budget changed the exact journal project/source/defaults identity.");
   const blockNumber=BigInt(prepared.route.authenticatedBlockNumber), block=toHex(blockNumber);
   const read=async(address:Hex,functionName:string,args:readonly unknown[]=[],abi:Abi=ABI):Promise<unknown>=>{
     const value=await input.pool.request({method:"eth_call",params:[{from:owner,to:address,data:encodeFunctionData({abi,functionName,args})},block]});
@@ -182,7 +186,7 @@ export async function compileKeelCreatorPreparedPublication(input: KeelCreatorPr
   const expectedTokenURI="data:application/json;charset=utf-8,"+await escape(prefix)+utf8(prepared.image.bytes)+await escape('\",\"animation_url\":\"data:text/html;charset=utf-8,')+utf8(prepared.shell.prefix.bytes)+utf8(prepared.preparedBodyBytes)+utf8(prepared.shell.suffix.bytes)+await escape(contextURI+'\",\"keel_schema\":\"keel-inline-raw-percent-token-uri@1\"}');
   const completeTokenURIBytes=new TextEncoder().encode(expectedTokenURI).length;
   if(completeTokenURIBytes>maximumTokenUriBytes)throw new RangeError("Complete prepared tokenURI exceeds the selected Inline limit.");
-  const journal=createKeelCreatorPublicationJournal({...input.identity,prepared,collection,tokenId:1n,steps,simulation:{metadataCall:{from:owner,to:collection,data:encodeFunctionData({abi:ABI,functionName:"tokenURI",args:[1n]}),value:"0x0",gas:toHex(maximumReadGas)},expectedTokenURI,maximumTokenUriBytes,maximumReadGas,collectionOverheadGas,maximumTransactionGas,assertions}});
+  const journal=createKeelCreatorPublicationJournal({...input.identity,prepared,collection,tokenId:1n,steps,simulation:{...(input.localTestChainProfile===undefined?{}:{localTestChainProfile:input.localTestChainProfile}),...(readBounds.nonstandardReadPolicy===undefined?{}:{nonstandardReadPolicy:readBounds.nonstandardReadPolicy}),...(readBounds.preparationReadBudget===undefined?{}:{preparationReadBudget:readBounds.preparationReadBudget}),metadataCall:{from:owner,to:collection,data:encodeFunctionData({abi:ABI,functionName:"tokenURI",args:[1n]}),value:"0x0",gas:toHex(maximumReadGas)},expectedTokenURI,maximumTokenUriBytes,maximumReadGas,collectionOverheadGas,maximumTransactionGas,assertions}});
   const finalBlock=await input.pool.request({method:"eth_getBlockByNumber",params:[block,false]}) as {hash?:unknown};
   if(!same(finalBlock?.hash,String(prepared.route.authenticatedBlockHash)))throw new TypeError("Publication snapshot was reorganized during compilation.");
   return {journal,creatorNonce:creatorNonce.toString(),routeId:routeId.toString(),collectionId:collectionId.toString(),sourceBytes:prepared.sourceBytes,newStoredBytes,reusedStoredBytes,platformFee:platformFee.toString(),completeTokenURIBytes,expectedTokenURISha256:sha256(stringToHex(expectedTokenURI)),status:"compiled-awaiting-simulation" as const,signing:"not-performed" as const,submission:"not-performed" as const};

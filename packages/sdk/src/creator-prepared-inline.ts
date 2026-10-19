@@ -5,7 +5,7 @@ import { buildKeelPreparedDenseCopyShell, prepareKeelDensePayload } from "./prep
 import { prepareKeelDenseCopyFragment, serializeKeelDenseTransportJSON } from "./dense-transport.js";
 import { assertKeelInlineImageBytes } from "./collector-policy.js";
 import { normalizedAddress, uint } from "./validation.js";
-import { resolveKeelPayloadStorage, resolveKeelShell, type KeelPayloadStorageMode } from "@keel/protocol";
+import { resolveKeelPayloadStorage, resolveKeelShell, type KeelPayloadStorageMode, resolveKeelPreparationReadBounds, type KeelTokenURIPreparationBudget, type KeelExplicitNonstandardReadPolicy } from "@keel/protocol";
 
 const MEDIA = "application/vnd.keel.token-uri-raw-percent-fragment";
 
@@ -51,8 +51,9 @@ function creatorModulePlaybackOrder(resources: readonly {
 
 /** Only committed fragments are a proven lower bound before token context is
  * available. An envelope reserve is an estimate, never the final size gate. */
-export function assessKeelCreatorPreparedInlineBudget(preparedFragmentBytes: number) {
-  if (!Number.isSafeInteger(preparedFragmentBytes) || preparedFragmentBytes < 0 || preparedFragmentBytes > 2_000_000) throw new RangeError("Prepared Inline fragments alone exceed the complete URI byte limit.");
+export function assessKeelCreatorPreparedInlineBudget(preparedFragmentBytes: number, nonstandardReadPolicy?: KeelExplicitNonstandardReadPolicy, preparationReadBudget?: KeelTokenURIPreparationBudget) {
+  const maximum = resolveKeelPreparationReadBounds({ ...(nonstandardReadPolicy === undefined ? {} : { nonstandardReadPolicy }), ...(preparationReadBudget === undefined ? {} : { preparationReadBudget }) }).maximumTokenUriBytes;
+  if (!Number.isSafeInteger(preparedFragmentBytes) || preparedFragmentBytes < 0 || preparedFragmentBytes > maximum) throw new RangeError("Prepared Inline fragments alone exceed the complete URI byte limit.");
   return Object.freeze({ status: "provisional-unmeasured" as const, preparedFragmentBytes,
     reservedEnvelopeBytes: 65_536, estimatedCompleteTokenURIBytes: preparedFragmentBytes + 65_536,
     completeTokenURIBytes: null, requiresCompleteRead: true as const });
@@ -67,6 +68,8 @@ export const KEEL_CREATOR_PREPARED_COPY_ABI = parseAbi([
  * selected-chain readback, complete URI, call gas and offline browser behavior. */
 export async function prepareKeelCreatorInline(input: {
   readonly chainId: number;
+  readonly nonstandardReadPolicy?: KeelExplicitNonstandardReadPolicy;
+  readonly preparationReadBudget?: KeelTokenURIPreparationBudget;
   readonly store: Address;
   readonly payloadStorage?: KeelPayloadStorageMode;
   readonly viewer?: "keel-verification-shell" | "none";
@@ -86,6 +89,8 @@ export async function prepareKeelCreatorInline(input: {
   readonly shellRevision?: bigint;
   readonly readSlug?: (id: Hex) => Promise<Uint8Array | null>;
 }) {
+  const readBounds = resolveKeelPreparationReadBounds(input);
+  input = { ...input, ...(readBounds.nonstandardReadPolicy === undefined ? {} : { nonstandardReadPolicy: readBounds.nonstandardReadPolicy }), ...(readBounds.preparationReadBudget === undefined ? {} : { preparationReadBudget: readBounds.preparationReadBudget }) };
   const payloadStorage = resolveKeelPayloadStorage(input.payloadStorage);
   if (payloadStorage === "raw") throw new TypeError("Raw storage preserves supplied bytes. Fresh dense COPY requires Compact and cannot substitute an encoded carrier for Raw; select its compatible native reader.");
   if (resolveKeelShell(input.viewer) !== "keel-verification-shell") throw new TypeError("This prepared route requires the registered verification shell. Preserve viewer=none through its creator-owned shell route.");
@@ -186,7 +191,7 @@ export async function prepareKeelCreatorInline(input: {
   let offset = 0; for (const p of body) { preparedBodyBytes.set(p.bytes, offset); offset += p.bytes.length; }
   const preparedBytes = prefix.bytes.length + preparedBodyBytes.length + suffix.bytes.length + image.bytes.length;
   // The final metadata/context can only be measured once collection/token bindings exist.
-  const provisionalTokenURIBudget = assessKeelCreatorPreparedInlineBudget(preparedBytes);
+  const provisionalTokenURIBudget = assessKeelCreatorPreparedInlineBudget(preparedBytes, input.nonstandardReadPolicy, readBounds.preparationReadBudget);
   return {
     protocol: "keel.creator-prepared-inline@1" as const, chainId, store, payloadStorage, readerGrammar, viewer: "keel-verification-shell" as const,
     status: "review-only" as const, signing: "not-performed" as const, submission: "not-performed" as const,

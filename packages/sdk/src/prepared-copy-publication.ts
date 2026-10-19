@@ -1,9 +1,8 @@
 import { assertKeelDataURICompatibility, decodeKeelPreparedDenseCopyFragment } from "./dense-transport.js";
 import { assertKeelFreshPayloadCarriage, inspectKeelInlinePayloadCarriage } from "./inline-transport-audit.js";
-import { createIntegrity, type Integrity } from "@keel/protocol";
+import { createIntegrity, type Integrity, resolveKeelTokenURIReadBounds, assertKeelNonstandardTokenURIIdentity, type KeelExplicitNonstandardReadPolicy } from "@keel/protocol";
 import { assertKeelInlineImageBytes } from "./collector-policy.js";
 import { assertKeelInlineNoExternalDependencies, decodeKeelInlineGraphFragment } from "./inline-viewer-graph.js";
-import { KEEL_INLINE_MAX_TOKEN_URI_BYTES, keelInlineReadGasLimit } from "./presentation.js";
 
 const encoder = new TextEncoder();
 const decoder = new TextDecoder("utf-8", { fatal: true });
@@ -26,6 +25,7 @@ export function isKeelPreparedCopyMediaType(mediaType: string): boolean {
 }
 
 export interface KeelPreparedCopyReadInput {
+  readonly nonstandardReadPolicy?: KeelExplicitNonstandardReadPolicy;
   readonly chainId: number;
   readonly store: string;
   readonly mediaType: string;
@@ -94,14 +94,17 @@ export async function assertKeelPreparedCopyRead(input: KeelPreparedCopyReadInpu
   const graphBytes = new Uint8Array(input.graphBytes);
   const graphIntegrity = { ...input.graphIntegrity };
   const { chainId, store, mediaType, expectedTokenURI, returnedTokenURI, callGasLimit, blockGasLimit } = input;
+  const readBounds = resolveKeelTokenURIReadBounds(input.nonstandardReadPolicy);
   const requiredBuilder = keelPreparedCopyBuilder(mediaType);
   if (!Number.isSafeInteger(chainId) || chainId < 1 || !/^0x[0-9a-f]{40}$/iu.test(store) || /^0x0{40}$/iu.test(store)) throw new TypeError("Prepared COPY needs an exact selected-chain store.");
-  if (typeof callGasLimit !== "bigint" || typeof blockGasLimit !== "bigint" || callGasLimit <= 0n || callGasLimit > keelInlineReadGasLimit(blockGasLimit)) throw new RangeError("The complete collection read exceeds the selected-chain public RPC gas boundary.");
+  if (typeof callGasLimit !== "bigint" || typeof blockGasLimit !== "bigint" || callGasLimit <= 0n || callGasLimit > (blockGasLimit < readBounds.maximumReadGas ? blockGasLimit : readBounds.maximumReadGas)) throw new RangeError("The complete collection read exceeds the selected-chain public RPC gas boundary.");
   const actual = await createIntegrity(graphBytes);
   if (actual.algorithm !== graphIntegrity.algorithm || actual.digest.toLowerCase() !== graphIntegrity.digest?.toLowerCase() || actual.byteLength !== graphIntegrity.byteLength) throw new TypeError("Prepared COPY source bytes do not match the publish plan commitment.");
   if (typeof expectedTokenURI !== "string" || typeof returnedTokenURI !== "string" || expectedTokenURI !== returnedTokenURI) throw new TypeError("The complete returned tokenURI differs from canonical preparation. Extra wrapping, transcoding, hexadecimal transport and runtime encoding are not COPY reuse.");
   const returnedBytes = encoder.encode(returnedTokenURI);
-  if (returnedBytes.byteLength > KEEL_INLINE_MAX_TOKEN_URI_BYTES) throw new RangeError("The complete returned tokenURI exceeds the public-reader byte limit.");
+  if (returnedBytes.byteLength > readBounds.maximumTokenUriBytes) throw new RangeError("The complete returned tokenURI exceeds the public-reader byte limit.");
+  const tokenURIIntegrity = await createIntegrity(returnedBytes);
+  assertKeelNonstandardTokenURIIdentity(readBounds.nonstandardReadPolicy, { chainId, digest: tokenURIIntegrity.digest, byteLength: returnedBytes.byteLength });
   const graphText = decoder.decode(graphBytes);
   const at = expectedTokenURI.indexOf(graphText);
   if (graphText.length === 0 || at < 0 || expectedTokenURI.indexOf(graphText, at + graphText.length) >= 0) throw new TypeError("The complete URI must copy the exact prepared graph once, without another encoding layer.");
@@ -128,7 +131,8 @@ export async function assertKeelPreparedCopyRead(input: KeelPreparedCopyReadInpu
     schema: "keel-prepared-copy-read-check@1" as const,
     policy: "prepared-copy" as const, chainId, store: store.toLowerCase(), mediaType,
     requiredBuilder, readOperation: "copy-prepared-fragments" as const,
-    graphIntegrity: actual, tokenURIIntegrity: await createIntegrity(returnedBytes),
+    graphIntegrity: actual, tokenURIIntegrity,
+    ...(readBounds.nonstandardReadPolicy === undefined ? {} : { nonstandardReadPolicy: readBounds.nonstandardReadPolicy }),
     completeTokenURIBytes: returnedBytes.byteLength, payloadCarriage,
     callGasLimit: callGasLimit.toString(), blockGasLimit: blockGasLimit.toString(),
     selectedChainReadAuthenticated: false as const,
@@ -138,4 +142,4 @@ export async function assertKeelPreparedCopyRead(input: KeelPreparedCopyReadInpu
 
 export type KeelPreparedCopyReadCheck = Awaited<ReturnType<typeof assertKeelPreparedCopyRead>>;
 export type KeelPreparedCopyPublishEvidence = Pick<KeelPreparedCopyReadInput,
-  "graphBytes" | "expectedTokenURI" | "returnedTokenURI" | "callGasLimit" | "blockGasLimit">;
+  "graphBytes" | "expectedTokenURI" | "returnedTokenURI" | "callGasLimit" | "blockGasLimit" | "nonstandardReadPolicy">;

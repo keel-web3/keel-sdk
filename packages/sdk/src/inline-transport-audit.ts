@@ -1,3 +1,4 @@
+import { resolveKeelTokenURIReadBounds, assertKeelNonstandardTokenURIIdentity, type KeelExplicitNonstandardReadPolicy } from "@keel/protocol";
 import { createKeelLegacySharedImageReader, KEEL_LEGACY_SHARED_IMAGE_PROFILE } from "./legacy-shared-image-reader.js";
 import { gunzipSync } from "node:zlib";
 import {createPpmdTask} from "./decoders/vendor/ppmd.js";
@@ -43,7 +44,7 @@ export function readKeelInlineJSONArray(html: string, marker: string): readonly 
   throw new TypeError("Incomplete Inline resource array.");
 }
 
-export function decodeKeelInlineDataURI(uri: unknown, mediaPrefix: string): Uint8Array {
+export function decodeKeelInlineDataURI(uri: unknown, mediaPrefix: string, maximumUriBytes = MAX_BYTES): Uint8Array {
   if (typeof uri !== "string" || !uri.startsWith("data:")) throw new TypeError("Inline requires a self-contained data URI.");
   const parsed = new URL(uri);
   if (parsed.hash) throw new TypeError("Inline data URI cannot contain a fragment.");
@@ -58,7 +59,7 @@ export function decodeKeelInlineDataURI(uri: unknown, mediaPrefix: string): Uint
     }
   }
   const comma = uri.indexOf(",");
-  if (comma < 5 || encoder.encode(uri).length > MAX_BYTES) throw new RangeError("Invalid or oversized Inline data URI.");
+  if (comma < 5 || !Number.isSafeInteger(maximumUriBytes) || maximumUriBytes < 1 || encoder.encode(uri).length > maximumUriBytes) throw new RangeError("Invalid or oversized Inline data URI.");
   const header = uri.slice(0, comma), text = uri.slice(comma + 1);
   const [media = "", ...parameters] = header.slice(5).toLowerCase().split(";");
   if ((mediaPrefix === "image/" ? !/^image\/[a-z0-9.+-]+$/u.test(media) : media !== mediaPrefix.toLowerCase())
@@ -286,12 +287,15 @@ export function assertKeelFreshPayloadAudit(value: unknown): void {
 }
 
 /** Measurements from the complete token return, not the compressed pack total. */
-export async function auditKeelInlineTokenURI(tokenURI: string) {
-  if (typeof tokenURI !== "string" || encoder.encode(tokenURI).length > MAX_BYTES) throw new RangeError("Complete tokenURI exceeds the inspection limit.");
-  const json = decodeKeelInlineDataURI(tokenURI, "application/json");
+export async function auditKeelInlineTokenURI(tokenURI: string, options: { readonly nonstandardReadPolicy?: KeelExplicitNonstandardReadPolicy } = {}) {
+  const bounds = resolveKeelTokenURIReadBounds(options.nonstandardReadPolicy);
+  if (typeof tokenURI !== "string" || encoder.encode(tokenURI).length > bounds.maximumTokenUriBytes) throw new RangeError("Complete tokenURI exceeds the inspection limit.");
+  const tokenURIIntegrity = await createIntegrity(encoder.encode(tokenURI));
+  assertKeelNonstandardTokenURIIdentity(bounds.nonstandardReadPolicy, { digest: tokenURIIntegrity.digest, byteLength: encoder.encode(tokenURI).length });
+  const json = decodeKeelInlineDataURI(tokenURI, "application/json", bounds.maximumTokenUriBytes);
   const metadata = object(JSON.parse(decoder.decode(json)));
-  const html = decodeKeelInlineDataURI(metadata.animation_url, "text/html");
-  const image = decodeKeelInlineDataURI(metadata.image, "image/");
+  const html = decodeKeelInlineDataURI(metadata.animation_url, "text/html", bounds.maximumTokenUriBytes);
+  const image = decodeKeelInlineDataURI(metadata.image, "image/", bounds.maximumTokenUriBytes);
   const imageURI = metadata.image as string;
   const imageMedia = imageURI.slice(5, imageURI.indexOf(",")).split(";", 1)[0]!;
   assertKeelInlineImageBytes(image, imageMedia);
@@ -301,7 +305,7 @@ export async function auditKeelInlineTokenURI(tokenURI: string) {
     htmlBytes: html.length, imageBytes: image.length,
     completeDocumentBase64Layers: Number(/^data:application\/json[^,]*;base64,/iu.test(tokenURI))
       + Number(/^data:text\/html[^,]*;base64,/iu.test(metadata.animation_url as string)),
-    tokenURIIntegrity: await createIntegrity(encoder.encode(tokenURI)), htmlIntegrity: await createIntegrity(html), carriage,
+    tokenURIIntegrity, ...(bounds.nonstandardReadPolicy === undefined ? {} : { nonstandardReadPolicy: bounds.nonstandardReadPolicy }), htmlIntegrity: await createIntegrity(html), carriage,
     freshPayloadPolicySatisfied: !carriage.requiresExistingPreparedReuse,
     freshPreparedCopyPolicySatisfied: !carriage.requiresExistingPreparedReuse,
     payloadPolicyScope: "prepared-copy-representation" as const,
