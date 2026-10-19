@@ -73,7 +73,7 @@ test("the protected K shell mounts only verified art inside an opaque network-de
     assert.match(valid.stdout, /id="verify-title">Files verified/u);
     assert.match(valid.stdout, /class="verify-page-nav"/u);
     assert.match(valid.stdout, /data-keel-panel-placement="right"/u);
-    assert.match(valid.stdout, /sandbox="allow-scripts allow-pointer-lock"/u);
+    assert.match(valid.stdout, /sandbox="allow-scripts allow-pointer-lock allow-downloads"/u);
     assert.doesNotMatch(valid.stdout, /allow-same-origin|>PWNED<|https?:\/\//u);
     assert.doesNotMatch(valid.stderr, /Uncaught|net::ERR|Failed to load resource/iu);
 

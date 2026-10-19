@@ -21,6 +21,33 @@ export interface KeelStudioStagingCapabilities {
 export type KeelStudioCapabilityDocument = KeelStudioCapabilities | KeelStudioStagingCapabilities;
 
 export type StudioChainFamily = "ethereum" | "tezos";
+
+/**
+ * How an agent or Studio planner reaches a Tezos KEEL collection when a
+ * capability document lists a ready Tezos chain: the review-only MCP tools and
+ * SDK functions of the creator-collection route, in launch order.
+ */
+export const KEEL_STUDIO_TEZOS_COLLECTION_ROUTE = Object.freeze({
+  family: "tezos" as const,
+  route: "keel.tezos.collection-route@1" as const,
+  plan: "keel-tezos-collection-launch-plan" as const,
+  tools: Object.freeze([
+    "keel-tezos-collection-launch-plan",
+    "keel-tezos-collection-originate-prepare",
+    "keel-tezos-hold-resources-prepare",
+    "keel-tezos-presentation-bind-prepare",
+    "keel-tezos-mint-gate-prepare",
+    "keel-tezos-mint-prepare",
+    "keel-tezos-token-metadata-prepare",
+    "keel-tezos-readback-check",
+  ] as const),
+  wallet: { signing: false as const, submission: false as const, approval: "creator wallet (Beacon) reviews every operation group" as const },
+});
+
+/** The route a planner should take for one capability chain entry, or null when the chain is not usable. */
+export function studioChainRoute(chain: StudioChainCapability): typeof KEEL_STUDIO_TEZOS_COLLECTION_ROUTE | null {
+  return chain.family === "tezos" && chain.status === "ready" ? KEEL_STUDIO_TEZOS_COLLECTION_ROUTE : null;
+}
 export type StudioChainStatus = "ready" | "blocked";
 
 export interface StudioChainCapability {
