@@ -1,0 +1,161 @@
+{
+  "schema": "keel.independent-normal-gif-guided-review-source-and-admission@1",
+  "sourceCommit": "83d868557c3ce9a71c14d1d9a7f82b22e18fb195",
+  "observedEvidenceHead": "27099bb12b7adc4656c4b5567258c1ebf0abcfb2",
+  "sourceApproval": true,
+  "oneGuidedReviewAdmitted": true,
+  "captureApproval": false,
+  "simulationApproval": false,
+  "signingApproval": false,
+  "submissionApproval": false,
+  "activationApproval": false,
+  "finalReleaseApproval": false,
+  "request": {
+    "path": "/tmp/keel-private-gif-guided-review-20261020-01/admission-request.json",
+    "bytes": 1318,
+    "sha256": "7c129feef6c10d001db27f7831cce490de9beaf166b7b97da54fbcf78cc84351"
+  },
+  "strictReview": {
+    "path": "/private/tmp/keel-independent-gif-guided-review-20261020/guided-review-admission.json",
+    "bytes": 1017,
+    "sha256": "980cad9d2e563378f8bae55e3d17bfeb83e17568118e816a5196744d330df9e4"
+  },
+  "runConfig": {
+    "path": "/tmp/keel-private-gif-guided-review-20261020-01/run-config.json",
+    "bytes": 417,
+    "sha256": "a11d99cba2b4e2b90d40f91c1a1728f47af28011664b0625026521b8f11b9d14"
+  },
+  "exactCommand": {
+    "path": "/private/tmp/keel-independent-gif-guided-review-20261020/command-admission.json",
+    "bytes": 5318,
+    "sha256": "09368cd84baf23516f848a4b14ef44447302cae060a7599176dc4f5d990e5729"
+  },
+  "scope": {
+    "creatorId": "ac001c30-ad5e-465a-b784-854be440f0be",
+    "projectId": "fcf16528-aa7e-43c0-a7f0-8a4542ed96e6",
+    "projectRevision": 1,
+    "releaseId": "0c6c734d-20c0-4d3a-959a-fb7ac8143af2",
+    "releaseRevision": {
+      "before": 13,
+      "after": 14
+    },
+    "database": "owned clone Unix55459 only",
+    "normalService": "changeReleasePlanning review",
+    "methodCallsMaximum": 1,
+    "noDirectReviewFlagWrite": true,
+    "noPrivateCredentialReadOrCreate": true,
+    "allOriginalAssetsPreserved": {
+      "files": 156,
+      "bytes": 79402974
+    }
+  },
+  "evidence": {
+    "actualSourceClosure": "source-integrity.json",
+    "independentByteIdenticalOfflineRebuild": "rebuild.json",
+    "offlineUnitControls": {
+      "pass": 27,
+      "fail": 0
+    },
+    "realOwnedChildBounds": {
+      "pass": 3,
+      "fail": 0
+    },
+    "independentActualBundleImport": {
+      "status": "PASS",
+      "applicationExportsCalled": 0,
+      "networkAndChildAttempts": []
+    },
+    "assetReadOnlyVerification": {
+      "files": 156,
+      "bytes": 79402974,
+      "allFileBytesMatch": true
+    }
+  },
+  "reviewedControls": [
+    "Uninstrumented real normal service/192 source closure; exact built SDK1754 and14 external package bindings;45site-domain sources verified.",
+    "All100 table snapshots and actual planning view read under actual repeatable-read read-only transaction/credential policy.",
+    "Exact review command binds configuration key, command id, original answers and original project; only normal revision-checked writer exposed.",
+    "Only exact13-to14 target revision/timestamp/reviewedConfiguration/lastCommand permitted; other99 tables, other release rows, assets and zero candidates preserved.",
+    "Exact Unixsocket-only guard rejects HTTP/DNS/TCP/TLS/UDP/children; stripped environment, no public stage signer or compiler driver.",
+    "Exclusive file+directory-fsynced consumed marker before one writer;45second owned launcher,64KiBstreams,5second SQL/1secondlock bounds.",
+    "Failure or uncertain outcome requires readonly reconciliation; no retry, deletion, renaming, restore, compiler capture or publication authorization."
+  ],
+  "sourceReferences": [
+    "docs/tools/gif-guided-review-only/review-entry.ts:8",
+    "docs/tools/gif-guided-review-only/review-entry.ts:19",
+    "docs/tools/gif-guided-review-only/run-review.mjs:32",
+    "docs/tools/gif-guided-review-only/run-review.mjs:34",
+    "docs/tools/gif-guided-review-only/transition.mjs:28",
+    "apps/studio/src/server/services/release-planning-service.ts:93",
+    "apps/studio/src/server/services/release-service.ts:1797"
+  ],
+  "executedByReviewer": {
+    "onlyOfflineControlsImportRebuildAndAssetReads": true,
+    "applicationExportCalls": 0,
+    "databaseRequests": 0,
+    "RPC": 0,
+    "normalWriterCalls": 0
+  },
+  "files": {
+    "command-admission.json": {
+      "bytes": 5318,
+      "sha256": "09368cd84baf23516f848a4b14ef44447302cae060a7599176dc4f5d990e5729"
+    },
+    "discovery-fixture-review.json": {
+      "bytes": 845,
+      "sha256": "e9380f53ce9e177c68359f3dcea8aab0e04bc588d56b0c291b9d99cd912536bc"
+    },
+    "guided-review-admission.json": {
+      "bytes": 1017,
+      "sha256": "980cad9d2e563378f8bae55e3d17bfeb83e17568118e816a5196744d330df9e4"
+    },
+    "import.stderr": {
+      "bytes": 198,
+      "sha256": "33939da4e65e7e041bc8c9e28a31e720ded56dcd9e9c1f4c25aa3332154a7098"
+    },
+    "import.stdout": {
+      "bytes": 215,
+      "sha256": "6a26796938a02ee5a4148886d740d49183f84f87c30a93832d3927333c006abf"
+    },
+    "independent-import.json": {
+      "bytes": 321,
+      "sha256": "433176aea667dfaa0404a393704f437777231be3c2985f573a5373d0cfd5a2d5"
+    },
+    "launcher.stderr": {
+      "bytes": 101,
+      "sha256": "252d7231af920fa962cc126cebf263ce4a3097f6917c6bb29efd6bd9f9a768b4"
+    },
+    "launcher.stdout": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "offline.stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "offline.stdout": {
+      "bytes": 4274,
+      "sha256": "9be4d9e2a58264dfd300099163bccd4808210ecd41e2da4300b9936473c92ad1"
+    },
+    "prepare-admission.py": {
+      "bytes": 3186,
+      "sha256": "54a61bae51da3c58b539c6bfd3b24ace1b867e3c014c1bf5870df8c73228fe7f"
+    },
+    "rebuild.json": {
+      "bytes": 874,
+      "sha256": "63d18b105dab2a5a6bd92f8c1dac9a8815494edb2b5d299be00e8397d9923d02"
+    },
+    "run-config.json": {
+      "bytes": 417,
+      "sha256": "a11d99cba2b4e2b90d40f91c1a1728f47af28011664b0625026521b8f11b9d14"
+    },
+    "source-integrity.json": {
+      "bytes": 561,
+      "sha256": "14e2718c1abf55b2fabe2d1e479bc24faae99cdbcad427359ae1b42bdf10b054"
+    },
+    "verify-closure.mjs": {
+      "bytes": 3418,
+      "sha256": "00bbe181e7582b6008fae2c8576852357778b47de02539a68a619fe2e14ee578"
+    }
+  }
+}

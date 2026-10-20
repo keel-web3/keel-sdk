@@ -1,0 +1,19 @@
+{
+  "independentOfflineRebuildExactBundle": true,
+  "bundleSHA256": "6eb56fbbcf84c4bfef941a6b1c630b4ff076e2f6ec5be6f47e412cf2ca750bbc",
+  "sourceInputsSHA256": "21f9457b2293deb1aaa75ab339f29c0b8d14cee00254e9b8208267f0e7408f55",
+  "toolFilesSHA256": "f1ff42267dc5c43e7cefa5ec9ea94890da43cd424286e1726718fed6253c89b6",
+  "smoke": {
+    "path": "/tmp/keel-private-gif-guided-independent-bundle-20261020-01/bundle-import-smoke.json",
+    "sha256": "433176aea667dfaa0404a393704f437777231be3c2985f573a5373d0cfd5a2d5",
+    "schema": "keel-capacity-bundle-import@1",
+    "status": "PASS",
+    "bundleSHA256": "6eb56fbbcf84c4bfef941a6b1c630b4ff076e2f6ec5be6f47e412cf2ca750bbc",
+    "actualNodeModuleImported": true,
+    "compilerFunctionInvoked": false,
+    "applicationWriteCalled": false,
+    "driverImported": false,
+    "networkAndChildAttempts": []
+  },
+  "appExportCalls": 0
+}
