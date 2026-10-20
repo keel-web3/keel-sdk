@@ -1,0 +1,81 @@
+{
+  "schema": "independent-amsterdam-gas-auditor-correction-review@1",
+  "decision": "APPROVE_NARROW_SEMANTICS_CORRECTION",
+  "gethCommit": "a579077007b98217c3e253a66e4b452ca0c32b96",
+  "sourceFiles": [
+    {
+      "path": "internal/ethapi/simulate.go",
+      "sha256": "e2780bad2f9c24f00c7fb8763150ad8ee9eb78440e3a04df19bbaf3571cdd7a7",
+      "relevantLines": [
+        377,
+        398
+      ]
+    },
+    {
+      "path": "core/gaspool.go",
+      "sha256": "fb8d293cb4e3039597c3527caf1d0b724b4596997261394566ac1faebff086af",
+      "relevantLines": [
+        105,
+        116,
+        140,
+        164
+      ]
+    },
+    {
+      "path": "core/state_transition.go",
+      "sha256": "88e50cb7988f0989c71df1ca74b46d003175f11f60057ba501b48cf0deacab5f",
+      "relevantLines": [
+        1042,
+        1062,
+        1070,
+        1086
+      ]
+    },
+    {
+      "path": "core/txpool/validation.go",
+      "sha256": "cd06fc841fa66a38dbe942678a052c162e87675a422fefec89b4a01cb41d9398",
+      "relevantLines": [
+        93,
+        96,
+        104
+      ]
+    },
+    {
+      "path": "params/protocol_params.go",
+      "sha256": "94657cdf80d2f0b136ff6d89003326f496d3b1ba1abcb1a855b7b98c941e9e28",
+      "relevantLines": [
+        31,
+        32
+      ]
+    }
+  ],
+  "sourceSemantics": [
+    "simulate emits each call gasUsed=result.UsedGas and sets block.header.GasUsed=gp.Used().",
+    "State transition settles receipt UsedGas after refund/calldata floor, separately computes txExecutionGas and txStateGas, then passes all three to ChargeGasAmsterdam.",
+    "ChargeGasAmsterdam separately accumulates execution, state and receipt cumulative gas; Used() returns max(cumulativeExecution,cumulativeState), not cumulative receipt gas."
+  ],
+  "actualObserved": {
+    "perCallGasUsed": [
+      7449976,
+      50745569,
+      26360009
+    ],
+    "sumPerCallGasUsed": 84555554,
+    "blockGasUsed": 83397240,
+    "difference": 1158314,
+    "blockGasLimit": 200000000,
+    "gasCeilings": [
+      9012324,
+      61379375,
+      31884460
+    ]
+  },
+  "approvedAuditChange": "Remove only the invalid legacy additive equality between sum per-call receipt gasUsed and block dimension gasUsed. Assert each actual call gasUsed within its unchanged exact ceiling, report their exact sum independently, and assert reported block gasUsed is nonnegative and within actual block gasLimit. Preserve initial RED and retain all other provenance/runtime/input/fee checks.",
+  "dimensionAttribution": "Actual execution-dimension and state-dimension totals are not emitted in this receipt. Do not label the1158314 difference as measured execution/state gas or infer dimensions from it.",
+  "signingGasCompatibility": "Pinned Amsterdam txpool validation uses MaxTxTotalGas4294967295 and block gas allowance; the pre-Amsterdam16,777,216 total cap is not used at Amsterdam. Existing execution-dimension cap remains unchanged. Preserve exact proposed gas ceilings; no cap/raise justified.",
+  "productionChangeRequired": false,
+  "inputOrFeesChanged": false,
+  "blockingSigningEquivalenceFinding": null,
+  "originalGIFQualified": false,
+  "activationApproved": false
+}
