@@ -1,0 +1,38 @@
+{
+  "files": [
+    {
+      "basename": "qa-final.json",
+      "localPath": "/private/tmp/keel-activation95-successor-final-20261020/qa-final.json",
+      "bytes": 34562,
+      "sha256": "1174040c38cd96cdbcb66fafd3aeb7cacdb10803bf9f1837c4b81ab1754755b9"
+    },
+    {
+      "basename": "release-review-final.json",
+      "localPath": "/private/tmp/keel-activation95-successor-final-20261020/release-review-final.json",
+      "bytes": 8820,
+      "sha256": "6a89ce0d62b38b40897b9598c581474254b5b5def196bf8a684a600e515ab83a"
+    },
+    {
+      "basename": "actual-state-source-proof.json",
+      "localPath": "/private/tmp/keel-activation95-successor-final-20261020/actual-state-source-proof.json",
+      "bytes": 93969,
+      "sha256": "0dbd3104146b0e54e7db2276e4ed73489c5fec28765ff34a8d9b973d2fa007b8"
+    },
+    {
+      "basename": "single-source-terminal-denial.json",
+      "localPath": "/private/tmp/keel-activation95-successor-final-20261020/single-source-terminal-denial.json",
+      "bytes": 4739,
+      "sha256": "0dbe1ebfd57078185b775f743ce220a47148817a24118c747745d6e7330265e9"
+    },
+    {
+      "basename": "activation-plan.final.json",
+      "localPath": "/private/tmp/keel-activation95-successor-final-20261020/activation-plan.final.json",
+      "bytes": 5135,
+      "sha256": "1729c3f7c453211801ffc64e8674ba3afe5a31ea639f8ba82f7b0a3aef2db788"
+    }
+  ],
+  "commandSHA256": "af233f2695627adad290dc14c8d6f82c39628a1c7eaae6a24c89fef191132ddb",
+  "basePendingSHA256": "fbbbff3b61eeb0cebb47795a3a8c496b55168ffa6b55ebc31ef1a9fae81a4745",
+  "baseSource": "176c93d16bf62ca2500f3d71915d7b6129458638",
+  "operatorSHA256": "a1594559c2c04159ac94827d0f4f2a991310fb06648379bca6081d5ce6a98de1"
+}

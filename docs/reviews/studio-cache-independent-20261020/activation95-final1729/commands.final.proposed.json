@@ -1,0 +1,165 @@
+{
+  "schema": "keel.exact95-final-activation-command@1",
+  "status": "PENDING_INDEPENDENT_EXACT_HASH_REVIEW",
+  "root": "/home/ubuntu/keel-studio-activation-2779804f-f8fe-4fcd-8153-f45ad70b03b6",
+  "files": [
+    {
+      "basename": "qa-final.json",
+      "localPath": "/private/tmp/keel-activation95-successor-final-20261020/qa-final.json",
+      "bytes": 34562,
+      "sha256": "1174040c38cd96cdbcb66fafd3aeb7cacdb10803bf9f1837c4b81ab1754755b9",
+      "exclusiveReceiverArgv": [
+        "/usr/bin/ssh",
+        "-o",
+        "BatchMode=yes",
+        "-o",
+        "ConnectTimeout=12",
+        "-o",
+        "StrictHostKeyChecking=yes",
+        "-o",
+        "UserKnownHostsFile=/Users/ravonus/dev/hashers/ops/servers/known_hosts",
+        "ubuntu@40.160.39.155",
+        "sudo -n /usr/bin/python3 -B -c 'import os,sys,stat,hashlib,json\nfrom pathlib import Path\nroot=Path('\"'\"'/home/ubuntu/keel-studio-activation-2779804f-f8fe-4fcd-8153-f45ad70b03b6'\"'\"');s=root.lstat();assert root.resolve()==root and stat.S_ISDIR(s.st_mode)and s.st_uid==0 and stat.S_IMODE(s.st_mode)==0o700\nraw=sys.stdin.buffer.read(34563);assert len(raw)==34562 and hashlib.sha256(raw).hexdigest()=='\"'\"'1174040c38cd96cdbcb66fafd3aeb7cacdb10803bf9f1837c4b81ab1754755b9'\"'\"'\nd=os.open(root,os.O_RDONLY|os.O_DIRECTORY|os.O_NOFOLLOW)\ntry:\n with os.fdopen(os.open('\"'\"'qa-final.json'\"'\"',os.O_WRONLY|os.O_CREAT|os.O_EXCL|os.O_NOFOLLOW,0o444,dir_fd=d),'\"'\"'wb'\"'\"')as f:f.write(raw);f.flush();os.fsync(f.fileno())\n os.fsync(d)\nfinally:os.close(d)\nprint(json.dumps({'\"'\"'result'\"'\"':'\"'\"'EXCLUSIVE_FINAL_PUBLIC_FILE_INSTALLED'\"'\"','\"'\"'basename'\"'\"':'\"'\"'qa-final.json'\"'\"','\"'\"'sha256'\"'\"':'\"'\"'1174040c38cd96cdbcb66fafd3aeb7cacdb10803bf9f1837c4b81ab1754755b9'\"'\"','\"'\"'bytes'\"'\"':len(raw)}))\n'"
+      ]
+    },
+    {
+      "basename": "release-review-final.json",
+      "localPath": "/private/tmp/keel-activation95-successor-final-20261020/release-review-final.json",
+      "bytes": 8820,
+      "sha256": "6a89ce0d62b38b40897b9598c581474254b5b5def196bf8a684a600e515ab83a",
+      "exclusiveReceiverArgv": [
+        "/usr/bin/ssh",
+        "-o",
+        "BatchMode=yes",
+        "-o",
+        "ConnectTimeout=12",
+        "-o",
+        "StrictHostKeyChecking=yes",
+        "-o",
+        "UserKnownHostsFile=/Users/ravonus/dev/hashers/ops/servers/known_hosts",
+        "ubuntu@40.160.39.155",
+        "sudo -n /usr/bin/python3 -B -c 'import os,sys,stat,hashlib,json\nfrom pathlib import Path\nroot=Path('\"'\"'/home/ubuntu/keel-studio-activation-2779804f-f8fe-4fcd-8153-f45ad70b03b6'\"'\"');s=root.lstat();assert root.resolve()==root and stat.S_ISDIR(s.st_mode)and s.st_uid==0 and stat.S_IMODE(s.st_mode)==0o700\nraw=sys.stdin.buffer.read(8821);assert len(raw)==8820 and hashlib.sha256(raw).hexdigest()=='\"'\"'6a89ce0d62b38b40897b9598c581474254b5b5def196bf8a684a600e515ab83a'\"'\"'\nd=os.open(root,os.O_RDONLY|os.O_DIRECTORY|os.O_NOFOLLOW)\ntry:\n with os.fdopen(os.open('\"'\"'release-review-final.json'\"'\"',os.O_WRONLY|os.O_CREAT|os.O_EXCL|os.O_NOFOLLOW,0o444,dir_fd=d),'\"'\"'wb'\"'\"')as f:f.write(raw);f.flush();os.fsync(f.fileno())\n os.fsync(d)\nfinally:os.close(d)\nprint(json.dumps({'\"'\"'result'\"'\"':'\"'\"'EXCLUSIVE_FINAL_PUBLIC_FILE_INSTALLED'\"'\"','\"'\"'basename'\"'\"':'\"'\"'release-review-final.json'\"'\"','\"'\"'sha256'\"'\"':'\"'\"'6a89ce0d62b38b40897b9598c581474254b5b5def196bf8a684a600e515ab83a'\"'\"','\"'\"'bytes'\"'\"':len(raw)}))\n'"
+      ]
+    },
+    {
+      "basename": "actual-state-source-proof.json",
+      "localPath": "/private/tmp/keel-activation95-successor-final-20261020/actual-state-source-proof.json",
+      "bytes": 93969,
+      "sha256": "0dbd3104146b0e54e7db2276e4ed73489c5fec28765ff34a8d9b973d2fa007b8",
+      "exclusiveReceiverArgv": [
+        "/usr/bin/ssh",
+        "-o",
+        "BatchMode=yes",
+        "-o",
+        "ConnectTimeout=12",
+        "-o",
+        "StrictHostKeyChecking=yes",
+        "-o",
+        "UserKnownHostsFile=/Users/ravonus/dev/hashers/ops/servers/known_hosts",
+        "ubuntu@40.160.39.155",
+        "sudo -n /usr/bin/python3 -B -c 'import os,sys,stat,hashlib,json\nfrom pathlib import Path\nroot=Path('\"'\"'/home/ubuntu/keel-studio-activation-2779804f-f8fe-4fcd-8153-f45ad70b03b6'\"'\"');s=root.lstat();assert root.resolve()==root and stat.S_ISDIR(s.st_mode)and s.st_uid==0 and stat.S_IMODE(s.st_mode)==0o700\nraw=sys.stdin.buffer.read(93970);assert len(raw)==93969 and hashlib.sha256(raw).hexdigest()=='\"'\"'0dbd3104146b0e54e7db2276e4ed73489c5fec28765ff34a8d9b973d2fa007b8'\"'\"'\nd=os.open(root,os.O_RDONLY|os.O_DIRECTORY|os.O_NOFOLLOW)\ntry:\n with os.fdopen(os.open('\"'\"'actual-state-source-proof.json'\"'\"',os.O_WRONLY|os.O_CREAT|os.O_EXCL|os.O_NOFOLLOW,0o444,dir_fd=d),'\"'\"'wb'\"'\"')as f:f.write(raw);f.flush();os.fsync(f.fileno())\n os.fsync(d)\nfinally:os.close(d)\nprint(json.dumps({'\"'\"'result'\"'\"':'\"'\"'EXCLUSIVE_FINAL_PUBLIC_FILE_INSTALLED'\"'\"','\"'\"'basename'\"'\"':'\"'\"'actual-state-source-proof.json'\"'\"','\"'\"'sha256'\"'\"':'\"'\"'0dbd3104146b0e54e7db2276e4ed73489c5fec28765ff34a8d9b973d2fa007b8'\"'\"','\"'\"'bytes'\"'\"':len(raw)}))\n'"
+      ]
+    },
+    {
+      "basename": "single-source-terminal-denial.json",
+      "localPath": "/private/tmp/keel-activation95-successor-final-20261020/single-source-terminal-denial.json",
+      "bytes": 4739,
+      "sha256": "0dbe1ebfd57078185b775f743ce220a47148817a24118c747745d6e7330265e9",
+      "exclusiveReceiverArgv": [
+        "/usr/bin/ssh",
+        "-o",
+        "BatchMode=yes",
+        "-o",
+        "ConnectTimeout=12",
+        "-o",
+        "StrictHostKeyChecking=yes",
+        "-o",
+        "UserKnownHostsFile=/Users/ravonus/dev/hashers/ops/servers/known_hosts",
+        "ubuntu@40.160.39.155",
+        "sudo -n /usr/bin/python3 -B -c 'import os,sys,stat,hashlib,json\nfrom pathlib import Path\nroot=Path('\"'\"'/home/ubuntu/keel-studio-activation-2779804f-f8fe-4fcd-8153-f45ad70b03b6'\"'\"');s=root.lstat();assert root.resolve()==root and stat.S_ISDIR(s.st_mode)and s.st_uid==0 and stat.S_IMODE(s.st_mode)==0o700\nraw=sys.stdin.buffer.read(4740);assert len(raw)==4739 and hashlib.sha256(raw).hexdigest()=='\"'\"'0dbe1ebfd57078185b775f743ce220a47148817a24118c747745d6e7330265e9'\"'\"'\nd=os.open(root,os.O_RDONLY|os.O_DIRECTORY|os.O_NOFOLLOW)\ntry:\n with os.fdopen(os.open('\"'\"'single-source-terminal-denial.json'\"'\"',os.O_WRONLY|os.O_CREAT|os.O_EXCL|os.O_NOFOLLOW,0o444,dir_fd=d),'\"'\"'wb'\"'\"')as f:f.write(raw);f.flush();os.fsync(f.fileno())\n os.fsync(d)\nfinally:os.close(d)\nprint(json.dumps({'\"'\"'result'\"'\"':'\"'\"'EXCLUSIVE_FINAL_PUBLIC_FILE_INSTALLED'\"'\"','\"'\"'basename'\"'\"':'\"'\"'single-source-terminal-denial.json'\"'\"','\"'\"'sha256'\"'\"':'\"'\"'0dbe1ebfd57078185b775f743ce220a47148817a24118c747745d6e7330265e9'\"'\"','\"'\"'bytes'\"'\"':len(raw)}))\n'"
+      ]
+    },
+    {
+      "basename": "activation-plan.final.json",
+      "localPath": "/private/tmp/keel-activation95-successor-final-20261020/activation-plan.final.json",
+      "bytes": 5135,
+      "sha256": "1729c3f7c453211801ffc64e8674ba3afe5a31ea639f8ba82f7b0a3aef2db788",
+      "exclusiveReceiverArgv": [
+        "/usr/bin/ssh",
+        "-o",
+        "BatchMode=yes",
+        "-o",
+        "ConnectTimeout=12",
+        "-o",
+        "StrictHostKeyChecking=yes",
+        "-o",
+        "UserKnownHostsFile=/Users/ravonus/dev/hashers/ops/servers/known_hosts",
+        "ubuntu@40.160.39.155",
+        "sudo -n /usr/bin/python3 -B -c 'import os,sys,stat,hashlib,json\nfrom pathlib import Path\nroot=Path('\"'\"'/home/ubuntu/keel-studio-activation-2779804f-f8fe-4fcd-8153-f45ad70b03b6'\"'\"');s=root.lstat();assert root.resolve()==root and stat.S_ISDIR(s.st_mode)and s.st_uid==0 and stat.S_IMODE(s.st_mode)==0o700\nraw=sys.stdin.buffer.read(5136);assert len(raw)==5135 and hashlib.sha256(raw).hexdigest()=='\"'\"'1729c3f7c453211801ffc64e8674ba3afe5a31ea639f8ba82f7b0a3aef2db788'\"'\"'\nd=os.open(root,os.O_RDONLY|os.O_DIRECTORY|os.O_NOFOLLOW)\ntry:\n with os.fdopen(os.open('\"'\"'activation-plan.final.json'\"'\"',os.O_WRONLY|os.O_CREAT|os.O_EXCL|os.O_NOFOLLOW,0o444,dir_fd=d),'\"'\"'wb'\"'\"')as f:f.write(raw);f.flush();os.fsync(f.fileno())\n os.fsync(d)\nfinally:os.close(d)\nprint(json.dumps({'\"'\"'result'\"'\"':'\"'\"'EXCLUSIVE_FINAL_PUBLIC_FILE_INSTALLED'\"'\"','\"'\"'basename'\"'\"':'\"'\"'activation-plan.final.json'\"'\"','\"'\"'sha256'\"'\"':'\"'\"'1729c3f7c453211801ffc64e8674ba3afe5a31ea639f8ba82f7b0a3aef2db788'\"'\"','\"'\"'bytes'\"'\"':len(raw)}))\n'"
+      ]
+    }
+  ],
+  "readonlyPreflightArgv": [
+    "/usr/bin/ssh",
+    "-o",
+    "BatchMode=yes",
+    "-o",
+    "ConnectTimeout=12",
+    "-o",
+    "StrictHostKeyChecking=yes",
+    "-o",
+    "UserKnownHostsFile=/Users/ravonus/dev/hashers/ops/servers/known_hosts",
+    "ubuntu@40.160.39.155",
+    "sudo -n /usr/bin/python3 -B /home/ubuntu/keel-studio-activation-2779804f-f8fe-4fcd-8153-f45ad70b03b6/activate-receipt-bound-studio.py /home/ubuntu/keel-studio-activation-2779804f-f8fe-4fcd-8153-f45ad70b03b6/activation-plan.final.json"
+  ],
+  "executeArgv": [
+    "/usr/bin/ssh",
+    "-o",
+    "BatchMode=yes",
+    "-o",
+    "ConnectTimeout=12",
+    "-o",
+    "StrictHostKeyChecking=yes",
+    "-o",
+    "UserKnownHostsFile=/Users/ravonus/dev/hashers/ops/servers/known_hosts",
+    "ubuntu@40.160.39.155",
+    "sudo -n /usr/bin/python3 -B /home/ubuntu/keel-studio-activation-2779804f-f8fe-4fcd-8153-f45ad70b03b6/activate-receipt-bound-studio.py /home/ubuntu/keel-studio-activation-2779804f-f8fe-4fcd-8153-f45ad70b03b6/activation-plan.final.json --execute-approved-sha256 1729c3f7c453211801ffc64e8674ba3afe5a31ea639f8ba82f7b0a3aef2db788"
+  ],
+  "finalPlanSHA256": "1729c3f7c453211801ffc64e8674ba3afe5a31ea639f8ba82f7b0a3aef2db788",
+  "staticReadinessActual": {
+    "schema": "keel.activation95-static-readiness@1",
+    "result": "PASS_STATIC_ONLY_FULL_APPROVED_PREFLIGHT_NOT_RUN",
+    "approvalFlagsRemainFalse": true,
+    "actualImageIds": {
+      "appImageId": "sha256:95bdda05a7596553251e9d4ba9fe72758abc5137fcb661efed80ca94ab5e6bcb",
+      "runnerImageId": "sha256:d97ddf2aba94cb963646fdf05bc8dc8c99b7e69b8c19bad85c06bea7c67fc9f5"
+    },
+    "original": {
+      "id": "b6ff8c7a6f5c2282e29883de917f2d376a8e92efffecc45d115338e0516a5201",
+      "image": "sha256:a53c65ac2aee00217f206f07f4ddecbf9d55b5a43f60bf87858d9756259ba730",
+      "healthy": true,
+      "running": true,
+      "workerPaused": true,
+      "ConfigSHA256": "9543c71f9f506e5243c9a74a3d70007ab6919c9f4eb76c0fec8ad7cdb40a77eb",
+      "HostConfigSHA256": "9ebb974a9d71321d58a0bb74a528d089a6a4337a54328460a9768ff260e56467",
+      "MountsSHA256": "8227ad2f93c93f7a55ba2006d6b73695ae8b04f636a637bc54b08dc65298996f"
+    },
+    "currentCapacity": {
+      "availableBytes": 1796681728,
+      "requiredBytes": 1342177280,
+      "ready": true,
+      "rawTarFileCreated": false,
+      "allNewImageBytesBudgeted": true,
+      "daemonImportScratchBudgeted": false
+    },
+    "memAvailableBytes": 6127837184,
+    "databaseAccess": false,
+    "snapshotCreated": false,
+    "productionMutation": false,
+    "plannedNamesAndSocketUnused": true,
+    "actual95ImportAdapterVerified": true
+  },
+  "healthWindow": "/private/tmp/keel-activation95-successor-health-window-20261020",
+  "noSigning": true,
+  "noRetryAfterUncertainExecution": true
+}

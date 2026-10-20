@@ -1,0 +1,11 @@
+{
+  "argv": [
+    "python3",
+    "/private/tmp/keel-activation95-successor-final-execute-20261020.py",
+    "/private/tmp/keel-independent-activation95-final1729-20261020/review.json",
+    "4bfd78057769ab09020e0b9463bab4b159a42f151a057916d7231e36f70dd941"
+  ],
+  "reviewSHA256": "4bfd78057769ab09020e0b9463bab4b159a42f151a057916d7231e36f70dd941",
+  "wrapperSHA256": "e8c19c00a0e178b9dba8b4396b767e2676d435ceab700a9f043155bb92e8a2b2",
+  "noRetry": true
+}

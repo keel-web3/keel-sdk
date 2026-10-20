@@ -1,0 +1,16 @@
+{
+  "operationalFieldsExactlyMatchFbbbPending": true,
+  "fourEvidenceDigestsAndFiveReceiversVerified": true,
+  "newReview6a89Exact": true,
+  "sameActual0dbdAndDenial0dbeExact": true,
+  "newQA117404And75SourceReceipt1260Verified": true,
+  "QAAccuratelyRetainsPreviousFailedActivationOverall": true,
+  "actualNewStaticReadinessPASS": true,
+  "operatorA159PureValidateFinalPlanPASS": true,
+  "wrapperReverseOnlyPathsCommandHashExactPriorReviewed": true,
+  "wrapperSHA256": "e8c19c00a0e178b9dba8b4396b767e2676d435ceab700a9f043155bb92e8a2b2",
+  "planSHA256": "1729c3f7c453211801ffc64e8674ba3afe5a31ea639f8ba82f7b0a3aef2db788",
+  "commandsSHA256": "af233f2695627adad290dc14c8d6f82c39628a1c7eaae6a24c89fef191132ddb",
+  "prior4c17ConsumedNeverReplay": true,
+  "initialAdHocCheckerMetadataCorrection": "Initial checker expected pre-failure QA overall label; actual QA correctly records failed prior activation while retaining explicit75PASS technical preactivation scope. Updated exact metadata expectation only; no source/test/reference change."
+}
