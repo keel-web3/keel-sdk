@@ -1,0 +1,28 @@
+{
+  "schema": "keel-independent-import-result-review@1",
+  "checkedAt": "2026-10-20T08:16:14.505339+00:00",
+  "operatorExecuted": true,
+  "reviewerExecuted": false,
+  "scope": "Review existing rawstdout and durable-equality readback receipts; no new host action.",
+  "planSHA256": "8c8531bf8f595ff4395481da1c7c71d9000c902f4c448d6311d363c501ea68b6",
+  "steps": [
+    {
+      "phase": "cleanup",
+      "durableReceiptSHA256": "efae21b353dcdda31d5c6f26c3fbf56974267d3d7b28c5ef6bb3a43ae6479cac",
+      "localReadbackFileSHA256": "fcd27f65c9a22b9fa05153b079aba844ee62fb7c8c604029858bb0f667a47a04",
+      "originalBeforeEqualsAfter": true
+    },
+    {
+      "phase": "app",
+      "durableReceiptSHA256": "bd73889acd74c7eb57abed5927cb2cab94f08aee55ea0127d671b9864db389f2",
+      "localReadbackFileSHA256": "315d7dd78ab8c0c7d8a70ad0a9dae725d7eedfc44ea4bc9322675357d556d394",
+      "originalBeforeEqualsAfter": true
+    }
+  ],
+  "newNativeProgram": false,
+  "productionActivation": false,
+  "signing": false,
+  "submission": false,
+  "decision": "ACCEPT_SCOPED_CLEANUP_IMPORT_RESULTS",
+  "liveReleaseApproval": false
+}

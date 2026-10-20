@@ -1,0 +1,82 @@
+TAP version 13
+# Subtest: snapshot-stale
+ok 1 - snapshot-stale
+  ---
+  duration_ms: 0.683375
+  type: 'test'
+  ...
+# Subtest: snapshot-mismatch
+ok 2 - snapshot-mismatch
+  ---
+  duration_ms: 0.040417
+  type: 'test'
+  ...
+# Subtest: chain-reorganized
+ok 3 - chain-reorganized
+  ---
+  duration_ms: 0.032125
+  type: 'test'
+  ...
+# Subtest: local-deadline
+ok 4 - local-deadline
+  ---
+  duration_ms: 0.028959
+  type: 'test'
+  ...
+# Subtest: native-incomplete
+ok 5 - native-incomplete
+  ---
+  duration_ms: 0.074166
+  type: 'test'
+  ...
+# Subtest: native-rejected
+ok 6 - native-rejected
+  ---
+  duration_ms: 0.026625
+  type: 'test'
+  ...
+# Subtest: incomplete-witness
+ok 7 - incomplete-witness
+  ---
+  duration_ms: 0.087291
+  type: 'test'
+  ...
+# Subtest: native-start
+ok 8 - native-start
+  ---
+  duration_ms: 0.030125
+  type: 'test'
+  ...
+# Subtest: native-input
+ok 9 - native-input
+  ---
+  duration_ms: 0.226416
+  type: 'test'
+  ...
+# Subtest: native-provenance
+ok 10 - native-provenance
+  ---
+  duration_ms: 0.211625
+  type: 'test'
+  ...
+# Subtest: native-state-root
+ok 11 - native-state-root
+  ---
+  duration_ms: 0.072917
+  type: 'test'
+  ...
+# Subtest: unknown, private text and near matches never pass through
+ok 12 - unknown, private text and near matches never pass through
+  ---
+  duration_ms: 0.050292
+  type: 'test'
+  ...
+1..12
+# tests 12
+# suites 0
+# pass 12
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 34.82625
