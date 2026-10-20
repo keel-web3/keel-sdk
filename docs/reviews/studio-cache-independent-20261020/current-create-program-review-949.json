@@ -1,0 +1,23 @@
+{
+  "schema": "keel-current-native-prerequisites-review@1",
+  "decision": "APPROVE",
+  "scope": "one-exact-public-native-program-no-signing",
+  "reviewerId": "cache-release-independent-reviewer",
+  "hostPlanSha256": "9c6a2edbdfd5f25cbcd371a154760506cc0e11bec5c976546e9ac5cc39ee819c",
+  "planSha256": "6c88643d56e4e181231480b8b4090bbe53e205849987407c06266b24e667e79f",
+  "requestSHA256": "b7c95872efa3e65f94888219a8bf89572e71c3ebd1515004ba022904e23c16d4",
+  "blockingFindings": [],
+  "canonicalBlock": {
+    "number": "0xb66f65",
+    "hash": "0xc991ca990f1b2b8eb6bc8483eb199137c5ff16318524d71f03b8c128dafaffe6",
+    "timestamp": "0x6ad782e0"
+  },
+  "nativeImageId": "sha256:48144d982e4edaf62198f3ca583dd5ded6c7f1228c6cc39322fd5a90341cba43",
+  "executorSHA256": "3f9c2e9f2a9fb4267695bfc8493379001f81d1f7cca8b75eaa19133b0f20fcc8",
+  "auditSHA256": "a27234a6ab4f43ef7d22c2e947e2322ebb9d25cd89ee4dc9368690a3877eedc2",
+  "limits": "One exact local native characterization through current b524 SDK, unchanged180s snapshot policy, fixed approved EthPanda proof-state reads only. No public eth_simulateV1, retries, signing, submission, private program, activation, or claim reset.",
+  "publicationReady": false,
+  "originalGIFQualified": false,
+  "expectedRuntimeCount": 6,
+  "claimPreservationRequired": true
+}
