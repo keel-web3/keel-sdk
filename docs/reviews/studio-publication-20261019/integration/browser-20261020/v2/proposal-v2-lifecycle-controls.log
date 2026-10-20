@@ -1,0 +1,58 @@
+TAP version 13
+# Subtest: CDP commands time out, ignore their late replies and cannot resolve a different command
+ok 1 - CDP commands time out, ignore their late replies and cannot resolve a different command
+  ---
+  duration_ms: 48.490542
+  type: 'test'
+  ...
+# Subtest: socket disconnect rejects every pending command and all subsequent commands
+ok 2 - socket disconnect rejects every pending command and all subsequent commands
+  ---
+  duration_ms: 0.392792
+  type: 'test'
+  ...
+# Subtest: malformed CDP responses fail the session instead of escaping event handlers
+ok 3 - malformed CDP responses fail the session instead of escaping event handlers
+  ---
+  duration_ms: 0.541167
+  type: 'test'
+  ...
+# Subtest: a synchronous socket send failure rejects its pending command
+ok 4 - a synchronous socket send failure rejects its pending command
+  ---
+  duration_ms: 0.184959
+  type: 'test'
+  ...
+# Subtest: disposing a session rejects pending work, removes listeners and is idempotent
+ok 5 - disposing a session rejects pending work, removes listeners and is idempotent
+  ---
+  duration_ms: 0.145459
+  type: 'test'
+  ...
+# Subtest: a nonexistent browser rejects and removes its owned profile
+ok 6 - a nonexistent browser rejects and removes its owned profile
+  ---
+  duration_ms: 4.540667
+  type: 'test'
+  ...
+# Subtest: a browser exiting before DevTools rejects and removes its owned profile
+ok 7 - a browser exiting before DevTools rejects and removes its owned profile
+  ---
+  duration_ms: 6.524
+  type: 'test'
+  ...
+# Subtest: actual Chrome cleanup is idempotent, settles pending work and removes its owned profile
+ok 8 - actual Chrome cleanup is idempotent, settles pending work and removes its owned profile
+  ---
+  duration_ms: 281.898959
+  type: 'test'
+  ...
+1..8
+# tests 8
+# suites 0
+# pass 8
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 417.799917

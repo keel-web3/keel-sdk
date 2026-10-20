@@ -1,0 +1,88 @@
+TAP version 13
+# Subtest: Tone + keel-audio load inside the compact Inline shell CSP and a real click in the art frame starts sound
+ok 1 - Tone + keel-audio load inside the compact Inline shell CSP and a real click in the art frame starts sound
+  ---
+  duration_ms: 1594.906041
+  type: 'test'
+  ...
+# Subtest: under the reference viewer's worker-src 'none' CSP, keel-audio falls Tone back to its timer clock and the score still ticks
+ok 2 - under the reference viewer's worker-src 'none' CSP, keel-audio falls Tone back to its timer clock and the score still ticks
+  ---
+  duration_ms: 1041.640875
+  type: 'test'
+  ...
+# Subtest: the protected K shell mounts only verified art inside an opaque network-denied frame
+ok 3 - the protected K shell mounts only verified art inside an opaque network-denied frame
+  ---
+  duration_ms: 909.470708
+  type: 'test'
+  ...
+# Subtest: the marketplace-safe prepared animation URI installs token context before the K shell launches
+ok 4 - the marketplace-safe prepared animation URI installs token context before the K shell launches
+  ---
+  duration_ms: 309.045875
+  type: 'test'
+  ...
+# Subtest: the compact escaped animation URI is directly browser-readable without inner Base64 decoding
+ok 5 - the compact escaped animation URI is directly browser-readable without inner Base64 decoding
+  ---
+  duration_ms: 361.01625
+  type: 'test'
+  ...
+# Subtest: the unchanged canonical shell rejects changed artwork bytes and accepts the original again
+ok 6 - the unchanged canonical shell rejects changed artwork bytes and accepts the original again
+  ---
+  duration_ms: 752.812167
+  type: 'test'
+  ...
+# Subtest: canonical chrome displays logical token identity and supply without an audit claim
+ok 7 - canonical chrome displays logical token identity and supply without an audit claim
+  ---
+  duration_ms: 366.929291
+  type: 'test'
+  ...
+# Subtest: a 32-module graph whose modules name each other and import by specifier verifies and runs
+ok 8 - a 32-module graph whose modules name each other and import by specifier verifies and runs
+  ---
+  duration_ms: 322.669333
+  type: 'test'
+  ...
+# Subtest: names in the entry document still resolve, nested through the text resources they name
+ok 9 - names in the entry document still resolve, nested through the text resources they name
+  ---
+  duration_ms: 312.956458
+  type: 'test'
+  ...
+# Subtest: the canonical Inline shell runs verified data modules under a restrictive marketplace srcdoc CSP
+ok 10 - the canonical Inline shell runs verified data modules under a restrictive marketplace srcdoc CSP
+  ---
+  duration_ms: 4225.604
+  type: 'test'
+  ...
+# Subtest: the canonical asset module starts only after its verified child mount exists
+ok 11 - the canonical asset module starts only after its verified child mount exists
+  ---
+  duration_ms: 4216.822875
+  type: 'test'
+  ...
+# Subtest: the exact p5 and seeded-random modules run under the marketplace CSP
+ok 12 - the exact p5 and seeded-random modules run under the marketplace CSP
+  ---
+  duration_ms: 4269.84325
+  type: 'test'
+  ...
+# Subtest: the exact Three.js r180 module pair runs under the marketplace CSP
+ok 13 - the exact Three.js r180 module pair runs under the marketplace CSP
+  ---
+  duration_ms: 4283.491333
+  type: 'test'
+  ...
+1..13
+# tests 13
+# suites 0
+# pass 13
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 24781.530708

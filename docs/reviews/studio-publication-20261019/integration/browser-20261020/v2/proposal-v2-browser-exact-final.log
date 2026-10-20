@@ -1,0 +1,21 @@
+TAP version 13
+# Subtest: Tone + keel-audio load inside the compact Inline shell CSP and a real click in the art frame starts sound
+not ok 1 - Tone + keel-audio load inside the compact Inline shell CSP and a real click in the art frame starts sound
+  ---
+  duration_ms: 1545.735041
+  type: 'test'
+  location: '/private/tmp/keel-browser-integration-20261020/proposal-v2/tests/keel-audio-browser.test.mjs:229:1'
+  failureType: 'testCodeFailure'
+  error: "ENOTEMPTY: directory not empty, rmdir '/var/folders/zk/40xbztxx7tb90tl4nnryd2780000gn/T/keel-audio-chrome-wCh8Dl/Default/Cache/Cache_Data/index-dir'"
+  code: 'ENOTEMPTY'
+  ...
+# Subtest: under the reference viewer's worker-src 'none' CSP, keel-audio falls Tone back to its timer clock and the score still ticks
+not ok 2 - under the reference viewer's worker-src 'none' CSP, keel-audio falls Tone back to its timer clock and the score still ticks
+  ---
+  duration_ms: 1059.092875
+  type: 'test'
+  location: '/private/tmp/keel-browser-integration-20261020/proposal-v2/tests/keel-audio-browser.test.mjs:250:1'
+  failureType: 'testCodeFailure'
+  error: "ENOTEMPTY: directory not empty, rmdir '/var/folders/zk/40xbztxx7tb90tl4nnryd2780000gn/T/keel-audio-chrome-u0MZp5/Default/Cache/Cache_Data/index-dir'"
+  code: 'ENOTEMPTY'
+  ...

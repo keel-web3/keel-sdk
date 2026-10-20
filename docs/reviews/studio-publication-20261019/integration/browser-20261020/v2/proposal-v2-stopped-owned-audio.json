@@ -1,0 +1,15 @@
+{
+  "reason": "existing audio harness Cache cleanup ENOTEMPTY leaves local server open",
+  "exactProcesses": [
+    {
+      "pid": 21442,
+      "ppid": 21424,
+      "command": "/opt/homebrew/opt/node@22/bin/node --test --test-concurrency=1 /tmp/keel-browser-integration-20261020/proposal-v2/tests/keel-audio-browser.test.mjs /tmp/keel-browser-integration-20261020/proposal-v2/tests/sdk-verification-shell-browser.test.mjs /tmp/keel-browser-integration-20261020/proposal-v2/tests/sdk-verification-shell-large-graph-browser.test.mjs /tmp/keel-browser-integration-20261020/proposal-v2/tests/sdk-verification-shell-marketplace-csp.test.mjs"
+    },
+    {
+      "pid": 21443,
+      "ppid": 21442,
+      "command": "/opt/homebrew/Cellar/node@22/22.22.1_3/bin/node --test-concurrency=1 /tmp/keel-browser-integration-20261020/proposal-v2/tests/keel-audio-browser.test.mjs"
+    }
+  ]
+}

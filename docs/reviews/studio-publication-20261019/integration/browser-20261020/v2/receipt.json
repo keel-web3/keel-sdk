@@ -1,0 +1,46 @@
+{
+  "baselineSdk": "e4985920593539f468c16524e2f74d2adf2878c3",
+  "rejectedProposalSha256": "75902d5e1ea99f38867dbb07041094d9ae3f5cc00aaccfe7ef84cd07071c1fc0",
+  "replacementProposalSha256": "6a84179682dc2d639e61189ad27cab77a0d77dfb24b0d4fed93d16cf5704c1a1",
+  "helperSha256": "e34024962c38eb0109ee3e57951514677d325bd76546d2eefb1015df03ed4896",
+  "reviewerUnchangedControlSha256": "53156cd813b50d55d72f462ba649a2e66ea548da636fe472bc9414978d886a17",
+  "productionChange": false,
+  "proposalApplied": false,
+  "observationWindowMs": 4000,
+  "lateReadinessEarlyExit": false,
+  "actualReviewerControlResult": {
+    "pass": 2,
+    "fail": 0
+  },
+  "newOwnerLifecycleAndBrowserControls": {
+    "pass": 12,
+    "fail": 0
+  },
+  "ownerDraftBrowserResult": {
+    "pass": 13,
+    "fail": 0,
+    "log": "proposal-v2-and-audio-final13.log",
+    "qualification": "author-only exact replacement plus separate audio cleanup proposal; independent approval pending"
+  },
+  "hashes": {
+    "tests/keel-audio-browser.test.mjs": "b4bb9215ecbe878cfdc3993746c1e6c1eea28abd9462aae0118387a928bc7d9d",
+    "tests/sdk-verification-shell-browser.test.mjs": "bef6685cd851b00efc9ea7aa6d58aea85129504ed5e67ac2d080c1fda9e93e5a",
+    "tests/sdk-verification-shell-large-graph-browser.test.mjs": "79d8e4059b033fed92ab6224c86736c4148b074e7474736adb6ac028a765f18a",
+    "tests/sdk-verification-shell-marketplace-csp.test.mjs": "438a4cca21fe651fd1de13e335a8cb2a2d5ef8ab545b6d75fef457a602a18647",
+    "tests/helpers/marketplace-csp-browser.mjs": "e34024962c38eb0109ee3e57951514677d325bd76546d2eefb1015df03ed4896",
+    "tests/sdk-marketplace-csp-observer-controls.test.mjs": "fa7ffa4141950ba7191436df2fe8a689cb82340a3cdbb69fd227d42d53e9b0bb",
+    "separateAudioCleanupProposedFile": "0171744841038d8a2df768f764755688e0ad9c954f30c75b67317cc1b537003c"
+  },
+  "audioCleanupProposalSha256": "51fa75ad7864221274058dfacfc90d2bd2f37e59a5f0ffe488fc518029523a8f",
+  "exactFinalHelperResult": {
+    "pass": 18,
+    "fail": 0,
+    "groups": "12ownercontrols+2unchangedreviewercontrols+4CSPbrowsercases"
+  },
+  "exactOriginalAudioCleanupRerun": "RED2 ENOTEMPTY; ownNodeprocesses stopped/retained; no final13 pass claimed from that run",
+  "separateAudioCleanupProposal": {
+    "pass": 2,
+    "fail": 0,
+    "approved": false
+  }
+}

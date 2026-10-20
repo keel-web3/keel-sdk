@@ -1,0 +1,72 @@
+TAP version 13
+# Subtest: CDP commands time out, ignore their late replies and cannot resolve a different command
+ok 1 - CDP commands time out, ignore their late replies and cannot resolve a different command
+  ---
+  duration_ms: 43.591041
+  type: 'test'
+  ...
+# Subtest: socket disconnect rejects every pending command and all subsequent commands
+ok 2 - socket disconnect rejects every pending command and all subsequent commands
+  ---
+  duration_ms: 0.451084
+  type: 'test'
+  ...
+# Subtest: malformed CDP responses fail the session instead of escaping event handlers
+ok 3 - malformed CDP responses fail the session instead of escaping event handlers
+  ---
+  duration_ms: 0.5315
+  type: 'test'
+  ...
+# Subtest: a synchronous socket send failure rejects its pending command
+ok 4 - a synchronous socket send failure rejects its pending command
+  ---
+  duration_ms: 0.160958
+  type: 'test'
+  ...
+# Subtest: disposing a session rejects pending work, removes listeners and is idempotent
+ok 5 - disposing a session rejects pending work, removes listeners and is idempotent
+  ---
+  duration_ms: 0.140875
+  type: 'test'
+  ...
+# Subtest: a nonexistent browser rejects and removes its owned profile
+ok 6 - a nonexistent browser rejects and removes its owned profile
+  ---
+  duration_ms: 4.7905
+  type: 'test'
+  ...
+# Subtest: a browser exiting before DevTools rejects and removes its owned profile
+ok 7 - a browser exiting before DevTools rejects and removes its owned profile
+  ---
+  duration_ms: 3.180333
+  type: 'test'
+  ...
+# Subtest: actual Chrome cleanup is idempotent, settles pending work and removes its owned profile
+ok 8 - actual Chrome cleanup is idempotent, settles pending work and removes its owned profile
+  ---
+  duration_ms: 374.772125
+  type: 'test'
+  ...
+# {"elapsedMs":4515,"state":{"state":"passed","text":"module ran"},"events":[{"kind":"exception","text":"Error: REVIEW_LATE_RUNTIME_FAILURE\\n    at http://127.0.0.1:49509/:1:231"}]}
+# Subtest: observer retains a real runtime error after readiness but within its claimed unchanged4000ms observation window
+ok 9 - observer retains a real runtime error after readiness but within its claimed unchanged4000ms observation window
+  ---
+  duration_ms: 4521.097291
+  type: 'test'
+  ...
+# {"control":true,"state":{"state":"passed","text":"module ran"},"events":[{"kind":"exception","text":"Error: REVIEW_LATE_RUNTIME_FAILURE\\n    at http://127.0.0.1:49541/:1:232"}]}
+# Subtest: control captures the same real250ms exception while readiness is deliberately later
+ok 10 - control captures the same real250ms exception while readiness is deliberately later
+  ---
+  duration_ms: 4135.871833
+  type: 'test'
+  ...
+1..10
+# tests 10
+# suites 0
+# pass 10
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 8759.858958
