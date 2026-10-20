@@ -1,0 +1,17 @@
+--- a/discovery-http.mjs
++++ b/discovery-http.mjs
+@@ -9,12 +9,12 @@
+ const child=spawn(process.execPath,[app+'/server.js'],{cwd:app,stdio:['ignore','pipe','pipe'],env:{PATH:process.env.PATH,HOME:'/tmp',NODE_ENV:'production',HOSTNAME:'127.0.0.1',PORT:'4321',STUDIO_WALLET_ACCESS_ENABLED:'1',STUDIO_ACCESS_WALLETS:'0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',DATABASE_URL:'postgresql://synthetic:synthetic@127.0.0.1:1/synthetic',KEEL_PUBLICATION_WORKER_PAUSED:'1',KEEL_CHAIN_ID:'11155111',NEXT_PUBLIC_CHAIN_ID:'11155111',NEXT_PUBLIC_APP_URL:'https://studio.onkeel.io',KEEL_RPC_URL:'http://127.0.0.1:1'}});
+ let logBytes=0;child.stdout.on('data',b=>{logBytes+=b.length});child.stderr.on('data',b=>{logBytes+=b.length});
+ const hard=setTimeout(()=>child.kill('SIGKILL'),45000),checks=[];
+-async function fetchOne(path,method='GET'){assert.ok(logBytes<=65536,'server log output bound');return fetch(origin+path,{method,redirect:'manual',signal:AbortSignal.timeout(5000)})}
++async function fetchOne(path,method='GET',timeoutMs=5000){assert.ok(logBytes<=65536,'server log output bound');return fetch(origin+path,{method,redirect:'manual',signal:AbortSignal.timeout(timeoutMs)})}
+ try{
+  let ready=false;const start=Date.now();
+  while(Date.now()-start<30000){
+   assert.equal(child.exitCode,null,'server exited before readiness');
+-  try{const response=await fetchOne('/api/health');assert.equal(response.status,200);assert.equal((await response.json()).mode,'private-preview');ready=true;break}catch(error){if(error.cause?.code!=='ECONNREFUSED')throw error;await new Promise(r=>setTimeout(r,100))}
++  try{const response=await fetchOne('/api/health','GET',Math.min(5000,Math.max(1,30000-(Date.now()-start))));assert.equal(response.status,200);assert.equal((await response.json()).mode,'private-preview');ready=true;break}catch(error){if(error.cause?.code!=='ECONNREFUSED'&&!(error instanceof DOMException&&error.name==='TimeoutError'))throw error;if(Date.now()-start>=30000)break;await new Promise(r=>setTimeout(r,Math.min(100,30000-(Date.now()-start))))}
+  }
+  assert.ok(ready,'server readiness deadline');
+  for(const method of ['GET','HEAD']){

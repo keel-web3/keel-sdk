@@ -1,0 +1,125 @@
+{
+  "schema": "keel.independent-image95-harness-review-controls@1",
+  "node": "v22.22.1",
+  "typescript": "5.9.3",
+  "worker": {
+    "oldSHA256": "9c61e6f5283c31b02d4c76a5fd0dd0a886fe788631898fe519cbd5af5e34776d",
+    "newSHA256": "9a74cb0f583058b96a3beb322721478670decfdca746021dd813ea26cf72c53e",
+    "topLevelStatements": 64,
+    "statementMultisetIdentical": true,
+    "lineMultisetIdentical": true,
+    "assertions": 32
+  },
+  "http": {
+    "oldSHA256": "0de71c6cb7590e37a777d4ef4f125297e47b7bf50357f8c5ecccd3fe5190e30e",
+    "newSHA256": "7ba994e0fc31f79f345e23a20428cd792fecdabc03b1ff326032d312b8af8974",
+    "assertions": 15,
+    "allAssertionsByteIdentical": true,
+    "cases": [
+      {
+        "name": "cold-start-one-timeout-then-ready",
+        "requests": 2,
+        "elapsedMs": 5100,
+        "signalTimeouts": [
+          5000,
+          5000
+        ],
+        "status": "PASS"
+      },
+      {
+        "name": "all-timeouts-stop-at-original-deadline",
+        "requests": 6,
+        "elapsedMs": 30000,
+        "signalTimeouts": [
+          5000,
+          5000,
+          5000,
+          5000,
+          5000,
+          4500
+        ],
+        "status": "EXPECTED_REJECTION"
+      },
+      {
+        "name": "connection-refused-then-ready",
+        "requests": 2,
+        "elapsedMs": 100,
+        "signalTimeouts": [
+          5000,
+          5000
+        ],
+        "status": "PASS"
+      },
+      {
+        "name": "health-401-is-terminal",
+        "requests": 1,
+        "elapsedMs": 0,
+        "signalTimeouts": [
+          5000
+        ],
+        "status": "EXPECTED_REJECTION"
+      },
+      {
+        "name": "health-403-is-terminal",
+        "requests": 1,
+        "elapsedMs": 0,
+        "signalTimeouts": [
+          5000
+        ],
+        "status": "EXPECTED_REJECTION"
+      },
+      {
+        "name": "health-503-is-terminal",
+        "requests": 1,
+        "elapsedMs": 0,
+        "signalTimeouts": [
+          5000
+        ],
+        "status": "EXPECTED_REJECTION"
+      },
+      {
+        "name": "bad-json-is-terminal",
+        "requests": 1,
+        "elapsedMs": 0,
+        "signalTimeouts": [
+          5000
+        ],
+        "status": "EXPECTED_REJECTION"
+      },
+      {
+        "name": "wrong-mode-is-terminal",
+        "requests": 1,
+        "elapsedMs": 0,
+        "signalTimeouts": [
+          5000
+        ],
+        "status": "EXPECTED_REJECTION"
+      },
+      {
+        "name": "ordinary-Error-named-TimeoutError-is-terminal",
+        "requests": 1,
+        "elapsedMs": 0,
+        "signalTimeouts": [
+          5000
+        ],
+        "status": "EXPECTED_REJECTION"
+      },
+      {
+        "name": "socket-reset-is-terminal",
+        "requests": 1,
+        "elapsedMs": 0,
+        "signalTimeouts": [
+          5000
+        ],
+        "status": "EXPECTED_REJECTION"
+      },
+      {
+        "name": "post-readiness-timeout-remains-terminal",
+        "requests": 1,
+        "status": "EXPECTED_REJECTION"
+      }
+    ]
+  },
+  "imageExecuted": false,
+  "productionActions": false
+}
