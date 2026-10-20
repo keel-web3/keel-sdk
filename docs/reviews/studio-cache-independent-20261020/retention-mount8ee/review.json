@@ -1,0 +1,84 @@
+{
+  "schema": "keel.independent-older-build-retention-review@1",
+  "decision": "APPROVE_ONE_EXACT_RETENTION_ACTION",
+  "sourceCommit": "8ee80c4184b8e779ad4d40f05c032e985f83a716",
+  "command": {
+    "path": "/private/tmp/keel-independent-mount8ee-20261020/command-admission.json",
+    "bytes": 7762,
+    "sha256": "9720c64802ba14b19e9ec15d6088b48934ee24518ed042214f4d1f808d92d608"
+  },
+  "review": {
+    "path": "/private/tmp/keel-independent-mount8ee-20261020/archive-retention-review.json",
+    "bytes": 3288,
+    "sha256": "e5ca4412ff1b2e876a09efb88008e2278f50393e39a11d062ca8f91a9b9f0589"
+  },
+  "independentTests": {
+    "maintainedRetentionLinux": 7,
+    "fullMountMultisetControls": 15,
+    "unchangedNativeGuardControls": 4,
+    "failures": 0,
+    "skips": 0
+  },
+  "bothProtectedCopiesIndependentlyFullHashed": true,
+  "noArchiveExtraction": true,
+  "independentQACommit": "b02d0ff3319b44e00032c8e52bc4773e6b257818",
+  "noHostActionByReviewer": true,
+  "scope": "Exactly two named older input archive files, protected fullbytes retained locally; no currentruntime,rollback,image/container/volume/database mutation.",
+  "evidence": [
+    {
+      "path": "/Users/ravonus/dev/wt/studio-cache-independent-review-20261020/docs/reviews/studio-cache-independent-20261020/retention-mount8ee/adversarial.test.py",
+      "bytes": 2031,
+      "sha256": "66342337931b17bf91413a7e2c8d7c7c41acd9440ab1e5001393715f2d656007"
+    },
+    {
+      "path": "/Users/ravonus/dev/wt/studio-cache-independent-review-20261020/docs/reviews/studio-cache-independent-20261020/retention-mount8ee/archive-retention-plan.json",
+      "bytes": 3504,
+      "sha256": "de25dbdcfa3faca4bba4fa160beb6e5af8126c418fc2f6645772d21f8294ded6"
+    },
+    {
+      "path": "/Users/ravonus/dev/wt/studio-cache-independent-review-20261020/docs/reviews/studio-cache-independent-20261020/retention-mount8ee/archive-retention-review.json",
+      "bytes": 3288,
+      "sha256": "e5ca4412ff1b2e876a09efb88008e2278f50393e39a11d062ca8f91a9b9f0589"
+    },
+    {
+      "path": "/Users/ravonus/dev/wt/studio-cache-independent-review-20261020/docs/reviews/studio-cache-independent-20261020/retention-mount8ee/bootstrap.py",
+      "bytes": 62157,
+      "sha256": "355ae63adbc336cf4e557e72d0146b533797582ab6f64d36409d5c68488bbcf0"
+    },
+    {
+      "path": "/Users/ravonus/dev/wt/studio-cache-independent-review-20261020/docs/reviews/studio-cache-independent-20261020/retention-mount8ee/command-admission.json",
+      "bytes": 7762,
+      "sha256": "9720c64802ba14b19e9ec15d6088b48934ee24518ed042214f4d1f808d92d608"
+    },
+    {
+      "path": "/Users/ravonus/dev/wt/studio-cache-independent-review-20261020/docs/reviews/studio-cache-independent-20261020/retention-mount8ee/linux-process.json",
+      "bytes": 109,
+      "sha256": "9911c278adfb7b29aaeba78cbcfac491d2f13d9bc5c1ec85998b2b99014bde4e"
+    },
+    {
+      "path": "/Users/ravonus/dev/wt/studio-cache-independent-review-20261020/docs/reviews/studio-cache-independent-20261020/retention-mount8ee/linux.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/Users/ravonus/dev/wt/studio-cache-independent-review-20261020/docs/reviews/studio-cache-independent-20261020/retention-mount8ee/linux.stdout",
+      "bytes": 945,
+      "sha256": "7059142cc13757330de3b377173399249752533470706a1c4b9e3052f325fbf9"
+    },
+    {
+      "path": "/Users/ravonus/dev/wt/studio-cache-independent-review-20261020/docs/reviews/studio-cache-independent-20261020/retention-mount8ee/local-retention-fullhash.json",
+      "bytes": 659,
+      "sha256": "8162e45373623ecbce5801b3c67f26cc6ed8b43b4d481386881af6eee85205c5"
+    },
+    {
+      "path": "/Users/ravonus/dev/wt/studio-cache-independent-review-20261020/docs/reviews/studio-cache-independent-20261020/retention-mount8ee/retain-older-inputs.py",
+      "bytes": 13083,
+      "sha256": "c2dc22d61a7c715b83680366b3208f3252ff404477676ea8b70b9b785b3f442e"
+    },
+    {
+      "path": "/Users/ravonus/dev/wt/studio-cache-independent-review-20261020/docs/reviews/studio-cache-independent-20261020/retention-mount8ee/retention.test.py",
+      "bytes": 5228,
+      "sha256": "89016ee51e02c8744727d7cb43b8db38db9b23dff31230c9495baeae16240f47"
+    }
+  ]
+}

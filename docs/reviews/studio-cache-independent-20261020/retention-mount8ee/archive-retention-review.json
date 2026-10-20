@@ -1,0 +1,66 @@
+{
+  "schema": "keel.two-protected-older-input-retention-review@1",
+  "scope": "exact-two-older-input-archives-only",
+  "decision": "APPROVE",
+  "sourceCommit": "8ee80c4184b8e779ad4d40f05c032e985f83a716",
+  "operatorSHA256": "c2dc22d61a7c715b83680366b3208f3252ff404477676ea8b70b9b785b3f442e",
+  "planSHA256": "de25dbdcfa3faca4bba4fa160beb6e5af8126c418fc2f6645772d21f8294ded6",
+  "protectedLocalRetentionReceiptSHA256": "bfa9b343cab907e053e19d88aaa706d3954536273ced9343e0c50bf058eb1b46",
+  "localFullHashesFreshlyVerified": true,
+  "blockingFindings": [],
+  "independentLinuxControls": 26,
+  "independentFailures": 0,
+  "independentSkips": 0,
+  "protectedCopyFreshHashResult": {
+    "path": "/private/tmp/keel-independent-mount8ee-20261020/local-retention-fullhash.json",
+    "bytes": 659,
+    "sha256": "8162e45373623ecbce5801b3c67f26cc6ed8b43b4d481386881af6eee85205c5"
+  },
+  "allowedExactFiles": [
+    {
+      "path": "/home/ubuntu/keel-studio-alias-171f635e-20261014/keel-showcase.tar.gz",
+      "bytes": 555623546,
+      "allocatedBytes": 555630592,
+      "device": 2049,
+      "inode": 4980888,
+      "uid": 1000,
+      "gid": 1000,
+      "mode": 420,
+      "links": 1,
+      "mtimeNs": 1791950418000000000,
+      "ctimeNs": 1791957326326578609,
+      "sha256": "7cd9852035ef222fb8dd806b28da05561cf2ec30127d0025b84c8d0bf2f61f01"
+    },
+    {
+      "path": "/home/ubuntu/keel-studio-primary-0bd2db80-20261014/keel-showcase.tar.gz",
+      "bytes": 555608603,
+      "allocatedBytes": 555614208,
+      "device": 2049,
+      "inode": 4980882,
+      "uid": 1000,
+      "gid": 1000,
+      "mode": 384,
+      "links": 1,
+      "mtimeNs": 1791937590000000000,
+      "ctimeNs": 1791938838856834251,
+      "sha256": "8ac4dc36a1dbc44da7a12efa985497980a31b3d3e8bcec4f01a2477be731bd77"
+    }
+  ],
+  "allocationReclaimCeilingBytes": 1111244800,
+  "conditions": [
+    "Root freshly rehashes both protected local copies immediately before this one action and retains them. Never extract archive contents.",
+    "Fresh configured normal proxy predicate and exact original runtime/healthy/paused/fullConfig/HostConfig/Mounts guards.",
+    "Existing rollout lock; immutable exactsource/plan/review; exact source path/metadata/ctime before move/hash/nlink and references rechecked.",
+    "Quarantine ownership/no-replace rename/file and directory fsync, second hash/reference checks before unlink; preserve all foreign occupants.",
+    "One execute only. On failure or uncertainty preserve receipt/partial state and stop. No replay or source/quarantine reset.",
+    "Only two opaque olderinputarchives are removed on server; all directory shells/images/containers/volumes/data/rollback and protected local bytes remain.",
+    "Use measured actual free bytes afterwards; unchanged cache/import reserves and independent admissions still apply."
+  ],
+  "restorationLimit": "Content and uid/gid/mode/mtime can be restored only from retained copies under a separately reviewed no-overwrite action. Original inode and ctime cannot be reconstructed after unlink. No automatic postunlink restore authorized.",
+  "imageImportApproved": false,
+  "cacheCleanupApproved": false,
+  "productionActivationApproved": false,
+  "databaseMutationApproved": false,
+  "signingApproved": false,
+  "submissionApproved": false
+}
