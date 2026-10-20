@@ -1,15 +1,19 @@
+import { gzipSync } from "node:zlib";
 import { resolveKeelPayloadStorage, type KeelPayloadStorageMode } from "@keel/protocol";
 import { prepareKeelDensePayload } from "./prepared-dense-copy.js";
+export { selectKeelRegisteredInlineCandidate, keelRegisteredInlineRecipeDigest } from "./registered-inline-candidates.js";
+export type { KeelRegisteredInlineCodec, KeelRegisteredInlineSource, KeelRegisteredInlinePart, KeelRegisteredInlineRecipe,
+  KeelRegisteredInlineMeasurementScope, KeelRegisteredInlineBuiltCandidate, KeelRegisteredInlineCandidate } from "./registered-inline-candidates.js";
 
 /** Build policy is resolved before any upload. Capabilities must come from the
  * authenticated selected publication path, never the decoder installed locally. */
 export function resolveKeelInlineBuildRoute(input: {
   readonly payloadStorage?: KeelPayloadStorageMode;
-  readonly compression?: "auto" | "brotli" | "none";
+  readonly compression?: "auto" | "brotli" | "gzip" | "none";
   readonly brotliQuality?: number;
   /** Planning input from the selected reader's authenticated fresh carriage.
    * This is not registration evidence. Omit to retain the unqualified planner. */
-  readonly freshReaderCompressions?: readonly ("none" | "brotli")[];
+  readonly freshReaderCompressions?: readonly ("none" | "gzip" | "brotli")[];
   readonly resources: readonly { readonly id: string; readonly bytes: Uint8Array }[];
 }) {
   const storage = resolveKeelPayloadStorage(input.payloadStorage);
@@ -20,14 +24,20 @@ export function resolveKeelInlineBuildRoute(input: {
   const freshReaderCompressions = input.freshReaderCompressions === undefined ? undefined : [...input.freshReaderCompressions];
   if (freshReaderCompressions !== undefined && (!freshReaderCompressions.includes("none")
     || new Set(freshReaderCompressions).size !== freshReaderCompressions.length
-    || freshReaderCompressions.some(codec => codec !== "none" && codec !== "brotli"))) {
+    || freshReaderCompressions.some(codec => codec !== "none" && codec !== "gzip" && codec !== "brotli"))) {
     throw new TypeError("Fresh reader compression choices must include none and contain only unique supported codecs.");
   }
-  if (compression === "brotli" && freshReaderCompressions !== undefined && !freshReaderCompressions.includes("brotli")) {
-    throw new KeelInlineReaderCodecUnavailableError();
+  if ((compression === "brotli" || compression === "gzip") && freshReaderCompressions !== undefined && !freshReaderCompressions.includes(compression)) {
+    throw new KeelInlineReaderCodecUnavailableError(compression);
   }
   const effectiveCompression = compression === "auto" && freshReaderCompressions !== undefined && !freshReaderCompressions.includes("brotli") ? "none" : compression;
   const resources = input.resources.map(resource => {
+    if (effectiveCompression === "gzip") {
+      const packed = gzipSync(resource.bytes, { level: 9 });
+      return { id: resource.id, compression: "gzip" as const, sourceBytes: resource.bytes.length,
+        compressedBytes: packed.length, preparedBytes: null, uncompressedPreparedBytes: null, preparedBytesSaved: null,
+        sourceByteIdentity: "verified-exact" as const, selection: compression };
+    }
     const payload = prepareKeelDensePayload(resource.bytes, { compression: effectiveCompression,
       ...(input.brotliQuality === undefined ? {} : { brotliQuality: input.brotliQuality }) });
     return { id: resource.id, compression: payload.compression, ...payload.optimization, selection: compression };
@@ -49,8 +59,8 @@ export function resolveKeelInlineBuildRoute(input: {
 
 export class KeelInlineReaderCodecUnavailableError extends TypeError {
   readonly code = "KEEL_INLINE_CODEC_UNSUPPORTED";
-  constructor() {
-    super("KEEL_INLINE_CODEC_UNSUPPORTED: Explicit Brotli requires the exact selected-chain registered decoder and fresh carriage. The selected reader cannot carry that choice; preserve the original source, compression preference and existing plans before reviewing a compatible reader.");
+  constructor(codec: "gzip" | "brotli" = "brotli") {
+    super(`KEEL_INLINE_CODEC_UNSUPPORTED: Explicit ${codec === "brotli" ? "Brotli" : "Gzip"} requires the exact selected-chain registered decoder and fresh carriage. The selected reader cannot carry that choice; preserve the original source, compression preference and existing plans before reviewing a compatible reader.`);
     this.name = "KeelInlineReaderCodecUnavailableError";
   }
 }
@@ -72,3 +82,6 @@ export function assertKeelInlineBuildRoute(input: Parameters<typeof resolveKeelI
   }
   return plan;
 }
+
+export { createKeelRegisteredNativeGzipProof, assertKeelRegisteredNativeGzipProof, snapshotKeelRegisteredNativeGzipBinding, KEEL_REGISTERED_NATIVE_GZIP_FRAME_PROFILE } from "./registered-native-gzip.js";
+export type { KeelRegisteredNativeGzipBinding, KeelRegisteredNativeGzipProof } from "./registered-native-gzip.js";

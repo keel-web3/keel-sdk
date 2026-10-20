@@ -106,17 +106,19 @@ export async function buildKeelPreparedDenseCopyShell(input: Parameters<typeof b
  * shell is manufactured here, and tokenURI never performs this conversion.
  */
 export function prepareKeelGzipDensePayload(bytes: Uint8Array, options: {
-  readonly compression?: "auto" | "none";
+  readonly compression?: "auto" | "gzip" | "none";
+  readonly readerGrammar?: "uri81" | "legacy-strict";
   readonly transportProfile?: "uri81-block-v1";
 } = {}) {
   if (!(bytes instanceof Uint8Array)) throw new TypeError("Dense COPY payload must be bytes.");
   if (bytes.byteLength > 4 * 1024 * 1024) throw new RangeError("Dense COPY payload exceeds its byte bound.");
-  if (options.compression !== undefined && options.compression !== "auto" && options.compression !== "none") {
+  if (options.compression !== undefined && options.compression !== "auto" && options.compression !== "gzip" && options.compression !== "none") {
     throw new TypeError("Unsupported dense COPY payload compression.");
   }
   const source = Buffer.from(bytes);
   const gzip = options.compression === "none" ? null : gzipSync(source, { level: 9 });
-  const compression = gzip && gzip.byteLength < source.byteLength ? "gzip" as const : "none" as const;
+  if (options.readerGrammar !== undefined && !["uri81", "legacy-strict"].includes(options.readerGrammar)) throw new TypeError("Unsupported prepared COPY reader grammar.");
+  const compression = gzip && (options.compression === "gzip" || gzip.byteLength < source.byteLength) ? "gzip" as const : "none" as const;
   const compressedBytes = compression === "gzip" ? gzip! : source;
   if (compression === "gzip" && !gunzipSync(compressedBytes, { maxOutputLength: source.byteLength }).equals(source)) {
     throw new TypeError("Dense COPY compression changed source bytes.");
@@ -128,6 +130,12 @@ export function prepareKeelGzipDensePayload(bytes: Uint8Array, options: {
     const hash = createHash("sha256"); hash.update(value);
     return { algorithm: "sha256" as const, digest: `0x${hash.digest("hex")}` as const, byteLength: value.byteLength };
   };
-  return { compression, compressedBytes, storedDense, transportProfile,
-    sourceIntegrity: integrity(source), storedIntegrity: integrity(compressedBytes) };
+  const preparedBytes = prepareKeelDenseCopyFragment(serializeKeelDenseTransportJSON(storedDense).slice(1,-1),
+    options.readerGrammar === undefined ? {} : { readerGrammar: options.readerGrammar });
+  const rawPreparedBytes = compression === "none" ? preparedBytes.length : prepareKeelDenseCopyFragment(serializeKeelDenseTransportJSON(encodeKeelDenseTransport(source, transportProfile)).slice(1,-1), options.readerGrammar === undefined ? {} : { readerGrammar: options.readerGrammar }).length;
+  return { compression, compressedBytes, storedDense, transportProfile, preparedBytes, preparedIntegrity: integrity(preparedBytes),
+    decodedIntegrity: integrity(source), sourceIntegrity: integrity(source), storedIntegrity: integrity(compressedBytes),
+    optimization: { sourceBytes: source.length, compressedBytes: compressedBytes.length, preparedBytes: preparedBytes.length,
+      uncompressedPreparedBytes: rawPreparedBytes, preparedBytesSaved: rawPreparedBytes - preparedBytes.length,
+      sourceByteIdentity: "verified-exact" as const, selection: options.compression ?? "auto" } };
 }

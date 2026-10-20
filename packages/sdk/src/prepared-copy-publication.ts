@@ -1,3 +1,4 @@
+import { assertKeelRegisteredNativeGzipProof, type KeelRegisteredNativeGzipProof } from "./registered-native-gzip.js";
 import { assertKeelDataURICompatibility, decodeKeelPreparedDenseCopyFragment } from "./dense-transport.js";
 import { assertKeelFreshPayloadCarriage, inspectKeelInlinePayloadCarriage } from "./inline-transport-audit.js";
 import { createIntegrity, type Integrity, resolveKeelTokenURIReadBounds, assertKeelNonstandardTokenURIIdentity, type KeelExplicitNonstandardReadPolicy } from "@keel/protocol";
@@ -26,6 +27,7 @@ export function isKeelPreparedCopyMediaType(mediaType: string): boolean {
 
 export interface KeelPreparedCopyReadInput {
   readonly nonstandardReadPolicy?: KeelExplicitNonstandardReadPolicy;
+  readonly registeredNativeGzip?: KeelRegisteredNativeGzipProof;
   readonly chainId: number;
   readonly store: string;
   readonly mediaType: string;
@@ -92,6 +94,8 @@ function auditCreatorItems(html: Uint8Array): void {
 export async function assertKeelPreparedCopyRead(input: KeelPreparedCopyReadInput) {
   // Snapshot caller-owned values before the first async digest.
   const graphBytes = new Uint8Array(input.graphBytes);
+  const registeredNativeGzip = input.registeredNativeGzip === undefined ? undefined : assertKeelRegisteredNativeGzipProof(input.registeredNativeGzip);
+  if (registeredNativeGzip !== undefined && (registeredNativeGzip.binding.chainId !== input.chainId || registeredNativeGzip.binding.store !== input.store.toLowerCase())) throw new TypeError("Native Gzip COPY readback changed its selected chain/store.");
   const graphIntegrity = { ...input.graphIntegrity };
   const { chainId, store, mediaType, expectedTokenURI, returnedTokenURI, callGasLimit, blockGasLimit } = input;
   const readBounds = resolveKeelTokenURIReadBounds(input.nonstandardReadPolicy);
@@ -117,8 +121,8 @@ export async function assertKeelPreparedCopyRead(input: KeelPreparedCopyReadInpu
   if (typeof metadata.animation_url !== "string") throw new TypeError("Prepared COPY requires animation_url.");
   assertKeelDataURICompatibility(metadata.animation_url, "Prepared animation_url");
   const html = dataURI(metadata.animation_url, "text/html");
-  assertKeelFreshPayloadCarriage(html);
-  const payloadCarriage = inspectKeelInlinePayloadCarriage(html);
+  assertKeelFreshPayloadCarriage(html, { registeredNativeGzip });
+  const payloadCarriage = inspectKeelInlinePayloadCarriage(html, { registeredNativeGzip });
   const sourceHTML = raw && payloadCarriage.preparedDenseCopy?.contractOperation === "verified-copy"
     ? decodeKeelPreparedDenseCopyFragment(graphBytes) : decodeKeelInlineGraphFragment(graphBytes, mediaType);
   if (!decoder.decode(html).includes(decoder.decode(sourceHTML))) throw new TypeError("Returned animation does not contain the exact decoded prepared graph.");
@@ -142,4 +146,4 @@ export async function assertKeelPreparedCopyRead(input: KeelPreparedCopyReadInpu
 
 export type KeelPreparedCopyReadCheck = Awaited<ReturnType<typeof assertKeelPreparedCopyRead>>;
 export type KeelPreparedCopyPublishEvidence = Pick<KeelPreparedCopyReadInput,
-  "graphBytes" | "expectedTokenURI" | "returnedTokenURI" | "callGasLimit" | "blockGasLimit" | "nonstandardReadPolicy">;
+  "graphBytes" | "expectedTokenURI" | "returnedTokenURI" | "callGasLimit" | "blockGasLimit" | "nonstandardReadPolicy" | "registeredNativeGzip">;
