@@ -1,0 +1,36 @@
+{
+  "schema": "keel-native-create-code-size-test-correction-proposal@1",
+  "runtimeSourceCommit": "050449e0ec6d9973adf038ca1c0bcf06a50de629",
+  "pinnedGethCommit": "a579077007b98217c3e253a66e4b452ca0c32b96",
+  "currentTestSHA256": "c4ee39488156af9b8b82fd388b04dc8e380a370053b99c968fb8a3e473460d21",
+  "proposedTestSHA256": "bab3fe5a28ed22e49777ae5b5c136a06dd65140ece90ce7b962a2ab8596b7646",
+  "patchSHA256": "1b78d617617b7ee6eb3f3438f13206bd777af464fed822d1b38f5decd7d88e8c",
+  "onlyChange": "test constructor return length24577 ->65537 bytes; expected max-code-size error,10Mgas and every assertion unchanged",
+  "reason": "PinnedAmsterdam maximumruntime65536, so24577 is not oversized; initialtest insteadhitcode-depositout-of-gas. Amsterdamchecksmax-code-sizebeforecode-depositcharge.",
+  "sourceEvidence": [
+    {
+      "gethFile": "params/protocol_params.go",
+      "sourceSHA256": "94657cdf80d2f0b136ff6d89003326f496d3b1ba1abcb1a855b7b98c941e9e28",
+      "firstLine": 159,
+      "lastLine": 164,
+      "excerpt": "\tInitialBaseFee                  = 1000000000 // Initial base fee for EIP-1559 blocks.\n\n\tMaxCodeSize              = 24576                    // Maximum bytecode to permit for a contract\n\tMaxInitCodeSize          = 2 * MaxCodeSize          // Maximum initcode to permit in a creation transaction and create instructions\n\tMaxCodeSizeAmsterdam     = 65536                    // Maximum bytecode to permit for a contract post Amsterdam\n\tMaxInitCodeSizeAmsterdam = 2 * MaxCodeSizeAmsterdam // Maximum initcode to permit in a creation transaction and create instructions post Amsterdam"
+    },
+    {
+      "gethFile": "core/vm/common.go",
+      "sourceSHA256": "c7b2bac3e5d54a78f7c2ead6b1722871996c94cd102a5eb24a6158b9019f0e8d",
+      "firstLine": 42,
+      "lastLine": 52,
+      "excerpt": "// CheckMaxCodeSize checks the size of contract code against the protocol-defined limit.\nfunc CheckMaxCodeSize(rules *params.Rules, size uint64) error {\n\tif rules.IsAmsterdam {\n\t\tif size > params.MaxCodeSizeAmsterdam {\n\t\t\treturn fmt.Errorf(\"%w: code size %v limit %v\", ErrMaxCodeSizeExceeded, size, params.MaxCodeSizeAmsterdam)\n\t\t}\n\t} else if rules.IsEIP158 {\n\t\tif size > params.MaxCodeSize {\n\t\t\treturn fmt.Errorf(\"%w: code size %v limit %v\", ErrMaxCodeSizeExceeded, size, params.MaxCodeSize)\n\t\t}\n\t}"
+    },
+    {
+      "gethFile": "core/vm/evm.go",
+      "sourceSHA256": "a3a22a662f2a79d5a99e422c21c0254e985decb7013062928a8c5457e00d2d4d",
+      "firstLine": 669,
+      "lastLine": 681,
+      "excerpt": "\t\t}\n\t} else if evm.chainRules.IsAmsterdam {\n\t\t// Check max code size BEFORE charging gas so over-max code\n\t\t// does not consume state gas (which would inflate tx_state).\n\t\tif err := CheckMaxCodeSize(&evm.chainRules, uint64(len(ret))); err != nil {\n\t\t\treturn ret, err\n\t\t}\n\t\t// Charge execution gas (hash cost) before state gas.\n\t\texecutionCost := toWordSize(uint64(len(ret))) * params.Keccak256WordGas\n\t\tif !contract.chargeExecution(executionCost, evm.Config.Tracer, tracing.GasChangeCallCodeStorage) {\n\t\t\treturn ret, ErrCodeStoreOutOfGas\n\t\t}\n\t\t// Charge state gas (code-deposit) afterwards."
+    }
+  ],
+  "independentApproval": "PENDING",
+  "actualPublicStateReads": 0,
+  "signatureOrSpend": false
+}
