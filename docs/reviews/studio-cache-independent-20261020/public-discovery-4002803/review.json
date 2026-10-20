@@ -1,0 +1,73 @@
+{
+  "schema": "keel.independent-exact-public-discovery-source-review@1",
+  "sourceCommit": "4002803ccfcb20c39ffe5c555b68d8e197f379f8",
+  "baseCommit": "3e50d15bb74f939951de0cc0333a7baa9d8018c1",
+  "sourceApproval": true,
+  "artifactApproval": false,
+  "deploymentApproval": false,
+  "releaseApproval": false,
+  "onlyProductionChange": "Add exact /.well-known/keel.json to GET/HEAD public static path allowlist.",
+  "scope": "The existing advertised static metadata is public; private creator/MCP/agent operations and all write methods retain normal authentication. No live 401 response is bypassed and no deployed success is claimed.",
+  "sourceFiles": {
+    "apps/studio/src/lib/studio-access-policy.ts": {
+      "bytes": 3965,
+      "sha256": "47a0c9460cfc269aa9cf649ee8493c24052ddb02b4e014cb8e7180c767f6696b"
+    },
+    "apps/studio/tests/unit/studio-wallet-access.test.ts": {
+      "bytes": 17160,
+      "sha256": "ebd45793e8552f6d9570e93d4bac5cd780d6b7d6e2a101559fd8156b51440815"
+    },
+    "apps/studio/public/.well-known/keel.json": {
+      "bytes": 10436,
+      "sha256": "0125ca589421e9c3e0b449556158aa00e5fb5d0ec0e0ac2d1aeb8e7825e483d9"
+    }
+  },
+  "staticMetadataByteIdenticalToBase": true,
+  "fixtureCorrection": {
+    "patchSHA256": "24caf25ec43c59118f5ee914d1dc59a723fce703d3949a3d65ec508daf5e7cec",
+    "approvedEarlier": true,
+    "afterSHA256": "ebd45793e8552f6d9570e93d4bac5cd780d6b7d6e2a101559fd8156b51440815",
+    "onlyOldTestChange": "Remove exact newly public document from obsolete negative-list input; all existing assertions and other inputs identical."
+  },
+  "independentVerification": {
+    "command": [
+      "/Users/ravonus/.nvm/versions/node/v22.22.1/bin/node",
+      "--import",
+      "tsx",
+      "--test",
+      "tests/unit/studio-wallet-access.test.ts"
+    ],
+    "cwd": "/Users/ravonus/dev/wt/studio-public-discovery-20261020/keel-site/apps/studio",
+    "pass": 14,
+    "fail": 0,
+    "skip": 0,
+    "controls": [
+      "GET/HEAD exact static path traverses actual proxy with unavailable access DB and no access lookup.",
+      "Unknown/case/trailing/wildcard well-known paths, private MCP/project/agent paths retain 401/403.",
+      "POST/PUT/PATCH/DELETE/OPTIONS exact metadata path remain private.",
+      "Existing invited-wallet/session/operator/return selector protections remain passing."
+    ],
+    "noRealHTTPOrDB": true
+  },
+  "references": {
+    "publicPathMethodGate": "apps/studio/src/lib/studio-access-policy.ts:30",
+    "exactAllowlist": "apps/studio/src/lib/studio-access-policy.ts:31",
+    "unchangedProxyAuthenticationBranch": "apps/studio/src/proxy.ts:18",
+    "newPublicAndPrivateControls": "apps/studio/tests/unit/studio-wallet-access.test.ts:250"
+  },
+  "remaining": [
+    "New candidate build/image and exact release/import/operator plan must bind this new source.",
+    "Deployed GET/HEAD static discovery acceptance and private method/status negatives remain required after a reviewed deployment.",
+    "Existing GIF/Gator/own-copy normal/native/deployed acceptance gates are not changed by this metadata fix."
+  ],
+  "evidence": {
+    "controls.stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "controls.stdout": {
+      "bytes": 3609,
+      "sha256": "e0b554d26cf784d78b6f020959ac8b5439082d429e07638dae579858ff43c09c"
+    }
+  }
+}
