@@ -1,0 +1,9 @@
+{
+  "schema": "keel-independent-remote-native-result@1",
+  "commit": "86b1534b27ac7dce9ac7aaaf30318dab1808696c",
+  "exitCode": 0,
+  "rawLogSHA256": "56deec50547e73b55f0a62f397bbda444662655b23ccb9e7411707828bb0297f",
+  "finishedUTC": "2026-10-20T03:33:05.694002+00:00",
+  "cleanAfter": true,
+  "liveChainProof": false
+}
