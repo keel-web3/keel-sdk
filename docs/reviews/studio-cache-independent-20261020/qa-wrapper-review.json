@@ -1,0 +1,12 @@
+{
+  "schema": "keel-independent-pure-audit-wrapper-review@1",
+  "decision": "APPROVE_EXACT_PURE_OFFLINE_AUDIT_STEP_ONLY",
+  "configSHA256": "37118fc52ab5f6a36fafd88d7739d345b7190bd0e12a97dadcacaa0031008de1",
+  "wrapperSHA256": "6a8ac47855be7b8e1cd6a9ac03f45a24b516a35de0dd6d179a9997eadd0d1074",
+  "adjacentComparisonBound": true,
+  "blockingFindings": [],
+  "limitsAndComparisonChecksUnchanged": true,
+  "actualCaptureAudited": false,
+  "nativeApproved": false,
+  "publicationApproved": false
+}
