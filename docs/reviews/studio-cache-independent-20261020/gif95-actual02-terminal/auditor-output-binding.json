@@ -1,0 +1,6 @@
+{
+  "originalSHA256": "7c47fbab3039cd25b7bd680861c36d739fa7986656f890eebad9e0288c49510f",
+  "copySHA256": "09afc45465a14385f7989beb049c44a2474a26a363654224cbcabbd0a56137bf",
+  "onlyChange": "Exclusive local output path; every assertion/import/reference unchanged",
+  "reverseBytesExact": true
+}

@@ -1,0 +1,53 @@
+{
+  "schema": "keel.independent-activation95-static-stage-review@1",
+  "decision": "APPROVE_STATIC_STAGE_AND_READONLY_READINESS_ONLY",
+  "reviewerId": "cache-release-reviewer",
+  "sourceCommit": "0da384c6f32b61f7ee941da4f6a2aede50ac2ec0",
+  "manifestSHA256": "e24aae89cd4e151cc97f7cb0613aed8eccd1c58eb10b59a87f3e238e9025111a",
+  "commandsPath": "/private/tmp/keel-activation95-mount-correction-20261020/docs/reviews/studio-publication-20261020/release/activation95-static-stage/static-stage-commands.proposed.json",
+  "commandsSHA256": "5cffe62ebe5b8d74559e0723f03dd32b4d24b4da8368342da131d7662fe09b23",
+  "root": "/home/ubuntu/keel-studio-activation-9fc5c1d4-34c8-4164-a1ae-33136375d1ba",
+  "allowedCommandFields": [
+    "rootCreateArgv",
+    "files[].exclusiveReceiverArgv with exact stdinLocalPath bytes",
+    "readonlyStaticReadinessArgv"
+  ],
+  "maximumRootCreates": 1,
+  "maximumInstallPerFile": 1,
+  "maximumReadinessRuns": 1,
+  "files": 12,
+  "totalBytes": 138555,
+  "dependencyHelperSHA256": "7d1650301c9201f1e54294ad91a7b00291e1941b10bda29da1be8fe177876bcf",
+  "pendingPlanSHA256": "591a8b72c264642c53baccb25968f724407e9d452b4f5a2a22cd2bd31db750f1",
+  "checks": {
+    "helperReverseByteExactOriginal8c7": true,
+    "readinessOnlyCanonicalMountReporting": true,
+    "pendingOnlyHelperHashChanged": true,
+    "changedPayloads": [
+      "activation-plan.pending.json",
+      "check-static-readiness.py",
+      "receipt-bound-dependencies.py"
+    ],
+    "files": 12,
+    "totalBytes": 138555,
+    "fullLocalFileHashVerification": true,
+    "receiverExclusivityAndFsync": true,
+    "allSixApprovalFlagsFalse": true,
+    "independentTests": {
+      "mount17": 17,
+      "maintainedRecoveryOwnershipHealth": 47,
+      "stageIntegrity": 4,
+      "failures": 0
+    },
+    "initialCheckerSetupError": "An ad hoc packet check incorrectly treated metadata strings and null digests as boolean approval flags. Corrected only checker projection to the six explicit flags; source and payload unchanged."
+  },
+  "prior646Decision": "BLOCKED_ORDER_SENSITIVE_MOUNT_GUARD; no stage execution admitted",
+  "blockingFindings": [],
+  "databaseAccessApproved": false,
+  "snapshotApproved": false,
+  "containerActionsApproved": false,
+  "activationApproved": false,
+  "futureFinalCommandsApproved": false,
+  "signingApproved": false,
+  "submissionApproved": false
+}

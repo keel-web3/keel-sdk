@@ -1,0 +1,13 @@
+test_all_unreviewed_nonempty_host_authority_rejected (__main__.HostOwnership.test_all_unreviewed_nonempty_host_authority_rejected) ... ok
+test_measured_ordinary_daemon_defaults_are_copied_and_guarded (__main__.HostOwnership.test_measured_ordinary_daemon_defaults_are_copied_and_guarded) ... ok
+test_no_remote_logger_or_alternate_runtime_copied (__main__.HostOwnership.test_no_remote_logger_or_alternate_runtime_copied) ... ok
+test_unknown_neutral_daemon_fields_allowed_exact_sandbox_fields_compared (__main__.HostOwnership.test_unknown_neutral_daemon_fields_allowed_exact_sandbox_fields_compared) ... ok
+test_fresh_inspection_before_old_start_detects_restarted_candidate (__main__.StoppedOwnerFence.test_fresh_inspection_before_old_start_detects_restarted_candidate) ... ok
+test_missing_failed_or_ambiguous_stop_inspection_never_restarts_old (__main__.StoppedOwnerFence.test_missing_failed_or_ambiguous_stop_inspection_never_restarts_old) ... ok
+test_stop_error_before_mutation_keeps_old_name_and_runtime_stopped (__main__.StoppedOwnerFence.test_stop_error_before_mutation_keeps_old_name_and_runtime_stopped) ... ok
+test_stop_response_lost_after_mutation_allows_verified_recovery (__main__.StoppedOwnerFence.test_stop_response_lost_after_mutation_allows_verified_recovery) ... ok
+
+----------------------------------------------------------------------
+Ran 8 tests in 0.006s
+
+OK

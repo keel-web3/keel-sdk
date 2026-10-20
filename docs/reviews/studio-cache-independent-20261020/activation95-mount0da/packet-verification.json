@@ -1,0 +1,22 @@
+{
+  "helperReverseByteExactOriginal8c7": true,
+  "readinessOnlyCanonicalMountReporting": true,
+  "pendingOnlyHelperHashChanged": true,
+  "changedPayloads": [
+    "activation-plan.pending.json",
+    "check-static-readiness.py",
+    "receipt-bound-dependencies.py"
+  ],
+  "files": 12,
+  "totalBytes": 138555,
+  "fullLocalFileHashVerification": true,
+  "receiverExclusivityAndFsync": true,
+  "allSixApprovalFlagsFalse": true,
+  "independentTests": {
+    "mount17": 17,
+    "maintainedRecoveryOwnershipHealth": 47,
+    "stageIntegrity": 4,
+    "failures": 0
+  },
+  "initialCheckerSetupError": "An ad hoc packet check incorrectly treated metadata strings and null digests as boolean approval flags. Corrected only checker projection to the six explicit flags; source and payload unchanged."
+}
