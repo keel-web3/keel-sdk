@@ -1,0 +1,125 @@
+{
+  "schema": "keel.qa-actual-fe455-lazy-closure-addendum@1",
+  "result": "PASS_280_DIRECT_AND_IDENTIFIED_LAZY_DEFINITIONS",
+  "candidateImage": "sha256:fe455169d3d10b37696ed17053ff0be167649f5a490acd7e4cea61c2412d6ccb",
+  "previous279ScopeCorrection": "Preserved original raw output was the transitive graph of literal direct require calls only. Its claim of entire reachable closure omitted lazy require.bind(28424). Do not use that original label as complete coverage.",
+  "previous279AllRecordsExactInNew280": true,
+  "soleAdditionalModule": {
+    "old": "28424",
+    "candidate": "28424",
+    "oldSHA256": "cd9f7feed5ae5eb48658c1c2fa1e161c37b3814511b5a93ff7ea9e1d55de6d1c",
+    "candidateSHA256": "f01caf24b8e77c9436aa8fe0dfc77f240af6d14274e47e4801dd2d890c739a77",
+    "oldBytes": 2968,
+    "candidateBytes": 2968,
+    "normalizedSHA256": "1aab9fd289423293381af9f8638294f933d79b586d8d46f4ff59d1ebf26230d9",
+    "equalExceptTypedNumericRequireIds": true,
+    "directCalls": 11,
+    "oldChunk": "chunks/28424.js",
+    "candidateChunk": "chunks/28424.js"
+  },
+  "literalDirectTransitivePlusLazyCount": 280,
+  "failures": 0,
+  "loaderCalls": [
+    {
+      "module": "14367",
+      "kind": "e",
+      "call": "c.e(28424)"
+    },
+    {
+      "module": "14367",
+      "kind": "bind",
+      "call": "c.bind(c,28424)"
+    },
+    {
+      "module": "62148",
+      "kind": "e",
+      "call": "c.e(99882)"
+    },
+    {
+      "module": "62148",
+      "kind": "e",
+      "call": "c.e(58636)"
+    },
+    {
+      "module": "62148",
+      "kind": "bind",
+      "call": "c.bind(c,58636)"
+    },
+    {
+      "module": "71131",
+      "kind": "t",
+      "call": "c.t(d,2)"
+    }
+  ],
+  "noUntrackedNonliteralDirectLoad": true,
+  "allSixLazyChunkVersionsHashAndLengthBoundToActual95AndFe455AppManifests": [
+    {
+      "root": "/private/tmp/keel-public-discovery-build-20261020/image-context/web/apps/studio/.next-discovery-4002-b524-portable22-20261020/server",
+      "relative": "chunks/28424.js",
+      "bytes": 3043,
+      "sha256": "ee418e47388e79990cb24caab8ad1f0ee5fd01a2e7db07f919eb044e8bac2ffa",
+      "modules": [
+        "28424"
+      ]
+    },
+    {
+      "root": "/private/tmp/keel-qa-fe455-artifact-20261020/actual-compiled-server",
+      "relative": "chunks/28424.js",
+      "bytes": 3043,
+      "sha256": "b51f08dcfd4c4f2a08872fe99c87bf52e2f14397474063ed5d66d5c37029dc60",
+      "modules": [
+        "28424"
+      ]
+    },
+    {
+      "root": "/private/tmp/keel-public-discovery-build-20261020/image-context/web/apps/studio/.next-discovery-4002-b524-portable22-20261020/server",
+      "relative": "chunks/99882.js",
+      "bytes": 8352,
+      "sha256": "f4c65cb17b3a291ed9ef68e3a57cb3958fe12b4257a64c10df24433602faf43a",
+      "modules": [
+        "99882"
+      ]
+    },
+    {
+      "root": "/private/tmp/keel-qa-fe455-artifact-20261020/actual-compiled-server",
+      "relative": "chunks/99882.js",
+      "bytes": 8352,
+      "sha256": "f4c65cb17b3a291ed9ef68e3a57cb3958fe12b4257a64c10df24433602faf43a",
+      "modules": [
+        "99882"
+      ]
+    },
+    {
+      "root": "/private/tmp/keel-public-discovery-build-20261020/image-context/web/apps/studio/.next-discovery-4002-b524-portable22-20261020/server",
+      "relative": "chunks/58636.js",
+      "bytes": 26037,
+      "sha256": "2520468b3197b64f0c5a7b7a165a6ade1393feab3953611f71c3e9e20d0d1f98",
+      "modules": [
+        "58636",
+        "71465"
+      ]
+    },
+    {
+      "root": "/private/tmp/keel-qa-fe455-artifact-20261020/actual-compiled-server",
+      "relative": "chunks/58636.js",
+      "bytes": 26037,
+      "sha256": "2520468b3197b64f0c5a7b7a165a6ade1393feab3953611f71c3e9e20d0d1f98",
+      "modules": [
+        "58636",
+        "71465"
+      ]
+    }
+  ],
+  "namespaceMode2": {
+    "call": "c.t(d,2)",
+    "actualRuntimeSHA256": "1731fff704be69a53af89b19deb207302d095f4174685dd3682dbbeb674f0033",
+    "requireOnlyWhenFlag1": "Actual byte-identical runtime t=function(a,b){if(1&b&&(a=this(a)),...; mode2 has bit1 unset, so this call does not require a module."
+  },
+  "supporting99882And58636AndWebpackRuntimeByteExact": true,
+  "canonicalReferenceOrActualModuleBodiesEdited": false,
+  "moduleFactoriesInvoked": false,
+  "networkOrNativeInvoked": false,
+  "actualHostTestsReplayed": false,
+  "sdkAndImageUnchanged": true,
+  "activationExecutionAuthority": false
+}

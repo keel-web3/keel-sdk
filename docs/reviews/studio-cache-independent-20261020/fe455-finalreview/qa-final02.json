@@ -1,0 +1,197 @@
+{
+  "schema": "keel.independent-technical-preactivation-qa@2",
+  "result": "PASS_TECHNICAL_PREACTIVATION_SOURCE_AND_ACTUAL_ARTIFACT",
+  "reviewer": "independent_qa",
+  "candidate": {
+    "siteCommit": "fb3c24e12ffb9a316e894747418146b7b38f243a",
+    "sdkCommit": "311d61526284248938e335d7ed879089408933be",
+    "appImageId": "sha256:fe455169d3d10b37696ed17053ff0be167649f5a490acd7e4cea61c2412d6ccb",
+    "buildId": "nuYbnoJa19cODlsCvyQcG",
+    "unchangedRunnerImage": "sha256:d97ddf2aba94cb963646fdf05bc8dc8c99b7e69b8c19bad85c06bea7c67fc9f5"
+  },
+  "sourceQA": {
+    "commit": "a90e6df4bf4acac5921b95062439f4b30d97348d",
+    "resultSHA256": "4c664dee654f86a1fb40e51c72c4ecfc7d83fe5c584e65061a166090974850c1",
+    "freshPass": 377,
+    "fail": 0,
+    "skip": 0,
+    "ownSDKCanonicalBuild": "PASS",
+    "nonincrementalSiteTSC": "PASS",
+    "MCPTools": 117,
+    "ownSixTarMembersChecked": 1599
+  },
+  "artifact": {
+    "actualBuildReceiptSHA256": "2730154b0343cc53f214ca6cc9c072771b888eca7f098f870cfd6a7bc1345b50",
+    "fullSaveBytes": 703956480,
+    "fullSaveSHA256": "d7b01b81ba15044693511d2d1ec2acaecda0d9f97c62a309a2ba9282d9b6383e",
+    "all40Blobs38LayersIndependentlyVerified": true,
+    "fullAppEntries": 36064,
+    "fullAppTreeSHA256": "345ea159bdf35662cfb79769546f570a41c9ed8426185fc846ea26c44720cf14",
+    "all1360InstalledCoreFilesMatchOwnFresh311": true,
+    "mergedMasterProof": "Site81cea94 fulltree exactfb3; SDK1681772 fulltree exact991 evidence head, packages exact311 and other changes docs-only",
+    "nativeOpsBootstrapPausedWorkerAndOtherExternalDependencies": "Exact95; only four declared studio-agent-drafts file bytes differ externally",
+    "storageReviewActualCompiledDirectAndLazyClosure280": "All279 original records exact plus identified lazy module28424 and its transitive mapping. Entire observed loader set audited: literal direct require, chunk e, bind targets, namespace t(mode2) with no loadbit. Exact old/new lazy chunks bound to actual95/fe455 manifests; runtime/99882/58636 exactbytes. No untracked nonliteral direct load or module factory execution."
+  },
+  "actualPublicQualification": {
+    "sourceCommit": "5b30aa93ee4903a35547d7978f926a8bbbe057b5",
+    "runnerSHA256": "f0e11547a8c065b01496e4cfd0d6154c67f537a61327c0f0b0070fc40a9d21e4",
+    "packetSHA256": "b8620733455b4b969e7564fa5e4611b218126095d9c2821158c3face2e72f8bf",
+    "roles": [
+      {
+        "role": "tree",
+        "stdoutSHA256": "2a6e6c5583ac322fa79c59a266fe7c8470bb98a32b63958e1b4dfa68241a309a",
+        "durableSHA256": "2a6e6c5583ac322fa79c59a266fe7c8470bb98a32b63958e1b4dfa68241a309a",
+        "bytes": 2830,
+        "durableBytesExactStdout": true,
+        "retainedStoppedId": "3d361dd5691ff2ac99d0856e86c804fad44e21938f9f24de157a18b77c366499",
+        "exitCode": 0,
+        "runnerEnforcedStoppedAndOOMFalse": true,
+        "fullCreatedConfigSHA256": "b592e2769b8c580cd5246d238f9e9727132f7395e2b44dbb5f5534dfe3d72dcd",
+        "fullCreatedHostSHA256": "d414ee38017b9a1329f2db1546bebf3af22357f104f173bf999159b81d67168f",
+        "elapsedSeconds": 7.94289075396955,
+        "observerSamples": 0,
+        "observedCgroupPeakBytes": null,
+        "allObservedOOMCountersZero": true,
+        "retainedExactNodeDeprecationWarning": []
+      },
+      {
+        "role": "sdk",
+        "stdoutSHA256": "33f27bcb01ef07c2cb9a75b75da82aa18f44c19b2fe2945a97da1d8742821550",
+        "durableSHA256": "33f27bcb01ef07c2cb9a75b75da82aa18f44c19b2fe2945a97da1d8742821550",
+        "bytes": 40060,
+        "durableBytesExactStdout": true,
+        "retainedStoppedId": "f99430be09993722d6715aa10e303d41f4502cfa3b6ff3ddd0309767f6eaf168",
+        "exitCode": 0,
+        "runnerEnforcedStoppedAndOOMFalse": true,
+        "fullCreatedConfigSHA256": "5ee985a121a2fb0d0b30baf1f0f08f0373520e3a261feb7285ccc83e75f1821a",
+        "fullCreatedHostSHA256": "e034da1c383657b86312d551208ba569613f9562f804044a1f558a47f92dcde9",
+        "elapsedSeconds": 6.418318452080712,
+        "observerSamples": 15,
+        "observedCgroupPeakBytes": 314994688,
+        "allObservedOOMCountersZero": true,
+        "retainedExactNodeDeprecationWarning": [
+          "(node:43) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.",
+          "(Use `node --trace-deprecation ...` to show where the warning was created)"
+        ]
+      },
+      {
+        "role": "http",
+        "stdoutSHA256": "dd5483bcfe49f99dd9ee85d9ccc4e406c87bdaa45ae9235f2ac813540663c84c",
+        "durableSHA256": "dd5483bcfe49f99dd9ee85d9ccc4e406c87bdaa45ae9235f2ac813540663c84c",
+        "bytes": 15938,
+        "durableBytesExactStdout": true,
+        "retainedStoppedId": "422df3ace177497c9879eb9317b01b586faa1ea1890dddd4efc817d674323d30",
+        "exitCode": 0,
+        "runnerEnforcedStoppedAndOOMFalse": true,
+        "fullCreatedConfigSHA256": "9eacbbcdfdc77a38748600c53fc43bb3832da097e2a85d5102e7f93d8dab9d9e",
+        "fullCreatedHostSHA256": "c8ec2f7b906fcde4f9ff87c03a15fdffe3e5dc87fc82dc7623b04729cdf50e97",
+        "elapsedSeconds": 9.47083344613202,
+        "observerSamples": 22,
+        "observedCgroupPeakBytes": 266977280,
+        "allObservedOOMCountersZero": true,
+        "retainedExactNodeDeprecationWarning": []
+      }
+    ],
+    "sameCaps": "768MiB memory/swap; SDK2CPU/treeHTTP1CPU;64PIDs; networknone;readonlyUID999;emptyPG cover/no data credentials or proofsocket",
+    "allDurableOutputsExactStdout": true,
+    "original95AndRunnerPreserved": {
+      "originalId": "7fd10f4d82afd155b2bd2df5d4ae57017fc5f4ecea4b284c13e493d6abae59a1",
+      "configSHA256": "4bcd9f4748cb653ea4bbafc483662c1dc32ec90339b0777dcf4f7e906707d055",
+      "hostSHA256": "186e487039113f582118064bce13b98c79f75eca5b3fa0d788c7d79b8fb14049",
+      "mountsSHA256": "74cc304b0955c822f88ffdbcbff56d89857f5ea3d7c51246ec106f00247ade89",
+      "runnerId": "434316eff6e19951807f95ba8aee03a4db684d760039dfeb723c7bf9203a8649",
+      "workerPaused": true,
+      "healthy": true
+    },
+    "http": "Four public GETHEAD200 with exactMIME/manifestbytes;16 private and wrong-method401 on actual packaged loopbackserver",
+    "runtimeNode": "v22.23.1",
+    "runtimeViem": "2.57.7",
+    "fullPrivateProgramOrRPCInvoked": false,
+    "executionAttribution": "Root sole host operator; QA independently audited frozen source, archive and durable raw receipts, not independently executed host roles"
+  },
+  "freshOpsControls": [
+    {
+      "file": "build-controls.test.py.stderr",
+      "tests": 2,
+      "result": "PASS"
+    },
+    {
+      "file": "candidate-oom-default.test.py.stderr",
+      "tests": 8,
+      "result": "PASS"
+    },
+    {
+      "file": "delta-controls.test.py.stderr",
+      "tests": 5,
+      "result": "PASS"
+    },
+    {
+      "file": "image-only-controls.test.py.stderr",
+      "tests": 9,
+      "result": "PASS"
+    },
+    {
+      "file": "sdk-delta-controls.test.py.stderr",
+      "tests": 5,
+      "result": "PASS"
+    },
+    {
+      "file": "qualification-controls.stderr",
+      "tests": 5,
+      "result": "PASS"
+    }
+  ],
+  "warningParserCorrection": {
+    "patchSHA256": "2eb389746babf2b6a2e85fe54d3010bb2de832250e0b4a7cd5f855cae1c4eb4e",
+    "reviewSHA256": "e4942504e3d128b6563c96585634a0cd396eb78fd30e04e775343454a0d68db1",
+    "independentlyApproved": true,
+    "scope": "Enumerates exact two Node43 SDK-only DEP0040 warning lines; preserves original parserRED/all actual identity/observer/status assertions. No product or maintained test changes."
+  },
+  "evidence": {
+    "image-audit.json": "47231b0c1fab450ef40e2ef646f6d6f1d601c20d55d9976dbc6434f4216bf6b6",
+    "source-and-compiled-lineage.json": "f8691f27ca9affe560f30875dfb5773b7753e77ae4db68049fd3538292100326",
+    "runtime-receipt-audit.json": "0f18991b9f3215b2eeb5e6a7a826caef05b907a0eeff1a01973bb297a7025cd9",
+    "acceptance-matrix.json": "4d81648c9893db3f41c5b32226bb27bab0ec1a5612a6b544ab0221efb341fad4",
+    "qualification-admission.json": "45ac595da7c1e128d9800fdd836acc56b7b30737cda24b5497fec741a1a3760e",
+    "lazy-coverage-addendum.json": "ec15200ac215050e3758fa7f200c4e14519490f202d7ccb4516ab0a18b7fb820",
+    "acceptance-matrix02.json": "478dcdf72d3dfba31b14d088b6846fc6ef224eefc7ec96f154d2876f6f95a72c"
+  },
+  "qaTechnicalPreactivationApproval": true,
+  "finalExactActivationPlanStillRequiresSeparateReviewAndLeadAuthority": true,
+  "activationExecutionAuthority": false,
+  "productionActivatedByQA": false,
+  "signing": false,
+  "submission": false,
+  "newPrivateProgramReplay": false,
+  "mandatoryPostdeploymentGate6": [
+    "Normal deployed own exact-source Gator1cef workflow to actual full native simulation and unsigned wallet",
+    "Normal deployed realGIFfcf workflow to actual full native simulation and unsigned wallet",
+    "Historical normal authenticated renderer exactMIME/hash/SDKdecode/canvas on this exact new build; rawHTTPstatus only if observed",
+    "Original Kthings owner check remains later; no access bypass"
+  ],
+  "retainedNegatives": [
+    "Olde61/b524 compatibility3FAIL2PASS remains separate immutable evidence",
+    "Initial own TypeScript tooling path lookup setupFAIL retained, corrected to owned apps/studio dependencyroot only",
+    "Initial new stderr parserRED on exactNodewarning retained and explicitly independently approved correction",
+    "All prior activation/native/GIF guard/fixture REDs retain their original candidates; no fresh image/program/live success inferred from helpers"
+  ],
+  "supersedesAggregateForLazyCoverageOnly": {
+    "path": "qa-final.json",
+    "sha256": "acd1382b595ad32def38299782041c3882b7d6821791d58b146ed9d39251d298",
+    "originalResultPreserved": "All original source/artifact/actual runtime results unchanged; original279 traversal label is narrowed to literal direct-require transitive graph."
+  },
+  "compiledLazyCoverageAddendum": {
+    "path": "lazy-coverage-addendum.json",
+    "sha256": "ec15200ac215050e3758fa7f200c4e14519490f202d7ccb4516ab0a18b7fb820",
+    "rawComparison": "actual-lazy-closure.stdout",
+    "rawSHA256": "c484f79846012725b4234cf0061309dc54f4c6c26022f0c8baa335b19b673343",
+    "scriptSHA256": "00ad93750b39d0a08ec59d7cf29d2fdfc4f3cbacd95b945de8f2c5274bbdd963",
+    "actualArchivedFe455RootUsed": true,
+    "independentQARerun": true,
+    "passedDefinitions": 280,
+    "failures": 0,
+    "referenceOrModuleBodyEdits": false,
+    "sourceImageRuntimeInputsUnchanged": true,
+    "actualRuntimeTestsReplayed": false
+  }
+}

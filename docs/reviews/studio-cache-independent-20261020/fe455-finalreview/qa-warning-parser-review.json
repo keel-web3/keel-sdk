@@ -1,0 +1,38 @@
+{
+  "decision": "APPROVE_EXACT_QA_WARNING_OBSERVATION_PARSER_CORRECTION",
+  "reviewerId": "cache-release-reviewer",
+  "patchSHA256": "2eb389746babf2b6a2e85fe54d3010bb2de832250e0b4a7cd5f855cae1c4eb4e",
+  "beforeSHA256": "f10c1e1e4a67e74ac75d3f8afa89821ce80f0e06bbf0eff869ba2c3d211da7ef",
+  "afterSHA256": "fb5bbfa362e852c126096ee79da1e2daf437cd53965262a1240bfd0812a44848",
+  "exactWarningLinesSDKOnly": [
+    "(node:43) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.",
+    "(Use `node --trace-deprecation ...` to show where the warning was created)"
+  ],
+  "otherRolesMustHaveNoWarnings": true,
+  "receiptPayloadExitOOMIdentityAssertionsUnchanged": true,
+  "initialParserRedPreserved": true,
+  "observed": {
+    "tree": {
+      "warnings": [],
+      "observerEvents": 0,
+      "durableSHA256": "2a6e6c5583ac322fa79c59a266fe7c8470bb98a32b63958e1b4dfa68241a309a",
+      "result": "PASS"
+    },
+    "sdk": {
+      "warnings": [
+        "(node:43) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.",
+        "(Use `node --trace-deprecation ...` to show where the warning was created)"
+      ],
+      "observerEvents": 15,
+      "durableSHA256": "33f27bcb01ef07c2cb9a75b75da82aa18f44c19b2fe2945a97da1d8742821550",
+      "result": "PASS"
+    },
+    "http": {
+      "warnings": [],
+      "observerEvents": 22,
+      "durableSHA256": "dd5483bcfe49f99dd9ee85d9ccc4e406c87bdaa45ae9235f2ac813540663c84c",
+      "result": "PASS"
+    }
+  },
+  "scope": "Pure fixed actual-receipt parser correction only; no product assertion, source, authority, RPC or transaction change."
+}
