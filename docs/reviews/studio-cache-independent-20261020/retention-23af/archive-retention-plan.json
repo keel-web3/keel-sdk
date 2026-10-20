@@ -1,0 +1,72 @@
+{
+  "schema": "keel.two-protected-older-input-retention@1",
+  "id": "f801a4be-623c-498a-96f5-ede05cad642d",
+  "operatorSHA256": "3268e21a73a0fc2fff9b720073cb19692d485f6715ce77f7bdf14b8859062e0b",
+  "files": [
+    {
+      "path": "/home/ubuntu/keel-studio-alias-171f635e-20261014/keel-showcase.tar.gz",
+      "bytes": 555623546,
+      "allocatedBytes": 555630592,
+      "device": 2049,
+      "inode": 4980888,
+      "uid": 1000,
+      "gid": 1000,
+      "mode": 420,
+      "links": 1,
+      "mtimeNs": 1791950418000000000,
+      "ctimeNs": 1791957326326578609,
+      "sha256": "7cd9852035ef222fb8dd806b28da05561cf2ec30127d0025b84c8d0bf2f61f01"
+    },
+    {
+      "path": "/home/ubuntu/keel-studio-primary-0bd2db80-20261014/keel-showcase.tar.gz",
+      "bytes": 555608603,
+      "allocatedBytes": 555614208,
+      "device": 2049,
+      "inode": 4980882,
+      "uid": 1000,
+      "gid": 1000,
+      "mode": 384,
+      "links": 1,
+      "mtimeNs": 1791937590000000000,
+      "ctimeNs": 1791938838856834251,
+      "sha256": "8ac4dc36a1dbc44da7a12efa985497980a31b3d3e8bcec4f01a2477be731bd77"
+    }
+  ],
+  "allocatedBytesReclaimUpperBound": 1111244800,
+  "protectedLocalRetentionReceiptPath": "/Users/ravonus/dev/wt/studio-publication-20261019/native-artifacts/retained-older-build-inputs-20261020/retention-receipt.json",
+  "protectedLocalRetentionReceiptSHA256": "bfa9b343cab907e053e19d88aaa706d3954536273ced9343e0c50bf058eb1b46",
+  "independentQACommit": "b02d0ff3319b44e00032c8e52bc4773e6b257818",
+  "independentQALocalAuditSHA256": "59a263a953e4271dd3f43760adc8f6ea4fbe679108c6256d132a2cc8f6d600f8",
+  "independentQARemoteAuditSHA256": "099e8cbe4f1be9d0e1dfd24e4c2ee94677864dcf58660ea0c1e7318224f50df9",
+  "archivesExtracted": false,
+  "applicationActivation": false,
+  "keepAllOtherFilesDirectoriesImagesContainersVolumesDataAndRollback": true,
+  "restoration": {
+    "offhostProtectedCopies": [
+      {
+        "source": "/home/ubuntu/keel-studio-alias-171f635e-20261014/keel-showcase.tar.gz",
+        "retainedLocalPath": "/Users/ravonus/dev/wt/studio-publication-20261019/native-artifacts/retained-older-build-inputs-20261020/alias-171f635e-keel-showcase.tar.gz",
+        "sha256": "7cd9852035ef222fb8dd806b28da05561cf2ec30127d0025b84c8d0bf2f61f01",
+        "bytes": 555623546,
+        "originalUID": 1000,
+        "originalGID": 1000,
+        "originalMode": 420,
+        "originalMTimeNs": 1791950418000000000
+      },
+      {
+        "source": "/home/ubuntu/keel-studio-primary-0bd2db80-20261014/keel-showcase.tar.gz",
+        "retainedLocalPath": "/Users/ravonus/dev/wt/studio-publication-20261019/native-artifacts/retained-older-build-inputs-20261020/primary-0bd2db80-keel-showcase.tar.gz",
+        "sha256": "8ac4dc36a1dbc44da7a12efa985497980a31b3d3e8bcec4f01a2477be731bd77",
+        "bytes": 555608603,
+        "originalUID": 1000,
+        "originalGID": 1000,
+        "originalMode": 384,
+        "originalMTimeNs": 1791937590000000000
+      }
+    ],
+    "procedure": "Copy each protected exact file via existing trusted transport to an exclusive temporary file in its original parent; verify fullSHA/size; restore uid/gid/mode and mtimeNs; fsync file+parent; renameat2NOREPLACE to original basename. Stop on any foreign occupant/denial/failedverification. This is documentation, not an executable restore approval.",
+    "inodeOrCTimePreservationPromised": false
+  },
+  "status": "PROPOSAL_REQUIRES_EXACT_INDEPENDENT_REVIEW_AND_COORDINATED_ONE_ACTION",
+  "minimumReceiptSpaceBytes": 1048576
+}

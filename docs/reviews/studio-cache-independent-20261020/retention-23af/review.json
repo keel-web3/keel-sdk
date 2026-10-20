@@ -1,0 +1,83 @@
+{
+  "schema": "keel.independent-older-build-retention-review@1",
+  "decision": "APPROVE_ONE_EXACT_RETENTION_ACTION",
+  "sourceCommit": "23af224224db443d5b1c958e91f131c897959fba",
+  "command": {
+    "path": "/private/tmp/keel-independent-retention-23af-20261020/command-admission.json",
+    "bytes": 7788,
+    "sha256": "ec7a2ab500c233b08e9453c2d13f2af0aba80cf5748a477715580fc401ba919d"
+  },
+  "review": {
+    "path": "/private/tmp/keel-independent-retention-23af-20261020/archive-retention-review.json",
+    "bytes": 3294,
+    "sha256": "0a3f83700df7ba23eb13c90a728f4dff54fdacd958ea7062b56b64cffdb5ff35"
+  },
+  "independentTests": {
+    "maintainedLinux": 7,
+    "newReferenceAndActualPostunlinkFault": 4,
+    "failures": 0,
+    "skips": 0
+  },
+  "bothProtectedCopiesIndependentlyFullHashed": true,
+  "noArchiveExtraction": true,
+  "independentQACommit": "b02d0ff3319b44e00032c8e52bc4773e6b257818",
+  "noHostActionByReviewer": true,
+  "scope": "Exactly two named older input archive files, protected fullbytes retained locally; no currentruntime,rollback,image/container/volume/database mutation.",
+  "evidence": [
+    {
+      "path": "/Users/ravonus/dev/wt/studio-cache-independent-review-20261020/docs/reviews/studio-cache-independent-20261020/retention-23af/adversarial.test.py",
+      "bytes": 2031,
+      "sha256": "66342337931b17bf91413a7e2c8d7c7c41acd9440ab1e5001393715f2d656007"
+    },
+    {
+      "path": "/Users/ravonus/dev/wt/studio-cache-independent-review-20261020/docs/reviews/studio-cache-independent-20261020/retention-23af/archive-retention-plan.json",
+      "bytes": 3504,
+      "sha256": "2f21e96ada07a0ed9fd1c7c51e9a4fb92a98f07d8c8ca4bb32206f6f72aec774"
+    },
+    {
+      "path": "/Users/ravonus/dev/wt/studio-cache-independent-review-20261020/docs/reviews/studio-cache-independent-20261020/retention-23af/archive-retention-review.json",
+      "bytes": 3294,
+      "sha256": "0a3f83700df7ba23eb13c90a728f4dff54fdacd958ea7062b56b64cffdb5ff35"
+    },
+    {
+      "path": "/Users/ravonus/dev/wt/studio-cache-independent-review-20261020/docs/reviews/studio-cache-independent-20261020/retention-23af/bootstrap.py",
+      "bytes": 32610,
+      "sha256": "1dab3c850dc891cc4680bf1095d8a458e908a68f0c9ea9a35d0534417dbb9996"
+    },
+    {
+      "path": "/Users/ravonus/dev/wt/studio-cache-independent-review-20261020/docs/reviews/studio-cache-independent-20261020/retention-23af/command-admission.json",
+      "bytes": 7788,
+      "sha256": "ec7a2ab500c233b08e9453c2d13f2af0aba80cf5748a477715580fc401ba919d"
+    },
+    {
+      "path": "/Users/ravonus/dev/wt/studio-cache-independent-review-20261020/docs/reviews/studio-cache-independent-20261020/retention-23af/linux-process.json",
+      "bytes": 109,
+      "sha256": "ff6af967ec94c7be8190c84582dfdbaf68c95a2aa0d8849eb843306e73b20619"
+    },
+    {
+      "path": "/Users/ravonus/dev/wt/studio-cache-independent-review-20261020/docs/reviews/studio-cache-independent-20261020/retention-23af/linux.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/Users/ravonus/dev/wt/studio-cache-independent-review-20261020/docs/reviews/studio-cache-independent-20261020/retention-23af/linux.stdout",
+      "bytes": 1138,
+      "sha256": "10ea61c8e6654677fe49441c8507b61035ee275d47c1776a77618bea39de7c8c"
+    },
+    {
+      "path": "/Users/ravonus/dev/wt/studio-cache-independent-review-20261020/docs/reviews/studio-cache-independent-20261020/retention-23af/local-retention-fullhash.json",
+      "bytes": 775,
+      "sha256": "d19f789f12200e6a5d6017582f18d288af459773d203b476094084e98dffe77f"
+    },
+    {
+      "path": "/Users/ravonus/dev/wt/studio-cache-independent-review-20261020/docs/reviews/studio-cache-independent-20261020/retention-23af/retain-older-inputs.py",
+      "bytes": 12988,
+      "sha256": "3268e21a73a0fc2fff9b720073cb19692d485f6715ce77f7bdf14b8859062e0b"
+    },
+    {
+      "path": "/Users/ravonus/dev/wt/studio-cache-independent-review-20261020/docs/reviews/studio-cache-independent-20261020/retention-23af/retention.test.py",
+      "bytes": 5228,
+      "sha256": "89016ee51e02c8744727d7cb43b8db38db9b23dff31230c9495baeae16240f47"
+    }
+  ]
+}
