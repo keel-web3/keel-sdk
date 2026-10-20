@@ -1,0 +1,111 @@
+{
+  "schema": "keel.failed-activation95-pure-guard-diagnosis@1",
+  "applicationGuard": [
+    {
+      "type": "DeploymentGuardError",
+      "reason": "replacement_configuration_mismatch"
+    }
+  ],
+  "configDifferences": [
+    {
+      "section": "HostConfig",
+      "key": "OomKillDisable",
+      "expectedSHA256": "74234e98afe7498fb5daf1f36ac2d78acc339464f950703b8c019892f982b90b",
+      "actualSHA256": "fcbcf165908dd18a9e49f7ff27810176db8e9f63b4352213741664245224f8aa",
+      "expectedType": "NoneType",
+      "actualType": "bool",
+      "expectedPresent": true,
+      "actualPresent": true,
+      "expected": null,
+      "actual": false
+    }
+  ],
+  "mounts": [
+    {
+      "Type": "volume",
+      "Name": "0d9eca55480a9798561fb99565277d6d741ccfac9b30131d19e76c2e4247a066",
+      "Source": "/var/lib/docker/volumes/0d9eca55480a9798561fb99565277d6d741ccfac9b30131d19e76c2e4247a066/_data",
+      "Destination": "/var/lib/postgresql/data",
+      "Driver": "local",
+      "Mode": "rw",
+      "RW": true,
+      "Propagation": ""
+    },
+    {
+      "Type": "volume",
+      "Name": "keel-studio-proof-socket-9fc5c1d4-34c8-4164-a1ae-33136375d1ba",
+      "Source": "/var/lib/docker/volumes/keel-studio-proof-socket-9fc5c1d4-34c8-4164-a1ae-33136375d1ba/_data",
+      "Destination": "/run/keel-proof",
+      "Driver": "local",
+      "Mode": "z",
+      "RW": false,
+      "Propagation": ""
+    },
+    {
+      "Type": "volume",
+      "Name": "keel-showcase-ovh",
+      "Source": "/var/lib/docker/volumes/keel-showcase-ovh/_data",
+      "Destination": "/data",
+      "Driver": "local",
+      "Mode": "rw",
+      "RW": true,
+      "Propagation": ""
+    }
+  ],
+  "originalMounts": [
+    {
+      "Type": "volume",
+      "Name": "keel-showcase-ovh",
+      "Source": "/var/lib/docker/volumes/keel-showcase-ovh/_data",
+      "Destination": "/data",
+      "Driver": "local",
+      "Mode": "rw",
+      "RW": true,
+      "Propagation": ""
+    },
+    {
+      "Type": "volume",
+      "Name": "0d9eca55480a9798561fb99565277d6d741ccfac9b30131d19e76c2e4247a066",
+      "Source": "/var/lib/docker/volumes/0d9eca55480a9798561fb99565277d6d741ccfac9b30131d19e76c2e4247a066/_data",
+      "Destination": "/var/lib/postgresql/data",
+      "Driver": "local",
+      "Mode": "rw",
+      "RW": true,
+      "Propagation": ""
+    }
+  ],
+  "socketVolume": {
+    "CreatedAt": "2026-10-20T21:50:39Z",
+    "Driver": "local",
+    "Labels": null,
+    "Mountpoint": "/var/lib/docker/volumes/keel-studio-proof-socket-9fc5c1d4-34c8-4164-a1ae-33136375d1ba/_data",
+    "Name": "keel-studio-proof-socket-9fc5c1d4-34c8-4164-a1ae-33136375d1ba",
+    "Options": {
+      "device": "tmpfs",
+      "o": "size=16m,uid=999,gid=999,mode=0700,noexec,nosuid",
+      "type": "tmpfs"
+    },
+    "Scope": "local"
+  },
+  "oldState": {
+    "running": true,
+    "healthy": "healthy"
+  },
+  "candidateState": {
+    "Status": "created",
+    "Running": false,
+    "Paused": false,
+    "Restarting": false,
+    "OOMKilled": false,
+    "Dead": false,
+    "Pid": 0,
+    "ExitCode": 0,
+    "Error": "",
+    "StartedAt": "0001-01-01T00:00:00Z",
+    "FinishedAt": "0001-01-01T00:00:00Z"
+  },
+  "databaseAccess": false,
+  "mutations": 0
+}
+{"basename": "database-snapshot-result.json", "bytes": 1028, "sha256": "027606f61439f38aaa5598269e676a8f6bb777c1b82ab3ab896f5175fb429f5e", "content": {"schema": "keel-private-database-snapshot-result@1", "result": "PASS", "budgetBytes": 268435456, "innerDeadlineMs": 150000, "innerKillGraceMs": 5000, "outerDeadlineSeconds": 180, "diagnosticRetainedCapBytes": 65536, "dockerExitCode": 0, "container": {"schema": "keel-container-database-snapshot@1", "result": "PASS", "category": "complete", "childExitCode": 0, "childSignal": null, "childClosed": true, "streamedBytes": 123386980, "stderrBytes": 0, "stderrRetainedBytes": 0, "stderrSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855", "stderrPrefixBase64": "", "deadlineMs": 150000, "killGraceMs": 5000, "termSent": false, "killSent": false}, "diagnosticObservedBytes": 387, "diagnosticRetainedBytes": 387, "diagnosticSHA256": "3bc33b9ff0a92ddbb9ae86179c912a8fbba8b82a93371598cf1985f78f5273c6", "snapshotBytes": 123386980, "snapshotSHA256": "8f84944c6ca183018c79ecf11e7bcea1c3a44886c809b1d3d101c5fe22a47094"}}
+{"basename": "snapshot-diagnostics.json", "bytes": 387, "sha256": "3bc33b9ff0a92ddbb9ae86179c912a8fbba8b82a93371598cf1985f78f5273c6", "content": {"schema": "keel-container-database-snapshot@1", "result": "PASS", "category": "complete", "childExitCode": 0, "childSignal": null, "childClosed": true, "streamedBytes": 123386980, "stderrBytes": 0, "stderrRetainedBytes": 0, "stderrSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855", "stderrPrefixBase64": "", "deadlineMs": 150000, "killGraceMs": 5000, "termSent": false, "killSent": false}}

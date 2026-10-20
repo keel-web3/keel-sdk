@@ -1,0 +1,22 @@
+test_baseline (__main__.FullMountMultiset.test_baseline) ... ok
+test_destination (__main__.FullMountMultiset.test_destination) ... ok
+test_driver (__main__.FullMountMultiset.test_driver) ... ok
+test_duplicate (__main__.FullMountMultiset.test_duplicate) ... ok
+test_missing (__main__.FullMountMultiset.test_missing) ... ok
+test_mode (__main__.FullMountMultiset.test_mode) ... ok
+test_name (__main__.FullMountMultiset.test_name) ... ok
+test_nested_array_order (__main__.FullMountMultiset.test_nested_array_order) ... ok
+test_original_config_unchanged (__main__.FullMountMultiset.test_original_config_unchanged) ... ok
+test_original_host_config_unchanged (__main__.FullMountMultiset.test_original_host_config_unchanged) ... ok
+test_outer_permutation_preserves_all_full_elements (__main__.FullMountMultiset.test_outer_permutation_preserves_all_full_elements) ... ok
+test_propagation (__main__.FullMountMultiset.test_propagation) ... ok
+test_rw (__main__.FullMountMultiset.test_rw) ... ok
+test_scalar_type (__main__.FullMountMultiset.test_scalar_type) ... ok
+test_source (__main__.FullMountMultiset.test_source) ... ok
+test_type (__main__.FullMountMultiset.test_type) ... ok
+test_unknown_field (__main__.FullMountMultiset.test_unknown_field) ... ok
+
+----------------------------------------------------------------------
+Ran 17 tests in 0.001s
+
+OK

@@ -1,0 +1,11 @@
+test_daemon_false_default_passes_full_application_guard (__main__.ActualDefaultRegression.test_daemon_false_default_passes_full_application_guard) ... ok
+test_explicit_false_preserved (__main__.ActualDefaultRegression.test_explicit_false_preserved) ... ok
+test_explicit_true_preserved_not_coerced (__main__.ActualDefaultRegression.test_explicit_true_preserved_not_coerced) ... ok
+test_guard_still_rejects_true_and_integer_zero (__main__.ActualDefaultRegression.test_guard_still_rejects_true_and_integer_zero) ... ok
+test_pinned_null_default_explicit_false_without_old_mutation (__main__.ActualDefaultRegression.test_pinned_null_default_explicit_false_without_old_mutation) ... ok
+test_unrelated_host_permissions_still_rejected (__main__.ActualDefaultRegression.test_unrelated_host_permissions_still_rejected) ... ok
+
+----------------------------------------------------------------------
+Ran 6 tests in 0.000s
+
+OK
