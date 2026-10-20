@@ -1,0 +1,8 @@
+{
+  "schema": "reviewer-own-audit-parser-corrections@1",
+  "healthInitialError": "KeyError status on final bounded-health-window-finished record, retained initial stdout/stderr.",
+  "healthCorrection": "Assert every schema-tagged read has HTTP200 and separately require exactly one interrupted configurationChange:false terminal record plus the owned SIGTERM stop receipt; no health failure ignored.",
+  "walletInitialError": "Ad-hoc equality compared owner display index1 with source index0 and failed before other metadata assertions.",
+  "walletCorrection": "Assert exact sequential1/2/3 and source0/1/2 mapping, signed transactions exact; compare full initcode object and exact runtime bytes/SHA/Keccak, separately require original source metadata status.",
+  "runtimeOrProductChanges": false
+}

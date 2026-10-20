@@ -1,0 +1,124 @@
+{
+  "schema": "independent-current-create-postrun-audit@1",
+  "decision": "PASS_PREREQUISITE_NATIVE_CHARACTERIZATION_ONLY",
+  "planSHA256": "6c88643d56e4e181231480b8b4090bbe53e205849987407c06266b24e667e79f",
+  "requestSHA256": "b7c95872efa3e65f94888219a8bf89572e71c3ebd1515004ba022904e23c16d4",
+  "nativeEnvelope": {
+    "bytes": 123479,
+    "sha256": "fe543ca9fb6ee0a3d56fc87e068b987f69f653c8c811482bf71e5074212c3d7f"
+  },
+  "durableReceipt": {
+    "bytes": 71610,
+    "sha256": "3c823b3bd973fbdf1335386cbed045df760ed899eaf88d4e1a555f79d0449c56",
+    "exactReconstructedFromTerminal": true
+  },
+  "nativeImportReceiptSHA256": "94363e9b6b454edf2bb0d47c5648fdde35035a5d20a90f338aedcb98a8903e5d",
+  "rawFactory": {
+    "bytes": 64445,
+    "sha256": "dde5065538c2e18fc4a4426b47197d40d8850b61fdea1d1a31590981dccb1c72"
+  },
+  "canonicalBlock": {
+    "number": "11956069",
+    "hash": "0xc991ca990f1b2b8eb6bc8483eb199137c5ff16318524d71f03b8c128dafaffe6"
+  },
+  "resultBlock": {
+    "number": "0xb66f66",
+    "hash": "0x3da7c24a3d848b2f0990bbfa0e202402194cf703296618ffad16aec06b1fbf0d",
+    "parentHash": "0xc991ca990f1b2b8eb6bc8483eb199137c5ff16318524d71f03b8c128dafaffe6",
+    "stateRoot": "0xec92fc3dd9e014d2ad2603b45547ab6bc5e444591460035d9b4e22a4d1136dfd"
+  },
+  "calls": [
+    {
+      "index": 0,
+      "gasUsed": 7449976,
+      "returnedBytes": 4683,
+      "returnedSHA256": "0c0378cd53af45c0b9a0df29db7615bf122fc0ac68cc59918efcb98593293584"
+    },
+    {
+      "index": 1,
+      "gasUsed": 50745569,
+      "returnedBytes": 4563,
+      "returnedSHA256": "526bdb9a141827bd0fc1223c4c614fc2365c92e3e6d1dd2d077349d29738016a"
+    },
+    {
+      "index": 2,
+      "gasUsed": 26360009,
+      "returnedBytes": 16911,
+      "returnedSHA256": "df1aeac604199ff6dc48a35e49986cfa040f168ec752508ab47fbc06a23e6420"
+    }
+  ],
+  "nativeEvidence": {
+    "accountProofs": 33,
+    "baseStateRoot": "0xfebe76e58c983d7e78ba12358a658d186ed8c159451dd1a6c6c11910f6e551c5",
+    "blockHash": "0xc991ca990f1b2b8eb6bc8483eb199137c5ff16318524d71f03b8c128dafaffe6",
+    "chainId": 11155111,
+    "codeHashChecks": 6,
+    "gasBudget": 10000000000,
+    "gethCommit": "a579077007b98217c3e253a66e4b452ca0c32b96",
+    "nativeWallTimeMs": 9778,
+    "processCPUMicroseconds": 84142,
+    "processPeakRSSBytes": 14942208,
+    "readRequests": 39,
+    "requestSha256": "fe543ca9fb6ee0a3d56fc87e068b987f69f653c8c811482bf71e5074212c3d7f",
+    "responseBytes": 275627,
+    "schema": "keel-proof-executor-evidence@1",
+    "signing": "not-performed",
+    "state": "ephemeral-proof-backed",
+    "storageProofs": 19,
+    "submission": "not-performed",
+    "witnessBytes": 131425,
+    "witnessClosureProofs": 0,
+    "binarySha256": "3f9c2e9f2a9fb4267695bfc8493379001f81d1f7cca8b75eaa19133b0f20fcc8"
+  },
+  "physicalState": {
+    "count": 44,
+    "maximumRequestBytes": 283,
+    "totalRequestBytes": 10019,
+    "methods": {
+      "eth_chainId": 2,
+      "eth_getBlockByNumber": 3,
+      "eth_getProof": 33,
+      "eth_getCode": 6
+    },
+    "allHTTP200": true,
+    "remoteSimulationCount": 0
+  },
+  "originalFullGuardUnchanged": {
+    "id": "b6ff8c7a6f5c2282e29883de917f2d376a8e92efffecc45d115338e0516a5201",
+    "imageId": "sha256:a53c65ac2aee00217f206f07f4ddecbf9d55b5a43f60bf87858d9756259ba730",
+    "running": true,
+    "healthy": true,
+    "workerPaused": true,
+    "configSha256": "9543c71f9f506e5243c9a74a3d70007ab6919c9f4eb76c0fec8ad7cdb40a77eb",
+    "hostConfigSha256": "9ebb974a9d71321d58a0bb74a528d089a6a4337a54328460a9768ff260e56467"
+  },
+  "cleanup": {
+    "client": {
+      "state": "stopped",
+      "containerId": "d024635c4ce43563dad748939b670df3538b608b5e1e36924c40e0f9bf601027",
+      "retained": true
+    },
+    "runner": {
+      "state": "stopped",
+      "containerId": "9bbc13307d16ce13740d9202aa7cf9ce63ccad8e6e07b97e4051a522eee60d29",
+      "retained": true
+    }
+  },
+  "healthHTTP200Observations": 17,
+  "ownedHealthStopRecorded": true,
+  "originalPublicTimeoutClaimPreserved": true,
+  "mayOfferExactSharedPrerequisitePacketForOwnerApproval": true,
+  "ownerApprovalIsNotTransactionAuthorityForAgent": true,
+  "childRuntimeObserved": false,
+  "originalGIFQualified": false,
+  "activationApproved": false,
+  "publicationReady": false,
+  "signing": "not-performed",
+  "submission": "not-performed",
+  "remainingSequence": [
+    "Obtain explicit owner approval for exact shared prerequisite transactions only; no automatic signing or spending.",
+    "Submit only after approval, verify each receipt and exact runtime/child bytes and selected-chain registrations/readbacks.",
+    "Run unchanged normal original GIF compiler and full proof on actual dependencies; preserve GIF gate.",
+    "Complete independent release/activation plan gates and own-Juniper exact Gator deployed UI unsigned wallet boundary."
+  ]
+}

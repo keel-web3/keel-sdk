@@ -1,0 +1,80 @@
+{
+  "schema": "independent-native-prerequisite-owner-packet-review@1",
+  "decision": "APPROVE_FOR_OWNER_REVIEW_ONLY",
+  "reviewerId": "cache-release-independent-reviewer",
+  "packetSourceCommit": "211c353fdd9bb688e45e496e339bd13ed87d2d89",
+  "packetSHA256": "628d9615dacfd046e557821557c2b042fab1bc0e673f9c65bd887bbf9882e1db",
+  "packetBytes": 129885,
+  "nativeTerminalAuditSHA256": "b4d2c8735b4459f79a7f5d31aa86947f90fd3d1fb19900fc5afae46e7402426d",
+  "blockingFindings": [],
+  "signingEquivalence": "Every transaction exactly equals its independently simulated call plus explicit chainId0xaa36a7; CREATE to remains omitted. Sender, nonce, gas, data, value, priority and fee unchanged. All three CREATE addresses independently recalculated with viem.",
+  "transactions": [
+    {
+      "role": "metadata formatter",
+      "nonce": 296,
+      "gasLimit": 9012324,
+      "maxFeePerGasWei": 1000030,
+      "maxPriorityFeePerGasWei": 1000000,
+      "maximumFeeWei": "9012594369720",
+      "predictedAddress": "0x368c3d58D4409774ba6014C97778F22E3cffaC35",
+      "initcodeSHA256": "f28a027d206fc921edb4f722a6707b1f077e60c061644a5a1c835c4a4f513c5a",
+      "expectedRuntime": {
+        "bytes": 4683,
+        "sha256": "0c0378cd53af45c0b9a0df29db7615bf122fc0ac68cc59918efcb98593293584",
+        "keccak256": "0xd7d042765a972c73fac3a803a10874591793e54ccac7f6405b9fe851bf07e928"
+      }
+    },
+    {
+      "role": "compatible collection factory",
+      "nonce": 297,
+      "gasLimit": 61379375,
+      "maxFeePerGasWei": 1000030,
+      "maxPriorityFeePerGasWei": 1000000,
+      "maximumFeeWei": "61381216381250",
+      "predictedAddress": "0xa1496dCEe98FCF986Bee0e105439E684D79e37FD",
+      "initcodeSHA256": "fc253662eaace8f8a57c6a39e52ac623c85e229ad81048645fe74b9165490ba0",
+      "expectedRuntime": {
+        "bytes": 4563,
+        "sha256": "526bdb9a141827bd0fc1223c4c614fc2365c92e3e6d1dd2d077349d29738016a",
+        "keccak256": "0xfea1d1c22f57fdac48ad13f4b90dc041c1489471f055591efc9587fddc3a7b7b"
+      }
+    },
+    {
+      "role": "native media module",
+      "nonce": 298,
+      "gasLimit": 31884460,
+      "maxFeePerGasWei": 1000030,
+      "maxPriorityFeePerGasWei": 1000000,
+      "maximumFeeWei": "31885416533800",
+      "predictedAddress": "0x924c5fA733CF9eF24dc7b355261660dddb24cb1D",
+      "initcodeSHA256": "e450f6839afe2463a380c1ffb3243261a2685a2b06d6d371af33e3273433e5ce",
+      "expectedRuntime": {
+        "bytes": 16911,
+        "sha256": "df1aeac604199ff6dc48a35e49986cfa040f168ec752508ab47fbc06a23e6420",
+        "keccak256": "0x3605de5ffc3c243724537e639fbb9feca2d3fe90091d70758e377ae254a9393d"
+      }
+    }
+  ],
+  "totalMaximumFeeWei": "102279227284770",
+  "totalMaximumFeeSepoliaETH": "0.00010227922728477",
+  "totalValueWei": "0",
+  "ownerApproval": false,
+  "agentSigningApproved": false,
+  "agentSubmissionApproved": false,
+  "publicationApproved": false,
+  "activationApproved": false,
+  "originalGIFQualified": false,
+  "prerequisiteScope": "Three exact Sepolia shared formatter/factory/native-media deployments only; no collection mint, user artwork upload, paid storage, publication or production activation.",
+  "requiredBeforeEachSignature": [
+    "Explicit owner approval of this exact packet, wallet on Sepolia11155111 and exact sender764E3EE7A844d9165937c41fd08086e43b997149.",
+    "Read current pending/confirmed nonce at the expected sequence296/297/298, current block gas allowance, balance for exact remaining maximum fees, sender code and each as-yet undeployed expected address; reject drift.",
+    "Confirm current fee requirement fits exact maxFee1000030wei and maxPriority1000000wei; no silent fee, gas, nonce or bytecode changes.",
+    "Wait for prior successful receipt and exact runtime readback before the next dependent transaction."
+  ],
+  "requiredAfterReceipts": [
+    "Receipt-backed exact formatter/factory/deployer/carriers/native-media runtime bytes and bindings, including all children, and selected-chain compatibility/registration reads.",
+    "Normal unchanged original GIF reprepare and full proof on these actual dependencies; mandatory GIF and independent release gates stay open until completed."
+  ],
+  "scopeClarification": "Earlier reviewer statement that no owner spend request could be offered before full GIF proof is superseded: prerequisite-only owner approval is an authorized separate stage, while production release remains blocked.",
+  "displayMetadata": "Owner indices1/2/3 map to source indices0/1/2; bytes/SHA/Keccak exact. Source status SOURCE_DERIVED_NOT_OBSERVED retained in source and actual top-level runtime observation audited separately; no actual child runtime claim."
+}
