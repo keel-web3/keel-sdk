@@ -1,0 +1,16 @@
+[
+  {
+    "argv1": "/tmp/keel-qa-receipt-activation-20261020/keel-site/docs/tools/gif-guided-review-only/run-review.mjs",
+    "exitCode": 0,
+    "stdoutBytes": 0,
+    "stderrContainsENOENT": false,
+    "applicationExportCalls": 0
+  },
+  {
+    "argv1": "/private/tmp/keel-qa-receipt-activation-20261020/keel-site/docs/tools/gif-guided-review-only/run-review.mjs",
+    "exitCode": 1,
+    "stdoutBytes": 0,
+    "stderrContainsENOENT": true,
+    "applicationExportCalls": 0
+  }
+]

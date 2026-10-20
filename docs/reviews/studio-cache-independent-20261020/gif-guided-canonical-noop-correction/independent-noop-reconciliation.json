@@ -1,0 +1,12 @@
+{
+  "schema": "keel.independent-guided-noop-readonly-reconciliation@1",
+  "result": "PASS_NO_NORMAL_ACTION_OCCURRED",
+  "all100TableProjectionsExactBaseline": true,
+  "readOnly": true,
+  "releaseRevision": 13,
+  "baselineRawSHA256": "27613206c74343dbf0f8870c682a60133323fa94eca881dd5cc926f8990f9e2a",
+  "allFiveActionOutputsAbsent": true,
+  "databaseWrites": 0,
+  "applicationExportsCalled": 0,
+  "RPC": 0
+}

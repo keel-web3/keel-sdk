@@ -1,0 +1,69 @@
+{
+  "schema": "keel.canonical-guided-review-noop-correction@1",
+  "result": "CONCRETE_CANONICAL_COMMAND_PREPARED_FOR_ROOT_REVIEW",
+  "rootReviewRequired": true,
+  "oldAliasNoopConfirmed": true,
+  "originalNoopEvidence": {
+    "launcher-result.json": {
+      "path": "/tmp/keel-private-gif-guided-review-20261020-01/launcher-result.json",
+      "bytes": 296,
+      "sha256": "2e1b881b85d1b2530e456c289a288e7d29738c401f420e858cc7af9ab515c50d"
+    },
+    "launcher.stdout": {
+      "path": "/tmp/keel-private-gif-guided-review-20261020-01/launcher.stdout",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "launcher.stderr": {
+      "path": "/tmp/keel-private-gif-guided-review-20261020-01/launcher.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "noop-reconciliation.json": {
+      "path": "/tmp/keel-private-gif-guided-review-20261020-01/noop-reconciliation.json",
+      "bytes": 684,
+      "sha256": "e60fdc76938218996137b2f20de8c47f4e8fc6e714874b5c2efb56ae3b4e5fd7"
+    }
+  },
+  "independent100TableReadOnlyReconciliation": {
+    "path": "/private/tmp/keel-independent-gif-guided-review-20261020/independent-noop-reconciliation.json",
+    "bytes": 408,
+    "sha256": "b0244d82c9adff3c5bc853ef5370559c887f67320c04c2ce836332aea2a97293"
+  },
+  "entrypointControl": {
+    "path": "/private/tmp/keel-independent-gif-guided-canonical-20261020/entrypoint-control.json",
+    "bytes": 476,
+    "sha256": "6c1259056f8a22c05855121665c2bf81566c8c6515b33d135f743c79e6b00044"
+  },
+  "wrapper": {
+    "path": "/private/tmp/keel-independent-gif-guided-canonical-20261020/run-canonical.py",
+    "bytes": 8005,
+    "sha256": "81315e269bb7fa162c855d06f19b5ac3d5218329127a377906f752b6b1b2bd6a"
+  },
+  "command": {
+    "path": "/private/tmp/keel-independent-gif-guided-canonical-20261020/command-admission.json",
+    "bytes": 2956,
+    "sha256": "b2d70c3a9ab2ad933f9d5614afb607b4f3c59b0511ce8ba9a64b302de0b92c63"
+  },
+  "wrapperAuthorship": "Independent reviewer authored admission orchestration at root request; root will review and execute, if accepted. Unchanged83d application tool was independently reviewed in1a03f31.",
+  "ownOfflineVerifierTests": {
+    "pass": 7,
+    "fail": 0,
+    "actualAppExports": 0,
+    "actualDBWrites": 0,
+    "actualRPC": 0
+  },
+  "authorizedOneAction": "Only unchanged normal changeReleasePlanning review on private clone55459, revision13 to14.",
+  "noAutomaticRetry": true,
+  "allOldFilesAndCommandsRetained": true,
+  "originalStrictReviewAndConfigUnchanged": true,
+  "receiptVerification": [
+    "Requires actual semantic receipt rather than exitcode.",
+    "Checks exact source/packet/review/bundle, command and consumed marker identity.",
+    "Checks actual100table baseline and afterprojections, only4targetfield delta, all99other tables and otherrelease rows.",
+    "Checks actual original project, view revision/ready/reviewed state,156file79402974Basset receipt,0candidate and0compiler/RPC/sign/submit."
+  ],
+  "captureApproval": false,
+  "activationApproval": false,
+  "releaseApproval": false
+}
