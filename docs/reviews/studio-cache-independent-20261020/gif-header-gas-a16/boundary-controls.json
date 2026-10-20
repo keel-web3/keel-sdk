@@ -1,0 +1,43 @@
+{
+  "schema": "keel.independent-synthetic-gas-policy-controls@1",
+  "results": [
+    {
+      "name": "postfork-block-cap",
+      "result": "PASS",
+      "syntheticHeaderPolicyOnly": true,
+      "actualOriginalCaptureMutated": false
+    },
+    {
+      "name": "postfork-block-cap-above-policy",
+      "result": "REJECT_AS_EXPECTED",
+      "syntheticHeaderPolicyOnly": true
+    },
+    {
+      "name": "postfork-hard-ceiling",
+      "result": "PASS",
+      "syntheticHeaderPolicyOnly": true,
+      "actualOriginalCaptureMutated": false
+    },
+    {
+      "name": "postfork-hard-ceiling-above-policy",
+      "result": "REJECT_AS_EXPECTED",
+      "syntheticHeaderPolicyOnly": true
+    },
+    {
+      "name": "prefork-hard-ceiling",
+      "result": "PASS",
+      "syntheticHeaderPolicyOnly": true,
+      "actualOriginalCaptureMutated": false
+    },
+    {
+      "name": "prefork-hard-ceiling-above-policy",
+      "result": "REJECT_AS_EXPECTED",
+      "syntheticHeaderPolicyOnly": true
+    }
+  ],
+  "pass": 6,
+  "fail": 0,
+  "programExecuted": false,
+  "RPC": 0,
+  "signing": false
+}
