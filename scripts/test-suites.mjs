@@ -86,6 +86,7 @@ export const DETERMINISTIC_TEST_FILES = Object.freeze([
   "tests/proof-runner-client.test.mjs",
   "tests/proof-runtime-package.test.mjs",
   "tests/proof-state-reader.test.mjs",
+  "tests/proof-state-reader-cache.test.mjs",
   "tests/sdk-owned-simulation-transport.test.mjs",
   "tests/sdk-public-simulation-qualification.test.mjs",
   "tests/signed-anchor.test.mjs",
