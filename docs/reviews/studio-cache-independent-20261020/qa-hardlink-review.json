@@ -1,0 +1,11 @@
+{
+  "schema": "keel-independent-QA-hardlink-representation-review@1",
+  "decision": "APPROVE_EXPECTED_TAR_TYPE1_TO_EXACT_REGULAR_TARGET_ONLY",
+  "patchSHA256": "02dca5c4e3cf883b1539c06aee29e0cf3e7ae85ecf83b02d56c4546018e4d115",
+  "runnerSHA256": "aa9867a6a1613363215888cdc5b378c038c8a3480ac48bdb9195f1675a4ff3c1",
+  "actualRawToRawComparisonUnchanged": true,
+  "modeUIDGIDPreserved": true,
+  "bothActualInodeTargetAndHashVerified": true,
+  "initialRepresentationREDRetained": true,
+  "productOrNativeApproval": false
+}
