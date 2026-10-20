@@ -65,7 +65,10 @@ export * from "./tezos-publication.js";
 export * from "./tezos-standard.js";
 export * from "./tezos-modules.generated.js";
 export * from "./tezos-collection.js";
+export * from "./tezos-split-registries.js";
+export * from "./tezos-harness-tree.js";
 export * from "./tezos-live-state.js";
+export * from "./chain-capability-map.js";
 
 export * from "./network-inspection.js";
 
@@ -76,6 +79,12 @@ export * from "./hold-publication.js";
 export * from "./treasury.js";
 
 export * from "./admin-pauses.js";
+export * from "./tezos-pause.js";
+export * from "./tezos-automation.js";
+export * from "./tezos-token-bound-account.js";
+export * from "./tezos-recovery.js";
+export * from "./tezos-governance.js";
+export * from "./tezos-entrypoint-capability.js";
 
 export * from "./hold-events.js";
 

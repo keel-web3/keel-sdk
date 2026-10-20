@@ -1,5 +1,7 @@
 import { sha256 } from "viem";
 
+import { keelTezosOnchfsObjectId } from "./tezos-collection.js";
+
 /**
  * Review-only Tezos publication primitives.
  *
@@ -279,6 +281,11 @@ export function buildKeelHoldCarrierOperations(input: { readonly hold: string; r
   for (const file of files) operations.push({ kind: "transaction", amount: "0", destination: input.hold, parameters: { entrypoint: "create_file", value: pair([list(file.chunks.map((chunk) => hexBytes(chunk, "chunk pointer"))), hexBytes(file.metadata, "file metadata")]) } });
   for (const directory of directories) operations.push({ kind: "transaction", amount: "0", destination: input.hold, parameters: { entrypoint: "create_directory", value: map(Object.entries(directory.files).map(([name, cid]) => [name, hexBytes(cid, "directory child CID")])) } });
   for (const object of input.document.keelObjects) {
+    // KeelHoldOnchFS refuses an id that does not commit the whole descriptor; fail before signing.
+    const clean = (value: string) => value.replace(/^0x/u, "").toLowerCase();
+    if (clean(sha256(`0x${clean(object.manifest)}`)) !== clean(object.manifestSha256)) throw new Error(`Object ${object.objectId}: manifestSha256 is not the SHA-256 of its manifest.`);
+    const expected = keelTezosOnchfsObjectId(object);
+    if (clean(object.objectId) !== expected) throw new Error(`Object ${object.objectId}: objectId must be sha256(PACK(descriptor)) = ${expected}; manifest-only ids are refused by KeelHoldOnchFS.`);
     operations.push({
       kind: "transaction",
       amount: "0",

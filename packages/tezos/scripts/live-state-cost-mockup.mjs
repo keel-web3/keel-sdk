@@ -8,8 +8,10 @@
  *   A  live read      the triggering action writes its record (cart_superseded, an image record); the token's
  *                     static HTML reads it at view time (@keel/sdk/tezos-live-state). No metadata write.
  *   B  creator rewrite small per-token token_metadata (shared onchfs artifact + state attributes), rewritten
- *                     by the creator in a batch, or by the triggering contract in the same operation through an
- *                     internal FA2 set_token_metadata (the contract is an FA2 administrator).
+ *                     by the creator in a batch, or in the same operation group as the triggering call
+ *                     (prepareKeelTezosStateRewrite). Creator-only editor model: the triggering contract is
+ *                     never an FA2 administrator and holder editing stays off, so its internal rewrite and a
+ *                     holder's rewrite are both refused.
  *   0  inline rewrite the conventional case: the whole inline-HTML token_info is rewritten on each change.
  *
  * Also checks the live-state module end to end against the mockup's own RPC (big_map by script_expr through
@@ -146,7 +148,7 @@ try {
     return output.match(/New contract (KT1[1-9A-HJ-NP-Za-km-z]{33}) originated/u)[1];
   };
 
-  // ---- Setup: Hold, Index, FA2 (KEEL route code), 600 tokens, the cart stub as an FA2 administrator.
+  // ---- Setup: Hold, Index, FA2 (KEEL route code), 600 tokens, the cart stub (not an FA2 administrator).
   process.stdout.write("\nsetup\n");
   let plan = route.prepareKeelTezosCollectionOriginations({ network, creator, maxSupply: 1000, code: { hold: loadCode("collection_route_hold"), index: loadCode("collection_route_index") } });
   const entry = (stage, key) => plan.stages[stage].operations.find((item) => item.artifact === key);
@@ -157,7 +159,8 @@ try {
   apply("set_minter", call(fa2, "set_minter", { prim: "Pair", args: [{ string: creator }, { prim: "True" }] }));
   for (let batch = 0; batch < 6; batch += 1) apply(`strike 100 (tokens ${batch * 100 + 1}-${batch * 100 + 100})`, call(fa2, "strike", { prim: "Pair", args: [{ string: collector }, { int: "100" }] }));
   const stub = originate("originate cart stub", "cart", "/s/live-state-cart-stub.tz", `(Pair "${fa2}" (Pair 0 (Pair {} {})))`);
-  apply("add_administrator (cart stub)", call(fa2, "add_administrator", { string: stub }));
+  const authority = await live.checkKeelTezosStateRewriteAuthority({ network, rpcUrl: "http://localhost:8732", collection: fa2, triggerContracts: [stub], fetchImpl: mockupFetch });
+  expect("creator-only editor model: holder editing off, cart stub not an administrator", [authority.ok, authority.holderMetadataEditing, authority.administrators[stub]], [true, false, false]);
 
   // Shared artifact for B (one-time): the cart viewer and preview in the Hold, addressed per token.
   const shared = route.prepareKeelTezosHoldResources({ network, creator, hold, directory: true, resources: [
@@ -219,17 +222,19 @@ try {
   const supersede = (entrypoint, tokenId, cart) => call(stub, entrypoint, { prim: "Pair", args: [nat(tokenId), { bytes: hash(cart) }] });
   apply("supersede token 20 (first record, warm-up)", supersede("supersede", 20, "cart-20-g1"));
   const aOnly = apply("A: supersede token 20 (record + cart_superseded event)", supersede("supersede", 20, "cart-20-g2"));
-  apply("B warm-up: supersede_and_rewrite token 21 (stub attribute format)", supersede("supersede_and_rewrite", 21, "cart-21-g1"));
-  apply("B warm-up: supersede token 21", supersede("supersede", 21, "cart-21-g2"));
-  const bSame = apply("B: supersede_and_rewrite token 21 (record + event + rewrite, same op)", supersede("supersede_and_rewrite", 21, "cart-21-g3"));
+  apply("B warm-up: supersede token 21 (generation 1)", supersede("supersede", 21, "cart-21-g1"));
+  const rewrite21 = live.prepareKeelTezosStateRewrite({ network, creator, collection: fa2, trigger: [supersede("supersede", 21, "cart-21-g2")], tokens: [smallToken(21, 2, 0)] });
+  const bSame = applyBatch("B: creator group, supersede token 21 + its trait rewrite (atomic)", rewrite21.operations);
   const meta21 = route.decodeKeelTezosTokenMetadataView(JSON.parse(client("rpc", "post", "/chains/main/blocks/head/helpers/scripts/run_script_view", "with", JSON.stringify({ contract: fa2, view: "token_metadata", input: nat(21), chain_id: network, unparsing_mode: "Readable" }))).data);
-  expect("the triggering call rewrote token 21's attributes", JSON.parse(meta21.tokenInfo.attributes), attributes(3, 0));
+  expect("the triggering group rewrote token 21's attributes", JSON.parse(meta21.tokenInfo.attributes), attributes(2, 0));
   expect("and left its artifactUri alone", meta21.tokenInfo.artifactUri, smallToken(21, 0, 0).artifactUri);
-  const internalMax = await largest(1, 590, (n) => fits(["transfer", "0", "from", "bootstrap1", "to", stub, "--entrypoint", "add_image_and_rewrite", "--arg", `{ ${smallIds.slice(0, n).join(" ; ")} }`, "--burn-cap", "500"]));
-  process.stdout.write(`  contract-internal batch: max ${internalMax.max} rewrites in one operation (${internalMax.limitedBy ?? "no refusal"})\n`);
-  const internal100 = measure("B: add_image_and_rewrite, 100 tokens in one operation", client("transfer", "0", "from", "bootstrap1", "to", stub, "--entrypoint", "add_image_and_rewrite", "--arg", `{ ${hundred.join(" ; ")} }`, "--burn-cap", "500"), { transactions: 1, internalRewrites: 100 });
-  const internal1 = measure("B: add_image_and_rewrite, 1 token", client("transfer", "0", "from", "bootstrap1", "to", stub, "--entrypoint", "add_image_and_rewrite", "--arg", `{ ${hundred[0]} }`, "--burn-cap", "500"), { transactions: 1, internalRewrites: 1 });
-  const internalAtMax = measure(`B: add_image_and_rewrite, max ${internalMax.max} tokens in one operation`, client("transfer", "0", "from", "bootstrap1", "to", stub, "--entrypoint", "add_image_and_rewrite", "--arg", `{ ${smallIds.slice(0, internalMax.max).join(" ; ")} }`, "--burn-cap", "500"), { transactions: 1, internalRewrites: internalMax.max });
+  const refusedWith = (args, reason) => { try { client(...args); return "applied"; } catch (error) { return (error.output ?? "").includes(reason) ? reason : "refused otherwise"; } };
+  const contractRewrite = refusedWith(transferArgs(supersede("supersede_and_rewrite", 22, "cart-22-g1"), "bootstrap1"), "UNAUTHORIZED_PRESENTATION_EDITOR");
+  expect("the cart contract cannot rewrite metadata itself", contractRewrite, "UNAUTHORIZED_PRESENTATION_EDITOR");
+  const holderRewrite = refusedWith(transferArgs(route.prepareKeelTezosTokenMetadata({ network, creator: collector, collection: fa2, tokens: [smallToken(22, 9, 0)] }).operations[0], "bootstrap2"), "UNAUTHORIZED_PRESENTATION_EDITOR");
+  expect("a holder cannot rewrite metadata", holderRewrite, "UNAUTHORIZED_PRESENTATION_EDITOR");
+  // A global change: the image record alone (A); B rewrites listed tokens through the creator batch above.
+  const imageRecords = [1, 2, 3].map((n) => measure(`A: add image ${n} (record only, no rewrite)`, client("transfer", "0", "from", "bootstrap1", "to", stub, "--entrypoint", "add_image_and_rewrite", "--arg", "{}", "--burn-cap", "10")));
 
   // ---- A's only write for a global change: the real Genesis image record, when its compiled contracts exist.
   let genesisImage;
@@ -269,7 +274,7 @@ try {
   expect("live read: status", state.status, "live");
   expect("live read: generation after the change", online.values.generation, 3);
   expect("live read: view after the change", online.values.generationView, 3);
-  expect("live read: images after add_image_and_rewrite x3", online.values.images, 3);
+  expect("live read: images after three image records", online.values.images, 3);
 
   // ---- Summary.
   const r = (value) => Number(value.toFixed(6));
@@ -290,8 +295,9 @@ try {
       smallFirstWriteBatches: { operations: firstWriteBatches.length, tokens: smallIds.length, totalTez: sumTez(firstWriteBatches) },
       smallSameSizeRewrite: smallSame, smallGrow, smallShrink, smallRegrow,
       creatorBatch: { maxPerGroup: groupMax, hundredTokens: { groups: creator100.length, totalTez: sumTez(creator100), receipts: creator100 }, maxGroup: creatorMax },
-      triggeringCall: { aOnly, bSameOperation: bSame, extraTez: r(bSame.totalTez - aOnly.totalTez), extraGas: r(bSame.consumedGas - aOnly.consumedGas) },
-      contractInternalBatch: { max: internalMax, one: internal1, hundred: internal100, atMax: internalAtMax },
+      triggeringCall: { aOnly, bSameGroup: bSame, extraTez: r(bSame.totalTez - aOnly.totalTez), extraGas: r(bSame.consumedGas - aOnly.consumedGas) },
+      editorModel: { model: "creator-only", authority, contractRewrite, holderRewrite },
+      imageRecords,
       sharedArtifactOnce: { totalTez: r(sharedTotal) },
       genesisImageRecord: genesisImage ?? null,
     },

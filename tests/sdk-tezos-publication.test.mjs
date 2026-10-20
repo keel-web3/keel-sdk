@@ -1,5 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
+import { createHash } from "node:crypto";
 import {
   KEEL_TEZOS_ADMIN_PLACEHOLDER,
   KEEL_TEZOS_DEPENDENCY_PLACEHOLDER,
@@ -10,6 +11,7 @@ import {
   buildKeelCollectionSetTokenMetadata,
   buildKeelHoldCarrierOperations,
   buildKeelTezosNftMint,
+  keelTezosOnchfsObjectId,
   buildKeelTezosNftPrepareRelease,
   buildKeelTezosNftReserveRelease,
   buildKeelTezosNftStoreContent,
@@ -50,21 +52,38 @@ test("Tezos one-of-one originations stay staged at receipt-backed dependencies",
   assert.equal(JSON.stringify(dependent[1]).includes(index), true);
 });
 
+// Vector from the SmartPy-compiled KeelHoldOnchFS target scenario (weld of "keel-harness-test-2").
+const smartpyVector = {
+  descriptor: { fileCid: "7bd487c06b2d8b66205417cf9d3f60520bbd806857119c807eb2adc1dc0b6dc0", manifestSha256: "4b9947534781c82e8f9efc5b03966a55989aa9b97700aa4a015b47cd5f59ac59", storedSha256: "c77048e0e3c8f95d17f4a72074cb8d2bd943b1ea99a9280e39244e8c0dea23a3", storedByteLength: 27, decodedSha256: "c77048e0e3c8f95d17f4a72074cb8d2bd943b1ea99a9280e39244e8c0dea23a3", decodedByteLength: 27, mediaType: "text/plain", compression: "none" },
+  objectId: "94f68efafc8551b78dda99c98848f4185a2d9d4892194c25b12ca7686c20ed05",
+};
+
+test("the OnchFS object id is sha256(PACK(descriptor)), equal to the SmartPy contract's", () => {
+  assert.equal(keelTezosOnchfsObjectId(smartpyVector.descriptor), smartpyVector.objectId);
+  for (const change of [{ fileCid: "11".repeat(32) }, { mediaType: "text/html" }, { compression: "gzip" }, { decodedByteLength: 28 }]) {
+    assert.notEqual(keelTezosOnchfsObjectId({ ...smartpyVector.descriptor, ...change }), smartpyVector.objectId);
+  }
+});
+
 test("OnchFS carrier operations preserve chunks, files, and object welds", () => {
-  const operations = buildKeelHoldCarrierOperations({
-    hold,
-    source: creator,
-    document: {
-      inscriptions: [
-        { type: "chunk", content: "6162", hash: "00".repeat(32) },
-        { type: "file", cid: "11".repeat(32), metadata: "", chunks: ["22".repeat(32)] },
-        { type: "directory", cid: "33".repeat(32), files: { "index.html": "11".repeat(32) } },
-      ],
-      keelObjects: [{ objectId: "44".repeat(32), fileCid: "11".repeat(32), manifest: "55", manifestSha256: "66".repeat(32), storedSha256: "77".repeat(32), storedByteLength: 2, decodedSha256: "88".repeat(32), decodedByteLength: 2, mediaType: "text/html", compression: "none" }],
-    },
+  const manifest = Buffer.from('{"schema":"keel.tezos.object@1"}').toString("hex");
+  const manifestSha256 = createHash("sha256").update(Buffer.from(manifest, "hex")).digest("hex");
+  const object = { fileCid: "11".repeat(32), manifest, manifestSha256, storedSha256: "77".repeat(32), storedByteLength: 2, decodedSha256: "88".repeat(32), decodedByteLength: 2, mediaType: "text/html", compression: "none" };
+  const document = (keelObjects) => ({
+    inscriptions: [
+      { type: "chunk", content: "6162", hash: "00".repeat(32) },
+      { type: "file", cid: "11".repeat(32), metadata: "", chunks: ["22".repeat(32)] },
+      { type: "directory", cid: "33".repeat(32), files: { "index.html": "11".repeat(32) } },
+    ],
+    keelObjects,
   });
+  const objectId = keelTezosOnchfsObjectId(object);
+  const operations = buildKeelHoldCarrierOperations({ hold, source: creator, document: document([{ ...object, objectId }]) });
   assert.deepEqual(operations.map((item) => item.parameters.entrypoint), ["write_chunk", "create_file", "create_directory", "weld_object"]);
   assert.equal(operations[3].destination, hold);
+  // A manifest-only id (the old derivation) and a wrong manifest digest are refused before signing.
+  assert.throws(() => buildKeelHoldCarrierOperations({ hold, source: creator, document: document([{ ...object, objectId: manifestSha256 }]) }), /sha256\(PACK\(descriptor\)\)/u);
+  assert.throws(() => buildKeelHoldCarrierOperations({ hold, source: creator, document: document([{ ...object, objectId, manifestSha256: "66".repeat(32) }]) }), /SHA-256 of its manifest/u);
 });
 
 test("Tezos presentation calls encode bytes rather than URLs as JSON strings", () => {

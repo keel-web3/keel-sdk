@@ -127,6 +127,39 @@ function join(parts: readonly Uint8Array[]): Uint8Array {
   return output;
 }
 
+/** Michelson PACK of the KeelHoldOnchFS object descriptor (a right comb of bytes and nats). */
+function packObjectDescriptor(binding: Omit<KeelOnchfsObjectBinding, "objectId" | "path" | "resourceId" | "manifest">): Uint8Array {
+  const fromHex = (value: string): Uint8Array => Uint8Array.from(value.match(/../gu) ?? [], (pair) => Number.parseInt(pair, 16));
+  const packBytes = (value: Uint8Array): Uint8Array => {
+    const length = new Uint8Array(4);
+    new DataView(length.buffer).setUint32(0, value.byteLength);
+    return join([Uint8Array.of(0x0a), length, value]);
+  };
+  const packNat = (value: number): Uint8Array => {
+    let rest = BigInt(value) >> 6n;
+    const out = [Number(BigInt(value) & 0x3fn) | (rest > 0n ? 0x80 : 0)];
+    while (rest > 0n) {
+      const next = rest >> 7n;
+      out.push(Number(rest & 0x7fn) | (next > 0n ? 0x80 : 0));
+      rest = next;
+    }
+    return join([Uint8Array.of(0x00), Uint8Array.from(out)]);
+  };
+  const fields = [
+    packBytes(fromHex(binding.fileCid)),
+    packBytes(fromHex(binding.manifestSha256)),
+    packBytes(fromHex(binding.storedSha256)),
+    packNat(binding.storedByteLength),
+    packBytes(fromHex(binding.decodedSha256)),
+    packNat(binding.decodedByteLength),
+    packBytes(utf8ToBytes(binding.mediaType)),
+    packBytes(utf8ToBytes(binding.compression)),
+  ];
+  let body = fields[fields.length - 1] as Uint8Array;
+  for (let index = fields.length - 2; index >= 0; index -= 1) body = join([Uint8Array.of(0x07, 0x07), fields[index] as Uint8Array, body]);
+  return join([Uint8Array.of(0x05), body]);
+}
+
 function fileNodes(node: INode, prefix = ""): readonly { readonly path: string; readonly node: FileInode }[] {
   if (node.type === "file") return [{ path: prefix, node }];
   return Object.entries(node.files)
@@ -230,12 +263,8 @@ export async function buildKeelOnchfsCarrier(
     } as const;
     const manifestBytes = utf8ToBytes(canonicalJson(manifestValue));
     const manifestIntegrity = await createIntegrity(manifestBytes);
-    return {
-      objectId: manifestIntegrity.digest.slice(2),
+    const descriptor = {
       fileCid,
-      path,
-      ...(source.resourceId === undefined ? {} : { resourceId: source.resourceId }),
-      manifest: hex(manifestBytes),
       manifestSha256: manifestIntegrity.digest.slice(2),
       storedSha256: storedIntegrity.digest.slice(2),
       storedByteLength: storedBytes.byteLength,
@@ -243,6 +272,15 @@ export async function buildKeelOnchfsCarrier(
       decodedByteLength: node.source.content.byteLength,
       mediaType,
       compression,
+    };
+    // KeelHoldOnchFS object id: sha256(PACK(descriptor)), so the id commits every field.
+    const objectIntegrity = await createIntegrity(packObjectDescriptor(descriptor));
+    return {
+      objectId: objectIntegrity.digest.slice(2),
+      path,
+      ...(source.resourceId === undefined ? {} : { resourceId: source.resourceId }),
+      manifest: hex(manifestBytes),
+      ...descriptor,
     } satisfies KeelOnchfsObjectBinding;
   }));
   const document: KeelOnchfsCarrierDocument = {

@@ -19,7 +19,8 @@ import {
 import { siblingRepositories } from "./sibling-repository.mjs";
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), "..");
-const CONTRACTS = resolve(ROOT, "../keel-contracts");
+// KEEL_CONTRACTS_DIR selects an isolated contracts checkout explicitly.
+const CONTRACTS = process.env.KEEL_CONTRACTS_DIR ? resolve(process.env.KEEL_CONTRACTS_DIR) : resolve(ROOT, "../keel-contracts");
 const TARGETS = resolve(CONTRACTS, "out/tezos-collection-route/targets");
 const sibling = siblingRepositories("keel-contracts");
 const ADMIN = "tz1KqTpEZ7Yob7QbPE4Hy4Wo8fHG8LhKxZSx";
@@ -69,7 +70,7 @@ test("SDK origination storage equals the SmartPy-compiled initial storage", {
     collection: buildKeelTezosCollectionFA2Storage({ administrator: ADMIN, keelIndex: DEPENDENCY, maxSupply: 100 }),
     presentation: buildKeelTezosPresentationStateStorage(),
     creator_profile: buildKeelTezosCreatorProfileStorage({ manager: DEPENDENCY }),
-    one_mint: buildKeelTezosOneMintStorage({ creatorProfileRegistry: DEPENDENCY }),
+    one_mint: buildKeelTezosOneMintStorage({ creatorProfileRegistry: DEPENDENCY, pauseAuthority: DEPENDENCY }),
     mint_gate: buildKeelTezosMintGateStorage({ administrator: ADMIN, creatorProfileRegistry: DEPENDENCY }),
   };
   for (const [name, storage] of Object.entries(cases)) assert.deepEqual(storage, compiled(name), name);

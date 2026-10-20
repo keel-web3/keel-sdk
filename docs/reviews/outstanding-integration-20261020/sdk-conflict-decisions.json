@@ -1,0 +1,631 @@
+[
+  {
+    "path": "docs/TEZOS_ROUTE_INVENTORY.md",
+    "blocks": [
+      {
+        "block": 0,
+        "decision": "incoming",
+        "currentSha256": "c25ffbb770fc2128a2ca0b028e2277fbf2e90a27c5499c5133c194526ac09c9a",
+        "incomingSha256": "4921c6bc3051cedd3c4d0435eb72f5f650b68f0835eb03c4871da795d43f6ee4"
+      },
+      {
+        "block": 1,
+        "decision": "incoming",
+        "currentSha256": "f848c4b4f6fa39b94cc6151cc9f1939b01555a540b703553811b631288afc5d8",
+        "incomingSha256": "4056e78ac9b7faba00421b35a9cf3eea44b618744727e5d56d691217527aacc7"
+      },
+      {
+        "block": 2,
+        "decision": "incoming",
+        "currentSha256": "e31f13b047d29f6523daba59ea27ba962318f5b2d0c58c2d9e6a39d20159e71e",
+        "incomingSha256": "397a1bf1919affb36a57658077f482f2c7b2592fa32f94d62e706750d99f0e29"
+      },
+      {
+        "block": 3,
+        "decision": "incoming",
+        "currentSha256": "83e5d223d613f31620637d231af2fe9e1a10eb1c5c180759e9512203c057e8bd",
+        "incomingSha256": "fc9f9f33f90f011912c3f5c18291664a36155b8b19673efc1c7bec9ce5c962d0"
+      },
+      {
+        "block": 4,
+        "decision": "incoming",
+        "currentSha256": "ff38361c71b7e0a1dafe3e9ebc18bb1e6c6cf32303668d26f725ccb0bc3c4b50",
+        "incomingSha256": "16f6fd986bd446ac3d33250cface08b09b94d2f77495c62ea0a3aa5ade32ff5e"
+      },
+      {
+        "block": 5,
+        "decision": "incoming",
+        "currentSha256": "87709aa36908576a2ffa96e09c33f8d85908de4c98293a80cad65b6593a2230f",
+        "incomingSha256": "c23c9273fb2c877b77d5ee5f2fc1c6eeb84d84f05f7886599e1e9a9caa887b17"
+      },
+      {
+        "block": 6,
+        "decision": "incoming",
+        "currentSha256": "f3eae10b52387914a1f989cb8890b8acd1db7a05ee41615c091a17c2d65911c2",
+        "incomingSha256": "53f05575b2f153febc9f66d63ba8a09171f064ccfd1d65e56b54c51569cc274f"
+      }
+    ]
+  },
+  {
+    "path": "packages/mcp/src/resources.ts",
+    "blocks": [
+      {
+        "block": 0,
+        "decision": "incoming",
+        "currentSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "incomingSha256": "b33efea3dc88bb0601edb18eb571629591a3ef42285ecc6aa143600471d575b4"
+      }
+    ]
+  },
+  {
+    "path": "packages/mcp/src/tezos-collection-tools.ts",
+    "blocks": [
+      {
+        "block": 0,
+        "decision": "incoming",
+        "currentSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "incomingSha256": "0e8355d65fb0ddc1080260f4ea0414199d6050b1fe1e4f94c820e39ada128a36"
+      },
+      {
+        "block": 1,
+        "decision": "incoming",
+        "currentSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "incomingSha256": "372c587e4e809e0fd4561c1d100a45f1e7023f76c7b55338ab58fdd6afc69d12"
+      },
+      {
+        "block": 2,
+        "decision": "incoming",
+        "currentSha256": "40980c2129a79e20677eee29b9bf646a09f0767cec8bb1893c378396d616e380",
+        "incomingSha256": "cb88df9d6541316ef27ffa087fc6a240c160b5fcdbf3703dfd2b08fa200ccba1"
+      },
+      {
+        "block": 3,
+        "decision": "incoming",
+        "currentSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "incomingSha256": "cba9a3bf30b8bf6d777e0bcce45d446f0e2b6611487a5221dd07355d43220797"
+      },
+      {
+        "block": 4,
+        "decision": "incoming",
+        "currentSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "incomingSha256": "032445c21806d084a12684a9349ad7a25c711cc65e266e7692dad7225fa638d2"
+      },
+      {
+        "block": 5,
+        "decision": "incoming",
+        "currentSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "incomingSha256": "d9956c86712f19231ef25d8540614b151ddb1c45ad580d63bd6288191aabac40"
+      },
+      {
+        "block": 6,
+        "decision": "incoming",
+        "currentSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "incomingSha256": "f20054a811c61b093b3dc78315b5a079d41912eadd61b1d9f457c6d55b3614dc"
+      },
+      {
+        "block": 7,
+        "decision": "incoming",
+        "currentSha256": "6d022615c33eb8bc962ea24c53dd2f2a21f713460122fc7c3a7dcf3dd0cc74ee",
+        "incomingSha256": "23fa36653268aad98543c96b269cef119065032d4b7474e6f5b9c485ab614a3f"
+      },
+      {
+        "block": 8,
+        "decision": "incoming",
+        "currentSha256": "066505c8e2b5b0ae65288d2975d161eaf0fe19b675c033c9388f523d959537b9",
+        "incomingSha256": "ce536f8b2aeb80cfc7a6046ec6e42b52c02ec409ef73000b48c0aa2f6a483822"
+      },
+      {
+        "block": 9,
+        "decision": "incoming",
+        "currentSha256": "96c81f03b64df82d253c319e74171fcca8de29ec498a0d447fd7cf3f13d24cfe",
+        "incomingSha256": "91596b342f94bef141a1c409147633ce2feb9447c684f70ebe03728f0d0f9890"
+      },
+      {
+        "block": 10,
+        "decision": "incoming",
+        "currentSha256": "934fea9788c7e5fe62361da4bc4d76e97ba9da7d1376442155177425a5da7135",
+        "incomingSha256": "8de35e98f7b3f9ac0f6c55cc77b3ff392b0d4674c5259388e9a9e900da07a048"
+      },
+      {
+        "block": 11,
+        "decision": "incoming",
+        "currentSha256": "5f5a7f43c8f0caa6e7a187ae2e2eb5c25a2b984561092985eea64ecac25ab4b0",
+        "incomingSha256": "d10b57127c6302c371edce29cf94ba0f6d35fc4880a21bcce76b0b9e76ab9705"
+      },
+      {
+        "block": 12,
+        "decision": "incoming",
+        "currentSha256": "a416cb39a872d399e0c8f3cf1fbb91a9dfbcc2734896180b1b763b1e893d1f59",
+        "incomingSha256": "3ad1ed1ed10aa08848b70e2c39b7f09156b610c66a8218272456cc9fe5694cb2"
+      },
+      {
+        "block": 13,
+        "decision": "incoming",
+        "currentSha256": "4e9efa55c0a1f3c576bc19d21ed6ab504ea0f0067e285f251ebe8d93da9b28e1",
+        "incomingSha256": "cd91f260ad214c2399488771b62bc133210fbe7d0feb4900841b47a5971dc35f"
+      },
+      {
+        "block": 14,
+        "decision": "incoming",
+        "currentSha256": "616a7b7a3f24683ffe07d00375e7a0b722b0192d87990e7dce46a18a0657f74b",
+        "incomingSha256": "e062f34f52d9c7be8633742b2417ad58258aa1edc62a49630f79df8588d94795"
+      },
+      {
+        "block": 15,
+        "decision": "incoming",
+        "currentSha256": "215c5733c4cbce59a1f00f80c30f94b3d501ecd39e44b4e01a233efb6c3dd41d",
+        "incomingSha256": "ffb7c7fd39929c31e9c64115693811c55199f7018aa7f6e1f500516c7bf1e337"
+      }
+    ]
+  },
+  {
+    "path": "packages/mcp/src/tools.ts",
+    "blocks": [
+      {
+        "block": 0,
+        "decision": "current standards-enforced shell/publication handlers",
+        "currentSha256": "b4f0928eea2cd7aefad60a97f078b0be9e1417f9221c69a32f3b0c2e436ec7a4",
+        "incomingSha256": "40d47671c71d268edb20479f3618e20adc6a322365a622710b0ab2ad9a7f34c5"
+      }
+    ]
+  },
+  {
+    "path": "packages/sdk/package.json",
+    "blocks": [
+      {
+        "block": 0,
+        "decision": "incoming",
+        "currentSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "incomingSha256": "04f6f176e1ba9ab7b7ee3d71c8b792a27c5fd15a8b2672738bd16ff153232965"
+      },
+      {
+        "block": 1,
+        "decision": "incoming",
+        "currentSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "incomingSha256": "ce64967e23b55d91c6a9769e3e1a02edbca1f7693995915cb2cbabfadf394bd7"
+      }
+    ]
+  },
+  {
+    "path": "packages/sdk/src/index.ts",
+    "blocks": [
+      {
+        "block": 0,
+        "decision": "incoming",
+        "currentSha256": "ea3ea23f12649444f3a3886b2cb22c77720110e3da3020ac6b03c710faabef74",
+        "incomingSha256": "f2b3ca2b1885340fbde7eda040e04487199b9ac5f608f4952a98249a9ca139dc"
+      }
+    ]
+  },
+  {
+    "path": "packages/sdk/src/tezos-collection.ts",
+    "blocks": [
+      {
+        "block": 0,
+        "decision": "incoming",
+        "currentSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "incomingSha256": "eb8cb2d52668843532092016916ae5c22bf52a3a5acb88069deb608262e6cd7a"
+      },
+      {
+        "block": 1,
+        "decision": "incoming",
+        "currentSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "incomingSha256": "26f8e4c0d174eb66d5ec941dd7bf791b3bb9158b027f047ae220c6db3624fa4c"
+      },
+      {
+        "block": 2,
+        "decision": "incoming",
+        "currentSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "incomingSha256": "4b0e0458559288a1d23debecdd99974f6c9fab305ebd30c1eec5bf49928d9dac"
+      },
+      {
+        "block": 3,
+        "decision": "incoming",
+        "currentSha256": "fba1540a94747d2c8044cd2ec293d8ab160036a3afb3ef52303a910d20f637cb",
+        "incomingSha256": "15af7bb6dd494eaf239d472217fd1ebc7637087cb7ea96c65c4fef96a2fde685"
+      },
+      {
+        "block": 4,
+        "decision": "incoming",
+        "currentSha256": "b47e3286b727ffda67b73542d01039b53f51dd4c0a83f71efbb8597f73bc46bd",
+        "incomingSha256": "59113156a6ace8ed9d2d7ef1f84010f6e0914cd368b689cbf19aa88b795e2ba4"
+      },
+      {
+        "block": 5,
+        "decision": "incoming",
+        "currentSha256": "ebbf7f669eb3f701794ac8e1622b4ad72458c3712a880c232641e382d62fe517",
+        "incomingSha256": "5e3a42ada4e5cf71a7794c943a098f5221e55380ce4f72604e573b3f3a254b94"
+      },
+      {
+        "block": 6,
+        "decision": "incoming",
+        "currentSha256": "69e3ce9b5d80ae30e3f6746f81982b41aec2ddad94b7e6f37bedfddbd766ff4b",
+        "incomingSha256": "af31a75f8eda3ea0afa4011629c0f99bf67a8535abd1513886285e6581b8601d"
+      },
+      {
+        "block": 7,
+        "decision": "incoming",
+        "currentSha256": "0a3cc67375ebec8b120487732333a7fb6ee4221e5a953bba895fe7f0c7e12e53",
+        "incomingSha256": "949128e4b18b711835bbf5fe7c6623caad5180a491784a5e23e6f3e4fccc5c40"
+      },
+      {
+        "block": 8,
+        "decision": "incoming",
+        "currentSha256": "1efef1096dd2b2910ec6b27cc5d64e98b5a17cbc94d838a1b72526f8486fca0e",
+        "incomingSha256": "c144d7d582957d18beb7260b40620970e09cdecf0ffcfdc9ea04cd444945d8e7"
+      },
+      {
+        "block": 9,
+        "decision": "incoming",
+        "currentSha256": "35ce9e21f5c79a0e25faf8bc69c4cd02641435cc0687bd5a8f8121a8f4c00811",
+        "incomingSha256": "06cfdd40218f6b8b0b05d7e1cde36346b03cde5d205152d0cdc74b0ad5a87058"
+      },
+      {
+        "block": 10,
+        "decision": "incoming",
+        "currentSha256": "70eb2dde580c6942710d2debd87174dfbab26f56f7c0b7395cb5812ce857baf0",
+        "incomingSha256": "ab62c55bf258b6e795546d62a942be0ec3868d91cf6365109a26bb0830890001"
+      },
+      {
+        "block": 11,
+        "decision": "incoming",
+        "currentSha256": "d34d4aefe0d98b91201f12827e7c2a7e6c3925c1c86c671696ddbaa32359cad8",
+        "incomingSha256": "1f513ffbbbee9dba071b25ad02d2ad1b3665af2be611072c6497eb1f95814366"
+      },
+      {
+        "block": 12,
+        "decision": "incoming",
+        "currentSha256": "b53c331644ea08936232b8c873b395deb84411f24e622976872b8859217d708c",
+        "incomingSha256": "91808e59fd552125ed812f67a53746255d8c37bca121480805086157300d8530"
+      },
+      {
+        "block": 13,
+        "decision": "incoming",
+        "currentSha256": "9d02976b59812f2c74e845c36f3391bdef8ded16af72c7f8a39a0a27ac9c402e",
+        "incomingSha256": "32b320dc210d7b1fdaba9ae0ddbeee94258d186cd0bb538ec6dd7b62e625fdc3"
+      },
+      {
+        "block": 14,
+        "decision": "incoming",
+        "currentSha256": "a831f910048ad0351bcc3e73b1e4e006febfe67bf25080c03d10dad8f0ea6cbe",
+        "incomingSha256": "1b8e4eaaa74c216758e8b0570c6835a14abc0269fd5e292b1002cc181a7c8789"
+      },
+      {
+        "block": 15,
+        "decision": "incoming",
+        "currentSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "incomingSha256": "f1dcb048d9f1e6e7d4c4e80be457de9592e12aaa604d98d817781d4a7efa9c00"
+      },
+      {
+        "block": 16,
+        "decision": "incoming",
+        "currentSha256": "9b8311431db50de1088d00defd823fb31de6c70a9af1dcfb8503438c7d4af2f1",
+        "incomingSha256": "b5d899469e0ca4572aa257ae0abfcc3dd9fdbd7d106f85dcbf048dd8bfaae296"
+      },
+      {
+        "block": 17,
+        "decision": "incoming",
+        "currentSha256": "cd2b0abd5423252efe11594477f57851d30aed62914722c32d5eb70162104f9b",
+        "incomingSha256": "21fbe1c5c9986e57db2653ac236ad6b509b93d93a31a66701655796c0da6d505"
+      },
+      {
+        "block": 18,
+        "decision": "incoming",
+        "currentSha256": "c5f4ab418c79d44ef67c32bd809fd7faa035d10d086341b9da38c7d53ba2a4fc",
+        "incomingSha256": "a30398a7c8fb9881e434cac57643e95dfcdf704ca79e3af015476d0434d71191"
+      },
+      {
+        "block": 19,
+        "decision": "incoming",
+        "currentSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "incomingSha256": "51b547733f9315ec595a299c11b3a3632defdc7c0768f96e8e9e48ffc56dc55f"
+      },
+      {
+        "block": 20,
+        "decision": "incoming",
+        "currentSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "incomingSha256": "8975d752189a874e62808aa9f5604f99de2e49ed633d42164eeeab4515234fa7"
+      },
+      {
+        "block": 21,
+        "decision": "incoming",
+        "currentSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "incomingSha256": "0029826b983d2339dfb758e5ff6f26866836732a7999635917b36331ebbcc96b"
+      }
+    ]
+  },
+  {
+    "path": "packages/sdk/src/tezos-live-state.ts",
+    "blocks": [
+      {
+        "block": 0,
+        "decision": "incoming",
+        "currentSha256": "88c42495e97ca061908a5c0098f5385a353d20a9391d5424d1f8043ca8734efc",
+        "incomingSha256": "5cb6898c1e7f242b6cd67050c19bb1ef6fda3480ed8df43d3c62dd5e866ae35a"
+      },
+      {
+        "block": 1,
+        "decision": "incoming",
+        "currentSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "incomingSha256": "404e201d6d6c8c7c53df3b0e59168c4313346daa76f152e0ea5dda455401c115"
+      },
+      {
+        "block": 2,
+        "decision": "incoming",
+        "currentSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "incomingSha256": "da091f575e2f5aad1f15c86633ad391edc2f9d20915a04097dcdb02f2e9603cb"
+      }
+    ]
+  },
+  {
+    "path": "packages/sdk/src/tezos-modules.generated.ts",
+    "decision": "regenerated from merged actual contracts AST + split/binding validation"
+  },
+  {
+    "path": "packages/tezos/scripts/collection-route-mockup.mjs",
+    "blocks": [
+      {
+        "block": 0,
+        "decision": "incoming",
+        "currentSha256": "c4bb38d3fe8ade4531229120da99643c848b5ffa94d5ce83d2c074fa766b64ad",
+        "incomingSha256": "6c7dd08fa4715b35244f3fd57d7e82b2893e90fa839d84853bd3b8af0ebf74d1"
+      },
+      {
+        "block": 1,
+        "decision": "incoming",
+        "currentSha256": "01310973b2d10f4231d1afcb810a4841057ba2a835a9a419bd5aa4d07286d947",
+        "incomingSha256": "4faf9c6836817b2d57a3cd106c927e7bf94b61911de36e964a8cb5d7e7f8c8d8"
+      },
+      {
+        "block": 2,
+        "decision": "incoming",
+        "currentSha256": "cf2a08b4852ff1c8c646a9329a9b3d277e04e6d081ea1c68bbe65c11d3ba61c8",
+        "incomingSha256": "1c03cd62ae0af7f20fdd4ff46ccdea111aa5bcc3fbd9c2bffaf0f70b7adb3e94"
+      },
+      {
+        "block": 3,
+        "decision": "incoming",
+        "currentSha256": "2b07911b29d80823808cbffaac9bd40d28e28eae7d8a09159f7c43ada46551d4",
+        "incomingSha256": "321136958fa9e29100d0e9791f6656845205873f898c902894b8a9407cdcdf66"
+      },
+      {
+        "block": 4,
+        "decision": "incoming",
+        "currentSha256": "5c484ddc263c8802edaf2b03963a51d34cb98436fdd095d271ad49f7c60ac750",
+        "incomingSha256": "22cfad30efe9276e64b76b17bffcc8fc2ac5fbeb9584c1ed2af6bde902f900b7"
+      },
+      {
+        "block": 5,
+        "decision": "incoming",
+        "currentSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "incomingSha256": "403ec14b11e632e15e0ad80f8bd108ddfe68e95158d9bfb8a209d515ea07f7e2"
+      }
+    ]
+  },
+  {
+    "path": "packages/tezos/scripts/live-state-cart-stub.tz",
+    "blocks": [
+      {
+        "block": 0,
+        "decision": "incoming",
+        "currentSha256": "efe8cef91dfcf4fb10db2e6ba27865669079611ef3ddcdb65e19b4b68584ea81",
+        "incomingSha256": "92ed3a08894cc83d04e00609465cd6c32a5c3cfa59cf911ce7d53580f99a7039"
+      }
+    ]
+  },
+  {
+    "path": "packages/tezos/scripts/live-state-cost-mockup.mjs",
+    "blocks": [
+      {
+        "block": 0,
+        "decision": "incoming",
+        "currentSha256": "963a70cb5bf4b6e34a4c67d2a4f90c834e1344f56b63c330b28bf7327ca098b0",
+        "incomingSha256": "ab8e5327e613819518f7b4071090dd0463b2b81722c72f51ab93347f948899de"
+      },
+      {
+        "block": 1,
+        "decision": "incoming",
+        "currentSha256": "2ec9c78da55c899afdc87e727f8f888d5c029a090ed735cbc92f12fd7b36f3c2",
+        "incomingSha256": "68d244197e21320b850b50b140d15deaa86e5ac22e8f94f37392a5a1d38cb88a"
+      },
+      {
+        "block": 2,
+        "decision": "incoming",
+        "currentSha256": "a229940d5bab4a31f256cde89298ddea39719ece6146a08c412541a330beecb6",
+        "incomingSha256": "a340711519d57181cd8cce277c2ea86152453acfbdcc21ced06215e0ed85aa52"
+      },
+      {
+        "block": 3,
+        "decision": "incoming",
+        "currentSha256": "b87242b2cfdcf71f558e100e9cfd5e4442d8a24a575c42d619479b2f07bac6f7",
+        "incomingSha256": "4e7138e69df4a2108f88dd34e9f0664fc9f028066c7faac810316ff668feef9d"
+      },
+      {
+        "block": 4,
+        "decision": "incoming",
+        "currentSha256": "f1989cc7fc52b142239dfa071dacbd334155382baa83659d2e09769ce306517d",
+        "incomingSha256": "c060351f43853759e1fd03462a27d8a5109a93b2d8ecf7df319a9372484a4c4c"
+      },
+      {
+        "block": 5,
+        "decision": "incoming",
+        "currentSha256": "1f2222df96289fee48bdf102d24698d1e18ad78b4972cc00e55d3e7ca8fa2959",
+        "incomingSha256": "a88228412fa82d02dc1d38cdb8366b0ec301fa9106347c1e25a2b599fc330df2"
+      }
+    ]
+  },
+  {
+    "path": "scripts/test-suites.mjs",
+    "blocks": [
+      {
+        "block": 0,
+        "decision": "incoming",
+        "currentSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "incomingSha256": "95684aad2a77be40a889fd1305b1af2c9cbedaf43ee64d003e1bb784e9b8e0ce"
+      },
+      {
+        "block": 1,
+        "decision": "union current native cases and incoming split cases",
+        "currentSha256": "e79d48ab72cbd87f183f8f558f3752512f0742eb3469ee629e5edd36fa1c0b54",
+        "incomingSha256": "a41707c968694ca16621999ef770473cca08b786bb3becc88341ed70ec663f91"
+      },
+      {
+        "block": 2,
+        "decision": "incoming",
+        "currentSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "incomingSha256": "eafa791f14be5d5db61898d58f69475cdb018e8500f21eaa60513e5156dcd7e0"
+      }
+    ]
+  },
+  {
+    "path": "tests/mcp-tezos-collection.test.mjs",
+    "blocks": [
+      {
+        "block": 0,
+        "decision": "incoming",
+        "currentSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "incomingSha256": "b0d2e7d6596f8ae31d6aff2dabb5b69dca61da6a2903fd54f5cd3532d0d5a16a"
+      },
+      {
+        "block": 1,
+        "decision": "incoming",
+        "currentSha256": "4a3c80e49e2d9ee2ae6acb1da8c4409c048e6391b3f7fc15b0226731f5fb012d",
+        "incomingSha256": "7a503f74da0be68d16643c0410d8a31841833a2e11e0fb0f8c5e604780226a4f"
+      },
+      {
+        "block": 2,
+        "decision": "incoming",
+        "currentSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "incomingSha256": "0955a0f9f71494cdad4a5f0b5a0ab2f04500a1dd3bde300c6c55532bd4efc370"
+      }
+    ]
+  },
+  {
+    "path": "tests/mcp.test.mjs",
+    "blocks": [
+      {
+        "block": 0,
+        "decision": "retain all current tools/assertions, insert seven new exact Tezos tools at actual registration position",
+        "currentSha256": "5886c824b02308049d3195b2675d34451f4ac573b42e16e8296755d0120f258e",
+        "incomingSha256": "e2bae7032c42f0a8d1fabd0f93ef0fc6300fd873935b163c39d502732426fe3b"
+      }
+    ]
+  },
+  {
+    "path": "tests/sdk-tezos-collection.test.mjs",
+    "blocks": [
+      {
+        "block": 0,
+        "decision": "incoming",
+        "currentSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "incomingSha256": "f38c53c8b653ba982a64d68e0f92c55da2cc2d7289b1149f67f147e13cf3cafb"
+      },
+      {
+        "block": 1,
+        "decision": "incoming",
+        "currentSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "incomingSha256": "c92085fddfee6605bcf50d3bbdf70569e97f044e215216e928810d22c49a1995"
+      },
+      {
+        "block": 2,
+        "decision": "incoming",
+        "currentSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "incomingSha256": "740ba94e66c599bf546263d8a35d33e065008897181ccfd9ce296780219ed3fa"
+      },
+      {
+        "block": 3,
+        "decision": "incoming",
+        "currentSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "incomingSha256": "c247e097f39793ae778be2f4ea50edef1799f74ab9fffea7676a7a202949a155"
+      },
+      {
+        "block": 4,
+        "decision": "incoming",
+        "currentSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "incomingSha256": "3db9eff0dd27995811131ce47e7d0bb100e9910bceae1cf61c24e62faf2e5f69"
+      },
+      {
+        "block": 5,
+        "decision": "incoming",
+        "currentSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "incomingSha256": "9fb26ed01763957fcfde835f4b8132a9c307df9e5c325256948da0e35e6433bb"
+      },
+      {
+        "block": 6,
+        "decision": "incoming",
+        "currentSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "incomingSha256": "c9c723213afd32a5e54818dbbff7ef515e7fcd2a28557624be821437dc3893b7"
+      },
+      {
+        "block": 7,
+        "decision": "incoming",
+        "currentSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "incomingSha256": "9056f6df8149b79284ffadd993c73f1dc29a0d46ca9c3ad64fa79339ec0f82b3"
+      },
+      {
+        "block": 8,
+        "decision": "incoming",
+        "currentSha256": "7dfaedce5eda4803c96ef66a61606ec0a408a9040b8b6b30e1cca78ca2a0d6e1",
+        "incomingSha256": "392732a164c0247806ce31cbe9b699cb2ff6ed6a1a94e79c5fd42da659eb2aa5"
+      },
+      {
+        "block": 9,
+        "decision": "incoming",
+        "currentSha256": "57ac823e64a03f18316807d29e6c05c8a3f8776332e1bc44cda2245e375be9b7",
+        "incomingSha256": "b22ebfa72e5de6380b1abd67188d2f0f5baa010f2780bbb13cc556bd5ee77fe4"
+      },
+      {
+        "block": 10,
+        "decision": "incoming",
+        "currentSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "incomingSha256": "2c6f4c0002ccbd0c1be19da665da0df05fed0e260c5342b5e79893cb9bd834d9"
+      }
+    ]
+  },
+  {
+    "path": "tests/sdk-tezos-live-state.test.mjs",
+    "blocks": [
+      {
+        "block": 0,
+        "decision": "incoming",
+        "currentSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "incomingSha256": "2547cfcc91a781b2a8439b17f503a783f5cee9c2378bd44e012985d7743e5431"
+      },
+      {
+        "block": 1,
+        "decision": "incoming",
+        "currentSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "incomingSha256": "457a758645ad7b8171abed6723c559b5823e283b6a5b79f16ab0bc403ac8de26"
+      },
+      {
+        "block": 2,
+        "decision": "incoming",
+        "currentSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "incomingSha256": "6f79b470159d274a831ea9d7c7bea680e9272e1536c8510e47849b678de37e36"
+      }
+    ]
+  },
+  {
+    "path": "tests/tezos-collection-conformance.test.mjs",
+    "blocks": [
+      {
+        "block": 0,
+        "decision": "incoming",
+        "currentSha256": "e01d28df91bd5c5ffbc44b238a51bb105647f949198148a280d17caf58f92555",
+        "incomingSha256": "9a4153b336af73c819ba63e89b8eef1f3ad46473590fdbad1801738df0ce6e8b"
+      },
+      {
+        "block": 1,
+        "decision": "retain current exact AST inheritance/decorator assertions, reject incoming weaker regex test",
+        "currentSha256": "2525df51e039e7ffdc4a52ccc55140bd8e8c84fd8488698ca551763c9f2e0f2c",
+        "incomingSha256": "715a17ebfbff8e1905aa0054e0d299808f3e892b1584f827dabccd02ae0857d9"
+      },
+      {
+        "block": 2,
+        "decision": "incoming",
+        "currentSha256": "df17e7898ed76b57526134d18233d580b0d8768f90bf4d8b58398c0879124bd9",
+        "incomingSha256": "bbd38f4e36ca07e2ac519fceca2b73664d38b888084be35d91f6534f2400972f"
+      }
+    ]
+  }
+]

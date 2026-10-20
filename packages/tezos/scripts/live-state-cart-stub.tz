@@ -5,7 +5,9 @@
 #                          the same operation through an internal set_token_metadata
 #   add_image_and_rewrite  bump a global image count and rewrite every listed token  (design B: one-call batch)
 # The rewrite reads the FA2's own `token_metadata` view, replaces only the "attributes" entry, and calls
-# set_token_metadata, so the stub must be an FA2 administrator. Never deployed anywhere but the Octez mockup.
+# set_token_metadata. Under KEEL's creator-only editor model the stub is never an FA2 administrator, so these
+# internal rewrites are refused; the mockup rewrites traits in the creator's own operation group instead, and
+# uses add_image_and_rewrite with an empty list as a plain image record. Never deployed anywhere but the Octez mockup.
 parameter (or (or (pair %supersede nat bytes) (pair %supersede_and_rewrite nat bytes)) (list %add_image_and_rewrite nat));
 storage (pair (address %fa2) (pair (nat %image_count) (pair (big_map %generation_count nat nat) (big_map %generations (pair nat nat) bytes))));
 code {
