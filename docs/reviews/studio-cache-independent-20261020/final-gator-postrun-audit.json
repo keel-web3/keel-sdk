@@ -1,0 +1,426 @@
+{
+  "schema": "keel-independent-consumed-gator-qualification-audit@1",
+  "checkedAt": "2026-10-20T09:26:52.602Z",
+  "result": "ACCEPT_EXACT_ISOLATED_NATIVE_QUALIFICATION_ONLY",
+  "reviewer": "cache-release-independent-reviewer",
+  "blockingFindings": [],
+  "sourceClosureFiles": 54,
+  "allSourceHashesUnchanged": true,
+  "configSHA256": "6eb1981d981fa0f18e6e58cba578d903157b79468ef76fd04e469f25c30cdc87",
+  "clientImageId": "sha256:fe94404ea7a860e6397e0964ef8dbe7d9fa9bb2777a57dd90cf8c63d802d8369",
+  "nativeImageId": "sha256:d97ddf2aba94cb963646fdf05bc8dc8c99b7e69b8c19bad85c06bea7c67fc9f5",
+  "sdkCommit": "b524bf5fc19939c7523aada2e53f79e3360970ea",
+  "capture": {
+    "bytes": 16947770,
+    "sha256": "8e1083ed3d1963c151bf12c94fc1672d01f241de4c0fd11f901c69bb23a37949"
+  },
+  "planSHA256": "d6c14c345422206c83c2c2d48ca481a6ec8c1f9c4b9a1d6080bbf8bfa6e650eb",
+  "durable": {
+    "bytes": 121484,
+    "sha256": "b39fd4207da5ae9462f935f362156aa337ea970cb505e1bd9ec9ea454dce1d6e",
+    "recordEqualsActualStdout": true,
+    "rawDigestIndependentlyRecomputed": true
+  },
+  "originalBinding": {
+    "artifactId": "91d644eb-9faa-44b0-a67e-4ac432bcf5fc",
+    "artifactRevision": 1,
+    "releaseId": "fc69f51d-e570-4936-b469-85f1c8ad5331",
+    "releaseRevision": 3
+  },
+  "calls": 34,
+  "preparationCalls": 30,
+  "calldataBytes": 937384,
+  "tokenURI": {
+    "bytes": 1026069,
+    "sha256": "ed0283c5db3680cc2b78d28ea1efb307cc87fe962784c8bb70acdd2bc7dd5fad",
+    "decodedMetadata": true,
+    "imageBytes": 5801,
+    "imageSHA256": "884f889b56e371694e58e79e781568691448c3a0bac2ee23588cb04ae2a83ab7",
+    "animationBytes": 673444,
+    "animationSHA256": "abd2dbbc26adc5babb4d77df7a0025de4b3de757e9f43928373b7de7aa217850"
+  },
+  "physical": {
+    "requests": 371,
+    "status200": 371,
+    "methodCounts": {
+      "eth_chainId": 6,
+      "eth_getBlockByNumber": 9,
+      "eth_getCode": 27,
+      "eth_getProof": 329
+    },
+    "totalBodyBytes": 94752,
+    "maxBodyBytes": 284
+  },
+  "nativeExecutions": [
+    {
+      "wallTimeMs": 83103,
+      "processCPUMicroseconds": 650029,
+      "readRequests": 326,
+      "witnessBytes": 1537483,
+      "responseBytes": 3207862,
+      "requestSHA256": "0574333a1b933fd12c5bd51755531793c68ee603b8f1af7e18d370b36a2daa44"
+    },
+    {
+      "wallTimeMs": 558,
+      "processCPUMicroseconds": 409073,
+      "readRequests": 326,
+      "witnessBytes": 1537483,
+      "responseBytes": 3207862,
+      "requestSHA256": "c0e86c0a3dbdf43a4aeadb86225f1860ba3f497c689534baa8e4274a9de00bb4"
+    },
+    {
+      "wallTimeMs": 8065,
+      "processCPUMicroseconds": 616704,
+      "readRequests": 356,
+      "witnessBytes": 1767781,
+      "responseBytes": 3677328,
+      "requestSHA256": "df57113fdb3431b8380af829b8eedd0a7e8368c1be740f0c1c7cdc7d94cd1998"
+    }
+  ],
+  "proof": {
+    "validatedTransactionCalls": 30,
+    "simulatedCalls": 34,
+    "requiredReaderProofs": 2,
+    "completeTokenURIHashMatches": true,
+    "allThreeAuthenticatedStateRootsAgree": true,
+    "SDKStartAndFinishCanonicalAnd180SecondFreshnessChecksUnchanged": true,
+    "sourceAttempts": 0,
+    "readBoundaryAttempts": 0,
+    "capacityAttempts": 0
+  },
+  "pipelineSeconds": 196.12,
+  "health": {
+    "successfulChecks": 3,
+    "stopped": true,
+    "failed": false
+  },
+  "originalContainerUnchanged": true,
+  "ownedClientAndRunnerStoppedAndRetained": true,
+  "signing": false,
+  "submission": false,
+  "productionActivated": false,
+  "remainingGates": [
+    "deployed Studio UI and exact compiled app release acceptance",
+    "authenticated historical HTTP 200, decoded tokenURI, canonical shell and canvas evidence",
+    "correct Gator owner wallet authority and explicit human signing boundary"
+  ],
+  "limits": "Actual default public factory; no limits, clock, calldata, fee, sender or gas override supplied by driver",
+  "scopeLimits": [
+    "Offline post-run audit only; no program replay or RPC by reviewer",
+    "Native proof qualifies the exact isolated SDK factory run, not deployed Studio operation",
+    "Producer assembly derived current gas and fees using unchanged normal compiler; old and fresh inputs are not byte-identical",
+    "All prior failed artifacts and consumed runs remain preserved"
+  ],
+  "evidence": [
+    {
+      "path": "/private/tmp/keel-gator-final-cache-pipeline-config-20261020/config.json",
+      "bytes": 18823,
+      "sha256": "6eb1981d981fa0f18e6e58cba578d903157b79468ef76fd04e469f25c30cdc87"
+    },
+    {
+      "path": "/Users/ravonus/.nvm/versions/node/v22.22.1/bin/node",
+      "bytes": 112972416,
+      "sha256": "245e0321af97d3c21dd4e7104457334dfe3c3ba7982d0db75363e354565f8cbb"
+    },
+    {
+      "path": "/opt/homebrew/Cellar/python@3.14/3.14.7/Frameworks/Python.framework/Versions/3.14/bin/python3.14",
+      "bytes": 34640,
+      "sha256": "d8f1d508de5acfd500f20d1949528375ff4a1f470efb267f00d1770941cdeee3"
+    },
+    {
+      "path": "/Users/ravonus/dev/wt/studio-publication-20261019/keel-site/docs/reviews/studio-publication-20261019/release/production-proof-factory/current-cache/gator-one-shot.py",
+      "bytes": 6190,
+      "sha256": "3b50a0cba13af02a8169bf4471a8a8d5f7ad1a29a1a251ec6f668c5a04fd4b07"
+    },
+    {
+      "path": "/Users/ravonus/dev/wt/studio-publication-20261019/keel-site/docs/reviews/studio-publication-20261019/release/production-proof-factory/current-cache/identity.mjs",
+      "bytes": 8515,
+      "sha256": "e72af3e856ae7dbd82307b43f8e71e16140f6f550c5e1f96d2502e480f637436"
+    },
+    {
+      "path": "/Users/ravonus/dev/wt/studio-publication-20261019/keel-site/docs/reviews/studio-publication-20261019/release/production-proof-factory/current-cache/make-program-plan.mjs",
+      "bytes": 7971,
+      "sha256": "dc8a1e5794e686d8b43f998d54695ca2ee02a951ad7bf8c6884e2f92334ee7d2"
+    },
+    {
+      "path": "/Users/ravonus/dev/wt/studio-publication-20261019/keel-site/docs/reviews/studio-publication-20261019/release/production-proof-factory/current-cache/run-production-factory.mjs",
+      "bytes": 6516,
+      "sha256": "6af5e22a9821ac79c566ab0d326133429ad1365ee619190a578df9ec89c7bf57"
+    },
+    {
+      "path": "/Users/ravonus/dev/wt/studio-publication-20261019/release-proof-qualification/docs/reviews/studio-publication-20261019/release/server-sdk-runtime-patch/current-final/host-qualify.py",
+      "bytes": 30086,
+      "sha256": "fd543fe16ff36e66a491b69d0f70da5f589a87f1c2e7407612f136f91cc15a63"
+    },
+    {
+      "path": "/Users/ravonus/dev/wt/studio-publication-20261019/release-proof-qualification/docs/reviews/studio-publication-20261019/release/server-sdk-runtime-patch/current-final/host-plan-gatorrr-final.json",
+      "bytes": 9352,
+      "sha256": "98334426551da7eb18308258e1278abf86b49813770ca0b30248aee1b0de439e"
+    },
+    {
+      "path": "/Users/ravonus/dev/wt/studio-publication-20261019/release-proof-qualification/docs/reviews/studio-publication-20261019/release/server-sdk-runtime-patch/current-final/host-stage-proposal.json",
+      "bytes": 19061,
+      "sha256": "681c926b76109b9d09045d9e9e9714311fffa0be04c6a36f3f389b32361ad15e"
+    },
+    {
+      "path": "/Users/ravonus/dev/wt/studio-publication-20261019/release-proof-qualification/docs/reviews/studio-publication-20261019/release/server-sdk-runtime-patch/current-final/review-gator-late-proposal.mjs",
+      "bytes": 7130,
+      "sha256": "6c72768fce5182b5b11d77227b9edbe22d7f69f82080419c318345eeb2f4a810"
+    },
+    {
+      "path": "/Users/ravonus/dev/wt/studio-publication-20261019/release-proof-qualification/docs/reviews/studio-publication-20261019/release/server-sdk-runtime-patch/current-final/run-ready.py",
+      "bytes": 2560,
+      "sha256": "90adec102d68cad49be0837599a93cd8dfb8710af995bf91b9ab7c3a1b67c64b"
+    },
+    {
+      "path": "/private/tmp/keel-qa-gator-cache-admission-b524-20261020/gatorrr-review.json",
+      "bytes": 888,
+      "sha256": "44992b1b14bf14283cd4a953109a6c9714ca92e6fba10492401c1d1d896f197a"
+    },
+    {
+      "path": "/private/tmp/keel-qa-gator-cache-admission-b524-20261020/pure-audit-config.json",
+      "bytes": 1786,
+      "sha256": "37118fc52ab5f6a36fafd88d7739d345b7190bd0e12a97dadcacaa0031008de1"
+    },
+    {
+      "path": "/private/tmp/keel-qa-gator-cache-admission-b524-20261020/run-automated-pure-audit.py",
+      "bytes": 2484,
+      "sha256": "6a8ac47855be7b8e1cd6a9ac03f45a24b516a35de0dd6d179a9997eadd0d1074"
+    },
+    {
+      "path": "/private/tmp/keel-qa-gator-cache-admission-b524-20261020/run-capture-config.json",
+      "bytes": 365,
+      "sha256": "041907bc60369829cc4c857b97b5d25c9e39b230b66c7f0e5dab09fcd62eece5"
+    },
+    {
+      "path": "/private/tmp/keel-qa-gator-cache-auditor-b524-20261020/audit.mjs",
+      "bytes": 16315,
+      "sha256": "56bba683d3e36415e1d048e95e01b81b16e42caa693bca1b312c42eb430ca6b1"
+    },
+    {
+      "path": "/private/tmp/keel-qa-gator-cache-auditor-b524-20261020/comparison.mjs",
+      "bytes": 2873,
+      "sha256": "6ce1d106afd8b58c17583fda9974f298ce65fda27f2c67ca905602c058c419d1"
+    },
+    {
+      "path": "/private/tmp/keel-private-gator-cache-pipeline-20261020-02/packet.json",
+      "bytes": 2491,
+      "sha256": "50071e7efa5596aa464b8686006681e70a59050c846d33d5194d18f9d09e764f"
+    },
+    {
+      "path": "/private/tmp/keel-private-gator-cache-bundle-20261020-02/bundle-receipt.json",
+      "bytes": 44075,
+      "sha256": "820012ba8c0dc3ae72e60cd470efd994909f2fd6d9cc6fee4415f59a56d6ba18"
+    },
+    {
+      "path": "/private/tmp/keel-private-gator-cache-bundle-20261020-02/normal-original.mjs",
+      "bytes": 1346599,
+      "sha256": "7f97045aaeaa8a4161c3cc66deebc8685453f001da42315db13e242f5756f90c"
+    },
+    {
+      "path": "/Users/ravonus/dev/wt/studio-cache-independent-review-20261020/docs/reviews/studio-cache-independent-20261020/final-host-public-stage-admission.json",
+      "bytes": 19569,
+      "sha256": "891b97b10d0e7a0c9d9ef5326087b97f2d07d70388f638477d095278ced9e0cb"
+    },
+    {
+      "path": "/Users/ravonus/dev/wt/studio-cache-independent-review-20261020/docs/reviews/studio-cache-independent-20261020/whole-studio-review.json",
+      "bytes": 2338,
+      "sha256": "793eb9b8c58ee5d1e119a100b5260295edbc19bbd6f6dcd33c80bf38acdca3ce"
+    },
+    {
+      "path": "/Users/ravonus/dev/wt/studio-cache-independent-review-20261020/docs/reviews/studio-cache-independent-20261020/whole-studio-command-admission.json",
+      "bytes": 9714,
+      "sha256": "864c8e15cb6f1ef37ef3d8f51c6dbb601377a5a3260fbd225ba0785c5e4f791e"
+    },
+    {
+      "path": "/private/tmp/keel-whole-studio-fe944-import-live-20261020/09-actual-durable-import-receipt.stdout",
+      "bytes": 1775,
+      "sha256": "fad5658934f993bb4aef143eaafbb259b21db7d85b2fc81dc091389c5e2afcf4"
+    },
+    {
+      "path": "/private/tmp/keel-current-final-be5ffe-stage-20261020/06-readonly-preflight.stdout",
+      "bytes": 1393,
+      "sha256": "48b1a949313568b8001796227bd1d165e2d2965d5d19c810c8eb86de88838d12"
+    },
+    {
+      "path": "/private/tmp/keel-release-a33-execution-20261020/run.py",
+      "bytes": 8723,
+      "sha256": "b68949338b52b47330ff4c884255b55438fead378203660144e87c5fd552f93d"
+    },
+    {
+      "path": "/Users/ravonus/dev/wt/studio-publication-20261019/review/docs/reviews/studio-publication-20261019/review/production-proof-host-7680-proxy-resumption/proxy-runtime-read.py",
+      "bytes": 687,
+      "sha256": "0745563e340e0b1b2892350379a5772dca68b50bc8a173e18c191ac81e53b5b3"
+    },
+    {
+      "path": "/Users/ravonus/dev/wt/studio-publication-20261019/review/docs/reviews/studio-publication-20261019/review/production-proof-host-7680-proxy-resumption/proxy-normal-health-supported.py",
+      "bytes": 535,
+      "sha256": "02101279212a8684519fd1f45b17dc6f3471eab08efc5510d22aebaaf2b908f6"
+    },
+    {
+      "path": "/Users/ravonus/dev/wt/studio-publication-20261019/review/docs/reviews/studio-publication-20261019/review/amd64-stream-import/stream-stage-transfer.json",
+      "bytes": 12536,
+      "sha256": "c27432ac9fb328948322b3f6b03a1dd56fa26c3eac2980cd266e3289e84a28da"
+    },
+    {
+      "path": "/Users/ravonus/dev/wt/studio-publication-20261019/keel-site/docs/tools/gatorrr-cached-capture/build-bundle.mjs",
+      "bytes": 6939,
+      "sha256": "9ae08d8832a55fe347fb8f4ed4ebd8437f8b6012b6975002f8c7dd782a0d7172"
+    },
+    {
+      "path": "/Users/ravonus/dev/wt/studio-publication-20261019/keel-site/docs/tools/gatorrr-cached-capture/capture-entry.ts",
+      "bytes": 1615,
+      "sha256": "0859e6c33a14215a6fff07c679ac54afdb89f0f443eea6cfbb751f4fe7ad8920"
+    },
+    {
+      "path": "/Users/ravonus/dev/wt/studio-publication-20261019/keel-site/docs/tools/gatorrr-cached-capture/capture-signer.mjs",
+      "bytes": 3053,
+      "sha256": "962a069df00e700478244d8ba242d6288f63d4b40f3bcf4a6d93b61eccb8ae83"
+    },
+    {
+      "path": "/Users/ravonus/dev/wt/studio-publication-20261019/keel-site/docs/tools/gatorrr-cached-capture/check-bundle-import.mjs",
+      "bytes": 4147,
+      "sha256": "d1a32e65a0256691e96cc0af31faa94fcbf5e61da36f45d21b8774c7ef4dad5d"
+    },
+    {
+      "path": "/Users/ravonus/dev/wt/studio-publication-20261019/keel-site/docs/tools/gatorrr-cached-capture/diagnostic-signer-context.test.ts",
+      "bytes": 2349,
+      "sha256": "c72209f2771808e236281776968f2055b36aaf430b5eb464410cfabd95e0cf8e"
+    },
+    {
+      "path": "/Users/ravonus/dev/wt/studio-publication-20261019/keel-site/docs/tools/gatorrr-cached-capture/diagnostic-signer-context.ts",
+      "bytes": 764,
+      "sha256": "b98b96fa48622002b1de520d0063b05309fd9af84e11f430c5b05d7ca4dea8a0"
+    },
+    {
+      "path": "/Users/ravonus/dev/wt/studio-publication-20261019/keel-site/docs/tools/gatorrr-cached-capture/execution-core.mjs",
+      "bytes": 8484,
+      "sha256": "2f83e8f320bef63009fab9f3282c977f8c28d50100399bd60dada0c5141e92e4"
+    },
+    {
+      "path": "/Users/ravonus/dev/wt/studio-publication-20261019/keel-site/docs/tools/gatorrr-cached-capture/execution-core.test.mjs",
+      "bytes": 2630,
+      "sha256": "fb522a061c9779a51b4d648291b5f376ae8dbf725c8dedba3056aab7d5eac1ec"
+    },
+    {
+      "path": "/Users/ravonus/dev/wt/studio-publication-20261019/keel-site/docs/tools/gatorrr-cached-capture/identity.mjs",
+      "bytes": 2223,
+      "sha256": "426164037f2013bdc4053fc03d1f76f256f23ff75454d2de9aa4301f932d4f2a"
+    },
+    {
+      "path": "/Users/ravonus/dev/wt/studio-publication-20261019/keel-site/docs/tools/gatorrr-cached-capture/public-signer-receipt.mjs",
+      "bytes": 2960,
+      "sha256": "742c4bdf24ecdeed76db08b3d1f707f74b2b4b4dcb8e570364f885abe8cae8cf"
+    },
+    {
+      "path": "/Users/ravonus/dev/wt/studio-publication-20261019/keel-site/docs/tools/gatorrr-cached-capture/public-signer.test.mjs",
+      "bytes": 5687,
+      "sha256": "8a56788b9c689407480d7ced511b6a244acece08c09b169920ded90aaecb9c2b"
+    },
+    {
+      "path": "/Users/ravonus/dev/wt/studio-publication-20261019/keel-site/docs/tools/gatorrr-cached-capture/read-schema.mjs",
+      "bytes": 3734,
+      "sha256": "76358b052c390ae7c30f1a99bea29414a29762c15632e62052a1ba924b7445ef"
+    },
+    {
+      "path": "/Users/ravonus/dev/wt/studio-publication-20261019/keel-site/docs/tools/gatorrr-cached-capture/read-schema.test.mjs",
+      "bytes": 3401,
+      "sha256": "f2eaeda588b68ff018b0dd5d5975ba69d714ac3d6f694d70ad73a12729ba2da7"
+    },
+    {
+      "path": "/Users/ravonus/dev/wt/studio-publication-20261019/keel-site/docs/tools/gatorrr-cached-capture/run-capture.mjs",
+      "bytes": 16445,
+      "sha256": "7e20a4ba1ce91c536cee9aeb9145259914a919ac34ad77d521a5e12b9880ea8f"
+    },
+    {
+      "path": "/Users/ravonus/dev/wt/studio-publication-20261019/keel-site/docs/tools/gatorrr-cached-capture/run-capture.test.mjs",
+      "bytes": 9303,
+      "sha256": "1ac5d0ac9d89c4afe140fe729eec8f8218d4ad2c74e2397a4aaf0a2caf8841d5"
+    },
+    {
+      "path": "/Users/ravonus/dev/wt/studio-publication-20261019/keel-site/docs/tools/gatorrr-cached-capture/verify-original.mjs",
+      "bytes": 5160,
+      "sha256": "4f114ff75c808e2be16d75708b6da120406ee9c58dc6bb0b2b8b1322faf431b3"
+    },
+    {
+      "path": "/Users/ravonus/dev/wt/studio-publication-20261019/keel-site/docs/tools/gatorrr-cached-capture/verify-original.test.mjs",
+      "bytes": 965,
+      "sha256": "9194385cc16ccd43e2eb863d33838b633d28c898bfcc21ab253798dd5abfdf61"
+    },
+    {
+      "path": "/Users/ravonus/dev/wt/studio-publication-20261019/keel-site/docs/tools/gatorrr-cached-capture/zero-parameter-read.test.mjs",
+      "bytes": 2486,
+      "sha256": "f04444017ab021504f69b9b2390f35fe97df0fb4620b285298bb9a0de3b7ba2a"
+    },
+    {
+      "path": "/private/tmp/keel-private-native-capacity-20261019/clone-gatorrr-03/preparation.json",
+      "bytes": 1941,
+      "sha256": "1bb834b5816350ff9656d7fb3389d3fa12f08701da87825547ea2a61fd21e3ee"
+    },
+    {
+      "path": "/private/tmp/keel-private-gatorrr-existing-inputs-20261019-03/copy-receipt.json",
+      "bytes": 290,
+      "sha256": "2acaecf3dec8a6f832eef07aed9cae81b4e552e368aa542cda1d3bbb0436753d"
+    },
+    {
+      "path": "/private/tmp/keel-private-incident-20261019/inline-fragment-catalog.json",
+      "bytes": 12408,
+      "sha256": "16e9a686827d500eb2a85803e48820244abdd12ef1e35f21ee7dd1c7988df191"
+    },
+    {
+      "path": "/private/tmp/keel-private-incident-20261019/recovered-gator-candidate/Gatorrr-0.3.html",
+      "bytes": 530981,
+      "sha256": "9761586c1f904925743521d3cba30e4c32f591ebb8f017864e2f34427a02bff1"
+    },
+    {
+      "path": "/private/tmp/keel-private-incident-20261019/recovered-gator-candidate/home-preview.png",
+      "bytes": 5801,
+      "sha256": "884f889b56e371694e58e79e781568691448c3a0bac2ee23588cb04ae2a83ab7"
+    },
+    {
+      "path": "/private/tmp/keel-native-startup-lead-20261019/production-public-stage-signer-v4.json",
+      "bytes": 484,
+      "sha256": "7507d902728f7d62783c32dcd54429ac4b0719be1607b88860cfb7374c305f59"
+    },
+    {
+      "path": "/private/tmp/keel-private-gator-cache-bundle-20261020-02/bundle-import-smoke.json",
+      "bytes": 286,
+      "sha256": "4cffac828eb3bc9529f5647456d325c04a9d950d205a39c30f3ffe4c2c5cec43"
+    },
+    {
+      "path": "/private/tmp/keel-private-gator-cache-pipeline-20261020-02/program-final.json",
+      "bytes": 3378,
+      "sha256": "d6c14c345422206c83c2c2d48ca481a6ec8c1f9c4b9a1d6080bbf8bfa6e650eb"
+    },
+    {
+      "path": "/private/tmp/keel-private-gator-cache-pipeline-20261020-02/normal.capture.json",
+      "bytes": 16947770,
+      "sha256": "8e1083ed3d1963c151bf12c94fc1672d01f241de4c0fd11f901c69bb23a37949"
+    },
+    {
+      "path": "/private/tmp/keel-private-gator-cache-pipeline-20261020-02/normal.receipt.json",
+      "bytes": 4824,
+      "sha256": "3ce3741e7673847d5ea110368db181f3ff2e03de3fa52476616e3dc9f858d3e4"
+    },
+    {
+      "path": "/private/tmp/keel-qa-gator-cache-admission-b524-20261020/pipeline-audit/capture-audit.json",
+      "bytes": 7664,
+      "sha256": "52594538d4d9e321162670769c1eaedca8825d64827b00eac7ea7185cafe418c"
+    },
+    {
+      "path": "/private/tmp/keel-gator-final-cache-late-review-20261020/program-review.json",
+      "bytes": 854,
+      "sha256": "917d3e204ad5eac332b35ed4d12f687c70fc571c4300769fda19385a1acb9614"
+    },
+    {
+      "path": "/private/tmp/keel-gator-final-cache-late-review-20261020/host-review.json",
+      "bytes": 1437,
+      "sha256": "283389315c72826fd255fdcd48a4ea9bf409a6bb938992201cbd1304c4d3cad6"
+    },
+    {
+      "path": "/private/tmp/keel-gator-final-cache-late-review-20261020/admitted-commands.json",
+      "bytes": 8960,
+      "sha256": "77e7ecccc947623669555be2de71327082d5fad6f9d900a3bcb181a7cb244635"
+    }
+  ]
+}
