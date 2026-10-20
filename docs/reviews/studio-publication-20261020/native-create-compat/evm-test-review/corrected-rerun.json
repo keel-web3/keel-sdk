@@ -1,0 +1,28 @@
+{
+  "schema": "keel-native-create-approved-fixture-rerun@1",
+  "recordedAt": "2026-10-20T14:21:28.907344+00:00",
+  "baseCommit": "38c0219cd9f0d1b9aebc8af21601aad5ab46dece",
+  "approvedPatchSha256": "1b78d617617b7ee6eb3f3438f13206bd777af464fed822d1b38f5decd7d88e8c",
+  "independentApproval": {
+    "reviewer": "/root/cache_release_reviewer",
+    "scope": "exact input-only fixture correction and source qualification build; no public execution or deployment"
+  },
+  "runtimeSha256": "7d01c9e741d5335b3985e702832017acfb1855b6052c66f1967e6bf98ee04939",
+  "testSha256": "bab3fe5a28ed22e49777ae5b5c136a06dd65140ece90ce7b962a2ab8596b7646",
+  "pinnedGethCommit": "a579077007b98217c3e253a66e4b452ca0c32b96",
+  "command": "GOTOOLCHAIN=go1.25.8 GOPROXY=off KEEL_NATIVE_PUBLIC3_PAYLOAD=/Users/ravonus/dev/wt/studio-native-create-compat-20261020/keel-sdk/native/proof-executor/fixtures/current49d-public-three-create.json /opt/homebrew/bin/go test -overlay /tmp/keel-native-create-evm-20261020/overlay.json ./internal/ethapi -run ^TestKeelSparse -count=1 -json",
+  "cwd": "/Users/ravonus/dev/wt/studio-publication-20261019/native-artifacts/64e-production-local/geth",
+  "testEvents": {
+    "pass": 38,
+    "fail": 0,
+    "skip": 0
+  },
+  "package": "PASS",
+  "logSha256": "828558513f33c0c4b557ad16440ed7ed2fb0f2ea6734c2ec7937d9ad4e91f478",
+  "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "scope": "local synthetic EVM state; retained exact three-CREATE calldata; no public state or remote simulation",
+  "publicStateReads": 0,
+  "signing": "not-performed",
+  "submission": "not-performed",
+  "originalRedEvidencePreserved": true
+}

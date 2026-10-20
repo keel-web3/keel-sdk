@@ -211,7 +211,7 @@ func TestKeelSparseEVMMixedCreateAndCallUsesSameBlockState(t *testing.T) {
 	}
 }
 func TestKeelSparseEVMConstructorRevertAndCodeSizeRemainFailures(t *testing.T) {
-	for name, init := range map[string]string{"revert": "0x60006000fd", "code-size": "0x6160016000f3"} {
+	for name, init := range map[string]string{"revert": "0x60006000fd", "code-size": "0x620100016000f3"} {
 		t.Run(name, func(t *testing.T) {
 			s, _, blocks, err := executeSyntheticCreates(t, syntheticProgram(t, init, false), syntheticFunds())
 			if err != nil {
