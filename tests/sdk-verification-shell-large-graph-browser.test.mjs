@@ -92,8 +92,8 @@ test("a 32-module graph whose modules name each other and import by specifier ve
   try {
     const rendered = await dumpDOM(chrome, fixture.origin);
     assert.doesNotMatch(rendered.stdout, /Invalid string length/u);
-    assert.match(rendered.stdout, /<body[^>]*data-verification="verified"/u);
-    assert.match(rendered.stdout, /id="verify-title">KEEL verified/u);
+    assert.match(rendered.stdout, /<html[^>]*data-vault-verification="verified"/u);
+    assert.match(rendered.stdout, /id="verify-title">Files verified/u);
     assert.match(rendered.stdout, /<iframe/u);
   } finally {
     await fixture.close();
@@ -123,8 +123,8 @@ if(globalThis.__parts.length!==${MODULES - 2})throw new Error("modules missing")
   const fixture = await serve(local.rootBytes);
   try {
     const rendered = await dumpDOM(chrome, fixture.origin);
-    assert.match(rendered.stdout, /<body[^>]*data-verification="verified"/u);
-    assert.match(rendered.stdout, /id="verify-title">KEEL verified/u);
+    assert.match(rendered.stdout, /<html[^>]*data-vault-verification="verified"/u);
+    assert.match(rendered.stdout, /id="verify-title">Files verified/u);
   } finally {
     await fixture.close();
   }

@@ -1,5 +1,4 @@
 import assert from "node:assert/strict";
-import { spawn } from "node:child_process";
 import { once } from "node:events";
 import { readFile, readdir, stat } from "node:fs/promises";
 import { createServer } from "node:http";
@@ -13,6 +12,22 @@ import {
   buildKeelInlineModuleFragment,
   buildKeelInlineShellFragments,
 } from "../packages/sdk/dist/inline-viewer-graph.js";
+import {KEEL_CREATIVE_RUNTIME_CATALOG} from "../packages/sdk/dist/creative-runtime-catalog.js";
+import {createHash} from "node:crypto";
+import {observeMarketplaceCsp} from "./helpers/marketplace-csp-browser.mjs";
+function assertPinnedResource(id, bytes) {
+  const resource=KEEL_CREATIVE_RUNTIME_CATALOG.flatMap(entry=>entry.resources).find(entry=>entry.id===id);
+  assert.ok(resource?.integrity);
+  assert.equal(bytes.byteLength,resource.integrity.byteLength);
+  assert.equal('0x'+createHash('sha256').update(bytes).digest('hex'),resource.integrity.digest);
+}
+function assertMarketplaceExecution(rendered) {
+  // Fonts are deliberately denied by the unchanged marketplace policy. Keep
+  // their exact violations visible; every other policy/runtime error fails.
+  const failures=rendered.events.filter(event=>event.kind==='exception'||event.kind==='instrumentation'||event.kind==='security'&&!/^Loading the font 'data:font\/woff2;base64,[A-Za-z0-9+/=.]+' violates the following Content Security Policy directive: "default-src 'none'"\. Note that 'font-src' was not explicitly set, so 'default-src' is used as a fallback\. The action has been blocked\.$/u.test(event.text));
+  assert.deepEqual(failures,[]);
+  assert.equal(rendered.frames.filter(frame=>frame.origin==='null').length,2);
+}
 
 async function headlessChrome() {
   if (process.env.KEEL_CHROME_HEADLESS_SHELL) return process.env.KEEL_CHROME_HEADLESS_SHELL;
@@ -23,20 +38,6 @@ async function headlessChrome() {
     .map((entry) => join(homedir(), "Library/Caches/ms-playwright", entry.name, "chrome-headless-shell-mac-arm64", "chrome-headless-shell"))[0];
   if (candidate === undefined || !(await stat(candidate)).isFile()) throw new Error("Chrome headless shell missing");
   return candidate;
-}
-
-function dumpDOM(binary, url) {
-  return new Promise((resolve, reject) => {
-    const child = spawn(binary, ["--headless", "--virtual-time-budget=4000", "--dump-dom", url], { stdio: ["ignore", "pipe", "pipe"] });
-    let stdout = "";
-    let stderr = "";
-    child.stdout.setEncoding("utf8");
-    child.stderr.setEncoding("utf8");
-    child.stdout.on("data", (value) => { stdout += value; });
-    child.stderr.on("data", (value) => { stderr += value; });
-    child.on("error", reject);
-    child.on("close", (code) => code === 0 ? resolve({ stdout, stderr }) : reject(new Error(`Chrome failed (${code}): ${stderr}`)));
-  });
 }
 
 async function renderUnderMarketplaceCsp(rootBytes, protocol) {
@@ -57,7 +58,7 @@ async function renderUnderMarketplaceCsp(rootBytes, protocol) {
   await once(server, "listening");
   try {
     const chrome = await headlessChrome();
-    return await dumpDOM(chrome, `http://127.0.0.1:${server.address().port}`);
+    return await observeMarketplaceCsp(chrome, `http://127.0.0.1:${server.address().port}`, protocol);
   } finally {
     await new Promise((resolve, reject) => server.close((error) => error ? reject(error) : resolve()));
   }
@@ -84,7 +85,7 @@ test("the canonical Inline shell runs verified data modules under a restrictive 
     },
   });
   const rendered = await renderUnderMarketplaceCsp(local.rootBytes, "keel-csp-proof");
-  assert.doesNotMatch(rendered.stderr, /Refused to load the script|violates the following Content Security Policy directive/iu);
+  assertMarketplaceExecution(rendered);
   assert.match(rendered.stdout, /id="result" data-state="passed">module ran/u);
 });
 
@@ -102,6 +103,8 @@ test("the canonical asset module starts only after its verified child mount exis
   });
   const rendered = await renderUnderMarketplaceCsp(local.rootBytes, "keel-asset-csp-proof");
   assert.doesNotMatch(rendered.stderr, /Cannot read properties of null|Uncaught/iu);
+  assertMarketplaceExecution(rendered);
+  assert.deepEqual(rendered.frames.find(frame=>frame.image!==null)?.image,{complete:true,width:1,height:1});
 });
 
 test("the exact p5 and seeded-random modules run under the marketplace CSP", { timeout: 30_000 }, async () => {
@@ -110,8 +113,9 @@ test("the exact p5 and seeded-random modules run under the marketplace CSP", { t
     readFile("examples/demos/vendor/p5.min.js"),
     readFile("examples/library/seeded-random.js"),
   ]);
+  assertPinnedResource("p5-1-11-3",p5Bytes);
   const p5 = await buildKeelInlineModuleFragment({
-    moduleId: "p5.js",
+    moduleId: "p5-1-11-3",
     version: "1.11.3",
     mediaType: "text/javascript",
     aliases: ["p5.min.js", "./p5.min.js", "p5.js"],
@@ -140,7 +144,7 @@ test("the exact p5 and seeded-random modules run under the marketplace CSP", { t
     },
   });
   const rendered = await renderUnderMarketplaceCsp(local.rootBytes, "keel-p5-csp-proof");
-  assert.doesNotMatch(rendered.stderr, /Refused to load the script|violates the following Content Security Policy directive|Uncaught/iu);
+  assertMarketplaceExecution(rendered);
   assert.match(rendered.stdout, /id="result" data-state="passed">module ran/u);
 });
 
@@ -150,8 +154,11 @@ test("the exact Three.js r180 module pair runs under the marketplace CSP", { tim
     readFile("examples/demos/vendor/three.min.js"),
     readFile("examples/demos/vendor/three.core.min.js"),
   ]);
+  const normalizedMain=new TextEncoder().encode(mainBytes.toString('utf8').replaceAll('from"/content/three.core.min.js"','from"./three.core.min.js"'));
+  assertPinnedResource("three-r180-core",coreBytes);
+  assertPinnedResource("three-r180-module",normalizedMain);
   const core = await buildKeelInlineModuleFragment({
-    moduleId: "three.r180.core",
+    moduleId: "three-r180-core",
     version: "0.180.0",
     mediaType: "text/javascript",
     aliases: ["three.core.min.js", "./three.core.min.js", "/content/three.core.min.js"],
@@ -160,11 +167,11 @@ test("the exact Three.js r180 module pair runs under the marketplace CSP", { tim
     execution: "module",
   });
   const main = await buildKeelInlineModuleFragment({
-    moduleId: "three.r180.main",
+    moduleId: "three-r180-module",
     version: "0.180.0",
     mediaType: "text/javascript",
     aliases: ["three.module.min.js", "./three.module.min.js", "/content/three.module.min.js"],
-    decodedBytes: mainBytes,
+    decodedBytes: normalizedMain,
     compression: "gzip",
     execution: "module",
   });
@@ -179,6 +186,6 @@ test("the exact Three.js r180 module pair runs under the marketplace CSP", { tim
     },
   });
   const rendered = await renderUnderMarketplaceCsp(local.rootBytes, "keel-three-csp-proof");
-  assert.doesNotMatch(rendered.stderr, /Refused to load the script|violates the following Content Security Policy directive|Uncaught/iu);
+  assertMarketplaceExecution(rendered);
   assert.match(rendered.stdout, /id="result" data-state="passed">module ran/u);
 });
