@@ -1,0 +1,32 @@
+{
+  "schema": "keel-independent-gif-deployed-assembly-command@1",
+  "approvedScope": "ONE exact normal compiler assembly and allowed one blocked local candidate only",
+  "argv": [
+    "/Users/ravonus/.nvm/versions/node/v22.22.1/bin/node",
+    "--conditions=react-server",
+    "/Users/ravonus/dev/wt/studio-wallet-read-routing-qa-20261020/keel-site/docs/tools/gif-deployed-infrastructure-capture/run-capture.mjs",
+    "/private/tmp/keel-independent-gif-deployed-review-20261020/assembly-run-config.json"
+  ],
+  "cwd": "/Users/ravonus/dev/wt/studio-wallet-read-routing-qa-20261020/candidate-3e50",
+  "configSHA256": "66cc7f292c8707d8dcf654e4710c3b59583c9692f0028d90c19f5ddece2c1523",
+  "packetSHA256": "58da18d1f6c2d8a3e30304b2e08aa838fe5d1289fda8e4b283339fd71043ceb7",
+  "reviewPath": "/Users/ravonus/dev/wt/studio-cache-independent-review-20261020/docs/reviews/studio-cache-independent-20261020/gif-deployed-assembly-01/assembly-review.json",
+  "reviewSHA256": "7e799adb9363a36f3256894e610805c1a2ad037f23a5b8bfdcb8040c1eed7fc8",
+  "outputPrefix": "/tmp/keel-private-gif-deployed-capture-20261020-01/normal",
+  "network": {
+    "recipient": "https://rpc.sepolia.ethpandaops.io/",
+    "requestCount": 400,
+    "requestBodyBytes": 65536,
+    "totalRequestBytes": 2097152,
+    "decodedResponseBodyBytes": 16777216,
+    "totalDecodedResponseBytes": 67108864,
+    "deadlineMs": 180000,
+    "remoteSimulation": false,
+    "signing": false,
+    "submission": false
+  },
+  "repeatOrFailureRecovery": "No retry/replay/filename or input change under this admission; preserve raw output and return for a new exact review.",
+  "fullNativeProgramExecutionApproved": false,
+  "productionMutationApproved": false,
+  "activationApproved": false
+}

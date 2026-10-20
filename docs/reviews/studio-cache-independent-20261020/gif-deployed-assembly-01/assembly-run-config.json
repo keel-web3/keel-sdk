@@ -1,0 +1,10 @@
+{
+  "packet": {
+    "path": "/tmp/keel-private-gif-deployed-20261020-01/packet.json",
+    "sha256": "58da18d1f6c2d8a3e30304b2e08aa838fe5d1289fda8e4b283339fd71043ceb7"
+  },
+  "review": {
+    "path": "/Users/ravonus/dev/wt/studio-cache-independent-review-20261020/docs/reviews/studio-cache-independent-20261020/gif-deployed-assembly-01/assembly-review.json",
+    "sha256": "7e799adb9363a36f3256894e610805c1a2ad037f23a5b8bfdcb8040c1eed7fc8"
+  }
+}

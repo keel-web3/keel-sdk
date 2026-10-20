@@ -1,0 +1,182 @@
+{
+  "schema": "keel-independent-gif-deployed-assembly-source-review@1",
+  "decision": "ADMIT_ONE_EXACT_ASSEMBLY_ONLY_ATTEMPT",
+  "sourceToolCommit": "0092d3c0f71d8be0090714d195c4506826e4023c",
+  "authorEvidenceCommit": "c5e9e554",
+  "observedToolEvidenceHead": "d24f0e300b3e1cde6e424a0822321edec28f45d1",
+  "siteCommit": "3e50d15bb74f939951de0cc0333a7baa9d8018c1",
+  "sdkCommit": "b524bf5fc19939c7523aada2e53f79e3360970ea",
+  "actualSDKReadVerification": {
+    "files": 1754,
+    "digest": "3effa2f2e594fe969f592d9446b5095484adf358033c76b83349385956c69df8",
+    "gitCommit": "b524bf5fc19939c7523aada2e53f79e3360970ea"
+  },
+  "sourceIntegrity": {
+    "sourceCommit": "3e50d15bb74f939951de0cc0333a7baa9d8018c1",
+    "sdkCommit": "b524bf5fc19939c7523aada2e53f79e3360970ea",
+    "toolCommit": "0092d3c0f71d8be0090714d195c4506826e4023c",
+    "appSourcesVerified": 192,
+    "toolFilesVerified": 19,
+    "siteDomainFilesVerified": 45,
+    "siteDomainTreeSHA256": "8f78956f3993430eddbd6d5a70834531c9dabd35c43938add0c47659f3ddbac4",
+    "sourceInputsSHA256": "21f9457b2293deb1aaa75ab339f29c0b8d14cee00254e9b8208267f0e7408f55",
+    "toolFilesSHA256": "f51a49f4c7b9b0df3fc5159c0b5a60692bf49dda76728c3d0380003dec2f4b1a",
+    "bundleSHA256": "21fe4e7b4eab1e1ce4baa47868cb3a0d01b669db12038a879df6b0dbe2c58ac6",
+    "offlineImportExistingReceiptVerified": true,
+    "externalPackages": 14,
+    "compilerInvoked": false,
+    "rpcPerformed": false
+  },
+  "diffScope": "All21 files added in the new diagnostic namespace; old tools,23-call baseline, application source and SDK unchanged.",
+  "reviewedProperties": {
+    "entry": "Normal updated-review/capture service only; no source instrumentation, CREATE/state prefix, external driver or held-state projection.",
+    "newProgramTruthfulness": "executionCoreEquivalent:false; explicit new real factory, newly predicted collection and new collection target in original controller/drop data. Actual newly assembled remaining calldata is measured and requires independent review before any native execution.",
+    "sourceAssets": "Strict original project/release revisions, manifest digest,174440B descriptor\u2192130296B rawGIF,191878B WebP and complete556541B URI/e81bb249\u2026 retained. Offline synthetic remap is only an auditor test, not compiler/EVM evidence.",
+    "clone": "Owned local socket55459 only. Fresh read-only99projection check and all156input files79402974B match exact copied inventory; prior factories/98other projections remain unchanged. Only exact one blocked candidatev1 with no approval may be added; no production DB access or credential directory.",
+    "configuration": "Exactly approved catalog two-path change2d54c8\u2026 plus new factorya149 rowf4efbc67 at actualreceipt11956740; prior rows preserved. This assembly does not activate config in production.",
+    "signer": "Public-only existing484B receipt7507d9\u2026 is rechecked in the real request-local credential policy. Scope creator/release/rev13 fixed; no credential read/creation/derivation/signing account; actual stage argument stays original publicZERO.",
+    "network": "One exactEthPanda recipient with strict public-read grammar, correlated request/response ids,400requests/180s/64KiBbody/2MiBrequesttotal/16MiBresponse/64MiBresponsetotal bounds. Denial/redirect/unknown/revert errors terminal except the separately exact closed-job getter ABI response. Only explicit flat known rate errors permit three attempts; no eth_simulate,estimateGas,sign/send or private program payload.",
+    "identity": "Packet/bundle/read-source/tool-file/builtSDK/public receipt/catalog/copy/clone/output identities checked before assembly and applicable invariants after; network log uses exclusivewx output to prevent same-prefix reuse.",
+    "assemblyBoundary": "Actual normal compiler output and fresh header/plan/source tuple will be inspected after capture. This does not preapprove new calls, execution, fullGIF success, publication or deployed UI."
+  },
+  "independentControls": {
+    "initialRun": {
+      "tests": 87,
+      "pass": 85,
+      "fail": 2,
+      "reason": "Sandbox denied owned PG Unix socket; originalRED retained, no assertion edits."
+    },
+    "unchangedCloneSupplement": {
+      "tests": 4,
+      "pass": 4,
+      "fail": 0,
+      "reason": "Same read-only clone tests with required socket access."
+    },
+    "actualCredentialContext": {
+      "tests": 2,
+      "pass": 2,
+      "fail": 0,
+      "keyFallbacks": 0
+    },
+    "offlineMjsClosure": "83non-clone cases pass in original run;4clone cases pass in fresh unchanged supplement. Together cover all87 source controls.",
+    "existingImportReceipt": "Actual ESM import smokePASS/0network-child/compiler calls verified by hash; not rerun as compiler."
+  },
+  "exactAdmission": {
+    "reviewSHA256": "7e799adb9363a36f3256894e610805c1a2ad037f23a5b8bfdcb8040c1eed7fc8",
+    "commandSHA256": "e19241701ff184090892d275468e7780ec9b28b60d6b4fcb74480eb062da2eeb",
+    "runConfigSHA256": "66cc7f292c8707d8dcf654e4710c3b59583c9692f0028d90c19f5ddece2c1523",
+    "packet": {
+      "path": "/tmp/keel-private-gif-deployed-20261020-01/packet.json",
+      "bytes": 2816,
+      "sha256": "58da18d1f6c2d8a3e30304b2e08aa838fe5d1289fda8e4b283339fd71043ceb7"
+    },
+    "bundleReceipt": {
+      "path": "/tmp/keel-private-gif-deployed-bundle-20261020-01/bundle-receipt.json",
+      "bytes": 44673,
+      "sha256": "999c1cb50ec239db0c746dfb84b9d42b894e083717532a66cd252c0295d0bea0"
+    },
+    "bundleSHA256": "21fe4e7b4eab1e1ce4baa47868cb3a0d01b669db12038a879df6b0dbe2c58ac6",
+    "inputRecords": [
+      {
+        "role": "clonePreparation",
+        "path": "/tmp/keel-private-gif-deployed-20261020-01/preparation.json",
+        "bytes": 19463,
+        "sha256": "cc0ca2fc41c673148f8358f4ae76b12827145f59dba40cf02326d3a592c5122f"
+      },
+      {
+        "role": "cloneDataCopy",
+        "path": "/tmp/keel-private-gif-deployed-20261020-01/inputs/copy-receipt.json",
+        "bytes": 290,
+        "sha256": "bb16657d6466f5dca9bd19ea3ceac13ada5df7bf79bdd407d7c3b7c5eb871f00"
+      },
+      {
+        "role": "cloneState",
+        "path": "/tmp/keel-private-gif-deployed-20261020-01/clone-after-config-private.json",
+        "bytes": 2712242,
+        "sha256": "74a3128d8f656a4e0d22768abc00365a7c9ad6ce2eda6bb621cae3a3f14d2608"
+      },
+      {
+        "role": "catalog",
+        "path": "/tmp/keel-private-gif-deployed-20261020-01/catalog.proposed.json",
+        "bytes": 12694,
+        "sha256": "2d54c8a4ab1e3360fdf702af0113c27739dcddf44abd4e0682f68606005652d7"
+      },
+      {
+        "role": "source",
+        "path": "/tmp/keel-private-gif-existing-inputs-20261019-04/blobs/c4/ff/c4ff4691aadf85cb5c7e2848d94a2874acdb862b5e6f498db2a350d98e1c3f00",
+        "bytes": 174440,
+        "sha256": "c4ff4691aadf85cb5c7e2848d94a2874acdb862b5e6f498db2a350d98e1c3f00"
+      },
+      {
+        "role": "preview",
+        "path": "/tmp/keel-private-gif-existing-inputs-20261019-04/blobs/c4/cc/c4cc1d08196fa856853906f6123c53193b8670ed1ec69a46d767eecdf6cb3df6",
+        "bytes": 191878,
+        "sha256": "c4cc1d08196fa856853906f6123c53193b8670ed1ec69a46d767eecdf6cb3df6"
+      },
+      {
+        "role": "bundleReceipt",
+        "path": "/tmp/keel-private-gif-deployed-bundle-20261020-01/bundle-receipt.json",
+        "bytes": 44673,
+        "sha256": "999c1cb50ec239db0c746dfb84b9d42b894e083717532a66cd252c0295d0bea0"
+      },
+      {
+        "role": "publicSignerReceipt",
+        "path": "/tmp/keel-native-startup-lead-20261019/production-public-stage-signer-v4.json",
+        "bytes": 484,
+        "sha256": "7507d902728f7d62783c32dcd54429ac4b0719be1607b88860cfb7374c305f59"
+      }
+    ]
+  },
+  "reviewerActions": {
+    "compilerInvoked": false,
+    "chainRPC": false,
+    "localSQL": "Read-only owned-clone projection checks only",
+    "credentialRead": false,
+    "signing": false,
+    "submission": false,
+    "productionMutation": false,
+    "privateProgramExecuted": false
+  },
+  "deferredRequirements": [
+    "Inspect actual resulting new program before any separate native execution.",
+    "If assembly blocks/fails, retain genuine failure and exact clone invariants; do not relabel offline tests as fullGIF proof.",
+    "Fresh normal strict/native and deployed unsigned-wallet/historical viewer gates remain."
+  ],
+  "evidence": [
+    {
+      "path": "/private/tmp/keel-independent-gif-deployed-review-20261020/source-integrity.json",
+      "bytes": 761,
+      "sha256": "ce43f072cafd5daa656737ee81a4311650ea31d6c077be5207d891fbe8af04e1"
+    },
+    {
+      "path": "/private/tmp/keel-independent-gif-deployed-review-20261020/offline-controls.stdout",
+      "bytes": 24154,
+      "sha256": "79824d763149005af0528f6234bd3e131fbb32961571f5a62ffdbb0b159afc2f"
+    },
+    {
+      "path": "/private/tmp/keel-independent-gif-deployed-review-20261020/offline-controls.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/private/tmp/keel-independent-gif-deployed-review-20261020/clone-controls-supplement.stdout",
+      "bytes": 960,
+      "sha256": "47a6f5b1a56af169436096ce436bc1e530278e6f0f610869f09f512ce3b6e69c"
+    },
+    {
+      "path": "/private/tmp/keel-independent-gif-deployed-review-20261020/clone-controls-supplement.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/private/tmp/keel-independent-gif-deployed-review-20261020/credential-context-controls.stdout",
+      "bytes": 619,
+      "sha256": "1a95db056079da7a8b705723e1af4d20261f8a7efd57ab73e9608e1e54ab7aad"
+    },
+    {
+      "path": "/private/tmp/keel-independent-gif-deployed-review-20261020/credential-context-controls.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  ]
+}
