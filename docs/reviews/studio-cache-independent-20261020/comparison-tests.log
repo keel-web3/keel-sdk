@@ -1,0 +1,124 @@
+TAP version 13
+# Subtest: allow only documented fresh pin/fingerprint/gas/fee paths and decoded openJob fields
+ok 1 - allow only documented fresh pin/fingerprint/gas/fee paths and decoded openJob fields
+  ---
+  duration_ms: 1.122292
+  type: 'test'
+  ...
+# Subtest: forbid non-refresh execution change chainId
+ok 2 - forbid non-refresh execution change chainId
+  ---
+  duration_ms: 0.131209
+  type: 'test'
+  ...
+# Subtest: forbid non-refresh execution change reader
+ok 3 - forbid non-refresh execution change reader
+  ---
+  duration_ms: 0.039458
+  type: 'test'
+  ...
+# Subtest: forbid non-refresh execution change readerRuntimeCodeHash
+ok 4 - forbid non-refresh execution change readerRuntimeCodeHash
+  ---
+  duration_ms: 0.035209
+  type: 'test'
+  ...
+# Subtest: forbid non-refresh execution change metadataTarget
+ok 5 - forbid non-refresh execution change metadataTarget
+  ---
+  duration_ms: 0.098667
+  type: 'test'
+  ...
+# Subtest: forbid non-refresh execution change expectedTokenURI
+ok 6 - forbid non-refresh execution change expectedTokenURI
+  ---
+  duration_ms: 0.032292
+  type: 'test'
+  ...
+# Subtest: forbid non-refresh execution change assertions[0].value
+ok 7 - forbid non-refresh execution change assertions[0].value
+  ---
+  duration_ms: 0.073083
+  type: 'test'
+  ...
+# Subtest: forbid non-refresh execution change preparationCalls[29].data
+ok 8 - forbid non-refresh execution change preparationCalls[29].data
+  ---
+  duration_ms: 0.026375
+  type: 'test'
+  ...
+# Subtest: forbid non-refresh execution change preparationCalls[0].from
+ok 9 - forbid non-refresh execution change preparationCalls[0].from
+  ---
+  duration_ms: 0.222375
+  type: 'test'
+  ...
+# Subtest: forbid non-refresh execution change preparationCalls[0].to
+ok 10 - forbid non-refresh execution change preparationCalls[0].to
+  ---
+  duration_ms: 0.270792
+  type: 'test'
+  ...
+# Subtest: forbid non-refresh execution change preparationCalls[0].value
+ok 11 - forbid non-refresh execution change preparationCalls[0].value
+  ---
+  duration_ms: 0.0795
+  type: 'test'
+  ...
+# Subtest: forbid non-refresh execution change preparationCalls[0].gasPrice
+ok 12 - forbid non-refresh execution change preparationCalls[0].gasPrice
+  ---
+  duration_ms: 0.026458
+  type: 'test'
+  ...
+# Subtest: forbid non-refresh execution change preparationCalls[0].keys
+ok 13 - forbid non-refresh execution change preparationCalls[0].keys
+  ---
+  duration_ms: 0.020459
+  type: 'test'
+  ...
+# Subtest: forbid non-refresh execution change requiredReaderCalls[0].expectedReturn
+ok 14 - forbid non-refresh execution change requiredReaderCalls[0].expectedReturn
+  ---
+  duration_ms: 0.019167
+  type: 'test'
+  ...
+# Subtest: forbid non-refresh execution change requiredReaderCalls[0].gasMargin
+ok 15 - forbid non-refresh execution change requiredReaderCalls[0].gasMargin
+  ---
+  duration_ms: 0.01775
+  type: 'test'
+  ...
+# Subtest: forbid non-refresh execution change maximumTokenUriBytes
+ok 16 - forbid non-refresh execution change maximumTokenUriBytes
+  ---
+  duration_ms: 0.017709
+  type: 'test'
+  ...
+# Subtest: additional fields and removed calls never become allowed gas refreshes
+ok 17 - additional fields and removed calls never become allowed gas refreshes
+  ---
+  duration_ms: 0.363333
+  type: 'test'
+  ...
+# Subtest: quantity normalization is exact and rejects unsafe or malformed quantities
+ok 18 - quantity normalization is exact and rejects unsafe or malformed quantities
+  ---
+  duration_ms: 0.183833
+  type: 'test'
+  ...
+# Subtest: diagnostic singleton wrappers normalize only at the six approved paths
+ok 19 - diagnostic singleton wrappers normalize only at the six approved paths
+  ---
+  duration_ms: 0.097084
+  type: 'test'
+  ...
+1..19
+# tests 19
+# suites 0
+# pass 19
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 41.315334

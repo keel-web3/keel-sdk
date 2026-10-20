@@ -1,0 +1,19 @@
+{
+  "schema": "keel-reviewer-oci-runtime-correspondence@1",
+  "image": "sha256:5c961bf73aab9549167a8d7c5afbf88f6c8b92fcc1502d6294c55e4669a8ca8d",
+  "all1360DistFilesMatchCandidateBytes": true,
+  "packagePayloadFiles": 1372,
+  "unchangedImageConfig": true,
+  "otherNewFiles": [
+    "app/ops/sdk-runtime-patch-manifest.json",
+    "app/web/apps/studio/public/keel-build.json",
+    "app/context-manifest.json"
+  ],
+  "programExecuted": false,
+  "packageWhiteouts": [
+    "app/keel-externals/node_modules/@keel/.wh.builder",
+    "app/keel-externals/node_modules/@keel/.wh.protocol",
+    "app/keel-externals/node_modules/@keel/.wh.sdk",
+    "app/keel-externals/node_modules/@keel/.wh.viewer"
+  ]
+}
