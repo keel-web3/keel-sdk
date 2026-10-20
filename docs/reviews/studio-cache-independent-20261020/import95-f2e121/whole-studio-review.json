@@ -1,0 +1,52 @@
+{
+  "schema": "keel-whole-studio-stdin-import-review@1",
+  "decision": "APPROVE",
+  "reviewerId": "independent-release-reviewer",
+  "reviewedAt": "2026-10-20T19:51:05.801961+00:00",
+  "planSHA256": "5be18ef338864a7e03b97add5adb96ccacf9faad16c63273b8b58c3d29591e96",
+  "operatorSHA256": "5d87a7e33e8cd1d4c833220f489bf8d74df596bea587a32a3b33bc5d75855f1b",
+  "transferProposalSHA256": "8d5a99c9580ecf2d5e3f6e75c5c41890f15f0aba95802b24f857300fdb211c03",
+  "allowedPhases": [
+    "app"
+  ],
+  "blockingFindings": [],
+  "scope": "One exact image95 stdin load only. No cache cleanup, container creation/start, database mutation, native/private program, activation, signing or submission.",
+  "image": "sha256:95bdda05a7596553251e9d4ba9fe72758abc5137fcb661efed80ca94ab5e6bcb",
+  "archiveBytes": 692871680,
+  "archiveSHA256": "f015350eb2566bd9557d5033795713ba1d5aa97c04a55e84a837541e4d071407",
+  "requiredFreeBytes": 2247132160,
+  "newExpandedBytes": 212083200,
+  "fullRawScratchBytes": 692871680,
+  "rollbackReserveBytes": 1073741824,
+  "metadataReserveBytes": 268435456,
+  "evidence": {
+    "independentActualArchiveSHA256Verified": true,
+    "independentOCIIndexManifestConfigChainAndAll36DiffIdsVerified": true,
+    "independentFullImageConfigVerified": true,
+    "independentSourceAndImportControls": 4,
+    "independentCombinedLinuxControls": 49,
+    "independentArchiveDescriptorResult": {
+      "path": "/Users/ravonus/dev/wt/studio-cache-independent-review-20261020/docs/reviews/studio-cache-independent-20261020/import95-f2e121/archive95-descriptor-result.json",
+      "bytes": 785,
+      "sha256": "ad2b5fdcd05cb4b628f7927f3d405f2259034c00e257705f5e68a905e3f0d513"
+    },
+    "authorFullBlobAndExpandedLayerAuditSHA256": "4b6d1ae201b2fc6648ea06cf5f818e96500de04437e8d44f9172530a6b46ecc1",
+    "compressedBlobDecompressionNotRepeatedByReviewer": true,
+    "unchangedStreamHelperSHA256": "29b1cbd30707efb0565ea3170b4b3be0fed3f03ff5641a64d681c8c7a5b049de",
+    "unchangedStreamHelperPreviouslyReviewedAnd13ControlsPassed": true,
+    "retainedFE944ActualImportReceiptSHA256": "71acc384008c655eeb1a2dcf286af7bcfb75ad1fe0bf8b6bceb17c4b8063f123"
+  },
+  "conditions": [
+    "Authenticate all retained prior immutable source, receipts and helper hashes.",
+    "Fresh full original healthy/running/worker-paused state under exclusive rollout lock.",
+    "Fresh Docker filesystem available bytes must be at least2247132160; full raw daemon scratch and all reserves remain counted.",
+    "Forward and hash exactly692871680 physical stdin bytes through EOF; Docker load exit and complete image identity/layers/Config must all pass before durable PASS.",
+    "One attempt only; on failure or uncertainty retain consumed marker, partial new image and all old evidence. No retry, cleanup or activation.",
+    "Independent actual host image/native/discovery qualification and all original user release gates remain required before activation."
+  ],
+  "cleanupApproved": false,
+  "releaseApproved": false,
+  "nativeProgramApproved": false,
+  "productionActivationApproved": false,
+  "signingApproved": false
+}

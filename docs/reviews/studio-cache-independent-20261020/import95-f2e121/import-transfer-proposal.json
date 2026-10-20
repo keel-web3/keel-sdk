@@ -1,0 +1,87 @@
+{
+  "schema": "keel-whole-studio-import-transfer-proposal@1",
+  "status": "PROPOSAL_REQUIRES_INDEPENDENT_ADMISSION_NO_ACTION_AUTHORITY",
+  "sourceCommitAtPreparation": "f2e1217881dfca9405ba5936aff1d788da7e92bb",
+  "root": "/home/ubuntu/keel-proof-qualification-43a5d5f4-05ad-4a2b-a261-530d7a8fb2d5",
+  "rootCreateArgv": [
+    "/usr/bin/ssh",
+    "-o",
+    "BatchMode=yes",
+    "-o",
+    "ConnectTimeout=12",
+    "-o",
+    "StrictHostKeyChecking=yes",
+    "-o",
+    "UserKnownHostsFile=/Users/ravonus/dev/hashers/ops/servers/known_hosts",
+    "ubuntu@40.160.39.155",
+    "sudo -n /usr/bin/python3 -c 'import os,stat\nfrom pathlib import Path\np=Path('\"'\"'/home/ubuntu/keel-proof-qualification-43a5d5f4-05ad-4a2b-a261-530d7a8fb2d5'\"'\"');parent=p.parent;s=parent.lstat();assert parent.resolve()==parent and stat.S_ISDIR(s.st_mode) and s.st_uid==1000 and s.st_ino==143 and s.st_dev==2049\nos.mkdir(p,0o700)\nfd=os.open(parent,os.O_RDONLY|os.O_DIRECTORY|os.O_NOFOLLOW);os.fsync(fd);os.close(fd)\nprint('\"'\"'exclusive-root-created'\"'\"')'"
+  ],
+  "files": [
+    {
+      "localPath": "/private/tmp/keel-release-494d-20261020/docs/reviews/studio-publication-20261019/release/discovery-import-95b/import-whole-studio.py",
+      "remoteBasename": "import-whole-studio.py",
+      "bytes": 6989,
+      "sha256": "5d87a7e33e8cd1d4c833220f489bf8d74df596bea587a32a3b33bc5d75855f1b",
+      "exclusiveReceiverArgv": [
+        "/usr/bin/ssh",
+        "-o",
+        "BatchMode=yes",
+        "-o",
+        "ConnectTimeout=12",
+        "-o",
+        "StrictHostKeyChecking=yes",
+        "-o",
+        "UserKnownHostsFile=/Users/ravonus/dev/hashers/ops/servers/known_hosts",
+        "ubuntu@40.160.39.155",
+        "sudo -n /usr/bin/python3 -c 'import os,stat,sys,hashlib\nfrom pathlib import Path\nroot=Path('\"'\"'/home/ubuntu/keel-proof-qualification-43a5d5f4-05ad-4a2b-a261-530d7a8fb2d5'\"'\"');s=root.lstat();assert root.resolve()==root and stat.S_ISDIR(s.st_mode) and s.st_uid==0 and stat.S_IMODE(s.st_mode)==0o700\nraw=sys.stdin.buffer.read(6990);assert len(raw)==6989 and hashlib.sha256(raw).hexdigest()=='\"'\"'5d87a7e33e8cd1d4c833220f489bf8d74df596bea587a32a3b33bc5d75855f1b'\"'\"'\nparent=os.open(root,os.O_RDONLY|os.O_DIRECTORY|os.O_NOFOLLOW);fd=os.open('\"'\"'import-whole-studio.py'\"'\"',os.O_WRONLY|os.O_CREAT|os.O_EXCL|os.O_NOFOLLOW,0o444,dir_fd=parent)\ntry:\n with os.fdopen(fd,'\"'\"'wb'\"'\"')as f:f.write(raw);f.flush();os.fsync(f.fileno())\n os.fsync(parent)\nfinally:os.close(parent)\nprint('\"'\"'5d87a7e33e8cd1d4c833220f489bf8d74df596bea587a32a3b33bc5d75855f1b'\"'\"')'"
+      ]
+    },
+    {
+      "localPath": "/private/tmp/keel-release-494d-20261020/docs/reviews/studio-publication-20261019/release/discovery-import-95b/whole-studio-plan.json",
+      "remoteBasename": "whole-studio-plan.json",
+      "bytes": 10719,
+      "sha256": "5be18ef338864a7e03b97add5adb96ccacf9faad16c63273b8b58c3d29591e96",
+      "exclusiveReceiverArgv": [
+        "/usr/bin/ssh",
+        "-o",
+        "BatchMode=yes",
+        "-o",
+        "ConnectTimeout=12",
+        "-o",
+        "StrictHostKeyChecking=yes",
+        "-o",
+        "UserKnownHostsFile=/Users/ravonus/dev/hashers/ops/servers/known_hosts",
+        "ubuntu@40.160.39.155",
+        "sudo -n /usr/bin/python3 -c 'import os,stat,sys,hashlib\nfrom pathlib import Path\nroot=Path('\"'\"'/home/ubuntu/keel-proof-qualification-43a5d5f4-05ad-4a2b-a261-530d7a8fb2d5'\"'\"');s=root.lstat();assert root.resolve()==root and stat.S_ISDIR(s.st_mode) and s.st_uid==0 and stat.S_IMODE(s.st_mode)==0o700\nraw=sys.stdin.buffer.read(10720);assert len(raw)==10719 and hashlib.sha256(raw).hexdigest()=='\"'\"'5be18ef338864a7e03b97add5adb96ccacf9faad16c63273b8b58c3d29591e96'\"'\"'\nparent=os.open(root,os.O_RDONLY|os.O_DIRECTORY|os.O_NOFOLLOW);fd=os.open('\"'\"'whole-studio-plan.json'\"'\"',os.O_WRONLY|os.O_CREAT|os.O_EXCL|os.O_NOFOLLOW,0o444,dir_fd=parent)\ntry:\n with os.fdopen(fd,'\"'\"'wb'\"'\"')as f:f.write(raw);f.flush();os.fsync(f.fileno())\n os.fsync(parent)\nfinally:os.close(parent)\nprint('\"'\"'5be18ef338864a7e03b97add5adb96ccacf9faad16c63273b8b58c3d29591e96'\"'\"')'"
+      ]
+    }
+  ],
+  "independentReviewRemoteBasename": "whole-studio-review.json",
+  "preflightArgv": [
+    "/usr/bin/ssh",
+    "-o",
+    "BatchMode=yes",
+    "-o",
+    "ConnectTimeout=12",
+    "-o",
+    "StrictHostKeyChecking=yes",
+    "-o",
+    "UserKnownHostsFile=/Users/ravonus/dev/hashers/ops/servers/known_hosts",
+    "ubuntu@40.160.39.155",
+    "sudo -n /usr/bin/python3 /home/ubuntu/keel-proof-qualification-43a5d5f4-05ad-4a2b-a261-530d7a8fb2d5/import-whole-studio.py --root /home/ubuntu/keel-proof-qualification-43a5d5f4-05ad-4a2b-a261-530d7a8fb2d5 --plan-sha256 5be18ef338864a7e03b97add5adb96ccacf9faad16c63273b8b58c3d29591e96"
+  ],
+  "stdinArchive": {
+    "localPath": "/private/tmp/keel-public-discovery-build-20261020/keel-studio-4002-b524.oci.tar",
+    "bytes": 692871680,
+    "sha256": "f015350eb2566bd9557d5033795713ba1d5aa97c04a55e84a837541e4d071407"
+  },
+  "requiredActualFreeBytes": 2247132160,
+  "requiredOuterConditions": [
+    "independent exact image/source/import review and one-action command admission",
+    "fresh bounded normalproxy window/exact original healthy running workerpaused guard",
+    "all previous import/helper receipts and retained FE944/native images authenticated",
+    "full raw scratch/new expanded layers/1GiBrollback/256MiBmetadata fit actual free beforeclaim",
+    "one load only, stop on denial/failure/uncertainty, preserve all oldreceipts and originalservice",
+    "no cleanup/start/activation/database mutation/signing authority"
+  ]
+}
