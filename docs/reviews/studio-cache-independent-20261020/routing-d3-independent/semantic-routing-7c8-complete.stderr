@@ -1,0 +1,1 @@
+Observed semantic failures must stay terminal; ordinary unavailable reads must preserve exact fallback
