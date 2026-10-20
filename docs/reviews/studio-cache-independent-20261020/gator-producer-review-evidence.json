@@ -1,0 +1,32 @@
+{
+  "schema": "keel-independent-assembly-only-review-evidence@1",
+  "at": "2026-10-20T08:18:05.418022+00:00",
+  "decision": "APPROVE_EXACT_PACKET02_ASSEMBLY_ONLY",
+  "reviewSHA256": "44992b1b14bf14283cd4a953109a6c9714ca92e6fba10492401c1d1d896f197a",
+  "packetPath": "/tmp/keel-private-gator-cache-pipeline-20261020-02/packet.json",
+  "packetSHA256": "50071e7efa5596aa464b8686006681e70a59050c846d33d5194d18f9d09e764f",
+  "closureSHA256": "5a9468283855a14cef9a3e9a8d56591ef7a5c21cfee2f6daeb34e9126d7fc996",
+  "ownTests": {
+    "correctlyConfiguredPass": 95,
+    "fail": 0,
+    "logSHA256": "ff8bf987b5562e0e931a921fa12534201f3934abee89daffa4e0853c53b0222b",
+    "retainedInitialRun": {
+      "pass": 94,
+      "fail": 1,
+      "reason": "Reviewer omitted KEEL_GATORRR_TEST_SDK required by one unchanged test. Corrected environment only; no source/assertion change.",
+      "logSHA256": "4898f6ae9be53ef019cce67483c3a81728b47b63844fc1af22ca0a55c4e597b8"
+    }
+  },
+  "reviewedBoundaries": [
+    "All192application source inputs match pinned f11git bytes;18tool source files exactly match receipt.",
+    "All1754SDKbuilt-file records match b524 digest3eff; bundle/source/preview/catalog/clone preparation/copy/publicSigner receipt hashes match.",
+    "Dedicated private clone only; credential directory absent and no credential read/copy; diagnostic uses hash-bound public signer receipt and exact creator/release scope.",
+    "Normal service compiler and local candidate renewal only; zero prefix transactions; no private/native/remote eth_simulateV1/signing/submission.",
+    "Only approved public read recipient; schema/byte/request bounds; denied/redirect/unknown execution errors stop without fallback.",
+    "Exact original project/revisions/art/source/PNG/calls rechecked after assembly; full independent pure auditor remains separate."
+  ],
+  "executionScope": "One fresh assembly as first stage of independently admitted automatic pipeline. Do not run standalone before final pipeline/predicate/native admission; preserve freshness and every prior failed attempt.",
+  "actualAssemblyPerformed": false,
+  "nativeProgramApproved": false,
+  "publicationApproved": false
+}
