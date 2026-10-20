@@ -14,6 +14,7 @@ export const BROWSER_TEST_FILES = Object.freeze([
   "tests/link-assembly-browser.test.mjs",
   "tests/sdk-verification-shell-marketplace-csp.test.mjs",
   "tests/sdk-marketplace-csp-observer-controls.test.mjs",
+  "tests/sdk-browser-cdp-navigation.test.mjs",
   "tests/three-r180-browser.test.mjs",
   "tests/keel-audio-browser.test.mjs",
 ]);
