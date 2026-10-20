@@ -1,0 +1,53 @@
+{
+  "schema": "keel-reviewed-gator-one-shot-pipeline@1",
+  "decision": "APPROVE",
+  "reviewerId": "independent-release-reviewer",
+  "reviewedAt": "2026-10-20T09:19:24.597365+00:00",
+  "configSHA256": "6eb1981d981fa0f18e6e58cba578d903157b79468ef76fd04e469f25c30cdc87",
+  "pipelineSHA256": "3b50a0cba13af02a8169bf4471a8a8d5f7ad1a29a1a251ec6f668c5a04fd4b07",
+  "original": {
+    "artifactId": "91d644eb-9faa-44b0-a67e-4ac432bcf5fc",
+    "artifactRevision": 1,
+    "releaseId": "fc69f51d-e570-4936-b469-85f1c8ad5331",
+    "releaseRevision": 3
+  },
+  "maximumAssemblies": 1,
+  "maximumNativeExecutions": 1,
+  "signing": false,
+  "submission": false,
+  "blockingFindings": [],
+  "scope": "One exact fresh original Gator assembly\u2192pure offline comparator\u2192exact plan\u2192independently reviewed late predicate\u2192soleoperator isolated native qualification. No human aging pause or automatic retry.",
+  "image": "sha256:fe94404ea7a860e6397e0964ef8dbe7d9fa9bb2777a57dd90cf8c63d802d8369",
+  "sdkCommit": "b524bf5fc19939c7523aada2e53f79e3360970ea",
+  "reviewedSourceFiles": 54,
+  "prerequisites": {
+    "SDKCanonical": {
+      "pass": 2671,
+      "fail": 0,
+      "optionalSkip": 8
+    },
+    "actualFinalImage": {
+      "packageAPIpass": 127,
+      "manifestFiles": 1360,
+      "actualCompiledCachePhysicalReadsForTwoQueries": 1,
+      "actualWholeAppEntriesEqualToFreshFullReference": 36052
+    },
+    "nativeComponentUnchanged": true,
+    "actualDurableImportReceiptSHA256": "71acc384008c655eeb1a2dcf286af7bcfb75ad1fe0bf8b6bceb17c4b8063f123",
+    "actualPublicStagePreflightSHA256": "48b1a949313568b8001796227bd1d165e2d2965d5d19c810c8eb86de88838d12",
+    "allFutureOutputsAbsentBeforeAdmission": true,
+    "allSourceHashesIndependentlyVerified": true
+  },
+  "conditions": [
+    "Execute exact frozen five-step config once; source hashes rechecked before every step. Any failure is consumed and preserved.",
+    "No input/sender/gas/calldata/fee/limit/clock/spawner/fetch override, captured deadline renewal, repin or alternate provider.",
+    "Only normal-clone compiler renewal before first capture; original artwork/project/release/receipts remain unchanged.",
+    "Native fixedapproved EthPanda pinned-proof state only; full program local; native broker networknone.",
+    "Fresh normal configured proxy health and full original-state guards; any failed health evidence prevents final acceptance regardless of an intermediate phase label.",
+    "Sole release operator; retain foreign resources and all failures; no production activation, migrations, credential reads, signing or submission.",
+    "Completion remains REQUIRES_INDEPENDENT_AUDIT; generated reviews authorize this qualification only."
+  ],
+  "releaseApproved": false,
+  "productionActivationApproved": false,
+  "walletBoundaryApproved": false
+}

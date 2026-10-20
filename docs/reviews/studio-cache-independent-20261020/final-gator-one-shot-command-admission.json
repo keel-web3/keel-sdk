@@ -1,0 +1,25 @@
+{
+  "schema": "keel-independent-final-gator-one-shot-command-admission@1",
+  "decision": "APPROVE_ONE_EXACT_QUALIFICATION_SEQUENCE",
+  "configPath": "/private/tmp/keel-gator-final-cache-pipeline-config-20261020/config.json",
+  "configSHA256": "6eb1981d981fa0f18e6e58cba578d903157b79468ef76fd04e469f25c30cdc87",
+  "reviewPath": "/Users/ravonus/dev/wt/studio-cache-independent-review-20261020/docs/reviews/studio-cache-independent-20261020/final-gator-one-shot-review.json",
+  "reviewSHA256": "69355c0b3cafcb68f3e7876891eb7f9b4f1378d5550dab4ff36aef9d7c6fba18",
+  "pipelineSHA256": "3b50a0cba13af02a8169bf4471a8a8d5f7ad1a29a1a251ec6f668c5a04fd4b07",
+  "argv": [
+    "/opt/homebrew/Cellar/python@3.14/3.14.7/Frameworks/Python.framework/Versions/3.14/bin/python3.14",
+    "/Users/ravonus/dev/wt/studio-publication-20261019/keel-site/docs/reviews/studio-publication-20261019/release/production-proof-factory/current-cache/gator-one-shot.py",
+    "/private/tmp/keel-gator-final-cache-pipeline-config-20261020/config.json",
+    "6eb1981d981fa0f18e6e58cba578d903157b79468ef76fd04e469f25c30cdc87",
+    "/Users/ravonus/dev/wt/studio-cache-independent-review-20261020/docs/reviews/studio-cache-independent-20261020/final-gator-one-shot-review.json",
+    "69355c0b3cafcb68f3e7876891eb7f9b4f1378d5550dab4ff36aef9d7c6fba18"
+  ],
+  "cwd": "/Users/ravonus/dev/wt/studio-publication-20261019/keel-site",
+  "sourceFiles": 54,
+  "maximumExecutions": 1,
+  "automaticRetry": false,
+  "signing": false,
+  "submission": false,
+  "productionActivation": false,
+  "requiresIndependentResultAudit": true
+}
