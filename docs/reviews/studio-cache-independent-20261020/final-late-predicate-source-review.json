@@ -1,0 +1,21 @@
+{
+  "schema": "keel-independent-final-late-predicate-source-review@1",
+  "at": "2026-10-20T09:16:32.558965+00:00",
+  "decision": "APPROVE_PIN_AND_PATH_ONLY_SOURCE_SUCCESSOR",
+  "predicateSHA256": "6c72768fce5182b5b11d77227b9edbe22d7f69f82080419c318345eeb2f4a810",
+  "previousPredicateSHA256": "0199936d2f128a90caebe31677d7dd90c6f4e025965197ba16b813e9a5a18b8b",
+  "readyWrapperSHA256": "90adec102d68cad49be0837599a93cd8dfb8710af995bf91b9ab7c3a1b67c64b",
+  "reverseReadyRootLiteralRestoresSHA256": "70c93206461aa25c2da0638f9450f1d81ee1952f5039ccf21b0a54a5d71cd044",
+  "hostPlanSHA256": "98334426551da7eb18308258e1278abf86b49813770ca0b30248aee1b0de439e",
+  "checksPreserved": [
+    "Exactoriginal34calls/30preparation/sourceHTML/PNG/URI/stageSigner",
+    "Freshpinnedblock+defaultSDKfactory+unmodifiedgas/calldata/fees/limits/clock",
+    "No signing/submission/activation/remote fullprogramfallback",
+    "Pure plan recomputation and exact serialized plan parity before generated one-shotadmission",
+    "PinnedSSH/exclusive receivers/trustedknownhost/qualifiedhostprofile"
+  ],
+  "actualPredicateInvoked": false,
+  "wholePipelineApproved": false,
+  "nativeProgramApproved": false,
+  "requires": "Final source-closure/config/dynamicoutput review before one fresh automatic sequence."
+}
