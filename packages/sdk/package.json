@@ -139,9 +139,17 @@
       "types": "./dist/tezos-collection.d.ts",
       "import": "./dist/tezos-collection.js"
     },
+    "./tezos-harness-tree": {
+      "types": "./dist/tezos-harness-tree.d.ts",
+      "import": "./dist/tezos-harness-tree.js"
+    },
     "./tezos-live-state": {
       "types": "./dist/tezos-live-state.d.ts",
       "import": "./dist/tezos-live-state.js"
+    },
+    "./chain-capability-map": {
+      "types": "./dist/chain-capability-map.d.ts",
+      "import": "./dist/chain-capability-map.js"
     },
     "./shell-registry": {
       "types": "./dist/shell-registry.d.ts",
@@ -274,6 +282,30 @@
     "./admin-pauses": {
       "types": "./dist/admin-pauses.d.ts",
       "import": "./dist/admin-pauses.js"
+    },
+    "./tezos-pause": {
+      "types": "./dist/tezos-pause.d.ts",
+      "import": "./dist/tezos-pause.js"
+    },
+    "./tezos-automation": {
+      "types": "./dist/tezos-automation.d.ts",
+      "import": "./dist/tezos-automation.js"
+    },
+    "./tezos-token-bound-account": {
+      "types": "./dist/tezos-token-bound-account.d.ts",
+      "import": "./dist/tezos-token-bound-account.js"
+    },
+    "./tezos-recovery": {
+      "types": "./dist/tezos-recovery.d.ts",
+      "import": "./dist/tezos-recovery.js"
+    },
+    "./tezos-governance": {
+      "types": "./dist/tezos-governance.d.ts",
+      "import": "./dist/tezos-governance.js"
+    },
+    "./tezos-entrypoint-capability": {
+      "types": "./dist/tezos-entrypoint-capability.d.ts",
+      "import": "./dist/tezos-entrypoint-capability.js"
     },
     "./hold-events": {
       "types": "./dist/hold-events.d.ts",

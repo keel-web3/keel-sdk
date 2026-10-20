@@ -17,3 +17,15 @@ test('native NFT ledger is reusable source without an origination target', () =>
   const ip = KEEL_TEZOS_MODULES.find(module => module.id === 'keel-ip-control');
   assert.ok(ip.deployable.includes('KeelIPWrappedFA2'));
 });
+
+test('the cross-chain mint attestor configures a target per route, as EVM routes do', () => {
+  const mint = KEEL_TEZOS_MODULES.find(module => module.id === 'keel-cross-chain-mint');
+  const entrypoints = mint.entrypoints.KeelCrossChainMintAttestor;
+  const views = mint.views.KeelCrossChainMintAttestor;
+  assert.ok(entrypoints.includes('set_route'));
+  assert.ok(views.includes('route'));
+  assert.ok(views.includes('artifact_registry'));
+  // One global target, frozen by the lock, is gone: the lock now freezes the report source.
+  assert.equal(entrypoints.includes('set_mint_target'), false);
+  assert.equal(views.includes('mint_target'), false);
+});

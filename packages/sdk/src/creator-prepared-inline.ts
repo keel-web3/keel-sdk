@@ -1,7 +1,7 @@
 import { encodeAbiParameters, encodeFunctionData, getAddress, parseAbi, type Address, type Hex } from "viem";
 import { createKeelManagedObjectPlan } from "./native-managed.js";
 import { buildKeelOnchainContainerBinding } from "./verification-shell.js";
-import { buildKeelPreparedDenseCopyShell, prepareKeelDensePayload } from "./prepared-dense-copy.js";
+import { buildKeelPreparedDenseCopyShell, prepareKeelDensePayload, prepareKeelGzipDensePayload } from "./prepared-dense-copy.js";
 import { prepareKeelDenseCopyFragment, serializeKeelDenseTransportJSON } from "./dense-transport.js";
 import { assertKeelInlineImageBytes } from "./collector-policy.js";
 import { normalizedAddress, uint } from "./validation.js";
@@ -74,7 +74,7 @@ export async function prepareKeelCreatorInline(input: {
   readonly payloadStorage?: KeelPayloadStorageMode;
   readonly viewer?: "keel-verification-shell" | "none";
   /** Default shared by all resources; per-resource explicit choices win. */
-  readonly compression?: "auto" | "brotli" | "none";
+  readonly compression?: "auto" | "brotli" | "gzip" | "none";
   readonly brotliQuality?: number;
   /** Low-level byte planning only; authenticated preparation derives this from the registered profile. */
   readonly readerGrammar?: "uri81" | "legacy-strict";
@@ -82,7 +82,7 @@ export async function prepareKeelCreatorInline(input: {
     readonly id: string; readonly aliases?: readonly string[];
     readonly role: "entrypoint" | "module" | "asset";
     readonly mediaType: string; readonly bytes: Uint8Array;
-    readonly compression?: "auto" | "brotli" | "none";
+    readonly compression?: "auto" | "brotli" | "gzip" | "none";
   }[];
   readonly poster: { readonly bytes: Uint8Array; readonly mediaType: string };
   readonly description?: string;
@@ -146,8 +146,10 @@ export async function prepareKeelCreatorInline(input: {
     if (resource.role === "entrypoint" && resource.mediaType !== "text/html") throw new TypeError("The creator entrypoint must be HTML.");
     const source = resource.bytes.slice();
     if (/^(?:text\/|application\/(?:javascript|json))/u.test(resource.mediaType)) new TextDecoder("utf-8", { fatal: true, ignoreBOM: true }).decode(source);
-    const payload = prepareKeelDensePayload(source, { compression: resource.compression ?? compression, readerGrammar,
-      ...(brotliQuality === undefined ? {} : { brotliQuality }) });
+    const selectedCompression = resource.compression ?? compression;
+    const payload = selectedCompression === "gzip" ? prepareKeelGzipDensePayload(source, { compression: "gzip", readerGrammar })
+      : prepareKeelDensePayload(source, { compression: selectedCompression, readerGrammar,
+        ...(brotliQuality === undefined ? {} : { brotliQuality }) });
     const carrier = await object(resource.id + ":payload", payload.preparedBytes);
     const binding = await buildKeelOnchainContainerBinding({ chainId, store, objectId: carrier.objectId, compression: payload.compression, bytes: source, storedBytes: payload.compressedBytes });
     const previousBinding = carrierBindings.get(carrier.objectId);

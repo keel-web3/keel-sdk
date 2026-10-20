@@ -1,3 +1,7 @@
+import { snapshotKeelExplicitExternalPreview, assertKeelExternalPreviewImageURI, type KeelExplicitExternalPreview } from "./external-preview.js";
+export { prepareKeelExplicitExternalPreview, snapshotKeelExplicitExternalPreview } from "./external-preview.js";
+export type { KeelExplicitExternalPreview } from "./external-preview.js";
+import { assertKeelRegisteredNativeGzipProof, type KeelRegisteredNativeGzipProof } from "./registered-native-gzip.js";
 import { assertKeelFreshPayloadCarriage, assertKeelPreparedCollectorInlineMetadata as assertKeelCollectorInlineMetadata } from "./inline-transport-audit.js";
 /**
  * Node-only planner for a modular Inline KEEL viewer.
@@ -268,6 +272,7 @@ export interface KeelInlineExistingObjectReusePart extends KeelPublishedInlineFr
 }
 
 export interface KeelInlineExistingObjectReuseOptions {
+  readonly registeredNativeGzip?: KeelRegisteredNativeGzipProof | undefined;
   readonly nonstandardReadPolicy?: KeelExplicitNonstandardReadPolicy;
   readonly preparationReadBudget?: KeelTokenURIPreparationBudget;
   readonly existingParts?: readonly KeelPublishedInlineFragment[];
@@ -388,6 +393,7 @@ export interface KeelInlineRawPercentTokenURIFragment extends KeelInlineFragment
  * JSON envelope receives an additional Base64 layer.
  */
 export interface KeelInlineRawPercentTokenURIGraph {
+  readonly registeredNativeGzip?: KeelRegisteredNativeGzipProof | undefined;
   readonly schema: "keel-inline-raw-percent-token-uri@1";
   readonly mediaType: "application/vnd.keel.token-uri-raw-percent-fragment";
   readonly contextParameter: "keel-context";
@@ -451,6 +457,7 @@ export interface KeelPreparedTokenURIFragment {
 }
 
 export interface KeelPreparedOneOfOneTokenURI {
+  readonly externalPreview?: KeelExplicitExternalPreview;
   readonly schema: "keel-prepared-one-of-one-token-uri@1";
   readonly animationEncoding: "base64" | "percent" | "raw-percent";
   readonly requiredBuilder: "KeelHarnessBuilder" | "KeelPercentTokenURIBuilder" | "KeelRawTokenURIBuilder";
@@ -1795,7 +1802,7 @@ export async function buildKeelInlineRawPercentTokenURIGraph(
   options = { ...options, ...(readBounds.nonstandardReadPolicy === undefined ? {} : { nonstandardReadPolicy: readBounds.nonstandardReadPolicy }), ...(readBounds.preparationReadBudget === undefined ? {} : { preparationReadBudget: readBounds.preparationReadBudget }) };
   const reuse = await inspectExistingGraphReuse(root, options, "raw-percent");
   if (reuse !== undefined) { root = reuse.root; options = { ...options, existingParts: reuse.existingParts }; }
-  if (reuse === undefined) assertKeelFreshPayloadCarriage(root.rootBytes);
+  if (reuse === undefined) assertKeelFreshPayloadCarriage(root.rootBytes, options);
   if (root.parts.length < 2 || root.parts.at(-1)?.role !== "shell-suffix") {
     throw new TypeError("An Inline raw-percent tokenURI graph requires an ordered shell and terminal suffix.");
   }
@@ -1854,6 +1861,7 @@ export async function buildKeelInlineRawPercentTokenURIGraph(
   }
   return {
     schema: "keel-inline-raw-percent-token-uri@1",
+    ...(options.registeredNativeGzip === undefined ? {} : { registeredNativeGzip: assertKeelRegisteredNativeGzipProof(options.registeredNativeGzip, htmlBytes) }),
     mediaType: "application/vnd.keel.token-uri-raw-percent-fragment",
     contextParameter: "keel-context",
     contextDelivery: "percent-html-tail",
@@ -2057,7 +2065,7 @@ export async function buildKeelInlineTokenURIGraph(
   options = { ...options, ...(readBounds.nonstandardReadPolicy === undefined ? {} : { nonstandardReadPolicy: readBounds.nonstandardReadPolicy }), ...(readBounds.preparationReadBudget === undefined ? {} : { preparationReadBudget: readBounds.preparationReadBudget }) };
   const reuse = await inspectExistingGraphReuse(root, options, options.carriage);
   const carriage = reuse?.carriage ?? resolveKeelInlineCarriage(options.carriage);
-  if (reuse === undefined) assertKeelFreshPayloadCarriage(root.rootBytes);
+  if (reuse === undefined) assertKeelFreshPayloadCarriage(root.rootBytes, options);
   if (reuse !== undefined) {
     root = reuse.root;
     // The strict check has cloned all receipt bytes. Do not inspect/transform them twice.
@@ -2160,6 +2168,8 @@ export async function buildKeelInlineFollowLatestTokenURIBodyGraph(
  * reusable middle graph between them.
  */
 export async function buildKeelPreparedOneOfOneTokenURI(input: {
+  readonly externalPreview?: KeelExplicitExternalPreview;
+  readonly registeredNativeGzip?: KeelRegisteredNativeGzipProof | undefined;
   readonly graph: Pick<
     KeelInlinePreEncodedTokenURIGraph
       | KeelInlinePreEncodedTokenURIBodyGraph
@@ -2211,6 +2221,8 @@ export async function buildKeelPreparedOneOfOneTokenURI(input: {
   /** Collector-facing Inline is the default. Other routes must be explicit. */
   readonly presentationPolicy?: KeelPresentationPolicy;
 }): Promise<KeelPreparedOneOfOneTokenURI> {
+  const externalPreview = input.externalPreview === undefined ? undefined : snapshotKeelExplicitExternalPreview(input.externalPreview);
+  if (externalPreview !== undefined && (input.graph.mediaType !== "application/vnd.keel.token-uri-raw-percent-fragment" || input.presentationPolicy !== undefined && input.presentationPolicy !== "collector-inline")) throw new TypeError("Explicit external preview requires the raw-percent canonical collector route.");
   if (!Number.isSafeInteger(input.chainId) || input.chainId <= 0) {
     throw new TypeError("A prepared tokenURI needs a positive safe chain ID.");
   }
@@ -2276,7 +2288,8 @@ export async function buildKeelPreparedOneOfOneTokenURI(input: {
   });
   const contextBytes = encoder.encode(contextJSON);
   const contextDigest = (await createIntegrity(contextBytes)).digest as Hex;
-  assertPreparedImageURI(input.imageURI);
+  if (externalPreview === undefined) assertPreparedImageURI(input.imageURI);
+  else assertKeelExternalPreviewImageURI(input.imageURI, externalPreview);
   const prefixHead = [
     `{"name":${JSON.stringify(`${input.collectionName} #1`)}`,
     `,"description":${JSON.stringify(input.description)}`,
@@ -2337,10 +2350,11 @@ export async function buildKeelPreparedOneOfOneTokenURI(input: {
     if (tokenJSON !== expectedJSON) throw new Error("Prepared raw-percent fragments changed the exact token JSON bytes.");
     const metadata = JSON.parse(tokenJSON) as { readonly animation_url?: unknown };
     if (typeof metadata.animation_url !== "string") throw new Error("Prepared token metadata has no animation_url.");
-    if (presentationPolicy === "collector-inline") assertKeelCollectorInlineMetadata(metadata);
+    if (presentationPolicy === "collector-inline") assertKeelCollectorInlineMetadata(metadata, { registeredNativeGzip: input.registeredNativeGzip, externalPreview });
     else assertMarketplaceSafeDataURI(metadata.animation_url, "Prepared token animation_url");
     return {
       schema: "keel-prepared-one-of-one-token-uri@1",
+      ...(externalPreview === undefined ? {} : { externalPreview }),
       animationEncoding,
       requiredBuilder: "KeelRawTokenURIBuilder",
       encodedPrefix,
@@ -2378,7 +2392,7 @@ export async function buildKeelPreparedOneOfOneTokenURI(input: {
   if (tokenJSON !== expectedJSON) throw new Error("Prepared tokenURI fragments changed the exact token JSON bytes.");
   const metadata = JSON.parse(tokenJSON) as { readonly animation_url?: unknown };
   if (typeof metadata.animation_url !== "string") throw new Error("Prepared token metadata has no animation_url.");
-  if (presentationPolicy === "collector-inline") assertKeelCollectorInlineMetadata(metadata);
+  if (presentationPolicy === "collector-inline") assertKeelCollectorInlineMetadata(metadata, { registeredNativeGzip: input.registeredNativeGzip, externalPreview });
   else assertMarketplaceSafeDataURI(metadata.animation_url, "Prepared token animation_url");
   return {
     schema: "keel-prepared-one-of-one-token-uri@1",

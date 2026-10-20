@@ -1,3 +1,5 @@
+import { snapshotKeelExplicitExternalPreview, assertKeelExternalPreviewImageURI, type KeelExplicitExternalPreview } from "./external-preview.js";
+import { assertKeelRegisteredNativeGzipProof, type KeelRegisteredNativeGzipProof } from "./registered-native-gzip.js";
 import { resolveKeelTokenURIReadBounds, assertKeelNonstandardTokenURIIdentity, type KeelExplicitNonstandardReadPolicy } from "@keel/protocol";
 import { createKeelLegacySharedImageReader, KEEL_LEGACY_SHARED_IMAGE_PROFILE } from "./legacy-shared-image-reader.js";
 import { gunzipSync } from "node:zlib";
@@ -6,7 +8,7 @@ import { unpackKeelInlineDescriptors } from "./inline-descriptor-columns.js";
 import { createHash } from "node:crypto";
 import { inspectKeelDataURICompatibility, decodeKeelDenseTransport, serializeKeelDenseTransportJSON, type KeelDenseTransportProfile } from "./dense-transport.js";
 import { createIntegrity } from "@keel/protocol";
-import { assertKeelInlineImageBytes, assertKeelCollectorInlineMetadata } from "./collector-policy.js";
+import { assertKeelInlineImageBytes, assertKeelCollectorInlineMetadata, assertKeelCollectorInlineAnimation } from "./collector-policy.js";
 import { createKeelLegacyPreparedDenseReader, KEEL_LEGACY_PREPARED_DENSE_PROFILE, type KeelLegacyPreparedDensePack } from "./legacy-prepared-dense-reader.js";
 import type { KeelStandaloneViewerItem } from "./verification-shell.js";
 import { keelPreparedDenseCopyBootSuffix } from "./prepared-dense-framing.js";
@@ -168,7 +170,8 @@ export function inspectKeelPreparedDenseCopyDocument(html: string) {
     items: expandedItems, transportProfile: profiles[0] as KeelDenseTransportProfile, shellBootEncoding: "base64" as const, shellBootCompression, payloadPreparation: "build-time" as const, contractOperation: "verified-copy" as const, legacyPreparedProfile };
 }
 
-export function inspectKeelInlinePayloadCarriage(htmlBytes: Uint8Array) {
+export function inspectKeelInlinePayloadCarriage(htmlBytes: Uint8Array, options: { readonly registeredNativeGzip?: KeelRegisteredNativeGzipProof | undefined } = {}) {
+  const nativeGzip = options.registeredNativeGzip === undefined ? undefined : assertKeelRegisteredNativeGzipProof(options.registeredNativeGzip, htmlBytes);
   if (htmlBytes.length > MAX_BYTES) throw new RangeError("Inline HTML exceeds the inspection limit.");
   const source = decoder.decode(htmlBytes), preparedDenseCopy = inspectKeelPreparedDenseCopyDocument(source);
   const html = preparedDenseCopy?.html ?? source;
@@ -217,12 +220,14 @@ export function inspectKeelInlinePayloadCarriage(htmlBytes: Uint8Array) {
         binaryBytes: bytes.length, textCarriageBytes: encoder.encode(text).length,
         directImage, requiresExistingPreparedReuse: encoding === "dense" ? preparedDenseCopy!.transportProfile !== "uri81-block-v1"
           && preparedDenseCopy!.legacyPreparedProfile !== KEEL_LEGACY_PREPARED_DENSE_PROFILE
-          && preparedDenseCopy!.legacyPreparedProfile !== KEEL_LEGACY_SHARED_IMAGE_PROFILE : encoding !== "text" && !directImage,
+          && preparedDenseCopy!.legacyPreparedProfile !== KEEL_LEGACY_SHARED_IMAGE_PROFILE : encoding !== "text" && !directImage && !(encoding === "base64" && payload.compression === "gzip" && nativeGzip?.members.some(member => member.id === item.id && member.mediaType === mediaType
+            && member.storedIntegrity.byteLength === bytes.length && member.storedIntegrity.digest === `0x${createHash("sha256").update(bytes).digest("hex")}`)),
         ...(encoding === "dense" ? {transportProfile: preparedDenseCopy!.transportProfile} : {}),
       }));
     }
   }
   return Object.freeze({ schema: "keel-inline-payload-carriage@1" as const,
+    ...(nativeGzip === undefined ? {} : { registeredNativeGzip: nativeGzip }),
     payloadCount: payloads.length,
     packedPayloadBytes: payloads.reduce((n, p) => n + p.binaryBytes, 0),
     payloadTextCarriageBytes: payloads.reduce((n, p) => n + p.textCarriageBytes, 0),
@@ -234,38 +239,45 @@ export function inspectKeelInlinePayloadCarriage(htmlBytes: Uint8Array) {
 
 /** Fresh publication must not silently encode a binary/text body. Existing
  * prepared objects use the exact assembly-only reuse inspector instead. */
-export function assertKeelFreshPayloadCarriage(html: Uint8Array): void {
-  const audit = inspectKeelInlinePayloadCarriage(html);
+export function assertKeelFreshPayloadCarriage(html: Uint8Array, options: { readonly registeredNativeGzip?: KeelRegisteredNativeGzipProof | undefined } = {}): void {
+  const audit = inspectKeelInlinePayloadCarriage(html, options);
   if (audit.requiresExistingPreparedReuse) throw new TypeError(
     "Fresh Inline uses URI81 for dense payloads and forbids new storedBase64/storedHex body copies. Legacy Base90/91 require exact existing-object reuse. Use raw UTF-8 text or exact existing prepared COPY; incompatible binary needs a verified reader recipe, not an encoding fallback.");
 }
 
 /** Node preparation recognizes and reconstructs the exact literal boot before
  * applying ordinary collector policy to its canonical inner document. */
-export function assertKeelPreparedCollectorInlineMetadata(metadata: Readonly<Record<string, unknown>>): void {
+export function assertKeelPreparedCollectorInlineMetadata(metadata: Readonly<Record<string, unknown>>, options: { readonly registeredNativeGzip?: KeelRegisteredNativeGzipProof | undefined; readonly externalPreview?: KeelExplicitExternalPreview | undefined } = {}): void {
+  const external = options.externalPreview === undefined ? undefined : assertKeelExternalPreviewImageURI(metadata.image, options.externalPreview);
+  const validate = (value: Readonly<Record<string, unknown>>) => {
+    if (external === undefined) assertKeelCollectorInlineMetadata(value);
+    else { assertKeelExternalPreviewImageURI(value.image, external); assertKeelCollectorInlineAnimation(value.animation_url); }
+  };
   const animation = metadata.animation_url;
   if (typeof animation === "string" && animation.startsWith("data:text/html;charset=utf-8,")) {
     const html = decoder.decode(decodeKeelInlineDataURI(animation, "text/html"));
+    if (options.registeredNativeGzip !== undefined || external !== undefined) assertKeelFreshPayloadCarriage(encoder.encode(html), options);
     const prepared = inspectKeelPreparedDenseCopyDocument(html);
     if ((prepared?.legacyPreparedProfile === KEEL_LEGACY_PREPARED_DENSE_PROFILE || prepared?.legacyPreparedProfile === KEEL_LEGACY_SHARED_IMAGE_PROFILE)) {
       const innerAnimation = "data:text/html;charset=utf-8," + encodeURIComponent(prepared.html);
-      assertKeelCollectorInlineMetadata({ ...metadata, animation_url: innerAnimation }); return;
+      validate({ ...metadata, animation_url: innerAnimation }); return;
     }
   }
-  assertKeelCollectorInlineMetadata(metadata);
+  validate(metadata);
 }
 
 /** Check the serialized audit again when reading a digest-bound review plan.
  * This does not replace parsing the source bytes when creating that plan. */
 export function assertKeelFreshPayloadAudit(value: unknown): void {
   const audit = object(value);
-  const fields = ["schema", "payloadCount", "packedPayloadBytes", "payloadTextCarriageBytes", "addedTextBytes", "requiresExistingPreparedReuse", "payloads", "preparedDenseCopy"];
+  const fields = ["schema", "payloadCount", "packedPayloadBytes", "payloadTextCarriageBytes", "addedTextBytes", "requiresExistingPreparedReuse", "payloads", "preparedDenseCopy", "registeredNativeGzip"];
   if (Object.keys(audit).some(key => !fields.includes(key)) || audit.schema !== "keel-inline-payload-carriage@1"
       || audit.requiresExistingPreparedReuse !== false || !Array.isArray(audit.payloads) || audit.payloads.length > 16_384
       || audit.payloadCount !== audit.payloads.length) throw new TypeError("Invalid fresh payload carriage audit.");
   const prepared = audit.preparedDenseCopy === undefined ? undefined : object(audit.preparedDenseCopy);
   if (prepared && (Object.keys(prepared).some(key => !["transportProfile","shellBootEncoding","shellBootCompression","payloadPreparation","contractOperation","legacyPreparedProfile"].includes(key)) || prepared.legacyPreparedProfile === undefined && prepared.transportProfile !== "uri81-block-v1" || prepared.shellBootEncoding !== "base64" || prepared.shellBootCompression !== undefined && prepared.shellBootCompression !== "gzip" && prepared.shellBootCompression !== "none" && prepared.shellBootCompression !== "ppmd" || prepared.payloadPreparation !== "build-time" || prepared.contractOperation !== "verified-copy"
       || prepared.legacyPreparedProfile !== undefined && ((prepared.legacyPreparedProfile !== KEEL_LEGACY_PREPARED_DENSE_PROFILE && prepared.legacyPreparedProfile !== KEEL_LEGACY_SHARED_IMAGE_PROFILE) || prepared.transportProfile !== "base90-v1" || !["gzip","none"].includes(String(prepared.shellBootCompression))))) throw new TypeError("Invalid prepared dense COPY audit; fresh payloads require URI81 or an exact supported legacy profile.");
+  const nativeGzip = audit.registeredNativeGzip === undefined ? undefined : assertKeelRegisteredNativeGzipProof(audit.registeredNativeGzip as KeelRegisteredNativeGzipProof);
   let binary = 0, carried = 0;
   for (const value of audit.payloads) {
     const payload = object(value);
@@ -280,29 +292,38 @@ export function assertKeelFreshPayloadAudit(value: unknown): void {
       && payload.textCarriageBytes === Math.ceil((payload.binaryBytes as number) / 3) * 4;
     const dense = payload.encoding === "dense" && prepared !== undefined && payload.transportProfile === prepared.transportProfile
       && ((prepared.legacyPreparedProfile === KEEL_LEGACY_PREPARED_DENSE_PROFILE || prepared.legacyPreparedProfile === KEEL_LEGACY_SHARED_IMAGE_PROFILE) ? ["none","brotli","gzip","deflate"].includes(String(payload.compression)) : payload.compression === "container-bound") && payload.directImage === false;
-    if (!rawText && !image && !dense) throw new TypeError("Fresh payload audit contains a newly encoded body.");
+    const gzip = payload.encoding === "base64" && payload.compression === "gzip" && payload.directImage === false
+      && payload.textCarriageBytes === Math.ceil((payload.binaryBytes as number) / 3) * 4
+      && nativeGzip?.members.some(member => member.id === payload.id && member.mediaType === payload.mediaType && member.storedIntegrity.byteLength === payload.binaryBytes);
+    if (!rawText && !image && !dense && !gzip) throw new TypeError("Fresh payload audit contains a newly encoded body.");
     binary += payload.binaryBytes as number; carried += payload.textCarriageBytes as number;
   }
   if (binary !== audit.packedPayloadBytes || carried !== audit.payloadTextCarriageBytes || carried - binary !== audit.addedTextBytes) throw new TypeError("Fresh payload carriage totals disagree.");
 }
 
 /** Measurements from the complete token return, not the compressed pack total. */
-export async function auditKeelInlineTokenURI(tokenURI: string, options: { readonly nonstandardReadPolicy?: KeelExplicitNonstandardReadPolicy } = {}) {
+export async function auditKeelInlineTokenURI(tokenURI: string, options: { readonly nonstandardReadPolicy?: KeelExplicitNonstandardReadPolicy; readonly registeredNativeGzip?: KeelRegisteredNativeGzipProof | undefined; readonly externalPreview?: KeelExplicitExternalPreview | undefined } = {}) {
+  const external = options.externalPreview === undefined ? undefined : snapshotKeelExplicitExternalPreview(options.externalPreview);
+  if (options.registeredNativeGzip !== undefined && (!tokenURI.startsWith("data:application/json;charset=utf-8,") || /;base64,/u.test(tokenURI.slice(0, tokenURI.indexOf(",") + 1)))) throw new TypeError("Registered native Gzip admits raw-percent metadata only, never a complete Base64 wrapper.");
+  if (external !== undefined && (typeof tokenURI !== "string" || !tokenURI.startsWith("data:application/json;charset=utf-8,"))) throw new TypeError("Explicit external previews require raw-percent metadata, never a whole-document Base64 wrapper.");
   const bounds = resolveKeelTokenURIReadBounds(options.nonstandardReadPolicy);
   if (typeof tokenURI !== "string" || encoder.encode(tokenURI).length > bounds.maximumTokenUriBytes) throw new RangeError("Complete tokenURI exceeds the inspection limit.");
   const tokenURIIntegrity = await createIntegrity(encoder.encode(tokenURI));
   assertKeelNonstandardTokenURIIdentity(bounds.nonstandardReadPolicy, { digest: tokenURIIntegrity.digest, byteLength: encoder.encode(tokenURI).length });
   const json = decodeKeelInlineDataURI(tokenURI, "application/json", bounds.maximumTokenUriBytes);
   const metadata = object(JSON.parse(decoder.decode(json)));
+  if (options.registeredNativeGzip !== undefined && (typeof metadata.animation_url !== "string" || !metadata.animation_url.startsWith("data:text/html;charset=utf-8,"))) throw new TypeError("Registered native Gzip admits per-resource compression, never complete-HTML Base64.");
   const html = decodeKeelInlineDataURI(metadata.animation_url, "text/html", bounds.maximumTokenUriBytes);
-  const image = decodeKeelInlineDataURI(metadata.image, "image/", bounds.maximumTokenUriBytes);
+  if (external !== undefined) assertKeelPreparedCollectorInlineMetadata(metadata, { ...options, externalPreview: external });
+  const image = external === undefined ? decodeKeelInlineDataURI(metadata.image, "image/", bounds.maximumTokenUriBytes) : undefined;
   const imageURI = metadata.image as string;
   const imageMedia = imageURI.slice(5, imageURI.indexOf(",")).split(";", 1)[0]!;
-  assertKeelInlineImageBytes(image, imageMedia);
-  const carriage = inspectKeelInlinePayloadCarriage(html);
+  if (image !== undefined) assertKeelInlineImageBytes(image, imageMedia);
+  const carriage = inspectKeelInlinePayloadCarriage(html, options);
   return Object.freeze({ schema: "keel-inline-token-audit@1" as const,
     completeTokenURIBytes: encoder.encode(tokenURI).length, metadataBytes: json.length,
-    htmlBytes: html.length, imageBytes: image.length,
+    htmlBytes: html.length, imageBytes: image?.length ?? 0, imageURIBytes: encoder.encode(imageURI).length,
+    ...(external === undefined ? {} : { externalPreview: external, externalPreviewAvailability: "not-inspected" as const, externalPreviewSourceBytesRevalidated: false as const }),
     completeDocumentBase64Layers: Number(/^data:application\/json[^,]*;base64,/iu.test(tokenURI))
       + Number(/^data:text\/html[^,]*;base64,/iu.test(metadata.animation_url as string)),
     tokenURIIntegrity, ...(bounds.nonstandardReadPolicy === undefined ? {} : { nonstandardReadPolicy: bounds.nonstandardReadPolicy }), htmlIntegrity: await createIntegrity(html), carriage,
@@ -313,6 +334,6 @@ export async function auditKeelInlineTokenURI(tokenURI: string, options: { reado
       explanation: "Returned Base64/hex may be emitted from native Hold bytes at read time. Verify object records, carrier bytes and the upload inventory before claiming stored duplication or storage savings." },
     uriCompatibility: { tokenURI: inspectKeelDataURICompatibility(tokenURI),
       animationURL: inspectKeelDataURICompatibility(metadata.animation_url as string),
-      image: inspectKeelDataURICompatibility(metadata.image as string) },
+      image: external === undefined ? inspectKeelDataURICompatibility(metadata.image as string) : null },
     browserVerified: false as const });
 }

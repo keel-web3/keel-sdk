@@ -26,7 +26,7 @@ import {
   type KeelProjectComponent,
   type KeelWebpProfile,
 } from "@keel/protocol";
-import { chooseSmallestCompression } from "@keel/builder";
+import { compressBytes, chooseSmallestCompression } from "@keel/builder";
 import { normalizeAssets, normalizeProjectPath, sourceUriForFile, uniqueResourceId } from "./media.js";
 import type {
   NormalizedStudioAsset,
@@ -72,7 +72,7 @@ function resourceAliases(resourceId: string, fileName: string): readonly string[
 }
 
 const brotliCompressAsync = promisify(brotliCompress);
-async function prepareResource(asset: NormalizedStudioAsset, payloadStorage: KeelPayloadStorageMode, compression: "auto" | "brotli" | "none", brotliQuality: number): Promise<PreparedStudioResource> {
+async function prepareResource(asset: NormalizedStudioAsset, payloadStorage: KeelPayloadStorageMode, compression: "auto" | "brotli" | "gzip" | "none", brotliQuality: number): Promise<PreparedStudioResource> {
   const decodedIntegrity = await createIntegrity(asset.bytes);
   // The inline presentation contract must be able to concatenate the exact
   // HTML shell without running a browser codec. Entrypoints are deliberately
@@ -85,7 +85,8 @@ async function prepareResource(asset: NormalizedStudioAsset, payloadStorage: Kee
     || asset.mediaType === "application/vnd.keel.token-uri-base64-body-fragment"
     || asset.mediaType === "application/vnd.keel.legacy-shared-image-copy-program";
   let selected: { compression: import("@keel/protocol").Compression; bytes: Uint8Array } = { compression: "none", bytes: asset.bytes.slice() };
-  if (!contractReadable && payloadStorage !== "raw" && compression !== "none") {
+  if (!contractReadable && payloadStorage !== "raw" && compression === "gzip") selected = { compression: "gzip", bytes: await compressBytes("gzip", asset.bytes) };
+  else if (!contractReadable && payloadStorage !== "raw" && compression !== "none") {
     const compressed = new Uint8Array(await brotliCompressAsync(asset.bytes, { params: {
       [zlibConstants.BROTLI_PARAM_QUALITY ?? 1]: brotliQuality,
       [zlibConstants.BROTLI_PARAM_MODE ?? 0]: zlibConstants.BROTLI_MODE_GENERIC ?? 0,
@@ -652,7 +653,7 @@ export async function prepareStudioArtifact(options: PrepareStudioArtifactOption
   }
   const payloadStorage = resolveKeelPayloadStorage(options.payloadStorage);
   const compression = options.compression ?? "auto", brotliQuality = options.brotliQuality ?? 11;
-  if (!["auto", "brotli", "none"].includes(compression)) throw new TypeError("Unsupported lossless compression policy.");
+  if (!["auto", "brotli", "gzip", "none"].includes(compression)) throw new TypeError("Unsupported lossless compression policy.");
   if (!Number.isInteger(brotliQuality) || brotliQuality < 0 || brotliQuality > 11) throw new TypeError("Brotli quality must be an integer from 0 to 11.");
   const withDerivatives = await appendMediaDerivatives(normalizeAssets(options.assets), options.mediaDerivativeProfiles ?? []);
   const flashRuntime = options.flashRuntime === undefined ? undefined : resolveFlashRuntime(options.flashRuntime, withDerivatives.assets);

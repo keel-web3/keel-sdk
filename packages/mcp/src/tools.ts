@@ -12,9 +12,9 @@ import { PREREVEAL_TOOL_DEFINITIONS } from './prereveal-tools.js';
 import { ARENA_TOOL_DEFINITIONS } from './arena-tools.js';
 import { LAYERED_TOOL_DEFINITIONS } from './layered-tools.js';
 import { SVG_TOOL_DEFINITIONS } from './svg-tools.js';
-import { CREATOR_INLINE_TOOL_DEFINITIONS } from './creator-inline-tools.js';
 import { TEZOS_COLLECTION_TOOL_DEFINITIONS } from './tezos-collection-tools.js';
 import { TEZOS_LIVE_STATE_TOOL_DEFINITIONS } from './tezos-live-state-tools.js';
+import { CREATOR_INLINE_TOOL_DEFINITIONS } from './creator-inline-tools.js';
 import { resolveKeelInlineCarriage } from "@keel/sdk/presentation";
 import {
   prepareKeelTezosShell,

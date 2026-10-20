@@ -10,10 +10,12 @@ export const FRAY_KEEL_UPLOAD_PLAN_PROTOCOL = "fray-keel-upload-plan@1" as const
 
 export type FrayUploadFamily = "ethereum" | "tezos";
 
+/** `KeelImmutableCheckpointRegistry` identity, field for field. */
 export interface KeelTezosCheckpointIdentity {
-  readonly chunk_store: string;
+  /** The carrier the registry hauls slugs from (`haul_slug`). */
+  readonly hold: string;
   readonly expected_index_root: Hex;
-  readonly expected_chunk_count: number;
+  readonly expected_slug_count: number;
   readonly expected_stored_sha256: Hex;
   readonly expected_stored_byte_length: number;
   readonly decoded_sha256: Hex;
@@ -37,12 +39,12 @@ export type FrayKeelTezosOperation =
       readonly identity: KeelTezosCheckpointIdentity;
     }
   | {
-      readonly kind: "append_checkpoint_chunk";
+      readonly kind: "append_checkpoint_slug";
       readonly contract: string;
-      readonly entrypoint: "append_checkpoint_chunk";
+      readonly entrypoint: "append_checkpoint_slug";
       readonly object_id: Hex;
       readonly expected_index: number;
-      readonly chunk_pointer: Hex;
+      readonly slug_pointer: Hex;
     }
   | {
       readonly kind: "seal_checkpoint";
@@ -66,7 +68,15 @@ export interface FrayKeelUploadPlan {
   readonly tezos?: {
     readonly keelHold: string;
     readonly checkpointRegistry: string;
+    /** The only account that can begin, append and seal this checkpoint. */
+    readonly owner: string;
     readonly objectId: Hex;
+    /** Confirm objectId before signing: it must equal this view's answer. */
+    readonly objectIdView: {
+      readonly contract: string;
+      readonly view: "predict_object_id";
+      readonly input: { readonly owner: string; readonly identity: KeelTezosCheckpointIdentity };
+    };
     readonly operations: readonly FrayKeelTezosOperation[];
     readonly readView: "read_immutable_object";
   };
@@ -86,6 +96,12 @@ export interface CreateFrayKeelUploadPlanInput {
   readonly tezos?: {
     readonly keelHold: string;
     readonly checkpointRegistry: string;
+    /**
+     * The account that signs begin, append and seal. The registry binds the
+     * object ID to it: objectId = sha256(PACK(record(owner, identity))), the
+     * `predict_object_id` view. Another account cannot pre-claim it.
+     */
+    readonly owner: string;
     readonly objectId: Hex;
     readonly identity: KeelTezosCheckpointIdentity;
   };
@@ -106,12 +122,23 @@ export async function createFrayKeelUploadPlan(
     ...(input.maxChunkBytes === undefined ? {} : { maxChunkBytes: input.maxChunkBytes }),
     keccak256: input.keccak256,
   });
+  if (input.tezos !== undefined) {
+    if (!/^(?:tz[1-4]|KT1)[1-9A-HJ-NP-Za-km-z]{33}$/u.test(input.tezos.owner ?? "")) throw new TypeError("Fray Tezos upload needs the checkpoint owner address.");
+    if (input.tezos.identity.hold !== input.tezos.keelHold) throw new TypeError("The checkpoint identity must name the Hold the slugs are written to.");
+    if (!/^0x[0-9a-fA-F]{64}$/u.test(input.tezos.objectId)) throw new TypeError("Fray Tezos objectId must be 32 bytes.");
+  }
   const tezos = input.tezos === undefined
     ? undefined
     : {
         keelHold: input.tezos.keelHold,
         checkpointRegistry: input.tezos.checkpointRegistry,
+        owner: input.tezos.owner,
         objectId: input.tezos.objectId,
+        objectIdView: {
+          contract: input.tezos.checkpointRegistry,
+          view: "predict_object_id" as const,
+          input: { owner: input.tezos.owner, identity: input.tezos.identity },
+        },
         operations: createKeelTezosCheckpointOperations({
           chunks,
           keelHold: input.tezos.keelHold,
@@ -168,12 +195,12 @@ function createKeelTezosCheckpointOperations(input: {
       identity: input.identity,
     },
     ...pointers.map((slugPointer, index) => ({
-      kind: "append_checkpoint_chunk" as const,
+      kind: "append_checkpoint_slug" as const,
       contract: input.checkpointRegistry,
-      entrypoint: "append_checkpoint_chunk" as const,
+      entrypoint: "append_checkpoint_slug" as const,
       object_id: input.objectId,
       expected_index: index,
-      chunk_pointer: slugPointer,
+      slug_pointer: slugPointer,
     })),
     {
       kind: "seal_checkpoint",

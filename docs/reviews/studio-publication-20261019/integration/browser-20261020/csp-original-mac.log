@@ -1,0 +1,37 @@
+TAP version 13
+# Subtest: the canonical Inline shell runs verified data modules under a restrictive marketplace srcdoc CSP
+not ok 1 - the canonical Inline shell runs verified data modules under a restrictive marketplace srcdoc CSP
+  ---
+  duration_ms: 256.713709
+  type: 'test'
+  location: '/Users/ravonus/dev/wt/studio-browser-integration-20261020/keel-sdk/tests/sdk-verification-shell-marketplace-csp.test.mjs:66:1'
+  failureType: 'testCodeFailure'
+  error: |-
+    The input was expected to not match the regular expression /Refused to load the script|violates the following Content Security Policy directive/iu. Input:
+    
+    `[1019/221011.257078:INFO:CONSOLE:122] "Loading the font 'data:font/woff2;base64,d09GMgABAAAAABXMAAsAAAAAKbAAABV6AAEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAG4FSBmAAgh4KwlitKQE2AiQDgmILgWIABCAFgmUHghsbVB1FRbBxAAgU3wHg/yqBB0P6GxIcombUG3hv2mxWzaIo1aw5goHxpff2Xc/1+638jjg2PO+2/yP3igPnaCAiihMbE5UtbN2oKVq4I2fja0N9PVzhWA01W8syUhOJ5jQzwvhkbVu+5Rpba7mQ38vi5ABA/VcDG10nK2zpebjh/QosD+IggTiZ4MB8ONLn9+rK+ZKXRva1eSk6AKq4OhgwLGv3nBclXJYpqiKDOTXJTg4E3UeWbDkZCmwrsHGBjofpwJIC3dzy6O6eowT/9v6/NdPOPyR1dXioUuHImp8f2j+TLQQOcFPepDAbVSA0psLiTgnJ9Xl0Z3SdqtStcrUY0/oVIemwbcAI6H1pNwz0MGBs4E3vec+NAIYAA+C8...SicsR7XkFgDE82XFXPZhBhwAWCRHEa5vriIe1NQdwPcNculckGRHgobpSBuXK9e9xLoqEMXppG3MJE64MvdAMZbohvaaifYB7OwZPiQlYR9MAV+xY2rpbLq+ldf/RLBetRLhsFHCaE6DXxnwiPejFrQoi4JkjKugmWwTXps54VEofoer4t+iv0pUkIfpukQ2YTuNQ23RQUUi3q85fcJbbm/TecIv9ESMRM64Y+FEXa6Bj5TUOm+74EEC5friTJtFUetAjJdlg4TOZUO2/2byoXGU1b7EMrtrcp9KU+SjKi3HRZtiAOgj9fBAgFZ9PHw3KD484Dnicv3nz48kPgb5nlVlhpldXWWGud9YgC0NAxfh2KfgVqBA+fQIX+mpQ5QqQo0YRixD7/MhvET4KIChNMMcMcCzASSTFzvSVgC1dIEaR5AZG7wkoQFOcdSYJES7lAo9Bn/BAhSxpCf5pUqrBPvb9BjwaNqp1XOgT4YxmWYwVWYhVWYw3WVn9rCAAA' violates the following Content Security Policy directive: "default-src 'none'". Note that 'font-src' was not explicitly set, so 'default-src' is used as a fallback. The action has been blocked.", source: about:srcdoc (122)\n` +
+      `[1019/221011.257116:INFO:CONSOLE:122] "Loading the font 'data:font/woff2;base64,d09GMgABAAAAABYMAAsAAAAAKdwAABW5AAEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAG4FSBmAAgh4KwnytUgE2AiQDgmILgWIABCAFgm4Hghsbhh2zoo6yWhZI/osEnuP1QXBETfGKsk2bzapYFLXCkhMMjJX3wPP+jbhGSDI7RG7W4I6EdO0E7ClVAxZEBAl0FcEWxA7xFKNYUqypnpHw2NK6wRaCNd1U28UzpnieFzW9eDk7j20wp5VkO91UkAxInKRkc2CGk/IiW1aSzq4LdIQLfd/je/QP3PB+RRRQFNDAJjhgmOB7aDNonSS/2TCazCJG4KSe6udN5vkT/Nv7p7lXe69IqnUdknBkzftXupf7V4L8Qf4wKSYZJX9AqDxeM0BSYz+PrkbPqUk9YafEHmNj0m6I8Mj7fderI8uz4LTQ3wkPDFAAmGdkHdTnRBAKMCIAgH7B9xtsTQUYoYokIgFLXZTbYO98+8QE+K6j...EkFcSqGIhaL7IDuTBURcGZoMnoocADVcpyFXDhCbufgzLNRfVSC7LKJoiz6k9IrX/wgjvgD/fZj1akm+QiRtAIf2fmqzaiboYHf8VfiLmo0D9akQz2hMKedDxwNCujvgX+DwVX1Bdfz3kPFUchGItRELdqlDHsSKJhSKXwqs8x+HRUoOdyVCiXPipSOjGqQ2gzNqj8fgyvJWPbXzzVfE2kRl01Vs5kQ6hymNTcYTTYhgsBhNhuK5kKZ9jGQajN1lGIFywkryCRzLUhdP3p7juT9cNEu7FNqVg8bfN0pUmNp4DIBYGRPaXjl1tmuRVWWmW1NdZax5mL9QiIXLlx54HEE5kXCm9UNGwc3BtX/JbVsABCIhl0E+svF2ojsTAS4SJEihK9AItYwjJWsIo1rCOhgdBjiw3ZgXYthfaerk1UzyOXXWGGbj7i2AYxpOw5csBkDPlQLAbZCPzPMYXUihz2H2hyxFGlauwfYcS5zm3u8xhpniPP6/rMCAAAAA==' violates the following Content Security Policy directive: "default-src 'none'". Note that 'font-src' was not explicitly set, so 'default-src' is used as a fallback. The action has been blocked.", source: about:srcdoc (122)\n`
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected:
+  actual: |-
+    [1019/221011.257078:INFO:CONSOLE:122] "Loading the font 'data:font/woff2;base64,d09GMgABAAAAABXMAAsAAAAAKbAAABV6AAEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAG4FSBmAAgh4KwlitKQE2AiQDgmILgWIABCAFgmUHghsbVB1FRbBxAAgU3wHg/yqBB0P6GxIcombUG3hv2mxWzaIo1aw5goHxpff2Xc/1+638jjg2PO+2/yP3igPnaCAiihMbE5UtbN2oKVq4I2fja0N9PVzhWA01W8syUhOJ5jQzwvhkbVu+5Rpba7mQ38vi5ABA/VcDG10nK2zpebjh/QosD+IggTiZ4MB8ONLn9+rK+ZKXRva1eSk6AKq4OhgwLGv3nBclXJYpqiKDOTXJTg4E3UeWbDkZCmwrsHGBjofpwJIC3dzy6O6eowT/9v6/NdPOPyR1dXioUuHImp8f2j+TLQQOcFPepDAbVSA0psLiTgnJ9Xl0Z3SdqtStcrUY0/oVIemwbcAI6H1pNwz0MGBs4E3vec+NAIYAA+C8...SicsR7XkFgDE82XFXPZhBhwAWCRHEa5vriIe1NQdwPcNculckGRHgobpSBuXK9e9xLoqEMXppG3MJE64MvdAMZbohvaaifYB7OwZPiQlYR9MAV+xY2rpbLq+ldf/RLBetRLhsFHCaE6DXxnwiPejFrQoi4JkjKugmWwTXps54VEofoer4t+iv0pUkIfpukQ2YTuNQ23RQUUi3q85fcJbbm/TecIv9ESMRM64Y+FEXa6Bj5TUOm+74EEC5friTJtFUetAjJdlg4TOZUO2/2byoXGU1b7EMrtrcp9KU+SjKi3HRZtiAOgj9fBAgFZ9PHw3KD484Dnicv3nz48kPgb5nlVlhpldXWWGud9YgC0NAxfh2KfgVqBA+fQIX+mpQ5QqQo0YRixD7/MhvET4KIChNMMcMcCzASSTFzvSVgC1dIEaR5AZG7wkoQFOcdSYJES7lAo9Bn/BAhSxpCf5pUqrBPvb9BjwaNqp1XOgT4YxmWYwVWYhVWYw3WVn9rCAAA' violates the following Content Security Policy directive: "default-src 'none'". Note that 'font-src' was not explicitly set, so 'default-src' is used as a fallback. The action has been blocked.", source: about:srcdoc (122)
+    [1019/221011.257116:INFO:CONSOLE:122] "Loading the font 'data:font/woff2;base64,d09GMgABAAAAABYMAAsAAAAAKdwAABW5AAEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAG4FSBmAAgh4KwnytUgE2AiQDgmILgWIABCAFgm4Hghsbhh2zoo6yWhZI/osEnuP1QXBETfGKsk2bzapYFLXCkhMMjJX3wPP+jbhGSDI7RG7W4I6EdO0E7ClVAxZEBAl0FcEWxA7xFKNYUqypnpHw2NK6wRaCNd1U28UzpnieFzW9eDk7j20wp5VkO91UkAxInKRkc2CGk/IiW1aSzq4LdIQLfd/je/QP3PB+RRRQFNDAJjhgmOB7aDNonSS/2TCazCJG4KSe6udN5vkT/Nv7p7lXe69IqnUdknBkzftXupf7V4L8Qf4wKSYZJX9AqDxeM0BSYz+PrkbPqUk9YafEHmNj0m6I8Mj7fderI8uz4LTQ3wkPDFAAmGdkHdTnRBAKMCIAgH7B9xtsTQUYoYokIgFLXZTbYO98+8QE+K6j...EkFcSqGIhaL7IDuTBURcGZoMnoocADVcpyFXDhCbufgzLNRfVSC7LKJoiz6k9IrX/wgjvgD/fZj1akm+QiRtAIf2fmqzaiboYHf8VfiLmo0D9akQz2hMKedDxwNCujvgX+DwVX1Bdfz3kPFUchGItRELdqlDHsSKJhSKXwqs8x+HRUoOdyVCiXPipSOjGqQ2gzNqj8fgyvJWPbXzzVfE2kRl01Vs5kQ6hymNTcYTTYhgsBhNhuK5kKZ9jGQajN1lGIFywkryCRzLUhdP3p7juT9cNEu7FNqVg8bfN0pUmNp4DIBYGRPaXjl1tmuRVWWmW1NdZax5mL9QiIXLlx54HEE5kXCm9UNGwc3BtX/JbVsABCIhl0E+svF2ojsTAS4SJEihK9AItYwjJWsIo1rCOhgdBjiw3ZgXYthfaerk1UzyOXXWGGbj7i2AYxpOw5csBkDPlQLAbZCPzPMYXUihz2H2hyxFGlauwfYcS5zm3u8xhpniPP6/rMCAAAAA==' violates the following Content Security Policy directive: "default-src 'none'". Note that 'font-src' was not explicitly set, so 'default-src' is used as a fallback. The action has been blocked.", source: about:srcdoc (122)
+    
+  operator: 'doesNotMatch'
+  stack: |-
+    TestContext.<anonymous> (file:///Users/ravonus/dev/wt/studio-browser-integration-20261020/keel-sdk/tests/sdk-verification-shell-marketplace-csp.test.mjs:87:10)
+    process.processTicksAndRejections (node:internal/process/task_queues:103:5)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async startSubtestAfterBootstrap (node:internal/test_runner/harness:296:3)
+  ...
+1..1
+# tests 1
+# suites 0
+# pass 0
+# fail 1
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 649.3245

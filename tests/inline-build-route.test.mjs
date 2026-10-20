@@ -38,3 +38,26 @@ test('binary media selects beneficial lossless compression while explicit Off an
   assert.equal(exact.resources[0].compression,'none');assert.equal(exact.compressedBytes,bytes.length);
  }
 });
+
+test('reader-aware AUTO retains its preference while selecting eligible exact None bytes',()=>{
+ const before=Buffer.from(resources[0].bytes),allowed=['none'];
+ const plan=assertKeelInlineBuildRoute({resources,freshReaderCompressions:allowed,publicationPath:'legacy-collection-harness'});
+ assert.equal(plan.compression,'auto');assert.equal(plan.readerSelection,'auto-reader-compatible-none');
+ assert.equal(plan.route,'legacy-uncompressed');assert.equal(plan.resources[0].compression,'none');
+ assert.equal(plan.resources[0].selection,'auto');assert.equal(plan.compressedBytes,plan.sourceBytes);
+ assert.deepEqual(plan.freshReaderCompressions,['none']);assert.deepEqual(resources[0].bytes,before);
+ allowed.push('brotli');assert.deepEqual(plan.freshReaderCompressions,['none']);
+ assert.equal(plan.requiresFullReadValidation,true);assert.equal(plan.requiresDeliveryValidation,true);assert.deepEqual(plan.offchainPayloads,[]);
+});
+
+test('explicit Brotli cannot silently use a None-only reader or an invalid capability list',()=>{
+ assert.throws(()=>resolveKeelInlineBuildRoute({resources,compression:'brotli',freshReaderCompressions:['none']}),error=>error.code==='KEEL_INLINE_CODEC_UNSUPPORTED');
+ for(const allowed of [[],['brotli'],['none','none'],['none','base90']])assert.throws(()=>resolveKeelInlineBuildRoute({resources,freshReaderCompressions:allowed}),/Fresh reader compression/);
+});
+
+test('a permitted Brotli candidate still needs the matching publication path and full validation',()=>{
+ const plan=resolveKeelInlineBuildRoute({resources,freshReaderCompressions:['none','brotli']});
+ assert.equal(plan.resources[0].compression,'brotli');assert.equal(plan.route,'creator-prepared-copy');
+ assert.throws(()=>assertKeelInlineBuildRoute({resources,freshReaderCompressions:['none','brotli'],publicationPath:'legacy-collection-harness'}),/KEEL_INLINE_DELIVERY_PLAN_REQUIRED/);
+ assert.equal(plan.requiresDeliveryValidation,true);
+});

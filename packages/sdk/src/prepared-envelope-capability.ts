@@ -61,15 +61,21 @@ const legacyDeployers: Readonly<Record<string, readonly [number, number]>> = {
   "0x0ad0ffcfd89af5655e1e7bca58caca649fd990d798751d7fc2a5c5b8c4b29425": [1109, 1146],
   "0x08f11e6ba895a0e8a16d4a36ee413c6e3340826c81896091fa13f6f03746619c": [1093, 1130],
 };
-// Exact Contracts4015 compiler fingerprints (Solc0.8.36, IR,50runs,Prague,noCBOR).
+// Exact Contracts4015 and Contracts49d compiler fingerprints
+// (Solc0.8.36, IR,50runs,Prague,noCBOR); no source-only capability inference.
 // Mask only compiler-declared constructor immutables or linked-library addresses;
 // verify the actual immutable carrier bytes and library code separately below.
 const factoryImmutableStarts = [3665, 3848, 3611, 3744, 3782, 758, 799];
 const deployerImmutableStarts = [1093, 1130, 941, 981, 84];
-const collectionLibraryStarts = [20381, 20889, 21233, 21680];
+const collectionProfiles = [
+  { length: 26362, libraryStarts: [20381, 20889, 21233, 21680], maskedHash: "0x679192f3111d5bfc3de391ea22f86b90b952af2a8601c48eed57386d926ed44b" },
+  // Contracts49d: exact compiled Routed721 default holder edits remain disabled.
+  // Genuine unlinked artifact, metadata/source SHA and link ranges are retained in
+  // tests/fixtures/prepared-envelope-capability-49d.json; this is not a deployment claim.
+  { length: 26364, libraryStarts: [20383, 20891, 21235, 21682], maskedHash: "0x7f636ad8e43975569ee1c2c2a00aea3bb441b89bb57f0e6b998a8bdbd2e68bf1" },
+] as const;
 const factoryTemplateHash = "0xb01f2470dabda7abb69504a82b7e0b5a8ce2d39b9f513d5910b423a27de73f15";
 const deployerTemplateHash = "0x4b5bc008b1c3d73cf34bee82a23e8d0ce40ff486c516ed04718fcb03f2932e7b";
-const collectionTemplateHash = "0x679192f3111d5bfc3de391ea22f86b90b952af2a8601c48eed57386d926ed44b";
 const metadataLibraryRuntimeHash = "0xd7d042765a972c73fac3a803a10874591793e54ccac7f6405b9fe851bf07e928";
 
 function asBytes(value: Uint8Array | string): Uint8Array {
@@ -186,8 +192,9 @@ async function qualifyFactory(
       if (!legacyCreations.has(creationHash)) fail("unknown legacy collection creation code");
       limit = 32768;
     } else {
-      if (creation.length !== 26362 || maskedHash(creation, collectionLibraryStarts, 20) !== collectionTemplateHash) fail("unknown maintained collection creation code");
-      const libraryAddresses = collectionLibraryStarts.map((start) => getAddress(toHex(creation.slice(start, start + 20))));
+      const profile = collectionProfiles.find(profile => creation.length === profile.length && maskedHash(creation, profile.libraryStarts, 20) === profile.maskedHash);
+      if (profile === undefined) return fail("unknown maintained collection creation code");
+      const libraryAddresses = profile.libraryStarts.map((start) => getAddress(toHex(creation.slice(start, start + 20))));
       if (libraryAddresses.some((address) => address !== libraryAddresses[0])) fail("inconsistent metadata library links");
       const library = asBytes(await read(() => adapter.getCode({ address: libraryAddresses[0]!, blockNumber: block.number, ...options })));
       if (library.length !== 4683 || keccak256(library) !== metadataLibraryRuntimeHash) fail("unknown metadata library runtime");

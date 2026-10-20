@@ -60,7 +60,7 @@ export interface PrepareStudioArtifactOptions {
    * Upload planning must independently retain compression:none for changed storage. */
   readonly contractReadableFallback?: boolean;
   /** Explicit lossless codec policy; none is independent of Compact/Raw storage. */
-  readonly compression?: "auto" | "brotli" | "none";
+  readonly compression?: "auto" | "brotli" | "gzip" | "none";
   readonly brotliQuality?: number;
   /** Compact stores losslessly compressed native bytes; Raw disables automatic compression. */
   readonly payloadStorage?: KeelPayloadStorageMode;

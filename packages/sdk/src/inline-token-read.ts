@@ -1,3 +1,5 @@
+import { snapshotKeelExplicitExternalPreview, type KeelExplicitExternalPreview } from "./external-preview.js";
+import { assertKeelRegisteredNativeGzipProof, type KeelRegisteredNativeGzipProof } from "./registered-native-gzip.js";
 import { resolveKeelTokenURIReadBounds, assertKeelNonstandardTokenURIIdentity, keelTokenURIRpcResponseBytes, type KeelExplicitNonstandardReadPolicy } from "@keel/protocol";
 import { keelRpcReaderTransport } from "./rpc.js";
 import { auditKeelInlineTokenURI } from "./inline-transport-audit.js";
@@ -10,9 +12,14 @@ const quantity = (value: unknown): bigint => {
 /** Read-only, bounded, block-pinned user-facing audit. Never signs or submits. */
 export async function readKeelInlineTokenAudit(input: {
   readonly nonstandardReadPolicy?: KeelExplicitNonstandardReadPolicy;
+  readonly registeredNativeGzip?: KeelRegisteredNativeGzipProof;
+  readonly externalPreview?: KeelExplicitExternalPreview;
   readonly rpcUrl?: string; readonly chainId: number; readonly collection: string; readonly tokenId: string;
 }, fetcher: typeof fetch = fetch) {
   const {chainId, collection, tokenId} = input;
+  const externalPreview = input.externalPreview === undefined ? undefined : snapshotKeelExplicitExternalPreview(input.externalPreview);
+  const registeredNativeGzip = input.registeredNativeGzip === undefined ? undefined : assertKeelRegisteredNativeGzipProof(input.registeredNativeGzip);
+  if (registeredNativeGzip !== undefined && registeredNativeGzip.binding.chainId !== chainId) throw new TypeError("Native Gzip readback changed the selected chain.");
   const bounds = resolveKeelTokenURIReadBounds(input.nonstandardReadPolicy);
   if (bounds.nonstandardReadPolicy && bounds.nonstandardReadPolicy.identity.chainId !== chainId) throw new TypeError("Nonstandard token read changed chain after acknowledgement.");
   const transport = keelRpcReaderTransport(input.rpcUrl, chainId);
@@ -57,7 +64,7 @@ export async function readKeelInlineTokenAudit(input: {
   if (length > BigInt(bounds.maximumTokenUriBytes) || bytes.length !== 64 + Math.ceil(Number(length)/32)*32
       || bytes.slice(64+Number(length)).some(byte=>byte!==0)) throw new RangeError("TokenURI ABI length/padding is invalid or oversized.");
   const tokenURI = decoder.decode(bytes.slice(64,64+Number(length)));
-  const audit = await auditKeelInlineTokenURI(tokenURI, bounds.nonstandardReadPolicy === undefined ? {} : { nonstandardReadPolicy: bounds.nonstandardReadPolicy });
+  const audit = await auditKeelInlineTokenURI(tokenURI, { ...(bounds.nonstandardReadPolicy === undefined ? {} : { nonstandardReadPolicy: bounds.nonstandardReadPolicy }), ...(registeredNativeGzip === undefined ? {} : { registeredNativeGzip }), ...(externalPreview === undefined ? {} : { externalPreview }) });
   assertKeelNonstandardTokenURIIdentity(bounds.nonstandardReadPolicy, { chainId, digest: audit.tokenURIIntegrity.digest, byteLength: new TextEncoder().encode(tokenURI).length });
   const after = await rpc("eth_getBlockByNumber",[tag,false]) as Record<string,unknown>;
   if (after.hash !== blockHash || quantity(await rpc("eth_chainId",[])) !== BigInt(chainId)) throw new Error("Token chain/block changed during the audit.");

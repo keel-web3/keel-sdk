@@ -61,6 +61,15 @@ test("MCP plans, originates, stores, binds, gates, mints and writes metadata rev
   assert.equal(originate.isError, undefined, JSON.stringify(originate));
   const collectionEntry = originate.structuredContent.stages[1].operations.find((entry) => entry.artifact === "collection");
   assert.equal(collectionEntry.operation.kind, "origination");
+  assert.deepEqual(originate.structuredContent.collection.metadataEditing, { creator: true, holders: false, holderFreeze: false });
+  const holders = await call("keel-tezos-mint-gate-prepare", { network, creator, action: "set-holder-metadata-editing", collection, enabled: true });
+  assert.equal(holders.isError, undefined, JSON.stringify(holders));
+  assert.equal(holders.structuredContent.operation.parameters.entrypoint, "set_token_owner_can_edit");
+  const royalty = await call("keel-tezos-mint-gate-prepare", { network, creator, action: "set-default-royalty", collection, royalty: { receiver: creator, bps: 500 } });
+  assert.equal(royalty.structuredContent.operation.parameters.entrypoint, "set_default_royalty");
+  const removed = await call("keel-tezos-mint-gate-prepare", { network, creator, action: "remove-default-royalty", collection });
+  assert.deepEqual(removed.structuredContent.operation.parameters.value, { prim: "None" });
+  assert.deepEqual(holders.structuredContent.operation.parameters.value, { prim: "True" });
   assert.equal(originate.structuredContent.signing, "not-performed");
 
   const resources = await call("keel-tezos-hold-resources-prepare", { network, creator, hold, directory: true, resources: [{ name: "cart.html", mediaType: "text/html", path: "cart.html" }, { name: "preview.svg", mediaType: "image/svg+xml", path: "preview.svg" }] });
@@ -113,7 +122,7 @@ test("MCP read-back verifies a collection against a loopback Tezos RPC", async (
       if (request.url.endsWith("/chain_id")) body = network;
       else if (request.url.endsWith("/header")) body = { level: 42 };
       else if (request.url.endsWith("/script")) body = { code: [] };
-      else body = { data: { total_supply: { int: "1" }, is_minter: { prim: "True" }, token_metadata: { prim: "Pair", args: [{ int: "1" }, tokenMap] } }[JSON.parse(raw).view] };
+      else body = { data: { total_supply: { int: "1" }, is_minter: { prim: "True" }, token_owner_can_edit: { prim: "False" }, royalty_info: { prim: "None" }, token_metadata: { prim: "Pair", args: [{ int: "1" }, tokenMap] } }[JSON.parse(raw).view] };
       response.setHeader("content-type", "application/json");
       response.end(JSON.stringify(body));
     });
@@ -126,4 +135,160 @@ test("MCP read-back verifies a collection against a loopback Tezos RPC", async (
   assert.equal(result.structuredContent.publicationVerified, true, JSON.stringify(result.structuredContent.checks));
   const tampered = await call("keel-tezos-readback-check", { network, rpcUrl, collection, expectedTokens: [{ tokenId: 1, tokenInfoSha256: "00".repeat(32) }] });
   assert.equal(tampered.structuredContent.publicationVerified, false);
+  // A collection that lets holders edit is not the creator-only collection the caller expects.
+  const noRoyalty = await call("keel-tezos-readback-check", { network, rpcUrl, collection, expectNoRoyalty: true });
+  assert.equal(noRoyalty.structuredContent.checks.find((check) => check.name === "default-royalty").ok, true);
+  const holderEditable = await call("keel-tezos-readback-check", { network, rpcUrl, collection, expectedHolderMetadataEditing: true });
+  assert.equal(holderEditable.structuredContent.publicationVerified, false);
+  assert.equal(holderEditable.structuredContent.checks.find((check) => check.name === "metadata-editing-authority").ok, false);
+});
+
+test("MCP prepares harness tree calls on the piece that holds them", async (t) => {
+  const { call } = await fixture(t);
+  const tree = "KT1BNnzhtsMKUG7t72phZN8BG2W6TwPUQsYt";
+  const digest = `0x${"11".repeat(32)}`;
+  const forged = await call("keel-tezos-harness-tree-prepare", { network, sender: creator, harnessRegistry: registry, treeRegistry: tree,
+    action: { kind: "forge", salt: "0x01", collection, editPolicy: 0, forkPolicy: 1, children: [{ key: 1, revision: 1 }, { key: 2, revision: 1 }], manifestDigest: digest, entropySetDigest: digest } });
+  assert.equal(forged.isError, undefined, JSON.stringify(forged));
+  assert.equal(forged.structuredContent.operation.destination, tree);
+  assert.equal(forged.structuredContent.operation.parameters.entrypoint, "forge_harness_tree");
+  assert.equal(forged.structuredContent.treeDigest, "0xaf3c157af65142cf4a2f8cde2e5c6d24530e78cf8ec7c2c94d556f5ff65b398d");
+  assert.equal(forged.structuredContent.signing, "not-performed");
+  const selections = await call("keel-tezos-harness-tree-prepare", { network, sender: creator, harnessRegistry: registry, treeRegistry: tree,
+    action: { kind: "append-selections", harnessId: `0x${"ab".repeat(32)}`, expectedParent: 1, revisions: [2, 1], manifestDigest: digest, entropySetDigest: digest } });
+  assert.equal(selections.structuredContent.operation.destination, registry);
+  const refused = await call("keel-tezos-harness-tree-prepare", { network, sender: creator, harnessRegistry: registry, treeRegistry: tree, action: { kind: "set-limits", maxDepth: 1, maxObjects: 1 } });
+  assert.equal(refused.isError, true);
+});
+
+test("MCP prepares automation keys, grants, the signing payload and the relayer call", async (t) => {
+  const { call } = await fixture(t);
+  const controller = "KT1BNnzhtsMKUG7t72phZN8BG2W6TwPUQsYt";
+  const target = "KT1RJ6PbjHpwc3M5rw5s2Nbmefwbuwbdxton";
+  const signer = "tz1KqTpEZ7Yob7QbPE4Hy4Wo8fHG8LhKxZSx";
+  const managed = { target, payload: "0x05002a", amount: 2 };
+  const key = await call("keel-tezos-automation-prepare", { network, controller, action: { kind: "key", publicKey: "edpkuBknW28nW72KG6RoHtYW7p12T6GKc7nAbwYX5m8Wd9sDVC9yav", validUntil: 87400, enabled: true } });
+  assert.equal(key.isError, undefined, JSON.stringify(key));
+  assert.equal(key.structuredContent.result.signer, signer);
+  assert.equal(key.structuredContent.result.actions[0].operation.parameters.entrypoint, "configure_automation_key");
+  const grant = await call("keel-tezos-automation-prepare", { network, controller, action: { kind: "grant", signer, call: { target, payload: "0x05002a" }, validAfter: 1000, validUntil: 4600, maxAmount: 3, enabled: true } });
+  assert.equal(grant.structuredContent.result.operation.parameters.entrypoint, "configure_automation_capability");
+  const payload = await call("keel-tezos-automation-prepare", { network, controller, action: { kind: "signing-payload", signer, call: managed, nonce: 0, deadline: 1200 } });
+  assert.match(payload.structuredContent.result, /^0x05/u);
+  const execute = await call("keel-tezos-automation-prepare", { network, controller, action: { kind: "execute", signer, call: managed, deadline: 1200, signature: "edsigtaLvXR5xFtiGkKFegQXhWnxxsBYPCk4DJvYU8hb5xSdxQjppPgdtE77E6CXQrm9obabM7ycWNNVAq1r65RzKo7yMSD4yAz" } });
+  assert.equal(execute.structuredContent.result.operation.parameters.entrypoint, "execute_automation");
+  assert.equal(execute.structuredContent.signing, "not-performed");
+  const contractSigner = await call("keel-tezos-automation-prepare", { network, controller, action: { kind: "signing-payload", signer: target, call: managed, nonce: 0, deadline: 1200 } });
+  assert.equal(contractSigner.isError, true);
+});
+
+test("MCP prepares token-bound account creation and owner execution, refusing delegate calls", async (t) => {
+  const { call } = await fixture(t);
+  const accountRegistry = "KT1BNnzhtsMKUG7t72phZN8BG2W6TwPUQsYt";
+  const created = await call("keel-tezos-token-bound-account-prepare", { network, action: { kind: "create", registry: accountRegistry, tokenContract: collection, tokenId: 1, salt: "0x01" } });
+  assert.equal(created.isError, undefined, JSON.stringify(created));
+  assert.equal(created.structuredContent.operation.destination, accountRegistry);
+  assert.equal(created.structuredContent.operation.parameters.entrypoint, "create_account");
+  assert.equal(created.structuredContent.readBack.view, "account");
+  assert.equal(created.structuredContent.signing, "not-performed");
+  const account = "KT1RJ6PbjHpwc3M5rw5s2Nbmefwbuwbdxton";
+  const executed = await call("keel-tezos-token-bound-account-prepare", { network, action: { kind: "execute", account, calls: [{ kind: "value", to: collector, amount: 5 }, { kind: "fa2", fa2: collection, tokenId: 2, to: collector }] } });
+  assert.equal(executed.isError, undefined, JSON.stringify(executed));
+  assert.equal(executed.structuredContent.operation.destination, account);
+  assert.equal(executed.structuredContent.operation.parameters.entrypoint, "execute");
+  assert.equal(executed.structuredContent.authorization, "host-owner");
+  const delegated = await call("keel-tezos-token-bound-account-prepare", { network, action: { kind: "execute", account, operation: 1, calls: [{ kind: "value", to: collector, amount: 5 }] } });
+  assert.equal(delegated.isError, true);
+  assert.equal(delegated.structuredContent.code, "KEEL_CHAIN_CAPABILITY_UNSUPPORTED");
+  assert.equal(delegated.structuredContent.capability, "stake.token-bound-account.delegate-call");
+});
+
+test("MCP prepares manager pause and cold recovery, refusing the EVM-only upgrade path", async (t) => {
+  const { call } = await fixture(t);
+  // The shared golden vector from keel-contracts test/fixtures/parity/manager-recovery.json (SmartPy and Octez agree).
+  const golden = {"network": "NetXdQprcVkpaWU", "registry": "KT1Tezooo3zzSmartPyzzSTATiCzzzseJjWC", "manager": "KT1TezoooozzSmartPyzzSTATiCzzzwwBFA1", "creator": "tz1KqTpEZ7Yob7QbPE4Hy4Wo8fHG8LhKxZSx", "salt": "0x0000000000000000000000000000000000000000000000000000000000000001", "groupId": "0x2633ce75040906c626e62aaa22cd4f8f36e465d851fb6aaf44d303f9e5bc3998", "members": ["tz1KqTpEZ7Yob7QbPE4Hy4Wo8fHG8LhKxZSx"], "governors": ["tz1KqTpEZ7Yob7QbPE4Hy4Wo8fHG8LhKxZSx", "tz1VSUr8wwNhLAzempoch5d6hLRiTh8Cjcjb", "tz1aSkwEot3L2kmUvcoxzjMomb9mvBNuzFK6"], "bindingRevision": 1, "deadline": 100000, "actionPayload": "0x0507070a0000001d6b65656c2e74657a6f732e7265636f766572792e616374696f6e2e763107070a0000001601d1371b91c7491542e97deee96091e28a80b233590007070a000000047a06a77007070a000000202633ce75040906c626e62aaa22cd4f8f36e465d851fb6aaf44d303f9e5bc399807070a0000001601d1371b91fdbd07c8855659c84652230be0eaecd50007070a00000020cd155e9e01018fa80a056c2b4c6416622d952ab7f8cc515c7aeb00a6309595f107070a00000020eda274b83e9d75af519fbf67d63e328f09ffda3da2bf1bc3ae4f42e6bfeca8ed070700000707000000a09a0c", "digest": "0x4c9173be876dfaf2f6d54b1f6a6e206a84dd2a20fb6cc443b50e8d41eef4cb54", "acceptancePayload": "0x0507070a000000216b65656c2e74657a6f732e7265636f766572792e616363657074616e63652e763107070a0000001601d1371b91c7491542e97deee96091e28a80b233590007070a000000047a06a77007070a000000204c9173be876dfaf2f6d54b1f6a6e206a84dd2a20fb6cc443b50e8d41eef4cb540a000000150002298c03ed7d454a101eb7022bc95f7e5f41ac78"};
+  const pause = await call("keel-tezos-recovery-prepare", { network, action: { kind: "pause", controller: "KT1BNnzhtsMKUG7t72phZN8BG2W6TwPUQsYt" } });
+  assert.equal(pause.isError, undefined, JSON.stringify(pause));
+  assert.equal(pause.structuredContent.operation.parameters.entrypoint, "pause_manager");
+  assert.equal(pause.structuredContent.signing, "not-performed");
+  const group = await call("keel-tezos-recovery-prepare", { network, action: { kind: "create-group", registry: golden.registry, creator: golden.creator,
+    salt: golden.salt, members: golden.members, verifyKeys: false, deadline: golden.deadline } });
+  assert.equal(group.isError, undefined, JSON.stringify(group));
+  assert.equal(group.structuredContent.groupId, golden.groupId);
+  assert.equal(group.structuredContent.operation.parameters.entrypoint, "create_group");
+  const payload = await call("keel-tezos-recovery-prepare", { network: golden.network, action: { kind: "payload", payload: "action", registry: golden.registry,
+    manager: golden.manager, groupId: golden.groupId, governors: golden.governors, bindingRevision: golden.bindingRevision, deadline: golden.deadline } });
+  assert.equal(payload.structuredContent.payload, golden.actionPayload);
+  assert.equal(payload.structuredContent.digest, golden.digest);
+  const acceptance = await call("keel-tezos-recovery-prepare", { network: golden.network, action: { kind: "payload", payload: "acceptance", registry: golden.registry,
+    digest: golden.digest, signer: golden.creator } });
+  assert.equal(acceptance.structuredContent.payload, golden.acceptancePayload);
+  const upgrade = await call("keel-tezos-recovery-prepare", { network, action: { kind: "upgrade" } });
+  assert.equal(upgrade.isError, true);
+  assert.equal(upgrade.structuredContent.code, "KEEL_CHAIN_CAPABILITY_UNSUPPORTED");
+  assert.equal(upgrade.structuredContent.capability, "authority.recovery.upgrade");
+  const contractKey = await call("keel-tezos-recovery-prepare", { network, action: { kind: "create-group", registry: golden.registry, creator: golden.creator,
+    salt: golden.salt, members: [golden.registry], verifyKeys: false, deadline: 1 } });
+  assert.equal(contractKey.isError, true);
+});
+
+test("MCP prepares a valued governance action whose executing approval alone attaches the value", async (t) => {
+  const { call } = await fixture(t);
+  const manager = "KT1RJ6PbjHpwc3M5rw5s2Nbmefwbuwbdxton";
+  const sink = "KT1BNnzhtsMKUG7t72phZN8BG2W6TwPUQsYt";
+  const calls = [21, 22].map((tag, index) => ({ destination: sink, entrypoint: "receive_value", parameterType: { prim: "nat" }, value: { int: String(tag) }, amount: index + 2 }));
+  const first = await call("keel-tezos-governance-prepare", { network, manager, calls, deadline: 2000, governorCount: 4 });
+  assert.equal(first.isError, undefined, JSON.stringify(first));
+  assert.equal(first.structuredContent.value, "5");
+  assert.equal(first.structuredContent.threshold, 3);
+  assert.equal(first.structuredContent.proposal.parameters.entrypoint, "propose_with_value");
+  assert.match(first.structuredContent.approvals, /next_proposal_id/u);
+  assert.equal(first.structuredContent.errors.KEEL_INCORRECT_VALUE, "IncorrectValue");
+  assert.equal(first.structuredContent.signing, "not-performed");
+  const second = await call("keel-tezos-governance-prepare", { network, manager, calls, deadline: 2000, governorCount: 4, proposalId: 0 });
+  assert.deepEqual(second.structuredContent.approvals.map((a) => [a.executes, a.operation.amount]), [[false, "0"], [true, "5"]]);
+  const overflow = await call("keel-tezos-governance-prepare", { network, manager, deadline: 2000, governorCount: 4,
+    calls: [{ ...calls[0], amount: "9223372036854775808" }] });
+  assert.equal(overflow.isError, true);
+});
+
+test("MCP prepares entrypoint capabilities that match the shared golden vector and refuses authority entrypoints", async (t) => {
+  const { call } = await fixture(t);
+  const controller = "KT1Tezooo1zzSmartPyzzSTATiCzzzyfC8eF";
+  const capability = { target: "KT1Tezooo2zzSmartPyzzSTATiCzzzwqqQ4H", entrypoint: "set_value", parameterType: "nat" };
+  const key = "0x99361ba6d5ce37ddf232c5c3a9bb2c4684ea49df86a31f35ff5813443f7ed9bb";
+  const policy = await call("keel-tezos-entrypoint-capability-prepare", { network, controller, capability, action: { kind: "policy", minimumTier: 2, maxAmount: 5 } });
+  assert.equal(policy.isError, undefined, JSON.stringify(policy));
+  assert.equal(policy.structuredContent.capabilityKey, key);
+  assert.equal(policy.structuredContent.governanceCall.entrypoint, "configure_entrypoint_policy");
+  assert.equal(policy.structuredContent.signing, "not-performed");
+  const payload = await call("keel-tezos-entrypoint-capability-prepare", { network: "NetXdQprcVkpaWU", controller, capability,
+    action: { kind: "automation-payload", args: 42, amount: 2, signer: "tz1KqTpEZ7Yob7QbPE4Hy4Wo8fHG8LhKxZSx", nonce: 0, deadline: 1200 } });
+  assert.equal(payload.isError, undefined, JSON.stringify(payload));
+  assert.match(payload.structuredContent.payload, /^0x0507070a000000236b65656c/u);
+  const role = await call("keel-tezos-entrypoint-capability-prepare", { network, controller, capability, action: { kind: "role", args: 42, amount: 2 } });
+  assert.equal(role.structuredContent.operation.parameters.entrypoint, "execute_role_entrypoint");
+  const protectedName = await call("keel-tezos-entrypoint-capability-prepare", { network, controller,
+    capability: { ...capability, entrypoint: "set_administrator", parameterType: "address" }, action: { kind: "policy", minimumTier: 3, maxAmount: 0 } });
+  assert.equal(protectedName.isError, true);
+});
+
+test("MCP prepares seeded-collection calls and returns the typed refusal for EVM-only seed modes", async (t) => {
+  const { call } = await fixture(t);
+  const configure = await call("keel-tezos-seed-action-prepare", { network, sender: creator, collection, action: { kind: "configure", profile: { reveal: "immediate", mode: "derived" } } });
+  assert.equal(configure.isError, undefined, JSON.stringify(configure));
+  assert.equal(configure.structuredContent.operation.parameters.entrypoint, "configure_seed_profile");
+  assert.equal(configure.structuredContent.signing, "not-performed");
+  const mint = await call("keel-tezos-seed-action-prepare", { network, sender: creator, collection, action: { kind: "mint", recipient: collector, quantity: 2, data: "0x01" } });
+  assert.equal(mint.structuredContent.operation.parameters.entrypoint, "strike_with_data");
+  const vrf = await call("keel-tezos-seed-action-prepare", { network, sender: creator, collection, action: { kind: "request" } });
+  assert.equal(vrf.isError, true);
+  assert.equal(vrf.structuredContent.code, "KEEL_CHAIN_CAPABILITY_UNSUPPORTED");
+  assert.equal(vrf.structuredContent.capability, "collection.seed-chainlink-vrf");
+  const future = await call("keel-tezos-collection-originate-prepare", { network, creator, maxSupply: 10, artifactsDir: "targets", bindings: { index, creatorProfile: registry }, entropyProfile: { reveal: "future-block" } });
+  assert.equal(future.structuredContent.code, "KEEL_CHAIN_CAPABILITY_UNSUPPORTED");
+  assert.match(future.structuredContent.closest.behaviour, /provider/u);
+  const seeded = await call("keel-tezos-collection-originate-prepare", { network, creator, maxSupply: 10, artifactsDir: "targets", bindings: { index, creatorProfile: registry }, entropyProfile: { reveal: "immediate" } });
+  assert.equal(seeded.isError, undefined, JSON.stringify(seeded));
+  assert.equal(seeded.structuredContent.stages.at(-1).id, "configure-seed-profile");
 });

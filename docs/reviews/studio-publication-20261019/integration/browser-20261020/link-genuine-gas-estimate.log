@@ -1,0 +1,46 @@
+TAP version 13
+# Subtest: contract-returned canonical link URI verifies each HTTPS fetch before mounting artwork
+    # Subtest: SDK enum meanings match Solidity, including distinct Hold and link compression
+    ok 1 - SDK enum meanings match Solidity, including distinct Hold and link compression
+      ---
+      duration_ms: 3.120541
+      type: 'test'
+      ...
+# {"estimate":"10810508","inputBytes":15108}
+# {"estimate":"102133263","inputBytes":143728}
+# {"phase":"put","gasUsed":"100000000","inputBytes":143728}
+    1..1
+not ok 1 - contract-returned canonical link URI verifies each HTTPS fetch before mounting artwork
+  ---
+  duration_ms: 212.755167
+  type: 'test'
+  location: '/private/tmp/keel-browser-integration-20261020/proposal/tests/link-assembly-browser.test.mjs:57:1'
+  failureType: 'testCodeFailure'
+  error: |-
+    put
+    + actual - expected
+    
+    + 'reverted'
+    - 'success'
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: 'success'
+  actual: 'reverted'
+  operator: 'strictEqual'
+  stack: |-
+    write (file:///private/tmp/keel-browser-integration-20261020/proposal/tests/link-assembly-browser.test.mjs:95:244)
+    process.processTicksAndRejections (node:internal/process/task_queues:103:5)
+    async TestContext.<anonymous> (file:///private/tmp/keel-browser-integration-20261020/proposal/tests/link-assembly-browser.test.mjs:115:5)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async startSubtestAfterBootstrap (node:internal/test_runner/harness:296:3)
+  ...
+1..1
+# tests 2
+# suites 0
+# pass 1
+# fail 1
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 643.836292
