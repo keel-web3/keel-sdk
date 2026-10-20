@@ -7,6 +7,9 @@ export function resolveKeelInlineBuildRoute(input: {
   readonly payloadStorage?: KeelPayloadStorageMode;
   readonly compression?: "auto" | "brotli" | "none";
   readonly brotliQuality?: number;
+  /** Planning input from the selected reader's authenticated fresh carriage.
+   * This is not registration evidence. Omit to retain the unqualified planner. */
+  readonly freshReaderCompressions?: readonly ("none" | "brotli")[];
   readonly resources: readonly { readonly id: string; readonly bytes: Uint8Array }[];
 }) {
   const storage = resolveKeelPayloadStorage(input.payloadStorage);
@@ -14,14 +17,26 @@ export function resolveKeelInlineBuildRoute(input: {
     throw new TypeError("Raw payload storage cannot enable automatic compression.");
   }
   const compression = storage === "raw" ? "none" : input.compression ?? "auto";
+  const freshReaderCompressions = input.freshReaderCompressions === undefined ? undefined : [...input.freshReaderCompressions];
+  if (freshReaderCompressions !== undefined && (!freshReaderCompressions.includes("none")
+    || new Set(freshReaderCompressions).size !== freshReaderCompressions.length
+    || freshReaderCompressions.some(codec => codec !== "none" && codec !== "brotli"))) {
+    throw new TypeError("Fresh reader compression choices must include none and contain only unique supported codecs.");
+  }
+  if (compression === "brotli" && freshReaderCompressions !== undefined && !freshReaderCompressions.includes("brotli")) {
+    throw new KeelInlineReaderCodecUnavailableError();
+  }
+  const effectiveCompression = compression === "auto" && freshReaderCompressions !== undefined && !freshReaderCompressions.includes("brotli") ? "none" : compression;
   const resources = input.resources.map(resource => {
-    const payload = prepareKeelDensePayload(resource.bytes, { compression,
+    const payload = prepareKeelDensePayload(resource.bytes, { compression: effectiveCompression,
       ...(input.brotliQuality === undefined ? {} : { brotliQuality: input.brotliQuality }) });
-    return { id: resource.id, compression: payload.compression, ...payload.optimization };
+    return { id: resource.id, compression: payload.compression, ...payload.optimization, selection: compression };
   });
   const prepared = resources.some(resource => resource.compression === "brotli");
   return { route: prepared ? "creator-prepared-copy" as const : "legacy-uncompressed" as const,
-    compression, resources, sourceBytes: resources.reduce((n, r) => n + r.sourceBytes, 0),
+    compression, resources, ...(freshReaderCompressions === undefined ? {} : { freshReaderCompressions,
+      readerSelection: effectiveCompression === "none" && compression === "auto" ? "auto-reader-compatible-none" as const : "reader-compatible" as const }),
+    sourceBytes: resources.reduce((n, r) => n + r.sourceBytes, 0),
     compressedBytes: resources.reduce((n, r) => n + r.compressedBytes, 0),
     storagePlacement: "onchain" as const,
     requiresFullReadValidation: true as const, requiresDeliveryValidation: true as const,
@@ -30,6 +45,14 @@ export function resolveKeelInlineBuildRoute(input: {
       { route: "original-assisted-delivery" as const, storagePlacement: "onchain" as const, delivery: "hybrid" as const, resourceBytes: "original" as const, status: "requires-validation" as const },
       { route: "creator-custom" as const, storagePlacement: "creator-selected" as const, delivery: "creator-selected" as const, resourceBytes: "creator-selected" as const, status: "requires-validation" as const },
     ], offchainPayloads: [] as readonly string[] };
+}
+
+export class KeelInlineReaderCodecUnavailableError extends TypeError {
+  readonly code = "KEEL_INLINE_CODEC_UNSUPPORTED";
+  constructor() {
+    super("KEEL_INLINE_CODEC_UNSUPPORTED: Explicit Brotli requires the exact selected-chain registered decoder and fresh carriage. The selected reader cannot carry that choice; preserve the original source, compression preference and existing plans before reviewing a compatible reader.");
+    this.name = "KeelInlineReaderCodecUnavailableError";
+  }
 }
 
 export class KeelInlineDeliveryPlanRequiredError extends TypeError {
