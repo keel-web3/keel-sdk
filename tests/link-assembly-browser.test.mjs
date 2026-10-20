@@ -91,7 +91,13 @@ test('contract-returned canonical link URI verifies each HTTPS fetch before moun
       return {address:receipt.contractAddress, abi:a.abi};
     };
     const write = async (contract, functionName, args) => {
-      const hash = await wallet.writeContract({...contract,chain:null,functionName,args,gas:100000000n});
+      // Only the synthetic bulk-SSTORE fixture setup needs its measured gas.
+      // The production link builder/read limits and all other calls are unchanged.
+      const gas = functionName === 'put'
+        ? await client.estimateContractGas({...contract,account:account.address,functionName,args,gas:1000000000n})
+        : 100000000n;
+      assert.ok(gas > 0n && gas <= 1000000000n, 'fixture setup must fit the existing local block gas limit');
+      const hash = await wallet.writeContract({...contract,chain:null,functionName,args,gas});
       assert.equal((await client.waitForTransactionReceipt({hash})).status, 'success', functionName);
     };
     const probe = await deploy('KeelLinkURIBuilder.t','LinkEnumProbe');
