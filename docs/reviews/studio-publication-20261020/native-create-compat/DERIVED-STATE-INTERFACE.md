@@ -25,11 +25,15 @@ It is never supplied as a fixture replacement for missing execution.
 The Node boundary remains `createCapacityDriver({packet, signal})`, with the
 reader's existing compiler hooks:
 
-- `wrapClient(actualPublicClient)` routes bounded getters/code reads for only the
-  six prefix-created identities to S1 and the actual derived header. A getter
-  executes against StateDB.Copy with bounded gas; its changes are discarded.
-  Creator nonce/balance reads may expose the actual derived N+3 state only inside
-  this visibly simulated compiler context. The real pending N is rechecked.
+- `wrapClient(actualPublicClient)` routes every supported state query at implicit
+  latest, derived N+1 or its hash to S1, including old readers/catalog getters,
+  balance and nonce. Query targets/selectors and gas remain explicitly bounded
+  by the reviewed compiler packet. A getter executes against StateDB.Copy and
+  the actual derived header; its changes are discarded. Creator nonce/balance
+  may expose N+3 only inside this visibly simulated context. The real pending N
+  is rechecked. Latest getBlock/getBlockNumber returns the actual derived header
+  or number with explicit capacity context outside the normal capture. Actual
+  historical receipts and explicit canonical reads at N or earlier remain real.
 - `projectFactoryRecords(actualRows, chainId)` creates only a hypothetical current
   factory projection. It does not borrow a legacy database ID, receipt or start
   block, and records `LOCAL_SIMULATED_ONLY` provenance.
@@ -49,14 +53,20 @@ inputs and the exact reversible instrumentation, with no production source edit.
 Original GIF descriptor/source bytes and WebP preview commitments, owner/project/
 revision and the original stage-signer policy remain exact.
 
-Never forward derived-head N+1 state requests to public RPC: its public block N+1
-is a different state. Created-address reads/getters are local S1 operations.
-Historical receipt/header reads remain actual canonical reads. Other state reads
-must execute locally on S1 or use explicitly proven unchanged canonical-N bytes,
-with prefix write-footprint evidence; otherwise reject them. Do not silently
-translate or relabel a counterfactual hash as public-canonical proof. Upstream
-requests remain only the approved authenticated state/header/code methods, with
-existing denial, cancellation, pacing and bounded-resource policies.
+Never forward derived-head N+1 state requests to public RPC: its public block
+N+1 is a different state. All supported state reads execute locally on S1; this
+includes targets outside the six created contracts. Prefix system processing
+also changes protocol accounts, the sender and coinbase, and an ordinary callee
+may inspect other accounts or block variables. Merely having a different target
+does not prove unchanged behavior. Local S1 reads use authenticated original-N
+proofs only through the held StateDB reader and its actual prefix writes.
+Historical receipts/headers and explicit canonical-N-or-earlier reads may use
+the actual public client. Derived-state eth_getProof is unsupported unless a
+genuine local proof API is separately implemented; never forward it upstream.
+Reject unknown counterfactual hashes, unsupported methods and unapproved targets
+rather than fall back to public canonical data. Upstream requests remain only
+approved authenticated original-state/header/code methods, with existing denial,
+cancellation, pacing and bounded-resource policies.
 
 A whole-program capacity continuation starts from S1 AND its actual N+1 header.
 Each subsequent publication block uses the normal Geth pipeline at N+2 onward,
