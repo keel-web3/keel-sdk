@@ -1,0 +1,11 @@
+--- a/apps/studio/tests/unit/contract-deployment.test.ts
++++ b/apps/studio/tests/unit/contract-deployment.test.ts
+@@ -77,7 +77,7 @@
+     "~/lib/contract-deployment": require(path.join(app, "src/lib/contract-deployment.ts")),
+     "~/lib/contract-submission-journal": require(path.join(app, "src/lib/contract-submission-journal.ts")),
+     "~/lib/wallet": { connectWallet: async () => ({ account: walletAccount, publicClient: client, walletClient: { chain: { id: chainId }, sendTransaction: async (value: any) => { writes.push(value); assert.ok(contractSubmissionJournal(localStorage).read(11155111, account)); return send(value); } } }) },
+-    "../../activity/activity-store": { activity: { track: () => "job", update: (_id: string, value: any) => updates.push(value) } },
++    "../../activity/activity-store": { activity: { track: () => "job", snapshot: () => [], update: (_id: string, value: any) => updates.push(value) } },
+     "../workspace-parts": { Link: (p: any) => React.createElement("a", p), PageHead: () => null },
+     "../workspace.module.css": { default: new Proxy({}, { get: (_, key) => String(key) }) },
+   };

@@ -1,0 +1,138 @@
+{
+  "schema": "keel-independent-routing-source-review@1",
+  "decision": "BLOCKED_PENDING_TERMINAL_PROOF_REORG_CORRECTION",
+  "sourceCommit": "d3cdaf2b5b3822454353215c23eff7d8af9deb97",
+  "baseCommit": "6c51775534b487e938917a7ac589a42941cfab42",
+  "observedEvidenceOnlyHead": "e30d163e0bb56f95c591156645b59d79044a6ef2",
+  "allEightRuntimeSourceFilesExactFrozen": true,
+  "findings": [
+    {
+      "priority": "P1",
+      "title": "Do not rotate recipients after an observed proof or reorg failure",
+      "file": "apps/studio/src/features/wallet/transactions/wallet-first-rpc.ts",
+      "lines": [
+        345,
+        355,
+        173
+      ],
+      "reproduction": "Actual createCapableWalletReadProvider loads the frozen source; selected wallet returns Sepolia chainId and throws Error(message) carrying status503 for eth_getProof(address,[],{blockHash,requireCanonical:true}). Messages invalid proof and canonical block hash mismatch; reorg detected each dispatch the same payload to managed and return its synthetic alternate success. Revert/access-denial controls reject without managed payload.",
+      "expected": "Reject and send zero alternate target reads after either semantic proof/reorg failure, regardless of outer retryable HTTP status. Preserve request fields and the original failure.",
+      "actual": [
+        {
+          "message": "invalid proof",
+          "walletPayloads": 1,
+          "managedPayloads": 1,
+          "outcome": "success",
+          "required": "rejected with zero alternate payloads"
+        },
+        {
+          "message": "canonical block hash mismatch; reorg detected",
+          "walletPayloads": 1,
+          "managedPayloads": 1,
+          "outcome": "success",
+          "required": "rejected with zero alternate payloads"
+        },
+        {
+          "message": "execution reverted",
+          "walletPayloads": 1,
+          "managedPayloads": 0,
+          "outcome": "rejected",
+          "required": "rejected with zero alternate payloads"
+        },
+        {
+          "message": "access denied",
+          "walletPayloads": 1,
+          "managedPayloads": 0,
+          "outcome": "rejected",
+          "required": "rejected with zero alternate payloads"
+        }
+      ],
+      "classifierInheritedByteExactBase": true,
+      "relevance": "The new connected public-read routing uses this inherited classifier and must meet the explicit no-semantic-failure-rotation boundary. This is not an eth_simulateV1 replay or a claimed live chain incident."
+    }
+  ],
+  "reviewedBoundaries": {
+    "gateway": "Same-origin check and existing creator session precede upstream lookup; shared database quota fails closed. Positive enabled-chain registry determines the sole upstream URL. No caller URL, headers, or credentials accepted.",
+    "admission": "Strict public method/parameter allowlist; rejects signing/submission/eth_simulateV1/state-overrides and foreign eth_call/estimate sender. Exact cloned parameters, gas, fees, value, address and block object are retained.",
+    "bounds": "Incoming body512KiB, streamed response10MiB,20s physical server read scope,25s browser abort,180requests/minute shared quota. No claim these bounds prove unknown upstream EVM gas capacity.",
+    "identity": "Wallet/account checks and selected/managed chain checks surround successful reads; wrong-chain/current-account changes discard results. Request clone precedes asynchronous checks.",
+    "secrets": "Only existing server-selected chain RPC is used; generic errors strip upstream URLs/headers/arbitrary messages. No new credentials.",
+    "execution": "New managed allowlist excludes eth_simulateV1 and every send/sign method. Selected publication path and physical simulation lock remain on their existing path.",
+    "activity": "Only after exact canonical transaction/runtime reconciliation, matching client deployment Activity txHash, chain, route and pending status settle. Unknown-hash, foreign-chain/server/finished/unrelated jobs remain separate."
+  },
+  "limits": {
+    "owner54AndQA16AreExistingEvidenceNotReviewerReruns": true,
+    "reviewerFreshCheck": "Four-case actual-source synthetic-provider negative harness; fails two required cases and passes denial/revert controls.",
+    "initialAttempt": "Missing TypeScript at source worktree; retained separate initial-environment log. Corrected dependency boundary uses existing QA node_modules without changing source or assertions.",
+    "liveNetwork": false,
+    "signing": false,
+    "submission": false,
+    "activation": false,
+    "productionSourceEdits": false
+  },
+  "sourceInputs": [
+    {
+      "path": "apps/studio/src/app/api/wallet/read/[chainId]/route.ts",
+      "gitBlob": "3176de69d82a8a70a9ad897d8f22873526372ed1",
+      "bytes": 3963,
+      "sha256": "87e8ed9739efc5e06bfb293c115f7c092f64b6f73c564de3fec84d0c5cca02eb"
+    },
+    {
+      "path": "apps/studio/src/components/studio/workspace/contracts/deployment-review.tsx",
+      "gitBlob": "0d58771af3c9807ed8547d4c6a91e4a0c80dca65",
+      "bytes": 12724,
+      "sha256": "68835bb9a1e511f4a87bbaff12951877428af4e5662997a5fc142b7aff8492c8"
+    },
+    {
+      "path": "apps/studio/src/features/wallet/transactions/managed-wallet-read.ts",
+      "gitBlob": "5e3e97a7844f84576dc3f718c2728dc6be34740b",
+      "bytes": 3557,
+      "sha256": "0d2d302169b3e951a1f48e2b425e37b0f07f481fd35b173b352f5ac7320e8bdf"
+    },
+    {
+      "path": "apps/studio/src/features/wallet/transactions/wallet-first-rpc.ts",
+      "gitBlob": "c99f785b010a78973e8121dec4e69707518e1e4c",
+      "bytes": 23795,
+      "sha256": "dc1df52e2ceb9828ccd6b53e9fedc730eafed2ee3b8060279ee9b1b6e42f3c4d"
+    },
+    {
+      "path": "apps/studio/src/lib/contract-deployment-activity.ts",
+      "gitBlob": "bbada22ab3b23697dd05855458ee7175b7d796c5",
+      "bytes": 1136,
+      "sha256": "180dd798fc9dfd91d291c2027a43add0366a28ac141a89493b7b2caeb51378c2"
+    },
+    {
+      "path": "apps/studio/src/lib/wallet-read-policy.ts",
+      "gitBlob": "f65f8cf7d08f4f9f9be6d83c0b5b80f7a8ecedd3",
+      "bytes": 8999,
+      "sha256": "936b3ec7a859c0c0bfbba837a338f796759f469e52c6836bdde8be6aaf142bff"
+    },
+    {
+      "path": "apps/studio/src/lib/wallet.ts",
+      "gitBlob": "c95a7e965a78c224ebde4f62e39144f9c060de79",
+      "bytes": 4098,
+      "sha256": "c1c3e6610513f84a9fc7921220c213e92b607349aae2b41ddd79ad45c645ff60"
+    },
+    {
+      "path": "apps/studio/src/server/services/wallet-read-service.ts",
+      "gitBlob": "dfe07d7542e4a16132a2d2b660c806dcde4d1f42",
+      "bytes": 6679,
+      "sha256": "5f0724ba24784eb296c4863e2593878235d7d12266ebf4bb0494d0b61b5de0ff"
+    }
+  ],
+  "harness": {
+    "path": "/private/tmp/keel-independent-routing-d3-20261020/semantic-proof-negative.cjs",
+    "bytes": 2278,
+    "sha256": "61207dc952514fd77d955c2f3b008b24b01cd94497d6aae0ef3bf67f84d05a53"
+  },
+  "stdout": {
+    "path": "/private/tmp/keel-independent-routing-d3-20261020/semantic-proof-negative.stdout",
+    "bytes": 896,
+    "sha256": "5f21d9b2483ce8a0f86598f243827cb4657e027268b5f9c8f73e2d6fcf42b0a4"
+  },
+  "stderr": {
+    "path": "/private/tmp/keel-independent-routing-d3-20261020/semantic-proof-negative.stderr",
+    "bytes": 79,
+    "sha256": "94f2d6b27fd0e5e802b5526befb0bb393f3572f720bd48e852fa512be46d88cb"
+  }
+}

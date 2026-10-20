@@ -1,0 +1,28 @@
+{
+  "schema": "keel-independent-maintained-nine-fixture-binding-review@1",
+  "decision": "APPROVE_EXACT_SINGLE_SNAPSHOT_PROPERTY_ONLY",
+  "patch": {
+    "path": "/private/tmp/keel-independent-routing-d3-20261020/maintained-nine.fixture.patch",
+    "bytes": 1128,
+    "sha256": "974765dd465e6a0876dca5a8cb956ac6dfc866cf91422418c4fde9b7389d939e"
+  },
+  "before": {
+    "path": "/private/tmp/keel-independent-routing-d3-20261020/maintained-nine.fixture.original.ts",
+    "bytes": 13168,
+    "sha256": "2cb0140592101a1efe13be6bc0212a97f78c9f64031ac129437f51baf855e9a2"
+  },
+  "after": {
+    "path": "/private/tmp/keel-independent-routing-d3-20261020/maintained-nine.fixture.proposed.ts",
+    "bytes": 13188,
+    "sha256": "215cbda541fe4df9ac10cf5dd90af858c538602f914fe789382b78e53d99f5ce"
+  },
+  "reverseRestoresOriginalExactly": true,
+  "assertionsInputsAndAllNineTestsUnchanged": true,
+  "reason": "The actual new Activity consumer calls snapshot(). This fixture records no Activity list and already stubs track/update, so returning an empty list satisfies the real API. Matching real jobs are covered separately by actual Activity tests, not by this empty-store double.",
+  "conditions": [
+    "Retain original8PASS1FAIL RED.",
+    "Do not weaken production guard or other assertions.",
+    "This does not approve routing source, activation, or paused custom-feature expansion."
+  ],
+  "sourceCommit": "d3cdaf2b5b3822454353215c23eff7d8af9deb97"
+}
