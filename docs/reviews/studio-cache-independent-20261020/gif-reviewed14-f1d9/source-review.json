@@ -1,0 +1,246 @@
+{
+  "schema": "keel.independent-gif-reviewed14-assembly-source-review@1",
+  "sourceCommit": "f1d9c97b429a3c344181c60d862436e5153bf993",
+  "observedEvidenceHead": "31e6855cbae08acca5529c986aadd6c7f4ea219c",
+  "sourceApproval": true,
+  "oneNormalAssemblyAdmitted": true,
+  "normalWriterRenewalScope": "Only one blocked diagnostic candidate v1 on ownedclone55459,project1,release14. All98 other prepared projections/sourceassets/answers/terms unchanged.",
+  "actualGuidedReview": "Actual4d16 receipt and617e actualnormal-after independently rechecked with frozen pure verifier; all99 newbaseline projections recursively match that after-state. OldNOOP remains preserved.",
+  "strictReview": {
+    "bytes": 886,
+    "sha256": "3568cc8463535c8509a0f59aae6863ce70eecaa82fe0206d6a4a8ab874e52bb9"
+  },
+  "command": {
+    "bytes": 8207,
+    "sha256": "91d16854f2700d0eccd9ed518d622e591aaf842498b3ca698427ba93d9e93b2a"
+  },
+  "config": {
+    "bytes": 402,
+    "sha256": "4bca6b74533a36b2492b0b0e2d1bab1344444c86660dec41ec59a3ecffb0861f"
+  },
+  "privateCommandPath": "/private/tmp/keel-independent-gif-reviewed14-20261020/command-admission.json",
+  "independentTests": {
+    "offline": {
+      "pass": 87,
+      "fail": 0
+    },
+    "realReadOnlyClone": {
+      "pass": 4,
+      "fail": 0
+    },
+    "actual400CredentialAsyncContext": {
+      "pass": 2,
+      "fail": 0
+    },
+    "guardedActualESMImport": {
+      "pass": true,
+      "applicationExportsCalled": 0,
+      "networkAttempts": 0,
+      "compilerInvoked": false
+    }
+  },
+  "independentSourceClosure": {
+    "packetSHA256": "fdf1c7c85682a62b215572747e076f3374eba3c02de03d4af7996f337eb72c42",
+    "bundleReceiptSHA256": "d69d812e66950b18df535225ba195dc30f90857d7fddaa78d3764978077f398f",
+    "bundleSHA256": "2ffd2af15a66685e4877ba988e2f39c74c3133c06da0bdc583f155398387e096",
+    "appSources": 192,
+    "toolFiles": 21,
+    "SDKFiles": 1754,
+    "SDKDigest": "3effa2f2e594fe969f592d9446b5095484adf358033c76b83349385956c69df8",
+    "externalPackages": 14,
+    "externalDomainFiles": 45,
+    "actualGuidedAfterProjectionsMatch": 99,
+    "actualGuidedReceiptSHA256": "4d16e109235ef6aebd515c5306f7184b2aa1f0881520006ed499487f80c3deb5",
+    "changedSourcePathsVersusOld3e50": [
+      "apps/studio/src/lib/studio-access-policy.ts"
+    ],
+    "sourceInstrumentation": [],
+    "prefixTransactions": 0,
+    "compilerInvoked": false,
+    "RPC": 0
+  },
+  "independentOfflineRebuild": {
+    "actualRebuiltBundleExact": true,
+    "bundleSHA256": "2ffd2af15a66685e4877ba988e2f39c74c3133c06da0bdc583f155398387e096",
+    "sourceInputsSHA256": "d212f3e153cef8521e5d6f1d0845756211904569bec9f3f8898cd017377a0f09",
+    "toolFilesSHA256": "7051016c1a570fc4eb8df6ac860ddc8447ac92f830894e8b5864904e646b5f0d",
+    "smoke": {
+      "path": "/tmp/keel-private-gif-reviewed14-independent-bundle-20261020-02/bundle-import-smoke.json",
+      "sha256": "4d6e053a1d1815d129281034e8c801142da4a74ac59157bb16e4348f3ce19813",
+      "schema": "keel-capacity-bundle-import@1",
+      "status": "PASS",
+      "bundleSHA256": "2ffd2af15a66685e4877ba988e2f39c74c3133c06da0bdc583f155398387e096",
+      "actualNodeModuleImported": true,
+      "compilerFunctionInvoked": false,
+      "driverImported": false,
+      "networkAndChildAttempts": []
+    },
+    "appExportsCalled": 0,
+    "compilerInvoked": false,
+    "RPC": 0
+  },
+  "diffReview": {
+    "networkGuardByteIdenticalToReviewed0092": true,
+    "readSchemaByteIdentical": true,
+    "deployedCoreAuditorByteIdentical": true,
+    "originalGIFWebPAndCompleteURIChecksPreserved": true,
+    "diagnosticSignerScope14": true,
+    "publicZEROOriginalDrop": true,
+    "originalHistorical23CallBaselineUntouched": true,
+    "newProgramExecutionCoreEquivalent": false,
+    "source400OnlyIncludedAppDelta": "studio-access-policy exactpublicdiscovery allowlist",
+    "newActualGuidedReceiptAndBaselineBinding": true,
+    "CLIPathAliasMainGuardTestedBeforeReadingMissingConfig": true
+  },
+  "scopeLimits": {
+    "publicReadsOnly": "https://rpc.sepolia.ethpandaops.io/",
+    "requestLimit": 400,
+    "assemblyMs": 180000,
+    "perRequestBytes": 65536,
+    "totalRequestBytes": 2097152,
+    "perDecodedResponseBytes": 16777216,
+    "totalDecodedResponseBytes": 67108864,
+    "denialRedirectRevertTerminal": true,
+    "prefixTransactions": 0,
+    "sourceInstrumentation": 0,
+    "fullProgramExecutionApproved": false,
+    "remoteSimulationApproved": false,
+    "signingApproved": false,
+    "submissionApproved": false,
+    "activationApproved": false,
+    "finalReleaseApproval": false
+  },
+  "reviewerExecution": {
+    "normalCompilerCalls": 0,
+    "normalAppServiceCalls": 0,
+    "RPC": 0,
+    "databaseWrites": 0,
+    "onlyReadOnlyCloneChecksAndOfflineBuilds": true
+  },
+  "preservedReviewerSetupFailures": [
+    "Initialofflinecommand omitted mandatoryKEEL_GIF_TEST_SDK:73pass/2fail; exactSDKbinding corrected with no source/assertion changes,87pass.",
+    "DirectTScredential invocations failedmissingtsx and sparse-relative policy; compiledunchangedtest against verifiedactual400policy using ownedofflineoutput,2pass.",
+    "Firstindependentrebuild used retainedfailed dependencyconfig and stoppedENOENT beforebuild; partialoutputretained, correctcanonical400config rebuiltbyteexact.",
+    "Intermediatecomparison used flatJSONreplacer and was not accepted asproof; superseded by recursiveJSONcomparison ofall99 projections, matched.",
+    "Stdin-basedadmissionimport triedrealpath(-) and failedbeforeapp; realfilevalidatorstrictgatePASS withno runCapture."
+  ],
+  "remaining": [
+    "Executeonlyexactnewcommandonce; failure/uncertaintyrequiresreadonlyaudit,no replay orreset.",
+    "Actualnewcapture/program mustbeindependentlyreviewed beforeanyfullnativeprogram execution.",
+    "Image95 qualificationOOM andHTTPstartupTimeout remainRED andunwaived; deployedunsignedacceptance andfinalactivation/importtuple remainseparate."
+  ],
+  "files": {
+    "admission-validation.stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "admission-validation.stdout": {
+      "bytes": 71,
+      "sha256": "4d588042ded475b868558c5a9c8476504ef114dab1ce9cd81f275abad79528b3"
+    },
+    "assembly-review.json": {
+      "bytes": 886,
+      "sha256": "3568cc8463535c8509a0f59aae6863ce70eecaa82fe0206d6a4a8ab874e52bb9"
+    },
+    "clone.stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "clone.stdout": {
+      "bytes": 960,
+      "sha256": "1d286f40aad4d0dffbef4515064ad3e2cf61cf596b8aacfc9c88eb26a513de09"
+    },
+    "command-admission.json": {
+      "bytes": 8207,
+      "sha256": "91d16854f2700d0eccd9ed518d622e591aaf842498b3ca698427ba93d9e93b2a"
+    },
+    "compile-context.mjs": {
+      "bytes": 1571,
+      "sha256": "552cf89b56d91246e53ea749543f0ea20daf6fd2cb21e813617bd63d93a8c448"
+    },
+    "credential-actual-source.stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "credential-actual-source.stdout": {
+      "bytes": 616,
+      "sha256": "02ef1a0fcd85ceb31259d05892bc6882f1d3d7b8ec0fc93616473dbed30b6be3"
+    },
+    "credential-build.stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "credential-build.stdout": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "credential-corrected.stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "credential-corrected.stdout": {
+      "bytes": 2777,
+      "sha256": "2add03530b8e1bf3d6a9c23c9eed9cede28d5effd429bdb60f523f1b1a728a3b"
+    },
+    "credential-source.json": {
+      "bytes": 180,
+      "sha256": "110ef5d2c945de82e4e883e78b20e1fd0d458eaaa3b9f1c651dfd0cab89714e1"
+    },
+    "credential.stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "credential.stdout": {
+      "bytes": 1648,
+      "sha256": "6263cb79fb2248be852b871648cbdf2064d25f41a65d0b2b01fdf9b848557c87"
+    },
+    "initial-flat-canonicalizer-not-approval.json": {
+      "bytes": 800,
+      "sha256": "3e79956510afca6b6ac3ebf5bfa9f5397b680e12822081bf058d8a01a0532316"
+    },
+    "initial-flat-canonicalizer.mjs": {
+      "bytes": 4485,
+      "sha256": "b311caa801f933ff96691cbe803a139e0af306a82eaa3d745d4ebca869645d53"
+    },
+    "offline-corrected.stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "offline-corrected.stdout": {
+      "bytes": 20205,
+      "sha256": "b8f5134ae46a346303e7f7bdf25f88d2710392878391886483b81bdc31767ca0"
+    },
+    "offline.stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "offline.stdout": {
+      "bytes": 20371,
+      "sha256": "018135913d745017460b1e177726383c041a432cba52c0d591a647a5fd484632"
+    },
+    "prepare-admission.py": {
+      "bytes": 3338,
+      "sha256": "e2bb2c845998953d34b693d73d4bf20d50b885b29b6682d5dfe104068fcfeca9"
+    },
+    "rebuild.json": {
+      "bytes": 871,
+      "sha256": "b4a743e78099f44d5d9f01691416d3a39347b7179565cf3de26de139bc70a055"
+    },
+    "run-config.json": {
+      "bytes": 402,
+      "sha256": "4bca6b74533a36b2492b0b0e2d1bab1344444c86660dec41ec59a3ecffb0861f"
+    },
+    "source-integrity.json": {
+      "bytes": 800,
+      "sha256": "3e79956510afca6b6ac3ebf5bfa9f5397b680e12822081bf058d8a01a0532316"
+    },
+    "validate-admission.mjs": {
+      "bytes": 641,
+      "sha256": "53bdbd51f1137de8b8800463ba8b56c905e31160f51eb43a00e53e9448a03285"
+    },
+    "verify-closure.mjs": {
+      "bytes": 4616,
+      "sha256": "09e034ec729c5780eb63b684d3151cb02c6a11d0baded06f90a7f2c16a462863"
+    }
+  }
+}
