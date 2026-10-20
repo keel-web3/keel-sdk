@@ -11,6 +11,7 @@ import { gzipSync, deflateSync } from 'node:zlib';
 import { createPublicClient, createWalletClient, http, keccak256, sha256, toHex, zeroHash } from 'viem';
 import { privateKeyToAccount } from 'viem/accounts';
 import { ABIS } from '../packages/sdk/dist/abis/keel-artifacts.generated.js';
+import {dumpBrowserDom} from './helpers/browser-dom-navigation.mjs';
 import { buildKeelInlineShellFragments, buildKeelInlineModuleFragment, keelAssetDisplayModuleBytes, buildKeelLinkPresentationCall, KEEL_INLINE_PROTECTION_SHELL_ID, KeelFidelity, KeelLocatorScheme, KeelLinkCompression, KeelCompression, validateKeelFidelityLinks, KEEL_ASSET_DISPLAY_MODULE_VERSION } from '../packages/sdk/dist/index.js';
 
 // Local EVM + real browser integration. The three fixture contracts supply
@@ -30,17 +31,11 @@ async function chromePath() {
   assert.ok(names.length, 'Install Chrome headless shell or set KEEL_CHROME_HEADLESS_SHELL');
   return join(cache, names[0], 'chrome-headless-shell-mac-arm64/chrome-headless-shell');
 }
-async function render(chrome, uri) {
-  return new Promise((resolve, reject) => {
-    // Only this fixture exempts loopback TLS and private-network address space.
-    // Browser CORS remains enabled and is tested; production flags are unchanged.
-    const child = spawn(chrome, ['--headless', '--ignore-certificate-errors', '--disable-features=BlockInsecurePrivateNetworkRequests,LocalNetworkAccessChecks', '--virtual-time-budget=5000', '--dump-dom', uri]);
-    let out = '', err = '';
-    const timer = setTimeout(() => { child.kill('SIGTERM'); reject(Error('Browser timed out')); }, 20000);
-    child.stdout.on('data', b => out += b); child.stderr.on('data', b => err += b);
-    child.on('error', e => { clearTimeout(timer); reject(e); });
-    child.on('close', code => { clearTimeout(timer); code === 0 ? resolve({out, err}) : reject(Error(err)); });
-  });
+async function render(chrome,uri) {
+  // Same exact data URI, virtual-time budget, loopback TLS/private-network flags
+  // and CORS behavior. Only argv delivery changes to bounded CDP navigation.
+  const result=await dumpBrowserDom(chrome,uri,{virtualTimeBudgetMs:5000,fixtureMode:'link-dom-dump'});
+  return {out:result.stdout,err:result.stderr};
 }
 function verified(result) {
   assert.ok(result.out.includes('data-vault-verification="verified"'), result.out.slice(-5500) + '\n' + result.err);

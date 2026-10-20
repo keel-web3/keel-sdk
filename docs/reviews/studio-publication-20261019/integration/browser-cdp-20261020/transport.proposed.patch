@@ -1,0 +1,215 @@
+diff --git a/tests/helpers/marketplace-csp-browser.mjs b/tests/helpers/marketplace-csp-browser.mjs
+--- a/tests/helpers/marketplace-csp-browser.mjs
++++ b/tests/helpers/marketplace-csp-browser.mjs
+@@ -125,7 +125,13 @@
+ }
+ 
+ /** Startup failures and observation failures use the same owned-child cleanup. */
+-export async function launchCspBrowser(binary) {
++export async function launchCspBrowser(binary,{fixtureMode='csp-audio'}={}) {
++  const fixtureArgs={
++    'csp-audio':['--mute-audio','--autoplay-policy=document-user-activation-required'],
++    'dom-dump':[],
++    'link-dom-dump':['--ignore-certificate-errors','--disable-features=BlockInsecurePrivateNetworkRequests,LocalNetworkAccessChecks'],
++  }[fixtureMode];
++  if(fixtureArgs===undefined)throw new TypeError('Unknown browser fixture mode');
+   const profile=await mkdtemp(join(tmpdir(),'keel-marketplace-csp-'));
+   let child,socket,session,exitPromise,closePromise,childError;
+   const close=()=>closePromise??=(async()=>{
+@@ -155,7 +161,7 @@
+     if(closeError)throw closeError;
+   })();
+   try {
+-    child=spawn(binary,['--headless','--mute-audio','--autoplay-policy=document-user-activation-required','--remote-debugging-port=0',`--user-data-dir=${profile}`,'about:blank'],{stdio:['ignore','ignore','pipe']});
++    child=spawn(binary,['--headless',...fixtureArgs,'--remote-debugging-port=0',`--user-data-dir=${profile}`,'about:blank'],{stdio:['ignore','ignore','pipe']});
+     // Attach before any await or kill, so an early exit cannot race cleanup.
+     exitPromise=new Promise(resolve=>child.once('exit',resolve));
+     child.on('error',error=>{childError=error;});
+diff --git a/tests/helpers/browser-dom-navigation.mjs b/tests/helpers/browser-dom-navigation.mjs
+new file mode 100644
+index 0000000..a8f3d3b
+--- /dev/null
++++ b/tests/helpers/browser-dom-navigation.mjs
+@@ -0,0 +1,75 @@
++import assert from 'node:assert/strict';
++import {createHash} from 'node:crypto';
++import {launchCspBrowser} from './marketplace-csp-browser.mjs';
++
++const identity=value=>({sha256:createHash('sha256').update(value,'utf8').digest('hex'),utf8Bytes:Buffer.byteLength(value,'utf8')});
++
++/** Same browser navigation and virtual-time budget as --dump-dom, without
++ * placing a multi-MB data URI in a Linux process argument (MAX_ARG_STRLEN).
++ * No file/HTTP replacement, decoding, URI normalization or policy fallback. */
++export async function dumpBrowserDom(binary,url,{virtualTimeBudgetMs,fixtureMode='dom-dump'}={}) {
++  assert.equal(typeof url,'string');
++  assert.ok(virtualTimeBudgetMs===2500||virtualTimeBudgetMs===5000,'Retain the original fixture virtual-time budget');
++  assert.ok(fixtureMode==='dom-dump'||fixtureMode==='link-dom-dump');
++  const requested=identity(url),deadline=Date.now()+20_000;
++  const browser=await launchCspBrowser(binary,{fixtureMode});
++  const errors=[],events=[],tasks=new Set();
++  let observationError;
++  try {
++    const {targetId}=await browser.send('Target.createTarget',{url:'about:blank'});
++    const {sessionId}=await browser.send('Target.attachToTarget',{targetId,flatten:true});
++    let resolveBudget,resolveLoaded,observedUrl;
++    const budgetExpired=new Promise(resolve=>{resolveBudget=resolve;});
++    const loaded=new Promise(resolve=>{resolveLoaded=resolve;});
++    browser.on(message=>{
++      const {method,params,sessionId:source}=message;
++      if(method==='Emulation.virtualTimeBudgetExpired'&&source===sessionId)resolveBudget();
++      if(method==='Page.loadEventFired'&&source===sessionId)resolveLoaded();
++      if(method==='Page.frameNavigated'&&source===sessionId&&params.frame.parentId===undefined)observedUrl=params.frame.url;
++      if(method==='Runtime.exceptionThrown')errors.push('Uncaught '+(params.exceptionDetails.exception?.description??params.exceptionDetails.text));
++      if(method==='Log.entryAdded')errors.push(params.entry.text);
++      if(method==='Target.attachedToTarget') {
++        const child=params.sessionId;
++        const task=Promise.all([
++          browser.send('Runtime.enable',{},child),browser.send('Log.enable',{},child),
++          browser.send('Target.setAutoAttach',{autoAttach:true,waitForDebuggerOnStart:false,flatten:true},child),
++        ]).catch(error=>{errors.push(String(error));events.push({kind:'instrumentation',error:String(error)});});
++        tasks.add(task);void task.finally(()=>tasks.delete(task));
++      }
++    });
++    await Promise.all([
++      browser.send('Page.enable',{},sessionId),browser.send('Runtime.enable',{},sessionId),browser.send('Log.enable',{},sessionId),
++      browser.send('Target.setAutoAttach',{autoAttach:true,waitForDebuggerOnStart:false,flatten:true},sessionId),
++    ]);
++    const beforeDeadline=async operation=>{
++      let timer;
++      try {await Promise.race([operation,new Promise((_,reject)=>{
++        timer=setTimeout(()=>reject(new Error('Browser timed out')),Math.max(1,deadline-Date.now()));
++      })]);}finally{clearTimeout(timer);}
++    };
++    // Start the original virtual-time budget only after navigation has loaded
++    // its document; a pre-navigation budget can expire on the blank document.
++    const navigation=await browser.send('Page.navigate',{url},sessionId);
++    if(navigation.errorText)throw new Error(`Browser navigation failed: ${navigation.errorText}`);
++    await beforeDeadline(loaded);
++    await browser.send('Emulation.setVirtualTimePolicy',{policy:'pauseIfNetworkFetchesPending',budget:virtualTimeBudgetMs},sessionId);
++    await beforeDeadline(budgetExpired);
++    const snapshot=await browser.send('Runtime.evaluate',{expression:'(document.doctype?new XMLSerializer().serializeToString(document.doctype)+"\\n":"")+document.documentElement.outerHTML',returnByValue:true},sessionId);
++    if(snapshot.exceptionDetails)throw new Error('Browser DOM snapshot failed: '+(snapshot.exceptionDetails.exception?.description??snapshot.exceptionDetails.text));
++    await Promise.all([...tasks]);browser.assertHealthy();
++    assert.deepEqual(events,[],'Every child target must be observed');
++    if(url.startsWith('data:'))assert.equal(observedUrl,url,'Chrome must navigate the exact original data URI');
++    const result={stdout:snapshot.result.value,stderr:errors.join('\n'),navigation:{transport:'cdp',argvDocument:'about:blank',requested,observed:identity(observedUrl??''),virtualTimeBudgetMs,fixtureMode}};
++    if(process.env.KEEL_BROWSER_NAVIGATION_EVIDENCE) {
++      const {appendFile}=await import('node:fs/promises');
++      await appendFile(process.env.KEEL_BROWSER_NAVIGATION_EVIDENCE,JSON.stringify(result.navigation)+'\n');
++    }
++    return result;
++  } catch(error) {observationError=error;throw error;}
++  finally {
++    try {await browser.close();}catch(cleanupError) {
++      if(observationError)throw new AggregateError([observationError,cleanupError],'Browser observation and cleanup failed');
++      throw cleanupError;
++    }
++  }
++}
+diff --git a/tests/sdk-browser-cdp-navigation.test.mjs b/tests/sdk-browser-cdp-navigation.test.mjs
+new file mode 100644
+index 0000000..4dd5c55
+--- /dev/null
++++ b/tests/sdk-browser-cdp-navigation.test.mjs
+@@ -0,0 +1,29 @@
++import test from 'node:test';
++import assert from 'node:assert/strict';
++import {createHash} from 'node:crypto';
++import {spawnSync} from 'node:child_process';
++import {dumpBrowserDom} from './helpers/browser-dom-navigation.mjs';
++
++for(const virtualTimeBudgetMs of [2500,5000]) {
++  test(`CDP navigates an exact oversized UTF8 data URI with the original ${virtualTimeBudgetMs}ms virtual budget`,{timeout:30_000},async()=>{
++    const binary=process.env.KEEL_CHROME_HEADLESS_SHELL;
++    assert.ok(binary,'An actual explicitly selected Chrome is required');
++    const html=`<!doctype html><html><body><p>原本🙂</p><!--${'source bytes '.repeat(20_000)}--><script>document.body.dataset.origin=location.origin;setTimeout(()=>document.body.dataset.early='yes',${virtualTimeBudgetMs-500});setTimeout(()=>document.body.dataset.late='no',${virtualTimeBudgetMs+500});</script></body></html>`;
++    const uri='data:text/html;charset=utf-8,'+encodeURIComponent(html);
++    assert.ok(Buffer.byteLength(uri,'utf8')>131_072,'Exercise the Linux single-argument ceiling without reducing content');
++    if(process.platform==='linux') {
++      const original=spawnSync(binary,['--headless',`--virtual-time-budget=${virtualTimeBudgetMs}`,'--dump-dom',uri]);
++      assert.equal(original.error?.code,'E2BIG','The same exact URI must reproduce the original kernel argv failure');
++    }
++    const result=await dumpBrowserDom(binary,uri,{virtualTimeBudgetMs,fixtureMode:'dom-dump'});
++    assert.deepEqual(result.navigation.requested,{sha256:createHash('sha256').update(uri,'utf8').digest('hex'),utf8Bytes:Buffer.byteLength(uri,'utf8')});
++    assert.deepEqual(result.navigation.observed,result.navigation.requested);
++    assert.equal(result.navigation.argvDocument,'about:blank');
++    assert.equal(result.navigation.virtualTimeBudgetMs,virtualTimeBudgetMs);
++    assert.match(result.stdout,/data-origin="null"/u);
++    assert.match(result.stdout,/data-early="yes"/u);
++    assert.doesNotMatch(result.stdout,/data-late="no"/u);
++    assert.match(result.stdout,/原本🙂/u);
++    assert.deepEqual(result.stderr,'');
++  });
++}
+diff --git a/tests/link-assembly-browser.test.mjs b/tests/link-assembly-browser.test.mjs
+--- a/tests/link-assembly-browser.test.mjs
++++ b/tests/link-assembly-browser.test.mjs
+@@ -11,6 +11,7 @@
+ import { createPublicClient, createWalletClient, http, keccak256, sha256, toHex, zeroHash } from 'viem';
+ import { privateKeyToAccount } from 'viem/accounts';
+ import { ABIS } from '../packages/sdk/dist/abis/keel-artifacts.generated.js';
++import {dumpBrowserDom} from './helpers/browser-dom-navigation.mjs';
+ import { buildKeelInlineShellFragments, buildKeelInlineModuleFragment, keelAssetDisplayModuleBytes, buildKeelLinkPresentationCall, KEEL_INLINE_PROTECTION_SHELL_ID, KeelFidelity, KeelLocatorScheme, KeelLinkCompression, KeelCompression, validateKeelFidelityLinks, KEEL_ASSET_DISPLAY_MODULE_VERSION } from '../packages/sdk/dist/index.js';
+ 
+ // Local EVM + real browser integration. The three fixture contracts supply
+@@ -30,17 +31,11 @@
+   assert.ok(names.length, 'Install Chrome headless shell or set KEEL_CHROME_HEADLESS_SHELL');
+   return join(cache, names[0], 'chrome-headless-shell-mac-arm64/chrome-headless-shell');
+ }
+-async function render(chrome, uri) {
+-  return new Promise((resolve, reject) => {
+-    // Only this fixture exempts loopback TLS and private-network address space.
+-    // Browser CORS remains enabled and is tested; production flags are unchanged.
+-    const child = spawn(chrome, ['--headless', '--ignore-certificate-errors', '--disable-features=BlockInsecurePrivateNetworkRequests,LocalNetworkAccessChecks', '--virtual-time-budget=5000', '--dump-dom', uri]);
+-    let out = '', err = '';
+-    const timer = setTimeout(() => { child.kill('SIGTERM'); reject(Error('Browser timed out')); }, 20000);
+-    child.stdout.on('data', b => out += b); child.stderr.on('data', b => err += b);
+-    child.on('error', e => { clearTimeout(timer); reject(e); });
+-    child.on('close', code => { clearTimeout(timer); code === 0 ? resolve({out, err}) : reject(Error(err)); });
+-  });
++async function render(chrome,uri) {
++  // Same exact data URI, virtual-time budget, loopback TLS/private-network flags
++  // and CORS behavior. Only argv delivery changes to bounded CDP navigation.
++  const result=await dumpBrowserDom(chrome,uri,{virtualTimeBudgetMs:5000,fixtureMode:'link-dom-dump'});
++  return {out:result.stdout,err:result.stderr};
+ }
+ function verified(result) {
+   assert.ok(result.out.includes('data-vault-verification="verified"'), result.out.slice(-5500) + '\n' + result.err);
+diff --git a/tests/sdk-verification-shell-browser.test.mjs b/tests/sdk-verification-shell-browser.test.mjs
+--- a/tests/sdk-verification-shell-browser.test.mjs
++++ b/tests/sdk-verification-shell-browser.test.mjs
+@@ -1,5 +1,4 @@
+ import assert from "node:assert/strict";
+-import { spawn } from "node:child_process";
+ import { once } from "node:events";
+ import { readFile, readdir, stat } from "node:fs/promises";
+ import { createServer } from "node:http";
+@@ -15,6 +14,7 @@
+   buildKeelInlineShellFragments,
+ } from "../packages/sdk/dist/index.js";
+ import {observeOfflineShell} from "./support/offline-shell-browser.mjs";
++import {dumpBrowserDom} from "./helpers/browser-dom-navigation.mjs";
+ 
+ async function headlessChrome() {
+   if (process.env.KEEL_CHROME_HEADLESS_SHELL) return process.env.KEEL_CHROME_HEADLESS_SHELL;
+@@ -27,18 +27,8 @@
+   return candidate;
+ }
+ 
+-function dumpDOM(binary, url) {
+-  return new Promise((resolve, reject) => {
+-    const child = spawn(binary, ["--headless", "--virtual-time-budget=2500", "--dump-dom", url], { stdio: ["ignore", "pipe", "pipe"] });
+-    let stdout = "";
+-    let stderr = "";
+-    child.stdout.setEncoding("utf8");
+-    child.stderr.setEncoding("utf8");
+-    child.stdout.on("data", (value) => { stdout += value; });
+-    child.stderr.on("data", (value) => { stderr += value; });
+-    child.on("error", reject);
+-    child.on("close", (code) => code === 0 ? resolve({ stdout, stderr }) : reject(new Error(`Chrome failed (${code}): ${stderr}`)));
+-  });
++async function dumpDOM(binary,url) {
++  return await dumpBrowserDom(binary,url,{virtualTimeBudgetMs:2500,fixtureMode:'dom-dump'});
+ }
+ 
+ async function fixtureServer() {
