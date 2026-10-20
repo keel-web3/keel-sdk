@@ -1,0 +1,11 @@
+{
+  "schema": "keel-independent-remote-source@1",
+  "commit": "86b1534b27ac7dce9ac7aaaf30318dab1808696c",
+  "tree": "ca4598ec37b7418a898449f30c86151c93e91d77",
+  "archiveSHA256": "81c4e98c488eadbe90d45e43ef2322f04d15e3fc9c0095b4338c9c506c802ad3",
+  "actualDistro": "Fray-Prover",
+  "platform": "Linux-6.18.33.2-microsoft-standard-WSL2-x86_64-with-glibc2.39",
+  "cleanBefore": true,
+  "transport": "git archive + exact raw commit object; verified actual complete tree; shallow boundary only",
+  "compilerOrProductionChanges": false
+}

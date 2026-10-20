@@ -1,0 +1,40 @@
+Moderator-tier policy for A.setValue, cap 5 -> ok
+A moderator sets 42 -> ok
+One policy covers any argument: 7 with 3 attached -> ok
+The target holds 7 and 3 -> ok
+Value above the policy cap is refused -> KEEL_VALUE_LIMIT
+The attached value must equal the call value -> KEEL_AMOUNT
+A target refusal rolls the call back -> TARGET_REJECTED
+An account without a role is refused -> KEEL_ROLE
+A call without a policy is refused -> KEEL_POLICY
+Admin-tier policy for B.setValue -> ok
+A moderator is below the Admin tier -> KEEL_TIER
+An admin sets B to 5 -> ok
+Refusals changed nothing; B holds 5 -> ok
+An ownership change cannot be delegated -> KEEL_CAPABILITY_PROTECTED
+Manager functions other than the system stop cannot be delegated -> KEEL_MANAGER_PROTECTED
+A target without code is refused -> KEEL_TARGET
+Tier None is refused -> KEEL_TIER
+The system stop may be delegated to admins -> ok
+A moderator cannot stop systems -> KEEL_TIER
+An admin stops system 1 through the role lane -> ok
+System 1 is stopped -> ok
+Disable A.setValue -> ok
+A disabled policy is refused -> KEEL_POLICY
+Automation-tier policy for A.setValue, cap 5 -> ok
+Automation key for one day -> ok
+Grant A.setValue for an hour, up to 3 -> ok
+The key sets 11 with 2 attached -> ok
+One grant covers any argument: 12 -> ok
+Two executions after a key and a grant -> ok
+Value above the grant cap is refused -> KEEL_AUTOMATION_GRANT
+Automation runs only Automation-tier policies -> KEEL_TIER
+A signature for other arguments does not verify -> KEEL_SIGNATURE_INVALID
+A moderator may use an Automation-tier policy -> ok
+An admin pauses the manager -> ok
+The role lane stops while the manager is paused -> KEEL_MANAGER_PAUSED
+Automation stops while the manager is paused -> KEEL_MANAGER_PAUSED
+The paused lanes changed nothing -> ok
+Governance resumes the manager -> ok
+Another type at that entrypoint is not a target -> KEEL_TARGET
+A missing entrypoint is not a target -> KEEL_TARGET

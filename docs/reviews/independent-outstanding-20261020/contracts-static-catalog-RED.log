@@ -1,0 +1,352 @@
+TAP version 13
+# Subtest: cost gate accepts equal costs and measured improvements
+ok 1 - cost gate accepts equal costs and measured improvements
+  ---
+  duration_ms: 1.515209
+  type: 'test'
+  ...
+# Subtest: cost gate rejects gas, storage and operation-size regressions
+ok 2 - cost gate rejects gas, storage and operation-size regressions
+  ---
+  duration_ms: 0.617833
+  type: 'test'
+  ...
+# Subtest: cost gate rejects missing cases, missing metrics, protocol drift and NaN
+ok 3 - cost gate rejects missing cases, missing metrics, protocol drift and NaN
+  ---
+  duration_ms: 1.158208
+  type: 'test'
+  ...
+# Subtest: recording a baseline requires all cases, successful operations and exact read-back
+ok 4 - recording a baseline requires all cases, successful operations and exact read-back
+  ---
+  duration_ms: 3.220292
+  type: 'test'
+  ...
+# Subtest: versioned budget preserves historical cases and the pinned toolchain
+ok 5 - versioned budget preserves historical cases and the pinned toolchain
+  ---
+  duration_ms: 0.542834
+  type: 'test'
+  ...
+# Subtest: published manager ABIs match their compiler output
+not ok 6 - published manager ABIs match their compiler output
+  ---
+  duration_ms: 9.364542
+  type: 'test'
+  location: '/Users/ravonus/dev/wt/independent-outstanding-20261020/keel-contracts/test-js/manager-wire-abi.test.mjs:16:1'
+  failureType: 'testCodeFailure'
+  error: "ENOENT: no such file or directory, open '/Users/ravonus/dev/wt/independent-outstanding-20261020/keel-contracts/out/KeelManager.sol/KeelManager.json'"
+  code: 'ENOENT'
+  stack: |-
+    Object.openSync (node:fs:560:18)
+    readFileSync (node:fs:444:35)
+    read (file:///Users/ravonus/dev/wt/independent-outstanding-20261020/keel-contracts/test-js/manager-wire-abi.test.mjs:5:33)
+    TestContext.<anonymous> (file:///Users/ravonus/dev/wt/independent-outstanding-20261020/keel-contracts/test-js/manager-wire-abi.test.mjs:19:20)
+    Test.runInAsyncScope (node:async_hooks:214:14)
+    Test.run (node:internal/test_runner/test:1047:25)
+    Test.start (node:internal/test_runner/test:944:17)
+    startSubtestAfterBootstrap (node:internal/test_runner/harness:296:17)
+  ...
+# Subtest: ABI comparison ignores only top-level entry order
+ok 7 - ABI comparison ignores only top-level entry order
+  ---
+  duration_ms: 1.344458
+  type: 'test'
+  ...
+# Subtest: manager and RPC helper cannot drift on errors or indexed event fields
+ok 8 - manager and RPC helper cannot drift on errors or indexed event fields
+  ---
+  duration_ms: 1.023042
+  type: 'test'
+  ...
+# Subtest: the proxy ABI includes the fixed recovery helper wire surface
+ok 9 - the proxy ABI includes the fixed recovery helper wire surface
+  ---
+  duration_ms: 0.798375
+  type: 'test'
+  ...
+# Subtest: checked-in module ABIs preserve ERC-4906 log encoding
+ok 10 - checked-in module ABIs preserve ERC-4906 log encoding
+  ---
+  duration_ms: 72.985
+  type: 'test'
+  ...
+# Subtest: every Solidity source has an accurate module manifest
+not ok 11 - every Solidity source has an accurate module manifest
+  ---
+  duration_ms: 485.90875
+  type: 'test'
+  location: '/Users/ravonus/dev/wt/independent-outstanding-20261020/keel-contracts/test-js/module-scope.test.mjs:7:1'
+  failureType: 'testCodeFailure'
+  error: 'Command failed: python3 /Users/ravonus/dev/wt/independent-outstanding-20261020/keel-contracts/script/module-scope-audit.py'
+  code: 'ERR_TEST_FAILURE'
+  stack: |-
+    genericNodeError (node:internal/errors:983:15)
+    wrappedFn (node:internal/errors:537:14)
+    checkExecSyncError (node:child_process:916:11)
+    execFileSync (node:child_process:952:15)
+    TestContext.<anonymous> (file:///Users/ravonus/dev/wt/independent-outstanding-20261020/keel-contracts/test-js/module-scope.test.mjs:8:26)
+    Test.runInAsyncScope (node:async_hooks:214:14)
+    Test.run (node:internal/test_runner/test:1047:25)
+    Test.start (node:internal/test_runner/test:944:17)
+    startSubtestAfterBootstrap (node:internal/test_runner/harness:296:17)
+  ...
+# Subtest: publication depends on Hold without pulling in a cross-chain mint bridge
+ok 12 - publication depends on Hold without pulling in a cross-chain mint bridge
+  ---
+  duration_ms: 1.496167
+  type: 'test'
+  ...
+# Subtest: codecs declare no standalone deployment requirement
+ok 13 - codecs declare no standalone deployment requirement
+  ---
+  duration_ms: 0.121875
+  type: 'test'
+  ...
+# Subtest: the npm package contains only classified pinned fixtures
+not ok 14 - the npm package contains only classified pinned fixtures
+  ---
+  duration_ms: 5036.838
+  type: 'test'
+  location: '/Users/ravonus/dev/wt/independent-outstanding-20261020/keel-contracts/test-js/package-boundary.test.mjs:92:1'
+  failureType: 'testCodeFailure'
+  error: |-
+    Expected values to be strictly deep-equal:
+    + actual - expected
+    ... Skipped lines
+    
+      [
+        'test/fixtures/TestStorageViewerRenderer.sol',
+        'test/fixtures/bitcoin-v3/receipt.json',
+        'test/fixtures/creator-721a/KeelCreator721ABefore.sol',
+        'test/fixtures/creator-mint-decoding/Keel721MintBefore.sol',
+    ...
+        'test/fixtures/parity/core.json',
+    +   'test/fixtures/parity/entrypoint-capabilities.json',
+    +   'test/fixtures/parity/execution-automation.json',
+    +   'test/fixtures/parity/governance-value-counters.json',
+    +   'test/fixtures/parity/harness-policies.json',
+    +   'test/fixtures/parity/harness-trees.json',
+        'test/fixtures/parity/harness.json',
+    +   'test/fixtures/parity/links.json',
+    +   'test/fixtures/parity/manager-recovery.json',
+    +   'test/fixtures/parity/mint-target-identity.json',
+        'test/fixtures/parity/presentation.json',
+    +   'test/fixtures/parity/seeded-collection.json',
+    +   'test/fixtures/parity/system-pause-collections.json',
+    +   'test/fixtures/parity/system-pause-modules.json',
+    +   'test/fixtures/parity/system-pause.json',
+    +   'test/fixtures/parity/token-bound-account.json',
+        'test/fixtures/parity/trie.json',
+        'test/fixtures/platform-fees/KeelPlatformFeesBefore.sol',
+        'test/fixtures/prepared-composer/KeelEvmPreparedCarrierInlineComposerBaseline.sol',
+        'test/fixtures/prepared-composer/KeelPreparedContainerTableBaseline.sol',
+        'test/fixtures/presentation/KeelPresentationStateRegistryBaseline.sol',
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected:
+    0: 'test/fixtures/TestStorageViewerRenderer.sol'
+    1: 'test/fixtures/bitcoin-v3/receipt.json'
+    2: 'test/fixtures/creator-721a/KeelCreator721ABefore.sol'
+    3: 'test/fixtures/creator-mint-decoding/Keel721MintBefore.sol'
+    4: 'test/fixtures/creator-routes/KeelMintRouteRegistryBefore.sol'
+    5: 'test/fixtures/eth-hash/README.md'
+    6: 'test/fixtures/eth-hash/ethhash-enrichment.json'
+    7: 'test/fixtures/eth-hash/ethhash-rotation.json'
+    8: 'test/fixtures/eth-hash/ethhash-v1.json'
+    9: 'test/fixtures/eth-state-proof-vectors.json'
+    10: 'test/fixtures/evm-pause/PreparedEnvelopeBefore.sol'
+    11: 'test/fixtures/harness/revisioned-sdk/KeelRawTokenURIBuilderBaseline.sol'
+    12: 'test/fixtures/harness/revisioned-sdk/existing-image-base64.fragment'
+    13: 'test/fixtures/harness/revisioned-sdk/manifest.json'
+    14: 'test/fixtures/harness/revisioned-sdk/redline-game.fragment'
+    15: 'test/fixtures/harness/revisioned-sdk/v1-canonical.html'
+    16: 'test/fixtures/harness/revisioned-sdk/v1-part0.bin'
+    17: 'test/fixtures/harness/revisioned-sdk/v1-part1.bin'
+    18: 'test/fixtures/harness/revisioned-sdk/v1-part2.bin'
+    19: 'test/fixtures/harness/revisioned-sdk/v1-part3.bin'
+    20: 'test/fixtures/harness/revisioned-sdk/v1-part4.bin'
+    21: 'test/fixtures/harness/revisioned-sdk/v1-part5.bin'
+    22: 'test/fixtures/harness/revisioned-sdk/v1-part6.bin'
+    23: 'test/fixtures/harness/revisioned-sdk/v1-token-uri.bin'
+    24: 'test/fixtures/harness/revisioned-sdk/v2-canonical.html'
+    25: 'test/fixtures/harness/revisioned-sdk/v2-part0.bin'
+    26: 'test/fixtures/harness/revisioned-sdk/v2-part1.bin'
+    27: 'test/fixtures/harness/revisioned-sdk/v2-part2.bin'
+    28: 'test/fixtures/harness/revisioned-sdk/v2-part3.bin'
+    29: 'test/fixtures/harness/revisioned-sdk/v2-part4.bin'
+    30: 'test/fixtures/harness/revisioned-sdk/v2-part5.bin'
+    31: 'test/fixtures/harness/revisioned-sdk/v2-part6.bin'
+    32: 'test/fixtures/harness/revisioned-sdk/v2-token-uri.bin'
+    33: 'test/fixtures/index/KeelIndexBefore.sol'
+    34: 'test/fixtures/ipfs-cid-vectors.json'
+    35: 'test/fixtures/link-uri-builder/KeelLinkURIBuilderBefore.sol'
+    36: 'test/fixtures/mint-claims/OneMintControllerBefore.sol'
+    37: 'test/fixtures/mint-flow/OneMintControllerBeforeCleanup.sol'
+    38: 'test/fixtures/mint-frozen-ranges/KeelMintReleasesBeforeFrozenRanges.sol'
+    39: 'test/fixtures/mint-frozen-ranges/KeelMintRouteRegistryBeforeFrozenRanges.sol'
+    40: 'test/fixtures/mint-releases/KeelMintRouteRegistryBeforeReleases.sol'
+    41: 'test/fixtures/op-output-root-vector.json'
+    42: 'test/fixtures/parity/bitcoin.json'
+    43: 'test/fixtures/parity/collection.json'
+    44: 'test/fixtures/parity/core.json'
+    45: 'test/fixtures/parity/harness.json'
+    46: 'test/fixtures/parity/presentation.json'
+    47: 'test/fixtures/parity/trie.json'
+    48: 'test/fixtures/platform-fees/KeelPlatformFeesBefore.sol'
+    49: 'test/fixtures/prepared-composer/KeelEvmPreparedCarrierInlineComposerBaseline.sol'
+    50: 'test/fixtures/prepared-composer/KeelPreparedContainerTableBaseline.sol'
+    51: 'test/fixtures/presentation/KeelPresentationStateRegistryBaseline.sol'
+    52: 'test/fixtures/presentation/KeelStoredTokenJSONBaseline.sol'
+    53: 'test/fixtures/presentation/KeelVisualStateLedgerBaseline.sol'
+    54: 'test/fixtures/queue-ledger/QueueLedgerPrototype.sol'
+    55: 'test/fixtures/seeded-721a/BatchSeedTrial.sol'
+    56: 'test/fixtures/seeded-721a/CopyBatchSeedTrial.sol'
+    57: 'test/fixtures/seeded-721a/SeedBatchesCopyBefore.sol'
+    58: 'test/fixtures/seeded-721a/SeedTrialCurrent.sol'
+    59: 'test/fixtures/seeded-721a/SeedTrialOriginal.sol'
+    60: 'test/fixtures/seeded-721a/Seeded721ABefore.sol'
+    61: 'test/fixtures/synthetic-collection-directory.bin'
+    62: 'test/fixtures/synthetic-large-artwork.ppm'
+    63: 'test/fixtures/synthetic-token-1.json'
+    64: 'test/fixtures/token-matrix-gas/KeelTokenMatrixPackedBaseline.sol'
+  actual:
+    0: 'test/fixtures/TestStorageViewerRenderer.sol'
+    1: 'test/fixtures/bitcoin-v3/receipt.json'
+    2: 'test/fixtures/creator-721a/KeelCreator721ABefore.sol'
+    3: 'test/fixtures/creator-mint-decoding/Keel721MintBefore.sol'
+    4: 'test/fixtures/creator-routes/KeelMintRouteRegistryBefore.sol'
+    5: 'test/fixtures/eth-hash/README.md'
+    6: 'test/fixtures/eth-hash/ethhash-enrichment.json'
+    7: 'test/fixtures/eth-hash/ethhash-rotation.json'
+    8: 'test/fixtures/eth-hash/ethhash-v1.json'
+    9: 'test/fixtures/eth-state-proof-vectors.json'
+    10: 'test/fixtures/evm-pause/PreparedEnvelopeBefore.sol'
+    11: 'test/fixtures/harness/revisioned-sdk/KeelRawTokenURIBuilderBaseline.sol'
+    12: 'test/fixtures/harness/revisioned-sdk/existing-image-base64.fragment'
+    13: 'test/fixtures/harness/revisioned-sdk/manifest.json'
+    14: 'test/fixtures/harness/revisioned-sdk/redline-game.fragment'
+    15: 'test/fixtures/harness/revisioned-sdk/v1-canonical.html'
+    16: 'test/fixtures/harness/revisioned-sdk/v1-part0.bin'
+    17: 'test/fixtures/harness/revisioned-sdk/v1-part1.bin'
+    18: 'test/fixtures/harness/revisioned-sdk/v1-part2.bin'
+    19: 'test/fixtures/harness/revisioned-sdk/v1-part3.bin'
+    20: 'test/fixtures/harness/revisioned-sdk/v1-part4.bin'
+    21: 'test/fixtures/harness/revisioned-sdk/v1-part5.bin'
+    22: 'test/fixtures/harness/revisioned-sdk/v1-part6.bin'
+    23: 'test/fixtures/harness/revisioned-sdk/v1-token-uri.bin'
+    24: 'test/fixtures/harness/revisioned-sdk/v2-canonical.html'
+    25: 'test/fixtures/harness/revisioned-sdk/v2-part0.bin'
+    26: 'test/fixtures/harness/revisioned-sdk/v2-part1.bin'
+    27: 'test/fixtures/harness/revisioned-sdk/v2-part2.bin'
+    28: 'test/fixtures/harness/revisioned-sdk/v2-part3.bin'
+    29: 'test/fixtures/harness/revisioned-sdk/v2-part4.bin'
+    30: 'test/fixtures/harness/revisioned-sdk/v2-part5.bin'
+    31: 'test/fixtures/harness/revisioned-sdk/v2-part6.bin'
+    32: 'test/fixtures/harness/revisioned-sdk/v2-token-uri.bin'
+    33: 'test/fixtures/index/KeelIndexBefore.sol'
+    34: 'test/fixtures/ipfs-cid-vectors.json'
+    35: 'test/fixtures/link-uri-builder/KeelLinkURIBuilderBefore.sol'
+    36: 'test/fixtures/mint-claims/OneMintControllerBefore.sol'
+    37: 'test/fixtures/mint-flow/OneMintControllerBeforeCleanup.sol'
+    38: 'test/fixtures/mint-frozen-ranges/KeelMintReleasesBeforeFrozenRanges.sol'
+    39: 'test/fixtures/mint-frozen-ranges/KeelMintRouteRegistryBeforeFrozenRanges.sol'
+    40: 'test/fixtures/mint-releases/KeelMintRouteRegistryBeforeReleases.sol'
+    41: 'test/fixtures/op-output-root-vector.json'
+    42: 'test/fixtures/parity/bitcoin.json'
+    43: 'test/fixtures/parity/collection.json'
+    44: 'test/fixtures/parity/core.json'
+    45: 'test/fixtures/parity/entrypoint-capabilities.json'
+    46: 'test/fixtures/parity/execution-automation.json'
+    47: 'test/fixtures/parity/governance-value-counters.json'
+    48: 'test/fixtures/parity/harness-policies.json'
+    49: 'test/fixtures/parity/harness-trees.json'
+    50: 'test/fixtures/parity/harness.json'
+    51: 'test/fixtures/parity/links.json'
+    52: 'test/fixtures/parity/manager-recovery.json'
+    53: 'test/fixtures/parity/mint-target-identity.json'
+    54: 'test/fixtures/parity/presentation.json'
+    55: 'test/fixtures/parity/seeded-collection.json'
+    56: 'test/fixtures/parity/system-pause-collections.json'
+    57: 'test/fixtures/parity/system-pause-modules.json'
+    58: 'test/fixtures/parity/system-pause.json'
+    59: 'test/fixtures/parity/token-bound-account.json'
+    60: 'test/fixtures/parity/trie.json'
+    61: 'test/fixtures/platform-fees/KeelPlatformFeesBefore.sol'
+    62: 'test/fixtures/prepared-composer/KeelEvmPreparedCarrierInlineComposerBaseline.sol'
+    63: 'test/fixtures/prepared-composer/KeelPreparedContainerTableBaseline.sol'
+    64: 'test/fixtures/presentation/KeelPresentationStateRegistryBaseline.sol'
+    65: 'test/fixtures/presentation/KeelStoredTokenJSONBaseline.sol'
+    66: 'test/fixtures/presentation/KeelVisualStateLedgerBaseline.sol'
+    67: 'test/fixtures/queue-ledger/QueueLedgerPrototype.sol'
+    68: 'test/fixtures/seeded-721a/BatchSeedTrial.sol'
+    69: 'test/fixtures/seeded-721a/CopyBatchSeedTrial.sol'
+    70: 'test/fixtures/seeded-721a/SeedBatchesCopyBefore.sol'
+    71: 'test/fixtures/seeded-721a/SeedTrialCurrent.sol'
+    72: 'test/fixtures/seeded-721a/SeedTrialOriginal.sol'
+    73: 'test/fixtures/seeded-721a/Seeded721ABefore.sol'
+    74: 'test/fixtures/synthetic-collection-directory.bin'
+    75: 'test/fixtures/synthetic-large-artwork.ppm'
+    76: 'test/fixtures/synthetic-token-1.json'
+    77: 'test/fixtures/token-matrix-gas/KeelTokenMatrixPackedBaseline.sol'
+  operator: 'deepStrictEqual'
+  stack: |-
+    TestContext.<anonymous> (file:///Users/ravonus/dev/wt/independent-outstanding-20261020/keel-contracts/test-js/package-boundary.test.mjs:106:10)
+    Test.runInAsyncScope (node:async_hooks:214:14)
+    Test.run (node:internal/test_runner/test:1047:25)
+    Test.start (node:internal/test_runner/test:944:17)
+    startSubtestAfterBootstrap (node:internal/test_runner/harness:296:17)
+  ...
+# Subtest: shared traces retain ownership, freeze, clock, payment, and lifecycle refusals
+ok 15 - shared traces retain ownership, freeze, clock, payment, and lifecycle refusals
+  ---
+  duration_ms: 0.768166
+  type: 'test'
+  ...
+# Subtest: evm contract context bytes expose the same immutable seed and exact commitment
+ok 16 - evm contract context bytes expose the same immutable seed and exact commitment
+  ---
+  duration_ms: 0.895125
+  type: 'test'
+  ...
+# Subtest: tezos contract context bytes expose the same immutable seed and exact commitment
+ok 17 - tezos contract context bytes expose the same immutable seed and exact commitment
+  ---
+  duration_ms: 0.589459
+  type: 'test'
+  ...
+# Subtest: collection trace covers reservation isolation and role rotation through exhaustion
+ok 18 - collection trace covers reservation isolation and role rotation through exhaustion
+  ---
+  duration_ms: 0.19825
+  type: 'test'
+  ...
+# Subtest: native artifact gate catches the actual compiler and annotation failures
+ok 19 - native artifact gate catches the actual compiler and annotation failures
+  ---
+  duration_ms: 192.5495
+  type: 'test'
+  ...
+# Subtest: each native module source is catalogued beside its EVM module and has an executable scenario
+ok 20 - each native module source is catalogued beside its EVM module and has an executable scenario
+  ---
+  duration_ms: 7.218708
+  type: 'test'
+  ...
+# Subtest: native SDK discovery keeps inherited public interfaces and shared source identities
+ok 21 - native SDK discovery keeps inherited public interfaces and shared source identities
+  ---
+  duration_ms: 641.734834
+  type: 'test'
+  ...
+1..21
+# tests 21
+# suites 0
+# pass 18
+# fail 3
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 5088.219584

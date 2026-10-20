@@ -1,0 +1,45 @@
+{
+  "schema": "keel-independent-validation-toolchain@1",
+  "host": "windows/WSL/Fray-Prover",
+  "platform": "Linux-6.18.33.2-microsoft-standard-WSL2-x86_64-with-glibc2.39",
+  "prefix": "/root/keel-validation-tools-20261020",
+  "files": [
+    {
+      "path": "node-v22.22.1-linux-x64/bin/node",
+      "sha256": "243fd8938011479f41b3de101842150fa990f33fbbb3f7aabd330857f2d79e1d",
+      "bytes": 124674920
+    },
+    {
+      "path": "forge-v1.7.1/forge",
+      "sha256": "4f77da0810de94325734855d0ad58d70640aa8a5b2a837608ddf8c26da34355c",
+      "bytes": 84666760
+    },
+    {
+      "path": "downloads/node-SHASUMS256.txt",
+      "sha256": "b4e0a68b3fd205e27a000f5722d7932cf31c1e0b6b3d9101bcb153abfd5d8023",
+      "bytes": 3777
+    },
+    {
+      "path": "downloads/foundry-release.json",
+      "sha256": "fb4ce2edb12d415b2bbda8fc9767e90b223acc6be241218ff6cca73ebcf2164b",
+      "bytes": 80774
+    },
+    {
+      "path": "downloads/foundry-asset.json",
+      "sha256": "a16ace221741ce8d5e97c9ba0f8cd3ec52459a289f462bac91669de557bf4c0a",
+      "bytes": 1846
+    },
+    {
+      "path": "downloads/smartpy-release.json",
+      "sha256": "296762d8c44825bdd653c31b1d691da5c6ea06306434547b6cc85d18a1c011da",
+      "bytes": 3387
+    },
+    {
+      "path": "smartpy-install-report.json",
+      "sha256": "66a0969bf329485d22c61c74d6fcedf1e8399ef7b542df62dcfaa144d6f6774a",
+      "bytes": 77278
+    }
+  ],
+  "globalChanges": false,
+  "credentialChanges": false
+}

@@ -1,0 +1,8 @@
+381 Solidity sources; 47 module dependency edges
+keel-die: missing catalog source KeelNativeMediaPresentation.sol
+keel-die: missing catalog source interfaces/IKeelNativeMediaPresentationEvents.sol
+keel-die: missing catalog source interfaces/IKeelNativeMediaPresentationHost.sol
+Stale source index: modules/keel-artifacts/README.md (run pnpm docs:generate)
+Stale source index: modules/keel-die/README.md (run pnpm docs:generate)
+Stale source index: modules/keel-stake/README.md (run pnpm docs:generate)
+6 issues

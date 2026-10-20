@@ -1,0 +1,50 @@
+{
+  "image": "tezos/tezos@sha256:c7adc1605e0ac167743e5ccc107c88719d201994b8166dd794ea10fd0488bea2",
+  "protocol": {
+    "protocol": "PrihK96nBAFSxVL1GLJTVhu9YnzkMFiBeuJRPA8NwuZVZCE1L6i",
+    "next_protocol": "PsUshuai9QapM5TGj1JpuVGkdxz5GykdnEvS6Rh8SUVrARvZLCY"
+  },
+  "scripts": [
+    {
+      "script": "out/tezos-collection-route/targets/collection_route_creator_profile/step_001_cont_0_contract.tz",
+      "sha256": "0403d1a0945475e103c45677c54e19e63bdbcc86dc0d31f1db855196f3555170",
+      "passed": true
+    },
+    {
+      "script": "out/tezos-collection-route/targets/collection_route_collection/step_001_cont_0_contract.tz",
+      "sha256": "16414e7093583fcc5c06f1d5070ad1e1ab62c7d001c0f49050350b12336ee92f",
+      "passed": true
+    },
+    {
+      "script": "out/tezos-collection-route/targets/collection_route_seeded_collection/step_001_cont_0_contract.tz",
+      "sha256": "44e8643b6a335670ddb8a8b640dea1f77afe139cbcedd3d092381e039385790e",
+      "passed": true
+    },
+    {
+      "script": "out/tezos-collection-route/targets/collection_route_index/step_001_cont_0_contract.tz",
+      "sha256": "68ab840d900c1318569f4e5eeaed2f5e9ca897a92494a1a265c92eda5c8bd335",
+      "passed": true
+    },
+    {
+      "script": "out/tezos-collection-route/targets/collection_route_hold/step_001_cont_0_contract.tz",
+      "sha256": "a44d0682e989ff29f789f6ce486cf11a00d9d20e12f10bd07b109174399d26b0",
+      "passed": true
+    },
+    {
+      "script": "out/tezos-collection-route/targets/collection_route_mint_gate/step_001_cont_0_contract.tz",
+      "sha256": "b1c025921cf402130b972da3f85dd1a5f8fffa8a3681e8ce1d7e1c1b75f9b956",
+      "passed": true
+    },
+    {
+      "script": "out/tezos-collection-route/targets/collection_route_presentation/step_001_cont_0_contract.tz",
+      "sha256": "b34aa6c8f4ccf4673f0ffe617963d48c75edd1f3fcb272d678caaf5915b06743",
+      "passed": true
+    },
+    {
+      "script": "out/tezos-collection-route/targets/collection_route_one_mint/step_001_cont_0_contract.tz",
+      "sha256": "e97fe00778293bead7e156b3eae502994b024ee271f38c0726730d551f759def",
+      "passed": true
+    }
+  ],
+  "liveChainProof": false
+}

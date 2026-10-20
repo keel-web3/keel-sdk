@@ -1,0 +1,3274 @@
+Compiling 777 files with Solc 0.8.36
+Solc 0.8.36 finished in 1219.15s
+Compiler run successful with warnings:
+Warning (6335): "layout" will be promoted to keyword in the future and will not be allowed as an identifier anymore.
+  --> node_modules/erc721a-upgradeable/contracts/ERC721AStorage.sol:54:5:
+   |
+54 |     function layout() internal pure returns (Layout storage l) {
+   |     ^ (Relevant source part starts here and spans across multiple lines).
+
+Warning (6335): "layout" will be promoted to keyword in the future and will not be allowed as an identifier anymore.
+  --> node_modules/erc721a-upgradeable/contracts/ERC721A__InitializableStorage.sol:23:5:
+   |
+23 |     function layout() internal pure returns (Layout storage l) {
+   |     ^ (Relevant source part starts here and spans across multiple lines).
+
+Warning (6335): "error" will be promoted to keyword in the future and will not be allowed as an identifier anymore.
+   --> node_modules/@openzeppelin/contracts/utils/cryptography/ECDSA.sol:125:29:
+    |
+125 |         (address recovered, RecoverError error, bytes32 errorArg) = tryRecover(hash, signature);
+    |                             ^^^^^^^^^^^^^^^^^^
+
+Warning (6335): "error" will be promoted to keyword in the future and will not be allowed as an identifier anymore.
+   --> node_modules/@openzeppelin/contracts/utils/cryptography/ECDSA.sol:134:29:
+    |
+134 |         (address recovered, RecoverError error, bytes32 errorArg) = tryRecoverCalldata(hash, signature);
+    |                             ^^^^^^^^^^^^^^^^^^
+
+Warning (6335): "error" will be promoted to keyword in the future and will not be allowed as an identifier anymore.
+   --> node_modules/@openzeppelin/contracts/utils/cryptography/ECDSA.sol:161:29:
+    |
+161 |         (address recovered, RecoverError error, bytes32 errorArg) = tryRecover(hash, r, vs);
+    |                             ^^^^^^^^^^^^^^^^^^
+
+Warning (6335): "error" will be promoted to keyword in the future and will not be allowed as an identifier anymore.
+   --> node_modules/@openzeppelin/contracts/utils/cryptography/ECDSA.sol:203:29:
+    |
+203 |         (address recovered, RecoverError error, bytes32 errorArg) = tryRecover(hash, v, r, s);
+    |                             ^^^^^^^^^^^^^^^^^^
+
+Warning (6335): "error" will be promoted to keyword in the future and will not be allowed as an identifier anymore.
+   --> node_modules/@openzeppelin/contracts/utils/cryptography/ECDSA.sol:273:26:
+    |
+273 |     function _throwError(RecoverError error, bytes32 errorArg) private pure {
+    |                          ^^^^^^^^^^^^^^^^^^
+
+Warning (6335): "error" will be promoted to keyword in the future and will not be allowed as an identifier anymore.
+   --> src/modules/keel-anchors/KeelSignedAnchorVerifier.sol:184:29:
+    |
+184 |         (address recovered, ECDSA.RecoverError error,) = ECDSA.tryRecoverCalldata(digest, signature);
+    |                             ^^^^^^^^^^^^^^^^^^^^^^^^
+
+Warning (6335): "at" will be promoted to keyword in the future and will not be allowed as an identifier anymore.
+   --> src/modules/keel-codecs/libraries/KeelDagPb.sol:205:44:
+    |
+205 |     function _equal(bytes memory haystack, uint256 at, bytes memory needle) private pure returns (bool) {
+    |                                            ^^^^^^^^^^
+
+Warning (6335): "at" will be promoted to keyword in the future and will not be allowed as an identifier anymore.
+  --> src/modules/keel-kernel/libraries/JsonEscape.sol:81:18:
+   |
+81 |             for (uint256 at; at < length; at += 32) {
+   |                  ^^^^^^^^^^
+
+Warning (6335): "layout" will be promoted to keyword in the future and will not be allowed as an identifier anymore.
+  --> src/modules/keel-managed-modules/KeelManagedModule.sol:78:75:
+   |
+78 |     function _compatibility(address implementation) private view returns (bytes32 layout, bytes32 configuration) {
+   |                                                                           ^^^^^^^^^^^^^^
+
+Warning (6335): "layout" will be promoted to keyword in the future and will not be allowed as an identifier anymore.
+  --> src/modules/keel-managed-modules/KeelManagedModule.sol:90:10:
+   |
+90 |         (bytes32 layout, bytes32 configuration) = _compatibility(implementation);
+   |          ^^^^^^^^^^^^^^
+
+Warning (6335): "at" will be promoted to keyword in the future and will not be allowed as an identifier anymore.
+   --> src/modules/keel-mint-access/KeelMintQueue.sol:242:38:
+    |
+242 |     function _releaseSlot(uint64 id, uint48 at) private {
+    |                                      ^^^^^^^^^
+
+Warning (6335): "layout" will be promoted to keyword in the future and will not be allowed as an identifier anymore.
+  --> src/modules/keel-managed-modules/KeelManagedMintRouteRegistry.sol:45:9:
+   |
+45 |         bytes32 layout = keccak256("keel.managed.layout.KeelMintRouteRegistry.v1");
+   |         ^^^^^^^^^^^^^^
+
+Warning (6335): "at" will be promoted to keyword in the future and will not be allowed as an identifier anymore.
+   --> src/modules/keel-sleeve/KeelTokenMatrix.sol:103:39:
+    |
+103 |     function _u16(bytes memory value, uint256 at) private pure returns (uint16) {
+    |                                       ^^^^^^^^^^
+
+Warning (6335): "at" will be promoted to keyword in the future and will not be allowed as an identifier anymore.
+   --> src/modules/keel-sleeve/KeelTokenMatrix.sol:222:14:
+    |
+222 |         for (uint256 at; at < commands.length; at += 2) {
+    |              ^^^^^^^^^^
+
+Warning (6335): "at" will be promoted to keyword in the future and will not be allowed as an identifier anymore.
+   --> src/modules/keel-sleeve/KeelTokenMatrix.sol:253:13:
+    |
+253 |             uint256 at = i * rowStride;
+    |             ^^^^^^^^^^
+
+Warning (6335): "at" will be promoted to keyword in the future and will not be allowed as an identifier anymore.
+   --> src/modules/keel-sleeve/KeelTokenMatrix.sol:309:9:
+    |
+309 |         uint256 at = (id % rowsPerBlock) * rowStride;
+    |         ^^^^^^^^^^
+
+Warning (6335): "at" will be promoted to keyword in the future and will not be allowed as an identifier anymore.
+  --> test/fixtures/token-matrix-gas/KeelTokenMatrixPackedBaseline.sol:92:39:
+   |
+92 |     function _u16(bytes memory value, uint256 at) private pure returns (uint16) {
+   |                                       ^^^^^^^^^^
+
+Warning (6335): "at" will be promoted to keyword in the future and will not be allowed as an identifier anymore.
+   --> test/fixtures/token-matrix-gas/KeelTokenMatrixPackedBaseline.sol:164:14:
+    |
+164 |         for (uint256 at; at < commands.length; at += 2) {
+    |              ^^^^^^^^^^
+
+Warning (6335): "at" will be promoted to keyword in the future and will not be allowed as an identifier anymore.
+   --> test/fixtures/token-matrix-gas/KeelTokenMatrixPackedBaseline.sol:190:13:
+    |
+190 |             uint256 at = i * rowStride;
+    |             ^^^^^^^^^^
+
+Warning (6335): "at" will be promoted to keyword in the future and will not be allowed as an identifier anymore.
+   --> test/fixtures/token-matrix-gas/KeelTokenMatrixPackedBaseline.sol:240:9:
+    |
+240 |         uint256 at = (id % rowsPerBlock) * rowStride;
+    |         ^^^^^^^^^^
+
+Warning (6335): "at" will be promoted to keyword in the future and will not be allowed as an identifier anymore.
+  --> test/gas/baseline/KeelTokenMatrixOptimizationBefore.sol:92:39:
+   |
+92 |     function _u16(bytes memory value, uint256 at) private pure returns (uint16) {
+   |                                       ^^^^^^^^^^
+
+Warning (6335): "at" will be promoted to keyword in the future and will not be allowed as an identifier anymore.
+   --> test/gas/baseline/KeelTokenMatrixOptimizationBefore.sol:164:14:
+    |
+164 |         for (uint256 at; at < commands.length; at += 2) {
+    |              ^^^^^^^^^^
+
+Warning (6335): "at" will be promoted to keyword in the future and will not be allowed as an identifier anymore.
+   --> test/gas/baseline/KeelTokenMatrixOptimizationBefore.sol:190:13:
+    |
+190 |             uint256 at = i * rowStride;
+    |             ^^^^^^^^^^
+
+Warning (6335): "at" will be promoted to keyword in the future and will not be allowed as an identifier anymore.
+   --> test/gas/baseline/KeelTokenMatrixOptimizationBefore.sol:240:9:
+    |
+240 |         uint256 at = (id % rowsPerBlock) * rowStride;
+    |         ^^^^^^^^^^
+
+Warning (6335): "error" will be promoted to keyword in the future and will not be allowed as an identifier anymore.
+   --> test/modules/keel-die/KeelSeedVrfAudit.t.sol:241:19:
+    |
+241 |         (bool ok, bytes memory error) = coordinator.fulfill(adapter, id, words, 100000);
+    |                   ^^^^^^^^^^^^^^^^^^
+
+Warning (6335): "at" will be promoted to keyword in the future and will not be allowed as an identifier anymore.
+   --> test/modules/keel-die/KeelSharedEditionBatch.t.sol:106:9:
+    |
+106 |         uint256 at = _only(logs, address(shared), keccak256("SharedCollectionCreated(string,uint128,address)"));
+    |         ^^^^^^^^^^
+
+Warning (6335): "at" will be promoted to keyword in the future and will not be allowed as an identifier anymore.
+   --> test/modules/keel-die/RegisteredRevisionConsumer.t.sol:284:9:
+    |
+284 |         uint256 at;
+    |         ^^^^^^^^^^
+
+Warning (6335): "at" will be promoted to keyword in the future and will not be allowed as an identifier anymore.
+   --> test/modules/keel-harness/KeelCompactCollection.t.sol:108:43:
+    |
+108 |         output = new bytes(input.length); uint256 at;
+    |                                           ^^^^^^^^^^
+
+Warning (6335): "at" will be promoted to keyword in the future and will not be allowed as an identifier anymore.
+   --> test/modules/keel-harness/KeelPreparedTableGas.t.sol:111:9:
+    |
+111 |         uint256 at;
+    |         ^^^^^^^^^^
+
+Warning (6335): "at" will be promoted to keyword in the future and will not be allowed as an identifier anymore.
+   --> test/modules/keel-harness/KeelRawTokenURIBuilder.t.sol:213:13:
+    |
+213 |             uint256 at = index * 3;
+    |             ^^^^^^^^^^
+
+Warning (6335): "at" will be promoted to keyword in the future and will not be allowed as an identifier anymore.
+   --> test/modules/keel-harness/KeelRawTokenURIBuilder.t.sol:223:13:
+    |
+223 |             uint256 at = index * 3;
+    |             ^^^^^^^^^^
+
+Warning (6335): "at" will be promoted to keyword in the future and will not be allowed as an identifier anymore.
+  --> test/modules/keel-kernel/fixtures/MintSeededHarness.sol:13:20:
+   |
+13 |     function index(uint32 at, uint16 offset, uint16 width) external pure returns (uint64) {
+   |                    ^^^^^^^^^
+
+Warning (6335): "at" will be promoted to keyword in the future and will not be allowed as an identifier anymore.
+  --> test/modules/keel-kernel/fixtures/MintSeededHarness.sol:37:36:
+   |
+37 |     function writeWord(uint256 id, uint32 at, uint256 value) external {
+   |                                    ^^^^^^^^^
+
+Warning (6335): "at" will be promoted to keyword in the future and will not be allowed as an identifier anymore.
+  --> test/modules/keel-kernel/fixtures/MintSeededHarness.sol:41:35:
+   |
+41 |     function readWord(uint256 id, uint32 at) external view returns (uint256) {
+   |                                   ^^^^^^^^^
+
+Warning (6335): "at" will be promoted to keyword in the future and will not be allowed as an identifier anymore.
+   --> test/modules/keel-kernel/fixtures/MintSeededHarness.sol:166:45:
+    |
+166 |     function keelMintSeededWord(uint256 id, uint32 at) external view returns (uint256) {
+    |                                             ^^^^^^^^^
+
+Warning (6335): "at" will be promoted to keyword in the future and will not be allowed as an identifier anymore.
+   --> test/modules/keel-kernel/KeelMintSeeded.t.sol:235:9:
+    |
+235 |         uint32 at,
+    |         ^^^^^^^^^
+
+Warning (6335): "at" will be promoted to keyword in the future and will not be allowed as an identifier anymore.
+   --> test/modules/keel-kernel/KeelMintSeeded.t.sol:252:74:
+    |
+252 |     function testFuzzMultiwordRecordIsolation(uint256 id, uint256 value, uint32 at) public {
+    |                                                                          ^^^^^^^^^
+
+Warning (6335): "at" will be promoted to keyword in the future and will not be allowed as an identifier anymore.
+   --> test/modules/keel-kernel/fixtures/MintSeededReference.sol:209:20:
+    |
+209 |     function index(uint32 at, uint16 offset, uint16 width) external pure returns (uint64) {
+    |                    ^^^^^^^^^
+
+Warning (6335): "at" will be promoted to keyword in the future and will not be allowed as an identifier anymore.
+   --> test/modules/keel-kernel/fixtures/MintSeededReference.sol:233:36:
+    |
+233 |     function writeWord(uint256 id, uint32 at, uint256 value) external {
+    |                                    ^^^^^^^^^
+
+Warning (6335): "at" will be promoted to keyword in the future and will not be allowed as an identifier anymore.
+   --> test/modules/keel-kernel/fixtures/MintSeededReference.sol:237:35:
+    |
+237 |     function readWord(uint256 id, uint32 at) external view returns (uint256) {
+    |                                   ^^^^^^^^^
+
+Warning (6335): "at" will be promoted to keyword in the future and will not be allowed as an identifier anymore.
+  --> test/modules/keel-mint-access/KeelLotteryEngineAudit.t.sol:67:24:
+   |
+67 |         (, uint64 id,, uint48 at) = engine.pick(context(100, 100));
+   |                        ^^^^^^^^^
+
+Warning (6335): "at" will be promoted to keyword in the future and will not be allowed as an identifier anymore.
+   --> test/modules/keel-mint-access/KeelMintQueueDemand.t.sol:221:9:
+    |
+221 |         uint256 at = 700; // setUp's 1,000 minus 300; a literal because via-IR re-reads block.timestamp
+    |         ^^^^^^^^^^
+
+Warning (6335): "leave" will be promoted to keyword in the future and will not be allowed as an identifier anymore.
+  --> test/modules/keel-stake/KeelStakeCallbacks.t.sol:83:5:
+   |
+83 |     function leave(KeelStakeObjectManager manager, bytes32 id, uint256 tokenId) external {
+   |     ^ (Relevant source part starts here and spans across multiple lines).
+
+Warning (6335): "at" will be promoted to keyword in the future and will not be allowed as an identifier anymore.
+   --> test/parity/CoreParity.t.sol:137:9:
+    |
+137 |         uint256 at = type(uint256).max;
+    |         ^^^^^^^^^^
+
+Warning (6335): "at" will be promoted to keyword in the future and will not be allowed as an identifier anymore.
+  --> test/parity/EntrypointCapabilitiesParity.t.sol:63:13:
+   |
+63 |             string memory at = string.concat(".steps[", fx.toString(i), "]");
+   |             ^^^^^^^^^^^^^^^^
+
+Warning (6335): "at" will be promoted to keyword in the future and will not be allowed as an identifier anymore.
+   --> test/parity/EntrypointCapabilitiesParity.t.sol:102:22:
+    |
+102 |     function _policy(string memory at) private {
+    |                      ^^^^^^^^^^^^^^^^
+
+Warning (6335): "at" will be promoted to keyword in the future and will not be allowed as an identifier anymore.
+   --> test/parity/EntrypointCapabilitiesParity.t.sol:119:20:
+    |
+119 |     function _role(string memory at) private {
+    |                    ^^^^^^^^^^^^^^^^
+
+Warning (6335): "at" will be promoted to keyword in the future and will not be allowed as an identifier anymore.
+   --> test/parity/EntrypointCapabilitiesParity.t.sol:130:24:
+    |
+130 |     function _automate(string memory at) private {
+    |                        ^^^^^^^^^^^^^^^^
+
+Warning (6335): "at" will be promoted to keyword in the future and will not be allowed as an identifier anymore.
+   --> test/parity/EntrypointCapabilitiesParity.t.sol:143:21:
+    |
+143 |     function _state(string memory at) private view {
+    |                     ^^^^^^^^^^^^^^^^
+
+Warning (6335): "at" will be promoted to keyword in the future and will not be allowed as an identifier anymore.
+   --> test/parity/EntrypointCapabilitiesParity.t.sol:166:26:
+    |
+166 |     function _capability(string memory at) private view returns (address target, bytes4 selector) {
+    |                          ^^^^^^^^^^^^^^^^
+
+Warning (6335): "at" will be promoted to keyword in the future and will not be allowed as an identifier anymore.
+   --> test/parity/EntrypointCapabilitiesParity.t.sol:177:22:
+    |
+177 |     function _callOf(string memory at, uint256 argument) private view returns (KeelManager.Call memory) {
+    |                      ^^^^^^^^^^^^^^^^
+
+Warning (6335): "at" will be promoted to keyword in the future and will not be allowed as an identifier anymore.
+   --> test/parity/EntrypointCapabilitiesParity.t.sol:182:20:
+    |
+182 |     function _uint(string memory at, string memory key) private view returns (uint256) {
+    |                    ^^^^^^^^^^^^^^^^
+
+Warning (6335): "at" will be promoted to keyword in the future and will not be allowed as an identifier anymore.
+   --> test/parity/EntrypointCapabilitiesParity.t.sol:187:23:
+    |
+187 |     function _failure(string memory at, bytes4 selector, uint256 expected, uint256 attached)
+    |                       ^^^^^^^^^^^^^^^^
+
+Warning (6335): "error" will be promoted to keyword in the future and will not be allowed as an identifier anymore.
+   --> test/parity/EntrypointCapabilitiesParity.t.sol:203:9:
+    |
+203 |         bytes4 error;
+    |         ^^^^^^^^^^^^
+
+Warning (6335): "at" will be promoted to keyword in the future and will not be allowed as an identifier anymore.
+  --> test/parity/ExecutionAutomationParity.t.sol:59:13:
+   |
+59 |             string memory at = string.concat(".steps[", fx.toString(i), "]");
+   |             ^^^^^^^^^^^^^^^^
+
+Warning (6335): "at" will be promoted to keyword in the future and will not be allowed as an identifier anymore.
+  --> test/parity/ExecutionAutomationParity.t.sol:88:22:
+   |
+88 |     function _policy(string memory at) private {
+   |                      ^^^^^^^^^^^^^^^^
+
+Warning (6335): "at" will be promoted to keyword in the future and will not be allowed as an identifier anymore.
+   --> test/parity/ExecutionAutomationParity.t.sol:104:19:
+    |
+104 |     function _key(string memory at) private {
+    |                   ^^^^^^^^^^^^^^^^
+
+Warning (6335): "at" will be promoted to keyword in the future and will not be allowed as an identifier anymore.
+   --> test/parity/ExecutionAutomationParity.t.sol:112:21:
+    |
+112 |     function _grant(string memory at) private {
+    |                     ^^^^^^^^^^^^^^^^
+
+Warning (6335): "at" will be promoted to keyword in the future and will not be allowed as an identifier anymore.
+   --> test/parity/ExecutionAutomationParity.t.sol:129:22:
+    |
+129 |     function _govern(string memory at, bytes memory data) private {
+    |                      ^^^^^^^^^^^^^^^^
+
+Warning (6335): "at" will be promoted to keyword in the future and will not be allowed as an identifier anymore.
+   --> test/parity/ExecutionAutomationParity.t.sol:138:23:
+    |
+138 |     function _execute(string memory at) private {
+    |                       ^^^^^^^^^^^^^^^^
+
+Warning (6335): "at" will be promoted to keyword in the future and will not be allowed as an identifier anymore.
+   --> test/parity/ExecutionAutomationParity.t.sol:162:21:
+    |
+162 |     function _state(string memory at) private view {
+    |                     ^^^^^^^^^^^^^^^^
+
+Warning (6335): "at" will be promoted to keyword in the future and will not be allowed as an identifier anymore.
+   --> test/parity/ExecutionAutomationParity.t.sol:175:26:
+    |
+175 |     function _capability(string memory at) private view returns (address target, bytes4 selector) {
+    |                          ^^^^^^^^^^^^^^^^
+
+Warning (6335): "at" will be promoted to keyword in the future and will not be allowed as an identifier anymore.
+   --> test/parity/ExecutionAutomationParity.t.sol:181:20:
+    |
+181 |     function _call(string memory at, uint256 value) private view returns (KeelManager.Call memory) {
+    |                    ^^^^^^^^^^^^^^^^
+
+Warning (6335): "at" will be promoted to keyword in the future and will not be allowed as an identifier anymore.
+   --> test/parity/ExecutionAutomationParity.t.sol:190:20:
+    |
+190 |     function _uint(string memory at, string memory key) private view returns (uint256) {
+    |                    ^^^^^^^^^^^^^^^^
+
+Warning (6335): "at" will be promoted to keyword in the future and will not be allowed as an identifier anymore.
+   --> test/parity/ExecutionAutomationParity.t.sol:195:23:
+    |
+195 |     function _failure(string memory at, uint256 expected, uint256 attached) private view returns (bytes memory) {
+    |                       ^^^^^^^^^^^^^^^^
+
+Warning (6335): "at" will be promoted to keyword in the future and will not be allowed as an identifier anymore.
+  --> test/parity/GovernanceValueCountersParity.t.sol:57:13:
+   |
+57 |             string memory at = string.concat(".steps[", fx.toString(i), "]");
+   |             ^^^^^^^^^^^^^^^^
+
+Warning (6335): "at" will be promoted to keyword in the future and will not be allowed as an identifier anymore.
+  --> test/parity/GovernanceValueCountersParity.t.sol:78:21:
+   |
+78 |     function _value(string memory at) private {
+   |                     ^^^^^^^^^^^^^^^^
+
+Warning (6335): "at" will be promoted to keyword in the future and will not be allowed as an identifier anymore.
+   --> test/parity/GovernanceValueCountersParity.t.sol:100:23:
+    |
+100 |     function _counter(string memory at) private {
+    |                       ^^^^^^^^^^^^^^^^
+
+Warning (6335): "at" will be promoted to keyword in the future and will not be allowed as an identifier anymore.
+   --> test/parity/GovernanceValueCountersParity.t.sol:262:27:
+    |
+262 |     function _expectNamed(string memory at) private view {
+    |                           ^^^^^^^^^^^^^^^^
+
+Warning (6335): "at" will be promoted to keyword in the future and will not be allowed as an identifier anymore.
+  --> test/parity/HarnessTreeParity.t.sol:56:13:
+   |
+56 |             string memory at = string.concat(".setup.leaves[", fx.toString(i), "]");
+   |             ^^^^^^^^^^^^^^^^
+
+Warning (6335): "at" will be promoted to keyword in the future and will not be allowed as an identifier anymore.
+  --> test/parity/HarnessTreeParity.t.sol:82:13:
+   |
+82 |             string memory at = string.concat(".steps[", fx.toString(i), "]");
+   |             ^^^^^^^^^^^^^^^^
+
+Warning (6335): "at" will be promoted to keyword in the future and will not be allowed as an identifier anymore.
+  --> test/parity/HarnessTreeParity.t.sol:88:19:
+   |
+88 |     function _run(string memory at) private {
+   |                   ^^^^^^^^^^^^^^^^
+
+Warning (6335): "at" will be promoted to keyword in the future and will not be allowed as an identifier anymore.
+   --> test/parity/HarnessTreeParity.t.sol:113:32:
+    |
+113 |     function _call(bytes32 op, string memory at) private view returns (bytes memory) {
+    |                                ^^^^^^^^^^^^^^^^
+
+Warning (6335): "at" will be promoted to keyword in the future and will not be allowed as an identifier anymore.
+   --> test/parity/HarnessTreeParity.t.sol:227:21:
+    |
+227 |     function _check(string memory at) private view {
+    |                     ^^^^^^^^^^^^^^^^
+
+Warning (6335): "at" will be promoted to keyword in the future and will not be allowed as an identifier anymore.
+   --> test/parity/HarnessTreeParity.t.sol:343:25:
+    |
+343 |     function _revisions(string memory at) private view returns (uint64[] memory revisions) {
+    |                         ^^^^^^^^^^^^^^^^
+
+Warning (6335): "at" will be promoted to keyword in the future and will not be allowed as an identifier anymore.
+   --> test/parity/HarnessTreeParity.t.sol:363:17:
+    |
+363 |     function _s(string memory at, string memory key) private view returns (string memory) {
+    |                 ^^^^^^^^^^^^^^^^
+
+Warning (6335): "at" will be promoted to keyword in the future and will not be allowed as an identifier anymore.
+   --> test/parity/HarnessTreeParity.t.sol:367:17:
+    |
+367 |     function _u(string memory at, string memory key) private view returns (uint256) {
+    |                 ^^^^^^^^^^^^^^^^
+
+Warning (6335): "at" will be promoted to keyword in the future and will not be allowed as an identifier anymore.
+   --> test/parity/LinkParity.t.sol:145:13:
+    |
+145 |             string memory at = string.concat(path, ".links[", fixtureVm.toString(j), "]");
+    |             ^^^^^^^^^^^^^^^^
+
+Warning (6335): "at" will be promoted to keyword in the future and will not be allowed as an identifier anymore.
+   --> test/parity/LinkParity.t.sol:160:20:
+    |
+160 |     function _uint(string memory at, string memory key) private view returns (uint8) {
+    |                    ^^^^^^^^^^^^^^^^
+
+Warning (6335): "at" will be promoted to keyword in the future and will not be allowed as an identifier anymore.
+  --> test/parity/ManagerRecoveryParity.t.sol:66:13:
+   |
+66 |             string memory at = string.concat(".steps[", fx.toString(i), "]");
+   |             ^^^^^^^^^^^^^^^^
+
+Warning (6335): "at" will be promoted to keyword in the future and will not be allowed as an identifier anymore.
+  --> test/parity/ManagerRecoveryParity.t.sol:88:21:
+   |
+88 |     function _setup(string memory at) private {
+   |                     ^^^^^^^^^^^^^^^^
+
+Warning (6335): "at" will be promoted to keyword in the future and will not be allowed as an identifier anymore.
+   --> test/parity/ManagerRecoveryParity.t.sol:116:23:
+    |
+116 |     function _regrant(string memory at) private {
+    |                       ^^^^^^^^^^^^^^^^
+
+Warning (6335): "at" will be promoted to keyword in the future and will not be allowed as an identifier anymore.
+   --> test/parity/ManagerRecoveryParity.t.sol:129:21:
+    |
+129 |     function _state(string memory at) private {
+    |                     ^^^^^^^^^^^^^^^^
+
+Warning (6335): "at" will be promoted to keyword in the future and will not be allowed as an identifier anymore.
+   --> test/parity/ManagerRecoveryParity.t.sol:141:20:
+    |
+141 |     function _role(string memory at) private {
+    |                    ^^^^^^^^^^^^^^^^
+
+Warning (6335): "at" will be promoted to keyword in the future and will not be allowed as an identifier anymore.
+   --> test/parity/ManagerRecoveryParity.t.sol:149:26:
+    |
+149 |     function _automation(string memory at) private {
+    |                          ^^^^^^^^^^^^^^^^
+
+Warning (6335): "at" will be promoted to keyword in the future and will not be allowed as an identifier anymore.
+   --> test/parity/ManagerRecoveryParity.t.sol:159:25:
+    |
+159 |     function _signature(string memory at) private view {
+    |                         ^^^^^^^^^^^^^^^^
+
+Warning (6335): "at" will be promoted to keyword in the future and will not be allowed as an identifier anymore.
+   --> test/parity/ManagerRecoveryParity.t.sol:164:24:
+    |
+164 |     function _keyState(string memory at) private view {
+    |                        ^^^^^^^^^^^^^^^^
+
+Warning (6335): "at" will be promoted to keyword in the future and will not be allowed as an identifier anymore.
+   --> test/parity/ManagerRecoveryParity.t.sol:169:21:
+    |
+169 |     function _pause(string memory at) private {
+    |                     ^^^^^^^^^^^^^^^^
+
+Warning (6335): "at" will be promoted to keyword in the future and will not be allowed as an identifier anymore.
+   --> test/parity/ManagerRecoveryParity.t.sol:177:23:
+    |
+177 |     function _unpause(string memory at) private {
+    |                       ^^^^^^^^^^^^^^^^
+
+Warning (6335): "at" will be promoted to keyword in the future and will not be allowed as an identifier anymore.
+   --> test/parity/ManagerRecoveryParity.t.sol:195:27:
+    |
+195 |     function _createGroup(string memory at) private {
+    |                           ^^^^^^^^^^^^^^^^
+
+Warning (6335): "at" will be promoted to keyword in the future and will not be allowed as an identifier anymore.
+   --> test/parity/ManagerRecoveryParity.t.sol:208:26:
+    |
+208 |     function _groupState(string memory at) private view {
+    |                          ^^^^^^^^^^^^^^^^
+
+Warning (6335): "at" will be promoted to keyword in the future and will not be allowed as an identifier anymore.
+   --> test/parity/ManagerRecoveryParity.t.sol:217:22:
+    |
+217 |     function _backup(string memory at) private {
+    |                      ^^^^^^^^^^^^^^^^
+
+Warning (6335): "at" will be promoted to keyword in the future and will not be allowed as an identifier anymore.
+   --> test/parity/ManagerRecoveryParity.t.sol:239:22:
+    |
+239 |     function _rotate(string memory at) private {
+    |                      ^^^^^^^^^^^^^^^^
+
+Warning (6335): "at" will be promoted to keyword in the future and will not be allowed as an identifier anymore.
+   --> test/parity/ManagerRecoveryParity.t.sol:252:23:
+    |
+252 |     function _recover(string memory at) private {
+    |                       ^^^^^^^^^^^^^^^^
+
+Warning (6335): "at" will be promoted to keyword in the future and will not be allowed as an identifier anymore.
+   --> test/parity/ManagerRecoveryParity.t.sol:314:25:
+    |
+314 |     function _approvals(string memory at, string memory key, bytes32 group, bytes32 actionHash, uint64 deadline)
+    |                         ^^^^^^^^^^^^^^^^
+
+Warning (6335): "at" will be promoted to keyword in the future and will not be allowed as an identifier anymore.
+   --> test/parity/ManagerRecoveryParity.t.sol:341:23:
+    |
+341 |     function _accepts(string memory at, string memory key, string memory when, address[] memory members, bytes32 digest)
+    |                       ^^^^^^^^^^^^^^^^
+
+Warning (6335): "at" will be promoted to keyword in the future and will not be allowed as an identifier anymore.
+   --> test/parity/ManagerRecoveryParity.t.sol:397:20:
+    |
+397 |     function _uint(string memory at, string memory key) private view returns (uint256) {
+    |                    ^^^^^^^^^^^^^^^^
+
+Warning (6335): "at" will be promoted to keyword in the future and will not be allowed as an identifier anymore.
+   --> test/parity/ManagerRecoveryParity.t.sol:401:23:
+    |
+401 |     function _bytes32(string memory at, string memory key) private view returns (bytes32) {
+    |                       ^^^^^^^^^^^^^^^^
+
+Warning (6335): "at" will be promoted to keyword in the future and will not be allowed as an identifier anymore.
+   --> test/parity/ManagerRecoveryParity.t.sol:405:20:
+    |
+405 |     function _name(string memory at, string memory key) private view returns (bytes32) {
+    |                    ^^^^^^^^^^^^^^^^
+
+Warning (6335): "at" will be promoted to keyword in the future and will not be allowed as an identifier anymore.
+   --> test/parity/ManagerRecoveryParity.t.sol:409:21:
+    |
+409 |     function _label(string memory at) private view returns (string memory) {
+    |                     ^^^^^^^^^^^^^^^^
+
+Warning (6335): "at" will be promoted to keyword in the future and will not be allowed as an identifier anymore.
+   --> test/parity/ManagerRecoveryParity.t.sol:413:22:
+    |
+413 |     function _expect(string memory at) private {
+    |                      ^^^^^^^^^^^^^^^^
+
+Warning (6335): "at" will be promoted to keyword in the future and will not be allowed as an identifier anymore.
+   --> test/parity/ManagerRecoveryParity.t.sol:419:21:
+    |
+419 |     function _error(string memory at) private view returns (bytes memory) {
+    |                     ^^^^^^^^^^^^^^^^
+
+Warning (6335): "at" will be promoted to keyword in the future and will not be allowed as an identifier anymore.
+  --> test/parity/MintTargetIdentityParity.t.sol:73:13:
+   |
+73 |             string memory at = string.concat(".cases[", fixtureVm.toString(i), "]");
+   |             ^^^^^^^^^^^^^^^^
+
+Warning (6335): "at" will be promoted to keyword in the future and will not be allowed as an identifier anymore.
+  --> test/parity/SystemPauseCollectionsParity.t.sol:54:13:
+   |
+54 |             string memory at = string.concat(".gates[", fx.toString(i), "]");
+   |             ^^^^^^^^^^^^^^^^
+
+Warning (6335): "at" will be promoted to keyword in the future and will not be allowed as an identifier anymore.
+  --> test/parity/SystemPauseCollectionsParity.t.sol:74:13:
+   |
+74 |             string memory at = string.concat(".delivery[", fx.toString(i), "]");
+   |             ^^^^^^^^^^^^^^^^
+
+Warning (6335): "at" will be promoted to keyword in the future and will not be allowed as an identifier anymore.
+  --> test/parity/SystemPauseModulesParity.t.sol:41:13:
+   |
+41 |             string memory at = string.concat(".gates[", fx.toString(i), "]");
+   |             ^^^^^^^^^^^^^^^^
+
+Warning (6335): "at" will be promoted to keyword in the future and will not be allowed as an identifier anymore.
+  --> test/parity/SystemPauseParity.t.sol:57:13:
+   |
+57 |             string memory at = string.concat(".steps[", fx.toString(i), "]");
+   |             ^^^^^^^^^^^^^^^^
+
+Warning (6335): "at" will be promoted to keyword in the future and will not be allowed as an identifier anymore.
+  --> test/parity/SystemPauseParity.t.sol:78:21:
+   |
+78 |     function _actor(string memory at) private view returns (bytes32) {
+   |                     ^^^^^^^^^^^^^^^^
+
+Warning (6335): "at" will be promoted to keyword in the future and will not be allowed as an identifier anymore.
+  --> test/parity/SystemPauseParity.t.sol:83:23:
+   |
+83 |     function _failure(string memory at) private view returns (bytes memory) {
+   |                       ^^^^^^^^^^^^^^^^
+
+Warning (6335): "at" will be promoted to keyword in the future and will not be allowed as an identifier anymore.
+   --> test/parity/SystemPauseParity.t.sol:107:21:
+    |
+107 |     function _pause(string memory at) private {
+    |                     ^^^^^^^^^^^^^^^^
+
+Warning (6335): "at" will be promoted to keyword in the future and will not be allowed as an identifier anymore.
+   --> test/parity/SystemPauseParity.t.sol:126:22:
+    |
+126 |     function _resume(string memory at) private {
+    |                      ^^^^^^^^^^^^^^^^
+
+Warning (6335): "at" will be promoted to keyword in the future and will not be allowed as an identifier anymore.
+   --> test/parity/SystemPauseParity.t.sol:144:21:
+    |
+144 |     function _forge(string memory at) private {
+    |                     ^^^^^^^^^^^^^^^^
+
+Warning (6335): "at" will be promoted to keyword in the future and will not be allowed as an identifier anymore.
+   --> test/parity/SystemPauseParity.t.sol:175:27:
+    |
+175 |     function _expectState(string memory at) private view {
+    |                           ^^^^^^^^^^^^^^^^
+
+Warning (6335): "at" will be promoted to keyword in the future and will not be allowed as an identifier anymore.
+   --> test/parity/TokenBoundAccountParity.t.sol:124:13:
+    |
+124 |             string memory at = string.concat(".steps[", fx.toString(i), "]");
+    |             ^^^^^^^^^^^^^^^^
+
+Warning (6335): "at" will be promoted to keyword in the future and will not be allowed as an identifier anymore.
+   --> test/parity/TokenBoundAccountParity.t.sol:148:22:
+    |
+148 |     function _create(string memory at) private {
+    |                      ^^^^^^^^^^^^^^^^
+
+Warning (6335): "at" will be promoted to keyword in the future and will not be allowed as an identifier anymore.
+   --> test/parity/TokenBoundAccountParity.t.sol:161:23:
+    |
+161 |     function _execute(string memory at) private {
+    |                       ^^^^^^^^^^^^^^^^
+
+Warning (6335): "at" will be promoted to keyword in the future and will not be allowed as an identifier anymore.
+   --> test/parity/TokenBoundAccountParity.t.sol:176:21:
+    |
+176 |     function _views(string memory at) private view {
+    |                     ^^^^^^^^^^^^^^^^
+
+Warning (6335): "at" will be promoted to keyword in the future and will not be allowed as an identifier anymore.
+   --> test/parity/TokenBoundAccountParity.t.sol:226:22:
+    |
+226 |     function _string(string memory at, string memory key) private view returns (string memory) {
+    |                      ^^^^^^^^^^^^^^^^
+
+Warning (6335): "at" will be promoted to keyword in the future and will not be allowed as an identifier anymore.
+   --> test/parity/TokenBoundAccountParity.t.sol:230:20:
+    |
+230 |     function _uint(string memory at, string memory key) private view returns (uint256) {
+    |                    ^^^^^^^^^^^^^^^^
+
+Warning (2519): This declaration shadows an existing declaration.
+   --> src/modules/keel-kernel/libraries/KeelTokenURIEnvelope.sol:106:18:
+    |
+106 |         returns (bool valid)
+    |                  ^^^^^^^^^^
+Note: The shadowed declaration is here:
+  --> src/modules/keel-kernel/libraries/KeelTokenURIEnvelope.sol:56:5:
+   |
+56 |     function valid(bytes memory encodedPrefix, bytes memory encodedSuffix) internal pure returns (bool) {
+   |     ^ (Relevant source part starts here and spans across multiple lines).
+
+Warning (8760): This declaration has the same name as another declaration.
+   --> src/modules/keel-die/KEEL721.sol:276:9:
+    |
+276 |         Presentation storage presentation = _tokenPresentations[tokenId];
+    |         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Note: The other declaration is here:
+   --> src/modules/keel-die/KEEL721.sol:476:5:
+    |
+476 |     function presentation(uint256 tokenId)
+    |     ^ (Relevant source part starts here and spans across multiple lines).
+
+Warning (8760): This declaration has the same name as another declaration.
+   --> src/modules/keel-hold/KeelHold.sol:600:9:
+    |
+600 |         address descriptorPointer = record.descriptorPointer;
+    |         ^^^^^^^^^^^^^^^^^^^^^^^^^
+Note: The other declaration is here:
+   --> src/modules/keel-hold/KeelHold.sol:529:5:
+    |
+529 |     function descriptorPointer(bytes32 objectId) external view returns (address pointer) {
+    |     ^ (Relevant source part starts here and spans across multiple lines).
+
+Warning (8760): This declaration has the same name as another declaration.
+   --> src/modules/keel-hold/KeelHold.sol:629:9:
+    |
+629 |         address descriptorPointer = record.descriptorPointer;
+    |         ^^^^^^^^^^^^^^^^^^^^^^^^^
+Note: The other declaration is here:
+   --> src/modules/keel-hold/KeelHold.sol:529:5:
+    |
+529 |     function descriptorPointer(bytes32 objectId) external view returns (address pointer) {
+    |     ^ (Relevant source part starts here and spans across multiple lines).
+
+Warning (8760): This declaration has the same name as another declaration.
+   --> src/modules/keel-hold/KeelHold.sol:657:9:
+    |
+657 |         address descriptorPointer = record.descriptorPointer;
+    |         ^^^^^^^^^^^^^^^^^^^^^^^^^
+Note: The other declaration is here:
+   --> src/modules/keel-hold/KeelHold.sol:529:5:
+    |
+529 |     function descriptorPointer(bytes32 objectId) external view returns (address pointer) {
+    |     ^ (Relevant source part starts here and spans across multiple lines).
+
+Warning (8760): This declaration has the same name as another declaration.
+   --> src/modules/keel-hold/KeelHold.sol:750:29:
+    |
+750 |     function _leafCarrierAt(address descriptorPointer, uint256 base, uint256 index)
+    |                             ^^^^^^^^^^^^^^^^^^^^^^^^^
+Note: The other declaration is here:
+   --> src/modules/keel-hold/KeelHold.sol:529:5:
+    |
+529 |     function descriptorPointer(bytes32 objectId) external view returns (address pointer) {
+    |     ^ (Relevant source part starts here and spans across multiple lines).
+
+Warning (8760): This declaration has the same name as another declaration.
+   --> src/modules/keel-hold/KeelHold.sol:762:24:
+    |
+762 |     function _partIdAt(address descriptorPointer, uint256 base, uint256 index) private view returns (bytes32 id) {
+    |                        ^^^^^^^^^^^^^^^^^^^^^^^^^
+Note: The other declaration is here:
+   --> src/modules/keel-hold/KeelHold.sol:529:5:
+    |
+529 |     function descriptorPointer(bytes32 objectId) external view returns (address pointer) {
+    |     ^ (Relevant source part starts here and spans across multiple lines).
+
+Warning (8760): This declaration has the same name as another declaration.
+   --> src/modules/keel-mint-access/KeelMintGate.sol:746:66:
+    |
+746 |         (uint256 unitPrice, address signer, bool platformSigned, bytes32 authorizationDigest) =
+    |                                                                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Note: The other declaration is here:
+   --> src/modules/keel-mint-access/KeelMintGate.sol:865:5:
+    |
+865 |     function authorizationDigest(MintAuthorization calldata authorization) external view returns (bytes32) {
+    |     ^ (Relevant source part starts here and spans across multiple lines).
+
+Warning (2519): This declaration shadows an existing declaration.
+  --> src/modules/keel-mint-access/KeelMintRewardEntropy.sol:91:13:
+   |
+91 |             KeelRewardClaims target = KeelRewardClaims(consumer);
+   |             ^^^^^^^^^^^^^^^^^^^^^^^
+Note: The shadowed declaration is here:
+  --> src/modules/keel-mint-access/KeelMintRewardEntropy.sol:96:9:
+   |
+96 |         KeelMintQueue target = KeelMintQueue(consumer);
+   |         ^^^^^^^^^^^^^^^^^^^^
+
+Warning (2519): This declaration shadows an existing declaration.
+  --> src/modules/keel-mint-access/KeelMintRewardEntropy.sol:93:17:
+   |
+93 |             (,, bool pending) = target.draws(localId);
+   |                 ^^^^^^^^^^^^
+Note: The shadowed declaration is here:
+  --> src/modules/keel-mint-access/KeelMintRewardEntropy.sol:98:14:
+   |
+98 |         (,,, bool pending, bool fulfilled,) = target.cohorts(localId);
+   |              ^^^^^^^^^^^^
+
+Warning (8760): This declaration has the same name as another declaration.
+   --> src/modules/keel-mint-access/KeelQueueReadAdapter.sol:101:46:
+    |
+101 |     function _counts() private view returns (uint8 readCount, uint8 gateCount, uint8 boundCount) {
+    |                                              ^^^^^^^^^^^^^^^
+Note: The other declaration is here:
+   --> src/modules/keel-mint-access/KeelQueueReadAdapter.sol:260:5:
+    |
+260 |     function readCount() external view returns (uint8 count) {
+    |     ^ (Relevant source part starts here and spans across multiple lines).
+
+Warning (8760): This declaration has the same name as another declaration.
+   --> src/modules/keel-mint-access/KeelQueueReadAdapter.sol:101:63:
+    |
+101 |     function _counts() private view returns (uint8 readCount, uint8 gateCount, uint8 boundCount) {
+    |                                                               ^^^^^^^^^^^^^^^
+Note: The other declaration is here:
+   --> src/modules/keel-mint-access/KeelQueueReadAdapter.sol:265:5:
+    |
+265 |     function gateCount() external view returns (uint8 count) {
+    |     ^ (Relevant source part starts here and spans across multiple lines).
+
+Warning (8760): This declaration has the same name as another declaration.
+   --> src/modules/keel-mint-access/KeelQueueReadAdapter.sol:101:80:
+    |
+101 |     function _counts() private view returns (uint8 readCount, uint8 gateCount, uint8 boundCount) {
+    |                                                                                ^^^^^^^^^^^^^^^^
+Note: The other declaration is here:
+   --> src/modules/keel-mint-access/KeelQueueReadAdapter.sol:270:5:
+    |
+270 |     function boundCount() external view returns (uint8 count) {
+    |     ^ (Relevant source part starts here and spans across multiple lines).
+
+Warning (8760): This declaration has the same name as another declaration.
+   --> src/modules/keel-mint-access/KeelQueueReadAdapter.sol:175:49:
+    |
+175 |     function _supply(uint256[16] memory values, uint256 boundCount) private view returns (uint256 value) {
+    |                                                 ^^^^^^^^^^^^^^^^^^
+Note: The other declaration is here:
+   --> src/modules/keel-mint-access/KeelQueueReadAdapter.sol:270:5:
+    |
+270 |     function boundCount() external view returns (uint8 count) {
+    |     ^ (Relevant source part starts here and spans across multiple lines).
+
+Warning (8760): This declaration has the same name as another declaration.
+   --> src/modules/keel-mint-access/KeelQueueReadAdapter.sol:277:9:
+    |
+277 |         uint256 readCount = uint8(_rules);
+    |         ^^^^^^^^^^^^^^^^^
+Note: The other declaration is here:
+   --> src/modules/keel-mint-access/KeelQueueReadAdapter.sol:260:5:
+    |
+260 |     function readCount() external view returns (uint8 count) {
+    |     ^ (Relevant source part starts here and spans across multiple lines).
+
+Warning (8760): This declaration has the same name as another declaration.
+   --> src/modules/keel-mint-access/KeelQueueReadAdapter.sol:284:12:
+    |
+284 |         (, uint8 gateCount,) = _counts();
+    |            ^^^^^^^^^^^^^^^
+Note: The other declaration is here:
+   --> src/modules/keel-mint-access/KeelQueueReadAdapter.sol:265:5:
+    |
+265 |     function gateCount() external view returns (uint8 count) {
+    |     ^ (Relevant source part starts here and spans across multiple lines).
+
+Warning (8760): This declaration has the same name as another declaration.
+   --> src/modules/keel-mint-access/KeelQueueReadAdapter.sol:292:13:
+    |
+292 |         (,, uint8 boundCount) = _counts();
+    |             ^^^^^^^^^^^^^^^^
+Note: The other declaration is here:
+   --> src/modules/keel-mint-access/KeelQueueReadAdapter.sol:270:5:
+    |
+270 |     function boundCount() external view returns (uint8 count) {
+    |     ^ (Relevant source part starts here and spans across multiple lines).
+
+Warning (8760): This declaration has the same name as another declaration.
+   --> src/modules/keel-mint-access/KeelQueueReadAdapter.sol:304:13:
+    |
+304 |         (,, uint8 boundCount) = _counts();
+    |             ^^^^^^^^^^^^^^^^
+Note: The other declaration is here:
+   --> src/modules/keel-mint-access/KeelQueueReadAdapter.sol:270:5:
+    |
+270 |     function boundCount() external view returns (uint8 count) {
+    |     ^ (Relevant source part starts here and spans across multiple lines).
+
+Warning (8760): This declaration has the same name as another declaration.
+   --> src/modules/keel-mint-access/KeelQueueReadAdapter.sol:317:12:
+    |
+317 |         (, uint8 gateCount, uint8 boundCount) = _counts();
+    |            ^^^^^^^^^^^^^^^
+Note: The other declaration is here:
+   --> src/modules/keel-mint-access/KeelQueueReadAdapter.sol:265:5:
+    |
+265 |     function gateCount() external view returns (uint8 count) {
+    |     ^ (Relevant source part starts here and spans across multiple lines).
+
+Warning (8760): This declaration has the same name as another declaration.
+   --> src/modules/keel-mint-access/KeelQueueReadAdapter.sol:317:29:
+    |
+317 |         (, uint8 gateCount, uint8 boundCount) = _counts();
+    |                             ^^^^^^^^^^^^^^^^
+Note: The other declaration is here:
+   --> src/modules/keel-mint-access/KeelQueueReadAdapter.sol:270:5:
+    |
+270 |     function boundCount() external view returns (uint8 count) {
+    |     ^ (Relevant source part starts here and spans across multiple lines).
+
+Warning (8760): This declaration has the same name as another declaration.
+  --> src/modules/keel-sleeve/KeelMetadataRelay.sol:84:22:
+   |
+84 |     function _digest(Watch storage watch) private view returns (bytes32 result) {
+   |                      ^^^^^^^^^^^^^^^^^^^
+Note: The other declaration is here:
+   --> src/modules/keel-sleeve/KeelMetadataRelay.sol:219:5:
+    |
+219 |     function watch(bytes32 id) external view returns (Watch memory) {
+    |     ^ (Relevant source part starts here and spans across multiple lines).
+
+Warning (8760): This declaration has the same name as another declaration.
+   --> src/modules/keel-sleeve/KeelMetadataRelay.sol:105:9:
+    |
+105 |         Watch storage watch = _watches[watchId];
+    |         ^^^^^^^^^^^^^^^^^^^
+Note: The other declaration is here:
+   --> src/modules/keel-sleeve/KeelMetadataRelay.sol:219:5:
+    |
+219 |     function watch(bytes32 id) external view returns (Watch memory) {
+    |     ^ (Relevant source part starts here and spans across multiple lines).
+
+Warning (8760): This declaration has the same name as another declaration.
+   --> src/modules/keel-sleeve/KeelMetadataRelay.sol:156:9:
+    |
+156 |         Watch storage watch = _watches[key];
+    |         ^^^^^^^^^^^^^^^^^^^
+Note: The other declaration is here:
+   --> src/modules/keel-sleeve/KeelMetadataRelay.sol:219:5:
+    |
+219 |     function watch(bytes32 id) external view returns (Watch memory) {
+    |     ^ (Relevant source part starts here and spans across multiple lines).
+
+Warning (8760): This declaration has the same name as another declaration.
+   --> test/fixtures/creator-mint-decoding/Keel721MintBefore.sol:280:9:
+    |
+280 |         Presentation storage presentation = _tokenPresentations[tokenId];
+    |         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Note: The other declaration is here:
+   --> test/fixtures/creator-mint-decoding/Keel721MintBefore.sol:450:5:
+    |
+450 |     function presentation(uint256 tokenId)
+    |     ^ (Relevant source part starts here and spans across multiple lines).
+
+Warning (8760): This declaration has the same name as another declaration.
+   --> test/fixtures/creator-routes/KeelMintRouteRegistryBefore.sol:120:9:
+    |
+120 |         MintRoute storage route = _route(routeId);
+    |         ^^^^^^^^^^^^^^^^^^^^^^^
+Note: The other declaration is here:
+   --> test/fixtures/creator-routes/KeelMintRouteRegistryBefore.sol:126:5:
+    |
+126 |     function route(uint256 routeId) external view returns (MintRoute memory) {
+    |     ^ (Relevant source part starts here and spans across multiple lines).
+
+Warning (8760): This declaration has the same name as another declaration.
+   --> test/fixtures/mint-frozen-ranges/KeelMintRouteRegistryBeforeFrozenRanges.sol:127:9:
+    |
+127 |         MintRoute storage route = _route(routeId);
+    |         ^^^^^^^^^^^^^^^^^^^^^^^
+Note: The other declaration is here:
+   --> test/fixtures/mint-frozen-ranges/KeelMintRouteRegistryBeforeFrozenRanges.sol:133:5:
+    |
+133 |     function route(uint256 routeId) external view returns (MintRoute memory) {
+    |     ^ (Relevant source part starts here and spans across multiple lines).
+
+Warning (8760): This declaration has the same name as another declaration.
+   --> test/gas/baseline/KeelHoldOptimizationBefore.sol:592:9:
+    |
+592 |         address descriptorPointer = record.descriptorPointer;
+    |         ^^^^^^^^^^^^^^^^^^^^^^^^^
+Note: The other declaration is here:
+   --> test/gas/baseline/KeelHoldOptimizationBefore.sol:521:5:
+    |
+521 |     function descriptorPointer(bytes32 objectId) external view returns (address pointer) {
+    |     ^ (Relevant source part starts here and spans across multiple lines).
+
+Warning (8760): This declaration has the same name as another declaration.
+   --> test/gas/baseline/KeelHoldOptimizationBefore.sol:616:9:
+    |
+616 |         address descriptorPointer = record.descriptorPointer;
+    |         ^^^^^^^^^^^^^^^^^^^^^^^^^
+Note: The other declaration is here:
+   --> test/gas/baseline/KeelHoldOptimizationBefore.sol:521:5:
+    |
+521 |     function descriptorPointer(bytes32 objectId) external view returns (address pointer) {
+    |     ^ (Relevant source part starts here and spans across multiple lines).
+
+Warning (8760): This declaration has the same name as another declaration.
+   --> test/gas/baseline/KeelHoldOptimizationBefore.sol:641:9:
+    |
+641 |         address descriptorPointer = record.descriptorPointer;
+    |         ^^^^^^^^^^^^^^^^^^^^^^^^^
+Note: The other declaration is here:
+   --> test/gas/baseline/KeelHoldOptimizationBefore.sol:521:5:
+    |
+521 |     function descriptorPointer(bytes32 objectId) external view returns (address pointer) {
+    |     ^ (Relevant source part starts here and spans across multiple lines).
+
+Warning (8760): This declaration has the same name as another declaration.
+   --> test/gas/baseline/KeelHoldOptimizationBefore.sol:720:29:
+    |
+720 |     function _leafCarrierAt(address descriptorPointer, uint256 base, uint256 index)
+    |                             ^^^^^^^^^^^^^^^^^^^^^^^^^
+Note: The other declaration is here:
+   --> test/gas/baseline/KeelHoldOptimizationBefore.sol:521:5:
+    |
+521 |     function descriptorPointer(bytes32 objectId) external view returns (address pointer) {
+    |     ^ (Relevant source part starts here and spans across multiple lines).
+
+Warning (8760): This declaration has the same name as another declaration.
+   --> test/gas/baseline/KeelHoldOptimizationBefore.sol:732:24:
+    |
+732 |     function _partIdAt(address descriptorPointer, uint256 base, uint256 index) private view returns (bytes32 id) {
+    |                        ^^^^^^^^^^^^^^^^^^^^^^^^^
+Note: The other declaration is here:
+   --> test/gas/baseline/KeelHoldOptimizationBefore.sol:521:5:
+    |
+521 |     function descriptorPointer(bytes32 objectId) external view returns (address pointer) {
+    |     ^ (Relevant source part starts here and spans across multiple lines).
+
+Warning (2519): This declaration shadows an existing declaration.
+  --> test/gas/baseline/RewardEntropyGuardBefore.sol:83:13:
+   |
+83 |             KeelRewardClaims target = KeelRewardClaims(consumer);
+   |             ^^^^^^^^^^^^^^^^^^^^^^^
+Note: The shadowed declaration is here:
+  --> test/gas/baseline/RewardEntropyGuardBefore.sol:88:9:
+   |
+88 |         KeelMintQueue target = KeelMintQueue(consumer);
+   |         ^^^^^^^^^^^^^^^^^^^^
+
+Warning (2519): This declaration shadows an existing declaration.
+  --> test/gas/baseline/RewardEntropyGuardBefore.sol:85:17:
+   |
+85 |             (,, bool pending) = target.draws(localId);
+   |                 ^^^^^^^^^^^^
+Note: The shadowed declaration is here:
+  --> test/gas/baseline/RewardEntropyGuardBefore.sol:90:14:
+   |
+90 |         (,,, bool pending, bool fulfilled,) = target.cohorts(localId);
+   |              ^^^^^^^^^^^^
+
+Warning (8760): This declaration has the same name as another declaration.
+  --> test/modules/keel-kernel/KeelMintSeededBatches.t.sol:24:51:
+   |
+24 |     function append(uint256 first, uint256 count, bytes32 seed, KeelMintSeededBatches.Mode mode) external {
+   |                                                   ^^^^^^^^^^^^
+Note: The other declaration is here:
+  --> test/modules/keel-kernel/KeelMintSeededBatches.t.sol:28:5:
+   |
+28 |     function seed(uint256 id) external view returns (bytes32) {
+   |     ^ (Relevant source part starts here and spans across multiple lines).
+
+Warning (2519): This declaration shadows an existing declaration.
+   --> test/modules/keel-mint-access/KeelLotteryEngineAudit.t.sol:127:14:
+    |
+127 |         for (uint64 id = 1; id <= 65; ++id) {
+    |              ^^^^^^^^^
+Note: The shadowed declaration is here:
+   --> test/modules/keel-mint-access/KeelLotteryEngineAudit.t.sol:139:28:
+    |
+139 |         (uint64 requestId, uint64 id, uint64 count,) = engine.pick(context(65, 65));
+    |                            ^^^^^^^^^
+
+Warning (2519): This declaration shadows an existing declaration.
+  --> test/modules/keel-sleeve/KeelTokenMatrix.t.sol:46:23:
+   |
+46 |     function rowBlock(bytes memory rows) private returns (bytes32) {
+   |                       ^^^^^^^^^^^^^^^^^
+Note: The shadowed declaration is here:
+  --> test/modules/keel-sleeve/KeelTokenMatrix.t.sol:53:5:
+   |
+53 |     function rows() private pure returns (bytes memory b) {
+   |     ^ (Relevant source part starts here and spans across multiple lines).
+
+Warning (3628): This contract has a payable fallback function, but no receive ether function. Consider adding a receive ether function.
+  --> src/modules/keel-artifacts/KeelManagerProxy.sol:46:1:
+   |
+46 | contract KeelManagerProxy is
+   | ^ (Relevant source part starts here and spans across multiple lines).
+Note: The payable fallback function is defined here.
+  --> node_modules/@openzeppelin/contracts/proxy/Proxy.sol:66:5:
+   |
+66 |     fallback() external payable virtual {
+   |     ^ (Relevant source part starts here and spans across multiple lines).
+
+Warning (3628): This contract has a payable fallback function, but no receive ether function. Consider adding a receive ether function.
+  --> src/modules/keel-managed-modules/KeelManagedModule.sol:49:1:
+   |
+49 | contract KeelManagedModule is IKeelManagedModuleErrors, IKeelManagedModuleEvents {
+   | ^ (Relevant source part starts here and spans across multiple lines).
+Note: The payable fallback function is defined here.
+   --> src/modules/keel-managed-modules/KeelManagedModule.sol:266:5:
+    |
+266 |     fallback() external payable {
+    |     ^ (Relevant source part starts here and spans across multiple lines).
+
+Warning (3628): This contract has a payable fallback function, but no receive ether function. Consider adding a receive ether function.
+  --> test/modules/keel-managed-modules/KeelManagedModule.t.sol:60:1:
+   |
+60 | contract BrokenManagedEntrypoints {
+   | ^ (Relevant source part starts here and spans across multiple lines).
+Note: The payable fallback function is defined here.
+  --> test/modules/keel-managed-modules/KeelManagedModule.t.sol:72:5:
+   |
+72 |     fallback() external payable {
+   |     ^ (Relevant source part starts here and spans across multiple lines).
+
+Warning (3628): This contract has a payable fallback function, but no receive ether function. Consider adding a receive ether function.
+  --> test/modules/keel-managed-modules/KeelManagedModule.t.sol:80:1:
+   |
+80 | contract SilentWrongManagedHold {
+   | ^ (Relevant source part starts here and spans across multiple lines).
+Note: The payable fallback function is defined here.
+   --> test/modules/keel-managed-modules/KeelManagedModule.t.sol:109:5:
+    |
+109 |     fallback() external payable {
+    |     ^ (Relevant source part starts here and spans across multiple lines).
+
+Warning (9170): Comparison of variables of contract type is deprecated and scheduled for removal. Use an explicit cast to address type and compare the addresses instead.
+   --> src/modules/keel-mint-access/KeelMintQueue.sol:531:52:
+    |
+531 |         if (address(accessPolicy) != address(0) && policy != accessPolicy) revert Invalid();
+    |                                                    ^^^^^^^^^^^^^^^^^^^^^^
+
+Warning (9302): Return value of low-level calls not used.
+  --> test/modules/keel-mint-access/KeelMintQueueLifecycle.t.sol:12:45:
+   |
+12 |             if(action==0){vm.prank(account);address(q).call(abi.encodeCall(q.join,(uint32(1+(seed>>16)%5))));}
+   |                                             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Warning (9302): Return value of low-level calls not used.
+  --> test/modules/keel-mint-access/KeelMintQueueLifecycle.t.sol:14:45:
+   |
+14 |             if(action==2){vm.prank(account);address(q).call(abi.encodeCall(q.cancel,()));}
+   |                                             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Warning (5740): Unreachable code.
+   --> src/modules/keel-die/KEEL721.sol:217:9:
+    |
+217 |         KeelPause.requireActive(_pauseAuthority, KeelPause.VIEWERS);
+    |         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Warning (5740): Unreachable code.
+   --> src/modules/keel-die/KEEL721.sol:218:9:
+    |
+218 |         if (defaultPresentationFrozen) revert PresentationFrozen();
+    |         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Warning (5740): Unreachable code.
+   --> src/modules/keel-die/KEEL721.sol:219:9:
+    |
+219 |         _validatePresentation(manifestURI, manifestDigest);
+    |         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Warning (5740): Unreachable code.
+   --> src/modules/keel-die/KEEL721.sol:220:9:
+    |
+220 |         if (onchainHarnessBuilder != address(0) && bytes(harnessBaseURI_).length != 0) revert InvalidPresentation();
+    |         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Warning (5740): Unreachable code.
+   --> src/modules/keel-die/KEEL721.sol:221:9:
+    |
+221 |         _defaultPresentation = Presentation({
+    |         ^ (Relevant source part starts here and spans across multiple lines).
+
+Warning (5740): Unreachable code.
+   --> src/modules/keel-die/KEEL721.sol:245:9:
+    |
+245 |         KeelPause.requireActive(_pauseAuthority, KeelPause.VIEWERS);
+    |         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Warning (5740): Unreachable code.
+   --> src/modules/keel-die/KEEL721.sol:246:9:
+    |
+246 |         address owner = ownerOf(tokenId);
+    |         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Warning (5740): Unreachable code.
+   --> src/modules/keel-die/KEEL721.sol:247:9:
+    |
+247 |         Presentation storage existing = _tokenPresentations[tokenId];
+    |         ^ (Relevant source part starts here and spans across multiple lines).
+
+Warning (5740): Unreachable code.
+   --> src/modules/keel-die/KEEL721.sol:249:9:
+    |
+249 |         if (!hasRole(PRESENTATION_ROLE, msg.sender) && !(tokenOwnerCanEdit && owner == msg.sender)) {
+    |         ^ (Relevant source part starts here and spans across multiple lines).
+
+Warning (5740): Unreachable code.
+   --> src/modules/keel-die/KEEL721.sol:252:9:
+    |
+252 |         _validatePresentation(manifestURI, manifestDigest);
+    |         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Warning (5740): Unreachable code.
+   --> src/modules/keel-die/KEEL721.sol:253:9:
+    |
+253 |         _tokenPresentations[tokenId] = Presentation({
+    |         ^ (Relevant source part starts here and spans across multiple lines).
+
+Warning (5740): Unreachable code.
+   --> src/modules/keel-die/KEEL721.sol:295:9:
+    |
+295 |         if (!_defaultPresentationAvailable()) revert InvalidPresentation();
+    |         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Warning (5740): Unreachable code.
+   --> src/modules/keel-die/KEEL721.sol:296:9:
+    |
+296 |         defaultPresentationFrozen = true;
+    |         ^ (Relevant source part starts here and spans across multiple lines).
+
+Warning (5740): Unreachable code.
+   --> src/modules/keel-die/KEEL721.sol:304:9:
+    |
+304 |         if (defaultPresentationFrozen) revert PresentationFrozen();
+    |         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Warning (5740): Unreachable code.
+   --> src/modules/keel-die/KEEL721.sol:305:9:
+    |
+305 |         if (builder.code.length == 0 || objectId == bytes32(0) || digest == bytes32(0)) {
+    |         ^ (Relevant source part starts here and spans across multiple lines).
+
+Warning (5740): Unreachable code.
+   --> src/modules/keel-die/KEEL721.sol:308:9:
+    |
+308 |         delete _preparedTokenURIPrefix;
+    |         ^ (Relevant source part starts here and spans across multiple lines).
+
+Warning (5740): Unreachable code.
+   --> src/modules/keel-die/KEEL721.sol:322:9:
+    |
+322 |         if (defaultPresentationFrozen) revert PresentationFrozen();
+    |         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Warning (5740): Unreachable code.
+   --> src/modules/keel-die/KEEL721.sol:323:9:
+    |
+323 |         if (
+    |         ^ (Relevant source part starts here and spans across multiple lines).
+
+Warning (5740): Unreachable code.
+   --> src/modules/keel-die/KEEL721.sol:327:9:
+    |
+327 |         delete _preparedTokenURIPrefix;
+    |         ^ (Relevant source part starts here and spans across multiple lines).
+
+Warning (5740): Unreachable code.
+   --> src/modules/keel-die/KEEL721.sol:345:9:
+    |
+345 |         if (defaultPresentationFrozen) revert PresentationFrozen();
+    |         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Warning (5740): Unreachable code.
+   --> src/modules/keel-die/KEEL721.sol:346:9:
+    |
+346 |         if (
+    |         ^ (Relevant source part starts here and spans across multiple lines).
+
+Warning (5740): Unreachable code.
+   --> src/modules/keel-die/KEEL721.sol:351:9:
+    |
+351 |         _preparedTokenURIPrefix = encodedPrefix;
+    |         ^ (Relevant source part starts here and spans across multiple lines).
+
+Warning (5667): Unused function parameter. Remove or comment out the variable name to silence this warning.
+   --> src/modules/keel-artifacts/KeelManager.sol:976:35:
+    |
+976 |     function configureRpcHostList(string[] calldata hosts, uint64 expectedRevision) external onlySelf {
+    |                                   ^^^^^^^^^^^^^^^^^^^^^^^
+
+Warning (5667): Unused function parameter. Remove or comment out the variable name to silence this warning.
+   --> src/modules/keel-artifacts/KeelManager.sol:976:60:
+    |
+976 |     function configureRpcHostList(string[] calldata hosts, uint64 expectedRevision) external onlySelf {
+    |                                                            ^^^^^^^^^^^^^^^^^^^^^^^
+
+Warning (5667): Unused function parameter. Remove or comment out the variable name to silence this warning.
+   --> src/modules/keel-mint-access/KeelMintQueue.sol:705:9:
+    |
+705 |         uint32 policy,
+    |         ^^^^^^^^^^^^^
+
+Warning (5667): Unused function parameter. Remove or comment out the variable name to silence this warning.
+   --> src/modules/keel-mint-access/KeelMintQueue.sol:706:9:
+    |
+706 |         uint256 tokenId,
+    |         ^^^^^^^^^^^^^^^
+
+Warning (5667): Unused function parameter. Remove or comment out the variable name to silence this warning.
+   --> src/modules/keel-mint-access/KeelMintQueue.sol:707:9:
+    |
+707 |         uint16 weight,
+    |         ^^^^^^^^^^^^^
+
+Warning (5667): Unused function parameter. Remove or comment out the variable name to silence this warning.
+   --> src/modules/keel-mint-access/OneMintController.sol:269:26:
+    |
+269 |     function adminStrike(bytes32 dropId, uint16 stageIndex, address recipient, uint32 quantity, bytes calldata mintData)
+    |                          ^^^^^^^^^^^^^^
+
+Warning (5667): Unused function parameter. Remove or comment out the variable name to silence this warning.
+   --> src/modules/keel-mint-access/OneMintController.sol:269:42:
+    |
+269 |     function adminStrike(bytes32 dropId, uint16 stageIndex, address recipient, uint32 quantity, bytes calldata mintData)
+    |                                          ^^^^^^^^^^^^^^^^^
+
+Warning (5667): Unused function parameter. Remove or comment out the variable name to silence this warning.
+   --> src/modules/keel-mint-access/OneMintController.sol:269:61:
+    |
+269 |     function adminStrike(bytes32 dropId, uint16 stageIndex, address recipient, uint32 quantity, bytes calldata mintData)
+    |                                                             ^^^^^^^^^^^^^^^^^
+
+Warning (5667): Unused function parameter. Remove or comment out the variable name to silence this warning.
+   --> src/modules/keel-mint-access/OneMintController.sol:269:80:
+    |
+269 |     function adminStrike(bytes32 dropId, uint16 stageIndex, address recipient, uint32 quantity, bytes calldata mintData)
+    |                                                                                ^^^^^^^^^^^^^^^
+
+Warning (5667): Unused function parameter. Remove or comment out the variable name to silence this warning.
+   --> src/modules/keel-mint-access/OneMintController.sol:269:97:
+    |
+269 |     function adminStrike(bytes32 dropId, uint16 stageIndex, address recipient, uint32 quantity, bytes calldata mintData)
+    |                                                                                                 ^^^^^^^^^^^^^^^^^^^^^^^
+
+Warning (5667): Unused function parameter. Remove or comment out the variable name to silence this warning.
+   --> src/modules/keel-mint-access/OneMintController.sol:355:25:
+    |
+355 |     function publicMint(bytes32 dropId, uint16 stageIndex, uint32 quantity, bytes calldata mintData)
+    |                         ^^^^^^^^^^^^^^
+
+Warning (5667): Unused function parameter. Remove or comment out the variable name to silence this warning.
+   --> src/modules/keel-mint-access/OneMintController.sol:355:41:
+    |
+355 |     function publicMint(bytes32 dropId, uint16 stageIndex, uint32 quantity, bytes calldata mintData)
+    |                                         ^^^^^^^^^^^^^^^^^
+
+Warning (5667): Unused function parameter. Remove or comment out the variable name to silence this warning.
+   --> src/modules/keel-mint-access/OneMintController.sol:355:60:
+    |
+355 |     function publicMint(bytes32 dropId, uint16 stageIndex, uint32 quantity, bytes calldata mintData)
+    |                                                            ^^^^^^^^^^^^^^^
+
+Warning (5667): Unused function parameter. Remove or comment out the variable name to silence this warning.
+   --> src/modules/keel-mint-access/OneMintController.sol:355:77:
+    |
+355 |     function publicMint(bytes32 dropId, uint16 stageIndex, uint32 quantity, bytes calldata mintData)
+    |                                                                             ^^^^^^^^^^^^^^^^^^^^^^^
+
+Warning (5667): Unused function parameter. Remove or comment out the variable name to silence this warning.
+   --> src/modules/keel-mint-access/OneMintController.sol:363:28:
+    |
+363 |     function allowlistMint(Authorization calldata authorization, bytes calldata signature, bytes calldata mintData)
+    |                            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Warning (5667): Unused function parameter. Remove or comment out the variable name to silence this warning.
+   --> src/modules/keel-mint-access/OneMintController.sol:363:66:
+    |
+363 |     function allowlistMint(Authorization calldata authorization, bytes calldata signature, bytes calldata mintData)
+    |                                                                  ^^^^^^^^^^^^^^^^^^^^^^^^
+
+Warning (5667): Unused function parameter. Remove or comment out the variable name to silence this warning.
+   --> src/modules/keel-mint-access/OneMintController.sol:363:92:
+    |
+363 |     function allowlistMint(Authorization calldata authorization, bytes calldata signature, bytes calldata mintData)
+    |                                                                                            ^^^^^^^^^^^^^^^^^^^^^^^
+
+Warning (5667): Unused function parameter. Remove or comment out the variable name to silence this warning.
+   --> src/modules/keel-mint-access/OneMintController.sol:376:9:
+    |
+376 |         bytes32 dropId,
+    |         ^^^^^^^^^^^^^^
+
+Warning (5667): Unused function parameter. Remove or comment out the variable name to silence this warning.
+   --> src/modules/keel-mint-access/OneMintController.sol:377:9:
+    |
+377 |         uint16 stageIndex,
+    |         ^^^^^^^^^^^^^^^^^
+
+Warning (5667): Unused function parameter. Remove or comment out the variable name to silence this warning.
+   --> src/modules/keel-mint-access/OneMintController.sol:378:9:
+    |
+378 |         uint32 quantity,
+    |         ^^^^^^^^^^^^^^^
+
+Warning (5667): Unused function parameter. Remove or comment out the variable name to silence this warning.
+   --> src/modules/keel-mint-access/OneMintController.sol:379:9:
+    |
+379 |         uint32 allowance,
+    |         ^^^^^^^^^^^^^^^^
+
+Warning (5667): Unused function parameter. Remove or comment out the variable name to silence this warning.
+   --> src/modules/keel-mint-access/OneMintController.sol:380:9:
+    |
+380 |         bytes32[] calldata merkleProof,
+    |         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Warning (5667): Unused function parameter. Remove or comment out the variable name to silence this warning.
+   --> src/modules/keel-mint-access/OneMintController.sol:381:9:
+    |
+381 |         bytes calldata mintData
+    |         ^^^^^^^^^^^^^^^^^^^^^^^
+
+Warning (5667): Unused function parameter. Remove or comment out the variable name to silence this warning.
+   --> src/modules/keel-mint-access/OneMintController.sol:387:9:
+    |
+387 |         Authorization calldata authorization,
+    |         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Warning (5667): Unused function parameter. Remove or comment out the variable name to silence this warning.
+   --> src/modules/keel-mint-access/OneMintController.sol:388:9:
+    |
+388 |         bytes calldata signature,
+    |         ^^^^^^^^^^^^^^^^^^^^^^^^
+
+Warning (5667): Unused function parameter. Remove or comment out the variable name to silence this warning.
+   --> src/modules/keel-mint-access/OneMintController.sol:389:9:
+    |
+389 |         uint256[] calldata entitlementIds,
+    |         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Warning (5667): Unused function parameter. Remove or comment out the variable name to silence this warning.
+   --> src/modules/keel-mint-access/OneMintController.sol:390:9:
+    |
+390 |         bytes calldata mintData
+    |         ^^^^^^^^^^^^^^^^^^^^^^^
+
+Warning (5667): Unused function parameter. Remove or comment out the variable name to silence this warning.
+   --> src/modules/keel-mint-access/OneMintController.sol:498:24:
+    |
+498 |     function batchMint(address paymentAsset, uint256 maxTotal, Purchase[] calldata purchases)
+    |                        ^^^^^^^^^^^^^^^^^^^^
+
+Warning (5667): Unused function parameter. Remove or comment out the variable name to silence this warning.
+   --> src/modules/keel-mint-access/OneMintController.sol:498:46:
+    |
+498 |     function batchMint(address paymentAsset, uint256 maxTotal, Purchase[] calldata purchases)
+    |                                              ^^^^^^^^^^^^^^^^
+
+Warning (5667): Unused function parameter. Remove or comment out the variable name to silence this warning.
+   --> src/modules/keel-mint-access/OneMintController.sol:498:64:
+    |
+498 |     function batchMint(address paymentAsset, uint256 maxTotal, Purchase[] calldata purchases)
+    |                                                                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Warning (5667): Unused function parameter. Remove or comment out the variable name to silence this warning.
+   --> src/modules/keel-mint-access/OneMintController.sol:507:29:
+    |
+507 |     function mintWithCoupon(Purchase calldata purchase, CouponRedemption calldata coupon, uint256 maxTotal)
+    |                             ^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Warning (5667): Unused function parameter. Remove or comment out the variable name to silence this warning.
+   --> src/modules/keel-mint-access/OneMintController.sol:507:57:
+    |
+507 |     function mintWithCoupon(Purchase calldata purchase, CouponRedemption calldata coupon, uint256 maxTotal)
+    |                                                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Warning (5667): Unused function parameter. Remove or comment out the variable name to silence this warning.
+   --> src/modules/keel-mint-access/OneMintController.sol:507:91:
+    |
+507 |     function mintWithCoupon(Purchase calldata purchase, CouponRedemption calldata coupon, uint256 maxTotal)
+    |                                                                                           ^^^^^^^^^^^^^^^^
+
+Warning (5667): Unused function parameter. Remove or comment out the variable name to silence this warning.
+   --> src/modules/keel-mint-access/OneMintController.sol:516:9:
+    |
+516 |         Purchase calldata purchase,
+    |         ^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Warning (5667): Unused function parameter. Remove or comment out the variable name to silence this warning.
+   --> src/modules/keel-mint-access/OneMintController.sol:517:9:
+    |
+517 |         CouponRedemption calldata coupon,
+    |         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Warning (5667): Unused function parameter. Remove or comment out the variable name to silence this warning.
+   --> src/modules/keel-mint-access/OneMintController.sol:518:9:
+    |
+518 |         NftCouponProof calldata proof,
+    |         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Warning (5667): Unused function parameter. Remove or comment out the variable name to silence this warning.
+   --> src/modules/keel-mint-access/OneMintController.sol:519:9:
+    |
+519 |         uint256 maxTotal
+    |         ^^^^^^^^^^^^^^^^
+
+Warning (5667): Unused function parameter. Remove or comment out the variable name to silence this warning.
+   --> src/modules/keel-mint-access/OneMintController.sol:525:9:
+    |
+525 |         address paymentAsset,
+    |         ^^^^^^^^^^^^^^^^^^^^
+
+Warning (5667): Unused function parameter. Remove or comment out the variable name to silence this warning.
+   --> src/modules/keel-mint-access/OneMintController.sol:526:9:
+    |
+526 |         uint256 maxTotal,
+    |         ^^^^^^^^^^^^^^^^
+
+Warning (5667): Unused function parameter. Remove or comment out the variable name to silence this warning.
+   --> src/modules/keel-mint-access/OneMintController.sol:527:9:
+    |
+527 |         Purchase[] calldata purchases,
+    |         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Warning (5667): Unused function parameter. Remove or comment out the variable name to silence this warning.
+   --> src/modules/keel-mint-access/OneMintController.sol:528:9:
+    |
+528 |         CouponRedemption[] calldata redemptions,
+    |         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Warning (5667): Unused function parameter. Remove or comment out the variable name to silence this warning.
+   --> src/modules/keel-mint-access/OneMintController.sol:529:9:
+    |
+529 |         NftCouponProof[] calldata proofs
+    |         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Warning (5667): Unused function parameter. Remove or comment out the variable name to silence this warning.
+   --> src/modules/keel-mint-access/OneMintController.sol:535:9:
+    |
+535 |         address paymentAsset,
+    |         ^^^^^^^^^^^^^^^^^^^^
+
+Warning (5667): Unused function parameter. Remove or comment out the variable name to silence this warning.
+   --> src/modules/keel-mint-access/OneMintController.sol:536:9:
+    |
+536 |         uint256 maxTotal,
+    |         ^^^^^^^^^^^^^^^^
+
+Warning (5667): Unused function parameter. Remove or comment out the variable name to silence this warning.
+   --> src/modules/keel-mint-access/OneMintController.sol:537:9:
+    |
+537 |         Purchase[] calldata purchases,
+    |         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Warning (5667): Unused function parameter. Remove or comment out the variable name to silence this warning.
+   --> src/modules/keel-mint-access/OneMintController.sol:538:9:
+    |
+538 |         CouponRedemption[] calldata redemptions
+    |         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Warning (2072): Unused local variable.
+   --> test/modules/keel-anchors/KeelZkAnchorVerifier.t.sol:607:9:
+    |
+607 |         Sp1GatewayMock gateway = new Sp1GatewayMock();
+    |         ^^^^^^^^^^^^^^^^^^^^^^
+
+Warning (2072): Unused local variable.
+   --> test/modules/keel-mint-access/OneMintQueueIntegration.t.sol:233:9:
+    |
+233 |         uint64 ticketId = queue.ticketOf(address(recipient));
+    |         ^^^^^^^^^^^^^^^
+
+Warning (2018): Function state mutability can be restricted to view
+  --> test/modules/keel-artifacts/KeelTestOwnerManager.t.sol:93:5:
+   |
+93 |     function testOwnerProfileAllowsOneOnAnvil() public {
+   |     ^ (Relevant source part starts here and spans across multiple lines).
+
+Warning (2018): Function state mutability can be restricted to pure
+  --> test/modules/keel-die/Keel721MetadataFormatting.t.sol:14:5:
+   |
+14 |     function testFuzzFormattingPreservesOriginalBytes(string memory value, uint256 id, bytes32 digest) public view {
+   |     ^ (Relevant source part starts here and spans across multiple lines).
+
+Warning (2018): Function state mutability can be restricted to view
+  --> test/modules/keel-die/KeelShared1155Optimization.t.sol:84:5:
+   |
+84 |     function recordCreatorTransfer(uint128 id, address previous, address next) external {
+   |     ^ (Relevant source part starts here and spans across multiple lines).
+
+Warning (2018): Function state mutability can be restricted to view
+   --> test/modules/keel-die/RegisteredRevisionConsumer.t.sol:137:5:
+    |
+137 |     function testCanonicalCollectorMetadataAndTwoPercentBoundaries() public {
+    |     ^ (Relevant source part starts here and spans across multiple lines).
+
+Warning (2018): Function state mutability can be restricted to view
+  --> test/modules/keel-harness/KeelPreparedTableGas.t.sol:69:5:
+   |
+69 |     function rejectedSame(bytes memory input) private {
+   |     ^ (Relevant source part starts here and spans across multiple lines).
+
+Warning (2018): Function state mutability can be restricted to view
+   --> test/modules/keel-harness/KeelPreparedTableGas.t.sol:120:5:
+    |
+120 |     function testFuzzCanonicalTablesRoundTrip(uint8 requested) public {
+    |     ^ (Relevant source part starts here and spans across multiple lines).
+
+Warning (2018): Function state mutability can be restricted to view
+   --> test/modules/keel-harness/ProtectedHarness.t.sol:148:5:
+    |
+148 |     function test_AnArtifactCannotPassItselfOffAsTheVerifier() public {
+    |     ^ (Relevant source part starts here and spans across multiple lines).
+
+Warning (2018): Function state mutability can be restricted to view
+  --> test/modules/keel-kernel/JsonEscape.t.sol:65:5:
+   |
+65 |     function testARealSizedDataURIIsCheapToEscape() public {
+   |     ^ (Relevant source part starts here and spans across multiple lines).
+
+Warning (2018): Function state mutability can be restricted to view
+  --> test/modules/keel-kernel/JsonEscape.t.sol:82:5:
+   |
+82 |     function testReportEscapeGas() public {
+   |     ^ (Relevant source part starts here and spans across multiple lines).
+
+Warning (2018): Function state mutability can be restricted to pure
+  --> test/modules/keel-mint-access/KeelMintQueueAssemblyRegression.t.sol:42:5:
+   |
+42 |     function _policy(KeelQueueAccess.Gate gate, bool skip) internal view returns (KeelQueueAccess.Policy memory p) {
+   |     ^ (Relevant source part starts here and spans across multiple lines).
+
+Warning (4591): There are more than 256 warnings. Ignoring the rest.
+
+Ran 7 tests for test/modules/keel-codecs/Bls12381.t.sol:Bls12381Test
+[PASS] testExpandMessageXmdMatchesRfc9380() (gas: 9059)
+[PASS] testHashToFieldMatchesReference() (gas: 81481)
+[PASS] testHashToG2MatchesReference() (gas: 131435)
+[PASS] testRejectsADifferentPublicKey() (gas: 1040432717)
+[PASS] testRejectsATamperedSignature() (gas: 1040432714)
+[PASS] testRejectsAWrongMessage() (gas: 319005)
+[PASS] testVerifiesARealSignature() (gas: 319013)
+Suite result: ok. 7 passed; 0 failed; 0 skipped; finished in 10.09ms (5.91ms CPU time)
+
+Ran 7 tests for test/modules/keel-mint-access/KeelMintQueueAssemblyRegression.t.sol:KeelMintQueueAssemblyRegressionTest
+[PASS] testAssemblyForwardsEip712SignatureAndRejectsReplayForOtherWallet() (gas: 165707)
+[PASS] testAssemblyForwardsLiveNftActivationAndRevocation() (gas: 333685)
+[PASS] testAssemblyForwardsMerkleProofAndRejectsOtherWallet() (gas: 154453)
+[PASS] testAssemblyForwardsWalletActivationAndBindsCaller() (gas: 162341)
+[PASS] testAssemblyRejectsMalformedAndTruncatedDynamicArgumentsWithoutCredential() (gas: 128045)
+[PASS] testAssemblyRejectsTruncatedDynamicArgumentsWithoutCredential() (gas: 93636)
+[PASS] testEmptyResetCancelAndRefillPreserveMonotonicIds() (gas: 267521)
+Suite result: ok. 7 passed; 0 failed; 0 skipped; finished in 13.42ms (7.00ms CPU time)
+
+Ran 2 tests for test/modules/keel-hold/KEEL721TokenURIGas.t.sol:KEEL721TokenURIGasTest
+[PASS] testReadingATokenWithALargePresentationStaysWellUnderTheCap() (gas: 60485078)
+[PASS] testReportTokenURIGas() (gas: 60485052)
+Suite result: ok. 2 passed; 0 failed; 0 skipped; finished in 63.19ms (62.74ms CPU time)
+
+Ran 11 tests for test/modules/keel-mint-access/KeelMintQueueDemand.t.sol:KeelMintQueueDemandTest
+[PASS] testDemandConfigIsGlobalAcrossCustomersAndManualModeStaysOpen() (gas: 18965194)
+[PASS] testDemandCurveUsesWaveCapacityAndRecomputesOnRefill() (gas: 26666364)
+[PASS] testDemandWarmupChangesOnlyWhileInactiveAndBecomesQueuePeriod() (gas: 8862230)
+[PASS] testDrainedWaveStaysOpenWhileEntriesArriveThenCoolsByTheClock() (gas: 9929182)
+[PASS] testFixedDemandBoundaryCrossesThenRequiresQueue() (gas: 9723409)
+[PASS] testOnlyControllerCanCallAfterMintAndOnlyOwnerConfiguresDemand() (gas: 8725998)
+[PASS] testQuietSecondsDrainDemandAndKeepMintOpen() (gas: 9046695)
+[PASS] testRejectedMintRollsBackDemandAndSupplyBeforeRetry() (gas: 9218223)
+[PASS] testSlowEntriesStretchTheQuietToFourGapsCappedAtFourWindows() (gas: 9646171)
+[PASS] testSoldOutResetsWaitingAndReadyTicketsAndRefillStartsOpen() (gas: 9313840)
+[PASS] testTenThousandMintsAcrossSlowAndBurstProfiles() (gas: 158116447)
+Suite result: ok. 11 passed; 0 failed; 0 skipped; finished in 128.64ms (128.23ms CPU time)
+
+Ran 3 tests for test/modules/keel-die/Keel721MetadataFormatting.t.sol:Keel721MetadataFormattingTest
+[PASS] testFuzzDefaultContextRetainsCollectionIdentity(uint256,bytes32) (runs: 1000, μ: 84350, ~: 82770)
+[PASS] testFuzzFormattingPreservesOriginalBytes(string,uint256,bytes32) (runs: 1000, μ: 166953, ~: 62524)
+[PASS] testHarnessSeparatorsPreserveBytes() (gas: 69142)
+Suite result: ok. 3 passed; 0 failed; 0 skipped; finished in 465.82ms (465.72ms CPU time)
+
+Ran 10 tests for test/modules/keel-die/Keel721MintDecoding.t.sol:Keel721MintDecodingTest
+[PASS] testAliasedCalldataOffsetsStillProduceIndependentHookSlices() (gas: 393076)
+[PASS] testEmptyBatchDataAndStorageWordBoundaries() (gas: 1496712)
+[PASS] testFinalRepresentableRangeAndOverflowMatch() (gas: 281111)
+[PASS] testFuzzBatchHooksEventsAndReservationsMatch(uint8,uint8) (runs: 1000, μ: 1351172, ~: 1142271)
+[PASS] testFuzzMalformedBatchRevertsMatch(bytes) (runs: 1000, μ: 73625, ~: 71177)
+[PASS] testFuzzSingleRawPayloadMatches(bytes) (runs: 1000, μ: 239593, ~: 238990)
+[PASS] testPrivilegedReceiverReentryUsesANewRange() (gas: 626156)
+[PASS] testReceiverRejectionRollsBackHooksSupplyAndReservations() (gas: 377427)
+[PASS] testReceiverSeesHookAndReservedRange() (gas: 462410)
+[PASS] testTruncatedWrongDomainAndWrongCountMatch() (gas: 300705)
+Suite result: ok. 10 passed; 0 failed; 0 skipped; finished in 950.97ms (950.38ms CPU time)
+
+Ran 11 tests for test/modules/keel-die/Keel721Presentation.t.sol:Keel721PresentationTest
+[PASS] testFreezePinsInheritedImageAndURIRoute() (gas: 749181)
+[PASS] testFrozenKeelRouteDoesNotInheritFutureDefault() (gas: 556213)
+[PASS] testFuzzTemplateUsesWholeDecimalTokenId(uint256) (runs: 1000, μ: 117974, ~: 116154)
+[PASS] testHolderCannotEditOrFreezeUntilTheCreatorOptsIn() (gas: 5472578)
+[PASS] testImageBytesComeFromHoldIncludingAbove32K() (gas: 45408827)
+[PASS] testImageReadVerifiesTheCommittedDigest() (gas: 298849)
+[PASS] testInvalidImageAndEmptyImageFallback() (gas: 322131)
+[PASS] testModuleBindingAndNamespacesCannotBeHijacked() (gas: 1341878)
+[PASS] testRolesPausesAndFrozenDefaultsCannotBeBypassed() (gas: 99056)
+[PASS] testStandardOnlyCollectionCanFreezeWithoutAKeelManifest() (gas: 5276002)
+[PASS] testStandardTemplatesOverridesAndExplicitKeelFallback() (gas: 314598)
+Suite result: ok. 11 passed; 0 failed; 0 skipped; finished in 126.41ms (125.78ms CPU time)
+
+Ran 8 tests for test/modules/keel-die/Keel721PresentationSecurity.t.sol:Keel721PresentationSecurityTest
+[PASS] testAuthorizationCallbackCannotWriteAnotherCollection() (gas: 322443)
+[PASS] testCallbackFreezeCannotBeOverwrittenAndFailureRollsBack() (gas: 345162)
+[PASS] testFreezeEffectsPrecedePrivilegedModuleCallback() (gas: 5630621)
+[PASS] testFuzzFreezeSnapshotsShortAndLongStorageStrings(uint8,uint8) (runs: 1000, μ: 474318, ~: 433673)
+[PASS] testOwnershipTransferMovesEditPermissionButNeverUnfreezes() (gas: 280802)
+[PASS] testPreparedModeTransitionsNeverAcceptAnIgnoredImageEdit() (gas: 10743349)
+[PASS] testRevertingModuleCallbackRollsBackTokenFreezeAndSnapshot() (gas: 5699558)
+[PASS] testTwoCollectionsKeepIdenticalTokenIdsAndFreezesIndependent() (gas: 5638701)
+Suite result: ok. 8 passed; 0 failed; 0 skipped; finished in 150.88ms (150.39ms CPU time)
+
+Ran 8 tests for test/gas/KeelAccessGroups.gas.t.sol:KeelAccessGroupsGasTest
+[PASS] testGasAuthorizeBootstrap() (gas: 106492)
+Logs:
+  warm authorization: 15065
+
+[PASS] testGasBootstrapTo3() (gas: 127863)
+Logs:
+  roster update: 113700
+
+[PASS] testGasReadFullRoster32() (gas: 91723)
+Logs:
+  group read: 89574
+
+[PASS] testGasRosterDisjoint32() (gas: 1004620)
+Logs:
+  roster update: 1141005
+
+[PASS] testGasRosterGrow3To32() (gas: 358627)
+Logs:
+  roster update: 74293
+
+[PASS] testGasRosterReplaceOne32() (gas: 297214)
+Logs:
+  roster update: 284816
+
+[PASS] testGasRosterShrink32To3() (gas: 290757)
+Logs:
+  roster update: 359945
+
+[PASS] testGasRosterUnchanged32() (gas: 167839)
+Logs:
+  roster update: 150701
+
+Suite result: ok. 8 passed; 0 failed; 0 skipped; finished in 1.83ms (1.42ms CPU time)
+
+Ran 19 tests for test/modules/keel-kernel/KeelAccessGroupsAttacks.t.sol:KeelAccessGroupsAttacksTest
+[PASS] testAddingMembersRaisesQuorumAndRemovedMembersLoseAccess() (gas: 515666)
+[PASS] testAdminRoleLaneCannotConfigureEvenWithExactManagerPolicies() (gas: 669932)
+[PASS] testAuthorizedTargetCannotReenterGroupExecution() (gas: 505960)
+[PASS] testContractWalletCannotChangePermissionsDuringSignatureCheck() (gas: 1060122)
+[PASS] testContractWalletCannotConsumeAnotherGroupNonceInsideStaticCallback() (gas: 1409939)
+[PASS] testDownstreamFailureRollsBackConsumedNonceAndTargetWrite() (gas: 197708)
+[PASS] testFakeGovernanceContractCannotBorrowGovernorAuthority() (gas: 113408)
+[PASS] testFullGroupQuorumAndExactGrantCannotBecomeGovernance() (gas: 1033024)
+[PASS] testFuzzArbitraryCallerCannotConfigure(address,uint8) (runs: 1000, μ: 89352, ~: 89739)
+[PASS] testFuzzSignedParametersCannotBeSubstituted(uint256) (runs: 1000, μ: 182490, ~: 182490)
+[PASS] testGovernanceCallingRelayDoesNotMakeRelayTheManager() (gas: 151107)
+[PASS] testIdenticalRegistryCannotReplayAnotherRegistryApproval() (gas: 2786192)
+[PASS] testIdenticalRostersCannotReplayBetweenGroups() (gas: 542273)
+[PASS] testOutsiderAdminModeratorAndSingleGovernorCannotConfigure() (gas: 655257)
+[PASS] testPermissionForOneSelectorDoesNotAuthorizeAnother() (gas: 183790)
+[PASS] testRejectingContractWalletLeavesAllStateUntouched() (gas: 760321)
+[PASS] testRelayerCannotConsumeModuleAuthorizationDirectly() (gas: 170568)
+[PASS] testRemovedThenReaddedSignerCannotReviveOldApproval() (gas: 344172)
+[PASS] testSignedAuthorizationCannotCrossChains() (gas: 184088)
+Suite result: ok. 19 passed; 0 failed; 0 skipped; finished in 433.44ms (429.49ms CPU time)
+
+Ran 8 tests for test/modules/keel-kernel/KeelAccessGroupsReview.t.sol:KeelAccessGroupsReviewTest
+[PASS] testDisjointShrinkGrowAndRejoin() (gas: 2532263)
+[PASS] testFuzzRosterMergeMatchesSet(uint16,uint16) (runs: 1000, μ: 383508, ~: 371725)
+[PASS] testInvalidRosterRollsBackPartialMerge() (gas: 149719)
+[PASS] testInvalidTrailingSignatureIsNotIgnoredAfterThreshold() (gas: 40477)
+[PASS] testMemberPolicyRequiresGovernanceAndRevision() (gas: 25519)
+[PASS] testPolicyRejectsManagerRoleLane() (gas: 58332)
+[PASS] testRaisedLimitAdmits64AndLoweringDoesNotStrandGroup() (gas: 2694477)
+[PASS] testRosterEventPacksRevisionAndFlags() (gas: 60326)
+Suite result: ok. 8 passed; 0 failed; 0 skipped; finished in 287.36ms (286.79ms CPU time)
+
+Ran 2 tests for test/modules/keel-anchors/KeelAnchorReplicationBridge.t.sol:KeelAnchorReplicationBridgeTest
+[PASS] testLocatorAndCampaignMismatchesAreRejected() (gas: 3154979)
+[PASS] testVerifiedAnchorAcceptsPendingCarrierProof() (gas: 2289801)
+Suite result: ok. 2 passed; 0 failed; 0 skipped; finished in 2.20ms (1.39ms CPU time)
+
+Ran 5 tests for test/modules/keel-anchors/KeelAnchorRevisions.t.sol:KeelAnchorRevisionsTest
+[PASS] testANewRevisionHasNoAnchorUntilReproven() (gas: 13373)
+[PASS] testAnchorIsAlsoScopedToTheChain() (gas: 13410)
+[PASS] testObjectLevelQueryIsNotRevisionScoped() (gas: 13622)
+[PASS] testReanchoringTheNewRevisionRestoresIt() (gas: 1262627)
+[PASS] testRevisionOneIsAnchored() (gas: 10211)
+Suite result: ok. 5 passed; 0 failed; 0 skipped; finished in 1.61ms (460.00µs CPU time)
+
+Ran 9 tests for test/modules/keel-artifacts/KeelArtifactRegistry.t.sol:KeelArtifactRegistryTest
+[PASS] testCreatorObjectUsesAppendOnlyExactParentHistory() (gas: 715110)
+[PASS] testFreezeIsPermanentAndAuthorized() (gas: 400287)
+[PASS] testImmutableObjectCannotBeRevised() (gas: 548520)
+[PASS] testObjectCreationFeeIsGovernanceOnlyAndSettlesDirectly() (gas: 2895431)
+[PASS] testObjectLargerThanOneSlugManifestSealsThroughCompositeCheckpoints() (gas: 11414453)
+[PASS] testPublicationJobPreservesWalletCreator() (gas: 2918961)
+[PASS] testRevisionMustMatchKeelHoldDecodedDigest() (gas: 189926)
+[PASS] testTokenBindingCannotBeClaimedByNonOwner() (gas: 184192)
+[PASS] testTokenBoundAuthorityFollowsCurrentOwner() (gas: 763075)
+Suite result: ok. 9 passed; 0 failed; 0 skipped; finished in 3.59ms (3.23ms CPU time)
+
+Ran 8 tests for test/modules/keel-artifacts/KeelArtifactRegistryReview.t.sol:KeelArtifactRegistryReviewTest
+[PASS] testCreationFeesSettleInSharedTreasury() (gas: 1194685)
+[PASS] testEnabledFeeRejectsSelfRecipientAtConfiguration() (gas: 27863)
+[PASS] testFeeCallbackSeesCompleteStateAndCannotMutateIt() (gas: 979530)
+[PASS] testFrozenLineageCannotAcquireRevisionPolicy() (gas: 247255)
+[PASS] testFuzzEditorPolicyTracksLiveOwner(uint8,bool,bool) (runs: 1000, μ: 294811, ~: 294507)
+[PASS] testFuzzIncorrectFeeDoesNotCreateRecord(uint96,bool) (runs: 1000, μ: 104738, ~: 104812)
+[PASS] testRejectedFeeRollsBackAndSameArtifactCanRetry() (gas: 1241594)
+[PASS] testUnboundTokenOwnerPolicyDoesNotGrantCreatorAccess() (gas: 241634)
+Suite result: ok. 8 passed; 0 failed; 0 skipped; finished in 132.80ms (132.36ms CPU time)
+
+Ran 20 tests for test/modules/keel-die/KeelArtifactTokenRenderer.t.sol:KeelArtifactTokenRendererTest
+[PASS] test1155BindingAutomaticallyAnnouncesCurrentURI() (gas: 2101713)
+[PASS] testBindingsAreImmutableAndExactRetriesWorkBeforeAndAfterMint() (gas: 3069636)
+[PASS] testBindingsRequireADeployedCollectionContract() (gas: 1136914)
+[PASS] testConcreteRendererReadsDedicated721And1155ArtifactBindings() (gas: 4406888)
+[PASS] testConcreteRendererReadsShared1155AndPreservesLogicalCreatorAuthority() (gas: 2690294)
+[PASS] testCustomRendererUsesOptionalStandardAndPreservesPendingErrors() (gas: 17544624)
+[PASS] testFutureSeedDoesNotGateArtifactMetadataOrRevealOnRead() (gas: 2712494)
+[PASS] testMetadataNotificationUsesCloneAddressAndStandardData() (gas: 1918186)
+[PASS] testMissingBindingIsNotDisguisedAsPendingSeed() (gas: 804941)
+[PASS] testNameBindingIsSetOnceAndValidated() (gas: 1537777)
+[PASS] testNameBindingPrefixAndSourceNamesEscapedForJSON() (gas: 2583817)
+[PASS] testNotificationFailurePreservesBindingAndRetry() (gas: 1452154)
+[PASS] testPremintAndExactRetryDoNotAnnounceMetadata() (gas: 1918335)
+[PASS] testRendererSizeAndDeploymentGasStayBounded() (gas: 4488655)
+[PASS] testSeedless721AAndStandard721RenderWithoutSeedCapability() (gas: 3276410)
+[PASS] testShared1155ContractMetadataIsGenericAndRangesKeepTheirOwnTokenBindings() (gas: 4712127)
+[PASS] testTokenPresentationRejectsUnsafePosterMediaType() (gas: 1310749)
+[PASS] testUnboundCollectionsKeepTheKeelName() (gas: 1778588)
+[PASS] testUnboundFailClosedReadsDoNotBlock1155ItemCreation() (gas: 16796312)
+[PASS] testVrfArtifactMetadataWorksBeforeRequestThroughFulfillmentAndTransfer() (gas: 3977857)
+Suite result: ok. 20 passed; 0 failed; 0 skipped; finished in 24.75ms (23.00ms CPU time)
+
+Ran 11 tests for test/modules/keel-graph/KeelAssetTagBatch.t.sol:KeelAssetTagBatchGasTest
+[PASS] testGasCanonicalEight() (gas: 68450)
+[PASS] testGasCanonicalKnownLabelsThirtyTwo() (gas: 393442)
+[PASS] testGasCanonicalOne() (gas: 47789)
+[PASS] testGasCanonicalThirtyTwo() (gas: 139849)
+[PASS] testGasCommunityEight() (gas: 95271)
+[PASS] testGasCommunityKnownLabelsThirtyTwo() (gas: 450604)
+[PASS] testGasCommunityOne() (gas: 73742)
+[PASS] testGasCommunityThirtyTwo() (gas: 169066)
+[PASS] testGasNewLabelOne() (gas: 77467)
+[PASS] testGasReadCanonicalKnownId() (gas: 10498)
+[PASS] testGasReadCanonicalUnknownId() (gas: 8112)
+Suite result: ok. 11 passed; 0 failed; 0 skipped; finished in 10.32ms (1.75ms CPU time)
+
+Ran 5 tests for test/modules/keel-graph/KeelAssetTagBatch.t.sol:KeelAssetTagBatchTest
+[PASS] testCommunityDuplicateIdsAcrossRevisitedPagesCountOnce() (gas: 124158)
+[PASS] testCommunityLimitFailureRollsBackEarlierPage() (gas: 210973)
+[PASS] testDuplicateAtFullCommunityLimitIsStillANoOp() (gas: 196267)
+[PASS] testFuzzUnsortedCanonicalBatchesMatchBitmapAndOrderedEvents(bytes32,uint8) (runs: 1000, μ: 264751, ~: 245483)
+[PASS] testLateUnknownTagRollsBackFlushedWordsAndCommunityCount() (gas: 130372)
+Suite result: ok. 5 passed; 0 failed; 0 skipped; finished in 348.53ms (339.71ms CPU time)
+
+Ran 3 tests for test/modules/keel-graph/KeelAssetTagBatch.t.sol:KeelAssetTagBoundsTest
+[PASS] testFuzzAllocatedIdsStayKnownAfterMembershipRemoval(uint16) (runs: 1000, μ: 108258, ~: 108145)
+[PASS] testFuzzUnallocatedIdsFailClosed(uint64) (runs: 1000, μ: 47451, ~: 48148)
+[PASS] testLastIdRemainsUsableAfterDictionaryExhaustion() (gas: 255184)
+Suite result: ok. 3 passed; 0 failed; 0 skipped; finished in 149.19ms (140.44ms CPU time)
+
+Ran 11 tests for test/modules/keel-graph/KeelAssetTagRegistry.t.sol:KeelAssetTagRegistryTest
+[PASS] testBatchLimitIs32AndEmptyBatchesAreSafeNoOps() (gas: 130763)
+[PASS] testCanonicalAndCommunityWritesValidateAssetExistence() (gas: 38930)
+[PASS] testCanonicalWritesFollowControllerTransferAndFreeze() (gas: 186536)
+[PASS] testCommunityAndCanonicalDefinitionsReuseOneNormalizedId() (gas: 155153)
+[PASS] testCommunityLabelsMustExistAndActiveMembershipIsBounded() (gas: 2075596)
+[PASS] testCommunityMembershipIsSeparatePerSenderAndSurvivesFreeze() (gas: 179238)
+[PASS] testConstructorRequiresLibraryContract() (gas: 117971)
+[PASS] testIds255And256UseAdjacentBitmapWords() (gas: 14199994)
+[PASS] testLabelGrammarNormalizesUppercaseAndAllowsRequestedSeparators() (gas: 179223)
+[PASS] testRealLibraryTupleEventsClosedBehaviorAndControllerTransfer() (gas: 6639269)
+[PASS] testTagToggleIsIdempotentAndUnknownIdsFailClosed() (gas: 120204)
+Suite result: ok. 11 passed; 0 failed; 0 skipped; finished in 6.88ms (6.52ms CPU time)
+
+Ran 16 tests for test/modules/keel-anchors/KeelAttestedAnchorRegistry.t.sol:KeelAttestedAnchorRegistryTest
+[PASS] testAnchoredChainQueriesAcrossAllFamilies() (gas: 4784103)
+[PASS] testCancelOnlyByContributor() (gas: 917042)
+[PASS] testContentAnchorLifecycle() (gas: 1270628)
+[PASS] testEmissionRatesWeightCreditPerChain() (gas: 1894621)
+[PASS] testKeccakObjectsCannotAnchor() (gas: 413083)
+[PASS] testLeaseTakeoverOfAbandonedPendingAnchor() (gas: 922871)
+[PASS] testNativeAnchorVerifiesOnChainDataWithoutOracle() (gas: 2714620)
+[PASS] testObjectAnchorPolicyBitMask() (gas: 938111)
+[PASS] testObjectAnchorsAcrossEveryEnabledNetwork() (gas: 3057810)
+[PASS] testRejectionReRequestAndStaleNonce() (gas: 1257430)
+[PASS] testRequestAnchorCannotCaptureTheNativeSlot() (gas: 1843326)
+[PASS] testSeededFamiliesAndAppendOnlyRegistration() (gas: 553686)
+[PASS] testSlugedAnchorLifecycleAndCreditDedup() (gas: 2670191)
+[PASS] testSolidityAnchorRootMatchesCrossLanguageGoldenVectors() (gas: 14493)
+[PASS] testSubmitAuthorization() (gas: 872181)
+[PASS] testVerifierRegistryRules() (gas: 447031)
+Suite result: ok. 16 passed; 0 failed; 0 skipped; finished in 6.54ms (5.67ms CPU time)
+
+Ran 2 tests for test/modules/keel-creator-identity/KeelAttributionRegistry.t.sol:KeelAttributionRegistryTest
+[PASS] testHarnessAttributionsUseHarnessCreatorWithoutGrantingHarnessEdits() (gas: 982432)
+[PASS] testObjectAttributionsAreIndependentFromEditPolicyAndSupportAttestation() (gas: 744786)
+Suite result: ok. 2 passed; 0 failed; 0 skipped; finished in 1.06ms (385.79µs CPU time)
+
+Ran 2 tests for test/parity/CollectionParity.t.sol:CollectionParityTest
+[PASS] testHolderEditingAndFreezingAreCreatorOptIn() (gas: 275042)
+[PASS] testSharedReservationTrace() (gas: 847346)
+Suite result: ok. 2 passed; 0 failed; 0 skipped; finished in 3.17s (3.17s CPU time)
+
+Ran 1 test for test/parity/CollectionParity.t.sol:IndexResolutionParityTest
+[PASS] testTokenOverrideDefaultUpdatesAndEmptyScopeFreezes() (gas: 7415008)
+Suite result: ok. 1 passed; 0 failed; 0 skipped; finished in 686.79µs (464.46µs CPU time)
+
+Ran 12 tests for test/modules/keel-mint-access/KeelAuctionSales.t.sol:KeelAuctionSalesTest
+[PASS] testAuthorizedHouseReceiverCannotReenterIssuer() (gas: 688448)
+[PASS] testDedicated1155ContractCanSellAnEditionOfOne() (gas: 1151161)
+[PASS] testFuzzSharedOutcomeCapacity(uint8,uint8,uint8) (runs: 1000, μ: 583500, ~: 584330)
+[PASS] testOnlyBoundHouseCanRegisterGeneralSale() (gas: 273798)
+[PASS] testOrdinary1155EditionOfOneAndMultipleCopies() (gas: 1886421)
+[PASS] testOrdinarySaleRejectsPatronOutcomeAndMalformedConfiguration() (gas: 519054)
+[PASS] testRejectedReceiverRollsBackAndClaimCanRetry() (gas: 862355)
+[PASS] testSaleCannotUseAnotherAuctionsReleaseBinding() (gas: 308875)
+[PASS] testSameRouteBidderKeepsItsOwnQuantity() (gas: 722915)
+[PASS] testSameRouteCancellationReleasesMaximumOnce() (gas: 521815)
+[PASS] testSameRouteOutcomesReserveOnlyMaximumAndPatronsReceive721Tokens() (gas: 819533)
+[PASS] testSharedCollectionSalesClaimInReverseOrderWithDistinctReleaseIdentity() (gas: 1174220)
+Suite result: ok. 12 passed; 0 failed; 0 skipped; finished in 215.46ms (214.06ms CPU time)
+
+Ran 24 tests for test/modules/keel-kernel/KeelAuthority.t.sol:KeelAuthorityTest
+[PASS] testBootstrapCanRotateToAnotherSingleWallet() (gas: 102389)
+[PASS] testBootstrapForwardsExactValue() (gas: 80334)
+[PASS] testBootstrapMemberActsWithOrdinaryTransactions() (gas: 96034)
+[PASS] testBootstrapSignedLaneAcceptsOneSignature() (gas: 73520)
+[PASS] testConfigurationIsRootOnly() (gas: 26196)
+[PASS] testContractWalletMemberSigns() (gas: 294302)
+[PASS] testDelegateCallsOnlyItsExactAction() (gas: 95876)
+[PASS] testDelegateCannotSendValue() (gas: 60139)
+[PASS] testOneOfThreeRejected() (gas: 156651)
+[PASS] testOutsiderCannotExecute() (gas: 23043)
+[PASS] testProtectedSelectorsAndSelfCannotBeDelegated() (gas: 99181)
+[PASS] testQuorumActivatesAndClosesBootstrapLane() (gas: 148232)
+[PASS] testQuorumCanGrowToFive() (gas: 306896)
+[PASS] testQuorumCannotReturnToOneWallet() (gas: 175548)
+[PASS] testReplayAndExpiryRejected() (gas: 229223)
+[PASS] testRevertBubblesAndRollsBackNonce() (gas: 32861)
+[PASS] testRootMovesToAnotherHolderByGrantThenRenounce() (gas: 149220)
+[PASS] testRosterChangeInvalidatesOutstandingApprovals() (gas: 279372)
+[PASS] testSignaturesBindTheExactCall() (gas: 167776)
+[PASS] testStaleRevisionRejected() (gas: 34320)
+[PASS] testTwoMemberRosterRejected() (gas: 31636)
+[PASS] testTwoOfThreeExecutes() (gas: 205142)
+[PASS] testUnsortedDuplicateOrOutsiderSignaturesRejected() (gas: 215296)
+[PASS] testUnsortedOrDuplicateRosterRejected() (gas: 104088)
+Suite result: ok. 24 passed; 0 failed; 0 skipped; finished in 4.72ms (3.80ms CPU time)
+
+Ran 5 tests for test/modules/keel-codecs/KeelBase32.t.sol:KeelBase32Test
+[PASS] test_CodecsProduceDistinctStrings() (gas: 88139)
+[PASS] test_EmptyFileDagPb() (gas: 45435)
+[PASS] test_EveryEncodingIsFiftyNineChars() (gas: 685756)
+[PASS] test_HelloWorldDagPb() (gas: 46094)
+[PASS] test_HelloWorldRaw() (gas: 42849)
+Suite result: ok. 5 passed; 0 failed; 0 skipped; finished in 1.79ms (1.70ms CPU time)
+
+Ran 3 tests for test/modules/keel-codecs/KeelBase58.t.sol:KeelBase58Test
+[PASS] test_EmptyFileCid() (gas: 339692)
+[PASS] test_EveryEncodingIsFortySixCharsStartingQm() (gas: 8106629)
+[PASS] test_HelloWorldCid() (gas: 340388)
+Suite result: ok. 3 passed; 0 failed; 0 skipped; finished in 14.99ms (14.90ms CPU time)
+
+Ran 10 tests for test/modules/keel-anchors/KeelBitcoinRealProof.t.sol:KeelBitcoinRealProofTest
+[PASS] testActualProofAutomaticallyRecordsAttachment() (gas: 1490963)
+[PASS] testActualProofSettlesImmutableVersionWithoutGovernance() (gas: 993900432)
+[PASS] testAnUnrelatedObjectCannotReuseTheValidProof() (gas: 1079713)
+[PASS] testCorruptedPublicValuesCannotChangeState() (gas: 955115)
+[PASS] testCorruptedRealProofCannotRecordAttachment() (gas: 992476604)
+[PASS] testEveryProofByteMutationIsRejectedByActualVerifier() (gas: 124892019)
+[PASS] testEveryPublicValueByteIsBoundByActualVerifier() (gas: 56975463)
+[PASS] testFuzzRealProofCannotAttachDifferentStoredBytes(uint8,uint8) (runs: 1000, μ: 1122720, ~: 1122721)
+[PASS] testMissingDuplicatedAndReorderedStorageChunksCannotClaimThePayload() (gas: 1214259)
+[PASS] testRealQuorumSuspensionBlocksAnOtherwiseValidProof() (gas: 751261)
+Suite result: ok. 10 passed; 0 failed; 0 skipped; finished in 828.22ms (824.26ms CPU time)
+
+Ran 4 tests for test/modules/keel-publication/KeelCarrierBatchLimit.t.sol:KeelCarrierBatchLimitTest
+[PASS] testMeasuredCalldataEventBatchMatrix() (gas: 107049818)
+[PASS] testMeasuredManagedBatchMatrix() (gas: 411222764)
+[PASS] testMeasuredTinyModularViewerBatch() (gas: 6581884)
+[PASS] testProductionJobRejectsFourBeforeForwarding() (gas: 25916110)
+Suite result: ok. 4 passed; 0 failed; 0 skipped; finished in 742.57ms (742.33ms CPU time)
+
+Ran 4 tests for test/modules/keel-publication/KeelCarrierBatcher.t.sol:KeelCarrierBatcherTest
+[PASS] testBatchedContentIsContentAddressedAndReadyForDirectRegistryWrite() (gas: 191753)
+[PASS] testBatchesCarriersAndDependentLeafDescriptor() (gas: 322307)
+[PASS] testRejectsMoreThanThreePayloadsInAnyCarrierBatch() (gas: 25602)
+[PASS] testRejectsRegistryOrArbitraryTargetOperation() (gas: 21031)
+Suite result: ok. 4 passed; 0 failed; 0 skipped; finished in 664.08µs (342.75µs CPU time)
+
+Ran 5 tests for test/modules/keel-hold/KeelCastingBoundaries.t.sol:KeelCastingBoundariesTest
+[PASS] testBatchReusesOldAndNewDuplicatesInInputOrder() (gas: 148628)
+[PASS] testEmptySlugAndBatchReject() (gas: 21794)
+[PASS] testInvalidLaterSlugRollsBackEarlierDeploymentAndPointer() (gas: 153451)
+[PASS] testMaximumSlugAndFirstRejectedByte() (gas: 4784326)
+[PASS] testStoredPayloadCannotExecute() (gas: 73411)
+Suite result: ok. 5 passed; 0 failed; 0 skipped; finished in 711.25µs (436.88µs CPU time)
+
+Ran 3 tests for test/modules/keel-crucible/KeelCollectionAttestationRegistry.t.sol:KeelCollectionAttestationRegistryTest
+[PASS] testCollectionAdapterExpiryAndRevocationAreIndependentFromNativeProof() (gas: 559146)
+[PASS] testThresholdAttestationBindsPinnedIdentityAndRejectsReplay() (gas: 241960)
+[PASS] testThresholdDuplicateCrossDomainAndBlockSubstitutionFail() (gas: 87881)
+Suite result: ok. 3 passed; 0 failed; 0 skipped; finished in 1.79ms (1.49ms CPU time)
+
+Ran 11 tests for test/modules/keel-crucible/KeelCollectionVerificationRegistry.t.sol:KeelCollectionVerificationRegistryTest
+[PASS] testActualTokenURIAndPortableAnchorAreRequired() (gas: 441186)
+[PASS] testAuditedAdapterIsExactCodeBoundAndFeeCannotBuyGreen() (gas: 2520346)
+[PASS] testFrozenRevisionChangesGovernanceFacetNotRouteFacet() (gas: 993233)
+[PASS] testLockedRouteAllowsTrackedR1ToR2AndPreservesHistory() (gas: 1961879)
+[PASS] testMintVerdictMeansProofAndControlRiskNotWhetherMintIsActive() (gas: 5591366)
+[PASS] testMutablePointerIsAmberAndRedirectInvalidatesExactURIReceipt() (gas: 2157083)
+[PASS] testPermanentRouteClaimWithLiveRedirectAuthorityIsRed() (gas: 1082947)
+[PASS] testPermissionlessNativeReceiptIsCanonicalIdempotentAndCannotBeChurned() (gas: 1116989)
+[PASS] testProxyIdentityCannotBeApprovedFromSelfReportedHookState() (gas: 17049)
+[PASS] testSelectorsAloneNeverApproveLiarAndContentOnlyLeavesControlsUnknown() (gas: 1215249)
+[PASS] testSupplyVerdictSupportsFixedCapAndProvableUncappedWithoutConflatingBurns() (gas: 4867341)
+Suite result: ok. 11 passed; 0 failed; 0 skipped; finished in 5.67ms (5.09ms CPU time)
+
+Ran 22 tests for test/modules/keel-crucible/KeelCommunityReplicationRegistry.t.sol:KeelCommunityReplicationRegistryTest
+[PASS] testAcceptedCarrierIsRequiredOnEveryLaterRevision() (gas: 1874362)
+[PASS] testAcceptedPortableReadbackCannotEarnAgainThroughLocatorAlias() (gas: 1505740)
+[PASS] testCarrierAcceptedAfterNextCampaignCreationStillBlocksCarrierRegression() (gas: 2725597)
+[PASS] testClaimsPreventConcurrentAssignmentAndUniqueBytesEarnOnce() (gas: 656066)
+[PASS] testCreatorCanAddPortableTargetsAfterEvmCompletion() (gas: 1091458)
+[PASS] testCreatorEditPolicySurvivesTokenTransferForLaterRevision() (gas: 2658872)
+[PASS] testCrossCampaignDuplicateSlugCannotEarnDuplicateScore() (gas: 1060226)
+[PASS] testDisabledCampaignCanBeReplacedButCannotBeReenabled() (gas: 777422)
+[PASS] testDuplicateSlugTasksAreRejectedInsideOneCampaign() (gas: 36279)
+[PASS] testEitherCreatorOrTokenOwnerCanAtomicallyReplaceAnIdleNextRevisionCampaign() (gas: 2569857)
+[PASS] testExpiredLeaseCanBeReassignedAndCreatorCanDisableCampaign() (gas: 649320)
+[PASS] testFinalizesExactObjectBindsRevisionAndScoresAcceptedTezosProof() (gas: 1486769)
+[PASS] testFormerTokenOwnerCannotAdvanceFutureCarrierPolicyAfterTransfer() (gas: 2094355)
+[PASS] testImmutableObjectCanFinishItsPublisherAuthorizedPreservationCampaign() (gas: 1481382)
+[PASS] testRejectsBadSlugRootAndWrongBytes() (gas: 473420)
+[PASS] testReleasedSlugAndCarrierClaimsKeepOriginalLeaseWindow() (gas: 572559)
+[PASS] testRevisionBindingRejectsDigestAlgorithmSubstitution() (gas: 965025)
+[PASS] testRevisionPolicyBlocksDirectAppendWithoutAReplicationCampaign() (gas: 967861)
+[PASS] testRevisionPublisherCampaignSurvivesTransferAndTokenOwnerCanPauseIt() (gas: 2105114)
+[PASS] testSelectedPortableCarrierMustFinishBeforeFirstRevisionCanBeCreated() (gas: 1466231)
+[PASS] testSubmitRequiresAnUnexpiredExclusiveClaim() (gas: 464171)
+[PASS] testThreeSlugSubmissionBatchIsRejectedBeforeExecution() (gas: 423823)
+Suite result: ok. 22 passed; 0 failed; 0 skipped; finished in 10.94ms (10.01ms CPU time)
+
+Ran 5 tests for test/modules/keel-harness/KeelCompactCollection.t.sol:KeelCompactCollectionTest
+[PASS] testCollectionUsesRawStoredFragmentsAndChangesContextPerToken() (gas: 4325719)
+[PASS] testCompactBindingRequiresPresentationAuthorityAndCorrectDigest() (gas: 41099)
+[PASS] testLargeStoredFragmentReadDoesNotReencodePayload() (gas: 96977310)
+[PASS] testProductionContractsFitEvmDeploymentLimits() (gas: 11611)
+[PASS] testSwitchingBackToLegacyBuilderClearsCompactEncoding() (gas: 7368061)
+Suite result: ok. 5 passed; 0 failed; 0 skipped; finished in 113.21ms (112.06ms CPU time)
+
+Ran 9 tests for test/modules/keel-die/KeelCreator1155Optimization.t.sol:KeelCreator1155BaselineOptimizationTest
+[PASS] testAuthorizedReceiverCannotSpendTheConsumedReservationAgain() (gas: 159063)
+[PASS] testCloneInitializationAuthorityAndStandards() (gas: 65759)
+[PASS] testClosedItemsAndCollectionsStillHonorExistingCapacity() (gas: 153976)
+[PASS] testFuzzReservationLifecycle(uint256,uint8) (runs: 1000, μ: 315404, ~: 276340)
+[PASS] testIndependentItemsAndItemIdOverflowRollback() (gas: 260978)
+[PASS] testMaximumSupplyAndPackedBoundaries() (gas: 179112)
+[PASS] testOwnershipCallbackFailureRestoresBothOwnerFields() (gas: 95096)
+[PASS] testReceiverRejectionRollbackAndForwardingUseFinalState() (gas: 652098)
+[PASS] testUnauthorizedAndInvalidCallsCannotChangeCapacity() (gas: 130135)
+Suite result: ok. 9 passed; 0 failed; 0 skipped; finished in 610.83ms (610.48ms CPU time)
+
+Ran 10 tests for test/modules/keel-die/KeelCreator1155Optimization.t.sol:KeelCreator1155OptimizationTest
+[PASS] testAuthorizedReceiverCannotSpendTheConsumedReservationAgain() (gas: 153191)
+[PASS] testCapacityEventSchemaAndUnusedLayoutSlot() (gas: 128689)
+[PASS] testCloneInitializationAuthorityAndStandards() (gas: 61094)
+[PASS] testClosedItemsAndCollectionsStillHonorExistingCapacity() (gas: 147929)
+[PASS] testFuzzReservationLifecycle(uint256,uint8) (runs: 1000, μ: 302316, ~: 252309)
+[PASS] testIndependentItemsAndItemIdOverflowRollback() (gas: 210669)
+[PASS] testMaximumSupplyAndPackedBoundaries() (gas: 173296)
+[PASS] testOwnershipCallbackFailureRestoresBothOwnerFields() (gas: 95803)
+[PASS] testReceiverRejectionRollbackAndForwardingUseFinalState() (gas: 626439)
+[PASS] testUnauthorizedAndInvalidCallsCannotChangeCapacity() (gas: 125954)
+Suite result: ok. 10 passed; 0 failed; 0 skipped; finished in 701.64ms (701.18ms CPU time)
+
+Ran 2 tests for test/modules/keel-die/KeelCreator1155Routes.t.sol:KeelCreator1155RoutesTest
+[PASS] testBaselineDedicated1155PauseAndHookRollback() (gas: 14987243)
+[PASS] testDedicated1155PauseAndHookRollback() (gas: 15341521)
+Suite result: ok. 2 passed; 0 failed; 0 skipped; finished in 2.98ms (2.30ms CPU time)
+
+Ran 10 tests for test/modules/keel-die/KeelCreator721AReservations.t.sol:KeelCreator721AReservationsTest
+[PASS] testCallbacksObserveEffectsAndCannotSpendReservations() (gas: 1630165)
+[PASS] testClosedCollectionStillFulfillsAndReleasesReservations() (gas: 1547362)
+[PASS] testEmptyMalformedAndUnauthorizedInputsRetainReverts() (gas: 1363650)
+[PASS] testFreshReserveWritesOneRecordInsteadOfTwo() (gas: 820555)
+[PASS] testFuzzReservationSequence(uint256,uint8) (runs: 1000, μ: 1893168, ~: 1741092)
+[PASS] testImplementationCannotInitializeOrMint() (gas: 27168)
+[PASS] testMaximumCounterAndArithmeticBoundaries() (gas: 1898082)
+[PASS] testOwnershipDoesNotGrantMintManagerAuthority() (gas: 1446400)
+[PASS] testRejectingReceiverRestoresSupplyAndReservations() (gas: 1528504)
+[PASS] testReserveTopUpPartialAndFullConsumption() (gas: 1562608)
+Suite result: ok. 10 passed; 0 failed; 0 skipped; finished in 4.06s (4.06s CPU time)
+
+Ran 15 tests for test/modules/keel-die/KeelCreatorFactory.t.sol:KeelCreatorFactoryTest
+[PASS] testAcceptedDedicatedAndSharedTransfersUpdateDirectoryExactly() (gas: 870783)
+[PASS] testCreatorCollectionCreationGasStaysBounded() (gas: 1248890)
+[PASS] testCreatorGetsOrganizedDedicated721And1155Clones() (gas: 1001994)
+[PASS] testDedicated1155OrganizesIndependentItemsAndLocksWrongItemCapacity() (gas: 658719)
+[PASS] testDedicated721UsesSharedRendererAndFulfillsReservedDropAfterClose() (gas: 644556)
+[PASS] testDedicatedERC721DefaultsTo721AAndSupportsExplicitStandard721() (gas: 1036100)
+[PASS] testExternalCollectionNeedsLiveAuthorityAndDoesNotPretendMintCompatibility() (gas: 904416)
+[PASS] testFactoryEventSchemaPreservesRegistrationSelectionAndClosure() (gas: 568513)
+[PASS] testFactoryRegistrationEventsDistinguishSharedAndExternal() (gas: 1157919)
+[PASS] testFactoryRejectsOversizedCollectionSymbol() (gas: 19365)
+[PASS] testFactoryTransferEventKeepsCreatorTopicsDistinct() (gas: 581108)
+[PASS] testImplementationsAndSharedContractsStayBelowEIP170() (gas: 20042)
+[PASS] testMeasureERC721AMintSavingsAgainstStandardERC721() (gas: 2461337)
+[PASS] testOneTimeFactoryDeploymentGasStaysBounded() (gas: 5681978)
+[PASS] testShared1155AssignsDisjointPredictableRangesPerCreatorCollection() (gas: 742578)
+Suite result: ok. 15 passed; 0 failed; 0 skipped; finished in 10.56ms (5.01ms CPU time)
+
+Ran 8 tests for test/modules/keel-die/KeelCreatorFactoryAccounting.t.sol:KeelCreatorFactoryAccountingTest
+[PASS] testDirectoryFirstMiddleLastOnlyAndSelfTransfers() (gas: 1797032)
+[PASS] testFuzzRecordRoundTripAtNameAndTimestampBoundaries(uint64,uint8,bytes32) (runs: 1000, μ: 649444, ~: 584575)
+[PASS] testIdOverflowRevertsCloneAndNonceChanges() (gas: 349871)
+[PASS] testInterleavedKindsAndExternalRecordsRemainIndependent() (gas: 3217288)
+[PASS] testNestedInitializationAllocatesDistinctIdsAndRollsBackOnFailure() (gas: 6862110)
+[PASS] testRejectedInputsPauseAndAuthorityLeaveNoRecords() (gas: 598370)
+[PASS] testSeedConfigurationFailureRollsBackKindIdNonceAndClone() (gas: 1133178)
+[PASS] testSharedIdUpperBoundaryPreservesPackedNeighbors() (gas: 338634)
+Suite result: ok. 8 passed; 0 failed; 0 skipped; finished in 898.95ms (891.77ms CPU time)
+
+Ran 8 tests for test/modules/keel-die/KeelCreatorFactoryAccounting.t.sol:KeelCreatorFactoryBaselineAccountingTest
+[PASS] testDirectoryFirstMiddleLastOnlyAndSelfTransfers() (gas: 1803373)
+[PASS] testFuzzRecordRoundTripAtNameAndTimestampBoundaries(uint64,uint8,bytes32) (runs: 1000, μ: 649075, ~: 585341)
+[PASS] testIdOverflowRevertsCloneAndNonceChanges() (gas: 349385)
+[PASS] testInterleavedKindsAndExternalRecordsRemainIndependent() (gas: 3222866)
+[PASS] testNestedInitializationAllocatesDistinctIdsAndRollsBackOnFailure() (gas: 6566030)
+[PASS] testRejectedInputsPauseAndAuthorityLeaveNoRecords() (gas: 600959)
+[PASS] testSeedConfigurationFailureRollsBackKindIdNonceAndClone() (gas: 1135062)
+[PASS] testSharedIdUpperBoundaryPreservesPackedNeighbors() (gas: 339525)
+Suite result: ok. 8 passed; 0 failed; 0 skipped; finished in 711.42ms (707.86ms CPU time)
+
+Ran 13 tests for test/modules/keel-creator-identity/KeelCreatorProfileRegistry.t.sol:KeelCreatorProfileRegistryTest
+[PASS] testConstructorRequiresManagerContract() (gas: 73967)
+[PASS] testCreatorUpdateUsesAuthorizationAndRevisionCAS() (gas: 202169)
+[PASS] testDeterministicProfileCanBeginIncompleteThenEnableDrops() (gas: 263463)
+[PASS] testFuzzCreatorDeclaredOrganizationIsEventSourced(bytes32) (runs: 1000, μ: 209739, ~: 209739)
+[PASS] testManagerEnsureIsGovernanceExecutionModeOnly() (gas: 231356)
+[PASS] testManagerEnsureIsIdempotentAndCannotOverwriteOrAppointRecovery() (gas: 241564)
+[PASS] testMissingProfilesFailClosed() (gas: 25179)
+[PASS] testOnlyCreatorChosenRecoveryAuthorityCanMoveProfile() (gas: 253389)
+[PASS] testRecoveryCannotOverwriteAnotherCanonicalProfile() (gas: 426590)
+[PASS] testRecoveryPreservesCreatorIdAndBlocksWalletReuse() (gas: 272685)
+[PASS] testRejectsAmbiguousPartialMissingAndRevertingObjectReferences() (gas: 90327)
+[PASS] testRejectsOversizedURIAndInvalidUsernameCommitmentInput() (gas: 24546)
+[PASS] testValidKeelObjectReferenceCompletesProfile() (gas: 241328)
+Suite result: ok. 13 passed; 0 failed; 0 skipped; finished in 361.16ms (360.41ms CPU time)
+
+Ran 10 tests for test/modules/keel-die/KeelCreatorSeeded721A.t.sol:KeelCreatorSeeded721ATest
+[PASS] testAutomaticRevealAndSeedWritesRollbackWithReceiver() (gas: 1201025)
+[PASS] testCallbackCannotReadAndFilterFutureMintResult() (gas: 1040650)
+[PASS] testExpiredHashNeverUsesZeroOrANewBlock() (gas: 781293)
+[PASS] testFuzzImmediateModesAndStorageStayStable(uint8,bool,bool) (runs: 1000, μ: 1346351, ~: 1202219)
+[PASS] testLateRevealUsesAuthenticatedOriginalHeadersWithoutReroll() (gas: 2426813)
+[PASS] testLockedTransfersAndPermissionlessReveal() (gas: 914195)
+[PASS] testPermissionsProfileFreezeAndSourcePin() (gas: 898670)
+[PASS] testSavedHashesRevealForever() (gas: 933515)
+[PASS] testSealedTransferRetainsTheOriginalCommitmentAndDraw() (gas: 875875)
+[PASS] testUnconfiguredImplementationAndInvalidProfileCannotMint() (gas: 561064)
+Suite result: ok. 10 passed; 0 failed; 0 skipped; finished in 1.58s (1.58s CPU time)
+
+Ran 5 tests for test/modules/keel-cross-chain-mint/KeelCrossChainMintBridge.t.sol:KeelCrossChainMintBridgeTest
+[PASS] testLockConfigurationFreezesForwarderAndIdentity() (gas: 170151)
+[PASS] testReportBindsMintDataToGatedObjectAtOffset() (gas: 1351549)
+[PASS] testReportForWrongTargetChainIsInert() (gas: 926155)
+[PASS] testReportMintsOncePerSourceTokenAndRetriesFailedMints() (gas: 1669102)
+[PASS] testRequestRequiresOwnershipObjectControlAndTargetAnchor() (gas: 856516)
+Suite result: ok. 5 passed; 0 failed; 0 skipped; finished in 8.26ms (4.33ms CPU time)
+
+Ran 4 tests for test/modules/keel-anchors/KeelCrossChainParity.t.sol:KeelCrossChainParityTest
+[PASS] testAnchorRecordsTheSharedRoot() (gas: 1184722)
+[PASS] testFullAnchorPathMarksTheObjectChainAnchored() (gas: 1182571)
+[PASS] testPayloadHashesToTheSharedAnchorRoot() (gas: 747)
+[PASS] testRejectsAProofForDifferentContent() (gas: 612982)
+Suite result: ok. 4 passed; 0 failed; 0 skipped; finished in 4.57ms (2.71ms CPU time)
+
+Ran 9 tests for test/modules/keel-mint-access/KeelDeferredAuction.t.sol:KeelDeferredAuctionTest
+[PASS] testBootstrapFailureRollsBackCloneAndCanRetry() (gas: 2238727)
+[PASS] testCancelledAndPendingCannotSpendOrCreate() (gas: 440603)
+[PASS] testClaimantPaysExactFeeAndCannotChargeAgain() (gas: 1752864)
+[PASS] testCreatorUpfrontCreatesOnlyWinning721WithReservedRelease() (gas: 1714103)
+[PASS] testOnlyBoundHouseCanSelectOutcomeAndOnlyFactoryCanBootstrap() (gas: 378467)
+[PASS] testProceedsPublishOnceThenCreateOnly1155AndReleaseRemainder() (gas: 1750619)
+[PASS] testProceedsShortfallRequiresExactTopUpAndDoesNotConsumeOtherAuctionReserve() (gas: 545663)
+[PASS] testProductionModulesFitDeploymentLimit() (gas: 14444)
+[PASS] testTwoSalesReuseIntentWithoutChargingTreasuryTwice() (gas: 3084252)
+Suite result: ok. 9 passed; 0 failed; 0 skipped; finished in 11.89ms (8.56ms CPU time)
+
+Ran 10 tests for test/modules/keel-die/KeelDeferredCollection.t.sol:KeelDeferredCollectionTest
+[PASS] testAlteredSupplyRoyaltyOrImplementationCannotConsumeReservation() (gas: 101787)
+[PASS] testCannotOverwritePendingReservationOrUseUncommittedSeedProfile() (gas: 58542)
+[PASS] testConsumedBeforeInitializationAndFailedInitializationRollsBackForRetry() (gas: 6524693)
+[PASS] testFuzzReservationSeparatesCreatorResolverAndSalt(address,bytes32) (runs: 1000, μ: 105961, ~: 105961)
+[PASS] testPauseBlocksFulfillmentWithoutConsumingReservation() (gas: 6301013)
+[PASS] testPendingOrCancelledCannotCreateEitherOutcome() (gas: 73649)
+[PASS] testReservationCreatesNeitherCollectionAndDoesNotConsumeCreatorNonce() (gas: 68365)
+[PASS] testSingleOutcomeStandard721() (gas: 588031)
+[PASS] testWinningBidderCreatesOnly721WithCreatorOwnershipAndCorrectDirectory() (gas: 636461)
+[PASS] testWinningPatronsCreateOnly1155AndUnrelatedCreationDoesNotInvalidateReservation() (gas: 1075885)
+Suite result: ok. 10 passed; 0 failed; 0 skipped; finished in 321.97ms (320.10ms CPU time)
+
+Ran 7 tests for test/modules/keel-mint-access/KeelDemandAudit.t.sol:KeelDemandAuditTest
+[PASS] testBoundedReadRejectsMalformedDataAndInvalidBool() (gas: 165489)
+[PASS] testCeilingMinimumFixedAndMaximumSupply() (gas: 82481)
+[PASS] testFuzzDecayAndTriggerMatchIntegerModel(uint96,uint16,bytes32) (runs: 1000, μ: 240248, ~: 249941)
+[PASS] testObservationFailurePreservesDemandAndZeroScoreSkipsSource() (gas: 71956)
+[PASS] testOnlyQueueCanMutate() (gas: 38805)
+[PASS] testRecordUsesOneSupplySnapshot() (gas: 42070)
+[PASS] testWaveRefillAndCoolingBounds() (gas: 138219)
+Suite result: ok. 7 passed; 0 failed; 0 skipped; finished in 709.93ms (709.54ms CPU time)
+
+Ran 1 test for test/modules/keel-hold/KeelDirectCopyBench.t.sol:KeelDirectCopyBenchTest
+[PASS] test_OneCopyBeatsThree() (gas: 2455894)
+Suite result: ok. 1 passed; 0 failed; 0 skipped; finished in 48.38ms (1.26ms CPU time)
+
+Ran 6 tests for test/modules/keel-codecs/KeelEthStateProof.t.sol:KeelEthStateProofTest
+[PASS] testAccountProofYieldsTheStorageRoot() (gas: 196133)
+[PASS] testFullChainFromBlockHashToValue() (gas: 384467)
+[PASS] testHeaderYieldsTheStateRoot() (gas: 37319)
+[PASS] testRejectsAHeaderThatDoesNotHash() (gas: 5527)
+[PASS] testStorageProofIsBoundToItsRoot() (gas: 13919)
+[PASS] testStorageProofYieldsTheValue() (gas: 151978)
+Suite result: ok. 6 passed; 0 failed; 0 skipped; finished in 3.51ms (3.26ms CPU time)
+
+Ran 8 tests for test/modules/keel-die/KeelFactory.t.sol:KeelFactoryTest
+[PASS] testAgentAuthorizationCannotBeReplayedOrMutated() (gas: 11848293)
+[PASS] testAgentCreatesOneExactCollectionForAccountWithAuthorization() (gas: 11872316)
+[PASS] testAuthorizationDeadlineAndNonceBoundsAreFailClosed() (gas: 6732986)
+[PASS] testCreationCodeCarrierKeepsTheDeployerBelowEIP170() (gas: 6723091)
+[PASS] testCreatorCanInvalidatePendingAgentNonce() (gas: 6752966)
+[PASS] testFactoryAdvertisesCapacityAwareEmbeddedCollectionCode() (gas: 6731832)
+[PASS] testSharedDeployerNamespacesSaltSoDirectCallsCannotSquatFactoryAddress() (gas: 16911907)
+[PASS] testWrongAgentAndMutatedConfigCannotUseAccountAuthorization() (gas: 11911886)
+Suite result: ok. 8 passed; 0 failed; 0 skipped; finished in 11.86ms (11.09ms CPU time)
+
+Ran 4 tests for test/modules/keel-kernel/KeelFeeTreasury.t.sol:KeelFeeTreasuryTest
+[PASS] testDuplicateAssetsCannotClaimTwice() (gas: 162546)
+[PASS] testOneClaimCollectsNativeAndTokenReceipts() (gas: 207690)
+[PASS] testRejectedNativeClaimRollsBackTokenTransfer() (gas: 247216)
+[PASS] testUnrelatedCallerAndAdminLaneCannotClaim() (gas: 181508)
+Suite result: ok. 4 passed; 0 failed; 0 skipped; finished in 8.16ms (3.01ms CPU time)
+
+Ran 23 tests for test/modules/keel-mint-access/KeelFrozenReleaseRanges.t.sol:KeelFrozenReleaseRangesTest
+[PASS] testDisclosureAndLookupReadbacksAreComplete() (gas: 556142)
+[PASS] testEditionKeepsOneIdAcrossSalesAndCannotGetSecondRelease() (gas: 1069883)
+[PASS] testFreezingDormantReleaseDoesNotClaimTheActiveReleasesTail() (gas: 939576)
+[PASS] testFrozenRangeSkipsBothIndexWritesAndHidesUnusedTail() (gas: 857926)
+[PASS] testFuzzFrozenRangeMatchesOriginalMintAndLookupBehavior(uint256,uint8) (runs: 1000, μ: 6650172, ~: 6555609)
+[PASS] testFuzzInterleavingKeepsLocalOrder(uint8,uint8,uint8) (runs: 1000, μ: 2066113, ~: 1793599)
+[PASS] testInterleavingClipsBothIndexesAndKeepsEveryLocalIdentity() (gas: 1047178)
+[PASS] testMutableSupplyCannotUseFrozenTailUntilCreatorLocksIt() (gas: 578653)
+[PASS] testOneMintCampaignBindingAndSupplyUpdatesCannotBypassRelease() (gas: 10241758)
+[PASS] testOpenSupplyCanBecomeFiniteAndCannotExceedHardCeiling() (gas: 598712)
+[PASS] testOwnershipTransferChangesAuthorityNotIdentityOrLocks() (gas: 572531)
+[PASS] testPackedRangeBoundariesAndGaps() (gas: 883648)
+[PASS] testProjectedTailSaturatesPhysicalBoundaryWithoutWrappingPackedFields() (gas: 843207)
+[PASS] testReceiverCanResolveAndCannotReenter() (gas: 779009)
+[PASS] testRejectedHookRollsBackSupplyAndRanges() (gas: 1462453)
+[PASS] testRejectedInterleavedMintRestoresClippedTailAndCanRetry() (gas: 1549894)
+[PASS] testReleaseEventsKeepIndexedIdentityAndPackedPolicy() (gas: 337109)
+[PASS] testReservedCapacityFloorAndPermanentLock() (gas: 592720)
+[PASS] testRevokedControllerCanReleaseProtectedCapacity() (gas: 310706)
+[PASS] testRoutesAndCampaignsCannotResetTheCap() (gas: 997089)
+[PASS] testSharedEditionSnapshotTracksCurrentCreator() (gas: 850699)
+[PASS] testThreeInterleavedReleasesAndNamesResolveBothWays() (gas: 1584426)
+[PASS] testUnapprovedFactoryAndOutstandingReservationsRejectActivation() (gas: 196544)
+Suite result: ok. 23 passed; 0 failed; 0 skipped; finished in 7.12s (7.11s CPU time)
+
+Ran 3 tests for test/modules/keel-kernel/KeelGovernance.t.sol:KeelGovernanceTest
+[PASS] testFuzzOnlyGovernanceModeIsAccepted(uint256) (runs: 1000, μ: 59150, ~: 59150)
+[PASS] testMalformedOrMissingExecutionContextIsRejected() (gas: 199028)
+[PASS] testReportedGovernanceDoesNotAuthorizeAnotherCaller() (gas: 55422)
+Suite result: ok. 3 passed; 0 failed; 0 skipped; finished in 22.03ms (21.90ms CPU time)
+
+Ran 4 tests for test/modules/keel-graph/KeelGraphRegistry.t.sol:KeelGraphRegistryTest
+[PASS] testEveryVersionRequiresExactManifestAndGraphDigests() (gas: 27830)
+[PASS] testPendingVersionMustActivateBeforeAnotherPublishOrPromotion() (gas: 124032)
+[PASS] testPublisherMovesFromLedgerToSafeBeforeFreeze() (gas: 46027)
+[PASS] testVersionsPromoteRemoteToContentAddressedToOnchainOnly() (gas: 361887)
+Suite result: ok. 4 passed; 0 failed; 0 skipped; finished in 688.71µs (369.04µs CPU time)
+
+Ran 7 tests for test/modules/keel-harness/KeelHarnessBuilder.t.sol:KeelHarnessBuilderTest
+[PASS] testHTMLMediaTypePrefixKeepsItsExactBoundary() (gas: 685486)
+[PASS] testHarnessRejectsNonHTMLButItemBuilderReturnsExactBytes() (gas: 527542)
+[PASS] testHeadlessEntrypointGetsCanonicalDocumentBeforeContextInjection() (gas: 1412832)
+[PASS] testKeelHoldKeepsExactBytesBeforeHTMLDataURIEncoding() (gas: 178457)
+[PASS] testLeafAndCompositeReturnExactRawHTML() (gas: 1900906)
+[PASS] testMissingOrCorruptObjectRendersHugeRedWithoutFallback() (gas: 3672399)
+[PASS] testPercentEscapePreservesPackedAlphabetAndEscapesParserDelimiters() (gas: 170211)
+Suite result: ok. 7 passed; 0 failed; 0 skipped; finished in 24.61ms (23.79ms CPU time)
+
+Ran 3 tests for test/modules/keel-hold/KeelHarnessBuilderGas.t.sol:KeelHarnessBuilderGasTest
+[PASS] testAssemblyStillRefusesAWrongDigest() (gas: 653134)
+[PASS] testBothPathsAreCheapAndTheSlotPathIsCheaper() (gas: 62191851)
+[PASS] testRealSizedHarnessAssemblesWellUnderTheCallCap() (gas: 43830685)
+Suite result: ok. 3 passed; 0 failed; 0 skipped; finished in 248.88ms (248.04ms CPU time)
+
+Ran 1 test for test/modules/keel-harness/KeelHarnessFailureFormatting.t.sol:KeelHarnessFailureFormattingTest
+[PASS] testExactExistingFailurePageBytes() (gas: 28657)
+Suite result: ok. 1 passed; 0 failed; 0 skipped; finished in 227.25µs (105.58µs CPU time)
+
+Ran 6 tests for test/modules/keel-artifacts/KeelHarnessRegistry.t.sol:KeelHarnessRegistryTest
+[PASS] testForkActivationRequiresMatchingKeelIndexCommitment() (gas: 933244)
+[PASS] testForkRejectsWrongSlotCountAndUnknownLineageRevision() (gas: 1336870)
+[PASS] testHarnessPinsExactObjectRevisionsAndRequiresExactParent() (gas: 1167898)
+[PASS] testImmutableHarnessRejectsRevisionAndFork() (gas: 653956)
+[PASS] testPendingForkAuthorityMovesOnTransferAndNewOwnerCanCancel() (gas: 1113897)
+[PASS] testPublicationJobPreservesWalletHarnessCreator() (gas: 827785)
+Suite result: ok. 6 passed; 0 failed; 0 skipped; finished in 3.59ms (2.40ms CPU time)
+
+Ran 1 test for test/parity/CoreParity.t.sol:GovernanceParityTest
+[PASS] testSharedRpcCommitment() (gas: 16288865)
+Suite result: ok. 1 passed; 0 failed; 0 skipped; finished in 19.44s (19.44s CPU time)
+
+Ran 4 tests for test/modules/keel-artifacts/KeelHarnessRegistryLayout.t.sol:KeelHarnessRegistryLayoutTest
+[PASS] testAllEventTopicsAndDataAcrossHarnessLifecycle() (gas: 913543)
+[PASS] testFuzzEffectiveHarnessWireOrder(uint64) (runs: 1000, μ: 723431, ~: 723431)
+[PASS] testImmutableCreationEmitsFreezeAndPreservesPolicyOrdinals() (gas: 300723)
+[PASS] testReorderedStoredRecordsRetainEveryField() (gas: 894768)
+Suite result: ok. 4 passed; 0 failed; 0 skipped; finished in 291.63ms (291.13ms CPU time)
+
+Ran 7 tests for test/modules/keel-artifacts/KeelHarnessRegistryOptimization.t.sol:KeelHarnessRegistryOptimizationTest
+[PASS] testFuzzPackedArraysRetainEveryRevisionAndHistory(uint8,uint64) (runs: 1000, μ: 5333036, ~: 3349466)
+[PASS] testHostileReadAuthoritiesCannotMutateThroughCallbacks() (gas: 2413267)
+[PASS] testMalformedRevisionRetainsZeroIdErrorPrecedence() (gas: 32298)
+[PASS] testPackedReaderEmptyAndEveryWordBoundary() (gas: 861008)
+[PASS] testPermissionsPauseAndCommitmentRemainAuthoritative() (gas: 688713)
+[PASS] testPublicationDelegationRequiresGovernanceAndApprovedCaller() (gas: 337409)
+[PASS] testRejectsEmptyOversizedAndInvalidTailBeforeWriting() (gas: 267887)
+Suite result: ok. 7 passed; 0 failed; 0 skipped; finished in 2.47s (2.47s CPU time)
+
+Ran 9 tests for test/modules/keel-artifacts/KeelHarnessRegistryReuse.t.sol:KeelHarnessRegistryReuseTest
+[PASS] testBatchBounds() (gas: 27932)
+[PASS] testBatchDuplicateExistingAndEvents() (gas: 673312)
+[PASS] testBatchMissingAndOverflowRollbackEveryWrite() (gas: 748479)
+[PASS] testBranchRejectsSelectionReuseAndLeafTransitionWorks() (gas: 937519)
+[PASS] testDirectSourceNeverChainsAndFullAppendResetsOwner() (gas: 11185047)
+[PASS] testFuzzBatchKeysPreserveOrderAndPermissions(uint8) (runs: 1000, μ: 12474926, ~: 7975678)
+[PASS] testFuzzReusePreservesSlotsDigestsEventsAndForks(uint8,uint64) (runs: 1000, μ: 4449757, ~: 2893131)
+[PASS] testReuseAuthorizationValidationPauseAndStaticCallbacks() (gas: 803362)
+[PASS] testSourceBoundaryAndFullWidthRevisionCounter() (gas: 1720372)
+Suite result: ok. 9 passed; 0 failed; 0 skipped; finished in 6.88s (6.88s CPU time)
+
+Ran 8 tests for test/modules/keel-artifacts/KeelHarnessRegistryTree.t.sol:KeelHarnessRegistryTreeTest
+[PASS] testCyclesDepthAndGovernedLimits() (gas: 3125350)
+[PASS] testForkKeysOwnerPauseCommitmentAndStaticCallbacks() (gas: 2677409)
+[PASS] testFuzzFourChildrenPerWord(uint8) (runs: 1000, μ: 1533423, ~: 1313222)
+[PASS] testKeysIdempotentExhaustionNeverCarriesIntoLimits() (gas: 1183062)
+[PASS] testPackedHeaderMaximumCountCannotOverflowOrClobberNeighbors() (gas: 9410237)
+[PASS] testRejectsMalformedWordsAndUnknownChildren() (gas: 449297)
+[PASS] testThousandObjectsAndPinnedChildUpdate() (gas: 36570124)
+[PASS] testTreePublicationJobPreservesCreatorAndImmutablePolicy() (gas: 632775)
+Suite result: ok. 8 passed; 0 failed; 0 skipped; finished in 767.01ms (766.28ms CPU time)
+
+Ran 22 tests for test/modules/keel-publication/KeelHistoryPublicationJob.t.sol:KeelHistoryPublicationJobTest
+[PASS] testCompetingOpenCannotShiftQuotedPublicationId() (gas: 373058)
+[PASS] testEmptyStoredPublicationHasReadableTerminalState() (gas: 291619)
+[PASS] testEscrowFundingFinalPaymentAndOverwithdrawal() (gas: 519102)
+[PASS] testEventDeterminismBindsPlanModeChunksAndCalldata() (gas: 443163)
+[PASS] testExecutorWithPostOpenCodeCannotPublish() (gas: 374328)
+[PASS] testExpiredPartialPublicationCanBeAbandonedAndRefunded() (gas: 514618)
+[PASS] testExpiredPartialPublicationRotatesWithoutStealingEntitlement() (gas: 594583)
+[PASS] testExplicitModeMetadataCursorAndFinalization() (gas: 514280)
+[PASS] testForwardedExecutorAndDeadlineAreFailClosed() (gas: 501000)
+[PASS] testMultipleRotationsCreditEachExecutorExactlyOnce() (gas: 615981)
+[PASS] testProgressBoundedCompensationAccruesPerBatch() (gas: 540452)
+[PASS] testRejectsChunkAboveBoundBeforeCursorAdvance() (gas: 398966)
+[PASS] testRejectsDuplicateBatchAndPrematureFinalization() (gas: 453909)
+[PASS] testRejectsIncompleteFinalization() (gas: 386605)
+[PASS] testRejectsInvalidModeAndBatchManifest() (gas: 22983)
+[PASS] testRejectsWrongActorPlanModeAndOrderWithoutAdvancing() (gas: 422264)
+[PASS] testRevertingExecutorCannotBlockRotationAndFailedClaimKeepsCredit() (gas: 536951)
+[PASS] testRevertingOwnerCannotBlockCancellationAndRefundClaimIsRetryable() (gas: 557997)
+[PASS] testThree23KChunksHaveEip7825Headroom() (gas: 15726147)
+[PASS] testWrongDigestAndWrongCountRollbackBeforeCursorAdvance() (gas: 405307)
+[PASS] testZeroProgressCancellationRefundsAndRemainsReadable() (gas: 431915)
+[PASS] testZeroRefundCancellationStillCreatesTerminalRecord() (gas: 474896)
+Suite result: ok. 22 passed; 0 failed; 0 skipped; finished in 62.70ms (61.99ms CPU time)
+
+Ran 9 tests for test/modules/keel-hold/KeelHold.t.sol:KeelHoldTest
+[PASS] testCreatesLeafAndRecursiveCompositeWithImmutableIndexes() (gas: 447291)
+[PASS] testIdenticalIndexesRemainCommittedInEachImmutableDescriptor() (gas: 266063)
+[PASS] testOneShotAssemblyCurveRejectsTheNextMeasuredPage() (gas: 17141777)
+[PASS] testOneShotAssemblyCurveSupportsOnePointThreeEightMiBWithColdCarriers() (gas: 34239379)
+[PASS] testRejectsMoreThanThreeSlugsInOneBatch() (gas: 20285)
+[PASS] testRejectsObjectFanoutAboveBalancedTreeLimit() (gas: 105164)
+[PASS] testStoresAndReadsDeduplicatedSlug() (gas: 79760)
+[PASS] testStoresThreeSlugsInOneBatchAndReturnsDirectPointers() (gas: 305741)
+[PASS] testThreeFullCarriersFitFusakaTransactionGasCap() (gas: 14162735)
+Suite result: ok. 9 passed; 0 failed; 0 skipped; finished in 16.79ms (16.18ms CPU time)
+
+Ran 9 tests for test/modules/keel-hold/KeelHoldFlatRead.t.sol:KeelHoldFlatReadTest
+[PASS] testFlattensCompositeAcrossLeafBoundaries() (gas: 701762)
+[PASS] testFlattensNestedCompositeDepthThree() (gas: 905310)
+[PASS] testRandomAccessSkipsPriorSlugPayloads() (gas: 29898527)
+[PASS] testReadsSingleSlugLeafWithEndOfObject() (gas: 172712)
+[PASS] testReturnsStoredBytesForCompressedLeaf() (gas: 243409)
+[PASS] testRevertsObjectMissingForUnknownAndZeroIds() (gas: 31999)
+[PASS] testRevertsReadDepthExceededOnPathologicalCompositeChain() (gas: 2016446)
+[PASS] testRevertsSliceOutOfBoundsBeyondFinalSlug() (gas: 178573)
+[PASS] testTraversesLeafSlugsSequentiallyWithImplicitContinuation() (gas: 312932)
+Suite result: ok. 9 passed; 0 failed; 0 skipped; finished in 7.07ms (6.49ms CPU time)
+
+Ran 11 tests for test/gas/KeelHoldHeaders.gas.t.sol:KeelHoldHeadersGasTest
+[PASS] testGasCountDeep() (gas: 140410)
+Logs:
+  read call: 135875
+
+[PASS] testGasCountWide() (gas: 60672)
+Logs:
+  read call: 56269
+
+[PASS] testGasHaulDeep() (gas: 157417)
+Logs:
+  read call: 152816
+
+[PASS] testGasHaulLeaf() (gas: 30121)
+Logs:
+  read call: 25564
+
+[PASS] testGasHaulWide() (gas: 116017)
+Logs:
+  read call: 111504
+
+[PASS] testGasLeafPointers() (gas: 18557)
+Logs:
+  read call: 14031
+
+[PASS] testGasMetadata() (gas: 17322)
+Logs:
+  read call: 12875
+
+[PASS] testGasPartIds() (gas: 19336)
+Logs:
+  read call: 14721
+
+[PASS] testGasReadDeep() (gas: 141142)
+Logs:
+  read call: 136504
+
+[PASS] testGasReadFirst() (gas: 30220)
+Logs:
+  read call: 25822
+
+[PASS] testGasReadLast() (gas: 73986)
+Logs:
+  read call: 69499
+
+Suite result: ok. 11 passed; 0 failed; 0 skipped; finished in 3.88ms (2.20ms CPU time)
+
+Ran 6 tests for test/modules/keel-hold/KeelHoldHeaders.t.sol:KeelHoldHeadersTest
+[PASS] testCompressedDescendantStillAllowsStoredReadOnly() (gas: 282858)
+[PASS] testDepthBoundaryAndSealCount() (gas: 2310472)
+[PASS] testDepthErrorPrecedesMissingChild() (gas: 1928786)
+[PASS] testFuzzHeaderMetadataAndTraversalAgree(uint8,uint8,uint8) (runs: 1000, μ: 662885, ~: 639083)
+[PASS] testFuzzMalformedHeadersFailEveryConsumer(uint8) (runs: 1000, μ: 203246, ~: 202475)
+[PASS] testSearchStopsBeforeMalformedLaterSibling() (gas: 461077)
+Suite result: ok. 6 passed; 0 failed; 0 skipped; finished in 1.36s (1.36s CPU time)
+
+Ran 10 tests for test/gas/KeelHoldMetadataReads.gas.t.sol:KeelHoldMetadataReadsGasTest
+[PASS] testGasMetadata1() (gas: 17335)
+Logs:
+  read call: 10730
+
+[PASS] testGasMetadata127() (gas: 17421)
+Logs:
+  read call: 10795
+
+[PASS] testGasMetadata128() (gas: 17377)
+Logs:
+  read call: 10795
+
+[PASS] testGasMetadata128Warm() (gas: 21397)
+Logs:
+  read call: 3796
+
+[PASS] testGasMetadata31() (gas: 17247)
+Logs:
+  read call: 10730
+
+[PASS] testGasMetadata32() (gas: 17423)
+Logs:
+  read call: 10730
+
+[PASS] testGasMetadata33() (gas: 17400)
+Logs:
+  read call: 10751
+
+[PASS] testGasMetadata64() (gas: 17422)
+Logs:
+  read call: 10751
+
+[PASS] testGasMetadataComposite() (gas: 17456)
+Logs:
+  read call: 10741
+
+[PASS] testGasMetadataCompressed() (gas: 17291)
+Logs:
+  read call: 10730
+
+Suite result: ok. 10 passed; 0 failed; 0 skipped; finished in 1.75ms (477.08µs CPU time)
+
+Ran 10 tests for test/gas/KeelHoldUploads.gas.t.sol:KeelHoldUploadsGasTest
+[PASS] testGasBatchDuplicates() (gas: 199545)
+Logs:
+  upload call: 119064
+
+[PASS] testGasBatchFresh() (gas: 416249)
+Logs:
+  upload call: 336094
+
+[PASS] testGasBatchMixed() (gas: 310008)
+Logs:
+  upload call: 229506
+
+[PASS] testGasBatchReused() (gas: 95569)
+Logs:
+  upload call: 15876
+
+[PASS] testGasExhaustedBatchLarge() (gas: 223249)
+Logs:
+  upload call: 16413
+
+[PASS] testGasExhaustedSingleLarge() (gas: 168783)
+Logs:
+  upload call: 14727
+
+[PASS] testGasLastChunkExceedsAllowance() (gas: 331358)
+Logs:
+  upload call: 237695
+
+[PASS] testGasLifecycleThreeChunks() (gas: 528579)
+Logs:
+  upload call: 518816
+
+[PASS] testGasSingleFresh() (gas: 191298)
+Logs:
+  upload call: 114137
+
+[PASS] testGasSingleReused() (gas: 84013)
+Logs:
+  upload call: 7107
+
+Suite result: ok. 10 passed; 0 failed; 0 skipped; finished in 2.44ms (1.73ms CPU time)
+
+Ran 5 tests for test/gas/KeelHoldWeldEvents.gas.t.sol:KeelHoldWeldEventsGasTest
+[PASS] testGasComposite() (gas: 117627)
+Logs:
+  weld call: 113105
+
+[PASS] testGasLeaf() (gas: 108970)
+Logs:
+  weld call: 104142
+
+[PASS] testGasLeaf128References() (gas: 721321)
+Logs:
+  weld call: 699359
+
+[PASS] testGasLeafLongMediaType() (gas: 139564)
+Logs:
+  weld call: 125858
+
+[PASS] testGasLeafThreeReferences() (gas: 118513)
+Logs:
+  weld call: 113505
+
+Suite result: ok. 5 passed; 0 failed; 0 skipped; finished in 1.48ms (799.54µs CPU time)
+
+Ran 2 tests for test/modules/keel-ip-control/KeelIPActionExecutor.t.sol:KeelIPActionExecutorTest
+[PASS] testDownloadRemintAndBackpackAreLiveAuthorizedOperations() (gas: 1394523)
+[PASS] testSignedCapabilityCanBeRelayedForRemint() (gas: 1124447)
+Suite result: ok. 2 passed; 0 failed; 0 skipped; finished in 3.08ms (1.70ms CPU time)
+
+Ran 5 tests for test/modules/keel-ip-control/KeelIPControl.t.sol:KeelIPControlTest
+[PASS] testCreatorGrantAndSignedCapabilityAreOneShot() (gas: 967750)
+[PASS] testLicenseIsBrotliBoundAndOpenPolicyIsVerifiable() (gas: 890790)
+[PASS] testResourceLeafCanBeLockedWithoutHidingPublicRoot() (gas: 1433550)
+[PASS] testTokenDependencyFailureAllAnyAndActionMask() (gas: 2624887)
+[PASS] testTokenOwnershipIsLiveAndSupportsMultipleRequirements() (gas: 1150011)
+Suite result: ok. 5 passed; 0 failed; 0 skipped; finished in 6.35ms (4.75ms CPU time)
+
+Ran 5 tests for test/modules/keel-hold/KeelIndex.t.sol:KeelIndexTest
+[PASS] testCollectionRevisionHistory() (gas: 128260)
+[PASS] testCollectionScopeRejectsTokenOwnerPolicy() (gas: 14446)
+[PASS] testPendingRevisionCannotGrantItsFutureControllerActivationPowerEarly() (gas: 220717)
+[PASS] testTokenOwnerCanPublishAndFreezeImmutableRevision() (gas: 130062)
+[PASS] testUnregisteredTokenScopeCannotSelectCreatorOnlyPolicy() (gas: 139587)
+Suite result: ok. 5 passed; 0 failed; 0 skipped; finished in 864.25µs (475.29µs CPU time)
+
+Ran 3 tests for test/modules/keel-die/KeelIndexMetadata.t.sol:KeelIndexMetadataTest
+[PASS] testBrokenReceiverDoesNotBlockActivationAndCanBeRetried() (gas: 233178)
+[PASS] testPublicationIsQuietAndActivationUsesStandardCollectionLog() (gas: 139583)
+[PASS] testUntrustedCallerCannotNotify() (gas: 10557)
+Suite result: ok. 3 passed; 0 failed; 0 skipped; finished in 1.52ms (618.17µs CPU time)
+
+Ran 13 tests for test/modules/keel-hold/KeelIndexSecurity.t.sol:KeelIndexSecurityTest
+[PASS] testActivationTimePendingExclusionAndPermanentFreeze() (gas: 906416)
+[PASS] testAdmissionBoundariesAndMaximumValues() (gas: 3668030)
+[PASS] testCurrentOwnerControlsPendingActivationAfterTransfer() (gas: 747116)
+[PASS] testFuzzDerivedHistoryMatchesOriginal(uint8,bool) (runs: 1000, μ: 2373117, ~: 2031926)
+[PASS] testFuzzReadBytesAndEventsMatchAcrossUriLengths(uint16,bool) (runs: 1000, μ: 1612004, ~: 1069899)
+[PASS] testFuzzRevisionScalarsOccupyOneWord(uint64,uint8,bool) (runs: 1000, μ: 346829, ~: 347251)
+[PASS] testFuzzSharedAuthorityKeepsEveryPolicyAndRevertOrder(uint8,uint8,bool) (runs: 1000, μ: 388173, ~: 319159)
+[PASS] testMalformedAuthorityResponseKeepsOriginalRevertBytes() (gas: 62469)
+[PASS] testMaximumRevisionPackingActivationAndOverflowMatchOriginal() (gas: 1743416)
+[PASS] testRemovedControllerAndRegistrarCannotRegainAccess() (gas: 473747)
+[PASS] testSharedStorageHelpersKeepCollectionAndTokenScopesIsolated() (gas: 1915686)
+[PASS] testStaticAdminProbeCannotChangeAnotherCollection() (gas: 315110)
+[PASS] testZeroAndMissingKeysKeepRevisionMissingRevert() (gas: 138309)
+Suite result: ok. 13 passed; 0 failed; 0 skipped; finished in 11.46s (11.46s CPU time)
+
+Ran 3 tests for test/modules/keel-harness/KeelInlineModuleReuseBenchmark.t.sol:KeelInlineModuleReuseBenchmarkTest
+[PASS] testBenchmarkDynamicEncodingOfExistingP5PreservesBytes() (gas: 73751036)
+Logs:
+  legacy dynamic Base64 probe gas: 72935938
+
+[PASS] testBenchmarkLegacyPortableGzipP5InlineReportsCostAndPreservesBytes() (gas: 198116875)
+Logs:
+  legacy gzip p5 read gas: 21897881
+
+[PASS] testBenchmarkLegacyPreEncodedP5InlineReportsCostAndPreservesBytes() (gas: 152605794)
+Logs:
+  legacy pre-encoded p5 read gas: 15599088
+
+Suite result: ok. 3 passed; 0 failed; 0 skipped; finished in 3.73s (2.06s CPU time)
+
+Ran 10 tests for test/modules/keel-codecs/KeelIpfsCid.t.sol:KeelIpfsCidTest
+[PASS] testCidV0IsTheMultihashForm() (gas: 4007)
+[PASS] testEmptyFileMatchesPublishedCid() (gas: 3162)
+[PASS] testExactlyOneSlugStaysSingleBlock() (gas: 1991352)
+[PASS] testKilobyteBlock() (gas: 167462)
+[PASS] testMultiSlugWithRemainder() (gas: 4992886)
+[PASS] testOneBytePastASlugBuildsATree() (gas: 2004989)
+[PASS] testRawCidV1Prefix() (gas: 10378)
+[PASS] testRejectsDagsNeedingAnExtraLevel() (gas: 4402)
+[PASS] testSingleBlockWithData() (gas: 3886)
+[PASS] testSlugBoundaryCounts() (gas: 372)
+Suite result: ok. 10 passed; 0 failed; 0 skipped; finished in 15.04ms (14.85ms CPU time)
+
+Ran 2 tests for test/modules/keel-codecs/KeelIpfsCidIncremental.t.sol:KeelIpfsCidIncrementalTest
+[PASS] test_IncrementalCidIsAValidQmString() (gas: 12566885)
+[PASS] test_IncrementalMatchesSingleShot() (gas: 68680527)
+Suite result: ok. 2 passed; 0 failed; 0 skipped; finished in 48.02ms (47.85ms CPU time)
+
+Ran 7 tests for test/modules/keel-anchors/KeelIpfsCidVerifier.t.sol:KeelIpfsCidVerifierTest
+[PASS] testPreviewMatchesTheGoldenCid() (gas: 29204)
+[PASS] testRejectsAWrongClaimedCid() (gas: 537636)
+[PASS] testRejectsContentOverTheCap() (gas: 536109)
+[PASS] testRejectsReplay() (gas: 857865)
+[PASS] testRejectsSubstitutedContent() (gas: 678100)
+[PASS] testRejectsWrongFamily() (gas: 515994)
+[PASS] testVerifiesAnchorByRecomputingTheCid() (gas: 857863)
+Suite result: ok. 7 passed; 0 failed; 0 skipped; finished in 4.87ms (2.24ms CPU time)
+
+Ran 7 tests for test/modules/keel-anchors/KeelL2AnchorVerifier.t.sol:KeelL2AnchorVerifierTest
+[PASS] testAnchorSettlesWhenTheProvenDigestMatches() (gas: 487384)
+[PASS] testConfigurationCanBeFrozen() (gas: 38116)
+[PASS] testRejectsAChainWithNoPinnedRemoteStore() (gas: 990846)
+[PASS] testRejectsATaskAlreadySettled() (gas: 41101)
+[PASS] testRejectsAnAnchorThatIsNotPending() (gas: 41063)
+[PASS] testRejectsWhenTheAdapterIsNotPinnedToThisContract() (gas: 41272)
+[PASS] testRejectsWhenTheProvenDigestIsNotTheOneAsked() (gas: 448421)
+Suite result: ok. 7 passed; 0 failed; 0 skipped; finished in 5.23ms (4.52ms CPU time)
+
+Ran 11 tests for test/modules/keel-anchors/KeelL2StateVerifier.t.sol:KeelL2StateVerifierTest
+[PASS] testArbitrumPathRejectsAHeaderForAnotherBlock() (gas: 36190)
+[PASS] testArbitrumPathRejectsAnUnconfirmedSendRoot() (gas: 30191)
+[PASS] testArbitrumPathYieldsTheStateRoot() (gas: 62316)
+[PASS] testEndToEndArbitrumStorageRead() (gas: 407406)
+[PASS] testOpStackPathRejectsComponentsThatDoNotHashToTheAnchor() (gas: 29251)
+[PASS] testOpStackPathYieldsTheStateRoot() (gas: 26366)
+[PASS] testRejectsAGameOfARetiredType() (gas: 39514)
+[PASS] testRejectsAGameStillInProgress() (gas: 37222)
+[PASS] testRejectsAGameTheChallengerWon() (gas: 37200)
+[PASS] testResolvedGameYieldsTheStateRoot() (gas: 41239)
+[PASS] testStacksAreNotInterchangeable() (gas: 30185)
+Suite result: ok. 11 passed; 0 failed; 0 skipped; finished in 2.98ms (2.23ms CPU time)
+
+Ran 3 tests for test/modules/keel-harness/KeelLegacyHoldRawTokenURIBuilder.t.sol:KeelLegacyHoldRawTokenURIBuilderTest
+[PASS] testLargePosterEnvelopeFitsBoundedValidationWithoutChangingBytes() (gas: 12689369)
+[PASS] testOnlyExactHistoricalChainAddressAndRuntime() (gas: 272539)
+[PASS] testRegistrationStillRequiresExactValidObject() (gas: 5531910)
+Suite result: ok. 3 passed; 0 failed; 0 skipped; finished in 47.65ms (47.23ms CPU time)
+
+Ran 20 tests for test/modules/keel-graph/KeelLibraryRegistry.t.sol:KeelLibraryRegistryTest
+[PASS] testCreationModuleIsAFirstClassLibraryAsset() (gas: 634185)
+[PASS] testExistingPaidEntitlementRemainsOnItsExactHistoricalPolicy() (gas: 1237739)
+[PASS] testGraphPublisherTransferDoesNotSilentlyMovePolicyAuthority() (gas: 1057623)
+[PASS] testHistoricalPolicyRemainsBoundAfterForwardManifestAndPolicyActivate() (gas: 1044137)
+[PASS] testIndexesExactGraphVersionAndRejectsNonPublisher() (gas: 648908)
+[PASS] testInvalidPolicyCombinationsFailClosed() (gas: 620744)
+[PASS] testNonLibraryGraphCannotBeIndexed() (gas: 356819)
+[PASS] testOldPendingSubmissionRemainsAuditableButCannotUseNewTerms() (gas: 1293833)
+[PASS] testOpenPolicyCanHaveAnExactAvailabilityWindow() (gas: 680835)
+[PASS] testPaidAccessUsesExactPriceExtendsTimeAndCreditsPayout() (gas: 939201)
+[PASS] testPermanentCloseBlocksNewAccessButKeepsExistingEntitlements() (gas: 852204)
+[PASS] testPermanentPaidEntitlementCannotBeChargedTwice() (gas: 862048)
+[PASS] testPolicyCannotChangeWithoutMatchingManifestCommitmentFirst() (gas: 813709)
+[PASS] testPolicyHistoryActivatesLinearlyAndFreezeIsPermanent() (gas: 1068583)
+[PASS] testRejectedWithdrawalKeepsCreditIntact() (gas: 843764)
+[PASS] testSingleLeafAllowlistClaimIsDomainBoundAndPermanent() (gas: 836187)
+[PASS] testSubmissionPolicyCanResolveAfterTermsAreFrozen() (gas: 986547)
+[PASS] testSubmissionRequiresTheReviewedActivePolicyCommitment() (gas: 1046832)
+[PASS] testTokenGateIsLiveAndFollowsTheTokenBalance() (gas: 781527)
+[PASS] testWalletActionsRejectAChangedPolicyEvenWhenPriceIsUnchanged() (gas: 1092110)
+Suite result: ok. 20 passed; 0 failed; 0 skipped; finished in 9.74ms (8.84ms CPU time)
+
+Ran 10 tests for test/modules/keel-artifacts/KeelLinkRegistry.t.sol:KeelLinkRegistryTest
+[PASS] testConstructorRejectsMissingRegistryContract() (gas: 74548)
+[PASS] testGroupedEventFieldsMatchPublishedValues() (gas: 678161)
+[PASS] testHistoricalRevisionCanBeRevealedAfterCoeditorAdvancesHead() (gas: 1327556)
+[PASS] testHybridRequiresAlgorithmDigestLengthAndMediaTypeEquality() (gas: 746019)
+[PASS] testObjectWithoutFidelityCommitmentCannotAcquireLinks() (gas: 405755)
+[PASS] testRejectsInvalidUrisMediaTypesCommitmentsAndEmptySets() (gas: 475077)
+[PASS] testRevisionCommitmentAtomicallyBindsCanonicalFidelitySet() (gas: 908974)
+[PASS] testSetMustMatchPrecommitAndCannotBeOverwritten() (gas: 703935)
+[PASS] testSha256HybridExposesCompleteOnchainFallbackDescriptor() (gas: 681775)
+[PASS] testTokenTransferCannotChangeImmutablePrecommittedRenditions() (gas: 752974)
+Suite result: ok. 10 passed; 0 failed; 0 skipped; finished in 7.60ms (6.52ms CPU time)
+
+Ran 15 tests for test/modules/keel-artifacts/KeelLinkRegistryReview.t.sol:KeelLinkRegistryReviewTest
+[PASS] testEveryMediaByteInBothTokens() (gas: 6928050)
+[PASS] testEveryUriByteAcrossWordBoundaries() (gas: 18964321)
+[PASS] testFuzzInvalidUriByteIsRejectedAtAnyPosition(uint8,uint16) (runs: 1000, μ: 279089, ~: 326324)
+[PASS] testFuzzPackedRecordRoundTrip(uint64,uint64,uint64,uint8,uint8,uint8,address) (runs: 1000, μ: 532294, ~: 533269)
+[PASS] testFuzzPresentationUsesStoredScheme(uint8,bytes32,address) (runs: 1000, μ: 297743, ~: 296973)
+[PASS] testHttpsCannotBeDeclaredAsImmutableProtocol() (gas: 73148)
+[PASS] testImmutableLinksAllowCustomAndNoViewer() (gas: 645833)
+[PASS] testLastInvalidLinkLeavesNoPartialSetAndAllowsCorrectRetry() (gas: 506652)
+[PASS] testMaximumPackedFieldsAndHybridFidelity() (gas: 295955)
+[PASS] testMediaSlashAndLengthBoundaries() (gas: 3283871)
+[PASS] testMissingPresentationDoesNotAcquireDefaultScheme() (gas: 52939)
+[PASS] testMutableLinksRejectRawAndCustomViewerForEveryCaller() (gas: 885865)
+[PASS] testPrefixesAndTrailingCalldata() (gas: 186641)
+[PASS] testReplayAcrossRevisionAndObjectCannotAcquireLinks() (gas: 370535)
+[PASS] testUriStorageBoundaries() (gas: 4204783)
+Suite result: ok. 15 passed; 0 failed; 0 skipped; finished in 2.44s (2.44s CPU time)
+
+Ran 9 tests for test/modules/keel-artifacts/KeelLinkURIBuilder.t.sol:KeelLinkURIBuilderTest
+[PASS] testAssembledRouteReturnsDataURIAndBareHttpsStillReverts() (gas: 427585)
+[PASS] testCorruptPinnedShellFails() (gas: 387457)
+[PASS] testImmutableRawRoutesNeedNoBuilderAndCustomShellMustBeRegistered() (gas: 1872965)
+[PASS] testInvalidConfigurationRejectsMissingFragmentsAndUnsafeLimits() (gas: 185571)
+[PASS] testMissingLinkCannotReachBuilder() (gas: 55397)
+[PASS] testMissingOrDisabledBuilderFailsWithoutRawFallback() (gas: 324426)
+[PASS] testNoCodeAndZeroShellRegistrationsFail() (gas: 36221)
+[PASS] testOnlyGovernanceCanRegisterMatchingBuilder() (gas: 1652734)
+[PASS] testResponseCapFailsBeforeAssembly() (gas: 1486163)
+Suite result: ok. 9 passed; 0 failed; 0 skipped; finished in 4.99ms (3.42ms CPU time)
+
+Ran 4 tests for test/modules/keel-artifacts/KeelLinkURIBuilderReview.t.sol:KeelLinkURIBuilderReviewTest
+[PASS] testCorruptionAndUnsupportedMediaKeepExactErrors() (gas: 296689)
+[PASS] testEmptyGatewaysAndMaximumGatewayStorage() (gas: 13551450)
+[PASS] testFuzzCompleteReturnAndRevertBytes(bytes,uint8,uint8,uint8,bytes32) (runs: 1000, μ: 340621, ~: 354924)
+[PASS] testGatewayWordBoundariesAndMaximumPaths() (gas: 21540503)
+Suite result: ok. 4 passed; 0 failed; 0 skipped; finished in 905.97ms (904.41ms CPU time)
+
+Ran 14 tests for test/gas/KeelLoopStrategies.t.sol:KeelLoopStrategiesTest
+[PASS] testFuzzStrategiesMatchOnUnevenAndEmptyArrays(uint8,uint8) (runs: 1000, μ: 94304, ~: 86154)
+[PASS] testGasFusedEight() (gas: 14082)
+[PASS] testGasFusedOne() (gas: 7580)
+[PASS] testGasFusedThirtyTwo() (gas: 35910)
+[PASS] testGasFusedUneven() (gas: 70603)
+[PASS] testGasRecursiveEight() (gas: 14376)
+[PASS] testGasRecursiveOne() (gas: 7785)
+[PASS] testGasRecursiveThirtyTwo() (gas: 37332)
+[PASS] testGasRecursiveUneven() (gas: 68673)
+[PASS] testGasSeparateEight() (gas: 14062)
+[PASS] testGasSeparateOne() (gas: 7415)
+[PASS] testGasSeparateThirtyTwo() (gas: 35868)
+[PASS] testGasSeparateUneven() (gas: 66801)
+[PASS] testOverflowRevertsForEveryStrategy() (gas: 15103)
+Suite result: ok. 14 passed; 0 failed; 0 skipped; finished in 417.11ms (416.89ms CPU time)
+
+Ran 11 tests for test/modules/keel-mint-access/KeelLotteryEngineAudit.t.sol:KeelLotteryEngineAuditTest
+[PASS] testCancelledTicketsConsumeAttemptsNotAdmissionsOrProtection() (gas: 3182449)
+[PASS] testCommitmentPackingAndLateArrivalsPreserveFrozenDraw() (gas: 174814)
+[PASS] testFuzzSelectionsStayUniqueAndBoundToSnapshot(bytes32,uint8) (runs: 1000, μ: 889028, ~: 565000)
+[PASS] testGas1() (gas: 174868)
+Logs:
+  request: 38837
+  fulfill: 25596
+  firstPick: 87878
+  snapshot: 1413
+
+[PASS] testGas10() (gas: 174637)
+Logs:
+  request: 38837
+  fulfill: 25596
+  firstPick: 87862
+  snapshot: 1413
+
+[PASS] testGas100() (gas: 174634)
+Logs:
+  request: 38837
+  fulfill: 25596
+  firstPick: 87881
+  snapshot: 1413
+
+[PASS] testGas1000() (gas: 176042)
+Logs:
+  request: 35927
+  fulfill: 25596
+  firstPick: 92067
+  snapshot: 1413
+
+[PASS] testGasMillion() (gas: 267521)
+Logs:
+  request: 35927
+  fulfill: 25596
+  firstPick: 183722
+  snapshot: 1413
+
+[PASS] testGasUint32Maximum() (gas: 348354)
+Logs:
+  request: 35927
+  fulfill: 25596
+  firstPick: 264357
+  snapshot: 1413
+
+[PASS] testRecoveryRequiresDeadlineAndPreservesFrozenBounds() (gas: 130790)
+[PASS] testResetHidesOldGenerationAndRejectsUnauthorizedWrites() (gas: 79224)
+Suite result: ok. 11 passed; 0 failed; 0 skipped; finished in 3.39s (3.39s CPU time)
+
+Ran 6 tests for test/modules/keel-mint-access/KeelLotteryPoolAudit.t.sol:KeelLotteryPoolAuditTest
+[PASS] testEveryLeafBitAndEmptyLeaf() (gas: 1634729)
+[PASS] testFuzzPackedRootPrefixesPreserveWideCarries(uint256) (runs: 1000, μ: 89307, ~: 89307)
+[PASS] testFuzzSparseFullWidthRangesMatchSortedReference(bytes32) (runs: 1000, μ: 6061759, ~: 6062501)
+[PASS] testGrowthAtEveryTreeLevelKeepsEarlierCounts() (gas: 2201293)
+[PASS] testLargestRootCountersPreserveEveryPrefixDigit() (gas: 87201)
+[PASS] testQueueOnlyAndRangeRevertsRemainExact() (gas: 165640)
+Suite result: ok. 6 passed; 0 failed; 0 skipped; finished in 11.08s (11.08s CPU time)
+
+Ran 20 tests for test/modules/keel-managed-modules/KeelManagedAccessGroups.t.sol:KeelManagedAccessGroupsAttacksTest
+[PASS] testAccessRepairPreservesRosterCapabilitiesNonceAndPreexistingUnspentApproval() (gas: 3064885)
+[PASS] testAddingMembersRaisesQuorumAndRemovedMembersLoseAccess() (gas: 754730)
+[PASS] testAdminRoleLaneCannotConfigureEvenWithExactManagerPolicies() (gas: 997105)
+[PASS] testAuthorizedTargetCannotReenterGroupExecution() (gas: 626387)
+[PASS] testContractWalletCannotChangePermissionsDuringSignatureCheck() (gas: 1519903)
+[PASS] testContractWalletCannotConsumeAnotherGroupNonceInsideStaticCallback() (gas: 1514928)
+[PASS] testDownstreamFailureRollsBackConsumedNonceAndTargetWrite() (gas: 354043)
+[PASS] testFakeGovernanceContractCannotBorrowGovernorAuthority() (gas: 246735)
+[PASS] testFullGroupQuorumAndExactGrantCannotBecomeGovernance() (gas: 1460305)
+[PASS] testFuzzArbitraryCallerCannotConfigure(address,uint8) (runs: 1000, μ: 191409, ~: 191797)
+[PASS] testFuzzSignedParametersCannotBeSubstituted(uint256) (runs: 1000, μ: 306516, ~: 306516)
+[PASS] testGovernanceCallingRelayDoesNotMakeRelayTheManager() (gas: 253106)
+[PASS] testIdenticalRegistryCannotReplayAnotherRegistryApproval() (gas: 4972690)
+[PASS] testIdenticalRostersCannotReplayBetweenGroups() (gas: 736584)
+[PASS] testOutsiderAdminModeratorAndSingleGovernorCannotConfigure() (gas: 1883158)
+[PASS] testPermissionForOneSelectorDoesNotAuthorizeAnother() (gas: 307816)
+[PASS] testRejectingContractWalletLeavesAllStateUntouched() (gas: 927917)
+[PASS] testRelayerCannotConsumeModuleAuthorizationDirectly() (gas: 294330)
+[PASS] testRemovedThenReaddedSignerCannotReviveOldApproval() (gas: 466678)
+[PASS] testSignedAuthorizationCannotCrossChains() (gas: 307817)
+Suite result: ok. 20 passed; 0 failed; 0 skipped; finished in 2.35s (2.34s CPU time)
+
+Ran 23 tests for test/modules/keel-managed-modules/KeelManagedAccessGroups.t.sol:KeelManagedTreasuryGroupsTest
+[PASS] testBootstrapGroupPaysDefaultWithoutCustomCap() (gas: 246789)
+[PASS] testCapabilityRevocationAndRegrantInvalidateSignatures() (gas: 259302)
+[PASS] testConfigurationEventsBindWalletGroupsLimitAndRevision() (gas: 238979)
+[PASS] testContractWalletCanBeTheBootstrapMember() (gas: 356258)
+[PASS] testCustomCooldownIsGlobalAcrossGroupsAndAssets() (gas: 583225)
+[PASS] testCustomGroupUsesSameAccessModuleForAnotherContract() (gas: 540504)
+[PASS] testCustomPayoutsAreDisabledUntilGovernanceSetsLimit() (gas: 83229)
+[PASS] testDefaultGroupsStartWithoutImplicitCapabilities() (gas: 80681)
+[PASS] testExpiredAndDuplicateSignaturesAreRejected() (gas: 342629)
+[PASS] testFuzzActivatedThresholdRoundsUp(uint8) (runs: 1000, μ: 946817, ~: 830991)
+[PASS] testFuzzCustomCapCannotBeExceeded(uint96) (runs: 1000, μ: 171836, ~: 171836)
+[PASS] testGovernanceCannotDrainToCustomRecipient() (gas: 113664)
+[PASS] testGroupCannotChangeWalletEvenWithRoleCapability() (gas: 178432)
+[PASS] testGroupDisableAndRosterChangesInvalidatePendingPayout() (gas: 293651)
+[PASS] testGroupExecutionCannotTurnRolePermissionIntoGovernance() (gas: 401930)
+[PASS] testGroupsReuseExistingManagerPoliciesWithoutChangingTarget() (gas: 561332)
+[PASS] testManagerPauseStopsGroupPayments() (gas: 117201)
+[PASS] testPayoutSignaturesCannotSurviveConfigurationChange() (gas: 171533)
+[PASS] testRejectedCustomTransferRestoresNonceAndCooldown() (gas: 271959)
+[PASS] testSignedAmountCannotBeChangedOrReplayed() (gas: 226695)
+[PASS] testThreeMembersActivateTwoThirdsAndCannotDowngrade() (gas: 473963)
+[PASS] testTwoMemberSetupAndStaleRosterAreRejected() (gas: 240837)
+[PASS] testWalletChangeLocksGroupAndGovernanceWithdrawalsForFullDay() (gas: 353332)
+Suite result: ok. 23 passed; 0 failed; 0 skipped; finished in 4.58s (4.57s CPU time)
+
+Ran 9 tests for test/modules/keel-managed-modules/KeelManagedArtAndSeed.t.sol:KeelManagedArtAndSeedTest
+[PASS] testHarnessRegistryRepairPreservesPinnedSlotsAliasesAndPackedLimits() (gas: 11171986)
+[PASS] testIndexRepairPreservesPendingTimelockHistoryRolesAndPermanentFreeze() (gas: 7730548)
+[PASS] testMatrixRepairPreservesPackedDictionaryRowCoordinatesReadDepthAndFrozenRows() (gas: 8973669)
+[PASS] testProfileRepairPreservesIdentityRecoveryAuthorityAndStaleRevisionProtection() (gas: 4358111)
+[PASS] testRawPreparedCopyRepairPreservesEnvelopeBytesAndDigestRejection() (gas: 7852277)
+[PASS] testRendererRepairPreservesBindingAndExactCommittedMetadata() (gas: 15929425)
+[PASS] testSeededRepairKeepsOriginalDrawCommitmentLockAndMaterializedSeed() (gas: 13422108)
+[PASS] testSilentRendererBugQuarantineRepairAndExactNFTURIResume() (gas: 20038883)
+[PASS] testStoredJSONAndSleeveRepairSilentWrongArtWithoutChangingBindingsOrFreezeBits() (gas: 5959310)
+Suite result: ok. 9 passed; 0 failed; 0 skipped; finished in 47.97ms (40.45ms CPU time)
+
+Ran 10 tests for test/modules/keel-managed-modules/KeelManagedDeferredAuction.t.sol:KeelManagedDeferredAuctionTest
+[PASS] testBootstrapFailureRollsBackCloneAndCanRetry() (gas: 2334627)
+[PASS] testCancelledAndPendingCannotSpendOrCreate() (gas: 532292)
+[PASS] testClaimantPaysExactFeeAndCannotChargeAgain() (gas: 1855313)
+[PASS] testCreatorUpfrontCreatesOnlyWinning721WithReservedRelease() (gas: 1806046)
+[PASS] testOnlyBoundHouseCanSelectOutcomeAndOnlyFactoryCanBootstrap() (gas: 421981)
+[PASS] testProceedsPublishOnceThenCreateOnly1155AndReleaseRemainder() (gas: 1876035)
+[PASS] testProceedsShortfallRequiresExactTopUpAndDoesNotConsumeOtherAuctionReserve() (gas: 620297)
+[PASS] testProductionModulesFitDeploymentLimit() (gas: 14466)
+[PASS] testRepairBeforeAndAfterPublicationKeepsDeferredAddressesBudgetAndMintLatches() (gas: 14495507)
+[PASS] testTwoSalesReuseIntentWithoutChargingTreasuryTwice() (gas: 3219265)
+Suite result: ok. 10 passed; 0 failed; 0 skipped; finished in 24.05ms (13.45ms CPU time)
+
+Ran 5 tests for test/modules/keel-managed-modules/KeelManagedDependencies.t.sol:KeelManagedFeeTreasuryTest
+[PASS] testDuplicateAssetsCannotClaimTwice() (gas: 187895)
+[PASS] testOneClaimCollectsNativeAndTokenReceipts() (gas: 239385)
+[PASS] testRejectedNativeClaimRollsBackTokenTransfer() (gas: 303521)
+[PASS] testTreasuryRepairRetainsReceiptsPayoutRevisionAndTimelock() (gas: 1460810)
+[PASS] testUnrelatedCallerAndAdminLaneCannotClaim() (gas: 239204)
+Suite result: ok. 5 passed; 0 failed; 0 skipped; finished in 20.88ms (13.85ms CPU time)
+
+Ran 1 test for test/modules/keel-managed-modules/KeelManagedDependencies.t.sol:KeelManagedSeedBlockArchiveTest
+[PASS] testArchiveRepairPreservesAuthenticatedHashesAndCanCheckpointAgain() (gas: 13111288)
+Suite result: ok. 1 passed; 0 failed; 0 skipped; finished in 9.20ms (7.90ms CPU time)
+
+Ran 15 tests for test/modules/keel-managed-modules/KeelManagedDependencies.t.sol:KeelManagedSeedRegistryTest
+[PASS] testCannotOverwriteSeedSet() (gas: 905420)
+[PASS] testCollectionControllerPublishesExactImmutableHarnessRevisionSeedSet() (gas: 905779)
+[PASS] testDeriveTokenSeedMatchesDomainSeparatedVector() (gas: 922027)
+[PASS] testExactPrecommitCanBeRelayedAfterControllerRotation() (gas: 926113)
+[PASS] testFuzzPublicationEventAndRecordMatch(bytes32,bytes32,uint64) (runs: 1000, μ: 942007, ~: 942007)
+[PASS] testFuzzSeedContextMatchesIndividualReads(bytes32,bytes32,bytes32) (runs: 1000, μ: 962980, ~: 962980)
+[PASS] testHistoricalHarnessRevisionSeedRemainsStable() (gas: 1315435)
+[PASS] testHistoricalPrecommitCanBeRevealedAfterHeadAdvances() (gas: 1094567)
+[PASS] testMintSeedSetMixesImmutableCollectionMintEntropy() (gas: 928599)
+[PASS] testMissingHarnessOrRevisionReverts() (gas: 763160)
+[PASS] testRejectsBadConstructorAndZeroCommitments() (gas: 2653633)
+[PASS] testSeedContextMissingRevisionReturnsZeroFields() (gas: 721145)
+[PASS] testSeedMustMatchHarnessPrecommitAndUncommittedHarnessRejects() (gas: 1356637)
+[PASS] testSeedRegistryRepairDoesNotReinitializeOrRedirectDependencies() (gas: 1194782)
+[PASS] testTokenOwnersCannotRerollOrOverrideAfterTransfer() (gas: 753991)
+Suite result: ok. 15 passed; 0 failed; 0 skipped; finished in 1.58s (1.57s CPU time)
+
+Ran 7 tests for test/modules/keel-managed-modules/KeelManagedDependencies.t.sol:KeelManagedSeedVrfAdapterTest
+[PASS] testCoordinatorOnlyRequestAuthorizationAndAtomicCreditFailure() (gas: 14149001)
+[PASS] testDeliveryFailureRetriesTheOriginalWordWithoutAnotherCharge() (gas: 13365413)
+[PASS] testLockedAndSealedTransfersKeepVrfSeedIdentity() (gas: 14832560)
+[PASS] testOneRequestCoversHundredTokensAndResponsesMayArriveOutOfOrder() (gas: 14571593)
+[PASS] testOwnSubscriptionRestrictsRequestersAndRevocationDoesNotBlockDelivery() (gas: 14027030)
+[PASS] testPendingVrfRequestSurvivesFaultRepairAndDeliversOriginalWordOnce() (gas: 14851283)
+[PASS] testPrepaidPersonalCreditsRouteFeesToTreasuryAndOnlyChargeOnce() (gas: 14335140)
+Suite result: ok. 7 passed; 0 failed; 0 skipped; finished in 48.19ms (45.55ms CPU time)
+
+Ran 26 tests for test/modules/keel-managed-modules/KeelManagedDirectMint.t.sol:KeelManaged721Test
+[PASS] testAdministratorCanDisableTokenOwnerPresentationEditsAndReadPolicy() (gas: 342329)
+[PASS] testAdministratorCountIsExactAndTheLastAdministratorCannotLeave() (gas: 192106)
+[PASS] testAdvertisesEverySharedKeelMinterInterface() (gas: 52383)
+[PASS] testCampaignCreationRoleCanBeNarrowlyDelegated() (gas: 88902)
+[PASS] testFrozenTokenSnapshotsRegistryPresentation() (gas: 449854)
+[PASS] testImageFallsBackToTheManifestRatherThanRedrawingTheArtwork() (gas: 358650)
+[PASS] testLargeDefaultPresentationRoundTrips() (gas: 158925223)
+[PASS] testLargePresentationKeepsAuthorizationAndValidityChecks() (gas: 4544476)
+[PASS] testLargeTokenPresentationRoundTripsAndFreezes() (gas: 52037253)
+[PASS] testManagerHookReceivesExactPerTokenSlicesBeforeReceiver() (gas: 5124801)
+[PASS] testManagerHookRejectsMalformedBatchEnvelopeBeforeAnyMint() (gas: 4833889)
+[PASS] testMapMetadataEmbedsExactOnchainHTMLAndNoExternalHarnessURL() (gas: 10906964)
+[PASS] testMintRangeIsReservedBeforeReceiverCallback() (gas: 683778)
+[PASS] testMinterRoleCannotBeRemovedWithOutstandingReservation() (gas: 467570)
+[PASS] testPreEncodedModuleGraphProducesExactInlineSeededTokenURI() (gas: 17831776)
+[PASS] testPreparedFragmentsAbove32KRoundTrip() (gas: 151301106)
+[PASS] testPreparedOneOfOneCopiesCompactPercentHTMLAndBindsItsCarriageMode() (gas: 12675679)
+[PASS] testPreparedOneOfOneCopiesExactBuildTimeBase64FragmentsWithoutRuntimeCodec() (gas: 10229677)
+[PASS] testPreparedOneOfOneRejectsMalformedOrNonCanonicalBase64AtTheSetter() (gas: 9629580)
+[PASS] testPreparedOneOfOneRepairRetainsRoleBudgetAndNames() (gas: 3714172)
+[PASS] testRFC4648DataURIPayloadInvariantRejectsURLFragmentsAndBadPadding() (gas: 8255)
+[PASS] testRepairRetainsNamesRoyaltiesRolesReservationsAndTokenIdentity() (gas: 6785594)
+[PASS] testReusableHarnessContextChangesAnimationURIWithoutChangingCommittedHarnessBytes() (gas: 13974016)
+[PASS] testRoyaltyReceiverIsRequiredWhenRoyaltyIsNonZero() (gas: 194591)
+[PASS] testStandardMetadataAndRegistryOverride() (gas: 383795)
+[PASS] testTokenURIBase64RoundTripsEveryMetadataString() (gas: 1175709)
+Suite result: ok. 26 passed; 0 failed; 0 skipped; finished in 1.02s (1.00s CPU time)
+
+Ran 9 tests for test/modules/keel-managed-modules/KeelManagedDirectMint.t.sol:KeelManagedFactoryTest
+[PASS] testAgentAuthorizationCannotBeReplayedOrMutated() (gas: 614510)
+[PASS] testAgentCreatesOneExactCollectionForAccountWithAuthorization() (gas: 663419)
+[PASS] testAuthorizationDeadlineAndNonceBoundsAreFailClosed() (gas: 186249)
+[PASS] testCreationCodeCarrierKeepsTheDeployerBelowEIP170() (gas: 165606)
+[PASS] testCreatorCanInvalidatePendingAgentNonce() (gas: 211698)
+[PASS] testFactoryAdvertisesCapacityAwareEmbeddedCollectionCode() (gas: 204797)
+[PASS] testFactoryAndDeploymentRailRepairPreserveSignedNonceAndExistingCollection() (gas: 20896329)
+[PASS] testSharedDeployerNamespacesSaltSoDirectCallsCannotSquatFactoryAddress() (gas: 912557)
+[PASS] testWrongAgentAndMutatedConfigCannotUseAccountAuthorization() (gas: 686736)
+Suite result: ok. 9 passed; 0 failed; 0 skipped; finished in 35.38ms (19.55ms CPU time)
+
+Ran 6 tests for test/modules/keel-managed-modules/KeelManagedDirectMint.t.sol:KeelManagedRevisioned721SecurityTest
+[PASS] testAdminAndManagerMintsRequirePermanentDirectBinding() (gas: 680212)
+[PASS] testAuthorizedAlternativeRouteConfigurationIsExplicitlyRejected() (gas: 673359)
+[PASS] testCompleteERC165AndConfiguredProofRequired() (gas: 2632896)
+[PASS] testDirectOnlyOutputAndOwnerBeforeForwarding() (gas: 544467)
+[PASS] testMalformedOffsetsLengthSizeAndPaddingReject() (gas: 647379)
+[PASS] testOwnershipTransferAndFreezeAuthorityRetainCanonicalRules() (gas: 673789)
+Suite result: ok. 6 passed; 0 failed; 0 skipped; finished in 15.39ms (2.97ms CPU time)
+
+Ran 12 tests for test/modules/keel-managed-modules/KeelManagedEmergency.t.sol:KeelManagedEmergencyTest
+[PASS] testBrokenPauseLogicCannotPreventRouterQuarantineOrGovernedRepair() (gas: 2346071)
+[PASS] testEmptyBatchAndCloneAdministrationCannotAlterRootState() (gas: 41837)
+[PASS] testFrozenRouteRemainsPausableAndResumeCannotUnfreezeIt() (gas: 330858)
+[PASS] testFullAndSelectorStopsHaveOneSharedRevisionAndClearIndependently() (gas: 424556)
+[PASS] testFullQuarantineAuthorizationAndReassertionRejectStaleRelease() (gas: 321424)
+[PASS] testFullQuarantineBlocksReadsUnknownSelectorsAndEmptyValueCallsButRetainsControls() (gas: 2341241)
+[PASS] testFuzzRepairPauseAndMintSequencesPreserveGhostSupply(bytes32) (runs: 1000, μ: 1525558, ~: 1529678)
+[PASS] testInstanceAndGlobalStopsComposeWithoutAffectingOtherSelectors() (gas: 436952)
+[PASS] testOnlyAdminsMayStopAndOnlyQuorumMayResume() (gas: 305706)
+[PASS] testPausedManagerStillAllowsAdminStopQuorumRepairAndResume() (gas: 2185664)
+[PASS] testReassertedStopInvalidatesPreparedResumeAndBatchRevisionIsAtomic() (gas: 271236)
+[PASS] testStoppedCallsFailBeforeMissingManagerAndUnstoppedCallsFailClosed() (gas: 108242)
+Suite result: ok. 12 passed; 0 failed; 0 skipped; finished in 12.05s (12.04s CPU time)
+
+Ran 2 tests for test/modules/keel-managed-modules/KeelManagedFactoryAuction.t.sol:KeelManagedFactoryAuctionTest
+[PASS] testFactoryAndSharedEditionRepairKeepDirectoryAuthorityRangesAndBalances() (gas: 10095849)
+[PASS] testFrayAuctionRepairPreservesOutcomeReservationAndAlreadyMintedLatch() (gas: 10380429)
+Suite result: ok. 2 passed; 0 failed; 0 skipped; finished in 20.77ms (9.03ms CPU time)
+
+Ran 6 tests for test/modules/keel-managed-modules/KeelManagedGas.t.sol:KeelManagedGasTest
+[PASS] testGasManagedMintEight() (gas: 120575)
+[PASS] testGasManagedMintOne() (gas: 106974)
+[PASS] testGasManagedMintThirtyTwo() (gas: 162733)
+[PASS] testGasOrdinaryMintEight() (gas: 91205)
+[PASS] testGasOrdinaryMintOne() (gas: 77347)
+[PASS] testGasOrdinaryMintThirtyTwo() (gas: 133363)
+Suite result: ok. 6 passed; 0 failed; 0 skipped; finished in 6.62ms (366.67µs CPU time)
+
+Ran 3 tests for test/modules/keel-managed-modules/KeelManagedIncidentRecovery.t.sol:KeelManagedIncidentRecoveryTest
+[PASS] testActualReentryExploitQuarantineCounterCorrectionAndSafeResume() (gas: 2538773)
+[PASS] testCorrectionRejectsUnauthorizedUnpausedWrongExpectedAndWrongTargetValues() (gas: 2404016)
+[PASS] testRepairedCallbackFailureRollsBackAllSupplyCapacityAndOwnership() (gas: 2540761)
+Suite result: ok. 3 passed; 0 failed; 0 skipped; finished in 10.90ms (4.53ms CPU time)
+
+Ran 2 tests for test/modules/keel-managed-modules/KeelManagedMintCallbacks.t.sol:KeelManagedMintCallbacksTest
+[PASS] test1155SameAndCrossFunctionReentryRollbackPauseAndRepair() (gas: 10319598)
+[PASS] test721SameAndCrossFunctionReentryRollbackPauseAndRepair() (gas: 9788167)
+Suite result: ok. 2 passed; 0 failed; 0 skipped; finished in 18.55ms (11.52ms CPU time)
+
+Ran 20 tests for test/modules/keel-managed-modules/KeelManagedModule.t.sol:KeelManagedModuleTest
+[PASS] test721ARepairPreservesPackedOwnershipAndReservationAccounting() (gas: 6247330)
+[PASS] testArtifactRepairPreservesCreatorParentHistoryAndFrozenLineage() (gas: 15077784)
+[PASS] testAtomicInitializationRejectsEmptyAndReadOnlyCallsAndReleasesSalt() (gas: 1040738389)
+[PASS] testBroken1155MintRepairRetainsPackedItemBalancesAndReservations() (gas: 9043158)
+[PASS] testBroken721MintRepairsWithoutChangingAddressOwnerReservationsOrApprovals() (gas: 4372781)
+[PASS] testCrossChainBridgeRepairPreservesLockedWorkflowAndAuthority() (gas: 12378048)
+[PASS] testDirectRouterAndImplementationCannotBeInitializedOrMinted() (gas: 116514)
+[PASS] testFreezeRequiresGovernanceAndCanOnlyFinalizeAtRouter() (gas: 267205)
+[PASS] testFrozenRouterStillRejectsImplementationCodeDrift() (gas: 169330)
+[PASS] testFuzzRepairsPreserveSupplyAndReservations(uint8,uint8) (runs: 1000, μ: 4310802, ~: 4309237)
+[PASS] testLiveRouterRejectsUnregisteredCodeDrift() (gas: 39078)
+[PASS] testMintGateRepairKeepsPaidBalanceWalletLimitsCampaignAndOriginalValue() (gas: 17481848)
+[PASS] testMissingCompatibilityFailsClosedAndGovernanceCanRestore() (gas: 283740)
+[PASS] testOneMintAndRouteRepairsPreserveDropWalletCapacityAndMintNextToken() (gas: 30529506)
+[PASS] testOpenControllerCannotAccidentallyReplaceVerifiedController() (gas: 22009369)
+[PASS] testReceiverFailureAfterRepairStillRollsBackSupplyAndReservation() (gas: 4242198)
+[PASS] testSilentStorageReadBugFailsDigestThenQuarantineRepairRestoresOriginalCarriers() (gas: 15194700)
+[PASS] testStorageRepairRetainsDescriptorsCarriersLimitsAndHarnessRegistrations() (gas: 16259295)
+[PASS] testWrongImmutableHoldBindingFailsBeforeWritesAndRestoresShells() (gas: 26771594)
+[PASS] testWrongLayoutFailsBeforeTouchingTokenStateAndCanBeRepaired() (gas: 4692110)
+Suite result: ok. 20 passed; 0 failed; 0 skipped; finished in 1.62s (1.61s CPU time)
+
+Ran 19 tests for test/modules/keel-managed-modules/KeelManagedOneMintBatch.t.sol:KeelManagedOneMintBatchTest
+[PASS] testAggregateTokenPaymentAndWithdraw() (gas: 10829839)
+[PASS] testBrokenBatchRepairKeepsCartReservationsPaymentAndCallbackOrder() (gas: 9406393)
+[PASS] testClaimBitmapAndReplay() (gas: 4070363)
+[PASS] testDirectModuleRejected() (gas: 4441725)
+[PASS] testEOASignedBatchLastSignatureRollbackAndChainBinding() (gas: 4909827)
+[PASS] testFreeCheckoutAndReentryBlocked() (gas: 4617724)
+[PASS] testFuzzNativeCheckout(bool,bool,uint8,uint8) (runs: 1000, μ: 6476577, ~: 6107980)
+[PASS] testGas1() (gas: 4019288)
+[PASS] testGas10() (gas: 11780370)
+[PASS] testGas100() (gas: 89105504)
+[PASS] testInvalidCheckoutInputs() (gas: 4979022)
+[PASS] testLastRowFailureRollsBack() (gas: 4449758)
+[PASS] testMerkleUsageSharedWithSingleAndRollback() (gas: 4829719)
+[PASS] testMixedReservationModeFailsBeforePayment() (gas: 4357819)
+[PASS] testPausedDropAndDisabledRouteRollback() (gas: 4485053)
+[PASS] testReceiverFailureRollsBackPaymentAndCapacity() (gas: 4754896)
+[PASS] testSignatureDomainAndReplay() (gas: 3926256)
+[PASS] testTaxTokenRejectedWithoutChargingOrMinting() (gas: 5074967)
+[PASS] testTokenCallbackCannotReenter() (gas: 6110697)
+Suite result: ok. 19 passed; 0 failed; 0 skipped; finished in 3.54s (3.54s CPU time)
+
+Ran 25 tests for test/modules/keel-managed-modules/KeelManagedQueue.t.sol:KeelManagedMintQueueTest
+[PASS] testAdminGrantClosesExpiredReplacement() (gas: 316713)
+[PASS] testAdminGrantInvalidatesWaitingTicket() (gas: 1454423)
+[PASS] testCancelledEntriesNeverBecomeReady() (gas: 775407)
+[PASS] testCancellingExpiredTurnCountsItExactlyOnce() (gas: 1010297)
+[PASS] testDefaultQueueAndTenMinuteTurn() (gas: 1073048)
+[PASS] testDisabledQueueStillEnforcesLimits() (gas: 180249)
+[PASS] testDuplicateAndUnauthorizedConsume() (gas: 908654)
+[PASS] testFifoAndEightConcurrentTurns() (gas: 1691996)
+[PASS] testFuzzConsumeConservesAllowance(uint8) (runs: 1000, μ: 962069, ~: 958926)
+[PASS] testGasConsume() (gas: 955272)
+[PASS] testGasGrantEight() (gas: 1166331)
+[PASS] testGasJoin() (gas: 78965)
+[PASS] testKeeperDoesNotSubmitNoOpTransactions() (gas: 463902)
+[PASS] testLongIdleDoesNotScanEmptyTimeWindows() (gas: 1637947)
+[PASS] testLotteryCannotDrawBeforeClosureOrAcceptDuplicateEntropy() (gas: 3116306)
+[PASS] testLotteryConstructorRejectsExternallyOwnedEntropy() (gas: 1054622)
+[PASS] testLotteryLateCohortCannotOvertakeInitialEntrants() (gas: 2753539)
+[PASS] testMerkleBypassVersionRevokesProof() (gas: 213976)
+[PASS] testPartialConsumptionAndReentry() (gas: 1029296)
+[PASS] testPendingLotteryRepairPreservesOriginalCommitmentAndRejectsLateAndRepeatedEntropy() (gas: 5171906)
+[PASS] testPriorityAndLotteryPoolRepairRetainOrderingAndRemovedTickets() (gas: 4498587)
+[PASS] testQueueAndDemandRepairPreserveLiveTicketPartialConsumptionAndLifetimeBudget() (gas: 11890058)
+[PASS] testReentryAccountsForExpiredTurnExactlyOnce() (gas: 1109499)
+[PASS] testWalletBypassAndRevocation() (gas: 111692)
+[PASS] testWalletTicketOwnsQuantityAndOrdinaryReadyIsAnonymous() (gas: 983688)
+Suite result: ok. 25 passed; 0 failed; 0 skipped; finished in 3.18s (3.17s CPU time)
+
+Ran 22 tests for test/modules/keel-managed-modules/KeelManagedQueue.t.sol:KeelManagedQueueAccessTest
+[PASS] testAccessRepairRetainsUsedWalletQuotaAndCannotReinitialize() (gas: 2501466)
+[PASS] testBalanceThresholdIsLiveAndBudgetIsPerWallet() (gas: 380186)
+[PASS] testBoundAccessModuleCannotBeReplacedAndCreateAtStartsPaused() (gas: 3801769)
+[PASS] testCannotSwapCredentialDuringActiveTicket() (gas: 408529)
+[PASS] testDisabledQueueDoesNotSpendLimitedBenefit() (gas: 353242)
+[PASS] testExactTokenAndOptionalMerkleConditionBothRequired() (gas: 424961)
+[PASS] testFuzzSkipConsumptionConservesBudgets(uint32) (runs: 1000, μ: 500179, ~: 491932)
+[PASS] testHostileNftReturnBombFailsClosed() (gas: 236223)
+[PASS] testMerkleProofBindsWalletWeightPolicyAndQueue() (gas: 394686)
+[PASS] testNftTransferRevokesUnspentSkipAndCannotReplaySpentToken() (gas: 517146)
+[PASS] testOneSkipTransactionThenOrdinaryQueue() (gas: 833216)
+[PASS] testOrdinaryAdmissionPreservesUnusedOptionalAcceleration() (gas: 743571)
+[PASS] testPauseExpiryAndWalletRevocationPreserveUsage() (gas: 459560)
+[PASS] testPolicyDoesNotBypassWalletCapOrController() (gas: 402939)
+[PASS] testPriorityLateHolderGetsFutureSlotWithoutDisplacingReadyTurns() (gas: 2174108)
+[PASS] testPriorityShareKeepsFourOfFiveContestedTurnsOrdinary() (gas: 12849017)
+[PASS] testReadyPriorityRevocationFailsClosedButCanCancelAndRejoinOrdinary() (gas: 1088383)
+[PASS] testRevokedPriorityFallsBackToOrdinaryCohort() (gas: 753989)
+[PASS] testSignatureBoundsAndRejectingContractSigner() (gas: 318895)
+[PASS] testSignedCampaignRejectsWrongWalletChainAndConsumedReplay() (gas: 424047)
+[PASS] testSkipCancelsWaitingTicketWithoutDuplicateAdmission() (gas: 658870)
+[PASS] testWeightedPriorityAndSingleUseTurn() (gas: 1046173)
+Suite result: ok. 22 passed; 0 failed; 0 skipped; finished in 1.24s (1.23s CPU time)
+
+Ran 4 tests for test/modules/keel-managed-modules/KeelManagedRewards.t.sol:KeelManagedMintRewardEntropyTest
+[PASS] testCallerCannotForgeEntropyOrSpendUnlistedSubscription() (gas: 103614)
+[PASS] testClosedCohortGetsOneVerifiableDrawAndPermissionlessDelivery() (gas: 752659)
+[PASS] testPendingDeliveryRepairPreservesOriginalProviderRequestAndRejectsReroll() (gas: 2126313)
+[PASS] testRewardDrawUsesSharedAdapterThenRedeemsExactlyOnce() (gas: 3218042)
+Suite result: ok. 4 passed; 0 failed; 0 skipped; finished in 12.08ms (5.44ms CPU time)
+
+Ran 12 tests for test/modules/keel-managed-modules/KeelManagedRewards.t.sol:KeelManagedRewardClaimsTest
+[PASS] testDefaultAndCustomWeightsAreReadable() (gas: 352466)
+[PASS] testEntropyCannotBeForgedOrReplayed() (gas: 489611)
+[PASS] testFuzzEveryDrawIsInPool(uint256) (runs: 1000, μ: 496421, ~: 496584)
+[PASS] testNoDuplicateWeightedDrawAndNoReroll() (gas: 699656)
+[PASS] testPauseBlocksNewClaimsButNotEarnedRedemption() (gas: 333109)
+[PASS] testPendingDrawRepairPreservesBudgetCollectionBitmapCreditsAndSingleRedemption() (gas: 3500840)
+[PASS] testRedemptionFailurePreservesCredit() (gas: 345791)
+[PASS] testReviewedCampaignIdCannotShiftAndStillRequiresOwner() (gas: 277070)
+[PASS] testStrangerCannotSpendCredit() (gas: 303390)
+[PASS] testTokenClaimIsConsumedAcrossTransfers() (gas: 1093593)
+[PASS] testUniquePoolRejectsSameItemUnderDifferentBenefitIds() (gas: 258296)
+[PASS] testWalletCampaignDoesNotGrantToUnlistedWallet() (gas: 347722)
+Suite result: ok. 12 passed; 0 failed; 0 skipped; finished in 569.08ms (562.27ms CPU time)
+
+Ran 24 tests for test/modules/keel-artifacts/KeelManager.t.sol:KeelManagerTest
+[PASS] testAutomationCanApproveOnlyExplicitTimeBoundErc1271Requests() (gas: 393051)
+[PASS] testAutomationIsShortLivedScopedNonceBoundAndRelayerAgnostic() (gas: 415286)
+[PASS] testAutomationKeyAndCapabilityCannotOutliveThirtyDayBound() (gas: 355593)
+[PASS] testAutomationKeyReenableDoesNotReviveOldCapability() (gas: 537678)
+[PASS] testCriticalManagerFunctionsCannotBeDelegatedToLowerTiers() (gas: 101985)
+[PASS] testDownstreamCallsExposeTheirExecutionLane() (gas: 220296)
+[PASS] testExecutionPolicyNonceAdvancesAcrossDisableAndReenable() (gas: 245636)
+[PASS] testGovernanceCanPauseThroughTheMultisigLane() (gas: 134311)
+[PASS] testGovernanceRequiresSortedTwoThirdsSignaturesAndCannotReplay() (gas: 149058)
+[PASS] testGovernorRosterCannotBeScheduledWithUnprovenOrFarFutureKeys() (gas: 326700)
+[PASS] testGovernorRosterChangeIsDelayedAcceptedAndAdvancesThreshold() (gas: 608306)
+[PASS] testGovernorsProvideDirectErc1271TwoThirdsSignature() (gas: 67912)
+[PASS] testImplementationIsLockedAndProxyRejectsFewerThanThreeGovernors() (gas: 5637291)
+[PASS] testModuleReplacementIsCodeHashBoundAndCanBePermanentlyFrozen() (gas: 232521)
+[PASS] testPauseStopsLowerTiersButGovernanceCanRecover() (gas: 320226)
+[PASS] testProxyStartsWithMeaningfulTwoThirdsGovernanceAndAsciiIdentity() (gas: 51710)
+[PASS] testRoleExecutionBlocksReentryAndOuterEffectsRemainConsistent() (gas: 266225)
+[PASS] testRolePoliciesAreExactAndRespectAdminModeratorOrdering() (gas: 262200)
+[PASS] testRpcHostListDigestIsTheReproduciblePreimageAndTracksEveryInput() (gas: 102230)
+[PASS] testRpcHostListRejectsUnusableEntriesAndStaleRevisions() (gas: 1406109)
+[PASS] testRpcHostListReplacementClearsPriorEntriesAndSurvivesGovernorRotation() (gas: 715082)
+[PASS] testRpcHostListStartsEmptyAndOnlyGovernanceCanReplaceIt() (gas: 256251)
+[PASS] testTargetRevertRollsBackGovernanceNonce() (gas: 114708)
+[PASS] testUupsUpgradeRequiresGovernanceAndPreservesState() (gas: 5801783)
+Suite result: ok. 24 passed; 0 failed; 0 skipped; finished in 63.23ms (60.32ms CPU time)
+
+Ran 13 tests for test/modules/keel-artifacts/KeelManagerAdversarial.t.sol:KeelManagerAdversarialTest
+[PASS] testAConsumedNonceCannotBeReplayed() (gas: 144107)
+[PASS] testAFrozenArtifactLineageRefusesEveryActor() (gas: 2890780)
+[PASS] testAFrozenKeelIndexScopeRefusesEveryActor() (gas: 6950726)
+[PASS] testARosterCannotBeStagedWithoutEveryIncomingAcceptance() (gas: 408955)
+[PASS] testAStagedUpgradeCanBeWaitedOutCancelledAndOnlyLandsAsAnnounced() (gas: 11862058)
+[PASS] testEveryLaneRefusesAValueItDidNotAgreeTo() (gas: 702098)
+[PASS] testMalformedGovernorEnvelopesAreAllRefused() (gas: 204878)
+[PASS] testOnlyTheGovernanceLaneCanReachTheUpgradeEntryPoint() (gas: 6107490)
+[PASS] testPauseIsAdminOnlyKillsTheRoleLaneAndFlipsContractSignatures() (gas: 409244)
+[PASS] testRoleAdministrationSelectorsCannotBeDelegatedToAnyTier() (gas: 7430645)
+[PASS] testRotationSchedulingRefusesDirectCallsAndOutOfBoundsRosters() (gas: 444609)
+[PASS] testStaleEpochEnvelopesDieAtTheRotationBoundary() (gas: 309852)
+[PASS] testTheLastAdministratorCanNeverBeRemovedOrRenounce() (gas: 5013260)
+Suite result: ok. 13 passed; 0 failed; 0 skipped; finished in 58.28ms (50.58ms CPU time)
+
+Ran 15 tests for test/modules/keel-artifacts/KeelManagerCEI.t.sol:KeelManagerCEITest
+[PASS] testAutomationCallbackCannotEnterAnyExecutionLane() (gas: 933115)
+[PASS] testAutomationContractSignatureChecksPrecedeNonceEffects() (gas: 798029)
+[PASS] testAutomationRevertRestoresNonceModeBalancesAndTargetState() (gas: 405367)
+[PASS] testBubbledReentryRevertsTheWholeOuterTransaction() (gas: 440835)
+[PASS] testContractSignatureCannotWriteOrConsumeNonceDuringChecks() (gas: 1024175693)
+[PASS] testFuzzWrongPaymentCannotUseManagerBalance(uint96,uint8) (runs: 1000, μ: 86179, ~: 80351)
+[PASS] testGovernanceCallbackCannotEnterAnyExecutionLane() (gas: 952667)
+[PASS] testGovernanceRevertRestoresNonceModeBalancesAndTargetState() (gas: 430655)
+[PASS] testGovernorAcceptanceChecksCannotObserveHalfWrittenRoster() (gas: 1374395)
+[PASS] testMalformedRoleAndAutomationSelectorsNeverReachTarget() (gas: 203593)
+[PASS] testPausedOperationalLanesCannotReachTargetButGovernanceCanRepair() (gas: 251231)
+[PASS] testRejectedLastAcceptanceRollsBackAllPendingState() (gas: 1177305)
+[PASS] testRoleCallbackCannotEnterAnyExecutionLane() (gas: 901193)
+[PASS] testRoleRevertRestoresModeBalancesAndTargetState() (gas: 381441)
+[PASS] testValueCeilingsAreCheckedBeforeTheTargetReceivesControl() (gas: 93749)
+Suite result: ok. 15 passed; 0 failed; 0 skipped; finished in 345.32ms (337.23ms CPU time)
+
+Ran 5 tests for test/modules/keel-artifacts/KeelManagerCalldata.t.sol:KeelManagerCalldataTest
+[PASS] testFuzzNestedStringsMatchMemoryReads(bytes,bytes,uint8,uint64,uint64) (runs: 1000, μ: 137093, ~: 116790)
+[PASS] testMalformedNestedOffsetsAndLengthsPreserveRejection() (gas: 670352)
+[PASS] testThirtyTwoMaximumLengthHosts() (gas: 334668)
+[PASS] testTruncatedHeadsAndStringTailsMatchMemoryDecoder() (gas: 219805)
+[PASS] testWordBoundariesEmptyStringsAndMaximumEpochs() (gas: 172722)
+Suite result: ok. 5 passed; 0 failed; 0 skipped; finished in 624.79ms (618.63ms CPU time)
