@@ -1,0 +1,44 @@
+{
+  "schema": "keel-native-create-compat-source-proposal@1",
+  "baseSDKCommit": "b524bf5fc19939c7523aada2e53f79e3360970ea",
+  "gethCommit": "a579077007b98217c3e253a66e4b452ca0c32b96",
+  "goVersion": "go1.25.8",
+  "platform": "darwin/arm64",
+  "tests": {
+    "passed": 26,
+    "failed": 0,
+    "skipped": 0,
+    "scope": "pure parser/result-envelope controls only"
+  },
+  "files": [
+    {
+      "path": "native/proof-executor/geth-overlay/internal/ethapi/keel_sparse.go",
+      "bytes": 8136,
+      "sha256": "7d01c9e741d5335b3985e702832017acfb1855b6052c66f1967e6bf98ee04939"
+    },
+    {
+      "path": "native/proof-executor/geth-overlay/internal/ethapi/keel_sparse_test.go",
+      "bytes": 8910,
+      "sha256": "d3e94e3b70eca2e468bf813750f96ca2b2d59fc3c7fd833d39826b7f888a09c4"
+    },
+    {
+      "path": "native/proof-executor/fixtures/current49d-public-three-create.json",
+      "bytes": 112111,
+      "sha256": "de76973a117dbe9aba405f4753baf6d8e81e424fa0d2c1d196c064cb0effcbeb"
+    },
+    {
+      "path": "docs/reviews/studio-publication-20261020/native-create-compat/own-go-controls.jsonl",
+      "bytes": 24545,
+      "sha256": "ee9c124bfac2224739985588077b5c6166437d90b12ee4b678b6cb4b603fea1f"
+    }
+  ],
+  "nativeExecutorBuilt": false,
+  "nativeImageBuilt": false,
+  "publicRPCRequests": 0,
+  "actualPrefixExecuted": false,
+  "privateProgramExecuted": false,
+  "productionMutation": false,
+  "signing": false,
+  "submission": false,
+  "independentReview": "PENDING"
+}

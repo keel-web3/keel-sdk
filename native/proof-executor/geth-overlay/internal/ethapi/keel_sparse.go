@@ -79,6 +79,29 @@ func KeelSparseSimulate(ctx context.Context, base *types.Header, s *state.StateD
 	if base == nil || base.Number == nil || base.Difficulty == nil || base.Difficulty.Sign() != 0 || base.Root == (common.Hash{}) || base.GasLimit == 0 || !params.SepoliaChainConfig.IsAmsterdam(base.Number, base.Time) {
 		return nil, errors.New("unsupported pinned chain/fork/header")
 	}
+	opts, err := keelSparseOptions(raw, base.GasLimit, budget)
+	if err != nil {
+		return nil, err
+	}
+	b := &KeelSparseBackend{Base: types.CopyHeader(base), FetchAncestor: ancestor, Headers: make(map[uint64]*types.Header), Timeout: timeout, engine: beacon.New(ethash.NewFaker())}
+	sim := &simulator{b: b, state: s, base: types.CopyHeader(base), chainConfig: params.SepoliaChainConfig, budget: newGasBudget(budget), validate: opts.Validation, fullTx: opts.ReturnFullTransactions}
+	result, err := sim.execute(ctx, opts.BlockStateCalls)
+	if err != nil {
+		return nil, err
+	}
+	if b.err != nil {
+		return nil, fmt.Errorf("missing authenticated ancestor: %w", b.err)
+	}
+	if err := s.Error(); err != nil {
+		return nil, fmt.Errorf("incomplete authenticated witness: %w", err)
+	}
+	if err := verifyKeelSparseEnvelopes(raw, result); err != nil {
+		return nil, err
+	}
+	return json.Marshal(result)
+}
+
+func keelSparseOptions(raw json.RawMessage, gasLimit, budget uint64) (simOpts, error) {
 	// Reject overrides and unexpected envelope extensions before typed decoding.
 	var envelope struct {
 		BlockStateCalls []struct {
@@ -91,51 +114,74 @@ func KeelSparseSimulate(ctx context.Context, base *types.Header, s *state.StateD
 	d := json.NewDecoder(bytes.NewReader(raw))
 	d.DisallowUnknownFields()
 	if err := d.Decode(&envelope); err != nil {
-		return nil, err
+		return simOpts{}, err
 	}
-	if len(envelope.BlockStateCalls) == 0 || len(envelope.BlockStateCalls) > 256 || envelope.TraceTransfers || !envelope.ReturnFullTransactions {
-		return nil, errors.New("unsupported simulation shape")
+	if len(envelope.BlockStateCalls) == 0 || len(envelope.BlockStateCalls) > 256 || envelope.TraceTransfers {
+		return simOpts{}, errors.New("unsupported simulation shape")
 	}
 	var opts simOpts
 	if err := json.Unmarshal(raw, &opts); err != nil {
-		return nil, err
+		return simOpts{}, err
 	}
+	totalCalls := 0
 	for i, block := range opts.BlockStateCalls {
-		if len(block.Calls) != 1 || block.StateOverrides != nil || block.BlockOverrides != nil {
-			return nil, errors.New("exact one-call blocks without overrides required")
+		if len(block.Calls) == 0 || block.StateOverrides != nil || block.BlockOverrides != nil {
+			return simOpts{}, errors.New("nonempty call blocks without overrides required")
 		}
-		var fields map[string]json.RawMessage
-		if err := json.Unmarshal(envelope.BlockStateCalls[i].Calls[0], &fields); err != nil {
-			return nil, err
+		totalCalls += len(block.Calls)
+		// The direct simulator entry must retain the unchanged public RPC bounds.
+		if len(block.Calls) > maxSimulateCallsPerBlock || totalCalls > maxSimulateTotalCalls {
+			return simOpts{}, errors.New("simulation call count limit exceeded")
 		}
-		for key := range fields {
-			switch key {
-			case "from", "to", "data", "value", "gas", "nonce", "gasPrice", "maxFeePerGas", "maxPriorityFeePerGas":
-			default:
-				return nil, errors.New("unsupported transaction field")
+		for j, call := range block.Calls {
+			var fields map[string]json.RawMessage
+			if err := json.Unmarshal(envelope.BlockStateCalls[i].Calls[j], &fields); err != nil {
+				return simOpts{}, err
+			}
+			for key := range fields {
+				switch key {
+				case "from", "to", "data", "value", "gas", "nonce", "gasPrice", "maxFeePerGas", "maxPriorityFeePerGas":
+				default:
+					return simOpts{}, errors.New("unsupported transaction field")
+				}
+			}
+			if call.From == nil || call.Gas == nil || uint64(*call.Gas) == 0 || uint64(*call.Gas) > gasLimit || uint64(*call.Gas) > budget || call.Value == nil || call.Value.ToInt().Sign() < 0 || call.Value.ToInt().Cmp(new(big.Int).Lsh(big.NewInt(1), 256)) >= 0 {
+				return simOpts{}, errors.New("invalid original transaction envelope")
 			}
 		}
-		call := block.Calls[0]
-		if call.From == nil || call.To == nil || call.Gas == nil || uint64(*call.Gas) == 0 || uint64(*call.Gas) > base.GasLimit || uint64(*call.Gas) > budget || call.Value == nil || call.Value.ToInt().Sign() < 0 || call.Value.ToInt().Cmp(new(big.Int).Lsh(big.NewInt(1), 256)) >= 0 {
-			return nil, errors.New("invalid original transaction envelope")
-		}
 	}
-	b := &KeelSparseBackend{Base: types.CopyHeader(base), FetchAncestor: ancestor, Headers: make(map[uint64]*types.Header), Timeout: timeout, engine: beacon.New(ethash.NewFaker())}
-	sim := &simulator{b: b, state: s, base: types.CopyHeader(base), chainConfig: params.SepoliaChainConfig, budget: newGasBudget(budget), validate: opts.Validation, fullTx: true}
-	result, err := sim.execute(ctx, opts.BlockStateCalls)
-	if err != nil {
-		return nil, err
+	return opts, nil
+}
+
+// Compare every executed envelope to a fresh decode of the original bytes. The
+// simulator may populate local defaults; those defaults are never proof authority.
+func verifyKeelSparseEnvelopes(raw json.RawMessage, result []*simBlockResult) error {
+	var original simOpts
+	if err := json.Unmarshal(raw, &original); err != nil {
+		return err
 	}
-	if b.err != nil {
-		return nil, fmt.Errorf("missing authenticated ancestor: %w", b.err)
-	}
-	if err := s.Error(); err != nil {
-		return nil, fmt.Errorf("incomplete authenticated witness: %w", err)
+	if len(result) != len(original.BlockStateCalls) {
+		return errors.New("simulation block count changed")
 	}
 	for i, block := range result {
-		if block.Block.Root() == (common.Hash{}) || len(block.Block.Transactions()) != 1 || block.Block.Transactions()[0].Gas() != uint64(*opts.BlockStateCalls[i].Calls[0].Gas) {
-			return nil, errors.New("local resource cap changed an original envelope or root is absent")
+		calls := original.BlockStateCalls[i].Calls
+		if block == nil || block.Block == nil || block.Block.Root() == (common.Hash{}) || len(block.Block.Transactions()) != len(calls) || len(block.Calls) != len(calls) {
+			return errors.New("simulation result count or authenticated root mismatch")
+		}
+		for j, transaction := range block.Block.Transactions() {
+			if transaction == nil {
+				return errors.New("simulation omitted an original transaction")
+			}
+			call := calls[j]
+			sender, present := block.senders[transaction.Hash()]
+			to := transaction.To()
+			if call.From == nil || !present || sender != *call.From || call.Gas == nil || transaction.Gas() != uint64(*call.Gas) || call.Value == nil || transaction.Value().Cmp(call.Value.ToInt()) != 0 || !bytes.Equal(transaction.Data(), call.data()) || (to == nil) != (call.To == nil) || to != nil && *to != *call.To {
+				return errors.New("local simulation changed an original execution envelope")
+			}
+			if call.Nonce != nil && transaction.Nonce() != uint64(*call.Nonce) || call.GasPrice != nil && transaction.GasPrice().Cmp(call.GasPrice.ToInt()) != 0 || call.MaxFeePerGas != nil && transaction.GasFeeCap().Cmp(call.MaxFeePerGas.ToInt()) != 0 || call.MaxPriorityFeePerGas != nil && transaction.GasTipCap().Cmp(call.MaxPriorityFeePerGas.ToInt()) != 0 {
+				return errors.New("local simulation changed an original nonce or fee envelope")
+			}
 		}
 	}
-	return json.Marshal(result)
+	return nil
 }
