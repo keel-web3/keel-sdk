@@ -1,0 +1,164 @@
+
+> @keel/contracts@0.3.0 gas:check /Users/ravonus/dev/wt/independent-outstanding-20261020/keel-contracts
+> node ../keel-sdk/scripts/solidity-gas-check.mjs && pnpm run gas:snapshots:check
+
+Solidity gas policy passed across 1385 public/external entrypoints (615 state-changing, 54 payable, 118 transient-guarded).
+
+> @keel/contracts@0.3.0 gas:snapshots:check /Users/ravonus/dev/wt/independent-outstanding-20261020/keel-contracts
+> forge snapshot --match-path 'test/gas/*.t.sol' --match-test '^testGas' --check
+
+No files changed, compilation skipped
+
+Ran 5 tests for test/gas/KeelHoldWeldEvents.gas.t.sol:KeelHoldWeldEventsGasTest
+[PASS] testGasComposite() (gas: 117627)
+[PASS] testGasLeaf() (gas: 108970)
+[PASS] testGasLeaf128References() (gas: 721321)
+[PASS] testGasLeafLongMediaType() (gas: 139564)
+[PASS] testGasLeafThreeReferences() (gas: 118513)
+Suite result: ok. 5 passed; 0 failed; 0 skipped; finished in 1.51ms (300.92µs CPU time)
+
+Ran 12 tests for test/gas/KeelLoopStrategies.t.sol:KeelLoopStrategiesTest
+[PASS] testGasFusedEight() (gas: 14082)
+[PASS] testGasFusedOne() (gas: 7580)
+[PASS] testGasFusedThirtyTwo() (gas: 35910)
+[PASS] testGasFusedUneven() (gas: 70603)
+[PASS] testGasRecursiveEight() (gas: 14376)
+[PASS] testGasRecursiveOne() (gas: 7785)
+[PASS] testGasRecursiveThirtyTwo() (gas: 37332)
+[PASS] testGasRecursiveUneven() (gas: 68673)
+[PASS] testGasSeparateEight() (gas: 14062)
+[PASS] testGasSeparateOne() (gas: 7415)
+[PASS] testGasSeparateThirtyTwo() (gas: 35868)
+[PASS] testGasSeparateUneven() (gas: 66801)
+Suite result: ok. 12 passed; 0 failed; 0 skipped; finished in 1.58ms (693.33µs CPU time)
+
+Ran 4 tests for test/gas/KeelMatrixDigits.t.sol:KeelMatrixDigitsTest
+[PASS] testGasAfterMaximumDigits() (gas: 40233)
+[PASS] testGasAfterZeroDigits() (gas: 33403)
+[PASS] testGasBeforeMaximumDigits() (gas: 108483)
+[PASS] testGasBeforeZeroDigits() (gas: 33994)
+Suite result: ok. 4 passed; 0 failed; 0 skipped; finished in 1.64ms (357.71µs CPU time)
+
+Ran 10 tests for test/gas/KeelHoldMetadataReads.gas.t.sol:KeelHoldMetadataReadsGasTest
+[PASS] testGasMetadata1() (gas: 17335)
+[PASS] testGasMetadata127() (gas: 17421)
+[PASS] testGasMetadata128() (gas: 17377)
+[PASS] testGasMetadata128Warm() (gas: 21397)
+[PASS] testGasMetadata31() (gas: 17247)
+[PASS] testGasMetadata32() (gas: 17423)
+[PASS] testGasMetadata33() (gas: 17400)
+[PASS] testGasMetadata64() (gas: 17422)
+[PASS] testGasMetadataComposite() (gas: 17456)
+[PASS] testGasMetadataCompressed() (gas: 17291)
+Suite result: ok. 10 passed; 0 failed; 0 skipped; finished in 1.60ms (192.96µs CPU time)
+
+Ran 4 tests for test/gas/KeelTransientRewards.t.sol:KeelTransientRewardsTest
+[PASS] testGasAfterClaim() (gas: 70338)
+[PASS] testGasAfterEntropyRequest() (gas: 69408)
+[PASS] testGasBeforeClaim() (gas: 72279)
+[PASS] testGasBeforeEntropyRequest() (gas: 71351)
+Suite result: ok. 4 passed; 0 failed; 0 skipped; finished in 1.91ms (81.25µs CPU time)
+
+Ran 10 tests for test/gas/KeelHoldUploads.gas.t.sol:KeelHoldUploadsGasTest
+[PASS] testGasBatchDuplicates() (gas: 199545)
+[PASS] testGasBatchFresh() (gas: 416249)
+[PASS] testGasBatchMixed() (gas: 310008)
+[PASS] testGasBatchReused() (gas: 95569)
+[PASS] testGasExhaustedBatchLarge() (gas: 223249)
+[PASS] testGasExhaustedSingleLarge() (gas: 168783)
+[PASS] testGasLastChunkExceedsAllowance() (gas: 331358)
+[PASS] testGasLifecycleThreeChunks() (gas: 528579)
+[PASS] testGasSingleFresh() (gas: 191298)
+[PASS] testGasSingleReused() (gas: 84013)
+Suite result: ok. 10 passed; 0 failed; 0 skipped; finished in 2.10ms (603.79µs CPU time)
+
+Ran 11 tests for test/gas/KeelHoldHeaders.gas.t.sol:KeelHoldHeadersGasTest
+[PASS] testGasCountDeep() (gas: 140410)
+[PASS] testGasCountWide() (gas: 60672)
+[PASS] testGasHaulDeep() (gas: 157417)
+[PASS] testGasHaulLeaf() (gas: 30121)
+[PASS] testGasHaulWide() (gas: 116017)
+[PASS] testGasLeafPointers() (gas: 18557)
+[PASS] testGasMetadata() (gas: 17322)
+[PASS] testGasPartIds() (gas: 19336)
+[PASS] testGasReadDeep() (gas: 141142)
+[PASS] testGasReadFirst() (gas: 30220)
+[PASS] testGasReadLast() (gas: 73986)
+Suite result: ok. 11 passed; 0 failed; 0 skipped; finished in 2.01ms (592.08µs CPU time)
+
+Ran 8 tests for test/gas/KeelAccessGroups.gas.t.sol:KeelAccessGroupsGasTest
+[PASS] testGasAuthorizeBootstrap() (gas: 106492)
+[PASS] testGasBootstrapTo3() (gas: 127863)
+[PASS] testGasReadFullRoster32() (gas: 91723)
+[PASS] testGasRosterDisjoint32() (gas: 1004620)
+[PASS] testGasRosterGrow3To32() (gas: 358627)
+[PASS] testGasRosterReplaceOne32() (gas: 297214)
+[PASS] testGasRosterShrink32To3() (gas: 290757)
+[PASS] testGasRosterUnchanged32() (gas: 167839)
+Suite result: ok. 8 passed; 0 failed; 0 skipped; finished in 2.42ms (1.75ms CPU time)
+
+Ran 10 tests for test/gas/CoreUserPaths.gas.t.sol:CoreUserPathsGasTest
+[PASS] testGasCancelBid() (gas: 61659)
+[PASS] testGasCreateCollection() (gas: 5110982)
+[PASS] testGasCreateLeafObjectWithThirtyTwoReferences() (gas: 255021)
+[PASS] testGasManagerMintFive() (gas: 186545)
+[PASS] testGasManagerMintOne() (gas: 77870)
+[PASS] testGasPlaceInitialBid() (gas: 95290)
+[PASS] testGasPublishCollectionRevision() (gas: 106565)
+[PASS] testGasPutDeduplicatedSlug() (gas: 14151)
+[PASS] testGasPutFreshOneKiBSlug() (gas: 275656)
+[PASS] testGasReplaceBid() (gas: 88693)
+Suite result: ok. 10 passed; 0 failed; 0 skipped; finished in 2.67ms (597.21µs CPU time)
+
+Ran 10 tests for test/gas/ParityPaths.gas.t.sol:ParityPathsGasTest
+[PASS] testGasCollectionMint1() (gas: 87515)
+[PASS] testGasCollectionRelease2() (gas: 23195)
+[PASS] testGasCollectionReserve3() (gas: 61419)
+[PASS] testGasHoldDuplicate1024() (gas: 89337)
+[PASS] testGasHoldDuplicate32() (gas: 20706)
+[PASS] testGasHoldDuplicate4096() (gas: 302022)
+[PASS] testGasHoldFresh1024() (gas: 349992)
+[PASS] testGasHoldFresh32() (gas: 82321)
+[PASS] testGasHoldFresh4096() (gas: 1179401)
+[PASS] testGasShellSetKeeper() (gas: 14299)
+Suite result: ok. 10 passed; 0 failed; 0 skipped; finished in 3.15ms (371.83µs CPU time)
+
+Ran 14 tests for test/gas/KeelWeb3.gas.t.sol:KeelWeb3GasTest
+[PASS] testGasAdapterRequestHeadSlugOfCompositeWithPartScan() (gas: 175061)
+[PASS] testGasAdapterRequestHeadSlugWithContentHeaders() (gas: 88241)
+[PASS] testGasAdapterRequestMidSlugOfHundredSlugLeaf() (gas: 82983)
+[PASS] testGasAdapterRequestNotFound() (gas: 46064)
+[PASS] testGasAdapterRequestTailSlugOfComposite() (gas: 135475)
+[PASS] testGasAdapterRequestTailSlugOfHundredSlugLeaf() (gas: 65038)
+[PASS] testGasCoreFlatSlugCountHundredSlugLeaf() (gas: 16312)
+[PASS] testGasCoreReadObjectComposite138KiB() (gas: 472310)
+[PASS] testGasCoreReadObjectHundredKiBLeaf() (gas: 575869)
+[PASS] testGasCoreReadObjectSingleKiBLeaf() (gas: 23131)
+[PASS] testGasCoreReadObjectTenKiBLeaf() (gas: 60310)
+[PASS] testGasCoreReadSlugHeadOfHundredSlugLeaf() (gas: 22530)
+[PASS] testGasCoreReadSlugTailOfComposite() (gas: 71693)
+[PASS] testGasCoreReadSlugTailOfHundredSlugLeaf() (gas: 22205)
+Suite result: ok. 14 passed; 0 failed; 0 skipped; finished in 3.98ms (1.14ms CPU time)
+
+Ran 14 tests for test/gas/KeelReferenceReads.t.sol:KeelReferenceReadsTest
+[PASS] testGasAfterCountComposite() (gas: 332380)
+[PASS] testGasAfterHaulComposite() (gas: 10697275)
+[PASS] testGasAfterHaulLeaf() (gas: 413666)
+[PASS] testGasAfterPageEight() (gas: 19663)
+[PASS] testGasAfterPageMaximum() (gas: 69477)
+[PASS] testGasAfterPageOne() (gas: 15926)
+[PASS] testGasAfterPageThirtyTwo() (gas: 29581)
+[PASS] testGasBeforeCountComposite() (gas: 366178)
+[PASS] testGasBeforeHaulComposite() (gas: 13811021)
+[PASS] testGasBeforeHaulLeaf() (gas: 440658)
+[PASS] testGasBeforePageEight() (gas: 20492)
+[PASS] testGasBeforePageMaximum() (gas: 94473)
+[PASS] testGasBeforePageOne() (gas: 15928)
+[PASS] testGasBeforePageThirtyTwo() (gas: 35385)
+Suite result: ok. 14 passed; 0 failed; 0 skipped; finished in 15.32ms (21.09ms CPU time)
+
+Ran 12 test suites in 16.69ms (39.88ms CPU time): 112 tests passed, 0 failed, 0 skipped (112 total tests)
+Diff in "KeelMatrixDigitsTest::testGasAfterMaximumDigits()": consumed "(gas: 40233)" gas, expected "(gas: 40244)" gas 
+Diff in "KeelMatrixDigitsTest::testGasAfterZeroDigits()": consumed "(gas: 33403)" gas, expected "(gas: 33418)" gas 
+ ELIFECYCLE  Command failed with exit code 1.
+ ELIFECYCLE  Command failed with exit code 1.

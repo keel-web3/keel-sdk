@@ -1,0 +1,19 @@
+{
+  "schema": "keel-native-holder-fixture-correction@1",
+  "sourceCommit": "e9f202a5030b75ad7032800f210b622193166d1b",
+  "parentCommit": "3ce5312daecb21b62bdebae681a9e16715fcbb97",
+  "independentlyApprovedExactPatchSHA256": "5118452669677fc560f1542fc503a7516f6658fdd687d5d5653fdc85bb810631",
+  "appliedOnlyAfterParentReportedIndependentApproval": true,
+  "oldAssertionsChanged": false,
+  "productionSourceChanged": false,
+  "compiledSevenNativeArtifactFilesByteIdentical": true,
+  "command": "forge test -j 4 --match-contract 'KeelNativeMedia(CompatibilityTest|PresentationSecurityCompatibilityTest|PresentationTest)' --match-test 'test(StandardTemplatesOverridesAndExplicitKeelFallback|ImageBytesComeFromHoldIncludingAbove32K|FreezePinsInheritedImageAndURIRoute|OwnershipTransferMovesEditPermissionButNeverUnfreezes|FreezePinsNativeSourceWhileOtherTokensFollowUpdatedDefault|HolderCannotEditOrFreezeWithoutCreatorOptIn)' -vvv",
+  "result": {
+    "exit": 0,
+    "pass": 6,
+    "fail": 0,
+    "skip": 0
+  },
+  "fullSuiteSuccessor": "NOT RUN: independent final full Forge remains required",
+  "publicChainOperations": 0
+}

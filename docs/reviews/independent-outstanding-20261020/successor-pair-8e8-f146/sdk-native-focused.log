@@ -1,0 +1,892 @@
+TAP version 13
+# Subtest: effective set is the intersection of allows minus the union of denies
+ok 1 - effective set is the intersection of allows minus the union of denies
+  ---
+  duration_ms: 1.854125
+  type: 'test'
+  ...
+# Subtest: a concrete-ceiling app cannot widen above the host
+ok 2 - a concrete-ceiling app cannot widen above the host
+  ---
+  duration_ms: 0.503209
+  type: 'test'
+  ...
+# Subtest: deny always wins over any allow
+ok 3 - deny always wins over any allow
+  ---
+  duration_ms: 0.998292
+  type: 'test'
+  ...
+# Subtest: monotonicity: adding a restrictive layer only removes capabilities
+ok 4 - monotonicity: adding a restrictive layer only removes capabilities
+  ---
+  duration_ms: 0.409667
+  type: 'test'
+  ...
+# Subtest: matching is case-insensitive so a mixed-case token cannot evade a deny
+ok 5 - matching is case-insensitive so a mixed-case token cannot evade a deny
+  ---
+  duration_ms: 0.278417
+  type: 'test'
+  ...
+# Subtest: a wildcard ceiling grant is surfaced (unbounded / wildcardGranted), not silent
+ok 6 - a wildcard ceiling grant is surfaced (unbounded / wildcardGranted), not silent
+  ---
+  duration_ms: 0.160417
+  type: 'test'
+  ...
+# Subtest: grant-all ceiling is flagged unbounded
+ok 7 - grant-all ceiling is flagged unbounded
+  ---
+  duration_ms: 0.186709
+  type: 'test'
+  ...
+# Subtest: strictCeiling makes a ceiling wildcard non-granting (forward-safe)
+ok 8 - strictCeiling makes a ceiling wildcard non-granting (forward-safe)
+  ---
+  duration_ms: 0.112292
+  type: 'test'
+  ...
+# Subtest: array-form allow:['*'] behaves like grant-all and does not pollute the universe
+ok 9 - array-form allow:['*'] behaves like grant-all and does not pollute the universe
+  ---
+  duration_ms: 0.474458
+  type: 'test'
+  ...
+# Subtest: a lone wildcard grants nothing on its own
+ok 10 - a lone wildcard grants nothing on its own
+  ---
+  duration_ms: 0.539458
+  type: 'test'
+  ...
+# Subtest: namespace deny wildcard removes a whole family
+ok 11 - namespace deny wildcard removes a whole family
+  ---
+  duration_ms: 0.199375
+  type: 'test'
+  ...
+# Subtest: order independence of intersection (concrete layers)
+ok 12 - order independence of intersection (concrete layers)
+  ---
+  duration_ms: 0.146208
+  type: 'test'
+  ...
+# Subtest: token builders reject wildcard metacharacters
+ok 13 - token builders reject wildcard metacharacters
+  ---
+  duration_ms: 0.386209
+  type: 'test'
+  ...
+# Subtest: manifestCapabilityLayer derives browser + network + wallet tokens (lowercased)
+ok 14 - manifestCapabilityLayer derives browser + network + wallet tokens (lowercased)
+  ---
+  duration_ms: 0.128666
+  type: 'test'
+  ...
+# Subtest: effectiveRuntimeCapabilities respects the host ceiling for the sandbox
+ok 15 - effectiveRuntimeCapabilities respects the host ceiling for the sandbox
+  ---
+  duration_ms: 0.105417
+  type: 'test'
+  ...
+# Subtest: allowedWalletIntents / allowedHostOperations filter candidates by the effective set
+ok 16 - allowedWalletIntents / allowedHostOperations filter candidates by the effective set
+  ---
+  duration_ms: 0.133917
+  type: 'test'
+  ...
+# Subtest: returned layers are frozen copies, not the caller's mutable arrays
+ok 17 - returned layers are frozen copies, not the caller's mutable arrays
+  ---
+  duration_ms: 0.123917
+  type: 'test'
+  ...
+# Subtest: narrowWalletOperations removes host-forbidden intents but never adds new ones
+ok 18 - narrowWalletOperations removes host-forbidden intents but never adds new ones
+  ---
+  duration_ms: 1.392667
+  type: 'test'
+  ...
+# Subtest: narrowHostOperations filters a host-operation map by policy
+ok 19 - narrowHostOperations filters a host-operation map by policy
+  ---
+  duration_ms: 0.418167
+  type: 'test'
+  ...
+# Subtest: explain reports why a capability was blocked
+ok 20 - explain reports why a capability was blocked
+  ---
+  duration_ms: 0.174166
+  type: 'test'
+  ...
+# Subtest: coordinate packing matches applied Octez receipt ID
+ok 21 - coordinate packing matches applied Octez receipt ID
+  ---
+  duration_ms: 1.798125
+  type: 'test'
+  ...
+# Subtest: attachment parameters match native applied scenario
+ok 22 - attachment parameters match native applied scenario
+  ---
+  duration_ms: 7.912333
+  type: 'test'
+  ...
+# Subtest: fake source bytes, unsupported routes and invalid coordinates fail locally
+ok 23 - fake source bytes, unsupported routes and invalid coordinates fail locally
+  ---
+  duration_ms: 2.000458
+  type: 'test'
+  ...
+# Subtest: reader rejects wrong network and unavailable RPC before accepting a receipt
+ok 24 - reader rejects wrong network and unavailable RPC before accepting a receipt
+  ---
+  duration_ms: 19.026125
+  type: 'test'
+  ...
+# Subtest: readback decodes exact native receipt and distinguishes current status
+ok 25 - readback decodes exact native receipt and distinguishes current status
+  ---
+  duration_ms: 3.450208
+  type: 'test'
+  ...
+# Subtest: submission reads confirmed block and rejects failed operations
+ok 26 - submission reads confirmed block and rejects failed operations
+  ---
+  duration_ms: 4.998708
+  type: 'test'
+  ...
+# Subtest: profile suspension is distinct from historical acceptance and source finality
+ok 27 - profile suspension is distinct from historical acceptance and source finality
+  ---
+  duration_ms: 4.416917
+  type: 'test'
+  ...
+# Subtest: MCP lists every Tezos collection-route tool with a schema
+ok 28 - MCP lists every Tezos collection-route tool with a schema
+  ---
+  duration_ms: 625.674417
+  type: 'test'
+  ...
+# Subtest: MCP plans, originates, stores, binds, gates, mints and writes metadata review-only
+ok 29 - MCP plans, originates, stores, binds, gates, mints and writes metadata review-only
+  ---
+  duration_ms: 170.31475
+  type: 'test'
+  ...
+# Subtest: MCP Tezos tools refuse key material and wrong network identities
+ok 30 - MCP Tezos tools refuse key material and wrong network identities
+  ---
+  duration_ms: 21.066625
+  type: 'test'
+  ...
+# Subtest: MCP read-back verifies a collection against a loopback Tezos RPC
+ok 31 - MCP read-back verifies a collection against a loopback Tezos RPC
+  ---
+  duration_ms: 226.953334
+  type: 'test'
+  ...
+# Subtest: MCP prepares harness tree calls on the piece that holds them
+ok 32 - MCP prepares harness tree calls on the piece that holds them
+  ---
+  duration_ms: 30.935709
+  type: 'test'
+  ...
+# Subtest: MCP prepares automation keys, grants, the signing payload and the relayer call
+ok 33 - MCP prepares automation keys, grants, the signing payload and the relayer call
+  ---
+  duration_ms: 15.849792
+  type: 'test'
+  ...
+# Subtest: MCP prepares token-bound account creation and owner execution, refusing delegate calls
+ok 34 - MCP prepares token-bound account creation and owner execution, refusing delegate calls
+  ---
+  duration_ms: 9.877542
+  type: 'test'
+  ...
+# Subtest: MCP prepares manager pause and cold recovery, refusing the EVM-only upgrade path
+ok 35 - MCP prepares manager pause and cold recovery, refusing the EVM-only upgrade path
+  ---
+  duration_ms: 20.484917
+  type: 'test'
+  ...
+# Subtest: MCP prepares a valued governance action whose executing approval alone attaches the value
+ok 36 - MCP prepares a valued governance action whose executing approval alone attaches the value
+  ---
+  duration_ms: 11.077875
+  type: 'test'
+  ...
+# Subtest: MCP prepares entrypoint capabilities that match the shared golden vector and refuses authority entrypoints
+ok 37 - MCP prepares entrypoint capabilities that match the shared golden vector and refuses authority entrypoints
+  ---
+  duration_ms: 15.693834
+  type: 'test'
+  ...
+# Subtest: MCP prepares seeded-collection calls and returns the typed refusal for EVM-only seed modes
+ok 38 - MCP prepares seeded-collection calls and returns the typed refusal for EVM-only seed modes
+  ---
+  duration_ms: 21.61625
+  type: 'test'
+  ...
+# Subtest: keel-tezos-live-state-prepare is listed with a review-only description
+ok 39 - keel-tezos-live-state-prepare is listed with a review-only description
+  ---
+  duration_ms: 388.682042
+  type: 'test'
+  ...
+# Subtest: reads the snapshot over a loopback RPC, then the fragment follows the chain
+ok 40 - reads the snapshot over a loopback RPC, then the fragment follows the chain
+  ---
+  duration_ms: 204.997458
+  type: 'test'
+  ...
+# Subtest: offline snapshots work without a network; keys, bad endpoints and bad snapshots are refused
+ok 41 - offline snapshots work without a network; keys, bad endpoints and bad snapshots are refused
+  ---
+  duration_ms: 16.522625
+  type: 'test'
+  ...
+# Subtest: every capability states both adapters, or the closest secure behaviour and why
+ok 42 - every capability states both adapters, or the closest secure behaviour and why
+  ---
+  duration_ms: 1.445167
+  type: 'test'
+  ...
+# Subtest: an unsupported call returns a typed refusal with the closest secure behaviour
+ok 43 - an unsupported call returns a typed refusal with the closest secure behaviour
+  ---
+  duration_ms: 2.22725
+  type: 'test'
+  ...
+# Subtest: native adapters name catalogued Tezos contracts
+ok 44 - native adapters name catalogued Tezos contracts
+  ---
+  duration_ms: 0.677667
+  type: 'test'
+  ...
+# Subtest: EVM adapters name contract sources and the review map lists every capability
+ok 45 - EVM adapters name contract sources and the review map lists every capability
+  ---
+  duration_ms: 92.927958
+  type: 'test'
+  ...
+# Subtest: the signing payload and capability key match the SmartPy-verified golden vector
+ok 46 - the signing payload and capability key match the SmartPy-verified golden vector
+  ---
+  duration_ms: 6.398542
+  type: 'test'
+  ...
+# Subtest: every shared Tezos refusal maps to the EVM error of the same step
+ok 47 - every shared Tezos refusal maps to the EVM error of the same step
+  ---
+  duration_ms: 1.056417
+  type: 'test'
+  ...
+# Subtest: the payload binds controller, chain, signer, nonce, deadline, amount and payload
+ok 48 - the payload binds controller, chain, signer, nonce, deadline, amount and payload
+  ---
+  duration_ms: 11.546666
+  type: 'test'
+  ...
+# Subtest: only implicit-account keys sign; a KT1 gets a typed error
+ok 49 - only implicit-account keys sign; a KT1 gets a typed error
+  ---
+  duration_ms: 1.434542
+  type: 'test'
+  ...
+# Subtest: governance actions and the relayer transaction use the controller entrypoint layouts
+ok 50 - governance actions and the relayer transaction use the controller entrypoint layouts
+  ---
+  duration_ms: 3.280625
+  type: 'test'
+  ...
+# Subtest: the key state reads back in EVM automationKeyState shape
+ok 51 - the key state reads back in EVM automationKeyState shape
+  ---
+  duration_ms: 0.3085
+  type: 'test'
+  ...
+# Subtest: the catalogue and capability map name the controller automation entrypoints
+ok 52 - the catalogue and capability map name the controller automation entrypoints
+  ---
+  duration_ms: 0.3225
+  type: 'test'
+  ...
+# Subtest: native discovery includes governed inherited implementations
+ok 53 - native discovery includes governed inherited implementations
+  ---
+  duration_ms: 1.084
+  type: 'test'
+  ...
+# Subtest: native NFT ledger is reusable source without an origination target
+ok 54 - native NFT ledger is reusable source without an origination target
+  ---
+  duration_ms: 0.196292
+  type: 'test'
+  ...
+# Subtest: the cross-chain mint attestor configures a target per route, as EVM routes do
+ok 55 - the cross-chain mint attestor configures a target per route, as EVM routes do
+  ---
+  duration_ms: 0.121625
+  type: 'test'
+  ...
+# Subtest: the generated catalogue carries source entrypoints and views for every route contract
+ok 56 - the generated catalogue carries source entrypoints and views for every route contract
+  ---
+  duration_ms: 1.48225
+  type: 'test'
+  ...
+# Subtest: originations stage dependents behind receipt-backed bindings and check compiled entrypoints
+ok 57 - originations stage dependents behind receipt-backed bindings and check compiled entrypoints
+  ---
+  duration_ms: 13.741541
+  type: 'test'
+  ...
+# Subtest: FA2 storage builder matches the compiled initial storage shape
+ok 58 - FA2 storage builder matches the compiled initial storage shape
+  ---
+  duration_ms: 1.673541
+  type: 'test'
+  ...
+# Subtest: Hold resources match OnchFS CIDs, dedupe chunks, and fit operation batches
+ok 59 - Hold resources match OnchFS CIDs, dedupe chunks, and fit operation batches
+  ---
+  duration_ms: 20.161584
+  type: 'test'
+  ...
+# Subtest: presentation binding publishes, activates and binds the renderer, freezing only on request
+ok 60 - presentation binding publishes, activates and binds the renderer, freezing only on request
+  ---
+  duration_ms: 1.730083
+  type: 'test'
+  ...
+# Subtest: mint gate prepares price, supply, allowlist and a paused start with a predicted drop id
+ok 61 - mint gate prepares price, supply, allowlist and a paused start with a predicted drop id
+  ---
+  duration_ms: 5.507667
+  type: 'test'
+  ...
+# Subtest: merkle leaf and drop id use Michelson PACK exactly as the mockup views returned
+ok 62 - merkle leaf and drop id use Michelson PACK exactly as the mockup views returned
+  ---
+  duration_ms: 0.359708
+  type: 'test'
+  ...
+# Subtest: mint prepares exact payments for public, merkle, premint and direct batch mints
+ok 63 - mint prepares exact payments for public, merkle, premint and direct batch mints
+  ---
+  duration_ms: 1.256542
+  type: 'test'
+  ...
+# Subtest: token metadata is TZIP-21 with self-contained raw-percent presentation and refuses KEEL pointers
+ok 64 - token metadata is TZIP-21 with self-contained raw-percent presentation and refuses KEEL pointers
+  ---
+  duration_ms: 11.705833
+  type: 'test'
+  ...
+# Subtest: token_metadata view decoding round-trips the prepared map
+ok 65 - token_metadata view decoding round-trips the prepared map
+  ---
+  duration_ms: 1.288625
+  type: 'test'
+  ...
+# Subtest: read-back verifies chain, gate, presentation and token metadata through injected RPC
+ok 66 - read-back verifies chain, gate, presentation and token metadata through injected RPC
+  ---
+  duration_ms: 28.705042
+  type: 'test'
+  ...
+# Subtest: planners route Tezos collections through the new tools
+ok 67 - planners route Tezos collections through the new tools
+  ---
+  duration_ms: 1.173208
+  type: 'test'
+  ...
+# Subtest: the key, adapter, probe and signing payload match the SmartPy and Octez golden vector
+ok 68 - the key, adapter, probe and signing payload match the SmartPy and Octez golden vector
+  ---
+  duration_ms: 10.60275
+  type: 'test'
+  ...
+# Subtest: the parameter type is part of the key, and the default entrypoint carries no annotation
+ok 69 - the parameter type is part of the key, and the default entrypoint carries no annotation
+  ---
+  duration_ms: 2.574375
+  type: 'test'
+  ...
+# Subtest: prepare refuses what the controller refuses before any call is built
+ok 70 - prepare refuses what the controller refuses before any call is built
+  ---
+  duration_ms: 11.055833
+  type: 'test'
+  ...
+# Subtest: the policy call is a governance call the manager lambda can carry
+ok 71 - the policy call is a governance call the manager lambda can carry
+  ---
+  duration_ms: 1.961417
+  type: 'test'
+  ...
+# Subtest: role and automation calls carry the key, packed arguments and exact amount
+ok 72 - role and automation calls carry the key, packed arguments and exact amount
+  ---
+  duration_ms: 1.06875
+  type: 'test'
+  ...
+# Subtest: the capability map names entrypoint capabilities as adapter-different
+ok 73 - the capability map names entrypoint capabilities as adapter-different
+  ---
+  duration_ms: 0.281375
+  type: 'test'
+  ...
+# Subtest: the SDK reproduces the shared fixture golden vector and maps every Tezos refusal
+ok 74 - the SDK reproduces the shared fixture golden vector and maps every Tezos refusal
+  ---
+  duration_ms: 0.837958
+  type: 'test'
+  ...
+# Subtest: the errors name the EVM errors and the limits are EVM uint64 and Tezos mutez
+ok 75 - the errors name the EVM errors and the limits are EVM uint64 and Tezos mutez
+  ---
+  duration_ms: 1.253833
+  type: 'test'
+  ...
+# Subtest: the threshold is EVM ceil(2N/3) for three to 32 governors
+ok 76 - the threshold is EVM ceil(2N/3) for three to 32 governors
+  ---
+  duration_ms: 1.072542
+  type: 'test'
+  ...
+# Subtest: one call builds the lambda the Octez replay runs, forwarding exactly its value
+ok 77 - one call builds the lambda the Octez replay runs, forwarding exactly its value
+  ---
+  duration_ms: 1.635291
+  type: 'test'
+  ...
+# Subtest: calls are consed in order and their amounts add to the proposal value
+ok 78 - calls are consed in order and their amounts add to the proposal value
+  ---
+  duration_ms: 3.220042
+  type: 'test'
+  ...
+# Subtest: a zero-value action uses plain propose, and the default entrypoint needs no annotation
+ok 79 - a zero-value action uses plain propose, and the default entrypoint needs no annotation
+  ---
+  duration_ms: 0.569458
+  type: 'test'
+  ...
+# Subtest: only the approval that reaches the threshold attaches the value
+ok 80 - only the approval that reaches the threshold attaches the value
+  ---
+  duration_ms: 0.826333
+  type: 'test'
+  ...
+# Subtest: bad input is refused before any call is built
+ok 81 - bad input is refused before any call is built
+  ---
+  duration_ms: 1.019417
+  type: 'test'
+  ...
+# Subtest: the capability map lists governance value and counters
+ok 82 - the capability map lists governance value and counters
+  ---
+  duration_ms: 0.272458
+  type: 'test'
+  ...
+# Subtest: the error map covers every Tezos error the shared fixture expects
+ok 83 - the error map covers every Tezos error the shared fixture expects
+  ---
+  duration_ms: 1.228583
+  type: 'test'
+  ...
+# Subtest: tree calls route to the piece that holds them, with EVM payload words
+ok 84 - tree calls route to the piece that holds them, with EVM payload words
+  ---
+  duration_ms: 28.202416
+  type: 'test'
+  ...
+# Subtest: payloads EVM would refuse are refused before they are built
+ok 85 - payloads EVM would refuse are refused before they are built
+  ---
+  duration_ms: 6.259125
+  type: 'test'
+  ...
+# Subtest: the capability map shows harness trees as adapter-different with no user-visible difference
+ok 86 - the capability map shows harness trees as adapter-different with no user-visible difference
+  ---
+  duration_ms: 0.328333
+  type: 'test'
+  ...
+# Subtest: every shared tree vector has the digest the SDK computes
+ok 87 - every shared tree vector has the digest the SDK computes
+  ---
+  duration_ms: 4.569458
+  type: 'test'
+  ...
+# Subtest: PACK and script_expr equal Octez for every supported key type
+ok 88 - PACK and script_expr equal Octez for every supported key type
+  ---
+  duration_ms: 18.758875
+  type: 'test'
+  ...
+# Subtest: the decoder validates types and normalizes Readable Micheline
+ok 89 - the decoder validates types and normalizes Readable Micheline
+  ---
+  duration_ms: 7.864916
+  type: 'test'
+  ...
+# Subtest: reads resolve big_map ids from storage annotations, check types against the contract, and hash keys
+ok 90 - reads resolve big_map ids from storage annotations, check types against the contract, and hash keys
+  ---
+  duration_ms: 74.550333
+  type: 'test'
+  ...
+# Subtest: the fragment publishes the frozen snapshot synchronously, as JSON, before any runtime module
+ok 91 - the fragment publishes the frozen snapshot synchronously, as JSON, before any runtime module
+  ---
+  duration_ms: 8.046375
+  type: 'test'
+  ...
+# Subtest: a live read replaces values only from the same chain, at or after the snapshot, with valid types
+ok 92 - a live read replaces values only from the same chain, at or after the snapshot, with valid types
+  ---
+  duration_ms: 17.760334
+  type: 'test'
+  ...
+# Subtest: TzKT serves big_map reads when every RPC fails; views keep their last value; a blocked sandbox keeps the snapshot
+ok 93 - TzKT serves big_map reads when every RPC fails; views keep their last value; a blocked sandbox keeps the snapshot
+  ---
+  duration_ms: 11.634708
+  type: 'test'
+  ...
+# Subtest: snapshots, endpoints and options are validated before anything is emitted
+ok 94 - snapshots, endpoints and options are validated before anything is emitted
+  ---
+  duration_ms: 11.468584
+  type: 'test'
+  ...
+# Subtest: the creator signs the trigger and the trait rewrite as one atomic group; no contract becomes an editor
+ok 95 - the creator signs the trigger and the trait rewrite as one atomic group; no contract becomes an editor
+  ---
+  duration_ms: 6.108542
+  type: 'test'
+  ...
+# Subtest: the authority check reads holder editing and whether each trigger contract is an administrator
+ok 96 - the authority check reads holder editing and whether each trigger contract is an administrator
+  ---
+  duration_ms: 5.2575
+  type: 'test'
+  ...
+# Subtest: a Tezos stop goes to the access controller and a resume to the manager, with EVM masks
+ok 97 - a Tezos stop goes to the access controller and a resume to the manager, with EVM masks
+  ---
+  duration_ms: 8.102583
+  type: 'test'
+  ...
+# Subtest: masks and revisions EVM would refuse are refused before they are built
+ok 98 - masks and revisions EVM would refuse are refused before they are built
+  ---
+  duration_ms: 1.877042
+  type: 'test'
+  ...
+# Subtest: the Tezos state reads like the EVM state
+ok 99 - the Tezos state reads like the EVM state
+  ---
+  duration_ms: 0.486541
+  type: 'test'
+  ...
+# Subtest: the shared pause vectors use the SDK bits and error names on both chains
+ok 100 - the shared pause vectors use the SDK bits and error names on both chains
+  ---
+  duration_ms: 0.809834
+  type: 'test'
+  ...
+# Subtest: every native pause gate names a cataloged entrypoint and an EVM bit
+ok 101 - every native pause gate names a cataloged entrypoint and an EVM bit
+  ---
+  duration_ms: 1.094958
+  type: 'test'
+  ...
+# Subtest: the module gate vectors use the SDK gates on both chains
+ok 102 - the module gate vectors use the SDK gates on both chains
+  ---
+  duration_ms: 0.795292
+  type: 'test'
+  ...
+# Subtest: the collection and mint-lane gate vectors use the SDK gates on both chains
+ok 103 - the collection and mint-lane gate vectors use the SDK gates on both chains
+  ---
+  duration_ms: 1.207542
+  type: 'test'
+  ...
+# Subtest: no native gate checks a bit Tezos has nothing to stop for
+ok 104 - no native gate checks a bit Tezos has nothing to stop for
+  ---
+  duration_ms: 0.431417
+  type: 'test'
+  ...
+# Subtest: collections and mint lanes store the pause authority EVM fixes at deployment
+ok 105 - collections and mint lanes store the pause authority EVM fixes at deployment
+  ---
+  duration_ms: 6.260791
+  type: 'test'
+  ...
+# Subtest: Tezos one-of-one originations stay staged at receipt-backed dependencies
+ok 106 - Tezos one-of-one originations stay staged at receipt-backed dependencies
+  ---
+  duration_ms: 2.91875
+  type: 'test'
+  ...
+# Subtest: the OnchFS object id is sha256(PACK(descriptor)), equal to the SmartPy contract's
+ok 107 - the OnchFS object id is sha256(PACK(descriptor)), equal to the SmartPy contract's
+  ---
+  duration_ms: 2.671917
+  type: 'test'
+  ...
+# Subtest: OnchFS carrier operations preserve chunks, files, and object welds
+ok 108 - OnchFS carrier operations preserve chunks, files, and object welds
+  ---
+  duration_ms: 2.816666
+  type: 'test'
+  ...
+# Subtest: Tezos presentation calls encode bytes rather than URLs as JSON strings
+ok 109 - Tezos presentation calls encode bytes rather than URLs as JSON strings
+  ---
+  duration_ms: 0.389792
+  type: 'test'
+  ...
+# Subtest: Tezos standard token metadata stays public while the Keel JSON route stays separate
+ok 110 - Tezos standard token metadata stays public while the Keel JSON route stays separate
+  ---
+  duration_ms: 0.575667
+  type: 'test'
+  ...
+# Subtest: Tezos NFT prototype uses the native ledger and token-metadata release path
+ok 111 - Tezos NFT prototype uses the native ledger and token-metadata release path
+  ---
+  duration_ms: 0.564125
+  type: 'test'
+  ...
+# Subtest: Tezos NFT origination binds only the receipt-time creator placeholder
+ok 112 - Tezos NFT origination binds only the receipt-time creator placeholder
+  ---
+  duration_ms: 0.310083
+  type: 'test'
+  ...
+# Subtest: Tezos standard route inherits the KEEL default and selects Hybrid from measured size
+ok 113 - Tezos standard route inherits the KEEL default and selects Hybrid from measured size
+  ---
+  duration_ms: 28.858333
+  type: 'test'
+  ...
+# Subtest: the recovery scope is EVM KeelManagerProxy.RECOVERY_SCOPE and the errors name EVM errors
+ok 114 - the recovery scope is EVM KeelManagerProxy.RECOVERY_SCOPE and the errors name EVM errors
+  ---
+  duration_ms: 0.869834
+  type: 'test'
+  ...
+# Subtest: KT1 contracts cannot hold recovery keys and get the typed signer error
+ok 115 - KT1 contracts cannot hold recovery keys and get the typed signer error
+  ---
+  duration_ms: 2.255542
+  type: 'test'
+  ...
+# Subtest: rosters follow EVM: one key or three to 32, sorted, never repeated
+ok 116 - rosters follow EVM: one key or three to 32, sorted, never repeated
+  ---
+  duration_ms: 4.191459
+  type: 'test'
+  ...
+# Subtest: the upgrade-with-backup path is EVM-only and throws the typed capability error
+ok 117 - the upgrade-with-backup path is EVM-only and throws the typed capability error
+  ---
+  duration_ms: 0.561917
+  type: 'test'
+  ...
+# Subtest: builders send the same calls a Studio user makes on EVM, unsigned
+ok 118 - builders send the same calls a Studio user makes on EVM, unsigned
+  ---
+  duration_ms: 26.816334
+  type: 'test'
+  ...
+# Subtest: the SDK reproduces the golden recovery vector SmartPy and Octez checked
+ok 119 - the SDK reproduces the golden recovery vector SmartPy and Octez checked
+  ---
+  duration_ms: 4.327458
+  type: 'test'
+  ...
+# Subtest: the SDK constants are the ones the native contracts compile
+ok 120 - the SDK constants are the ones the native contracts compile
+  ---
+  duration_ms: 4.29525
+  type: 'test'
+  ...
+# Subtest: the Tezos profile carries the same codes as the EVM profile
+ok 121 - the Tezos profile carries the same codes as the EVM profile
+  ---
+  duration_ms: 3.184375
+  type: 'test'
+  ...
+# Subtest: future-block and Chainlink VRF raise the typed capability error on Tezos
+ok 122 - future-block and Chainlink VRF raise the typed capability error on Tezos
+  ---
+  duration_ms: 2.613541
+  type: 'test'
+  ...
+# Subtest: the seed actions build the catalogued entrypoints
+ok 123 - the seed actions build the catalogued entrypoints
+  ---
+  duration_ms: 5.250833
+  type: 'test'
+  ...
+# Subtest: the seeded storage adds the seed fields in comb order and the plan stages the profile
+ok 124 - the seeded storage adds the seed fields in comb order and the plan stages the profile
+  ---
+  duration_ms: 2.001667
+  type: 'test'
+  ...
+# Subtest: the SDK profile rules match the shared profile vectors
+ok 125 - the SDK profile rules match the shared profile vectors
+  ---
+  duration_ms: 1.692
+  type: 'test'
+  ...
+# Subtest: native creator shell identity matches the SmartPy PACK golden vector
+ok 126 - native creator shell identity matches the SmartPy PACK golden vector
+  ---
+  duration_ms: 2.876875
+  type: 'test'
+  ...
+# Subtest: registration emits native Micheline with explicit network and sender
+ok 127 - registration emits native Micheline with explicit network and sender
+  ---
+  duration_ms: 2.608083
+  type: 'test'
+  ...
+# Subtest: updates retain identity; freeze cannot carry replacement bytes
+ok 128 - updates retain identity; freeze cannot carry replacement bytes
+  ---
+  duration_ms: 2.046833
+  type: 'test'
+  ...
+# Subtest: rejects cross-family identities, bad checksums and malformed actions
+ok 129 - rejects cross-family identities, bad checksums and malformed actions
+  ---
+  duration_ms: 3.032792
+  type: 'test'
+  ...
+# Subtest: MCP exposes exactly the same review-only native preparation
+ok 130 - MCP exposes exactly the same review-only native preparation
+  ---
+  duration_ms: 216.50875
+  type: 'test'
+  ...
+# Subtest: MCP exposes the receipt-bound standard Tezos publication call adapter
+ok 131 - MCP exposes the receipt-bound standard Tezos publication call adapter
+  ---
+  duration_ms: 260.273959
+  type: 'test'
+  ...
+# Subtest: MCP exposes the public FA2 metadata path and separate KEEL JSON compatibility path
+ok 132 - MCP exposes the public FA2 metadata path and separate KEEL JSON compatibility path
+  ---
+  duration_ms: 194.6115
+  type: 'test'
+  ...
+# Subtest: native adapter bundles for a browser without Node built-ins
+ok 133 - native adapter bundles for a browser without Node built-ins
+  ---
+  duration_ms: 133.097292
+  type: 'test'
+  ...
+# Subtest: every call Studio made before a split still resolves, with the same kind
+ok 134 - every call Studio made before a split still resolves, with the same kind
+  ---
+  duration_ms: 1.356208
+  type: 'test'
+  ...
+# Subtest: the library split puts acquisitions on the access registry
+ok 135 - the library split puts acquisitions on the access registry
+  ---
+  duration_ms: 1.051583
+  type: 'test'
+  ...
+# Subtest: the verification registry keeps every call; the inspector is originated first
+ok 136 - the verification registry keeps every call; the inspector is originated first
+  ---
+  duration_ms: 0.169
+  type: 'test'
+  ...
+# Subtest: the replication split puts contributor work on the work registry, bound once after origination
+ok 137 - the replication split puts contributor work on the work registry, bound once after origination
+  ---
+  duration_ms: 0.649917
+  type: 'test'
+  ...
+# Subtest: an unsplit contract is its own single piece, and unknown calls fail closed
+ok 138 - an unsplit contract is its own single piece, and unknown calls fail closed
+  ---
+  duration_ms: 0.364167
+  type: 'test'
+  ...
+# Subtest: the registry key and create call use the registry layout; the address is read back
+ok 139 - the registry key and create call use the registry layout; the address is read back
+  ---
+  duration_ms: 3.772083
+  type: 'test'
+  ...
+# Subtest: execute writes one lambda that emits the calls in order
+ok 140 - execute writes one lambda that emits the calls in order
+  ---
+  duration_ms: 1.190708
+  type: 'test'
+  ...
+# Subtest: only CALL exists on Tezos; other ERC-6551 operations get a typed error
+ok 141 - only CALL exists on Tezos; other ERC-6551 operations get a typed error
+  ---
+  duration_ms: 0.951625
+  type: 'test'
+  ...
+# Subtest: the capability map lists the native registry and account
+ok 142 - the capability map lists the native registry and account
+  ---
+  duration_ms: 0.226791
+  type: 'test'
+  ...
+# Subtest: the SDK matches the SmartPy registry key, entrypoints and views
+ok 143 - the SDK matches the SmartPy registry key, entrypoints and views
+  ---
+  duration_ms: 1.433916
+  type: 'test'
+  ...
+# Subtest: the generated Tezos catalogue is current with the contract sources
+ok 144 - the generated Tezos catalogue is current with the contract sources
+  ---
+  duration_ms: 4117.009792
+  type: 'test'
+  ...
+# Subtest: SDK origination storage equals the SmartPy-compiled initial storage
+ok 145 - SDK origination storage equals the SmartPy-compiled initial storage
+  ---
+  duration_ms: 8.720459
+  type: 'test'
+  ...
+# Subtest: protocol agrees with the authoritative Tezos byte-returning view
+ok 146 - protocol agrees with the authoritative Tezos byte-returning view
+  ---
+  duration_ms: 1.033416
+  type: 'test'
+  ...
+# Subtest: browser bundle calls haul_object and decodes its returned bytes
+ok 147 - browser bundle calls haul_object and decodes its returned bytes
+  ---
+  duration_ms: 54.778416
+  type: 'test'
+  ...
+1..147
+# tests 147
+# suites 0
+# pass 147
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 12988.986375

@@ -1,0 +1,21 @@
+{
+  "schema": "keel-independent-forge-final@1",
+  "sourceCommit": "3ce5312daecb21b62bdebae681a9e16715fcbb97",
+  "exitCode": 1,
+  "finalSummaries": [
+    [
+      "299",
+      "2641",
+      "5",
+      "1"
+    ]
+  ],
+  "rawLogSHA256": "e0f36d8fa2bfee9e7440d760ad7764d25f99779d2df4573e1c09074dbca83b15",
+  "finishedUTC": "2026-10-20T03:59:16.026829+00:00",
+  "sourceClean": true,
+  "compiler": "0.8.36+8a079791",
+  "forge": "1.7.1",
+  "threads": 4,
+  "sourceAndAssertionsChanged": false,
+  "publicChainOperations": 0
+}

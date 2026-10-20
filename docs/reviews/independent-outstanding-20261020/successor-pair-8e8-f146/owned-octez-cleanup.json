@@ -1,0 +1,14 @@
+{
+  "schema": "keel-independent-owned-orphan-cleanup@1",
+  "containerId": "7edb5b88f986ae0b4f684b05c37a979bbceb72f0298234486f047ecdfa5cf250",
+  "name": "/keel-octez-ebe306a626f6",
+  "created": "2026-10-20T03:25:17.078420588Z",
+  "image": "tezos/tezos@sha256:c7adc1605e0ac167743e5ccc107c88719d201994b8166dd794ea10fd0488bea2",
+  "networkMode": "none",
+  "mounts": [],
+  "matchedPublicArtifact": "out/parity/entrypoint-capabilities/compiled/run.IZXDpo/Keel_Tezos_entrypoint_capabilities/step_005_cont_0_contract.tz",
+  "artifactSHA256": "3ccc0c40641f3bd20337eeed0e140a71ac7d5cc4e9376b31504a76d83bb33ef2",
+  "onlyOwnedContainerRemoved": true,
+  "credentialFilesRead": false,
+  "timestamp": "2026-10-20T03:51:35.743343+00:00"
+}

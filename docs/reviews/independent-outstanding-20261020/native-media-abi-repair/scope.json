@@ -1,0 +1,18 @@
+{
+  "schema": "keel-scoped-generated-native-abi@1",
+  "sdkParent": "f1460ba4fc5eb675fc43a87354acc1bd42f06c29",
+  "contractSource": "8e8e32df58b2a641a71ec7d449b4a407f1c002fb",
+  "newABIs": [
+    "KeelNativeMediaPresentation"
+  ],
+  "existingABIsUnchanged": 64,
+  "modulesGeneratedUnchanged": true,
+  "deploymentRecordsUnchanged": true,
+  "abiIndex": {
+    "sha256": "3876b811c80e62e92628541b279f321665847c1486c0a39553668833d29889ed"
+  },
+  "abiModule": {
+    "sha256": "98156506b37bf3719af738546986694b1d707be66967361d7c411a443bb80073"
+  },
+  "abiSHA256": "3e19838c76ae15bb311dbe14f46ca542f0874cc612741c3beaf35dd99d5759ee"
+}

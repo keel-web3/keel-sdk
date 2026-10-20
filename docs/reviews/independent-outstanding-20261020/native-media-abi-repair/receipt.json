@@ -1,0 +1,26 @@
+{
+  "schema": "keel-native-media-abi-repair@1",
+  "contractsParent": "8e8e32df58b2a641a71ec7d449b4a407f1c002fb",
+  "contractsCommit": "3ce5312daecb21b62bdebae681a9e16715fcbb97",
+  "sdkParent": "f1460ba4fc5eb675fc43a87354acc1bd42f06c29",
+  "sdkCommit": "e4985920593539f468c16524e2f74d2adf2878c3",
+  "sourceAndTestChanges": false,
+  "existingABIsUnchanged": 64,
+  "modulesAndDeploymentsUnchanged": true,
+  "rootAssignedAuthorAfterIndependentFailure": true,
+  "ownerBuild": "PASS",
+  "ownerCatalogTests": {
+    "pass": 16,
+    "fail": 0,
+    "skip": 0
+  },
+  "baselineCatalog": {
+    "pass": 15,
+    "fail": 1,
+    "failure": "KeelNativeMediaPresentation has no recorded ABI"
+  },
+  "independentApproval": "PENDING; author is not sole approver",
+  "contractsBundleSHA256": "97faf54e19701b6a8d102583654b035ef810dc3ee692275443566cfc392d32ec",
+  "sdkBundleSHA256": "a919d55571b32e59eea32a381b2426df0cd19061f3e8d18ffabf6deec4106a4e",
+  "publicChainOperations": 0
+}

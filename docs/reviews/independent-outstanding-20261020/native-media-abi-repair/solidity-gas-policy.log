@@ -1,0 +1,1 @@
+Solidity gas policy passed across 1385 public/external entrypoints (615 state-changing, 54 payable, 118 transient-guarded).
