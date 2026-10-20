@@ -1,0 +1,9 @@
+{
+  "schema": "keel-capacity-bundle-import@1",
+  "status": "PASS",
+  "bundleSHA256": "6988226fab81105e2ec2a6e233e1dd902a08d2eecc4381c8b661730f57b52647",
+  "actualNodeModuleImported": true,
+  "compilerFunctionInvoked": false,
+  "driverImported": false,
+  "networkAndChildAttempts": []
+}

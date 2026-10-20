@@ -1,0 +1,8 @@
+{
+  "bytes": 9269,
+  "sha256": "044d8f8f07b49c70988a367ffeef04a54098025c372e3e4a0fc8110a9e0e8bec",
+  "byteExact": true,
+  "actualReceiptSHA256": "40af7068350612432dab565600aa2e187caa2fba2f356dc84306999e056383e3",
+  "actualPlanSHA256": "5be18ef338864a7e03b97add5adb96ccacf9faad16c63273b8b58c3d29591e96",
+  "independentActualImageMetadataSHA256": "d912066e518d9bfb514f6a158df1a0ac5fe546612c9243e55f5b2f6ff569d2ad"
+}

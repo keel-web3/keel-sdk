@@ -1,0 +1,165 @@
+{
+  "inputs": {
+    "keel-qa-gif-reviewed14-20261020/candidate-400/apps/studio/src/server/security/credential-policy.ts": {
+      "bytes": 3153,
+      "imports": [
+        {
+          "path": "node:async_hooks",
+          "kind": "import-statement",
+          "external": true
+        },
+        {
+          "path": "viem",
+          "kind": "import-statement",
+          "external": true
+        }
+      ],
+      "format": "esm"
+    },
+    "keel-qa-receipt-activation-20261020/keel-site/docs/tools/gif-fresh-forward-capture/identity.mjs": {
+      "bytes": 2223,
+      "imports": [
+        {
+          "path": "node:crypto",
+          "kind": "import-statement",
+          "external": true
+        },
+        {
+          "path": "node:fs/promises",
+          "kind": "import-statement",
+          "external": true
+        },
+        {
+          "path": "node:child_process",
+          "kind": "import-statement",
+          "external": true
+        },
+        {
+          "path": "node:path",
+          "kind": "import-statement",
+          "external": true
+        }
+      ],
+      "format": "esm"
+    },
+    "keel-qa-receipt-activation-20261020/keel-site/docs/tools/gif-fresh-forward-capture/public-signer-receipt.mjs": {
+      "bytes": 2961,
+      "imports": [
+        {
+          "path": "node:fs/promises",
+          "kind": "import-statement",
+          "external": true
+        },
+        {
+          "path": "keel-qa-receipt-activation-20261020/keel-site/docs/tools/gif-fresh-forward-capture/identity.mjs",
+          "kind": "import-statement",
+          "original": "./identity.mjs"
+        }
+      ],
+      "format": "esm"
+    },
+    "keel-qa-receipt-activation-20261020/keel-site/docs/tools/gif-fresh-forward-capture/diagnostic-signer-context.ts": {
+      "bytes": 760,
+      "imports": [
+        {
+          "path": "keel-qa-gif-reviewed14-20261020/candidate-400/apps/studio/src/server/security/credential-policy.ts",
+          "kind": "import-statement",
+          "original": "../../../apps/studio/src/server/security/credential-policy"
+        },
+        {
+          "path": "keel-qa-receipt-activation-20261020/keel-site/docs/tools/gif-fresh-forward-capture/public-signer-receipt.mjs",
+          "kind": "import-statement",
+          "original": "./public-signer-receipt.mjs"
+        }
+      ],
+      "format": "esm"
+    },
+    "keel-qa-receipt-activation-20261020/keel-site/docs/tools/gif-fresh-forward-capture/diagnostic-signer-context.test.ts": {
+      "bytes": 2337,
+      "imports": [
+        {
+          "path": "node:test",
+          "kind": "import-statement",
+          "external": true
+        },
+        {
+          "path": "node:assert/strict",
+          "kind": "import-statement",
+          "external": true
+        },
+        {
+          "path": "keel-qa-receipt-activation-20261020/keel-site/docs/tools/gif-fresh-forward-capture/diagnostic-signer-context.ts",
+          "kind": "import-statement",
+          "original": "./diagnostic-signer-context"
+        },
+        {
+          "path": "keel-qa-receipt-activation-20261020/keel-site/docs/tools/gif-fresh-forward-capture/public-signer-receipt.mjs",
+          "kind": "import-statement",
+          "original": "./public-signer-receipt.mjs"
+        },
+        {
+          "path": "keel-qa-gif-reviewed14-20261020/candidate-400/apps/studio/src/server/security/credential-policy.ts",
+          "kind": "import-statement",
+          "original": "../../../apps/studio/src/server/security/credential-policy"
+        }
+      ],
+      "format": "esm"
+    }
+  },
+  "outputs": {
+    "keel-independent-gif-native95-wave-20261020/context-test.mjs": {
+      "imports": [
+        {
+          "path": "node:test",
+          "kind": "import-statement",
+          "external": true
+        },
+        {
+          "path": "node:assert/strict",
+          "kind": "import-statement",
+          "external": true
+        },
+        {
+          "path": "node:async_hooks",
+          "kind": "import-statement",
+          "external": true
+        },
+        {
+          "path": "viem",
+          "kind": "import-statement",
+          "external": true
+        },
+        {
+          "path": "node:fs/promises",
+          "kind": "import-statement",
+          "external": true
+        },
+        {
+          "path": "node:crypto",
+          "kind": "import-statement",
+          "external": true
+        }
+      ],
+      "exports": [],
+      "entryPoint": "keel-qa-receipt-activation-20261020/keel-site/docs/tools/gif-fresh-forward-capture/diagnostic-signer-context.test.ts",
+      "inputs": {
+        "keel-qa-receipt-activation-20261020/keel-site/docs/tools/gif-fresh-forward-capture/diagnostic-signer-context.test.ts": {
+          "bytesInOutput": 2020
+        },
+        "keel-qa-gif-reviewed14-20261020/candidate-400/apps/studio/src/server/security/credential-policy.ts": {
+          "bytesInOutput": 2044
+        },
+        "keel-qa-receipt-activation-20261020/keel-site/docs/tools/gif-fresh-forward-capture/public-signer-receipt.mjs": {
+          "bytesInOutput": 3039
+        },
+        "keel-qa-receipt-activation-20261020/keel-site/docs/tools/gif-fresh-forward-capture/identity.mjs": {
+          "bytesInOutput": 113
+        },
+        "keel-qa-receipt-activation-20261020/keel-site/docs/tools/gif-fresh-forward-capture/diagnostic-signer-context.ts": {
+          "bytesInOutput": 293
+        }
+      },
+      "bytes": 8295
+    }
+  }
+}

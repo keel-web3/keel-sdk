@@ -1,0 +1,25 @@
+{
+  "schema": "keel-reviewed-gator-one-shot-pipeline@1",
+  "decision": "APPROVE",
+  "reviewerId": "independent-release-reviewer",
+  "configSHA256": "badfcb3ae765bb9387e6f180dceb81ed1275555f4b74c05c95556504d294bc17",
+  "pipelineSHA256": "6a21086958110f0ed9c6169847ebb120946bdc3e2c83312b95f31e89e0b3203e",
+  "original": {
+    "artifactId": "fcf16528-aa7e-43c0-a7f0-8a4542ed96e6",
+    "artifactRevision": 1,
+    "releaseId": "0c6c734d-20c0-4d3a-959a-fb7ac8143af2",
+    "releaseRevision": 14
+  },
+  "maximumAssemblies": 1,
+  "maximumNativeExecutions": 1,
+  "signing": false,
+  "submission": false,
+  "scope": "ONE fresh normal saved-v2 GIF assembly, canonical forward validation and exact95/D97 native qualification; no production activation",
+  "conditions": [
+    "Stage/read-only preflight and proxy/normal health readiness must pass before capture; all existing original/resource/image/ownership guards remain.",
+    "No retry, repin, renewal, deadline/fee/nonce/SDK-limit/clock override or source/input edits after capture.",
+    "Dynamic review is only a projection of independently frozen conditional-templateb2b70 after exact source-bound predicate7c178 passes.",
+    "Result requires separate independent terminal audit; no signing/submission/activation/publication readiness is conveyed."
+  ],
+  "blockingFindings": []
+}

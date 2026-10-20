@@ -1,0 +1,94 @@
+{
+  "schema": "keel.independent-compiled-proof-body-equivalence@1",
+  "result": "PASS_STATIC_DEFINITION_EQUIVALENCE_ONLY",
+  "definitions": [
+    {
+      "file": "/Users/ravonus/dev/wt/studio-publication-20261019/native-artifacts/final-literal-f11-b524/keel-site/apps/studio/.next-final-f11-b524-portable22-20261020/server/chunks/96429.js",
+      "chunkSHA256": "759d16eef27a3733ff410096be2075a5935242f50fd85ea861400484a66ef3f0",
+      "moduleId": "44950",
+      "definitionSHA256": "b452390e6c7c9d46345aeb17d341931a3763ea76c5ae6fde98c811b8ce601ef2"
+    },
+    {
+      "file": "/private/tmp/keel-public-discovery-build-20261020/image-context/web/apps/studio/.next-discovery-4002-b524-portable22-20261020/server/chunks/96429.js",
+      "chunkSHA256": "e167be407bd4ea2364188a83be335a630609d48e4b702073b6e92f95d8229619",
+      "moduleId": "26099",
+      "definitionSHA256": "c27417e72b28a9dca46c79855f0388760586faba029c96c4b4fe69a7a05760d7"
+    }
+  ],
+  "normalization": "Only direct calls to the factory third webpack-require parameter have numeric module IDs replaced; all other bytes/constants/guards unchanged.",
+  "dependencyCalls": 17,
+  "distinctDependencyIDMappings": [
+    {
+      "old": "94976",
+      "next": "94976"
+    },
+    {
+      "old": "45336",
+      "next": "45336"
+    },
+    {
+      "old": "27076",
+      "next": "27076"
+    },
+    {
+      "old": "93858",
+      "next": "93858"
+    },
+    {
+      "old": "17499",
+      "next": "70311"
+    },
+    {
+      "old": "37738",
+      "next": "47933"
+    },
+    {
+      "old": "8807",
+      "next": "80208"
+    },
+    {
+      "old": "51012",
+      "next": "58769"
+    },
+    {
+      "old": "2125",
+      "next": "89492"
+    },
+    {
+      "old": "77598",
+      "next": "77598"
+    },
+    {
+      "old": "51455",
+      "next": "51455"
+    },
+    {
+      "old": "78474",
+      "next": "78474"
+    },
+    {
+      "old": "57075",
+      "next": "57075"
+    },
+    {
+      "old": "77030",
+      "next": "77030"
+    },
+    {
+      "old": "76760",
+      "next": "76760"
+    },
+    {
+      "old": "43888",
+      "next": "43888"
+    },
+    {
+      "old": "35254",
+      "next": "35254"
+    }
+  ],
+  "normalizedDefinitionSHA256": "6fd09b0620f075992657e8bac273d387427d966fbc02426911918be90e2c30ba",
+  "moduleInvocations": 0,
+  "RPC": 0,
+  "liveDenialClaim": false
+}

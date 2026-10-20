@@ -1,0 +1,30 @@
+{
+  "schema": "keel.actual95-import-adapter-transfer-proposal@1",
+  "status": "APPROVE_EXCLUSIVE_ADAPTER_FILE_INSTALL_ONLY",
+  "localPath": "/private/tmp/keel-gif-native95-20261020/docs/reviews/studio-publication-20261020/release/activation95-actual-import/verified-image-import95.json",
+  "bytes": 9269,
+  "sha256": "044d8f8f07b49c70988a367ffeef04a54098025c372e3e4a0fc8110a9e0e8bec",
+  "remoteRoot": "/home/ubuntu/keel-proof-qualification-43a5d5f4-05ad-4a2b-a261-530d7a8fb2d5",
+  "remoteBasename": "verified-image-import95.json",
+  "remoteMode": "0600",
+  "exclusiveReceiverArgv": [
+    "/usr/bin/ssh",
+    "-o",
+    "BatchMode=yes",
+    "-o",
+    "ConnectTimeout=12",
+    "-o",
+    "StrictHostKeyChecking=yes",
+    "-o",
+    "UserKnownHostsFile=/Users/ravonus/dev/hashers/ops/servers/known_hosts",
+    "ubuntu@40.160.39.155",
+    "sudo -n /usr/bin/python3 -c 'import os,stat,hashlib,sys,json\nfrom pathlib import Path\nroot=Path('\"'\"'/home/ubuntu/keel-proof-qualification-43a5d5f4-05ad-4a2b-a261-530d7a8fb2d5'\"'\"');s=root.lstat();assert root.resolve()==root and stat.S_ISDIR(s.st_mode)and s.st_uid==0 and stat.S_IMODE(s.st_mode)==0o700\nfor name,digest in [('\"'\"'app-receipt.json'\"'\"','\"'\"'40af7068350612432dab565600aa2e187caa2fba2f356dc84306999e056383e3'\"'\"'),('\"'\"'whole-studio-plan.json'\"'\"','\"'\"'5be18ef338864a7e03b97add5adb96ccacf9faad16c63273b8b58c3d29591e96'\"'\"')]:\n f=root/name;t=f.lstat();assert stat.S_ISREG(t.st_mode)and t.st_uid==0 and hashlib.sha256(f.read_bytes()).hexdigest()==digest\nraw=sys.stdin.buffer.read(9270);assert len(raw)==9269and hashlib.sha256(raw).hexdigest()=='\"'\"'044d8f8f07b49c70988a367ffeef04a54098025c372e3e4a0fc8110a9e0e8bec'\"'\"'\nparent=os.open(root,os.O_RDONLY|os.O_DIRECTORY|os.O_NOFOLLOW)\ntry:\n with os.fdopen(os.open('\"'\"'verified-image-import95.json'\"'\"',os.O_WRONLY|os.O_CREAT|os.O_EXCL|os.O_NOFOLLOW,0o600,dir_fd=parent),'\"'\"'wb'\"'\"')as f:f.write(raw);f.flush();os.fsync(f.fileno())\n os.fsync(parent)\nfinally:os.close(parent)\nprint(json.dumps({'\"'\"'result'\"'\"':'\"'\"'PASS_EXCLUSIVE_95_RECEIPT_ADAPTER_INSTALL'\"'\"','\"'\"'sha256'\"'\"':'\"'\"'044d8f8f07b49c70988a367ffeef04a54098025c372e3e4a0fc8110a9e0e8bec'\"'\"','\"'\"'bytes'\"'\"':len(raw)}))\n'"
+  ],
+  "rootAlreadyExists": true,
+  "oldFilesChanged": false,
+  "applicationActivation": false,
+  "reviewerId": "cache-release-independent-reviewer",
+  "decision": "APPROVE",
+  "blockingFindings": [],
+  "scope": "One exact0600 new receipt-adapter file under existing43a5 root, after rechecking physical receipt40af and plan5be; no prior file changes, import, DB, container or activation."
+}

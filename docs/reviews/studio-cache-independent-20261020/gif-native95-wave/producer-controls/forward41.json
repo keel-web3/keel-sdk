@@ -1,0 +1,13 @@
+{
+  "argv": [
+    "/opt/homebrew/opt/node@22/bin/node",
+    "--test",
+    "--test-concurrency=1",
+    "/tmp/keel-qa-receipt-activation-20261020/keel-site/docs/tools/gif-fresh-forward-capture/forward/forward-reference.test.mjs"
+  ],
+  "cwd": "/tmp/keel-qa-receipt-activation-20261020/keel-site",
+  "testEnvironmentBindings": {
+    "KEEL_GIF_TEST_SDK": "/Users/ravonus/dev/wt/studio-publication-20261019/native-artifacts/final-literal-f11-b524/keel-sdk"
+  },
+  "exitCode": 0
+}

@@ -1,0 +1,26 @@
+{
+  "configSHA256": "badfcb3ae765bb9387e6f180dceb81ed1275555f4b74c05c95556504d294bc17",
+  "sourceRows": 251,
+  "allSourceHashesLengthsAndCanonicalPathsVerified": true,
+  "allFutureOutputsAbsent": true,
+  "unchangedFiveTimeouts": [
+    150,
+    30,
+    15,
+    30,
+    1100
+  ],
+  "offlineValidation": "PASS",
+  "negativeCasesRejected": [
+    "original",
+    "timeout",
+    "extra-step",
+    "source-digest",
+    "signing",
+    "native-count",
+    "reviewer"
+  ],
+  "compiler": 0,
+  "RPC": 0,
+  "native": 0
+}

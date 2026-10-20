@@ -1,0 +1,17 @@
+{
+  "changedTopFiles": [
+    "drop-diff.test.mjs",
+    "README.md",
+    "run-capture.test.mjs",
+    "run-capture.mjs",
+    "build-bundle.mjs"
+  ],
+  "unchangedTopFileCount": 21,
+  "forwardFolderByteExact": true,
+  "sourceInputs": 192,
+  "sourceInputsGitByteExact": true,
+  "toolFiles": 33,
+  "bundleSHA256": "6988226fab81105e2ec2a6e233e1dd902a08d2eecc4381c8b661730f57b52647",
+  "packetSHA256": "6a8359955daceb7cf29ffdcace0a97fb24741ae7ca60005956e5de7d10638267",
+  "bundleReceiptSHA256": "720c2c5e5ee49ef75014e5e0ea9c408f68bf1fc74c8593bcd952ac32f3e757f4"
+}

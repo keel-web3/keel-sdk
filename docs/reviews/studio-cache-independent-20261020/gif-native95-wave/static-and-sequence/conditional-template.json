@@ -1,0 +1,16 @@
+{
+  "schema": "keel-source-pinned-gif-native-conditional-review@1",
+  "decision": "APPROVE",
+  "reviewerId": "independent-release-reviewer",
+  "predicateSHA256": "7c178356e26b54469e29a5ce1e28a910220984fded897c7a5b92b541084938d7",
+  "policySHA256": "26afd8b7c0106db1474d4bddc0f63af7cc25c81befad4b005b0749c415ffbb1a",
+  "hostPlanSHA256": "958a073ea9c4f78934f3c5e7f544ceda0288d323554808886e8186d0173c26af",
+  "maximumNativeExecutions": 1,
+  "signing": false,
+  "submission": false,
+  "dynamicReviewFields": [
+    "planSha256",
+    "captureSha256"
+  ],
+  "blockingFindings": []
+}

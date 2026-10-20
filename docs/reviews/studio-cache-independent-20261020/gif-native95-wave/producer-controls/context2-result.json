@@ -1,0 +1,20 @@
+{
+  "invocation": [
+    "/opt/homebrew/opt/node@22/bin/node",
+    "--test",
+    "/private/tmp/keel-independent-gif-native95-wave-20261020/context-test.mjs"
+  ],
+  "pass": 2,
+  "fail": 0,
+  "skip": 0,
+  "exitCode": 0,
+  "source": "/private/tmp/keel-qa-gif-reviewed14-20261020/candidate-400/apps/studio/src/server/security/credential-policy.ts",
+  "sourceSHA256": "208e5b4a551323ed81d4cf22d07639ec10c84f21e118fc340d3295de8229b16f",
+  "testBundleSHA256": "42f0ea1a3e1dddf35b60b02cd80891977153a505bad894c785e18bbf1dcbba7c",
+  "buildMetafile": "context-test-metafile.json",
+  "sourceSelection": "The unchanged diagnostic-signer-context test bundled with exactactual400 credential-policy; no test source/assertion changes.",
+  "priorSetupError": "--import tsx unavailable in isolated QA repo; initial invocation did not load the test; preserved here as setup failure rather than app failure.",
+  "compilerOriginalProgramInvoked": false,
+  "RPC": 0,
+  "signing": false
+}

@@ -1,0 +1,8 @@
+{
+  "scope": "Controlled single-source chain/header/proof401/403 reader terminal controls only; no live denial",
+  "pass": 6,
+  "fail": 0,
+  "testSourceSHA256": "067e04b71864c2b30f70053da2da19cab439c6356c52586c64160d5531c67d21",
+  "SDKRoot": "/Users/ravonus/dev/wt/studio-publication-20261019/native-artifacts/final-literal-f11-b524/keel-sdk",
+  "RPC": 0
+}

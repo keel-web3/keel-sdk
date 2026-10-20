@@ -1,0 +1,14 @@
+{
+  "policy": "/private/tmp/keel-gif-native95-sequence-20261020/sequence/source-policy.json",
+  "hostPlan": "/private/tmp/keel-gif-native95-sequence-20261020/docs/reviews/studio-publication-20261020/release/full-gif-native95/host-plan-gif95.json",
+  "conditionalTemplate": "/private/tmp/keel-independent-gif-native95-static-20261020/conditional-template.json",
+  "hostReview": "/private/tmp/keel-independent-gif-native95-static-20261020/host-review.json",
+  "stage": "/private/tmp/keel-gif-native95-sequence-20261020/docs/reviews/studio-publication-20261020/release/full-gif-native95/host-stage-proposal.json",
+  "hostRoot": "/home/ubuntu/keel-proof-qualification-9d94c44e-ad0f-45d1-b258-540e204f6ebd",
+  "capture": "/tmp/keel-private-gif-fresh-forward-capture-20261020-01/normal.capture.json",
+  "receipt": "/tmp/keel-private-gif-fresh-forward-capture-20261020-01/normal.receipt.json",
+  "audit": "/tmp/keel-private-gif-fresh-forward-capture-20261020-01/normal.forward-audit.json",
+  "program": "/private/tmp/keel-gif-native95-sequence-20261020/sequence/program.json",
+  "pureProgram": "/private/tmp/keel-gif-native95-sequence-20261020/sequence/program.pure.json",
+  "outputDirectory": "/private/tmp/keel-gif-native95-sequence-20261020/sequence/late"
+}
