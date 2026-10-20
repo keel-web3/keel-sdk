@@ -1,0 +1,50 @@
+{
+  "schema": "keel-independent-narrow-qa-fixture-corrections@1",
+  "recordedAt": "2026-10-20T14:49:28.512335+00:00",
+  "decision": "APPROVE_ONLY_EXACT_RECORDED_FIXTURE_AND_DESCRIPTOR_TYPE_CORRECTIONS",
+  "nativeDefaultUser": {
+    "patch": {
+      "path": "/Users/ravonus/dev/wt/studio-publication-20261019/qa-native-create-c4-20261020/evidence/default-user-proposal.patch",
+      "bytes": 1016,
+      "sha256": "50380b6a79031dbff3be50d214119a205dc74f22fbbe58377fc29071b614cc93"
+    },
+    "beforeSHA256": "a9545326cbb2c86686d90bccf6f45102bdfaf0106815df33f93e0d8c9c48d772",
+    "afterSHA256": "92273c14e75e1dc013a34db2ae9b3efded20a1dda8e36bc2bd1550f1c621da15",
+    "byteExactOnlyExpectedDefaultUserLiteralChanged": true,
+    "proof": [
+      "Actual481 image-inspect a685a7ebaf7e12c927545aeb15dbe2516d40948ae67015aa727d5f28f4912c33 User1000:1000",
+      "AuthenticD97 archive11028992B/d8e3539de3f259e4e9e4eb35ca3dcd709637ec4fcfa5041e03c777e3ce59d507 config5b2c74103448ce4fed0353121a615df2e222e01d357d5d108f511a7aeee363af User1000:1000",
+      "Unchanged officialbuild-proof-runner-image.mjs line18 requires1000:1000; scratchDockerfile USER1000:1000"
+    ],
+    "runtimeExecutionUser999AssertionsUnchanged": true,
+    "scope": "Image default metadata only, not qualification runtime UID"
+  },
+  "snapshotErrorLiteral": {
+    "patch": {
+      "path": "/Users/ravonus/dev/wt/studio-publication-20261019/qa-activation-fe944-20261020/evidence-7a2/message-proposal.patch",
+      "bytes": 936,
+      "sha256": "88a8cf06b17c7dd6f994407d3d3378faada722056640affa960cf48af8b8ab16"
+    },
+    "beforeSHA256": "32b907915f649143c1bb6db5c4780dc421ac72dc5ede78304e4af9398e121e1e",
+    "afterSHA256": "ca4ab8979655e2a6ad51c6c9be4ec90de0bf338be0cd6288f9328def89620ca5",
+    "byteExactOnlyRegexChanged": true,
+    "expected": "^artifact_path_symlink$",
+    "actualSource": "bounded() raises literalartifact_path_symlink",
+    "noPopenNoDumpForeignPreservationAssertionsUnchanged": true
+  },
+  "OCIParser": {
+    "correction": {
+      "path": "/Users/ravonus/dev/wt/studio-publication-20261019/qa-native-create-c4-20261020/evidence/oci-parser-correction.json",
+      "bytes": 529,
+      "sha256": "4aeeab6ac5a93f3b116e8ee2a4d710fe09b0b01db649f3d8c79df523f1f60e04"
+    },
+    "acceptedCondition": "Recurse v.config only when it is a dict with digest; image runtime Config is metadata, not an OCI descriptor",
+    "genuineManifestConfigAndLayerHashSizeChecksUnchanged": true,
+    "runtimeConfigBlobRemainsHashBound": true,
+    "scope": "Artifact closure only; no actual executor/container/fullprogram acceptance inferred"
+  },
+  "initialREDEvidencePreserved": true,
+  "noProductionSourceArtifactReferenceHashChanges": true,
+  "productionActivationApproved": false,
+  "runtimeOrLiveProofApprovedByThisRecord": false
+}

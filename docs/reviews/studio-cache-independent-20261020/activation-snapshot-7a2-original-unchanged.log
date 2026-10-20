@@ -1,0 +1,21 @@
+E
+======================================================================
+ERROR: test_timeout_keeps_partial_snapshot_content_and_path_durable (__main__.SnapshotFailureDurability.test_timeout_keeps_partial_snapshot_content_and_path_durable)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/ravonus/dev/wt/studio-cache-independent-review-20261020/docs/reviews/studio-cache-independent-20261020/activation-snapshot-failure-review.test.py", line 34, in test_timeout_keeps_partial_snapshot_content_and_path_durable
+    a.retain_database_snapshot(root, "a" * 64, 1024)
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/ravonus/dev/wt/studio-publication-20261019/release-proof-qualification/docs/reviews/studio-publication-20261019/release/final-candidate/activation-fe944/activate-qualified-studio.py", line 297, in retain_database_snapshot
+    helper = bounded(root, "snapshot-supervisor.cjs")
+  File "/Users/ravonus/dev/wt/studio-publication-20261019/release-proof-qualification/docs/reviews/studio-publication-20261019/release/final-candidate/activation-fe944/activate-qualified-studio.py", line 59, in bounded
+    require(target.is_file() and target.resolve().is_relative_to(root), "artifact_file_missing")
+    ~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/ravonus/dev/wt/studio-publication-20261019/release-proof-qualification/docs/reviews/studio-publication-20261019/release/final-candidate/activation-fe944/activate-qualified-studio.py", line 41, in require
+    raise RuntimeError(reason)
+RuntimeError: artifact_file_missing
+
+----------------------------------------------------------------------
+Ran 1 test in 0.002s
+
+FAILED (errors=1)

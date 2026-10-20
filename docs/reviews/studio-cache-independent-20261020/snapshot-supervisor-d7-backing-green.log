@@ -1,0 +1,17 @@
+TAP version 13
+# {"result":"FAIL","category":"diagnostic-limit","stderrBytes":4194304,"stderrRetainedBytes":16384,"scanned":[],"actualDockerCalls":0}
+# Subtest: actual supervisor retains only bounded diagnostic bytes, without zero-length backing views
+ok 1 - actual supervisor retains only bounded diagnostic bytes, without zero-length backing views
+  ---
+  duration_ms: 400.338416
+  type: 'test'
+  ...
+1..1
+# tests 1
+# suites 0
+# pass 1
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 430.895167

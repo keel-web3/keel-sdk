@@ -1,0 +1,18 @@
+F
+======================================================================
+FAIL: test_outer_timeout_durably_retains_partial_file_path_and_failure (__main__.NewBoundarySameDurabilityInvariant.test_outer_timeout_durably_retains_partial_file_path_and_failure)
+----------------------------------------------------------------------
+RuntimeError: artifact_file_missing
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/ravonus/dev/wt/studio-cache-independent-review-20261020/docs/reviews/studio-cache-independent-20261020/activation-snapshot-popen-timeout-review.test.py", line 22, in test_outer_timeout_durably_retains_partial_file_path_and_failure
+    with self.assertRaisesRegex(RuntimeError,'^database_snapshot_failed_or_exceeded_budget$'):a.retain_database_snapshot(root,'a'*64,1024)
+         ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: "^database_snapshot_failed_or_exceeded_budget$" does not match "artifact_file_missing"
+
+----------------------------------------------------------------------
+Ran 1 test in 0.001s
+
+FAILED (failures=1)
