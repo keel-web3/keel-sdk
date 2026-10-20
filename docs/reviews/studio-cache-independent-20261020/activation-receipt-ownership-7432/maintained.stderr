@@ -1,0 +1,18 @@
+test_daemon_created_current_before_lost_response_recovers_exact_candidate (maintained_controls.Contract.test_daemon_created_current_before_lost_response_recovers_exact_candidate) ... ok
+test_daemon_created_runner_before_lost_response_is_discovered_and_stopped (maintained_controls.Contract.test_daemon_created_runner_before_lost_response_is_discovered_and_stopped) ... ok
+test_foreign_current_and_runner_are_preserved_and_never_confirmed (maintained_controls.Contract.test_foreign_current_and_runner_are_preserved_and_never_confirmed) ... ok
+test_paths_refuse_escape_and_symlinks (maintained_controls.Contract.test_paths_refuse_escape_and_symlinks) ... ok
+test_planned_candidate_lost_response_before_cutover_preserves_original (maintained_controls.Contract.test_planned_candidate_lost_response_before_cutover_preserves_original) ... ok
+test_preserves_private_environment_and_original_mount (maintained_controls.Contract.test_preserves_private_environment_and_original_mount) ... ok
+test_recipient_and_approval_boundaries (maintained_controls.Contract.test_recipient_and_approval_boundaries) ... ok
+test_rollback_continues_after_uncertain_replacement_stop (maintained_controls.Contract.test_rollback_continues_after_uncertain_replacement_stop) ... ok
+test_rollback_never_confirms_failed_old_identity_restore (maintained_controls.Contract.test_rollback_never_confirms_failed_old_identity_restore) ... ok
+test_runner_duration_is_explicit_and_legacy_unitless_value_is_refused (maintained_controls.Contract.test_runner_duration_is_explicit_and_legacy_unitless_value_is_refused) ... ok
+test_runner_environment_is_cleared_and_extra_or_changed_values_reject (maintained_controls.Contract.test_runner_environment_is_cleared_and_extra_or_changed_values_reject) ... ok
+test_same_rollout_label_wrong_complete_config_does_not_take_ownership (maintained_controls.Contract.test_same_rollout_label_wrong_complete_config_does_not_take_ownership) ... ok
+test_stream_budget_immediate_boundaries (maintained_controls.Contract.test_stream_budget_immediate_boundaries) ... ok
+
+----------------------------------------------------------------------
+Ran 13 tests in 0.004s
+
+OK

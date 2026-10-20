@@ -1,0 +1,36 @@
+{
+  "actions": [
+    [
+      "cas-confirmation",
+      true
+    ],
+    [
+      "stop",
+      "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+    ]
+  ],
+  "candidateRunning": true,
+  "oldRunning": false,
+  "result": {
+    "actionFailures": [
+      "replacement_stop_failed",
+      "replacement_stopped_reinspection_failed"
+    ],
+    "databaseRestorePerformed": false,
+    "dependencyRollback": {
+      "confirmed": true
+    },
+    "destructiveCleanupPerformed": false,
+    "oldContainerRetained": true,
+    "oldRestartFencedOnFactoryDisable": true,
+    "oldRestartFencedOnStoppedOwners": true,
+    "preservedUnrelatedOccupants": [],
+    "recoveredApplicationIds": [
+      "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+    ],
+    "recoveredRunnerIds": [],
+    "status": "unconfirmed",
+    "unresolvedLookups": []
+  },
+  "sourceRoot": "/Users/ravonus/dev/wt/studio-receipt-ownership-20261020/keel-site/docs/reviews/studio-publication-20261020/release/activation-receipt-bound"
+}

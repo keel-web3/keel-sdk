@@ -1,0 +1,8 @@
+{
+  "scope": "one import-root literal only; bodies and assertions byte-identical",
+  "oldPath": "/tmp/keel-qa-receipt-activation-20261020/keel-site/docs/reviews/studio-publication-20261020/release/activation-receipt-bound",
+  "newPath": "/Users/ravonus/dev/wt/studio-receipt-ownership-20261020/keel-site/docs/reviews/studio-publication-20261020/release/activation-receipt-bound",
+  "beforeSHA256": "e5822d5743bc237ba3fd61a21a0da50a24255aa5e2dc367ee4937cd634211a5b",
+  "afterSHA256": "68c26a90e58be9d8072cea5fb038c93e7c9812835223e123839b5720c27f92db",
+  "reverseRestoresOriginal": true
+}
