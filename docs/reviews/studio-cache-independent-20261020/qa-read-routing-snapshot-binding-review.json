@@ -1,0 +1,39 @@
+{
+  "schema": "keel-independent-qa-fixture-binding-review@1",
+  "decision": "APPROVE_EXACT_ACTIVITY_SNAPSHOT_FIXTURE_BINDING_ONLY",
+  "proposalPath": "/tmp/keel-qa-read-routing-snapshot-proposal-20261020",
+  "beforeSHA256": "616b878eec64080171292c39b5a89cfeb940324b3df6fd1fd4fe437575392741",
+  "proposedSHA256": "04fb573bca87af2159114aaa8bf2625e4945f4d4ec879a6da10ef6a991586a8f",
+  "patchSHA256": "3c7bd5e9f7b0fa074e311acda2ca9831efb68f1f96cb7d1e5ddb57c0ff827c6d",
+  "reverseRestoresOriginalExactly": true,
+  "testBodiesInputsAndAssertionsUnchanged": true,
+  "basis": [
+    "The real Activity API snapshot returns readonly ActivityJob[].",
+    "The real saved-hash reconciliation consumes snapshot after canonical transaction checks.",
+    "The fixture has no Activity jobs and returns before activity.track, so an empty list matches its declared boundary."
+  ],
+  "limits": [
+    "No real Activity-job settlement coverage claimed.",
+    "No application source or guard change approved.",
+    "Preserve initial RED.",
+    "No actual network, wallet dispatch, test execution or activation by this reviewer.",
+    "User pause on custom-contract follow-up remains in effect; this binding creates no feature-expansion authority."
+  ],
+  "sourceInputs": [
+    {
+      "path": "/Users/ravonus/dev/wt/studio-wallet-capable-routing-20261020/keel-site/apps/studio/src/components/studio/activity/activity-store.ts",
+      "sha256": "6e2d72bfd02e6e7bddade5a6c7949568213f0a1bf0fd3728d9f581adddd6d64d",
+      "bytes": 5814
+    },
+    {
+      "path": "/Users/ravonus/dev/wt/studio-wallet-capable-routing-20261020/keel-site/apps/studio/src/components/studio/workspace/contracts/deployment-review.tsx",
+      "sha256": "68835bb9a1e511f4a87bbaff12951877428af4e5662997a5fc142b7aff8492c8",
+      "bytes": 12724
+    },
+    {
+      "path": "/Users/ravonus/dev/wt/studio-wallet-capable-routing-20261020/keel-site/apps/studio/src/lib/contract-deployment-activity.ts",
+      "sha256": "180dd798fc9dfd91d291c2027a43add0366a28ac141a89493b7b2caeb51378c2",
+      "bytes": 1136
+    }
+  ]
+}
