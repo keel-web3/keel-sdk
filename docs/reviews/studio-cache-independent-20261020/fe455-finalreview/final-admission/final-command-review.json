@@ -1,0 +1,64 @@
+{
+  "schema": "keel.independent-exact-image-only-activation-command-review@1",
+  "decision": "APPROVE",
+  "reviewerId": "independent-release-reviewer",
+  "sourceCommit": "38b1e44f2f3efd55d200cc6e37d8be93df5b4876",
+  "candidate": {
+    "siteCommit": "fb3c24e12ffb9a316e894747418146b7b38f243a",
+    "sdkCommit": "311d61526284248938e335d7ed879089408933be",
+    "buildId": "nuYbnoJa19cODlsCvyQcG",
+    "appImageId": "sha256:fe455169d3d10b37696ed17053ff0be167649f5a490acd7e4cea61c2412d6ccb"
+  },
+  "activationId": "823ac084-558f-4112-87fa-99aaf86b9cd3",
+  "proposedAndAdmittedCommandSHA256": "38db2edd2130469d77354b40c7a765d2d372d3e5d5a192ce43b193872da8441e",
+  "admittedCommandPath": "/private/tmp/keel-independent-fe455-finalreview-20261020/final-command.admitted.json",
+  "finalPlanSHA256": "cc02d07681de6ef308df8d20fd2eb1eb6b4980f8d1e417d9d1cb0dc2a74627a5",
+  "finalPlanBytes": 4107,
+  "technicalReviewSHA256": "9309cd891b3326b096f6c8655a27aa24d94b60c40fd125d4be331a4f81a779a2",
+  "qaSHA256": "f57d5d1f36d6db96eaca656bff54ec2f8e336bc0785817e24aa7084bc8d73c0d",
+  "staticPacketSHA256": "91216dd61e3bf5d64d5a762c4faaaa64ce94722f143374c9dcbca91473b9586d",
+  "changedTopLevelKeysFromReviewedPending": [
+    "approval",
+    "evidence",
+    "physicalPhase",
+    "pending"
+  ],
+  "allOperationalFieldsByteEquivalentAsCanonicalJSON": true,
+  "evidenceAttributionDraftText": "Legacy pending wording in evidenceAttribution.qa and releaseReview is retained nonoperational draft wording; factual exact digests and explicit current phase govern this review. No earlier native proof is relabelled.",
+  "scope": [
+    "Install only the three exact new root0444 evidence/final-plan files with exclusive no-follow hash/length-bound receivers",
+    "One read-only preflight of exact final plan",
+    "At most one exact plan-hash-bound image-only cutover including reviewed bounded durable snapshot and ownership-guarded rollback"
+  ],
+  "commandSequence": [
+    "files[0].argv with exact local stdin",
+    "files[1].argv with exact local stdin",
+    "files[2].argv with exact local stdin",
+    "readOnlyPreflightArgv",
+    "executeArgv only after all prior exit0 and retained preflight PASS"
+  ],
+  "automaticRetryAllowed": false,
+  "maximumExecutions": 1,
+  "operator": "Root sole host operator; reviewer performs no host mutation",
+  "freshChecksEnforcedByOperator": [
+    "Current95 full raw Config/Host/canonical Mounts, healthy paused",
+    "Existing D97 runner and socket exact",
+    "Exact fe455 full Config/RootFS/Size",
+    "Unused candidate/rollback/failed names",
+    "Fresh pinned daemon capability profile and candidate-only OOM semantics",
+    "Free1GiB rollback plus256MiB snapshot budget before claim; preserve1GiB after snapshot",
+    "Fresh bounded durable database snapshot before candidate creation and old stop"
+  ],
+  "blockingFindings": [],
+  "unsignedArtworkBoundaryPreserved": true,
+  "signing": false,
+  "submission": false,
+  "runtimeSuccessClaimed": false,
+  "overallDeliveryAcceptance": false,
+  "mandatoryAfterCutover": [
+    "Independent actual complete runtime/runner/mount/pause/read-only factory and public discovery readbacks",
+    "Fresh normal deployed ownGator and realGIF actual full native preflight to unsigned wallet",
+    "Authenticated historical exactbytes/SDKdecode/canvas on this exact build; rawHTTPstatus only if observed"
+  ],
+  "onFailure": "Stop and preserve exact receipts/snapshot/owned/foreign occupants; no automatic replay or second activation"
+}
