@@ -1,0 +1,5 @@
+Independent review approves exact source 380fa21a10eb77e161ed1cae3513e5e2f819f1ae as an offline reference correction only. The original strict modules and all unrelated verifier guards remain byte-identical. All 41 controls pass independently; the retained actual program was validated with network and child-process APIs blocked, with zero attempts. The complete old URI reproduces before the actual SDK derives the new collection context and omits the artifact annotation under Site400’s image-module rule. The complete new 580-byte drop calldata matches canonical metadata/stage derivation.
+
+The output remains a new program with executionCoreEquivalent false. No fresh capture, RPC, native execution, signing, submission, activation or publication readiness is approved. Preserve all earlier strict failures.
+
+The adjacent native-helper-review.json separately approves dbfcffa38’s exact optional Docker absence predicate after independent 30-control PASS. Same existing inputs and resource limits apply.

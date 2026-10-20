@@ -1,0 +1,15 @@
+{
+  "schema": "keel.independent-source-review@1",
+  "decision": "APPROVE_EXACT_OPTIONAL_DOCKER_ABSENCE_PREDICATE_ONLY",
+  "sourceCommit": "dbfcffa38ef31af885fd97fcde4e87a260da2f54",
+  "runtimePath": "/private/tmp/keel-mount-order-20261020/docs/reviews/studio-publication-20261020/release/older-input-retention/resume95/native95-host-controls.py",
+  "runtimeSHA256": "f67da5b9384f7f63d292b620e27f55e2eba167bbe79b5993eec505140373f901",
+  "checks": {
+    "pass": 30,
+    "fail": 0,
+    "skip": 0
+  },
+  "predicate": "optional && exit1 && stripped stdout [] && case-insensitive exact whole error: no such object: plannedname",
+  "scope": "Same already reviewed native95 SDK/HTTP qualification inputs and caps; first actual execution remains root/QA responsibility.",
+  "activationApproved": false
+}

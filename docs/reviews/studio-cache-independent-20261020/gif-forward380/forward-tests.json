@@ -1,0 +1,12 @@
+{
+  "argv": [
+    "/opt/homebrew/opt/node@22/bin/node",
+    "--test",
+    "--test-concurrency=1",
+    "docs/tools/gif-forward-reference/forward-reference.test.mjs"
+  ],
+  "cwd": "/private/tmp/keel-gif-forward-reference-20261020",
+  "exitCode": 0,
+  "stdoutSHA256": "54ae26fe2df3631f996514db656e5fbb842e195c88c5cbaceb0984777803b0fd",
+  "stderrSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+}
