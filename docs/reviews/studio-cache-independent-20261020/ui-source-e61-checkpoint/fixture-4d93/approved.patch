@@ -1,0 +1,38 @@
+--- a/apps/studio/tests/unit/release-review-handoff.test.ts
++++ b/apps/studio/tests/unit/release-review-handoff.test.ts
+@@ -16,18 +16,21 @@
+   return exports;
+ }
+ const id = "11111111-1111-4111-8111-111111111111", operationId = "22222222-2222-4222-8222-222222222222", wallet = `0x${"33".repeat(20)}`;
++const tables = { studioUsers: { id: {}, walletAddress: {} }, launchReleases: { id: {}, creatorId: {}, artifactId: {}, revision: {} }, artifacts: { id: {}, creatorId: {}, activeRevision: {}, manifestDigest: {}, manifest: {} } };
+ const links = load("src/lib/release-review-handoff.ts", {});
+ class AuthError extends Error {}
+ class GrantError extends Error {}
+ class OriginError extends Error {}
+ class ReleaseError extends Error { constructor(message: string, readonly code: string) { super(message); } }
++const continuation = load("src/lib/release-continuation.ts", {});
++const actions = { advanceReleasePublish: async () => ({ schema: "keel-release-continuation@1", releaseId: id, revision: 4, status: "review-required", nextAction: "prepare-review", reviewPath: `/studio/releases/${id}`, message: "Exact current review", storagePreserved: true, uploadedBytes: 0, signing: "not-performed", submission: "not-performed" }) };
+ const result = { schema: "keel-release-wallet-review@1", releaseId: id, revision: 4, wallet, preparation: { operationId }, execution: executionAuthority.describeKeelExecutionAuthority({ route: "studio-release", creatorAccount: wallet, requestedSigner: wallet, releaseId: id, revision: 4, operationId }), reviewPath: links.releaseWalletReviewPath(id, operationId, 4), signing: "not-performed", submission: "not-performed" };
+ 
+ test("owner handoff binds account wallet and saved operation without accepting a caller wallet", async () => {
+   const calls: unknown[][] = [];
+-  const query: any = { from: () => query, where: () => query, limit: async () => [{ wallet }] };
++  const query: any = { table: undefined, from: (table: unknown) => { query.table = table; return query; }, leftJoin: () => query, where: () => query, limit: async () => query.table === tables.studioUsers ? [{ wallet }] : [{ revision: 4, manifest: null, projectId: null }] };
+   const service = load("src/server/services/release-review-handoff-service.ts", {
+-    "drizzle-orm": { eq: () => {} }, "~/lib/release-review-handoff": links, "~/server/db": { db: { select: () => query } }, "~/server/db/schema": { studioUsers: {} },
++    "drizzle-orm": { eq: () => {}, and: () => {} }, "~/lib/release-review-handoff": links, "~/server/db": { db: { select: () => query } }, "~/server/db/schema": tables, "./release-action-service": actions, "~/lib/release-continuation": continuation,
+     "./release-service": { ReleaseServiceError: ReleaseError, prepareReleasePublish: async (...args: unknown[]) => { calls.push(args); return { operationId }; }, readReleasePublishReview: async (...args: unknown[]) => { calls.push(args); return { operationId }; } },
+   });
+   assert.deepEqual(await service.prepareCreatorReleaseReview("creator", id, 4), result);
+@@ -88,9 +91,9 @@
+ });
+ 
+ test("creator release handoff forwards cancellation to prepare and exact saved read", async () => {
+-  const controller = new AbortController(), signals: any[] = [], query: any = { from: () => query, where: () => query, limit: async () => [{ wallet }] };
++  const controller = new AbortController(), signals: any[] = [], query: any = { table: undefined, from: (table: unknown) => { query.table = table; return query; }, leftJoin: () => query, where: () => query, limit: async () => query.table === tables.studioUsers ? [{ wallet }] : [{ revision: 4, manifest: null, projectId: null }] };
+   const service = load("src/server/services/release-review-handoff-service.ts", {
+-    "drizzle-orm": { eq: () => {} }, "~/lib/release-review-handoff": links, "~/server/db": { db: { select: () => query } }, "~/server/db/schema": { studioUsers: {} },
++    "drizzle-orm": { eq: () => {}, and: () => {} }, "~/lib/release-review-handoff": links, "~/server/db": { db: { select: () => query } }, "~/server/db/schema": tables, "./release-action-service": actions, "~/lib/release-continuation": continuation,
+     "./release-service": { ReleaseServiceError: ReleaseError, prepareReleasePublish: async (...args: any[]) => { signals.push(args[4].signal); return { operationId }; },
+       readReleasePublishReview: async (...args: any[]) => { signals.push(args[6].signal); controller.abort(); return { operationId }; } },
+   });

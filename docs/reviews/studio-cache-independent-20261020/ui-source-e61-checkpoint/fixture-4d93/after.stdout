@@ -1,0 +1,39 @@
+TAP version 13
+# node:internal/modules/esm/resolve:314
+#   return new ERR_PACKAGE_PATH_NOT_EXPORTED(
+#          ^
+# Error [ERR_PACKAGE_PATH_NOT_EXPORTED]: Package subpath './studio-execution-authority' is not defined by "exports" in /private/tmp/keel-independent-handoff-fixture05-20261020/apps/studio/node_modules/@keel/sdk/package.json
+#     at exportsNotFound (node:internal/modules/esm/resolve:314:10)
+#     at packageExportsResolve (node:internal/modules/esm/resolve:604:13)
+#     at resolveExports (node:internal/modules/cjs/loader:650:36)
+#     at Function._findPath (node:internal/modules/cjs/loader:717:31)
+#     at node:internal/modules/cjs/loader:1369:27
+#     at j._resolveFilename (file:///Users/ravonus/dev/wt/studio-publication-20261019/keel-site/node_modules/.pnpm/tsx@4.23.12/node_modules/tsx/dist/register-C4vWVmug.mjs:2:17957)
+#     at nextResolveSimple (/Users/ravonus/dev/wt/studio-publication-20261019/keel-site/node_modules/.pnpm/tsx@4.23.12/node_modules/tsx/dist/register-C557imBs.cjs:10:1006)
+#     at /Users/ravonus/dev/wt/studio-publication-20261019/keel-site/node_modules/.pnpm/tsx@4.23.12/node_modules/tsx/dist/register-C557imBs.cjs:9:4959
+#     at /Users/ravonus/dev/wt/studio-publication-20261019/keel-site/node_modules/.pnpm/tsx@4.23.12/node_modules/tsx/dist/register-C557imBs.cjs:9:4261
+#     at resolveTsPaths (/Users/ravonus/dev/wt/studio-publication-20261019/keel-site/node_modules/.pnpm/tsx@4.23.12/node_modules/tsx/dist/register-C557imBs.cjs:10:759) {
+#   code: 'ERR_PACKAGE_PATH_NOT_EXPORTED'
+# }
+# Node.js v22.22.1
+# Subtest: tests/unit/release-review-handoff.test.ts
+not ok 1 - tests/unit/release-review-handoff.test.ts
+  ---
+  duration_ms: 400.186542
+  type: 'test'
+  location: '/private/tmp/keel-independent-handoff-fixture05-20261020/apps/studio/tests/unit/release-review-handoff.test.ts:1:1'
+  failureType: 'testCodeFailure'
+  exitCode: 1
+  signal: ~
+  error: 'test failed'
+  code: 'ERR_TEST_FAILURE'
+  ...
+1..1
+# tests 1
+# suites 0
+# pass 0
+# fail 1
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 403.942833

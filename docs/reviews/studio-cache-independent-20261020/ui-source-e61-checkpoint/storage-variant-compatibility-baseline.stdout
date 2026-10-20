@@ -1,0 +1,75 @@
+TAP version 13
+# Subtest: client.prepareReview: storage response must return actionable unsigned reviewUrl
+not ok 1 - client.prepareReview: storage response must return actionable unsigned reviewUrl
+  ---
+  duration_ms: 10.295916
+  type: 'test'
+  location: '/private/tmp/keel-independent-ui-e61-20261020/storage-variant-compatibility.regression.test.mjs:10:3'
+  failureType: 'testCodeFailure'
+  error: 'Studio returned another or invalid wallet-review identity.'
+  code: 'ERR_TEST_FAILURE'
+  name: 'TypeError'
+  stack: |-
+    checkedReview (file:///Users/ravonus/dev/wt/studio-proof-state-cache-20261020/keel-sdk/packages/sdk/dist/studio-agent-drafts.js:463:19)
+    Object.prepareReview (file:///Users/ravonus/dev/wt/studio-proof-state-cache-20261020/keel-sdk/packages/sdk/dist/studio-agent-drafts.js:472:16)
+    async TestContext.<anonymous> (file:///private/tmp/keel-independent-ui-e61-20261020/storage-variant-compatibility.regression.test.mjs:13:53)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async startSubtestAfterBootstrap (node:internal/test_runner/harness:296:3)
+  ...
+# Subtest: executeKeelStudioAgentDraftOperation: storage response must return actionable unsigned reviewUrl
+not ok 2 - executeKeelStudioAgentDraftOperation: storage response must return actionable unsigned reviewUrl
+  ---
+  duration_ms: 0.711083
+  type: 'test'
+  location: '/private/tmp/keel-independent-ui-e61-20261020/storage-variant-compatibility.regression.test.mjs:10:3'
+  failureType: 'testCodeFailure'
+  error: 'Studio returned another or invalid wallet-review identity.'
+  code: 'ERR_TEST_FAILURE'
+  name: 'TypeError'
+  stack: |-
+    checkedReview (file:///Users/ravonus/dev/wt/studio-proof-state-cache-20261020/keel-sdk/packages/sdk/dist/studio-agent-drafts.js:463:19)
+    Object.prepareReview (file:///Users/ravonus/dev/wt/studio-proof-state-cache-20261020/keel-sdk/packages/sdk/dist/studio-agent-drafts.js:472:16)
+    async TestContext.<anonymous> (file:///private/tmp/keel-independent-ui-e61-20261020/storage-variant-compatibility.regression.test.mjs:13:128)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: current built b524 still accepts the existing collection response and derives owner reviewUrl
+ok 3 - current built b524 still accepts the existing collection response and derives owner reviewUrl
+  ---
+  duration_ms: 0.643625
+  type: 'test'
+  ...
+# Subtest: MCP Apps parser must expose the exact storage reviewUrl
+not ok 4 - MCP Apps parser must expose the exact storage reviewUrl
+  ---
+  duration_ms: 0.587
+  type: 'test'
+  location: '/private/tmp/keel-independent-ui-e61-20261020/storage-variant-compatibility.regression.test.mjs:33:1'
+  failureType: 'testCodeFailure'
+  error: 'The saved review identity is incomplete.'
+  code: 'ERR_TEST_FAILURE'
+  stack: |-
+    exact (evalmachine.<anonymous>:2:421)
+    TestContext.<anonymous> (file:///private/tmp/keel-independent-ui-e61-20261020/storage-variant-compatibility.regression.test.mjs:34:38)
+    Test.runInAsyncScope (node:async_hooks:214:14)
+    Test.run (node:internal/test_runner/test:1047:25)
+    Test.processPendingSubtests (node:internal/test_runner/test:744:18)
+    Test.postRun (node:internal/test_runner/test:1173:19)
+    Test.run (node:internal/test_runner/test:1101:12)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: same actual MCP Apps parser accepts existing collection result and URL
+ok 5 - same actual MCP Apps parser accepts existing collection result and URL
+  ---
+  duration_ms: 1.692042
+  type: 'test'
+  ...
+1..5
+# tests 5
+# suites 0
+# pass 2
+# fail 3
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 205.452791

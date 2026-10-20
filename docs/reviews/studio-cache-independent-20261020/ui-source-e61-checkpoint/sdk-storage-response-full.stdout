@@ -1,0 +1,40 @@
+TAP version 13
+# Subtest: client.prepareReview: current built b524 rejects new storage response before returning any reviewUrl
+ok 1 - client.prepareReview: current built b524 rejects new storage response before returning any reviewUrl
+  ---
+  duration_ms: 10.028417
+  type: 'test'
+  ...
+# Subtest: executeKeelStudioAgentDraftOperation: current built b524 rejects new storage response before returning any reviewUrl
+ok 2 - executeKeelStudioAgentDraftOperation: current built b524 rejects new storage response before returning any reviewUrl
+  ---
+  duration_ms: 1.176042
+  type: 'test'
+  ...
+# Subtest: current built b524 still accepts the existing collection response and derives owner reviewUrl
+ok 3 - current built b524 still accepts the existing collection response and derives owner reviewUrl
+  ---
+  duration_ms: 1.762958
+  type: 'test'
+  ...
+# Subtest: actual current MCP Apps parser rejects hosted storage tool response including valid reviewUrl
+ok 4 - actual current MCP Apps parser rejects hosted storage tool response including valid reviewUrl
+  ---
+  duration_ms: 0.571416
+  type: 'test'
+  ...
+# Subtest: same actual MCP Apps parser accepts existing collection result and URL
+ok 5 - same actual MCP Apps parser accepts existing collection result and URL
+  ---
+  duration_ms: 0.466958
+  type: 'test'
+  ...
+1..5
+# tests 5
+# suites 0
+# pass 5
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 247.3565
