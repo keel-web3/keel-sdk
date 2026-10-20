@@ -1,0 +1,39 @@
+{
+  "files": [
+    {
+      "path": "README.md",
+      "bytes": 572,
+      "sha256": "c06af3c3c546093dc52cfdf13f841e057ed9f9d3f67c2710b07315b6f0653e0f"
+    },
+    {
+      "path": "independent-policy-matrix.mjs",
+      "bytes": 1031,
+      "sha256": "3e95240e08e01c0a89210d5135fc1f2d0a11135f96ad2a932281dd198c3e3097"
+    },
+    {
+      "path": "matrix.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "matrix.stdout",
+      "bytes": 70,
+      "sha256": "b8893f8d8dfbc8b3b323496361e49434104a538ab48f18f73994c8ae7065f535"
+    },
+    {
+      "path": "production-source.patch",
+      "bytes": 1207,
+      "sha256": "a0c532960f6456b57b2e706292b3b51d72f53057d6eeb2cfc91b1201006a0100"
+    },
+    {
+      "path": "review.json",
+      "bytes": 2231,
+      "sha256": "5e96b0ad9cd46f84c2921cb291d520cdcc26eec7be9822bb8e22ef68d10335d6"
+    },
+    {
+      "path": "test-reference.patch",
+      "bytes": 2130,
+      "sha256": "9ed192a7c7c1583755105bbdf7db2c9bc7517439f526c24a0b7e93a2bd9bcab0"
+    }
+  ]
+}

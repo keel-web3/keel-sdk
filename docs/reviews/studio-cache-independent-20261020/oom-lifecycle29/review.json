@@ -1,0 +1,84 @@
+{
+  "schema": "keel.independent-oom-lifecycle-attribution-review@1",
+  "reviewerId": "cache-release-reviewer",
+  "result": "ATTRIBUTED_ENGINE_LIFECYCLE_DEFAULT_WITH_ORIGINAL_STRICT_POSTGUARD_RED_RETAINED",
+  "hostProfile": {
+    "schema": "keel.current-docker-default-capabilities@1",
+    "readOnly": true,
+    "daemon": {
+      "/version": {
+        "Version": "29.1.3",
+        "GitCommit": "29.1.3-0ubuntu3~24.04.2",
+        "ApiVersion": "1.52",
+        "MinAPIVersion": "1.44",
+        "Os": "linux",
+        "Arch": "amd64",
+        "KernelVersion": "6.8.0-106-generic"
+      },
+      "/info": {
+        "ServerVersion": "29.1.3",
+        "CgroupVersion": "2",
+        "OomKillDisable": false,
+        "MemoryLimit": true,
+        "MemorySwap": null,
+        "DockerRootDir": "/var/lib/docker"
+      }
+    }
+  },
+  "hostProfileSHA256": "de90264866cfea2742d916546b3df4121d338e036f9f60d24555df5887d83cdd",
+  "actualStrictPostguardEvidence": {
+    "path": "/tmp/keel-qa-activation95-postdeploy-20261020/postguard-diagnostic.stdout",
+    "sha256": "93e35cb4f294f8dca7906e11bd8a9d749129e428ff5a1c1c7cb45b573fa7f0bf",
+    "expected": false,
+    "actual": null,
+    "allOtherFullConfigHostFieldsExactByQA": true
+  },
+  "sourceBasis": [
+    {
+      "url": "https://github.com/moby/moby/blob/docker-v29.1.3/daemon/daemon_unix.go",
+      "function": "adaptContainerSettings",
+      "meaning": "CREATE fills an unset OomKillDisable pointer with false."
+    },
+    {
+      "url": "https://github.com/moby/moby/blob/docker-v29.1.3/daemon/start.go",
+      "function": "ContainerStart",
+      "meaning": "Before starting, it revalidates and may adjust the stored HostConfig."
+    },
+    {
+      "url": "https://github.com/moby/moby/blob/docker-v29.1.3/daemon/daemon_unix.go",
+      "function": "verifyPlatformContainerResources",
+      "meaning": "When the kernel capability is unsupported, a present OomKillDisable value is cleared to nil, including false. Only true emits the warning."
+    },
+    {
+      "url": "https://github.com/moby/moby/blob/docker-v29.1.3/pkg/sysinfo/cgroup2_linux.go",
+      "function": "applyMemoryCgroupInfoV2",
+      "meaning": "The cgroup-v2 profile sets OomKillDisable support false."
+    }
+  ],
+  "attribution": "Fresh host29.1.3 Ubuntu build/cgroup2 capability profile and observed createdFalse/runningNull agree with this upstream version lifecycle. The distribution GitCommit is a package identifier; no unverified upstream Git-object or binary-source identity claim.",
+  "designDecision": "APPROVE_NARROW_CANDIDATE_ONLY_SEMANTIC_PROJECTION_DESIGN; exact implementation and next rollout remain unapproved",
+  "qualifiedProjectionBounds": [
+    "Keep explicitFalse CREATE request for the pinned null original default.",
+    "Only within candidate assert_application comparison, and only under the freshly pinned daemon/version/kernel/cgroup2/unsupported-OOM capability profile, allow a present expected value that is identity False and a present actual value that is identity None to compare as False on a copied HostConfig.",
+    "Do not mutate the actual inspection or normalize original baseline Config/Host digests. Keep every other complete field, unknown key, JSON type, nested order and mount multiplicity exact.",
+    "Actual True, numeric0/1, strings, lists, objects and absent property remain mismatches when False is expected. ExpectedTrue is never reduced to False or None.",
+    "Record actual null, expected false, profile digest and the single qualified comparison projection. Retain the original unchanged strict postguard RED; report a separately named semantic-guard result.",
+    "Do not key the allowance only on Running=True: resource verification runs before the actual start and can clear the pointer even when startup later fails. Recovery must handle that without taking ownership of a genuinely mismatched container.",
+    "No broad null/false normalization of Config or other HostConfig fields; engine/profile drift disables this special projection."
+  ],
+  "requiredFocusedControls": [
+    "createdFalse exact; runningNull under matched profile; failed-startNull under matched profile",
+    "False->True,False->0,False->string,False->missing reject",
+    "True->False/None reject; unrelated permission and full-field drift reject",
+    "profile version/kernel/cgroup/capability drift forbids projection",
+    "original old-baseline raw Config/Host hashes unchanged; actual objects unmodified"
+  ],
+  "nextImageOnlyIntegrationBoundary": "Current running baseline is7fd/image95 with proof backend, catalog and enabled fourth factory already installed. New operator must preserve that current state and existing D97 runner/socket rather than replay old initial three-row baseline or append duplicate backend/catalog environment. Review its concrete current-baseline image-only delta separately.",
+  "originalStrictApplicationGuardPass": false,
+  "currentApplicationHealthyObservedByQA": true,
+  "newSourceImplementationApproved": false,
+  "nextDeploymentApproved": false,
+  "hostMutationsByReviewer": 0,
+  "signingApproved": false,
+  "submissionApproved": false
+}

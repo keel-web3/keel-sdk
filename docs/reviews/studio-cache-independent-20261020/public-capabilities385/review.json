@@ -1,0 +1,44 @@
+{
+  "schema": "keel.independent-public-capabilities-policy-review@1",
+  "decision": "APPROVE_EXACT_SOURCE_AND_TEST_REFERENCE_CORRECTION",
+  "reviewerId": "cache-release-reviewer",
+  "sourceCommit": "d6e00b171",
+  "evidenceCommit": "3854da1f4f06fb077af6d4720ee86180cc239cb7",
+  "baseCommit": "9597d6907660751e310a36335028d27d114de32d",
+  "productionScope": "One exact /.well-known/keel-capabilities GET/HEAD public-path allowlist entry only",
+  "productionPatchSHA256": "a0c532960f6456b57b2e706292b3b51d72f53057d6eeb2cfc91b1201006a0100",
+  "testReferencePatchSHA256": "9ed192a7c7c1583755105bbdf7db2c9bc7517439f526c24a0b7e93a2bd9bcab0",
+  "testReferenceCorrectionExplicitlyApproved": true,
+  "referenceRationale": "Existing SDK studio-capabilities.ts fetches this public metadata route; the unchanged route returns only chainId, configured upload size and fixed public capabilities. Moving this exact path from private-negative coverage to public GET/HEAD coverage reflects the requested public contract. Child/case-variant negatives replace the old negative input; all old assertion statements and unrelated inputs remain.",
+  "existingRouteAndDocumentUnchanged": true,
+  "noPrivateProjectSessionCredentialOrGrantData": true,
+  "writesMCPPrivateAndWildcardPathsRemainGated": true,
+  "ownNode22MaintainedTests": {
+    "pass": 17,
+    "fail": 0,
+    "skip": 0,
+    "argv": [
+      "/Users/ravonus/.nvm/versions/node/v22.22.1/bin/node",
+      "--import",
+      "tsx",
+      "--test",
+      "tests/unit/studio-wallet-access.test.ts",
+      "tests/unit/studio-capabilities.test.ts"
+    ],
+    "cwd": "/private/tmp/keel-studio-public-capability-20261020/apps/studio",
+    "rawTAPLocation": "Conversation tool output; no repeated test run solely for log persistence"
+  },
+  "ownIndependentPolicyMatrix": {
+    "result": "PASS",
+    "checks": 91,
+    "network": 0,
+    "database": 0,
+    "production": 0
+  },
+  "baselineOwnerEvidence": "16PASS/1FAIL on new public compatibility regression before source fix; retained. Earlier wrong Node25/dependency setup RED retained separately.",
+  "deploymentApproved": false,
+  "liveCapabilityEndpointProof": false,
+  "signingApproved": false,
+  "submissionApproved": false,
+  "blockingFindings": []
+}

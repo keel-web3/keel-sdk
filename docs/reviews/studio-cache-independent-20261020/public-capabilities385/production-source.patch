@@ -1,0 +1,13 @@
+diff --git a/apps/studio/src/lib/studio-access-policy.ts b/apps/studio/src/lib/studio-access-policy.ts
+index e0157fc74..4989534d3 100644
+--- a/apps/studio/src/lib/studio-access-policy.ts
++++ b/apps/studio/src/lib/studio-access-policy.ts
+@@ -29,7 +29,7 @@ export function isStudioAccessPublicPath(path: string, method: string): boolean
+   // Pairing creates no creator grant until an invited signed creator approves.
+   if (path === "/api/agent/pair" || path === "/api/agent/pair/poll") return method === "POST";
+   if (method !== "GET" && method !== "HEAD") return false;
+-  if (["/coming-soon", "/api/studio/access", "/api/health", "/favicon.ico", "/robots.txt", "/.well-known/keel.json"].includes(path)) return true;
++  if (["/coming-soon", "/api/studio/access", "/api/health", "/favicon.ico", "/robots.txt", "/.well-known/keel.json", "/.well-known/keel-capabilities"].includes(path)) return true;
+   if (/^\/_next\/static\/(?:[A-Za-z0-9_@.-]+\/)*[A-Za-z0-9_@.-]+\.(?:js|css|woff2?|png|webp|svg)$/u.test(path)) return true;
+   if (/^\/branding\/onkeel-(?:light|dark)-(?:logo|wordmark|glyph)-[0-9]+\.webp$/u.test(path)) return true;
+   return /^\/fonts\/(?:vendor\/)?[A-Za-z0-9_.-]+\.woff2?$/u.test(path);
