@@ -1,0 +1,57 @@
+[
+    {
+        "Id": "sha256:48144d982e4edaf62198f3ca583dd5ded6c7f1228c6cc39322fd5a90341cba43",
+        "RepoTags": [
+            "keel-proof-runner:c4e852b769dbfc7de9c9ba2a3f7da94e547b763a"
+        ],
+        "RepoDigests": [
+            "keel-proof-runner@sha256:48144d982e4edaf62198f3ca583dd5ded6c7f1228c6cc39322fd5a90341cba43"
+        ],
+        "Parent": "",
+        "Comment": "buildkit.dockerfile.v0",
+        "Created": "2026-10-20T08:22:15.108176637-06:00",
+        "DockerVersion": "",
+        "Author": "",
+        "Architecture": "amd64",
+        "Os": "linux",
+        "Size": 11018829,
+        "GraphDriver": {
+            "Data": null,
+            "Name": "overlayfs"
+        },
+        "RootFS": {
+            "Type": "layers",
+            "Layers": [
+                "sha256:8eadead30526ca682df9942202852bc4c3e6697af388ca908c848a770a12369d",
+                "sha256:48995027bd73ab5193697b289b447a43dfe003eec80426137f58ae6743ccf053",
+                "sha256:4618cc5bd6c7b50190771c7d2b1913d6e0cb51cdab23c40ef9a98a92e0088297"
+            ]
+        },
+        "Metadata": {
+            "LastTagTime": "2026-10-20T14:22:15.91827564Z"
+        },
+        "Descriptor": {
+            "mediaType": "application/vnd.oci.image.index.v1+json",
+            "digest": "sha256:48144d982e4edaf62198f3ca583dd5ded6c7f1228c6cc39322fd5a90341cba43",
+            "size": 855,
+            "annotations": {
+                "io.containerd.image.name": "docker.io/library/keel-proof-runner:c4e852b769dbfc7de9c9ba2a3f7da94e547b763a",
+                "org.opencontainers.image.ref.name": "c4e852b769dbfc7de9c9ba2a3f7da94e547b763a"
+            }
+        },
+        "Config": {
+            "Cmd": null,
+            "Entrypoint": [
+                "/runner"
+            ],
+            "Env": [
+                "PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
+            ],
+            "Labels": null,
+            "OnBuild": null,
+            "User": "1000:1000",
+            "Volumes": null,
+            "WorkingDir": "/"
+        }
+    }
+]

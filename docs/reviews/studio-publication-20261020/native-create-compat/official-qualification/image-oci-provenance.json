@@ -1,0 +1,79 @@
+{
+  "schema": "keel-native-create-image-provenance@1",
+  "sdkCommit": "c4e852b769dbfc7de9c9ba2a3f7da94e547b763a",
+  "imageId": "sha256:48144d982e4edaf62198f3ca583dd5ded6c7f1228c6cc39322fd5a90341cba43",
+  "imageIdentityKind": "OCI image index including build attestation",
+  "amd64ManifestDigest": "sha256:1448782860af4e8aa877694bfcb27d8b2af00b3920149434bc455cf8efe76280",
+  "configDigest": "sha256:68bf35d00302a8b09282f5f6ef0d20fb6058e2515aba43f89fadd98c2ab98c52",
+  "platform": "linux/amd64",
+  "archiveSha256": "3ca58e95c5cf67d5990ad20b5e9bb7844137839f64dbd3281298bfd26e0c8714",
+  "archiveBytes": 11032064,
+  "verifiedDescriptors": [
+    {
+      "digest": "sha256:48144d982e4edaf62198f3ca583dd5ded6c7f1228c6cc39322fd5a90341cba43",
+      "bytes": 855,
+      "mediaType": "application/vnd.oci.image.index.v1+json"
+    },
+    {
+      "digest": "sha256:1448782860af4e8aa877694bfcb27d8b2af00b3920149434bc455cf8efe76280",
+      "bytes": 861,
+      "mediaType": "application/vnd.oci.image.manifest.v1+json"
+    },
+    {
+      "digest": "sha256:68bf35d00302a8b09282f5f6ef0d20fb6058e2515aba43f89fadd98c2ab98c52",
+      "bytes": 1255,
+      "mediaType": "application/vnd.oci.image.config.v1+json"
+    },
+    {
+      "digest": "sha256:7599c55b34b921ee1922a694b2b874a19ef3bab324316c82f4fbd8b46582b75f",
+      "bytes": 8416735,
+      "mediaType": "application/vnd.oci.image.layer.v1.tar+gzip"
+    },
+    {
+      "digest": "sha256:c2f67b32e5858108fe396d6d42c2d9f5c063ac38a522dfb79d7d9e5c4adb7c01",
+      "bytes": 2598704,
+      "mediaType": "application/vnd.oci.image.layer.v1.tar+gzip"
+    },
+    {
+      "digest": "sha256:35c1bd0103fed1f6f26a5db46693e274522938fbb04e404957f849581cf31843",
+      "bytes": 419,
+      "mediaType": "application/vnd.oci.image.layer.v1.tar+gzip"
+    },
+    {
+      "digest": "sha256:84d2e0f15261c591b96e3953fecc2187c1840910d238b99308657e533c8681e3",
+      "bytes": 565,
+      "mediaType": "application/vnd.oci.image.manifest.v1+json"
+    },
+    {
+      "digest": "sha256:e06ccd47a08835d7c4f0b7031ce709dfb6f6c84d151c9c360db3f88ad0591043",
+      "bytes": 167,
+      "mediaType": "application/vnd.oci.image.config.v1+json"
+    },
+    {
+      "digest": "sha256:516eab149ef535446ff1d148df28b69218da61f10f88b16d3bef3925e433e062",
+      "bytes": 935,
+      "mediaType": "application/vnd.in-toto+json"
+    }
+  ],
+  "files": {
+    "executor": {
+      "sha256": "3f9c2e9f2a9fb4267695bfc8493379001f81d1f7cca8b75eaa19133b0f20fcc8",
+      "bytes": 15611063,
+      "mode": "0o555"
+    },
+    "runner": {
+      "sha256": "9936f4b8661b4a8b396b581f5e6152b37a442dfc04d56e1960c7f59687a1da26",
+      "bytes": 4538754,
+      "mode": "0o555"
+    },
+    "receipt.json": {
+      "sha256": "0e36b95d2187b8b4c9dd871b085752e8867a353f62821b798f06db9f177ce2b2",
+      "bytes": 501,
+      "mode": "0o444"
+    }
+  },
+  "sourceBuildReceiptSha256": "0e36b95d2187b8b4c9dd871b085752e8867a353f62821b798f06db9f177ce2b2",
+  "imageConfigMatchesInspectIgnoringExplicitNulls": true,
+  "layerDiffIdsMatchConfig": true,
+  "noContainerStarted": true
+}

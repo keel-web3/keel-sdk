@@ -1,0 +1,206 @@
+{
+  "schema": "keel-native-create-official-qualification-build@1",
+  "recordedAt": "2026-10-20T14:27:14.841909+00:00",
+  "sourceCommit": "c4e852b769dbfc7de9c9ba2a3f7da94e547b763a",
+  "sourceTree": "294e2cb999e1c24e463c96a2c3131a90ec7fc407",
+  "baseRuntimeSDKCommit": "b524bf5fc19939c7523aada2e53f79e3360970ea",
+  "runtimeShimSha256": "7d01c9e741d5335b3985e702832017acfb1855b6052c66f1967e6bf98ee04939",
+  "approvedFixtureSha256": "bab3fe5a28ed22e49777ae5b5c136a06dd65140ece90ce7b962a2ab8596b7646",
+  "independentSourceReview": {
+    "reviewerCommit": "0cbed06",
+    "receiptSha256": "ffcf04d27b2b6adb7ad783954c5541b79c6983ad6ad74018de2c1a3587dcfd3b",
+    "scope": "source and qualification build only"
+  },
+  "artifactDirectory": "/Users/ravonus/dev/wt/studio-publication-20261019/native-artifacts/native-create-candidate-20261020",
+  "buildHost": "darwin/arm64",
+  "buildTarget": "linux/amd64",
+  "goVersion": "go version go1.25.8 darwin/arm64",
+  "buildEnvironment": {
+    "GOOS": "linux",
+    "GOARCH": "amd64",
+    "CGO_ENABLED": "0",
+    "GOTOOLCHAIN": "go1.25.8",
+    "GOPROXY": "off"
+  },
+  "executor": {
+    "sha256": "3f9c2e9f2a9fb4267695bfc8493379001f81d1f7cca8b75eaa19133b0f20fcc8",
+    "bytes": 15611063,
+    "format": "ELF64 x86-64 statically linked"
+  },
+  "broker": {
+    "sha256": "9936f4b8661b4a8b396b581f5e6152b37a442dfc04d56e1960c7f59687a1da26",
+    "bytes": 4538754,
+    "format": "ELF64 x86-64 statically linked",
+    "freshRebuiltSameBytes": true
+  },
+  "image": {
+    "imageId": "sha256:48144d982e4edaf62198f3ca583dd5ded6c7f1228c6cc39322fd5a90341cba43",
+    "platform": "linux/amd64",
+    "archiveSha256": "3ca58e95c5cf67d5990ad20b5e9bb7844137839f64dbd3281298bfd26e0c8714",
+    "archiveBytes": 11032064,
+    "saveReloadVerified": true,
+    "recursiveOCIAndLayerBytesVerified": true
+  },
+  "checks": {
+    "approvedFixtureCorrectedEVM": {
+      "pass": 38,
+      "fail": 0,
+      "skip": 0,
+      "scope": "local synthetic state and whole-block current49d constructors"
+    },
+    "officialExecutorAndBrokerBuild": "PASS",
+    "officialScratchImageBuildSaveReload": "PASS",
+    "frozenOfflineInstall": "PASS",
+    "officialSDKBuild": "PASS",
+    "unchangedNativeJSControls": {
+      "pass": 58,
+      "fail": 0,
+      "skip": 0,
+      "scope": "test doubles/offline framing, not live integration"
+    },
+    "freshPinnedGethOfflineTests": {
+      "testEvents": {
+        "pass": 85,
+        "fail": 0,
+        "skip": 0
+      },
+      "packages": {
+        "internal/ethapi": "PASS (38 events)",
+        "internal/keelfork": "PASS (47 events)",
+        "cmd/keel-proof-executor": "BUILD BLOCKED on Darwin: existing main.go:163 Utime.Usec int32 vs Sec int64"
+      },
+      "combinedCommandExit": 1,
+      "scope": "local synthetic state and retained public-proof fixtures; zero new public reads"
+    },
+    "unchangedExecutorTestsLinuxCrosscompile": {
+      "result": "PASS (compile only; not executed)",
+      "sha256": "fa3b4878d1dd1840de28cab024d08111eac10855939e982ee7de4456953fcb89",
+      "bytes": 13557921,
+      "format": "/Users/ravonus/dev/wt/studio-publication-20261019/native-artifacts/native-create-candidate-20261020/executor-controls-linux-amd64.test: ELF 64-bit LSB executable, x86-64, version 1 (SYSV), statically linked, BuildID[sha1]=d69626ef93170614e522da8c035b8f9145381e97, with debug_info, not stripped"
+    }
+  },
+  "retainedFailures": [
+    "original code-size fixture RED at evm-test-review/initial-evm-red.jsonl",
+    "targeted-native-controls.log initial missing dist setup (13 PASS,3 module import failures)",
+    "fresh-geth-controls.jsonl Darwin-only cmd package compile error; no source/test changes made"
+  ],
+  "remainingAcceptance": [
+    "independent QA actual Linux/amd64 binary and isolation tests",
+    "separately reviewed fresh current-state three-CREATE prerequisite qualification; original consumed public timeout must not be replayed",
+    "no GIF private-program or deployment acceptance claimed"
+  ],
+  "newELFExecuted": false,
+  "publicRPCRequests": 0,
+  "privateProgramExecuted": false,
+  "productionMutation": false,
+  "signing": "not-performed",
+  "submission": "not-performed",
+  "oldD97FE944Candidate": "preserved unchanged",
+  "evidenceFiles": [
+    {
+      "path": "receipt.json",
+      "bytes": 501,
+      "sha256": "0e36b95d2187b8b4c9dd871b085752e8867a353f62821b798f06db9f177ce2b2"
+    },
+    {
+      "path": "runner-image-receipt.json",
+      "bytes": 733,
+      "sha256": "5863fd7c49b039daa26e824340fb9c45f43a2cc370e6e37578372c5b50b76ec6"
+    },
+    {
+      "path": "image-inspect.json",
+      "bytes": 2047,
+      "sha256": "a685a7ebaf7e12c927545aeb15dbe2516d40948ae67015aa727d5f28f4912c33"
+    },
+    {
+      "path": "image-oci-provenance.json",
+      "bytes": 3026,
+      "sha256": "72eeba8705c123ef3f3cc60fd132c15d903de2e1ee4771853453f567edc16cd0"
+    },
+    {
+      "path": "build.stdout",
+      "bytes": 464,
+      "sha256": "1dbd6f9e9c1be90084b4a5ca846a66747bb6aabeeab55583efe6dbda6bc104ae"
+    },
+    {
+      "path": "build.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "image-build.stdout",
+      "bytes": 680,
+      "sha256": "66b2cd9bfa4ec41644c345433233d5cfecdcda3e0872fb730254a90bc76792e5"
+    },
+    {
+      "path": "image-build.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "executor-buildinfo.txt",
+      "bytes": 4166,
+      "sha256": "6b15c5419d61d4355c67db21511029f9cd3279b0c5f96f3b25db949503fd5a32"
+    },
+    {
+      "path": "broker-buildinfo.txt",
+      "bytes": 223,
+      "sha256": "a8f0409dc3699f0f075dd9b9bfe61482b98c3e5742070b4d16cf071903698466"
+    },
+    {
+      "path": "install.stdout",
+      "bytes": 3939,
+      "sha256": "1f7b2bddd3acc56f67ef3298726f47e82be39aef376423f178e2c66b968eaf0b"
+    },
+    {
+      "path": "install.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "sdk-build.stdout",
+      "bytes": 274,
+      "sha256": "971c2cd318feffa53baf32c9efeec5b8725a30d19d60f5cc5ef13f69e616b14a"
+    },
+    {
+      "path": "sdk-build.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "targeted-native-controls.log",
+      "bytes": 6764,
+      "sha256": "17255f7c9df4ce987ae73b752c0831fc0b6cb89bd9498f137decc28f98c54885"
+    },
+    {
+      "path": "targeted-native-controls-built.log",
+      "bytes": 11746,
+      "sha256": "27b9942909cf0c232eef93593c08a9afe888e2c6eaf8ee0bbc68ecfc3ef82ef7"
+    },
+    {
+      "path": "fresh-geth-controls.jsonl",
+      "bytes": 82345,
+      "sha256": "71eb47d4cf9fc9ecb6db471ab861de36c241c9f860184cf6625140355ddb408b"
+    },
+    {
+      "path": "fresh-geth-controls.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "test-overlay.json",
+      "bytes": 624,
+      "sha256": "09553b5f98b98922eedad27f9bbb8c39a351803cb87f8f359c0f1b9a43d15820"
+    },
+    {
+      "path": "executor-test-crosscompile.stdout",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "executor-test-crosscompile.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  ]
+}

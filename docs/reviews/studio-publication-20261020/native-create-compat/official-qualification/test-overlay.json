@@ -1,0 +1,6 @@
+{
+  "Replace": {
+    "/Users/ravonus/dev/wt/studio-publication-20261019/native-artifacts/native-create-candidate-20261020/geth/internal/ethapi/keel_sparse_create_test.go": "/Users/ravonus/dev/wt/studio-native-create-compat-20261020/keel-sdk/native/proof-executor/geth-overlay/internal/ethapi/keel_sparse_test.go",
+    "/Users/ravonus/dev/wt/studio-publication-20261019/native-artifacts/native-create-candidate-20261020/geth/internal/ethapi/keel_sparse_create_evm_test.go": "/Users/ravonus/dev/wt/studio-native-create-compat-20261020/keel-sdk/native/proof-executor/geth-overlay/internal/ethapi/keel_sparse_evm_test.go"
+  }
+}
