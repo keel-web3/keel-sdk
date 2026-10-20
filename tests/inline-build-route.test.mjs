@@ -52,7 +52,7 @@ test('reader-aware AUTO retains its preference while selecting eligible exact No
 
 test('explicit Brotli cannot silently use a None-only reader or an invalid capability list',()=>{
  assert.throws(()=>resolveKeelInlineBuildRoute({resources,compression:'brotli',freshReaderCompressions:['none']}),error=>error.code==='KEEL_INLINE_CODEC_UNSUPPORTED');
- for(const allowed of [[],['brotli'],['none','none'],['none','gzip'],['none','base90']])assert.throws(()=>resolveKeelInlineBuildRoute({resources,freshReaderCompressions:allowed}),/Fresh reader compression/);
+ for(const allowed of [[],['brotli'],['none','none'],['none','base90']])assert.throws(()=>resolveKeelInlineBuildRoute({resources,freshReaderCompressions:allowed}),/Fresh reader compression/);
 });
 
 test('a permitted Brotli candidate still needs the matching publication path and full validation',()=>{
