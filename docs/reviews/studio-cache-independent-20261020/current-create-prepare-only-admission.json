@@ -1,0 +1,81 @@
+{
+  "schema": "independent-public-native-prepare-only-admission@1",
+  "decision": "APPROVE",
+  "reviewerId": "cache-release-independent-reviewer",
+  "scope": "One fresh read-only prepare run, not public simulation. Dynamic native execution admission is separate.",
+  "argv": [
+    "/Users/ravonus/.nvm/versions/node/v22.22.1/bin/node",
+    "/Users/ravonus/dev/wt/native-public-durability-20261020/docs/reviews/studio-publication-20261020/native-prerequisites/bounded/runner.mjs",
+    "prepare",
+    "/Users/ravonus/dev/wt/native-public-durability-20261020/docs/reviews/studio-publication-20261020/native-prerequisites/bounded/recipe.json",
+    "native481-949-prepare-01"
+  ],
+  "executionUID": 0,
+  "outputDirectory": "/private/tmp/keel-native49d-bounded-20261020/native481-949-prepare-01",
+  "sourceFiles": [
+    {
+      "path": "/Users/ravonus/dev/wt/native-public-durability-20261020/docs/reviews/studio-publication-20261020/native-prerequisites/bounded/runner.mjs",
+      "bytes": 15995,
+      "sha256": "61c88f0218dc789e9781a0b80d99ff81603e869605ef442d6c01bc9e6b55eca8"
+    },
+    {
+      "path": "/Users/ravonus/dev/wt/native-public-durability-20261020/docs/reviews/studio-publication-20261020/native-prerequisites/bounded/transport.mjs",
+      "bytes": 12690,
+      "sha256": "2b2f62f4644bb0d31e826a429031200036f45b98b0bb295a06214e0bfac95973"
+    },
+    {
+      "path": "/Users/ravonus/dev/wt/native-public-durability-20261020/docs/reviews/studio-publication-20261020/native-prerequisites/bounded/recipe.json",
+      "bytes": 1068,
+      "sha256": "cb26ae70d01b2d8b256bf760a2eff19b2642cc56296899adce2070c65608dcb8"
+    }
+  ],
+  "staticPacketSHA256": "ef45b0d16c25698af7691005be8a883ccddaff9f0ac189408f4f2a1a6c86f324",
+  "maximumRPCReads": 17,
+  "endpoint": "https://rpc.sepolia.ethpandaops.io",
+  "allowedMethods": [
+    "eth_chainId",
+    "eth_getBlockByNumber",
+    "eth_getTransactionCount",
+    "eth_getBalance",
+    "eth_getCode",
+    "eth_maxPriorityFeePerGas",
+    "eth_gasPrice"
+  ],
+  "forbiddenMethods": [
+    "eth_simulateV1",
+    "eth_sendRawTransaction",
+    "eth_sendTransaction"
+  ],
+  "unchangedBounds": {
+    "overallMs": 90000,
+    "requestMs": 60000,
+    "connectMs": 10000,
+    "readMs": 15000,
+    "pacingMs": 250,
+    "responseBytes": 2097152,
+    "cumulativeResponseBytes": 4194304,
+    "requestBytes": 524288,
+    "cumulativeRequestBytes": 1048576,
+    "headerAgeSeconds": 120
+  },
+  "nonce": 296,
+  "freshFeeFormula": "2*canonicalBaseFee+quotedPriority within unchanged priority1e9/maxFee2e9",
+  "unchangedCeilings": [
+    9012324,
+    61379375,
+    31884460
+  ],
+  "stateOverrides": false,
+  "privateProgram": false,
+  "signing": false,
+  "submission": false,
+  "publicSimulationApproved": false,
+  "nativeExecutionApproved": false,
+  "activationApproved": false,
+  "consumedPublicClaimSHA256": "cb58ad8b60a9d5028cb2b6fd4c5d1497579f787847eda7dd79b74b43f1b11a49",
+  "requirements": [
+    "Existing consumed global public simulation claim and prior READ_TIMEOUT remain unchanged.",
+    "Use prepare mode only with a new exclusive directory; retain all failures without automatic replay, renaming or source changes.",
+    "Notify independent reviewer immediately with exact plan, all17 raw responses and result hashes; a fresh plan receipt does not admit native execution."
+  ]
+}
