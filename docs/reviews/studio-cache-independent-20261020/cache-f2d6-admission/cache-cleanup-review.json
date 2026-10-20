@@ -1,0 +1,64 @@
+{
+  "schema": "keel-public-package-cache-cleanup-review@1",
+  "decision": "APPROVE",
+  "reviewerId": "independent-release-reviewer",
+  "reviewedAt": "2026-10-20T19:57:04.228793+00:00",
+  "sourceCommit": "f2d6de9477074559f9c365aa80925edd6cfc49a9",
+  "packetEvidenceHEAD": "0e43ea0e774eab2d461270e9def5b1514a2d2cc4",
+  "planSHA256": "28dbfac54fa26c38e27da64a7dee062926ed1fa06ade2f33ac6895e0a65acd59",
+  "operatorSHA256": "d32238756e3f3a2d00344f4f652a30dd9b88ac960378a5c0c00f1bd2801a5e0d",
+  "transferProposalSHA256": "a8f9fb71529474930250444288310ea54613c94ed111662ea4865c6b0201c848",
+  "scope": "exact-888-public-cache-files-only",
+  "blockingFindings": [],
+  "allowedRootPaths": [
+    "/home/ubuntu/.cache/pnpm/v11",
+    "/home/ubuntu/.npm/_cacache"
+  ],
+  "allowedFileCount": 888,
+  "allocatedReclaimBytes": 488615936,
+  "directoryShellsRemoved": 0,
+  "retainedReserveBytes": 1342177280,
+  "independentEvidence": {
+    "actualLinuxCases": 62,
+    "failures": 0,
+    "skips": 0,
+    "realUID1000RetainedCwdRegression": "PASS_REJECTED_CACHE_PROCESS_CWD_INODE_REFERENCE",
+    "all38PriorCacheTestsByteIdentical": true,
+    "qualified888FileAndAllDirectoryMetadataUnchanged": true,
+    "testResult": {
+      "path": "/Users/ravonus/dev/wt/studio-cache-independent-review-20261020/docs/reviews/studio-cache-independent-20261020/cache-f2d6-admission/independent62-linux.stdout",
+      "bytes": 3220,
+      "sha256": "bf41f52fca87d23b7354c973b10a9c83e82385f5d4467bc91f5a9307dab1ed9a"
+    },
+    "realChildResult": {
+      "path": "/Users/ravonus/dev/wt/studio-cache-independent-review-20261020/docs/reviews/studio-cache-independent-20261020/cache-f2d6-admission/real-cwd.stdout",
+      "bytes": 483,
+      "sha256": "26f62877b531cef6bac60015043a80458f499a6819bb88ec8bc12523cbc52cbd"
+    }
+  },
+  "closedFindings": [
+    "CC1: still-live missing cwd/exe cannot skip FD/maps/mount boundaries.",
+    "CC2: durable move intents precede rename; uncertain post-rename mutation is reconciled and shells restored with durable status.",
+    "CC3: cwd/exe target device/inode checks catch references after quarantine."
+  ],
+  "namespaceReview": "Known inode handles are checked before textual paths; proc readlink need not resolve a deleted executable in the host namespace. Mount sources naming original cache paths remain terminal. Any renamed bind target is checked by actual namespace inode. The only overlapping-target exception requires exact /systemd/inaccessible/dir tmpfs with ro,nosuid,nodev,noexec and both cache paths absent in that namespace. Any denial, missing mount target or still-live unresolved boundary fails closed.",
+  "conditions": [
+    "Root must independently verify this exact command receipt and immutable files.",
+    "Fresh exact-new-operator read-only preflight must PASS before execute. Prior readonly03 is supporting evidence only and does not replace this check.",
+    "Fresh normal configured proxy predicate and original healthy/running/worker-paused/full-Config state.",
+    "Exclusive rollout lock, all prior pinned immutable helper/import receipts, original-state equality before and after.",
+    "Revalidate all888 public file hashes, ownership, metadata, single-link status, directory/ancestor identities and all references before move and before unlink.",
+    "Only exact cache files may be unlinked inside authenticated root-owned0700 quarantine; retain every directory shell and any new foreign occupant.",
+    "One execute only. Stop on denial/failure/uncertainty, retain consumed marker, partial receipt and prior failed evidence. No retry/reset/new scope implied.",
+    "Validate durable receipt equals returned result and measure actual free space before any separately admitted image import."
+  ],
+  "cleanupOnly": true,
+  "imageImportApproved": false,
+  "containerOrVolumeMutationApproved": false,
+  "configurationOrCredentialCleanupApproved": false,
+  "databaseMutationApproved": false,
+  "productionActivationApproved": false,
+  "privateProgramApproved": false,
+  "signingApproved": false,
+  "transactionSubmissionApproved": false
+}

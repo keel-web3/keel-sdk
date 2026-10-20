@@ -1,0 +1,9 @@
+{
+  "operatorSHA256": "d32238756e3f3a2d00344f4f652a30dd9b88ac960378a5c0c00f1bd2801a5e0d",
+  "all38PriorCacheTestsByteIdentical": true,
+  "qualified888FileAndDirectoryMetadataExactTo00f850": true,
+  "allocatedReclaimBytes": 488615936,
+  "newNamespaceCases": 13,
+  "sourceChangesConfinedToNamespaceAndProcPathChecks": true,
+  "productionActions": false
+}
