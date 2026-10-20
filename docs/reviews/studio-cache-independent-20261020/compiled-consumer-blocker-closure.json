@@ -1,0 +1,31 @@
+{
+  "schema": "keel-independent-compiled-consumer-blocker-closure@1",
+  "at": "2026-10-20T08:41:02.751406+00:00",
+  "decision": "CLOSE_COMPILED_CONSUMER_P1_FOR_CORRECTED_IMAGE_ONLY",
+  "image": "sha256:0c35272c4114d61dbc65b9e22cf55b59cef2b572ecc684eca4eaf0a49c0ce7ea",
+  "buildId": "pyrfdcquUJkhz22Y0jyAz",
+  "compiledChunkSHA256": "759d16eef27a3733ff410096be2075a5935242f50fd85ea861400484a66ef3f0",
+  "actualCompiledModule": "44950",
+  "moduleDefinitionSHA256": "b452390e6c7c9d46345aeb17d341931a3763ea76c5ae6fde98c811b8ce601ef2",
+  "physicalCodeReadsForTwoIdenticalCalls": 1,
+  "behaviorAssertionUnchanged": true,
+  "probeChange": "Actual new build dist-directory literal only; reverse restores7af3 original test hash.",
+  "QAActualImageAPIs": {
+    "pass": 127,
+    "fail": 0,
+    "skip": 0,
+    "manifestFiles": 1360,
+    "rawStdoutHashesIndependentlyVerified": true
+  },
+  "old5c961P1RetainedWithPhysicalReads": 2,
+  "releaseApproved": false,
+  "remainingGates": [
+    "Exact final import/host pins and rollback capacity",
+    "Fresh automatic full strict Gator native qualification and independent result audit",
+    "Production browser/historical decoded metadata and canvas acceptance",
+    "Wallet owner authority and any signing/submission separate"
+  ],
+  "nativeProgramExecuted": false,
+  "productionActivated": false,
+  "signing": false
+}
