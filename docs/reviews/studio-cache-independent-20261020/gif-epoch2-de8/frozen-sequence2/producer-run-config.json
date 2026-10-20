@@ -1,0 +1,12 @@
+{
+  "packet": {
+    "path": "/private/tmp/keel-private-gif-fresh-forward2-20261020-01/packet.json",
+    "bytes": 3270,
+    "sha256": "3e08eeee6d169c72b0378563f681e72e0b77f48d9bfdad78b090a2b8fe4f796e"
+  },
+  "review": {
+    "path": "/private/tmp/keel-independent-gif-native95-static-20261020/producer-review02.json",
+    "bytes": 1032,
+    "sha256": "5199b31b12634ce9035326879a5d173b2e9ecea125219de148faf23ccc84b1c9"
+  }
+}

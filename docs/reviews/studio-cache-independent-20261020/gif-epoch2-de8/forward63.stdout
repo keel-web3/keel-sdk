@@ -1,0 +1,388 @@
+TAP version 13
+# Subtest: actual old strict failure stays RED; derived complete forward reference passes offline only
+ok 1 - actual old strict failure stays RED; derived complete forward reference passes offline only
+  ---
+  duration_ms: 771.610875
+  type: 'test'
+  ...
+# Subtest: full drop rejects independently changed target
+ok 2 - full drop rejects independently changed target
+  ---
+  duration_ms: 309.932667
+  type: 'test'
+  ...
+# Subtest: full drop rejects independently changed payout
+ok 3 - full drop rejects independently changed payout
+  ---
+  duration_ms: 305.240291
+  type: 'test'
+  ...
+# Subtest: full drop rejects independently changed supply
+ok 4 - full drop rejects independently changed supply
+  ---
+  duration_ms: 340.44725
+  type: 'test'
+  ...
+# Subtest: full drop rejects independently changed maxPerTransaction
+ok 5 - full drop rejects independently changed maxPerTransaction
+  ---
+  duration_ms: 308.457708
+  type: 'test'
+  ...
+# Subtest: full drop rejects independently changed maxPerWallet
+ok 6 - full drop rejects independently changed maxPerWallet
+  ---
+  duration_ms: 323.038709
+  type: 'test'
+  ...
+# Subtest: full drop rejects independently changed stages[0].kind
+ok 7 - full drop rejects independently changed stages[0].kind
+  ---
+  duration_ms: 303.879167
+  type: 'test'
+  ...
+# Subtest: full drop rejects independently changed stages[0].startTime
+ok 8 - full drop rejects independently changed stages[0].startTime
+  ---
+  duration_ms: 333.076709
+  type: 'test'
+  ...
+# Subtest: full drop rejects independently changed stages[0].endTime
+ok 9 - full drop rejects independently changed stages[0].endTime
+  ---
+  duration_ms: 345.312333
+  type: 'test'
+  ...
+# Subtest: full drop rejects independently changed stages[0].unitPrice
+ok 10 - full drop rejects independently changed stages[0].unitPrice
+  ---
+  duration_ms: 302.584584
+  type: 'test'
+  ...
+# Subtest: full drop rejects independently changed stages[0].paymentAsset
+ok 11 - full drop rejects independently changed stages[0].paymentAsset
+  ---
+  duration_ms: 311.114375
+  type: 'test'
+  ...
+# Subtest: full drop rejects independently changed stages[0].signer
+ok 12 - full drop rejects independently changed stages[0].signer
+  ---
+  duration_ms: 310.57125
+  type: 'test'
+  ...
+# Subtest: full drop rejects independently changed stages[0].entitlementToken
+ok 13 - full drop rejects independently changed stages[0].entitlementToken
+  ---
+  duration_ms: 313.115875
+  type: 'test'
+  ...
+# Subtest: full drop rejects independently changed stages[0].maxPerTransaction
+ok 14 - full drop rejects independently changed stages[0].maxPerTransaction
+  ---
+  duration_ms: 318.077209
+  type: 'test'
+  ...
+# Subtest: full drop rejects independently changed stages[0].maxPerWallet
+ok 15 - full drop rejects independently changed stages[0].maxPerWallet
+  ---
+  duration_ms: 361.974958
+  type: 'test'
+  ...
+# Subtest: full drop rejects independently changed stages[0].metadataDigest
+ok 16 - full drop rejects independently changed stages[0].metadataDigest
+  ---
+  duration_ms: 304.993667
+  type: 'test'
+  ...
+# Subtest: full drop rejects independently changed metadataDigest
+ok 17 - full drop rejects independently changed metadataDigest
+  ---
+  duration_ms: 317.349583
+  type: 'test'
+  ...
+# Subtest: read/execution limit and identity stays bound: discoveryGasPolicy
+ok 18 - read/execution limit and identity stays bound: discoveryGasPolicy
+  ---
+  duration_ms: 199.43525
+  type: 'test'
+  ...
+# Subtest: read/execution limit and identity stays bound: chainId
+ok 19 - read/execution limit and identity stays bound: chainId
+  ---
+  duration_ms: 221.521209
+  type: 'test'
+  ...
+# Subtest: read/execution limit and identity stays bound: reader
+ok 20 - read/execution limit and identity stays bound: reader
+  ---
+  duration_ms: 213.643916
+  type: 'test'
+  ...
+# Subtest: read/execution limit and identity stays bound: readerRuntimeCodeHash
+ok 21 - read/execution limit and identity stays bound: readerRuntimeCodeHash
+  ---
+  duration_ms: 208.368041
+  type: 'test'
+  ...
+# Subtest: read/execution limit and identity stays bound: maximumTokenUriBytes
+ok 22 - read/execution limit and identity stays bound: maximumTokenUriBytes
+  ---
+  duration_ms: 245.023209
+  type: 'test'
+  ...
+# Subtest: read/execution limit and identity stays bound: maximumReadGas
+ok 23 - read/execution limit and identity stays bound: maximumReadGas
+  ---
+  duration_ms: 217.285583
+  type: 'test'
+  ...
+# Subtest: read/execution limit and identity stays bound: collectionOverheadGas
+ok 24 - read/execution limit and identity stays bound: collectionOverheadGas
+  ---
+  duration_ms: 216.842458
+  type: 'test'
+  ...
+# Subtest: read/execution limit and identity stays bound: maximumTransactionGas
+ok 25 - read/execution limit and identity stays bound: maximumTransactionGas
+  ---
+  duration_ms: 248.683959
+  type: 'test'
+  ...
+# Subtest: unchanged structural guard rejects source GIF descriptor
+ok 26 - unchanged structural guard rejects source GIF descriptor
+  ---
+  duration_ms: 195.079
+  type: 'test'
+  ...
+# Subtest: unchanged structural guard rejects WebP preview
+ok 27 - unchanged structural guard rejects WebP preview
+  ---
+  duration_ms: 234.906042
+  type: 'test'
+  ...
+# Subtest: unchanged structural guard rejects URI body
+ok 28 - unchanged structural guard rejects URI body
+  ---
+  duration_ms: 575.859291
+  type: 'test'
+  ...
+# Subtest: unchanged structural guard rejects old artifact restored to new envelope
+ok 29 - unchanged structural guard rejects old artifact restored to new envelope
+  ---
+  duration_ms: 592.258125
+  type: 'test'
+  ...
+# Subtest: unchanged structural guard rejects unexpected target
+ok 30 - unchanged structural guard rejects unexpected target
+  ---
+  duration_ms: 313.32325
+  type: 'test'
+  ...
+# Subtest: unchanged structural guard rejects unexpected sender
+ok 31 - unchanged structural guard rejects unexpected sender
+  ---
+  duration_ms: 334.036875
+  type: 'test'
+  ...
+# Subtest: unchanged structural guard rejects unexpected value
+ok 32 - unchanged structural guard rejects unexpected value
+  ---
+  duration_ms: 312.222208
+  type: 'test'
+  ...
+# Subtest: unchanged structural guard rejects stale revision
+ok 33 - unchanged structural guard rejects stale revision
+  ---
+  duration_ms: 198.315667
+  type: 'test'
+  ...
+# Subtest: unchanged structural guard rejects changed canonical header
+ok 34 - unchanged structural guard rejects changed canonical header
+  ---
+  duration_ms: 302.313459
+  type: 'test'
+  ...
+# Subtest: unchanged structural guard rejects extra override field
+ok 35 - unchanged structural guard rejects extra override field
+  ---
+  duration_ms: 303.958958
+  type: 'test'
+  ...
+# Subtest: canonical document every field participates in independently derived digest
+ok 36 - canonical document every field participates in independently derived digest
+  ---
+  duration_ms: 71.601125
+  type: 'test'
+  ...
+# Subtest: unchanged old graph is actual SDK input and whole old URI reproduces before forwarding
+ok 37 - unchanged old graph is actual SDK input and whole old URI reproduces before forwarding
+  ---
+  duration_ms: 76.842542
+  type: 'test'
+  ...
+# Subtest: three old strict module bytes are retained unchanged
+ok 38 - three old strict module bytes are retained unchanged
+  ---
+  duration_ms: 8.411458
+  type: 'test'
+  ...
+# Subtest: forward core differs ONLY by separately reviewed expected-drop derivation and truthful flags
+ok 39 - forward core differs ONLY by separately reviewed expected-drop derivation and truthful flags
+  ---
+  duration_ms: 0.08575
+  type: 'test'
+  ...
+# Subtest: no observed new URI/digest literal can serve as an expected value
+ok 40 - no observed new URI/digest literal can serve as an expected value
+  ---
+  duration_ms: 70.35
+  type: 'test'
+  ...
+# Subtest: forward original preserves all remaining original verifier bytes and guards
+ok 41 - forward original preserves all remaining original verifier bytes and guards
+  ---
+  duration_ms: 0.107708
+  type: 'test'
+  ...
+# Subtest: historical actual block
+ok 42 - historical actual block
+  ---
+  duration_ms: 50.490834
+  type: 'test'
+  ...
+# Subtest: fresh actual lower block ceiling
+ok 43 - fresh actual lower block ceiling
+  ---
+  duration_ms: 47.215166
+  type: 'test'
+  ...
+# Subtest: reject larger total envelope
+ok 44 - reject larger total envelope
+  ---
+  duration_ms: 11.231667
+  type: 'test'
+  ...
+# Subtest: reject smaller total envelope
+ok 45 - reject smaller total envelope
+  ---
+  duration_ms: 10.606833
+  type: 'test'
+  ...
+# Subtest: reject historical envelope reused
+ok 46 - reject historical envelope reused
+  ---
+  duration_ms: 9.4885
+  type: 'test'
+  ...
+# Subtest: reject preparation envelope changed
+ok 47 - reject preparation envelope changed
+  ---
+  duration_ms: 9.404458
+  type: 'test'
+  ...
+# Subtest: reject observation envelope changed
+ok 48 - reject observation envelope changed
+  ---
+  duration_ms: 9.719542
+  type: 'test'
+  ...
+# Subtest: reject canonical hash changed
+ok 49 - reject canonical hash changed
+  ---
+  duration_ms: 9.561625
+  type: 'test'
+  ...
+# Subtest: reject canonical number changed
+ok 50 - reject canonical number changed
+  ---
+  duration_ms: 9.765125
+  type: 'test'
+  ...
+# Subtest: reject input number changed
+ok 51 - reject input number changed
+  ---
+  duration_ms: 9.840167
+  type: 'test'
+  ...
+# Subtest: reject canonical timestamp changed
+ok 52 - reject canonical timestamp changed
+  ---
+  duration_ms: 9.72425
+  type: 'test'
+  ...
+# Subtest: reject native header changed
+ok 53 - reject native header changed
+  ---
+  duration_ms: 9.692083
+  type: 'test'
+  ...
+# Subtest: reject compiler header changed
+ok 54 - reject compiler header changed
+  ---
+  duration_ms: 10.609333
+  type: 'test'
+  ...
+# Subtest: reject chain changed
+ok 55 - reject chain changed
+  ---
+  duration_ms: 9.7445
+  type: 'test'
+  ...
+# Subtest: preserve historical strict equality discoveryGasPolicy
+ok 56 - preserve historical strict equality discoveryGasPolicy
+  ---
+  duration_ms: 36.337166
+  type: 'test'
+  ...
+# Subtest: preserve historical strict equality chainId
+ok 57 - preserve historical strict equality chainId
+  ---
+  duration_ms: 40.950291
+  type: 'test'
+  ...
+# Subtest: preserve historical strict equality reader
+ok 58 - preserve historical strict equality reader
+  ---
+  duration_ms: 34.9185
+  type: 'test'
+  ...
+# Subtest: preserve historical strict equality readerRuntimeCodeHash
+ok 59 - preserve historical strict equality readerRuntimeCodeHash
+  ---
+  duration_ms: 34.700584
+  type: 'test'
+  ...
+# Subtest: preserve historical strict equality maximumTokenUriBytes
+ok 60 - preserve historical strict equality maximumTokenUriBytes
+  ---
+  duration_ms: 35.51975
+  type: 'test'
+  ...
+# Subtest: preserve historical strict equality maximumReadGas
+ok 61 - preserve historical strict equality maximumReadGas
+  ---
+  duration_ms: 42.232
+  type: 'test'
+  ...
+# Subtest: preserve historical strict equality collectionOverheadGas
+ok 62 - preserve historical strict equality collectionOverheadGas
+  ---
+  duration_ms: 35.995458
+  type: 'test'
+  ...
+# Subtest: whole fresh program derives exact original assets and URI without changing input
+ok 63 - whole fresh program derives exact original assets and URI without changing input
+  ---
+  duration_ms: 755.90275
+  type: 'test'
+  ...
+1..63
+# tests 63
+# suites 0
+# pass 63
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 13223.876667
