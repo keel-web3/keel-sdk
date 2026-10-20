@@ -1,0 +1,49 @@
+{
+  "files": [
+    {
+      "path": "README.md",
+      "bytes": 861,
+      "sha256": "2ffea0b95ca2ccafa711fbcc64f9e194c2e586b24ce02b091f30761b8b29ee74"
+    },
+    {
+      "path": "audit-save.py",
+      "bytes": 4986,
+      "sha256": "794ed49fb9220508de0be5236e08293f4426d15180c498f2a1f2a73cbdb18009"
+    },
+    {
+      "path": "build-receipt-review.json",
+      "bytes": 1415,
+      "sha256": "06e40365432e3152f1706ff431af9e2c10cd9b2a6eeaf0619e37cf9d9aa41054"
+    },
+    {
+      "path": "checkpoint.json",
+      "bytes": 3893,
+      "sha256": "12cd665bf1f853d38eb4436c40ad820d76813eccd806705cc1cef3f064bed58e"
+    },
+    {
+      "path": "evidence-manifest.json",
+      "bytes": 1220,
+      "sha256": "fadc0c165621c6e255090b18e48454ccb31bdfadc39da03ec9038a13c58e7bff"
+    },
+    {
+      "path": "save-audit.exit",
+      "bytes": 2,
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+    },
+    {
+      "path": "save-audit.json",
+      "bytes": 13401,
+      "sha256": "b69a885c3a57329cb9cb8306f1c5f3ff693be51bc42093b381874b9f7e590891"
+    },
+    {
+      "path": "save-audit.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "save-audit.stdout",
+      "bytes": 1086,
+      "sha256": "af9ff563434ef408590d19c92d3b53c87f351462788aa79e133b09d0fd47fb87"
+    }
+  ]
+}

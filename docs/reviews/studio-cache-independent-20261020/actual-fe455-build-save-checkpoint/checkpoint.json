@@ -1,0 +1,51 @@
+{
+  "schema": "keel.independent-fe455-artifact-checkpoint@1",
+  "reviewerId": "cache-release-reviewer",
+  "decision": "PASS_ACTUAL_BUILD_AND_FULL_SAVE_INTEGRITY_ONLY_QUALIFICATION_PENDING",
+  "image": "sha256:fe455169d3d10b37696ed17053ff0be167649f5a490acd7e4cea61c2412d6ccb",
+  "siteSource": "fb3c24e12ffb9a316e894747418146b7b38f243a",
+  "sdkSource": "311d61526284248938e335d7ed879089408933be",
+  "buildId": "nuYbnoJa19cODlsCvyQcG",
+  "buildReceiptReviewSHA256": "06e40365432e3152f1706ff431af9e2c10cd9b2a6eeaf0619e37cf9d9aa41054",
+  "fullSaveAuditSHA256": "b69a885c3a57329cb9cb8306f1c5f3ff693be51bc42093b381874b9f7e590891",
+  "actualImageConfigSHA256": "b8ddaf6d68e76ad758ee46b7c8407b480dfb146113ba0f31a43f10943d80a38b",
+  "actualRootFSSHA256": "4d3fdbf45a284484f2287b2ddb4cf0dc0f07855a86ec376713658fd1534c63b2",
+  "archiveSHA256": "d7b01b81ba15044693511d2d1ec2acaecda0d9f97c62a309a2ba9282d9b6383e",
+  "archiveBytes": 703956480,
+  "all40BlobsAnd38CompressedExpandedLayersVerified": true,
+  "all36RetainedBaseLayersPreserved": true,
+  "rawExecuteByteExactDurable6114": true,
+  "original95AndRunnerRemainUnchangedByBuild": true,
+  "sourceQA377AcceptedScope": "Source311/fb3 only, with exact independent220d/f020 binding approvals; not actual-image runtime/live proof.",
+  "qualificationProposalInspected": {
+    "path": "/private/tmp/keel-image-only-release-20261020/docs/reviews/studio-publication-20261020/release/image-only311/postbuild-qualification.commands.proposed.json",
+    "sha256": "0ef03cd362bb26b14b103677dda6a8f96be933b1771edaea14d4113265e71773",
+    "status": "NOT_ADMITTED_IN_THIS_CHECKPOINT_REPLACEMENT_BEING_FROZEN",
+    "structure": "Intended isolated tree/SDK/HTTP roles on actualfe455; networknone/readOnly/UID999/capdropALL/no-new-privileges/boundedmemory/PIDs/logs/emptyPGcover and fixed public readonly qualification mounts; only exact owned immutable IDs after full planned Config/Host/Mount match. No production socket or credentials.",
+    "fixtureObservations": [
+      "Original714 qualifier48a3 puts retained media buffers before worker; author is carrying prior independently approved worker-before-media ordering with all statements/assertions unchanged.",
+      "HTTP startup fixture shown still has ECONNREFUSED-only handling. Any reuse of the prior exact TimeoutError-within30s startup correction must be explicitly hash-bound; no postready timeout or resource relaxation approved."
+    ],
+    "actualQualificationOrContainerActionsByReviewer": 0
+  },
+  "compiledProofClosure": {
+    "status": "PENDING_FROZEN_SOURCE_AND_INDEPENDENT_REVIEW",
+    "initialAmbiguous43108Rejected": true,
+    "reportedSuccessor": "Engineer reports exact storage-review route .X registration order and279 reachable definitions. This report has NOT yet been independently reviewed; not treated as equivalent proof here."
+  },
+  "validPreactivationEvidenceBoundary": "If actual new-image runtime and complete proof execution closure/dependencies are independently exact to qualified95/b524/D97, historical Gator34/GIF25 native capacity evidence is reusable with its original image attribution. It is not new-image/UI/live proof and permits no expired replay or freshness override.",
+  "remainingBeforeActivation": [
+    "Independent actual new-image SDK/HTTP/full-tree/closure qualification and exact reviewed isolated operator recipe.",
+    "Exact final image-only activation plan/evidence/current-state/rollback/snapshot bindings."
+  ],
+  "mandatoryAfterSeparatelyApprovedActivation": [
+    "Fresh own exact Gator and GIF normal deployed full-native simulation to unsigned owner wallet.",
+    "Required authenticated historical browser/SDK-decoded/canvas parity on the new build."
+  ],
+  "allFinalActivationFlagsSupported": false,
+  "activationAuthority": false,
+  "fullNewPrivateProgramProofClaimed": false,
+  "signing": false,
+  "submission": false,
+  "reviewerHostActions": 0
+}
