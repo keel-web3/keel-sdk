@@ -1,0 +1,23 @@
+{
+  "schema": "keel-production-proof-host-review@1",
+  "decision": "APPROVE",
+  "reviewerId": "cache-release-independent-reviewer",
+  "planSha256": "9c6a2edbdfd5f25cbcd371a154760506cc0e11bec5c976546e9ac5cc39ee819c",
+  "mode": "factory",
+  "phases": [
+    "execute"
+  ],
+  "blockingFindings": [],
+  "sourceFreeze": "a2a3fc18f8a0230732fa36fcca6943c392987586",
+  "operatorSHA256": "5f7f8beb57fdc4972f3416317f624f8e0f17904bbdb5a281e4da1f33ce2263ed",
+  "scope": "Approve the exact qualification-only FE944/b524 client and 481 CREATE runner host implementation/profile. This receipt does not admit a program. Execution also requires a separately reviewed exact fresh public native plan and keel-current-native-prerequisites-review@1, bounded outer command/health guards, and unchanged original full Config/HostConfig before and after. No public eth_simulateV1 replay, application activation, private GIF program, signing, or submission.",
+  "lateProgramReviewRequired": true,
+  "activationApproved": false,
+  "originalGIFApproved": false,
+  "artifactProofSHA256": "ba46f469c248d1e0fd48ce3733e00a81821b1ec3a87edc1f24eb56aeb1dc91c3",
+  "hostControls": {
+    "passed": 23,
+    "failed": 0,
+    "logSHA256": "acd7463507aa2d0f15e5ac782b3cdcb3ae89877c3de9fdca4e0f0e3a2933e9b0"
+  }
+}

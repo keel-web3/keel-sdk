@@ -1,0 +1,69 @@
+{
+  "schema": "independent-native-create-artifact-profile-review@1",
+  "result": "PASS",
+  "sourceFreeze": "a2a3fc18f8a0230732fa36fcca6943c392987586",
+  "hostPlanSHA256": "9c6a2edbdfd5f25cbcd371a154760506cc0e11bec5c976546e9ac5cc39ee819c",
+  "importPlanSHA256": "827f05ae182484013886a668c7e4154974fdbfd332ffdf2e3c6dea99680d96cf",
+  "archive": {
+    "bytes": 11032064,
+    "sha256": "3ca58e95c5cf67d5990ad20b5e9bb7844137839f64dbd3281298bfd26e0c8714"
+  },
+  "blobCount": 9,
+  "descriptorVisits": 9,
+  "layers": [
+    {
+      "digest": "sha256:7599c55b34b921ee1922a694b2b874a19ef3bab324316c82f4fbd8b46582b75f",
+      "diffID": "sha256:8eadead30526ca682df9942202852bc4c3e6697af388ca908c848a770a12369d",
+      "uncompressedTarBytes": 15612928,
+      "entries": 1
+    },
+    {
+      "digest": "sha256:c2f67b32e5858108fe396d6d42c2d9f5c063ac38a522dfb79d7d9e5c4adb7c01",
+      "diffID": "sha256:48995027bd73ab5193697b289b447a43dfe003eec80426137f58ae6743ccf053",
+      "uncompressedTarBytes": 4540416,
+      "entries": 1
+    },
+    {
+      "digest": "sha256:35c1bd0103fed1f6f26a5db46693e274522938fbb04e404957f849581cf31843",
+      "diffID": "sha256:4618cc5bd6c7b50190771c7d2b1913d6e0cb51cdab23c40ef9a98a92e0088297",
+      "uncompressedTarBytes": 2048,
+      "entries": 1
+    }
+  ],
+  "conservativeExpandedBytes": 20160512,
+  "expandedBudget": 22020096,
+  "requiredFreeBytes": 1375229440,
+  "sources": {
+    "operator": {
+      "bytes": 30122,
+      "sha256": "5f7f8beb57fdc4972f3416317f624f8e0f17904bbdb5a281e4da1f33ce2263ed"
+    },
+    "core": {
+      "bytes": 31411,
+      "sha256": "ad688aee2e42512e892d97a045cd4cae8eafcae1752f001f9685e2851c5ea1f0"
+    },
+    "identity": {
+      "bytes": 8515,
+      "sha256": "e72af3e856ae7dbd82307b43f8e71e16140f6f550c5e1f96d2502e480f637436"
+    },
+    "sdkManifest": {
+      "bytes": 236909,
+      "sha256": "a1112b91209dfe58466d9af9c0e51cc0329ecea580bbb1bf28a1b458bfef3549"
+    },
+    "executor": {
+      "bytes": 15611063,
+      "sha256": "3f9c2e9f2a9fb4267695bfc8493379001f81d1f7cca8b75eaa19133b0f20fcc8"
+    },
+    "driver": {
+      "bytes": 6511,
+      "sha256": "996de48fa7557d997a3f2f5158a4cd6a048ec20b1883ad27aa7a3a74ec982db8"
+    }
+  },
+  "unchangedHostFunctionCount": 21,
+  "identityUnchanged": true,
+  "driverOnlyManifestAndExecutorPinsChanged": true,
+  "originalDescriptorNegative": "image_layers_or_configuration",
+  "correctedDescriptorActualFixture": "PASS",
+  "runtimeExecutionPerformed": false,
+  "hostActionPerformed": false
+}
