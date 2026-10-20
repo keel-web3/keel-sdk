@@ -1,0 +1,2 @@
+{"case": "deleted-cwd-with-retained-cache-fd", "cacheFDExists": true, "rejected": false, "hostOrRPC": false}
+{"case": "post-rename-error-before-bookkeeping", "sourceRootStates": {"pnpm": false, "npm": true}, "quarantineRootPresent": true, "restoration": [], "removed": [], "hostOrRPC": false}
