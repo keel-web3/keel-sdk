@@ -6,7 +6,14 @@ normal f11/b524 GIF compiler bundle. It is not a new storage protocol, a public
 API or an assertion that prerequisites have been deployed.
 
 The source tuple remains Site f11, SDK b524, Contracts 6e (current49d production
-bytecode) and Modules cd97151. Prefix input binds the current49d three CREATEs:
+bytecode) and Modules cd97151. The hypothetical native-media catalog record retains
+its unchanged maintained profile sourceCommit
+`1c9634683c22c0d599cb825be050e932ff4f7d31`, as required by the actual f11 module
+qualifier. That profile metadata is distinct from the real current49d/6e artifact
+build provenance; both must be recorded. Do not fill a catalog profile sourceCommit
+from the whole factory/artifact contractsCommit. Actual module bytes, formatter
+links and current factory constructor/carrier identities still come from S1 and
+must match their separate compiled commitments. Prefix input binds the current49d three CREATEs:
 formatter, maintained factory and native media module; exact sender/nonces
 296/297/298, initcode hashes, gas/fee/value fields, expected six created addresses,
 compiled runtime/link identities and actual canonical header. No 4015/two-CREATE
