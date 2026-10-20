@@ -1,0 +1,12 @@
+{
+  "packet": {
+    "path": "/tmp/keel-private-gif-existing-v2-20261020-01/packet.json",
+    "bytes": 3239,
+    "sha256": "cac421bcd74743f5b97a6be6af33da4215435c0b3fed8c4037c812e6ac99d008"
+  },
+  "review": {
+    "path": "/private/tmp/keel-independent-gif-existing-v2-20261020/assembly-review.json",
+    "bytes": 937,
+    "sha256": "6718ccbe13300688d5654d1a75e25f694123bf8c628daf590330bcb30f7a9372"
+  }
+}

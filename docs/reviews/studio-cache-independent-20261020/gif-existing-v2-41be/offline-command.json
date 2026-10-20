@@ -1,0 +1,17 @@
+{
+  "argv": [
+    "/Users/ravonus/.nvm/versions/node/v22.22.1/bin/node",
+    "--test",
+    "/private/tmp/keel-qa-receipt-activation-20261020/keel-site/docs/tools/gif-existing-v2-capture/deployed-core.test.mjs",
+    "/private/tmp/keel-qa-receipt-activation-20261020/keel-site/docs/tools/gif-existing-v2-capture/existing-candidate.test.mjs",
+    "/private/tmp/keel-qa-receipt-activation-20261020/keel-site/docs/tools/gif-existing-v2-capture/guided-review-receipt.test.mjs",
+    "/private/tmp/keel-qa-receipt-activation-20261020/keel-site/docs/tools/gif-existing-v2-capture/public-signer.test.mjs",
+    "/private/tmp/keel-qa-receipt-activation-20261020/keel-site/docs/tools/gif-existing-v2-capture/read-schema.test.mjs",
+    "/private/tmp/keel-qa-receipt-activation-20261020/keel-site/docs/tools/gif-existing-v2-capture/run-capture.test.mjs"
+  ],
+  "cwd": "/private/tmp/keel-qa-gif-reviewed14-20261020/candidate-400",
+  "explicitEnvironment": {
+    "KEEL_CAPTURE_SDK_ROOT": "/Users/ravonus/dev/wt/studio-publication-20261019/native-artifacts/final-literal-f11-b524/keel-sdk"
+  },
+  "exitCode": 1
+}

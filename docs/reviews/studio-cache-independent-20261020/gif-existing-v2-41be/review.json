@@ -1,0 +1,243 @@
+{
+  "schema": "keel.independent-gif-existing-v2-source-review@1",
+  "decision": "APPROVE_ONE_EXACT_READ_ONLY_NORMAL_ASSEMBLY_ONLY",
+  "toolSourceCommit": "41be256c14697868b2384d89f28f81581fa83030",
+  "toolEvidenceHEAD": "2cc5bcce35beb6acc731cbda7a52d839b4c496d6",
+  "siteCommit": "4002803ccfcb20c39ffe5c555b68d8e197f379f8",
+  "sdkCommit": "b524bf5fc19939c7523aada2e53f79e3360970ea",
+  "sdkBuiltDigest": "3effa2f2e594fe969f592d9446b5095484adf358033c76b83349385956c69df8",
+  "packet": {
+    "path": "/tmp/keel-private-gif-existing-v2-20261020-01/packet.json",
+    "bytes": 3239,
+    "sha256": "cac421bcd74743f5b97a6be6af33da4215435c0b3fed8c4037c812e6ac99d008"
+  },
+  "bundleReceipt": {
+    "path": "/tmp/keel-private-gif-existing-v2-bundle-20261020-01/bundle-receipt.json",
+    "bytes": 45303,
+    "sha256": "2763ee074fde6a488f2609c55ebe73951059e425904866ea3fea5c85380aa49d"
+  },
+  "bundleSHA256": "1f5f68a5936ddfa4ef2ee0383b224489495a10390c257568d5785e01299880fa",
+  "commandAdmission": {
+    "path": "/private/tmp/keel-independent-gif-existing-v2-20261020/command-admission.json",
+    "bytes": 9209,
+    "sha256": "d8c5add750ffc780d67436ca3b46ef77ecb0550194ce95fcc74ac7cf949e0304"
+  },
+  "strictAssemblyReview": {
+    "path": "/private/tmp/keel-independent-gif-existing-v2-20261020/assembly-review.json",
+    "bytes": 937,
+    "sha256": "6718ccbe13300688d5654d1a75e25f694123bf8c628daf590330bcb30f7a9372"
+  },
+  "config": {
+    "path": "/private/tmp/keel-independent-gif-existing-v2-20261020/run-config.json",
+    "bytes": 404,
+    "sha256": "7b4bbca523e9da80ec2db9bcb89ee004b68cc739416c34033f765e399921aa6a"
+  },
+  "blockingFindings": [],
+  "normalCallgraph": {
+    "entry": "generateOriginal",
+    "readUpdatedPublicationReview": 1,
+    "captureSavedPublicationProgram": 1,
+    "CheckRenewalFundingHistoryCalls": 0,
+    "sourceReferences": [
+      "apps/studio/src/server/services/updated-publication-review-service.ts:199",
+      "apps/studio/src/server/services/updated-publication-review-service.ts:220",
+      "apps/studio/src/server/services/updated-review-candidate-service.ts:145"
+    ],
+    "normalReadViewMayTakeTemporaryRowLocksButWritesNoSourceRows": true,
+    "captureUsesReadOnlyDatabaseAndFreshPostassemblySourceCandidateSnapshot": true,
+    "existingCandidate": {
+      "id": "d04c272e-b860-4903-9747-b196a2abf828",
+      "digest": "0xef6a1e18057f709f49e5ad9c8fca18de3ad10fc2dd45edce7ab99caf71d844c2",
+      "version": 2,
+      "status": "blocked",
+      "deadline": "1792610916",
+      "deadlineRepinningAllowed": false,
+      "approvalBoundary": null
+    }
+  },
+  "independentVerification": {
+    "offlineCases": 91,
+    "realReadonlyCloneCases": 4,
+    "actual400CredentialALS": 2,
+    "failures": 0,
+    "skips": 0,
+    "appSourcesVerified": 192,
+    "toolFilesVerified": 23,
+    "builtSDKFilesVerified": 1754,
+    "externalPackages": 14,
+    "actualSiteDomainFiles": 45,
+    "originalGuidedAfterProjectionsUnchanged": 99,
+    "current100TablesExact": true,
+    "all155ImmutableInputsAnd45ByteDiagnosticPointerExact": true,
+    "offlineBundleRebuildByteExact": true,
+    "actualModuleImport": "PASS_0_IO_0_EXPORT_CALLS",
+    "canonicalCLIAndActualStrictReviewValidator": "PASS"
+  },
+  "reviewedBehavior": {
+    "networkGuardAndSchema": "byte-identical to consumed revision14 producer; same400 requests/180seconds/fixedSepoliaRecipient and terminal denials/redirects/unrecognized reverts",
+    "privateFailureDetail": "new private0600 output,8192byte cap, retained privately only",
+    "sourceInstrumentation": [],
+    "prefixTransactions": 0,
+    "executionCoreEquivalent": false,
+    "originalGIFWebPURIAndConfigOtherThanExplicitDeployedFactoryCollectionRemap": "strict independent core auditor retained",
+    "diagnosticPublicIdentity": "existing public receipt and revision14 AsyncLocalStorage; local key reads/writes/signing prohibited"
+  },
+  "conditions": [
+    "One exact canonical command only; all five output files must be absent.",
+    "Candidate identity/deadline remain exact with the same180second remaining-window check; no renewal or changes.",
+    "All100 database table projections/schema/candidate and155 immutable files/latest pointer must remain exact before and after.",
+    "Preserve old revision13/revision14 consumed failures and this attempt on failure or uncertainty. No automatic retry/reset/restore.",
+    "Capture outputs require independent review before any remote or native full-program execution."
+  ],
+  "noReviewerCaptureOrRPC": true,
+  "fullProgramApproved": false,
+  "remoteSimulationApproved": false,
+  "nativeProgramApproved": false,
+  "productionWritesApproved": false,
+  "signingApproved": false,
+  "transactionSubmissionApproved": false,
+  "activationApproved": false,
+  "deployedHTTPWalletOrReleaseAcceptanceClaim": false,
+  "image95AndDiskReserveGatesUnchanged": true,
+  "reviewerSetupFailuresRetained": [
+    "Initial offline fixture environment used wrong variable; source test refused rather than substituteSDK. Corrected only to requiredKEEL_GIF_TEST_SDK, then91PASS.",
+    "Initial offline bundle rebuild used /tmp alias siteRoot with canonical toolRoot; source bound-path guard rejected. Corrected only canonical siteRoot/new output, then bundle byte-exact."
+  ],
+  "evidence": [
+    {
+      "path": "/Users/ravonus/dev/wt/studio-cache-independent-review-20261020/docs/reviews/studio-cache-independent-20261020/gif-existing-v2-41be/assembly-review.json",
+      "bytes": 937,
+      "sha256": "6718ccbe13300688d5654d1a75e25f694123bf8c628daf590330bcb30f7a9372"
+    },
+    {
+      "path": "/Users/ravonus/dev/wt/studio-cache-independent-review-20261020/docs/reviews/studio-cache-independent-20261020/gif-existing-v2-41be/run-config.json",
+      "bytes": 404,
+      "sha256": "7b4bbca523e9da80ec2db9bcb89ee004b68cc739416c34033f765e399921aa6a"
+    },
+    {
+      "path": "/Users/ravonus/dev/wt/studio-cache-independent-review-20261020/docs/reviews/studio-cache-independent-20261020/gif-existing-v2-41be/command-admission.json",
+      "bytes": 9209,
+      "sha256": "d8c5add750ffc780d67436ca3b46ef77ecb0550194ce95fcc74ac7cf949e0304"
+    },
+    {
+      "path": "/Users/ravonus/dev/wt/studio-cache-independent-review-20261020/docs/reviews/studio-cache-independent-20261020/gif-existing-v2-41be/offline.stdout",
+      "bytes": 21462,
+      "sha256": "1deca88295c631269d082f76bee994fcd83875cc7b105a9537b10544b318ee86"
+    },
+    {
+      "path": "/Users/ravonus/dev/wt/studio-cache-independent-review-20261020/docs/reviews/studio-cache-independent-20261020/gif-existing-v2-41be/offline.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/Users/ravonus/dev/wt/studio-cache-independent-review-20261020/docs/reviews/studio-cache-independent-20261020/gif-existing-v2-41be/offline-command.json",
+      "bytes": 1095,
+      "sha256": "10cd78394d15dcbb1041bce81a2ee662ba09c62c37afed713e1c7a1f0920f73d"
+    },
+    {
+      "path": "/Users/ravonus/dev/wt/studio-cache-independent-review-20261020/docs/reviews/studio-cache-independent-20261020/gif-existing-v2-41be/offline-corrected.stdout",
+      "bytes": 21161,
+      "sha256": "2e40762f043bd44eaf7feda3aa7daab40efcbde8296be306c264f8b5bb646356"
+    },
+    {
+      "path": "/Users/ravonus/dev/wt/studio-cache-independent-review-20261020/docs/reviews/studio-cache-independent-20261020/gif-existing-v2-41be/offline-corrected.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/Users/ravonus/dev/wt/studio-cache-independent-review-20261020/docs/reviews/studio-cache-independent-20261020/gif-existing-v2-41be/offline-corrected-command.json",
+      "bytes": 1091,
+      "sha256": "a96c5472ed26b46fd6ac489b773eb8880f3249bb85cd4c851e6bb9cc4e77ac49"
+    },
+    {
+      "path": "/Users/ravonus/dev/wt/studio-cache-independent-review-20261020/docs/reviews/studio-cache-independent-20261020/gif-existing-v2-41be/clone.stdout",
+      "bytes": 963,
+      "sha256": "079609dfd351c246924995e9199c7e55597106295aa70b0f9fbd92f47395952a"
+    },
+    {
+      "path": "/Users/ravonus/dev/wt/studio-cache-independent-review-20261020/docs/reviews/studio-cache-independent-20261020/gif-existing-v2-41be/clone.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/Users/ravonus/dev/wt/studio-cache-independent-review-20261020/docs/reviews/studio-cache-independent-20261020/gif-existing-v2-41be/credential.stdout",
+      "bytes": 617,
+      "sha256": "f93b8135bb61305f6f84a508173f841225d55ae60318923ae7702e7110e6b9d6"
+    },
+    {
+      "path": "/Users/ravonus/dev/wt/studio-cache-independent-review-20261020/docs/reviews/studio-cache-independent-20261020/gif-existing-v2-41be/credential.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/Users/ravonus/dev/wt/studio-cache-independent-review-20261020/docs/reviews/studio-cache-independent-20261020/gif-existing-v2-41be/credential-source.json",
+      "bytes": 180,
+      "sha256": "110ef5d2c945de82e4e883e78b20e1fd0d458eaaa3b9f1c651dfd0cab89714e1"
+    },
+    {
+      "path": "/Users/ravonus/dev/wt/studio-cache-independent-review-20261020/docs/reviews/studio-cache-independent-20261020/gif-existing-v2-41be/source-integrity.json",
+      "bytes": 800,
+      "sha256": "a9df28a994af85c19413a3847cff01bfd4b3384fa0210056c4705b0e7746acf7"
+    },
+    {
+      "path": "/Users/ravonus/dev/wt/studio-cache-independent-review-20261020/docs/reviews/studio-cache-independent-20261020/gif-existing-v2-41be/closure.stdout",
+      "bytes": 727,
+      "sha256": "f6d41c8dc508f34c0cfafc3fad58b9d6fe1ae7a5201402767d3bf80801c7175e"
+    },
+    {
+      "path": "/Users/ravonus/dev/wt/studio-cache-independent-review-20261020/docs/reviews/studio-cache-independent-20261020/gif-existing-v2-41be/closure.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/Users/ravonus/dev/wt/studio-cache-independent-review-20261020/docs/reviews/studio-cache-independent-20261020/gif-existing-v2-41be/rebuild.stdout",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/Users/ravonus/dev/wt/studio-cache-independent-review-20261020/docs/reviews/studio-cache-independent-20261020/gif-existing-v2-41be/rebuild.stderr",
+      "bytes": 719,
+      "sha256": "b56eb94946b46984280f9967c3339e75cd5e491711f1cd253d457aa8a488c1a4"
+    },
+    {
+      "path": "/Users/ravonus/dev/wt/studio-cache-independent-review-20261020/docs/reviews/studio-cache-independent-20261020/gif-existing-v2-41be/rebuild-canonical.stdout",
+      "bytes": 168,
+      "sha256": "9aa6292f9376a6c09d3a7eed920037b07072f19b03cdbe6bbf8681948582a5a3"
+    },
+    {
+      "path": "/Users/ravonus/dev/wt/studio-cache-independent-review-20261020/docs/reviews/studio-cache-independent-20261020/gif-existing-v2-41be/rebuild-canonical.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/Users/ravonus/dev/wt/studio-cache-independent-review-20261020/docs/reviews/studio-cache-independent-20261020/gif-existing-v2-41be/admission-validation.stdout",
+      "bytes": 175,
+      "sha256": "51e2617edf263b2e65ba8fbe9f251607ece7453e3762db3d986a83d6fc53be6e"
+    },
+    {
+      "path": "/Users/ravonus/dev/wt/studio-cache-independent-review-20261020/docs/reviews/studio-cache-independent-20261020/gif-existing-v2-41be/admission-validation.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/Users/ravonus/dev/wt/studio-cache-independent-review-20261020/docs/reviews/studio-cache-independent-20261020/gif-existing-v2-41be/prepare-admission.py",
+      "bytes": 3824,
+      "sha256": "89d883ecb1cdfe6a712137446014b17bae8a8c474f4b478a1a6b0c4735f7ebb8"
+    },
+    {
+      "path": "/Users/ravonus/dev/wt/studio-cache-independent-review-20261020/docs/reviews/studio-cache-independent-20261020/gif-existing-v2-41be/validate-admission.mjs",
+      "bytes": 1416,
+      "sha256": "b2ef65e530f7b7da6fe974410f175dfb6f83ffb65c260f7b5b23432e7be87ebb"
+    },
+    {
+      "path": "/Users/ravonus/dev/wt/studio-cache-independent-review-20261020/docs/reviews/studio-cache-independent-20261020/gif-existing-v2-41be/verify-closure.mjs",
+      "bytes": 4452,
+      "sha256": "1b38176c483e4f4fb197a9ae3f4b62891f35c7b5608adf8e6f2c25f432465335"
+    },
+    {
+      "path": "/Users/ravonus/dev/wt/studio-cache-independent-review-20261020/docs/reviews/studio-cache-independent-20261020/gif-existing-v2-41be/compile-context.mjs",
+      "bytes": 1573,
+      "sha256": "3a898b4af707d278134309d866170c7ba9440ee483e57b9b12c37ef958d629a0"
+    }
+  ]
+}
