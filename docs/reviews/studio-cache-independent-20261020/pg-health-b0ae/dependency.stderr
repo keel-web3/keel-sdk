@@ -1,0 +1,25 @@
+test_actual_helper_mounts_capabilities_and_blank_values_guarded (__main__.Contract.test_actual_helper_mounts_capabilities_and_blank_values_guarded) ... ok
+test_candidate_cas_failure_falls_back_only_after_stop (__main__.Contract.test_candidate_cas_failure_falls_back_only_after_stop) ... ok
+test_control_bounds_actual_child_output_and_lifetime (__main__.Contract.test_control_bounds_actual_child_output_and_lifetime) ... ok
+test_data_or_runtime_drift_refused_before_create (__main__.Contract.test_data_or_runtime_drift_refused_before_create) ... ok
+test_dead_candidate_uses_guarded_helper_stops_before_safe_return (__main__.Contract.test_dead_candidate_uses_guarded_helper_stops_before_safe_return) ... ok
+test_disable_exec_exact_sql_only_before_subprocess (__main__.Contract.test_disable_exec_exact_sql_only_before_subprocess) ... ok
+test_exec_inner_deadline_outputcap_empty_environment (__main__.Contract.test_exec_inner_deadline_outputcap_empty_environment) ... ok
+test_extra_inherited_volume_or_bad_names_refused (__main__.Contract.test_extra_inherited_volume_or_bad_names_refused) ... ok
+test_failed_clean_stop_never_confirms_safe_restart (__main__.Contract.test_failed_clean_stop_never_confirms_safe_restart) ... ok
+test_foreign_helper_preserved_unstarted (__main__.Contract.test_foreign_helper_preserved_unstarted) ... ok
+test_helper_only_original_data_blank_image_environment_and_fixed_pg (__main__.Contract.test_helper_only_original_data_blank_image_environment_and_fixed_pg) ... ok
+test_live_candidate_cas_before_stop_no_helper (__main__.Contract.test_live_candidate_cas_before_stop_no_helper) ... ok
+test_lost_start_response_still_stops_owned_helper (__main__.Contract.test_lost_start_response_still_stops_owned_helper) ... ok
+test_original_live_only_never_start_second_postgres (__main__.Contract.test_original_live_only_never_start_second_postgres) ... ok
+test_runtime_candidate_only_catalog_binding_does_not_mutate_old (__main__.Contract.test_runtime_candidate_only_catalog_binding_does_not_mutate_old) ... ok
+test_spec_exactfiles_and_no_source_substitution (__main__.Contract.test_spec_exactfiles_and_no_source_substitution) ... ok
+test_two_database_owners_refused (__main__.Contract.test_two_database_owners_refused) ... ok
+test_uncertain_create_reconciles_exact_ownership (__main__.Contract.test_uncertain_create_reconciles_exact_ownership) ... ok
+test_old_restart_requires_confirmed_factory_disable (__main__.RecoveryFence.test_old_restart_requires_confirmed_factory_disable) ... ok
+test_unresolved_foreign_candidate_never_starts_pg_or_old (__main__.RecoveryFence.test_unresolved_foreign_candidate_never_starts_pg_or_old) ... ok
+
+----------------------------------------------------------------------
+Ran 20 tests in 0.105s
+
+OK
