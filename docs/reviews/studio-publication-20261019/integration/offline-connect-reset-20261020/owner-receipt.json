@@ -1,0 +1,31 @@
+{
+  "schema": "keel-offline-connect-reset-owner-check@1",
+  "sourceCommit": "1d3ce42fd7d785ceca7886cf69c03bc12f02811c",
+  "baseSDK": "b524bf5fc19939c7523aada2e53f79e3360970ea",
+  "node": "v22.22.1",
+  "chrome": "Google Chrome 155.0.8059.85",
+  "environment": "macOS, task-owned temporary profiles, synthetic loopback fixtures only",
+  "commands": [
+    "/opt/homebrew/opt/node@22/bin/node --test tests/offline-shell-connect-reset.test.mjs",
+    "CHROMIUM_PATH=/Applications/Google Chrome.app/Contents/MacOS/Google Chrome /opt/homebrew/opt/node@22/bin/node --test tests/offline-shell-connect-reset.test.mjs tests/sdk-verification-wrap-offline-browser.test.mjs",
+    "/opt/homebrew/opt/node@22/bin/node --test tests/test-suite-classification.test.mjs"
+  ],
+  "results": {
+    "realTCPAndErrors": "6PASS0FAIL",
+    "unchangedOfflineBrowser": "2PASS0FAIL",
+    "combined": "8PASS0FAIL",
+    "classification": "3PASS0FAIL",
+    "independentReview": "PENDING",
+    "GitHubSuccessor": "NOT_RUN"
+  },
+  "sdkDist": {
+    "root": "/Users/ravonus/dev/wt/studio-proof-state-cache-20261020/keel-sdk/packages/sdk/dist",
+    "verificationShellSha256": "ca3b5c6c28129eaad884d08297aadce9a004e440193fb5c30fdd5fa87e863c8f",
+    "modified": false
+  },
+  "unchangedExistingBrowserTest": {
+    "path": "tests/sdk-verification-wrap-offline-browser.test.mjs",
+    "sha256": "9806a250d5af17ea3066ff9cc439d318b38434420b27b0ed142a84ebdbb34279",
+    "byteEqualToBase": true
+  }
+}
