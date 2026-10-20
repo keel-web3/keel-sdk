@@ -95,7 +95,7 @@ export async function assertKeelPreparedCopyRead(input: KeelPreparedCopyReadInpu
   // Snapshot caller-owned values before the first async digest.
   const graphBytes = new Uint8Array(input.graphBytes);
   const registeredNativeGzip = input.registeredNativeGzip === undefined ? undefined : assertKeelRegisteredNativeGzipProof(input.registeredNativeGzip);
-  if (registeredNativeGzip !== undefined && (registeredNativeGzip.binding.chainId !== input.chainId || registeredNativeGzip.binding.store !== input.store.toLowerCase())) throw new TypeError("Native Gzip COPY readback changed its selected chain/store.");
+  if (registeredNativeGzip !== undefined && (registeredNativeGzip.binding.chainId !== input.chainId || registeredNativeGzip.binding.store.toLowerCase() !== input.store.toLowerCase())) throw new TypeError("Native Gzip COPY readback changed its selected chain/store.");
   const graphIntegrity = { ...input.graphIntegrity };
   const { chainId, store, mediaType, expectedTokenURI, returnedTokenURI, callGasLimit, blockGasLimit } = input;
   const readBounds = resolveKeelTokenURIReadBounds(input.nonstandardReadPolicy);
