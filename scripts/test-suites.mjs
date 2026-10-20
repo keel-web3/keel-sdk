@@ -100,6 +100,7 @@ export const DETERMINISTIC_TEST_FILES = Object.freeze([
   "tests/creator-prepared-inline.test.mjs",
   "tests/inline-build-route.test.mjs",
   "tests/registered-native-gzip.test.mjs",
+  "tests/native-gzip-store-case.test.mjs",
   "tests/registered-inline-candidates.test.mjs",
   "tests/creator-prepared-route.test.mjs",
   "tests/creator-publication-journal.test.mjs",
