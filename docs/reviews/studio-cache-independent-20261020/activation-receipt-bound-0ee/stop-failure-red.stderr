@@ -1,0 +1,5 @@
+Traceback (most recent call last):
+  File "/private/tmp/keel-independent-receipt-activation-20261020/stop-failure-regression.py", line 16, in <module>
+    assert ('start',f.h.OLD_ID) not in d.actions, 'old restart attempted while owned candidate stop is unconfirmed'
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: old restart attempted while owned candidate stop is unconfirmed

@@ -1,0 +1,5 @@
+Traceback (most recent call last):
+  File "/tmp/keel-qa-receipt-activation-20261020/foreign-capability-adversarial.py", line 17, in <module>
+    assert all(x['rejected']for x in out),'PG-only ownership guard accepted foreign extra host permissions'
+           ~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: PG-only ownership guard accepted foreign extra host permissions
