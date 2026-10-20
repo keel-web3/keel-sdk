@@ -1,0 +1,24 @@
+{
+  "schema": "keel-independent-compiled-probe-binding-review@1",
+  "decision": "APPROVE_TEST_ONLY_BINDING_CORRECTION",
+  "scriptSHA256": "ed4458abded101fec3ed28effd9b409101569583df6b11cfa55c8dc736327e15",
+  "scope": "Select actual exported Studio public transport factory and four synthetic process-only proof environment settings before original module load. Do not replace factory definitions.",
+  "requiredPreservedAssertions": [
+    "physicalCodeReads===1",
+    "socketAttempts===0",
+    "childAttempts===0",
+    "nativeExecuted===false",
+    "realRPCRequests===0"
+  ],
+  "requiredIsolation": [
+    "local exact image",
+    "network none",
+    "readonly",
+    "UID999",
+    "no real credentials"
+  ],
+  "probeExecutedByReviewer": false,
+  "productionChangesApproved": false,
+  "releaseApproved": false,
+  "originalSelectorFailureMustBeRetained": true
+}
