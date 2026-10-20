@@ -1,0 +1,141 @@
+{
+  "schema": "keel-independent-fe944-activation-source-review@1",
+  "recordedAt": "2026-10-20T14:29:08.653692+00:00",
+  "reviewer": "cache-release-independent-reviewer",
+  "sourceCommit": "9e12c9323cff8689c0209d140fa059c461d440ea",
+  "decision": "HOLD_SOURCE_AND_EXECUTION_PENDING_BOUNDED_SNAPSHOT_CORRECTION",
+  "activationApproved": false,
+  "operator": {
+    "path": "/Users/ravonus/dev/wt/studio-publication-20261019/release-proof-qualification/docs/reviews/studio-publication-20261019/release/final-candidate/activation-fe944/activate-qualified-studio.py",
+    "bytes": 36025,
+    "sha256": "6084172fbcc434ba974f17fabf8787d9710e1fb5e8a97d332f02aab11e6f35ce"
+  },
+  "pendingPlan": {
+    "path": "/Users/ravonus/dev/wt/studio-publication-20261019/release-proof-qualification/docs/reviews/studio-publication-20261019/release/final-candidate/activation-fe944/activation-plan.pending.json",
+    "bytes": 3623,
+    "sha256": "587029d84164d5c2d1b8799331a53aee2291467ea7a73c8acf2cab1065cad0ef"
+  },
+  "pendingPlanRejectionIndependentlyVerified": "required_approval_missing",
+  "sourceChecks": {
+    "oldOperatorSHA256": "493296809896bfb921cb03cb80e907a498f1ca8fe8186296578a4788b702f7a3",
+    "all13DeclaredUnchangedFunctionASTsMatch": true,
+    "unchangedFunctions": [
+      "require",
+      "sha",
+      "bounded",
+      "runtime_request",
+      "load_guard",
+      "disk_budget",
+      "check_archives",
+      "wait_healthy",
+      "runner_configuration",
+      "assert_runner",
+      "rollout_labels",
+      "assert_application",
+      "recover_runtime"
+    ],
+    "changedFunctions": [
+      "validate",
+      "check_preloaded_images",
+      "safe_receipt",
+      "main"
+    ],
+    "addedFunction": "retain_database_snapshot",
+    "focusedControls": {
+      "pass": 32,
+      "fail": 0,
+      "log": {
+        "path": "/Users/ravonus/dev/wt/studio-cache-independent-review-20261020/docs/reviews/studio-cache-independent-20261020/activation-fe944-9e12-author-controls-independent.log",
+        "bytes": 131,
+        "sha256": "c963ce945cc711268c5d52a4339605057e489e776065736a6a524d54abcfc5b6"
+      }
+    },
+    "candidate": "Sitef11/SDKb524/buildpyrfdcquUJkhz22Y0jyAz/FE944 and unchangedD97/executor8a/native64e lineage",
+    "preloadedImportBinding": "actual71acc receipt and678a source/e75c plan inffb6, raw604859904B00f52, completeConfig/RootFS guards",
+    "noOtherBlockingCutoverFindingInReviewedDelta": true
+  },
+  "findings": [
+    {
+      "id": "SNAPSHOT_CONTAINER_LIFETIME_UNPROVEN",
+      "priority": "P1",
+      "file": "activate-qualified-studio.py",
+      "line": 298,
+      "details": "Container command is pg_dump|head with no container-side wall deadline/cancellation supervisor. subprocess.run(timeout=180) at line300 bounds only the local docker CLI; it does not establish termination of the separately daemon-owned container exec/process group.",
+      "reproductionOrTestExpectation": "In an owned disposable environment, make pg_dump hang or ignore TERM, then disconnect/time out the Docker CLI. Verify the owned remote process group is terminated by an explicit inner hard deadline and no cutover actions occur after snapshot failure. Do not test this by hanging production."
+    },
+    {
+      "id": "SNAPSHOT_STDERR_NOT_BOUNDED",
+      "priority": "P1",
+      "file": "activate-qualified-studio.py",
+      "line": 300,
+      "details": "stderr=subprocess.PIPE is fully buffered by subprocess.run without any byte bound, despite the snapshot resource envelope. The stdout head cap does not cap diagnostic memory.",
+      "reproductionOrTestExpectation": "Owned test child emits stderr beyond a declared hard cap while stdout remains small. Capture must never buffer or retain more than that cap, terminate/fail safely on overflow, and preserve private bounded diagnostics without printing credentials."
+    },
+    {
+      "id": "SNAPSHOT_TIMEOUT_PARTIAL_EVIDENCE_NOT_FSYNCED",
+      "priority": "P1",
+      "file": "activate-qualified-studio.py",
+      "line": 300,
+      "details": "When subprocess.run raises TimeoutExpired, control skips filefsync at302 and directoryfsync at305. File close alone does not meet the claimed durable partial-failure-evidence boundary.",
+      "actualOfflineRegression": {
+        "pass": 0,
+        "fail": 1,
+        "actualDockerCalls": 0,
+        "partialSnapshotBytes": 20,
+        "fileOrDirectoryFsyncCalls": 0,
+        "source": {
+          "path": "/Users/ravonus/dev/wt/studio-cache-independent-review-20261020/docs/reviews/studio-cache-independent-20261020/activation-snapshot-failure-review.test.py",
+          "bytes": 2034,
+          "sha256": "8dc59827810b3c8ac8dfd378570ca1025bfe1122f981bcfc357a7ccfe2e36063"
+        },
+        "log": {
+          "path": "/Users/ravonus/dev/wt/studio-cache-independent-review-20261020/docs/reviews/studio-cache-independent-20261020/activation-snapshot-9e12-timeout-red.log",
+          "bytes": 1075,
+          "sha256": "f31efc7e8f63b071723a793177bdaaf21a9ca7b15f7dd575cad01a44c88eb754"
+        }
+      },
+      "reproductionOrTestExpectation": "Actual helper plus real temporary files: injected subprocess writes20partialbytes then raisesTimeoutExpired. Require file+directory fsync and bounded durable failure metadata before exception returns; snapshot success and all cutover operations must remain false."
+    }
+  ],
+  "retainedMigrationEvidenceReview": {
+    "summary": {
+      "path": "/Users/ravonus/dev/wt/studio-publication-20261019/release-proof-qualification/docs/reviews/studio-publication-20261019/release/final-candidate/activation-fe944/genuine-migration-rollback-result.json",
+      "bytes": 1614,
+      "sha256": "f12779630cbac880cca3b5720f79b28302f31d9d9b51449c644e1da989a2ba9c"
+    },
+    "scriptReviewed": {
+      "path": "/Users/ravonus/dev/wt/studio-publication-20261019/release-proof-qualification/docs/reviews/studio-publication-20261019/release/final-candidate/activation-fe944/migration-rollback-check.py",
+      "bytes": 5050,
+      "sha256": "fa98a9651e091537460eb0532a4c7fb35897951331cdfa27f637e1dac8d12ec6"
+    },
+    "rawSummaryMatchesCommittedSummary": true,
+    "all308ActualLocalCommandsExit0": true,
+    "ownedLocalServerStopCommandExit0": true,
+    "fullBootstrap": {
+      "bytes": 62411,
+      "sha256": "7556a9091ed6646ca329f9442ee30cca3319a3092151c27099b9a2ddbb7f17c3"
+    },
+    "oldTableProjections": 99,
+    "sourceDump": "genuine previously retained private dump, not fresh production backup",
+    "sourceDumpSHA256": "8f8a9990927766bde9a40af1efb0f1f18a6484a39d76998e55c57073e08026c6",
+    "scope": "Reviewed existing realPG17.10 migration/restore evidence; independent QA still pending. Reviewer did not rerun private database test or claim current production rollback acceptance."
+  },
+  "preactivationGatesNotWaived": [
+    "Snapshot successor source/lifecycle/cap/durability fix and independent review",
+    "Independent actual candidate tests and exact compiled controlled401/403 terminal negatives, all200 native proof separately retained",
+    "Mandatory originalGIF prerequisite/native/wholeprogram gate per root latest steering; no silent waiver for copy test",
+    "Concrete final plan with actual QA/review/state/denial evidence hashes and exact lead approval",
+    "Fresh locked original fullConfig/mount/pause/resource/image guards, exclusive admitted transfer/execute commands and actual before-cutover bounded private backup"
+  ],
+  "safePathForUserRequestedGatorCopy": [
+    "Root reports normal saved ownJuniper project1cef1869-6d1b-4840-b3de-63d8def2e390 rev1 with536782 originalHTML+PNGbytes; this review does not independently re-audit that copy",
+    "Complete blockers/QA/GIF gates before admitting activation; copy test does not replace them",
+    "After exact separately approved cutover, independently verify servedpyrfd build/FE944 APIs and normal authorized Juniper copy path to unsigned wallet handoff",
+    "No signature, spend, submission, foreign-owner access bypass or original release rewriting; owner/historical authenticated HTTP200/MIME/decode/canvas gates remain separately tracked"
+  ],
+  "hostActionsByReviewer": 0,
+  "productionWritesByReviewer": 0,
+  "signing": false,
+  "submission": false,
+  "releaseOwnerNotified": true
+}

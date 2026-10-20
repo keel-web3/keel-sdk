@@ -1,0 +1,15 @@
+F
+======================================================================
+FAIL: test_timeout_keeps_partial_snapshot_content_and_path_durable (__main__.SnapshotFailureDurability.test_timeout_keeps_partial_snapshot_content_and_path_durable)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/ravonus/dev/wt/studio-cache-independent-review-20261020/docs/reviews/studio-cache-independent-20261020/activation-snapshot-failure-review.test.py", line 37, in test_timeout_keeps_partial_snapshot_content_and_path_durable
+    self.assertIn("file", syncs, "Timeout failure must fsync retained partial evidence before returning")
+    ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 'file' not found in [] : Timeout failure must fsync retained partial evidence before returning
+
+----------------------------------------------------------------------
+Ran 1 test in 0.001s
+
+FAILED (failures=1)
+{'partialBytes': 20, 'syncs': [], 'actualDockerCalls': 0}
