@@ -1,0 +1,214 @@
+TAP version 13
+# Subtest: actual SDK refuses canSend before returning storage navigation
+ok 1 - actual SDK refuses canSend before returning storage navigation
+  ---
+  duration_ms: 9.248459
+  type: 'test'
+  ...
+# Subtest: actual SDK refuses nullPermissions before returning storage navigation
+ok 2 - actual SDK refuses nullPermissions before returning storage navigation
+  ---
+  duration_ms: 0.268459
+  type: 'test'
+  ...
+# Subtest: actual SDK refuses nullOperation before returning storage navigation
+ok 3 - actual SDK refuses nullOperation before returning storage navigation
+  ---
+  duration_ms: 0.251834
+  type: 'test'
+  ...
+# Subtest: actual SDK refuses nullCalls before returning storage navigation
+ok 4 - actual SDK refuses nullCalls before returning storage navigation
+  ---
+  duration_ms: 1.4855
+  type: 'test'
+  ...
+# Subtest: actual SDK refuses executeFalse before returning storage navigation
+ok 5 - actual SDK refuses executeFalse before returning storage navigation
+  ---
+  duration_ms: 0.33725
+  type: 'test'
+  ...
+# Subtest: actual SDK refuses ownerSupplied before returning storage navigation
+ok 6 - actual SDK refuses ownerSupplied before returning storage navigation
+  ---
+  duration_ms: 0.212208
+  type: 'test'
+  ...
+# Subtest: actual SDK refuses numericProjectRevision before returning storage navigation
+ok 7 - actual SDK refuses numericProjectRevision before returning storage navigation
+  ---
+  duration_ms: 0.198666
+  type: 'test'
+  ...
+# Subtest: actual SDK refuses booleanProjectRevision before returning storage navigation
+ok 8 - actual SDK refuses booleanProjectRevision before returning storage navigation
+  ---
+  duration_ms: 0.178166
+  type: 'test'
+  ...
+# Subtest: actual SDK refuses nonStringDigest before returning storage navigation
+ok 9 - actual SDK refuses nonStringDigest before returning storage navigation
+  ---
+  duration_ms: 0.912166
+  type: 'test'
+  ...
+# Subtest: actual SDK refuses nullMessage before returning storage navigation
+ok 10 - actual SDK refuses nullMessage before returning storage navigation
+  ---
+  duration_ms: 0.454
+  type: 'test'
+  ...
+# Subtest: actual SDK refuses foreignPort before returning storage navigation
+ok 11 - actual SDK refuses foreignPort before returning storage navigation
+  ---
+  duration_ms: 0.241125
+  type: 'test'
+  ...
+# Subtest: actual SDK refuses trailingNewline before returning storage navigation
+ok 12 - actual SDK refuses trailingNewline before returning storage navigation
+  ---
+  duration_ms: 0.103292
+  type: 'test'
+  ...
+# Subtest: actual SDK refuses extraFragment before returning storage navigation
+ok 13 - actual SDK refuses extraFragment before returning storage navigation
+  ---
+  duration_ms: 0.090292
+  type: 'test'
+  ...
+# Subtest: actual SDK refuses urlCredentials before returning storage navigation
+ok 14 - actual SDK refuses urlCredentials before returning storage navigation
+  ---
+  duration_ms: 0.081292
+  type: 'test'
+  ...
+# Subtest: actual SDK refuses encodedQuery before returning storage navigation
+ok 15 - actual SDK refuses encodedQuery before returning storage navigation
+  ---
+  duration_ms: 0.067542
+  type: 'test'
+  ...
+# Subtest: actual SDK refuses doubleQuery before returning storage navigation
+ok 16 - actual SDK refuses doubleQuery before returning storage navigation
+  ---
+  duration_ms: 0.063792
+  type: 'test'
+  ...
+# Subtest: actual SDK refuses uppercaseFlag before returning storage navigation
+ok 17 - actual SDK refuses uppercaseFlag before returning storage navigation
+  ---
+  duration_ms: 0.058709
+  type: 'test'
+  ...
+# Subtest: actual SDK refuses preflightCalls before returning storage navigation
+ok 18 - actual SDK refuses preflightCalls before returning storage navigation
+  ---
+  duration_ms: 0.066
+  type: 'test'
+  ...
+# Subtest: actual SDK refuses preflightNull before returning storage navigation
+ok 19 - actual SDK refuses preflightNull before returning storage navigation
+  ---
+  duration_ms: 0.078208
+  type: 'test'
+  ...
+# Subtest: actual SDK refuses preflightBadType before returning storage navigation
+ok 20 - actual SDK refuses preflightBadType before returning storage navigation
+  ---
+  duration_ms: 0.064833
+  type: 'test'
+  ...
+# Subtest: actual SDK 401 terminal, one request and no navigation result
+ok 21 - actual SDK 401 terminal, one request and no navigation result
+  ---
+  duration_ms: 0.149958
+  type: 'test'
+  ...
+# Subtest: actual SDK 403 terminal, one request and no navigation result
+ok 22 - actual SDK 403 terminal, one request and no navigation result
+  ---
+  duration_ms: 0.081083
+  type: 'test'
+  ...
+# Subtest: exact state remains required even for navigation with valid server response
+ok 23 - exact state remains required even for navigation with valid server response
+  ---
+  duration_ms: 0.264125
+  type: 'test'
+  ...
+# Subtest: actual MCP Apps parser refuses nullPermissions
+ok 24 - actual MCP Apps parser refuses nullPermissions
+  ---
+  duration_ms: 0.651875
+  type: 'test'
+  ...
+# Subtest: actual MCP Apps parser refuses unknownPermission
+ok 25 - actual MCP Apps parser refuses unknownPermission
+  ---
+  duration_ms: 0.288083
+  type: 'test'
+  ...
+# Subtest: actual MCP Apps parser refuses numericCanSign
+ok 26 - actual MCP Apps parser refuses numericCanSign
+  ---
+  duration_ms: 0.184959
+  type: 'test'
+  ...
+# Subtest: actual MCP Apps parser refuses authority
+ok 27 - actual MCP Apps parser refuses authority
+  ---
+  duration_ms: 0.169583
+  type: 'test'
+  ...
+# Subtest: actual MCP Apps parser refuses operation
+ok 28 - actual MCP Apps parser refuses operation
+  ---
+  duration_ms: 0.166666
+  type: 'test'
+  ...
+# Subtest: actual MCP Apps parser refuses staleProof
+ok 29 - actual MCP Apps parser refuses staleProof
+  ---
+  duration_ms: 0.175958
+  type: 'test'
+  ...
+# Subtest: actual MCP Apps parser refuses foreignUrl
+ok 30 - actual MCP Apps parser refuses foreignUrl
+  ---
+  duration_ms: 0.171958
+  type: 'test'
+  ...
+# Subtest: actual MCP Apps parser refuses extraQuery
+ok 31 - actual MCP Apps parser refuses extraQuery
+  ---
+  duration_ms: 0.17325
+  type: 'test'
+  ...
+# Subtest: actual MCP Apps parser refuses encodedURL
+ok 32 - actual MCP Apps parser refuses encodedURL
+  ---
+  duration_ms: 0.298875
+  type: 'test'
+  ...
+# Subtest: storage identity cannot silently become another source, owner, funding plan, or collection operation
+ok 33 - storage identity cannot silently become another source, owner, funding plan, or collection operation
+  ---
+  duration_ms: 1.187209
+  type: 'test'
+  ...
+# Subtest: reconcile-only response remains unsigned navigation with no fabricated preflight or calls
+ok 34 - reconcile-only response remains unsigned navigation with no fabricated preflight or calls
+  ---
+  duration_ms: 0.314084
+  type: 'test'
+  ...
+1..34
+# tests 34
+# suites 0
+# pass 34
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 175.663875

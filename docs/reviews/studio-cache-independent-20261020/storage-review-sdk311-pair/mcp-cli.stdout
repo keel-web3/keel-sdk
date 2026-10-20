@@ -1,0 +1,85 @@
+TAP version 13
+# Subtest: studio draft CLI reads JSON and YAML configs without wallet or chain actions
+not ok 1 - studio draft CLI reads JSON and YAML configs without wallet or chain actions
+  ---
+  duration_ms: 4.046875
+  type: 'test'
+  location: '/Users/ravonus/dev/wt/studio-storage-review-compat-20261020/keel-sdk/tests/keel-studio-agent-drafts-cli.test.mjs:49:1'
+  failureType: 'testCodeFailure'
+  error: 'listen EPERM: operation not permitted 127.0.0.1'
+  code: 'EPERM'
+  stack: |-
+    Server.setupListenHandle [as _listen2] (node:net:1918:21)
+    listenInCluster (node:net:1997:12)
+    node:net:2206:7
+    process.processTicksAndRejections (node:internal/process/task_queues:89:21)
+  ...
+# Subtest: MCP edits Studio drafts with an origin-bound environment override and optimistic revision
+ok 2 - MCP edits Studio drafts with an origin-bound environment override and optimistic revision
+  ---
+  duration_ms: 110.321959
+  type: 'test'
+  ...
+# Subtest: MCP never accepts a draft key in tool arguments and fails closed without an approved connection
+ok 3 - MCP never accepts a draft key in tool arguments and fails closed without an approved connection
+  ---
+  duration_ms: 1.461792
+  type: 'test'
+  ...
+# Subtest: MCP stages an image-only KEEL shell project without uploading a local viewer
+ok 4 - MCP stages an image-only KEEL shell project without uploading a local viewer
+  ---
+  duration_ms: 5.008833
+  type: 'test'
+  ...
+# Subtest: MCP stages standard video and model roles through the canonical viewer policy
+ok 5 - MCP stages standard video and model roles through the canonical viewer policy
+  ---
+  duration_ms: 2.373667
+  type: 'test'
+  ...
+# Subtest: MCP rejects a locally declared KEEL shell before staging while allowing creator HTML
+ok 6 - MCP rejects a locally declared KEEL shell before staging while allowing creator HTML
+  ---
+  duration_ms: 1.95675
+  type: 'test'
+  ...
+# Subtest: portable MCP forwards explicit defaults operations through the same account-scoped endpoint
+ok 7 - portable MCP forwards explicit defaults operations through the same account-scoped endpoint
+  ---
+  duration_ms: 2.66225
+  type: 'test'
+  ...
+# Subtest: portable MCP reads and shares reviewable conversation forms without model execution or plan mutation
+ok 8 - portable MCP reads and shares reviewable conversation forms without model execution or plan mutation
+  ---
+  duration_ms: 1.482458
+  type: 'test'
+  ...
+# Subtest: portable MCP prepares the same owner review and never accepts caller wallet or calldata
+ok 9 - portable MCP prepares the same owner review and never accepts caller wallet or calldata
+  ---
+  duration_ms: 1.317542
+  type: 'test'
+  ...
+# Subtest: portable MCP forwards explicit read-call diagnosis without accepting wallet commands
+ok 10 - portable MCP forwards explicit read-call diagnosis without accepting wallet commands
+  ---
+  duration_ms: 0.96325
+  type: 'test'
+  ...
+# Subtest: registered portable MCP continues the paid release, preserves unknown outcomes, and cancels only an exact review
+ok 11 - registered portable MCP continues the paid release, preserves unknown outcomes, and cancels only an exact review
+  ---
+  duration_ms: 1.659084
+  type: 'test'
+  ...
+1..11
+# tests 11
+# suites 0
+# pass 10
+# fail 1
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 668.099667

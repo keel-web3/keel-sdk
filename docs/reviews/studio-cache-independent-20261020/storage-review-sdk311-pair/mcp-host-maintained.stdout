@@ -1,0 +1,37 @@
+TAP version 13
+# /Users/ravonus/dev/wt/studio-public-discovery-20261020/keel-site/node_modules/.pnpm/server-only@0.0.1/node_modules/server-only/index.js:1
+# throw new Error(
+#       ^
+# Error: This module cannot be imported from a Client Component module. It should only be used from a Server Component.
+#     at Object.<anonymous> (/Users/ravonus/dev/wt/studio-public-discovery-20261020/keel-site/node_modules/.pnpm/server-only@0.0.1/node_modules/server-only/index.js:1:7)
+#     at Module._compile (node:internal/modules/cjs/loader:1705:14)
+#     at Object.transformer (/Users/ravonus/dev/wt/studio-public-discovery-20261020/keel-site/node_modules/.pnpm/tsx@4.23.12/node_modules/tsx/dist/register-C557imBs.cjs:9:3619)
+#     at Module.load (node:internal/modules/cjs/loader:1441:32)
+#     at Function._load (node:internal/modules/cjs/loader:1263:12)
+#     at TracingChannel.traceSync (node:diagnostics_channel:328:14)
+#     at wrapModuleLoad (node:internal/modules/cjs/loader:237:24)
+#     at cjsLoader (node:internal/modules/esm/translators:309:5)
+#     at ModuleWrap.<anonymous> (node:internal/modules/esm/translators:202:7)
+#     at ModuleJob.run (node:internal/modules/esm/module_job:343:25)
+# Node.js v22.22.1
+# Subtest: tests/unit/studio-mcp.test.ts
+not ok 1 - tests/unit/studio-mcp.test.ts
+  ---
+  duration_ms: 1559.52725
+  type: 'test'
+  location: '/private/tmp/keel-studio-live-flow-integration-20261020/apps/studio/tests/unit/studio-mcp.test.ts:1:1'
+  failureType: 'testCodeFailure'
+  exitCode: 1
+  signal: ~
+  error: 'test failed'
+  code: 'ERR_TEST_FAILURE'
+  ...
+1..1
+# tests 1
+# suites 0
+# pass 0
+# fail 1
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 1563.526625

@@ -1,0 +1,84 @@
+TAP version 13
+# (node:34383) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+# (Use `node --trace-deprecation ...` to show where the warning was created)
+# Subtest: NFT control preparation returns an unsigned exact call and cannot execute it
+ok 1 - NFT control preparation returns an unsigned exact call and cannot execute it
+  ---
+  duration_ms: 174.143333
+  type: 'test'
+  ...
+# Subtest: initialize answers with a supported protocol version and the tools capability
+ok 2 - initialize answers with a supported protocol version and the tools capability
+  ---
+  duration_ms: 0.175083
+  type: 'test'
+  ...
+# Subtest: notifications get no response and malformed messages get JSON-RPC errors
+ok 3 - notifications get no response and malformed messages get JSON-RPC errors
+  ---
+  duration_ms: 0.064958
+  type: 'test'
+  ...
+# Subtest: tools are listed only when the key's permissions allow them, and none of them sign
+ok 4 - tools are listed only when the key's permissions allow them, and none of them sign
+  ---
+  duration_ms: 2.277125
+  type: 'test'
+  ...
+# Subtest: Inline staging repair inspection and mutation require their own exact draft scopes
+ok 5 - Inline staging repair inspection and mutation require their own exact draft scopes
+  ---
+  duration_ms: 0.1955
+  type: 'test'
+  ...
+# Subtest: tool failures come back as isError results with a plain message
+ok 6 - tool failures come back as isError results with a plain message
+  ---
+  duration_ms: 0.80075
+  type: 'test'
+  ...
+# Subtest: pairing codes survive retyping
+ok 7 - pairing codes survive retyping
+  ---
+  duration_ms: 0.123583
+  type: 'test'
+  ...
+# Subtest: project defaults require separate explicit permissions and never expand existing draft grants
+ok 8 - project defaults require separate explicit permissions and never expand existing draft grants
+  ---
+  duration_ms: 0.108166
+  type: 'test'
+  ...
+# Subtest: conversation discovery and suggestion require their own permissions
+ok 9 - conversation discovery and suggestion require their own permissions
+  ---
+  duration_ms: 0.298875
+  type: 'test'
+  ...
+# Subtest: private media tools share Studio preparation and require draft write permission
+ok 10 - private media tools share Studio preparation and require draft write permission
+  ---
+  duration_ms: 16.755334
+  type: 'test'
+  ...
+# Subtest: receipt recovery requires draft-write permission and exposes no signer
+ok 11 - receipt recovery requires draft-write permission and exposes no signer
+  ---
+  duration_ms: 0.198375
+  type: 'test'
+  ...
+# Subtest: MCP review app is scoped, local and attached to exact prepare/resume tools
+ok 12 - MCP review app is scoped, local and attached to exact prepare/resume tools
+  ---
+  duration_ms: 0.357417
+  type: 'test'
+  ...
+1..12
+# tests 12
+# suites 0
+# pass 12
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 2087.186458

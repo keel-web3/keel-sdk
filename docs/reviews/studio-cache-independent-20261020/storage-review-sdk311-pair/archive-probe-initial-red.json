@@ -1,0 +1,8 @@
+{
+  "schema": "reviewer-probe-error@1",
+  "initialInvocation": "Exact original archive-equivalence-probe.py text executed via Python stdin",
+  "exitCode": 1,
+  "lastAssertion": "AssertionError: ('@keel/builder', 'package/package.json')",
+  "cause": "Raw source package.json contains workspace:* dependencies; pnpm pack resolves them to exact local package versions. Proposed correction is not applied and has not run.",
+  "allOtherChecksUnchanged": true
+}

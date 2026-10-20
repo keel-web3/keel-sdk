@@ -1,0 +1,110 @@
+{
+  "decision": "APPROVE_EXACT_REVIEWER_PROBE_CORRECTION_ONLY",
+  "reviewer": "lead; not SDK compatibility implementer or package producer",
+  "sdkSource": "311d61526284248938e335d7ed879089408933be",
+  "patchSHA256": "bbf2c32101284a38ce5ec509fd4f10ef3aca47b53cdc62254498fd1f3cd05911",
+  "originalProbeSHA256": "b91db04bc624c5e236dd61f66e67e2718d034e21568179b357071c5f818313be",
+  "proposedProbeSHA256": "30be5a55374487d580b7da77367d451d8aac267f8139ba06c15a737501a19316",
+  "initialRootExplorationRed": "Strict raw package-source member check found all6 tar LICENSE files inherited from repository root, absent in package folders. Root independently verified all6 equal frozen311:LICENSE1088B/cabead0e38fc8766f174225e5e9a5c566cc4570676bb0bc31ca23f7af143211a. No production or reference asset change.",
+  "firstWorkspaceOnlyProposal": "f93578d25b625e21185f953f8ea58ef84f90d1faf61b091de2b540225d03b3b5 never approved/applied",
+  "rationale": "Packed metadata resolves literal workspace:* dependencies to exact frozen local versions; inherited LICENSE is exact repository-root bytes. All other fields and members remain exact, paths unique, nonregular types refused. This fixes verifier assumptions without permitting source/decoder/simulation changes. Original RED retained.",
+  "independentActualSixArchiveChecks": [
+    {
+      "archive": "keel-builder-0.3.0.tgz",
+      "sha256": "5c28f6d67b3e94a8530c1a498a2481ddf850dbd63049447a4f714801e55df689",
+      "regularMembers": 159,
+      "workspaceExactVersionConversions": [
+        {
+          "name": "@keel/protocol",
+          "source": "workspace:*",
+          "packed": "0.3.0"
+        },
+        {
+          "name": "@keel/sdk",
+          "source": "workspace:*",
+          "packed": "0.3.2"
+        }
+      ]
+    },
+    {
+      "archive": "keel-ethereum-adapter-0.3.0.tgz",
+      "sha256": "b926172c07bcebf086611fcb973cad071e783fde6328258e60bc92d92978994d",
+      "regularMembers": 31,
+      "workspaceExactVersionConversions": [
+        {
+          "name": "@keel/protocol",
+          "source": "workspace:*",
+          "packed": "0.3.0"
+        },
+        {
+          "name": "@keel/sdk",
+          "source": "workspace:*",
+          "packed": "0.3.2"
+        }
+      ]
+    },
+    {
+      "archive": "keel-mcp-0.4.2.tgz",
+      "sha256": "2437277589eb80675a050dd0fe188bfec1f2b5871d5f97d5805a3e96e82e2b04",
+      "regularMembers": 196,
+      "workspaceExactVersionConversions": [
+        {
+          "name": "@keel/builder",
+          "source": "workspace:*",
+          "packed": "0.3.0"
+        },
+        {
+          "name": "@keel/ethereum-adapter",
+          "source": "workspace:*",
+          "packed": "0.3.0"
+        },
+        {
+          "name": "@keel/protocol",
+          "source": "workspace:*",
+          "packed": "0.3.0"
+        },
+        {
+          "name": "@keel/sdk",
+          "source": "workspace:*",
+          "packed": "0.3.2"
+        }
+      ]
+    },
+    {
+      "archive": "keel-protocol-0.3.0.tgz",
+      "sha256": "fc665a5f115815ddbb0bcb0a123caa6123856142d8208f361af67e79b920ff4d",
+      "regularMembers": 159,
+      "workspaceExactVersionConversions": []
+    },
+    {
+      "archive": "keel-sdk-0.3.2.tgz",
+      "sha256": "693e357852288d98a42c74c7955ee59ac8c6a04ea3d2e9ded1ce09657f7d040a",
+      "regularMembers": 939,
+      "workspaceExactVersionConversions": [
+        {
+          "name": "@keel/protocol",
+          "source": "workspace:*",
+          "packed": "0.3.0"
+        },
+        {
+          "name": "@keel/viewer",
+          "source": "workspace:*",
+          "packed": "0.3.0"
+        }
+      ]
+    },
+    {
+      "archive": "keel-viewer-0.3.0.tgz",
+      "sha256": "6a13ab97e15e498c178d96f18dfe6579791c91560db97f4002453222809b1fc3",
+      "regularMembers": 115,
+      "workspaceExactVersionConversions": [
+        {
+          "name": "@keel/protocol",
+          "source": "workspace:*",
+          "packed": "0.3.0"
+        }
+      ]
+    }
+  ],
+  "releaseApproved": false
+}

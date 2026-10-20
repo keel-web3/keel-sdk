@@ -1,0 +1,106 @@
+{
+  "sdkSource": "311d61526284248938e335d7ed879089408933be",
+  "emittedFiles": 1745,
+  "unchanged": 1739,
+  "changed": {
+    "packages/mcp/dist/tools.js": {
+      "before": "3fe74172489e4745ed6ceeb9e1ca870768817351d78b573f611e1fef93b6981c",
+      "after": "98023da9021b13034e1437221d181160a8b4d47e1f21240001cf64ffcae2c026"
+    },
+    "packages/mcp/dist/tools.js.map": {
+      "before": "5162fe23deb9bd4be913448194387f5b228879489b990caf5411ae9b263868f9",
+      "after": "52535e7ea5f897b5493efd4490ae88fd04c9b5da306cc32d24f5c3a2520d2446"
+    },
+    "packages/sdk/dist/studio-agent-drafts.js.map": {
+      "before": "b509db71ac5fe185bf3aae1f6722b5a18388aea7ee4650c0faec2d6f5a260f5b",
+      "after": "e523e94e6eafd696967daada371361df345e51b27f53c747e6500714b830c208"
+    },
+    "packages/sdk/dist/studio-agent-drafts.js": {
+      "before": "319640a1a9b541f2ab7dddfad39f88630102ba9b796656dc8bca110aae11ad38",
+      "after": "138835e5ca36194a34e348dec1f6930b189786b22a779e95563047bc10309fd5"
+    },
+    "packages/sdk/dist/studio-agent-drafts.d.ts": {
+      "before": "f6515402c2ab8b65d08b3aacd4dc0c1387477cd99baff6c1cfa7aecc007a1d3e",
+      "after": "27cc7157deb45f3d15a82d230c96b92b8ffb3e2c46bbc92d29d45ce8f2cdd6a2"
+    },
+    "packages/sdk/dist/studio-agent-drafts.d.ts.map": {
+      "before": "a3a64f44c05bee6125aafd940531bfc792e4409746c8ba35c91468396b6ae4e6",
+      "after": "814b661399ffa5d464b4d748fd6e581032bc41e18713981b77fb240cf213c137"
+    }
+  },
+  "tarPackages": [
+    {
+      "package": "@keel/builder",
+      "sha256": "5c28f6d67b3e94a8530c1a498a2481ddf850dbd63049447a4f714801e55df689",
+      "bytes": 216487,
+      "distMembers": 156,
+      "nonMetadataMembersByteExactIncludingOnlyFrozenRootLICENSEFallback": true,
+      "archiveNamesUniqueAndTypesRegularOrDirectory": true,
+      "packageMetadataExactExceptFrozenWorkspaceVersions": true
+    },
+    {
+      "package": "@keel/ethereum-adapter",
+      "sha256": "b926172c07bcebf086611fcb973cad071e783fde6328258e60bc92d92978994d",
+      "bytes": 42253,
+      "distMembers": 28,
+      "nonMetadataMembersByteExactIncludingOnlyFrozenRootLICENSEFallback": true,
+      "archiveNamesUniqueAndTypesRegularOrDirectory": true,
+      "packageMetadataExactExceptFrozenWorkspaceVersions": true
+    },
+    {
+      "package": "@keel/mcp",
+      "sha256": "2437277589eb80675a050dd0fe188bfec1f2b5871d5f97d5805a3e96e82e2b04",
+      "bytes": 385308,
+      "distMembers": 193,
+      "nonMetadataMembersByteExactIncludingOnlyFrozenRootLICENSEFallback": true,
+      "archiveNamesUniqueAndTypesRegularOrDirectory": true,
+      "packageMetadataExactExceptFrozenWorkspaceVersions": true
+    },
+    {
+      "package": "@keel/protocol",
+      "sha256": "fc665a5f115815ddbb0bcb0a123caa6123856142d8208f361af67e79b920ff4d",
+      "bytes": 253182,
+      "distMembers": 156,
+      "nonMetadataMembersByteExactIncludingOnlyFrozenRootLICENSEFallback": true,
+      "archiveNamesUniqueAndTypesRegularOrDirectory": true,
+      "packageMetadataExactExceptFrozenWorkspaceVersions": true
+    },
+    {
+      "package": "@keel/sdk",
+      "sha256": "693e357852288d98a42c74c7955ee59ac8c6a04ea3d2e9ded1ce09657f7d040a",
+      "bytes": 2259847,
+      "distMembers": 936,
+      "nonMetadataMembersByteExactIncludingOnlyFrozenRootLICENSEFallback": true,
+      "archiveNamesUniqueAndTypesRegularOrDirectory": true,
+      "packageMetadataExactExceptFrozenWorkspaceVersions": true
+    },
+    {
+      "package": "@keel/viewer",
+      "sha256": "6a13ab97e15e498c178d96f18dfe6579791c91560db97f4002453222809b1fc3",
+      "bytes": 212496,
+      "distMembers": 112,
+      "nonMetadataMembersByteExactIncludingOnlyFrozenRootLICENSEFallback": true,
+      "archiveNamesUniqueAndTypesRegularOrDirectory": true,
+      "packageMetadataExactExceptFrozenWorkspaceVersions": true
+    }
+  ],
+  "oldCollectionValidatorByteExact": true,
+  "oldResumeReadCaptureBlockByteExact": true,
+  "discovery": {
+    "currentSourcePin": "311d61526284248938e335d7ed879089408933be",
+    "immutableDocPathsExist": [
+      "README.md",
+      "docs/KEEL_NETWORK_DISCOVERY.md",
+      "docs/KEEL_RPC_SETUP.md",
+      "docs/KEEL_STUDIO_SHARED_PLANNING.md",
+      "docs/KEEL_STUDIO_WALLET_REVIEW.md",
+      "docs/SEPOLIA_TESTER_HANDOFF.md",
+      "docs/STUDIO_ACCESS.md",
+      "packages/mcp/README.md",
+      "skills/fray-keel-agent/SKILL.md"
+    ],
+    "networksEntireObjectUnchanged": true,
+    "historicalAccessReleaseUnchanged": "https://github.com/keel-web3/keel-sdk/releases/tag/studio-guided-planning-20261007",
+    "sourceApprovalDoesNotClaimRemotePublication": true
+  }
+}
