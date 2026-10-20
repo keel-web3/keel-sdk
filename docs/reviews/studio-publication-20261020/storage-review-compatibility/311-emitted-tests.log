@@ -1,0 +1,280 @@
+TAP version 13
+# Subtest: studio draft CLI reads JSON and YAML configs without wallet or chain actions
+ok 1 - studio draft CLI reads JSON and YAML configs without wallet or chain actions
+  ---
+  duration_ms: 1027.674417
+  type: 'test'
+  ...
+# Subtest: MCP edits Studio drafts with an origin-bound environment override and optimistic revision
+ok 2 - MCP edits Studio drafts with an origin-bound environment override and optimistic revision
+  ---
+  duration_ms: 144.791417
+  type: 'test'
+  ...
+# Subtest: MCP never accepts a draft key in tool arguments and fails closed without an approved connection
+ok 3 - MCP never accepts a draft key in tool arguments and fails closed without an approved connection
+  ---
+  duration_ms: 1.61375
+  type: 'test'
+  ...
+# Subtest: MCP stages an image-only KEEL shell project without uploading a local viewer
+ok 4 - MCP stages an image-only KEEL shell project without uploading a local viewer
+  ---
+  duration_ms: 6.158333
+  type: 'test'
+  ...
+# Subtest: MCP stages standard video and model roles through the canonical viewer policy
+ok 5 - MCP stages standard video and model roles through the canonical viewer policy
+  ---
+  duration_ms: 2.544042
+  type: 'test'
+  ...
+# Subtest: MCP rejects a locally declared KEEL shell before staging while allowing creator HTML
+ok 6 - MCP rejects a locally declared KEEL shell before staging while allowing creator HTML
+  ---
+  duration_ms: 2.013709
+  type: 'test'
+  ...
+# Subtest: portable MCP forwards explicit defaults operations through the same account-scoped endpoint
+ok 7 - portable MCP forwards explicit defaults operations through the same account-scoped endpoint
+  ---
+  duration_ms: 1.507917
+  type: 'test'
+  ...
+# Subtest: portable MCP reads and shares reviewable conversation forms without model execution or plan mutation
+ok 8 - portable MCP reads and shares reviewable conversation forms without model execution or plan mutation
+  ---
+  duration_ms: 1.376791
+  type: 'test'
+  ...
+# Subtest: portable MCP prepares the same owner review and never accepts caller wallet or calldata
+ok 9 - portable MCP prepares the same owner review and never accepts caller wallet or calldata
+  ---
+  duration_ms: 1.363417
+  type: 'test'
+  ...
+# Subtest: portable MCP forwards explicit read-call diagnosis without accepting wallet commands
+ok 10 - portable MCP forwards explicit read-call diagnosis without accepting wallet commands
+  ---
+  duration_ms: 0.987167
+  type: 'test'
+  ...
+# Subtest: registered portable MCP continues the paid release, preserves unknown outcomes, and cancels only an exact review
+ok 11 - registered portable MCP continues the paid release, preserves unknown outcomes, and cancels only an exact review
+  ---
+  duration_ms: 1.66675
+  type: 'test'
+  ...
+# Subtest: headless creation and media preserve exact inputs, cancellation and typed authentication errors
+ok 12 - headless creation and media preserve exact inputs, cancellation and typed authentication errors
+  ---
+  duration_ms: 201.044792
+  type: 'test'
+  ...
+# Subtest: shared planning reads and edits the same release revision without signing or trusting supplied URLs
+ok 13 - shared planning reads and edits the same release revision without signing or trusting supplied URLs
+  ---
+  duration_ms: 0.793667
+  type: 'test'
+  ...
+# Subtest: storage review uses the owner-scoped server preparation path and returns its existing Studio page
+ok 14 - storage review uses the owner-scoped server preparation path and returns its existing Studio page
+  ---
+  duration_ms: 0.25675
+  type: 'test'
+  ...
+# Subtest: draft review links use the hosted default and never forward untrusted URLs or credentials
+ok 15 - draft review links use the hosted default and never forward untrusted URLs or credentials
+  ---
+  duration_ms: 1.905834
+  type: 'test'
+  ...
+# Subtest: agent draft client covers every Studio release type without wallet or publication methods
+ok 16 - agent draft client covers every Studio release type without wallet or publication methods
+  ---
+  duration_ms: 3.119083
+  type: 'test'
+  ...
+# Subtest: agent draft client persists optimistic revisions and fails closed
+ok 17 - agent draft client persists optimistic revisions and fails closed
+  ---
+  duration_ms: 0.480083
+  type: 'test'
+  ...
+# Subtest: agent draft operation config keeps stale edits and unsupported actions explicit
+ok 18 - agent draft operation config keeps stale edits and unsupported actions explicit
+  ---
+  duration_ms: 0.478334
+  type: 'test'
+  ...
+# Subtest: portable draft validation rejects malformed or stale-agent payloads before network access
+ok 19 - portable draft validation rejects malformed or stale-agent payloads before network access
+  ---
+  duration_ms: 0.210125
+  type: 'test'
+  ...
+# Subtest: diagnose retries the existing release with a read-only request and unchanged IDs
+ok 20 - diagnose retries the existing release with a read-only request and unchanged IDs
+  ---
+  duration_ms: 0.496458
+  type: 'test'
+  ...
+# Subtest: exact owner-review preparation binds the saved revision and derives a safe operation URL
+ok 21 - exact owner-review preparation binds the saved revision and derives a safe operation URL
+  ---
+  duration_ms: 1.144333
+  type: 'test'
+  ...
+# Subtest: diagnostics explicitly request replay evidence and reject a mutating or unrelated reply
+ok 22 - diagnostics explicitly request replay evidence and reject a mutating or unrelated reply
+  ---
+  duration_ms: 0.334583
+  type: 'test'
+  ...
+# Subtest: metadata replay validates exact ABI calldata, hashes and read-only gas boundaries
+ok 23 - metadata replay validates exact ABI calldata, hashes and read-only gas boundaries
+  ---
+  duration_ms: 5.684959
+  type: 'test'
+  ...
+# Subtest: receipt recovery uses the same saved release and rejects unverified or mismatched evidence
+ok 24 - receipt recovery uses the same saved release and rejects unverified or mismatched evidence
+  ---
+  duration_ms: 0.554792
+  type: 'test'
+  ...
+# Subtest: bounded Continue uses the exact existing revision and refuses mismatched, mutating or private-call responses
+ok 25 - bounded Continue uses the exact existing revision and refuses mismatched, mutating or private-call responses
+  ---
+  duration_ms: 0.709791
+  type: 'test'
+  ...
+# Subtest: storage recovery exposes bounded next steps without owner observation inputs
+ok 26 - storage recovery exposes bounded next steps without owner observation inputs
+  ---
+  duration_ms: 0.220041
+  type: 'test'
+  ...
+# Subtest: saved-program capture verifies exact revisions and complete serialized program digest without accepting a simulation
+ok 27 - saved-program capture verifies exact revisions and complete serialized program digest without accepting a simulation
+  ---
+  duration_ms: 0.458125
+  type: 'test'
+  ...
+# Subtest: resume uses read-only exact operation and rejects a replacement operation or stale revision
+ok 28 - resume uses read-only exact operation and rejects a replacement operation or stale revision
+  ---
+  duration_ms: 0.180709
+  type: 'test'
+  ...
+# Subtest: updated review retries the same project and exact candidate cancellation without supplied replacement programs
+ok 29 - updated review retries the same project and exact candidate cancellation without supplied replacement programs
+  ---
+  duration_ms: 0.206667
+  type: 'test'
+  ...
+# Subtest: browser upload keeps authentication status for both JSON and HTML 401 replies without retry
+ok 30 - browser upload keeps authentication status for both JSON and HTML 401 replies without retry
+  ---
+  duration_ms: 4.352875
+  type: 'test'
+  ...
+# Subtest: SDK refuses cross-object, forged tool/owner paths and inconsistent operation guidance
+ok 31 - SDK refuses cross-object, forged tool/owner paths and inconsistent operation guidance
+  ---
+  duration_ms: 1.118875
+  type: 'test'
+  ...
+# Subtest: SDK paginates and forwards exact current state without signing; stale errors retain safe recovery data
+ok 32 - SDK paginates and forwards exact current state without signing; stale errors retain safe recovery data
+  ---
+  duration_ms: 9.4835
+  type: 'test'
+  ...
+# Subtest: SDK negotiates default discovery and accepts a complete legacy server response
+ok 33 - SDK negotiates default discovery and accepts a complete legacy server response
+  ---
+  duration_ms: 0.467541
+  type: 'test'
+  ...
+# Subtest: portable MCP advertises pagination/bindings/read-review and follows returned continuation arguments
+ok 34 - portable MCP advertises pagination/bindings/read-review and follows returned continuation arguments
+  ---
+  duration_ms: 129.918
+  type: 'test'
+  ...
+# Subtest: read-review sends the exact saved operation and rejects an operation substituted in the response
+ok 35 - read-review sends the exact saved operation and rejects an operation substituted in the response
+  ---
+  duration_ms: 0.595042
+  type: 'test'
+  ...
+# Subtest: wallet approval continuation preserves exact guidance and refuses cross-release progress
+ok 36 - wallet approval continuation preserves exact guidance and refuses cross-release progress
+  ---
+  duration_ms: 0.473167
+  type: 'test'
+  ...
+# Subtest: unsupported dispatcher identity preconditions fail before creating a client or fetching
+ok 37 - unsupported dispatcher identity preconditions fail before creating a client or fetching
+  ---
+  duration_ms: 0.408
+  type: 'test'
+  ...
+# Subtest: supported dispatcher state preconditions reach the server unchanged and server rejection cannot be bypassed
+ok 38 - supported dispatcher state preconditions reach the server unchanged and server rejection cannot be bypassed
+  ---
+  duration_ms: 0.993292
+  type: 'test'
+  ...
+# Subtest: provided falsey state constraints are invalid rather than silently omitted
+ok 39 - provided falsey state constraints are invalid rather than silently omitted
+  ---
+  duration_ms: 0.736167
+  type: 'test'
+  ...
+# Subtest: emitted prepare-only client accepts funding without collection or signing authority
+ok 40 - emitted prepare-only client accepts funding without collection or signing authority
+  ---
+  duration_ms: 9.217875
+  type: 'test'
+  ...
+# Subtest: emitted prepare-only client accepts saved resume without collection or signing authority
+ok 41 - emitted prepare-only client accepts saved resume without collection or signing authority
+  ---
+  duration_ms: 0.458333
+  type: 'test'
+  ...
+# Subtest: emitted prepare-only client accepts pending receipt without collection or signing authority
+ok 42 - emitted prepare-only client accepts pending receipt without collection or signing authority
+  ---
+  duration_ms: 0.24125
+  type: 'test'
+  ...
+# Subtest: emitted current MCP operation dispatch and actual packaged server preserve the truthful storage discriminator
+ok 43 - emitted current MCP operation dispatch and actual packaged server preserve the truthful storage discriminator
+  ---
+  duration_ms: 129.271833
+  type: 'test'
+  ...
+# Subtest: new storage navigation refuses extra authority, malformed preflight, stale bindings and hostile URLs
+ok 44 - new storage navigation refuses extra authority, malformed preflight, stale bindings and hostile URLs
+  ---
+  duration_ms: 3.1525
+  type: 'test'
+  ...
+# Subtest: collection-only GET read/resume reject a storage variant and preserve original collection behavior
+ok 45 - collection-only GET read/resume reject a storage variant and preserve original collection behavior
+  ---
+  duration_ms: 0.843333
+  type: 'test'
+  ...
+1..45
+# tests 45
+# suites 0
+# pass 45
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 1070.261875

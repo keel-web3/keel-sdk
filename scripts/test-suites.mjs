@@ -313,6 +313,7 @@ export const DETERMINISTIC_TEST_FILES = Object.freeze([
   "tests/sdk-tezos-shell.test.mjs",
   "tests/sdk-standard-chain-stack.test.mjs",
   "tests/sdk-studio-agent-drafts.test.mjs",
+  "tests/sdk-studio-storage-review.test.mjs",
   "tests/sdk-studio-wallet-rejection.test.mjs",
   "tests/sdk-studio-capabilities.test.mjs",
   "tests/sdk-studio-project-handoff.test.mjs",

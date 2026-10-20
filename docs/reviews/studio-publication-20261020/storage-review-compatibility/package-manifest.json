@@ -1,0 +1,114 @@
+{
+  "branchPushed": false,
+  "canonicalParent": "fb90011f1ce0ef4dc0883378ffbed39522b1cbfe",
+  "distEquivalence": {
+    "afterFiles": 1745,
+    "beforeFiles": 1745,
+    "intendedChangedFiles": 6,
+    "unchangedFiles": 1739
+  },
+  "node": "22.22.1",
+  "packagedRuntime": "unchanged b524; no native build; D97 deployment unchanged",
+  "packages": [
+    {
+      "bytes": 216487,
+      "dependencies": {
+        "@gltf-transform/core": "4.4.2",
+        "@gltf-transform/extensions": "4.4.2",
+        "@gltf-transform/functions": "4.4.2",
+        "@keel/protocol": "0.3.0",
+        "@keel/sdk": "0.3.2",
+        "esbuild": "0.28.2",
+        "ffmpeg-static": "5.3.0",
+        "terser": "5.44.0",
+        "typescript": "^5.9.0"
+      },
+      "distFileCount": 156,
+      "distInventoryDigest": "337299c42a1da9433e83b47d29e83981265c9212db0cf052786c816fac6a7755",
+      "file": "/private/tmp/keel-storage-review-compat-20261020/packages/keel-builder-0.3.0.tgz",
+      "name": "@keel/builder",
+      "sha256": "5c28f6d67b3e94a8530c1a498a2481ddf850dbd63049447a4f714801e55df689",
+      "version": "0.3.0"
+    },
+    {
+      "bytes": 42253,
+      "dependencies": {
+        "@keel/protocol": "0.3.0",
+        "@keel/sdk": "0.3.2",
+        "viem": "^2.55.0"
+      },
+      "distFileCount": 28,
+      "distInventoryDigest": "398f14260916346d62da759b3c9d69c5ce52d2b46b499af5f67d9fac7cf8d0d6",
+      "file": "/private/tmp/keel-storage-review-compat-20261020/packages/keel-ethereum-adapter-0.3.0.tgz",
+      "name": "@keel/ethereum-adapter",
+      "sha256": "b926172c07bcebf086611fcb973cad071e783fde6328258e60bc92d92978994d",
+      "version": "0.3.0"
+    },
+    {
+      "bytes": 385308,
+      "dependencies": {
+        "@keel/builder": "0.3.0",
+        "@keel/ethereum-adapter": "0.3.0",
+        "@keel/protocol": "0.3.0",
+        "@keel/sdk": "0.3.2"
+      },
+      "distFileCount": 193,
+      "distInventoryDigest": "e4744c45e9650534ff7aa93337471a80b27693c3c117d67b1ea6320fca782108",
+      "file": "/private/tmp/keel-storage-review-compat-20261020/packages/keel-mcp-0.4.2.tgz",
+      "name": "@keel/mcp",
+      "sha256": "2437277589eb80675a050dd0fe188bfec1f2b5871d5f97d5805a3e96e82e2b04",
+      "version": "0.4.2"
+    },
+    {
+      "bytes": 253182,
+      "dependencies": {},
+      "distFileCount": 156,
+      "distInventoryDigest": "2588a043df37906e76a4ea643fe561d10b9fc75c84de6f350c9d5d704572b2d4",
+      "file": "/private/tmp/keel-storage-review-compat-20261020/packages/keel-protocol-0.3.0.tgz",
+      "name": "@keel/protocol",
+      "sha256": "fc665a5f115815ddbb0bcb0a123caa6123856142d8208f361af67e79b920ff4d",
+      "version": "0.3.0"
+    },
+    {
+      "bytes": 2259847,
+      "dependencies": {
+        "@jsquash/png": "3.1.1",
+        "@jsquash/webp": "1.5.0",
+        "@keel/protocol": "0.3.0",
+        "@keel/viewer": "0.3.0",
+        "@noble/hashes": "1.8.0",
+        "esbuild": "0.28.2",
+        "terser": "5.44.0",
+        "viem": "^2.38.0"
+      },
+      "distFileCount": 936,
+      "distInventoryDigest": "8e96e32b3da26c724886b04e50eae26928080bcf5193d53a460cb2b47e17a2b8",
+      "file": "/private/tmp/keel-storage-review-compat-20261020/packages/keel-sdk-0.3.2.tgz",
+      "name": "@keel/sdk",
+      "sha256": "693e357852288d98a42c74c7955ee59ac8c6a04ea3d2e9ded1ce09657f7d040a",
+      "version": "0.3.2"
+    },
+    {
+      "bytes": 212496,
+      "dependencies": {
+        "@keel/protocol": "0.3.0"
+      },
+      "distFileCount": 112,
+      "distInventoryDigest": "c9d4ff79436e8c0b61c3e3b230d6e159bff58a8bb8a863f2996e5b28fbab8c6a",
+      "file": "/private/tmp/keel-storage-review-compat-20261020/packages/keel-viewer-0.3.0.tgz",
+      "name": "@keel/viewer",
+      "sha256": "6a13ab97e15e498c178d96f18dfe6579791c91560db97f4002453222809b1fc3",
+      "version": "0.3.0"
+    }
+  ],
+  "registryPublished": false,
+  "schema": "keel-storage-review-compat-packages@1",
+  "sdkSource": "311d61526284248938e335d7ed879089408933be",
+  "sdkSourceUrl": "https://github.com/keel-web3/keel-sdk/tree/311d61526284248938e335d7ed879089408933be",
+  "siteAdapter": "56e835862b9bdf5b824e6adf06382f098a7f386a",
+  "sourceFix": "09914c94e9110ac90bbecbfc295e42a3fb348d75",
+  "typescriptBuilds": [
+    "packages/sdk/tsconfig.json",
+    "packages/mcp/tsconfig.json"
+  ]
+}
