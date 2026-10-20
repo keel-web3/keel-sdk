@@ -6,6 +6,19 @@ import {createServer} from 'node:http';
 import {tmpdir} from 'node:os';
 import path from 'node:path';
 
+/** A browser may reset its loopback CONNECT socket after our denial was sent.
+ * Only that completed-denial ECONNRESET is expected; retain every other error. */
+export function endDeniedProxyConnect(socket,onUnexpectedError) {
+  assert.equal(typeof onUnexpectedError,'function');
+  let denialFinished=false;
+  socket.once('finish',()=>{denialFinished=true;});
+  socket.on('error',error=>{
+    if(denialFinished&&error.code==='ECONNRESET')return;
+    onUnexpectedError(error);
+  });
+  socket.end('HTTP/1.1 502 Blocked\r\nConnection: close\r\n\r\n');
+}
+
 export function pageRequestsFromNetLog(log,origin) {
   const type=log.constants?.logEventTypes?.URL_REQUEST_START_JOB;
   assert.equal(typeof type,'number','Chromium must supply the network event schema');
@@ -31,19 +44,20 @@ export async function observeOfflineShell(html, terminalState='verified', expect
   const origin=`http://127.0.0.1:${server.address().port}`;
   // A deny-only loopback proxy covers every renderer, including requests
   // started before a child target's CDP interception can be installed.
-  const proxyRequests=[];
+  const proxyRequests=[],errors=[];
+  const recordProxyError=error=>errors.push(`Loopback denial socket ${error.code??'unknown'}: ${error.message}`);
   const proxy=createServer((request,response)=>{proxyRequests.push(request.url);response.writeHead(502);response.end();});
-  proxy.on('connect',(request,socket)=>{proxyRequests.push(`CONNECT ${request.url}`);socket.end('HTTP/1.1 502 Blocked\r\nConnection: close\r\n\r\n');});
+  proxy.on('connect',(request,socket)=>{proxyRequests.push(`CONNECT ${request.url}`);endDeniedProxyConnect(socket,recordProxyError);});
   proxy.listen(0,'127.0.0.1');await once(proxy,'listening');
   // Browser services use the default network context, separate from the
   // artwork's isolated context below. Block those without filtering domains
   // out of the artwork observer or relying on startup timing.
   const browserProxy=createServer((_request,response)=>{response.writeHead(502);response.end();});
-  browserProxy.on('connect',(_request,socket)=>socket.end('HTTP/1.1 502 Blocked\r\nConnection: close\r\n\r\n'));
+  browserProxy.on('connect',(_request,socket)=>endDeniedProxyConnect(socket,recordProxyError));
   browserProxy.listen(0,'127.0.0.1');await once(browserProxy,'listening');
   const netlogPath=path.join(profile,'network.json');
   const child=spawn(binary,['--headless','--no-sandbox','--disable-dev-shm-usage','--disable-background-networking','--disable-client-side-phishing-detection','--disable-features=OptimizationHints,MediaRouter,AutofillServerCommunication,PreconnectToSearch,SearchEnginePreconnect','--safebrowsing-disable-auto-update','--disable-component-update','--disable-domain-reliability','--disable-sync','--disable-default-apps','--disable-extensions','--no-first-run','--no-default-browser-check','--host-resolver-rules=MAP * ~NOTFOUND, EXCLUDE 127.0.0.1, EXCLUDE localhost',`--proxy-server=http://127.0.0.1:${browserProxy.address().port}`,'--remote-debugging-port=0',`--log-net-log=${netlogPath}`,`--user-data-dir=${profile}`,'about:blank'],{stdio:['ignore','ignore','pipe']});
-  let socket,sequence=0;const pending=new Map(),attempts=[],errors=[];
+  let socket,sequence=0;const pending=new Map(),attempts=[];
   try {
     const endpoint=await new Promise((resolve,reject)=>{
       let stderr='';const timer=setTimeout(()=>reject(new Error('Chromium debugging endpoint timed out')),startupTimeout);
@@ -102,12 +116,11 @@ export async function observeOfflineShell(html, terminalState='verified', expect
     assert.equal(result?.state,terminalState,'The complete shell must reach the expected verification outcome');
     if(expectedSignal)assert.ok(result.signals?.includes(expectedSignal),'The mounted artwork must execute its committed module');
     await new Promise(resolve=>setTimeout(resolve,100));
-    const observedErrors=[...errors];
     const exited=once(child,'exit');
     await command('Browser.close');
     await exited;
     const netlog=JSON.parse(await readFile(netlogPath,'utf8'));
-    return {...result,externalRequests:attempts,proxyRequests,pageNetworkRequests:pageRequestsFromNetLog(netlog,origin),errors:observedErrors};
+    return {...result,externalRequests:attempts,proxyRequests,pageNetworkRequests:pageRequestsFromNetLog(netlog,origin),errors};
   }finally{
     for(const request of pending.values())request.reject(new Error('Browser qualification closed'));
     socket?.close();if(child.exitCode===null&&child.signalCode===null){child.kill('SIGKILL');await once(child,'exit').catch(()=>{});}
