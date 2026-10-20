@@ -1,6 +1,7 @@
+import { snapshotKeelExplicitExternalPreview, type KeelExplicitExternalPreview } from "./external-preview.js";
 import { assertKeelRegisteredNativeGzipProof, type KeelRegisteredNativeGzipProof } from "./registered-native-gzip.js";
 import { assertKeelDataURICompatibility, decodeKeelPreparedDenseCopyFragment } from "./dense-transport.js";
-import { assertKeelFreshPayloadCarriage, inspectKeelInlinePayloadCarriage } from "./inline-transport-audit.js";
+import { assertKeelFreshPayloadCarriage, inspectKeelInlinePayloadCarriage, assertKeelPreparedCollectorInlineMetadata } from "./inline-transport-audit.js";
 import { createIntegrity, type Integrity, resolveKeelTokenURIReadBounds, assertKeelNonstandardTokenURIIdentity, type KeelExplicitNonstandardReadPolicy } from "@keel/protocol";
 import { assertKeelInlineImageBytes } from "./collector-policy.js";
 import { assertKeelInlineNoExternalDependencies, decodeKeelInlineGraphFragment } from "./inline-viewer-graph.js";
@@ -28,6 +29,7 @@ export function isKeelPreparedCopyMediaType(mediaType: string): boolean {
 export interface KeelPreparedCopyReadInput {
   readonly nonstandardReadPolicy?: KeelExplicitNonstandardReadPolicy;
   readonly registeredNativeGzip?: KeelRegisteredNativeGzipProof;
+  readonly externalPreview?: KeelExplicitExternalPreview;
   readonly chainId: number;
   readonly store: string;
   readonly mediaType: string;
@@ -93,6 +95,7 @@ function auditCreatorItems(html: Uint8Array): void {
  * registration, wallet authority, a receipt, or visual/browser behavior. */
 export async function assertKeelPreparedCopyRead(input: KeelPreparedCopyReadInput) {
   // Snapshot caller-owned values before the first async digest.
+  const externalPreview = input.externalPreview === undefined ? undefined : snapshotKeelExplicitExternalPreview(input.externalPreview);
   const graphBytes = new Uint8Array(input.graphBytes);
   const registeredNativeGzip = input.registeredNativeGzip === undefined ? undefined : assertKeelRegisteredNativeGzipProof(input.registeredNativeGzip);
   if (registeredNativeGzip !== undefined && (registeredNativeGzip.binding.chainId !== input.chainId || registeredNativeGzip.binding.store.toLowerCase() !== input.store.toLowerCase())) throw new TypeError("Native Gzip COPY readback changed its selected chain/store.");
@@ -113,6 +116,7 @@ export async function assertKeelPreparedCopyRead(input: KeelPreparedCopyReadInpu
   const at = expectedTokenURI.indexOf(graphText);
   if (graphText.length === 0 || at < 0 || expectedTokenURI.indexOf(graphText, at + graphText.length) >= 0) throw new TypeError("The complete URI must copy the exact prepared graph once, without another encoding layer.");
   const raw = mediaType === "application/vnd.keel.token-uri-raw-percent-fragment";
+  if (externalPreview !== undefined && !raw) throw new TypeError("Explicit external preview requires raw-percent COPY.");
   if (raw && !expectedTokenURI.startsWith("data:application/json;charset=utf-8,")) throw new TypeError("Compact COPY cannot add a complete-metadata Base64 layer.");
   if (!raw && !expectedTokenURI.startsWith("data:application/json;base64,")) throw new TypeError("Preserve the existing prepared Base64/percent envelope.");
   assertKeelDataURICompatibility(expectedTokenURI, "Prepared tokenURI");
@@ -127,11 +131,15 @@ export async function assertKeelPreparedCopyRead(input: KeelPreparedCopyReadInpu
     ? decodeKeelPreparedDenseCopyFragment(graphBytes) : decodeKeelInlineGraphFragment(graphBytes, mediaType);
   if (!decoder.decode(html).includes(decoder.decode(sourceHTML))) throw new TypeError("Returned animation does not contain the exact decoded prepared graph.");
   auditCreatorItems(html);
-  if (typeof metadata.image !== "string" || !metadata.image.startsWith("data:image/")) throw new TypeError("Prepared COPY needs the self-contained original collector image.");
-  assertKeelDataURICompatibility(metadata.image, "Prepared image");
-  const imageHeader = metadata.image.slice(5, metadata.image.indexOf(",")).split(";", 1)[0]!;
-  assertKeelInlineImageBytes(dataURI(metadata.image, imageHeader), imageHeader);
+  if (externalPreview !== undefined) assertKeelPreparedCollectorInlineMetadata(metadata, { registeredNativeGzip, externalPreview });
+  else {
+    if (typeof metadata.image !== "string" || !metadata.image.startsWith("data:image/")) throw new TypeError("Prepared COPY needs the self-contained original collector image.");
+    assertKeelDataURICompatibility(metadata.image, "Prepared image");
+    const imageHeader = metadata.image.slice(5, metadata.image.indexOf(",")).split(";", 1)[0]!;
+    assertKeelInlineImageBytes(dataURI(metadata.image, imageHeader), imageHeader);
+  }
   return Object.freeze({
+    ...(externalPreview === undefined ? {} : { externalPreview }),
     schema: "keel-prepared-copy-read-check@1" as const,
     policy: "prepared-copy" as const, chainId, store: store.toLowerCase(), mediaType,
     requiredBuilder, readOperation: "copy-prepared-fragments" as const,
@@ -146,4 +154,4 @@ export async function assertKeelPreparedCopyRead(input: KeelPreparedCopyReadInpu
 
 export type KeelPreparedCopyReadCheck = Awaited<ReturnType<typeof assertKeelPreparedCopyRead>>;
 export type KeelPreparedCopyPublishEvidence = Pick<KeelPreparedCopyReadInput,
-  "graphBytes" | "expectedTokenURI" | "returnedTokenURI" | "callGasLimit" | "blockGasLimit" | "nonstandardReadPolicy" | "registeredNativeGzip">;
+  "graphBytes" | "expectedTokenURI" | "returnedTokenURI" | "callGasLimit" | "blockGasLimit" | "nonstandardReadPolicy" | "registeredNativeGzip" | "externalPreview">;

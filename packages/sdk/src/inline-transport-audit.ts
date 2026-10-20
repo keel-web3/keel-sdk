@@ -1,3 +1,4 @@
+import { snapshotKeelExplicitExternalPreview, assertKeelExternalPreviewImageURI, type KeelExplicitExternalPreview } from "./external-preview.js";
 import { assertKeelRegisteredNativeGzipProof, type KeelRegisteredNativeGzipProof } from "./registered-native-gzip.js";
 import { resolveKeelTokenURIReadBounds, assertKeelNonstandardTokenURIIdentity, type KeelExplicitNonstandardReadPolicy } from "@keel/protocol";
 import { createKeelLegacySharedImageReader, KEEL_LEGACY_SHARED_IMAGE_PROFILE } from "./legacy-shared-image-reader.js";
@@ -7,7 +8,7 @@ import { unpackKeelInlineDescriptors } from "./inline-descriptor-columns.js";
 import { createHash } from "node:crypto";
 import { inspectKeelDataURICompatibility, decodeKeelDenseTransport, serializeKeelDenseTransportJSON, type KeelDenseTransportProfile } from "./dense-transport.js";
 import { createIntegrity } from "@keel/protocol";
-import { assertKeelInlineImageBytes, assertKeelCollectorInlineMetadata } from "./collector-policy.js";
+import { assertKeelInlineImageBytes, assertKeelCollectorInlineMetadata, assertKeelCollectorInlineAnimation } from "./collector-policy.js";
 import { createKeelLegacyPreparedDenseReader, KEEL_LEGACY_PREPARED_DENSE_PROFILE, type KeelLegacyPreparedDensePack } from "./legacy-prepared-dense-reader.js";
 import type { KeelStandaloneViewerItem } from "./verification-shell.js";
 import { keelPreparedDenseCopyBootSuffix } from "./prepared-dense-framing.js";
@@ -246,18 +247,23 @@ export function assertKeelFreshPayloadCarriage(html: Uint8Array, options: { read
 
 /** Node preparation recognizes and reconstructs the exact literal boot before
  * applying ordinary collector policy to its canonical inner document. */
-export function assertKeelPreparedCollectorInlineMetadata(metadata: Readonly<Record<string, unknown>>, options: { readonly registeredNativeGzip?: KeelRegisteredNativeGzipProof | undefined } = {}): void {
+export function assertKeelPreparedCollectorInlineMetadata(metadata: Readonly<Record<string, unknown>>, options: { readonly registeredNativeGzip?: KeelRegisteredNativeGzipProof | undefined; readonly externalPreview?: KeelExplicitExternalPreview | undefined } = {}): void {
+  const external = options.externalPreview === undefined ? undefined : assertKeelExternalPreviewImageURI(metadata.image, options.externalPreview);
+  const validate = (value: Readonly<Record<string, unknown>>) => {
+    if (external === undefined) assertKeelCollectorInlineMetadata(value);
+    else { assertKeelExternalPreviewImageURI(value.image, external); assertKeelCollectorInlineAnimation(value.animation_url); }
+  };
   const animation = metadata.animation_url;
   if (typeof animation === "string" && animation.startsWith("data:text/html;charset=utf-8,")) {
     const html = decoder.decode(decodeKeelInlineDataURI(animation, "text/html"));
-    if (options.registeredNativeGzip !== undefined) assertKeelFreshPayloadCarriage(encoder.encode(html), options);
+    if (options.registeredNativeGzip !== undefined || external !== undefined) assertKeelFreshPayloadCarriage(encoder.encode(html), options);
     const prepared = inspectKeelPreparedDenseCopyDocument(html);
     if ((prepared?.legacyPreparedProfile === KEEL_LEGACY_PREPARED_DENSE_PROFILE || prepared?.legacyPreparedProfile === KEEL_LEGACY_SHARED_IMAGE_PROFILE)) {
       const innerAnimation = "data:text/html;charset=utf-8," + encodeURIComponent(prepared.html);
-      assertKeelCollectorInlineMetadata({ ...metadata, animation_url: innerAnimation }); return;
+      validate({ ...metadata, animation_url: innerAnimation }); return;
     }
   }
-  assertKeelCollectorInlineMetadata(metadata);
+  validate(metadata);
 }
 
 /** Check the serialized audit again when reading a digest-bound review plan.
@@ -296,8 +302,10 @@ export function assertKeelFreshPayloadAudit(value: unknown): void {
 }
 
 /** Measurements from the complete token return, not the compressed pack total. */
-export async function auditKeelInlineTokenURI(tokenURI: string, options: { readonly nonstandardReadPolicy?: KeelExplicitNonstandardReadPolicy; readonly registeredNativeGzip?: KeelRegisteredNativeGzipProof | undefined } = {}) {
+export async function auditKeelInlineTokenURI(tokenURI: string, options: { readonly nonstandardReadPolicy?: KeelExplicitNonstandardReadPolicy; readonly registeredNativeGzip?: KeelRegisteredNativeGzipProof | undefined; readonly externalPreview?: KeelExplicitExternalPreview | undefined } = {}) {
+  const external = options.externalPreview === undefined ? undefined : snapshotKeelExplicitExternalPreview(options.externalPreview);
   if (options.registeredNativeGzip !== undefined && (!tokenURI.startsWith("data:application/json;charset=utf-8,") || /;base64,/u.test(tokenURI.slice(0, tokenURI.indexOf(",") + 1)))) throw new TypeError("Registered native Gzip admits raw-percent metadata only, never a complete Base64 wrapper.");
+  if (external !== undefined && (typeof tokenURI !== "string" || !tokenURI.startsWith("data:application/json;charset=utf-8,"))) throw new TypeError("Explicit external previews require raw-percent metadata, never a whole-document Base64 wrapper.");
   const bounds = resolveKeelTokenURIReadBounds(options.nonstandardReadPolicy);
   if (typeof tokenURI !== "string" || encoder.encode(tokenURI).length > bounds.maximumTokenUriBytes) throw new RangeError("Complete tokenURI exceeds the inspection limit.");
   const tokenURIIntegrity = await createIntegrity(encoder.encode(tokenURI));
@@ -306,14 +314,16 @@ export async function auditKeelInlineTokenURI(tokenURI: string, options: { reado
   const metadata = object(JSON.parse(decoder.decode(json)));
   if (options.registeredNativeGzip !== undefined && (typeof metadata.animation_url !== "string" || !metadata.animation_url.startsWith("data:text/html;charset=utf-8,"))) throw new TypeError("Registered native Gzip admits per-resource compression, never complete-HTML Base64.");
   const html = decodeKeelInlineDataURI(metadata.animation_url, "text/html", bounds.maximumTokenUriBytes);
-  const image = decodeKeelInlineDataURI(metadata.image, "image/", bounds.maximumTokenUriBytes);
+  if (external !== undefined) assertKeelPreparedCollectorInlineMetadata(metadata, { ...options, externalPreview: external });
+  const image = external === undefined ? decodeKeelInlineDataURI(metadata.image, "image/", bounds.maximumTokenUriBytes) : undefined;
   const imageURI = metadata.image as string;
   const imageMedia = imageURI.slice(5, imageURI.indexOf(",")).split(";", 1)[0]!;
-  assertKeelInlineImageBytes(image, imageMedia);
+  if (image !== undefined) assertKeelInlineImageBytes(image, imageMedia);
   const carriage = inspectKeelInlinePayloadCarriage(html, options);
   return Object.freeze({ schema: "keel-inline-token-audit@1" as const,
     completeTokenURIBytes: encoder.encode(tokenURI).length, metadataBytes: json.length,
-    htmlBytes: html.length, imageBytes: image.length,
+    htmlBytes: html.length, imageBytes: image?.length ?? 0, imageURIBytes: encoder.encode(imageURI).length,
+    ...(external === undefined ? {} : { externalPreview: external, externalPreviewAvailability: "not-inspected" as const, externalPreviewSourceBytesRevalidated: false as const }),
     completeDocumentBase64Layers: Number(/^data:application\/json[^,]*;base64,/iu.test(tokenURI))
       + Number(/^data:text\/html[^,]*;base64,/iu.test(metadata.animation_url as string)),
     tokenURIIntegrity, ...(bounds.nonstandardReadPolicy === undefined ? {} : { nonstandardReadPolicy: bounds.nonstandardReadPolicy }), htmlIntegrity: await createIntegrity(html), carriage,
@@ -324,6 +334,6 @@ export async function auditKeelInlineTokenURI(tokenURI: string, options: { reado
       explanation: "Returned Base64/hex may be emitted from native Hold bytes at read time. Verify object records, carrier bytes and the upload inventory before claiming stored duplication or storage savings." },
     uriCompatibility: { tokenURI: inspectKeelDataURICompatibility(tokenURI),
       animationURL: inspectKeelDataURICompatibility(metadata.animation_url as string),
-      image: inspectKeelDataURICompatibility(metadata.image as string) },
+      image: external === undefined ? inspectKeelDataURICompatibility(metadata.image as string) : null },
     browserVerified: false as const });
 }
