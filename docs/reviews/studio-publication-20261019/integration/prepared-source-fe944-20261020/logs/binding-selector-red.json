@@ -1,0 +1,35 @@
+{
+  "schema": "keel-compiled-prepared-source-asset-path@1",
+  "scope": "actual emitted SDK creator preparation function, not HTTP/authentication/chain readiness",
+  "buildId": "pyrfdcquUJkhz22Y0jyAz",
+  "uid": 999,
+  "node": "v22.23.1",
+  "moduleId": 32633,
+  "exportName": "dj",
+  "moduleDefinitionSha256": "f884f6e46a58fee6be5e78927258d66aba500f027d953fd482e6d5af3baaa77d",
+  "routeSha256": "d6102eb519fcdf983818c70584f94e1fc7859fb91560aa70d4a6a623434ab222",
+  "externalVerificationDefinition": "a=>{a.exports=import(\"@keel/sdk/verification-shell\")}",
+  "input": {
+    "synthetic": true,
+    "sourceBytes": 76,
+    "sourceSha256": "fe9b5e4f7ab1454c4bc657c5f83afef92e7e62a9f2f2ec913a98cefc7823b6aa",
+    "posterBytes": 68,
+    "posterSha256": "431ced6916a2a21a156e38701afe55bbd7f88969fbbfc56d7fe099d47f265460"
+  },
+  "httpEntryInvoked": false,
+  "databaseInvoked": false,
+  "walletInvoked": false,
+  "registeredReaderAuthenticated": false,
+  "results": [],
+  "result": "FAIL",
+  "error": {
+    "name": "TypeError",
+    "message": "Deployed creator contracts are required.",
+    "stack": [
+      "TypeError: Deployed creator contracts are required.",
+      "    at s (/app/web/apps/studio/.next-final-f11-b524-portable22-20261020/server/chunks/86587.js:1:22571)",
+      "    at file:///qualification/probe-compiled-dense.mjs:11:77"
+    ]
+  },
+  "connectionsAttempted": 0
+}
