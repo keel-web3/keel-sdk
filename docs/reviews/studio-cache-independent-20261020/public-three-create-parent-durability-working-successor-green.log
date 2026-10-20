@@ -1,0 +1,24 @@
+TAP version 13
+# {"mode":"prepare","syncs":[{"directory":"/private/var/folders/zk/40xbztxx7tb90tl4nnryd2780000gn/T/keel-review-parent-sync-xjUiSM","childExists":true},{"directory":"/private/var/folders/zk/40xbztxx7tb90tl4nnryd2780000gn/T/keel-review-parent-sync-xjUiSM/parent-durability-case","childExists":true},{"directory":"/private/var/folders/zk/40xbztxx7tb90tl4nnryd2780000gn/T/keel-review-parent-sync-xjUiSM/parent-durability-case","childExists":true},{"directory":"/private/var/folders/zk/40xbztxx7tb90tl4nnryd2780000gn/T/keel-review-parent-sync-xjUiSM/parent-durability-case","childExists":true}],"reads":1,"actualNetwork":0}
+# Subtest: prepare: actual run entry is parent-directory synced before first RPC
+ok 1 - prepare: actual run entry is parent-directory synced before first RPC
+  ---
+  duration_ms: 39.743625
+  type: 'test'
+  ...
+# {"mode":"execute","syncs":[{"directory":"/private/var/folders/zk/40xbztxx7tb90tl4nnryd2780000gn/T/keel-review-parent-sync-IuDrc7","childExists":false},{"directory":"/private/var/folders/zk/40xbztxx7tb90tl4nnryd2780000gn/T/keel-review-parent-sync-IuDrc7","childExists":true},{"directory":"/private/var/folders/zk/40xbztxx7tb90tl4nnryd2780000gn/T/keel-review-parent-sync-IuDrc7/parent-durability-case","childExists":true},{"directory":"/private/var/folders/zk/40xbztxx7tb90tl4nnryd2780000gn/T/keel-review-parent-sync-IuDrc7/parent-durability-case","childExists":true},{"directory":"/private/var/folders/zk/40xbztxx7tb90tl4nnryd2780000gn/T/keel-review-parent-sync-IuDrc7/parent-durability-case","childExists":true}],"reads":1,"actualNetwork":0}
+# Subtest: execute: actual run entry is parent-directory synced before first RPC
+ok 2 - execute: actual run entry is parent-directory synced before first RPC
+  ---
+  duration_ms: 29.194542
+  type: 'test'
+  ...
+1..2
+# tests 2
+# suites 0
+# pass 2
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 106.037375

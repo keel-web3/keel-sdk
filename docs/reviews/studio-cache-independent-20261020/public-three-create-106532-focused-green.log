@@ -1,0 +1,160 @@
+TAP version 13
+# {"name":"one-native-3create-v1.claim.json","syncs":["file","directory"]}
+# Subtest: actual Recorder persists containing directory for one-native-3create-v1.claim.json
+ok 1 - actual Recorder persists containing directory for one-native-3create-v1.claim.json
+  ---
+  duration_ms: 19.543959
+  type: 'test'
+  ...
+# {"name":"fresh-plan.json","syncs":["file","directory"]}
+# Subtest: actual Recorder persists containing directory for fresh-plan.json
+ok 2 - actual Recorder persists containing directory for fresh-plan.json
+  ---
+  duration_ms: 19.81925
+  type: 'test'
+  ...
+# {"name":"cumulative.request.json","syncs":["file","directory"]}
+# Subtest: actual Recorder persists containing directory for cumulative.request.json
+ok 3 - actual Recorder persists containing directory for cumulative.request.json
+  ---
+  duration_ms: 37.457458
+  type: 'test'
+  ...
+# {"name":"events.jsonl","syncs":["file","directory","file"]}
+# Subtest: actual Recorder persists containing directory for events.jsonl
+ok 4 - actual Recorder persists containing directory for events.jsonl
+  ---
+  duration_ms: 27.665958
+  type: 'test'
+  ...
+# {"mode":"prepare","syncs":[{"directory":"/private/var/folders/zk/40xbztxx7tb90tl4nnryd2780000gn/T/keel-review-parent-sync-1aTR12","childExists":true},{"directory":"/private/var/folders/zk/40xbztxx7tb90tl4nnryd2780000gn/T/keel-review-parent-sync-1aTR12/parent-durability-case","childExists":true},{"directory":"/private/var/folders/zk/40xbztxx7tb90tl4nnryd2780000gn/T/keel-review-parent-sync-1aTR12/parent-durability-case","childExists":true},{"directory":"/private/var/folders/zk/40xbztxx7tb90tl4nnryd2780000gn/T/keel-review-parent-sync-1aTR12/parent-durability-case","childExists":true}],"reads":1,"actualNetwork":0}
+# Subtest: prepare: actual run entry is parent-directory synced before first RPC
+ok 5 - prepare: actual run entry is parent-directory synced before first RPC
+  ---
+  duration_ms: 93.479458
+  type: 'test'
+  ...
+# {"mode":"execute","syncs":[{"directory":"/private/var/folders/zk/40xbztxx7tb90tl4nnryd2780000gn/T/keel-review-parent-sync-Xu91tL","childExists":false},{"directory":"/private/var/folders/zk/40xbztxx7tb90tl4nnryd2780000gn/T/keel-review-parent-sync-Xu91tL","childExists":true},{"directory":"/private/var/folders/zk/40xbztxx7tb90tl4nnryd2780000gn/T/keel-review-parent-sync-Xu91tL/parent-durability-case","childExists":true},{"directory":"/private/var/folders/zk/40xbztxx7tb90tl4nnryd2780000gn/T/keel-review-parent-sync-Xu91tL/parent-durability-case","childExists":true},{"directory":"/private/var/folders/zk/40xbztxx7tb90tl4nnryd2780000gn/T/keel-review-parent-sync-Xu91tL/parent-durability-case","childExists":true}],"reads":1,"actualNetwork":0}
+# Subtest: execute: actual run entry is parent-directory synced before first RPC
+ok 6 - execute: actual run entry is parent-directory synced before first RPC
+  ---
+  duration_ms: 58.675708
+  type: 'test'
+  ...
+# Subtest: valid response is streamed into exclusive files with fixed recipient and exact receipts
+ok 7 - valid response is streamed into exclusive files with fixed recipient and exact receipts
+  ---
+  duration_ms: 104.283292
+  type: 'test'
+  ...
+# Subtest: HTTP503 retains bounded body and never follows or retries
+ok 8 - HTTP503 retains bounded body and never follows or retries
+  ---
+  duration_ms: 64.65125
+  type: 'test'
+  ...
+# Subtest: HTTP401 retains bounded body and never follows or retries
+ok 9 - HTTP401 retains bounded body and never follows or retries
+  ---
+  duration_ms: 36.948459
+  type: 'test'
+  ...
+# Subtest: HTTP403 retains bounded body and never follows or retries
+ok 10 - HTTP403 retains bounded body and never follows or retries
+  ---
+  duration_ms: 35.88475
+  type: 'test'
+  ...
+# Subtest: HTTP429 retains bounded body and never follows or retries
+ok 11 - HTTP429 retains bounded body and never follows or retries
+  ---
+  duration_ms: 38.977417
+  type: 'test'
+  ...
+# Subtest: HTTP302 retains bounded body and never follows or retries
+ok 12 - HTTP302 retains bounded body and never follows or retries
+  ---
+  duration_ms: 42.914
+  type: 'test'
+  ...
+# Subtest: HTTP200 RPC_REVERT stays distinct from HTTP failures
+ok 13 - HTTP200 RPC_REVERT stays distinct from HTTP failures
+  ---
+  duration_ms: 54.059875
+  type: 'test'
+  ...
+# Subtest: HTTP200 RPC_METHOD_UNSUPPORTED stays distinct from HTTP failures
+ok 14 - HTTP200 RPC_METHOD_UNSUPPORTED stays distinct from HTTP failures
+  ---
+  duration_ms: 36.665583
+  type: 'test'
+  ...
+# Subtest: HTTP200 RPC_RATE_LIMIT stays distinct from HTTP failures
+ok 15 - HTTP200 RPC_RATE_LIMIT stays distinct from HTTP failures
+  ---
+  duration_ms: 37.112917
+  type: 'test'
+  ...
+# Subtest: response cap is enforced during streaming before JSON parse/full buffering
+ok 16 - response cap is enforced during streaming before JSON parse/full buffering
+  ---
+  duration_ms: 38.63925
+  type: 'test'
+  ...
+# Subtest: exactly-at-cap body succeeds, cumulative cap rejects next excess and malformed/encoded replies stop
+ok 17 - exactly-at-cap body succeeds, cumulative cap rejects next excess and malformed/encoded replies stop
+  ---
+  duration_ms: 213.005042
+  type: 'test'
+  ...
+# Subtest: connect, read idle and overall cancellation destroy physical work without retries
+ok 18 - connect, read idle and overall cancellation destroy physical work without retries
+  ---
+  duration_ms: 180.9915
+  type: 'test'
+  ...
+# Subtest: filesystem outputs reject traversal, symlink directories/leafs and duplicate writes
+ok 19 - filesystem outputs reject traversal, symlink directories/leafs and duplicate writes
+  ---
+  duration_ms: 7.483375
+  type: 'test'
+  ...
+# Subtest: only exact public3CREATE may reach network; changed bytecode, gas, private body, overrides and send methods reject
+ok 20 - only exact public3CREATE may reach network; changed bytecode, gas, private body, overrides and send methods reject
+  ---
+  duration_ms: 2.123083
+  type: 'test'
+  ...
+# Subtest: fresh plan retains fixed data/nonces/ceilings, hashes changed fees BEFORE dispatch and rejects stale identity/fork/limit
+ok 21 - fresh plan retains fixed data/nonces/ceilings, hashes changed fees BEFORE dispatch and rejects stale identity/fork/limit
+  ---
+  duration_ms: 7.165084
+  type: 'test'
+  ...
+# Subtest: provider status/revert/runtime are distinct, unobserved child code or empty CREATE return is never proof
+ok 22 - provider status/revert/runtime are distinct, unobserved child code or empty CREATE return is never proof
+  ---
+  duration_ms: 2.393
+  type: 'test'
+  ...
+# Subtest: execute without exact admission stops before network; existing global one-shot claim cannot repeat
+ok 23 - execute without exact admission stops before network; existing global one-shot claim cannot repeat
+  ---
+  duration_ms: 34.11675
+  type: 'test'
+  ...
+# Subtest: prepare-mode freezes exact public inputs with no simulation call or execution claim
+ok 24 - prepare-mode freezes exact public inputs with no simulation call or execution claim
+  ---
+  duration_ms: 4083.02375
+  type: 'test'
+  ...
+1..24
+# tests 24
+# suites 0
+# pass 24
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 5067.012167
