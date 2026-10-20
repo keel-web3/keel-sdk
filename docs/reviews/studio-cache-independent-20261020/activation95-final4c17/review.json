@@ -1,0 +1,61 @@
+{
+  "schema": "keel.independent-exact95-final-activation-review@1",
+  "reviewerId": "cache-release-reviewer",
+  "recordedAt": "2026-10-20T21:49:54.827669+00:00",
+  "decision": "APPROVE_EXACT_ONE_REVIEWED_CUTOVER",
+  "blockingFindings": [],
+  "finalPlanPath": "/private/tmp/keel-activation95-final-20261020/activation-plan.final.json",
+  "finalPlanSHA256": "4c17cc98989f9a7e80027218aa5b6e8f96357075d3af9627d8624acbe400e7ad",
+  "commandsPath": "/private/tmp/keel-activation95-final-20261020/commands.final.proposed.json",
+  "commandsSHA256": "8c5fa03cacadc5aeb6852055670386bcf4dbd8ed95c70bbb6fbce8aaa2452e6a",
+  "root": "/home/ubuntu/keel-studio-activation-9fc5c1d4-34c8-4164-a1ae-33136375d1ba",
+  "candidate": {
+    "siteCommit": "4002803ccfcb20c39ffe5c555b68d8e197f379f8",
+    "sdkCommit": "b524bf5fc19939c7523aada2e53f79e3360970ea",
+    "buildId": "jtZVm1JMsE-biSFoBQzjQ",
+    "appImageId": "sha256:95bdda05a7596553251e9d4ba9fe72758abc5137fcb661efed80ca94ab5e6bcb",
+    "runnerImageId": "sha256:d97ddf2aba94cb963646fdf05bc8dc8c99b7e69b8c19bad85c06bea7c67fc9f5",
+    "binarySha256": "8a2970e2cebc1f4b51bd228ab7fa53208e2d247030f46037991351115f12a3b5"
+  },
+  "permittedCommands": [
+    "Each of the five exact exclusiveReceiverArgv once, stdin exact matching localPath bytes",
+    "readonlyPreflightArgv once",
+    "executeArgv once only following successful read-only preflight and unchanged operator guards"
+  ],
+  "exactExecutionHashRequired": true,
+  "maximumCutovers": 1,
+  "maximumRetryAfterUncertainResult": 0,
+  "operatorSourceSHA256": "22ee9270e2a3613429debbb55c2e3b3a9dbdb6f312f4e3509172a4356c83b414",
+  "dependencyHelperSHA256": "7d1650301c9201f1e54294ad91a7b00291e1941b10bda29da1be8fe177876bcf",
+  "verification": {
+    "allOperationalFieldsEqualApproved591Pending": true,
+    "allFiveFilesExactAndExclusivelyReceived": true,
+    "fourEvidenceDigestsMatchActualIndependentSources": true,
+    "qaLatestTechnicalPASSAndPostDeployStillBlocked": true,
+    "actualStaticReadinessExact": true,
+    "frozenOperatorPureValidateFinalPlan": "PASS",
+    "planSHA256": "4c17cc98989f9a7e80027218aa5b6e8f96357075d3af9627d8624acbe400e7ad",
+    "commandsSHA256": "8c5fa03cacadc5aeb6852055670386bcf4dbd8ed95c70bbb6fbce8aaa2452e6a",
+    "testsPreviouslyOwn68": true,
+    "initialAdHocCheckSetupError": "Expected stdinLocalPath duplicate field absent from final-command schema; verified exact localPath stdin binding instead; no source or assertion edited."
+  },
+  "wrapper": {
+    "path": "/private/tmp/keel-activation95-final-execute-20261020.py",
+    "sha256": "ee599f8c1da75859fae48cbd16fcbdd0ecff54df9b54d53c291aa4aac89a1fd6",
+    "reviewed": true,
+    "scope": "Runs the exact five receivers, preflight and cutover from immutable commands; verifies all five local bytes, stops any nonzero/uncertain outcome, never retries."
+  },
+  "existingHumanDeploymentAuthorizationAndLeadAuthorizationAccepted": true,
+  "freshDurableSnapshotAndHeldLockOwnershipGuardsRemainMandatory": true,
+  "rollbackRetainsOldImageContainerDataAndSnapshot": true,
+  "postActivationAcceptanceMandatory": [
+    "Independent actual candidate image/build/backend and durable cutover/postguards",
+    "Own exact Gator duplicate deployed full simulation to unsigned wallet first",
+    "Real saved GIF deployed full simulation to unsigned wallet",
+    "Authenticated historical exact bytes/MIME/SDK decode/rendered canvas and critical resource/permission/history/recovery checks"
+  ],
+  "artworkSigningApproved": false,
+  "artworkSubmissionApproved": false,
+  "finalUserAcceptanceClaim": false,
+  "reviewerExecutedHostAction": false
+}

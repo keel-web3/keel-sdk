@@ -1,0 +1,93 @@
+{
+  "schema": "keel.reviewed-operator-activation.v1",
+  "draft": "REVIEWED_FINAL_CANDIDATE_AWAITING_EXACT_EXECUTION_ADMISSION",
+  "operatorScriptSHA256": "22ee9270e2a3613429debbb55c2e3b3a9dbdb6f312f4e3509172a4356c83b414",
+  "candidate": {
+    "siteCommit": "4002803ccfcb20c39ffe5c555b68d8e197f379f8",
+    "sdkCommit": "b524bf5fc19939c7523aada2e53f79e3360970ea",
+    "buildId": "jtZVm1JMsE-biSFoBQzjQ",
+    "appImageId": "sha256:95bdda05a7596553251e9d4ba9fe72758abc5137fcb661efed80ca94ab5e6bcb",
+    "runnerImageId": "sha256:d97ddf2aba94cb963646fdf05bc8dc8c99b7e69b8c19bad85c06bea7c67fc9f5",
+    "binarySha256": "8a2970e2cebc1f4b51bd228ab7fa53208e2d247030f46037991351115f12a3b5"
+  },
+  "approval": {
+    "siteCommit": "4002803ccfcb20c39ffe5c555b68d8e197f379f8",
+    "sdkCommit": "b524bf5fc19939c7523aada2e53f79e3360970ea",
+    "independentQA": true,
+    "independentReleaseReview": true,
+    "leadExecuteApproved": true,
+    "rollbackSchemaCompatible": true,
+    "singleSourceTerminal401And403Verified": true,
+    "qualifiedActualStateSource": true,
+    "qaEvidencePath": "qa-final.json",
+    "qaEvidenceSHA256": "d8a62e65cfe1cccd181068038dac7c58376bc7dd141e29ada1627bf9741473e0",
+    "reviewEvidencePath": "release-review-final.json",
+    "reviewEvidenceSHA256": "07e754cbabab306fa79f487496d0f32aa3eff94a035a59afb55f26c09ef028b9",
+    "stateSourceEvidencePath": "actual-state-source-proof.json",
+    "stateSourceEvidenceSHA256": "0dbd3104146b0e54e7db2276e4ed73489c5fec28765ff34a8d9b973d2fa007b8",
+    "denialEvidencePath": "single-source-terminal-denial.json",
+    "denialEvidenceSHA256": "0dbe1ebfd57078185b775f743ce220a47148817a24118c747745d6e7330265e9"
+  },
+  "expectedProduction": {
+    "containerId": "b6ff8c7a6f5c2282e29883de917f2d376a8e92efffecc45d115338e0516a5201",
+    "imageId": "sha256:a53c65ac2aee00217f206f07f4ddecbf9d55b5a43f60bf87858d9756259ba730"
+  },
+  "stateRpcUrls": [
+    "https://rpc.sepolia.ethpandaops.io"
+  ],
+  "approvedStateRpcUrls": [
+    "https://rpc.sepolia.ethpandaops.io"
+  ],
+  "reserveBytes": 1073741824,
+  "databaseSnapshotBudgetBytes": 268435456,
+  "activationId": "9fc5c1d4-34c8-4164-a1ae-33136375d1ba",
+  "candidateName": "keel-studio-candidate-9fc5c1d4-34c8-4164-a1ae-33136375d1ba",
+  "runnerName": "keel-studio-runner-9fc5c1d4-34c8-4164-a1ae-33136375d1ba",
+  "socketVolume": "keel-studio-proof-socket-9fc5c1d4-34c8-4164-a1ae-33136375d1ba",
+  "rollbackName": "keel-studio-rollback-9fc5c1d4-34c8-4164-a1ae-33136375d1ba",
+  "failedName": "keel-studio-failed-9fc5c1d4-34c8-4164-a1ae-33136375d1ba",
+  "applicationArchive": {
+    "path": "keel-studio-4002-b524.oci.tar",
+    "sha256": "f015350eb2566bd9557d5033795713ba1d5aa97c04a55e84a837541e4d071407",
+    "bytes": 692871680,
+    "imageBytes": 692828469,
+    "expandedImageBytes": 1979348992,
+    "rawTarSha256": "f015350eb2566bd9557d5033795713ba1d5aa97c04a55e84a837541e4d071407",
+    "rawTarBytes": 692871680
+  },
+  "runnerArchive": {
+    "path": "keel-proof-runner64e.tar",
+    "bytes": 11028992,
+    "sha256": "d8e3539de3f259e4e9e4eb35ca3dcd709637ec4fcfa5041e03c777e3ce59d507",
+    "imageBytes": 11015759,
+    "expandedImageBytes": 20149760
+  },
+  "dependencies": {
+    "schema": "keel.receipt-bound-publication-dependencies@1",
+    "catalogPath": "/data/studio/keel-inline-fragment-catalog-2d54c8a4ab1e3360fdf702af0113c27739dcddf44abd4e0682f68606005652d7.json",
+    "catalogSHA256": "2d54c8a4ab1e3360fdf702af0113c27739dcddf44abd4e0682f68606005652d7",
+    "helperSHA256": "7d1650301c9201f1e54294ad91a7b00291e1941b10bda29da1be8fe177876bcf",
+    "enableSQLSHA256": "2b62d8ee1b33228acb4ac19a1b95fae9ba2826496b72586d60a09ba4187fcf0e",
+    "disableSQLSHA256": "bf7b04e48d09027c57a15e203ab967f89735f1568eb3b2c65f27635ef1660c8b",
+    "bootstrapBaseSHA256": "7556a9091ed6646ca329f9442ee30cca3319a3092151c27099b9a2ddbb7f17c3",
+    "bootstrapSHA256": "5a162c659511c8679678c1ee14c2f2317e7a1550060f7dc7bcf918515611de8b",
+    "runtimeSupervisorSHA256": "d357df6c3f75f62592a6f7c815583c521f8f34b274bcdbe358dcddb8fe0d5b9e",
+    "pgOnlyName": "keel-studio-pg-only-4ef5db63-73b5-44f3-aafe-332ce1eca8af"
+  },
+  "preloadedStage": {
+    "schema": "keel.reviewed-preloaded-activation@1",
+    "root": "/home/ubuntu/keel-proof-qualification-43a5d5f4-05ad-4a2b-a261-530d7a8fb2d5",
+    "receiptPath": "verified-image-import95.json",
+    "receiptSHA256": "044d8f8f07b49c70988a367ffeef04a54098025c372e3e4a0fc8110a9e0e8bec"
+  },
+  "postDeploymentAcceptance": [
+    "Own exact Gator unsigned wallet boundary",
+    "Exact saved GIF unsigned wallet boundary",
+    "Authenticated historical Gator200/MIME/decode/renderedcanvas"
+  ],
+  "leadAuthorization": {
+    "recordedAt": "2026-10-20T21:47:59.124611+00:00",
+    "scope": "Activate exact independently QA qualified and release reviewed400/b524/95/D97 using existing infrastructure; retain snapshot/rollback; no artwork signing or submission",
+    "basis": "Direct user execution and deployment authorization; independent release evidence07e754 and QA current matrix d8a62 technical preactivation PASS; static14steps actualPASS"
+  }
+}

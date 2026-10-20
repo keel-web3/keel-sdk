@@ -1,0 +1,44 @@
+{
+  "files": [
+    {
+      "path": "README.md",
+      "bytes": 620,
+      "sha256": "d3c70bcb21d02eab7d259fef2c1aff9639c62ce635d2811cd555d0224a6fc715"
+    },
+    {
+      "path": "activation-plan.final.json",
+      "bytes": 5041,
+      "sha256": "4c17cc98989f9a7e80027218aa5b6e8f96357075d3af9627d8624acbe400e7ad"
+    },
+    {
+      "path": "commands.final.proposed.json",
+      "bytes": 11276,
+      "sha256": "8c5fa03cacadc5aeb6852055670386bcf4dbd8ed95c70bbb6fbce8aaa2452e6a"
+    },
+    {
+      "path": "launch-argv.json",
+      "bytes": 481,
+      "sha256": "7c3e933ff8fd32694b0f03a68d43d1e8499c5c9c7a8d39b4f40bc7c9dc6c46ae"
+    },
+    {
+      "path": "lead-execution-wrapper.reviewed.py",
+      "bytes": 1898,
+      "sha256": "ee599f8c1da75859fae48cbd16fcbdd0ecff54df9b54d53c291aa4aac89a1fd6"
+    },
+    {
+      "path": "manifest.json",
+      "bytes": 1644,
+      "sha256": "2954fdb74eb97dfff4b04216d759dfbf7324ac73eec8be07031f7276f395b08b"
+    },
+    {
+      "path": "review.json",
+      "bytes": 3598,
+      "sha256": "5e21c2dc16c8bf3fa8080dc6443fcacfb9b8e8d5887dd90d5c478a2039a8c638"
+    },
+    {
+      "path": "verification.json",
+      "bytes": 707,
+      "sha256": "be48a5b8f2094e2e1af5d5e5912a9bf142a1c6c9a07966e0bbef6248084c479f"
+    }
+  ]
+}
