@@ -1,0 +1,80 @@
+TAP version 13
+# Subtest: Tone + keel-audio load inside the compact Inline shell CSP and a real click in the art frame starts sound
+ok 1 - Tone + keel-audio load inside the compact Inline shell CSP and a real click in the art frame starts sound
+  ---
+  duration_ms: 1070.432042
+  type: 'test'
+  ...
+# Subtest: under the reference viewer's worker-src 'none' CSP, keel-audio falls Tone back to its timer clock and the score still ticks
+ok 2 - under the reference viewer's worker-src 'none' CSP, keel-audio falls Tone back to its timer clock and the score still ticks
+  ---
+  duration_ms: 956.036667
+  type: 'test'
+  ...
+# Subtest: the protected K shell mounts only verified art inside an opaque network-denied frame
+ok 3 - the protected K shell mounts only verified art inside an opaque network-denied frame
+  ---
+  duration_ms: 666.750709
+  type: 'test'
+  ...
+# Subtest: the marketplace-safe prepared animation URI installs token context before the K shell launches
+ok 4 - the marketplace-safe prepared animation URI installs token context before the K shell launches
+  ---
+  duration_ms: 201.583542
+  type: 'test'
+  ...
+# Subtest: the compact escaped animation URI is directly browser-readable without inner Base64 decoding
+ok 5 - the compact escaped animation URI is directly browser-readable without inner Base64 decoding
+  ---
+  duration_ms: 220.806208
+  type: 'test'
+  ...
+# Subtest: the unchanged canonical shell rejects changed artwork bytes and accepts the original again
+not ok 6 - the unchanged canonical shell rejects changed artwork bytes and accepts the original again
+  ---
+  duration_ms: 13.666625
+  type: 'test'
+  location: '/private/tmp/keel-browser-integration-20261020/proposal/tests/sdk-verification-shell-browser.test.mjs:189:1'
+  failureType: 'testCodeFailure'
+  error: |-
+    exactly one creator payload is replaced
+    
+    1 !== 2
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: 2
+  actual: 1
+  operator: 'strictEqual'
+  stack: |-
+    TestContext.<anonymous> (file:///private/tmp/keel-browser-integration-20261020/proposal/tests/sdk-verification-shell-browser.test.mjs:204:10)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: canonical chrome displays logical token identity and supply without an audit claim
+ok 7 - canonical chrome displays logical token identity and supply without an audit claim
+  ---
+  duration_ms: 181.347625
+  type: 'test'
+  ...
+# Subtest: a 32-module graph whose modules name each other and import by specifier verifies and runs
+ok 8 - a 32-module graph whose modules name each other and import by specifier verifies and runs
+  ---
+  duration_ms: 251.980042
+  type: 'test'
+  ...
+# Subtest: names in the entry document still resolve, nested through the text resources they name
+ok 9 - names in the entry document still resolve, nested through the text resources they name
+  ---
+  duration_ms: 231.557459
+  type: 'test'
+  ...
+1..9
+# tests 9
+# suites 0
+# pass 8
+# fail 1
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 4775.976375

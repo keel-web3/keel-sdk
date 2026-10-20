@@ -1,0 +1,11 @@
+diff --git a/scripts/test-suites.mjs b/scripts/test-suites.mjs
+--- a/scripts/test-suites.mjs
++++ b/scripts/test-suites.mjs
+@@ -74,6 +74,7 @@
+  * its execution boundary.
+  */
+ export const DETERMINISTIC_TEST_FILES = Object.freeze([
++  "tests/sdk-browser-fixture-identity.test.mjs",
+   "tests/nonstandard-read-policy.test.mjs",
+   "tests/governed-rpc-boundaries.test.mjs",
+   "tests/hybrid-chunk-resume.test.mjs",

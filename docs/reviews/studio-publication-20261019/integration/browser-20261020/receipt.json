@@ -1,0 +1,71 @@
+{
+  "sourceCommit": "e4985920593539f468c16524e2f74d2adf2878c3",
+  "productionChange": false,
+  "proposalApplied": false,
+  "node": "v22.22.1",
+  "browser": "/Users/ravonus/Library/Caches/ms-playwright/chromium_headless_shell-1234/chrome-headless-shell-mac-arm64/chrome-headless-shell",
+  "proposalSha256": "75902d5e1ea99f38867dbb07041094d9ae3f5cc00aaccfe7ef84cd07071c1fc0",
+  "browserDraft": {
+    "tests": 13,
+    "pass": 13,
+    "fail": 0,
+    "qualification": "author-only unapproved draft; Linux replay and independent review pending",
+    "log": "proposal-final-mac-v2.log"
+  },
+  "newIdentityRegressions": {
+    "tests": 4,
+    "pass": 4,
+    "fail": 0
+  },
+  "hashes": {
+    "tests/keel-audio-browser.test.mjs": {
+      "original": "16fa2295549ca94f08b4758d3f3951b6a289ec1846489328f0830f98acdb734c",
+      "proposed": "b4bb9215ecbe878cfdc3993746c1e6c1eea28abd9462aae0118387a928bc7d9d"
+    },
+    "tests/sdk-verification-shell-browser.test.mjs": {
+      "original": "7e365a77dcc5c975787737fe561de44379799abc0fd32334f989057b50a9d74c",
+      "proposed": "bef6685cd851b00efc9ea7aa6d58aea85129504ed5e67ac2d080c1fda9e93e5a"
+    },
+    "tests/sdk-verification-shell-large-graph-browser.test.mjs": {
+      "original": "09f2adf7b61c1f5e6f70fe1609b53c9440b9081d829c97d48edc2c79c7ff0f8a",
+      "proposed": "79d8e4059b033fed92ab6224c86736c4148b074e7474736adb6ac028a765f18a"
+    },
+    "tests/sdk-verification-shell-marketplace-csp.test.mjs": {
+      "original": "1bed77435c3529f25e7ee7b5cc97fde74f4656550faae588cf10411f991d43f4",
+      "proposed": "438a4cca21fe651fd1de13e335a8cb2a2d5ef8ab545b6d75fef457a602a18647"
+    },
+    "tests/helpers/marketplace-csp-browser.mjs": {
+      "original": null,
+      "proposed": "bf2e75974b10a74a968bf36a031d3014e2d96f38ed79ff352ec95e0c3b84c351"
+    },
+    "packages/sdk/src/verification-shell.ts": {
+      "unchangedSha256": "e137704169b91974afb1e79d5b13b9247d2fd49c58eab6e84f97b07e59104849"
+    },
+    "packages/sdk/src/inline-viewer-graph.ts": {
+      "unchangedSha256": "6e426ae6240ac16915e24c2d91bf97b601e3f91877b367981f48f620fec53a58"
+    },
+    "packages/sdk/dist/verification-shell.js": {
+      "unchangedSha256": "ca3b5c6c28129eaad884d08297aadce9a004e440193fb5c30fdd5fa87e863c8f"
+    },
+    "packages/sdk/dist/inline-viewer-graph.js": {
+      "unchangedSha256": "be3d38a1beff1d967afdfc62db975583a9b57a1d64f48c153ee9b47bffd37638"
+    },
+    "packages/sdk/dist/assets/keel-published-view-reader-v1.js": {
+      "unchangedSha256": "978e5fed29103cc72a2272f908421f14a587009d959aa40d3a1853af130bae1a",
+      "byteLength": 251050
+    },
+    "packages/sdk/dist/assets/keel-published-view-reader-v1.provenance.json": {
+      "unchangedSha256": "0ba6dc2e5390c4bbe3034fbeadad533ef5380afeb48c9ab3480f8e6f8f7aeac3",
+      "byteLength": 1314
+    }
+  },
+  "browserSha256": "7687bff7cb2db075f250e6d5848bbc8838cac3802ac3952a899c574f8eccab45",
+  "link": {
+    "artifactSourceCommit": "49d320dd019cbcc1a36aec33bb59a552f8a349a8",
+    "originalResult": "1 enum subtest PASS, parent setup FAIL: suffix put consumes exact fixed100M gas",
+    "estimatedSuffixGas": "102133263",
+    "suffixBytes": 143728,
+    "productionLimitChanged": false
+  },
+  "linkGasProposalSha256": "1468a78017132c89af715f6197477614ee490f9e199e01f45232a528c32b6049"
+}

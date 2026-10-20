@@ -1,0 +1,198 @@
+{
+  "sourceCommit": "49d320dd019cbcc1a36aec33bb59a552f8a349a8",
+  "sourceRoot": "/Users/ravonus/dev/wt/studio-outstanding-sdk-20261020/keel-contracts/out/qualified-49d320dd",
+  "artifacts": [
+    {
+      "path": "KeelLinkURIBuilder.t.sol/LinkEnumProbe.json",
+      "sha256": "0cec4ba01f75696686c68127ac4ce9283bd6159f9b11cf431fbf930610c77872",
+      "compiler": {
+        "version": "0.8.36+commit.8a079791"
+      },
+      "settings": {
+        "remappings": [
+          "@app-test/=test/apps/",
+          "@app/=src/apps/",
+          "@keel-test/=test/modules/",
+          "@keel/=src/modules/",
+          "@openzeppelin/contracts/=node_modules/@openzeppelin/contracts/",
+          "erc721a-upgradeable/=node_modules/erc721a-upgradeable/",
+          "erc721a/=node_modules/erc721a/"
+        ],
+        "optimizer": {
+          "enabled": true,
+          "runs": 50
+        },
+        "metadata": {
+          "bytecodeHash": "none",
+          "appendCBOR": false
+        },
+        "compilationTarget": {
+          "test/modules/keel-artifacts/KeelLinkURIBuilder.t.sol": "LinkEnumProbe"
+        },
+        "evmVersion": "prague",
+        "libraries": {},
+        "viaIR": true
+      }
+    },
+    {
+      "path": "KeelLinkURIBuilder.t.sol/LinkAssemblyStore.json",
+      "sha256": "d2e4763c2caad77d2d04422d67256c443f548bb934330ce5576842083ead9300",
+      "compiler": {
+        "version": "0.8.36+commit.8a079791"
+      },
+      "settings": {
+        "remappings": [
+          "@app-test/=test/apps/",
+          "@app/=src/apps/",
+          "@keel-test/=test/modules/",
+          "@keel/=src/modules/",
+          "@openzeppelin/contracts/=node_modules/@openzeppelin/contracts/",
+          "erc721a-upgradeable/=node_modules/erc721a-upgradeable/",
+          "erc721a/=node_modules/erc721a/"
+        ],
+        "optimizer": {
+          "enabled": true,
+          "runs": 50
+        },
+        "metadata": {
+          "bytecodeHash": "none",
+          "appendCBOR": false
+        },
+        "compilationTarget": {
+          "test/modules/keel-artifacts/KeelLinkURIBuilder.t.sol": "LinkAssemblyStore"
+        },
+        "evmVersion": "prague",
+        "libraries": {},
+        "viaIR": true
+      }
+    },
+    {
+      "path": "KeelLinkURIBuilder.t.sol/LinkAssemblyManager.json",
+      "sha256": "ea65d01fd6583dc32cb609cde6736151b8792a2fa0e2bc0a6278d0335b04623d",
+      "compiler": {
+        "version": "0.8.36+commit.8a079791"
+      },
+      "settings": {
+        "remappings": [
+          "@app-test/=test/apps/",
+          "@app/=src/apps/",
+          "@keel-test/=test/modules/",
+          "@keel/=src/modules/",
+          "@openzeppelin/contracts/=node_modules/@openzeppelin/contracts/",
+          "erc721a-upgradeable/=node_modules/erc721a-upgradeable/",
+          "erc721a/=node_modules/erc721a/"
+        ],
+        "optimizer": {
+          "enabled": true,
+          "runs": 50
+        },
+        "metadata": {
+          "bytecodeHash": "none",
+          "appendCBOR": false
+        },
+        "compilationTarget": {
+          "test/modules/keel-artifacts/KeelLinkURIBuilder.t.sol": "LinkAssemblyManager"
+        },
+        "evmVersion": "prague",
+        "libraries": {},
+        "viaIR": true
+      }
+    },
+    {
+      "path": "KeelLinkURIBuilder.t.sol/LinkAssemblyRegistry.json",
+      "sha256": "64bbb6b65df60ff43ad46a1171487e7a22b84839d2ee1e4510f562b7a5d05d8e",
+      "compiler": {
+        "version": "0.8.36+commit.8a079791"
+      },
+      "settings": {
+        "remappings": [
+          "@app-test/=test/apps/",
+          "@app/=src/apps/",
+          "@keel-test/=test/modules/",
+          "@keel/=src/modules/",
+          "@openzeppelin/contracts/=node_modules/@openzeppelin/contracts/",
+          "erc721a-upgradeable/=node_modules/erc721a-upgradeable/",
+          "erc721a/=node_modules/erc721a/"
+        ],
+        "optimizer": {
+          "enabled": true,
+          "runs": 50
+        },
+        "metadata": {
+          "bytecodeHash": "none",
+          "appendCBOR": false
+        },
+        "compilationTarget": {
+          "test/modules/keel-artifacts/KeelLinkURIBuilder.t.sol": "LinkAssemblyRegistry"
+        },
+        "evmVersion": "prague",
+        "libraries": {},
+        "viaIR": true
+      }
+    },
+    {
+      "path": "KeelLinkRegistry.sol/KeelLinkRegistry.json",
+      "sha256": "c8ca7b6cbe61d9442873074ac4b761f80cc2d2f83a4e4e695d24ca43b410fd86",
+      "compiler": {
+        "version": "0.8.36+commit.8a079791"
+      },
+      "settings": {
+        "remappings": [
+          "@app-test/=test/apps/",
+          "@app/=src/apps/",
+          "@keel-test/=test/modules/",
+          "@keel/=src/modules/",
+          "@openzeppelin/contracts/=node_modules/@openzeppelin/contracts/",
+          "erc721a-upgradeable/=node_modules/erc721a-upgradeable/",
+          "erc721a/=node_modules/erc721a/"
+        ],
+        "optimizer": {
+          "enabled": true,
+          "runs": 50
+        },
+        "metadata": {
+          "bytecodeHash": "none",
+          "appendCBOR": false
+        },
+        "compilationTarget": {
+          "src/modules/keel-artifacts/KeelLinkRegistry.sol": "KeelLinkRegistry"
+        },
+        "evmVersion": "prague",
+        "libraries": {},
+        "viaIR": true
+      }
+    },
+    {
+      "path": "KeelLinkURIBuilder.sol/KeelLinkURIBuilder.json",
+      "sha256": "510009489f845c6e43ecc797b7310aeaad598e2109984280c505220d270c1950",
+      "compiler": {
+        "version": "0.8.36+commit.8a079791"
+      },
+      "settings": {
+        "remappings": [
+          "@app-test/=test/apps/",
+          "@app/=src/apps/",
+          "@keel-test/=test/modules/",
+          "@keel/=src/modules/",
+          "@openzeppelin/contracts/=node_modules/@openzeppelin/contracts/",
+          "erc721a-upgradeable/=node_modules/erc721a-upgradeable/",
+          "erc721a/=node_modules/erc721a/"
+        ],
+        "optimizer": {
+          "enabled": true,
+          "runs": 50
+        },
+        "metadata": {
+          "bytecodeHash": "none",
+          "appendCBOR": false
+        },
+        "compilationTarget": {
+          "src/modules/keel-artifacts/KeelLinkURIBuilder.sol": "KeelLinkURIBuilder"
+        },
+        "evmVersion": "prague",
+        "libraries": {},
+        "viaIR": true
+      }
+    }
+  ]
+}
