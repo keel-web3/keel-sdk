@@ -1,0 +1,57 @@
+{
+  "schema": "keel.independent-activation95-source-review@1",
+  "decision": "APPROVE_OPERATOR_SOURCE_ONLY_PENDING_PLAN_NOT_ADMITTED",
+  "sourceCommit": "f2fc211641024af4637dbc618aa21a703e79eeab",
+  "evidenceCommit": "e03ab62bdf4599b48d594759bd4f34ed9fcb94ba",
+  "operator": {
+    "path": "/private/tmp/keel-studio-activation-95-20261020/docs/reviews/studio-publication-20261020/release/activation-receipt-bound/activate-receipt-bound-studio.py",
+    "bytes": 43653,
+    "sha256": "22ee9270e2a3613429debbb55c2e3b3a9dbdb6f312f4e3509172a4356c83b414"
+  },
+  "dependencyHelperSHA256": "8c7b95514f750b95663c83f850c51fd5d3538c108a082d8072505dfaece01ff5",
+  "pendingPlan": {
+    "path": "/private/tmp/keel-studio-activation-95-20261020/docs/reviews/studio-publication-20261020/release/activation-receipt-bound/activation-plan.pending.json",
+    "sha256": "fe34253b97a9551190d8c076d88c96e3afaa147bd09c8d9cd38fab5126b77710",
+    "allApprovalBooleansFalse": true,
+    "preloadedReceiptStillPlaceholder": true,
+    "admitted": false
+  },
+  "sourceDiff": {
+    "parent": "b0ae8caf4001392fe148200a81c1fa1b5d57a794",
+    "soleOperatorChange": "SOURCE literal 3e50d15bb74f939951de0cc0333a7baa9d8018c1 to4002803ccfcb20c39ffe5c555b68d8e197f379f8",
+    "wholeOperatorReverseByteExact": true,
+    "allFunctionAndClassASTsEqual": true,
+    "helperByteExact": true
+  },
+  "independentControls": {
+    "maintainedOperator": 13,
+    "dependencyContract": 20,
+    "ownership": 8,
+    "imageHealthDefaults": 6,
+    "pass": 47,
+    "fail": 0,
+    "skip": 0
+  },
+  "existingQualificationReused": {
+    "actualA53NeverStartedConfigurationReceiptSHA256": "76ee3e0cd854aec30d18138db034ded847ee6d3e4880d01017e9f0821a1bc9cd",
+    "sameExactHelper": true,
+    "doesNotEstablishRunningPGOrSuccessfulCASRollback": true
+  },
+  "remainingPlanBindings": [
+    "Actual95 SDK/worker/HTTP and exact compiled terminal-denial qualification outcomes",
+    "Fresh new GIF full native/strict qualification with corrected canonical references",
+    "Actual95 verified import receipt adapted to the existing operator receipt schema with both image descriptors and preserved original",
+    "Exact candidate QA/release/lead evidence digests and approval booleans, rollback/schema compatibility",
+    "Fresh locked preflight, bounded durable database snapshot and exact source/resources immediately before cutover"
+  ],
+  "postDeploymentAcceptance": [
+    "Own-workspace exact Gator unsigned wallet boundary",
+    "Authenticated historical200 decode/render evidence",
+    "Required normal GIF deployed unsigned handoff and collector rendering acceptance"
+  ],
+  "postDeploymentAcceptanceIsNotAnImpossiblePredeploymentGate": true,
+  "newHostActionApproved": false,
+  "activationApproved": false,
+  "releaseReady": false,
+  "signingApproved": false
+}
