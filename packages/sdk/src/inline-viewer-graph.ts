@@ -1,3 +1,6 @@
+import { snapshotKeelExplicitExternalPreview, assertKeelExternalPreviewImageURI, type KeelExplicitExternalPreview } from "./external-preview.js";
+export { prepareKeelExplicitExternalPreview, snapshotKeelExplicitExternalPreview } from "./external-preview.js";
+export type { KeelExplicitExternalPreview } from "./external-preview.js";
 import { assertKeelRegisteredNativeGzipProof, type KeelRegisteredNativeGzipProof } from "./registered-native-gzip.js";
 import { assertKeelFreshPayloadCarriage, assertKeelPreparedCollectorInlineMetadata as assertKeelCollectorInlineMetadata } from "./inline-transport-audit.js";
 /**
@@ -454,6 +457,7 @@ export interface KeelPreparedTokenURIFragment {
 }
 
 export interface KeelPreparedOneOfOneTokenURI {
+  readonly externalPreview?: KeelExplicitExternalPreview;
   readonly schema: "keel-prepared-one-of-one-token-uri@1";
   readonly animationEncoding: "base64" | "percent" | "raw-percent";
   readonly requiredBuilder: "KeelHarnessBuilder" | "KeelPercentTokenURIBuilder" | "KeelRawTokenURIBuilder";
@@ -2164,6 +2168,7 @@ export async function buildKeelInlineFollowLatestTokenURIBodyGraph(
  * reusable middle graph between them.
  */
 export async function buildKeelPreparedOneOfOneTokenURI(input: {
+  readonly externalPreview?: KeelExplicitExternalPreview;
   readonly registeredNativeGzip?: KeelRegisteredNativeGzipProof | undefined;
   readonly graph: Pick<
     KeelInlinePreEncodedTokenURIGraph
@@ -2216,6 +2221,8 @@ export async function buildKeelPreparedOneOfOneTokenURI(input: {
   /** Collector-facing Inline is the default. Other routes must be explicit. */
   readonly presentationPolicy?: KeelPresentationPolicy;
 }): Promise<KeelPreparedOneOfOneTokenURI> {
+  const externalPreview = input.externalPreview === undefined ? undefined : snapshotKeelExplicitExternalPreview(input.externalPreview);
+  if (externalPreview !== undefined && (input.graph.mediaType !== "application/vnd.keel.token-uri-raw-percent-fragment" || input.presentationPolicy !== undefined && input.presentationPolicy !== "collector-inline")) throw new TypeError("Explicit external preview requires the raw-percent canonical collector route.");
   if (!Number.isSafeInteger(input.chainId) || input.chainId <= 0) {
     throw new TypeError("A prepared tokenURI needs a positive safe chain ID.");
   }
@@ -2281,7 +2288,8 @@ export async function buildKeelPreparedOneOfOneTokenURI(input: {
   });
   const contextBytes = encoder.encode(contextJSON);
   const contextDigest = (await createIntegrity(contextBytes)).digest as Hex;
-  assertPreparedImageURI(input.imageURI);
+  if (externalPreview === undefined) assertPreparedImageURI(input.imageURI);
+  else assertKeelExternalPreviewImageURI(input.imageURI, externalPreview);
   const prefixHead = [
     `{"name":${JSON.stringify(`${input.collectionName} #1`)}`,
     `,"description":${JSON.stringify(input.description)}`,
@@ -2342,10 +2350,11 @@ export async function buildKeelPreparedOneOfOneTokenURI(input: {
     if (tokenJSON !== expectedJSON) throw new Error("Prepared raw-percent fragments changed the exact token JSON bytes.");
     const metadata = JSON.parse(tokenJSON) as { readonly animation_url?: unknown };
     if (typeof metadata.animation_url !== "string") throw new Error("Prepared token metadata has no animation_url.");
-    if (presentationPolicy === "collector-inline") assertKeelCollectorInlineMetadata(metadata, { registeredNativeGzip: input.registeredNativeGzip });
+    if (presentationPolicy === "collector-inline") assertKeelCollectorInlineMetadata(metadata, { registeredNativeGzip: input.registeredNativeGzip, externalPreview });
     else assertMarketplaceSafeDataURI(metadata.animation_url, "Prepared token animation_url");
     return {
       schema: "keel-prepared-one-of-one-token-uri@1",
+      ...(externalPreview === undefined ? {} : { externalPreview }),
       animationEncoding,
       requiredBuilder: "KeelRawTokenURIBuilder",
       encodedPrefix,
@@ -2383,7 +2392,7 @@ export async function buildKeelPreparedOneOfOneTokenURI(input: {
   if (tokenJSON !== expectedJSON) throw new Error("Prepared tokenURI fragments changed the exact token JSON bytes.");
   const metadata = JSON.parse(tokenJSON) as { readonly animation_url?: unknown };
   if (typeof metadata.animation_url !== "string") throw new Error("Prepared token metadata has no animation_url.");
-  if (presentationPolicy === "collector-inline") assertKeelCollectorInlineMetadata(metadata, { registeredNativeGzip: input.registeredNativeGzip });
+  if (presentationPolicy === "collector-inline") assertKeelCollectorInlineMetadata(metadata, { registeredNativeGzip: input.registeredNativeGzip, externalPreview });
   else assertMarketplaceSafeDataURI(metadata.animation_url, "Prepared token animation_url");
   return {
     schema: "keel-prepared-one-of-one-token-uri@1",
