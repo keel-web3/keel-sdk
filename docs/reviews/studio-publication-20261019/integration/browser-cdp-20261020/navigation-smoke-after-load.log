@@ -1,0 +1,22 @@
+TAP version 13
+# Subtest: CDP navigates an exact oversized UTF8 data URI with the original 2500ms virtual budget
+ok 1 - CDP navigates an exact oversized UTF8 data URI with the original 2500ms virtual budget
+  ---
+  duration_ms: 547.827462
+  type: 'test'
+  ...
+# Subtest: CDP navigates an exact oversized UTF8 data URI with the original 5000ms virtual budget
+ok 2 - CDP navigates an exact oversized UTF8 data URI with the original 5000ms virtual budget
+  ---
+  duration_ms: 515.023598
+  type: 'test'
+  ...
+1..2
+# tests 2
+# suites 0
+# pass 2
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 1093.838165

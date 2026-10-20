@@ -1,0 +1,12 @@
+[
+  {
+    "file": "tests/link-assembly-browser.test.mjs",
+    "unchangedAssertCalls": 27,
+    "assertionsSha256": "a2470dcfa4c1ae862d478ecebe9e52cfe6b802e8884cbec9b216683d746a3e1e"
+  },
+  {
+    "file": "tests/sdk-verification-shell-browser.test.mjs",
+    "unchangedAssertCalls": 51,
+    "assertionsSha256": "713e4fd9390a0336c40be08fe50442cd6344f8843b3e8ec1851a041a1f730eba"
+  }
+]

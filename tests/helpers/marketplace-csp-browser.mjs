@@ -125,7 +125,13 @@ async function connectSocket(endpoint) {
 }
 
 /** Startup failures and observation failures use the same owned-child cleanup. */
-export async function launchCspBrowser(binary) {
+export async function launchCspBrowser(binary,{fixtureMode='csp-audio'}={}) {
+  const fixtureArgs={
+    'csp-audio':['--mute-audio','--autoplay-policy=document-user-activation-required'],
+    'dom-dump':[],
+    'link-dom-dump':['--ignore-certificate-errors','--disable-features=BlockInsecurePrivateNetworkRequests,LocalNetworkAccessChecks'],
+  }[fixtureMode];
+  if(fixtureArgs===undefined)throw new TypeError('Unknown browser fixture mode');
   const profile=await mkdtemp(join(tmpdir(),'keel-marketplace-csp-'));
   let child,socket,session,exitPromise,closePromise,childError;
   const close=()=>closePromise??=(async()=>{
@@ -155,7 +161,7 @@ export async function launchCspBrowser(binary) {
     if(closeError)throw closeError;
   })();
   try {
-    child=spawn(binary,['--headless','--mute-audio','--autoplay-policy=document-user-activation-required','--remote-debugging-port=0',`--user-data-dir=${profile}`,'about:blank'],{stdio:['ignore','ignore','pipe']});
+    child=spawn(binary,['--headless',...fixtureArgs,'--remote-debugging-port=0',`--user-data-dir=${profile}`,'about:blank'],{stdio:['ignore','ignore','pipe']});
     // Attach before any await or kill, so an early exit cannot race cleanup.
     exitPromise=new Promise(resolve=>child.once('exit',resolve));
     child.on('error',error=>{childError=error;});

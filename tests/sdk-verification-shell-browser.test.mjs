@@ -1,5 +1,4 @@
 import assert from "node:assert/strict";
-import { spawn } from "node:child_process";
 import { once } from "node:events";
 import { readFile, readdir, stat } from "node:fs/promises";
 import { createServer } from "node:http";
@@ -15,6 +14,7 @@ import {
   buildKeelInlineShellFragments,
 } from "../packages/sdk/dist/index.js";
 import {observeOfflineShell} from "./support/offline-shell-browser.mjs";
+import {dumpBrowserDom} from "./helpers/browser-dom-navigation.mjs";
 
 async function headlessChrome() {
   if (process.env.KEEL_CHROME_HEADLESS_SHELL) return process.env.KEEL_CHROME_HEADLESS_SHELL;
@@ -27,18 +27,8 @@ async function headlessChrome() {
   return candidate;
 }
 
-function dumpDOM(binary, url) {
-  return new Promise((resolve, reject) => {
-    const child = spawn(binary, ["--headless", "--virtual-time-budget=2500", "--dump-dom", url], { stdio: ["ignore", "pipe", "pipe"] });
-    let stdout = "";
-    let stderr = "";
-    child.stdout.setEncoding("utf8");
-    child.stderr.setEncoding("utf8");
-    child.stdout.on("data", (value) => { stdout += value; });
-    child.stderr.on("data", (value) => { stderr += value; });
-    child.on("error", reject);
-    child.on("close", (code) => code === 0 ? resolve({ stdout, stderr }) : reject(new Error(`Chrome failed (${code}): ${stderr}`)));
-  });
+async function dumpDOM(binary,url) {
+  return await dumpBrowserDom(binary,url,{virtualTimeBudgetMs:2500,fixtureMode:'dom-dump'});
 }
 
 async function fixtureServer() {

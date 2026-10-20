@@ -1,0 +1,21 @@
+{
+  "sdkBase": "64e5fa37667ac424ae87019c7609581dfc2ea364",
+  "node": "v22.22.1",
+  "contractsSource": "6e4116d43d9ae257ba7a3f05971a9cc56ec72f68",
+  "browserSha256": "0b20b130e7edd9dd51873be867761295fe0cfad490c2b9a64f95bd3cfc08fa71",
+  "wrapperSha256": "70470be226ed33490b2957484aa7d41ce3ed514a64cac6570d6695d34764ddaa",
+  "hashes": {
+    "packages/sdk/dist/inline-viewer-graph.js": "be3d38a1beff1d967afdfc62db975583a9b57a1d64f48c153ee9b47bffd37638",
+    "packages/sdk/dist/verification-shell.js": "ca3b5c6c28129eaad884d08297aadce9a004e440193fb5c30fdd5fa87e863c8f",
+    "packages/sdk/src/inline-viewer-graph.ts": "6e426ae6240ac16915e24c2d91bf97b601e3f91877b367981f48f620fec53a58",
+    "packages/sdk/src/verification-shell.ts": "e137704169b91974afb1e79d5b13b9247d2fd49c58eab6e84f97b07e59104849"
+  },
+  "linkArtifactHashes": {
+    "KeelLinkURIBuilder.t.sol/LinkEnumProbe.json": "0cec4ba01f75696686c68127ac4ce9283bd6159f9b11cf431fbf930610c77872",
+    "KeelLinkURIBuilder.t.sol/LinkAssemblyStore.json": "d2e4763c2caad77d2d04422d67256c443f548bb934330ce5576842083ead9300",
+    "KeelLinkURIBuilder.t.sol/LinkAssemblyManager.json": "ea65d01fd6583dc32cb609cde6736151b8792a2fa0e2bc0a6278d0335b04623d",
+    "KeelLinkURIBuilder.t.sol/LinkAssemblyRegistry.json": "64bbb6b65df60ff43ad46a1171487e7a22b84839d2ee1e4510f562b7a5d05d8e",
+    "KeelLinkRegistry.sol/KeelLinkRegistry.json": "cf8a5e2580aaecb1df5e44fea7abb25b755e0d0f6110c72437bb3fb759bf03ad",
+    "KeelLinkURIBuilder.sol/KeelLinkURIBuilder.json": "f74863bbab8fa8cbdb802ec20ae5e6001378ef925c6506d1ab3b36c7c1712d5b"
+  }
+}
