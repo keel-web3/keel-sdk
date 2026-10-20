@@ -1,0 +1,114 @@
+{
+  "schema": "independent-owner-scope-wallet-route-and-gator-dependency-review@1",
+  "decision": "PREREQUISITE_AUTHORIZATION_AND_EXISTING_WALLET_PATH_CONFIRMED_WITH_EXACT_PREFLIGHT",
+  "reviewerId": "cache-release-independent-reviewer",
+  "authorizationEvidence": "Parent /root trusted current user-scope message: user explicitly approved the reviewed three infrastructure deployments, asks if browser wallet action is needed; agent must not sign, submit, activate or spend on artwork.",
+  "approvedPacketSHA256": "628d9615dacfd046e557821557c2b042fab1bc0e673f9c65bd887bbf9882e1db",
+  "ownerPrerequisiteApprovalReported": true,
+  "newOwnerApprovalLoopRequired": false,
+  "agentSigningApproved": false,
+  "agentSubmissionApproved": false,
+  "artworkSpendApproved": false,
+  "productionActivationApproved": false,
+  "walletAction": {
+    "humanActionRequired": true,
+    "network": "Ethereum Sepolia11155111",
+    "sender": "0x764E3EE7A844d9165937c41fd08086e43b997149",
+    "sequence": "Three separate CREATE approvals, nonces296/297/298, wait for each successful exact receipt/runtime before next.",
+    "existingRoute": "/studio/contracts/deploy",
+    "inputSchema": "keel-studio-deployment-review@1 wrapping maintained MCP keel-wallet-deploy-request@1",
+    "packetIsDirectlyImportable": false,
+    "preparationNeeded": "Prepare three registered compatible deployment-review envelopes from exact reviewed artifact/initcode/data/value/gas/runtime; final owner packet is not the UI import schema.",
+    "requestIssuance": "Owner clicks Approve deployment in wallet; normal walletClient.sendTransaction is line63. Reviewer/agent must not click that action or invoke a custom/devtools wallet request.",
+    "source": [
+      {
+        "path": "apps/studio/src/lib/contract-deployment.ts",
+        "bytes": 7163,
+        "sha256": "d6a6494f7a5915a6b2f97bdcadce03196dd0acadc01b499c1ba036b076972c6e",
+        "oldProductionSourceAndCandidateEqual": true
+      },
+      {
+        "path": "apps/studio/src/components/studio/workspace/contracts/deployment-review.tsx",
+        "bytes": 12495,
+        "sha256": "97176b5a2ea9a5c7a8d580c2916885bef4fff61974f3a199f3e300d029f4852f",
+        "oldProductionSourceAndCandidateEqual": true
+      },
+      {
+        "path": "apps/studio/src/app/studio/contracts/deploy/page.tsx",
+        "bytes": 889,
+        "sha256": "4e63576c83cb19cf49926471b4d183f4076d5983de539213684f8a4b57cdb5f7",
+        "oldProductionSourceAndCandidateEqual": true
+      }
+    ],
+    "checks": [
+      "contract-deployment.ts30-35 validates strict envelope SHA256, initcodeKeccak and value/gas.",
+      "contract-deployment.ts38-56 enforces exactsender/chain, confirmed==pending nonce, gas/estimate/block bounds, fresh expectedruntime, predictedcode emptiness and fees.",
+      "deployment-review.ts55-58 gives120s review lifetime and rechecks same nonce/address, rejecting increased fee estimates.",
+      "Persistent submission lock and uncertain-outcome journal preserve any pending request; no clearing/retry bypass."
+    ],
+    "scopeGapAndSafeUse": "Generic file does not embed original nonce or fee caps. Before exposing each owner action, compare its displayed unsigned nonce/predictedaddress and exact fields to approved packet and fresh state, record those facts, and require fees within approved per-transaction caps and remaining total. Existing approve check then rejects drift from that reviewed nonce/address/fee baseline. No new approval loop is needed for lower fees within an approved ceiling.",
+    "feeAuthorization": {
+      "totalCeilingWei": "102279227284770",
+      "totalCeilingSepoliaETH": "0.00010227922728477",
+      "packetMaxFeePerGasWei": "1000030",
+      "packetPriorityCapWei": "1000000",
+      "freshLowerOrEqualPermitted": true,
+      "requirements": "Record fresh chosen fee caps explicitly before owner request; reject any above approved cap or remaining total. Keep target/data/value/gas/nonce exact. Do not label a fresh lower-fee signed envelope byte-identical to historical simulation fee fields. Positive exact runtime check stays required.",
+      "higherFeeOrNonceDrift": "STOP; no silent change or invented authorization."
+    }
+  },
+  "gatorTechnicalDependency": {
+    "newThreeDeploymentsRequired": false,
+    "capture": {
+      "bytes": 16947770,
+      "sha256": "8e1083ed3d1963c151bf12c94fc1672d01f241de4c0fd11f901c69bb23a37949"
+    },
+    "planSHA256": "d6c14c345422206c83c2c2d48ca481a6ec8c1f9c4b9a1d6080bbf8bfa6e650eb",
+    "binding": {
+      "artifactId": "91d644eb-9faa-44b0-a67e-4ac432bcf5fc",
+      "artifactRevision": 1,
+      "releaseId": "fc69f51d-e570-4936-b469-85f1c8ad5331",
+      "releaseRevision": 3,
+      "sourceSnapshotDigest": "0x6e6c6611be77a3aff8f025762b944f79d202aa523864f73c4b08b555d8d0217e",
+      "manifestDigest": "0xa04bb6b4460c994f9f5f0ea9e11d0485fdab6704f4529f14a6b1f64a80a882d1",
+      "planDigest": "0xa5e5b9dcbbd5ffe19c216bd291721546aed79c4d63e9924a296332c2ddeb1ed6",
+      "deadline": "1792560144"
+    },
+    "reader": "0xFbBb2a0c470aC0e81ED35de6722E26Ca8fF8134D",
+    "metadataTarget": "0x5A060e6a06848F9d0538F48cb4970AeeE8d1446a",
+    "existingFactory": "0xe7F47a76d2887d0a54F7C40dCf7ffcC69e6f22be",
+    "preparationTargets": {
+      "0x93f8bb414f22d5Df29Db6d67b78224D69453A094": 24,
+      "0xe7F47a76d2887d0a54F7C40dCf7ffcC69e6f22be": 1,
+      "0x96Cef44bDd8647F42c66d1B82e69334a9b4aDcB3": 1,
+      "0x5A060e6a06848F9d0538F48cb4970AeeE8d1446a": 3,
+      "0xEF3306378895a9B49ed16416A8fCb767E79b8595": 1
+    },
+    "newAddressOccurrencesIncludingEmbeddedHex": {
+      "0x368c3d58d4409774ba6014c97778f22e3cffac35": 0,
+      "0xa1496dcee98fcf986bee0e105439e684d79e37fd": 0,
+      "0x924c5fa733cf9ef24dc7b355261660dddb24cb1d": 0
+    },
+    "nativeComponent": {
+      "executorSha256": "8a2970e2cebc1f4b51bd228ab7fa53208e2d247030f46037991351115f12a3b5",
+      "brokerSha256": "9936f4b8661b4a8b396b581f5e6152b37a442dfc04d56e1960c7f59687a1da26",
+      "imageId": "sha256:d97ddf2aba94cb963646fdf05bc8dc8c99b7e69b8c19bad85c06bea7c67fc9f5"
+    },
+    "actualFullStrictQualificationReceiptSHA256": "b39fd4207da5ae9462f935f362156aa337ea970cb505e1bd9ec9ea454dce1d6e",
+    "nativeCalls": 34,
+    "signingOrLivePublicationProven": false
+  },
+  "gifAndReleaseGate": {
+    "gifFailureEvidence": "/private/tmp/keel-private-final-original-assembly-20261020/gif/normal.failure.json",
+    "specificBlocker": "Old e7F factory historical envelope prefix cap32768 vs exactGIF prefix256001/suffix2042. New maintained factory/media route addresses this separate originalGIF prerequisite.",
+    "mandateEvidence": [
+      "docs/reviews/studio-publication-20261019/lead/late-wave-ledger.md:236-238",
+      "docs/reviews/studio-publication-20261019/lead/required-original-submissions.json"
+    ],
+    "gate": "Both originals are mandatory actual deployed simulation+unsigned wallet boundary cases under the user mandate. GIF is a release-wide acceptance gate, not a newly manufactured Gator call dependency.",
+    "actualGIFProofStillRequiredAfterDeployments": true
+  },
+  "whyGatorIsNotLive": "Candidate FE944/b524/d97 has not been activated; last production observation still cacc/SDK505/a53/buildxOH. A passing isolated full native qualification is not deployed UI, user wallet handoff, historical asset browser acceptance or transaction submission.",
+  "ownCopyBoundary": "Exact ownJuniper Gator copy project1cef1869-6d1b-4840-b3de-63d8def2e390 is the required normal deployed unsigned-wallet test before involving Kthings again; no artwork publication approval follows from prerequisite approval.",
+  "liveUIObservationScope": "Production source includes existing route; parent confirms relevant deployed/browser source equality. Reviewer public web open was inaccessible and is not a live UI pass. No browser wallet request was issued."
+}
