@@ -1,0 +1,16 @@
+{
+  "schema": "keel.independent-cache4355-test-assertion-parity@1",
+  "base": "0e3cba39ef09228b8b70a3db9045074fe1ca24bc",
+  "successor": "4355c1be6",
+  "unchangedPriorClassASTs": [
+    "Files",
+    "Plan",
+    "Lifecycle",
+    "CorrectiveReferences",
+    "CorrectiveMoves"
+  ],
+  "onlyAddedClasses": [
+    "KernelNoExecutable"
+  ],
+  "allPriorAssertionsUnchanged": true
+}

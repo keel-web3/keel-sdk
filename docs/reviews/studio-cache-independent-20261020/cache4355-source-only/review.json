@@ -1,0 +1,78 @@
+{
+  "schema": "keel.independent-cache4355-inode-kernel-review@1",
+  "decision": "APPROVE_NARROW_SOURCE_CHANGES_ONLY_NO_CLEANUP_ADMISSION",
+  "sourceCommit": "4355c1be6",
+  "evidenceHEAD": "52e5dd3af04c5e82edbff7ab3413cd216fd0c3a5",
+  "operatorSHA256": "028905e213821a2d75327cc6748f2a7121d5b521dac93095213d187d59ad4af8",
+  "closedFinding": "CC3 now verifies cwd/exe device and inode before pathname checks; unchanged real Linux UID1000 retained-cwd regression rejects despite demonstrable retained relative access.",
+  "kernelQualification": "Only missing exe is qualified, with both PF_KTHREAD0x00200000 and Kthread:1 plus independently observed empty FD table/maps. All cwd/FD/maps/mount, denied access and still-live unknown-boundary checks remain.",
+  "independentResults": {
+    "LinuxCases": 49,
+    "failures": 0,
+    "skips": 0,
+    "additionalRealUID1000ChildControl": "PASS",
+    "priorFiveTestClassASTsUnchanged": true
+  },
+  "remainingBlocker": "Actual read-only namespace preflight is blocked by systemd inaccessible /home mount. Root is preparing a separately reviewed narrow visibility correction. This receipt grants no cache cleanup or permission-denial bypass.",
+  "cleanupApproved": false,
+  "importAuthority": "Only the separate exact image95 import admission applies, with actual2247132160B capacity and guards required.",
+  "activationApproved": false,
+  "productionActions": false,
+  "evidence": [
+    {
+      "path": "/Users/ravonus/dev/wt/studio-cache-independent-review-20261020/docs/reviews/studio-cache-independent-20261020/cache4355-source-only/assertion-parity.json",
+      "bytes": 372,
+      "sha256": "1be5cb55c0ef4a06d69636498aeec8c9e6eeb4389b27583c10ce87ecf8e8629d"
+    },
+    {
+      "path": "/Users/ravonus/dev/wt/studio-cache-independent-review-20261020/docs/reviews/studio-cache-independent-20261020/cache4355-source-only/cleanup-public-caches.py",
+      "bytes": 20351,
+      "sha256": "028905e213821a2d75327cc6748f2a7121d5b521dac93095213d187d59ad4af8"
+    },
+    {
+      "path": "/Users/ravonus/dev/wt/studio-cache-independent-review-20261020/docs/reviews/studio-cache-independent-20261020/cache4355-source-only/cleanup-public-caches.test.py",
+      "bytes": 17834,
+      "sha256": "ee406e495e724bb0a4ea25f376fae81fa4a9ffe22ad0bef92956dde33e7bcad5"
+    },
+    {
+      "path": "/Users/ravonus/dev/wt/studio-cache-independent-review-20261020/docs/reviews/studio-cache-independent-20261020/cache4355-source-only/linux-process.json",
+      "bytes": 139,
+      "sha256": "2e82c135ecdcf5cd15380447e336a4342ba205bb22fd6449ea566485fb71fe76"
+    },
+    {
+      "path": "/Users/ravonus/dev/wt/studio-cache-independent-review-20261020/docs/reviews/studio-cache-independent-20261020/cache4355-source-only/linux.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/Users/ravonus/dev/wt/studio-cache-independent-review-20261020/docs/reviews/studio-cache-independent-20261020/cache4355-source-only/linux.stdout",
+      "bytes": 3002,
+      "sha256": "eecad9326608007ae6da085718126772cb70fe3e6b80be1c73f73a508231b97c"
+    },
+    {
+      "path": "/Users/ravonus/dev/wt/studio-cache-independent-review-20261020/docs/reviews/studio-cache-independent-20261020/cache4355-source-only/real-cwd-binding.json",
+      "bytes": 326,
+      "sha256": "a63a0ef9d4f69a3c27499287db0db20660107b0a2e0485bbf4fdb198f7ef253d"
+    },
+    {
+      "path": "/Users/ravonus/dev/wt/studio-cache-independent-review-20261020/docs/reviews/studio-cache-independent-20261020/cache4355-source-only/real-cwd-process.json",
+      "bytes": 145,
+      "sha256": "a41a859de0d07a9180680facf7e10f0760b6bea00cca5e9de1176ffc4c53f018"
+    },
+    {
+      "path": "/Users/ravonus/dev/wt/studio-cache-independent-review-20261020/docs/reviews/studio-cache-independent-20261020/cache4355-source-only/real-cwd-run.py",
+      "bytes": 3821,
+      "sha256": "2206a13db4b8c96460d557d6d5dbf75431d967b3925710dc8362c5100e61efbd"
+    },
+    {
+      "path": "/Users/ravonus/dev/wt/studio-cache-independent-review-20261020/docs/reviews/studio-cache-independent-20261020/cache4355-source-only/real-cwd.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/Users/ravonus/dev/wt/studio-cache-independent-review-20261020/docs/reviews/studio-cache-independent-20261020/cache4355-source-only/real-cwd.stdout",
+      "bytes": 483,
+      "sha256": "51ea666c36f6c6a54222cdefbf62de3ce300bf060639cc5c4363b6d8f13e96c2"
+    }
+  ]
+}
