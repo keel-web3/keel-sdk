@@ -1,0 +1,29 @@
+{
+  "schema": "independent-wallet-provider-routing-interface-review@1",
+  "decision": "INTERFACE_ONLY_EXACT_DIFF_REVIEW_PENDING",
+  "reviewerId": "cache-release-independent-reviewer",
+  "scope": "User requested automatic capable-provider routing, wallet reads first and approved KEEL capable fallback, through existing maintained deployment review. No new owner approval loop, transaction submission path, artwork spend or activation.",
+  "mustPreserve": [
+    "Cheap wallet account/chain/state reads first; exact sender, approved nonce/predictedaddress, value, gas, calldata and fee-ceiling policy remain. Lower/equal recordedfees within approvedcap are allowed.",
+    "Use known method/body/gas/fork capability data to choose the approved capable source before dispatching a known-incompatible expensive payload. Never fix provider limits by truncation, gas clamping, changing fees/nonces/data, splitting a program or unpinning.",
+    "Fallback is limited to approved read/simulation scope with same chain, exact method/params and authenticated canonical block. Fresh pending nonce/chain conflicts or reorg stop rather than reconcile by changing transaction identity.",
+    "HTTP401/403, access denial, genuine contract revert, invalid proof or wrong-chain/header are terminal and never rotated as transport capability failures.",
+    "Unknown outcome from a full eth_simulateV1 must not trigger duplicate execution or backend replay; retain consumed attempt and reconcile. Do not apply an ordinary idempotent-read retry policy to this method.",
+    "The factory wallet attempt84bb19006925a4d3c24c06366671d10c591090cc2b4e1ec098fe0078e879af59 is being reconciled from its exact hash; no new send or nonce guess. Existing submission lock/journal must survive refresh, route change, cancellation and unknownresponse.",
+    "Server provider URL/auth credentials stay server-only, never in client build/querystrings/request review or raw errors. Return only bounded redacted capability diagnostics.",
+    "Server fallback endpoint is not an open RPC proxy: strict method/chain/field allowlist, exact request/response/time/attempt/gas budgets, appropriate existing auth/rate limits, no arbitrary URL/protocol, and no send/sign/wallet methods.",
+    "The ordinary user Approve action remains the only wallet-request entry. Agent must not inject devtools/custom wallet requests or Confirm the wallet."
+  ],
+  "focusedControlsForExactSuccessor": [
+    "Wallet-capable route preserves input and never invokes KEEL fallback.",
+    "Known wallet body/gas/fork incapability selects approved KEEL source before the incompatible payload is sent; cheap wallet identity reads may still occur.",
+    "Fallback sees same exact method/params and pinned chain/header; mismatches stop.",
+    "401 and403, contract revert, reorg/invalid proof terminate without another recipient.",
+    "Full simulation unknownoutcome is retained without duplicate execution; submitted tx unknownoutcome reconciles exacthash without resend.",
+    "Request/response/attempt/time/gas limits reject before unbounded work; server auth redaction and deny-send/sign negative controls.",
+    "Existing exact unsigned wallet fields, user fee ceiling, nonce guards, canonical receipt/runtime readback and journal recovery remain green."
+  ],
+  "sourceApprovalGranted": false,
+  "newRPCOrTestsExecutedByReviewer": false,
+  "activationApproved": false
+}
