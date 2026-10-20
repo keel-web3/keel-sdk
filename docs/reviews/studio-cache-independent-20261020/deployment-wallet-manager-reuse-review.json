@@ -1,0 +1,414 @@
+{
+  "schema": "keel-independent-deployment-tooling-and-authority-review@1",
+  "decision": "REUSE_EXACT_VERIFIED_SHARED_INFRASTRUCTURE; NO REDEPLOYMENT SOLELY TO CHANGE PAYER",
+  "role": "Independent source and existing evidence review only",
+  "sourceHeadsObserved": {
+    "reviewBase": "bbaf843cdde3c0acc1833351bb8017a2f156b8ea",
+    "site": "190b227ce9d0f528846b1fc0003ba05b6d477080",
+    "contractsEvidence": "d0f35b7e2a48622a8488fbb2d75529452431ad10",
+    "sdkCacheCandidate": "a9cd9f8048bcd4096abafd0cc4e1c7265dc2c581",
+    "qa": "5f51b7d9e47ae182bb9e6ed8e990ab312fe29ddc"
+  },
+  "latestUserArchitecture": {
+    "sharedInfrastructure": "Use the existing KEEL deployment wallet/tooling for future shared platform deployments.",
+    "customCreatorDeployment": "Separate custom-contract browser feature; follow-up implementation and tests are paused by the user.",
+    "noNewProtocolInferred": true,
+    "noMorePersonalBrowserSharedInfrastructureRequests": true
+  },
+  "deploymentTooling": {
+    "establishedKeelPublicDeployerFromExistingCheckpoints": "0x404A6bd65EF48AE85Da7b0E9358715a34A401b05",
+    "keyFileOverrideEnvName": "KEEL_DEPLOYER_KEY_FILE",
+    "defaultCredentialFilenameFromSource": ".secrets/vault-sepolia-deployer.json",
+    "otherEnvNames": [
+      "KEEL_RPC_URL",
+      "KEEL_MANAGER_GOVERNORS",
+      "KEEL_SEPOLIA_OUTPUT_DIRECTORY",
+      "KEEL_PUBLICATION_JOB_SEPOLIA_DEPLOYER_FILE",
+      "KEEL_PUBLICATION_JOB_SEPOLIA_AUTHORITY_FILE",
+      "KEEL_PUBLICATION_JOB_SEPOLIA_BROADCAST"
+    ],
+    "credentialContentsInspected": false,
+    "credentialExistenceOrUnlockabilityClaimed": false,
+    "frayIsDistinct": {
+      "source": "scripts/deploy-fray-sepolia-stack.mjs",
+      "publicPublisher": "0xB92Bf2C3f4768bAc142A0E42d35784c95e6A8dB0",
+      "keystoreFilenameFromSource": ".secrets/sepolia-bots/bot-1",
+      "passwordSourceType": "login Keychain; not invoked"
+    },
+    "existingScriptsAreNotThisReleaseExecutionPlan": "Do not rerun a full stack/showcase or FRAY deployment script for these already deployed dependencies. Their presence establishes the prior wallet/tool convention, not authority for unrelated transactions.",
+    "checkpointFactsAreRecordedNotFreshChainState": true,
+    "publicCheckpointEvidence": [
+      {
+        "path": "/Users/ravonus/dev/wt/studio-publication-20261019/keel-site/apps/studio/.data/stratus-sepolia-showcase/deployment.json",
+        "bytes": 5662,
+        "sha256": "8baf053e84d96e2856cb3babbaef22ea533e78ea2add50239d9f7f920964b24e",
+        "lines": [],
+        "recordedSchema": "oca-sepolia-showcase-deployment@1",
+        "chainId": 11155111,
+        "recordedPublicDeployer": "0x404A6bd65EF48AE85Da7b0E9358715a34A401b05",
+        "recordedManagerContracts": {
+          "managerImplementation": {
+            "address": "0x9be5cd3af690948472a614aa9b5aba97b29736b7",
+            "blockNumber": "11476922",
+            "transactionHash": "0xf201adb7424eed1844591f27411b761d120325dfa39abac03e70c93f768c3000"
+          },
+          "stratusManager": {
+            "address": "0x7cb6d62cdd968ba45a8a1f0d99a02e5e274fe6e3",
+            "blockNumber": "11476924",
+            "transactionHash": "0xd651408d7ec6f222aa5a47655ce34e7f92fd02a92c58bee1f1f69c69d25455c2"
+          },
+          "mintAccessManager": {
+            "address": "0xec125031e5972f0f874b313e8e3c69d42503c9cf",
+            "blockNumber": "11476928",
+            "transactionHash": "0xa92c538456ad309617e5354e9110b0b404858ed343ee9baaa8d2e19dce46e0ed"
+          }
+        }
+      },
+      {
+        "path": "/Users/ravonus/dev/wt/studio-publication-20261019/keel-site/apps/studio/.data/stratus-publication-job-sepolia/deployment.json",
+        "bytes": 3297,
+        "sha256": "37c1c13d80af452f1dfb3b5015e7a84e12b2ddf573ac4b3ff65648e3acd430f9",
+        "lines": [],
+        "recordedSchema": "stratus-publication-job-sepolia@1",
+        "chainId": 11155111,
+        "recordedPublicDeployer": "0x404A6bd65EF48AE85Da7b0E9358715a34A401b05",
+        "recordedPublicGovernors": [
+          "0x1bF2d0B339b5850F88eCe7b14a2497c3Dc821C90",
+          "0x296fdA826B65e8b6E47B02fc9E1aE272ca4Bc7df",
+          "0x404A6bd65EF48AE85Da7b0E9358715a34A401b05"
+        ],
+        "recordedManagerContracts": {
+          "managerImplementation": {
+            "address": "0x8ed77c640482fef214b1adf88806112cdbd669e3",
+            "transactionHash": "0x8bb61c035728c2a8f9f6c20878da683b06615a8614ec4e5bedc0b4e6d8caad4b",
+            "blockNumber": "11541239",
+            "gasUsed": "4978829"
+          },
+          "manager": {
+            "address": "0xedd9f3cd41ddd24b638332d63bda429fad66140b",
+            "transactionHash": "0x04a50a988092509536f5f7d03f6459ee88f114e085394e3aad1f839c5b6be24c",
+            "blockNumber": "11541240",
+            "gasUsed": "361249"
+          }
+        }
+      },
+      {
+        "path": "/Users/ravonus/dev/wt/studio-publication-20261019/keel-site/apps/studio/.data/oca-factory-agent-sepolia/deployment.json",
+        "bytes": 1751,
+        "sha256": "a9fc0e75fdfd8dedfef3d2c531e0e42334e92a08fe45c7b97ac5fb6697daa198",
+        "lines": [],
+        "recordedSchema": "oca-factory-agent-sepolia@1",
+        "chainId": 11155111,
+        "recordedPublicDeployer": "0x404A6bd65EF48AE85Da7b0E9358715a34A401b05",
+        "recordedManagerContracts": {}
+      }
+    ]
+  },
+  "authority": {
+    "deploymentSender": "Pays gas and determines CREATE-derived addresses; it is not automatically a contract owner, module governor, or collection administrator.",
+    "directFactory": {
+      "address": "0xa1496dCEe98FCF986Bee0e105439E684D79e37FD",
+      "source": "KeelFactory.sol:33,107,115,128",
+      "noOwnerPauseOrConfigurationSetter": true,
+      "constructor": "Creates its own canonical collection deployer. No sender authority is stored. Creator nonce and signed full configuration control individual collection creation."
+    },
+    "formatter": {
+      "address": "0x368c3d58D4409774ba6014C97778F22E3cffaC35",
+      "source": "Keel721MetadataFormatting.sol:19-21",
+      "authority": "Stateless linked formatting library; no deployer-controlled owner, registry, or setter."
+    },
+    "nativeMedia": {
+      "address": "0x924c5fA733CF9eF24dc7b355261660dddb24cb1D",
+      "source": "KeelNativeMediaPresentation.sol:67,84; KeelRouted721.sol:50,65",
+      "authority": "State is keyed by collection/token. Every edit delegates authorization to the bound collection, including its role, pause, supply and freeze checks. Deployment sender has no global module control."
+    },
+    "manager": {
+      "initialize": "Explicit governor and Admin rosters are constructor-proxy initialization arguments, not implicit authority granted to the deployment payer.",
+      "registration": "configureModule(moduleId, activeModule, expectedCodeHash) is onlySelf, checks nonzero deployed code and extcodehash, increments revision and refuses frozen entries.",
+      "governance": "executeGovernance(Call, deadline, Signature[]) checks exact value, deadline, EIP-712 nonce/epoch and sorted current governor signatures; quorum is ceil(2*n/3). Any account may relay. A payer/key alone does not satisfy quorum.",
+      "consumption": "resolveModule rechecks the active codehash. KeelManagedModule follows the registry and requires layout/configuration compatibility while retaining clone addresses/state. A plain direct factory/native-media/library does not consult an unrelated registry pointer.",
+      "existingMcp": [
+        "keel-manager-modules-inspect",
+        "keel-manager-module-replacement-prepare"
+      ],
+      "selectionRule": "Inspect the actual selected Hold/consumer and pinned registry record before any governed replacement; do not infer a universal active Manager from a showcase manifest.",
+      "newManagerRegistrationRequiredForTheseDirectObjects": "None identified in their exact source or the reviewed direct Routed721 image hook. No registration or governance transaction is authorized by this report.",
+      "liveRosterOrModuleStateReverified": false
+    }
+  },
+  "reuse": {
+    "allThreeCanonicalEvidence": [
+      {
+        "path": "/Users/ravonus/dev/wt/studio-publication-20261019/qa-final/keel-site/docs/reviews/studio-publication-20261019/qa/formatter-chain-receipt-01/result.json",
+        "bytes": 5849,
+        "sha256": "61fc008fb9b5f7cf7d36bf952731b2593e5efd669d46a17657bbd2d83efe9b3f",
+        "lines": [],
+        "role": "formatter",
+        "result": "PASS_FIRST_FORMATTER_CANONICAL_RECEIPT_AND_EXACT_RUNTIME",
+        "transactionHash": "0x3860667f372e44c35807635f9d10821526c683443c8406316a651241dcb62ce6",
+        "scope": "Existing independent QA receipt inspected locally; no new chain query by this reviewer."
+      },
+      {
+        "path": "/Users/ravonus/dev/wt/studio-publication-20261019/qa-final/keel-site/docs/reviews/studio-publication-20261019/qa/factory-chain-receipt-02/result.json",
+        "bytes": 5918,
+        "sha256": "c0425996586df9e3bf429cec1a716f4b9f39ae1608707f059c07b2080be8cb5d",
+        "lines": [],
+        "role": "factory",
+        "result": "PASS_SECOND_FACTORY_CANONICAL_RECEIPT_AND_EXACT_PARENT_RUNTIME",
+        "transactionHash": "0x84bb19006925a4d3c24c06366671d10c591090cc2b4e1ec098fe0078e879af59",
+        "scope": "Existing independent QA receipt inspected locally; no new chain query by this reviewer."
+      },
+      {
+        "path": "/Users/ravonus/dev/wt/studio-publication-20261019/qa-final/keel-site/docs/reviews/studio-publication-20261019/qa/factory-chain-receipt-02/children-result.json",
+        "bytes": 12399,
+        "sha256": "7c53899fdbe19d35f3faea1621084eae14e88d55902de0053e1d4550e585a5dc",
+        "lines": [],
+        "role": "factory children",
+        "result": "PASS_ACTUAL_DEPLOYER_CARRIERS_BINDINGS_AND_B524_CAPABILITY",
+        "transactionHash": null,
+        "scope": "Existing independent QA receipt inspected locally; no new chain query by this reviewer."
+      },
+      {
+        "path": "/Users/ravonus/dev/wt/studio-publication-20261019/qa-final/keel-site/docs/reviews/studio-publication-20261019/qa/native-media-chain-receipt-03/result.json",
+        "bytes": 5879,
+        "sha256": "6ca5803fa8c27bc0ca659ea1b3c2296c0e01e4bd3bcabb732010776dd64d7cfd",
+        "lines": [],
+        "role": "native media",
+        "result": "PASS_THIRD_NATIVE_MEDIA_CANONICAL_RECEIPT_AND_EXACT_RUNTIME",
+        "transactionHash": "0x0cedbca40d4920e0cbbc19c575fd3a436c7f5ca23e9f5f3aea70b69aa34641ff",
+        "scope": "Existing independent QA receipt inspected locally; no new chain query by this reviewer."
+      }
+    ],
+    "qaFreeze": "075d533c",
+    "reuseConditions": "Use the exact receipt-backed addresses, parent and child runtime hashes, collection deployer getter/carriers, and current SDK capability checks already verified by QA. Preserve their transaction provenance; do not rewrite the payer.",
+    "payerOriginRequiresRedeployment": false,
+    "noOwnerTransferNeededForTheseThree": true,
+    "doesNotGrantCollectionOwnership": "Future collection admins remain the exact constructor configuration; the shared deployment payer does not gain artwork rights.",
+    "releaseStatus": "Shared prerequisite deployment/readback is complete in QA evidence. Normal full GIF proof, deployment/configuration review and deployed user-wallet handoff remain separate; this is not release approval."
+  },
+  "customContractFollowUpPaused": {
+    "existingUi": "Contracts workspace Review deployment links /studio/contracts/deploy; imports a bounded strict maintained MCP envelope and preserves the submission journal.",
+    "existingSdkMcp": "wallet-request-prepare explicitly advertises deploy and returns unsigned prepared-only requests.",
+    "discoveryGap": "Hosted Studio MCP keel_whoami exposes contracts but does not expose a custom deployment review route/capability; keel_contracts discovers existing owned/used contracts. Hosted Studio MCP has no custom deployment prepare tool in the reviewed registry. The browser feature is discoverable from the Contracts UI, but its agent handoff is not explicit there.",
+    "deferredRegression": "After the user resumes this feature, test that agent discovery identifies the custom deployment capability and supported review route while distinguishing shared platform infrastructure. Reuse existing read-only contract/receipt evidence and existing parser/journal fixtures; stop before wallet dispatch and do not deploy another contract for the test.",
+    "implementationChanges": false,
+    "testsExecutedThisTask": 0,
+    "newSpendRequiredForDiscoveryRegression": false
+  },
+  "preservedBoundaries": {
+    "signing": false,
+    "submission": false,
+    "chainRpc": false,
+    "credentialReads": false,
+    "signerInstantiation": false,
+    "productionSourceEdits": false,
+    "customFeatureTests": false,
+    "configurationMutation": false,
+    "activationApproval": false
+  },
+  "sourceInputs": [
+    {
+      "path": "/Users/ravonus/dev/wt/studio-publication-20261019/keel-site/apps/studio/scripts/deploy-sepolia-showcase.ts",
+      "bytes": 19212,
+      "sha256": "bea88debc66d6d54bf0feed93207ab66283f9093fab688727fd68bfbc4c0f211",
+      "lines": [
+        25,
+        26,
+        32,
+        59,
+        97,
+        145
+      ]
+    },
+    {
+      "path": "/Users/ravonus/dev/wt/studio-publication-20261019/keel-site/apps/studio/scripts/deploy-keel-publication-job-sepolia.mjs",
+      "bytes": 11675,
+      "sha256": "292f206ee331da455cb604ff92954a2d9dbec78969a2f30e45765abb0d33065a",
+      "lines": [
+        18,
+        25,
+        63,
+        93,
+        191,
+        217
+      ]
+    },
+    {
+      "path": "/Users/ravonus/dev/fray/scripts/deploy-fray-sepolia-stack.mjs",
+      "bytes": 61462,
+      "sha256": "cf33b5364726813140b3c4c7ec02dc36d28b02cf2c84a33610167f040c96f4e8",
+      "lines": [
+        1,
+        38,
+        39,
+        104,
+        108,
+        111,
+        180
+      ]
+    },
+    {
+      "path": "/Users/ravonus/dev/wt/native-prerequisites-49d-20261020/keel-contracts/src/modules/keel-artifacts/KeelManager.sol",
+      "bytes": 64156,
+      "sha256": "19976049c786405ebbcaea528d764bca44ee9df0904dcaeee3a13fa683a0fa7f",
+      "lines": [
+        222,
+        243,
+        401,
+        528,
+        910,
+        931,
+        1178
+      ],
+      "runtimeSourceExactContractsCommit": "6e4116d43d9ae257ba7a3f05971a9cc56ec72f68"
+    },
+    {
+      "path": "/Users/ravonus/dev/wt/native-prerequisites-49d-20261020/keel-contracts/src/modules/keel-kernel/libraries/KeelGovernance.sol",
+      "bytes": 3511,
+      "sha256": "28b9c2165ec9ae4588a277a28a0d83b678705a8424707ca506500a3ef5356705",
+      "lines": [
+        42,
+        45,
+        55
+      ],
+      "runtimeSourceExactContractsCommit": "6e4116d43d9ae257ba7a3f05971a9cc56ec72f68"
+    },
+    {
+      "path": "/Users/ravonus/dev/wt/native-prerequisites-49d-20261020/keel-contracts/src/modules/keel-managed-modules/KeelManagedModule.sol",
+      "bytes": 17002,
+      "sha256": "f8f250bc45eefa24e336f700292a2ac682cc3deff477cddcb11e1a480850d5c1",
+      "lines": [
+        43,
+        89,
+        134
+      ],
+      "runtimeSourceExactContractsCommit": "6e4116d43d9ae257ba7a3f05971a9cc56ec72f68"
+    },
+    {
+      "path": "/Users/ravonus/dev/wt/native-prerequisites-49d-20261020/keel-contracts/src/modules/keel-die/KeelFactory.sol",
+      "bytes": 11360,
+      "sha256": "1cdaf174511273ecc6d56e587443cafd2d2988809cd180090932fbfcda956bac",
+      "lines": [
+        33,
+        107,
+        115,
+        128,
+        226
+      ],
+      "runtimeSourceExactContractsCommit": "6e4116d43d9ae257ba7a3f05971a9cc56ec72f68"
+    },
+    {
+      "path": "/Users/ravonus/dev/wt/native-prerequisites-49d-20261020/keel-contracts/src/modules/keel-die/KEEL721Deployer.sol",
+      "bytes": 7706,
+      "sha256": "aae7fa81d64d3005538e8d8dced4f3234f9df90d76762f30ccfd174a1a388988",
+      "lines": [
+        41,
+        62,
+        99
+      ],
+      "runtimeSourceExactContractsCommit": "6e4116d43d9ae257ba7a3f05971a9cc56ec72f68"
+    },
+    {
+      "path": "/Users/ravonus/dev/wt/native-prerequisites-49d-20261020/keel-contracts/src/modules/keel-die/KeelNativeMediaPresentation.sol",
+      "bytes": 24204,
+      "sha256": "decd4b53795469e96433437b72bd23b09ac9c17b1ce0e66ff59278203d699971",
+      "lines": [
+        26,
+        67,
+        84
+      ],
+      "runtimeSourceExactContractsCommit": "6e4116d43d9ae257ba7a3f05971a9cc56ec72f68"
+    },
+    {
+      "path": "/Users/ravonus/dev/wt/native-prerequisites-49d-20261020/keel-contracts/src/modules/keel-die/KeelRouted721.sol",
+      "bytes": 6659,
+      "sha256": "864f6ca88948bbcf46f0e4d4cdd34a7a4b554cdec167898c9efcf8cb09947916",
+      "lines": [
+        50,
+        65
+      ],
+      "runtimeSourceExactContractsCommit": "6e4116d43d9ae257ba7a3f05971a9cc56ec72f68"
+    },
+    {
+      "path": "/Users/ravonus/dev/wt/native-prerequisites-49d-20261020/keel-contracts/src/modules/keel-die/libraries/Keel721MetadataFormatting.sol",
+      "bytes": 7483,
+      "sha256": "13bbe5d3881d557195bf57a2d3cd4fd0b735f3c0977c5018d922ceb918459e11",
+      "lines": [
+        19,
+        21,
+        92
+      ],
+      "runtimeSourceExactContractsCommit": "6e4116d43d9ae257ba7a3f05971a9cc56ec72f68"
+    },
+    {
+      "path": "/Users/ravonus/dev/wt/studio-proof-state-cache-20261020/keel-sdk/packages/mcp/src/rpc-tools.ts",
+      "bytes": 12915,
+      "sha256": "b33228a0693dcba67b7609ad52d473ff4e4b69fd4b4b6c25e92a7dc6b428f52b",
+      "lines": [
+        55,
+        68
+      ]
+    },
+    {
+      "path": "/Users/ravonus/dev/wt/studio-proof-state-cache-20261020/keel-sdk/packages/mcp/src/tools.ts",
+      "bytes": 142444,
+      "sha256": "15d80ea310d676400752ca203490b89293e44fc472402a6748ab5b8b46dc03c3",
+      "lines": [
+        528,
+        705,
+        1867
+      ]
+    },
+    {
+      "path": "/Users/ravonus/dev/wt/studio-publication-20261019/keel-site/apps/studio/src/server/agent/studio-mcp.ts",
+      "bytes": 72727,
+      "sha256": "253429d9f7797ef54129becb2996ee92ea985f1bfa6e5ccb3add62dfb715f778",
+      "lines": [
+        440,
+        449,
+        480,
+        515
+      ]
+    },
+    {
+      "path": "/Users/ravonus/dev/wt/studio-publication-20261019/keel-site/apps/studio/src/components/studio/workspace/studio-contracts.tsx",
+      "bytes": 15999,
+      "sha256": "acefa2446869a615536c6486bc03bfd04779b49d4dbe5a20c8a93ca6b07cf29a",
+      "lines": [
+        136
+      ]
+    },
+    {
+      "path": "/Users/ravonus/dev/wt/studio-publication-20261019/keel-site/apps/studio/docs/CONTRACT_DEPLOYMENT_REVIEW.md",
+      "bytes": 3297,
+      "sha256": "5bb76f415e0be2300bae642f0abd6afd24cc3316939276b6f819beeed9e68756",
+      "lines": [
+        3,
+        25,
+        32,
+        53
+      ]
+    },
+    {
+      "path": "/Users/ravonus/dev/wt/studio-publication-20261019/keel-site/apps/studio/src/lib/contract-deployment.ts",
+      "bytes": 7163,
+      "sha256": "d6a6494f7a5915a6b2f97bdcadce03196dd0acadc01b499c1ba036b076972c6e",
+      "lines": [
+        25,
+        38,
+        59,
+        66
+      ]
+    },
+    {
+      "path": "/Users/ravonus/dev/wt/studio-publication-20261019/keel-site/apps/studio/src/components/studio/workspace/contracts/deployment-review.tsx",
+      "bytes": 12495,
+      "sha256": "97176b5a2ea9a5c7a8d580c2916885bef4fff61974f3a199f3e300d029f4852f",
+      "lines": [
+        55,
+        63,
+        86
+      ]
+    }
+  ]
+}
