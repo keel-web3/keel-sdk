@@ -1,0 +1,216 @@
+{
+  "schema": "keel.independent-provisional-v2-one-assembly-command@1",
+  "approved": true,
+  "argv": [
+    "/Users/ravonus/.nvm/versions/node/v22.22.1/bin/node",
+    "--conditions=react-server",
+    "/private/tmp/keel-qa-receipt-activation-20261020/keel-site/docs/tools/gif-existing-v2-provisional/run-capture.mjs",
+    "/private/tmp/keel-independent-gif-v2-provisional-20261020/run-config.json"
+  ],
+  "cwd": "/private/tmp/keel-qa-gif-reviewed14-20261020/candidate-400",
+  "executions": 1,
+  "automaticRetry": false,
+  "privateOutputsPrefix": "/tmp/keel-private-gif-existing-v2-provisional-capture-20261020-01/normal",
+  "files": [
+    {
+      "path": "/private/tmp/keel-independent-gif-v2-provisional-20261020/run-config.json",
+      "bytes": 420,
+      "sha256": "494efc3df09dca9f39713486ea3f406485355e31924919d1d61a9d3c08be8706"
+    },
+    {
+      "path": "/private/tmp/keel-independent-gif-v2-provisional-20261020/assembly-review.json",
+      "bytes": 1000,
+      "sha256": "09254086bb442759d8f3cbcb221d749108ad2f70d4c0d255238a9733827aee5c"
+    },
+    {
+      "path": "/tmp/keel-private-gif-existing-v2-provisional-20261020-01/packet.json",
+      "bytes": 3287,
+      "sha256": "eb40a93faf886dd13ee0a902606f96b7da1db7cb34043c8662838f88828d8cb7"
+    },
+    {
+      "path": "/tmp/keel-private-gif-existing-v2-provisional-bundle-20261020-01/bundle-receipt.json",
+      "bytes": 45616,
+      "sha256": "14fe18281be138e9c3553776c9b7020f698cbd5d882d3cbd415c9656f4075f29"
+    },
+    {
+      "path": "/tmp/keel-private-gif-existing-v2-provisional-bundle-20261020-01/normal-original.mjs",
+      "bytes": 1347945,
+      "sha256": "b90bccc1347c646867b3def3229677dc66803967662431c0b09fbb53dd2ea8e2"
+    },
+    {
+      "path": "/private/tmp/keel-qa-receipt-activation-20261020/keel-site/docs/tools/gif-existing-v2-provisional/assembly-failure.mjs",
+      "bytes": 2284,
+      "sha256": "a9d250ac5a915864003230bd5f6031a2a7b923749a55a9bfba1bf2f20011176d"
+    },
+    {
+      "path": "/private/tmp/keel-qa-receipt-activation-20261020/keel-site/docs/tools/gif-existing-v2-provisional/build-bundle.mjs",
+      "bytes": 6938,
+      "sha256": "836de94d858eea88cf0d3b6409e513bd29c6af39a63be88a5f9a88d99bf9b628"
+    },
+    {
+      "path": "/private/tmp/keel-qa-receipt-activation-20261020/keel-site/docs/tools/gif-existing-v2-provisional/capture-entry.ts",
+      "bytes": 2012,
+      "sha256": "7ebd480858c00770379ee2855a567dc0ea34b46a68374552ffaf29ad10f164ec"
+    },
+    {
+      "path": "/private/tmp/keel-qa-receipt-activation-20261020/keel-site/docs/tools/gif-existing-v2-provisional/capture-signer.mjs",
+      "bytes": 3290,
+      "sha256": "66b2420ade80d1e19a6d64db41a5bbbab0e34f22c79bbdf68ecf5d9b2b80c680"
+    },
+    {
+      "path": "/private/tmp/keel-qa-receipt-activation-20261020/keel-site/docs/tools/gif-existing-v2-provisional/check-bundle-import.mjs",
+      "bytes": 4147,
+      "sha256": "d1a32e65a0256691e96cc0af31faa94fcbf5e61da36f45d21b8774c7ef4dad5d"
+    },
+    {
+      "path": "/private/tmp/keel-qa-receipt-activation-20261020/keel-site/docs/tools/gif-existing-v2-provisional/clone-state.mjs",
+      "bytes": 5737,
+      "sha256": "f67d3c69658e29f242d7a532f4fa587e3b3506d1fd12157836a8391df01a268e"
+    },
+    {
+      "path": "/private/tmp/keel-qa-receipt-activation-20261020/keel-site/docs/tools/gif-existing-v2-provisional/clone-state.test.mjs",
+      "bytes": 1374,
+      "sha256": "8298154e8de871450fce229ba61afb803fc240fd2d562d946addb477eb20ba43"
+    },
+    {
+      "path": "/private/tmp/keel-qa-receipt-activation-20261020/keel-site/docs/tools/gif-existing-v2-provisional/deployed-core.mjs",
+      "bytes": 10163,
+      "sha256": "71e3d17dcdcbfa14655b8099c2d0df278ea2424efcf7126c0f758669cde687c9"
+    },
+    {
+      "path": "/private/tmp/keel-qa-receipt-activation-20261020/keel-site/docs/tools/gif-existing-v2-provisional/deployed-core.test.mjs",
+      "bytes": 7283,
+      "sha256": "932663d4cbd6685c8ece5a8ff81b116f6f4c410b00027725209fae073b0e6d1e"
+    },
+    {
+      "path": "/private/tmp/keel-qa-receipt-activation-20261020/keel-site/docs/tools/gif-existing-v2-provisional/diagnostic-signer-context.test.ts",
+      "bytes": 2337,
+      "sha256": "36a27c24c56a011fdc25287771e911d96fc48bbcee1e6c5cd4d3b5a88ca2724c"
+    },
+    {
+      "path": "/private/tmp/keel-qa-receipt-activation-20261020/keel-site/docs/tools/gif-existing-v2-provisional/diagnostic-signer-context.ts",
+      "bytes": 760,
+      "sha256": "2595ec2221292b8144ebf455e6285a76a7847960b3e40a12e568270329515948"
+    },
+    {
+      "path": "/private/tmp/keel-qa-receipt-activation-20261020/keel-site/docs/tools/gif-existing-v2-provisional/drop-diff.mjs",
+      "bytes": 2694,
+      "sha256": "983bc4f561699740a86c06bee3279ac99e13c3f3791ee4e6f4837c020f519e31"
+    },
+    {
+      "path": "/private/tmp/keel-qa-receipt-activation-20261020/keel-site/docs/tools/gif-existing-v2-provisional/drop-diff.test.mjs",
+      "bytes": 4540,
+      "sha256": "73956230e2a697f13e62af8e60696bae81cd50bee5dd46f37b910aa10acf962a"
+    },
+    {
+      "path": "/private/tmp/keel-qa-receipt-activation-20261020/keel-site/docs/tools/gif-existing-v2-provisional/existing-candidate.mjs",
+      "bytes": 827,
+      "sha256": "2e456299679ff3de75046ffca5cd01f8158673a40f68583859eaeb8605f9ad25"
+    },
+    {
+      "path": "/private/tmp/keel-qa-receipt-activation-20261020/keel-site/docs/tools/gif-existing-v2-provisional/existing-candidate.test.mjs",
+      "bytes": 3794,
+      "sha256": "5fc217fa60197311d366498d13ea244eae888d8cbd1b7be7c85abed045666bc7"
+    },
+    {
+      "path": "/private/tmp/keel-qa-receipt-activation-20261020/keel-site/docs/tools/gif-existing-v2-provisional/guided-review-receipt.mjs",
+      "bytes": 1710,
+      "sha256": "c098d0c8b2bdd1e649688948e7ad74308614dee7ceb4dd10bfdf5007d31c75e8"
+    },
+    {
+      "path": "/private/tmp/keel-qa-receipt-activation-20261020/keel-site/docs/tools/gif-existing-v2-provisional/guided-review-receipt.test.mjs",
+      "bytes": 2284,
+      "sha256": "489859359f1faa9fcc7f7daa7c4945c851812017244109476ce78df6ca875c7f"
+    },
+    {
+      "path": "/private/tmp/keel-qa-receipt-activation-20261020/keel-site/docs/tools/gif-existing-v2-provisional/identity.mjs",
+      "bytes": 2223,
+      "sha256": "426164037f2013bdc4053fc03d1f76f256f23ff75454d2de9aa4301f932d4f2a"
+    },
+    {
+      "path": "/private/tmp/keel-qa-receipt-activation-20261020/keel-site/docs/tools/gif-existing-v2-provisional/public-signer-receipt.mjs",
+      "bytes": 2961,
+      "sha256": "a44972e65aa584554726637dd5119682b617c4977e8ab465b30d4d9580d2bf15"
+    },
+    {
+      "path": "/private/tmp/keel-qa-receipt-activation-20261020/keel-site/docs/tools/gif-existing-v2-provisional/public-signer.test.mjs",
+      "bytes": 5725,
+      "sha256": "90ec77dfdc3a38db98ad1b60d487891cf415128005e4a19c8d7010da1f1f16a7"
+    },
+    {
+      "path": "/private/tmp/keel-qa-receipt-activation-20261020/keel-site/docs/tools/gif-existing-v2-provisional/read-schema.mjs",
+      "bytes": 3734,
+      "sha256": "76358b052c390ae7c30f1a99bea29414a29762c15632e62052a1ba924b7445ef"
+    },
+    {
+      "path": "/private/tmp/keel-qa-receipt-activation-20261020/keel-site/docs/tools/gif-existing-v2-provisional/read-schema.test.mjs",
+      "bytes": 3401,
+      "sha256": "f2eaeda588b68ff018b0dd5d5975ba69d714ac3d6f694d70ad73a12729ba2da7"
+    },
+    {
+      "path": "/private/tmp/keel-qa-receipt-activation-20261020/keel-site/docs/tools/gif-existing-v2-provisional/run-capture.mjs",
+      "bytes": 20823,
+      "sha256": "acb8bc5a35444cef07b542f217a1a1a584879342e6ff9785db3430689349937b"
+    },
+    {
+      "path": "/private/tmp/keel-qa-receipt-activation-20261020/keel-site/docs/tools/gif-existing-v2-provisional/run-capture.test.mjs",
+      "bytes": 9403,
+      "sha256": "c2ddb0a5c42487f709c12bc5b35dc0d323f063bdadbb473e7ac2aabd49cc288a"
+    },
+    {
+      "path": "/private/tmp/keel-qa-receipt-activation-20261020/keel-site/docs/tools/gif-existing-v2-provisional/verify-original.mjs",
+      "bytes": 6401,
+      "sha256": "4a226a9459833dee0dc9560f1cc951ed3d9e54d4184bc60fe59a8f196ce23d7e"
+    }
+  ],
+  "scope": {
+    "normalCompilerAssembly": true,
+    "localBlockedCandidateRenewal": false,
+    "candidateRowsBefore": 1,
+    "candidateRowsAfter": 1,
+    "candidateVersionBeforeAndAfter": 2,
+    "candidateId": "d04c272e-b860-4903-9747-b196a2abf828",
+    "candidateDigest": "0xef6a1e18057f709f49e5ad9c8fca18de3ad10fc2dd45edce7ab99caf71d844c2",
+    "fixedDeadline": "1792610916",
+    "all100DatabaseProjectionsUnchanged": true,
+    "immutableInputFilesUnchanged": 155,
+    "diagnosticLatestPointerUnchanged": true,
+    "readUpdatedPublicationReviewCalls": 1,
+    "captureSavedPublicationProgramCalls": 1,
+    "checkFundingMainnetOrHistoryCalls": 0,
+    "projectRevision": 1,
+    "releaseRevision": 14,
+    "originalSourceAndAssetsPreserved": true,
+    "originalDropStageSigner": "public-zero",
+    "diagnosticPublicSignerScopeRevision": 14,
+    "existingDeployedInfrastructureOnly": true,
+    "prefixTransactions": 0,
+    "old23CallEquivalenceClaim": false,
+    "fullNewProgramExecution": false,
+    "privateProgramExecution": false,
+    "remoteSimulation": false,
+    "signing": false,
+    "submission": false,
+    "productionWrites": false,
+    "activation": false
+  },
+  "limits": {
+    "publicRecipient": "https://rpc.sepolia.ethpandaops.io/",
+    "requests": 400,
+    "assemblyMs": 180000,
+    "requestBytesEach": 65536,
+    "requestBytesTotal": 2097152,
+    "responseDecodedBytesEach": 16777216,
+    "responseDecodedBytesTotal": 67108864,
+    "rateLimitAttemptsOnly": 3,
+    "accessDenialRedirectRevertTerminal": true
+  },
+  "failureRule": "Preserve exact attempt and readonly-audit state; no replay/rename/reset/restore or full program execution.",
+  "allSevenOutputsAbsentAtReview": true,
+  "unacceptedPrivateCaptureDiagnosticAllowed": true,
+  "provisionalCaptureAccepted": false,
+  "unchangedStrictVerifierStillRequired": true,
+  "privateFieldDiffGrantsNoAcceptance": true,
+  "newProgramRequiresSeparateActualOutputReviewBeforeExecution": true,
+  "image95OOMAndHTTPTimeoutAreNotPassedOrWaived": true
+}

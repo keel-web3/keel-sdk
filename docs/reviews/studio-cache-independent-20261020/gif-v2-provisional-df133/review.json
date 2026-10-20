@@ -1,0 +1,226 @@
+{
+  "schema": "keel.independent-gif-provisional-diagnostic-review@1",
+  "decision": "APPROVE_ONE_EXACT_READ_ONLY_ASSEMBLY_WITH_UNACCEPTED_PRIVATE_DIAGNOSTICS_ONLY",
+  "sourceCommit": "df1330470a04db49e009b7a5db8ded6e873b8728",
+  "evidenceHEAD": "86e6b9c880998c27b72e6a0daaac2080c9c48e33",
+  "siteCommit": "4002803ccfcb20c39ffe5c555b68d8e197f379f8",
+  "sdkCommit": "b524bf5fc19939c7523aada2e53f79e3360970ea",
+  "packet": {
+    "path": "/tmp/keel-private-gif-existing-v2-provisional-20261020-01/packet.json",
+    "bytes": 3287,
+    "sha256": "eb40a93faf886dd13ee0a902606f96b7da1db7cb34043c8662838f88828d8cb7"
+  },
+  "bundleReceipt": {
+    "path": "/tmp/keel-private-gif-existing-v2-provisional-bundle-20261020-01/bundle-receipt.json",
+    "bytes": 45616,
+    "sha256": "14fe18281be138e9c3553776c9b7020f698cbd5d882d3cbd415c9656f4075f29"
+  },
+  "bundleSHA256": "b90bccc1347c646867b3def3229677dc66803967662431c0b09fbb53dd2ea8e2",
+  "commandAdmission": {
+    "path": "/private/tmp/keel-independent-gif-v2-provisional-20261020/command-admission.json",
+    "bytes": 10050,
+    "sha256": "d2669d2f11002c5bfd0ee21a10349f5be05163b1b000555a8096ebfc0c232d3a"
+  },
+  "strictReview": {
+    "path": "/private/tmp/keel-independent-gif-v2-provisional-20261020/assembly-review.json",
+    "bytes": 1000,
+    "sha256": "09254086bb442759d8f3cbcb221d749108ad2f70d4c0d255238a9733827aee5c"
+  },
+  "config": {
+    "path": "/private/tmp/keel-independent-gif-v2-provisional-20261020/run-config.json",
+    "bytes": 420,
+    "sha256": "494efc3df09dca9f39713486ea3f406485355e31924919d1d61a9d3c08be8706"
+  },
+  "blockingFindings": [],
+  "changeReviewed": "Before the same verifier, persist one private0600 JSON of the returned program explicitly accepted:false/fullProgramExecuted:false/simulationAccepted:false, then a pure ABI per-field hash comparison against the unchanged strict target-only remap reference. No reference or acceptance condition is changed.",
+  "strictVerifierAndSafetyPreservation": {
+    "unchanged22OriginalFiles": [
+      "deployed-core.test.mjs",
+      "capture-signer.mjs",
+      "read-schema.test.mjs",
+      "guided-review-receipt.test.mjs",
+      "public-signer.test.mjs",
+      "assembly-failure.mjs",
+      "guided-review-receipt.mjs",
+      "capture-entry.ts",
+      "identity.mjs",
+      "existing-candidate.test.mjs",
+      "clone-state.mjs",
+      "clone-state.test.mjs",
+      "public-signer-receipt.mjs",
+      "verify-original.mjs",
+      "diagnostic-signer-context.ts",
+      "README.md",
+      "existing-candidate.mjs",
+      "deployed-core.mjs",
+      "check-bundle-import.mjs",
+      "build-bundle.mjs",
+      "diagnostic-signer-context.test.ts",
+      "read-schema.mjs"
+    ],
+    "networkGuardByteIdentical": true,
+    "runReviewFixtureSchemaAndOnePermissionOnlyReverseExact": true,
+    "runFixtureOriginalSHA256": "ef243394ce57d473bd89cd61272e5a1620236fd3d6e05f6e550ebb2c99439936",
+    "runFixtureNewSHA256": "c2ddb0a5c42487f709c12bc5b35dc0d323f063bdadbb473e7ac2aabd49cc288a"
+  },
+  "fixtureApproval": {
+    "decision": "APPROVE_ONLY_NEW_SCHEMA_AND_EXPLICIT_DIAGNOSTIC_PERMISSION_BINDING",
+    "newFixtureSHA256": "c2ddb0a5c42487f709c12bc5b35dc0d323f063bdadbb473e7ac2aabd49cc288a",
+    "oldFixtureSHA256": "ef243394ce57d473bd89cd61272e5a1620236fd3d6e05f6e550ebb2c99439936",
+    "wholeFileReverseExact": true,
+    "allPriorBodiesAndAssertionsUnchanged": true
+  },
+  "independentChecks": {
+    "offline": 99,
+    "actualReadonlyClone": 4,
+    "failures": 0,
+    "skips": 0,
+    "actualOfflineRebuildByteExact": true,
+    "actualImportNoIOAndNoExportCalls": true,
+    "sourcesVerified": 192,
+    "toolFilesVerified": 25,
+    "SDKBuiltFiles": 1754,
+    "SDKBuiltDigest": "3effa2f2e594fe969f592d9446b5095484adf358033c76b83349385956c69df8",
+    "externalPackages": 14,
+    "siteDomainFiles": 45,
+    "all99OriginalProjectionsMatchGuidedAfter": true,
+    "actual100DatabaseProjectionsAndExistingV2Exact": true,
+    "all155ImmutableFilesAndDiagnosticPointerExact": true,
+    "actualStrictReviewValidatorAndCanonicalCLI": "PASS"
+  },
+  "priorAttempt": "The consumed existing-v2 attempt made42HTTP200 calls and failed the unchanged drop comparison. Its returned program was not persisted, so actual differing fields and a digest-only explanation remain unproven. Preserve this failure and all earlier epochs.",
+  "scope": {
+    "normalReadUpdatedPublicationReviewCalls": 1,
+    "normalCaptureSavedPublicationProgramCalls": 1,
+    "fixedExistingCandidateVersion": 2,
+    "renewal": false,
+    "CheckFundingMainnetHistory": false,
+    "candidateOrDatabaseMutation": false,
+    "prefixTransactions": 0,
+    "networkRecipient": "https://rpc.sepolia.ethpandaops.io/",
+    "networkRequests": 400,
+    "assemblyMs": 180000,
+    "newPrivateDiagnosticOutputsOnly": true,
+    "originalGIFWebPURIAndSourcePreserved": true,
+    "newDropFieldHashesAreDiagnosticOnly": true,
+    "strictVerifierFailureRemainsFailure": true,
+    "publicDiagnosticSignerOnly": true
+  },
+  "conditions": [
+    "Root independently verifies all exact command/review/packet/bundle/tool pins and all seven output files absent.",
+    "One command only; fixed candidate identity/digest/deadline and180second remaining window. No retry/reset/restore.",
+    "All100database/schema/candidate fields and155immutable files/latest pointer must remain exact before and after.",
+    "Provisional capture or field-diff output never grants acceptance or execution authority. Any strict-verifier failure must remain explicit.",
+    "Review actual capture and field-level evidence separately before changing references or approving a full program."
+  ],
+  "noCaptureOrRPCExecutedByReviewer": true,
+  "fullSimulationApproved": false,
+  "nativeProgramApproved": false,
+  "signingApproved": false,
+  "spendApproved": false,
+  "submissionApproved": false,
+  "activationApproved": false,
+  "allOriginalReleaseAndImage95GatesRemain": true,
+  "evidence": [
+    {
+      "path": "/Users/ravonus/dev/wt/studio-cache-independent-review-20261020/docs/reviews/studio-cache-independent-20261020/gif-v2-provisional-df133/assembly-review.json",
+      "bytes": 1000,
+      "sha256": "09254086bb442759d8f3cbcb221d749108ad2f70d4c0d255238a9733827aee5c"
+    },
+    {
+      "path": "/Users/ravonus/dev/wt/studio-cache-independent-review-20261020/docs/reviews/studio-cache-independent-20261020/gif-v2-provisional-df133/run-config.json",
+      "bytes": 420,
+      "sha256": "494efc3df09dca9f39713486ea3f406485355e31924919d1d61a9d3c08be8706"
+    },
+    {
+      "path": "/Users/ravonus/dev/wt/studio-cache-independent-review-20261020/docs/reviews/studio-cache-independent-20261020/gif-v2-provisional-df133/command-admission.json",
+      "bytes": 10050,
+      "sha256": "d2669d2f11002c5bfd0ee21a10349f5be05163b1b000555a8096ebfc0c232d3a"
+    },
+    {
+      "path": "/Users/ravonus/dev/wt/studio-cache-independent-review-20261020/docs/reviews/studio-cache-independent-20261020/gif-v2-provisional-df133/source-parity.json",
+      "bytes": 963,
+      "sha256": "cb615ce64503270c85b774b641319ab3fb7c2c9a30f5be099ad7ef5637de8428"
+    },
+    {
+      "path": "/Users/ravonus/dev/wt/studio-cache-independent-review-20261020/docs/reviews/studio-cache-independent-20261020/gif-v2-provisional-df133/offline.stdout",
+      "bytes": 22737,
+      "sha256": "4a2f74e7198ac54357f4754dc0007bf1a31f4a9aa796ac069829d475422b89f9"
+    },
+    {
+      "path": "/Users/ravonus/dev/wt/studio-cache-independent-review-20261020/docs/reviews/studio-cache-independent-20261020/gif-v2-provisional-df133/offline.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/Users/ravonus/dev/wt/studio-cache-independent-review-20261020/docs/reviews/studio-cache-independent-20261020/gif-v2-provisional-df133/clone.stdout",
+      "bytes": 964,
+      "sha256": "d4d0c652dee5f06b95da26c3e0aa580cfec8cc27965291fe83a814cc766643f7"
+    },
+    {
+      "path": "/Users/ravonus/dev/wt/studio-cache-independent-review-20261020/docs/reviews/studio-cache-independent-20261020/gif-v2-provisional-df133/clone.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/Users/ravonus/dev/wt/studio-cache-independent-review-20261020/docs/reviews/studio-cache-independent-20261020/gif-v2-provisional-df133/source-integrity.json",
+      "bytes": 800,
+      "sha256": "bd8d21f6b017edae1b6b14aecd6c415bc0af7dba2fafcc772c9583b3b0f7fab6"
+    },
+    {
+      "path": "/Users/ravonus/dev/wt/studio-cache-independent-review-20261020/docs/reviews/studio-cache-independent-20261020/gif-v2-provisional-df133/closure.stdout",
+      "bytes": 727,
+      "sha256": "78e039bd71cf54d2a5b4e132ea11ebbf0940579bb12c6919c66738f7d74b6b84"
+    },
+    {
+      "path": "/Users/ravonus/dev/wt/studio-cache-independent-review-20261020/docs/reviews/studio-cache-independent-20261020/gif-v2-provisional-df133/closure.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/Users/ravonus/dev/wt/studio-cache-independent-review-20261020/docs/reviews/studio-cache-independent-20261020/gif-v2-provisional-df133/rebuild.stdout",
+      "bytes": 168,
+      "sha256": "7bc69380ebf6aa8c64f75876a94d2900b15c3d943c576bcb4920798230ca306f"
+    },
+    {
+      "path": "/Users/ravonus/dev/wt/studio-cache-independent-review-20261020/docs/reviews/studio-cache-independent-20261020/gif-v2-provisional-df133/rebuild.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/Users/ravonus/dev/wt/studio-cache-independent-review-20261020/docs/reviews/studio-cache-independent-20261020/gif-v2-provisional-df133/admission-validation.stdout",
+      "bytes": 175,
+      "sha256": "99788b0a35d1c341a35427ffadb0c8bb853835ddc7f966cf1be0ff3fa82dd278"
+    },
+    {
+      "path": "/Users/ravonus/dev/wt/studio-cache-independent-review-20261020/docs/reviews/studio-cache-independent-20261020/gif-v2-provisional-df133/admission-validation.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/Users/ravonus/dev/wt/studio-cache-independent-review-20261020/docs/reviews/studio-cache-independent-20261020/gif-v2-provisional-df133/prepare-admission.py",
+      "bytes": 4130,
+      "sha256": "d1fa9a4e3293f4aa74abbf9117dadbe133e8f3e690000ad5827374357bb5d36e"
+    },
+    {
+      "path": "/Users/ravonus/dev/wt/studio-cache-independent-review-20261020/docs/reviews/studio-cache-independent-20261020/gif-v2-provisional-df133/validate-admission.mjs",
+      "bytes": 1427,
+      "sha256": "16af012cfaba9fcec43d1ec0ca0658f88939aa93e6e6ffc13fb4ae24231b7073"
+    },
+    {
+      "path": "/Users/ravonus/dev/wt/studio-cache-independent-review-20261020/docs/reviews/studio-cache-independent-20261020/gif-v2-provisional-df133/verify-closure.mjs",
+      "bytes": 4479,
+      "sha256": "f7a4d47e76c18b84a50e50d11b51cce98add88751e298dd319ede2d521d0d8f7"
+    },
+    {
+      "path": "/Users/ravonus/dev/wt/studio-cache-independent-review-20261020/docs/reviews/studio-cache-independent-20261020/gif-v2-provisional-df133/drop-diff.mjs",
+      "bytes": 2694,
+      "sha256": "983bc4f561699740a86c06bee3279ac99e13c3f3791ee4e6f4837c020f519e31"
+    },
+    {
+      "path": "/Users/ravonus/dev/wt/studio-cache-independent-review-20261020/docs/reviews/studio-cache-independent-20261020/gif-v2-provisional-df133/drop-diff.test.mjs",
+      "bytes": 4540,
+      "sha256": "73956230e2a697f13e62af8e60696bae81cd50bee5dd46f37b910aa10acf962a"
+    }
+  ]
+}
