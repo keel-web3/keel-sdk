@@ -87,30 +87,56 @@ shell choices must not be silently changed by a media candidate or recommendatio
 
 ## Metadata slot intent planning
 
-`@keel/builder/media-slot-plan` supplies the browser-safe `planKeelMediaSlots`
-planner. Original images/GIF default to the image slot with no shell; uploaded
-WebP/AVIF default to animation_url with the KEEL shell. Explicitly selected
-encoded candidates go to animation_url, and thumbnails are separate resources.
-Global, collection, exact-media and combined-media/collection defaults select
-independent onchain/IPFS/hosted delivery. Explicit slot choices always win.
-Both-slot duplication is never automatic; `assertKeelMediaSlotReadFit` requires
-evidence for the exact plan and the complete metadata response, not source size.
+Current authority: the [Studio owner requirements](https://github.com/keel-web3/keel-site/blob/master/docs/STUDIO_PUBLICATION_REQUIREMENTS.md)
+and [active sprint/failure record](https://github.com/keel-web3/keel-site/blob/master/docs/STUDIO_PUBLICATION_SPRINTS.md).
+The browser-safe `@keel/builder/media-slot-plan` and protocol smart-presentation
+planner carry explicit source/preview identities and saved choices; their output
+is not evidence that a compatible reader or viewer is deployed.
 
-Integration status: original image/GIF intent now flows through Studio preparation,
-form/API ingress, agent handoff, account-scoped recovery and persisted manifest
-extensions. No-shell image preparation retains one exact native image and omits
-HTML/automatic thumbnails. SDK staging and CLI use the same format defaults.
-Explicit image delivery is saved independently; it does not trigger an external
-upload or claim the external delivery is ready.
+Default to the registered verifier for scripts, animation, video, audio and 3D.
+A GIF is animation, not a static image. Inspect actual bytes/motion/execution;
+unknown motion cannot take the static cost exception. Only an inspected static
+raster that otherwise duplicates image and animation uses the 500,000-byte cost
+exception: above it, recommend the compatible image-only route. An advanced
+creator may still choose the verifier and save that default.
 
-The selected legacy collection cannot publish image-only metadata simply by
-omitting its harness: its actual runtime fills animation_url with manifestURI.
-Both pre-storage release simulation and final release review therefore reject
-this saved plan before new funding. A registered collection/presentation route
-with genuine image-only metadata, native original-image reading, appropriate
-creator authority and exact complete-read evidence must be selected first.
-Do not weaken this check, copy native images into a second encoded payload, or
-silently replace the plan with HTML. Module-based route capability matching is
-still under investigation. The generic current artifact renderer requires HTML
-and only PNG/JPEG/WebP posters; source availability is not deployment evidence.
-Independent animation-slot publication is not yet wired into the legacy route.
+Collector image and artwork animation have different roles. A script, movie or
+model needs its intended verified player/viewer plus a suitable collection-grid
+preview. Keep the exact original and selected preview separate from generated
+metadata derivatives; preserve all real script/model dependencies. An explicit
+supported hosted/IPFS preview or a sufficiently small verified thumbnail does
+not change the original artwork's integrity commitment or prove external delivery.
+
+The compatibility targets are 1,750,000 bytes for the encoded image and 2,000,000
+bytes for the complete metadata/read presentation, not a 2 MB upload ban. Measure
+all actual returned image + animation + embedded hybrid loader/index + metadata
+bytes. Offer meaningful image-only or hybrid-only alternatives before supported
+IPFS/hosted delivery if the combination is too large. The hybrid program itself
+must remain embedded and measured; do not assume its index cannot grow. Preserve
+explicitly acknowledged larger nonstandard output where its actual route works.
+Never silently reduce quality, drop animation/audio or change delivery.
+
+## Verification status and open work
+
+The [current sprint ledger](https://github.com/keel-web3/keel-site/blob/master/docs/gauntlet/publication-sprints.json)
+records actual supported-boundary and release verdicts. The normal source-recovery
+constructor distinguishes original creator resources from bounded metadata-only
+previews, and reused registered Gzip modules require their exact independent proof.
+Neither that source behavior nor media encoder availability proves end-to-end
+publication for every MIME accepted by a picker.
+
+Animated WebP/AVIF playback, full-featured 3D, broader audio/model adapters,
+automatic video recommendations and the historical sequence/layer player remain
+separate acceptance tasks until normal-service and final browser tests pass.
+`prepareMediaCandidate` does not implement a general animated-layer scripting
+player by itself. Every recommendation must include player/index/decoder/full
+presentation cost and complete frame/timing/alpha/audio verification, with an
+explicit decision for loss or feature changes. Failed source replacement, apply,
+undo/re-edit, refresh and stale-candidate cases must preserve originals.
+
+A saved image-only plan needs a genuine compatible current reader/composer route;
+never weaken its guard or supply different metadata to make it appear publishable.
+Retired prelaunch formats are not a fallback. UI/API/MCP use the same deterministic
+choices, but each requires fresh integrated evidence, exact simulation and an
+unsigned wallet handoff before claiming readiness. Ordinary creators do not
+select RPC providers; existing wallet/free/managed routing owns that choice.
