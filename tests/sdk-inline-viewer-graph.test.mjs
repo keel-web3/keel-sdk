@@ -417,17 +417,17 @@ test("creator HTML is one verified middle slot inside the canonical shell", asyn
   assert.equal(local.rootBytes.byteLength < source.byteLength + shell.prefix.bytes.byteLength + shell.suffix.bytes.byteLength + 1_000, true);
 });
 
-test("normal media uses the registered shell and asset-display module without a creator wrapper", async () => {
+test("normal raster/video uses the registered shell without a creator wrapper; malformed GLB is rejected", async () => {
   const shell = await buildKeelInlineShellFragments({ repositoryRoot });
   const inputs = [
     { id: "poster.webp", mediaType: "image/webp", source: new Uint8Array([0x52, 0x49, 0x46, 0x46]) },
     { id: "loop.webm", mediaType: "video/webm", source: new Uint8Array([0x1a, 0x45, 0xdf, 0xa3]) },
     { id: "scene.glb", mediaType: "model/gltf-binary", source: new Uint8Array([0x67, 0x6c, 0x54, 0x46]) },
   ];
-  const documents = await Promise.all(inputs.map((asset) => buildKeelInlineNormalMediaDocument({ shell, asset })));
+  const documents = await Promise.all(inputs.slice(0, 2).map((asset) => buildKeelInlineNormalMediaDocument({ shell, asset })));
+  await assert.rejects(buildKeelInlineNormalMediaDocument({ shell, asset: inputs[2] }), /Malformed GLB/u);
 
   assert.deepEqual(documents.map((document) => document.parts.map((part) => part.role)), [
-    ["shell-prefix", "module", "entrypoint", "shell-suffix"],
     ["shell-prefix", "module", "entrypoint", "shell-suffix"],
     ["shell-prefix", "module", "entrypoint", "shell-suffix"],
   ]);
@@ -441,7 +441,8 @@ test("normal media uses the registered shell and asset-display module without a 
     assert.match(new TextDecoder().decode(document.rootBytes), new RegExp(`"id":"${asset.id}"`, "u"));
     assert.doesNotMatch(new TextDecoder().decode(document.rootBytes), /index\.html|local-shell|viewer\.js/u);
   }
-  assert.deepEqual(inputs.map((asset) => keelAssetDisplayKind(asset.mediaType)), ["image", "video", "model"]);
+  assert.deepEqual(inputs.slice(0, 2).map((asset) => keelAssetDisplayKind(asset.mediaType)), ["image", "video"]);
+  assert.throws(() => keelAssetDisplayKind("model/gltf-binary"), /does not support/u);
   assert.throws(() => keelAssetDisplayKind("model/gltf+json"), /does not support/u);
 
   const display = await buildKeelInlineAssetDisplayModuleFragment();
@@ -455,8 +456,8 @@ test("normal media uses the registered shell and asset-display module without a 
   const displaySource = new TextDecoder().decode(secondDisplayBytes);
   assert.match(displaySource, /createElement\("img"\)/u);
   assert.match(displaySource, /createElement\("video"\)/u);
-  assert.match(displaySource, /model\/gltf-binary/u);
-  assert.match(displaySource, /getContext\("webgl"/u);
+  assert.doesNotMatch(displaySource, /model\/gltf-binary/u);
+  assert.doesNotMatch(displaySource, /getContext\("webgl"/u);
   assert.match(displaySource, /__KEEL_ENTRY__/u);
   assert.doesNotMatch(displaySource, /fetch\(|ethereum|wallet|XMLHttpRequest/u);
 

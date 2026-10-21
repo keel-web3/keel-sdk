@@ -10,10 +10,10 @@ const profile=(version=KEEL_ASSET_DISPLAY_MODULE_VERSION,mediaType='image/webp',
 test('native raster adapter authenticates its exact animation-capable decoded module bytes',()=>{
  const bytes=keelAssetDisplayModuleBytes(),record=keelAssetDisplayModuleRevision(KEEL_ASSET_DISPLAY_MODULE_VERSION);
  assert.equal(bytes.length,record.byteLength);assert.equal('0x'+createHash('sha256').update(bytes).digest('hex'),record.digest);
- assert.equal(qualifyKeelNativeRasterViewer(profile()).version,'1.3.0');assert.deepEqual(KEEL_NATIVE_RASTER_VIEWER_ADAPTER.dependencies,[]);
+ assert.equal(qualifyKeelNativeRasterViewer(profile()).version,'1.4.0');assert.deepEqual(KEEL_NATIVE_RASTER_VIEWER_ADAPTER.dependencies,[]);
 });
 test('native animation profile preserves existing catalog GIF, PNG and JPEG routes without a Three dependency',()=>{
- for(const version of ['1.1.0','1.2.0','1.3.0'])for(const mime of ['image/gif','image/png','image/jpeg']){
+ for(const version of ['1.1.0','1.2.0','1.3.0','1.4.0'])for(const mime of ['image/gif','image/png','image/jpeg']){
   const adapter=qualifyKeelNativeRasterViewer(profile(version,mime,images[mime]));assert.equal(adapter.version,version);assert.deepEqual(adapter.dependencies,[]);
  }
 });

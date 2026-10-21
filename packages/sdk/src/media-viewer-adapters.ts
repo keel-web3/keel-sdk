@@ -34,7 +34,7 @@ export function qualifyKeelNativeRasterViewer(input: {
   }
   const motion = classifyKeelAssetMotion({ mediaType: input.mediaType, bytes: input.source });
   if ((input.mediaType === "image/webp" || input.mediaType === "image/avif")
-    && input.version !== KEEL_NATIVE_RASTER_VIEWER_ADAPTER.version && motion !== "still") {
+    && !["1.3.0", "1.4.0"].includes(input.version) && motion !== "still") {
     throw new TypeError("Animated or unclassified WebP/AVIF requires the exact animation-capable KEEL asset-display revision; a draw-once module would change the work.");
   }
   return Object.freeze({ ...KEEL_NATIVE_RASTER_VIEWER_ADAPTER, version: input.version });

@@ -1,0 +1,23 @@
+--- a/tests/sdk-inline-viewer-graph.test.mjs
++++ b/tests/sdk-inline-viewer-graph.test.mjs
+@@ -417,17 +417,17 @@
+   assert.equal(local.rootBytes.byteLength < source.byteLength + shell.prefix.bytes.byteLength + shell.suffix.bytes.byteLength + 1_000, true);
+ });
+ 
+-test("normal media uses the registered shell and asset-display module without a creator wrapper", async () => {
++test("normal raster/video uses the registered shell without a creator wrapper; malformed GLB is rejected", async () => {
+   const shell = await buildKeelInlineShellFragments({ repositoryRoot });
+   const inputs = [
+     { id: "poster.webp", mediaType: "image/webp", source: new Uint8Array([0x52, 0x49, 0x46, 0x46]) },
+     { id: "loop.webm", mediaType: "video/webm", source: new Uint8Array([0x1a, 0x45, 0xdf, 0xa3]) },
+     { id: "scene.glb", mediaType: "model/gltf-binary", source: new Uint8Array([0x67, 0x6c, 0x54, 0x46]) },
+   ];
+-  const documents = await Promise.all(inputs.map((asset) => buildKeelInlineNormalMediaDocument({ shell, asset })));
++  const documents = await Promise.all(inputs.slice(0, 2).map((asset) => buildKeelInlineNormalMediaDocument({ shell, asset })));
++  await assert.rejects(buildKeelInlineNormalMediaDocument({ shell, asset: inputs[2] }), /Malformed GLB/u);
+ 
+   assert.deepEqual(documents.map((document) => document.parts.map((part) => part.role)), [
+-    ["shell-prefix", "module", "entrypoint", "shell-suffix"],
+     ["shell-prefix", "module", "entrypoint", "shell-suffix"],
+     ["shell-prefix", "module", "entrypoint", "shell-suffix"],
+   ]);

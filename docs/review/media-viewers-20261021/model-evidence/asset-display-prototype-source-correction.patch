@@ -1,0 +1,13 @@
+--- a/tests/sdk-inline-viewer-graph.test.mjs
++++ b/tests/sdk-inline-viewer-graph.test.mjs
+@@ -456,8 +456,8 @@
+   const displaySource = new TextDecoder().decode(secondDisplayBytes);
+   assert.match(displaySource, /createElement\("img"\)/u);
+   assert.match(displaySource, /createElement\("video"\)/u);
+-  assert.match(displaySource, /model\/gltf-binary/u);
+-  assert.match(displaySource, /getContext\("webgl"/u);
++  assert.doesNotMatch(displaySource, /model\/gltf-binary/u);
++  assert.doesNotMatch(displaySource, /getContext\("webgl"/u);
+   assert.match(displaySource, /__KEEL_ENTRY__/u);
+   assert.doesNotMatch(displaySource, /fetch\(|ethereum|wallet|XMLHttpRequest/u);
+ 

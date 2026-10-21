@@ -1,0 +1,12 @@
+--- a/tests/sdk-inline-viewer-graph.test.mjs
++++ b/tests/sdk-inline-viewer-graph.test.mjs
+@@ -441,7 +441,8 @@
+     assert.match(new TextDecoder().decode(document.rootBytes), new RegExp(`"id":"${asset.id}"`, "u"));
+     assert.doesNotMatch(new TextDecoder().decode(document.rootBytes), /index\.html|local-shell|viewer\.js/u);
+   }
+-  assert.deepEqual(inputs.map((asset) => keelAssetDisplayKind(asset.mediaType)), ["image", "video", "model"]);
++  assert.deepEqual(inputs.slice(0, 2).map((asset) => keelAssetDisplayKind(asset.mediaType)), ["image", "video"]);
++  assert.throws(() => keelAssetDisplayKind("model/gltf-binary"), /does not support/u);
+   assert.throws(() => keelAssetDisplayKind("model/gltf+json"), /does not support/u);
+ 
+   const display = await buildKeelInlineAssetDisplayModuleFragment();

@@ -438,6 +438,18 @@
     "./proof-simulation-node": {
       "types": "./dist/proof-simulation-node.d.ts",
       "import": "./dist/proof-simulation-node.js"
+    },
+    "./model-media": {
+      "types": "./dist/model-media.d.ts",
+      "import": "./dist/model-media.js"
+    },
+    "./model-viewer-module": {
+      "types": "./dist/model-viewer-module.d.ts",
+      "import": "./dist/model-viewer-module.js"
+    },
+    "./media-viewer-adapters": {
+      "types": "./dist/media-viewer-adapters.d.ts",
+      "import": "./dist/media-viewer-adapters.js"
     }
   },
   "files": [

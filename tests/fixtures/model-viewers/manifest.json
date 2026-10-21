@@ -1,0 +1,49 @@
+{
+  "schema": "keel-model-fixtures@1",
+  "scope": "genuine new source fixtures, not incident assets or modified references",
+  "features": [
+    "two primitives",
+    "three mesh draws",
+    "parent/local transforms",
+    "PNG texture",
+    "material colors",
+    "source translation clip",
+    "source skin/skeleton rotation",
+    "source morph clip",
+    "alternate scene",
+    "external glTF buffer and image",
+    "OBJ objects/materials/texture"
+  ],
+  "files": [
+    {
+      "path": "complete.glb",
+      "bytes": 4112,
+      "sha256": "6c836f043d3d7ba771fc13a1498a4cc1ad872c8297f8a15c7b912a1a8c0157d2"
+    },
+    {
+      "path": "complete.gltf",
+      "bytes": 3577,
+      "sha256": "df4ef251db7b6f87e8d8212d0f18a8d660fb71ab6a1a2653b8797b5bd6031e0b"
+    },
+    {
+      "path": "scene.bin",
+      "bytes": 510,
+      "sha256": "bb419384840f01a7308110f5357f8fa795a6fd880543bff8bf2437b3f2173a78"
+    },
+    {
+      "path": "textures/checker.png",
+      "bytes": 98,
+      "sha256": "7e3068e4965331d8e361e4f73e54a45c5e203a623e61871a0aecab6323041d9d"
+    },
+    {
+      "path": "complete.obj",
+      "bytes": 230,
+      "sha256": "a233b3a8827e71a9875730e906885cdedebc9a683b7298468d43e93087a8d5c5"
+    },
+    {
+      "path": "materials.mtl",
+      "bytes": 72,
+      "sha256": "c487b0e94be88b003525cb5e8a318d7b268a1498399b066f5d63a448079f6372"
+    }
+  ]
+}

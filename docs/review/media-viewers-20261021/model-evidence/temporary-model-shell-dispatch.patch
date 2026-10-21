@@ -1,0 +1,30 @@
+diff --git a/packages/sdk/src/verification-shell.ts b/packages/sdk/src/verification-shell.ts
+index 7aea642..571f3a0 100644
+--- a/packages/sdk/src/verification-shell.ts
++++ b/packages/sdk/src/verification-shell.ts
+@@ -883,6 +883,7 @@ function compactInlineRuntime(
+     const verificationChecks = Object.freeze(items.map((item) => Object.freeze({
+       id: item.id,
+       name: item.aliases[0] ?? item.id,
++      aliases: Object.freeze([...item.aliases]),
+       label: item.aliases[0] ?? item.id,
+       role: item.role ?? "asset",
+       mediaType: item.mediaType,
+@@ -974,12 +975,14 @@ function compactInlineRuntime(
+     frame.title = "Verified KEEL work";
+     frame.sandbox.add("allow-scripts", "allow-pointer-lock", "allow-downloads");
+     frame.referrerPolicy = "no-referrer";
+-    const directMedia = entry.mediaType.startsWith("image/") || entry.mediaType.startsWith("video/") || entry.mediaType === "model/gltf-binary";
++    const modelMedia = ["model/gltf-binary", "model/gltf+json", "model/obj"].includes(entry.mediaType);
++    const directMedia = entry.mediaType.startsWith("image/") || entry.mediaType.startsWith("video/") || modelMedia;
++    const displayModuleId = modelMedia ? "keel.model-display" : "keel.asset-display";
+     const assetDisplay = directMedia
+-      ? items.filter((item) => item.id === "keel.asset-display" && item.role === "module" && item.mediaType === "text/javascript")
++      ? items.filter((item) => item.id === displayModuleId && item.role === "module" && item.mediaType === "text/javascript")
+       : [];
+     if (directMedia && assetDisplay.length !== 1) {
+-      throw new Error("A direct media entry requires exactly one verified keel.asset-display module.");
++      throw new Error(`A direct media entry requires exactly one verified ${displayModuleId} module.`);
+     }
+     const entryURL = contentUrls[entry.id];
+     if (entryURL === undefined) throw new Error("Verified entrypoint descriptor is missing.");

@@ -61,9 +61,9 @@ for(const format of ['webp','avif'])test(`canonical still ${format} retains orig
  });assert.equal(sha(await original(`still.${format}`)),sha(bytes));
 });
 
-for(const version of ['1.1.0','1.3.0'])test(`canonical GIF motion remains native with exact catalog module profile ${version}`,{timeout:30000},async()=>{
+for(const version of ['1.1.0','1.3.0','1.4.0'])test(`canonical GIF motion remains native with exact catalog module profile ${version}`,{timeout:30000},async()=>{
  const source=await original('animation.gif'),shell=await buildKeelInlineShellFragments({repositoryRoot:process.cwd()});
- const decoded=version==='1.1.0'?new Uint8Array(await readFile(new URL('./fixtures/asset-display-1.1.0.js',import.meta.url))):new Uint8Array(await import('../packages/sdk/dist/asset-display.js').then(m=>m.keelAssetDisplayModuleBytes()));
+ const decoded=version!=='1.4.0'?new Uint8Array(await readFile(new URL(`./fixtures/asset-display-${version}.js`,import.meta.url))):new Uint8Array(await import('../packages/sdk/dist/asset-display.js').then(m=>m.keelAssetDisplayModuleBytes()));
  const display=await buildKeelInlineModuleFragment({moduleId:'keel.asset-display',version,mediaType:'text/javascript',aliases:['keel.asset-display'],decodedBytes:decoded,compression:'none',execution:'classic',phase:'render'});
  const document=await buildKeelInlineLocalDocument({shell,modules:[display],entry:{id:'original-artwork',mediaType:'image/gif',source}});
  await mounted(new TextDecoder().decode(document.rootBytes),async({childEvaluate,capture})=>{

@@ -175,3 +175,7 @@ export * from "./simulation-capacity-policy.js";
 
 export * from "./legacy-shared-image-program.js";
 export * from "./tx-gas.js";
+
+export * from "./model-media.js";
+export * from "./model-viewer-module.js";
+export * from "./media-viewer-adapters.js";

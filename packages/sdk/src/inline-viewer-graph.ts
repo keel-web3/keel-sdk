@@ -1,7 +1,7 @@
 import { snapshotKeelExplicitExternalPreview, assertKeelExternalPreviewImageURI, type KeelExplicitExternalPreview } from "./external-preview.js";
 export { prepareKeelExplicitExternalPreview, snapshotKeelExplicitExternalPreview } from "./external-preview.js";
 export type { KeelExplicitExternalPreview } from "./external-preview.js";
-import { assertKeelRegisteredNativeGzipProof, type KeelRegisteredNativeGzipProof } from "./registered-native-gzip.js";
+import { assertKeelRegisteredNativeGzipProof, createKeelRegisteredNativeGzipProof, snapshotKeelRegisteredNativeGzipBinding, KEEL_REGISTERED_NATIVE_GZIP_FRAME_PROFILE, type KeelRegisteredNativeGzipBinding, type KeelRegisteredNativeGzipProof } from "./registered-native-gzip.js";
 import { assertKeelFreshPayloadCarriage, assertKeelPreparedCollectorInlineMetadata as assertKeelCollectorInlineMetadata } from "./inline-transport-audit.js";
 /**
  * Node-only planner for a modular Inline KEEL viewer.
@@ -33,6 +33,8 @@ import { encodeAbiParameters, getAddress, keccak256, stringToHex } from "viem";
 import { KEEL_INLINE_MAX_TOKEN_URI_BYTES, keelWeb3ObjectURI, resolveKeelInlineCarriage, type KeelInlineCarriage } from "./presentation.js";
 import { assertKeelInlineImageBytes, prepareKeelInlineImageCarriage, type KeelPresentationPolicy } from "./collector-policy.js";
 import { KEEL_CREATIVE_RUNTIME_CATALOG } from './creative-runtime-catalog.js';
+import {inspectKeelModelMedia, KEEL_MODEL_MEDIA_TYPES, type KeelModelMediaType, type KeelModelResource} from "./model-media.js";
+import {KEEL_MODEL_VENDOR_MODULES, KEEL_MODEL_DISPLAY_MODULE_ID, KEEL_MODEL_DISPLAY_REVISION, keelModelDisplayModuleBytes, keelModelViewerModuleProfiles} from "./model-viewer-module.js";
 import {
   KEEL_ASSET_DISPLAY_MEDIA_TYPES,
   KEEL_ASSET_DISPLAY_MODULE_ID,
@@ -295,6 +297,20 @@ export interface KeelInlineLocalDocument extends KeelInlineGraphDocument {
   readonly schema: "keel-inline-local-document@1";
 }
 
+export interface KeelInlineModelMediaDocument extends KeelInlineLocalDocument {
+  /** Byte inspection only; selected-chain reauthentication is still mandatory. */
+  readonly registeredNativeGzip?: KeelRegisteredNativeGzipProof;
+  readonly modelPresentation: {
+    readonly schema: "keel-model-presentation@1";
+    readonly originalEntry: {readonly id: string; readonly mediaType: KeelModelMediaType; readonly aliases: readonly string[]; readonly integrity: Integrity};
+    readonly originalDependencies: readonly {readonly id: string; readonly mediaType: string; readonly aliases: readonly string[]; readonly integrity: Integrity}[];
+    readonly generatedEntry: {readonly id: string; readonly mediaType: "text/html"; readonly integrity: Integrity; readonly kind: "derived-presentation"};
+    readonly bindingIntegrity: Integrity;
+    readonly sourceStorage: readonly {readonly id: string; readonly compression: "none" | "gzip"; readonly decodedByteLength: number; readonly storedByteLength: number; readonly descriptorByteLength: number}[];
+    readonly byteCounts: {readonly originalSources: number; readonly generatedHTML: number; readonly sharedDecodedModules: number; readonly completeHTML: number};
+  };
+}
+
 /**
  * Canonical composition for one normal image, video, or GLB. The shell and
  * asset-display module are reusable objects; the sole creator object is
@@ -519,6 +535,13 @@ const EXTERNAL_RESOURCE_LITERAL = /\b(?:(?:https?|ipfs|web3|keel-onchain):[^\s"'
 
 /** Shared library bytes are not creator resources. Match the full pinned artifact. */
 async function assertInlineModuleDependencies(bytes: Uint8Array, moduleId: string): Promise<void> {
+  const model = KEEL_MODEL_VENDOR_MODULES.find(module => module.moduleId === moduleId)
+    ?? (moduleId === KEEL_MODEL_DISPLAY_MODULE_ID ? KEEL_MODEL_DISPLAY_REVISION : undefined);
+  if (model !== undefined) {
+    const actual = await createIntegrity(bytes);
+    if (actual.digest !== model.digest || actual.byteLength !== model.byteLength) throw new TypeError(`Inline model runtime ${moduleId} differs from its pinned artifact.`);
+    return;
+  }
   const candidates: Array<{ id: string; integrity: Integrity | null }> = KEEL_CREATIVE_RUNTIME_CATALOG.flatMap(runtime => runtime.resources.filter(resource => resource.referenceStatus === 'active'));
   if (moduleId === 'keel-layered-runtime-v4') {
     const generated = './layered-runtime-info.js';
@@ -1159,6 +1182,37 @@ function isNormalMediaEntry(mediaType: string): mediaType is KeelAssetDisplayMed
   return (KEEL_ASSET_DISPLAY_MEDIA_TYPES as readonly string[]).includes(mediaType);
 }
 
+function isModelMediaEntry(mediaType: string): mediaType is KeelModelMediaType {
+  return (KEEL_MODEL_MEDIA_TYPES as readonly string[]).includes(mediaType);
+}
+
+/** Exact complete-model closure, never arbitrary modules or a first-primitive fallback. */
+async function assertCanonicalModelMediaGraph(entry: KeelModelResource, assets: readonly KeelModelResource[], modules: readonly KeelInlineModuleFragment[]): Promise<void> {
+  const inspection = inspectKeelModelMedia(entry, assets);
+  const expected = keelModelViewerModuleProfiles(inspection.format, inspection.materialLibraryIds.length !== 0);
+  if (modules.length !== expected.length) throw new TypeError("Direct models require the exact complete registered model-viewer dependency closure.");
+  for (let index = 0; index < expected.length; index++) {
+    const profile = expected[index]!, module = modules[index]!, embedded = module.item.embedded;
+    if (module.moduleId !== profile.moduleId || module.version !== profile.version || module.phase !== profile.phase || module.execution !== profile.execution || module.weight !== profile.weight || embedded === undefined || !["none", "gzip"].includes(embedded.compression)) throw new TypeError("Model module identity, order, execution or codec differs from its exact closure.");
+    const stored = embedded.storedText === undefined ? exactBase64Bytes(embedded.storedBase64 ?? "", "Model module") : encoder.encode(embedded.storedText);
+    const decoded = embedded.compression === "gzip" ? new Uint8Array(gunzipSync(stored, {maxOutputLength: profile.byteLength})) : stored;
+    const integrity = await createIntegrity(decoded);
+    if (integrity.digest !== profile.digest || integrity.byteLength !== profile.byteLength) throw new TypeError("Model module source does not match its pinned official byte profile.");
+    const canonical = await buildKeelInlineModuleFragment({moduleId: profile.moduleId, version: profile.version, mediaType: "text/javascript", aliases: profile.aliases, decodedBytes: decoded, compression: embedded.compression as "none" | "gzip", execution: profile.execution, phase: profile.phase, weight: profile.weight});
+    if (!exactBytes(module.bytes, canonical.bytes) || module.integrity.digest !== canonical.integrity.digest || module.integrity.byteLength !== canonical.integrity.byteLength || module.item.role !== "module") throw new TypeError("Model module fragment or aliases differ from the canonical closed graph.");
+  }
+}
+
+/** Local preparation only: published reuse still needs exact same-chain receipts/read-back. */
+export async function buildKeelInlineModelViewerModules(input: {readonly format: "gltf" | "obj"; readonly materialLibraries?: boolean; readonly three: {readonly main: Uint8Array; readonly core: Uint8Array}}): Promise<readonly KeelInlineModuleFragment[]> {
+  return await Promise.all(keelModelViewerModuleProfiles(input.format, input.materialLibraries).map(async profile => {
+    const source = profile.moduleId === "three-r180-core" ? input.three.core : profile.moduleId === "three-r180-module" ? input.three.main : profile.moduleId === KEEL_MODEL_DISPLAY_MODULE_ID ? keelModelDisplayModuleBytes() : new TextEncoder().encode(KEEL_MODEL_VENDOR_MODULES.find(module => module.moduleId === profile.moduleId)!.source);
+    const integrity = await createIntegrity(source);
+    if (integrity.digest !== profile.digest || integrity.byteLength !== profile.byteLength) throw new TypeError("Model graph needs the exact pinned source bytes.");
+    return await buildKeelInlineModuleFragment({moduleId: profile.moduleId, version: profile.version, mediaType: "text/javascript", aliases: profile.aliases, decodedBytes: source, compression: "gzip", execution: profile.execution, phase: profile.phase, weight: profile.weight});
+  }));
+}
+
 async function assertCanonicalAssetDisplayModule(module: KeelInlineModuleFragment): Promise<void> {
   const revision = keelAssetDisplayModuleRevision(module.version);
   const embedded = module.item.embedded;
@@ -1228,7 +1282,7 @@ export async function buildKeelInlineLocalDocument(input: {
     /** Metadata background_color, or omit to match a uniform image border. */
     readonly backgroundColor?: string;
     /** Text artwork, or the direct creator media entry mounted by keel.asset-display. */
-    readonly mediaType: "text/html" | "text/javascript" | KeelAssetDisplayMediaType;
+    readonly mediaType: "text/html" | "text/javascript" | KeelAssetDisplayMediaType | KeelModelMediaType;
     readonly source: Uint8Array;
     readonly compression?: KeelInlineCompression;
   readonly payloadStorage?: KeelPayloadStorageMode;
@@ -1270,8 +1324,12 @@ export async function buildKeelInlineLocalDocument(input: {
     if (asset.source.byteLength === 0) throw new TypeError(`Inline asset ${asset.id} cannot be empty.`);
     ids.add(asset.id);
   }
-  const directMedia = isNormalMediaEntry(input.entry.mediaType);
-  if (directMedia) {
+  const modelMedia = isModelMediaEntry(input.entry.mediaType);
+  const directMedia = modelMedia || isNormalMediaEntry(input.entry.mediaType);
+  if (modelMedia) {
+    inspectKeelModelMedia(input.entry, assets);
+    throw new TypeError("Direct models require buildKeelInlineModelMediaDocument: a derived verified presentation entry and exact complete loader closure, never the retired first-primitive renderer.");
+  } else if (directMedia) {
     if (assets.length !== 0) {
       throw new TypeError("A direct image, video, or GLB entry cannot declare additional creator assets.");
     }
@@ -1370,6 +1428,108 @@ export async function buildKeelInlineLocalDocument(input: {
   };
 }
 
+/** Complete inspected originals, exact loader closure and every retained dependency. */
+export async function buildKeelInlineModelMediaDocument(input: {
+  readonly shell: KeelInlineShellFragments;
+  readonly modules: readonly KeelInlineModuleFragment[];
+  readonly entry: KeelModelResource & {readonly mediaType: KeelModelMediaType};
+  readonly assets?: readonly KeelModelResource[];
+  /** Exact current reader binding, authenticated by the caller; never inferred from a local module label. */
+  readonly registeredNativeGzipBinding?: KeelRegisteredNativeGzipBinding;
+}): Promise<KeelInlineModelMediaDocument> {
+  // Snapshot every byte/identity before the first asynchronous digest or catalog read.
+  const shell = structuredClone(input.shell), modules = structuredClone(input.modules), entry = structuredClone(input.entry), assets = structuredClone(input.assets ?? []);
+  const nativeBinding = input.registeredNativeGzipBinding === undefined ? undefined : snapshotKeelRegisteredNativeGzipBinding(input.registeredNativeGzipBinding);
+  if (nativeBinding) {
+    const profile = KEEL_REGISTERED_NATIVE_GZIP_FRAME_PROFILE;
+    for (const [part, length, digest] of [[shell.prefix, profile.prefixByteLength, profile.prefixDigest], [shell.suffix, profile.suffixByteLength, profile.suffixDigest]] as const) {
+      if (shell.codecProfile !== "browser-gzip-deflate" || part.bytes.length !== length || `0x${createHash("sha256").update(part.bytes).digest("hex")}` !== digest) throw new TypeError("Models require the exact authenticated current native Gzip frames.");
+    }
+  } else {
+    const canonical = await buildKeelInlineShellFragments({repositoryRoot: ""});
+    if (!exactBytes(shell.prefix.bytes, canonical.prefix.bytes) || !exactBytes(shell.suffix.bytes, canonical.suffix.bytes)) throw new TypeError("Models require exact canonical shell fragments; local bytes are not registration evidence.");
+  }
+  await assertCanonicalModelMediaGraph(entry, assets, orderKeelModules(modules));
+  const identities = await Promise.all([entry, ...assets].map(async resource => ({id: resource.id, mediaType: resource.mediaType, aliases: [...(resource.aliases ?? [])], integrity: await createIntegrity(resource.source)})));
+  const originalEntry = {...identities[0]!, mediaType: entry.mediaType}, binding = {schema: "keel-model-presentation@1", original: {...originalEntry, name: entry.aliases?.[0] ?? entry.id}, resources: identities,
+    modules: modules.map(module => ({id: module.moduleId, version: module.version, digest: module.item.integrity.digest, byteLength: module.item.integrity.byteLength}))};
+  const bindingJSON = serializeScriptJSON(binding), generatedId = "keel-model-presentation";
+  if ([entry, ...assets].some(resource => resource.id === generatedId || resource.aliases?.includes(generatedId))) throw new TypeError("Original model resource conflicts with its derived presentation identity.");
+  const html = encoder.encode(`<!doctype html><html><head><meta charset="utf-8"><style>html,body,#keel-asset-display{width:100%;height:100%;margin:0;overflow:hidden;background:#05060b}</style></head><body><main id="keel-asset-display"></main><script type="module">import{createModelViewer}from"keel.model-display";Object.defineProperty(globalThis,"__KEEL_MODEL_VIEWER__",{value:createModelViewer(${bindingJSON}),writable:false,configurable:false});</script></body></html>`);
+  const sources: readonly (KeelModelResource & {readonly role: "asset" | "entrypoint"})[] = [...[entry, ...assets].map(resource => ({...resource, role: "asset" as const})), {id: generatedId, mediaType: "text/html", source: html, role: "entrypoint" as const}];
+  const sourceStorage = await Promise.all(sources.map(async resource => {
+    // Current native frames admit exact text or validated raster None siblings.
+    // Other binary None/Base64 is not an admissible fresh recipe, even if shorter.
+    const codecs: readonly ("none" | "gzip")[] = nativeBinding && !isKeelViewerTextMediaType(resource.mediaType) && !["image/png", "image/jpeg"].includes(resource.mediaType) ? ["gzip"] : ["none", "gzip"];
+    const candidates = await Promise.all(codecs.map(async compression => {
+      const slot = await buildEmbeddedKeelViewerSlot({id: resource.id, mediaType: resource.mediaType, role: resource.role, ...(resource.aliases === undefined ? {} : {aliases: resource.aliases}), bytes: resource.source, compression});
+      return {id: resource.id, compression, decodedByteLength: resource.source.length, storedByteLength: slot.item.embedded!.storedIntegrity!.byteLength, descriptorByteLength: slot.fragment.length};
+    }));
+    return candidates.reduce((best, candidate) => candidate.descriptorByteLength < best.descriptorByteLength ? candidate : best);
+  }));
+  const document = await buildKeelInlineLocalDocument({shell, modules, assets: [entry, ...assets].map((resource, index) => ({...resource, compression: sourceStorage[index]!.compression})), entry: {id: generatedId, mediaType: "text/html", source: html, compression: sourceStorage.at(-1)!.compression}});
+  const registeredNativeGzip = nativeBinding === undefined ? undefined : createKeelRegisteredNativeGzipProof({binding: nativeBinding, documentBytes: document.rootBytes});
+  return {...document, ...(registeredNativeGzip === undefined ? {} : {registeredNativeGzip}), modelPresentation: {schema: "keel-model-presentation@1", originalEntry, originalDependencies: identities.slice(1), generatedEntry: {id: generatedId, mediaType: "text/html", integrity: await createIntegrity(html), kind: "derived-presentation"}, bindingIntegrity: await createIntegrity(encoder.encode(bindingJSON)), sourceStorage, byteCounts: {originalSources: [entry, ...assets].reduce((n, resource) => n + resource.source.length, 0), generatedHTML: html.length, sharedDecodedModules: modules.reduce((n, module) => n + module.item.integrity.byteLength, 0), completeHTML: document.byteLength}}};
+}
+
+/** Selected-chain read-back gate. Local profiles alone never become registered modules. */
+export async function buildKeelRegisteredInlineModelMediaTokenURIGraph(input: {
+  readonly shell: KeelInlineShellFragments;
+  readonly modules: readonly KeelInlineModuleFragment[];
+  readonly entry: KeelModelResource & {readonly mediaType: KeelModelMediaType};
+  readonly assets?: readonly KeelModelResource[];
+  readonly chainId: number;
+  readonly store: Hex;
+  readonly builder: Hex;
+  readonly readScope: {readonly blockNumber: bigint; readonly blockHash: Hex};
+  /** Ordered exact prefix, every closed-graph module, then suffix. */
+  readonly existingParts: readonly KeelPublishedInlineFragment[];
+  /** Existing authorized object reader; no signing or provider fallback is performed here. */
+  readonly readObject: (carrier: KeelPublishedInlineFragment["carrier"], scope: {readonly blockNumber: bigint; readonly blockHash: Hex}) => Promise<Uint8Array>;
+  /** Correct deployed registry ABI supplied by the selected-chain integration. */
+  readonly readRegistration: (input: {readonly chainId: number; readonly store: Hex; readonly objectId: Hex; readonly builder: Hex; readonly blockNumber: bigint; readonly blockHash: Hex}) => Promise<boolean>;
+  readonly readBlockHash: (blockNumber: bigint) => Promise<Hex>;
+  readonly registeredNativeGzipBinding: KeelRegisteredNativeGzipBinding;
+  /** Existing Site authenticator must re-read metadata, registry, deployed reader and exact frame receipts at this scope. */
+  readonly readCurrentNativeGzipBinding: (scope: {readonly blockNumber: bigint; readonly blockHash: Hex}) => Promise<KeelRegisteredNativeGzipBinding>;
+}): Promise<KeelInlineRawPercentTokenURIGraph & {readonly modelPresentation: KeelInlineModelMediaDocument["modelPresentation"]}> {
+  input = {...input, shell: structuredClone(input.shell), modules: structuredClone(input.modules), entry: structuredClone(input.entry), assets: structuredClone(input.assets ?? []), existingParts: structuredClone(input.existingParts), readScope: {...input.readScope}, registeredNativeGzipBinding: snapshotKeelRegisteredNativeGzipBinding(input.registeredNativeGzipBinding)};
+  if (!Number.isSafeInteger(input.chainId) || input.chainId < 1) throw new TypeError("Models need an explicit selected chain.");
+  if (input.readScope.blockNumber < 0n || !/^0x[0-9a-f]{64}$/iu.test(input.readScope.blockHash)) throw new TypeError("Models require an exact selected-chain block scope.");
+  const store = getAddress(input.store), builder = getAddress(input.builder), binding = input.registeredNativeGzipBinding;
+  if (input.chainId !== binding.chainId || store !== getAddress(binding.store) || builder !== getAddress(binding.reader)) throw new TypeError("Model native Gzip binding must match the selected chain, store and deployed reader.");
+  const assertCurrentBinding = async () => {
+    const current = snapshotKeelRegisteredNativeGzipBinding(await input.readCurrentNativeGzipBinding({...input.readScope}));
+    if (canonicalJson(current) !== canonicalJson(binding)) throw new TypeError("Model native Gzip reader binding changed; preserve the source and review again.");
+  };
+  await assertCurrentBinding();
+  const document = await buildKeelInlineModelMediaDocument(input);
+  const reusable = document.parts.filter(part => part.kind === "existing");
+  if (input.existingParts.length !== reusable.length) throw new TypeError("Model registered closure has missing or extra reusable fragments.");
+  for (const [index, part] of reusable.entries()) {
+    const published = input.existingParts[index]!;
+    if (published.carrier.chainId !== input.chainId || getAddress(published.carrier.store) !== store) throw new TypeError("Model reuse must stay on the exact selected chain and store.");
+    await assertPublishedFragmentIntegrity(published, "Registered model reusable fragment");
+    if (part.role !== "module" && published.carrier.objectId !== (part.role === "shell-prefix" ? binding.prefixObjectId : binding.suffixObjectId)) throw new TypeError("Model native Gzip shell object differs from the authenticated current reader.");
+    if (!await input.readRegistration({chainId: input.chainId, store: input.store, objectId: published.carrier.objectId, builder, ...input.readScope})) throw new TypeError("Model reusable fragment is not registered for the exact selected builder at the pinned block.");
+    const observed = await input.readObject({...published.carrier}, {...input.readScope});
+    if (!exactBytes(observed, published.bytes)) throw new TypeError("Registered model read-back differs from the exact selected fragment.");
+    if (part.role === "module") {
+      const declared = input.modules.find(module => module.moduleId === part.moduleId)!;
+      const embedded = declared.item.embedded!, stored = embedded.storedText === undefined ? exactBase64Bytes(embedded.storedBase64 ?? "", "Model module") : encoder.encode(embedded.storedText);
+      const decoded = embedded.compression === "gzip" ? new Uint8Array(gunzipSync(stored)) : stored;
+      await verifyKeelPublishedInlineModuleFragment({fragment: published, moduleId: declared.moduleId, mediaType: "text/javascript", aliases: declared.item.aliases, decodedBytes: decoded});
+    } else if (!exactBytes(decodePublishedGraphPart(published), part.bytes)) throw new TypeError("Registered model shell differs from the exact canonical shell.");
+  }
+  await assertCurrentBinding();
+  if ((await input.readBlockHash(input.readScope.blockNumber)).toLowerCase() !== input.readScope.blockHash.toLowerCase()) throw new TypeError("Model read-back block changed; reprepare the exact selected-chain closure.");
+  let existingIndex = 0;
+  const publishedBytes = concat(document.parts.map(part => part.kind === "existing" ? decodePublishedGraphPart(input.existingParts[existingIndex++]!) : part.bytes));
+  const registeredNativeGzip = createKeelRegisteredNativeGzipProof({binding, documentBytes: publishedBytes});
+  const graph = await buildKeelInlineRawPercentTokenURIGraph(document, {existingParts: input.existingParts, registeredNativeGzip});
+  return {...graph, modelPresentation: document.modelPresentation};
+}
+
 /**
  * Compose a normal single-file image, video, or self-contained GLB without
  * authoring a project wrapper. The registered KEEL shell and asset-display
@@ -1385,6 +1545,10 @@ export async function buildKeelInlineNormalMediaDocument(input: {
     readonly aliases?: readonly string[];
   };
 }): Promise<KeelInlineNormalMediaDocument> {
+  if ((KEEL_MODEL_MEDIA_TYPES as readonly string[]).includes(input.asset.mediaType)) {
+    inspectKeelModelMedia(input.asset);
+    throw new TypeError("Models require the exact complete loader closure and derived presentation, never the retired flat-primitive renderer.");
+  }
   keelAssetDisplayKind(input.asset.mediaType);
   const [assetDisplay, canonicalShell] = await Promise.all([
     buildKeelInlineAssetDisplayModuleFragment(),
@@ -2083,6 +2247,10 @@ export async function buildKeelPublishedInlineNormalMediaTokenURIGraph(input: {
   readonly registeredShell: readonly [KeelPublishedInlineFragment, KeelPublishedInlineFragment];
   readonly existingParts: readonly [KeelPublishedInlineFragment, KeelPublishedInlineFragment, KeelPublishedInlineFragment];
 }) {
+  if ((KEEL_MODEL_MEDIA_TYPES as readonly string[]).includes(input.asset.mediaType)) {
+    inspectKeelModelMedia(input.asset);
+    throw new TypeError("Models require the exact complete loader closure and derived presentation, never the retired flat-primitive renderer.");
+  }
   keelAssetDisplayKind(input.asset.mediaType);
   const halves = [];
   for (const [index, published] of [input.existingParts[0], input.existingParts[2]].entries()) {

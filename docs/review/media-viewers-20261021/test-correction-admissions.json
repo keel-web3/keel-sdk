@@ -1,0 +1,29 @@
+{
+  "scope": "Exact test-only expectation corrections admitted by independent reviewer /root/review_current_successor; not full source/runtime/registration approval",
+  "patches": [
+    {
+      "sha256": "84152e6ad705f94f98a67560419ba9beb558103aec5ec02c50ec97163cac94df",
+      "disposition": "Unchanged four GLB magic bytes cannot be a complete model; replace impossible success with malformed-header rejection, preserve all raster/video and copy/hash/security assertions."
+    },
+    {
+      "sha256": "a20bab483dfd67cdea8c08dbafa50fe61edec66fe9b3f5e57761d15921fc0c67",
+      "disposition": "Actual CDP Runtime.evaluate returnByValue ready callback shape includes selectScene:{}; retain real behavior/scene assertions."
+    },
+    {
+      "sha256": "9f9d5c5150fc203d82fc070a83c7157ef37535950d0570368b2eaa03efbbfcfb",
+      "disposition": "Unchanged skin joints[4] has one real bone, parent skeleton node3 is not a second bone; preserve skin/mesh/texture/morph/quaternion guards."
+    },
+    {
+      "sha256": "165ccbe69fb9fa8ff9cc95bc3af79d00f72b647b4d9523ee86bd2631bea1c6ef",
+      "disposition": "Replace invalid green>50 assumption with exact full RGBA equality to independently built official loader reference, no tolerance/reference/source changes."
+    },
+    {
+      "sha256": "3bd4681d5d677915cd9f9041f57293d209b89a362223245ed0936e6725722146",
+      "disposition": "After owner-authorized fresh1.4 prototype removal, exact raster/video kind positives + explicit unsupported GLB/glTF replace retired model-kind success."
+    },
+    {
+      "sha256": "0bbad778416652284820d9b26fd9cb03771319b8b0649a2d00c7ceb42d8df06d",
+      "disposition": "After physical fresh1.4 prototype removal, assert absence of model/glTF MIME and WebGL prototype code, preserving img/video/no-network/wallet/copy/hash/counterfeit guards."
+    }
+  ]
+}
