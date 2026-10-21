@@ -311,7 +311,8 @@ test("MCP initializes, lists strict tools, and returns JSON-RPC parameter errors
     assert.match(publicationModes.staging.existingGraphRevision, /follow-latest.*without rewriting token presentation/iu);
     assert.match(publicationModes.staging.activeBuilderResolution, /selected-chain KeelRawTokenURIBuilder, Hold code and deployment receipts/iu);
     assert.match(publicationModes.staging.activeBuilderResolution, /KeelRawTokenURIBuilder/iu);
-    assert.match(publicationModes.staging.activeBuilderResolution, /PreEncodedGraph mode/iu);
+    assert.match(publicationModes.staging.activeBuilderResolution, /canonical raw-percent/iu);
+    assert.match(publicationModes.staging.activeBuilderResolution, /Historical prepared Base64\/percent carriage is retired/iu);
     assert.match(publicationModes.staging.legacyProtectorLane, /older complete-document protector lane/iu);
     assert.match(publicationModes.staging.legacyProtectorLane, /not the readiness check/iu);
     assert.deepEqual(await readdir(directory), resourceFiles);
