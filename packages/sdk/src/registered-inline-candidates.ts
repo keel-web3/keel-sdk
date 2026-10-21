@@ -151,7 +151,7 @@ function canonicalSources(html: Uint8Array, maximum: number) {
       : codec === "brotli" ? Uint8Array.from(brotliDecompressSync(stored, { maxOutputLength: length }))
       : (() => { throw new TypeError("Candidate uses an unsupported codec."); })();
     if (bytes.length !== length || sha(bytes) !== value.integrity.digest) throw new TypeError("Canonical source integrity mismatch.");
-    resources.push({ id: value.id, mediaType: value.mediaType, bytes, compression: codec });
+    resources.push({ id: value.id, mediaType: value.mediaType, bytes, compression: codec, descriptor: canonicalJson(value) });
   }
   return resources;
 }
@@ -252,7 +252,6 @@ export async function selectKeelRegisteredInlineCandidate(input: {
     const html = decodeKeelInlineDataURI(animationURI, "text/html", maxBuilt);
     assertKeelFreshPayloadCarriage(html, { registeredNativeGzip: built.registeredNativeGzip });
     const carriage = inspectKeelInlinePayloadCarriage(html, { registeredNativeGzip: built.registeredNativeGzip });
-    if (carriage.payloads.some(payload => payload.compression !== "container-bound" && payload.compression !== "none" && payload.compression !== recipe.codec)) throw new TypeError("Candidate silently changed its selected codec.");
     if (!Array.isArray(built.documentParts) || !built.documentParts.length || built.documentParts.length > 256) throw new RangeError("Invalid document part count.");
     const parts = built.documentParts.map((part: KeelRegisteredInlinePart) => ({ ...part, bytes: Uint8Array.from(part.bytes) }));
     if (built.auxiliaryObjects !== undefined && (!Array.isArray(built.auxiliaryObjects) || built.auxiliaryObjects.length > 128)) throw new RangeError("Invalid auxiliary object count.");
@@ -277,6 +276,13 @@ export async function selectKeelRegisteredInlineCandidate(input: {
     for (const registered of recipe.registeredParts) if (!unique.has(registered.objectId)) throw new TypeError("Candidate omitted a registered decoder/boot/module part.");
     for (const reused of recipe.reusedSourceObjects ?? []) if (!unique.has(reused.objectId)) throw new TypeError("Candidate omitted an authenticated reused source object.");
     if (!bytesEqual(Buffer.concat([...decodedParts, suffix]), html)) throw new TypeError("Stored document parts do not cover the actual returned HTML.");
+    const registeredModuleDescriptors = parts.filter(part => part.disposition === "reused" && part.role === "module"
+      && recipe.registeredParts.some(registered => registered.objectId === part.objectId && registered.role === "module")).map(part => {
+        const text = dec.decode(decodeKeelInlineGraphFragment(part.bytes, "application/vnd.keel.token-uri-raw-percent-fragment"));
+        if (!text.startsWith(",")) throw new TypeError("A registered module part must carry one exact resource descriptor.");
+        const descriptor: unknown = JSON.parse(text.slice(1)); record(descriptor);
+        return canonicalJson(descriptor);
+      });
     if (inspectKeelPreparedDenseCopyDocument(dec.decode(html)) !== undefined) throw new TypeError("Current registered candidates require canonical resource items, not a compatibility container.");
     const nativeBrowserGzip = built.registeredNativeGzip !== undefined;
     const resources = canonicalSources(html, maximum);
@@ -292,7 +298,18 @@ export async function selectKeelRegisteredInlineCandidate(input: {
         if (!shared || shared.mediaType !== resource.mediaType || shared.digest !== sha(resource.bytes) || shared.byteLength !== resource.bytes.length) throw new TypeError("Candidate introduced an unregistered source member.");
       }
       const resourceCodec = "compression" in resource ? resource.compression : undefined;
-      if (resourceCodec !== undefined && resourceCodec !== "none" && resourceCodec !== recipe.codec) throw new TypeError("Candidate silently changed its selected codec.");
+      if (expected) {
+        if (resourceCodec !== undefined && resourceCodec !== "none" && resourceCodec !== recipe.codec) throw new TypeError("Candidate silently changed its selected codec.");
+      } else if (resourceCodec !== "none") {
+        // A creator's codec choice cannot re-encode an immutable shared module.
+        // Only an exact registered reused module descriptor with the final
+        // document's native-Gzip proof may retain its independent codec.
+        if (resourceCodec !== "gzip" || registeredModuleDescriptors.filter(value => value === resource.descriptor).length !== 1
+          || !built.registeredNativeGzip?.members.some(member => member.id === resource.id && member.mediaType === resource.mediaType
+            && member.integrity.digest === sha(resource.bytes) && member.integrity.byteLength === resource.bytes.length)) {
+          throw new TypeError("A compressed shared source lacks its exact registered module and native-Gzip proof.");
+        }
+      }
     }
     if (sources.some(source => !seen.has(source.id))) throw new TypeError("Candidate omitted an original source.");
     if (input.sources.length !== sources.length || input.sources.some((source, i) => source.id !== sources[i]!.id
