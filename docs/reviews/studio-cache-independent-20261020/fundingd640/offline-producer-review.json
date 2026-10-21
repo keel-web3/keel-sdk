@@ -1,0 +1,59 @@
+{
+  "schema": "keel.independent-sdk311-offline-producer-review@1",
+  "decision": "APPROVE_EXACT_OFFLINE_PRODUCER_AND_ONE_OWNED_CONTEXT_PREPARATION",
+  "reviewerId": "independent-release-reviewer",
+  "proposalCommit": "868a0b1e69e41f2d7c629f6a4e2294d793038a51",
+  "siteCommit": "d64027b868c1d038854b6181049785fe50da0dcb",
+  "sdkCommit": "311d61526284248938e335d7ed879089408933be",
+  "newNextBuildId": "IETVxBFih4T2X8_Bx9hK0",
+  "files": {
+    "reuse-qualified-sdk311-packages.proposed.py": "54dbed1ca0157cf0681f003e048debfce712e76e460a6076981f0904ba7293f1",
+    "prepare-owned-context.with-reviewed-producer.proposed.py": "e9620d14cc1747c28e790926d0c5f8760880d78949442267d2823ed327bc7ea7",
+    "prepare-owned-context.strict-original.py": "c5f087c7525385ba0d4449df2ac4cfa628b0a0b40e544620259c28e2e446094a"
+  },
+  "ownReadOnlyCheck": {
+    "path": "/private/tmp/keel-independent-fundingd640-20261021/package-correspondence-review-check.json",
+    "sha256": "ab86349213d0fb0156526d29c8433bfb4deffb92067530d471c4add6d7e7269d",
+    "members": 1372,
+    "exactPreparerReverse": true,
+    "actualTwoLinePermutationVerified": true,
+    "mutationNegativesRejected": [
+      "dependencyVersion",
+      "whitespace",
+      "addedField",
+      "oldOrder"
+    ],
+    "reusePerformedByReviewer": false
+  },
+  "correspondenceScope": "Only exact builder package/package.json 1507B mode0644 oldSHAba3a10b6543c1090117e1e5ad8fa8446807374e9515d6f989c647ecd61cfed87/newSHA149ce768965ee659df75147ae25f65e37e2179aa3b201004dd510ddf401b7b4c; exact adjacent dependency-line swap plus fullJSONequal. All other member records byte/mode/size/type exact; duplicates/nonregular rejected. No broad SDK/hash exception.",
+  "shippedArchives": "Exact four prior qualified archive SHA pins, copied unchanged. All fresh generated inputs retained separately.",
+  "permittedOwnedPreparation": [
+    {
+      "from": "/private/tmp/keel-funding-image-build-20261021-01/image-context",
+      "to": "/private/tmp/keel-funding-image-build-20261021-01/image-context.strict-member-red"
+    },
+    {
+      "from": "/private/tmp/keel-funding-image-build-20261021-01/regenerated-package-archives",
+      "to": "/private/tmp/keel-funding-image-build-20261021-01/regenerated-package-archives.strict-member-red"
+    }
+  ],
+  "preconditions": [
+    "Only owned regular directories, no symlink; all destination and fresh-packed-sdk311-archives paths absent; never overwrite/delete old RED evidence",
+    "Preserve original strict failure logs/receipt before preparer rewrites same owned context-generation log names",
+    "Verify exact proposed source hashes before one invocation; stop on nonzero or uncertain result; no automatic retry"
+  ],
+  "oneOfflineArgv": [
+    "python3",
+    "-B",
+    "/private/tmp/keel-image-only-release-20261020/docs/reviews/studio-publication-20261020/release/funding-image311/prepare-owned-context.with-reviewed-producer.proposed.py"
+  ],
+  "strictAssertions": "Existing strict ma==mb fullmember checks remain byte-identical after inserted producer; installed1360/full external dependency zero-difference constraints remain mandatory in subsequent artifact qualification.",
+  "limits": "Existing exact contextPreparation recipe; no Next/SDK rebuild or local full image build admitted; retain both fresh-generated and prior qualified archives.",
+  "notAdmitted": [
+    "Host staging/build/import/activation",
+    "Deletion or cleanup of prior contexts/archives",
+    "Private artwork program preparation/replay/native execution/RPC/signing/submission",
+    "Image or live publication acceptance"
+  ],
+  "blockingFindings": []
+}

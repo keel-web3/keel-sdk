@@ -1,0 +1,69 @@
+{
+  "schema": "keel.independent-fundingd640-source-review@1",
+  "decision": "APPROVE_EXACT_SOURCE_FOR_ORDINARY_PR_AND_MERGE",
+  "reviewerId": "independent-release-reviewer",
+  "siteCommit": "d64027b868c1d038854b6181049785fe50da0dcb",
+  "authorFixCommit": "14a6a8f3b85ffce82789a30ff33d690fcc8543fc",
+  "base": "4796c0e0e8a90c68ffab28e637c9c270861e0970",
+  "sdk": "311d61526284248938e335d7ed879089408933be",
+  "priorReviewSHA256": "65bcc6772db163da86c68ffffd783c372e39231c9443517bc2a4d1d7269ade28",
+  "findingClosure": {
+    "FUNDING44-001": "CLOSED_FOR_EXACT_SOURCE_ONLY",
+    "approvedCompletedFixtureSHA256": "d012738abc99a7bac3e1aef020faa21de5392192572669147679a604a0d73120",
+    "originalRegressionSHA256": "569fab6aaa892dae689df51015c624d760d5a18b1edddd10dc80d5f99440b1dd",
+    "originalAndCompleted44REDPreserved": true,
+    "actualD640": {
+      "status": "approval-required",
+      "paidWei": "240",
+      "previousMinimumWei": "238",
+      "currentProofMinimumWei": "236",
+      "returnedMinimumWei": "236",
+      "persistedMinimumWei": "236",
+      "realSaveJournalExecuted": true
+    },
+    "newGuard": "Under existing journal/artifact row lock, same immutable paid quote/program/project/chain/revision/manifest/release/defaults and old/current approval/plan fingerprint/metadata identity; newer checkedAt than old proof+stored observation, current<=120s expiry; recompute exactminimum from successful current gasmap. Incomplete/stale/changed/underfunded/concurrent evidence preserves current metadata.",
+    "authorityPreserved": "Current paid amount/rate/gasbudget/funding proof/receipt and wallet journal remain untouched. Only validatedFundingMinimum+observation checkedAt may merge."
+  },
+  "independentChecks": {
+    "node": "22.22.1",
+    "focusedFundingAndActualPersistence": 46,
+    "failures": 0,
+    "skips": 0,
+    "approvedRegressionExit": 0,
+    "originalTenFundingBodies": "Unchanged, bound by prior independent review and exactQA",
+    "unchangedSDK311": "Actual emitted client test passes; own6reviewed changed-file hashes match frozen311; independentQA1745allbyteexact",
+    "observerAndBothFundingLoops": "Exact44cac byteunchanged in this correction; prior scoped security/signing/chain review carries"
+  },
+  "independentQA": {
+    "commit": "49816105f826d843fef1ce5644e0fdf885e28743",
+    "path": "/tmp/keel-qa-receipt-activation-20261020/keel-site/docs/reviews/studio-publication-20261021/qa-fundingd640/result.json",
+    "sha256": "c4a30e8a2597e67b2df254afa2fb162e75fcd81f477572880a29d67e7fd836f0",
+    "passingExecutions": 342,
+    "notAllUnique": true,
+    "fullAppTSC": 0,
+    "actualSaveAdversaries": 23,
+    "scope": "Source only; no privateprogram or newnative/liveapproval"
+  },
+  "sourceFiles": {
+    "apps/studio/src/lib/managed-publication.ts": "287781e5515b536aaca191d904af4ea134daca5df1996530a395cac41968e3ee",
+    "apps/studio/src/server/services/managed-publication-service.ts": "002b71a601a5974cb51f3cfc6b6ec087cdc113cb96739bfa9a060959bb6f3b52"
+  },
+  "testEvidenceSHA256": {
+    "d640-funding46.stdout": "5901310c27f84ed011b2d4c09008ff40255df1a7841cc2f2c08ee78c7c1edbf1",
+    "d640-funding46.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "d640-approved-repro.stdout": "f1ae53d4eaffae6a03fa0a7e06715848ad5646ae58c3d476989abeefcb860363",
+    "d640-approved-repro.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "blockingFindingsWithinExactSource": [],
+  "permitted": "Ordinary source PR72/merge of exactd640 under normal repository permissions; unchanged rights/receipt/source/freshness/transaction gates.",
+  "notAdmitted": [
+    "Hoststage/build/imageimport/cutover or any newartifactapproval",
+    "Art preparation/native replay/provider/request changes, signatures/submissions/spend",
+    "Blocked direct navigation retry/alternative access",
+    "Backup transfer/deletion scope beyond separately admitted exact3copies"
+  ],
+  "candidateDeployed": false,
+  "Gate6": "FAIL_UNRESOLVED_OWN_GATOR_AND_REAL_GIF_HANDOFF",
+  "productionCurrently": "CEE8/c63d/F2/SDK311 per existingQA; not read anew by reviewer",
+  "reviewerAuthoredProductionFix": false
+}
