@@ -1,0 +1,115 @@
+{
+  "schema": "keel.exact-final-history17cb-activation-actions@1",
+  "root": "/home/ubuntu/keel-studio-image-only-4c0acc2f-67e9-4d8f-92b0-71c9e95e83b5",
+  "source": {
+    "siteCommit": "71cb0e31bab5e4ee93af9d3b3185978e46f1fe8e",
+    "sdkCommit": "311d61526284248938e335d7ed879089408933be",
+    "buildId": "jfjIfW1-d41RR-j-i-YgL",
+    "appImageId": "sha256:17cb5aac36536e3d6026ba32b3bb3a66adc04af5bb7207082ee472dce66320c9"
+  },
+  "sourceRecipeSHA256": "bdceba43c06eb1c19970ba27ad3d907266b6ed0b356aa768cdddce39189b0c65",
+  "pendingPlanSHA256": "e39978f51efaf177a8ad5b5086dd2d6897e9c1113ab8645ee90d4c4fae43aec6",
+  "finalPlanSHA256": "d3d795443544b5beb6e2f9729f31512289248ae798404bade3e50fbbee510b06",
+  "technicalQASHA256": "b8583942eb1d04d1a4e78464f1a4eb3632e8e1a79111365c7a302e583e54921c",
+  "technicalReviewSHA256": "934c5347b8bf09ec2ae4e0254bb0b93eab3c5dec0801719e1a64069070d56b4c",
+  "permittedChangedFields": [
+    "approval.independentQA",
+    "approval.independentReleaseReview",
+    "approval.leadExecuteApproved",
+    "evidence.qa.sha256",
+    "evidence.releaseReview.sha256",
+    "physicalPhase",
+    "pending"
+  ],
+  "allImmutableFieldsExact": true,
+  "leadExecutionAuthorization": "User explicitly authorized ordinary deployment through existing infrastructure; lead approves this exact reviewed image-only activation. No wallet transaction or new credentials.",
+  "transferFiles": [
+    {
+      "remoteBasename": "qa-final.json",
+      "localPath": "/tmp/keel-qa-receipt-activation-20261020/keel-site/docs/reviews/studio-publication-20261021/qa-history17cb-runtime/qa-final.json",
+      "bytes": 11413,
+      "sha256": "b8583942eb1d04d1a4e78464f1a4eb3632e8e1a79111365c7a302e583e54921c",
+      "installArgv": [
+        "/usr/bin/ssh",
+        "-o",
+        "BatchMode=yes",
+        "-o",
+        "ConnectTimeout=12",
+        "-o",
+        "StrictHostKeyChecking=yes",
+        "-o",
+        "UserKnownHostsFile=/Users/ravonus/dev/hashers/ops/servers/known_hosts",
+        "ubuntu@40.160.39.155",
+        "sudo -n /usr/bin/python3 -B -c 'import os,stat,hashlib,sys;from pathlib import Path;r=Path('\"'\"'/home/ubuntu/keel-studio-image-only-4c0acc2f-67e9-4d8f-92b0-71c9e95e83b5'\"'\"');s=r.lstat();assert stat.S_ISDIR(s.st_mode)and s.st_uid==0 and stat.S_IMODE(s.st_mode)==0o700 and r.resolve()==r;n=int(sys.argv[1]);expected=sys.argv[2];raw=sys.stdin.buffer.read(n+1);assert len(raw)==n and hashlib.sha256(raw).hexdigest()==expected;f=os.fdopen(os.open(r/'\"'\"'qa-final.json'\"'\"',os.O_WRONLY|os.O_CREAT|os.O_EXCL|os.O_NOFOLLOW,0o600),'\"'\"'wb'\"'\"');f.write(raw);f.flush();os.fchmod(f.fileno(),0o444);os.fsync(f.fileno());f.close();d=os.open(r,os.O_DIRECTORY|os.O_NOFOLLOW);os.fsync(d);os.close(d)' 11413 b8583942eb1d04d1a4e78464f1a4eb3632e8e1a79111365c7a302e583e54921c"
+      ]
+    },
+    {
+      "remoteBasename": "releaseReview-final.json",
+      "localPath": "/private/tmp/keel-independent-history17cb-final-20261021/releaseReview-final.json",
+      "bytes": 15052,
+      "sha256": "934c5347b8bf09ec2ae4e0254bb0b93eab3c5dec0801719e1a64069070d56b4c",
+      "installArgv": [
+        "/usr/bin/ssh",
+        "-o",
+        "BatchMode=yes",
+        "-o",
+        "ConnectTimeout=12",
+        "-o",
+        "StrictHostKeyChecking=yes",
+        "-o",
+        "UserKnownHostsFile=/Users/ravonus/dev/hashers/ops/servers/known_hosts",
+        "ubuntu@40.160.39.155",
+        "sudo -n /usr/bin/python3 -B -c 'import os,stat,hashlib,sys;from pathlib import Path;r=Path('\"'\"'/home/ubuntu/keel-studio-image-only-4c0acc2f-67e9-4d8f-92b0-71c9e95e83b5'\"'\"');s=r.lstat();assert stat.S_ISDIR(s.st_mode)and s.st_uid==0 and stat.S_IMODE(s.st_mode)==0o700 and r.resolve()==r;n=int(sys.argv[1]);expected=sys.argv[2];raw=sys.stdin.buffer.read(n+1);assert len(raw)==n and hashlib.sha256(raw).hexdigest()==expected;f=os.fdopen(os.open(r/'\"'\"'releaseReview-final.json'\"'\"',os.O_WRONLY|os.O_CREAT|os.O_EXCL|os.O_NOFOLLOW,0o600),'\"'\"'wb'\"'\"');f.write(raw);f.flush();os.fchmod(f.fileno(),0o444);os.fsync(f.fileno());f.close();d=os.open(r,os.O_DIRECTORY|os.O_NOFOLLOW);os.fsync(d);os.close(d)' 15052 934c5347b8bf09ec2ae4e0254bb0b93eab3c5dec0801719e1a64069070d56b4c"
+      ]
+    },
+    {
+      "remoteBasename": "activation-plan.final.json",
+      "localPath": "/private/tmp/keel-17cb-activation-final-20261021/activation-plan.final.json",
+      "bytes": 3417,
+      "sha256": "d3d795443544b5beb6e2f9729f31512289248ae798404bade3e50fbbee510b06",
+      "installArgv": [
+        "/usr/bin/ssh",
+        "-o",
+        "BatchMode=yes",
+        "-o",
+        "ConnectTimeout=12",
+        "-o",
+        "StrictHostKeyChecking=yes",
+        "-o",
+        "UserKnownHostsFile=/Users/ravonus/dev/hashers/ops/servers/known_hosts",
+        "ubuntu@40.160.39.155",
+        "sudo -n /usr/bin/python3 -B -c 'import os,stat,hashlib,sys;from pathlib import Path;r=Path('\"'\"'/home/ubuntu/keel-studio-image-only-4c0acc2f-67e9-4d8f-92b0-71c9e95e83b5'\"'\"');s=r.lstat();assert stat.S_ISDIR(s.st_mode)and s.st_uid==0 and stat.S_IMODE(s.st_mode)==0o700 and r.resolve()==r;n=int(sys.argv[1]);expected=sys.argv[2];raw=sys.stdin.buffer.read(n+1);assert len(raw)==n and hashlib.sha256(raw).hexdigest()==expected;f=os.fdopen(os.open(r/'\"'\"'activation-plan.final.json'\"'\"',os.O_WRONLY|os.O_CREAT|os.O_EXCL|os.O_NOFOLLOW,0o600),'\"'\"'wb'\"'\"');f.write(raw);f.flush();os.fchmod(f.fileno(),0o444);os.fsync(f.fileno());f.close();d=os.open(r,os.O_DIRECTORY|os.O_NOFOLLOW);os.fsync(d);os.close(d)' 3417 d3d795443544b5beb6e2f9729f31512289248ae798404bade3e50fbbee510b06"
+      ]
+    }
+  ],
+  "preflightArgv": [
+    "/usr/bin/ssh",
+    "-o",
+    "BatchMode=yes",
+    "-o",
+    "ConnectTimeout=12",
+    "-o",
+    "StrictHostKeyChecking=yes",
+    "-o",
+    "UserKnownHostsFile=/Users/ravonus/dev/hashers/ops/servers/known_hosts",
+    "ubuntu@40.160.39.155",
+    "sudo -n /usr/bin/python3 -B /home/ubuntu/keel-studio-image-only-4c0acc2f-67e9-4d8f-92b0-71c9e95e83b5/activate-image-only.py /home/ubuntu/keel-studio-image-only-4c0acc2f-67e9-4d8f-92b0-71c9e95e83b5/activation-plan.final.json"
+  ],
+  "executeArgv": [
+    "/usr/bin/ssh",
+    "-o",
+    "BatchMode=yes",
+    "-o",
+    "ConnectTimeout=12",
+    "-o",
+    "StrictHostKeyChecking=yes",
+    "-o",
+    "UserKnownHostsFile=/Users/ravonus/dev/hashers/ops/servers/known_hosts",
+    "ubuntu@40.160.39.155",
+    "sudo -n /usr/bin/python3 -B /home/ubuntu/keel-studio-image-only-4c0acc2f-67e9-4d8f-92b0-71c9e95e83b5/activate-image-only.py /home/ubuntu/keel-studio-image-only-4c0acc2f-67e9-4d8f-92b0-71c9e95e83b5/activation-plan.final.json --execute-approved-sha256 d3d795443544b5beb6e2f9729f31512289248ae798404bade3e50fbbee510b06"
+  ],
+  "maximumActivationExecutions": 1,
+  "automaticRetry": false,
+  "finalActionAdmissionPending": true,
+  "productionActivated": false
+}

@@ -40,6 +40,21 @@
       "path": "qa-exact-approved-parser.py",
       "bytes": 10420,
       "sha256": "5f39987377f1a01327acd430de4cae7585250d92b04c8246e82878b73d21c898"
+    },
+    {
+      "path": "final-action-review.json",
+      "bytes": 3469,
+      "sha256": "e3718c93f4f13775ae0648b4f0a9c94a4996776b7de498c2a24c456f18f803bb"
+    },
+    {
+      "path": "final-actions.admitted.json",
+      "bytes": 6784,
+      "sha256": "bcf60a7960523a702a904ea34996d8b820b1c08f53e0ad00dec0e326d719c415"
+    },
+    {
+      "path": "activation-plan.final.json",
+      "bytes": 3417,
+      "sha256": "d3d795443544b5beb6e2f9729f31512289248ae798404bade3e50fbbee510b06"
     }
   ]
 }
