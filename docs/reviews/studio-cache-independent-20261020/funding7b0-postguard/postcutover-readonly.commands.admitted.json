@@ -1,0 +1,67 @@
+{
+  "schema": "keel.actual7b0-postcutover-readonly-guard-binding@1",
+  "candidate": {
+    "siteCommit": "62f5df235441a342871419ecc837907e42226596",
+    "sdkCommit": "311d61526284248938e335d7ed879089408933be",
+    "buildId": "oPM_JP5lg4vgS2ZQciiei",
+    "appImageId": "sha256:7b0c99bf7c5cd6a8ea639c7ea35a605e7e16b54b155b4300043651db0e2865d3"
+  },
+  "remoteRoot": "/home/ubuntu/keel-studio-image-only-b9b37f1a-1357-4e60-a02a-32ee90086bc9",
+  "actualFinalPlanPath": "/private/tmp/keel-7b0-activation-final-20261021/activation-plan.final.json",
+  "actualFinalPlanSHA256": "8d86a8c3548027ba9d2777161c227323de7bba1e94cc8a342463205bfd3e22f2",
+  "templatePath": "/private/tmp/keel-image-only-release-20261020/docs/reviews/studio-publication-20261020/release/funding-correction311/postcheck-readonly.template.py",
+  "templateSHA256": "5b86865549184db1987bd1452c46fdad620362e431c7ee27ddb4bc8b69621a61",
+  "newRuntimeContainerID": null,
+  "actualDurableActivationReceiptSHA256": null,
+  "rootIsSoleHostOperator": true,
+  "authorHostActions": false,
+  "bindOnlyAfterActualDurablePASS": true,
+  "bindLocalSourceArgvTemplate": [
+    "/usr/bin/python3",
+    "-B",
+    "-c",
+    "import os,sys,json,re,hashlib,ast\nfrom pathlib import Path\nt=Path('/private/tmp/keel-image-only-release-20261020/docs/reviews/studio-publication-20261020/release/funding-correction311/postcheck-readonly.template.py');b=t.read_bytes();assert hashlib.sha256(b).hexdigest()=='5b86865549184db1987bd1452c46fdad620362e431c7ee27ddb4bc8b69621a61';assert b.count(b'__ACTUAL_NEW_CONTAINER_ID__')==1\np=Path(sys.argv[1]);raw=p.read_bytes();assert 0<len(raw)<=65536 and hashlib.sha256(raw).hexdigest()==sys.argv[2];a=json.loads(raw);assert a['productionActivated'] is True and a['candidate']=={'siteCommit': '62f5df235441a342871419ecc837907e42226596', 'sdkCommit': '311d61526284248938e335d7ed879089408933be', 'buildId': 'oPM_JP5lg4vgS2ZQciiei', 'appImageId': 'sha256:7b0c99bf7c5cd6a8ea639c7ea35a605e7e16b54b155b4300043651db0e2865d3'} and a['originalContainer']=='58fc75f0ada4a3dd367ab7039331bc1830eb9d256d77f148f26035b86e95abdd'\nid=a['newContainer'];assert re.fullmatch('[0-9a-f]{64}',id) and id!='58fc75f0ada4a3dd367ab7039331bc1830eb9d256d77f148f26035b86e95abdd'\nbound=b.replace(b'__ACTUAL_NEW_CONTAINER_ID__',id.encode());ast.parse(bound);out=Path(sys.argv[3]);assert out.parent.resolve()==out.parent\nwith os.fdopen(os.open(out,os.O_WRONLY|os.O_CREAT|os.O_EXCL|os.O_NOFOLLOW,0o600),'wb') as f:f.write(bound);f.flush();os.fsync(f.fileno())\nd=os.open(out.parent,os.O_DIRECTORY|os.O_NOFOLLOW);os.fsync(d);os.close(d)\nprint(json.dumps({'result':'BOUND_SOURCE_ONLY','newContainer':id,'boundPostguardPath':str(out),'boundPostguardSHA256':hashlib.sha256(bound).hexdigest(),'receiptSHA256':hashlib.sha256(raw).hexdigest(),'hostActions':False}))\n",
+    "__ACTUAL_DURABLE_ACTIVATION_RECEIPT_LOCAL_PATH__",
+    "__ACTUAL_DURABLE_ACTIVATION_RECEIPT_SHA256__",
+    "/private/tmp/keel-7b0-activation-actual-20261021/postcheck-readonly.bound.py"
+  ],
+  "postguardReadOnlyArgv": [
+    "/usr/bin/ssh",
+    "-o",
+    "BatchMode=yes",
+    "-o",
+    "ConnectTimeout=12",
+    "-o",
+    "StrictHostKeyChecking=yes",
+    "-o",
+    "UserKnownHostsFile=/Users/ravonus/dev/hashers/ops/servers/known_hosts",
+    "ubuntu@40.160.39.155",
+    "sudo -n /usr/bin/python3 -B -"
+  ],
+  "stdinLocalPathAfterBinding": "/private/tmp/keel-7b0-activation-actual-20261021/postcheck-readonly.bound.py",
+  "transportTimeoutSeconds": 120,
+  "requireWholeCommandExitCodeZeroAndAllThreeRecordsPASS": true,
+  "sensitiveDataPolicy": "HostmemoryConfig/Env checked only by digest; no rawsecret/publicdump/artwork/trace output. Backupsha/TOCcount/hash only; noDBrestore.",
+  "preservationChecks": [
+    "actualnew7b0 immutableID/fullcandidateConfiguration/healthy/publisherpause",
+    "stopped58fc1058 atrollbackb9 fulloriginalrawbaseline",
+    "D97/socket/profile and completeimageConfigRootFSsize",
+    "all1360SDK311/source62f/buildoPM/native8a",
+    "newcompleteboundedDBsnapshotfullsha and598TOC; restorefalse",
+    "previous7016snapshot98c938124235723 and c63CEE8fullstoppedbaseline",
+    "previous07a4snapshot153259124215008 and stoppedfe455+95 retained"
+  ],
+  "olderProtectedOffhostCopies": {
+    "directory": "/private/tmp/keel-older-snapshot-retention-20261021",
+    "files": [
+      "2779804f.dump",
+      "823ac084.dump",
+      "5895d3d5.dump"
+    ],
+    "reference": "/private/tmp/keel-image-only-release-20261020/docs/reviews/studio-publication-20261020/release/funding-image311/actual-deployment-audit/result.json",
+    "hostPostguardDoesNotAccessMacPaths": true,
+    "noCleanupOrRestore": true
+  },
+  "livePublicationAcceptanceClaimed": false,
+  "executeAutomatically": false
+}
