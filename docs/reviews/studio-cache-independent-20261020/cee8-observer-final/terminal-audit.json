@@ -1,0 +1,57 @@
+{
+  "result": "PASS_OBSERVER_ONLY_ACTUAL_THREE_PUBLIC_ROLES",
+  "image": "sha256:cee8c0b777f78372c6ee56bd9ff1c66dbeafd6393d04cb7f298fab6eb7bac9b7",
+  "rows": [
+    {
+      "role": "tree",
+      "bytes": 2539,
+      "sha256": "99705aa32c08764aae69860555cd279f67fe49e19852182dfe8527480ed148dc",
+      "durableBytesExactStdout": true,
+      "status": "PASS",
+      "exitCode": 0,
+      "retainedStoppedId": "87a356f79626853bc36788c177e1a71d881a640101e032894a4ffcf7a7dbf1c5",
+      "elapsedSeconds": 8.13035945314914,
+      "observerSamples": 0,
+      "cgroupPeakBytes": null,
+      "allObservedOomCountersZero": true
+    },
+    {
+      "role": "sdk",
+      "bytes": 40145,
+      "sha256": "8f138fc8d49872b8e0901be0e298f4f623ce0ea10fe5d6a91c7606d2d478e77f",
+      "durableBytesExactStdout": true,
+      "status": "PASS",
+      "exitCode": 0,
+      "retainedStoppedId": "aa347ccaf601582e75cee433b196b6d4f8a808d8ec9d4f7b282726083be1b9bb",
+      "elapsedSeconds": 6.150425722822547,
+      "observerSamples": 15,
+      "cgroupPeakBytes": 315383808,
+      "allObservedOomCountersZero": true
+    },
+    {
+      "role": "http",
+      "bytes": 15262,
+      "sha256": "14cc0f61f4e80fbd2b0e28897b9331dcb10ecbb3df7f742f53357fe9ccdc30ec",
+      "durableBytesExactStdout": true,
+      "status": "PASS",
+      "exitCode": 0,
+      "retainedStoppedId": "1dd0aae8c1b14cc6c41fe14e820bbf0d695e8280d9e034364f952d803bbfd2c8",
+      "elapsedSeconds": 8.595651286887005,
+      "observerSamples": 21,
+      "cgroupPeakBytes": 271130624,
+      "allObservedOomCountersZero": true
+    }
+  ],
+  "fullBeforeAfterBaseline": {
+    "originalId": "fa0eb0299164407e24e1cda31b21b196ea8a8071a1a39ce71efd414234ef1659",
+    "configSHA256": "4b0d3c5b22fb8d7c5550d8fc6bc84a8d9528fbf1737e2aa3ce72f16a231e39a2",
+    "hostSHA256": "186e487039113f582118064bce13b98c79f75eca5b3fa0d788c7d79b8fb14049",
+    "mountsSHA256": "74cc304b0955c822f88ffdbcbff56d89857f5ea3d7c51246ec106f00247ade89",
+    "runnerId": "434316eff6e19951807f95ba8aee03a4db684d760039dfeb723c7bf9203a8649",
+    "workerPaused": true,
+    "healthy": true
+  },
+  "rootSoleHostOperator": true,
+  "reviewerIndependentReceiptAuditOnly": true,
+  "privateProgramRPCSigningSubmission": false
+}

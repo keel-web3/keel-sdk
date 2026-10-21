@@ -1,0 +1,169 @@
+{
+  "schema": "keel.qa-observer-only-activation-readiness@1",
+  "result": "APPROVE_OBSERVER_ONLY_CANDIDATE_FOR_SEPARATELY_REVIEWED_IMAGE_ONLY_ACTIVATION",
+  "recordedAt": "2026-10-21T00:31:32.519433+00:00",
+  "candidate": {
+    "site": "0c7b01e3acae5ec787568d6b5931b002654b4de0",
+    "sdk": "311d61526284248938e335d7ed879089408933be",
+    "buildId": "F2eKiuWl2rvz5hqBZQ9wi",
+    "image": "sha256:cee8c0b777f78372c6ee56bd9ff1c66dbeafd6393d04cb7f298fab6eb7bac9b7",
+    "completeAppEntries": 36065,
+    "completeAppTreeSHA256": "9df3273c29d50154dfb783ef05b419317b803e47b847dbf7170d98d3fde74438",
+    "nativeImageRemains": "sha256:d97ddf2aba94cb963646fdf05bc8dc8c99b7e69b8c19bad85c06bea7c67fc9f5",
+    "nativeExecutorSHA256": "8a2970e2cebc1f4b51bd228ab7fa53208e2d247030f46037991351115f12a3b5"
+  },
+  "scope": {
+    "observerOnlyTechnicalQAApproved": true,
+    "exactActivationCommandAdmission": false,
+    "productionApplicationActuallyActivatedByThisReceipt": false,
+    "newNativeOrPublicationProgramApproval": false,
+    "walletRequestSigningSubmissionApproval": false,
+    "purpose": "Deploy previously source-reviewed owner-bound saved-plan observer, without claiming to fix failed publication or using alternate auth/data access. Exact final operator/plan/command approval remains independentreviewer/root scope."
+  },
+  "sourceBasis": {
+    "path": "docs/reviews/studio-publication-20261020/qa-observer0c7/result.json",
+    "sha256": "31cfeb1ddc0af01c769e241d721592394184f68ce78e6dd467ea97f11e55b7ab",
+    "result": "89PASS/TSC0 exact0c7+311; not rerun thiswave"
+  },
+  "contextBasis": {
+    "path": "docs/reviews/studio-publication-20261020/qa-observer-artifact/result.json",
+    "sha256": "d86c6fe1d0aa5d6d4b1ce18adfd725e322028fb8382a82e2362b106dd817c541",
+    "result": "22unchangedpurecontrols + full9df327context reconstruction; not freshsource/nativeproof"
+  },
+  "actualArtifactBasis": {
+    "path": "docs/reviews/studio-publication-20261020/qa-observer-actual-cee8/result.json",
+    "sha256": "197cf3a83fd16d0f351889bc0bcdc067dc370d799f50f5383a478a2ce44b7978",
+    "result": "Complete713080832BSAVE/42blobs40layers/38parentprefix/fullConfig/36065app/1360own311PASS; independentoffhostaudit"
+  },
+  "freshActualLinuxRoles": {
+    "runtimeAuditPath": "runtime-receipt-audit.json",
+    "runtimeAuditSHA256": "3d60057a2fa5457bb362ed7d2565e6c0ec6ede0a7d36fa39ecc176067959e685",
+    "roles": [
+      {
+        "role": "tree",
+        "stdoutSHA256": "99705aa32c08764aae69860555cd279f67fe49e19852182dfe8527480ed148dc",
+        "durableSHA256": "99705aa32c08764aae69860555cd279f67fe49e19852182dfe8527480ed148dc",
+        "bytes": 2539,
+        "durableBytesExactStdout": true,
+        "retainedStoppedId": "87a356f79626853bc36788c177e1a71d881a640101e032894a4ffcf7a7dbf1c5",
+        "exitCode": 0,
+        "runnerEnforcedStoppedAndOOMFalse": true,
+        "fullCreatedConfigSHA256": "dbec731671964458aad660f8f8e2f3c5a47c458f03f837bf2d3fcb48ab8d1dc2",
+        "fullCreatedHostSHA256": "99622a9f244969d593bebd002d1e639ce60ff5a75e17e94eac3bcdda16140c43",
+        "elapsedSeconds": 8.13035945314914,
+        "observerSamples": 0,
+        "observedCgroupPeakBytes": null,
+        "allObservedOOMCountersZero": true,
+        "retainedExactNodeDeprecationWarning": []
+      },
+      {
+        "role": "sdk",
+        "stdoutSHA256": "8f138fc8d49872b8e0901be0e298f4f623ce0ea10fe5d6a91c7606d2d478e77f",
+        "durableSHA256": "8f138fc8d49872b8e0901be0e298f4f623ce0ea10fe5d6a91c7606d2d478e77f",
+        "bytes": 40145,
+        "durableBytesExactStdout": true,
+        "retainedStoppedId": "aa347ccaf601582e75cee433b196b6d4f8a808d8ec9d4f7b282726083be1b9bb",
+        "exitCode": 0,
+        "runnerEnforcedStoppedAndOOMFalse": true,
+        "fullCreatedConfigSHA256": "c65e739e6ca36a0755752310acee131a24b2a33d918b46c3c01df254686a4c82",
+        "fullCreatedHostSHA256": "82868ab5f4f99471555966d6cffa4a03c93c5f88a5395210c79578fb0605decc",
+        "elapsedSeconds": 6.150425722822547,
+        "observerSamples": 15,
+        "observedCgroupPeakBytes": 315383808,
+        "allObservedOOMCountersZero": true,
+        "retainedExactNodeDeprecationWarning": [
+          "(node:43) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.",
+          "(Use `node --trace-deprecation ...` to show where the warning was created)"
+        ]
+      },
+      {
+        "role": "http",
+        "stdoutSHA256": "14cc0f61f4e80fbd2b0e28897b9331dcb10ecbb3df7f742f53357fe9ccdc30ec",
+        "durableSHA256": "14cc0f61f4e80fbd2b0e28897b9331dcb10ecbb3df7f742f53357fe9ccdc30ec",
+        "bytes": 15262,
+        "durableBytesExactStdout": true,
+        "retainedStoppedId": "1dd0aae8c1b14cc6c41fe14e820bbf0d695e8280d9e034364f952d803bbfd2c8",
+        "exitCode": 0,
+        "runnerEnforcedStoppedAndOOMFalse": true,
+        "fullCreatedConfigSHA256": "3aafef3e26e17a3df9ff236e96757e023ecab30e2f821c5c2a9b492e3f106277",
+        "fullCreatedHostSHA256": "936c259c09192fae1384dd3ee2206caa6af3e429cfc7cd32292869ac179634d8",
+        "elapsedSeconds": 8.595651286887005,
+        "observerSamples": 21,
+        "observedCgroupPeakBytes": 271130624,
+        "allObservedOOMCountersZero": true,
+        "retainedExactNodeDeprecationWarning": []
+      }
+    ],
+    "all3OuterAndInnerPass": true,
+    "all3DurableCopiesByteEqualStdout": true,
+    "all3DistinctOwnedContainersStoppedAndOOMFalse": true,
+    "fullOriginalAndRunnerPreserved": {
+      "originalId": "fa0eb0299164407e24e1cda31b21b196ea8a8071a1a39ce71efd414234ef1659",
+      "configSHA256": "4b0d3c5b22fb8d7c5550d8fc6bc84a8d9528fbf1737e2aa3ce72f16a231e39a2",
+      "hostSHA256": "186e487039113f582118064bce13b98c79f75eca5b3fa0d788c7d79b8fb14049",
+      "mountsSHA256": "74cc304b0955c822f88ffdbcbff56d89857f5ea3d7c51246ec106f00247ade89",
+      "runnerId": "434316eff6e19951807f95ba8aee03a4db684d760039dfeb723c7bf9203a8649",
+      "workerPaused": true,
+      "healthy": true
+    },
+    "runtimeNode": "v22.23.1",
+    "runtimeVersions": {
+      "next": "16.2.12",
+      "sharp": "0.35.3",
+      "esbuild": "0.28.2",
+      "viem": "2.57.7"
+    },
+    "fullTreeEntries": 36065,
+    "allCoreDistFiles": 1360,
+    "unchangedExternalDependencyEntries": 16129,
+    "onlyExternalDifferences": [],
+    "nativeOpsBootstrapPublisherUnchanged": true,
+    "nativeAndLzmaActualCompiledFactoryGoldens": true,
+    "publishedReaderAndCanonicalChrome": true,
+    "workerImportSockets": 0,
+    "mediaCapabilitiesImageMovie": true,
+    "observedCgroupPeaksBytes": {
+      "sdk": 315383808,
+      "http": 271130624
+    },
+    "observedOOMCounters": "zero in allSDK/HTTPobserver samples; tree has noobserver, DockerOOMfalse enforced",
+    "HTTP": {
+      "exactPublicGETHEAD200": 4,
+      "privateAndWrongMethod401": 16,
+      "manifestBytes": 10686,
+      "manifestSHA256": "2e4896620cb0d443576d1ae37202f04702a11868f32de958d6b545c4e5c3da9f",
+      "actualPackagedServer": true,
+      "authenticated": false,
+      "scope": "isolated no-network loopback server, not deployed browser or upstream RPC"
+    },
+    "underTest": "ActualinstalledLinuximage modules and actualstandaloneHTTPserver with controlledpublicinputs/networknone/read-only/UID999/emptyPGcover; no livecreator/RPC/privateprogram."
+  },
+  "parserBindingDelta": {
+    "path": "candidate-binding-and-extra-checks.patch",
+    "sha256": "e912888863b5d825db12e2eeaeba33cb4cca39d611061397c4b9657da7485db2",
+    "scope": "Candidate source/build/image/currentbaseline/tree count and rawfile/command-receipt setup retargets only, plus stronger zeroSDKdelta/fullbeforebaseline/golden/source assertions. Allold warning/HTTP/privacy/OOM/durable/authority assertions retained. ExactNode43DEP0040two-line exception unchanged from independentapprovede494 priorparser. No wrongassertion correction thiswave."
+  },
+  "retainedNegatives": {
+    "originalStrict280CompiledComparison": "FAIL_UNPROVEN soleprotocol95997\u219233504; reviewer59d176 source/codegen attribution kept separate, not total compiled/native equivalence",
+    "oldFe455OwnGatorAndRealGIF": "Both actualnormalUIpreparations failedgeneric; causes unresolved, no retry byQA",
+    "priorAuditorSetupREDS": "Schema-wrapper and metadata-key lookup originals retained with exact independent approvals in earliercontext/artifact evidence"
+  },
+  "remainingRequiredAfterSeparateActivation": [
+    "Independently confirm newdeployedbuild/image/provenance and currentrollback/runner/pausedguards",
+    "Normalauthenticatedowner saved-plan status and private diagnostic download using existingUI; no alternateblockedAPI/auth bypass",
+    "Own exact-source Gator1cef normaldeployed simulation to unsignedwallet boundary",
+    "Real GIFfcf normaldeployed simulation to unsignedwallet boundary",
+    "Fresh historical MIME/hash/SDKdecode/render on thisobserverbuild; no exactHTTP200 claim unless observed",
+    "OriginalA5/Kthings owner untouched; do not callourcopy owner-original execution"
+  ],
+  "Gate6": "FAIL_UNRESOLVED_PENDING_REAL_DEPLOYED_PUBLICATION_SUCCESS",
+  "fullNativeEquivalenceClaim": false,
+  "authBypass": false,
+  "qaHostActions": 0,
+  "qaBrowserActions": 0,
+  "qaPrivateProgramReplays": 0,
+  "qaSignatures": 0,
+  "qaSubmissions": 0,
+  "qaProductionChanges": 0,
+  "actualRolesExecutedBy": "Root solehostoperator; QA independentlyexecuted purelocalreceipt parser afterfreshdurablecopies"
+}

@@ -1,0 +1,41 @@
+{
+  "schema": "keel.actual-fe455-public-test@1",
+  "result": "PASS",
+  "role": "tree",
+  "image": "sha256:cee8c0b777f78372c6ee56bd9ff1c66dbeafd6393d04cb7f298fab6eb7bac9b7",
+  "before": {
+    "originalId": "fa0eb0299164407e24e1cda31b21b196ea8a8071a1a39ce71efd414234ef1659",
+    "configSHA256": "4b0d3c5b22fb8d7c5550d8fc6bc84a8d9528fbf1737e2aa3ce72f16a231e39a2",
+    "hostSHA256": "186e487039113f582118064bce13b98c79f75eca5b3fa0d788c7d79b8fb14049",
+    "mountsSHA256": "74cc304b0955c822f88ffdbcbff56d89857f5ea3d7c51246ec106f00247ade89",
+    "runnerId": "434316eff6e19951807f95ba8aee03a4db684d760039dfeb723c7bf9203a8649",
+    "workerPaused": true,
+    "healthy": true
+  },
+  "nativeOrRPCInvoked": false,
+  "authenticatedContainerId": "87a356f79626853bc36788c177e1a71d881a640101e032894a4ffcf7a7dbf1c5",
+  "fullCreatedConfigSHA256": "dbec731671964458aad660f8f8e2f3c5a47c458f03f837bf2d3fcb48ab8d1dc2",
+  "fullCreatedHostSHA256": "99622a9f244969d593bebd002d1e639ce60ff5a75e17e94eac3bcdda16140c43",
+  "exitCode": 0,
+  "oomComparison": {
+    "schema": "keel.candidate-oom-comparison@1",
+    "projected": true,
+    "expected": false,
+    "actual": null,
+    "hostProfileSHA256": "de90264866cfea2742d916546b3df4121d338e036f9f60d24555df5887d83cdd",
+    "scope": "new-owned-candidate-comparison-only"
+  },
+  "retainedStoppedContainerId": "87a356f79626853bc36788c177e1a71d881a640101e032894a4ffcf7a7dbf1c5",
+  "stdout": "{\"schema\":\"keel.actual-image-complete-tree-component-equivalence@1\",\"result\":\"PASS\",\"entries\":36065,\"completeAppTreeSHA256\":\"9df3273c29d50154dfb783ef05b419317b803e47b847dbf7170d98d3fde74438\",\"externalDependencyEntries\":16129,\"onlyExternalDifferences\":[],\"unchangedExternalClosureSHA256\":\"3bfed0d64c298b7cf08da09fae1c75867d551cfa90e010780b21ff5236f64b8e\",\"unchangedNativeOpsBootstrapWorkerSHA256\":\"0abb465788d32be2a0047bcf4c91dd5745be0848ecb8dfda511714f6f89ebbc8\",\"nativeSimulationPerformed\":false,\"networkUsed\":false,\"productionActivated\":false}\n",
+  "stderr": "",
+  "after": {
+    "originalId": "fa0eb0299164407e24e1cda31b21b196ea8a8071a1a39ce71efd414234ef1659",
+    "configSHA256": "4b0d3c5b22fb8d7c5550d8fc6bc84a8d9528fbf1737e2aa3ce72f16a231e39a2",
+    "hostSHA256": "186e487039113f582118064bce13b98c79f75eca5b3fa0d788c7d79b8fb14049",
+    "mountsSHA256": "74cc304b0955c822f88ffdbcbff56d89857f5ea3d7c51246ec106f00247ade89",
+    "runnerId": "434316eff6e19951807f95ba8aee03a4db684d760039dfeb723c7bf9203a8649",
+    "workerPaused": true,
+    "healthy": true
+  },
+  "elapsedSeconds": 8.13035945314914
+}

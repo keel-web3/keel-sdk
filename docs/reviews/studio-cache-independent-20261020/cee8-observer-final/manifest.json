@@ -1,0 +1,48 @@
+{
+  "schema": "keel.independent-observer-only-evidence@1",
+  "scope": "Observer-only candidate readiness. Exact final activation commands separately reviewed; publication failures/Gate6 unresolved.",
+  "files": [
+    {
+      "path": "releaseReview-final.json",
+      "bytes": 9116,
+      "sha256": "84c799263865dc0a7f6627ec33f4cd8109e645637231291da6ec85ff38898f0f",
+      "source": "/private/tmp/keel-independent-cee8-final-review-20261021/releaseReview-final.json"
+    },
+    {
+      "path": "terminal-audit.json",
+      "bytes": 2203,
+      "sha256": "edc542e05cdebd502c36aa53c1044fed2d9f30c6f003f1a1b0cf3b84a60f4dba",
+      "source": "/private/tmp/keel-independent-cee8-final-review-20261021/terminal-audit.json"
+    },
+    {
+      "path": "qa-final.json",
+      "bytes": 9354,
+      "sha256": "4c307f5e8ae93dff80adec048bbacfe6dfce4a8ab9f49a8675760ecfa1e15ca9",
+      "source": "/tmp/keel-qa-receipt-activation-20261020/keel-site/docs/reviews/studio-publication-20261020/qa-observer-cee8-runtime/qa-final.json"
+    },
+    {
+      "path": "candidate-binding-and-extra-checks.patch",
+      "bytes": 10796,
+      "sha256": "e912888863b5d825db12e2eeaeba33cb4cca39d611061397c4b9657da7485db2",
+      "source": "/tmp/keel-qa-receipt-activation-20261020/keel-site/docs/reviews/studio-publication-20261020/qa-observer-cee8-runtime/candidate-binding-and-extra-checks.patch"
+    },
+    {
+      "path": "tree.stdout",
+      "bytes": 2539,
+      "sha256": "99705aa32c08764aae69860555cd279f67fe49e19852182dfe8527480ed148dc",
+      "source": "/private/tmp/keel-cee8-public-roles-actual-20261021/tree.stdout"
+    },
+    {
+      "path": "sdk.stdout",
+      "bytes": 40145,
+      "sha256": "8f138fc8d49872b8e0901be0e298f4f623ce0ea10fe5d6a91c7606d2d478e77f",
+      "source": "/private/tmp/keel-cee8-public-roles-actual-20261021/sdk.stdout"
+    },
+    {
+      "path": "http.stdout",
+      "bytes": 15262,
+      "sha256": "14cc0f61f4e80fbd2b0e28897b9331dcb10ecbb3df7f742f53357fe9ccdc30ec",
+      "source": "/private/tmp/keel-cee8-public-roles-actual-20261021/http.stdout"
+    }
+  ]
+}
