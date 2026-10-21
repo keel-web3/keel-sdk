@@ -1,0 +1,12 @@
+{
+  "result": "PASS_EXACT_EIGHT_PUBLIC_SCOPE",
+  "actualReceiptSHA256": "265976d16b47bcfe3ec5cddcd6e16066eca734b4cc1186bbda542e73ec461819",
+  "exactExpectedRemovedPathsHashesSizes": true,
+  "removedCount": 8,
+  "removedPayloadBytes": 66240746,
+  "fullCurrentBeforeAfterExact": true,
+  "freeBytesAfter": 1481584640,
+  "directoryPrivateDataImageContainerVolumeSnapshotOrActivationChanges": false,
+  "noAdditionalActionAuthority": true,
+  "reviewerHostCalls": 0
+}

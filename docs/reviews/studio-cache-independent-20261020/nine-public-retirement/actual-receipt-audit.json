@@ -1,0 +1,14 @@
+{
+  "result": "PASS_EXACT_RETIRED_SCOPE",
+  "actualResultSHA256": "1f4d5df97f41207e6b73b217b42a9d37046151d702b376c0d7a6b4d3ab65eee2",
+  "freshUnchangedPreflightSHA256": "bb13b941ac676eb1d83df5d645a5fcce117426063e77ce60f43853da454e3f58",
+  "removedCount": 9,
+  "removedPayloadBytes": 330572918,
+  "exactAllNinePathsHashesAndSizes": true,
+  "fullCurrentBeforeAfterExact": true,
+  "freeBytesAfter": 1438470144,
+  "directoriesOrPrivateDataModified": false,
+  "sourceUnchangedFromAdmission": true,
+  "initialBaselineNotHealthyRED": "Retained; before cleanup consumption. Normal public GET later woke same original id; no explicit restart or guard change. No additional cleanup execution admitted.",
+  "reviewerHostActions": 0
+}
