@@ -8,7 +8,7 @@ async function stage(overrides={}){let metadata,form;const input={studioUrl:'htt
 test('SDK staging and protocol expose the same presets and exact new-source recommendation',async()=>{
  assert.deepEqual(KEEL_ASSET_PRESENTATION_PREFERENCES,['automatic','external-preview','inline-image-hybrid-verifier']);
  const small=await stage();assert.equal(small.metadata.viewer,'keel-verification-shell');assert.equal(small.metadata.assetPresentation,'automatic');
- const bytes=text.encode('x'.repeat(500001));const large=await stage({files:[{path:'item.txt',mediaType:'text/plain',bytes,role:'data',format:'asset'}]});assert.equal(large.metadata.viewer,'none');assert.equal((await large.form.get('files').arrayBuffer()).byteLength,500001);
+ const bytes=text.encode('x'.repeat(500001));const large=await stage({files:[{path:'item.txt',mediaType:'text/plain',bytes,role:'data',format:'asset'}]});assert.equal(large.metadata.viewer,'keel-verification-shell');assert.equal((await large.form.get('files').arrayBuffer()).byteLength,500001);
  const split=await stage({files:[{path:'item.txt',mediaType:'text/plain',bytes:text.encode('x'.repeat(2000001)),role:'data',format:'asset'}]});assert.equal(split.metadata.viewer,'keel-verification-shell');
 });
 test('all choice fields survive SDK/API staging without becoming wallet authority',async()=>{

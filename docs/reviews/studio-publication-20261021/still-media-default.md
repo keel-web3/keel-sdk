@@ -88,3 +88,24 @@ and exact full-output/normal simulation gates. A producer's `sourceMotion`
 claim, local probe, numeric estimate or SDK staging metadata is not receipt,
 registration, readback, availability, funding or wallet authority. No live
 acceptance gate is claimed by this source/test checkpoint.
+
+## Staging authority correction after independent review
+
+Independent review found a real error in d222's staging expectation: a known
+still file over500KB could select `viewer=none` without any selected-chain
+capability, omitting the default publication intent and persisting artifact-only
+intent too early. The pure planner's provisional recommendation is not
+authority for that persistence decision. Automatic SDK staging now retains the
+canonical viewer and full default publication intent until Studio performs
+selected-chain and complete-output qualification. Explicit viewer, saved
+profile/slots and explicit candidate choices retain their existing precedence.
+
+The unchanged emitted d222 staging regression is retained: 2 PASS / 1 FAIL;
+its successor source makes those three independent-intent owner cases PASS.
+The default PNG threshold test's old `none` expectation is held separately for
+independent approval; its proposed correction adds publication-intent checks
+and preserves every uploaded-byte assertion. It is not silently relabeled
+successful. Independent receipt b439e5d948ef674ce130ab0c2f3f4c1475ace44acbc72f6d425a6f3f707c9e06
+approved the exact earlier eight legacy expectation corrections e705c863 and
+the first new-test classifier entry25bbe60c; only those were applied at this
+checkpoint. Their full affected rerun plus new authority cases is54 PASS.
