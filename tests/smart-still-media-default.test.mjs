@@ -103,9 +103,9 @@ async function stage(bytes, mediaType, explicit = {}) {
       return Response.json({schema:'keel-studio-project-handoff@1',id:'same-source',handoffUrl:'https://studio.example/studio/projects/new?handoff=secret',expiresAt:'2027-09-01T00:00:00Z',fileCount:1,totalBytes:bytes.length,wallet:{signing:'not-performed',submission:'not-performed'}},{status:201});
     }});return metadata;
 }
-test('real SDK staging probes actual PNG/APNG and preserves exact bytes at the still threshold',async()=>{
+test('real SDK staging keeps canonical intent until server qualification and preserves exact source bytes',async()=>{
   for(const size of [499999,500000,500001,1999999,2000000,2000001]){
-    const metadata=await stage(png({size}),'image/png');assert.equal(metadata.viewer,size>500000&&size<=2000000?'none':'keel-verification-shell');
+    const metadata=await stage(png({size}),'image/png');assert.equal(metadata.viewer,'keel-verification-shell');assert.equal(metadata.publicationIntent?.schema,'keel-studio-publication-intent@1');assert.equal(metadata.publicationIntent?.viewer.required,true);
   }
   assert.equal((await stage(png({size:500001,animated:true}),'image/png')).viewer,'keel-verification-shell');
   assert.equal((await stage(png({size:500001,animated:true}),'image/apng')).viewer,'keel-verification-shell');

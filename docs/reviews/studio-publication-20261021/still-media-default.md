@@ -30,8 +30,9 @@ does not decode, resize, re-encode, execute or mutate source. Its 32MiB/65,536
 chunk scan budget returns unknown, not an upload rejection. The publication
 compiler must still validate the actual media and registered renderer.
 
-SDK staging computes motion from its existing snapshotted source bytes, alongside
-execution inspection. Builder intent accepts optional motion; MIME and byte
+For explicit source-specific candidates, SDK staging computes motion from its
+existing snapshotted source bytes, alongside execution inspection. Automatic
+staging retains canonical intent until server qualification. Builder intent accepts optional motion; MIME and byte
 length alone cannot assert still. A thumbnail prevents the duplication shortcut.
 No new UI, codec, contract, RPC, signing field, deployment or paid operation was
 introduced.
@@ -109,3 +110,5 @@ successful. Independent receipt b439e5d948ef674ce130ab0c2f3f4c1475ace44acbc72f6d
 approved the exact earlier eight legacy expectation corrections e705c863 and
 the first new-test classifier entry25bbe60c; only those were applied at this
 checkpoint. Their full affected rerun plus new authority cases is54 PASS.
+
+Independent staging receipt727aff6c7a89b5d094dd9a9ebce13c1480ce126b3bbc8db7ec50a9263574306b approved exact test correction0bf207 and classifierfdbf800. Both are applied in the final successor; unchanged emitted600KB independent repro now passes. Historical d222 REDs and source remain retained.
