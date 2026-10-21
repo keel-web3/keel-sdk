@@ -1,0 +1,106 @@
+{
+  "schema": "keel.independent-nine-public-retention-audit@1",
+  "result": "PASS_ALL_RETAINED_BYTES",
+  "archiveSHA256": "f3ddc1ae80c079989a331e04ee2958d4e6ea584c6aeda4311427cfb3e8d6feaf",
+  "archiveBytes": 330588160,
+  "archiveMode": 384,
+  "archiveUid": 501,
+  "archiveLinks": 1,
+  "sourceManifestSHA256": "524fcf0b432fa67658c19188c8ca47e0a7e10701eee6fdb79a4efec9ff547d2c",
+  "retentionReceiptSHA256": "fb7cb3dc7df41f4d95d9228870c37756d61279f2bd505db2b0715692e21cb87c",
+  "regularMembers": [
+    {
+      "member": "00",
+      "path": "/home/ubuntu/keel-native-synthetic-a33fea51-ad24-4f29-aa9d-0dbe066a5177/node",
+      "bytes": 124835376,
+      "sha256": "93956de2e59480474a7b46571da1651180b1a050cdf32641ebec4ce6e478e068",
+      "tarRegular": true,
+      "tarMode": 384,
+      "restoreOriginalMode": 365,
+      "restoreOriginalMtimeNs": 1792466535500476585
+    },
+    {
+      "member": "01",
+      "path": "/home/ubuntu/keel-native-synthetic-b3508590-c73a-4ccd-b180-b86c4b1417bb/node",
+      "bytes": 124835376,
+      "sha256": "93956de2e59480474a7b46571da1651180b1a050cdf32641ebec4ce6e478e068",
+      "tarRegular": true,
+      "tarMode": 384,
+      "restoreOriginalMode": 365,
+      "restoreOriginalMtimeNs": 1792469435326405394
+    },
+    {
+      "member": "02",
+      "path": "/home/ubuntu/keel-proof-qualification-9d94c44e-ad0f-45d1-b258-540e204f6ebd/executor",
+      "bytes": 15605747,
+      "sha256": "8a2970e2cebc1f4b51bd228ab7fa53208e2d247030f46037991351115f12a3b5",
+      "tarRegular": true,
+      "tarMode": 384,
+      "restoreOriginalMode": 292,
+      "restoreOriginalMtimeNs": 1792530997700523042
+    },
+    {
+      "member": "03",
+      "path": "/home/ubuntu/keel-native-synthetic-a33fea51-ad24-4f29-aa9d-0dbe066a5177/build/keel-proof-executor",
+      "bytes": 15605747,
+      "sha256": "8a2970e2cebc1f4b51bd228ab7fa53208e2d247030f46037991351115f12a3b5",
+      "tarRegular": true,
+      "tarMode": 384,
+      "restoreOriginalMode": 365,
+      "restoreOriginalMtimeNs": 1792466534715464163
+    },
+    {
+      "member": "04",
+      "path": "/home/ubuntu/keel-native-synthetic-b3508590-c73a-4ccd-b180-b86c4b1417bb/build/keel-proof-executor",
+      "bytes": 15605747,
+      "sha256": "8a2970e2cebc1f4b51bd228ab7fa53208e2d247030f46037991351115f12a3b5",
+      "tarRegular": true,
+      "tarMode": 384,
+      "restoreOriginalMode": 365,
+      "restoreOriginalMtimeNs": 1792469434510396088
+    },
+    {
+      "member": "05",
+      "path": "/home/ubuntu/keel-studio-image-delta-f31d041e-d2d4-401d-8fc7-c3e996078cca/delta-build-context.tar.gz",
+      "bytes": 11051960,
+      "sha256": "b9cc594d66269aa02b5f49ab6632b6bc1deb386112a869a6ea7d73e48dd28485",
+      "tarRegular": true,
+      "tarMode": 384,
+      "restoreOriginalMode": 292,
+      "restoreOriginalMtimeNs": 1792537456199251713
+    },
+    {
+      "member": "06",
+      "path": "/home/ubuntu/keel-studio-observer-build-df9a57fc-e7ef-49fc-9af7-10528dd885b1/delta-build-context.tar.gz",
+      "bytes": 9145805,
+      "sha256": "c2a0871c0393108c452d76a4df20f749e46361ba6a5fcf0f650d4713efe71194",
+      "tarRegular": true,
+      "tarMode": 384,
+      "restoreOriginalMode": 292,
+      "restoreOriginalMtimeNs": 1792541797631837739
+    },
+    {
+      "member": "07",
+      "path": "/home/ubuntu/keel-studio-funding-build-631074fc-e4c1-47df-968d-f7abffaabf52/delta-build-context.tar.gz",
+      "bytes": 7580336,
+      "sha256": "d4f08cd5410e8133e2c36005f3d5fe51ff0b11798f6babca9739cb19d4a41b35",
+      "tarRegular": true,
+      "tarMode": 384,
+      "restoreOriginalMode": 292,
+      "restoreOriginalMtimeNs": 1792547615787391465
+    },
+    {
+      "member": "08",
+      "path": "/home/ubuntu/keel-studio-funding62f-build-433758fa-9631-4205-88b5-346e819b304e/delta-build-context.tar.gz",
+      "bytes": 6306824,
+      "sha256": "22a499dbf31babee3bdba49070c70006552bd19774c069cd9621b51f87929036",
+      "tarRegular": true,
+      "tarMode": 384,
+      "restoreOriginalMode": 292,
+      "restoreOriginalMtimeNs": 1792552224739452052
+    }
+  ],
+  "payloadBytes": 330572918,
+  "elapsedSeconds": 0.2970366249792278,
+  "scope": "Full retained member streams independently hashed; no extraction, host calls or cleanup. Source-manifest publicProvenanceQualified=false is original inventory metadata; separate provenance review required."
+}

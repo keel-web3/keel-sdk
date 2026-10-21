@@ -1,0 +1,77 @@
+{
+  "schema": "keel.independent-exact-nine-public-retirement-review@1",
+  "reviewerId": "independent-release-reviewer",
+  "decision": "APPROVE_EXACT_NINE_PUBLIC_RETIREMENT",
+  "planSHA256": "61e2fb3048f98b3ff1e2e36c8c66bfe5ab76096f3e679fed8cfd38628bfdcfda",
+  "operatorSHA256": "7e1e6243ffd5fa813a3f8ce23f0a503a32a60de80106760d308225af1e5c776a",
+  "commandProposalSHA256": "1cb5efbeb53a13565616a5fb3e067f07725fb5b86c08a9852163b78e353b6df3",
+  "retentionReceiptSHA256": "fb7cb3dc7df41f4d95d9228870c37756d61279f2bd505db2b0715692e21cb87c",
+  "offhostArchiveAllNineFullHashesVerified": true,
+  "retainedArchive": {
+    "path": "/private/tmp/keel-nine-public-stage-retention-20261021/public-retained-files.tar",
+    "bytes": 330588160,
+    "sha256": "f3ddc1ae80c079989a331e04ee2958d4e6ea584c6aeda4311427cfb3e8d6feaf",
+    "mode": "0600",
+    "nlink": 1,
+    "regularMembers": 9,
+    "payloadBytes": 330572918,
+    "restoration": "Exact retained regular member00-08/path/mode/mtime mapping independently full-hashed. Byte/mode/mtime restoration possible only by separate exclusive no-overwrite action; prior inode/ctime not promised. No automatic restore or retry authorized."
+  },
+  "publicProvenanceAuditSHA256": "9e1303ca9987badd18f50f9a8ed9883d1c592ba465299ac1783b48d70d3a25d0",
+  "retentionAuditSHA256": "94d854e8432123198f379dc92b16035d6d9c6b0109eae7854cd30edfc9131c86",
+  "scope": {
+    "remoteRoot": "/home/ubuntu/keel-nine-public-retirement-7a356a00-b961-4530-84f8-1a32373396b2",
+    "exactSourcePaths": [
+      "/home/ubuntu/keel-native-synthetic-a33fea51-ad24-4f29-aa9d-0dbe066a5177/node",
+      "/home/ubuntu/keel-native-synthetic-b3508590-c73a-4ccd-b180-b86c4b1417bb/node",
+      "/home/ubuntu/keel-proof-qualification-9d94c44e-ad0f-45d1-b258-540e204f6ebd/executor",
+      "/home/ubuntu/keel-native-synthetic-a33fea51-ad24-4f29-aa9d-0dbe066a5177/build/keel-proof-executor",
+      "/home/ubuntu/keel-native-synthetic-b3508590-c73a-4ccd-b180-b86c4b1417bb/build/keel-proof-executor",
+      "/home/ubuntu/keel-studio-image-delta-f31d041e-d2d4-401d-8fc7-c3e996078cca/delta-build-context.tar.gz",
+      "/home/ubuntu/keel-studio-observer-build-df9a57fc-e7ef-49fc-9af7-10528dd885b1/delta-build-context.tar.gz",
+      "/home/ubuntu/keel-studio-funding-build-631074fc-e4c1-47df-968d-f7abffaabf52/delta-build-context.tar.gz",
+      "/home/ubuntu/keel-studio-funding62f-build-433758fa-9631-4205-88b5-346e819b304e/delta-build-context.tar.gz"
+    ],
+    "filesCanonicalSHA256": "2ab2726362ef169e6e2e3ebadc0886b26073611f342825feede8cd397627a46e",
+    "sourceInventoryRecords": 11,
+    "selectedPublicFiles": 9,
+    "excludedUnqualifiedFixtureFiles": 2,
+    "maximumCleanupExecutions": 1,
+    "allocatedByteCeiling": 330592256,
+    "directoriesRemoved": 0,
+    "privateBackupArtworkDatabaseSourceOrUserFilesRemoved": false,
+    "imagesContainersVolumesSnapshotsRollbackArtifactsModified": false,
+    "activationSigningSubmissionOrNativeProgramAuthority": false
+  },
+  "requiredInvariants": [
+    "Use original reviewed infrastructure sudo-n workflow and strict SSH host-key pinning; stop on any denial.",
+    "All nine source files fully hash/stat/parentfd/no-follow/root-owner guarded before consumption or first unlink. Parent owned rootUID/GID0, no group/world writes; source metadata exact including inode/dev/nlink/mode/mtime/ctime/allocated bytes.",
+    "Fresh complete current5c97/7b0 Config/Host/mount/healthy/paused and D97/socket/profile/image checks under existing exclusive nonblocking rolloutlock before and after; original current baseline must remain exact.",
+    "Active other-process FD/maps and running-container direct/ancestor bind references fail closed; unknown live process state rejects.",
+    "Per-file rescan then full file/parent/path identity rechecks, durable exclusive intent, final entry identity recheck before unlink; fsync parent and reconcile from held inode.",
+    "Exclusive consumed/before/intent/result files preserve partial or uncertain outcome; no automatic retry, restore, source substitution or additional deletion.",
+    "Success requires terminal exit0 and resultPASS with exactly9 expected removedOnly entries; otherwise retain evidence and stop. Actual free space is observed, never assumed from unlink ceiling; subsequent build still enforces unchanged reserves."
+  ],
+  "independentControls": {
+    "finalPassed": 18,
+    "failed": 0,
+    "authorActualFilesystem": 8,
+    "unchangedReviewerReplacementRegression": 3,
+    "reviewerReferenceScope": 7,
+    "finalRunRecordSHA256": "b97a389cfd898ffb3719f9a935d3e72bf39fb5ef30f0d0776e3720e3d8f7956c",
+    "limitations": "Local actual filesystem with synthetic proc/Docker records. No remote safety or cleanup success claimed before root executes guards."
+  },
+  "resolvedFinding": {
+    "id": "NINE-RETIRE-001",
+    "baselineSourceSHA256": "586793d0e556cf70f0c0cb6f69587e1089bf98a4c5005a9e04502353af5a0d6a",
+    "regressionSHA256": "05d3f769c7e0c5b844dae7ec5664bf045b0f4c3a834b3742da7a8e8434ea9735",
+    "originalResult": "1PASS2FAIL: foreign occupants were deleted during reference scan/after intent replacement",
+    "correctedResult": "3PASS, test bytes unchanged; source now rescans before validation and rechecks identity after intent",
+    "originalMacTempdirSetupRED": "Default alias path was refused before mutation. Same bytes rerun with canonical TMPDIR=/private/tmp input; preserved."
+  },
+  "commandInputAuditSHA256": "1df95e3e89cf89791c252f2a2365261b3d576f0eb86ccf7ef1f424d6f593da81",
+  "blockingFindings": [],
+  "automaticRetry": false,
+  "reviewerHostActions": 0,
+  "currentLiveGate6": "FAIL_RETAINED; no new source/artifact/deployment/live success inferred by public scratch cleanup"
+}

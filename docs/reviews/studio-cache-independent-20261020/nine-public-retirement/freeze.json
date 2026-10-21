@@ -1,0 +1,8 @@
+{
+  "sourceFreezeCommit": "38567e3fd56be8eeaa12cd3d50b017123f4df1cd",
+  "operatorSHA256": "7e1e6243ffd5fa813a3f8ce23f0a503a32a60de80106760d308225af1e5c776a",
+  "planSHA256": "61e2fb3048f98b3ff1e2e36c8c66bfe5ab76096f3e679fed8cfd38628bfdcfda",
+  "commandProposalSHA256": "1cb5efbeb53a13565616a5fb3e067f07725fb5b86c08a9852163b78e353b6df3",
+  "reviewSHA256": "d56f5ab118cd7e2a5f66e99d4e7a4952aead9e793be7494b699a8008802972d3",
+  "admittedCommandsSHA256": "e6fdfe24757f8b780de30a98f4c2504ddf0ee0de5ca619303352029aa92fba35"
+}

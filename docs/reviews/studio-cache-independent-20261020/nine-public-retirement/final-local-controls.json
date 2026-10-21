@@ -1,0 +1,44 @@
+{
+  "sourceSHA256": "7e1e6243ffd5fa813a3f8ce23f0a503a32a60de80106760d308225af1e5c776a",
+  "totalPass": 18,
+  "totalFail": 0,
+  "runs": [
+    {
+      "name": "author-eight-final",
+      "argv": [
+        "python3",
+        "-B",
+        "/private/tmp/keel-image-only-release-20261020/docs/reviews/studio-publication-20261020/release/history-prefix311/nine-public-retirement/cleanup-nine-public.test.py"
+      ],
+      "exitCode": 0,
+      "elapsedSeconds": 0.08650400000624359,
+      "stdoutSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSHA256": "f41dcd6bb4c47a8cfd051c6146cc5c4ce810845249725ce89362bfcb2b60bb01"
+    },
+    {
+      "name": "entry-replacement-final",
+      "argv": [
+        "python3",
+        "-B",
+        "/private/tmp/keel-independent-nine-public-retention-20261021/entry-replacement.regression.py"
+      ],
+      "exitCode": 0,
+      "elapsedSeconds": 0.048887541983276606,
+      "stdoutSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSHA256": "2abf7a65d711a21c1b6ea676b2531434979a98f49665cc93e5574507aefa88b4"
+    },
+    {
+      "name": "reference-scope-final",
+      "argv": [
+        "python3",
+        "-B",
+        "/private/tmp/keel-independent-nine-public-retention-20261021/reference-scope.test.py"
+      ],
+      "exitCode": 0,
+      "elapsedSeconds": 0.04827058408409357,
+      "stdoutSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSHA256": "38fdc48b0ed74852ff7b2c46084aa3f73d6e5ef3563bcf149d5fb8d109f86db9"
+    }
+  ],
+  "scope": "Local real filesystem and synthetic proc/Docker only; no host actions."
+}

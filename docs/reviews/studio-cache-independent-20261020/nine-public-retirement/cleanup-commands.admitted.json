@@ -1,0 +1,147 @@
+{
+  "schema": "keel.exact-nine-public-retirement-commands-admitted@1",
+  "cleanupApproved": true,
+  "rootIsSoleHostOperator": true,
+  "remoteRoot": "/home/ubuntu/keel-nine-public-retirement-7a356a00-b961-4530-84f8-1a32373396b2",
+  "createRootArgv": [
+    "/usr/bin/ssh",
+    "-o",
+    "BatchMode=yes",
+    "-o",
+    "ConnectTimeout=12",
+    "-o",
+    "StrictHostKeyChecking=yes",
+    "-o",
+    "UserKnownHostsFile=/Users/ravonus/dev/hashers/ops/servers/known_hosts",
+    "ubuntu@40.160.39.155",
+    "sudo -n /usr/bin/python3 -B -c 'import os;from pathlib import Path;r=Path('\"'\"'/home/ubuntu/keel-nine-public-retirement-7a356a00-b961-4530-84f8-1a32373396b2'\"'\"');assert os.geteuid()==0 and r.parent==Path('\"'\"'/home/ubuntu'\"'\"');os.mkdir(r,0o700);d=os.open(r.parent,os.O_RDONLY|os.O_DIRECTORY|os.O_NOFOLLOW);os.fsync(d);os.close(d)'"
+  ],
+  "transferFiles": [
+    {
+      "localPath": "/private/tmp/keel-image-only-release-20261020/docs/reviews/studio-publication-20261020/release/history-prefix311/nine-public-retirement/cleanup-nine-public.py",
+      "remotePath": "/home/ubuntu/keel-nine-public-retirement-7a356a00-b961-4530-84f8-1a32373396b2/cleanup-nine-public.py",
+      "bytes": 12552,
+      "sha256": "7e1e6243ffd5fa813a3f8ce23f0a503a32a60de80106760d308225af1e5c776a",
+      "installArgv": [
+        "/usr/bin/ssh",
+        "-o",
+        "BatchMode=yes",
+        "-o",
+        "ConnectTimeout=12",
+        "-o",
+        "StrictHostKeyChecking=yes",
+        "-o",
+        "UserKnownHostsFile=/Users/ravonus/dev/hashers/ops/servers/known_hosts",
+        "ubuntu@40.160.39.155",
+        "sudo -n /usr/bin/python3 -B -c 'import hashlib,os,stat,sys;from pathlib import Path;r=Path('\"'\"'/home/ubuntu/keel-nine-public-retirement-7a356a00-b961-4530-84f8-1a32373396b2'\"'\"');s=r.lstat();assert os.geteuid()==0 and r.resolve()==r and stat.S_ISDIR(s.st_mode) and s.st_uid==s.st_gid==0 and stat.S_IMODE(s.st_mode)==0o700;b=sys.stdin.buffer.read(12553);assert len(b)==12552 and hashlib.sha256(b).hexdigest()=='\"'\"'7e1e6243ffd5fa813a3f8ce23f0a503a32a60de80106760d308225af1e5c776a'\"'\"';fd=os.open(r/'\"'\"'cleanup-nine-public.py'\"'\"',os.O_WRONLY|os.O_CREAT|os.O_EXCL|os.O_NOFOLLOW,0o600);f=os.fdopen(fd,'\"'\"'wb'\"'\"');f.write(b);f.flush();os.fchmod(f.fileno(),0o444);os.fsync(f.fileno());f.close();d=os.open(r,os.O_RDONLY|os.O_DIRECTORY|os.O_NOFOLLOW);os.fsync(d);os.close(d)'"
+      ]
+    },
+    {
+      "localPath": "/private/tmp/keel-image-only-release-20261020/docs/reviews/studio-publication-20261020/release/history-prefix311/nine-public-retirement/cleanup-plan.proposed.json",
+      "remotePath": "/home/ubuntu/keel-nine-public-retirement-7a356a00-b961-4530-84f8-1a32373396b2/cleanup-plan.json",
+      "bytes": 5967,
+      "sha256": "61e2fb3048f98b3ff1e2e36c8c66bfe5ab76096f3e679fed8cfd38628bfdcfda",
+      "installArgv": [
+        "/usr/bin/ssh",
+        "-o",
+        "BatchMode=yes",
+        "-o",
+        "ConnectTimeout=12",
+        "-o",
+        "StrictHostKeyChecking=yes",
+        "-o",
+        "UserKnownHostsFile=/Users/ravonus/dev/hashers/ops/servers/known_hosts",
+        "ubuntu@40.160.39.155",
+        "sudo -n /usr/bin/python3 -B -c 'import hashlib,os,stat,sys;from pathlib import Path;r=Path('\"'\"'/home/ubuntu/keel-nine-public-retirement-7a356a00-b961-4530-84f8-1a32373396b2'\"'\"');s=r.lstat();assert os.geteuid()==0 and r.resolve()==r and stat.S_ISDIR(s.st_mode) and s.st_uid==s.st_gid==0 and stat.S_IMODE(s.st_mode)==0o700;b=sys.stdin.buffer.read(5968);assert len(b)==5967 and hashlib.sha256(b).hexdigest()=='\"'\"'61e2fb3048f98b3ff1e2e36c8c66bfe5ab76096f3e679fed8cfd38628bfdcfda'\"'\"';fd=os.open(r/'\"'\"'cleanup-plan.json'\"'\"',os.O_WRONLY|os.O_CREAT|os.O_EXCL|os.O_NOFOLLOW,0o600);f=os.fdopen(fd,'\"'\"'wb'\"'\"');f.write(b);f.flush();os.fchmod(f.fileno(),0o444);os.fsync(f.fileno());f.close();d=os.open(r,os.O_RDONLY|os.O_DIRECTORY|os.O_NOFOLLOW);os.fsync(d);os.close(d)'"
+      ]
+    },
+    {
+      "localPath": "/private/tmp/keel-nine-public-stage-retention-20261021/retention-receipt.json",
+      "remotePath": "/home/ubuntu/keel-nine-public-retirement-7a356a00-b961-4530-84f8-1a32373396b2/retention-receipt.json",
+      "bytes": 5929,
+      "sha256": "fb7cb3dc7df41f4d95d9228870c37756d61279f2bd505db2b0715692e21cb87c",
+      "installArgv": [
+        "/usr/bin/ssh",
+        "-o",
+        "BatchMode=yes",
+        "-o",
+        "ConnectTimeout=12",
+        "-o",
+        "StrictHostKeyChecking=yes",
+        "-o",
+        "UserKnownHostsFile=/Users/ravonus/dev/hashers/ops/servers/known_hosts",
+        "ubuntu@40.160.39.155",
+        "sudo -n /usr/bin/python3 -B -c 'import hashlib,os,stat,sys;from pathlib import Path;r=Path('\"'\"'/home/ubuntu/keel-nine-public-retirement-7a356a00-b961-4530-84f8-1a32373396b2'\"'\"');s=r.lstat();assert os.geteuid()==0 and r.resolve()==r and stat.S_ISDIR(s.st_mode) and s.st_uid==s.st_gid==0 and stat.S_IMODE(s.st_mode)==0o700;b=sys.stdin.buffer.read(5930);assert len(b)==5929 and hashlib.sha256(b).hexdigest()=='\"'\"'fb7cb3dc7df41f4d95d9228870c37756d61279f2bd505db2b0715692e21cb87c'\"'\"';fd=os.open(r/'\"'\"'retention-receipt.json'\"'\"',os.O_WRONLY|os.O_CREAT|os.O_EXCL|os.O_NOFOLLOW,0o600);f=os.fdopen(fd,'\"'\"'wb'\"'\"');f.write(b);f.flush();os.fchmod(f.fileno(),0o444);os.fsync(f.fileno());f.close();d=os.open(r,os.O_RDONLY|os.O_DIRECTORY|os.O_NOFOLLOW);os.fsync(d);os.close(d)'"
+      ]
+    },
+    {
+      "localPath": "/private/tmp/keel-independent-nine-public-retention-20261021/cleanup-review.json",
+      "remotePath": "/home/ubuntu/keel-nine-public-retirement-7a356a00-b961-4530-84f8-1a32373396b2/cleanup-review.json",
+      "bytes": 5689,
+      "sha256": "d56f5ab118cd7e2a5f66e99d4e7a4952aead9e793be7494b699a8008802972d3",
+      "installArgv": [
+        "/usr/bin/ssh",
+        "-o",
+        "BatchMode=yes",
+        "-o",
+        "ConnectTimeout=12",
+        "-o",
+        "StrictHostKeyChecking=yes",
+        "-o",
+        "UserKnownHostsFile=/Users/ravonus/dev/hashers/ops/servers/known_hosts",
+        "ubuntu@40.160.39.155",
+        "sudo -n /usr/bin/python3 -B -c 'import hashlib,os,stat,sys;from pathlib import Path;r=Path('\"'\"'/home/ubuntu/keel-nine-public-retirement-7a356a00-b961-4530-84f8-1a32373396b2'\"'\"');s=r.lstat();assert os.geteuid()==0 and r.resolve()==r and stat.S_ISDIR(s.st_mode) and s.st_uid==s.st_gid==0 and stat.S_IMODE(s.st_mode)==0o700;b=sys.stdin.buffer.read(5690);assert len(b)==5689 and hashlib.sha256(b).hexdigest()=='\"'\"'d56f5ab118cd7e2a5f66e99d4e7a4952aead9e793be7494b699a8008802972d3'\"'\"';fd=os.open(r/'\"'\"'cleanup-review.json'\"'\"',os.O_WRONLY|os.O_CREAT|os.O_EXCL|os.O_NOFOLLOW,0o600);f=os.fdopen(fd,'\"'\"'wb'\"'\"');f.write(b);f.flush();os.fchmod(f.fileno(),0o444);os.fsync(f.fileno());f.close();d=os.open(r,os.O_RDONLY|os.O_DIRECTORY|os.O_NOFOLLOW);os.fsync(d);os.close(d)'"
+      ]
+    }
+  ],
+  "preflightArgv": [
+    "/usr/bin/ssh",
+    "-o",
+    "BatchMode=yes",
+    "-o",
+    "ConnectTimeout=12",
+    "-o",
+    "StrictHostKeyChecking=yes",
+    "-o",
+    "UserKnownHostsFile=/Users/ravonus/dev/hashers/ops/servers/known_hosts",
+    "ubuntu@40.160.39.155",
+    "sudo -n /usr/bin/python3 -B /home/ubuntu/keel-nine-public-retirement-7a356a00-b961-4530-84f8-1a32373396b2/cleanup-nine-public.py /home/ubuntu/keel-nine-public-retirement-7a356a00-b961-4530-84f8-1a32373396b2/cleanup-plan.json"
+  ],
+  "executeTimeoutSeconds": 210,
+  "innerSignalDeadlineSeconds": 180,
+  "independentReviewRequired": {
+    "remoteBasename": "cleanup-review.json",
+    "rootOwnedMode": "0444",
+    "decision": "APPROVE_EXACT_NINE_PUBLIC_RETIREMENT",
+    "planSHA256": "61e2fb3048f98b3ff1e2e36c8c66bfe5ab76096f3e679fed8cfd38628bfdcfda",
+    "operatorSHA256": "7e1e6243ffd5fa813a3f8ce23f0a503a32a60de80106760d308225af1e5c776a",
+    "retentionReceiptSHA256": "fb7cb3dc7df41f4d95d9228870c37756d61279f2bd505db2b0715692e21cb87c",
+    "offhostArchiveAllNineFullHashesVerified": true,
+    "reviewInstallArgvAndSHA256": "Bound exactly by fourth transferFiles row and reviewSHA256"
+  },
+  "freshNormalHealthAndOriginalRunnerSocketGuardsRequired": true,
+  "sourceFilesOnly": 9,
+  "payloadBytes": 330572918,
+  "allocatedBytes": 330592256,
+  "directoriesOrImagesContainersVolumesSnapshotsDataRemoved": false,
+  "automaticRetry": false,
+  "partialFailure": "Terminal FAIL with held-inode reconciled removedOnly; retain every marker/result. No automatic replay or restoration.",
+  "sourcePayloadHashesAuthoritative": true,
+  "reviewPath": "/private/tmp/keel-independent-nine-public-retention-20261021/cleanup-review.json",
+  "reviewSHA256": "d56f5ab118cd7e2a5f66e99d4e7a4952aead9e793be7494b699a8008802972d3",
+  "maximumCleanupExecutions": 1,
+  "executeArgv": [
+    "/usr/bin/ssh",
+    "-o",
+    "BatchMode=yes",
+    "-o",
+    "ConnectTimeout=12",
+    "-o",
+    "StrictHostKeyChecking=yes",
+    "-o",
+    "UserKnownHostsFile=/Users/ravonus/dev/hashers/ops/servers/known_hosts",
+    "ubuntu@40.160.39.155",
+    "sudo -n /usr/bin/python3 -B /home/ubuntu/keel-nine-public-retirement-7a356a00-b961-4530-84f8-1a32373396b2/cleanup-nine-public.py /home/ubuntu/keel-nine-public-retirement-7a356a00-b961-4530-84f8-1a32373396b2/cleanup-plan.json --execute-approved-sha256 61e2fb3048f98b3ff1e2e36c8c66bfe5ab76096f3e679fed8cfd38628bfdcfda --review-sha256 d56f5ab118cd7e2a5f66e99d4e7a4952aead9e793be7494b699a8008802972d3"
+  ],
+  "scopeNote": "Only exact root creation/four exclusive public metadata installs/read-only preflight/at most one nine-file cleanup. No host build, activation, private program or restore authorization."
+}

@@ -1,0 +1,41 @@
+{
+  "result": "PASS_NINE_PUBLIC_PROVENANCE_AND_RESTORE_BYTE_MAPPING",
+  "retentionAuditSHA256": "94d854e8432123198f379dc92b16035d6d9c6b0109eae7854cd30edfc9131c86",
+  "sourceInventorySHA256": "1940389d44d7021c41a498c8a3024619c08874fcac0c04c1450ce06aabddbae5",
+  "sourceInventoryRecords": 11,
+  "selectedSourceRecords": 9,
+  "excludedFixtureUnknownSHA256": "09ad77aa3eff1d19a8d15914a924b1cdd73de0bd3ede71e26a67d335a8724fff",
+  "publicNodeAndExecutorPriorPlan": {
+    "path": "/private/tmp/keel-image-only-release-20261020/docs/reviews/studio-publication-20261019/release/production-proof-factory/plans/synthetic-host-plan.json",
+    "sha256": "305e19a008d73efd90ddf16294cb1607d5311e31a6c2e7b6c5a255f7929b195e",
+    "hostNodeSha256": "93956de2e59480474a7b46571da1651180b1a050cdf32641ebec4ce6e478e068",
+    "executorSha256": "8a2970e2cebc1f4b51bd228ab7fa53208e2d247030f46037991351115f12a3b5",
+    "mode": "synthetic"
+  },
+  "publicArchivePriorIndependentAdmissions": [
+    {
+      "path": "/Users/ravonus/dev/wt/studio-cache-independent-review-20261020/docs/reviews/studio-cache-independent-20261020/host-build311-admission/review.json",
+      "sha256": "257a06848224a63aee248801bde61909f6e613fea805d0ef8beabc31ffadb53f",
+      "boundPublicArchiveSHA256": "b9cc594d66269aa02b5f49ab6632b6bc1deb386112a869a6ea7d73e48dd28485"
+    },
+    {
+      "path": "/Users/ravonus/dev/wt/studio-cache-independent-review-20261020/docs/reviews/studio-cache-independent-20261020/observer0c7-hostbuild/host-build-review.json",
+      "sha256": "1874dab86e663c5097144ebd731f9c43ac5dcf5e3b3e32c0bd0efa2aff7bc5f2",
+      "boundPublicArchiveSHA256": "c2a0871c0393108c452d76a4df20f749e46361ba6a5fcf0f650d4713efe71194"
+    },
+    {
+      "path": "/Users/ravonus/dev/wt/studio-cache-independent-review-20261020/docs/reviews/studio-cache-independent-20261020/fundingd640/host-build-review.json",
+      "sha256": "11ac1698fe3a9ec45e78f49442bab459de60c98eed06185888e12c0dd0ebd486",
+      "boundPublicArchiveSHA256": "d4f08cd5410e8133e2c36005f3d5fe51ff0b11798f6babca9739cb19d4a41b35"
+    },
+    {
+      "path": "/Users/ravonus/dev/wt/studio-cache-independent-review-20261020/docs/reviews/studio-cache-independent-20261020/funding62f-preparation/host-build-review.json",
+      "sha256": "4b69cbb51d2de0b23cc90205ddea0a97f90161e7e51ef02a5ef9098b07eef939",
+      "boundPublicArchiveSHA256": "22a499dbf31babee3bdba49070c70006552bd19774c069cd9621b51f87929036"
+    }
+  ],
+  "restoreByteUsability": "All nine regular member byte streams fully independently hashed with exact original-path/member/mode/mtime mapping. Protected archive remains owner0600 and nlink1. Exclusive restore can reconstruct bytes/mode/mtime; inode/ctime are not recoverable and are not promised. No restore command authorized here.",
+  "sourceInventoryInitialFlags": "Original inventory publicProvenanceQualified=false/fullSHA256=null/deletionApproved=false unchanged. Independent fullsha and prior public provenance are established by this separate evidence; these initial flags are not treated as approval.",
+  "reviewerHostActions": 0,
+  "cleanupAdmission": false
+}

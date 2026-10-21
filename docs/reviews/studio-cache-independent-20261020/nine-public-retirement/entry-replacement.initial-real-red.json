@@ -1,0 +1,10 @@
+{
+  "exitCode": 1,
+  "elapsed": 0.04804504103958607,
+  "TMPDIR": "/private/tmp",
+  "sourceSHA256": "586793d0e556cf70f0c0cb6f69587e1089bf98a4c5005a9e04502353af5a0d6a",
+  "testSHA256": "05d3f769c7e0c5b844dae7ec5664bf045b0f4c3a834b3742da7a8e8434ea9735",
+  "stdoutSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "stderrSHA256": "c3a91624b7a86485e401ecd6b8c09d102aa4330e3e3af6c179ebf8e7663603b9",
+  "initialSetupError": "Default macOS TMPDIR includes a symlink ancestor, correctly refused before any mutation. Same test bytes rerun with canonical private/tmp fixture input."
+}

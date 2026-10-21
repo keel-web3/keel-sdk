@@ -1,0 +1,110 @@
+{
+  "schema": "keel.independent-history71cb-source-QA@1",
+  "result": "PASS_SCOPED_EXACT_SOURCE_INTEGRATION_ONLY",
+  "recordedAt": "2026-10-21T04:36:05.035520+00:00",
+  "candidate": {
+    "site": "71cb0e31bab5e4ee93af9d3b3185978e46f1fe8e",
+    "tree": "a41c88dfe6a8343f030892f220efea002c779743",
+    "SDK": "311d61526284248938e335d7ed879089408933be"
+  },
+  "ownCheckout": "/private/tmp/keel-qa-history-prefix-20261021/keel-site",
+  "passingMainCohortTestExecutions": 277,
+  "additionalFreshIndependentPrivacyOraclePASS": 3,
+  "finalCandidateTotalPassingExecutions": 280,
+  "uniqueTestCountNotClaimed": true,
+  "finalCandidateFailures": 0,
+  "finalCandidateSkipped": 0,
+  "counts": {
+    "focused-source": {
+      "tests": 161,
+      "pass": 161,
+      "fail": 0,
+      "skipped": 0
+    },
+    "api-mcp-source": {
+      "tests": 90,
+      "pass": 90,
+      "fail": 0,
+      "skipped": 0
+    },
+    "approved-independent": {
+      "tests": 26,
+      "pass": 26,
+      "fail": 0,
+      "skipped": 0
+    },
+    "privacy-oracle-ee0-red": {
+      "tests": 3,
+      "pass": 1,
+      "fail": 2,
+      "skipped": 0
+    },
+    "privacy-oracle-71cb-green": {
+      "tests": 3,
+      "pass": 3,
+      "fail": 0,
+      "skipped": 0
+    }
+  },
+  "cohortExplanation": "161focused includesall15privacy+56history/boundarysubset;90normalprimary/legacy/hybrid/continuation/MCP/preflight;26unchangedindependenthistoryAPI;3unchangedreviewerprivacyoracleadditional. No previousee0testPASS relabeled.",
+  "fullNonincrementalTSCExit": 0,
+  "fullTSCElapsedSeconds": 27.364584458060563,
+  "allSDK1745BeforeAfterExact": true,
+  "allSixProductionFileHashesMatchReviewedExactSource": true,
+  "sourceSecurityReview": {
+    "path": "source-review71cb.json",
+    "sha256": "429bade6b66bf908a67cce95479f5dc98609533a8d60ac936f063c12cb0572bd",
+    "decision": "APPROVE_SOURCE_CONDITIONAL_ON_FRESH_QA",
+    "freshQaConditionEvidence": "this277+3passingcurrentcandidate executions/fullTSC0",
+    "notAnArtifactDeploymentOrLiveApproval": true
+  },
+  "newPrivacyRegression": {
+    "unmodifiedOracleScriptSHA256": "d52287669b01e9abdccd5f3e3526f25148a231093ee49ceaf59b5a2a98fb96ff",
+    "baselineExactEE0": {
+      "pass": 1,
+      "fail": 2,
+      "exit": 1
+    },
+    "candidateExact71cb": {
+      "pass": 3,
+      "fail": 0,
+      "exit": 0
+    },
+    "syntheticLeakMarkersOnly": true,
+    "assertionsOrReferenceNotChanged": true,
+    "sourceBinding": "sameunchangedoracle explicitKEEL_REVIEW_SOURCE_REF at immutableGitcommit;loadedhandlerhash verifiedequalowncleancheckout71cb"
+  },
+  "adversarialHistoryTest": {
+    "sha256": "61089b74ac0c9429ff8c47512ed714b702c4db9a4c6b08d92d0b91a04e24a025",
+    "sameExact61089ApprovedFixtureAsEE0": true,
+    "fixtureReviewSHA256": "83f79a9533c067be939519a8fd3712e1b547797e558073a6e4e52048ac688900",
+    "initialSDKFrozenFixtureRED": "retained original25PASS1RED under priorqa-history-ee0;notrerunorrewritten",
+    "allAssertionsUnchangedThisWave": true
+  },
+  "environment": {
+    "node": "22.22.1",
+    "platform": "Darwinarm64",
+    "typescript": "5.9.3",
+    "tsx": "4.23.12",
+    "viem": "2.55.19",
+    "uptimeBeforeTests": "4.20,3.68,4.20",
+    "dependencies": "owned45nonKeelreadonlysymlinks+ownimmutableSDK311packages;no shareddependenciesmodified"
+  },
+  "productionFixAuthoredByQA": false,
+  "sourceOnlyQaPassed": true,
+  "newArtifact": "UNBUILT_UNQUALIFIED_BY_QA",
+  "newDeployment": "NOT_PERFORMED",
+  "currentProduction": "7b0/62f/311/oPM: GatorgenericFAILcauseunknown;GIFFAIL300086msafter2fullnativeproofs+unsignedfundingvalidationduringsecondhistory;freshHhash/MIME/decode/canvasPASS exactHTTPstatusunobserved",
+  "liveGate6": "FAIL_RETAINED",
+  "browserThisWave": 0,
+  "lastBrowserFailureScope": "priorcompoundmarkHandoff/screenshotcallrequestedextensionupdate; affectedAPIscopeundetermined; no subsequentretry/alternateAPI",
+  "hostActions": 0,
+  "privateDataRead": 0,
+  "nativeOrRPCReplay": 0,
+  "signatures": 0,
+  "submissions": 0,
+  "releaseOrActivationAuthority": false,
+  "priorStrictCompiledEquivalence": "FAIL_UNPROVEN_PRIOR_SCOPE_RETAINED_NO_NEW_COMPILEDCLAIM",
+  "matrixSHA256": "567694b0fae164fc980a6613d46d0811b31c9bffa0fbb2e0886fd1fe050fa700",
+  "commandsSHA256": "081930998f145f55bfab95e5a4bbf0b366c04175a2c26b7c90f382f3bbc89bbb"
+}
