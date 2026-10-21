@@ -1,0 +1,11 @@
+{
+  "schema": "keel.independent-handoff-diagnostic-fixture-binding-review@1",
+  "decision": "APPROVE_EXACT_DEPENDENCY_ONLY_FIXTURE_PATCH",
+  "patchSHA256": "0d4ac1cd3365fc3a6a3e8ad0b79704046ed6aa8c3d4a84d76a27687f5c245690",
+  "beforeSHA256": "f4fb4859b403526e44779b17ea4d3a301a51a8f174739263b7743c87a30dcb5d",
+  "proposedSHA256": "83cf7a9a840bdabdd4d3145e72832e789c8a2e023b0cae5f2eb0b8c756c72d9a",
+  "reason": "Actualhandoff now imports withPublicationDiagnostic/event and explicitlypasses signaloptions. Fixture supplies the new dependency as transparentcallback(options.signal) and no-op event. Removingsolebinding line restoresoriginalbyteexact; everyexistingbody/assertion/input remains. Diagnosticstore/concurrency/timing/privacy behavior is not covered by this stub and must retain separate actual-source controls.",
+  "originalSetupREDRetained": true,
+  "productionSourceApproval": false,
+  "activationOrExecutionApproval": false
+}

@@ -1,0 +1,36 @@
+{
+  "schema": "keel.independent-post1058-scoped-source-prefix-review@1",
+  "decision": "APPROVE_ONLY_COMMITTED_DESCRIPTOR_AND_SOURCE_DIAGNOSTIC_COMPONENTS",
+  "reviewerId": "independent-release-reviewer",
+  "sourceCommit": "83cb35c47c6b92eabe91b96ed83f6d1613bfd289",
+  "fixtureCommit": "77b6c94cdf07922d69273b69cb2962db5d6cde54",
+  "base": "d64027b868c1d038854b6181049785fe50da0dcb",
+  "reviewedFilesSHA256": {
+    "apps/studio/src/server/deployment/service.ts": "8033f2c14dbc98c4e90e210bf784ba2c4368f8e0a9c9b9c2f4331f30519988c8",
+    "apps/studio/src/server/services/release-review-handoff-service.ts": "92e242942d96697ebb28fbc15e7b167c2c2959c56b38800d61bf807497a88977",
+    "apps/studio/tests/unit/deployment-unprepared-source.test.ts": "181711c7d3bc99d6135aa79ef157c3af2678bca19a2a9808fab6bfa557553263",
+    "apps/studio/tests/unit/source-review-diagnostic.test.ts": "0497000cc4982948f40b6293f6f62221069c980f496746ae61545b709a2564a6",
+    "apps/studio/tests/unit/source-release-review-wiring.test.ts": "83cf7a9a840bdabdd4d3145e72832e789c8a2e023b0cae5f2eb0b8c756c72d9a"
+  },
+  "emptyPlanGuard": "Only stagecomplete + absentmanifestplan + empty/unbound/wrong-chain resources nowfailsclosed. Existingimported same-chain pointers, manifestplans andpendingstages preserved. This is not a newgeneral imported-resource verificationpolicy or receipt/readback claim.",
+  "sourceDiagnostic": "Existingownerwallet/release/project/revision snapshot precedesprepared-source-onlywithPublicationDiagnostic. Exact reconcileOnly sourceauthentication/adoption anderrors preserved; existingowner-private/redactedstore/generation binding/cancel/300s behavior reused; trace ends before native storage gets its unchanged independentbudget. No newRPC/signing/transaction/storageauthority.",
+  "independentActualSourceTests": {
+    "node": "22.22.1",
+    "pass": 25,
+    "fail": 0,
+    "skip": 0,
+    "scope": "20sourcehandoff+actualdiagnosticstore+originalmemorycontrols,5emptyplancontrols; synthetic DB/proof boundaries, actual temporarytrace store; no productionDB/network/nativeexecution",
+    "logsSHA256": {
+      "source-descriptor-diagnostic.stdout": "5e58a4fce8589869ef1be574e9e2be04b59ac48dc60c2ecdca5bb50cf2dc702d",
+      "source-descriptor-diagnostic.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "deployment-unprepared-source.stdout": "c0587a6808d8814c2cfae5319463bd910f639fe4ecc624cf94149e233cce31aa",
+      "deployment-unprepared-source.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  },
+  "fixtureBindingReviewSHA256": "aafd9ad80719f3bf7993d2a6a27426597ecc3f5ed8f88d814a38b8bd627d40c3",
+  "live1058FailureRetained": "Gatorgenericcauseunknown; GIFthirdroundtimeoutafteractualfundingcapincrease; no falsepromise thesecomponents fixfullGate6",
+  "fundingEnvelopeWorkingChangesReviewed": false,
+  "wholeIntegratedCandidateOrReleaseApproved": false,
+  "blockingFindingsInScopedComponents": [],
+  "reviewerSourceOrHostMutations": false
+}

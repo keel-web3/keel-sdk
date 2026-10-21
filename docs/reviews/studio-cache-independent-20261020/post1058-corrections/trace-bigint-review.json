@@ -1,0 +1,13 @@
+{
+  "schema": "keel.independent-1058-trace-bigint-fixture-binding-review@1",
+  "decision": "APPROVE_EXACT_TWO_INPUT_TYPE_BINDINGS_ONLY",
+  "patchSHA256": "207222781a44816ebe039bce141fa1a5e58005b39432d4392785f2049d5af8a9",
+  "beforeSHA256": "feebb846a491f492d408f1fefa72dd13a3464293a41c58face2022473c10399c",
+  "proposedSHA256": "e0f98f750aaf15ad2601fda68e8ffb61a8e1313235f4b1a98218c7e984b8ee1c",
+  "reason": "Actualsource diagnostic serializer represents bigint as {$keelDiagnosticBigInt:decimalString}. Apply alreadyexisting exact bigintdecoder to onlycanonicalBlock.gasLimit and maximumTransactionGas. Reversingonlytwo calls restoresoriginalbytes; rawtracehash/length/modes/assets/URI/calldatahashes/callcounts/fundingvalue/status assertions unchanged. Syntheticmarkers199999809/200000000 decodeexactly. No value/hashcopy/tolerance or expectedPASS change.",
+  "originalTypeSetupREDRetained": true,
+  "proposedSummaryRemainsLiveFAIL": true,
+  "rawPrivateTraceReadOrCopiedByReviewer": false,
+  "parserExecutionByReviewer": "Onlyexistinghelper withsyntheticmarkers; no rawtrace analysis rerun",
+  "sourceOrReleaseApproval": false
+}
