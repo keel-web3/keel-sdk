@@ -1,0 +1,73 @@
+{
+  "result": "PASS_EXACT_OBSERVER_ONLY_FINAL_PACKET",
+  "planSHA256": "602988e239087b9f9f1fee3503890edfa7dce64dde9160b7838ce690192f5ebb",
+  "commandSHA256": "2325a9733615c5fa2926fccec3ca88e982892663846cf730996999776bdaf70e",
+  "pendingPlanSHA256": "72eb6810dc906f0a55e1c0e419b4ca3ad11492e7384ab139f92931248ecc5913",
+  "diff": [
+    [
+      "approval.independentQA",
+      false,
+      true
+    ],
+    [
+      "approval.independentReleaseReview",
+      false,
+      true
+    ],
+    [
+      "approval.leadExecuteApproved",
+      false,
+      true
+    ],
+    [
+      "evidence.qa.sha256",
+      null,
+      "4c307f5e8ae93dff80adec048bbacfe6dfce4a8ab9f49a8675760ecfa1e15ca9"
+    ],
+    [
+      "evidence.releaseReview.sha256",
+      null,
+      "84c799263865dc0a7f6627ec33f4cd8109e645637231291da6ec85ff38898f0f"
+    ],
+    [
+      "physicalPhase",
+      "ACTUAL_HOST_IMAGE_BUILT_PUBLIC_QUALIFICATION_PENDING",
+      "OBSERVER_ONLY_ACTUAL_IMAGE_QA_AND_REVIEW_READY"
+    ],
+    [
+      "pending",
+      [
+        "fullSAVE archive audit and actualimage three publicroles",
+        "exact independentQA/release approval hashes",
+        "lead activation authorization"
+      ],
+      [
+        "Diagnose retained live failures through normal owner UI, then fix and retest; Gate6 publication acceptance remains FAILED."
+      ]
+    ]
+  ],
+  "files": [
+    {
+      "name": "qa-final.json",
+      "bytes": 9354,
+      "sha256": "4c307f5e8ae93dff80adec048bbacfe6dfce4a8ab9f49a8675760ecfa1e15ca9",
+      "receiver": "EXACT_EXCLUSIVE_NOFOLLOW_ROOT0444_FILE_AND_DIRECTORY_FSYNC"
+    },
+    {
+      "name": "releaseReview-final.json",
+      "bytes": 9116,
+      "sha256": "84c799263865dc0a7f6627ec33f4cd8109e645637231291da6ec85ff38898f0f",
+      "receiver": "EXACT_EXCLUSIVE_NOFOLLOW_ROOT0444_FILE_AND_DIRECTORY_FSYNC"
+    },
+    {
+      "name": "activation-plan.final.json",
+      "bytes": 3531,
+      "sha256": "602988e239087b9f9f1fee3503890edfa7dce64dde9160b7838ce690192f5ebb",
+      "receiver": "EXACT_EXCLUSIVE_NOFOLLOW_ROOT0444_FILE_AND_DIRECTORY_FSYNC"
+    }
+  ],
+  "allOperationalFieldsUnchanged": true,
+  "argvExactFrozenRecipe": true,
+  "leadAdmissionSHA256": "547b7ea1ea8ee4e885ce1a4463dedebd881984d994af4aeec4661ee36e4eb7cf",
+  "reviewerHostActions": false
+}

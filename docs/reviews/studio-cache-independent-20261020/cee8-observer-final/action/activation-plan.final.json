@@ -1,0 +1,82 @@
+{
+  "schema": "keel.current95-image-only-activation@1",
+  "activationId": "5895d3d5-5f83-4a1c-b144-42724651ac91",
+  "candidate": {
+    "siteCommit": "0c7b01e3acae5ec787568d6b5931b002654b4de0",
+    "sdkCommit": "311d61526284248938e335d7ed879089408933be",
+    "buildId": "F2eKiuWl2rvz5hqBZQ9wi",
+    "appImageId": "sha256:cee8c0b777f78372c6ee56bd9ff1c66dbeafd6393d04cb7f298fab6eb7bac9b7"
+  },
+  "candidateName": "keel-studio-candidate-5895d3d5-5f83-4a1c-b144-42724651ac91",
+  "rollbackName": "keel-studio-rollback-5895d3d5-5f83-4a1c-b144-42724651ac91",
+  "failedName": "keel-studio-failed-5895d3d5-5f83-4a1c-b144-42724651ac91",
+  "expectedCurrent": {
+    "id": "fa0eb0299164407e24e1cda31b21b196ea8a8071a1a39ce71efd414234ef1659",
+    "image": "sha256:fe455169d3d10b37696ed17053ff0be167649f5a490acd7e4cea61c2412d6ccb",
+    "configSHA256": "4b0d3c5b22fb8d7c5550d8fc6bc84a8d9528fbf1737e2aa3ce72f16a231e39a2",
+    "hostConfigSHA256": "186e487039113f582118064bce13b98c79f75eca5b3fa0d788c7d79b8fb14049",
+    "mountsSHA256": "74cc304b0955c822f88ffdbcbff56d89857f5ea3d7c51246ec106f00247ade89"
+  },
+  "existingRunner": {
+    "id": "434316eff6e19951807f95ba8aee03a4db684d760039dfeb723c7bf9203a8649",
+    "image": "sha256:d97ddf2aba94cb963646fdf05bc8dc8c99b7e69b8c19bad85c06bea7c67fc9f5",
+    "configSHA256": "23f5b528017bd47ac37f47ea6d4a56efd3926e4ca1fa0aad13f02652b1570113",
+    "hostConfigSHA256": "6fc9390416de4dd4ff6872f14b3430c76838f6bcef8abd428b6c63fd3d55dd82",
+    "mountsSHA256": "07f01d55cebb43e5ed07f5bdcafc33bf85d6a294839179d72e9ba5121609937f"
+  },
+  "existingSocket": {
+    "Name": "keel-studio-proof-socket-2779804f-f8fe-4fcd-8153-f45ad70b03b6",
+    "Driver": "local",
+    "Options": {
+      "device": "tmpfs",
+      "o": "size=16m,uid=999,gid=999,mode=0700,noexec,nosuid",
+      "type": "tmpfs"
+    }
+  },
+  "reserveBytes": 1073741824,
+  "snapshotBudgetBytes": 268435456,
+  "operatorSHA256": "981b482694d7db031d869d7c271487033c28f37b1ef3679528ab4150fbda42b7",
+  "operatorFiles": {
+    "reviewed-activation-support.py": "a1594559c2c04159ac94827d0f4f2a991310fb06648379bca6081d5ce6a98de1",
+    "guarded-deployment-checks.py": "b5f7d764b6c05db503a23ea63ca21a36bfcb0f17cc8292444d790d4a8aad6e00",
+    "candidate-oom-default.py": "6621ff48fc02057d98d91ef5fd71e6e30eeea1ef847149170e316d9725e77c73"
+  },
+  "imageAudit": {
+    "imageBytes": 713038494,
+    "configSHA256": "b8ddaf6d68e76ad758ee46b7c8407b480dfb146113ba0f31a43f10943d80a38b",
+    "rootFSSHA256": "089fc8c7150dc9b4a5c209773ed4d715f2bbac89511814ceb0387e6e4c1b00be"
+  },
+  "approval": {
+    "independentQA": true,
+    "independentReleaseReview": true,
+    "leadExecuteApproved": true
+  },
+  "evidence": {
+    "qa": {
+      "path": "qa-final.json",
+      "sha256": "4c307f5e8ae93dff80adec048bbacfe6dfce4a8ab9f49a8675760ecfa1e15ca9"
+    },
+    "releaseReview": {
+      "path": "releaseReview-final.json",
+      "sha256": "84c799263865dc0a7f6627ec33f4cd8109e645637231291da6ec85ff38898f0f"
+    },
+    "import": {
+      "path": "actual-host-build-receipt.json",
+      "sha256": "63997bc00ab617cfbeabc95ffa510fe0ea889348e8d313a7db3b1e7d7c38a620"
+    }
+  },
+  "changes": {
+    "image": true,
+    "rolloutLabels": true,
+    "runner": false,
+    "backendEnvironment": false,
+    "catalog": false,
+    "factories": false,
+    "migrations": false,
+    "data": false
+  },
+  "physicalPhase": "OBSERVER_ONLY_ACTUAL_IMAGE_QA_AND_REVIEW_READY",
+  "pending": [
+    "Diagnose retained live failures through normal owner UI, then fix and retest; Gate6 publication acceptance remains FAILED."
+  ]
+}

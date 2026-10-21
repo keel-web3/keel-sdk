@@ -1,0 +1,53 @@
+{
+  "schema": "keel.independent-observer-only-exact-action-review@1",
+  "decision": "APPROVE_EXACT_ONE_OBSERVER_ONLY_IMAGE_CUTOVER",
+  "reviewerId": "independent-release-reviewer",
+  "candidate": {
+    "siteCommit": "0c7b01e3acae5ec787568d6b5931b002654b4de0",
+    "sdkCommit": "311d61526284248938e335d7ed879089408933be",
+    "buildId": "F2eKiuWl2rvz5hqBZQ9wi",
+    "appImageId": "sha256:cee8c0b777f78372c6ee56bd9ff1c66dbeafd6393d04cb7f298fab6eb7bac9b7"
+  },
+  "admittedCommandsPath": "/private/tmp/keel-independent-cee8-final-review-20261021/commands.admitted.json",
+  "admittedCommandsSHA256": "2325a9733615c5fa2926fccec3ca88e982892663846cf730996999776bdaf70e",
+  "finalPlanSHA256": "602988e239087b9f9f1fee3503890edfa7dce64dde9160b7838ce690192f5ebb",
+  "pendingPlanSHA256": "72eb6810dc906f0a55e1c0e419b4ca3ad11492e7384ab139f92931248ecc5913",
+  "readinessReviewSHA256": "84c799263865dc0a7f6627ec33f4cd8109e645637231291da6ec85ff38898f0f",
+  "validationSHA256": "9690c6c0bcec02d78bf8a93ad41dc82b44ab45d93be034bcc287cc0ca716d12d",
+  "leadAdmissionSHA256": "547b7ea1ea8ee4e885ce1a4463dedebd881984d994af4aeec4661ee36e4eb7cf",
+  "operations": [
+    "Install only three exact new evidence/final-plan files through frozen O_EXCL/no-follow root0444 receivers in already-staged root5895",
+    "Run exact read-only preflight argv; require terminal PASS before execution",
+    "One exact executeArgv with approved plan602988, existing snapshot before create and full identity/pause/disk/runner guards, unchanged ownership-limited rollback"
+  ],
+  "maximumNativeOrPrivatePreparationExecutions": 0,
+  "maximumActivationExecutions": 1,
+  "rootSoleOperator": true,
+  "reviewerPerformedHostAction": false,
+  "guardsMandatory": {
+    "sameRolloutLock": true,
+    "expectedCurrent": "fa0/fe455 raw4b0d/186e/74cc healthy and paused",
+    "existingRunner": "4343/D97 and socket2779 unchanged",
+    "reserveBytes": 1073741824,
+    "snapshotBudgetBytes": 268435456,
+    "snapshotBeforeCandidateCreate": "Existing bounded durable supervised PGdump must PASS; require reserve after snapshot",
+    "namesUnused": true,
+    "fullCandidateOwnershipGuard": true,
+    "foreignObjectsPreserved": true
+  },
+  "stopConditions": [
+    "Any install/preflight failure or uncertainty: stop without execute",
+    "Any execute failure or uncertainty: no rerun/resume; preserve all evidence and inspect actual state before separately reviewed recovery"
+  ],
+  "notAdmitted": [
+    "Static-stage/role/cutover replay or alternate argv/input",
+    "Archive cleanup, image/container/volume deletion, data restore or runner/catalog/factory/migration/Env changes",
+    "Private preparation or full/native artwork replay, signature/submission/spend",
+    "Alternate access around blocked browser/API, raw backend/DB/host private trace reads"
+  ],
+  "publicationReadinessApproved": false,
+  "Gate6": "FAILED_UNRESOLVED_LIVE_GATOR_GIF_PREPARATION_FAILURES",
+  "strict280WholeCompiledEquivalenceApproved": false,
+  "postCutover": "Independent full deployed identity/configuration/D97/rollback/pause/snapshot readback and normal authenticated owner UI retained-trace diagnosis only; no new prepare until exact cause and reviewed fix",
+  "blockingFindingsWithinObserverOnlyAction": []
+}
