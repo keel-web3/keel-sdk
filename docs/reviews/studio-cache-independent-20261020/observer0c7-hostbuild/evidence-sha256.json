@@ -14,5 +14,6 @@
   "protocol-candidate.statements.json": "a3a370ffca5599e659958fbc1d58be56075b79ef0c0d18c04d545a8bbf188189",
   "protocol-codegen-attribution.json": "59d176592acadeaed7f1ab61117faae415ebd6e5a39f5fdfa068036fd68df9e6",
   "protocol-old.statements.json": "affc3cf2c43b10467432c2ef6461b930389fda4fda2f599527766cb0a8cff3cb",
-  "protocol-statements-summary.json": "efbd5fce7fcccbcb66acca09506753c22bd7dcd551dd75e726e77262fc5baf64"
+  "protocol-statements-summary.json": "efbd5fce7fcccbcb66acca09506753c22bd7dcd551dd75e726e77262fc5baf64",
+  "qa-base-schema-review.json": "8f22e09f6c924d622015cec7025261e17f084699e35d0e95e634c4b4854e640f"
 }
