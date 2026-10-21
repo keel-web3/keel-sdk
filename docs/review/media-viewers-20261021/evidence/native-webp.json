@@ -1,0 +1,569 @@
+{
+  "input": {
+    "path": "animation.webp",
+    "bytes": 236,
+    "sha256": "d17ebc1878257df2d0707790579495552c9440e380c867183e1c618024eac951"
+  },
+  "moduleDocumentBytes": 170289,
+  "samples": [
+    {
+      "elapsedMs": 0,
+      "sha256": "271765d114332c74193f4902c9b161541d16dfd11d0c2bdea6cd4e64a7224646",
+      "rgba": [
+        0,
+        0,
+        255,
+        255
+      ],
+      "centerRGBA": [
+        159,
+        0,
+        96,
+        255
+      ],
+      "width": 16,
+      "height": 16
+    },
+    {
+      "elapsedMs": 71,
+      "sha256": "271765d114332c74193f4902c9b161541d16dfd11d0c2bdea6cd4e64a7224646",
+      "rgba": [
+        0,
+        0,
+        255,
+        255
+      ],
+      "centerRGBA": [
+        159,
+        0,
+        96,
+        255
+      ],
+      "width": 16,
+      "height": 16
+    },
+    {
+      "elapsedMs": 135,
+      "sha256": "5a4eb187e6e64e65313b7b96eaaf4ff3e820d3626a941996e1e4056f16750bdf",
+      "rgba": [
+        0,
+        255,
+        0,
+        255
+      ],
+      "centerRGBA": [
+        159,
+        96,
+        0,
+        255
+      ],
+      "width": 16,
+      "height": 16
+    },
+    {
+      "elapsedMs": 184,
+      "sha256": "5a4eb187e6e64e65313b7b96eaaf4ff3e820d3626a941996e1e4056f16750bdf",
+      "rgba": [
+        0,
+        255,
+        0,
+        255
+      ],
+      "centerRGBA": [
+        159,
+        96,
+        0,
+        255
+      ],
+      "width": 16,
+      "height": 16
+    },
+    {
+      "elapsedMs": 253,
+      "sha256": "5a4eb187e6e64e65313b7b96eaaf4ff3e820d3626a941996e1e4056f16750bdf",
+      "rgba": [
+        0,
+        255,
+        0,
+        255
+      ],
+      "centerRGBA": [
+        159,
+        96,
+        0,
+        255
+      ],
+      "width": 16,
+      "height": 16
+    },
+    {
+      "elapsedMs": 303,
+      "sha256": "5a4eb187e6e64e65313b7b96eaaf4ff3e820d3626a941996e1e4056f16750bdf",
+      "rgba": [
+        0,
+        255,
+        0,
+        255
+      ],
+      "centerRGBA": [
+        159,
+        96,
+        0,
+        255
+      ],
+      "width": 16,
+      "height": 16
+    },
+    {
+      "elapsedMs": 369,
+      "sha256": "5a4eb187e6e64e65313b7b96eaaf4ff3e820d3626a941996e1e4056f16750bdf",
+      "rgba": [
+        0,
+        255,
+        0,
+        255
+      ],
+      "centerRGBA": [
+        159,
+        96,
+        0,
+        255
+      ],
+      "width": 16,
+      "height": 16
+    },
+    {
+      "elapsedMs": 420,
+      "sha256": "5a4eb187e6e64e65313b7b96eaaf4ff3e820d3626a941996e1e4056f16750bdf",
+      "rgba": [
+        0,
+        255,
+        0,
+        255
+      ],
+      "centerRGBA": [
+        159,
+        96,
+        0,
+        255
+      ],
+      "width": 16,
+      "height": 16
+    },
+    {
+      "elapsedMs": 486,
+      "sha256": "c8fbce2447d33f1b2abd786cdeb05e3f40aed6696a2076118b90ec5411fb60f1",
+      "rgba": [
+        255,
+        0,
+        0,
+        255
+      ],
+      "centerRGBA": [
+        255,
+        0,
+        0,
+        255
+      ],
+      "width": 16,
+      "height": 16
+    },
+    {
+      "elapsedMs": 538,
+      "sha256": "c8fbce2447d33f1b2abd786cdeb05e3f40aed6696a2076118b90ec5411fb60f1",
+      "rgba": [
+        255,
+        0,
+        0,
+        255
+      ],
+      "centerRGBA": [
+        255,
+        0,
+        0,
+        255
+      ],
+      "width": 16,
+      "height": 16
+    },
+    {
+      "elapsedMs": 602,
+      "sha256": "271765d114332c74193f4902c9b161541d16dfd11d0c2bdea6cd4e64a7224646",
+      "rgba": [
+        0,
+        0,
+        255,
+        255
+      ],
+      "centerRGBA": [
+        159,
+        0,
+        96,
+        255
+      ],
+      "width": 16,
+      "height": 16
+    },
+    {
+      "elapsedMs": 653,
+      "sha256": "271765d114332c74193f4902c9b161541d16dfd11d0c2bdea6cd4e64a7224646",
+      "rgba": [
+        0,
+        0,
+        255,
+        255
+      ],
+      "centerRGBA": [
+        159,
+        0,
+        96,
+        255
+      ],
+      "width": 16,
+      "height": 16
+    },
+    {
+      "elapsedMs": 718,
+      "sha256": "271765d114332c74193f4902c9b161541d16dfd11d0c2bdea6cd4e64a7224646",
+      "rgba": [
+        0,
+        0,
+        255,
+        255
+      ],
+      "centerRGBA": [
+        159,
+        0,
+        96,
+        255
+      ],
+      "width": 16,
+      "height": 16
+    },
+    {
+      "elapsedMs": 769,
+      "sha256": "271765d114332c74193f4902c9b161541d16dfd11d0c2bdea6cd4e64a7224646",
+      "rgba": [
+        0,
+        0,
+        255,
+        255
+      ],
+      "centerRGBA": [
+        159,
+        0,
+        96,
+        255
+      ],
+      "width": 16,
+      "height": 16
+    },
+    {
+      "elapsedMs": 835,
+      "sha256": "271765d114332c74193f4902c9b161541d16dfd11d0c2bdea6cd4e64a7224646",
+      "rgba": [
+        0,
+        0,
+        255,
+        255
+      ],
+      "centerRGBA": [
+        159,
+        0,
+        96,
+        255
+      ],
+      "width": 16,
+      "height": 16
+    },
+    {
+      "elapsedMs": 887,
+      "sha256": "5a4eb187e6e64e65313b7b96eaaf4ff3e820d3626a941996e1e4056f16750bdf",
+      "rgba": [
+        0,
+        255,
+        0,
+        255
+      ],
+      "centerRGBA": [
+        159,
+        96,
+        0,
+        255
+      ],
+      "width": 16,
+      "height": 16
+    },
+    {
+      "elapsedMs": 956,
+      "sha256": "5a4eb187e6e64e65313b7b96eaaf4ff3e820d3626a941996e1e4056f16750bdf",
+      "rgba": [
+        0,
+        255,
+        0,
+        255
+      ],
+      "centerRGBA": [
+        159,
+        96,
+        0,
+        255
+      ],
+      "width": 16,
+      "height": 16
+    },
+    {
+      "elapsedMs": 1004,
+      "sha256": "5a4eb187e6e64e65313b7b96eaaf4ff3e820d3626a941996e1e4056f16750bdf",
+      "rgba": [
+        0,
+        255,
+        0,
+        255
+      ],
+      "centerRGBA": [
+        159,
+        96,
+        0,
+        255
+      ],
+      "width": 16,
+      "height": 16
+    },
+    {
+      "elapsedMs": 1070,
+      "sha256": "5a4eb187e6e64e65313b7b96eaaf4ff3e820d3626a941996e1e4056f16750bdf",
+      "rgba": [
+        0,
+        255,
+        0,
+        255
+      ],
+      "centerRGBA": [
+        159,
+        96,
+        0,
+        255
+      ],
+      "width": 16,
+      "height": 16
+    },
+    {
+      "elapsedMs": 1120,
+      "sha256": "5a4eb187e6e64e65313b7b96eaaf4ff3e820d3626a941996e1e4056f16750bdf",
+      "rgba": [
+        0,
+        255,
+        0,
+        255
+      ],
+      "centerRGBA": [
+        159,
+        96,
+        0,
+        255
+      ],
+      "width": 16,
+      "height": 16
+    },
+    {
+      "elapsedMs": 1186,
+      "sha256": "5a4eb187e6e64e65313b7b96eaaf4ff3e820d3626a941996e1e4056f16750bdf",
+      "rgba": [
+        0,
+        255,
+        0,
+        255
+      ],
+      "centerRGBA": [
+        159,
+        96,
+        0,
+        255
+      ],
+      "width": 16,
+      "height": 16
+    },
+    {
+      "elapsedMs": 1235,
+      "sha256": "c8fbce2447d33f1b2abd786cdeb05e3f40aed6696a2076118b90ec5411fb60f1",
+      "rgba": [
+        255,
+        0,
+        0,
+        255
+      ],
+      "centerRGBA": [
+        255,
+        0,
+        0,
+        255
+      ],
+      "width": 16,
+      "height": 16
+    },
+    {
+      "elapsedMs": 1304,
+      "sha256": "c8fbce2447d33f1b2abd786cdeb05e3f40aed6696a2076118b90ec5411fb60f1",
+      "rgba": [
+        255,
+        0,
+        0,
+        255
+      ],
+      "centerRGBA": [
+        255,
+        0,
+        0,
+        255
+      ],
+      "width": 16,
+      "height": 16
+    },
+    {
+      "elapsedMs": 1353,
+      "sha256": "271765d114332c74193f4902c9b161541d16dfd11d0c2bdea6cd4e64a7224646",
+      "rgba": [
+        0,
+        0,
+        255,
+        255
+      ],
+      "centerRGBA": [
+        159,
+        0,
+        96,
+        255
+      ],
+      "width": 16,
+      "height": 16
+    },
+    {
+      "elapsedMs": 1420,
+      "sha256": "271765d114332c74193f4902c9b161541d16dfd11d0c2bdea6cd4e64a7224646",
+      "rgba": [
+        0,
+        0,
+        255,
+        255
+      ],
+      "centerRGBA": [
+        159,
+        0,
+        96,
+        255
+      ],
+      "width": 16,
+      "height": 16
+    },
+    {
+      "elapsedMs": 1468,
+      "sha256": "271765d114332c74193f4902c9b161541d16dfd11d0c2bdea6cd4e64a7224646",
+      "rgba": [
+        0,
+        0,
+        255,
+        255
+      ],
+      "centerRGBA": [
+        159,
+        0,
+        96,
+        255
+      ],
+      "width": 16,
+      "height": 16
+    },
+    {
+      "elapsedMs": 1534,
+      "sha256": "271765d114332c74193f4902c9b161541d16dfd11d0c2bdea6cd4e64a7224646",
+      "rgba": [
+        0,
+        0,
+        255,
+        255
+      ],
+      "centerRGBA": [
+        159,
+        0,
+        96,
+        255
+      ],
+      "width": 16,
+      "height": 16
+    },
+    {
+      "elapsedMs": 1586,
+      "sha256": "5a4eb187e6e64e65313b7b96eaaf4ff3e820d3626a941996e1e4056f16750bdf",
+      "rgba": [
+        0,
+        255,
+        0,
+        255
+      ],
+      "centerRGBA": [
+        159,
+        96,
+        0,
+        255
+      ],
+      "width": 16,
+      "height": 16
+    },
+    {
+      "elapsedMs": 1653,
+      "sha256": "5a4eb187e6e64e65313b7b96eaaf4ff3e820d3626a941996e1e4056f16750bdf",
+      "rgba": [
+        0,
+        255,
+        0,
+        255
+      ],
+      "centerRGBA": [
+        159,
+        96,
+        0,
+        255
+      ],
+      "width": 16,
+      "height": 16
+    },
+    {
+      "elapsedMs": 1702,
+      "sha256": "5a4eb187e6e64e65313b7b96eaaf4ff3e820d3626a941996e1e4056f16750bdf",
+      "rgba": [
+        0,
+        255,
+        0,
+        255
+      ],
+      "centerRGBA": [
+        159,
+        96,
+        0,
+        255
+      ],
+      "width": 16,
+      "height": 16
+    },
+    {
+      "elapsedMs": 1766,
+      "sha256": "5a4eb187e6e64e65313b7b96eaaf4ff3e820d3626a941996e1e4056f16750bdf",
+      "rgba": [
+        0,
+        255,
+        0,
+        255
+      ],
+      "centerRGBA": [
+        159,
+        96,
+        0,
+        255
+      ],
+      "width": 16,
+      "height": 16
+    }
+  ],
+  "scope": "actual canonical local shell; no selected-chain registration or deployed claim"
+}

@@ -5,6 +5,7 @@ const TEST_ROOT = resolve(import.meta.dirname, "../tests");
 
 /** Requires a real installed headless browser and therefore stays out of the default unit gate. */
 export const BROWSER_TEST_FILES = Object.freeze([
+  "tests/media-viewer-browser.test.mjs",
   "tests/sdk-verification-wrap-offline-browser.test.mjs",
   "tests/sdk-prepared-dense-copy-browser.test.mjs",
   "tests/sdk-legacy-prepared-dense-browser.test.mjs",
@@ -76,6 +77,7 @@ export const TEST_FILES_ON_DISK = Object.freeze(readdirSync(TEST_ROOT)
  * its execution boundary.
  */
 export const DETERMINISTIC_TEST_FILES = Object.freeze([
+  "tests/media-viewer-adapters.test.mjs",
   "tests/current-publication-carriage.test.mjs",
   "tests/sdk-staging-verifier-authority.test.mjs",
   "tests/smart-still-media-default.test.mjs",

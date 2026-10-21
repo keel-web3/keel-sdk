@@ -1,0 +1,264 @@
+{
+  "source": "frozen read-only SDK7730",
+  "copied": [
+    "node_modules",
+    "packages/sprite-codex/node_modules",
+    "packages/sprite-codex/dist",
+    "packages/game-engine/node_modules",
+    "packages/mcp/node_modules",
+    "packages/mcp/dist",
+    "packages/protocol/node_modules",
+    "packages/protocol/dist",
+    "packages/viewer/node_modules",
+    "packages/viewer/dist",
+    "packages/sdk/node_modules",
+    "packages/sdk/dist",
+    "packages/sandbox-sdk/node_modules",
+    "packages/sandbox-sdk/dist",
+    "packages/ethereum-adapter/node_modules",
+    "packages/ethereum-adapter/dist",
+    "packages/studio-core/node_modules",
+    "packages/studio-core/dist",
+    "packages/builder/node_modules",
+    "packages/builder/dist",
+    "packages/web3-boundary-tests/node_modules"
+  ],
+  "ownedAbsoluteLinksRepaired": [
+    {
+      "link": "node_modules/solc",
+      "old": "/private/tmp/keel-current-doc-aligned-sdk-official-20261021-01/keel-sdk/node_modules/.pnpm/solc@0.8.36/node_modules/solc",
+      "new": "/private/tmp/keel-media-viewers-20261021-01/keel-sdk/node_modules/.pnpm/solc@0.8.36/node_modules/solc"
+    },
+    {
+      "link": "node_modules/typescript",
+      "old": "/private/tmp/keel-current-doc-aligned-sdk-official-20261021-01/keel-sdk/node_modules/.pnpm/typescript@5.9.3/node_modules/typescript",
+      "new": "/private/tmp/keel-media-viewers-20261021-01/keel-sdk/node_modules/.pnpm/typescript@5.9.3/node_modules/typescript"
+    },
+    {
+      "link": "node_modules/viem",
+      "old": "/private/tmp/keel-current-doc-aligned-sdk-official-20261021-01/keel-sdk/node_modules/.pnpm/viem@2.55.19_typescript@5.9.3_zod@4.5.4/node_modules/viem",
+      "new": "/private/tmp/keel-media-viewers-20261021-01/keel-sdk/node_modules/.pnpm/viem@2.55.19_typescript@5.9.3_zod@4.5.4/node_modules/viem"
+    },
+    {
+      "link": "node_modules/yaml",
+      "old": "/private/tmp/keel-current-doc-aligned-sdk-official-20261021-01/keel-sdk/node_modules/.pnpm/yaml@2.8.2/node_modules/yaml",
+      "new": "/private/tmp/keel-media-viewers-20261021-01/keel-sdk/node_modules/.pnpm/yaml@2.8.2/node_modules/yaml"
+    },
+    {
+      "link": "node_modules/esbuild",
+      "old": "/private/tmp/keel-current-doc-aligned-sdk-official-20261021-01/keel-sdk/node_modules/.pnpm/esbuild@0.28.2/node_modules/esbuild",
+      "new": "/private/tmp/keel-media-viewers-20261021-01/keel-sdk/node_modules/.pnpm/esbuild@0.28.2/node_modules/esbuild"
+    },
+    {
+      "link": "node_modules/.modules.yaml",
+      "old": "/private/tmp/keel-current-doc-aligned-sdk-official-20261021-01/keel-sdk/node_modules/.modules.yaml",
+      "new": "/private/tmp/keel-media-viewers-20261021-01/keel-sdk/node_modules/.modules.yaml"
+    },
+    {
+      "link": "node_modules/.pnpm-workspace-state-v1.json",
+      "old": "/private/tmp/keel-current-doc-aligned-sdk-official-20261021-01/keel-sdk/node_modules/.pnpm-workspace-state-v1.json",
+      "new": "/private/tmp/keel-media-viewers-20261021-01/keel-sdk/node_modules/.pnpm-workspace-state-v1.json"
+    },
+    {
+      "link": "node_modules/.pnpm/node_modules/@keel/web3-boundary-tests",
+      "old": "/private/tmp/keel-current-doc-aligned-sdk-official-20261021-01/keel-sdk/packages/web3-boundary-tests",
+      "new": "/private/tmp/keel-media-viewers-20261021-01/keel-sdk/packages/web3-boundary-tests"
+    },
+    {
+      "link": "node_modules/@keel/sprite-codex",
+      "old": "/private/tmp/keel-current-doc-aligned-sdk-official-20261021-01/keel-sdk/packages/sprite-codex",
+      "new": "/private/tmp/keel-media-viewers-20261021-01/keel-sdk/packages/sprite-codex"
+    },
+    {
+      "link": "packages/sprite-codex/node_modules/typescript",
+      "old": "/private/tmp/keel-current-doc-aligned-sdk-official-20261021-01/keel-sdk/node_modules/.pnpm/typescript@5.9.3/node_modules/typescript",
+      "new": "/private/tmp/keel-media-viewers-20261021-01/keel-sdk/node_modules/.pnpm/typescript@5.9.3/node_modules/typescript"
+    },
+    {
+      "link": "packages/sprite-codex/node_modules/sharp",
+      "old": "/private/tmp/keel-current-doc-aligned-sdk-official-20261021-01/keel-sdk/node_modules/.pnpm/sharp@0.35.3_@types+node@22.20.1/node_modules/sharp",
+      "new": "/private/tmp/keel-media-viewers-20261021-01/keel-sdk/node_modules/.pnpm/sharp@0.35.3_@types+node@22.20.1/node_modules/sharp"
+    },
+    {
+      "link": "packages/mcp/node_modules/typescript",
+      "old": "/private/tmp/keel-current-doc-aligned-sdk-official-20261021-01/keel-sdk/node_modules/.pnpm/typescript@5.9.3/node_modules/typescript",
+      "new": "/private/tmp/keel-media-viewers-20261021-01/keel-sdk/node_modules/.pnpm/typescript@5.9.3/node_modules/typescript"
+    },
+    {
+      "link": "packages/mcp/node_modules/@keel/protocol",
+      "old": "/private/tmp/keel-current-doc-aligned-sdk-official-20261021-01/keel-sdk/packages/protocol",
+      "new": "/private/tmp/keel-media-viewers-20261021-01/keel-sdk/packages/protocol"
+    },
+    {
+      "link": "packages/mcp/node_modules/@keel/sdk",
+      "old": "/private/tmp/keel-current-doc-aligned-sdk-official-20261021-01/keel-sdk/packages/sdk",
+      "new": "/private/tmp/keel-media-viewers-20261021-01/keel-sdk/packages/sdk"
+    },
+    {
+      "link": "packages/mcp/node_modules/@keel/ethereum-adapter",
+      "old": "/private/tmp/keel-current-doc-aligned-sdk-official-20261021-01/keel-sdk/packages/ethereum-adapter",
+      "new": "/private/tmp/keel-media-viewers-20261021-01/keel-sdk/packages/ethereum-adapter"
+    },
+    {
+      "link": "packages/mcp/node_modules/@keel/builder",
+      "old": "/private/tmp/keel-current-doc-aligned-sdk-official-20261021-01/keel-sdk/packages/builder",
+      "new": "/private/tmp/keel-media-viewers-20261021-01/keel-sdk/packages/builder"
+    },
+    {
+      "link": "packages/protocol/node_modules/typescript",
+      "old": "/private/tmp/keel-current-doc-aligned-sdk-official-20261021-01/keel-sdk/node_modules/.pnpm/typescript@5.9.3/node_modules/typescript",
+      "new": "/private/tmp/keel-media-viewers-20261021-01/keel-sdk/node_modules/.pnpm/typescript@5.9.3/node_modules/typescript"
+    },
+    {
+      "link": "packages/viewer/node_modules/typescript",
+      "old": "/private/tmp/keel-current-doc-aligned-sdk-official-20261021-01/keel-sdk/node_modules/.pnpm/typescript@5.9.3/node_modules/typescript",
+      "new": "/private/tmp/keel-media-viewers-20261021-01/keel-sdk/node_modules/.pnpm/typescript@5.9.3/node_modules/typescript"
+    },
+    {
+      "link": "packages/viewer/node_modules/esbuild",
+      "old": "/private/tmp/keel-current-doc-aligned-sdk-official-20261021-01/keel-sdk/node_modules/.pnpm/esbuild@0.25.12/node_modules/esbuild",
+      "new": "/private/tmp/keel-media-viewers-20261021-01/keel-sdk/node_modules/.pnpm/esbuild@0.25.12/node_modules/esbuild"
+    },
+    {
+      "link": "packages/viewer/node_modules/@keel/protocol",
+      "old": "/private/tmp/keel-current-doc-aligned-sdk-official-20261021-01/keel-sdk/packages/protocol",
+      "new": "/private/tmp/keel-media-viewers-20261021-01/keel-sdk/packages/protocol"
+    },
+    {
+      "link": "packages/sdk/node_modules/typescript",
+      "old": "/private/tmp/keel-current-doc-aligned-sdk-official-20261021-01/keel-sdk/node_modules/.pnpm/typescript@5.9.3/node_modules/typescript",
+      "new": "/private/tmp/keel-media-viewers-20261021-01/keel-sdk/node_modules/.pnpm/typescript@5.9.3/node_modules/typescript"
+    },
+    {
+      "link": "packages/sdk/node_modules/viem",
+      "old": "/private/tmp/keel-current-doc-aligned-sdk-official-20261021-01/keel-sdk/node_modules/.pnpm/viem@2.55.19_typescript@5.9.3_zod@4.5.4/node_modules/viem",
+      "new": "/private/tmp/keel-media-viewers-20261021-01/keel-sdk/node_modules/.pnpm/viem@2.55.19_typescript@5.9.3_zod@4.5.4/node_modules/viem"
+    },
+    {
+      "link": "packages/sdk/node_modules/esbuild",
+      "old": "/private/tmp/keel-current-doc-aligned-sdk-official-20261021-01/keel-sdk/node_modules/.pnpm/esbuild@0.28.2/node_modules/esbuild",
+      "new": "/private/tmp/keel-media-viewers-20261021-01/keel-sdk/node_modules/.pnpm/esbuild@0.28.2/node_modules/esbuild"
+    },
+    {
+      "link": "packages/sdk/node_modules/terser",
+      "old": "/private/tmp/keel-current-doc-aligned-sdk-official-20261021-01/keel-sdk/node_modules/.pnpm/terser@5.44.0/node_modules/terser",
+      "new": "/private/tmp/keel-media-viewers-20261021-01/keel-sdk/node_modules/.pnpm/terser@5.44.0/node_modules/terser"
+    },
+    {
+      "link": "packages/sdk/node_modules/@keel/protocol",
+      "old": "/private/tmp/keel-current-doc-aligned-sdk-official-20261021-01/keel-sdk/packages/protocol",
+      "new": "/private/tmp/keel-media-viewers-20261021-01/keel-sdk/packages/protocol"
+    },
+    {
+      "link": "packages/sdk/node_modules/@keel/viewer",
+      "old": "/private/tmp/keel-current-doc-aligned-sdk-official-20261021-01/keel-sdk/packages/viewer",
+      "new": "/private/tmp/keel-media-viewers-20261021-01/keel-sdk/packages/viewer"
+    },
+    {
+      "link": "packages/sandbox-sdk/node_modules/typescript",
+      "old": "/private/tmp/keel-current-doc-aligned-sdk-official-20261021-01/keel-sdk/node_modules/.pnpm/typescript@5.9.3/node_modules/typescript",
+      "new": "/private/tmp/keel-media-viewers-20261021-01/keel-sdk/node_modules/.pnpm/typescript@5.9.3/node_modules/typescript"
+    },
+    {
+      "link": "packages/sandbox-sdk/node_modules/@keel/protocol",
+      "old": "/private/tmp/keel-current-doc-aligned-sdk-official-20261021-01/keel-sdk/packages/protocol",
+      "new": "/private/tmp/keel-media-viewers-20261021-01/keel-sdk/packages/protocol"
+    },
+    {
+      "link": "packages/sandbox-sdk/node_modules/@keel/viewer",
+      "old": "/private/tmp/keel-current-doc-aligned-sdk-official-20261021-01/keel-sdk/packages/viewer",
+      "new": "/private/tmp/keel-media-viewers-20261021-01/keel-sdk/packages/viewer"
+    },
+    {
+      "link": "packages/sandbox-sdk/node_modules/@keel/sdk",
+      "old": "/private/tmp/keel-current-doc-aligned-sdk-official-20261021-01/keel-sdk/packages/sdk",
+      "new": "/private/tmp/keel-media-viewers-20261021-01/keel-sdk/packages/sdk"
+    },
+    {
+      "link": "packages/sandbox-sdk/node_modules/@keel/studio-core",
+      "old": "/private/tmp/keel-current-doc-aligned-sdk-official-20261021-01/keel-sdk/packages/studio-core",
+      "new": "/private/tmp/keel-media-viewers-20261021-01/keel-sdk/packages/studio-core"
+    },
+    {
+      "link": "packages/ethereum-adapter/node_modules/typescript",
+      "old": "/private/tmp/keel-current-doc-aligned-sdk-official-20261021-01/keel-sdk/node_modules/.pnpm/typescript@5.9.3/node_modules/typescript",
+      "new": "/private/tmp/keel-media-viewers-20261021-01/keel-sdk/node_modules/.pnpm/typescript@5.9.3/node_modules/typescript"
+    },
+    {
+      "link": "packages/ethereum-adapter/node_modules/viem",
+      "old": "/private/tmp/keel-current-doc-aligned-sdk-official-20261021-01/keel-sdk/node_modules/.pnpm/viem@2.55.19_typescript@5.9.3_zod@4.5.4/node_modules/viem",
+      "new": "/private/tmp/keel-media-viewers-20261021-01/keel-sdk/node_modules/.pnpm/viem@2.55.19_typescript@5.9.3_zod@4.5.4/node_modules/viem"
+    },
+    {
+      "link": "packages/ethereum-adapter/node_modules/@keel/protocol",
+      "old": "/private/tmp/keel-current-doc-aligned-sdk-official-20261021-01/keel-sdk/packages/protocol",
+      "new": "/private/tmp/keel-media-viewers-20261021-01/keel-sdk/packages/protocol"
+    },
+    {
+      "link": "packages/ethereum-adapter/node_modules/@keel/sdk",
+      "old": "/private/tmp/keel-current-doc-aligned-sdk-official-20261021-01/keel-sdk/packages/sdk",
+      "new": "/private/tmp/keel-media-viewers-20261021-01/keel-sdk/packages/sdk"
+    },
+    {
+      "link": "packages/studio-core/node_modules/onchfs",
+      "old": "/private/tmp/keel-current-doc-aligned-sdk-official-20261021-01/keel-sdk/node_modules/.pnpm/onchfs@0.1.0_typescript@5.9.3_zod@4.5.4/node_modules/onchfs",
+      "new": "/private/tmp/keel-media-viewers-20261021-01/keel-sdk/node_modules/.pnpm/onchfs@0.1.0_typescript@5.9.3_zod@4.5.4/node_modules/onchfs"
+    },
+    {
+      "link": "packages/studio-core/node_modules/typescript",
+      "old": "/private/tmp/keel-current-doc-aligned-sdk-official-20261021-01/keel-sdk/node_modules/.pnpm/typescript@5.9.3/node_modules/typescript",
+      "new": "/private/tmp/keel-media-viewers-20261021-01/keel-sdk/node_modules/.pnpm/typescript@5.9.3/node_modules/typescript"
+    },
+    {
+      "link": "packages/studio-core/node_modules/sharp",
+      "old": "/private/tmp/keel-current-doc-aligned-sdk-official-20261021-01/keel-sdk/node_modules/.pnpm/sharp@0.35.3_@types+node@22.20.1/node_modules/sharp",
+      "new": "/private/tmp/keel-media-viewers-20261021-01/keel-sdk/node_modules/.pnpm/sharp@0.35.3_@types+node@22.20.1/node_modules/sharp"
+    },
+    {
+      "link": "packages/studio-core/node_modules/@keel/protocol",
+      "old": "/private/tmp/keel-current-doc-aligned-sdk-official-20261021-01/keel-sdk/packages/protocol",
+      "new": "/private/tmp/keel-media-viewers-20261021-01/keel-sdk/packages/protocol"
+    },
+    {
+      "link": "packages/studio-core/node_modules/@keel/builder",
+      "old": "/private/tmp/keel-current-doc-aligned-sdk-official-20261021-01/keel-sdk/packages/builder",
+      "new": "/private/tmp/keel-media-viewers-20261021-01/keel-sdk/packages/builder"
+    },
+    {
+      "link": "packages/builder/node_modules/typescript",
+      "old": "/private/tmp/keel-current-doc-aligned-sdk-official-20261021-01/keel-sdk/node_modules/.pnpm/typescript@5.9.3/node_modules/typescript",
+      "new": "/private/tmp/keel-media-viewers-20261021-01/keel-sdk/node_modules/.pnpm/typescript@5.9.3/node_modules/typescript"
+    },
+    {
+      "link": "packages/builder/node_modules/esbuild",
+      "old": "/private/tmp/keel-current-doc-aligned-sdk-official-20261021-01/keel-sdk/node_modules/.pnpm/esbuild@0.28.2/node_modules/esbuild",
+      "new": "/private/tmp/keel-media-viewers-20261021-01/keel-sdk/node_modules/.pnpm/esbuild@0.28.2/node_modules/esbuild"
+    },
+    {
+      "link": "packages/builder/node_modules/terser",
+      "old": "/private/tmp/keel-current-doc-aligned-sdk-official-20261021-01/keel-sdk/node_modules/.pnpm/terser@5.44.0/node_modules/terser",
+      "new": "/private/tmp/keel-media-viewers-20261021-01/keel-sdk/node_modules/.pnpm/terser@5.44.0/node_modules/terser"
+    },
+    {
+      "link": "packages/builder/node_modules/sharp",
+      "old": "/private/tmp/keel-current-doc-aligned-sdk-official-20261021-01/keel-sdk/node_modules/.pnpm/sharp@0.35.3_@types+node@22.20.1/node_modules/sharp",
+      "new": "/private/tmp/keel-media-viewers-20261021-01/keel-sdk/node_modules/.pnpm/sharp@0.35.3_@types+node@22.20.1/node_modules/sharp"
+    },
+    {
+      "link": "packages/builder/node_modules/@keel/protocol",
+      "old": "/private/tmp/keel-current-doc-aligned-sdk-official-20261021-01/keel-sdk/packages/protocol",
+      "new": "/private/tmp/keel-media-viewers-20261021-01/keel-sdk/packages/protocol"
+    },
+    {
+      "link": "packages/builder/node_modules/@keel/sdk",
+      "old": "/private/tmp/keel-current-doc-aligned-sdk-official-20261021-01/keel-sdk/packages/sdk",
+      "new": "/private/tmp/keel-media-viewers-20261021-01/keel-sdk/packages/sdk"
+    },
+    {
+      "link": "packages/web3-boundary-tests/node_modules/viem",
+      "old": "/private/tmp/keel-current-doc-aligned-sdk-official-20261021-01/keel-sdk/node_modules/.pnpm/viem@2.55.19_typescript@5.9.3_zod@4.5.4/node_modules/viem",
+      "new": "/private/tmp/keel-media-viewers-20261021-01/keel-sdk/node_modules/.pnpm/viem@2.55.19_typescript@5.9.3_zod@4.5.4/node_modules/viem"
+    }
+  ],
+  "install": "not-performed"
+}

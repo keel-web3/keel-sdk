@@ -1,0 +1,58 @@
+{
+  "schema": "keel-media-viewer-fixtures@1",
+  "recipe": "New synthetic16x16 frames: red/blue/green,120/280/160ms ffconcat plus final repeatedframe. WebP centeralpha96, AVIFopaque. No incident artwork or existing reference assets replaced.",
+  "frameColors": [
+    [
+      255,
+      0,
+      0
+    ],
+    [
+      0,
+      0,
+      255
+    ],
+    [
+      0,
+      255,
+      0
+    ]
+  ],
+  "files": [
+    {
+      "path": "animation.avif",
+      "bytes": 1209,
+      "sha256": "8ff2cbf589c8d4f21e6ef2d6905b6bad2cef91e5a245244c70fe1aac72247447"
+    },
+    {
+      "path": "animation.gif",
+      "bytes": 988,
+      "sha256": "f4657570de93661fecd7d9c38e77ab993df39af675e091d55f9df5b99ff7858e"
+    },
+    {
+      "path": "animation.webp",
+      "bytes": 236,
+      "sha256": "d17ebc1878257df2d0707790579495552c9440e380c867183e1c618024eac951"
+    },
+    {
+      "path": "still.avif",
+      "bytes": 326,
+      "sha256": "64825a665d949853d751fd0bcdfb3f09a049ef28b5d71df600f65fc1c82e406b"
+    },
+    {
+      "path": "still.jpg",
+      "bytes": 208,
+      "sha256": "896376a1667a034555d12b35d387be9034da1f03a74b96b99cb47fa77f845d62"
+    },
+    {
+      "path": "still.png",
+      "bytes": 82,
+      "sha256": "9ed16ce9427bac44b0ce31fdf43ab90571b9a6125f7e42919401ad434f0204c5"
+    },
+    {
+      "path": "still.webp",
+      "bytes": 52,
+      "sha256": "ae661581dd3274181c220f5e3b121addaa5805f4badd833a094071f329c52f2f"
+    }
+  ]
+}

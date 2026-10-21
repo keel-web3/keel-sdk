@@ -1,6 +1,6 @@
 /** Browser-safe declarations and bytes for KEEL's reusable normal-media module. */
 export const KEEL_ASSET_DISPLAY_MODULE_ID = "keel.asset-display" as const;
-export const KEEL_ASSET_DISPLAY_MODULE_VERSION = "1.2.0" as const;
+export const KEEL_ASSET_DISPLAY_MODULE_VERSION = "1.3.0" as const;
 
 export const KEEL_ASSET_DISPLAY_MEDIA_TYPES = Object.freeze([
   "image/avif",
@@ -76,7 +76,12 @@ const pickBackground=function keelAssetBackground(metadataColor, edgeRGBA) {
 };let background=pickBackground(entry.background_color,[]);
 const matchBackground=e=>{const c=document.createElement("canvas");c.width=c.height=16;const x=c.getContext("2d"),edges=[];if(x){try{x.drawImage(e,0,0,16,16);const p=x.getImageData(0,0,16,16).data;for(let y=0;y<16;y++)for(let z=0;z<16;z++)if(y===0||y===15||z===0||z===15){const i=(y*16+z)*4;edges.push(p[i],p[i+1],p[i+2],p[i+3]);}}catch{}}background=pickBackground(entry.background_color,edges);for(const n of [document.documentElement,document.body,root])n.style.background=background;return background;};
 const style=e=>{Object.assign(e.style,{display:"block",width:"100%",height:"100%",maxWidth:"100%",maxHeight:"100%",objectFit:"contain",background});return e},mount=e=>{root.replaceChildren(e);return e};
-if(entry.mediaType.startsWith("image/")){const e=document.createElement("img");e.alt=entry.name||"Verified KEEL image";if(entry.mediaType==="image/avif"||entry.mediaType==="image/webp"){e.onload=()=>{matchBackground(e);const c=document.createElement("canvas"),x=c.getContext("2d");if(!x)fail("2D canvas is unavailable");c.width=e.naturalWidth;c.height=e.naturalHeight;c.title="Right-click to save this verified image as PNG";c.setAttribute("aria-label",e.alt);Object.assign(c.style,{display:"block",width:"auto",height:"auto",maxWidth:"100%",maxHeight:"100%",margin:"auto",background});x.drawImage(e,0,0);mount(c)};e.onerror=()=>fail("image decode failed");e.src=entry.url;return}style(e);e.onload=()=>{e.style.background=matchBackground(e)};e.src=entry.url;mount(e);return}
+// Canvas PNG export is only safe after complete container inspection proves a still.
+// Unknown motion remains native; a missing WebCodecs API never freezes animation.
+const stillRaster=(b,m)=>{if(!(b instanceof Uint8Array)||b.length<20||b.length>33554432)return false;const v=new DataView(b.buffer,b.byteOffset,b.byteLength),tag=o=>String.fromCharCode(...b.subarray(o,o+4));let at=0,n=0;
+if(m==="image/webp"){if(tag(0)!=="RIFF"||tag(8)!=="WEBP"||v.getUint32(4,true)!==b.length-8)return false;at=12;let images=0;while(at<b.length){if(++n>65536||at+8>b.length)return false;const t=tag(at),size=v.getUint32(at+4,true),end=at+8+size+size%2;if(end>b.length||t==="VP8X"&&size!==10)return false;if(t==="ANIM"||t==="ANMF"||t==="VP8X"&&(b[at+8]&2)!==0)return false;if(t==="VP8 "||t==="VP8L"){if(!size||++images!==1)return false}at=end}return images===1}
+if(m==="image/avif"){let brand=false,meta=false,data=false;while(at<b.length){if(++n>65536||at+8>b.length)return false;let size=v.getUint32(at),header=8;const t=tag(at+4);if(size===1){if(at+16>b.length)return false;size=v.getUint32(at+8)*4294967296+v.getUint32(at+12);header=16}if(size===0)size=b.length-at;if(!Number.isSafeInteger(size)||size<header||at+size>b.length)return false;const end=at+size;if(t==="moov")return false;if(t==="ftyp"){if(at!==0||size<header+8||(size-header)%4)return false;for(let i=at+header;i<end;i+=4){if(i===at+header+4)continue;const value=tag(i);if(value==="avis")return false;if(value==="avif")brand=true}}if(t==="meta")meta=true;if(t==="mdat")data=true;at=end}return brand&&meta&&data}return false};
+if(entry.mediaType.startsWith("image/")){const e=document.createElement("img");e.alt=entry.name||"Verified KEEL image";if(entry.mediaType==="image/avif"||entry.mediaType==="image/webp"){const still=stillRaster(content.bytes(entry.id),entry.mediaType);e.onload=()=>{matchBackground(e);if(!still){e.style.background=background;return}const c=document.createElement("canvas"),x=c.getContext("2d");if(!x)fail("2D canvas is unavailable");c.width=e.naturalWidth;c.height=e.naturalHeight;c.title="Right-click to save this verified image as PNG";c.setAttribute("aria-label",e.alt);Object.assign(c.style,{display:"block",width:"auto",height:"auto",maxWidth:"100%",maxHeight:"100%",margin:"auto",background});x.drawImage(e,0,0);mount(c)};e.onerror=()=>fail("image decode failed");if(!still){Object.assign(e.style,{display:"block",width:"auto",height:"auto",maxWidth:"100%",maxHeight:"100%",margin:"auto",background});mount(e)}e.src=entry.url;return}style(e);e.onload=()=>{e.style.background=matchBackground(e)};e.src=entry.url;mount(e);return}
 if(entry.mediaType.startsWith("video/")){const e=style(document.createElement("video"));e.src=entry.url;e.controls=true;e.autoplay=true;e.loop=true;e.muted=true;e.playsInline=true;mount(e);return}
 if(entry.mediaType!=="model/gltf-binary")fail("unsupported media type "+entry.mediaType);
 const b=content.bytes(entry.id),v=new DataView(b.buffer,b.byteOffset,b.byteLength);if(b.byteLength<20||v.getUint32(0,true)!==0x46546c67||v.getUint32(4,true)!==2||v.getUint32(8,true)!==b.byteLength)fail("invalid GLB header");
@@ -98,6 +103,7 @@ export function keelAssetDisplayModuleBytes(): Uint8Array {
  * Never replace an existing published renderer just because the SDK is newer.
  */
 export const KEEL_ASSET_DISPLAY_SUPPORTED_REVISIONS = Object.freeze([
+  Object.freeze({version: "1.3.0", digest: "0x4f88f47a332061125a3a6a0133d2a70f5b6d641c4d0c84dd7c0302626f8034dc", byteLength: 9648}),
   Object.freeze({version: "1.2.0", digest: "0x9db2505b726d6c0b9821ce2c90df96c4e37b6c1607fe4dd565f883b3531bed8b", byteLength: 7810}),
   Object.freeze({version: "1.1.0", digest: "0x53957405312b1fe3b187a5c49b13d13a08fd6e960953c815c6e49b53637d97f4", byteLength: 6172}),
 ] as const);

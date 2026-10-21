@@ -1,0 +1,168 @@
+{
+  "schema": "keel-native-raster-source-evidence@1",
+  "base": "7730e3150b7ec6da69913a779273fdb981d7fff3",
+  "sourceFiles": [
+    {
+      "path": "packages/sdk/src/asset-display.ts",
+      "bytes": 13242,
+      "sha256": "61dbb7cdbb39db3e7f2f2f6bb6a546ccf3ad7e8b21a65deab34e4e87c1161dbc"
+    },
+    {
+      "path": "packages/sdk/src/media-viewer-adapters.ts",
+      "bytes": 2559,
+      "sha256": "76dabb60ef62ce127055a1833d67021f489853bb884465652c9e9c52728f8a71"
+    },
+    {
+      "path": "scripts/test-suites.mjs",
+      "bytes": 18131,
+      "sha256": "6081e103247e27f9445bcfb440cf00b18c9c7f6d58e95fed8fdf477988384695"
+    },
+    {
+      "path": "tests/media-viewer-adapters.test.mjs",
+      "bytes": 3623,
+      "sha256": "99d954aa1403a14b338304018e64987a23259d18151e10b9f5a73ef560339860"
+    },
+    {
+      "path": "tests/media-viewer-browser.test.mjs",
+      "bytes": 10903,
+      "sha256": "ef9c2df4850b3d3e76f3877c67b9750919330875e7e3922605c5a6b3f97a067e"
+    },
+    {
+      "path": "tests/fixtures/asset-display-1.1.0.js",
+      "bytes": 6172,
+      "sha256": "53957405312b1fe3b187a5c49b13d13a08fd6e960953c815c6e49b53637d97f4"
+    },
+    {
+      "path": "tests/fixtures/media-viewers/animation.avif",
+      "bytes": 1209,
+      "sha256": "8ff2cbf589c8d4f21e6ef2d6905b6bad2cef91e5a245244c70fe1aac72247447"
+    },
+    {
+      "path": "tests/fixtures/media-viewers/animation.gif",
+      "bytes": 988,
+      "sha256": "f4657570de93661fecd7d9c38e77ab993df39af675e091d55f9df5b99ff7858e"
+    },
+    {
+      "path": "tests/fixtures/media-viewers/animation.webp",
+      "bytes": 236,
+      "sha256": "d17ebc1878257df2d0707790579495552c9440e380c867183e1c618024eac951"
+    },
+    {
+      "path": "tests/fixtures/media-viewers/manifest.json",
+      "bytes": 1423,
+      "sha256": "2d210850ff77880543d744dec9a8b7d3a137b82ecbf5b596a0fa84e04f2b8a7d"
+    },
+    {
+      "path": "tests/fixtures/media-viewers/still.avif",
+      "bytes": 326,
+      "sha256": "64825a665d949853d751fd0bcdfb3f09a049ef28b5d71df600f65fc1c82e406b"
+    },
+    {
+      "path": "tests/fixtures/media-viewers/still.jpg",
+      "bytes": 208,
+      "sha256": "896376a1667a034555d12b35d387be9034da1f03a74b96b99cb47fa77f845d62"
+    },
+    {
+      "path": "tests/fixtures/media-viewers/still.png",
+      "bytes": 82,
+      "sha256": "9ed16ce9427bac44b0ce31fdf43ab90571b9a6125f7e42919401ad434f0204c5"
+    },
+    {
+      "path": "tests/fixtures/media-viewers/still.webp",
+      "bytes": 52,
+      "sha256": "ae661581dd3274181c220f5e3b121addaa5805f4badd833a094071f329c52f2f"
+    }
+  ],
+  "evidenceFiles": [
+    {
+      "path": "docs/review/media-viewers-20261021/evidence/animation-baseline-pinned.json",
+      "bytes": 3331,
+      "sha256": "84372f1bad4324901dc3e052bb11e9f7d51703b6c5d87c168709f086d2beaf97"
+    },
+    {
+      "path": "docs/review/media-viewers-20261021/evidence/animation-baseline.json",
+      "bytes": 3383,
+      "sha256": "9343272613216af55680da59a200bd226f4fd22798145359229280d59c92880d"
+    },
+    {
+      "path": "docs/review/media-viewers-20261021/evidence/baseline-asset-display-1.2.0.js",
+      "bytes": 7810,
+      "sha256": "9db2505b726d6c0b9821ce2c90df96c4e37b6c1607fe4dd565f883b3531bed8b"
+    },
+    {
+      "path": "docs/review/media-viewers-20261021/evidence/catalog-probe.failed.mjs.txt",
+      "bytes": 4787,
+      "sha256": "c6b8c5d00afd235b11da29bda4b4076c33fcfb36f13f2ca4d08758db7b2752e8"
+    },
+    {
+      "path": "docs/review/media-viewers-20261021/evidence/catalog-reuse-readback-first.log.gz",
+      "bytes": 449,
+      "sha256": "8398d4840c1d4cdddcec9f6a521450b670bde3fcedba7b0087dbf34a03e184d5"
+    },
+    {
+      "path": "docs/review/media-viewers-20261021/evidence/catalog-reuse-readback.log.gz",
+      "bytes": 3193,
+      "sha256": "21f20314c9d11d0c373b1d3c1fcb74dbb107179c5c79ad0d02ba8bdcf1a8924f"
+    },
+    {
+      "path": "docs/review/media-viewers-20261021/evidence/dependency-copy.json",
+      "bytes": 15543,
+      "sha256": "5d7aa9d9723813e1c969ca41083e66a2862950f99d60e8295b088f04244bf7bc"
+    },
+    {
+      "path": "docs/review/media-viewers-20261021/evidence/initial-discovery.json",
+      "bytes": 3656,
+      "sha256": "14bda908da72a1c9f6a0a6bfbc282da239ad3b0da13ebd309709306007c653ef"
+    },
+    {
+      "path": "docs/review/media-viewers-20261021/evidence/local-document-sizes.json",
+      "bytes": 1708,
+      "sha256": "d28629131397b464bc2c2d5b8c52fbff7812562aea2a1b3c9ccb202b92113502"
+    },
+    {
+      "path": "docs/review/media-viewers-20261021/evidence/native-avif.json",
+      "bytes": 9576,
+      "sha256": "14f83b6c4f8bea0018695919360e3a6682b08590ac4cec67832f1a46e27476ee"
+    },
+    {
+      "path": "docs/review/media-viewers-20261021/evidence/native-raster-final.tap.gz",
+      "bytes": 406,
+      "sha256": "9876cfc7d13d8908c6866725f555d9b0e12201ec1a818484be27527425bd1359"
+    },
+    {
+      "path": "docs/review/media-viewers-20261021/evidence/native-raster-first.tap.gz",
+      "bytes": 709,
+      "sha256": "8a80ebdf19dc89c184824855a960d446ec4fbd8a7acc5310ee9dcb512356a9a5"
+    },
+    {
+      "path": "docs/review/media-viewers-20261021/evidence/native-raster-second.tap.gz",
+      "bytes": 1006,
+      "sha256": "755684207f7697cb6a40352f58a8b420a2ae653e3d435d423363b2d4f098deea"
+    },
+    {
+      "path": "docs/review/media-viewers-20261021/evidence/native-raster-third.tap.gz",
+      "bytes": 330,
+      "sha256": "138e2b9391bb7a4ed14827ddf26d5cb9611b421abb6a4d7ccba75cf0164b62f0"
+    },
+    {
+      "path": "docs/review/media-viewers-20261021/evidence/native-raster-tsc-final.log.gz",
+      "bytes": 20,
+      "sha256": "9ceffb7310338057cfe71a4ae1e2c98d2c485d81cdef906532a801f457a38d64"
+    },
+    {
+      "path": "docs/review/media-viewers-20261021/evidence/native-raster-unit-final.tap.gz",
+      "bytes": 2539,
+      "sha256": "767daee7662a02a777f3addd8d26fc199137c5e74fe2cb877300a66718ad0e41"
+    },
+    {
+      "path": "docs/review/media-viewers-20261021/evidence/native-webp.json",
+      "bytes": 9912,
+      "sha256": "17ee5186f53d433498e824204f53bf7755cd3de33c11ba30ff818408bfa564b1"
+    },
+    {
+      "path": "docs/review/media-viewers-20261021/evidence/source-discovery-hashes.json",
+      "bytes": 2331,
+      "sha256": "08bcc368c55bcc412423f448315df77942aed052fe20fb3cc1db4b1d70cc1945"
+    }
+  ]
+}

@@ -1,0 +1,56 @@
+{
+  "baseSDK": "7730e3150b7ec6da69913a779273fdb981d7fff3",
+  "engineDiscoveryHEAD": "c81d50447df21af1b5fcd066e46122ae252020c3",
+  "files": [
+    {
+      "path": "/private/tmp/keel-media-viewers-20261021-01/keel-sdk/packages/sdk/src/asset-display.ts",
+      "bytes": 11271,
+      "sha256": "c2265e4f54bd0d32dd206b716e55d6993b92a6298f4377f6056384659b0f65b7"
+    },
+    {
+      "path": "/private/tmp/keel-media-viewers-20261021-01/keel-sdk/packages/sdk/src/inline-viewer-graph.ts",
+      "bytes": 114789,
+      "sha256": "640c84da1d71df8e731a4dfbc825515278166e8ca2ae0f12a9d9500a815d0c38"
+    },
+    {
+      "path": "/private/tmp/keel-media-viewers-20261021-01/keel-sdk/packages/sdk/src/three-module.ts",
+      "bytes": 6151,
+      "sha256": "f3efa161578b3bcd742b55f5bd154c89322a8e0985ebd7a9ed5f1d670ec60352"
+    },
+    {
+      "path": "/private/tmp/keel-media-viewers-20261021-01/keel-sdk/packages/viewer/src/sandbox.ts",
+      "bytes": 54671,
+      "sha256": "d7f616e59f378151a1237031be8645557b292ef76954fe428ddd2b66b16dc06e"
+    },
+    {
+      "path": "/private/tmp/keel-media-viewers-20261021-01/keel-sdk/examples/demos/vendor/three.min.js",
+      "bytes": 338922,
+      "sha256": "3cd014e8adad7a6bc02a9bf103aa877fc714650ebe229412c4417904832965df"
+    },
+    {
+      "path": "/private/tmp/keel-media-viewers-20261021-01/keel-sdk/examples/demos/vendor/three.core.min.js",
+      "bytes": 381124,
+      "sha256": "61ba0df005b05991361d040d8ff670e1aadfd0ce7aeebd1fdb0725957a8957de"
+    },
+    {
+      "path": "/Users/ravonus/dev/keel-engine/packages/import/src/styled-asset-player.ts",
+      "bytes": 9011,
+      "sha256": "0bea1a202b33fdbd7ee739a3a7de44efb719ed023c87e41be90f5b2848c2a23d"
+    },
+    {
+      "path": "/Users/ravonus/dev/keel-engine/packages/import/src/styled-asset.ts",
+      "bytes": 31116,
+      "sha256": "549b15c0736ce34437f1a36f317ad86b618b8671dd7e0962dd54a70bdf112c90"
+    },
+    {
+      "path": "/private/tmp/keel-publish-entry-20261021-01/docs/STUDIO_PUBLICATION_REQUIREMENTS.md",
+      "bytes": 6673,
+      "sha256": "ff4a32c4f9d24d69f6634ed022e958ddf9614a727c0a73c5d92004a2c8432e90"
+    },
+    {
+      "path": "/private/tmp/keel-publish-entry-20261021-01/docs/STUDIO_PUBLICATION_SPRINTS.md",
+      "bytes": 17059,
+      "sha256": "98416ee5b5a991277a06e29781dc5dabc79af0238561ce0a5ebd84886c130cf8"
+    }
+  ]
+}

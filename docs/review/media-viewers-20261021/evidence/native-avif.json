@@ -1,0 +1,551 @@
+{
+  "input": {
+    "path": "animation.avif",
+    "bytes": 1209,
+    "sha256": "8ff2cbf589c8d4f21e6ef2d6905b6bad2cef91e5a245244c70fe1aac72247447"
+  },
+  "moduleDocumentBytes": 171587,
+  "samples": [
+    {
+      "elapsedMs": 0,
+      "sha256": "a8037f096b9edd1e025f493bca55343bc2a09a26474ed54fed5fb1ffb0ce5fd0",
+      "rgba": [
+        0,
+        0,
+        255,
+        255
+      ],
+      "centerRGBA": [
+        0,
+        0,
+        255,
+        255
+      ],
+      "width": 16,
+      "height": 16
+    },
+    {
+      "elapsedMs": 51,
+      "sha256": "a8037f096b9edd1e025f493bca55343bc2a09a26474ed54fed5fb1ffb0ce5fd0",
+      "rgba": [
+        0,
+        0,
+        255,
+        255
+      ],
+      "centerRGBA": [
+        0,
+        0,
+        255,
+        255
+      ],
+      "width": 16,
+      "height": 16
+    },
+    {
+      "elapsedMs": 101,
+      "sha256": "a8037f096b9edd1e025f493bca55343bc2a09a26474ed54fed5fb1ffb0ce5fd0",
+      "rgba": [
+        0,
+        0,
+        255,
+        255
+      ],
+      "centerRGBA": [
+        0,
+        0,
+        255,
+        255
+      ],
+      "width": 16,
+      "height": 16
+    },
+    {
+      "elapsedMs": 168,
+      "sha256": "770f625351441436485cf87812e6569436cf4910c7ce0a7222c0e7b5070cae02",
+      "rgba": [
+        0,
+        255,
+        0,
+        255
+      ],
+      "centerRGBA": [
+        0,
+        255,
+        0,
+        255
+      ],
+      "width": 16,
+      "height": 16
+    },
+    {
+      "elapsedMs": 218,
+      "sha256": "770f625351441436485cf87812e6569436cf4910c7ce0a7222c0e7b5070cae02",
+      "rgba": [
+        0,
+        255,
+        0,
+        255
+      ],
+      "centerRGBA": [
+        0,
+        255,
+        0,
+        255
+      ],
+      "width": 16,
+      "height": 16
+    },
+    {
+      "elapsedMs": 284,
+      "sha256": "770f625351441436485cf87812e6569436cf4910c7ce0a7222c0e7b5070cae02",
+      "rgba": [
+        0,
+        255,
+        0,
+        255
+      ],
+      "centerRGBA": [
+        0,
+        255,
+        0,
+        255
+      ],
+      "width": 16,
+      "height": 16
+    },
+    {
+      "elapsedMs": 334,
+      "sha256": "c8fbce2447d33f1b2abd786cdeb05e3f40aed6696a2076118b90ec5411fb60f1",
+      "rgba": [
+        255,
+        0,
+        0,
+        255
+      ],
+      "centerRGBA": [
+        255,
+        0,
+        0,
+        255
+      ],
+      "width": 16,
+      "height": 16
+    },
+    {
+      "elapsedMs": 404,
+      "sha256": "c8fbce2447d33f1b2abd786cdeb05e3f40aed6696a2076118b90ec5411fb60f1",
+      "rgba": [
+        255,
+        0,
+        0,
+        255
+      ],
+      "centerRGBA": [
+        255,
+        0,
+        0,
+        255
+      ],
+      "width": 16,
+      "height": 16
+    },
+    {
+      "elapsedMs": 453,
+      "sha256": "a8037f096b9edd1e025f493bca55343bc2a09a26474ed54fed5fb1ffb0ce5fd0",
+      "rgba": [
+        0,
+        0,
+        255,
+        255
+      ],
+      "centerRGBA": [
+        0,
+        0,
+        255,
+        255
+      ],
+      "width": 16,
+      "height": 16
+    },
+    {
+      "elapsedMs": 537,
+      "sha256": "a8037f096b9edd1e025f493bca55343bc2a09a26474ed54fed5fb1ffb0ce5fd0",
+      "rgba": [
+        0,
+        0,
+        255,
+        255
+      ],
+      "centerRGBA": [
+        0,
+        0,
+        255,
+        255
+      ],
+      "width": 16,
+      "height": 16
+    },
+    {
+      "elapsedMs": 583,
+      "sha256": "a8037f096b9edd1e025f493bca55343bc2a09a26474ed54fed5fb1ffb0ce5fd0",
+      "rgba": [
+        0,
+        0,
+        255,
+        255
+      ],
+      "centerRGBA": [
+        0,
+        0,
+        255,
+        255
+      ],
+      "width": 16,
+      "height": 16
+    },
+    {
+      "elapsedMs": 657,
+      "sha256": "a8037f096b9edd1e025f493bca55343bc2a09a26474ed54fed5fb1ffb0ce5fd0",
+      "rgba": [
+        0,
+        0,
+        255,
+        255
+      ],
+      "centerRGBA": [
+        0,
+        0,
+        255,
+        255
+      ],
+      "width": 16,
+      "height": 16
+    },
+    {
+      "elapsedMs": 737,
+      "sha256": "a8037f096b9edd1e025f493bca55343bc2a09a26474ed54fed5fb1ffb0ce5fd0",
+      "rgba": [
+        0,
+        0,
+        255,
+        255
+      ],
+      "centerRGBA": [
+        0,
+        0,
+        255,
+        255
+      ],
+      "width": 16,
+      "height": 16
+    },
+    {
+      "elapsedMs": 787,
+      "sha256": "770f625351441436485cf87812e6569436cf4910c7ce0a7222c0e7b5070cae02",
+      "rgba": [
+        0,
+        255,
+        0,
+        255
+      ],
+      "centerRGBA": [
+        0,
+        255,
+        0,
+        255
+      ],
+      "width": 16,
+      "height": 16
+    },
+    {
+      "elapsedMs": 853,
+      "sha256": "770f625351441436485cf87812e6569436cf4910c7ce0a7222c0e7b5070cae02",
+      "rgba": [
+        0,
+        255,
+        0,
+        255
+      ],
+      "centerRGBA": [
+        0,
+        255,
+        0,
+        255
+      ],
+      "width": 16,
+      "height": 16
+    },
+    {
+      "elapsedMs": 900,
+      "sha256": "770f625351441436485cf87812e6569436cf4910c7ce0a7222c0e7b5070cae02",
+      "rgba": [
+        0,
+        255,
+        0,
+        255
+      ],
+      "centerRGBA": [
+        0,
+        255,
+        0,
+        255
+      ],
+      "width": 16,
+      "height": 16
+    },
+    {
+      "elapsedMs": 969,
+      "sha256": "c8fbce2447d33f1b2abd786cdeb05e3f40aed6696a2076118b90ec5411fb60f1",
+      "rgba": [
+        255,
+        0,
+        0,
+        255
+      ],
+      "centerRGBA": [
+        255,
+        0,
+        0,
+        255
+      ],
+      "width": 16,
+      "height": 16
+    },
+    {
+      "elapsedMs": 1018,
+      "sha256": "c8fbce2447d33f1b2abd786cdeb05e3f40aed6696a2076118b90ec5411fb60f1",
+      "rgba": [
+        255,
+        0,
+        0,
+        255
+      ],
+      "centerRGBA": [
+        255,
+        0,
+        0,
+        255
+      ],
+      "width": 16,
+      "height": 16
+    },
+    {
+      "elapsedMs": 1085,
+      "sha256": "a8037f096b9edd1e025f493bca55343bc2a09a26474ed54fed5fb1ffb0ce5fd0",
+      "rgba": [
+        0,
+        0,
+        255,
+        255
+      ],
+      "centerRGBA": [
+        0,
+        0,
+        255,
+        255
+      ],
+      "width": 16,
+      "height": 16
+    },
+    {
+      "elapsedMs": 1135,
+      "sha256": "a8037f096b9edd1e025f493bca55343bc2a09a26474ed54fed5fb1ffb0ce5fd0",
+      "rgba": [
+        0,
+        0,
+        255,
+        255
+      ],
+      "centerRGBA": [
+        0,
+        0,
+        255,
+        255
+      ],
+      "width": 16,
+      "height": 16
+    },
+    {
+      "elapsedMs": 1202,
+      "sha256": "a8037f096b9edd1e025f493bca55343bc2a09a26474ed54fed5fb1ffb0ce5fd0",
+      "rgba": [
+        0,
+        0,
+        255,
+        255
+      ],
+      "centerRGBA": [
+        0,
+        0,
+        255,
+        255
+      ],
+      "width": 16,
+      "height": 16
+    },
+    {
+      "elapsedMs": 1252,
+      "sha256": "a8037f096b9edd1e025f493bca55343bc2a09a26474ed54fed5fb1ffb0ce5fd0",
+      "rgba": [
+        0,
+        0,
+        255,
+        255
+      ],
+      "centerRGBA": [
+        0,
+        0,
+        255,
+        255
+      ],
+      "width": 16,
+      "height": 16
+    },
+    {
+      "elapsedMs": 1317,
+      "sha256": "a8037f096b9edd1e025f493bca55343bc2a09a26474ed54fed5fb1ffb0ce5fd0",
+      "rgba": [
+        0,
+        0,
+        255,
+        255
+      ],
+      "centerRGBA": [
+        0,
+        0,
+        255,
+        255
+      ],
+      "width": 16,
+      "height": 16
+    },
+    {
+      "elapsedMs": 1370,
+      "sha256": "770f625351441436485cf87812e6569436cf4910c7ce0a7222c0e7b5070cae02",
+      "rgba": [
+        0,
+        255,
+        0,
+        255
+      ],
+      "centerRGBA": [
+        0,
+        255,
+        0,
+        255
+      ],
+      "width": 16,
+      "height": 16
+    },
+    {
+      "elapsedMs": 1455,
+      "sha256": "770f625351441436485cf87812e6569436cf4910c7ce0a7222c0e7b5070cae02",
+      "rgba": [
+        0,
+        255,
+        0,
+        255
+      ],
+      "centerRGBA": [
+        0,
+        255,
+        0,
+        255
+      ],
+      "width": 16,
+      "height": 16
+    },
+    {
+      "elapsedMs": 1504,
+      "sha256": "770f625351441436485cf87812e6569436cf4910c7ce0a7222c0e7b5070cae02",
+      "rgba": [
+        0,
+        255,
+        0,
+        255
+      ],
+      "centerRGBA": [
+        0,
+        255,
+        0,
+        255
+      ],
+      "width": 16,
+      "height": 16
+    },
+    {
+      "elapsedMs": 1585,
+      "sha256": "c8fbce2447d33f1b2abd786cdeb05e3f40aed6696a2076118b90ec5411fb60f1",
+      "rgba": [
+        255,
+        0,
+        0,
+        255
+      ],
+      "centerRGBA": [
+        255,
+        0,
+        0,
+        255
+      ],
+      "width": 16,
+      "height": 16
+    },
+    {
+      "elapsedMs": 1639,
+      "sha256": "c8fbce2447d33f1b2abd786cdeb05e3f40aed6696a2076118b90ec5411fb60f1",
+      "rgba": [
+        255,
+        0,
+        0,
+        255
+      ],
+      "centerRGBA": [
+        255,
+        0,
+        0,
+        255
+      ],
+      "width": 16,
+      "height": 16
+    },
+    {
+      "elapsedMs": 1699,
+      "sha256": "a8037f096b9edd1e025f493bca55343bc2a09a26474ed54fed5fb1ffb0ce5fd0",
+      "rgba": [
+        0,
+        0,
+        255,
+        255
+      ],
+      "centerRGBA": [
+        0,
+        0,
+        255,
+        255
+      ],
+      "width": 16,
+      "height": 16
+    },
+    {
+      "elapsedMs": 1753,
+      "sha256": "a8037f096b9edd1e025f493bca55343bc2a09a26474ed54fed5fb1ffb0ce5fd0",
+      "rgba": [
+        0,
+        0,
+        255,
+        255
+      ],
+      "centerRGBA": [
+        0,
+        0,
+        255,
+        255
+      ],
+      "width": 16,
+      "height": 16
+    }
+  ],
+  "scope": "actual canonical local shell; no selected-chain registration or deployed claim"
+}

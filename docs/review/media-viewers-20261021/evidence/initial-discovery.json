@@ -1,0 +1,102 @@
+{
+  "baseSDK": "7730e3150b7ec6da69913a779273fdb981d7fff3",
+  "workspace": "/private/tmp/keel-media-viewers-20261021-01/keel-sdk",
+  "branch": "codex/media-viewers-20261021",
+  "scope": "PUB-301/302/303 source/catalog discovery; no runtime edits, no onchain writes",
+  "mcpScopeNote": "Configured MCP preflight returned keel-pixel-pfps workspace and stale retirement guidance; not accepted as SDK publication readiness. Source docs and pinned SDK are authoritative. Engine catalog is discovery only.",
+  "network": {
+    "family": "ethereum",
+    "chainId": 11155111,
+    "block": "11965192",
+    "checkedAt": "2026-10-21T21:49:36.247Z",
+    "blockTimestamp": "2026-10-21T21:49:24.000Z",
+    "blockGasLimit": "200000000",
+    "inlineReadGasLimit": "60000000",
+    "maximumInlineReadGas": "60000000",
+    "fees": {
+      "status": "live-rpc-quote",
+      "gasPriceWei": "20",
+      "baseFeeWei": "15",
+      "priorityFeeWei": "5",
+      "note": "Use exact prepared calls for estimation. Rollup L1 data fees and chain-specific charges may be additional."
+    },
+    "deployments": [
+      {
+        "contract": "KeelHold",
+        "address": "0x0a4f31d5ab08029e4c68f6f3227d9fa3a2d66267",
+        "status": "code-present-identity-unverified"
+      },
+      {
+        "contract": "KeelHarnessBuilder",
+        "address": "0x7ac86609d6781e896c541210fdd8d1d919c5584a",
+        "status": "code-present-identity-unverified"
+      },
+      {
+        "contract": "KeelRawTokenURIBuilder",
+        "status": "needs-setup",
+        "candidates": []
+      }
+    ],
+    "publicationReady": false,
+    "setup": "Resolve deployed KEEL instances, verify their code and active shell/module registry, or prepare deployment of missing modules. Never reuse another chain's addresses."
+  },
+  "catalogQueries": [
+    {
+      "schema": "fray-keel-agent@1",
+      "status": "partial",
+      "studioUrl": "https://studio.onkeel.io",
+      "query": "three",
+      "library": [],
+      "modules": [],
+      "reuse": {
+        "status": "incomplete-search",
+        "action": "retry-unavailable-indexes-before-deciding-reuse"
+      },
+      "errors": [
+        "modules: HTTP 401",
+        "verified-modules: HTTP 401",
+        "library: Keel Library index returned HTTP 401."
+      ],
+      "carriers": "metadata-only; no carrier bytes were fetched or verified"
+    },
+    {
+      "schema": "fray-keel-agent@1",
+      "status": "partial",
+      "studioUrl": "https://studio.onkeel.io",
+      "query": "gltf",
+      "library": [],
+      "modules": [],
+      "reuse": {
+        "status": "incomplete-search",
+        "action": "retry-unavailable-indexes-before-deciding-reuse"
+      },
+      "errors": [
+        "modules: HTTP 401",
+        "verified-modules: HTTP 401",
+        "library: Keel Library index returned HTTP 401."
+      ],
+      "carriers": "metadata-only; no carrier bytes were fetched or verified"
+    },
+    {
+      "schema": "fray-keel-agent@1",
+      "status": "partial",
+      "studioUrl": "https://studio.onkeel.io",
+      "query": "asset-display",
+      "library": [],
+      "modules": [],
+      "reuse": {
+        "status": "incomplete-search",
+        "action": "retry-unavailable-indexes-before-deciding-reuse"
+      },
+      "errors": [
+        "modules: HTTP 401",
+        "verified-modules: HTTP 401",
+        "library: Keel Library index returned HTTP 401."
+      ],
+      "carriers": "metadata-only; no carrier bytes were fetched or verified"
+    }
+  ],
+  "admission": "401 is terminal for those unauthenticated Studio catalog routes. No empty result is used as evidence of module absence.",
+  "signing": "not-performed",
+  "submission": "not-performed"
+}

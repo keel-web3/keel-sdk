@@ -1,0 +1,132 @@
+{
+  "commit": "7730e3150b7ec6da69913a779273fdb981d7fff3",
+  "module": {
+    "bytes": 7810,
+    "sha256": "9db2505b726d6c0b9821ce2c90df96c4e37b6c1607fe4dd565f883b3531bed8b"
+  },
+  "environment": {
+    "node": "v22.22.1",
+    "chromium": "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome"
+  },
+  "results": [
+    {
+      "format": "webp",
+      "source": {
+        "bytes": 236,
+        "sha256": "d17ebc1878257df2d0707790579495552c9440e380c867183e1c618024eac951"
+      },
+      "decoded": {
+        "frameCount": 3,
+        "repetitionCount": "Infinity",
+        "frames": [
+          {
+            "duration": 120000,
+            "center": [
+              255,
+              0,
+              0,
+              96
+            ]
+          },
+          {
+            "duration": 280000,
+            "center": [
+              0,
+              0,
+              255,
+              96
+            ]
+          },
+          {
+            "duration": 346000,
+            "center": [
+              0,
+              255,
+              0,
+              96
+            ]
+          }
+        ]
+      },
+      "renderedElement": "canvas",
+      "elapsedSampleMs": [
+        0,
+        160,
+        460,
+        860
+      ],
+      "screenshotSHA256": [
+        "933c9548b55e0b3cc25919a7cdbfafea61f3e4264acb04ac4712e2e21da51e1e",
+        "933c9548b55e0b3cc25919a7cdbfafea61f3e4264acb04ac4712e2e21da51e1e",
+        "933c9548b55e0b3cc25919a7cdbfafea61f3e4264acb04ac4712e2e21da51e1e",
+        "933c9548b55e0b3cc25919a7cdbfafea61f3e4264acb04ac4712e2e21da51e1e"
+      ],
+      "verdict": "REPRODUCED_FAIL",
+      "scope": "exact baseline module, genuine synthetic animation, module-only Chromium; not private GIF or registered/deployed proof"
+    },
+    {
+      "format": "avif",
+      "source": {
+        "bytes": 1209,
+        "sha256": "8ff2cbf589c8d4f21e6ef2d6905b6bad2cef91e5a245244c70fe1aac72247447"
+      },
+      "decoded": {
+        "frameCount": 4,
+        "repetitionCount": "Infinity",
+        "frames": [
+          {
+            "duration": 120000,
+            "center": [
+              255,
+              0,
+              0,
+              255
+            ]
+          },
+          {
+            "duration": 280000,
+            "center": [
+              0,
+              0,
+              255,
+              255
+            ]
+          },
+          {
+            "duration": 160000,
+            "center": [
+              0,
+              255,
+              0,
+              255
+            ]
+          },
+          {
+            "duration": 40000,
+            "center": [
+              0,
+              255,
+              0,
+              255
+            ]
+          }
+        ]
+      },
+      "renderedElement": "canvas",
+      "elapsedSampleMs": [
+        0,
+        160,
+        460,
+        860
+      ],
+      "screenshotSHA256": [
+        "933c9548b55e0b3cc25919a7cdbfafea61f3e4264acb04ac4712e2e21da51e1e",
+        "933c9548b55e0b3cc25919a7cdbfafea61f3e4264acb04ac4712e2e21da51e1e",
+        "933c9548b55e0b3cc25919a7cdbfafea61f3e4264acb04ac4712e2e21da51e1e",
+        "933c9548b55e0b3cc25919a7cdbfafea61f3e4264acb04ac4712e2e21da51e1e"
+      ],
+      "verdict": "REPRODUCED_FAIL",
+      "scope": "exact baseline module, genuine synthetic animation, module-only Chromium; not private GIF or registered/deployed proof"
+    }
+  ]
+}

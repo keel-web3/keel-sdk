@@ -1,0 +1,32 @@
+import assert from 'node:assert/strict';
+import {readFile,writeFile} from 'node:fs/promises';
+import {createHash} from 'node:crypto';
+import {createRequire} from 'node:module';
+import {keelHoldAbi} from '../keel-sdk/packages/sdk/dist/abi.js';
+import {createKeelHoldObjectReader} from '../keel-sdk/packages/viewer/dist/index.js';
+import {decompressBytes} from '../keel-sdk/packages/builder/dist/index.js';
+const require=createRequire(new URL('../keel-sdk/package.json',import.meta.url));
+const {createPublicClient,http,parseAbi,hexToBytes,keccak256}=require('viem');
+const file='/private/tmp/keel-publish-entry-20261021-01/docs/reviews/studio-publication-20261021/qa-normal-media-c3a/authenticated-public-catalog.json',raw=await readFile(file);
+assert.equal(createHash('sha256').update(raw).digest('hex'),'2d54c8a4ab1e3360fdf702af0113c27739dcddf44abd4e0682f68606005652d7');
+const catalog=JSON.parse(raw),url='https://ethereum-sepolia-rpc.publicnode.com',client=createPublicClient({transport:http(url,{retryCount:0,timeout:10000}),batch:{multicall:false}}),abi=parseAbi(keelHoldAbi),chainId=await client.getChainId();assert.equal(chainId,catalog.chainId);
+const block=await client.getBlock(),calls=[],reads=[],records=new Map();
+const read=(name,args)=>{calls.push({method:'eth_call',function:name,block:block.number.toString()});return client.readContract({address:catalog.store,abi,functionName:name,args,blockNumber:block.number})};
+const reader=createKeelHoldObjectReader({
+ getObject:async(request)=>{const record=await read('getObject',[request.objectId]);assert.equal(record.exists,true);records.set(request.objectId,{compression:record.compression,decodedBytes:record.byteLength.toString(),storedBytes:record.storedByteLength.toString()});return record;},
+ getObjectSlugPointers:request=>read('getObjectSlugPointers',[request.objectId,BigInt(request.offset),BigInt(request.limit)]),
+ getObjectPartIds:request=>read('getObjectPartIds',[request.objectId,BigInt(request.offset),BigInt(request.limit)]),
+ getCode:async request=>{calls.push({method:'eth_getCode',address:request.address,block:block.number.toString()});return hexToBytes(await client.getCode({address:request.address,blockNumber:block.number})??'0x')},
+},{cacheBlockHash:block.hash,maxDecodedBytes:2000000,maxStoredBytes:2000000,maxNodes:512,maxConcurrentReads:2,maxDepth:16,decompress:decompressBytes});
+for(const module of catalog.compact.modules.filter(m=>/^(?:three-r180-(?:module|core)|keel\.asset-display)$/.test(m.moduleId))){
+ const artifacts=[];
+ for(const[kind,identity]of[['source',module.source],['current-raw-percent-fragment',module]]){
+  const bytes=await reader({chainId,store:catalog.store,objectId:identity.objectId},AbortSignal.timeout(60000)),digest='0x'+createHash('sha256').update(bytes).digest('hex');assert.equal(bytes.length,identity.byteLength);assert.equal(digest,identity.digest);
+  const sealed=await read('isSealed',[identity.objectId]);assert.equal(sealed,true);const registered=await read('harnessRegistered',[identity.objectId,catalog.compact.builder]);if(kind==='current-raw-percent-fragment')assert.equal(registered,true);
+  artifacts.push({kind,objectId:identity.objectId,bytes:bytes.length,sha256:digest,mediaType:identity.mediaType,sealed,nativeStorage:records.get(identity.objectId),registeredToRecordedCompactBuilder:registered});
+ }reads.push({moduleId:module.moduleId,version:module.version,artifacts});
+}
+assert.equal(reads.length,3);const receipt=await client.getTransactionReceipt({hash:catalog.compact.builderDeploymentTransactionHash});assert.equal(receipt.status,'success');assert.equal(receipt.contractAddress?.toLowerCase(),catalog.compact.builder.toLowerCase());
+const code=await client.getCode({address:catalog.compact.builder,blockNumber:block.number});assert.equal(keccak256(code),catalog.compact.builderRuntimeCodeHash);const after=await client.getBlock({blockNumber:block.number});assert.equal(after.hash,block.hash);
+const report={schema:'keel-media-catalog-reuse-readback@1',scope:'exact retained authenticated catalog plus pinned-block public object/fragment readback; no claim that this retained catalog is the current mutable Studio configuration',catalog:{path:file,sha256:'2d54c8a4ab1e3360fdf702af0113c27739dcddf44abd4e0682f68606005652d7'},chainId,rpc:url,block:{number:block.number.toString(),hash:block.hash},store:catalog.store,recordedCompactBuilder:catalog.compact.builder,builderReceipt:{hash:receipt.transactionHash,block:receipt.blockNumber.toString(),status:receipt.status,codeHash:keccak256(code)},reads,calls,signing:'not-performed',submission:'not-performed'};
+await writeFile(new URL('./catalog-reuse-readback.json',import.meta.url),JSON.stringify(report,null,2)+'\n');console.log(JSON.stringify({...report,calls:report.calls.length},null,2));
