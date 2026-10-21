@@ -760,13 +760,10 @@ export async function inspectKeelInlineExistingObjectReuse(input: {
       bytes: decodedBytes, byteLength: decodedBytes.byteLength, integrity: await createIntegrity(decodedBytes) });
   }
   const media = existingParts.map(part => part.carrier.mediaType);
-  let carriage: Exclude<KeelInlineCarriage, "compact">;
-  if (media.every(value => value === "application/vnd.keel.token-uri-raw-percent-fragment")) carriage = "raw-percent";
-  else if (media.every(value => value === "application/vnd.keel.token-uri-percent-fragment")) carriage = "percent";
-  else if (media[0] === "application/vnd.keel.token-uri-base64-fragment" && media.at(-1) === media[0]
-      && media.every(value => value === media[0] || value === "application/vnd.keel.token-uri-base64-body-fragment")) {
-    carriage = media.includes("application/vnd.keel.token-uri-base64-body-fragment") ? "follow-latest" : "pinned";
-  } else throw new TypeError("Existing Inline objects have incompatible mixed prepared-copy carriages.");
+  if (!media.every(value => value === "application/vnd.keel.token-uri-raw-percent-fragment")) {
+    throw new KeelLegacyCarriageError("Existing non-raw-percent prepared fragments");
+  }
+  const carriage = "raw-percent" as const;
   if (requestedCarriage !== undefined && resolveKeelInlineCarriage(requestedCarriage) !== carriage) {
     throw new TypeError(`Requested Inline carriage does not match the existing ${carriage} prepared bytes.`);
   }
@@ -994,43 +991,11 @@ export function buildKeelOnchainShellLoader(input: KeelOnchainShellLoaderInput):
   return `<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Keel shell loader</title></head><body><p id="keel-loader-status">Loading committed Keel shell…</p><script>(()=>{const R=${rpcLiteral},T=${builderLiteral},D=${callLiteral},C=${contextLiteral},E=50000000;const fail=e=>{document.body.textContent="Keel shell load failed: "+(e?.message??e);document.documentElement.dataset.keelLoader="failed"};const hexBytes=h=>{if(typeof h!=="string"||!/^0x[0-9a-f]*$/i.test(h)||h.length%2!==0)throw new Error("RPC returned malformed bytes.");const a=new Uint8Array((h.length-2)/2);for(let i=0;i<a.length;i++)a[i]=Number.parseInt(h.slice(2+i*2,4+i*2),16);return a};const resultBytes=h=>{const o=Number(BigInt("0x"+h.slice(2,66))),p=2+o*2,l=Number(BigInt("0x"+h.slice(p,p+64)));return hexBytes("0x"+h.slice(p+64,p+64+l*2))};const safe=v=>{const s=String.fromCharCode(92),j=JSON.stringify(v);if(j===undefined)throw new Error("Prepared context is not JSON serializable.");return j.replaceAll("&",s+"u0026").replaceAll("<",s+"u003c").replaceAll(">",s+"u003e").replaceAll(String.fromCharCode(8232),s+"u2028").replaceAll(String.fromCharCode(8233),s+"u2029")};(async()=>{await new Promise(r=>setTimeout(r,0));const response=await fetch(R,{method:"POST",headers:{"content-type":"application/json"},body:JSON.stringify({jsonrpc:"2.0",id:1,method:"eth_call",params:[{to:T,data:D,gas:"0x"+E.toString(16)},"latest"]})});const body=await response.json();if(!response.ok||body.error||typeof body.result!=="string")throw new Error(body.error?.message??"RPC shell read failed.");const html=new TextDecoder("utf-8",{fatal:true}).decode(resultBytes(body.result));if(!html.includes("verify-corner"))throw new Error("Committed shell failed its canonical check.");const c=C??globalThis.__KEEL_ONCHAIN_CONTEXT__;if(!c||typeof c.json!=="string"||typeof c.digest!=="string"||!Number.isSafeInteger(c.byteLength))throw new Error("Prepared Keel context was not available.");const injection="<scr"+"ipt>globalThis.__KEEL_ONCHAIN_CONTEXT__=Object.freeze({json:"+safe(c.json)+",digest:"+safe(c.digest)+",byteLength:"+c.byteLength+"})</scr"+"ipt>";const head=/<head(?:\\s[^>]*)?>/i;const next=head.test(html)?html.replace(head,m=>m+injection):injection+html;document.open();document.write(next);document.close()})().catch(fail)})()</script></body></html>`;
 }
 
-/**
- * Encode one complete HTML document for KEEL's prepared tokenURI lane.
- *
- * The result is deliberately two Base64 layers: the inner layer is the HTML
- * payload and the outer layer is the exact ASCII stream copied by the
- * contract. No HTML, JSON, whitespace, delimiter, or control byte survives in
- * the published fragment, so URI readers cannot reinterpret content as syntax.
- */
+/** Retired whole-document Base64 publication entrypoint. */
 export async function buildKeelPreparedTokenURIFragment(
   source: Uint8Array | string,
 ): Promise<KeelPreparedTokenURIFragment> {
-  if (typeof source === "string") assertWellFormedUnicode(source);
-  if (!(typeof source === "string" || source instanceof Uint8Array)) {
-    throw new TypeError("A prepared tokenURI fragment must be UTF-8 text or Uint8Array bytes.");
-  }
-  const sourceBytes = typeof source === "string" ? encoder.encode(source) : source.slice();
-  if (sourceBytes.byteLength === 0) throw new TypeError("A prepared tokenURI fragment cannot be empty.");
-  const htmlBytes = appendSpacesToMultiple(sourceBytes, 9);
-  const inner = base64Bytes(htmlBytes);
-  if (inner.byteLength % 3 !== 0) {
-    throw new Error("Prepared tokenURI HTML did not align at the outer Base64 boundary.");
-  }
-  const fragmentBytes = base64Bytes(inner);
-  const fragmentText = decoder.decode(fragmentBytes);
-  if (fragmentBytes.byteLength % 4 !== 0 || /=/u.test(fragmentText)) {
-    throw new Error("Prepared tokenURI fragment must be unpadded RFC 4648 Base64.");
-  }
-  return {
-    schema: "keel-prepared-token-uri-fragment@1",
-    mediaType: "application/vnd.keel.token-uri-base64-fragment",
-    sourceByteLength: sourceBytes.byteLength,
-    sourceIntegrity: await createIntegrity(sourceBytes),
-    htmlBytes,
-    htmlIntegrity: await createIntegrity(htmlBytes),
-    fragmentBytes,
-    fragmentIntegrity: await createIntegrity(fragmentBytes),
-  };
+  throw new KeelLegacyCarriageError("buildKeelPreparedTokenURIFragment");
 }
 
 function tokenContextHTMLTail(contextJSON: string, contextDigest: Hex, contextByteLength: number): string {
@@ -1535,8 +1500,8 @@ async function assertCanonicalNormalMediaDocument(root: KeelInlineNormalMediaDoc
 export async function buildKeelRegisteredInlineNormalMediaTokenURIGraph(input: {
   readonly document: KeelInlineNormalMediaDocument;
   readonly shellId?: typeof KEEL_INLINE_PROTECTION_SHELL_ID;
-  /** Omitted selects the compact saver; legacy publication needs an explicit selection. */
-  readonly carriage?: "compact" | "raw-percent" | "pinned";
+  /** Only the current compact raw-percent composer is publishable. */
+  readonly carriage?: "compact" | "raw-percent";
   readonly existingParts: readonly [KeelPublishedInlineFragment, KeelPublishedInlineFragment, KeelPublishedInlineFragment];
 }): Promise<KeelInlineRawPercentTokenURIGraph | KeelInlineEscapedTokenURIGraph | KeelInlinePreEncodedTokenURIGraph | KeelInlinePreEncodedTokenURIBodyGraph> {
   if ((input.shellId ?? KEEL_INLINE_PROTECTION_SHELL_ID) !== KEEL_INLINE_PROTECTION_SHELL_ID) {
@@ -1558,42 +1523,21 @@ export async function buildKeelRegisteredInlineNormalMediaTokenURIGraph(input: {
 }
 
 
-/**
- * Build the reusable pre-encoded tokenURI lane from an already verified Inline
- * graph. Every non-terminal HTML fragment is padded with legal inter-fragment
- * whitespace to a nine-byte boundary. That makes both Base64 layers line up:
- * concatenating these stored fragments is byte-identical to encoding the
- * completed HTML and then the completed JSON at read time.
- *
- * Existing shell/module source objects yield deterministic reusable fragment
- * bytes and are published once per chain. The creator entry remains the only
- * artwork-specific publication payload.
- */
-/**
- * The compact raw-percent lane is the standard. The Base64-carried lanes stay
- * in the SDK for already-minted collections and reviewed exceptions, but they
- * cannot be reached by accident: a caller must acknowledge the legacy carriage
- * in its options, by explicitly passing a reviewed acknowledgement. Environment variables do not bypass this gate.
- */
+/** Retired publication carriage cannot be re-enabled by options or environment. */
 export interface KeelLegacyCarriageOptions {
-  readonly legacyCarriage?: "acknowledged";
+  readonly legacyCarriage?: never;
 }
 
 export class KeelLegacyCarriageError extends Error {
   readonly lane: string;
   constructor(lane: string) {
-    super(
-      `${lane} is a legacy Base64-carried Inline lane. Use buildKeelInlineRawPercentTokenURIGraph (compact raw-percent), `
-      + "or pass { legacyCarriage: \"acknowledged\" } after an explicit creator/agent instruction, "
-      + "Existing objects use exact assembly-only reuse; environment variables never bypass this gate.",
-    );
+    super(`${lane} is retired for publication. Use buildKeelInlineRawPercentTokenURIGraph (compact raw-percent); acknowledgements and environment switches cannot select historical carriage.`);
     this.name = "KeelLegacyCarriageError";
     this.lane = lane;
   }
 }
 
 export function assertLegacyCarriageAllowed(lane: string, options: KeelLegacyCarriageOptions | undefined): void {
-  if (options?.legacyCarriage === "acknowledged") return;
   throw new KeelLegacyCarriageError(lane);
 }
 
@@ -1601,89 +1545,7 @@ export async function buildKeelInlinePreEncodedTokenURIGraph(
   root: KeelInlineGraphDocument,
   options: KeelInlineExistingObjectReuseOptions & KeelLegacyCarriageOptions = {},
 ): Promise<KeelInlinePreEncodedTokenURIGraph> {
-  const readBounds = resolveKeelPreparationReadBounds(options);
-  options = { ...options, ...(readBounds.nonstandardReadPolicy === undefined ? {} : { nonstandardReadPolicy: readBounds.nonstandardReadPolicy }), ...(readBounds.preparationReadBudget === undefined ? {} : { preparationReadBudget: readBounds.preparationReadBudget }) };
-  const reuse = await inspectExistingGraphReuse(root, options, "pinned");
-  if (reuse === undefined) assertLegacyCarriageAllowed("buildKeelInlinePreEncodedTokenURIGraph", options);
-  else { root = reuse.root; options = { ...options, existingParts: reuse.existingParts }; }
-  if (root.parts.length < 2 || root.parts.at(-1)?.role !== "shell-suffix") {
-    throw new TypeError("An Inline pre-encoded tokenURI graph requires an ordered shell and terminal suffix.");
-  }
-
-  const fragments: KeelInlinePreEncodedTokenURIFragment[] = [];
-  const htmlParts: Uint8Array[] = [];
-  let existingIndex = 0;
-  for (let index = 0; index < root.parts.length; index += 1) {
-    const part = root.parts[index]!;
-    const published = part.kind === "existing" ? options.existingParts?.[existingIndex++] : undefined;
-    if (options.existingParts !== undefined && part.kind === "existing" && published === undefined) {
-      throw new TypeError(`Inline ${part.role} has no canonical published fragment.`);
-    }
-    if (published !== undefined) {
-      await assertPublishedFragmentIntegrity(published, `Inline ${part.role}`);
-      const decodedHtmlBytes = decodePublishedGraphPart(published);
-      fragments.push({
-        bytes: published.bytes.slice(),
-        integrity: published.integrity,
-        role: part.role,
-        sourceKind: part.kind,
-        sourceObjectId: published.carrier.objectId,
-        sourceIntegrity: await createIntegrity(decodedHtmlBytes),
-        decodedHtmlBytes,
-      });
-      htmlParts.push(decodedHtmlBytes);
-      continue;
-    }
-    const decodedHtmlBytes = appendSpacesToMultiple(part.bytes, 9);
-    const inner = base64Bytes(decodedHtmlBytes);
-    if (inner.byteLength % 3 !== 0) {
-      throw new Error(`Inline ${part.role} fragment did not align at the outer Base64 boundary.`);
-    }
-    const bytes = base64Bytes(inner);
-    const sourceIntegrity = await createIntegrity(part.bytes);
-    fragments.push({
-      bytes,
-      integrity: await createIntegrity(bytes),
-      role: part.role,
-      sourceKind: part.kind,
-      sourceIntegrity,
-      decodedHtmlBytes,
-    });
-    htmlParts.push(decodedHtmlBytes);
-  }
-
-  if (options.existingParts !== undefined && existingIndex !== options.existingParts.length) {
-    throw new TypeError("Inline graph contains unused canonical published fragments.");
-  }
-
-  const fragmentBytes = concat(fragments.map((fragment) => fragment.bytes));
-  if (fragmentBytes.byteLength > readBounds.maximumTokenUriBytes) {
-    throw new RangeError(`The prepared Inline tokenURI stream is ${fragmentBytes.byteLength.toLocaleString()} bytes, above KEEL's ${readBounds.maximumTokenUriBytes.toLocaleString()}-byte public-read limit.`);
-  }
-  if (/=/u.test(decoder.decode(fragmentBytes))) {
-    throw new Error("Reusable Inline tokenURI fragments must be unpadded Base64 for exact concatenation.");
-  }
-  const decodedStatic = Buffer.from(decoder.decode(fragmentBytes), "base64").toString("utf8");
-  const htmlBytes = exactBase64Bytes(decodedStatic, "Pre-encoded Inline HTML stream");
-  const expectedHtml = concat(htmlParts);
-  if (!exactBytes(htmlBytes, expectedHtml)) {
-    throw new Error("Pre-encoded Inline tokenURI fragments do not reconstruct the exact aligned HTML.");
-  }
-
-  return {
-    schema: "keel-inline-preencoded-token-uri@1",
-    mediaType: "application/vnd.keel.token-uri-base64-fragment",
-    contextParameter: "keel-context",
-    contextDelivery: "base64-html-tail",
-    fragmentBytes,
-    fragmentIntegrity: await createIntegrity(fragmentBytes),
-    htmlBytes,
-    htmlIntegrity: await createIntegrity(htmlBytes),
-    creatorPublicationBytes: fragments
-      .filter((fragment) => fragment.sourceKind === "creator")
-      .reduce((total, fragment) => total + fragment.bytes.byteLength, 0),
-    parts: fragments,
-  };
+  throw new KeelLegacyCarriageError("buildKeelInlinePreEncodedTokenURIGraph");
 }
 
 /**
@@ -1704,86 +1566,7 @@ export async function buildKeelInlineEscapedTokenURIGraph(
     readonly maxTokenURIBytes?: number;
   } = {},
 ): Promise<KeelInlineEscapedTokenURIGraph> {
-  const readBounds = resolveKeelPreparationReadBounds(options);
-  options = { ...options, ...(readBounds.nonstandardReadPolicy === undefined ? {} : { nonstandardReadPolicy: readBounds.nonstandardReadPolicy }), ...(readBounds.preparationReadBudget === undefined ? {} : { preparationReadBudget: readBounds.preparationReadBudget }) };
-  const reuse = await inspectExistingGraphReuse(root, options, "percent");
-  if (reuse === undefined) assertLegacyCarriageAllowed("buildKeelInlineEscapedTokenURIGraph", options);
-  else { root = reuse.root; options = { ...options, existingParts: reuse.existingParts }; }
-  if (root.parts.length < 2 || root.parts.at(-1)?.role !== "shell-suffix") {
-    throw new TypeError("An Inline escaped tokenURI graph requires an ordered shell and terminal suffix.");
-  }
-
-  const fragments: KeelInlineEscapedTokenURIFragment[] = [];
-  const htmlParts: Uint8Array[] = [];
-  let existingIndex = 0;
-  for (const part of root.parts) {
-    const published = part.kind === "existing" ? options.existingParts?.[existingIndex++] : undefined;
-    if (options.existingParts !== undefined && part.kind === "existing" && published === undefined) {
-      throw new TypeError(`Inline ${part.role} has no canonical published escaped fragment.`);
-    }
-    let bytes: Uint8Array;
-    let escapedHtmlBytes: Uint8Array;
-    let decodedHtmlBytes: Uint8Array;
-    if (published !== undefined) {
-      await assertPublishedFragmentIntegrity(published, `Inline ${part.role}`);
-      if (published.carrier.mediaType !== "application/vnd.keel.token-uri-percent-fragment") {
-        throw new TypeError(`Inline ${part.role} reusable object is not a compact percent fragment.`);
-      }
-      bytes = published.bytes.slice();
-      escapedHtmlBytes = exactBase64Bytes(decoder.decode(bytes), `Published escaped Inline ${part.role}`);
-      decodedHtmlBytes = exactPercentPayloadBytes(escapedHtmlBytes, `Published escaped Inline ${part.role}`);
-    } else {
-      decodedHtmlBytes = part.bytes.slice();
-      escapedHtmlBytes = alignedPercentPayload(decodedHtmlBytes);
-      bytes = base64Bytes(escapedHtmlBytes);
-    }
-    if (escapedHtmlBytes.byteLength % 3 !== 0 || /=/u.test(decoder.decode(bytes))) {
-      throw new Error(`Inline ${part.role} escaped fragment must be aligned unpadded Base64 for exact concatenation.`);
-    }
-    fragments.push({
-      bytes,
-      integrity: published?.integrity ?? await createIntegrity(bytes),
-      role: part.role,
-      sourceKind: part.kind,
-      ...(published === undefined ? {} : { sourceObjectId: published.carrier.objectId }),
-      sourceIntegrity: await createIntegrity(decodedHtmlBytes),
-      decodedHtmlBytes,
-      escapedHtmlBytes,
-    });
-    htmlParts.push(decodedHtmlBytes);
-  }
-
-  if (options.existingParts !== undefined && existingIndex !== options.existingParts.length) {
-    throw new TypeError("Inline graph contains unused canonical published escaped fragments.");
-  }
-  const fragmentBytes = concat(fragments.map((fragment) => fragment.bytes));
-  const maxTokenURIBytes = options.maxTokenURIBytes ?? readBounds.maximumTokenUriBytes;
-  if (!Number.isSafeInteger(maxTokenURIBytes) || maxTokenURIBytes <= 0 || readBounds.nonstandardReadPolicy !== undefined && maxTokenURIBytes > readBounds.maximumTokenUriBytes) {
-    throw new RangeError("The escaped Inline tokenURI public-read ceiling must be a positive safe integer.");
-  }
-  if (fragmentBytes.byteLength > maxTokenURIBytes) {
-    throw new RangeError(`The escaped Inline tokenURI stream is ${fragmentBytes.byteLength.toLocaleString()} bytes, above the reviewed ${maxTokenURIBytes.toLocaleString()}-byte public-read ceiling.`);
-  }
-  const escapedHtmlBytes = exactBase64Bytes(decoder.decode(fragmentBytes), "Escaped Inline outer fragment stream");
-  const htmlBytes = exactPercentPayloadBytes(escapedHtmlBytes, "Escaped Inline HTML stream");
-  if (!exactBytes(htmlBytes, concat(htmlParts))) {
-    throw new Error("Escaped Inline tokenURI fragments do not reconstruct the exact source HTML.");
-  }
-  return {
-    schema: "keel-inline-escaped-token-uri@1",
-    mediaType: "application/vnd.keel.token-uri-percent-fragment",
-    contextParameter: "keel-context",
-    contextDelivery: "percent-html-tail",
-    fragmentBytes,
-    fragmentIntegrity: await createIntegrity(fragmentBytes),
-    htmlBytes,
-    htmlIntegrity: await createIntegrity(htmlBytes),
-    escapedHtmlBytes,
-    creatorPublicationBytes: fragments
-      .filter((fragment) => fragment.sourceKind === "creator")
-      .reduce((total, fragment) => total + fragment.bytes.byteLength, 0),
-    parts: fragments,
-  };
+  throw new KeelLegacyCarriageError("buildKeelInlineEscapedTokenURIGraph");
 }
 
 /**
@@ -2048,7 +1831,7 @@ export async function buildKeelWeb3TokenJSONGraph(input: {
   };
 }
 
-/** Shared SDK/MCP planner. Local work defaults compact; exact object reuse infers its stored carriage. */
+/** Shared SDK/MCP planner. Fresh publication and exact object reuse both require compact raw-percent carriage. */
 export function buildKeelInlineTokenURIGraph(
   root: KeelInlineGraphDocument,
   options?: KeelInlineExistingObjectReuseOptions & { readonly existingObjectReuse?: never; readonly maxTokenURIBytes?: number; readonly carriage?: "compact" | "raw-percent" },
@@ -2063,129 +1846,44 @@ export async function buildKeelInlineTokenURIGraph(
 ) {
   const readBounds = resolveKeelPreparationReadBounds(options);
   options = { ...options, ...(readBounds.nonstandardReadPolicy === undefined ? {} : { nonstandardReadPolicy: readBounds.nonstandardReadPolicy }), ...(readBounds.preparationReadBudget === undefined ? {} : { preparationReadBudget: readBounds.preparationReadBudget }) };
+  if (Object.hasOwn(options, "legacyCarriage")) throw new KeelLegacyCarriageError("legacyCarriage option");
+  resolveKeelInlineCarriage(options.carriage);
   const reuse = await inspectExistingGraphReuse(root, options, options.carriage);
-  const carriage = reuse?.carriage ?? resolveKeelInlineCarriage(options.carriage);
   if (reuse === undefined) assertKeelFreshPayloadCarriage(root.rootBytes, options);
-  if (reuse !== undefined) {
+  else {
     root = reuse.root;
-    // The strict check has cloned all receipt bytes. Do not inspect/transform them twice.
-    options = { existingParts: reuse.existingParts, ...(readBounds.nonstandardReadPolicy === undefined ? {} : { nonstandardReadPolicy: readBounds.nonstandardReadPolicy }), ...(readBounds.preparationReadBudget === undefined ? {} : { preparationReadBudget: readBounds.preparationReadBudget }),
-      ...(options.maxTokenURIBytes === undefined ? {} : { maxTokenURIBytes: options.maxTokenURIBytes }),
-      ...(options.carriage === undefined ? {} : { carriage: options.carriage }) };
+    options = { ...options, existingParts: reuse.existingParts };
   }
-  if (carriage === "raw-percent") return buildKeelInlineRawPercentTokenURIGraph(root, options);
-  // Selecting a carriage is not a reviewed encoding exception. Exact existing
-  // objects were already checked above; fresh encoding requires acknowledgement.
-  if (reuse === undefined) assertLegacyCarriageAllowed("buildKeelInlineTokenURIGraph", options);
-  const legacy = { ...(readBounds.nonstandardReadPolicy === undefined ? {} : { nonstandardReadPolicy: readBounds.nonstandardReadPolicy }), ...(readBounds.preparationReadBudget === undefined ? {} : { preparationReadBudget: readBounds.preparationReadBudget }), ...(options.existingParts === undefined ? {} : { existingParts: options.existingParts }), legacyCarriage: "acknowledged" as const };
-  if (carriage === "percent") return buildKeelInlineEscapedTokenURIGraph(root, legacy);
-  if (carriage === "pinned") return buildKeelInlinePreEncodedTokenURIGraph(root, legacy);
-  return buildKeelInlineFollowLatestTokenURIBodyGraph(root, legacy);
+  return buildKeelInlineRawPercentTokenURIGraph(root, options);
 }
 
-/** Compare both explicit carriage modes without silently selecting publication bytes. */
+/** Retired comparison entrypoint; publication has one current raw-percent carriage. */
 export async function compareKeelInlineTokenURICarriages(
   root: KeelInlineGraphDocument,
 ): Promise<KeelInlineTokenURICarriageComparison> {
-  const [base64, percent] = await Promise.all([
-    /* Why: a size comparison measures the legacy carriages; it publishes nothing. */
-    buildKeelInlinePreEncodedTokenURIGraph(root, { legacyCarriage: "acknowledged" }),
-    buildKeelInlineEscapedTokenURIGraph(root, { legacyCarriage: "acknowledged" }),
-  ]);
-  const preferred = percent.fragmentBytes.byteLength < base64.fragmentBytes.byteLength ? "percent" : "base64";
-  const larger = Math.max(base64.fragmentBytes.byteLength, percent.fragmentBytes.byteLength);
-  const smaller = Math.min(base64.fragmentBytes.byteLength, percent.fragmentBytes.byteLength);
-  return {
-    schema: "keel-inline-token-uri-carriage-comparison@1",
-    preferred,
-    base64StorageBytes: base64.fragmentBytes.byteLength,
-    percentStorageBytes: percent.fragmentBytes.byteLength,
-    savingsBytes: larger - smaller,
-    savingsPercent: larger === 0 ? 0 : ((larger - smaller) / larger) * 100,
-    base64,
-    percent,
-  };
+  throw new KeelLegacyCarriageError("compareKeelInlineTokenURICarriages");
 }
 
-/**
- * Build KEEL's recommended default viewer payload: immutable modules/work only,
- * with no copied shell top or bottom. The canonical shell is resolved by its
- * stable registry ID at contract-read time and therefore follows the latest
- * registered revision until that shell is frozen.
- *
- * This is deliberately separate from `buildKeelInlinePreEncodedTokenURIGraph`:
- * the older full-graph helper remains the explicit pinned/frozen-shell lane.
- */
+/** Retired follow-latest publication entrypoint. Use the qualified current shell graph. */
 export async function buildKeelInlineFollowLatestTokenURIBodyGraph(
   root: KeelInlineGraphDocument,
   options: KeelInlineExistingObjectReuseOptions & KeelLegacyCarriageOptions = {},
 ): Promise<KeelInlinePreEncodedTokenURIBodyGraph> {
-  const readBounds = resolveKeelPreparationReadBounds(options);
-  options = { ...options, ...(readBounds.nonstandardReadPolicy === undefined ? {} : { nonstandardReadPolicy: readBounds.nonstandardReadPolicy }), ...(readBounds.preparationReadBudget === undefined ? {} : { preparationReadBudget: readBounds.preparationReadBudget }) };
-  const reuse = await inspectExistingGraphReuse(root, options, "follow-latest");
-  if (reuse === undefined) assertLegacyCarriageAllowed("buildKeelInlineFollowLatestTokenURIBodyGraph", options);
-  const full = await buildKeelInlinePreEncodedTokenURIGraph(reuse?.root ?? root, reuse === undefined ? options
-    : { existingParts: reuse.existingParts, legacyCarriage: "acknowledged" });
-  const first = full.parts[0];
-  const last = full.parts.at(-1);
-  if (first?.role !== "shell-prefix" || last?.role !== "shell-suffix") {
-    throw new TypeError("A follow-latest Inline body requires one canonical shell prefix and suffix.");
-  }
-  const parts = full.parts.slice(1, -1);
-  if (parts.length === 0 || parts.some((part) => part.role === "shell-prefix" || part.role === "shell-suffix")) {
-    throw new TypeError("A follow-latest Inline body must contain immutable work or module parts between the shell boundaries.");
-  }
-  const fragmentBytes = concat(parts.map((part) => part.bytes));
-  const htmlBytes = concat(parts.map((part) => part.decodedHtmlBytes));
-  if (fragmentBytes.byteLength > readBounds.maximumTokenUriBytes) {
-    throw new RangeError(`The prepared Inline body stream is ${fragmentBytes.byteLength.toLocaleString()} bytes, above KEEL's ${readBounds.maximumTokenUriBytes.toLocaleString()}-byte public-read limit.`);
-  }
-  const decodedMiddle = Buffer.from(decoder.decode(fragmentBytes), "base64").toString("utf8");
-  const decodedBody = exactBase64Bytes(decodedMiddle, "Pre-encoded Inline body stream");
-  if (!exactBytes(decodedBody, htmlBytes)) {
-    throw new Error("Pre-encoded Inline body fragments do not reconstruct the exact aligned body HTML.");
-  }
-  return {
-    schema: "keel-inline-preencoded-token-uri-body@1",
-    mediaType: "application/vnd.keel.token-uri-base64-body-fragment",
-    shellSelection: "follow-latest",
-    shellId: KEEL_INLINE_PROTECTION_SHELL_ID,
-    fragmentBytes,
-    fragmentIntegrity: await createIntegrity(fragmentBytes),
-    htmlBytes,
-    htmlIntegrity: await createIntegrity(htmlBytes),
-    creatorPublicationBytes: parts
-      .filter((part) => part.sourceKind === "creator")
-      .reduce((total, part) => total + part.bytes.byteLength, 0),
-    parts,
-  };
+  throw new KeelLegacyCarriageError("buildKeelInlineFollowLatestTokenURIBodyGraph");
 }
 
 /**
  * Finish an immutable 1/1 ERC-721 tokenURI entirely at release-build time.
  * The collection address must already be deterministically predicted. The
- * contract stores these two small outer-Base64 slices and directly copies the
+ * contract stores these two raw-percent slices and directly copies the
  * reusable middle graph between them.
  */
 export async function buildKeelPreparedOneOfOneTokenURI(input: {
   readonly externalPreview?: KeelExplicitExternalPreview;
   readonly registeredNativeGzip?: KeelRegisteredNativeGzipProof | undefined;
-  readonly graph: Pick<
-    KeelInlinePreEncodedTokenURIGraph
-      | KeelInlinePreEncodedTokenURIBodyGraph
-      | KeelInlineEscapedTokenURIGraph
-      | KeelInlineRawPercentTokenURIGraph,
-    "fragmentBytes" | "mediaType"
-  >;
-  /**
-   * Exact registered shell fragments that the onchain builder will wrap around
-   * a follow-latest body. Omit this only for a legacy graph that already
-   * contains its pinned shell boundaries.
-   */
-  readonly shellFragments?: {
-    readonly prefix: Uint8Array;
-    readonly suffix: Uint8Array;
-  };
+  readonly graph: Pick<KeelInlineRawPercentTokenURIGraph, "fragmentBytes" | "mediaType">;
+  /** Current raw-percent graphs already include their exact shell. */
+  readonly shellFragments?: never;
   readonly chainId: number;
   readonly collection: Hex;
   readonly collectionName: string;
@@ -2295,36 +1993,13 @@ export async function buildKeelPreparedOneOfOneTokenURI(input: {
     `,"description":${JSON.stringify(input.description)}`,
     `,"image":${JSON.stringify(input.imageURI)}`,
   ].join("");
-  const animationEncoding = input.graph.mediaType === "application/vnd.keel.token-uri-raw-percent-fragment"
-    ? "raw-percent"
-    : input.graph.mediaType === "application/vnd.keel.token-uri-percent-fragment"
-      ? "percent"
-      : "base64";
-  if (presentationPolicy === "collector-inline" && animationEncoding !== "raw-percent") {
-    throw new TypeError("Collector-facing Inline requires the automatic raw-percent carriage. Legacy Base64 requires an explicit presentation policy.");
+  if (input.graph.mediaType !== "application/vnd.keel.token-uri-raw-percent-fragment" || input.shellFragments !== undefined) {
+    throw new KeelLegacyCarriageError("Prepared tokenURI graph media/shell carriage");
   }
-  if (
-    input.graph.mediaType !== "application/vnd.keel.token-uri-base64-fragment"
-    && input.graph.mediaType !== "application/vnd.keel.token-uri-base64-body-fragment"
-    && input.graph.mediaType !== "application/vnd.keel.token-uri-percent-fragment"
-    && input.graph.mediaType !== "application/vnd.keel.token-uri-raw-percent-fragment"
-  ) {
-    throw new TypeError(`Unsupported prepared tokenURI graph media type: ${input.graph.mediaType}`);
-  }
-  if (animationEncoding !== "base64" && input.shellFragments !== undefined) {
-    throw new TypeError("Percent tokenURI graphs already include their pinned shell; percent follow-latest fragments are not supported.");
-  }
-  const animationKey = animationEncoding === "base64"
-    ? ',"animation_url":"data:text/html;base64,'
-    : ',"animation_url":"data:text/html;charset=utf-8,';
-  const prefixPadding = animationEncoding === "raw-percent"
-    ? 0
-    : (3 - ((encoder.encode(prefixHead).byteLength + encoder.encode(animationKey).byteLength) % 3)) % 3;
-  const prefixRaw = `${prefixHead}${" ".repeat(prefixPadding)}${animationKey}`;
+  const animationEncoding = "raw-percent" as const;
+  const prefixRaw = `${prefixHead},"animation_url":"data:text/html;charset=utf-8,`;
   const suffixRaw = [
-    animationEncoding !== "base64"
-      ? decoder.decode(compactPercentPayload(encoder.encode(tokenContextHTMLTail(contextJSON, contextDigest, contextBytes.byteLength))))
-      : Buffer.from(tokenContextHTMLTail(contextJSON, contextDigest, contextBytes.byteLength), "utf8").toString("base64"),
+    decoder.decode(compactPercentPayload(encoder.encode(tokenContextHTMLTail(contextJSON, contextDigest, contextBytes.byteLength)))) ,
     '","keel_schema":"keel-manifest@2"',
     `,"keel_manifest":${JSON.stringify(input.manifestURI)}`,
     `,"keel_manifest_digest":${JSON.stringify(input.manifestDigest.toLowerCase())}`,
@@ -2335,7 +2010,7 @@ export async function buildKeelPreparedOneOfOneTokenURI(input: {
     ...(input.attributes === undefined ? [] : [`,"attributes":${serializeInlineScriptJSON(input.attributes)}`]),
     "}",
   ].join("");
-  if (animationEncoding === "raw-percent") {
+  {
     const presentationFragmentBytes = input.graph.fragmentBytes;
     const encodedPrefix = compactPercentPayload(encoder.encode(prefixRaw));
     const encodedSuffix = compactPercentPayload(encoder.encode(suffixRaw));
@@ -2366,46 +2041,7 @@ export async function buildKeelPreparedOneOfOneTokenURI(input: {
       derivedTokenSeed,
     };
   }
-  const prefix = createComposableBase64Fragment(prefixRaw, {
-    mustAllowFollowingFragment: true,
-    paddingStrategy: "json-whitespace",
-  });
-  if (prefix.paddingBytes !== 0) throw new Error("Prepared token JSON prefix failed its pre-animation alignment.");
-  const presentationFragmentBytes = input.shellFragments === undefined
-    ? input.graph.fragmentBytes
-    : concat([input.shellFragments.prefix, input.graph.fragmentBytes, input.shellFragments.suffix]);
-  const middleBase64 = decoder.decode(presentationFragmentBytes);
-  const middleRaw = exactBase64Bytes(middleBase64, "Prepared tokenURI middle fragment");
-  if (animationEncoding === "percent") {
-    exactPercentPayloadBytes(middleRaw, "Prepared escaped animation middle");
-  } else {
-    exactBase64Bytes(decoder.decode(middleRaw), "Prepared Base64 animation middle");
-  }
-  const suffix = createComposableBase64Fragment(suffixRaw, { mustAllowFollowingFragment: false });
-  const tokenURIBase64 = concatenateComposableBase64Fragments([
-    prefix,
-    { rawByteLength: middleRaw.byteLength, paddingBytes: 0, base64: middleBase64 },
-    suffix,
-  ]);
-  const tokenJSON = Buffer.from(tokenURIBase64, "base64").toString("utf8");
-  const expectedJSON = `${prefixRaw}${" ".repeat(prefix.paddingBytes)}${decoder.decode(middleRaw)}${suffixRaw}`;
-  if (tokenJSON !== expectedJSON) throw new Error("Prepared tokenURI fragments changed the exact token JSON bytes.");
-  const metadata = JSON.parse(tokenJSON) as { readonly animation_url?: unknown };
-  if (typeof metadata.animation_url !== "string") throw new Error("Prepared token metadata has no animation_url.");
-  if (presentationPolicy === "collector-inline") assertKeelCollectorInlineMetadata(metadata, { registeredNativeGzip: input.registeredNativeGzip, externalPreview });
-  else assertMarketplaceSafeDataURI(metadata.animation_url, "Prepared token animation_url");
-  return {
-    schema: "keel-prepared-one-of-one-token-uri@1",
-    animationEncoding,
-    requiredBuilder: animationEncoding === "percent" ? "KeelPercentTokenURIBuilder" : "KeelHarnessBuilder",
-    encodedPrefix: encoder.encode(prefix.base64),
-    encodedSuffix: encoder.encode(suffix.base64),
-    tokenURI: `data:application/json;base64,${tokenURIBase64}`,
-    tokenJSON,
-    contextJSON,
-    contextDigest,
-    derivedTokenSeed,
-  };
+  throw new Error("Unreachable prepared carriage.");
 }
 
 /** Exact default-fragment byte counts for previews, without allocating another large document. */

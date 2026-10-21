@@ -5,10 +5,6 @@ import { parseKeelExternalPreviewUri, canonicalJson } from "@keel/protocol";
 import { decodeKeelInlineGraphFragment } from "./inline-viewer-graph.js";
 import { assertKeelFreshPayloadCarriage, decodeKeelInlineDataURI, inspectKeelInlinePayloadCarriage,
   inspectKeelPreparedDenseCopyDocument, readKeelInlineJSONArray } from "./inline-transport-audit.js";
-import { readKeelPreparedInlineSources } from "./prepared-inline-sources.js";
-import { readKeelLegacyPreparedDenseSources } from "./legacy-prepared-dense-copy.js";
-import { buildKeelPreparedDenseCopyShell } from "./prepared-dense-copy.js";
-import { readKeelLegacySharedImageCopyProgram } from "./legacy-shared-image-program.js";
 
 export type KeelRegisteredInlineCodec = "none" | "gzip" | "brotli";
 type Hash = `0x${string}`;
@@ -34,7 +30,7 @@ export interface KeelRegisteredInlineRecipe {
   readonly registrationDigest: Hash;
   readonly revision: number;
   readonly codec: KeelRegisteredInlineCodec;
-  readonly sourceReader: "canonical-items" | "uri81-containers" | "legacy-dense";
+  readonly sourceReader: "canonical-items";
   readonly registeredParts: readonly ({ readonly objectId: Hash; readonly role: KeelRegisteredInlinePart["role"] } & Commitment)[];
   /** Distinct from reader registration. The normal selected-chain adapter
    * authenticates these source-object receipts/read-backs before supplying
@@ -60,11 +56,7 @@ export type KeelRegisteredInlineBuiltCandidate = {
   /** Actual non-document native objects, such as the committed packtable or
    * prepared image. Count them as well; they cannot replace document coverage. */
   readonly auxiliaryObjects?: readonly KeelRegisteredInlinePart[];
-  /** Existing native shared-image protocol: physical frames and the native
-   * image occur in auxiliaryObjects; no expanded return-only paid sibling. */
-  readonly sharedImageProgram?: { readonly objectId: Hash; readonly bytes: Uint8Array };
   readonly generatedHtmlSuffix?: Uint8Array;
-  readonly tableDigest?: Hash;
 };
 export type KeelRegisteredInlineCandidate =
   | { readonly id: string; readonly status: "unavailable"; readonly codec: KeelRegisteredInlineCodec; readonly reason: string }
@@ -105,7 +97,7 @@ function recipeSnapshot(input: KeelRegisteredInlineRecipe) {
   for (const address of [recipe.store, recipe.registry, recipe.reader]) if (!ADDRESS.test(address) || /^0x0{40}$/iu.test(address)) throw new TypeError("Invalid reader address.");
   hash(recipe.readerRuntimeCodeHash); hash(recipe.registrationDigest);
   if (!recipe.profile || recipe.profile.length > 160 || !["none", "gzip", "brotli"].includes(recipe.codec)
-    || !["canonical-items", "uri81-containers", "legacy-dense"].includes(recipe.sourceReader)
+    || recipe.sourceReader !== "canonical-items"
     || !recipe.registeredParts.length || recipe.registeredParts.length > 128) throw new TypeError("Unsupported registered reader recipe.");
   const ids = new Set<string>();
   for (const part of recipe.registeredParts) {
@@ -242,6 +234,7 @@ export async function selectKeelRegisteredInlineCandidate(input: {
     input.signal?.throwIfAborted();
     if (buildSources.some((source, i) => !bytesEqual(source.bytes, sources[i]!.bytes))) throw new TypeError("Candidate builder mutated its source input.");
     if (built.recipeDigest !== recipeDigest || typeof built.tokenURI !== "string" || enc.encode(built.tokenURI).length > maxBuilt) throw new TypeError("Candidate output changed recipe or exceeded its measured byte bound.");
+    if (Object.hasOwn(built, "sharedImageProgram") || Object.hasOwn(built, "tableDigest")) throw new TypeError("Retired candidate container adapters cannot be selected for current publication.");
     const tokenURI = built.tokenURI;
     retainedReturnedBytes += enc.encode(tokenURI).length;
     if (retainedReturnedBytes > maxReturned) throw new RangeError("Retained candidate returns exceed the local comparison memory bound.");
@@ -260,12 +253,10 @@ export async function selectKeelRegisteredInlineCandidate(input: {
     assertKeelFreshPayloadCarriage(html, { registeredNativeGzip: built.registeredNativeGzip });
     const carriage = inspectKeelInlinePayloadCarriage(html, { registeredNativeGzip: built.registeredNativeGzip });
     if (carriage.payloads.some(payload => payload.compression !== "container-bound" && payload.compression !== "none" && payload.compression !== recipe.codec)) throw new TypeError("Candidate silently changed its selected codec.");
-    if (!Array.isArray(built.documentParts) || (!built.documentParts.length && built.sharedImageProgram === undefined) || built.documentParts.length > 256) throw new RangeError("Invalid document part count.");
+    if (!Array.isArray(built.documentParts) || !built.documentParts.length || built.documentParts.length > 256) throw new RangeError("Invalid document part count.");
     const parts = built.documentParts.map((part: KeelRegisteredInlinePart) => ({ ...part, bytes: Uint8Array.from(part.bytes) }));
     if (built.auxiliaryObjects !== undefined && (!Array.isArray(built.auxiliaryObjects) || built.auxiliaryObjects.length > 128)) throw new RangeError("Invalid auxiliary object count.");
     const auxiliary = (built.auxiliaryObjects ?? []).map(part => ({ ...part, bytes: Uint8Array.from(part.bytes) }));
-    const sharedProgram = built.sharedImageProgram === undefined ? undefined : { objectId: built.sharedImageProgram.objectId, bytes: Uint8Array.from(built.sharedImageProgram.bytes) };
-    if (sharedProgram && (recipe.sourceReader !== "legacy-dense" || recipe.profile !== "keel.legacy-prepared-dense-shared-image@1" || parts.length)) throw new TypeError("Native shared-image measurement requires its exact existing reader/program profile.");
     const suffix = built.generatedHtmlSuffix === undefined ? new Uint8Array() : Uint8Array.from(built.generatedHtmlSuffix);
     const unique = new Map<string, typeof parts[number]>(); let physical = suffix.length;
     const decodedParts = [];
@@ -281,43 +272,14 @@ export async function selectKeelRegisteredInlineCandidate(input: {
       if (part.disposition === "reused" && (!registered || registered.digest !== sha(part.bytes) || registered.byteLength !== part.bytes.length || registered.role !== part.role)
         || registered && part.disposition !== "reused") throw new TypeError("Reused bytes differ from the authenticated reader recipe.");
       if (index < parts.length) decodedParts.push(decodeKeelInlineGraphFragment(part.bytes, "application/vnd.keel.token-uri-raw-percent-fragment"));
-      else if (sharedProgram) {
-        if (part.role === "program" && (part.objectId !== sharedProgram.objectId || !bytesEqual(part.bytes, sharedProgram.bytes))
-          || part.role === "image" && !bytesEqual(part.bytes, image.bytes)) throw new TypeError("Shared native-image physical object differs from its exact binding.");
-      } else if (part.role === "table") {
-        if (sha(part.bytes) !== built.tableDigest) throw new TypeError("Auxiliary table differs from the actual reader commitment.");
-      } else if (part.role !== "image" || !bytesEqual(part.bytes, image.bytes) && !bytesEqual(part.bytes, enc.encode(imageURI as string))) throw new TypeError("Unbound auxiliary candidate object.");
+      else if (part.role !== "image" || !bytesEqual(part.bytes, image.bytes) && !bytesEqual(part.bytes, enc.encode(imageURI as string))) throw new TypeError("Unbound auxiliary candidate object.");
     }
     for (const registered of recipe.registeredParts) if (!unique.has(registered.objectId)) throw new TypeError("Candidate omitted a registered decoder/boot/module part.");
     for (const reused of recipe.reusedSourceObjects ?? []) if (!unique.has(reused.objectId)) throw new TypeError("Candidate omitted an authenticated reused source object.");
-    if (sharedProgram) {
-      const programObject = unique.get(sharedProgram.objectId), used = new Set<string>([sharedProgram.objectId]);
-      if (!programObject || programObject.role !== "program" || !bytesEqual(programObject.bytes, sharedProgram.bytes)) throw new TypeError("Missing exact physical native-image program object.");
-      const rendered = await readKeelLegacySharedImageCopyProgram({ bytes: sharedProgram.bytes, readObject: async objectId => {
-        input.signal?.throwIfAborted(); const object = unique.get(objectId);
-        if (!object || object.role === "program") throw new TypeError("Missing actual shared-image physical frame."); used.add(objectId); return object.bytes;
-      } });
-      if (unique.size !== used.size || !bytesEqual(unique.get(rendered.imageObjectId)!.bytes, image.bytes)) throw new TypeError("Shared-image inventory is incomplete, duplicated or contains an unused paid sibling.");
-      decodedParts.push(decodeKeelInlineGraphFragment(rendered.bytes, "application/vnd.keel.token-uri-raw-percent-fragment"));
-    }
     if (!bytesEqual(Buffer.concat([...decodedParts, suffix]), html)) throw new TypeError("Stored document parts do not cover the actual returned HTML.");
-    const prepared = inspectKeelPreparedDenseCopyDocument(dec.decode(html));
-    if (recipe.sourceReader === "canonical-items" && prepared || recipe.sourceReader === "uri81-containers" && prepared?.transportProfile !== "uri81-block-v1") throw new TypeError("Candidate carriage differs from its selected reader recipe.");
-    if (recipe.sourceReader === "uri81-containers" && !auxiliary.some(part => part.role === "table")) throw new TypeError("Prepared URI81 comparison needs its actual table object bytes.");
-    // Establish zero included JS codec bytes from an exact maintained native
-    // reader comparison, never a caller's numeric estimate or gzip label.
-    let nativeBrowserGzip = false;
-    if (recipe.codec === "gzip" && recipe.sourceReader === "uri81-containers") {
-      const native = await buildKeelPreparedDenseCopyShell({ codecProfile: "native", embeddedContainerDelivery: { chainId: recipe.chainId, store: recipe.store },
-        shellBootCompression: prepared!.shellBootCompression === "none" ? "none" : "gzip" });
-      input.signal?.throwIfAborted();
-      const source = dec.decode(html);
-      nativeBrowserGzip = source.startsWith(dec.decode(native.prefix)) && source.endsWith(dec.decode(native.suffix));
-    }
-    const resources = recipe.sourceReader === "legacy-dense" ? (await readKeelLegacyPreparedDenseSources({ htmlBytes: html })).resources
-      : recipe.sourceReader === "uri81-containers" ? (await readKeelPreparedInlineSources({ htmlBytes: html, chainId: recipe.chainId, store: recipe.store,
-          tableDigest: built.tableDigest!, maximumDecodedSourceBytes: maximum, ...(input.signal === undefined ? {} : { signal: input.signal }) })).resources
-      : canonicalSources(html, maximum);
+    if (inspectKeelPreparedDenseCopyDocument(dec.decode(html)) !== undefined) throw new TypeError("Current registered candidates require canonical resource items, not a compatibility container.");
+    const nativeBrowserGzip = built.registeredNativeGzip !== undefined;
+    const resources = canonicalSources(html, maximum);
     input.signal?.throwIfAborted();
     const seen = new Set<string>();
     for (const resource of resources) {

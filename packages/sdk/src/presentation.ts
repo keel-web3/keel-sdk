@@ -273,7 +273,7 @@ export function assessKeelInlinePresentation(input: {
 
 /** The automatic saver stores final fragments; reads only concatenate them. */
 export const KEEL_INLINE_COMPACT_MEDIA_TYPE = "application/vnd.keel.token-uri-raw-percent-fragment" as const;
-export const KEEL_INLINE_CARRIAGES = ["compact", "raw-percent", "percent", "follow-latest", "pinned"] as const;
+export const KEEL_INLINE_CARRIAGES = ["compact", "raw-percent"] as const;
 export type KeelInlineCarriage = typeof KEEL_INLINE_CARRIAGES[number];
 
 export function resolveKeelInlineCarriage(carriage: string = "compact"): Exclude<KeelInlineCarriage, "compact"> {

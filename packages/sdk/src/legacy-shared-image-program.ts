@@ -22,36 +22,7 @@ export function encodeKeelLegacySharedImageCopyProgram(input: {
   readonly imageObjectId: Hex;
   readonly fragments: readonly ({ readonly objectId: Hex; readonly digest: Hex } | null)[];
 }) {
-  const graph = input.graph, image = input.sharedCollectorImage, at = image.documentPartIndex;
-  if (graph.mediaType !== "application/vnd.keel.token-uri-raw-percent-fragment" || !valid(input.imageObjectId)
-      || !Number.isSafeInteger(at) || at < 0 || at >= graph.parts.length || graph.parts.length > 128 || input.fragments.length !== graph.parts.length
-      || input.fragments[at] !== null || !["image/png","image/jpeg","image/gif","image/webp","image/avif"].includes(image.mediaType)
-      || image.bytes.length < 1 || image.bytes.length > 2_000_000 || image.integrity.byteLength !== image.bytes.length || hash(image.bytes) !== image.integrity.digest
-      || Buffer.from(graph.parts[at]!.bytes).toString("utf8") !== Buffer.from(image.bytes).toString("base64")) throw new TypeError("Invalid exact shared native-image program binding.");
-  let renderedLength = 0;
-  for (const part of graph.parts) {
-    if (!(part.bytes instanceof Uint8Array) || part.bytes.length > 2_000_000 - renderedLength) throw new TypeError("Prepared graph exceeds the complete Inline bound.");
-    renderedLength += part.bytes.length;
-  }
-  const rendered = Uint8Array.from(Buffer.concat(graph.parts.map(part => part.bytes)));
-  if (renderedLength !== graph.fragmentBytes.length || graph.fragmentIntegrity.algorithm !== "sha256"
-      || graph.fragmentIntegrity.byteLength !== renderedLength || !valid(graph.fragmentIntegrity.digest)
-      || hash(rendered) !== graph.fragmentIntegrity.digest || !Buffer.from(rendered).equals(Buffer.from(graph.fragmentBytes))) throw new TypeError("Prepared graph rendered commitment differs from its exact parts.");
-  const ids: Hex[] = [], digests: Hex[] = [], modes: number[] = [];
-  for (let index = 0; index < graph.parts.length; index++) {
-    if (index === at) { ids.push(input.imageObjectId); digests.push(image.integrity.digest); modes.push(1); continue; }
-    const binding = input.fragments[index], part = graph.parts[index]!;
-    if (!binding || !valid(binding.objectId) || !valid(binding.digest) || hash(part.bytes) !== binding.digest) throw new TypeError("COPY fragment binding differs from its exact prepared bytes.");
-    ids.push(binding.objectId); digests.push(binding.digest); modes.push(0);
-  }
-  const bytes = hexToBytes(encodeAbiParameters(parameters, [KEEL_LEGACY_SHARED_IMAGE_PROGRAM_TAG, BigInt(graph.fragmentBytes.length), graph.fragmentIntegrity.digest,
-    input.imageObjectId, image.integrity.digest, BigInt(image.bytes.length), ids, digests, modes]));
-  return { profile: KEEL_LEGACY_SHARED_IMAGE_PROGRAM_PROFILE, mediaType: KEEL_LEGACY_SHARED_IMAGE_PROGRAM_MEDIA_TYPE, bytes,
-    integrity: { algorithm: "sha256" as const, digest: hash(bytes), byteLength: bytes.length }, imageObjectId: input.imageObjectId,
-    imageIntegrity: { ...image.integrity }, renderedIntegrity: { ...graph.fragmentIntegrity }, imagePartIndex: at,
-    requiredBuilder: "KeelLegacySharedImageTokenURIBuilder" as const, immutableLiteralImageEnvelopeSupported: false as const,
-    storage: { nativeImagePayloadBytes: image.bytes.length, encodedImagePayloadBytes: 0 as const, returnedImageBase64Bytes: graph.parts[at]!.bytes.length },
-    selectedChainBindingVerified: false as const, signing: "not-performed" as const, submission: "not-performed" as const };
+  throw new TypeError("encodeKeelLegacySharedImageCopyProgram is retired for fresh publication. Use the registered canonical raw-percent resource pipeline.");
 }
 /** Local exact replay, not selected-chain registration or contract execution proof. */
 export async function readKeelLegacySharedImageCopyProgram(input: { readonly bytes: Uint8Array;

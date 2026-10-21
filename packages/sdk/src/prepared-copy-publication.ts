@@ -10,15 +10,12 @@ const encoder = new TextEncoder();
 const decoder = new TextDecoder("utf-8", { fatal: true });
 const profiles = {
   "application/vnd.keel.token-uri-raw-percent-fragment": "KeelRawTokenURIBuilder",
-  "application/vnd.keel.token-uri-percent-fragment": "KeelPercentTokenURIBuilder",
-  "application/vnd.keel.token-uri-base64-fragment": "KeelHarnessBuilder",
-  "application/vnd.keel.token-uri-base64-body-fragment": "KeelHarnessBuilder",
 } as const;
 
 /** The existing fragment's media type selects its COPY builder; there is no
  * encoder/composer fallback for incompatible binary or a different transport. */
 export function keelPreparedCopyBuilder(mediaType: string): string {
-  if (!Object.hasOwn(profiles, mediaType)) throw new TypeError("Publication requires a supported prepared COPY fragment, not raw binary or a custom transport.");
+  if (!Object.hasOwn(profiles, mediaType)) throw new TypeError("Publication requires the current raw-percent prepared COPY fragment, not retired carriage, raw binary or a custom transport.");
   return profiles[mediaType as keyof typeof profiles];
 }
 
@@ -118,7 +115,6 @@ export async function assertKeelPreparedCopyRead(input: KeelPreparedCopyReadInpu
   const raw = mediaType === "application/vnd.keel.token-uri-raw-percent-fragment";
   if (externalPreview !== undefined && !raw) throw new TypeError("Explicit external preview requires raw-percent COPY.");
   if (raw && !expectedTokenURI.startsWith("data:application/json;charset=utf-8,")) throw new TypeError("Compact COPY cannot add a complete-metadata Base64 layer.");
-  if (!raw && !expectedTokenURI.startsWith("data:application/json;base64,")) throw new TypeError("Preserve the existing prepared Base64/percent envelope.");
   assertKeelDataURICompatibility(expectedTokenURI, "Prepared tokenURI");
   const metadata = JSON.parse(decoder.decode(dataURI(expectedTokenURI, "application/json"))) as Record<string, unknown>;
   if (raw && (typeof metadata.animation_url !== "string" || !metadata.animation_url.startsWith("data:text/html;charset=utf-8,"))) throw new TypeError("Compact COPY cannot add a complete-HTML Base64 layer.");

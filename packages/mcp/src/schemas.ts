@@ -394,12 +394,12 @@ const inlinePrepare: JsonSchema = object({
   carriage: {
     type: "string",
     enum: ["compact", "raw-percent"],
-    description: "Fresh source uses compact raw-percent COPY only. Existing aligned Base64 or percent fragments go through keel-inline-reuse-plan without transcoding.",
+    description: "Current source and object reuse use compact raw-percent COPY only; historical carriage is not a publication option.",
   },
   presentationPolicy: {
     type: "string",
     enum: ["collector-inline", "external-resolver", "raw-artifact"],
-    description: "Optional. Defaults to collector-inline: self-contained data:image/* plus raw-percent data:text/html HTML inside the registered canonical KEEL verification shell. Prepare the exact image carriage once at build time and publish one ASCII payload or URI; never publish raw image bytes plus a second encoded copy. The contract/viewer only copies the prepared header/payload/footer and never Base64-encodes media during tokenURI. GIF is direct data:image/gif from the exact source, never an SVG wrapper, resize or placeholder. External resolvers and legacy artifact routes require an explicit policy.",
+    description: "Optional. Defaults to collector-inline: self-contained data:image/* plus raw-percent data:text/html HTML inside the registered canonical KEEL verification shell. Prepare the exact image carriage once at build time and publish one ASCII payload or URI; never publish raw image bytes plus a second encoded copy. The contract/viewer only copies the prepared header/payload/footer and never Base64-encodes media during tokenURI. GIF is direct data:image/gif from the exact source, never an SVG wrapper, resize or placeholder. External previews and creator-owned raw artifacts require their explicit current policy.",
   },
   collection: string("Collection address for a prepared one-of-one tokenURI.", 42),
   metadataTransport: { type: "string", enum: ["web3-json"], description: "Existing collection URI route: prepare raw JSON with inline SVG/image and canonical HTML, without KEEL721-specific binding calls." },
