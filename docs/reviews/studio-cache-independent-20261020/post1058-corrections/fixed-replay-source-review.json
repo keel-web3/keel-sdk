@@ -1,0 +1,60 @@
+{
+  "schema": "keel.independent-fixed-funded-replay-source-review@1",
+  "decision": "APPROVE_EXACT_SOURCE_FOR_ORDINARY_PR_AND_MERGE",
+  "reviewerId": "independent-release-reviewer",
+  "sourceCommit": "5e0c95187dbb7412408cfddc3683098dbfd6cc3d",
+  "base": "d64027b868c1d038854b6181049785fe50da0dcb",
+  "sourceDiagnosticParent": "83cb35c47c6b92eabe91b96ed83f6d1613bfd289",
+  "approvedFixtureParent": "77b6c94cdf07922d69273b69cb2962db5d6cde54",
+  "prefixReviewSHA256": "6515b486c917f45c6b99092015a4c65748a45421e7a82ae2af1d78316c368ac2",
+  "reviewedFilesSHA256": {
+    "apps/studio/src/server/services/initial-storage-preflight-service.ts": "243e81dc5fdd29d63662afb84b58c871f7a5e661681a2c6acd7ee3dcf7458595",
+    "apps/studio/src/server/services/managed-publication-service.ts": "0efe2379dc4ee2eeb52777ac988b756f75d26b703b3ee1b8db9b6bde57a7b527",
+    "apps/studio/src/server/services/updated-review-funding.ts": "2708807b654c65420875aff00a96b8ec85adc9c1223aff529bb9525e0a8727ad",
+    "apps/studio/tests/unit/funded-replay-envelope.test.ts": "639fe5772bc267793486b3818f6c9e35e04dc301a3e50ecfb828c3faafefa560"
+  },
+  "reviewConclusion": "Prior proof supplies request gas bounds only; it never supplies new validation authority. Only exact process-local unchanged full proof objects minted after complete SDK proof/postchecks qualify, within120s and samecomplete request/program/source/release/defaults/chain/job/reader/metadata scope. Normalizeonly canonicalapproval.value and fullychecked fundExecutor second amountslot; allsenders/targets/calldata/explicitnonces/order/other values remainbound. Clampeachpriororderedgas bound downward tocurrentblockpolicy. Everyfunded replay obtainsfreshcanonical block/fees andrunsactualSDK fixed-envelope discovery, stricttransactionvalidation andwholemetadata replay. No capacity/clock/header override or partialproof acceptance.",
+  "SDKPrimarySourceBasis": {
+    "sdk": "311d61526284248938e335d7ed879089408933be",
+    "file": "packages/sdk/src/publication-preflight.ts",
+    "lines": [
+      247,
+      250,
+      274,
+      521,
+      540
+    ],
+    "semantics": "OmitteddiscoveryGasPolicy meansfixed-envelopes; underAmsterdamseparatestate gas the actualsuccessful supplied allowance is retained and stillstrictly replayed. Freshcurrentheaderlimits remainapplicable."
+  },
+  "independentChecks": {
+    "node": "22.22.1",
+    "newActualStudioAndSDK311SyntheticTransportTests": 19,
+    "prefixSourceDiagnosticDescriptorTests": 25,
+    "failures": 0,
+    "skips": 0,
+    "explicitlySyntheticNoNativeVM": true,
+    "bothRealFundingLoops": "two full21discovery+21strictvalidation+25metadata sequences; risingcap amount94429455419783952 atfresh39345644wei/gas; loweringcapclamps andretains exact testedescrow; exactsavedgasmaps/immutableinputs",
+    "negativeControls": "Serialized/cloned/partial/forged/mutated/future/expired proofs; source/manifest/revision/release/defaults/chain/deadline/job/sender/target/data/order drift; actualSDK revert/outofgas rejects beforewallet result",
+    "logsSHA256": {
+      "funded-replay19.stdout": "44aacd454e0850be51194b8c5d4e06b6a2e2263881b7bf9fb1065dc3ada54d97",
+      "funded-replay19.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "originalFundingTests": "updated-review-funding andvalidated-funding-envelope byteexactd640; approvedfixturedependencyonlybinding preserved"
+  },
+  "authorEvidenceNotIndependentRerun": {
+    "affectedTestExecutions": 237,
+    "TSCExit": 0,
+    "priorRisingCapREDRetained": true
+  },
+  "savedPaidAuthority": "d640 persistenceguard andpriorpaidquote/receipt/funding authorityunchanged; exacttested amount/rate/currentminimum semantics preserved; no unvalidated highseed or underfundedacceptance",
+  "limits": "Existingmax3passes, initialunmeasureddiscovery provider-capacity policy, SDKstart+finishfreshness andfullvalidation, diagnostics/cancellation/deadline andwallet/storage approvalgates unchanged",
+  "noSDKNativeProtocolOrUIChanges": true,
+  "liveGate6": "1058 remainsFAIL; newsource notdeployed orliveproven. Gatorpre-nativecauseunknown; newdiagnosticmay revealit.",
+  "excludedFromApproval": [
+    "Any laterprovenancehook/integratedsource successor until separatelyreviewed",
+    "Artifact/hostbuild/import/activation/privateprogram/native/RPCexecution",
+    "Artworksigning/spend/publication/readiness claims"
+  ],
+  "blockingSourceFindings": [],
+  "reviewerAuthoredProductionFix": false
+}
