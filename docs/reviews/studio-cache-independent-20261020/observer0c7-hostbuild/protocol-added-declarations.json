@@ -1,0 +1,617 @@
+[
+  {
+    "name": "i",
+    "kind": "VariableDeclaration",
+    "source": "i=\"keel-artifact-registry@1\""
+  },
+  {
+    "name": "l",
+    "kind": "VariableDeclaration",
+    "source": "l=\"keel-plugin-bindings@1\""
+  },
+  {
+    "name": "m",
+    "kind": "VariableDeclaration",
+    "source": "m=\"keel-contract-plugin@1\""
+  },
+  {
+    "name": "n",
+    "kind": "VariableDeclaration",
+    "source": "n=\"keel-graph-registry@1\""
+  },
+  {
+    "name": "o",
+    "kind": "VariableDeclaration",
+    "source": "o=\"keel-plugin-registry@1\""
+  },
+  {
+    "name": "p",
+    "kind": "VariableDeclaration",
+    "source": "p=\"keel-wallet-intents@1\""
+  },
+  {
+    "name": "q",
+    "kind": "VariableDeclaration",
+    "source": "q=\"keel-library-bindings@1\""
+  },
+  {
+    "name": "r",
+    "kind": "VariableDeclaration",
+    "source": "r=\"keel-build-provenance@1\""
+  },
+  {
+    "name": "s",
+    "kind": "VariableDeclaration",
+    "source": "s=\"keel-project-stack@1\""
+  },
+  {
+    "name": "am",
+    "kind": "VariableDeclaration",
+    "source": "am=\"keel-module-catalog@1\""
+  },
+  {
+    "name": "au",
+    "kind": "VariableDeclaration",
+    "source": "au=/^0x[0-9a-f]{64}$/u"
+  },
+  {
+    "name": "av",
+    "kind": "VariableDeclaration",
+    "source": "av=/^0x[0-9a-f]{40}$/u"
+  },
+  {
+    "name": "aw",
+    "kind": "FunctionDeclaration",
+    "source": "function aw(a,b){if(\"string\"!=typeof a||0===a.length||a.length>256||/[\\u0000-\\u001f\\u007f]/u.test(a))throw TypeError(`${b} must be a non-empty identifier.`)}"
+  },
+  {
+    "name": "ax",
+    "kind": "FunctionDeclaration",
+    "source": "function ax(a,b,c=0){if(!Number.isSafeInteger(a)||a<c)throw RangeError(`${b} must be a safe integer >= ${c}.`)}"
+  },
+  {
+    "name": "ay",
+    "kind": "FunctionDeclaration",
+    "source": "function ay(a,b){if(\"string\"!=typeof a||!au.test(a))throw TypeError(`${b} must be lower-case bytes32.`)}"
+  },
+  {
+    "name": "az",
+    "kind": "FunctionDeclaration",
+    "source": "function az(a,b){if(\"string\"!=typeof a||!av.test(a))throw TypeError(`${b} must be a lower-case EVM address.`)}"
+  },
+  {
+    "name": "aA",
+    "kind": "FunctionDeclaration",
+    "source": "function aA(a,b,c){var d,e;if(\"keel-stake-object@1\"!==a.protocol||!0!==a.requireStaked)throw TypeError(\"Unsupported Keel stake-object protocol.\");if(\"ethereum\"===a.chain.family?(ax(a.chain.chainId,\"stakeObject.chain.chainId\",1),az(a.chain.manager,\"stakeObject.chain.manager\")):(aw(a.chain.network,\"stakeObject.chain.network\"),aw(a.chain.manager,\"stakeObject.chain.manager\")),aw(a.hostCollection,\"stakeObject.hostCollection\"),aw(a.hostTokenId,\"stakeObject.hostTokenId\"),aw(a.stakedTokenId,\"stakeObject.stakedTokenId\"),\"ethereum\"===a.chain.family&&(az(a.hostCollection,\"stakeObject.hostCollection\"),!/^\\$anchor\\.tokenId$|^(?:0|[1-9][0-9]*)$/u.test(a.hostTokenId)))throw TypeError(\"stakeObject.hostTokenId must be $anchor.tokenId or a uint256.\");ay(a.stakeObjectId,\"stakeObject.stakeObjectId\"),ay(a.viewerId,\"stakeObject.viewerId\"),aw(a.stakedEntrypoint.resource,\"stakeObject.stakedEntrypoint.resource\"),aw(a.stakedEntrypoint.mode,\"stakeObject.stakedEntrypoint.mode\");let f=a=>(b instanceof Map,b.has(a));if(!f(a.stakedEntrypoint.resource))throw TypeError(\"stakeObject.stakedEntrypoint must reference a manifest resource.\");let g=new Set,h=new Set;if(0===a.gatedResources.length||a.gatedResources.length>128)throw RangeError(\"stakeObject.gatedResources must contain 1 through 128 resources.\");for(let[b,c]of a.gatedResources.entries()){if(aw(c.resource,`stakeObject.gatedResources[${b}].resource`),ax(c.slot,`stakeObject.gatedResources[${b}].slot`),g.has(c.resource))throw TypeError(\"stakeObject.gatedResources cannot repeat a resource.\");if(h.has(c.slot))throw TypeError(\"stakeObject.gatedResources cannot repeat a load slot.\");if(!f(c.resource))throw TypeError(`Unknown gated resource ${c.resource}.`);if(void 0!==c.objectId&&aw(c.objectId,`stakeObject.gatedResources[${b}].objectId`),void 0!==c.objectRevision&&ax(c.objectRevision,`stakeObject.gatedResources[${b}].objectRevision`,1),void 0===c.objectId!=(void 0===c.objectRevision))throw TypeError(\"A gated object identity must include both objectId and objectRevision.\");g.add(c.resource),h.add(c.slot)}if(!g.has(a.stakedEntrypoint.resource))throw TypeError(\"The staked entrypoint must be gated and cannot load while unstaked.\");let i=a.gatedResources.find(b=>b.resource===a.stakedEntrypoint.resource);if(i?.objectId===void 0||void 0===i.objectRevision)throw TypeError(\"The staked entrypoint must pin its exact manager code object and revision.\");if(void 0===a.runtime||null===a.runtime||\"object\"!=typeof a.runtime)throw TypeError(\"stakeObject.runtime must pin the active runtime commitments.\");if(ay(a.runtime.seed,\"stakeObject.runtime.seed\"),ay(a.runtime.argumentsDigest,\"stakeObject.runtime.argumentsDigest\"),ay(a.runtime.variablesDigest,\"stakeObject.runtime.variablesDigest\"),ay(a.runtime.runtimeDigest,\"stakeObject.runtime.runtimeDigest\"),void 0!==a.runtime.argumentsResource&&(aw(a.runtime.argumentsResource,\"stakeObject.runtime.argumentsResource\"),!g.has(a.runtime.argumentsResource)))throw TypeError(\"Stake arguments must be gated.\");if(void 0!==a.runtime.variablesResource&&(aw(a.runtime.variablesResource,\"stakeObject.runtime.variablesResource\"),!g.has(a.runtime.variablesResource)))throw TypeError(\"Stake variables must be gated.\");for(let[b,e]of(\"none\"!==(d=a.lockup??{mode:\"none\"}).mode&&\"until-disabled\"!==d.mode&&ax(d.seconds,\"stakeObject.lockup.seconds\",1),(a.removeComponentIds??[]).entries()))if(aw(e,`stakeObject.removeComponentIds[${b}]`),void 0!==c&&!c.has(e))throw TypeError(`Stake object removes unknown project component ${e}.`);!function(a,b){if(\"none\"===a.kind||\"manager-scoped\"===a.kind){if(\"manager-scoped\"===a.kind&&\"tezos\"!==b.family)throw TypeError(\"manager-scoped backpacks are reserved for Tezos.\");return}if(\"ethereum\"!==b.family)throw TypeError(\"ERC-6551 backpacks require an Ethereum stake manager.\");az(a.registry,\"backpack.registry\"),az(a.implementation,\"backpack.implementation\"),void 0!==a.salt&&ay(a.salt,\"backpack.salt\")}(a.backpack??{kind:\"none\"},a.chain),\"official\"!==(e=a.managerPolicy??{mode:\"official\"}).mode&&(aw(e.adapterId,\"stakeObject.managerPolicy.adapterId\"),ax(e.adapterVersion,\"stakeObject.managerPolicy.adapterVersion\",1),ay(e.immutableCodeHash,\"stakeObject.managerPolicy.immutableCodeHash\"),ay(e.evidenceDigest,\"stakeObject.managerPolicy.evidenceDigest\"),ay(e.reviewReceipt,\"stakeObject.managerPolicy.reviewReceipt\"),ay(e.feeReceipt,\"stakeObject.managerPolicy.feeReceipt\"))}"
+  },
+  {
+    "name": "aB",
+    "kind": "VariableDeclaration",
+    "source": "aB=/[\\u0000-\\u001f\\u007f]/u"
+  },
+  {
+    "name": "aC",
+    "kind": "FunctionDeclaration",
+    "source": "function aC(a,b,c){if(\"string\"!=typeof a)throw TypeError(`${b} must be a string.`);let d=a.trim();if(0===d.length)throw TypeError(`${b} must not be empty.`);if(aB.test(d))throw TypeError(`${b} must not contain control characters.`);if(new TextEncoder().encode(d).byteLength>c)throw RangeError(`${b} is limited to ${c} UTF-8 bytes.`);return d}"
+  },
+  {
+    "name": "aD",
+    "kind": "FunctionDeclaration",
+    "source": "function aD(a){if(!Array.isArray(a))throw TypeError(\"Keel attributions must be an array.\");if(a.length>128)throw RangeError(\"Keel attributions are limited to 128 entries.\");let b=new Set;return a.map((a,c)=>{if(null===a||\"object\"!=typeof a||Array.isArray(a))throw TypeError(`attributions[${c}] must be an object.`);let d=aC(a.account,`attributions[${c}].account`,128),e=aC(a.tag,`attributions[${c}].tag`,64),f=void 0===a.displayName?void 0:aC(a.displayName,`attributions[${c}].displayName`,96),g=function(a,b){if(void 0===a)return;if(null===a||\"object\"!=typeof a||Array.isArray(a))throw TypeError(`${b} must be an object.`);if(\"object\"!==a.kind&&\"viewer\"!==a.kind)throw TypeError(`${b}.kind must be object or viewer.`);let c=aC(a.id,`${b}.id`,128),d=a.revision;if(void 0!==d&&(!Number.isSafeInteger(d)||1>Number(d)))throw RangeError(`${b}.revision must be a positive safe integer.`);let e=void 0===a.registry?void 0:aC(a.registry,`${b}.registry`,128);return{kind:a.kind,id:c,...void 0===d?{}:{revision:Number(d)},...void 0===e?{}:{registry:e}}}(a.target,`attributions[${c}].target`),h=`${g?.kind??\"viewer\"}:${g?.id.toLowerCase()??\"manifest\"}:${d.toLowerCase()}:${e.toLowerCase()}`;if(b.has(h))throw TypeError(`Duplicate attribution at attributions[${c}].`);return b.add(h),{account:d,tag:e,...void 0===f?{}:{displayName:f},...void 0===g?{}:{target:g}}})}"
+  },
+  {
+    "name": "aE",
+    "kind": "VariableDeclaration",
+    "source": "aE=/^keel:\\/\\/wake\\/eip155\\/([1-9][0-9]*)\\/(0x[0-9a-f]{40})\\/(0|[1-9][0-9]*)(?:\\/chunk\\/(0|[1-9][0-9]*))?$/u"
+  },
+  {
+    "name": "aI",
+    "kind": "VariableDeclaration",
+    "source": "aI=\"keel:community-replication\""
+  },
+  {
+    "name": "aJ",
+    "kind": "VariableDeclaration",
+    "source": "aJ=[\"evm\",\"tezos\",\"ordinals\"]"
+  },
+  {
+    "name": "aK",
+    "kind": "VariableDeclaration",
+    "source": "aK=new Set(aJ)"
+  },
+  {
+    "name": "aL",
+    "kind": "VariableDeclaration",
+    "source": "aL=new Set([\"protocol\",\"enabled\",\"carriers\",\"claimLeaseSeconds\",\"revisionPolicy\"])"
+  },
+  {
+    "name": "aM",
+    "kind": "FunctionDeclaration",
+    "source": "function aM(a){if(null===a||\"object\"!=typeof a||Array.isArray(a))throw TypeError(\"Community replication preference must be an object.\");if(Object.keys(a).some(a=>!aL.has(a)))throw TypeError(\"Community replication preference contains an unsupported field.\");if(\"keel-community-replication-preference@1\"!==a.protocol)throw TypeError(\"Unsupported community replication preference.\");if(!0!==a.enabled)throw TypeError(\"A stored community replication preference must be enabled.\");if(!Array.isArray(a.carriers)||a.carriers.length<1||a.carriers.length>3)throw RangeError(\"Community replication requires from one through three carriers.\");let b=a.carriers.map(a=>\"string\"==typeof a&&aK.has(a)?aJ.indexOf(a):-1);if(b.some(a=>a<0))throw TypeError(\"Community replication carrier is unsupported.\");if(b.some((a,c)=>c>0&&a<=(b[c-1]??-1)))throw TypeError(\"Community replication carriers must be unique and canonically ordered.\");if(!Number.isSafeInteger(a.claimLeaseSeconds)||a.claimLeaseSeconds<300||a.claimLeaseSeconds>604800)throw RangeError(\"Community replication claim lease must be from 300 through 604800 seconds.\");if(\"require-new-proofs\"!==a.revisionPolicy)throw TypeError(\"Community replication must require new proofs for every revision.\")}"
+  },
+  {
+    "name": "aN",
+    "kind": "VariableDeclaration",
+    "source": "aN=[\"entrypoint\",\"fallback\",\"preview\",\"original\",\"script\",\"style\",\"font\",\"image\",\"audio\",\"video\",\"model\",\"shader\",\"data\",\"library\",\"other\"]"
+  },
+  {
+    "name": "aO",
+    "kind": "VariableDeclaration",
+    "source": "aO=/^0x[0-9a-f]{64}$/"
+  },
+  {
+    "name": "aP",
+    "kind": "VariableDeclaration",
+    "source": "aP=/^0x[0-9a-f]{8}$/"
+  },
+  {
+    "name": "aQ",
+    "kind": "VariableDeclaration",
+    "source": "aQ=/^0x[0-9a-fA-F]{40}$/"
+  },
+  {
+    "name": "aR",
+    "kind": "VariableDeclaration",
+    "source": "aR=/^[a-zA-Z0-9][a-zA-Z0-9._:/-]{0,127}$/"
+  },
+  {
+    "name": "aS",
+    "kind": "VariableDeclaration",
+    "source": "aS=/^(0|[1-9][0-9]*)$/"
+  },
+  {
+    "name": "aT",
+    "kind": "VariableDeclaration",
+    "source": "aT=(1n<<256n)-1n"
+  },
+  {
+    "name": "aU",
+    "kind": "VariableDeclaration",
+    "source": "aU=/^\\/(?:content|onchain|ipfs)\\/[A-Za-z0-9._~!$&'()*+,;=:@%/-]+$/"
+  },
+  {
+    "name": "aV",
+    "kind": "VariableDeclaration",
+    "source": "aV=/^keel:\\/\\/[A-Za-z0-9._~-]+(?:\\/[A-Za-z0-9._~!$&'()*+,;=:@%~-]+)+$/"
+  },
+  {
+    "name": "aW",
+    "kind": "VariableDeclaration",
+    "source": "aW=new Set([\"image/gif\",\"image/avif\",\"image/webp\",\"image/png\",\"image/jpeg\"])"
+  },
+  {
+    "name": "aX",
+    "kind": "VariableDeclaration",
+    "source": "aX=new Set([...aW,\"video/mp4\"])"
+  },
+  {
+    "name": "aY",
+    "kind": "FunctionDeclaration",
+    "source": "function aY(a,b,c,d,e){a.push({level:b,path:c,code:d,message:e})}"
+  },
+  {
+    "name": "aZ",
+    "kind": "FunctionDeclaration",
+    "source": "function aZ(a,b,c){if((!Number.isSafeInteger(a.byteLength??0)||(a.byteLength??0)<0)&&aY(c,\"error\",`${b}.byteLength`,\"integrity.length\",\"byteLength must be a non-negative safe integer.\"),\"none\"===a.algorithm){\"0x\"!==a.digest&&aY(c,\"error\",`${b}.digest`,\"integrity.none\",\"none must use digest 0x.\");return}aO.test(a.digest)||aY(c,\"error\",`${b}.digest`,\"integrity.digest\",\"SHA-256 and Keccak-256 digests must be lower-case bytes32.\")}"
+  },
+  {
+    "name": "a$",
+    "kind": "FunctionDeclaration",
+    "source": "function a$(a,b,c,d){void 0===a?aY(d,\"error\",b,\"integrity.required\",`${c} sources require decoded-byte integrity.`):(aZ(a,b,d),\"none\"===a.algorithm&&aY(d,\"error\",`${b}.algorithm`,\"integrity.required\",`${c} sources require a cryptographic digest.`))}"
+  },
+  {
+    "name": "a_",
+    "kind": "FunctionDeclaration",
+    "source": "function a_(a,b,c){a.protocol!==n&&aY(c,\"error\",`${b}.protocol`,\"plugin.graph.protocol\",`Expected ${n}.`),(!Number.isSafeInteger(a.chainId)||a.chainId<=0)&&aY(c,\"error\",`${b}.chainId`,\"chain.invalid\",\"Plugin graph chainId must be a positive safe integer.\"),aQ.test(a.registry)||aY(c,\"error\",`${b}.registry`,\"address.invalid\",\"Graph registry must be an EVM address.\"),aO.test(a.graphId)||aY(c,\"error\",`${b}.graphId`,\"plugin.graph.id\",\"graphId must be lower-case bytes32.\"),(!Number.isSafeInteger(a.version)||a.version<1)&&aY(c,\"error\",`${b}.version`,\"plugin.graph.version\",\"Graph version must be a positive safe integer.\"),[\"remote-pinned\",\"content-addressed\",\"onchain\"].includes(a.storageTier)||aY(c,\"error\",`${b}.storageTier`,\"plugin.graph.tier\",\"Unsupported graph storage tier.\")}"
+  },
+  {
+    "name": "a0",
+    "kind": "FunctionDeclaration",
+    "source": "function a0(a,b){return a.algorithm===b.algorithm&&a.digest===b.digest&&a.byteLength===b.byteLength}"
+  },
+  {
+    "name": "a1",
+    "kind": "FunctionDeclaration",
+    "source": "function a1(a,b,c,d){aZ(a.integrity,`${b}.integrity`,d),(\"none\"===a.integrity.algorithm||void 0===a.integrity.byteLength||a.integrity.byteLength<=0)&&aY(d,\"error\",`${b}.integrity`,\"plugin.resource.integrity\",\"Pinned plugin resources require a cryptographic digest and positive byteLength.\");let e=c.get(a.resource);if(void 0===e)return void aY(d,\"error\",`${b}.resource`,\"plugin.resource.missing\",`Unknown pinned plugin resource ${a.resource}.`);for(let[b,c]of e.sources.entries())a0(c.integrity,a.integrity)||aY(d,\"error\",`$.resources.${a.resource}.sources[${b}].integrity`,\"plugin.resource.mismatch\",\"Every fallback for a privileged plugin resource must resolve to the exact pinned bytes.\")}"
+  },
+  {
+    "name": "a2",
+    "kind": "FunctionDeclaration",
+    "source": "function a2(a){return void 0===a?\"\":`${a.min}:${a.max}`}"
+  },
+  {
+    "name": "a4",
+    "kind": "VariableDeclaration",
+    "source": "a4=\"keel.ip-control\""
+  },
+  {
+    "name": "a5",
+    "kind": "VariableDeclaration",
+    "source": "a5=/^0x[0-9a-f]{64}$/u"
+  },
+  {
+    "name": "a6",
+    "kind": "FunctionDeclaration",
+    "source": "function a6(a,b){if(null===a||\"object\"!=typeof a||Array.isArray(a))throw TypeError(`${b} must be an object.`);return a}"
+  },
+  {
+    "name": "a7",
+    "kind": "FunctionDeclaration",
+    "source": "function a7(a,b){if(\"string\"!=typeof a||0===a.length)throw TypeError(`${b} must be a non-empty string.`);return a}"
+  },
+  {
+    "name": "a8",
+    "kind": "FunctionDeclaration",
+    "source": "function a8(a,b){if(!Number.isSafeInteger(a)||a<=0)throw TypeError(`${b} must be a positive safe integer.`);return a}"
+  },
+  {
+    "name": "a9",
+    "kind": "FunctionDeclaration",
+    "source": "function a9(a,b){let c=a7(a,b);if(!a5.test(c))throw TypeError(`${b} must be lower-case bytes32 hex.`);return c}"
+  },
+  {
+    "name": "ba",
+    "kind": "FunctionDeclaration",
+    "source": "function ba(a,b,c){let d=a7(a,c);if(!b.includes(d))throw TypeError(`${c} has an unsupported value.`);return d}"
+  },
+  {
+    "name": "bb",
+    "kind": "FunctionDeclaration",
+    "source": "function bb(a,b){let c=a6(a,\"$.extensions.keel.ip-control\");if(\"keel-ip-control@1\"!==c.protocol)throw TypeError(\"$.extensions.keel.ip-control.protocol must be keel-ip-control@1.\");let d=ba(c.chain,[\"ethereum\",\"tezos\"],\"$.extensions.keel.ip-control.chain\");if(a8(c.chainId,\"$.extensions.keel.ip-control.chainId\"),\"tezos\"===d&&a7(c.network,\"$.extensions.keel.ip-control.network\"),\"ethereum\"===d&&void 0!==c.network)throw TypeError(\"Ethereum IP-control manifests must use chainId instead of network.\");a7(c.registry,\"$.extensions.keel.ip-control.registry\"),a9(c.policyId,\"$.extensions.keel.ip-control.policyId\"),a9(c.objectId,\"$.extensions.keel.ip-control.objectId\"),a8(c.objectRevision,\"$.extensions.keel.ip-control.objectRevision\");let e=a6(c.license,\"$.extensions.keel.ip-control.license\");if(a9(e.licenseId,\"$.extensions.keel.ip-control.license.licenseId\"),a9(e.contentObjectId,\"$.extensions.keel.ip-control.license.contentObjectId\"),a9(e.decodedDigest,\"$.extensions.keel.ip-control.license.decodedDigest\"),\"brotli\"!==e.compression)throw TypeError(\"$.extensions.keel.ip-control.license.compression must be brotli.\");void 0!==e.identifier&&a7(e.identifier,\"$.extensions.keel.ip-control.license.identifier\");let f=c.resources;if(!Array.isArray(f)||0===f.length||f.length>512)throw TypeError(\"$.extensions.keel.ip-control.resources must contain 1-512 bindings.\");let g=new Set;for(let[a,e]of f.entries()){let f=`$.extensions.keel.ip-control.resources[${a}]`,h=a6(e,f),i=a7(h.resource,`${f}.resource`);if(g.has(i))throw TypeError(`${f}.resource is duplicated.`);if(g.add(i),void 0!==b&&!b.has(i))throw TypeError(`${f}.resource is not declared in the manifest resources.`);if(a9(h.objectId,`${f}.objectId`),a8(h.objectRevision,`${f}.objectRevision`),!Array.isArray(h.actions)||0===h.actions.length||h.actions.length>4)throw TypeError(`${f}.actions must contain 1-4 actions.`);let j=new Set;for(let[a,b]of h.actions.entries()){let c=`${f}.actions[${a}]`,d=ba(b,[\"view\",\"download\",\"remint\",\"mint-to-backpack\"],c);if(j.has(d))throw TypeError(`${c} is duplicated.`);j.add(d)}if(void 0!==h.delivery){let a=a6(h.delivery,`${f}.delivery`);if(a.chain!==d)throw TypeError(`${f}.delivery.chain must match the IP-control chain.`);if(a.chainId!==c.chainId)throw TypeError(`${f}.delivery.chainId must match the IP-control chainId.`);if(\"tezos\"===d){if(a7(a.network,`${f}.delivery.network`),!/^KT1[1-9A-HJ-NP-Za-km-z]{33}$/u.test(a.store))throw TypeError(`${f}.delivery.store must be a Tezos KT1 address.`)}else{if(void 0!==a.network)throw TypeError(`${f}.delivery.network is only valid for Tezos.`);if(!/^0x[0-9a-fA-F]{40}$/u.test(a.store))throw TypeError(`${f}.delivery.store must be an EVM address.`)}if(a9(a.contentObjectId,`${f}.delivery.contentObjectId`),a9(a.decodedDigest,`${f}.delivery.decodedDigest`),void 0!==a.fileName){let b=a7(a.fileName,`${f}.delivery.fileName`);if(b.length>160||/[\\u0000-\\u001f\\u007f\\\\/]/u.test(b))throw TypeError(`${f}.delivery.fileName contains unsupported characters.`)}}}if(\"tezos\"===d&&!/^KT1[1-9A-HJ-NP-Za-km-z]{33}$/u.test(c.registry))throw TypeError(\"Tezos IP-control registry must be a KT1 address.\");let h=\"string\"==typeof c.licenseRegistry?c.licenseRegistry:\"\";if(\"tezos\"===d&&!/^KT1[1-9A-HJ-NP-Za-km-z]{33}$/u.test(h))throw TypeError(\"Tezos IP-control licenseRegistry must be a KT1 address.\");if(\"ethereum\"===d&&void 0!==c.licenseRegistry)throw TypeError(\"Ethereum IP-control manifests must use the combined registry.\");if(\"ethereum\"===d&&!/^0x[0-9a-fA-F]{40}$/u.test(c.registry))throw TypeError(\"Ethereum IP-control registry must be an address.\");if(void 0!==c.tokenGate&&(\"tezos\"!==d||!/^KT1[1-9A-HJ-NP-Za-km-z]{33}$/u.test(c.tokenGate)))throw TypeError(\"IP-control tokenGate is only valid as a Tezos KT1 token evaluator.\");if(void 0!==c.actionExecutor&&!(\"ethereum\"===d?/^0x[0-9a-fA-F]{40}$/u.test(c.actionExecutor):/^KT1[1-9A-HJ-NP-Za-km-z]{33}$/u.test(c.actionExecutor)))throw TypeError(\"IP-control actionExecutor must be a chain-local executor address.\")}"
+  },
+  {
+    "name": "bc",
+    "kind": "FunctionDeclaration",
+    "source": "function bc(a,b){if(null===a||\"object\"!=typeof a||Array.isArray(a))throw TypeError(`${b} must be an object.`);return a}"
+  },
+  {
+    "name": "bd",
+    "kind": "FunctionDeclaration",
+    "source": "function bd(a,b){if(!Array.isArray(a))throw TypeError(`${b} must be an array.`);return a}"
+  },
+  {
+    "name": "be",
+    "kind": "FunctionDeclaration",
+    "source": "function be(a,b){if(\"string\"!=typeof a)throw TypeError(`${b} must be a string.`);return a}"
+  },
+  {
+    "name": "bf",
+    "kind": "FunctionDeclaration",
+    "source": "function bf(a,b){if(\"number\"!=typeof a||!Number.isFinite(a))throw TypeError(`${b} must be a finite number.`);return a}"
+  },
+  {
+    "name": "bg",
+    "kind": "FunctionDeclaration",
+    "source": "function bg(a,b){void 0!==a&&be(a,b)}"
+  },
+  {
+    "name": "bh",
+    "kind": "FunctionDeclaration",
+    "source": "function bh(a,b){void 0!==a&&bf(a,b)}"
+  },
+  {
+    "name": "bi",
+    "kind": "FunctionDeclaration",
+    "source": "function bi(a,b){void 0!==a&&function(a,b){if(\"boolean\"!=typeof a)throw TypeError(`${b} must be a boolean.`)}(a,b)}"
+  },
+  {
+    "name": "bj",
+    "kind": "FunctionDeclaration",
+    "source": "function bj(a,b,c){let d=be(a,c);if(!b.includes(d))throw TypeError(`${c} has an unsupported value.`);return d}"
+  },
+  {
+    "name": "bk",
+    "kind": "FunctionDeclaration",
+    "source": "function bk(a,b){let c=bc(a,b);bj(c.algorithm,[\"sha256\",\"keccak256\",\"none\"],`${b}.algorithm`),be(c.digest,`${b}.digest`),bh(c.byteLength,`${b}.byteLength`)}"
+  },
+  {
+    "name": "bl",
+    "kind": "FunctionDeclaration",
+    "source": "function bl(a,b){let c=bc(a,b);bj(c.protocol,[\"keel-graph-registry@1\"],`${b}.protocol`),bf(c.chainId,`${b}.chainId`),be(c.registry,`${b}.registry`),be(c.graphId,`${b}.graphId`),bf(c.version,`${b}.version`),bj(c.storageTier,[\"remote-pinned\",\"content-addressed\",\"onchain\"],`${b}.storageTier`)}"
+  },
+  {
+    "name": "bm",
+    "kind": "FunctionDeclaration",
+    "source": "function bm(a,b){let c=bc(a,b);be(c.resource,`${b}.resource`),bk(c.integrity,`${b}.integrity`)}"
+  },
+  {
+    "name": "bn",
+    "kind": "FunctionDeclaration",
+    "source": "function bn(a){var b,c,d,e,f,g,h,i;let j,k,l,m,n,o,p,q=bc(a,\"$\");be(q.schema,\"$.schema\"),be(q.canonicalization,\"$.canonicalization\"),be(q.id,\"$.id\"),be(q.name,\"$.name\"),bg(q.description,\"$.description\");let r=bc(q.entrypoint,\"$.entrypoint\");be(r.resource,\"$.entrypoint.resource\"),bj(r.mode,[\"html\",\"module\",\"svg\",\"image\",\"video\",\"audio\",\"model\"],\"$.entrypoint.mode\"),bg(r.mount,\"$.entrypoint.mount\");let s=bd(q.resources,\"$.resources\");s.forEach((a,b)=>{var c;let d;be((d=bc(a,c=`$.resources[${b}]`)).id,`${c}.id`),bj(d.role,aN,`${c}.role`),be(d.mediaType,`${c}.mediaType`),bi(d.executable,`${c}.executable`),bg(d.originalName,`${c}.originalName`),bg(d.description,`${c}.description`),void 0!==d.aliases&&bd(d.aliases,`${c}.aliases`).forEach((a,b)=>be(a,`${c}.aliases[${b}]`)),bd(d.sources,`${c}.sources`).forEach((a,b)=>(function(a,b){let c=bc(a,b),d=bj(c.kind,[\"inline\",\"uri\",\"onchain\",\"contract-call\",\"composite\"],`${b}.kind`);switch(void 0!==c.compression&&bj(c.compression,[\"none\",\"gzip\",\"deflate\",\"brotli\"],`${b}.compression`),d){case\"inline\":be(c.data,`${b}.data`),bj(c.encoding,[\"utf8\",\"base64\",\"base64url\"],`${b}.encoding`),bk(c.integrity,`${b}.integrity`);return;case\"uri\":be(c.uri,`${b}.uri`),void 0!==c.gateways&&bd(c.gateways,`${b}.gateways`).forEach((a,c)=>be(a,`${b}.gateways[${c}]`)),bk(c.integrity,`${b}.integrity`),bi(c.immutable,`${b}.immutable`);return;case\"onchain\":bf(c.chainId,`${b}.chainId`),be(c.store,`${b}.store`),be(c.objectId,`${b}.objectId`),void 0!==c.chunks&&bd(c.chunks,`${b}.chunks`).forEach((a,c)=>be(a,`${b}.chunks[${c}]`)),bk(c.integrity,`${b}.integrity`);return;case\"contract-call\":bf(c.chainId,`${b}.chainId`),be(c.to,`${b}.to`),be(c.data,`${b}.data`),bj(c.decode,[\"bytes\",\"string\",\"base64\"],`${b}.decode`),bk(c.integrity,`${b}.integrity`);return;case\"composite\":bd(c.parts,`${b}.parts`).forEach((a,c)=>be(a,`${b}.parts[${c}]`)),bg(c.separator,`${b}.separator`),bk(c.integrity,`${b}.integrity`)}})(a,`${c}.sources[${b}]`)),void 0!==d.extensions&&bc(d.extensions,`${c}.extensions`)});let t=bc(q.fallback,\"$.fallback\");if(be(t.image,\"$.fallback.image\"),bg(t.animation,\"$.fallback.animation\"),bg(t.externalUrl,\"$.fallback.externalUrl\"),bg(t.backgroundColor,\"$.fallback.backgroundColor\"),void 0!==q.thumbnail){let a=bc(q.thumbnail,\"$.thumbnail\");if(bj(a.protocol,[\"keel-thumbnail@1\"],\"$.thumbnail.protocol\"),bg(a.image,\"$.thumbnail.image\"),bg(a.animation,\"$.thumbnail.animation\"),bf(a.maxBytes,\"$.thumbnail.maxBytes\"),void 0!==a.capture){let b=bc(a.capture,\"$.thumbnail.capture\");bj(b.mode,[\"signal\",\"after-init\",\"time\"],\"$.thumbnail.capture.mode\"),bj(b.target,[\"canvas\",\"viewport\"],\"$.thumbnail.capture.target\"),bh(b.delayMs,\"$.thumbnail.capture.delayMs\"),bh(b.durationMs,\"$.thumbnail.capture.durationMs\"),bh(b.frameRate,\"$.thumbnail.capture.frameRate\"),bg(b.label,\"$.thumbnail.capture.label\")}}if(void 0!==q.mediaDerivatives&&bd(q.mediaDerivatives,\"$.mediaDerivatives\").forEach((a,b)=>{bc(a,`$.mediaDerivatives[${b}]`),as(a)}),void 0!==q.stakeObject&&(bc(q.stakeObject,\"$.stakeObject\"),aA(q.stakeObject,new Set(s.map(a=>a.id)))),function(a,b){let c=bc(a,b),d=bc(c.engine,`${b}.engine`);bj(d.protocol,[\"keel-runtime@1\"],`${b}.engine.protocol`),bj(d.viewerProtocol,[\"keel-viewer@1\"],`${b}.engine.viewerProtocol`),bj(d.renderer,[\"browser\"],`${b}.engine.renderer`),void 0!==d.viewerMirrors&&bd(d.viewerMirrors,`${b}.engine.viewerMirrors`).forEach((a,c)=>{let d=bc(a,`${b}.engine.viewerMirrors[${c}]`);be(d.id,`${b}.engine.viewerMirrors[${c}].id`),be(d.uri,`${b}.engine.viewerMirrors[${c}].uri`),bk(d.integrity,`${b}.engine.viewerMirrors[${c}].integrity`),bi(d.immutable,`${b}.engine.viewerMirrors[${c}].immutable`),bg(d.launchUrlTemplate,`${b}.engine.viewerMirrors[${c}].launchUrlTemplate`)});let e=bc(c.determinism,`${b}.determinism`);if(\"replay\"===bj(e.mode,[\"live\",\"replay\"],`${b}.determinism.mode`)){be(e.seed,`${b}.determinism.seed`),bj(e.randomAlgorithm,[\"xoshiro128ss\"],`${b}.determinism.randomAlgorithm`);let a=bc(e.viewport,`${b}.determinism.viewport`);bf(a.width,`${b}.determinism.viewport.width`),bf(a.height,`${b}.determinism.viewport.height`),bf(a.devicePixelRatio,`${b}.determinism.viewport.devicePixelRatio`);let c=bc(e.clock,`${b}.determinism.clock`),d=bj(c.mode,[\"fixed\",\"frame\"],`${b}.determinism.clock.mode`);bf(c.epochMs,`${b}.determinism.clock.epochMs`),\"frame\"===d&&bf(c.frameDurationMs,`${b}.determinism.clock.frameDurationMs`),be(e.locale,`${b}.determinism.locale`),be(e.timezone,`${b}.determinism.timezone`)}let f=bc(c.content,`${b}.content`);if(bj(f.protocol,[\"keel-content-gateway@1\"],`${b}.content.protocol`),bj(f.mode,[\"verified-only\"],`${b}.content.mode`),bj(f.externalSources,[\"host-verified\"],`${b}.content.externalSources`),bj(f.manifestTrust,[\"digest\",\"registry\"],`${b}.content.manifestTrust`),!0!==f.blockUndeclared)throw TypeError(`${b}.content.blockUndeclared must be true.`);if(bg(f.resourcePathPrefix,`${b}.content.resourcePathPrefix`),bg(f.onchainPathPrefix,`${b}.content.onchainPathPrefix`),bg(f.ipfsPathPrefix,`${b}.content.ipfsPathPrefix`),bj(c.sandbox,[\"strict\",\"isolated-origin\"],`${b}.sandbox`),void 0!==c.capabilities){let a=bc(c.capabilities,`${b}.capabilities`);if(\"network\"in a)throw TypeError(`${b}.capabilities.network is not supported; remote sources are host-verified.`);for(let c of[\"downloads\",\"pointerLock\",\"fullscreen\",\"clipboardWrite\",\"gamepad\",\"audioAutoplay\",\"webAssembly\"])bi(a[c],`${b}.capabilities.${c}`)}if(void 0!==c.networkAllowlist)throw TypeError(`${b}.networkAllowlist is not supported; declare hashed URI sources instead.`);for(let a of[\"maxResourceBytes\",\"maxTotalBytes\",\"maxRecursionDepth\",\"maxResources\",\"timeoutMs\"])bh(c[a],`${b}.${a}`)}(q.runtime,\"$.runtime\"),void 0!==q.plugins&&(bj((j=bc(q.plugins,b=\"$.plugins\")).protocol,[\"keel-plugin-bindings@1\"],`${b}.protocol`),bd(j.plugins,`${b}.plugins`).forEach((a,c)=>{var d;let e,f=`${b}.plugins[${c}]`,g=bc(a,f);be(g.id,`${f}.id`),be(g.manifestResource,`${f}.manifestResource`),bk(g.manifestIntegrity,`${f}.manifestIntegrity`),bl(g.graph,`${f}.graph`),bj((e=bc(g.trust,d=`${f}.trust`)).protocol,[\"keel-plugin-registry@1\"],`${d}.protocol`),bf(e.chainId,`${d}.chainId`),be(e.registry,`${d}.registry`),be(e.specDigest,`${d}.specDigest`),bj(e.requiredStatus,[\"sanctioned\"],`${d}.requiredStatus`)})),void 0!==q.libraries&&(bj((k=bc(q.libraries,c=\"$.libraries\")).protocol,[\"keel-library-bindings@1\"],`${c}.protocol`),bd(k.assets,`${c}.assets`).forEach((a,b)=>{let d=`${c}.assets[${b}]`,e=bc(a,d);be(e.id,`${d}.id`),be(e.resource,`${d}.resource`),bk(e.resourceIntegrity,`${d}.resourceIntegrity`),bf(e.chainId,`${d}.chainId`),be(e.registry,`${d}.registry`),be(e.assetId,`${d}.assetId`),bf(e.policyVersion,`${d}.policyVersion`),be(e.policyCommitment,`${d}.policyCommitment`),bl(e.graph,`${d}.graph`),be(e.manifestDigest,`${d}.manifestDigest`),be(e.resourceGraphDigest,`${d}.resourceGraphDigest`);let f=bc(e.updates,`${d}.updates`);if(bj(f.mode,[\"locked\",\"manual\",\"auto-compatible\"],`${d}.updates.mode`),void 0!==f.compatibleGraphVersions){let a=bc(f.compatibleGraphVersions,`${d}.updates.compatibleGraphVersions`);bf(a.min,`${d}.updates.compatibleGraphVersions.min`),bf(a.max,`${d}.updates.compatibleGraphVersions.max`)}})),void 0!==q.stack&&(bj((l=bc(q.stack,d=\"$.stack\")).protocol,[\"keel-project-stack@1\"],`${d}.protocol`),bd(l.components,`${d}.components`).forEach((a,b)=>{let c=`${d}.components[${b}]`,e=bc(a,c);be(e.id,`${c}.id`),be(e.label,`${c}.label`),bj(e.role,[\"entrypoint\",\"renderer\",\"runtime\",\"script\",\"module\",\"style\",\"shader\",\"sprite-atlas\",\"sprite-loader\",\"audio-engine\",\"wallet-runtime\",\"audio\",\"image\",\"font\",\"model\",\"data\",\"plugin\",\"library\",\"other\"],`${c}.role`),bf(e.order,`${c}.order`),be(e.resource,`${c}.resource`),bk(e.resourceIntegrity,`${c}.resourceIntegrity`),bg(e.library,`${c}.library`),void 0!==e.labelOrigin&&bj(e.labelOrigin,[\"creator\",\"library-default\"],`${c}.labelOrigin`),bj(e.format,[\"asset\",\"classic-script\",\"es-module\",\"commonjs\",\"umd\",\"wasm\"],`${c}.format`);let f=bc(e.updates,`${c}.updates`);if(bj(f.mode,[\"locked\",\"manual\",\"auto-compatible\"],`${c}.updates.mode`),void 0!==f.compatibleGraphVersions){let a=bc(f.compatibleGraphVersions,`${c}.updates.compatibleGraphVersions`);bf(a.min,`${c}.updates.compatibleGraphVersions.min`),bf(a.max,`${c}.updates.compatibleGraphVersions.max`)}})),void 0!==q.build&&function(a,b){let c=bc(a,b);bj(c.protocol,[\"keel-build-provenance@1\"],`${b}.protocol`);let d=bc(c.source,`${b}.source`);bj(d.availability,[\"included\",\"digest-only\"],`${b}.source.availability`),bg(d.resource,`${b}.source.resource`),bk(d.integrity,`${b}.source.integrity`),bd(c.steps,`${b}.steps`).forEach((a,c)=>{let d=`${b}.steps[${c}]`,e=bc(a,d);be(e.id,`${d}.id`),bj(e.operation,[\"normalize\",\"transpile\",\"bundle\",\"minify\",\"compress\",\"encode\",\"package\"],`${d}.operation`);let f=bc(e.tool,`${d}.tool`);if(be(f.name,`${d}.tool.name`),be(f.version,`${d}.tool.version`),bk(e.input,`${d}.input`),bk(e.output,`${d}.output`),be(e.optionsDigest,`${d}.optionsDigest`),!0!==e.deterministic)throw TypeError(`${d}.deterministic must be true.`)});let e=bc(c.final,`${b}.final`);if(be(e.resource,`${b}.final.resource`),bk(e.integrity,`${b}.final.integrity`),void 0!==c.storage){let a=bc(c.storage,`${b}.storage`);bj(a.compression,[\"gzip\",\"deflate\",\"brotli\"],`${b}.storage.compression`),bk(a.input,`${b}.storage.input`),bk(a.stored,`${b}.storage.stored`);let d=bc(a.tool,`${b}.storage.tool`);if(be(d.name,`${b}.storage.tool.name`),be(d.version,`${b}.storage.tool.version`),be(a.optionsDigest,`${b}.storage.optionsDigest`),!0!==a.deterministic)throw TypeError(`${b}.storage.deterministic must be true.`)}}(q.build,\"$.build\"),void 0!==q.contractPlugin&&function(a,b){let c=bc(a,b);if(bj(c.protocol,[\"keel-contract-plugin@1\"],`${b}.protocol`),be(c.pluginId,`${b}.pluginId`),bf(c.version,`${b}.version`),void 0!==c.parent){let a=bc(c.parent,`${b}.parent`);bf(a.version,`${b}.parent.version`),be(a.manifestDigest,`${b}.parent.manifestDigest`)}if(bl(c.graph,`${b}.graph`),void 0!==c.trust)throw TypeError(`${b}.trust is forbidden because it would create a circular manifest/spec digest; trust belongs to the outer plugin reference.`);let d=bc(c.contract,`${b}.contract`);bf(d.chainId,`${b}.contract.chainId`),be(d.address,`${b}.contract.address`),be(d.runtimeCodeHash,`${b}.contract.runtimeCodeHash`),be(d.requiredInterfaceId,`${b}.contract.requiredInterfaceId`);let e=bc(c.runtime,`${b}.runtime`);bm(e.abi,`${b}.runtime.abi`),bm(e.adapter,`${b}.runtime.adapter`),bm(e.walletLibrary,`${b}.runtime.walletLibrary`);let f=bc(c.permissions,`${b}.permissions`);bj(f.protocol,[\"keel-wallet-intents@1\"],`${b}.permissions.protocol`),be(f.digest,`${b}.permissions.digest`),bd(f.intents,`${b}.permissions.intents`).forEach((a,c)=>{let d=`${b}.permissions.intents[${c}]`,e=bc(a,d);be(e.id,`${d}.id`),be(e.label,`${d}.label`),bj(e.target,[\"plugin-contract\",\"artifact-collection\"],`${d}.target`),be(e.selector,`${d}.selector`),bj(e.stateMutability,[\"view\",\"nonpayable\",\"payable\"],`${d}.stateMutability`),bj(e.valuePolicy,[\"zero\",\"exact-quote\"],`${d}.valuePolicy`),be(e.confirmation,`${d}.confirmation`)})}(q.contractPlugin,\"$.contractPlugin\"),void 0!==q.anchor&&(bj((m=bc(q.anchor,e=\"$.anchor\")).protocol,[\"keel-artifact-registry@1\"],`${e}.protocol`),bj(m.kind,[\"artifact-registry\"],`${e}.kind`),bf(m.chainId,`${e}.chainId`),be(m.registry,`${e}.registry`),be(m.collection,`${e}.collection`),be(m.tokenId,`${e}.tokenId`),bh(m.revision,`${e}.revision`)),bf((n=bc(q.revision,f=\"$.revision\")).number,`${f}.number`),bh(n.parent,`${f}.parent`),g=n.parentDigest,h=`${f}.parentDigest`,void 0!==g&&bk(g,h),bf((o=bc(n.compatibility,`${f}.compatibility`)).min,`${f}.compatibility.min`),bf(o.max,`${f}.compatibility.max`),bj(n.policy,[\"immutable\",\"creator\",\"token-owner\",\"creator-or-token-owner\",\"timelocked\"],`${f}.policy`),bg(n.activationTime,`${f}.activationTime`),bi(n.frozen,`${f}.frozen`),bg(n.notes,`${f}.notes`),bg((p=bc(q.provenance,i=\"$.provenance\")).creator,`${i}.creator`),be(p.createdAt,`${i}.createdAt`),bg(p.collection,`${i}.collection`),bg(p.tokenId,`${i}.tokenId`),bh(p.chainId,`${i}.chainId`),bg(p.sourceRepository,`${i}.sourceRepository`),bg(p.license,`${i}.license`),void 0!==q.downloads&&bd(q.downloads,\"$.downloads\").forEach((a,b)=>{let c=bc(a,`$.downloads[${b}]`);be(c.resource,`$.downloads[${b}].resource`),be(c.label,`$.downloads[${b}].label`),bg(c.filename,`$.downloads[${b}].filename`)}),void 0!==q.attributes&&bd(q.attributes,\"$.attributes\").forEach((a,b)=>{let c=bc(a,`$.attributes[${b}]`);if(be(c.trait_type,`$.attributes[${b}].trait_type`),\"string\"!=typeof c.value&&\"number\"!=typeof c.value)throw TypeError(`$.attributes[${b}].value must be a string or number.`);bg(c.display_type,`$.attributes[${b}].display_type`)}),void 0!==q.attributions&&aD(q.attributions),void 0!==q.extensions){let a=bc(q.extensions,\"$.extensions\");void 0!==a[aI]&&aM(a[aI]),void 0!==a[a4]&&bb(a[a4],new Set(s.map(a=>a.id)))}return a3(a),a}"
+  },
+  {
+    "name": "bo",
+    "kind": "VariableDeclaration",
+    "source": "bo=\"keel-source-analysis@1\""
+  },
+  {
+    "name": "bp",
+    "kind": "VariableDeclaration",
+    "source": "bp=\"1.0.0\""
+  },
+  {
+    "name": "bq",
+    "kind": "VariableDeclaration",
+    "source": "bq=/^(?:text\\/|application\\/(?:javascript|json|typescript|xml|wasm-text))/iu"
+  },
+  {
+    "name": "br",
+    "kind": "VariableDeclaration",
+    "source": "br=/\\b[A-Za-z_$][A-Za-z0-9_$]*\\b/gu"
+  },
+  {
+    "name": "bs",
+    "kind": "VariableDeclaration",
+    "source": "bs=/\\/\\*[\\s\\S]*?\\*\\/|\\/\\/[^\\n\\r]*/gu"
+  },
+  {
+    "name": "bt",
+    "kind": "VariableDeclaration",
+    "source": "bt=/\\b(?:eval|Function)\\s*\\(|\\bset(?:Timeout|Interval)\\s*\\(\\s*[\"']/gu"
+  },
+  {
+    "name": "bu",
+    "kind": "VariableDeclaration",
+    "source": "bu=/[\"'`](?:[A-Za-z0-9+/]{160,}={0,2}|(?:\\\\x[0-9a-fA-F]{2}){40,}|(?:\\\\u[0-9a-fA-F]{4}){24,})[\"'`]/gu"
+  },
+  {
+    "name": "bv",
+    "kind": "VariableDeclaration",
+    "source": "bv=new Set([\"as\",\"async\",\"await\",\"break\",\"case\",\"catch\",\"class\",\"const\",\"continue\",\"debugger\",\"default\",\"delete\",\"do\",\"else\",\"export\",\"extends\",\"false\",\"finally\",\"for\",\"from\",\"function\",\"get\",\"if\",\"import\",\"in\",\"instanceof\",\"let\",\"new\",\"null\",\"of\",\"return\",\"set\",\"static\",\"super\",\"switch\",\"this\",\"throw\",\"true\",\"try\",\"typeof\",\"undefined\",\"var\",\"void\",\"while\",\"with\",\"yield\"])"
+  },
+  {
+    "name": "bw",
+    "kind": "FunctionDeclaration",
+    "source": "function bw(a,b){return 0===b?0:Math.round(1e3*a/b)}"
+  },
+  {
+    "name": "bx",
+    "kind": "FunctionDeclaration",
+    "source": "function bx(a,b){return a.algorithm===b.algorithm&&a.digest===b.digest&&a.byteLength===b.byteLength}"
+  },
+  {
+    "name": "by",
+    "kind": "FunctionDeclaration",
+    "source": "async function by(a){let b=function(a,b){let c;if(!bq.test(b))return{protocol:bo,analyzer:{name:\"keel-source-readability\",version:bp},mediaType:b,classification:\"not-applicable\",readabilityScore:0,metrics:{characters:a.length,lines:0,longestLine:0,averageLine:0,whitespaceRatioPermille:0,commentCharacters:0,identifiers:0,shortIdentifierRatioPermille:0,dynamicCodeCalls:0,encodedLiteralCharacters:0},reasons:[\"Readability analysis applies only to declared textual source.\"]};let d=a.split(/\\r?\\n/u),e=d.reduce((a,b)=>Math.max(a,b.length),0),f=a.match(/\\s/gu)?.length??0,g=a.match(bs)??[],h=(a.match(br)??[]).filter(a=>!bv.has(a)),i=h.filter(a=>a.length<=2).length,j=a.match(bt)?.length??0,k=(a.match(bu)??[]).reduce((a,b)=>a+b.length,0),l=bw(f,a.length),m=bw(i,h.length),n=g.reduce((a,b)=>a+b.length,0),o=0===d.length?0:Math.round(a.length/d.length),p=a.length>=400&&(e>=800||o>=320)&&l<160,q=k>=160,r=h.length>=20&&m>=720;c=j>0&&(q||r)||k>=2e3?\"potentially-obfuscated\":p||r&&e>=500?\"minified\":\"readable\";let s=100;e>=800?s-=30:e>=300&&(s-=12),l<80?s-=24:l<130&&(s-=10),r&&(s-=28),j>0&&(s-=Math.min(20,5*j)),q&&(s-=Math.min(30,Math.ceil(k/250))),n>0&&(s+=4),s=Math.min(Math.max(s,0),100);let t=[];return\"readable\"===c&&t.push(\"Layout and identifier signals are consistent with human-readable source.\"),p&&t.push(\"Most code is concentrated into unusually long lines with little whitespace.\"),r&&t.push(\"A high share of identifiers are one or two characters long.\"),j>0&&t.push(\"Dynamic code construction is present and requires reviewer attention.\"),q&&t.push(\"Large encoded string payloads are present and require reviewer attention.\"),n>0&&t.push(\"Source retains comments that can aid review.\"),0===t.length&&t.push(\"No strong readability or obfuscation signal was found.\"),{protocol:bo,analyzer:{name:\"keel-source-readability\",version:bp},mediaType:b,classification:c,readabilityScore:s,metrics:{characters:a.length,lines:d.length,longestLine:e,averageLine:o,whitespaceRatioPermille:l,commentCharacters:n,identifiers:h.length,shortIdentifierRatioPermille:m,dynamicCodeCalls:j,encodedLiteralCharacters:k},reasons:t}}(bq.test(a.mediaType)?new TextDecoder(\"utf-8\",{fatal:!0}).decode(a.sourceBytes):\"\",a.mediaType),[c,d,e]=await Promise.all([T(a.sourceBytes),T(a.outputBytes),T(x(R(b)))]);if(!bx(c,d)&&void 0===a.buildRecipeDigest)throw TypeError(\"Transformed output requires the digest of its deterministic build recipe.\");return{protocol:\"keel-source-receipt@1\",source:c,output:d,report:b,reportDigest:e.digest,...void 0===a.repository?{}:{repository:a.repository},...void 0===a.buildRecipeDigest?{}:{buildRecipeDigest:a.buildRecipeDigest},disposition:bx(c,d)?\"exact-source-output\":\"queued\"}}"
+  },
+  {
+    "name": "bz",
+    "kind": "VariableDeclaration",
+    "source": "bz=\"keel-creation-binding@1\""
+  },
+  {
+    "name": "bA",
+    "kind": "VariableDeclaration",
+    "source": "bA=\"application/vnd.keel.creation-module+json\""
+  },
+  {
+    "name": "bB",
+    "kind": "VariableDeclaration",
+    "source": "bB=/^[a-z][a-z0-9-]{0,63}$/u"
+  },
+  {
+    "name": "bC",
+    "kind": "VariableDeclaration",
+    "source": "bC=/^configuration\\.[a-z][a-z0-9.-]{0,95}$/u"
+  },
+  {
+    "name": "bD",
+    "kind": "VariableDeclaration",
+    "source": "bD=/^#[0-9a-f]{6}$/u"
+  },
+  {
+    "name": "bE",
+    "kind": "VariableDeclaration",
+    "source": "bE=/^0x[0-9a-f]{40}$/u"
+  },
+  {
+    "name": "bF",
+    "kind": "VariableDeclaration",
+    "source": "bF=/^0x[0-9a-f]{64}$/u"
+  },
+  {
+    "name": "bG",
+    "kind": "VariableDeclaration",
+    "source": "bG=new Set([\"artwork\",\"interactive\",\"generative\",\"game\",\"audio\",\"tool\"])"
+  },
+  {
+    "name": "bH",
+    "kind": "VariableDeclaration",
+    "source": "bH=new Set([\"onchain\",\"hybrid\"])"
+  },
+  {
+    "name": "bI",
+    "kind": "VariableDeclaration",
+    "source": "bI=new Set([\"recursive\",\"hybrid\",\"onchfs\"])"
+  },
+  {
+    "name": "bJ",
+    "kind": "VariableDeclaration",
+    "source": "bJ=new Set([\"studio.standard-project@1\",\"studio.seeded-character@1\"])"
+  },
+  {
+    "name": "bK",
+    "kind": "VariableDeclaration",
+    "source": "bK=new Set([\"signal\",\"after-init\",\"time\"])"
+  },
+  {
+    "name": "bL",
+    "kind": "VariableDeclaration",
+    "source": "bL=/^(?:\\.[a-z0-9][a-z0-9.+_-]{0,31}|[a-z0-9][a-z0-9!#$&^_.+-]{0,63}\\/(?:\\*|[a-z0-9][a-z0-9!#$&^_.+-]{0,63}))$/iu"
+  },
+  {
+    "name": "bM",
+    "kind": "FunctionDeclaration",
+    "source": "function bM(a,b,c){if(0===a.trim().length||a.length>c||/[\\u0000-\\u001f\\u007f]/u.test(a))throw TypeError(`${b} is invalid.`)}"
+  },
+  {
+    "name": "bN",
+    "kind": "FunctionDeclaration",
+    "source": "function bN(a){if(null===a||\"object\"!=typeof a||Array.isArray(a))throw TypeError(\"Creation module must be an object.\");if(\"keel-creation-module@1\"!==a.protocol)throw TypeError(\"Unsupported Keel creation module.\");if(!bB.test(a.id)||!Number.isSafeInteger(a.version)||a.version<1)throw TypeError(\"Creation module identity is invalid.\");if(bM(a.title,\"Creation module title\",96),bM(a.summary,\"Creation module summary\",320),!bG.has(a.category))throw TypeError(\"Creation module category is invalid.\");if(a.plugin?.protocol!==\"keel-creation-plugin@1\"||!bJ.has(a.plugin.renderer))throw TypeError(\"Creation module plugin renderer is unsupported.\");if(!bH.has(a.output?.storageStrategy)||!bI.has(a.output?.marketplaceExportMode)||a.output?.generatePreview!==!0)throw TypeError(\"Creation module output policy is invalid.\");if(a.prompts.length<2||a.prompts.length>24)throw RangeError(\"Creation modules need 2 through 24 prompts.\");let b=new Set,c=new Set,d=0,e=0;for(let[f,g]of a.prompts.entries()){let a=`prompts[${f}]`;if(!bB.test(g.id)||b.has(g.id))throw TypeError(`${a}.id must be valid and unique.`);if(b.add(g.id),c.has(g.target))throw TypeError(`${a}.target must be unique.`);if(c.add(g.target),bM(g.label,`${a}.label`,96),\"boolean\"!=typeof g.required)throw TypeError(`${a}.required must be boolean.`);if(void 0!==g.help&&bM(g.help,`${a}.help`,320),\"artifact.name\"===g.target&&(d+=1),\"artifact.resources\"===g.target&&(e+=1),g.target.startsWith(\"configuration.\")&&!bC.test(g.target))throw TypeError(`${a}.target is invalid.`);if(\"short-text\"===g.type||\"long-text\"===g.type){if(\"artifact.name\"!==g.target&&\"artifact.description\"!==g.target&&!bC.test(g.target))throw TypeError(`${a}.target is not valid for text.`);if(\"artifact.name\"===g.target&&\"short-text\"!==g.type)throw TypeError(`${a}.artifact name must be short text.`);let b=\"short-text\"===g.type?160:4e3;if(!Number.isSafeInteger(g.maxLength)||g.maxLength<1||g.maxLength>b)throw RangeError(`${a}.maxLength is invalid.`);if(void 0!==g.default&&(\"string\"!=typeof g.default||g.default.length>g.maxLength))throw RangeError(`${a}.default is invalid.`);void 0!==g.placeholder&&bM(g.placeholder,`${a}.placeholder`,160)}else if(\"choice\"===g.type){if(!bC.test(g.target))throw TypeError(`${a}.target is not valid for a choice.`);if(g.options.length<2||g.options.length>24)throw RangeError(`${a}.options is invalid.`);let b=new Set;for(let c of g.options){if(!bB.test(c.value)||b.has(c.value))throw TypeError(`${a} option values must be valid and unique.`);b.add(c.value),bM(c.label,`${a} option label`,80)}if(void 0!==g.default&&!b.has(g.default))throw TypeError(`${a}.default is not an option.`)}else if(\"toggle\"===g.type){if(!bC.test(g.target))throw TypeError(`${a}.target is not valid for a toggle.`);if(\"boolean\"!=typeof g.default)throw TypeError(`${a}.default must be boolean.`)}else if(\"number\"===g.type){if(!bC.test(g.target))throw TypeError(`${a}.target is not valid for a number.`);if(![g.min,g.max,g.step].every(Number.isFinite)||g.min>g.max||g.step<=0)throw RangeError(`${a} numeric range is invalid.`);if(void 0!==g.default&&(g.default<g.min||g.default>g.max))throw RangeError(`${a}.default is outside its range.`);if(void 0!==g.default&&Math.abs((g.default-g.min)/g.step-Math.round((g.default-g.min)/g.step))>1e-9)throw RangeError(`${a}.default does not align to its step.`)}else if(\"color\"===g.type){if(!bC.test(g.target))throw TypeError(`${a}.target is not valid for a color.`);if(void 0!==g.default&&!bD.test(g.default))throw TypeError(`${a}.default must be a lower-case hex color.`)}else if(\"files\"===g.type){if(\"artifact.resources\"!==g.target)throw TypeError(`${a}.target is not valid for files.`);if(!Number.isSafeInteger(g.minFiles)||!Number.isSafeInteger(g.maxFiles)||g.minFiles<0||g.maxFiles<Math.max(1,g.minFiles)||g.maxFiles>256)throw RangeError(`${a} file count is invalid.`);if(0===g.accept.length||g.accept.length>32||g.accept.some(a=>\"string\"!=typeof a||!bL.test(a)))throw TypeError(`${a}.accept is invalid.`);if(\"boolean\"!=typeof g.directory)throw TypeError(`${a}.directory must be boolean.`)}else throw TypeError(`${a}.type is unsupported.`)}if(1!==d||1!==e)throw TypeError(\"A creation module must declare exactly one artifact name prompt and one resource prompt.\");let f=a.output.thumbnail;if(!bK.has(f?.mode)||!Number.isSafeInteger(f.delayMs)||f.delayMs<0||f.delayMs>3e4||!Number.isSafeInteger(f.durationMs)||f.durationMs<0||f.durationMs>3e4||!Number.isSafeInteger(f.frameRate)||f.frameRate<1||f.frameRate>60)throw RangeError(\"Creation module thumbnail settings are invalid.\")}"
+  },
+  {
+    "name": "bO",
+    "kind": "FunctionDeclaration",
+    "source": "function bO(a){if(null===a||\"object\"!=typeof a||Array.isArray(a))throw TypeError(\"Creation binding must be an object.\");if(a.protocol!==bz)throw TypeError(\"Unsupported Keel creation binding.\");if(!Number.isSafeInteger(a.chainId)||a.chainId<=0)throw TypeError(\"Creation binding chain is invalid.\");for(let[b,c]of[[\"library registry\",a.libraryRegistry],[\"graph registry\",a.graphRegistry],[\"manifest store\",a.moduleManifest?.store],[\"resource object registry\",a.moduleResource?.logicalObject?.registry],[\"resource link registry\",a.moduleResource?.logicalObject?.linkRegistry],[\"resource carrier\",a.moduleResource?.carrier?.store]])if(\"string\"!=typeof c||!bE.test(c))throw TypeError(`Creation binding ${b} is invalid.`);for(let[b,c]of[[\"asset ID\",a.assetId],[\"policy commitment\",a.policyCommitment],[\"graph ID\",a.graphId],[\"resource graph digest\",a.resourceGraphDigest],[\"manifest object ID\",a.moduleManifest?.objectId],[\"manifest digest\",a.moduleManifest?.digest],[\"resource logical object ID\",a.moduleResource?.logicalObject?.objectId],[\"resource carrier object ID\",a.moduleResource?.carrier?.objectId],[\"resource digest\",a.moduleResource?.digest]])if(\"string\"!=typeof c||!bF.test(c))throw TypeError(`Creation binding ${b} is invalid.`);if(!Number.isSafeInteger(a.policyVersion)||a.policyVersion<1||!Number.isSafeInteger(a.graphVersion)||a.graphVersion<1||!Number.isSafeInteger(a.moduleResource?.logicalObject?.revision)||a.moduleResource.logicalObject.revision<1||!Number.isSafeInteger(a.moduleResource?.byteLength)||a.moduleResource.byteLength<1||a.moduleResource?.mediaType!==bA||\"string\"!=typeof a.moduleResource?.resourceId||!bB.test(a.moduleResource.resourceId)||!bB.test(a.moduleId)||!Number.isSafeInteger(a.moduleVersion)||a.moduleVersion<1)throw TypeError(\"Creation binding version or resource metadata is invalid.\");if(null===a.answers||\"object\"!=typeof a.answers||Array.isArray(a.answers))throw TypeError(\"Creation binding answers must be an object.\");let b=Object.entries(a.answers);if(b.length>23)throw RangeError(\"Creation binding has too many answers.\");for(let[a,c]of b){if(!bB.test(a))throw TypeError(\"Creation binding answer ID is invalid.\");if(\"string\"==typeof c){if(c.length>4e3||/[\\u0000-\\u0008\\u000b\\u000c\\u000e-\\u001f\\u007f]/u.test(c))throw TypeError(\"Creation binding text answer is invalid.\")}else if(\"number\"==typeof c){if(!Number.isFinite(c))throw TypeError(\"Creation binding number answer is invalid.\")}else if(\"boolean\"!=typeof c)throw TypeError(\"Creation binding answers must be text, numbers, or booleans.\")}}"
+  },
+  {
+    "name": "bP",
+    "kind": "FunctionDeclaration",
+    "source": "function bP(a,b){bN(a);let c=new Set(a.prompts.filter(a=>\"files\"!==a.type).map(a=>a.id));if(Object.keys(b).some(a=>!c.has(a)))throw TypeError(\"Creation answers contain an undeclared prompt.\");let d={};for(let c of a.prompts){if(\"files\"===c.type)continue;let a=function(a,b){let c=b??a.default;if(void 0===c||\"\"===c||\"string\"==typeof c&&0===c.trim().length){if(a.required)throw TypeError(`${a.label} is required.`);return}if(\"short-text\"===a.type||\"long-text\"===a.type){if(\"string\"!=typeof c||c.length>a.maxLength)throw TypeError(`${a.label} is invalid.`);return c.trim()}if(\"choice\"===a.type){if(\"string\"!=typeof c||!a.options.some(a=>a.value===c))throw TypeError(`${a.label} is invalid.`);return c}if(\"toggle\"===a.type){if(\"boolean\"!=typeof c)throw TypeError(`${a.label} is invalid.`);return c}if(\"number\"===a.type){if(\"number\"!=typeof c||!Number.isFinite(c)||c<a.min||c>a.max||Math.abs((c-a.min)/a.step-Math.round((c-a.min)/a.step))>1e-9)throw TypeError(`${a.label} is invalid.`);return c}if(\"string\"!=typeof c||!bD.test(c))throw TypeError(`${a.label} is invalid.`);return c}(c,b[c.id]);void 0!==a&&(d[c.id]=a)}return d}"
+  },
+  {
+    "name": "bS",
+    "kind": "VariableDeclaration",
+    "source": "bS=/^[a-z][a-zA-Z0-9_-]{0,47}$/u"
+  },
+  {
+    "name": "bT",
+    "kind": "VariableDeclaration",
+    "source": "bT=/^#[0-9a-fA-F]{6}$/u"
+  },
+  {
+    "name": "bU",
+    "kind": "VariableDeclaration",
+    "source": "bU=/^(\\d{4})-(\\d{2})-(\\d{2})$/u"
+  },
+  {
+    "name": "bV",
+    "kind": "VariableDeclaration",
+    "source": "bV=/^(\\d{4})-(\\d{2})-(\\d{2})T(\\d{2}):(\\d{2})Z$/u"
+  },
+  {
+    "name": "bW",
+    "kind": "VariableDeclaration",
+    "source": "bW=/[\\u0000-\\u0008\\u000b\\u000c\\u000e-\\u001f\\u007f]/u"
+  },
+  {
+    "name": "bY",
+    "kind": "VariableDeclaration",
+    "source": "bY=new Set([\"text\",\"number\",\"select\",\"multi-select\",\"color\",\"palette\",\"boolean\",\"date\"])"
+  },
+  {
+    "name": "bZ",
+    "kind": "VariableDeclaration",
+    "source": "bZ=[\"key\",\"label\",\"help\",\"required\",\"placement\",\"type\"]"
+  },
+  {
+    "name": "b$",
+    "kind": "VariableDeclaration",
+    "source": "b$=[\"swatches\",\"allowCustom\",\"clamp\"]"
+  },
+  {
+    "name": "b_",
+    "kind": "VariableDeclaration",
+    "source": "b_={text:[...bZ,\"minLength\",\"maxLength\",\"multiline\",\"placeholder\",\"default\"],number:[...bZ,\"min\",\"max\",\"step\",\"control\",\"unit\",\"default\"],select:[...bZ,\"options\",\"default\"],\"multi-select\":[...bZ,\"options\",\"minItems\",\"maxItems\",\"default\"],color:[...bZ,...b$,\"default\"],palette:[...bZ,...b$,\"minItems\",\"maxItems\",\"default\"],boolean:[...bZ,\"default\"],date:[...bZ,\"time\",\"min\",\"max\",\"default\"]}"
+  },
+  {
+    "name": "b1",
+    "kind": "FunctionDeclaration",
+    "source": "function b1(a,b){if(null===a||\"object\"!=typeof a||Array.isArray(a))throw TypeError(`${b} must be an object.`);return a}"
+  },
+  {
+    "name": "b2",
+    "kind": "FunctionDeclaration",
+    "source": "function b2(a,b,c){for(let d of Object.keys(a))if(!b.includes(d))throw TypeError(`${c}: \"${d}\" is not supported.`)}"
+  },
+  {
+    "name": "b3",
+    "kind": "FunctionDeclaration",
+    "source": "function b3(a,b,c,d){if(\"string\"!=typeof a)throw TypeError(`${b} must be text.`);let e=a.trim();if(e.length<c||e.length>d||bW.test(e))throw TypeError(`${b} must be ${c}–${d} characters.`);return e}"
+  },
+  {
+    "name": "b4",
+    "kind": "FunctionDeclaration",
+    "source": "function b4(a,b,c,d){if(\"number\"!=typeof a||!Number.isSafeInteger(a)||a<c||a>d)throw TypeError(`${b} must be a whole number from ${c} to ${d}.`);return a}"
+  },
+  {
+    "name": "b5",
+    "kind": "FunctionDeclaration",
+    "source": "function b5(a,b,c,d){if(\"number\"!=typeof a||!Number.isFinite(a)||a<c||a>d)throw TypeError(`${b} must be a number from ${c} to ${d}.`);return a}"
+  },
+  {
+    "name": "b6",
+    "kind": "FunctionDeclaration",
+    "source": "function b6(a,b){if(\"boolean\"!=typeof a)throw TypeError(`${b} must be true or false.`);return a}"
+  },
+  {
+    "name": "b7",
+    "kind": "FunctionDeclaration",
+    "source": "function b7(a){return\"string\"==typeof a&&bT.test(a)?a.toLowerCase():void 0}"
+  },
+  {
+    "name": "b8",
+    "kind": "FunctionDeclaration",
+    "source": "function b8(a,b){if(!b)return!0;let{h:c,s:d,l:e}=function(a){let b=b7(a);if(!b)throw TypeError(\"Use a six-digit hex color.\");let c=Number.parseInt(b.slice(1,3),16)/255,d=Number.parseInt(b.slice(3,5),16)/255,e=Number.parseInt(b.slice(5,7),16)/255,f=Math.max(c,d,e),g=Math.min(c,d,e),h=(f+g)/2,i=f-g;if(0===i)return{h:0,s:0,l:100*h};let j=i/(1-Math.abs(2*h-1)),k=f===c?(d-e)/i%6:f===d?(e-c)/i+2:(c-d)/i+4;return(k*=60)<0&&(k+=360),{h:k,s:Math.min(100,100*j),l:100*h}}(a),f=(a,b)=>!b||a>=b[0]-1&&a<=b[1]+1;return!!f(d,b.saturation)&&!!f(e,b.lightness)&&(!b.hue||d<.5||function(a,b,c=0){let[d,e]=b;if(e-d>=360||0===d&&360===e)return!0;let f=((a-d)%360+360)%360;return f<=((e-d)%360+360)%360+c||f>=360-c}(c,b.hue,1))}"
+  },
+  {
+    "name": "b9",
+    "kind": "FunctionDeclaration",
+    "source": "function b9(a,b,c){if(!Array.isArray(a)||2!==a.length)throw TypeError(`${b} must be a [minimum, maximum] pair.`);return[b5(a[0],`${b} minimum`,0,c),b5(a[1],`${b} maximum`,0,c)]}"
+  },
+  {
+    "name": "ca",
+    "kind": "FunctionDeclaration",
+    "source": "function ca(a,b){if(\"string\"!=typeof a)return;let c=(b?bV:bU).exec(a);if(!c)return;let[d,e,f,g=0,h=0]=c.slice(1).map(Number);if(d<1||e<1||e>12||f<1||g>23||h>59)return;let i=new Date(Date.UTC(d,e-1,f));if(i.setUTCFullYear(d),i.getUTCMonth()===e-1&&i.getUTCDate()===f)return a}"
+  },
+  {
+    "name": "cb",
+    "kind": "FunctionDeclaration",
+    "source": "function cb(a,b){if(!Array.isArray(a)||a.length<2||a.length>256)throw TypeError(`${b} needs 2–256 options.`);let c=a.map((a,c)=>{let d=b1(a,`${b} option ${c+1}`);return b2(d,[\"value\",\"label\"],`${b} option ${c+1}`),{value:b3(d.value,`${b} option ${c+1} value`,1,96),label:b3(d.label,`${b} option ${c+1} label`,1,96)}});if(new Set(c.map(a=>a.value)).size!==c.length)throw TypeError(`${b}: option values must be unique.`);return c}"
+  },
+  {
+    "name": "cc",
+    "kind": "FunctionDeclaration",
+    "source": "function cc(a,b){let c={};if(void 0!==a.clamp&&(c.clamp=function(a,b){let c=b1(a,`${b} clamp`);if(b2(c,[\"hue\",\"saturation\",\"lightness\"],`${b} clamp`),0===Object.keys(c).length)throw TypeError(`${b} clamp needs at least one bound.`);let d={};for(let a of(void 0!==c.hue&&(d.hue=b9(c.hue,`${b} hue`,360)),[\"saturation\",\"lightness\"])){if(void 0===c[a])continue;let e=b9(c[a],`${b} ${a}`,100);if(e[0]>e[1])throw TypeError(`${b} ${a} minimum exceeds its maximum.`);d[a]=e}return d}(a.clamp,b)),void 0!==a.swatches){if(!Array.isArray(a.swatches)||a.swatches.length<1||a.swatches.length>64)throw TypeError(`${b} needs 1–64 swatches.`);let d=a.swatches.map(a=>{let d=b7(a);if(!d)throw TypeError(`${b}: swatches must be six-digit hex colors.`);if(!b8(d,c.clamp))throw TypeError(`${b}: swatch ${d} is outside the allowed color range.`);return d});if(new Set(d).size!==d.length)throw TypeError(`${b}: swatches must be unique.`);c.swatches=d}if(void 0!==a.allowCustom&&(c.allowCustom=b6(a.allowCustom,`${b} allowCustom`)),!1===c.allowCustom&&!c.swatches)throw TypeError(`${b}: swatches are required when custom colors are not allowed.`);return c}"
+  },
+  {
+    "name": "cd",
+    "kind": "FunctionDeclaration",
+    "source": "function cd(a,b){let c=b7(b);if(c)return!1===a.allowCustom?a.swatches?.includes(c)?c:void 0:b8(c,a.clamp)?c:void 0}"
+  },
+  {
+    "name": "ce",
+    "kind": "FunctionDeclaration",
+    "source": "function ce(a){return TypeError(`${a.label}: choose a value within the allowed settings.`)}"
+  },
+  {
+    "name": "cf",
+    "kind": "FunctionDeclaration",
+    "source": "function cf(a,b){switch(a.type){case\"text\":if(\"string\"!=typeof b||b.trim().length<a.minLength||b.length>a.maxLength||a.required&&0===b.trim().length)throw ce(a);return b;case\"number\":{if(\"number\"!=typeof b||!Number.isFinite(b)||b<a.min||b>a.max)throw ce(a);let c=(b-a.min)/a.step;if(Math.abs(c-Math.round(c))>1e-7)throw ce(a);return b}case\"boolean\":if(\"boolean\"!=typeof b)throw ce(a);return b;case\"color\":{let c=cd(a,b);if(!c)throw ce(a);return c}case\"select\":if(\"string\"!=typeof b||!a.options.some(a=>a.value===b))throw ce(a);return b;case\"date\":{let c=ca(b,!0===a.time);if(!c||void 0!==a.min&&c<a.min||void 0!==a.max&&c>a.max)throw ce(a);return c}case\"multi-select\":case\"palette\":{if(!Array.isArray(b)||b.length<Math.max(+!!a.required,a.minItems)||b.length>a.maxItems)throw ce(a);let c=b.map(b=>{if(\"palette\"===a.type){let c=cd(a,b);if(!c)throw ce(a);return c}if(\"string\"!=typeof b||!a.options.some(a=>a.value===b))throw ce(a);return b});if(new Set(c).size!==c.length)throw TypeError(`${a.label}: values must be unique.`);return c}}}"
+  },
+  {
+    "name": "cg",
+    "kind": "FunctionDeclaration",
+    "source": "function cg(a,b){let c,d=b1(a,`Setting ${b+1}`);if(\"string\"!=typeof d.type||!bY.has(d.type))throw TypeError(`Setting ${b+1} has an unsupported type.`);let e=d.type;if(b2(d,b_[e],`Setting ${b+1}`),\"string\"!=typeof d.key||!bS.test(d.key)||bX.has(d.key))throw TypeError(`Setting ${b+1}: use a key that starts with a lowercase letter followed by letters, numbers, underscores or hyphens.`);let f=b3(d.label,`Setting ${b+1} label`,1,96),g={key:d.key,label:f,required:b6(d.required,`${f} required`)};if(void 0!==d.help&&(g.help=b3(d.help,`${f} help`,0,320)),void 0!==d.placement){if(\"basic\"!==d.placement&&\"advanced\"!==d.placement)throw TypeError(`${f}: placement must be \"basic\" or \"advanced\".`);g.placement=d.placement}switch(e){case\"text\":{let a=b4(d.minLength,`${f} minimum length`,0,4e3),b=b4(d.maxLength,`${f} maximum length`,1,4e3);if(a>b)throw TypeError(`${f}: minimum length exceeds maximum.`);c={...g,type:e,minLength:a,maxLength:b,multiline:b6(d.multiline,`${f} multiline`),...void 0===d.placeholder?{}:{placeholder:b3(d.placeholder,`${f} placeholder`,0,160)}};break}case\"number\":{let a=b5(d.min,`${f} minimum`,-1e12,1e12),b=b5(d.max,`${f} maximum`,-1e12,1e12),h=b5(d.step,`${f} step`,1e-6,1e12);if(a>b||(b-a)/h>Number.MAX_SAFE_INTEGER)throw TypeError(`${f}: invalid number range.`);if(void 0!==d.control&&\"slider\"!==d.control&&\"field\"!==d.control)throw TypeError(`${f}: control must be \"slider\" or \"field\".`);c={...g,type:e,min:a,max:b,step:h,...void 0===d.control?{}:{control:d.control},...void 0===d.unit?{}:{unit:b3(d.unit,`${f} unit`,1,16)}};break}case\"select\":c={...g,type:e,options:cb(d.options,f)};break;case\"multi-select\":{let a=cb(d.options,f),b=b4(d.minItems,`${f} minimum selections`,0,64),h=b4(d.maxItems,`${f} maximum selections`,1,64);if(b>h)throw TypeError(`${f}: minimum count exceeds maximum.`);if(b>a.length)throw TypeError(`${f}: not enough options for the minimum count.`);c={...g,type:e,options:a,minItems:b,maxItems:h};break}case\"color\":c={...g,type:e,...cc(d,f)};break;case\"palette\":{let a=b4(d.minItems,`${f} minimum colors`,0,64),b=b4(d.maxItems,`${f} maximum colors`,1,64);if(a>b)throw TypeError(`${f}: minimum count exceeds maximum.`);let h=cc(d,f);if(!1===h.allowCustom&&h.swatches&&a>h.swatches.length)throw TypeError(`${f}: not enough swatches for the minimum count.`);c={...g,type:e,minItems:a,maxItems:b,...h};break}case\"boolean\":c={...g,type:e};break;case\"date\":{let a=void 0===d.time?void 0:b6(d.time,`${f} time`),b=(b,c)=>{let d=ca(b,!0===a);if(!d)throw TypeError(`${f} ${c} must be ${a?\"YYYY-MM-DDTHH:MMZ\":\"YYYY-MM-DD\"}.`);return d},h=void 0===d.min?void 0:b(d.min,\"minimum\"),i=void 0===d.max?void 0:b(d.max,\"maximum\");if(void 0!==h&&void 0!==i&&h>i)throw TypeError(`${f}: earliest date is after the latest date.`);c={...g,type:e,...void 0===a?{}:{time:a},...void 0===h?{}:{min:h},...void 0===i?{}:{max:i}}}}if(void 0!==d.default){let a=cf(c,d.default);c={...c,default:a}}return c}"
+  },
+  {
+    "name": "ch",
+    "kind": "FunctionDeclaration",
+    "source": "function ch(a){b0(a);let b=JSON.stringify(a);if(void 0===b||new TextEncoder().encode(b).byteLength>96e3)throw TypeError(\"Module settings exceed the 96 KB limit.\");let c=b1(a,\"Module settings\");if(b2(c,[\"protocol\",\"fields\"],\"Module settings\"),c.protocol!==bQ)throw TypeError(`Module settings must use ${bQ}.`);if(!Array.isArray(c.fields)||c.fields.length<1||c.fields.length>24)throw TypeError(\"Module settings need 1–24 fields.\");let d=c.fields.map(cg);if(new Set(d.map(a=>a.key)).size!==d.length)throw TypeError(\"Module input keys must be unique.\");return{protocol:bQ,fields:d}}"
+  },
+  {
+    "name": "cr",
+    "kind": "VariableDeclaration",
+    "source": "cr=/^[!-~]+$/u"
+  },
+  {
+    "name": "cs",
+    "kind": "FunctionDeclaration",
+    "source": "function cs(a){if(!Array.isArray(a)||0===a.length)throw RangeError(\"rpcHosts requires at least one entry.\");if(a.length>32)throw RangeError(\"rpcHosts accepts at most 32 entries.\");let b=new Set;return Object.freeze(a.map((a,c)=>{let d=function(a,b){if(\"string\"!=typeof a||0===a.length)throw TypeError(`rpcHosts[${b}] must be a non-empty string.`);let c=new TextEncoder().encode(a).byteLength;if(c>128)throw RangeError(`rpcHosts[${b}] is ${c} bytes; the limit is 128.`);if(!cr.test(a)||/[\"'\\\\@]/u.test(a))throw TypeError(`rpcHosts[${b}] must be printable ASCII without whitespace, quotes, backslashes, or credentials.`);let d=a.startsWith(\"https://\")&&a.length>8;if(!d&&/[/:?#]/u.test(a))throw TypeError(`rpcHosts[${b}] must be a bare host or an https:// URL.`);if(d)try{let b=new URL(a);if(0===b.hostname.length)throw TypeError(\"empty host\")}catch{throw TypeError(`rpcHosts[${b}] is not a parseable https:// URL.`)}return a}(a,c);if(b.has(d))throw TypeError(`rpcHosts[${c}] duplicates an earlier entry.`);return b.add(d),d}))}"
+  },
+  {
+    "name": "ct",
+    "kind": "FunctionDeclaration",
+    "source": "function ct(a,b){if(!Number.isSafeInteger(a)||a<0)throw RangeError(`${b} must be a non-negative integer.`);return a.toString(10)}"
+  },
+  {
+    "name": "cu",
+    "kind": "FunctionDeclaration",
+    "source": "async function cu(a,b,c){var d;let e,f,g=(e=cs(a),f=`keel-rpc-host-list@1\n${ct(b,\"revision\")}\n${ct(c,\"epoch\")}\n`,new TextEncoder().encode(`${f}${e.map(a=>`${a}\n`).join(\"\")}`));return d=new Uint8Array(await crypto.subtle.digest(\"SHA-256\",g)),`0x${Array.from(d,a=>a.toString(16).padStart(2,\"0\")).join(\"\")}`}"
+  },
+  {
+    "name": "cw",
+    "kind": "FunctionDeclaration",
+    "source": "function cw(a,b){if(!Number.isSafeInteger(a)||a<0)throw RangeError(`${b} must be a non-negative integer.`);return a}"
+  }
+]

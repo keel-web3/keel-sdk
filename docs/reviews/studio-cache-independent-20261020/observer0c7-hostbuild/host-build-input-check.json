@@ -1,0 +1,62 @@
+{
+  "result": "PASS_EXACT_PUBLIC_BUILD_PACKET",
+  "sourceFreeze": "dfa544263473f0c743196e8172630f7ad6928e21",
+  "planSHA256": "69e4d723e6d3811d38982f65500c6c8f4a74e843e4784877fa68d7c62eb91712",
+  "commandsSHA256": "754f918a3b54e859d6e6448e7c57ad1bb065d3aa01c0b78bf2ad8314f5cfa625",
+  "files": [
+    {
+      "localPath": "/private/tmp/keel-image-only-release-20261020/docs/reviews/studio-publication-20261020/release/image-only-observer311/activate-image-only.py",
+      "bytes": 15358,
+      "sha256": "981b482694d7db031d869d7c271487033c28f37b1ef3679528ab4150fbda42b7"
+    },
+    {
+      "localPath": "/private/tmp/keel-image-only-release-20261020/docs/reviews/studio-publication-20261020/release/image-only-observer311/reviewed-activation-support.py",
+      "bytes": 43831,
+      "sha256": "a1594559c2c04159ac94827d0f4f2a991310fb06648379bca6081d5ce6a98de1"
+    },
+    {
+      "localPath": "/private/tmp/keel-image-only-release-20261020/docs/reviews/studio-publication-20261020/release/image-only-observer311/guarded-deployment-checks.py",
+      "bytes": 5005,
+      "sha256": "b5f7d764b6c05db503a23ea63ca21a36bfcb0f17cc8292444d790d4a8aad6e00"
+    },
+    {
+      "localPath": "/private/tmp/keel-image-only-release-20261020/docs/reviews/studio-publication-20261020/release/image-only-observer311/candidate-oom-default.py",
+      "bytes": 2033,
+      "sha256": "6621ff48fc02057d98d91ef5fd71e6e30eeea1ef847149170e316d9725e77c73"
+    },
+    {
+      "localPath": "/private/tmp/keel-image-only-release-20261020/docs/reviews/studio-publication-20261020/release/image-only-observer311/build-public-delta.py",
+      "bytes": 9152,
+      "sha256": "965fb974792eb078f9225c8bab3831cfb68bf0aef62e493a6d731af0ff420ac7"
+    },
+    {
+      "localPath": "/private/tmp/keel-plan-observer-image-build-20261020-01/delta-build-context.tar.gz",
+      "bytes": 9145805,
+      "sha256": "c2a0871c0393108c452d76a4df20f749e46361ba6a5fcf0f650d4713efe71194"
+    },
+    {
+      "localPath": "/private/tmp/keel-image-only-release-20261020/docs/reviews/studio-publication-20261020/release/image-only-observer311/host-build-plan.proposed.json",
+      "bytes": 4081,
+      "sha256": "69e4d723e6d3811d38982f65500c6c8f4a74e843e4784877fa68d7c62eb91712"
+    }
+  ],
+  "budget": {
+    "rollbackReserveBytes": 1073741824,
+    "snapshotReserveBytes": 268435456,
+    "additionalMetadataBytes": 67108864,
+    "compressedStagedContextBytes": 9145805,
+    "daemonRawTarScratchBytes": 43601920,
+    "unpackedContextPlusExpandedLayerPlusContentStoreCopies": 131690496,
+    "requiredInitialFreeBytes": 1593724365,
+    "freshObservedFreeBytes": 1594028032,
+    "observedBeforeStaging": true,
+    "postStageGuardRequired": true,
+    "operationalHeadroomProven": false
+  },
+  "completeFormulaRecomputed": true,
+  "currentPrestageMarginBytes": 303667,
+  "postStageFitProven": false,
+  "deletionOrCleanupApproved": false,
+  "hostActionsByReviewer": false,
+  "initialReaderSetup": "Wrong guessed argv key yieldedNone TypeError before any command action; corrected to actual frozen exclusiveReceiverArgv, no packet/test/reference changes"
+}
