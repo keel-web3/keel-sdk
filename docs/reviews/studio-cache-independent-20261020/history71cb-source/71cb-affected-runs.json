@@ -1,0 +1,35 @@
+[
+  {
+    "label": "dom-name-privacy.71cb-green",
+    "argv": [
+      "/Users/ravonus/.nvm/versions/node/v22.22.1/bin/node",
+      "--test",
+      "/private/tmp/keel-independent-history-ee0-20261021/dom-name-privacy.regression.test.mjs"
+    ],
+    "cwd": "/private/tmp/keel-history-prefix-20261021",
+    "sourceCommit": "71cb0e31bab5e4ee93af9d3b3185978e46f1fe8e",
+    "exitCode": 0,
+    "elapsedSeconds": 0.17072420893236995,
+    "stdoutSHA256": "b07c674b6247d931e0fc4b2db108be3b9995074f61717854167475891c977fc2",
+    "stderrSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdoutTail": "fier never emits second DOMException.name getter value after AbortError allowlist check\n  ---\n  duration_ms: 0.564\n  type: 'test'\n  ...\n# Subtest: actual classifier never emits second DOMException.name getter value after TimeoutError allowlist check\nok 2 - actual classifier never emits second DOMException.name getter value after TimeoutError allowlist check\n  ---\n  duration_ms: 0.081458\n  type: 'test'\n  ...\n# Subtest: standard DOMException labels remain structural vocabulary\nok 3 - standard DOMException labels remain structural vocabulary\n  ---\n  duration_ms: 0.123375\n  type: 'test'\n  ...\n1..3\n# tests 3\n# suites 0\n# pass 3\n# fail 0\n# cancelled 0\n# skipped 0\n# todo 0\n# duration_ms 146.767333\n"
+  },
+  {
+    "label": "maintained-and-boundary.71cb",
+    "argv": [
+      "/Users/ravonus/.nvm/versions/node/v22.22.1/bin/node",
+      "--import",
+      "./node_modules/tsx/dist/loader.mjs",
+      "--test",
+      "tests/unit/updated-review-reconciliation.test.ts",
+      "tests/unit/release-review-failure-boundary.test.ts"
+    ],
+    "cwd": "/private/tmp/keel-history-prefix-20261021/apps/studio",
+    "sourceCommit": "71cb0e31bab5e4ee93af9d3b3185978e46f1fe8e",
+    "exitCode": 0,
+    "elapsedSeconds": 0.955969916889444,
+    "stdoutSHA256": "17000102eeeb1fad22c6c8d5d7c4105e32788c4583344829231d7cfac62bca9d",
+    "stderrSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stdoutTail": "thout adoption\nok 54 - funded recovery blocks unverified internal or wrapped openings without adoption\n  ---\n  duration_ms: 5.294709\n  type: 'test'\n  ...\n# Subtest: funded recovery rejects changed transaction identity and escrow\nok 55 - funded recovery rejects changed transaction identity and escrow\n  ---\n  duration_ms: 8.817\n  type: 'test'\n  ...\n# Subtest: different archived program is preserved and never supplied as current-job adoption hint\nok 56 - different archived program is preserved and never supplied as current-job adoption hint\n  ---\n  duration_ms: 15.027\n  type: 'test'\n  ...\n1..56\n# tests 56\n# suites 0\n# pass 56\n# fail 0\n# cancelled 0\n# skipped 0\n# todo 0\n# duration_ms 931.884417\n"
+  }
+]
