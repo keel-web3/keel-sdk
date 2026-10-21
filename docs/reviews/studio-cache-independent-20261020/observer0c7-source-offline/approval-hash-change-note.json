@@ -1,0 +1,7 @@
+{
+  "firstApply": "STOPPED_BEFORE_EDIT_APPROVAL_HASH_DIFFERED",
+  "cause": "Root descriptive synthetic length corrected before final freeze; exact approved patch unchanged",
+  "rootApprovedReviewSHA256": "1151556d56b52b11d8af70e2afb34a4a51aafe03784bd855ac6926575d1b9d94",
+  "extraOldFixtureRerun": "same2synthetic-token-setup-RED retained; first raw timings were superseded by this same old-fixture rerun, not relabelled as product failure",
+  "productionOrCredentialChanges": false
+}

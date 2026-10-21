@@ -1,0 +1,297 @@
+{
+  "schema": "keel.observer-app-build-recipe-proposal@1",
+  "source": "0c7b01e3acae5ec787568d6b5931b002654b4de0",
+  "sdk": "311d61526284248938e335d7ed879089408933be",
+  "buildRootMustBeNew": "/private/tmp/keel-plan-observer-image-build-20261020-01",
+  "sourceCheckouts": [
+    {
+      "argv": [
+        "git",
+        "init",
+        "/private/tmp/keel-plan-observer-image-build-20261020-01/keel-site"
+      ]
+    },
+    {
+      "cwd": "/private/tmp/keel-plan-observer-image-build-20261020-01/keel-site",
+      "argv": [
+        "git",
+        "fetch",
+        "--depth=1",
+        "/private/tmp/keel-plan-progress-20261020",
+        "0c7b01e3acae5ec787568d6b5931b002654b4de0"
+      ]
+    },
+    {
+      "cwd": "/private/tmp/keel-plan-observer-image-build-20261020-01/keel-site",
+      "argv": [
+        "git",
+        "checkout",
+        "--detach",
+        "FETCH_HEAD"
+      ]
+    },
+    {
+      "cwd": "/private/tmp/keel-plan-observer-image-build-20261020-01/keel-site",
+      "argv": [
+        "git",
+        "rev-parse",
+        "HEAD"
+      ]
+    },
+    {
+      "argv": [
+        "git",
+        "init",
+        "/private/tmp/keel-plan-observer-image-build-20261020-01/keel-sdk"
+      ]
+    },
+    {
+      "cwd": "/private/tmp/keel-plan-observer-image-build-20261020-01/keel-sdk",
+      "argv": [
+        "git",
+        "fetch",
+        "--depth=1",
+        "/private/tmp/keel-ui-mcp-image-build-20261020/keel-sdk",
+        "311d61526284248938e335d7ed879089408933be"
+      ]
+    },
+    {
+      "cwd": "/private/tmp/keel-plan-observer-image-build-20261020-01/keel-sdk",
+      "argv": [
+        "git",
+        "checkout",
+        "--detach",
+        "FETCH_HEAD"
+      ]
+    },
+    {
+      "cwd": "/private/tmp/keel-plan-observer-image-build-20261020-01/keel-sdk",
+      "argv": [
+        "git",
+        "rev-parse",
+        "HEAD"
+      ]
+    }
+  ],
+  "dependencyClonefileCommands": [
+    [
+      "/bin/cp",
+      "-cR",
+      "/private/tmp/keel-ui-mcp-image-build-20261020/keel-site/node_modules",
+      "/private/tmp/keel-plan-observer-image-build-20261020-01/keel-site/node_modules"
+    ],
+    [
+      "/bin/cp",
+      "-cR",
+      "/private/tmp/keel-ui-mcp-image-build-20261020/keel-site/apps/studio/node_modules",
+      "/private/tmp/keel-plan-observer-image-build-20261020-01/keel-site/apps/studio/node_modules"
+    ],
+    [
+      "/bin/cp",
+      "-cR",
+      "/private/tmp/keel-ui-mcp-image-build-20261020/keel-site/packages/site-domain/node_modules",
+      "/private/tmp/keel-plan-observer-image-build-20261020-01/keel-site/packages/site-domain/node_modules"
+    ],
+    [
+      "/bin/cp",
+      "-cR",
+      "/private/tmp/keel-ui-mcp-image-build-20261020/keel-sdk/node_modules",
+      "/private/tmp/keel-plan-observer-image-build-20261020-01/keel-sdk/node_modules"
+    ],
+    [
+      "/bin/cp",
+      "-cR",
+      "/private/tmp/keel-ui-mcp-image-build-20261020/keel-sdk/packages/builder/node_modules",
+      "/private/tmp/keel-plan-observer-image-build-20261020-01/keel-sdk/packages/builder/node_modules"
+    ],
+    [
+      "/bin/cp",
+      "-cR",
+      "/private/tmp/keel-ui-mcp-image-build-20261020/keel-sdk/packages/ethereum-adapter/node_modules",
+      "/private/tmp/keel-plan-observer-image-build-20261020-01/keel-sdk/packages/ethereum-adapter/node_modules"
+    ],
+    [
+      "/bin/cp",
+      "-cR",
+      "/private/tmp/keel-ui-mcp-image-build-20261020/keel-sdk/packages/mcp/node_modules",
+      "/private/tmp/keel-plan-observer-image-build-20261020-01/keel-sdk/packages/mcp/node_modules"
+    ],
+    [
+      "/bin/cp",
+      "-cR",
+      "/private/tmp/keel-ui-mcp-image-build-20261020/keel-sdk/packages/protocol/node_modules",
+      "/private/tmp/keel-plan-observer-image-build-20261020-01/keel-sdk/packages/protocol/node_modules"
+    ],
+    [
+      "/bin/cp",
+      "-cR",
+      "/private/tmp/keel-ui-mcp-image-build-20261020/keel-sdk/packages/sandbox-sdk/node_modules",
+      "/private/tmp/keel-plan-observer-image-build-20261020-01/keel-sdk/packages/sandbox-sdk/node_modules"
+    ],
+    [
+      "/bin/cp",
+      "-cR",
+      "/private/tmp/keel-ui-mcp-image-build-20261020/keel-sdk/packages/sdk/node_modules",
+      "/private/tmp/keel-plan-observer-image-build-20261020-01/keel-sdk/packages/sdk/node_modules"
+    ],
+    [
+      "/bin/cp",
+      "-cR",
+      "/private/tmp/keel-ui-mcp-image-build-20261020/keel-sdk/packages/sprite-codex/node_modules",
+      "/private/tmp/keel-plan-observer-image-build-20261020-01/keel-sdk/packages/sprite-codex/node_modules"
+    ],
+    [
+      "/bin/cp",
+      "-cR",
+      "/private/tmp/keel-ui-mcp-image-build-20261020/keel-sdk/packages/studio-core/node_modules",
+      "/private/tmp/keel-plan-observer-image-build-20261020-01/keel-sdk/packages/studio-core/node_modules"
+    ],
+    [
+      "/bin/cp",
+      "-cR",
+      "/private/tmp/keel-ui-mcp-image-build-20261020/keel-sdk/packages/viewer/node_modules",
+      "/private/tmp/keel-plan-observer-image-build-20261020-01/keel-sdk/packages/viewer/node_modules"
+    ],
+    [
+      "/bin/cp",
+      "-cR",
+      "/private/tmp/keel-ui-mcp-image-build-20261020/keel-sdk/packages/web3-boundary-tests/node_modules",
+      "/private/tmp/keel-plan-observer-image-build-20261020-01/keel-sdk/packages/web3-boundary-tests/node_modules"
+    ],
+    [
+      "/bin/cp",
+      "-cR",
+      "/private/tmp/keel-ui-mcp-image-build-20261020/keel-sdk/packages/builder/dist",
+      "/private/tmp/keel-plan-observer-image-build-20261020-01/keel-sdk/packages/builder/dist"
+    ],
+    [
+      "/bin/cp",
+      "-cR",
+      "/private/tmp/keel-ui-mcp-image-build-20261020/keel-sdk/packages/ethereum-adapter/dist",
+      "/private/tmp/keel-plan-observer-image-build-20261020-01/keel-sdk/packages/ethereum-adapter/dist"
+    ],
+    [
+      "/bin/cp",
+      "-cR",
+      "/private/tmp/keel-ui-mcp-image-build-20261020/keel-sdk/packages/mcp/dist",
+      "/private/tmp/keel-plan-observer-image-build-20261020-01/keel-sdk/packages/mcp/dist"
+    ],
+    [
+      "/bin/cp",
+      "-cR",
+      "/private/tmp/keel-ui-mcp-image-build-20261020/keel-sdk/packages/protocol/dist",
+      "/private/tmp/keel-plan-observer-image-build-20261020-01/keel-sdk/packages/protocol/dist"
+    ],
+    [
+      "/bin/cp",
+      "-cR",
+      "/private/tmp/keel-ui-mcp-image-build-20261020/keel-sdk/packages/sandbox-sdk/dist",
+      "/private/tmp/keel-plan-observer-image-build-20261020-01/keel-sdk/packages/sandbox-sdk/dist"
+    ],
+    [
+      "/bin/cp",
+      "-cR",
+      "/private/tmp/keel-ui-mcp-image-build-20261020/keel-sdk/packages/sdk/dist",
+      "/private/tmp/keel-plan-observer-image-build-20261020-01/keel-sdk/packages/sdk/dist"
+    ],
+    [
+      "/bin/cp",
+      "-cR",
+      "/private/tmp/keel-ui-mcp-image-build-20261020/keel-sdk/packages/sprite-codex/dist",
+      "/private/tmp/keel-plan-observer-image-build-20261020-01/keel-sdk/packages/sprite-codex/dist"
+    ],
+    [
+      "/bin/cp",
+      "-cR",
+      "/private/tmp/keel-ui-mcp-image-build-20261020/keel-sdk/packages/studio-core/dist",
+      "/private/tmp/keel-plan-observer-image-build-20261020-01/keel-sdk/packages/studio-core/dist"
+    ],
+    [
+      "/bin/cp",
+      "-cR",
+      "/private/tmp/keel-ui-mcp-image-build-20261020/keel-sdk/packages/viewer/dist",
+      "/private/tmp/keel-plan-observer-image-build-20261020-01/keel-sdk/packages/viewer/dist"
+    ]
+  ],
+  "linkPolicy": "Retarget only copied KEEL workspace absolute links to ownednewpair; relative pnpm graph preserved. Explicit7app @keel links; packages/site-domain/node_modules/zod must resolve newownedroot. Contracts/modules reuse exactpriorliteral qualifiedpublic source; no writes to oldworkspace.",
+  "freshNextBuild": {
+    "argv": [
+      "/Users/ravonus/.nvm/versions/node/v22.22.1/bin/corepack",
+      "pnpm@10.15.0",
+      "--filter",
+      "@keel/studio",
+      "build"
+    ],
+    "cwd": "/private/tmp/keel-plan-observer-image-build-20261020-01/keel-site",
+    "source": "0c7b01e3acae5ec787568d6b5931b002654b4de0",
+    "sdk": "311d61526284248938e335d7ed879089408933be",
+    "settings": {
+      "NEXT_PUBLIC_APP_URL": "https://studio.onkeel.io",
+      "NEXT_PUBLIC_WALLET_RPC_URL": "https://ethereum-sepolia-rpc.publicnode.com",
+      "NEXT_PUBLIC_RPC_URL": "https://ethereum-sepolia-rpc.publicnode.com",
+      "NEXT_PUBLIC_CHAIN_ID": "11155111",
+      "NEXT_PUBLIC_SHOWCASE_MODE": "1",
+      "NODE_ENV": "production",
+      "STUDIO_STANDALONE": "1",
+      "STUDIO_ONE_SHOT_BUILD": "1",
+      "STUDIO_NEXT_DIST_DIR": ".next-discovery-4002-b524-portable22-20261020",
+      "STUDIO_TSCONFIG_PATH": "tsconfig.production.json",
+      "NEXT_TELEMETRY_DISABLED": "1",
+      "KEEL_CHAIN_ID": "11155111",
+      "KEEL_RPC_URL": "https://rpc.sepolia.ethpandaops.io",
+      "KEEL_PUBLICATION_WORKER_PAUSED": "1",
+      "DATABASE_URL": "postgresql://synthetic:synthetic@127.0.0.1:1/synthetic"
+    },
+    "requiredBeforeStart": [
+      "Independent source review + independent exact311 QA accepted",
+      "Fresh uptime1min<=40, free diskbudget checked",
+      "Owned clean source exact0c7 HEAD; no copied dirty source/no prior.next output",
+      "Owned clean SDK311 HEAD,1745dist hashes exact reviewed311 (no SDKbuild)",
+      "All root/app/site-domain node_modules and @keel workspace links resolve owned newpair; direct zod resolution succeeds"
+    ]
+  },
+  "contextPreparation": {
+    "argv": [
+      "/Users/ravonus/.nvm/versions/node/v22.22.1/bin/node",
+      "apps/studio/ops/showcase/prepare-image-context.mjs",
+      "--dist",
+      "apps/studio/.next-discovery-4002-b524-portable22-20261020",
+      "--reuse-existing-volume",
+      "1",
+      "--local-deployment",
+      "/private/tmp/keel-routing-build-20261020/public-deployment.json",
+      "--output",
+      "/private/tmp/keel-plan-observer-image-build-20261020-01/image-context"
+    ],
+    "cwd": "/private/tmp/keel-plan-observer-image-build-20261020-01/keel-site",
+    "source": "0c7b01e3acae5ec787568d6b5931b002654b4de0",
+    "sdk": "311d61526284248938e335d7ed879089408933be"
+  },
+  "contextComponentPolicy": [
+    "Use exact prior SDK311 fourpackage archives after actual full regular-member equality proof; retain regenerated representation/hash diagnostics",
+    "Proof-executor/native64e8a receipt, ops/bootstrap/catalog exactpriorqualified bytes; no0050 active",
+    "Keep actual inherited workerb331 as explicit reused component; fresh regenerated worker never shipped",
+    "Fresh truthful source/build/context receipts; distdirectory literal reused only forsmallpathdelta"
+  ],
+  "deltaPreparationArgv": [
+    "python3",
+    "/private/tmp/keel-image-only-release-20261020/docs/reviews/studio-publication-20261020/release/image-only-observer311/prepare-delta.py",
+    "--old-context",
+    "/private/tmp/keel-ui-mcp-image-build-20261020/image-context",
+    "--fresh-context",
+    "/private/tmp/keel-plan-observer-image-build-20261020-01/image-context",
+    "--actual-base-tree",
+    "/private/tmp/keel-image-only-release-20261020/docs/reviews/studio-publication-20261020/release/image-only-observer311/evidence/qualified-base-fe455-app-tree.json",
+    "--output",
+    "/private/tmp/keel-plan-observer-image-build-20261020-01/delta-context",
+    "--source",
+    "0c7b01e3acae5ec787568d6b5931b002654b4de0"
+  ],
+  "hostActionApproved": false,
+  "automaticExecution": false,
+  "knownPreparationRed": {
+    "path": "/private/tmp/keel-plan-observer-image-build-20261020/keel-site",
+    "error": "git shared-alternate nesting too deep; no checkout/build occurred",
+    "resolution": "new -01 root using depth1 git fetch, no new shared-alternate chain; retain failed owned preparation"
+  }
+}

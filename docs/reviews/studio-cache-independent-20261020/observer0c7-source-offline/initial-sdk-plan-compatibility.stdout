@@ -1,0 +1,50 @@
+TAP version 13
+# Subtest: actual emitted311 plan reader accepts additive observer DTO with one GET and no preparation authority
+not ok 1 - actual emitted311 plan reader accepts additive observer DTO with one GET and no preparation authority
+  ---
+  duration_ms: 0.694208
+  type: 'test'
+  location: '/private/tmp/keel-independent-observer0c7-20261020/sdk-plan-compatibility.test.mjs:8:1'
+  failureType: 'testCodeFailure'
+  error: 'KEEL Studio agent draft grant is invalid.'
+  code: 'ERR_TEST_FAILURE'
+  name: 'TypeError'
+  stack: |-
+    createKeelStudioAgentDraftClient (file:///Users/ravonus/dev/wt/studio-storage-review-compat-20261020/keel-sdk/packages/sdk/dist/studio-agent-drafts.js:251:15)
+    client (file:///private/tmp/keel-independent-observer0c7-20261020/sdk-plan-compatibility.test.mjs:7:60)
+    TestContext.<anonymous> (file:///private/tmp/keel-independent-observer0c7-20261020/sdk-plan-compatibility.test.mjs:8:128)
+    Test.runInAsyncScope (node:async_hooks:214:14)
+    Test.run (node:internal/test_runner/test:1047:25)
+    Test.start (node:internal/test_runner/test:944:17)
+    startSubtestAfterBootstrap (node:internal/test_runner/harness:296:17)
+  ...
+# Subtest: actual emitted311 still rejects another release or invalid revision before exposing planning result
+not ok 2 - actual emitted311 still rejects another release or invalid revision before exposing planning result
+  ---
+  duration_ms: 0.075042
+  type: 'test'
+  location: '/private/tmp/keel-independent-observer0c7-20261020/sdk-plan-compatibility.test.mjs:9:1'
+  failureType: 'testCodeFailure'
+  error: 'KEEL Studio agent draft grant is invalid.'
+  code: 'ERR_TEST_FAILURE'
+  name: 'TypeError'
+  stack: |-
+    createKeelStudioAgentDraftClient (file:///Users/ravonus/dev/wt/studio-storage-review-compat-20261020/keel-sdk/packages/sdk/dist/studio-agent-drafts.js:251:15)
+    client (file:///private/tmp/keel-independent-observer0c7-20261020/sdk-plan-compatibility.test.mjs:7:60)
+    TestContext.<anonymous> (file:///private/tmp/keel-independent-observer0c7-20261020/sdk-plan-compatibility.test.mjs:9:226)
+    Test.runInAsyncScope (node:async_hooks:214:14)
+    Test.run (node:internal/test_runner/test:1047:25)
+    Test.processPendingSubtests (node:internal/test_runner/test:744:18)
+    Test.postRun (node:internal/test_runner/test:1173:19)
+    Test.run (node:internal/test_runner/test:1101:12)
+    async startSubtestAfterBootstrap (node:internal/test_runner/harness:296:3)
+  ...
+1..2
+# tests 2
+# suites 0
+# pass 0
+# fail 2
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 235.41725

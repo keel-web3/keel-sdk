@@ -1,0 +1,15 @@
+{
+  "schema": "keel.independent-test-observation-correction-review@1",
+  "decision": "APPROVE",
+  "reviewerId": "independent-release-reviewer",
+  "patchSHA256": "fa4b962dac103e7c5f20f51df932bf366bd994b02cc5f1c43a0f9d18134f1685",
+  "beforeSHA256": "97f1f99d8c06d422775287848cfb897472bd84a95096b4a735e14eceafaa3de6",
+  "proposedSHA256": "44aa928011797aee169cab1109fb2a1ca3c21d6b3b0df31b500e3f834d017bae",
+  "scope": "One synthetic429 test fixes Date.now during mount/fetch and restores in teardown. No product clock, timeout, resource or request behavior changes.",
+  "reason": "Mounted component now can precede response-now by1ms; ceil((retryAt-now)/1000) may naturally display601. Deterministic fixture time makes the exact600s label assertion meaningful.",
+  "allExistingAssertionsRetained": true,
+  "noAutomaticTimerAndGETOnlyAssertionsUnchanged": true,
+  "initial7Pass1FailRetained": true,
+  "productionSourceChanged": false,
+  "hostOrPrivateWorkflowApproval": false
+}

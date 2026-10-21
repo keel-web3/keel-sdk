@@ -1,0 +1,65 @@
+{
+  "schema": "keel.qa-saved-plan-observer-source@1",
+  "result": "PASS_SCOPED_SOURCE_QA_ONLY",
+  "source": "0c7b01e3acae5ec787568d6b5931b002654b4de0",
+  "sourceTree": "b3eeea70045ca6eef6ed91a0c7a129aaf94794cb",
+  "baseMaster": "81cea94aba1f7086c782877ea53ea477f130ca18",
+  "baseTreeExactLiveFb3": true,
+  "sdk": "311d61526284248938e335d7ed879089408933be",
+  "maintainedAffected": {
+    "pass": 66,
+    "fail": 0,
+    "skip": 0
+  },
+  "maintainedPrivateHandlerAndTrace": {
+    "pass": 15,
+    "fail": 0,
+    "skip": 0
+  },
+  "independentMountedAdversarial": {
+    "pass": 8,
+    "fail": 0,
+    "skip": 0
+  },
+  "totalFresh": {
+    "pass": 89,
+    "fail": 0,
+    "skip": 0
+  },
+  "wholeAppNonincrementalTSC": "PASS exit0 29.067s",
+  "inputs": "Synthetic saved binding artifact1/rev3 release2/rev7 chain11155111; controlled HTTP responses/VM query boundaries; source inputs and hashes in tests/identity. No private incident input.",
+  "expectedActual": {
+    "GETOnlyAndNoAutoMutation": "PASS mounted reload/null/429/503/401 and duplicate reconnect; owner66 also proves primarydoubleclick only one authorizedPOST",
+    "staleLateRepliesAndPrivateLinkBinding": "PASS independently held oldGET late for each artifactId/artifactRev/releaseId/releaseRev; abort observed, no stale text/link adoption",
+    "serverOwnerProjection": "PASS actual service under controlled DB selects release+artifact bycreator, exact chain/revision binding, foreign/missingowner rejection; no preflight or preparation authority projected",
+    "readOnlyNoWalletOrCancel": "PASS hidden controls and callback/handlers fenced; default non-readOnly oracle bytes unchanged and tests pass",
+    "privateAuthPrivacyHandler": "PASS15 unchanged maintained tests and exact source hash unchanged frombaseline"
+  },
+  "wrongTestCorrection": {
+    "initial": "7PASS1FAIL retained: expected600s label; mount/fetch1ms gap legitimately ceil601",
+    "patchSHA256": "fa4b962dac103e7c5f20f51df932bf366bd994b02cc5f1c43a0f9d18134f1685",
+    "independentReviewSHA256": "06389c5df23e4cabd647c3aa7117e8f75743596318c4a788cbc725c32d94abb8",
+    "approved": true,
+    "onlyChange": "Deterministic Date.now within one synthetic429 case, restoredfinally; all600s/noautotimer/GET/noauthority assertions preserved. Production clocks/limits unchanged."
+  },
+  "sdk1745BeforeAfterUnchanged": true,
+  "sourceNotDeployedByQA": true,
+  "imageQualification": "PENDING_NEW_ARTIFACT",
+  "actualOwnerPrivateDiagnosticExport": "PENDING_SEPARATELY_COORDINATED_DEPLOYMENT_AND_NORMAL_UI",
+  "livePublicationProof": "BLOCKED; prior actualfe455 Gator/GIF generic failures remain unresolved, not replayed",
+  "historicalH": "Prior fresh actualfe455 H commit e70 retained, not newobserver deployed proof",
+  "qaBrowserActions": 0,
+  "qaHostActions": 0,
+  "realRPCOrDatabaseCalls": 0,
+  "simulationReplay": false,
+  "signing": false,
+  "submission": false,
+  "productionFixAuthoredByQA": false,
+  "releaseActivationAuthority": false,
+  "evidence": {
+    "identity.json": "533bf0b84c4745e022e3b5d972c49d26667fdb36c6effc024b8cac06084ba097",
+    "source-commands.json": "ec51226e888ea0accc9b1369acfc27f6f4cb4f58ccd878ddf00252a352c6440d",
+    "adversarial-command.json": "f2b46d66efa43be1a707df3db12248795231b1696a86f178655d2af743d84c89",
+    "independent-clock-review.json": "06389c5df23e4cabd647c3aa7117e8f75743596318c4a788cbc725c32d94abb8"
+  }
+}
