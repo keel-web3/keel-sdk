@@ -1,0 +1,75 @@
+{
+  "schema": "keel.independent-observer-actual-image-public-qualification-review@1",
+  "decision": "APPROVE_EXACT_THREE_SERIAL_PUBLIC_TEST_ROLES_ONLY",
+  "reviewerId": "independent-release-reviewer",
+  "sourceFreeze": "876261dcf8ac2911ea367e20a802e0f26754a79c",
+  "candidate": {
+    "siteCommit": "0c7b01e3acae5ec787568d6b5931b002654b4de0",
+    "sdkCommit": "311d61526284248938e335d7ed879089408933be",
+    "buildId": "F2eKiuWl2rvz5hqBZQ9wi",
+    "imageId": "sha256:cee8c0b777f78372c6ee56bd9ff1c66dbeafd6393d04cb7f298fab6eb7bac9b7",
+    "imageBytes": 713038494,
+    "imageConfigSHA256": "b8ddaf6d68e76ad758ee46b7c8407b480dfb146113ba0f31a43f10943d80a38b",
+    "rootFSSHA256": "089fc8c7150dc9b4a5c209773ed4d715f2bbac89511814ceb0387e6e4c1b00be"
+  },
+  "actualBuildReceiptSHA256": "63997bc00ab617cfbeabc95ffa510fe0ea889348e8d313a7db3b1e7d7c38a620",
+  "packetSHA256": "a15ccae39a0a9003d4ea38153fa36ee70fa237f7b6fdf809eeeb4e13dbefa8d9",
+  "transferSHA256": "8dde66961e985ca6359de36bddd0bf682049946148ced9a619a9e6a44b2257ee",
+  "transferPath": "/private/tmp/keel-independent-cee8-public-qualification-20261021/public-transfer.admitted.json",
+  "runnerSHA256": "6fee44f7ff8bc0fad10416c78fa72d8dafaeb1a5d4d8409b57b453271f9b845b",
+  "root": "/home/ubuntu/keel-studio-image-qualification-ce7d492f-915a-4c11-8ce2-3c02bd366c5a",
+  "inputBindingsSHA256": "b9457977faef78cf47c26b2d292f870fd93e55f7737ba65e730323cc274188f6",
+  "independentLocalControls": {
+    "profile": 5,
+    "tree": 4,
+    "pass": 9,
+    "fail": 0,
+    "profileStderrSHA256": "baf49b59538192f3e136ca0404cac516ecb8dd2fe5ba1416604056f3080fa49c",
+    "treeStdoutSHA256": "8a705dfaf83c2660ab084581aa6335e3f7b9fbf2bd0675655f3dba354b01ec25"
+  },
+  "expectedValueRebindingReview": "APPROVE exact source/build literal rebinding only for SDK+HTTP qualifiers; reverse replaces0c7/F2 withfb3/nuY and restores baseline bytes. Compiled factory and memoryobserver unchanged. Tree becomes stricter: zero external package differences and exact345e base digest. No asset/golden/limit/resource/deadline assertions removed.",
+  "executionSequence": [
+    "transfer.createExclusiveRootArgv once",
+    "transfer.files each exactstdin through exclusive root0444 hash/length-bound receivers incl selfpacket",
+    "transfer.createEmptyPostgresCoverArgv once; do not also execute duplicate packet cover command",
+    "transfer.serialRoles.tree once; require durablePASS exit0/full baseline unchanged",
+    "transfer.serialRoles.sdk once only after treePASS",
+    "transfer.serialRoles.http once only after SDKPASS"
+  ],
+  "isolation": {
+    "network": "none; HTTP child loopback only, no public/private provider",
+    "rootfs": "readonly UID999:999 capdropALL no-new-privileges pids64",
+    "memoryBytes": 805306368,
+    "swapBytes": 805306368,
+    "cpus": {
+      "tree": 1,
+      "sdk": 2,
+      "http": 1
+    },
+    "hostDeadlinesSeconds": {
+      "tree": 180,
+      "sdk": 180,
+      "http": 75
+    },
+    "logs": "one1MiB json-file, bounded4MiB combined reader",
+    "mounts": "Only reviewed public qualification files and empty0555 PostgreSQL cover; no real data, private Env, credentials or proofsocket; fixed tmp/run masks",
+    "entrypoint": "Override image runtime supervisor with node; never start production service/PG. HTTP test intentionally starts packaged standalone child under isolated synthetic context."
+  },
+  "freshChecksEnforced": "Each role common rolloutlock; exactfa0/fe455 fullConfig/Host/canonicalMount/healthy/paused; D97/socket; fullCEE8descriptor; fresh daemon profile;1GiB+256MiB diskreserve,1GiB availablememory,load<4; unused owned names",
+  "ownershipAndRecovery": "Authenticate exact image/name/labels/Config/Host/read-only mountset before start and cleanup. All later mutations immutableID; preserve foreign occupant; stop only owned tests; retain stopped containers; no rm or retry. Full original/runner unchanged after each role.",
+  "maximumExecutionsPerRole": 1,
+  "automaticRetryAllowed": false,
+  "fullSaveAttribution": "Author complete audit380f33e PASS; independent QA actual archive audit in progress with separately approved metadata-key typo correction. Public test admission does not claim completed QA or full private execution.",
+  "qaMetadataKeyCorrectionReviewSHA256": "7109109e297292e07c4f4fa2a68249e44c1f7cb0e017209ad65ed5564a9cf831",
+  "strictProtocol280": "FAIL_UNPROVEN_SDK311_PROTOCOL_MODULE retained plus source attribution59d176; no whole-equivalence or full-native pass claimed",
+  "legacySchemaLabel": "Runner retains keel.actual-fe455-public-test@1 spelling; actual image/source fields and hashes bindCEE8, not a prior image receipt",
+  "blockingPublicTestFindings": [],
+  "productionActivationApproved": false,
+  "privateProgramOrTraceAccessApproved": false,
+  "preparationReplayApproved": false,
+  "Gate6Approved": false,
+  "publicationReadiness": "BLOCKED_UNRESOLVED_LIVE_GATOR_GIF_PREPARATION_FAILURES",
+  "signing": false,
+  "submission": false,
+  "reviewerHostMutation": false
+}

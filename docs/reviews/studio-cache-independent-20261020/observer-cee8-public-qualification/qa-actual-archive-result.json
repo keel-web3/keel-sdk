@@ -1,0 +1,91 @@
+{
+  "schema": "keel.qa-observer-cee8-actual-artifact@1",
+  "result": "PASS_COMPLETE_ARCHIVE_AND_PACKAGED_BYTES_ONLY",
+  "source": "0c7b01e3acae5ec787568d6b5931b002654b4de0",
+  "sdk": "311d61526284248938e335d7ed879089408933be",
+  "buildId": "F2eKiuWl2rvz5hqBZQ9wi",
+  "buildPacketSource": "dfa544263473f0c743196e8172630f7ad6928e21",
+  "laterPublicQualificationSource": "876261dcf8ac2911ea367e20a802e0f26754a79c",
+  "image": "sha256:cee8c0b777f78372c6ee56bd9ff1c66dbeafd6393d04cb7f298fab6eb7bac9b7",
+  "actualDockerReportedImageSize": 713038494,
+  "saveBytes": 713080832,
+  "saveSHA256": "4c3c46568867ad1236f4834988b9a9f87fb318098c760e6a036cb8a77228e9a1",
+  "durableBuildReceiptSHA256": "63997bc00ab617cfbeabc95ffa510fe0ea889348e8d313a7db3b1e7d7c38a620",
+  "exactBuildStdoutEqualsDurableReceipt": true,
+  "buildReceiptObservations": {
+    "outerCommandExitCode": 0,
+    "outerCommandElapsedSeconds": 33.27165816701017,
+    "operatorElapsedSeconds": 31.438098907005042,
+    "initialFreeBytes": 1593888768,
+    "requiredFreeBytes": 1593724365,
+    "marginBytes": 164403,
+    "originalAndRunnerAfter": "EXACT_UNCHANGED",
+    "resourceEnforcementDirectlyObserved": false,
+    "cleanup": false,
+    "activation": false
+  },
+  "freshIndependentAudit": {
+    "path": "image-audit.json",
+    "sha256": "6ac48446bf3b9d46e49b0c11fc2a17ee00e0d627247cb164815e4014531742ba",
+    "expandedLayers": 40,
+    "authenticatedBlobs": 42,
+    "completeOuterArchiveMembers": 47,
+    "completeParentPrefixLayers": 38,
+    "baseImage": "sha256:fe455169d3d10b37696ed17053ff0be167649f5a490acd7e4cea61c2412d6ccb",
+    "baseFullConfigExact": true,
+    "platform": "linux/amd64",
+    "fullAppEntries": 36065,
+    "fullAppTreeSHA256": "9df3273c29d50154dfb783ef05b419317b803e47b847dbf7170d98d3fde74438",
+    "allAppFileKindsModesUIDGIDBytesLinkTargetsBound": true,
+    "installedCoreDistFilesMatchOwnFreshSDK311": 1360,
+    "unexpectedAppEntriesOrChunks": 0,
+    "duplicateLayerPaths": 0,
+    "resolvedHardlinks": 4,
+    "appliedWhiteouts": 468,
+    "opaqueMarkers": 0,
+    "newLayerPathsOnlyUnderApp": true,
+    "fileIdentityStableDuringAudit": true,
+    "elapsedSeconds": 7.207962499931455,
+    "environment": "Darwin arm64/Python3.14; local offhost public SAVE reads only",
+    "compatibleManifestSupplement": {
+      "path": "compatibility-manifest-audit.json",
+      "sha256": "8bd6b5750080d0f0647d7c1ad87d3d3c0130593c42e6b2c0c25025eaf4f53c73",
+      "result": "PASS exact OCI/Docker sameconfig+same40orderedlayer graph; no extraouterentries"
+    }
+  },
+  "sourceAndRuntimeTruth": {
+    "publicReceiptSource": "0c7/SDK311/F2e exact sourcecontext and archivedbytes",
+    "executorSHA256": "8a2970e2cebc1f4b51bd228ab7fa53208e2d247030f46037991351115f12a3b5",
+    "nativeSourceSDK": "64e5fa37667ac424ae87019c7609581dfc2ea364",
+    "runnerImage": "sha256:d97ddf2aba94cb963646fdf05bc8dc8c99b7e69b8c19bad85c06bea7c67fc9f5",
+    "nativeNotRebuiltAs311": true,
+    "workerNativeOpsBootstrapCatalog": "All actual bytes/modes preserved by complete tree equality; inherited publisherb331, not regenerated5ba0 worker"
+  },
+  "auditorKeyCorrection": {
+    "original": "KeyError binarySHA256 after archive/tree/SDK checks; original script and error retained",
+    "patchSHA256": "92587d8870c23a53ea743c8ff8b15e063cd5f92428221514216072e8ac8d00bc",
+    "reviewSHA256": "7109109e297292e07c4f4fa2a68249e44c1f7cb0e017209ad65ed5564a9cf831",
+    "scope": "Exact existing schema binarySha256 key only, same8a literal and full metadata equality; no product/expected-byte adjustment"
+  },
+  "carriedScopedEvidence": {
+    "source": "89PASS/TSC0 exact0c7+311 commit22da, not rerun thiswave",
+    "context": "868d7b9db exact frozen9df327 tree +22controls; now independently matched actualarchive",
+    "compiledStrictClosure": "Original280FAIL soleprotocolmodule95997\u219233504 retained; reviewer59d176source/codegen attribution remains separate; no full compiled/native equivalence claim",
+    "oldGatorNative": "FE944/f11/b524/D97 proof retained only original scope",
+    "oldRealGIFNative": "95/400/b524/D97 proof retained only original scope",
+    "historicalH": "Prior actualfe455/e70 separate from newobserver build"
+  },
+  "remainingGates": {
+    "actualCEE8PublicLinuxTreeSDKHTTP": "PENDING_ROOT_EXECUTION_OF_SEPARATELY_REVIEWED_PACKET",
+    "activation": "NOT_APPROVED_BY_THIS_QA",
+    "normalOwnerPrivateDiagnostics": "PENDING_DEPLOYED_OBSERVER_AND_NORMAL_OWNER_UI",
+    "Gate6": "FAIL_UNRESOLVED actualfe455Gator/GIF generic failures; no retry thiswave",
+    "originalA5Owner": "UNTOUCHED"
+  },
+  "hostActionsByQA": 0,
+  "browserActionsByQA": 0,
+  "nativeOrPrivateProgramReplayByQA": 0,
+  "signaturesByQA": 0,
+  "transactionsByQA": 0,
+  "productionChangesByQA": 0
+}

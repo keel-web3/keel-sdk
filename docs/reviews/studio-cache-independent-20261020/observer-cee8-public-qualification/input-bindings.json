@@ -1,0 +1,27 @@
+{
+  "result": "PASS_EXACT_PUBLIC_QUALIFICATION_AND_STATIC_STAGING_INPUTS",
+  "packets": [
+    {
+      "file": "postbuild-qualification.commands.proposed.json",
+      "sha256": "a15ccae39a0a9003d4ea38153fa36ee70fa237f7b6fdf809eeeb4e13dbefa8d9",
+      "files": 10
+    },
+    {
+      "file": "postbuild-transfer.commands.proposed.json",
+      "sha256": "8dde66961e985ca6359de36bddd0bf682049946148ced9a619a9e6a44b2257ee",
+      "files": 11
+    },
+    {
+      "file": "activation-stage.commands.proposed.json",
+      "sha256": "abd62d5a8650e9fed0039113fe81dfc36b156f8435bb605ee7511bdf88701acb",
+      "files": 7
+    }
+  ],
+  "actualBuildReceiptSHA256": "63997bc00ab617cfbeabc95ffa510fe0ea889348e8d313a7db3b1e7d7c38a620",
+  "actualImage": "sha256:cee8c0b777f78372c6ee56bd9ff1c66dbeafd6393d04cb7f298fab6eb7bac9b7",
+  "qualificationRoot": "/home/ubuntu/keel-studio-image-qualification-ce7d492f-915a-4c11-8ce2-3c02bd366c5a",
+  "staticRoot": "/home/ubuntu/keel-studio-image-only-5895d3d5-5f83-4a1c-b144-42724651ac91",
+  "allPendingActivationFlagsFalse": true,
+  "strictProtocol280": "FAIL_UNPROVEN_RETAINED",
+  "reviewerHostActions": false
+}
