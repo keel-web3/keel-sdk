@@ -1,0 +1,196 @@
+{
+  "schema": "keel.public-delta-build-commands-proposal@1",
+  "remoteRoot": "/home/ubuntu/keel-studio-funding62f-build-433758fa-9631-4205-88b5-346e819b304e",
+  "source": "62f5df235441a342871419ecc837907e42226596",
+  "sdk": "311d61526284248938e335d7ed879089408933be",
+  "rootCreateArgv": [
+    "/usr/bin/ssh",
+    "-o",
+    "BatchMode=yes",
+    "-o",
+    "ConnectTimeout=12",
+    "-o",
+    "StrictHostKeyChecking=yes",
+    "-o",
+    "UserKnownHostsFile=/Users/ravonus/dev/hashers/ops/servers/known_hosts",
+    "ubuntu@40.160.39.155",
+    "sudo -n /usr/bin/python3 -B -c 'import os,pathlib,stat; p=pathlib.Path('\"'\"'/home/ubuntu/keel-studio-funding62f-build-433758fa-9631-4205-88b5-346e819b304e'\"'\"'); parent=p.parent; assert parent.resolve()==parent and parent.stat().st_uid==1000 and not p.exists(); os.mkdir(p,0o700); fd=os.open(parent,os.O_RDONLY|os.O_DIRECTORY|os.O_NOFOLLOW); os.fsync(fd); os.close(fd)'"
+  ],
+  "files": [
+    {
+      "basename": "activate-image-only.py",
+      "localPath": "/private/tmp/keel-image-only-release-20261020/docs/reviews/studio-publication-20261020/release/funding-correction311/activate-image-only.py",
+      "bytes": 17126,
+      "sha256": "dcec1958b0802f88b815c8d923308315aa92d11ba660969e39f258f05eb12fba",
+      "exclusiveReceiverArgv": [
+        "/usr/bin/ssh",
+        "-o",
+        "BatchMode=yes",
+        "-o",
+        "ConnectTimeout=12",
+        "-o",
+        "StrictHostKeyChecking=yes",
+        "-o",
+        "UserKnownHostsFile=/Users/ravonus/dev/hashers/ops/servers/known_hosts",
+        "ubuntu@40.160.39.155",
+        "sudo -n /usr/bin/python3 -B -c 'import os,pathlib,stat,hashlib,sys; root=pathlib.Path('\"'\"'/home/ubuntu/keel-studio-funding62f-build-433758fa-9631-4205-88b5-346e819b304e'\"'\"'); s=root.lstat(); assert stat.S_ISDIR(s.st_mode) and s.st_uid==0 and stat.S_IMODE(s.st_mode)==0o700 and root.resolve()==root; b=sys.stdin.buffer.read(17127); assert len(b)==17126 and hashlib.sha256(b).hexdigest()=='\"'\"'dcec1958b0802f88b815c8d923308315aa92d11ba660969e39f258f05eb12fba'\"'\"'; fd=os.open(root/'\"'\"'activate-image-only.py'\"'\"',os.O_WRONLY|os.O_CREAT|os.O_EXCL|os.O_NOFOLLOW,0o444); f=os.fdopen(fd,'\"'\"'wb'\"'\"'); f.write(b); f.flush(); os.fsync(f.fileno()); f.close(); fd=os.open(root,os.O_RDONLY|os.O_DIRECTORY|os.O_NOFOLLOW); os.fsync(fd); os.close(fd)'"
+      ],
+      "stdinLocalPath": "/private/tmp/keel-image-only-release-20261020/docs/reviews/studio-publication-20261020/release/funding-correction311/activate-image-only.py"
+    },
+    {
+      "basename": "reviewed-activation-support.py",
+      "localPath": "/private/tmp/keel-image-only-release-20261020/docs/reviews/studio-publication-20261020/release/funding-correction311/reviewed-activation-support.py",
+      "bytes": 43831,
+      "sha256": "a1594559c2c04159ac94827d0f4f2a991310fb06648379bca6081d5ce6a98de1",
+      "exclusiveReceiverArgv": [
+        "/usr/bin/ssh",
+        "-o",
+        "BatchMode=yes",
+        "-o",
+        "ConnectTimeout=12",
+        "-o",
+        "StrictHostKeyChecking=yes",
+        "-o",
+        "UserKnownHostsFile=/Users/ravonus/dev/hashers/ops/servers/known_hosts",
+        "ubuntu@40.160.39.155",
+        "sudo -n /usr/bin/python3 -B -c 'import os,pathlib,stat,hashlib,sys; root=pathlib.Path('\"'\"'/home/ubuntu/keel-studio-funding62f-build-433758fa-9631-4205-88b5-346e819b304e'\"'\"'); s=root.lstat(); assert stat.S_ISDIR(s.st_mode) and s.st_uid==0 and stat.S_IMODE(s.st_mode)==0o700 and root.resolve()==root; b=sys.stdin.buffer.read(43832); assert len(b)==43831 and hashlib.sha256(b).hexdigest()=='\"'\"'a1594559c2c04159ac94827d0f4f2a991310fb06648379bca6081d5ce6a98de1'\"'\"'; fd=os.open(root/'\"'\"'reviewed-activation-support.py'\"'\"',os.O_WRONLY|os.O_CREAT|os.O_EXCL|os.O_NOFOLLOW,0o444); f=os.fdopen(fd,'\"'\"'wb'\"'\"'); f.write(b); f.flush(); os.fsync(f.fileno()); f.close(); fd=os.open(root,os.O_RDONLY|os.O_DIRECTORY|os.O_NOFOLLOW); os.fsync(fd); os.close(fd)'"
+      ],
+      "stdinLocalPath": "/private/tmp/keel-image-only-release-20261020/docs/reviews/studio-publication-20261020/release/funding-correction311/reviewed-activation-support.py"
+    },
+    {
+      "basename": "guarded-deployment-checks.py",
+      "localPath": "/private/tmp/keel-image-only-release-20261020/docs/reviews/studio-publication-20261020/release/funding-correction311/guarded-deployment-checks.py",
+      "bytes": 5005,
+      "sha256": "b5f7d764b6c05db503a23ea63ca21a36bfcb0f17cc8292444d790d4a8aad6e00",
+      "exclusiveReceiverArgv": [
+        "/usr/bin/ssh",
+        "-o",
+        "BatchMode=yes",
+        "-o",
+        "ConnectTimeout=12",
+        "-o",
+        "StrictHostKeyChecking=yes",
+        "-o",
+        "UserKnownHostsFile=/Users/ravonus/dev/hashers/ops/servers/known_hosts",
+        "ubuntu@40.160.39.155",
+        "sudo -n /usr/bin/python3 -B -c 'import os,pathlib,stat,hashlib,sys; root=pathlib.Path('\"'\"'/home/ubuntu/keel-studio-funding62f-build-433758fa-9631-4205-88b5-346e819b304e'\"'\"'); s=root.lstat(); assert stat.S_ISDIR(s.st_mode) and s.st_uid==0 and stat.S_IMODE(s.st_mode)==0o700 and root.resolve()==root; b=sys.stdin.buffer.read(5006); assert len(b)==5005 and hashlib.sha256(b).hexdigest()=='\"'\"'b5f7d764b6c05db503a23ea63ca21a36bfcb0f17cc8292444d790d4a8aad6e00'\"'\"'; fd=os.open(root/'\"'\"'guarded-deployment-checks.py'\"'\"',os.O_WRONLY|os.O_CREAT|os.O_EXCL|os.O_NOFOLLOW,0o444); f=os.fdopen(fd,'\"'\"'wb'\"'\"'); f.write(b); f.flush(); os.fsync(f.fileno()); f.close(); fd=os.open(root,os.O_RDONLY|os.O_DIRECTORY|os.O_NOFOLLOW); os.fsync(fd); os.close(fd)'"
+      ],
+      "stdinLocalPath": "/private/tmp/keel-image-only-release-20261020/docs/reviews/studio-publication-20261020/release/funding-correction311/guarded-deployment-checks.py"
+    },
+    {
+      "basename": "candidate-oom-default.py",
+      "localPath": "/private/tmp/keel-image-only-release-20261020/docs/reviews/studio-publication-20261020/release/funding-correction311/candidate-oom-default.py",
+      "bytes": 2033,
+      "sha256": "6621ff48fc02057d98d91ef5fd71e6e30eeea1ef847149170e316d9725e77c73",
+      "exclusiveReceiverArgv": [
+        "/usr/bin/ssh",
+        "-o",
+        "BatchMode=yes",
+        "-o",
+        "ConnectTimeout=12",
+        "-o",
+        "StrictHostKeyChecking=yes",
+        "-o",
+        "UserKnownHostsFile=/Users/ravonus/dev/hashers/ops/servers/known_hosts",
+        "ubuntu@40.160.39.155",
+        "sudo -n /usr/bin/python3 -B -c 'import os,pathlib,stat,hashlib,sys; root=pathlib.Path('\"'\"'/home/ubuntu/keel-studio-funding62f-build-433758fa-9631-4205-88b5-346e819b304e'\"'\"'); s=root.lstat(); assert stat.S_ISDIR(s.st_mode) and s.st_uid==0 and stat.S_IMODE(s.st_mode)==0o700 and root.resolve()==root; b=sys.stdin.buffer.read(2034); assert len(b)==2033 and hashlib.sha256(b).hexdigest()=='\"'\"'6621ff48fc02057d98d91ef5fd71e6e30eeea1ef847149170e316d9725e77c73'\"'\"'; fd=os.open(root/'\"'\"'candidate-oom-default.py'\"'\"',os.O_WRONLY|os.O_CREAT|os.O_EXCL|os.O_NOFOLLOW,0o444); f=os.fdopen(fd,'\"'\"'wb'\"'\"'); f.write(b); f.flush(); os.fsync(f.fileno()); f.close(); fd=os.open(root,os.O_RDONLY|os.O_DIRECTORY|os.O_NOFOLLOW); os.fsync(fd); os.close(fd)'"
+      ],
+      "stdinLocalPath": "/private/tmp/keel-image-only-release-20261020/docs/reviews/studio-publication-20261020/release/funding-correction311/candidate-oom-default.py"
+    },
+    {
+      "basename": "build-public-delta.py",
+      "localPath": "/private/tmp/keel-image-only-release-20261020/docs/reviews/studio-publication-20261020/release/funding-correction311/build-public-delta.py",
+      "bytes": 9152,
+      "sha256": "4980f28054d8bddeb8cc7e3365669efb17436e427593a0cb648304e32274a04f",
+      "exclusiveReceiverArgv": [
+        "/usr/bin/ssh",
+        "-o",
+        "BatchMode=yes",
+        "-o",
+        "ConnectTimeout=12",
+        "-o",
+        "StrictHostKeyChecking=yes",
+        "-o",
+        "UserKnownHostsFile=/Users/ravonus/dev/hashers/ops/servers/known_hosts",
+        "ubuntu@40.160.39.155",
+        "sudo -n /usr/bin/python3 -B -c 'import os,pathlib,stat,hashlib,sys; root=pathlib.Path('\"'\"'/home/ubuntu/keel-studio-funding62f-build-433758fa-9631-4205-88b5-346e819b304e'\"'\"'); s=root.lstat(); assert stat.S_ISDIR(s.st_mode) and s.st_uid==0 and stat.S_IMODE(s.st_mode)==0o700 and root.resolve()==root; b=sys.stdin.buffer.read(9153); assert len(b)==9152 and hashlib.sha256(b).hexdigest()=='\"'\"'4980f28054d8bddeb8cc7e3365669efb17436e427593a0cb648304e32274a04f'\"'\"'; fd=os.open(root/'\"'\"'build-public-delta.py'\"'\"',os.O_WRONLY|os.O_CREAT|os.O_EXCL|os.O_NOFOLLOW,0o444); f=os.fdopen(fd,'\"'\"'wb'\"'\"'); f.write(b); f.flush(); os.fsync(f.fileno()); f.close(); fd=os.open(root,os.O_RDONLY|os.O_DIRECTORY|os.O_NOFOLLOW); os.fsync(fd); os.close(fd)'"
+      ],
+      "stdinLocalPath": "/private/tmp/keel-image-only-release-20261020/docs/reviews/studio-publication-20261020/release/funding-correction311/build-public-delta.py"
+    },
+    {
+      "basename": "delta-build-context.tar.gz",
+      "localPath": "/private/tmp/keel-62f5-public-artifact-actual-20261021/delta-build-context.tar.gz",
+      "bytes": 6306824,
+      "sha256": "22a499dbf31babee3bdba49070c70006552bd19774c069cd9621b51f87929036",
+      "exclusiveReceiverArgv": [
+        "/usr/bin/ssh",
+        "-o",
+        "BatchMode=yes",
+        "-o",
+        "ConnectTimeout=12",
+        "-o",
+        "StrictHostKeyChecking=yes",
+        "-o",
+        "UserKnownHostsFile=/Users/ravonus/dev/hashers/ops/servers/known_hosts",
+        "ubuntu@40.160.39.155",
+        "sudo -n /usr/bin/python3 -B -c 'import os,pathlib,stat,hashlib,sys; root=pathlib.Path('\"'\"'/home/ubuntu/keel-studio-funding62f-build-433758fa-9631-4205-88b5-346e819b304e'\"'\"'); s=root.lstat(); assert stat.S_ISDIR(s.st_mode) and s.st_uid==0 and stat.S_IMODE(s.st_mode)==0o700 and root.resolve()==root; b=sys.stdin.buffer.read(6306825); assert len(b)==6306824 and hashlib.sha256(b).hexdigest()=='\"'\"'22a499dbf31babee3bdba49070c70006552bd19774c069cd9621b51f87929036'\"'\"'; fd=os.open(root/'\"'\"'delta-build-context.tar.gz'\"'\"',os.O_WRONLY|os.O_CREAT|os.O_EXCL|os.O_NOFOLLOW,0o444); f=os.fdopen(fd,'\"'\"'wb'\"'\"'); f.write(b); f.flush(); os.fsync(f.fileno()); f.close(); fd=os.open(root,os.O_RDONLY|os.O_DIRECTORY|os.O_NOFOLLOW); os.fsync(fd); os.close(fd)'"
+      ],
+      "stdinLocalPath": "/private/tmp/keel-62f5-public-artifact-actual-20261021/delta-build-context.tar.gz"
+    },
+    {
+      "basename": "host-build-plan.json",
+      "localPath": "/private/tmp/keel-image-only-release-20261020/docs/reviews/studio-publication-20261020/release/funding-correction311/host-build-plan.proposed.json",
+      "bytes": 5024,
+      "sha256": "cb8f791beee370c401216f15f65d73986fca4e1bb0a87ee5657b732c0b24fabf",
+      "exclusiveReceiverArgv": [
+        "/usr/bin/ssh",
+        "-o",
+        "BatchMode=yes",
+        "-o",
+        "ConnectTimeout=12",
+        "-o",
+        "StrictHostKeyChecking=yes",
+        "-o",
+        "UserKnownHostsFile=/Users/ravonus/dev/hashers/ops/servers/known_hosts",
+        "ubuntu@40.160.39.155",
+        "sudo -n /usr/bin/python3 -B -c 'import os,pathlib,stat,hashlib,sys; root=pathlib.Path('\"'\"'/home/ubuntu/keel-studio-funding62f-build-433758fa-9631-4205-88b5-346e819b304e'\"'\"'); s=root.lstat(); assert stat.S_ISDIR(s.st_mode) and s.st_uid==0 and stat.S_IMODE(s.st_mode)==0o700 and root.resolve()==root; b=sys.stdin.buffer.read(5025); assert len(b)==5024 and hashlib.sha256(b).hexdigest()=='\"'\"'cb8f791beee370c401216f15f65d73986fca4e1bb0a87ee5657b732c0b24fabf'\"'\"'; fd=os.open(root/'\"'\"'host-build-plan.json'\"'\"',os.O_WRONLY|os.O_CREAT|os.O_EXCL|os.O_NOFOLLOW,0o444); f=os.fdopen(fd,'\"'\"'wb'\"'\"'); f.write(b); f.flush(); os.fsync(f.fileno()); f.close(); fd=os.open(root,os.O_RDONLY|os.O_DIRECTORY|os.O_NOFOLLOW); os.fsync(fd); os.close(fd)'"
+      ],
+      "stdinLocalPath": "/private/tmp/keel-image-only-release-20261020/docs/reviews/studio-publication-20261020/release/funding-correction311/host-build-plan.proposed.json"
+    }
+  ],
+  "noApprovalOrHostAction": true,
+  "readOnlyPreflightArgv": [
+    "/usr/bin/ssh",
+    "-o",
+    "BatchMode=yes",
+    "-o",
+    "ConnectTimeout=12",
+    "-o",
+    "StrictHostKeyChecking=yes",
+    "-o",
+    "UserKnownHostsFile=/Users/ravonus/dev/hashers/ops/servers/known_hosts",
+    "ubuntu@40.160.39.155",
+    "sudo -n /usr/bin/python3 -B /home/ubuntu/keel-studio-funding62f-build-433758fa-9631-4205-88b5-346e819b304e/build-public-delta.py /home/ubuntu/keel-studio-funding62f-build-433758fa-9631-4205-88b5-346e819b304e/host-build-plan.json"
+  ],
+  "executeArgvRequiringIndependentAdmission": [
+    "/usr/bin/ssh",
+    "-o",
+    "BatchMode=yes",
+    "-o",
+    "ConnectTimeout=12",
+    "-o",
+    "StrictHostKeyChecking=yes",
+    "-o",
+    "UserKnownHostsFile=/Users/ravonus/dev/hashers/ops/servers/known_hosts",
+    "ubuntu@40.160.39.155",
+    "sudo -n /usr/bin/python3 -B /home/ubuntu/keel-studio-funding62f-build-433758fa-9631-4205-88b5-346e819b304e/build-public-delta.py /home/ubuntu/keel-studio-funding62f-build-433758fa-9631-4205-88b5-346e819b304e/host-build-plan.json --execute-approved-sha256 cb8f791beee370c401216f15f65d73986fca4e1bb0a87ee5657b732c0b24fabf"
+  ],
+  "normalHealthWindow": {
+    "maxRequests": 20,
+    "intervalSeconds": 45,
+    "maxLifetimeSeconds": 900,
+    "stopOnFailureOrTerminalOutcome": true
+  },
+  "archiveDestinationRule": "Complete actual immutable Docker SAVE streamed from production SSH through root Mac pipe to new protected Yuna file. No new full image archive on production or root Mac; SSH credentials remain on root Mac. Final image identity bound only after durable build PASS.",
+  "budgetWarning": "Planning free observation is before staging; exact fresh after-stage guard is mandatory. No new cleanup, lower reserves or altered accounting."
+}
