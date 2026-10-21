@@ -1,0 +1,300 @@
+{
+  "schema": "keel.actual-observer-public-test-transfer@1",
+  "packetSHA256": "9098fea599e5fc3f0302fd12ae57e5bf3219c7feda2866a7f181f4122473493a",
+  "createExclusiveRootArgv": [
+    "/usr/bin/ssh",
+    "-o",
+    "BatchMode=yes",
+    "-o",
+    "ConnectTimeout=12",
+    "-o",
+    "StrictHostKeyChecking=yes",
+    "-o",
+    "UserKnownHostsFile=/Users/ravonus/dev/hashers/ops/servers/known_hosts",
+    "ubuntu@40.160.39.155",
+    "sudo -n /usr/bin/python3 -B -c 'import os,stat;from pathlib import Path;r=Path('\"'\"'/home/ubuntu/keel-studio-image-qualification-fefa0600-ecc0-4584-b211-8cd0d139e601'\"'\"');assert r.parent.resolve()==r.parent;os.mkdir(r,0o700);d=os.open(r.parent,os.O_DIRECTORY|os.O_NOFOLLOW);os.fsync(d);os.close(d)'"
+  ],
+  "files": [
+    {
+      "name": "qualify-final-image.mjs",
+      "localPath": "/private/tmp/keel-image-only-release-20261020/docs/reviews/studio-publication-20261020/release/history-prefix311/postbuild/qualify-final-image.mjs",
+      "bytes": 6384,
+      "sha256": "77300ca8d113492381cb834bf3b87bcc7907fcf2cdadc3c1e6e5a013aead3683",
+      "installArgv": [
+        "/usr/bin/ssh",
+        "-o",
+        "BatchMode=yes",
+        "-o",
+        "ConnectTimeout=12",
+        "-o",
+        "StrictHostKeyChecking=yes",
+        "-o",
+        "UserKnownHostsFile=/Users/ravonus/dev/hashers/ops/servers/known_hosts",
+        "ubuntu@40.160.39.155",
+        "sudo -n /usr/bin/python3 -B -c 'import os,stat,hashlib,sys;from pathlib import Path;r=Path('\"'\"'/home/ubuntu/keel-studio-image-qualification-fefa0600-ecc0-4584-b211-8cd0d139e601'\"'\"');s=r.lstat();assert r.resolve()==r and s.st_uid==0 and stat.S_IMODE(s.st_mode)==0o700;b=sys.stdin.buffer.read(6385);assert len(b)==6384 and hashlib.sha256(b).hexdigest()=='\"'\"'77300ca8d113492381cb834bf3b87bcc7907fcf2cdadc3c1e6e5a013aead3683'\"'\"';p=r/'\"'\"'qualify-final-image.mjs'\"'\"';fd=os.open(p,os.O_WRONLY|os.O_CREAT|os.O_EXCL|os.O_NOFOLLOW,0o600);f=os.fdopen(fd,'\"'\"'wb'\"'\"');f.write(b);f.flush();os.fchmod(f.fileno(),0o444);os.fsync(f.fileno());f.close();d=os.open(r,os.O_DIRECTORY|os.O_NOFOLLOW);os.fsync(d);os.close(d)'"
+      ],
+      "stdinLocalPath": "/private/tmp/keel-image-only-release-20261020/docs/reviews/studio-publication-20261020/release/history-prefix311/postbuild/qualify-final-image.mjs"
+    },
+    {
+      "name": "compiled-factory.mjs",
+      "localPath": "/private/tmp/keel-image-only-release-20261020/docs/reviews/studio-publication-20261020/release/history-prefix311/postbuild/compiled-factory.mjs",
+      "bytes": 3794,
+      "sha256": "53f7cda6cbfdd9b47f20e29f42f5e2dcf7dbe82cec6f7669024214678f984fd9",
+      "installArgv": [
+        "/usr/bin/ssh",
+        "-o",
+        "BatchMode=yes",
+        "-o",
+        "ConnectTimeout=12",
+        "-o",
+        "StrictHostKeyChecking=yes",
+        "-o",
+        "UserKnownHostsFile=/Users/ravonus/dev/hashers/ops/servers/known_hosts",
+        "ubuntu@40.160.39.155",
+        "sudo -n /usr/bin/python3 -B -c 'import os,stat,hashlib,sys;from pathlib import Path;r=Path('\"'\"'/home/ubuntu/keel-studio-image-qualification-fefa0600-ecc0-4584-b211-8cd0d139e601'\"'\"');s=r.lstat();assert r.resolve()==r and s.st_uid==0 and stat.S_IMODE(s.st_mode)==0o700;b=sys.stdin.buffer.read(3795);assert len(b)==3794 and hashlib.sha256(b).hexdigest()=='\"'\"'53f7cda6cbfdd9b47f20e29f42f5e2dcf7dbe82cec6f7669024214678f984fd9'\"'\"';p=r/'\"'\"'compiled-factory.mjs'\"'\"';fd=os.open(p,os.O_WRONLY|os.O_CREAT|os.O_EXCL|os.O_NOFOLLOW,0o600);f=os.fdopen(fd,'\"'\"'wb'\"'\"');f.write(b);f.flush();os.fchmod(f.fileno(),0o444);os.fsync(f.fileno());f.close();d=os.open(r,os.O_DIRECTORY|os.O_NOFOLLOW);os.fsync(d);os.close(d)'"
+      ],
+      "stdinLocalPath": "/private/tmp/keel-image-only-release-20261020/docs/reviews/studio-publication-20261020/release/history-prefix311/postbuild/compiled-factory.mjs"
+    },
+    {
+      "name": "expected-four-sdk-dist.json",
+      "localPath": "/private/tmp/keel-image-only-release-20261020/docs/reviews/studio-publication-20261020/release/history-prefix311/postbuild/expected-four-sdk-dist.json",
+      "bytes": 226964,
+      "sha256": "edb263fba57b51e966f8da183d3562cdb0d749634fd68296919a41f02e2ce9c6",
+      "installArgv": [
+        "/usr/bin/ssh",
+        "-o",
+        "BatchMode=yes",
+        "-o",
+        "ConnectTimeout=12",
+        "-o",
+        "StrictHostKeyChecking=yes",
+        "-o",
+        "UserKnownHostsFile=/Users/ravonus/dev/hashers/ops/servers/known_hosts",
+        "ubuntu@40.160.39.155",
+        "sudo -n /usr/bin/python3 -B -c 'import os,stat,hashlib,sys;from pathlib import Path;r=Path('\"'\"'/home/ubuntu/keel-studio-image-qualification-fefa0600-ecc0-4584-b211-8cd0d139e601'\"'\"');s=r.lstat();assert r.resolve()==r and s.st_uid==0 and stat.S_IMODE(s.st_mode)==0o700;b=sys.stdin.buffer.read(226965);assert len(b)==226964 and hashlib.sha256(b).hexdigest()=='\"'\"'edb263fba57b51e966f8da183d3562cdb0d749634fd68296919a41f02e2ce9c6'\"'\"';p=r/'\"'\"'expected-four-sdk-dist.json'\"'\"';fd=os.open(p,os.O_WRONLY|os.O_CREAT|os.O_EXCL|os.O_NOFOLLOW,0o600);f=os.fdopen(fd,'\"'\"'wb'\"'\"');f.write(b);f.flush();os.fchmod(f.fileno(),0o444);os.fsync(f.fileno());f.close();d=os.open(r,os.O_DIRECTORY|os.O_NOFOLLOW);os.fsync(d);os.close(d)'"
+      ],
+      "stdinLocalPath": "/private/tmp/keel-image-only-release-20261020/docs/reviews/studio-publication-20261020/release/history-prefix311/postbuild/expected-four-sdk-dist.json"
+    },
+    {
+      "name": "observer.mjs",
+      "localPath": "/private/tmp/keel-image-only-release-20261020/docs/reviews/studio-publication-20261020/release/history-prefix311/postbuild/observer.mjs",
+      "bytes": 2218,
+      "sha256": "d141191056bb0e969fa6f18f32f025d83d573708ce74b03802b908ef6dabbe35",
+      "installArgv": [
+        "/usr/bin/ssh",
+        "-o",
+        "BatchMode=yes",
+        "-o",
+        "ConnectTimeout=12",
+        "-o",
+        "StrictHostKeyChecking=yes",
+        "-o",
+        "UserKnownHostsFile=/Users/ravonus/dev/hashers/ops/servers/known_hosts",
+        "ubuntu@40.160.39.155",
+        "sudo -n /usr/bin/python3 -B -c 'import os,stat,hashlib,sys;from pathlib import Path;r=Path('\"'\"'/home/ubuntu/keel-studio-image-qualification-fefa0600-ecc0-4584-b211-8cd0d139e601'\"'\"');s=r.lstat();assert r.resolve()==r and s.st_uid==0 and stat.S_IMODE(s.st_mode)==0o700;b=sys.stdin.buffer.read(2219);assert len(b)==2218 and hashlib.sha256(b).hexdigest()=='\"'\"'d141191056bb0e969fa6f18f32f025d83d573708ce74b03802b908ef6dabbe35'\"'\"';p=r/'\"'\"'observer.mjs'\"'\"';fd=os.open(p,os.O_WRONLY|os.O_CREAT|os.O_EXCL|os.O_NOFOLLOW,0o600);f=os.fdopen(fd,'\"'\"'wb'\"'\"');f.write(b);f.flush();os.fchmod(f.fileno(),0o444);os.fsync(f.fileno());f.close();d=os.open(r,os.O_DIRECTORY|os.O_NOFOLLOW);os.fsync(d);os.close(d)'"
+      ],
+      "stdinLocalPath": "/private/tmp/keel-image-only-release-20261020/docs/reviews/studio-publication-20261020/release/history-prefix311/postbuild/observer.mjs"
+    },
+    {
+      "name": "discovery-http.mjs",
+      "localPath": "/private/tmp/keel-image-only-release-20261020/docs/reviews/studio-publication-20261020/release/history-prefix311/postbuild/discovery-http.mjs",
+      "bytes": 4529,
+      "sha256": "1c759dd9c2a763bc30a3c74c05f55c61ea1a4535148348031ecd908478185231",
+      "installArgv": [
+        "/usr/bin/ssh",
+        "-o",
+        "BatchMode=yes",
+        "-o",
+        "ConnectTimeout=12",
+        "-o",
+        "StrictHostKeyChecking=yes",
+        "-o",
+        "UserKnownHostsFile=/Users/ravonus/dev/hashers/ops/servers/known_hosts",
+        "ubuntu@40.160.39.155",
+        "sudo -n /usr/bin/python3 -B -c 'import os,stat,hashlib,sys;from pathlib import Path;r=Path('\"'\"'/home/ubuntu/keel-studio-image-qualification-fefa0600-ecc0-4584-b211-8cd0d139e601'\"'\"');s=r.lstat();assert r.resolve()==r and s.st_uid==0 and stat.S_IMODE(s.st_mode)==0o700;b=sys.stdin.buffer.read(4530);assert len(b)==4529 and hashlib.sha256(b).hexdigest()=='\"'\"'1c759dd9c2a763bc30a3c74c05f55c61ea1a4535148348031ecd908478185231'\"'\"';p=r/'\"'\"'discovery-http.mjs'\"'\"';fd=os.open(p,os.O_WRONLY|os.O_CREAT|os.O_EXCL|os.O_NOFOLLOW,0o600);f=os.fdopen(fd,'\"'\"'wb'\"'\"');f.write(b);f.flush();os.fchmod(f.fileno(),0o444);os.fsync(f.fileno());f.close();d=os.open(r,os.O_DIRECTORY|os.O_NOFOLLOW);os.fsync(d);os.close(d)'"
+      ],
+      "stdinLocalPath": "/private/tmp/keel-image-only-release-20261020/docs/reviews/studio-publication-20261020/release/history-prefix311/postbuild/discovery-http.mjs"
+    },
+    {
+      "name": "scan-app.cjs",
+      "localPath": "/private/tmp/keel-image-only-release-20261020/docs/reviews/studio-publication-20261020/release/history-prefix311/postbuild/scan-app.cjs",
+      "bytes": 964,
+      "sha256": "0052bea161b10e1c3d304742b1acc98fe011de86cc339b21c88dfa63b4b6caab",
+      "installArgv": [
+        "/usr/bin/ssh",
+        "-o",
+        "BatchMode=yes",
+        "-o",
+        "ConnectTimeout=12",
+        "-o",
+        "StrictHostKeyChecking=yes",
+        "-o",
+        "UserKnownHostsFile=/Users/ravonus/dev/hashers/ops/servers/known_hosts",
+        "ubuntu@40.160.39.155",
+        "sudo -n /usr/bin/python3 -B -c 'import os,stat,hashlib,sys;from pathlib import Path;r=Path('\"'\"'/home/ubuntu/keel-studio-image-qualification-fefa0600-ecc0-4584-b211-8cd0d139e601'\"'\"');s=r.lstat();assert r.resolve()==r and s.st_uid==0 and stat.S_IMODE(s.st_mode)==0o700;b=sys.stdin.buffer.read(965);assert len(b)==964 and hashlib.sha256(b).hexdigest()=='\"'\"'0052bea161b10e1c3d304742b1acc98fe011de86cc339b21c88dfa63b4b6caab'\"'\"';p=r/'\"'\"'scan-app.cjs'\"'\"';fd=os.open(p,os.O_WRONLY|os.O_CREAT|os.O_EXCL|os.O_NOFOLLOW,0o600);f=os.fdopen(fd,'\"'\"'wb'\"'\"');f.write(b);f.flush();os.fchmod(f.fileno(),0o444);os.fsync(f.fileno());f.close();d=os.open(r,os.O_DIRECTORY|os.O_NOFOLLOW);os.fsync(d);os.close(d)'"
+      ],
+      "stdinLocalPath": "/private/tmp/keel-image-only-release-20261020/docs/reviews/studio-publication-20261020/release/history-prefix311/postbuild/scan-app.cjs"
+    },
+    {
+      "name": "verify-image-tree.cjs",
+      "localPath": "/private/tmp/keel-image-only-release-20261020/docs/reviews/studio-publication-20261020/release/history-prefix311/postbuild/verify-image-tree.cjs",
+      "bytes": 2277,
+      "sha256": "8e2e6d4c3ae58f80c3627aa9b2c93494d4c2b5ec8d2711e80502b51954b8c311",
+      "installArgv": [
+        "/usr/bin/ssh",
+        "-o",
+        "BatchMode=yes",
+        "-o",
+        "ConnectTimeout=12",
+        "-o",
+        "StrictHostKeyChecking=yes",
+        "-o",
+        "UserKnownHostsFile=/Users/ravonus/dev/hashers/ops/servers/known_hosts",
+        "ubuntu@40.160.39.155",
+        "sudo -n /usr/bin/python3 -B -c 'import os,stat,hashlib,sys;from pathlib import Path;r=Path('\"'\"'/home/ubuntu/keel-studio-image-qualification-fefa0600-ecc0-4584-b211-8cd0d139e601'\"'\"');s=r.lstat();assert r.resolve()==r and s.st_uid==0 and stat.S_IMODE(s.st_mode)==0o700;b=sys.stdin.buffer.read(2278);assert len(b)==2277 and hashlib.sha256(b).hexdigest()=='\"'\"'8e2e6d4c3ae58f80c3627aa9b2c93494d4c2b5ec8d2711e80502b51954b8c311'\"'\"';p=r/'\"'\"'verify-image-tree.cjs'\"'\"';fd=os.open(p,os.O_WRONLY|os.O_CREAT|os.O_EXCL|os.O_NOFOLLOW,0o600);f=os.fdopen(fd,'\"'\"'wb'\"'\"');f.write(b);f.flush();os.fchmod(f.fileno(),0o444);os.fsync(f.fileno());f.close();d=os.open(r,os.O_DIRECTORY|os.O_NOFOLLOW);os.fsync(d);os.close(d)'"
+      ],
+      "stdinLocalPath": "/private/tmp/keel-image-only-release-20261020/docs/reviews/studio-publication-20261020/release/history-prefix311/postbuild/verify-image-tree.cjs"
+    },
+    {
+      "name": "run-public-qualification.py",
+      "localPath": "/private/tmp/keel-image-only-release-20261020/docs/reviews/studio-publication-20261020/release/history-prefix311/postbuild/run-public-qualification.py",
+      "bytes": 10892,
+      "sha256": "11513996f17768d50e1bab826c76a253a9ea3cc900a4c8e3773c097094add49f",
+      "installArgv": [
+        "/usr/bin/ssh",
+        "-o",
+        "BatchMode=yes",
+        "-o",
+        "ConnectTimeout=12",
+        "-o",
+        "StrictHostKeyChecking=yes",
+        "-o",
+        "UserKnownHostsFile=/Users/ravonus/dev/hashers/ops/servers/known_hosts",
+        "ubuntu@40.160.39.155",
+        "sudo -n /usr/bin/python3 -B -c 'import os,stat,hashlib,sys;from pathlib import Path;r=Path('\"'\"'/home/ubuntu/keel-studio-image-qualification-fefa0600-ecc0-4584-b211-8cd0d139e601'\"'\"');s=r.lstat();assert r.resolve()==r and s.st_uid==0 and stat.S_IMODE(s.st_mode)==0o700;b=sys.stdin.buffer.read(10893);assert len(b)==10892 and hashlib.sha256(b).hexdigest()=='\"'\"'11513996f17768d50e1bab826c76a253a9ea3cc900a4c8e3773c097094add49f'\"'\"';p=r/'\"'\"'run-public-qualification.py'\"'\"';fd=os.open(p,os.O_WRONLY|os.O_CREAT|os.O_EXCL|os.O_NOFOLLOW,0o600);f=os.fdopen(fd,'\"'\"'wb'\"'\"');f.write(b);f.flush();os.fchmod(f.fileno(),0o444);os.fsync(f.fileno());f.close();d=os.open(r,os.O_DIRECTORY|os.O_NOFOLLOW);os.fsync(d);os.close(d)'"
+      ],
+      "stdinLocalPath": "/private/tmp/keel-image-only-release-20261020/docs/reviews/studio-publication-20261020/release/history-prefix311/postbuild/run-public-qualification.py"
+    },
+    {
+      "name": "expected-app-tree.json",
+      "localPath": "/private/tmp/keel-71cb-public-artifact-actual-20261021/expected-app-tree.json",
+      "bytes": 8546189,
+      "sha256": "18b915affabb9b03a465fd3295f12a79161eeeb1237348edc44ffcb5611d76f1",
+      "installArgv": [
+        "/usr/bin/ssh",
+        "-o",
+        "BatchMode=yes",
+        "-o",
+        "ConnectTimeout=12",
+        "-o",
+        "StrictHostKeyChecking=yes",
+        "-o",
+        "UserKnownHostsFile=/Users/ravonus/dev/hashers/ops/servers/known_hosts",
+        "ubuntu@40.160.39.155",
+        "sudo -n /usr/bin/python3 -B -c 'import os,stat,hashlib,sys;from pathlib import Path;r=Path('\"'\"'/home/ubuntu/keel-studio-image-qualification-fefa0600-ecc0-4584-b211-8cd0d139e601'\"'\"');s=r.lstat();assert r.resolve()==r and s.st_uid==0 and stat.S_IMODE(s.st_mode)==0o700;b=sys.stdin.buffer.read(8546190);assert len(b)==8546189 and hashlib.sha256(b).hexdigest()=='\"'\"'18b915affabb9b03a465fd3295f12a79161eeeb1237348edc44ffcb5611d76f1'\"'\"';p=r/'\"'\"'expected-app-tree.json'\"'\"';fd=os.open(p,os.O_WRONLY|os.O_CREAT|os.O_EXCL|os.O_NOFOLLOW,0o600);f=os.fdopen(fd,'\"'\"'wb'\"'\"');f.write(b);f.flush();os.fchmod(f.fileno(),0o444);os.fsync(f.fileno());f.close();d=os.open(r,os.O_DIRECTORY|os.O_NOFOLLOW);os.fsync(d);os.close(d)'"
+      ],
+      "stdinLocalPath": "/private/tmp/keel-71cb-public-artifact-actual-20261021/expected-app-tree.json"
+    },
+    {
+      "name": "base7b0-app-tree.json",
+      "localPath": "/private/tmp/keel-image-only-release-20261020/docs/reviews/studio-publication-20261020/release/funding-correction311/evidence/expected-app-tree.json",
+      "bytes": 8546189,
+      "sha256": "eab2bf89d3243e171e082daa74e46845c97fc1b021f124b12ec1c114cf0e2299",
+      "installArgv": [
+        "/usr/bin/ssh",
+        "-o",
+        "BatchMode=yes",
+        "-o",
+        "ConnectTimeout=12",
+        "-o",
+        "StrictHostKeyChecking=yes",
+        "-o",
+        "UserKnownHostsFile=/Users/ravonus/dev/hashers/ops/servers/known_hosts",
+        "ubuntu@40.160.39.155",
+        "sudo -n /usr/bin/python3 -B -c 'import os,stat,hashlib,sys;from pathlib import Path;r=Path('\"'\"'/home/ubuntu/keel-studio-image-qualification-fefa0600-ecc0-4584-b211-8cd0d139e601'\"'\"');s=r.lstat();assert r.resolve()==r and s.st_uid==0 and stat.S_IMODE(s.st_mode)==0o700;b=sys.stdin.buffer.read(8546190);assert len(b)==8546189 and hashlib.sha256(b).hexdigest()=='\"'\"'eab2bf89d3243e171e082daa74e46845c97fc1b021f124b12ec1c114cf0e2299'\"'\"';p=r/'\"'\"'base7b0-app-tree.json'\"'\"';fd=os.open(p,os.O_WRONLY|os.O_CREAT|os.O_EXCL|os.O_NOFOLLOW,0o600);f=os.fdopen(fd,'\"'\"'wb'\"'\"');f.write(b);f.flush();os.fchmod(f.fileno(),0o444);os.fsync(f.fileno());f.close();d=os.open(r,os.O_DIRECTORY|os.O_NOFOLLOW);os.fsync(d);os.close(d)'"
+      ],
+      "stdinLocalPath": "/private/tmp/keel-image-only-release-20261020/docs/reviews/studio-publication-20261020/release/funding-correction311/evidence/expected-app-tree.json"
+    },
+    {
+      "name": "postbuild-packet.json",
+      "localPath": "/private/tmp/keel-image-only-release-20261020/docs/reviews/studio-publication-20261020/release/history-prefix311/postbuild/postbuild-qualification.commands.proposed.json",
+      "bytes": 22627,
+      "sha256": "9098fea599e5fc3f0302fd12ae57e5bf3219c7feda2866a7f181f4122473493a",
+      "installArgv": [
+        "/usr/bin/ssh",
+        "-o",
+        "BatchMode=yes",
+        "-o",
+        "ConnectTimeout=12",
+        "-o",
+        "StrictHostKeyChecking=yes",
+        "-o",
+        "UserKnownHostsFile=/Users/ravonus/dev/hashers/ops/servers/known_hosts",
+        "ubuntu@40.160.39.155",
+        "sudo -n /usr/bin/python3 -B -c 'import os,stat,hashlib,sys;from pathlib import Path;r=Path('\"'\"'/home/ubuntu/keel-studio-image-qualification-fefa0600-ecc0-4584-b211-8cd0d139e601'\"'\"');s=r.lstat();assert r.resolve()==r and s.st_uid==0 and stat.S_IMODE(s.st_mode)==0o700;b=sys.stdin.buffer.read(22628);assert len(b)==22627 and hashlib.sha256(b).hexdigest()=='\"'\"'9098fea599e5fc3f0302fd12ae57e5bf3219c7feda2866a7f181f4122473493a'\"'\"';p=r/'\"'\"'postbuild-packet.json'\"'\"';fd=os.open(p,os.O_WRONLY|os.O_CREAT|os.O_EXCL|os.O_NOFOLLOW,0o600);f=os.fdopen(fd,'\"'\"'wb'\"'\"');f.write(b);f.flush();os.fchmod(f.fileno(),0o444);os.fsync(f.fileno());f.close();d=os.open(r,os.O_DIRECTORY|os.O_NOFOLLOW);os.fsync(d);os.close(d)'"
+      ],
+      "stdinLocalPath": "/private/tmp/keel-image-only-release-20261020/docs/reviews/studio-publication-20261020/release/history-prefix311/postbuild/postbuild-qualification.commands.proposed.json"
+    }
+  ],
+  "createEmptyPostgresCoverArgv": [
+    "/usr/bin/ssh",
+    "-o",
+    "BatchMode=yes",
+    "-o",
+    "ConnectTimeout=12",
+    "-o",
+    "StrictHostKeyChecking=yes",
+    "-o",
+    "UserKnownHostsFile=/Users/ravonus/dev/hashers/ops/servers/known_hosts",
+    "ubuntu@40.160.39.155",
+    "sudo -n /usr/bin/python3 -B -c 'import os;from pathlib import Path;r=Path('\"'\"'/home/ubuntu/keel-studio-image-qualification-fefa0600-ecc0-4584-b211-8cd0d139e601'\"'\"');os.mkdir(r/'\"'\"'empty-postgres'\"'\"',0o555);d=os.open(r,os.O_DIRECTORY|os.O_NOFOLLOW);os.fsync(d);os.close(d)'"
+  ],
+  "serialRoles": {
+    "tree": [
+      "/usr/bin/ssh",
+      "-o",
+      "BatchMode=yes",
+      "-o",
+      "ConnectTimeout=12",
+      "-o",
+      "StrictHostKeyChecking=yes",
+      "-o",
+      "UserKnownHostsFile=/Users/ravonus/dev/hashers/ops/servers/known_hosts",
+      "ubuntu@40.160.39.155",
+      "sudo -n /usr/bin/python3 -B /home/ubuntu/keel-studio-image-qualification-fefa0600-ecc0-4584-b211-8cd0d139e601/run-public-qualification.py tree"
+    ],
+    "sdk": [
+      "/usr/bin/ssh",
+      "-o",
+      "BatchMode=yes",
+      "-o",
+      "ConnectTimeout=12",
+      "-o",
+      "StrictHostKeyChecking=yes",
+      "-o",
+      "UserKnownHostsFile=/Users/ravonus/dev/hashers/ops/servers/known_hosts",
+      "ubuntu@40.160.39.155",
+      "sudo -n /usr/bin/python3 -B /home/ubuntu/keel-studio-image-qualification-fefa0600-ecc0-4584-b211-8cd0d139e601/run-public-qualification.py sdk"
+    ],
+    "http": [
+      "/usr/bin/ssh",
+      "-o",
+      "BatchMode=yes",
+      "-o",
+      "ConnectTimeout=12",
+      "-o",
+      "StrictHostKeyChecking=yes",
+      "-o",
+      "UserKnownHostsFile=/Users/ravonus/dev/hashers/ops/servers/known_hosts",
+      "ubuntu@40.160.39.155",
+      "sudo -n /usr/bin/python3 -B /home/ubuntu/keel-studio-image-qualification-fefa0600-ecc0-4584-b211-8cd0d139e601/run-public-qualification.py http"
+    ]
+  },
+  "executeAutomatically": false,
+  "approval": false,
+  "root": "/home/ubuntu/keel-studio-image-qualification-fefa0600-ecc0-4584-b211-8cd0d139e601",
+  "source": "71cb0e31bab5e4ee93af9d3b3185978e46f1fe8e",
+  "image": "sha256:17cb5aac36536e3d6026ba32b3bb3a66adc04af5bb7207082ee472dce66320c9",
+  "runnerSHA256": "11513996f17768d50e1bab826c76a253a9ea3cc900a4c8e3773c097094add49f",
+  "sourceFreeze": null
+}

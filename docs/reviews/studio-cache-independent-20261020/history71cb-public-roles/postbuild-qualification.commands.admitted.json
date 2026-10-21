@@ -1,0 +1,441 @@
+{
+  "schema": "keel.actual-observer-public-static-qualification-proposal@1",
+  "image": "sha256:17cb5aac36536e3d6026ba32b3bb3a66adc04af5bb7207082ee472dce66320c9",
+  "source": "71cb0e31bab5e4ee93af9d3b3185978e46f1fe8e",
+  "sdk": "311d61526284248938e335d7ed879089408933be",
+  "buildId": "jfjIfW1-d41RR-j-i-YgL",
+  "root": "/home/ubuntu/keel-studio-image-qualification-fefa0600-ecc0-4584-b211-8cd0d139e601",
+  "createExclusiveRootArgv": [
+    "/usr/bin/ssh",
+    "-o",
+    "BatchMode=yes",
+    "-o",
+    "ConnectTimeout=12",
+    "-o",
+    "StrictHostKeyChecking=yes",
+    "-o",
+    "UserKnownHostsFile=/Users/ravonus/dev/hashers/ops/servers/known_hosts",
+    "ubuntu@40.160.39.155",
+    "sudo -n /usr/bin/python3 -B -c 'import os,stat;from pathlib import Path;r=Path('\"'\"'/home/ubuntu/keel-studio-image-qualification-fefa0600-ecc0-4584-b211-8cd0d139e601'\"'\"');assert r.parent.resolve()==r.parent;os.mkdir(r,0o700);d=os.open(r.parent,os.O_DIRECTORY|os.O_NOFOLLOW);os.fsync(d);os.close(d)'"
+  ],
+  "files": [
+    {
+      "name": "qualify-final-image.mjs",
+      "localPath": "/private/tmp/keel-image-only-release-20261020/docs/reviews/studio-publication-20261020/release/history-prefix311/postbuild/qualify-final-image.mjs",
+      "bytes": 6384,
+      "sha256": "77300ca8d113492381cb834bf3b87bcc7907fcf2cdadc3c1e6e5a013aead3683"
+    },
+    {
+      "name": "compiled-factory.mjs",
+      "localPath": "/private/tmp/keel-image-only-release-20261020/docs/reviews/studio-publication-20261020/release/history-prefix311/postbuild/compiled-factory.mjs",
+      "bytes": 3794,
+      "sha256": "53f7cda6cbfdd9b47f20e29f42f5e2dcf7dbe82cec6f7669024214678f984fd9"
+    },
+    {
+      "name": "expected-four-sdk-dist.json",
+      "localPath": "/private/tmp/keel-image-only-release-20261020/docs/reviews/studio-publication-20261020/release/history-prefix311/postbuild/expected-four-sdk-dist.json",
+      "bytes": 226964,
+      "sha256": "edb263fba57b51e966f8da183d3562cdb0d749634fd68296919a41f02e2ce9c6"
+    },
+    {
+      "name": "observer.mjs",
+      "localPath": "/private/tmp/keel-image-only-release-20261020/docs/reviews/studio-publication-20261020/release/history-prefix311/postbuild/observer.mjs",
+      "bytes": 2218,
+      "sha256": "d141191056bb0e969fa6f18f32f025d83d573708ce74b03802b908ef6dabbe35"
+    },
+    {
+      "name": "discovery-http.mjs",
+      "localPath": "/private/tmp/keel-image-only-release-20261020/docs/reviews/studio-publication-20261020/release/history-prefix311/postbuild/discovery-http.mjs",
+      "bytes": 4529,
+      "sha256": "1c759dd9c2a763bc30a3c74c05f55c61ea1a4535148348031ecd908478185231"
+    },
+    {
+      "name": "scan-app.cjs",
+      "localPath": "/private/tmp/keel-image-only-release-20261020/docs/reviews/studio-publication-20261020/release/history-prefix311/postbuild/scan-app.cjs",
+      "bytes": 964,
+      "sha256": "0052bea161b10e1c3d304742b1acc98fe011de86cc339b21c88dfa63b4b6caab"
+    },
+    {
+      "name": "verify-image-tree.cjs",
+      "localPath": "/private/tmp/keel-image-only-release-20261020/docs/reviews/studio-publication-20261020/release/history-prefix311/postbuild/verify-image-tree.cjs",
+      "bytes": 2277,
+      "sha256": "8e2e6d4c3ae58f80c3627aa9b2c93494d4c2b5ec8d2711e80502b51954b8c311"
+    },
+    {
+      "name": "run-public-qualification.py",
+      "localPath": "/private/tmp/keel-image-only-release-20261020/docs/reviews/studio-publication-20261020/release/history-prefix311/postbuild/run-public-qualification.py",
+      "bytes": 10892,
+      "sha256": "11513996f17768d50e1bab826c76a253a9ea3cc900a4c8e3773c097094add49f"
+    },
+    {
+      "name": "expected-app-tree.json",
+      "localPath": "/private/tmp/keel-71cb-public-artifact-actual-20261021/expected-app-tree.json",
+      "bytes": 8546189,
+      "sha256": "18b915affabb9b03a465fd3295f12a79161eeeb1237348edc44ffcb5611d76f1"
+    },
+    {
+      "name": "base7b0-app-tree.json",
+      "localPath": "/private/tmp/keel-image-only-release-20261020/docs/reviews/studio-publication-20261020/release/funding-correction311/evidence/expected-app-tree.json",
+      "bytes": 8546189,
+      "sha256": "eab2bf89d3243e171e082daa74e46845c97fc1b021f124b12ec1c114cf0e2299"
+    }
+  ],
+  "createEmptyPGCoverArgv": [
+    "/usr/bin/ssh",
+    "-o",
+    "BatchMode=yes",
+    "-o",
+    "ConnectTimeout=12",
+    "-o",
+    "StrictHostKeyChecking=yes",
+    "-o",
+    "UserKnownHostsFile=/Users/ravonus/dev/hashers/ops/servers/known_hosts",
+    "ubuntu@40.160.39.155",
+    "sudo -n /usr/bin/python3 -B -c 'import os,stat;from pathlib import Path;r=Path('\"'\"'/home/ubuntu/keel-studio-image-qualification-fefa0600-ecc0-4584-b211-8cd0d139e601'\"'\"');assert r.resolve()==r and r.stat().st_uid==0 and stat.S_IMODE(r.stat().st_mode)==0o700;os.mkdir(r/'\"'\"'empty-postgres'\"'\"',0o555);d=os.open(r,os.O_DIRECTORY|os.O_NOFOLLOW);os.fsync(d);os.close(d)'"
+  ],
+  "serialRoles": {
+    "tree": {
+      "name": "keel-image-tree-fefa0600-ecc0-4584-b211-8cd0d139e601",
+      "hostDeadlineSeconds": 180,
+      "createArgv": [
+        "/usr/bin/ssh",
+        "-o",
+        "BatchMode=yes",
+        "-o",
+        "ConnectTimeout=12",
+        "-o",
+        "StrictHostKeyChecking=yes",
+        "-o",
+        "UserKnownHostsFile=/Users/ravonus/dev/hashers/ops/servers/known_hosts",
+        "ubuntu@40.160.39.155",
+        "sudo -n /usr/bin/docker create --name keel-image-tree-fefa0600-ecc0-4584-b211-8cd0d139e601 --label io.keel.qualification.id=fefa0600-ecc0-4584-b211-8cd0d139e601 --label io.keel.qualification.role=tree --network none --read-only --user 999:999 --cap-drop ALL --security-opt no-new-privileges --memory 805306368 --memory-swap 805306368 --cpus 1 --pids-limit 64 --no-healthcheck --log-driver json-file --log-opt max-size=1m --log-opt max-file=1 --tmpfs /tmp:rw,nosuid,nodev,noexec,size=64m,uid=999,gid=999,mode=1777 --tmpfs /run:rw,nosuid,nodev,noexec,size=16m,uid=999,gid=999,mode=0700 --mount type=bind,src=/home/ubuntu/keel-studio-image-qualification-fefa0600-ecc0-4584-b211-8cd0d139e601/empty-postgres,dst=/var/lib/postgresql/data,readonly --mount type=bind,src=/home/ubuntu/keel-studio-image-qualification-fefa0600-ecc0-4584-b211-8cd0d139e601/scan-app.cjs,dst=/qualification/scan-app.cjs,readonly --mount type=bind,src=/home/ubuntu/keel-studio-image-qualification-fefa0600-ecc0-4584-b211-8cd0d139e601/verify-image-tree.cjs,dst=/qualification/verify-image-tree.cjs,readonly --mount type=bind,src=/home/ubuntu/keel-studio-image-qualification-fefa0600-ecc0-4584-b211-8cd0d139e601/expected-app-tree.json,dst=/qualification/expected-app-tree.json,readonly --mount type=bind,src=/home/ubuntu/keel-studio-image-qualification-fefa0600-ecc0-4584-b211-8cd0d139e601/base7b0-app-tree.json,dst=/qualification/base7b0-app-tree.json,readonly --workdir /app/web/apps/studio --entrypoint node sha256:17cb5aac36536e3d6026ba32b3bb3a66adc04af5bb7207082ee472dce66320c9 /qualification/verify-image-tree.cjs"
+      ],
+      "inspectBeforeStartArgv": [
+        "/usr/bin/ssh",
+        "-o",
+        "BatchMode=yes",
+        "-o",
+        "ConnectTimeout=12",
+        "-o",
+        "StrictHostKeyChecking=yes",
+        "-o",
+        "UserKnownHostsFile=/Users/ravonus/dev/hashers/ops/servers/known_hosts",
+        "ubuntu@40.160.39.155",
+        "sudo -n /usr/bin/docker inspect keel-image-tree-fefa0600-ecc0-4584-b211-8cd0d139e601"
+      ],
+      "failure": "Authenticate immutable ID/image/exact argv+mounts+ownership before stopping only this owned resource; preserve foreign occupant; retain stopped container/no rm",
+      "startOnlyAfter": "Exact inspected full Config/HostConfig/mounts match create request and trusted image defaults; record immutable ID and use that ID for subsequent Docker operations",
+      "startArgvTemplate": [
+        "/usr/bin/ssh",
+        "-o",
+        "BatchMode=yes",
+        "-o",
+        "ConnectTimeout=12",
+        "-o",
+        "StrictHostKeyChecking=yes",
+        "-o",
+        "UserKnownHostsFile=/Users/ravonus/dev/hashers/ops/servers/known_hosts",
+        "ubuntu@40.160.39.155",
+        "sudo -n /usr/bin/docker start __AUTHENTICATED_CONTAINER_ID__"
+      ],
+      "waitArgvTemplate": [
+        "/usr/bin/ssh",
+        "-o",
+        "BatchMode=yes",
+        "-o",
+        "ConnectTimeout=12",
+        "-o",
+        "StrictHostKeyChecking=yes",
+        "-o",
+        "UserKnownHostsFile=/Users/ravonus/dev/hashers/ops/servers/known_hosts",
+        "ubuntu@40.160.39.155",
+        "sudo -n /usr/bin/docker wait __AUTHENTICATED_CONTAINER_ID__"
+      ],
+      "boundedLogsArgvTemplate": [
+        "/usr/bin/ssh",
+        "-o",
+        "BatchMode=yes",
+        "-o",
+        "ConnectTimeout=12",
+        "-o",
+        "StrictHostKeyChecking=yes",
+        "-o",
+        "UserKnownHostsFile=/Users/ravonus/dev/hashers/ops/servers/known_hosts",
+        "ubuntu@40.160.39.155",
+        "sudo -n /usr/bin/docker logs --tail 4000 __AUTHENTICATED_CONTAINER_ID__"
+      ],
+      "inspectAfterArgvTemplate": [
+        "/usr/bin/ssh",
+        "-o",
+        "BatchMode=yes",
+        "-o",
+        "ConnectTimeout=12",
+        "-o",
+        "StrictHostKeyChecking=yes",
+        "-o",
+        "UserKnownHostsFile=/Users/ravonus/dev/hashers/ops/servers/known_hosts",
+        "ubuntu@40.160.39.155",
+        "sudo -n /usr/bin/docker inspect __AUTHENTICATED_CONTAINER_ID__"
+      ],
+      "onlyTemplateBinding": "The guarded runner derives actual immutable ID after matching exact planned name/image/labels/Config/HostConfig/Mounts. Every mutation after create uses that ID.",
+      "executeGuardedArgv": [
+        "/usr/bin/ssh",
+        "-o",
+        "BatchMode=yes",
+        "-o",
+        "ConnectTimeout=12",
+        "-o",
+        "StrictHostKeyChecking=yes",
+        "-o",
+        "UserKnownHostsFile=/Users/ravonus/dev/hashers/ops/servers/known_hosts",
+        "ubuntu@40.160.39.155",
+        "sudo -n /usr/bin/python3 -B /home/ubuntu/keel-studio-image-qualification-fefa0600-ecc0-4584-b211-8cd0d139e601/run-public-qualification.py tree"
+      ]
+    },
+    "sdk": {
+      "name": "keel-image-sdk-fefa0600-ecc0-4584-b211-8cd0d139e601",
+      "hostDeadlineSeconds": 180,
+      "createArgv": [
+        "/usr/bin/ssh",
+        "-o",
+        "BatchMode=yes",
+        "-o",
+        "ConnectTimeout=12",
+        "-o",
+        "StrictHostKeyChecking=yes",
+        "-o",
+        "UserKnownHostsFile=/Users/ravonus/dev/hashers/ops/servers/known_hosts",
+        "ubuntu@40.160.39.155",
+        "sudo -n /usr/bin/docker create --name keel-image-sdk-fefa0600-ecc0-4584-b211-8cd0d139e601 --label io.keel.qualification.id=fefa0600-ecc0-4584-b211-8cd0d139e601 --label io.keel.qualification.role=sdk --network none --read-only --user 999:999 --cap-drop ALL --security-opt no-new-privileges --memory 805306368 --memory-swap 805306368 --cpus 2 --pids-limit 64 --no-healthcheck --log-driver json-file --log-opt max-size=1m --log-opt max-file=1 --tmpfs /tmp:rw,nosuid,nodev,noexec,size=64m,uid=999,gid=999,mode=1777 --tmpfs /run:rw,nosuid,nodev,noexec,size=16m,uid=999,gid=999,mode=0700 --mount type=bind,src=/home/ubuntu/keel-studio-image-qualification-fefa0600-ecc0-4584-b211-8cd0d139e601/empty-postgres,dst=/var/lib/postgresql/data,readonly --mount type=bind,src=/home/ubuntu/keel-studio-image-qualification-fefa0600-ecc0-4584-b211-8cd0d139e601/observer.mjs,dst=/qualification/observer.mjs,readonly --mount type=bind,src=/home/ubuntu/keel-studio-image-qualification-fefa0600-ecc0-4584-b211-8cd0d139e601/qualify-final-image.mjs,dst=/qualification/qualify-final-image.mjs,readonly --mount type=bind,src=/home/ubuntu/keel-studio-image-qualification-fefa0600-ecc0-4584-b211-8cd0d139e601/compiled-factory.mjs,dst=/qualification/compiled-factory.mjs,readonly --mount type=bind,src=/home/ubuntu/keel-studio-image-qualification-fefa0600-ecc0-4584-b211-8cd0d139e601/expected-four-sdk-dist.json,dst=/qualification/expected-four-sdk-dist.json,readonly --workdir /app/web/apps/studio --entrypoint node sha256:17cb5aac36536e3d6026ba32b3bb3a66adc04af5bb7207082ee472dce66320c9 --import /qualification/observer.mjs /qualification/qualify-final-image.mjs"
+      ],
+      "inspectBeforeStartArgv": [
+        "/usr/bin/ssh",
+        "-o",
+        "BatchMode=yes",
+        "-o",
+        "ConnectTimeout=12",
+        "-o",
+        "StrictHostKeyChecking=yes",
+        "-o",
+        "UserKnownHostsFile=/Users/ravonus/dev/hashers/ops/servers/known_hosts",
+        "ubuntu@40.160.39.155",
+        "sudo -n /usr/bin/docker inspect keel-image-sdk-fefa0600-ecc0-4584-b211-8cd0d139e601"
+      ],
+      "failure": "Authenticate immutable ID/image/exact argv+mounts+ownership before stopping only this owned resource; preserve foreign occupant; retain stopped container/no rm",
+      "startOnlyAfter": "Exact inspected full Config/HostConfig/mounts match create request and trusted image defaults; record immutable ID and use that ID for subsequent Docker operations",
+      "startArgvTemplate": [
+        "/usr/bin/ssh",
+        "-o",
+        "BatchMode=yes",
+        "-o",
+        "ConnectTimeout=12",
+        "-o",
+        "StrictHostKeyChecking=yes",
+        "-o",
+        "UserKnownHostsFile=/Users/ravonus/dev/hashers/ops/servers/known_hosts",
+        "ubuntu@40.160.39.155",
+        "sudo -n /usr/bin/docker start __AUTHENTICATED_CONTAINER_ID__"
+      ],
+      "waitArgvTemplate": [
+        "/usr/bin/ssh",
+        "-o",
+        "BatchMode=yes",
+        "-o",
+        "ConnectTimeout=12",
+        "-o",
+        "StrictHostKeyChecking=yes",
+        "-o",
+        "UserKnownHostsFile=/Users/ravonus/dev/hashers/ops/servers/known_hosts",
+        "ubuntu@40.160.39.155",
+        "sudo -n /usr/bin/docker wait __AUTHENTICATED_CONTAINER_ID__"
+      ],
+      "boundedLogsArgvTemplate": [
+        "/usr/bin/ssh",
+        "-o",
+        "BatchMode=yes",
+        "-o",
+        "ConnectTimeout=12",
+        "-o",
+        "StrictHostKeyChecking=yes",
+        "-o",
+        "UserKnownHostsFile=/Users/ravonus/dev/hashers/ops/servers/known_hosts",
+        "ubuntu@40.160.39.155",
+        "sudo -n /usr/bin/docker logs --tail 4000 __AUTHENTICATED_CONTAINER_ID__"
+      ],
+      "inspectAfterArgvTemplate": [
+        "/usr/bin/ssh",
+        "-o",
+        "BatchMode=yes",
+        "-o",
+        "ConnectTimeout=12",
+        "-o",
+        "StrictHostKeyChecking=yes",
+        "-o",
+        "UserKnownHostsFile=/Users/ravonus/dev/hashers/ops/servers/known_hosts",
+        "ubuntu@40.160.39.155",
+        "sudo -n /usr/bin/docker inspect __AUTHENTICATED_CONTAINER_ID__"
+      ],
+      "onlyTemplateBinding": "The guarded runner derives actual immutable ID after matching exact planned name/image/labels/Config/HostConfig/Mounts. Every mutation after create uses that ID.",
+      "executeGuardedArgv": [
+        "/usr/bin/ssh",
+        "-o",
+        "BatchMode=yes",
+        "-o",
+        "ConnectTimeout=12",
+        "-o",
+        "StrictHostKeyChecking=yes",
+        "-o",
+        "UserKnownHostsFile=/Users/ravonus/dev/hashers/ops/servers/known_hosts",
+        "ubuntu@40.160.39.155",
+        "sudo -n /usr/bin/python3 -B /home/ubuntu/keel-studio-image-qualification-fefa0600-ecc0-4584-b211-8cd0d139e601/run-public-qualification.py sdk"
+      ]
+    },
+    "http": {
+      "name": "keel-image-http-fefa0600-ecc0-4584-b211-8cd0d139e601",
+      "hostDeadlineSeconds": 75,
+      "createArgv": [
+        "/usr/bin/ssh",
+        "-o",
+        "BatchMode=yes",
+        "-o",
+        "ConnectTimeout=12",
+        "-o",
+        "StrictHostKeyChecking=yes",
+        "-o",
+        "UserKnownHostsFile=/Users/ravonus/dev/hashers/ops/servers/known_hosts",
+        "ubuntu@40.160.39.155",
+        "sudo -n /usr/bin/docker create --name keel-image-http-fefa0600-ecc0-4584-b211-8cd0d139e601 --label io.keel.qualification.id=fefa0600-ecc0-4584-b211-8cd0d139e601 --label io.keel.qualification.role=http --network none --read-only --user 999:999 --cap-drop ALL --security-opt no-new-privileges --memory 805306368 --memory-swap 805306368 --cpus 1 --pids-limit 64 --no-healthcheck --log-driver json-file --log-opt max-size=1m --log-opt max-file=1 --tmpfs /tmp:rw,nosuid,nodev,noexec,size=64m,uid=999,gid=999,mode=1777 --tmpfs /run:rw,nosuid,nodev,noexec,size=16m,uid=999,gid=999,mode=0700 --mount type=bind,src=/home/ubuntu/keel-studio-image-qualification-fefa0600-ecc0-4584-b211-8cd0d139e601/empty-postgres,dst=/var/lib/postgresql/data,readonly --mount type=bind,src=/home/ubuntu/keel-studio-image-qualification-fefa0600-ecc0-4584-b211-8cd0d139e601/observer.mjs,dst=/qualification/observer.mjs,readonly --mount type=bind,src=/home/ubuntu/keel-studio-image-qualification-fefa0600-ecc0-4584-b211-8cd0d139e601/discovery-http.mjs,dst=/qualification/discovery-http.mjs,readonly --workdir /app/web/apps/studio --entrypoint node sha256:17cb5aac36536e3d6026ba32b3bb3a66adc04af5bb7207082ee472dce66320c9 --import /qualification/observer.mjs /qualification/discovery-http.mjs"
+      ],
+      "inspectBeforeStartArgv": [
+        "/usr/bin/ssh",
+        "-o",
+        "BatchMode=yes",
+        "-o",
+        "ConnectTimeout=12",
+        "-o",
+        "StrictHostKeyChecking=yes",
+        "-o",
+        "UserKnownHostsFile=/Users/ravonus/dev/hashers/ops/servers/known_hosts",
+        "ubuntu@40.160.39.155",
+        "sudo -n /usr/bin/docker inspect keel-image-http-fefa0600-ecc0-4584-b211-8cd0d139e601"
+      ],
+      "failure": "Authenticate immutable ID/image/exact argv+mounts+ownership before stopping only this owned resource; preserve foreign occupant; retain stopped container/no rm",
+      "startOnlyAfter": "Exact inspected full Config/HostConfig/mounts match create request and trusted image defaults; record immutable ID and use that ID for subsequent Docker operations",
+      "startArgvTemplate": [
+        "/usr/bin/ssh",
+        "-o",
+        "BatchMode=yes",
+        "-o",
+        "ConnectTimeout=12",
+        "-o",
+        "StrictHostKeyChecking=yes",
+        "-o",
+        "UserKnownHostsFile=/Users/ravonus/dev/hashers/ops/servers/known_hosts",
+        "ubuntu@40.160.39.155",
+        "sudo -n /usr/bin/docker start __AUTHENTICATED_CONTAINER_ID__"
+      ],
+      "waitArgvTemplate": [
+        "/usr/bin/ssh",
+        "-o",
+        "BatchMode=yes",
+        "-o",
+        "ConnectTimeout=12",
+        "-o",
+        "StrictHostKeyChecking=yes",
+        "-o",
+        "UserKnownHostsFile=/Users/ravonus/dev/hashers/ops/servers/known_hosts",
+        "ubuntu@40.160.39.155",
+        "sudo -n /usr/bin/docker wait __AUTHENTICATED_CONTAINER_ID__"
+      ],
+      "boundedLogsArgvTemplate": [
+        "/usr/bin/ssh",
+        "-o",
+        "BatchMode=yes",
+        "-o",
+        "ConnectTimeout=12",
+        "-o",
+        "StrictHostKeyChecking=yes",
+        "-o",
+        "UserKnownHostsFile=/Users/ravonus/dev/hashers/ops/servers/known_hosts",
+        "ubuntu@40.160.39.155",
+        "sudo -n /usr/bin/docker logs --tail 4000 __AUTHENTICATED_CONTAINER_ID__"
+      ],
+      "inspectAfterArgvTemplate": [
+        "/usr/bin/ssh",
+        "-o",
+        "BatchMode=yes",
+        "-o",
+        "ConnectTimeout=12",
+        "-o",
+        "StrictHostKeyChecking=yes",
+        "-o",
+        "UserKnownHostsFile=/Users/ravonus/dev/hashers/ops/servers/known_hosts",
+        "ubuntu@40.160.39.155",
+        "sudo -n /usr/bin/docker inspect __AUTHENTICATED_CONTAINER_ID__"
+      ],
+      "onlyTemplateBinding": "The guarded runner derives actual immutable ID after matching exact planned name/image/labels/Config/HostConfig/Mounts. Every mutation after create uses that ID.",
+      "executeGuardedArgv": [
+        "/usr/bin/ssh",
+        "-o",
+        "BatchMode=yes",
+        "-o",
+        "ConnectTimeout=12",
+        "-o",
+        "StrictHostKeyChecking=yes",
+        "-o",
+        "UserKnownHostsFile=/Users/ravonus/dev/hashers/ops/servers/known_hosts",
+        "ubuntu@40.160.39.155",
+        "sudo -n /usr/bin/python3 -B /home/ubuntu/keel-studio-image-qualification-fefa0600-ecc0-4584-b211-8cd0d139e601/run-public-qualification.py http"
+      ]
+    }
+  },
+  "requiredBeforeEachRole": "Lead sole operator; fresh normal bounded health window (max20 requests/45s interval/900s); existing rollout lock; current5c97/7b0 full Config/Host/Mounts/paused exact and D97/socket unchanged; >=1GiB memory, load<4 and1GiB+256MiB disk reserve; fresh owned names unused",
+  "requireAfterEachRole": "exit0, OOMKilledfalse, stopped authenticated owned resource, exact original and runner unchanged; no automatic retry",
+  "activationApproved": false,
+  "runnerSHA256": "11513996f17768d50e1bab826c76a253a9ea3cc900a4c8e3773c097094add49f",
+  "nativeProgramInvoked": false,
+  "privateInputIncluded": false,
+  "executeAutomatically": false,
+  "sourceFreeze": null,
+  "independentProtocolAttribution": {
+    "priorStrictCompiledClosureFailureRetained": true,
+    "currentWholeCompiledClosureEquivalenceClaim": false,
+    "actualCanonicalFactoryGoldensRequired": true,
+    "installedSDK1360AndNativeOpsBootstrapWorkerZeroDeltaRequired": true,
+    "sourceOnlyReviewSHA256": "5e692e190a6e122df532bfa6e529aab62acc3a4e3e2df2fba6b1ca8082f5480c",
+    "noPrivateProgramOrRPCInvoked": true
+  },
+  "createEmptyPostgresCoverArgv": [
+    "/usr/bin/ssh",
+    "-o",
+    "BatchMode=yes",
+    "-o",
+    "ConnectTimeout=12",
+    "-o",
+    "StrictHostKeyChecking=yes",
+    "-o",
+    "UserKnownHostsFile=/Users/ravonus/dev/hashers/ops/servers/known_hosts",
+    "ubuntu@40.160.39.155",
+    "sudo -n /usr/bin/python3 -B -c 'import os;from pathlib import Path;r=Path('\"'\"'/home/ubuntu/keel-studio-image-qualification-fefa0600-ecc0-4584-b211-8cd0d139e601'\"'\"');os.mkdir(r/'\"'\"'empty-postgres'\"'\"',0o555);d=os.open(r,os.O_DIRECTORY|os.O_NOFOLLOW);os.fsync(d);os.close(d)'"
+  ],
+  "sourceArtifactPreparationBaseCommit": "0e6729f807ab6ac21b1fe1f52722c9534ec5c063",
+  "actualPublicArtifactProvenance": {
+    "actualBuildStdoutLocalPath": "/private/tmp/keel-71cb-host-image-build-actual-20261021/after-normal-health-window/01-only-public-image-build.stdout",
+    "actualBuildReceiptBytes": 6760,
+    "actualBuildReceiptSHA256": "b7d273249cb1f278ab67d9f73a1ad4b85eb46f0da59fa052e5149dc24ef7f427",
+    "durableReadbackByteEqualityConfirmedByRoot": true,
+    "fullSaveOnlyOnYuna": "/private/tmp/keel-actual-history71cb-image-20261021/image.tar",
+    "saveBytes": 728640512,
+    "saveSHA256": "f85233156f412f17f92aa609e20c1e13f377205cb885b97e5b2a9a108ec728bc",
+    "saveProducerAndConsumerExitCodes": [
+      0,
+      0
+    ],
+    "completeOCIAuditPendingIndependentQA": true,
+    "newImageBytes": 728593160,
+    "newImageConfigSHA256": "b8ddaf6d68e76ad758ee46b7c8407b480dfb146113ba0f31a43f10943d80a38b",
+    "newImageRootFSSHA256": "4c8ae79ca08fa02d6ce7209d2a9116550ab175a502572d850aec7fd2aa9fa2e0",
+    "newImageLayerCount": 46,
+    "base7b0LayerPrefixCount": 44
+  }
+}

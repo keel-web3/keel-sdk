@@ -1,0 +1,40 @@
+{
+  "schema": "keel.independent-public-evidence-manifest@1",
+  "files": [
+    {
+      "path": "public-roles-review.json",
+      "bytes": 5346,
+      "sha256": "92b2205c307a63c0c0f9d19fb7476c18f9cadbfcbbc096002be2b7041ff2bf3f"
+    },
+    {
+      "path": "postbuild-transfer.commands.admitted.json",
+      "bytes": 19977,
+      "sha256": "69622878e12584eb01075d4f8f28c92bc32e4643f91a94366b9c494bf32484d8"
+    },
+    {
+      "path": "postbuild-qualification.commands.admitted.json",
+      "bytes": 22627,
+      "sha256": "9098fea599e5fc3f0302fd12ae57e5bf3219c7feda2866a7f181f4122473493a"
+    },
+    {
+      "path": "input-and-source-audit.json",
+      "bytes": 2660,
+      "sha256": "b4d8485eb833105da10876fe5e6a177009cf4ea66f16db27f543a64cff9d11b2"
+    },
+    {
+      "path": "qualification-controls.stdout",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "qualification-controls.stderr",
+      "bytes": 103,
+      "sha256": "0f7e4b97443e54aca647179972594d13bb587afcbf151fab8228148587ea844a"
+    },
+    {
+      "path": "independent-artifact-qa.json",
+      "bytes": 6632,
+      "sha256": "b83a0702a4ada47249ee5d5f159cee7daa7f18af87f703cc4a14dcabb6ac53d0"
+    }
+  ]
+}
