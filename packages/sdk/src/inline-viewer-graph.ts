@@ -13,6 +13,7 @@ import { assertKeelFreshPayloadCarriage, assertKeelPreparedCollectorInlineMetada
 import {
   assertDataUriMediaType,
   createIntegrity,
+  canonicalJson,
   resolveKeelPayloadStorage,
   type KeelPayloadStorageMode,
   isDataUriLiteralByte,
@@ -1581,11 +1582,20 @@ export async function buildKeelInlineRawPercentTokenURIGraph(
     readonly maxTokenURIBytes?: number;
   } = {},
 ): Promise<KeelInlineRawPercentTokenURIGraph> {
+  // Capture all bytes, identities and the typed proof before the first await.
+  // Published module bytes may differ only in their lossless compression.
+  root = { ...root, rootBytes: new Uint8Array(root.rootBytes), rootIntegrity: { ...root.rootIntegrity },
+    parts: root.parts.map(part => ({ ...part, bytes: new Uint8Array(part.bytes), integrity: { ...part.integrity } })) };
   const readBounds = resolveKeelPreparationReadBounds(options);
-  options = { ...options, ...(readBounds.nonstandardReadPolicy === undefined ? {} : { nonstandardReadPolicy: readBounds.nonstandardReadPolicy }), ...(readBounds.preparationReadBudget === undefined ? {} : { preparationReadBudget: readBounds.preparationReadBudget }) };
+  options = { ...options,
+    ...(options.existingObjectReuse === undefined ? {} : { existingObjectReuse: { ...options.existingObjectReuse } }),
+    ...(options.existingParts === undefined ? {} : { existingParts: options.existingParts.map(part => ({ ...part,
+      bytes: new Uint8Array(part.bytes), integrity: { ...part.integrity }, carrier: { ...part.carrier } })) }),
+    ...(options.registeredNativeGzip === undefined ? {} : { registeredNativeGzip: assertKeelRegisteredNativeGzipProof(options.registeredNativeGzip) }),
+    ...(readBounds.nonstandardReadPolicy === undefined ? {} : { nonstandardReadPolicy: readBounds.nonstandardReadPolicy }),
+    ...(readBounds.preparationReadBudget === undefined ? {} : { preparationReadBudget: readBounds.preparationReadBudget }) };
   const reuse = await inspectExistingGraphReuse(root, options, "raw-percent");
   if (reuse !== undefined) { root = reuse.root; options = { ...options, existingParts: reuse.existingParts }; }
-  if (reuse === undefined) assertKeelFreshPayloadCarriage(root.rootBytes, options);
   if (root.parts.length < 2 || root.parts.at(-1)?.role !== "shell-suffix") {
     throw new TypeError("An Inline raw-percent tokenURI graph requires an ordered shell and terminal suffix.");
   }
@@ -1608,6 +1618,15 @@ export async function buildKeelInlineRawPercentTokenURIGraph(
       bytes = published.bytes.slice();
       escapedHtmlBytes = exactPercentPayloadBytes(bytes, `Published raw-percent Inline ${part.role}`, true);
       decodedHtmlBytes = exactPercentPayloadBytes(escapedHtmlBytes, `Published raw-percent decoded ${part.role}`, true);
+      if (options.registeredNativeGzip !== undefined && part.role === "module") {
+        const declared = JSON.parse(decoder.decode(part.bytes).replace(/^,/, "")) as Record<string, unknown>;
+        const actual = JSON.parse(decoder.decode(decodedHtmlBytes).replace(/^,/, "")) as Record<string, unknown>;
+        const { embedded: _declaredStorage, ...expectedDeclaration } = declared;
+        const { embedded: _actualStorage, ...actualDeclaration } = actual;
+        if (canonicalJson(expectedDeclaration) !== canonicalJson(actualDeclaration)) {
+          throw new TypeError("Published native Gzip module changed the declared source identity or metadata.");
+        }
+      }
     } else {
       decodedHtmlBytes = part.bytes.slice();
       escapedHtmlBytes = compactPercentPayload(decodedHtmlBytes);
@@ -1642,6 +1661,9 @@ export async function buildKeelInlineRawPercentTokenURIGraph(
   if (!exactBytes(htmlBytes, concat(htmlParts))) {
     throw new Error("Raw-percent Inline fragments do not reconstruct the exact source HTML.");
   }
+  // Authenticate the exact assembled return, including retained published
+  // slots, rather than the unused local recompression of those slots.
+  assertKeelFreshPayloadCarriage(htmlBytes, options);
   return {
     schema: "keel-inline-raw-percent-token-uri@1",
     ...(options.registeredNativeGzip === undefined ? {} : { registeredNativeGzip: assertKeelRegisteredNativeGzipProof(options.registeredNativeGzip, htmlBytes) }),
