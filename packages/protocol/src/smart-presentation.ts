@@ -13,6 +13,8 @@ export const KEEL_PRESENTATION_FALLBACK_DELIVERIES = ["ipfs", "hosted"] as const
 export type KeelPresentationFallbackDelivery = (typeof KEEL_PRESENTATION_FALLBACK_DELIVERIES)[number];
 export interface KeelExternalPresentation { readonly delivery: KeelPresentationFallbackDelivery; readonly imageUri: string; readonly animationUri: string; readonly contentDigest: `0x${string}` }
 export type KeelAssetExecution = "static" | "script" | "unknown";
+/** Non-executable media may still animate. This is independent of execution classification. */
+export type KeelAssetMotion = "still" | "animated" | "unknown";
 export interface KeelPresentationSource {
   readonly resourceId: string;
   readonly mediaType: string;
@@ -67,6 +69,8 @@ export interface KeelSmartAssetPresentationInput {
   readonly preview?: KeelPresentationSource;
   /** Derived from actual source inspection. Script MIME types cannot be overridden by this field. */
   readonly execution: KeelAssetExecution;
+  /** Actual source inspection; missing motion never authorizes the still-image shortcut. */
+  readonly sourceMotion?: KeelAssetMotion;
   readonly assetPresentation?: KeelAssetPresentationPreference;
   /** Explicit project choice; a saved external-preview preference does not authorize an invented URL. */
   readonly externalPreviewUri?: string;
@@ -153,6 +157,54 @@ export function classifyKeelAssetExecution(input: { readonly mediaType: string; 
   return "unknown";
 }
 
+const motionCRC = Uint32Array.from({ length: 256 }, (_, n) => {
+  for (let i = 0; i < 8; i++) n = n & 1 ? (n >>> 1) ^ 0xedb88320 : n >>> 1;
+  return n >>> 0;
+});
+/** Bounded container inspection only; no image decode, source mutation or readiness claim.
+ * Mirrors the authoring PNG/WebP animation guards. Inconclusive input keeps verification. */
+export function classifyKeelAssetMotion(input: { readonly mediaType: string; readonly bytes: Uint8Array }): KeelAssetMotion {
+  const b = input.bytes, mime = input.mediaType.split(";", 1)[0]!.trim().toLowerCase();
+  if (!(b instanceof Uint8Array) || !b.length) throw new TypeError("Actual source bytes are required for motion inspection.");
+  if (b.length > 32 * 1024 * 1024) return "unknown";
+  const text = (at: number) => String.fromCharCode(...b.subarray(at, at + 4));
+  if (mime === "image/gif") return b.length >= 13 && ["GIF87a", "GIF89a"].includes(String.fromCharCode(...b.subarray(0, 6))) ? "animated" : "unknown";
+  if (mime === "image/jpeg") return b.length >= 4 && b[0] === 0xff && b[1] === 0xd8 && b[2] === 0xff && b.at(-2) === 0xff && b.at(-1) === 0xd9 ? "still" : "unknown";
+  const view = new DataView(b.buffer, b.byteOffset, b.byteLength);
+  if (mime === "image/png" || mime === "image/apng") {
+    if (b.length < 45 || ![137, 80, 78, 71, 13, 10, 26, 10].every((byte, i) => b[i] === byte)) return "unknown";
+    let at = 8, chunks = 0, animated = false, pixels = false, ended = false;
+    while (at < b.length) {
+      if (++chunks > 65_536 || at + 12 > b.length || ended) return "unknown";
+      const length = view.getUint32(at), end = at + 12 + length, kind = text(at + 4);
+      if (end > b.length || !/^[A-Za-z]{4}$/u.test(kind) || chunks === 1 && (kind !== "IHDR" || length !== 13)
+        || chunks > 1 && kind === "IHDR") return "unknown";
+      let checksum = 0xffffffff;
+      for (let i = at + 4; i < end - 4; i++) checksum = (checksum >>> 8) ^ motionCRC[(checksum ^ b[i]!) & 255]!;
+      if (((checksum ^ 0xffffffff) >>> 0) !== view.getUint32(end - 4)) return "unknown";
+      if (kind === "acTL" || kind === "fcTL" || kind === "fdAT") animated = true;
+      if (kind === "IDAT") pixels = true;
+      if (kind === "IEND") { if (length || !pixels || end !== b.length) return "unknown"; ended = true; }
+      at = end;
+    }
+    return !ended ? "unknown" : animated ? "animated" : mime === "image/apng" ? "unknown" : "still";
+  }
+  if (mime === "image/webp") {
+    if (b.length < 20 || text(0) !== "RIFF" || text(8) !== "WEBP" || view.getUint32(4, true) !== b.length - 8) return "unknown";
+    let at = 12, chunks = 0, animated = false, pixels = false;
+    while (at < b.length) {
+      if (++chunks > 65_536 || at + 8 > b.length) return "unknown";
+      const kind = text(at), length = view.getUint32(at + 4, true), end = at + 8 + length + length % 2;
+      if (end > b.length || kind === "VP8X" && length !== 10) return "unknown";
+      if (kind === "ANIM" || kind === "ANMF" || kind === "VP8X" && (b[at + 8]! & 2) !== 0) animated = true;
+      if ((kind === "VP8 " || kind === "VP8L") && length > 0) pixels = true;
+      at = end;
+    }
+    return animated ? "animated" : pixels ? "still" : "unknown";
+  }
+  return "unknown";
+}
+
 export const KEEL_ASSET_IMAGE_DELIVERIES = ["inline", "external", "onchain-reference", "omitted"] as const;
 export const KEEL_ASSET_ANIMATION_DELIVERIES = ["inline-shell", "hybrid-shell", "ipfs-shell", "hosted-shell", "inline-media", "onchain-reference", "omitted"] as const;
 export const KEEL_ASSET_PRESENTATION_FALLBACK_DELIVERIES = KEEL_PRESENTATION_FALLBACK_DELIVERIES;
@@ -208,12 +260,14 @@ function compactNativeAlternative(execution: KeelAssetExecution, mediaType: stri
 }
 /** Candidate policy is review data. Only an actual selected-chain adapter can qualify a layout. */
 export function planKeelSmartAssetPresentation(input: KeelSmartAssetPresentationInput) {
-  record(input, ["contextIdentity", "source", "preview", "execution", "assetPresentation", "externalPreviewUri", "fallbackDelivery", "externalPresentation", "measurements", "candidateMeasurements", "capabilities", "selection", "nonstandardCompatibilityAcknowledged", "omittedGridImageAcknowledged"], "smart presentation input");
+  record(input, ["contextIdentity", "source", "preview", "execution", "sourceMotion", "assetPresentation", "externalPreviewUri", "fallbackDelivery", "externalPresentation", "measurements", "candidateMeasurements", "capabilities", "selection", "nonstandardCompatibilityAcknowledged", "omittedGridImageAcknowledged"], "smart presentation input");
   const contextIdentity = input.contextIdentity === undefined ? undefined : { ...input.contextIdentity };
   if (contextIdentity) { record(contextIdentity, ["projectId", "revision", "defaultsRevision"], "presentation context identity"); for (const value of Object.values(contextIdentity)) if (typeof value !== "string" || !value || value.length > 1024 || /[\u0000-\u001f\u007f]/u.test(value)) throw new TypeError("Invalid presentation revision identity."); }
   const original = source(input.source), preview = input.preview === undefined ? undefined : source(input.preview);
   if (!["static", "script", "unknown"].includes(input.execution)) throw new TypeError("Actual source execution classification is required.");
   const execution = scriptMIME.test(original.mediaType) ? "script" : input.execution;
+  const sourceMotion = input.sourceMotion ?? "unknown";
+  if (!["still", "animated", "unknown"].includes(sourceMotion)) throw new TypeError("Actual source motion classification is required.");
   const assetPresentation = parseKeelAssetPresentationPreference(input.assetPresentation ?? "automatic");
   const fallbackDelivery = input.fallbackDelivery === undefined ? undefined : parseKeelPresentationFallbackDelivery(input.fallbackDelivery);
   const externalPreviewUri = input.externalPreviewUri === undefined ? undefined : parseKeelExternalPreviewUri(input.externalPreviewUri);
@@ -299,11 +353,15 @@ export function planKeelSmartAssetPresentation(input: KeelSmartAssetPresentation
   });
   const large = (original.byteLength ?? 0) > KEEL_SMART_SPLIT_ASSET_THRESHOLD_BYTES;
   const intermediate = (original.byteLength ?? 0) > KEEL_SMART_INLINE_ASSET_MAX_BYTES && !large;
+  const sameImage = preview === undefined || original.digest !== undefined && preview.digest === original.digest
+    && preview.byteLength === original.byteLength && preview.mediaType === original.mediaType;
+  const stillShortcut = intermediate && execution === "static" && sourceMotion === "still" && sameImage
+    && ["image/png", "image/jpeg", "image/webp", "image/avif", "image/bmp", "image/tiff", "image/heic", "image/heif"].includes(original.mediaType);
   const preferred: KeelAssetPresentationCandidateId[] = assetPresentation === "external-preview" ? large ? ["external-preview-hybrid", "external-preview-inline"] : ["external-preview-inline", "external-preview-hybrid"]
     : assetPresentation === "inline-image-hybrid-verifier" ? ["canonical-hybrid"]
     : large ? ["canonical-hybrid", "external-preview-hybrid", "canonical-inline"]
-    : intermediate && execution === "static" ? [isImage ? "image-only-inline" : "media-only-inline", "canonical-inline", "canonical-hybrid", "external-preview-hybrid"]
-    : ["canonical-inline", "canonical-hybrid", isImage ? "image-only-inline" : "media-only-inline", "external-preview-hybrid"];
+    : stillShortcut ? ["image-only-inline", "canonical-inline", "canonical-hybrid", "external-preview-hybrid"]
+    : ["canonical-inline", "canonical-hybrid", "external-preview-hybrid"];
   const usable = (id: KeelAssetPresentationCandidateId) => candidates.find(c => c.id === id)!;
   const qualified = preferred.map(usable).filter(c => c.hardBlockers.length === 0);
   const recommended = qualified.find(c => c.measurementComplete && c.standardsCompatible) ?? qualified.find(c => c.standardsCompatible !== false) ?? qualified[0] ?? usable(preferred[0]!);
@@ -320,16 +378,16 @@ export function planKeelSmartAssetPresentation(input: KeelSmartAssetPresentation
       if (fallbackDelivery === undefined) suggestions.push({ code: "choose-ipfs-or-hosted-if-external-presentation-is-desired" });
     }
   }
-  const acknowledgementKey = canonicalJson({ contextIdentity: contextIdentity ?? null, source: original, preview: preview ?? null, execution, assetPresentation, selection: selected.selection, fallbackDelivery: fallbackDelivery ?? null, externalPreviewUri: externalPreviewUri ?? null, externalPresentation: externalPresentation ?? null, capabilities: capabilities ?? null, candidateMeasurements: candidates.map(c => [c.id, c.measurements]) });
+  const acknowledgementKey = canonicalJson({ contextIdentity: contextIdentity ?? null, source: original, preview: preview ?? null, execution, sourceMotion, assetPresentation, selection: selected.selection, fallbackDelivery: fallbackDelivery ?? null, externalPreviewUri: externalPreviewUri ?? null, externalPresentation: externalPresentation ?? null, capabilities: capabilities ?? null, candidateMeasurements: candidates.map(c => [c.id, c.measurements]) });
   const compatibilityReviewRequired = selected.compatibilityWarnings.some(w => w !== "collection-grids-will-not-show-an-image") && input.nonstandardCompatibilityAcknowledged !== true
     || selected.image === null && input.omittedGridImageAcknowledged !== true;
-  const policy = { schema: "keel-smart-asset-presentation@1" as const, ...(contextIdentity === undefined ? {} : { contextIdentity }), assetPresentation, source: original, ...(preview === undefined ? {} : { preview }), execution,
+  const policy = { schema: "keel-smart-asset-presentation@1" as const, ...(contextIdentity === undefined ? {} : { contextIdentity }), assetPresentation, source: original, ...(preview === undefined ? {} : { preview }), execution, sourceMotion,
     ...(fallbackDelivery === undefined ? {} : { fallbackDelivery }), ...(externalPreviewUri === undefined ? {} : { externalPreviewUri }), ...(externalPresentation === undefined ? {} : { externalPresentation }),
     ...(capabilities === undefined ? {} : { capabilities }),
     ...selected, selectedCandidateId: selected.id, recommendedCandidateId: recommended.id, selectionSource,
     candidates, suggestions, acknowledgementKey, nonstandardCompatibilityAcknowledged: input.nonstandardCompatibilityAcknowledged === true, omittedGridImageAcknowledged: input.omittedGridImageAcknowledged === true,
     thresholds: { assetInlineBytes: KEEL_SMART_INLINE_ASSET_MAX_BYTES, assetSplitReadBytes: KEEL_SMART_SPLIT_ASSET_THRESHOLD_BYTES, encodedImageUriBytes: KEEL_SMART_INLINE_IMAGE_URI_MAX_BYTES, completeTokenUriBytes: KEEL_SMART_TOKEN_URI_MAX_BYTES },
-    reasons: [large ? "split-read-recommended-for-source-size" : intermediate ? "direct-native-media-recommended-for-source-size" : "registered-verifier-default", ...selected.hardBlockers], blockers: selected.hardBlockers,
+    reasons: [large ? "split-read-recommended-for-source-size" : stillShortcut ? "direct-still-image-recommended-for-duplicate-source-size" : "registered-verifier-default", ...selected.hardBlockers], blockers: selected.hardBlockers,
     status: selected.hardBlockers.length ? "blocked" as const : compatibilityReviewRequired ? "compatibility-review-required" as const : "requires-validation" as const,
     publicationReady: false as const, requiresExactFullSimulation: true as const, requiredNativeStorageCopies: 1 as const };
   return freeze({ ...policy, planKey: canonicalJson(policy) });

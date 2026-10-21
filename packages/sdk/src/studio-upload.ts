@@ -1,5 +1,5 @@
 import { parseKeelSelectedProjectProfile, type KeelSelectedProjectProfile } from "./studio-project-defaults.js";
-import { resolveKeelShell, resolveKeelPayloadStorage, classifyKeelAssetExecution, planKeelSmartAssetPresentation, resolveKeelAssetPresentationSelection, parseKeelAssetPresentationPreference, parseKeelExternalPreviewUri, parseKeelPresentationFallbackDelivery, KEEL_ASSET_PRESENTATION_CANDIDATE_IDS, type KeelPresentationFallbackDelivery, type KeelAssetPresentationCandidateId, type KeelAssetPresentationPreference, type KeelPayloadStorageMode } from "@keel/protocol";
+import { resolveKeelShell, resolveKeelPayloadStorage, classifyKeelAssetExecution, classifyKeelAssetMotion, planKeelSmartAssetPresentation, resolveKeelAssetPresentationSelection, parseKeelAssetPresentationPreference, parseKeelExternalPreviewUri, parseKeelPresentationFallbackDelivery, KEEL_ASSET_PRESENTATION_CANDIDATE_IDS, type KeelPresentationFallbackDelivery, type KeelAssetPresentationCandidateId, type KeelAssetPresentationPreference, type KeelPayloadStorageMode } from "@keel/protocol";
 import {
   defaultKeelStudioPublicationIntent,
   type KeelStudioPublicationIntent,
@@ -299,6 +299,7 @@ export async function stageKeelStudioProject(
   const automaticViewer=onlyFile===undefined?undefined:planKeelSmartAssetPresentation({
     source:{resourceId:onlyFile.path,mediaType:onlyFile.mediaType,byteLength:onlyFileBytes!.byteLength},
     execution:classifyKeelAssetExecution({mediaType:onlyFile.mediaType,bytes:onlyFileBytes!,declaredScript:onlyFile.format!=="asset"}),
+    sourceMotion:classifyKeelAssetMotion({mediaType:onlyFile.mediaType,bytes:onlyFileBytes!}),
     assetPresentation,...(input.assetPresentationSelection===undefined?{}:{selection:resolveKeelAssetPresentationSelection(input.assetPresentationSelection,onlyFile.mediaType)}),
     ...(fallbackDelivery===undefined?{}:{fallbackDelivery}),...(externalPreviewUri===undefined?{}:{externalPreviewUri}),
   }).viewer;
