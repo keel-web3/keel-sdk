@@ -1,0 +1,167 @@
+{
+  "schema": "keel-current-publication-validation@1",
+  "sourceCommit": "0c7db6aeee3abaeaa954ddaec22d00066ea13496",
+  "environment": "macOS Node22.22.1 isolated private worktree",
+  "officialBuild": {
+    "schema": "keel-official-sdk-build@1",
+    "sourceCommit": "0c7db6aeee3abaeaa954ddaec22d00066ea13496",
+    "sourceTree": "4c3ff44ea8070d8976641105399c890820f8ae61",
+    "node": "22.22.1",
+    "command": "PATH=/Users/ravonus/.nvm/versions/node/v22.22.1/bin:$PATH node scripts/build.mjs",
+    "exitCode": 0,
+    "fileCount": 1749,
+    "totalBytes": 24720027,
+    "inventoryPath": "/private/tmp/keel-current-publication-only-evidence-20261021-01/official-dist-inventory-0c7.json",
+    "inventorySha256": "518e0e7a2f03fe8cfcfb5fc518f26eb709b26e860a584a973f4101f625bbc502",
+    "packages": {
+      "protocol": {
+        "fileCount": 156,
+        "totalBytes": 1189793
+      },
+      "viewer": {
+        "fileCount": 112,
+        "totalBytes": 1038522
+      },
+      "sdk": {
+        "fileCount": 940,
+        "totalBytes": 19013873
+      },
+      "builder": {
+        "fileCount": 156,
+        "totalBytes": 1014854
+      },
+      "ethereum-adapter": {
+        "fileCount": 28,
+        "totalBytes": 197398
+      },
+      "mcp": {
+        "fileCount": 193,
+        "totalBytes": 1475265
+      },
+      "sprite-codex": {
+        "fileCount": 52,
+        "totalBytes": 361127
+      },
+      "studio-core": {
+        "fileCount": 84,
+        "totalBytes": 359333
+      },
+      "sandbox-sdk": {
+        "fileCount": 28,
+        "totalBytes": 69862
+      }
+    }
+  },
+  "focused": {
+    "command": "node --test tests/current-publication-carriage.test.mjs tests/registered-native-gzip.test.mjs tests/native-gzip-store-case.test.mjs tests/explicit-external-preview.test.mjs tests/smart-still-media-default.test.mjs",
+    "tests": 42,
+    "pass": 42,
+    "fail": 0,
+    "skipped": 0
+  },
+  "predecessor": {
+    "commit": "10f308c4d49706e4d1aa1eb8aee7f4d82867f553",
+    "tests": 9,
+    "pass": 1,
+    "fail": 8,
+    "meaning": "Unchanged current-only regression file against preserved predecessor; current raw compilation positive control remains green."
+  },
+  "existingAssertionsChanged": false,
+  "network": false,
+  "signing": false,
+  "chainDeployment": false,
+  "independentApproval": "PENDING",
+  "fullCanonicalSuite": "NOT RUN; retirement-positive old tests preserved and new classification entry held for root",
+  "evidence": [
+    {
+      "path": "/private/tmp/keel-current-publication-only-evidence-20261021-01/current-focused-corrected-setup.log",
+      "byteLength": 8913,
+      "sha256": "ba8b36c550c307e237bcb0ec09495f521e991f62b36802a2e8ba013be06f096a"
+    },
+    {
+      "path": "/private/tmp/keel-current-publication-only-evidence-20261021-01/current-focused-final.log",
+      "byteLength": 7743,
+      "sha256": "0f846fbefe4186716ce6f9e4993eaf79bb5715ae63c9ef0541fa6a748e247049"
+    },
+    {
+      "path": "/private/tmp/keel-current-publication-only-evidence-20261021-01/current-focused.log",
+      "byteLength": 11637,
+      "sha256": "67d635fbb89d05ce50d78869dd6cf719bf4c1506edbd0e36a88b3109deeb06fa"
+    },
+    {
+      "path": "/private/tmp/keel-current-publication-only-evidence-20261021-01/current-test-classification.patch",
+      "byteLength": 366,
+      "sha256": "41aa08bb9d51435fd27c2a9ffff58188624212aa213c039b726e5ad26bfefbeb"
+    },
+    {
+      "path": "/private/tmp/keel-current-publication-only-evidence-20261021-01/dependency-overlay.json",
+      "byteLength": 18649,
+      "sha256": "663ec52841a0aeb4604446433a41dc170160fab88553b5eb39ea7101a20d68a9"
+    },
+    {
+      "path": "/private/tmp/keel-current-publication-only-evidence-20261021-01/frozen-mcp-tsc.log",
+      "byteLength": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/private/tmp/keel-current-publication-only-evidence-20261021-01/frozen-sdk-tsc.log",
+      "byteLength": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/private/tmp/keel-current-publication-only-evidence-20261021-01/frozen5da-focused.log",
+      "byteLength": 7985,
+      "sha256": "a29d2ffd818a0485dfe9d2f95679e58641f4d3a40eff7cb155b186c1f98adbe4"
+    },
+    {
+      "path": "/private/tmp/keel-current-publication-only-evidence-20261021-01/generated-test-assets.json",
+      "byteLength": 1899,
+      "sha256": "662b41ab9c5e5bbba2f0bf3d22222810f05c68e26ad0a0432af1c104d02c1cdd"
+    },
+    {
+      "path": "/private/tmp/keel-current-publication-only-evidence-20261021-01/mcp-build.log",
+      "byteLength": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/private/tmp/keel-current-publication-only-evidence-20261021-01/mcp-current-raw.log",
+      "byteLength": 493,
+      "sha256": "156a0cf756a48c0308d16c2f241598acd80dd816b1ac20b0fd02e1b672c71ae1"
+    },
+    {
+      "path": "/private/tmp/keel-current-publication-only-evidence-20261021-01/official-0c7-focused.log",
+      "byteLength": 13288,
+      "sha256": "40dc211c63ca72840bce66280533e55e330846da110e3cfafec3842e0cbbc99e"
+    },
+    {
+      "path": "/private/tmp/keel-current-publication-only-evidence-20261021-01/official-build-0c7.log",
+      "byteLength": 261,
+      "sha256": "c3bb51b4b8150ec23657e73ce52837c124eb04084015f3c90c6a419a178e91b5"
+    },
+    {
+      "path": "/private/tmp/keel-current-publication-only-evidence-20261021-01/official-build-manifest-0c7.json",
+      "byteLength": 1266,
+      "sha256": "78c53d271f526a4f996641d9c78029c3f402309663ff243ef947fe9982a5fa9d"
+    },
+    {
+      "path": "/private/tmp/keel-current-publication-only-evidence-20261021-01/official-dist-inventory-0c7.json",
+      "byteLength": 257979,
+      "sha256": "518e0e7a2f03fe8cfcfb5fc518f26eb709b26e860a584a973f4101f625bbc502"
+    },
+    {
+      "path": "/private/tmp/keel-current-publication-only-evidence-20261021-01/predecessor10f-final9-red.log",
+      "byteLength": 13182,
+      "sha256": "34717a5195f4b3e150a67ecf3785c84c8c6cbf7ebfeabfbdd5bec55c7a81655e"
+    },
+    {
+      "path": "/private/tmp/keel-current-publication-only-evidence-20261021-01/predecessor10f-red.log",
+      "byteLength": 8335,
+      "sha256": "852e4efc34872bbbd575e21c2e3d144541be7584f07dd15b67109913988fbc5e"
+    },
+    {
+      "path": "/private/tmp/keel-current-publication-only-evidence-20261021-01/sdk-build.log",
+      "byteLength": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  ]
+}
