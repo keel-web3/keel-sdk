@@ -45,7 +45,7 @@ test('fresh canonical graph refuses hidden compressed Base64 body under raw-perc
   assert.equal(inspectKeelInlinePayloadCarriage(plain.rootBytes).requiresExistingPreparedReuse,false);
   const packed=await buildKeelInlineLocalDocument({shell,modules:[],entry:{id:'entry',mediaType:'text/javascript',source:utf8('globalThis.answer=42;'),compression:'gzip'}});
   await assert.rejects(buildKeelInlineTokenURIGraph(packed),/forbids new storedBase64\/storedHex/);
-  await assert.rejects(buildKeelInlineTokenURIGraph(packed,{existingParts:[]}),/forbids new storedBase64\/storedHex/);
+  await assert.rejects(buildKeelInlineTokenURIGraph(packed,{existingParts:[]}),/shell-prefix has no canonical published raw-percent fragment/);
 });
 
 for(const encoding of ['base64','hex']) test(`audit measures ${encoding} inflation while fresh publication rejects it`,async()=>{
@@ -83,8 +83,8 @@ test('audit rejects headers and URL delimiters that would make native decoding d
   const metadata=JSON.parse(decodeURIComponent(good.slice(good.indexOf(',')+1)));
   const custom=value=>'data:application/json;charset=utf-8,'+encodeURIComponent(JSON.stringify({...metadata,animation_url:value}));
   for(const bad of ['data:text/html; base64,PGgxPnRlc3Q8L2gxPg==','data:text/htmlx,Exact','data:text/html;charset=utf-8,Exact#lost'])
-    await assert.rejects(auditKeelInlineTokenURI(custom(bad)),/header|canonical|fragment/);
-  await assert.rejects(auditKeelInlineTokenURI(good.replace('application/json','application/jsonx')),/header/);
+    await assert.rejects(auditKeelInlineTokenURI(custom(bad)),/raw-percent HTML|fragment/);
+  await assert.rejects(auditKeelInlineTokenURI(good.replace('application/json','application/jsonx')),/raw-percent metadata/);
 });
 
 test('text byte corruption, conflicting representations and false compression fail',async()=>{
@@ -147,7 +147,7 @@ test('MCP exposes the body rule and a read-only public-token audit, and blocks e
   const server=await createMcpServer({workspaceRoot:dir});
   const init=await server.handle({jsonrpc:'2.0',id:1,method:'initialize',params:{protocolVersion:'2024-11-05',capabilities:{},clientInfo:{name:'body-default-test',version:'1'}}});
   assert.match(init.result.instructions,/storedText/);
-  assert.match(init.result.instructions,/keel-inline-token-audit/);
+  assert.match(init.result.instructions,/keel-inline-publication-check/);
   const list=await server.handle({jsonrpc:'2.0',id:2,method:'tools/list',params:{}});
   assert(list.result.tools.some(t=>t.name==='keel-inline-token-audit'));
   await writeFile(path.join(dir,'entry.js'),'document.body.textContent="Exact water";');

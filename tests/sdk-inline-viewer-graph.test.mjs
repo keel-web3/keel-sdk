@@ -1,3 +1,4 @@
+import {withCurrentCanonicalFrames,currentNativeGzipProof,currentCanonicalShell} from './support/current-canonical-fixture.mjs';
 import assert from "node:assert/strict";
 import { createHash } from "node:crypto";
 import test from "node:test";
@@ -241,221 +242,39 @@ test("Gzip Inline graph reuses shell and p5 fragments and publishes only creator
   assert.match(html, /"compression":"gzip"/u);
   assert.match(html, /"id":"sketch\.js"/u);
 
-  const tokenGraph = await buildKeelInlinePreEncodedTokenURIGraph(root, { legacyCarriage: "acknowledged" });
-  assert.equal(tokenGraph.schema, "keel-inline-preencoded-token-uri@1");
-  assert.equal(tokenGraph.mediaType, "application/vnd.keel.token-uri-base64-fragment");
-  assert.equal(tokenGraph.contextDelivery, "base64-html-tail");
-  assert.equal(tokenGraph.parts.filter((part) => part.sourceKind === "existing").length, 3);
-  assert.equal(tokenGraph.parts.filter((part) => part.sourceKind === "creator").length, 1);
-  assert.equal(
-    tokenGraph.creatorPublicationBytes,
-    tokenGraph.parts.find((part) => part.sourceKind === "creator").bytes.byteLength,
-  );
-  assert.ok(tokenGraph.creatorPublicationBytes < tokenGraph.fragmentBytes.byteLength / 2);
-  assert.doesNotMatch(new TextDecoder().decode(tokenGraph.fragmentBytes), /=/u);
-  assert.match(new TextDecoder().decode(tokenGraph.htmlBytes), /"compression":"gzip"/u);
-  const tokenGraphHtml = new TextDecoder().decode(tokenGraph.htmlBytes);
-  assert.doesNotMatch(tokenGraphHtml, /\/content\/|\/api\/onchain\//u);
-  assert.doesNotThrow(() => assertKeelCollectorInlineMetadata({
-    image: validPngURI, animation_url: `data:text/html;charset=utf-8,${encodeURIComponent(tokenGraphHtml)}`,
-  }));
-
-  const decodedMiddle = Buffer.from(new TextDecoder().decode(tokenGraph.fragmentBytes), "base64").toString("utf8");
-  assert.match(decodedMiddle, /^[A-Za-z0-9+/]+$/u);
-  assert.deepEqual(Buffer.from(decodedMiddle, "base64"), Buffer.from(tokenGraph.htmlBytes));
-
-  const escapedGraph = await buildKeelInlineEscapedTokenURIGraph(root, { legacyCarriage: "acknowledged" });
-  assert.equal(escapedGraph.schema, "keel-inline-escaped-token-uri@1");
-  assert.equal(escapedGraph.mediaType, "application/vnd.keel.token-uri-percent-fragment");
-  assert.equal(escapedGraph.contextDelivery, "percent-html-tail");
-  assert.deepEqual(Buffer.from(escapedGraph.htmlBytes), Buffer.from(root.rootBytes));
-  assert.doesNotMatch(new TextDecoder().decode(escapedGraph.fragmentBytes), /=/u);
-  assert.equal(escapedGraph.parts.filter((part) => part.sourceKind === "creator").length, 1);
-  assert.equal(escapedGraph.parts.every((part) => part.escapedHtmlBytes.byteLength % 3 === 0), true);
-  const escapedPayload = new TextDecoder().decode(escapedGraph.escapedHtmlBytes);
-  assert.equal(new TextEncoder().encode(decodeURIComponent(escapedPayload)).byteLength, escapedGraph.htmlBytes.byteLength);
-  assert.equal(decodeURIComponent(escapedPayload), new TextDecoder().decode(root.rootBytes));
-  const storedBase64 = p5.item.embedded.storedBase64;
-  const creatorSlot = JSON.parse(new TextDecoder().decode(root.parts.find((part) => part.kind === "creator").bytes).slice(1));
-  assert.match(creatorSlot.embedded.storedText, /new p5\(\(\)=>\{\}\);/u);
-  assert.equal(Object.hasOwn(creatorSlot.embedded, "storedBase64"), false);
-  assert.equal(escapedPayload.includes(storedBase64), true, "compressed resource Base64 must remain literal");
-
   await assert.rejects(buildKeelInlineRawPercentTokenURIGraph(root), /forbids new storedBase64/u);
-  const rawP5 = await buildKeelInlineModuleFragment({ moduleId: "p5", version: "1.11.11", mediaType: "text/javascript",
-    decodedBytes: utf8(`globalThis.p5=${JSON.stringify("x".repeat(200_000))}`), execution: "classic" });
-  const rawRoot = await buildKeelInlineLocalDocument({ shell, modules: [rawP5],
-    entry: { id: "sketch.js", mediaType: "text/javascript", source: utf8("new p5(()=>{});") } });
-  const rawPercentGraph = await buildKeelInlineRawPercentTokenURIGraph(rawRoot);
-  assert.equal(rawPercentGraph.schema, "keel-inline-raw-percent-token-uri@1");
-  assert.equal(rawPercentGraph.mediaType, "application/vnd.keel.token-uri-raw-percent-fragment");
-  assert.deepEqual(Buffer.from(rawPercentGraph.htmlBytes), Buffer.from(rawRoot.rootBytes));
-  assert.equal(
-    decodeURIComponent(new TextDecoder().decode(rawPercentGraph.fragmentBytes)),
-    new TextDecoder().decode(rawPercentGraph.escapedHtmlBytes),
-  );
-  assert.equal(decodeURIComponent(new TextDecoder().decode(rawPercentGraph.escapedHtmlBytes)), new TextDecoder().decode(rawRoot.rootBytes));
-
-  const comparison = await compareKeelInlineTokenURICarriages(rawRoot);
-  const comparisonPercent = await buildKeelInlineEscapedTokenURIGraph(rawRoot, { legacyCarriage: "acknowledged" });
-  const comparisonBase64 = await buildKeelInlinePreEncodedTokenURIGraph(rawRoot, { legacyCarriage: "acknowledged" });
-  assert.equal(comparison.schema, "keel-inline-token-uri-carriage-comparison@1");
-  assert.equal(comparison.percentStorageBytes, comparisonPercent.fragmentBytes.byteLength);
-  assert.equal(comparison.base64StorageBytes, comparisonBase64.fragmentBytes.byteLength);
-  assert.equal(comparison.preferred, "percent");
-  assert.ok(comparison.percentStorageBytes < comparison.base64StorageBytes);
-  assert.equal(comparison.savingsBytes, comparison.base64StorageBytes - comparison.percentStorageBytes);
-
-  const followLatest = await buildKeelInlineFollowLatestTokenURIBodyGraph(root, { legacyCarriage: "acknowledged" });
-  assert.equal(followLatest.schema, "keel-inline-preencoded-token-uri-body@1");
-  assert.equal(followLatest.mediaType, "application/vnd.keel.token-uri-base64-body-fragment");
-  assert.equal(followLatest.shellSelection, "follow-latest");
-  assert.equal(followLatest.shellId, KEEL_INLINE_PROTECTION_SHELL_ID);
-  assert.deepEqual(followLatest.parts.map((part) => part.role), ["module", "entrypoint"]);
-  assert.equal(followLatest.parts.some((part) => part.role === "shell-prefix" || part.role === "shell-suffix"), false);
-  assert.deepEqual(
-    Buffer.from(followLatest.fragmentBytes),
-    Buffer.concat(tokenGraph.parts.slice(1, -1).map((part) => Buffer.from(part.bytes))),
-  );
-  assert.ok(followLatest.fragmentBytes.byteLength < tokenGraph.fragmentBytes.byteLength);
-  assert.equal(followLatest.creatorPublicationBytes, tokenGraph.creatorPublicationBytes);
-
-  await assert.rejects(
-    buildKeelPreparedOneOfOneTokenURI({
-      graph: tokenGraph,
-      chainId,
-      collection: `0x${"ab".repeat(20)}`,
-      collectionName: "Legacy without policy",
-      description: "Legacy carriage must never be the collector default",
-      imageURI: validWebpURI,
-      manifestURI: "",
-      manifestDigest: `0x${"12".repeat(32)}`,
-    }),
-    /Collector-facing Inline requires the automatic raw-percent carriage/u,
-  );
-
-  const prepared = await buildKeelPreparedOneOfOneTokenURI({
-    graph: tokenGraph,
-    chainId,
-    collection: `0x${"ab".repeat(20)}`,
-    collectionName: "Seed Current",
-    description: "A deterministic p5 flow field </script> 雪",
-    imageURI: validWebpURI,
-    manifestURI: `web3://0x${"cd".repeat(20)}:${chainId}/object/0x${"ef".repeat(32)}`,
-    manifestDigest: `0x${"12".repeat(32)}`,
-    artifact: {
-      store: `0x${"cd".repeat(20)}`,
-      objectId: `0x${"34".repeat(32)}`,
-      digest: `0x${"56".repeat(32)}`,
-      byteLength: 3_300,
-      mediaType: "text/javascript",
-    },
-    presentationPolicy: "raw-artifact",
-  });
-  assert.equal(prepared.schema, "keel-prepared-one-of-one-token-uri@1");
-  assert.equal(prepared.requiredBuilder, "KeelHarnessBuilder");
-  assert.equal(prepared.tokenURI, `data:application/json;base64,${new TextDecoder().decode(prepared.encodedPrefix)}${new TextDecoder().decode(tokenGraph.fragmentBytes)}${new TextDecoder().decode(prepared.encodedSuffix)}`);
-  const metadata = JSON.parse(prepared.tokenJSON);
-  assert.equal(metadata.name, "Seed Current #1");
-  assert.equal(metadata.description, "A deterministic p5 flow field </script> 雪");
-  assert.deepEqual(metadata.keel_artifact, {
-    store: `0x${"cd".repeat(20)}`,
-    object_id: `0x${"34".repeat(32)}`,
-    digest: `0x${"56".repeat(32)}`,
-    byte_length: 3_300,
-    media_type: "text/javascript",
-    uri: `web3://0x${"cd".repeat(20)}:${chainId}/haulObject/0x${"34".repeat(32)}?mime.type=text%2Fjavascript`,
-  });
-  assert.match(metadata.animation_url, /^data:text\/html;base64,/u);
-  assert.match(metadata.animation_url, /^data:text\/html;base64,/u);
-  const animationPayload = metadata.animation_url.slice(metadata.animation_url.indexOf(",") + 1);
-  assert.match(animationPayload, /^(?:[A-Za-z0-9+/]{4})*(?:[A-Za-z0-9+/]{2}==|[A-Za-z0-9+/]{3}=)?$/u);
-  assert.doesNotMatch(animationPayload, /[#?&_-]/u);
-  const animationHTML = Buffer.from(animationPayload, "base64").toString("utf8");
-  assert.match(animationHTML, /__KEEL_CONTEXT__/u);
-  assert.match(animationHTML, /__KEEL_ONCHAIN_CONTEXT__/u);
-  assert.match(animationHTML, new RegExp(prepared.contextDigest, "u"));
-  assert.equal(JSON.parse(prepared.contextJSON).derivedTokenSeed, prepared.derivedTokenSeed);
-  assert.doesNotMatch(new TextDecoder().decode(prepared.encodedPrefix), /=/u);
-
-  const escapedPrepared = await buildKeelPreparedOneOfOneTokenURI({
-    graph: escapedGraph,
-    chainId,
-    collection: `0x${"ab".repeat(20)}`,
-    collectionName: "Seed Current",
-    description: "A deterministic p5 flow field </script> 雪",
-      imageURI: validWebpURI,
-    manifestURI: `web3://0x${"cd".repeat(20)}:${chainId}/object/0x${"ef".repeat(32)}`,
-    manifestDigest: `0x${"12".repeat(32)}`,
-    presentationPolicy: "raw-artifact",
-  });
-  assert.equal(escapedPrepared.animationEncoding, "percent");
-  assert.equal(escapedPrepared.requiredBuilder, "KeelPercentTokenURIBuilder");
-  assert.match(escapedPrepared.tokenURI, /^data:application\/json;base64,[A-Za-z0-9+/]+=*$/u);
-  const escapedMetadata = JSON.parse(escapedPrepared.tokenJSON);
-  assert.match(escapedMetadata.animation_url, /^data:text\/html;charset=utf-8,/u);
-  assert.equal(escapedMetadata.animation_url.startsWith("data:text/html;base64,"), false);
-  const escapedAnimationPayload = escapedMetadata.animation_url.slice(escapedMetadata.animation_url.indexOf(",") + 1);
-  assert.doesNotMatch(escapedAnimationPayload, /[\s<>"'&#?\\]/u);
-  assert.equal(new URL(escapedMetadata.animation_url).href, escapedMetadata.animation_url, "animation URI must survive URL parsing without normalization");
-  assert.equal(escapedAnimationPayload.includes(storedBase64), true);
-  const escapedAnimationHTML = decodeURIComponent(escapedAnimationPayload);
-  assert.ok(escapedAnimationHTML.startsWith(new TextDecoder().decode(root.rootBytes)));
-  assert.match(escapedAnimationHTML, /__KEEL_CONTEXT__/u);
-  assert.ok(escapedPrepared.tokenURI.length < prepared.tokenURI.length);
-
-  const rawPercentPrepared = await buildKeelPreparedOneOfOneTokenURI({
-    graph: rawPercentGraph,
-    chainId,
-    collection: `0x${"ab".repeat(20)}`,
-    collectionName: "Seed Current",
-    description: "A deterministic p5 flow field </script> 雪",
-    imageURI: validWebpURI,
-    manifestURI: `web3://0x${"cd".repeat(20)}:${chainId}/object/0x${"ef".repeat(32)}`,
-    manifestDigest: `0x${"12".repeat(32)}`,
-  });
-  assert.equal(rawPercentPrepared.animationEncoding, "raw-percent");
-  assert.equal(rawPercentPrepared.requiredBuilder, "KeelRawTokenURIBuilder");
-  assert.match(rawPercentPrepared.tokenURI, /^data:application\/json;charset=utf-8,/u);
-  assert.equal(decodeURIComponent(rawPercentPrepared.tokenURI.slice(rawPercentPrepared.tokenURI.indexOf(",") + 1)), rawPercentPrepared.tokenJSON);
-  const rawPercentMetadata = JSON.parse(rawPercentPrepared.tokenJSON);
-  assert.match(rawPercentMetadata.animation_url, /^data:text\/html;charset=utf-8,/u);
-  assert.equal(decodeURIComponent(rawPercentMetadata.animation_url.slice(rawPercentMetadata.animation_url.indexOf(",") + 1)).startsWith(new TextDecoder().decode(rawRoot.rootBytes)), true);
-  const comparablePrepared = await buildKeelPreparedOneOfOneTokenURI({ graph: comparisonPercent,
-    chainId, collection: `0x${"ab".repeat(20)}`, collectionName: "Seed Current",
-    description: "A deterministic p5 flow field </script> 雪", imageURI: validWebpURI,
-    manifestURI: `web3://0x${"cd".repeat(20)}:${chainId}/object/0x${"ef".repeat(32)}`,
-    manifestDigest: `0x${"12".repeat(32)}`, presentationPolicy: "raw-artifact" });
-  assert.ok(rawPercentPrepared.tokenURI.length < comparablePrepared.tokenURI.length);
-
-  const followLatestPrepared = await buildKeelPreparedOneOfOneTokenURI({
-    graph: followLatest,
-    shellFragments: {
-      prefix: tokenGraph.parts[0].bytes,
-      suffix: tokenGraph.parts.at(-1).bytes,
-    },
-    chainId,
-    collection: `0x${"ab".repeat(20)}`,
-    collectionName: "Seed Current",
-    description: "A deterministic p5 flow field </script> 雪",
-      imageURI: validWebpURI,
-    manifestURI: `web3://0x${"cd".repeat(20)}:${chainId}/object/0x${"ef".repeat(32)}`,
-    manifestDigest: `0x${"12".repeat(32)}`,
-    artifact: {
-      store: `0x${"cd".repeat(20)}`,
-      objectId: `0x${"34".repeat(32)}`,
-      digest: `0x${"56".repeat(32)}`,
-      byteLength: 3_300,
-      mediaType: "text/javascript",
-    },
-    presentationPolicy: "raw-artifact",
-  });
-  assert.equal(followLatestPrepared.tokenURI, prepared.tokenURI);
-  assert.equal(followLatestPrepared.tokenJSON, prepared.tokenJSON);
-
+  const currentRoot=withCurrentCanonicalFrames(root),registeredNativeGzip=currentNativeGzipProof(currentRoot);
+  const tokenGraph=await buildKeelInlineRawPercentTokenURIGraph(currentRoot,{registeredNativeGzip});
+  assert.equal(tokenGraph.schema,"keel-inline-raw-percent-token-uri@1");
+  assert.equal(tokenGraph.mediaType,"application/vnd.keel.token-uri-raw-percent-fragment");
+  assert.equal(tokenGraph.parts.filter(p=>p.sourceKind==='existing').length,3);
+  assert.equal(tokenGraph.parts.filter(p=>p.sourceKind==='creator').length,1);
+  assert.equal(tokenGraph.creatorPublicationBytes,tokenGraph.parts.find(p=>p.sourceKind==='creator').bytes.length);
+  assert.ok(tokenGraph.creatorPublicationBytes<tokenGraph.fragmentBytes.length/2);
+  assert.deepEqual(decodeKeelInlineGraphFragment(tokenGraph.fragmentBytes,tokenGraph.mediaType),currentRoot.rootBytes);
+  assert.match(new TextDecoder().decode(tokenGraph.htmlBytes), /"compression":"gzip"/u);
+  const storedBase64=p5.item.embedded.storedBase64;
+  assert.equal(new TextDecoder().decode(tokenGraph.escapedHtmlBytes).includes(storedBase64),true);
+  const creatorSlot=JSON.parse(new TextDecoder().decode(root.parts.find(p=>p.kind==='creator').bytes).slice(1));
+  assert.match(creatorSlot.embedded.storedText,/new p5\(\(\)=>\{\}\);/u);
+  assert.equal(Object.hasOwn(creatorSlot.embedded,'storedBase64'),false);
+  for(const build of [buildKeelInlinePreEncodedTokenURIGraph,buildKeelInlineEscapedTokenURIGraph,buildKeelInlineFollowLatestTokenURIBodyGraph,compareKeelInlineTokenURICarriages])await assert.rejects(build(root,{legacyCarriage:'acknowledged'}),/retired/);
+  const prepared=await buildKeelPreparedOneOfOneTokenURI({graph:tokenGraph,registeredNativeGzip,chainId,
+    collection:`0x${"ab".repeat(20)}`,collectionName:'Seed Current',description:'A deterministic p5 flow field </script> 雪',imageURI:validWebpURI,
+    manifestURI:`web3://0x${"cd".repeat(20)}:${chainId}/object/0x${"ef".repeat(32)}`,manifestDigest:`0x${"12".repeat(32)}`,
+    artifact:{store:`0x${"cd".repeat(20)}`,objectId:`0x${"34".repeat(32)}`,digest:`0x${"56".repeat(32)}`,byteLength:3300,mediaType:'text/javascript'}});
+  assert.equal(prepared.schema,'keel-prepared-one-of-one-token-uri@1');assert.equal(prepared.requiredBuilder,'KeelRawTokenURIBuilder');
+  assert.equal(prepared.tokenURI,`data:application/json;charset=utf-8,${new TextDecoder().decode(prepared.encodedPrefix)}${new TextDecoder().decode(tokenGraph.fragmentBytes)}${new TextDecoder().decode(prepared.encodedSuffix)}`);
+  const metadata=JSON.parse(prepared.tokenJSON);assert.equal(metadata.name,'Seed Current #1');assert.equal(metadata.description,'A deterministic p5 flow field </script> 雪');
+  assert.deepEqual(metadata.keel_artifact,{store:`0x${"cd".repeat(20)}`,object_id:`0x${"34".repeat(32)}`,digest:`0x${"56".repeat(32)}`,byte_length:3300,media_type:'text/javascript',uri:`web3://0x${"cd".repeat(20)}:${chainId}/haulObject/0x${"34".repeat(32)}?mime.type=text%2Fjavascript`});
+  assert.match(metadata.animation_url,/^data:text\/html;charset=utf-8,/u);assert.equal(new URL(metadata.animation_url).href,metadata.animation_url);
+  const animationHTML=decodeURIComponent(metadata.animation_url.slice(metadata.animation_url.indexOf(',')+1));
+  assert.ok(animationHTML.startsWith(new TextDecoder().decode(currentRoot.rootBytes)));
+  assert.match(animationHTML,/__KEEL_CONTEXT__/u);assert.match(animationHTML,/__KEEL_ONCHAIN_CONTEXT__/u);assert.match(animationHTML,new RegExp(prepared.contextDigest,'u'));
+  assert.equal(JSON.parse(prepared.contextJSON).derivedTokenSeed,prepared.derivedTokenSeed);
   const compactImageURI = "data:image/svg+xml,%3Csvg%20xmlns=%22http://www.w3.org/2000/svg%22%3E%3C/svg%3E";
   const compactImagePrepared = await buildKeelPreparedOneOfOneTokenURI({
-    graph: tokenGraph,
+    graph: tokenGraph, registeredNativeGzip,
     chainId,
     collection: `0x${"ab".repeat(20)}`,
     collectionName: "Compact escaped image",
@@ -469,7 +288,7 @@ test("Gzip Inline graph reuses shell and p5 fragments and publishes only creator
 
   await assert.rejects(
     buildKeelPreparedOneOfOneTokenURI({
-      graph: tokenGraph,
+      graph: tokenGraph, registeredNativeGzip,
       chainId,
       collection: `0x${"ab".repeat(20)}`,
       collectionName: "Unsafe image",
@@ -483,7 +302,7 @@ test("Gzip Inline graph reuses shell and p5 fragments and publishes only creator
   );
   const web3ImageURI = `web3://0x${"cd".repeat(20)}:${chainId}/haulObject/0x${"ef".repeat(32)}?mime.type=image%2Fwebp`;
   const web3ImagePrepared = await buildKeelPreparedOneOfOneTokenURI({
-    graph: tokenGraph,
+    graph: tokenGraph, registeredNativeGzip,
     chainId,
     collection: `0x${"ab".repeat(20)}`,
     collectionName: "KEEL Web3 image in Inline",
@@ -496,7 +315,7 @@ test("Gzip Inline graph reuses shell and p5 fragments and publishes only creator
   assert.equal(JSON.parse(web3ImagePrepared.tokenJSON).image, web3ImageURI);
   await assert.rejects(
     buildKeelPreparedOneOfOneTokenURI({
-      graph: tokenGraph,
+      graph: tokenGraph, registeredNativeGzip,
       chainId,
       collection: `0x${"ab".repeat(20)}`,
       collectionName: "Offchain image",
@@ -542,7 +361,7 @@ test("historical compressed assets remain exact locally while fresh Inline rejec
   const stored = Buffer.from(assetItem.embedded.storedBase64, "base64");
   assert.deepEqual(gunzipSync(stored), Buffer.from(animation));
   await assert.rejects(buildKeelInlineRawPercentTokenURIGraph(root), /forbids new storedBase64/u);
-  await assert.rejects(buildKeelInlineRawPercentTokenURIGraph(root, { existingParts: [] }), /forbids new storedBase64/u);
+  await assert.rejects(buildKeelInlineRawPercentTokenURIGraph(root, { existingParts: [] }), /shell-prefix has no canonical published raw-percent fragment/u);
   await assert.rejects(
     buildKeelInlineLocalDocument({
       shell,
@@ -576,7 +395,7 @@ test("canonical Inline publication has one shell top, ordered middle, and one sh
     entry: { id: "sketch.js", mediaType: "text/javascript", source: utf8("new p5(()=>{});") },
   });
   assert.deepEqual(local.parts.map((part) => part.role), ["shell-prefix", "module", "module", "entrypoint", "shell-suffix"]);
-  const graph = await buildKeelInlinePreEncodedTokenURIGraph(local, { legacyCarriage: "acknowledged" });
+  const graph = await buildKeelInlineRawPercentTokenURIGraph(local);
   assert.deepEqual(graph.parts.map((part) => part.role), ["shell-prefix", "module", "module", "entrypoint", "shell-suffix"]);
   assert.equal(graph.parts.filter((part) => part.role === "shell-prefix").length, 1);
   assert.equal(graph.parts.filter((part) => part.role === "shell-suffix").length, 1);
@@ -725,12 +544,13 @@ test("published canonical fragments survive platform-specific module recompressi
     compression: "gzip",
     execution: "classic",
   });
-  const canonicalRoot = await buildKeelInlineLocalDocument({
+  const canonicalRoot = withCurrentCanonicalFrames(await buildKeelInlineLocalDocument({
     shell,
     modules: [canonicalModule],
     entry: { id: "sketch.js", mediaType: "text/javascript", source: utf8("new p5(()=>{});") },
-  });
-  const canonicalGraph = await buildKeelInlinePreEncodedTokenURIGraph(canonicalRoot, { legacyCarriage: "acknowledged" });
+  }));
+  const registeredNativeGzip=currentNativeGzipProof(canonicalRoot);
+  const canonicalGraph = await buildKeelInlineRawPercentTokenURIGraph(canonicalRoot, { registeredNativeGzip });
   const published = canonicalGraph.parts.filter((part) => part.sourceKind === "existing").map((part, index) => ({
     bytes: part.bytes,
     integrity: part.integrity,
@@ -762,12 +582,12 @@ test("published canonical fragments survive platform-specific module recompressi
     compression: "deflate",
     execution: "classic",
   });
-  const recompressedRoot = await buildKeelInlineLocalDocument({
+  const recompressedRoot = withCurrentCanonicalFrames(await buildKeelInlineLocalDocument({
     shell,
     modules: [recompressedModule],
     entry: { id: "sketch.js", mediaType: "text/javascript", source: utf8("new p5(()=>{});") },
-  });
-  const reusedGraph = await buildKeelInlinePreEncodedTokenURIGraph(recompressedRoot, { existingParts: published , legacyCarriage: "acknowledged" });
+  }));
+  const reusedGraph = await buildKeelInlineRawPercentTokenURIGraph(recompressedRoot, { existingParts: published, registeredNativeGzip });
   assert.deepEqual(
     reusedGraph.parts.filter((part) => part.sourceKind === "existing").map((part) => part.integrity.digest),
     published.map((part) => part.integrity.digest),
@@ -775,26 +595,7 @@ test("published canonical fragments survive platform-specific module recompressi
   assert.match(new TextDecoder().decode(reusedGraph.htmlBytes), /"compression":"gzip"/u);
   assert.doesNotMatch(new TextDecoder().decode(reusedGraph.htmlBytes), /"compression":"deflate"/u);
 
-  const canonicalEscaped = await buildKeelInlineEscapedTokenURIGraph(canonicalRoot, { legacyCarriage: "acknowledged" });
-  const publishedEscaped = canonicalEscaped.parts.filter((part) => part.sourceKind === "existing").map((part, index) => ({
-    bytes: part.bytes,
-    integrity: part.integrity,
-    carrier: {
-      chainId,
-      store: `0x${"ab".repeat(20)}`,
-      objectId: `0x${String(index + 11).padStart(64, "0")}`,
-      mediaType: canonicalEscaped.mediaType,
-      compression: "none",
-      storedByteLength: part.bytes.byteLength,
-    },
-  }));
-  const reusedEscaped = await buildKeelInlineEscapedTokenURIGraph(recompressedRoot, { existingParts: publishedEscaped , legacyCarriage: "acknowledged" });
-  assert.match(new TextDecoder().decode(reusedEscaped.htmlBytes), /"compression":"gzip"/u);
-  assert.doesNotMatch(new TextDecoder().decode(reusedEscaped.htmlBytes), /"compression":"deflate"/u);
-  await assert.rejects(
-    buildKeelInlineEscapedTokenURIGraph(recompressedRoot, { existingParts: published , legacyCarriage: "acknowledged" }),
-    /not a compact percent fragment/u,
-  );
+  for(const build of [buildKeelInlineEscapedTokenURIGraph,buildKeelInlinePreEncodedTokenURIGraph])await assert.rejects(build(recompressedRoot,{existingParts:published,legacyCarriage:'acknowledged'}),/retired/);
   await assert.rejects(
     verifyKeelPublishedInlineModuleFragment({
       fragment: published[1],
@@ -807,14 +608,14 @@ test("published canonical fragments survive platform-specific module recompressi
   );
 });
 
-test("fresh Base64 encoding requires acknowledgement and ignores the environment bypass", async () => {
+test("fresh Base64 encoding stays retired despite acknowledgement and environment", async () => {
   const { assertLegacyCarriageAllowed, KeelLegacyCarriageError } = await import("../packages/sdk/dist/inline-viewer-graph.js");
   const saved = process.env.KEEL_LEGACY_CARRIAGE;
   delete process.env.KEEL_LEGACY_CARRIAGE;
   try {
     assert.throws(() => assertLegacyCarriageAllowed("buildKeelInlinePreEncodedTokenURIGraph", undefined), KeelLegacyCarriageError);
     assert.throws(() => assertLegacyCarriageAllowed("buildKeelInlinePreEncodedTokenURIGraph", {}), /compact raw-percent/u);
-    assert.doesNotThrow(() => assertLegacyCarriageAllowed("buildKeelInlinePreEncodedTokenURIGraph", { legacyCarriage: "acknowledged" }));
+    assert.throws(() => assertLegacyCarriageAllowed("buildKeelInlinePreEncodedTokenURIGraph", { legacyCarriage: "acknowledged" }), KeelLegacyCarriageError);
     process.env.KEEL_LEGACY_CARRIAGE = "allow";
     assert.throws(() => assertLegacyCarriageAllowed("buildKeelInlineEscapedTokenURIGraph", {}), KeelLegacyCarriageError);
   } finally {
@@ -860,4 +661,52 @@ test("default saver keeps raw text unchanged through SDK, publication reuse, and
   assert.ok(decodeURIComponent(metadata.animation_url.slice(metadata.animation_url.indexOf(",") + 1)).startsWith(Buffer.from(document.rootBytes).toString()));
   await assert.rejects(buildKeelInlineTokenURIGraph(document, { carriage: "typo" }), /Unsupported Inline carriage/);
   await assert.rejects(buildKeelInlineTokenURIGraph(document, { existingParts: existingParts.map((p) => ({ ...p, carrier: { ...p.carrier, mediaType: "application/vnd.keel.token-uri-base64-fragment" } })) }), /not a raw-percent fragment/);
+});
+
+async function currentPublishedModule({compression='gzip',source=utf8('globalThis.currentArt="exact original";'),aliases=['exact.js']}={}){
+ const module=await buildKeelInlineModuleFragment({moduleId:'keel.current-module',version:'1',mediaType:'text/javascript',decodedBytes:source,compression,aliases,execution:'classic'});
+ const root=await buildKeelInlineLocalDocument({shell:currentCanonicalShell(),modules:[module],entry:{id:'entry.html',mediaType:'text/html',source:utf8('<!doctype html><p>original entry</p>')}});
+ const proof=compression==='gzip'?currentNativeGzipProof(root):undefined;
+ const graph=proof?await buildKeelInlineRawPercentTokenURIGraph(root,{registeredNativeGzip:proof}):undefined;
+ const published=graph?.parts.filter(p=>p.sourceKind==='existing').map((p,i)=>({bytes:Uint8Array.from(p.bytes),integrity:{...p.integrity},carrier:{chainId,store:'0x'+'12'.repeat(20),objectId:'0x'+(i+1).toString(16).padStart(64,'0'),mediaType:graph.mediaType,compression:'none',storedByteLength:p.bytes.length}}));
+ return{root,proof,graph,published};
+}
+
+test('direct and shared current COPY authenticate published Gzip bytes despite unused local Deflate compression',async()=>{
+ const canonical=await currentPublishedModule(),local=await currentPublishedModule({compression:'deflate'});
+ for(const build of [buildKeelInlineRawPercentTokenURIGraph,buildKeelInlineTokenURIGraph]){
+  const result=await build(local.root,{existingParts:canonical.published,registeredNativeGzip:canonical.proof});
+  assert.deepEqual(result.fragmentBytes,canonical.graph.fragmentBytes);assert.deepEqual(result.htmlBytes,canonical.root.rootBytes);
+  assert.deepEqual(result.registeredNativeGzip,canonical.proof);
+ }
+});
+
+test('a consistent registered frame proof cannot replace the declared source or module aliases',async()=>{
+ const original=await currentPublishedModule({compression:'deflate'});
+ for(const replacement of [await currentPublishedModule({source:utf8('globalThis.currentArt="different";')}),await currentPublishedModule({aliases:['different.js']})]){
+  for(const build of [buildKeelInlineRawPercentTokenURIGraph,buildKeelInlineTokenURIGraph])await assert.rejects(build(original.root,{existingParts:replacement.published,registeredNativeGzip:replacement.proof}),/changed the declared source identity or metadata/);
+ }
+ const canonical=await currentPublishedModule(),deflate=await currentPublishedModule({compression:'deflate'});
+ const invalid=canonical.published.map(p=>({...p,bytes:Uint8Array.from(p.bytes),integrity:{...p.integrity},carrier:{...p.carrier}}));
+ const payload=deflate.root.parts.find(p=>p.role==='module').bytes;
+ invalid[1].bytes=utf8(encodeURIComponent(encodeURIComponent(new TextDecoder().decode(payload))));
+ invalid[1].integrity={algorithm:'sha256',digest:'0x'+createHash('sha256').update(invalid[1].bytes).digest('hex'),byteLength:invalid[1].bytes.length};invalid[1].carrier.storedByteLength=invalid[1].bytes.length;
+ await assert.rejects(buildKeelInlineRawPercentTokenURIGraph(original.root,{existingParts:invalid,registeredNativeGzip:canonical.proof}),/Native Gzip/);
+ await assert.rejects(buildKeelInlineTokenURIGraph(original.root,{existingParts:canonical.published,registeredNativeGzip:{...canonical.proof,binding:{...canonical.proof.binding,reader:'0x'+'99'.repeat(20)}}}),/Native Gzip|native Gzip/);
+});
+
+test('current COPY snapshots entry bytes, receipt order, source identities and proof before async digest',async()=>{
+ for(const build of [buildKeelInlineRawPercentTokenURIGraph,buildKeelInlineTokenURIGraph]){
+  const canonical=await currentPublishedModule();const expected=Uint8Array.from(canonical.graph.fragmentBytes);
+  const digest=globalThis.crypto.subtle.digest;let enter,release,first=true;
+  const entered=new Promise(r=>enter=r),gate=new Promise(r=>release=r);
+  globalThis.crypto.subtle.digest=async function(...args){if(first){first=false;enter();await gate;}return digest.apply(this,args);};
+  try{
+   const promise=build(canonical.root,{existingParts:canonical.published,registeredNativeGzip:canonical.proof});await entered;
+   canonical.root.rootBytes.fill(0);canonical.root.parts.find(p=>p.kind==='creator').bytes.fill(0);
+   canonical.published[1].bytes.fill(0);canonical.published[1].carrier.objectId='0x'+'ff'.repeat(32);canonical.published.reverse();
+   canonical.proof.binding.reader='0x'+'99'.repeat(20);release();
+   assert.deepEqual((await promise).fragmentBytes,expected);
+  }finally{release();globalThis.crypto.subtle.digest=digest;}
+ }
 });
