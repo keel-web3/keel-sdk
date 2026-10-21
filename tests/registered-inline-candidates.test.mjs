@@ -3,12 +3,10 @@ import assert from 'node:assert/strict';
 import { createHash } from 'node:crypto';
 import { readFileSync } from 'node:fs';
 import path from 'node:path';
-import { encodeAbiParameters } from 'viem';
-import { selectKeelRegisteredInlineCandidate, keelRegisteredInlineRecipeDigest } from '../packages/sdk/dist/inline-build-route.js';
-import { buildKeelInlineShellFragments, buildKeelInlineLocalDocument, buildKeelInlineRawPercentTokenURIGraph } from '../packages/sdk/dist/inline-viewer-graph.js';
-import { buildKeelPreparedDenseCopyShell, prepareKeelDensePayload, prepareKeelGzipDensePayload } from '../packages/sdk/dist/prepared-dense-copy.js';
-import { buildKeelOnchainContainerBinding } from '../packages/sdk/dist/verification-shell.js';
-import { prepareKeelDenseCopyFragment, serializeKeelDenseTransportJSON, toKeelDenseTransportDataURL } from '../packages/sdk/dist/dense-transport.js';
+import { gunzipSync } from 'node:zlib';
+import { selectKeelRegisteredInlineCandidate, keelRegisteredInlineRecipeDigest, createKeelRegisteredNativeGzipProof, KEEL_REGISTERED_NATIVE_GZIP_FRAME_PROFILE as nativeProfile } from '../packages/sdk/dist/inline-build-route.js';
+import { buildKeelInlineShellFragments, buildKeelInlineLocalDocument, buildKeelInlineRawPercentTokenURIGraph, decodeKeelInlineGraphFragment } from '../packages/sdk/dist/inline-viewer-graph.js';
+import { prepareKeelDenseCopyFragment, toKeelDenseTransportDataURL } from '../packages/sdk/dist/dense-transport.js';
 
 const sha = bytes => '0x' + createHash('sha256').update(bytes).digest('hex');
 const address = '0x1111111111111111111111111111111111111111';
@@ -59,48 +57,35 @@ async function noneCandidate(id='none', style='compact') {
   const r=recipe(id,'none','canonical-items',parts);
   return candidate(id,r,{tokenURI:tokenURI(Buffer.from(document.rootBytes).toString(),metadataFields,imageURI,style),documentParts:parts});
 }
-// Uses the maintained native Gzip/Dense preparation, exact container binding,
-// shell and ABI packtable. Identities are explicitly local fixture commitments,
-// not fabricated public-chain receipts or registration proof.
-async function denseCandidate(codec,id=codec) {
-  const shell=await buildKeelPreparedDenseCopyShell({codecProfile:codec==='gzip'?'native':'brotli-js',embeddedContainerDelivery:{chainId,store:address}});
-  const packs=[],descriptors=[];
-  for(const [index,source] of sources.entries()) {
-    const payload=codec==='gzip'?prepareKeelGzipDensePayload(source.bytes):prepareKeelDensePayload(source.bytes,{compression:'brotli'});
-    const objectId=hash(100+index);
-    const binding=await buildKeelOnchainContainerBinding({chainId,store:address,objectId,compression:payload.compression,bytes:source.bytes,storedBytes:payload.compressedBytes});
-    const storedIntegrity=payload.storedIntegrity;
-    packs.push({containerId:binding.id,objectId,storedIntegrity,storedDense:payload.storedDense});
-    descriptors.push({id:source.id,aliases:[source.id],role:index===0?'entrypoint':'asset',mediaType:source.mediaType,
-      integrity:{algorithm:'sha256',digest:sha(source.bytes),byteLength:source.bytes.length},onchain:{containerId:binding.id,offset:0},containerBindings:[binding]});
-  }
-  const bridge=Buffer.from(shell.containerBridge).toString();
-  const body=packs.map(serializeKeelDenseTransportJSON).join(',')+bridge+','+descriptors.map(serializeKeelDenseTransportJSON).join(',');
-  const html=Buffer.from(shell.prefix).toString()+body+Buffer.from(shell.suffix).toString();
-  const parts=[{objectId:hash(20),bytes:prepareKeelDenseCopyFragment(Buffer.from(shell.prefix).toString()),disposition:'reused',role:'boot-and-decoder'},
-    {objectId:hash(21),bytes:prepareKeelDenseCopyFragment(body),disposition:'new',role:'payload'},
-    {objectId:hash(22),bytes:prepareKeelDenseCopyFragment(Buffer.from(shell.suffix).toString()),disposition:'reused',role:'boot-and-decoder'}];
-  const rows=packs.map(pack=>({byteLength:BigInt(pack.storedIntegrity.byteLength),digest:pack.storedIntegrity.digest,objectId:pack.objectId,containerId:pack.containerId}));
-  const table=Buffer.from(encodeAbiParameters([{type:'tuple[]',components:[{name:'byteLength',type:'uint256'},{name:'digest',type:'bytes32'},{name:'objectId',type:'bytes32'},{name:'containerId',type:'bytes32'}]}],[rows]).slice(2),'hex');
-  const r=recipe(id,codec,'uri81-containers',parts);
-  return candidate(id,r,{tokenURI:tokenURI(html),documentParts:parts,tableDigest:sha(table),auxiliaryObjects:[
-    {objectId:hash(30),bytes:table,disposition:'new',role:'table'},
-    {objectId:hash(31),bytes:Buffer.from(imageURI),disposition:'new',role:'image'},
-  ]});
+// Current canonical Gzip frame and proof; fixture identities are explicit local
+// commitments, never selected-chain registration or live execution evidence.
+async function gzipCandidate(id='gzip') {
+  const frame=JSON.parse(gunzipSync(readFileSync(new URL('./fixtures/registered-native-gzip-revision5.json.gz',import.meta.url))));
+  const integrity=bytes=>({algorithm:'sha256',digest:sha(bytes),byteLength:bytes.length});
+  const half=side=>decodeKeelInlineGraphFragment(Buffer.from(frame.fragments['compact-'+side].base64,'base64'),'application/vnd.keel.token-uri-raw-percent-fragment');
+  const shell={schema:'keel-inline-shell-fragments@1',codecProfile:'browser-gzip-deflate',prefix:{bytes:half('prefix'),integrity:integrity(half('prefix'))},suffix:{bytes:half('suffix'),integrity:integrity(half('suffix'))}};
+  const binding=Object.fromEntries(['chainId','revision','store','registry','reader','readerRuntimeCodeHash','metadataObjectId','readerDeploymentTransactionHash','registeredPrefixObjectId','registeredSuffixObjectId','prefixObjectId','suffixObjectId'].map(key=>[key,nativeProfile[key]]));
+  Object.assign(binding,{profile:'keel.canonical-native-gzip@1',metadataIntegrity:{algorithm:'sha256',digest:nativeProfile.metadataDigest,byteLength:nativeProfile.metadataByteLength}});
+  const document=await buildKeelInlineLocalDocument({shell,modules:[],entry:{id:sources[0].id,mediaType:'text/html',source:sources[0].bytes,compression:'gzip'},assets:[{id:sources[1].id,mediaType:sources[1].mediaType,source:sources[1].bytes,compression:'none'}]});
+  const registeredNativeGzip=createKeelRegisteredNativeGzipProof({binding,documentBytes:document.rootBytes});
+  const graph=await buildKeelInlineRawPercentTokenURIGraph(document,{registeredNativeGzip});
+  const parts=graph.parts.map((part,index)=>({objectId:part.sourceKind==='existing'?index===0?nativeProfile.prefixObjectId:nativeProfile.suffixObjectId:sha(part.bytes),bytes:part.bytes,disposition:part.sourceKind==='existing'?'reused':'new',role:part.sourceKind==='existing'?'boot-and-decoder':'payload'}));
+  const r=recipe(id,'gzip','canonical-items',parts);
+  return candidate(id,r,{tokenURI:tokenURI(Buffer.from(document.rootBytes).toString()),documentParts:parts,registeredNativeGzip,auxiliaryObjects:[{objectId:hash(31),bytes:Buffer.from(imageURI),disposition:'new',role:'image'}]});
 }
 const select = async (candidates,options={})=>selectKeelRegisteredInlineCandidate({sources,collectorImage,metadataFields,measurementScope:scope,candidates,...options});
 
-test('actual None and maintained native-Gzip/URI81 builds compare complete metadata, decoder/boot and source bytes',async t=>{
-  const candidates=[await noneCandidate(),await denseCandidate('gzip'),await denseCandidate('brotli')];
+test('actual current canonical None and native-Gzip builds compare complete metadata, decoder/boot and source bytes',async t=>{
+  const candidates=[await noneCandidate(),await gzipCandidate(),{id:'brotli-unavailable',codec:'brotli',status:'unavailable',reason:'No authenticated current Brotli recipe'}];
   const result=await select(candidates);
-  assert.equal(result.candidates.length,3); assert.equal(result.publicationReady,false); assert.equal(result.walletApprovalAuthorized,false);
+  assert.equal(result.candidates.length,2); assert.equal(result.publicationReady,false); assert.equal(result.walletApprovalAuthorized,false);
   assert.equal(result.selectionStatus,'provisional-do-not-adopt'); assert.equal(result.requiresFullSimulation,true);
   assert.deepEqual(result.candidates.map(c=>c.completeTokenURIBytes),result.candidates.map(c=>c.completeTokenURIBytes).sort((a,b)=>a-b));
   assert.equal(result.selected.tokenURICommitment.digest,sha(Buffer.from(result.selected.tokenURI)));
   const gzip=result.candidates.find(c=>c.codec==='gzip'); assert.equal(gzip.nativeBrowserGzip,true); assert.equal(gzip.javascriptCodecDecoderBytes,0);
   assert.ok(gzip.combinedBootDecoderObjectBytes>0,'native gzip still counts actual transport and shell boot/glue');
   assert.ok(result.candidates.every(c=>c.sourceByteIdentity==='verified-exact'&&c.imageBytes===collectorImage.bytes.length));
-  assert.ok(result.candidates.find(c=>c.codec==='brotli').combinedBootDecoderObjectBytes>gzip.combinedBootDecoderObjectBytes);
+  assert.equal(result.filtered.find(c=>c.id==='brotli-unavailable').reason,'No authenticated current Brotli recipe');
   t.diagnostic(JSON.stringify({actualRetainedGatorrr:!!exactDirectory,registrationEvidence:'named-local-fixture-not-live-proof',candidates:result.candidates.map(({tokenURI,...measurement})=>measurement)}));
 });
 
@@ -128,8 +113,8 @@ test('same reused boot object is charged once even when used twice; conflicting 
   await assert.rejects(select([bad]),/Conflicting same-object/);
 });
 
-for(const kind of ['metadata','image','source-membership','coverage','recipe','registered-bytes','auxiliary-table'])test(`corrupt ${kind} stops selection instead of hiding behind another successful candidate`,async()=>{
-  const c=kind==='auxiliary-table'?await denseCandidate('gzip','bad'):await noneCandidate('bad'),run=c.build;
+for(const kind of ['metadata','image','source-membership','coverage','recipe','registered-bytes','auxiliary-image'])test(`corrupt ${kind} stops selection instead of hiding behind another successful candidate`,async()=>{
+  const c=kind==='auxiliary-image'?await gzipCandidate('bad'):await noneCandidate('bad'),run=c.build;
   c.build=async input=>{
     const b=await run(input);
     if(kind==='metadata')return {...b,tokenURI:tokenURI(Buffer.from((await canonical).document.rootBytes).toString(),{...metadataFields,name:'changed'})};
@@ -138,7 +123,7 @@ for(const kind of ['metadata','image','source-membership','coverage','recipe','r
     if(kind==='coverage')return {...b,documentParts:b.documentParts.slice(1)};
     if(kind==='recipe')return {...b,recipeDigest:hash(99)};
     if(kind==='registered-bytes')return {...b,documentParts:b.documentParts.map((p,i)=>i? p:{...p,bytes:Buffer.from('%41')})};
-    return {...b,auxiliaryObjects:b.auxiliaryObjects.map(p=>p.role==='table'?{...p,bytes:Buffer.from('wrong')}:p)};
+    return {...b,auxiliaryObjects:b.auxiliaryObjects.map(p=>p.role==='image'?{...p,bytes:Buffer.from('wrong')}:p)};
   };
   await assert.rejects(select([c,await noneCandidate('good')]));
 });
@@ -196,4 +181,10 @@ test('reused creator objects require distinct receipt-bound attribution; count e
  const result=await selectKeelRegisteredInlineCandidate(input);assert.equal(result.selected.reusedStoredBytes,part.bytes.length+built.documentParts.filter(x=>x.disposition==='reused').reduce((n,x)=>n+x.bytes.length,0));
  await assert.rejects(selectKeelRegisteredInlineCandidate({...input,candidates:[candidate('missing-proof',base.recipe,{...built,documentParts:parts})]}),/reuse|registered|unverified/i);
  await assert.rejects(selectKeelRegisteredInlineCandidate({...input,candidates:[candidate('wrong-proof',{...r,reusedSourceObjects:[{...proof,sourceIds:['invented-source']}]},{...built,documentParts:parts})]}),/attribution|source/i);
+});
+
+for (const retiredField of ['tableDigest','sharedImageProgram']) test(`retired ${retiredField} cannot authorize current candidate selection`,async()=>{
+  const c=await noneCandidate('retired-container'),run=c.build;
+  c.build=async input=>({...await run(input),[retiredField]:retiredField==='tableDigest'?hash(99):{}});
+  await assert.rejects(select([c,await noneCandidate('good')]),/Retired candidate container adapters/);
 });
