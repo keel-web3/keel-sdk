@@ -1,0 +1,35 @@
+{
+  "schema": "keel.rename-first-operator-source-correspondence@1",
+  "unchangedFunctions": [
+    "require",
+    "digest",
+    "file_sha",
+    "regular",
+    "load",
+    "modules",
+    "mount_digest",
+    "profile",
+    "assert_baseline",
+    "assert_runner",
+    "desired_request",
+    "assert_candidate",
+    "check_image",
+    "validate"
+  ],
+  "changedFunctions": [
+    "recover",
+    "main"
+  ],
+  "unchangedSnapshotGuardOOMSupportSHA256": {
+    "reviewed-activation-support.py": "a1594559c2c04159ac94827d0f4f2a991310fb06648379bca6081d5ce6a98de1",
+    "guarded-deployment-checks.py": "b5f7d764b6c05db503a23ea63ca21a36bfcb0f17cc8292444d790d4a8aad6e00",
+    "candidate-oom-default.py": "6621ff48fc02057d98d91ef5fd71e6e30eeea1ef847149170e316d9725e77c73",
+    "snapshot-supervisor.cjs": "5d8d56588eba290773961d74152baf3728ffd2e00a75894beed92d38af06706e"
+  },
+  "candidateAppImageUnchanged": "sha256:cee8c0b777f78372c6ee56bd9ff1c66dbeafd6393d04cb7f298fab6eb7bac9b7",
+  "newOperatorSHA256": "8c9584a951215a43b25d8f1599c69aed60553c80b7ab0f0ee6faebb01bce73ca",
+  "newActivationId": "07a4de5e-f373-49bb-9e05-952906a8c4a4",
+  "old5895ConsumedFailurePreserved": true,
+  "testScope": "Actualmain/recover with explicit Docker/PG boundary doubles; no realPG/daemon/root stage claim. Original stopfirst main remains observedfailure regression; successor accepts no identity/resource/config relaxations.",
+  "hostActions": false
+}

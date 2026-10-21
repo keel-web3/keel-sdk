@@ -1,0 +1,46 @@
+{
+  "schema": "keel.independent-rename-before-stop-source-controls@1",
+  "operatorSHA256": "8c9584a951215a43b25d8f1599c69aed60553c80b7ab0f0ee6faebb01bce73ca",
+  "unchangedOutsideFunctions": [
+    "recover",
+    "main"
+  ],
+  "allOtherSourceExact": true,
+  "maintained9TestByteExact": true,
+  "supportExact": {
+    "reviewed-activation-support.py": "a1594559c2c04159ac94827d0f4f2a991310fb06648379bca6081d5ce6a98de1",
+    "guarded-deployment-checks.py": "b5f7d764b6c05db503a23ea63ca21a36bfcb0f17cc8292444d790d4a8aad6e00",
+    "candidate-oom-default.py": "6621ff48fc02057d98d91ef5fd71e6e30eeea1ef847149170e316d9725e77c73",
+    "snapshot-supervisor.cjs": "5d8d56588eba290773961d74152baf3728ffd2e00a75894beed92d38af06706e",
+    "daemon-profile.json": "de90264866cfea2742d916546b3df4121d338e036f9f60d24555df5887d83cdd"
+  },
+  "tests": [
+    {
+      "test": "main13",
+      "count": 13,
+      "exitCode": 0,
+      "stdoutSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSHA256": "d109531461f08c69e61c291b56c37a29f1de82ef62d9783f832320f6e0e3b126"
+    },
+    {
+      "test": "maintained9",
+      "count": 9,
+      "exitCode": 0,
+      "stdoutSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSHA256": "603db52fd0016ca5cdcf83b2588160ae92bde08c66ba4c61dfc8a2a74cdb95c9"
+    },
+    {
+      "test": "recovery-waker1",
+      "count": 1,
+      "exitCode": 0,
+      "stdoutSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSHA256": "d10ffbd9f0faa72cd6837063279524e199b59fbc3d035051302a1e8dbc4b36ad"
+    }
+  ],
+  "totalPass": 23,
+  "skip": 0,
+  "syntheticDockerOnly": true,
+  "newRealHostOrDBAction": false,
+  "baselineRecoveryWake": "RED retained, SHA1eb12c8cb5bedaeaf8c5a99f578e72007a0af671709bd0cf2f8c5d0584f19ad5",
+  "sourceScope": "Main retires current name while healthy before stopping immutable old ID; recovery retires only authenticated candidate CURRENT name before stopping; failed-name/lost-reply reconciliation and bounded diagnostics. No other logic or private authority change."
+}

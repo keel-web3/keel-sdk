@@ -1,0 +1,126 @@
+{
+  "schema": "keel.independent-cee8-rename-first-review-evidence@1",
+  "scope": "Prior consumed5895 failure + exact successor530be source and static6ac admission only; no new activation/private replay.",
+  "files": [
+    {
+      "path": "main13.stderr",
+      "bytes": 112,
+      "sha256": "d109531461f08c69e61c291b56c37a29f1de82ef62d9783f832320f6e0e3b126",
+      "source": "/private/tmp/keel-independent-cee8-rename-first-20261021/main13.stderr"
+    },
+    {
+      "path": "failure-audit.json",
+      "bytes": 3872,
+      "sha256": "71bc71b6ab1551a91cfa48f2877225f3094d5649e9e07d490ed34808e3b706d0",
+      "source": "/private/tmp/keel-independent-cee8-rename-first-20261021/failure-audit.json"
+    },
+    {
+      "path": "static-validation.json",
+      "bytes": 3358,
+      "sha256": "fdea077f2f5208beaa96f4fb7953c47b43a592064b3f063e31ec79198db5244a",
+      "source": "/private/tmp/keel-independent-cee8-rename-first-20261021/static-validation.json"
+    },
+    {
+      "path": "main13.stdout",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "source": "/private/tmp/keel-independent-cee8-rename-first-20261021/main13.stdout"
+    },
+    {
+      "path": "maintained9.stderr",
+      "bytes": 107,
+      "sha256": "603db52fd0016ca5cdcf83b2588160ae92bde08c66ba4c61dfc8a2a74cdb95c9",
+      "source": "/private/tmp/keel-independent-cee8-rename-first-20261021/maintained9.stderr"
+    },
+    {
+      "path": "recovery-name-waker.regression.test.py",
+      "bytes": 2480,
+      "sha256": "00d3dd1e4f36bdbad64039a18fed9158198273c1e99343f1476b2082eeb2b93a",
+      "source": "/private/tmp/keel-independent-cee8-rename-first-20261021/recovery-name-waker.regression.test.py"
+    },
+    {
+      "path": "source-controls.json",
+      "bytes": 2101,
+      "sha256": "7bd94d0103ee64896e6cb4ca2b8b925bcf147bdee39924b337adf73a3b25350c",
+      "source": "/private/tmp/keel-independent-cee8-rename-first-20261021/source-controls.json"
+    },
+    {
+      "path": "recovery-waker1.stderr",
+      "bytes": 98,
+      "sha256": "d10ffbd9f0faa72cd6837063279524e199b59fbc3d035051302a1e8dbc4b36ad",
+      "source": "/private/tmp/keel-independent-cee8-rename-first-20261021/recovery-waker1.stderr"
+    },
+    {
+      "path": "baseline.stdout",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "source": "/private/tmp/keel-independent-cee8-rename-first-20261021/baseline.stdout"
+    },
+    {
+      "path": "baseline.stderr",
+      "bytes": 1081,
+      "sha256": "1eb12c8cb5bedaeaf8c5a99f578e72007a0af671709bd0cf2f8c5d0584f19ad5",
+      "source": "/private/tmp/keel-independent-cee8-rename-first-20261021/baseline.stderr"
+    },
+    {
+      "path": "recovery-waker1.stdout",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "source": "/private/tmp/keel-independent-cee8-rename-first-20261021/recovery-waker1.stdout"
+    },
+    {
+      "path": "source-static-review.json",
+      "bytes": 3221,
+      "sha256": "400914e39fa52b931e1f184f709619f56bfe6ade528a6b149e05e7560f9b0068",
+      "source": "/private/tmp/keel-independent-cee8-rename-first-20261021/source-static-review.json"
+    },
+    {
+      "path": "maintained9.stdout",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "source": "/private/tmp/keel-independent-cee8-rename-first-20261021/maintained9.stdout"
+    },
+    {
+      "path": "static-stage.admitted.json",
+      "bytes": 15155,
+      "sha256": "ed33fad64d5e17a140b854bf2b63392f7e40eaf8e884995a4121f1c1a0cde718",
+      "source": "/private/tmp/keel-independent-cee8-rename-first-20261021/static-stage.admitted.json"
+    },
+    {
+      "path": "activate-image-only.py",
+      "bytes": 17126,
+      "sha256": "8c9584a951215a43b25d8f1599c69aed60553c80b7ab0f0ee6faebb01bce73ca",
+      "source": "/private/tmp/keel-image-only-release-20261020/docs/reviews/studio-publication-20261020/release/observer-cutover-rename-first/activate-image-only.py"
+    },
+    {
+      "path": "cutover-order-main.test.py",
+      "bytes": 15787,
+      "sha256": "8390c23bcf0d01b2140b4160bdfa66522f4761cc5f2d94d504f1da2c1ceb5e71",
+      "source": "/private/tmp/keel-image-only-release-20261020/docs/reviews/studio-publication-20261020/release/observer-cutover-rename-first/cutover-order-main.test.py"
+    },
+    {
+      "path": "image-only-controls.test.py",
+      "bytes": 6990,
+      "sha256": "50471b8ca2e13f70ca9fcf78faf1668ecc9052536bcea12a19e627d24fa3022d",
+      "source": "/private/tmp/keel-image-only-release-20261020/docs/reviews/studio-publication-20261020/release/observer-cutover-rename-first/image-only-controls.test.py"
+    },
+    {
+      "path": "activation-plan.pending.json",
+      "bytes": 3551,
+      "sha256": "49e141ef5578d6f6ec5dff7021f43f8ceefcb998c15ea84d1856840a46dacfee",
+      "source": "/private/tmp/keel-image-only-release-20261020/docs/reviews/studio-publication-20261020/release/observer-cutover-rename-first/activation-plan.pending.json"
+    },
+    {
+      "path": "source-correspondence.json",
+      "bytes": 1420,
+      "sha256": "a1d1968b8c11011c277a87f69bee2dc39d70985dd61f62cceb309f82e4e828c0",
+      "source": "/private/tmp/keel-image-only-release-20261020/docs/reviews/studio-publication-20261020/release/observer-cutover-rename-first/evidence/source-correspondence.json"
+    },
+    {
+      "path": "qa-prior-cutover-failure.json",
+      "bytes": 2807,
+      "sha256": "795d2ab17cb7616bc4f79cf86722e2f20bc13b51e9ea9552ce26668d9bf3d230",
+      "source": "/tmp/keel-qa-receipt-activation-20261020/keel-site/docs/reviews/studio-publication-20261020/qa-observer-cee8-cutover-failure/result.json"
+    }
+  ]
+}
