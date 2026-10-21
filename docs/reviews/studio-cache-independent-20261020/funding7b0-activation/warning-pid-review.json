@@ -1,0 +1,19 @@
+{
+  "schema": "keel.independent-actual7b0-warning-observation-binding-review@1",
+  "decision": "APPROVE_EXACT_ONE_CHARACTER_EXPECTED_PID_CORRECTION_ONLY",
+  "reviewerId": "independent-release-reviewer",
+  "patchSHA256": "cc7696b50c4f6c6dba41b13717a7aa24af2fef374931e97ff4b311d9ffd85846",
+  "beforeSHA256": "fdead48d6a2db9edafb5352121fcb70e9aee0be3b9f8bd2e9918d245d3109aa6",
+  "proposedSHA256": "92be3e8e499d893437883fecf95bc7b7a2bdc70e38d4282a3b33bff20ba33a4b",
+  "actualSdkStdoutSHA256": "09fe4486cebad9941668b7460cd929d95247bcba35e0e04d25f49d39972b006f",
+  "independentObservation": "Only two non-observer stderr lines, exactly Node43 DEP0040 punycode text and exact trace-deprecation hint; old actual1058 parser expected Node44",
+  "mechanicalEquivalence": "New file equals old bytes with exactly one44\u219243 character, reverse restores old exact",
+  "unchangedAssertions": [
+    "Exact complete two-line SDK-only warning list; all extra/missing/unexpected warnings reject",
+    "All observer/OOM/exits/goldens/HTTP/status/baseline/actualraw-durablebyteequal checks",
+    "No product/runtime code, resource or deadline change"
+  ],
+  "scope": "This binds actual public test child process metadata, no publication/native/live-success correction or wildcard tolerance",
+  "originalFailurePreservation": "Retain original parser+patch; qualify only on actual complete durable inputs. Missing durable fixture is not a manufactured assertion RED; wrong expected44 is independently demonstrable from actual43 stdout. No runtime replay needed.",
+  "hostActions": 0
+}

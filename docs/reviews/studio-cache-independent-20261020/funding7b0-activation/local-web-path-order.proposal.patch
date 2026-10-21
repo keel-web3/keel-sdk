@@ -1,0 +1,11 @@
+--- original.py
++++ proposed.py
+@@ -28,7 +28,7 @@
+  if row[1]=='dir':
+   for child in sorted(p.iterdir()):walk(child)
+ walk(web)
+-rows.sort(key=lambda x:x[0])
++rows.sort(key=lambda x:Path(x[0]))
+ expected=[r for r in d['entries']if r[0]=='web'or r[0].startswith('web/')]
+ assert rows==expected,('complete_exact_subset_mismatch',len(rows),len(expected),next(((a,z)for a,z in zip(rows,expected)if a!=z),None))
+ after=web.lstat()

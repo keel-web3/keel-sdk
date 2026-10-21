@@ -1,0 +1,66 @@
+{
+  "schema": "keel.independent-owned-local-public-web-retention-review@1",
+  "decision": "APPROVE_ONLY_EXACT_DUPLICATE_LOCAL_WEB_CLEANUP_AFTER_RECHECK",
+  "reviewerId": "independent-release-reviewer",
+  "exactTarget": "/private/tmp/keel-funding-image-build-20261021-01/image-context/web",
+  "qualifiedManifestSHA256": "c5fb631c57f11c695d0e85ef5c6af0cf6ec42ae3462bb98aabd8835064e7625e",
+  "freshSubsetProof": {
+    "result": "PASS_EXACT_PUBLIC_WEB_SUBSET",
+    "path": "/private/tmp/keel-funding-image-build-20261021-01/image-context/web",
+    "entries": 9208,
+    "regularBytes": 297058197,
+    "subsetSHA256": "28a086660858f18afcf7054426c4be8f9a3309c2dec2c8146cac5031414a317f",
+    "rootIdentity": {
+      "st_dev": 16777234,
+      "st_ino": 2048933249,
+      "st_uid": 501,
+      "st_gid": 0,
+      "st_mode": 16877,
+      "st_mtime_ns": 1792547318497979852,
+      "st_ctime_ns": 1792547320281022836
+    },
+    "noSymlinkFollow": true,
+    "deletionPerformed": false
+  },
+  "actualSubsetCheckerSHA256": "0810e45add0c27599585c4bdb39773e4b157372689dbf6eb7096f505a05cfbda",
+  "checkerCorrection": {
+    "independentRootApproval": "Explicit parent approval of exact42123bad patch before qualification",
+    "patchSHA256": "42123bad06e3b8a08d25b585903cb1a63957386df1371cf7b3878fdf5bef3b6b",
+    "onlyChange": "Path component sort key matches frozen producer Path.rglob order; all rows/fields/modes/bytes/hashes/links exact",
+    "originalRedRetained": "local-web-check.original.py and local-web-check.original-red.stderr"
+  },
+  "retention": {
+    "qualifiedYunaCompleteContext": {
+      "path": "yuna-mbp:/private/tmp/keel-funding-image-build-20261021-01/image-context.1058-qualified",
+      "fullPrior9227EntryAudit": {
+        "result": "PASS",
+        "entries": 9227,
+        "regularBytes": 300110627,
+        "sourceManifestSHA256": "c5fb631c57f11c695d0e85ef5c6af0cf6ec42ae3462bb98aabd8835064e7625e",
+        "exactFullMetadataHashAndLinkSet": true,
+        "databaseOrPrivateArtworkTransferred": false
+      },
+      "receiptPath": "/private/tmp/keel-next-offload-transfer-20261021/18-verify-full-transferred-public-context.stdout",
+      "receiptSHA256": "a62c679cf60c1a37f129c442909d6ec97fc971f3f9da150c6cb26c30191dc06b"
+    },
+    "actualLocal1058FullSAVE": {
+      "path": "/private/tmp/keel-actual-funding-image-20261021/image.tar",
+      "bytes": 720655872,
+      "freshFullSHA256": "7d0f46114cfd8335ccc6cac1fbff005781b4aa2c70243bb88b89bebd7c530be4",
+      "mode": "0o600"
+    },
+    "actual7b0YunaSAVE": "Independent d1b0/9f161 entire726973952B/1e3cee69 immutable image remains onYuna; no copy/deletion here"
+  },
+  "permittedCleanup": "Only generated duplicate web dir at exactTarget with symlink-safe removal, after root validates exact canonical root/inode identity and complete subset still matches. Parent reports no active local build. No follows of contained symlinks and no broader retry on drift. Preserve parent image-context, all nonweb files/dirs, source and SDK checkouts, package archives, strictRED contexts, full images, owner diagnostics/artwork, DBs/snapshots/server rollback/volumes and all protected copies. No chmod/content edits outside target.",
+  "onUnknownOrDrift": "STOP",
+  "recovery": "Restore exact public byte/mode/link tree from qualifiedYuna context or actual1058SAVE; inode/ctime exact restoration not claimed",
+  "spaceClaim": "No deleted/allocated/free-space gain claimed before actual root action",
+  "permissions": {
+    "rootSoleOperatorMayRemoveExactPublicDuplicate": true,
+    "reviewerDeletionPerformed": false,
+    "remoteHostMutation": false,
+    "privateDBOrArtworkOrCredentialTransfer": false,
+    "releaseGateAdded": false
+  },
+  "blockingFindings": []
+}
