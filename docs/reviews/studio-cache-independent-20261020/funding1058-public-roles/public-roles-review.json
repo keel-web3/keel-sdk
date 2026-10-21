@@ -1,0 +1,64 @@
+{
+  "schema": "keel.independent-actual1058-public-role-admission@1",
+  "decision": "APPROVE_EXACT_PUBLIC_STAGING_AND_ONE_SERIAL_EXECUTION_PER_ROLE",
+  "reviewerId": "independent-release-reviewer",
+  "sourceFreeze": "4c24e17728b9b02efaa642f3995562a776da1b6a",
+  "candidate": {
+    "image": "sha256:1058a269e6eec831d62945fe0b2623a2c25747a7a900b1e215b24691196ea3db",
+    "imageBytes": 720611802,
+    "imageConfigSHA256": "b8ddaf6d68e76ad758ee46b7c8407b480dfb146113ba0f31a43f10943d80a38b",
+    "rootFSSHA256": "2041f5532020f331f10a65e63bea094a903c8776f82f39744bd8d5fcfb691488",
+    "source": "d64027b868c1d038854b6181049785fe50da0dcb",
+    "sdk": "311d61526284248938e335d7ed879089408933be",
+    "buildId": "IETVxBFih4T2X8_Bx9hK0"
+  },
+  "qualificationSHA256": "3498e00daf2ffa32eedb4c0fb120628a2d23855c69606344bb48bca9ea3dcf18",
+  "commandPath": "/private/tmp/keel-independent-funding1058-20261021/public-roles.commands.admitted.json",
+  "commandSHA256": "5e9af9b50b4b596e1bc3c83effa9186ee1b957b7c9ba587598276d0e96c7b371",
+  "root": "/home/ubuntu/keel-studio-image-qualification-fe61b712-e05f-4858-88f7-e88ea0cf7318",
+  "runnerSHA256": "cf1d003acc7a2998a2a75010550c3c97ff2e4094546c317e877d6026f227f35c",
+  "independentChecks": {
+    "all11PayloadLengthsHashesAndReceiverPathsExact": true,
+    "all11ExclusiveNofollow0444FileAndDirectoryFsyncReceivers": true,
+    "totalPublicPayloadBytes": 17384154,
+    "sourceCorrespondence": "Runner reverse byte-exact after only listed actualimage/Size/RootFS/root/buildguard/plan/manifestname literal retargets from prior approved CEE8 runner",
+    "qualifiers": "SDK/source/build literals only; compiledfactory exactold; SDK1360manifest/goldens/worker-before-media/HTTPTimeoutError handling/privacy/method assertions unchanged",
+    "guardControls": {
+      "pass": 5,
+      "fail": 0,
+      "skip": 0
+    }
+  },
+  "actualArtifactIndependentQA": {
+    "commit": "412f0bcdb68d6e6a1840b96b8576146bc29b37ad",
+    "resultPath": "/tmp/keel-qa-receipt-activation-20261020/keel-site/docs/reviews/studio-publication-20261021/qa-actual-funding1058/result.json",
+    "resultSHA256": "703456fbf266e75d6b64536b8a4ec0f4269d74c7341fdf3cb623b26a36091c1b",
+    "scope": "Actual fullSAVE44blobs/42layers/40parentprefix/fullConfig/36065tree/1360ownSDK311/nativeopsbootstrapworker exact, not rerun by reviewer",
+    "rawFixtureReviewSHA256": "14dee5288abc487933ae7c1bc8bb24a51bde76f19467d7bde4c68aa37682df46"
+  },
+  "admitted": [
+    "Exact exclusive rootfe61b712 +11public payloads0444 and emptyPG555 cover, no liveDB/data/socket/credential mount",
+    "Run exact transfer.serialRoles.tree then sdk then http, each at most once, via frozen authenticated runner only",
+    "Require fresh fullcurrentCEE8/c63+D97/socket/pause/healthy/profile checks, exclusive rolloutlock, >=1GiB memory/load<4/free>=1GiB+256MiB before each role",
+    "Readonly/networknone/uid999/capdropALL/no-new-privileges/768MiBmemory+swap/pids64/boundedlogs+tmpfs; SDK2CPU/tree+HTTP1CPU",
+    "On failure stop; no retry, name/root mutation, alternate caller or foreign-resource cleanup. Authenticate exact owned container before stopping; retain stopped containers/results, fullbefore==after baseline required"
+  ],
+  "maximumExecutionsPerRole": {
+    "tree": 1,
+    "sdk": 1,
+    "http": 1
+  },
+  "deadlinesSeconds": {
+    "tree": 180,
+    "sdk": 180,
+    "http": 75
+  },
+  "activationApproved": false,
+  "privateArtworkProgramOrNativeProofExecutionApproved": false,
+  "realRPCOrSigningOrSubmissionApproved": false,
+  "livePublicationOrGate6Approved": false,
+  "compiledWholeClosureEquivalenceClaimed": false,
+  "strict280Status": "HistoricalFAIL_UNPROVEN/source-attribution limit preserved; not waived or relabeled",
+  "blockingFindings": [],
+  "reviewerHostActions": 0
+}

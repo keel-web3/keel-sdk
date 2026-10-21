@@ -1,0 +1,13 @@
+{
+  "schema": "keel.independent-qa-raw-fixture-binding-review@1",
+  "decision": "APPROVE_EXACT_TWO_INPUT_PATH_BINDINGS_ONLY",
+  "patchPath": "/private/tmp/keel-qa-fundingd640-artifact-20261021/context-raw-path.patch",
+  "patchSHA256": "31fab0f23431b022840135c1196bf6f44a34fcdd66600110c461c28e17b483dc",
+  "beforeSHA256": "48abf8af98b187451b637f0ea06a79869a11fc0d393c1c31f4a0de13f0a92eba",
+  "proposedSHA256": "643e368e7c8ab6a4052d955a4199317e0e133322842c1a8ef92788f3675868f0",
+  "reason": "Frozen producer shipped exactgzip only. QA independently expands it to own context.raw.tar; own fullhash/length and gzip equality match frozen38,993,920B/2151e3413edf60e19c12b2e54eeb440910aabdf636dd9051e3f22e539d551ee1. Exactly two source path replacements reverse byte-exact; all assertions/referencehashes/types/limits unchanged.",
+  "originalSetupREDRetained": true,
+  "reviewTiming": "QA proposed path was already executed under parent ordinary fixture-setup authorization; this is independent current review, not a claim of earlier approval.",
+  "assertionsChanged": false,
+  "productSourceChanged": false
+}
