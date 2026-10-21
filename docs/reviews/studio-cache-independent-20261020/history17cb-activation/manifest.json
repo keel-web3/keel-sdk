@@ -1,0 +1,45 @@
+{
+  "schema": "keel.independent-public-evidence-manifest@1",
+  "files": [
+    {
+      "path": "qa-metadata-binding-review.json",
+      "bytes": 2461,
+      "sha256": "2ed6c9414edceb63b02b4ef6c1d02623839a787fa78cd0295f142af9f4250db8"
+    },
+    {
+      "path": "static-stage-review.json",
+      "bytes": 2613,
+      "sha256": "6ac4c7659c6857362acaa40c29716993a6c703be0a4565ad97d89d74b03a7726"
+    },
+    {
+      "path": "activation-stage.commands.admitted.json",
+      "bytes": 16149,
+      "sha256": "8e6df25f84d9ede20058db84148a78243d32227c2bc5d17ae2a008ecdd80a5f4"
+    },
+    {
+      "path": "postguard-rollback-lineage-review.json",
+      "bytes": 1289,
+      "sha256": "fc4ad1ccd8c473f48c5f5cc2cafa3dba763acb9d0dda5fc86920bfce361dc5f8"
+    },
+    {
+      "path": "releaseReview-final.json",
+      "bytes": 15052,
+      "sha256": "934c5347b8bf09ec2ae4e0254bb0b93eab3c5dec0801719e1a64069070d56b4c"
+    },
+    {
+      "path": "independent-qa-final.json",
+      "bytes": 11413,
+      "sha256": "b8583942eb1d04d1a4e78464f1a4eb3632e8e1a79111365c7a302e583e54921c"
+    },
+    {
+      "path": "qa-metadata-bindings.patch",
+      "bytes": 4426,
+      "sha256": "30ca2ca022458cf2ae8a3281252432b5f6d8cd945c49f265d298511650520274"
+    },
+    {
+      "path": "qa-exact-approved-parser.py",
+      "bytes": 10420,
+      "sha256": "5f39987377f1a01327acd430de4cae7585250d92b04c8246e82878b73d21c898"
+    }
+  ]
+}

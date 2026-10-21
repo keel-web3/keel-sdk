@@ -1,0 +1,16 @@
+{
+  "schema": "keel.independent17cb-postguard-rollback-lineage-review@1",
+  "result": "PASS_SOURCE_ONLY_NO_EXECUTION_ADMISSION",
+  "postguardTemplateSHA256": "82e8ca2535a3b1f221e486cc4bbec78280d4b2546d6f54ffc9a13eb194844d7f",
+  "priorActualPostguardSHA256": "7b0d08210d9545e8a8998ba96787d164ef755c0a9fb8eda1f0fede770547cb3f",
+  "reverseOnlyExactLiteralRetargetsAndAdditiveRetentionBlockRestoresEntirePriorSource": true,
+  "existingFullCandidateSDK1360NativeSnapshot598TOCAndAllOlderRetentionGuardsUnchanged": true,
+  "newAdditiveBlock": "Exactly b9 retainedsnapshot124261128/0a6c and58fc1058 full Config/Host/mount+stopped. Only hashes/TOC read, no restore/artwork/trace reads.",
+  "futureBindingOnly": [
+    "actual successful finalPlanSHA256",
+    "actual successful immutable newContainerId from durable activation receipt"
+  ],
+  "rollbackDocumentSHA256": "c9c94d4604e70542bdcea35ba93f697dc9d891c84d0d0e791c4e513e5fc07521",
+  "rollbackReviewed": "Original full candidate+old baseline andD97/socket authenticated recover under common lock; rename replacement off wakeup name before stop; every owned replacement stopped before old restore; unknown/foreign preserved, no main replay or DBrestore. Exact deliberate invocation not admitted by this source-only review.",
+  "hostCalls": 0
+}
