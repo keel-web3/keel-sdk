@@ -1,0 +1,18 @@
+{
+  "schema": "keel.independent-retention-review-cancellation@1",
+  "status": "CANCELLED_BY_LEAD_BEFORE_ADMISSION_OR_ACTION",
+  "scope": "Single completed f31 public build context archive; proposedretention52f353/restoree968/commands5ea44",
+  "files": {
+    "retain-one-public-context.py": "52f3535242a702f5d99e9857c0191b5e7bbfdea5fc2043eeb8ac19be49080dec",
+    "restore-one-public-context.py": "e968b48ff623f2048f6c641e2c70cd98a075b75eb0c3ef8b2af03b2245efc855",
+    "commands.proposed.json": "5ea44e9fb5ba8997813b2aaa6e57d6bbb9ec9a1ea0af81df4da94b8497f16a4c"
+  },
+  "reviewPerformed": "Read-only source and proposed command inspection only; not a completed source or safety approval",
+  "reviewerTestsExecuted": 0,
+  "retentionAdmitted": false,
+  "restoreAdmitted": false,
+  "reviewerHostActions": 0,
+  "rootReportedReason": "Actual locked poststage public-build preflight PASS with free1593901056B>=required1593724365B, so retention not needed; measured space difference cause not claimed",
+  "archiveState": "Lead reports original f31 archive untouched and proposed retention source unused",
+  "existingHostBuildAdmission": "1874/754f remains conditional on its unchanged fresh locked budget/default guard and one exact69e4 consumption; no cleanup inferred"
+}
