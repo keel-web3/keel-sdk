@@ -1,7 +1,14 @@
 # Native Hybrid RPC planning and preview
 
-Source-only integration, 2026-10-08. No deployment, provider benchmark, registration,
-storage migration, database migration or transaction is part of this change.
+Historical source-only model, 2026-10-08. This document does not establish current
+Studio publication or measured traffic. The ordinary hypothetical panel/provider
+choice was removed in the current Site source; it must not be restored as an upload
+prerequisite. Actual activation remains a separate gate. Read the current
+[owner requirements](https://github.com/keel-web3/keel-site/blob/master/docs/STUDIO_PUBLICATION_REQUIREMENTS.md)
+and [active sprint record](https://github.com/keel-web3/keel-site/blob/master/docs/STUDIO_PUBLICATION_SPRINTS.md).
+The system selects supported wallet/free/managed transport automatically. No
+ordinary creator endpoint selection is required. The design below is retained as
+model documentation, not evidence that the live Studio performs these reads.
 
 ## Existing loader and exact bytes
 
