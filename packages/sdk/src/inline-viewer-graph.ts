@@ -1861,21 +1861,15 @@ export function buildKeelInlineTokenURIGraph(
 export function buildKeelInlineTokenURIGraph(
   root: KeelInlineGraphDocument,
   options: KeelInlineExistingObjectReuseOptions & KeelLegacyCarriageOptions & { readonly maxTokenURIBytes?: number; readonly carriage?: KeelInlineCarriage },
-): Promise<KeelInlineRawPercentTokenURIGraph | KeelInlineEscapedTokenURIGraph | KeelInlinePreEncodedTokenURIGraph | KeelInlinePreEncodedTokenURIBodyGraph>;
+): Promise<KeelInlineRawPercentTokenURIGraph>;
 export async function buildKeelInlineTokenURIGraph(
   root: KeelInlineGraphDocument,
   options: KeelInlineExistingObjectReuseOptions & KeelLegacyCarriageOptions & { readonly maxTokenURIBytes?: number; readonly carriage?: KeelInlineCarriage } = {},
 ) {
-  const readBounds = resolveKeelPreparationReadBounds(options);
-  options = { ...options, ...(readBounds.nonstandardReadPolicy === undefined ? {} : { nonstandardReadPolicy: readBounds.nonstandardReadPolicy }), ...(readBounds.preparationReadBudget === undefined ? {} : { preparationReadBudget: readBounds.preparationReadBudget }) };
   if (Object.hasOwn(options, "legacyCarriage")) throw new KeelLegacyCarriageError("legacyCarriage option");
   resolveKeelInlineCarriage(options.carriage);
-  const reuse = await inspectExistingGraphReuse(root, options, options.carriage);
-  if (reuse === undefined) assertKeelFreshPayloadCarriage(root.rootBytes, options);
-  else {
-    root = reuse.root;
-    options = { ...options, existingParts: reuse.existingParts };
-  }
+  // The raw builder snapshots input immediately and authenticates the exact
+  // assembled published slots. Do not inspect an unused local recompression.
   return buildKeelInlineRawPercentTokenURIGraph(root, options);
 }
 
