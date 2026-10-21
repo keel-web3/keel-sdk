@@ -1,0 +1,45 @@
+{
+  "schema": "keel.qa-rename-first-source-integrity@1",
+  "result": "PASS",
+  "operatorSHA256": "8c9584a951215a43b25d8f1599c69aed60553c80b7ab0f0ee6faebb01bce73ca",
+  "pendingPlanSHA256": "49e141ef5578d6f6ec5dff7021f43f8ceefcb998c15ea84d1856840a46dacfee",
+  "stageCommandsSHA256": "ed33fad64d5e17a140b854bf2b63392f7e40eaf8e884995a4121f1c1a0cde718",
+  "unchanged14Functions": [
+    "require",
+    "digest",
+    "file_sha",
+    "regular",
+    "load",
+    "modules",
+    "mount_digest",
+    "profile",
+    "assert_baseline",
+    "assert_runner",
+    "desired_request",
+    "assert_candidate",
+    "check_image",
+    "validate"
+  ],
+  "onlyChangedFunctions": [
+    "recover",
+    "main"
+  ],
+  "allOtherModuleASTExact": true,
+  "byteExactUnchangedHelpersAndMaintainedTests": {
+    "reviewed-activation-support.py": "a1594559c2c04159ac94827d0f4f2a991310fb06648379bca6081d5ce6a98de1",
+    "guarded-deployment-checks.py": "b5f7d764b6c05db503a23ea63ca21a36bfcb0f17cc8292444d790d4a8aad6e00",
+    "candidate-oom-default.py": "6621ff48fc02057d98d91ef5fd71e6e30eeea1ef847149170e316d9725e77c73",
+    "snapshot-supervisor.cjs": "5d8d56588eba290773961d74152baf3728ffd2e00a75894beed92d38af06706e",
+    "daemon-profile.json": "de90264866cfea2742d916546b3df4121d338e036f9f60d24555df5887d83cdd",
+    "image-only-controls.test.py": "50471b8ca2e13f70ca9fcf78faf1668ecc9052536bcea12a19e627d24fa3022d",
+    "candidate-oom-default.test.py": "efe60879aa53547840ca8b731a63a5db936e91b09650ea664b8ffce146659869"
+  },
+  "pendingAllApprovalFalseRejected": "required_approval_missing",
+  "candidate": {
+    "siteCommit": "0c7b01e3acae5ec787568d6b5931b002654b4de0",
+    "sdkCommit": "311d61526284248938e335d7ed879089408933be",
+    "buildId": "F2eKiuWl2rvz5hqBZQ9wi",
+    "appImageId": "sha256:cee8c0b777f78372c6ee56bd9ff1c66dbeafd6393d04cb7f298fab6eb7bac9b7"
+  },
+  "hostActions": false
+}

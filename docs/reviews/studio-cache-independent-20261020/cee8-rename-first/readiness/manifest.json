@@ -1,0 +1,42 @@
+{
+  "schema": "keel.independent-rename-first-readiness-evidence@1",
+  "scope": "Observer-only readiness, final exact action remains separately reviewed; no prior consumed action reuse or private preparation.",
+  "files": [
+    {
+      "path": "releaseReview-final.json",
+      "bytes": 11379,
+      "sha256": "b8cd2c3d7164bd7a4c774374f5cbe14329e9fec690ed5f9ab484eb3e4087c10e",
+      "source": "/private/tmp/keel-independent-cee8-rename-first-20261021/releaseReview-final.json"
+    },
+    {
+      "path": "actual-static-audit.json",
+      "bytes": 448,
+      "sha256": "5793c9e2cdee921aa7056e0b266846abfe535f6caf73492ccf8dbd35b4c8061e",
+      "source": "/private/tmp/keel-independent-cee8-rename-first-20261021/actual-static-audit.json"
+    },
+    {
+      "path": "qa-final.json",
+      "bytes": 4950,
+      "sha256": "22d615400163f84b472daa1beeb1ab28c48a7d2c3303243217aae8499c0566b9",
+      "source": "/tmp/keel-qa-receipt-activation-20261020/keel-site/docs/reviews/studio-publication-20261020/qa-observer-rename-first/qa-final.json"
+    },
+    {
+      "path": "qa-source-integrity.json",
+      "bytes": 1857,
+      "sha256": "bff96e3608a1bde5339fa166c1e310d0f1fa30eebe71e33c843268b80f13e45a",
+      "source": "/tmp/keel-qa-receipt-activation-20261020/keel-site/docs/reviews/studio-publication-20261020/qa-observer-rename-first/source-integrity.json"
+    },
+    {
+      "path": "actual-static-progress.json",
+      "bytes": 8748,
+      "sha256": "4cfdbf99d66519044cda0955069a6c6c2969773cdc8ac3a03dd88c7eee059831",
+      "source": "/private/tmp/keel-cee8-rename-first-stage-actual-20261021/progress.json"
+    },
+    {
+      "path": "actual-static-result.json",
+      "bytes": 94,
+      "sha256": "a51d3e00cf842256bdeccc15d2a3f992c2a8efb0441db1dc4662241785780058",
+      "source": "/private/tmp/keel-cee8-rename-first-stage-actual-20261021/result.json"
+    }
+  ]
+}

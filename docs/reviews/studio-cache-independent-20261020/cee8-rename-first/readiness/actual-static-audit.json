@@ -1,0 +1,11 @@
+{
+  "result": "PASS_EXACT_STATIC7_ROOT07A4_ONLY",
+  "packetSHA256": "ed33fad64d5e17a140b854bf2b63392f7e40eaf8e884995a4121f1c1a0cde718",
+  "progressSHA256": "4cfdbf99d66519044cda0955069a6c6c2969773cdc8ac3a03dd88c7eee059831",
+  "resultSHA256": "a51d3e00cf842256bdeccc15d2a3f992c2a8efb0441db1dc4662241785780058",
+  "steps": 8,
+  "allExit0EmptyStdoutStderr": true,
+  "actualRootSoleOperator": true,
+  "reviewerAuditOnly": true,
+  "activation": false
+}
