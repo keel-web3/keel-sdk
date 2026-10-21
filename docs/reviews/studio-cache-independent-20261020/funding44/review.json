@@ -1,0 +1,90 @@
+{
+  "schema": "keel.independent-funding44-source-review@1",
+  "decision": "BLOCK_SOURCE_APPROVAL_PENDING_FUNDING44_001",
+  "reviewerId": "independent-release-reviewer",
+  "siteCommit": "44cacd41c642b6d6f21dd269a134cd21917a33c4",
+  "baseCommit": "4796c0e0e8a90c68ffab28e637c9c270861e0970",
+  "sdk": "311d61526284248938e335d7ed879089408933be",
+  "sdkRuntimeClientSHA256": "138835e5ca36194a34e348dec1f6930b189786b22a779e95563047bc10309fd5",
+  "node": "22.22.1",
+  "environment": "Darwin; actual source functions with mocked DB/complete-proof boundary only; no live replay or new native qualification",
+  "finding": {
+    "id": "FUNDING44-001",
+    "priority": "P2",
+    "file": "/private/tmp/keel-plan-progress-20261020/apps/studio/src/server/services/managed-publication-service.ts",
+    "line": 430,
+    "alsoLines": [
+      1042,
+      1052
+    ],
+    "ui": "/private/tmp/keel-plan-progress-20261020/apps/studio/src/components/artifacts/onchain-panel.tsx:620",
+    "trigger": "Existing saved review has a retained funding minimum; a fresh successful complete proof derives a different lower current minimum.",
+    "actual": "Real approvalPreparation+real saveJournal returns approval240wei/currentproofminimum236 but returned AND persistedminimum238 from prior saved quote. UI says Current validated minimum.",
+    "cause": "The refreshed local quote at1042 is overwritten by saveJournal current.quote preservation430 whenever current.fundingPreflight exists. Current maintained fixture stubs saveJournal without its real merge.",
+    "expected": "Keep existing paid amount/rate/budget/payment/receipt authority immutable; expose/persist current validated minimum only bound to same preserved paid quote and current successful full proof, without stale/concurrent overwrite. Underfunded/increased/failed/unvalidated paths remain blocked or fully replayed.",
+    "regression": "/private/tmp/keel-independent-funding44-20261021/saved-minimum-persistence.regression.mjs",
+    "regressionSHA256": "569fab6aaa892dae689df51015c624d760d5a18b1edddd10dc80d5f99440b1dd",
+    "command": "KEEL_REVIEW_SITE_ROOT=<exact Site root> /Users/ravonus/.nvm/versions/node/v22.22.1/bin/node /private/tmp/keel-independent-funding44-20261021/saved-minimum-persistence.regression.mjs",
+    "result": "RED238!=236; paid240 remains exact"
+  },
+  "reviewedNonblockingConclusions": [
+    "Both new sufficient-budget branches require a prior full validated budget from the same loop and a successful current exact-value proof. Initial higher unvalidated seeds reprice/replay; increases require another complete proof; three-pass/freshness/cancellation remain unchanged.",
+    "Retained funding quote gas map records paid arithmetic; executor runtime limits persist separately from current preflight.executorGasLimits. Approval target/calldata/deadline/source/nonce/fee simulation-signing guards are unchanged.",
+    "Optional minimum is accepted by actual packagedSDK311 storageReview and not injected into strict storage-review handoff/wallet fields; focused emitted-client test passes.",
+    "Owner-checked selected release chain drives observation, with artifact chain fallback; source/release revisions and capabilities/hash/auth handlers unchanged. Explicit different selected-release-chain test matches intended read-only semantics.",
+    "No UI redesign/control change: only funding text distinguishes exact paid budget/currentminimum and states unusedfunding is paidexecutor, not refunded."
+  ],
+  "independentTests": {
+    "funding": {
+      "PASS": 21,
+      "FAIL": 0,
+      "SKIP": 0
+    },
+    "observerUnchangedCases": {
+      "PASS": 24,
+      "initialFileSetupErrors": 1,
+      "reason": "Existing CSS test hook omitted in reviewer invocation; original raw retained"
+    },
+    "affectedMountedUsingExistingCssHook": {
+      "PASS": 5,
+      "FAIL": 0,
+      "SKIP": 0
+    },
+    "newActualPersistenceRegression": {
+      "PASS": 0,
+      "FAIL": 1,
+      "expectedBugReproduction": true
+    },
+    "tenOriginalFundingTestBodies": "Byte exact by TypeScript AST callback text; no existing assertion changed",
+    "sdkSixReviewedEmittedFiles": "Exact unchanged frozen311 hashes"
+  },
+  "qaFixtureCorrection": {
+    "reviewSHA256": "76e2212d255febec974a30930b4e6c99205259122ef723bcf0f79544e720911d",
+    "scope": "Exact056d two ESM namespace binding correction approved; later transitive setupfailure remains unqualified, no14case green inference"
+  },
+  "sourceFiles": {
+    "apps/studio/src/lib/managed-publication.ts": "17d05f9c836c799861aa865095f7daef77c14709ff9d08bf89462f8da580848d",
+    "apps/studio/src/server/services/managed-publication-service.ts": "34fde2d1e91cd025f5f3eda8fd2f849293ef71ab60d1bf84d96092e78dc2da8f",
+    "apps/studio/src/server/services/updated-review-funding.ts": "3a2db412f054a2ddd75603471f5411821d415a97a8fb7a5fe5d722bd186e0172",
+    "apps/studio/src/server/services/release-planning-service.ts": "df91fca3b6d0aed118000f7416d8b744809e9263b71dd995dc4b9b15af0d6e44",
+    "apps/studio/src/components/artifacts/onchain-panel.tsx": "94ff59c2dc4b8559da6891938ce1af2a76c2181a77d8ced87f832c3d7c9d647b"
+  },
+  "productionDiffSHA256": "f3f95ae2fb885020bfed65458766603c9a11f69c93f28b4428a8191233ebd56a",
+  "rawLogs": {
+    "funding.stdout": "2d8fd890109949f0e1c86395826b0750420ff918cb6bcef5dc1bc6a8e5826b7d",
+    "saved-minimum-baseline.stdout": "f6ad73afaee08758bfa636ec9b014883fcc5993dd66f4de6b1570104c762132c",
+    "observer.stdout": "ef4c0b9fe77837b65a30591210b64aa290d930bebf58fb2f597b2323db929981",
+    "observer-mounted-css.stdout": "7caeb248d6b2844fd9439098a2411f1c2a5b3a61e1e7328ebf41428ef45eb416",
+    "observer-mounted-css.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "observer.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "saved-minimum-baseline.stderr": "6c247efc2313d6e8700edec2d7ffdb5a584f59bc49fb609e1a95298c7b37e439",
+    "funding.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "diagnosticSetupNotes": [
+    "Initial manual CJS require.resolve hit import-only export; a one-character ESM diagnostic syntax typo followed; corrected import.meta.resolve bound actual311 runtime. These were diagnostic setup errors, not product tests; tool transcript retains outputs.",
+    "Initial mounted suite omitted existing CSS hook and failed before five mounted cases; unaffected24passed. Reran only five affected mounted cases with existing unchanged support/css-modules.mjs; allPASS."
+  ],
+  "privateTrace": "Not read or committed; used provided sanitized analysis only. No private input/RPC/browser/host/preparation/signing/spend/backup actions by reviewer.",
+  "releaseApproval": false,
+  "Gate6": "FAIL_UNRESOLVED; source44cac not deployed; currentCEE8 remains healthy per independent existing evidence, no new reviewhostcheck"
+}

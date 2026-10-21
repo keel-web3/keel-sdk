@@ -1,0 +1,13 @@
+{
+  "decision": "APPROVE_EXACT_QA_IMPORT_ONLY_FIXTURE_CORRECTION",
+  "patchSHA256": "056d1a2dbf888ca8bbf24964117cce02ced1a745195e4d607fab76efec028d87",
+  "proposedSHA256": "08126aac00882e22db88d7c740cc4abb02826202a7d5feb1fb0d20f8ffa334dc",
+  "reason": "CJS cannot require import-only package exports. Bind only the same exact own-fresh311 protocol and execution-authority namespaces via ESM; all fixture bodies/assertions and inputs reverse-byte-exact. Unknown modules continue original require path.",
+  "exactNamespaceSHA256": {
+    "protocol": "a66505758195d461018576043a816b049e619efd9a6762fd3cda63e5a6e574d2",
+    "studio-execution-authority": "c0be8d60b9cc2e1f26e19b39235759ad600ab6de5595590b48797b4821160930"
+  },
+  "initialSetupREDMustRemain": true,
+  "productionApproval": false,
+  "testOutcomesNotInferred": true
+}

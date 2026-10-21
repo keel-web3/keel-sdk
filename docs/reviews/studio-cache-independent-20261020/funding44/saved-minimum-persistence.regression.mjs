@@ -1,0 +1,31 @@
+import assert from 'node:assert/strict';
+import fs from 'node:fs';
+import vm from 'node:vm';
+import {createRequire} from 'node:module';
+const root=process.env.KEEL_REVIEW_SITE_ROOT||'/private/tmp/keel-plan-progress-20261020';
+const require=createRequire(root+'/apps/studio/package.json');
+const ts=require('typescript');
+const sourceText=fs.readFileSync(root+'/apps/studio/src/server/services/managed-publication-service.ts','utf8');
+const sf=ts.createSourceFile('actual-service.ts',sourceText,ts.ScriptTarget.Latest,true);
+const functions=['saveJournal','approvalPreparation','uniqueHashes','uniqueNumbers'].map(name=>{
+ const node=sf.statements.find(n=>ts.isFunctionDeclaration(n)&&n.name?.text===name);assert.ok(node,name);return node.getText(sf);
+}).join('\n');
+const library=fs.readFileSync(root+'/apps/studio/src/lib/managed-publication.ts','utf8');
+const exports={};vm.runInThisContext('(function(exports,require){'+ts.transpileModule(library,{compilerOptions:{target:ts.ScriptTarget.ES2022,module:ts.ModuleKind.CommonJS}}).outputText+'\n})')(exports,()=>({}));
+const seed={storageMode:'native-carrier-v1',maximumExecutorGas:10,walletApprovalTransactionGas:1,selectedGasPriceWei:'2',executorFundingGasPriceWei:'2',executorEscrowWei:'20',mainnetReferenceGasPriceWei:'2',mainnetReferenceCostWei:'20',unusedEscrow:'paid-to-executor-on-success'};
+const paid=exports.withValidatedExecutorFunding(seed,{'carrier:0:1':'100','completion:0:0':'20'},'40');
+const oldMinimum=exports.withValidatedExecutorFunding(paid,{'carrier:0:1':'99','completion:0:0':'20'},'40');
+const retained=exports.withValidatedFundingEnvelope(paid,oldMinimum);
+const current={artifactId:'project',coordinatorPlanId:'coordinator',stagePlanIds:[],planDigest:'0xaa',executor:'0x11',publicationJob:'0x22',deadline:'99999999',quote:retained,fundingPreflight:{old:'verified'},transactionHashes:[],receiptFeesWei:{},submissions:{},completedChunks:0,completedOperations:0,failedChunkIndexes:[],failedOperationIndexes:[]};
+let reads=0,saved;
+const tx={select(){const n=++reads;const result=n===1?[{id:'project'}]:n===2?[{id:'coordinator',publicationState:{managedPublication:current}}]:[];const q={from(){return q},where(){return q},limit(){return q},for(){return Promise.resolve(result)}};return q},update(){return{set(value){saved=value.publicationState.managedPublication;return{where:async()=>undefined}}}}};
+let replayedAmount;
+const context={...exports,db:{transaction:async fn=>fn(tx)},artifacts:{id:'id'},resourceUploadPlans:{id:'id'},eq:()=>true,inArray:()=>true,assertPublicationGeneration:()=>{},managedState:state=>state.managedPublication,manifestFor:()=>({chunkDigests:[],operationDigests:[],allowedTargets:[]}),encodeFunctionData:()=> '0x1234',jobAbi:[],quoteFor:journal=>journal.quote,progress:()=>({}),managedOperationBatchSize:value=>value,InitialStoragePreflightError:Error,
+ requireInitialStoragePreflight:async input=>{replayedAmount=input.approval.value;return{operationBatchSize:1,approvalDigest:input.approval.value,transactionGasLimits:['39'],executorGasLimits:{'carrier:0:1':'98','completion:0:0':'20'}}}};
+const js=ts.transpileModule(functions,{compilerOptions:{target:ts.ScriptTarget.ES2022}}).outputText;
+const run=vm.runInNewContext('(async function(context,journal){const {'+Object.keys(context).join(',')+'}=context;'+js+';return approvalPreparation(journal)})');
+const result=await run(context,structuredClone(current));
+assert.equal(result.status,'approval-required');assert.equal(replayedAmount,'240');assert.equal(result.approval.value,'240');assert.equal(result.preflight.approvalDigest,'240');assert.equal(saved.quote.executorEscrowWei,'240');
+console.log(JSON.stringify({status:result.status,paidWei:result.approval.value,previousMinimumWei:'238',currentProofMinimumWei:'236',returnedMinimumWei:result.quote.validatedFundingMinimum.executorEscrowWei,persistedMinimumWei:saved.quote.validatedFundingMinimum.executorEscrowWei,realSaveJournalExecuted:true}));
+assert.equal(result.quote.validatedFundingMinimum.executorEscrowWei,'236','A successful current proof minimum must survive actual saveJournal paid-quote preservation');
+assert.equal(saved.quote.validatedFundingMinimum.executorEscrowWei,'236');
