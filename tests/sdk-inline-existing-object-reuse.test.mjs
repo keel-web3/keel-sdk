@@ -15,7 +15,7 @@ function localDocument(){return document([
  ['shell-suffix','</body></html>'],
 ].map(([role,text])=>{const b=bytes(text);return{kind:'existing',role,bytes:b,byteLength:b.length,integrity:integrity(b)};}));}
 async function fixture(carriage='raw-percent'){
- const built=await sdk.buildKeelInlineTokenURIGraph(localDocument(),{carriage,legacyCarriage:"acknowledged"});
+ const built=await sdk.buildKeelInlineTokenURIGraph(localDocument(),{carriage});
  const existingParts=built.parts.map((p,i)=>({role:p.role,bytes:p.bytes.slice(),integrity:{...p.integrity},
   carrier:{chainId:scope.chainId,store:scope.store,objectId:'0x'+(i+1).toString(16).padStart(64,'0'),mediaType:built.mediaType,compression:'none',storedByteLength:p.bytes.length}}));
  if(carriage==='follow-latest')throw new Error('Use mixed fixture');
@@ -24,30 +24,27 @@ async function fixture(carriage='raw-percent'){
 async function inspect(parts,extra={}){return sdk.inspectKeelInlineExistingObjectReuse({existingObjectReuse:scope,existingParts:parts,...extra});}
 const clone=p=>p.map(x=>({...x,bytes:x.bytes.slice(),integrity:{...x.integrity},carrier:{...x.carrier}}));
 
-test('prepared aligned Base64 is inferred and copied exactly, with zero new source bytes',async()=>{
- const {existingParts}=await fixture('pinned');
- const inspected=await inspect(existingParts);
- assert.equal(inspected.carriage,'pinned');assert.equal(inspected.newSourcePublicationBytes,0);
+test('current raw-percent is copied exactly with zero new source bytes',async()=>{
+ const {existingParts}=await fixture();const inspected=await inspect(existingParts);
+ assert.equal(inspected.carriage,'raw-percent');assert.equal(inspected.newSourcePublicationBytes,0);
  assert.equal(inspected.storageTransform,'none');assert.equal(inspected.selectedChainBindingVerified,false);
  assert.deepEqual(inspected.reusedObjectIds,existingParts.map(p=>p.carrier.objectId));
  const graph=await sdk.buildKeelInlineTokenURIGraph(inspected.root,{existingParts,existingObjectReuse:scope});
- assert.equal(graph.schema,'keel-inline-preencoded-token-uri@1');
+ assert.equal(graph.schema,'keel-inline-raw-percent-token-uri@1');
  assert.equal(graph.creatorPublicationBytes,0);assert.deepEqual(graph.fragmentBytes,join(existingParts));
  assert.deepEqual(graph.parts.map(p=>p.sourceObjectId),inspected.reusedObjectIds);
  graph.parts.forEach((p,i)=>assert.deepEqual(p.bytes,existingParts[i].bytes));
  assert.deepEqual(graph.htmlBytes,inspected.root.rootBytes);
- const direct=await sdk.buildKeelInlinePreEncodedTokenURIGraph(inspected.root,{existingParts,existingObjectReuse:scope});
+ const direct=await sdk.buildKeelInlineRawPercentTokenURIGraph(inspected.root,{existingParts,existingObjectReuse:scope});
  assert.deepEqual(direct.fragmentBytes,graph.fragmentBytes);
 });
 
-test('raw-percent and percent infer exact existing carriages without repadding',async()=>{
- for(const carriage of ['raw-percent','percent']){
-  const {existingParts}=await fixture(carriage);
-  const inspected=await inspect(existingParts);assert.equal(inspected.carriage,carriage);
-  const graph=await sdk.buildKeelInlineTokenURIGraph(inspected.root,{existingParts,existingObjectReuse:scope});
+test('current carriage aliases retain exact existing fragments without repadding',async()=>{
+ for(const carriage of ['compact','raw-percent']){
+  const {existingParts}=await fixture(carriage);const inspected=await inspect(existingParts);
+  assert.equal(inspected.carriage,'raw-percent');
+  const graph=await sdk.buildKeelInlineTokenURIGraph(inspected.root,{existingParts,existingObjectReuse:scope,carriage});
   assert.deepEqual(graph.fragmentBytes,join(existingParts));assert.equal(graph.creatorPublicationBytes,0);
-  const fn=carriage==='percent'?sdk.buildKeelInlineEscapedTokenURIGraph:sdk.buildKeelInlineRawPercentTokenURIGraph;
-  const direct=await fn(inspected.root,{existingParts,existingObjectReuse:scope});assert.deepEqual(direct.fragmentBytes,graph.fragmentBytes);
  }
 });
 
@@ -80,23 +77,17 @@ test('existing URI81 registrations retain RFC-valid literals and exact object by
  }
 });
 
-test('full shell plus prepared body media infers follow-latest and preserves body IDs',async()=>{
- const {existingParts}=await fixture('pinned');
- for(const p of existingParts.slice(1,-1))p.carrier.mediaType='application/vnd.keel.token-uri-base64-body-fragment';
- const inspected=await inspect(existingParts);assert.equal(inspected.carriage,'follow-latest');
- const graph=await sdk.buildKeelInlineTokenURIGraph(inspected.root,{existingParts,existingObjectReuse:scope});
- assert.equal(graph.shellSelection,'follow-latest');assert.equal(graph.creatorPublicationBytes,0);
- assert.deepEqual(graph.fragmentBytes,join(existingParts.slice(1,-1)));
- assert.deepEqual(graph.parts.map(p=>p.sourceObjectId),inspected.reusedObjectIds.slice(1,-1));
- const direct=await sdk.buildKeelInlineFollowLatestTokenURIBodyGraph(inspected.root,{existingParts,existingObjectReuse:scope});
- assert.deepEqual(direct.fragmentBytes,graph.fragmentBytes);
-});
-
-test('explicit mismatching carriage and direct helper fail before fresh encoding',async()=>{
- const {existingParts}=await fixture('pinned');const inspected=await inspect(existingParts);
- await assert.rejects(inspect(existingParts,{carriage:'compact'}),/does not match/);
- await assert.rejects(sdk.buildKeelInlineTokenURIGraph(inspected.root,{existingParts,existingObjectReuse:scope,carriage:'percent'}),/does not match/);
- await assert.rejects(sdk.buildKeelInlineRawPercentTokenURIGraph(inspected.root,{existingParts,existingObjectReuse:scope}),/does not match/);
+test('retired body media and explicit incompatible selectors fail before encoding',async()=>{
+ const {existingParts}=await fixture();const inspected=await inspect(existingParts);
+ for(const mediaType of ['application/vnd.keel.token-uri-base64-fragment','application/vnd.keel.token-uri-base64-body-fragment','application/vnd.keel.token-uri-percent-fragment']){
+  const altered=clone(existingParts);altered[1].carrier.mediaType=mediaType;
+  await assert.rejects(inspect(altered));
+ }
+ for(const carriage of ['pinned','percent','follow-latest']){
+  await assert.rejects(inspect(existingParts,{carriage}),/Unsupported Inline carriage/);
+  await assert.rejects(sdk.buildKeelInlineTokenURIGraph(inspected.root,{existingParts,existingObjectReuse:scope,carriage}),/Unsupported Inline carriage/);
+ }
+ await assert.rejects(sdk.buildKeelInlinePreEncodedTokenURIGraph(inspected.root,{existingParts,existingObjectReuse:scope}),/retired/);
 });
 
 test('assembly-only requires every ordered part and forbids creator or unused parts',async()=>{
@@ -132,20 +123,21 @@ test('stored SHA, exact lengths and compression are checked before assembly',asy
 });
 
 test('source edits, root edits and local unpadded source cannot hide behind old receipts',async()=>{
- const {existingParts}=await fixture('pinned');const {root}=await inspect(existingParts);
+ const {existingParts}=await fixture();const {root}=await inspect(existingParts);
  const changedParts=root.parts.map((p,i)=>i===1?(()=>{const b=bytes('<script>different()</script>');return{...p,bytes:b,byteLength:b.length,integrity:integrity(b)};})():p);
  await assert.rejects(sdk.buildKeelInlineTokenURIGraph(document(changedParts),{existingParts,existingObjectReuse:scope}),/differs from the published decoded source/);
  const changedRoot={...root,rootBytes:bytes('different'),byteLength:9,rootIntegrity:integrity(bytes('different'))};
  await assert.rejects(sdk.buildKeelInlineTokenURIGraph(changedRoot,{existingParts,existingObjectReuse:scope}),/root differs/);
- await assert.rejects(sdk.buildKeelInlineTokenURIGraph(localDocument(),{existingParts,existingObjectReuse:scope}),/cannot replace or repad/);
+ const exact=await sdk.buildKeelInlineTokenURIGraph(localDocument(),{existingParts,existingObjectReuse:scope});
+ assert.deepEqual(exact.fragmentBytes,join(existingParts));assert.equal(exact.creatorPublicationBytes,0);
 });
 
-test('shell order, exact Base64 alignment and inconsistent immutable IDs fail closed',async()=>{
- const {existingParts}=await fixture('pinned');
+test('shell order, malformed percent escapes and inconsistent immutable IDs fail closed',async()=>{
+ const {existingParts}=await fixture();
  const moved=clone(existingParts);moved[1].role='shell-prefix';await assert.rejects(inspect(moved),/move shell boundaries/);
- const bad=clone(existingParts);bad[1].bytes=bytes(Buffer.from(Buffer.from('seven!!').toString('base64')).toString('base64'));
+ const bad=clone(existingParts);bad[1].bytes=bytes('%GG');
  bad[1].integrity=integrity(bad[1].bytes);bad[1].carrier.storedByteLength=bad[1].bytes.length;
- await assert.rejects(inspect(bad),/alignment|unpadded/);
+ await assert.rejects(inspect(bad),/percent escape/);
  const conflict=clone(existingParts);conflict[1].carrier.objectId=conflict[0].carrier.objectId;
  await assert.rejects(inspect(conflict),/conflicting/);
 });
@@ -159,8 +151,8 @@ test('inspection clones Buffer-backed bytes rather than exposing caller aliasing
 
 test('ordinary default and explicit local carriage outputs remain byte-identical',async()=>{
  const root=localDocument();
- for(const carriage of [undefined,'compact','raw-percent','percent','pinned','follow-latest']){
-  const options=carriage===undefined?{}:{carriage,legacyCarriage:'acknowledged'};
+ for(const carriage of [undefined,'compact','raw-percent']){
+  const options=carriage===undefined?{}:{carriage};
   const candidate=await sdk.buildKeelInlineTokenURIGraph(root,options);
   const golden={"default":"8f56c5230d5dcaf9ad44491cfe13e8c4b3b6193095bcc17156b4a8e2999821b2","compact":"8f56c5230d5dcaf9ad44491cfe13e8c4b3b6193095bcc17156b4a8e2999821b2","raw-percent":"8f56c5230d5dcaf9ad44491cfe13e8c4b3b6193095bcc17156b4a8e2999821b2","percent":"b80a38221bd1b68ed27c7776afc469e70079119ba4fb0f5dea0a0562c3356a70","pinned":"dc18b1d315ab5d6a4d492062f7270843e10e63e902367831a9dd5262b4df8b71","follow-latest":"8b85e4738cb2f5e03c91398dca3458cef13b2bd1ce977c81fa8cbd621885c792"};
   const actual=createHash('sha256').update(JSON.stringify(candidate,(_,v)=>v instanceof Uint8Array?{hex:Buffer.from(v).toString('hex')}:v)).digest('hex');
@@ -176,21 +168,21 @@ async function withDigestBarrier(action){
 }
 
 test('async digest suspension cannot change selected chain, future receipts, order or carriage',async()=>{
- const {existingParts}=await fixture('pinned');const mutableScope={...scope};
- const input={existingObjectReuse:mutableScope,existingParts,carriage:'pinned'};
+ const {existingParts}=await fixture();const mutableScope={...scope};
+ const input={existingObjectReuse:mutableScope,existingParts,carriage:'raw-percent'};
  const expected=clone(existingParts);
  await withDigestBarrier(async({entered,release})=>{
   const pending=sdk.inspectKeelInlineExistingObjectReuse(input);await entered;
   mutableScope.chainId=1;mutableScope.store='0x'+'34'.repeat(20);
   existingParts[2].carrier.chainId=1;existingParts[2].carrier.store=mutableScope.store;
-  existingParts[2].bytes.fill(0);existingParts[2].role='shell-prefix';input.carriage='raw-percent';existingParts.reverse();
+  existingParts[2].bytes.fill(0);existingParts[2].role='shell-prefix';input.carriage='pinned';existingParts.reverse();
   release();const result=await pending;
-  assert.equal(result.carriage,'pinned');assert.deepEqual(result.existingParts,expected);
+  assert.equal(result.carriage,'raw-percent');assert.deepEqual(result.existingParts,expected);
  });
 });
 
 test('async digest suspension compares root against its entry-time snapshot',async()=>{
- const {existingParts}=await fixture('pinned');const {root}=await inspect(existingParts);
+ const {existingParts}=await fixture();const {root}=await inspect(existingParts);
  const expectedRoot=Uint8Array.from(root.rootBytes);const expectedStored=join(existingParts);
  await withDigestBarrier(async({entered,release})=>{
   const pending=sdk.buildKeelInlineTokenURIGraph(root,{existingParts,existingObjectReuse:{...scope}});await entered;

@@ -1,5 +1,5 @@
 import { parseKeelSelectedProjectProfile, type KeelSelectedProjectProfile } from "./studio-project-defaults.js";
-import { resolveKeelShell, resolveKeelPayloadStorage, classifyKeelAssetExecution, planKeelSmartAssetPresentation, resolveKeelAssetPresentationSelection, parseKeelAssetPresentationPreference, parseKeelExternalPreviewUri, parseKeelPresentationFallbackDelivery, KEEL_ASSET_PRESENTATION_CANDIDATE_IDS, type KeelPresentationFallbackDelivery, type KeelAssetPresentationCandidateId, type KeelAssetPresentationPreference, type KeelPayloadStorageMode } from "@keel/protocol";
+import { resolveKeelShell, resolveKeelPayloadStorage, classifyKeelAssetExecution, classifyKeelAssetMotion, planKeelSmartAssetPresentation, resolveKeelAssetPresentationSelection, parseKeelAssetPresentationPreference, parseKeelExternalPreviewUri, parseKeelPresentationFallbackDelivery, KEEL_ASSET_PRESENTATION_CANDIDATE_IDS, type KeelPresentationFallbackDelivery, type KeelAssetPresentationCandidateId, type KeelAssetPresentationPreference, type KeelPayloadStorageMode } from "@keel/protocol";
 import {
   defaultKeelStudioPublicationIntent,
   type KeelStudioPublicationIntent,
@@ -296,9 +296,12 @@ export async function stageKeelStudioProject(
 
   const onlyFile=files.length===1?files[0]:undefined;
   const onlyFileBytes=onlyFile===undefined?undefined:onlyFile.bytes instanceof Uint8Array?onlyFile.bytes:new Uint8Array(await onlyFile.bytes.arrayBuffer());
-  const automaticViewer=onlyFile===undefined?undefined:planKeelSmartAssetPresentation({
+  // A byte-only recommendation is not selected-chain/complete-output authority.
+  // Keep default publication intent until Studio qualifies an automatic layout.
+  const automaticViewer=onlyFile===undefined?undefined:input.assetPresentationSelection===undefined?KEEL_VERIFICATION_SHELL:planKeelSmartAssetPresentation({
     source:{resourceId:onlyFile.path,mediaType:onlyFile.mediaType,byteLength:onlyFileBytes!.byteLength},
     execution:classifyKeelAssetExecution({mediaType:onlyFile.mediaType,bytes:onlyFileBytes!,declaredScript:onlyFile.format!=="asset"}),
+    sourceMotion:classifyKeelAssetMotion({mediaType:onlyFile.mediaType,bytes:onlyFileBytes!}),
     assetPresentation,...(input.assetPresentationSelection===undefined?{}:{selection:resolveKeelAssetPresentationSelection(input.assetPresentationSelection,onlyFile.mediaType)}),
     ...(fallbackDelivery===undefined?{}:{fallbackDelivery}),...(externalPreviewUri===undefined?{}:{externalPreviewUri}),
   }).viewer;

@@ -2,7 +2,7 @@ import { createHash } from "node:crypto";
 import { gunzipSync } from "node:zlib";
 import { canonicalJson } from "@keel/protocol";
 import { assertKeelInlineImageBytes } from "./collector-policy.js";
-import { validateKeelLegacyPreparedContext } from "./legacy-prepared-dense-reader.js";
+import { validateKeelPreparedContext } from "./prepared-context.js";
 
 type Hash = `0x${string}`;
 type Commitment = { readonly algorithm: "sha256"; readonly digest: Hash; readonly byteLength: number };
@@ -151,7 +151,7 @@ export function assertKeelRegisteredNativeGzipProof(input: KeelRegisteredNativeG
     if (tail) {
       const match = /^<script>\(\(\)=>\{try\{const v="([A-Za-z0-9_-]+)"/u.exec(tail);
       if (!match) throw new TypeError("Unrecognized native Gzip context tail.");
-      const contextBytes = Buffer.from(match[1]!, "base64url"), json = dec.decode(contextBytes), context = JSON.parse(json); validateKeelLegacyPreparedContext(context, binding.chainId);
+      const contextBytes = Buffer.from(match[1]!, "base64url"), json = dec.decode(contextBytes), context = JSON.parse(json); validateKeelPreparedContext(context, binding.chainId);
       if (Buffer.from(contextBytes).toString("base64url") !== match[1] || context.protocol !== "keel-context@1" || context.chainId !== String(binding.chainId)
         || tail !== contextTail(json)) throw new TypeError("The native Gzip context changed chain or contains extra code.");
     }

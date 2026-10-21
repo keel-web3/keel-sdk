@@ -1,14 +1,15 @@
-import { KEEL_SMART_INLINE_ASSET_MAX_BYTES, planKeelSmartAssetPresentation, resolveKeelTokenURIReadBounds, assertKeelNonstandardTokenURIIdentity, sha256Hex, hashKeelSmartAssetPresentationPlan, measureKeelSmartAssetPresentation, type KeelExplicitNonstandardReadPolicy, type KeelSmartAssetPresentationPlan } from "@keel/protocol";
+import { KEEL_SMART_INLINE_ASSET_MAX_BYTES, planKeelSmartAssetPresentation, resolveKeelTokenURIReadBounds, assertKeelNonstandardTokenURIIdentity, sha256Hex, hashKeelSmartAssetPresentationPlan, measureKeelSmartAssetPresentation, type KeelAssetMotion, type KeelExplicitNonstandardReadPolicy, type KeelSmartAssetPresentationPlan } from "@keel/protocol";
 /** Browser-safe intent planning. This is not a storage receipt or payment approval. */
 export type KeelMediaSlotDelivery = "onchain" | "ipfs" | "hosted";
 /** @deprecated Use the smart asset boundaries, which distinguish direct from split-read delivery. */
 export const KEEL_STANDALONE_VIEWER_MAX_BYTES = KEEL_SMART_INLINE_ASSET_MAX_BYTES;
 export const KEEL_INLINE_IMAGE_DEFAULT_MAX_BYTES = KEEL_SMART_INLINE_ASSET_MAX_BYTES;
 /** Unknown sizes keep verification enabled until actual source bytes are known. */
-export function defaultKeelImageViewer(mediaType: string, byteLength?: number): "none" | "keel-verification-shell" {
+export function defaultKeelImageViewer(mediaType: string, byteLength?: number, sourceMotion?: KeelAssetMotion): "none" | "keel-verification-shell" {
   if (byteLength !== undefined && (!Number.isSafeInteger(byteLength) || byteLength < 0)) throw new TypeError("Media byte length must be a nonnegative integer.");
   const mime=mediaType.split(";",1)[0]!.trim().toLowerCase();
   return planKeelSmartAssetPresentation({source:{resourceId:"source",mediaType:mime,...(byteLength===undefined?{}:{byteLength})},
+    ...(sourceMotion===undefined?{}:{sourceMotion}),
     execution:mime === "image/svg+xml" ? "unknown" : /^(?:text\/(?:html|javascript|ecmascript)|application\/(?:javascript|ecmascript|wasm|xhtml\+xml))$/u.test(mime) ? "script" : "static"}).viewer;
 }
 export function defaultKeelImageDelivery(byteLength?: number): KeelMediaSlotDelivery {
@@ -50,13 +51,14 @@ function selection(value: KeelMediaSlotSelection | null): KeelMediaSlotSelection
   if (!value || typeof value !== "object" || Object.keys(value).some(key => !["resourceId","presentation","delivery"].includes(key)) || !["direct","keel-shell"].includes(value.presentation)) throw new TypeError("Invalid metadata slot choice.");
   return {resourceId:resource(value.resourceId),presentation:value.presentation,delivery:delivery(value.delivery)};
 }
-/** Static media above the decimal 500KB boundary through 2MB use direct display; smaller or unknown
- * images use the verifier. A thumbnail is always a distinct resource.
+/** Known still same-source raster above 500KB through 2MB may use direct display.
+ * Animated or unknown motion and a distinct thumbnail keep the verifier.
  * Only an explicitly selected candidate switches the source to that candidate. */
 export function planKeelMediaSlots(input: {
   readonly sourceResourceId: string;
   readonly mediaType: string;
   readonly sourceByteLength?: number;
+  readonly sourceMotion?: KeelAssetMotion;
   readonly collectionType?: string;
   readonly selectedCandidateResourceId?: string;
   readonly thumbnailResourceId?: string;
@@ -65,7 +67,7 @@ export function planKeelMediaSlots(input: {
   readonly explicit?: KeelMediaSlotChoices;
 }): KeelMediaSlotPlan {
   const source=resource(input.sourceResourceId), mime=input.mediaType.split(";",1)[0]!.trim().toLowerCase();
-  const defaultViewer = defaultKeelImageViewer(mime, input.sourceByteLength);
+  const defaultViewer = input.thumbnailResourceId === undefined ? defaultKeelImageViewer(mime, input.sourceByteLength, input.sourceMotion) : "keel-verification-shell";
   if (input.thumbnailByteLength !== undefined && (!Number.isSafeInteger(input.thumbnailByteLength) || input.thumbnailByteLength < 0)) throw new TypeError("Thumbnail byte length must be a nonnegative integer.");
   const imageBytes = input.thumbnailResourceId === undefined ? input.sourceByteLength : input.thumbnailByteLength;
   let imageDelivery:KeelMediaSlotDelivery=defaultKeelImageDelivery(imageBytes), animationDelivery:KeelMediaSlotDelivery="onchain";

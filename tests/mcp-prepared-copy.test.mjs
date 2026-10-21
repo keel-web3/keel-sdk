@@ -18,7 +18,7 @@ const roles = ["shell-prefix", "entrypoint", "shell-suffix"];
 const source = ["<main>   ", "Water    ", "</main>  "];
 const initialize = { protocolVersion: "2024-11-05", capabilities: {}, clientInfo: { name: "prepared-copy-test", version: "1" } };
 
-async function fixture(t, lane = "base64") {
+async function fixture(t, lane = "raw") {
   const dir = await mkdtemp(path.join("/tmp", "keel-copy-test-"));
   t.after(() => rm(dir, { recursive: true, force: true }));
   const server = await createMcpServer({ workspaceRoot: dir });
@@ -45,7 +45,7 @@ async function fixture(t, lane = "base64") {
   return { dir, server, init, input, call };
 }
 
-for (const lane of ["base64", "raw", "percent", "follow-latest"]) test(`MCP copies exact ${lane} references with zero writes`, async t => {
+for (const lane of ["raw"]) test(`MCP copies exact ${lane} references with zero writes`, async t => {
   const { input, call } = await fixture(t, lane);
   const result = await call("keel-inline-reuse-plan", input);
   assert.equal(result.result.isError, undefined, JSON.stringify(result));
@@ -60,6 +60,13 @@ for (const lane of ["base64", "raw", "percent", "follow-latest"]) test(`MCP copi
   assert.equal(plan.uploadPlan, null);
   assert.equal(plan.submission, "not-performed");
   assert.match(plan.readback.authentication, /caller-supplied/);
+});
+
+for (const lane of ["base64", "percent", "follow-latest"]) test(`MCP rejects retired ${lane} publication references`, async t => {
+  const { input, call } = await fixture(t, lane);
+  const result = await call("keel-inline-reuse-plan", input);
+  assert.equal(result.result.isError, true, JSON.stringify(result));
+  assert.match(result.result.content[0].text, /retired/);
 });
 
 test("MCP preserves an existing asset slot without preparing another copy", async t => {
@@ -80,7 +87,7 @@ test("MCP rejects binary, mixed carriage, altered bytes, and unsafe preparation 
   };
   await rejected({ ...input, encodeBody: true }, /unsupported fields/);
   await rejected({ ...input, parts: input.parts.map((part, i) => i === 1 ? { ...part, mediaType: "application/octet-stream" } : part) }, /incompatible prepared-copy media/);
-  await rejected({ ...input, parts: input.parts.map((part, i) => i === 1 ? { ...part, mediaType: media.raw } : part) }, /incompatible mixed/);
+  await rejected({ ...input, parts: input.parts.map((part, i) => i === 1 ? { ...part, mediaType: media.percent } : part) }, /canonical RFC 4648 Base64/);
   await rejected({ ...input, parts: input.parts.map((part, i) => i === 1 ? { ...part, digest: hash(100) } : part) }, /commitment/);
   await rejected({ ...input, parts: input.parts.map((part, i) => i === 1 ? { ...part, compression: "gzip" } : part) }, /uncompressed prepared/);
   await rejected({ ...input, parts: input.parts.map((part, i) => i === 1 ? { ...part, objectId: hash(99) } : part) }, /reference vector/);
@@ -97,19 +104,20 @@ test("MCP rejects padded raw LZMA labeled as a prepared Base64 body", async t =>
   input.parts[1] = { ...input.parts[1], digest: integrity.digest, byteLength: raw.length };
   const result = await call("keel-inline-reuse-plan", input);
   assert.equal(result.result.isError, true);
-  assert.match(result.result.content[0].text, /Base64|UTF-8|encoding|encoded/);
+  assert.match(result.result.content[0].text, /unsafe literal|UTF-8|encoding|encoded/);
 });
 
 test("handshake, preflight, resource and tool discovery expose the same copy policy", async t => {
   const { dir, server, init, call } = await fixture(t);
-  assert.match(init.result.instructions, /Existing onchain objects come first/);
-  assert.match(init.result.instructions, /preparedTokenURI\/preEncodedTokenURI/);
+  assert.match(init.result.instructions, /Use current raw-percent COPY/);
+
   await mkdir(path.join(dir, "docs"));
   await writeFile(path.join(dir, "README.md"), "Test workspace");
   await writeFile(path.join(dir, "docs/KEEL_PREPARED_COPY_ASSEMBLY.md"), "Copy exact prepared bytes");
   const preflight = (await call("keel-contract-workflow-preflight", {})).result.structuredContent;
   assert.equal(preflight.preparedCopy.existingObjectsFirst, "keel-inline-reuse-plan");
   assert.equal(preflight.preparedCopy.newSourcePublicationBytes, 0);
+  assert.deepEqual(preflight.preparedCopy.methods, ["preparedTokenURI", "preEncodedTokenURI"]);
   assert(preflight.documents.some(doc => doc.path === preflight.preparedCopy.documentation));
   const resource = await server.handle({ jsonrpc: "2.0", id: 50, method: "resources/read", params: { uri: "keel://mcp/publication-modes" } });
   const modes = JSON.parse(resource.result.contents[0].text);
@@ -118,7 +126,7 @@ test("handshake, preflight, resource and tool discovery expose the same copy pol
   assert.deepEqual(modes.staging.existingObjectReuse, preflight.preparedCopy);
   assert.match(modes.staging.imageCarriage, /Never|never/);
   const tools = await server.handle({ jsonrpc: "2.0", id: 51, method: "tools/list", params: {} });
-  assert.match(tools.result.tools.find(tool => tool.name === "keel-inline-prepare").description, /^NEW SOURCE ONLY/);
+  assert.match(tools.result.tools.find(tool => tool.name === "keel-inline-prepare").description, /^Current raw-percent source/);
 });
 
 

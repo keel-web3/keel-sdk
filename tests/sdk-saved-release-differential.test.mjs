@@ -15,22 +15,22 @@ const fixture = JSON.parse(await readFile(new URL("./fixtures/saved-release-da9b
 const studioUrl = "https://studio.example.invalid";
 const grantToken = "synthetic_" + "x".repeat(48);
 
-for (const saved of fixture.policies) test(`qualified saved generation survives review without rewriting: ${saved.id}`, () => {
-  const before = structuredClone(saved);
-  assert.deepEqual(assertKeelRetainedBuildDefaultsCurrent(saved.profile, { ...saved.input, retained: saved.saved }), saved.saved);
-  const read = resolveKeelRetainedBuildReadPolicy(saved.profile, {
-    ...saved.input, retained: saved.saved, constraints: { maxReadGas: 2_000_000, maxOutputBytes: 1_800_000 },
-  });
-  assert.deepEqual(read.retained, saved.saved);
-  assert.equal(read.readLimits.maxReadGas, 2_000_000);
-  assert.equal(read.readLimits.maxOutputBytes, 1_800_000);
-  assert.equal(read.requiresFullReadValidation, true);
-  assert.deepEqual(saved, before);
-  if (saved.saved.sources.transportProfile !== "system" && saved.saved.values.transportProfile !== "uri81-block-v1") {
-    assert.throws(() => resolveKeelBuildDefaults(saved.profile, saved.input), TypeError);
-  } else {
-    assert.equal(resolveKeelBuildDefaults(saved.profile, saved.input).values.transportProfile, "uri81-block-v1");
-  }
+// Retain the original rejected fixtures. Current policy fixtures are derived
+// with only the retired transport choice replaced; actual SDK resolution still
+// supplies every source/default value and provenance before the guard tests.
+const currentChoices=value=>Array.isArray(value)?value.map(currentChoices):value&&typeof value==='object'?Object.fromEntries(Object.entries(value).map(([key,item])=>[key,key==='transportProfile'?'uri81-block-v1':key==='transportProfiles'?['uri81-block-v1']:currentChoices(item)])):value;
+for (const original of fixture.policies) test(`transport eligibility and current generation keep exact review boundaries: ${original.id}`, () => {
+  const before = structuredClone(original);
+  if(original.saved.values.transportProfile!=='uri81-block-v1'){
+    assert.throws(() => assertKeelRetainedBuildDefaultsCurrent(original.profile, { ...original.input, retained: original.saved }), /Invalid retained build policy value/);
+    assert.throws(() => resolveKeelRetainedBuildReadPolicy(original.profile, { ...original.input, retained: original.saved }), /Invalid retained build policy value/);
+  }else assert.deepEqual(assertKeelRetainedBuildDefaultsCurrent(original.profile,{...original.input,retained:original.saved}),original.saved);
+  const profile=currentChoices(original.profile),input=currentChoices(original.input);
+  const saved=resolveKeelBuildDefaults(profile,input);
+  assert.deepEqual(assertKeelRetainedBuildDefaultsCurrent(profile, { ...input, retained: saved }), saved);
+  const read=resolveKeelRetainedBuildReadPolicy(profile,{...input,retained:saved,constraints:{maxReadGas:2_000_000,maxOutputBytes:1_800_000}});
+  assert.deepEqual(read.retained,saved);assert.equal(read.readLimits.maxReadGas,2_000_000);assert.equal(read.readLimits.maxOutputBytes,1_800_000);
+  assert.equal(read.requiresFullReadValidation,true);assert.deepEqual(original,before);
 });
 
 for (const saved of fixture.reviewOperations) test(`qualified source.release uses its saved identity and wire request: ${saved.operation}`, async () => {
@@ -87,9 +87,10 @@ for (const failure of ["json-auth", "html-auth", "permission", "timeout"]) test(
   assert.deepEqual(new Uint8Array(await formData.get("files").arrayBuffer()), bytes);
 });
 
-test("a changed saved generation remains stale while exact old policy stays readable", () => {
-  const saved = fixture.policies.find(item => item.id === "historical-system-default");
-  const changed = { ...saved.profile, revision: saved.profile.revision + 1, global: { transportProfile: "uri81-block-v1" } };
-  assert.throws(() => assertKeelRetainedBuildDefaultsCurrent(changed, { retained: saved.saved }), /build-defaults-stale/);
-  assert.deepEqual(resolveKeelRetainedBuildReadPolicy(changed, { retained: saved.saved }).retained, saved.saved);
+test("a changed current saved generation remains stale while its exact current policy stays readable", () => {
+  const original=fixture.policies.find(item=>item.id==='historical-system-default');
+  const profile=currentChoices(original.profile),saved=resolveKeelBuildDefaults(profile,currentChoices(original.input));
+  const changed={...profile,revision:profile.revision+1,global:{transportProfile:'uri81-block-v1'}};
+  assert.throws(()=>assertKeelRetainedBuildDefaultsCurrent(changed,{retained:saved}),/build-defaults-stale/);
+  assert.deepEqual(resolveKeelRetainedBuildReadPolicy(changed,{retained:saved}).retained,saved);
 });

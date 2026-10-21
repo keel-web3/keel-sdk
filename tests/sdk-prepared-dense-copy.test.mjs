@@ -36,7 +36,7 @@ test('prepared dense shell defaults to URI81 and rejects incompatible explicit c
 for(const carriage of ['uri81'])test(`${carriage}: inspect literal shell framing and exact packed commitments without execution`,async()=>{
  const f=await fixture(carriage),unwrapped=inspectKeelPreparedDenseCopyDocument(f.body);assert.equal(unwrapped.transportProfile,f.profile);assert.match(unwrapped.html,/globalThis\.__KEEL_EMBEDDED_CONTAINERS__/);const audit=inspectKeelInlinePayloadCarriage(Buffer.from(f.body));assert.equal(audit.payloadCount,1);assert.equal(audit.packedPayloadBytes,f.bytes.length);assert.equal(audit.payloads[0].encoding,'dense');assert.equal(audit.preparedDenseCopy.contractOperation,'verified-copy');assertKeelFreshPayloadCarriage(Buffer.from(f.body));assertKeelFreshPayloadAudit(audit);
  const changed=f.body.replace(f.pack.storedIntegrity.digest,'0x'+'00'.repeat(32));assert.throws(()=>inspectKeelInlinePayloadCarriage(Buffer.from(changed)),/stored commitment/);
- const invalid=structuredClone(audit);invalid.preparedDenseCopy.payloadPreparation='read-time';assert.throws(()=>assertKeelFreshPayloadAudit(invalid),/prepared dense COPY audit/);
+ const invalid=structuredClone(audit);invalid.preparedDenseCopy.payloadPreparation='read-time';assert.throws(()=>assertKeelFreshPayloadAudit(invalid),/Fresh prepared payloads/);
 });
 test('question marks and following markup survive both URL parsers byte for byte',async()=>{
  const text='before?after< > " # % & `\n🔥';const html=toKeelDenseTransportDataURL('html',text);assert.equal(await(await fetch(new URL(html).href)).text(),text);
@@ -131,8 +131,8 @@ test('the historical Base90 token still decodes but cannot pass a fresh-publicat
  const audit=inspectKeelInlinePayloadCarriage(html);
  assert.equal(audit.preparedDenseCopy.transportProfile,'base90-v1');
  assert.ok(audit.payloadCount>0);assert.equal(audit.requiresExistingPreparedReuse,true);
- assert.throws(()=>assertKeelFreshPayloadAudit(audit),/fresh payload/);
- assert.throws(()=>assertKeelFreshPayloadCarriage(html),/Legacy Base90/);
+ assert.throws(()=>assertKeelFreshPayloadAudit(audit),/Invalid fresh payload carriage audit/);
+ assert.throws(()=>assertKeelFreshPayloadCarriage(html),/retired Base90/);
  const forged=structuredClone(audit);forged.requiresExistingPreparedReuse=false;for(const payload of forged.payloads)payload.requiresExistingPreparedReuse=false;
- assert.throws(()=>assertKeelFreshPayloadAudit(forged),/URI81/);
+ assert.throws(()=>assertKeelFreshPayloadAudit(forged),/Fresh prepared payloads/);
 });

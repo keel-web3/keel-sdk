@@ -185,7 +185,7 @@ function resolveBuildDefaultsGeneration(profile: KeelStudioDefaultProfile, input
   retained?: KeelEffectiveBuildDefaults): KeelEffectiveBuildDefaults {
   const current = parseKeelStudioDefaultProfile(profile);
   const values: Record<string, KeelPlanValue> = { compression: "auto", brotliQuality: 11,
-    transportProfile: retained?.sources.transportProfile === "system" ? retained.values.transportProfile! : "uri81-block-v1",
+    transportProfile: "uri81-block-v1",
     payloadStorage: "compact", hybridFallback: false, rpcMaxConcurrentReads: KEEL_DEFAULT_RPC_READ_CONCURRENCY,
     ...(retained && retained.values.assetPresentation === undefined ? {} : { assetPresentation: "automatic" }) };
   const sources: Record<string, "system" | "account" | "media" | "project" | "build" | "contract"> = Object.fromEntries(Object.keys(values).map(key => [key, "system"]));
@@ -194,8 +194,7 @@ function resolveBuildDefaultsGeneration(profile: KeelStudioDefaultProfile, input
     for (const [key, value] of Object.entries(layer ?? {})) {
       const field = fields.get(key);
       if (!field) { if (source === "build") throw new TypeError("Unsupported explicit build setting."); continue; }
-      const issue = retained && key === "transportProfile" && typeof value === "string"
-        && ["uri81-block-v1", "base90-v1", "base91-v1", "base90-block-v2"].includes(value) ? undefined : validateKeelPlanValue(field, value);
+      const issue = validateKeelPlanValue(field, value);
       if (issue) throw new TypeError(issue.message);
       values[key] = copyValue(value); sources[key] = source;
     }
@@ -234,8 +233,7 @@ function retainedBuildSnapshot(value: KeelEffectiveBuildDefaults): KeelEffective
   const fields = new Map(KEEL_BUILD_DEFAULT_FIELDS.map(field => [field.id, field]));
   for (const [key, value] of Object.entries(values)) {
     const field = fields.get(key);
-    if (!field || (key === "transportProfile" ? typeof value !== "string" || !["uri81-block-v1", "base90-v1", "base91-v1", "base90-block-v2"].includes(value)
-      : validateKeelPlanValue(field, value) !== undefined)) throw new TypeError("Invalid retained build policy value.");
+    if (!field || validateKeelPlanValue(field, value) !== undefined) throw new TypeError("Invalid retained build policy value.");
   }
   if (Object.keys(rawSources).length !== Object.keys(values).length || Object.keys(rawSources).some(key => !Object.hasOwn(values, key))
     || Object.keys(values).some(key => typeof rawSources[key] !== "string" || !["system", "account", "media", "project", "build", "contract"].includes(rawSources[key] as string))) throw new TypeError("Invalid retained build policy sources.");

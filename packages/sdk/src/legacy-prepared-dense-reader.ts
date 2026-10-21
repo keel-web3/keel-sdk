@@ -27,16 +27,8 @@ function integrity(value: unknown, maximum: number): Commitment {
       || !Number.isSafeInteger(entry.byteLength) || (entry.byteLength as number) < 1 || (entry.byteLength as number) > maximum) throw new TypeError("Invalid legacy COPY commitment.");
   return Object.freeze({ algorithm: "sha256", digest: entry.digest as `0x${string}`, byteLength: entry.byteLength as number });
 }
-/** The legacy collection supplies this context. No composer/table provenance is invented. */
-export function validateKeelLegacyPreparedContext(value: unknown, chainId: number) {
-  const context = plain(value, ["protocol", "chainId", "collection", "tokenId", "derivedTokenSeed", "manifestDigest"], "legacy prepared context");
-  if (!Number.isSafeInteger(chainId) || chainId <= 0 || context.protocol !== "keel-context@1" || context.chainId !== String(chainId)
-      || typeof context.collection !== "string" || !/^0x[0-9a-f]{40}$/u.test(context.collection) || /^0x0{40}$/u.test(context.collection)
-      || typeof context.tokenId !== "string" || !/^(?:0|[1-9][0-9]*)$/u.test(context.tokenId) || context.tokenId.length > 78 || BigInt(context.tokenId) >= 1n << 256n
-      || typeof context.derivedTokenSeed !== "string" || !HASH.test(context.derivedTokenSeed)
-      || typeof context.manifestDigest !== "string" || !HASH.test(context.manifestDigest)) throw new TypeError("Invalid legacy prepared context values.");
-  return Object.freeze({ ...context });
-}
+/** Read-only diagnostic alias; current publication imports prepared-context directly. */
+export { validateKeelPreparedContext as validateKeelLegacyPreparedContext } from "./prepared-context.js";
 /** Canonical content identity deliberately names a prepared payload, not a chain object. */
 export function keelLegacyPreparedDensePackIdentity(pack: Omit<KeelLegacyPreparedDensePack, "id" | "storedDense">): Uint8Array {
   const commitment = (value: Commitment) => ({ algorithm: value.algorithm, byteLength: value.byteLength, digest: value.digest });

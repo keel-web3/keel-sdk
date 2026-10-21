@@ -54,15 +54,15 @@ test('human reference names are discoverable while filenames retain their identi
  } finally { await rm(sdkRoot,{recursive:true,force:true}); }
 });
 
-test('core MCP handshake and policy declare URI81, automatic compression and mandatory reuse',async()=>{
+test('core MCP handshake and policy declare current raw-percent, registered native Gzip and mandatory reuse',async()=>{
  const {createMcpServer}=await import('../packages/mcp/dist/server.js');
  const {PREPARED_COPY_POLICY}=await import('../packages/mcp/dist/prepared-copy-guidance.js');
- assert.equal(PREPARED_COPY_POLICY.collectorInlineBinaryDefault.transportProfile,'uri81-block-v1');
+ assert.equal(PREPARED_COPY_POLICY.collectorInlineBinaryDefault.codecProfile,'registered-none-native-gzip');
  const server=await createMcpServer({workspaceRoot:process.cwd(),pluginConfig:false});
  const init=await server.handle({jsonrpc:'2.0',id:1,method:'initialize',params:{protocolVersion:'2024-11-05',capabilities:{},clientInfo:{name:'standards-test',version:'1'}}});
- assert.match(init.result.instructions,/URI81 applies to both compressed and uncompressed/);
+ assert.match(init.result.instructions,/Current collector Inline uses authenticated canonical raw-percent frames/);
  assert.match(init.result.instructions,/keel-inline-reuse-plan/);
- assert.match(init.result.instructions,/Compression never makes Base90 URI-safe/);
+ assert.match(init.result.instructions,/Base64\/percent publication carriage is retired/);
  assert.match(init.result.instructions,/Before declaring a KEEL route immutable/);
  const list=await server.handle({jsonrpc:'2.0',id:2,method:'tools/list',params:{}});
  assert.ok(list.result.tools.some(tool=>tool.name==='keel-manager-modules-inspect'));

@@ -22,7 +22,7 @@ async function document() {
 async function fixture(carriage = "compact") {
   const root = await document();
   const graph = await buildKeelInlineTokenURIGraph(root,
-    carriage === "compact" ? {} : { carriage, legacyCarriage: "acknowledged" });
+    { carriage });
   const prepared = await buildKeelPreparedOneOfOneTokenURI({ graph,
     chainId, collection: "0x2222222222222222222222222222222222222222",
     collectionName: "Original art", description: "COPY fixture", manifestURI: "",
@@ -61,7 +61,7 @@ async function fixture(carriage = "compact") {
 test("shared planner no longer auto-acknowledges a fresh Base64 carriage", async () => {
   const root = await document();
   for (const carriage of ["pinned", "percent", "follow-latest"]) {
-    await assert.rejects(buildKeelInlineTokenURIGraph(root, { carriage }), /explicit|acknowledged|raw-percent/i);
+    await assert.rejects(buildKeelInlineTokenURIGraph(root, { carriage }), /Unsupported Inline carriage:/i);
   }
 });
 
@@ -72,7 +72,7 @@ test("environment configuration cannot bypass fresh encoding review", () => {
   finally { if (before === undefined) delete process.env.KEEL_LEGACY_CARRIAGE; else process.env.KEEL_LEGACY_CARRIAGE = before; }
 });
 
-for (const carriage of ["compact", "pinned", "percent"]) test(`complete ${carriage} COPY retains exact prepared bytes and binds the plan`, async () => {
+for (const carriage of ["compact", "raw-percent"]) test(`complete ${carriage} COPY retains exact prepared bytes and binds the plan`, async () => {
   const f = await fixture(carriage);
   const checked = await assertKeelPreparedCopyRead(f.bound);
   assert.equal(checked.completeTokenURIBytes, Buffer.byteLength(f.prepared.tokenURI));
@@ -95,7 +95,7 @@ test("SDK stops a different return, transport or source before producing a plan"
     await assert.rejects(createKeelPublishReviewPlan(f.chainPlan, { preparedCopy: { ...f.evidence, returnedTokenURI } }), /differs from canonical/);
   }
   await assert.rejects(createKeelPublishReviewPlan(f.chainPlan, { preparedCopy: { ...f.evidence, graphBytes: bytes("different") } }), /source bytes/);
-  await assert.rejects(assertKeelPreparedCopyRead({ ...f.bound, mediaType: "application/octet-stream" }), /supported prepared COPY/);
+  await assert.rejects(assertKeelPreparedCopyRead({ ...f.bound, mediaType: "application/octet-stream" }), /current raw-percent prepared COPY/);
 });
 
 test("COPY checks are commitment-bound and cannot be stripped or moved to another chain/store", async () => {
@@ -137,7 +137,7 @@ test("fresh MCP cannot select an alternative carriage under another presentation
   for (const carriage of ["pinned", "percent", "follow-latest"]) {
     const result = await call("keel-inline-prepare", { carriage, presentationPolicy: "raw-artifact", entry: "unused.js" });
     assert.equal(result.isError, true);
-    assert.match(result.content[0].text, /compact raw-percent COPY/);
+    assert.match(result.content[0].text, /Unsupported Inline carriage:/);
   }
 });
 

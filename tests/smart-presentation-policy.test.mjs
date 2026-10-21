@@ -15,11 +15,12 @@ const imageURI='data:image/png;base64,'+png.toString('base64');
 const htmlURI=html=>'data:text/html;charset=utf-8,'+encodeURIComponent(html);
 const render = (extra={}) => jsonURI({name:'Exact 🌊',image:imageURI,animation_url:htmlURI('<!doctype html><p>exact verifier program</p>'),...extra});
 
-test('actual decimal thresholds use above, with source and metadata boundaries separate',()=>{
+test('known still same-source raster uses decimal thresholds separate from metadata boundaries',()=>{
+ const still=n=>({...input(n),source:{...input(n).source,mediaType:'image/png'},preview:undefined,sourceMotion:'still'});
  assert.equal(p.KEEL_SMART_INLINE_ASSET_MAX_BYTES,500000);assert.equal(p.KEEL_SMART_SPLIT_ASSET_THRESHOLD_BYTES,2000000);
- for(const n of [499999,500000])assert.equal(p.planKeelSmartAssetPresentation(input(n)).selectedCandidateId,'canonical-inline');
- for(const n of [500001,1999999,2000000])assert.equal(p.planKeelSmartAssetPresentation(input(n)).selectedCandidateId,'image-only-inline');
- assert.equal(p.planKeelSmartAssetPresentation(input(2000001)).selectedCandidateId,'canonical-hybrid');
+ for(const n of [499999,500000])assert.equal(p.planKeelSmartAssetPresentation(still(n)).selectedCandidateId,'canonical-inline');
+ for(const n of [500001,1999999,2000000])assert.equal(p.planKeelSmartAssetPresentation(still(n)).selectedCandidateId,'image-only-inline');
+ assert.equal(p.planKeelSmartAssetPresentation(still(2000001)).selectedCandidateId,'canonical-hybrid');
 });
 test('matrix exposes maintained alternatives and never calls a local numeric estimate chain-ready',()=>{
  const plan=p.planKeelSmartAssetPresentation(input());assert.equal(plan.candidates.length,10);assert.equal(plan.publicationReady,false);
@@ -28,13 +29,13 @@ test('matrix exposes maintained alternatives and never calls a local numeric est
 test('real prefix/cap arithmetic rejects old duplication and chooses another qualified layout',()=>{
  const x={...input(130296),measurements:{prefixBytes:256001,suffixBytes:2042,maxEnvelopeBytes:32768,literalMediaPrefixBytes:255863}};
  assert.equal(p.planKeelSmartAssetPresentation(x).selectedCandidateId,'canonical-hybrid');
- const direct=p.planKeelSmartAssetPresentation({...x,capabilities:{...capabilities,shellHybrid:'unsupported'}});assert.equal(direct.selectedCandidateId,'image-only-inline');
+ const direct=p.planKeelSmartAssetPresentation({...x,capabilities:{...capabilities,shellHybrid:'unsupported'}});assert.equal(direct.selectedCandidateId,'canonical-inline');assert.equal(direct.status,'blocked');
  assert.ok(direct.candidates[0].hardBlockers.includes('deployed-envelope-limit'));
  assert.equal(p.planKeelSmartAssetPresentation({...x,measurements:{prefixBytes:100,suffixBytes:100,maxEnvelopeBytes:32768,literalMediaPrefixBytes:0}}).selectedCandidateId,'canonical-inline');
  assert.equal(direct.source.byteLength,130296);assert.deepEqual(direct.preview,image);
 });
 test('explicit layout remains selected even when a different layout is recommended',()=>{
- const plan=choose(input(1000000),hybrid);assert.equal(plan.selectedCandidateId,'canonical-hybrid');assert.equal(plan.selectionSource,'explicit');assert.equal(plan.recommendedCandidateId,'image-only-inline');
+ const plan=choose(input(1000000),hybrid);assert.equal(plan.selectedCandidateId,'canonical-hybrid');assert.equal(plan.selectionSource,'explicit');assert.equal(plan.recommendedCandidateId,'canonical-inline');
 });
 test('scripts always require a registered verifier and script MIME overrides a static caller label',()=>{
  const x={...input(1000000),source:{...input().source,mediaType:'text/javascript'},execution:'static'};
@@ -48,10 +49,10 @@ test('actual inspection catches MIME lies, active SVG and undecidable PDF withou
  assert.equal(p.classifyKeelAssetExecution({mediaType:'application/octet-stream',bytes:Buffer.from([1,2,3])}),'unknown');
  assert.equal(p.classifyKeelAssetExecution({mediaType:'image/png',bytes:png}),'static');
 });
-test('all non-script media use same size policy and direct playback retains a separate usable poster',()=>{
+test('non-raster or unknown-motion media default to verification and retain a distinct poster',()=>{
  for(const mediaType of ['video/mp4','audio/mpeg','model/gltf-binary','application/pdf','text/plain']){
   const x={...input(500001),source:{...input(500001).source,mediaType}};const plan=p.planKeelSmartAssetPresentation(x);
-  if(mediaType==='application/pdf'){assert.equal(plan.selectedCandidateId,'canonical-inline');assert.ok(plan.candidates.find(c=>c.id==='media-only-inline').hardBlockers.includes('qualified-inline-media-renderer-required'));}else{assert.equal(plan.selectedCandidateId,'media-only-inline');assert.equal(plan.animation.delivery,'inline-media');}assert.equal(plan.image.resourceId,'preview');assert.equal(plan.status,'requires-validation');
+  assert.equal(plan.selectedCandidateId,'canonical-inline');assert.equal(plan.animation.delivery,'inline-shell');if(mediaType==='application/pdf')assert.ok(plan.candidates.find(c=>c.id==='media-only-inline').hardBlockers.includes('qualified-inline-media-renderer-required'));assert.equal(plan.image.resourceId,'preview');assert.equal(plan.status,'requires-validation');
   const missing=p.planKeelSmartAssetPresentation({...x,preview:undefined});assert.equal(missing.status,'blocked');assert.ok(missing.hardBlockers.includes('usable-grid-image-required'));
  }
 });
@@ -209,9 +210,9 @@ test('actual encoded verifier soft-target boundaries remain explicit choices wit
  }
 });
 
-test('medium image recommendation keeps exact original bytes instead of a separate generated poster',async()=>{
+test('explicit image-only selection keeps exact original bytes instead of a separate generated poster',async()=>{
  const original=Buffer.alloc(500001);png.copy(original);const source={resourceId:'exact-original.png',mediaType:'image/png',byteLength:original.length,digest:digest(original)};
- const plan=p.planKeelSmartAssetPresentation({...input(),source,capabilities:{...capabilities,inlineImageTypes:['image/png']}});
+ const plan=choose({...input(),source,capabilities:{...capabilities,inlineImageTypes:['image/png']}},{image:'inline',animation:'omitted'});
  assert.equal(plan.selectedCandidateId,'image-only-inline');assert.equal(plan.image.resourceId,source.resourceId);assert.equal(plan.image.commitment.digest,source.digest);assert.equal(plan.animation.delivery,'omitted');
  const actual=jsonURI({image:'data:image/png;base64,'+original.toString('base64')});
  const measured=await p.measureKeelSmartAssetPresentation(plan,()=>actual);assert.equal(measured.hardBlockers.length,0);assert.equal(measured.tokenURI,actual);

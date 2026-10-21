@@ -50,7 +50,7 @@ function hex(value: unknown, length: number, label: string): Hex {
 export const PREPARED_COPY_TOOL_DEFINITIONS: readonly ToolDefinition[] = [{
   descriptor: {
     name: "keel-inline-reuse-plan",
-    description: "FIRST for existing onchain objects: validate exact read-back files and plan copy-only Inline assembly using the matching registered builder. KEEL's aligned Base64 fragments are copied between the prepared top/bottom without re-encoding the body. The raw-percent builder also copies its exact prepared fragments. Zero uploads, zero repacking, zero runtime body encoding. Incompatible binary/media/alignment fails instead of inventing an encoder. Caller-supplied receipt/block evidence still requires selected-chain authentication before publication; no signing or submission.",
+    description: "Validate current raw-percent object read-back and plan copy-only Inline assembly using the matching registered builder. Historical Base64/percent carriage is retired for publication. Zero uploads, zero repacking, zero runtime body encoding. Incompatible binary/media/alignment fails instead of inventing an encoder. Caller-supplied receipt/block evidence still requires selected-chain authentication before publication; no signing or submission.",
     inputSchema: schema,
   },
   async run(context, value) {
@@ -87,11 +87,8 @@ export const PREPARED_COPY_TOOL_DEFINITIONS: readonly ToolDefinition[] = [{
     }
     const inspected = await inspectKeelInlineExistingObjectReuse({ existingParts: published,
       existingObjectReuse: { mode: "assembly-only", chainId, store } });
-    const requiredBuilder = inspected.carriage === "raw-percent" ? "KeelRawTokenURIBuilder"
-      : inspected.carriage === "percent" ? "KeelPercentTokenURIBuilder" : "KeelHarnessBuilder";
-    const preparedBodyBytes = published.reduce((total, part) => total + (
-      inspected.carriage === "follow-latest" && part.role.startsWith("shell-") ? 0 : part.bytes.byteLength
-    ), 0);
+    const requiredBuilder = "KeelRawTokenURIBuilder";
+    const preparedBodyBytes = published.reduce((total, part) => total + part.bytes.byteLength, 0);
     return {
       schema: "keel-inline-reuse-plan@1", status: "review-only", chainId, store, builder,
       readback: { blockNumber, blockHash, orderedObjectIds, authentication: "caller-supplied; selected-chain receipt, runtime, registration, binding order and block checks still required" },

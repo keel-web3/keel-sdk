@@ -114,16 +114,16 @@ test('fresh build defaults layer explicit overrides, hard reader bounds and Raw 
   assert.throws(() => assertKeelBuildDefaultsCurrent(current, { ...current, values: { ...current.values, maxReadGas: 1 } }), /build-defaults-stale/);
 });
 
-test('retained read policy preserves exact old source choices while layering only current read limits', async () => {
+test('retained read policy preserves current source choices while layering only current read limits', async () => {
   const { resolveKeelBuildDefaults, resolveKeelRetainedBuildReadPolicy, assertKeelBuildDefaultsCurrent } = await import('../packages/sdk/dist/studio-project-defaults.js');
   const profile = { ...createKeelStudioDefaultProfile(), revision: 9,
-    global: { transportProfile: 'base90-v1', compression: 'brotli', maxReadGas: 50_000_000 },
-    byMedia: { 'image/png': { transportProfile: 'base90-v1', maxOutputBytes: 1_900_000 } } };
+    global: { transportProfile: 'uri81-block-v1', compression: 'brotli', maxReadGas: 50_000_000 },
+    byMedia: { 'image/png': { transportProfile: 'uri81-block-v1', maxOutputBytes: 1_900_000 } } };
   const modern = resolveKeelBuildDefaults(createKeelStudioDefaultProfile());
-  const retained = { ...modern, revision: 2, values: { ...modern.values, transportProfile: 'base90-v1', compression: 'none', payloadStorage: 'raw' },
+  const retained = { ...modern, revision: 2, values: { ...modern.values, transportProfile: 'uri81-block-v1', compression: 'none', payloadStorage: 'raw' },
     sources: { ...modern.sources, transportProfile: 'system', compression: 'project', payloadStorage: 'project' } };
   const before = structuredClone(retained), layers = { retained, mediaType: 'image/png',
-    project: { transportProfile: 'base90-v1', maxReadGas: 40_000_000 }, build: { compression: 'none', maxOutputBytes: 1_800_000 },
+    project: { transportProfile: 'uri81-block-v1', maxReadGas: 40_000_000 }, build: { compression: 'none', maxOutputBytes: 1_800_000 },
     constraints: { maxReadGas: 30_000_000, maxOutputBytes: 2_000_000 } };
   const result = resolveKeelRetainedBuildReadPolicy(profile, layers);
   assert.equal(result.schema, 'keel-retained-build-read-policy@1');
@@ -135,10 +135,10 @@ test('retained read policy preserves exact old source choices while layering onl
   const reordered = { ...retained, values: Object.fromEntries(Object.entries(retained.values).reverse()), sources: Object.fromEntries(Object.entries(retained.sources).reverse()) };
   assert.equal(resolveKeelRetainedBuildReadPolicy(profile, { ...layers, retained: reordered }).retainedPolicyDigest, result.retainedPolicyDigest);
   assert.notEqual(resolveKeelRetainedBuildReadPolicy(profile, { ...layers, retained: { ...retained, sources: { ...retained.sources, transportProfile: 'project' } } }).retainedPolicyDigest, result.retainedPolicyDigest);
-  retained.values.transportProfile = 'uri81-block-v1';
-  assert.equal(result.retained.values.transportProfile, 'base90-v1', 'saved snapshot is copied before returning');
+  retained.values.transportProfile = 'base90-v1';
+  assert.equal(result.retained.values.transportProfile, 'uri81-block-v1', 'saved snapshot is copied before returning');
   assert.throws(() => assertKeelBuildDefaultsCurrent(before, modern), /build-defaults-stale/);
-  assert.throws(() => resolveKeelBuildDefaults(profile), TypeError);
+  assert.throws(() => resolveKeelBuildDefaults({ ...profile, global: { ...profile.global, transportProfile: 'base90-v1' } }), TypeError);
 });
 
 test('read-only legacy compatibility never offers retired formats for fresh preparation or fabricates a missing snapshot', async () => {
@@ -179,12 +179,13 @@ test('retained policy rejects corrupt snapshots, provenance and read bounds with
   }
 });
 
-test('retained generation tolerates only the unchanged historical system transport default', async () => {
+test('retired system transport defaults reject while current unchanged generations remain exact', async () => {
   const { resolveKeelBuildDefaults, assertKeelRetainedBuildDefaultsCurrent } = await import('../packages/sdk/dist/studio-project-defaults.js');
   const empty = createKeelStudioDefaultProfile(), modern = resolveKeelBuildDefaults(empty);
-  const saved = { ...modern, values: { ...modern.values, transportProfile: 'base90-v1' } };
-  const result = assertKeelRetainedBuildDefaultsCurrent(empty, { retained: saved });
-  assert.deepEqual(result, saved); assert.notEqual(result, saved);
+  const retired = { ...modern, values: { ...modern.values, transportProfile: 'base90-v1' } };
+  assert.throws(() => assertKeelRetainedBuildDefaultsCurrent(empty, { retained: retired }), /Invalid retained build policy value/);
+  const result = assertKeelRetainedBuildDefaultsCurrent(empty, { retained: modern });
+  assert.deepEqual(result, modern); assert.notEqual(result, modern);
   assert.equal(resolveKeelBuildDefaults(empty).values.transportProfile, 'uri81-block-v1');
   for (const [profile, layer] of [
     [{ ...empty, revision: 1 }, {}],
@@ -193,11 +194,11 @@ test('retained generation tolerates only the unchanged historical system transpo
     [empty, { build: { compression: 'none' } }],
     [empty, { build: { brotliQuality: 10 } }],
     [empty, { constraints: { maxReadGas: 30_000_000 } }],
-    [empty, { project: { transportProfile: 'base90-v1' } }],
-  ]) assert.throws(() => assertKeelRetainedBuildDefaultsCurrent(profile, { retained: saved, ...layer }), /build-defaults-stale/);
+  ]) assert.throws(() => assertKeelRetainedBuildDefaultsCurrent(profile, { retained: modern, ...layer }), /build-defaults-stale/);
+  assert.throws(() => assertKeelRetainedBuildDefaultsCurrent(empty, { retained: modern, project: { transportProfile: 'base90-v1' } }), /not offered/);
 });
 
-test('retained generation validates exact legacy account, media, project and build choices without exposing fresh availability', async () => {
+test('retired account, media, project and build choices reject without exposing fresh availability', async () => {
   const { resolveKeelBuildDefaults, assertKeelRetainedBuildDefaultsCurrent } = await import('../packages/sdk/dist/studio-project-defaults.js');
   const empty = createKeelStudioDefaultProfile(), modern = resolveKeelBuildDefaults(empty);
   for (const source of ['account', 'media', 'project', 'build']) {
@@ -206,8 +207,8 @@ test('retained generation validates exact legacy account, media, project and bui
       ...(source === 'media' ? { byMedia: { 'image/png': { transportProfile: 'base90-v1' } } } : {}) };
     const layers = { mediaType: 'image/png', ...(source === 'project' ? { project: { transportProfile: 'base90-v1' } } : {}),
       ...(source === 'build' ? { build: { transportProfile: 'base90-v1' } } : {}) };
-    assert.deepEqual(assertKeelRetainedBuildDefaultsCurrent(profile, { retained: saved, ...layers }), saved);
+    assert.throws(() => assertKeelRetainedBuildDefaultsCurrent(profile, { retained: saved, ...layers }), /Invalid retained build policy value/);
     assert.throws(() => resolveKeelBuildDefaults(profile, layers));
-    assert.throws(() => assertKeelRetainedBuildDefaultsCurrent(profile, { retained: saved, ...layers, build: { transportProfile: 'uri81-block-v1' } }), /build-defaults-stale/);
+    assert.throws(() => assertKeelRetainedBuildDefaultsCurrent(profile, { retained: saved, ...layers, build: { transportProfile: 'uri81-block-v1' } }), /Invalid retained build policy value/);
   }
 });
