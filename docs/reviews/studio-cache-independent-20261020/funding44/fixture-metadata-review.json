@@ -1,0 +1,11 @@
+{
+  "decision": "APPROVE_EXACT_FIXTURE_METADATA_COMPLETION",
+  "patchSHA256": "dec611b7fe967884e316048292e4453459e44f89d0a7ff23e8b2ebf0eb9da359",
+  "proposedSHA256": "d012738abc99a7bac3e1aef020faa21de5392192572669147679a604a0d73120",
+  "originalSHA256": "569fab6aaa892dae689df51015c624d760d5a18b1edddd10dc80d5f99440b1dd",
+  "reason": "Add matching old/current proof bindings and monotonic valid timestamps so a strict same-paid-quote/currentproof guard can reject incomplete evidence while regression tests the real merge. This remains a synthetic boundary fixture, not crypto/live proof.",
+  "allOriginalAssertionLinesByteExact": true,
+  "amountsAndGasAssertionsUnchanged": true,
+  "originalREDRetained": true,
+  "newSourceApproval": false
+}

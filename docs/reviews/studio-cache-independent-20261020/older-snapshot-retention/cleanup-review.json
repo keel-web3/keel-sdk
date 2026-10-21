@@ -1,0 +1,62 @@
+{
+  "schema": "keel.independent-exact-three-older-snapshot-retirement-review@1",
+  "decision": "APPROVE_EXACT_ONE_USER_APPROVED_THREE_HOST_COPY_RETIREMENT",
+  "reviewerId": "independent-release-reviewer",
+  "commandPath": "/private/tmp/keel-independent-older-snapshot-review-20261021/cleanup-command.admitted.json",
+  "commandSHA256": "e93665ae2b6d9b493a38a9477016bbd5ec600594a8250842c2b776faa06c078b",
+  "scriptSHA256": "86d41aa3a42c71e459df1235a8f147b31c00d50b7b880c274bfbbeaeddf68521",
+  "planFileSHA256": "1a885a5c6ba39111224b133deec51bc3595831976a27439a28262185413eae17",
+  "wirePlanSHA256": "1a885a5c6ba39111224b133deec51bc3595831976a27439a28262185413eae17",
+  "wirePlanDataDeepExactFinalFile": true,
+  "backupValidationSHA256": "f18a44fa491f4c7569fbc43de3a008c6fdcb69ef714fbaaf37e7116595d10a0a",
+  "humanAuthorizationSHA256": "4fb1a4be98c2e19d54a053442f492f9f9c6dce3b5a1bb9362b8d1dc0381d3393",
+  "sourceOnlyChangeSince4fa": "Leading docstring accurately describes three unlinks; remainder byte exact",
+  "scope": [
+    {
+      "id": "2779804f",
+      "remotePath": "/home/ubuntu/keel-studio-activation-2779804f-f8fe-4fcd-8153-f45ad70b03b6/retained-database-before.dump",
+      "bytes": 123389662,
+      "sha256": "2b8d1b0d5423668a8735524fd639abc78df0a25c85c13ce3933787c7f2354336",
+      "protectedLocalCopy": "/private/tmp/keel-older-snapshot-retention-20261021/2779804f.dump"
+    },
+    {
+      "id": "823ac084",
+      "remotePath": "/home/ubuntu/keel-studio-image-only-823ac084-558f-4112-87fa-99aaf86b9cd3/retained-database-before.dump",
+      "bytes": 123414720,
+      "sha256": "f342e8a346083f3df8cfaa47e3099859c5e7a8689cd9c49519f799d97ed622bc",
+      "protectedLocalCopy": "/private/tmp/keel-older-snapshot-retention-20261021/823ac084.dump"
+    },
+    {
+      "id": "5895d3d5",
+      "remotePath": "/home/ubuntu/keel-studio-image-only-5895d3d5-5f83-4a1c-b144-42724651ac91/retained-database-before.dump",
+      "bytes": 124210275,
+      "sha256": "994a046b87e9db335797e99c49ad16108a4ba5e56e5b2017a967a795417451db",
+      "protectedLocalCopy": "/private/tmp/keel-older-snapshot-retention-20261021/5895d3d5.dump"
+    }
+  ],
+  "retainedLatestHostSnapshot": {
+    "path": "/home/ubuntu/keel-studio-image-only-07a4de5e-f373-49bb-9e05-952906a8c4a4/retained-database-before.dump",
+    "bytes": 124215008,
+    "sha256": "153259aed5c61230e7100979d7a28103e2480687f05c81138d4c407a61bd169d"
+  },
+  "mandatorySourceGuards": [
+    "Existing common rolloutlock exclusive; strictcurrentCEE8 identity/Config/Host/fullcanonicalmounts/healthy/paused before eachunlink and after",
+    "Latest07a4 PGDMP/fullSHA/bytes verified before and after; no mutation of it",
+    "All3 exactroot0700parents/root0600regularnlink1nofollow fullSHA+metadata verified before FIRSTunlink",
+    "Perfile same dirfd+complete inode/dev/mtime/ctime metadata immediatelybeforeunlink, durable intent before and parentfsync after, durable partial outcome on ordinary failure",
+    "Own new exclusive c860 receiptroot; preserve all parentdirs/receipts/data/containers/images/volumes and protectedlocalcopies"
+  ],
+  "maximumInvocations": 1,
+  "rootSoleOperator": true,
+  "deadlineSeconds": 55,
+  "noRetryOrUncertainReplay": true,
+  "stopOnFailureOrUncertainty": "Inspect durable receipt and exactreadback; do not rerun. Client timeout may leave remote outcome uncertain.",
+  "notAdmitted": [
+    "Any additional path or data removal",
+    "Snapshot/rawdata/TOC commit, new transfer or content inspection",
+    "Latest07a4/liveDB/artwork/project/receipt deletion, DBrestore, image/container/volume or service changes",
+    "Application deployment, privatepreparation/RPC/artwork replay/signing/submission/spend"
+  ],
+  "reviewerActions": "Local fullfilehash/mode/link checks and pg_restore17.10 --list only; no restore/contentoutput/transfer/hostmutation",
+  "blockingFindingsWithinExactScope": []
+}

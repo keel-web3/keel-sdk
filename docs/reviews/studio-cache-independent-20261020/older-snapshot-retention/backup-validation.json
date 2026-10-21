@@ -1,0 +1,88 @@
+{
+  "schema": "keel.independent-protected-snapshot-copy-validation@1",
+  "result": "PASS_THREE_EXACT_LOCAL_PROTECTED_BACKUPS_AND_RESTORE_LISTS",
+  "reviewerId": "independent-release-reviewer",
+  "userAuthority": "Root reports explicit human approval of verified backup transfer and cleanup of exactly277/823/5895 older host copies; no other backup scope",
+  "protectedRoot": "/private/tmp/keel-older-snapshot-retention-20261021",
+  "rootOwner": 501,
+  "rootMode": 448,
+  "pgRestore": "/opt/homebrew/opt/postgresql@17/bin/pg_restore",
+  "version": "pg_restore (PostgreSQL) 17.10 (Homebrew)",
+  "parentResultSHA256": "8e7c9a404be00204faa467f5ec08186e19a93e8659fcd144b42bc540e9017ff5",
+  "snapshots": [
+    {
+      "id": "2779804f",
+      "protectedPath": "/private/tmp/keel-older-snapshot-retention-20261021/2779804f.dump",
+      "metadata": {
+        "device": 16777234,
+        "inode": 2048583606,
+        "bytes": 123389662,
+        "uid": 501,
+        "gid": 0,
+        "mode": 384,
+        "links": 1,
+        "mtimeNs": 1792545760583199666,
+        "ctimeNs": 1792545760583199666
+      },
+      "sha256": "2b8d1b0d5423668a8735524fd639abc78df0a25c85c13ce3933787c7f2354336",
+      "header": "PGDMP",
+      "restoreListExitCode": 0,
+      "restoreListBytes": 45227,
+      "restoreListSHA256": "105a53ec5df54f56a4f19e65da0276c5840f96a58f470f9e03a30d3cfb92ebc5",
+      "restoreListEntryCount": 592,
+      "TOCStoredOrPrinted": false,
+      "restored": false
+    },
+    {
+      "id": "823ac084",
+      "protectedPath": "/private/tmp/keel-older-snapshot-retention-20261021/823ac084.dump",
+      "metadata": {
+        "device": 16777234,
+        "inode": 2048583622,
+        "bytes": 123414720,
+        "uid": 501,
+        "gid": 0,
+        "mode": 384,
+        "links": 1,
+        "mtimeNs": 1792545765310933298,
+        "ctimeNs": 1792545765310933298
+      },
+      "sha256": "f342e8a346083f3df8cfaa47e3099859c5e7a8689cd9c49519f799d97ed622bc",
+      "header": "PGDMP",
+      "restoreListExitCode": 0,
+      "restoreListBytes": 45652,
+      "restoreListSHA256": "790ead138e720949d1f170cb4d46f9fe7d9e9aa485962c6d24cfd74966f6ba48",
+      "restoreListEntryCount": 598,
+      "TOCStoredOrPrinted": false,
+      "restored": false
+    },
+    {
+      "id": "5895d3d5",
+      "protectedPath": "/private/tmp/keel-older-snapshot-retention-20261021/5895d3d5.dump",
+      "metadata": {
+        "device": 16777234,
+        "inode": 2048583636,
+        "bytes": 124210275,
+        "uid": 501,
+        "gid": 0,
+        "mode": 384,
+        "links": 1,
+        "mtimeNs": 1792545770347120306,
+        "ctimeNs": 1792545770347120306
+      },
+      "sha256": "994a046b87e9db335797e99c49ad16108a4ba5e56e5b2017a967a795417451db",
+      "header": "PGDMP",
+      "restoreListExitCode": 0,
+      "restoreListBytes": 45652,
+      "restoreListSHA256": "62ff95bd1a5f0530e8c7e0f7828af1060f283dd4dc79bbe3e8ed0bdb78fe6314",
+      "restoreListEntryCount": 598,
+      "TOCStoredOrPrinted": false,
+      "restored": false
+    }
+  ],
+  "readOnlyLocal": true,
+  "noDatabaseContentsPrintedOrCommitted": true,
+  "noTransferOrHostActionByReviewer": true,
+  "deletionAdmitted": false,
+  "current07a4HostSnapshot": "Untouched; local validation makes no new host-state claim"
+}
