@@ -1,0 +1,70 @@
+TAP version 13
+# Subtest: current canonical player keeps native sar bytes and actual browser display geometry
+not ok 1 - current canonical player keeps native sar bytes and actual browser display geometry
+  ---
+  duration_ms: 15562.234125
+  type: 'test'
+  location: '/private/tmp/keel-temporal-display-guard-20261022-01/keel-sdk/tests/native-presentation-guard.browser.test.mjs:10:53'
+  failureType: 'testCodeFailure'
+  error: 'The actual canonical sandbox must mount the exact native media'
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: true
+  operator: '=='
+  stack: |-
+    withNativeMediaBrowser (file:///private/tmp/keel-temporal-display-guard-20261022-01/keel-sdk/tests/helpers/native-media-browser.mjs:34:12)
+    async TestContext.<anonymous> (file:///private/tmp/keel-temporal-display-guard-20261022-01/keel-sdk/tests/native-presentation-guard.browser.test.mjs:14:15)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async startSubtestAfterBootstrap (node:internal/test_runner/harness:296:3)
+  ...
+# Subtest: current canonical player keeps native title bytes and actual browser display geometry
+not ok 2 - current canonical player keeps native title bytes and actual browser display geometry
+  ---
+  duration_ms: 15364.111875
+  type: 'test'
+  location: '/private/tmp/keel-temporal-display-guard-20261022-01/keel-sdk/tests/native-presentation-guard.browser.test.mjs:10:53'
+  failureType: 'testCodeFailure'
+  error: 'The actual canonical sandbox must mount the exact native media'
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: true
+  operator: '=='
+  stack: |-
+    withNativeMediaBrowser (file:///private/tmp/keel-temporal-display-guard-20261022-01/keel-sdk/tests/helpers/native-media-browser.mjs:34:12)
+    async TestContext.<anonymous> (file:///private/tmp/keel-temporal-display-guard-20261022-01/keel-sdk/tests/native-presentation-guard.browser.test.mjs:14:15)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: real variable-rate MP4 to webp: complete RGBA/timeline verification and current canonical playback
+ok 3 - real variable-rate MP4 to webp: complete RGBA/timeline verification and current canonical playback
+  ---
+  duration_ms: 2509.704125
+  type: 'test'
+  ...
+# Subtest: real variable-rate MP4 to avif: complete RGBA/timeline verification and current canonical playback
+ok 4 - real variable-rate MP4 to avif: complete RGBA/timeline verification and current canonical playback
+  ---
+  duration_ms: 2463.746625
+  type: 'test'
+  ...
+# Subtest: current native-Gzip graph includes actual shell/player, preview and metadata in both measured alternatives
+ok 5 - current native-Gzip graph includes actual shell/player, preview and metadata in both measured alternatives
+  ---
+  duration_ms: 242.687333
+  type: 'test'
+  ...
+# Subtest: audio movie image carriers fail closed; native MP4 retains every decoded PCM sample
+ok 6 - audio movie image carriers fail closed; native MP4 retains every decoded PCM sample
+  ---
+  duration_ms: 271.096375
+  type: 'test'
+  ...
+1..6
+# tests 6
+# suites 0
+# pass 4
+# fail 2
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 37108.935333

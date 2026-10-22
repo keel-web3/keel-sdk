@@ -1,8 +1,10 @@
 /** Conservative admission for the presentation semantics which RGBA hashes do
  * not contain. This is intentionally a small supported ISO profile, not a
  * metadata stripper or a general movie normalizer. Unsupported media stays
- * native. Box layouts follow the pinned FFmpeg n6.1.1 MOV demuxer (mvhd,
- * tkhd, pasp, stsd) and AVIF's property containers.
+ * native. Box layouts follow the reviewed FFmpeg n6.1.1 MOV demuxer (mvhd,
+ * tkhd, pasp, stsd) and AVIF's property containers. The recorded Darwin
+ * binary reports 6.0; the same layouts were checked in that release too.
+ * https://github.com/FFmpeg/FFmpeg/blob/n6.0/libavformat/mov.c
  * https://github.com/FFmpeg/FFmpeg/blob/n6.1.1/libavformat/mov.c
  * https://aomediacodec.github.io/av1-avif/v1.2.0.html
  */

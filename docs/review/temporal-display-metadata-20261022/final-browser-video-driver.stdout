@@ -1,0 +1,46 @@
+TAP version 13
+# Subtest: current canonical player keeps native sar bytes and actual browser display geometry
+ok 1 - current canonical player keeps native sar bytes and actual browser display geometry
+  ---
+  duration_ms: 919.152334
+  type: 'test'
+  ...
+# Subtest: current canonical player keeps native title bytes and actual browser display geometry
+ok 2 - current canonical player keeps native title bytes and actual browser display geometry
+  ---
+  duration_ms: 483.391417
+  type: 'test'
+  ...
+# Subtest: real variable-rate MP4 to webp: complete RGBA/timeline verification and current canonical playback
+ok 3 - real variable-rate MP4 to webp: complete RGBA/timeline verification and current canonical playback
+  ---
+  duration_ms: 2530.023375
+  type: 'test'
+  ...
+# Subtest: real variable-rate MP4 to avif: complete RGBA/timeline verification and current canonical playback
+ok 4 - real variable-rate MP4 to avif: complete RGBA/timeline verification and current canonical playback
+  ---
+  duration_ms: 2597.215583
+  type: 'test'
+  ...
+# Subtest: current native-Gzip graph includes actual shell/player, preview and metadata in both measured alternatives
+ok 5 - current native-Gzip graph includes actual shell/player, preview and metadata in both measured alternatives
+  ---
+  duration_ms: 399.998083
+  type: 'test'
+  ...
+# Subtest: audio movie image carriers fail closed; native MP4 retains every decoded PCM sample
+ok 6 - audio movie image carriers fail closed; native MP4 retains every decoded PCM sample
+  ---
+  duration_ms: 517.730292
+  type: 'test'
+  ...
+1..6
+# tests 6
+# suites 0
+# pass 6
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 8321.811917

@@ -1,0 +1,77 @@
+{
+  "verdict": "APPROVED_TEST_SETUP_ONLY",
+  "reviewedFixtureCommit": "1b094aab54da816fdc37ed397b41396a292ef2e4",
+  "priorIndependentBlockedReview": "88e4f3026",
+  "patches": [
+    {
+      "name": "explicit-color-positive-fixture.patch",
+      "sha256": "b0962f67b15dcef58e18ce159e045183a9c75437b1465be30388c3a189ceace2",
+      "admitted": true,
+      "scope": "Only explicit bt709 primaries/sRGB transfer/RGB matrix/full range in two synthetic supported-positive generators. Original untagged generators retained additively as image-conversion rejection/native-byte retention negatives.",
+      "independentProof": "Four fixture families: no-audio MP4, AAC440 MP4, AAC660 MP4, no-audio MOV. Every original/tagged decoded RGBA hash and DTS/PTS/duration identical; full f64 AAC PCM length/hash identical. Old input probe explicitly unknown primaries/transfer; new input probe explicitly bt709/iec61966-2-1.",
+      "assertionsUnchanged": 106
+    },
+    {
+      "name": "reviewer-retained-candidate-setup.patch",
+      "sha256": "4818fb3e757ce68ede1cb339c60d0b446509c7edc8ba25deb4fb19c5f8af666e",
+      "admitted": true,
+      "scope": "Move only candidate setup from now-rejecting shared prepareMediaCandidate to exact already-retained464B old candidate bytes; original SAR/title source generation and all five assertions unchanged.",
+      "candidateSHA256": "15e160de0827a42f62a73490d690561125232cff77877db53148cbc1ece035db",
+      "referenceAssetsUnchanged": true,
+      "independentProof": "Original first-three driver freshly1P2F before assert because shared preparation rejects; corrected retained-candidate driver3P and exact original hashes. Separate new source/shared prep/compare and original-native retention negatives remain covered."
+    },
+    {
+      "name": "native-video-driver-extension.patch",
+      "sha256": "4979d61dde8240def00ca6d96101ec6472a5c9feae4c9d48b9116d894928453f",
+      "admitted": true,
+      "scope": "Test helper optional mountSelector only; byte-equal default IMG/AUDIO expression; only two new native SAR/title cases explicitly require actual VIDEO. Source4cef175 patch frozen; no production changes.",
+      "assertionsUnchanged": 14,
+      "independentProof": "AST confirms all helper/new native-case assertions identical; default generated evaluation expression byte-equal; new expression requires actual #keel-asset-display video. Original4P2F browser RED retained; no fresh browser success claimed in this setup-only review."
+    }
+  ],
+  "freshResults": {
+    "originalMaintainedPositiveTests": {
+      "pass": 21,
+      "fail": 2,
+      "scope": "Expected RED current conservativeguard against old unspecified-color image conversion preconditions"
+    },
+    "correctedMaintainedPlusAdditiveNativeRetention": {
+      "pass": 30,
+      "fail": 0,
+      "skip": 0
+    },
+    "originalFirstThreeReviewerDriver": {
+      "pass": 1,
+      "fail": 2,
+      "scope": "Expected RED setup throws before actual rejection assertion"
+    },
+    "retainedCandidateFirstThreeDriver": {
+      "pass": 3,
+      "fail": 0,
+      "skip": 0
+    },
+    "independentDecodedFixtureFamilies": 4,
+    "unchangedAssertionCalls": 125
+  },
+  "rawEvidence": "commands-results.json, color-fixture-identity.json, generated source/framehash/probe files, assertion-ast-parity.json andbrowser-driver-ast-parity.json, original/corrected logs andretainedoriginal assets identities",
+  "requirements": [
+    "Do not remove original untagged source negative tests, exact SAR/title/APNG inputs or old RED logs.",
+    "Keep all rejection/pixel/timing/audio/metadata/original-preservation assertions and production limits unchanged.",
+    "These fixtures establish supported-positive source preconditions; they grant no automatic equivalence to arbitrary untagged movies.",
+    "Rerun all affected cases and actual canonical browser tests on the final frozen source; no passed-previously substitution."
+  ],
+  "notApproved": [
+    "SDK1b or later759 production source",
+    "finaltemporalpair or PUB402adoption",
+    "actual canonicalbrowser success onfinalsource",
+    "selectedchain/native/RPC integration",
+    "deployment/release",
+    "wallet signing or artwork publication"
+  ],
+  "reviewerActions": {
+    "hostCalls": 0,
+    "providerCalls": 0,
+    "nativeExecutions": 0,
+    "productionFixAuthorship": false
+  }
+}

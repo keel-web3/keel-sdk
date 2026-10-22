@@ -1,0 +1,169 @@
+TAP version 13
+# Subtest: actual independently encoded bytes pass every RGBA pixel and immutable source/recipe commitments
+ok 1 - actual independently encoded bytes pass every RGBA pixel and immutable source/recipe commitments
+  ---
+  duration_ms: 8.241542
+  type: 'test'
+  ...
+# Subtest: a changed last RGBA alpha sample fails even though dimensions and all other pixels match
+ok 2 - a changed last RGBA alpha sample fails even though dimensions and all other pixels match
+  ---
+  duration_ms: 3.000417
+  type: 'test'
+  ...
+# Subtest: actual animation verifies every frame, intrinsic infinite loop and exact variable timing
+ok 3 - actual animation verifies every frame, intrinsic infinite loop and exact variable timing
+  ---
+  duration_ms: 4.259958
+  type: 'test'
+  ...
+# Subtest: last-frame change, one millisecond duration change and finite-loop change are all rejected
+ok 4 - last-frame change, one millisecond duration change and finite-loop change are all rejected
+  ---
+  duration_ms: 8.077292
+  type: 'test'
+  ...
+# Subtest: finite identical animation loops remain exact and are not relabelled infinite
+ok 5 - finite identical animation loops remain exact and are not relabelled infinite
+  ---
+  duration_ms: 2.65825
+  type: 'test'
+  ...
+# Subtest: movie to actual checked animated WebP is conditional on authenticated canonical-player semantics
+not ok 6 - movie to actual checked animated WebP is conditional on authenticated canonical-player semantics
+  ---
+  duration_ms: 85.34475
+  type: 'test'
+  location: '/private/tmp/keel-temporal-display-guard-20261022-01/keel-sdk/tests/reviewer-original-actual-media-pair.test.mjs:24:1'
+  failureType: 'testCodeFailure'
+  error: 'The source movie has unspecified color semantics; this image conversion cannot claim lossless preservation. Native media is retained.'
+  code: 'ERR_TEST_FAILURE'
+  stack: |-
+    movieCandidate (file:///private/tmp/keel-temporal-display-guard-20261022-01/keel-sdk/packages/builder/dist/media-preparation.js:242:19)
+    async prepareMediaCandidate (file:///private/tmp/keel-temporal-display-guard-20261022-01/keel-sdk/packages/builder/dist/media-preparation.js:319:18)
+    async TestContext.<anonymous> (file:///private/tmp/keel-temporal-display-guard-20261022-01/keel-sdk/tests/reviewer-original-actual-media-pair.test.mjs:24:158)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: actual AAC audio includes every canonical PCM sample, channels, presentation timestamps and hashes
+ok 7 - actual AAC audio includes every canonical PCM sample, channels, presentation timestamps and hashes
+  ---
+  duration_ms: 251.03775
+  type: 'test'
+  ...
+# Subtest: equal-duration audio with changed actual samples fails, rather than presence-only approval
+ok 8 - equal-duration audio with changed actual samples fails, rather than presence-only approval
+  ---
+  duration_ms: 164.407042
+  type: 'test'
+  ...
+# Subtest: audio disappearance fails even when all video samples remain exact
+ok 9 - audio disappearance fails even when all video samples remain exact
+  ---
+  duration_ms: 234.953333
+  type: 'test'
+  ...
+# Subtest: explicit edits stay selected without granting automatic fidelity or fallback-to-original authority
+ok 10 - explicit edits stay selected without granting automatic fidelity or fallback-to-original authority
+  ---
+  duration_ms: 1.652625
+  type: 'test'
+  ...
+# Subtest: decoder corruption, unsupported external containers and pre-aborted work fail closed
+ok 11 - decoder corruption, unsupported external containers and pre-aborted work fail closed
+  ---
+  duration_ms: 41.927041
+  type: 'test'
+  ...
+# Subtest: the verifier snapshots mutable caller arrays and nested recipe before its first await
+ok 12 - the verifier snapshots mutable caller arrays and nested recipe before its first await
+  ---
+  duration_ms: 2.795875
+  type: 'test'
+  ...
+# Subtest: actual float64 PCM retains precision below float32 and detects a change in the final audio sample
+ok 13 - actual float64 PCM retains precision below float32 and detects a change in the final audio sample
+  ---
+  duration_ms: 283.806
+  type: 'test'
+  ...
+# Subtest: original mode preserves arbitrary container bytes without decode or format eligibility claims
+ok 14 - original mode preserves arbitrary container bytes without decode or format eligibility claims
+  ---
+  duration_ms: 2.875708
+  type: 'test'
+  ...
+# Subtest: still lossless WebP fully decodes and verifies pixel identity with measured bytes
+ok 15 - still lossless WebP fully decodes and verifies pixel identity with measured bytes
+  ---
+  duration_ms: 5.761625
+  type: 'test'
+  ...
+# Subtest: explicit still edits create a reversible recipe, preserve source and distinguish encoding lossless from source pixels
+ok 16 - explicit still edits create a reversible recipe, preserve source and distinguish encoding lossless from source pixels
+  ---
+  duration_ms: 5.244667
+  type: 'test'
+  ...
+# Subtest: compare returns decoded PNG frames at the same timestamp with original and processed geometry
+ok 17 - compare returns decoded PNG frames at the same timestamp with original and processed geometry
+  ---
+  duration_ms: 6.181125
+  type: 'test'
+  ...
+# Subtest: animated GIF retains all frames and their delays, comparison selects same source instant
+ok 18 - animated GIF retains all frames and their delays, comparison selects same source instant
+  ---
+  duration_ms: 216.18725
+  type: 'test'
+  ...
+# Subtest: actual capability report and cancellation do not claim universal decode support
+ok 19 - actual capability report and cancellation do not claim universal decode support
+  ---
+  duration_ms: 33.186834
+  type: 'test'
+  ...
+# Subtest: MOV input is decoded by capability and exports MP4/MOV without changing source
+not ok 20 - MOV input is decoded by capability and exports MP4/MOV without changing source
+  ---
+  duration_ms: 234.131208
+  type: 'test'
+  location: '/private/tmp/keel-temporal-display-guard-20261022-01/keel-sdk/tests/reviewer-original-media-preparation.test.mjs:40:1'
+  failureType: 'testCodeFailure'
+  error: 'The source movie has unspecified color semantics; this image conversion cannot claim lossless preservation. Native media is retained.'
+  code: 'ERR_TEST_FAILURE'
+  stack: |-
+    movieCandidate (file:///private/tmp/keel-temporal-display-guard-20261022-01/keel-sdk/packages/builder/dist/media-preparation.js:242:19)
+    process.processTicksAndRejections (node:internal/process/task_queues:103:5)
+    async prepareMediaCandidate (file:///private/tmp/keel-temporal-display-guard-20261022-01/keel-sdk/packages/builder/dist/media-preparation.js:319:18)
+    async TestContext.<anonymous> (file:///private/tmp/keel-temporal-display-guard-20261022-01/keel-sdk/tests/reviewer-original-media-preparation.test.mjs:47:12)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: still layers compose ordered source copies with explicit alpha, rotation and output bounds
+ok 21 - still layers compose ordered source copies with explicit alpha, rotation and output bounds
+  ---
+  duration_ms: 16.708291
+  type: 'test'
+  ...
+# Subtest: animated layers fail closed rather than silently ignoring composition
+ok 22 - animated layers fail closed rather than silently ignoring composition
+  ---
+  duration_ms: 1.269333
+  type: 'test'
+  ...
+# Subtest: an animated AVIF reimport preserves the verified sequence stream, both frames and exact timing
+ok 23 - an animated AVIF reimport preserves the verified sequence stream, both frames and exact timing
+  ---
+  duration_ms: 691.768791
+  type: 'test'
+  ...
+1..23
+# tests 23
+# suites 0
+# pass 21
+# fail 2
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 2518.191875

@@ -1,0 +1,338 @@
+TAP version 13
+# Subtest: SDK848 actual MCP candidate: unsupported sar lossless semantics stays native
+ok 1 - SDK848 actual MCP candidate: unsupported sar lossless semantics stays native
+  ---
+  duration_ms: 238.011209
+  type: 'test'
+  ...
+# Subtest: SDK848 actual MCP compare: unsupported sar lossless semantics stays native
+ok 2 - SDK848 actual MCP compare: unsupported sar lossless semantics stays native
+  ---
+  duration_ms: 69.283792
+  type: 'test'
+  ...
+# Subtest: SDK848 actual MCP candidate: unsupported title lossless semantics stays native
+ok 3 - SDK848 actual MCP candidate: unsupported title lossless semantics stays native
+  ---
+  duration_ms: 63.300458
+  type: 'test'
+  ...
+# Subtest: SDK848 actual MCP compare: unsupported title lossless semantics stays native
+ok 4 - SDK848 actual MCP compare: unsupported title lossless semantics stays native
+  ---
+  duration_ms: 62.92875
+  type: 'test'
+  ...
+# Subtest: SDK848 shared candidate: unsupported sar semantics must remain native
+ok 5 - SDK848 shared candidate: unsupported sar semantics must remain native
+  ---
+  duration_ms: 75.570375
+  type: 'test'
+  ...
+# Subtest: SDK848 shared compare: unsupported sar semantics must remain native
+ok 6 - SDK848 shared compare: unsupported sar semantics must remain native
+  ---
+  duration_ms: 61.437125
+  type: 'test'
+  ...
+# Subtest: SDK848 shared candidate: unsupported title semantics must remain native
+ok 7 - SDK848 shared candidate: unsupported title semantics must remain native
+  ---
+  duration_ms: 62.062041
+  type: 'test'
+  ...
+# Subtest: SDK848 shared compare: unsupported title semantics must remain native
+ok 8 - SDK848 shared compare: unsupported title semantics must remain native
+  ---
+  duration_ms: 56.837458
+  type: 'test'
+  ...
+# Subtest: SDK848 shared candidate: exact three-frame APNG cannot become first-frame WebP
+ok 9 - SDK848 shared candidate: exact three-frame APNG cannot become first-frame WebP
+  ---
+  duration_ms: 5.131875
+  type: 'test'
+  ...
+# Subtest: SDK848 shared compare: exact three-frame APNG cannot become first-frame WebP
+ok 10 - SDK848 shared compare: exact three-frame APNG cannot become first-frame WebP
+  ---
+  duration_ms: 1.483375
+  type: 'test'
+  ...
+# Subtest: independent exact APNG regression: all three frames cannot be certified as one
+ok 11 - independent exact APNG regression: all three frames cannot be certified as one
+  ---
+  duration_ms: 31.006375
+  type: 'test'
+  ...
+# {"source":{"bytes":642,"sha256":"dd52b281bd517e471500f635bd67c696c2a6658473a00938c155c3866c060e58"},"candidate":{"bytes":174,"sha256":"737a04d4c463eff7395bcf4043315533956295ce1c11184291e4ab2085a1ba05"}}
+# Subtest: independent lossless verification must reject changed sample aspect ratio
+ok 12 - independent lossless verification must reject changed sample aspect ratio
+  ---
+  duration_ms: 87.17175
+  type: 'test'
+  ...
+# {"source":{"bytes":2918,"sha256":"66f1276bd4fdeafa2b3eb370598250b40248bb7ed356829c7bf257635512cab3"},"candidate":{"bytes":464,"sha256":"15e160de0827a42f62a73490d690561125232cff77877db53148cbc1ece035db"},"sourceSAR":"2:1","candidateSAR":"1:1"}
+# Subtest: independent movie creator title cannot disappear behind exact RGBA
+ok 13 - independent movie creator title cannot disappear behind exact RGBA
+  ---
+  duration_ms: 68.82175
+  type: 'test'
+  ...
+# {"source":{"bytes":2972,"sha256":"7c41053e177dd103e6a2a40e4b634a9cdaa48288b3ac3a028d64facffff636a7"},"candidate":{"bytes":464,"sha256":"15e160de0827a42f62a73490d690561125232cff77877db53148cbc1ece035db"}}
+# Subtest: actual three-frame APNG cannot be approved as its Sharp first-frame WebP
+ok 14 - actual three-frame APNG cannot be approved as its Sharp first-frame WebP
+  ---
+  duration_ms: 21.786958
+  type: 'test'
+  ...
+# {"source":{"bytes":642,"sha256":"dd52b281bd517e471500f635bd67c696c2a6658473a00938c155c3866c060e58"},"candidate":{"bytes":174,"sha256":"737a04d4c463eff7395bcf4043315533956295ce1c11184291e4ab2085a1ba05"},"actualFrames":3,"sharpPages":null}
+# Subtest: complete GIF block grammar and native zero-loop timing can qualify actual three-frame WebP
+ok 15 - complete GIF block grammar and native zero-loop timing can qualify actual three-frame WebP
+  ---
+  duration_ms: 6.972208
+  type: 'test'
+  ...
+# Subtest: concatenated GIFs and missing complete trailer cannot be relabelled one verified animation
+ok 16 - concatenated GIFs and missing complete trailer cannot be relabelled one verified animation
+  ---
+  duration_ms: 9.62125
+  type: 'test'
+  ...
+# Subtest: GIF creator comments stay native until a preserving adapter can establish metadata correspondence
+ok 17 - GIF creator comments stay native until a preserving adapter can establish metadata correspondence
+  ---
+  duration_ms: 3.286625
+  type: 'test'
+  ...
+# Subtest: duplicate WebP animation control is rejected even if the native decoder accepts its pixels
+ok 18 - duplicate WebP animation control is rejected even if the native decoder accepts its pixels
+  ---
+  duration_ms: 3.81575
+  type: 'test'
+  ...
+# Subtest: actual candidate bytes must match their recipe container even when all decoded RGBA is equal
+ok 19 - actual candidate bytes must match their recipe container even when all decoded RGBA is equal
+  ---
+  duration_ms: 2.654
+  type: 'test'
+  ...
+# Subtest: complete AVIF traversal finds sequence brands beyond byte40 and rejects malformed box bounds
+ok 20 - complete AVIF traversal finds sequence brands beyond byte40 and rejects malformed box bounds
+  ---
+  duration_ms: 0.295458
+  type: 'test'
+  ...
+# Subtest: PNG creator text cannot disappear behind equal decoded RGBA samples
+ok 21 - PNG creator text cannot disappear behind equal decoded RGBA samples
+  ---
+  duration_ms: 2.955459
+  type: 'test'
+  ...
+# Subtest: actual independently encoded bytes pass every RGBA pixel and immutable source/recipe commitments
+ok 22 - actual independently encoded bytes pass every RGBA pixel and immutable source/recipe commitments
+  ---
+  duration_ms: 11.276167
+  type: 'test'
+  ...
+# Subtest: a changed last RGBA alpha sample fails even though dimensions and all other pixels match
+ok 23 - a changed last RGBA alpha sample fails even though dimensions and all other pixels match
+  ---
+  duration_ms: 3.951792
+  type: 'test'
+  ...
+# Subtest: actual animation verifies every frame, intrinsic infinite loop and exact variable timing
+ok 24 - actual animation verifies every frame, intrinsic infinite loop and exact variable timing
+  ---
+  duration_ms: 5.752917
+  type: 'test'
+  ...
+# Subtest: last-frame change, one millisecond duration change and finite-loop change are all rejected
+ok 25 - last-frame change, one millisecond duration change and finite-loop change are all rejected
+  ---
+  duration_ms: 10.537667
+  type: 'test'
+  ...
+# Subtest: finite identical animation loops remain exact and are not relabelled infinite
+ok 26 - finite identical animation loops remain exact and are not relabelled infinite
+  ---
+  duration_ms: 3.582166
+  type: 'test'
+  ...
+# Subtest: movie to actual checked animated WebP is conditional on authenticated canonical-player semantics
+ok 27 - movie to actual checked animated WebP is conditional on authenticated canonical-player semantics
+  ---
+  duration_ms: 210.118417
+  type: 'test'
+  ...
+# Subtest: actual AAC audio includes every canonical PCM sample, channels, presentation timestamps and hashes
+ok 28 - actual AAC audio includes every canonical PCM sample, channels, presentation timestamps and hashes
+  ---
+  duration_ms: 312.922583
+  type: 'test'
+  ...
+# Subtest: equal-duration audio with changed actual samples fails, rather than presence-only approval
+ok 29 - equal-duration audio with changed actual samples fails, rather than presence-only approval
+  ---
+  duration_ms: 202.006375
+  type: 'test'
+  ...
+# Subtest: audio disappearance fails even when all video samples remain exact
+ok 30 - audio disappearance fails even when all video samples remain exact
+  ---
+  duration_ms: 275.314583
+  type: 'test'
+  ...
+# Subtest: explicit edits stay selected without granting automatic fidelity or fallback-to-original authority
+ok 31 - explicit edits stay selected without granting automatic fidelity or fallback-to-original authority
+  ---
+  duration_ms: 2.063667
+  type: 'test'
+  ...
+# Subtest: decoder corruption, unsupported external containers and pre-aborted work fail closed
+ok 32 - decoder corruption, unsupported external containers and pre-aborted work fail closed
+  ---
+  duration_ms: 51.940625
+  type: 'test'
+  ...
+# Subtest: the verifier snapshots mutable caller arrays and nested recipe before its first await
+ok 33 - the verifier snapshots mutable caller arrays and nested recipe before its first await
+  ---
+  duration_ms: 2.730709
+  type: 'test'
+  ...
+# Subtest: actual float64 PCM retains precision below float32 and detects a change in the final audio sample
+ok 34 - actual float64 PCM retains precision below float32 and detects a change in the final audio sample
+  ---
+  duration_ms: 323.638166
+  type: 'test'
+  ...
+# Subtest: original mode preserves arbitrary container bytes without decode or format eligibility claims
+ok 35 - original mode preserves arbitrary container bytes without decode or format eligibility claims
+  ---
+  duration_ms: 3.29325
+  type: 'test'
+  ...
+# Subtest: still lossless WebP fully decodes and verifies pixel identity with measured bytes
+ok 36 - still lossless WebP fully decodes and verifies pixel identity with measured bytes
+  ---
+  duration_ms: 6.792334
+  type: 'test'
+  ...
+# Subtest: explicit still edits create a reversible recipe, preserve source and distinguish encoding lossless from source pixels
+ok 37 - explicit still edits create a reversible recipe, preserve source and distinguish encoding lossless from source pixels
+  ---
+  duration_ms: 6.02725
+  type: 'test'
+  ...
+# Subtest: compare returns decoded PNG frames at the same timestamp with original and processed geometry
+ok 38 - compare returns decoded PNG frames at the same timestamp with original and processed geometry
+  ---
+  duration_ms: 7.567416
+  type: 'test'
+  ...
+# Subtest: animated GIF retains all frames and their delays, comparison selects same source instant
+ok 39 - animated GIF retains all frames and their delays, comparison selects same source instant
+  ---
+  duration_ms: 273.97575
+  type: 'test'
+  ...
+# Subtest: actual capability report and cancellation do not claim universal decode support
+ok 40 - actual capability report and cancellation do not claim universal decode support
+  ---
+  duration_ms: 38.311125
+  type: 'test'
+  ...
+# Subtest: MOV input is decoded by capability and exports MP4/MOV without changing source
+ok 41 - MOV input is decoded by capability and exports MP4/MOV without changing source
+  ---
+  duration_ms: 802.612875
+  type: 'test'
+  ...
+# Subtest: still layers compose ordered source copies with explicit alpha, rotation and output bounds
+ok 42 - still layers compose ordered source copies with explicit alpha, rotation and output bounds
+  ---
+  duration_ms: 19.382083
+  type: 'test'
+  ...
+# Subtest: animated layers fail closed rather than silently ignoring composition
+ok 43 - animated layers fail closed rather than silently ignoring composition
+  ---
+  duration_ms: 1.458875
+  type: 'test'
+  ...
+# Subtest: an animated AVIF reimport preserves the verified sequence stream, both frames and exact timing
+ok 44 - an animated AVIF reimport preserves the verified sequence stream, both frames and exact timing
+  ---
+  duration_ms: 848.154917
+  type: 'test'
+  ...
+# Subtest: exact retained sar: shared preparation/comparison and actual candidate proof reject; original mode is byte exact
+ok 45 - exact retained sar: shared preparation/comparison and actual candidate proof reject; original mode is byte exact
+  ---
+  duration_ms: 162.019042
+  type: 'test'
+  ...
+# Subtest: exact retained title: shared preparation/comparison and actual candidate proof reject; original mode is byte exact
+ok 46 - exact retained title: shared preparation/comparison and actual candidate proof reject; original mode is byte exact
+  ---
+  duration_ms: 189.659375
+  type: 'test'
+  ...
+# Subtest: creator, creation-time, stream title and language metadata are never stripped behind a lossless flag
+ok 47 - creator, creation-time, stream title and language metadata are never stripped behind a lossless flag
+  ---
+  duration_ms: 322.665792
+  type: 'test'
+  ...
+# Subtest: real remuxed display rotation is rejected instead of being baked into lossless pixels
+ok 48 - real remuxed display rotation is rejected instead of being baked into lossless pixels
+  ---
+  duration_ms: 79.709542
+  type: 'test'
+  ...
+# Subtest: raw movie and track matrix, display dimensions, clean aperture and explicit color boxes fail closed
+ok 49 - raw movie and track matrix, display dimensions, clean aperture and explicit color boxes fail closed
+  ---
+  duration_ms: 335.5985
+  type: 'test'
+  ...
+# Subtest: conflicting DAR, multiline metadata, extra side data and incomplete boxes cannot manufacture admission
+ok 50 - conflicting DAR, multiline metadata, extra side data and incomplete boxes cannot manufacture admission
+  ---
+  duration_ms: 12.666792
+  type: 'test'
+  ...
+# Subtest: original untagged movie fixtures retain native bytes instead of acquiring invented image color semantics
+ok 51 - original untagged movie fixtures retain native bytes instead of acquiring invented image color semantics
+  ---
+  duration_ms: 363.379208
+  type: 'test'
+  ...
+# Subtest: standard WebP duration correction preserves the entire frame payload, loop and original bytes
+ok 52 - standard WebP duration correction preserves the entire frame payload, loop and original bytes
+  ---
+  duration_ms: 5.853416
+  type: 'test'
+  ...
+# Subtest: unrepresentable, omitted, reordered and truncated timelines fail closed without mutating the container
+ok 53 - unrepresentable, omitted, reordered and truncated timelines fail closed without mutating the container
+  ---
+  duration_ms: 0.711833
+  type: 'test'
+  ...
+# Subtest: strict animation parser rejects duplicate headers, flags, bad frame bounds, reordered control and corrupt padded chunks
+ok 54 - strict animation parser rejects duplicate headers, flags, bad frame bounds, reordered control and corrupt padded chunks
+  ---
+  duration_ms: 0.373125
+  type: 'test'
+  ...
+1..54
+# tests 54
+# suites 0
+# pass 54
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 6939.879416
