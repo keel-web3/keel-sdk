@@ -42,7 +42,7 @@ export function assertMoviePresentationSemantics(bytes: Uint8Array, inputReport:
   type Box = {kind:string; start:number; end:number};
   type Clock = {scale:bigint; duration:bigint};
   type Edit = {flags:number; duration:bigint; mediaTime:bigint};
-  type Track = {duration?:bigint; media?:Clock; edit?:Edit; video?:boolean; codec?:string; timing?:{duration:bigint;samples:bigint}; compositionSamples?:bigint};
+  type Track = {duration?:bigint; media?:Clock; edit?:Edit; video?:boolean; codec?:string; timing?:{duration:bigint;samples:bigint}; compositionSamples?:bigint; encodedSamples?:bigint};
   let count=0, movieHeaders=0, videoHeaders=0, srgbFull=false;
   let movie:Clock|undefined, avifItems=0, avifExtents=0;
   const tracks:Track[]=[], avifConfigs:Uint8Array[]=[];
@@ -88,7 +88,7 @@ export function assertMoviePresentationSemantics(bytes: Uint8Array, inputReport:
     for(const box of boxes(start,end)) {
       const {kind,start:a,end:z}=box;
       if(!allowed[parent]?.includes(kind))retain(`unsupported ${parent}/${kind} metadata, aperture or presentation semantics`);
-      if(["mvhd","tkhd","mdhd","edts","elst","stts","ctts","stsd","colr","pasp","meta","iinf","iprp"].includes(kind)&&seen.has(kind))retain("duplicate presentation, edit-list or metadata semantics");
+      if(["mvhd","tkhd","mdhd","edts","elst","stts","ctts","stsz","stsd","colr","pasp","meta","iinf","iprp"].includes(kind)&&seen.has(kind))retain("duplicate presentation, edit-list or sample metadata semantics");
       seen.add(kind);
       if(kind==="trak") {
         const nested:Track={};tracks.push(nested);walk(a,z,kind,depth+1,nested);
@@ -107,6 +107,23 @@ export function assertMoviePresentationSemantics(bytes: Uint8Array, inputReport:
         const at=a+8,duration=version===1?view.getBigUint64(at):BigInt(view.getUint32(at)),mediaTime=version===1?view.getBigInt64(at+8):BigInt(view.getInt32(at+4)),rateAt=at+(version===1?16:8);
         if(duration<=0n || mediaTime<0n || view.getInt32(rateAt)!==65536)retain("unsupported edit-list segment, media-time or playback rate");
         owner.edit={flags,duration,mediaTime};
+      } else if(kind==="stsz") {
+        const owner=track??retain("sample sizes outside their track");
+        // MOV stsz has either one fixed size or exactly one uint32 size for
+        // every sample (mov_read_stsz, pinned n6.0 source in the evidence).
+        // Compact stz2 is not in the admitted profile. A permissive decoder's
+        // truncated table must never become complete-sample authority.
+        if(z-a<12 || view.getUint32(a)!==0)retain("unsupported sample-size version or flags");
+        const size=view.getUint32(a+4),n=view.getUint32(a+8);
+        if(!n || z-a!==12+(size===0?n*4:0))retain("sample-size count or exact table byte bounds");
+        let total=BigInt(size)*BigInt(n);
+        if(size===0)for(let i=0;i<n;i++) {
+          const sampleSize=view.getUint32(a+12+i*4);
+          if(!sampleSize)retain("empty or unavailable encoded sample bounds");
+          total+=BigInt(sampleSize);
+        }
+        if(total>BigInt(bytes.length))retain("encoded sample sizes exceed complete container bounds");
+        owner.encodedSamples=BigInt(n);
       } else if(kind==="stts" || kind==="ctts") {
         const owner=track??retain("sample timeline outside its edit-list track");
         if(a+8>z || (view.getUint32(a)&0xffffff)!==0 || bytes[a]!>(kind==="stts"?0:1))retain("unsupported edit-list sample timeline version or flags");
@@ -202,9 +219,16 @@ export function assertMoviePresentationSemantics(bytes: Uint8Array, inputReport:
   if(movieHeaders!==1 || videoHeaders!==1)retain("ambiguous movie/track display geometry semantics");
   for(const track of tracks) {
     const edit=track.edit;
-    if(!edit)continue;
-    const movieClock=movie??retain("unavailable movie edit-list clock"),media=track.media??retain("unavailable media edit-list clock");
-    if(!track.timing || track.timing.duration!==media.duration || track.compositionSamples!==undefined && track.compositionSamples!==track.timing.samples)retain("edit-list media bounds differ from the complete sample timeline");
+    const movieClock=movie??retain("unavailable movie timeline clock"),media=track.media??retain("unavailable media timeline clock");
+    if(!track.timing || track.timing.duration!==media.duration || track.encodedSamples!==track.timing.samples || track.compositionSamples!==undefined && track.compositionSamples!==track.timing.samples)retain("media bounds or encoded sample counts differ from the complete sample timeline");
+    if(!edit) {
+      // No edts is an identity mapping of the whole media timeline, not an
+      // exemption from duration/sample checks. Use the same exact upward
+      // movie-clock rescaling as the supported whole-segment edit profile.
+      const duration=(media.duration*movieClock.scale+media.scale-1n)/media.scale;
+      if(track.duration!==duration || duration>movieClock.duration)retain("unedited track duration or media timeline clock correspondence");
+      continue;
+    }
     if(track.duration===undefined || edit.mediaTime>=media.duration || track.video && edit.mediaTime!==0n)retain("edit-list segment or media bounds");
     // Exact integer rescaling, including the muxer's specified upward movie-
     // clock rounding. No tolerance or duration repair is used. Only a whole
