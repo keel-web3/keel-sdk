@@ -1,0 +1,92 @@
+TAP version 13
+# Subtest: unedited ordinary movie control has complete actual sample timing and remains optimizable
+ok 1 - unedited ordinary movie control has complete actual sample timing and remains optimizable
+  ---
+  duration_ms: 166.345834
+  type: 'test'
+  ...
+# Subtest: unmodeled noedit-movie-track-tail must not receive complete timeline equivalence
+not ok 2 - unmodeled noedit-movie-track-tail must not receive complete timeline equivalence
+  ---
+  duration_ms: 124.294875
+  type: 'test'
+  location: '/private/tmp/keel-temporal-track-binding-20261022-01/keel-sdk/reviewer-noedit-timeline.test.mjs:7:219'
+  failureType: 'testCodeFailure'
+  error: 'Missing expected rejection.'
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected:
+  operator: 'rejects'
+  stack: |-
+    async TestContext.<anonymous> (file:///private/tmp/keel-temporal-track-binding-20261022-01/keel-sdk/reviewer-noedit-timeline.test.mjs:7:675)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# {"variant":"noedit-movie-track-tail","sourceBytes":2901,"sourceSHA256":"42f7dee0db6a9e65c66c515b376d00703308d54ca96fbaf5033fc69dc1d5ffcf"}
+# {"variant":"noedit-movie-track-tail","actualDecodedDurationMs":600,"candidateBytes":464,"candidateSHA256":"15e160de0827a42f62a73490d690561125232cff77877db53148cbc1ece035db","eligibility":"requires-canonical-player-proof"}
+# Subtest: unmodeled noedit-media-tail must not receive complete timeline equivalence
+not ok 3 - unmodeled noedit-media-tail must not receive complete timeline equivalence
+  ---
+  duration_ms: 123.850625
+  type: 'test'
+  location: '/private/tmp/keel-temporal-track-binding-20261022-01/keel-sdk/reviewer-noedit-timeline.test.mjs:7:219'
+  failureType: 'testCodeFailure'
+  error: 'Missing expected rejection.'
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected:
+  operator: 'rejects'
+  stack: |-
+    async TestContext.<anonymous> (file:///private/tmp/keel-temporal-track-binding-20261022-01/keel-sdk/reviewer-noedit-timeline.test.mjs:7:675)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# {"variant":"noedit-media-tail","sourceBytes":2901,"sourceSHA256":"b87d389151c2db4eac79ccb8adabe4cd635183414c676808343f26ecefa7b8ac"}
+# {"variant":"noedit-media-tail","actualDecodedDurationMs":600,"candidateBytes":464,"candidateSHA256":"15e160de0827a42f62a73490d690561125232cff77877db53148cbc1ece035db","eligibility":"requires-canonical-player-proof"}
+# Subtest: unmodeled noedit-all-clock-tail must not receive complete timeline equivalence
+not ok 4 - unmodeled noedit-all-clock-tail must not receive complete timeline equivalence
+  ---
+  duration_ms: 120.59475
+  type: 'test'
+  location: '/private/tmp/keel-temporal-track-binding-20261022-01/keel-sdk/reviewer-noedit-timeline.test.mjs:7:219'
+  failureType: 'testCodeFailure'
+  error: 'Missing expected rejection.'
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected:
+  operator: 'rejects'
+  stack: |-
+    async TestContext.<anonymous> (file:///private/tmp/keel-temporal-track-binding-20261022-01/keel-sdk/reviewer-noedit-timeline.test.mjs:7:675)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# {"variant":"noedit-all-clock-tail","sourceBytes":2901,"sourceSHA256":"6218f0b975d6def54a0c0a5b8878b342918f523e33d2444ea2237e4a8fb3fcee"}
+# {"variant":"noedit-all-clock-tail","actualDecodedDurationMs":600,"candidateBytes":464,"candidateSHA256":"15e160de0827a42f62a73490d690561125232cff77877db53148cbc1ece035db","eligibility":"requires-canonical-player-proof"}
+# Subtest: coherent extended header and STTS clocks cannot invent an absent fourth encoded sample
+not ok 5 - coherent extended header and STTS clocks cannot invent an absent fourth encoded sample
+  ---
+  duration_ms: 121.496875
+  type: 'test'
+  location: '/private/tmp/keel-temporal-track-binding-20261022-01/keel-sdk/reviewer-noedit-timeline.test.mjs:8:1'
+  failureType: 'testCodeFailure'
+  error: 'Missing expected rejection.'
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected:
+  operator: 'rejects'
+  stack: |-
+    async TestContext.<anonymous> (file:///private/tmp/keel-temporal-track-binding-20261022-01/keel-sdk/reviewer-noedit-timeline.test.mjs:8:822)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# {"variant":"invented-sample","sourceSHA256":"3911e5d7363e348bd9f4dfc8b34801b3cf0c8559d35a06f96192ace15e014806","bytes":2937}
+# {"actualDecodedDurationMs":800,"actualDecodedFrames":3,"candidateBytes":464,"eligibility":"requires-canonical-player-proof"}
+1..5
+# tests 5
+# suites 0
+# pass 1
+# fail 4
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 752.924084

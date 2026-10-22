@@ -1,0 +1,76 @@
+{
+  "sdkCommit": "2a69bd24ea60cfc89a9a3943af79124201f02f5d",
+  "siteCommit": "3a76da90027b8c8e4b0c4b3aee8be0f03091bbe4",
+  "node": "{\"version\":\"v22.22.1\",\"platform\":\"darwin\",\"arch\":\"arm64\",\"versions\":{\"node\":\"22.22.1\",\"acorn\":\"8.15.0\",\"ada\":\"2.9.2\",\"amaro\":\"1.1.5\",\"ares\":\"1.34.6\",\"brotli\":\"1.1.0\",\"cjs_module_lexer\":\"2.2.0\",\"cldr\":\"48.0\",\"icu\":\"78.2\",\"llhttp\":\"9.3.0\",\"modules\":\"127\",\"napi\":\"10\",\"nbytes\":\"0.1.1\",\"ncrypto\":\"0.0.1\",\"nghttp2\":\"1.64.0\",\"openssl\":\"3.5.5\",\"simdjson\":\"4.2.4\",\"simdutf\":\"6.4.2\",\"sqlite\":\"3.51.2\",\"tz\":\"2025c\",\"undici\":\"6.23.0\",\"unicode\":\"17.0\",\"uv\":\"1.51.0\",\"uvwasi\":\"0.0.23\",\"v8\":\"12.4.254.21-node.35\",\"zlib\":\"1.3.1-e00f703\",\"zstd\":\"1.5.7\"}}",
+  "files": {
+    "packages/builder/src/movie-presentation-semantics.ts": "74e2dd6c7dc2f8c82184b5dbe986c60fb34d417b0ed79ad7d499584a2cbfc9c8",
+    "packages/builder/src/media-preparation.ts": "70ba1bf7dc2339283aec42b769e48def0955d3069faa5aabc639ff26b13631d8",
+    "tests/movie-track-binding.test.mjs": "10a0c264090aa1a1215ba21707639e57bfe242988d60a73eb498625b36f9b6dd",
+    "reviewer-noedit-timeline.test.mjs": "9871f665c5b28a15884072f8086710fa18a7f7d85f0a4a5d5003e284e0ecaa69"
+  },
+  "aliases": {
+    "/private/tmp/keel-temporal-track-binding-20261022-01/keel-sdk/packages/builder/node_modules/ffmpeg-static": "/Users/ravonus/dev/keel-sdk/node_modules/.pnpm/ffmpeg-static@5.3.0/node_modules/ffmpeg-static",
+    "/private/tmp/keel-temporal-track-binding-20261022-01/keel-sdk/packages/builder/node_modules/@keel/protocol": "/private/tmp/keel-temporal-track-binding-20261022-01/keel-sdk/packages/protocol",
+    "/private/tmp/keel-temporal-track-binding-20261022-01/keel-sdk/packages/mcp/node_modules/@keel/builder": "/private/tmp/keel-temporal-track-binding-20261022-01/keel-sdk/packages/builder",
+    "/private/tmp/keel-temporal-track-binding-20261022-01/keel-site/apps/studio/node_modules/@keel/builder": "/private/tmp/keel-temporal-track-binding-20261022-01/keel-sdk/packages/builder",
+    "/private/tmp/keel-temporal-track-binding-20261022-01/keel-sdk/packages/sdk/node_modules/saxes": "/Users/ravonus/dev/wt/studio-public-discovery-20261020/keel-site/node_modules/.pnpm/saxes@6.0.0/node_modules/saxes"
+  },
+  "inputs": {
+    "invented-sample-unsafe-proof.json": {
+      "bytes": 2259,
+      "sha256": "56badec1b80c57ad41d0a2990b73da5024497c7b2cee84ae03fd0f9abc270083"
+    },
+    "invented-sample.mp4": {
+      "bytes": 2937,
+      "sha256": "3911e5d7363e348bd9f4dfc8b34801b3cf0c8559d35a06f96192ace15e014806"
+    },
+    "invented-sample.webp": {
+      "bytes": 464,
+      "sha256": "af3d9003c447a0503c289d78c63ec6f11d6e9b719243387ace40842b71a19bd9"
+    },
+    "noedit-all-clock-tail-unsafe-proof.json": {
+      "bytes": 2259,
+      "sha256": "d15c68a8bfc282fdba72faa66a98a2796910e3ae62ec412838cacf6bbf5a9e1c"
+    },
+    "noedit-all-clock-tail.mp4": {
+      "bytes": 2901,
+      "sha256": "6218f0b975d6def54a0c0a5b8878b342918f523e33d2444ea2237e4a8fb3fcee"
+    },
+    "noedit-all-clock-tail.webp": {
+      "bytes": 464,
+      "sha256": "15e160de0827a42f62a73490d690561125232cff77877db53148cbc1ece035db"
+    },
+    "noedit-media-tail-unsafe-proof.json": {
+      "bytes": 2259,
+      "sha256": "d4b23b52ce8ec870c1583984ecbfa05dcc06fbb997832f3f519f0fb60d681424"
+    },
+    "noedit-media-tail.mp4": {
+      "bytes": 2901,
+      "sha256": "b87d389151c2db4eac79ccb8adabe4cd635183414c676808343f26ecefa7b8ac"
+    },
+    "noedit-media-tail.webp": {
+      "bytes": 464,
+      "sha256": "15e160de0827a42f62a73490d690561125232cff77877db53148cbc1ece035db"
+    },
+    "noedit-movie-track-tail-unsafe-proof.json": {
+      "bytes": 2259,
+      "sha256": "877a3a69feafd8ff0ae529b66a406f51a2841f7080dec5324fdf5904e617a6da"
+    },
+    "noedit-movie-track-tail.mp4": {
+      "bytes": 2901,
+      "sha256": "42f7dee0db6a9e65c66c515b376d00703308d54ca96fbaf5033fc69dc1d5ffcf"
+    },
+    "noedit-movie-track-tail.webp": {
+      "bytes": 464,
+      "sha256": "15e160de0827a42f62a73490d690561125232cff77877db53148cbc1ece035db"
+    },
+    "coherent-stsz-four.mp4": {
+      "bytes": 2941,
+      "sha256": "6d1129149eccd627df7112e60dea6e791466710a260360b49d7cc165297d7576"
+    },
+    "coherent-stsz-four-unsafe.webp": {
+      "bytes": 464,
+      "sha256": "af3d9003c447a0503c289d78c63ec6f11d6e9b719243387ace40842b71a19bd9"
+    }
+  }
+}
