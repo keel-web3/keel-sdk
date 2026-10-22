@@ -33,3 +33,10 @@ export async function qualifyAuthoredPublishedModules(input: readonly KeelAuthor
 export function assertAuthoredPublishedRecords(expected: readonly KeelAuthoredPublishedModule[], actual: readonly KeelAuthoredPublishedModule[]) {
   if (canonicalJson(expected) !== canonicalJson(actual)) throw new TypeError("Published authored dependency source, API/license profile, aliases, chain or complete closure changed.");
 }
+
+/** Exact maintained dependency metadata; never an availability/receipt claim. */
+export function authoredPublishedRuntimeProfiles(runtime: string, version?: string) {
+  if (runtime !== "three" || version !== undefined && version !== KEEL_THREE_R180.version) throw new TypeError("The authored runtime needs its exact supported Three 0.180.0 profile; a pinned version cannot be silently substituted.");
+  return AUTHORED_THREE_PROFILES.map(profile => ({ moduleId: profile.moduleId, version: KEEL_THREE_R180.version, digest: profile.digest, byteLength: profile.byteLength,
+    mediaType: "text/javascript" as const, execution: "module" as const, license: "MIT" as const, aliases: [...profile.aliases], dependencies: [...profile.dependencies] }));
+}

@@ -1,4 +1,5 @@
 import path from "node:path";
+import { resolveAuthoredRuntime } from "./authored-runtime-resolution.js";
 import { mkdir, open } from "node:fs/promises";
 import type { KeelAuthoredProjectGraph, KeelAuthoredProjectInput, KeelAuthoredPublishedModuleInput } from "@keel/sdk/authored-project-graph";
 import type { KeelStudioStagedProjectFile } from "@keel/sdk/studio-upload";
@@ -31,7 +32,7 @@ export async function loadAuthoredProject(context: ToolContext, manifest: string
 export const AUTHORED_PROJECT_TOOL_DEFINITIONS: readonly ToolDefinition[] = [{
   descriptor: {
     name: "keel-project-author",
-    description: "Default authoring path for NEW agent-created JavaScript artwork. The agent chooses functional boundaries and authors exact ES module sources; this tool generates only a small bootstrap and HTML, parses real imports, rejects unresolved/disconnected modules and writes an immutable digest-bound source graph. Keep behavior/data/rendering modules separate; byte chunks or an entry importing one flattened bundle do not satisfy the design. Existing uploaded code is preserved through ordinary staging. Search and verify selected-chain runtime reuse before authoring replacements. Output stageArguments must pass unchanged through keel-studio-stage-project; no publication, signatures or spend occurs.",
+    description: "Default authoring path for NEW agent-created JavaScript artwork. The agent chooses functional boundaries and authors exact ES module sources; this tool generates only a small bootstrap and HTML, parses real imports, rejects unresolved/disconnected modules and writes an immutable digest-bound source graph. Keep behavior/data/rendering modules separate; byte chunks or an entry importing one flattened bundle do not satisfy the design. Existing uploaded code is preserved through ordinary staging. Actual Three imports (or engine runtime intent) automatically resolve the connected Studio's exact maintained published core/main closure and cache verified public source privately. Never ask creators for bindings, provider or cache paths. Unsupported/pinned version mismatches and unresolved imports fail closed. Output stageArguments must pass unchanged through keel-studio-stage-project; no publication, signatures or spend occurs.",
     inputSchema: { type: "object", additionalProperties: false, properties: {
       title: { type: "string", minLength: 1, maxLength: 160 }, chainId: { type: "integer", minimum: 1 },
       modules: { type: "array", minItems: 2, maxItems: 64, items: { type: "object", additionalProperties: false, properties: {
@@ -39,10 +40,9 @@ export const AUTHORED_PROJECT_TOOL_DEFINITIONS: readonly ToolDefinition[] = [{
         purpose: { type: "string", minLength: 1, maxLength: 320 }, source: { type: "string", minLength: 1, maxLength: 2_000_000 },
       }, required: ["id", "purpose", "source"] } },
       start: { type: "object", additionalProperties: false, properties: { module: { type: "string", minLength: 1, maxLength: 96 }, export: { type: "string", minLength: 1, maxLength: 128 } }, required: ["module", "export"] },
-      publishedModules: { type: "array", minItems: 2, maxItems: 2, description: "Agent-resolved exact current Three r180 core/main closure. Discover current selected-chain bindings with keel-library-search; read/hash their public sources into the private workspace. Never ask the creator for cache paths or bindings and never embed these library bytes in creator modules.", items: { type: "object", additionalProperties: false, properties: {
-        binding: { type: "object", additionalProperties: false, properties: { moduleId: { type: "string" }, version: { type: "string" }, digest: { type: "string" }, objectId: { type: "string" }, store: { type: "string" }, chain: { type: "string" } }, required: ["moduleId", "version", "digest", "objectId", "store", "chain"] },
-        sourcePath: { type: "string", minLength: 1, maxLength: 2048, description: "Agent-owned exact cached PUBLIC module source. Used only for parsing/hashing; not copied into the authored revision or staged." },
-      }, required: ["binding", "sourcePath"] } },
+      runtime: { type: "string", enum: ["three"], description: "Agent/engine runtime intent. Actual imports infer the maintained runtime automatically; ordinary creators do not select bindings, cache paths or providers." },
+      runtimeVersion: { type: "string", minLength: 1, maxLength: 80, description: "Preserve an explicitly requested dependency version. Unsupported versions fail instead of being substituted." },
+      studioUrl: { type: "string", minLength: 1, maxLength: 2048, description: "Existing connected Studio origin; no provider or source URL override." },
       stylesheet: { type: "string", minLength: 1, maxLength: 1_000_000 },
       assets: { type: "array", maxItems: 64, items: { type: "object", additionalProperties: false, properties: {
         path: { type: "string", maxLength: 103, description: "Stable logical target under assets/, for example assets/palette.json." },
@@ -54,7 +54,9 @@ export const AUTHORED_PROJECT_TOOL_DEFINITIONS: readonly ToolDefinition[] = [{
   },
   async run(context, value) {
     if (!value || typeof value !== "object" || Array.isArray(value)) throw new TypeError("Authored project arguments must be an object.");
-    const { out, assets, publishedModules, ...input } = value as Record<string, unknown>;
+    if (Object.keys(value).some(key => !["title", "chainId", "modules", "start", "runtime", "runtimeVersion", "studioUrl", "stylesheet", "assets", "out"].includes(key))) throw new TypeError("Authored work uses automatic maintained runtime discovery; custom bindings, source URLs and cache paths are not author inputs.");
+    const { out, assets, runtime, runtimeVersion, studioUrl, ...input } = value as Record<string, unknown>;
+    if (!Number.isSafeInteger(input.chainId) || Number(input.chainId) < 1) throw new TypeError("An exact selected chain is required before authored runtime resolution.");
     if (typeof out !== "string" || !out || out.length > 512) throw new TypeError("Authored output directory is required.");
     const root = await context.workspace.resolveOutputDirectory(out);
     if (assets !== undefined && (!Array.isArray(assets) || assets.length > 64)) throw new TypeError("Authored assets must be a bounded list of exact private workspace sources.");
@@ -66,12 +68,13 @@ export const AUTHORED_PROJECT_TOOL_DEFINITIONS: readonly ToolDefinition[] = [{
     }
     const published: KeelAuthoredPublishedModuleInput[] = [];
     const sourceCache: { moduleId: string; sourcePath: string }[] = [];
-    if (publishedModules !== undefined && (!Array.isArray(publishedModules) || publishedModules.length !== 2)) throw new TypeError("Published dependencies require the complete maintained core/main closure.");
-    for (const candidate of (publishedModules ?? []) as Record<string, unknown>[]) {
-      if (!candidate || typeof candidate !== "object" || Array.isArray(candidate) || Object.keys(candidate).some(key => !["binding", "sourcePath"].includes(key)) || typeof candidate.sourcePath !== "string" || !candidate.binding || typeof candidate.binding !== "object") throw new TypeError("Invalid exact published module cache.");
-      const selected = candidate.binding as KeelAuthoredPublishedModuleInput["binding"];
-      published.push({ binding: selected, source: (await context.workspace.readFile(candidate.sourcePath, 2_000_000)).bytes });
-      sourceCache.push({ moduleId: selected.moduleId, sourcePath: candidate.sourcePath });
+    const { inferKeelAuthoredRuntime } = await import("@keel/sdk/authored-project/node");
+    if (runtime !== undefined && typeof runtime !== "string" || runtimeVersion !== undefined && typeof runtimeVersion !== "string" || studioUrl !== undefined && typeof studioUrl !== "string") throw new TypeError("Invalid authored runtime intent.");
+    const selected = inferKeelAuthoredRuntime(input.modules as KeelAuthoredProjectInput["modules"], runtime === undefined ? runtimeVersion === undefined ? undefined : { runtime: "three", version: runtimeVersion } : { runtime, ...(runtimeVersion === undefined ? {} : { version: runtimeVersion }) });
+    const resolution = selected ? await resolveAuthoredRuntime(context, { ...selected, chainId: Number(input.chainId), ...(studioUrl === undefined ? {} : { studioUrl }) }) : undefined;
+    if (resolution) for (const module of resolution.sources) {
+      published.push(module);
+      sourceCache.push({ moduleId: module.binding.moduleId, sourcePath: `.keel-mcp/public-runtime-cache/${input.chainId}/${module.binding.digest.slice(7)}.js` });
     }
     const { createKeelAuthoredProject } = await import("@keel/sdk/authored-project/node");
     const project = await createKeelAuthoredProject({ ...input, ...(loadedAssets.length ? { assets: loadedAssets } : {}), ...(published.length ? { publishedModules: published } : {}) } as unknown as KeelAuthoredProjectInput);
@@ -79,6 +82,7 @@ export const AUTHORED_PROJECT_TOOL_DEFINITIONS: readonly ToolDefinition[] = [{
     const relativeDirectory = path.relative(context.workspace.root, directory).split(path.sep).join("/");
     const manifest = `${relativeDirectory}/keel-authored-project.json`;
     const entries = project.files.map(file => ({ path: `${relativeDirectory}/${file.path}`, bytes: file.bytes as Uint8Array }));
+    for (const [index, source] of published.entries()) entries.unshift({ path: sourceCache[index]!.sourcePath, bytes: source.source });
     if (sourceCache.length) entries.push({ path: `${relativeDirectory}/keel-authored-published-sources.json`, bytes: new TextEncoder().encode(`${JSON.stringify(sourceCache)}\n`) });
     entries.push({ path: manifest, bytes: new TextEncoder().encode(`${JSON.stringify(project.graph, null, 2)}\n`) });
     // Validate every destination first. Existing exact revisions are safe to
@@ -111,7 +115,7 @@ export const AUTHORED_PROJECT_TOOL_DEFINITIONS: readonly ToolDefinition[] = [{
       sourceBytes: project.sourceBytes, completePresentationBytes: null,
       stageArguments: { title: input.title, storageStrategy: "onchain", authoredProject: manifest,
         files: project.files.map(({ bytes: _bytes, ...file }) => ({ ...file, path: `${relativeDirectory}/${file.path}` })) },
-      sharedReuse: { status: "selected-chain-verification-required", knownRuntimeRoute: "Studio-selected verified runtime catalog", arbitrarySharedBindings: "unqualified-custom-profiles-blocked", publishedModuleIds: project.graph.publishedModules?.map(module => module.binding.moduleId) ?? [], publishedBytesStaged: 0 },
+      sharedReuse: { status: resolution ? "current-studio-discovery-verified; normal-preparation-revalidates" : "no-maintained-runtime-imports", knownRuntimeRoute: "automatically resolved current Studio catalog", ...(resolution ? { pin: resolution.pin, reader: resolution.reader } : {}), arbitrarySharedBindings: "unqualified-custom-profiles-blocked", publishedModuleIds: project.graph.publishedModules?.map(module => module.binding.moduleId) ?? [], publishedBytesStaged: 0 },
       publicationReady: false, signing: "not-performed", submission: "not-performed",
     };
   },

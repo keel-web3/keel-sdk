@@ -84,6 +84,7 @@ export const DETERMINISTIC_TEST_FILES = Object.freeze([
   "tests/temporal-webp.test.mjs",
   "tests/sdk-authored-project.test.mjs",
   "tests/sdk-authored-published-project.test.mjs",
+  "tests/mcp-authored-runtime-resolution.test.mjs",
   "tests/media-viewer-adapters.test.mjs",
   "tests/native-media-inspection.test.mjs",
   "tests/native-media-graph.test.mjs",

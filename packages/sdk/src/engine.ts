@@ -47,7 +47,7 @@ export const KEEL_ENGINE_CATALOG = {
   schema: "keel-engine-catalog@1",
   projectArchitecture: {
     default: "modular",
-    authoring: { tool: "keel-project-author", origin: "new-agent-authored-executable", output: "actual-files-and-digest-bound-dependency-graph", staging: "keel-studio-stage-project with exact authoredProject and files", sourcePolicy: "Preserve supplied originals; author functional ES modules instead of slicing bytes or flattening code.", creatorQuestions: "creative-intent-rights-budget-or-visible-quality-only", sharedReuse: "Search and verify selected-chain catalog; unknown imports and unsupported arbitrary shared bindings block staging." },
+    authoring: { tool: "keel-project-author", origin: "new-agent-authored-executable", output: "actual-files-and-digest-bound-dependency-graph", staging: "keel-studio-stage-project with exact authoredProject and files", sourcePolicy: "Preserve supplied originals; author functional ES modules instead of slicing bytes or flattening code.", creatorQuestions: "creative-intent-rights-budget-or-visible-quality-only", sharedReuse: "keel-project-author infers actual Three imports or engine runtime intent, authenticates the existing Studio connection and resolves its exact maintained selected-chain core/main closure automatically; no creator bindings, cache paths or RPC choices. Pinned version mismatch and unknown/unqualified imports fail closed; normal Studio preparation revalidates." },
     audience: "Creators do not need development or storage expertise.",
     assetPlanning: {
       discovery: "Inventory every supplied asset and its actual type, digest, size and dependencies; preserve originals and search selected-chain registry/index for exact reusable objects.",

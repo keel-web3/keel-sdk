@@ -125,7 +125,7 @@ function projectRouteInstructions(
     outcomeRoute,
     scopeRoute,
     runtimeRoute,
-    "For NEW agent-authored JavaScript, use keel-project-author to create separate functional ES modules, a generated bootstrap and digest-bound dependency graph; pass its exact authoredProject/files to keel-studio-stage-project. A byte-chunk plan or one flattened creator bundle is insufficient. Existing uploaded originals and an explicit self-contained creator choice stay unchanged. Search and verify selected-chain shared runtimes before generating replacements; unresolved imports block staging.",
+    "For NEW agent-authored JavaScript, use keel-project-author to create separate functional ES modules, a generated bootstrap and digest-bound dependency graph; pass its exact authoredProject/files to keel-studio-stage-project. A byte-chunk plan or one flattened creator bundle is insufficient. Existing uploaded originals and an explicit self-contained creator choice stay unchanged. The author tool infers Three imports and automatically resolves the exact maintained core/main closure through the existing authenticated Studio connection. Pass engine runtime intent when appropriate; preserve pinned versions. The agent does not ask the creator for module bindings, source/cache paths or RPC servers. Unknown imports and unsupported versions block staging; normal Studio preparation revalidates exact selected-chain bytes and registration.",
     chainRoute,
   ];
 }

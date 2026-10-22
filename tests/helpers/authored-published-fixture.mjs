@@ -13,3 +13,9 @@ export async function publishedThreeFixture(){
  for(const item of fixture.modules){const bytes=Buffer.from(item.fragmentBase64,'base64');assert.equal((await createIntegrity(bytes)).digest,item.entry.digest);assert.equal(bytes.length,item.entry.byteLength)}
  return{...fixture,publishedModules};
 }
+
+export async function authoredRuntimeResolutionFixture(){
+ const fixture=await publishedThreeFixture();const {currentNativeMediaRecipe}=await import('./native-media-fixtures.mjs');const {registeredNativeGzipBinding:reader}=await currentNativeMediaRecipe();
+ return{schema:'keel-authored-runtime-resolution@1',runtime:'three',version:'0.180.0',chainId:11155111,pin:{blockNumber:'11967301',blockHash:fixture.readbackBlock.hash},reader:{...reader,builderDeploymentTransactionHash:reader.readerDeploymentTransactionHash},
+ modules:await Promise.all(fixture.publishedModules.map(async(module,index)=>({binding:module.binding,sourceIntegrity:await createIntegrity(module.source),sourceBase64:Buffer.from(module.source).toString('base64'),license:'MIT',execution:'module',aliases:fixture.modules[index].entry.aliases,dependencies:index?['three-r180-core']:[],fragment:{objectId:fixture.modules[index].entry.objectId,integrity:{algorithm:'sha256',digest:fixture.modules[index].entry.digest,byteLength:fixture.modules[index].entry.byteLength},mediaType:fixture.modules[index].entry.mediaType,compression:'none'}}))),publicationReady:false,signing:'not-performed',submission:'not-performed'};
+}

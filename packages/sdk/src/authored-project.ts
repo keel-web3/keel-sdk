@@ -1,6 +1,7 @@
-/** Node-side authoring. Source modules are parsed, never split or rewritten. */
+/** Node-side authoring preserves original modules; Compact delivery links only
+ * parsed maintained runtime imports to the current registered aliases. */
 import path from "node:path";
-import { qualifyAuthoredPublishedModules, assertAuthoredPublishedRecords } from "./authored-published-modules.js";
+import { qualifyAuthoredPublishedModules, assertAuthoredPublishedRecords, authoredPublishedRuntimeProfiles } from "./authored-published-modules.js";
 import type { KeelAuthoredPublishedModuleInput, KeelAuthoredPublishedModule } from "./authored-project-graph.js";
 import { build, transform } from "esbuild";
 import ts from "typescript";
@@ -8,6 +9,7 @@ import { inspectKeelNativeSVG } from "./native-media-inspection.js";
 import { canonicalJson, createIntegrity, resolveKeelPayloadStorage, type KeelPayloadStorageMode, type Integrity } from "@keel/protocol";
 import type { KeelStudioStagedProjectFile } from "./studio-upload.js";
 
+export { authoredPublishedRuntimeProfiles, qualifyAuthoredPublishedModules } from "./authored-published-modules.js";
 export { KEEL_AUTHORED_PROJECT_PROTOCOL } from "./authored-project-graph.js";
 export type { KeelAuthoredModule, KeelAuthoredProjectInput, KeelAuthoredProjectNode, KeelAuthoredProjectEdge, KeelAuthoredProjectGraph } from "./authored-project-graph.js";
 import { KEEL_AUTHORED_PROJECT_PROTOCOL, assertKeelAuthoredProjectCommitments, type KeelAuthoredModule, type KeelAuthoredProjectInput, type KeelAuthoredProjectNode, type KeelAuthoredProjectEdge, type KeelAuthoredProjectGraph } from "./authored-project-graph.js";
@@ -34,6 +36,7 @@ function localImport(importer: string, specifier: string): string {
 async function moduleEdges(files: readonly KeelStudioStagedProjectFile[], published: readonly KeelAuthoredPublishedModule[], publishedSources: readonly KeelAuthoredPublishedModuleInput[]): Promise<KeelAuthoredProjectEdge[]> {
   const sources = new Map(files.map(file => [file.path, file]));
   const sharedAliases = new Map(published.flatMap(module => module.aliases.map(alias => [alias, `published:${module.binding.moduleId}`] as const)));
+  if (published.some(module => module.binding.moduleId === "three-r180-module")) for (const alias of ["three", "three@0.180.0"]) sharedAliases.set(alias, "published:three-r180-module");
   for (const module of publishedSources) sources.set(`published:${module.binding.moduleId}`, { path: `published:${module.binding.moduleId}`, bytes: module.source, mediaType: "text/javascript", role: "module", format: "es-module" });
   const edges = new Map<string, KeelAuthoredProjectEdge>();
   const result = await build({
@@ -352,8 +355,10 @@ export async function buildKeelAuthoredInlineDocument(input: {
       // reader accepts named/namespace/default imports and named exports, not
       // runtime import(), import.meta, star reexports or combined clauses.
       const source = new TextDecoder("utf-8", { fatal: true }).decode(bytes);
-      const compiled = await compileAuthoredModule(source, id);
+      const linked = linkAuthoredPublishedImports(source, graph.publishedModules ?? []);
+      const compiled = await compileAuthoredModule(linked, id);
       if (payloadStorage === "raw") {
+        if (linked !== source) throw new TypeError("Raw authored modules must use the exact registered runtime aliases. Preserve the original source and have the agent reauthor its import using the resolved alias.");
         qualifyAuthoredModuleSyntax(source, id, true);
       } else bytes = compiled;
     } else if (file.mediaType === "text/css") {
@@ -376,4 +381,41 @@ export async function buildKeelAuthoredInlineDocument(input: {
   let offset = 0; for (const part of parts) { rootBytes.set(part.bytes, offset); offset += part.bytes.length; }
   return { schema: "keel-inline-local-document@1" as const, rootBytes, rootIntegrity: await createIntegrity(rootBytes), byteLength: rootBytes.length, parts,
     authored: { sourceGraphDigest: graph.digest, resources: creator.map(({ part, ...item }) => ({ ...item, fragmentIntegrity: part.integrity })), publicationReady: false as const } };
+}
+
+/** Parse actual new creator imports; ordinary creators never choose a runtime ABI. */
+export function inferKeelAuthoredRuntime(modules: readonly KeelAuthoredModule[], requested?: { readonly runtime: string; readonly version?: string }) {
+  let detected = false; let version = requested?.version;
+  for (const module of modules) {
+    const parsed = ts.createSourceFile(module.id, module.source, ts.ScriptTarget.ES2022, true, ts.ScriptKind.JS);
+    for (const statement of parsed.statements) {
+      const specifier = (ts.isImportDeclaration(statement) || ts.isExportDeclaration(statement)) && statement.moduleSpecifier;
+      if (!specifier || !ts.isStringLiteral(specifier)) continue;
+      const value = specifier.text;
+      if (/^(?:three(?:@[^/]+)?|(?:\.\/|\/content\/)?three\.(?:module|core)\.min\.js)$/u.test(value)) {
+        detected = true;
+        const pinned = /^three@([^/]+)$/u.exec(value)?.[1];
+        if (pinned && version !== undefined && pinned !== version) throw new TypeError("The authored dependency has conflicting pinned Three versions.");
+        if (pinned) version = pinned;
+      }
+    }
+  }
+  if (requested && requested.runtime !== "three") throw new TypeError("This authored runtime has no qualified automatic module resolver.");
+  if (!detected && !requested) return undefined;
+  authoredPublishedRuntimeProfiles("three", version);
+  return { runtime: "three" as const, version: version ?? "0.180.0" };
+}
+
+/** Rewrite only parsed new-author import specifiers for the current registered
+ * alias. Exact supplied originals remain private and their digests are kept. */
+function linkAuthoredPublishedImports(source: string, published: readonly KeelAuthoredPublishedModule[]) {
+  if (!published.some(module => module.binding.moduleId === "three-r180-module")) return source;
+  const parsed = ts.createSourceFile("authored.js", source, ts.ScriptTarget.ES2022, true, ts.ScriptKind.JS);
+  const replacements: { start: number; end: number }[] = [];
+  for (const statement of parsed.statements) {
+    const value = (ts.isImportDeclaration(statement) || ts.isExportDeclaration(statement)) && statement.moduleSpecifier;
+    if (value && ts.isStringLiteral(value) && ["three", "three@0.180.0"].includes(value.text)) replacements.push({ start: value.getStart(parsed), end: value.end });
+  }
+  for (const range of replacements.reverse()) source = source.slice(0, range.start) + JSON.stringify("three.module.min.js") + source.slice(range.end);
+  return source;
 }
