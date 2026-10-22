@@ -1,0 +1,64 @@
+{
+  "schema": "keel.retired-browser-requirement-correction@1",
+  "runtimeSource": "81cb23c57a5f426324acd0961ae21476de9cd861",
+  "affectedBrowser": {
+    "pass": 9,
+    "fail": 0,
+    "skip": 0
+  },
+  "fullClassifiedBrowserAfterCorrection": "not-run",
+  "files": [
+    {
+      "path": "README.md",
+      "bytes": 1492,
+      "sha256": "b337df66fa22e2f5e8c89fc15b05dee4d65bf274b1cea4e3d6f928ef9242040c"
+    },
+    {
+      "path": "approved-exact-test-correction.patch",
+      "bytes": 8958,
+      "sha256": "cb0dbfae57e501ce15c55de1838ad8523d8145dee4aa27306bdd28943f06dcc1"
+    },
+    {
+      "path": "approved-sdk-retired-browser-cases-installed1234.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "approved-sdk-retired-browser-cases-installed1234.stdout",
+      "bytes": 2414,
+      "sha256": "8ca8b285fa1ac27604f14ebd239881f1dba2758a125944a8ece8933fba0c45b0"
+    },
+    {
+      "path": "approved-sdk-retired-browser-cases.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "approved-sdk-retired-browser-cases.stdout",
+      "bytes": 3790,
+      "sha256": "717f65134cd100fdd3d3497b3931ec224d522febba4faa67374fefa54e06a172"
+    },
+    {
+      "path": "independent-retired-requirement-review.json",
+      "bytes": 2294,
+      "sha256": "960d1a6b68d19e0c9911fb1fab32647c5d17cd7278e4d0541990a08527fccd07"
+    },
+    {
+      "path": "postfreeze-479.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "postfreeze-479.stdout",
+      "bytes": 2408,
+      "sha256": "095b5a3732baf17e8439fe38e47040d66336216d5e6ca18d3743bc27958606f9"
+    },
+    {
+      "path": "postfreeze-result.json",
+      "bytes": 969,
+      "sha256": "eebb1628c23917ba20baf2bd6cac628319706224145f20b1d7350a8fc8688c92"
+    }
+  ],
+  "sourceCommit": "479892cf5f6d8d883d51a28598aa3f4fdb546f51",
+  "postfreezeExitCode": 0
+}

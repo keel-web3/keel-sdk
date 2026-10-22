@@ -1,0 +1,19 @@
+{
+  "sourceCommit": "479892cf5f6d8d883d51a28598aa3f4fdb546f51",
+  "runtimeSource": "81cb23c57a5f426324acd0961ae21476de9cd861",
+  "command": [
+    "/Users/ravonus/.nvm/versions/node/v22.22.1/bin/node",
+    "--test",
+    "tests/sdk-legacy-prepared-dense-browser.test.mjs",
+    "tests/sdk-verification-shell-browser.test.mjs"
+  ],
+  "installedChrome": "/Users/ravonus/Library/Caches/ms-playwright/chromium_headless_shell-1234/chrome-headless-shell-mac-arm64/chrome-headless-shell",
+  "exitCode": 0,
+  "seconds": 2.2231970420107245,
+  "testHashes": {
+    "tests/sdk-legacy-prepared-dense-browser.test.mjs": "6f609275d88189c0dddb4bbee27a5155880e4df000c8208014ebc38b646178f6",
+    "tests/sdk-verification-shell-browser.test.mjs": "3eb5f245d91b89cae07472cd0a0aed416e276b58b94d4ed8c9ad5bcd2fe7c67f"
+  },
+  "stdoutSHA256": "095b5a3732baf17e8439fe38e47040d66336216d5e6ca18d3743bc27958606f9",
+  "stderrSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+}

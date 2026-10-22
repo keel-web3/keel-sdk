@@ -1,0 +1,23 @@
+{
+  "reviewerId": "cache-release-reviewer",
+  "productionEditsByReviewer": false,
+  "authorFilesChangedByReviewer": false,
+  "scope": "Exact test observation/reference/setup correction only; no source, full source/gate, native/governance/live or activation approval. Retain original RED receipts and rerun affected exact cases.",
+  "decision": "APPROVED_EXACT_REQUIREMENT_CORRECTION",
+  "patchPath": "/private/tmp/keel-sdk-retired-browser-test-proposal-20261021/proposal.patch",
+  "patchSHA256": "cb0dbfae57e501ce15c55de1838ad8523d8145dee4aa27306bdd28943f06dcc1",
+  "source": "81cb23c57a5f426324acd0961ae21476de9cd861",
+  "reason": "Owner-required retirement is already unconditional in frozen prechange b0 as well as81cb: legacy Dense fresh-document builder and preEncoded/escaped graph builders throw before any historical browser document exists, even with legacy acknowledgment. The old five positives cannot test supported fresh publication. Keeping their exact original preparation/source/boot inputs and five cases, but asserting the exact existing rejection, correctly tests the retired boundary. No implementation restoration, skip or production change.",
+  "coverageChangedExplicitly": [
+    "The three retired Dense positive/data-before-render/tamper browser assertions are removed from these cases because no historical document may be prepared.",
+    "The two retired preEncoded/escaped context/encoding/browser-success assertions are removed from these cases.",
+    "These five negative cases are not positive browser/render/context-fidelity proof and do not substitute for current-program context or current tamper gates.",
+    "Other current canonical shell/security/browser fixtures and assertions remain untouched."
+  ],
+  "independentEvidence": {
+    "proposalScratchExecution": "5 PASS0FAIL0SKIP using exact proposed hashes; only reviewer-owned copies patched.",
+    "resultPath": "/private/tmp/keel-independent-test-corrections-20261022/retired-proposed-result.json",
+    "resultSHA256": "4fde3dd9eba993283d9eece6d1e958a2a761c2fce115eb13f91d98aa3e183d47",
+    "baseline": "Read actual frozen b0 source: same unconditional exact guards. Author direct unchanged old-case0P5F baseline and full55P6F failure preserved in docs/review/native-svg-style-full-81cb-20261021."
+  }
+}
