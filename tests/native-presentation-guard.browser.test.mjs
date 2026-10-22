@@ -16,6 +16,6 @@ for(const [name,width] of [['sar',64],['title',32]])test(`current canonical play
   assert.equal(geometry.tag,'VIDEO');assert.equal(geometry.width,width);assert.equal(geometry.height,24);assert.equal(geometry.fit,'contain');
   const digest=await childEvaluate(`(async()=>Array.from(new Uint8Array(await crypto.subtle.digest('SHA-256',__KEEL_CONTENT__.bytes('native-semantic-source'))),n=>n.toString(16).padStart(2,'0')).join(''))()`);
   assert.equal(digest,createHash('sha256').update(source).digest('hex'));return{...geometry,sourceSHA256:digest,sourceBytes:source.length,scope:'local current canonical player; no chain, remote upload, signing or publication'};
- });
+ },{mountSelector:'#keel-asset-display video'});
  if(process.env.KEEL_TEMPORAL_EVIDENCE_DIR){await mkdir(process.env.KEEL_TEMPORAL_EVIDENCE_DIR,{recursive:true});await writeFile(path.join(process.env.KEEL_TEMPORAL_EVIDENCE_DIR,'native-'+name+'.json'),JSON.stringify(result,null,2)+'\n');}
 });
