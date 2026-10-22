@@ -11,6 +11,7 @@ import { resolveBundledFfmpeg } from "./media-optimization.js";
 import { parseKeelMediaEditRecipe, type KeelMediaEditRecipe } from "./media-edit-recipe.js";
 import { assignTemporalWebPDelays } from "./temporal-webp.js";
 import { actualAvifContainer, assertActualImageSequence, assertActualCandidateContainer } from "./actual-media-container.js";
+import { assertMoviePresentationSemantics } from "./movie-presentation-semantics.js";
 export * from "./media-edit-recipe.js";
 
 const MAX_BYTES = 256 * 1024 * 1024;
@@ -43,7 +44,7 @@ export interface KeelMediaCandidate {
   readonly warnings: readonly string[];
 }
 function animatedAvif(bytes:Uint8Array) { return actualAvifContainer(bytes)?.sequence === true; }
-interface Decoded { info: KeelMediaInfo; hashes: readonly string[]; rgba?:Uint8Array; videoMap?:string; imageMetadata?: ImageMetadata; startTimeMs?: number; extraStreams?: boolean; }
+interface Decoded { info: KeelMediaInfo; hashes: readonly string[]; rgba?:Uint8Array; videoMap?:string; imageMetadata?: ImageMetadata; startTimeMs?: number; extraStreams?: boolean; srgbFull?:boolean; }
 function hash(bytes: Uint8Array) { const h = createHash("sha256"); h.update(bytes); return h.digest("hex"); }
 function bounded(bytes: Uint8Array) { if (!(bytes instanceof Uint8Array) || bytes.byteLength < 1 || bytes.byteLength > MAX_BYTES) throw new RangeError(`Media must contain 1–${MAX_BYTES} bytes.`); }
 function geometry(recipe: KeelMediaEditRecipe) { return recipe.crop !== undefined || recipe.width !== undefined || recipe.height !== undefined || (recipe.rotate ?? 0) !== 0 || (recipe.layers?.length ?? 0) > 0; }
@@ -134,7 +135,8 @@ async function ffmpegRun(binary: string, cwd: string, args: string[], signal?:Ab
 }
 async function decodeMovie(binary: string, cwd: string, input: string, signal?:AbortSignal, exactOrigin = false): Promise<Decoded> {
   signal?.throwIfAborted();
-  const avifSequence = animatedAvif(new Uint8Array(await readFile(path.join(cwd,input))));
+  const containerBytes = new Uint8Array(await readFile(path.join(cwd,input)));
+  const avifSequence = animatedAvif(containerBytes);
   // The pinned platform builds expose AVIF sequences either as the sole video
   // stream or after a primary-image stream. Probe the actual container first.
   const origin = exactOrigin ? ["-copyts"] : [];
@@ -146,6 +148,7 @@ async function decodeMovie(binary: string, cwd: string, input: string, signal?:A
   const selectedStream = videoStreams[videoIndex]!;
   const dims = /Video:[^\n]*?\b(\d{1,5})x(\d{1,5})\b/u.exec(selectedStream);
   if (!dims || Number(dims[1])*Number(dims[2]) > MAX_PIXELS || Math.max(Number(dims[1]),Number(dims[2])) > 8192) throw new Error("Movie dimensions are unavailable or exceed the decode budget.");
+  const presentation = assertMoviePresentationSemantics(containerBytes,probe.stderr.split("Output #")[0]!,selectedStream,Number(dims[1]),Number(dims[2]));
   const duration=/Duration:\s*(\d+):(\d+):(\d+(?:\.\d+)?)/u.exec(probe.stderr), rate=/,\s*([\d.]+) fps/u.exec(selectedStream);
   if (duration && rate) {
     const expectedFrames=(Number(duration[1])*3600+Number(duration[2])*60+Number(duration[3]))*Number(rate[1]);
@@ -178,7 +181,7 @@ async function decodeMovie(binary: string, cwd: string, input: string, signal?:A
   if (times.some(n=>!Number.isFinite(n)) || delays.some(n=>!Number.isFinite(n)||n<=0)) throw new Error("Movie frame timing is incomplete.");
   // RGBA8 hashes must never be misrepresented as verification of HDR or high-depth source samples.
   if (/Video:[^\n]*(?:yuv\w*p(?:9|10|12|14|16)|gbrp(?:9|10|12|14|16)|rgba64|rgb48|bt2020|smpte2084|arib-std-b67)/iu.test(stderr)) throw new Error("High-depth/HDR movie edits need a color-preserving adapter. Original bytes remain supported.");
-  return {info:{width,height,durationMs:times.at(-1)!+delays.at(-1)!,frameCount:frames.length,animated:frames.length>1,hasAudio:/Stream #.*Audio:/u.test(stderr),frameTimesMs:times,frameDurationsMs:delays},hashes:frames.map(f=>f[5]!),videoMap,startTimeMs:first*timingBase,extraStreams:/Stream #.*(?:Subtitle|Data|Attachment):/u.test(probe.stderr)};
+  return {info:{width,height,durationMs:times.at(-1)!+delays.at(-1)!,frameCount:frames.length,animated:frames.length>1,hasAudio:/Stream #.*Audio:/u.test(stderr),frameTimesMs:times,frameDurationsMs:delays},hashes:frames.map(f=>f[5]!),videoMap,startTimeMs:first*timingBase,extraStreams:/Stream #.*(?:Subtitle|Data|Attachment):/u.test(probe.stderr),srgbFull:presentation.srgbFull};
 }
 function assertSingleFileMedia(bytes:Uint8Array) {
   const ascii = new TextDecoder("latin1").decode(bytes.subarray(0,32));
@@ -202,6 +205,10 @@ async function movieCandidate(bytes: Uint8Array, recipe: KeelMediaEditRecipe, si
   try {
     await writeFile(path.join(dir,"source"),bytes,{flag:"wx"});
     const source = decodedImage ?? await decodeMovie(runtime.binary,dir,"source",signal); checkGeometry(recipe,source.info);
+    if(decodedImage) {
+      const meta=decodedImage.imageMetadata!;
+      if(meta.orientation && meta.orientation!==1 || meta.depth && meta.depth!=="uchar" || meta.space && !["srgb","b-w"].includes(meta.space) || [meta.icc,meta.exif,meta.xmp,meta.iptc].some(value=>value!==undefined)) throw new Error("Movie export cannot preserve these image color, orientation or creator metadata semantics; native media is retained.");
+    }
     const imageDelay=source.info.frameDurationsMs[0] ?? 0;
     if (decodedImage && (!source.info.animated || imageDelay<=0 || source.info.frameDurationsMs.some(n=>!Number.isSafeInteger(n)||n<=0))) throw new Error("Image-to-movie export requires a complete animation with positive millisecond frame delays.");
     const variableImageTiming=decodedImage && source.info.frameDurationsMs.some(n=>n!==imageDelay);
@@ -218,8 +225,13 @@ async function movieCandidate(bytes: Uint8Array, recipe: KeelMediaEditRecipe, si
     }
     if (decodedImage) await writeFile(path.join(dir,"source.rgba"),decodedImage.rgba!,{flag:"wx"});
     if (["webp","avif"].includes(recipe.format) && source.info.hasAudio && !recipe.noSound) throw new Error("Image output cannot retain audio. Enable No sound explicitly or keep a movie/original output.");
+    if (["webp","avif"].includes(recipe.format) && !decodedImage && !source.srgbFull) throw new Error("The source movie has unspecified color semantics; this image conversion cannot claim lossless preservation. Native media is retained.");
     if (geometry(recipe)) throw new Error("Movie geometry editing is not yet verified by this adapter; preserve original geometry or use an explicit image edit.");
     const args = ["-loglevel","error","-protocol_whitelist","file,pipe","-threads","2",...(variableImageTiming ? ["-i","timeline.apng"] : decodedImage ? ["-f","rawvideo","-pixel_format","rgba","-video_size",`${source.info.width}x${source.info.height}`,"-framerate",`1000/${imageDelay}`,"-i","source.rgba"] : ["-i","source"]),"-map",source.videoMap ?? "0:v:0","-vsync","0","-enc_time_base","-1"];
+    // Raw RGBA input otherwise loses its established Sharp sRGB semantics.
+    // Forward only an actually qualified profile; unspecified movies never
+    // acquire invented sRGB authority just to make an AVIF candidate pass.
+    if(decodedImage || source.srgbFull) args.push("-color_primaries","bt709","-color_trc","iec61966-2-1","-colorspace","rgb","-color_range","pc");
     if (recipe.noSound || ["webp","avif"].includes(recipe.format)) args.push("-an"); else args.push("-map","0:a?","-c:a","copy");
     const crf = String(Math.round((100-recipe.quality)*0.51));
     if (recipe.format === "webp") args.push("-c:v","libwebp_anim","-lossless",recipe.mode === "lossless" ? "1":"0","-quality",String(recipe.quality),"-loop","0");
@@ -370,11 +382,11 @@ async function decodeActualPairStream(bytes: Uint8Array, dir: string, name: stri
     if (decoded.extraStreams) throw new Error("Subtitle, data or attachment tracks require a preserving adapter; native media is retained.");
     if (decoded.info.hasAudio) {
       const audio = await decodePairAudio(runtime.binary, dir, name, signal);
-      return { stream: { info: decoded.info, frameHashes: decoded.hashes, loop: { kind: "canonical-player-defined" }, startTimeMs: decoded.startTimeMs ?? 0, audio } };
+      return { stream: { info: decoded.info, frameHashes: decoded.hashes, loop: { kind: "canonical-player-defined" }, startTimeMs: decoded.startTimeMs ?? 0, audio, colorSemantics: decoded.srgbFull ? "srgb-full" : "unspecified-rgb" } };
     }
     loop = { kind: "canonical-player-defined" };
   }
-  return { stream: { info: decoded.info, frameHashes: decoded.hashes, loop, startTimeMs: decoded.startTimeMs ?? 0 }, ...(metadata ? { metadata } : {}) };
+  return { stream: { info: decoded.info, frameHashes: decoded.hashes, loop, startTimeMs: decoded.startTimeMs ?? 0, colorSemantics: metadata || decoded.srgbFull ? "srgb-full" : "unspecified-rgb" }, ...(metadata ? { metadata } : {}) };
 }
 
 /** Verify the ACTUAL retained candidate, never a regenerated replacement. Every
@@ -396,6 +408,7 @@ export async function verifyActualMediaPair(input: { readonly sourceBytes: Uint8
     assertActualCandidateContainer(candidateBytes,recipe.format,candidate.metadata?.format);
     input.signal?.throwIfAborted();
     const a = source.stream, b = candidate.stream;
+    if(a.colorSemantics!==b.colorSemantics) throw new Error("The actual candidate changed source color semantics; native media is retained.");
     if (canonicalJson(a.info) !== canonicalJson(b.info) || a.startTimeMs !== b.startTimeMs || a.frameHashes.length !== b.frameHashes.length
       || a.frameHashes.some((value, i) => value !== b.frameHashes[i])) throw new Error("The supplied candidate changed actual full-frame RGBA, dimensions, exact timing, start position or audio presence; selected native media is retained.");
     if (canonicalJson(a.audio ?? null) !== canonicalJson(b.audio ?? null)) throw new Error("The supplied candidate changed actual complete audio PCM, channels, sample clock or presentation timing; selected native media is retained.");

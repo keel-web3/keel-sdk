@@ -13,6 +13,7 @@ export interface ActualMediaAudio {
 export interface ActualMediaPairStream {
   readonly info: KeelMediaInfo; readonly frameHashes: readonly string[]; readonly loop: ActualMediaLoop;
   readonly startTimeMs: number; readonly audio?: ActualMediaAudio;
+  readonly colorSemantics: "srgb-full" | "unspecified-rgb";
 }
 /** The verifier brands and freezes this result in memory. JSON with identical
  * fields has no verification authority. No bytes are regenerated or adopted. */
