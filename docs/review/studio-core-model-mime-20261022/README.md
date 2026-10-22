@@ -1,0 +1,5 @@
+# Shared model MIME checkpoint
+
+Only `.obj -> model/obj` and `.mtl -> text/plain` were added to existing shared media inference. Existing `.glb`, `.gltf`, `.bin` mappings and explicit declared MIME precedence remain unchanged. This fixes empty/octet-stream browser declarations consistently for SDK, Studio and API users; MIME inference alone never proves model validity or browser fidelity. The existing strict model source/dependency inspector remains required.
+
+Base SDK81cb23c. Source commit in evidence-manifest. Compiler: `/Users/ravonus/.nvm/versions/node/v22.22.1/bin/node node_modules/typescript/bin/tsc -p packages/studio-core/tsconfig.json` exit0. `node --test tests/studio-core.test.mjs tests/studio-core-build-defaults.test.mjs` 34 PASS/0 FAIL/0 SKIP under Node22.22.1 zlib1.3.1-e00f703. Only additive tests were introduced; existing assertions/references untouched. No native parser, asset-display bytes, canonical boot, package exports, module IDs or signing changes. No independent review/full SDK gate/deployment claim.

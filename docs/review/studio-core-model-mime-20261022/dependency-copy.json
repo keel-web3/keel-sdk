@@ -1,0 +1,123 @@
+{
+  "copied": [
+    "keel-sdk/node_modules",
+    "keel-sdk/packages/sprite-codex/node_modules",
+    "keel-sdk/packages/game-engine/node_modules",
+    "keel-sdk/packages/mcp/node_modules",
+    "keel-sdk/packages/protocol/node_modules",
+    "keel-sdk/packages/viewer/node_modules",
+    "keel-sdk/packages/sdk/node_modules",
+    "keel-sdk/packages/sandbox-sdk/node_modules",
+    "keel-sdk/packages/ethereum-adapter/node_modules",
+    "keel-sdk/packages/studio-core/node_modules",
+    "keel-sdk/packages/builder/node_modules",
+    "keel-sdk/packages/web3-boundary-tests/node_modules",
+    "keel-sdk/packages/sprite-codex/dist",
+    "keel-sdk/packages/mcp/dist",
+    "keel-sdk/packages/protocol/dist",
+    "keel-sdk/packages/viewer/dist",
+    "keel-sdk/packages/sdk/dist",
+    "keel-sdk/packages/sandbox-sdk/dist",
+    "keel-sdk/packages/ethereum-adapter/dist",
+    "keel-sdk/packages/studio-core/dist",
+    "keel-sdk/packages/builder/dist",
+    "keel-site/apps/studio/node_modules",
+    "keel-site/packages/site-domain/node_modules"
+  ],
+  "links": [
+    {
+      "path": "keel-sdk/node_modules/@keel/sprite-codex",
+      "before": "/private/tmp/keel-native-svg-audio-20261021/keel-sdk/packages/sprite-codex",
+      "target": "/private/tmp/keel-site-model-preview-20261022-01/keel-sdk/packages/sprite-codex"
+    },
+    {
+      "path": "keel-sdk/node_modules/@keel/mcp",
+      "before": "../../packages/mcp",
+      "target": "/private/tmp/keel-site-model-preview-20261022-01/keel-sdk/packages/mcp"
+    },
+    {
+      "path": "keel-sdk/node_modules/@keel/protocol",
+      "before": "../../packages/protocol",
+      "target": "/private/tmp/keel-site-model-preview-20261022-01/keel-sdk/packages/protocol"
+    },
+    {
+      "path": "keel-sdk/node_modules/@keel/viewer",
+      "before": "../../packages/viewer",
+      "target": "/private/tmp/keel-site-model-preview-20261022-01/keel-sdk/packages/viewer"
+    },
+    {
+      "path": "keel-sdk/node_modules/@keel/sdk",
+      "before": "../../packages/sdk",
+      "target": "/private/tmp/keel-site-model-preview-20261022-01/keel-sdk/packages/sdk"
+    },
+    {
+      "path": "keel-sdk/node_modules/@keel/sandbox-sdk",
+      "before": "../../packages/sandbox-sdk",
+      "target": "/private/tmp/keel-site-model-preview-20261022-01/keel-sdk/packages/sandbox-sdk"
+    },
+    {
+      "path": "keel-sdk/node_modules/@keel/ethereum-adapter",
+      "before": "../../packages/ethereum-adapter",
+      "target": "/private/tmp/keel-site-model-preview-20261022-01/keel-sdk/packages/ethereum-adapter"
+    },
+    {
+      "path": "keel-sdk/node_modules/@keel/studio-core",
+      "before": "../../packages/studio-core",
+      "target": "/private/tmp/keel-site-model-preview-20261022-01/keel-sdk/packages/studio-core"
+    },
+    {
+      "path": "keel-sdk/node_modules/@keel/builder",
+      "before": "../../packages/builder",
+      "target": "/private/tmp/keel-site-model-preview-20261022-01/keel-sdk/packages/builder"
+    },
+    {
+      "path": "keel-site/apps/studio/node_modules/@keel/site-domain",
+      "before": "/private/tmp/keel-site-model-integration-20261022-01/keel-site/packages/site-domain",
+      "target": "/private/tmp/keel-site-model-preview-20261022-01/keel-site/packages/site-domain"
+    },
+    {
+      "path": "keel-site/apps/studio/node_modules/@keel/protocol",
+      "before": "/private/tmp/keel-site-model-integration-20261022-01/keel-sdk/packages/protocol",
+      "target": "/private/tmp/keel-site-model-preview-20261022-01/keel-sdk/packages/protocol"
+    },
+    {
+      "path": "keel-site/apps/studio/node_modules/@keel/viewer",
+      "before": "/private/tmp/keel-site-model-integration-20261022-01/keel-sdk/packages/viewer",
+      "target": "/private/tmp/keel-site-model-preview-20261022-01/keel-sdk/packages/viewer"
+    },
+    {
+      "path": "keel-site/apps/studio/node_modules/@keel/sdk",
+      "before": "/private/tmp/keel-site-model-integration-20261022-01/keel-sdk/packages/sdk",
+      "target": "/private/tmp/keel-site-model-preview-20261022-01/keel-sdk/packages/sdk"
+    },
+    {
+      "path": "keel-site/apps/studio/node_modules/@keel/ethereum-adapter",
+      "before": "/private/tmp/keel-site-model-integration-20261022-01/keel-sdk/packages/ethereum-adapter",
+      "target": "/private/tmp/keel-site-model-preview-20261022-01/keel-sdk/packages/ethereum-adapter"
+    },
+    {
+      "path": "keel-site/apps/studio/node_modules/@keel/studio-core",
+      "before": "/private/tmp/keel-site-model-integration-20261022-01/keel-sdk/packages/studio-core",
+      "target": "/private/tmp/keel-site-model-preview-20261022-01/keel-sdk/packages/studio-core"
+    },
+    {
+      "path": "keel-site/apps/studio/node_modules/@keel/builder",
+      "before": "/private/tmp/keel-site-model-integration-20261022-01/keel-sdk/packages/builder",
+      "target": "/private/tmp/keel-site-model-preview-20261022-01/keel-sdk/packages/builder"
+    },
+    {
+      "path": "keel-sdk/packages/sdk/node_modules/@keel/protocol",
+      "before": "/private/tmp/keel-native-svg-audio-20261021/keel-sdk/packages/protocol",
+      "target": "/private/tmp/keel-site-model-preview-20261022-01/keel-sdk/packages/protocol"
+    },
+    {
+      "path": "keel-sdk/packages/sdk/node_modules/@keel/viewer",
+      "before": "/private/tmp/keel-native-svg-audio-20261021/keel-sdk/packages/viewer",
+      "target": "/private/tmp/keel-site-model-preview-20261022-01/keel-sdk/packages/viewer"
+    }
+  ],
+  "SDKSource": "/private/tmp/keel-native-svg-audio-20261021/keel-sdk",
+  "SDKSourceHead": "6d2ddd1edae8eda928fb75ebee5beb3d4bf8f306",
+  "ownedSDKBase": "81cb23c57a5f426324acd0961ae21476de9cd861",
+  "policy": "APFS copies of existing declared dependency/build closure. No install or shared edits."
+}

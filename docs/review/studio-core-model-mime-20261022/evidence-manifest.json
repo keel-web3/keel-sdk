@@ -1,0 +1,32 @@
+{
+  "sourceCommit": "716e9ea9de5944c775428e334da530b2680eaebe",
+  "base": "81cb23c57a5f426324acd0961ae21476de9cd861",
+  "authorResult": "34PASS 0FAIL 0SKIP; studio-core tsc exit0; no full SDK, browser or live claim",
+  "files": [
+    {
+      "path": "dependency-copy.json",
+      "sha256": "cb04cd4b09a652b001ce99553b357bd3e33e647cba8ed925a8113d76a458550c",
+      "bytes": 5701
+    },
+    {
+      "path": "mime-build.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "mime-build.stdout",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "mime-tests.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "mime-tests.stdout",
+      "sha256": "7e26996ab69f05fe8b15985538918335b927e48f942fe1164c33df96f3dc1192",
+      "bytes": 7979
+    }
+  ]
+}

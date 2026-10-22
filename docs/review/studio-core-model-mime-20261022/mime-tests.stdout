@@ -1,0 +1,218 @@
+TAP version 13
+# (node:42471) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+# (Use `node --trace-deprecation ...` to show where the warning was created)
+# Subtest: Compact plus explicit Off preserves all native bytes without relabeling Raw
+ok 1 - Compact plus explicit Off preserves all native bytes without relabeling Raw
+  ---
+  duration_ms: 4.8045
+  type: 'test'
+  ...
+# Subtest: Brotli quality is honored and Raw or contract-readable HTML always remain uncompressed
+ok 2 - Brotli quality is honored and Raw or contract-readable HTML always remain uncompressed
+  ---
+  duration_ms: 10.400292
+  type: 'test'
+  ...
+# (node:42472) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+# (Use `node --trace-deprecation ...` to show where the warning was created)
+# Subtest: normal model folders infer exact shared MIME roles without rewriting declared MIME or original paths
+ok 3 - normal model folders infer exact shared MIME roles without rewriting declared MIME or original paths
+  ---
+  duration_ms: 0.572
+  type: 'test'
+  ...
+# Subtest: studio-core creates safe names and compression summaries
+ok 4 - studio-core creates safe names and compression summaries
+  ---
+  duration_ms: 0.530834
+  type: 'test'
+  ...
+# Subtest: canonical Inline graph is the entrypoint and never generates a replacement index.html
+ok 5 - canonical Inline graph is the entrypoint and never generates a replacement index.html
+  ---
+  duration_ms: 6.396916
+  type: 'test'
+  ...
+# Subtest: compact percent Inline graph stays the exact uncompressed entrypoint
+ok 6 - compact percent Inline graph stays the exact uncompressed entrypoint
+  ---
+  duration_ms: 0.666209
+  type: 'test'
+  ...
+# Subtest: studio-core wrapper uses virtual content paths only
+ok 7 - studio-core wrapper uses virtual content paths only
+  ---
+  duration_ms: 0.208625
+  type: 'test'
+  ...
+# Subtest: ordinary Keel modules select the creator media renderer without owning verification
+ok 8 - ordinary Keel modules select the creator media renderer without owning verification
+  ---
+  duration_ms: 0.261459
+  type: 'test'
+  ...
+# Subtest: SWF-only projects fail closed with a Ruffle requirement instead of a blocked nested frame
+ok 9 - SWF-only projects fail closed with a Ruffle requirement instead of a blocked nested frame
+  ---
+  duration_ms: 0.086083
+  type: 'test'
+  ...
+# Subtest: manifest-declared Flash runtime generates an in-sandbox Ruffle entrypoint
+ok 10 - manifest-declared Flash runtime generates an in-sandbox Ruffle entrypoint
+  ---
+  duration_ms: 6.254083
+  type: 'test'
+  ...
+# Subtest: studio-core emits a valid strict manifest
+ok 11 - studio-core emits a valid strict manifest
+  ---
+  duration_ms: 0.968833
+  type: 'test'
+  ...
+# Subtest: studio-core requires a verified image fallback for an HTML entrypoint
+ok 12 - studio-core requires a verified image fallback for an HTML entrypoint
+  ---
+  duration_ms: 0.57625
+  type: 'test'
+  ...
+# Subtest: studio-core rejects an explicit non-image fallback
+ok 13 - studio-core rejects an explicit non-image fallback
+  ---
+  duration_ms: 0.258375
+  type: 'test'
+  ...
+# Subtest: studio-core uses an image entrypoint as its own fallback
+ok 14 - studio-core uses an image entrypoint as its own fallback
+  ---
+  duration_ms: 0.271583
+  type: 'test'
+  ...
+# Subtest: ordinary media remains the direct entrypoint for the reusable KEEL asset-display module
+ok 15 - ordinary media remains the direct entrypoint for the reusable KEEL asset-display module
+  ---
+  duration_ms: 2.6365
+  type: 'test'
+  ...
+# Subtest: studio-core detects parent-hash reorgs
+ok 16 - studio-core detects parent-hash reorgs
+  ---
+  duration_ms: 0.150625
+  type: 'test'
+  ...
+# Subtest: studio-core prepares and verifies exact decoded and compressed bytes
+ok 17 - studio-core prepares and verifies exact decoded and compressed bytes
+  ---
+  duration_ms: 2.465625
+  type: 'test'
+  ...
+# Subtest: studio-core keeps the HTML entrypoint contract-readable for inline presentation
+ok 18 - studio-core keeps the HTML entrypoint contract-readable for inline presentation
+  ---
+  duration_ms: 0.42125
+  type: 'test'
+  ...
+# Subtest: studio-core exposes both stable IDs and real file paths to verified viewers
+ok 19 - studio-core exposes both stable IDs and real file paths to verified viewers
+  ---
+  duration_ms: 1.142916
+  type: 'test'
+  ...
+# Subtest: studio-core can explicitly prepare a frozen immutable 1/1 artifact
+ok 20 - studio-core can explicitly prepare a frozen immutable 1/1 artifact
+  ---
+  duration_ms: 0.553542
+  type: 'test'
+  ...
+# Subtest: studio-core keeps the existing creator revision default when immutable is omitted
+ok 21 - studio-core keeps the existing creator revision default when immutable is omitted
+  ---
+  duration_ms: 0.353916
+  type: 'test'
+  ...
+# Subtest: studio-core rejects immutable revisions other than the canonical 1/1 shape
+ok 22 - studio-core rejects immutable revisions other than the canonical 1/1 shape
+  ---
+  duration_ms: 0.346583
+  type: 'test'
+  ...
+# Subtest: studio-core automatically packs a complete OBJKT ZIP from resolved Keel resources
+ok 23 - studio-core automatically packs a complete OBJKT ZIP from resolved Keel resources
+  ---
+  duration_ms: 2.397083
+  type: 'test'
+  ...
+# Subtest: studio-core hybrid ZIP accepts only a self-verifying Keel entrypoint
+ok 24 - studio-core hybrid ZIP accepts only a self-verifying Keel entrypoint
+  ---
+  duration_ms: 0.769042
+  type: 'test'
+  ...
+# Subtest: studio-core rejects uncommitted insecure remote transports
+ok 25 - studio-core rejects uncommitted insecure remote transports
+  ---
+  duration_ms: 0.722458
+  type: 'test'
+  ...
+# Subtest: generated composite entrypoints omit the fictional local file source
+ok 26 - generated composite entrypoints omit the fictional local file source
+  ---
+  duration_ms: 1.630792
+  type: 'test'
+  ...
+# Subtest: pre-encoded tokenURI fragments remain exact uncompressed contract-readable bytes
+ok 27 - pre-encoded tokenURI fragments remain exact uncompressed contract-readable bytes
+  ---
+  duration_ms: 0.46075
+  type: 'test'
+  ...
+# Subtest: Keel stores an independently compressed module graph and materializes a directory without ZIP
+ok 28 - Keel stores an independently compressed module graph and materializes a directory without ZIP
+  ---
+  duration_ms: 2.294875
+  type: 'test'
+  ...
+# Subtest: Studio builds one multi-chunk OnchFS directory with Keel bindings to the same bytes
+ok 29 - Studio builds one multi-chunk OnchFS directory with Keel bindings to the same bytes
+  ---
+  duration_ms: 66.469
+  type: 'test'
+  ...
+# Subtest: delivery planning uses measured OnchFS limits and moves larger directories to IPFS without changing storage
+ok 30 - delivery planning uses measured OnchFS limits and moves larger directories to IPFS without changing storage
+  ---
+  duration_ms: 0.902292
+  type: 'test'
+  ...
+# Subtest: cross-chain Module Catalog merges byte-identical carriers and rejects version collisions
+ok 31 - cross-chain Module Catalog merges byte-identical carriers and rejects version collisions
+  ---
+  duration_ms: 0.826791
+  type: 'test'
+  ...
+# Subtest: built-in media profiles create exact WebP derivative receipts
+ok 32 - built-in media profiles create exact WebP derivative receipts
+  ---
+  duration_ms: 3.872833
+  type: 'test'
+  ...
+# Subtest: prepared manifests commit generated media derivatives and exact output resources
+ok 33 - prepared manifests commit generated media derivatives and exact output resources
+  ---
+  duration_ms: 2.303333
+  type: 'test'
+  ...
+# Subtest: default raw-percent saver survives editor preparation without compression or a generated wrapper
+ok 34 - default raw-percent saver survives editor preparation without compression or a generated wrapper
+  ---
+  duration_ms: 0.296917
+  type: 'test'
+  ...
+1..34
+# tests 34
+# suites 0
+# pass 34
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 684.85125
