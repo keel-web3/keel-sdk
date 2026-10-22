@@ -1,0 +1,76 @@
+{
+  "schema": "keel.independent-shared-model-mime-source-review@1",
+  "verdict": "APPROVED_SCOPED",
+  "sourceCommit": "716e9ea9de5944c775428e334da530b2680eaebe",
+  "evidenceCommit": "fba36cf27603b71d1938d2f12e1190871bbd62db",
+  "baseCommit": "81cb23c57a5f426324acd0961ae21476de9cd861",
+  "sourceScope": "Exactly two extension fallback mappings .obj\u2192model/obj and .mtl\u2192text/plain. No parser/renderer/module/shell/protocol/exports/signing changes.",
+  "checks": {
+    "ownFocused": {
+      "tests": 34,
+      "pass": 34,
+      "fail": 0,
+      "skipped": 0,
+      "cancelled": 0
+    },
+    "ownStudioCoreCompileExit": 0,
+    "exactProductionTwoLineDifference": true,
+    "compiledMediaBytesEqualFrozenAuthor": true,
+    "gitTrackedSourceUnchanged": true
+  },
+  "sourceFindings": [],
+  "preservation": [
+    "Explicit declared non-octet MIME still takes precedence and is lowercased by the unchanged rule.",
+    "Unknown or deceptive extensions remain unknown/the actual last extension; path/byte normalization is unchanged.",
+    "Role inference and exact file bytes are unchanged; model MIME inference alone never establishes complete geometry/dependency validity, codec/browser fidelity or publication authority.",
+    "Only one additive test block/import; all existing assertions and reference bytes unchanged."
+  ],
+  "limitations": [
+    "Whole SDK81 source approval belongs to its separate reviewer; this admits only the two-line716 MIME successor.",
+    "Own studio-core source was compiled in a clean isolated checkout with read-only existing locked dependency aliases and copied base81 sibling dist. Own34 existing/additive core tests passed. No entire SDK rebuild/full composition suite is claimed.",
+    "No Site source/UI/runtime, selected-chain module/canonical reader qualification, deployment, signing or activation approval."
+  ],
+  "setupFailurePreservation": "Initial shared clone checkout exceeded Git alternate nesting limit before any check. Own alternate list was flattened to the same seven existing local object stores; no author Git metadata/source changed. Original alternate text retained.",
+  "inputs": [
+    {
+      "path": "packages/studio-core/src/media.ts",
+      "sha256": "b27a470e835570c76a7f4293a1422647059da4c4f52e1b91cece8284bec58eb3"
+    },
+    {
+      "path": "tests/studio-core.test.mjs",
+      "sha256": "96867db448aa8d7a6993a76929e4517adb36a60c41e110c89969f4f4703ae40e"
+    }
+  ],
+  "evidenceFiles": [
+    {
+      "path": "checks.json",
+      "byteLength": 1232,
+      "sha256": "e2df72cad76ca967cd9eb7e77638f9d4b72afadb856ee56ad1d7ea6b83519d6d"
+    },
+    {
+      "path": "compile.stderr",
+      "byteLength": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "compile.stdout",
+      "byteLength": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "focused.stderr",
+      "byteLength": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "focused.stdout",
+      "byteLength": 7976,
+      "sha256": "961443af6f1df86e136c2a58538c9981ebedccdf2bc98c1293772112c9219949"
+    },
+    {
+      "path": "initial-alternates.txt",
+      "byteLength": 71,
+      "sha256": "fd69e42ef8356393ef3c83d991608f2e83ce3e359042c79e1995e03de3760095"
+    }
+  ]
+}
