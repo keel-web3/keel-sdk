@@ -1,0 +1,20 @@
+--- a/tests/movie-edit-list.test.mjs
++++ b/tests/movie-edit-list.test.mjs
+@@ -6,6 +6,7 @@
+ import path from 'node:path';
+ import {tmpdir} from 'node:os';
+ import {prepareMediaCandidate,verifyActualMediaPair} from '../packages/builder/dist/media-preparation.js';
++import {assertMoviePresentationSemantics} from '../packages/builder/dist/movie-presentation-semantics.js';
+ const require=createRequire(new URL('../packages/builder/package.json',import.meta.url)),ffmpeg=require('ffmpeg-static'),sharp=require('sharp');
+ const recipe={schema:'keel-media-edit@1',mode:'lossless',format:'webp',quality:82,noSound:false},original={...recipe,mode:'original',format:'original'};
+ async function inDir(run){const dir=await mkdtemp(path.join(tmpdir(),'keel-edit-grammar-'));try{return await run(dir)}finally{await rm(dir,{recursive:true,force:true})}}
+@@ -50,7 +51,8 @@
+  changed=rewrite(changed,['moov','trak','edts','elst'],b=>{b.writeUInt32BE(300,16);return b});
+  await assert.rejects(prepareMediaCandidate({bytes:changed,recipe}),/complete sample timeline|edit|bounds|semantics/i);await nativeExact(changed);
+  const badCount=rewrite(source,['moov','trak','mdia','minf','stbl','stts'],b=>{b.writeUInt32BE(0,12);return b});
+- await assert.rejects(prepareMediaCandidate({bytes:badCount,recipe}),/timeline|count|edit|semantics/i);await nativeExact(badCount);
++ assert.throws(()=>assertMoviePresentationSemantics(badCount,'','Video: h264, gbrp(pc), 32x24 [SAR 1:1 DAR 4:3]',32,24),/timeline|count|edit|semantics/i);
++ await assert.rejects(prepareMediaCandidate({bytes:badCount,recipe}),/missing mandatory atoms|broken header/i);await nativeExact(badCount);
+ }));
+ test('actual AV1 AVIF default infinite repeat remains supported; finite or inconsistent repeat profiles retain native',async()=>{
+  const rgba=Buffer.alloc(4*4*4*2);for(let i=0;i<32;i++){rgba[i*4+(i<16?0:1)]=255;rgba[i*4+3]=255;}
