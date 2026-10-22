@@ -1,0 +1,88 @@
+{
+  "schema": "keel.independent-s3-model-source-review@1",
+  "source": "ae03a3e46c192f498c919c16aac14ebe1ac0db6c",
+  "base": "7730e3150b7ec6da69913a779273fdb981d7fff3",
+  "result": "BLOCKED_BEFORE_S3_INTEGRATION",
+  "scope": "Separate S3 source checkpoint; not core176/SDK773 release content. No host/chain/signing actions by reviewer.",
+  "finding": {
+    "priority": "P2",
+    "file": "packages/sdk/src/inline-viewer-graph.ts",
+    "line": 1530,
+    "title": "Registered model complete-HTML count remains the local compression count",
+    "explanation": "The registered helper intentionally reuses exact independently authenticated published module descriptors, allowing different compatible lossless compression from local module construction. It returns graph from those real bytes but returns document.modelPresentation unchanged, retaining byteCounts.completeHTML for the local composition. This underreports admissible actual returned HTML cost and can mislead the later presentation planner.",
+    "actualProbe": {
+      "source": "ae03a3e46c192f498c919c16aac14ebe1ac0db6c",
+      "scope": "Synthetic exact-readback callback negative cost-accounting probe, not chain proof",
+      "reportedCompleteHTML": 364274,
+      "actualCompleteHTML": 630140,
+      "difference": 265866,
+      "alteredOnly": "exact decoded shared module retained as independently registered None rather than local Gzip; all bytes and carrier digests read back exactly"
+    },
+    "probeSHA256": "187814d8d6af47a4fb61c575b2cf6c3a481f0baf734b3c07909f96be99c9e568",
+    "probeStdoutSHA256": "d5ec8618e8ca1ba297351a583c6cd9b26ce92c6451c7b9033b2d773dab95f793",
+    "requiredCorrection": "Derive complete-HTML counts from the actual registered result/composed bytes, preserve all original identities and readback/current-reader guards, and add an alternate registered compression regression. No recompression or source conversion workaround."
+  },
+  "independentValidation": {
+    "exactArchiveCompiledSDK": 0,
+    "affectedDeterministic": {
+      "pass": 64,
+      "fail": 0,
+      "skip": 0,
+      "stdoutSHA256": "c167c64e1fe0aa7eb5b2cc67b0ac469ecd594ddfcf857f78dfc008e0e430d36d"
+    },
+    "browser": {
+      "source": "ae03a3e46c192f498c919c16aac14ebe1ac0db6c",
+      "results": [
+        {
+          "stage": "raster-browser7",
+          "command": [
+            "/Users/ravonus/.nvm/versions/node/v22.22.1/bin/node",
+            "--test",
+            "tests/media-viewer-browser.test.mjs"
+          ],
+          "exit": 0,
+          "seconds": 15.322,
+          "stdoutSHA256": "7603aa0d719505cff6aee67c7a877219ee5ab76b3990c44149f2c2a75c24a788",
+          "stderrSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "stage": "model-browser4",
+          "command": [
+            "/Users/ravonus/.nvm/versions/node/v22.22.1/bin/node",
+            "--test",
+            "tests/model-viewer-browser.test.mjs"
+          ],
+          "exit": 0,
+          "seconds": 6.618,
+          "stdoutSHA256": "04b7cdce245ccde23cae90f700a5df09f11dc6265b2a9606745b8073874a461b",
+          "stderrSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        }
+      ]
+    },
+    "sourceBindingSHA256": "2163bd4721d1d03a3c1d71db46af9e36755dbc6b83dba022aa43952abe314be3",
+    "modelEvidenceManifestSHA256": "e66405aafdb0480d5b5df3dfc4b91cfea342961ef270ed4baba4725d82ef7323",
+    "frozenEvidenceFilesRehashed": 132,
+    "fixtureFilesBeforeAfterRehashed": 6,
+    "retainedVendorFilesRehashed": 5
+  },
+  "reviewedBoundaries": [
+    "Exact separate original models/dependencies and derived HTML identity; no first-primitive or invented spin fallback",
+    "Exact official-profile closed modules/order/source digest and module alias/content validation",
+    "Canonical shell bytes unchanged; actual current revision5 frames require typed nativeGzip binding and caller current reauthentication",
+    "Selected chain/store/reader/block and exact registry/object readbacks, immutable input snapshots and final block check; synthetic callback fixtures do not claim live authentication",
+    "Relative resource paths, external/unknown/missing/extra dependencies, malformed GLB, unsupported required decoders and temporal textures fail before preparation",
+    "Actual all-pixel official-reference browser at source t0/t1/alternate scene, 3 meshes/skin/bone/morph/original animation/play-pause and exact texture identities",
+    "Fresh asset-display1.4 physically removes prototype; raster still export/animation behavior preserved; exact test-only corrections independently admitted"
+  ],
+  "environmentHistory": "Initial isolated unit runs omitted normal packaged SDK assets and then builder/studio-core outputs. Both ENV failures remain retained; only unchanged maintained build stages were completed. Exact final64 passes; no test assertions or timeouts changed. First private accounting probe ran from wrong cwd; its failure remains retained, qualified v2 uses actual repo cwd.",
+  "notApproved": [
+    "complete default SDK gate",
+    "S3 integration",
+    "new module registration/publication/ABI capability",
+    "Studio selector/UI integration",
+    "audio/SVG/APNG/video browser capability not demonstrated",
+    "private incident/live artwork",
+    "core release deployment"
+  ],
+  "productionSourceAuthoredByReviewer": false
+}

@@ -1,0 +1,199 @@
+{
+  "base": "ae03a3e46c192f498c919c16aac14ebe1ac0db6c",
+  "priorIndependentReviewSHA256": "28cdf67ad40fb2a0191991b5a115815d3c780ae429457b4e25be000bf222f561",
+  "scope": "Narrow final-authenticated model composition size correction; containing commit identifies source tested.",
+  "changedSource": [
+    {
+      "path": "packages/sdk/src/inline-viewer-graph.ts",
+      "byteLength": 134072,
+      "sha256": "650fc2b545749dac43f2e15333c85a91f1038eeefb70abd04b282356b92eafc4"
+    },
+    {
+      "path": "tests/model-viewer-graph.test.mjs",
+      "byteLength": 20159,
+      "sha256": "024aeafeefb7f9e289da34a867267f43199b9ecfd7c16b429961efaa8c3ab3fe"
+    }
+  ],
+  "byteIdenticalToBase": [
+    {
+      "path": "packages/sdk/package.json",
+      "byteLength": 15024,
+      "sha256": "9e599a9e9776ab0df298691915f4dd65c02ae58e20083a28d8a4ebf14550baf8"
+    },
+    {
+      "path": "packages/sdk/resources/three-r180/BufferGeometryUtils.js",
+      "byteLength": 35539,
+      "sha256": "fda7e946b8e0b5ab39b779206589e7a1079a22eb24efb89d7223e03fdfb1f751"
+    },
+    {
+      "path": "packages/sdk/resources/three-r180/GLTFLoader.js",
+      "byteLength": 114739,
+      "sha256": "67ac5551fdafa6e349bd80c8f8e5e39c136d6b2fb1ad647db9abb21dc86f9e4a"
+    },
+    {
+      "path": "packages/sdk/resources/three-r180/LICENSE",
+      "byteLength": 1081,
+      "sha256": "bfe119ea4fd413f5f7ca3fcd63adb0c4a073ed39daa2fe7d3e6b769e21272601"
+    },
+    {
+      "path": "packages/sdk/resources/three-r180/MTLLoader.js",
+      "byteLength": 11356,
+      "sha256": "f1f8f0c6fcfa09671cb609954ea436521d835606853c110c5aff2dc8188f5e61"
+    },
+    {
+      "path": "packages/sdk/resources/three-r180/OBJLoader.js",
+      "byteLength": 22922,
+      "sha256": "e3ceb6a8ed48ca146049a8f0879c7acbf884d430f2e728779af26c6ea3a57c65"
+    },
+    {
+      "path": "packages/sdk/resources/three-r180/upstream.json",
+      "byteLength": 1365,
+      "sha256": "b7e7e29e6e6b1ccd8d8050916c076d796ecbab45cc8cdc9b57feaabce9aea620"
+    },
+    {
+      "path": "packages/sdk/src/asset-display.ts",
+      "byteLength": 8799,
+      "sha256": "be5035c99373d7b59eb86d02937b452a9525b603added83537615968caf08f72"
+    },
+    {
+      "path": "packages/sdk/src/index.ts",
+      "byteLength": 5961,
+      "sha256": "515b69d2f85cc9a63662511ccaff0a6019bbc76f92fdd0270a13d698313ca8e6"
+    },
+    {
+      "path": "packages/sdk/src/media-viewer-adapters.ts",
+      "byteLength": 2543,
+      "sha256": "28f403cdcb9435c0fb20d4ae8228ae5b9eab00e4f92dc596b0452849b847e290"
+    },
+    {
+      "path": "packages/sdk/src/model-media.ts",
+      "byteLength": 13278,
+      "sha256": "edc3b395af44e2a6466f3934357a20f2790fd156fccbe4a0ab011f0619faa761"
+    },
+    {
+      "path": "packages/sdk/src/model-viewer-module.ts",
+      "byteLength": 10178,
+      "sha256": "ef7972a131813ec586cc2323845a05e4148816c6e742c3b7f847e1e061cef1ba"
+    },
+    {
+      "path": "packages/sdk/src/model-viewer-vendor.ts",
+      "byteLength": 77704,
+      "sha256": "4855c65cd93ce89baca4f96173a8907f08d734ff41b1f5af35932b7937b544e2"
+    },
+    {
+      "path": "packages/sdk/src/verification-shell.ts",
+      "byteLength": 115635,
+      "sha256": "e137704169b91974afb1e79d5b13b9247d2fd49c58eab6e84f97b07e59104849"
+    },
+    {
+      "path": "scripts/build-model-viewer-vendor.mjs",
+      "byteLength": 1983,
+      "sha256": "d7ef9d4c173262e3992b471dd130daf14db50c8d2c85bb33924f62b946b59cb6"
+    },
+    {
+      "path": "scripts/test-suites.mjs",
+      "byteLength": 18211,
+      "sha256": "5dcf1cb35612a7878543075b92474634d4c7aeaa1e43f9ea7664dd8bd76296f5"
+    },
+    {
+      "path": "tests/fixtures/asset-display-1.3.0.js",
+      "byteLength": 9648,
+      "sha256": "4f88f47a332061125a3a6a0133d2a70f5b6d641c4d0c84dd7c0302626f8034dc"
+    },
+    {
+      "path": "tests/fixtures/model-viewers/complete.glb",
+      "byteLength": 4112,
+      "sha256": "6c836f043d3d7ba771fc13a1498a4cc1ad872c8297f8a15c7b912a1a8c0157d2"
+    },
+    {
+      "path": "tests/fixtures/model-viewers/complete.gltf",
+      "byteLength": 3577,
+      "sha256": "df4ef251db7b6f87e8d8212d0f18a8d660fb71ab6a1a2653b8797b5bd6031e0b"
+    },
+    {
+      "path": "tests/fixtures/model-viewers/complete.obj",
+      "byteLength": 230,
+      "sha256": "a233b3a8827e71a9875730e906885cdedebc9a683b7298468d43e93087a8d5c5"
+    },
+    {
+      "path": "tests/fixtures/model-viewers/generate.mjs",
+      "byteLength": 6138,
+      "sha256": "314279988ef6c48c10ba1ac3b12ed466b361f3cd75e8113159722c802e364f89"
+    },
+    {
+      "path": "tests/fixtures/model-viewers/manifest.json",
+      "byteLength": 1356,
+      "sha256": "c0dc38073ba78ceb84950b82556e076aa28205dda3a15c881f36b1b585db07cf"
+    },
+    {
+      "path": "tests/fixtures/model-viewers/materials.mtl",
+      "byteLength": 72,
+      "sha256": "c487b0e94be88b003525cb5e8a318d7b268a1498399b066f5d63a448079f6372"
+    },
+    {
+      "path": "tests/fixtures/model-viewers/scene.bin",
+      "byteLength": 510,
+      "sha256": "bb419384840f01a7308110f5357f8fa795a6fd880543bff8bf2437b3f2173a78"
+    },
+    {
+      "path": "tests/fixtures/model-viewers/textures/checker.png",
+      "byteLength": 98,
+      "sha256": "7e3068e4965331d8e361e4f73e54a45c5e203a623e61871a0aecab6323041d9d"
+    },
+    {
+      "path": "tests/helpers/model-viewer-fixtures.mjs",
+      "byteLength": 4059,
+      "sha256": "ed798fc6d63eb9af8c0c6ae03c8b3bae1c0ec1e7f195d3eceeca9119907b7fef"
+    },
+    {
+      "path": "tests/helpers/model-viewer-reference.mjs",
+      "byteLength": 8918,
+      "sha256": "9de9024f9aa4b4eef470a6e33af446974c778df7e56a1a47537bcce1f3129cfe"
+    },
+    {
+      "path": "tests/media-viewer-adapters.test.mjs",
+      "byteLength": 3631,
+      "sha256": "5ffd719aefe1b840c5fc287bc96edc1bc33c82cbbbaf42f2475e7707864b97dc"
+    },
+    {
+      "path": "tests/media-viewer-browser.test.mjs",
+      "byteLength": 10916,
+      "sha256": "220e58e9adf13ad1a5961bb85062205bdea7444d2ad7364de1a554524c7cfcf9"
+    },
+    {
+      "path": "tests/model-viewer-browser.test.mjs",
+      "byteLength": 13329,
+      "sha256": "63fbfcdf208dcfd71312d27f7d668c81e4e9e4a03f06ff83f6b93c4a2ab8c8bb"
+    },
+    {
+      "path": "tests/sdk-inline-viewer-graph.test.mjs",
+      "byteLength": 40879,
+      "sha256": "132b3ef6e38b29d6737e2c811e0ba5357922c5992886e7d01b1990a292a5ecd7"
+    }
+  ],
+  "authorResults": {
+    "typeScriptExitCode": 0,
+    "deterministic": {
+      "pass": 67,
+      "fail": 0,
+      "skip": 0
+    },
+    "rasterBrowser": {
+      "pass": 7,
+      "fail": 0,
+      "skip": 0
+    },
+    "modelBrowser": {
+      "pass": 4,
+      "fail": 0,
+      "skip": 0
+    },
+    "node": "22.22.1",
+    "chromium": "155.0.8059.85",
+    "environment": "macOS arm64; local loopback only; production credentials omitted",
+    "registration": false,
+    "deployment": false,
+    "walletAction": false
+  },
+  "independentSuccessorApproval": false
+}

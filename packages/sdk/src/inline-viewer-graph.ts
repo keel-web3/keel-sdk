@@ -1527,7 +1527,11 @@ export async function buildKeelRegisteredInlineModelMediaTokenURIGraph(input: {
   const publishedBytes = concat(document.parts.map(part => part.kind === "existing" ? decodePublishedGraphPart(input.existingParts[existingIndex++]!) : part.bytes));
   const registeredNativeGzip = createKeelRegisteredNativeGzipProof({binding, documentBytes: publishedBytes});
   const graph = await buildKeelInlineRawPercentTokenURIGraph(document, {existingParts: input.existingParts, registeredNativeGzip});
-  return {...graph, modelPresentation: document.modelPresentation};
+  // Reused modules keep their authenticated published storage, which can be
+  // a different lossless codec from our local preparation. Source/dependency
+  // and decoded-module commitments stay exact; returned HTML cost must follow
+  // the final graph, never the unused local recompression of shared objects.
+  return {...graph, modelPresentation: {...document.modelPresentation, byteCounts: {...document.modelPresentation.byteCounts, completeHTML: graph.htmlBytes.byteLength}}};
 }
 
 /**
