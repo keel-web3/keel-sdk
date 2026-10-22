@@ -1,0 +1,142 @@
+TAP version 13
+# Subtest: canonical shell preserves every distinct native webp animation color and looping
+ok 1 - canonical shell preserves every distinct native webp animation color and looping
+  ---
+  duration_ms: 2477.108667
+  type: 'test'
+  ...
+# Subtest: canonical shell preserves every distinct native avif animation color and looping
+ok 2 - canonical shell preserves every distinct native avif animation color and looping
+  ---
+  duration_ms: 2268.338292
+  type: 'test'
+  ...
+# Subtest: canonical still webp retains original PNG-export canvas and exact source commitment
+ok 3 - canonical still webp retains original PNG-export canvas and exact source commitment
+  ---
+  duration_ms: 662.61425
+  type: 'test'
+  ...
+# Subtest: canonical still avif retains original PNG-export canvas and exact source commitment
+ok 4 - canonical still avif retains original PNG-export canvas and exact source commitment
+  ---
+  duration_ms: 612.72925
+  type: 'test'
+  ...
+# Subtest: canonical GIF motion remains native with exact catalog module profile 1.1.0
+ok 5 - canonical GIF motion remains native with exact catalog module profile 1.1.0
+  ---
+  duration_ms: 2210.269125
+  type: 'test'
+  ...
+# Subtest: canonical GIF motion remains native with exact catalog module profile 1.3.0
+ok 6 - canonical GIF motion remains native with exact catalog module profile 1.3.0
+  ---
+  duration_ms: 2200.636083
+  type: 'test'
+  ...
+# Subtest: canonical GIF motion remains native with exact catalog module profile 1.4.0
+ok 7 - canonical GIF motion remains native with exact catalog module profile 1.4.0
+  ---
+  duration_ms: 2224.097625
+  type: 'test'
+  ...
+# Subtest: canonical GIF motion remains native with exact catalog module profile 1.5.0
+ok 8 - canonical GIF motion remains native with exact catalog module profile 1.5.0
+  ---
+  duration_ms: 2234.529417
+  type: 'test'
+  ...
+# Subtest: actual canonical compiled glb renders all primitives, original textures/transforms/skin/morph/source clips and alternate scene
+ok 9 - actual canonical compiled glb renders all primitives, original textures/transforms/skin/morph/source clips and alternate scene
+  ---
+  duration_ms: 1513.492041
+  type: 'test'
+  ...
+# Subtest: actual canonical compiled gltf renders all primitives, original textures/transforms/skin/morph/source clips and alternate scene
+ok 10 - actual canonical compiled gltf renders all primitives, original textures/transforms/skin/morph/source clips and alternate scene
+  ---
+  duration_ms: 1481.756709
+  type: 'test'
+  ...
+# Subtest: actual canonical retained-current-native-frame glb renders all primitives, original textures/transforms/skin/morph/source clips and alternate scene
+ok 11 - actual canonical retained-current-native-frame glb renders all primitives, original textures/transforms/skin/morph/source clips and alternate scene
+  ---
+  duration_ms: 1293.720375
+  type: 'test'
+  ...
+# Subtest: actual canonical OBJ retains both objects, MTL colors and original texture without external requests
+ok 12 - actual canonical OBJ retains both objects, MTL colors and original texture without external requests
+  ---
+  duration_ms: 1251.992292
+  type: 'test'
+  ...
+# Subtest: actual canonical still SVG renders original XML and preserves native motion
+ok 13 - actual canonical still SVG renders original XML and preserves native motion
+  ---
+  duration_ms: 637.936375
+  type: 'test'
+  ...
+# Subtest: actual canonical smil SVG renders original XML and preserves native motion
+ok 14 - actual canonical smil SVG renders original XML and preserves native motion
+  ---
+  duration_ms: 2751.119833
+  type: 'test'
+  ...
+# Subtest: actual canonical css SVG renders original XML and preserves native motion
+ok 15 - actual canonical css SVG renders original XML and preserves native motion
+  ---
+  duration_ms: 2697.863167
+  type: 'test'
+  ...
+# Subtest: actual canonical audio/wav decodes exact original, displays cover and starts only with native play gesture
+ok 16 - actual canonical audio/wav decodes exact original, displays cover and starts only with native play gesture
+  ---
+  duration_ms: 755.374125
+  type: 'test'
+  ...
+# Subtest: actual canonical audio/mpeg decodes exact original, displays cover and starts only with native play gesture
+ok 17 - actual canonical audio/mpeg decodes exact original, displays cover and starts only with native play gesture
+  ---
+  duration_ms: 682.759084
+  type: 'test'
+  ...
+# Subtest: actual canonical audio/ogg decodes exact original, displays cover and starts only with native play gesture
+ok 18 - actual canonical audio/ogg decodes exact original, displays cover and starts only with native play gesture
+  ---
+  duration_ms: 704.822167
+  type: 'test'
+  ...
+# Subtest: actual canonical audio/flac decodes exact original, displays cover and starts only with native play gesture
+ok 19 - actual canonical audio/flac decodes exact original, displays cover and starts only with native play gesture
+  ---
+  duration_ms: 708.375709
+  type: 'test'
+  ...
+# Subtest: actual canonical audio/aac decodes exact original, displays cover and starts only with native play gesture
+ok 20 - actual canonical audio/aac decodes exact original, displays cover and starts only with native play gesture
+  ---
+  duration_ms: 692.558
+  type: 'test'
+  ...
+# Subtest: actual canonical audio/mp4 decodes exact original, displays cover and starts only with native play gesture
+ok 21 - actual canonical audio/mp4 decodes exact original, displays cover and starts only with native play gesture
+  ---
+  duration_ms: 790.406959
+  type: 'test'
+  ...
+# Subtest: actual retained current reader frames decode and play exact native-Gzip audio with the new module
+ok 22 - actual retained current reader frames decode and play exact native-Gzip audio with the new module
+  ---
+  duration_ms: 510.408167
+  type: 'test'
+  ...
+1..22
+# tests 22
+# suites 0
+# pass 22
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 31892.168375

@@ -1,0 +1,58 @@
+{
+  "input": {
+    "path": "still.svg",
+    "byteLength": 102,
+    "sha256": "a3e279c57f01648e753ce85eb3735aabc5f8aecb8b8ba208170a0d7a169e955a"
+  },
+  "documentBytes": 167098,
+  "samples": [
+    {
+      "elapsedMs": 0,
+      "centerRGBA": [
+        255,
+        0,
+        0,
+        255
+      ],
+      "width": 400,
+      "height": 400
+    },
+    {
+      "elapsedMs": 62,
+      "centerRGBA": [
+        255,
+        0,
+        0,
+        255
+      ],
+      "width": 400,
+      "height": 400
+    },
+    {
+      "elapsedMs": 110,
+      "centerRGBA": [
+        255,
+        0,
+        0,
+        255
+      ],
+      "width": 400,
+      "height": 400
+    },
+    {
+      "elapsedMs": 161,
+      "centerRGBA": [
+        255,
+        0,
+        0,
+        255
+      ],
+      "width": 400,
+      "height": 400
+    }
+  ],
+  "consoleErrors": [],
+  "externalRequests": [],
+  "failedRequests": [],
+  "scope": "Actual local canonical shell and sandboxed native browser rendering; no selected-chain registration, deployment, hardware audio-output or publication claim"
+}

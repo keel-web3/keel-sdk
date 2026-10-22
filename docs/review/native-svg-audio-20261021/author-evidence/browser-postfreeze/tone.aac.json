@@ -1,0 +1,43 @@
+{
+  "input": {
+    "path": "tone.aac",
+    "byteLength": 3728,
+    "sha256": "85f965ea8ee43ad39c11374cb5c16bc355261c3ebe5f9721c5c00fef56c88f0b"
+  },
+  "documentBytes": 173545,
+  "initial": {
+    "paused": true,
+    "autoplay": false,
+    "controls": true,
+    "currentTime": 0,
+    "duration": 1.151995,
+    "srcSHA256": "0x85f965ea8ee43ad39c11374cb5c16bc355261c3ebe5f9721c5c00fef56c88f0b",
+    "coverSHA256": "0x9ed16ce9427bac44b0ce31fdf43ab90571b9a6125f7e42919401ad434f0204c5"
+  },
+  "coverPixels": {
+    "centerRGBA": [
+      255,
+      0,
+      0,
+      255
+    ],
+    "width": 16,
+    "height": 16
+  },
+  "decoded": {
+    "duration": 1.152,
+    "sampleRate": 48000,
+    "channels": 1,
+    "rms": 0.23861846565757627,
+    "frequency": 469.6180555555556
+  },
+  "playback": {
+    "paused": false,
+    "currentTime": 0.104125,
+    "error": null
+  },
+  "consoleErrors": [],
+  "externalRequests": [],
+  "failedRequests": [],
+  "scope": "Actual local canonical shell and sandboxed native browser rendering; no selected-chain registration, deployment, hardware audio-output or publication claim"
+}

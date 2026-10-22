@@ -1,0 +1,11 @@
+{
+  "baseline": "b0a78fd50797a9af82be282f0d1103fe49ff0dc8",
+  "candidate": "912bdc15f6bcadf399d9b9a038f0f321ccb10db6",
+  "baselineSkipNames": 87,
+  "candidateSkipNames": 85,
+  "previouslySkippedNowExecuted": [
+    "reads a local anvil chain and the values arrive as document variables",
+    "the MCP tool declares reads, performs them, and hands back a verified init fragment"
+  ],
+  "newSkips": []
+}

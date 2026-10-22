@@ -155,3 +155,27 @@ Unsigned exact source/fragment export (no connection or transaction):
 ```
 node docs/review/native-svg-audio-20261021/export-module.mjs <new-output-directory>
 ```
+
+## Frozen source and fresh author results
+
+Exact source `912bdc15f6bcadf399d9b9a038f0f321ccb10db6`:
+
+* Full clean NVM build: PASS.
+* Fresh entire maintained test list: **2700 PASS, 0 FAIL, 0 cancelled, 85 skipped**,
+  120.017 seconds. No existing assertion/reference/tolerance changed.
+* Fresh postfreeze canonical browser preservation: **22 PASS, 0 FAIL, 0 skipped**,
+  31.892 seconds. Includes all new media, old animation and complete 3D cases.
+* SDK nonincremental TypeScript: exit 0.
+
+The 87→85 skip difference from b0 is explained by two unchanged local-Anvil
+read tests executing when its existing binary is on PATH. No new skips were
+introduced. The first corrected NVM full run was 2699 PASS/1 FAIL because the
+isolated SDK package lacked its package-local workspace aliases in the installed
+copy test; aliases were corrected, all original assertions remained, and the
+entire unchanged maintained test list was rerun.
+
+`author-results.json` binds the exact source, runtime binary, counts, commands'
+raw output hashes, prior REDs and module identity. `author-evidence/` contains
+the complete passing test/browser outputs and actual SVG/audio/model results.
+These are implementer results. Independent approval and live release gates are
+still pending; source remains frozen while that review proceeds.

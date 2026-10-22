@@ -1,0 +1,235 @@
+[
+  {
+    "name": "parent-transform",
+    "mesh": false,
+    "skin": false,
+    "bone": false,
+    "position": [
+      0.25,
+      0,
+      0
+    ],
+    "world": [
+      1,
+      0,
+      0,
+      0,
+      0,
+      1,
+      0,
+      0,
+      0,
+      0,
+      1,
+      0,
+      0.25,
+      0,
+      0,
+      1
+    ],
+    "quaternion": [
+      0,
+      0,
+      0,
+      1
+    ],
+    "morph": null,
+    "texture": false,
+    "textureSize": null
+  },
+  {
+    "name": "textured-two-primitives",
+    "mesh": false,
+    "skin": false,
+    "bone": false,
+    "position": [
+      -0.800000011920929,
+      0,
+      0
+    ],
+    "world": [
+      1,
+      0,
+      0,
+      0,
+      0,
+      1,
+      0,
+      0,
+      0,
+      0,
+      1,
+      0,
+      -0.550000011920929,
+      0,
+      0,
+      1
+    ],
+    "quaternion": [
+      0,
+      0,
+      0,
+      1
+    ],
+    "morph": null,
+    "texture": false,
+    "textureSize": null
+  },
+  {
+    "name": "two-primitives",
+    "mesh": true,
+    "skin": false,
+    "bone": false,
+    "position": [
+      0,
+      0,
+      0
+    ],
+    "world": [
+      1,
+      0,
+      0,
+      0,
+      0,
+      1,
+      0,
+      0,
+      0,
+      0,
+      1,
+      0,
+      -0.550000011920929,
+      0,
+      0,
+      1
+    ],
+    "quaternion": [
+      0,
+      0,
+      0,
+      1
+    ],
+    "morph": null,
+    "texture": true,
+    "textureSize": [
+      2,
+      2
+    ]
+  },
+  {
+    "name": "two-primitives_1",
+    "mesh": true,
+    "skin": false,
+    "bone": false,
+    "position": [
+      0,
+      0,
+      0
+    ],
+    "world": [
+      1,
+      0,
+      0,
+      0,
+      0,
+      1,
+      0,
+      0,
+      0,
+      0,
+      1,
+      0,
+      -0.550000011920929,
+      0,
+      0,
+      1
+    ],
+    "quaternion": [
+      0,
+      0,
+      0,
+      1
+    ],
+    "morph": null,
+    "texture": false,
+    "textureSize": null
+  },
+  {
+    "name": "skinned-morph-triangle",
+    "mesh": true,
+    "skin": true,
+    "bone": false,
+    "position": [
+      0.8,
+      0,
+      0
+    ],
+    "world": [
+      1,
+      0,
+      0,
+      0,
+      0,
+      1,
+      0,
+      0,
+      0,
+      0,
+      1,
+      0,
+      1.05,
+      0,
+      0,
+      1
+    ],
+    "quaternion": [
+      0,
+      0,
+      0,
+      1
+    ],
+    "morph": [
+      0
+    ],
+    "texture": false,
+    "textureSize": null
+  },
+  {
+    "name": "source-bone",
+    "mesh": false,
+    "skin": false,
+    "bone": true,
+    "position": [
+      0,
+      0,
+      0
+    ],
+    "world": [
+      1,
+      0,
+      0,
+      0,
+      0,
+      1,
+      0,
+      0,
+      0,
+      0,
+      1,
+      0,
+      0.25,
+      0,
+      0,
+      1
+    ],
+    "quaternion": [
+      0,
+      0,
+      0,
+      1
+    ],
+    "morph": null,
+    "texture": false,
+    "textureSize": null
+  }
+]
