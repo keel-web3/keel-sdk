@@ -226,6 +226,14 @@ export function assertMoviePresentationSemantics(bytes: Uint8Array, inputReport:
         || avifItems!==1 || avifExtents!==1 || avifConfigs.length!==2 || !config || config.length<4 || config[0]!==0x81 || config.length!==avifConfigs[1]!.length || config.some((value,i)=>value!==avifConfigs[1]![i]))retain("unsupported AVIF edit-list repeat profile or flags");
     }
   }
+  const completeMovie=movie??retain("unavailable complete movie clock");
+  let completeDuration=0n;
+  for(const track of tracks) {
+    const duration=track.edit?.flags===1?track.edit.duration:track.duration;
+    if(duration===undefined || duration<=0n)retain("unavailable complete track duration");
+    if(duration!>completeDuration)completeDuration=duration!;
+  }
+  if(completeMovie.duration!==completeDuration)retain("movie duration differs from complete track edit-list bounds");
   // A codec may omit SAR in the probe (ordinary QuickTime output does). The
   // complete ISO path above still requires identity transforms and exact
   // track display dimensions equal to the coded raster, and checks every
