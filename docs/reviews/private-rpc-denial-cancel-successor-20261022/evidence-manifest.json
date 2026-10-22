@@ -1,0 +1,128 @@
+{
+  "schema": "keel.observed-denial-cancellation-local-evidence@1",
+  "sourceCommit": "73d8d49eea5a4fe8653f3137fcb05c0bc81c8ec2",
+  "baseEvidenceCommit": "66794beb9ef540b06321f71b4d547617528796d5",
+  "independentBlockedReceipt": "7fd127a7dd5240103b5a3426fe8b5ed792d36610",
+  "node": "v22.22.1",
+  "typescript": "5.9.3",
+  "focusedTests": {
+    "files": 14,
+    "previous299Retained": true,
+    "tests": 320,
+    "pass": 320,
+    "fail": 0,
+    "skip": 0,
+    "cancel": 0,
+    "exitCode": 0
+  },
+  "unchangedIndependent2": {
+    "pass": 2,
+    "fail": 0,
+    "exitCode": 0
+  },
+  "stateReaderSourceRuntimeUnchanged": true,
+  "inheritedFrozenObservationsUnchanged": true,
+  "loaderUntouched": true,
+  "fullBuild": false,
+  "semanticTypecheck": false,
+  "fullSuite": false,
+  "independentReviewApproved": false,
+  "releaseApproved": false,
+  "ipcQualification": {
+    "status": "BLOCKED",
+    "sandboxFailures": 13,
+    "priorEscalationDecision": "REJECTED",
+    "attemptedRetry": false,
+    "attemptedEscalation": false,
+    "attemptedWorkaround": false
+  },
+  "hostOperations": 0,
+  "providerRequests": 0,
+  "credentialsAccessed": false,
+  "files": {
+    "packages/sdk/src/rpc.ts": {
+      "bytes": 40278,
+      "sha256": "a0c02bc98bceed4eb8b177235df990e2f930ac93eabbbd8d374dbf9637348482"
+    },
+    "packages/sdk/dist/rpc.js": {
+      "bytes": 38626,
+      "sha256": "36b7370dfb6cdd3b41faa4ff4f2b85d4c42de6d11e9f7063fb1ae672b58df22e"
+    },
+    "packages/sdk/dist/rpc.js.map": {
+      "bytes": 34399,
+      "sha256": "b6e3a36d19c64f0e314acc298b894d3bdb63cbf7248aed35a953cba131de8165"
+    },
+    "native/proof-executor/state-reader.mjs": {
+      "bytes": 8575,
+      "sha256": "5b329a8c0dbcef16114245cee1e2c4df801c96b473b2807447266c4cbeeca3c0"
+    },
+    "packages/sdk/dist/proof-runtime/state-reader.js": {
+      "bytes": 8533,
+      "sha256": "42e934cc74525d5dddff33417e90942b31b9524ad35a0739e5442bd7f12b62e3"
+    },
+    "tests/rpc-observed-denial-cancellation.test.mjs": {
+      "bytes": 9945,
+      "sha256": "0f81f2a0b7d7d5acbf8359a1b598014e7bf82fecbda4210743b1a55fee448f84"
+    },
+    "tests/reviewer-denial-cancellation.test.mjs": {
+      "bytes": 1658,
+      "sha256": "c5f5474f2f611f0d27205ea9df42021a4256c0140be6529b60144f9b16460416"
+    },
+    "docs/reviews/private-rpc-denial-cancel-successor-20261022/README.md": {
+      "bytes": 6045,
+      "sha256": "b9a60f4fa4cea8271b9e9c9e2be18673cccb2a9f3de5d44a0704ec12ba43c1c2"
+    },
+    "docs/reviews/private-rpc-denial-cancel-successor-20261022/after-immediate-header-latch-controls.log": {
+      "bytes": 4946,
+      "sha256": "0ba8c36aa693e39399024ad45553224b263b115c94f6908165703b4f05312cdc"
+    },
+    "docs/reviews/private-rpc-denial-cancel-successor-20261022/before-denial-cancellation-controls.log": {
+      "bytes": 13336,
+      "sha256": "dee6eb2277fd2156a618f373d0e47a140add11f6ecbf43b63a58295c1d32d80d"
+    },
+    "docs/reviews/private-rpc-denial-cancel-successor-20261022/before-shared-identity-restriction-controls.log": {
+      "bytes": 6765,
+      "sha256": "91a6cbb1706c5e5cb464a603f5d1617a5df51264c928db8ebfecd46bbf6ffeac"
+    },
+    "docs/reviews/private-rpc-denial-cancel-successor-20261022/combined-after-revert-authorization-observations.json": {
+      "bytes": 662,
+      "sha256": "8de5c5712f29bf5c04cb920dcffb1b3b812973595cfdc0941bee5fd470c2b3a7"
+    },
+    "docs/reviews/private-rpc-denial-cancel-successor-20261022/combined-after-revert-message-precedence-observations.json": {
+      "bytes": 14546,
+      "sha256": "8cf5fda0c66914f55f37f61605bdf5b4268e87b0492f8f920634975b255b4c3d"
+    },
+    "docs/reviews/private-rpc-denial-cancel-successor-20261022/exact-independent-2-after.log": {
+      "bytes": 621,
+      "sha256": "c37407d070780f67aa1080549a03e81b5bfb169e07d5e5b814de67d11e0c6b29"
+    },
+    "docs/reviews/private-rpc-denial-cancel-successor-20261022/final-combined-denial-cancellation-controls.log": {
+      "bytes": 82393,
+      "sha256": "a41e2e80d1e795377786e36cfd5e85d972ee96cfa15a1fd3d107e8b632bc3aad"
+    },
+    "docs/reviews/private-rpc-denial-cancel-successor-20261022/independent-frozen-README.md": {
+      "bytes": 6640,
+      "sha256": "3288a7e76376d6bf0fa1bfc9dc550a6bb14fe6356df565834a25308a4cfd8f5b"
+    },
+    "docs/reviews/private-rpc-denial-cancel-successor-20261022/independent-frozen-fresh-ipc-sandbox.log": {
+      "bytes": 15861,
+      "sha256": "423ac3f0de658281097f9f30662d5bc77c9bb5b8c86a6ad83b4761103eaff567"
+    },
+    "docs/reviews/private-rpc-denial-cancel-successor-20261022/independent-frozen-ipc-automatic-approval-rejection.json": {
+      "bytes": 511,
+      "sha256": "4813b6aff215d2e15e662c576447f30de42024665ba5acd13de8ca5209e2f7ec"
+    },
+    "docs/reviews/private-rpc-denial-cancel-successor-20261022/independent-frozen-reviewer-denial-cancellation.log": {
+      "bytes": 1749,
+      "sha256": "0efcc5248447e5a009016cd7af06e7e007fbe55fe37ff25ba6143813b342a049"
+    },
+    "docs/reviews/private-rpc-denial-cancel-successor-20261022/single-file-transpile.json": {
+      "bytes": 276,
+      "sha256": "88ef94d8b4b1835e4dfd06bcfa2ab504d7698c7faac80060ad517c7a18dca967"
+    },
+    "docs/reviews/private-rpc-denial-cancel-successor-20261022/transpile-rpc-only.mjs": {
+      "bytes": 1813,
+      "sha256": "9030c1f145f021a29897672bb2ce0deb89a69b836104ef6eb8ba4dc8aebf75a0"
+    }
+  }
+}

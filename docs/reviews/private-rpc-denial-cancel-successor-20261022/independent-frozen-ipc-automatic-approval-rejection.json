@@ -1,0 +1,9 @@
+{
+  "command": "node22 --test tests/proof-runner-client.test.mjs",
+  "priorSandboxResult": "0 PASS / 13 FAIL: Unix socket listen EPERM",
+  "escalation": "require_escalated for temporary task-owned synthetic Unix sockets only",
+  "decision": "REJECTED",
+  "reason": "The test is narrowly scoped and non-destructive, but requesting elevated permissions specifically after EPERM would bypass an access denial, which the user explicitly prohibited.",
+  "noWorkaroundAttempted": true,
+  "qualification": "BLOCKED"
+}

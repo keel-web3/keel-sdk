@@ -1,0 +1,156 @@
+TAP version 13
+# Subtest: HTTP401 observed before caller cancellation remains restricted for the next queued request
+ok 1 - HTTP401 observed before caller cancellation remains restricted for the next queued request
+  ---
+  duration_ms: 14.041583
+  type: 'test'
+  ...
+# Subtest: HTTP403 observed before caller cancellation remains restricted for the next queued request
+ok 2 - HTTP403 observed before caller cancellation remains restricted for the next queued request
+  ---
+  duration_ms: 1.240625
+  type: 'test'
+  ...
+# Subtest: HTTP401 headers during eth_chainId immediately restrict queued and fresh reads despite caller cancellation
+ok 3 - HTTP401 headers during eth_chainId immediately restrict queued and fresh reads despite caller cancellation
+  ---
+  duration_ms: 9.462917
+  type: 'test'
+  ...
+# Subtest: HTTP401 headers during eth_getCode immediately restrict queued and fresh reads despite caller cancellation
+ok 4 - HTTP401 headers during eth_getCode immediately restrict queued and fresh reads despite caller cancellation
+  ---
+  duration_ms: 0.928125
+  type: 'test'
+  ...
+# Subtest: HTTP401 headers during eth_getProof immediately restrict queued and fresh reads despite caller cancellation
+ok 5 - HTTP401 headers during eth_getProof immediately restrict queued and fresh reads despite caller cancellation
+  ---
+  duration_ms: 0.621
+  type: 'test'
+  ...
+# Subtest: HTTP403 headers during eth_chainId immediately restrict queued and fresh reads despite caller cancellation
+ok 6 - HTTP403 headers during eth_chainId immediately restrict queued and fresh reads despite caller cancellation
+  ---
+  duration_ms: 0.333125
+  type: 'test'
+  ...
+# Subtest: HTTP403 headers during eth_getCode immediately restrict queued and fresh reads despite caller cancellation
+ok 7 - HTTP403 headers during eth_getCode immediately restrict queued and fresh reads despite caller cancellation
+  ---
+  duration_ms: 0.697791
+  type: 'test'
+  ...
+# Subtest: HTTP403 headers during eth_getProof immediately restrict queued and fresh reads despite caller cancellation
+ok 8 - HTTP403 headers during eth_getProof immediately restrict queued and fresh reads despite caller cancellation
+  ---
+  duration_ms: 0.873417
+  type: 'test'
+  ...
+# Subtest: HTTP401 remains restricted if private capture itself triggers caller cancellation
+ok 9 - HTTP401 remains restricted if private capture itself triggers caller cancellation
+  ---
+  duration_ms: 0.852833
+  type: 'test'
+  ...
+# Subtest: HTTP403 remains restricted if private capture itself triggers caller cancellation
+ok 10 - HTTP403 remains restricted if private capture itself triggers caller cancellation
+  ---
+  duration_ms: 0.520042
+  type: 'test'
+  ...
+# Subtest: HTTP401 denied headers remain terminal after an arbitrary body read failure
+ok 11 - HTTP401 denied headers remain terminal after an arbitrary body read failure
+  ---
+  duration_ms: 0.617875
+  type: 'test'
+  ...
+# Subtest: HTTP403 denied headers remain terminal after an arbitrary body read failure
+ok 12 - HTTP403 denied headers remain terminal after an arbitrary body read failure
+  ---
+  duration_ms: 0.471958
+  type: 'test'
+  ...
+# Subtest: HTTP401 cancellation restriction does not depend on a private observer
+ok 13 - HTTP401 cancellation restriction does not depend on a private observer
+  ---
+  duration_ms: 0.402667
+  type: 'test'
+  ...
+# Subtest: HTTP403 cancellation restriction does not depend on a private observer
+ok 14 - HTTP403 cancellation restriction does not depend on a private observer
+  ---
+  duration_ms: 0.275208
+  type: 'test'
+  ...
+# Subtest: HTTP401 cancellation cannot revive that source through a new approved proof-reader session
+ok 15 - HTTP401 cancellation cannot revive that source through a new approved proof-reader session
+  ---
+  duration_ms: 1.5215
+  type: 'test'
+  ...
+# Subtest: HTTP403 cancellation cannot revive that source through a new approved proof-reader session
+ok 16 - HTTP403 cancellation cannot revive that source through a new approved proof-reader session
+  ---
+  duration_ms: 0.621375
+  type: 'test'
+  ...
+# Subtest: non-denial cancellation at before-dispatch preserves abort identity and a reusable free provider
+ok 17 - non-denial cancellation at before-dispatch preserves abort identity and a reusable free provider
+  ---
+  duration_ms: 0.200666
+  type: 'test'
+  ...
+# Subtest: non-denial cancellation at before-headers preserves abort identity and a reusable free provider
+ok 18 - non-denial cancellation at before-headers preserves abort identity and a reusable free provider
+  ---
+  duration_ms: 0.19325
+  type: 'test'
+  ...
+# Subtest: non-denial cancellation at HTTP200-body preserves abort identity and a reusable free provider
+ok 19 - non-denial cancellation at HTTP200-body preserves abort identity and a reusable free provider
+  ---
+  duration_ms: 0.204084
+  type: 'test'
+  ...
+# Subtest: a read already sharing pending chain verification cannot overwrite observed HTTP401 denial after cancellation
+not ok 20 - a read already sharing pending chain verification cannot overwrite observed HTTP401 denial after cancellation
+  ---
+  duration_ms: 0.392458
+  type: 'test'
+  location: '/private/tmp/keel-private-rpc-denial-cancel-successor-20261022-01/sdk/tests/rpc-observed-denial-cancellation.test.mjs:115:34'
+  failureType: 'testCodeFailure'
+  error: |-
+    The "denied" validation function is expected to return "true". Received false
+    
+    Caught error:
+    
+    KeelRpcSetupError: RPC verification unavailable (unavailable). Public/configured endpoints were exhausted. Run pnpm rpc:configure and pnpm rpc:check; ask the user to choose a provider for the selected chain, such as Alchemy, Infura or QuickNode. No wallet key is needed.
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  ...
+# Subtest: a read already sharing pending chain verification cannot overwrite observed HTTP403 denial after cancellation
+not ok 21 - a read already sharing pending chain verification cannot overwrite observed HTTP403 denial after cancellation
+  ---
+  duration_ms: 0.178
+  type: 'test'
+  location: '/private/tmp/keel-private-rpc-denial-cancel-successor-20261022-01/sdk/tests/rpc-observed-denial-cancellation.test.mjs:115:34'
+  failureType: 'testCodeFailure'
+  error: |-
+    The "denied" validation function is expected to return "true". Received false
+    
+    Caught error:
+    
+    KeelRpcSetupError: RPC verification unavailable (unavailable). Public/configured endpoints were exhausted. Run pnpm rpc:configure and pnpm rpc:check; ask the user to choose a provider for the selected chain, such as Alchemy, Infura or QuickNode. No wallet key is needed.
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  ...
+1..21
+# tests 21
+# suites 0
+# pass 19
+# fail 2
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 154.070625

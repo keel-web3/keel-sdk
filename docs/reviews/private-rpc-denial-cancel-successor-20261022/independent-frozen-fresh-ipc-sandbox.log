@@ -1,0 +1,270 @@
+TAP version 13
+# Subtest: valid broker identity and final zero exit permit completion
+not ok 1 - valid broker identity and final zero exit permit completion
+  ---
+  duration_ms: 7.306875
+  type: 'test'
+  location: '/private/tmp/keel-independent-private-rpc-successor-20261022-01/sdk/tests/proof-runner-client.test.mjs:17:1'
+  failureType: 'uncaughtException'
+  error: 'listen EPERM: operation not permitted /var/folders/zk/40xbztxx7tb90tl4nnryd2780000gn/T/runner-client-test-dxSmfZ/runner.sock'
+  code: 'EPERM'
+  stack: |-
+    Server.setupListenHandle [as _listen2] (node:net:1918:21)
+    listenInCluster (node:net:1997:12)
+    Server.listen (node:net:2119:5)
+    file:///private/tmp/keel-independent-private-rpc-successor-20261022-01/sdk/tests/proof-runner-client.test.mjs:12:36
+    new Promise (<anonymous>)
+    fixture (file:///private/tmp/keel-independent-private-rpc-successor-20261022-01/sdk/tests/proof-runner-client.test.mjs:12:8)
+    async TestContext.<anonymous> (file:///private/tmp/keel-independent-private-rpc-successor-20261022-01/sdk/tests/proof-runner-client.test.mjs:18:15)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async startSubtestAfterBootstrap (node:internal/test_runner/harness:296:3)
+  ...
+# Subtest: missing exit cannot be a successful native completion
+not ok 2 - missing exit cannot be a successful native completion
+  ---
+  duration_ms: 3.719166
+  type: 'test'
+  location: '/private/tmp/keel-independent-private-rpc-successor-20261022-01/sdk/tests/proof-runner-client.test.mjs:27:3'
+  failureType: 'uncaughtException'
+  error: 'listen EPERM: operation not permitted /var/folders/zk/40xbztxx7tb90tl4nnryd2780000gn/T/runner-client-test-0FLHtK/runner.sock'
+  code: 'EPERM'
+  stack: |-
+    Server.setupListenHandle [as _listen2] (node:net:1918:21)
+    listenInCluster (node:net:1997:12)
+    Server.listen (node:net:2119:5)
+    file:///private/tmp/keel-independent-private-rpc-successor-20261022-01/sdk/tests/proof-runner-client.test.mjs:12:36
+    new Promise (<anonymous>)
+    fixture (file:///private/tmp/keel-independent-private-rpc-successor-20261022-01/sdk/tests/proof-runner-client.test.mjs:12:8)
+    async TestContext.<anonymous> (file:///private/tmp/keel-independent-private-rpc-successor-20261022-01/sdk/tests/proof-runner-client.test.mjs:28:15)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: nonzero exit cannot be a successful native completion
+not ok 3 - nonzero exit cannot be a successful native completion
+  ---
+  duration_ms: 1.064541
+  type: 'test'
+  location: '/private/tmp/keel-independent-private-rpc-successor-20261022-01/sdk/tests/proof-runner-client.test.mjs:27:3'
+  failureType: 'uncaughtException'
+  error: 'listen EPERM: operation not permitted /var/folders/zk/40xbztxx7tb90tl4nnryd2780000gn/T/runner-client-test-cikEcd/runner.sock'
+  code: 'EPERM'
+  stack: |-
+    Server.setupListenHandle [as _listen2] (node:net:1918:21)
+    listenInCluster (node:net:1997:12)
+    Server.listen (node:net:2119:5)
+    file:///private/tmp/keel-independent-private-rpc-successor-20261022-01/sdk/tests/proof-runner-client.test.mjs:12:36
+    new Promise (<anonymous>)
+    fixture (file:///private/tmp/keel-independent-private-rpc-successor-20261022-01/sdk/tests/proof-runner-client.test.mjs:12:8)
+    async TestContext.<anonymous> (file:///private/tmp/keel-independent-private-rpc-successor-20261022-01/sdk/tests/proof-runner-client.test.mjs:28:15)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: wrong identity cannot be a successful native completion
+not ok 4 - wrong identity cannot be a successful native completion
+  ---
+  duration_ms: 1.353334
+  type: 'test'
+  location: '/private/tmp/keel-independent-private-rpc-successor-20261022-01/sdk/tests/proof-runner-client.test.mjs:27:3'
+  failureType: 'uncaughtException'
+  error: 'listen EPERM: operation not permitted /var/folders/zk/40xbztxx7tb90tl4nnryd2780000gn/T/runner-client-test-4Rsl8E/runner.sock'
+  code: 'EPERM'
+  stack: |-
+    Server.setupListenHandle [as _listen2] (node:net:1918:21)
+    listenInCluster (node:net:1997:12)
+    Server.listen (node:net:2119:5)
+    file:///private/tmp/keel-independent-private-rpc-successor-20261022-01/sdk/tests/proof-runner-client.test.mjs:12:36
+    new Promise (<anonymous>)
+    fixture (file:///private/tmp/keel-independent-private-rpc-successor-20261022-01/sdk/tests/proof-runner-client.test.mjs:12:8)
+    async TestContext.<anonymous> (file:///private/tmp/keel-independent-private-rpc-successor-20261022-01/sdk/tests/proof-runner-client.test.mjs:28:15)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: wrong concurrency cannot be a successful native completion
+not ok 5 - wrong concurrency cannot be a successful native completion
+  ---
+  duration_ms: 1.230209
+  type: 'test'
+  location: '/private/tmp/keel-independent-private-rpc-successor-20261022-01/sdk/tests/proof-runner-client.test.mjs:27:3'
+  failureType: 'uncaughtException'
+  error: 'listen EPERM: operation not permitted /var/folders/zk/40xbztxx7tb90tl4nnryd2780000gn/T/runner-client-test-QfhCCX/runner.sock'
+  code: 'EPERM'
+  stack: |-
+    Server.setupListenHandle [as _listen2] (node:net:1918:21)
+    listenInCluster (node:net:1997:12)
+    Server.listen (node:net:2119:5)
+    file:///private/tmp/keel-independent-private-rpc-successor-20261022-01/sdk/tests/proof-runner-client.test.mjs:12:36
+    new Promise (<anonymous>)
+    fixture (file:///private/tmp/keel-independent-private-rpc-successor-20261022-01/sdk/tests/proof-runner-client.test.mjs:12:8)
+    async TestContext.<anonymous> (file:///private/tmp/keel-independent-private-rpc-successor-20261022-01/sdk/tests/proof-runner-client.test.mjs:28:15)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: unbounded wall time cannot be a successful native completion
+not ok 6 - unbounded wall time cannot be a successful native completion
+  ---
+  duration_ms: 1.070417
+  type: 'test'
+  location: '/private/tmp/keel-independent-private-rpc-successor-20261022-01/sdk/tests/proof-runner-client.test.mjs:27:3'
+  failureType: 'uncaughtException'
+  error: 'listen EPERM: operation not permitted /var/folders/zk/40xbztxx7tb90tl4nnryd2780000gn/T/runner-client-test-cCJnIZ/runner.sock'
+  code: 'EPERM'
+  stack: |-
+    Server.setupListenHandle [as _listen2] (node:net:1918:21)
+    listenInCluster (node:net:1997:12)
+    Server.listen (node:net:2119:5)
+    file:///private/tmp/keel-independent-private-rpc-successor-20261022-01/sdk/tests/proof-runner-client.test.mjs:12:36
+    new Promise (<anonymous>)
+    fixture (file:///private/tmp/keel-independent-private-rpc-successor-20261022-01/sdk/tests/proof-runner-client.test.mjs:12:8)
+    async TestContext.<anonymous> (file:///private/tmp/keel-independent-private-rpc-successor-20261022-01/sdk/tests/proof-runner-client.test.mjs:28:15)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: primitive frame cannot be a successful native completion
+not ok 7 - primitive frame cannot be a successful native completion
+  ---
+  duration_ms: 0.803417
+  type: 'test'
+  location: '/private/tmp/keel-independent-private-rpc-successor-20261022-01/sdk/tests/proof-runner-client.test.mjs:27:3'
+  failureType: 'uncaughtException'
+  error: 'listen EPERM: operation not permitted /var/folders/zk/40xbztxx7tb90tl4nnryd2780000gn/T/runner-client-test-6yowFu/runner.sock'
+  code: 'EPERM'
+  stack: |-
+    Server.setupListenHandle [as _listen2] (node:net:1918:21)
+    listenInCluster (node:net:1997:12)
+    Server.listen (node:net:2119:5)
+    file:///private/tmp/keel-independent-private-rpc-successor-20261022-01/sdk/tests/proof-runner-client.test.mjs:12:36
+    new Promise (<anonymous>)
+    fixture (file:///private/tmp/keel-independent-private-rpc-successor-20261022-01/sdk/tests/proof-runner-client.test.mjs:12:8)
+    async TestContext.<anonymous> (file:///private/tmp/keel-independent-private-rpc-successor-20261022-01/sdk/tests/proof-runner-client.test.mjs:28:15)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: array frame cannot be a successful native completion
+not ok 8 - array frame cannot be a successful native completion
+  ---
+  duration_ms: 1.872709
+  type: 'test'
+  location: '/private/tmp/keel-independent-private-rpc-successor-20261022-01/sdk/tests/proof-runner-client.test.mjs:27:3'
+  failureType: 'uncaughtException'
+  error: 'listen EPERM: operation not permitted /var/folders/zk/40xbztxx7tb90tl4nnryd2780000gn/T/runner-client-test-Y0gUxN/runner.sock'
+  code: 'EPERM'
+  stack: |-
+    Server.setupListenHandle [as _listen2] (node:net:1918:21)
+    listenInCluster (node:net:1997:12)
+    Server.listen (node:net:2119:5)
+    file:///private/tmp/keel-independent-private-rpc-successor-20261022-01/sdk/tests/proof-runner-client.test.mjs:12:36
+    new Promise (<anonymous>)
+    fixture (file:///private/tmp/keel-independent-private-rpc-successor-20261022-01/sdk/tests/proof-runner-client.test.mjs:12:8)
+    async TestContext.<anonymous> (file:///private/tmp/keel-independent-private-rpc-successor-20261022-01/sdk/tests/proof-runner-client.test.mjs:28:15)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: result before identity cannot be a successful native completion
+not ok 9 - result before identity cannot be a successful native completion
+  ---
+  duration_ms: 1.718917
+  type: 'test'
+  location: '/private/tmp/keel-independent-private-rpc-successor-20261022-01/sdk/tests/proof-runner-client.test.mjs:27:3'
+  failureType: 'uncaughtException'
+  error: 'listen EPERM: operation not permitted /var/folders/zk/40xbztxx7tb90tl4nnryd2780000gn/T/runner-client-test-UqGdFk/runner.sock'
+  code: 'EPERM'
+  stack: |-
+    Server.setupListenHandle [as _listen2] (node:net:1918:21)
+    listenInCluster (node:net:1997:12)
+    Server.listen (node:net:2119:5)
+    file:///private/tmp/keel-independent-private-rpc-successor-20261022-01/sdk/tests/proof-runner-client.test.mjs:12:36
+    new Promise (<anonymous>)
+    fixture (file:///private/tmp/keel-independent-private-rpc-successor-20261022-01/sdk/tests/proof-runner-client.test.mjs:12:8)
+    async TestContext.<anonymous> (file:///private/tmp/keel-independent-private-rpc-successor-20261022-01/sdk/tests/proof-runner-client.test.mjs:28:15)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: trailing result cannot be a successful native completion
+not ok 10 - trailing result cannot be a successful native completion
+  ---
+  duration_ms: 1.397709
+  type: 'test'
+  location: '/private/tmp/keel-independent-private-rpc-successor-20261022-01/sdk/tests/proof-runner-client.test.mjs:27:3'
+  failureType: 'uncaughtException'
+  error: 'listen EPERM: operation not permitted /var/folders/zk/40xbztxx7tb90tl4nnryd2780000gn/T/runner-client-test-nInrqy/runner.sock'
+  code: 'EPERM'
+  stack: |-
+    Server.setupListenHandle [as _listen2] (node:net:1918:21)
+    listenInCluster (node:net:1997:12)
+    Server.listen (node:net:2119:5)
+    file:///private/tmp/keel-independent-private-rpc-successor-20261022-01/sdk/tests/proof-runner-client.test.mjs:12:36
+    new Promise (<anonymous>)
+    fixture (file:///private/tmp/keel-independent-private-rpc-successor-20261022-01/sdk/tests/proof-runner-client.test.mjs:12:8)
+    async TestContext.<anonymous> (file:///private/tmp/keel-independent-private-rpc-successor-20261022-01/sdk/tests/proof-runner-client.test.mjs:28:15)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: unknown frame cannot be a successful native completion
+not ok 11 - unknown frame cannot be a successful native completion
+  ---
+  duration_ms: 0.968458
+  type: 'test'
+  location: '/private/tmp/keel-independent-private-rpc-successor-20261022-01/sdk/tests/proof-runner-client.test.mjs:27:3'
+  failureType: 'uncaughtException'
+  error: 'listen EPERM: operation not permitted /var/folders/zk/40xbztxx7tb90tl4nnryd2780000gn/T/runner-client-test-jEKoWV/runner.sock'
+  code: 'EPERM'
+  stack: |-
+    Server.setupListenHandle [as _listen2] (node:net:1918:21)
+    listenInCluster (node:net:1997:12)
+    Server.listen (node:net:2119:5)
+    file:///private/tmp/keel-independent-private-rpc-successor-20261022-01/sdk/tests/proof-runner-client.test.mjs:12:36
+    new Promise (<anonymous>)
+    fixture (file:///private/tmp/keel-independent-private-rpc-successor-20261022-01/sdk/tests/proof-runner-client.test.mjs:12:8)
+    async TestContext.<anonymous> (file:///private/tmp/keel-independent-private-rpc-successor-20261022-01/sdk/tests/proof-runner-client.test.mjs:28:15)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: invalid exit cannot be a successful native completion
+not ok 12 - invalid exit cannot be a successful native completion
+  ---
+  duration_ms: 0.651541
+  type: 'test'
+  location: '/private/tmp/keel-independent-private-rpc-successor-20261022-01/sdk/tests/proof-runner-client.test.mjs:27:3'
+  failureType: 'uncaughtException'
+  error: 'listen EPERM: operation not permitted /var/folders/zk/40xbztxx7tb90tl4nnryd2780000gn/T/runner-client-test-XZqhZy/runner.sock'
+  code: 'EPERM'
+  stack: |-
+    Server.setupListenHandle [as _listen2] (node:net:1918:21)
+    listenInCluster (node:net:1997:12)
+    Server.listen (node:net:2119:5)
+    file:///private/tmp/keel-independent-private-rpc-successor-20261022-01/sdk/tests/proof-runner-client.test.mjs:12:36
+    new Promise (<anonymous>)
+    fixture (file:///private/tmp/keel-independent-private-rpc-successor-20261022-01/sdk/tests/proof-runner-client.test.mjs:12:8)
+    async TestContext.<anonymous> (file:///private/tmp/keel-independent-private-rpc-successor-20261022-01/sdk/tests/proof-runner-client.test.mjs:28:15)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: busy cannot be a successful native completion
+not ok 13 - busy cannot be a successful native completion
+  ---
+  duration_ms: 1.060208
+  type: 'test'
+  location: '/private/tmp/keel-independent-private-rpc-successor-20261022-01/sdk/tests/proof-runner-client.test.mjs:27:3'
+  failureType: 'uncaughtException'
+  error: 'listen EPERM: operation not permitted /var/folders/zk/40xbztxx7tb90tl4nnryd2780000gn/T/runner-client-test-rWA03Z/runner.sock'
+  code: 'EPERM'
+  stack: |-
+    Server.setupListenHandle [as _listen2] (node:net:1918:21)
+    listenInCluster (node:net:1997:12)
+    Server.listen (node:net:2119:5)
+    file:///private/tmp/keel-independent-private-rpc-successor-20261022-01/sdk/tests/proof-runner-client.test.mjs:12:36
+    new Promise (<anonymous>)
+    fixture (file:///private/tmp/keel-independent-private-rpc-successor-20261022-01/sdk/tests/proof-runner-client.test.mjs:12:8)
+    async TestContext.<anonymous> (file:///private/tmp/keel-independent-private-rpc-successor-20261022-01/sdk/tests/proof-runner-client.test.mjs:28:15)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+1..13
+# tests 13
+# suites 0
+# pass 0
+# fail 13
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 100.96325

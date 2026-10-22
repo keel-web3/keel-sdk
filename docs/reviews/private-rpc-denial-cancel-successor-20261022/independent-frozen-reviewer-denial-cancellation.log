@@ -1,0 +1,40 @@
+TAP version 13
+# Subtest: HTTP401 observed before caller cancellation remains restricted for the next queued request
+not ok 1 - HTTP401 observed before caller cancellation remains restricted for the next queued request
+  ---
+  duration_ms: 33.97475
+  type: 'test'
+  location: '/private/tmp/keel-independent-private-rpc-successor-20261022-01/sdk/tests/reviewer-denial-cancellation.test.mjs:6:34'
+  failureType: 'testCodeFailure'
+  error: 'Missing expected rejection.'
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  stack: |-
+    async TestContext.<anonymous> (file:///private/tmp/keel-independent-private-rpc-successor-20261022-01/sdk/tests/reviewer-denial-cancellation.test.mjs:24:3)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async startSubtestAfterBootstrap (node:internal/test_runner/harness:296:3)
+  ...
+# Subtest: HTTP403 observed before caller cancellation remains restricted for the next queued request
+not ok 2 - HTTP403 observed before caller cancellation remains restricted for the next queued request
+  ---
+  duration_ms: 4.574459
+  type: 'test'
+  location: '/private/tmp/keel-independent-private-rpc-successor-20261022-01/sdk/tests/reviewer-denial-cancellation.test.mjs:6:34'
+  failureType: 'testCodeFailure'
+  error: 'Missing expected rejection.'
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  stack: |-
+    async TestContext.<anonymous> (file:///private/tmp/keel-independent-private-rpc-successor-20261022-01/sdk/tests/reviewer-denial-cancellation.test.mjs:24:3)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+1..2
+# tests 2
+# suites 0
+# pass 0
+# fail 2
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 183.3355
