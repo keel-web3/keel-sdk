@@ -1,0 +1,33 @@
+{
+  "schema": "keel-temporal-complete-graph-measurement@1",
+  "scope": "Actual SDK compiler plus retained current registered frame/profile recipe under explicit synthetic metadata context; no selected-chain/live or normal Studio recommendation integration claim",
+  "measurements": [
+    {
+      "format": "original",
+      "sourceBytes": 1811,
+      "completeHTMLBytes": 94292,
+      "completeTokenURIBytes": 136123,
+      "completeTokenURIDigest": "0x9778443f926ae0dd83b10351fc4451f044b308c35af43686d0285f9196baeb3e",
+      "storedGraphBytes": 94292,
+      "shellAndModuleBytes": 92215
+    },
+    {
+      "format": "webp",
+      "sourceBytes": 188,
+      "completeHTMLBytes": 92779,
+      "completeTokenURIBytes": 134610,
+      "completeTokenURIDigest": "0xa848cd23bf125e4c8b13300522f23119c152ae712a238f755f97e90597d691a3",
+      "storedGraphBytes": 92779,
+      "shellAndModuleBytes": 92215
+    },
+    {
+      "format": "avif",
+      "sourceBytes": 1381,
+      "completeHTMLBytes": 93820,
+      "completeTokenURIBytes": 135651,
+      "completeTokenURIDigest": "0x81772df92ef5d83e0bd3af423e1c4f32965a804cc1953c8b0790cbd9c1d666e8",
+      "storedGraphBytes": 93820,
+      "shellAndModuleBytes": 92215
+    }
+  ]
+}

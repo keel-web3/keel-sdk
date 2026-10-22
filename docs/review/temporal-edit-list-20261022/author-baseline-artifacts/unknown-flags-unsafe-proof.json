@@ -1,0 +1,86 @@
+{
+  "schema": "keel-actual-media-pair@1",
+  "sourceIntegrity": {
+    "algorithm": "sha256",
+    "digest": "0x33f37b310127315151ab0593177e2963aab85b245987d8ebea33a830925b9f1b",
+    "byteLength": 2937
+  },
+  "candidateIntegrity": {
+    "algorithm": "sha256",
+    "digest": "0x15e160de0827a42f62a73490d690561125232cff77877db53148cbc1ece035db",
+    "byteLength": 464
+  },
+  "recipe": {
+    "schema": "keel-media-edit@1",
+    "mode": "lossless",
+    "format": "webp",
+    "quality": 82,
+    "noSound": false
+  },
+  "recipeDigest": "0xa88749b5d17ca04f88556d8782161f8a6920290ca9d28cc202e82b62a6dc6ad5",
+  "publicationReady": false,
+  "adoptionAuthorized": false,
+  "source": {
+    "info": {
+      "width": 32,
+      "height": 24,
+      "durationMs": 600,
+      "frameCount": 3,
+      "animated": true,
+      "hasAudio": false,
+      "frameTimesMs": [
+        0,
+        200,
+        400
+      ],
+      "frameDurationsMs": [
+        200,
+        200,
+        200
+      ]
+    },
+    "frameHashes": [
+      "d5a25730825423e4aec7729e6670db04e0f9e0617b84e483628bc40fce97b1cd",
+      "a1a5407e5c472e563538b71ebd549ff45d3ccbae81fa5ff367ad77335e08f1c4",
+      "ff79243a85c2cc222d940c90d4f77fc06aad5234dabbc40e7277b43de487b890"
+    ],
+    "loop": {
+      "kind": "canonical-player-defined"
+    },
+    "startTimeMs": 0,
+    "colorSemantics": "srgb-full"
+  },
+  "candidate": {
+    "info": {
+      "width": 32,
+      "height": 24,
+      "durationMs": 600,
+      "frameCount": 3,
+      "animated": true,
+      "hasAudio": false,
+      "frameTimesMs": [
+        0,
+        200,
+        400
+      ],
+      "frameDurationsMs": [
+        200,
+        200,
+        200
+      ]
+    },
+    "frameHashes": [
+      "d5a25730825423e4aec7729e6670db04e0f9e0617b84e483628bc40fce97b1cd",
+      "a1a5407e5c472e563538b71ebd549ff45d3ccbae81fa5ff367ad77335e08f1c4",
+      "ff79243a85c2cc222d940c90d4f77fc06aad5234dabbc40e7277b43de487b890"
+    ],
+    "loop": {
+      "kind": "container",
+      "repetitions": 0
+    },
+    "startTimeMs": 0,
+    "colorSemantics": "srgb-full"
+  },
+  "eligibility": "requires-canonical-player-proof",
+  "reason": "Decoded content is exactly equivalent; the authenticated canonical renderer must prove repeat playback for both containers before automatic selection."
+}

@@ -1,0 +1,53 @@
+{
+  "runtime": "pinned ffmpeg-static5.3.0 Darwin arm64 executable reportsFFmpeg6.0; exact binary inenvironment",
+  "grammarFile": "packages/builder/src/movie-presentation-semantics.ts",
+  "grammarSHA256": "b93c53f1f84de805a196e2ec5fe9dfbf91fc8002f0b022f9ef7cef2294948938",
+  "upstream": [
+    {
+      "file": "docs/review/temporal-edit-list-20261022/upstream/mov-n6.0.c",
+      "url": "https://raw.githubusercontent.com/FFmpeg/FFmpeg/n6.0/libavformat/mov.c",
+      "sha256": "ac9995a92d222a512d9869444552c855bda2dac0069935c468b986d1308c655f",
+      "functions": [
+        {
+          "name": "mov_read_elst",
+          "startLine": 5603,
+          "endLine": 5670,
+          "sha256": "7a30b8703fa779cf89adad8c1132e648016502c36a49c49414cf3160687f9a92"
+        },
+        {
+          "name": "mov_read_stts",
+          "startLine": 2979,
+          "endLine": 3092,
+          "sha256": "a8e656ccbfec12643ce16396e02c91fe309e6f9fec7f11a3a47b57b1606d8fa6"
+        },
+        {
+          "name": "mov_read_ctts",
+          "startLine": 3139,
+          "endLine": 3203,
+          "sha256": "57b1cfbf253ec82d7a2653299713c20ef489027b02654e5e7607604653230471"
+        }
+      ]
+    },
+    {
+      "file": "docs/review/temporal-edit-list-20261022/upstream/movenc-n6.0.c",
+      "url": "https://raw.githubusercontent.com/FFmpeg/FFmpeg/n6.0/libavformat/movenc.c",
+      "sha256": "9f64debd4bc0de057ddbcfe63c23035261e7c61c205a0b576cec0128a13461b2",
+      "functions": [
+        {
+          "name": "mov_write_edts_tag",
+          "startLine": 3422,
+          "endLine": 3518,
+          "sha256": "99992908ea8afac420f9bd3ccfec66ccf34df4d1383137aec30981518f9a8d03"
+        },
+        {
+          "name": "mov_write_tkhd_tag",
+          "startLine": 3277,
+          "endLine": 3385,
+          "sha256": "17fbb1ab59f2464efbec0f6a39edfa1ba65a7a15823b4358636e93d095971e02"
+        }
+      ]
+    }
+  ],
+  "scope": "One complete forward segment; explicit complete AVIF/AV1 infinite-repeat profile; unsupported forms retain native; no permissive decoder admission",
+  "productionSourceCommit": "b5a153547a5d5876f028d7c2678605fda735185d"
+}

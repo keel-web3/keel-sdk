@@ -1,0 +1,130 @@
+TAP version 13
+# Subtest: closed presentation guard must reject unmodelled edit list half-rate
+not ok 1 - closed presentation guard must reject unmodelled edit list half-rate
+  ---
+  duration_ms: 174.1775
+  type: 'test'
+  location: '/private/tmp/keel-temporal-edit-list-20261022-01/baseline/reviewer-editlist-byte-equality.test.mjs:6:299'
+  failureType: 'testCodeFailure'
+  error: 'Missing expected rejection.'
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected:
+  operator: 'rejects'
+  stack: |-
+    async TestContext.<anonymous> (file:///private/tmp/keel-temporal-edit-list-20261022-01/baseline/reviewer-editlist-byte-equality.test.mjs:6:782)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async startSubtestAfterBootstrap (node:internal/test_runner/harness:296:3)
+  ...
+# {"variant":"half-rate","sourceBytes":2937,"sourceSHA256":"b2ad0f3b82fe2808a468d1f0e6ac283c869e9fc852483e48f2caf602583109e3"}
+# {"variant":"half-rate","candidateBytes":464,"candidateSHA256":"15e160de0827a42f62a73490d690561125232cff77877db53148cbc1ece035db","eligibility":"requires-canonical-player-proof"}
+# Subtest: closed presentation guard must reject unmodelled edit list unknown-version
+not ok 2 - closed presentation guard must reject unmodelled edit list unknown-version
+  ---
+  duration_ms: 132.545625
+  type: 'test'
+  location: '/private/tmp/keel-temporal-edit-list-20261022-01/baseline/reviewer-editlist-byte-equality.test.mjs:6:299'
+  failureType: 'testCodeFailure'
+  error: 'Missing expected rejection.'
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected:
+  operator: 'rejects'
+  stack: |-
+    async TestContext.<anonymous> (file:///private/tmp/keel-temporal-edit-list-20261022-01/baseline/reviewer-editlist-byte-equality.test.mjs:6:782)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# {"variant":"unknown-version","sourceBytes":2937,"sourceSHA256":"41bf356340d157a5b731e3ef498e9e9048c37f585913813fb0de1bbd9d958902"}
+# {"variant":"unknown-version","candidateBytes":464,"candidateSHA256":"15e160de0827a42f62a73490d690561125232cff77877db53148cbc1ece035db","eligibility":"requires-canonical-player-proof"}
+# Subtest: closed presentation guard must reject unmodelled edit list wrong-count
+not ok 3 - closed presentation guard must reject unmodelled edit list wrong-count
+  ---
+  duration_ms: 131.444208
+  type: 'test'
+  location: '/private/tmp/keel-temporal-edit-list-20261022-01/baseline/reviewer-editlist-byte-equality.test.mjs:6:299'
+  failureType: 'testCodeFailure'
+  error: 'Missing expected rejection.'
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected:
+  operator: 'rejects'
+  stack: |-
+    async TestContext.<anonymous> (file:///private/tmp/keel-temporal-edit-list-20261022-01/baseline/reviewer-editlist-byte-equality.test.mjs:6:782)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# {"variant":"wrong-count","sourceBytes":2937,"sourceSHA256":"4182c1002ed7999774e8abaa86b259dfe8e068c307c35b2a0eb13323762fead5"}
+# {"variant":"wrong-count","candidateBytes":464,"candidateSHA256":"15e160de0827a42f62a73490d690561125232cff77877db53148cbc1ece035db","eligibility":"requires-canonical-player-proof"}
+# Subtest: closed presentation guard must reject unmodelled edit list duplicate
+not ok 4 - closed presentation guard must reject unmodelled edit list duplicate
+  ---
+  duration_ms: 129.250333
+  type: 'test'
+  location: '/private/tmp/keel-temporal-edit-list-20261022-01/baseline/reviewer-editlist-byte-equality.test.mjs:6:299'
+  failureType: 'testCodeFailure'
+  error: 'Missing expected rejection.'
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected:
+  operator: 'rejects'
+  stack: |-
+    async TestContext.<anonymous> (file:///private/tmp/keel-temporal-edit-list-20261022-01/baseline/reviewer-editlist-byte-equality.test.mjs:6:782)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# {"variant":"duplicate","sourceBytes":2965,"sourceSHA256":"f41bb7f4977ab4a34def60d30c170e9afdb385156dd9f6da686089b324f227ed"}
+# {"variant":"duplicate","candidateBytes":464,"candidateSHA256":"15e160de0827a42f62a73490d690561125232cff77877db53148cbc1ece035db","eligibility":"requires-canonical-player-proof"}
+# Subtest: all unqualified edit-list sources remain exact in native Original mode without requiring semantic admission
+ok 5 - all unqualified edit-list sources remain exact in native Original mode without requiring semantic admission
+  ---
+  duration_ms: 1.08225
+  type: 'test'
+  ...
+# Subtest: closed presentation guard must reject unknown-flags edit container
+not ok 6 - closed presentation guard must reject unknown-flags edit container
+  ---
+  duration_ms: 124.247875
+  type: 'test'
+  location: '/private/tmp/keel-temporal-edit-list-20261022-01/baseline/reviewer-editlist-byte-equality.test.mjs:8:184'
+  failureType: 'testCodeFailure'
+  error: 'Missing expected rejection.'
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected:
+  operator: 'rejects'
+  stack: |-
+    async TestContext.<anonymous> (file:///private/tmp/keel-temporal-edit-list-20261022-01/baseline/reviewer-editlist-byte-equality.test.mjs:8:640)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# {"variant":"unknown-flags","sourceBytes":2937,"sourceSHA256":"33f37b310127315151ab0593177e2963aab85b245987d8ebea33a830925b9f1b"}
+# {"variant":"unknown-flags","candidateBytes":464,"candidateSHA256":"15e160de0827a42f62a73490d690561125232cff77877db53148cbc1ece035db","eligibility":"requires-canonical-player-proof"}
+# Subtest: closed presentation guard must reject duplicate-edts edit container
+not ok 7 - closed presentation guard must reject duplicate-edts edit container
+  ---
+  duration_ms: 124.84125
+  type: 'test'
+  location: '/private/tmp/keel-temporal-edit-list-20261022-01/baseline/reviewer-editlist-byte-equality.test.mjs:8:184'
+  failureType: 'testCodeFailure'
+  error: 'Missing expected rejection.'
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected:
+  operator: 'rejects'
+  stack: |-
+    async TestContext.<anonymous> (file:///private/tmp/keel-temporal-edit-list-20261022-01/baseline/reviewer-editlist-byte-equality.test.mjs:8:640)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# {"variant":"duplicate-edts","sourceBytes":2973,"sourceSHA256":"ec083cb7e5c9a53fc65e626b408fd4553d784889874914c30c2eacc970440c21"}
+# {"variant":"duplicate-edts","candidateBytes":464,"candidateSHA256":"15e160de0827a42f62a73490d690561125232cff77877db53148cbc1ece035db","eligibility":"requires-canonical-player-proof"}
+1..7
+# tests 7
+# suites 0
+# pass 1
+# fail 6
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 951.547459

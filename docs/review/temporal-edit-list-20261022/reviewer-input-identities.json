@@ -1,0 +1,72 @@
+[
+  {
+    "path": "edit-list-inputs/duplicate-edts.mp4",
+    "bytes": 2973,
+    "sha256": "ec083cb7e5c9a53fc65e626b408fd4553d784889874914c30c2eacc970440c21"
+  },
+  {
+    "path": "edit-list-inputs/duplicate-unsafe-proof.json",
+    "bytes": 2259,
+    "sha256": "ea786b859a1a2df08458c86c24c948b1163950218ddc5ac6cf73ce5d5dde398c"
+  },
+  {
+    "path": "edit-list-inputs/duplicate.mp4",
+    "bytes": 2965,
+    "sha256": "f41bb7f4977ab4a34def60d30c170e9afdb385156dd9f6da686089b324f227ed"
+  },
+  {
+    "path": "edit-list-inputs/duplicate.webp",
+    "bytes": 464,
+    "sha256": "15e160de0827a42f62a73490d690561125232cff77877db53148cbc1ece035db"
+  },
+  {
+    "path": "edit-list-inputs/half-rate-unsafe-proof.json",
+    "bytes": 2259,
+    "sha256": "bbdf30ff2fcc6c49f122cc8b95d50b9c5d4c36a9f17e790f59f9f8754ebfe898"
+  },
+  {
+    "path": "edit-list-inputs/half-rate.mp4",
+    "bytes": 2937,
+    "sha256": "b2ad0f3b82fe2808a468d1f0e6ac283c869e9fc852483e48f2caf602583109e3"
+  },
+  {
+    "path": "edit-list-inputs/half-rate.webp",
+    "bytes": 464,
+    "sha256": "15e160de0827a42f62a73490d690561125232cff77877db53148cbc1ece035db"
+  },
+  {
+    "path": "edit-list-inputs/unknown-flags.mp4",
+    "bytes": 2937,
+    "sha256": "33f37b310127315151ab0593177e2963aab85b245987d8ebea33a830925b9f1b"
+  },
+  {
+    "path": "edit-list-inputs/unknown-version-unsafe-proof.json",
+    "bytes": 2259,
+    "sha256": "8d63abc95e5c8465cbd4f7048657451d0375bd2e521b964c87f91c31fbf26986"
+  },
+  {
+    "path": "edit-list-inputs/unknown-version.mp4",
+    "bytes": 2937,
+    "sha256": "41bf356340d157a5b731e3ef498e9e9048c37f585913813fb0de1bbd9d958902"
+  },
+  {
+    "path": "edit-list-inputs/unknown-version.webp",
+    "bytes": 464,
+    "sha256": "15e160de0827a42f62a73490d690561125232cff77877db53148cbc1ece035db"
+  },
+  {
+    "path": "edit-list-inputs/wrong-count-unsafe-proof.json",
+    "bytes": 2259,
+    "sha256": "0f81be8bcfd421f8ed99600410b25729270ed84eab137648272eefcd65ac28d2"
+  },
+  {
+    "path": "edit-list-inputs/wrong-count.mp4",
+    "bytes": 2937,
+    "sha256": "4182c1002ed7999774e8abaa86b259dfe8e068c307c35b2a0eb13323762fead5"
+  },
+  {
+    "path": "edit-list-inputs/wrong-count.webp",
+    "bytes": 464,
+    "sha256": "15e160de0827a42f62a73490d690561125232cff77877db53148cbc1ece035db"
+  }
+]

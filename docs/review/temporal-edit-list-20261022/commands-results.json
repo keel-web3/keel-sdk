@@ -1,0 +1,49 @@
+{
+  "schema": "keel-author-edit-list-checks@1",
+  "executedSdkCommit": "f01114d7ee11ef9d389551b6f22cc076c15df697",
+  "productionCommit": "b5a153547a5d5876f028d7c2678605fda735185d",
+  "siteCommit": "3a76da90027b8c8e4b0c4b3aee8be0f03091bbe4",
+  "independentTestCorrectionAdmission": "PENDING",
+  "independentSourceApproval": "PENDING",
+  "checks": [
+    {
+      "name": "SDK existing54+reviewer7+new6",
+      "exitCode": 0,
+      "pass": 67,
+      "fail": 0,
+      "skip": 0,
+      "stdout": "freeze-sdk.stdout",
+      "stderr": "freeze-sdk.stderr"
+    },
+    {
+      "name": "normal complete-context Site",
+      "exitCode": 0,
+      "pass": 22,
+      "fail": 0,
+      "skip": 0,
+      "stdout": "freeze-site.stdout",
+      "stderr": "freeze-site.stderr"
+    },
+    {
+      "name": "current canonical installed Chromium",
+      "exitCode": 0,
+      "pass": 6,
+      "fail": 0,
+      "skip": 0,
+      "stdout": "freeze-browser.stdout",
+      "stderr": "freeze-browser.stderr"
+    },
+    {
+      "name": "builder TSC",
+      "exitCode": 0,
+      "stdout": "freeze-builder-tsc.stdout",
+      "stderr": "freeze-builder-tsc.stderr"
+    },
+    {
+      "name": "Site TSC",
+      "exitCode": 0,
+      "stdout": "freeze-site-tsc.stdout",
+      "stderr": "freeze-site-tsc.stderr"
+    }
+  ]
+}

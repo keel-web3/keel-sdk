@@ -1,0 +1,483 @@
+TAP version 13
+# Subtest: closed presentation guard must reject unmodelled edit list half-rate
+ok 1 - closed presentation guard must reject unmodelled edit list half-rate
+  ---
+  duration_ms: 67.667375
+  type: 'test'
+  ...
+# {"variant":"half-rate","sourceBytes":2937,"sourceSHA256":"b2ad0f3b82fe2808a468d1f0e6ac283c869e9fc852483e48f2caf602583109e3"}
+# Subtest: closed presentation guard must reject unmodelled edit list unknown-version
+ok 2 - closed presentation guard must reject unmodelled edit list unknown-version
+  ---
+  duration_ms: 52.344583
+  type: 'test'
+  ...
+# {"variant":"unknown-version","sourceBytes":2937,"sourceSHA256":"41bf356340d157a5b731e3ef498e9e9048c37f585913813fb0de1bbd9d958902"}
+# Subtest: closed presentation guard must reject unmodelled edit list wrong-count
+ok 3 - closed presentation guard must reject unmodelled edit list wrong-count
+  ---
+  duration_ms: 51.458875
+  type: 'test'
+  ...
+# {"variant":"wrong-count","sourceBytes":2937,"sourceSHA256":"4182c1002ed7999774e8abaa86b259dfe8e068c307c35b2a0eb13323762fead5"}
+# Subtest: closed presentation guard must reject unmodelled edit list duplicate
+ok 4 - closed presentation guard must reject unmodelled edit list duplicate
+  ---
+  duration_ms: 51.908625
+  type: 'test'
+  ...
+# {"variant":"duplicate","sourceBytes":2965,"sourceSHA256":"f41bb7f4977ab4a34def60d30c170e9afdb385156dd9f6da686089b324f227ed"}
+# Subtest: all unqualified edit-list sources remain exact in native Original mode without requiring semantic admission
+ok 5 - all unqualified edit-list sources remain exact in native Original mode without requiring semantic admission
+  ---
+  duration_ms: 1.096291
+  type: 'test'
+  ...
+# Subtest: closed presentation guard must reject unknown-flags edit container
+ok 6 - closed presentation guard must reject unknown-flags edit container
+  ---
+  duration_ms: 61.482291
+  type: 'test'
+  ...
+# {"variant":"unknown-flags","sourceBytes":2937,"sourceSHA256":"33f37b310127315151ab0593177e2963aab85b245987d8ebea33a830925b9f1b"}
+# Subtest: closed presentation guard must reject duplicate-edts edit container
+ok 7 - closed presentation guard must reject duplicate-edts edit container
+  ---
+  duration_ms: 52.026458
+  type: 'test'
+  ...
+# {"variant":"duplicate-edts","sourceBytes":2973,"sourceSHA256":"ec083cb7e5c9a53fc65e626b408fd4553d784889874914c30c2eacc970440c21"}
+# Subtest: SDK848 actual MCP candidate: unsupported sar lossless semantics stays native
+ok 8 - SDK848 actual MCP candidate: unsupported sar lossless semantics stays native
+  ---
+  duration_ms: 112.988833
+  type: 'test'
+  ...
+# Subtest: SDK848 actual MCP compare: unsupported sar lossless semantics stays native
+ok 9 - SDK848 actual MCP compare: unsupported sar lossless semantics stays native
+  ---
+  duration_ms: 44.346334
+  type: 'test'
+  ...
+# Subtest: SDK848 actual MCP candidate: unsupported title lossless semantics stays native
+ok 10 - SDK848 actual MCP candidate: unsupported title lossless semantics stays native
+  ---
+  duration_ms: 42.753958
+  type: 'test'
+  ...
+# Subtest: SDK848 actual MCP compare: unsupported title lossless semantics stays native
+ok 11 - SDK848 actual MCP compare: unsupported title lossless semantics stays native
+  ---
+  duration_ms: 44.166333
+  type: 'test'
+  ...
+# Subtest: SDK848 shared candidate: unsupported sar semantics must remain native
+ok 12 - SDK848 shared candidate: unsupported sar semantics must remain native
+  ---
+  duration_ms: 52.298542
+  type: 'test'
+  ...
+# Subtest: SDK848 shared compare: unsupported sar semantics must remain native
+ok 13 - SDK848 shared compare: unsupported sar semantics must remain native
+  ---
+  duration_ms: 43.26775
+  type: 'test'
+  ...
+# Subtest: SDK848 shared candidate: unsupported title semantics must remain native
+ok 14 - SDK848 shared candidate: unsupported title semantics must remain native
+  ---
+  duration_ms: 42.969125
+  type: 'test'
+  ...
+# Subtest: SDK848 shared compare: unsupported title semantics must remain native
+ok 15 - SDK848 shared compare: unsupported title semantics must remain native
+  ---
+  duration_ms: 42.37375
+  type: 'test'
+  ...
+# Subtest: SDK848 shared candidate: exact three-frame APNG cannot become first-frame WebP
+ok 16 - SDK848 shared candidate: exact three-frame APNG cannot become first-frame WebP
+  ---
+  duration_ms: 2.786958
+  type: 'test'
+  ...
+# Subtest: SDK848 shared compare: exact three-frame APNG cannot become first-frame WebP
+ok 17 - SDK848 shared compare: exact three-frame APNG cannot become first-frame WebP
+  ---
+  duration_ms: 1.095917
+  type: 'test'
+  ...
+# Subtest: independent exact APNG regression: all three frames cannot be certified as one
+ok 18 - independent exact APNG regression: all three frames cannot be certified as one
+  ---
+  duration_ms: 16.04325
+  type: 'test'
+  ...
+# {"source":{"bytes":642,"sha256":"dd52b281bd517e471500f635bd67c696c2a6658473a00938c155c3866c060e58"},"candidate":{"bytes":174,"sha256":"737a04d4c463eff7395bcf4043315533956295ce1c11184291e4ab2085a1ba05"}}
+# Subtest: independent lossless verification must reject changed sample aspect ratio
+ok 19 - independent lossless verification must reject changed sample aspect ratio
+  ---
+  duration_ms: 54.353
+  type: 'test'
+  ...
+# {"source":{"bytes":2918,"sha256":"66f1276bd4fdeafa2b3eb370598250b40248bb7ed356829c7bf257635512cab3"},"candidate":{"bytes":464,"sha256":"15e160de0827a42f62a73490d690561125232cff77877db53148cbc1ece035db"},"sourceSAR":"2:1","candidateSAR":"1:1"}
+# Subtest: independent movie creator title cannot disappear behind exact RGBA
+ok 20 - independent movie creator title cannot disappear behind exact RGBA
+  ---
+  duration_ms: 51.754083
+  type: 'test'
+  ...
+# {"source":{"bytes":2972,"sha256":"7c41053e177dd103e6a2a40e4b634a9cdaa48288b3ac3a028d64facffff636a7"},"candidate":{"bytes":464,"sha256":"15e160de0827a42f62a73490d690561125232cff77877db53148cbc1ece035db"}}
+# Subtest: actual three-frame APNG cannot be approved as its Sharp first-frame WebP
+ok 21 - actual three-frame APNG cannot be approved as its Sharp first-frame WebP
+  ---
+  duration_ms: 16.937167
+  type: 'test'
+  ...
+# {"source":{"bytes":642,"sha256":"dd52b281bd517e471500f635bd67c696c2a6658473a00938c155c3866c060e58"},"candidate":{"bytes":174,"sha256":"737a04d4c463eff7395bcf4043315533956295ce1c11184291e4ab2085a1ba05"},"actualFrames":3,"sharpPages":null}
+# Subtest: complete GIF block grammar and native zero-loop timing can qualify actual three-frame WebP
+ok 22 - complete GIF block grammar and native zero-loop timing can qualify actual three-frame WebP
+  ---
+  duration_ms: 4.305791
+  type: 'test'
+  ...
+# Subtest: concatenated GIFs and missing complete trailer cannot be relabelled one verified animation
+ok 23 - concatenated GIFs and missing complete trailer cannot be relabelled one verified animation
+  ---
+  duration_ms: 4.151
+  type: 'test'
+  ...
+# Subtest: GIF creator comments stay native until a preserving adapter can establish metadata correspondence
+ok 24 - GIF creator comments stay native until a preserving adapter can establish metadata correspondence
+  ---
+  duration_ms: 2.143625
+  type: 'test'
+  ...
+# Subtest: duplicate WebP animation control is rejected even if the native decoder accepts its pixels
+ok 25 - duplicate WebP animation control is rejected even if the native decoder accepts its pixels
+  ---
+  duration_ms: 3.028333
+  type: 'test'
+  ...
+# Subtest: actual candidate bytes must match their recipe container even when all decoded RGBA is equal
+ok 26 - actual candidate bytes must match their recipe container even when all decoded RGBA is equal
+  ---
+  duration_ms: 2.309042
+  type: 'test'
+  ...
+# Subtest: complete AVIF traversal finds sequence brands beyond byte40 and rejects malformed box bounds
+ok 27 - complete AVIF traversal finds sequence brands beyond byte40 and rejects malformed box bounds
+  ---
+  duration_ms: 0.227625
+  type: 'test'
+  ...
+# Subtest: PNG creator text cannot disappear behind equal decoded RGBA samples
+ok 28 - PNG creator text cannot disappear behind equal decoded RGBA samples
+  ---
+  duration_ms: 2.279375
+  type: 'test'
+  ...
+# Subtest: actual independently encoded bytes pass every RGBA pixel and immutable source/recipe commitments
+ok 29 - actual independently encoded bytes pass every RGBA pixel and immutable source/recipe commitments
+  ---
+  duration_ms: 9.726042
+  type: 'test'
+  ...
+# Subtest: a changed last RGBA alpha sample fails even though dimensions and all other pixels match
+ok 30 - a changed last RGBA alpha sample fails even though dimensions and all other pixels match
+  ---
+  duration_ms: 3.209791
+  type: 'test'
+  ...
+# Subtest: actual animation verifies every frame, intrinsic infinite loop and exact variable timing
+ok 31 - actual animation verifies every frame, intrinsic infinite loop and exact variable timing
+  ---
+  duration_ms: 5.470292
+  type: 'test'
+  ...
+# Subtest: last-frame change, one millisecond duration change and finite-loop change are all rejected
+ok 32 - last-frame change, one millisecond duration change and finite-loop change are all rejected
+  ---
+  duration_ms: 9.221458
+  type: 'test'
+  ...
+# Subtest: finite identical animation loops remain exact and are not relabelled infinite
+ok 33 - finite identical animation loops remain exact and are not relabelled infinite
+  ---
+  duration_ms: 2.923834
+  type: 'test'
+  ...
+# Subtest: movie to actual checked animated WebP is conditional on authenticated canonical-player semantics
+ok 34 - movie to actual checked animated WebP is conditional on authenticated canonical-player semantics
+  ---
+  duration_ms: 143.548375
+  type: 'test'
+  ...
+# Subtest: actual AAC audio includes every canonical PCM sample, channels, presentation timestamps and hashes
+ok 35 - actual AAC audio includes every canonical PCM sample, channels, presentation timestamps and hashes
+  ---
+  duration_ms: 252.312916
+  type: 'test'
+  ...
+# Subtest: equal-duration audio with changed actual samples fails, rather than presence-only approval
+ok 36 - equal-duration audio with changed actual samples fails, rather than presence-only approval
+  ---
+  duration_ms: 169.240708
+  type: 'test'
+  ...
+# Subtest: audio disappearance fails even when all video samples remain exact
+ok 37 - audio disappearance fails even when all video samples remain exact
+  ---
+  duration_ms: 229.989208
+  type: 'test'
+  ...
+# Subtest: explicit edits stay selected without granting automatic fidelity or fallback-to-original authority
+ok 38 - explicit edits stay selected without granting automatic fidelity or fallback-to-original authority
+  ---
+  duration_ms: 1.810417
+  type: 'test'
+  ...
+# Subtest: decoder corruption, unsupported external containers and pre-aborted work fail closed
+ok 39 - decoder corruption, unsupported external containers and pre-aborted work fail closed
+  ---
+  duration_ms: 42.601458
+  type: 'test'
+  ...
+# Subtest: the verifier snapshots mutable caller arrays and nested recipe before its first await
+ok 40 - the verifier snapshots mutable caller arrays and nested recipe before its first await
+  ---
+  duration_ms: 2.814208
+  type: 'test'
+  ...
+# Subtest: actual float64 PCM retains precision below float32 and detects a change in the final audio sample
+ok 41 - actual float64 PCM retains precision below float32 and detects a change in the final audio sample
+  ---
+  duration_ms: 284.308083
+  type: 'test'
+  ...
+# Subtest: original mode preserves arbitrary container bytes without decode or format eligibility claims
+ok 42 - original mode preserves arbitrary container bytes without decode or format eligibility claims
+  ---
+  duration_ms: 2.8605
+  type: 'test'
+  ...
+# Subtest: still lossless WebP fully decodes and verifies pixel identity with measured bytes
+ok 43 - still lossless WebP fully decodes and verifies pixel identity with measured bytes
+  ---
+  duration_ms: 5.721083
+  type: 'test'
+  ...
+# Subtest: explicit still edits create a reversible recipe, preserve source and distinguish encoding lossless from source pixels
+ok 44 - explicit still edits create a reversible recipe, preserve source and distinguish encoding lossless from source pixels
+  ---
+  duration_ms: 5.19925
+  type: 'test'
+  ...
+# Subtest: compare returns decoded PNG frames at the same timestamp with original and processed geometry
+ok 45 - compare returns decoded PNG frames at the same timestamp with original and processed geometry
+  ---
+  duration_ms: 6.750417
+  type: 'test'
+  ...
+# Subtest: animated GIF retains all frames and their delays, comparison selects same source instant
+ok 46 - animated GIF retains all frames and their delays, comparison selects same source instant
+  ---
+  duration_ms: 239.763333
+  type: 'test'
+  ...
+# Subtest: actual capability report and cancellation do not claim universal decode support
+ok 47 - actual capability report and cancellation do not claim universal decode support
+  ---
+  duration_ms: 34.209542
+  type: 'test'
+  ...
+# Subtest: MOV input is decoded by capability and exports MP4/MOV without changing source
+ok 48 - MOV input is decoded by capability and exports MP4/MOV without changing source
+  ---
+  duration_ms: 701.8665
+  type: 'test'
+  ...
+# Subtest: still layers compose ordered source copies with explicit alpha, rotation and output bounds
+ok 49 - still layers compose ordered source copies with explicit alpha, rotation and output bounds
+  ---
+  duration_ms: 16.429584
+  type: 'test'
+  ...
+# Subtest: animated layers fail closed rather than silently ignoring composition
+ok 50 - animated layers fail closed rather than silently ignoring composition
+  ---
+  duration_ms: 1.273916
+  type: 'test'
+  ...
+# Subtest: an animated AVIF reimport preserves the verified sequence stream, both frames and exact timing
+ok 51 - an animated AVIF reimport preserves the verified sequence stream, both frames and exact timing
+  ---
+  duration_ms: 742.951292
+  type: 'test'
+  ...
+# Subtest: well-formed version0 and version1 identity edits retain all real decoded frames and exact timing
+ok 52 - well-formed version0 and version1 identity edits retain all real decoded frames and exact timing
+  ---
+  duration_ms: 287.399083
+  type: 'test'
+  ...
+# Subtest: edit-list length, segment, signed media-time, clocks and dwell/reverse forms reject with unchanged originals
+ok 53 - edit-list length, segment, signed media-time, clocks and dwell/reverse forms reject with unchanged originals
+  ---
+  duration_ms: 717.270708
+  type: 'test'
+  ...
+# Subtest: an AVIF brand cannot grant repeat-edit authority to a real H264 movie
+ok 54 - an AVIF brand cannot grant repeat-edit authority to a real H264 movie
+  ---
+  duration_ms: 53.374584
+  type: 'test'
+  ...
+# Subtest: coherently shortened header clocks cannot hide unchanged full sample timing
+not ok 55 - coherently shortened header clocks cannot hide unchanged full sample timing
+  ---
+  duration_ms: 96.98625
+  type: 'test'
+  location: '/private/tmp/keel-temporal-edit-list-20261022-01/keel-sdk/tests/movie-edit-list.test.mjs:45:1'
+  failureType: 'testCodeFailure'
+  error: |-
+    The input did not match the regular expression /timeline|count|edit|semantics/i. Input:
+    
+    'Error: Command failed: /private/tmp/keel-media-viewers-20261021-01/keel-sdk/packages/builder/node_modules/ffmpeg-static/ffmpeg -hide_banner -nostdin -max_alloc 268435456 -protocol_whitelist file,pipe -threads 2 -i source -t 0 -map 0:v:0 -an -f null -\n' +
+      '[mov,mp4,m4a,3gp,3g2,mj2 @ 0x124617180] stream 0, missing mandatory atoms, broken header\n' +
+      '[mov,mp4,m4a,3gp,3g2,mj2 @ 0x124617180] Could not find codec parameters for stream 0 (Video: h264 (avc1 / 0x31637661), none(pc, gbr/bt709/iec61966-2-1), 32x24): unspecified pixel format\n' +
+      "Consider increasing the value for the 'analyzeduration' (0) and 'probesize' (5000000) options\n" +
+      "Input #0, mov,mp4,m4a,3gp,3g2,mj2, from 'source':\n" +
+      '  Metadata:\n' +
+      '    major_brand     : isom\n' +
+      '    minor_version   : 512\n' +
+      '    compatible_brands: isomiso2avc1mp41\n' +
+      '    encoder         : Lavf60.3.100\n' +
+      '  Duration: 00:00:00.07, bitrate: 344 kb/s\n' +
+      '  Stream #0:0[0x1](und): Video: h264 (avc1 / 0x31637661), none(pc, gbr/bt709/iec61966-2-1), 32x24, SAR 1:1 DAR 4:3, 45k tbr, 90k tbn (default)\n' +
+      '    Metadata:\n' +
+      '      handler_name    : VideoHandler\n' +
+      '      vendor_id       : [0][0][0][0]\n' +
+      '      encoder         : Lavc60.3.100 libx264rgb\n' +
+      'Stream mapping:\n' +
+      '  Stream #0:0 -> #0:0 (h264 (native) -> wrapped_avframe (native))\n' +
+      'Cannot determine format of input stream 0:0 after EOF\n' +
+      'Error marking filters as finished\n' +
+      'Conversion failed!\n'
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected:
+  actual:
+  error: |-
+    Command failed: /private/tmp/keel-media-viewers-20261021-01/keel-sdk/packages/builder/node_modules/ffmpeg-static/ffmpeg -hide_banner -nostdin -max_alloc 268435456 -protocol_whitelist file,pipe -threads 2 -i source -t 0 -map 0:v:0 -an -f null -
+    [mov,mp4,m4a,3gp,3g2,mj2 @ 0x124617180] stream 0, missing mandatory atoms, broken header
+    [mov,mp4,m4a,3gp,3g2,mj2 @ 0x124617180] Could not find codec parameters for stream 0 (Video: h264 (avc1 / 0x31637661), none(pc, gbr/bt709/iec61966-2-1), 32x24): unspecified pixel format
+    Consider increasing the value for the 'analyzeduration' (0) and 'probesize' (5000000) options
+    Input #0, mov,mp4,m4a,3gp,3g2,mj2, from 'source':
+      Metadata:
+        major_brand     : isom
+        minor_version   : 512
+        compatible_brands: isomiso2avc1mp41
+        encoder         : Lavf60.3.100
+      Duration: 00:00:00.07, bitrate: 344 kb/s
+      Stream #0:0[0x1](und): Video: h264 (avc1 / 0x31637661), none(pc, gbr/bt709/iec61966-2-1), 32x24, SAR 1:1 DAR 4:3, 45k tbr, 90k tbn (default)
+        Metadata:
+          handler_name    : VideoHandler
+          vendor_id       : [0][0][0][0]
+          encoder         : Lavc60.3.100 libx264rgb
+    Stream mapping:
+      Stream #0:0 -> #0:0 (h264 (native) -> wrapped_avframe (native))
+    Cannot determine format of input stream 0:0 after EOF
+    Error marking filters as finished
+    Conversion failed!
+    
+  stack: |-
+    genericNodeError (node:internal/errors:983:15)
+    wrappedFn (node:internal/errors:537:14)
+    ChildProcess.exithandler (node:child_process:417:12)
+    ChildProcess.emit (node:events:519:28)
+    maybeClose (node:internal/child_process:1101:16)
+    ChildProcess._handle.onexit (node:internal/child_process:304:5)
+  operator: 'rejects'
+  stack: |-
+    async file:///private/tmp/keel-temporal-edit-list-20261022-01/keel-sdk/tests/movie-edit-list.test.mjs:53:2
+    async inDir (file:///private/tmp/keel-temporal-edit-list-20261022-01/keel-sdk/tests/movie-edit-list.test.mjs:11:104)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: actual AV1 AVIF default infinite repeat remains supported; finite or inconsistent repeat profiles retain native
+ok 56 - actual AV1 AVIF default infinite repeat remains supported; finite or inconsistent repeat profiles retain native
+  ---
+  duration_ms: 318.898417
+  type: 'test'
+  ...
+# Subtest: exact retained sar: shared preparation/comparison and actual candidate proof reject; original mode is byte exact
+ok 57 - exact retained sar: shared preparation/comparison and actual candidate proof reject; original mode is byte exact
+  ---
+  duration_ms: 136.803083
+  type: 'test'
+  ...
+# Subtest: exact retained title: shared preparation/comparison and actual candidate proof reject; original mode is byte exact
+ok 58 - exact retained title: shared preparation/comparison and actual candidate proof reject; original mode is byte exact
+  ---
+  duration_ms: 133.225542
+  type: 'test'
+  ...
+# Subtest: creator, creation-time, stream title and language metadata are never stripped behind a lossless flag
+ok 59 - creator, creation-time, stream title and language metadata are never stripped behind a lossless flag
+  ---
+  duration_ms: 265.883791
+  type: 'test'
+  ...
+# Subtest: real remuxed display rotation is rejected instead of being baked into lossless pixels
+ok 60 - real remuxed display rotation is rejected instead of being baked into lossless pixels
+  ---
+  duration_ms: 62.504375
+  type: 'test'
+  ...
+# Subtest: raw movie and track matrix, display dimensions, clean aperture and explicit color boxes fail closed
+ok 61 - raw movie and track matrix, display dimensions, clean aperture and explicit color boxes fail closed
+  ---
+  duration_ms: 550.617875
+  type: 'test'
+  ...
+# Subtest: conflicting DAR, multiline metadata, extra side data and incomplete boxes cannot manufacture admission
+ok 62 - conflicting DAR, multiline metadata, extra side data and incomplete boxes cannot manufacture admission
+  ---
+  duration_ms: 10.527541
+  type: 'test'
+  ...
+# Subtest: original untagged movie fixtures retain native bytes instead of acquiring invented image color semantics
+ok 63 - original untagged movie fixtures retain native bytes instead of acquiring invented image color semantics
+  ---
+  duration_ms: 275.174541
+  type: 'test'
+  ...
+# Subtest: standard WebP duration correction preserves the entire frame payload, loop and original bytes
+ok 64 - standard WebP duration correction preserves the entire frame payload, loop and original bytes
+  ---
+  duration_ms: 3.84125
+  type: 'test'
+  ...
+# Subtest: unrepresentable, omitted, reordered and truncated timelines fail closed without mutating the container
+ok 65 - unrepresentable, omitted, reordered and truncated timelines fail closed without mutating the container
+  ---
+  duration_ms: 0.512458
+  type: 'test'
+  ...
+# Subtest: strict animation parser rejects duplicate headers, flags, bad frame bounds, reordered control and corrupt padded chunks
+ok 66 - strict animation parser rejects duplicate headers, flags, bad frame bounds, reordered control and corrupt padded chunks
+  ---
+  duration_ms: 0.266417
+  type: 'test'
+  ...
+1..66
+# tests 66
+# suites 0
+# pass 65
+# fail 1
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 7748.91975
