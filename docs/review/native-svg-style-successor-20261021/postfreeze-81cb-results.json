@@ -1,0 +1,42 @@
+{
+  "schema": "keel-svg-style-postfreeze-author@1",
+  "sourceCommit": "81cb23c57a5f426324acd0961ae21476de9cd861",
+  "focused": {
+    "command": "node --test tests/native-media-inspection.test.mjs tests/native-media-graph.test.mjs tests/media-viewer-adapters.test.mjs tests/sdk-media-revision-reuse.test.mjs tests/sdk-inline-viewer-graph.test.mjs",
+    "pass": 79,
+    "fail": 0,
+    "cancelled": 0,
+    "skipped": 0,
+    "durationMs": 805.700833
+  },
+  "typecheck": {
+    "command": "node node_modules/typescript/bin/tsc -p packages/sdk/tsconfig.json --incremental false",
+    "exitCode": 0
+  },
+  "runtime": {
+    "node": "22.22.1",
+    "nodeSHA256": "245e0321af97d3c21dd4e7104457334dfe3c3ba7982d0db75363e354565f8cbb",
+    "zlib": "1.3.1-e00f703"
+  },
+  "sourceSHA256": "515444b251b9f115b00d1dbbef894b454c62ab4beaa9a5de0432a69971ccd2c9",
+  "testsSHA256": "ca55c603657cb2ee94af2af863350db0d8a7bcb48735b1ce9823f88d74657d64",
+  "moduleUnchanged": {
+    "version": "1.5.0",
+    "byteLength": 6821,
+    "sha256": "a00a81a869a5bb589f2156a5ef19ea2fa1f01f7173cff7212e28ccbb9ed5baf0"
+  },
+  "independentApproval": "pending",
+  "fullMaintainedAndBrowser": "not rerun on this successor; awaiting independent parser admission",
+  "evidence": [
+    {
+      "path": "postfreeze-81cb-focused.stdout.log",
+      "sha256": "d541124529b43aa42eaf82a058da74451906de0108e48dc523f8269c976eb8e6",
+      "byteLength": 18520
+    },
+    {
+      "path": "postfreeze-81cb-sdk-tsc.stdout.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "byteLength": 0
+    }
+  ]
+}

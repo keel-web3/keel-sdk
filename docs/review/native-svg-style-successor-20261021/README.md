@@ -56,3 +56,9 @@ All 912 full-suite/browser results remain historical; they do not approve this
 successor. A fresh full suite and browser preservation run are deferred until
 independent review confirms all current parser blockers are resolved and the
 source is frozen. The lead owns the separate Site bridge and live gates.
+
+Fresh postfreeze confirmation on exact source
+`81cb23c57a5f426324acd0961ae21476de9cd861`: **79 PASS / 0 FAIL / 0 skips**,
+805.701ms, and nonincremental SDK TypeScript exit 0.
+See `postfreeze-81cb-results.json` and the corresponding raw logs. These are
+author checks, not independent approval or fresh full/browser gate results.

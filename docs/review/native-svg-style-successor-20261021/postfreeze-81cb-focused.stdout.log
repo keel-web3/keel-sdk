@@ -1,0 +1,484 @@
+TAP version 13
+# Subtest: native raster adapter authenticates its exact animation-capable decoded module bytes
+ok 1 - native raster adapter authenticates its exact animation-capable decoded module bytes
+  ---
+  duration_ms: 0.918708
+  type: 'test'
+  ...
+# Subtest: native animation profile preserves existing catalog GIF, PNG and JPEG routes without a Three dependency
+ok 2 - native animation profile preserves existing catalog GIF, PNG and JPEG routes without a Three dependency
+  ---
+  duration_ms: 0.365292
+  type: 'test'
+  ...
+# Subtest: older draw-once WebP/AVIF cannot be reused for actually animated or inconclusive source bytes
+ok 3 - older draw-once WebP/AVIF cannot be reused for actually animated or inconclusive source bytes
+  ---
+  duration_ms: 0.230875
+  type: 'test'
+  ...
+# Subtest: altered module identity, bytes or version never establishes native-media compatibility
+ok 4 - altered module identity, bytes or version never establishes native-media compatibility
+  ---
+  duration_ms: 0.124125
+  type: 'test'
+  ...
+# Subtest: artwork category cannot imply unsupported audio, executable SVG or model playback
+ok 5 - artwork category cannot imply unsupported audio, executable SVG or model playback
+  ---
+  duration_ms: 0.110208
+  type: 'test'
+  ...
+# Subtest: actual canonical audio/wav graph retains the original once and builds exact derived presentation
+ok 6 - actual canonical audio/wav graph retains the original once and builds exact derived presentation
+  ---
+  duration_ms: 58.21525
+  type: 'test'
+  ...
+# Subtest: actual canonical audio/mpeg graph retains the original once and builds exact derived presentation
+ok 7 - actual canonical audio/mpeg graph retains the original once and builds exact derived presentation
+  ---
+  duration_ms: 50.202209
+  type: 'test'
+  ...
+# Subtest: actual canonical audio/ogg graph retains the original once and builds exact derived presentation
+ok 8 - actual canonical audio/ogg graph retains the original once and builds exact derived presentation
+  ---
+  duration_ms: 51.966458
+  type: 'test'
+  ...
+# Subtest: actual canonical audio/flac graph retains the original once and builds exact derived presentation
+ok 9 - actual canonical audio/flac graph retains the original once and builds exact derived presentation
+  ---
+  duration_ms: 52.781167
+  type: 'test'
+  ...
+# Subtest: actual canonical audio/aac graph retains the original once and builds exact derived presentation
+ok 10 - actual canonical audio/aac graph retains the original once and builds exact derived presentation
+  ---
+  duration_ms: 47.826583
+  type: 'test'
+  ...
+# Subtest: actual canonical audio/mp4 graph retains the original once and builds exact derived presentation
+ok 11 - actual canonical audio/mp4 graph retains the original once and builds exact derived presentation
+  ---
+  duration_ms: 50.885417
+  type: 'test'
+  ...
+# Subtest: native audio exact cover is separate source, never a duplicate encoded artwork
+ok 12 - native audio exact cover is separate source, never a duplicate encoded artwork
+  ---
+  duration_ms: 101.147834
+  type: 'test'
+  ...
+# Subtest: native graph snapshots originals before asynchronous preparation and rejects source/plan substitutions
+ok 13 - native graph snapshots originals before asynchronous preparation and rejects source/plan substitutions
+  ---
+  duration_ms: 59.697542
+  type: 'test'
+  ...
+# Subtest: passive SVG exact bytes stay the direct verified source, executable SVG is never silently flattened
+ok 14 - passive SVG exact bytes stay the direct verified source, executable SVG is never silently flattened
+  ---
+  duration_ms: 26.930458
+  type: 'test'
+  ...
+# Subtest: new media rejects old/counterfeit display and unsupported runtime MIME rather than parsing binary HTML
+ok 15 - new media rejects old/counterfeit display and unsupported runtime MIME rather than parsing binary HTML
+  ---
+  duration_ms: 1.38025
+  type: 'test'
+  ...
+# Subtest: registered audio preparation snapshots the exact approved document before async validation
+ok 16 - registered audio preparation snapshots the exact approved document before async validation
+  ---
+  duration_ms: 45.497667
+  type: 'test'
+  ...
+# Subtest: a caller cannot forge a normal-media SVG declaration to suppress executable source
+ok 17 - a caller cannot forge a normal-media SVG declaration to suppress executable source
+  ---
+  duration_ms: 37.881917
+  type: 'test'
+  ...
+# Subtest: strict native still SVG retains exact XML and motion semantics
+ok 18 - strict native still SVG retains exact XML and motion semantics
+  ---
+  duration_ms: 4.619958
+  type: 'test'
+  ...
+# Subtest: strict native smil SVG retains exact XML and motion semantics
+ok 19 - strict native smil SVG retains exact XML and motion semantics
+  ---
+  duration_ms: 1.292208
+  type: 'test'
+  ...
+# Subtest: strict native css SVG retains exact XML and motion semantics
+ok 20 - strict native css SVG retains exact XML and motion semantics
+  ---
+  duration_ms: 0.533291
+  type: 'test'
+  ...
+# Subtest: native SVG rejects encoding mismatch without changing the original
+ok 21 - native SVG rejects encoding mismatch without changing the original
+  ---
+  duration_ms: 0.446125
+  type: 'test'
+  ...
+# Subtest: native SVG rejects mismatched tags without changing the original
+ok 22 - native SVG rejects mismatched tags without changing the original
+  ---
+  duration_ms: 0.185125
+  type: 'test'
+  ...
+# Subtest: native SVG rejects duplicate XML attribute without changing the original
+ok 23 - native SVG rejects duplicate XML attribute without changing the original
+  ---
+  duration_ms: 0.125167
+  type: 'test'
+  ...
+# Subtest: native SVG rejects invalid XML entity without changing the original
+ok 24 - native SVG rejects invalid XML entity without changing the original
+  ---
+  duration_ms: 0.176625
+  type: 'test'
+  ...
+# Subtest: native SVG rejects DTD without changing the original
+ok 25 - native SVG rejects DTD without changing the original
+  ---
+  duration_ms: 0.133292
+  type: 'test'
+  ...
+# Subtest: native SVG rejects script without changing the original
+ok 26 - native SVG rejects script without changing the original
+  ---
+  duration_ms: 0.326917
+  type: 'test'
+  ...
+# Subtest: native SVG rejects event handler without changing the original
+ok 27 - native SVG rejects event handler without changing the original
+  ---
+  duration_ms: 0.316583
+  type: 'test'
+  ...
+# Subtest: native SVG rejects foreignObject without changing the original
+ok 28 - native SVG rejects foreignObject without changing the original
+  ---
+  duration_ms: 0.105542
+  type: 'test'
+  ...
+# Subtest: native SVG rejects interactive link without changing the original
+ok 29 - native SVG rejects interactive link without changing the original
+  ---
+  duration_ms: 0.117625
+  type: 'test'
+  ...
+# Subtest: native SVG rejects SMIL executable target without changing the original
+ok 30 - native SVG rejects SMIL executable target without changing the original
+  ---
+  duration_ms: 0.123125
+  type: 'test'
+  ...
+# Subtest: native SVG rejects external image without changing the original
+ok 31 - native SVG rejects external image without changing the original
+  ---
+  duration_ms: 0.062959
+  type: 'test'
+  ...
+# Subtest: native SVG rejects external CSS URL without changing the original
+ok 32 - native SVG rejects external CSS URL without changing the original
+  ---
+  duration_ms: 0.063458
+  type: 'test'
+  ...
+# Subtest: native SVG rejects escaped CSS URL without changing the original
+ok 33 - native SVG rejects escaped CSS URL without changing the original
+  ---
+  duration_ms: 0.0395
+  type: 'test'
+  ...
+# Subtest: native SVG rejects extra namespace without changing the original
+ok 34 - native SVG rejects extra namespace without changing the original
+  ---
+  duration_ms: 0.043709
+  type: 'test'
+  ...
+# Subtest: native SVG accepts exact internal definitions and rejects invalid UTF-8
+ok 35 - native SVG accepts exact internal definitions and rejects invalid UTF-8
+  ---
+  duration_ms: 0.106708
+  type: 'test'
+  ...
+# Subtest: native audio/wav requires complete real container and exact retained samples
+ok 36 - native audio/wav requires complete real container and exact retained samples
+  ---
+  duration_ms: 2.43975
+  type: 'test'
+  ...
+# Subtest: native audio/mpeg requires complete real container and exact retained samples
+ok 37 - native audio/mpeg requires complete real container and exact retained samples
+  ---
+  duration_ms: 0.54725
+  type: 'test'
+  ...
+# Subtest: native audio/ogg requires complete real container and exact retained samples
+ok 38 - native audio/ogg requires complete real container and exact retained samples
+  ---
+  duration_ms: 1.43475
+  type: 'test'
+  ...
+# Subtest: native audio/flac requires complete real container and exact retained samples
+ok 39 - native audio/flac requires complete real container and exact retained samples
+  ---
+  duration_ms: 1.155541
+  type: 'test'
+  ...
+# Subtest: native audio/aac requires complete real container and exact retained samples
+ok 40 - native audio/aac requires complete real container and exact retained samples
+  ---
+  duration_ms: 0.408333
+  type: 'test'
+  ...
+# Subtest: native audio/mp4 requires complete real container and exact retained samples
+ok 41 - native audio/mp4 requires complete real container and exact retained samples
+  ---
+  duration_ms: 0.7545
+  type: 'test'
+  ...
+# Subtest: WAV validates format fields and sample alignment, never MIME-only admission
+ok 42 - WAV validates format fields and sample alignment, never MIME-only admission
+  ---
+  duration_ms: 0.477083
+  type: 'test'
+  ...
+# Subtest: native adapter requires exact new module; old/counterfeit profiles cannot bless SVG/audio
+ok 43 - native adapter requires exact new module; old/counterfeit profiles cannot bless SVG/audio
+  ---
+  duration_ms: 0.532
+  type: 'test'
+  ...
+# Subtest: MP4 sample tables cannot authorize payload ranges beyond actual media data
+ok 44 - MP4 sample tables cannot authorize payload ranges beyond actual media data
+  ---
+  duration_ms: 0.283583
+  type: 'test'
+  ...
+# Subtest: complete native SVG style rejects contiguous relative import without source changes
+ok 45 - complete native SVG style rejects contiguous relative import without source changes
+  ---
+  duration_ms: 0.121666
+  type: 'test'
+  ...
+# Subtest: complete native SVG style rejects CDATA-split relative import without source changes
+ok 46 - complete native SVG style rejects CDATA-split relative import without source changes
+  ---
+  duration_ms: 0.142792
+  type: 'test'
+  ...
+# Subtest: complete native SVG style rejects contiguous relative URL without source changes
+ok 47 - complete native SVG style rejects contiguous relative URL without source changes
+  ---
+  duration_ms: 0.046792
+  type: 'test'
+  ...
+# Subtest: complete native SVG style rejects CDATA-split relative URL without source changes
+ok 48 - complete native SVG style rejects CDATA-split relative URL without source changes
+  ---
+  duration_ms: 0.046625
+  type: 'test'
+  ...
+# Subtest: complete native SVG style rejects comment-split relative import without source changes
+ok 49 - complete native SVG style rejects comment-split relative import without source changes
+  ---
+  duration_ms: 0.060583
+  type: 'test'
+  ...
+# Subtest: complete native SVG style rejects comment-split relative URL without source changes
+ok 50 - complete native SVG style rejects comment-split relative URL without source changes
+  ---
+  duration_ms: 0.037583
+  type: 'test'
+  ...
+# Subtest: complete native SVG style rejects mixed text CDATA and comments without source changes
+ok 51 - complete native SVG style rejects mixed text CDATA and comments without source changes
+  ---
+  duration_ms: 0.039459
+  type: 'test'
+  ...
+# Subtest: complete native SVG style rejects nested self-closing style resets depth without source changes
+ok 52 - complete native SVG style rejects nested self-closing style resets depth without source changes
+  ---
+  duration_ms: 0.080875
+  type: 'test'
+  ...
+# Subtest: complete native SVG style rejects nested style followed by split import without source changes
+ok 53 - complete native SVG style rejects nested style followed by split import without source changes
+  ---
+  duration_ms: 0.036541
+  type: 'test'
+  ...
+# Subtest: complete native SVG style rejects element-descendant CSS text without source changes
+ok 54 - complete native SVG style rejects element-descendant CSS text without source changes
+  ---
+  duration_ms: 0.038791
+  type: 'test'
+  ...
+# Subtest: complete native SVG style preserves split native animation and exact internal URLs
+ok 55 - complete native SVG style preserves split native animation and exact internal URLs
+  ---
+  duration_ms: 0.1285
+  type: 'test'
+  ...
+# Subtest: complete native SVG style keeps separate styles separate and ignores comments as text
+ok 56 - complete native SVG style keeps separate styles separate and ignores comments as text
+  ---
+  duration_ms: 0.061
+  type: 'test'
+  ...
+# Subtest: native SVG style chunk inspection is bounded before building an unbounded DOM string
+ok 57 - native SVG style chunk inspection is bounded before building an unbounded DOM string
+  ---
+  duration_ms: 41.87575
+  type: 'test'
+  ...
+# Subtest: Inline creator bytes reject hidden external URL sentinels before packing
+ok 58 - Inline creator bytes reject hidden external URL sentinels before packing
+  ---
+  duration_ms: 1.604375
+  type: 'test'
+  ...
+# Subtest: Inline locator check distinguishes minified ar variables from Arweave references
+ok 59 - Inline locator check distinguishes minified ar variables from Arweave references
+  ---
+  duration_ms: 0.323541
+  type: 'test'
+  ...
+# Subtest: inline SVG image carriage avoids double Base64 while retaining exact bytes
+ok 60 - inline SVG image carriage avoids double Base64 while retaining exact bytes
+  ---
+  duration_ms: 12.414916
+  type: 'test'
+  ...
+# Subtest: collector Inline rejects off-chain resources while allowing navigation links and protocol text
+ok 61 - collector Inline rejects off-chain resources while allowing navigation links and protocol text
+  ---
+  duration_ms: 0.676875
+  type: 'test'
+  ...
+# Subtest: composable Base64 fragments equal one traditional outer encoding across UTF-8 boundaries
+ok 62 - composable Base64 fragments equal one traditional outer encoding across UTF-8 boundaries
+  ---
+  duration_ms: 3.851958
+  type: 'test'
+  ...
+# Subtest: hundreds of reordered composable JSON fragments remain one deterministic Base64 stream
+ok 63 - hundreds of reordered composable JSON fragments remain one deterministic Base64 stream
+  ---
+  duration_ms: 7.743917
+  type: 'test'
+  ...
+# Subtest: inline JSON escaping closes script parser hazards before byte alignment
+ok 64 - inline JSON escaping closes script parser hazards before byte alignment
+  ---
+  duration_ms: 0.180708
+  type: 'test'
+  ...
+# Subtest: composable Base64 rejects malformed Unicode and padded non-terminal fragments
+ok 65 - composable Base64 rejects malformed Unicode and padded non-terminal fragments
+  ---
+  duration_ms: 0.2095
+  type: 'test'
+  ...
+# Subtest: Gzip Inline graph reuses shell and p5 fragments and publishes only creator bytes
+ok 66 - Gzip Inline graph reuses shell and p5 fragments and publishes only creator bytes
+  ---
+  duration_ms: 80.884917
+  type: 'test'
+  ...
+# Subtest: historical compressed assets remain exact locally while fresh Inline rejects encoded body copies
+ok 67 - historical compressed assets remain exact locally while fresh Inline rejects encoded body copies
+  ---
+  duration_ms: 24.960708
+  type: 'test'
+  ...
+# Subtest: canonical Inline publication has one shell top, ordered middle, and one shell bottom
+ok 68 - canonical Inline publication has one shell top, ordered middle, and one shell bottom
+  ---
+  duration_ms: 23.810125
+  type: 'test'
+  ...
+# Subtest: creator HTML is one verified middle slot inside the canonical shell
+ok 69 - creator HTML is one verified middle slot inside the canonical shell
+  ---
+  duration_ms: 13.16425
+  type: 'test'
+  ...
+# Subtest: normal raster/video uses the registered shell without a creator wrapper; malformed GLB is rejected
+ok 70 - normal raster/video uses the registered shell without a creator wrapper; malformed GLB is rejected
+  ---
+  duration_ms: 32.360083
+  type: 'test'
+  ...
+# Subtest: normal-media default compact graphs accept only the registered shell and display module
+ok 71 - normal-media default compact graphs accept only the registered shell and display module
+  ---
+  duration_ms: 85.54875
+  type: 'test'
+  ...
+# Subtest: published canonical fragments survive platform-specific module recompression
+ok 72 - published canonical fragments survive platform-specific module recompression
+  ---
+  duration_ms: 35.821834
+  type: 'test'
+  ...
+# Subtest: fresh Base64 encoding stays retired despite acknowledgement and environment
+ok 73 - fresh Base64 encoding stays retired despite acknowledgement and environment
+  ---
+  duration_ms: 0.188042
+  type: 'test'
+  ...
+# Subtest: default saver keeps raw text unchanged through SDK, publication reuse, and metadata
+ok 74 - default saver keeps raw text unchanged through SDK, publication reuse, and metadata
+  ---
+  duration_ms: 115.997041
+  type: 'test'
+  ...
+# Subtest: direct and shared current COPY authenticate published Gzip bytes despite unused local Deflate compression
+ok 75 - direct and shared current COPY authenticate published Gzip bytes despite unused local Deflate compression
+  ---
+  duration_ms: 24.923459
+  type: 'test'
+  ...
+# Subtest: a consistent registered frame proof cannot replace the declared source or module aliases
+ok 76 - a consistent registered frame proof cannot replace the declared source or module aliases
+  ---
+  duration_ms: 36.539542
+  type: 'test'
+  ...
+# Subtest: current COPY snapshots entry bytes, receipt order, source identities and proof before async digest
+ok 77 - current COPY snapshots entry bytes, receipt order, source identities and proof before async digest
+  ---
+  duration_ms: 28.837542
+  type: 'test'
+  ...
+# Subtest: canonical media bytes survive minified browser bundling unchanged
+ok 78 - canonical media bytes survive minified browser bundling unchanged
+  ---
+  duration_ms: 40.301375
+  type: 'test'
+  ...
+# Subtest: already-published canonical 1.1 media remains usable without publishing a new renderer
+ok 79 - already-published canonical 1.1 media remains usable without publishing a new renderer
+  ---
+  duration_ms: 19.74075
+  type: 'test'
+  ...
+1..79
+# tests 79
+# suites 0
+# pass 79
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 805.700833
