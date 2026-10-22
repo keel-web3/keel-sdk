@@ -10,7 +10,7 @@ import { actualAvifContainer } from "./actual-media-container.js";
  * https://github.com/FFmpeg/FFmpeg/blob/n6.1.1/libavformat/mov.c
  * https://aomediacodec.github.io/av1-avif/v1.2.0.html
  */
-export function assertMoviePresentationSemantics(bytes: Uint8Array, inputReport: string, selectedStream: string, width: number, height: number): { readonly srgbFull: boolean } {
+export function assertMoviePresentationSemantics(bytes: Uint8Array, inputReport: string, selectedStream: string, width: number, height: number): { readonly srgbFull: boolean; readonly videoTimeline: {readonly samples:bigint; readonly scale:bigint; readonly duration:bigint} } {
   const retain = (reason: string): never => { throw new TypeError(`Movie ${reason} require an exact preserving adapter; native media is retained.`); };
   const sar = /\[SAR (\d+):(\d+) DAR (\d+):(\d+)\]/u.exec(selectedStream);
   if (sar && (BigInt(sar[1]!) <= 0n || BigInt(sar[1]!) !== BigInt(sar[2]!) || BigInt(sar[3]!) * BigInt(height) !== BigInt(sar[4]!) * BigInt(width)) || !sar && /\[(?:SAR|DAR)/u.test(selectedStream)) retain("sample/display aspect ratio semantics");
@@ -88,7 +88,7 @@ export function assertMoviePresentationSemantics(bytes: Uint8Array, inputReport:
     for(const box of boxes(start,end)) {
       const {kind,start:a,end:z}=box;
       if(!allowed[parent]?.includes(kind))retain(`unsupported ${parent}/${kind} metadata, aperture or presentation semantics`);
-      if(["mvhd","tkhd","mdhd","edts","elst","stts","ctts","stsz","stsd","colr","pasp","meta","iinf","iprp"].includes(kind)&&seen.has(kind))retain("duplicate presentation, edit-list or sample metadata semantics");
+      if(["mvhd","tkhd","mdia","mdhd","minf","stbl","edts","elst","stts","ctts","stsz","stsd","colr","pasp","meta","iinf","iprp"].includes(kind)&&seen.has(kind))retain("duplicate presentation, edit-list or sample metadata semantics");
       seen.add(kind);
       if(kind==="trak") {
         const nested:Track={};tracks.push(nested);walk(a,z,kind,depth+1,nested);
@@ -258,10 +258,17 @@ export function assertMoviePresentationSemantics(bytes: Uint8Array, inputReport:
     if(duration!>completeDuration)completeDuration=duration!;
   }
   if(completeMovie.duration!==completeDuration)retain("movie duration differs from complete track edit-list bounds");
+  const video=tracks.find(track=>track.video)??retain("unavailable selected video sample profile");
+  // These admitted AVC/AV1 sample entries carry one complete picture access
+  // unit per sample. Other mappings need a qualified preserving adapter.
+  // This record is recomputed from the actual bytes on every decode; it is
+  // not a caller-supplied claim that a permissive decoder read every sample.
+  if(!["avc1","avc3","av01"].includes(video.codec??""))retain("unqualified one-frame-per-sample codec profile");
+  const videoTimeline=Object.freeze({samples:video.encodedSamples!,scale:video.media!.scale,duration:video.media!.duration});
   // A codec may omit SAR in the probe (ordinary QuickTime output does). The
   // complete ISO path above still requires identity transforms and exact
   // track display dimensions equal to the coded raster, and checks every
   // pasp override. This is a measured identity display, not a guessed ratio.
   // Pinned MOV demuxer: mov_read_trak derives SAR from differing tkhd bounds.
-  return {srgbFull};
+  return {srgbFull,videoTimeline};
 }

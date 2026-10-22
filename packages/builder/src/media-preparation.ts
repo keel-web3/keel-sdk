@@ -162,6 +162,7 @@ async function decodeMovie(binary: string, cwd: string, input: string, signal?:A
   const tb = Number(timebase[1])/Number(timebase[2])*1000;
   const frames = stdout.split("\n").filter(line => /^0,/.test(line)).map(line => line.split(",").map(s=>s.trim()));
   if (!frames.length || frames.length > MAX_FRAMES || width*height*frames.length > MAX_MOVIE_PIXELS) throw new RangeError("Movie exceeds the bounded full-frame verification budget.");
+  if(BigInt(frames.length)!==presentation.videoTimeline.samples) throw new Error("The complete movie sample count does not match every actual decoded frame; native media is retained.");
   let timingFrames = frames, timingBase = tb;
   {
     // The rawvideo encoder used for decoded hashes can replace video packet
@@ -171,6 +172,8 @@ async function decodeMovie(binary: string, cwd: string, input: string, signal?:A
     const packetBase = /^#tb 0:\s*(\d+)\/(\d+)/mu.exec(packets.stdout);
     timingFrames = packets.stdout.split("\n").filter(line => /^0,/.test(line)).map(line => line.split(",").map(s=>s.trim())).sort((left,right) => Number(left[2])-Number(right[2]));
     if (!packetBase || timingFrames.length !== frames.length) throw new Error("The movie packet timeline does not match every decoded frame.");
+    const first=timingFrames[0]!,last=timingFrames.at(-1)!,clock=presentation.videoTimeline;
+    if(BigInt(first[2]!)!==0n || (BigInt(last[2]!)+BigInt(last[3]!))*BigInt(packetBase[1]!)*clock.scale!==clock.duration*BigInt(packetBase[2]!)) throw new Error("The complete movie media duration does not match the actual packet timeline; native media is retained.");
     timingBase = Number(packetBase[1])/Number(packetBase[2])*1000;
     const firstPacket = Number(timingFrames[0]![2]), firstDecoded = Number(frames[0]![2]);
     if (timingFrames.some((frame,index) => exactOrigin

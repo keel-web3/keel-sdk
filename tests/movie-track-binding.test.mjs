@@ -29,7 +29,8 @@ test('STSZ fullbox, fixed/variable byte bounds, counts, zero sizes, duplicate an
   rewrite(bytes,stsz,b=>{const q=b.subarray(0,20);q.writeUInt32BE(q.length);q.writeUInt32BE(0xffffffff,12);return q}),
   rewrite(bytes,stsz,b=>{const q=Buffer.concat([b,Buffer.from([0])]);q.writeUInt32BE(q.length);return q}),
   rewrite(bytes,stsz,b=>Buffer.concat([b,b])),rewrite(bytes,stsz,()=>Buffer.alloc(0)),
-  rewrite(bytes,stsz,b=>{b.write('stz2',4);return b})
+  rewrite(bytes,stsz,b=>{b.write('stz2',4);return b}),
+  ...[['moov','trak','mdia'],['moov','trak','mdia','minf'],['moov','trak','mdia','minf','stbl']].map(names=>rewrite(bytes,names,b=>Buffer.concat([b,b])))
  ];
  for(const changed of invalid){assert.throws(()=>assertMoviePresentationSemantics(changed,'',report,32,24),/sample|count|bounds|duplicate|semantics/i);await assert.rejects(prepareMediaCandidate({bytes:changed,recipe}));await exactNative(changed)}
 }));
@@ -40,3 +41,11 @@ test('fixed-size PCM sample tables and the video track each bind their own no-ed
  for(const kind of ['stsz','stts']){let index=0;const changed=rewrite(bytes,table(kind),b=>{if(index++===1){const at=kind==='stsz'?16:16;b.writeUInt32BE(b.readUInt32BE(at)+1,at)}return b});assert.throws(()=>assertMoviePresentationSemantics(changed,'',report,32,24),/sample|timeline|bounds|semantics/i);await exactNative(changed)}
  let mdhd=0;const changed=rewrite(bytes,['moov','trak','mdia','mdhd'],b=>{if(mdhd++===1)b.writeUInt32BE(b.readUInt32BE(24)+1,24);return b});assert.throws(()=>assertMoviePresentationSemantics(changed,'',report,32,24),/sample|timeline|bounds|semantics/i);await exactNative(changed);
 }));
+
+test('coherent extra STSZ/STTS/header sample cannot be certified from three actual decoded frames',async()=>{
+ const bytes=new Uint8Array(await readFile(new URL('../docs/review/temporal-track-binding-20261022/coherent-stsz-four.mp4',import.meta.url)));
+ await exactNative(bytes);
+ await assert.rejects(prepareMediaCandidate({bytes,recipe}),/sample|frame|timeline|duration|bounds|semantics|preserv/i);
+ const candidate=new Uint8Array(await readFile(new URL('../docs/review/temporal-track-binding-20261022/coherent-stsz-four-unsafe.webp',import.meta.url)));
+ await assert.rejects(verifyActualMediaPair({sourceBytes:bytes,candidateBytes:candidate,recipe}),/sample|frame|timeline|duration|bounds|semantics|preserv/i);
+});
