@@ -151,6 +151,12 @@ async function decodeMovie(binary: string, cwd: string, input: string, signal?:A
   if (!dims || Number(dims[1])*Number(dims[2]) > MAX_PIXELS || Math.max(Number(dims[1]),Number(dims[2])) > 8192) throw new Error("Movie dimensions are unavailable or exceed the decode budget.");
   const presentation = assertMoviePresentationSemantics(containerBytes,probe.stderr.split("Output #")[0]!,selectedStream,Number(dims[1]),Number(dims[2]),purpose);
   const nativeDisplay=presentation.nativeDisplay;
+  // Native SAR previews may expand beyond the coded raster. Bind the same
+  // existing frame/pixel budgets to the complete parsed sample count before
+  // launching a scaled decode, rather than rejecting after processing it.
+  if(nativeDisplay&&(presentation.videoTimeline.samples>BigInt(MAX_FRAMES)
+    ||presentation.videoTimeline.samples*BigInt(nativeDisplay.width)*BigInt(nativeDisplay.height)>BigInt(MAX_MOVIE_PIXELS)))
+    throw new RangeError("Movie exceeds the bounded native display frame decode budget.");
   const nativePreviewFilter=nativeDisplay&&(nativeDisplay.width!==nativeDisplay.codedWidth||nativeDisplay.height!==nativeDisplay.codedHeight)
     ?`scale=${nativeDisplay.width}:${nativeDisplay.height}:flags=bilinear,setsar=1`:undefined;
   const nativeVideoFilter=nativePreviewFilter?["-vf",nativePreviewFilter]:[];
