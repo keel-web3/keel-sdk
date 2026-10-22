@@ -2,7 +2,7 @@ import assert from 'node:assert/strict';
 import test from 'node:test';
 import {mkdtemp,writeFile,rm} from 'node:fs/promises';
 import path from 'node:path';
-import {createKeelAuthoredProject,assertKeelAuthoredProjectFiles} from '../packages/sdk/dist/authored-project.js';
+import {createKeelAuthoredProject,assertKeelAuthoredProjectFiles,planKeelAuthoredProjectChanges} from '../packages/sdk/dist/authored-project.js';
 import {stageKeelStudioProject} from '../packages/sdk/dist/studio-upload.js';
 import {authoredFixture} from './helpers/authored-project-fixture.mjs';
 import {publishedThreeFixture} from './helpers/authored-published-fixture.mjs';
@@ -29,4 +29,8 @@ test('real MCP author and stage revalidate the private public-source cache witho
  assert.equal((await call(3,'keel-studio-stage-project',{...result.stageArguments,studioUrl:'https://studio.invalid'})).result.isError,undefined);assert.equal(requests,1);
  await writeFile(path.join(root,fixture.publishedModules[0].binding.moduleId+'.js'),'corrupt cached public source');assert.equal((await call(4,'keel-studio-stage-project',{...result.stageArguments,studioUrl:'https://studio.invalid'})).result.isError,true);assert.equal(requests,1);
  }finally{globalThis.fetch=prior.fetch;if(prior.url===undefined)delete process.env.KEEL_STUDIO_URL;else process.env.KEEL_STUDIO_URL=prior.url;if(prior.token===undefined)delete process.env.KEEL_STUDIO_AGENT_TOKEN;else process.env.KEEL_STUDIO_AGENT_TOKEN=prior.token;await rm(root,{recursive:true,force:true})}
+});
+
+test('a changed shared runtime binding cannot masquerade as an unchanged creator-only revision',async()=>{
+ const fixture=await publishedThreeFixture(),before=await createKeelAuthoredProject(specification(fixture.publishedModules)),changed=structuredClone(fixture.publishedModules);changed[1].binding.objectId='0x'+'3'.repeat(64);const after=await createKeelAuthoredProject(specification(changed));assert.throws(()=>planKeelAuthoredProjectChanges(before.graph,after.graph),/published runtime dependency changed/);
 });

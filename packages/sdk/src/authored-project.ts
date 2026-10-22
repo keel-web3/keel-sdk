@@ -269,6 +269,7 @@ function authoredExecutionOrder(edges: readonly KeelAuthoredProjectEdge[], expec
 /** Pure source delta; publication must still authenticate existing object IDs. */
 export function planKeelAuthoredProjectChanges(previous: KeelAuthoredProjectGraph, next: KeelAuthoredProjectGraph) {
   if (previous.chainId !== next.chainId || previous.schema !== KEEL_AUTHORED_PROJECT_PROTOCOL || next.schema !== KEEL_AUTHORED_PROJECT_PROTOCOL) throw new TypeError("Authored revisions must retain their selected chain and graph protocol.");
+  if (canonicalJson(previous.publishedModules ?? []) !== canonicalJson(next.publishedModules ?? [])) throw new TypeError("A published runtime dependency changed; require its exact selected-chain revision review instead of treating this as a creator-only edit.");
   const prior = new Map(previous.nodes.map(node => [node.id, node]));
   const current = new Set(next.nodes.map(node => node.id));
   const changed = next.nodes.filter(node => {
