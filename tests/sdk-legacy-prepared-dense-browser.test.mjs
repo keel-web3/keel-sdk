@@ -14,22 +14,14 @@ async function actualFullReturn(shellBootCompression) {
   const metadata = await(await fetch(envelope.tokenURI)).json();
   return {html:await(await fetch(metadata.animation_url)).text(),plan,envelope};
 }
-for(const boot of ['gzip','none'])test(`actual full legacy metadata return ${boot} boot verifies and executes original content offline with appended context`,{timeout:120000},async()=>{
-  const full=await actualFullReturn(boot);
-  assert.ok(!Buffer.from(full.plan.shellRegistration.prefix).toString().includes('__KEEL_CONTEXT__='),'The builder must not prepopulate a synthetic context');
-  const proof=await observeOfflineShell(full.html,'verified','data-before-render:1:'+poster.length,{retainSignalsAcrossDocumentOpen:true});
-  assert.deepEqual(proof.externalRequests,[]);assert.deepEqual(proof.pageNetworkRequests,[]);assert.deepEqual(proof.errors,[]);assert.equal(proof.frames,1);
-  console.log(JSON.stringify({boot,artworkRequests:proof.externalRequests,pageNetworkRequests:proof.pageNetworkRequests,deniedProxyRequests:proof.proxyRequests}));
+for(const boot of ['gzip','none'])test(`retired full legacy metadata ${boot} boot rejects before offline publication can be prepared`,{timeout:120000},async()=>{
+  await assert.rejects(actualFullReturn(boot),error=>error instanceof TypeError&&/^buildKeelLegacyPreparedDenseDocument is retired for fresh publication\. Use the registered canonical raw-percent resource pipeline\.$/u.test(error.message));
 });
 test('scriptless browser control retains every denied browser-service proxy request',{timeout:60000},async()=>{
   const proof=await observeOfflineShell('<!doctype html><html><body data-verification="verified"><p>Scriptless browser-service control</p></body></html>');
   assert.deepEqual(proof.externalRequests,[]);assert.deepEqual(proof.pageNetworkRequests,[]);assert.equal(proof.frames,0);
   console.log(JSON.stringify({scriptlessControl:true,artworkRequests:proof.externalRequests,pageNetworkRequests:proof.pageNetworkRequests,deniedProxyRequests:proof.proxyRequests}));
 });
-test('changed dense compressed bytes block the child before any artwork signal',{timeout:120000},async()=>{
-  const full=await actualFullReturn('gzip');
-  const changed=full.html.replace(/("storedDense":")([^"\\])/u,(_all,start,first)=>start+(first==='A'?'B':'A'));
-  assert.notEqual(changed,full.html);
-  const proof=await observeOfflineShell(changed,'failed',undefined,{retainSignalsAcrossDocumentOpen:true});
-  assert.equal(proof.frames,0);assert.deepEqual(proof.signals,[]);assert.deepEqual(proof.externalRequests,[]);assert.deepEqual(proof.pageNetworkRequests,[]);
+test('retired dense preparation cannot reach a changed-payload browser execution path',{timeout:120000},async()=>{
+  await assert.rejects(actualFullReturn('gzip'),error=>error instanceof TypeError&&/^buildKeelLegacyPreparedDenseDocument is retired for fresh publication\. Use the registered canonical raw-percent resource pipeline\.$/u.test(error.message));
 });

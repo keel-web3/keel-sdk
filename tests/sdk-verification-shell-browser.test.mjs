@@ -85,7 +85,7 @@ test("the protected K shell mounts only verified art inside an opaque network-de
   }
 });
 
-test("the marketplace-safe prepared animation URI installs token context before the K shell launches", { timeout: 30_000 }, async () => {
+test("retired pre-encoded publication carriage rejects before marketplace context can be prepared", { timeout: 30_000 }, async () => {
   const shell = await buildKeelInlineShellFragments({ repositoryRoot: process.cwd() });
   const local = await buildKeelInlineLocalDocument({
     shell,
@@ -96,47 +96,10 @@ test("the marketplace-safe prepared animation URI installs token context before 
       source: new TextEncoder().encode('<!doctype html><html><body><div id="art">context ready</div></body></html>'),
     },
   });
-  const graph = await buildKeelInlinePreEncodedTokenURIGraph(local, { legacyCarriage: "acknowledged" });
-  const legacyInput = {
-    graph,
-    chainId: 11_155_111,
-    collection: `0x${"ab".repeat(20)}`,
-    collectionName: "Context proof",
-    description: "Pure Base64 browser proof",
-    imageURI: "data:image/svg+xml;base64,PHN2Zy8+",
-    manifestURI: `web3://0x${"cd".repeat(20)}:11155111/object/0x${"ef".repeat(32)}`,
-    manifestDigest: `0x${"12".repeat(32)}`,
-  };
-  await assert.rejects(() => buildKeelPreparedOneOfOneTokenURI(legacyInput), /automatic raw-percent carriage/u);
-  const prepared = await buildKeelPreparedOneOfOneTokenURI({...legacyInput, presentationPolicy: "raw-artifact"});
-  const metadata = JSON.parse(Buffer.from(prepared.tokenURI.split(",", 2)[1], "base64").toString("utf8"));
-  const animationPayload = metadata.animation_url.split(",", 2)[1];
-  assert.match(animationPayload, /^(?:[A-Za-z0-9+/]{4})*(?:[A-Za-z0-9+/]{2}==|[A-Za-z0-9+/]{3}=)?$/u);
-  assert.doesNotMatch(animationPayload, /[#?&_-]/u);
-
-  const [chrome, fixture] = await Promise.all([headlessChrome(), new Promise((resolve) => {
-    const server = createServer((_request, response) => {
-      response.setHeader("content-type", "text/html; charset=utf-8");
-      response.end(Buffer.from(animationPayload, "base64"));
-    });
-    server.listen(0, "127.0.0.1", () => resolve({
-      origin: `http://127.0.0.1:${server.address().port}`,
-      close: () => new Promise((resolveClose, reject) => server.close((error) => error ? reject(error) : resolveClose())),
-    }));
-  })]);
-  try {
-    const rendered = await dumpDOM(chrome, fixture.origin);
-    assert.match(rendered.stdout, /data-vault-verification="verified"/u);
-    assert.match(rendered.stdout, /id="verify-seal"/u);
-    assert.match(rendered.stdout, /id="verify-title">Files verified/u);
-    assert.match(rendered.stdout, /0xabababababababababababababababababababab/u);
-    assert.doesNotMatch(rendered.stderr, /Uncaught|net::ERR|Failed to load resource/iu);
-  } finally {
-    await fixture.close();
-  }
+  await assert.rejects(() => buildKeelInlinePreEncodedTokenURIGraph(local, { legacyCarriage: "acknowledged" }), error => error.name === "KeelLegacyCarriageError" && /^buildKeelInlinePreEncodedTokenURIGraph is retired for publication\./u.test(error.message));
 });
 
-test("the compact escaped animation URI is directly browser-readable without inner Base64 decoding", { timeout: 30_000 }, async () => {
+test("retired escaped publication carriage rejects instead of preparing a historical animation URI", { timeout: 30_000 }, async () => {
   const shell = await buildKeelInlineShellFragments({ repositoryRoot: process.cwd() });
   const local = await buildKeelInlineLocalDocument({
     shell,
@@ -147,33 +110,7 @@ test("the compact escaped animation URI is directly browser-readable without inn
       source: new TextEncoder().encode('<!doctype html><html><body><div id="art">escaped context ready</div></body></html>'),
     },
   });
-  const graph = await buildKeelInlineEscapedTokenURIGraph(local, { legacyCarriage: "acknowledged" });
-  const legacyInput = {
-    graph,
-    chainId: 11_155_111,
-    collection: `0x${"ab".repeat(20)}`,
-    collectionName: "Escaped context proof",
-    description: "Compact percent carriage browser proof",
-    imageURI: "data:image/svg+xml;base64,PHN2Zy8+",
-    manifestURI: `web3://0x${"cd".repeat(20)}:11155111/object/0x${"ef".repeat(32)}`,
-    manifestDigest: `0x${"12".repeat(32)}`,
-  };
-  await assert.rejects(() => buildKeelPreparedOneOfOneTokenURI(legacyInput), /automatic raw-percent carriage/u);
-  const prepared = await buildKeelPreparedOneOfOneTokenURI({...legacyInput, presentationPolicy: "raw-artifact"});
-  const metadata = JSON.parse(Buffer.from(prepared.tokenURI.split(",", 2)[1], "base64").toString("utf8"));
-  assert.equal(prepared.animationEncoding, "percent");
-  assert.equal(prepared.requiredBuilder, "KeelPercentTokenURIBuilder");
-  assert.match(metadata.animation_url, /^data:text\/html;charset=utf-8,/u);
-  assert.doesNotMatch(metadata.animation_url.slice(metadata.animation_url.indexOf(",") + 1), /[\s<>"'&#?\\]/u);
-  assert.equal(new URL(metadata.animation_url).href, metadata.animation_url);
-  assert.ok(decodeURIComponent(metadata.animation_url.slice(metadata.animation_url.indexOf(",") + 1)).startsWith(new TextDecoder().decode(local.rootBytes)));
-
-  const chrome = await headlessChrome();
-  const rendered = await dumpDOM(chrome, metadata.animation_url);
-  assert.match(rendered.stdout, /data-vault-verification="verified"/u);
-  assert.match(rendered.stdout, /id="verify-title">Files verified/u);
-  assert.match(rendered.stdout, /0xabababababababababababababababababababab/u);
-  assert.doesNotMatch(rendered.stderr, /Uncaught|net::ERR|Failed to load resource/iu);
+  await assert.rejects(() => buildKeelInlineEscapedTokenURIGraph(local, { legacyCarriage: "acknowledged" }), error => error.name === "KeelLegacyCarriageError" && /^buildKeelInlineEscapedTokenURIGraph is retired for publication\./u.test(error.message));
 });
 
 test("the unchanged canonical shell rejects changed artwork bytes and accepts the original again", { timeout: 30_000 }, async () => {
