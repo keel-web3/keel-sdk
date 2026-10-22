@@ -176,8 +176,9 @@ function rejectRpcError(method: string, error: { code?: unknown; message?: unkno
   if (code === 3) throw new KeelRpcResponseError(3, typeof error.data === "string" && /^0x[0-9a-f]*$/iu.test(error.data) ? error.data : undefined, undefined, status);
   if (code === -32602 || code <= -38000 && code >= -38099 && code !== -38026)
     throw new KeelRpcResponseError(code, undefined, undefined, status);
-  if ([401, 403].includes(code) || /api.?key|unauthorized|authentication|access denied/iu.test(message)) throw new ProviderFailure("access-denied", 0, { transportFailure: "rpc-error", httpStatus: status, rpcCode: code });
+  if ([401, 403].includes(code)) throw new ProviderFailure("access-denied", 0, { transportFailure: "rpc-error", httpStatus: status, rpcCode: code });
   if (/execution reverted/iu.test(message)) throw new KeelRpcResponseError(3, typeof error.data === "string" && /^0x[0-9a-f]*$/iu.test(error.data) ? error.data : undefined, undefined, status);
+  if (/api.?key|unauthorized|authentication|access denied/iu.test(message)) throw new ProviderFailure("access-denied", 0, { transportFailure: "rpc-error", httpStatus: status, rpcCode: code });
   if (code === 429 || code === -32005 || /rate.?limit|too many requests|quota|compute units|usage.?limit/iu.test(message)) throw new ProviderFailure("rate-limited", delay, { transportFailure: "rate-limited", httpStatus: status, rpcCode: code });
   if (/missing trie|historical|pruned|state.*unavailable|header not found/iu.test(message)) throw new ProviderFailure("history-unavailable", 0, { transportFailure: "rpc-error", httpStatus: status, rpcCode: code });
   if (method === "eth_simulateV1") {
