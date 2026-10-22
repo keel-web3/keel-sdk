@@ -1,0 +1,93 @@
+TAP version 13
+# Subtest: actual full legacy metadata return gzip boot verifies and executes original content offline with appended context
+not ok 1 - actual full legacy metadata return gzip boot verifies and executes original content offline with appended context
+  ---
+  duration_ms: 5.407709
+  type: 'test'
+  location: '/private/tmp/keel-media-viewers-20261021-01/keel-sdk/tests/sdk-legacy-prepared-dense-browser.test.mjs:17:35'
+  failureType: 'testCodeFailure'
+  error: 'buildKeelLegacyPreparedDenseDocument is retired for fresh publication. Use the registered canonical raw-percent resource pipeline.'
+  code: 'ERR_TEST_FAILURE'
+  name: 'TypeError'
+  stack: |-
+    buildKeelLegacyPreparedDenseDocument (file:///private/tmp/keel-media-viewers-20261021-01/keel-sdk/packages/sdk/dist/legacy-prepared-dense-copy.js:25:11)
+    actualFullReturn (file:///private/tmp/keel-media-viewers-20261021-01/keel-sdk/tests/sdk-legacy-prepared-dense-browser.test.mjs:11:22)
+    async TestContext.<anonymous> (file:///private/tmp/keel-media-viewers-20261021-01/keel-sdk/tests/sdk-legacy-prepared-dense-browser.test.mjs:18:14)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async startSubtestAfterBootstrap (node:internal/test_runner/harness:296:3)
+  ...
+# Subtest: actual full legacy metadata return none boot verifies and executes original content offline with appended context
+not ok 2 - actual full legacy metadata return none boot verifies and executes original content offline with appended context
+  ---
+  duration_ms: 1.325083
+  type: 'test'
+  location: '/private/tmp/keel-media-viewers-20261021-01/keel-sdk/tests/sdk-legacy-prepared-dense-browser.test.mjs:17:35'
+  failureType: 'testCodeFailure'
+  error: 'buildKeelLegacyPreparedDenseDocument is retired for fresh publication. Use the registered canonical raw-percent resource pipeline.'
+  code: 'ERR_TEST_FAILURE'
+  name: 'TypeError'
+  stack: |-
+    buildKeelLegacyPreparedDenseDocument (file:///private/tmp/keel-media-viewers-20261021-01/keel-sdk/packages/sdk/dist/legacy-prepared-dense-copy.js:25:11)
+    actualFullReturn (file:///private/tmp/keel-media-viewers-20261021-01/keel-sdk/tests/sdk-legacy-prepared-dense-browser.test.mjs:11:22)
+    async TestContext.<anonymous> (file:///private/tmp/keel-media-viewers-20261021-01/keel-sdk/tests/sdk-legacy-prepared-dense-browser.test.mjs:18:14)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: changed dense compressed bytes block the child before any artwork signal
+not ok 3 - changed dense compressed bytes block the child before any artwork signal
+  ---
+  duration_ms: 1.056459
+  type: 'test'
+  location: '/private/tmp/keel-media-viewers-20261021-01/keel-sdk/tests/sdk-legacy-prepared-dense-browser.test.mjs:29:1'
+  failureType: 'testCodeFailure'
+  error: 'buildKeelLegacyPreparedDenseDocument is retired for fresh publication. Use the registered canonical raw-percent resource pipeline.'
+  code: 'ERR_TEST_FAILURE'
+  name: 'TypeError'
+  stack: |-
+    buildKeelLegacyPreparedDenseDocument (file:///private/tmp/keel-media-viewers-20261021-01/keel-sdk/packages/sdk/dist/legacy-prepared-dense-copy.js:25:11)
+    actualFullReturn (file:///private/tmp/keel-media-viewers-20261021-01/keel-sdk/tests/sdk-legacy-prepared-dense-browser.test.mjs:11:22)
+    async TestContext.<anonymous> (file:///private/tmp/keel-media-viewers-20261021-01/keel-sdk/tests/sdk-legacy-prepared-dense-browser.test.mjs:30:14)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: the marketplace-safe prepared animation URI installs token context before the K shell launches
+not ok 4 - the marketplace-safe prepared animation URI installs token context before the K shell launches
+  ---
+  duration_ms: 74.439041
+  type: 'test'
+  location: '/private/tmp/keel-media-viewers-20261021-01/keel-sdk/tests/sdk-verification-shell-browser.test.mjs:88:1'
+  failureType: 'testCodeFailure'
+  error: 'buildKeelInlinePreEncodedTokenURIGraph is retired for publication. Use buildKeelInlineRawPercentTokenURIGraph (compact raw-percent); acknowledgements and environment switches cannot select historical carriage.'
+  code: 'ERR_TEST_FAILURE'
+  name: 'KeelLegacyCarriageError'
+  stack: |-
+    buildKeelInlinePreEncodedTokenURIGraph (file:///private/tmp/keel-media-viewers-20261021-01/keel-sdk/packages/sdk/dist/inline-viewer-graph.js:1224:11)
+    TestContext.<anonymous> (file:///private/tmp/keel-media-viewers-20261021-01/keel-sdk/tests/sdk-verification-shell-browser.test.mjs:99:23)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async startSubtestAfterBootstrap (node:internal/test_runner/harness:296:3)
+  ...
+# Subtest: the compact escaped animation URI is directly browser-readable without inner Base64 decoding
+not ok 5 - the compact escaped animation URI is directly browser-readable without inner Base64 decoding
+  ---
+  duration_ms: 15.579709
+  type: 'test'
+  location: '/private/tmp/keel-media-viewers-20261021-01/keel-sdk/tests/sdk-verification-shell-browser.test.mjs:139:1'
+  failureType: 'testCodeFailure'
+  error: 'buildKeelInlineEscapedTokenURIGraph is retired for publication. Use buildKeelInlineRawPercentTokenURIGraph (compact raw-percent); acknowledgements and environment switches cannot select historical carriage.'
+  code: 'ERR_TEST_FAILURE'
+  name: 'KeelLegacyCarriageError'
+  stack: |-
+    buildKeelInlineEscapedTokenURIGraph (file:///private/tmp/keel-media-viewers-20261021-01/keel-sdk/packages/sdk/dist/inline-viewer-graph.js:1234:11)
+    TestContext.<anonymous> (file:///private/tmp/keel-media-viewers-20261021-01/keel-sdk/tests/sdk-verification-shell-browser.test.mjs:150:23)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+1..5
+# tests 5
+# suites 0
+# pass 0
+# fail 5
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 369.590291

@@ -1,0 +1,445 @@
+{"files":["tests/media-viewer-browser.test.mjs","tests/native-media-browser.test.mjs","tests/model-viewer-browser.test.mjs","tests/sdk-verification-wrap-offline-browser.test.mjs","tests/sdk-prepared-dense-copy-browser.test.mjs","tests/sdk-legacy-prepared-dense-browser.test.mjs","tests/sdk-studio-plan-viewer-browser.test.mjs","tests/sdk-verification-shell-browser.test.mjs","tests/sdk-verification-shell-large-graph-browser.test.mjs","tests/link-assembly-browser.test.mjs","tests/sdk-verification-shell-marketplace-csp.test.mjs","tests/sdk-marketplace-csp-observer-controls.test.mjs","tests/sdk-browser-cdp-navigation.test.mjs","tests/three-r180-browser.test.mjs","tests/keel-audio-browser.test.mjs"]}
+TAP version 13
+# Subtest: Tone + keel-audio load inside the compact Inline shell CSP and a real click in the art frame starts sound
+ok 1 - Tone + keel-audio load inside the compact Inline shell CSP and a real click in the art frame starts sound
+  ---
+  duration_ms: 1126.162041
+  type: 'test'
+  ...
+# Subtest: under the reference viewer's worker-src 'none' CSP, keel-audio falls Tone back to its timer clock and the score still ticks
+ok 2 - under the reference viewer's worker-src 'none' CSP, keel-audio falls Tone back to its timer clock and the score still ticks
+  ---
+  duration_ms: 957.14075
+  type: 'test'
+  ...
+# Subtest: contract-returned canonical link URI verifies each HTTPS fetch before mounting artwork
+not ok 3 - contract-returned canonical link URI verifies each HTTPS fetch before mounting artwork
+  ---
+  duration_ms: 73.880625
+  type: 'test'
+  location: '/private/tmp/keel-native-svg-audio-20261021/keel-sdk/tests/link-assembly-browser.test.mjs:52:1'
+  failureType: 'testCodeFailure'
+  error: "ENOENT: no such file or directory, open '/private/tmp/keel-native-svg-audio-20261021/keel-contracts/out/KeelLinkURIBuilder.t.sol/LinkEnumProbe.json'"
+  code: 'ENOENT'
+  stack: |-
+    async open (node:internal/fs/promises:636:25)
+    async readFile (node:internal/fs/promises:1235:14)
+    async artifact (file:///private/tmp/keel-native-svg-audio-20261021/keel-sdk/tests/link-assembly-browser.test.mjs:21:21)
+    async deploy (file:///private/tmp/keel-native-svg-audio-20261021/keel-sdk/tests/link-assembly-browser.test.mjs:81:17)
+    async TestContext.<anonymous> (file:///private/tmp/keel-native-svg-audio-20261021/keel-sdk/tests/link-assembly-browser.test.mjs:98:19)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async startSubtestAfterBootstrap (node:internal/test_runner/harness:296:3)
+  ...
+# Subtest: canonical shell preserves every distinct native webp animation color and looping
+ok 4 - canonical shell preserves every distinct native webp animation color and looping
+  ---
+  duration_ms: 2253.181375
+  type: 'test'
+  ...
+# Subtest: canonical shell preserves every distinct native avif animation color and looping
+ok 5 - canonical shell preserves every distinct native avif animation color and looping
+  ---
+  duration_ms: 2230.19325
+  type: 'test'
+  ...
+# Subtest: canonical still webp retains original PNG-export canvas and exact source commitment
+ok 6 - canonical still webp retains original PNG-export canvas and exact source commitment
+  ---
+  duration_ms: 653.850208
+  type: 'test'
+  ...
+# Subtest: canonical still avif retains original PNG-export canvas and exact source commitment
+ok 7 - canonical still avif retains original PNG-export canvas and exact source commitment
+  ---
+  duration_ms: 623.438584
+  type: 'test'
+  ...
+# Subtest: canonical GIF motion remains native with exact catalog module profile 1.1.0
+ok 8 - canonical GIF motion remains native with exact catalog module profile 1.1.0
+  ---
+  duration_ms: 2220.090167
+  type: 'test'
+  ...
+# Subtest: canonical GIF motion remains native with exact catalog module profile 1.3.0
+ok 9 - canonical GIF motion remains native with exact catalog module profile 1.3.0
+  ---
+  duration_ms: 2207.594208
+  type: 'test'
+  ...
+# Subtest: canonical GIF motion remains native with exact catalog module profile 1.4.0
+ok 10 - canonical GIF motion remains native with exact catalog module profile 1.4.0
+  ---
+  duration_ms: 2233.594125
+  type: 'test'
+  ...
+# Subtest: canonical GIF motion remains native with exact catalog module profile 1.5.0
+ok 11 - canonical GIF motion remains native with exact catalog module profile 1.5.0
+  ---
+  duration_ms: 2223.238041
+  type: 'test'
+  ...
+# Subtest: actual canonical compiled glb renders all primitives, original textures/transforms/skin/morph/source clips and alternate scene
+ok 12 - actual canonical compiled glb renders all primitives, original textures/transforms/skin/morph/source clips and alternate scene
+  ---
+  duration_ms: 1905.745958
+  type: 'test'
+  ...
+# Subtest: actual canonical compiled gltf renders all primitives, original textures/transforms/skin/morph/source clips and alternate scene
+ok 13 - actual canonical compiled gltf renders all primitives, original textures/transforms/skin/morph/source clips and alternate scene
+  ---
+  duration_ms: 1434.218791
+  type: 'test'
+  ...
+# Subtest: actual canonical retained-current-native-frame glb renders all primitives, original textures/transforms/skin/morph/source clips and alternate scene
+ok 14 - actual canonical retained-current-native-frame glb renders all primitives, original textures/transforms/skin/morph/source clips and alternate scene
+  ---
+  duration_ms: 1277.477
+  type: 'test'
+  ...
+# Subtest: actual canonical OBJ retains both objects, MTL colors and original texture without external requests
+ok 15 - actual canonical OBJ retains both objects, MTL colors and original texture without external requests
+  ---
+  duration_ms: 1245.955417
+  type: 'test'
+  ...
+# Subtest: actual canonical still SVG renders original XML and preserves native motion
+ok 16 - actual canonical still SVG renders original XML and preserves native motion
+  ---
+  duration_ms: 632.951375
+  type: 'test'
+  ...
+# Subtest: actual canonical smil SVG renders original XML and preserves native motion
+ok 17 - actual canonical smil SVG renders original XML and preserves native motion
+  ---
+  duration_ms: 2716.309625
+  type: 'test'
+  ...
+# Subtest: actual canonical css SVG renders original XML and preserves native motion
+ok 18 - actual canonical css SVG renders original XML and preserves native motion
+  ---
+  duration_ms: 2709.472542
+  type: 'test'
+  ...
+# Subtest: actual canonical audio/wav decodes exact original, displays cover and starts only with native play gesture
+ok 19 - actual canonical audio/wav decodes exact original, displays cover and starts only with native play gesture
+  ---
+  duration_ms: 751.139834
+  type: 'test'
+  ...
+# Subtest: actual canonical audio/mpeg decodes exact original, displays cover and starts only with native play gesture
+ok 20 - actual canonical audio/mpeg decodes exact original, displays cover and starts only with native play gesture
+  ---
+  duration_ms: 709.040292
+  type: 'test'
+  ...
+# Subtest: actual canonical audio/ogg decodes exact original, displays cover and starts only with native play gesture
+ok 21 - actual canonical audio/ogg decodes exact original, displays cover and starts only with native play gesture
+  ---
+  duration_ms: 748.872292
+  type: 'test'
+  ...
+# Subtest: actual canonical audio/flac decodes exact original, displays cover and starts only with native play gesture
+ok 22 - actual canonical audio/flac decodes exact original, displays cover and starts only with native play gesture
+  ---
+  duration_ms: 739.769417
+  type: 'test'
+  ...
+# Subtest: actual canonical audio/aac decodes exact original, displays cover and starts only with native play gesture
+ok 23 - actual canonical audio/aac decodes exact original, displays cover and starts only with native play gesture
+  ---
+  duration_ms: 751.052708
+  type: 'test'
+  ...
+# Subtest: actual canonical audio/mp4 decodes exact original, displays cover and starts only with native play gesture
+ok 24 - actual canonical audio/mp4 decodes exact original, displays cover and starts only with native play gesture
+  ---
+  duration_ms: 719.749458
+  type: 'test'
+  ...
+# Subtest: actual retained current reader frames decode and play exact native-Gzip audio with the new module
+ok 25 - actual retained current reader frames decode and play exact native-Gzip audio with the new module
+  ---
+  duration_ms: 449.53125
+  type: 'test'
+  ...
+# Subtest: CDP navigates an exact oversized UTF8 data URI with the original 2500ms virtual budget
+ok 26 - CDP navigates an exact oversized UTF8 data URI with the original 2500ms virtual budget
+  ---
+  duration_ms: 191.874583
+  type: 'test'
+  ...
+# Subtest: CDP navigates an exact oversized UTF8 data URI with the original 5000ms virtual budget
+ok 27 - CDP navigates an exact oversized UTF8 data URI with the original 5000ms virtual budget
+  ---
+  duration_ms: 158.098334
+  type: 'test'
+  ...
+# Subtest: actual full legacy metadata return gzip boot verifies and executes original content offline with appended context
+not ok 28 - actual full legacy metadata return gzip boot verifies and executes original content offline with appended context
+  ---
+  duration_ms: 6.262792
+  type: 'test'
+  location: '/private/tmp/keel-native-svg-audio-20261021/keel-sdk/tests/sdk-legacy-prepared-dense-browser.test.mjs:17:35'
+  failureType: 'testCodeFailure'
+  error: 'buildKeelLegacyPreparedDenseDocument is retired for fresh publication. Use the registered canonical raw-percent resource pipeline.'
+  code: 'ERR_TEST_FAILURE'
+  name: 'TypeError'
+  stack: |-
+    buildKeelLegacyPreparedDenseDocument (file:///private/tmp/keel-native-svg-audio-20261021/keel-sdk/packages/sdk/dist/legacy-prepared-dense-copy.js:25:11)
+    actualFullReturn (file:///private/tmp/keel-native-svg-audio-20261021/keel-sdk/tests/sdk-legacy-prepared-dense-browser.test.mjs:11:22)
+    async TestContext.<anonymous> (file:///private/tmp/keel-native-svg-audio-20261021/keel-sdk/tests/sdk-legacy-prepared-dense-browser.test.mjs:18:14)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async startSubtestAfterBootstrap (node:internal/test_runner/harness:296:3)
+  ...
+# Subtest: actual full legacy metadata return none boot verifies and executes original content offline with appended context
+not ok 29 - actual full legacy metadata return none boot verifies and executes original content offline with appended context
+  ---
+  duration_ms: 1.9215
+  type: 'test'
+  location: '/private/tmp/keel-native-svg-audio-20261021/keel-sdk/tests/sdk-legacy-prepared-dense-browser.test.mjs:17:35'
+  failureType: 'testCodeFailure'
+  error: 'buildKeelLegacyPreparedDenseDocument is retired for fresh publication. Use the registered canonical raw-percent resource pipeline.'
+  code: 'ERR_TEST_FAILURE'
+  name: 'TypeError'
+  stack: |-
+    buildKeelLegacyPreparedDenseDocument (file:///private/tmp/keel-native-svg-audio-20261021/keel-sdk/packages/sdk/dist/legacy-prepared-dense-copy.js:25:11)
+    actualFullReturn (file:///private/tmp/keel-native-svg-audio-20261021/keel-sdk/tests/sdk-legacy-prepared-dense-browser.test.mjs:11:22)
+    async TestContext.<anonymous> (file:///private/tmp/keel-native-svg-audio-20261021/keel-sdk/tests/sdk-legacy-prepared-dense-browser.test.mjs:18:14)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# {"scriptlessControl":true,"artworkRequests":[],"pageNetworkRequests":[],"deniedProxyRequests":[]}
+# Subtest: scriptless browser control retains every denied browser-service proxy request
+ok 30 - scriptless browser control retains every denied browser-service proxy request
+  ---
+  duration_ms: 292.127625
+  type: 'test'
+  ...
+# Subtest: changed dense compressed bytes block the child before any artwork signal
+not ok 31 - changed dense compressed bytes block the child before any artwork signal
+  ---
+  duration_ms: 0.772459
+  type: 'test'
+  location: '/private/tmp/keel-native-svg-audio-20261021/keel-sdk/tests/sdk-legacy-prepared-dense-browser.test.mjs:29:1'
+  failureType: 'testCodeFailure'
+  error: 'buildKeelLegacyPreparedDenseDocument is retired for fresh publication. Use the registered canonical raw-percent resource pipeline.'
+  code: 'ERR_TEST_FAILURE'
+  name: 'TypeError'
+  stack: |-
+    buildKeelLegacyPreparedDenseDocument (file:///private/tmp/keel-native-svg-audio-20261021/keel-sdk/packages/sdk/dist/legacy-prepared-dense-copy.js:25:11)
+    actualFullReturn (file:///private/tmp/keel-native-svg-audio-20261021/keel-sdk/tests/sdk-legacy-prepared-dense-browser.test.mjs:11:22)
+    async TestContext.<anonymous> (file:///private/tmp/keel-native-svg-audio-20261021/keel-sdk/tests/sdk-legacy-prepared-dense-browser.test.mjs:30:14)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: CDP commands time out, ignore their late replies and cannot resolve a different command
+ok 32 - CDP commands time out, ignore their late replies and cannot resolve a different command
+  ---
+  duration_ms: 22.350417
+  type: 'test'
+  ...
+# Subtest: socket disconnect rejects every pending command and all subsequent commands
+ok 33 - socket disconnect rejects every pending command and all subsequent commands
+  ---
+  duration_ms: 0.37925
+  type: 'test'
+  ...
+# Subtest: malformed CDP responses fail the session instead of escaping event handlers
+ok 34 - malformed CDP responses fail the session instead of escaping event handlers
+  ---
+  duration_ms: 0.640583
+  type: 'test'
+  ...
+# Subtest: a synchronous socket send failure rejects its pending command
+ok 35 - a synchronous socket send failure rejects its pending command
+  ---
+  duration_ms: 0.166625
+  type: 'test'
+  ...
+# Subtest: disposing a session rejects pending work, removes listeners and is idempotent
+ok 36 - disposing a session rejects pending work, removes listeners and is idempotent
+  ---
+  duration_ms: 0.143834
+  type: 'test'
+  ...
+# Subtest: a nonexistent browser rejects and removes its owned profile
+ok 37 - a nonexistent browser rejects and removes its owned profile
+  ---
+  duration_ms: 3.32125
+  type: 'test'
+  ...
+# Subtest: a browser exiting before DevTools rejects and removes its owned profile
+ok 38 - a browser exiting before DevTools rejects and removes its owned profile
+  ---
+  duration_ms: 4.035541
+  type: 'test'
+  ...
+# Subtest: actual Chrome cleanup is idempotent, settles pending work and removes its owned profile
+ok 39 - actual Chrome cleanup is idempotent, settles pending work and removes its owned profile
+  ---
+  duration_ms: 110.756833
+  type: 'test'
+  ...
+# Subtest: a refused CDP connection terminates its owned child and removes its profile
+ok 40 - a refused CDP connection terminates its owned child and removes its profile
+  ---
+  duration_ms: 114.653166
+  type: 'test'
+  ...
+# Subtest: missing DevTools startup is bounded and cleans up the actual owned process
+ok 41 - missing DevTools startup is bounded and cleans up the actual owned process
+  ---
+  duration_ms: 10018.242292
+  type: 'test'
+  ...
+# Subtest: actual Chrome retains a250ms runtime error with readiness at50ms
+ok 42 - actual Chrome retains a250ms runtime error with readiness at50ms
+  ---
+  duration_ms: 4459.87075
+  type: 'test'
+  ...
+# Subtest: actual Chrome retains a250ms runtime error with readiness at500ms
+ok 43 - actual Chrome retains a250ms runtime error with readiness at500ms
+  ---
+  duration_ms: 4124.88275
+  type: 'test'
+  ...
+# Subtest: default Brotli/URI81 COPY survives both escaped data URI layers in Chrome and blocks a changed payload
+ok 44 - default Brotli/URI81 COPY survives both escaped data URI layers in Chrome and blocks a changed payload
+  ---
+  duration_ms: 2831.601042
+  type: 'test'
+  ...
+# {"compression":"none","artworkRequests":[],"pageNetworkRequests":[],"deniedProxyRequests":[]}
+# {"compression":"auto","artworkRequests":[],"pageNetworkRequests":[],"deniedProxyRequests":[]}
+# Subtest: actual Chromium replays none and Brotli modular bytes through the complete metadata data URI with network denied
+ok 45 - actual Chromium replays none and Brotli modular bytes through the complete metadata data URI with network denied
+  ---
+  duration_ms: 958.887959
+  type: 'test'
+  ...
+# Subtest: a changed prepared payload never executes the artwork in the actual offline browser
+ok 46 - a changed prepared payload never executes the artwork in the actual offline browser
+  ---
+  duration_ms: 365.9145
+  type: 'test'
+  ...
+# Subtest: unsupported cyclic module imports reject during preparation before storage or browser execution
+ok 47 - unsupported cyclic module imports reject during preparation before storage or browser execution
+  ---
+  duration_ms: 0.499167
+  type: 'test'
+  ...
+# Subtest: the protected K shell mounts only verified art inside an opaque network-denied frame
+ok 48 - the protected K shell mounts only verified art inside an opaque network-denied frame
+  ---
+  duration_ms: 618.941791
+  type: 'test'
+  ...
+# Subtest: the marketplace-safe prepared animation URI installs token context before the K shell launches
+not ok 49 - the marketplace-safe prepared animation URI installs token context before the K shell launches
+  ---
+  duration_ms: 16.25475
+  type: 'test'
+  location: '/private/tmp/keel-native-svg-audio-20261021/keel-sdk/tests/sdk-verification-shell-browser.test.mjs:88:1'
+  failureType: 'testCodeFailure'
+  error: 'buildKeelInlinePreEncodedTokenURIGraph is retired for publication. Use buildKeelInlineRawPercentTokenURIGraph (compact raw-percent); acknowledgements and environment switches cannot select historical carriage.'
+  code: 'ERR_TEST_FAILURE'
+  name: 'KeelLegacyCarriageError'
+  stack: |-
+    buildKeelInlinePreEncodedTokenURIGraph (file:///private/tmp/keel-native-svg-audio-20261021/keel-sdk/packages/sdk/dist/inline-viewer-graph.js:1335:11)
+    TestContext.<anonymous> (file:///private/tmp/keel-native-svg-audio-20261021/keel-sdk/tests/sdk-verification-shell-browser.test.mjs:99:23)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: the compact escaped animation URI is directly browser-readable without inner Base64 decoding
+not ok 50 - the compact escaped animation URI is directly browser-readable without inner Base64 decoding
+  ---
+  duration_ms: 14.2115
+  type: 'test'
+  location: '/private/tmp/keel-native-svg-audio-20261021/keel-sdk/tests/sdk-verification-shell-browser.test.mjs:139:1'
+  failureType: 'testCodeFailure'
+  error: 'buildKeelInlineEscapedTokenURIGraph is retired for publication. Use buildKeelInlineRawPercentTokenURIGraph (compact raw-percent); acknowledgements and environment switches cannot select historical carriage.'
+  code: 'ERR_TEST_FAILURE'
+  name: 'KeelLegacyCarriageError'
+  stack: |-
+    buildKeelInlineEscapedTokenURIGraph (file:///private/tmp/keel-native-svg-audio-20261021/keel-sdk/packages/sdk/dist/inline-viewer-graph.js:1345:11)
+    TestContext.<anonymous> (file:///private/tmp/keel-native-svg-audio-20261021/keel-sdk/tests/sdk-verification-shell-browser.test.mjs:150:23)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: the unchanged canonical shell rejects changed artwork bytes and accepts the original again
+ok 51 - the unchanged canonical shell rejects changed artwork bytes and accepts the original again
+  ---
+  duration_ms: 445.29375
+  type: 'test'
+  ...
+# Subtest: canonical chrome displays logical token identity and supply without an audit claim
+ok 52 - canonical chrome displays logical token identity and supply without an audit claim
+  ---
+  duration_ms: 143.25325
+  type: 'test'
+  ...
+# Subtest: a 32-module graph whose modules name each other and import by specifier verifies and runs
+ok 53 - a 32-module graph whose modules name each other and import by specifier verifies and runs
+  ---
+  duration_ms: 248.397334
+  type: 'test'
+  ...
+# Subtest: names in the entry document still resolve, nested through the text resources they name
+ok 54 - names in the entry document still resolve, nested through the text resources they name
+  ---
+  duration_ms: 240.109292
+  type: 'test'
+  ...
+# Subtest: the canonical Inline shell runs verified data modules under a restrictive marketplace srcdoc CSP
+ok 55 - the canonical Inline shell runs verified data modules under a restrictive marketplace srcdoc CSP
+  ---
+  duration_ms: 4166.141458
+  type: 'test'
+  ...
+# Subtest: the canonical asset module starts only after its verified child mount exists
+ok 56 - the canonical asset module starts only after its verified child mount exists
+  ---
+  duration_ms: 4174.160125
+  type: 'test'
+  ...
+# Subtest: the exact p5 and seeded-random modules run under the marketplace CSP
+ok 57 - the exact p5 and seeded-random modules run under the marketplace CSP
+  ---
+  duration_ms: 4205.881208
+  type: 'test'
+  ...
+# Subtest: the exact Three.js r180 module pair runs under the marketplace CSP
+ok 58 - the exact Three.js r180 module pair runs under the marketplace CSP
+  ---
+  duration_ms: 4185.831167
+  type: 'test'
+  ...
+# Subtest: network attribution keeps opaque and unknown initiators and never exempts a hostname
+ok 59 - network attribution keeps opaque and unknown initiators and never exempts a hostname
+  ---
+  duration_ms: 1.110833
+  type: 'test'
+  ...
+# Subtest: maintained wrapper renders committed modules without external requests and rejects tampering before mounting
+ok 60 - maintained wrapper renders committed modules without external requests and rejects tampering before mounting
+  ---
+  duration_ms: 2686.5275
+  type: 'test'
+  ...
+# Subtest: network-denied browser harness renders the exact Three r180 rotating cube through the shared aliases
+ok 61 - network-denied browser harness renders the exact Three r180 rotating cube through the shared aliases
+  ---
+  duration_ms: 353.161666
+  type: 'test'
+  ...
+1..61
+# tests 61
+# suites 0
+# pass 55
+# fail 6
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 81485.293917

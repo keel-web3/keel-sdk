@@ -1,0 +1,138 @@
+{
+  "schema": "keel-sdk-81cb-initial-full-qualification@1",
+  "sourceCommit": "81cb23c57a5f426324acd0961ae21476de9cd861",
+  "checkoutHead": "7abfc90210c13499d0139e790e84fc27c3f1fce2",
+  "sourceUnchangedSinceScopedApproval": true,
+  "scopedReview": {
+    "decision": "APPROVED_SCOPED",
+    "sha256": "aa976e8bb530bc6a4ee764415a2b3b7deb143d4cc77ad1e55542a50763415b79"
+  },
+  "fullCleanBuild": "PASS",
+  "fullMaintained": {
+    "tests": 2798,
+    "pass": 2713,
+    "fail": 0,
+    "cancelled": 0,
+    "skipped": 85,
+    "durationMs": 125588.105333
+  },
+  "fullBrowser": {
+    "status": "FAIL",
+    "tests": 61,
+    "pass": 55,
+    "fail": 6,
+    "cancelled": 0,
+    "skipped": 0,
+    "durationMs": 81485.293917,
+    "mediaPreservation": {
+      "pass": 22,
+      "fail": 0,
+      "skipped": 0,
+      "caseNames": [
+        "canonical shell preserves every distinct native webp animation color and looping",
+        "canonical shell preserves every distinct native avif animation color and looping",
+        "canonical still webp retains original PNG-export canvas and exact source commitment",
+        "canonical still avif retains original PNG-export canvas and exact source commitment",
+        "canonical GIF motion remains native with exact catalog module profile 1.1.0",
+        "canonical GIF motion remains native with exact catalog module profile 1.3.0",
+        "canonical GIF motion remains native with exact catalog module profile 1.4.0",
+        "canonical GIF motion remains native with exact catalog module profile 1.5.0",
+        "actual canonical compiled glb renders all primitives, original textures/transforms/skin/morph/source clips and alternate scene",
+        "actual canonical compiled gltf renders all primitives, original textures/transforms/skin/morph/source clips and alternate scene",
+        "actual canonical retained-current-native-frame glb renders all primitives, original textures/transforms/skin/morph/source clips and alternate scene",
+        "actual canonical OBJ retains both objects, MTL colors and original texture without external requests",
+        "actual canonical still SVG renders original XML and preserves native motion",
+        "actual canonical smil SVG renders original XML and preserves native motion",
+        "actual canonical css SVG renders original XML and preserves native motion",
+        "actual canonical audio/wav decodes exact original, displays cover and starts only with native play gesture",
+        "actual canonical audio/mpeg decodes exact original, displays cover and starts only with native play gesture",
+        "actual canonical audio/ogg decodes exact original, displays cover and starts only with native play gesture",
+        "actual canonical audio/flac decodes exact original, displays cover and starts only with native play gesture",
+        "actual canonical audio/aac decodes exact original, displays cover and starts only with native play gesture",
+        "actual canonical audio/mp4 decodes exact original, displays cover and starts only with native play gesture",
+        "actual retained current reader frames decode and play exact native-Gzip audio with the new module"
+      ]
+    },
+    "failures": [
+      {
+        "group": "missing-fixture",
+        "case": "contract-returned canonical link URI verifies each HTTPS fetch before mounting artwork",
+        "reason": "No sibling contracts output in isolated SDK checkout; exact existing artifacts only inspected, initial result not rerun or approved here."
+      },
+      {
+        "group": "obsolete-positive",
+        "count": 3,
+        "file": "tests/sdk-legacy-prepared-dense-browser.test.mjs",
+        "reason": "Calls retired buildKeelLegacyPreparedDenseDocument expecting success."
+      },
+      {
+        "group": "obsolete-positive",
+        "count": 2,
+        "file": "tests/sdk-verification-shell-browser.test.mjs",
+        "reason": "Calls retired preEncoded/escaped publication carriage expecting success."
+      }
+    ]
+  },
+  "originalB0RetiredPositiveBaseline": {
+    "source": "b0a78fd50797a9af82be282f0d1103fe49ff0dc8",
+    "tests": 5,
+    "pass": 0,
+    "fail": 5,
+    "cancelled": 0,
+    "skipped": 0,
+    "durationMs": 369.590291
+  },
+  "freshNonincrementalSDKTypecheck": {
+    "exitCode": 0
+  },
+  "skipAudit": "Same85skips as previous author environment; two original b0Anvil skips execute because existing Anvil is on PATH. No test/skip edits.",
+  "distInventory": {
+    "path": "dist-inventory.json",
+    "sha256": "81f409f73f7a7bb95922403376786528b0381ee36cc76ef4a15300846c17acd0",
+    "scope": "Author normal build inventory, not independent build proof"
+  },
+  "sourceCleanBeforeDocs": true,
+  "decision": "Full browser gate FAIL; no release/native-chain/governance/live approval",
+  "evidence": [
+    {
+      "path": "b0-retired-browser-baseline.stdout.log",
+      "byteLength": 6031,
+      "sha256": "1d3478724ab9f39481b66049c5b88199cd86ede33a209ab26fdaf966db810333"
+    },
+    {
+      "path": "contracts-artifact-provenance.json",
+      "byteLength": 43777,
+      "sha256": "07ce076ba7ddb44544e87284a781e49f1e86266abb028290ad6253a2d1259ef6"
+    },
+    {
+      "path": "dist-inventory.json",
+      "byteLength": 321385,
+      "sha256": "81f409f73f7a7bb95922403376786528b0381ee36cc76ef4a15300846c17acd0"
+    },
+    {
+      "path": "full-browser.stdout.log",
+      "byteLength": 21990,
+      "sha256": "b1d58c0ef069bca3d2fcd9025580fc7bc9de6402dfc561350f1a11f0b5ee7ebf"
+    },
+    {
+      "path": "full-build-suite.stdout.log",
+      "byteLength": 669203,
+      "sha256": "31b6c29ac257ec2d0f6265f4ef445eee6884b8c6dd651552caaf1aca5240647f"
+    },
+    {
+      "path": "independent-scoped-review.json",
+      "byteLength": 11507,
+      "sha256": "aa976e8bb530bc6a4ee764415a2b3b7deb143d4cc77ad1e55542a50763415b79"
+    },
+    {
+      "path": "pre.json",
+      "byteLength": 957,
+      "sha256": "7ce92b55f97715835b02c392442b5ad4fe970eac0de992fe06cf70365e06711d"
+    },
+    {
+      "path": "sdk-tsc.stdout.log",
+      "byteLength": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  ]
+}

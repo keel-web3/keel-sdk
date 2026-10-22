@@ -1,0 +1,18 @@
+{
+  "startedUtc": "2026-10-22T04:01:47.457434+00:00",
+  "sourceCommit": "81cb23c57a5f426324acd0961ae21476de9cd861",
+  "checkoutHead": "7abfc90210c13499d0139e790e84fc27c3f1fce2",
+  "docsOnlyDescendant": true,
+  "trackedAndUntrackedClean": true,
+  "scopedIndependentReviewSHA256": "aa976e8bb530bc6a4ee764415a2b3b7deb143d4cc77ad1e55542a50763415b79",
+  "reviewedProductionPinsVerified": true,
+  "node": {
+    "path": "/Users/ravonus/.nvm/versions/node/v22.22.1/bin/node",
+    "version": "22.22.1",
+    "zlib": "1.3.1-e00f703",
+    "sha256": "245e0321af97d3c21dd4e7104457334dfe3c3ba7982d0db75363e354565f8cbb"
+  },
+  "heavyJobPreflight": "uptime 22:00: one-minute load4.62",
+  "fullCommand": "PATH=/Users/ravonus/.nvm/versions/node/v22.22.1/bin:/opt/homebrew/bin:$PATH node scripts/test.mjs",
+  "localDependencySetup": "Retained existing b0 apps/studio decoder +apps/demo Vite7.3.6; package-local own @keel/protocol,@keel/viewer and pinned saxes6.0.0 aliases."
+}

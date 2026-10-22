@@ -1,0 +1,229 @@
+{
+  "schema": "keel-independent-native-svg-audio-source-review@1",
+  "decision": "APPROVED_SCOPED",
+  "reviewerId": "cache-release-reviewer",
+  "approvedSourceCommit": "81cb23c57a5f426324acd0961ae21476de9cd861",
+  "initialReviewedSourceCommit": "912bdc15f6bcadf399d9b9a038f0f321ccb10db6",
+  "baseSourceCommit": "b0a78fd50797a9af82be282f0d1103fe49ff0dc8",
+  "worktree": "/private/tmp/keel-native-svg-audio-20261021/keel-sdk",
+  "productionPins": [
+    {
+      "path": "packages/sdk/src/asset-display.ts",
+      "bytes": 10874,
+      "sha256": "5db0da15130263c406cfbd43ec36599747376c5a5065217325110f3fdbccbe1a"
+    },
+    {
+      "path": "packages/sdk/src/inline-viewer-graph.ts",
+      "bytes": 147366,
+      "sha256": "7c1af86131a80904c097b4379e060543aef1bf605cb663ab1659fa5fe5e164d0"
+    },
+    {
+      "path": "packages/sdk/src/media-viewer-adapters.ts",
+      "bytes": 3847,
+      "sha256": "a997afa949fdc809289f6b68c2ec1408e07937c1fe545a4f385747409202d80f"
+    },
+    {
+      "path": "packages/sdk/src/native-media-inspection.ts",
+      "bytes": 22892,
+      "sha256": "515444b251b9f115b00d1dbbef894b454c62ab4beaa9a5de0432a69971ccd2c9"
+    },
+    {
+      "path": "packages/sdk/src/index.ts",
+      "bytes": 6008,
+      "sha256": "a23aaeabe74f428607aa042c83e1befc5035f933140e855f984a0ec32fa6ccb1"
+    },
+    {
+      "path": "packages/sdk/package.json",
+      "bytes": 15194,
+      "sha256": "0398234f2d4af303c878945790935cfd86dc9d10d10c5e9c940492d9ef97a47b"
+    }
+  ],
+  "initialSourceDisposition": {
+    "decision": "BLOCKED",
+    "findingId": "SVG-AUDIO-912-001",
+    "file": "packages/sdk/src/native-media-inspection.ts",
+    "lines": "51-53 in 912",
+    "reason": "Per-SAX-event style scanning accepts external CSS dependencies split across text/CDATA/comment boundaries; identical original bytes falsely qualify static/still/self-contained.",
+    "reproduction": "split-svg-style.regression.mjs",
+    "actualResult": "2 correct rejection controls; 3 false admissions; exit1; no source mutation or network.",
+    "observationSHA256": "ee7ff97f98f46cd6e971156ed42d90cc0e3b9035d80609e8273eb6fcb38f0546"
+  },
+  "resolvedFinding": {
+    "findingId": "SVG-AUDIO-912-001",
+    "source": "81cb23c57a5f426324acd0961ae21476de9cd861",
+    "correction": "Inspect complete bounded DOM-equivalent text+CDATA at matching style close, concatenate across comments, reject element descendants, preserve all original bytes. Only inspector production file differs from912.",
+    "independentReproduction": "All same5 input/assertion cases now reject; only exclusive observation output pathname changed to preserve original RED.",
+    "remainingBlockingFindings": []
+  },
+  "referenceCorrections": {
+    "decision": "APPROVED_EXACT_CURRENT_VERSION_REFERENCE_CORRECTIONS",
+    "sourceDiff": "b0a78fd50797a9af82be282f0d1103fe49ff0dc8..912bdc15f6bcadf399d9b9a038f0f321ccb10db6",
+    "files": [
+      "tests/media-viewer-adapters.test.mjs",
+      "tests/sdk-media-revision-reuse.test.mjs",
+      "tests/media-viewer-browser.test.mjs"
+    ],
+    "reason": "Current export is genuine1.5 renderer6821/a00a81; old1.4 fixture independently equals bytes emitted from frozen b0 source5056/16a440. Old1.1/1.2/1.3/1.4 identities, GIF motion/pixel assertions, module substitution negatives and original existing fixtures remain. New fixtures are additive, not incident-asset substitutions.",
+    "old14ByteExactBaseSource": true,
+    "unchangedExistingFixtureBytes": true
+  },
+  "independentChecks": {
+    "successorFocused": "59 PASS,0 FAIL,0 SKIP on exact clean81cb",
+    "ownRegression": "5 correct rejections with unchanged source bytes",
+    "browser": "10 PASS native public fixtures: still/SMIL/CSS SVG; six actual audio container decodes/covers/gesture-only playback; retained current-native-Gzip WAV. No external origin requests. Common1.5 render/graph code byte-identical912\u219281cb; browser result is local representative playback, not arbitrary-container decode proof.",
+    "referenceIdentity": "PASS old1.4 and current1.5 exact bytes/digests",
+    "original912TestBodies": "46 PASS; exact Git912 bodies materialized separately to avoid concurrently appended owner tests. Not a full suite.",
+    "retainedSetupAndFailures": [
+      "Own initial browser sandbox EPERM 127.0.0.1: no case completed; exact test then rerun under narrowly approved localhost permission.",
+      "During owner WIP, own first focused command observed49PASS10FAIL because author had appended successor cases while emitted inspector still912. Raw retained; not claimed frozen912 test coverage.",
+      "Original false-admission evidence retained unchanged."
+    ]
+  },
+  "reviewedProperties": [
+    "Original source snapshot/identity and deterministic graph reconstruction; changed stored/declaration/module inputs fail.",
+    "Container structure and browserDecode-required remain distinct; no arbitrary codec payload decode claim.",
+    "No new flat model renderer or Three dependency in native raster/SVG/audio path.",
+    "Audio uses authenticated exact verified resource URL, separate verified cover, native controls and no autoplay.",
+    "Current nativeGzip and retired Raw/None rejection/authenticated proof requirements retained."
+  ],
+  "scope": "SDK source/API and exact fixture reference approval only. Separate composed source QA, package/artifact checks, selected-chain module governance/registration/readback, configured native proof, API/MCP/UI/live and deployment remain required where applicable. No artwork publication/signing/spending or activation approval.",
+  "productionEditsByReviewer": false,
+  "hostActionsByReviewer": false,
+  "evidence": [
+    {
+      "path": "/private/tmp/keel-independent-native-svg-audio-20261021/split-svg-style.regression.mjs",
+      "bytes": 1819,
+      "sha256": "5acfa7c5018dc90a4da4fc00fee71bc99b62e7439303fb22da68c1338dc900b7"
+    },
+    {
+      "path": "/private/tmp/keel-independent-native-svg-audio-20261021/split-style-observation.json",
+      "bytes": 2015,
+      "sha256": "ee7ff97f98f46cd6e971156ed42d90cc0e3b9035d80609e8273eb6fcb38f0546"
+    },
+    {
+      "path": "/private/tmp/keel-independent-native-svg-audio-20261021/split-style-red.stdout",
+      "bytes": 1843,
+      "sha256": "6f4a2811f630ed7b26ae9bd4dbaf7dd6731b5b284f8d344164f301a948e71e4d"
+    },
+    {
+      "path": "/private/tmp/keel-independent-native-svg-audio-20261021/split-style-red.stderr",
+      "bytes": 697,
+      "sha256": "506f734782ce8d95ad1504a12668a64b7a7bdd2266baae80c17163eab78c81cf"
+    },
+    {
+      "path": "/private/tmp/keel-independent-native-svg-audio-20261021/reference-identity.mjs",
+      "bytes": 1674,
+      "sha256": "bd7afb096305f38656b7bc44209b4435be5de95ee53907aad85293c5d1ecce97"
+    },
+    {
+      "path": "/private/tmp/keel-independent-native-svg-audio-20261021/reference-identity.stdout",
+      "bytes": 299,
+      "sha256": "93670ffd622361597a42aa6a1f86d4907d58fa828c3812e81cdb79e833b667ae"
+    },
+    {
+      "path": "/private/tmp/keel-independent-native-svg-audio-20261021/reference-identity.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/private/tmp/keel-independent-native-svg-audio-20261021/successor81-regression.mjs",
+      "bytes": 1825,
+      "sha256": "eeea848d9d8b5795d00f3784e4d75d11e0dce329319b50815590de51980ec002"
+    },
+    {
+      "path": "/private/tmp/keel-independent-native-svg-audio-20261021/successor81-style-observation.json",
+      "bytes": 1574,
+      "sha256": "15bb87573b85aaa48fa26f4eec515bdc3620d17bb6b690f1d2a031b1fa566699"
+    },
+    {
+      "path": "/private/tmp/keel-independent-native-svg-audio-20261021/successor81-regression.stdout",
+      "bytes": 1432,
+      "sha256": "259e987becef1f6f2783cc6b8632b593ce40a903f5e28f73244c57994fc64218"
+    },
+    {
+      "path": "/private/tmp/keel-independent-native-svg-audio-20261021/successor81-regression.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/private/tmp/keel-independent-native-svg-audio-20261021/successor81-focused.stdout",
+      "bytes": 13720,
+      "sha256": "784934c92f685e05a3acaec4d4f57d9a392452d349004de14024611dd0da1bdf"
+    },
+    {
+      "path": "/private/tmp/keel-independent-native-svg-audio-20261021/successor81-focused.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/private/tmp/keel-independent-native-svg-audio-20261021/successor81-tests.json",
+      "bytes": 1247,
+      "sha256": "da3af6ad6a77200bcd523f9e3d267c504c59ca1dc2e8e6f28cc604f0b8bf51ba"
+    },
+    {
+      "path": "/private/tmp/keel-independent-native-svg-audio-20261021/native-browser.stdout",
+      "bytes": 2770,
+      "sha256": "f0d5dc14f82f0e28dc5d9c0bfb00ab3888722bb00f2ce2297784b7f0151b0dc4"
+    },
+    {
+      "path": "/private/tmp/keel-independent-native-svg-audio-20261021/native-browser.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/private/tmp/keel-independent-native-svg-audio-20261021/browser-result.json",
+      "bytes": 645,
+      "sha256": "08e317d53f7285159475687b6e7d7690ca7e14352b69984cabacff5734eb2226"
+    },
+    {
+      "path": "/private/tmp/keel-independent-native-svg-audio-20261021/sandbox-setup-red.browser-result.json",
+      "bytes": 645,
+      "sha256": "5b56317ddcefd1ff17d367e69bfa55a52d0be12b1ffbfb71500098f2c99edbd6"
+    },
+    {
+      "path": "/private/tmp/keel-independent-native-svg-audio-20261021/sandbox-setup-red.native-browser.stdout",
+      "bytes": 7113,
+      "sha256": "53b2e384b7272fa3c7baa3e0e4fde4c99214afa820a0bcb549f25fcfc4878b48"
+    },
+    {
+      "path": "/private/tmp/keel-independent-native-svg-audio-20261021/sandbox-setup-red.native-browser.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/private/tmp/keel-independent-native-svg-audio-20261021/focused-sdk.stdout",
+      "bytes": 21358,
+      "sha256": "69cac426dd2e1e5a2020e0a0e8c9853e564d1533b17496a836328950ffdd0cf3"
+    },
+    {
+      "path": "/private/tmp/keel-independent-native-svg-audio-20261021/focused-sdk.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/private/tmp/keel-independent-native-svg-audio-20261021/test-results.json",
+      "bytes": 1022,
+      "sha256": "fe6c6a5cce5b3e9d1bac8eb20a3e93acf96f2ddadf3d60a3c378b7e9717d57d1"
+    },
+    {
+      "path": "/private/tmp/keel-independent-native-svg-audio-20261021/frozen912-test-snapshot/result.json",
+      "bytes": 843,
+      "sha256": "7128fe68eefaecc58d841ed9466c3e4297e0016b311dded039522e691df6b9f3"
+    },
+    {
+      "path": "/private/tmp/keel-independent-native-svg-audio-20261021/frozen912-test-snapshot/run.stdout",
+      "bytes": 10573,
+      "sha256": "6711cbbab54e596e9a8f4deb109b3840816b6e4548dedada4e6ca97cdf888166"
+    },
+    {
+      "path": "/private/tmp/keel-independent-native-svg-audio-20261021/frozen912-test-snapshot/run.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/private/tmp/keel-independent-native-svg-audio-20261021/frozen912-test-snapshot/test-inputs.json",
+      "bytes": 549,
+      "sha256": "2482c2eaab7955e0fe4c34301af074c8169134f56b72489d9341761731b4c3b8"
+    }
+  ]
+}
