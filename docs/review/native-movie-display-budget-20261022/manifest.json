@@ -1,0 +1,197 @@
+[
+  {
+    "path": "README.md",
+    "byteLength": 3737,
+    "sha256": "03805eae19b93f01cadd4fe8b3bcc28d3f8ffaace27f6c680bc996c3bdf1089a"
+  },
+  {
+    "path": "author-corrected-fixture-after.stdout",
+    "byteLength": 652,
+    "sha256": "147719826806b6f4c827d02c1779b9bd9e448e9dfb8063bdb4f23d47b49b94ad"
+  },
+  {
+    "path": "author-corrected-fixture-before.stdout",
+    "byteLength": 2621,
+    "sha256": "0a462e5346587c6a0c2bc3b93d4e6b97c6a6dcb81a94b8404e05932830635c53"
+  },
+  {
+    "path": "author-unchanged-before.stdout",
+    "byteLength": 2577,
+    "sha256": "5e345d36a6ee4b5e0ec463d27eaa1a5b46f6029aa17999225599ed10089f9d91"
+  },
+  {
+    "path": "browser-results/audio.json",
+    "byteLength": 923,
+    "sha256": "6295d1056d6e4fec156a772a2749a580b7367bfad211a54dac7c9d72bdbca645"
+  },
+  {
+    "path": "browser-results/avif.json",
+    "byteLength": 8505,
+    "sha256": "8c2d343dfadc47dfeb8d091794b446d4ccf81ec5906ba6ccbcab81cd6d0d2d18"
+  },
+  {
+    "path": "browser-results/complete-cost.json",
+    "byteLength": 1213,
+    "sha256": "de87cc67c52716badfb7720ded3e1029d9e78c4bdc66c86a7ca852023ed23c7b"
+  },
+  {
+    "path": "browser-results/native-inspector-sar.json",
+    "byteLength": 370,
+    "sha256": "18d429b0991cb725e0defd90656189691cfd1cd4581d7e8b32a884e8ca4e0222"
+  },
+  {
+    "path": "browser-results/native-inspector-title.json",
+    "byteLength": 370,
+    "sha256": "3b1bdad2ed249d84ca92d4245ad8da0efa720697efb271d4d732b1880f5cc08c"
+  },
+  {
+    "path": "browser-results/native-sar.json",
+    "byteLength": 367,
+    "sha256": "e642a1c708184cacd02525523f7688eb27dc84138dd82c96f23b8645a1b0c05f"
+  },
+  {
+    "path": "browser-results/native-title.json",
+    "byteLength": 367,
+    "sha256": "cd6e19cd52917625f6ceaa748e1a0f6e21400db44146eda0e50d2459b92be264"
+  },
+  {
+    "path": "browser-results/reviewer-native-clamped.gif",
+    "byteLength": 126,
+    "sha256": "35fd32e1ac822834d6e945ce225c13a0c48731397a5578b86bd9aafae3546435"
+  },
+  {
+    "path": "browser-results/reviewer-native-finite.gif",
+    "byteLength": 126,
+    "sha256": "19a488cb5a0d34f20c3d0d266797b65c62ab197554f7e484377954ee5acb83a5"
+  },
+  {
+    "path": "browser-results/webp.json",
+    "byteLength": 8504,
+    "sha256": "b6286d796cd28eff711001f4d62729101df80328e9c0bd7018263d7548baf1d9"
+  },
+  {
+    "path": "browser.stdout",
+    "byteLength": 2161,
+    "sha256": "6af4ddf65ef64fd316615757461825130b132e483b9df2d1e55ea6ceb4819de6"
+  },
+  {
+    "path": "builder-build.stdout",
+    "byteLength": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "path": "builder-tsc.stdout",
+    "byteLength": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "path": "corrected-after-launches.json",
+    "byteLength": 339,
+    "sha256": "ed70b8cd8f5b39bffe4a92fe5e588c405199caeadad1ea3f4a2d72a30f4bbfc0"
+  },
+  {
+    "path": "corrected-before-launches.json",
+    "byteLength": 873,
+    "sha256": "cea1b486cff554bfdf86a3b9bef061cee34c0116362640b7948ed5ebccbecabc"
+  },
+  {
+    "path": "corrected-coded-framehash.stderr",
+    "byteLength": 1613,
+    "sha256": "54c58ce743ccf3f6c5809110ee49e47662782927a3e41d3d5b3020f2fb12aa82"
+  },
+  {
+    "path": "corrected-coded-framehash.stdout",
+    "byteLength": 33816,
+    "sha256": "a1989d031874d211bc07182b22bdf5bdc245782a30d379715f2f9e111a868df5"
+  },
+  {
+    "path": "corrected-native-overbudget-display.mp4",
+    "byteLength": 8838,
+    "sha256": "6b2509573d9cd6ba31ae2cfba98e32632132f0b0d80f34917eb2912d59d94aa6"
+  },
+  {
+    "path": "display-budget-setup.proposed.patch",
+    "byteLength": 1399,
+    "sha256": "905944cf3edb8f9e118c68fc338fe54305d8aa51a233bd1ff1fe9fdd5c2f839f"
+  },
+  {
+    "path": "environment.json",
+    "byteLength": 1840,
+    "sha256": "30f3b72d5234294d61ce9b8ee5b1a29e3a8382e0e715946de2c2787d2d931d64"
+  },
+  {
+    "path": "full-sdk.stdout",
+    "byteLength": 30403,
+    "sha256": "6962fd4b28203df63f9d27da03f2a6aeb1702a0a9b37a8fdf76b45aed8ab758d"
+  },
+  {
+    "path": "input-identities.json",
+    "byteLength": 697,
+    "sha256": "221f6c3c473c95589155f8fc47a7b22488217f40d93da9feae7ea9727c2df260"
+  },
+  {
+    "path": "lease.json",
+    "byteLength": 343,
+    "sha256": "c950bba79466eeb659303646aeb0243595d0ea3132326fa3305eaf2f8b217c07"
+  },
+  {
+    "path": "native-display-budget-launches.json",
+    "byteLength": 339,
+    "sha256": "ed70b8cd8f5b39bffe4a92fe5e588c405199caeadad1ea3f4a2d72a30f4bbfc0"
+  },
+  {
+    "path": "native-overbudget-display.mp4",
+    "byteLength": 8838,
+    "sha256": "6b2509573d9cd6ba31ae2cfba98e32632132f0b0d80f34917eb2912d59d94aa6"
+  },
+  {
+    "path": "original-coded-framehash.stderr",
+    "byteLength": 1622,
+    "sha256": "079fc34d3b62f063dc01a8d7b484b2373cfa81c512b3aee2dccd2ec4ee452c72"
+  },
+  {
+    "path": "original-coded-framehash.stdout",
+    "byteLength": 33816,
+    "sha256": "a1989d031874d211bc07182b22bdf5bdc245782a30d379715f2f9e111a868df5"
+  },
+  {
+    "path": "original-reviewer-native-display-budget-launches.json",
+    "byteLength": 873,
+    "sha256": "25eda3b107da66ef3106a1cc3ad4ac80393c9cc1f413a6bc99c81462413695cb"
+  },
+  {
+    "path": "original-reviewer-native-overbudget-display.mp4",
+    "byteLength": 8838,
+    "sha256": "ad64e44832758bb5abef4db4a4025cb3a5cc44b814072b57d5d32d9b0c963b9b"
+  },
+  {
+    "path": "original-reviewer-reviewer-native-display-budget.stdout",
+    "byteLength": 2558,
+    "sha256": "e1ad8e1a57a1d12ca25181bf514ff9cfc86c0b1a880433cca7be349e1b0b4c68"
+  },
+  {
+    "path": "prior-affected-commands.json",
+    "byteLength": 1997,
+    "sha256": "0b882e162e8f77a6a4105b4f7745ffbfee241d610b6e0c8d750fe7519cfcbcdb"
+  },
+  {
+    "path": "reviewer-native-display-budget-corrected.test.mjs",
+    "byteLength": 2398,
+    "sha256": "c18051c068e2a8b3276f6c9014f5a50f1ba18c4b74bb35ec436620d6022bb40e"
+  },
+  {
+    "path": "reviewer-native-display-budget.original.mjs",
+    "byteLength": 2389,
+    "sha256": "7f1ff60ae6f263ca0975c06e84646ddecfedf53fe2263175e9ba98d32a77d8b0"
+  },
+  {
+    "path": "reviewer-native-display-budget.test.mjs",
+    "byteLength": 2389,
+    "sha256": "7f1ff60ae6f263ca0975c06e84646ddecfedf53fe2263175e9ba98d32a77d8b0"
+  },
+  {
+    "path": "setup-coded-equality.json",
+    "byteLength": 222,
+    "sha256": "dc2efafdc508f549b58248079d62d17b5d288633c6eac4cb6a6d9745cb449202"
+  }
+]

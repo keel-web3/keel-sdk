@@ -1,0 +1,25 @@
+{
+  "heavy": false,
+  "launches": [
+    [
+      "-hide_banner",
+      "-nostdin",
+      "-max_alloc",
+      "268435456",
+      "-protocol_whitelist",
+      "file,pipe",
+      "-threads",
+      "2",
+      "-i",
+      "source",
+      "-t",
+      "0",
+      "-map",
+      "0:v:0",
+      "-an",
+      "-f",
+      "null",
+      "-"
+    ]
+  ]
+}

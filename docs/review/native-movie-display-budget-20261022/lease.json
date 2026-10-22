@@ -1,0 +1,8 @@
+{
+  "base": "b3f60c2980a613559da577063a741b3639245adc",
+  "scope": "one production guard; own source/aliases/dist; public immutable dependencies; no original review mutation",
+  "budgetGiB": 2,
+  "maxHeavyStages": 1,
+  "source": "fefd8fc91c7e286143a8857edfbb5cdddafbcb56",
+  "state": "frozen source and evidence awaiting independent review"
+}

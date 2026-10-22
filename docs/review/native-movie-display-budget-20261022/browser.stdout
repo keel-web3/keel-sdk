@@ -1,0 +1,58 @@
+TAP version 13
+# Subtest: native sar PNG inspection and canonical original movie agree on actual browser geometry
+ok 1 - native sar PNG inspection and canonical original movie agree on actual browser geometry
+  ---
+  duration_ms: 508.292542
+  type: 'test'
+  ...
+# Subtest: native title PNG inspection and canonical original movie agree on actual browser geometry
+ok 2 - native title PNG inspection and canonical original movie agree on actual browser geometry
+  ---
+  duration_ms: 475.056292
+  type: 'test'
+  ...
+# Subtest: current canonical player keeps native sar bytes and actual browser display geometry
+ok 3 - current canonical player keeps native sar bytes and actual browser display geometry
+  ---
+  duration_ms: 429.063416
+  type: 'test'
+  ...
+# Subtest: current canonical player keeps native title bytes and actual browser display geometry
+ok 4 - current canonical player keeps native title bytes and actual browser display geometry
+  ---
+  duration_ms: 411.316792
+  type: 'test'
+  ...
+# Subtest: real variable-rate MP4 to webp: complete RGBA/timeline verification and current canonical playback
+ok 5 - real variable-rate MP4 to webp: complete RGBA/timeline verification and current canonical playback
+  ---
+  duration_ms: 2440.9795
+  type: 'test'
+  ...
+# Subtest: real variable-rate MP4 to avif: complete RGBA/timeline verification and current canonical playback
+ok 6 - real variable-rate MP4 to avif: complete RGBA/timeline verification and current canonical playback
+  ---
+  duration_ms: 2513.065917
+  type: 'test'
+  ...
+# Subtest: current native-Gzip graph includes actual shell/player, preview and metadata in both measured alternatives
+ok 7 - current native-Gzip graph includes actual shell/player, preview and metadata in both measured alternatives
+  ---
+  duration_ms: 262.71675
+  type: 'test'
+  ...
+# Subtest: audio movie image carriers fail closed; native MP4 retains every decoded PCM sample
+ok 8 - audio movie image carriers fail closed; native MP4 retains every decoded PCM sample
+  ---
+  duration_ms: 364.426625
+  type: 'test'
+  ...
+1..8
+# tests 8
+# suites 0
+# pass 8
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 8135.033916
