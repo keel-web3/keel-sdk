@@ -454,6 +454,14 @@
     "./native-media-inspection": {
       "types": "./dist/native-media-inspection.d.ts",
       "import": "./dist/native-media-inspection.js"
+    },
+    "./authored-project-graph": {
+      "types": "./dist/authored-project-graph.d.ts",
+      "import": "./dist/authored-project-graph.js"
+    },
+    "./authored-project/node": {
+      "types": "./dist/authored-project.d.ts",
+      "import": "./dist/authored-project.js"
     }
   },
   "files": [
@@ -477,10 +485,10 @@
     "esbuild": "0.28.2",
     "terser": "5.44.0",
     "viem": "^2.38.0",
-    "saxes": "6.0.0"
+    "saxes": "6.0.0",
+    "typescript": "^5.9.0"
   },
   "devDependencies": {
-    "@types/node": "^22.15.0",
-    "typescript": "^5.9.0"
+    "@types/node": "^22.15.0"
   }
 }

@@ -5,6 +5,10 @@ const TEST_ROOT = resolve(import.meta.dirname, "../tests");
 
 /** Requires a real installed headless browser and therefore stays out of the default unit gate. */
 export const BROWSER_TEST_FILES = Object.freeze([
+  "tests/sdk-authored-project-browser.test.mjs",
+  "tests/sdk-authored-reader-parity.test.mjs",
+  "tests/qa-authored-current-reader-browser.test.mjs",
+  "tests/qa-authored-correction-accepted-browser.test.mjs",
   "tests/media-viewer-browser.test.mjs",
   "tests/native-media-browser.test.mjs",
   "tests/temporal-carrier-sequence.browser.test.mjs",
@@ -81,6 +85,12 @@ export const TEST_FILES_ON_DISK = Object.freeze(readdirSync(TEST_ROOT)
  */
 export const DETERMINISTIC_TEST_FILES = Object.freeze([
   "tests/temporal-webp.test.mjs",
+  "tests/sdk-authored-project.test.mjs",
+  "tests/sdk-authored-published-project.test.mjs",
+  "tests/mcp-authored-runtime-resolution.test.mjs",
+  "tests/qa-authored-origin-and-response.test.mjs",
+  "tests/qa-authored-pure-barrel-rejection.test.mjs",
+  "tests/qa-browser-close-lifecycle.test.mjs",
   "tests/media-viewer-adapters.test.mjs",
   "tests/native-media-inspection.test.mjs",
   "tests/native-media-graph.test.mjs",

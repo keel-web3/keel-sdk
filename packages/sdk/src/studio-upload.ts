@@ -1,3 +1,4 @@
+import { authoredPublishedModuleDeclaration, assertKeelAuthoredProjectCommitments, KEEL_AUTHORED_PROJECT_DESCRIPTOR_PATH, type KeelAuthoredProjectGraph } from "./authored-project-graph.js";
 import { parseKeelSelectedProjectProfile, type KeelSelectedProjectProfile } from "./studio-project-defaults.js";
 import { resolveKeelShell, resolveKeelPayloadStorage, classifyKeelAssetExecution, classifyKeelAssetMotion, planKeelSmartAssetPresentation, resolveKeelAssetPresentationSelection, parseKeelAssetPresentationPreference, parseKeelExternalPreviewUri, parseKeelPresentationFallbackDelivery, KEEL_ASSET_PRESENTATION_CANDIDATE_IDS, type KeelPresentationFallbackDelivery, type KeelAssetPresentationCandidateId, type KeelAssetPresentationPreference, type KeelPayloadStorageMode } from "@keel/protocol";
 import {
@@ -105,6 +106,8 @@ export interface StageKeelStudioProjectInput {
   readonly viewer?: "keel-verification-shell" | "none";
   /** Editable intent only. Unsupported readers block before storage funding. */
   readonly mediaSlots?: {readonly image?: {readonly resourceId:string;readonly presentation:"direct"|"keel-shell";readonly delivery:"onchain"|"ipfs"|"hosted"}|null;readonly animation_url?: {readonly resourceId:string;readonly presentation:"direct"|"keel-shell";readonly delivery:"onchain"|"ipfs"|"hosted"}|null};
+  /** Exact source graph for the new agent-authored executable flow. */
+  readonly authoredProject?: KeelAuthoredProjectGraph;
   readonly files: readonly KeelStudioStagedProjectFile[];
   readonly reusableModule?: {
     readonly resourcePaths: readonly string[];
@@ -274,13 +277,19 @@ export async function stageKeelStudioProject(
   input: StageKeelStudioProjectInput,
 ): Promise<KeelStudioProjectHandoffResult> {
   input = { ...input, files: input.files.map(file => ({ ...file, bytes: file.bytes instanceof Uint8Array ? file.bytes.slice() : file.bytes })),
+    ...(input.authoredProject===undefined?{}:{authoredProject:structuredClone(input.authoredProject)}),
     ...(input.projectProfile===undefined?{}:{projectProfile:structuredClone(input.projectProfile)}),
     ...(input.releaseIntent===undefined?{}:{releaseIntent:structuredClone(input.releaseIntent)}),
     ...(input.publicationIntent===undefined?{}:{publicationIntent:structuredClone(input.publicationIntent)}),
     ...(input.reusableModule===undefined?{}:{reusableModule:structuredClone(input.reusableModule)}),
     ...(input.mediaSlots===undefined?{}:{mediaSlots:structuredClone(input.mediaSlots)}),
     ...(input.flashRuntime===undefined?{}:{flashRuntime:structuredClone(input.flashRuntime)}) };
-  const files = input.files;
+  let files = input.files;
+  if (input.authoredProject !== undefined) {
+    await assertKeelAuthoredProjectCommitments(input.authoredProject, files);
+    if (input.releaseIntent !== undefined && input.releaseIntent.chainId !== input.authoredProject.chainId) throw new TypeError("Authored project chain differs from release intent.");
+    if (input.viewer === "none") throw new TypeError("Modular authored projects require the registered verifier; explicit self-contained creator HTML uses its separate supported route.");
+  }
   const title = input.title.trim();
   if (title.length < 2 || title.length > 160) throw new RangeError("Staged project title must contain from 2 through 160 characters.");
   if (input.agentToken.length < 32) throw new TypeError("KEEL Studio agent token must contain at least 32 characters.");
@@ -308,6 +317,12 @@ export async function stageKeelStudioProject(
   const explicitSlotViewer = mediaSlots?.animation_url?.presentation === "keel-shell" ? "keel-verification-shell"
     : mediaSlots?.animation_url === null && mediaSlots.image != null ? "none" : undefined;
   const viewer = resolveKeelShell(input.viewer ?? projectProfile?.snapshot.configuration.viewer ?? explicitSlotViewer ?? automaticViewer);
+  if (input.authoredProject !== undefined) {
+    if (viewer !== KEEL_VERIFICATION_SHELL) throw new TypeError("The modular authored route requires the registered verification shell.");
+    files = [...files, { path: KEEL_AUTHORED_PROJECT_DESCRIPTOR_PATH,
+      bytes: new TextEncoder().encode(`${JSON.stringify(input.authoredProject)}\n`), mediaType: "application/json", role: "data", format: "asset", label: "Private authored source graph" }];
+    if (input.authoredProject.publishedModules?.length) files = [...files, { path: "keel.module.json", bytes: new TextEncoder().encode(`${JSON.stringify(authoredPublishedModuleDeclaration(input.authoredProject.publishedModules))}\n`), mediaType: "application/json", role: "data", format: "asset", label: "Exact existing published module bindings" }];
+  }
   if (viewer !== KEEL_VERIFICATION_SHELL && viewer !== "none") throw new TypeError("viewer must be keel-verification-shell or none.");
   if (viewer === "none" && input.publicationIntent !== undefined) {
     throw new TypeError("An artifact-only project cannot also require the KEEL verification shell.");

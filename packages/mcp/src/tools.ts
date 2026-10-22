@@ -1,3 +1,4 @@
+import { AUTHORED_PROJECT_TOOL_DEFINITIONS, loadAuthoredProject } from "./authored-project-tools.js";
 import { executeKeelStudioAgentDraftOperation } from "@keel/sdk/studio-agent-drafts";
 import { STUDIO_PRIVATE_TOOL_DEFINITIONS } from "./studio-private-tools.js";
 import { SIGNATURE_PRIVACY_TOOL_DEFINITIONS } from "./signature-privacy-tools.js";
@@ -1190,7 +1191,7 @@ async function studioDraftTool(context: ToolContext, value: unknown): Promise<un
 }
 
 async function studioStageProjectTool(context: ToolContext, value: unknown): Promise<unknown> {
-  const input = record(value, ["studioUrl", "title", "description", "storageStrategy", "payloadStorage", "marketplaceExportMode", "viewer", "assetPresentation", "assetPresentationSelection", "fallbackDelivery", "nonstandardCompatibilityAcknowledged", "externalPreviewUri", "mediaSlots", "files", "reusableModule", "releaseIntent", "projectProfile"], "Studio stage project arguments");
+  const input = record(value, ["studioUrl", "title", "description", "storageStrategy", "payloadStorage", "marketplaceExportMode", "viewer", "assetPresentation", "assetPresentationSelection", "fallbackDelivery", "nonstandardCompatibilityAcknowledged", "externalPreviewUri", "mediaSlots", "files", "authoredProject", "reusableModule", "releaseIntent", "projectProfile"], "Studio stage project arguments");
   const configuredStudioUrl = optionalString(input, "studioUrl");
   const studioUrl = resolveKeelEndpoints({ ...(configuredStudioUrl === undefined ? {} : { studioUrl: configuredStudioUrl }) }, process.env).studioUrl;
   const token = await loadStudioAgentToken({ workspace: context.workspace.root, studioUrl });
@@ -1229,6 +1230,7 @@ async function studioStageProjectTool(context: ToolContext, value: unknown): Pro
       ...(label === undefined ? {} : { label }),
     });
   }
+  const authored = input.authoredProject === undefined ? undefined : await loadAuthoredProject(context, requiredString(input, "authoredProject"), files);
   let reusableModule: StageKeelStudioProjectInput["reusableModule"];
   if (input.reusableModule !== undefined) {
     const module = record(input.reusableModule, ["resourcePaths", "assetType", "license", "accessMode", "tags"], "reusableModule");
@@ -1267,7 +1269,8 @@ async function studioStageProjectTool(context: ToolContext, value: unknown): Pro
     ...(input.assetPresentation === undefined ? {} : { assetPresentation: input.assetPresentation as NonNullable<StageKeelStudioProjectInput["assetPresentation"]> }),
     ...(input.externalPreviewUri === undefined ? {} : { externalPreviewUri: input.externalPreviewUri as string }),
     ...(input.mediaSlots === undefined ? {} : { mediaSlots: input.mediaSlots as NonNullable<StageKeelStudioProjectInput["mediaSlots"]> }),
-    files,
+    files: authored?.files ?? files,
+    ...(authored === undefined ? {} : { authoredProject: authored.graph }),
     ...(reusableModule === undefined ? {} : { reusableModule }),
     ...(input.projectProfile === undefined ? {} : { projectProfile: input.projectProfile as never }),
     ...(input.releaseIntent === undefined ? {} : { releaseIntent: input.releaseIntent as never }),
@@ -1838,6 +1841,7 @@ export const TOOL_DEFINITIONS: readonly ToolDefinition[] = [
   ...TEZOS_COLLECTION_TOOL_DEFINITIONS,
   ...TEZOS_LIVE_STATE_TOOL_DEFINITIONS,
   ...ENGINE_TOOL_DEFINITIONS,
+  ...AUTHORED_PROJECT_TOOL_DEFINITIONS,
   tool("keel-token-standard-audit", "HARD GATE for tokens, collections, metadata and viewers. Reads tokenURI live (rpcUrl + contract + tokenId: one eth_call capped at 30M gas at a pinned block; eth_estimateGas is advisory only) or audits prepared bytes (tokenUri / tokenUriPath). Decodes the data: JSON (raw-percent or base64) and every embedded data: URI, unpacking gzip/deflate, and FAILS CLOSED on any http(s), ipfs, ar/arweave, web3:// or keel-onchain locator (only http://www.w3.org/2000/svg is allowed), an image that is not an onchain data:image, an HTML viewer that does not match its persisted shell choice (canonical verification by default; explicit viewer=none preserves creator-owned self-contained HTML), complete-HTML Base64, reads above 30M gas or tokenURI over 2 MB. Returns verdict, exact findings and a digest; pass the digest as standards.auditDigest. A waiver must be an explicit exception {codes, reason, reviewer}. Writes only its record under .keel-mcp/audits/.", TOOL_SCHEMAS.tokenStandardAudit, tokenStandardAuditTool),
   ...EDITOR_TOOL_DEFINITIONS,
   ...LAYERED_TOOL_DEFINITIONS,

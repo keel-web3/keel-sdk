@@ -47,6 +47,7 @@ export const KEEL_ENGINE_CATALOG = {
   schema: "keel-engine-catalog@1",
   projectArchitecture: {
     default: "modular",
+    authoring: { tool: "keel-project-author", origin: "new-agent-authored-executable", output: "actual-files-and-digest-bound-dependency-graph", staging: "keel-studio-stage-project with exact authoredProject and files", sourcePolicy: "Preserve supplied originals; author functional ES modules instead of slicing bytes or flattening code.", creatorQuestions: "creative-intent-rights-budget-or-visible-quality-only", sharedReuse: "keel-project-author infers actual Three imports or engine runtime intent, authenticates the existing Studio connection and resolves its exact maintained selected-chain core/main closure automatically; no creator bindings, cache paths or RPC choices. Pinned version mismatch and unknown/unqualified imports fail closed; normal Studio preparation revalidates." },
     audience: "Creators do not need development or storage expertise.",
     assetPlanning: {
       discovery: "Inventory every supplied asset and its actual type, digest, size and dependencies; preserve originals and search selected-chain registry/index for exact reusable objects.",
@@ -258,12 +259,15 @@ export function planKeelProject(value: unknown = {}) {
   const modules = intent.family === "tezos" && intent.outcome !== undefined && intent.outcome !== "explore" && intent.mintSystem !== "fray-auction"
     ? [...KEEL_TEZOS_STANDARD_MODULES, ...runtimeModules]
     : runtimeModules;
+  const authoredJavaScript = intent.family !== "tezos" && ["html", "p5", "three"].includes(intent.runtime ?? "");
   const nextTools = intent.mintSystem === "fray-auction" ? ["fray-auction-intake", "keel-library-search", "fray-stage-project"]
     : intent.outcome === "explore" ? ["analyze", "keel-library-search"]
     : [
       ...(intent.family === "tezos" ? ["keel-tezos-standard-route-plan", "keel-tezos-collection-launch-plan"] : []),
       "keel-studio-capabilities", "analyze", "cost", "keel-library-search",
-      ...(intent.family === "tezos" ? ["keel-tezos-collection-originate-prepare", "keel-tezos-hold-resources-prepare", "keel-tezos-presentation-bind-prepare", "keel-tezos-mint-gate-prepare", "keel-tezos-mint-prepare", "keel-tezos-token-metadata-prepare", "keel-tezos-readback-check", "keel-tezos-publication-prepare"] : intent.storage === "inline" ? ["keel-inline-prepare"] : ["upload-plan"]), "keel-studio-stage-project",
+      ...(authoredJavaScript ? ["keel-project-author"] : []),
+      ...(intent.family === "tezos" ? ["keel-tezos-collection-originate-prepare", "keel-tezos-hold-resources-prepare", "keel-tezos-presentation-bind-prepare", "keel-tezos-mint-gate-prepare", "keel-tezos-mint-prepare", "keel-tezos-token-metadata-prepare", "keel-tezos-readback-check", "keel-tezos-publication-prepare"] : authoredJavaScript ? [] : intent.storage === "inline" ? ["keel-inline-prepare"] : ["upload-plan"]), "keel-studio-stage-project",
+      ...(authoredJavaScript ? ["keel-studio-draft"] : []),
     ];
   return {
     schema: "keel-engine-plan@1" as const,
@@ -287,6 +291,7 @@ export function planKeelProject(value: unknown = {}) {
     questions,
     nextQuestions: questions.slice(0, 3),
     blockers,
+    authoring: authoredJavaScript ? KEEL_ENGINE_CATALOG.projectArchitecture.authoring : null,
     modules: { required: modules, publicationStatus: "unverified", setup: KEEL_ENGINE_CATALOG.moduleWorkflow },
     nextTools,
     ...(patternChecks.length ? { patternChecks } : {}),
