@@ -1,0 +1,30 @@
+Input #0, mov,mp4,m4a,3gp,3g2,mj2, from '/private/tmp/keel-independent-temporal-pairs-20261022-01/evidence/inputs/title.mp4':
+  Metadata:
+    major_brand     : isom
+    minor_version   : 512
+    compatible_brands: isomiso2avc1mp41
+    title           : PRIVATE_CREATOR_TITLE_REQUIRED
+    encoder         : Lavf60.3.100
+  Duration: 00:00:00.60, start: 0.000000, bitrate: 39 kb/s
+  Stream #0:0[0x1](und): Video: h264 (High 4:4:4 Predictive) (avc1 / 0x31637661), gbrp(pc, gbr/unknown/unknown, progressive), 32x24 [SAR 1:1 DAR 4:3], 27 kb/s, 5 fps, 5 tbr, 10240 tbn (default)
+    Metadata:
+      handler_name    : VideoHandler
+      vendor_id       : [0][0][0][0]
+      encoder         : Lavc60.3.100 libx264rgb
+Stream mapping:
+  Stream #0:0 -> #0:0 (h264 (native) -> wrapped_avframe (native))
+Output #0, null, to 'pipe:':
+  Metadata:
+    major_brand     : isom
+    minor_version   : 512
+    compatible_brands: isomiso2avc1mp41
+    title           : PRIVATE_CREATOR_TITLE_REQUIRED
+    encoder         : Lavf60.3.100
+  Stream #0:0(und): Video: wrapped_avframe, gbrp(pc, gbr/unknown/unknown, progressive), 32x24 [SAR 1:1 DAR 4:3], q=2-31, 200 kb/s, 5 fps, 5 tbn (default)
+    Metadata:
+      handler_name    : VideoHandler
+      vendor_id       : [0][0][0][0]
+      encoder         : Lavc60.3.100 wrapped_avframe
+frame=    0 fps=0.0 q=0.0 size=       0kB time=-577014:32:22.77 bitrate=  -0.0kbits/s speed=N/A    frame=    0 fps=0.0 q=0.0 Lsize=N/A time=-577014:32:22.77 bitrate=N/A speed=N/A    
+video:0kB audio:0kB subtitle:0kB other streams:0kB global headers:0kB muxing overhead: unknown
+Output file is empty, nothing was encoded (check -ss / -t / -frames parameters if used)

@@ -1,0 +1,19 @@
+[webp @ 0x14f7073c0] skipping unsupported chunk: ANIM
+[webp @ 0x14f7073c0] skipping unsupported chunk: ANMF
+    Last message repeated 2 times
+[webp @ 0x14f7073c0] image data not found
+[webp_pipe @ 0x14f706910] Could not find codec parameters for stream 0 (Video: webp, none): unspecified size
+Consider increasing the value for the 'analyzeduration' (0) and 'probesize' (5000000) options
+Input #0, webp_pipe, from '/private/tmp/keel-independent-temporal-pairs-20261022-01/evidence/inputs/title.webp':
+  Duration: N/A, bitrate: N/A
+  Stream #0:0: Video: webp, none, 25 fps, 25 tbr, 25 tbn
+Stream mapping:
+  Stream #0:0 -> #0:0 (webp (native) -> wrapped_avframe (native))
+[webp @ 0x14f70a2d0] skipping unsupported chunk: ANIM
+[webp @ 0x14f70a2d0] skipping unsupported chunk: ANMF
+    Last message repeated 2 times
+[webp @ 0x14f70a2d0] image data not found
+Error while decoding stream #0:0: Invalid data found when processing input
+Cannot determine format of input stream 0:0 after EOF
+Error marking filters as finished
+Conversion failed!
