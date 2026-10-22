@@ -21,6 +21,8 @@ test('unrepresentable, omitted, reordered and truncated timelines fail closed wi
     {frameTimesMs:[0,120,360],frameDurationsMs:[120,240,0x1000000]},
     {frameTimesMs:[0,121,360],frameDurationsMs:[120,240,200]},
     {frameTimesMs:[1,120,360],frameDurationsMs:[120,240,200]}])assert.throws(()=>assignTemporalWebPDelays(original,timeline),/exact|omitted|merged/);
+  for(const delay of [1,10])assert.throws(()=>assignTemporalWebPDelays(original,{frameTimesMs:[0,delay,delay*2],frameDurationsMs:[delay,delay,delay]}),/clamp/);
+  assert.equal(assignTemporalWebPDelays(original,{frameTimesMs:[0,11,22],frameDurationsMs:[11,11,11]}).length,original.length);
   for(const bytes of [new Uint8Array(),original.subarray(0,original.length-1),Uint8Array.from(original,(v,i)=>i===4?v+1:v)])assert.throws(()=>assignTemporalWebPDelays(bytes,timeline));
 });
 test('strict animation parser rejects duplicate headers, flags, bad frame bounds, reordered control and corrupt padded chunks',()=>{

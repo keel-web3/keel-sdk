@@ -21,6 +21,7 @@ export function assignTemporalWebPDelays(bytes: Uint8Array, timeline: {
   for (let i = 0; i < delays.length; i++) {
     const delay = delays[i]!;
     if (times[i] !== next || !Number.isSafeInteger(delay) || delay <= 0 || delay > 0xffffff) throw new TypeError("This source timeline cannot be represented exactly by WebP millisecond delays. Original retained.");
+    if (delay <= 10) throw new TypeError("Native WebP readers may clamp this source's short frame delays. Keep the original movie or another exactly verified carrier.");
     next += delay;
   }
   const offsets: number[] = [];
@@ -49,6 +50,7 @@ export function assignTemporalWebPDelays(bytes: Uint8Array, timeline: {
       animation = true;
     }
     if (kind === "ANMF") {
+      if (offsets.length >= delays.length) throw new TypeError("The temporal WebP contains more frames than the bounded source timeline.");
       if (!animation || length < 16 || once.has("EXIF") || once.has("XMP ") || (output[start + 15]! & 0xfc)
         || uint24(start) * 2 + uint24(start + 6) + 1 > canvasWidth
         || uint24(start + 3) * 2 + uint24(start + 9) + 1 > canvasHeight) throw new TypeError("The temporal WebP frame has no valid complete animation header.");
