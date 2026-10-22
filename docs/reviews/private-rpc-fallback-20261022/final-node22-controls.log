@@ -1,0 +1,1467 @@
+TAP version 13
+# Subtest: binary digest mismatch performs neither state acquisition nor spawn
+ok 1 - binary digest mismatch performs neither state acquisition nor spawn
+  ---
+  duration_ms: 33.051541
+  type: 'test'
+  ...
+# Subtest: execution forwarding is rejected before forwarding
+ok 2 - execution forwarding is rejected before forwarding
+  ---
+  duration_ms: 8.600417
+  type: 'test'
+  ...
+# Subtest: unapproved ancestor is rejected before forwarding
+ok 3 - unapproved ancestor is rejected before forwarding
+  ---
+  duration_ms: 2.888833
+  type: 'test'
+  ...
+# Subtest: unpinned proof is rejected before forwarding
+ok 4 - unpinned proof is rejected before forwarding
+  ---
+  duration_ms: 2.643542
+  type: 'test'
+  ...
+# Subtest: noncanonical proof is rejected before forwarding
+ok 5 - noncanonical proof is rejected before forwarding
+  ---
+  duration_ms: 2.122917
+  type: 'test'
+  ...
+# Subtest: unbounded slots is rejected before forwarding
+ok 6 - unbounded slots is rejected before forwarding
+  ---
+  duration_ms: 4.789209
+  type: 'test'
+  ...
+# Subtest: out of order read is rejected before forwarding
+ok 7 - out of order read is rejected before forwarding
+  ---
+  duration_ms: 1.201042
+  type: 'test'
+  ...
+# Subtest: mismatched input digest produces no proof
+ok 8 - mismatched input digest produces no proof
+  ---
+  duration_ms: 1.41525
+  type: 'test'
+  ...
+# Subtest: mismatched chain produces no proof
+ok 9 - mismatched chain produces no proof
+  ---
+  duration_ms: 1.499
+  type: 'test'
+  ...
+# Subtest: mismatched engine produces no proof
+ok 10 - mismatched engine produces no proof
+  ---
+  duration_ms: 5.141083
+  type: 'test'
+  ...
+# Subtest: mismatched gas budget produces no proof
+ok 11 - mismatched gas budget produces no proof
+  ---
+  duration_ms: 3.000958
+  type: 'test'
+  ...
+# Subtest: mismatched base state produces no proof
+ok 12 - mismatched base state produces no proof
+  ---
+  duration_ms: 1.028041
+  type: 'test'
+  ...
+# Subtest: mismatched read count produces no proof
+ok 13 - mismatched read count produces no proof
+  ---
+  duration_ms: 1.357875
+  type: 'test'
+  ...
+# Subtest: mismatched block count produces no proof
+ok 14 - mismatched block count produces no proof
+  ---
+  duration_ms: 0.877834
+  type: 'test'
+  ...
+# Subtest: mismatched zero root produces no proof
+ok 15 - mismatched zero root produces no proof
+  ---
+  duration_ms: 0.757959
+  type: 'test'
+  ...
+# Subtest: native partial after result is rejected
+ok 16 - native partial after result is rejected
+  ---
+  duration_ms: 2.00725
+  type: 'test'
+  ...
+# Subtest: native second-result after result is rejected
+ok 17 - native second-result after result is rejected
+  ---
+  duration_ms: 1.16925
+  type: 'test'
+  ...
+# Subtest: a result is held until successful native process exit and canonical recheck
+ok 18 - a result is held until successful native process exit and canonical recheck
+  ---
+  duration_ms: 1.120875
+  type: 'test'
+  ...
+# Subtest: initial options are snapshotted before asynchronous binary verification
+ok 19 - initial options are snapshotted before asynchronous binary verification
+  ---
+  duration_ms: 1.316458
+  type: 'test'
+  ...
+# Subtest: valid broker identity and final zero exit permit completion
+not ok 20 - valid broker identity and final zero exit permit completion
+  ---
+  duration_ms: 11.376417
+  type: 'test'
+  location: '/private/tmp/keel-private-rpc-fallback-20261022-01/sdk/tests/proof-runner-client.test.mjs:17:1'
+  failureType: 'uncaughtException'
+  error: 'listen EPERM: operation not permitted /var/folders/zk/40xbztxx7tb90tl4nnryd2780000gn/T/runner-client-test-8TUA5v/runner.sock'
+  code: 'EPERM'
+  stack: |-
+    Server.setupListenHandle [as _listen2] (node:net:1918:21)
+    listenInCluster (node:net:1997:12)
+    Server.listen (node:net:2119:5)
+    file:///private/tmp/keel-private-rpc-fallback-20261022-01/sdk/tests/proof-runner-client.test.mjs:12:36
+    new Promise (<anonymous>)
+    fixture (file:///private/tmp/keel-private-rpc-fallback-20261022-01/sdk/tests/proof-runner-client.test.mjs:12:8)
+    async TestContext.<anonymous> (file:///private/tmp/keel-private-rpc-fallback-20261022-01/sdk/tests/proof-runner-client.test.mjs:18:15)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async startSubtestAfterBootstrap (node:internal/test_runner/harness:296:3)
+  ...
+# Subtest: missing exit cannot be a successful native completion
+not ok 21 - missing exit cannot be a successful native completion
+  ---
+  duration_ms: 3.596334
+  type: 'test'
+  location: '/private/tmp/keel-private-rpc-fallback-20261022-01/sdk/tests/proof-runner-client.test.mjs:27:3'
+  failureType: 'uncaughtException'
+  error: 'listen EPERM: operation not permitted /var/folders/zk/40xbztxx7tb90tl4nnryd2780000gn/T/runner-client-test-YX1iz5/runner.sock'
+  code: 'EPERM'
+  stack: |-
+    Server.setupListenHandle [as _listen2] (node:net:1918:21)
+    listenInCluster (node:net:1997:12)
+    Server.listen (node:net:2119:5)
+    file:///private/tmp/keel-private-rpc-fallback-20261022-01/sdk/tests/proof-runner-client.test.mjs:12:36
+    new Promise (<anonymous>)
+    fixture (file:///private/tmp/keel-private-rpc-fallback-20261022-01/sdk/tests/proof-runner-client.test.mjs:12:8)
+    async TestContext.<anonymous> (file:///private/tmp/keel-private-rpc-fallback-20261022-01/sdk/tests/proof-runner-client.test.mjs:28:15)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: nonzero exit cannot be a successful native completion
+not ok 22 - nonzero exit cannot be a successful native completion
+  ---
+  duration_ms: 3.135083
+  type: 'test'
+  location: '/private/tmp/keel-private-rpc-fallback-20261022-01/sdk/tests/proof-runner-client.test.mjs:27:3'
+  failureType: 'uncaughtException'
+  error: 'listen EPERM: operation not permitted /var/folders/zk/40xbztxx7tb90tl4nnryd2780000gn/T/runner-client-test-7BvpSQ/runner.sock'
+  code: 'EPERM'
+  stack: |-
+    Server.setupListenHandle [as _listen2] (node:net:1918:21)
+    listenInCluster (node:net:1997:12)
+    Server.listen (node:net:2119:5)
+    file:///private/tmp/keel-private-rpc-fallback-20261022-01/sdk/tests/proof-runner-client.test.mjs:12:36
+    new Promise (<anonymous>)
+    fixture (file:///private/tmp/keel-private-rpc-fallback-20261022-01/sdk/tests/proof-runner-client.test.mjs:12:8)
+    async TestContext.<anonymous> (file:///private/tmp/keel-private-rpc-fallback-20261022-01/sdk/tests/proof-runner-client.test.mjs:28:15)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: wrong identity cannot be a successful native completion
+not ok 23 - wrong identity cannot be a successful native completion
+  ---
+  duration_ms: 2.128625
+  type: 'test'
+  location: '/private/tmp/keel-private-rpc-fallback-20261022-01/sdk/tests/proof-runner-client.test.mjs:27:3'
+  failureType: 'uncaughtException'
+  error: 'listen EPERM: operation not permitted /var/folders/zk/40xbztxx7tb90tl4nnryd2780000gn/T/runner-client-test-Zz5syQ/runner.sock'
+  code: 'EPERM'
+  stack: |-
+    Server.setupListenHandle [as _listen2] (node:net:1918:21)
+    listenInCluster (node:net:1997:12)
+    Server.listen (node:net:2119:5)
+    file:///private/tmp/keel-private-rpc-fallback-20261022-01/sdk/tests/proof-runner-client.test.mjs:12:36
+    new Promise (<anonymous>)
+    fixture (file:///private/tmp/keel-private-rpc-fallback-20261022-01/sdk/tests/proof-runner-client.test.mjs:12:8)
+    async TestContext.<anonymous> (file:///private/tmp/keel-private-rpc-fallback-20261022-01/sdk/tests/proof-runner-client.test.mjs:28:15)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: wrong concurrency cannot be a successful native completion
+not ok 24 - wrong concurrency cannot be a successful native completion
+  ---
+  duration_ms: 4.129083
+  type: 'test'
+  location: '/private/tmp/keel-private-rpc-fallback-20261022-01/sdk/tests/proof-runner-client.test.mjs:27:3'
+  failureType: 'uncaughtException'
+  error: 'listen EPERM: operation not permitted /var/folders/zk/40xbztxx7tb90tl4nnryd2780000gn/T/runner-client-test-rLFILq/runner.sock'
+  code: 'EPERM'
+  stack: |-
+    Server.setupListenHandle [as _listen2] (node:net:1918:21)
+    listenInCluster (node:net:1997:12)
+    Server.listen (node:net:2119:5)
+    file:///private/tmp/keel-private-rpc-fallback-20261022-01/sdk/tests/proof-runner-client.test.mjs:12:36
+    new Promise (<anonymous>)
+    fixture (file:///private/tmp/keel-private-rpc-fallback-20261022-01/sdk/tests/proof-runner-client.test.mjs:12:8)
+    async TestContext.<anonymous> (file:///private/tmp/keel-private-rpc-fallback-20261022-01/sdk/tests/proof-runner-client.test.mjs:28:15)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: unbounded wall time cannot be a successful native completion
+not ok 25 - unbounded wall time cannot be a successful native completion
+  ---
+  duration_ms: 3.751167
+  type: 'test'
+  location: '/private/tmp/keel-private-rpc-fallback-20261022-01/sdk/tests/proof-runner-client.test.mjs:27:3'
+  failureType: 'uncaughtException'
+  error: 'listen EPERM: operation not permitted /var/folders/zk/40xbztxx7tb90tl4nnryd2780000gn/T/runner-client-test-17ScVb/runner.sock'
+  code: 'EPERM'
+  stack: |-
+    Server.setupListenHandle [as _listen2] (node:net:1918:21)
+    listenInCluster (node:net:1997:12)
+    Server.listen (node:net:2119:5)
+    file:///private/tmp/keel-private-rpc-fallback-20261022-01/sdk/tests/proof-runner-client.test.mjs:12:36
+    new Promise (<anonymous>)
+    fixture (file:///private/tmp/keel-private-rpc-fallback-20261022-01/sdk/tests/proof-runner-client.test.mjs:12:8)
+    async TestContext.<anonymous> (file:///private/tmp/keel-private-rpc-fallback-20261022-01/sdk/tests/proof-runner-client.test.mjs:28:15)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: primitive frame cannot be a successful native completion
+not ok 26 - primitive frame cannot be a successful native completion
+  ---
+  duration_ms: 1.511459
+  type: 'test'
+  location: '/private/tmp/keel-private-rpc-fallback-20261022-01/sdk/tests/proof-runner-client.test.mjs:27:3'
+  failureType: 'uncaughtException'
+  error: 'listen EPERM: operation not permitted /var/folders/zk/40xbztxx7tb90tl4nnryd2780000gn/T/runner-client-test-x1P7rD/runner.sock'
+  code: 'EPERM'
+  stack: |-
+    Server.setupListenHandle [as _listen2] (node:net:1918:21)
+    listenInCluster (node:net:1997:12)
+    Server.listen (node:net:2119:5)
+    file:///private/tmp/keel-private-rpc-fallback-20261022-01/sdk/tests/proof-runner-client.test.mjs:12:36
+    new Promise (<anonymous>)
+    fixture (file:///private/tmp/keel-private-rpc-fallback-20261022-01/sdk/tests/proof-runner-client.test.mjs:12:8)
+    async TestContext.<anonymous> (file:///private/tmp/keel-private-rpc-fallback-20261022-01/sdk/tests/proof-runner-client.test.mjs:28:15)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: array frame cannot be a successful native completion
+not ok 27 - array frame cannot be a successful native completion
+  ---
+  duration_ms: 3.622959
+  type: 'test'
+  location: '/private/tmp/keel-private-rpc-fallback-20261022-01/sdk/tests/proof-runner-client.test.mjs:27:3'
+  failureType: 'uncaughtException'
+  error: 'listen EPERM: operation not permitted /var/folders/zk/40xbztxx7tb90tl4nnryd2780000gn/T/runner-client-test-MES0eB/runner.sock'
+  code: 'EPERM'
+  stack: |-
+    Server.setupListenHandle [as _listen2] (node:net:1918:21)
+    listenInCluster (node:net:1997:12)
+    Server.listen (node:net:2119:5)
+    file:///private/tmp/keel-private-rpc-fallback-20261022-01/sdk/tests/proof-runner-client.test.mjs:12:36
+    new Promise (<anonymous>)
+    fixture (file:///private/tmp/keel-private-rpc-fallback-20261022-01/sdk/tests/proof-runner-client.test.mjs:12:8)
+    async TestContext.<anonymous> (file:///private/tmp/keel-private-rpc-fallback-20261022-01/sdk/tests/proof-runner-client.test.mjs:28:15)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: result before identity cannot be a successful native completion
+not ok 28 - result before identity cannot be a successful native completion
+  ---
+  duration_ms: 3.069708
+  type: 'test'
+  location: '/private/tmp/keel-private-rpc-fallback-20261022-01/sdk/tests/proof-runner-client.test.mjs:27:3'
+  failureType: 'uncaughtException'
+  error: 'listen EPERM: operation not permitted /var/folders/zk/40xbztxx7tb90tl4nnryd2780000gn/T/runner-client-test-oct7U5/runner.sock'
+  code: 'EPERM'
+  stack: |-
+    Server.setupListenHandle [as _listen2] (node:net:1918:21)
+    listenInCluster (node:net:1997:12)
+    Server.listen (node:net:2119:5)
+    file:///private/tmp/keel-private-rpc-fallback-20261022-01/sdk/tests/proof-runner-client.test.mjs:12:36
+    new Promise (<anonymous>)
+    fixture (file:///private/tmp/keel-private-rpc-fallback-20261022-01/sdk/tests/proof-runner-client.test.mjs:12:8)
+    async TestContext.<anonymous> (file:///private/tmp/keel-private-rpc-fallback-20261022-01/sdk/tests/proof-runner-client.test.mjs:28:15)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: trailing result cannot be a successful native completion
+not ok 29 - trailing result cannot be a successful native completion
+  ---
+  duration_ms: 1.126083
+  type: 'test'
+  location: '/private/tmp/keel-private-rpc-fallback-20261022-01/sdk/tests/proof-runner-client.test.mjs:27:3'
+  failureType: 'uncaughtException'
+  error: 'listen EPERM: operation not permitted /var/folders/zk/40xbztxx7tb90tl4nnryd2780000gn/T/runner-client-test-6XfMft/runner.sock'
+  code: 'EPERM'
+  stack: |-
+    Server.setupListenHandle [as _listen2] (node:net:1918:21)
+    listenInCluster (node:net:1997:12)
+    Server.listen (node:net:2119:5)
+    file:///private/tmp/keel-private-rpc-fallback-20261022-01/sdk/tests/proof-runner-client.test.mjs:12:36
+    new Promise (<anonymous>)
+    fixture (file:///private/tmp/keel-private-rpc-fallback-20261022-01/sdk/tests/proof-runner-client.test.mjs:12:8)
+    async TestContext.<anonymous> (file:///private/tmp/keel-private-rpc-fallback-20261022-01/sdk/tests/proof-runner-client.test.mjs:28:15)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: unknown frame cannot be a successful native completion
+not ok 30 - unknown frame cannot be a successful native completion
+  ---
+  duration_ms: 1.00075
+  type: 'test'
+  location: '/private/tmp/keel-private-rpc-fallback-20261022-01/sdk/tests/proof-runner-client.test.mjs:27:3'
+  failureType: 'uncaughtException'
+  error: 'listen EPERM: operation not permitted /var/folders/zk/40xbztxx7tb90tl4nnryd2780000gn/T/runner-client-test-0eUDxG/runner.sock'
+  code: 'EPERM'
+  stack: |-
+    Server.setupListenHandle [as _listen2] (node:net:1918:21)
+    listenInCluster (node:net:1997:12)
+    Server.listen (node:net:2119:5)
+    file:///private/tmp/keel-private-rpc-fallback-20261022-01/sdk/tests/proof-runner-client.test.mjs:12:36
+    new Promise (<anonymous>)
+    fixture (file:///private/tmp/keel-private-rpc-fallback-20261022-01/sdk/tests/proof-runner-client.test.mjs:12:8)
+    async TestContext.<anonymous> (file:///private/tmp/keel-private-rpc-fallback-20261022-01/sdk/tests/proof-runner-client.test.mjs:28:15)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: invalid exit cannot be a successful native completion
+not ok 31 - invalid exit cannot be a successful native completion
+  ---
+  duration_ms: 0.636292
+  type: 'test'
+  location: '/private/tmp/keel-private-rpc-fallback-20261022-01/sdk/tests/proof-runner-client.test.mjs:27:3'
+  failureType: 'uncaughtException'
+  error: 'listen EPERM: operation not permitted /var/folders/zk/40xbztxx7tb90tl4nnryd2780000gn/T/runner-client-test-WT32fF/runner.sock'
+  code: 'EPERM'
+  stack: |-
+    Server.setupListenHandle [as _listen2] (node:net:1918:21)
+    listenInCluster (node:net:1997:12)
+    Server.listen (node:net:2119:5)
+    file:///private/tmp/keel-private-rpc-fallback-20261022-01/sdk/tests/proof-runner-client.test.mjs:12:36
+    new Promise (<anonymous>)
+    fixture (file:///private/tmp/keel-private-rpc-fallback-20261022-01/sdk/tests/proof-runner-client.test.mjs:12:8)
+    async TestContext.<anonymous> (file:///private/tmp/keel-private-rpc-fallback-20261022-01/sdk/tests/proof-runner-client.test.mjs:28:15)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: busy cannot be a successful native completion
+not ok 32 - busy cannot be a successful native completion
+  ---
+  duration_ms: 1.571583
+  type: 'test'
+  location: '/private/tmp/keel-private-rpc-fallback-20261022-01/sdk/tests/proof-runner-client.test.mjs:27:3'
+  failureType: 'uncaughtException'
+  error: 'listen EPERM: operation not permitted /var/folders/zk/40xbztxx7tb90tl4nnryd2780000gn/T/runner-client-test-swGGtj/runner.sock'
+  code: 'EPERM'
+  stack: |-
+    Server.setupListenHandle [as _listen2] (node:net:1918:21)
+    listenInCluster (node:net:1997:12)
+    Server.listen (node:net:2119:5)
+    file:///private/tmp/keel-private-rpc-fallback-20261022-01/sdk/tests/proof-runner-client.test.mjs:12:36
+    new Promise (<anonymous>)
+    fixture (file:///private/tmp/keel-private-rpc-fallback-20261022-01/sdk/tests/proof-runner-client.test.mjs:12:8)
+    async TestContext.<anonymous> (file:///private/tmp/keel-private-rpc-fallback-20261022-01/sdk/tests/proof-runner-client.test.mjs:28:15)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: the shipped Node runtime is the exact reviewed adapter, reader and IPC implementation
+ok 33 - the shipped Node runtime is the exact reviewed adapter, reader and IPC implementation
+  ---
+  duration_ms: 0.707083
+  type: 'test'
+  ...
+# Subtest: the public Node entry refuses missing approval or a missing verified executable before any provider read
+ok 34 - the public Node entry refuses missing approval or a missing verified executable before any provider read
+  ---
+  duration_ms: 4.765042
+  type: 'test'
+  ...
+# Subtest: immutable queries reuse one successful response and deep-copy caller-owned arrays
+ok 35 - immutable queries reuse one successful response and deep-copy caller-owned arrays
+  ---
+  duration_ms: 35.57125
+  type: 'test'
+  ...
+# Subtest: method/address/slot/hash keys are exact and case normalization does not change outgoing params
+ok 36 - method/address/slot/hash keys are exact and case normalization does not change outgoing params
+  ---
+  duration_ms: 10.290167
+  type: 'test'
+  ...
+# Subtest: chain/header/ancestor checks remain live while empty code is cached exactly
+ok 37 - chain/header/ancestor checks remain live while empty code is cached exactly
+  ---
+  duration_ms: 29.374833
+  type: 'test'
+  ...
+# Subtest: warmed response cannot bypass observed HTTP401 or shop another approved recipient
+ok 38 - warmed response cannot bypass observed HTTP401 or shop another approved recipient
+  ---
+  duration_ms: 2.600791
+  type: 'test'
+  ...
+# Subtest: warmed response cannot bypass observed HTTP403 or shop another approved recipient
+ok 39 - warmed response cannot bypass observed HTTP403 or shop another approved recipient
+  ---
+  duration_ms: 1.399542
+  type: 'test'
+  ...
+# Subtest: warmed response cannot bypass an observed canonical reorg
+ok 40 - warmed response cannot bypass an observed canonical reorg
+  ---
+  duration_ms: 0.795958
+  type: 'test'
+  ...
+# Subtest: separate readers never share response data even when their scheduler is shared
+ok 41 - separate readers never share response data even when their scheduler is shared
+  ---
+  duration_ms: 0.5625
+  type: 'test'
+  ...
+# Subtest: malformed proof/code result containers are never retained
+ok 42 - malformed proof/code result containers are never retained
+  ---
+  duration_ms: 0.624958
+  type: 'test'
+  ...
+# Subtest: close aborts a held response and prevents any late success
+ok 43 - close aborts a held response and prevents any late success
+  ---
+  duration_ms: 9.73125
+  type: 'test'
+  ...
+# Subtest: one canceled request cannot poison another in-flight caller or populate a stale cache epoch
+ok 44 - one canceled request cannot poison another in-flight caller or populate a stale cache epoch
+  ---
+  duration_ms: 6.815917
+  type: 'test'
+  ...
+# Subtest: HTTP401 with empty body is terminal without a second recipient or warmed retry
+ok 45 - HTTP401 with empty body is terminal without a second recipient or warmed retry
+  ---
+  duration_ms: 36.009625
+  type: 'test'
+  ...
+# Subtest: HTTP401 with rate-limit body is terminal without a second recipient or warmed retry
+ok 46 - HTTP401 with rate-limit body is terminal without a second recipient or warmed retry
+  ---
+  duration_ms: 4.434167
+  type: 'test'
+  ...
+# Subtest: HTTP401 with capability body is terminal without a second recipient or warmed retry
+ok 47 - HTTP401 with capability body is terminal without a second recipient or warmed retry
+  ---
+  duration_ms: 3.011917
+  type: 'test'
+  ...
+# Subtest: HTTP401 with malformed body is terminal without a second recipient or warmed retry
+ok 48 - HTTP401 with malformed body is terminal without a second recipient or warmed retry
+  ---
+  duration_ms: 1.65375
+  type: 'test'
+  ...
+# Subtest: HTTP403 with empty body is terminal without a second recipient or warmed retry
+ok 49 - HTTP403 with empty body is terminal without a second recipient or warmed retry
+  ---
+  duration_ms: 10.391667
+  type: 'test'
+  ...
+# Subtest: HTTP403 with rate-limit body is terminal without a second recipient or warmed retry
+ok 50 - HTTP403 with rate-limit body is terminal without a second recipient or warmed retry
+  ---
+  duration_ms: 0.641417
+  type: 'test'
+  ...
+# Subtest: HTTP403 with capability body is terminal without a second recipient or warmed retry
+ok 51 - HTTP403 with capability body is terminal without a second recipient or warmed retry
+  ---
+  duration_ms: 0.520459
+  type: 'test'
+  ...
+# Subtest: HTTP403 with malformed body is terminal without a second recipient or warmed retry
+ok 52 - HTTP403 with malformed body is terminal without a second recipient or warmed retry
+  ---
+  duration_ms: 0.446167
+  type: 'test'
+  ...
+# Subtest: malformed JSON is terminal without another recipient
+ok 53 - malformed JSON is terminal without another recipient
+  ---
+  duration_ms: 1.163083
+  type: 'test'
+  ...
+# Subtest: stale response identity is terminal without another recipient
+ok 54 - stale response identity is terminal without another recipient
+  ---
+  duration_ms: 0.750167
+  type: 'test'
+  ...
+# Subtest: missing result is terminal without another recipient
+ok 55 - missing result is terminal without another recipient
+  ---
+  duration_ms: 0.484584
+  type: 'test'
+  ...
+# Subtest: unknown RPC error is terminal without another recipient
+ok 56 - unknown RPC error is terminal without another recipient
+  ---
+  duration_ms: 0.933125
+  type: 'test'
+  ...
+# Subtest: invalid parameters is terminal without another recipient
+ok 57 - invalid parameters is terminal without another recipient
+  ---
+  duration_ms: 0.791542
+  type: 'test'
+  ...
+# Subtest: genuine revert is terminal without another recipient
+ok 58 - genuine revert is terminal without another recipient
+  ---
+  duration_ms: 0.466083
+  type: 'test'
+  ...
+# Subtest: revert prose with rate-limit wording is terminal without another recipient
+ok 59 - revert prose with rate-limit wording is terminal without another recipient
+  ---
+  duration_ms: 0.5105
+  type: 'test'
+  ...
+# Subtest: RPC401 with rate-limit wording is terminal without another recipient
+ok 60 - RPC401 with rate-limit wording is terminal without another recipient
+  ---
+  duration_ms: 0.403708
+  type: 'test'
+  ...
+# Subtest: RPC403 with rate-limit wording is terminal without another recipient
+ok 61 - RPC403 with rate-limit wording is terminal without another recipient
+  ---
+  duration_ms: 0.4405
+  type: 'test'
+  ...
+# Subtest: generic HTTP404 is terminal without another recipient
+ok 62 - generic HTTP404 is terminal without another recipient
+  ---
+  duration_ms: 0.5295
+  type: 'test'
+  ...
+# Subtest: generic HTTP503 is terminal without another recipient
+ok 63 - generic HTTP503 is terminal without another recipient
+  ---
+  duration_ms: 0.337625
+  type: 'test'
+  ...
+# Subtest: unknown transport error is terminal without another recipient
+ok 64 - unknown transport error is terminal without another recipient
+  ---
+  duration_ms: 0.380334
+  type: 'test'
+  ...
+# Subtest: missing pinned proof is terminal without another recipient
+ok 65 - missing pinned proof is terminal without another recipient
+  ---
+  duration_ms: 0.304417
+  type: 'test'
+  ...
+# Subtest: wrong chain stops before address/key disclosure or another recipient
+ok 66 - wrong chain stops before address/key disclosure or another recipient
+  ---
+  duration_ms: 0.219916
+  type: 'test'
+  ...
+# Subtest: canonical mismatch stops before address/key disclosure or another recipient
+ok 67 - canonical mismatch stops before address/key disclosure or another recipient
+  ---
+  duration_ms: 0.198666
+  type: 'test'
+  ...
+# Subtest: HTTP429 permits only an approved ordered fallback at the exact block
+ok 68 - HTTP429 permits only an approved ordered fallback at the exact block
+  ---
+  duration_ms: 1.003791
+  type: 'test'
+  ...
+# Subtest: explicit RPC rate-limit permits only an approved ordered fallback at the exact block
+ok 69 - explicit RPC rate-limit permits only an approved ordered fallback at the exact block
+  ---
+  duration_ms: 0.535
+  type: 'test'
+  ...
+# Subtest: unsupported method permits only an approved ordered fallback at the exact block
+ok 70 - unsupported method permits only an approved ordered fallback at the exact block
+  ---
+  duration_ms: 0.718584
+  type: 'test'
+  ...
+# Subtest: unsupported capability permits only an approved ordered fallback at the exact block
+ok 71 - unsupported capability permits only an approved ordered fallback at the exact block
+  ---
+  duration_ms: 0.429
+  type: 'test'
+  ...
+# Subtest: explicit timeout permits only an approved ordered fallback at the exact block
+ok 72 - explicit timeout permits only an approved ordered fallback at the exact block
+  ---
+  duration_ms: 0.578542
+  type: 'test'
+  ...
+# Subtest: HTTP413 body limit permits only an approved ordered fallback at the exact block
+ok 73 - HTTP413 body limit permits only an approved ordered fallback at the exact block
+  ---
+  duration_ms: 0.446666
+  type: 'test'
+  ...
+# Subtest: bounded response limit permits only an approved ordered fallback at the exact block
+ok 74 - bounded response limit permits only an approved ordered fallback at the exact block
+  ---
+  duration_ms: 7.085042
+  type: 'test'
+  ...
+# Subtest: healthy free never selects paid; new reader begins free after the prior cooldown expires
+ok 75 - healthy free never selects paid; new reader begins free after the prior cooldown expires
+  ---
+  duration_ms: 1.606958
+  type: 'test'
+  ...
+# Subtest: fallback recipient credentials alone grant no state-read disclosure
+ok 76 - fallback recipient credentials alone grant no state-read disclosure
+  ---
+  duration_ms: 0.337333
+  type: 'test'
+  ...
+# Subtest: public overload selects an already-approved paid proof source without remote execution
+ok 77 - public overload selects an already-approved paid proof source without remote execution
+  ---
+  duration_ms: 31.425958
+  type: 'test'
+  ...
+# Subtest: configured paid credentials do not authorize disclosure to that recipient
+ok 78 - configured paid credentials do not authorize disclosure to that recipient
+  ---
+  duration_ms: 9.791625
+  type: 'test'
+  ...
+# Subtest: paid HTTP 403 stops within one attempt and retains restriction/cooldown
+ok 79 - paid HTTP 403 stops within one attempt and retains restriction/cooldown
+  ---
+  duration_ms: 23.306167
+  type: 'test'
+  ...
+# Subtest: paid HTTP 429 stops within one attempt and retains restriction/cooldown
+ok 80 - paid HTTP 429 stops within one attempt and retains restriction/cooldown
+  ---
+  duration_ms: 1.049417
+  type: 'test'
+  ...
+# Subtest: wrong-chain paid source never receives address/key reads
+ok 81 - wrong-chain paid source never receives address/key reads
+  ---
+  duration_ms: 0.708959
+  type: 'test'
+  ...
+# Subtest: source snapshot mismatch is terminal instead of shopping another provider
+ok 82 - source snapshot mismatch is terminal instead of shopping another provider
+  ---
+  duration_ms: 0.566542
+  type: 'test'
+  ...
+# Subtest: invalid proof request is terminal, while unsupported proof method may use an approved alternative
+ok 83 - invalid proof request is terminal, while unsupported proof method may use an approved alternative
+  ---
+  duration_ms: 1.544916
+  type: 'test'
+  ...
+# Subtest: bounded response failure can select only an eligible alternative
+ok 84 - bounded response failure can select only an eligible alternative
+  ---
+  duration_ms: 7.440375
+  type: 'test'
+  ...
+# Subtest: cancel stops a pending read without selecting paid; fresh retry retains the exact query
+ok 85 - cancel stops a pending read without selecting paid; fresh retry retains the exact query
+  ---
+  duration_ms: 14.865292
+  type: 'test'
+  ...
+# Subtest: wallet, execution, unpinned and overscoped reads are rejected before any network request
+ok 86 - wallet, execution, unpinned and overscoped reads are rejected before any network request
+  ---
+  duration_ms: 0.584666
+  type: 'test'
+  ...
+# Subtest: captured public null response for eth_getProof fails closed without another recipient or latest fallback
+ok 87 - captured public null response for eth_getProof fails closed without another recipient or latest fallback
+  ---
+  duration_ms: 0.476833
+  type: 'test'
+  ...
+# Subtest: captured public null response for eth_getCode fails closed without another recipient or latest fallback
+ok 88 - captured public null response for eth_getCode fails closed without another recipient or latest fallback
+  ---
+  duration_ms: 0.281709
+  type: 'test'
+  ...
+# Subtest: captured public null response for eth_getBlockByHash fails closed without another recipient or latest fallback
+ok 89 - captured public null response for eth_getBlockByHash fails closed without another recipient or latest fallback
+  ---
+  duration_ms: 0.348375
+  type: 'test'
+  ...
+# Subtest: the captured public header, proof and code survive approved-reader framing without dropping Amsterdam fields
+ok 90 - the captured public header, proof and code survive approved-reader framing without dropping Amsterdam fields
+  ---
+  duration_ms: 0.693834
+  type: 'test'
+  ...
+# Subtest: owner-private evidence retains bounded invalidUTF8/JSON bytes before public normalization
+ok 91 - owner-private evidence retains bounded invalidUTF8/JSON bytes before public normalization
+  ---
+  duration_ms: 24.226833
+  type: 'test'
+  ...
+# Subtest: private network error snapshots retain custom fields but cannot mutate the original
+ok 92 - private network error snapshots retain custom fields but cannot mutate the original
+  ---
+  duration_ms: 0.501416
+  type: 'test'
+  ...
+# Subtest: pinned HTTP status and rate-limit evidence survive exhaustion and cooldown without a retry or private text
+ok 93 - pinned HTTP status and rate-limit evidence survive exhaustion and cooldown without a retry or private text
+  ---
+  duration_ms: 4.583542
+  type: 'test'
+  ...
+# Subtest: only recognized nested network codes are retained; message text never invents a timeout
+ok 94 - only recognized nested network codes are retained; message text never invents a timeout
+  ---
+  duration_ms: 8.491541
+  type: 'test'
+  ...
+# Subtest: actual request deadlines and response-body deadlines are retained as timeouts
+ok 95 - actual request deadlines and response-body deadlines are retained as timeouts
+  ---
+  duration_ms: 204.388625
+  type: 'test'
+  ...
+# Subtest: response failures distinguish missing body, byte bound, parse error, stale response id and missing result
+ok 96 - response failures distinguish missing body, byte bound, parse error, stale response id and missing result
+  ---
+  duration_ms: 1.536333
+  type: 'test'
+  ...
+# Subtest: classified RPC rate limits retain the numeric code, not remote error data
+ok 97 - classified RPC rate limits retain the numeric code, not remote error data
+  ---
+  duration_ms: 0.829958
+  type: 'test'
+  ...
+# Subtest: concurrent pinned requests retain the same observed rate-limit status while waiting in the queue
+ok 98 - concurrent pinned requests retain the same observed rate-limit status while waiting in the queue
+  ---
+  duration_ms: 0.579792
+  type: 'test'
+  ...
+# Subtest: caller cancellation is preserved and never triggers provider failover
+ok 99 - caller cancellation is preserved and never triggers provider failover
+  ---
+  duration_ms: 0.635959
+  type: 'test'
+  ...
+# Subtest: ordinary read failover remains bounded and deterministic simulation rejections never rotate
+ok 100 - ordinary read failover remains bounded and deterministic simulation rejections never rotate
+  ---
+  duration_ms: 2.058334
+  type: 'test'
+  ...
+# Subtest: a complete multi-megabyte 45-call program reaches the pinned transport unchanged; unknown failure stays unknown
+ok 101 - a complete multi-megabyte 45-call program reaches the pinned transport unchanged; unknown failure stays unknown
+  ---
+  duration_ms: 25.365792
+  type: 'test'
+  ...
+# Subtest: bounded explicit HTTP body-size evidence is actionable capacity without an invented RPC code
+ok 102 - bounded explicit HTTP body-size evidence is actionable capacity without an invented RPC code
+  ---
+  duration_ms: 4.669333
+  type: 'test'
+  ...
+# Subtest: generic, malformed, reflected, stale and oversized HTTP bodies never invent request-size evidence
+ok 103 - generic, malformed, reflected, stale and oversized HTTP bodies never invent request-size evidence
+  ---
+  duration_ms: 5.0885
+  type: 'test'
+  ...
+# Subtest: HTTP JSON-RPC execution and validation evidence outranks body-size wording
+ok 104 - HTTP JSON-RPC execution and validation evidence outranks body-size wording
+  ---
+  duration_ms: 2.198125
+  type: 'test'
+  ...
+# Subtest: aborted or timed-out HTTP error-body reads do not establish request capacity
+ok 105 - aborted or timed-out HTTP error-body reads do not establish request capacity
+  ---
+  duration_ms: 101.722084
+  type: 'test'
+  ...
+# Subtest: response-payload and negated request-size wording never establish outgoing body capacity
+ok 106 - response-payload and negated request-size wording never establish outgoing body capacity
+  ---
+  duration_ms: 1.381916
+  type: 'test'
+  ...
+# Subtest: complete capacity-detail envelope bound applies equally to HTTP200 and HTTP503 RPC errors
+ok 107 - complete capacity-detail envelope bound applies equally to HTTP200 and HTTP503 RPC errors
+  ---
+  duration_ms: 0.541125
+  type: 'test'
+  ...
+# Subtest: complete HTTP capacity details accept exactly16KiB and reject one additional byte independently of private capture
+ok 108 - complete HTTP capacity details accept exactly16KiB and reject one additional byte independently of private capture
+  ---
+  duration_ms: 0.9545
+  type: 'test'
+  ...
+# Subtest: HTTP error parsing preserves the lowest signed32-bit observed RPC code without inventing another code
+ok 109 - HTTP error parsing preserves the lowest signed32-bit observed RPC code without inventing another code
+  ---
+  duration_ms: 0.224958
+  type: 'test'
+  ...
+# Subtest: read-only RPC pool carries the complete bounded publication simulation instead of blocking all approvals
+ok 110 - read-only RPC pool carries the complete bounded publication simulation instead of blocking all approvals
+  ---
+  duration_ms: 32.719459
+  type: 'test'
+  ...
+# Subtest: simulation overrides and unbounded/ordinary oversized reads reject before network access
+ok 111 - simulation overrides and unbounded/ordinary oversized reads reject before network access
+  ---
+  duration_ms: 2.554333
+  type: 'test'
+  ...
+# Subtest: simulation failure type and numeric provider gas cap survive without leaking private provider text
+ok 112 - simulation failure type and numeric provider gas cap survive without leaking private provider text
+  ---
+  duration_ms: 4.478125
+  type: 'test'
+  ...
+# Subtest: shared request exhaustion retains only typed bounded need/remaining and never mislabels an ambiguous per-call cap
+ok 113 - shared request exhaustion retains only typed bounded need/remaining and never mislabels an ambiguous per-call cap
+  ---
+  duration_ms: 2.961916
+  type: 'test'
+  ...
+# Subtest: explicit configured primary reads share candidate admission without rerouting or adding retries
+ok 114 - explicit configured primary reads share candidate admission without rerouting or adding retries
+  ---
+  duration_ms: 58.558042
+  type: 'test'
+  ...
+# Subtest: duplicate in-progress requests share one exact program and settled results are never cached
+ok 115 - duplicate in-progress requests share one exact program and settled results are never cached
+  ---
+  duration_ms: 8.043792
+  type: 'test'
+  ...
+# Subtest: distinct queued programs have an explicit bound and cancellation drains them without more dispatch
+ok 116 - distinct queued programs have an explicit bound and cancellation drains them without more dispatch
+  ---
+  duration_ms: 6.744208
+  type: 'test'
+  ...
+# Subtest: private provider evidence preserves original RPC payload while public errors remain redacted
+ok 117 - private provider evidence preserves original RPC payload while public errors remain redacted
+  ---
+  duration_ms: 6.2385
+  type: 'test'
+  ...
+# Subtest: private raw provider responses never cross observer ownership through shared negative capability cache
+ok 118 - private raw provider responses never cross observer ownership through shared negative capability cache
+  ---
+  duration_ms: 10.137834
+  type: 'test'
+  ...
+# Subtest: an observed429 retries only after cooldown and full public qualification, preserving every call
+ok 119 - an observed429 retries only after cooldown and full public qualification, preserving every call
+  ---
+  duration_ms: 1009.829875
+  type: 'test'
+  ...
+# Subtest: one approved recipient automatically recovers an observed transient failure with fresh qualification and the complete immutable program
+ok 120 - one approved recipient automatically recovers an observed transient failure with fresh qualification and the complete immutable program
+  ---
+  duration_ms: 5053.725916
+  type: 'test'
+  ...
+# Subtest: same-recipient recovery is attempted at most once and never infers an outage from an unknown failure
+ok 121 - same-recipient recovery is attempted at most once and never infers an outage from an unknown failure
+  ---
+  duration_ms: 1018.219
+  type: 'test'
+  ...
+# Subtest: a cooldown that cannot fit the whole-request deadline returns the observed failure without retry
+ok 122 - a cooldown that cannot fit the whole-request deadline returns the observed failure without retry
+  ---
+  duration_ms: 2.398709
+  type: 'test'
+  ...
+# Subtest: cancellation during the recovery cooldown prevents fresh qualification and a second project request
+ok 123 - cancellation during the recovery cooldown prevents fresh qualification and a second project request
+  ---
+  duration_ms: 6.665833
+  type: 'test'
+  ...
+# (node:37138) ExperimentalWarning: The MockTimers API is an experimental feature and might change at any time
+# (Use `node --trace-warnings ...` to show where the warning was created)
+# Subtest: the complete request deadline discards a late response even when the provider ignores abort
+ok 124 - the complete request deadline discards a late response even when the provider ignores abort
+  ---
+  duration_ms: 102.34425
+  type: 'test'
+  ...
+# Subtest: a recovered request shares its original deadline and cannot receive a second full timeout budget
+ok 125 - a recovered request shares its original deadline and cannot receive a second full timeout budget
+  ---
+  duration_ms: 7.343792
+  type: 'test'
+  ...
+# Subtest: pinned pool candidate cannot silently fail over during qualification; strict nonce and balance errors retain codes
+ok 126 - pinned pool candidate cannot silently fail over during qualification; strict nonce and balance errors retain codes
+  ---
+  duration_ms: 0.871875
+  type: 'test'
+  ...
+# Subtest: public capacity or unsupported candidate swaps before any private data; complete SDK proof survives selection
+ok 127 - public capacity or unsupported candidate swaps before any private data; complete SDK proof survives selection
+  ---
+  duration_ms: 57.078
+  type: 'test'
+  ...
+# Subtest: rate-limit cooldown persists across new review transports without sharing private proof state
+ok 128 - rate-limit cooldown persists across new review transports without sharing private proof state
+  ---
+  duration_ms: 2.057333
+  type: 'test'
+  ...
+# Subtest: aggregate clamp after successful empty probes swaps the WHOLE unchanged request, never a continuation
+ok 129 - aggregate clamp after successful empty probes swaps the WHOLE unchanged request, never a continuation
+  ---
+  duration_ms: 4.0335
+  type: 'test'
+  ...
+# Subtest: a larger aggregate sequence is publicly requalified even when its largest envelope is unchanged
+ok 130 - a larger aggregate sequence is publicly requalified even when its largest envelope is unchanged
+  ---
+  duration_ms: 4.018625
+  type: 'test'
+  ...
+# Subtest: Retro-sized synthetic 34/40-call requests keep every byte on aggregate-capacity replay
+ok 131 - Retro-sized synthetic 34/40-call requests keep every byte on aggregate-capacity replay
+  ---
+  duration_ms: 303.468916
+  type: 'test'
+  ...
+# Subtest: body limit and transport outage swap complete programs; specific capacity evidence survives pool exhaustion
+ok 132 - body limit and transport outage swap complete programs; specific capacity evidence survives pool exhaustion
+  ---
+  duration_ms: 12.501125
+  type: 'test'
+  ...
+# Subtest: public qualification never grants disclosure to another indexed recipient
+ok 133 - public qualification never grants disclosure to another indexed recipient
+  ---
+  duration_ms: 1.921542
+  type: 'test'
+  ...
+# Subtest: contract revert, transaction validation failure and exact metadata mismatch never search for a passing backend
+ok 134 - contract revert, transaction validation failure and exact metadata mismatch never search for a passing backend
+  ---
+  duration_ms: 19.67075
+  type: 'test'
+  ...
+# Subtest: invalid parameters, common server validation errors and ambiguous simulation rejections are terminal
+ok 135 - invalid parameters, common server validation errors and ambiguous simulation rejections are terminal
+  ---
+  duration_ms: 24.383708
+  type: 'test'
+  ...
+# Subtest: HTTP bad or unprocessable project requests are terminal without inventing an RPC error code
+ok 136 - HTTP bad or unprocessable project requests are terminal without inventing an RPC error code
+  ---
+  duration_ms: 3.885167
+  type: 'test'
+  ...
+# Subtest: cancel stops an in-flight request without another recipient; a fresh saved-plan retry can pass
+ok 137 - cancel stops an in-flight request without another recipient; a fresh saved-plan retry can pass
+  ---
+  duration_ms: 3.610459
+  type: 'test'
+  ...
+# Subtest: input mutation, overrides, symbolic blocks and signing cannot alter or escape the bounded program
+ok 138 - input mutation, overrides, symbolic blocks and signing cannot alter or escape the bounded program
+  ---
+  duration_ms: 2.217708
+  type: 'test'
+  ...
+# Subtest: public qualification report uses production complete-sequence checks and states its capacity limits
+ok 139 - public qualification report uses production complete-sequence checks and states its capacity limits
+  ---
+  duration_ms: 6.923959
+  type: 'test'
+  ...
+# Subtest: public report refuses stale heads and invalid full-sequence evidence, and stops after access or rate restrictions
+ok 140 - public report refuses stale heads and invalid full-sequence evidence, and stops after access or rate restrictions
+  ---
+  duration_ms: 26.547958
+  type: 'test'
+  ...
+# Subtest: the approved CLI pins PublicNode and rejects URL overrides before probing
+ok 141 - the approved CLI pins PublicNode and rejects URL overrides before probing
+  ---
+  duration_ms: 0.195667
+  type: 'test'
+  ...
+# Subtest: live gate fails on unavailable or incomplete qualification while retaining public-only evidence
+ok 142 - live gate fails on unavailable or incomplete qualification while retaining public-only evidence
+  ---
+  duration_ms: 11.701417
+  type: 'test'
+  ...
+# Subtest: the recorded 2026-10-11 PublicNode clamp remains a failed capability gate, not publication evidence
+ok 143 - the recorded 2026-10-11 PublicNode clamp remains a failed capability gate, not publication evidence
+  ---
+  duration_ms: 7.23525
+  type: 'test'
+  ...
+# Subtest: a lower explicit envelope requalifies after a larger cap rejection without rewriting any calls
+ok 144 - a lower explicit envelope requalifies after a larger cap rejection without rewriting any calls
+  ---
+  duration_ms: 2.658125
+  type: 'test'
+  ...
+# Subtest: the complete metadata read adapts its rejected ceiling while preserving exact transactions
+ok 145 - the complete metadata read adapts its rejected ceiling while preserving exact transactions
+  ---
+  duration_ms: 5.4635
+  type: 'test'
+  ...
+# Subtest: complete-transaction estimates disclose only to an approved pinned recipient and grant no capacity proof
+ok 146 - complete-transaction estimates disclose only to an approved pinned recipient and grant no capacity proof
+  ---
+  duration_ms: 2.318042
+  type: 'test'
+  ...
+# Subtest: estimation rejects an unapproved recipient, changed snapshot, wrong chain and stale head before any project calldata
+ok 147 - estimation rejects an unapproved recipient, changed snapshot, wrong chain and stale head before any project calldata
+  ---
+  duration_ms: 0.921125
+  type: 'test'
+  ...
+# Subtest: estimate reverts and malformed results never fall through to a different recipient or fallback gas
+ok 148 - estimate reverts and malformed results never fall through to a different recipient or fallback gas
+  ---
+  duration_ms: 1.630333
+  type: 'test'
+  ...
+# Subtest: estimation accepts only exact fee-bound numbered-block requests without state overrides or a caller gas clamp
+ok 149 - estimation accepts only exact fee-bound numbered-block requests without state overrides or a caller gas clamp
+  ---
+  duration_ms: 0.457917
+  type: 'test'
+  ...
+# Subtest: cancellation discards a late estimate even when the provider ignores abort
+ok 150 - cancellation discards a late estimate even when the provider ignores abort
+  ---
+  duration_ms: 0.432625
+  type: 'test'
+  ...
+# Subtest: initial-storage capacity discovery requalifies the existing approved provider and validates the whole program without a new recipient
+ok 151 - initial-storage capacity discovery requalifies the existing approved provider and validates the whole program without a new recipient
+  ---
+  duration_ms: 14.704167
+  type: 'test'
+  ...
+# Subtest: dynamic discovery never turns unsupported approved methods into approval for another recipient
+ok 152 - dynamic discovery never turns unsupported approved methods into approval for another recipient
+  ---
+  duration_ms: 2.87575
+  type: 'test'
+  ...
+# Subtest: discovery chooses the largest approved reported capacity and cached rejection describes the current request
+ok 153 - discovery chooses the largest approved reported capacity and cached rejection describes the current request
+  ---
+  duration_ms: 5.626708
+  type: 'test'
+  ...
+# Subtest: cancelling adapted discovery discards late success without strict replay or a wallet proof
+ok 154 - cancelling adapted discovery discards late success without strict replay or a wallet proof
+  ---
+  duration_ms: 3.019208
+  type: 'test'
+  ...
+# Subtest: uneven carrier demand reuses measured prefix allowance and fully replays the same program
+ok 155 - uneven carrier demand reuses measured prefix allowance and fully replays the same program
+  ---
+  duration_ms: 8.503542
+  type: 'test'
+  ...
+# Subtest: a first-call demand larger than its equal share can borrow only observed remaining discovery capacity
+ok 156 - a first-call demand larger than its equal share can borrow only observed remaining discovery capacity
+  ---
+  duration_ms: 11.154542
+  type: 'test'
+  ...
+# Subtest: a genuine contract revert still refuses approval after bounded same-program allocation checks
+ok 157 - a genuine contract revert still refuses approval after bounded same-program allocation checks
+  ---
+  duration_ms: 4.177042
+  type: 'test'
+  ...
+# Subtest: later calls recover from reserved intrinsic floors through bounded complete discovery replays
+ok 158 - later calls recover from reserved intrinsic floors through bounded complete discovery replays
+  ---
+  duration_ms: 28.139792
+  type: 'test'
+  ...
+# Subtest: missing pre-refund evidence prevents allocation and a later metadata mismatch still blocks it
+ok 159 - missing pre-refund evidence prevents allocation and a later metadata mismatch still blocks it
+  ---
+  duration_ms: 13.688334
+  type: 'test'
+  ...
+# Subtest: cancellation during budget redistribution discards late results and never reaches strict approval
+ok 160 - cancellation during budget redistribution discards late results and never reaches strict approval
+  ---
+  duration_ms: 8.100667
+  type: 'test'
+  ...
+# Subtest: paid estimate uses the explicit approved pool entry point, not the legacy simulation-only factory
+ok 161 - paid estimate uses the explicit approved pool entry point, not the legacy simulation-only factory
+  ---
+  duration_ms: 0.572125
+  type: 'test'
+  ...
+# Subtest: an explicit measured whole-request budget bounds every complete 14-call discovery replay
+ok 162 - an explicit measured whole-request budget bounds every complete 14-call discovery replay
+  ---
+  duration_ms: 12.345167
+  type: 'test'
+  ...
+# Subtest: an unprofiled later envelope remainder cannot authorize whole-request allocation
+ok 163 - an unprofiled later envelope remainder cannot authorize whole-request allocation
+  ---
+  duration_ms: 3.609583
+  type: 'test'
+  ...
+# Subtest: project multi-block clamp diagnostics retain the exact request and cumulative position
+ok 164 - project multi-block clamp diagnostics retain the exact request and cumulative position
+  ---
+  duration_ms: 1.921042
+  type: 'test'
+  ...
+# Subtest: shared discovery never reduces a measured margin, accepts a strict clamp or ignores complete metadata
+ok 165 - shared discovery never reduces a measured margin, accepts a strict clamp or ignores complete metadata
+  ---
+  duration_ms: 41.896208
+  type: 'test'
+  ...
+# {"kind":"synthetic-production-size-path","failureKind":"provider-limit","httpStatus":503,"gasCapacityScope":"request-bytes","projectAttempts":1,"requestBytes":[1057498],"callsPerAttempt":[45]}
+# Subtest: shared discovery and a rejected 60M public-read ceiling preserve the strictly measured transactions
+ok 166 - shared discovery and a rejected 60M public-read ceiling preserve the strictly measured transactions
+  ---
+  duration_ms: 6.995958
+  type: 'test'
+  ...
+# Subtest: chain-keyed configured pool qualifies Ethereum and Sepolia without sharing a chain identity
+ok 167 - chain-keyed configured pool qualifies Ethereum and Sepolia without sharing a chain identity
+  ---
+  duration_ms: 3.140334
+  type: 'test'
+  ...
+# Subtest: measured profiles prefer approved request headroom while retaining every dependent call and byte
+ok 168 - measured profiles prefer approved request headroom while retaining every dependent call and byte
+  ---
+  duration_ms: 2.1895
+  type: 'test'
+  ...
+# Subtest: selected capacity failure keeps its originating provider rather than the last failed candidate
+ok 169 - selected capacity failure keeps its originating provider rather than the last failed candidate
+  ---
+  duration_ms: 1.533959
+  type: 'test'
+  ...
+# Subtest: measured capacity rejection identifies its selected provider without inventing a returned envelope
+ok 170 - measured capacity rejection identifies its selected provider without inventing a returned envelope
+  ---
+  duration_ms: 0.346625
+  type: 'test'
+  ...
+# Subtest: cumulative exhaustion falls back as a complete ordered program despite each call fitting the request cap
+ok 171 - cumulative exhaustion falls back as a complete ordered program despite each call fitting the request cap
+  ---
+  duration_ms: 35.070292
+  type: 'test'
+  ...
+# Subtest: a gas-envelope sum above a measured Geth request cap still permits a cheap complete program
+ok 172 - a gas-envelope sum above a measured Geth request cap still permits a cheap complete program
+  ---
+  duration_ms: 3.7365
+  type: 'test'
+  ...
+# Subtest: distinct provider transaction, block, byte and block-count limits select another approved full-program validator
+ok 173 - distinct provider transaction, block, byte and block-count limits select another approved full-program validator
+  ---
+  duration_ms: 7.05325
+  type: 'test'
+  ...
+# Subtest: profiles cannot approve an indexed recipient or silently change chain or mutable limits
+ok 174 - profiles cannot approve an indexed recipient or silently change chain or mutable limits
+  ---
+  duration_ms: 4.396292
+  type: 'test'
+  ...
+# Subtest: a measured high-capacity backend still refuses stale heads, changed pins and wrong chain before project disclosure
+ok 175 - a measured high-capacity backend still refuses stale heads, changed pins and wrong chain before project disclosure
+  ---
+  duration_ms: 4.09825
+  type: 'test'
+  ...
+# Subtest: no compatible validator reports an honest infrastructure failure and leaves large content and strict gas intact
+ok 176 - no compatible validator reports an honest infrastructure failure and leaves large content and strict gas intact
+  ---
+  duration_ms: 49.698208
+  type: 'test'
+  ...
+# Subtest: a later cumulative remainder does not disable the same provider for a smaller unchanged program
+ok 177 - a later cumulative remainder does not disable the same provider for a smaller unchanged program
+  ---
+  duration_ms: 4.845709
+  type: 'test'
+  ...
+# Subtest: explicit request-budget exhaustion falls back without guessing the cap or splitting dependent state
+ok 178 - explicit request-budget exhaustion falls back without guessing the cap or splitting dependent state
+  ---
+  duration_ms: 8.279209
+  type: 'test'
+  ...
+# Subtest: stale measured capacity does not disable an intrinsically valid program after a provider upgrade
+ok 179 - stale measured capacity does not disable an intrinsically valid program after a provider upgrade
+  ---
+  duration_ms: 2.179958
+  type: 'test'
+  ...
+# Subtest: profiles that expire during a reused transport cause fresh exact qualification on the next phase
+ok 180 - profiles that expire during a reused transport cause fresh exact qualification on the next phase
+  ---
+  duration_ms: 1.560209
+  type: 'test'
+  ...
+# Subtest: fallback replays dependent state from the beginning, never a successful-prefix continuation
+ok 181 - fallback replays dependent state from the beginning, never a successful-prefix continuation
+  ---
+  duration_ms: 3.024125
+  type: 'test'
+  ...
+# Subtest: an observed earlier provider cap also expires and requalifies after infrastructure recovery
+ok 182 - an observed earlier provider cap also expires and requalifies after infrastructure recovery
+  ---
+  duration_ms: 1.808125
+  type: 'test'
+  ...
+# Subtest: only typed request-capacity evidence permits -38026 fallback; transaction validation and ambiguous client errors remain terminal
+ok 183 - only typed request-capacity evidence permits -38026 fallback; transaction validation and ambiguous client errors remain terminal
+  ---
+  duration_ms: 18.917791
+  type: 'test'
+  ...
+# Subtest: configured reader standalone estimates require explicit admission and never enable stateful simulation
+ok 184 - configured reader standalone estimates require explicit admission and never enable stateful simulation
+  ---
+  duration_ms: 0.242708
+  type: 'test'
+  ...
+# Subtest: existing configured loopback and full reader calldata require explicit bounded admission without rerouting
+ok 185 - existing configured loopback and full reader calldata require explicit bounded admission without rerouting
+  ---
+  duration_ms: 3.952833
+  type: 'test'
+  ...
+# Subtest: explicit existing server transport identities preserve private HTTP reads without opening or disclosing a route
+ok 186 - explicit existing server transport identities preserve private HTTP reads without opening or disclosing a route
+  ---
+  duration_ms: 0.288875
+  type: 'test'
+  ...
+# Subtest: configured root URLs keep distinct credential identities without exposing them to observers
+ok 187 - configured root URLs keep distinct credential identities without exposing them to observers
+  ---
+  duration_ms: 0.329167
+  type: 'test'
+  ...
+# Subtest: rate/access diagnostics survive approved whole-program failover without shopping deterministic rejections
+ok 188 - rate/access diagnostics survive approved whole-program failover without shopping deterministic rejections
+  ---
+  duration_ms: 23.306042
+  type: 'test'
+  ...
+# Subtest: public probes use bounded Amsterdam base gas without lowering exact project envelopes
+ok 189 - public probes use bounded Amsterdam base gas without lowering exact project envelopes
+  ---
+  duration_ms: 3.609542
+  type: 'test'
+  ...
+# Subtest: 200 small calls succeed while a fixed 45-call program fails only after its serialized bytes cross the synthetic HTTP boundary
+ok 190 - 200 small calls succeed while a fixed 45-call program fails only after its serialized bytes cross the synthetic HTTP boundary
+  ---
+  duration_ms: 40.023833
+  type: 'test'
+  ...
+# Subtest: exact serialized HTTP boundary keeps every dependent call and permits only approved identical-program failover
+ok 191 - exact serialized HTTP boundary keeps every dependent call and permits only approved identical-program failover
+  ---
+  duration_ms: 2.974333
+  type: 'test'
+  ...
+# Subtest: HTTP503 byte capacity permits only approved identical 45-call fallback and never a same-recipient retry
+ok 192 - HTTP503 byte capacity permits only approved identical 45-call fallback and never a same-recipient retry
+  ---
+  duration_ms: 23.047834
+  type: 'test'
+  ...
+# Subtest: HTTP503 deterministic RPC rejections never shop for another provider despite capacity prose
+ok 193 - HTTP503 deterministic RPC rejections never shop for another provider despite capacity prose
+  ---
+  duration_ms: 5.622041
+  type: 'test'
+  ...
+# Subtest: cancelling after a body-capacity rejection prevents fallback dispatch
+ok 194 - cancelling after a body-capacity rejection prevents fallback dispatch
+  ---
+  duration_ms: 1.473875
+  type: 'test'
+  ...
+# Subtest: body-capacity fallback shares the complete-request deadline and discards a late unchanged response
+ok 195 - body-capacity fallback shares the complete-request deadline and discards a late unchanged response
+  ---
+  duration_ms: 372.006834
+  type: 'test'
+  ...
+# Subtest: HTTP 429 rotates, honors Retry-After across calls, and redacts keyed paths
+ok 196 - HTTP 429 rotates, honors Retry-After across calls, and redacts keyed paths
+  ---
+  duration_ms: 13.267375
+  type: 'test'
+  ...
+# Subtest: JSON rate limit and exhaustion return actionable setup without provider messages/secrets
+ok 197 - JSON rate limit and exhaustion return actionable setup without provider messages/secrets
+  ---
+  duration_ms: 1.161167
+  type: 'test'
+  ...
+# Subtest: wrong-chain provider is disabled before contract reads and fallback identity is pinned
+ok 198 - wrong-chain provider is disabled before contract reads and fallback identity is pinned
+  ---
+  duration_ms: 1.924583
+  type: 'test'
+  ...
+# Subtest: known old receipt falls back on null; pending null stays valid but cannot satisfy required evidence
+ok 199 - known old receipt falls back on null; pending null stays valid but cannot satisfy required evidence
+  ---
+  duration_ms: 1.107166
+  type: 'test'
+  ...
+# Subtest: deterministic revert does not rotate and adapter preserves probe error; wallet calls are refused
+ok 200 - deterministic revert does not rotate and adapter preserves probe error; wallet calls are refused
+  ---
+  duration_ms: 0.691042
+  type: 'test'
+  ...
+# Subtest: individual paced requests replace provider-incompatible JSON-RPC batches
+ok 201 - individual paced requests replace provider-incompatible JSON-RPC batches
+  ---
+  duration_ms: 64.771834
+  type: 'test'
+  ...
+# Subtest: invalid/oversized responses fail over; caller cancellation never contacts another provider
+ok 202 - invalid/oversized responses fail over; caller cancellation never contacts another provider
+  ---
+  duration_ms: 0.815125
+  type: 'test'
+  ...
+# Subtest: private configuration precedence, keyed HTTPS paths, validation and bounded file loading
+ok 203 - private configuration precedence, keyed HTTPS paths, validation and bounded file loading
+  ---
+  duration_ms: 475.371458
+  type: 'test'
+  ...
+# Subtest: MCP loads workspace providers and returns redacted structured setup instructions on exhaustion
+ok 204 - MCP loads workspace providers and returns redacted structured setup instructions on exhaustion
+  ---
+  duration_ms: 165.864
+  type: 'test'
+  ...
+# Subtest: JSON 429 honors Retry-After and concurrent reads cannot escape cooldown
+ok 205 - JSON 429 honors Retry-After and concurrent reads cannot escape cooldown
+  ---
+  duration_ms: 12.371167
+  type: 'test'
+  ...
+# Subtest: timeout fails over and preserves an exact keyed provider path including its trailing slash
+ok 206 - timeout fails over and preserves an exact keyed provider path including its trailing slash
+  ---
+  duration_ms: 0.526375
+  type: 'test'
+  ...
+# Subtest: an explicit chain-ID recheck is fresh and fails if the provider changes networks
+ok 207 - an explicit chain-ID recheck is fresh and fails if the provider changes networks
+  ---
+  duration_ms: 0.220459
+  type: 'test'
+  ...
+# Subtest: MCP error mapper shares bounded intrinsic-minimum diagnostics without exposing injected private fields
+ok 208 - MCP error mapper shares bounded intrinsic-minimum diagnostics without exposing injected private fields
+  ---
+  duration_ms: 2.35525
+  type: 'test'
+  ...
+# Subtest: operator 429/-32005 and chain-ID 403 diagnostics survive wrappers, cooldown and disabled-provider retries
+ok 209 - operator 429/-32005 and chain-ID 403 diagnostics survive wrappers, cooldown and disabled-provider retries
+  ---
+  duration_ms: 1.419667
+  type: 'test'
+  ...
+# Subtest: non-OK diagnostics retain only bounded correlated integer codes, never an HTML or oversized error body
+ok 210 - non-OK diagnostics retain only bounded correlated integer codes, never an HTML or oversized error body
+  ---
+  duration_ms: 0.782666
+  type: 'test'
+  ...
+# Subtest: HTTP-200 RPC rate/access errors retain their observed status and code
+ok 211 - HTTP-200 RPC rate/access errors retain their observed status and code
+  ---
+  duration_ms: 0.677041
+  type: 'test'
+  ...
+# Subtest: concurrent reads stop at the first access restriction after chain identity was cached
+ok 212 - concurrent reads stop at the first access restriction after chain identity was cached
+  ---
+  duration_ms: 0.3
+  type: 'test'
+  ...
+1..212
+# tests 212
+# suites 0
+# pass 199
+# fail 13
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 8934.127084

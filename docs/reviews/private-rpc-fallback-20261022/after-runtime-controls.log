@@ -1,0 +1,156 @@
+✔ binary digest mismatch performs neither state acquisition nor spawn (4.825541ms)
+✔ execution forwarding is rejected before forwarding (3.59775ms)
+✔ unapproved ancestor is rejected before forwarding (2.334875ms)
+✔ unpinned proof is rejected before forwarding (2.223417ms)
+✔ noncanonical proof is rejected before forwarding (1.606375ms)
+✔ unbounded slots is rejected before forwarding (0.995209ms)
+✔ out of order read is rejected before forwarding (1.098666ms)
+✔ mismatched input digest produces no proof (1.047708ms)
+✔ mismatched chain produces no proof (0.783ms)
+✔ mismatched engine produces no proof (0.847958ms)
+✔ mismatched gas budget produces no proof (1.397875ms)
+✔ mismatched base state produces no proof (2.021916ms)
+✔ mismatched read count produces no proof (0.79625ms)
+✔ mismatched block count produces no proof (0.783917ms)
+✔ mismatched zero root produces no proof (0.721041ms)
+✔ native partial after result is rejected (1.213042ms)
+✔ native second-result after result is rejected (1.386292ms)
+✔ a result is held until successful native process exit and canonical recheck (0.850541ms)
+✔ initial options are snapshotted before asynchronous binary verification (1.067875ms)
+
+  #  /opt/homebrew/Cellar/node/25.8.2/bin/node[32792]: void node::InternalCallbackScope::Close() at ../src/api/callback.cc:185
+  #  Assertion failed: (env_->execution_async_id()) == (0)
+
+----- Native stack trace -----
+
+ 1: 0x108ab9bf4 node::Assert(node::AssertionInfo const&) [/opt/homebrew/Cellar/node/25.8.2/lib/libnode.141.dylib]
+ 2: 0x109a30a30 node::InternalCallbackScope::Close() (.cold.1) [/opt/homebrew/Cellar/node/25.8.2/lib/libnode.141.dylib]
+ 3: 0x1089fff34 node::InternalCallbackScope::Close() [/opt/homebrew/Cellar/node/25.8.2/lib/libnode.141.dylib]
+ 4: 0x1089ffc38 node::InternalCallbackScope::~InternalCallbackScope() [/opt/homebrew/Cellar/node/25.8.2/lib/libnode.141.dylib]
+ 5: 0x108b0cef0 node::PerIsolatePlatformData::RunForegroundTask(std::__1::unique_ptr<v8::Task, std::__1::default_delete<v8::Task>>) [/opt/homebrew/Cellar/node/25.8.2/lib/libnode.141.dylib]
+ 6: 0x108b0bf98 node::PerIsolatePlatformData::FlushForegroundTasksInternal() [/opt/homebrew/Cellar/node/25.8.2/lib/libnode.141.dylib]
+ 7: 0x1047d23cc uv__async_io [/opt/homebrew/Cellar/libuv/1.52.1/lib/libuv.1.0.0.dylib]
+ 8: 0x1047e11b0 uv__io_poll [/opt/homebrew/Cellar/libuv/1.52.1/lib/libuv.1.0.0.dylib]
+ 9: 0x1047d2b64 uv_run [/opt/homebrew/Cellar/libuv/1.52.1/lib/libuv.1.0.0.dylib]
+10: 0x108a00e2c node::SpinEventLoopInternal(node::Environment*) [/opt/homebrew/Cellar/node/25.8.2/lib/libnode.141.dylib]
+11: 0x108ae8820 node::NodeMainInstance::Run(node::ExitCode*, node::Environment*) [/opt/homebrew/Cellar/node/25.8.2/lib/libnode.141.dylib]
+12: 0x108ae8554 node::NodeMainInstance::Run() [/opt/homebrew/Cellar/node/25.8.2/lib/libnode.141.dylib]
+13: 0x108a8c778 node::Start(int, char**) [/opt/homebrew/Cellar/node/25.8.2/lib/libnode.141.dylib]
+14: 0x190e92b98 start [/usr/lib/dyld]
+✖ tests/proof-runner-client.test.mjs (238.567708ms)
+✔ the shipped Node runtime is the exact reviewed adapter, reader and IPC implementation (3.57625ms)
+✔ the public Node entry refuses missing approval or a missing verified executable before any provider read (5.276875ms)
+✔ explicit configured primary reads share candidate admission without rerouting or adding retries (48.28675ms)
+✔ duplicate in-progress requests share one exact program and settled results are never cached (6.298625ms)
+✔ distinct queued programs have an explicit bound and cancellation drains them without more dispatch (4.25125ms)
+✔ private provider evidence preserves original RPC payload while public errors remain redacted (6.631708ms)
+✖ private raw provider responses never cross observer ownership through shared negative capability cache (10.395166ms)
+✔ an observed429 retries only after cooldown and full public qualification, preserving every call (1009.230667ms)
+✔ one approved recipient automatically recovers an observed transient failure with fresh qualification and the complete immutable program (5062.861333ms)
+✔ same-recipient recovery is attempted at most once and never infers an outage from an unknown failure (1027.22975ms)
+✔ a cooldown that cannot fit the whole-request deadline returns the observed failure without retry (2.67125ms)
+✔ cancellation during the recovery cooldown prevents fresh qualification and a second project request (2.154958ms)
+✔ the complete request deadline discards a late response even when the provider ignores abort (101.629458ms)
+✔ a recovered request shares its original deadline and cannot receive a second full timeout budget (9.929334ms)
+✔ pinned pool candidate cannot silently fail over during qualification; strict nonce and balance errors retain codes (0.781292ms)
+✔ public capacity or unsupported candidate swaps before any private data; complete SDK proof survives selection (67.983458ms)
+✔ rate-limit cooldown persists across new review transports without sharing private proof state (2.522625ms)
+✔ aggregate clamp after successful empty probes swaps the WHOLE unchanged request, never a continuation (5.052792ms)
+✔ a larger aggregate sequence is publicly requalified even when its largest envelope is unchanged (4.8505ms)
+✔ Retro-sized synthetic 34/40-call requests keep every byte on aggregate-capacity replay (146.539208ms)
+✔ body limit and transport outage swap complete programs; specific capacity evidence survives pool exhaustion (22.967042ms)
+✔ public qualification never grants disclosure to another indexed recipient (2.094667ms)
+✔ contract revert, transaction validation failure and exact metadata mismatch never search for a passing backend (15.658834ms)
+✔ invalid parameters, common server validation errors and ambiguous simulation rejections are terminal (22.292542ms)
+✔ HTTP bad or unprocessable project requests are terminal without inventing an RPC error code (5.990208ms)
+✔ cancel stops an in-flight request without another recipient; a fresh saved-plan retry can pass (3.768334ms)
+✔ input mutation, overrides, symbolic blocks and signing cannot alter or escape the bounded program (3.257667ms)
+✔ public qualification report uses production complete-sequence checks and states its capacity limits (7.274667ms)
+✔ public report refuses stale heads and invalid full-sequence evidence, and stops after access or rate restrictions (27.357083ms)
+✔ the approved CLI pins PublicNode and rejects URL overrides before probing (0.247125ms)
+✔ live gate fails on unavailable or incomplete qualification while retaining public-only evidence (12.93775ms)
+✔ the recorded 2026-10-11 PublicNode clamp remains a failed capability gate, not publication evidence (20.453042ms)
+✔ a lower explicit envelope requalifies after a larger cap rejection without rewriting any calls (4.350083ms)
+✔ the complete metadata read adapts its rejected ceiling while preserving exact transactions (5.696917ms)
+✔ complete-transaction estimates disclose only to an approved pinned recipient and grant no capacity proof (3.388167ms)
+✔ estimation rejects an unapproved recipient, changed snapshot, wrong chain and stale head before any project calldata (0.891959ms)
+✔ estimate reverts and malformed results never fall through to a different recipient or fallback gas (1.224666ms)
+✔ estimation accepts only exact fee-bound numbered-block requests without state overrides or a caller gas clamp (0.442833ms)
+✔ cancellation discards a late estimate even when the provider ignores abort (0.42025ms)
+✔ initial-storage capacity discovery requalifies the existing approved provider and validates the whole program without a new recipient (12.54475ms)
+✔ dynamic discovery never turns unsupported approved methods into approval for another recipient (3.151834ms)
+✔ discovery chooses the largest approved reported capacity and cached rejection describes the current request (7.870875ms)
+✔ cancelling adapted discovery discards late success without strict replay or a wallet proof (4.602333ms)
+✔ uneven carrier demand reuses measured prefix allowance and fully replays the same program (8.944875ms)
+✔ a first-call demand larger than its equal share can borrow only observed remaining discovery capacity (8.957333ms)
+✔ a genuine contract revert still refuses approval after bounded same-program allocation checks (7.770083ms)
+✔ later calls recover from reserved intrinsic floors through bounded complete discovery replays (50.470333ms)
+✔ missing pre-refund evidence prevents allocation and a later metadata mismatch still blocks it (8.582708ms)
+✔ cancellation during budget redistribution discards late results and never reaches strict approval (5.81825ms)
+✔ paid estimate uses the explicit approved pool entry point, not the legacy simulation-only factory (0.465625ms)
+✔ an explicit measured whole-request budget bounds every complete 14-call discovery replay (9.057541ms)
+✔ an unprofiled later envelope remainder cannot authorize whole-request allocation (3.173416ms)
+✔ project multi-block clamp diagnostics retain the exact request and cumulative position (2.64625ms)
+✔ shared discovery never reduces a measured margin, accepts a strict clamp or ignores complete metadata (31.557875ms)
+{"kind":"synthetic-production-size-path","failureKind":"provider-limit","httpStatus":503,"gasCapacityScope":"request-bytes","projectAttempts":1,"requestBytes":[1057498],"callsPerAttempt":[45]}
+✔ shared discovery and a rejected 60M public-read ceiling preserve the strictly measured transactions (17.0375ms)
+✔ chain-keyed configured pool qualifies Ethereum and Sepolia without sharing a chain identity (3.216792ms)
+✔ measured profiles prefer approved request headroom while retaining every dependent call and byte (2.149375ms)
+✔ selected capacity failure keeps its originating provider rather than the last failed candidate (1.553584ms)
+✔ measured capacity rejection identifies its selected provider without inventing a returned envelope (0.360208ms)
+✔ cumulative exhaustion falls back as a complete ordered program despite each call fitting the request cap (23.214042ms)
+✔ a gas-envelope sum above a measured Geth request cap still permits a cheap complete program (3.10025ms)
+✔ distinct provider transaction, block, byte and block-count limits select another approved full-program validator (5.60425ms)
+✔ profiles cannot approve an indexed recipient or silently change chain or mutable limits (3.555458ms)
+✔ a measured high-capacity backend still refuses stale heads, changed pins and wrong chain before project disclosure (1.4765ms)
+✔ no compatible validator reports an honest infrastructure failure and leaves large content and strict gas intact (18.624ms)
+✔ a later cumulative remainder does not disable the same provider for a smaller unchanged program (3.883042ms)
+✔ explicit request-budget exhaustion falls back without guessing the cap or splitting dependent state (10.325333ms)
+✔ stale measured capacity does not disable an intrinsically valid program after a provider upgrade (15.2985ms)
+✔ profiles that expire during a reused transport cause fresh exact qualification on the next phase (2.275583ms)
+✔ fallback replays dependent state from the beginning, never a successful-prefix continuation (3.310333ms)
+✔ an observed earlier provider cap also expires and requalifies after infrastructure recovery (2.108542ms)
+✔ only typed request-capacity evidence permits -38026 fallback; transaction validation and ambiguous client errors remain terminal (14.223333ms)
+✔ configured reader standalone estimates require explicit admission and never enable stateful simulation (0.262833ms)
+✔ existing configured loopback and full reader calldata require explicit bounded admission without rerouting (1.087875ms)
+✔ explicit existing server transport identities preserve private HTTP reads without opening or disclosing a route (0.23775ms)
+✔ configured root URLs keep distinct credential identities without exposing them to observers (0.228917ms)
+✔ rate/access diagnostics survive approved whole-program failover without shopping deterministic rejections (24.897667ms)
+✔ public probes use bounded Amsterdam base gas without lowering exact project envelopes (4.902666ms)
+✔ 200 small calls succeed while a fixed 45-call program fails only after its serialized bytes cross the synthetic HTTP boundary (17.753834ms)
+✔ exact serialized HTTP boundary keeps every dependent call and permits only approved identical-program failover (4.140667ms)
+✔ HTTP503 byte capacity permits only approved identical 45-call fallback and never a same-recipient retry (36.907291ms)
+✔ HTTP503 deterministic RPC rejections never shop for another provider despite capacity prose (6.00425ms)
+✔ cancelling after a body-capacity rejection prevents fallback dispatch (1.678291ms)
+✔ body-capacity fallback shares the complete-request deadline and discards a late unchanged response (373.047667ms)
+ℹ tests 104
+ℹ suites 0
+ℹ pass 102
+ℹ fail 2
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 8791.400958
+
+✖ failing tests:
+
+test at tests/proof-runner-client.test.mjs:1:1
+✖ tests/proof-runner-client.test.mjs (238.567708ms)
+  'test failed'
+
+test at tests/sdk-public-simulation-pool.test.mjs:183:1
+✖ private raw provider responses never cross observer ownership through shared negative capability cache (10.395166ms)
+  AssertionError [ERR_ASSERTION]: The expression evaluated to a falsy value:
+  
+    assert.ok(ownerA.some(event => event.rawResponse?.body === 'OWNER_A_ONLY_RAW_DENIAL'))
+  
+      at TestContext.<anonymous> (file:///private/tmp/keel-private-rpc-fallback-20261022-01/sdk/tests/sdk-public-simulation-pool.test.mjs:196:12)
+      at async Test.run (node:internal/test_runner/test:1208:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:831:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: false,
+    expected: true,
+    operator: '==',
+    diff: 'simple'
+  }

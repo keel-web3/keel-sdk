@@ -1,0 +1,1207 @@
+TAP version 13
+# Subtest: binary digest mismatch performs neither state acquisition nor spawn
+ok 1 - binary digest mismatch performs neither state acquisition nor spawn
+  ---
+  duration_ms: 12.280041
+  type: 'test'
+  ...
+# Subtest: execution forwarding is rejected before forwarding
+ok 2 - execution forwarding is rejected before forwarding
+  ---
+  duration_ms: 6.896
+  type: 'test'
+  ...
+# Subtest: unapproved ancestor is rejected before forwarding
+ok 3 - unapproved ancestor is rejected before forwarding
+  ---
+  duration_ms: 2.415292
+  type: 'test'
+  ...
+# Subtest: unpinned proof is rejected before forwarding
+ok 4 - unpinned proof is rejected before forwarding
+  ---
+  duration_ms: 2.37275
+  type: 'test'
+  ...
+# Subtest: noncanonical proof is rejected before forwarding
+ok 5 - noncanonical proof is rejected before forwarding
+  ---
+  duration_ms: 1.606541
+  type: 'test'
+  ...
+# Subtest: unbounded slots is rejected before forwarding
+ok 6 - unbounded slots is rejected before forwarding
+  ---
+  duration_ms: 2.33825
+  type: 'test'
+  ...
+# Subtest: out of order read is rejected before forwarding
+ok 7 - out of order read is rejected before forwarding
+  ---
+  duration_ms: 1.404875
+  type: 'test'
+  ...
+# Subtest: mismatched input digest produces no proof
+ok 8 - mismatched input digest produces no proof
+  ---
+  duration_ms: 1.173125
+  type: 'test'
+  ...
+# Subtest: mismatched chain produces no proof
+ok 9 - mismatched chain produces no proof
+  ---
+  duration_ms: 1.615708
+  type: 'test'
+  ...
+# Subtest: mismatched engine produces no proof
+ok 10 - mismatched engine produces no proof
+  ---
+  duration_ms: 3.736542
+  type: 'test'
+  ...
+# Subtest: mismatched gas budget produces no proof
+ok 11 - mismatched gas budget produces no proof
+  ---
+  duration_ms: 1.844083
+  type: 'test'
+  ...
+# Subtest: mismatched base state produces no proof
+ok 12 - mismatched base state produces no proof
+  ---
+  duration_ms: 2.005917
+  type: 'test'
+  ...
+# Subtest: mismatched read count produces no proof
+ok 13 - mismatched read count produces no proof
+  ---
+  duration_ms: 0.872666
+  type: 'test'
+  ...
+# Subtest: mismatched block count produces no proof
+ok 14 - mismatched block count produces no proof
+  ---
+  duration_ms: 1.588333
+  type: 'test'
+  ...
+# Subtest: mismatched zero root produces no proof
+ok 15 - mismatched zero root produces no proof
+  ---
+  duration_ms: 1.190834
+  type: 'test'
+  ...
+# Subtest: native partial after result is rejected
+ok 16 - native partial after result is rejected
+  ---
+  duration_ms: 1.184167
+  type: 'test'
+  ...
+# Subtest: native second-result after result is rejected
+ok 17 - native second-result after result is rejected
+  ---
+  duration_ms: 0.760292
+  type: 'test'
+  ...
+# Subtest: a result is held until successful native process exit and canonical recheck
+ok 18 - a result is held until successful native process exit and canonical recheck
+  ---
+  duration_ms: 1.343625
+  type: 'test'
+  ...
+# Subtest: initial options are snapshotted before asynchronous binary verification
+ok 19 - initial options are snapshotted before asynchronous binary verification
+  ---
+  duration_ms: 0.819291
+  type: 'test'
+  ...
+# Subtest: the shipped Node runtime is the exact reviewed adapter, reader and IPC implementation
+ok 20 - the shipped Node runtime is the exact reviewed adapter, reader and IPC implementation
+  ---
+  duration_ms: 1.144125
+  type: 'test'
+  ...
+# Subtest: the public Node entry refuses missing approval or a missing verified executable before any provider read
+ok 21 - the public Node entry refuses missing approval or a missing verified executable before any provider read
+  ---
+  duration_ms: 4.192
+  type: 'test'
+  ...
+# Subtest: immutable queries reuse one successful response and deep-copy caller-owned arrays
+ok 22 - immutable queries reuse one successful response and deep-copy caller-owned arrays
+  ---
+  duration_ms: 17.084959
+  type: 'test'
+  ...
+# Subtest: method/address/slot/hash keys are exact and case normalization does not change outgoing params
+ok 23 - method/address/slot/hash keys are exact and case normalization does not change outgoing params
+  ---
+  duration_ms: 3.118208
+  type: 'test'
+  ...
+# Subtest: chain/header/ancestor checks remain live while empty code is cached exactly
+ok 24 - chain/header/ancestor checks remain live while empty code is cached exactly
+  ---
+  duration_ms: 4.3345
+  type: 'test'
+  ...
+# Subtest: warmed response cannot bypass observed HTTP401 or shop another approved recipient
+ok 25 - warmed response cannot bypass observed HTTP401 or shop another approved recipient
+  ---
+  duration_ms: 10.106625
+  type: 'test'
+  ...
+# Subtest: warmed response cannot bypass observed HTTP403 or shop another approved recipient
+ok 26 - warmed response cannot bypass observed HTTP403 or shop another approved recipient
+  ---
+  duration_ms: 2.374459
+  type: 'test'
+  ...
+# Subtest: warmed response cannot bypass an observed canonical reorg
+ok 27 - warmed response cannot bypass an observed canonical reorg
+  ---
+  duration_ms: 0.995958
+  type: 'test'
+  ...
+# Subtest: separate readers never share response data even when their scheduler is shared
+ok 28 - separate readers never share response data even when their scheduler is shared
+  ---
+  duration_ms: 0.65025
+  type: 'test'
+  ...
+# Subtest: malformed proof/code result containers are never retained
+ok 29 - malformed proof/code result containers are never retained
+  ---
+  duration_ms: 0.700542
+  type: 'test'
+  ...
+# Subtest: close aborts a held response and prevents any late success
+ok 30 - close aborts a held response and prevents any late success
+  ---
+  duration_ms: 9.497833
+  type: 'test'
+  ...
+# Subtest: one canceled request cannot poison another in-flight caller or populate a stale cache epoch
+ok 31 - one canceled request cannot poison another in-flight caller or populate a stale cache epoch
+  ---
+  duration_ms: 2.690625
+  type: 'test'
+  ...
+# Subtest: HTTP401 with empty body is terminal without a second recipient or warmed retry
+ok 32 - HTTP401 with empty body is terminal without a second recipient or warmed retry
+  ---
+  duration_ms: 35.178458
+  type: 'test'
+  ...
+# Subtest: HTTP401 with rate-limit body is terminal without a second recipient or warmed retry
+ok 33 - HTTP401 with rate-limit body is terminal without a second recipient or warmed retry
+  ---
+  duration_ms: 9.638375
+  type: 'test'
+  ...
+# Subtest: HTTP401 with capability body is terminal without a second recipient or warmed retry
+ok 34 - HTTP401 with capability body is terminal without a second recipient or warmed retry
+  ---
+  duration_ms: 10.249208
+  type: 'test'
+  ...
+# Subtest: HTTP401 with malformed body is terminal without a second recipient or warmed retry
+ok 35 - HTTP401 with malformed body is terminal without a second recipient or warmed retry
+  ---
+  duration_ms: 8.11425
+  type: 'test'
+  ...
+# Subtest: HTTP403 with empty body is terminal without a second recipient or warmed retry
+ok 36 - HTTP403 with empty body is terminal without a second recipient or warmed retry
+  ---
+  duration_ms: 1.404458
+  type: 'test'
+  ...
+# Subtest: HTTP403 with rate-limit body is terminal without a second recipient or warmed retry
+ok 37 - HTTP403 with rate-limit body is terminal without a second recipient or warmed retry
+  ---
+  duration_ms: 0.68425
+  type: 'test'
+  ...
+# Subtest: HTTP403 with capability body is terminal without a second recipient or warmed retry
+ok 38 - HTTP403 with capability body is terminal without a second recipient or warmed retry
+  ---
+  duration_ms: 0.562
+  type: 'test'
+  ...
+# Subtest: HTTP403 with malformed body is terminal without a second recipient or warmed retry
+ok 39 - HTTP403 with malformed body is terminal without a second recipient or warmed retry
+  ---
+  duration_ms: 0.503417
+  type: 'test'
+  ...
+# Subtest: malformed JSON is terminal without another recipient
+ok 40 - malformed JSON is terminal without another recipient
+  ---
+  duration_ms: 2.441125
+  type: 'test'
+  ...
+# Subtest: stale response identity is terminal without another recipient
+ok 41 - stale response identity is terminal without another recipient
+  ---
+  duration_ms: 2.886125
+  type: 'test'
+  ...
+# Subtest: missing result is terminal without another recipient
+ok 42 - missing result is terminal without another recipient
+  ---
+  duration_ms: 4.531458
+  type: 'test'
+  ...
+# Subtest: unknown RPC error is terminal without another recipient
+ok 43 - unknown RPC error is terminal without another recipient
+  ---
+  duration_ms: 3.335667
+  type: 'test'
+  ...
+# Subtest: invalid parameters is terminal without another recipient
+ok 44 - invalid parameters is terminal without another recipient
+  ---
+  duration_ms: 0.651833
+  type: 'test'
+  ...
+# Subtest: genuine revert is terminal without another recipient
+ok 45 - genuine revert is terminal without another recipient
+  ---
+  duration_ms: 0.495291
+  type: 'test'
+  ...
+# Subtest: revert prose with rate-limit wording is terminal without another recipient
+ok 46 - revert prose with rate-limit wording is terminal without another recipient
+  ---
+  duration_ms: 0.858166
+  type: 'test'
+  ...
+# Subtest: RPC401 with rate-limit wording is terminal without another recipient
+ok 47 - RPC401 with rate-limit wording is terminal without another recipient
+  ---
+  duration_ms: 0.483375
+  type: 'test'
+  ...
+# Subtest: RPC403 with rate-limit wording is terminal without another recipient
+ok 48 - RPC403 with rate-limit wording is terminal without another recipient
+  ---
+  duration_ms: 0.507083
+  type: 'test'
+  ...
+# Subtest: generic HTTP404 is terminal without another recipient
+ok 49 - generic HTTP404 is terminal without another recipient
+  ---
+  duration_ms: 0.545666
+  type: 'test'
+  ...
+# Subtest: generic HTTP503 is terminal without another recipient
+ok 50 - generic HTTP503 is terminal without another recipient
+  ---
+  duration_ms: 0.375292
+  type: 'test'
+  ...
+# Subtest: unknown transport error is terminal without another recipient
+ok 51 - unknown transport error is terminal without another recipient
+  ---
+  duration_ms: 0.4405
+  type: 'test'
+  ...
+# Subtest: missing pinned proof is terminal without another recipient
+ok 52 - missing pinned proof is terminal without another recipient
+  ---
+  duration_ms: 0.305083
+  type: 'test'
+  ...
+# Subtest: wrong chain stops before address/key disclosure or another recipient
+ok 53 - wrong chain stops before address/key disclosure or another recipient
+  ---
+  duration_ms: 0.260167
+  type: 'test'
+  ...
+# Subtest: canonical mismatch stops before address/key disclosure or another recipient
+ok 54 - canonical mismatch stops before address/key disclosure or another recipient
+  ---
+  duration_ms: 0.236125
+  type: 'test'
+  ...
+# Subtest: HTTP429 permits only an approved ordered fallback at the exact block
+ok 55 - HTTP429 permits only an approved ordered fallback at the exact block
+  ---
+  duration_ms: 4.9985
+  type: 'test'
+  ...
+# Subtest: explicit RPC rate-limit permits only an approved ordered fallback at the exact block
+ok 56 - explicit RPC rate-limit permits only an approved ordered fallback at the exact block
+  ---
+  duration_ms: 1.100459
+  type: 'test'
+  ...
+# Subtest: unsupported method permits only an approved ordered fallback at the exact block
+ok 57 - unsupported method permits only an approved ordered fallback at the exact block
+  ---
+  duration_ms: 0.937125
+  type: 'test'
+  ...
+# Subtest: unsupported capability permits only an approved ordered fallback at the exact block
+ok 58 - unsupported capability permits only an approved ordered fallback at the exact block
+  ---
+  duration_ms: 0.563417
+  type: 'test'
+  ...
+# Subtest: explicit timeout permits only an approved ordered fallback at the exact block
+ok 59 - explicit timeout permits only an approved ordered fallback at the exact block
+  ---
+  duration_ms: 0.669458
+  type: 'test'
+  ...
+# Subtest: HTTP413 body limit permits only an approved ordered fallback at the exact block
+ok 60 - HTTP413 body limit permits only an approved ordered fallback at the exact block
+  ---
+  duration_ms: 0.517167
+  type: 'test'
+  ...
+# Subtest: bounded response limit permits only an approved ordered fallback at the exact block
+ok 61 - bounded response limit permits only an approved ordered fallback at the exact block
+  ---
+  duration_ms: 8.005917
+  type: 'test'
+  ...
+# Subtest: healthy free never selects paid; new reader begins free after the prior cooldown expires
+ok 62 - healthy free never selects paid; new reader begins free after the prior cooldown expires
+  ---
+  duration_ms: 1.641
+  type: 'test'
+  ...
+# Subtest: fallback recipient credentials alone grant no state-read disclosure
+ok 63 - fallback recipient credentials alone grant no state-read disclosure
+  ---
+  duration_ms: 0.368875
+  type: 'test'
+  ...
+# Subtest: public overload selects an already-approved paid proof source without remote execution
+ok 64 - public overload selects an already-approved paid proof source without remote execution
+  ---
+  duration_ms: 51.524709
+  type: 'test'
+  ...
+# Subtest: configured paid credentials do not authorize disclosure to that recipient
+ok 65 - configured paid credentials do not authorize disclosure to that recipient
+  ---
+  duration_ms: 4.743583
+  type: 'test'
+  ...
+# Subtest: paid HTTP 403 stops within one attempt and retains restriction/cooldown
+ok 66 - paid HTTP 403 stops within one attempt and retains restriction/cooldown
+  ---
+  duration_ms: 3.0155
+  type: 'test'
+  ...
+# Subtest: paid HTTP 429 stops within one attempt and retains restriction/cooldown
+ok 67 - paid HTTP 429 stops within one attempt and retains restriction/cooldown
+  ---
+  duration_ms: 16.941917
+  type: 'test'
+  ...
+# Subtest: wrong-chain paid source never receives address/key reads
+ok 68 - wrong-chain paid source never receives address/key reads
+  ---
+  duration_ms: 0.903417
+  type: 'test'
+  ...
+# Subtest: source snapshot mismatch is terminal instead of shopping another provider
+ok 69 - source snapshot mismatch is terminal instead of shopping another provider
+  ---
+  duration_ms: 0.683041
+  type: 'test'
+  ...
+# Subtest: invalid proof request is terminal, while unsupported proof method may use an approved alternative
+ok 70 - invalid proof request is terminal, while unsupported proof method may use an approved alternative
+  ---
+  duration_ms: 2.816417
+  type: 'test'
+  ...
+# Subtest: bounded response failure can select only an eligible alternative
+ok 71 - bounded response failure can select only an eligible alternative
+  ---
+  duration_ms: 10.640041
+  type: 'test'
+  ...
+# Subtest: cancel stops a pending read without selecting paid; fresh retry retains the exact query
+ok 72 - cancel stops a pending read without selecting paid; fresh retry retains the exact query
+  ---
+  duration_ms: 6.432
+  type: 'test'
+  ...
+# Subtest: wallet, execution, unpinned and overscoped reads are rejected before any network request
+ok 73 - wallet, execution, unpinned and overscoped reads are rejected before any network request
+  ---
+  duration_ms: 0.992958
+  type: 'test'
+  ...
+# Subtest: captured public null response for eth_getProof fails closed without another recipient or latest fallback
+ok 74 - captured public null response for eth_getProof fails closed without another recipient or latest fallback
+  ---
+  duration_ms: 0.728542
+  type: 'test'
+  ...
+# Subtest: captured public null response for eth_getCode fails closed without another recipient or latest fallback
+ok 75 - captured public null response for eth_getCode fails closed without another recipient or latest fallback
+  ---
+  duration_ms: 0.3525
+  type: 'test'
+  ...
+# Subtest: captured public null response for eth_getBlockByHash fails closed without another recipient or latest fallback
+ok 76 - captured public null response for eth_getBlockByHash fails closed without another recipient or latest fallback
+  ---
+  duration_ms: 0.406208
+  type: 'test'
+  ...
+# Subtest: the captured public header, proof and code survive approved-reader framing without dropping Amsterdam fields
+ok 77 - the captured public header, proof and code survive approved-reader framing without dropping Amsterdam fields
+  ---
+  duration_ms: 0.811833
+  type: 'test'
+  ...
+# Subtest: owner-private evidence retains bounded invalidUTF8/JSON bytes before public normalization
+ok 78 - owner-private evidence retains bounded invalidUTF8/JSON bytes before public normalization
+  ---
+  duration_ms: 34.531083
+  type: 'test'
+  ...
+# Subtest: private network error snapshots retain custom fields but cannot mutate the original
+ok 79 - private network error snapshots retain custom fields but cannot mutate the original
+  ---
+  duration_ms: 0.509958
+  type: 'test'
+  ...
+# Subtest: pinned HTTP status and rate-limit evidence survive exhaustion and cooldown without a retry or private text
+ok 80 - pinned HTTP status and rate-limit evidence survive exhaustion and cooldown without a retry or private text
+  ---
+  duration_ms: 3.927459
+  type: 'test'
+  ...
+# Subtest: only recognized nested network codes are retained; message text never invents a timeout
+ok 81 - only recognized nested network codes are retained; message text never invents a timeout
+  ---
+  duration_ms: 2.537834
+  type: 'test'
+  ...
+# Subtest: actual request deadlines and response-body deadlines are retained as timeouts
+ok 82 - actual request deadlines and response-body deadlines are retained as timeouts
+  ---
+  duration_ms: 203.287417
+  type: 'test'
+  ...
+# Subtest: response failures distinguish missing body, byte bound, parse error, stale response id and missing result
+ok 83 - response failures distinguish missing body, byte bound, parse error, stale response id and missing result
+  ---
+  duration_ms: 1.800459
+  type: 'test'
+  ...
+# Subtest: classified RPC rate limits retain the numeric code, not remote error data
+ok 84 - classified RPC rate limits retain the numeric code, not remote error data
+  ---
+  duration_ms: 0.997083
+  type: 'test'
+  ...
+# Subtest: concurrent pinned requests retain the same observed rate-limit status while waiting in the queue
+ok 85 - concurrent pinned requests retain the same observed rate-limit status while waiting in the queue
+  ---
+  duration_ms: 0.750334
+  type: 'test'
+  ...
+# Subtest: caller cancellation is preserved and never triggers provider failover
+ok 86 - caller cancellation is preserved and never triggers provider failover
+  ---
+  duration_ms: 0.898208
+  type: 'test'
+  ...
+# Subtest: ordinary read failover remains bounded and deterministic simulation rejections never rotate
+ok 87 - ordinary read failover remains bounded and deterministic simulation rejections never rotate
+  ---
+  duration_ms: 2.814667
+  type: 'test'
+  ...
+# Subtest: a complete multi-megabyte 45-call program reaches the pinned transport unchanged; unknown failure stays unknown
+ok 88 - a complete multi-megabyte 45-call program reaches the pinned transport unchanged; unknown failure stays unknown
+  ---
+  duration_ms: 30.321625
+  type: 'test'
+  ...
+# Subtest: bounded explicit HTTP body-size evidence is actionable capacity without an invented RPC code
+ok 89 - bounded explicit HTTP body-size evidence is actionable capacity without an invented RPC code
+  ---
+  duration_ms: 5.042333
+  type: 'test'
+  ...
+# Subtest: generic, malformed, reflected, stale and oversized HTTP bodies never invent request-size evidence
+ok 90 - generic, malformed, reflected, stale and oversized HTTP bodies never invent request-size evidence
+  ---
+  duration_ms: 7.059833
+  type: 'test'
+  ...
+# Subtest: HTTP JSON-RPC execution and validation evidence outranks body-size wording
+ok 91 - HTTP JSON-RPC execution and validation evidence outranks body-size wording
+  ---
+  duration_ms: 2.602375
+  type: 'test'
+  ...
+# Subtest: aborted or timed-out HTTP error-body reads do not establish request capacity
+ok 92 - aborted or timed-out HTTP error-body reads do not establish request capacity
+  ---
+  duration_ms: 102.534833
+  type: 'test'
+  ...
+# Subtest: response-payload and negated request-size wording never establish outgoing body capacity
+ok 93 - response-payload and negated request-size wording never establish outgoing body capacity
+  ---
+  duration_ms: 1.651167
+  type: 'test'
+  ...
+# Subtest: complete capacity-detail envelope bound applies equally to HTTP200 and HTTP503 RPC errors
+ok 94 - complete capacity-detail envelope bound applies equally to HTTP200 and HTTP503 RPC errors
+  ---
+  duration_ms: 0.673792
+  type: 'test'
+  ...
+# Subtest: complete HTTP capacity details accept exactly16KiB and reject one additional byte independently of private capture
+ok 95 - complete HTTP capacity details accept exactly16KiB and reject one additional byte independently of private capture
+  ---
+  duration_ms: 1.044333
+  type: 'test'
+  ...
+# Subtest: HTTP error parsing preserves the lowest signed32-bit observed RPC code without inventing another code
+ok 96 - HTTP error parsing preserves the lowest signed32-bit observed RPC code without inventing another code
+  ---
+  duration_ms: 0.282583
+  type: 'test'
+  ...
+# Subtest: read-only RPC pool carries the complete bounded publication simulation instead of blocking all approvals
+ok 97 - read-only RPC pool carries the complete bounded publication simulation instead of blocking all approvals
+  ---
+  duration_ms: 40.454834
+  type: 'test'
+  ...
+# Subtest: simulation overrides and unbounded/ordinary oversized reads reject before network access
+ok 98 - simulation overrides and unbounded/ordinary oversized reads reject before network access
+  ---
+  duration_ms: 4.112917
+  type: 'test'
+  ...
+# Subtest: simulation failure type and numeric provider gas cap survive without leaking private provider text
+ok 99 - simulation failure type and numeric provider gas cap survive without leaking private provider text
+  ---
+  duration_ms: 4.351
+  type: 'test'
+  ...
+# Subtest: shared request exhaustion retains only typed bounded need/remaining and never mislabels an ambiguous per-call cap
+ok 100 - shared request exhaustion retains only typed bounded need/remaining and never mislabels an ambiguous per-call cap
+  ---
+  duration_ms: 1.200083
+  type: 'test'
+  ...
+# Subtest: explicit configured primary reads share candidate admission without rerouting or adding retries
+ok 101 - explicit configured primary reads share candidate admission without rerouting or adding retries
+  ---
+  duration_ms: 50.905083
+  type: 'test'
+  ...
+# Subtest: duplicate in-progress requests share one exact program and settled results are never cached
+ok 102 - duplicate in-progress requests share one exact program and settled results are never cached
+  ---
+  duration_ms: 13.318791
+  type: 'test'
+  ...
+# Subtest: distinct queued programs have an explicit bound and cancellation drains them without more dispatch
+ok 103 - distinct queued programs have an explicit bound and cancellation drains them without more dispatch
+  ---
+  duration_ms: 6.811875
+  type: 'test'
+  ...
+# Subtest: private provider evidence preserves original RPC payload while public errors remain redacted
+ok 104 - private provider evidence preserves original RPC payload while public errors remain redacted
+  ---
+  duration_ms: 5.518375
+  type: 'test'
+  ...
+# Subtest: private raw provider responses never cross observer ownership through shared negative capability cache
+ok 105 - private raw provider responses never cross observer ownership through shared negative capability cache
+  ---
+  duration_ms: 3.15475
+  type: 'test'
+  ...
+# Subtest: an observed429 retries only after cooldown and full public qualification, preserving every call
+ok 106 - an observed429 retries only after cooldown and full public qualification, preserving every call
+  ---
+  duration_ms: 1010.201459
+  type: 'test'
+  ...
+# Subtest: one approved recipient automatically recovers an observed transient failure with fresh qualification and the complete immutable program
+ok 107 - one approved recipient automatically recovers an observed transient failure with fresh qualification and the complete immutable program
+  ---
+  duration_ms: 5061.44025
+  type: 'test'
+  ...
+# Subtest: same-recipient recovery is attempted at most once and never infers an outage from an unknown failure
+ok 108 - same-recipient recovery is attempted at most once and never infers an outage from an unknown failure
+  ---
+  duration_ms: 1018.310708
+  type: 'test'
+  ...
+# Subtest: a cooldown that cannot fit the whole-request deadline returns the observed failure without retry
+ok 109 - a cooldown that cannot fit the whole-request deadline returns the observed failure without retry
+  ---
+  duration_ms: 2.646959
+  type: 'test'
+  ...
+# Subtest: cancellation during the recovery cooldown prevents fresh qualification and a second project request
+ok 110 - cancellation during the recovery cooldown prevents fresh qualification and a second project request
+  ---
+  duration_ms: 6.69575
+  type: 'test'
+  ...
+# (node:38852) ExperimentalWarning: The MockTimers API is an experimental feature and might change at any time
+# (Use `node --trace-warnings ...` to show where the warning was created)
+# Subtest: the complete request deadline discards a late response even when the provider ignores abort
+ok 111 - the complete request deadline discards a late response even when the provider ignores abort
+  ---
+  duration_ms: 102.034458
+  type: 'test'
+  ...
+# Subtest: a recovered request shares its original deadline and cannot receive a second full timeout budget
+ok 112 - a recovered request shares its original deadline and cannot receive a second full timeout budget
+  ---
+  duration_ms: 7.524625
+  type: 'test'
+  ...
+# Subtest: pinned pool candidate cannot silently fail over during qualification; strict nonce and balance errors retain codes
+ok 113 - pinned pool candidate cannot silently fail over during qualification; strict nonce and balance errors retain codes
+  ---
+  duration_ms: 0.912958
+  type: 'test'
+  ...
+# Subtest: public capacity or unsupported candidate swaps before any private data; complete SDK proof survives selection
+ok 114 - public capacity or unsupported candidate swaps before any private data; complete SDK proof survives selection
+  ---
+  duration_ms: 60.7065
+  type: 'test'
+  ...
+# Subtest: rate-limit cooldown persists across new review transports without sharing private proof state
+ok 115 - rate-limit cooldown persists across new review transports without sharing private proof state
+  ---
+  duration_ms: 2.3315
+  type: 'test'
+  ...
+# Subtest: aggregate clamp after successful empty probes swaps the WHOLE unchanged request, never a continuation
+ok 116 - aggregate clamp after successful empty probes swaps the WHOLE unchanged request, never a continuation
+  ---
+  duration_ms: 4.866834
+  type: 'test'
+  ...
+# Subtest: a larger aggregate sequence is publicly requalified even when its largest envelope is unchanged
+ok 117 - a larger aggregate sequence is publicly requalified even when its largest envelope is unchanged
+  ---
+  duration_ms: 4.407291
+  type: 'test'
+  ...
+# Subtest: Retro-sized synthetic 34/40-call requests keep every byte on aggregate-capacity replay
+ok 118 - Retro-sized synthetic 34/40-call requests keep every byte on aggregate-capacity replay
+  ---
+  duration_ms: 378.654458
+  type: 'test'
+  ...
+# Subtest: body limit and transport outage swap complete programs; specific capacity evidence survives pool exhaustion
+ok 119 - body limit and transport outage swap complete programs; specific capacity evidence survives pool exhaustion
+  ---
+  duration_ms: 15.345083
+  type: 'test'
+  ...
+# Subtest: public qualification never grants disclosure to another indexed recipient
+ok 120 - public qualification never grants disclosure to another indexed recipient
+  ---
+  duration_ms: 2.57925
+  type: 'test'
+  ...
+# Subtest: contract revert, transaction validation failure and exact metadata mismatch never search for a passing backend
+ok 121 - contract revert, transaction validation failure and exact metadata mismatch never search for a passing backend
+  ---
+  duration_ms: 27.601792
+  type: 'test'
+  ...
+# Subtest: invalid parameters, common server validation errors and ambiguous simulation rejections are terminal
+ok 122 - invalid parameters, common server validation errors and ambiguous simulation rejections are terminal
+  ---
+  duration_ms: 27.656375
+  type: 'test'
+  ...
+# Subtest: HTTP bad or unprocessable project requests are terminal without inventing an RPC error code
+ok 123 - HTTP bad or unprocessable project requests are terminal without inventing an RPC error code
+  ---
+  duration_ms: 4.757791
+  type: 'test'
+  ...
+# Subtest: cancel stops an in-flight request without another recipient; a fresh saved-plan retry can pass
+ok 124 - cancel stops an in-flight request without another recipient; a fresh saved-plan retry can pass
+  ---
+  duration_ms: 3.204125
+  type: 'test'
+  ...
+# Subtest: input mutation, overrides, symbolic blocks and signing cannot alter or escape the bounded program
+ok 125 - input mutation, overrides, symbolic blocks and signing cannot alter or escape the bounded program
+  ---
+  duration_ms: 1.974334
+  type: 'test'
+  ...
+# Subtest: public qualification report uses production complete-sequence checks and states its capacity limits
+ok 126 - public qualification report uses production complete-sequence checks and states its capacity limits
+  ---
+  duration_ms: 7.103667
+  type: 'test'
+  ...
+# Subtest: public report refuses stale heads and invalid full-sequence evidence, and stops after access or rate restrictions
+ok 127 - public report refuses stale heads and invalid full-sequence evidence, and stops after access or rate restrictions
+  ---
+  duration_ms: 30.019792
+  type: 'test'
+  ...
+# Subtest: the approved CLI pins PublicNode and rejects URL overrides before probing
+ok 128 - the approved CLI pins PublicNode and rejects URL overrides before probing
+  ---
+  duration_ms: 0.215167
+  type: 'test'
+  ...
+# Subtest: live gate fails on unavailable or incomplete qualification while retaining public-only evidence
+ok 129 - live gate fails on unavailable or incomplete qualification while retaining public-only evidence
+  ---
+  duration_ms: 12.3365
+  type: 'test'
+  ...
+# Subtest: the recorded 2026-10-11 PublicNode clamp remains a failed capability gate, not publication evidence
+ok 130 - the recorded 2026-10-11 PublicNode clamp remains a failed capability gate, not publication evidence
+  ---
+  duration_ms: 7.274625
+  type: 'test'
+  ...
+# Subtest: a lower explicit envelope requalifies after a larger cap rejection without rewriting any calls
+ok 131 - a lower explicit envelope requalifies after a larger cap rejection without rewriting any calls
+  ---
+  duration_ms: 2.657916
+  type: 'test'
+  ...
+# Subtest: the complete metadata read adapts its rejected ceiling while preserving exact transactions
+ok 132 - the complete metadata read adapts its rejected ceiling while preserving exact transactions
+  ---
+  duration_ms: 6.240542
+  type: 'test'
+  ...
+# Subtest: complete-transaction estimates disclose only to an approved pinned recipient and grant no capacity proof
+ok 133 - complete-transaction estimates disclose only to an approved pinned recipient and grant no capacity proof
+  ---
+  duration_ms: 2.855584
+  type: 'test'
+  ...
+# Subtest: estimation rejects an unapproved recipient, changed snapshot, wrong chain and stale head before any project calldata
+ok 134 - estimation rejects an unapproved recipient, changed snapshot, wrong chain and stale head before any project calldata
+  ---
+  duration_ms: 1.028
+  type: 'test'
+  ...
+# Subtest: estimate reverts and malformed results never fall through to a different recipient or fallback gas
+ok 135 - estimate reverts and malformed results never fall through to a different recipient or fallback gas
+  ---
+  duration_ms: 1.400708
+  type: 'test'
+  ...
+# Subtest: estimation accepts only exact fee-bound numbered-block requests without state overrides or a caller gas clamp
+ok 136 - estimation accepts only exact fee-bound numbered-block requests without state overrides or a caller gas clamp
+  ---
+  duration_ms: 0.475209
+  type: 'test'
+  ...
+# Subtest: cancellation discards a late estimate even when the provider ignores abort
+ok 137 - cancellation discards a late estimate even when the provider ignores abort
+  ---
+  duration_ms: 0.485917
+  type: 'test'
+  ...
+# Subtest: initial-storage capacity discovery requalifies the existing approved provider and validates the whole program without a new recipient
+ok 138 - initial-storage capacity discovery requalifies the existing approved provider and validates the whole program without a new recipient
+  ---
+  duration_ms: 18.093917
+  type: 'test'
+  ...
+# Subtest: dynamic discovery never turns unsupported approved methods into approval for another recipient
+ok 139 - dynamic discovery never turns unsupported approved methods into approval for another recipient
+  ---
+  duration_ms: 2.734709
+  type: 'test'
+  ...
+# Subtest: discovery chooses the largest approved reported capacity and cached rejection describes the current request
+ok 140 - discovery chooses the largest approved reported capacity and cached rejection describes the current request
+  ---
+  duration_ms: 6.397584
+  type: 'test'
+  ...
+# Subtest: cancelling adapted discovery discards late success without strict replay or a wallet proof
+ok 141 - cancelling adapted discovery discards late success without strict replay or a wallet proof
+  ---
+  duration_ms: 3.175375
+  type: 'test'
+  ...
+# Subtest: uneven carrier demand reuses measured prefix allowance and fully replays the same program
+ok 142 - uneven carrier demand reuses measured prefix allowance and fully replays the same program
+  ---
+  duration_ms: 8.9135
+  type: 'test'
+  ...
+# Subtest: a first-call demand larger than its equal share can borrow only observed remaining discovery capacity
+ok 143 - a first-call demand larger than its equal share can borrow only observed remaining discovery capacity
+  ---
+  duration_ms: 12.638167
+  type: 'test'
+  ...
+# Subtest: a genuine contract revert still refuses approval after bounded same-program allocation checks
+ok 144 - a genuine contract revert still refuses approval after bounded same-program allocation checks
+  ---
+  duration_ms: 4.841709
+  type: 'test'
+  ...
+# Subtest: later calls recover from reserved intrinsic floors through bounded complete discovery replays
+ok 145 - later calls recover from reserved intrinsic floors through bounded complete discovery replays
+  ---
+  duration_ms: 31.228916
+  type: 'test'
+  ...
+# Subtest: missing pre-refund evidence prevents allocation and a later metadata mismatch still blocks it
+ok 146 - missing pre-refund evidence prevents allocation and a later metadata mismatch still blocks it
+  ---
+  duration_ms: 11.379375
+  type: 'test'
+  ...
+# Subtest: cancellation during budget redistribution discards late results and never reaches strict approval
+ok 147 - cancellation during budget redistribution discards late results and never reaches strict approval
+  ---
+  duration_ms: 5.231334
+  type: 'test'
+  ...
+# Subtest: paid estimate uses the explicit approved pool entry point, not the legacy simulation-only factory
+ok 148 - paid estimate uses the explicit approved pool entry point, not the legacy simulation-only factory
+  ---
+  duration_ms: 0.539834
+  type: 'test'
+  ...
+# Subtest: an explicit measured whole-request budget bounds every complete 14-call discovery replay
+ok 149 - an explicit measured whole-request budget bounds every complete 14-call discovery replay
+  ---
+  duration_ms: 14.130625
+  type: 'test'
+  ...
+# Subtest: an unprofiled later envelope remainder cannot authorize whole-request allocation
+ok 150 - an unprofiled later envelope remainder cannot authorize whole-request allocation
+  ---
+  duration_ms: 3.730458
+  type: 'test'
+  ...
+# Subtest: project multi-block clamp diagnostics retain the exact request and cumulative position
+ok 151 - project multi-block clamp diagnostics retain the exact request and cumulative position
+  ---
+  duration_ms: 2.097792
+  type: 'test'
+  ...
+# Subtest: shared discovery never reduces a measured margin, accepts a strict clamp or ignores complete metadata
+ok 152 - shared discovery never reduces a measured margin, accepts a strict clamp or ignores complete metadata
+  ---
+  duration_ms: 40.266917
+  type: 'test'
+  ...
+# {"kind":"synthetic-production-size-path","failureKind":"provider-limit","httpStatus":503,"gasCapacityScope":"request-bytes","projectAttempts":1,"requestBytes":[1057498],"callsPerAttempt":[45]}
+# Subtest: shared discovery and a rejected 60M public-read ceiling preserve the strictly measured transactions
+ok 153 - shared discovery and a rejected 60M public-read ceiling preserve the strictly measured transactions
+  ---
+  duration_ms: 6.931958
+  type: 'test'
+  ...
+# Subtest: chain-keyed configured pool qualifies Ethereum and Sepolia without sharing a chain identity
+ok 154 - chain-keyed configured pool qualifies Ethereum and Sepolia without sharing a chain identity
+  ---
+  duration_ms: 3.220708
+  type: 'test'
+  ...
+# Subtest: measured profiles prefer approved request headroom while retaining every dependent call and byte
+ok 155 - measured profiles prefer approved request headroom while retaining every dependent call and byte
+  ---
+  duration_ms: 2.422584
+  type: 'test'
+  ...
+# Subtest: selected capacity failure keeps its originating provider rather than the last failed candidate
+ok 156 - selected capacity failure keeps its originating provider rather than the last failed candidate
+  ---
+  duration_ms: 2.027917
+  type: 'test'
+  ...
+# Subtest: measured capacity rejection identifies its selected provider without inventing a returned envelope
+ok 157 - measured capacity rejection identifies its selected provider without inventing a returned envelope
+  ---
+  duration_ms: 0.438958
+  type: 'test'
+  ...
+# Subtest: cumulative exhaustion falls back as a complete ordered program despite each call fitting the request cap
+ok 158 - cumulative exhaustion falls back as a complete ordered program despite each call fitting the request cap
+  ---
+  duration_ms: 39.580834
+  type: 'test'
+  ...
+# Subtest: a gas-envelope sum above a measured Geth request cap still permits a cheap complete program
+ok 159 - a gas-envelope sum above a measured Geth request cap still permits a cheap complete program
+  ---
+  duration_ms: 3.703458
+  type: 'test'
+  ...
+# Subtest: distinct provider transaction, block, byte and block-count limits select another approved full-program validator
+ok 160 - distinct provider transaction, block, byte and block-count limits select another approved full-program validator
+  ---
+  duration_ms: 8.055333
+  type: 'test'
+  ...
+# Subtest: profiles cannot approve an indexed recipient or silently change chain or mutable limits
+ok 161 - profiles cannot approve an indexed recipient or silently change chain or mutable limits
+  ---
+  duration_ms: 5.035417
+  type: 'test'
+  ...
+# Subtest: a measured high-capacity backend still refuses stale heads, changed pins and wrong chain before project disclosure
+ok 162 - a measured high-capacity backend still refuses stale heads, changed pins and wrong chain before project disclosure
+  ---
+  duration_ms: 4.684875
+  type: 'test'
+  ...
+# Subtest: no compatible validator reports an honest infrastructure failure and leaves large content and strict gas intact
+ok 163 - no compatible validator reports an honest infrastructure failure and leaves large content and strict gas intact
+  ---
+  duration_ms: 59.899709
+  type: 'test'
+  ...
+# Subtest: a later cumulative remainder does not disable the same provider for a smaller unchanged program
+ok 164 - a later cumulative remainder does not disable the same provider for a smaller unchanged program
+  ---
+  duration_ms: 4.726417
+  type: 'test'
+  ...
+# Subtest: explicit request-budget exhaustion falls back without guessing the cap or splitting dependent state
+ok 165 - explicit request-budget exhaustion falls back without guessing the cap or splitting dependent state
+  ---
+  duration_ms: 10.0955
+  type: 'test'
+  ...
+# Subtest: stale measured capacity does not disable an intrinsically valid program after a provider upgrade
+ok 166 - stale measured capacity does not disable an intrinsically valid program after a provider upgrade
+  ---
+  duration_ms: 2.80125
+  type: 'test'
+  ...
+# Subtest: profiles that expire during a reused transport cause fresh exact qualification on the next phase
+ok 167 - profiles that expire during a reused transport cause fresh exact qualification on the next phase
+  ---
+  duration_ms: 2.02825
+  type: 'test'
+  ...
+# Subtest: fallback replays dependent state from the beginning, never a successful-prefix continuation
+ok 168 - fallback replays dependent state from the beginning, never a successful-prefix continuation
+  ---
+  duration_ms: 3.270167
+  type: 'test'
+  ...
+# Subtest: an observed earlier provider cap also expires and requalifies after infrastructure recovery
+ok 169 - an observed earlier provider cap also expires and requalifies after infrastructure recovery
+  ---
+  duration_ms: 2.763958
+  type: 'test'
+  ...
+# Subtest: only typed request-capacity evidence permits -38026 fallback; transaction validation and ambiguous client errors remain terminal
+ok 170 - only typed request-capacity evidence permits -38026 fallback; transaction validation and ambiguous client errors remain terminal
+  ---
+  duration_ms: 20.0795
+  type: 'test'
+  ...
+# Subtest: configured reader standalone estimates require explicit admission and never enable stateful simulation
+ok 171 - configured reader standalone estimates require explicit admission and never enable stateful simulation
+  ---
+  duration_ms: 0.274125
+  type: 'test'
+  ...
+# Subtest: existing configured loopback and full reader calldata require explicit bounded admission without rerouting
+ok 172 - existing configured loopback and full reader calldata require explicit bounded admission without rerouting
+  ---
+  duration_ms: 4.861625
+  type: 'test'
+  ...
+# Subtest: explicit existing server transport identities preserve private HTTP reads without opening or disclosing a route
+ok 173 - explicit existing server transport identities preserve private HTTP reads without opening or disclosing a route
+  ---
+  duration_ms: 0.319458
+  type: 'test'
+  ...
+# Subtest: configured root URLs keep distinct credential identities without exposing them to observers
+ok 174 - configured root URLs keep distinct credential identities without exposing them to observers
+  ---
+  duration_ms: 0.390709
+  type: 'test'
+  ...
+# Subtest: rate/access diagnostics survive approved whole-program failover without shopping deterministic rejections
+ok 175 - rate/access diagnostics survive approved whole-program failover without shopping deterministic rejections
+  ---
+  duration_ms: 29.597375
+  type: 'test'
+  ...
+# Subtest: public probes use bounded Amsterdam base gas without lowering exact project envelopes
+ok 176 - public probes use bounded Amsterdam base gas without lowering exact project envelopes
+  ---
+  duration_ms: 4.807708
+  type: 'test'
+  ...
+# Subtest: 200 small calls succeed while a fixed 45-call program fails only after its serialized bytes cross the synthetic HTTP boundary
+ok 177 - 200 small calls succeed while a fixed 45-call program fails only after its serialized bytes cross the synthetic HTTP boundary
+  ---
+  duration_ms: 49.494459
+  type: 'test'
+  ...
+# Subtest: exact serialized HTTP boundary keeps every dependent call and permits only approved identical-program failover
+ok 178 - exact serialized HTTP boundary keeps every dependent call and permits only approved identical-program failover
+  ---
+  duration_ms: 3.958875
+  type: 'test'
+  ...
+# Subtest: HTTP503 byte capacity permits only approved identical 45-call fallback and never a same-recipient retry
+ok 179 - HTTP503 byte capacity permits only approved identical 45-call fallback and never a same-recipient retry
+  ---
+  duration_ms: 26.997667
+  type: 'test'
+  ...
+# Subtest: HTTP503 deterministic RPC rejections never shop for another provider despite capacity prose
+ok 180 - HTTP503 deterministic RPC rejections never shop for another provider despite capacity prose
+  ---
+  duration_ms: 7.248834
+  type: 'test'
+  ...
+# Subtest: cancelling after a body-capacity rejection prevents fallback dispatch
+ok 181 - cancelling after a body-capacity rejection prevents fallback dispatch
+  ---
+  duration_ms: 2.020334
+  type: 'test'
+  ...
+# Subtest: body-capacity fallback shares the complete-request deadline and discards a late unchanged response
+ok 182 - body-capacity fallback shares the complete-request deadline and discards a late unchanged response
+  ---
+  duration_ms: 373.04825
+  type: 'test'
+  ...
+# Subtest: HTTP 429 rotates, honors Retry-After across calls, and redacts keyed paths
+ok 183 - HTTP 429 rotates, honors Retry-After across calls, and redacts keyed paths
+  ---
+  duration_ms: 15.752083
+  type: 'test'
+  ...
+# Subtest: JSON rate limit and exhaustion return actionable setup without provider messages/secrets
+ok 184 - JSON rate limit and exhaustion return actionable setup without provider messages/secrets
+  ---
+  duration_ms: 1.350417
+  type: 'test'
+  ...
+# Subtest: wrong-chain provider is disabled before contract reads and fallback identity is pinned
+ok 185 - wrong-chain provider is disabled before contract reads and fallback identity is pinned
+  ---
+  duration_ms: 2.273834
+  type: 'test'
+  ...
+# Subtest: known old receipt falls back on null; pending null stays valid but cannot satisfy required evidence
+ok 186 - known old receipt falls back on null; pending null stays valid but cannot satisfy required evidence
+  ---
+  duration_ms: 1.315042
+  type: 'test'
+  ...
+# Subtest: deterministic revert does not rotate and adapter preserves probe error; wallet calls are refused
+ok 187 - deterministic revert does not rotate and adapter preserves probe error; wallet calls are refused
+  ---
+  duration_ms: 0.814083
+  type: 'test'
+  ...
+# Subtest: individual paced requests replace provider-incompatible JSON-RPC batches
+ok 188 - individual paced requests replace provider-incompatible JSON-RPC batches
+  ---
+  duration_ms: 60.421875
+  type: 'test'
+  ...
+# Subtest: invalid/oversized responses fail over; caller cancellation never contacts another provider
+ok 189 - invalid/oversized responses fail over; caller cancellation never contacts another provider
+  ---
+  duration_ms: 0.783208
+  type: 'test'
+  ...
+# Subtest: private configuration precedence, keyed HTTPS paths, validation and bounded file loading
+ok 190 - private configuration precedence, keyed HTTPS paths, validation and bounded file loading
+  ---
+  duration_ms: 404.633083
+  type: 'test'
+  ...
+# Subtest: MCP loads workspace providers and returns redacted structured setup instructions on exhaustion
+ok 191 - MCP loads workspace providers and returns redacted structured setup instructions on exhaustion
+  ---
+  duration_ms: 196.317583
+  type: 'test'
+  ...
+# Subtest: JSON 429 honors Retry-After and concurrent reads cannot escape cooldown
+ok 192 - JSON 429 honors Retry-After and concurrent reads cannot escape cooldown
+  ---
+  duration_ms: 12.530584
+  type: 'test'
+  ...
+# Subtest: timeout fails over and preserves an exact keyed provider path including its trailing slash
+ok 193 - timeout fails over and preserves an exact keyed provider path including its trailing slash
+  ---
+  duration_ms: 0.579375
+  type: 'test'
+  ...
+# Subtest: an explicit chain-ID recheck is fresh and fails if the provider changes networks
+ok 194 - an explicit chain-ID recheck is fresh and fails if the provider changes networks
+  ---
+  duration_ms: 0.249541
+  type: 'test'
+  ...
+# Subtest: MCP error mapper shares bounded intrinsic-minimum diagnostics without exposing injected private fields
+ok 195 - MCP error mapper shares bounded intrinsic-minimum diagnostics without exposing injected private fields
+  ---
+  duration_ms: 2.911125
+  type: 'test'
+  ...
+# Subtest: operator 429/-32005 and chain-ID 403 diagnostics survive wrappers, cooldown and disabled-provider retries
+ok 196 - operator 429/-32005 and chain-ID 403 diagnostics survive wrappers, cooldown and disabled-provider retries
+  ---
+  duration_ms: 1.718667
+  type: 'test'
+  ...
+# Subtest: non-OK diagnostics retain only bounded correlated integer codes, never an HTML or oversized error body
+ok 197 - non-OK diagnostics retain only bounded correlated integer codes, never an HTML or oversized error body
+  ---
+  duration_ms: 0.912416
+  type: 'test'
+  ...
+# Subtest: HTTP-200 RPC rate/access errors retain their observed status and code
+ok 198 - HTTP-200 RPC rate/access errors retain their observed status and code
+  ---
+  duration_ms: 0.692625
+  type: 'test'
+  ...
+# Subtest: concurrent reads stop at the first access restriction after chain identity was cached
+ok 199 - concurrent reads stop at the first access restriction after chain identity was cached
+  ---
+  duration_ms: 0.299209
+  type: 'test'
+  ...
+1..199
+# tests 199
+# suites 0
+# pass 199
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 9132.24525

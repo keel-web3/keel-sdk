@@ -1,0 +1,89 @@
+{
+  "schema": "keel.private-rpc-fallback-local-evidence@1",
+  "sourceCommit": "6f4f5cd1ee9a8b8ce14aecc60e26f84f19180f94",
+  "baseCommit": "848a640afab90502e43bd750a7d930d9d0591244",
+  "node": "v22.22.1",
+  "typescript": "5.9.3",
+  "finalScoped": {
+    "files": 9,
+    "tests": 199,
+    "pass": 199,
+    "fail": 0,
+    "skipped": 0,
+    "cancelled": 0,
+    "exitCode": 0
+  },
+  "expandedRunnerClient": {
+    "pass": 199,
+    "fail": 13,
+    "exitCode": 1,
+    "failure": "Unix-socket-listen-EPERM-in-sandbox"
+  },
+  "reviewApproved": false,
+  "releaseApproved": false,
+  "hostOperations": 0,
+  "providerRequests": 0,
+  "credentialsAccessed": false,
+  "files": {
+    "native/proof-executor/state-reader.mjs": {
+      "bytes": 8575,
+      "sha256": "5b329a8c0dbcef16114245cee1e2c4df801c96b473b2807447266c4cbeeca3c0"
+    },
+    "packages/sdk/src/rpc.ts": {
+      "bytes": 39426,
+      "sha256": "8c2837a3d522190493fce82f25f4919b1bbe9e7ef55bb7b4a966f46759907317"
+    },
+    "tests/proof-state-reader-fallback-safety.test.mjs": {
+      "bytes": 7465,
+      "sha256": "caaae3f2562a69c98ca4a04190ff5324ebd9e8254c8bc3160ca634aaf7b5f0c6"
+    },
+    "packages/sdk/dist/rpc.js": {
+      "bytes": 37666,
+      "sha256": "78671c4822e0f44fb2293f2912017b177f54ee719337aef090eb7444e2f82db2"
+    },
+    "packages/sdk/dist/proof-runtime/state-reader.js": {
+      "bytes": 8533,
+      "sha256": "42e934cc74525d5dddff33417e90942b31b9524ad35a0739e5442bd7f12b62e3"
+    },
+    "docs/reviews/private-rpc-fallback-20261022/after-focused-controls.log": {
+      "bytes": 10181,
+      "sha256": "3dd6302cc38431a9f085653e9924c80f7a7ef8714b3ddc9e6cb663248db96316"
+    },
+    "docs/reviews/private-rpc-fallback-20261022/after-focused-local-links-controls.log": {
+      "bytes": 9663,
+      "sha256": "8ea1fff477bfaa7e600e3963f51d93329ee4045d69e21bf6c054e1f340e09969"
+    },
+    "docs/reviews/private-rpc-fallback-20261022/after-runtime-controls.log": {
+      "bytes": 14043,
+      "sha256": "404ce393fb8926c531904ffdeb28ec68f3e845bfa7cc030fb6311be515a5bace"
+    },
+    "docs/reviews/private-rpc-fallback-20261022/before-final-safety-controls.log": {
+      "bytes": 15426,
+      "sha256": "404e390287e58ed0a0618b5092f27fd81f4d09418b40340ce00a6b56a8368a86"
+    },
+    "docs/reviews/private-rpc-fallback-20261022/before-safety-controls.log": {
+      "bytes": 12446,
+      "sha256": "4a9018cb49dcb818ecaa3272d74c23c78bf0782340d79765e41beb1371fab8b0"
+    },
+    "docs/reviews/private-rpc-fallback-20261022/final-focused-controls.log": {
+      "bytes": 20847,
+      "sha256": "95c3d69067bf8032acdf8c8744a416e0569024393a7acef3b72a348894430eb3"
+    },
+    "docs/reviews/private-rpc-fallback-20261022/final-node22-controls.log": {
+      "bytes": 63914,
+      "sha256": "461264a7a2eea1a83175a6214a610adb7de9c3dc6ea405dd54f93e4cdf4ab29b"
+    },
+    "docs/reviews/private-rpc-fallback-20261022/final-node22-focused-controls.log": {
+      "bytes": 48829,
+      "sha256": "ff3cab93345a8677ae6bd2b919916860d86e6c4bc32c44721edc7305ff0341cc"
+    },
+    "docs/reviews/private-rpc-fallback-20261022/baseline-final-controls.mjs": {
+      "bytes": 7515,
+      "sha256": "6eab702012f750593d8611bb81565001ccdb97090ef29ea00647d5c8dc20e74f"
+    },
+    "docs/reviews/private-rpc-fallback-20261022/README.md": {
+      "bytes": 6000,
+      "sha256": "33efa674a8da4eae363d01522d585eca4aaecca4171aae68393c4666e37bb56a"
+    }
+  }
+}

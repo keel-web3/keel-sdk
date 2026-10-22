@@ -1,0 +1,289 @@
+✔ HTTP401 with empty body is terminal without a second recipient or warmed retry (32.493209ms)
+✖ HTTP401 with rate-limit body is terminal without a second recipient or warmed retry (2.416375ms)
+✖ HTTP401 with capability body is terminal without a second recipient or warmed retry (1.123625ms)
+✔ HTTP401 with malformed body is terminal without a second recipient or warmed retry (0.837417ms)
+✔ HTTP403 with empty body is terminal without a second recipient or warmed retry (0.89725ms)
+✖ HTTP403 with rate-limit body is terminal without a second recipient or warmed retry (0.687125ms)
+✖ HTTP403 with capability body is terminal without a second recipient or warmed retry (1.033333ms)
+✔ HTTP403 with malformed body is terminal without a second recipient or warmed retry (0.392042ms)
+✖ malformed JSON is terminal without another recipient (0.710959ms)
+✖ stale response identity is terminal without another recipient (0.555542ms)
+✖ missing result is terminal without another recipient (0.492416ms)
+✖ unknown RPC error is terminal without another recipient (0.457042ms)
+✖ invalid parameters is terminal without another recipient (0.898334ms)
+✖ genuine revert is terminal without another recipient (0.624667ms)
+✖ revert prose with rate-limit wording is terminal without another recipient (0.482958ms)
+✖ RPC401 with rate-limit wording is terminal without another recipient (0.453625ms)
+✖ RPC403 with rate-limit wording is terminal without another recipient (0.487333ms)
+✖ generic HTTP404 is terminal without another recipient (0.558292ms)
+✖ generic HTTP503 is terminal without another recipient (0.44675ms)
+✖ unknown transport error is terminal without another recipient (0.5175ms)
+✖ missing pinned proof is terminal without another recipient (0.373209ms)
+✖ wrong chain stops before address/key disclosure or another recipient (0.350875ms)
+✔ canonical mismatch stops before address/key disclosure or another recipient (0.178375ms)
+✔ HTTP429 permits only an approved ordered fallback at the exact block (1.302208ms)
+✔ explicit RPC rate-limit permits only an approved ordered fallback at the exact block (1.909625ms)
+✔ unsupported method permits only an approved ordered fallback at the exact block (0.467709ms)
+✔ unsupported capability permits only an approved ordered fallback at the exact block (0.534458ms)
+✔ explicit timeout permits only an approved ordered fallback at the exact block (0.440166ms)
+✔ HTTP413 body limit permits only an approved ordered fallback at the exact block (0.441291ms)
+✔ bounded response limit permits only an approved ordered fallback at the exact block (3.165583ms)
+✔ healthy free never selects paid; new reader begins free after the prior cooldown expires (1.295958ms)
+✔ fallback recipient credentials alone grant no state-read disclosure (0.321959ms)
+ℹ tests 32
+ℹ suites 0
+ℹ pass 14
+ℹ fail 18
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 353.156625
+
+✖ failing tests:
+
+test at docs/reviews/private-rpc-fallback-20261022/baseline-final-controls.mjs:30:3
+✖ HTTP401 with rate-limit body is terminal without a second recipient or warmed retry (2.416375ms)
+  AssertionError [ERR_ASSERTION]: Missing expected rejection.
+      at async TestContext.<anonymous> (file:///private/tmp/keel-private-rpc-fallback-20261022-01/sdk/docs/reviews/private-rpc-fallback-20261022/baseline-final-controls.mjs:36:7)
+      at async Test.run (node:internal/test_runner/test:1208:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:831:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: undefined,
+    operator: 'rejects',
+    diff: 'simple'
+  }
+
+test at docs/reviews/private-rpc-fallback-20261022/baseline-final-controls.mjs:30:3
+✖ HTTP401 with capability body is terminal without a second recipient or warmed retry (1.123625ms)
+  AssertionError [ERR_ASSERTION]: Missing expected rejection.
+      at async TestContext.<anonymous> (file:///private/tmp/keel-private-rpc-fallback-20261022-01/sdk/docs/reviews/private-rpc-fallback-20261022/baseline-final-controls.mjs:36:7)
+      at async Test.run (node:internal/test_runner/test:1208:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:831:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: undefined,
+    operator: 'rejects',
+    diff: 'simple'
+  }
+
+test at docs/reviews/private-rpc-fallback-20261022/baseline-final-controls.mjs:30:3
+✖ HTTP403 with rate-limit body is terminal without a second recipient or warmed retry (0.687125ms)
+  AssertionError [ERR_ASSERTION]: Missing expected rejection.
+      at async TestContext.<anonymous> (file:///private/tmp/keel-private-rpc-fallback-20261022-01/sdk/docs/reviews/private-rpc-fallback-20261022/baseline-final-controls.mjs:36:7)
+      at async Test.run (node:internal/test_runner/test:1208:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:831:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: undefined,
+    operator: 'rejects',
+    diff: 'simple'
+  }
+
+test at docs/reviews/private-rpc-fallback-20261022/baseline-final-controls.mjs:30:3
+✖ HTTP403 with capability body is terminal without a second recipient or warmed retry (1.033333ms)
+  AssertionError [ERR_ASSERTION]: Missing expected rejection.
+      at async TestContext.<anonymous> (file:///private/tmp/keel-private-rpc-fallback-20261022-01/sdk/docs/reviews/private-rpc-fallback-20261022/baseline-final-controls.mjs:36:7)
+      at async Test.run (node:internal/test_runner/test:1208:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:831:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: undefined,
+    operator: 'rejects',
+    diff: 'simple'
+  }
+
+test at docs/reviews/private-rpc-fallback-20261022/baseline-final-controls.mjs:60:42
+✖ malformed JSON is terminal without another recipient (0.710959ms)
+  AssertionError [ERR_ASSERTION]: Missing expected rejection.
+      at async TestContext.<anonymous> (file:///private/tmp/keel-private-rpc-fallback-20261022-01/sdk/docs/reviews/private-rpc-fallback-20261022/baseline-final-controls.mjs:63:19)
+      at async Test.run (node:internal/test_runner/test:1208:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:831:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: undefined,
+    operator: 'rejects',
+    diff: 'simple'
+  }
+
+test at docs/reviews/private-rpc-fallback-20261022/baseline-final-controls.mjs:60:42
+✖ stale response identity is terminal without another recipient (0.555542ms)
+  AssertionError [ERR_ASSERTION]: Missing expected rejection.
+      at async TestContext.<anonymous> (file:///private/tmp/keel-private-rpc-fallback-20261022-01/sdk/docs/reviews/private-rpc-fallback-20261022/baseline-final-controls.mjs:63:19)
+      at async Test.run (node:internal/test_runner/test:1208:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:831:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: undefined,
+    operator: 'rejects',
+    diff: 'simple'
+  }
+
+test at docs/reviews/private-rpc-fallback-20261022/baseline-final-controls.mjs:60:42
+✖ missing result is terminal without another recipient (0.492416ms)
+  AssertionError [ERR_ASSERTION]: Missing expected rejection.
+      at async TestContext.<anonymous> (file:///private/tmp/keel-private-rpc-fallback-20261022-01/sdk/docs/reviews/private-rpc-fallback-20261022/baseline-final-controls.mjs:63:19)
+      at async Test.run (node:internal/test_runner/test:1208:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:831:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: undefined,
+    operator: 'rejects',
+    diff: 'simple'
+  }
+
+test at docs/reviews/private-rpc-fallback-20261022/baseline-final-controls.mjs:60:42
+✖ unknown RPC error is terminal without another recipient (0.457042ms)
+  AssertionError [ERR_ASSERTION]: Missing expected rejection.
+      at async TestContext.<anonymous> (file:///private/tmp/keel-private-rpc-fallback-20261022-01/sdk/docs/reviews/private-rpc-fallback-20261022/baseline-final-controls.mjs:63:19)
+      at async Test.run (node:internal/test_runner/test:1208:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:831:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: undefined,
+    operator: 'rejects',
+    diff: 'simple'
+  }
+
+test at docs/reviews/private-rpc-fallback-20261022/baseline-final-controls.mjs:60:42
+✖ invalid parameters is terminal without another recipient (0.898334ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  
+  4 !== 3
+  
+      at TestContext.<anonymous> (file:///private/tmp/keel-private-rpc-fallback-20261022-01/sdk/docs/reviews/private-rpc-fallback-20261022/baseline-final-controls.mjs:65:12)
+      at async Test.run (node:internal/test_runner/test:1208:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:831:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: 4,
+    expected: 3,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at docs/reviews/private-rpc-fallback-20261022/baseline-final-controls.mjs:60:42
+✖ genuine revert is terminal without another recipient (0.624667ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  
+  4 !== 3
+  
+      at TestContext.<anonymous> (file:///private/tmp/keel-private-rpc-fallback-20261022-01/sdk/docs/reviews/private-rpc-fallback-20261022/baseline-final-controls.mjs:65:12)
+      at async Test.run (node:internal/test_runner/test:1208:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:831:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: 4,
+    expected: 3,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at docs/reviews/private-rpc-fallback-20261022/baseline-final-controls.mjs:60:42
+✖ revert prose with rate-limit wording is terminal without another recipient (0.482958ms)
+  AssertionError [ERR_ASSERTION]: Missing expected rejection.
+      at async TestContext.<anonymous> (file:///private/tmp/keel-private-rpc-fallback-20261022-01/sdk/docs/reviews/private-rpc-fallback-20261022/baseline-final-controls.mjs:63:19)
+      at async Test.run (node:internal/test_runner/test:1208:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:831:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: undefined,
+    operator: 'rejects',
+    diff: 'simple'
+  }
+
+test at docs/reviews/private-rpc-fallback-20261022/baseline-final-controls.mjs:60:42
+✖ RPC401 with rate-limit wording is terminal without another recipient (0.453625ms)
+  AssertionError [ERR_ASSERTION]: Missing expected rejection.
+      at async TestContext.<anonymous> (file:///private/tmp/keel-private-rpc-fallback-20261022-01/sdk/docs/reviews/private-rpc-fallback-20261022/baseline-final-controls.mjs:63:19)
+      at async Test.run (node:internal/test_runner/test:1208:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:831:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: undefined,
+    operator: 'rejects',
+    diff: 'simple'
+  }
+
+test at docs/reviews/private-rpc-fallback-20261022/baseline-final-controls.mjs:60:42
+✖ RPC403 with rate-limit wording is terminal without another recipient (0.487333ms)
+  AssertionError [ERR_ASSERTION]: Missing expected rejection.
+      at async TestContext.<anonymous> (file:///private/tmp/keel-private-rpc-fallback-20261022-01/sdk/docs/reviews/private-rpc-fallback-20261022/baseline-final-controls.mjs:63:19)
+      at async Test.run (node:internal/test_runner/test:1208:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:831:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: undefined,
+    operator: 'rejects',
+    diff: 'simple'
+  }
+
+test at docs/reviews/private-rpc-fallback-20261022/baseline-final-controls.mjs:60:42
+✖ generic HTTP404 is terminal without another recipient (0.558292ms)
+  AssertionError [ERR_ASSERTION]: Missing expected rejection.
+      at async TestContext.<anonymous> (file:///private/tmp/keel-private-rpc-fallback-20261022-01/sdk/docs/reviews/private-rpc-fallback-20261022/baseline-final-controls.mjs:63:19)
+      at async Test.run (node:internal/test_runner/test:1208:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:831:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: undefined,
+    operator: 'rejects',
+    diff: 'simple'
+  }
+
+test at docs/reviews/private-rpc-fallback-20261022/baseline-final-controls.mjs:60:42
+✖ generic HTTP503 is terminal without another recipient (0.44675ms)
+  AssertionError [ERR_ASSERTION]: Missing expected rejection.
+      at async TestContext.<anonymous> (file:///private/tmp/keel-private-rpc-fallback-20261022-01/sdk/docs/reviews/private-rpc-fallback-20261022/baseline-final-controls.mjs:63:19)
+      at async Test.run (node:internal/test_runner/test:1208:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:831:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: undefined,
+    operator: 'rejects',
+    diff: 'simple'
+  }
+
+test at docs/reviews/private-rpc-fallback-20261022/baseline-final-controls.mjs:60:42
+✖ unknown transport error is terminal without another recipient (0.5175ms)
+  AssertionError [ERR_ASSERTION]: Missing expected rejection.
+      at async TestContext.<anonymous> (file:///private/tmp/keel-private-rpc-fallback-20261022-01/sdk/docs/reviews/private-rpc-fallback-20261022/baseline-final-controls.mjs:63:19)
+      at async Test.run (node:internal/test_runner/test:1208:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:831:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: undefined,
+    operator: 'rejects',
+    diff: 'simple'
+  }
+
+test at docs/reviews/private-rpc-fallback-20261022/baseline-final-controls.mjs:60:42
+✖ missing pinned proof is terminal without another recipient (0.373209ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  
+  4 !== 3
+  
+      at TestContext.<anonymous> (file:///private/tmp/keel-private-rpc-fallback-20261022-01/sdk/docs/reviews/private-rpc-fallback-20261022/baseline-final-controls.mjs:65:12)
+      at async Test.run (node:internal/test_runner/test:1208:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:831:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: 4,
+    expected: 3,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at docs/reviews/private-rpc-fallback-20261022/baseline-final-controls.mjs:72:4
+✖ wrong chain stops before address/key disclosure or another recipient (0.350875ms)
+  AssertionError [ERR_ASSERTION]: Missing expected rejection.
+      at async TestContext.<anonymous> (file:///private/tmp/keel-private-rpc-fallback-20261022-01/sdk/docs/reviews/private-rpc-fallback-20261022/baseline-final-controls.mjs:74:9)
+      at async Test.run (node:internal/test_runner/test:1208:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:831:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: undefined,
+    expected: undefined,
+    operator: 'rejects',
+    diff: 'simple'
+  }
