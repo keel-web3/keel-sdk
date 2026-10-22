@@ -13,6 +13,16 @@ function cacheable(method,params,result) {
   return nodes(result.accountProof)&&result.accountProof.length>0&&Array.isArray(result.storageProof)&&result.storageProof.length===params[1].length
     &&result.storageProof.every(item=>item&&typeof item==='object'&&!Array.isArray(item)&&nodes(item.proof));
 }
+function retryableStateSource(error) {
+  if(!(error instanceof KeelRpcSetupError))return error?.code===-32601||error?.code===4200;
+  const d=error.diagnostic;
+  if(error.reason==='access-denied'||error.reason==='wrong-chain'||d?.httpStatus===401||d?.httpStatus===403)return false;
+  // Only observed retry classes may disclose address/key reads to an alternative.
+  // Malformed envelopes, unknown RPC/transport errors and missing pinned state
+  // are ambiguous safety failures, not authority to shop another recipient.
+  return error.reason==='rate-limited'||d?.transportFailure==='timeout'
+    ||d?.rpcCode===-32601||d?.rpcCode===4200||d?.httpStatus===413||d?.responseFailure==='response-too-large';
+}
 export function createApprovedProofStateReader({rpcUrls,approvedStateRpcUrls,block,fetchImpl,minIntervalMs=250,onAttempt}) {
   const configured=[...new Set(rpcUrls.map(url=>normalizeKeelRpcUrl(url)))];
   const approved=new Set(approvedStateRpcUrls.map(url=>normalizeKeelRpcUrl(url)));
@@ -88,12 +98,11 @@ export function createApprovedProofStateReader({rpcUrls,approvedStateRpcUrls,blo
           return result;
         }catch(error){
           invalidate();
-          if(error?.reason==='access-denied'||error instanceof KeelPublicationSimulationError&&error.kind==='chain-reorganized')terminalFailure??=keelSimulationTransportFailure(error);
           available(combined);
           // Never retry an invalid proof, transaction, request or reorg against
           // another provider. Only source availability/capability can select an
           // already-approved alternative. The pool retains cooldowns/restrictions.
-          if(!(error instanceof KeelRpcSetupError)&&error?.code!==-32601)throw keelSimulationTransportFailure(error);
+          if(!retryableStateSource(error)){terminalFailure??=keelSimulationTransportFailure(error);throw terminalFailure;}
           last=keelSimulationTransportFailure(error);qualified.delete(index);
           try{onAttempt?.({candidateIndex:index,...last.diagnostic});}catch{/* Observers cannot alter a read. */}
         }
