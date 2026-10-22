@@ -64,3 +64,7 @@ test('actual AV1 AVIF default infinite repeat remains supported; finite or incon
  const badFlags=rewrite(avif.bytes,['moov','trak','edts','elst'],b=>{b[11]=3;return b});
  for(const bytes of [finite,badFlags]){await assert.rejects(prepareMediaCandidate({bytes,recipe:{...recipe,format:'mp4'}}),/AVIF|repeat|flags|edit|semantics/i);await nativeExact(bytes);}
 });
+test('exact retained extended movie duration cannot add an unmodelled tail to complete unchanged tracks',async()=>{
+ const bytes=new Uint8Array(await readFile(new URL('../docs/review/temporal-edit-list-20261022/movie-tail-before-fix.mp4',import.meta.url)));
+ await assert.rejects(prepareMediaCandidate({bytes,recipe}),/movie duration|track|edit-list|bounds/i);await nativeExact(bytes);
+});
