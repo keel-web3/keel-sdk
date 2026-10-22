@@ -7,6 +7,12 @@ export interface MovieAudioTimeline {
   readonly runs:readonly {readonly count:bigint;readonly duration:bigint}[];
 }
 
+/** Internal native preview geometry; never a converted-carrier proof. */
+export interface MovieNativeDisplay {
+  readonly codedWidth:number;readonly codedHeight:number;readonly width:number;readonly height:number;
+  readonly sampleAspectRatio:{readonly numerator:number;readonly denominator:number};
+}
+
 /** Conservative admission for the presentation semantics which RGBA hashes do
  * not contain. This is intentionally a small supported ISO profile, not a
  * metadata stripper or a general movie normalizer. Unsupported media stays
@@ -17,10 +23,13 @@ export interface MovieAudioTimeline {
  * https://github.com/FFmpeg/FFmpeg/blob/n6.1.1/libavformat/mov.c
  * https://aomediacodec.github.io/av1-avif/v1.2.0.html
  */
-export function assertMoviePresentationSemantics(bytes: Uint8Array, inputReport: string, selectedStream: string, width: number, height: number): { readonly srgbFull: boolean; readonly videoTimeline: {readonly samples:bigint; readonly scale:bigint; readonly duration:bigint}; readonly audioTimeline?:MovieAudioTimeline } {
+export function assertMoviePresentationSemantics(bytes: Uint8Array, inputReport: string, selectedStream: string, width: number, height: number,purpose:"fidelity"|"native-inspection"="fidelity"): { readonly nativeDisplay?:MovieNativeDisplay;readonly nativeCreatorTitle?:boolean;readonly srgbFull: boolean; readonly videoTimeline: {readonly samples:bigint; readonly scale:bigint; readonly duration:bigint}; readonly audioTimeline?:MovieAudioTimeline } {
   const retain = (reason: string): never => { throw new TypeError(`Movie ${reason} require an exact preserving adapter; native media is retained.`); };
+  const native=purpose==="native-inspection",reportedTitles:string[]=[];
   const sar = /\[SAR (\d+):(\d+) DAR (\d+):(\d+)\]/u.exec(selectedStream);
-  if (sar && (BigInt(sar[1]!) <= 0n || BigInt(sar[1]!) !== BigInt(sar[2]!) || BigInt(sar[3]!) * BigInt(height) !== BigInt(sar[4]!) * BigInt(width)) || !sar && /\[(?:SAR|DAR)/u.test(selectedStream)) retain("sample/display aspect ratio semantics");
+  if(!native) {
+    if (sar && (BigInt(sar[1]!) <= 0n || BigInt(sar[1]!) !== BigInt(sar[2]!) || BigInt(sar[3]!) * BigInt(height) !== BigInt(sar[4]!) * BigInt(width)) || !sar && /\[(?:SAR|DAR)/u.test(selectedStream)) retain("sample/display aspect ratio semantics");
+  }else if(sar?Array.from(sar).slice(1).some(value=>BigInt(value)<=0n):/\[(?:SAR|DAR)/u.test(selectedStream))retain("unavailable native sample/display aspect ratio");
   // Autorotation can bake a matrix into pixels without preserving the original
   // display geometry. No side-data semantics are discarded by this adapter.
   if (/Side data:|displaymatrix|rotation of|rotate\s*:/iu.test(inputReport)) retain("display transform or side-data semantics");
@@ -35,6 +44,7 @@ export function assertMoviePresentationSemantics(bytes: Uint8Array, inputReport:
     const field = /^\s{4,}([^:]+?)\s*:\s*(.*)$/u.exec(line);
     if (!field) { if (line.trim()) metadata = false; continue; }
     const key=field[1]!.trim(), value=field[2]!.trim();
+    if(native&&key==="title"){reportedTitles.push(value);continue;}
     if (["major_brand","minor_version","compatible_brands"].includes(key)) continue;
     if (key === "encoder" && /^(?:Lavf\d+\.\d+\.\d+|Lavc\d+\.\d+\.\d+(?: [A-Za-z0-9_.-]+)?)$/u.test(value)) continue;
     if (key === "handler_name" && ["VideoHandler","SoundHandler","PictureHandler"].includes(value) || key === "vendor_id" && ["[0][0][0][0]","FFMP"].includes(value)) continue;
@@ -49,10 +59,11 @@ export function assertMoviePresentationSemantics(bytes: Uint8Array, inputReport:
   type Box = {kind:string; start:number; end:number};
   type Clock = {scale:bigint; duration:bigint};
   type Edit = {flags:number; duration:bigint; mediaTime:bigint};
-  type Track = {duration?:bigint; media?:Clock; edit?:Edit; video?:boolean; codec?:string; timing?:{duration:bigint;samples:bigint;runs:{count:bigint;duration:bigint}[]}; compositionSamples?:bigint; encodedSamples?:bigint; audio?:{sampleRate:number;channels:number}; aac?:{sampleRate:number;channels:number}; channelLayout?:number};
+  type Track = {duration?:bigint; media?:Clock; edit?:Edit; video?:boolean; codec?:string; timing?:{duration:bigint;samples:bigint;runs:{count:bigint;duration:bigint}[]}; compositionSamples?:bigint; encodedSamples?:bigint; audio?:{sampleRate:number;channels:number}; aac?:{sampleRate:number;channels:number}; channelLayout?:number;display?:{width16:bigint;height16:bigint};coded?:{width:number;height:number};aspect?:{numerator:bigint;denominator:bigint}};
   let count=0, movieHeaders=0, videoHeaders=0, srgbFull=false;
   let movie:Clock|undefined, avifItems=0, avifExtents=0;
-  const tracks:Track[]=[], avifConfigs:Uint8Array[]=[];
+  const tracks:Track[]=[], avifConfigs:Uint8Array[]=[],nativeTitles:string[]=[];
+  let majorBrand:string|undefined;
   const clock=(start:number,end:number):Clock=>{
     if(start+4>end || bytes[start]!>1 || (view.getUint32(start)&0xffffff)!==0)retain("unknown edit-list reference clock version or flags");
     const version=bytes[start]!,at=start+(version===1?20:12),size=version===1?8:4;
@@ -103,7 +114,7 @@ export function assertMoviePresentationSemantics(bytes: Uint8Array, inputReport:
     moov:["mvhd","trak","udta","iods"],trak:["tkhd","edts","mdia","udta"],edts:["elst"],
     mdia:["mdhd","hdlr","minf"],minf:["vmhd","smhd","hdlr","dinf","stbl"],dinf:["dref"],
     stbl:["stsd","stts","ctts","stss","stsc","stsz","stco","co64","sdtp","sgpd","sbgp"],
-    udta:["meta","\u00a9swr"],meta:["hdlr","ilst","pitm","iloc","iinf","iprp"],ilst:["\u00a9too"],
+    udta:["meta","\u00a9swr"],meta:["hdlr","ilst","pitm","iloc","iinf","iprp"],ilst:["\u00a9too",...(native?["\u00a9nam"]:[])],
     iprp:["ipco","ipma"],ipco:["ispe","pixi","av1C","colr","pasp"],
     visual:["avcC","hvcC","av1C","vpcC","pasp","btrt","colr","fiel","ccst"],
     audio:["esds","btrt","chan","wave","glbl","pcmC"],wave:["frma","enda","mp4a","esds","glbl","\0\0\0\0"],
@@ -116,8 +127,12 @@ export function assertMoviePresentationSemantics(bytes: Uint8Array, inputReport:
       const {kind,start:a,end:z}=box;
       if(!allowed[parent]?.includes(kind))retain(`unsupported ${parent}/${kind} metadata, aperture or presentation semantics`);
       if(["mvhd","tkhd","mdia","mdhd","minf","stbl","edts","elst","stts","ctts","stsz","stsd","colr","pasp","meta","iinf","iprp"].includes(kind)&&seen.has(kind))retain("duplicate presentation, edit-list or sample metadata semantics");
+      if(native&&["udta","ilst","\u00a9nam"].includes(kind)&&seen.has(kind))retain("duplicate native creator metadata containers");
       seen.add(kind);
-      if(kind==="trak") {
+      if(native&&kind==="ftyp") {
+        if(parent!=="root"||a!==8||z-a<8||(z-a)%4||majorBrand!==undefined)retain("incomplete native file-type profile");
+        majorBrand=text(a);
+      }else if(kind==="trak") {
         const nested:Track={};tracks.push(nested);walk(a,z,kind,depth+1,nested);
       } else if(kind==="edts") {
         const entries=boxes(a,z);
@@ -178,7 +193,11 @@ export function assertMoviePresentationSemantics(bytes: Uint8Array, inputReport:
           const owner=track??retain("track header outside its edit-list scope");
           owner.duration=version===1?view.getBigUint64(a+28):BigInt(view.getUint32(a+20));owner.video=!!(w||h);
           if((view.getUint32(a)&0xffffff)!==3 || view.getInt16(at-8)!==0 || view.getUint16(at-4)!==(w||h?0:256))retain("track enabled, layering or audio-volume semantics");
-          if(w||h){videoHeaders++;if(w!==width*65536 || h!==height*65536)retain("track display geometry semantics");}
+          if(w||h){
+            videoHeaders++;
+            if(native)owner.display={width16:BigInt(w),height16:BigInt(h)};
+            else if(w!==width*65536 || h!==height*65536)retain("track display geometry semantics");
+          }
         }
       } else if(kind==="mdhd") {
         if(a+4>z || bytes[a]!>1)retain("unknown media header metadata semantics");
@@ -186,7 +205,14 @@ export function assertMoviePresentationSemantics(bytes: Uint8Array, inputReport:
         if(languageAt+4>z || bytes.subarray(a+4,a+(version===1?20:12)).some(value=>value!==0) || ![0x55c4,0x7fff].includes(view.getUint16(languageAt)))retain("media creation, modification or language metadata semantics");
         const owner=track??retain("media clock outside its edit-list scope");owner.media=clock(a,z);
       } else if(kind==="pasp") {
-        if(z-a!==8 || view.getUint32(a)===0 || view.getUint32(a)!==view.getUint32(a+4))retain("non-square pixel aspect semantics");
+        if(!native) {
+          if(z-a!==8 || view.getUint32(a)===0 || view.getUint32(a)!==view.getUint32(a+4))retain("non-square pixel aspect semantics");
+        }else {
+          if(z-a!==8 || view.getUint32(a)===0 || view.getUint32(a+4)===0)retain("unavailable native pixel aspect ratio");
+          const numerator=BigInt(view.getUint32(a)),denominator=BigInt(view.getUint32(a+4));
+          if(parent==="visual"&&track?.video){if(track.aspect)retain("duplicate native pixel aspect ratio");track.aspect={numerator,denominator};}
+          else if(numerator!==denominator)retain("unqualified native pixel aspect scope");
+        }
       } else if(kind==="colr") {
         // IEC sRGB, RGB matrix, full range. Anything else (including ICC,
         // unspecified transfer, nclc or HDR) needs a preserving color adapter.
@@ -205,6 +231,12 @@ export function assertMoviePresentationSemantics(bytes: Uint8Array, inputReport:
           if(track)track.codec=entry.kind;
           if(["avc1","avc3","hvc1","hev1","av01","vp09"].includes(entry.kind)) {
             if(entry.start+78>entry.end)retain("incomplete visual sample-entry semantics");
+            if(native){
+              const codedWidth=view.getUint16(entry.start+24),codedHeight=view.getUint16(entry.start+26);
+              const owner=track??retain("native coded raster outside its selected track");
+              if(!owner.video||owner.coded||codedWidth!==width||codedHeight!==height)retain("native coded raster differs from the selected actual stream");
+              owner.coded={width:codedWidth,height:codedHeight};
+            }
             const nameLength=bytes[entry.start+42]!;
             if(nameLength>31 || nameLength && !/^Lavc\d+\.\d+\.\d+ [A-Za-z0-9_.-]+$/u.test(new TextDecoder().decode(bytes.subarray(entry.start+43,entry.start+43+nameLength))))retain("visual compressor/creator metadata semantics");
             walk(entry.start+78,entry.end,"visual",depth+1,track);
@@ -233,6 +265,18 @@ export function assertMoviePresentationSemantics(bytes: Uint8Array, inputReport:
         if(parent==="visual" || parent==="ipco")avifConfigs.push(bytes.slice(a,z));
       } else if(kind==="ispe") {
         if(parent==="ipco" && z-a===12 && view.getUint32(a)===0 && view.getUint32(a+4)===width && view.getUint32(a+8)===height)avifExtents++;
+      } else if(native&&kind==="\u00a9nam") {
+        // Pinned FFmpeg n6.0 movenc.c mov_write_ilst_tag /
+        // mov_write_string_data_tag: one UTF-8 data child, type1, locale0.
+        // This is retained metadata, not permission to strip it in a carrier.
+        if(parent!=="ilst"||track||nativeTitles.length)retain("unqualified native creator title scope");
+        const data=boxes(a,z),item=data[0];
+        if(data.length!==1||item?.kind!=="data"||item.end-item.start<9||item.end-item.start>8200
+          ||view.getUint32(item.start)!==1||view.getUint32(item.start+4)!==0)retain("native creator title type, locale or exact byte bounds");
+        let title:string;
+        try{title=new TextDecoder("utf-8",{fatal:true}).decode(bytes.subarray(item!.start+8,item!.end));}catch{retain("invalid native creator title UTF-8");}
+        if(!title!||title!.trim()!==title!||/[\u0000-\u001f\u007f]/u.test(title!))retain("native creator title control or whitespace semantics");
+        nativeTitles.push(title!);
       } else if(kind==="\u00a9too") {
         const data=boxes(a,z);
         if(data.length!==1 || data[0]!.kind!=="data" || data[0]!.start+8>data[0]!.end || !/^Lavf\d+\.\d+\.\d+$/u.test(new TextDecoder().decode(bytes.subarray(data[0]!.start+8,data[0]!.end))))retain("encoder/creator metadata semantics");
@@ -305,6 +349,26 @@ export function assertMoviePresentationSemantics(bytes: Uint8Array, inputReport:
   // not a caller-supplied claim that a permissive decoder read every sample.
   if(!["avc1","avc3","av01"].includes(video.codec??""))retain("unqualified one-frame-per-sample codec profile");
   const videoTimeline=Object.freeze({samples:video.encodedSamples!,scale:video.media!.scale,duration:video.media!.duration});
+  let nativeDisplay:MovieNativeDisplay|undefined;
+  if(native){
+    if(nativeTitles.length!==reportedTitles.length||nativeTitles.some((title,index)=>title!==reportedTitles[index]))retain("native creator title bytes differ from the actual decoder report");
+    const coded=video.coded,display=video.display;
+    if(!coded||!display||!majorBrand)retain("unavailable native coded/display geometry");
+    const aspect=video.aspect??{numerator:1n,denominator:1n},n=aspect.numerator,d=aspect.denominator;
+    if(sar){
+      if(BigInt(sar[1]!)*d!==BigInt(sar[2]!)*n||BigInt(sar[3]!)*BigInt(height)*d!==BigInt(sar[4]!)*BigInt(width)*n)retain("native pasp/SAR/DAR correspondence");
+    }else if(n!==d)retain("native non-square aspect lacks its actual decoder report");
+    const displayWidth=BigInt(width)*n;
+    if(displayWidth%d!==0n)retain("nonintegral native display geometry");
+    const w=displayWidth/d,h=BigInt(height);
+    if(w<1n||h<1n||w>8192n||h>8192n||w*h>64n*1024n*1024n)retain("native display raster budget");
+    // n6.0 movenc.c writes square coded tkhd bounds in QuickTime, and SAR-
+    // adjusted track width in MP4. Both still require exact pasp/probe agreement.
+    const tkhdWidth=(majorBrand==="qt  "?BigInt(width):w)*65536n;
+    if(display!.width16!==tkhdWidth||display!.height16!==h*65536n)retain("native track display geometry differs from its qualified aspect profile");
+    const ratio=Object.freeze({numerator:Number(n),denominator:Number(d)});
+    nativeDisplay=Object.freeze({codedWidth:width,codedHeight:height,width:Number(w),height:Number(h),sampleAspectRatio:ratio});
+  }
   const audioTracks=tracks.filter(track=>track.audio);
   if(audioTracks.length>1)retain("multiple audio-track presentation semantics");
   let audioTimeline:MovieAudioTimeline|undefined;
@@ -326,5 +390,5 @@ export function assertMoviePresentationSemantics(bytes: Uint8Array, inputReport:
   // track display dimensions equal to the coded raster, and checks every
   // pasp override. This is a measured identity display, not a guessed ratio.
   // Pinned MOV demuxer: mov_read_trak derives SAR from differing tkhd bounds.
-  return {srgbFull,videoTimeline,...(audioTimeline?{audioTimeline}:{})};
+  return {srgbFull,videoTimeline,...(audioTimeline?{audioTimeline}:{}),...(nativeDisplay?{nativeDisplay,nativeCreatorTitle:nativeTitles.length===1}:{})};
 }
