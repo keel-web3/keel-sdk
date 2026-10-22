@@ -3,7 +3,7 @@ import test from 'node:test';
 import {readFile} from 'node:fs/promises';
 import {createHash} from 'node:crypto';
 import {compareMediaFrames,ORIGINAL_MEDIA_EDIT_RECIPE} from '../packages/builder/dist/media-preparation.js';
-const finite=new Uint8Array(await readFile(new URL('../../evidence/browser-results/reviewer-native-finite.gif',import.meta.url))),short=new Uint8Array(await readFile(new URL('../../evidence/browser-results/reviewer-native-clamped.gif',import.meta.url)));
+const finite=new Uint8Array(await readFile(new URL('./fixtures/native-gif-entry/reviewer-native-finite.gif',import.meta.url))),short=new Uint8Array(await readFile(new URL('./fixtures/native-gif-entry/reviewer-native-clamped.gif',import.meta.url)));
 const digest=bytes=>'0x'+createHash('sha256').update(bytes).digest('hex');
 
 test('comparison captures time, MIME, recipe and source before any async continuation',async()=>{
