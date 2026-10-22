@@ -318,12 +318,18 @@ async function readFrame(bytes:Uint8Array,timeMs:number, signal?:AbortSignal,pur
 }
 /** Decode both views at one source time. Never compares independently running animations. */
 export async function compareMediaFrames(input:{readonly bytes:Uint8Array;readonly mediaType?:string;readonly recipe:unknown;readonly timeMs:number;readonly signal?:AbortSignal}) {
-  if(!Number.isFinite(input.timeMs)||input.timeMs<0||input.timeMs>3_600_000) throw new RangeError("Comparison time must be between 0 and 3,600,000 milliseconds.");
-  const candidate=await prepareMediaCandidate(input);
-  const original=await readFrame(input.bytes,input.timeMs,input.signal,candidate.recipe.mode==="original"?"native-inspection":"fidelity");
-  if (original.info.animated && input.timeMs>=original.info.durationMs) throw new RangeError("The requested comparison time is outside the source timeline.");
-  const processed=candidate.recipe.mode === "original" ? original : await readFrame(candidate.bytes,input.timeMs,input.signal);
-  return {originalFrame:original.bytes,processedFrame:processed.bytes,mediaType:"image/png" as const,timeMs:input.timeMs,sourceFrameTimeMs:original.frameTimeMs,candidateFrameTimeMs:processed.frameTimeMs,sourceInfo:original.info,candidateInfo:processed.info,recipe:candidate.recipe,sourceIntegrity:candidate.sourceIntegrity,outputIntegrity:candidate.outputIntegrity,measurements:candidate.measurements,verification:candidate.verification,warnings:[...candidate.warnings,...(original.warnings??[])]};
+  // Capture every request identity before the first await. Hashing, complete
+  // decoding and frame selection must never reread mutable caller bytes or a
+  // replacement recipe/time/signal. The captured signal itself stays live.
+  const {bytes:source,mediaType,timeMs,signal,recipe:rawRecipe}=input;
+  signal?.throwIfAborted();bounded(source);
+  if(!Number.isFinite(timeMs)||timeMs<0||timeMs>3_600_000) throw new RangeError("Comparison time must be between 0 and 3,600,000 milliseconds.");
+  const bytes=Uint8Array.from(source),recipe=parseKeelMediaEditRecipe(rawRecipe);
+  const candidate=await prepareMediaCandidate({bytes,recipe,...(mediaType===undefined?{}:{mediaType}),...(signal?{signal}:{})});
+  const original=await readFrame(bytes,timeMs,signal,candidate.recipe.mode==="original"?"native-inspection":"fidelity");
+  if (original.info.animated && timeMs>=original.info.durationMs) throw new RangeError("The requested comparison time is outside the source timeline.");
+  const processed=candidate.recipe.mode === "original" ? original : await readFrame(candidate.bytes,timeMs,signal);
+  return {originalFrame:original.bytes,processedFrame:processed.bytes,mediaType:"image/png" as const,timeMs,sourceFrameTimeMs:original.frameTimeMs,candidateFrameTimeMs:processed.frameTimeMs,sourceInfo:original.info,candidateInfo:processed.info,recipe:candidate.recipe,sourceIntegrity:candidate.sourceIntegrity,outputIntegrity:candidate.outputIntegrity,measurements:candidate.measurements,verification:candidate.verification,warnings:[...candidate.warnings,...(original.warnings??[])]};
 }
 
 const actualPairProofs = new WeakSet<object>();
