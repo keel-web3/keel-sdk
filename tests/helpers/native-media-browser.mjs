@@ -5,7 +5,7 @@ import {launchCspBrowser} from './marketplace-csp-browser.mjs';
 const require=createRequire(new URL('../../packages/builder/package.json',import.meta.url)),sharp=require('sharp');
 export const wait=ms=>new Promise(resolve=>setTimeout(resolve,ms));
 /** Actual canonical shell + sandboxed child through installed Chromium/CDP. */
-export async function withNativeMediaBrowser(document,run){
+export async function withNativeMediaBrowser(document,run,options={}){
   const binary=process.env.KEEL_CHROME_HEADLESS_SHELL??process.env.CHROMIUM_PATH;
   assert.ok(binary,'Installed Chromium is required; native decode/playback evidence never skips');
   const server=createServer((_req,res)=>{res.writeHead(200,{'content-type':'text/html; charset=utf-8'});res.end(document.rootBytes)});
@@ -27,7 +27,7 @@ export async function withNativeMediaBrowser(document,run){
     let child;const deadline=Date.now()+15000;
     while(Date.now()<deadline){
       if(errors.length)throw Error(errors.join('\n'));
-      for(const context of contexts.values()){try{if(await evaluate('typeof __KEEL_ENTRY__!=="undefined"&&!!document.querySelector("#keel-asset-display img,#keel-asset-display audio")',context)){child=context;break}}catch{}}
+      for(const context of contexts.values()){try{if(await evaluate(`typeof __KEEL_ENTRY__!=="undefined"&&!!document.querySelector(${JSON.stringify(options.mountSelector??'#keel-asset-display img,#keel-asset-display audio')})`,context)){child=context;break}}catch{}}
       if(child&&await evaluate('document.body.dataset.verification==="verified"&&document.querySelector("#keel-status").hidden'))break;
       await wait(20);
     }

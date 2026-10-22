@@ -1,0 +1,70 @@
+TAP version 13
+# Subtest: SDK848 actual MCP candidate: unsupported sar lossless semantics stays native
+ok 1 - SDK848 actual MCP candidate: unsupported sar lossless semantics stays native
+  ---
+  duration_ms: 166.855
+  type: 'test'
+  ...
+# Subtest: SDK848 actual MCP compare: unsupported sar lossless semantics stays native
+ok 2 - SDK848 actual MCP compare: unsupported sar lossless semantics stays native
+  ---
+  duration_ms: 59.822792
+  type: 'test'
+  ...
+# Subtest: SDK848 actual MCP candidate: unsupported title lossless semantics stays native
+ok 3 - SDK848 actual MCP candidate: unsupported title lossless semantics stays native
+  ---
+  duration_ms: 60.3505
+  type: 'test'
+  ...
+# Subtest: SDK848 actual MCP compare: unsupported title lossless semantics stays native
+ok 4 - SDK848 actual MCP compare: unsupported title lossless semantics stays native
+  ---
+  duration_ms: 62.168208
+  type: 'test'
+  ...
+# Subtest: SDK848 shared candidate: unsupported sar semantics must remain native
+ok 5 - SDK848 shared candidate: unsupported sar semantics must remain native
+  ---
+  duration_ms: 70.518417
+  type: 'test'
+  ...
+# Subtest: SDK848 shared compare: unsupported sar semantics must remain native
+ok 6 - SDK848 shared compare: unsupported sar semantics must remain native
+  ---
+  duration_ms: 60.377209
+  type: 'test'
+  ...
+# Subtest: SDK848 shared candidate: unsupported title semantics must remain native
+ok 7 - SDK848 shared candidate: unsupported title semantics must remain native
+  ---
+  duration_ms: 59.819708
+  type: 'test'
+  ...
+# Subtest: SDK848 shared compare: unsupported title semantics must remain native
+ok 8 - SDK848 shared compare: unsupported title semantics must remain native
+  ---
+  duration_ms: 59.710709
+  type: 'test'
+  ...
+# Subtest: SDK848 shared candidate: exact three-frame APNG cannot become first-frame WebP
+ok 9 - SDK848 shared candidate: exact three-frame APNG cannot become first-frame WebP
+  ---
+  duration_ms: 3.770125
+  type: 'test'
+  ...
+# Subtest: SDK848 shared compare: exact three-frame APNG cannot become first-frame WebP
+ok 10 - SDK848 shared compare: exact three-frame APNG cannot become first-frame WebP
+  ---
+  duration_ms: 1.67575
+  type: 'test'
+  ...
+1..10
+# tests 10
+# suites 0
+# pass 10
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 955.613334

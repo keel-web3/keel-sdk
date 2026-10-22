@@ -1,0 +1,21 @@
+{
+  "scope": "author baseline direct retained-byte diagnostic; original native assertion has Buffer/Uint8Array mismatch; no reviewer assertion modified",
+  "results": [
+    {
+      "name": "unknown-flags",
+      "sourceBytes": 2937,
+      "sourceSHA256": "33f37b310127315151ab0593177e2963aab85b245987d8ebea33a830925b9f1b",
+      "candidateBytes": 464,
+      "candidateSHA256": "15e160de0827a42f62a73490d690561125232cff77877db53148cbc1ece035db",
+      "eligibility": "requires-canonical-player-proof"
+    },
+    {
+      "name": "duplicate-edts",
+      "sourceBytes": 2973,
+      "sourceSHA256": "ec083cb7e5c9a53fc65e626b408fd4553d784889874914c30c2eacc970440c21",
+      "candidateBytes": 464,
+      "candidateSHA256": "15e160de0827a42f62a73490d690561125232cff77877db53148cbc1ece035db",
+      "eligibility": "requires-canonical-player-proof"
+    }
+  ]
+}

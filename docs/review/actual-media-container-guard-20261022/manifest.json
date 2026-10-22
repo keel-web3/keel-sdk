@@ -1,0 +1,79 @@
+{
+  "productionSource": "402ded35cd754f983771f6da91168c08ca262cff",
+  "sourceBase": "848a640afab90502e43bd750a7d930d9d0591244",
+  "tests": 34,
+  "browserCases": 4,
+  "independentApproval": "pending",
+  "files": [
+    {
+      "path": "README.md",
+      "bytes": 2649,
+      "sha256": "cfdd20e6572324de9be39657342290a6ba3cbaeb463579da070e661405bc225f"
+    },
+    {
+      "path": "apng-c36-baseline-red.stdout",
+      "bytes": 1155,
+      "sha256": "90a5ae5ddc2a54beab8b57aba795d859f8d3f626f4db5b6a2e9d713edab533b2"
+    },
+    {
+      "path": "canonical-browser-inputs-and-results/audio.json",
+      "bytes": 923,
+      "sha256": "6295d1056d6e4fec156a772a2749a580b7367bfad211a54dac7c9d72bdbca645"
+    },
+    {
+      "path": "canonical-browser-inputs-and-results/avif.json",
+      "bytes": 8505,
+      "sha256": "559c54dae7fa979dac48727fb52792d788861cf812631b8eebbc9ceb8962f9d1"
+    },
+    {
+      "path": "canonical-browser-inputs-and-results/complete-cost.json",
+      "bytes": 1213,
+      "sha256": "8afa42e335d3a30b338cf167ed4ddd9f0f494654cd5b83014e26a4d0c6232a11"
+    },
+    {
+      "path": "canonical-browser-inputs-and-results/webp.json",
+      "bytes": 8504,
+      "sha256": "9e10f0ba557236553136195af1c6ba9c0bf467faab0d3e4ac66b9ec7d9ae09c7"
+    },
+    {
+      "path": "container-first-cohort.stdout",
+      "bytes": 7154,
+      "sha256": "e3ab338f37ebbdce46065dbf9b8c0969690e5b478fa68f5d69cc216eb534feee"
+    },
+    {
+      "path": "container-first-tsc.stdout",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "container-second-cohort.stdout",
+      "bytes": 8688,
+      "sha256": "939345ac28f3df7cd63d53c655c0dab9e071ce9ebda546d04a7aa0d1f5db43ae"
+    },
+    {
+      "path": "container-second-tsc.stdout",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "guard-402-final-tsc.stdout",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "guard-final-canonical-browser.stdout",
+      "bytes": 1184,
+      "sha256": "4e3ce366ef96b050b2202c702d146285390db2a25074a63716a85127d9c293fd"
+    },
+    {
+      "path": "guard-final-cohort.stdout",
+      "bytes": 8890,
+      "sha256": "88174c2b10434e15c9c7c75f8bc05db163804c7510bb0b545b080d5a51e6a408"
+    },
+    {
+      "path": "prior-decoder-environment.json",
+      "bytes": 2705,
+      "sha256": "ec6ee8def92f412d9915899c44e633381961fcc1ede4232801e77c8990914b08"
+    }
+  ]
+}

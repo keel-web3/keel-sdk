@@ -1,0 +1,10 @@
+packages/builder/src/movie-presentation-semantics.ts(108,9): error TS18048: 'track' is possibly 'undefined'.
+packages/builder/src/movie-presentation-semantics.ts(122,11): error TS18048: 'track' is possibly 'undefined'.
+packages/builder/src/movie-presentation-semantics.ts(122,91): error TS18048: 'track' is possibly 'undefined'.
+packages/builder/src/movie-presentation-semantics.ts(130,69): error TS18048: 'track' is possibly 'undefined'.
+packages/builder/src/movie-presentation-semantics.ts(197,19): error TS18048: 'track.media' is possibly 'undefined'.
+packages/builder/src/movie-presentation-semantics.ts(197,56): error TS18048: 'movie' is possibly 'undefined'.
+packages/builder/src/movie-presentation-semantics.ts(197,68): error TS18048: 'track.media' is possibly 'undefined'.
+packages/builder/src/movie-presentation-semantics.ts(197,90): error TS18048: 'track.media' is possibly 'undefined'.
+packages/builder/src/movie-presentation-semantics.ts(198,47): error TS18048: 'movie' is possibly 'undefined'.
+packages/builder/src/movie-presentation-semantics.ts(209,152): error TS18048: 'movie' is possibly 'undefined'.

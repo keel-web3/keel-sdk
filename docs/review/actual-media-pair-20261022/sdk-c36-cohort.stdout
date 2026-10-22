@@ -1,0 +1,166 @@
+TAP version 13
+# Subtest: actual independently encoded bytes pass every RGBA pixel and immutable source/recipe commitments
+ok 1 - actual independently encoded bytes pass every RGBA pixel and immutable source/recipe commitments
+  ---
+  duration_ms: 11.071708
+  type: 'test'
+  ...
+# Subtest: a changed last RGBA alpha sample fails even though dimensions and all other pixels match
+ok 2 - a changed last RGBA alpha sample fails even though dimensions and all other pixels match
+  ---
+  duration_ms: 3.678584
+  type: 'test'
+  ...
+# Subtest: actual animation verifies every frame, intrinsic infinite loop and exact variable timing
+ok 3 - actual animation verifies every frame, intrinsic infinite loop and exact variable timing
+  ---
+  duration_ms: 5.162333
+  type: 'test'
+  ...
+# Subtest: last-frame change, one millisecond duration change and finite-loop change are all rejected
+ok 4 - last-frame change, one millisecond duration change and finite-loop change are all rejected
+  ---
+  duration_ms: 10.984333
+  type: 'test'
+  ...
+# Subtest: finite identical animation loops remain exact and are not relabelled infinite
+ok 5 - finite identical animation loops remain exact and are not relabelled infinite
+  ---
+  duration_ms: 3.256334
+  type: 'test'
+  ...
+# Subtest: movie to actual checked animated WebP is conditional on authenticated canonical-player semantics
+ok 6 - movie to actual checked animated WebP is conditional on authenticated canonical-player semantics
+  ---
+  duration_ms: 153.264125
+  type: 'test'
+  ...
+# Subtest: actual AAC audio includes every canonical PCM sample, channels, presentation timestamps and hashes
+ok 7 - actual AAC audio includes every canonical PCM sample, channels, presentation timestamps and hashes
+  ---
+  duration_ms: 251.957958
+  type: 'test'
+  ...
+# Subtest: equal-duration audio with changed actual samples fails, rather than presence-only approval
+ok 8 - equal-duration audio with changed actual samples fails, rather than presence-only approval
+  ---
+  duration_ms: 175.311333
+  type: 'test'
+  ...
+# Subtest: audio disappearance fails even when all video samples remain exact
+ok 9 - audio disappearance fails even when all video samples remain exact
+  ---
+  duration_ms: 240.527334
+  type: 'test'
+  ...
+# Subtest: explicit edits stay selected without granting automatic fidelity or fallback-to-original authority
+ok 10 - explicit edits stay selected without granting automatic fidelity or fallback-to-original authority
+  ---
+  duration_ms: 1.722042
+  type: 'test'
+  ...
+# Subtest: decoder corruption, unsupported external containers and pre-aborted work fail closed
+ok 11 - decoder corruption, unsupported external containers and pre-aborted work fail closed
+  ---
+  duration_ms: 45.629583
+  type: 'test'
+  ...
+# Subtest: the verifier snapshots mutable caller arrays and nested recipe before its first await
+ok 12 - the verifier snapshots mutable caller arrays and nested recipe before its first await
+  ---
+  duration_ms: 3.733708
+  type: 'test'
+  ...
+# Subtest: actual float64 PCM retains precision below float32 and detects a change in the final audio sample
+ok 13 - actual float64 PCM retains precision below float32 and detects a change in the final audio sample
+  ---
+  duration_ms: 294.939458
+  type: 'test'
+  ...
+# Subtest: original mode preserves arbitrary container bytes without decode or format eligibility claims
+ok 14 - original mode preserves arbitrary container bytes without decode or format eligibility claims
+  ---
+  duration_ms: 3.090292
+  type: 'test'
+  ...
+# Subtest: still lossless WebP fully decodes and verifies pixel identity with measured bytes
+ok 15 - still lossless WebP fully decodes and verifies pixel identity with measured bytes
+  ---
+  duration_ms: 6.025833
+  type: 'test'
+  ...
+# Subtest: explicit still edits create a reversible recipe, preserve source and distinguish encoding lossless from source pixels
+ok 16 - explicit still edits create a reversible recipe, preserve source and distinguish encoding lossless from source pixels
+  ---
+  duration_ms: 6.26975
+  type: 'test'
+  ...
+# Subtest: compare returns decoded PNG frames at the same timestamp with original and processed geometry
+ok 17 - compare returns decoded PNG frames at the same timestamp with original and processed geometry
+  ---
+  duration_ms: 7.816791
+  type: 'test'
+  ...
+# Subtest: animated GIF retains all frames and their delays, comparison selects same source instant
+ok 18 - animated GIF retains all frames and their delays, comparison selects same source instant
+  ---
+  duration_ms: 242.420708
+  type: 'test'
+  ...
+# Subtest: actual capability report and cancellation do not claim universal decode support
+ok 19 - actual capability report and cancellation do not claim universal decode support
+  ---
+  duration_ms: 35.727583
+  type: 'test'
+  ...
+# Subtest: MOV input is decoded by capability and exports MP4/MOV without changing source
+ok 20 - MOV input is decoded by capability and exports MP4/MOV without changing source
+  ---
+  duration_ms: 687.198458
+  type: 'test'
+  ...
+# Subtest: still layers compose ordered source copies with explicit alpha, rotation and output bounds
+ok 21 - still layers compose ordered source copies with explicit alpha, rotation and output bounds
+  ---
+  duration_ms: 16.507375
+  type: 'test'
+  ...
+# Subtest: animated layers fail closed rather than silently ignoring composition
+ok 22 - animated layers fail closed rather than silently ignoring composition
+  ---
+  duration_ms: 1.352083
+  type: 'test'
+  ...
+# Subtest: an animated AVIF reimport preserves the verified sequence stream, both frames and exact timing
+ok 23 - an animated AVIF reimport preserves the verified sequence stream, both frames and exact timing
+  ---
+  duration_ms: 711.753166
+  type: 'test'
+  ...
+# Subtest: standard WebP duration correction preserves the entire frame payload, loop and original bytes
+ok 24 - standard WebP duration correction preserves the entire frame payload, loop and original bytes
+  ---
+  duration_ms: 3.684
+  type: 'test'
+  ...
+# Subtest: unrepresentable, omitted, reordered and truncated timelines fail closed without mutating the container
+ok 25 - unrepresentable, omitted, reordered and truncated timelines fail closed without mutating the container
+  ---
+  duration_ms: 0.436834
+  type: 'test'
+  ...
+# Subtest: strict animation parser rejects duplicate headers, flags, bad frame bounds, reordered control and corrupt padded chunks
+ok 26 - strict animation parser rejects duplicate headers, flags, bad frame bounds, reordered control and corrupt padded chunks
+  ---
+  duration_ms: 0.248166
+  type: 'test'
+  ...
+1..26
+# tests 26
+# suites 0
+# pass 26
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 3187.184208

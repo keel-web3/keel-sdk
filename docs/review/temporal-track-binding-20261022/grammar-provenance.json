@@ -1,0 +1,18 @@
+[
+  {
+    "file": "../temporal-edit-list-20261022/upstream/mov-n6.0.c",
+    "sourceURL": "https://raw.githubusercontent.com/FFmpeg/FFmpeg/n6.0/libavformat/mov.c",
+    "fileSHA256": "ac9995a92d222a512d9869444552c855bda2dac0069935c468b986d1308c655f",
+    "firstPhysicalLine": 2891,
+    "lastPhysicalLine": 2977,
+    "excerptSHA256": "5c5f0d5626716c7da96f88cdad74d65690320235b6094d153ca320c2a9e07d92"
+  },
+  {
+    "file": "../temporal-edit-list-20261022/upstream/movenc-n6.0.c",
+    "sourceURL": "https://raw.githubusercontent.com/FFmpeg/FFmpeg/n6.0/libavformat/movenc.c",
+    "fileSHA256": "9f64debd4bc0de057ddbcfe63c23035261e7c61c205a0b576cec0128a13461b2",
+    "firstPhysicalLine": 205,
+    "lastPhysicalLine": 238,
+    "excerptSHA256": "5cdec9eab81731557542175b79d3602b5bef59914b49bd83a370a9b037c6683c"
+  }
+]

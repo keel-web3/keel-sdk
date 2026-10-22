@@ -1,0 +1,65 @@
+{
+  "accepted": true,
+  "source": {
+    "info": {
+      "width": 32,
+      "height": 24,
+      "durationMs": 800,
+      "frameCount": 3,
+      "animated": true,
+      "hasAudio": false,
+      "frameTimesMs": [
+        0,
+        200,
+        400
+      ],
+      "frameDurationsMs": [
+        200,
+        200,
+        400
+      ]
+    },
+    "frameHashes": [
+      "d5a25730825423e4aec7729e6670db04e0f9e0617b84e483628bc40fce97b1cd",
+      "a1a5407e5c472e563538b71ebd549ff45d3ccbae81fa5ff367ad77335e08f1c4",
+      "ff79243a85c2cc222d940c90d4f77fc06aad5234dabbc40e7277b43de487b890"
+    ],
+    "loop": {
+      "kind": "canonical-player-defined"
+    },
+    "startTimeMs": 0,
+    "colorSemantics": "srgb-full"
+  },
+  "candidate": {
+    "info": {
+      "width": 32,
+      "height": 24,
+      "durationMs": 800,
+      "frameCount": 3,
+      "animated": true,
+      "hasAudio": false,
+      "frameTimesMs": [
+        0,
+        200,
+        400
+      ],
+      "frameDurationsMs": [
+        200,
+        200,
+        400
+      ]
+    },
+    "frameHashes": [
+      "d5a25730825423e4aec7729e6670db04e0f9e0617b84e483628bc40fce97b1cd",
+      "a1a5407e5c472e563538b71ebd549ff45d3ccbae81fa5ff367ad77335e08f1c4",
+      "ff79243a85c2cc222d940c90d4f77fc06aad5234dabbc40e7277b43de487b890"
+    ],
+    "loop": {
+      "kind": "container",
+      "repetitions": 0
+    },
+    "startTimeMs": 0,
+    "colorSemantics": "srgb-full"
+  },
+  "eligibility": "requires-canonical-player-proof"
+}

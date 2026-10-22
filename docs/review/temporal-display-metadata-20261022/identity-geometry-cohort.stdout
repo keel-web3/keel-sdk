@@ -1,0 +1,86 @@
+TAP version 13
+# Subtest: original mode preserves arbitrary container bytes without decode or format eligibility claims
+ok 1 - original mode preserves arbitrary container bytes without decode or format eligibility claims
+  ---
+  duration_ms: 6.816917
+  type: 'test'
+  ...
+# Subtest: still lossless WebP fully decodes and verifies pixel identity with measured bytes
+ok 2 - still lossless WebP fully decodes and verifies pixel identity with measured bytes
+  ---
+  duration_ms: 16.9255
+  type: 'test'
+  ...
+# Subtest: explicit still edits create a reversible recipe, preserve source and distinguish encoding lossless from source pixels
+ok 3 - explicit still edits create a reversible recipe, preserve source and distinguish encoding lossless from source pixels
+  ---
+  duration_ms: 11.942709
+  type: 'test'
+  ...
+# Subtest: compare returns decoded PNG frames at the same timestamp with original and processed geometry
+ok 4 - compare returns decoded PNG frames at the same timestamp with original and processed geometry
+  ---
+  duration_ms: 14.908875
+  type: 'test'
+  ...
+# Subtest: animated GIF retains all frames and their delays, comparison selects same source instant
+ok 5 - animated GIF retains all frames and their delays, comparison selects same source instant
+  ---
+  duration_ms: 421.690791
+  type: 'test'
+  ...
+# Subtest: actual capability report and cancellation do not claim universal decode support
+ok 6 - actual capability report and cancellation do not claim universal decode support
+  ---
+  duration_ms: 58.555
+  type: 'test'
+  ...
+# Subtest: MOV input is decoded by capability and exports MP4/MOV without changing source
+not ok 7 - MOV input is decoded by capability and exports MP4/MOV without changing source
+  ---
+  duration_ms: 638.2765
+  type: 'test'
+  location: '/private/tmp/keel-temporal-display-guard-20261022-01/keel-sdk/tests/media-preparation.test.mjs:40:1'
+  failureType: 'testCodeFailure'
+  error: 'Movie embedded color profile semantics require an exact preserving adapter; native media is retained.'
+  code: 'ERR_TEST_FAILURE'
+  name: 'TypeError'
+  stack: |-
+    retain (file:///private/tmp/keel-temporal-display-guard-20261022-01/keel-sdk/packages/builder/dist/movie-presentation-semantics.js:10:40)
+    walk (file:///private/tmp/keel-temporal-display-guard-20261022-01/keel-sdk/packages/builder/dist/movie-presentation-semantics.js:133:21)
+    walk (file:///private/tmp/keel-temporal-display-guard-20261022-01/keel-sdk/packages/builder/dist/movie-presentation-semantics.js:184:17)
+    walk (file:///private/tmp/keel-temporal-display-guard-20261022-01/keel-sdk/packages/builder/dist/movie-presentation-semantics.js:184:17)
+    walk (file:///private/tmp/keel-temporal-display-guard-20261022-01/keel-sdk/packages/builder/dist/movie-presentation-semantics.js:184:17)
+    assertMoviePresentationSemantics (file:///private/tmp/keel-temporal-display-guard-20261022-01/keel-sdk/packages/builder/dist/movie-presentation-semantics.js:187:5)
+    decodeMovie (file:///private/tmp/keel-temporal-display-guard-20261022-01/keel-sdk/packages/builder/dist/media-preparation.js:144:26)
+    process.processTicksAndRejections (node:internal/process/task_queues:103:5)
+    async movieCandidate (file:///private/tmp/keel-temporal-display-guard-20261022-01/keel-sdk/packages/builder/dist/media-preparation.js:272:80)
+    async prepareMediaCandidate (file:///private/tmp/keel-temporal-display-guard-20261022-01/keel-sdk/packages/builder/dist/media-preparation.js:317:18)
+  ...
+# Subtest: still layers compose ordered source copies with explicit alpha, rotation and output bounds
+ok 8 - still layers compose ordered source copies with explicit alpha, rotation and output bounds
+  ---
+  duration_ms: 29.873459
+  type: 'test'
+  ...
+# Subtest: animated layers fail closed rather than silently ignoring composition
+ok 9 - animated layers fail closed rather than silently ignoring composition
+  ---
+  duration_ms: 2.370041
+  type: 'test'
+  ...
+# Subtest: an animated AVIF reimport preserves the verified sequence stream, both frames and exact timing
+ok 10 - an animated AVIF reimport preserves the verified sequence stream, both frames and exact timing
+  ---
+  duration_ms: 1157.912166
+  type: 'test'
+  ...
+1..10
+# tests 10
+# suites 0
+# pass 9
+# fail 1
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 2661.470375

@@ -41,7 +41,7 @@ test('MOV input is decoded by capability and exports MP4/MOV without changing so
  const {mkdtemp,readFile,rm}=await import('node:fs/promises');const {tmpdir}=await import('node:os');const path=await import('node:path');const {execFileSync}=await import('node:child_process');
  const dir=await mkdtemp(path.join(tmpdir(),'keel-movie-test-')), ffmpeg=require('ffmpeg-static');
  try {
-  execFileSync(ffmpeg,['-hide_banner','-loglevel','error','-f','lavfi','-i','testsrc=size=32x24:rate=5','-t','1','-c:v','libx264rgb','-crf','0','-threads','2','-y',path.join(dir,'source.mov')]);
+  execFileSync(ffmpeg,['-hide_banner','-loglevel','error','-f','lavfi','-i','testsrc=size=32x24:rate=5','-t','1','-c:v','libx264rgb','-crf','0','-threads','2','-color_primaries','bt709','-color_trc','iec61966-2-1','-colorspace','rgb','-color_range','pc','-y',path.join(dir,'source.mov')]);
   const bytes=new Uint8Array(await readFile(path.join(dir,'source.mov')));
   for(const format of ['mov','mp4','webp','avif']) {
    const r=await prepareMediaCandidate({bytes,mediaType:'video/quicktime',recipe:{...lossless,format,noSound:true}});

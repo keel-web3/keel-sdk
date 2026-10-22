@@ -1,0 +1,23 @@
+Exact source: 2a69bd24ea60cfc89a9a3943af79124201f02f5d (follows 6e6c7d491d43b629e8640ca74a18427629375ed6).
+SDK cwd: /private/tmp/keel-temporal-track-binding-20261022-01/keel-sdk
+Site cwd: /private/tmp/keel-temporal-track-binding-20261022-01/keel-site/apps/studio
+NODE=/Users/ravonus/.nvm/versions/node/v22.22.1/bin/node
+
+Baseline, freshly built529 before any production change:
+$NODE node_modules/typescript/bin/tsc -p packages/builder/tsconfig.json
+$NODE --test --test-concurrency=1 reviewer-noedit-timeline.test.mjs
+Expected: original1PASS/4FAIL. Raw baseline-noedit.stdout; unchanged test SHA9871f665c5b28a15884072f8086710fa18a7f7d85f0a4a5d5003e284e0ecaa69.
+
+Final SDK:
+$NODE node_modules/typescript/bin/tsc -p packages/builder/tsconfig.json
+$NODE --test --test-concurrency=1 tests/movie-track-binding.test.mjs tests/movie-edit-list.test.mjs tests/movie-presentation-semantics.test.mjs tests/actual-media-container.test.mjs tests/actual-media-pair.test.mjs tests/media-preparation.test.mjs tests/temporal-webp.test.mjs reviewer-temporal-pair-retained-bytes.mjs reviewer-shared-848.test.mjs reviewer-shared-848-mcp.test.mjs reviewer-editlist-byte-equality.test.mjs reviewer-noedit-timeline.test.mjs
+Expected/actual:76PASS/0FAIL, no skipped or cancelled cases.
+
+Final Site:
+$NODE --conditions=react-server --import tsx --import ./tests/unit/support/css-modules.mjs --test --test-concurrency=1 tests/unit/owned-temporal-complete-context.test.ts tests/unit/registered-inline-release-cost-scope.test.ts tests/unit/registered-inline-final-review.test.ts tests/unit/registered-inline-final-sdk.test.ts tests/unit/registered-inline-readonly.test.ts
+$NODE node_modules/typescript/bin/tsc --noEmit --incremental false
+Expected/actual:22PASS/0FAIL and TSC0; no Site source edits.
+
+Final canonical browser:
+CHROMIUM_PATH=/Users/ravonus/Library/Caches/ms-playwright/chromium_headless_shell-1234/chrome-headless-shell-mac-arm64/chrome-headless-shell KEEL_CHROME_HEADLESS_SHELL=/Users/ravonus/Library/Caches/ms-playwright/chromium_headless_shell-1234/chrome-headless-shell-mac-arm64/chrome-headless-shell KEEL_TEMPORAL_EVIDENCE_DIR=/private/tmp/keel-temporal-track-binding-20261022-01/evidence/final-browser $NODE --test --test-concurrency=1 tests/temporal-carrier-sequence.browser.test.mjs tests/native-presentation-guard.browser.test.mjs
+Expected/actual:6PASS/0FAIL. Synthetic/public inputs, actual canonical browser document, exact original/video fallback, all-frame playback/loop checks, no external requests or wallet interaction.

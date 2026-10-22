@@ -1,0 +1,346 @@
+TAP version 13
+# Subtest: actual three-frame APNG cannot be approved as its Sharp first-frame WebP
+ok 1 - actual three-frame APNG cannot be approved as its Sharp first-frame WebP
+  ---
+  duration_ms: 47.517834
+  type: 'test'
+  ...
+# {"source":{"bytes":642,"sha256":"dd52b281bd517e471500f635bd67c696c2a6658473a00938c155c3866c060e58"},"candidate":{"bytes":174,"sha256":"737a04d4c463eff7395bcf4043315533956295ce1c11184291e4ab2085a1ba05"},"actualFrames":3,"sharpPages":null}
+# Subtest: complete GIF block grammar and native zero-loop timing can qualify actual three-frame WebP
+ok 2 - complete GIF block grammar and native zero-loop timing can qualify actual three-frame WebP
+  ---
+  duration_ms: 8.217542
+  type: 'test'
+  ...
+# Subtest: concatenated GIFs and missing complete trailer cannot be relabelled one verified animation
+ok 3 - concatenated GIFs and missing complete trailer cannot be relabelled one verified animation
+  ---
+  duration_ms: 5.9805
+  type: 'test'
+  ...
+# Subtest: GIF creator comments stay native until a preserving adapter can establish metadata correspondence
+ok 4 - GIF creator comments stay native until a preserving adapter can establish metadata correspondence
+  ---
+  duration_ms: 4.325208
+  type: 'test'
+  ...
+# Subtest: duplicate WebP animation control is rejected even if the native decoder accepts its pixels
+ok 5 - duplicate WebP animation control is rejected even if the native decoder accepts its pixels
+  ---
+  duration_ms: 5.382791
+  type: 'test'
+  ...
+# Subtest: actual candidate bytes must match their recipe container even when all decoded RGBA is equal
+ok 6 - actual candidate bytes must match their recipe container even when all decoded RGBA is equal
+  ---
+  duration_ms: 3.612459
+  type: 'test'
+  ...
+# Subtest: complete AVIF traversal finds sequence brands beyond byte40 and rejects malformed box bounds
+ok 7 - complete AVIF traversal finds sequence brands beyond byte40 and rejects malformed box bounds
+  ---
+  duration_ms: 0.392708
+  type: 'test'
+  ...
+# Subtest: PNG creator text cannot disappear behind equal decoded RGBA samples
+ok 8 - PNG creator text cannot disappear behind equal decoded RGBA samples
+  ---
+  duration_ms: 4.5165
+  type: 'test'
+  ...
+# Subtest: actual independently encoded bytes pass every RGBA pixel and immutable source/recipe commitments
+ok 9 - actual independently encoded bytes pass every RGBA pixel and immutable source/recipe commitments
+  ---
+  duration_ms: 12.105791
+  type: 'test'
+  ...
+# Subtest: a changed last RGBA alpha sample fails even though dimensions and all other pixels match
+ok 10 - a changed last RGBA alpha sample fails even though dimensions and all other pixels match
+  ---
+  duration_ms: 4.996709
+  type: 'test'
+  ...
+# Subtest: actual animation verifies every frame, intrinsic infinite loop and exact variable timing
+ok 11 - actual animation verifies every frame, intrinsic infinite loop and exact variable timing
+  ---
+  duration_ms: 6.077458
+  type: 'test'
+  ...
+# Subtest: last-frame change, one millisecond duration change and finite-loop change are all rejected
+ok 12 - last-frame change, one millisecond duration change and finite-loop change are all rejected
+  ---
+  duration_ms: 11.812416
+  type: 'test'
+  ...
+# Subtest: finite identical animation loops remain exact and are not relabelled infinite
+ok 13 - finite identical animation loops remain exact and are not relabelled infinite
+  ---
+  duration_ms: 3.721584
+  type: 'test'
+  ...
+# Subtest: movie to actual checked animated WebP is conditional on authenticated canonical-player semantics
+not ok 14 - movie to actual checked animated WebP is conditional on authenticated canonical-player semantics
+  ---
+  duration_ms: 96.623
+  type: 'test'
+  location: '/private/tmp/keel-temporal-display-guard-20261022-01/keel-sdk/tests/actual-media-pair.test.mjs:24:1'
+  failureType: 'testCodeFailure'
+  error: 'Movie chapter or language metadata semantics require an exact preserving adapter; native media is retained.'
+  code: 'ERR_TEST_FAILURE'
+  name: 'TypeError'
+  stack: |-
+    retain (file:///private/tmp/keel-temporal-display-guard-20261022-01/keel-sdk/packages/builder/dist/movie-presentation-semantics.js:10:40)
+    assertMoviePresentationSemantics (file:///private/tmp/keel-temporal-display-guard-20261022-01/keel-sdk/packages/builder/dist/movie-presentation-semantics.js:47:9)
+    decodeMovie (file:///private/tmp/keel-temporal-display-guard-20261022-01/keel-sdk/packages/builder/dist/media-preparation.js:144:5)
+    process.processTicksAndRejections (node:internal/process/task_queues:103:5)
+    async movieCandidate (file:///private/tmp/keel-temporal-display-guard-20261022-01/keel-sdk/packages/builder/dist/media-preparation.js:215:40)
+    async prepareMediaCandidate (file:///private/tmp/keel-temporal-display-guard-20261022-01/keel-sdk/packages/builder/dist/media-preparation.js:307:18)
+    async TestContext.<anonymous> (file:///private/tmp/keel-temporal-display-guard-20261022-01/keel-sdk/tests/actual-media-pair.test.mjs:24:158)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: actual AAC audio includes every canonical PCM sample, channels, presentation timestamps and hashes
+not ok 15 - actual AAC audio includes every canonical PCM sample, channels, presentation timestamps and hashes
+  ---
+  duration_ms: 89.081042
+  type: 'test'
+  location: '/private/tmp/keel-temporal-display-guard-20261022-01/keel-sdk/tests/actual-media-pair.test.mjs:25:1'
+  failureType: 'testCodeFailure'
+  error: 'Movie chapter or language metadata semantics require an exact preserving adapter; native media is retained.'
+  code: 'ERR_TEST_FAILURE'
+  name: 'TypeError'
+  stack: |-
+    retain (file:///private/tmp/keel-temporal-display-guard-20261022-01/keel-sdk/packages/builder/dist/movie-presentation-semantics.js:10:40)
+    assertMoviePresentationSemantics (file:///private/tmp/keel-temporal-display-guard-20261022-01/keel-sdk/packages/builder/dist/movie-presentation-semantics.js:47:9)
+    decodeMovie (file:///private/tmp/keel-temporal-display-guard-20261022-01/keel-sdk/packages/builder/dist/media-preparation.js:144:5)
+    process.processTicksAndRejections (node:internal/process/task_queues:103:5)
+    async movieCandidate (file:///private/tmp/keel-temporal-display-guard-20261022-01/keel-sdk/packages/builder/dist/media-preparation.js:215:40)
+    async prepareMediaCandidate (file:///private/tmp/keel-temporal-display-guard-20261022-01/keel-sdk/packages/builder/dist/media-preparation.js:307:18)
+    async TestContext.<anonymous> (file:///private/tmp/keel-temporal-display-guard-20261022-01/keel-sdk/tests/actual-media-pair.test.mjs:25:164)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: equal-duration audio with changed actual samples fails, rather than presence-only approval
+not ok 16 - equal-duration audio with changed actual samples fails, rather than presence-only approval
+  ---
+  duration_ms: 114.490583
+  type: 'test'
+  location: '/private/tmp/keel-temporal-display-guard-20261022-01/keel-sdk/tests/actual-media-pair.test.mjs:26:1'
+  failureType: 'testCodeFailure'
+  error: |-
+    The input did not match the regular expression /audio PCM/. Input:
+    
+    'TypeError: Movie chapter or language metadata semantics require an exact preserving adapter; native media is retained.'
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected:
+  actual:
+  error: 'Movie chapter or language metadata semantics require an exact preserving adapter; native media is retained.'
+  name: 'TypeError'
+  stack: |-
+    retain (file:///private/tmp/keel-temporal-display-guard-20261022-01/keel-sdk/packages/builder/dist/movie-presentation-semantics.js:10:40)
+    assertMoviePresentationSemantics (file:///private/tmp/keel-temporal-display-guard-20261022-01/keel-sdk/packages/builder/dist/movie-presentation-semantics.js:47:9)
+    decodeMovie (file:///private/tmp/keel-temporal-display-guard-20261022-01/keel-sdk/packages/builder/dist/media-preparation.js:144:5)
+    process.processTicksAndRejections (node:internal/process/task_queues:103:5)
+    async decodeActualPairStream (file:///private/tmp/keel-temporal-display-guard-20261022-01/keel-sdk/packages/builder/dist/media-preparation.js:450:19)
+    async verifyActualMediaPair (file:///private/tmp/keel-temporal-display-guard-20261022-01/keel-sdk/packages/builder/dist/media-preparation.js:478:24)
+    async waitForActual (node:assert:644:5)
+    async Function.rejects (node:assert:767:25)
+    async TestContext.<anonymous> (file:///private/tmp/keel-temporal-display-guard-20261022-01/keel-sdk/tests/actual-media-pair.test.mjs:26:176)
+    async Test.run (node:internal/test_runner/test:1054:7)
+  operator: 'rejects'
+  stack: |-
+    async TestContext.<anonymous> (file:///private/tmp/keel-temporal-display-guard-20261022-01/keel-sdk/tests/actual-media-pair.test.mjs:26:176)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: audio disappearance fails even when all video samples remain exact
+not ok 17 - audio disappearance fails even when all video samples remain exact
+  ---
+  duration_ms: 93.500958
+  type: 'test'
+  location: '/private/tmp/keel-temporal-display-guard-20261022-01/keel-sdk/tests/actual-media-pair.test.mjs:27:1'
+  failureType: 'testCodeFailure'
+  error: 'Movie chapter or language metadata semantics require an exact preserving adapter; native media is retained.'
+  code: 'ERR_TEST_FAILURE'
+  name: 'TypeError'
+  stack: |-
+    retain (file:///private/tmp/keel-temporal-display-guard-20261022-01/keel-sdk/packages/builder/dist/movie-presentation-semantics.js:10:40)
+    assertMoviePresentationSemantics (file:///private/tmp/keel-temporal-display-guard-20261022-01/keel-sdk/packages/builder/dist/movie-presentation-semantics.js:47:9)
+    decodeMovie (file:///private/tmp/keel-temporal-display-guard-20261022-01/keel-sdk/packages/builder/dist/media-preparation.js:144:5)
+    process.processTicksAndRejections (node:internal/process/task_queues:103:5)
+    async movieCandidate (file:///private/tmp/keel-temporal-display-guard-20261022-01/keel-sdk/packages/builder/dist/media-preparation.js:215:40)
+    async prepareMediaCandidate (file:///private/tmp/keel-temporal-display-guard-20261022-01/keel-sdk/packages/builder/dist/media-preparation.js:307:18)
+    async TestContext.<anonymous> (file:///private/tmp/keel-temporal-display-guard-20261022-01/keel-sdk/tests/actual-media-pair.test.mjs:27:132)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: explicit edits stay selected without granting automatic fidelity or fallback-to-original authority
+ok 18 - explicit edits stay selected without granting automatic fidelity or fallback-to-original authority
+  ---
+  duration_ms: 3.66675
+  type: 'test'
+  ...
+# Subtest: decoder corruption, unsupported external containers and pre-aborted work fail closed
+ok 19 - decoder corruption, unsupported external containers and pre-aborted work fail closed
+  ---
+  duration_ms: 116.107625
+  type: 'test'
+  ...
+# Subtest: the verifier snapshots mutable caller arrays and nested recipe before its first await
+ok 20 - the verifier snapshots mutable caller arrays and nested recipe before its first await
+  ---
+  duration_ms: 4.856708
+  type: 'test'
+  ...
+# Subtest: actual float64 PCM retains precision below float32 and detects a change in the final audio sample
+not ok 21 - actual float64 PCM retains precision below float32 and detects a change in the final audio sample
+  ---
+  duration_ms: 103.436667
+  type: 'test'
+  location: '/private/tmp/keel-temporal-display-guard-20261022-01/keel-sdk/tests/actual-media-pair.test.mjs:31:1'
+  failureType: 'testCodeFailure'
+  error: 'Movie chapter or language metadata semantics require an exact preserving adapter; native media is retained.'
+  code: 'ERR_TEST_FAILURE'
+  name: 'TypeError'
+  stack: |-
+    retain (file:///private/tmp/keel-temporal-display-guard-20261022-01/keel-sdk/packages/builder/dist/movie-presentation-semantics.js:10:40)
+    assertMoviePresentationSemantics (file:///private/tmp/keel-temporal-display-guard-20261022-01/keel-sdk/packages/builder/dist/movie-presentation-semantics.js:47:9)
+    decodeMovie (file:///private/tmp/keel-temporal-display-guard-20261022-01/keel-sdk/packages/builder/dist/media-preparation.js:144:5)
+    async decodeActualPairStream (file:///private/tmp/keel-temporal-display-guard-20261022-01/keel-sdk/packages/builder/dist/media-preparation.js:450:19)
+    async verifyActualMediaPair (file:///private/tmp/keel-temporal-display-guard-20261022-01/keel-sdk/packages/builder/dist/media-preparation.js:478:24)
+    async TestContext.<anonymous> (file:///private/tmp/keel-temporal-display-guard-20261022-01/keel-sdk/tests/actual-media-pair.test.mjs:35:50)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: original mode preserves arbitrary container bytes without decode or format eligibility claims
+ok 22 - original mode preserves arbitrary container bytes without decode or format eligibility claims
+  ---
+  duration_ms: 4.657333
+  type: 'test'
+  ...
+# Subtest: still lossless WebP fully decodes and verifies pixel identity with measured bytes
+ok 23 - still lossless WebP fully decodes and verifies pixel identity with measured bytes
+  ---
+  duration_ms: 10.352833
+  type: 'test'
+  ...
+# Subtest: explicit still edits create a reversible recipe, preserve source and distinguish encoding lossless from source pixels
+ok 24 - explicit still edits create a reversible recipe, preserve source and distinguish encoding lossless from source pixels
+  ---
+  duration_ms: 9.213416
+  type: 'test'
+  ...
+# Subtest: compare returns decoded PNG frames at the same timestamp with original and processed geometry
+ok 25 - compare returns decoded PNG frames at the same timestamp with original and processed geometry
+  ---
+  duration_ms: 12.003666
+  type: 'test'
+  ...
+# Subtest: animated GIF retains all frames and their delays, comparison selects same source instant
+not ok 26 - animated GIF retains all frames and their delays, comparison selects same source instant
+  ---
+  duration_ms: 130.977667
+  type: 'test'
+  location: '/private/tmp/keel-temporal-display-guard-20261022-01/keel-sdk/tests/media-preparation.test.mjs:26:1'
+  failureType: 'testCodeFailure'
+  error: 'Movie chapter or language metadata semantics require an exact preserving adapter; native media is retained.'
+  code: 'ERR_TEST_FAILURE'
+  name: 'TypeError'
+  stack: |-
+    retain (file:///private/tmp/keel-temporal-display-guard-20261022-01/keel-sdk/packages/builder/dist/movie-presentation-semantics.js:10:40)
+    assertMoviePresentationSemantics (file:///private/tmp/keel-temporal-display-guard-20261022-01/keel-sdk/packages/builder/dist/movie-presentation-semantics.js:47:9)
+    decodeMovie (file:///private/tmp/keel-temporal-display-guard-20261022-01/keel-sdk/packages/builder/dist/media-preparation.js:144:5)
+    process.processTicksAndRejections (node:internal/process/task_queues:103:5)
+    async movieCandidate (file:///private/tmp/keel-temporal-display-guard-20261022-01/keel-sdk/packages/builder/dist/media-preparation.js:262:80)
+    async prepareMediaCandidate (file:///private/tmp/keel-temporal-display-guard-20261022-01/keel-sdk/packages/builder/dist/media-preparation.js:307:18)
+    async TestContext.<anonymous> (file:///private/tmp/keel-temporal-display-guard-20261022-01/keel-sdk/tests/media-preparation.test.mjs:31:13)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: actual capability report and cancellation do not claim universal decode support
+ok 27 - actual capability report and cancellation do not claim universal decode support
+  ---
+  duration_ms: 53.01375
+  type: 'test'
+  ...
+# Subtest: MOV input is decoded by capability and exports MP4/MOV without changing source
+not ok 28 - MOV input is decoded by capability and exports MP4/MOV without changing source
+  ---
+  duration_ms: 83.876125
+  type: 'test'
+  location: '/private/tmp/keel-temporal-display-guard-20261022-01/keel-sdk/tests/media-preparation.test.mjs:40:1'
+  failureType: 'testCodeFailure'
+  error: 'Movie chapter or language metadata semantics require an exact preserving adapter; native media is retained.'
+  code: 'ERR_TEST_FAILURE'
+  name: 'TypeError'
+  stack: |-
+    retain (file:///private/tmp/keel-temporal-display-guard-20261022-01/keel-sdk/packages/builder/dist/movie-presentation-semantics.js:10:40)
+    assertMoviePresentationSemantics (file:///private/tmp/keel-temporal-display-guard-20261022-01/keel-sdk/packages/builder/dist/movie-presentation-semantics.js:47:9)
+    decodeMovie (file:///private/tmp/keel-temporal-display-guard-20261022-01/keel-sdk/packages/builder/dist/media-preparation.js:144:5)
+    async movieCandidate (file:///private/tmp/keel-temporal-display-guard-20261022-01/keel-sdk/packages/builder/dist/media-preparation.js:215:40)
+    async prepareMediaCandidate (file:///private/tmp/keel-temporal-display-guard-20261022-01/keel-sdk/packages/builder/dist/media-preparation.js:307:18)
+    async TestContext.<anonymous> (file:///private/tmp/keel-temporal-display-guard-20261022-01/keel-sdk/tests/media-preparation.test.mjs:47:12)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: still layers compose ordered source copies with explicit alpha, rotation and output bounds
+ok 29 - still layers compose ordered source copies with explicit alpha, rotation and output bounds
+  ---
+  duration_ms: 31.397292
+  type: 'test'
+  ...
+# Subtest: animated layers fail closed rather than silently ignoring composition
+ok 30 - animated layers fail closed rather than silently ignoring composition
+  ---
+  duration_ms: 2.857584
+  type: 'test'
+  ...
+# Subtest: an animated AVIF reimport preserves the verified sequence stream, both frames and exact timing
+not ok 31 - an animated AVIF reimport preserves the verified sequence stream, both frames and exact timing
+  ---
+  duration_ms: 99.134542
+  type: 'test'
+  location: '/private/tmp/keel-temporal-display-guard-20261022-01/keel-sdk/tests/media-preparation.test.mjs:74:1'
+  failureType: 'testCodeFailure'
+  error: 'Movie chapter or language metadata semantics require an exact preserving adapter; native media is retained.'
+  code: 'ERR_TEST_FAILURE'
+  name: 'TypeError'
+  stack: |-
+    retain (file:///private/tmp/keel-temporal-display-guard-20261022-01/keel-sdk/packages/builder/dist/movie-presentation-semantics.js:10:40)
+    assertMoviePresentationSemantics (file:///private/tmp/keel-temporal-display-guard-20261022-01/keel-sdk/packages/builder/dist/movie-presentation-semantics.js:47:9)
+    decodeMovie (file:///private/tmp/keel-temporal-display-guard-20261022-01/keel-sdk/packages/builder/dist/media-preparation.js:144:5)
+    async movieCandidate (file:///private/tmp/keel-temporal-display-guard-20261022-01/keel-sdk/packages/builder/dist/media-preparation.js:262:80)
+    async prepareMediaCandidate (file:///private/tmp/keel-temporal-display-guard-20261022-01/keel-sdk/packages/builder/dist/media-preparation.js:307:18)
+    async TestContext.<anonymous> (file:///private/tmp/keel-temporal-display-guard-20261022-01/keel-sdk/tests/media-preparation.test.mjs:78:13)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: standard WebP duration correction preserves the entire frame payload, loop and original bytes
+ok 32 - standard WebP duration correction preserves the entire frame payload, loop and original bytes
+  ---
+  duration_ms: 6.417417
+  type: 'test'
+  ...
+# Subtest: unrepresentable, omitted, reordered and truncated timelines fail closed without mutating the container
+ok 33 - unrepresentable, omitted, reordered and truncated timelines fail closed without mutating the container
+  ---
+  duration_ms: 0.838833
+  type: 'test'
+  ...
+# Subtest: strict animation parser rejects duplicate headers, flags, bad frame bounds, reordered control and corrupt padded chunks
+ok 34 - strict animation parser rejects duplicate headers, flags, bad frame bounds, reordered control and corrupt padded chunks
+  ---
+  duration_ms: 0.472708
+  type: 'test'
+  ...
+1..34
+# tests 34
+# suites 0
+# pass 26
+# fail 8
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 1790.966209

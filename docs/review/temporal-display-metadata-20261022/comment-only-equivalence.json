@@ -1,0 +1,8 @@
+{
+  "source": "packages/builder/src/movie-presentation-semantics.ts",
+  "behaviorCommit": "75993716f998ff900c14b862552dc0adcdab7a03",
+  "originalCommentFreeEmitSHA256": "8bcd227e07f1949ca5ebc3dd722bed6072601229d535be9823b246ec0c8c590e",
+  "finalCommentFreeEmitSHA256": "8bcd227e07f1949ca5ebc3dd722bed6072601229d535be9823b246ec0c8c590e",
+  "identical": true,
+  "scope": "grammar-reference comment correction only; source review remains pending"
+}

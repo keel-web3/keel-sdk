@@ -1,0 +1,10 @@
+{
+  "sourceCommit": "b8947412338569fc2d073aa75e882949a6e4379d",
+  "sourceBytes": 2937,
+  "sourceSHA256": "24f30f1fc7fce04647dede03e4bb640ab180dbf721e60d613fc8ebfb358e9c06",
+  "declaredMovieDurationMs": 1200,
+  "decodedDurationMs": 600,
+  "candidateBytes": 464,
+  "eligibility": "requires-canonical-player-proof",
+  "scope": "author actual API baseline; no browser visual difference claim"
+}

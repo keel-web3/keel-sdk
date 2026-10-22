@@ -1,0 +1,43 @@
+[
+  {
+    "name": "sar",
+    "source": {
+      "file": "sar.mp4",
+      "bytes": 2918,
+      "sha256": "66f1276bd4fdeafa2b3eb370598250b40248bb7ed356829c7bf257635512cab3"
+    },
+    "candidate": {
+      "file": "sar.webp",
+      "bytes": 464,
+      "sha256": "15e160de0827a42f62a73490d690561125232cff77877db53148cbc1ece035db"
+    },
+    "unsafeEligibility": "requires-canonical-player-proof"
+  },
+  {
+    "name": "title",
+    "source": {
+      "file": "title.mp4",
+      "bytes": 2972,
+      "sha256": "7c41053e177dd103e6a2a40e4b634a9cdaa48288b3ac3a028d64facffff636a7"
+    },
+    "candidate": {
+      "file": "title.webp",
+      "bytes": 464,
+      "sha256": "15e160de0827a42f62a73490d690561125232cff77877db53148cbc1ece035db"
+    },
+    "unsafeEligibility": "requires-canonical-player-proof"
+  },
+  {
+    "name": "exact-apng",
+    "source": {
+      "file": "exact-three-frame.apng",
+      "bytes": 642,
+      "sha256": "dd52b281bd517e471500f635bd67c696c2a6658473a00938c155c3866c060e58"
+    },
+    "candidate": {
+      "file": "apng-first-frame.webp",
+      "bytes": 174,
+      "sha256": "737a04d4c463eff7395bcf4043315533956295ce1c11184291e4ab2085a1ba05"
+    }
+  }
+]

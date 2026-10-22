@@ -1,0 +1,45 @@
+TAP version 13
+# Subtest: ordinary no-edit video remains complete and equivalent through the actual shared APIs
+ok 1 - ordinary no-edit video remains complete and equivalent through the actual shared APIs
+  ---
+  duration_ms: 136.272584
+  type: 'test'
+  ...
+# Subtest: STSZ fullbox, fixed/variable byte bounds, counts, zero sizes, duplicate and compact ambiguity fail closed
+ok 2 - STSZ fullbox, fixed/variable byte bounds, counts, zero sizes, duplicate and compact ambiguity fail closed
+  ---
+  duration_ms: 428.193708
+  type: 'test'
+  ...
+# Subtest: fixed-size PCM sample tables and the video track each bind their own no-edit clocks and counts
+ok 3 - fixed-size PCM sample tables and the video track each bind their own no-edit clocks and counts
+  ---
+  duration_ms: 9.782916
+  type: 'test'
+  ...
+# Subtest: coherent extra STSZ/STTS/header sample cannot be certified from three actual decoded frames
+not ok 4 - coherent extra STSZ/STTS/header sample cannot be certified from three actual decoded frames
+  ---
+  duration_ms: 63.428625
+  type: 'test'
+  location: '/private/tmp/keel-temporal-track-binding-20261022-01/keel-sdk/tests/movie-track-binding.test.mjs:44:1'
+  failureType: 'testCodeFailure'
+  error: 'Missing expected rejection.'
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected:
+  operator: 'rejects'
+  stack: |-
+    async TestContext.<anonymous> (file:///private/tmp/keel-temporal-track-binding-20261022-01/keel-sdk/tests/movie-track-binding.test.mjs:47:2)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+1..4
+# tests 4
+# suites 0
+# pass 3
+# fail 1
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 732.948459

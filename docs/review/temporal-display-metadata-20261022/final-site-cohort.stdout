@@ -1,0 +1,152 @@
+TAP version 13
+# (node:10726) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+# (Use `node --trace-deprecation ...` to show where the warning was created)
+# Subtest: untouched uploaded movie automatically reaches ACTUAL complete two-context compiler measurement without Apply
+ok 1 - untouched uploaded movie automatically reaches ACTUAL complete two-context compiler measurement without Apply
+  ---
+  duration_ms: 1182.406334
+  type: 'test'
+  ...
+# {"scope":"local-actual-codecs-normal-assets-source-body-physical-plans-final-render-selector-with-explicit-owner-catalog-adapters","input":{"digest":"0xa421a05635b124a135c770d3c9cc814c515cfcdaa4a7b3e68f24a332033e5561","bytes":1786},"before":{"id":"canonical:gzip","codec":"gzip","recipeDigest":"0x9077af32ffa61cfc3290a19245cff080de90f1f943bd8d2c53b25fdc2ddf46e3","measurementScope":{"contextDigest":"0x8b4321a231f9c2330eb80e94451231fd5f4cf5a1b788939c64391a448e765c82","kind":"final-project-release","projectId":"20000000-0000-4000-8000-000000000001","releaseId":"20000000-0000-4000-8000-000000000002","releaseRevision":1,"sourceRevision":1},"tokenURICommitment":{"digest":"0x34e6b4a7e45b962e0fe30317273af90a9f5d2ccd0f6db4a8624ce5f6137e7b9b","byteLength":136065},"derivedMetadataDigest":"0xc805eee60a1c9c34de7d3de821b2084cb316519c606cb783d3329b022237800f","metadataBytes":115815,"htmlBytes":95106,"imageBytes":91,"imageURIBytes":146,"imageDelivery":"inline","externalPreviewReadAuthenticated":false,"animationURIBytes":115257,"sourceBytes":1786,"compressedPayloadBytes":7965,"encodedPayloadBytes":8349,"completeTokenURIBytes":136065,"newStoredBytes":2245,"reusedStoredBytes":132079,"uniqueStoredBytes":134324,"uniqueObjects":5,"decoderObjectBytes":0,"bootObjectBytes":0,"combinedBootDecoderObjectBytes":119848,"generatedHtmlSuffixBytes":969,"nativeBrowserGzip":true,"javascriptCodecDecoderBytes":0,"decoderCostScope":"exact-distinct-stored-object-roles","javascriptGzipDecoderBytes":0,"sourceByteIdentity":"verified-exact","physicalManifestStoredBytes":2826,"accountedNewStoredBytes":5071,"costScope":"distinct-document-and-preview-objects-plus-physical-manifest","gas":"requires-complete-final-simulation","finalContext":{"digest":"0xb4dbfd5e0f2c9f01dba2db2bcfb11015994b59696cf015ca6bde80d134f853eb","tokenUriDigest":"0x34e6b4a7e45b962e0fe30317273af90a9f5d2ccd0f6db4a8624ce5f6137e7b9b","completeTokenUriBytes":136065,"prefixBytes":337,"suffixBytes":1459,"graphDigest":"0x5f1e4ce44a7bfa625fe6ac0513934d34615ab6140843c9ed9f30eaa90a64fcf6","manifestDigest":"0xdbb403baacea2db749d1b3c69f20077f0ee4265430f23522757ca1325c39739a","manifestObjectId":"0x06d49d156509a713246cfb546e147055392bfd83358f0d26cb1036b0551850d1","manifestPlanDigest":"0x00172190f4eba229891266e06f5308d10b71332bb9e6dbf089d1e8a8e28b726a"}},"after":{"id":"canonical:gzip","codec":"gzip","recipeDigest":"0x9077af32ffa61cfc3290a19245cff080de90f1f943bd8d2c53b25fdc2ddf46e3","measurementScope":{"contextDigest":"0x8b4321a231f9c2330eb80e94451231fd5f4cf5a1b788939c64391a448e765c82","kind":"final-project-release","projectId":"20000000-0000-4000-8000-000000000001","releaseId":"20000000-0000-4000-8000-000000000002","releaseRevision":1,"sourceRevision":1},"tokenURICommitment":{"digest":"0xad23d59a247d4a0fef7e795babf1e7740a2bfb398ed008320866ada746f9f616","byteLength":134700},"derivedMetadataDigest":"0x6ef6e9f8de204232c163f7a0fa34cb1cd02e9be30a8387405f158a0758ad16ab","metadataBytes":114450,"htmlBytes":93741,"imageBytes":91,"imageURIBytes":146,"imageDelivery":"inline","externalPreviewReadAuthenticated":false,"animationURIBytes":113892,"sourceBytes":188,"compressedPayloadBytes":6943,"encodedPayloadBytes":6985,"completeTokenURIBytes":134700,"newStoredBytes":880,"reusedStoredBytes":132079,"uniqueStoredBytes":132959,"uniqueObjects":5,"decoderObjectBytes":0,"bootObjectBytes":0,"combinedBootDecoderObjectBytes":119848,"generatedHtmlSuffixBytes":969,"nativeBrowserGzip":true,"javascriptCodecDecoderBytes":0,"decoderCostScope":"exact-distinct-stored-object-roles","javascriptGzipDecoderBytes":0,"sourceByteIdentity":"verified-exact","physicalManifestStoredBytes":2855,"accountedNewStoredBytes":3735,"costScope":"distinct-document-and-preview-objects-plus-physical-manifest","gas":"requires-complete-final-simulation","finalContext":{"digest":"0x0304caf2ef192de3f610f9af673b650d11999d2e68fc77c90127f32e09dc3a0b","tokenUriDigest":"0xad23d59a247d4a0fef7e795babf1e7740a2bfb398ed008320866ada746f9f616","completeTokenUriBytes":134700,"prefixBytes":337,"suffixBytes":1459,"graphDigest":"0x97831c0bb98e5001da83a85d5a467b59cd7a5edc4a56724ea9ef1769e6ebc2b8","manifestDigest":"0xad789a42854e29c3041a2d57452825da32e45520eccc5510488b12d7a664da65","manifestObjectId":"0xf9d683d9c87b0cda8bb3b29945930bb76cc0bb2ef299fd5d89db7c92ec7addff","manifestPlanDigest":"0x4d3df354fa396a3b55b16368a6ce0b97871396ce7361c5550b8da033b89a9bcb"}}}
+# Subtest: Raw and explicit Apply retain creator intent without generating or measuring an alternative
+ok 2 - Raw and explicit Apply retain creator intent without generating or measuring an alternative
+  ---
+  duration_ms: 240.594125
+  type: 'test'
+  ...
+# Subtest: access denial terminates this consumer before another candidate or backend attempt
+ok 3 - access denial terminates this consumer before another candidate or backend attempt
+  ---
+  duration_ms: 385.676875
+  type: 'test'
+  ...
+# Subtest: hydrated pair proof cannot grant actual-pair authority to the logical media preparation sibling
+ok 4 - hydrated pair proof cannot grant actual-pair authority to the logical media preparation sibling
+  ---
+  duration_ms: 200.857833
+  type: 'test'
+  ...
+# Subtest: the retained invalid PNG stays rejected by the real decoder; correction never bypasses image verification
+ok 5 - the retained invalid PNG stays rejected by the real decoder; correction never bypasses image verification
+  ---
+  duration_ms: 2.721708
+  type: 'test'
+  ...
+# Subtest: the wrong owner/revision result cannot enter automatic preparation even through a faulty adapter
+ok 6 - the wrong owner/revision result cannot enter automatic preparation even through a faulty adapter
+  ---
+  duration_ms: 202.80675
+  type: 'test'
+  ...
+# Subtest: an older or unqualified renderer keeps the native temporal file instead of freezing it
+ok 7 - an older or unqualified renderer keeps the native temporal file instead of freezing it
+  ---
+  duration_ms: 638.338833
+  type: 'test'
+  ...
+# Subtest: a changed final collector preview commitment terminates before preparing either graph
+ok 8 - a changed final collector preview commitment terminates before preparing either graph
+  ---
+  duration_ms: 381.198625
+  type: 'test'
+  ...
+# Subtest: source change after the first actual final render cannot produce a second graph or adopt its partial result
+ok 9 - source change after the first actual final render cannot produce a second graph or adopt its partial result
+  ---
+  duration_ms: 529.884
+  type: 'test'
+  ...
+# Subtest: saved defaults change after the first actual final render is a terminal preparation error
+ok 10 - saved defaults change after the first actual final render is a terminal preparation error
+  ---
+  duration_ms: 489.474292
+  type: 'test'
+  ...
+# Subtest: pre-aborted default preparation performs no owned-source work
+ok 11 - pre-aborted default preparation performs no owned-source work
+  ---
+  duration_ms: 184.009958
+  type: 'test'
+  ...
+# Subtest: an untouched movie with real audio remains native with all original bytes; no image optimization drops sound
+ok 12 - an untouched movie with real audio remains native with all original bytes; no image optimization drops sound
+  ---
+  duration_ms: 370.5655
+  type: 'test'
+  ...
+# (node:11454) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+# (Use `node --trace-deprecation ...` to show where the warning was created)
+# Subtest: unchanged final normal bytes produce compact bound review without artwork or wallet authority
+ok 13 - unchanged final normal bytes produce compact bound review without artwork or wallet authority
+  ---
+  duration_ms: 227.517083
+  type: 'test'
+  ...
+# Subtest: a different actual candidate manifest requires a new review rather than adoption
+ok 14 - a different actual candidate manifest requires a new review rather than adoption
+  ---
+  duration_ms: 142.14075
+  type: 'test'
+  ...
+# Subtest: final review rejects provisional without borrowing another candidate's success
+ok 15 - final review rejects provisional without borrowing another candidate's success
+  ---
+  duration_ms: 140.337959
+  type: 'test'
+  ...
+# Subtest: final review rejects mutated-return without borrowing another candidate's success
+ok 16 - final review rejects mutated-return without borrowing another candidate's success
+  ---
+  duration_ms: 131.479916
+  type: 'test'
+  ...
+# Subtest: final review rejects source-race without borrowing another candidate's success
+ok 17 - final review rejects source-race without borrowing another candidate's success
+  ---
+  duration_ms: 143.594458
+  type: 'test'
+  ...
+# Subtest: actor/source/default/chain/revision substitution is rejected before final proof
+ok 18 - actor/source/default/chain/revision substitution is rejected before final proof
+  ---
+  duration_ms: 409.153083
+  type: 'test'
+  ...
+# (node:11620) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+# (Use `node --trace-deprecation ...` to show where the warning was created)
+# Subtest: real final normal metadata and actual per-codec plans drive SDK ranking; provisional body estimates cannot adopt
+ok 19 - real final normal metadata and actual per-codec plans drive SDK ranking; provisional body estimates cannot adopt
+  ---
+  duration_ms: 517.026917
+  type: 'test'
+  ...
+# {"scope":"local-final-normal-render-and-real-sdk-selector-no-live-registration-or-simulation","candidates":[{"id":"gzip","codec":"gzip","recipeDigest":"0xb57b5bb332b7c916f7cc6b1d4f65052e728cd5fc3c65eb165ce11832e2584bce","measurementScope":{"contextDigest":"0x008115e0a7863f5ce719b1fbc54e2fcf3fda55e7997f4dda659b280979bb2659","creatorId":"creator","kind":"final-project-release","projectId":"20000000-0000-4000-8000-000000000001","releaseId":"release","releaseRevision":7,"sourceRevision":4},"tokenURICommitment":{"digest":"0x08400f666e8e156d60d51dee4a944eb0a6d84980484580507fc433f3f95ad161","byteLength":124225},"derivedMetadataDigest":"0x127efebb5776473069388d4bc00ba47701b67cb97aa27d99ba449fce59800e6d","metadataBytes":106055,"htmlBytes":86986,"imageBytes":68,"imageURIBytes":114,"imageDelivery":"inline","externalPreviewReadAuthenticated":false,"animationURIBytes":105001,"sourceBytes":150123,"compressedPayloadBytes":552,"encodedPayloadBytes":740,"completeTokenURIBytes":124225,"newStoredBytes":2061,"reusedStoredBytes":119848,"uniqueStoredBytes":121909,"uniqueObjects":5,"decoderObjectBytes":0,"bootObjectBytes":0,"combinedBootDecoderObjectBytes":119848,"generatedHtmlSuffixBytes":969,"nativeBrowserGzip":true,"javascriptCodecDecoderBytes":0,"decoderCostScope":"exact-distinct-stored-object-roles","javascriptGzipDecoderBytes":0,"sourceByteIdentity":"verified-exact"},{"id":"none","codec":"none","recipeDigest":"0xd079a7bd1c11399ae268bd15f2c9e1c3135bb8833829ade8d588ee16e87e9492","measurementScope":{"contextDigest":"0x008115e0a7863f5ce719b1fbc54e2fcf3fda55e7997f4dda659b280979bb2659","creatorId":"creator","kind":"final-project-release","projectId":"20000000-0000-4000-8000-000000000001","releaseId":"release","releaseRevision":7,"sourceRevision":4},"tokenURICommitment":{"digest":"0x176dd7841244d782b34ae758c624f8ba74e52312a8ff3879104e0356fa1bbd7f","byteLength":373763},"derivedMetadataDigest":"0xd89d4fab62a85ac48da246de460f02548c753cd93ba146a5ec0ae730315ba932","metadataBytes":305553,"htmlBytes":236444,"imageBytes":68,"imageURIBytes":114,"imageDelivery":"inline","externalPreviewReadAuthenticated":false,"animationURIBytes":304499,"sourceBytes":150123,"compressedPayloadBytes":150123,"encodedPayloadBytes":150147,"completeTokenURIBytes":373763,"newStoredBytes":251599,"reusedStoredBytes":119848,"uniqueStoredBytes":371447,"uniqueObjects":5,"decoderObjectBytes":0,"bootObjectBytes":0,"combinedBootDecoderObjectBytes":119848,"generatedHtmlSuffixBytes":969,"nativeBrowserGzip":false,"javascriptCodecDecoderBytes":null,"decoderCostScope":"exact-distinct-stored-object-roles","sourceByteIdentity":"verified-exact"}]}
+# (node:11699) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+# (Use `node --trace-deprecation ...` to show where the warning was created)
+# Subtest: current readonly candidate derives exact scratch plans without persistent blob/database/history ports
+ok 20 - current readonly candidate derives exact scratch plans without persistent blob/database/history ports
+  ---
+  duration_ms: 218.107208
+  type: 'test'
+  ...
+# Subtest: paid or unresolved source cannot be relabeled new or enter comparison/adoption
+ok 21 - paid or unresolved source cannot be relabeled new or enter comparison/adoption
+  ---
+  duration_ms: 155.623125
+  type: 'test'
+  ...
+# Subtest: an exact unissued source reaches authoritative defaults rather than being blanket-blocked
+ok 22 - an exact unissued source reaches authoritative defaults rather than being blanket-blocked
+  ---
+  duration_ms: 40.88025
+  type: 'test'
+  ...
+1..22
+# tests 22
+# suites 0
+# pass 22
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 16917.974833

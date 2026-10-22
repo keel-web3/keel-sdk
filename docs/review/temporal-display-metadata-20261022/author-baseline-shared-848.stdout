@@ -1,0 +1,118 @@
+TAP version 13
+# Subtest: SDK848 shared candidate: unsupported sar semantics must remain native
+not ok 1 - SDK848 shared candidate: unsupported sar semantics must remain native
+  ---
+  duration_ms: 98.765375
+  type: 'test'
+  location: '/private/tmp/keel-independent-temporal-pairs-20261022-01/baseline-sdk-848/reviewer-shared-848.test.mjs:3:77'
+  failureType: 'testCodeFailure'
+  error: 'Missing expected rejection.'
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected:
+  operator: 'rejects'
+  stack: |-
+    async TestContext.<anonymous> (file:///private/tmp/keel-independent-temporal-pairs-20261022-01/baseline-sdk-848/reviewer-shared-848.test.mjs:3:625)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async startSubtestAfterBootstrap (node:internal/test_runner/harness:296:3)
+  ...
+# {"kind":"sar","action":"candidate","verification":{"sourcePreserved":true,"completeDecode":true,"framesAndTimingPreserved":true,"losslessPixelsVerified":true,"browserDecode":"requires-runtime-check"},"sourceInfo":{"width":32,"height":24,"durationMs":600,"frameCount":3,"animated":true,"hasAudio":false,"frameTimesMs":[0,200,400],"frameDurationsMs":[200,200,200]},"candidateInfo":{"width":32,"height":24,"durationMs":600,"frameCount":3,"animated":true,"hasAudio":false,"frameTimesMs":[0,200,400],"frameDurationsMs":[200,200,200]}}
+# Subtest: SDK848 shared compare: unsupported sar semantics must remain native
+not ok 2 - SDK848 shared compare: unsupported sar semantics must remain native
+  ---
+  duration_ms: 160.627667
+  type: 'test'
+  location: '/private/tmp/keel-independent-temporal-pairs-20261022-01/baseline-sdk-848/reviewer-shared-848.test.mjs:3:77'
+  failureType: 'testCodeFailure'
+  error: 'Missing expected rejection.'
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected:
+  operator: 'rejects'
+  stack: |-
+    async TestContext.<anonymous> (file:///private/tmp/keel-independent-temporal-pairs-20261022-01/baseline-sdk-848/reviewer-shared-848.test.mjs:3:625)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# {"kind":"sar","action":"compare","verification":{"sourcePreserved":true,"completeDecode":true,"framesAndTimingPreserved":true,"losslessPixelsVerified":true,"browserDecode":"requires-runtime-check"},"sourceInfo":{"width":32,"height":24,"durationMs":600,"frameCount":3,"animated":true,"hasAudio":false,"frameTimesMs":[0,200,400],"frameDurationsMs":[200,200,200]},"candidateInfo":{"width":32,"height":24,"durationMs":600,"frameCount":3,"animated":true,"hasAudio":false,"frameTimesMs":[0,200,400],"frameDurationsMs":[200,200,200]}}
+# Subtest: SDK848 shared candidate: unsupported title semantics must remain native
+not ok 3 - SDK848 shared candidate: unsupported title semantics must remain native
+  ---
+  duration_ms: 79.411417
+  type: 'test'
+  location: '/private/tmp/keel-independent-temporal-pairs-20261022-01/baseline-sdk-848/reviewer-shared-848.test.mjs:3:77'
+  failureType: 'testCodeFailure'
+  error: 'Missing expected rejection.'
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected:
+  operator: 'rejects'
+  stack: |-
+    async TestContext.<anonymous> (file:///private/tmp/keel-independent-temporal-pairs-20261022-01/baseline-sdk-848/reviewer-shared-848.test.mjs:3:625)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# {"kind":"title","action":"candidate","verification":{"sourcePreserved":true,"completeDecode":true,"framesAndTimingPreserved":true,"losslessPixelsVerified":true,"browserDecode":"requires-runtime-check"},"sourceInfo":{"width":32,"height":24,"durationMs":600,"frameCount":3,"animated":true,"hasAudio":false,"frameTimesMs":[0,200,400],"frameDurationsMs":[200,200,200]},"candidateInfo":{"width":32,"height":24,"durationMs":600,"frameCount":3,"animated":true,"hasAudio":false,"frameTimesMs":[0,200,400],"frameDurationsMs":[200,200,200]}}
+# Subtest: SDK848 shared compare: unsupported title semantics must remain native
+not ok 4 - SDK848 shared compare: unsupported title semantics must remain native
+  ---
+  duration_ms: 158.285125
+  type: 'test'
+  location: '/private/tmp/keel-independent-temporal-pairs-20261022-01/baseline-sdk-848/reviewer-shared-848.test.mjs:3:77'
+  failureType: 'testCodeFailure'
+  error: 'Missing expected rejection.'
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected:
+  operator: 'rejects'
+  stack: |-
+    async TestContext.<anonymous> (file:///private/tmp/keel-independent-temporal-pairs-20261022-01/baseline-sdk-848/reviewer-shared-848.test.mjs:3:625)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# {"kind":"title","action":"compare","verification":{"sourcePreserved":true,"completeDecode":true,"framesAndTimingPreserved":true,"losslessPixelsVerified":true,"browserDecode":"requires-runtime-check"},"sourceInfo":{"width":32,"height":24,"durationMs":600,"frameCount":3,"animated":true,"hasAudio":false,"frameTimesMs":[0,200,400],"frameDurationsMs":[200,200,200]},"candidateInfo":{"width":32,"height":24,"durationMs":600,"frameCount":3,"animated":true,"hasAudio":false,"frameTimesMs":[0,200,400],"frameDurationsMs":[200,200,200]}}
+# Subtest: SDK848 shared candidate: exact three-frame APNG cannot become first-frame WebP
+not ok 5 - SDK848 shared candidate: exact three-frame APNG cannot become first-frame WebP
+  ---
+  duration_ms: 5.427125
+  type: 'test'
+  location: '/private/tmp/keel-independent-temporal-pairs-20261022-01/baseline-sdk-848/reviewer-shared-848.test.mjs:4:44'
+  failureType: 'testCodeFailure'
+  error: 'Missing expected rejection.'
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected:
+  operator: 'rejects'
+  stack: |-
+    async TestContext.<anonymous> (file:///private/tmp/keel-independent-temporal-pairs-20261022-01/baseline-sdk-848/reviewer-shared-848.test.mjs:4:312)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# {"sourceBytes":642,"action":"candidate","verification":{"sourcePreserved":true,"completeDecode":true,"framesAndTimingPreserved":true,"losslessPixelsVerified":true,"browserDecode":"requires-runtime-check"},"sourceInfo":{"width":32,"height":24,"durationMs":0,"frameCount":1,"animated":false,"hasAudio":false,"frameTimesMs":[0],"frameDurationsMs":[0]},"candidateInfo":{"width":32,"height":24,"durationMs":0,"frameCount":1,"animated":false,"hasAudio":false,"frameTimesMs":[0],"frameDurationsMs":[0]}}
+# Subtest: SDK848 shared compare: exact three-frame APNG cannot become first-frame WebP
+not ok 6 - SDK848 shared compare: exact three-frame APNG cannot become first-frame WebP
+  ---
+  duration_ms: 6.496125
+  type: 'test'
+  location: '/private/tmp/keel-independent-temporal-pairs-20261022-01/baseline-sdk-848/reviewer-shared-848.test.mjs:4:44'
+  failureType: 'testCodeFailure'
+  error: 'Missing expected rejection.'
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected:
+  operator: 'rejects'
+  stack: |-
+    async TestContext.<anonymous> (file:///private/tmp/keel-independent-temporal-pairs-20261022-01/baseline-sdk-848/reviewer-shared-848.test.mjs:4:312)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# {"sourceBytes":642,"action":"compare","verification":{"sourcePreserved":true,"completeDecode":true,"framesAndTimingPreserved":true,"losslessPixelsVerified":true,"browserDecode":"requires-runtime-check"},"sourceInfo":{"width":32,"height":24,"durationMs":0,"frameCount":1,"animated":false,"hasAudio":false,"frameTimesMs":[0],"frameDurationsMs":[0]},"candidateInfo":{"width":32,"height":24,"durationMs":0,"frameCount":1,"animated":false,"hasAudio":false,"frameTimesMs":[0],"frameDurationsMs":[0]}}
+1..6
+# tests 6
+# suites 0
+# pass 0
+# fail 6
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 695.885166

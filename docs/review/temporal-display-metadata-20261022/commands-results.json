@@ -1,0 +1,53 @@
+{
+  "schema": "keel-author-checks@1",
+  "independentSourceApproval": "PENDING",
+  "scope": "local public synthetic media; no external RPC, production or wallet",
+  "checks": [
+    {
+      "name": "SDK complete codec/container/semantics/shared SDK+MCP",
+      "commit": "4cef175f2a7b9c18cb1470006a65835c56f35bf1",
+      "exitCode": 0,
+      "pass": 54,
+      "fail": 0,
+      "skip": 0,
+      "stdout": "final-4cef-sdk-cohort.stdout",
+      "stderr": "final-4cef-sdk-cohort.stderr"
+    },
+    {
+      "name": "Site normal full-context compilation",
+      "siteCommit": "3a76da90027b8c8e4b0c4b3aee8be0f03091bbe4",
+      "sdkCommit": "4cef175f2a7b9c18cb1470006a65835c56f35bf1",
+      "exitCode": 0,
+      "pass": 22,
+      "fail": 0,
+      "skip": 0,
+      "stdout": "final-4cef-site-cohort.stdout",
+      "stderr": "final-4cef-site-cohort.stderr"
+    },
+    {
+      "name": "actual canonical Chromium playback/native preservation",
+      "commit": "4cef175f2a7b9c18cb1470006a65835c56f35bf1",
+      "exitCode": 0,
+      "pass": 6,
+      "fail": 0,
+      "skip": 0,
+      "stdout": "final-browser-video-driver.stdout",
+      "stderr": "final-browser-video-driver.stderr"
+    },
+    {
+      "name": "builder TSC",
+      "commit": "75993716f998ff900c14b862552dc0adcdab7a03",
+      "exitCode": 0,
+      "stdout": "final-builder-tsc.stdout",
+      "stderr": "final-builder-tsc.stderr"
+    },
+    {
+      "name": "Site TSC",
+      "siteCommit": "3a76da90027b8c8e4b0c4b3aee8be0f03091bbe4",
+      "sdkCommit": "4180b9cceae65de05d0cdffa69d7b0d45f3728bb",
+      "exitCode": 0,
+      "stdout": "final-site-tsc-418.stdout",
+      "stderr": "final-site-tsc-418.stderr"
+    }
+  ]
+}

@@ -1,0 +1,39 @@
+{
+  "schema": "keel-temporal-audio-preservation@1",
+  "source": {
+    "byteLength": 13467,
+    "digest": "0xb66bf6aba2208322515f521606975ce2fca8d754f509376bc968ae2ed6251255"
+  },
+  "candidate": {
+    "byteLength": 13466,
+    "digest": "0x86dd32060e1e6b03e88e1db25513c4c38c0abd9011aeda7976cc385eca8fc44f"
+  },
+  "audio": {
+    "decodedPCMBytes": 96256,
+    "digest": "0x7484a35863bc2c16627fd25a729ae0fbfa46c27da7e951e0258fa268ae85752c",
+    "allSamplesEqual": true
+  },
+  "timeline": {
+    "width": 32,
+    "height": 24,
+    "durationMs": 1000,
+    "frameCount": 5,
+    "animated": true,
+    "hasAudio": true,
+    "frameTimesMs": [
+      0,
+      200,
+      400,
+      600,
+      800
+    ],
+    "frameDurationsMs": [
+      200,
+      200,
+      200,
+      200,
+      200
+    ]
+  },
+  "scope": "Pinned actual full source/movie decoders; image carriers rejected before audio removal. No live or hardware audio output claim"
+}
