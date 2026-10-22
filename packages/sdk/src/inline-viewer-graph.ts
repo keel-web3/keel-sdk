@@ -1,3 +1,4 @@
+import { inspectKeelNativeSVG, inspectKeelNativeAudio, KEEL_NATIVE_AUDIO_MEDIA_TYPES } from "./native-media-inspection.js";
 import { snapshotKeelExplicitExternalPreview, assertKeelExternalPreviewImageURI, type KeelExplicitExternalPreview } from "./external-preview.js";
 export { prepareKeelExplicitExternalPreview, snapshotKeelExplicitExternalPreview } from "./external-preview.js";
 export type { KeelExplicitExternalPreview } from "./external-preview.js";
@@ -331,6 +332,8 @@ export interface KeelInlineNormalMediaDocument extends KeelInlineGraphDocument {
       readonly integrity: Integrity;
     };
   };
+  readonly nativeMediaPresentation?: Awaited<ReturnType<typeof buildKeelInlineNativeAudioDocument>>["nativeMediaPresentation"];
+  readonly registeredNativeGzip?: KeelRegisteredNativeGzipProof;
 }
 
 export interface KeelInlinePreEncodedTokenURIFragment extends KeelInlineFragmentBytes {
@@ -1291,6 +1294,13 @@ export async function buildKeelInlineLocalDocument(input: {
     readonly aliases?: readonly string[];
   };
 }): Promise<KeelInlineLocalDocument> {
+  if ((KEEL_NATIVE_AUDIO_MEDIA_TYPES as readonly string[]).includes(input.entry.mediaType)) return buildKeelInlineNativeAudioDocument(input);
+  if (input.entry.mediaType === "image/svg+xml") {
+    input = structuredClone(input);
+    inspectKeelNativeSVG(input.entry.source);
+    if (input.modules.length !== 1 || input.modules[0]?.version !== "1.5.0") throw new TypeError("Native SVG requires the exact new SVG-capable asset-display 1.5 profile.");
+  }
+  if (input.entry.mediaType !== "text/html" && input.entry.mediaType !== "text/javascript" && !isNormalMediaEntry(input.entry.mediaType) && !isModelMediaEntry(input.entry.mediaType)) throw new TypeError("The entry MIME has no qualified current viewer; it cannot be silently parsed as HTML.");
   const payloadStorage = resolveKeelPayloadStorage(input.payloadStorage);
   const entryCompression = inlineCompression(inheritInlineStorage(payloadStorage, input.entry.payloadStorage), input.entry.compression, "none");
   const orderedModules = orderKeelModules(input.modules);
@@ -1428,6 +1438,43 @@ export async function buildKeelInlineLocalDocument(input: {
   };
 }
 
+/** Audio uses the already supported derived-HTML entry pattern: the immutable
+ * original stays an asset, and the existing registered shell need not change. */
+export async function buildKeelInlineNativeAudioDocument(input: Parameters<typeof buildKeelInlineLocalDocument>[0] & {
+  readonly registeredNativeGzipBinding?: KeelRegisteredNativeGzipBinding;
+}) {
+  input = structuredClone(input);
+  const inspection = inspectKeelNativeAudio({mediaType: input.entry.mediaType, source: input.entry.source});
+  const module = input.modules[0];
+  if (input.modules.length !== 1 || !module || module.version !== "1.5.0") throw new TypeError("Native audio requires exactly the current audio-capable asset-display 1.5 module.");
+  await assertCanonicalAssetDisplayModule(module);
+  const assets = input.assets ?? [], preview = assets[0];
+  if (assets.length > 1 || preview && !["image/png", "image/jpeg", "image/gif", "image/webp", "image/avif", "image/svg+xml"].includes(preview.mediaType)) throw new TypeError("An audio cover must be one exact supported image; extra creator dependencies require an explicit project route.");
+  if (preview) { if (preview.mediaType === "image/svg+xml") inspectKeelNativeSVG(preview.source); else assertKeelInlineImageBytes(preview.source, preview.mediaType); }
+  const nativeBinding = input.registeredNativeGzipBinding === undefined ? undefined : snapshotKeelRegisteredNativeGzipBinding(input.registeredNativeGzipBinding);
+  if (nativeBinding) {
+    const profile = KEEL_REGISTERED_NATIVE_GZIP_FRAME_PROFILE;
+    for (const [part, length, digest] of [[input.shell.prefix, profile.prefixByteLength, profile.prefixDigest], [input.shell.suffix, profile.suffixByteLength, profile.suffixDigest]] as const) if (input.shell.codecProfile !== "browser-gzip-deflate" || part.bytes.length !== length || `0x${createHash("sha256").update(part.bytes).digest("hex")}` !== digest) throw new TypeError("Audio needs the exact authenticated current native Gzip shell frames.");
+  } else {
+    const shell = await buildKeelInlineShellFragments({repositoryRoot: ""});
+    if (!exactBytes(shell.prefix.bytes, input.shell.prefix.bytes) || !exactBytes(shell.suffix.bytes, input.shell.suffix.bytes)) throw new TypeError("Audio needs the exact canonical shell; local bytes are not registration proof.");
+  }
+  const mode = resolveKeelPayloadStorage(input.payloadStorage), original = {id: input.entry.id, mediaType: input.entry.mediaType, integrity: await createIntegrity(input.entry.source)}, cover = preview ? {id: preview.id, mediaType: preview.mediaType, integrity: await createIntegrity(preview.source)} : undefined;
+  const generatedId = "keel-native-audio-presentation";
+  if ([input.entry, ...assets].some(resource => resource.id === generatedId || resource.aliases?.includes(generatedId))) throw new TypeError("Original audio resources conflict with the derived presentation identity.");
+  const descriptor = {id: original.id, mediaType: original.mediaType, digest: original.integrity.digest, byteLength: original.integrity.byteLength, name: input.entry.aliases?.[0] ?? original.id,
+    ...(cover ? {preview: {id: cover.id, digest: cover.integrity.digest, byteLength: cover.integrity.byteLength}} : {})};
+  const html = encoder.encode(`<!doctype html><html><head><meta charset="utf-8"><style>html,body,#keel-asset-display{width:100%;height:100%;margin:0;background:#05060b;overflow:hidden}</style></head><body><main id="keel-asset-display"></main><script>{const mount=()=>{const d=${serializeScriptJSON(descriptor)},c=globalThis.__KEEL_CONTENT__;const entry=Object.freeze({...d,url:c.url(d.id)});Object.defineProperty(globalThis,"__KEEL_ENTRY__",{value:entry,writable:false,configurable:false});globalThis.__KEEL_ASSET_DISPLAY__.mount(entry)};document.readyState==="loading"?addEventListener("DOMContentLoaded",mount,{once:true}):mount()}</script></body></html>`);
+  const audioMode = inheritInlineStorage(mode, input.entry.payloadStorage);
+  const compression = input.entry.compression !== undefined ? inlineCompression(audioMode, input.entry.compression, "none") : nativeBinding && audioMode !== "raw" ? "gzip" : assetCompression(input.entry, mode);
+  const document = await buildKeelInlineLocalDocument({shell: input.shell, modules: input.modules, payloadStorage: mode,
+    assets: [{...input.entry, compression}, ...assets], entry: {id: generatedId, mediaType: "text/html", source: html, compression: "none"}});
+  const registeredNativeGzip = nativeBinding ? createKeelRegisteredNativeGzipProof({binding: nativeBinding, documentBytes: document.rootBytes}) : undefined;
+  return {...document, ...(registeredNativeGzip ? {registeredNativeGzip} : {}), nativeMediaPresentation: {schema: "keel-native-audio-presentation@1" as const, original, ...(cover ? {preview: cover} : {}),
+    generatedEntry: {id: generatedId, mediaType: "text/html" as const, integrity: await createIntegrity(html), kind: "derived-presentation" as const}, inspection,
+    byteCounts: {originalSources: input.entry.source.length + assets.reduce((n, asset) => n + asset.source.length, 0), generatedHTML: html.length, completeHTML: document.byteLength}}};
+}
+
 /** Complete inspected originals, exact loader closure and every retained dependency. */
 export async function buildKeelInlineModelMediaDocument(input: {
   readonly shell: KeelInlineShellFragments;
@@ -1541,10 +1588,13 @@ export async function buildKeelRegisteredInlineModelMediaTokenURIGraph(input: {
  */
 export async function buildKeelInlineNormalMediaDocument(input: {
   readonly shell: KeelInlineShellFragments;
+  readonly preview?: {readonly id: string; readonly mediaType: string; readonly source: Uint8Array};
+  readonly payloadStorage?: KeelPayloadStorageMode;
+  readonly registeredNativeGzipBinding?: KeelRegisteredNativeGzipBinding;
   readonly asset: {
     readonly id: string;
     readonly backgroundColor?: string;
-    readonly mediaType: KeelAssetDisplayMediaType;
+    readonly mediaType: KeelAssetDisplayMediaType | KeelModelMediaType;
     readonly source: Uint8Array;
     readonly aliases?: readonly string[];
   };
@@ -1554,23 +1604,24 @@ export async function buildKeelInlineNormalMediaDocument(input: {
     throw new TypeError("Models require the exact complete loader closure and derived presentation, never the retired flat-primitive renderer.");
   }
   keelAssetDisplayKind(input.asset.mediaType);
+  const audio = (KEEL_NATIVE_AUDIO_MEDIA_TYPES as readonly string[]).includes(input.asset.mediaType);
+  if (audio || input.asset.mediaType === "image/svg+xml") input = structuredClone(input);
   const [assetDisplay, canonicalShell] = await Promise.all([
     buildKeelInlineAssetDisplayModuleFragment(),
     buildKeelInlineShellFragments({ repositoryRoot: "" }),
   ]);
   if (
-    !exactBytes(input.shell.prefix.bytes, canonicalShell.prefix.bytes)
-    || !exactBytes(input.shell.suffix.bytes, canonicalShell.suffix.bytes)
+    (!audio || !input.registeredNativeGzipBinding) && (!exactBytes(input.shell.prefix.bytes, canonicalShell.prefix.bytes)
+    || !exactBytes(input.shell.suffix.bytes, canonicalShell.suffix.bytes))
   ) {
     throw new TypeError("Normal media must use the exact canonical registered KEEL Inline shell fragments.");
   }
-  const local = await buildKeelInlineLocalDocument({
-    shell: input.shell,
-    modules: [assetDisplay],
-    entry: input.asset,
-  });
-  const entry = local.parts[2];
-  if (entry === undefined || entry.kind !== "creator" || entry.role !== "entrypoint") {
+  if (input.preview && !audio) throw new TypeError("Separate ordinary media posters are metadata; only audio cover presentation belongs to this explicit cover option.");
+  const request = {shell: input.shell, modules: [assetDisplay], entry: input.asset, ...(input.payloadStorage ? {payloadStorage: input.payloadStorage} : {}), ...(input.preview ? {assets: [input.preview]} : {})};
+  const audioDocument = audio ? await buildKeelInlineNativeAudioDocument({...request, ...(input.registeredNativeGzipBinding ? {registeredNativeGzipBinding: input.registeredNativeGzipBinding} : {})}) : undefined;
+  const local = audioDocument ?? await buildKeelInlineLocalDocument(request);
+  const entry = local.parts.find(part => part.kind === "creator" && JSON.parse(decoder.decode(part.bytes).slice(1)).id === input.asset.id);
+  if (entry === undefined || entry.kind !== "creator" || (!audio && entry.role !== "entrypoint")) {
     throw new Error("Canonical normal-media composition did not produce the creator entrypoint.");
   }
   const entryItem = JSON.parse(decoder.decode(entry.bytes).slice(1)) as KeelStandaloneViewerItem;
@@ -1583,6 +1634,8 @@ export async function buildKeelInlineNormalMediaDocument(input: {
     rootIntegrity: local.rootIntegrity,
     byteLength: local.byteLength,
     parts: local.parts,
+    ...(audioDocument ? {nativeMediaPresentation: audioDocument.nativeMediaPresentation} : {}),
+    ...(audioDocument?.registeredNativeGzip ? {registeredNativeGzip: audioDocument.registeredNativeGzip} : {}),
     declaration: {
       shellId: KEEL_INLINE_PROTECTION_SHELL_ID,
       assetDisplay: {
@@ -1592,14 +1645,47 @@ export async function buildKeelInlineNormalMediaDocument(input: {
       },
       creatorAsset: {
         id: input.asset.id,
-        mediaType: input.asset.mediaType,
+        mediaType: input.asset.mediaType as KeelAssetDisplayMediaType,
         integrity: entryItem.integrity,
       },
     },
   };
 }
 
+async function assertCanonicalNativeAudioDocument(root: KeelInlineNormalMediaDocument): Promise<void> {
+  // Reconstruct the deterministic presentation from verified originals. Caller
+  // metadata cannot bless a replacement script or counterfeit source commitment.
+  const sourceParts = root.parts.filter(part => part.kind === "creator" && part.role === "asset");
+  if (sourceParts.length < 1 || sourceParts.length > 2) throw new TypeError("Native audio requires exactly one original and at most one cover.");
+  const resources = await Promise.all(sourceParts.map(async part => {
+    const item = JSON.parse(decoder.decode(part.bytes).slice(1)) as KeelStandaloneViewerItem;
+    const embedded = item.embedded;
+    if (!embedded || !Number.isSafeInteger(item.integrity.byteLength) || item.integrity.byteLength < 1 || item.integrity.byteLength > 32 * 1024 * 1024) throw new TypeError("Native audio source has no bounded immutable embedded commitment.");
+    const stored = embedded.storedText === undefined ? exactBase64Bytes(embedded.storedBase64 ?? "", "Native audio source") : encoder.encode(embedded.storedText);
+    if (!["none", "gzip", "deflate", "brotli", "lzma"].includes(embedded.compression)) throw new TypeError("Native audio source has an unsupported current codec.");
+    const maxOutputLength = item.integrity.byteLength;
+    const source = embedded.compression === "none" ? stored : embedded.compression === "gzip" ? new Uint8Array(gunzipSync(stored, {maxOutputLength}))
+      : embedded.compression === "deflate" ? new Uint8Array(inflateSync(stored, {maxOutputLength})) : embedded.compression === "brotli" ? new Uint8Array(brotliDecompressSync(stored, {maxOutputLength}))
+      : decodeLzmaCommittedSync(stored, {decodedByteLength: maxOutputLength, maxDecodedBytes: maxOutputLength});
+    if (canonicalJson(await createIntegrity(source)) !== canonicalJson(item.integrity) || canonicalJson(await createIntegrity(stored)) !== canonicalJson(embedded.storedIntegrity)) throw new TypeError("Native audio source differs from its original commitment.");
+    return {id: item.id, mediaType: item.mediaType, source, compression: embedded.compression as KeelInlineCompression, ...(item.aliases ? {aliases: item.aliases} : {}), ...(embedded.compression === "lzma" ? {storedBytes: stored} : {})};
+  }));
+  const original = resources[0]!;
+  if (original.id !== root.declaration.creatorAsset.id || original.mediaType !== root.declaration.creatorAsset.mediaType || canonicalJson(await createIntegrity(original.source)) !== canonicalJson(root.declaration.creatorAsset.integrity)) throw new TypeError("Native audio declaration differs from the exact original.");
+  const standard = await buildKeelInlineShellFragments({repositoryRoot: ""});
+  const binding = root.registeredNativeGzip === undefined ? undefined : assertKeelRegisteredNativeGzipProof(root.registeredNativeGzip, root.rootBytes).binding;
+  const shell = binding ? {...standard, codecProfile: "browser-gzip-deflate" as const, prefix: {...standard.prefix, bytes: root.parts[0]!.bytes, integrity: await createIntegrity(root.parts[0]!.bytes)}, suffix: {...standard.suffix, bytes: root.parts.at(-1)!.bytes, integrity: await createIntegrity(root.parts.at(-1)!.bytes)}} : standard;
+  const display = await buildKeelInlineAssetDisplayModuleFragment();
+  const expected = await buildKeelInlineNativeAudioDocument({shell, modules: [display], entry: {...original, mediaType: original.mediaType as KeelAssetDisplayMediaType}, assets: resources.slice(1), ...(binding ? {registeredNativeGzipBinding: binding} : {})});
+  if (root.schema !== "keel-inline-normal-media-document@1" || root.declaration.shellId !== KEEL_INLINE_PROTECTION_SHELL_ID || root.declaration.assetDisplay.version !== KEEL_ASSET_DISPLAY_MODULE_VERSION || root.declaration.assetDisplay.moduleId !== KEEL_ASSET_DISPLAY_MODULE_ID
+    || !exactBytes(root.rootBytes, expected.rootBytes) || !exactBytes(root.rootBytes, concat(root.parts.map(part => part.bytes))) || root.byteLength !== expected.byteLength
+    || canonicalJson(root.rootIntegrity) !== canonicalJson(expected.rootIntegrity) || canonicalJson(root.nativeMediaPresentation) !== canonicalJson(expected.nativeMediaPresentation)
+    || canonicalJson(root.declaration.assetDisplay.integrity) !== canonicalJson(display.integrity)
+    || root.parts.length !== expected.parts.length || root.parts.some((part, index) => { const {bytes: _actualBytes, ...actual} = part, {bytes: _expectedBytes, ...target} = expected.parts[index]!; return canonicalJson(actual) !== canonicalJson(target); })) throw new TypeError("Native audio presentation differs from the deterministic canonical original/cover graph.");
+}
+
 async function assertCanonicalNormalMediaDocument(root: KeelInlineNormalMediaDocument): Promise<void> {
+  if ((KEEL_NATIVE_AUDIO_MEDIA_TYPES as readonly string[]).includes(root.declaration.creatorAsset.mediaType)) return assertCanonicalNativeAudioDocument(root);
   if (
     root.schema !== "keel-inline-normal-media-document@1"
     || root.declaration.shellId !== KEEL_INLINE_PROTECTION_SHELL_ID
@@ -1658,6 +1744,12 @@ async function assertCanonicalNormalMediaDocument(root: KeelInlineNormalMediaDoc
     throw new TypeError("Normal media creator entrypoint does not match its immutable declaration.");
   }
   keelAssetDisplayKind(item.mediaType);
+  if (item.mediaType === "image/svg+xml") {
+    if (item.embedded?.compression !== "none" || typeof item.embedded.storedText !== "string" || item.embedded.storedBase64 !== undefined) throw new TypeError("Normal SVG must preserve its exact native UTF-8 source.");
+    const source = encoder.encode(item.embedded.storedText);
+    if (canonicalJson(await createIntegrity(source)) !== canonicalJson(item.integrity) || canonicalJson(item.embedded.storedIntegrity) !== canonicalJson(item.integrity)) throw new TypeError("Normal SVG source differs from its immutable commitment.");
+    inspectKeelNativeSVG(source);
+  }
 }
 
 /**
@@ -1673,12 +1765,14 @@ export async function buildKeelRegisteredInlineNormalMediaTokenURIGraph(input: {
   readonly carriage?: "compact" | "raw-percent";
   readonly existingParts: readonly [KeelPublishedInlineFragment, KeelPublishedInlineFragment, KeelPublishedInlineFragment];
 }): Promise<KeelInlineRawPercentTokenURIGraph | KeelInlineEscapedTokenURIGraph | KeelInlinePreEncodedTokenURIGraph | KeelInlinePreEncodedTokenURIBodyGraph> {
+  input = {...input, document: structuredClone(input.document), existingParts: structuredClone(input.existingParts)};
   if ((input.shellId ?? KEEL_INLINE_PROTECTION_SHELL_ID) !== KEEL_INLINE_PROTECTION_SHELL_ID) {
     throw new TypeError("Normal media must use the canonical registered KEEL Inline protection shell.");
   }
   await assertCanonicalNormalMediaDocument(input.document);
-  const expected = await buildKeelInlineTokenURIGraph(input.document, { carriage: input.carriage ?? "compact" });
-  const graph = await buildKeelInlineTokenURIGraph(input.document, { carriage: input.carriage ?? "compact", existingParts: input.existingParts });
+  const proof = input.document.registeredNativeGzip;
+  const expected = await buildKeelInlineTokenURIGraph(input.document, { carriage: input.carriage ?? "compact", ...(proof ? {registeredNativeGzip: proof} : {}) });
+  const graph = await buildKeelInlineTokenURIGraph(input.document, { carriage: input.carriage ?? "compact", existingParts: input.existingParts, ...(proof ? {registeredNativeGzip: proof} : {}) });
   const expectedExisting = expected.parts.filter((part) => part.sourceKind === "existing");
   const actualExisting = graph.parts.filter((part) => part.sourceKind === "existing");
   if (

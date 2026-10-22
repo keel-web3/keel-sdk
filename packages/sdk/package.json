@@ -450,6 +450,10 @@
     "./media-viewer-adapters": {
       "types": "./dist/media-viewer-adapters.d.ts",
       "import": "./dist/media-viewer-adapters.js"
+    },
+    "./native-media-inspection": {
+      "types": "./dist/native-media-inspection.d.ts",
+      "import": "./dist/native-media-inspection.js"
     }
   },
   "files": [
@@ -472,7 +476,8 @@
     "@noble/hashes": "1.8.0",
     "esbuild": "0.28.2",
     "terser": "5.44.0",
-    "viem": "^2.38.0"
+    "viem": "^2.38.0",
+    "saxes": "6.0.0"
   },
   "devDependencies": {
     "@types/node": "^22.15.0",

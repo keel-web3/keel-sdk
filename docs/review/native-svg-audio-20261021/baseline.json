@@ -1,0 +1,47 @@
+{
+  "source": "b0a78fd50797a9af82be282f0d1103fe49ff0dc8",
+  "runtimeModule": {
+    "version": "1.4.0",
+    "bytes": 5056,
+    "sha256": "16a440e2b29572c3d45e3d9c31f7c444a867be5c5ac251fecfedaddcb1261dfb",
+    "mediaTypes": [
+      "image/avif",
+      "image/gif",
+      "image/jpeg",
+      "image/png",
+      "image/webp",
+      "video/mp4",
+      "video/webm"
+    ]
+  },
+  "environment": {
+    "node": "v22.22.1",
+    "network": 0,
+    "wallet": 0
+  },
+  "results": [
+    {
+      "fileName": "still.svg",
+      "mediaType": "image/svg+xml",
+      "bytes": 102,
+      "sha256": "a3e279c57f01648e753ce85eb3735aabc5f8aecb8b8ba208170a0d7a169e955a",
+      "execution": "static",
+      "motion": "unknown",
+      "kindError": "The canonical KEEL asset-display module does not support image/svg+xml.",
+      "preparation": "FAIL",
+      "error": "The canonical KEEL asset-display module does not support image/svg+xml."
+    },
+    {
+      "fileName": "tone.wav",
+      "mediaType": "audio/wav",
+      "bytes": 16044,
+      "sha256": "edfdbd36a8301a85c984026c4d27d31f5c86a83dce18b90cbe6c490067cb6c6d",
+      "execution": "static",
+      "motion": "unknown",
+      "kindError": "The canonical KEEL asset-display module does not support audio/wav.",
+      "preparation": "FAIL",
+      "error": "The canonical KEEL asset-display module does not support audio/wav."
+    }
+  ],
+  "scope": "Actual current SDK canonical preparation baseline. No live-chain, browser or Studio success claimed."
+}

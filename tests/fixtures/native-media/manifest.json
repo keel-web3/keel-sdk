@@ -1,0 +1,135 @@
+{
+  "scope": "generated representative media, not Gatorrr or GIF incident evidence",
+  "generation": "16044-byte PCM WAV from baseline.mjs; ffmpeg 9.0.1 locally converts the identical WAV, no source substitutions",
+  "commands": [
+    [
+      "/opt/homebrew/bin/ffmpeg",
+      "-hide_banner",
+      "-loglevel",
+      "error",
+      "-y",
+      "-i",
+      "/private/tmp/keel-native-svg-audio-20261021/keel-sdk/tests/fixtures/native-media/tone.wav",
+      "-map_metadata",
+      "-1",
+      "-c:a",
+      "libmp3lame",
+      "-b:a",
+      "32k",
+      "/private/tmp/keel-native-svg-audio-20261021/keel-sdk/tests/fixtures/native-media/tone.mp3"
+    ],
+    [
+      "/opt/homebrew/bin/ffmpeg",
+      "-hide_banner",
+      "-loglevel",
+      "error",
+      "-y",
+      "-i",
+      "/private/tmp/keel-native-svg-audio-20261021/keel-sdk/tests/fixtures/native-media/tone.wav",
+      "-map_metadata",
+      "-1",
+      "-c:a",
+      "libopus",
+      "-b:a",
+      "24k",
+      "/private/tmp/keel-native-svg-audio-20261021/keel-sdk/tests/fixtures/native-media/tone.ogg"
+    ],
+    [
+      "/opt/homebrew/bin/ffmpeg",
+      "-hide_banner",
+      "-loglevel",
+      "error",
+      "-y",
+      "-i",
+      "/private/tmp/keel-native-svg-audio-20261021/keel-sdk/tests/fixtures/native-media/tone.wav",
+      "-map_metadata",
+      "-1",
+      "-c:a",
+      "flac",
+      "/private/tmp/keel-native-svg-audio-20261021/keel-sdk/tests/fixtures/native-media/tone.flac"
+    ],
+    [
+      "/opt/homebrew/bin/ffmpeg",
+      "-hide_banner",
+      "-loglevel",
+      "error",
+      "-y",
+      "-i",
+      "/private/tmp/keel-native-svg-audio-20261021/keel-sdk/tests/fixtures/native-media/tone.wav",
+      "-map_metadata",
+      "-1",
+      "-c:a",
+      "aac",
+      "-b:a",
+      "32k",
+      "-f",
+      "adts",
+      "/private/tmp/keel-native-svg-audio-20261021/keel-sdk/tests/fixtures/native-media/tone.aac"
+    ],
+    [
+      "/opt/homebrew/bin/ffmpeg",
+      "-hide_banner",
+      "-loglevel",
+      "error",
+      "-y",
+      "-i",
+      "/private/tmp/keel-native-svg-audio-20261021/keel-sdk/tests/fixtures/native-media/tone.wav",
+      "-map_metadata",
+      "-1",
+      "-c:a",
+      "aac",
+      "-b:a",
+      "32k",
+      "-movflags",
+      "+faststart",
+      "/private/tmp/keel-native-svg-audio-20261021/keel-sdk/tests/fixtures/native-media/tone.m4a"
+    ]
+  ],
+  "files": [
+    {
+      "path": "css.svg",
+      "byteLength": 213,
+      "sha256": "056d219304dc5f2a861cb45574b7c9e4b942cefc3686170fff1de3892886ff1d"
+    },
+    {
+      "path": "smil.svg",
+      "byteLength": 235,
+      "sha256": "ddba4bc6b27e7aa54fa70df739e49ed61c69940827e29fa5ce8865686ed7f298"
+    },
+    {
+      "path": "still.svg",
+      "byteLength": 102,
+      "sha256": "a3e279c57f01648e753ce85eb3735aabc5f8aecb8b8ba208170a0d7a169e955a"
+    },
+    {
+      "path": "tone.aac",
+      "byteLength": 3728,
+      "sha256": "85f965ea8ee43ad39c11374cb5c16bc355261c3ebe5f9721c5c00fef56c88f0b"
+    },
+    {
+      "path": "tone.flac",
+      "byteLength": 12450,
+      "sha256": "d15280be3714b3060a7c33402497335cb46dd20f924f317216d0fc29fd091563"
+    },
+    {
+      "path": "tone.m4a",
+      "byteLength": 4507,
+      "sha256": "00e86b6683618578b8f9b78d7022da0037aa7b0238bd60b559ee27dcb7900690"
+    },
+    {
+      "path": "tone.mp3",
+      "byteLength": 4940,
+      "sha256": "c43b6cc2d33574765ebb26dfd04683bccce482ccb717bd53debdfb04e3ee5119"
+    },
+    {
+      "path": "tone.ogg",
+      "byteLength": 3510,
+      "sha256": "6442de9d9085d9fe79bb22b3f6d7a272b61074cf072ba6e89c058402f5d0b245"
+    },
+    {
+      "path": "tone.wav",
+      "byteLength": 16044,
+      "sha256": "edfdbd36a8301a85c984026c4d27d31f5c86a83dce18b90cbe6c490067cb6c6d"
+    }
+  ]
+}

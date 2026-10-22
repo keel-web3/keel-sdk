@@ -179,3 +179,5 @@ export * from "./tx-gas.js";
 export * from "./model-media.js";
 export * from "./model-viewer-module.js";
 export * from "./media-viewer-adapters.js";
+
+export * from "./native-media-inspection.js";

@@ -1,0 +1,12 @@
+import assert from 'node:assert/strict';
+import {mkdir,writeFile} from 'node:fs/promises';
+import {createHash} from 'node:crypto';
+import {resolve} from 'node:path';
+import {KEEL_ASSET_DISPLAY_MODULE_ID,KEEL_ASSET_DISPLAY_MODULE_VERSION,keelAssetDisplayModuleBytes,keelAssetDisplayModuleRevision} from '../../../packages/sdk/dist/asset-display.js';
+import {buildKeelInlineAssetDisplayModuleFragment} from '../../../packages/sdk/dist/inline-viewer-graph.js';
+const target=process.argv[2];assert.ok(target,'Provide an output directory for the unsigned exact shared-module source/fragment; this script never connects or signs.');
+const bytes=keelAssetDisplayModuleBytes(),digest='0x'+createHash('sha256').update(bytes).digest('hex'),revision=keelAssetDisplayModuleRevision(KEEL_ASSET_DISPLAY_MODULE_VERSION);
+assert.equal(digest,revision.digest);assert.equal(bytes.length,revision.byteLength);await mkdir(target,{recursive:true});
+await writeFile(resolve(target,'asset-display-1.5.0.js'),bytes,{flag:'wx'});
+const fragment=await buildKeelInlineAssetDisplayModuleFragment();await writeFile(resolve(target,'asset-display-1.5.0.fragment'),fragment.bytes,{flag:'wx'});
+await writeFile(resolve(target,'manifest.json'),JSON.stringify({moduleId:KEEL_ASSET_DISPLAY_MODULE_ID,version:KEEL_ASSET_DISPLAY_MODULE_VERSION,digest,byteLength:bytes.length,fragmentIntegrity:fragment.integrity,scope:'Unsigned source only; existing shared-module governance review, transaction approvals, exact selected-chain registration/read-back and consumer tests still required.'},null,2)+'\n',{flag:'wx'});
