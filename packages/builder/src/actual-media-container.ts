@@ -78,6 +78,11 @@ export function assertActualImageSequence(bytes:Uint8Array, metadata:{readonly f
   timeline:{readonly frameTimesMs:readonly number[];readonly frameDurationsMs:readonly number[]}) {
   if(metadata.format==="png") {
     if(classifyKeelAssetMotion({mediaType:"image/png",bytes})!=="still")throw new TypeError("APNG or unknown complete PNG container motion requires a complete sequence/timeline/loop adapter; native source retained.");
+    const view=new DataView(bytes.buffer,bytes.byteOffset,bytes.byteLength);
+    // ICC/EXIF have exact correspondence checks after decode. Text and other
+    // unmodelled ancillary/color semantics cannot silently disappear merely
+    // because the RGBA raster is equal. pHYs/sRGB are native raster hints.
+    for(let at=8;at<bytes.length;){const n=view.getUint32(at),kind=String.fromCharCode(...bytes.subarray(at+4,at+8));if(!["IHDR","PLTE","tRNS","IDAT","IEND","pHYs","sRGB","iCCP","eXIf"].includes(kind))throw new TypeError("PNG creator metadata or color semantics require an exact preserving adapter; native source retained.");at+=n+12;}
     if(timeline.frameDurationsMs.length!==1)throw new TypeError("The PNG decoder changed its complete still-image frame count.");
   }
   if(metadata.format==="heif") {const container=actualAvifContainer(bytes);if(!container || container.sequence)throw new TypeError("The complete AVIF sequence cannot be represented by a primary-image decode.");}
