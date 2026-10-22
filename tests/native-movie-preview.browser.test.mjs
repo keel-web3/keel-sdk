@@ -6,7 +6,7 @@ import {compareMediaFrames,ORIGINAL_MEDIA_EDIT_RECIPE} from '../packages/builder
 import {buildKeelInlineShellFragments,buildKeelInlineNormalMediaDocument} from '../packages/sdk/dist/inline-viewer-graph.js';
 import {withNativeMediaBrowser,wait} from './helpers/native-media-browser.mjs';
 for(const [name,width]of [['sar',64],['title',32]])test(`native ${name} PNG inspection and canonical original movie agree on actual browser geometry`,{timeout:30000},async()=>{
- const source=new Uint8Array(await readFile(new URL('../docs/review/temporal-display-metadata-20261022/reviewer-inputs/'+name+'.mp4',import.meta.url))),frame=await compareMediaFrames({bytes:source,mediaType:'video/mp4',recipe:ORIGINAL_MEDIA_EDIT_RECIPE,timeMs:0});
+ const source=new Uint8Array(await readFile(new URL('./fixtures/native-movie-inspection/'+name+'.mp4',import.meta.url))),frame=await compareMediaFrames({bytes:source,mediaType:'video/mp4',recipe:ORIGINAL_MEDIA_EDIT_RECIPE,timeMs:0});
  assert.equal(frame.sourceInfo.width,width);assert.equal(frame.sourceInfo.height,24);assert.equal(frame.verification.losslessPixelsVerified,false);
  const shell=await buildKeelInlineShellFragments({repositoryRoot:process.cwd()}),document=await buildKeelInlineNormalMediaDocument({shell,asset:{id:'native-preview-geometry',mediaType:'video/mp4',source}});
  const result=await withNativeMediaBrowser(document,async({childEvaluate})=>{

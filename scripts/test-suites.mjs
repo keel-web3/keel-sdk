@@ -6,6 +6,7 @@ const TEST_ROOT = resolve(import.meta.dirname, "../tests");
 /** Requires a real installed headless browser and therefore stays out of the default unit gate. */
 export const BROWSER_TEST_FILES = Object.freeze([
   "tests/native-presentation-guard.browser.test.mjs",
+  "tests/native-movie-preview.browser.test.mjs",
   "tests/sdk-authored-project-browser.test.mjs",
   "tests/sdk-authored-reader-parity.test.mjs",
   "tests/qa-authored-current-reader-browser.test.mjs",
@@ -92,6 +93,8 @@ export const DETERMINISTIC_TEST_FILES = Object.freeze([
   "tests/movie-edit-list.test.mjs",
   "tests/movie-presentation-semantics.test.mjs",
   "tests/movie-track-binding.test.mjs",
+  "tests/native-movie-inspection.test.mjs",
+  "tests/native-movie-mcp.test.mjs",
   "tests/proof-state-reader-fallback-safety.test.mjs",
   "tests/reviewer-denial-cancellation.test.mjs",
   "tests/reviewer-rpc-denial-cancellation.test.mjs",
