@@ -111,3 +111,16 @@ export function assertActualCandidateContainer(bytes:Uint8Array, format:string, 
   if(format==="webm"&&imageFormat===undefined&&bytes[0]===0x1a&&bytes[1]===0x45&&bytes[2]===0xdf&&bytes[3]===0xa3)return;
   throw new TypeError("The actual candidate container differs from its bound media recipe; native source retained.");
 }
+
+/** Native inspection reports one complete declared cycle; it does not
+ * translate loop counts, impose browser timer clamping or approve a candidate.
+ * Keep the full bounded GIF grammar and exact decoder frame/timing coverage.
+ * Unsupported interactive/unknown control remains actionable without changing
+ * the retainable original. Other formats keep their complete-container guard. */
+export function assertNativeImageSequence(bytes:Uint8Array,metadata:{readonly format?:string;readonly pages?:number;readonly loop?:number},
+  timeline:{readonly frameTimesMs:readonly number[];readonly frameDurationsMs:readonly number[]}) {
+  if(metadata.format!=="gif")return assertActualImageSequence(bytes,metadata,timeline);
+  const parsed=actualGifTimeline(bytes);
+  if(parsed.delays.length!==timeline.frameDurationsMs.length||parsed.delays.some((value,index)=>value!==timeline.frameDurationsMs[index]))
+    throw new TypeError("The native GIF decoder omitted or changed complete declared frame timing.");
+}

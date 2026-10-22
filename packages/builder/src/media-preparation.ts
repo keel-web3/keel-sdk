@@ -10,7 +10,7 @@ export type { ActualMediaPairProof } from "./media-pair-verification.js";
 import { resolveBundledFfmpeg } from "./media-optimization.js";
 import { parseKeelMediaEditRecipe, type KeelMediaEditRecipe } from "./media-edit-recipe.js";
 import { assignTemporalWebPDelays } from "./temporal-webp.js";
-import { actualAvifContainer, assertActualImageSequence, assertActualCandidateContainer } from "./actual-media-container.js";
+import { actualAvifContainer, assertActualImageSequence, assertNativeImageSequence, assertActualCandidateContainer } from "./actual-media-container.js";
 import { assertMoviePresentationSemantics, type MovieAudioTimeline } from "./movie-presentation-semantics.js";
 export * from "./media-edit-recipe.js";
 
@@ -61,7 +61,7 @@ interface SharpImage {
 }
 type SharpFactory = (bytes:Uint8Array,options?:Record<string,unknown>)=>SharpImage;
 async function sharpFactory():Promise<SharpFactory> { return (await import("sharp")).default as unknown as SharpFactory; }
-async function decodeImage(bytes: Uint8Array): Promise<Decoded> {
+async function decodeImage(bytes: Uint8Array,purpose:"fidelity"|"native-inspection"="fidelity"): Promise<Decoded> {
   const sharp = await sharpFactory();
   const image = sharp(bytes, { animated: true, failOn: "warning", limitInputPixels: MAX_PIXELS });
   const meta = await image.metadata();
@@ -75,7 +75,8 @@ async function decodeImage(bytes: Uint8Array): Promise<Decoded> {
   if (!delays || delays.length !== count || delays.some(n => !Number.isFinite(n) || n < 0)) throw new Error("The image decoder did not expose complete animation timing.");
   const times: number[] = []; let duration = 0;
   for (const delay of delays) { times.push(duration); duration += delay; }
-  assertActualImageSequence(bytes,meta,{frameTimesMs:times,frameDurationsMs:delays});
+  const checkSequence=purpose==="native-inspection"?assertNativeImageSequence:assertActualImageSequence;
+  checkSequence(bytes,meta,{frameTimesMs:times,frameDurationsMs:delays});
   return { info: { width, height, durationMs: duration, frameCount: count, animated: count > 1, hasAudio: false, frameTimesMs: times, frameDurationsMs: delays }, imageMetadata: meta, rgba:raw.data, hashes: Array.from({length:count}, (_,i) => hash(raw.data.subarray(i*size,(i+1)*size))) };
 }
 function checkGeometry(recipe: KeelMediaEditRecipe, info: KeelMediaInfo) {
@@ -296,14 +297,14 @@ function frameAt(info:KeelMediaInfo,timeMs:number) {
   for (let i=1;i<info.frameTimesMs.length;i++) {if (info.frameTimesMs[i]!>timeMs) break; index=i;}
   return index;
 }
-async function readFrame(bytes:Uint8Array,timeMs:number, signal?:AbortSignal):Promise<{bytes:Uint8Array;info:KeelMediaInfo;frameTimeMs:number}> {
+async function readFrame(bytes:Uint8Array,timeMs:number, signal?:AbortSignal,purpose:"fidelity"|"native-inspection"="fidelity"):Promise<{bytes:Uint8Array;info:KeelMediaInfo;frameTimeMs:number;warnings?:readonly string[]}> {
   signal?.throwIfAborted();
   let image=false;
   try {await (await sharpFactory())(bytes,{animated:true,limitInputPixels:MAX_PIXELS}).metadata(); image=true;} catch { /* Probe movie. */ }
   if(image && !animatedAvif(bytes)) {
-    const decoded=await decodeImage(bytes), index=frameAt(decoded.info,timeMs);
+    const decoded=await decodeImage(bytes,purpose), index=frameAt(decoded.info,timeMs);
     const frame=await (await sharpFactory())(bytes,{page:index,pages:1,limitInputPixels:MAX_PIXELS}).png().timeout({seconds:60}).toBuffer();
-    signal?.throwIfAborted(); return {bytes:new Uint8Array(frame),info:decoded.info,frameTimeMs:decoded.info.frameTimesMs[index]!};
+    signal?.throwIfAborted(); return {bytes:new Uint8Array(frame),info:decoded.info,frameTimeMs:decoded.info.frameTimesMs[index]!,...(purpose==="native-inspection"&&decoded.imageMetadata?.format==="gif"&&decoded.info.animated?{warnings:["Native GIF inspection reports declared frame delays for one cycle. Browser timer clamping and loop playback require actual runtime checks; this is not conversion or lossless-candidate approval."]}:{})};
   }
   assertSingleFileMedia(bytes);
   const runtime=await resolveBundledFfmpeg(); if(!runtime.available||!runtime.binary) throw new Error(runtime.reason ?? "Movie decoder unavailable.");
@@ -319,10 +320,10 @@ async function readFrame(bytes:Uint8Array,timeMs:number, signal?:AbortSignal):Pr
 export async function compareMediaFrames(input:{readonly bytes:Uint8Array;readonly mediaType?:string;readonly recipe:unknown;readonly timeMs:number;readonly signal?:AbortSignal}) {
   if(!Number.isFinite(input.timeMs)||input.timeMs<0||input.timeMs>3_600_000) throw new RangeError("Comparison time must be between 0 and 3,600,000 milliseconds.");
   const candidate=await prepareMediaCandidate(input);
-  const original=await readFrame(input.bytes,input.timeMs,input.signal);
+  const original=await readFrame(input.bytes,input.timeMs,input.signal,candidate.recipe.mode==="original"?"native-inspection":"fidelity");
   if (original.info.animated && input.timeMs>=original.info.durationMs) throw new RangeError("The requested comparison time is outside the source timeline.");
   const processed=candidate.recipe.mode === "original" ? original : await readFrame(candidate.bytes,input.timeMs,input.signal);
-  return {originalFrame:original.bytes,processedFrame:processed.bytes,mediaType:"image/png" as const,timeMs:input.timeMs,sourceFrameTimeMs:original.frameTimeMs,candidateFrameTimeMs:processed.frameTimeMs,sourceInfo:original.info,candidateInfo:processed.info,recipe:candidate.recipe,sourceIntegrity:candidate.sourceIntegrity,outputIntegrity:candidate.outputIntegrity,measurements:candidate.measurements,verification:candidate.verification,warnings:candidate.warnings};
+  return {originalFrame:original.bytes,processedFrame:processed.bytes,mediaType:"image/png" as const,timeMs:input.timeMs,sourceFrameTimeMs:original.frameTimeMs,candidateFrameTimeMs:processed.frameTimeMs,sourceInfo:original.info,candidateInfo:processed.info,recipe:candidate.recipe,sourceIntegrity:candidate.sourceIntegrity,outputIntegrity:candidate.outputIntegrity,measurements:candidate.measurements,verification:candidate.verification,warnings:[...candidate.warnings,...(original.warnings??[])]};
 }
 
 const actualPairProofs = new WeakSet<object>();
