@@ -323,13 +323,6 @@ export function createKeelRpcPool(options: KeelRpcPoolOptions): KeelRpcPool {
       const rawDelay = header === null ? 0 : /^\d+(?:\.\d+)?$/u.test(header) ? Number(header) * 1000 : Date.parse(header) - Date.now();
       const delay = Number.isFinite(rawDelay) ? Math.max(0, rawDelay) : 0;
       if (!response.ok) {
-        // Access denial is terminal regardless of an embedded RPC code or prose.
-        // Never let a denial body impersonate retryable capacity/rate evidence.
-        if (response.status === 401 || response.status === 403) {
-          privatelyObserve({ httpStatus: response.status });
-          await response.body?.cancel().catch(() => undefined);
-          throw new ProviderFailure("access-denied", 0, { httpStatus: response.status, transportFailure: "http-error" });
-        }
         // Read once for both the explicitly private observer and safe numeric
         // diagnostics. Public diagnostics never retain provider text or fields.
         let rpcCode: number | undefined;
@@ -369,11 +362,15 @@ export function createKeelRpcPool(options: KeelRpcPoolOptions): KeelRpcPool {
           } catch (error) {
             privatelyObserve({ httpStatus: response.status, retryAfterMs: delay, error });
             signal?.throwIfAborted();
+            if (response.status === 401 || response.status === 403) throw new ProviderFailure("access-denied", 0, { httpStatus: response.status, transportFailure: "http-error" });
             if (timedOut) throw networkFailure(error, true);
           }
           finally { await reader.cancel().catch(() => undefined); reader.releaseLock(); }
         }
         await response.body?.cancel().catch(() => undefined);
+        // Preserve the existing bounded owner-private observation above, while
+        // HTTP denial outranks every embedded RPC/body retry classification.
+        if (response.status === 401 || response.status === 403) throw new ProviderFailure("access-denied", 0, { httpStatus: response.status, transportFailure: "http-error" });
         if (rpcError) rejectRpcError(method, rpcError, response.status, delay, true);
         if (method === "eth_simulateV1" && (response.status === 413
           || [500, 502, 503, 504].includes(response.status) && requestBytesRejection))
