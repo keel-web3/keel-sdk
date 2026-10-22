@@ -1,0 +1,125 @@
+--- a/tests/sdk-legacy-prepared-dense-browser.test.mjs
++++ b/tests/sdk-legacy-prepared-dense-browser.test.mjs
+@@ -14,22 +14,14 @@
+   const metadata = await(await fetch(envelope.tokenURI)).json();
+   return {html:await(await fetch(metadata.animation_url)).text(),plan,envelope};
+ }
+-for(const boot of ['gzip','none'])test(`actual full legacy metadata return ${boot} boot verifies and executes original content offline with appended context`,{timeout:120000},async()=>{
+-  const full=await actualFullReturn(boot);
+-  assert.ok(!Buffer.from(full.plan.shellRegistration.prefix).toString().includes('__KEEL_CONTEXT__='),'The builder must not prepopulate a synthetic context');
+-  const proof=await observeOfflineShell(full.html,'verified','data-before-render:1:'+poster.length,{retainSignalsAcrossDocumentOpen:true});
+-  assert.deepEqual(proof.externalRequests,[]);assert.deepEqual(proof.pageNetworkRequests,[]);assert.deepEqual(proof.errors,[]);assert.equal(proof.frames,1);
+-  console.log(JSON.stringify({boot,artworkRequests:proof.externalRequests,pageNetworkRequests:proof.pageNetworkRequests,deniedProxyRequests:proof.proxyRequests}));
++for(const boot of ['gzip','none'])test(`retired full legacy metadata ${boot} boot rejects before offline publication can be prepared`,{timeout:120000},async()=>{
++  await assert.rejects(actualFullReturn(boot),error=>error instanceof TypeError&&/^buildKeelLegacyPreparedDenseDocument is retired for fresh publication\. Use the registered canonical raw-percent resource pipeline\.$/u.test(error.message));
+ });
+ test('scriptless browser control retains every denied browser-service proxy request',{timeout:60000},async()=>{
+   const proof=await observeOfflineShell('<!doctype html><html><body data-verification="verified"><p>Scriptless browser-service control</p></body></html>');
+   assert.deepEqual(proof.externalRequests,[]);assert.deepEqual(proof.pageNetworkRequests,[]);assert.equal(proof.frames,0);
+   console.log(JSON.stringify({scriptlessControl:true,artworkRequests:proof.externalRequests,pageNetworkRequests:proof.pageNetworkRequests,deniedProxyRequests:proof.proxyRequests}));
+ });
+-test('changed dense compressed bytes block the child before any artwork signal',{timeout:120000},async()=>{
+-  const full=await actualFullReturn('gzip');
+-  const changed=full.html.replace(/("storedDense":")([^"\\])/u,(_all,start,first)=>start+(first==='A'?'B':'A'));
+-  assert.notEqual(changed,full.html);
+-  const proof=await observeOfflineShell(changed,'failed',undefined,{retainSignalsAcrossDocumentOpen:true});
+-  assert.equal(proof.frames,0);assert.deepEqual(proof.signals,[]);assert.deepEqual(proof.externalRequests,[]);assert.deepEqual(proof.pageNetworkRequests,[]);
++test('retired dense preparation cannot reach a changed-payload browser execution path',{timeout:120000},async()=>{
++  await assert.rejects(actualFullReturn('gzip'),error=>error instanceof TypeError&&/^buildKeelLegacyPreparedDenseDocument is retired for fresh publication\. Use the registered canonical raw-percent resource pipeline\.$/u.test(error.message));
+ });
+--- a/tests/sdk-verification-shell-browser.test.mjs
++++ b/tests/sdk-verification-shell-browser.test.mjs
+@@ -85,7 +85,7 @@
+   }
+ });
+ 
+-test("the marketplace-safe prepared animation URI installs token context before the K shell launches", { timeout: 30_000 }, async () => {
++test("retired pre-encoded publication carriage rejects before marketplace context can be prepared", { timeout: 30_000 }, async () => {
+   const shell = await buildKeelInlineShellFragments({ repositoryRoot: process.cwd() });
+   const local = await buildKeelInlineLocalDocument({
+     shell,
+@@ -96,47 +96,10 @@
+       source: new TextEncoder().encode('<!doctype html><html><body><div id="art">context ready</div></body></html>'),
+     },
+   });
+-  const graph = await buildKeelInlinePreEncodedTokenURIGraph(local, { legacyCarriage: "acknowledged" });
+-  const legacyInput = {
+-    graph,
+-    chainId: 11_155_111,
+-    collection: `0x${"ab".repeat(20)}`,
+-    collectionName: "Context proof",
+-    description: "Pure Base64 browser proof",
+-    imageURI: "data:image/svg+xml;base64,PHN2Zy8+",
+-    manifestURI: `web3://0x${"cd".repeat(20)}:11155111/object/0x${"ef".repeat(32)}`,
+-    manifestDigest: `0x${"12".repeat(32)}`,
+-  };
+-  await assert.rejects(() => buildKeelPreparedOneOfOneTokenURI(legacyInput), /automatic raw-percent carriage/u);
+-  const prepared = await buildKeelPreparedOneOfOneTokenURI({...legacyInput, presentationPolicy: "raw-artifact"});
+-  const metadata = JSON.parse(Buffer.from(prepared.tokenURI.split(",", 2)[1], "base64").toString("utf8"));
+-  const animationPayload = metadata.animation_url.split(",", 2)[1];
+-  assert.match(animationPayload, /^(?:[A-Za-z0-9+/]{4})*(?:[A-Za-z0-9+/]{2}==|[A-Za-z0-9+/]{3}=)?$/u);
+-  assert.doesNotMatch(animationPayload, /[#?&_-]/u);
+-
+-  const [chrome, fixture] = await Promise.all([headlessChrome(), new Promise((resolve) => {
+-    const server = createServer((_request, response) => {
+-      response.setHeader("content-type", "text/html; charset=utf-8");
+-      response.end(Buffer.from(animationPayload, "base64"));
+-    });
+-    server.listen(0, "127.0.0.1", () => resolve({
+-      origin: `http://127.0.0.1:${server.address().port}`,
+-      close: () => new Promise((resolveClose, reject) => server.close((error) => error ? reject(error) : resolveClose())),
+-    }));
+-  })]);
+-  try {
+-    const rendered = await dumpDOM(chrome, fixture.origin);
+-    assert.match(rendered.stdout, /data-vault-verification="verified"/u);
+-    assert.match(rendered.stdout, /id="verify-seal"/u);
+-    assert.match(rendered.stdout, /id="verify-title">Files verified/u);
+-    assert.match(rendered.stdout, /0xabababababababababababababababababababab/u);
+-    assert.doesNotMatch(rendered.stderr, /Uncaught|net::ERR|Failed to load resource/iu);
+-  } finally {
+-    await fixture.close();
+-  }
++  await assert.rejects(() => buildKeelInlinePreEncodedTokenURIGraph(local, { legacyCarriage: "acknowledged" }), error => error.name === "KeelLegacyCarriageError" && /^buildKeelInlinePreEncodedTokenURIGraph is retired for publication\./u.test(error.message));
+ });
+ 
+-test("the compact escaped animation URI is directly browser-readable without inner Base64 decoding", { timeout: 30_000 }, async () => {
++test("retired escaped publication carriage rejects instead of preparing a historical animation URI", { timeout: 30_000 }, async () => {
+   const shell = await buildKeelInlineShellFragments({ repositoryRoot: process.cwd() });
+   const local = await buildKeelInlineLocalDocument({
+     shell,
+@@ -147,33 +110,7 @@
+       source: new TextEncoder().encode('<!doctype html><html><body><div id="art">escaped context ready</div></body></html>'),
+     },
+   });
+-  const graph = await buildKeelInlineEscapedTokenURIGraph(local, { legacyCarriage: "acknowledged" });
+-  const legacyInput = {
+-    graph,
+-    chainId: 11_155_111,
+-    collection: `0x${"ab".repeat(20)}`,
+-    collectionName: "Escaped context proof",
+-    description: "Compact percent carriage browser proof",
+-    imageURI: "data:image/svg+xml;base64,PHN2Zy8+",
+-    manifestURI: `web3://0x${"cd".repeat(20)}:11155111/object/0x${"ef".repeat(32)}`,
+-    manifestDigest: `0x${"12".repeat(32)}`,
+-  };
+-  await assert.rejects(() => buildKeelPreparedOneOfOneTokenURI(legacyInput), /automatic raw-percent carriage/u);
+-  const prepared = await buildKeelPreparedOneOfOneTokenURI({...legacyInput, presentationPolicy: "raw-artifact"});
+-  const metadata = JSON.parse(Buffer.from(prepared.tokenURI.split(",", 2)[1], "base64").toString("utf8"));
+-  assert.equal(prepared.animationEncoding, "percent");
+-  assert.equal(prepared.requiredBuilder, "KeelPercentTokenURIBuilder");
+-  assert.match(metadata.animation_url, /^data:text\/html;charset=utf-8,/u);
+-  assert.doesNotMatch(metadata.animation_url.slice(metadata.animation_url.indexOf(",") + 1), /[\s<>"'&#?\\]/u);
+-  assert.equal(new URL(metadata.animation_url).href, metadata.animation_url);
+-  assert.ok(decodeURIComponent(metadata.animation_url.slice(metadata.animation_url.indexOf(",") + 1)).startsWith(new TextDecoder().decode(local.rootBytes)));
+-
+-  const chrome = await headlessChrome();
+-  const rendered = await dumpDOM(chrome, metadata.animation_url);
+-  assert.match(rendered.stdout, /data-vault-verification="verified"/u);
+-  assert.match(rendered.stdout, /id="verify-title">Files verified/u);
+-  assert.match(rendered.stdout, /0xabababababababababababababababababababab/u);
+-  assert.doesNotMatch(rendered.stderr, /Uncaught|net::ERR|Failed to load resource/iu);
++  await assert.rejects(() => buildKeelInlineEscapedTokenURIGraph(local, { legacyCarriage: "acknowledged" }), error => error.name === "KeelLegacyCarriageError" && /^buildKeelInlineEscapedTokenURIGraph is retired for publication\./u.test(error.message));
+ });
+ 
+ test("the unchanged canonical shell rejects changed artwork bytes and accepts the original again", { timeout: 30_000 }, async () => {

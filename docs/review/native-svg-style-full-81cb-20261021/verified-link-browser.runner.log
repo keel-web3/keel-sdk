@@ -1,0 +1,64 @@
+{
+  "sourceCommit": "81cb23c57a5f426324acd0961ae21476de9cd861",
+  "case": "unchanged tests/link-assembly-browser.test.mjs",
+  "contractsHead": "ace3fed7aff1765c7d2ee9bba4d0232246f86ffb",
+  "contractsRoot": "/Users/ravonus/dev/keel-contracts",
+  "sourceClosuresVerifiedBeforeAndAfter": true,
+  "before": [
+    {
+      "path": "/Users/ravonus/dev/keel-contracts/out/KeelLinkURIBuilder.t.sol/LinkEnumProbe.json",
+      "sha256": "f04d1c8841ef2156b6bef7b4e08a4f274f591e51fad4a8056dbcf4918eacee83"
+    },
+    {
+      "path": "/Users/ravonus/dev/keel-contracts/out/KeelLinkURIBuilder.t.sol/LinkAssemblyStore.json",
+      "sha256": "61cdd1564109b7abb802796960785dc8a57543549dcaa30ac47d524c16ae9067"
+    },
+    {
+      "path": "/Users/ravonus/dev/keel-contracts/out/KeelLinkURIBuilder.t.sol/LinkAssemblyManager.json",
+      "sha256": "f8325b19d1c81783ed695de0d4c9a34a8b6f384416696823d59f4bce0bdb573e"
+    },
+    {
+      "path": "/Users/ravonus/dev/keel-contracts/out/KeelLinkURIBuilder.t.sol/LinkAssemblyRegistry.json",
+      "sha256": "493c804f83aa4db8ecfb85d6b90e3902f4cab31fac59053d51af04e7a3868632"
+    },
+    {
+      "path": "/Users/ravonus/dev/keel-contracts/out/KeelLinkRegistry.sol/KeelLinkRegistry.json",
+      "sha256": "6f62fb73db7203892befdfff02ef134ef807ede7d8b4e064eabfb936c63c855e"
+    },
+    {
+      "path": "/Users/ravonus/dev/keel-contracts/out/KeelLinkURIBuilder.sol/KeelLinkURIBuilder.json",
+      "sha256": "782481add4ae68022901c15be084d2f69cf94a81ed433d763ffc36414ee02660"
+    }
+  ],
+  "after": [
+    {
+      "path": "/Users/ravonus/dev/keel-contracts/out/KeelLinkURIBuilder.t.sol/LinkEnumProbe.json",
+      "sha256": "f04d1c8841ef2156b6bef7b4e08a4f274f591e51fad4a8056dbcf4918eacee83"
+    },
+    {
+      "path": "/Users/ravonus/dev/keel-contracts/out/KeelLinkURIBuilder.t.sol/LinkAssemblyStore.json",
+      "sha256": "61cdd1564109b7abb802796960785dc8a57543549dcaa30ac47d524c16ae9067"
+    },
+    {
+      "path": "/Users/ravonus/dev/keel-contracts/out/KeelLinkURIBuilder.t.sol/LinkAssemblyManager.json",
+      "sha256": "f8325b19d1c81783ed695de0d4c9a34a8b6f384416696823d59f4bce0bdb573e"
+    },
+    {
+      "path": "/Users/ravonus/dev/keel-contracts/out/KeelLinkURIBuilder.t.sol/LinkAssemblyRegistry.json",
+      "sha256": "493c804f83aa4db8ecfb85d6b90e3902f4cab31fac59053d51af04e7a3868632"
+    },
+    {
+      "path": "/Users/ravonus/dev/keel-contracts/out/KeelLinkRegistry.sol/KeelLinkRegistry.json",
+      "sha256": "6f62fb73db7203892befdfff02ef134ef807ede7d8b4e064eabfb936c63c855e"
+    },
+    {
+      "path": "/Users/ravonus/dev/keel-contracts/out/KeelLinkURIBuilder.sol/KeelLinkURIBuilder.json",
+      "sha256": "782481add4ae68022901c15be084d2f69cf94a81ed433d763ffc36414ee02660"
+    }
+  ],
+  "exitCode": 0,
+  "timedOut": false,
+  "durationMs": 4143,
+  "command": "KEEL_CONTRACTS_ROOT=/Users/ravonus/dev/keel-contracts KEEL_CHROME_HEADLESS_SHELL=<installed1234> node --test tests/link-assembly-browser.test.mjs",
+  "scope": "Existing exact artifacts, isolated disposable local Anvil and loopback TLS/browser fixtures only. No source/artifact copying, compilation, live-chain, owner-wallet action or deployment."
+}

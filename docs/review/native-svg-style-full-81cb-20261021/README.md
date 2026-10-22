@@ -53,3 +53,27 @@ unchanged in `scripts/test-suites.mjs`. Exact source/runtime/review evidence,
 complete raw outputs, artifact provenance and normal-build dist inventory are
 committed here. These author checks do not establish actual Studio integration,
 selected-chain registration, native-chain simulation, signing or deployment.
+
+## Bounded artifact-case rerun and pending test correction
+
+After verifying all existing artifact source closures, the unchanged
+`link-assembly-browser.test.mjs` was rerun with explicit `KEEL_CONTRACTS_ROOT`.
+Result: **11 PASS / 0 FAIL / 0 skips**, 4.089 seconds. All six artifact hashes
+and every metadata source commitment were verified unchanged before and after.
+It used only its disposable local Anvil and loopback TLS fixture; no artifacts
+were copied/compiled and no live chain or owner wallet was used. Raw output,
+runner, provenance and before/after hashes are committed. This resolves that
+environment case and preserves the original complete-gate failure receipt.
+
+The five remaining obsolete-positive cases still require independently reviewed
+test correction. `proposed-retired-browser-correction/proposal.patch` is
+**NOT APPLIED**; SHA256
+cb0dbfae57e501ce15c55de1838ad8523d8145dee4aa27306bdd28943f06dcc1.
+`git apply --check` succeeds. It keeps the five case counts and same input
+source/boot options, while asserting exact existing retired rejection instead
+of unsupported historical preparation success. No skip/classification/source
+change or restored builder is proposed. Their old unsupported-format positive
+assertions are explicitly retired, not silently counted as executed; current
+canonical byte/tamper/render tests remain unchanged. This proposal does not
+claim to replace any separately required current-program context fidelity proof.
+Independent review must approve the exact correction before it is applied.

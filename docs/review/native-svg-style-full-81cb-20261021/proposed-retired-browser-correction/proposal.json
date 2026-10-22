@@ -1,0 +1,21 @@
+{
+  "proposalStatus": "NOT APPLIED; independent approval required",
+  "sourceCommit": "81cb23c57a5f426324acd0961ae21476de9cd861",
+  "reason": "Five unchanged old positive browser cases are incompatible with owner-explicit retirement already enforced in b0; direct b0 reproduction0PASS5FAIL. No publication builder restoration is allowed.",
+  "exactCaseCountPreserved": 5,
+  "change": "Convert only these obsolete positive paths into exact current retired-rejection assertions with same incoming source/boot options; no skip or removal of case counts. This is an explicit requirement correction, not positive live/browser proof.",
+  "coverageDisposition": "Old unsupported-format positive/context/tamper assertions are explicitly retired in these five cases. Current canonical rendering/byte integrity/tamper coverage stays in the unchanged current K-shell and22 native media cases. No claim that negative cases replace full current-program context fidelity proof.",
+  "files": [
+    {
+      "path": "tests/sdk-legacy-prepared-dense-browser.test.mjs",
+      "beforeSHA256": "130c12b50fe66d393236aec8befda8d5d0c0be3cad20e11fc2b93f163225f35a",
+      "afterSHA256": "6f609275d88189c0dddb4bbee27a5155880e4df000c8208014ebc38b646178f6"
+    },
+    {
+      "path": "tests/sdk-verification-shell-browser.test.mjs",
+      "beforeSHA256": "aabddc10ea9774eec4b1ae3d3272aec4054ea93f5c1b291a8657efa2da74d574",
+      "afterSHA256": "3eb5f245d91b89cae07472cd0a0aed416e276b58b94d4ed8c9ad5bcd2fe7c67f"
+    }
+  ],
+  "patchSHA256": "cb0dbfae57e501ce15c55de1838ad8523d8145dee4aa27306bdd28943f06dcc1"
+}

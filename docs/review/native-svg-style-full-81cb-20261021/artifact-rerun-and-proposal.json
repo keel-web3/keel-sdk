@@ -1,0 +1,37 @@
+{
+  "sourceCommit": "81cb23c57a5f426324acd0961ae21476de9cd861",
+  "initialFullResultUnchanged": "55PASS6FAIL0skip; original full-browser.stdout.log retained",
+  "artifactDependentCase": {
+    "status": "PASS",
+    "pass": 11,
+    "fail": 0,
+    "cancelled": 0,
+    "skipped": 0,
+    "durationMs": 4088.552791,
+    "runnerDurationMs": 4143,
+    "artifactAndSourceClosureBeforeAfter": "all6unchanged",
+    "compiler": "0.8.36+commit.8a079791",
+    "sourceChanges": false,
+    "scope": "Local disposable Anvil and loopback TLS/browser fixtures only"
+  },
+  "remainingFullBrowserBlockers": {
+    "obsoletePositiveCases": 5,
+    "b0Baseline": {
+      "pass": 0,
+      "fail": 5
+    },
+    "decision": "Needs independently approved test correction; no source restoration or skip change"
+  },
+  "proposal": {
+    "applied": false,
+    "path": "proposed-retired-browser-correction/proposal.patch",
+    "sha256": "cb0dbfae57e501ce15c55de1838ad8523d8145dee4aa27306bdd28943f06dcc1",
+    "requiresIndependentApprovalBeforeApplication": true
+  },
+  "freshSDKTypecheck": {
+    "exitCode": 0,
+    "incremental": false
+  },
+  "sourceModuleAndAPIUnchanged": true,
+  "completeReleaseApproval": false
+}

@@ -1,0 +1,77 @@
+TAP version 13
+# Subtest: contract-returned canonical link URI verifies each HTTPS fetch before mounting artwork
+    # Subtest: SDK enum meanings match Solidity, including distinct Hold and link compression
+    ok 1 - SDK enum meanings match Solidity, including distinct Hold and link compression
+      ---
+      duration_ms: 3.064042
+      type: 'test'
+      ...
+    # Subtest: valid original, same-length tampering, restoration at the same HTTPS URL
+    ok 2 - valid original, same-length tampering, restoration at the same HTTPS URL
+      ---
+      duration_ms: 775.621042
+      type: 'test'
+      ...
+    # Subtest: Keccak commitments verify and detect changed bytes
+    ok 3 - Keccak commitments verify and detect changed bytes
+      ---
+      duration_ms: 380.485542
+      type: 'test'
+      ...
+    # Subtest: gzip and deflate verify decoded content; decompression overruns fail
+    ok 4 - gzip and deflate verify decoded content; decompression overruns fail
+      ---
+      duration_ms: 775.714417
+      type: 'test'
+      ...
+    # Subtest: redirects, CORS rejection and oversized streams do not create frames
+    ok 5 - redirects, CORS rejection and oversized streams do not create frames
+      ---
+      duration_ms: 507.531791
+      type: 'test'
+      ...
+    # Subtest: locator text stays data and cannot terminate the shell script
+    ok 6 - locator text stays data and cannot terminate the shell script
+      ---
+      duration_ms: 231.232042
+      type: 'test'
+      ...
+    # Subtest: direct image bytes use the pinned canonical asset-display module
+    ok 7 - direct image bytes use the pinned canonical asset-display module
+      ---
+      duration_ms: 248.699667
+      type: 'test'
+      ...
+    # Subtest: unsupported decoder and entry media fail at the contract
+    ok 8 - unsupported decoder and entry media fail at the contract
+      ---
+      duration_ms: 154.052958
+      type: 'test'
+      ...
+    # Subtest: IPNS uses its gateway through the canonical shell and rejects raw/custom delivery
+    ok 9 - IPNS uses its gateway through the canonical shell and rejects raw/custom delivery
+      ---
+      duration_ms: 228.997583
+      type: 'test'
+      ...
+    # Subtest: bare/custom HTTPS denied; bare immutable locators returned unchanged
+    ok 10 - bare/custom HTTPS denied; bare immutable locators returned unchanged
+      ---
+      duration_ms: 123.153292
+      type: 'test'
+      ...
+    1..10
+ok 1 - contract-returned canonical link URI verifies each HTTPS fetch before mounting artwork
+  ---
+  duration_ms: 3836.621333
+  type: 'test'
+  ...
+1..1
+# tests 11
+# suites 0
+# pass 11
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 4088.552791
