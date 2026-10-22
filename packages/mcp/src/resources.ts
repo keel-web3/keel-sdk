@@ -54,6 +54,8 @@ const RESOURCE_TEXT: Readonly<Record<string, string>> = {
       audit: "Token, collection and metadata work needs a passing keel-token-standard-audit digest; a live token contract must be audited at the exact address the request targets.",
       refusal: "isError result with structuredContent { code, nextTool, next }.",
     },
+    executableAuthoring: KEEL_ENGINE_CATALOG.projectArchitecture.authoring,
+    executableSteps: ["keel-engine-catalog", "keel-project-decisions", "keel-library-search", "keel-project-author", "keel-studio-stage-project", "keel-studio-draft"],
     steps: ["studio-capabilities", "analyze", "media-optimize", "media-optimize-apply", "cost", "keel-revision-plan", "upload-plan", "build", "verify", "module-resolve", "module-lock", "studio-stage-project", "studio-draft", "chain-plan", "ethereum-encode", "publish-plan", "wallet-request-prepare", "wallet-link"],
     repair: {
       prompt: "keel-draft-repair",
@@ -257,6 +259,7 @@ const RESOURCE_TEXT: Readonly<Record<string, string>> = {
       normalMedia: "Normal standalone image/video/GLB preparation resolves the registered keel.asset-display@1 module as part of that catalog graph; agents provide only the direct creator asset and never manufacture an index.html wrapper.",
       viewerNone: "Explicit creator-owned self-contained HTML shell/direct artifact, independently releasable and contract-readable through raw-artifact policy. Persist viewer=none separately from Compact/Raw; never label its own shell as canonical protection.",
       agentScope: "For the default verification path, agents supply creator resources/modules and reuse the registered KEEL shell. With explicit viewer=none they may build creator-owned self-contained HTML, preserving that choice without canonical claims.",
+      authoredJavaScript: KEEL_ENGINE_CATALOG.projectArchitecture.authoring,
       creatorHtml: "Creator-authored HTML is content in the verification shell by default; explicit viewer=none makes it the creator-owned presentation shell.",
       applicationAPI: "The canonical OnKEEL-themed shell exposes artwork __KEEL_SHELL__ and SDK createKeelShellClient: putPanel/removePanel, read-only verification and catalog(), open/close. The default Proof/Token/Files/System/App surface includes metadata and attributes, module/import/compression details, checked manifests, declared plugins and external sources; absent declarations are explicit. The original seal auto-hide is retained. Data-only panels appear in App; they cannot modify proof status, checks or identity. Evidence badges require exact passed resource ID/digest matches and certify file bytes only. Reuse this API instead of forking the shell. See docs/KEEL_SHELL_APPLICATION_API.md.",
       catalogFailure: "Fail when the chosen reader, builder or Hold lacks selected-chain evidence. Require canonical shell evidence for the verification choice only. Never silently switch shell, storage, carriage, or Inline/Hybrid delivery.",
