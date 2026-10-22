@@ -409,11 +409,11 @@ export function createKeelRpcPool(options: KeelRpcPoolOptions): KeelRpcPool {
       if (!Object.hasOwn(body, "result")) throw invalidResponse("missing-result", size);
       return body.result;
     } catch (error) {
-      signal?.throwIfAborted();
-      // Set restrictions before releasing the queue so concurrent reads cannot race a 429/403.
+      // Established access denial survives caller cancellation before queue release.
       if (error instanceof ProviderFailure && error.reason === "access-denied") {
         state.disabled = true; state.reason = error.reason; state.diagnostic = error.diagnostic;
       }
+      signal?.throwIfAborted();
       if (error instanceof ProviderFailure && error.reason === "rate-limited") {
         state.reason = error.reason;
         state.diagnostic = error.diagnostic;
