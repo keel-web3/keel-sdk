@@ -1,4 +1,5 @@
 import { canonicalJson, createIntegrity, type Integrity } from "@keel/protocol";
+import type { BrowserModuleCarrierBinding } from "./module/descriptor.js";
 import type { KeelStudioStagedProjectFile } from "./studio-upload.js";
 
 export const KEEL_AUTHORED_PROJECT_PROTOCOL = "keel-authored-project@1" as const;
@@ -10,11 +11,25 @@ export interface KeelAuthoredModule {
   readonly purpose: string;
   readonly source: string;
 }
+export interface KeelAuthoredPublishedModuleInput {
+  readonly binding: BrowserModuleCarrierBinding;
+  /** Read back or cached exact public source. Never included in staged files. */
+  readonly source: Uint8Array;
+}
+export interface KeelAuthoredPublishedModule {
+  readonly binding: BrowserModuleCarrierBinding;
+  readonly sourceIntegrity: Integrity & { readonly byteLength: number };
+  readonly aliases: readonly string[];
+  readonly execution: "module";
+  readonly license: "MIT";
+  readonly dependencies: readonly string[];
+}
 export interface KeelAuthoredProjectInput {
   readonly title: string;
   readonly chainId: number;
   readonly modules: readonly KeelAuthoredModule[];
   readonly start: { readonly module: string; readonly export: string };
+  readonly publishedModules?: readonly KeelAuthoredPublishedModuleInput[];
   readonly stylesheet?: string;
   readonly assets?: readonly { readonly path: string; readonly purpose: string; readonly mediaType: string; readonly bytes: Uint8Array }[];
 }
@@ -41,17 +56,18 @@ export interface KeelAuthoredProjectGraph {
   readonly nodes: readonly KeelAuthoredProjectNode[];
   readonly edges: readonly KeelAuthoredProjectEdge[];
   readonly digest: Integrity;
+  readonly publishedModules?: readonly KeelAuthoredPublishedModule[];
   readonly publicationReady: false;
 }
 
 /** Browser-safe exact commitment boundary; Node authoring also parses imports. */
 export async function assertKeelAuthoredProjectCommitments(graph: KeelAuthoredProjectGraph, files: readonly KeelStudioStagedProjectFile[]): Promise<void> {
   if (!graph || graph.schema !== KEEL_AUTHORED_PROJECT_PROTOCOL || graph.origin !== "agent-authored" || graph.architecture !== "logical-es-modules" || graph.entrypoint !== "index.html" || graph.publicationReady !== false || !Number.isSafeInteger(graph.chainId) || graph.chainId < 1 || !Array.isArray(graph.nodes) || !Array.isArray(graph.edges) || graph.nodes.length < 4 || graph.nodes.length > 131 || graph.edges.length > 4096) throw new TypeError("Invalid authored project graph.");
-  if (Object.keys(graph).some(key => !["schema", "origin", "architecture", "chainId", "entrypoint", "nodes", "edges", "digest", "publicationReady"].includes(key))) throw new TypeError("Unsupported authored graph field.");
+  if (Object.keys(graph).some(key => !["schema", "origin", "architecture", "chainId", "entrypoint", "nodes", "edges", "digest", "publishedModules", "publicationReady"].includes(key))) throw new TypeError("Unsupported authored graph field.");
   const { digest, ...content } = graph;
   if (canonicalJson(await createIntegrity(new TextEncoder().encode(canonicalJson(content)))) !== canonicalJson(digest)) throw new TypeError("Authored graph commitment changed.");
   if (files.length !== graph.nodes.length || new Set(files.map(file => file.path)).size !== files.length || new Set(graph.nodes.map(node => node.id)).size !== graph.nodes.length || new Set(graph.nodes.map(node => node.path)).size !== graph.nodes.length) throw new TypeError("Authored staging membership changed.");
-  const ids = new Set(graph.nodes.map(node => node.id));
+  const ids = new Set([...graph.nodes.map(node => node.id), ...(graph.publishedModules ?? []).map(module => `published:${module.binding.moduleId}`)]);
   for (const edge of graph.edges) if (!ids.has(edge.consumer) || !ids.has(edge.dependency) || typeof edge.specifier !== "string" || !edge.specifier || /[\\?#\u0000-\u001f\u007f]/u.test(edge.specifier)) throw new TypeError("Invalid authored dependency edge.");
   for (const node of graph.nodes) {
     if (node.id !== node.path || !/^(?:index\.html|main\.js|style\.css|modules\/[a-z][a-z0-9-]*\.js|assets\/[a-z][a-z0-9._-]*)$/u.test(node.path)) throw new TypeError("Authored logical identity changed.");
@@ -60,4 +76,9 @@ export async function assertKeelAuthoredProjectCommitments(graph: KeelAuthoredPr
     const bytes = file.bytes instanceof Uint8Array ? file.bytes : new Uint8Array(await file.bytes.arrayBuffer());
     if (canonicalJson(await createIntegrity(bytes)) !== canonicalJson(node.integrity)) throw new TypeError(`Authored source changed after planning: ${node.path}.`);
   }
+}
+
+/** Existing typed project declaration, derived from the exact source graph. */
+export function authoredPublishedModuleDeclaration(modules: readonly KeelAuthoredPublishedModule[]) {
+  return { schema: "keel-agent-project-declaration@1", module: { kind: "object", use: modules.map(module => module.binding.moduleId), modules: modules.map(module => module.binding.moduleId), moduleBindings: modules.map(module => module.binding), verification: { shell: true } } };
 }

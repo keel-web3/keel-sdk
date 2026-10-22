@@ -1,4 +1,4 @@
-import { assertKeelAuthoredProjectCommitments, KEEL_AUTHORED_PROJECT_DESCRIPTOR_PATH, type KeelAuthoredProjectGraph } from "./authored-project-graph.js";
+import { authoredPublishedModuleDeclaration, assertKeelAuthoredProjectCommitments, KEEL_AUTHORED_PROJECT_DESCRIPTOR_PATH, type KeelAuthoredProjectGraph } from "./authored-project-graph.js";
 import { parseKeelSelectedProjectProfile, type KeelSelectedProjectProfile } from "./studio-project-defaults.js";
 import { resolveKeelShell, resolveKeelPayloadStorage, classifyKeelAssetExecution, classifyKeelAssetMotion, planKeelSmartAssetPresentation, resolveKeelAssetPresentationSelection, parseKeelAssetPresentationPreference, parseKeelExternalPreviewUri, parseKeelPresentationFallbackDelivery, KEEL_ASSET_PRESENTATION_CANDIDATE_IDS, type KeelPresentationFallbackDelivery, type KeelAssetPresentationCandidateId, type KeelAssetPresentationPreference, type KeelPayloadStorageMode } from "@keel/protocol";
 import {
@@ -321,6 +321,7 @@ export async function stageKeelStudioProject(
     if (viewer !== KEEL_VERIFICATION_SHELL) throw new TypeError("The modular authored route requires the registered verification shell.");
     files = [...files, { path: KEEL_AUTHORED_PROJECT_DESCRIPTOR_PATH,
       bytes: new TextEncoder().encode(`${JSON.stringify(input.authoredProject)}\n`), mediaType: "application/json", role: "data", format: "asset", label: "Private authored source graph" }];
+    if (input.authoredProject.publishedModules?.length) files = [...files, { path: "keel.module.json", bytes: new TextEncoder().encode(`${JSON.stringify(authoredPublishedModuleDeclaration(input.authoredProject.publishedModules))}\n`), mediaType: "application/json", role: "data", format: "asset", label: "Exact existing published module bindings" }];
   }
   if (viewer !== KEEL_VERIFICATION_SHELL && viewer !== "none") throw new TypeError("viewer must be keel-verification-shell or none.");
   if (viewer === "none" && input.publicationIntent !== undefined) {

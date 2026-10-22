@@ -1,5 +1,7 @@
 /** Node-side authoring. Source modules are parsed, never split or rewritten. */
 import path from "node:path";
+import { qualifyAuthoredPublishedModules, assertAuthoredPublishedRecords } from "./authored-published-modules.js";
+import type { KeelAuthoredPublishedModuleInput, KeelAuthoredPublishedModule } from "./authored-project-graph.js";
 import { build, transform } from "esbuild";
 import ts from "typescript";
 import { inspectKeelNativeSVG } from "./native-media-inspection.js";
@@ -29,15 +31,17 @@ function localImport(importer: string, specifier: string): string {
   return resolved;
 }
 /** Parses the complete graph with esbuild, retaining original module bytes. */
-async function moduleEdges(files: readonly KeelStudioStagedProjectFile[]): Promise<KeelAuthoredProjectEdge[]> {
+async function moduleEdges(files: readonly KeelStudioStagedProjectFile[], published: readonly KeelAuthoredPublishedModule[], publishedSources: readonly KeelAuthoredPublishedModuleInput[]): Promise<KeelAuthoredProjectEdge[]> {
   const sources = new Map(files.map(file => [file.path, file]));
+  const sharedAliases = new Map(published.flatMap(module => module.aliases.map(alias => [alias, `published:${module.binding.moduleId}`] as const)));
+  for (const module of publishedSources) sources.set(`published:${module.binding.moduleId}`, { path: `published:${module.binding.moduleId}`, bytes: module.source, mediaType: "text/javascript", role: "module", format: "es-module" });
   const edges = new Map<string, KeelAuthoredProjectEdge>();
   const result = await build({
     entryPoints: ["main.js"], bundle: true, write: false, metafile: true, treeShaking: true, format: "iife", platform: "browser", target: "es2022", logLevel: "silent",
     logOverride: { "unsupported-dynamic-import": "error", "unsupported-require-call": "error", "direct-eval": "error" },
     plugins: [{ name: "keel-authored-source-graph", setup(builder) {
       builder.onResolve({ filter: /.*/ }, args => {
-        const resolved = args.kind === "entry-point" ? args.path : localImport(args.importer, args.path);
+        const resolved = args.kind === "entry-point" ? args.path : sharedAliases.get(args.path) ?? localImport(args.importer, args.path);
         const file = sources.get(resolved);
         if (!file || file.format !== "es-module") return { errors: [{ text: `Unresolved authored JavaScript module: ${resolved}.` }] };
         if (args.kind === "require-call" || args.kind === "require-resolve" || args.kind === "dynamic-import") return { errors: [{ text: "The current authored reader requires static ES module imports, not dynamic or CommonJS loading." }] };
@@ -75,12 +79,13 @@ async function moduleEdges(files: readonly KeelStudioStagedProjectFile[]): Promi
  */
 export async function createKeelAuthoredProject(value: KeelAuthoredProjectInput) {
   value = structuredClone(value);
-  exact(value, ["title", "chainId", "modules", "start", "stylesheet", "assets"], "Authored project");
+  exact(value, ["title", "chainId", "modules", "start", "stylesheet", "assets", "publishedModules"], "Authored project");
   const title = text(value.title, "Project title", 160);
   if (!Number.isSafeInteger(value.chainId) || value.chainId < 1) throw new TypeError("Authored project requires the selected chain ID.");
   if (!Array.isArray(value.modules) || value.modules.length < 2 || value.modules.length > 64) throw new TypeError("Author at least two functional JavaScript modules, at most 64; do not submit one flattened creator bundle.");
   exact(value.start, ["module", "export"], "Authored start");
   if (typeof value.start.export !== "string" || !/^[A-Za-z_$][\w$]*$/u.test(value.start.export)) throw new TypeError("Authored start requires an exported function name.");
+  const publishedModules = await qualifyAuthoredPublishedModules(value.publishedModules, value.chainId);
   const ids = new Set<string>();
   const definitions: Array<{ id: string; path: string; purpose: string; source: string }> = [];
   let totalBytes = 0;
@@ -116,7 +121,8 @@ export async function createKeelAuthoredProject(value: KeelAuthoredProjectInput)
     ...(stylesheet === undefined ? [] : [{ path: "style.css", bytes: encoder.encode(stylesheet), mediaType: "text/css", role: "style" as const, format: "asset" as const }]),
     ...assets.map(asset => ({ path: asset.path, bytes: asset.bytes, mediaType: asset.mediaType, role: "data" as const, format: "asset" as const })),
   ];
-  const edges = await moduleEdges(files);
+  const edges = await moduleEdges(files, publishedModules, value.publishedModules ?? []);
+  for (const module of publishedModules) if (!edges.some(edge => edge.dependency === `published:${module.binding.moduleId}`)) throw new TypeError(`Unused published dependency ${module.binding.moduleId}; do not attach an unreachable library.`);
   for (const definition of definitions) {
     const parsed = ts.createSourceFile(definition.path, definition.source, ts.ScriptTarget.ES2022, true, ts.ScriptKind.JS);
     const visit = (node: ts.Node) => {
@@ -142,7 +148,7 @@ export async function createKeelAuthoredProject(value: KeelAuthoredProjectInput)
     mediaType: file.mediaType, role: file.role as KeelAuthoredProjectNode["role"], format: file.format as KeelAuthoredProjectNode["format"],
     integrity: { ...await createIntegrity(file.bytes as Uint8Array), byteLength: (file.bytes as Uint8Array).byteLength },
   })));
-  const content = { schema: KEEL_AUTHORED_PROJECT_PROTOCOL, origin: "agent-authored" as const, architecture: "logical-es-modules" as const, chainId: value.chainId, entrypoint: "index.html" as const, nodes, edges, publicationReady: false as const };
+  const content = { schema: KEEL_AUTHORED_PROJECT_PROTOCOL, origin: "agent-authored" as const, architecture: "logical-es-modules" as const, chainId: value.chainId, entrypoint: "index.html" as const, nodes, edges, ...(publishedModules.length ? { publishedModules } : {}), publicationReady: false as const };
   const graph: KeelAuthoredProjectGraph = Object.freeze({ ...content, digest: await createIntegrity(encoder.encode(canonicalJson(content))) });
   return { graph, files, sourceBytes: files.reduce((sum, file) => sum + (file.bytes as Uint8Array).length, 0), authoredSourceBytes: totalBytes + assetBytes + (stylesheet === undefined ? 0 : encoder.encode(stylesheet).length), generatedBoundaryBytes: encoder.encode(bootstrap).length + encoder.encode(html).length, completePresentationBytes: null, publicationReady: false as const };
 }
@@ -249,7 +255,7 @@ async function assertAuthoredStylesheet(source: string): Promise<void> {
 function authoredExecutionOrder(edges: readonly KeelAuthoredProjectEdge[], expectedFiles: number): string[] {
   const ordered: string[] = [], visiting = new Set<string>(), completed = new Set<string>();
   const visit = (id: string) => {
-    if (completed.has(id)) return;
+    if (id.startsWith("published:") || completed.has(id)) return;
     if (visiting.has(id)) throw new TypeError("The current canonical authored-module reader requires an acyclic dependency graph; preserve the source and revise its functional boundaries.");
     visiting.add(id);
     for (const edge of edges.filter(edge => edge.consumer === id)) visit(edge.dependency);
@@ -274,9 +280,10 @@ export function planKeelAuthoredProjectChanges(previous: KeelAuthoredProjectGrap
 }
 
 /** Stage guard: re-parse source; a supplied JSON digest alone grants no trust. */
-export async function assertKeelAuthoredProjectFiles(graph: KeelAuthoredProjectGraph, files: readonly KeelStudioStagedProjectFile[]): Promise<void> {
+export async function assertKeelAuthoredProjectFiles(graph: KeelAuthoredProjectGraph, files: readonly KeelStudioStagedProjectFile[], publishedSources: readonly KeelAuthoredPublishedModuleInput[] = []): Promise<void> {
   await assertKeelAuthoredProjectCommitments(graph, files);
-  exact(graph, ["schema", "origin", "architecture", "chainId", "entrypoint", "nodes", "edges", "digest", "publicationReady"], "Authored graph");
+  assertAuthoredPublishedRecords(graph.publishedModules ?? [], await qualifyAuthoredPublishedModules(publishedSources, graph.chainId));
+  exact(graph, ["schema", "origin", "architecture", "chainId", "entrypoint", "nodes", "edges", "digest", "publishedModules", "publicationReady"], "Authored graph");
   if (graph.schema !== KEEL_AUTHORED_PROJECT_PROTOCOL || graph.origin !== "agent-authored" || graph.architecture !== "logical-es-modules" || graph.entrypoint !== "index.html" || graph.publicationReady !== false || !Array.isArray(graph.nodes) || !Array.isArray(graph.edges)) throw new TypeError("Invalid authored project graph.");
   if (files.length !== graph.nodes.length || new Set(files.map(file => file.path)).size !== files.length) throw new TypeError("Authored staging membership changed.");
   const definitions: KeelAuthoredModule[] = [];
@@ -307,7 +314,7 @@ export async function assertKeelAuthoredProjectFiles(graph: KeelAuthoredProjectG
     } else throw new TypeError(`Unexpected authored resource: ${node.path}.`);
   }
   if (!start || title === undefined) throw new TypeError("Authored project lost its generated entry boundaries.");
-  const regenerated = await createKeelAuthoredProject({ title, chainId: graph.chainId, modules: definitions, start, ...(stylesheet === undefined ? {} : { stylesheet }), ...(assets.length ? { assets } : {}) });
+  const regenerated = await createKeelAuthoredProject({ title, chainId: graph.chainId, modules: definitions, start, ...(publishedSources.length ? { publishedModules: publishedSources } : {}), ...(stylesheet === undefined ? {} : { stylesheet }), ...(assets.length ? { assets } : {}) });
   if (canonicalJson(regenerated.graph) !== canonicalJson(graph)) throw new TypeError("Authored project dependencies, identities or exact generated bytes changed.");
 }
 
@@ -319,6 +326,7 @@ export async function assertKeelAuthoredProjectFiles(graph: KeelAuthoredProjectG
  */
 export async function buildKeelAuthoredInlineDocument(input: {
   readonly graph: KeelAuthoredProjectGraph;
+  readonly publishedSources?: readonly KeelAuthoredPublishedModuleInput[];
   readonly files: readonly KeelStudioStagedProjectFile[];
   readonly shell: import("./inline-viewer-graph.js").KeelInlineShellFragments;
   readonly modules: readonly import("./inline-viewer-graph.js").KeelInlineModuleFragment[];
@@ -327,10 +335,11 @@ export async function buildKeelAuthoredInlineDocument(input: {
 }) {
   const graph = structuredClone(input.graph);
   const files = await Promise.all(input.files.map(async file => ({ ...file, bytes: file.bytes instanceof Uint8Array ? file.bytes.slice() : new Uint8Array(await file.bytes.arrayBuffer()) })));
-  await assertKeelAuthoredProjectFiles(graph, files);
+  await assertKeelAuthoredProjectFiles(graph, files, input.publishedSources);
   const { buildEmbeddedKeelViewerSlot } = await import("./verification-shell.js");
   const { orderKeelModules } = await import("./data-layer.js");
   const modules = orderKeelModules(input.modules);
+  if (graph.publishedModules?.length && (modules.length !== graph.publishedModules.length || modules.some((module, index) => module.moduleId !== graph.publishedModules![index]!.binding.moduleId || module.version !== graph.publishedModules![index]!.binding.version || module.execution !== "module"))) throw new TypeError("The authored runtime closure differs from its exact published module bindings.");
   const payloadStorage = resolveKeelPayloadStorage(input.payloadStorage);
   const ordered = authoredExecutionOrder(graph.edges, files.length);
   const creator: Array<{ readonly path: string; readonly sourceIntegrity: Integrity; readonly compiledIntegrity: Integrity; readonly part: import("./inline-viewer-graph.js").KeelInlineLocalDocument["parts"][number] }> = [];
