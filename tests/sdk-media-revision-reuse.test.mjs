@@ -9,7 +9,10 @@ import {buildKeelInlineLocalDocument,buildKeelInlineModuleFragment,buildKeelInli
 const digest=bytes=>'0x'+createHash('sha256').update(bytes).digest('hex');
 test('canonical media bytes survive minified browser bundling unchanged',async()=>{
  const canonical=keelAssetDisplayModuleBytes();
- assert.equal(digest(canonical),keelAssetDisplayModuleRevision('1.2.0').digest);
+ assert.equal(digest(canonical),'0x16a440e2b29572c3d45e3d9c31f7c444a867be5c5ac251fecfedaddcb1261dfb');
+ assert.equal(canonical.byteLength,5056);
+ assert.equal(digest(canonical),keelAssetDisplayModuleRevision('1.4.0').digest);
+ assert.deepEqual(keelAssetDisplayModuleRevision('1.2.0'),{version:'1.2.0',digest:'0x9db2505b726d6c0b9821ce2c90df96c4e37b6c1607fe4dd565f883b3531bed8b',byteLength:7810});
  const result=await build({entryPoints:[fileURLToPath(new URL('../packages/sdk/src/asset-display.ts',import.meta.url))],bundle:true,minify:true,format:'esm',platform:'browser',write:false});
  const browser=await import('data:text/javascript;base64,'+Buffer.from(result.outputFiles[0].text).toString('base64'));
  assert.deepEqual(browser.keelAssetDisplayModuleBytes(),canonical);
