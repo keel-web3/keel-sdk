@@ -5,6 +5,7 @@ const TEST_ROOT = resolve(import.meta.dirname, "../tests");
 
 /** Requires a real installed headless browser and therefore stays out of the default unit gate. */
 export const BROWSER_TEST_FILES = Object.freeze([
+  "tests/native-presentation-guard.browser.test.mjs",
   "tests/sdk-authored-project-browser.test.mjs",
   "tests/sdk-authored-reader-parity.test.mjs",
   "tests/qa-authored-current-reader-browser.test.mjs",
@@ -84,6 +85,19 @@ export const TEST_FILES_ON_DISK = Object.freeze(readdirSync(TEST_ROOT)
  * its execution boundary.
  */
 export const DETERMINISTIC_TEST_FILES = Object.freeze([
+  "tests/actual-media-container.test.mjs",
+  "tests/actual-media-pair.test.mjs",
+  "tests/audio-clock-binding-mcp.test.mjs",
+  "tests/audio-clock-binding.test.mjs",
+  "tests/movie-edit-list.test.mjs",
+  "tests/movie-presentation-semantics.test.mjs",
+  "tests/movie-track-binding.test.mjs",
+  "tests/proof-state-reader-fallback-safety.test.mjs",
+  "tests/reviewer-denial-cancellation.test.mjs",
+  "tests/reviewer-rpc-denial-cancellation.test.mjs",
+  "tests/rpc-numeric-denial-cancellation.test.mjs",
+  "tests/rpc-observed-denial-cancellation.test.mjs",
+  "tests/rpc-revert-message-precedence.test.mjs",
   "tests/temporal-webp.test.mjs",
   "tests/sdk-authored-project.test.mjs",
   "tests/sdk-authored-published-project.test.mjs",
