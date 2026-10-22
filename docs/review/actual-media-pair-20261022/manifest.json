@@ -1,0 +1,40 @@
+{
+  "sourceCommit": "c36f96e3865130166f168ae3f21c5519da61e51d",
+  "files": [
+    {
+      "path": "README.md",
+      "bytes": 2697,
+      "sha256": "163f26df54fd05065b85adc89df9d824646c43016700e8b8b20b1b9e560c12f3"
+    },
+    {
+      "path": "environment-and-results.json",
+      "bytes": 2705,
+      "sha256": "ec6ee8def92f412d9915899c44e633381961fcc1ede4232801e77c8990914b08"
+    },
+    {
+      "path": "sdk-actual-pair-first.stdout",
+      "bytes": 3100,
+      "sha256": "abcd665a8727befaf3b577bf05d6d1d16d6360033018636fd911b969536011e8"
+    },
+    {
+      "path": "sdk-c36-build.stdout",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "sdk-c36-cohort.stdout",
+      "bytes": 6701,
+      "sha256": "1a29daca2bc064ce6bc57bb1544abac61221731e6e9b35c5d6dcc24f123d00de"
+    },
+    {
+      "path": "sdk-pair-build-first.stdout",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "sdk-pair-cohort.stdout",
+      "bytes": 6442,
+      "sha256": "140e08b30f0883a2bbba3566eafc9834668fcd9fabbd9f1986550ee76d9a424e"
+    }
+  ]
+}

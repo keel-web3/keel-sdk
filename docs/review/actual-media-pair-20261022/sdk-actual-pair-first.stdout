@@ -1,0 +1,82 @@
+TAP version 13
+# Subtest: actual independently encoded bytes pass every RGBA pixel and immutable source/recipe commitments
+ok 1 - actual independently encoded bytes pass every RGBA pixel and immutable source/recipe commitments
+  ---
+  duration_ms: 10.915333
+  type: 'test'
+  ...
+# Subtest: a changed last RGBA alpha sample fails even though dimensions and all other pixels match
+ok 2 - a changed last RGBA alpha sample fails even though dimensions and all other pixels match
+  ---
+  duration_ms: 3.919291
+  type: 'test'
+  ...
+# Subtest: actual animation verifies every frame, intrinsic infinite loop and exact variable timing
+ok 3 - actual animation verifies every frame, intrinsic infinite loop and exact variable timing
+  ---
+  duration_ms: 4.890417
+  type: 'test'
+  ...
+# Subtest: last-frame change, one millisecond duration change and finite-loop change are all rejected
+ok 4 - last-frame change, one millisecond duration change and finite-loop change are all rejected
+  ---
+  duration_ms: 10.07175
+  type: 'test'
+  ...
+# Subtest: finite identical animation loops remain exact and are not relabelled infinite
+ok 5 - finite identical animation loops remain exact and are not relabelled infinite
+  ---
+  duration_ms: 4.133625
+  type: 'test'
+  ...
+# Subtest: movie to actual checked animated WebP is conditional on authenticated canonical-player semantics
+ok 6 - movie to actual checked animated WebP is conditional on authenticated canonical-player semantics
+  ---
+  duration_ms: 266.099292
+  type: 'test'
+  ...
+# Subtest: actual AAC audio includes every canonical PCM sample, channels, presentation timestamps and hashes
+ok 7 - actual AAC audio includes every canonical PCM sample, channels, presentation timestamps and hashes
+  ---
+  duration_ms: 349.408292
+  type: 'test'
+  ...
+# Subtest: equal-duration audio with changed actual samples fails, rather than presence-only approval
+ok 8 - equal-duration audio with changed actual samples fails, rather than presence-only approval
+  ---
+  duration_ms: 187.975375
+  type: 'test'
+  ...
+# Subtest: audio disappearance fails even when all video samples remain exact
+ok 9 - audio disappearance fails even when all video samples remain exact
+  ---
+  duration_ms: 243.280583
+  type: 'test'
+  ...
+# Subtest: explicit edits stay selected without granting automatic fidelity or fallback-to-original authority
+ok 10 - explicit edits stay selected without granting automatic fidelity or fallback-to-original authority
+  ---
+  duration_ms: 1.814958
+  type: 'test'
+  ...
+# Subtest: decoder corruption, unsupported external containers and pre-aborted work fail closed
+ok 11 - decoder corruption, unsupported external containers and pre-aborted work fail closed
+  ---
+  duration_ms: 45.104708
+  type: 'test'
+  ...
+# Subtest: the verifier snapshots mutable caller arrays and nested recipe before its first await
+ok 12 - the verifier snapshots mutable caller arrays and nested recipe before its first await
+  ---
+  duration_ms: 3.027209
+  type: 'test'
+  ...
+1..12
+# tests 12
+# suites 0
+# pass 12
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 1362.835875
