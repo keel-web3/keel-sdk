@@ -1,0 +1,904 @@
+TAP version 13
+# Subtest: contract execution reverted: unauthorized remains a revert and does not disable its provider
+ok 1 - contract execution reverted: unauthorized remains a revert and does not disable its provider
+  ---
+  duration_ms: 32.10075
+  type: 'test'
+  ...
+# Subtest: contract execution reverted: authentication required remains a revert and does not disable its provider
+ok 2 - contract execution reverted: authentication required remains a revert and does not disable its provider
+  ---
+  duration_ms: 1.949875
+  type: 'test'
+  ...
+# Subtest: HTTP200 genuine revert containing unauthorized stays deterministic and leaves provider reusable
+ok 3 - HTTP200 genuine revert containing unauthorized stays deterministic and leaves provider reusable
+  ---
+  duration_ms: 34.405417
+  type: 'test'
+  ...
+# Subtest: HTTP200 genuine revert containing authentication required stays deterministic and leaves provider reusable
+ok 4 - HTTP200 genuine revert containing authentication required stays deterministic and leaves provider reusable
+  ---
+  duration_ms: 1.484833
+  type: 'test'
+  ...
+# Subtest: HTTP200 genuine revert containing rate limit stays deterministic and leaves provider reusable
+ok 5 - HTTP200 genuine revert containing rate limit stays deterministic and leaves provider reusable
+  ---
+  duration_ms: 2.209125
+  type: 'test'
+  ...
+# Subtest: HTTP200 genuine revert containing request body size limit reached stays deterministic and leaves provider reusable
+ok 6 - HTTP200 genuine revert containing request body size limit reached stays deterministic and leaves provider reusable
+  ---
+  duration_ms: 0.830041
+  type: 'test'
+  ...
+# Subtest: HTTP413 genuine revert containing unauthorized stays deterministic and leaves provider reusable
+ok 7 - HTTP413 genuine revert containing unauthorized stays deterministic and leaves provider reusable
+  ---
+  duration_ms: 0.823709
+  type: 'test'
+  ...
+# Subtest: HTTP413 genuine revert containing authentication required stays deterministic and leaves provider reusable
+ok 8 - HTTP413 genuine revert containing authentication required stays deterministic and leaves provider reusable
+  ---
+  duration_ms: 0.567625
+  type: 'test'
+  ...
+# Subtest: HTTP413 genuine revert containing rate limit stays deterministic and leaves provider reusable
+ok 9 - HTTP413 genuine revert containing rate limit stays deterministic and leaves provider reusable
+  ---
+  duration_ms: 0.550875
+  type: 'test'
+  ...
+# Subtest: HTTP413 genuine revert containing request body size limit reached stays deterministic and leaves provider reusable
+ok 10 - HTTP413 genuine revert containing request body size limit reached stays deterministic and leaves provider reusable
+  ---
+  duration_ms: 0.521916
+  type: 'test'
+  ...
+# Subtest: HTTP429 genuine revert containing unauthorized stays deterministic and leaves provider reusable
+ok 11 - HTTP429 genuine revert containing unauthorized stays deterministic and leaves provider reusable
+  ---
+  duration_ms: 1.120125
+  type: 'test'
+  ...
+# Subtest: HTTP429 genuine revert containing authentication required stays deterministic and leaves provider reusable
+ok 12 - HTTP429 genuine revert containing authentication required stays deterministic and leaves provider reusable
+  ---
+  duration_ms: 1.061292
+  type: 'test'
+  ...
+# Subtest: HTTP429 genuine revert containing rate limit stays deterministic and leaves provider reusable
+ok 13 - HTTP429 genuine revert containing rate limit stays deterministic and leaves provider reusable
+  ---
+  duration_ms: 0.661875
+  type: 'test'
+  ...
+# Subtest: HTTP429 genuine revert containing request body size limit reached stays deterministic and leaves provider reusable
+ok 14 - HTTP429 genuine revert containing request body size limit reached stays deterministic and leaves provider reusable
+  ---
+  duration_ms: 2.913375
+  type: 'test'
+  ...
+# Subtest: HTTP503 genuine revert containing unauthorized stays deterministic and leaves provider reusable
+ok 15 - HTTP503 genuine revert containing unauthorized stays deterministic and leaves provider reusable
+  ---
+  duration_ms: 0.991583
+  type: 'test'
+  ...
+# Subtest: HTTP503 genuine revert containing authentication required stays deterministic and leaves provider reusable
+ok 16 - HTTP503 genuine revert containing authentication required stays deterministic and leaves provider reusable
+  ---
+  duration_ms: 1.177625
+  type: 'test'
+  ...
+# Subtest: HTTP503 genuine revert containing rate limit stays deterministic and leaves provider reusable
+ok 17 - HTTP503 genuine revert containing rate limit stays deterministic and leaves provider reusable
+  ---
+  duration_ms: 0.789167
+  type: 'test'
+  ...
+# Subtest: HTTP503 genuine revert containing request body size limit reached stays deterministic and leaves provider reusable
+ok 18 - HTTP503 genuine revert containing request body size limit reached stays deterministic and leaves provider reusable
+  ---
+  duration_ms: 1.072666
+  type: 'test'
+  ...
+# Subtest: actual HTTP401 remains credential denial despite execution/retry prose unauthorized
+ok 19 - actual HTTP401 remains credential denial despite execution/retry prose unauthorized
+  ---
+  duration_ms: 1.484208
+  type: 'test'
+  ...
+# Subtest: actual HTTP401 remains credential denial despite execution/retry prose authentication required
+ok 20 - actual HTTP401 remains credential denial despite execution/retry prose authentication required
+  ---
+  duration_ms: 0.674292
+  type: 'test'
+  ...
+# Subtest: actual HTTP401 remains credential denial despite execution/retry prose rate limit
+ok 21 - actual HTTP401 remains credential denial despite execution/retry prose rate limit
+  ---
+  duration_ms: 0.552209
+  type: 'test'
+  ...
+# Subtest: actual HTTP401 remains credential denial despite execution/retry prose request body size limit reached
+ok 22 - actual HTTP401 remains credential denial despite execution/retry prose request body size limit reached
+  ---
+  duration_ms: 0.599
+  type: 'test'
+  ...
+# Subtest: actual HTTP403 remains credential denial despite execution/retry prose unauthorized
+ok 23 - actual HTTP403 remains credential denial despite execution/retry prose unauthorized
+  ---
+  duration_ms: 0.883917
+  type: 'test'
+  ...
+# Subtest: actual HTTP403 remains credential denial despite execution/retry prose authentication required
+ok 24 - actual HTTP403 remains credential denial despite execution/retry prose authentication required
+  ---
+  duration_ms: 0.68425
+  type: 'test'
+  ...
+# Subtest: actual HTTP403 remains credential denial despite execution/retry prose rate limit
+ok 25 - actual HTTP403 remains credential denial despite execution/retry prose rate limit
+  ---
+  duration_ms: 1.060167
+  type: 'test'
+  ...
+# Subtest: actual HTTP403 remains credential denial despite execution/retry prose request body size limit reached
+ok 26 - actual HTTP403 remains credential denial despite execution/retry prose request body size limit reached
+  ---
+  duration_ms: 0.635834
+  type: 'test'
+  ...
+# Subtest: HTTP401 with empty body is terminal without a second recipient or warmed retry
+ok 27 - HTTP401 with empty body is terminal without a second recipient or warmed retry
+  ---
+  duration_ms: 30.632833
+  type: 'test'
+  ...
+# Subtest: HTTP401 with rate-limit body is terminal without a second recipient or warmed retry
+ok 28 - HTTP401 with rate-limit body is terminal without a second recipient or warmed retry
+  ---
+  duration_ms: 12.935916
+  type: 'test'
+  ...
+# Subtest: HTTP401 with capability body is terminal without a second recipient or warmed retry
+ok 29 - HTTP401 with capability body is terminal without a second recipient or warmed retry
+  ---
+  duration_ms: 2.789
+  type: 'test'
+  ...
+# Subtest: HTTP401 with malformed body is terminal without a second recipient or warmed retry
+ok 30 - HTTP401 with malformed body is terminal without a second recipient or warmed retry
+  ---
+  duration_ms: 4.280875
+  type: 'test'
+  ...
+# Subtest: HTTP403 with empty body is terminal without a second recipient or warmed retry
+ok 31 - HTTP403 with empty body is terminal without a second recipient or warmed retry
+  ---
+  duration_ms: 1.361333
+  type: 'test'
+  ...
+# Subtest: HTTP403 with rate-limit body is terminal without a second recipient or warmed retry
+ok 32 - HTTP403 with rate-limit body is terminal without a second recipient or warmed retry
+  ---
+  duration_ms: 4.804542
+  type: 'test'
+  ...
+# Subtest: HTTP403 with capability body is terminal without a second recipient or warmed retry
+ok 33 - HTTP403 with capability body is terminal without a second recipient or warmed retry
+  ---
+  duration_ms: 1.18275
+  type: 'test'
+  ...
+# Subtest: HTTP403 with malformed body is terminal without a second recipient or warmed retry
+ok 34 - HTTP403 with malformed body is terminal without a second recipient or warmed retry
+  ---
+  duration_ms: 2.23375
+  type: 'test'
+  ...
+# Subtest: malformed JSON is terminal without another recipient
+ok 35 - malformed JSON is terminal without another recipient
+  ---
+  duration_ms: 2.410625
+  type: 'test'
+  ...
+# Subtest: stale response identity is terminal without another recipient
+ok 36 - stale response identity is terminal without another recipient
+  ---
+  duration_ms: 3.528583
+  type: 'test'
+  ...
+# Subtest: missing result is terminal without another recipient
+ok 37 - missing result is terminal without another recipient
+  ---
+  duration_ms: 0.818125
+  type: 'test'
+  ...
+# Subtest: unknown RPC error is terminal without another recipient
+ok 38 - unknown RPC error is terminal without another recipient
+  ---
+  duration_ms: 1.774667
+  type: 'test'
+  ...
+# Subtest: invalid parameters is terminal without another recipient
+ok 39 - invalid parameters is terminal without another recipient
+  ---
+  duration_ms: 0.801
+  type: 'test'
+  ...
+# Subtest: genuine revert is terminal without another recipient
+ok 40 - genuine revert is terminal without another recipient
+  ---
+  duration_ms: 0.564791
+  type: 'test'
+  ...
+# Subtest: revert prose with rate-limit wording is terminal without another recipient
+ok 41 - revert prose with rate-limit wording is terminal without another recipient
+  ---
+  duration_ms: 0.557792
+  type: 'test'
+  ...
+# Subtest: RPC401 with rate-limit wording is terminal without another recipient
+ok 42 - RPC401 with rate-limit wording is terminal without another recipient
+  ---
+  duration_ms: 0.485791
+  type: 'test'
+  ...
+# Subtest: RPC403 with rate-limit wording is terminal without another recipient
+ok 43 - RPC403 with rate-limit wording is terminal without another recipient
+  ---
+  duration_ms: 0.547666
+  type: 'test'
+  ...
+# Subtest: generic HTTP404 is terminal without another recipient
+ok 44 - generic HTTP404 is terminal without another recipient
+  ---
+  duration_ms: 0.564417
+  type: 'test'
+  ...
+# Subtest: generic HTTP503 is terminal without another recipient
+ok 45 - generic HTTP503 is terminal without another recipient
+  ---
+  duration_ms: 0.44825
+  type: 'test'
+  ...
+# Subtest: unknown transport error is terminal without another recipient
+ok 46 - unknown transport error is terminal without another recipient
+  ---
+  duration_ms: 0.458875
+  type: 'test'
+  ...
+# Subtest: missing pinned proof is terminal without another recipient
+ok 47 - missing pinned proof is terminal without another recipient
+  ---
+  duration_ms: 0.353458
+  type: 'test'
+  ...
+# Subtest: wrong chain stops before address/key disclosure or another recipient
+ok 48 - wrong chain stops before address/key disclosure or another recipient
+  ---
+  duration_ms: 0.301
+  type: 'test'
+  ...
+# Subtest: canonical mismatch stops before address/key disclosure or another recipient
+ok 49 - canonical mismatch stops before address/key disclosure or another recipient
+  ---
+  duration_ms: 0.278875
+  type: 'test'
+  ...
+# Subtest: HTTP429 permits only an approved ordered fallback at the exact block
+ok 50 - HTTP429 permits only an approved ordered fallback at the exact block
+  ---
+  duration_ms: 1.307959
+  type: 'test'
+  ...
+# Subtest: explicit RPC rate-limit permits only an approved ordered fallback at the exact block
+ok 51 - explicit RPC rate-limit permits only an approved ordered fallback at the exact block
+  ---
+  duration_ms: 1.025667
+  type: 'test'
+  ...
+# Subtest: unsupported method permits only an approved ordered fallback at the exact block
+ok 52 - unsupported method permits only an approved ordered fallback at the exact block
+  ---
+  duration_ms: 2.41525
+  type: 'test'
+  ...
+# Subtest: unsupported capability permits only an approved ordered fallback at the exact block
+ok 53 - unsupported capability permits only an approved ordered fallback at the exact block
+  ---
+  duration_ms: 3.076833
+  type: 'test'
+  ...
+# Subtest: explicit timeout permits only an approved ordered fallback at the exact block
+ok 54 - explicit timeout permits only an approved ordered fallback at the exact block
+  ---
+  duration_ms: 1.425167
+  type: 'test'
+  ...
+# Subtest: HTTP413 body limit permits only an approved ordered fallback at the exact block
+ok 55 - HTTP413 body limit permits only an approved ordered fallback at the exact block
+  ---
+  duration_ms: 0.827708
+  type: 'test'
+  ...
+# Subtest: bounded response limit permits only an approved ordered fallback at the exact block
+ok 56 - bounded response limit permits only an approved ordered fallback at the exact block
+  ---
+  duration_ms: 14.557
+  type: 'test'
+  ...
+# Subtest: healthy free never selects paid; new reader begins free after the prior cooldown expires
+ok 57 - healthy free never selects paid; new reader begins free after the prior cooldown expires
+  ---
+  duration_ms: 2.1025
+  type: 'test'
+  ...
+# Subtest: fallback recipient credentials alone grant no state-read disclosure
+ok 58 - fallback recipient credentials alone grant no state-read disclosure
+  ---
+  duration_ms: 0.444417
+  type: 'test'
+  ...
+# Subtest: owner-private evidence retains bounded invalidUTF8/JSON bytes before public normalization
+ok 59 - owner-private evidence retains bounded invalidUTF8/JSON bytes before public normalization
+  ---
+  duration_ms: 24.739041
+  type: 'test'
+  ...
+# Subtest: private network error snapshots retain custom fields but cannot mutate the original
+ok 60 - private network error snapshots retain custom fields but cannot mutate the original
+  ---
+  duration_ms: 0.709125
+  type: 'test'
+  ...
+# Subtest: pinned HTTP status and rate-limit evidence survive exhaustion and cooldown without a retry or private text
+ok 61 - pinned HTTP status and rate-limit evidence survive exhaustion and cooldown without a retry or private text
+  ---
+  duration_ms: 6.176667
+  type: 'test'
+  ...
+# Subtest: only recognized nested network codes are retained; message text never invents a timeout
+ok 62 - only recognized nested network codes are retained; message text never invents a timeout
+  ---
+  duration_ms: 6.688459
+  type: 'test'
+  ...
+# Subtest: actual request deadlines and response-body deadlines are retained as timeouts
+ok 63 - actual request deadlines and response-body deadlines are retained as timeouts
+  ---
+  duration_ms: 205.356541
+  type: 'test'
+  ...
+# Subtest: response failures distinguish missing body, byte bound, parse error, stale response id and missing result
+ok 64 - response failures distinguish missing body, byte bound, parse error, stale response id and missing result
+  ---
+  duration_ms: 2.052167
+  type: 'test'
+  ...
+# Subtest: classified RPC rate limits retain the numeric code, not remote error data
+ok 65 - classified RPC rate limits retain the numeric code, not remote error data
+  ---
+  duration_ms: 1.107042
+  type: 'test'
+  ...
+# Subtest: concurrent pinned requests retain the same observed rate-limit status while waiting in the queue
+ok 66 - concurrent pinned requests retain the same observed rate-limit status while waiting in the queue
+  ---
+  duration_ms: 0.851208
+  type: 'test'
+  ...
+# Subtest: caller cancellation is preserved and never triggers provider failover
+ok 67 - caller cancellation is preserved and never triggers provider failover
+  ---
+  duration_ms: 0.874917
+  type: 'test'
+  ...
+# Subtest: ordinary read failover remains bounded and deterministic simulation rejections never rotate
+ok 68 - ordinary read failover remains bounded and deterministic simulation rejections never rotate
+  ---
+  duration_ms: 2.782666
+  type: 'test'
+  ...
+# Subtest: a complete multi-megabyte 45-call program reaches the pinned transport unchanged; unknown failure stays unknown
+ok 69 - a complete multi-megabyte 45-call program reaches the pinned transport unchanged; unknown failure stays unknown
+  ---
+  duration_ms: 36.048042
+  type: 'test'
+  ...
+# Subtest: bounded explicit HTTP body-size evidence is actionable capacity without an invented RPC code
+ok 70 - bounded explicit HTTP body-size evidence is actionable capacity without an invented RPC code
+  ---
+  duration_ms: 6.322917
+  type: 'test'
+  ...
+# Subtest: generic, malformed, reflected, stale and oversized HTTP bodies never invent request-size evidence
+ok 71 - generic, malformed, reflected, stale and oversized HTTP bodies never invent request-size evidence
+  ---
+  duration_ms: 6.161416
+  type: 'test'
+  ...
+# Subtest: HTTP JSON-RPC execution and validation evidence outranks body-size wording
+ok 72 - HTTP JSON-RPC execution and validation evidence outranks body-size wording
+  ---
+  duration_ms: 3.159125
+  type: 'test'
+  ...
+# Subtest: aborted or timed-out HTTP error-body reads do not establish request capacity
+ok 73 - aborted or timed-out HTTP error-body reads do not establish request capacity
+  ---
+  duration_ms: 101.977875
+  type: 'test'
+  ...
+# Subtest: response-payload and negated request-size wording never establish outgoing body capacity
+ok 74 - response-payload and negated request-size wording never establish outgoing body capacity
+  ---
+  duration_ms: 1.680709
+  type: 'test'
+  ...
+# Subtest: complete capacity-detail envelope bound applies equally to HTTP200 and HTTP503 RPC errors
+ok 75 - complete capacity-detail envelope bound applies equally to HTTP200 and HTTP503 RPC errors
+  ---
+  duration_ms: 0.672542
+  type: 'test'
+  ...
+# Subtest: complete HTTP capacity details accept exactly16KiB and reject one additional byte independently of private capture
+ok 76 - complete HTTP capacity details accept exactly16KiB and reject one additional byte independently of private capture
+  ---
+  duration_ms: 2.179833
+  type: 'test'
+  ...
+# Subtest: HTTP error parsing preserves the lowest signed32-bit observed RPC code without inventing another code
+ok 77 - HTTP error parsing preserves the lowest signed32-bit observed RPC code without inventing another code
+  ---
+  duration_ms: 0.811917
+  type: 'test'
+  ...
+# Subtest: eth_call HTTP200 contract revert containing unauthorized keeps the typed revert and usable original provider
+ok 78 - eth_call HTTP200 contract revert containing unauthorized keeps the typed revert and usable original provider
+  ---
+  duration_ms: 22.675958
+  type: 'test'
+  ...
+# Subtest: eth_call HTTP200 contract revert containing authentication required keeps the typed revert and usable original provider
+ok 79 - eth_call HTTP200 contract revert containing authentication required keeps the typed revert and usable original provider
+  ---
+  duration_ms: 1.34225
+  type: 'test'
+  ...
+# Subtest: eth_call HTTP200 contract revert containing rate limit keeps the typed revert and usable original provider
+ok 80 - eth_call HTTP200 contract revert containing rate limit keeps the typed revert and usable original provider
+  ---
+  duration_ms: 2.312917
+  type: 'test'
+  ...
+# Subtest: eth_call HTTP200 contract revert containing request body size limit reached keeps the typed revert and usable original provider
+ok 81 - eth_call HTTP200 contract revert containing request body size limit reached keeps the typed revert and usable original provider
+  ---
+  duration_ms: 0.826875
+  type: 'test'
+  ...
+# Subtest: eth_call HTTP200 contract revert containing api key missing keeps the typed revert and usable original provider
+ok 82 - eth_call HTTP200 contract revert containing api key missing keeps the typed revert and usable original provider
+  ---
+  duration_ms: 0.714375
+  type: 'test'
+  ...
+# Subtest: eth_call HTTP200 contract revert containing access denied keeps the typed revert and usable original provider
+ok 83 - eth_call HTTP200 contract revert containing access denied keeps the typed revert and usable original provider
+  ---
+  duration_ms: 0.5025
+  type: 'test'
+  ...
+# Subtest: eth_call HTTP200 contract revert containing historical state unavailable keeps the typed revert and usable original provider
+ok 84 - eth_call HTTP200 contract revert containing historical state unavailable keeps the typed revert and usable original provider
+  ---
+  duration_ms: 0.515208
+  type: 'test'
+  ...
+# Subtest: eth_call HTTP200 contract revert containing quota exceeded keeps the typed revert and usable original provider
+ok 85 - eth_call HTTP200 contract revert containing quota exceeded keeps the typed revert and usable original provider
+  ---
+  duration_ms: 0.427416
+  type: 'test'
+  ...
+# Subtest: eth_call HTTP200 contract revert containing RPC gas cap: 42 keeps the typed revert and usable original provider
+ok 86 - eth_call HTTP200 contract revert containing RPC gas cap: 42 keeps the typed revert and usable original provider
+  ---
+  duration_ms: 1.190041
+  type: 'test'
+  ...
+# Subtest: eth_call HTTP200 contract revert containing nonce too high keeps the typed revert and usable original provider
+ok 87 - eth_call HTTP200 contract revert containing nonce too high keeps the typed revert and usable original provider
+  ---
+  duration_ms: 3.344125
+  type: 'test'
+  ...
+# Subtest: eth_call HTTP200 contract revert containing insufficient funds keeps the typed revert and usable original provider
+ok 88 - eth_call HTTP200 contract revert containing insufficient funds keeps the typed revert and usable original provider
+  ---
+  duration_ms: 1.934959
+  type: 'test'
+  ...
+# Subtest: eth_call HTTP413 contract revert containing unauthorized keeps the typed revert and usable original provider
+ok 89 - eth_call HTTP413 contract revert containing unauthorized keeps the typed revert and usable original provider
+  ---
+  duration_ms: 0.668708
+  type: 'test'
+  ...
+# Subtest: eth_call HTTP413 contract revert containing authentication required keeps the typed revert and usable original provider
+ok 90 - eth_call HTTP413 contract revert containing authentication required keeps the typed revert and usable original provider
+  ---
+  duration_ms: 0.511583
+  type: 'test'
+  ...
+# Subtest: eth_call HTTP413 contract revert containing rate limit keeps the typed revert and usable original provider
+ok 91 - eth_call HTTP413 contract revert containing rate limit keeps the typed revert and usable original provider
+  ---
+  duration_ms: 0.4285
+  type: 'test'
+  ...
+# Subtest: eth_call HTTP413 contract revert containing request body size limit reached keeps the typed revert and usable original provider
+ok 92 - eth_call HTTP413 contract revert containing request body size limit reached keeps the typed revert and usable original provider
+  ---
+  duration_ms: 0.395416
+  type: 'test'
+  ...
+# Subtest: eth_call HTTP429 contract revert containing unauthorized keeps the typed revert and usable original provider
+ok 93 - eth_call HTTP429 contract revert containing unauthorized keeps the typed revert and usable original provider
+  ---
+  duration_ms: 0.38325
+  type: 'test'
+  ...
+# Subtest: eth_call HTTP429 contract revert containing authentication required keeps the typed revert and usable original provider
+ok 94 - eth_call HTTP429 contract revert containing authentication required keeps the typed revert and usable original provider
+  ---
+  duration_ms: 3.911834
+  type: 'test'
+  ...
+# Subtest: eth_call HTTP429 contract revert containing rate limit keeps the typed revert and usable original provider
+ok 95 - eth_call HTTP429 contract revert containing rate limit keeps the typed revert and usable original provider
+  ---
+  duration_ms: 1.069084
+  type: 'test'
+  ...
+# Subtest: eth_call HTTP429 contract revert containing request body size limit reached keeps the typed revert and usable original provider
+ok 96 - eth_call HTTP429 contract revert containing request body size limit reached keeps the typed revert and usable original provider
+  ---
+  duration_ms: 0.550583
+  type: 'test'
+  ...
+# Subtest: eth_call HTTP503 contract revert containing unauthorized keeps the typed revert and usable original provider
+ok 97 - eth_call HTTP503 contract revert containing unauthorized keeps the typed revert and usable original provider
+  ---
+  duration_ms: 0.341416
+  type: 'test'
+  ...
+# Subtest: eth_call HTTP503 contract revert containing authentication required keeps the typed revert and usable original provider
+ok 98 - eth_call HTTP503 contract revert containing authentication required keeps the typed revert and usable original provider
+  ---
+  duration_ms: 0.319875
+  type: 'test'
+  ...
+# Subtest: eth_call HTTP503 contract revert containing rate limit keeps the typed revert and usable original provider
+ok 99 - eth_call HTTP503 contract revert containing rate limit keeps the typed revert and usable original provider
+  ---
+  duration_ms: 0.464625
+  type: 'test'
+  ...
+# Subtest: eth_call HTTP503 contract revert containing request body size limit reached keeps the typed revert and usable original provider
+ok 100 - eth_call HTTP503 contract revert containing request body size limit reached keeps the typed revert and usable original provider
+  ---
+  duration_ms: 0.366
+  type: 'test'
+  ...
+# Subtest: eth_call actual HTTP401 remains denial despite contract-revert unauthorized prose
+ok 101 - eth_call actual HTTP401 remains denial despite contract-revert unauthorized prose
+  ---
+  duration_ms: 0.550875
+  type: 'test'
+  ...
+# Subtest: eth_call actual HTTP401 remains denial despite contract-revert authentication required prose
+ok 102 - eth_call actual HTTP401 remains denial despite contract-revert authentication required prose
+  ---
+  duration_ms: 0.353292
+  type: 'test'
+  ...
+# Subtest: eth_call actual HTTP401 remains denial despite contract-revert rate limit prose
+ok 103 - eth_call actual HTTP401 remains denial despite contract-revert rate limit prose
+  ---
+  duration_ms: 0.266
+  type: 'test'
+  ...
+# Subtest: eth_call actual HTTP401 remains denial despite contract-revert request body size limit reached prose
+ok 104 - eth_call actual HTTP401 remains denial despite contract-revert request body size limit reached prose
+  ---
+  duration_ms: 0.267375
+  type: 'test'
+  ...
+# Subtest: eth_call actual HTTP403 remains denial despite contract-revert unauthorized prose
+ok 105 - eth_call actual HTTP403 remains denial despite contract-revert unauthorized prose
+  ---
+  duration_ms: 0.237916
+  type: 'test'
+  ...
+# Subtest: eth_call actual HTTP403 remains denial despite contract-revert authentication required prose
+ok 106 - eth_call actual HTTP403 remains denial despite contract-revert authentication required prose
+  ---
+  duration_ms: 0.638833
+  type: 'test'
+  ...
+# Subtest: eth_call actual HTTP403 remains denial despite contract-revert rate limit prose
+ok 107 - eth_call actual HTTP403 remains denial despite contract-revert rate limit prose
+  ---
+  duration_ms: 9.319666
+  type: 'test'
+  ...
+# Subtest: eth_call actual HTTP403 remains denial despite contract-revert request body size limit reached prose
+ok 108 - eth_call actual HTTP403 remains denial despite contract-revert request body size limit reached prose
+  ---
+  duration_ms: 0.644042
+  type: 'test'
+  ...
+# Subtest: eth_simulateV1 HTTP200 contract revert containing unauthorized keeps the typed revert and usable original provider
+ok 109 - eth_simulateV1 HTTP200 contract revert containing unauthorized keeps the typed revert and usable original provider
+  ---
+  duration_ms: 0.7425
+  type: 'test'
+  ...
+# Subtest: eth_simulateV1 HTTP200 contract revert containing authentication required keeps the typed revert and usable original provider
+ok 110 - eth_simulateV1 HTTP200 contract revert containing authentication required keeps the typed revert and usable original provider
+  ---
+  duration_ms: 1.004458
+  type: 'test'
+  ...
+# Subtest: eth_simulateV1 HTTP200 contract revert containing rate limit keeps the typed revert and usable original provider
+ok 111 - eth_simulateV1 HTTP200 contract revert containing rate limit keeps the typed revert and usable original provider
+  ---
+  duration_ms: 1.005958
+  type: 'test'
+  ...
+# Subtest: eth_simulateV1 HTTP200 contract revert containing request body size limit reached keeps the typed revert and usable original provider
+ok 112 - eth_simulateV1 HTTP200 contract revert containing request body size limit reached keeps the typed revert and usable original provider
+  ---
+  duration_ms: 0.976792
+  type: 'test'
+  ...
+# Subtest: eth_simulateV1 HTTP200 contract revert containing api key missing keeps the typed revert and usable original provider
+ok 113 - eth_simulateV1 HTTP200 contract revert containing api key missing keeps the typed revert and usable original provider
+  ---
+  duration_ms: 0.80925
+  type: 'test'
+  ...
+# Subtest: eth_simulateV1 HTTP200 contract revert containing access denied keeps the typed revert and usable original provider
+ok 114 - eth_simulateV1 HTTP200 contract revert containing access denied keeps the typed revert and usable original provider
+  ---
+  duration_ms: 0.80425
+  type: 'test'
+  ...
+# Subtest: eth_simulateV1 HTTP200 contract revert containing historical state unavailable keeps the typed revert and usable original provider
+ok 115 - eth_simulateV1 HTTP200 contract revert containing historical state unavailable keeps the typed revert and usable original provider
+  ---
+  duration_ms: 1.833709
+  type: 'test'
+  ...
+# Subtest: eth_simulateV1 HTTP200 contract revert containing quota exceeded keeps the typed revert and usable original provider
+ok 116 - eth_simulateV1 HTTP200 contract revert containing quota exceeded keeps the typed revert and usable original provider
+  ---
+  duration_ms: 0.460041
+  type: 'test'
+  ...
+# Subtest: eth_simulateV1 HTTP200 contract revert containing RPC gas cap: 42 keeps the typed revert and usable original provider
+ok 117 - eth_simulateV1 HTTP200 contract revert containing RPC gas cap: 42 keeps the typed revert and usable original provider
+  ---
+  duration_ms: 0.714584
+  type: 'test'
+  ...
+# Subtest: eth_simulateV1 HTTP200 contract revert containing nonce too high keeps the typed revert and usable original provider
+ok 118 - eth_simulateV1 HTTP200 contract revert containing nonce too high keeps the typed revert and usable original provider
+  ---
+  duration_ms: 0.908166
+  type: 'test'
+  ...
+# Subtest: eth_simulateV1 HTTP200 contract revert containing insufficient funds keeps the typed revert and usable original provider
+ok 119 - eth_simulateV1 HTTP200 contract revert containing insufficient funds keeps the typed revert and usable original provider
+  ---
+  duration_ms: 0.436166
+  type: 'test'
+  ...
+# Subtest: eth_simulateV1 HTTP413 contract revert containing unauthorized keeps the typed revert and usable original provider
+ok 120 - eth_simulateV1 HTTP413 contract revert containing unauthorized keeps the typed revert and usable original provider
+  ---
+  duration_ms: 0.365958
+  type: 'test'
+  ...
+# Subtest: eth_simulateV1 HTTP413 contract revert containing authentication required keeps the typed revert and usable original provider
+ok 121 - eth_simulateV1 HTTP413 contract revert containing authentication required keeps the typed revert and usable original provider
+  ---
+  duration_ms: 0.350333
+  type: 'test'
+  ...
+# Subtest: eth_simulateV1 HTTP413 contract revert containing rate limit keeps the typed revert and usable original provider
+ok 122 - eth_simulateV1 HTTP413 contract revert containing rate limit keeps the typed revert and usable original provider
+  ---
+  duration_ms: 0.366542
+  type: 'test'
+  ...
+# Subtest: eth_simulateV1 HTTP413 contract revert containing request body size limit reached keeps the typed revert and usable original provider
+ok 123 - eth_simulateV1 HTTP413 contract revert containing request body size limit reached keeps the typed revert and usable original provider
+  ---
+  duration_ms: 3.148792
+  type: 'test'
+  ...
+# Subtest: eth_simulateV1 HTTP429 contract revert containing unauthorized keeps the typed revert and usable original provider
+ok 124 - eth_simulateV1 HTTP429 contract revert containing unauthorized keeps the typed revert and usable original provider
+  ---
+  duration_ms: 0.62425
+  type: 'test'
+  ...
+# Subtest: eth_simulateV1 HTTP429 contract revert containing authentication required keeps the typed revert and usable original provider
+ok 125 - eth_simulateV1 HTTP429 contract revert containing authentication required keeps the typed revert and usable original provider
+  ---
+  duration_ms: 0.787458
+  type: 'test'
+  ...
+# Subtest: eth_simulateV1 HTTP429 contract revert containing rate limit keeps the typed revert and usable original provider
+ok 126 - eth_simulateV1 HTTP429 contract revert containing rate limit keeps the typed revert and usable original provider
+  ---
+  duration_ms: 0.356542
+  type: 'test'
+  ...
+# Subtest: eth_simulateV1 HTTP429 contract revert containing request body size limit reached keeps the typed revert and usable original provider
+ok 127 - eth_simulateV1 HTTP429 contract revert containing request body size limit reached keeps the typed revert and usable original provider
+  ---
+  duration_ms: 0.362708
+  type: 'test'
+  ...
+# Subtest: eth_simulateV1 HTTP503 contract revert containing unauthorized keeps the typed revert and usable original provider
+ok 128 - eth_simulateV1 HTTP503 contract revert containing unauthorized keeps the typed revert and usable original provider
+  ---
+  duration_ms: 0.313834
+  type: 'test'
+  ...
+# Subtest: eth_simulateV1 HTTP503 contract revert containing authentication required keeps the typed revert and usable original provider
+ok 129 - eth_simulateV1 HTTP503 contract revert containing authentication required keeps the typed revert and usable original provider
+  ---
+  duration_ms: 0.265792
+  type: 'test'
+  ...
+# Subtest: eth_simulateV1 HTTP503 contract revert containing rate limit keeps the typed revert and usable original provider
+ok 130 - eth_simulateV1 HTTP503 contract revert containing rate limit keeps the typed revert and usable original provider
+  ---
+  duration_ms: 0.249541
+  type: 'test'
+  ...
+# Subtest: eth_simulateV1 HTTP503 contract revert containing request body size limit reached keeps the typed revert and usable original provider
+ok 131 - eth_simulateV1 HTTP503 contract revert containing request body size limit reached keeps the typed revert and usable original provider
+  ---
+  duration_ms: 0.240875
+  type: 'test'
+  ...
+# Subtest: eth_simulateV1 actual HTTP401 remains denial despite contract-revert unauthorized prose
+ok 132 - eth_simulateV1 actual HTTP401 remains denial despite contract-revert unauthorized prose
+  ---
+  duration_ms: 0.311834
+  type: 'test'
+  ...
+# Subtest: eth_simulateV1 actual HTTP401 remains denial despite contract-revert authentication required prose
+ok 133 - eth_simulateV1 actual HTTP401 remains denial despite contract-revert authentication required prose
+  ---
+  duration_ms: 0.253958
+  type: 'test'
+  ...
+# Subtest: eth_simulateV1 actual HTTP401 remains denial despite contract-revert rate limit prose
+ok 134 - eth_simulateV1 actual HTTP401 remains denial despite contract-revert rate limit prose
+  ---
+  duration_ms: 0.207667
+  type: 'test'
+  ...
+# Subtest: eth_simulateV1 actual HTTP401 remains denial despite contract-revert request body size limit reached prose
+ok 135 - eth_simulateV1 actual HTTP401 remains denial despite contract-revert request body size limit reached prose
+  ---
+  duration_ms: 0.209292
+  type: 'test'
+  ...
+# Subtest: eth_simulateV1 actual HTTP403 remains denial despite contract-revert unauthorized prose
+ok 136 - eth_simulateV1 actual HTTP403 remains denial despite contract-revert unauthorized prose
+  ---
+  duration_ms: 0.225333
+  type: 'test'
+  ...
+# Subtest: eth_simulateV1 actual HTTP403 remains denial despite contract-revert authentication required prose
+ok 137 - eth_simulateV1 actual HTTP403 remains denial despite contract-revert authentication required prose
+  ---
+  duration_ms: 0.218459
+  type: 'test'
+  ...
+# Subtest: eth_simulateV1 actual HTTP403 remains denial despite contract-revert rate limit prose
+ok 138 - eth_simulateV1 actual HTTP403 remains denial despite contract-revert rate limit prose
+  ---
+  duration_ms: 0.246833
+  type: 'test'
+  ...
+# Subtest: eth_simulateV1 actual HTTP403 remains denial despite contract-revert request body size limit reached prose
+ok 139 - eth_simulateV1 actual HTTP403 remains denial despite contract-revert request body size limit reached prose
+  ---
+  duration_ms: 0.244667
+  type: 'test'
+  ...
+# Subtest: pinned proof revert unauthorized is terminal without paid fallback and leaves a new free reader usable
+ok 140 - pinned proof revert unauthorized is terminal without paid fallback and leaves a new free reader usable
+  ---
+  duration_ms: 3.315583
+  type: 'test'
+  ...
+# Subtest: pinned proof revert authentication required is terminal without paid fallback and leaves a new free reader usable
+ok 141 - pinned proof revert authentication required is terminal without paid fallback and leaves a new free reader usable
+  ---
+  duration_ms: 6.284209
+  type: 'test'
+  ...
+# Subtest: pinned proof revert rate limit is terminal without paid fallback and leaves a new free reader usable
+ok 142 - pinned proof revert rate limit is terminal without paid fallback and leaves a new free reader usable
+  ---
+  duration_ms: 2.487041
+  type: 'test'
+  ...
+# Subtest: pinned proof revert request body size limit reached is terminal without paid fallback and leaves a new free reader usable
+ok 143 - pinned proof revert request body size limit reached is terminal without paid fallback and leaves a new free reader usable
+  ---
+  duration_ms: 1.038584
+  type: 'test'
+  ...
+# Subtest: observed HTTP401 wins even when its slow denial body fails bounded reading
+ok 144 - observed HTTP401 wins even when its slow denial body fails bounded reading
+  ---
+  duration_ms: 102.31575
+  type: 'test'
+  ...
+# Subtest: observed HTTP401 wins even when its oversized denial body fails bounded reading
+ok 145 - observed HTTP401 wins even when its oversized denial body fails bounded reading
+  ---
+  duration_ms: 0.639584
+  type: 'test'
+  ...
+# Subtest: observed HTTP401 wins even when its malformed denial body fails bounded reading
+ok 146 - observed HTTP401 wins even when its malformed denial body fails bounded reading
+  ---
+  duration_ms: 0.4065
+  type: 'test'
+  ...
+# Subtest: observed HTTP403 wins even when its slow denial body fails bounded reading
+ok 147 - observed HTTP403 wins even when its slow denial body fails bounded reading
+  ---
+  duration_ms: 101.361625
+  type: 'test'
+  ...
+# Subtest: observed HTTP403 wins even when its oversized denial body fails bounded reading
+ok 148 - observed HTTP403 wins even when its oversized denial body fails bounded reading
+  ---
+  duration_ms: 0.807875
+  type: 'test'
+  ...
+# Subtest: observed HTTP403 wins even when its malformed denial body fails bounded reading
+ok 149 - observed HTTP403 wins even when its malformed denial body fails bounded reading
+  ---
+  duration_ms: 0.416917
+  type: 'test'
+  ...
+1..149
+# tests 149
+# suites 0
+# pass 149
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 797.909125

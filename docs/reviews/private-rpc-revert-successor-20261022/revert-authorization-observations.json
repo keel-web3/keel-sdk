@@ -1,0 +1,34 @@
+[
+  {
+    "prose": "execution reverted: unauthorized",
+    "first": {
+      "name": "KeelRpcResponseError",
+      "code": 3
+    },
+    "status": [
+      {
+        "endpoint": "https://free.example",
+        "checkedChainId": 11155111,
+        "retryAfterMs": 0,
+        "disabled": false
+      }
+    ],
+    "requests": 2
+  },
+  {
+    "prose": "execution reverted: authentication required",
+    "first": {
+      "name": "KeelRpcResponseError",
+      "code": 3
+    },
+    "status": [
+      {
+        "endpoint": "https://free.example",
+        "checkedChainId": 11155111,
+        "retryAfterMs": 0,
+        "disabled": false
+      }
+    ],
+    "requests": 2
+  }
+]

@@ -1,0 +1,1110 @@
+TAP version 13
+# Subtest: contract execution reverted: unauthorized remains a revert and does not disable its provider
+not ok 1 - contract execution reverted: unauthorized remains a revert and does not disable its provider
+  ---
+  duration_ms: 23.7205
+  type: 'test'
+  location: '/private/tmp/keel-private-rpc-revert-successor-20261022-01/sdk/docs/reviews/private-rpc-revert-successor-20261022/independent-frozen-revert-authorization.test.mjs:8:3'
+  failureType: 'testCodeFailure'
+  error: 'Execution-reverted prose must keep the genuine revert path'
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: true
+  actual: false
+  operator: '=='
+  stack: |-
+    TestContext.<anonymous> (file:///private/tmp/keel-private-rpc-revert-successor-20261022-01/sdk/docs/reviews/private-rpc-revert-successor-20261022/independent-frozen-revert-authorization.test.mjs:24:12)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async startSubtestAfterBootstrap (node:internal/test_runner/harness:296:3)
+  ...
+# Subtest: contract execution reverted: authentication required remains a revert and does not disable its provider
+not ok 2 - contract execution reverted: authentication required remains a revert and does not disable its provider
+  ---
+  duration_ms: 4.647
+  type: 'test'
+  location: '/private/tmp/keel-private-rpc-revert-successor-20261022-01/sdk/docs/reviews/private-rpc-revert-successor-20261022/independent-frozen-revert-authorization.test.mjs:8:3'
+  failureType: 'testCodeFailure'
+  error: 'Execution-reverted prose must keep the genuine revert path'
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: true
+  actual: false
+  operator: '=='
+  stack: |-
+    TestContext.<anonymous> (file:///private/tmp/keel-private-rpc-revert-successor-20261022-01/sdk/docs/reviews/private-rpc-revert-successor-20261022/independent-frozen-revert-authorization.test.mjs:24:12)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: HTTP200 genuine revert containing unauthorized stays deterministic and leaves provider reusable
+not ok 3 - HTTP200 genuine revert containing unauthorized stays deterministic and leaves provider reusable
+  ---
+  duration_ms: 29.890416
+  type: 'test'
+  location: '/private/tmp/keel-private-rpc-revert-successor-20261022-01/sdk/docs/reviews/private-rpc-revert-successor-20261022/independent-frozen-revert-message-precedence.test.mjs:26:3'
+  failureType: 'testCodeFailure'
+  error: 'A genuine contract revert must keep its typed deterministic path'
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: true
+  actual: false
+  operator: '=='
+  stack: |-
+    TestContext.<anonymous> (file:///private/tmp/keel-private-rpc-revert-successor-20261022-01/sdk/docs/reviews/private-rpc-revert-successor-20261022/independent-frozen-revert-message-precedence.test.mjs:30:12)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async startSubtestAfterBootstrap (node:internal/test_runner/harness:296:3)
+  ...
+# Subtest: HTTP200 genuine revert containing authentication required stays deterministic and leaves provider reusable
+not ok 4 - HTTP200 genuine revert containing authentication required stays deterministic and leaves provider reusable
+  ---
+  duration_ms: 2.771792
+  type: 'test'
+  location: '/private/tmp/keel-private-rpc-revert-successor-20261022-01/sdk/docs/reviews/private-rpc-revert-successor-20261022/independent-frozen-revert-message-precedence.test.mjs:26:3'
+  failureType: 'testCodeFailure'
+  error: 'A genuine contract revert must keep its typed deterministic path'
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: true
+  actual: false
+  operator: '=='
+  stack: |-
+    TestContext.<anonymous> (file:///private/tmp/keel-private-rpc-revert-successor-20261022-01/sdk/docs/reviews/private-rpc-revert-successor-20261022/independent-frozen-revert-message-precedence.test.mjs:30:12)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: HTTP200 genuine revert containing rate limit stays deterministic and leaves provider reusable
+ok 5 - HTTP200 genuine revert containing rate limit stays deterministic and leaves provider reusable
+  ---
+  duration_ms: 5.857458
+  type: 'test'
+  ...
+# Subtest: HTTP200 genuine revert containing request body size limit reached stays deterministic and leaves provider reusable
+ok 6 - HTTP200 genuine revert containing request body size limit reached stays deterministic and leaves provider reusable
+  ---
+  duration_ms: 0.727292
+  type: 'test'
+  ...
+# Subtest: HTTP413 genuine revert containing unauthorized stays deterministic and leaves provider reusable
+not ok 7 - HTTP413 genuine revert containing unauthorized stays deterministic and leaves provider reusable
+  ---
+  duration_ms: 1.054208
+  type: 'test'
+  location: '/private/tmp/keel-private-rpc-revert-successor-20261022-01/sdk/docs/reviews/private-rpc-revert-successor-20261022/independent-frozen-revert-message-precedence.test.mjs:26:3'
+  failureType: 'testCodeFailure'
+  error: 'A genuine contract revert must keep its typed deterministic path'
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: true
+  actual: false
+  operator: '=='
+  stack: |-
+    TestContext.<anonymous> (file:///private/tmp/keel-private-rpc-revert-successor-20261022-01/sdk/docs/reviews/private-rpc-revert-successor-20261022/independent-frozen-revert-message-precedence.test.mjs:30:12)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: HTTP413 genuine revert containing authentication required stays deterministic and leaves provider reusable
+not ok 8 - HTTP413 genuine revert containing authentication required stays deterministic and leaves provider reusable
+  ---
+  duration_ms: 0.754708
+  type: 'test'
+  location: '/private/tmp/keel-private-rpc-revert-successor-20261022-01/sdk/docs/reviews/private-rpc-revert-successor-20261022/independent-frozen-revert-message-precedence.test.mjs:26:3'
+  failureType: 'testCodeFailure'
+  error: 'A genuine contract revert must keep its typed deterministic path'
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: true
+  actual: false
+  operator: '=='
+  stack: |-
+    TestContext.<anonymous> (file:///private/tmp/keel-private-rpc-revert-successor-20261022-01/sdk/docs/reviews/private-rpc-revert-successor-20261022/independent-frozen-revert-message-precedence.test.mjs:30:12)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: HTTP413 genuine revert containing rate limit stays deterministic and leaves provider reusable
+ok 9 - HTTP413 genuine revert containing rate limit stays deterministic and leaves provider reusable
+  ---
+  duration_ms: 0.464208
+  type: 'test'
+  ...
+# Subtest: HTTP413 genuine revert containing request body size limit reached stays deterministic and leaves provider reusable
+ok 10 - HTTP413 genuine revert containing request body size limit reached stays deterministic and leaves provider reusable
+  ---
+  duration_ms: 0.459125
+  type: 'test'
+  ...
+# Subtest: HTTP429 genuine revert containing unauthorized stays deterministic and leaves provider reusable
+not ok 11 - HTTP429 genuine revert containing unauthorized stays deterministic and leaves provider reusable
+  ---
+  duration_ms: 1.117708
+  type: 'test'
+  location: '/private/tmp/keel-private-rpc-revert-successor-20261022-01/sdk/docs/reviews/private-rpc-revert-successor-20261022/independent-frozen-revert-message-precedence.test.mjs:26:3'
+  failureType: 'testCodeFailure'
+  error: 'A genuine contract revert must keep its typed deterministic path'
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: true
+  actual: false
+  operator: '=='
+  stack: |-
+    TestContext.<anonymous> (file:///private/tmp/keel-private-rpc-revert-successor-20261022-01/sdk/docs/reviews/private-rpc-revert-successor-20261022/independent-frozen-revert-message-precedence.test.mjs:30:12)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: HTTP429 genuine revert containing authentication required stays deterministic and leaves provider reusable
+not ok 12 - HTTP429 genuine revert containing authentication required stays deterministic and leaves provider reusable
+  ---
+  duration_ms: 2.893708
+  type: 'test'
+  location: '/private/tmp/keel-private-rpc-revert-successor-20261022-01/sdk/docs/reviews/private-rpc-revert-successor-20261022/independent-frozen-revert-message-precedence.test.mjs:26:3'
+  failureType: 'testCodeFailure'
+  error: 'A genuine contract revert must keep its typed deterministic path'
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: true
+  actual: false
+  operator: '=='
+  stack: |-
+    TestContext.<anonymous> (file:///private/tmp/keel-private-rpc-revert-successor-20261022-01/sdk/docs/reviews/private-rpc-revert-successor-20261022/independent-frozen-revert-message-precedence.test.mjs:30:12)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: HTTP429 genuine revert containing rate limit stays deterministic and leaves provider reusable
+ok 13 - HTTP429 genuine revert containing rate limit stays deterministic and leaves provider reusable
+  ---
+  duration_ms: 0.622458
+  type: 'test'
+  ...
+# Subtest: HTTP429 genuine revert containing request body size limit reached stays deterministic and leaves provider reusable
+ok 14 - HTTP429 genuine revert containing request body size limit reached stays deterministic and leaves provider reusable
+  ---
+  duration_ms: 0.450833
+  type: 'test'
+  ...
+# Subtest: HTTP503 genuine revert containing unauthorized stays deterministic and leaves provider reusable
+not ok 15 - HTTP503 genuine revert containing unauthorized stays deterministic and leaves provider reusable
+  ---
+  duration_ms: 2.763292
+  type: 'test'
+  location: '/private/tmp/keel-private-rpc-revert-successor-20261022-01/sdk/docs/reviews/private-rpc-revert-successor-20261022/independent-frozen-revert-message-precedence.test.mjs:26:3'
+  failureType: 'testCodeFailure'
+  error: 'A genuine contract revert must keep its typed deterministic path'
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: true
+  actual: false
+  operator: '=='
+  stack: |-
+    TestContext.<anonymous> (file:///private/tmp/keel-private-rpc-revert-successor-20261022-01/sdk/docs/reviews/private-rpc-revert-successor-20261022/independent-frozen-revert-message-precedence.test.mjs:30:12)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: HTTP503 genuine revert containing authentication required stays deterministic and leaves provider reusable
+not ok 16 - HTTP503 genuine revert containing authentication required stays deterministic and leaves provider reusable
+  ---
+  duration_ms: 1.050458
+  type: 'test'
+  location: '/private/tmp/keel-private-rpc-revert-successor-20261022-01/sdk/docs/reviews/private-rpc-revert-successor-20261022/independent-frozen-revert-message-precedence.test.mjs:26:3'
+  failureType: 'testCodeFailure'
+  error: 'A genuine contract revert must keep its typed deterministic path'
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: true
+  actual: false
+  operator: '=='
+  stack: |-
+    TestContext.<anonymous> (file:///private/tmp/keel-private-rpc-revert-successor-20261022-01/sdk/docs/reviews/private-rpc-revert-successor-20261022/independent-frozen-revert-message-precedence.test.mjs:30:12)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: HTTP503 genuine revert containing rate limit stays deterministic and leaves provider reusable
+ok 17 - HTTP503 genuine revert containing rate limit stays deterministic and leaves provider reusable
+  ---
+  duration_ms: 0.581125
+  type: 'test'
+  ...
+# Subtest: HTTP503 genuine revert containing request body size limit reached stays deterministic and leaves provider reusable
+ok 18 - HTTP503 genuine revert containing request body size limit reached stays deterministic and leaves provider reusable
+  ---
+  duration_ms: 0.495333
+  type: 'test'
+  ...
+# Subtest: actual HTTP401 remains credential denial despite execution/retry prose unauthorized
+ok 19 - actual HTTP401 remains credential denial despite execution/retry prose unauthorized
+  ---
+  duration_ms: 5.853834
+  type: 'test'
+  ...
+# Subtest: actual HTTP401 remains credential denial despite execution/retry prose authentication required
+ok 20 - actual HTTP401 remains credential denial despite execution/retry prose authentication required
+  ---
+  duration_ms: 1.105208
+  type: 'test'
+  ...
+# Subtest: actual HTTP401 remains credential denial despite execution/retry prose rate limit
+ok 21 - actual HTTP401 remains credential denial despite execution/retry prose rate limit
+  ---
+  duration_ms: 0.901333
+  type: 'test'
+  ...
+# Subtest: actual HTTP401 remains credential denial despite execution/retry prose request body size limit reached
+ok 22 - actual HTTP401 remains credential denial despite execution/retry prose request body size limit reached
+  ---
+  duration_ms: 1.142
+  type: 'test'
+  ...
+# Subtest: actual HTTP403 remains credential denial despite execution/retry prose unauthorized
+ok 23 - actual HTTP403 remains credential denial despite execution/retry prose unauthorized
+  ---
+  duration_ms: 0.807833
+  type: 'test'
+  ...
+# Subtest: actual HTTP403 remains credential denial despite execution/retry prose authentication required
+ok 24 - actual HTTP403 remains credential denial despite execution/retry prose authentication required
+  ---
+  duration_ms: 0.711292
+  type: 'test'
+  ...
+# Subtest: actual HTTP403 remains credential denial despite execution/retry prose rate limit
+ok 25 - actual HTTP403 remains credential denial despite execution/retry prose rate limit
+  ---
+  duration_ms: 1.413584
+  type: 'test'
+  ...
+# Subtest: actual HTTP403 remains credential denial despite execution/retry prose request body size limit reached
+ok 26 - actual HTTP403 remains credential denial despite execution/retry prose request body size limit reached
+  ---
+  duration_ms: 1.435833
+  type: 'test'
+  ...
+# Subtest: eth_call HTTP200 contract revert containing unauthorized keeps the typed revert and usable original provider
+not ok 27 - eth_call HTTP200 contract revert containing unauthorized keeps the typed revert and usable original provider
+  ---
+  duration_ms: 25.713625
+  type: 'test'
+  location: '/private/tmp/keel-private-rpc-revert-successor-20261022-01/sdk/tests/rpc-revert-message-precedence.test.mjs:30:5'
+  failureType: 'testCodeFailure'
+  error: |-
+    The expression evaluated to a falsy value:
+    
+      assert.ok(error instanceof KeelRpcResponseError)
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: true
+  actual: false
+  operator: '=='
+  stack: |-
+    Object.<anonymous> (file:///private/tmp/keel-private-rpc-revert-successor-20261022-01/sdk/tests/rpc-revert-message-precedence.test.mjs:33:16)
+    expectedException (node:assert:576:17)
+    expectsError (node:assert:701:21)
+    Function.rejects (node:assert:767:3)
+    async TestContext.<anonymous> (file:///private/tmp/keel-private-rpc-revert-successor-20261022-01/sdk/tests/rpc-revert-message-precedence.test.mjs:32:7)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async startSubtestAfterBootstrap (node:internal/test_runner/harness:296:3)
+  ...
+# Subtest: eth_call HTTP200 contract revert containing authentication required keeps the typed revert and usable original provider
+not ok 28 - eth_call HTTP200 contract revert containing authentication required keeps the typed revert and usable original provider
+  ---
+  duration_ms: 3.465167
+  type: 'test'
+  location: '/private/tmp/keel-private-rpc-revert-successor-20261022-01/sdk/tests/rpc-revert-message-precedence.test.mjs:30:5'
+  failureType: 'testCodeFailure'
+  error: |-
+    The expression evaluated to a falsy value:
+    
+      assert.ok(error instanceof KeelRpcResponseError)
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: true
+  actual: false
+  operator: '=='
+  stack: |-
+    Object.<anonymous> (file:///private/tmp/keel-private-rpc-revert-successor-20261022-01/sdk/tests/rpc-revert-message-precedence.test.mjs:33:16)
+    expectedException (node:assert:576:17)
+    expectsError (node:assert:701:21)
+    Function.rejects (node:assert:767:3)
+    async TestContext.<anonymous> (file:///private/tmp/keel-private-rpc-revert-successor-20261022-01/sdk/tests/rpc-revert-message-precedence.test.mjs:32:7)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: eth_call HTTP200 contract revert containing rate limit keeps the typed revert and usable original provider
+ok 29 - eth_call HTTP200 contract revert containing rate limit keeps the typed revert and usable original provider
+  ---
+  duration_ms: 4.782042
+  type: 'test'
+  ...
+# Subtest: eth_call HTTP200 contract revert containing request body size limit reached keeps the typed revert and usable original provider
+ok 30 - eth_call HTTP200 contract revert containing request body size limit reached keeps the typed revert and usable original provider
+  ---
+  duration_ms: 1.532209
+  type: 'test'
+  ...
+# Subtest: eth_call HTTP200 contract revert containing api key missing keeps the typed revert and usable original provider
+not ok 31 - eth_call HTTP200 contract revert containing api key missing keeps the typed revert and usable original provider
+  ---
+  duration_ms: 1.393667
+  type: 'test'
+  location: '/private/tmp/keel-private-rpc-revert-successor-20261022-01/sdk/tests/rpc-revert-message-precedence.test.mjs:30:5'
+  failureType: 'testCodeFailure'
+  error: |-
+    The expression evaluated to a falsy value:
+    
+      assert.ok(error instanceof KeelRpcResponseError)
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: true
+  actual: false
+  operator: '=='
+  stack: |-
+    Object.<anonymous> (file:///private/tmp/keel-private-rpc-revert-successor-20261022-01/sdk/tests/rpc-revert-message-precedence.test.mjs:33:16)
+    expectedException (node:assert:576:17)
+    expectsError (node:assert:701:21)
+    Function.rejects (node:assert:767:3)
+    async TestContext.<anonymous> (file:///private/tmp/keel-private-rpc-revert-successor-20261022-01/sdk/tests/rpc-revert-message-precedence.test.mjs:32:7)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: eth_call HTTP200 contract revert containing access denied keeps the typed revert and usable original provider
+not ok 32 - eth_call HTTP200 contract revert containing access denied keeps the typed revert and usable original provider
+  ---
+  duration_ms: 1.015917
+  type: 'test'
+  location: '/private/tmp/keel-private-rpc-revert-successor-20261022-01/sdk/tests/rpc-revert-message-precedence.test.mjs:30:5'
+  failureType: 'testCodeFailure'
+  error: |-
+    The expression evaluated to a falsy value:
+    
+      assert.ok(error instanceof KeelRpcResponseError)
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: true
+  actual: false
+  operator: '=='
+  stack: |-
+    Object.<anonymous> (file:///private/tmp/keel-private-rpc-revert-successor-20261022-01/sdk/tests/rpc-revert-message-precedence.test.mjs:33:16)
+    expectedException (node:assert:576:17)
+    expectsError (node:assert:701:21)
+    Function.rejects (node:assert:767:3)
+    async TestContext.<anonymous> (file:///private/tmp/keel-private-rpc-revert-successor-20261022-01/sdk/tests/rpc-revert-message-precedence.test.mjs:32:7)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: eth_call HTTP200 contract revert containing historical state unavailable keeps the typed revert and usable original provider
+ok 33 - eth_call HTTP200 contract revert containing historical state unavailable keeps the typed revert and usable original provider
+  ---
+  duration_ms: 0.600958
+  type: 'test'
+  ...
+# Subtest: eth_call HTTP200 contract revert containing quota exceeded keeps the typed revert and usable original provider
+ok 34 - eth_call HTTP200 contract revert containing quota exceeded keeps the typed revert and usable original provider
+  ---
+  duration_ms: 1.290042
+  type: 'test'
+  ...
+# Subtest: eth_call HTTP200 contract revert containing RPC gas cap: 42 keeps the typed revert and usable original provider
+ok 35 - eth_call HTTP200 contract revert containing RPC gas cap: 42 keeps the typed revert and usable original provider
+  ---
+  duration_ms: 1.369083
+  type: 'test'
+  ...
+# Subtest: eth_call HTTP200 contract revert containing nonce too high keeps the typed revert and usable original provider
+ok 36 - eth_call HTTP200 contract revert containing nonce too high keeps the typed revert and usable original provider
+  ---
+  duration_ms: 2.020917
+  type: 'test'
+  ...
+# Subtest: eth_call HTTP200 contract revert containing insufficient funds keeps the typed revert and usable original provider
+ok 37 - eth_call HTTP200 contract revert containing insufficient funds keeps the typed revert and usable original provider
+  ---
+  duration_ms: 1.51575
+  type: 'test'
+  ...
+# Subtest: eth_call HTTP413 contract revert containing unauthorized keeps the typed revert and usable original provider
+not ok 38 - eth_call HTTP413 contract revert containing unauthorized keeps the typed revert and usable original provider
+  ---
+  duration_ms: 1.556458
+  type: 'test'
+  location: '/private/tmp/keel-private-rpc-revert-successor-20261022-01/sdk/tests/rpc-revert-message-precedence.test.mjs:30:5'
+  failureType: 'testCodeFailure'
+  error: |-
+    The expression evaluated to a falsy value:
+    
+      assert.ok(error instanceof KeelRpcResponseError)
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: true
+  actual: false
+  operator: '=='
+  stack: |-
+    Object.<anonymous> (file:///private/tmp/keel-private-rpc-revert-successor-20261022-01/sdk/tests/rpc-revert-message-precedence.test.mjs:33:16)
+    expectedException (node:assert:576:17)
+    expectsError (node:assert:701:21)
+    Function.rejects (node:assert:767:3)
+    async TestContext.<anonymous> (file:///private/tmp/keel-private-rpc-revert-successor-20261022-01/sdk/tests/rpc-revert-message-precedence.test.mjs:32:7)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: eth_call HTTP413 contract revert containing authentication required keeps the typed revert and usable original provider
+not ok 39 - eth_call HTTP413 contract revert containing authentication required keeps the typed revert and usable original provider
+  ---
+  duration_ms: 1.361875
+  type: 'test'
+  location: '/private/tmp/keel-private-rpc-revert-successor-20261022-01/sdk/tests/rpc-revert-message-precedence.test.mjs:30:5'
+  failureType: 'testCodeFailure'
+  error: |-
+    The expression evaluated to a falsy value:
+    
+      assert.ok(error instanceof KeelRpcResponseError)
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: true
+  actual: false
+  operator: '=='
+  stack: |-
+    Object.<anonymous> (file:///private/tmp/keel-private-rpc-revert-successor-20261022-01/sdk/tests/rpc-revert-message-precedence.test.mjs:33:16)
+    expectedException (node:assert:576:17)
+    expectsError (node:assert:701:21)
+    Function.rejects (node:assert:767:3)
+    async TestContext.<anonymous> (file:///private/tmp/keel-private-rpc-revert-successor-20261022-01/sdk/tests/rpc-revert-message-precedence.test.mjs:32:7)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: eth_call HTTP413 contract revert containing rate limit keeps the typed revert and usable original provider
+ok 40 - eth_call HTTP413 contract revert containing rate limit keeps the typed revert and usable original provider
+  ---
+  duration_ms: 0.5725
+  type: 'test'
+  ...
+# Subtest: eth_call HTTP413 contract revert containing request body size limit reached keeps the typed revert and usable original provider
+ok 41 - eth_call HTTP413 contract revert containing request body size limit reached keeps the typed revert and usable original provider
+  ---
+  duration_ms: 1.125125
+  type: 'test'
+  ...
+# Subtest: eth_call HTTP429 contract revert containing unauthorized keeps the typed revert and usable original provider
+not ok 42 - eth_call HTTP429 contract revert containing unauthorized keeps the typed revert and usable original provider
+  ---
+  duration_ms: 1.0825
+  type: 'test'
+  location: '/private/tmp/keel-private-rpc-revert-successor-20261022-01/sdk/tests/rpc-revert-message-precedence.test.mjs:30:5'
+  failureType: 'testCodeFailure'
+  error: |-
+    The expression evaluated to a falsy value:
+    
+      assert.ok(error instanceof KeelRpcResponseError)
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: true
+  actual: false
+  operator: '=='
+  stack: |-
+    Object.<anonymous> (file:///private/tmp/keel-private-rpc-revert-successor-20261022-01/sdk/tests/rpc-revert-message-precedence.test.mjs:33:16)
+    expectedException (node:assert:576:17)
+    expectsError (node:assert:701:21)
+    Function.rejects (node:assert:767:3)
+    async TestContext.<anonymous> (file:///private/tmp/keel-private-rpc-revert-successor-20261022-01/sdk/tests/rpc-revert-message-precedence.test.mjs:32:7)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: eth_call HTTP429 contract revert containing authentication required keeps the typed revert and usable original provider
+not ok 43 - eth_call HTTP429 contract revert containing authentication required keeps the typed revert and usable original provider
+  ---
+  duration_ms: 1.2605
+  type: 'test'
+  location: '/private/tmp/keel-private-rpc-revert-successor-20261022-01/sdk/tests/rpc-revert-message-precedence.test.mjs:30:5'
+  failureType: 'testCodeFailure'
+  error: |-
+    The expression evaluated to a falsy value:
+    
+      assert.ok(error instanceof KeelRpcResponseError)
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: true
+  actual: false
+  operator: '=='
+  stack: |-
+    Object.<anonymous> (file:///private/tmp/keel-private-rpc-revert-successor-20261022-01/sdk/tests/rpc-revert-message-precedence.test.mjs:33:16)
+    expectedException (node:assert:576:17)
+    expectsError (node:assert:701:21)
+    Function.rejects (node:assert:767:3)
+    async TestContext.<anonymous> (file:///private/tmp/keel-private-rpc-revert-successor-20261022-01/sdk/tests/rpc-revert-message-precedence.test.mjs:32:7)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: eth_call HTTP429 contract revert containing rate limit keeps the typed revert and usable original provider
+ok 44 - eth_call HTTP429 contract revert containing rate limit keeps the typed revert and usable original provider
+  ---
+  duration_ms: 1.526333
+  type: 'test'
+  ...
+# Subtest: eth_call HTTP429 contract revert containing request body size limit reached keeps the typed revert and usable original provider
+ok 45 - eth_call HTTP429 contract revert containing request body size limit reached keeps the typed revert and usable original provider
+  ---
+  duration_ms: 0.562458
+  type: 'test'
+  ...
+# Subtest: eth_call HTTP503 contract revert containing unauthorized keeps the typed revert and usable original provider
+not ok 46 - eth_call HTTP503 contract revert containing unauthorized keeps the typed revert and usable original provider
+  ---
+  duration_ms: 2.618333
+  type: 'test'
+  location: '/private/tmp/keel-private-rpc-revert-successor-20261022-01/sdk/tests/rpc-revert-message-precedence.test.mjs:30:5'
+  failureType: 'testCodeFailure'
+  error: |-
+    The expression evaluated to a falsy value:
+    
+      assert.ok(error instanceof KeelRpcResponseError)
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: true
+  actual: false
+  operator: '=='
+  stack: |-
+    Object.<anonymous> (file:///private/tmp/keel-private-rpc-revert-successor-20261022-01/sdk/tests/rpc-revert-message-precedence.test.mjs:33:16)
+    expectedException (node:assert:576:17)
+    expectsError (node:assert:701:21)
+    Function.rejects (node:assert:767:3)
+    async TestContext.<anonymous> (file:///private/tmp/keel-private-rpc-revert-successor-20261022-01/sdk/tests/rpc-revert-message-precedence.test.mjs:32:7)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: eth_call HTTP503 contract revert containing authentication required keeps the typed revert and usable original provider
+not ok 47 - eth_call HTTP503 contract revert containing authentication required keeps the typed revert and usable original provider
+  ---
+  duration_ms: 1.798334
+  type: 'test'
+  location: '/private/tmp/keel-private-rpc-revert-successor-20261022-01/sdk/tests/rpc-revert-message-precedence.test.mjs:30:5'
+  failureType: 'testCodeFailure'
+  error: |-
+    The expression evaluated to a falsy value:
+    
+      assert.ok(error instanceof KeelRpcResponseError)
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: true
+  actual: false
+  operator: '=='
+  stack: |-
+    Object.<anonymous> (file:///private/tmp/keel-private-rpc-revert-successor-20261022-01/sdk/tests/rpc-revert-message-precedence.test.mjs:33:16)
+    expectedException (node:assert:576:17)
+    expectsError (node:assert:701:21)
+    Function.rejects (node:assert:767:3)
+    async TestContext.<anonymous> (file:///private/tmp/keel-private-rpc-revert-successor-20261022-01/sdk/tests/rpc-revert-message-precedence.test.mjs:32:7)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: eth_call HTTP503 contract revert containing rate limit keeps the typed revert and usable original provider
+ok 48 - eth_call HTTP503 contract revert containing rate limit keeps the typed revert and usable original provider
+  ---
+  duration_ms: 6.68775
+  type: 'test'
+  ...
+# Subtest: eth_call HTTP503 contract revert containing request body size limit reached keeps the typed revert and usable original provider
+ok 49 - eth_call HTTP503 contract revert containing request body size limit reached keeps the typed revert and usable original provider
+  ---
+  duration_ms: 1.192875
+  type: 'test'
+  ...
+# Subtest: eth_call actual HTTP401 remains denial despite contract-revert unauthorized prose
+ok 50 - eth_call actual HTTP401 remains denial despite contract-revert unauthorized prose
+  ---
+  duration_ms: 0.906083
+  type: 'test'
+  ...
+# Subtest: eth_call actual HTTP401 remains denial despite contract-revert authentication required prose
+ok 51 - eth_call actual HTTP401 remains denial despite contract-revert authentication required prose
+  ---
+  duration_ms: 0.486917
+  type: 'test'
+  ...
+# Subtest: eth_call actual HTTP401 remains denial despite contract-revert rate limit prose
+ok 52 - eth_call actual HTTP401 remains denial despite contract-revert rate limit prose
+  ---
+  duration_ms: 1.63025
+  type: 'test'
+  ...
+# Subtest: eth_call actual HTTP401 remains denial despite contract-revert request body size limit reached prose
+ok 53 - eth_call actual HTTP401 remains denial despite contract-revert request body size limit reached prose
+  ---
+  duration_ms: 0.452958
+  type: 'test'
+  ...
+# Subtest: eth_call actual HTTP403 remains denial despite contract-revert unauthorized prose
+ok 54 - eth_call actual HTTP403 remains denial despite contract-revert unauthorized prose
+  ---
+  duration_ms: 0.820667
+  type: 'test'
+  ...
+# Subtest: eth_call actual HTTP403 remains denial despite contract-revert authentication required prose
+ok 55 - eth_call actual HTTP403 remains denial despite contract-revert authentication required prose
+  ---
+  duration_ms: 0.478333
+  type: 'test'
+  ...
+# Subtest: eth_call actual HTTP403 remains denial despite contract-revert rate limit prose
+ok 56 - eth_call actual HTTP403 remains denial despite contract-revert rate limit prose
+  ---
+  duration_ms: 0.945709
+  type: 'test'
+  ...
+# Subtest: eth_call actual HTTP403 remains denial despite contract-revert request body size limit reached prose
+ok 57 - eth_call actual HTTP403 remains denial despite contract-revert request body size limit reached prose
+  ---
+  duration_ms: 4.007958
+  type: 'test'
+  ...
+# Subtest: eth_simulateV1 HTTP200 contract revert containing unauthorized keeps the typed revert and usable original provider
+not ok 58 - eth_simulateV1 HTTP200 contract revert containing unauthorized keeps the typed revert and usable original provider
+  ---
+  duration_ms: 1.000125
+  type: 'test'
+  location: '/private/tmp/keel-private-rpc-revert-successor-20261022-01/sdk/tests/rpc-revert-message-precedence.test.mjs:30:5'
+  failureType: 'testCodeFailure'
+  error: |-
+    The expression evaluated to a falsy value:
+    
+      assert.ok(error instanceof KeelRpcResponseError)
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: true
+  actual: false
+  operator: '=='
+  stack: |-
+    Object.<anonymous> (file:///private/tmp/keel-private-rpc-revert-successor-20261022-01/sdk/tests/rpc-revert-message-precedence.test.mjs:33:16)
+    expectedException (node:assert:576:17)
+    expectsError (node:assert:701:21)
+    Function.rejects (node:assert:767:3)
+    async TestContext.<anonymous> (file:///private/tmp/keel-private-rpc-revert-successor-20261022-01/sdk/tests/rpc-revert-message-precedence.test.mjs:32:7)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: eth_simulateV1 HTTP200 contract revert containing authentication required keeps the typed revert and usable original provider
+not ok 59 - eth_simulateV1 HTTP200 contract revert containing authentication required keeps the typed revert and usable original provider
+  ---
+  duration_ms: 0.756291
+  type: 'test'
+  location: '/private/tmp/keel-private-rpc-revert-successor-20261022-01/sdk/tests/rpc-revert-message-precedence.test.mjs:30:5'
+  failureType: 'testCodeFailure'
+  error: |-
+    The expression evaluated to a falsy value:
+    
+      assert.ok(error instanceof KeelRpcResponseError)
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: true
+  actual: false
+  operator: '=='
+  stack: |-
+    Object.<anonymous> (file:///private/tmp/keel-private-rpc-revert-successor-20261022-01/sdk/tests/rpc-revert-message-precedence.test.mjs:33:16)
+    expectedException (node:assert:576:17)
+    expectsError (node:assert:701:21)
+    Function.rejects (node:assert:767:3)
+    async TestContext.<anonymous> (file:///private/tmp/keel-private-rpc-revert-successor-20261022-01/sdk/tests/rpc-revert-message-precedence.test.mjs:32:7)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: eth_simulateV1 HTTP200 contract revert containing rate limit keeps the typed revert and usable original provider
+ok 60 - eth_simulateV1 HTTP200 contract revert containing rate limit keeps the typed revert and usable original provider
+  ---
+  duration_ms: 0.410083
+  type: 'test'
+  ...
+# Subtest: eth_simulateV1 HTTP200 contract revert containing request body size limit reached keeps the typed revert and usable original provider
+ok 61 - eth_simulateV1 HTTP200 contract revert containing request body size limit reached keeps the typed revert and usable original provider
+  ---
+  duration_ms: 0.342708
+  type: 'test'
+  ...
+# Subtest: eth_simulateV1 HTTP200 contract revert containing api key missing keeps the typed revert and usable original provider
+not ok 62 - eth_simulateV1 HTTP200 contract revert containing api key missing keeps the typed revert and usable original provider
+  ---
+  duration_ms: 0.531583
+  type: 'test'
+  location: '/private/tmp/keel-private-rpc-revert-successor-20261022-01/sdk/tests/rpc-revert-message-precedence.test.mjs:30:5'
+  failureType: 'testCodeFailure'
+  error: |-
+    The expression evaluated to a falsy value:
+    
+      assert.ok(error instanceof KeelRpcResponseError)
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: true
+  actual: false
+  operator: '=='
+  stack: |-
+    Object.<anonymous> (file:///private/tmp/keel-private-rpc-revert-successor-20261022-01/sdk/tests/rpc-revert-message-precedence.test.mjs:33:16)
+    expectedException (node:assert:576:17)
+    expectsError (node:assert:701:21)
+    Function.rejects (node:assert:767:3)
+    async TestContext.<anonymous> (file:///private/tmp/keel-private-rpc-revert-successor-20261022-01/sdk/tests/rpc-revert-message-precedence.test.mjs:32:7)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: eth_simulateV1 HTTP200 contract revert containing access denied keeps the typed revert and usable original provider
+not ok 63 - eth_simulateV1 HTTP200 contract revert containing access denied keeps the typed revert and usable original provider
+  ---
+  duration_ms: 0.655667
+  type: 'test'
+  location: '/private/tmp/keel-private-rpc-revert-successor-20261022-01/sdk/tests/rpc-revert-message-precedence.test.mjs:30:5'
+  failureType: 'testCodeFailure'
+  error: |-
+    The expression evaluated to a falsy value:
+    
+      assert.ok(error instanceof KeelRpcResponseError)
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: true
+  actual: false
+  operator: '=='
+  stack: |-
+    Object.<anonymous> (file:///private/tmp/keel-private-rpc-revert-successor-20261022-01/sdk/tests/rpc-revert-message-precedence.test.mjs:33:16)
+    expectedException (node:assert:576:17)
+    expectsError (node:assert:701:21)
+    Function.rejects (node:assert:767:3)
+    async TestContext.<anonymous> (file:///private/tmp/keel-private-rpc-revert-successor-20261022-01/sdk/tests/rpc-revert-message-precedence.test.mjs:32:7)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: eth_simulateV1 HTTP200 contract revert containing historical state unavailable keeps the typed revert and usable original provider
+ok 64 - eth_simulateV1 HTTP200 contract revert containing historical state unavailable keeps the typed revert and usable original provider
+  ---
+  duration_ms: 0.316083
+  type: 'test'
+  ...
+# Subtest: eth_simulateV1 HTTP200 contract revert containing quota exceeded keeps the typed revert and usable original provider
+ok 65 - eth_simulateV1 HTTP200 contract revert containing quota exceeded keeps the typed revert and usable original provider
+  ---
+  duration_ms: 0.29975
+  type: 'test'
+  ...
+# Subtest: eth_simulateV1 HTTP200 contract revert containing RPC gas cap: 42 keeps the typed revert and usable original provider
+ok 66 - eth_simulateV1 HTTP200 contract revert containing RPC gas cap: 42 keeps the typed revert and usable original provider
+  ---
+  duration_ms: 0.418125
+  type: 'test'
+  ...
+# Subtest: eth_simulateV1 HTTP200 contract revert containing nonce too high keeps the typed revert and usable original provider
+ok 67 - eth_simulateV1 HTTP200 contract revert containing nonce too high keeps the typed revert and usable original provider
+  ---
+  duration_ms: 0.329167
+  type: 'test'
+  ...
+# Subtest: eth_simulateV1 HTTP200 contract revert containing insufficient funds keeps the typed revert and usable original provider
+ok 68 - eth_simulateV1 HTTP200 contract revert containing insufficient funds keeps the typed revert and usable original provider
+  ---
+  duration_ms: 0.31475
+  type: 'test'
+  ...
+# Subtest: eth_simulateV1 HTTP413 contract revert containing unauthorized keeps the typed revert and usable original provider
+not ok 69 - eth_simulateV1 HTTP413 contract revert containing unauthorized keeps the typed revert and usable original provider
+  ---
+  duration_ms: 0.511208
+  type: 'test'
+  location: '/private/tmp/keel-private-rpc-revert-successor-20261022-01/sdk/tests/rpc-revert-message-precedence.test.mjs:30:5'
+  failureType: 'testCodeFailure'
+  error: |-
+    The expression evaluated to a falsy value:
+    
+      assert.ok(error instanceof KeelRpcResponseError)
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: true
+  actual: false
+  operator: '=='
+  stack: |-
+    Object.<anonymous> (file:///private/tmp/keel-private-rpc-revert-successor-20261022-01/sdk/tests/rpc-revert-message-precedence.test.mjs:33:16)
+    expectedException (node:assert:576:17)
+    expectsError (node:assert:701:21)
+    Function.rejects (node:assert:767:3)
+    async TestContext.<anonymous> (file:///private/tmp/keel-private-rpc-revert-successor-20261022-01/sdk/tests/rpc-revert-message-precedence.test.mjs:32:7)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: eth_simulateV1 HTTP413 contract revert containing authentication required keeps the typed revert and usable original provider
+not ok 70 - eth_simulateV1 HTTP413 contract revert containing authentication required keeps the typed revert and usable original provider
+  ---
+  duration_ms: 0.520666
+  type: 'test'
+  location: '/private/tmp/keel-private-rpc-revert-successor-20261022-01/sdk/tests/rpc-revert-message-precedence.test.mjs:30:5'
+  failureType: 'testCodeFailure'
+  error: |-
+    The expression evaluated to a falsy value:
+    
+      assert.ok(error instanceof KeelRpcResponseError)
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: true
+  actual: false
+  operator: '=='
+  stack: |-
+    Object.<anonymous> (file:///private/tmp/keel-private-rpc-revert-successor-20261022-01/sdk/tests/rpc-revert-message-precedence.test.mjs:33:16)
+    expectedException (node:assert:576:17)
+    expectsError (node:assert:701:21)
+    Function.rejects (node:assert:767:3)
+    async TestContext.<anonymous> (file:///private/tmp/keel-private-rpc-revert-successor-20261022-01/sdk/tests/rpc-revert-message-precedence.test.mjs:32:7)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: eth_simulateV1 HTTP413 contract revert containing rate limit keeps the typed revert and usable original provider
+ok 71 - eth_simulateV1 HTTP413 contract revert containing rate limit keeps the typed revert and usable original provider
+  ---
+  duration_ms: 0.328583
+  type: 'test'
+  ...
+# Subtest: eth_simulateV1 HTTP413 contract revert containing request body size limit reached keeps the typed revert and usable original provider
+ok 72 - eth_simulateV1 HTTP413 contract revert containing request body size limit reached keeps the typed revert and usable original provider
+  ---
+  duration_ms: 0.312625
+  type: 'test'
+  ...
+# Subtest: eth_simulateV1 HTTP429 contract revert containing unauthorized keeps the typed revert and usable original provider
+not ok 73 - eth_simulateV1 HTTP429 contract revert containing unauthorized keeps the typed revert and usable original provider
+  ---
+  duration_ms: 0.579541
+  type: 'test'
+  location: '/private/tmp/keel-private-rpc-revert-successor-20261022-01/sdk/tests/rpc-revert-message-precedence.test.mjs:30:5'
+  failureType: 'testCodeFailure'
+  error: |-
+    The expression evaluated to a falsy value:
+    
+      assert.ok(error instanceof KeelRpcResponseError)
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: true
+  actual: false
+  operator: '=='
+  stack: |-
+    Object.<anonymous> (file:///private/tmp/keel-private-rpc-revert-successor-20261022-01/sdk/tests/rpc-revert-message-precedence.test.mjs:33:16)
+    expectedException (node:assert:576:17)
+    expectsError (node:assert:701:21)
+    Function.rejects (node:assert:767:3)
+    async TestContext.<anonymous> (file:///private/tmp/keel-private-rpc-revert-successor-20261022-01/sdk/tests/rpc-revert-message-precedence.test.mjs:32:7)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: eth_simulateV1 HTTP429 contract revert containing authentication required keeps the typed revert and usable original provider
+not ok 74 - eth_simulateV1 HTTP429 contract revert containing authentication required keeps the typed revert and usable original provider
+  ---
+  duration_ms: 0.471125
+  type: 'test'
+  location: '/private/tmp/keel-private-rpc-revert-successor-20261022-01/sdk/tests/rpc-revert-message-precedence.test.mjs:30:5'
+  failureType: 'testCodeFailure'
+  error: |-
+    The expression evaluated to a falsy value:
+    
+      assert.ok(error instanceof KeelRpcResponseError)
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: true
+  actual: false
+  operator: '=='
+  stack: |-
+    Object.<anonymous> (file:///private/tmp/keel-private-rpc-revert-successor-20261022-01/sdk/tests/rpc-revert-message-precedence.test.mjs:33:16)
+    expectedException (node:assert:576:17)
+    expectsError (node:assert:701:21)
+    Function.rejects (node:assert:767:3)
+    async TestContext.<anonymous> (file:///private/tmp/keel-private-rpc-revert-successor-20261022-01/sdk/tests/rpc-revert-message-precedence.test.mjs:32:7)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: eth_simulateV1 HTTP429 contract revert containing rate limit keeps the typed revert and usable original provider
+ok 75 - eth_simulateV1 HTTP429 contract revert containing rate limit keeps the typed revert and usable original provider
+  ---
+  duration_ms: 0.282
+  type: 'test'
+  ...
+# Subtest: eth_simulateV1 HTTP429 contract revert containing request body size limit reached keeps the typed revert and usable original provider
+ok 76 - eth_simulateV1 HTTP429 contract revert containing request body size limit reached keeps the typed revert and usable original provider
+  ---
+  duration_ms: 0.273083
+  type: 'test'
+  ...
+# Subtest: eth_simulateV1 HTTP503 contract revert containing unauthorized keeps the typed revert and usable original provider
+not ok 77 - eth_simulateV1 HTTP503 contract revert containing unauthorized keeps the typed revert and usable original provider
+  ---
+  duration_ms: 0.450083
+  type: 'test'
+  location: '/private/tmp/keel-private-rpc-revert-successor-20261022-01/sdk/tests/rpc-revert-message-precedence.test.mjs:30:5'
+  failureType: 'testCodeFailure'
+  error: |-
+    The expression evaluated to a falsy value:
+    
+      assert.ok(error instanceof KeelRpcResponseError)
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: true
+  actual: false
+  operator: '=='
+  stack: |-
+    Object.<anonymous> (file:///private/tmp/keel-private-rpc-revert-successor-20261022-01/sdk/tests/rpc-revert-message-precedence.test.mjs:33:16)
+    expectedException (node:assert:576:17)
+    expectsError (node:assert:701:21)
+    Function.rejects (node:assert:767:3)
+    async TestContext.<anonymous> (file:///private/tmp/keel-private-rpc-revert-successor-20261022-01/sdk/tests/rpc-revert-message-precedence.test.mjs:32:7)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: eth_simulateV1 HTTP503 contract revert containing authentication required keeps the typed revert and usable original provider
+not ok 78 - eth_simulateV1 HTTP503 contract revert containing authentication required keeps the typed revert and usable original provider
+  ---
+  duration_ms: 0.619625
+  type: 'test'
+  location: '/private/tmp/keel-private-rpc-revert-successor-20261022-01/sdk/tests/rpc-revert-message-precedence.test.mjs:30:5'
+  failureType: 'testCodeFailure'
+  error: |-
+    The expression evaluated to a falsy value:
+    
+      assert.ok(error instanceof KeelRpcResponseError)
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: true
+  actual: false
+  operator: '=='
+  stack: |-
+    Object.<anonymous> (file:///private/tmp/keel-private-rpc-revert-successor-20261022-01/sdk/tests/rpc-revert-message-precedence.test.mjs:33:16)
+    expectedException (node:assert:576:17)
+    expectsError (node:assert:701:21)
+    Function.rejects (node:assert:767:3)
+    async TestContext.<anonymous> (file:///private/tmp/keel-private-rpc-revert-successor-20261022-01/sdk/tests/rpc-revert-message-precedence.test.mjs:32:7)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: eth_simulateV1 HTTP503 contract revert containing rate limit keeps the typed revert and usable original provider
+ok 79 - eth_simulateV1 HTTP503 contract revert containing rate limit keeps the typed revert and usable original provider
+  ---
+  duration_ms: 0.316666
+  type: 'test'
+  ...
+# Subtest: eth_simulateV1 HTTP503 contract revert containing request body size limit reached keeps the typed revert and usable original provider
+ok 80 - eth_simulateV1 HTTP503 contract revert containing request body size limit reached keeps the typed revert and usable original provider
+  ---
+  duration_ms: 0.2755
+  type: 'test'
+  ...
+# Subtest: eth_simulateV1 actual HTTP401 remains denial despite contract-revert unauthorized prose
+ok 81 - eth_simulateV1 actual HTTP401 remains denial despite contract-revert unauthorized prose
+  ---
+  duration_ms: 0.236125
+  type: 'test'
+  ...
+# Subtest: eth_simulateV1 actual HTTP401 remains denial despite contract-revert authentication required prose
+ok 82 - eth_simulateV1 actual HTTP401 remains denial despite contract-revert authentication required prose
+  ---
+  duration_ms: 0.2405
+  type: 'test'
+  ...
+# Subtest: eth_simulateV1 actual HTTP401 remains denial despite contract-revert rate limit prose
+ok 83 - eth_simulateV1 actual HTTP401 remains denial despite contract-revert rate limit prose
+  ---
+  duration_ms: 0.218667
+  type: 'test'
+  ...
+# Subtest: eth_simulateV1 actual HTTP401 remains denial despite contract-revert request body size limit reached prose
+ok 84 - eth_simulateV1 actual HTTP401 remains denial despite contract-revert request body size limit reached prose
+  ---
+  duration_ms: 0.219375
+  type: 'test'
+  ...
+# Subtest: eth_simulateV1 actual HTTP403 remains denial despite contract-revert unauthorized prose
+ok 85 - eth_simulateV1 actual HTTP403 remains denial despite contract-revert unauthorized prose
+  ---
+  duration_ms: 0.212791
+  type: 'test'
+  ...
+# Subtest: eth_simulateV1 actual HTTP403 remains denial despite contract-revert authentication required prose
+ok 86 - eth_simulateV1 actual HTTP403 remains denial despite contract-revert authentication required prose
+  ---
+  duration_ms: 0.528625
+  type: 'test'
+  ...
+# Subtest: eth_simulateV1 actual HTTP403 remains denial despite contract-revert rate limit prose
+ok 87 - eth_simulateV1 actual HTTP403 remains denial despite contract-revert rate limit prose
+  ---
+  duration_ms: 0.605084
+  type: 'test'
+  ...
+# Subtest: eth_simulateV1 actual HTTP403 remains denial despite contract-revert request body size limit reached prose
+ok 88 - eth_simulateV1 actual HTTP403 remains denial despite contract-revert request body size limit reached prose
+  ---
+  duration_ms: 0.378292
+  type: 'test'
+  ...
+# Subtest: pinned proof revert unauthorized is terminal without paid fallback and leaves a new free reader usable
+not ok 89 - pinned proof revert unauthorized is terminal without paid fallback and leaves a new free reader usable
+  ---
+  duration_ms: 3.397625
+  type: 'test'
+  location: '/private/tmp/keel-private-rpc-revert-successor-20261022-01/sdk/tests/rpc-revert-message-precedence.test.mjs:54:30'
+  failureType: 'testCodeFailure'
+  error: |-
+    The validation function is expected to return "true". Received false
+    
+    Caught error:
+    
+    KeelPublicationSimulationError: The publication simulation could not finish. Retry the same prepared plan; no transaction was submitted.
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  stack: |-
+    async TestContext.<anonymous> (file:///private/tmp/keel-private-rpc-revert-successor-20261022-01/sdk/tests/rpc-revert-message-precedence.test.mjs:66:5)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: pinned proof revert authentication required is terminal without paid fallback and leaves a new free reader usable
+not ok 90 - pinned proof revert authentication required is terminal without paid fallback and leaves a new free reader usable
+  ---
+  duration_ms: 1.316959
+  type: 'test'
+  location: '/private/tmp/keel-private-rpc-revert-successor-20261022-01/sdk/tests/rpc-revert-message-precedence.test.mjs:54:30'
+  failureType: 'testCodeFailure'
+  error: |-
+    The validation function is expected to return "true". Received false
+    
+    Caught error:
+    
+    KeelPublicationSimulationError: The publication simulation could not finish. Retry the same prepared plan; no transaction was submitted.
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  stack: |-
+    async TestContext.<anonymous> (file:///private/tmp/keel-private-rpc-revert-successor-20261022-01/sdk/tests/rpc-revert-message-precedence.test.mjs:66:5)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: pinned proof revert rate limit is terminal without paid fallback and leaves a new free reader usable
+ok 91 - pinned proof revert rate limit is terminal without paid fallback and leaves a new free reader usable
+  ---
+  duration_ms: 0.904959
+  type: 'test'
+  ...
+# Subtest: pinned proof revert request body size limit reached is terminal without paid fallback and leaves a new free reader usable
+ok 92 - pinned proof revert request body size limit reached is terminal without paid fallback and leaves a new free reader usable
+  ---
+  duration_ms: 0.817792
+  type: 'test'
+  ...
+1..92
+# tests 92
+# suites 0
+# pass 60
+# fail 32
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 469.191959

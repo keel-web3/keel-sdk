@@ -1,0 +1,954 @@
+[
+  {
+    "name": "HTTP200 unauthorized",
+    "error": {
+      "name": "KeelRpcSetupError",
+      "code": "rpc.setup-required",
+      "reason": "access-denied"
+    },
+    "status": [
+      {
+        "checkedChainId": 11155111,
+        "reason": "access-denied",
+        "diagnostic": {
+          "transportFailure": "rpc-error",
+          "httpStatus": 200,
+          "rpcCode": -32000,
+          "failureReason": "access-denied"
+        },
+        "retryAfterMs": 999,
+        "disabled": true
+      },
+      {
+        "checkedChainId": 11155111,
+        "reason": "access-denied",
+        "diagnostic": {
+          "transportFailure": "rpc-error",
+          "httpStatus": 200,
+          "rpcCode": -32000,
+          "failureReason": "access-denied"
+        },
+        "retryAfterMs": 999,
+        "disabled": true
+      }
+    ],
+    "calls": [
+      {
+        "index": 0,
+        "method": "eth_chainId"
+      },
+      {
+        "index": 0,
+        "method": "eth_call"
+      },
+      {
+        "index": 1,
+        "method": "eth_chainId"
+      },
+      {
+        "index": 1,
+        "method": "eth_call"
+      }
+    ]
+  },
+  {
+    "name": "HTTP200 authentication required",
+    "error": {
+      "name": "KeelRpcSetupError",
+      "code": "rpc.setup-required",
+      "reason": "access-denied"
+    },
+    "status": [
+      {
+        "checkedChainId": 11155111,
+        "reason": "access-denied",
+        "diagnostic": {
+          "transportFailure": "rpc-error",
+          "httpStatus": 200,
+          "rpcCode": -32000,
+          "failureReason": "access-denied"
+        },
+        "retryAfterMs": 999,
+        "disabled": true
+      },
+      {
+        "checkedChainId": 11155111,
+        "reason": "access-denied",
+        "diagnostic": {
+          "transportFailure": "rpc-error",
+          "httpStatus": 200,
+          "rpcCode": -32000,
+          "failureReason": "access-denied"
+        },
+        "retryAfterMs": 1000,
+        "disabled": true
+      }
+    ],
+    "calls": [
+      {
+        "index": 0,
+        "method": "eth_chainId"
+      },
+      {
+        "index": 0,
+        "method": "eth_call"
+      },
+      {
+        "index": 1,
+        "method": "eth_chainId"
+      },
+      {
+        "index": 1,
+        "method": "eth_call"
+      }
+    ]
+  },
+  {
+    "name": "HTTP200 rate limit",
+    "error": {
+      "name": "KeelRpcResponseError",
+      "code": 3
+    },
+    "status": [
+      {
+        "checkedChainId": 11155111,
+        "retryAfterMs": 0,
+        "disabled": false
+      },
+      {
+        "retryAfterMs": 0,
+        "disabled": false
+      }
+    ],
+    "calls": [
+      {
+        "index": 0,
+        "method": "eth_chainId"
+      },
+      {
+        "index": 0,
+        "method": "eth_call"
+      },
+      {
+        "index": 0,
+        "method": "eth_getCode"
+      }
+    ]
+  },
+  {
+    "name": "HTTP200 request body size limit reached",
+    "error": {
+      "name": "KeelRpcResponseError",
+      "code": 3
+    },
+    "status": [
+      {
+        "checkedChainId": 11155111,
+        "retryAfterMs": 0,
+        "disabled": false
+      },
+      {
+        "retryAfterMs": 0,
+        "disabled": false
+      }
+    ],
+    "calls": [
+      {
+        "index": 0,
+        "method": "eth_chainId"
+      },
+      {
+        "index": 0,
+        "method": "eth_call"
+      },
+      {
+        "index": 0,
+        "method": "eth_getCode"
+      }
+    ]
+  },
+  {
+    "name": "HTTP413 unauthorized",
+    "error": {
+      "name": "KeelRpcSetupError",
+      "code": "rpc.setup-required",
+      "reason": "access-denied"
+    },
+    "status": [
+      {
+        "checkedChainId": 11155111,
+        "reason": "access-denied",
+        "diagnostic": {
+          "transportFailure": "rpc-error",
+          "httpStatus": 413,
+          "rpcCode": -32000,
+          "failureReason": "access-denied"
+        },
+        "retryAfterMs": 999,
+        "disabled": true
+      },
+      {
+        "checkedChainId": 11155111,
+        "reason": "access-denied",
+        "diagnostic": {
+          "transportFailure": "rpc-error",
+          "httpStatus": 413,
+          "rpcCode": -32000,
+          "failureReason": "access-denied"
+        },
+        "retryAfterMs": 1000,
+        "disabled": true
+      }
+    ],
+    "calls": [
+      {
+        "index": 0,
+        "method": "eth_chainId"
+      },
+      {
+        "index": 0,
+        "method": "eth_call"
+      },
+      {
+        "index": 1,
+        "method": "eth_chainId"
+      },
+      {
+        "index": 1,
+        "method": "eth_call"
+      }
+    ]
+  },
+  {
+    "name": "HTTP413 authentication required",
+    "error": {
+      "name": "KeelRpcSetupError",
+      "code": "rpc.setup-required",
+      "reason": "access-denied"
+    },
+    "status": [
+      {
+        "checkedChainId": 11155111,
+        "reason": "access-denied",
+        "diagnostic": {
+          "transportFailure": "rpc-error",
+          "httpStatus": 413,
+          "rpcCode": -32000,
+          "failureReason": "access-denied"
+        },
+        "retryAfterMs": 1000,
+        "disabled": true
+      },
+      {
+        "checkedChainId": 11155111,
+        "reason": "access-denied",
+        "diagnostic": {
+          "transportFailure": "rpc-error",
+          "httpStatus": 413,
+          "rpcCode": -32000,
+          "failureReason": "access-denied"
+        },
+        "retryAfterMs": 1000,
+        "disabled": true
+      }
+    ],
+    "calls": [
+      {
+        "index": 0,
+        "method": "eth_chainId"
+      },
+      {
+        "index": 0,
+        "method": "eth_call"
+      },
+      {
+        "index": 1,
+        "method": "eth_chainId"
+      },
+      {
+        "index": 1,
+        "method": "eth_call"
+      }
+    ]
+  },
+  {
+    "name": "HTTP413 rate limit",
+    "error": {
+      "name": "KeelRpcResponseError",
+      "code": 3
+    },
+    "status": [
+      {
+        "checkedChainId": 11155111,
+        "retryAfterMs": 0,
+        "disabled": false
+      },
+      {
+        "retryAfterMs": 0,
+        "disabled": false
+      }
+    ],
+    "calls": [
+      {
+        "index": 0,
+        "method": "eth_chainId"
+      },
+      {
+        "index": 0,
+        "method": "eth_call"
+      },
+      {
+        "index": 0,
+        "method": "eth_getCode"
+      }
+    ]
+  },
+  {
+    "name": "HTTP413 request body size limit reached",
+    "error": {
+      "name": "KeelRpcResponseError",
+      "code": 3
+    },
+    "status": [
+      {
+        "checkedChainId": 11155111,
+        "retryAfterMs": 0,
+        "disabled": false
+      },
+      {
+        "retryAfterMs": 0,
+        "disabled": false
+      }
+    ],
+    "calls": [
+      {
+        "index": 0,
+        "method": "eth_chainId"
+      },
+      {
+        "index": 0,
+        "method": "eth_call"
+      },
+      {
+        "index": 0,
+        "method": "eth_getCode"
+      }
+    ]
+  },
+  {
+    "name": "HTTP429 unauthorized",
+    "error": {
+      "name": "KeelRpcSetupError",
+      "code": "rpc.setup-required",
+      "reason": "access-denied"
+    },
+    "status": [
+      {
+        "checkedChainId": 11155111,
+        "reason": "access-denied",
+        "diagnostic": {
+          "transportFailure": "rpc-error",
+          "httpStatus": 429,
+          "rpcCode": -32000,
+          "failureReason": "access-denied"
+        },
+        "retryAfterMs": 1000,
+        "disabled": true
+      },
+      {
+        "checkedChainId": 11155111,
+        "reason": "access-denied",
+        "diagnostic": {
+          "transportFailure": "rpc-error",
+          "httpStatus": 429,
+          "rpcCode": -32000,
+          "failureReason": "access-denied"
+        },
+        "retryAfterMs": 1000,
+        "disabled": true
+      }
+    ],
+    "calls": [
+      {
+        "index": 0,
+        "method": "eth_chainId"
+      },
+      {
+        "index": 0,
+        "method": "eth_call"
+      },
+      {
+        "index": 1,
+        "method": "eth_chainId"
+      },
+      {
+        "index": 1,
+        "method": "eth_call"
+      }
+    ]
+  },
+  {
+    "name": "HTTP429 authentication required",
+    "error": {
+      "name": "KeelRpcSetupError",
+      "code": "rpc.setup-required",
+      "reason": "access-denied"
+    },
+    "status": [
+      {
+        "checkedChainId": 11155111,
+        "reason": "access-denied",
+        "diagnostic": {
+          "transportFailure": "rpc-error",
+          "httpStatus": 429,
+          "rpcCode": -32000,
+          "failureReason": "access-denied"
+        },
+        "retryAfterMs": 1000,
+        "disabled": true
+      },
+      {
+        "checkedChainId": 11155111,
+        "reason": "access-denied",
+        "diagnostic": {
+          "transportFailure": "rpc-error",
+          "httpStatus": 429,
+          "rpcCode": -32000,
+          "failureReason": "access-denied"
+        },
+        "retryAfterMs": 1000,
+        "disabled": true
+      }
+    ],
+    "calls": [
+      {
+        "index": 0,
+        "method": "eth_chainId"
+      },
+      {
+        "index": 0,
+        "method": "eth_call"
+      },
+      {
+        "index": 1,
+        "method": "eth_chainId"
+      },
+      {
+        "index": 1,
+        "method": "eth_call"
+      }
+    ]
+  },
+  {
+    "name": "HTTP429 rate limit",
+    "error": {
+      "name": "KeelRpcResponseError",
+      "code": 3
+    },
+    "status": [
+      {
+        "checkedChainId": 11155111,
+        "retryAfterMs": 0,
+        "disabled": false
+      },
+      {
+        "retryAfterMs": 0,
+        "disabled": false
+      }
+    ],
+    "calls": [
+      {
+        "index": 0,
+        "method": "eth_chainId"
+      },
+      {
+        "index": 0,
+        "method": "eth_call"
+      },
+      {
+        "index": 0,
+        "method": "eth_getCode"
+      }
+    ]
+  },
+  {
+    "name": "HTTP429 request body size limit reached",
+    "error": {
+      "name": "KeelRpcResponseError",
+      "code": 3
+    },
+    "status": [
+      {
+        "checkedChainId": 11155111,
+        "retryAfterMs": 0,
+        "disabled": false
+      },
+      {
+        "retryAfterMs": 0,
+        "disabled": false
+      }
+    ],
+    "calls": [
+      {
+        "index": 0,
+        "method": "eth_chainId"
+      },
+      {
+        "index": 0,
+        "method": "eth_call"
+      },
+      {
+        "index": 0,
+        "method": "eth_getCode"
+      }
+    ]
+  },
+  {
+    "name": "HTTP503 unauthorized",
+    "error": {
+      "name": "KeelRpcSetupError",
+      "code": "rpc.setup-required",
+      "reason": "access-denied"
+    },
+    "status": [
+      {
+        "checkedChainId": 11155111,
+        "reason": "access-denied",
+        "diagnostic": {
+          "transportFailure": "rpc-error",
+          "httpStatus": 503,
+          "rpcCode": -32000,
+          "failureReason": "access-denied"
+        },
+        "retryAfterMs": 999,
+        "disabled": true
+      },
+      {
+        "checkedChainId": 11155111,
+        "reason": "access-denied",
+        "diagnostic": {
+          "transportFailure": "rpc-error",
+          "httpStatus": 503,
+          "rpcCode": -32000,
+          "failureReason": "access-denied"
+        },
+        "retryAfterMs": 1000,
+        "disabled": true
+      }
+    ],
+    "calls": [
+      {
+        "index": 0,
+        "method": "eth_chainId"
+      },
+      {
+        "index": 0,
+        "method": "eth_call"
+      },
+      {
+        "index": 1,
+        "method": "eth_chainId"
+      },
+      {
+        "index": 1,
+        "method": "eth_call"
+      }
+    ]
+  },
+  {
+    "name": "HTTP503 authentication required",
+    "error": {
+      "name": "KeelRpcSetupError",
+      "code": "rpc.setup-required",
+      "reason": "access-denied"
+    },
+    "status": [
+      {
+        "checkedChainId": 11155111,
+        "reason": "access-denied",
+        "diagnostic": {
+          "transportFailure": "rpc-error",
+          "httpStatus": 503,
+          "rpcCode": -32000,
+          "failureReason": "access-denied"
+        },
+        "retryAfterMs": 1000,
+        "disabled": true
+      },
+      {
+        "checkedChainId": 11155111,
+        "reason": "access-denied",
+        "diagnostic": {
+          "transportFailure": "rpc-error",
+          "httpStatus": 503,
+          "rpcCode": -32000,
+          "failureReason": "access-denied"
+        },
+        "retryAfterMs": 1000,
+        "disabled": true
+      }
+    ],
+    "calls": [
+      {
+        "index": 0,
+        "method": "eth_chainId"
+      },
+      {
+        "index": 0,
+        "method": "eth_call"
+      },
+      {
+        "index": 1,
+        "method": "eth_chainId"
+      },
+      {
+        "index": 1,
+        "method": "eth_call"
+      }
+    ]
+  },
+  {
+    "name": "HTTP503 rate limit",
+    "error": {
+      "name": "KeelRpcResponseError",
+      "code": 3
+    },
+    "status": [
+      {
+        "checkedChainId": 11155111,
+        "retryAfterMs": 0,
+        "disabled": false
+      },
+      {
+        "retryAfterMs": 0,
+        "disabled": false
+      }
+    ],
+    "calls": [
+      {
+        "index": 0,
+        "method": "eth_chainId"
+      },
+      {
+        "index": 0,
+        "method": "eth_call"
+      },
+      {
+        "index": 0,
+        "method": "eth_getCode"
+      }
+    ]
+  },
+  {
+    "name": "HTTP503 request body size limit reached",
+    "error": {
+      "name": "KeelRpcResponseError",
+      "code": 3
+    },
+    "status": [
+      {
+        "checkedChainId": 11155111,
+        "retryAfterMs": 0,
+        "disabled": false
+      },
+      {
+        "retryAfterMs": 0,
+        "disabled": false
+      }
+    ],
+    "calls": [
+      {
+        "index": 0,
+        "method": "eth_chainId"
+      },
+      {
+        "index": 0,
+        "method": "eth_call"
+      },
+      {
+        "index": 0,
+        "method": "eth_getCode"
+      }
+    ]
+  },
+  {
+    "name": "HTTP401 unauthorized",
+    "error": {
+      "name": "KeelRpcSetupError",
+      "code": "rpc.setup-required",
+      "reason": "access-denied"
+    },
+    "status": [
+      {
+        "checkedChainId": 11155111,
+        "reason": "access-denied",
+        "diagnostic": {
+          "httpStatus": 401,
+          "transportFailure": "http-error",
+          "failureReason": "access-denied"
+        },
+        "retryAfterMs": 1000,
+        "disabled": true
+      },
+      {
+        "retryAfterMs": 0,
+        "disabled": false
+      }
+    ],
+    "calls": [
+      {
+        "index": 0,
+        "method": "eth_chainId"
+      },
+      {
+        "index": 0,
+        "method": "eth_call"
+      }
+    ]
+  },
+  {
+    "name": "HTTP401 authentication required",
+    "error": {
+      "name": "KeelRpcSetupError",
+      "code": "rpc.setup-required",
+      "reason": "access-denied"
+    },
+    "status": [
+      {
+        "checkedChainId": 11155111,
+        "reason": "access-denied",
+        "diagnostic": {
+          "httpStatus": 401,
+          "transportFailure": "http-error",
+          "failureReason": "access-denied"
+        },
+        "retryAfterMs": 1000,
+        "disabled": true
+      },
+      {
+        "retryAfterMs": 0,
+        "disabled": false
+      }
+    ],
+    "calls": [
+      {
+        "index": 0,
+        "method": "eth_chainId"
+      },
+      {
+        "index": 0,
+        "method": "eth_call"
+      }
+    ]
+  },
+  {
+    "name": "HTTP401 rate limit",
+    "error": {
+      "name": "KeelRpcSetupError",
+      "code": "rpc.setup-required",
+      "reason": "access-denied"
+    },
+    "status": [
+      {
+        "checkedChainId": 11155111,
+        "reason": "access-denied",
+        "diagnostic": {
+          "httpStatus": 401,
+          "transportFailure": "http-error",
+          "failureReason": "access-denied"
+        },
+        "retryAfterMs": 1000,
+        "disabled": true
+      },
+      {
+        "retryAfterMs": 0,
+        "disabled": false
+      }
+    ],
+    "calls": [
+      {
+        "index": 0,
+        "method": "eth_chainId"
+      },
+      {
+        "index": 0,
+        "method": "eth_call"
+      }
+    ]
+  },
+  {
+    "name": "HTTP401 request body size limit reached",
+    "error": {
+      "name": "KeelRpcSetupError",
+      "code": "rpc.setup-required",
+      "reason": "access-denied"
+    },
+    "status": [
+      {
+        "checkedChainId": 11155111,
+        "reason": "access-denied",
+        "diagnostic": {
+          "httpStatus": 401,
+          "transportFailure": "http-error",
+          "failureReason": "access-denied"
+        },
+        "retryAfterMs": 1000,
+        "disabled": true
+      },
+      {
+        "retryAfterMs": 0,
+        "disabled": false
+      }
+    ],
+    "calls": [
+      {
+        "index": 0,
+        "method": "eth_chainId"
+      },
+      {
+        "index": 0,
+        "method": "eth_call"
+      }
+    ]
+  },
+  {
+    "name": "HTTP403 unauthorized",
+    "error": {
+      "name": "KeelRpcSetupError",
+      "code": "rpc.setup-required",
+      "reason": "access-denied"
+    },
+    "status": [
+      {
+        "checkedChainId": 11155111,
+        "reason": "access-denied",
+        "diagnostic": {
+          "httpStatus": 403,
+          "transportFailure": "http-error",
+          "failureReason": "access-denied"
+        },
+        "retryAfterMs": 1000,
+        "disabled": true
+      },
+      {
+        "retryAfterMs": 0,
+        "disabled": false
+      }
+    ],
+    "calls": [
+      {
+        "index": 0,
+        "method": "eth_chainId"
+      },
+      {
+        "index": 0,
+        "method": "eth_call"
+      }
+    ]
+  },
+  {
+    "name": "HTTP403 authentication required",
+    "error": {
+      "name": "KeelRpcSetupError",
+      "code": "rpc.setup-required",
+      "reason": "access-denied"
+    },
+    "status": [
+      {
+        "checkedChainId": 11155111,
+        "reason": "access-denied",
+        "diagnostic": {
+          "httpStatus": 403,
+          "transportFailure": "http-error",
+          "failureReason": "access-denied"
+        },
+        "retryAfterMs": 1000,
+        "disabled": true
+      },
+      {
+        "retryAfterMs": 0,
+        "disabled": false
+      }
+    ],
+    "calls": [
+      {
+        "index": 0,
+        "method": "eth_chainId"
+      },
+      {
+        "index": 0,
+        "method": "eth_call"
+      }
+    ]
+  },
+  {
+    "name": "HTTP403 rate limit",
+    "error": {
+      "name": "KeelRpcSetupError",
+      "code": "rpc.setup-required",
+      "reason": "access-denied"
+    },
+    "status": [
+      {
+        "checkedChainId": 11155111,
+        "reason": "access-denied",
+        "diagnostic": {
+          "httpStatus": 403,
+          "transportFailure": "http-error",
+          "failureReason": "access-denied"
+        },
+        "retryAfterMs": 1000,
+        "disabled": true
+      },
+      {
+        "retryAfterMs": 0,
+        "disabled": false
+      }
+    ],
+    "calls": [
+      {
+        "index": 0,
+        "method": "eth_chainId"
+      },
+      {
+        "index": 0,
+        "method": "eth_call"
+      }
+    ]
+  },
+  {
+    "name": "HTTP403 request body size limit reached",
+    "error": {
+      "name": "KeelRpcSetupError",
+      "code": "rpc.setup-required",
+      "reason": "access-denied"
+    },
+    "status": [
+      {
+        "checkedChainId": 11155111,
+        "reason": "access-denied",
+        "diagnostic": {
+          "httpStatus": 403,
+          "transportFailure": "http-error",
+          "failureReason": "access-denied"
+        },
+        "retryAfterMs": 1000,
+        "disabled": true
+      },
+      {
+        "retryAfterMs": 0,
+        "disabled": false
+      }
+    ],
+    "calls": [
+      {
+        "index": 0,
+        "method": "eth_chainId"
+      },
+      {
+        "index": 0,
+        "method": "eth_call"
+      }
+    ]
+  }
+]

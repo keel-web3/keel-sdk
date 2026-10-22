@@ -1,0 +1,11 @@
+{
+  "node": "v22.22.1",
+  "typescript": "5.9.3",
+  "baselineJavaScriptParity": true,
+  "explicitModule": "ESNext",
+  "explicitModuleResolution": "Bundler",
+  "changedModule": "packages/sdk/src/rpc.ts",
+  "diagnosticErrors": 0,
+  "fullTypecheck": false,
+  "fullBuild": false
+}

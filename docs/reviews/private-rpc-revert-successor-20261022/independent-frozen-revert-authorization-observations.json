@@ -1,0 +1,50 @@
+[
+  {
+    "prose": "execution reverted: unauthorized",
+    "first": {
+      "name": "KeelRpcSetupError",
+      "reason": "access-denied",
+      "code": "rpc.setup-required"
+    },
+    "status": [
+      {
+        "endpoint": "https://free.example",
+        "checkedChainId": 11155111,
+        "reason": "access-denied",
+        "diagnostic": {
+          "transportFailure": "rpc-error",
+          "httpStatus": 200,
+          "rpcCode": -32000,
+          "failureReason": "access-denied"
+        },
+        "retryAfterMs": 1000,
+        "disabled": true
+      }
+    ],
+    "requests": 2
+  },
+  {
+    "prose": "execution reverted: authentication required",
+    "first": {
+      "name": "KeelRpcSetupError",
+      "reason": "access-denied",
+      "code": "rpc.setup-required"
+    },
+    "status": [
+      {
+        "endpoint": "https://free.example",
+        "checkedChainId": 11155111,
+        "reason": "access-denied",
+        "diagnostic": {
+          "transportFailure": "rpc-error",
+          "httpStatus": 200,
+          "rpcCode": -32000,
+          "failureReason": "access-denied"
+        },
+        "retryAfterMs": 1000,
+        "disabled": true
+      }
+    ],
+    "requests": 2
+  }
+]

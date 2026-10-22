@@ -1,0 +1,138 @@
+{
+  "schema": "keel.private-rpc-revert-successor-local-evidence@1",
+  "sourceCommit": "6250fe0481cc4994f2bd039613bda8409b3876a4",
+  "baseCommit": "4ce25c1a093c99b141711608cbb3ab38355dd4e4",
+  "independentBlockedReceipt": "87e762c3e46379d8954f5517f8e7adc5e84ed1be",
+  "node": "v22.22.1",
+  "typescript": "5.9.3",
+  "targetedTests": {
+    "files": 5,
+    "tests": 151,
+    "pass": 151,
+    "fail": 0,
+    "skip": 0,
+    "cancel": 0,
+    "exitCode": 0
+  },
+  "unchangedIndependent24": {
+    "pass": 24,
+    "fail": 0,
+    "exitCode": 0
+  },
+  "unchangedIndependent2": {
+    "pass": 2,
+    "fail": 0,
+    "exitCode": 0
+  },
+  "stateReaderSourceAndRuntimeUnchanged": true,
+  "fullBuild": false,
+  "semanticTypecheck": false,
+  "fullSuite": false,
+  "independentReviewApproved": false,
+  "releaseApproved": false,
+  "hostOperations": 0,
+  "providerRequests": 0,
+  "credentialsAccessed": false,
+  "files": {
+    "packages/sdk/src/rpc.ts": {
+      "bytes": 39547,
+      "sha256": "7ab01252775a8caf401172cbf8ef2070fe14bcb817a79e6225c78407bce03d58"
+    },
+    "packages/sdk/dist/rpc.js": {
+      "bytes": 37797,
+      "sha256": "1f769dcadc5b013a6563723432a31eb03b986f99a92533e1cb0d96591145d289"
+    },
+    "packages/sdk/dist/rpc.js.map": {
+      "bytes": 33874,
+      "sha256": "f6352ccaa7f129a0d7a4c9c6d3a768b6f4288d787ccbff5262e80fc99cabc13c"
+    },
+    "native/proof-executor/state-reader.mjs": {
+      "bytes": 8575,
+      "sha256": "5b329a8c0dbcef16114245cee1e2c4df801c96b473b2807447266c4cbeeca3c0"
+    },
+    "packages/sdk/dist/proof-runtime/state-reader.js": {
+      "bytes": 8533,
+      "sha256": "42e934cc74525d5dddff33417e90942b31b9524ad35a0739e5442bd7f12b62e3"
+    },
+    "tests/rpc-revert-message-precedence.test.mjs": {
+      "bytes": 7922,
+      "sha256": "70de025efaee68396c80bce9a147bb62b7e22459b965d40e66c3e0dc307cfce1"
+    },
+    "docs/reviews/private-rpc-revert-successor-20261022/README.md": {
+      "bytes": 5426,
+      "sha256": "beeb743c52ec8eec54fad3636371ca700350fc010a8e07b3112237d2f7a46bdf"
+    },
+    "docs/reviews/private-rpc-revert-successor-20261022/after-attempt-before-successful-transpile.log": {
+      "bytes": 67706,
+      "sha256": "0c93944d063290903db98f7679524bbe3363839976c6fa1128c76660f209f17b"
+    },
+    "docs/reviews/private-rpc-revert-successor-20261022/after-prose-only-correction-controls.log": {
+      "bytes": 39433,
+      "sha256": "82d64a1b315b4fb8390d5b647bf5c63365a41fa028cbf4c3c86a217cd609e119"
+    },
+    "docs/reviews/private-rpc-revert-successor-20261022/after-revert-controls.log": {
+      "bytes": 39867,
+      "sha256": "db4e1ce356a8f1e42b23a1e94695d9477d9ee630baef88a6d949f15286b0a0c3"
+    },
+    "docs/reviews/private-rpc-revert-successor-20261022/before-revert-authorization-observations.json": {
+      "bytes": 1192,
+      "sha256": "1b88ccdb01e56569bcce0e24530007f2a86b49e8c1e39d4256886855827e7790"
+    },
+    "docs/reviews/private-rpc-revert-successor-20261022/before-revert-controls-final.log": {
+      "bytes": 56012,
+      "sha256": "c47f0970b6e637ab039bbc8a69f57890f086111c8f6cca0a8822fb193fb0094e"
+    },
+    "docs/reviews/private-rpc-revert-successor-20261022/before-revert-controls.log": {
+      "bytes": 54661,
+      "sha256": "e96dbf08b9631e888cbcc05bbb3bc0cd343296e43e54adc7ae0d8d2758ea8476"
+    },
+    "docs/reviews/private-rpc-revert-successor-20261022/before-revert-message-precedence-observations.json": {
+      "bytes": 19208,
+      "sha256": "c4280b386b3a8402e02517b855572a8b55a8d038fb85b2344f5d1ff455e11ba3"
+    },
+    "docs/reviews/private-rpc-revert-successor-20261022/before-single-file-transpile.log": {
+      "bytes": 822,
+      "sha256": "932ebc887fb1cb67e1fa7726846908c7033a2a8eb78a26708cbeda9a4a058c10"
+    },
+    "docs/reviews/private-rpc-revert-successor-20261022/exact-independent-2-after.log": {
+      "bytes": 652,
+      "sha256": "f3ee247caaf10d71c1df2acd17c1fcca5cf71a7f38fe733561a4aeaeacd936a0"
+    },
+    "docs/reviews/private-rpc-revert-successor-20261022/exact-independent-24-after.log": {
+      "bytes": 6541,
+      "sha256": "22c9263be65c5dda9917274a9d394ea001fe58f78673f7e7a8ec0f79e4600d48"
+    },
+    "docs/reviews/private-rpc-revert-successor-20261022/independent-frozen-revert-authorization-observations.json": {
+      "bytes": 1192,
+      "sha256": "1b88ccdb01e56569bcce0e24530007f2a86b49e8c1e39d4256886855827e7790"
+    },
+    "docs/reviews/private-rpc-revert-successor-20261022/independent-frozen-revert-authorization.test.mjs": {
+      "bytes": 1807,
+      "sha256": "d70eb99b59bd3a16c41c1cafdbcbbd4d4711e170e8f70d077491ec387560bda8"
+    },
+    "docs/reviews/private-rpc-revert-successor-20261022/independent-frozen-revert-message-precedence-observations.json": {
+      "bytes": 19206,
+      "sha256": "9dc77b7abec8ae6328aa66bcdeeeb5ce6ff268933de1ad5067e99a392fb41011"
+    },
+    "docs/reviews/private-rpc-revert-successor-20261022/independent-frozen-revert-message-precedence.test.mjs": {
+      "bytes": 2969,
+      "sha256": "466e3e11656993eb671b2437c3ee3092bbdcbef8583ebd7d329379543983ab09"
+    },
+    "docs/reviews/private-rpc-revert-successor-20261022/revert-authorization-observations.json": {
+      "bytes": 662,
+      "sha256": "8de5c5712f29bf5c04cb920dcffb1b3b812973595cfdc0941bee5fd470c2b3a7"
+    },
+    "docs/reviews/private-rpc-revert-successor-20261022/revert-message-precedence-observations.json": {
+      "bytes": 14547,
+      "sha256": "67c53aa645826d497bf9f1c5368a901099fa20b9fffddb8ac7516f57d1e14435"
+    },
+    "docs/reviews/private-rpc-revert-successor-20261022/single-file-transpile.json": {
+      "bytes": 276,
+      "sha256": "88ef94d8b4b1835e4dfd06bcfa2ab504d7698c7faac80060ad517c7a18dca967"
+    },
+    "docs/reviews/private-rpc-revert-successor-20261022/transpile-rpc-only.mjs": {
+      "bytes": 1805,
+      "sha256": "a19737511a46286d78a1bd4ee4d75f9c6aa551c105110f42637a40945f5d30dc"
+    }
+  }
+}
