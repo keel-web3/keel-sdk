@@ -1,5 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
+import { inferMediaType, inferRole } from "../packages/studio-core/dist/media.js";
 import { assertValidManifest, createIntegrity } from "../packages/protocol/dist/index.js";
 import { keelTezosOnchfsObjectId } from "../packages/sdk/dist/index.js";
 import {
@@ -47,6 +48,21 @@ function storedZipFiles(bytes) {
 }
 
 const bytes = new TextEncoder().encode("<p>hello</p>");
+
+test("normal model folders infer exact shared MIME roles without rewriting declared MIME or original paths", () => {
+  const types = { "scene.glb": "model/gltf-binary", "scene.gltf": "model/gltf+json", "scene.obj": "model/obj", "materials.mtl": "text/plain", "scene.bin": "application/octet-stream" };
+  for (const [name, expected] of Object.entries(types)) {
+    for (const declared of [undefined, "", "application/octet-stream"]) {
+      assert.equal(inferMediaType(`nested/${name}`, declared), expected);
+      assert.equal(inferMediaType(`nested/${name.toUpperCase()}`, declared), expected);
+    }
+  }
+  assert.equal(inferRole(inferMediaType("nested/scene.obj"), "nested/scene.obj"), "model");
+  assert.equal(inferMediaType("nested/scene.obj", "text/plain"), "text/plain");
+  assert.equal(inferMediaType("nested/scene.obj", "MODEL/OBJ"), "model/obj");
+  assert.equal(inferMediaType("nested/not-obj.obj.png"), "image/png");
+  assert.equal(inferMediaType("nested/unsupported.fbx"), "application/octet-stream");
+});
 
 test("studio-core creates safe names and compression summaries", () => {
   assert.equal(slugify("  Living Study #1  "), "living-study-1");
