@@ -52,3 +52,35 @@ test('MP4 sample tables cannot authorize payload ranges beyond actual media data
   const bytes=await nativeFixture('tone.m4a'),broken=bytes.slice(),at=Buffer.from(broken).indexOf(Buffer.from('stsz'));assert.ok(at>0);new DataView(broken.buffer).setUint32(at+16,0x7fffffff);
   assert.throws(()=>inspectKeelNativeAudio({mediaType:'audio/mp4',source:broken}),/sample/);
 });
+
+// SVG-AUDIO-912-001: XML text/CDATA/comments form one CSS string in the DOM.
+// Keep every original assertion above unchanged; these cases reproduce the
+// independent reviewer’s exact split-token bypass before its production fix.
+for(const [name,body,code] of [
+  ['contiguous relative import','<style>@import "relative.css";</style>','external-dependency'],
+  ['CDATA-split relative import','<style>@im<![CDATA[port]]> "relative.css";</style>','external-dependency'],
+  ['contiguous relative URL','<style>rect{fill:url(relative.svg#paint)}</style>','external-dependency'],
+  ['CDATA-split relative URL','<style>rect{fill:u<![CDATA[rl]]>(relative.svg#paint)}</style>','external-dependency'],
+  ['comment-split relative import','<style>@im<!-- comment -->port "relative.css";</style>','external-dependency'],
+  ['comment-split relative URL','<style>rect{fill:u<!-- comment -->rl(relative.svg#paint)}</style>','external-dependency'],
+  ['mixed text CDATA and comments','<style>@<![CDATA[im]]><!-- split -->p<![CDATA[ort]]> "relative.css";</style>','external-dependency'],
+  ['nested self-closing style resets depth','<style><style/>@import "relative.css";</style>','unsupported-execution'],
+  ['nested style followed by split import','<style>@im<style>port</style> "relative.css";</style>','unsupported-execution'],
+  ['element-descendant CSS text','<style>@im<g>port</g> "relative.css";</style>','unsupported-execution'],
+])test(`complete native SVG style rejects ${name} without source changes`,()=>{
+  const source=svg(`${body}<rect width="10" height="10"/>`),before=source.slice();
+  assert.throws(()=>inspectKeelNativeSVG(source),error=>error instanceof KeelNativeMediaError&&error.code===code);
+  assert.deepEqual(source,before);
+});
+test('complete native SVG style preserves split native animation and exact internal URLs',()=>{
+  const source=svg('<defs><linearGradient id="paint"><stop stop-color="red"/></linearGradient></defs><style>@keyfr<![CDATA[ames]]> pulse{0%{opacity:1}100%{opacity:.5}}rect{ani<!-- comment -->mation:pulse 1s infinite;fill:u<![CDATA[rl]]>(#paint)}</style><rect width="10" height="10"/>'),before=source.slice();
+  assert.equal(inspectKeelNativeSVG(source).motion,'animated');assert.deepEqual(source,before);
+});
+test('complete native SVG style keeps separate styles separate and ignores comments as text',()=>{
+  const source=svg('<style>@im</style><style>port</style><style>/* legitimate comment */rect{fill:red}<!-- @import "not-css.css"; --></style><rect width="10" height="10"/>'),before=source.slice();
+  assert.equal(inspectKeelNativeSVG(source).motion,'still');assert.deepEqual(source,before);
+});
+test('native SVG style chunk inspection is bounded before building an unbounded DOM string',()=>{
+  const source=svg('<style>'+ '<![CDATA[]]>'.repeat(65537)+'</style>'),before=source.slice();
+  assert.throws(()=>inspectKeelNativeSVG(source),error=>error instanceof KeelNativeMediaError&&error.code==='inspection-budget');assert.deepEqual(source,before);
+});

@@ -1,0 +1,70 @@
+{
+  "results": [
+    {
+      "name": "contiguous-relative-import",
+      "sha256": "ae365a20e23b860952e2b7e18de9b956acda3b86cecb820a5d57e4f6bcc5368c",
+      "rejected": true,
+      "error": {
+        "name": "KeelNativeMediaError",
+        "code": "external-dependency"
+      },
+      "originalBytesUnchanged": true
+    },
+    {
+      "name": "split-cdata-relative-import",
+      "sha256": "4d1ff6962b3388947ce89d714d43f41f611abccd1478cfc65ced7b98c80a3d1d",
+      "rejected": false,
+      "inspection": {
+        "kind": "svg",
+        "mediaType": "image/svg+xml",
+        "execution": "static",
+        "motion": "still",
+        "byteLength": 126,
+        "rendering": "native-image",
+        "browserDecode": "required"
+      },
+      "originalBytesUnchanged": true
+    },
+    {
+      "name": "contiguous-relative-url",
+      "sha256": "e3b7070d9789e22e97212a4b464e3aae6745b75ff7cebf37a6c8b0990633d6e5",
+      "rejected": true,
+      "error": {
+        "name": "KeelNativeMediaError",
+        "code": "external-dependency"
+      },
+      "originalBytesUnchanged": true
+    },
+    {
+      "name": "split-cdata-relative-url",
+      "sha256": "36c375031d62d0bc3184b56f7e93f19bbce7acfcd7db619fa08a83126217432d",
+      "rejected": false,
+      "inspection": {
+        "kind": "svg",
+        "mediaType": "image/svg+xml",
+        "execution": "static",
+        "motion": "still",
+        "byteLength": 137,
+        "rendering": "native-image",
+        "browserDecode": "required"
+      },
+      "originalBytesUnchanged": true
+    },
+    {
+      "name": "split-comment-relative-import",
+      "sha256": "64c62634d3cd0c3d11fe41551fa31823d0baf3dd7862f33725b92593fac213dd",
+      "rejected": false,
+      "inspection": {
+        "kind": "svg",
+        "mediaType": "image/svg+xml",
+        "execution": "static",
+        "motion": "still",
+        "byteLength": 130,
+        "rendering": "native-image",
+        "browserDecode": "required"
+      },
+      "originalBytesUnchanged": true
+    }
+  ],
+  "networkActions": 0
+}

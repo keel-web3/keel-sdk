@@ -1,0 +1,59 @@
+{
+  "schema": "keel-svg-style-successor-author@1",
+  "blockedSource": "912bdc15f6bcadf399d9b9a038f0f321ccb10db6",
+  "parentCommit": "b4e9c892da8db908c09c765065c76644a48ccf9b",
+  "oldInspectionTestsUnchangedPrefix": true,
+  "oldInspectionTestsSHA256": "c0075fbd3947770b3f937c9579daecab88b839799190e5ab568f4c84a4ca8057",
+  "newTestsAppended": 13,
+  "beforeFix": {
+    "pass": 30,
+    "fail": 10,
+    "skipped": 0
+  },
+  "afterFixFocused": {
+    "pass": 79,
+    "fail": 0,
+    "skipped": 0
+  },
+  "sdkTsc": {
+    "exitCode": 0,
+    "incremental": false
+  },
+  "runtimeModule": {
+    "version": "1.5.0",
+    "byteLength": 6821,
+    "sha256": "a00a81a869a5bb589f2156a5ef19ea2fa1f01f7173cff7212e28ccbb9ed5baf0",
+    "changed": false
+  },
+  "inputSourceBytesChanged": false,
+  "publicApisChanged": false,
+  "independentApproval": "pending",
+  "fullSuiteAndBrowser": "pending fresh review admission; old912 results are historical",
+  "evidence": [
+    {
+      "path": "README.md",
+      "byteLength": 3382,
+      "sha256": "30c17b16ae5ff5ad82e60666a3184fcb591e87d0dc554c4a8b7c44628ba6b83d"
+    },
+    {
+      "path": "after-fix-focused.stdout.log",
+      "byteLength": 18520,
+      "sha256": "f8c0370a450ce2b96e7b05cb15321d45fa61189e7b8748a3c89fa13e9888e47c"
+    },
+    {
+      "path": "before-fix.stdout.log",
+      "byteLength": 16521,
+      "sha256": "48230266ff5fdecb9c29a356ea1734525c1c7f111f39c974610e3faa255f6087"
+    },
+    {
+      "path": "independent-912-observation.json",
+      "byteLength": 2015,
+      "sha256": "ee7ff97f98f46cd6e971156ed42d90cc0e3b9035d80609e8273eb6fcb38f0546"
+    },
+    {
+      "path": "sdk-tsc.stdout.log",
+      "byteLength": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  ]
+}

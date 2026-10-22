@@ -1,3 +1,5 @@
+> Independent review BLOCKED source912 for SVG-AUDIO-912-001. Its author passes below are historical, not approval. See [the scoped successor](../native-svg-style-successor-20261021/README.md).
+
 # Native SVG/audio successor (author evidence; independent approval pending)
 
 Base: SDK `b0a78fd50797a9af82be282f0d1103fe49ff0dc8`, isolated branch

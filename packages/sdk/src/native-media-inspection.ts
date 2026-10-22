@@ -25,16 +25,29 @@ export function inspectKeelNativeSVG(bytes: Uint8Array) {
   if (bytes.length > 32 * 1024 * 1024) throw new KeelNativeMediaError("inspection-budget", "SVG exceeds this bounded parser's 32 MiB inspection budget; select a supported project/read route.");
   let source: string; try { source = new TextDecoder("utf-8", { fatal: true }).decode(bytes); } catch { return invalid("SVG must be complete UTF-8 XML."); }
   const parser = new SaxesParser({ xmlns: true, fragment: false });
-  let nodes = 0, depth = 0, root = false, animated = false, styleDepth = 0;
+  let nodes = 0, depth = 0, root = false, animated = false;
+  let style: { readonly depth: number; readonly chunks: string[] } | undefined;
+  let styleChunks = 0, styleCharacters = 0;
+  const appendStyleText = (value: string): void => {
+    if (!style) return;
+    // Bound the document-wide accumulator, including empty CDATA events. XML
+    // comments contribute no DOM text, while text and CDATA join without gaps.
+    if (++styleChunks > 65536 || (styleCharacters += value.length) > 32 * 1024 * 1024) throw new KeelNativeMediaError("inspection-budget", "SVG exceeds the bounded complete-style inspection budget.");
+    style.chunks.push(value);
+  };
   parser.on("xmldecl", declaration => { if (declaration.encoding && !/^(?:utf-8|us-ascii)$/iu.test(declaration.encoding)) invalid("The native SVG profile requires the declared XML encoding to match its UTF-8 source bytes."); });
   parser.on("doctype", () => { throw new KeelNativeMediaError("unsupported-execution", "SVG DTDs/entities are not part of the native image profile; use a separately qualified project route."); });
   parser.on("processinginstruction", () => external());
   parser.on("opentag", tag => {
+    // A CSS style element has a text/CDATA/comment-only content profile here.
+    // Reject descendants instead of guessing which nested DOM text a browser
+    // stylesheet consumes, or allowing a nested style to reset our scope.
+    if (style) throw new KeelNativeMediaError("unsupported-execution", "SVG style element descendants need a separately qualified document execution profile; native styles must contain only text, CDATA and comments.");
     if (++nodes > 65536 || ++depth > 128) throw new KeelNativeMediaError("inspection-budget", "SVG exceeds the bounded element/depth budget.");
     if (!root) { if (tag.local !== "svg" || tag.uri !== svgNS) invalid("The XML root must be an SVG namespace document."); root = true; }
     if (tag.uri !== svgNS || !SVG_ELEMENTS.has(tag.local)) execution();
     if (["animate", "animateMotion", "animateTransform", "set"].includes(tag.local)) animated = true;
-    if (tag.local === "style") styleDepth = depth;
+    if (tag.local === "style") style = {depth, chunks: []};
     for (const attribute of Object.values(tag.attributes)) {
       const name = attribute.local, value = attribute.value;
       if (attribute.prefix === "xmlns" || attribute.name === "xmlns") { if (value !== svgNS) external(); continue; }
@@ -48,9 +61,17 @@ export function inspectKeelNativeSVG(bytes: Uint8Array) {
       if (name === "style" && /(?:animation|transition)\s*:/iu.test(value)) animated = true;
     }
   });
-  parser.on("text", value => { if (styleDepth) { inspectSVGStyle(value); if (/@keyframes|(?:animation|transition)\s*:/iu.test(value)) animated = true; } });
-  parser.on("cdata", value => { if (styleDepth) { inspectSVGStyle(value); if (/@keyframes|(?:animation|transition)\s*:/iu.test(value)) animated = true; } });
-  parser.on("closetag", () => { if (styleDepth === depth) styleDepth = 0; depth--; });
+  parser.on("text", appendStyleText);
+  parser.on("cdata", appendStyleText);
+  parser.on("closetag", () => {
+    if (style?.depth === depth) {
+      const completeCSS = style.chunks.join("");
+      inspectSVGStyle(completeCSS);
+      if (/@keyframes|(?:animation|transition)\s*:/iu.test(completeCSS)) animated = true;
+      style = undefined;
+    }
+    depth--;
+  });
   try { parser.write(source).close(); } catch (error) { if (error instanceof KeelNativeMediaError) throw error; return invalid("SVG is not a complete well-formed XML document."); }
   if (!root || depth) invalid("SVG document is incomplete.");
   return Object.freeze({ kind: "svg" as const, mediaType: "image/svg+xml" as const, execution: "static" as const, motion: animated ? "animated" as const : "still" as const, byteLength: bytes.length, rendering: "native-image" as const, browserDecode: "required" as const });
