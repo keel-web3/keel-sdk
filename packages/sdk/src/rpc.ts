@@ -320,6 +320,12 @@ export function createKeelRpcPool(options: KeelRpcPoolOptions): KeelRpcPool {
         body: requestBody,
         redirect: "error", signal: signal === undefined ? controller.signal : AbortSignal.any([controller.signal, signal]) }); }
       catch (error) { privatelyObserve({ error }); signal?.throwIfAborted(); throw networkFailure(error, timedOut); }
+      // The observed status restricts this shared source immediately. Body
+      // capture and caller cancellation cannot erase a known access denial.
+      if (response.status === 401 || response.status === 403) {
+        const denial = new ProviderFailure("access-denied", 0, { httpStatus: response.status, transportFailure: "http-error" });
+        state.disabled = true; state.reason = denial.reason; state.diagnostic = denial.diagnostic;
+      }
       const header = response.headers.get("retry-after");
       const rawDelay = header === null ? 0 : /^\d+(?:\.\d+)?$/u.test(header) ? Number(header) * 1000 : Date.parse(header) - Date.now();
       const delay = Number.isFinite(rawDelay) ? Math.max(0, rawDelay) : 0;
@@ -468,7 +474,10 @@ export function createKeelRpcPool(options: KeelRpcPoolOptions): KeelRpcPool {
       } catch (error) {
         input.signal?.throwIfAborted();
         if (error instanceof KeelRpcResponseError || error instanceof KeelRpcHttpRequestError) throw error;
-        const failure = error instanceof ProviderFailure ? error : networkFailure(error, false);
+        // A queued chain check may inherit another caller's cancellation. It
+        // must not replace a denial already observed by that shared source.
+        const failure = state.disabled && state.reason === "access-denied" ? new ProviderFailure("access-denied", 0, state.diagnostic)
+          : error instanceof ProviderFailure ? error : networkFailure(error, false);
         last = failure.reason; state.reason = last;
         state.diagnostic = failure.diagnostic; lastDiagnostic = failure.diagnostic;
         if (["wrong-chain", "access-denied"].includes(last)) state.disabled = true;
