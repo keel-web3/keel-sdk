@@ -1,5 +1,12 @@
 import { actualAvifContainer } from "./actual-media-container.js";
 
+export interface MovieAudioTimeline {
+  readonly codec:"pcm"|"aac-lc-1024";
+  readonly scale:bigint; readonly duration:bigint; readonly samples:bigint; readonly priming:bigint;
+  readonly sampleRate:number; readonly channels:number;
+  readonly runs:readonly {readonly count:bigint;readonly duration:bigint}[];
+}
+
 /** Conservative admission for the presentation semantics which RGBA hashes do
  * not contain. This is intentionally a small supported ISO profile, not a
  * metadata stripper or a general movie normalizer. Unsupported media stays
@@ -10,7 +17,7 @@ import { actualAvifContainer } from "./actual-media-container.js";
  * https://github.com/FFmpeg/FFmpeg/blob/n6.1.1/libavformat/mov.c
  * https://aomediacodec.github.io/av1-avif/v1.2.0.html
  */
-export function assertMoviePresentationSemantics(bytes: Uint8Array, inputReport: string, selectedStream: string, width: number, height: number): { readonly srgbFull: boolean; readonly videoTimeline: {readonly samples:bigint; readonly scale:bigint; readonly duration:bigint} } {
+export function assertMoviePresentationSemantics(bytes: Uint8Array, inputReport: string, selectedStream: string, width: number, height: number): { readonly srgbFull: boolean; readonly videoTimeline: {readonly samples:bigint; readonly scale:bigint; readonly duration:bigint}; readonly audioTimeline?:MovieAudioTimeline } {
   const retain = (reason: string): never => { throw new TypeError(`Movie ${reason} require an exact preserving adapter; native media is retained.`); };
   const sar = /\[SAR (\d+):(\d+) DAR (\d+):(\d+)\]/u.exec(selectedStream);
   if (sar && (BigInt(sar[1]!) <= 0n || BigInt(sar[1]!) !== BigInt(sar[2]!) || BigInt(sar[3]!) * BigInt(height) !== BigInt(sar[4]!) * BigInt(width)) || !sar && /\[(?:SAR|DAR)/u.test(selectedStream)) retain("sample/display aspect ratio semantics");
@@ -42,7 +49,7 @@ export function assertMoviePresentationSemantics(bytes: Uint8Array, inputReport:
   type Box = {kind:string; start:number; end:number};
   type Clock = {scale:bigint; duration:bigint};
   type Edit = {flags:number; duration:bigint; mediaTime:bigint};
-  type Track = {duration?:bigint; media?:Clock; edit?:Edit; video?:boolean; codec?:string; timing?:{duration:bigint;samples:bigint}; compositionSamples?:bigint; encodedSamples?:bigint};
+  type Track = {duration?:bigint; media?:Clock; edit?:Edit; video?:boolean; codec?:string; timing?:{duration:bigint;samples:bigint;runs:{count:bigint;duration:bigint}[]}; compositionSamples?:bigint; encodedSamples?:bigint; audio?:{sampleRate:number;channels:number}; aac?:{sampleRate:number;channels:number}; channelLayout?:number};
   let count=0, movieHeaders=0, videoHeaders=0, srgbFull=false;
   let movie:Clock|undefined, avifItems=0, avifExtents=0;
   const tracks:Track[]=[], avifConfigs:Uint8Array[]=[];
@@ -70,6 +77,26 @@ export function assertMoviePresentationSemantics(bytes: Uint8Array, inputReport:
     if(at+36>end)retain("incomplete display matrix semantics");
     const identity=[65536,0,0,0,65536,0,0,0,1073741824];
     if(identity.some((n,i)=>view.getInt32(at+i*4)!==n))retain("nonidentity display matrix semantics");
+  };
+  const aacConfig=(start:number,end:number):{sampleRate:number;channels:number}=>{
+    // Closed ES_Descriptor/DecoderConfig/ASC profile from pinned FFmpeg n6.0
+    // isom.c and mpeg4audio.c. No HE-AAC/SBR, 960-frame or implicit channels.
+    const descriptor=(at:number,bound:number)=>{
+      if(at>=bound)retain("incomplete AAC descriptor");const tag=bytes[at++]!;let size=0,done=false;
+      for(let i=0;i<4;i++){if(at>=bound)retain("incomplete AAC descriptor length");const value=bytes[at++]!;size=size*128+(value&127);if(!(value&128)){done=true;break;}}
+      if(!done || size>bound-at)retain("AAC descriptor bounds");return {tag,start:at,end:at+size};
+    };
+    if(end-start<4 || view.getUint32(start)!==0)retain("AAC descriptor version or flags");
+    const es=descriptor(start+4,end);if(es.tag!==3 || es.end!==end || es.end-es.start<3 || bytes[es.start+2]!==0)retain("unsupported AAC elementary-stream descriptor");
+    const decoder=descriptor(es.start+3,es.end);
+    if(decoder.tag!==4 || decoder.end-decoder.start<13 || bytes[decoder.start]!==0x40 || bytes[decoder.start+1]!==0x15)retain("unsupported AAC decoder profile");
+    const asc=descriptor(decoder.start+13,decoder.end),sl=descriptor(decoder.end,es.end);
+    if(asc.tag!==5 || asc.end!==decoder.end || sl.tag!==6 || sl.end!==es.end || sl.end-sl.start!==1 || bytes[sl.start]!==2)retain("ambiguous AAC decoder configuration");
+    const config=bytes.subarray(asc.start,asc.end),a=config[0]!,b=config[1]!;
+    if(![2,5].includes(config.length) || a>>>3!==2 || (b&7)!==0 || config.length===5 && ![0x56,0xe5,0].every((value,i)=>config[i+2]===value))retain("unsupported AAC frame-length, extension or priming profile");
+    const rates=[96000,88200,64000,48000,44100,32000,24000,22050,16000,12000,11025,8000,7350],sampleRate=rates[((a&7)<<1)|(b>>>7)],channels=(b>>>3)&15;
+    if(!sampleRate || ![1,2].includes(channels))retain("unsupported AAC sample clock or channel configuration");
+    return {sampleRate:sampleRate!,channels};
   };
   const allowed:Record<string,readonly string[]>={
     root:["ftyp","free","skip","wide","mdat","moov","meta"],
@@ -129,13 +156,13 @@ export function assertMoviePresentationSemantics(bytes: Uint8Array, inputReport:
         if(a+8>z || (view.getUint32(a)&0xffffff)!==0 || bytes[a]!>(kind==="stts"?0:1))retain("unsupported edit-list sample timeline version or flags");
         const n=view.getUint32(a+4);
         if(!n || n>65_536 || z-a!==8+n*8)retain("edit-list sample timeline count or byte bounds");
-        let duration=0n,samples=0n;
+        let duration=0n,samples=0n;const runs:{count:bigint;duration:bigint}[]=[];
         for(let i=0;i<n;i++) {
           const at=a+8+i*8,count=view.getUint32(at),value=kind==="ctts"&&bytes[a]===1?view.getInt32(at+4):view.getUint32(at+4);
           if(!count || kind==="stts"&&value<=0 || kind==="ctts"&&value!==0)retain("unsupported edit-list sample duration or composition offset");
-          samples+=BigInt(count);if(kind==="stts")duration+=BigInt(count)*BigInt(value);
+          samples+=BigInt(count);if(kind==="stts"){duration+=BigInt(count)*BigInt(value);runs.push({count:BigInt(count),duration:BigInt(value)});}
         }
-        if(kind==="stts")owner.timing={duration,samples};else owner.compositionSamples=samples;
+        if(kind==="stts")owner.timing={duration,samples,runs};else owner.compositionSamples=samples;
       } else if(kind==="mvhd" || kind==="tkhd") {
         if(a+4>z || bytes[a]!>1)retain("unknown movie/track header semantics");
         const version=bytes[a]!, at=a+(kind==="mvhd"?36:40)+(version===1?12:0);matrix(at,z);
@@ -185,6 +212,9 @@ export function assertMoviePresentationSemantics(bytes: Uint8Array, inputReport:
             if(entry.start+28>entry.end)retain("incomplete audio sample-entry semantics");
             const version=view.getUint16(entry.start+8),size=version===0?28:version===1?44:version===2?64:0;
             if(!size || entry.start+size>entry.end)retain("unsupported audio sample-entry semantics");
+            const sampleRate=view.getUint32(entry.start+24),channels=view.getUint16(entry.start+16);
+            if(version>1 || (sampleRate&65535)!==0 || !(sampleRate>>>16) || channels<1 || channels>8 || !track)retain("unqualified audio sample clock or channel profile");
+            track!.audio={sampleRate:sampleRate>>>16,channels};
             walk(entry.start+size,entry.end,"audio",depth+1,track);
           } else retain("unsupported audio/sample-entry semantics");
         }
@@ -209,7 +239,17 @@ export function assertMoviePresentationSemantics(bytes: Uint8Array, inputReport:
       } else if(kind==="\u00a9swr") {
         // QuickTime writes its technical muxer name as length+language+UTF8.
         if(z-a<4 || view.getUint16(a)!==z-a-4 || !/^Lavf\d+\.\d+\.\d+$/u.test(new TextDecoder().decode(bytes.subarray(a+4,z))))retain("QuickTime creator metadata semantics");
-      } else if(["esds","chan","glbl","pcmC","frma","enda","mp4a","\0\0\0\0"].includes(kind)) {
+      } else if(kind==="chan") {
+        const owner=track??retain("channel layout outside its audio track"),channels=owner.audio?.channels;
+        // Exact conventional mono/stereo CAF tags from pinned isom.c. Other
+        // speaker/coordinate layouts need an exact preserving adapter.
+        if(owner.channelLayout!==undefined || !channels || ![1,2].includes(channels) || z-a!==16 || view.getUint32(a)!==0 || view.getUint32(a+4)!==((channels===1?100:101)*65536+channels) || view.getUint32(a+8)!==0 || view.getUint32(a+12)!==0)retain("unqualified audio channel-layout semantics");
+        owner.channelLayout=channels!;
+      } else if(kind==="esds") {
+        const owner=track??retain("AAC configuration outside a track");
+        if(owner.codec!=="mp4a" || owner.aac)retain("duplicate or ambiguous AAC configuration");
+        owner.aac=aacConfig(a,z);
+      } else if(["glbl","pcmC","frma","enda","mp4a","\0\0\0\0"].includes(kind)) {
         // Closed decoder/sample configuration leaves. No arbitrary user data
         // or nested application/metadata containers are admitted here.
       } else if(!technicalLeaf.has(kind)) walk(a+(kind==="meta"?4:0),z,kind,depth+1,track);
@@ -265,10 +305,26 @@ export function assertMoviePresentationSemantics(bytes: Uint8Array, inputReport:
   // not a caller-supplied claim that a permissive decoder read every sample.
   if(!["avc1","avc3","av01"].includes(video.codec??""))retain("unqualified one-frame-per-sample codec profile");
   const videoTimeline=Object.freeze({samples:video.encodedSamples!,scale:video.media!.scale,duration:video.media!.duration});
+  const audioTracks=tracks.filter(track=>track.audio);
+  if(audioTracks.length>1)retain("multiple audio-track presentation semantics");
+  let audioTimeline:MovieAudioTimeline|undefined;
+  if(audioTracks.length) {
+    const audio=audioTracks[0]!,media=audio.media!,header=audio.audio!,priming=audio.edit?.mediaTime??0n,timing=audio.timing!;
+    if(media.scale!==BigInt(header.sampleRate))retain("audio media and sample clock correspondence");
+    if(["fl64","fl32","sowt","twos"].includes(audio.codec??"")) {
+      if(![1,2].includes(header.channels) || priming!==0n || timing.samples!==media.duration)retain("unsupported PCM sample count, channels, duration or edit priming");
+      audioTimeline={codec:"pcm",scale:media.scale,duration:media.duration,samples:timing.samples,priming,...header,runs:timing.runs};
+    } else if(audio.codec==="mp4a" && audio.aac) {
+      if(audio.aac.sampleRate!==header.sampleRate || audio.aac.channels!==header.channels || ![0n,1024n].includes(priming)
+        || timing.runs.some((run,i)=>run.duration!==1024n && !(i===timing.runs.length-1 && run.count===1n && run.duration>0n && run.duration<1024n)))retain("unqualified AAC packet duration, channels or edit priming");
+      audioTimeline={codec:"aac-lc-1024",scale:media.scale,duration:media.duration,samples:timing.samples,priming,...header,runs:timing.runs};
+    } else retain("unqualified audio codec or packet-to-sample mapping");
+    for(const run of audioTimeline!.runs)Object.freeze(run);Object.freeze(audioTimeline!.runs);Object.freeze(audioTimeline);
+  }
   // A codec may omit SAR in the probe (ordinary QuickTime output does). The
   // complete ISO path above still requires identity transforms and exact
   // track display dimensions equal to the coded raster, and checks every
   // pasp override. This is a measured identity display, not a guessed ratio.
   // Pinned MOV demuxer: mov_read_trak derives SAR from differing tkhd bounds.
-  return {srgbFull,videoTimeline};
+  return {srgbFull,videoTimeline,...(audioTimeline?{audioTimeline}:{})};
 }

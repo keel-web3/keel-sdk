@@ -11,7 +11,7 @@ import { resolveBundledFfmpeg } from "./media-optimization.js";
 import { parseKeelMediaEditRecipe, type KeelMediaEditRecipe } from "./media-edit-recipe.js";
 import { assignTemporalWebPDelays } from "./temporal-webp.js";
 import { actualAvifContainer, assertActualImageSequence, assertActualCandidateContainer } from "./actual-media-container.js";
-import { assertMoviePresentationSemantics } from "./movie-presentation-semantics.js";
+import { assertMoviePresentationSemantics, type MovieAudioTimeline } from "./movie-presentation-semantics.js";
 export * from "./media-edit-recipe.js";
 
 const MAX_BYTES = 256 * 1024 * 1024;
@@ -44,7 +44,7 @@ export interface KeelMediaCandidate {
   readonly warnings: readonly string[];
 }
 function animatedAvif(bytes:Uint8Array) { return actualAvifContainer(bytes)?.sequence === true; }
-interface Decoded { info: KeelMediaInfo; hashes: readonly string[]; rgba?:Uint8Array; videoMap?:string; imageMetadata?: ImageMetadata; startTimeMs?: number; extraStreams?: boolean; srgbFull?:boolean; }
+interface Decoded { info: KeelMediaInfo; hashes: readonly string[]; rgba?:Uint8Array; videoMap?:string; imageMetadata?: ImageMetadata; startTimeMs?: number; extraStreams?: boolean; srgbFull?:boolean; audio?:ActualMediaAudio; audioTimeline?:MovieAudioTimeline; }
 function hash(bytes: Uint8Array) { const h = createHash("sha256"); h.update(bytes); return h.digest("hex"); }
 function bounded(bytes: Uint8Array) { if (!(bytes instanceof Uint8Array) || bytes.byteLength < 1 || bytes.byteLength > MAX_BYTES) throw new RangeError(`Media must contain 1–${MAX_BYTES} bytes.`); }
 function geometry(recipe: KeelMediaEditRecipe) { return recipe.crop !== undefined || recipe.width !== undefined || recipe.height !== undefined || (recipe.rotate ?? 0) !== 0 || (recipe.layers?.length ?? 0) > 0; }
@@ -184,7 +184,13 @@ async function decodeMovie(binary: string, cwd: string, input: string, signal?:A
   if (times.some(n=>!Number.isFinite(n)) || delays.some(n=>!Number.isFinite(n)||n<=0)) throw new Error("Movie frame timing is incomplete.");
   // RGBA8 hashes must never be misrepresented as verification of HDR or high-depth source samples.
   if (/Video:[^\n]*(?:yuv\w*p(?:9|10|12|14|16)|gbrp(?:9|10|12|14|16)|rgba64|rgb48|bt2020|smpte2084|arib-std-b67)/iu.test(stderr)) throw new Error("High-depth/HDR movie edits need a color-preserving adapter. Original bytes remain supported.");
-  return {info:{width,height,durationMs:times.at(-1)!+delays.at(-1)!,frameCount:frames.length,animated:frames.length>1,hasAudio:/Stream #.*Audio:/u.test(stderr),frameTimesMs:times,frameDurationsMs:delays},hashes:frames.map(f=>f[5]!),videoMap,startTimeMs:first*timingBase,extraStreams:/Stream #.*(?:Subtitle|Data|Attachment):/u.test(probe.stderr),srgbFull:presentation.srgbFull};
+  const hasAudio=/Stream #.*Audio:/u.test(stderr),audioTimeline=presentation.audioTimeline;
+  if(hasAudio!==!!audioTimeline)throw new Error("The actual audio tracks do not match the qualified container timeline; native media is retained.");
+  const audio=hasAudio?await decodePairAudio(binary,cwd,input,audioTimeline!,signal):undefined;
+  return {info:{width,height,durationMs:times.at(-1)!+delays.at(-1)!,frameCount:frames.length,animated:frames.length>1,hasAudio,frameTimesMs:times,frameDurationsMs:delays},hashes:frames.map(f=>f[5]!),videoMap,startTimeMs:first*timingBase,extraStreams:/Stream #.*(?:Subtitle|Data|Attachment):/u.test(probe.stderr),srgbFull:presentation.srgbFull,...(audio?{audio,audioTimeline}:{} )};
+}
+function sameAudioPresentation(a:MovieAudioTimeline|undefined,b:MovieAudioTimeline|undefined) {
+  return !a&&!b || !!a&&!!b&&(a.duration-a.priming)*b.scale===(b.duration-b.priming)*a.scale;
 }
 function assertSingleFileMedia(bytes:Uint8Array) {
   const ascii = new TextDecoder("latin1").decode(bytes.subarray(0,32));
@@ -260,6 +266,7 @@ async function movieCandidate(bytes: Uint8Array, recipe: KeelMediaEditRecipe, si
     }
     if (!sameTimeline(source.info,candidate.info) || source.info.width !== candidate.info.width || source.info.height !== candidate.info.height) throw new Error(`Movie ${recipe.format} candidate changed frames, timing or dimensions; original retained.`);
     if (!recipe.noSound && source.info.hasAudio !== candidate.info.hasAudio) throw new Error("Movie candidate changed audio presence; original retained.");
+    if(recipe.mode==="lossless" && !recipe.noSound && (!sameAudioPresentation(source.audioTimeline,candidate.audioTimeline) || canonicalJson(source.audio??null)!==canonicalJson(candidate.audio??null))) throw new Error("Movie candidate changed exact audio presentation duration or complete PCM; original retained.");
     if (recipe.mode === "lossless" && source.hashes.some((v,i)=>candidate.hashes[i]!==v)) throw new Error("Movie candidate failed full decoded pixel-losslessness verification; original retained.");
     return {bytes:output,source,candidate};
   } finally { await rm(dir,{recursive:true,force:true}); }
@@ -332,7 +339,7 @@ export function assertActualMediaPairProof(value: unknown): asserts value is Act
   if (!value || typeof value !== "object" || !actualPairProofs.has(value)) throw new TypeError("A fresh actual-media-pair decoder proof is required.");
 }
 
-async function decodePairAudio(binary: string, dir: string, name: string, signal?: AbortSignal): Promise<ActualMediaAudio> {
+async function decodePairAudio(binary: string, dir: string, name: string, timeline:MovieAudioTimeline, signal?: AbortSignal): Promise<ActualMediaAudio> {
   // Canonical full PCM blocks avoid comparing arbitrary source packet grouping.
   // p=0 preserves the real short final block; no silence is manufactured.
   // https://ffmpeg.org/ffmpeg-filters.html#asetnsamples
@@ -358,11 +365,28 @@ async function decodePairAudio(binary: string, dir: string, name: string, signal
     || frameTimes.some((v, i) => !Number.isSafeInteger(v) || i > 0 && v !== frameTimes[i-1]! + frameSamples[i-1]!)
     || frameSamples.some((v, i) => !Number.isSafeInteger(v) || v < 1 || v > AUDIO_BLOCK_SAMPLES || i < rows.length-1 && v !== AUDIO_BLOCK_SAMPLES)
     || frameBytes.some((v, i) => !Number.isSafeInteger(v) || v !== 8 * channels * frameSamples[i]!) || frameHashes.some(v => !/^[0-9a-f]{64}$/u.test(v))) throw new Error("Audio PCM coverage, channel layout or timing changed or exceeds the complete verification budget.");
+  const expected=timeline.codec==="pcm"?timeline.samples:timeline.samples*1024n-timeline.priming;
+  if(BigInt(sampleRate)!==timeline.scale || sampleRate!==timeline.sampleRate || channels!==timeline.channels || frameTimes[0]!==0 || BigInt(totalSamples)!==expected || BigInt(frameTimes.at(-1)!+frameSamples.at(-1)!)!==expected) throw new Error("Actual full audio sample count, clock or end differs from its qualified container timeline; native media is retained.");
+  if(timeline.codec==="aac-lc-1024") {
+    // AAC-LC decodes complete 1024-sample frames, including its actual codec
+    // tail. Preserve those samples; bind separately to the declared logical
+    // presentation and known edit-list priming, never trim/pad to pass.
+    const packets=await ffmpegRun(binary,dir,["-protocol_whitelist","file,pipe","-threads","2","-copyts","-i",name,"-map","0:a:0","-vn","-c:a","copy","-f","framehash","-hash","sha256","pipe:1"],signal);
+    const packetBase=/^#tb 0:\s*(\d+)\/(\d+)$/mu.exec(packets.stdout),packetRate=/^#sample_rate 0:\s*(\d+)$/mu.exec(packets.stdout),packetRows=packets.stdout.split("\n").filter(line=>/^0,/u.test(line)).map(line=>line.split(",").map(value=>value.trim()));
+    if(!/^#codec_id 0:\s*aac$/mu.test(packets.stdout) || !packetBase || packetBase[1]!=="1" || BigInt(packetBase[2]!)!==timeline.scale || !packetRate || Number(packetRate[1])!==sampleRate || BigInt(packetRows.length)!==timeline.samples)throw new Error("Actual AAC packet count or clock differs from the qualified audio timeline; native media is retained.");
+    let at=-timeline.priming,index=0;
+    for(const run of timeline.runs)for(let n=0n;n<run.count;n++) {
+      const row=packetRows[index++]!;
+      if(!/^-?\d+$/u.test(row[1]??"") || !/^-?\d+$/u.test(row[2]??"") || !/^\d+$/u.test(row[3]??"") || BigInt(row[1]!)!==at || BigInt(row[2]!)!==at || BigInt(row[3]!)!==run.duration)throw new Error("Actual AAC packet presentation differs from complete sample-table timing; native media is retained.");
+      at+=run.duration;
+    }
+    if(at!==timeline.duration-timeline.priming)throw new Error("Actual AAC packet end differs from its declared audio presentation; native media is retained.");
+  }
   const value = { codec: "pcm_f64le" as const, sampleRate, channelLayout, timeBase, frameTimes, frameSamples, frameBytes, frameHashes, totalBytes, totalSamples };
   return { ...value, sequenceDigest: `0x${hash(new TextEncoder().encode(canonicalJson(value)))}` };
 }
 
-async function decodeActualPairStream(bytes: Uint8Array, dir: string, name: string, signal?: AbortSignal): Promise<{ stream: ActualMediaPairStream; metadata?: ImageMetadata }> {
+async function decodeActualPairStream(bytes: Uint8Array, dir: string, name: string, signal?: AbortSignal): Promise<{ stream: ActualMediaPairStream; metadata?: ImageMetadata; audioTimeline?:MovieAudioTimeline }> {
   signal?.throwIfAborted(); assertSingleFileMedia(bytes);
   let metadata: ImageMetadata | undefined;
   if (!animatedAvif(bytes)) {
@@ -384,8 +408,7 @@ async function decodeActualPairStream(bytes: Uint8Array, dir: string, name: stri
     decoded = await decodeMovie(runtime.binary, dir, name, signal, true);
     if (decoded.extraStreams) throw new Error("Subtitle, data or attachment tracks require a preserving adapter; native media is retained.");
     if (decoded.info.hasAudio) {
-      const audio = await decodePairAudio(runtime.binary, dir, name, signal);
-      return { stream: { info: decoded.info, frameHashes: decoded.hashes, loop: { kind: "canonical-player-defined" }, startTimeMs: decoded.startTimeMs ?? 0, audio, colorSemantics: decoded.srgbFull ? "srgb-full" : "unspecified-rgb" } };
+      return { stream: { info: decoded.info, frameHashes: decoded.hashes, loop: { kind: "canonical-player-defined" }, startTimeMs: decoded.startTimeMs ?? 0, audio:decoded.audio!, colorSemantics: decoded.srgbFull ? "srgb-full" : "unspecified-rgb" },audioTimeline:decoded.audioTimeline! };
     }
     loop = { kind: "canonical-player-defined" };
   }
@@ -415,6 +438,7 @@ export async function verifyActualMediaPair(input: { readonly sourceBytes: Uint8
     if (canonicalJson(a.info) !== canonicalJson(b.info) || a.startTimeMs !== b.startTimeMs || a.frameHashes.length !== b.frameHashes.length
       || a.frameHashes.some((value, i) => value !== b.frameHashes[i])) throw new Error("The supplied candidate changed actual full-frame RGBA, dimensions, exact timing, start position or audio presence; selected native media is retained.");
     if (canonicalJson(a.audio ?? null) !== canonicalJson(b.audio ?? null)) throw new Error("The supplied candidate changed actual complete audio PCM, channels, sample clock or presentation timing; selected native media is retained.");
+    if(!sameAudioPresentation(source.audioTimeline,candidate.audioTimeline))throw new Error("The supplied candidate changed the exact declared audio presentation duration; native media is retained.");
     for (const field of ["icc", "exif", "xmp", "iptc"] as const) {
       const original = source.metadata?.[field], processed = candidate.metadata?.[field];
       if ((original === undefined ? undefined : hash(original)) !== (processed === undefined ? undefined : hash(processed))) throw new Error("The supplied candidate changed embedded color or creator metadata; selected native media is retained.");
