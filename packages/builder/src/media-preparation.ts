@@ -7,6 +7,7 @@ import { createHash } from "node:crypto";
 import { createIntegrity, type Integrity } from "@keel/protocol";
 import { resolveBundledFfmpeg } from "./media-optimization.js";
 import { parseKeelMediaEditRecipe, type KeelMediaEditRecipe } from "./media-edit-recipe.js";
+import { assignTemporalWebPDelays } from "./temporal-webp.js";
 export * from "./media-edit-recipe.js";
 
 const MAX_BYTES = 256 * 1024 * 1024;
@@ -222,6 +223,7 @@ async function movieCandidate(bytes: Uint8Array, recipe: KeelMediaEditRecipe, si
     await ffmpegRun(runtime.binary,dir,args,signal);
     const info = await stat(path.join(dir,outputName)); if (info.size>MAX_BYTES) throw new RangeError("Candidate exceeds the output byte budget.");
     let output = new Uint8Array(await readFile(path.join(dir,outputName))); bounded(output);
+    if (recipe.format === "webp") output = assignTemporalWebPDelays(output, source.info);
     let candidate = recipe.format === "webp" ? await decodeImage(output) : await decodeMovie(runtime.binary,dir,outputName,signal);
     if (recipe.format !== "webp" && !sameTimeline(source.info,candidate.info)) {
       // Some encoders infer the last duration from the preceding timestamp.

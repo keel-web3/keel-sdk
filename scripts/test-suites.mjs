@@ -7,6 +7,7 @@ const TEST_ROOT = resolve(import.meta.dirname, "../tests");
 export const BROWSER_TEST_FILES = Object.freeze([
   "tests/media-viewer-browser.test.mjs",
   "tests/native-media-browser.test.mjs",
+  "tests/temporal-carrier-sequence.browser.test.mjs",
   "tests/model-viewer-browser.test.mjs",
   "tests/sdk-verification-wrap-offline-browser.test.mjs",
   "tests/sdk-prepared-dense-copy-browser.test.mjs",
@@ -79,6 +80,7 @@ export const TEST_FILES_ON_DISK = Object.freeze(readdirSync(TEST_ROOT)
  * its execution boundary.
  */
 export const DETERMINISTIC_TEST_FILES = Object.freeze([
+  "tests/temporal-webp.test.mjs",
   "tests/media-viewer-adapters.test.mjs",
   "tests/native-media-inspection.test.mjs",
   "tests/native-media-graph.test.mjs",
