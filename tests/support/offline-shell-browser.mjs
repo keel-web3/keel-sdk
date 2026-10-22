@@ -19,6 +19,19 @@ export function endDeniedProxyConnect(socket,onUnexpectedError) {
   socket.end('HTTP/1.1 502 Blocked\r\nConnection: close\r\n\r\n');
 }
 
+/** A browser may exit cleanly before its closing WebSocket sends the ACK.
+ * The process exit is required on both paths; crash/signal exits stay failures.
+ * All artwork, seal, sandbox and final network-log assertions remain unchanged.
+ */
+export async function closeObservedBrowser(command, exited) {
+  const cleanExit=exited.then(([code,signal])=>{
+    assert.equal(code,0,'Observed browser must exit cleanly after close dispatch');
+    assert.equal(signal,null,'Observed browser must not exit because of a signal');
+  });
+  await Promise.race([command('Browser.close'),cleanExit]);
+  await cleanExit;
+}
+
 export function pageRequestsFromNetLog(log,origin) {
   const type=log.constants?.logEventTypes?.URL_REQUEST_START_JOB;
   assert.equal(typeof type,'number','Chromium must supply the network event schema');
@@ -117,8 +130,7 @@ export async function observeOfflineShell(html, terminalState='verified', expect
     if(expectedSignal)assert.ok(result.signals?.includes(expectedSignal),'The mounted artwork must execute its committed module');
     await new Promise(resolve=>setTimeout(resolve,100));
     const exited=once(child,'exit');
-    await command('Browser.close');
-    await exited;
+    await closeObservedBrowser(command,exited);
     const netlog=JSON.parse(await readFile(netlogPath,'utf8'));
     return {...result,externalRequests:attempts,proxyRequests,pageNetworkRequests:pageRequestsFromNetLog(netlog,origin),errors};
   }finally{
