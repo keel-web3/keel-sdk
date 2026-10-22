@@ -10,6 +10,7 @@ export type { ActualMediaPairProof } from "./media-pair-verification.js";
 import { resolveBundledFfmpeg } from "./media-optimization.js";
 import { parseKeelMediaEditRecipe, type KeelMediaEditRecipe } from "./media-edit-recipe.js";
 import { assignTemporalWebPDelays } from "./temporal-webp.js";
+import { actualAvifContainer, assertActualImageSequence, assertActualCandidateContainer } from "./actual-media-container.js";
 export * from "./media-edit-recipe.js";
 
 const MAX_BYTES = 256 * 1024 * 1024;
@@ -41,7 +42,7 @@ export interface KeelMediaCandidate {
   readonly verification: { readonly sourcePreserved: true; readonly completeDecode: boolean; readonly framesAndTimingPreserved: boolean; readonly losslessPixelsVerified: boolean; readonly browserDecode: "requires-runtime-check" };
   readonly warnings: readonly string[];
 }
-function animatedAvif(bytes:Uint8Array) { return new TextDecoder("latin1").decode(bytes.subarray(4,40)).includes("avis"); }
+function animatedAvif(bytes:Uint8Array) { return actualAvifContainer(bytes)?.sequence === true; }
 interface Decoded { info: KeelMediaInfo; hashes: readonly string[]; rgba?:Uint8Array; videoMap?:string; imageMetadata?: ImageMetadata; startTimeMs?: number; extraStreams?: boolean; }
 function hash(bytes: Uint8Array) { const h = createHash("sha256"); h.update(bytes); return h.digest("hex"); }
 function bounded(bytes: Uint8Array) { if (!(bytes instanceof Uint8Array) || bytes.byteLength < 1 || bytes.byteLength > MAX_BYTES) throw new RangeError(`Media must contain 1–${MAX_BYTES} bytes.`); }
@@ -73,6 +74,7 @@ async function decodeImage(bytes: Uint8Array): Promise<Decoded> {
   if (!delays || delays.length !== count || delays.some(n => !Number.isFinite(n) || n < 0)) throw new Error("The image decoder did not expose complete animation timing.");
   const times: number[] = []; let duration = 0;
   for (const delay of delays) { times.push(duration); duration += delay; }
+  assertActualImageSequence(bytes,meta,{frameTimesMs:times,frameDurationsMs:delays});
   return { info: { width, height, durationMs: duration, frameCount: count, animated: count > 1, hasAudio: false, frameTimesMs: times, frameDurationsMs: delays }, imageMetadata: meta, rgba:raw.data, hashes: Array.from({length:count}, (_,i) => hash(raw.data.subarray(i*size,(i+1)*size))) };
 }
 function checkGeometry(recipe: KeelMediaEditRecipe, info: KeelMediaInfo) {
@@ -391,6 +393,7 @@ export async function verifyActualMediaPair(input: { readonly sourceBytes: Uint8
   try {
     const source = await decodeActualPairStream(sourceBytes, dir, "source", input.signal);
     const candidate = await decodeActualPairStream(candidateBytes, dir, "candidate", input.signal);
+    assertActualCandidateContainer(candidateBytes,recipe.format,candidate.metadata?.format);
     input.signal?.throwIfAborted();
     const a = source.stream, b = candidate.stream;
     if (canonicalJson(a.info) !== canonicalJson(b.info) || a.startTimeMs !== b.startTimeMs || a.frameHashes.length !== b.frameHashes.length
