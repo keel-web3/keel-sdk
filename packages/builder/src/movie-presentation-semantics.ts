@@ -77,10 +77,14 @@ export function assertMoviePresentationSemantics(bytes: Uint8Array, inputReport:
         if(a+4>z || bytes[a]!>1)retain("unknown movie/track header semantics");
         const version=bytes[a]!, at=a+(kind==="mvhd"?36:40)+(version===1?12:0);matrix(at,z);
         if(bytes.subarray(a+4,a+(version===1?20:12)).some(value=>value!==0))retain("creation or modification metadata semantics");
-        if(kind==="mvhd")movieHeaders++;
+        if(kind==="mvhd") {
+          movieHeaders++;
+          if((view.getUint32(a)&0xffffff)!==0 || view.getUint32(at-16)!==65536 || view.getUint16(at-12)!==256)retain("movie playback flags, rate or volume semantics");
+        }
         else {
           if(at+44>z)retain("incomplete track display geometry semantics");
           const w=view.getUint32(at+36),h=view.getUint32(at+40);
+          if((view.getUint32(a)&0xffffff)!==3 || view.getInt16(at-8)!==0 || view.getUint16(at-4)!==(w||h?0:256))retain("track enabled, layering or audio-volume semantics");
           if(w||h){videoHeaders++;if(w!==width*65536 || h!==height*65536)retain("track display geometry semantics");}
         }
       } else if(kind==="mdhd") {

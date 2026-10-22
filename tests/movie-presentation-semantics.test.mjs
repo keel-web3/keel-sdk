@@ -45,6 +45,9 @@ test('raw movie and track matrix, display dimensions, clean aperture and explici
  const source=Buffer.from(await movie(dir,'plain'));
  const cases=[
   ['track matrix',rewrite(source,['moov','trak','tkhd'],box=>{box.writeInt32BE(-65536,48);return box;})],
+  ['disabled track',rewrite(source,['moov','trak','tkhd'],box=>{box[11]=0;return box;})],
+  ['movie playback volume',rewrite(source,['moov','mvhd'],box=>{box.writeUInt16BE(128,32);return box;})],
+  ['movie playback rate',rewrite(source,['moov','mvhd'],box=>{box.writeUInt32BE(32768,28);return box;})],
   ['movie matrix',rewrite(source,['moov','mvhd'],box=>{box.writeInt32BE(-65536,44);return box;})],
   ['track geometry',rewrite(source,['moov','trak','tkhd'],box=>{box.writeUInt32BE(64*65536,84);return box;})],
   ['unexposed creation',rewrite(source,['moov','trak','mdia','mdhd'],box=>{box.writeUInt32BE(1,12);return box;})],
