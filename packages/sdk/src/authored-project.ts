@@ -5,6 +5,7 @@ import { qualifyAuthoredPublishedModules, assertAuthoredPublishedRecords, author
 import type { KeelAuthoredPublishedModuleInput, KeelAuthoredPublishedModule } from "./authored-project-graph.js";
 import { build, transform } from "esbuild";
 import ts from "typescript";
+import { assertAuthoredReaderGrammar, normalizeAuthoredReaderText } from "./authored-reader-grammar.js";
 import { inspectKeelNativeSVG } from "./native-media-inspection.js";
 import { canonicalJson, createIntegrity, resolveKeelPayloadStorage, type KeelPayloadStorageMode, type Integrity } from "@keel/protocol";
 import type { KeelStudioStagedProjectFile } from "./studio-upload.js";
@@ -158,9 +159,9 @@ export async function createKeelAuthoredProject(value: KeelAuthoredProjectInput)
 
 async function compileAuthoredModule(source: string, id: string): Promise<Uint8Array> {
   qualifyAuthoredModuleSyntax(source, id);
-  const built = await transform(source, { loader: "js", sourcefile: id, format: "esm", target: "es2022", minify: false, legalComments: "inline" });
+  const built = await transform(source, { loader: "js", sourcefile: id, format: "esm", target: "es2022", minifyWhitespace: true, legalComments: "inline" });
   if (built.warnings.length) throw new TypeError(`Module ${id} needs a current-reader syntax review.`);
-  return encoder.encode(built.code);
+  return encoder.encode(normalizeAuthoredReaderText(built.code, id));
 }
 function qualifyAuthoredModuleSyntax(source: string, id: string, raw = false): void {
   const parsed = ts.createSourceFile(id, source, ts.ScriptTarget.ES2022, true, ts.ScriptKind.JS);
@@ -169,20 +170,28 @@ function qualifyAuthoredModuleSyntax(source: string, id: string, raw = false): v
   const names = (node: ts.BindingName): string[] => ts.isIdentifier(node) ? [node.text] : node.elements.flatMap(element => ts.isOmittedExpression(element) ? [] : names(element.name));
   const has = (node: ts.Node, kind: ts.SyntaxKind) => ts.canHaveModifiers(node) && ts.getModifiers(node)?.some(modifier => modifier.kind === kind);
   const unsupported = () => { throw new TypeError(`Module ${id} uses syntax unsupported by the current registered static reader. Preserve its source and author compatible functional modules.`); };
+  const unsupportedName = () => { throw new TypeError(`Module ${id} has an unsupported Unicode or escaped module interface identifier for the current registered reader. Preserve its original source; have the agent author ASCII import/export binding names or use a separately qualified reader profile before preparing a paid plan.`); };
+  const reservedName = (name: string) => { if (name === "__proto__") throw new TypeError(`Module ${id} uses unsupported current-reader namespace key __proto__. Preserve the source and have the agent choose an ordinary import/export binding name before preparing a paid plan.`); };
+  const boundaryName = (node: ts.Identifier) => {
+    reservedName(node.text);
+    if (!/^[A-Za-z_$][A-Za-z0-9_$]*$/u.test(node.text) || raw && !/^[A-Za-z_$][A-Za-z0-9_$]*$/u.test(node.getText(parsed))) unsupportedName();
+  };
   for (const statement of parsed.statements) {
     if (ts.isVariableStatement(statement)) for (const declaration of statement.declarationList.declarations) {
       for (const name of names(declaration.name)) {
         if (!(statement.declarationList.flags & ts.NodeFlags.Const)) mutable.add(name);
-        if (has(statement, ts.SyntaxKind.ExportKeyword)) exported.add(name);
+        if (has(statement, ts.SyntaxKind.ExportKeyword)) { reservedName(name); if (!/^[A-Za-z_$][A-Za-z0-9_$]*$/u.test(name)) unsupportedName(); exported.add(name); }
       }
     }
-    if ((ts.isFunctionDeclaration(statement) || ts.isClassDeclaration(statement)) && statement.name && has(statement, ts.SyntaxKind.ExportKeyword)) exported.add(statement.name.text);
+    if ((ts.isFunctionDeclaration(statement) || ts.isClassDeclaration(statement)) && statement.name && has(statement, ts.SyntaxKind.ExportKeyword)) { boundaryName(statement.name); exported.add(statement.name.text); }
     if (ts.isExportDeclaration(statement)) {
       if (!statement.exportClause || !ts.isNamedExports(statement.exportClause)) unsupported();
       if (!statement.moduleSpecifier && statement.exportClause && ts.isNamedExports(statement.exportClause)) for (const element of statement.exportClause.elements) exported.add((element.propertyName ?? element.name).text);
     }
     if (ts.isImportDeclaration(statement)) {
       if (statement.importClause?.name && statement.importClause.namedBindings || raw && statement.getText(parsed).includes("\n")) unsupported();
+      if (statement.importClause?.name) boundaryName(statement.importClause.name);
+      if (statement.importClause?.namedBindings && ts.isNamespaceImport(statement.importClause.namedBindings)) boundaryName(statement.importClause.namedBindings.name);
     }
     if (raw && (ts.isExportAssignment(statement) || has(statement, ts.SyntaxKind.DefaultKeyword))) unsupported();
   }
@@ -196,12 +205,14 @@ function qualifyAuthoredModuleSyntax(source: string, id: string, raw = false): v
     if (ts.isMetaProperty(node) && node.keywordToken === ts.SyntaxKind.ImportKeyword
       || ts.isCallExpression(node) && (node.expression.kind === ts.SyntaxKind.ImportKeyword || ts.isIdentifier(node.expression) && ["eval", "require"].includes(node.expression.text))
       || (ts.isImportSpecifier(node) || ts.isExportSpecifier(node)) && (!ts.isIdentifier(node.name) || node.propertyName && !ts.isIdentifier(node.propertyName))) unsupported();
+    if (ts.isImportSpecifier(node) || ts.isExportSpecifier(node)) { if (ts.isIdentifier(node.name)) boundaryName(node.name); if (node.propertyName && ts.isIdentifier(node.propertyName)) boundaryName(node.propertyName); }
     if (ts.isBinaryExpression(node) && node.operatorToken.kind >= ts.SyntaxKind.FirstAssignment && node.operatorToken.kind <= ts.SyntaxKind.LastAssignment && assignedExports(node.left)
       || (ts.isPrefixUnaryExpression(node) || ts.isPostfixUnaryExpression(node)) && (node.operator === ts.SyntaxKind.PlusPlusToken || node.operator === ts.SyntaxKind.MinusMinusToken) && assignedExports(node.operand)
       || (ts.isForOfStatement(node) || ts.isForInStatement(node)) && !ts.isVariableDeclarationList(node.initializer) && assignedExports(node.initializer)) unsupported();
     node.forEachChild(visit);
   };
   visit(parsed);
+  if (raw) assertAuthoredReaderGrammar(source, id);
 }
 /** Restricted authoring grammar, plus the unchanged canonical sandbox/CSP.
  * This rejects declared network and code-loading dependencies before storage;
@@ -346,6 +357,7 @@ export async function buildKeelAuthoredInlineDocument(input: {
   if (graph.publishedModules?.length && (modules.length !== graph.publishedModules.length || modules.some((module, index) => module.moduleId !== graph.publishedModules![index]!.binding.moduleId || module.version !== graph.publishedModules![index]!.binding.version || module.execution !== "module"))) throw new TypeError("The authored runtime closure differs from its exact published module bindings.");
   const payloadStorage = resolveKeelPayloadStorage(input.payloadStorage);
   const ordered = authoredExecutionOrder(graph.edges, files.length);
+  const aliases = authoredReaderAliases(files, modules, graph, payloadStorage);
   const creator: Array<{ readonly path: string; readonly sourceIntegrity: Integrity; readonly compiledIntegrity: Integrity; readonly part: import("./inline-viewer-graph.js").KeelInlineLocalDocument["parts"][number] }> = [];
   for (const id of ordered) {
     const file = files.find(candidate => candidate.path === id)!;
@@ -355,19 +367,16 @@ export async function buildKeelAuthoredInlineDocument(input: {
       // reader accepts named/namespace/default imports and named exports, not
       // runtime import(), import.meta, star reexports or combined clauses.
       const source = new TextDecoder("utf-8", { fatal: true }).decode(bytes);
-      const linked = linkAuthoredPublishedImports(source, graph.publishedModules ?? []);
-      const compiled = await compileAuthoredModule(linked, id);
       if (payloadStorage === "raw") {
-        if (linked !== source) throw new TypeError("Raw authored modules must use the exact registered runtime aliases. Preserve the original source and have the agent reauthor its import using the resolved alias.");
         qualifyAuthoredModuleSyntax(source, id, true);
-      } else bytes = compiled;
+      } else bytes = await compileAuthoredModule(linkAuthoredImports(source, id, graph), id);
     } else if (file.mediaType === "text/css") {
       await assertAuthoredStylesheet(new TextDecoder().decode(bytes));
     }
     const entry = id === graph.entrypoint;
     if (payloadStorage === "raw" && input.compressionByPath?.[id] !== undefined && input.compressionByPath[id] !== "none") throw new TypeError("Raw authored source cannot enable automatic compression.");
     const slot = await buildEmbeddedKeelViewerSlot({ id, role: entry ? "entrypoint" : file.format === "es-module" ? "data" : "asset", mediaType: file.mediaType,
-      bytes, aliases: [...new Set([id, `./${id}`, ...(id.startsWith("modules/") ? [`./${path.posix.basename(id)}`] : [])])], compression: input.compressionByPath?.[id] ?? "none" });
+      bytes, aliases: aliases.get(id)!, compression: input.compressionByPath?.[id] ?? "none" });
     creator.push({ path: id, sourceIntegrity: await createIntegrity(file.bytes), compiledIntegrity: await createIntegrity(bytes),
       part: { kind: "creator", role: entry ? "entrypoint" : "asset", bytes: slot.fragment, byteLength: slot.fragment.length, integrity: slot.fragmentIntegrity } });
   }
@@ -406,16 +415,46 @@ export function inferKeelAuthoredRuntime(modules: readonly KeelAuthoredModule[],
   return { runtime: "three" as const, version: version ?? "0.180.0" };
 }
 
-/** Rewrite only parsed new-author import specifiers for the current registered
- * alias. Exact supplied originals remain private and their digests are kept. */
-function linkAuthoredPublishedImports(source: string, published: readonly KeelAuthoredPublishedModule[]) {
-  if (!published.some(module => module.binding.moduleId === "three-r180-module")) return source;
+/** Link exact graph edges to full registered identities in Compact only.
+ * A source module named main keeps its stable ID and cannot alias bootstrap. */
+function linkAuthoredImports(source: string, id: string, graph: KeelAuthoredProjectGraph) {
   const parsed = ts.createSourceFile("authored.js", source, ts.ScriptTarget.ES2022, true, ts.ScriptKind.JS);
-  const replacements: { start: number; end: number }[] = [];
+  const replacements: { start: number; end: number; target: string }[] = [];
   for (const statement of parsed.statements) {
     const value = (ts.isImportDeclaration(statement) || ts.isExportDeclaration(statement)) && statement.moduleSpecifier;
-    if (value && ts.isStringLiteral(value) && ["three", "three@0.180.0"].includes(value.text)) replacements.push({ start: value.getStart(parsed), end: value.end });
+    if (value && ts.isStringLiteral(value)) {
+      const edge = graph.edges.find(edge => edge.consumer === id && edge.specifier === value.text);
+      if (!edge) throw new TypeError(`Module ${id} lost its exact qualified import edge.`);
+      const published = edge.dependency.startsWith("published:") ? graph.publishedModules?.find(module => `published:${module.binding.moduleId}` === edge.dependency) : undefined;
+      const target = published ? published.aliases[0]! : edge.dependency;
+      replacements.push({ start: value.getStart(parsed), end: value.end, target });
+    }
   }
-  for (const range of replacements.reverse()) source = source.slice(0, range.start) + JSON.stringify("three.module.min.js") + source.slice(range.end);
+  for (const range of replacements.reverse()) source = source.slice(0, range.start) + JSON.stringify(range.target) + source.slice(range.end);
   return source;
+}
+
+function authoredReaderAliases(files: readonly KeelStudioStagedProjectFile[], modules: Parameters<typeof buildKeelAuthoredInlineDocument>[0]["modules"], graph: KeelAuthoredProjectGraph, storage: KeelPayloadStorageMode) {
+  const result = new Map(files.map(file => [file.path, [...new Set([file.path, `./${file.path}`, ...(storage === "raw" && file.path.startsWith("modules/") ? [`./${path.posix.basename(file.path)}`] : [])])]]));
+  const owners = new Map<string, string>();
+  const add = (id: string, aliases: readonly string[]) => {
+    for (const alias of [id, ...aliases]) {
+      const prior = owners.get(alias);
+      if (prior !== undefined && prior !== id) throw new TypeError(`Ambiguous current-reader alias ${alias}. Preserve source IDs and use compatible Compact linking before preparing a paid plan.`);
+      owners.set(alias, id);
+    }
+  };
+  for (const module of modules) add(module.item.id, module.item.aliases);
+  for (const file of files) add(file.path, result.get(file.path)!);
+  // Mirror every exact/fallback name used by the immutable reader. Raw source
+  // stays byte exact; reject any source-relative name resolving to another ID.
+  if (storage === "raw") for (const edge of graph.edges) {
+    const file = files.find(file => file.path === edge.consumer);
+    if (file?.format !== "es-module") continue;
+    const expected = edge.dependency.startsWith("published:") ? edge.dependency.slice("published:".length) : edge.dependency;
+    const normalized = edge.specifier.replace(/^\.\//u, "");
+    const actual = owners.get(edge.specifier) ?? owners.get(normalized) ?? owners.get(`./${normalized}`) ?? owners.get(`/content/${normalized}`);
+    if (actual !== expected) throw new TypeError(`Module ${file.path} uses an unsupported Raw current-reader alias for ${edge.specifier}. Preserve the source and use compatible Compact linking.`);
+  }
+  return result;
 }
