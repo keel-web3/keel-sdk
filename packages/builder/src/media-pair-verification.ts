@@ -5,7 +5,7 @@ import type { KeelMediaInfo } from "./media-preparation.js";
 export type ActualMediaLoop = { readonly kind: "still" } | { readonly kind: "container"; readonly repetitions: number }
   | { readonly kind: "canonical-player-defined" };
 export interface ActualMediaAudio {
-  readonly codec: "pcm_f32le"; readonly sampleRate: number; readonly channelLayout: string;
+  readonly codec: "pcm_f64le"; readonly sampleRate: number; readonly channelLayout: string;
   readonly timeBase: string; readonly frameTimes: readonly number[]; readonly frameSamples: readonly number[];
   readonly frameBytes: readonly number[]; readonly frameHashes: readonly string[];
   readonly totalBytes: number; readonly totalSamples: number; readonly sequenceDigest: string;

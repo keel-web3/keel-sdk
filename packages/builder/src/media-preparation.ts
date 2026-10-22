@@ -304,7 +304,7 @@ export async function compareMediaFrames(input:{readonly bytes:Uint8Array;readon
 const actualPairProofs = new WeakSet<object>();
 const MAX_AUDIO_PCM_BYTES = 64 * 1024 * 1024;
 const AUDIO_BLOCK_SAMPLES = 1024;
-const MAX_AUDIO_BLOCKS = MAX_AUDIO_PCM_BYTES / (4 * AUDIO_BLOCK_SAMPLES);
+const MAX_AUDIO_BLOCKS = MAX_AUDIO_PCM_BYTES / (8 * AUDIO_BLOCK_SAMPLES);
 function freezePair<T>(value: T): T {
   if (value && typeof value === "object") { for (const child of Object.values(value)) freezePair(child); Object.freeze(value); }
   return value;
@@ -321,22 +321,27 @@ async function decodePairAudio(binary: string, dir: string, name: string, signal
   // https://ffmpeg.org/ffmpeg-filters.html#asetnsamples
   // https://ffmpeg.org/ffmpeg-formats.html#framehash
   const { stdout, stderr } = await ffmpegRun(binary, dir, ["-protocol_whitelist", "file,pipe", "-threads", "2", "-copyts", "-i", name,
-    "-map", "0:a:0", "-vn", "-af", `asetnsamples=n=${AUDIO_BLOCK_SAMPLES}:p=0`, "-c:a", "pcm_f32le", "-frames:a", String(MAX_AUDIO_BLOCKS + 1), "-f", "framehash", "-hash", "sha256", "pipe:1"], signal);
+    "-map", "0:a:0", "-vn", "-af", `asetnsamples=n=${AUDIO_BLOCK_SAMPLES}:p=0`, "-c:a", "pcm_f64le", "-frames:a", String(MAX_AUDIO_BLOCKS + 1), "-f", "framehash", "-hash", "sha256", "pipe:1"], signal);
   const input = stderr.split("Output #")[0]!;
-  if (input.split("\n").filter(line => /^\s*Stream #.*Audio:/u.test(line)).length !== 1) throw new Error("Multiple audio tracks require explicit verified selection; native media is retained.");
+  const audioStreams = input.split("\n").filter(line => /^\s*Stream #.*Audio:/u.test(line));
+  if (audioStreams.length !== 1) throw new Error("Multiple audio tracks require explicit verified selection; native media is retained.");
+  // f64 represents every sample of these decoder formats without reducing its
+  // precision. Unknown or signed-64-bit integer PCM is not silently quantized.
+  if (!/,\s*(?:u8p?|s16p?|s32p?|fltp?|dblp?)(?:\s*\([^)]*\))?(?:,|\s*$)/u.test(audioStreams[0]!))
+    throw new Error("The audio decoder precision is not admitted for exact PCM verification; native media is retained.");
   const rate = /^#sample_rate 0:\s*(\d+)$/mu.exec(stdout), layout = /^#channel_layout_name 0:\s*(.+)$/mu.exec(stdout), tb = /^#tb 0:\s*(\d+)\/(\d+)$/mu.exec(stdout);
   const rows = stdout.split("\n").filter(line => /^0,/u.test(line)).map(line => line.split(",").map(v => v.trim()));
-  if (!rate || !layout || !tb || !/^#codec_id 0:\s*pcm_f32le$/mu.test(stdout) || !rows.length || rows.length > MAX_AUDIO_BLOCKS) throw new Error("The complete audio PCM timeline is unavailable or exceeds its verification bound.");
+  if (!rate || !layout || !tb || !/^#codec_id 0:\s*pcm_f64le$/mu.test(stdout) || !rows.length || rows.length > MAX_AUDIO_BLOCKS) throw new Error("The complete audio PCM timeline is unavailable or exceeds its verification bound.");
   const sampleRate = Number(rate[1]), timeBase = `${tb[1]}/${tb[2]}`, channelLayout = layout[1]!;
   if (sampleRate < 1 || sampleRate > 192_000 || Number(tb[1]) !== 1 || Number(tb[2]) !== sampleRate) throw new Error("The exact audio sample clock is unsupported; native media is retained.");
   const frameTimes = rows.map(row => Number(row[2])), frameSamples = rows.map(row => Number(row[3])), frameBytes = rows.map(row => Number(row[4])), frameHashes = rows.map(row => row[5]!);
   const totalBytes = frameBytes.reduce((n, v) => n + v, 0), totalSamples = frameSamples.reduce((n, v) => n + v, 0);
-  const channels = frameBytes[0]! / (4 * frameSamples[0]!);
+  const channels = frameBytes[0]! / (8 * frameSamples[0]!);
   if (!Number.isSafeInteger(channels) || channels < 1 || channels > 8 || totalBytes > MAX_AUDIO_PCM_BYTES
     || frameTimes.some((v, i) => !Number.isSafeInteger(v) || i > 0 && v !== frameTimes[i-1]! + frameSamples[i-1]!)
     || frameSamples.some((v, i) => !Number.isSafeInteger(v) || v < 1 || v > AUDIO_BLOCK_SAMPLES || i < rows.length-1 && v !== AUDIO_BLOCK_SAMPLES)
-    || frameBytes.some((v, i) => !Number.isSafeInteger(v) || v !== 4 * channels * frameSamples[i]!) || frameHashes.some(v => !/^[0-9a-f]{64}$/u.test(v))) throw new Error("Audio PCM coverage, channel layout or timing changed or exceeds the complete verification budget.");
-  const value = { codec: "pcm_f32le" as const, sampleRate, channelLayout, timeBase, frameTimes, frameSamples, frameBytes, frameHashes, totalBytes, totalSamples };
+    || frameBytes.some((v, i) => !Number.isSafeInteger(v) || v !== 8 * channels * frameSamples[i]!) || frameHashes.some(v => !/^[0-9a-f]{64}$/u.test(v))) throw new Error("Audio PCM coverage, channel layout or timing changed or exceeds the complete verification budget.");
+  const value = { codec: "pcm_f64le" as const, sampleRate, channelLayout, timeBase, frameTimes, frameSamples, frameBytes, frameHashes, totalBytes, totalSamples };
   return { ...value, sequenceDigest: `0x${hash(new TextEncoder().encode(canonicalJson(value)))}` };
 }
 

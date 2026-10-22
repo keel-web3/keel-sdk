@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {createRequire} from 'node:module';
-import {mkdtemp,readFile,rm} from 'node:fs/promises';
+import {mkdtemp,readFile,writeFile,rm} from 'node:fs/promises';
 import {tmpdir} from 'node:os';
 import path from 'node:path';
 import {execFileSync} from 'node:child_process';
@@ -28,3 +28,13 @@ test('audio disappearance fails even when all video samples remain exact',async(
 test('explicit edits stay selected without granting automatic fidelity or fallback-to-original authority',async()=>{const {source,candidate}=await imagePair();for(const recipe of [{...lossless,mode:'lossy'},{...lossless,rotate:90},{...lossless,noSound:true}]){const proof=await verifyActualMediaPair({sourceBytes:source,candidateBytes:candidate,recipe});assert.equal(proof.eligibility,'explicit-edit-only');assert.equal(proof.source,undefined);assert.equal(proof.adoptionAuthorized,false);}});
 test('decoder corruption, unsupported external containers and pre-aborted work fail closed',async()=>{const {source,candidate}=await imagePair();await assert.rejects(verifyActualMediaPair({sourceBytes:source,candidateBytes:candidate.subarray(0,20),recipe:lossless}));await assert.rejects(verifyActualMediaPair({sourceBytes:new TextEncoder().encode('#EXTM3U\nfile:///etc/passwd'),candidateBytes:candidate,recipe:lossless}),/self-contained/);const controller=new AbortController();controller.abort();await assert.rejects(verifyActualMediaPair({sourceBytes:source,candidateBytes:candidate,recipe:lossless,signal:controller.signal}),/abort/i);});
 test('the verifier snapshots mutable caller arrays and nested recipe before its first await',async()=>{const {source,candidate}=await imagePair();const originalDigest=digest(source),candidateDigest=digest(candidate),recipe={...lossless};const pending=verifyActualMediaPair({sourceBytes:source,candidateBytes:candidate,recipe});source.fill(0);candidate.fill(0);recipe.quality=1;const proof=await pending;assert.equal(proof.sourceIntegrity.digest,originalDigest);assert.equal(proof.candidateIntegrity.digest,candidateDigest);assert.equal(proof.recipe.quality,82);});
+test('actual float64 PCM retains precision below float32 and detects a change in the final audio sample',async()=>{
+ const dir=await mkdtemp(path.join(tmpdir(),'keel-pair-f64-'));try{
+  const pcm=Buffer.alloc(28800*8);for(let i=0;i<28800;i++)pcm.writeDoubleLE(0.25,i*8);
+  const produce=async(name,bytes)=>{await writeFile(path.join(dir,name+'.raw'),bytes);execFileSync(ffmpeg,['-hide_banner','-loglevel','error','-f','lavfi','-i','testsrc=size=32x24:rate=5','-f','f64le','-ar','48000','-ac','1','-i',path.join(dir,name+'.raw'),'-t','0.6','-c:v','libx264rgb','-crf','0','-c:a','pcm_f64le','-threads','2','-y',path.join(dir,name+'.mov')]);return new Uint8Array(await readFile(path.join(dir,name+'.mov')));};
+  const source=await produce('source',pcm),proof=await verifyActualMediaPair({sourceBytes:source,candidateBytes:source.slice(),recipe:{...lossless,format:'mov'}});
+  assert.equal(proof.source.audio.codec,'pcm_f64le');assert.equal(proof.source.audio.totalSamples,28800);assert.equal(proof.source.audio.totalBytes,28800*8);
+  pcm.writeDoubleLE(0.25+2**-40,pcm.length-8);assert.equal(Math.fround(pcm.readDoubleLE(pcm.length-8)),Math.fround(0.25),'regression delta is invisible after float32 quantization');
+  const candidate=await produce('changed-final-sample',pcm);await assert.rejects(verifyActualMediaPair({sourceBytes:source,candidateBytes:candidate,recipe:{...lossless,format:'mov'}}),/audio PCM/);
+ }finally{await rm(dir,{recursive:true,force:true});}
+});
