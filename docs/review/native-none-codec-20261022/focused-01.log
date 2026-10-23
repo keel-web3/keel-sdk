@@ -1,0 +1,73 @@
+TAP version 13
+# Subtest: unchanged generic fresh guard rejects actual rev5 gzip descriptor; exact recipe admits raw-percent only
+ok 1 - unchanged generic fresh guard rejects actual rev5 gzip descriptor; exact recipe admits raw-percent only
+  ---
+  duration_ms: 34.680125
+  type: 'test'
+  ...
+# Subtest: wrong chain/registration/frame/runtime cannot reuse native recipe
+ok 2 - wrong chain/registration/frame/runtime cannot reuse native recipe
+  ---
+  duration_ms: 1.058875
+  type: 'test'
+  ...
+# Subtest: changed compressed or decoded commitment, extra code and another codec remain rejected
+ok 3 - changed compressed or decoded commitment, extra code and another codec remain rejected
+  ---
+  duration_ms: 2.038959
+  type: 'test'
+  ...
+# Subtest: whole HTML Base64 carriage cannot reuse per-resource allowance
+ok 4 - whole HTML Base64 carriage cannot reuse per-resource allowance
+  ---
+  duration_ms: 9.183584
+  type: 'test'
+  ...
+# Subtest: proof and source snapshots reject mutations; explicitgzip eligible only when selected reader allows it
+ok 5 - proof and source snapshots reject mutations; explicitgzip eligible only when selected reader allows it
+  ---
+  duration_ms: 1.388709
+  type: 'test'
+  ...
+# Subtest: actual public rev5 nativeGzip whole-output candidate competes by returned URI, never source bytes alone
+ok 6 - actual public rev5 nativeGzip whole-output candidate competes by returned URI, never source bytes alone
+  ---
+  duration_ms: 37.285584
+  type: 'test'
+  ...
+# {"scope":"PROVISIONAL_TEMPLATE_NOT_ADOPTION_OR_FULL_SIMULATION","actualGatorrr":false,"source":[{"algorithm":"sha256","digest":"0xdd03cf819aecdb82a4a755ceebd0b1c8037f88b95124fac3ae175f7e65e21727","byteLength":1344},{"algorithm":"sha256","digest":"0x5331b957ef1f272fa51d16e8d6d844a4db5767975fb2ce987544594b2d96744f","byteLength":77}],"candidates":[{"id":"gzip","codec":"gzip","recipeDigest":"0xd78730f1e5090acda5c66bf280b89a67655d297fc9f7bd02f9fd78fc9abcffd2","measurementScope":{"kind":"provisional-template","templateDigest":"0x16065f7a79caa45206bca9251d980a9487ccbf4597d2beea421735671caddcc3"},"tokenURICommitment":{"digest":"0xb90515e61b6f6e4279e3607fee6afa6e396f55352428595dd0e78c54591db597","byteLength":119479},"derivedMetadataDigest":"0x44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a","metadataBytes":102577,"htmlBytes":85491,"imageBytes":77,"imageURIBytes":126,"imageDelivery":"inline","externalPreviewReadAuthenticated":false,"animationURIBytes":102344,"sourceBytes":1421,"compressedPayloadBytes":155,"encodedPayloadBytes":208,"completeTokenURIBytes":119479,"newStoredBytes":1467,"reusedStoredBytes":119848,"uniqueStoredBytes":121315,"uniqueObjects":4,"decoderObjectBytes":0,"bootObjectBytes":119848,"combinedBootDecoderObjectBytes":0,"generatedHtmlSuffixBytes":0,"nativeBrowserGzip":true,"javascriptCodecDecoderBytes":0,"decoderCostScope":"exact-distinct-stored-object-roles","javascriptGzipDecoderBytes":0,"sourceByteIdentity":"verified-exact"},{"id":"none","codec":"none","recipeDigest":"0x421cb56dd903261980c396d6b4c224d0537d0b9e050b57ac65bf4a611fa42d8a","measurementScope":{"kind":"provisional-template","templateDigest":"0x16065f7a79caa45206bca9251d980a9487ccbf4597d2beea421735671caddcc3"},"tokenURICommitment":{"digest":"0x8b1bd66b052cf73bbe8c0fc7f2dd11a00b2d2da07f59d7c740e1d7cc5f999789","byteLength":122025},"derivedMetadataDigest":"0x44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a","metadataBytes":104495,"htmlBytes":86781,"imageBytes":77,"imageURIBytes":126,"imageDelivery":"inline","externalPreviewReadAuthenticated":false,"animationURIBytes":104262,"sourceBytes":1421,"compressedPayloadBytes":1421,"encodedPayloadBytes":1448,"completeTokenURIBytes":122025,"newStoredBytes":4013,"reusedStoredBytes":119848,"uniqueStoredBytes":123861,"uniqueObjects":4,"decoderObjectBytes":0,"bootObjectBytes":119848,"combinedBootDecoderObjectBytes":0,"generatedHtmlSuffixBytes":0,"nativeBrowserGzip":false,"javascriptCodecDecoderBytes":null,"decoderCostScope":"exact-distinct-stored-object-roles","sourceByteIdentity":"verified-exact"}]}
+# Subtest: typed proof reaches COPY/readback audit; wrong chain and stale returned bytes reject
+ok 7 - typed proof reaches COPY/readback audit; wrong chain and stale returned bytes reject
+  ---
+  duration_ms: 40.091584
+  type: 'test'
+  ...
+# Subtest: explicitgzip is deterministic for incompressible URI81 payloads and never coerces to Brotli/None
+ok 8 - explicitgzip is deterministic for incompressible URI81 payloads and never coerces to Brotli/None
+  ---
+  duration_ms: 149.727042
+  type: 'test'
+  ...
+# (node:47875) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+# (Use `node --trace-deprecation ...` to show where the warning was created)
+# Subtest: Studio core explicitgzip stores exact deterministic gzip bytes, not its old Brotli else branch
+ok 9 - Studio core explicitgzip stores exact deterministic gzip bytes, not its old Brotli else branch
+  ---
+  duration_ms: 623.57325
+  type: 'test'
+  ...
+# Subtest: exact normal1786-byte MP4 default None survives the actual registered rev5 proof
+ok 10 - exact normal1786-byte MP4 default None survives the actual registered rev5 proof
+  ---
+  duration_ms: 4.273417
+  type: 'test'
+  ...
+1..10
+# tests 10
+# suites 0
+# pass 10
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 1114.131667
