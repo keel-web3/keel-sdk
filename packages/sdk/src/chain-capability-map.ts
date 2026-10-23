@@ -644,15 +644,6 @@ export const KEEL_CHAIN_CAPABILITIES: readonly KeelChainCapability[] = Object.fr
     userVisibleDifference: false,
   },
   {
-    id: "authority.contract-signatures",
-    area: "authority",
-    studioCall: "Let other protocols accept a governance signature",
-    status: "adapter-different",
-    evm: evm(["KeelManager"], "KeelManager is an ERC-1271 signer: isValidSignature accepts a stored approval (approveSignature: nonzero digest, at most 30 days; revokeSignature; masked by the manager pause, retired by recovery) or a fresh envelope (deadline, governance epoch, Signature[]) in which at least two-thirds of the governors signed contractSignatureDigest in ascending order. The envelope path ignores the pause. approveSignature and revokeSignature can be delegated through an execution policy."),
-    tezos: tez(["KeelSignatureAuthority", "KeelManager", "KeelAccessController"], "KeelSignatureAuthority answers is_valid_signature(digest, envelope option) with the same two paths and EVM's checks, reading the governor roster, epoch and threshold from KeelManager's governance_roster view; a bad envelope answers False and the envelope ignores both pauses. Governors sign contract_signature_payload, PACK(domain, manager, chain, digest, deadline, epoch), with their keys; each signature carries its public key and they ascend by key hash (buildKeelTezosGovernorEnvelope sorts them). signature_approval is EVM signatureApproval. approve_signature and revoke_signature accept the manager or its registered access controller, so an entrypoint capability (keelTezosSignatureApprovalCapability) delegates them to a role or automation key as EVM's policy does. Tezos has no ERC-1271, so a consuming contract calls the view by name (buildKeelTezosSignatureValidation)."),
-    userVisibleDifference: false,
-  },
-  {
     id: "authority.fee-treasury",
     area: "authority",
     studioCall: "Collect platform fees",

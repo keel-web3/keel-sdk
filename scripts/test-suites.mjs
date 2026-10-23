@@ -50,7 +50,6 @@ export const SIBLING_CONFORMANCE_TEST_FILES = Object.freeze([
   "tests/sdk-tezos-recovery.test.mjs",
   "tests/sdk-tezos-governance.test.mjs",
   "tests/sdk-tezos-entrypoint-capability.test.mjs",
-  "tests/sdk-tezos-signature-authority.test.mjs",
   "tests/mcp-arena.test.mjs",
   "tests/creator-1155-events.test.mjs",
   "tests/creator-factory-events.test.mjs",

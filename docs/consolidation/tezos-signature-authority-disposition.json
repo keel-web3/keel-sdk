@@ -1,0 +1,10 @@
+{
+  "snapshot": "2ec2e746b9ab515c0f8ce784d9e002be14b56995",
+  "integrationCommit": "0015585029a95db945b6c7acb691e4a412845437",
+  "disposition": "preserved inactive; not exported or registered in MCP/capability map",
+  "reason": "Current Tezos keel_manager_types does not define governor_signature; recovered SmartPy capability test fails before execution. Current authority implements recorded digest/automation approvals, not this proposed fresh governor envelope. Adding a security-sensitive protocol path is not a routine merge resolution.",
+  "localSDKMockChecks": "36/36 passed, which does not establish contract support",
+  "exactFailure": "contracts-tezos-signature-capabilities.log: types.governor_signature is not defined",
+  "recovery": "full source/tests and API wiring retained in main ancestry and tezos-signature-authority-wip.patch.gz",
+  "activationRequirement": "Reconcile with actual selected-chain contract capability and fresh cross-chain parity evidence before exposing the proposed API."
+}
