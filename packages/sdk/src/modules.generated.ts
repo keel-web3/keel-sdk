@@ -193,6 +193,7 @@ export const KEEL_MODULES: readonly KeelModule[] = [
       "KeelAccessGroups.sol",
       "KeelLocalPause.sol",
       "libraries/KeelPause.sol",
+      "interfaces/IKeelSystemPauseController.sol",
       "libraries/KeelTokenURIEnvelope.sol",
       "libraries/KeelMintSeeded.sol",
       "libraries/KeelMintSeededBatches.sol",
