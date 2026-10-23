@@ -94,6 +94,7 @@ export const DETERMINISTIC_TEST_FILES = Object.freeze([
   "tests/audio-clock-binding-mcp.test.mjs",
   "tests/audio-clock-binding.test.mjs",
   "tests/movie-edit-list.test.mjs",
+  "tests/movie-linux-item-metadata.test.mjs",
   "tests/movie-presentation-semantics.test.mjs",
   "tests/movie-track-binding.test.mjs",
   "tests/native-movie-inspection.test.mjs",
