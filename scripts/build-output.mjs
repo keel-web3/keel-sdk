@@ -5,7 +5,7 @@ import path from "node:path";
 // verification evidence, user assets, or dependency directories here.
 export const buildPackages = [
   "protocol", "viewer", "sdk", "builder", "ethereum-adapter", "mcp",
-  "sprite-codex", "studio-core", "sandbox-sdk",
+  "sprite-codex", "studio-core", "sandbox-sdk", "mint-queue",
 ];
 
 export async function cleanBuildOutputs(root) {

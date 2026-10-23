@@ -10,10 +10,13 @@ run("node", ["scripts/build-keel-market-wallet.mjs"]);
 
 tsc("packages/protocol/tsconfig.json");
 tsc("packages/viewer/tsconfig.json");
+run("node", ["packages/viewer/scripts/build-wrapper-viewer.mjs"]);
 tsc("packages/sdk/tsconfig.json");
 run("node", ["packages/sdk/scripts/package-proof-runtime.mjs"]);
 run("node", ["packages/sdk/scripts/package-canonical-shell.mjs"]);
 run("node", ["packages/sdk/scripts/package-layered-runtime.mjs"]);
+run("node", ["packages/sdk/scripts/package-storage-policy.mjs"]);
+run("node", ["packages/mint-queue/build.mjs"]);
 tsc("packages/builder/tsconfig.json");
 tsc("packages/ethereum-adapter/tsconfig.json");
 tsc("packages/mcp/tsconfig.json");

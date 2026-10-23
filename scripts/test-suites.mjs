@@ -283,6 +283,7 @@ export const DETERMINISTIC_TEST_FILES = Object.freeze([
   "tests/keel-browser-sha256.test.mjs",
   "tests/keel-build-recipe.test.mjs",
   "tests/build-output.test.mjs",
+  "tests/build-runtime-artifacts.test.mjs",
   "tests/keel-content-cache.test.mjs",
   "tests/keel-corpus.test.mjs",
   "tests/keel-creator-collection-cli.test.mjs",
