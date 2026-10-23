@@ -83,3 +83,8 @@ test('all unsupported members restrict their own actual methods even when anothe
  await Promise.allSettled([f.reader.request(input('eth_chainId')),f.reader.request(input('eth_getCode')),f.reader.request(input('eth_getProof'))]);
  await assert.rejects(f.reader.request(input('eth_getCode')),/rejected the required method/);await assert.rejects(f.reader.request(input('eth_getProof')),/rejected the required method/);assert.equal(f.singles.length,0);
 });
+for(const code of [401,403])test(`already observed ${code} in an incomplete result remains provider-wide terminal`,async()=>{
+ const f=fixture(),denial=Object.assign(new Error('denied'),{code});const reader=create({...f,requestBatch:async()=>[{status:'rejected',reason:denial}]},f.options);
+ const results=await Promise.allSettled([reader.request(input()),reader.request(input('eth_getCode'))]);assert.ok(results.every(item=>item.status==='rejected'&&item.reason===denial));
+ await assert.rejects(f.reader.request(input('eth_chainId')),error=>error.reason==='access-denied');assert.equal(f.singles.length,0);
+});

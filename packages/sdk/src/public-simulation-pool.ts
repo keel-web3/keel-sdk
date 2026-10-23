@@ -35,6 +35,25 @@ export interface KeelPublicSimulationPoolOptions {
 const object = (value: unknown): Record<string, unknown> | undefined => value !== null && typeof value === "object" && !Array.isArray(value) ? value as Record<string, unknown> : undefined;
 const quantity = (value: unknown): bigint | undefined => typeof value === "string" && /^0x(?:0|[1-9a-f][0-9a-f]*)$/iu.test(value) ? BigInt(value) : undefined;
 
+type ConfiguredReadRecipient = { readonly chainId: number; readonly rpcUrl: string; readonly configuredRecipient?: boolean; readonly allowLoopback?: boolean; readonly minIntervalMs?: number; readonly fetchImpl?: typeof fetch };
+function configuredReadScheduler(options: ConfiguredReadRecipient) {
+  let url: string;
+  if (options.configuredRecipient === true) {
+    let configured: URL;
+    try { configured = new URL(options.rpcUrl); } catch { throw new TypeError("Configured read admission needs its existing HTTP transport identity."); }
+    if (!["http:", "https:"].includes(configured.protocol)) throw new TypeError("Configured read admission needs its existing HTTP transport identity.");
+    configured.hash = "";
+    url = configured.pathname === "/" && !configured.search && !configured.username && !configured.password ? configured.origin : configured.href;
+  } else url = normalizeKeelRpcUrl(options.rpcUrl, options.allowLoopback);
+  return sharedKeelProviderRequestScheduler(url, { chainId: options.chainId, minIntervalMs: options.minIntervalMs ?? 250, maximumRetryDelayMs: 5_000 }, options.fetchImpl);
+}
+/** Provider-only numeric restriction, retained before a third-party HTTP client
+ * can replace the original error with its caller's cancellation. */
+export function createKeelConfiguredReadAccessDenialHandler(options: ConfiguredReadRecipient) {
+  const scheduler = configuredReadScheduler(options);
+  return (status: 401 | 403) => scheduler.observeAccessDenial(status);
+}
+
 /** Admit the caller's existing configured reader without discovering an endpoint,
  * changing recipients or adding a retry layer. The server must supply the exact
  * configured identity and disable any lower-layer retries it owns separately. */
@@ -56,19 +75,11 @@ export function createKeelScheduledReadTransport(readTransport: KeelPreflightTra
   /** Explicit existing HTTP batch support only; does not parallelize recipients. */
   readonly batch?: boolean;
 }): KeelPreflightTransport {
-  let url: string;
-  if (options.configuredRecipient === true) {
-    let configured: URL;
-    try { configured = new URL(options.rpcUrl); } catch { throw new TypeError("Configured read admission needs its existing HTTP transport identity."); }
-    if (!["http:", "https:"].includes(configured.protocol)) throw new TypeError("Configured read admission needs its existing HTTP transport identity.");
-    configured.hash = "";
-    url = configured.pathname === "/" && !configured.search && !configured.username && !configured.password ? configured.origin : configured.href;
-  } else url = normalizeKeelRpcUrl(options.rpcUrl, options.allowLoopback);
+  const scheduler = configuredReadScheduler(options);
   const timeoutMs = options.requestTimeoutMs ?? 120_000;
   if (!Number.isSafeInteger(timeoutMs) || timeoutMs < 100 || timeoutMs > 120_000) throw new TypeError("Scheduled reads need a bounded deadline of at most 120 seconds.");
   const maximumRequestBytes = options.maximumRequestBytes ?? 512 * 1024;
   if (!Number.isSafeInteger(maximumRequestBytes) || maximumRequestBytes < 1024 || maximumRequestBytes > 32 * 1024 * 1024) throw new RangeError("Configured reader admission needs an explicit bounded request size.");
-  const scheduler = sharedKeelProviderRequestScheduler(url, { chainId: options.chainId, minIntervalMs: options.minIntervalMs ?? 250, maximumRetryDelayMs: 5_000 }, options.fetchImpl);
   const methods = new Set(["eth_chainId", "eth_blockNumber", "eth_getBlockByNumber", "eth_getBlockByHash", "eth_getCode", "eth_getBalance", "eth_getTransactionCount",
     "eth_getTransactionReceipt", "eth_getTransactionByHash", "eth_call", "eth_gasPrice", "eth_maxPriorityFeePerGas", "eth_feeHistory", "eth_getLogs", "eth_getStorageAt", "eth_getProof", "net_version", "web3_clientVersion"]);
   if (options.allowEstimateGas === true) methods.add("eth_estimateGas");
@@ -86,7 +97,14 @@ export function createKeelScheduledReadTransport(readTransport: KeelPreflightTra
         ...(options.signal === undefined ? {} : { signal: options.signal }), ...(options.observe === undefined ? {} : { observe: options.observe }) }, async () => {
         outcomes = await readTransport.requestBatch!(group.map(item => item.exact));
         if (!Array.isArray(outcomes) || outcomes.length !== group.length || outcomes.some(item => !item || (item.status !== "fulfilled" && item.status !== "rejected"))) {
-          outcomes = undefined; throw new TypeError("The configured read batch returned an incomplete member result.");
+          // A known numeric denial remains terminal even inside an incomplete
+          // result array. Inspect at most the admitted member bound, never
+          // accept partial successes or infer another member's association.
+          const observed = Array.isArray(outcomes) ? outcomes.slice(0, 16).flatMap((item, index) => item?.status === "rejected"
+            ? [{ method: group[index]?.exact.method ?? group[0]!.exact.method, error: item.reason as unknown }] : []) : [];
+          outcomes = undefined;
+          if (observed.length) { const failure = new KeelProviderBatchFailure(observed); if (failure.accessDenied) throw failure; }
+          throw new TypeError("The configured read batch returned an incomplete member result.");
         }
         const failures = outcomes.flatMap((item, index) => item.status === "rejected" ? [{ method: group[index]!.exact.method, error: item.reason as unknown }] : []);
         if (failures.length) throw new KeelProviderBatchFailure(failures);

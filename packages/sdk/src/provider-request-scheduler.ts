@@ -211,6 +211,13 @@ export function createKeelProviderRequestScheduler(options: KeelProviderRequestS
     /** Invalidate availability after an explicit provider/chain configuration change.
      * Existing requests retain their own cancellation; no proof is ever cached. */
     invalidateCapabilities() { capabilities.clear(); },
+    /** A physical HTTP layer must record denial before a wrapper can replace
+     * it with cancellation. This stores only the numeric provider restriction. */
+    observeAccessDenial(status: 401 | 403) {
+      if (status !== 401 && status !== 403) throw new TypeError("Provider access restriction requires an observed 401 or 403.");
+      const failure: Failure = { retryable: false, retryAfterMs: 0, permanent: "access-denied", httpStatus: status };
+      cacheCapability("*", { status: "access-denied", expiresAt: Date.now() + capabilityAge, failure });
+    },
     async run<T>(input: KeelProviderScheduledRequest, execute: (signal: AbortSignal, context: { readonly requestId: number; readonly attempt: number }) => Promise<T>): Promise<T> {
       if (typeof input.method !== "string" || !/^[a-z][a-z0-9_]{0,127}$/iu.test(input.method)) throw new TypeError("Provider scheduling needs a bounded RPC method name.");
       const methods = [...new Set(input.methods ?? [input.method])];
