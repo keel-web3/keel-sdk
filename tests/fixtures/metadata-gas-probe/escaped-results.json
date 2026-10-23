@@ -1,0 +1,79 @@
+{
+  "graphBytes": 628198,
+  "sourceCommit": "ace3fed7aff1765c7d2ee9bba4d0232246f86ffb",
+  "compiler": "0.8.36+commit.8a079791.Emscripten.clang",
+  "compilerSettings": {
+    "optimizer": {
+      "enabled": true,
+      "runs": 50
+    },
+    "viaIR": true,
+    "evmVersion": "prague",
+    "metadata": {
+      "bytecodeHash": "none",
+      "appendCBOR": false
+    },
+    "outputSelection": {
+      "*": {
+        "*": [
+          "abi",
+          "evm.deployedBytecode.object",
+          "evm.deployedBytecode.immutableReferences"
+        ]
+      }
+    }
+  },
+  "results": [
+    {
+      "method": "preparedTokenURI",
+      "gasLimit": "200000000",
+      "executionGas": "61402782",
+      "intrinsicGas": 1504768,
+      "totalGas": "62907550",
+      "calldataBytes": 92836,
+      "prefixBytes": 92542,
+      "suffixBytes": 84,
+      "error": null,
+      "exactOutputMatch": true,
+      "returnBytes": 720928,
+      "returnSha256": "3784a4942e0ae43c594a8335b05c5b5c758b2efa5901b49d87472c0242947c30",
+      "ms": 4553,
+      "previewDecodedBytes": 18506,
+      "pattern": "escaped"
+    },
+    {
+      "method": "preEncodedTokenURI",
+      "gasLimit": "200000000",
+      "executionGas": "12266616",
+      "intrinsicGas": 912872,
+      "totalGas": "13179488",
+      "calldataBytes": 55844,
+      "prefixBytes": 55572,
+      "suffixBytes": 62,
+      "error": null,
+      "exactOutputMatch": true,
+      "returnBytes": 720928,
+      "returnSha256": "3784a4942e0ae43c594a8335b05c5b5c758b2efa5901b49d87472c0242947c30",
+      "ms": 897,
+      "previewDecodedBytes": 18506,
+      "pattern": "escaped"
+    },
+    {
+      "method": "preparedTokenURI",
+      "gasLimit": "60000000",
+      "executionGas": "58495232",
+      "intrinsicGas": 1504768,
+      "totalGas": "60000000",
+      "calldataBytes": 92836,
+      "prefixBytes": 92542,
+      "suffixBytes": 84,
+      "error": "out of gas",
+      "exactOutputMatch": false,
+      "returnBytes": 0,
+      "returnSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "ms": 4320,
+      "previewDecodedBytes": 18506,
+      "pattern": "escaped-cap"
+    }
+  ]
+}

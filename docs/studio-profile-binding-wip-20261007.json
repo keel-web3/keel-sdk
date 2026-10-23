@@ -1,0 +1,195 @@
+{
+  "schema": "keel-profile-binding-wip@1",
+  "status": "unfinished source checkpoint before focused tests",
+  "parents": {
+    "site": "3e6ae38fa63ae9cd1716083f993b65dda0928b75",
+    "sdk": "9042380adedd03950bee4d6ea48944d5fa48e84b"
+  },
+  "changes": [
+    "Private copied profile persisted with artifact and included in retry identity",
+    "Guided release initialization reads creator-bound copied defaults",
+    "Creation recipe retains account-scoped advanced choices and component settings",
+    "Single question validation reuses protocol rules"
+  ],
+  "validation": "SDK build passed; site strict typecheck running; new regressions and review pending",
+  "files": [
+    {
+      "repository": "keel-web3/keel-site",
+      "path": "apps/studio/src/server/services/studio-project-defaults-service.ts",
+      "bytes": 3575,
+      "sha256": "0ed26af79c56abc8f49f1e085482c4d156c81cca2a533b9b6e1b126f43d5c4c2",
+      "gitSha": "4b0b53d2b92d17a680300cf06b0024ae87232b38"
+    },
+    {
+      "repository": "keel-web3/keel-site",
+      "path": "apps/studio/src/lib/studio-defaults-client.ts",
+      "bytes": 5443,
+      "sha256": "3df99c8e5a4bd98ebea2b32678ef3479ee0abe8e9afb069e59ab38f372aafa28",
+      "gitSha": "6fd0529329b59308f795757c5f1f00d6c079f7cb"
+    },
+    {
+      "repository": "keel-web3/keel-site",
+      "path": "apps/studio/src/server/services/studio-project-profiles-service.ts",
+      "bytes": 3009,
+      "sha256": "d499e1d7f984620906b3bc5f53784d6bc4e56d5338097f006b288bd49c6c4fca",
+      "gitSha": "cca6c5f3337d396769916b6ef583fd60f5aedf25"
+    },
+    {
+      "repository": "keel-web3/keel-site",
+      "path": "apps/studio/src/server/http/studio-project-profiles-handler.ts",
+      "bytes": 3277,
+      "sha256": "2947130491185703a2509fd3fec5dce5d15c6b76fdece781a22e2173014b1ce1",
+      "gitSha": "f43d98f63e17ba857c60ab3aaf68be9bfdfbfb31"
+    },
+    {
+      "repository": "keel-web3/keel-site",
+      "path": "apps/studio/src/app/api/account/project-profiles/route.ts",
+      "bytes": 301,
+      "sha256": "82a6d20f7e6b8f0144941c2e84bf6649b3f2fc945bbe82a2045d01e7a8e37374",
+      "gitSha": "34cbaac6f65540d54c6471cec817f2463dcc9163"
+    },
+    {
+      "repository": "keel-web3/keel-site",
+      "path": "apps/studio/src/app/api/agent/project-profiles/route.ts",
+      "bytes": 300,
+      "sha256": "fc99d8d927c40e23851d928f9e3b0f0dca784a5c504a2d3231c2628ae9d2bab1",
+      "gitSha": "1de92f0f3e86d2277f2611a352f290dc9982ad74"
+    },
+    {
+      "repository": "keel-web3/keel-site",
+      "path": "apps/studio/src/components/create/project-profile-chooser.tsx",
+      "bytes": 14437,
+      "sha256": "53a54d477c88b063203e04d1898d3c037c07fe7f3577e4f0cd258af120f2fdd3",
+      "gitSha": "311ef9be62546a96da92029bfe69ea7f747cc500"
+    },
+    {
+      "repository": "keel-web3/keel-site",
+      "path": "apps/studio/src/components/create/focused-project-wizard.tsx",
+      "bytes": 2954,
+      "sha256": "c7271b1e7fa2c4b6c7c59a324a8d97a265ea88dd035b2bc68e3f4dcc0e8beb80",
+      "gitSha": "178e477126989a918013859a7fcfa992f47d1fcf"
+    },
+    {
+      "repository": "keel-web3/keel-site",
+      "path": "apps/studio/src/stores/upload-store.ts",
+      "bytes": 19825,
+      "sha256": "dcb44abce39003f96b84189a87c8e650ea80b9fd3a7d561e9b74b176ffd7e219",
+      "gitSha": "0ba8529982e3a8dbff011a78d5e5e408dfb55ad2"
+    },
+    {
+      "repository": "keel-web3/keel-site",
+      "path": "apps/studio/src/components/create/upload-wizard.tsx",
+      "bytes": 53375,
+      "sha256": "dabfb722861f577556dabdced639460902761ba36c3aa25f696412a23326ff16",
+      "gitSha": "db23a6947f2602021134ebb7c1880e26f4762ee1"
+    },
+    {
+      "repository": "keel-web3/keel-sdk",
+      "path": "packages/sdk/src/studio-project-profiles.ts",
+      "bytes": 12722,
+      "sha256": "398a26ca970ecf21573c647752a500957b409eee6537189d97c514c7e2ca0208",
+      "gitSha": "ab2071e13ddd3b125a3e9106b63cf97624ad3e9a"
+    },
+    {
+      "repository": "keel-web3/keel-sdk",
+      "path": "packages/sdk/src/studio-project-defaults.ts",
+      "bytes": 11332,
+      "sha256": "462d0dbb9ebc80820ef7cbd0734017f4295b0541e7362f607a1fc23b3601d30c",
+      "gitSha": "444bc3b3e5781276d272a5bdcfe519247d738a3c"
+    },
+    {
+      "repository": "keel-web3/keel-sdk",
+      "path": "packages/sdk/package.json",
+      "bytes": 11673,
+      "sha256": "ab5839f3122f1f9ff6cc08bc646433f46873c79a933c9edc55f5a31b26467702",
+      "gitSha": "d32987752538175421972561ce71cec024dc98c3"
+    },
+    {
+      "repository": "keel-web3/keel-site",
+      "path": "apps/studio/src/lib/upload-recipe.ts",
+      "bytes": 10523,
+      "sha256": "6207bb78b822fa4859a0d1d002c9ea9a8e729635659969d8c30fb172c69a3216",
+      "gitSha": "deba05c4debc2b8c80f9a5f3675da4d0b2090ec3"
+    },
+    {
+      "repository": "keel-web3/keel-sdk",
+      "path": "packages/protocol/src/creation-module.ts",
+      "bytes": 18055,
+      "sha256": "67b437265581e132cd76c324c872210d1fdd8c061d7f7312e37bc85042fa2df5",
+      "gitSha": "3360b59b0f816ff22230cc1a8df65f60275338cc"
+    },
+    {
+      "repository": "keel-web3/keel-site",
+      "path": "apps/studio/src/lib/artifact-form-data.ts",
+      "bytes": 4901,
+      "sha256": "d9ffbd1dc51ea25630e9b45b342d648b41b62320d369166dc28ba90e3214522e",
+      "gitSha": "c2cb5dc48c2b9ecbf384e7167f8ab39fba12d578"
+    },
+    {
+      "repository": "keel-web3/keel-site",
+      "path": "apps/studio/src/server/services/artifact-types.ts",
+      "bytes": 8458,
+      "sha256": "e7d23b1166c0becb94b451ed257a67d8464ca9d18a2847822b483162a8a06bde",
+      "gitSha": "a5d9fc01259d68b6a2d66cfdd407f176c0a1adab"
+    },
+    {
+      "repository": "keel-web3/keel-site",
+      "path": "apps/studio/src/server/services/artifact-form.ts",
+      "bytes": 14654,
+      "sha256": "20cfd10a3d4be4e70c974cc729a2134c8dbae54f05a8dbda420a7b8738eb2193",
+      "gitSha": "dcab07132e2763a1b7dba05d079eca14b00d00da"
+    },
+    {
+      "repository": "keel-web3/keel-site",
+      "path": "apps/studio/src/app/api/artifacts/route.ts",
+      "bytes": 5996,
+      "sha256": "7e671d52ae38b8270af9ce26ded452029410605fb812ad9360cdd82ff5d10970",
+      "gitSha": "efbf0ede7a2e56a362de5a1a3b4b2e35c80df935"
+    },
+    {
+      "repository": "keel-web3/keel-site",
+      "path": "apps/studio/src/server/db/schema.ts",
+      "bytes": 113932,
+      "sha256": "b2f7f59790edce07e72f7421814feac76f40e867fb288a2807c4a684fe73e365",
+      "gitSha": "0d6ab7f845bffc15ce4e88736480b2267147e32f"
+    },
+    {
+      "repository": "keel-web3/keel-site",
+      "path": "apps/studio/drizzle/0049_artifact_project_profiles.sql",
+      "bytes": 378,
+      "sha256": "babb598e3058d27ee0e91429b5f6b5456c50c6c3905ca67fb3230bda043723c2",
+      "gitSha": "b451ba5d1d627e948e9a8b8dae6fe701e1c079de"
+    },
+    {
+      "repository": "keel-web3/keel-site",
+      "path": "apps/studio/drizzle/meta/_journal.json",
+      "bytes": 7650,
+      "sha256": "de5a1828821f3248b35afe03edefdaa2499e1fb67c688cc45e0340ea7e41a8ab",
+      "gitSha": "a1c2ce058f384e8556fee97ced64e5455c36ea3c"
+    },
+    {
+      "repository": "keel-web3/keel-site",
+      "path": "apps/studio/src/server/services/artifact-service.ts",
+      "bytes": 32992,
+      "sha256": "698378b3f30ce65c53a68cbe2c358f81fe2648d0a13dc0b23037d8d70e6f072b",
+      "gitSha": "ca3af20241f7b4d56e79b4a6bed6830242a4ecb9"
+    },
+    {
+      "repository": "keel-web3/keel-site",
+      "path": "apps/studio/src/server/services/release-service.ts",
+      "bytes": 212082,
+      "sha256": "e992eb16e59e3043959530e1b8d8be0277a951ce93eb9296f3e32f1841cc8268",
+      "gitSha": "e3d25af8c2ec5eb7ddba1fc313bec94b20915b81"
+    },
+    {
+      "repository": "keel-web3/keel-site",
+      "path": "apps/studio/src/lib/release-types.ts",
+      "bytes": 9423,
+      "sha256": "253c39e2efb744e80885c7a3b3c3f9318a2ddfbfc918b4d39db754508125e2f7",
+      "gitSha": "c380e0b8d8804b73687206bcb63ec43981b76119"
+    }
+  ],
+  "migration": "0049_artifact_project_profiles.sql, source only; not applied",
+  "merged": false,
+  "deployed": false
+}
