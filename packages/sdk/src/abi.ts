@@ -451,11 +451,13 @@ export const keelIndexAbi = [
 ] as const;
 
 export const keelMintGateAbi = [
+  "function EXACT_MINT_AUTHORIZATION_TYPEHASH() view returns (bytes32)",
   "function requireSystemsActive(uint192 mask) view",
   "function creatorProfileRegistry() view returns (address)",
   "function mintRouteRegistry() view returns (address)",
   "function createCampaign((address target,address adapter,address payout,address paymentToken,address creatorSigner,uint64 startTime,uint64 endTime,uint64 maxSupply,uint64 maxPerWallet,uint128 unitPrice,bytes32 merkleRoot,address gateToken,uint256 gateTokenId,uint256 gateMinBalance,uint8 gateTokenStandard,address customGate,bytes customGateData,uint8 gateLogic,uint8 signatureMode,uint8 accessFlags,bytes32 metadataHash) config) returns (bytes32 campaignId)",
   "function mint(bytes32 campaignId,uint64 quantity,(uint256 allowance,bytes32[] merkleProof,(bytes32 campaignId,address account,address signer,uint256 maxQuantity,uint256 unitPrice,uint256 nonce,uint256 deadline,bytes32 contextHash) authorization,bytes signature,bytes customData,bytes mintData) proof) payable",
+  "function mintExact(bytes32 campaignId,uint64 quantity,(uint256 allowance,bytes32[] merkleProof,(bytes32 campaignId,address account,address signer,uint256 maxQuantity,uint256 unitPrice,uint256 nonce,uint256 deadline,bytes32 contextHash) authorization,bytes signature,bytes customData,bytes mintData) proof) payable",
   "function setCampaignPaused(bytes32 campaignId,bool paused)",
   "function invalidateAuthorizationNonce(bytes32 campaignId)",
   "function withdraw(address asset,address recipient)",
@@ -472,8 +474,10 @@ export const keelMintGateAbi = [
   "function pendingBalance(address asset,address recipient) view returns (uint256)",
   "function getCampaign(bytes32 campaignId) view returns ((address creator,address target,address adapter,address payout,address paymentToken,address creatorSigner,address platformSigner,address platformFeeRecipient,uint64 startTime,uint64 endTime,uint64 maxSupply,uint64 maxPerWallet,uint64 minted,uint128 unitPrice,uint16 platformFeeBps,bytes32 merkleRoot,address gateToken,uint256 gateTokenId,uint256 gateMinBalance,uint8 gateTokenStandard,address customGate,bytes customGateData,uint8 gateLogic,uint8 signatureMode,uint8 accessFlags,bool paused,bool exists,uint256 mintRouteId,bytes32 metadataHash))",
   "function authorizationDigest((bytes32 campaignId,address account,address signer,uint256 maxQuantity,uint256 unitPrice,uint256 nonce,uint256 deadline,bytes32 contextHash) authorization) view returns (bytes32)",
+  "function exactAuthorizationDigest((bytes32 campaignId,address account,address signer,uint256 maxQuantity,uint256 unitPrice,uint256 nonce,uint256 deadline,bytes32 contextHash) authorization) view returns (bytes32)",
   "event CampaignCreated(uint8 accessFlags,uint8 signatureMode,uint64 maxSupply,uint64 maxPerWallet,bytes32 indexed campaignId,bytes32 metadataHash,address indexed target,address indexed creator,address adapter,uint128 unitPrice)",
   "event Minted(bool platformSigned,bytes32 indexed campaignId,address signer,address indexed account,uint256 paid,uint256 quantity)",
+  "event ExactAuthorizationConsumed(uint64 quantity,bytes32 indexed campaignId,bytes32 indexed authorizationDigest,address indexed account,uint256 nonce)",
   "event CampaignCapacityReserved(bytes32 indexed campaignId,address indexed target,uint256 quantity,uint256 targetRemaining,uint256 campaignRemaining)",
   "event CampaignCapacityConsumed(bytes32 indexed campaignId,address indexed target,uint256 quantity,uint256 targetRemaining,uint256 campaignRemaining)",
   "event CampaignCapacityReleased(bytes32 indexed campaignId,address indexed target,uint256 quantity,uint256 targetRemaining,uint256 campaignRemaining)",
