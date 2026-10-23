@@ -3,6 +3,7 @@ import { gunzipSync } from "node:zlib";
 import { canonicalJson } from "@keel/protocol";
 import { assertKeelInlineImageBytes } from "./collector-policy.js";
 import { validateKeelPreparedContext } from "./prepared-context.js";
+import { assertRegisteredNativeNoneBinary, assertRegisteredNativeNoneModelGraph, type RegisteredNativeDecodedResource } from "./registered-native-none.js";
 
 type Hash = `0x${string}`;
 type Commitment = { readonly algorithm: "sha256"; readonly digest: Hash; readonly byteLength: number };
@@ -90,6 +91,7 @@ function inspectDocument(bytes: Uint8Array, binding: KeelRegisteredNativeGzipBin
   const items: unknown = JSON.parse("[null" + body + "]");
   if (!Array.isArray(items) || items.length < 2 || items.length > 129) throw new RangeError("Native Gzip resource count exceeds its existing bounded reader.");
   let total = 0; const ids = new Set<string>(), members = [];
+  const decodedResources: RegisteredNativeDecodedResource[] = [], modelNoneIds: string[] = [];
   for (const item of items.slice(1)) {
     plain(item); commitment(item.integrity); plain(item.embedded);
     if (Object.keys(item).some(key => !["id", "role", "mediaType", "aliases", "integrity", "embedded", "backgroundColor"].includes(key))
@@ -101,14 +103,18 @@ function inspectDocument(bytes: Uint8Array, binding: KeelRegisteredNativeGzipBin
       const fields = Object.keys(embedded).sort().join();
       let source: Uint8Array;
       if (fields === "compression,storedIntegrity,storedText" && typeof embedded.storedText === "string") source = enc.encode(embedded.storedText);
-      else if (fields === "compression,storedBase64,storedIntegrity" && typeof embedded.storedBase64 === "string"
-        && ["image/png", "image/jpeg", "image/gif", "image/webp", "image/avif"].includes(item.mediaType)) {
+      else if (fields === "compression,storedBase64,storedIntegrity" && typeof embedded.storedBase64 === "string") {
         source = Buffer.from(embedded.storedBase64, "base64");
-        if (Buffer.from(source).toString("base64") !== embedded.storedBase64) throw new TypeError("Invalid exact image carriage.");
-        assertKeelInlineImageBytes(source, item.mediaType);
+        if (Buffer.from(source).toString("base64") !== embedded.storedBase64) throw new TypeError("Invalid exact native media carriage.");
+        if (["image/png", "image/jpeg", "image/gif", "image/webp", "image/avif"].includes(item.mediaType)) assertKeelInlineImageBytes(source, item.mediaType);
+        else if (assertRegisteredNativeNoneBinary({id: item.id, role: item.role, mediaType: item.mediaType, source}) === "model") modelNoneIds.push(item.id);
       } else throw new TypeError("Native Gzip cannot admit another encoded None body.");
       commitment(embedded.storedIntegrity);
       if (canonicalJson(integrity(source)) !== canonicalJson(item.integrity) || canonicalJson(item.integrity) !== canonicalJson(embedded.storedIntegrity)) throw new TypeError("Native Gzip sibling source integrity mismatch.");
+      decodedResources.push({id: item.id, role: item.role, mediaType: item.mediaType, aliases: item.aliases, source});
+      // The None JSON model also needs its closure checked when a required
+      // binary buffer is absent, rather than relying on the buffer to opt in.
+      if (item.mediaType === "model/gltf+json") modelNoneIds.push(item.id);
       continue;
     }
     if (Object.keys(embedded).sort().join() !== "compression,storedBase64,storedIntegrity" || embedded.compression !== "gzip"
@@ -119,8 +125,10 @@ function inspectDocument(bytes: Uint8Array, binding: KeelRegisteredNativeGzipBin
     if (stored.toString("base64") !== embedded.storedBase64 || stored.length !== embedded.storedIntegrity.byteLength || sha(stored) !== embedded.storedIntegrity.digest) throw new TypeError("Native Gzip stored source integrity mismatch.");
     const decoded = gunzipSync(stored, { maxOutputLength: item.integrity.byteLength });
     if (decoded.length !== item.integrity.byteLength || sha(decoded) !== item.integrity.digest) throw new TypeError("Native Gzip decoded source integrity mismatch.");
+    decodedResources.push({id: item.id, role: item.role, mediaType: item.mediaType, aliases: item.aliases, source: decoded});
     members.push({ id: item.id, mediaType: item.mediaType, integrity: { ...item.integrity }, storedIntegrity: { ...embedded.storedIntegrity } });
   }
+  assertRegisteredNativeNoneModelGraph(decodedResources, modelNoneIds);
   if (!members.length) throw new TypeError("No exact native Gzip member was prepared.");
   void binding;
   return members;
