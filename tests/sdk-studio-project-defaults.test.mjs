@@ -211,4 +211,76 @@ test('retired account, media, project and build choices reject without exposing 
     assert.throws(() => resolveKeelBuildDefaults(profile, layers));
     assert.throws(() => assertKeelRetainedBuildDefaultsCurrent(profile, { retained: saved, ...layers, build: { transportProfile: 'uri81-block-v1' } }), /Invalid retained build policy value/);
   }
+test('collection type filters apply by exact axes and specificity after media, before explicit build and contract caps', async () => {
+ const { KEEL_BUILD_DEFAULT_FIELDS, resolveKeelBuildDefaults } = await import('../packages/sdk/dist/studio-project-defaults.js');
+ const buildMatrix = { schema:'keel-studio-plan-matrix@1',capabilityRevision:'filters',fields:KEEL_BUILD_DEFAULT_FIELDS };
+ let profile=createKeelStudioDefaultProfile();
+ const set=(scope,values)=>{profile=updateKeelStudioDefaultProfile(profile,buildMatrix,{expectedRevision:profile.revision,scope,values});};
+ set({kind:'global'},{brotliQuality:4});set({kind:'media',mediaType:'image/png'},{brotliQuality:5});
+ set({kind:'collection',filter:{tokenStructure:'edition'}},{brotliQuality:6,maxReadGas:9000});
+ set({kind:'collection',filter:{tokenStructure:'edition',tokenStandard:'erc721',mediaType:'image/png'}},{brotliQuality:8});
+ const input={mediaType:'image/png',collection:{tokenStandard:'erc721',tokenStructure:'edition',saleMethod:'fixed-price'}};
+ assert.equal(resolveKeelBuildDefaults(profile,input).values.brotliQuality,8);
+ assert.equal(resolveKeelBuildDefaults(profile,input).sources.brotliQuality,'collection');
+ assert.equal(resolveKeelBuildDefaults(profile,{...input,collection:{tokenStructure:'one-of-one'}}).values.brotliQuality,5);
+ assert.equal(resolveKeelBuildDefaults(profile,{...input,mediaType:'image/jpeg'}).values.brotliQuality,6);
+ assert.equal(resolveKeelBuildDefaults(profile,{...input,project:{brotliQuality:9},build:{brotliQuality:10},constraints:{maxReadGas:8000}}).values.brotliQuality,10);
+ assert.equal(resolveKeelBuildDefaults(profile,{...input,constraints:{maxReadGas:8000}}).values.maxReadGas,8000);
+ const pinned=pinKeelStudioDefaults(profile,buildMatrix,'image/png',input.collection);set({kind:'collection',filter:{tokenStructure:'edition'}},{brotliQuality:7});
+ assert.equal(pinned.byMedia['image/png'].brotliQuality,8);
+});
+test('collection filters reject equal-specificity ambiguity, invalid axes and signing values; removing empties reclaims capacity', async()=>{
+ const {validateKeelStudioDefaultsCommand}=await import('../packages/sdk/dist/studio-project-defaults.js');
+ let profile=change(createKeelStudioDefaultProfile(),{kind:'collection',filter:{tokenStructure:'edition'}},{delivery:'inline'});
+ assert.throws(()=>change(profile,{kind:'collection',filter:{tokenStandard:'erc721'}},{delivery:'hybrid'}),/overlap/);
+ for(const filter of [{},{mediaType:'image/png'},{address:'0x123'},{tokenStructure:'other'},{tokenStandard:'none',tokenStructure:'edition'}]) assert.throws(()=>change(profile,{kind:'collection',filter},{delivery:'inline'}));
+ assert.throws(()=>change(profile,{kind:'collection',filter:{tokenStructure:'edition'}},{privateKey:'secret'}),/project-specific/);
+ const command={commandId:'11111111-1111-4111-8111-111111111111',expectedRevision:profile.revision,scope:{kind:'collection',filter:{tokenStructure:'edition',mediaType:'image/png'}},values:{delivery:'inline'}};
+ assert.deepEqual(validateKeelStudioDefaultsCommand(command),command);
+ profile=change(profile,{kind:'collection',filter:{tokenStructure:'edition'}},{delivery:null});assert.deepEqual(profile.collectionFilters,[]);
+ assert.equal(parseKeelStudioDefaultProfile(createKeelStudioDefaultProfile()).collectionFilters,undefined);
+});
+test('named selection carries a copied collection filter snapshot and applies it only to matching new plans', async()=>{
+ const {parseKeelSelectedProjectProfile,pinKeelSelectedProjectDefaults}=await import('../packages/sdk/dist/studio-project-defaults.js');
+ const {KEEL_PROJECT_STARTER_PROFILES,snapshotKeelProjectProfile}=await import('../packages/sdk/dist/studio-project-profiles.js');
+ const profile=change(createKeelStudioDefaultProfile(),{kind:'collection',filter:{tokenStructure:'edition',mediaType:'image/png'}},{delivery:'hybrid'});
+ const selection=parseKeelSelectedProjectProfile({snapshot:snapshotKeelProjectProfile(KEEL_PROJECT_STARTER_PROFILES[1]),defaults:{revision:'copy:1',global:profile.global,byMedia:profile.byMedia,collectionFilters:profile.collectionFilters}});
+ const pinned=pinKeelSelectedProjectDefaults(selection,matrix,'image/png');assert.equal(pinned.byMedia['image/png'].delivery,'hybrid');assert.equal(pinned.revision,'copy:1');
+ const jpeg=pinKeelSelectedProjectDefaults(selection,matrix,'image/jpeg');assert.equal(jpeg.byMedia['image/jpeg'],undefined);
+});
+
+test('collection filters expose only consumed build defaults and keep explicit supported overrides', async()=>{
+ const {KEEL_BUILD_DEFAULT_FIELDS,resolveKeelBuildDefaults}=await import('../packages/sdk/dist/studio-project-defaults.js');
+ const fields={schema:'keel-studio-plan-matrix@1',capabilityRevision:'supported',fields:KEEL_BUILD_DEFAULT_FIELDS};
+ assert.ok(!KEEL_BUILD_DEFAULT_FIELDS.some(field=>['imageDelivery','animationDelivery'].includes(field.id)));
+ const profile=updateKeelStudioDefaultProfile(createKeelStudioDefaultProfile(),fields,{expectedRevision:0,scope:{kind:'collection',filter:{tokenStructure:'edition',mediaType:'image/png'}},values:{compression:'brotli'}});
+ const input={mediaType:'image/png',collection:{tokenStructure:'edition'}};
+ assert.equal(resolveKeelBuildDefaults(profile,input).values.compression,'brotli');
+ assert.equal(resolveKeelBuildDefaults(profile,{...input,build:{compression:'none'}}).values.compression,'none');
+ for(const key of ['imageDelivery','animationDelivery']) assert.throws(()=>updateKeelStudioDefaultProfile(profile,fields,{expectedRevision:1,scope:{kind:'global'},values:{[key]:'ipfs'}}),/project-specific/);
+ assert.throws(()=>change(createKeelStudioDefaultProfile(),{kind:'collection',filter:{tokenStructure:'edition'}},{releaseType:'one-of-one'}),/cannot change/);
+});
+test('portable defaults-edit and fresh authenticated resolution preserve collection filter scope',async()=>{
+ const {createKeelStudioAgentDraftClient,executeKeelStudioAgentDraftOperation}=await import('../packages/sdk/dist/studio-agent-drafts.js');
+ const {KEEL_BUILD_DEFAULT_FIELDS}=await import('../packages/sdk/dist/studio-project-defaults.js');
+ const command={commandId:'11111111-1111-4111-8111-111111111111',expectedRevision:0,scope:{kind:'collection',filter:{tokenStructure:'edition',mediaType:'image/png'}},values:{compression:'brotli'}};
+ let profile=createKeelStudioDefaultProfile();const requests=[];
+ const options={grantToken:'x'.repeat(48),studioUrl:'https://studio.example',fetchImplementation:async(url,init)=>{requests.push({url:String(url),...init});if(init.method==='PATCH'){const edit=JSON.parse(init.body);profile=updateKeelStudioDefaultProfile(profile,{schema:'keel-studio-plan-matrix@1',capabilityRevision:'x',fields:KEEL_BUILD_DEFAULT_FIELDS},edit);}return Response.json({schema:'keel-studio-defaults-view@1',profile,signing:'not-performed'});}};
+ await executeKeelStudioAgentDraftOperation({...options,operation:'defaults-edit',defaultsCommand:command});
+ const current=await createKeelStudioAgentDraftClient(options).effectiveBuildDefaults({mediaType:'image/png',collection:{tokenStructure:'edition'}});
+ assert.equal(current.values.compression,'brotli');assert.deepEqual(JSON.parse(requests[0].body),command);assert.equal(requests[1].cache,'no-store');
+});
+test('unknown private fields survive edits while effective unsupported slot intent blocks instead of changing carriers',async()=>{
+ const {KEEL_BUILD_DEFAULT_FIELDS,resolveKeelBuildDefaults,assertKeelBuildDefaultsCurrent}=await import('../packages/sdk/dist/studio-project-defaults.js');
+ const stored={...createKeelStudioDefaultProfile(),global:{futureSetting:'preserve-me',imageDelivery:'ipfs'},byMedia:{'image/png':{animationDelivery:'hosted'}}};
+ const before=structuredClone(stored),parsed=parseKeelStudioDefaultProfile(stored);
+ const fields={schema:'keel-studio-plan-matrix@1',capabilityRevision:'current',fields:KEEL_BUILD_DEFAULT_FIELDS};
+ const edited=updateKeelStudioDefaultProfile(parsed,fields,{expectedRevision:0,scope:{kind:'global'},values:{brotliQuality:7}});
+ assert.equal(edited.global.futureSetting,'preserve-me');assert.equal(edited.global.imageDelivery,'ipfs');assert.equal(edited.byMedia['image/png'].animationDelivery,'hosted');assert.deepEqual(stored,before);
+ assert.throws(()=>resolveKeelBuildDefaults(edited,{mediaType:'image/png'}),/requires a supported compiler/);
+ assert.throws(()=>resolveKeelBuildDefaults(edited,{mediaType:'image/png',build:{imageDelivery:'onchain'}}),/requires a supported compiler/);
+ const explicit=resolveKeelBuildDefaults(edited,{mediaType:'image/png',build:{imageDelivery:'onchain',animationDelivery:'onchain'}});
+ assert.equal(explicit.values.imageDelivery,undefined);assert.equal(explicit.values.animationDelivery,undefined);assert.equal(explicit.values.brotliQuality,7);
+ const current=resolveKeelBuildDefaults(createKeelStudioDefaultProfile());assert.doesNotThrow(()=>assertKeelBuildDefaultsCurrent(current,current));
+ assert.throws(()=>assertKeelBuildDefaultsCurrent(current,{...current,values:{...current.values,compression:'brotli'}}),/build-defaults-stale/);
 });
