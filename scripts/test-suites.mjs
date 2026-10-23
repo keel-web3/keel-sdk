@@ -61,6 +61,7 @@ export const SIBLING_CONFORMANCE_TEST_FILES = Object.freeze([
   "tests/seed-registry-wire.test.mjs",
   "tests/shared-1155-events.test.mjs",
   "tests/studio-structure-check.test.mjs",
+  "tests/field-permissions-vectors.test.mjs",
 ]);
 
 /** Compiled local EVM proofs require an already cached Docker Geth image and
@@ -132,6 +133,7 @@ export const DETERMINISTIC_TEST_FILES = Object.freeze([
   "tests/proof-state-reader-cache.test.mjs",
   "tests/sdk-owned-simulation-transport.test.mjs",
   "tests/sdk-public-simulation-qualification.test.mjs",
+  "tests/field-permissions.test.mjs",
   "tests/signed-anchor.test.mjs",
   "tests/sdk-saved-release-differential.test.mjs",
   "tests/native-geth-capacity-fixture.test.mjs",

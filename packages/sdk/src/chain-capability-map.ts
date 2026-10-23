@@ -467,6 +467,16 @@ export const KEEL_CHAIN_CAPABILITIES: readonly KeelChainCapability[] = Object.fr
     userVisibleDifference: false,
   },
   {
+    id: "presentation.editable-fields",
+    area: "presentation",
+    studioCall: "Let holders, games or allowlisted editors change token fields",
+    status: "partial",
+    evm: evm(["KeelFieldRegistry", "KeelFieldReader", "KeelFieldBinding"], "Shared registry: KF v1 schema, AND/OR gates (creator, account, account set, merkle, EIP-712/ERC-1271 grant, token owner, cross-collection owner via ownerOf/balanceOf), staticcall validators capped at 100k gas; a bound KEEL721 renders fields into tokenURI and the context."),
+    tezos: tez(["KeelFieldRegistry", "KeelFieldReader", "KeelFieldValidatorRegistry"], "Same schema bytes, gates and refusals; owner gates use the FA2 get_balance view, grants are PACKed and checked with check_signature, validators are onchain views; listed fields are patched into token_info attributes in the same operation."),
+    userVisibleDifference: "A Tezos signed grant names the issuer's public key (no contract issuers); on EVM it names an address and may be an ERC-1271 wallet.",
+    open: "Michelson views have no per-call gas cap, so a looping custom validator exhausts the editor's Tezos operation instead of returning a capped refusal; KEEL-approved validators are the mitigation.",
+  },
+  {
     id: "presentation.web3-url",
     area: "presentation",
     studioCall: "Serve a web3:// URL",
