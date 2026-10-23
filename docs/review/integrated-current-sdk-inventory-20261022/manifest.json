@@ -1,0 +1,22 @@
+[
+  {
+    "path": "README.md",
+    "bytes": 1108,
+    "sha256": "d6277cb3662e4836c671c98b35705b4e91f2293e990a70bbc6c08256bc825557"
+  },
+  {
+    "path": "full-suite.log",
+    "bytes": 763007,
+    "sha256": "3306af7058c311cba22713479dba549118b43223c296788aedc994c3a300fe60"
+  },
+  {
+    "path": "receipt.json",
+    "bytes": 2828,
+    "sha256": "10dff3ad24b3356df7d7bcdc9c53f8cefd7eee7287d98171fe0c5b4c9db51812"
+  },
+  {
+    "path": "runtime-output-manifest.json",
+    "bytes": 322689,
+    "sha256": "c202b19e027588dd13a5a3264998034b229bc08a219ba360dc8079be2725e225"
+  }
+]
