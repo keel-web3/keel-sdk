@@ -1,0 +1,150 @@
+{
+  "schema": "keel.rpc-physical-batch-evidence-manifest@1",
+  "sourceCommit": "5f49cb6c865fd69262e0fa943a611414157b0833",
+  "rows": [
+    {
+      "path": "packages/sdk/src/public-simulation-pool.ts",
+      "bytes": 48259,
+      "sha256": "069ec7f918dd2b037a9c98c160e0f30c395a7722dc831bd5d6fb222b445bb663",
+      "role": "source-or-test"
+    },
+    {
+      "path": "packages/sdk/src/provider-request-scheduler.ts",
+      "bytes": 24798,
+      "sha256": "9811b27ced6acc18853b168337d190741490bad3ad93b8415fd78d2dbc26afc7",
+      "role": "source-or-test"
+    },
+    {
+      "path": "tests/sdk-configured-read-batch.test.mjs",
+      "bytes": 9909,
+      "sha256": "29ec04ac327792c6e8b1733257f356f2cbb292b3e4a080026c3fed3425b5b22d",
+      "role": "source-or-test"
+    },
+    {
+      "path": "scripts/test-suites.mjs",
+      "bytes": 19633,
+      "sha256": "ea8d0d33768d396c9db430121b4f32a8a721bb782898de06f7b9823a78ad9f26",
+      "role": "source-or-test"
+    },
+    {
+      "path": "docs/reviews/studio-publication-20261022/rpc-physical-batch-author/INTERFACE.md",
+      "bytes": 2399,
+      "sha256": "5f900cde35cbf785e2394c8c8b944ca2cb9927181f54afacc4eb08378e1f9063",
+      "role": "evidence"
+    },
+    {
+      "path": "docs/reviews/studio-publication-20261022/rpc-physical-batch-author/README.md",
+      "bytes": 7267,
+      "sha256": "893bab37cf7819b97332e0728a9b945af63f264fb6a3d95d5ef61c8f8859aa64",
+      "role": "evidence"
+    },
+    {
+      "path": "docs/reviews/studio-publication-20261022/rpc-physical-batch-author/baseline.json",
+      "bytes": 20710,
+      "sha256": "e212b15f8c0f94d943e18613e8c9119ce4096faee55fa37bc0130c374ea430b0",
+      "role": "evidence"
+    },
+    {
+      "path": "docs/reviews/studio-publication-20261022/rpc-physical-batch-author/qualification.json",
+      "bytes": 2870,
+      "sha256": "f55e5e509dde188e3869d56f7ce668eb3bad5df949f3728797572a0358f8a806",
+      "role": "evidence"
+    },
+    {
+      "path": "docs/reviews/studio-publication-20261022/rpc-physical-batch-author/sdk-batch-and-scheduler.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "role": "evidence"
+    },
+    {
+      "path": "docs/reviews/studio-publication-20261022/rpc-physical-batch-author/sdk-batch-and-scheduler.stdout",
+      "bytes": 8407,
+      "sha256": "30407ea223d22e73924b2bdf93ae69b6f09c8ea1c71807cb4c9301b78d669fcd",
+      "role": "evidence"
+    },
+    {
+      "path": "docs/reviews/studio-publication-20261022/rpc-physical-batch-author/sdk-batch-initial.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "role": "evidence"
+    },
+    {
+      "path": "docs/reviews/studio-publication-20261022/rpc-physical-batch-author/sdk-batch-initial.stdout",
+      "bytes": 3901,
+      "sha256": "803000862b3fbd3b44939b258d7931f54025b5daeb768c487321bdc5deff8a86",
+      "role": "evidence"
+    },
+    {
+      "path": "docs/reviews/studio-publication-20261022/rpc-physical-batch-author/sdk-denial-correction-maintained.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "role": "evidence"
+    },
+    {
+      "path": "docs/reviews/studio-publication-20261022/rpc-physical-batch-author/sdk-denial-correction-maintained.stdout",
+      "bytes": 31544,
+      "sha256": "c8bd596142751960bfe4f434aab5502fff6c706a84f52ad1d02e8186428989cd",
+      "role": "evidence"
+    },
+    {
+      "path": "docs/reviews/studio-publication-20261022/rpc-physical-batch-author/sdk-denial-correction-tsc.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "role": "evidence"
+    },
+    {
+      "path": "docs/reviews/studio-publication-20261022/rpc-physical-batch-author/sdk-denial-correction-tsc.stdout",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "role": "evidence"
+    },
+    {
+      "path": "docs/reviews/studio-publication-20261022/rpc-physical-batch-author/sdk-maintained-final.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "role": "evidence"
+    },
+    {
+      "path": "docs/reviews/studio-publication-20261022/rpc-physical-batch-author/sdk-maintained-final.stdout",
+      "bytes": 31091,
+      "sha256": "fdd395001b42dc0ed6ac136fc7a1a68dea2f84e144ac8d7e74dd0d85fbacb1cf",
+      "role": "evidence"
+    },
+    {
+      "path": "docs/reviews/studio-publication-20261022/rpc-physical-batch-author/sdk-maintained.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "role": "evidence"
+    },
+    {
+      "path": "docs/reviews/studio-publication-20261022/rpc-physical-batch-author/sdk-maintained.stdout",
+      "bytes": 31101,
+      "sha256": "29ac1e9247dc0a474cb686b19ecaccc5a18d493b3b139d42ac7187e96e807e42",
+      "role": "evidence"
+    },
+    {
+      "path": "docs/reviews/studio-publication-20261022/rpc-physical-batch-author/sdk-tsc-after-alias-repair.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "role": "evidence"
+    },
+    {
+      "path": "docs/reviews/studio-publication-20261022/rpc-physical-batch-author/sdk-tsc-after-alias-repair.stdout",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "role": "evidence"
+    },
+    {
+      "path": "docs/reviews/studio-publication-20261022/rpc-physical-batch-author/sdk-tsc.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "role": "evidence"
+    },
+    {
+      "path": "docs/reviews/studio-publication-20261022/rpc-physical-batch-author/sdk-tsc.stdout",
+      "bytes": 2040,
+      "sha256": "2e6727d45fed15ba0c6926d074030e5627f16e58886e7e5829d66ce175e6702a",
+      "role": "evidence"
+    }
+  ]
+}
