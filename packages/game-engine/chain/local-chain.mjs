@@ -32,6 +32,7 @@ export function writeRecord(name, value, dir = sandboxDir()) {
 export async function startAnvil({ port = DEFAULT_PORT, chainId = PRACTICE_CHAIN_ID, state, fork, host = "127.0.0.1" } = {}) {
   const args = ["--host", host, "--port", String(port), "--chain-id", String(chainId), "--gas-limit", "60000000", "--code-size-limit", "49152"];
   if (state) args.push("--state", state, "--state-interval", "30");
+  else args.push("--prune-history");
   if (fork) args.push("--fork-url", fork);
   const child = spawn(process.env.KEEL_ANVIL ?? "anvil", args, { stdio: ["ignore", "pipe", "pipe"] });
   let log = "";
