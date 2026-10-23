@@ -1,0 +1,9 @@
+{
+  "source": "/Users/ravonus/dev/onchaininator/.claude/worktrees/keel-sdk",
+  "base": "9dcd52c7071edb57bbf2def2f46581208fab7410",
+  "checkpoint": "6b2046115f805e54ea8f555de0e238b0f9a019f1",
+  "authoredFiles": 176,
+  "privacyReview": "Base already in public SDK main. All176files are SDK source/docs/tests; sole key-pattern match is the unchanged known public local-Anvil fixture. No private repository ancestry imported.",
+  "disposition": "Old WAKE/managed-publication prototype remains inactive. Exact source/history retained without replacing current qualified format, contract ABI or hosted Studio route.",
+  "backup": "/Users/ravonus/Documents/Codex/2026-10-22/task/backups/worktree-files/28ccfe9504c3"
+}
