@@ -3,7 +3,7 @@ import { gunzipSync } from "node:zlib";
 import { canonicalJson } from "@keel/protocol";
 import { assertKeelInlineImageBytes } from "./collector-policy.js";
 import { validateKeelPreparedContext } from "./prepared-context.js";
-import { assertRegisteredNativeNoneBinary, assertRegisteredNativeNoneModelGraph, type RegisteredNativeDecodedResource } from "./registered-native-none.js";
+import { assertRegisteredNativeNoneBinary, assertRegisteredNativeNoneIdentity, assertRegisteredNativeNoneModelGraph, type RegisteredNativeDecodedResource } from "./registered-native-none.js";
 
 type Hash = `0x${string}`;
 type Commitment = { readonly algorithm: "sha256"; readonly digest: Hash; readonly byteLength: number };
@@ -31,6 +31,11 @@ export interface KeelRegisteredNativeGzipProof {
   readonly bindingDigest: Hash;
   readonly documentIntegrity: Commitment;
   readonly members: readonly { readonly id: string; readonly mediaType: string; readonly integrity: Commitment; readonly storedIntegrity: Commitment }[];
+  /** Exact identity-carried binary originals, separate from Gzip members. */
+  readonly nativeNoneMembers?: readonly {
+    readonly id: string; readonly role: "entrypoint" | "asset" | "data"; readonly mediaType: string;
+    readonly integrity: Commitment; readonly storedIntegrity: Commitment;
+  }[];
 }
 const enc = new TextEncoder(), dec = new TextDecoder("utf-8", { fatal: true, ignoreBOM: true });
 const HASH = /^0x[0-9a-f]{64}$/u;
@@ -57,12 +62,19 @@ export const KEEL_REGISTERED_NATIVE_GZIP_FRAME_PROFILE = Object.freeze({
 const profile = KEEL_REGISTERED_NATIVE_GZIP_FRAME_PROFILE;
 function plain(value: unknown): asserts value is Record<string, unknown> {
   if (!value || typeof value !== "object" || Array.isArray(value) || Object.getPrototypeOf(value) !== Object.prototype
+    || Reflect.ownKeys(value).length !== Object.keys(value).length
     || Object.values(Object.getOwnPropertyDescriptors(value)).some(field => field.get || field.set)) throw new TypeError("Native Gzip requires plain exact recipe data.");
 }
 function commitment(value: unknown): asserts value is Commitment {
   plain(value);
   if (Object.keys(value).sort().join() !== "algorithm,byteLength,digest" || value.algorithm !== "sha256" || typeof value.digest !== "string" || !HASH.test(value.digest)
     || !Number.isSafeInteger(value.byteLength) || Number(value.byteLength) < 1 || Number(value.byteLength) > 32 * 1024 * 1024) throw new TypeError("Invalid native Gzip commitment.");
+}
+function memberArray(value: unknown): asserts value is readonly unknown[] {
+  if (!Array.isArray(value) || Object.getPrototypeOf(value) !== Array.prototype || !value.length || value.length > 128
+    || Object.keys(value).length !== value.length
+    || Reflect.ownKeys(value).some(key => key !== "length" && (typeof key !== "string" || !/^(?:0|[1-9][0-9]*)$/u.test(key) || Number(key) >= value.length))
+    || Object.values(Object.getOwnPropertyDescriptors(value)).some(field => field.get || field.set)) throw new TypeError("Invalid native Gzip evidence member array.");
 }
 export function snapshotKeelRegisteredNativeGzipBinding(input: KeelRegisteredNativeGzipBinding) {
   plain(input); commitment(input.metadataIntegrity);
@@ -91,26 +103,32 @@ function inspectDocument(bytes: Uint8Array, binding: KeelRegisteredNativeGzipBin
   const items: unknown = JSON.parse("[null" + body + "]");
   if (!Array.isArray(items) || items.length < 2 || items.length > 129) throw new RangeError("Native Gzip resource count exceeds its existing bounded reader.");
   let total = 0; const ids = new Set<string>(), members = [];
+  const nativeNoneMembers: NonNullable<KeelRegisteredNativeGzipProof["nativeNoneMembers"]>[number][] = [];
   const decodedResources: RegisteredNativeDecodedResource[] = [], modelNoneIds: string[] = [];
   for (const item of items.slice(1)) {
     plain(item); commitment(item.integrity); plain(item.embedded);
     if (Object.keys(item).some(key => !["id", "role", "mediaType", "aliases", "integrity", "embedded", "backgroundColor"].includes(key))
-      || typeof item.id !== "string" || !item.id || ids.has(item.id) || typeof item.mediaType !== "string" || !item.mediaType) throw new TypeError("Invalid native Gzip source descriptor.");
+      || typeof item.id !== "string" || !item.id || ids.has(item.id) || typeof item.mediaType !== "string" || !item.mediaType
+      || typeof item.role !== "string" || !["entrypoint", "asset", "data", "module"].includes(item.role)) throw new TypeError("Invalid native Gzip source descriptor role or identity.");
     ids.add(item.id); total += item.integrity.byteLength;
     if (total > 32 * 1024 * 1024) throw new RangeError("Native Gzip decoded graph exceeds its actual reader bound.");
     const embedded = item.embedded;
     if (embedded.compression === "none") {
       const fields = Object.keys(embedded).sort().join();
-      let source: Uint8Array;
+      let source: Uint8Array, nativeNone = false;
       if (fields === "compression,storedIntegrity,storedText" && typeof embedded.storedText === "string") source = enc.encode(embedded.storedText);
       else if (fields === "compression,storedBase64,storedIntegrity" && typeof embedded.storedBase64 === "string") {
         source = Buffer.from(embedded.storedBase64, "base64");
         if (Buffer.from(source).toString("base64") !== embedded.storedBase64) throw new TypeError("Invalid exact native media carriage.");
         if (["image/png", "image/jpeg", "image/gif", "image/webp", "image/avif"].includes(item.mediaType)) assertKeelInlineImageBytes(source, item.mediaType);
-        else if (assertRegisteredNativeNoneBinary({id: item.id, role: item.role, mediaType: item.mediaType, source}) === "model") modelNoneIds.push(item.id);
+        else {
+          if (assertRegisteredNativeNoneBinary({id: item.id, role: item.role, mediaType: item.mediaType, source}) === "model") modelNoneIds.push(item.id);
+          nativeNone = true;
+        }
       } else throw new TypeError("Native Gzip cannot admit another encoded None body.");
       commitment(embedded.storedIntegrity);
       if (canonicalJson(integrity(source)) !== canonicalJson(item.integrity) || canonicalJson(item.integrity) !== canonicalJson(embedded.storedIntegrity)) throw new TypeError("Native Gzip sibling source integrity mismatch.");
+      if (nativeNone) nativeNoneMembers.push({id: item.id, role: item.role as "entrypoint" | "asset" | "data", mediaType: item.mediaType, integrity: {...item.integrity}, storedIntegrity: {...embedded.storedIntegrity}});
       decodedResources.push({id: item.id, role: item.role, mediaType: item.mediaType, aliases: item.aliases, source});
       // The None JSON model also needs its closure checked when a required
       // binary buffer is absent, rather than relying on the buffer to opt in.
@@ -131,30 +149,50 @@ function inspectDocument(bytes: Uint8Array, binding: KeelRegisteredNativeGzipBin
   assertRegisteredNativeNoneModelGraph(decodedResources, modelNoneIds);
   if (!members.length) throw new TypeError("No exact native Gzip member was prepared.");
   void binding;
-  return members;
+  return {members, nativeNoneMembers};
 }
 export function createKeelRegisteredNativeGzipProof(input: { readonly binding: KeelRegisteredNativeGzipBinding; readonly documentBytes: Uint8Array }) {
   const binding = snapshotKeelRegisteredNativeGzipBinding(input.binding), document = Uint8Array.from(input.documentBytes);
+  const inspected = inspectDocument(document, binding);
   return Object.freeze({ schema: "keel-registered-native-gzip-proof@1" as const, binding,
-    bindingDigest: sha(enc.encode(canonicalJson(binding))), documentIntegrity: integrity(document), members: inspectDocument(document, binding) });
+    bindingDigest: sha(enc.encode(canonicalJson(binding))), documentIntegrity: integrity(document), members: inspected.members,
+    ...(inspected.nativeNoneMembers.length ? {nativeNoneMembers: inspected.nativeNoneMembers} : {}) });
 }
 /** Exact byte inspection only; the normal Site authenticator still verifies
  * current chain/registry/code/receipt/read-back before every eligible use. */
 export function assertKeelRegisteredNativeGzipProof(input: KeelRegisteredNativeGzipProof, html?: Uint8Array): KeelRegisteredNativeGzipProof {
   plain(input); const binding = snapshotKeelRegisteredNativeGzipBinding(input.binding); commitment(input.documentIntegrity);
-  if (Object.keys(input).sort().join() !== "binding,bindingDigest,documentIntegrity,members,schema" || input.schema !== "keel-registered-native-gzip-proof@1"
-    || input.bindingDigest !== sha(enc.encode(canonicalJson(binding))) || !Array.isArray(input.members) || !input.members.length || input.members.length > 128) throw new TypeError("Invalid native Gzip evidence identity.");
-  const ids = new Set<string>();
+  const expectedKeys = ["binding", "bindingDigest", "documentIntegrity", "members", "schema", ...(Object.hasOwn(input, "nativeNoneMembers") ? ["nativeNoneMembers"] : [])].sort().join();
+  if (Object.keys(input).sort().join() !== expectedKeys || input.schema !== "keel-registered-native-gzip-proof@1"
+    || input.bindingDigest !== sha(enc.encode(canonicalJson(binding))) || input.documentIntegrity.byteLength > 2_000_000) throw new TypeError("Invalid native Gzip evidence identity.");
+  memberArray(input.members);
+  const ids = new Set<string>(); let total = 0;
   for (const member of input.members) {
     plain(member); commitment(member.integrity); commitment(member.storedIntegrity);
     if (Object.keys(member).sort().join() !== "id,integrity,mediaType,storedIntegrity" || typeof member.id !== "string" || !member.id || ids.has(member.id)
       || typeof member.mediaType !== "string" || !member.mediaType || member.storedIntegrity.byteLength > 4 * 1024 * 1024) throw new TypeError("Invalid native Gzip evidence member.");
     ids.add(member.id);
+    total += member.integrity.byteLength;
   }
+  if (Object.hasOwn(input, "nativeNoneMembers")) {
+    memberArray(input.nativeNoneMembers);
+    for (const value of input.nativeNoneMembers) {
+      plain(value); commitment(value.integrity); commitment(value.storedIntegrity);
+      if (Object.keys(value).sort().join() !== "id,integrity,mediaType,role,storedIntegrity" || typeof value.id !== "string" || !value.id || value.id.length > 512 || ids.has(value.id)
+        || typeof value.role !== "string" || !["entrypoint", "asset", "data"].includes(value.role)
+        || typeof value.mediaType !== "string" || !value.mediaType || value.mediaType.length > 128
+        || canonicalJson(value.integrity) !== canonicalJson(value.storedIntegrity)) throw new TypeError("Invalid native None evidence identity or role.");
+      assertRegisteredNativeNoneIdentity({role: value.role, mediaType: value.mediaType});
+      ids.add(value.id); total += value.integrity.byteLength;
+    }
+  }
+  if (ids.size > 128 || total > 32 * 1024 * 1024) throw new RangeError("Native Gzip evidence exceeds its bounded member inventory.");
   if (html) {
     const root = html.subarray(0, input.documentIntegrity.byteLength);
-    if (root.length !== input.documentIntegrity.byteLength || sha(root) !== input.documentIntegrity.digest
-      || canonicalJson(inspectDocument(root, binding)) !== canonicalJson(input.members)) throw new TypeError("Native Gzip source, frame or member evidence changed.");
+    if (root.length !== input.documentIntegrity.byteLength || sha(root) !== input.documentIntegrity.digest) throw new TypeError("Native Gzip source, frame or member evidence changed.");
+    const inspected = inspectDocument(root, binding);
+    if (canonicalJson(inspected.members) !== canonicalJson(input.members)
+      || canonicalJson(inspected.nativeNoneMembers) !== canonicalJson(input.nativeNoneMembers ?? [])) throw new TypeError("Native Gzip source, frame or member evidence changed.");
     const tail = dec.decode(html.subarray(root.length));
     if (tail) {
       const match = /^<script>\(\(\)=>\{try\{const v="([A-Za-z0-9_-]+)"/u.exec(tail);
