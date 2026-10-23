@@ -1,0 +1,1892 @@
+diff --git a/docs/KEEL_IP_CONTROL.md b/docs/KEEL_IP_CONTROL.md
+index 814f7eb8..715a25c5 100644
+--- a/docs/KEEL_IP_CONTROL.md
++++ b/docs/KEEL_IP_CONTROL.md
+@@ -57,11 +57,11 @@ the external-rule path uses a live `code_hash` plus `is_authorized` view just
+ like the EVM code-hash pin.
+ 
+ The EVM implementation is in
+-[`KeelIPControl.sol`](../packages/contracts/src/modules/keel-ip-control/KeelIPControl.sol). The
++[`KeelIPControl.sol`](https://github.com/Ravonus/keel-contracts/blob/master/src/modules/keel-ip-control/KeelIPControl.sol). The
+ Tezos policy evaluator is in
+-[`keel_ip_control.py`](../packages/tezos/contracts/keel_ip_control.py),
++`keel_ip_control.py`,
+ and the Tezos license catalog is deliberately separate in
+-[`keel_ip_license.py`](../packages/tezos/contracts/keel_ip_license.py).
++`keel_ip_license.py`.
+ 
+ ## Manifest and verifier boundary
+ 
+diff --git a/docs/KEEL_LEXICON.md b/docs/KEEL_LEXICON.md
+index db245e55..fd644a35 100644
+--- a/docs/KEEL_LEXICON.md
++++ b/docs/KEEL_LEXICON.md
+@@ -31,14 +31,14 @@ through them.
+ 
+ | # | Layer | Its one job | Where it lives |
+ |---|-------|-------------|----------------|
+-| 01 | **THE DIE** | The artist's contract. Strikes the tokens: who may buy, how many exist, what each one points at. | [`KEEL721`](../packages/contracts/src/modules/keel-die/KEEL721.sol), [`KeelFactory`](../packages/contracts/src/modules/keel-die/KeelFactory.sol), [`KeelMintGate`](../packages/contracts/src/modules/keel-mint-access/KeelMintGate.sol) |
+-| 02 | **THE HOLD** | Where the bytes live on the chain. Shared, permanent, never moves. | [`KeelHold`](../packages/contracts/src/modules/keel-hold/KeelHold.sol), [`Ingot`](../packages/contracts/src/modules/keel-hold/Ingot.sol) |
+-| 03 | **THE INDEX** | The sealed inventory. Every piece the work is made of, and its Mark. | [`KeelIndex`](../packages/contracts/src/modules/keel-hold/KeelIndex.sol), [`KeelArtifactRegistry`](../packages/contracts/src/modules/keel-artifacts/KeelArtifactRegistry.sol) |
++| 01 | **THE DIE** | The artist's contract. Strikes the tokens: who may buy, how many exist, what each one points at. | [`KEEL721`](https://github.com/Ravonus/keel-contracts/blob/master/src/modules/keel-die/KEEL721.sol), [`KeelFactory`](https://github.com/Ravonus/keel-contracts/blob/master/src/modules/keel-die/KeelFactory.sol), [`KeelMintGate`](https://github.com/Ravonus/keel-contracts/blob/master/src/modules/keel-mint-access/KeelMintGate.sol) |
++| 02 | **THE HOLD** | Where the bytes live on the chain. Shared, permanent, never moves. | [`KeelHold`](https://github.com/Ravonus/keel-contracts/blob/master/src/modules/keel-hold/KeelHold.sol), [`Ingot`](https://github.com/Ravonus/keel-contracts/blob/master/src/modules/keel-hold/Ingot.sol) |
++| 03 | **THE INDEX** | The sealed inventory. Every piece the work is made of, and its Mark. | [`KeelIndex`](https://github.com/Ravonus/keel-contracts/blob/master/src/modules/keel-hold/KeelIndex.sol), [`KeelArtifactRegistry`](https://github.com/Ravonus/keel-contracts/blob/master/src/modules/keel-artifacts/KeelArtifactRegistry.sol) |
+ | 04 | **THE CRUCIBLE** | Proves the work on every open, on the viewer's own machine. Clean, or slag. | `keel-crucible/` registries + the viewer-side verifier |
+-| 05 | **THE HARNESS** | Runs the art sealed off from your wallet and the open internet. Contains the Cage. | [`KeelHarnessRegistry`](../packages/contracts/src/modules/keel-artifacts/KeelHarnessRegistry.sol), [`KeelHarnessBuilder`](../packages/contracts/src/modules/keel-harness/KeelHarnessBuilder.sol) |
++| 05 | **THE HARNESS** | Runs the art sealed off from your wallet and the open internet. Contains the Cage. | [`KeelHarnessRegistry`](https://github.com/Ravonus/keel-contracts/blob/master/src/modules/keel-artifacts/KeelHarnessRegistry.sol), [`KeelHarnessBuilder`](https://github.com/Ravonus/keel-contracts/blob/master/src/modules/keel-harness/KeelHarnessBuilder.sol) |
+ | 06 | **THE ANCHOR** | A copy of the exact bytes driven into another chain. | `keel-anchors/` — attested, portable, zk, IPFS |
+ | 07 | **PARTS & INLAYS** | Art built out of other art, verified as hard as its host. | `keel-graph/`, `keel-equipment/` |
+-| 08 | **THE SLEEVE** | What ordinary marketplaces see. Boring, standard, works everywhere. | [`KeelSleeve`](../packages/contracts/src/modules/keel-sleeve/KeelSleeve.sol), the ERC-721/2981/4906 surface of `KEEL721` |
++| 08 | **THE SLEEVE** | What ordinary marketplaces see. Boring, standard, works everywhere. | [`KeelSleeve`](https://github.com/Ravonus/keel-contracts/blob/master/src/modules/keel-sleeve/KeelSleeve.sol), the ERC-721/2981/4906 surface of `KEEL721` |
+ 
+ ## The parts
+ 
+diff --git a/docs/KEEL_MODULES.md b/docs/KEEL_MODULES.md
+index 82a95ddc..7e786447 100644
+--- a/docs/KEEL_MODULES.md
++++ b/docs/KEEL_MODULES.md
+@@ -304,3 +304,23 @@ pnpm keel:sync
+ The `deployable` set is derived from compiled artifacts — a contract is deployable
+ when forge emitted creation bytecode for it — so interfaces, abstract bases, and
+ inlined libraries are excluded without anyone maintaining a list.
++
++Deriving from artifacts means an unbuilt tree has nothing to derive from, so sync
++separates *unknown* from *nothing*: a missing artifact directory is unknown, while
++one holding no creation bytecode is genuinely not deployable. A unit whose
++artifacts are unknown is never rederived, and a partial build is treated the same
++way as no build at all rather than being allowed to truncate the list.
++
++| unit | artifacts absent | sync does |
++| --- | --- | --- |
++| local | the tree is unbuilt | refuses to write **any** manifest, and asks for a `forge build` |
++| `external: true` | normal — sources live in another repository | keeps the committed `deployable`, and says so |
++
++Nothing is written until every unit resolves, so a refusal leaves the manifests
++exactly as they were.
++
++The contracts tree is a sibling of this repository, not part of it, so its path is
++derived in `tools/keel/contracts-root.mjs` rather than hardcoded per tool: from the
++main worktree's parent, which keeps the tools and the suite working from a linked
++git worktree, where `../keel-contracts` points at nothing. `KEEL_CONTRACTS_DIR`
++overrides it to point a run at another tree.
+diff --git a/examples/basic-manifest/manifest.integrity.json b/examples/basic-manifest/manifest.integrity.json
+index f2614924..9d58497a 100644
+--- a/examples/basic-manifest/manifest.integrity.json
++++ b/examples/basic-manifest/manifest.integrity.json
+@@ -4,7 +4,7 @@
+   "canonicalization": "RFC8785",
+   "integrity": {
+     "algorithm": "sha256",
+-    "digest": "0x41d6ade88965d534a13ad6b2e1f118460eabeffe9ddb39c0323213e5e77c8b33",
+-    "byteLength": 5834
++    "digest": "0x0e16e0848115172bbe9940f96c4b1b8525f0e9de9580d0c9f9eeb92a1663cbb5",
++    "byteLength": 5835
+   }
+ }
+diff --git a/package.json b/package.json
+index 2903de93..09eb8603 100644
+--- a/package.json
++++ b/package.json
+@@ -17,13 +17,13 @@
+     "mcp": "node packages/mcp/dist/cli.js",
+     "mcp:self-test": "node packages/mcp/dist/cli.js --self-test",
+     "contracts:static": "node scripts/solidity-static-check.mjs",
+-    "contracts:test": "forge test --root packages/contracts",
++    "contracts:test": "node scripts/contracts-run.mjs forge test",
+     "contracts:web3:test": "pnpm --filter @keel/web3-boundary-tests test",
+     "contracts:gas:policy": "node scripts/solidity-gas-check.mjs",
+-    "contracts:gas:snapshot": "forge snapshot --root packages/contracts --match-path 'test/gas/*.t.sol' --snap packages/contracts/.gas-snapshot",
+-    "contracts:gas:check": "node scripts/solidity-gas-check.mjs && forge snapshot --root packages/contracts --match-path 'test/gas/*.t.sol' --check packages/contracts/.gas-snapshot",
+-    "contracts:gas:report": "forge test --root packages/contracts --gas-report",
+-    "contracts:size:check": "pnpm --dir packages/contracts size:check",
++    "contracts:gas:snapshot": "node scripts/contracts-run.mjs forge snapshot --match-path 'test/gas/*.t.sol'",
++    "contracts:gas:check": "node scripts/solidity-gas-check.mjs && node scripts/contracts-run.mjs forge snapshot --match-path 'test/gas/*.t.sol' --check",
++    "contracts:gas:report": "node scripts/contracts-run.mjs forge test --gas-report",
++    "contracts:size:check": "node scripts/contracts-run.mjs forge build --sizes",
+     "tezos:gas:policy": "pnpm --dir packages/tezos gas:policy",
+     "tezos:gas:snapshot": "pnpm --dir packages/tezos gas:snapshot",
+     "tezos:gas:check": "pnpm --dir packages/tezos gas:check",
+diff --git a/packages/sdk/src/abis/keel-crucible.generated.ts b/packages/sdk/src/abis/keel-crucible.generated.ts
+index ba3bad50..3fe2a72a 100644
+--- a/packages/sdk/src/abis/keel-crucible.generated.ts
++++ b/packages/sdk/src/abis/keel-crucible.generated.ts
+@@ -5,5 +5,5 @@ export const ABIS = {
+   "KeelCollectionVerificationRegistry": [{"type":"constructor","inputs":[{"name":"admin","type":"address","internalType":"address"},{"name":"portableAnchorRegistry_","type":"address","internalType":"address"}],"stateMutability":"nonpayable"},{"type":"function","name":"ADAPTER_PROTOCOL","inputs":[],"outputs":[{"name":"","type":"bytes32","internalType":"bytes32"}],"stateMutability":"view"},{"type":"function","name":"AUDITOR_ROLE","inputs":[],"outputs":[{"name":"","type":"bytes32","internalType":"bytes32"}],"stateMutability":"view"},{"type":"function","name":"DEFAULT_ADMIN_ROLE","inputs":[],"outputs":[{"name":"","type":"bytes32","internalType":"bytes32"}],"stateMutability":"view"},{"type":"function","name":"HOOK_PROTOCOL","inputs":[],"outputs":[{"name":"","type":"bytes32","internalType":"bytes32"}],"stateMutability":"view"},{"type":"function","name":"MAX_TOKEN_URI_BYTES","inputs":[],"outputs":[{"name":"","type":"uint256","internalType":"uint256"}],"stateMutability":"view"},{"type":"function","name":"POLICY_ROLE","inputs":[],"outputs":[{"name":"","type":"bytes32","internalType":"bytes32"}],"stateMutability":"view"},{"type":"function","name":"PRESENTATION_CONTENT_DOMAIN","inputs":[],"outputs":[{"name":"","type":"bytes32","internalType":"bytes32"}],"stateMutability":"view"},{"type":"function","name":"SUPPLY_KNOWN_BURNED","inputs":[],"outputs":[{"name":"","type":"uint16","internalType":"uint16"}],"stateMutability":"view"},{"type":"function","name":"SUPPLY_KNOWN_LIFETIME_MINTED","inputs":[],"outputs":[{"name":"","type":"uint16","internalType":"uint16"}],"stateMutability":"view"},{"type":"function","name":"SUPPLY_KNOWN_MAX","inputs":[],"outputs":[{"name":"","type":"uint16","internalType":"uint16"}],"stateMutability":"view"},{"type":"function","name":"SUPPLY_KNOWN_OUTSTANDING","inputs":[],"outputs":[{"name":"","type":"uint16","internalType":"uint16"}],"stateMutability":"view"},{"type":"function","name":"SUPPLY_KNOWN_REMAINING","inputs":[],"outputs":[{"name":"","type":"uint16","internalType":"uint16"}],"stateMutability":"view"},{"type":"function","name":"SUPPLY_KNOWN_RESERVED","inputs":[],"outputs":[{"name":"","type":"uint16","internalType":"uint16"}],"stateMutability":"view"},{"type":"function","name":"approvedEvidenceRoot","inputs":[{"name":"collection","type":"address","internalType":"address"},{"name":"tokenId","type":"uint256","internalType":"uint256"},{"name":"policyKey","type":"bytes32","internalType":"bytes32"}],"outputs":[{"name":"","type":"bytes32","internalType":"bytes32"}],"stateMutability":"view"},{"type":"function","name":"computePresentationContentDigest","inputs":[{"name":"chainId","type":"uint256","internalType":"uint256"},{"name":"collection","type":"address","internalType":"address"},{"name":"keelIndex","type":"address","internalType":"address"},{"name":"presentationScope","type":"uint256","internalType":"uint256"},{"name":"presentationRevision","type":"uint64","internalType":"uint64"},{"name":"manifestDigest","type":"bytes32","internalType":"bytes32"},{"name":"portableRoot","type":"bytes32","internalType":"bytes32"},{"name":"portableAnchorRoot","type":"bytes32","internalType":"bytes32"}],"outputs":[{"name":"","type":"bytes32","internalType":"bytes32"}],"stateMutability":"pure"},{"type":"function","name":"getRoleAdmin","inputs":[{"name":"role","type":"bytes32","internalType":"bytes32"}],"outputs":[{"name":"","type":"bytes32","internalType":"bytes32"}],"stateMutability":"view"},{"type":"function","name":"grantRole","inputs":[{"name":"role","type":"bytes32","internalType":"bytes32"},{"name":"account","type":"address","internalType":"address"}],"outputs":[],"stateMutability":"nonpayable"},{"type":"function","name":"hasRole","inputs":[{"name":"role","type":"bytes32","internalType":"bytes32"},{"name":"account","type":"address","internalType":"address"}],"outputs":[{"name":"","type":"bool","internalType":"bool"}],"stateMutability":"view"},{"type":"function","name":"inspectCurrent","inputs":[{"name":"collection","type":"address","internalType":"address"},{"name":"tokenId","type":"uint256","internalType":"uint256"},{"name":"policyKey","type":"bytes32","internalType":"bytes32"}],"outputs":[{"name":"state","type":"tuple","internalType":"struct IKeelCollectionVerificationHook.VerificationState","components":[{"name":"expectedTokenURIHash","type":"bytes32","internalType":"bytes32"},{"name":"resolver","type":"address","internalType":"address"},{"name":"keelIndex","type":"address","internalType":"address"},{"name":"presentationScope","type":"uint256","internalType":"uint256"},{"name":"routeLocked","type":"bool","internalType":"bool"},{"name":"pointerAuthority","type":"address","internalType":"address"},{"name":"presentationRevision","type":"uint64","internalType":"uint64"},{"name":"portableRoot","type":"bytes32","internalType":"bytes32"},{"name":"manifestDigest","type":"bytes32","internalType":"bytes32"},{"name":"revisionPolicy","type":"uint8","internalType":"uint8"},{"name":"publisherAuthority","type":"address","internalType":"address"},{"name":"activationAuthority","type":"address","internalType":"address"},{"name":"governanceTimelock","type":"address","internalType":"address"},{"name":"revisionLineageRoot","type":"bytes32","internalType":"bytes32"},{"name":"appendOnlyRevisions","type":"bool","internalType":"bool"},{"name":"revisionFrozen","type":"bool","internalType":"bool"},{"name":"governanceVerifiable","type":"bool","internalType":"bool"},{"name":"mintStatus","type":"uint8","internalType":"uint8"},{"name":"mintAccessMode","type":"uint8","internalType":"uint8"},{"name":"mintAuthority","type":"address","internalType":"address"},{"name":"mintAuthoritiesRoot","type":"bytes32","internalType":"bytes32"},{"name":"mintAuthorityCount","type":"uint32","internalType":"uint32"},{"name":"mintPolicyAuthority","type":"address","internalType":"address"},{"name":"mintTimelock","type":"address","internalType":"address"},{"name":"mintVerifiable","type":"bool","internalType":"bool"},{"name":"totalSupply","type":"uint256","internalType":"uint256"},{"name":"lifetimeMinted","type":"uint256","internalType":"uint256"},{"name":"burnedCount","type":"uint256","internalType":"uint256"},{"name":"remainingMintable","type":"uint256","internalType":"uint256"},{"name":"maxSupply","type":"uint256","internalType":"uint256"},{"name":"reservedSupply","type":"uint256","internalType":"uint256"},{"name":"supplyKnownFlags","type":"uint16","internalType":"uint16"},{"name":"maxSupplyKind","type":"uint8","internalType":"uint8"},{"name":"capMutable","type":"bool","internalType":"bool"},{"name":"capAuthority","type":"address","internalType":"address"},{"name":"supplyTimelock","type":"address","internalType":"address"},{"name":"supplyVerifiable","type":"bool","internalType":"bool"},{"name":"burnPolicy","type":"uint8","internalType":"uint8"},{"name":"implementation","type":"address","internalType":"address"},{"name":"proxyAdmin","type":"address","internalType":"address"},{"name":"beacon","type":"address","internalType":"address"},{"name":"upgradeMutable","type":"bool","internalType":"bool"},{"name":"upgradeAuthority","type":"address","internalType":"address"},{"name":"upgradeTimelock","type":"address","internalType":"address"},{"name":"upgradeVerifiable","type":"bool","internalType":"bool"}]},{"name":"facets","type":"tuple","internalType":"struct KeelCollectionVerificationRegistry.Facets","components":[{"name":"route","type":"uint8","internalType":"enum KeelCollectionVerificationRegistry.Verdict"},{"name":"content","type":"uint8","internalType":"enum KeelCollectionVerificationRegistry.Verdict"},{"name":"governance","type":"uint8","internalType":"enum KeelCollectionVerificationRegistry.Verdict"},{"name":"mint","type":"uint8","internalType":"enum KeelCollectionVerificationRegistry.Verdict"},{"name":"supply","type":"uint8","internalType":"enum KeelCollectionVerificationRegistry.Verdict"},{"name":"upgrade","type":"uint8","internalType":"enum KeelCollectionVerificationRegistry.Verdict"}]}],"stateMutability":"view"},{"type":"function","name":"latestReceipt","inputs":[{"name":"collection","type":"address","internalType":"address"},{"name":"tokenId","type":"uint256","internalType":"uint256"}],"outputs":[{"name":"receiptId","type":"bytes32","internalType":"bytes32"}],"stateMutability":"view"},{"type":"function","name":"policy","inputs":[{"name":"id","type":"bytes32","internalType":"bytes32"}],"outputs":[{"name":"","type":"tuple","internalType":"struct KeelCollectionVerificationRegistry.Policy","components":[{"name":"input","type":"tuple","internalType":"struct KeelCollectionVerificationRegistry.PolicyInput","components":[{"name":"lane","type":"uint8","internalType":"enum KeelCollectionVerificationRegistry.Lane"},{"name":"runtimeCodeHash","type":"bytes32","internalType":"bytes32"},{"name":"adapter","type":"address","internalType":"address"},{"name":"adapterCodeHash","type":"bytes32","internalType":"bytes32"},{"name":"implementation","type":"address","internalType":"address"},{"name":"implementationCodeHash","type":"bytes32","internalType":"bytes32"},{"name":"proxyAdmin","type":"address","internalType":"address"},{"name":"beacon","type":"address","internalType":"address"},{"name":"policyDigest","type":"bytes32","internalType":"bytes32"},{"name":"version","type":"uint64","internalType":"uint64"}]},{"name":"enabled","type":"bool","internalType":"bool"},{"name":"exists","type":"bool","internalType":"bool"}]}],"stateMutability":"view"},{"type":"function","name":"policyId","inputs":[{"name":"input","type":"tuple","internalType":"struct KeelCollectionVerificationRegistry.PolicyInput","components":[{"name":"lane","type":"uint8","internalType":"enum KeelCollectionVerificationRegistry.Lane"},{"name":"runtimeCodeHash","type":"bytes32","internalType":"bytes32"},{"name":"adapter","type":"address","internalType":"address"},{"name":"adapterCodeHash","type":"bytes32","internalType":"bytes32"},{"name":"implementation","type":"address","internalType":"address"},{"name":"implementationCodeHash","type":"bytes32","internalType":"bytes32"},{"name":"proxyAdmin","type":"address","internalType":"address"},{"name":"beacon","type":"address","internalType":"address"},{"name":"policyDigest","type":"bytes32","internalType":"bytes32"},{"name":"version","type":"uint64","internalType":"uint64"}]}],"outputs":[{"name":"","type":"bytes32","internalType":"bytes32"}],"stateMutability":"pure"},{"type":"function","name":"portableAnchorRegistry","inputs":[],"outputs":[{"name":"","type":"address","internalType":"address"}],"stateMutability":"view"},{"type":"function","name":"receipt","inputs":[{"name":"id","type":"bytes32","internalType":"bytes32"}],"outputs":[{"name":"","type":"tuple","internalType":"struct KeelCollectionVerificationRegistry.Receipt","components":[{"name":"policyId","type":"bytes32","internalType":"bytes32"},{"name":"previousReceipt","type":"bytes32","internalType":"bytes32"},{"name":"evidenceRoot","type":"bytes32","internalType":"bytes32"},{"name":"tokenURIHash","type":"bytes32","internalType":"bytes32"},{"name":"portableRoot","type":"bytes32","internalType":"bytes32"},{"name":"portableAnchorRoot","type":"bytes32","internalType":"bytes32"},{"name":"presentationContentDigest","type":"bytes32","internalType":"bytes32"},{"name":"manifestDigest","type":"bytes32","internalType":"bytes32"},{"name":"stateDigest","type":"bytes32","internalType":"bytes32"},{"name":"runtimeCodeHash","type":"bytes32","internalType":"bytes32"},{"name":"implementationCodeHash","type":"bytes32","internalType":"bytes32"},{"name":"collection","type":"address","internalType":"address"},{"name":"resolver","type":"address","internalType":"address"},{"name":"keelIndex","type":"address","internalType":"address"},{"name":"pointerAuthority","type":"address","internalType":"address"},{"name":"publisherAuthority","type":"address","internalType":"address"},{"name":"activationAuthority","type":"address","internalType":"address"},{"name":"governanceTimelock","type":"address","internalType":"address"},{"name":"mintAuthority","type":"address","internalType":"address"},{"name":"mintPolicyAuthority","type":"address","internalType":"address"},{"name":"mintTimelock","type":"address","internalType":"address"},{"name":"capAuthority","type":"address","internalType":"address"},{"name":"supplyTimelock","type":"address","internalType":"address"},{"name":"implementation","type":"address","internalType":"address"},{"name":"proxyAdmin","type":"address","internalType":"address"},{"name":"beacon","type":"address","internalType":"address"},{"name":"upgradeAuthority","type":"address","internalType":"address"},{"name":"upgradeTimelock","type":"address","internalType":"address"},{"name":"revisionLineageRoot","type":"bytes32","internalType":"bytes32"},{"name":"mintAuthoritiesRoot","type":"bytes32","internalType":"bytes32"},{"name":"presentationScope","type":"uint256","internalType":"uint256"},{"name":"tokenId","type":"uint256","internalType":"uint256"},{"name":"chainId","type":"uint256","internalType":"uint256"},{"name":"totalSupply","type":"uint256","internalType":"uint256"},{"name":"lifetimeMinted","type":"uint256","internalType":"uint256"},{"name":"burnedCount","type":"uint256","internalType":"uint256"},{"name":"remainingMintable","type":"uint256","internalType":"uint256"},{"name":"maxSupply","type":"uint256","internalType":"uint256"},{"name":"reservedSupply","type":"uint256","internalType":"uint256"},{"name":"supplyKnownFlags","type":"uint16","internalType":"uint16"},{"name":"presentationRevision","type":"uint64","internalType":"uint64"},{"name":"policyVersion","type":"uint64","internalType":"uint64"},{"name":"observedBlock","type":"uint64","internalType":"uint64"},{"name":"evidenceBlock","type":"uint64","internalType":"uint64"},{"name":"evidenceBlockHash","type":"bytes32","internalType":"bytes32"},{"name":"expiresAt","type":"uint64","internalType":"uint64"},{"name":"mintAuthorityCount","type":"uint32","internalType":"uint32"},{"name":"revisionPolicy","type":"uint8","internalType":"uint8"},{"name":"mintStatus","type":"uint8","internalType":"uint8"},{"name":"mintAccessMode","type":"uint8","internalType":"uint8"},{"name":"burnPolicy","type":"uint8","internalType":"uint8"},{"name":"maxSupplyKind","type":"uint8","internalType":"uint8"},{"name":"lane","type":"uint8","internalType":"enum KeelCollectionVerificationRegistry.Lane"},{"name":"facets","type":"tuple","internalType":"struct KeelCollectionVerificationRegistry.Facets","components":[{"name":"route","type":"uint8","internalType":"enum KeelCollectionVerificationRegistry.Verdict"},{"name":"content","type":"uint8","internalType":"enum KeelCollectionVerificationRegistry.Verdict"},{"name":"governance","type":"uint8","internalType":"enum KeelCollectionVerificationRegistry.Verdict"},{"name":"mint","type":"uint8","internalType":"enum KeelCollectionVerificationRegistry.Verdict"},{"name":"supply","type":"uint8","internalType":"enum KeelCollectionVerificationRegistry.Verdict"},{"name":"upgrade","type":"uint8","internalType":"enum KeelCollectionVerificationRegistry.Verdict"}]},{"name":"revisionFrozen","type":"bool","internalType":"bool"},{"name":"appendOnlyRevisions","type":"bool","internalType":"bool"},{"name":"governanceVerifiable","type":"bool","internalType":"bool"},{"name":"routeLocked","type":"bool","internalType":"bool"},{"name":"mintVerifiable","type":"bool","internalType":"bool"},{"name":"capMutable","type":"bool","internalType":"bool"},{"name":"supplyVerifiable","type":"bool","internalType":"bool"},{"name":"upgradeMutable","type":"bool","internalType":"bool"},{"name":"upgradeVerifiable","type":"bool","internalType":"bool"},{"name":"revoked","type":"bool","internalType":"bool"},{"name":"exists","type":"bool","internalType":"bool"}]}],"stateMutability":"view"},{"type":"function","name":"receiptCurrent","inputs":[{"name":"id","type":"bytes32","internalType":"bytes32"}],"outputs":[{"name":"","type":"bool","internalType":"bool"}],"stateMutability":"view"},{"type":"function","name":"recordApproved","inputs":[{"name":"collection","type":"address","internalType":"address"},{"name":"tokenId","type":"uint256","internalType":"uint256"},{"name":"policyKey","type":"bytes32","internalType":"bytes32"}],"outputs":[{"name":"receiptId","type":"bytes32","internalType":"bytes32"}],"stateMutability":"nonpayable"},{"type":"function","name":"recordContentOnly","inputs":[{"name":"collection","type":"address","internalType":"address"},{"name":"tokenId","type":"uint256","internalType":"uint256"},{"name":"policyKey","type":"bytes32","internalType":"bytes32"},{"name":"expectedTokenURIHash","type":"bytes32","internalType":"bytes32"},{"name":"portableRoot","type":"bytes32","internalType":"bytes32"},{"name":"manifestDigest","type":"bytes32","internalType":"bytes32"},{"name":"evidenceRoot","type":"bytes32","internalType":"bytes32"},{"name":"evidenceBlock","type":"uint64","internalType":"uint64"},{"name":"evidenceBlockHash","type":"bytes32","internalType":"bytes32"},{"name":"expiresAt","type":"uint64","internalType":"uint64"}],"outputs":[{"name":"receiptId","type":"bytes32","internalType":"bytes32"}],"stateMutability":"nonpayable"},{"type":"function","name":"renounceRole","inputs":[{"name":"role","type":"bytes32","internalType":"bytes32"},{"name":"callerConfirmation","type":"address","internalType":"address"}],"outputs":[],"stateMutability":"nonpayable"},{"type":"function","name":"revoke","inputs":[{"name":"receiptId","type":"bytes32","internalType":"bytes32"},{"name":"reasonDigest","type":"bytes32","internalType":"bytes32"}],"outputs":[],"stateMutability":"nonpayable"},{"type":"function","name":"revokeRole","inputs":[{"name":"role","type":"bytes32","internalType":"bytes32"},{"name":"account","type":"address","internalType":"address"}],"outputs":[],"stateMutability":"nonpayable"},{"type":"function","name":"sealObservation","inputs":[{"name":"receiptId","type":"bytes32","internalType":"bytes32"},{"name":"observedBlockHash","type":"bytes32","internalType":"bytes32"}],"outputs":[],"stateMutability":"nonpayable"},{"type":"function","name":"setPolicy","inputs":[{"name":"input","type":"tuple","internalType":"struct KeelCollectionVerificationRegistry.PolicyInput","components":[{"name":"lane","type":"uint8","internalType":"enum KeelCollectionVerificationRegistry.Lane"},{"name":"runtimeCodeHash","type":"bytes32","internalType":"bytes32"},{"name":"adapter","type":"address","internalType":"address"},{"name":"adapterCodeHash","type":"bytes32","internalType":"bytes32"},{"name":"implementation","type":"address","internalType":"address"},{"name":"implementationCodeHash","type":"bytes32","internalType":"bytes32"},{"name":"proxyAdmin","type":"address","internalType":"address"},{"name":"beacon","type":"address","internalType":"address"},{"name":"policyDigest","type":"bytes32","internalType":"bytes32"},{"name":"version","type":"uint64","internalType":"uint64"}]},{"name":"enabled","type":"bool","internalType":"bool"}],"outputs":[{"name":"id","type":"bytes32","internalType":"bytes32"}],"stateMutability":"nonpayable"},{"type":"function","name":"supportsInterface","inputs":[{"name":"interfaceId","type":"bytes4","internalType":"bytes4"}],"outputs":[{"name":"","type":"bool","internalType":"bool"}],"stateMutability":"view"},{"type":"event","name":"CollectionVerificationObservationSealed","inputs":[{"name":"receiptId","type":"bytes32","indexed":true,"internalType":"bytes32"},{"name":"observedBlock","type":"uint64","indexed":true,"internalType":"uint64"},{"name":"blockHash","type":"bytes32","indexed":false,"internalType":"bytes32"}],"anonymous":false},{"type":"event","name":"CollectionVerificationRecorded","inputs":[{"name":"receiptId","type":"bytes32","indexed":true,"internalType":"bytes32"},{"name":"collection","type":"address","indexed":true,"internalType":"address"},{"name":"tokenId","type":"uint256","indexed":true,"internalType":"uint256"},{"name":"policyId","type":"bytes32","indexed":false,"internalType":"bytes32"},{"name":"previousReceipt","type":"bytes32","indexed":false,"internalType":"bytes32"},{"name":"evidenceRoot","type":"bytes32","indexed":false,"internalType":"bytes32"},{"name":"portableRoot","type":"bytes32","indexed":false,"internalType":"bytes32"},{"name":"presentationRevision","type":"uint64","indexed":false,"internalType":"uint64"},{"name":"lane","type":"uint8","indexed":false,"internalType":"enum KeelCollectionVerificationRegistry.Lane"},{"name":"routeVerdict","type":"uint8","indexed":false,"internalType":"enum KeelCollectionVerificationRegistry.Verdict"},{"name":"contentVerdict","type":"uint8","indexed":false,"internalType":"enum KeelCollectionVerificationRegistry.Verdict"},{"name":"auditor","type":"address","indexed":false,"internalType":"address"}],"anonymous":false},{"type":"event","name":"CollectionVerificationRevoked","inputs":[{"name":"receiptId","type":"bytes32","indexed":true,"internalType":"bytes32"},{"name":"auditor","type":"address","indexed":true,"internalType":"address"},{"name":"reasonDigest","type":"bytes32","indexed":false,"internalType":"bytes32"}],"anonymous":false},{"type":"event","name":"RoleAdminChanged","inputs":[{"name":"role","type":"bytes32","indexed":true,"internalType":"bytes32"},{"name":"previousAdminRole","type":"bytes32","indexed":true,"internalType":"bytes32"},{"name":"newAdminRole","type":"bytes32","indexed":true,"internalType":"bytes32"}],"anonymous":false},{"type":"event","name":"RoleGranted","inputs":[{"name":"role","type":"bytes32","indexed":true,"internalType":"bytes32"},{"name":"account","type":"address","indexed":true,"internalType":"address"},{"name":"sender","type":"address","indexed":true,"internalType":"address"}],"anonymous":false},{"type":"event","name":"RoleRevoked","inputs":[{"name":"role","type":"bytes32","indexed":true,"internalType":"bytes32"},{"name":"account","type":"address","indexed":true,"internalType":"address"},{"name":"sender","type":"address","indexed":true,"internalType":"address"}],"anonymous":false},{"type":"event","name":"VerificationPolicySet","inputs":[{"name":"policyId","type":"bytes32","indexed":true,"internalType":"bytes32"},{"name":"policyDigest","type":"bytes32","indexed":true,"internalType":"bytes32"},{"name":"version","type":"uint64","indexed":false,"internalType":"uint64"},{"name":"lane","type":"uint8","indexed":false,"internalType":"enum KeelCollectionVerificationRegistry.Lane"},{"name":"enabled","type":"bool","indexed":false,"internalType":"bool"}],"anonymous":false},{"type":"error","name":"AccessControlBadConfirmation","inputs":[]},{"type":"error","name":"AccessControlUnauthorizedAccount","inputs":[{"name":"account","type":"address","internalType":"address"},{"name":"neededRole","type":"bytes32","internalType":"bytes32"}]},{"type":"error","name":"AdapterCodeMismatch","inputs":[]},{"type":"error","name":"HookProtocolMismatch","inputs":[]},{"type":"error","name":"InvalidContract","inputs":[]},{"type":"error","name":"InvalidEvidence","inputs":[]},{"type":"error","name":"InvalidEvidenceBlock","inputs":[]},{"type":"error","name":"InvalidPolicy","inputs":[]},{"type":"error","name":"ObservationAlreadySealed","inputs":[]},{"type":"error","name":"PolicyUnavailable","inputs":[]},{"type":"error","name":"PortableRootUnanchored","inputs":[]},{"type":"error","name":"ReceiptAlreadyRevoked","inputs":[]},{"type":"error","name":"ReceiptUnavailable","inputs":[]},{"type":"error","name":"RuntimeCodeMismatch","inputs":[]},{"type":"error","name":"TokenURIMismatch","inputs":[]},{"type":"error","name":"TokenURIReadFailed","inputs":[]},{"type":"error","name":"ZeroAddress","inputs":[]}],
+   "KeelCommunityReplicationRegistry": [{"type":"constructor","inputs":[{"name":"artifactRegistry_","type":"address","internalType":"address"},{"name":"proofVerifier_","type":"address","internalType":"address"}],"stateMutability":"nonpayable"},{"type":"function","name":"CAMPAIGN_ID_DOMAIN","inputs":[],"outputs":[{"name":"","type":"bytes32","internalType":"bytes32"}],"stateMutability":"view"},{"type":"function","name":"CARRIER_EVM","inputs":[],"outputs":[{"name":"","type":"uint8","internalType":"uint8"}],"stateMutability":"view"},{"type":"function","name":"CARRIER_ORDINALS","inputs":[],"outputs":[{"name":"","type":"uint8","internalType":"uint8"}],"stateMutability":"view"},{"type":"function","name":"CARRIER_PROOF_ID_DOMAIN","inputs":[],"outputs":[{"name":"","type":"bytes32","internalType":"bytes32"}],"stateMutability":"view"},{"type":"function","name":"CARRIER_SCORE_BONUS","inputs":[],"outputs":[{"name":"","type":"uint256","internalType":"uint256"}],"stateMutability":"view"},{"type":"function","name":"CARRIER_TEZOS","inputs":[],"outputs":[{"name":"","type":"uint8","internalType":"uint8"}],"stateMutability":"view"},{"type":"function","name":"CHUNK_SCORE_BONUS","inputs":[],"outputs":[{"name":"","type":"uint256","internalType":"uint256"}],"stateMutability":"view"},{"type":"function","name":"MAX_CHUNKS","inputs":[],"outputs":[{"name":"","type":"uint32","internalType":"uint32"}],"stateMutability":"view"},{"type":"function","name":"MAX_CLAIM_BATCH","inputs":[],"outputs":[{"name":"","type":"uint32","internalType":"uint32"}],"stateMutability":"view"},{"type":"function","name":"MAX_CLAIM_LEASE","inputs":[],"outputs":[{"name":"","type":"uint32","internalType":"uint32"}],"stateMutability":"view"},{"type":"function","name":"MAX_LOCATOR_BYTES","inputs":[],"outputs":[{"name":"","type":"uint256","internalType":"uint256"}],"stateMutability":"view"},{"type":"function","name":"MAX_SUBMIT_BATCH","inputs":[],"outputs":[{"name":"","type":"uint32","internalType":"uint32"}],"stateMutability":"view"},{"type":"function","name":"MIN_CLAIM_LEASE","inputs":[],"outputs":[{"name":"","type":"uint32","internalType":"uint32"}],"stateMutability":"view"},{"type":"function","name":"VALID_CARRIER_MASK","inputs":[],"outputs":[{"name":"","type":"uint8","internalType":"uint8"}],"stateMutability":"view"},{"type":"function","name":"artifactRegistry","inputs":[],"outputs":[{"name":"","type":"address","internalType":"contract IKeelArtifactRegistry"}],"stateMutability":"view"},{"type":"function","name":"bindObjectRevision","inputs":[{"name":"campaignId","type":"bytes32","internalType":"bytes32"}],"outputs":[],"stateMutability":"nonpayable"},{"type":"function","name":"campaignCarrierStatus","inputs":[{"name":"campaignId","type":"bytes32","internalType":"bytes32"}],"outputs":[{"name":"requiredMask","type":"uint8","internalType":"uint8"},{"name":"completedMask","type":"uint8","internalType":"uint8"},{"name":"complete","type":"bool","internalType":"bool"}],"stateMutability":"view"},{"type":"function","name":"campaignContributorStats","inputs":[{"name":"campaignId","type":"bytes32","internalType":"bytes32"},{"name":"contributor","type":"address","internalType":"address"}],"outputs":[{"name":"","type":"tuple","internalType":"struct KeelCommunityReplicationRegistry.ContributorStats","components":[{"name":"verifiedBytes","type":"uint128","internalType":"uint128"},{"name":"slugs","type":"uint64","internalType":"uint64"},{"name":"carriers","type":"uint64","internalType":"uint64"},{"name":"score","type":"uint256","internalType":"uint256"}]}],"stateMutability":"view"},{"type":"function","name":"campaignCurrent","inputs":[{"name":"campaignId","type":"bytes32","internalType":"bytes32"}],"outputs":[{"name":"","type":"bool","internalType":"bool"}],"stateMutability":"view"},{"type":"function","name":"campaignForRevision","inputs":[{"name":"objectId","type":"bytes32","internalType":"bytes32"},{"name":"revision","type":"uint64","internalType":"uint64"}],"outputs":[{"name":"campaignId","type":"bytes32","internalType":"bytes32"}],"stateMutability":"view"},{"type":"function","name":"campaignState","inputs":[{"name":"campaignId","type":"bytes32","internalType":"bytes32"}],"outputs":[{"name":"","type":"tuple","internalType":"struct KeelCommunityReplicationRegistry.Campaign","components":[{"name":"creator","type":"address","internalType":"address"},{"name":"objectId","type":"bytes32","internalType":"bytes32"},{"name":"targetRevision","type":"uint64","internalType":"uint64"},{"name":"expectedParent","type":"uint64","internalType":"uint64"},{"name":"decodedDigest","type":"bytes32","internalType":"bytes32"},{"name":"metadataDigest","type":"bytes32","internalType":"bytes32"},{"name":"fidelitySetDigest","type":"bytes32","internalType":"bytes32"},{"name":"indexDigest","type":"bytes32","internalType":"bytes32"},{"name":"mediaTypeDigest","type":"bytes32","internalType":"bytes32"},{"name":"contentObjectId","type":"bytes32","internalType":"bytes32"},{"name":"byteLength","type":"uint64","internalType":"uint64"},{"name":"storedByteLength","type":"uint64","internalType":"uint64"},{"name":"createdAt","type":"uint64","internalType":"uint64"},{"name":"slugCount","type":"uint32","internalType":"uint32"},{"name":"completedSlugs","type":"uint32","internalType":"uint32"},{"name":"claimLeaseSeconds","type":"uint32","internalType":"uint32"},{"name":"digestAlgorithm","type":"uint8","internalType":"uint8"},{"name":"compression","type":"uint8","internalType":"enum IKeelHold.Compression"},{"name":"carrierMask","type":"uint8","internalType":"uint8"},{"name":"requiredCarrierMask","type":"uint8","internalType":"uint8"},{"name":"enabled","type":"bool","internalType":"bool"},{"name":"evmFinalized","type":"bool","internalType":"bool"},{"name":"revisionBound","type":"bool","internalType":"bool"},{"name":"exists","type":"bool","internalType":"bool"},{"name":"mediaType","type":"string","internalType":"string"}]}],"stateMutability":"view"},{"type":"function","name":"carrierProof","inputs":[{"name":"campaignId","type":"bytes32","internalType":"bytes32"},{"name":"carrier","type":"uint8","internalType":"uint8"}],"outputs":[{"name":"","type":"tuple","internalType":"struct KeelCommunityReplicationRegistry.CarrierProof","components":[{"name":"contributor","type":"address","internalType":"address"},{"name":"verifier","type":"address","internalType":"address"},{"name":"locatorDigest","type":"bytes32","internalType":"bytes32"},{"name":"proofDigest","type":"bytes32","internalType":"bytes32"},{"name":"readbackDigest","type":"bytes32","internalType":"bytes32"},{"name":"byteLength","type":"uint64","internalType":"uint64"},{"name":"submittedAt","type":"uint64","internalType":"uint64"},{"name":"verifiedAt","type":"uint64","internalType":"uint64"},{"name":"status","type":"uint8","internalType":"enum KeelCommunityReplicationRegistry.ProofStatus"},{"name":"locator","type":"string","internalType":"string"}]}],"stateMutability":"view"},{"type":"function","name":"carrierTask","inputs":[{"name":"campaignId","type":"bytes32","internalType":"bytes32"},{"name":"carrier","type":"uint8","internalType":"uint8"}],"outputs":[{"name":"","type":"tuple","internalType":"struct KeelCommunityReplicationRegistry.CarrierTask","components":[{"name":"claimant","type":"address","internalType":"address"},{"name":"claimExpiresAt","type":"uint64","internalType":"uint64"}]}],"stateMutability":"view"},{"type":"function","name":"claimCarrier","inputs":[{"name":"campaignId","type":"bytes32","internalType":"bytes32"},{"name":"carrier","type":"uint8","internalType":"uint8"}],"outputs":[],"stateMutability":"nonpayable"},{"type":"function","name":"claimSlugs","inputs":[{"name":"campaignId","type":"bytes32","internalType":"bytes32"},{"name":"indices","type":"uint32[]","internalType":"uint32[]"}],"outputs":[],"stateMutability":"nonpayable"},{"type":"function","name":"createCampaign","inputs":[{"name":"input","type":"tuple","internalType":"struct KeelCommunityReplicationRegistry.CampaignInput","components":[{"name":"objectId","type":"bytes32","internalType":"bytes32"},{"name":"objectSalt","type":"bytes32","internalType":"bytes32"},{"name":"targetRevision","type":"uint64","internalType":"uint64"},{"name":"expectedParent","type":"uint64","internalType":"uint64"},{"name":"digestAlgorithm","type":"uint8","internalType":"uint8"},{"name":"decodedDigest","type":"bytes32","internalType":"bytes32"},{"name":"metadataDigest","type":"bytes32","internalType":"bytes32"},{"name":"fidelitySetDigest","type":"bytes32","internalType":"bytes32"},{"name":"indexDigest","type":"bytes32","internalType":"bytes32"},{"name":"byteLength","type":"uint64","internalType":"uint64"},{"name":"storedByteLength","type":"uint64","internalType":"uint64"},{"name":"compression","type":"uint8","internalType":"enum IKeelHold.Compression"},{"name":"mediaType","type":"string","internalType":"string"},{"name":"carrierMask","type":"uint8","internalType":"uint8"},{"name":"claimLeaseSeconds","type":"uint32","internalType":"uint32"}]},{"name":"slugs","type":"tuple[]","internalType":"struct KeelCommunityReplicationRegistry.SlugInput[]","components":[{"name":"slugId","type":"bytes32","internalType":"bytes32"},{"name":"byteLength","type":"uint32","internalType":"uint32"}]}],"outputs":[{"name":"campaignId","type":"bytes32","internalType":"bytes32"}],"stateMutability":"nonpayable"},{"type":"function","name":"enableExternalCarriers","inputs":[{"name":"campaignId","type":"bytes32","internalType":"bytes32"},{"name":"carrierMask","type":"uint8","internalType":"uint8"}],"outputs":[],"stateMutability":"nonpayable"},{"type":"function","name":"finalizeEvmCarrier","inputs":[{"name":"campaignId","type":"bytes32","internalType":"bytes32"}],"outputs":[{"name":"contentObjectId","type":"bytes32","internalType":"bytes32"}],"stateMutability":"nonpayable"},{"type":"function","name":"globalContributorStats","inputs":[{"name":"contributor","type":"address","internalType":"address"}],"outputs":[{"name":"","type":"tuple","internalType":"struct KeelCommunityReplicationRegistry.ContributorStats","components":[{"name":"verifiedBytes","type":"uint128","internalType":"uint128"},{"name":"slugs","type":"uint64","internalType":"uint64"},{"name":"carriers","type":"uint64","internalType":"uint64"},{"name":"score","type":"uint256","internalType":"uint256"}]}],"stateMutability":"view"},{"type":"function","name":"keelHold","inputs":[],"outputs":[{"name":"","type":"address","internalType":"contract ICommunityHold"}],"stateMutability":"view"},{"type":"function","name":"predictCampaignId","inputs":[{"name":"input","type":"tuple","internalType":"struct KeelCommunityReplicationRegistry.CampaignInput","components":[{"name":"objectId","type":"bytes32","internalType":"bytes32"},{"name":"objectSalt","type":"bytes32","internalType":"bytes32"},{"name":"targetRevision","type":"uint64","internalType":"uint64"},{"name":"expectedParent","type":"uint64","internalType":"uint64"},{"name":"digestAlgorithm","type":"uint8","internalType":"uint8"},{"name":"decodedDigest","type":"bytes32","internalType":"bytes32"},{"name":"metadataDigest","type":"bytes32","internalType":"bytes32"},{"name":"fidelitySetDigest","type":"bytes32","internalType":"bytes32"},{"name":"indexDigest","type":"bytes32","internalType":"bytes32"},{"name":"byteLength","type":"uint64","internalType":"uint64"},{"name":"storedByteLength","type":"uint64","internalType":"uint64"},{"name":"compression","type":"uint8","internalType":"enum IKeelHold.Compression"},{"name":"mediaType","type":"string","internalType":"string"},{"name":"carrierMask","type":"uint8","internalType":"uint8"},{"name":"claimLeaseSeconds","type":"uint32","internalType":"uint32"}]},{"name":"creator","type":"address","internalType":"address"}],"outputs":[{"name":"","type":"bytes32","internalType":"bytes32"}],"stateMutability":"pure"},{"type":"function","name":"predictCarrierProofDigest","inputs":[{"name":"campaignId","type":"bytes32","internalType":"bytes32"},{"name":"carrier","type":"uint8","internalType":"uint8"},{"name":"locatorDigest","type":"bytes32","internalType":"bytes32"},{"name":"readbackDigest","type":"bytes32","internalType":"bytes32"}],"outputs":[{"name":"","type":"bytes32","internalType":"bytes32"}],"stateMutability":"pure"},{"type":"function","name":"proofVerifier","inputs":[],"outputs":[{"name":"","type":"address","internalType":"address"}],"stateMutability":"view"},{"type":"function","name":"releaseCarrierClaim","inputs":[{"name":"campaignId","type":"bytes32","internalType":"bytes32"},{"name":"carrier","type":"uint8","internalType":"uint8"}],"outputs":[],"stateMutability":"nonpayable"},{"type":"function","name":"releaseSlugClaim","inputs":[{"name":"campaignId","type":"bytes32","internalType":"bytes32"},{"name":"slugIndex","type":"uint32","internalType":"uint32"}],"outputs":[],"stateMutability":"nonpayable"},{"type":"function","name":"replaceCampaign","inputs":[{"name":"priorCampaignId","type":"bytes32","internalType":"bytes32"},{"name":"input","type":"tuple","internalType":"struct KeelCommunityReplicationRegistry.CampaignInput","components":[{"name":"objectId","type":"bytes32","internalType":"bytes32"},{"name":"objectSalt","type":"bytes32","internalType":"bytes32"},{"name":"targetRevision","type":"uint64","internalType":"uint64"},{"name":"expectedParent","type":"uint64","internalType":"uint64"},{"name":"digestAlgorithm","type":"uint8","internalType":"uint8"},{"name":"decodedDigest","type":"bytes32","internalType":"bytes32"},{"name":"metadataDigest","type":"bytes32","internalType":"bytes32"},{"name":"fidelitySetDigest","type":"bytes32","internalType":"bytes32"},{"name":"indexDigest","type":"bytes32","internalType":"bytes32"},{"name":"byteLength","type":"uint64","internalType":"uint64"},{"name":"storedByteLength","type":"uint64","internalType":"uint64"},{"name":"compression","type":"uint8","internalType":"enum IKeelHold.Compression"},{"name":"mediaType","type":"string","internalType":"string"},{"name":"carrierMask","type":"uint8","internalType":"uint8"},{"name":"claimLeaseSeconds","type":"uint32","internalType":"uint32"}]},{"name":"slugs","type":"tuple[]","internalType":"struct KeelCommunityReplicationRegistry.SlugInput[]","components":[{"name":"slugId","type":"bytes32","internalType":"bytes32"},{"name":"byteLength","type":"uint32","internalType":"uint32"}]}],"outputs":[{"name":"campaignId","type":"bytes32","internalType":"bytes32"}],"stateMutability":"nonpayable"},{"type":"function","name":"requiredCarrierMask","inputs":[{"name":"objectId","type":"bytes32","internalType":"bytes32"}],"outputs":[{"name":"","type":"uint8","internalType":"uint8"}],"stateMutability":"view"},{"type":"function","name":"reviewCarrierProof","inputs":[{"name":"campaignId","type":"bytes32","internalType":"bytes32"},{"name":"carrier","type":"uint8","internalType":"uint8"},{"name":"accepted","type":"bool","internalType":"bool"}],"outputs":[],"stateMutability":"nonpayable"},{"type":"function","name":"setCampaignEnabled","inputs":[{"name":"campaignId","type":"bytes32","internalType":"bytes32"},{"name":"enabled","type":"bool","internalType":"bool"}],"outputs":[],"stateMutability":"nonpayable"},{"type":"function","name":"slugTask","inputs":[{"name":"campaignId","type":"bytes32","internalType":"bytes32"},{"name":"slugIndex","type":"uint32","internalType":"uint32"}],"outputs":[{"name":"","type":"tuple","internalType":"struct KeelCommunityReplicationRegistry.SlugTask","components":[{"name":"slugId","type":"bytes32","internalType":"bytes32"},{"name":"claimant","type":"address","internalType":"address"},{"name":"contributor","type":"address","internalType":"address"},{"name":"claimExpiresAt","type":"uint64","internalType":"uint64"},{"name":"byteLength","type":"uint32","internalType":"uint32"},{"name":"complete","type":"bool","internalType":"bool"},{"name":"preexisting","type":"bool","internalType":"bool"}]}],"stateMutability":"view"},{"type":"function","name":"submitCarrierProof","inputs":[{"name":"campaignId","type":"bytes32","internalType":"bytes32"},{"name":"carrier","type":"uint8","internalType":"uint8"},{"name":"locator","type":"string","internalType":"string"},{"name":"readbackDigest","type":"bytes32","internalType":"bytes32"}],"outputs":[],"stateMutability":"nonpayable"},{"type":"function","name":"submitSlug","inputs":[{"name":"campaignId","type":"bytes32","internalType":"bytes32"},{"name":"slugIndex","type":"uint32","internalType":"uint32"},{"name":"data","type":"bytes","internalType":"bytes"}],"outputs":[],"stateMutability":"nonpayable"},{"type":"function","name":"submitSlugs","inputs":[{"name":"campaignId","type":"bytes32","internalType":"bytes32"},{"name":"indices","type":"uint32[]","internalType":"uint32[]"},{"name":"payloads","type":"bytes[]","internalType":"bytes[]"}],"outputs":[],"stateMutability":"nonpayable"},{"type":"function","name":"validateRevisionAppend","inputs":[{"name":"objectId","type":"bytes32","internalType":"bytes32"},{"name":"revision","type":"uint64","internalType":"uint64"},{"name":"publisher","type":"address","internalType":"address"},{"name":"contentObjectId","type":"bytes32","internalType":"bytes32"},{"name":"digestAlgorithm","type":"uint8","internalType":"uint8"},{"name":"decodedDigest","type":"bytes32","internalType":"bytes32"},{"name":"metadataDigest","type":"bytes32","internalType":"bytes32"},{"name":"fidelitySetDigest","type":"bytes32","internalType":"bytes32"}],"outputs":[],"stateMutability":"view"},{"type":"event","name":"CarrierClaimReleased","inputs":[{"name":"campaignId","type":"bytes32","indexed":true,"internalType":"bytes32"},{"name":"carrier","type":"uint8","indexed":true,"internalType":"uint8"},{"name":"contributor","type":"address","indexed":true,"internalType":"address"}],"anonymous":false},{"type":"event","name":"CarrierClaimed","inputs":[{"name":"campaignId","type":"bytes32","indexed":true,"internalType":"bytes32"},{"name":"carrier","type":"uint8","indexed":true,"internalType":"uint8"},{"name":"contributor","type":"address","indexed":true,"internalType":"address"},{"name":"expiresAt","type":"uint64","indexed":false,"internalType":"uint64"}],"anonymous":false},{"type":"event","name":"CarrierProofReviewed","inputs":[{"name":"campaignId","type":"bytes32","indexed":true,"internalType":"bytes32"},{"name":"carrier","type":"uint8","indexed":true,"internalType":"uint8"},{"name":"contributor","type":"address","indexed":true,"internalType":"address"},{"name":"verifier","type":"address","indexed":false,"internalType":"address"},{"name":"accepted","type":"bool","indexed":false,"internalType":"bool"},{"name":"score","type":"uint256","indexed":false,"internalType":"uint256"}],"anonymous":false},{"type":"event","name":"CarrierProofSubmitted","inputs":[{"name":"campaignId","type":"bytes32","indexed":true,"internalType":"bytes32"},{"name":"carrier","type":"uint8","indexed":true,"internalType":"uint8"},{"name":"contributor","type":"address","indexed":true,"internalType":"address"},{"name":"locatorDigest","type":"bytes32","indexed":false,"internalType":"bytes32"},{"name":"proofDigest","type":"bytes32","indexed":false,"internalType":"bytes32"},{"name":"readbackDigest","type":"bytes32","indexed":false,"internalType":"bytes32"},{"name":"byteLength","type":"uint64","indexed":false,"internalType":"uint64"},{"name":"locator","type":"string","indexed":false,"internalType":"string"}],"anonymous":false},{"type":"event","name":"EvmCarrierFinalized","inputs":[{"name":"campaignId","type":"bytes32","indexed":true,"internalType":"bytes32"},{"name":"contentObjectId","type":"bytes32","indexed":true,"internalType":"bytes32"},{"name":"finalizer","type":"address","indexed":true,"internalType":"address"}],"anonymous":false},{"type":"event","name":"ObjectCarrierPolicyAdvanced","inputs":[{"name":"objectId","type":"bytes32","indexed":true,"internalType":"bytes32"},{"name":"revision","type":"uint64","indexed":true,"internalType":"uint64"},{"name":"addedCarrierMask","type":"uint8","indexed":false,"internalType":"uint8"},{"name":"requiredCarrierMask","type":"uint8","indexed":false,"internalType":"uint8"}],"anonymous":false},{"type":"event","name":"ObjectRevisionBound","inputs":[{"name":"campaignId","type":"bytes32","indexed":true,"internalType":"bytes32"},{"name":"objectId","type":"bytes32","indexed":true,"internalType":"bytes32"},{"name":"revision","type":"uint64","indexed":true,"internalType":"uint64"},{"name":"contentObjectId","type":"bytes32","indexed":false,"internalType":"bytes32"}],"anonymous":false},{"type":"event","name":"ReplicationCampaignCreated","inputs":[{"name":"campaignId","type":"bytes32","indexed":true,"internalType":"bytes32"},{"name":"objectId","type":"bytes32","indexed":true,"internalType":"bytes32"},{"name":"targetRevision","type":"uint64","indexed":true,"internalType":"uint64"},{"name":"expectedParent","type":"uint64","indexed":false,"internalType":"uint64"},{"name":"creator","type":"address","indexed":false,"internalType":"address"},{"name":"digestAlgorithm","type":"uint8","indexed":false,"internalType":"uint8"},{"name":"decodedDigest","type":"bytes32","indexed":false,"internalType":"bytes32"},{"name":"metadataDigest","type":"bytes32","indexed":false,"internalType":"bytes32"},{"name":"fidelitySetDigest","type":"bytes32","indexed":false,"internalType":"bytes32"},{"name":"indexDigest","type":"bytes32","indexed":false,"internalType":"bytes32"},{"name":"mediaTypeDigest","type":"bytes32","indexed":false,"internalType":"bytes32"},{"name":"byteLength","type":"uint64","indexed":false,"internalType":"uint64"},{"name":"storedByteLength","type":"uint64","indexed":false,"internalType":"uint64"},{"name":"slugCount","type":"uint32","indexed":false,"internalType":"uint32"},{"name":"compression","type":"uint8","indexed":false,"internalType":"uint8"},{"name":"carrierMask","type":"uint8","indexed":false,"internalType":"uint8"},{"name":"requiredCarrierMask","type":"uint8","indexed":false,"internalType":"uint8"},{"name":"claimLeaseSeconds","type":"uint32","indexed":false,"internalType":"uint32"},{"name":"evmFinalized","type":"bool","indexed":false,"internalType":"bool"}],"anonymous":false},{"type":"event","name":"ReplicationCampaignEnabled","inputs":[{"name":"campaignId","type":"bytes32","indexed":true,"internalType":"bytes32"},{"name":"enabled","type":"bool","indexed":false,"internalType":"bool"}],"anonymous":false},{"type":"event","name":"ReplicationCampaignSuperseded","inputs":[{"name":"objectId","type":"bytes32","indexed":true,"internalType":"bytes32"},{"name":"revision","type":"uint64","indexed":true,"internalType":"uint64"},{"name":"priorCampaignId","type":"bytes32","indexed":true,"internalType":"bytes32"},{"name":"campaignId","type":"bytes32","indexed":false,"internalType":"bytes32"}],"anonymous":false},{"type":"event","name":"ReplicationCarriersEnabled","inputs":[{"name":"campaignId","type":"bytes32","indexed":true,"internalType":"bytes32"},{"name":"addedCarrierMask","type":"uint8","indexed":false,"internalType":"uint8"},{"name":"carrierMask","type":"uint8","indexed":false,"internalType":"uint8"}],"anonymous":false},{"type":"event","name":"SlugClaimReleased","inputs":[{"name":"campaignId","type":"bytes32","indexed":true,"internalType":"bytes32"},{"name":"slugIndex","type":"uint32","indexed":true,"internalType":"uint32"},{"name":"contributor","type":"address","indexed":true,"internalType":"address"}],"anonymous":false},{"type":"event","name":"SlugClaimed","inputs":[{"name":"campaignId","type":"bytes32","indexed":true,"internalType":"bytes32"},{"name":"slugIndex","type":"uint32","indexed":true,"internalType":"uint32"},{"name":"contributor","type":"address","indexed":true,"internalType":"address"},{"name":"expiresAt","type":"uint64","indexed":false,"internalType":"uint64"}],"anonymous":false},{"type":"event","name":"SlugContributionAccepted","inputs":[{"name":"campaignId","type":"bytes32","indexed":true,"internalType":"bytes32"},{"name":"slugIndex","type":"uint32","indexed":true,"internalType":"uint32"},{"name":"slugId","type":"bytes32","indexed":true,"internalType":"bytes32"},{"name":"contributor","type":"address","indexed":false,"internalType":"address"},{"name":"pointer","type":"address","indexed":false,"internalType":"address"},{"name":"byteLength","type":"uint32","indexed":false,"internalType":"uint32"},{"name":"score","type":"uint256","indexed":false,"internalType":"uint256"},{"name":"completedSlugs","type":"uint32","indexed":false,"internalType":"uint32"}],"anonymous":false},{"type":"event","name":"SlugResolvedAsPreexisting","inputs":[{"name":"campaignId","type":"bytes32","indexed":true,"internalType":"bytes32"},{"name":"slugIndex","type":"uint32","indexed":true,"internalType":"uint32"},{"name":"slugId","type":"bytes32","indexed":true,"internalType":"bytes32"},{"name":"pointer","type":"address","indexed":false,"internalType":"address"}],"anonymous":false},{"type":"event","name":"SlugTaskCommitted","inputs":[{"name":"campaignId","type":"bytes32","indexed":true,"internalType":"bytes32"},{"name":"slugIndex","type":"uint32","indexed":true,"internalType":"uint32"},{"name":"slugId","type":"bytes32","indexed":true,"internalType":"bytes32"},{"name":"byteLength","type":"uint32","indexed":false,"internalType":"uint32"},{"name":"preexisting","type":"bool","indexed":false,"internalType":"bool"}],"anonymous":false},{"type":"error","name":"CampaignDisabled","inputs":[]},{"type":"error","name":"CampaignExists","inputs":[]},{"type":"error","name":"CampaignMissing","inputs":[]},{"type":"error","name":"CampaignStale","inputs":[]},{"type":"error","name":"CarrierRegression","inputs":[]},{"type":"error","name":"ClaimMissing","inputs":[]},{"type":"error","name":"EvmAlreadyFinalized","inputs":[]},{"type":"error","name":"EvmIncomplete","inputs":[]},{"type":"error","name":"EvmNotEnabled","inputs":[]},{"type":"error","name":"InvalidBatch","inputs":[]},{"type":"error","name":"InvalidCampaign","inputs":[]},{"type":"error","name":"InvalidCarrier","inputs":[]},{"type":"error","name":"InvalidCommitment","inputs":[]},{"type":"error","name":"InvalidContract","inputs":[]},{"type":"error","name":"InvalidRevision","inputs":[]},{"type":"error","name":"InvalidRevisionPolicy","inputs":[]},{"type":"error","name":"InvalidSlug","inputs":[]},{"type":"error","name":"ProofAlreadyAccepted","inputs":[]},{"type":"error","name":"ProofMissing","inputs":[]},{"type":"error","name":"ProofPending","inputs":[]},{"type":"error","name":"RevisionAlreadyBound","inputs":[]},{"type":"error","name":"SlugAlreadyClaimed","inputs":[]},{"type":"error","name":"SlugComplete","inputs":[]},{"type":"error","name":"Unauthorized","inputs":[]},{"type":"error","name":"ZeroAddress","inputs":[]}],
+   "KeelPixelFingerprintRegistry": [{"type":"constructor","inputs":[{"name":"forwarder_","type":"address","internalType":"address"},{"name":"admin","type":"address","internalType":"address"}],"stateMutability":"nonpayable"},{"type":"function","name":"DEFAULT_ADMIN_ROLE","inputs":[],"outputs":[{"name":"","type":"bytes32","internalType":"bytes32"}],"stateMutability":"view"},{"type":"function","name":"administratorCount","inputs":[],"outputs":[{"name":"","type":"uint256","internalType":"uint256"}],"stateMutability":"view"},{"type":"function","name":"configurationLocked","inputs":[],"outputs":[{"name":"","type":"bool","internalType":"bool"}],"stateMutability":"view"},{"type":"function","name":"expectedWorkflowName","inputs":[],"outputs":[{"name":"","type":"bytes10","internalType":"bytes10"}],"stateMutability":"view"},{"type":"function","name":"expectedWorkflowOwner","inputs":[],"outputs":[{"name":"","type":"address","internalType":"address"}],"stateMutability":"view"},{"type":"function","name":"fingerprintOf","inputs":[{"name":"contentKey","type":"bytes32","internalType":"bytes32"}],"outputs":[{"name":"","type":"tuple","internalType":"struct KeelPixelFingerprintRegistry.Fingerprint","components":[{"name":"pixelHash","type":"bytes32","internalType":"bytes32"},{"name":"width","type":"uint32","internalType":"uint32"},{"name":"height","type":"uint32","internalType":"uint32"},{"name":"firstObserved","type":"uint64","internalType":"uint64"},{"name":"observations","type":"uint32","internalType":"uint32"},{"name":"exists","type":"bool","internalType":"bool"}]}],"stateMutability":"view"},{"type":"function","name":"forwarder","inputs":[],"outputs":[{"name":"","type":"address","internalType":"address"}],"stateMutability":"view"},{"type":"function","name":"getRoleAdmin","inputs":[{"name":"role","type":"bytes32","internalType":"bytes32"}],"outputs":[{"name":"","type":"bytes32","internalType":"bytes32"}],"stateMutability":"view"},{"type":"function","name":"grantRole","inputs":[{"name":"role","type":"bytes32","internalType":"bytes32"},{"name":"account","type":"address","internalType":"address"}],"outputs":[],"stateMutability":"nonpayable"},{"type":"function","name":"hasRole","inputs":[{"name":"role","type":"bytes32","internalType":"bytes32"},{"name":"account","type":"address","internalType":"address"}],"outputs":[{"name":"","type":"bool","internalType":"bool"}],"stateMutability":"view"},{"type":"function","name":"lastAdministratorProtectionEnabled","inputs":[],"outputs":[{"name":"","type":"bool","internalType":"bool"}],"stateMutability":"pure"},{"type":"function","name":"lockConfiguration","inputs":[],"outputs":[],"stateMutability":"nonpayable"},{"type":"function","name":"onReport","inputs":[{"name":"metadata","type":"bytes","internalType":"bytes"},{"name":"report","type":"bytes","internalType":"bytes"}],"outputs":[],"stateMutability":"nonpayable"},{"type":"function","name":"pixelEquivalent","inputs":[{"name":"left","type":"bytes32","internalType":"bytes32"},{"name":"right","type":"bytes32","internalType":"bytes32"}],"outputs":[{"name":"","type":"bool","internalType":"bool"}],"stateMutability":"view"},{"type":"function","name":"renounceRole","inputs":[{"name":"role","type":"bytes32","internalType":"bytes32"},{"name":"callerConfirmation","type":"address","internalType":"address"}],"outputs":[],"stateMutability":"nonpayable"},{"type":"function","name":"revokeRole","inputs":[{"name":"role","type":"bytes32","internalType":"bytes32"},{"name":"account","type":"address","internalType":"address"}],"outputs":[],"stateMutability":"nonpayable"},{"type":"function","name":"setForwarder","inputs":[{"name":"forwarder_","type":"address","internalType":"address"}],"outputs":[],"stateMutability":"nonpayable"},{"type":"function","name":"setWorkflowIdentity","inputs":[{"name":"owner_","type":"address","internalType":"address"},{"name":"name_","type":"bytes10","internalType":"bytes10"}],"outputs":[],"stateMutability":"nonpayable"},{"type":"function","name":"supportsInterface","inputs":[{"name":"interfaceId","type":"bytes4","internalType":"bytes4"}],"outputs":[{"name":"","type":"bool","internalType":"bool"}],"stateMutability":"view"},{"type":"event","name":"ConfigurationLockedForever","inputs":[],"anonymous":false},{"type":"event","name":"FingerprintObserved","inputs":[{"name":"contentKey","type":"bytes32","indexed":true,"internalType":"bytes32"},{"name":"pixelHash","type":"bytes32","indexed":true,"internalType":"bytes32"},{"name":"width","type":"uint32","indexed":false,"internalType":"uint32"},{"name":"height","type":"uint32","indexed":false,"internalType":"uint32"},{"name":"observations","type":"uint32","indexed":false,"internalType":"uint32"}],"anonymous":false},{"type":"event","name":"ForwarderConfigured","inputs":[{"name":"forwarder","type":"address","indexed":false,"internalType":"address"}],"anonymous":false},{"type":"event","name":"RoleAdminChanged","inputs":[{"name":"role","type":"bytes32","indexed":true,"internalType":"bytes32"},{"name":"previousAdminRole","type":"bytes32","indexed":true,"internalType":"bytes32"},{"name":"newAdminRole","type":"bytes32","indexed":true,"internalType":"bytes32"}],"anonymous":false},{"type":"event","name":"RoleGranted","inputs":[{"name":"role","type":"bytes32","indexed":true,"internalType":"bytes32"},{"name":"account","type":"address","indexed":true,"internalType":"address"},{"name":"sender","type":"address","indexed":true,"internalType":"address"}],"anonymous":false},{"type":"event","name":"RoleRevoked","inputs":[{"name":"role","type":"bytes32","indexed":true,"internalType":"bytes32"},{"name":"account","type":"address","indexed":true,"internalType":"address"},{"name":"sender","type":"address","indexed":true,"internalType":"address"}],"anonymous":false},{"type":"event","name":"WorkflowIdentityConfigured","inputs":[{"name":"expectedOwner","type":"address","indexed":false,"internalType":"address"},{"name":"expectedName","type":"bytes10","indexed":false,"internalType":"bytes10"}],"anonymous":false},{"type":"error","name":"AccessControlBadConfirmation","inputs":[]},{"type":"error","name":"AccessControlUnauthorizedAccount","inputs":[{"name":"account","type":"address","internalType":"address"},{"name":"neededRole","type":"bytes32","internalType":"bytes32"}]},{"type":"error","name":"ConfigurationLocked","inputs":[]},{"type":"error","name":"FingerprintContradiction","inputs":[{"name":"recorded","type":"bytes32","internalType":"bytes32"},{"name":"reported","type":"bytes32","internalType":"bytes32"}]},{"type":"error","name":"InvalidReport","inputs":[]},{"type":"error","name":"LastAdministrator","inputs":[]},{"type":"error","name":"OnlyForwarderCanReport","inputs":[]},{"type":"error","name":"WorkflowIdentityMismatch","inputs":[]},{"type":"error","name":"ZeroAddress","inputs":[]}],
+-  "KeelUriAttestationRegistry": [{"type":"constructor","inputs":[{"name":"forwarder_","type":"address","internalType":"address"},{"name":"admin","type":"address","internalType":"address"}],"stateMutability":"nonpayable"},{"type":"function","name":"DEFAULT_ADMIN_ROLE","inputs":[],"outputs":[{"name":"","type":"bytes32","internalType":"bytes32"}],"stateMutability":"view"},{"type":"function","name":"administratorCount","inputs":[],"outputs":[{"name":"","type":"uint256","internalType":"uint256"}],"stateMutability":"view"},{"type":"function","name":"attestationFor","inputs":[{"name":"uri","type":"string","internalType":"string"}],"outputs":[{"name":"","type":"tuple","internalType":"struct KeelUriAttestationRegistry.Attestation","components":[{"name":"contentDigest","type":"bytes32","internalType":"bytes32"},{"name":"byteLength","type":"uint64","internalType":"uint64"},{"name":"firstObserved","type":"uint64","internalType":"uint64"},{"name":"lastObserved","type":"uint64","internalType":"uint64"},{"name":"observations","type":"uint32","internalType":"uint32"},{"name":"changes","type":"uint32","internalType":"uint32"},{"name":"exists","type":"bool","internalType":"bool"}]}],"stateMutability":"view"},{"type":"function","name":"attestationOf","inputs":[{"name":"uriKey","type":"bytes32","internalType":"bytes32"}],"outputs":[{"name":"","type":"tuple","internalType":"struct KeelUriAttestationRegistry.Attestation","components":[{"name":"contentDigest","type":"bytes32","internalType":"bytes32"},{"name":"byteLength","type":"uint64","internalType":"uint64"},{"name":"firstObserved","type":"uint64","internalType":"uint64"},{"name":"lastObserved","type":"uint64","internalType":"uint64"},{"name":"observations","type":"uint32","internalType":"uint32"},{"name":"changes","type":"uint32","internalType":"uint32"},{"name":"exists","type":"bool","internalType":"bool"}]}],"stateMutability":"view"},{"type":"function","name":"configurationLocked","inputs":[],"outputs":[{"name":"","type":"bool","internalType":"bool"}],"stateMutability":"view"},{"type":"function","name":"expectedWorkflowId","inputs":[],"outputs":[{"name":"","type":"bytes32","internalType":"bytes32"}],"stateMutability":"view"},{"type":"function","name":"expectedWorkflowName","inputs":[],"outputs":[{"name":"","type":"bytes10","internalType":"bytes10"}],"stateMutability":"view"},{"type":"function","name":"expectedWorkflowOwner","inputs":[],"outputs":[{"name":"","type":"address","internalType":"address"}],"stateMutability":"view"},{"type":"function","name":"forwarder","inputs":[],"outputs":[{"name":"","type":"address","internalType":"address"}],"stateMutability":"view"},{"type":"function","name":"getRoleAdmin","inputs":[{"name":"role","type":"bytes32","internalType":"bytes32"}],"outputs":[{"name":"","type":"bytes32","internalType":"bytes32"}],"stateMutability":"view"},{"type":"function","name":"grantRole","inputs":[{"name":"role","type":"bytes32","internalType":"bytes32"},{"name":"account","type":"address","internalType":"address"}],"outputs":[],"stateMutability":"nonpayable"},{"type":"function","name":"hasRole","inputs":[{"name":"role","type":"bytes32","internalType":"bytes32"},{"name":"account","type":"address","internalType":"address"}],"outputs":[{"name":"","type":"bool","internalType":"bool"}],"stateMutability":"view"},{"type":"function","name":"lastAdministratorProtectionEnabled","inputs":[],"outputs":[{"name":"","type":"bool","internalType":"bool"}],"stateMutability":"pure"},{"type":"function","name":"lockConfiguration","inputs":[],"outputs":[],"stateMutability":"nonpayable"},{"type":"function","name":"onReport","inputs":[{"name":"metadata","type":"bytes","internalType":"bytes"},{"name":"report","type":"bytes","internalType":"bytes"}],"outputs":[],"stateMutability":"nonpayable"},{"type":"function","name":"renounceRole","inputs":[{"name":"role","type":"bytes32","internalType":"bytes32"},{"name":"callerConfirmation","type":"address","internalType":"address"}],"outputs":[],"stateMutability":"nonpayable"},{"type":"function","name":"revokeRole","inputs":[{"name":"role","type":"bytes32","internalType":"bytes32"},{"name":"account","type":"address","internalType":"address"}],"outputs":[],"stateMutability":"nonpayable"},{"type":"function","name":"setForwarder","inputs":[{"name":"forwarder_","type":"address","internalType":"address"}],"outputs":[],"stateMutability":"nonpayable"},{"type":"function","name":"setWorkflowIdentity","inputs":[{"name":"owner_","type":"address","internalType":"address"},{"name":"name_","type":"bytes10","internalType":"bytes10"},{"name":"workflowId","type":"bytes32","internalType":"bytes32"}],"outputs":[],"stateMutability":"nonpayable"},{"type":"function","name":"supportsInterface","inputs":[{"name":"interfaceId","type":"bytes4","internalType":"bytes4"}],"outputs":[{"name":"","type":"bool","internalType":"bool"}],"stateMutability":"view"},{"type":"event","name":"ConfigurationLockedForever","inputs":[],"anonymous":false},{"type":"event","name":"ForwarderConfigured","inputs":[{"name":"forwarder","type":"address","indexed":false,"internalType":"address"}],"anonymous":false},{"type":"event","name":"RoleAdminChanged","inputs":[{"name":"role","type":"bytes32","indexed":true,"internalType":"bytes32"},{"name":"previousAdminRole","type":"bytes32","indexed":true,"internalType":"bytes32"},{"name":"newAdminRole","type":"bytes32","indexed":true,"internalType":"bytes32"}],"anonymous":false},{"type":"event","name":"RoleGranted","inputs":[{"name":"role","type":"bytes32","indexed":true,"internalType":"bytes32"},{"name":"account","type":"address","indexed":true,"internalType":"address"},{"name":"sender","type":"address","indexed":true,"internalType":"address"}],"anonymous":false},{"type":"event","name":"RoleRevoked","inputs":[{"name":"role","type":"bytes32","indexed":true,"internalType":"bytes32"},{"name":"account","type":"address","indexed":true,"internalType":"address"},{"name":"sender","type":"address","indexed":true,"internalType":"address"}],"anonymous":false},{"type":"event","name":"UriContentChanged","inputs":[{"name":"uriKey","type":"bytes32","indexed":true,"internalType":"bytes32"},{"name":"previousDigest","type":"bytes32","indexed":true,"internalType":"bytes32"},{"name":"contentDigest","type":"bytes32","indexed":true,"internalType":"bytes32"},{"name":"heldForBlocks","type":"uint64","indexed":false,"internalType":"uint64"},{"name":"changes","type":"uint32","indexed":false,"internalType":"uint32"}],"anonymous":false},{"type":"event","name":"UriObserved","inputs":[{"name":"uriKey","type":"bytes32","indexed":true,"internalType":"bytes32"},{"name":"contentDigest","type":"bytes32","indexed":true,"internalType":"bytes32"},{"name":"byteLength","type":"uint64","indexed":false,"internalType":"uint64"},{"name":"observations","type":"uint32","indexed":false,"internalType":"uint32"},{"name":"uri","type":"string","indexed":false,"internalType":"string"}],"anonymous":false},{"type":"event","name":"WorkflowIdentityConfigured","inputs":[{"name":"expectedOwner","type":"address","indexed":false,"internalType":"address"},{"name":"expectedName","type":"bytes10","indexed":false,"internalType":"bytes10"},{"name":"workflowId","type":"bytes32","indexed":false,"internalType":"bytes32"}],"anonymous":false},{"type":"error","name":"AccessControlBadConfirmation","inputs":[]},{"type":"error","name":"AccessControlUnauthorizedAccount","inputs":[{"name":"account","type":"address","internalType":"address"},{"name":"neededRole","type":"bytes32","internalType":"bytes32"}]},{"type":"error","name":"ConfigurationLocked","inputs":[]},{"type":"error","name":"InvalidReport","inputs":[]},{"type":"error","name":"LastAdministrator","inputs":[]},{"type":"error","name":"OnlyForwarderCanReport","inputs":[]},{"type":"error","name":"WorkflowIdentityMismatch","inputs":[]},{"type":"error","name":"ZeroAddress","inputs":[]}],
++  "KeelUriAttestationRegistry": [{"type":"constructor","inputs":[{"name":"forwarder_","type":"address","internalType":"address"},{"name":"admin","type":"address","internalType":"address"}],"stateMutability":"nonpayable"},{"type":"function","name":"DEFAULT_ADMIN_ROLE","inputs":[],"outputs":[{"name":"","type":"bytes32","internalType":"bytes32"}],"stateMutability":"view"},{"type":"function","name":"administratorCount","inputs":[],"outputs":[{"name":"","type":"uint256","internalType":"uint256"}],"stateMutability":"view"},{"type":"function","name":"attestationFor","inputs":[{"name":"uri","type":"string","internalType":"string"}],"outputs":[{"name":"","type":"tuple","internalType":"struct KeelUriAttestationRegistry.Attestation","components":[{"name":"contentDigest","type":"bytes32","internalType":"bytes32"},{"name":"byteLength","type":"uint64","internalType":"uint64"},{"name":"firstObserved","type":"uint64","internalType":"uint64"},{"name":"lastObserved","type":"uint64","internalType":"uint64"},{"name":"observations","type":"uint32","internalType":"uint32"},{"name":"changes","type":"uint32","internalType":"uint32"},{"name":"exists","type":"bool","internalType":"bool"}]}],"stateMutability":"view"},{"type":"function","name":"attestationOf","inputs":[{"name":"uriKey","type":"bytes32","internalType":"bytes32"}],"outputs":[{"name":"","type":"tuple","internalType":"struct KeelUriAttestationRegistry.Attestation","components":[{"name":"contentDigest","type":"bytes32","internalType":"bytes32"},{"name":"byteLength","type":"uint64","internalType":"uint64"},{"name":"firstObserved","type":"uint64","internalType":"uint64"},{"name":"lastObserved","type":"uint64","internalType":"uint64"},{"name":"observations","type":"uint32","internalType":"uint32"},{"name":"changes","type":"uint32","internalType":"uint32"},{"name":"exists","type":"bool","internalType":"bool"}]}],"stateMutability":"view"},{"type":"function","name":"configurationLocked","inputs":[],"outputs":[{"name":"","type":"bool","internalType":"bool"}],"stateMutability":"view"},{"type":"function","name":"expectedWorkflowId","inputs":[],"outputs":[{"name":"","type":"bytes32","internalType":"bytes32"}],"stateMutability":"view"},{"type":"function","name":"expectedWorkflowName","inputs":[],"outputs":[{"name":"","type":"bytes10","internalType":"bytes10"}],"stateMutability":"view"},{"type":"function","name":"expectedWorkflowOwner","inputs":[],"outputs":[{"name":"","type":"address","internalType":"address"}],"stateMutability":"view"},{"type":"function","name":"forwarder","inputs":[],"outputs":[{"name":"","type":"address","internalType":"address"}],"stateMutability":"view"},{"type":"function","name":"getRoleAdmin","inputs":[{"name":"role","type":"bytes32","internalType":"bytes32"}],"outputs":[{"name":"","type":"bytes32","internalType":"bytes32"}],"stateMutability":"view"},{"type":"function","name":"grantRole","inputs":[{"name":"role","type":"bytes32","internalType":"bytes32"},{"name":"account","type":"address","internalType":"address"}],"outputs":[],"stateMutability":"nonpayable"},{"type":"function","name":"hasRole","inputs":[{"name":"role","type":"bytes32","internalType":"bytes32"},{"name":"account","type":"address","internalType":"address"}],"outputs":[{"name":"","type":"bool","internalType":"bool"}],"stateMutability":"view"},{"type":"function","name":"lastAdministratorProtectionEnabled","inputs":[],"outputs":[{"name":"","type":"bool","internalType":"bool"}],"stateMutability":"pure"},{"type":"function","name":"lockConfiguration","inputs":[],"outputs":[],"stateMutability":"nonpayable"},{"type":"function","name":"onReport","inputs":[{"name":"metadata","type":"bytes","internalType":"bytes"},{"name":"report","type":"bytes","internalType":"bytes"}],"outputs":[],"stateMutability":"nonpayable"},{"type":"function","name":"renounceRole","inputs":[{"name":"role","type":"bytes32","internalType":"bytes32"},{"name":"callerConfirmation","type":"address","internalType":"address"}],"outputs":[],"stateMutability":"nonpayable"},{"type":"function","name":"revokeRole","inputs":[{"name":"role","type":"bytes32","internalType":"bytes32"},{"name":"account","type":"address","internalType":"address"}],"outputs":[],"stateMutability":"nonpayable"},{"type":"function","name":"setForwarder","inputs":[{"name":"forwarder_","type":"address","internalType":"address"}],"outputs":[],"stateMutability":"nonpayable"},{"type":"function","name":"setWorkflowIdentity","inputs":[{"name":"owner_","type":"address","internalType":"address"},{"name":"name_","type":"bytes10","internalType":"bytes10"},{"name":"workflowId","type":"bytes32","internalType":"bytes32"}],"outputs":[],"stateMutability":"nonpayable"},{"type":"function","name":"supportsInterface","inputs":[{"name":"interfaceId","type":"bytes4","internalType":"bytes4"}],"outputs":[{"name":"","type":"bool","internalType":"bool"}],"stateMutability":"view"},{"type":"event","name":"ConfigurationLockedForever","inputs":[],"anonymous":false},{"type":"event","name":"ForwarderConfigured","inputs":[{"name":"forwarder","type":"address","indexed":false,"internalType":"address"}],"anonymous":false},{"type":"event","name":"RoleAdminChanged","inputs":[{"name":"role","type":"bytes32","indexed":true,"internalType":"bytes32"},{"name":"previousAdminRole","type":"bytes32","indexed":true,"internalType":"bytes32"},{"name":"newAdminRole","type":"bytes32","indexed":true,"internalType":"bytes32"}],"anonymous":false},{"type":"event","name":"RoleGranted","inputs":[{"name":"role","type":"bytes32","indexed":true,"internalType":"bytes32"},{"name":"account","type":"address","indexed":true,"internalType":"address"},{"name":"sender","type":"address","indexed":true,"internalType":"address"}],"anonymous":false},{"type":"event","name":"RoleRevoked","inputs":[{"name":"role","type":"bytes32","indexed":true,"internalType":"bytes32"},{"name":"account","type":"address","indexed":true,"internalType":"address"},{"name":"sender","type":"address","indexed":true,"internalType":"address"}],"anonymous":false},{"type":"event","name":"UriContentChanged","inputs":[{"name":"uriKey","type":"bytes32","indexed":true,"internalType":"bytes32"},{"name":"previousDigest","type":"bytes32","indexed":true,"internalType":"bytes32"},{"name":"contentDigest","type":"bytes32","indexed":true,"internalType":"bytes32"},{"name":"heldForBlocks","type":"uint64","indexed":false,"internalType":"uint64"},{"name":"changes","type":"uint32","indexed":false,"internalType":"uint32"}],"anonymous":false},{"type":"event","name":"UriObserved","inputs":[{"name":"uriKey","type":"bytes32","indexed":true,"internalType":"bytes32"},{"name":"contentDigest","type":"bytes32","indexed":true,"internalType":"bytes32"},{"name":"byteLength","type":"uint64","indexed":false,"internalType":"uint64"},{"name":"observations","type":"uint32","indexed":false,"internalType":"uint32"}],"anonymous":false},{"type":"event","name":"WorkflowIdentityConfigured","inputs":[{"name":"expectedOwner","type":"address","indexed":false,"internalType":"address"},{"name":"expectedName","type":"bytes10","indexed":false,"internalType":"bytes10"},{"name":"workflowId","type":"bytes32","indexed":false,"internalType":"bytes32"}],"anonymous":false},{"type":"error","name":"AccessControlBadConfirmation","inputs":[]},{"type":"error","name":"AccessControlUnauthorizedAccount","inputs":[{"name":"account","type":"address","internalType":"address"},{"name":"neededRole","type":"bytes32","internalType":"bytes32"}]},{"type":"error","name":"ConfigurationLocked","inputs":[]},{"type":"error","name":"InvalidReport","inputs":[]},{"type":"error","name":"LastAdministrator","inputs":[]},{"type":"error","name":"OnlyForwarderCanReport","inputs":[]},{"type":"error","name":"WorkflowIdentityMismatch","inputs":[]},{"type":"error","name":"ZeroAddress","inputs":[]}],
+ } as const;
+diff --git a/packages/sdk/src/modules.generated.ts b/packages/sdk/src/modules.generated.ts
+index cc620d69..3bdd2670 100644
+--- a/packages/sdk/src/modules.generated.ts
++++ b/packages/sdk/src/modules.generated.ts
+@@ -1,5 +1,5 @@
+ // GENERATED BY `keel sync` — DO NOT EDIT BY HAND.
+-// Source: packages/contracts/modules/*/keel.module.json and */deployments/*.json
++// Source: keel-contracts {modules,apps}/*/keel.module.json and */deployments/*.json
+ 
+ /** Reusable protocol infrastructure. Each module ships as its own repository. */
+ export type KeelModuleId = "keel-kernel" | "keel-codecs" | "keel-hold" | "keel-artifacts" | "keel-graph" | "keel-harness" | "keel-presentation" | "keel-die" | "keel-creator-identity" | "keel-mint-access" | "keel-equipment" | "keel-market" | "keel-anchors" | "keel-crucible" | "keel-ip-control" | "keel-sleeve" | "keel-web3-url" | "keel-cross-chain-mint" | "keel-stake";
+diff --git a/scripts/_bindreal.mjs b/scripts/_bindreal.mjs
+index 397d66b5..cc65e32a 100644
+--- a/scripts/_bindreal.mjs
++++ b/scripts/_bindreal.mjs
+@@ -2,8 +2,9 @@ import { readFileSync } from "node:fs";
+ import { createPublicClient, createWalletClient, formatEther, http } from "viem";
+ import { privateKeyToAccount } from "viem/accounts";
+ import { sepolia } from "viem/chains";
++import { CONTRACTS_ROOT } from "../tools/keel/contracts-root.mjs";
+ const RPC = "https://ethereum-sepolia-rpc.publicnode.com";
+-const LEDGER = JSON.parse(readFileSync("packages/contracts/out/KeelBackpackProofLedger.sol/KeelBackpackProofLedger.json", "utf8"));
++const LEDGER = JSON.parse(readFileSync(`${CONTRACTS_ROOT}/out/KeelBackpackProofLedger.sol/KeelBackpackProofLedger.json`, "utf8"));
+ const book = JSON.parse(readFileSync("scripts/backpack-demo-sepolia.json", "utf8"));
+ const old = JSON.parse(readFileSync("scripts/backpack-sepolia.json", "utf8"));
+ const account = privateKeyToAccount(JSON.parse(readFileSync(".secrets/vault-sepolia-deployer.json", "utf8")).privateKey);
+diff --git a/scripts/bind-shared-verifier.mjs b/scripts/bind-shared-verifier.mjs
+index 323ffb9a..9744295b 100644
+--- a/scripts/bind-shared-verifier.mjs
++++ b/scripts/bind-shared-verifier.mjs
+@@ -18,12 +18,13 @@ import { readFileSync, writeFileSync } from "node:fs";
+ import { createPublicClient, createWalletClient, formatEther, http, keccak256, toHex } from "viem";
+ import { privateKeyToAccount } from "viem/accounts";
+ import { sepolia } from "viem/chains";
++import { CONTRACTS_ROOT } from "../tools/keel/contracts-root.mjs";
+ 
+ const RPC = "https://ethereum-sepolia-rpc.publicnode.com";
+ const VIEWER = process.env.KEEL_VIEWER_HTML;
+ const tokenId = BigInt(process.argv[process.argv.indexOf("--token") + 1] ?? 1);
+ 
+-const art = (f, n) => JSON.parse(readFileSync(`packages/contracts/out/${f}/${n}.json`, "utf8"));
++const art = (f, n) => JSON.parse(readFileSync(`${CONTRACTS_ROOT}/out/${f}/${n}.json`, "utf8"));
+ const CS = art("KeelHold.sol", "KeelHold");
+ const LEDGER = art("KeelBackpackProofLedger.sol", "KeelBackpackProofLedger");
+ const book = JSON.parse(readFileSync("scripts/backpack-demo-sepolia.json", "utf8"));
+diff --git a/scripts/build-viewer-object-sepolia.mjs b/scripts/build-viewer-object-sepolia.mjs
+index 2905bfc6..3a1fc7d6 100644
+--- a/scripts/build-viewer-object-sepolia.mjs
++++ b/scripts/build-viewer-object-sepolia.mjs
+@@ -12,12 +12,13 @@ import { readFileSync, writeFileSync } from "node:fs";
+ import { createPublicClient, createWalletClient, http, formatEther } from "viem";
+ import { privateKeyToAccount } from "viem/accounts";
+ import { sepolia } from "viem/chains";
++import { CONTRACTS_ROOT } from "../tools/keel/contracts-root.mjs";
+ 
+ const RPC = "https://ethereum-sepolia-rpc.publicnode.com";
+ const KEY = JSON.parse(readFileSync(".secrets/vault-sepolia-deployer.json", "utf8")).privateKey;
+ const D = JSON.parse(readFileSync("scripts/backpack-sepolia.json", "utf8"));
+ const SCRATCH = process.env.KEEL_SHELL_DIR;
+-const art = (p, n) => JSON.parse(readFileSync(`packages/contracts/out/${p}/${n}.json`, "utf8"));
++const art = (p, n) => JSON.parse(readFileSync(`${CONTRACTS_ROOT}/out/${p}/${n}.json`, "utf8"));
+ const CS = art("KeelHold.sol", "KeelHold");
+ const LEDGER = art("KeelBackpackProofLedger.sol", "KeelBackpackProofLedger");
+ 
+@@ -80,7 +81,7 @@ if (!D.viewerObject) {
+   // The composite's digest is over the concatenation of its children.
+   const chunks = [];
+   for (const f of ["shell-prefix.bin", "slot-entry.bin", "slot-ape.bin", "shell-suffix.bin"]) chunks.push(new Uint8Array(readFileSync(`${SCRATCH}/${f}`)));
+-  chunks.push(new Uint8Array(readFileSync("packages/contracts/test/fixtures/bayc-ape-1.png")));
++  chunks.push(new Uint8Array(readFileSync(`${CONTRACTS_ROOT}/test/fixtures/bayc-ape-1.png`)));
+   const joined = new Uint8Array(chunks.reduce((a, c) => a + c.length, 0));
+   let off = 0; for (const c of chunks) { joined.set(c, off); off += c.length; }
+   const digest = `0x${Buffer.from(await crypto.subtle.digest("SHA-256", joined)).toString("hex")}`;
+diff --git a/scripts/burn-artwork-into-viewer.mjs b/scripts/burn-artwork-into-viewer.mjs
+index 647b1d67..02427518 100644
+--- a/scripts/burn-artwork-into-viewer.mjs
++++ b/scripts/burn-artwork-into-viewer.mjs
+@@ -21,17 +21,18 @@ import { readFileSync, writeFileSync } from "node:fs";
+ import { createPublicClient, createWalletClient, formatEther, http, keccak256, toHex } from "viem";
+ import { privateKeyToAccount } from "viem/accounts";
+ import { sepolia } from "viem/chains";
++import { CONTRACTS_ROOT } from "../tools/keel/contracts-root.mjs";
+ 
+ const RPC = process.env.SEPOLIA_RPC ?? "https://ethereum-sepolia-rpc.publicnode.com";
+ const MAINNET_RPC = process.env.MAINNET_RPC ?? "https://ethereum-rpc.publicnode.com";
+ const VIEWER = process.env.KEEL_VIEWER_HTML;
+-const FIXTURES = "packages/contracts/test/fixtures";
++const FIXTURES = `${CONTRACTS_ROOT}/test/fixtures`;
+ 
+ const argv = process.argv.slice(2);
+ const tokenId = Number(argv[argv.indexOf("--token") + 1]);
+ if (!Number.isInteger(tokenId)) throw new Error("pass --token <id>");
+ 
+-const art = (file, name) => JSON.parse(readFileSync(`packages/contracts/out/${file}/${name}.json`, "utf8"));
++const art = (file, name) => JSON.parse(readFileSync(`${CONTRACTS_ROOT}/out/${file}/${name}.json`, "utf8"));
+ const CS = art("KeelHold.sol", "KeelHold");
+ const LEDGER = art("KeelBackpackProofLedger.sol", "KeelBackpackProofLedger");
+ 
+diff --git a/scripts/check.mjs b/scripts/check.mjs
+index dd7b12ba..f602d332 100644
+--- a/scripts/check.mjs
++++ b/scripts/check.mjs
+@@ -3,5 +3,3 @@ import { run } from "./run.mjs";
+ run("node", ["scripts/test.mjs"]);
+ run("node", ["scripts/solidity-static-check.mjs"]);
+ run("node", ["scripts/solidity-gas-check.mjs"]);
+-
+-run("node", ["scripts/studio-structure-check.mjs"]);
+diff --git a/scripts/clean.mjs b/scripts/clean.mjs
+index 8b5f9a1e..a7da7d3f 100644
+--- a/scripts/clean.mjs
++++ b/scripts/clean.mjs
+@@ -10,7 +10,6 @@ for (const directory of [
+   "packages/ethereum-adapter/dist",
+   "packages/studio-core/dist",
+   ".verification",
+-  "packages/contracts/artifacts",
+ ]) {
+   await rm(path.join(root, directory), { recursive: true, force: true });
+ }
+diff --git a/scripts/compile-solidity-targets.mjs b/scripts/compile-solidity-targets.mjs
+index 7ea85a79..396915a4 100644
+--- a/scripts/compile-solidity-targets.mjs
++++ b/scripts/compile-solidity-targets.mjs
+@@ -3,6 +3,7 @@ import path from "node:path";
+ 
+ import { root } from "./run.mjs";
+ import { compileCanonicalSolidityArtifacts } from "./solidity-compiler.mjs";
++import { CONTRACTS_ROOT } from "../tools/keel/contracts-root.mjs";
+ 
+ const contractNames = process.argv.slice(2);
+ if (contractNames.length === 0 || contractNames.some((name) => !/^[A-Za-z][A-Za-z0-9_]*$/u.test(name))) {
+@@ -10,7 +11,7 @@ if (contractNames.length === 0 || contractNames.some((name) => !/^[A-Za-z][A-Za-
+ }
+ const sourceNames = contractNames.map((name) => `src/${name}.sol`);
+ const compiled = await compileCanonicalSolidityArtifacts(root, { contractNames, sourceNames });
+-const artifactsRoot = path.join(root, "packages", "contracts", "artifacts");
++const artifactsRoot = path.join(CONTRACTS_ROOT, "artifacts");
+ await mkdir(artifactsRoot, { recursive: true });
+ for (const [contractName, artifact] of compiled.artifacts) {
+   await writeFile(path.join(artifactsRoot, `${contractName}.json`), `${JSON.stringify(artifact, null, 2)}\n`);
+diff --git a/scripts/compile-solidity.mjs b/scripts/compile-solidity.mjs
+index 503205a2..5f6500dd 100644
+--- a/scripts/compile-solidity.mjs
++++ b/scripts/compile-solidity.mjs
+@@ -3,8 +3,9 @@ import path from "node:path";
+ 
+ import { root } from "./run.mjs";
+ import { compileCanonicalSolidityArtifacts, SOLIDITY_COMPILER_SETTINGS } from "./solidity-compiler.mjs";
++import { CONTRACTS_ROOT } from "../tools/keel/contracts-root.mjs";
+ 
+-const artifactsRoot = path.join(root, "packages", "contracts", "artifacts");
++const artifactsRoot = path.join(CONTRACTS_ROOT, "artifacts");
+ const compiled = await compileCanonicalSolidityArtifacts(root);
+ for (const diagnostic of compiled.diagnostics) {
+   const line = diagnostic.formattedMessage ?? diagnostic.message;
+diff --git a/scripts/compile-vault-runner-solidity.mjs b/scripts/compile-vault-runner-solidity.mjs
+index 7f738936..295bb213 100644
+--- a/scripts/compile-vault-runner-solidity.mjs
++++ b/scripts/compile-vault-runner-solidity.mjs
+@@ -2,6 +2,7 @@ import { mkdir, readFile, writeFile } from "node:fs/promises";
+ import path from "node:path";
+ 
+ import { root } from "./run.mjs";
++import { CONTRACTS_ROOT } from "../tools/keel/contracts-root.mjs";
+ import {
+   compileCanonicalSolidityArtifacts,
+   SOLIDITY_COMPILER_SETTINGS,
+@@ -29,7 +30,7 @@ const contractNames = Object.freeze([
+   "VaultRunSignatureAuthority",
+ ]);
+ 
+-const artifactsRoot = path.join(root, "packages", "contracts", "artifacts");
++const artifactsRoot = path.join(CONTRACTS_ROOT, "artifacts");
+ const checkOnly = process.argv.includes("--check");
+ const compiled = await compileCanonicalSolidityArtifacts(root, {
+   contractNames,
+diff --git a/scripts/contracts-run.mjs b/scripts/contracts-run.mjs
+new file mode 100644
+index 00000000..0ec74ad6
+--- /dev/null
++++ b/scripts/contracts-run.mjs
+@@ -0,0 +1,30 @@
++/**
++ * Runs a command inside the sibling keel-contracts repository.
++ *
++ * The contracts moved out of `packages/contracts/` into their own repository, so
++ * the `--root packages/contracts` these scripts used to pass no longer points at
++ * anything. Resolving the tree through `contracts-root.mjs` keeps them working
++ * from a linked git worktree too, where a relative `../keel-contracts` does not.
++ *
++ *   node scripts/contracts-run.mjs forge test --gas-report
++ */
++import { spawnSync } from "node:child_process";
++import { CONTRACTS_ROOT, contractsPresent } from "../tools/keel/contracts-root.mjs";
++
++const [command, ...args] = process.argv.slice(2);
++if (!command) {
++  console.error("usage: node scripts/contracts-run.mjs <command> [args...]");
++  process.exit(2);
++}
++if (!contractsPresent()) {
++  console.error(`keel-contracts is not checked out at ${CONTRACTS_ROOT}.`);
++  console.error("Clone it beside this repository, or set KEEL_CONTRACTS_DIR.");
++  process.exit(1);
++}
++
++const result = spawnSync(command, args, { cwd: CONTRACTS_ROOT, stdio: "inherit" });
++if (result.error) {
++  console.error(`${command}: ${result.error.message}`);
++  process.exit(1);
++}
++process.exit(result.status ?? 1);
+diff --git a/scripts/deploy-backpack-sepolia.mjs b/scripts/deploy-backpack-sepolia.mjs
+index 28ca031f..d1a7c278 100644
+--- a/scripts/deploy-backpack-sepolia.mjs
++++ b/scripts/deploy-backpack-sepolia.mjs
+@@ -10,6 +10,7 @@ import { readFileSync } from "node:fs";
+ import { createPublicClient, createWalletClient, getContractAddress, http, formatEther } from "viem";
+ import { privateKeyToAccount } from "viem/accounts";
+ import { sepolia } from "viem/chains";
++import { CONTRACTS_ROOT } from "../tools/keel/contracts-root.mjs";
+ 
+ const RPC = process.env.OCA_RPC_URL ?? "https://ethereum-sepolia-rpc.publicnode.com";
+ 
+@@ -24,7 +25,7 @@ if (!KEY) {
+ }
+ 
+ const artifact = (name) =>
+-  JSON.parse(readFileSync(`packages/contracts/out/${name}.sol/${name}.json`, "utf8"));
++  JSON.parse(readFileSync(`${CONTRACTS_ROOT}/out/${name}.sol/${name}.json`, "utf8"));
+ 
+ const account = privateKeyToAccount(KEY.startsWith("0x") ? KEY : `0x${KEY}`);
+ const publicClient = createPublicClient({ chain: sepolia, transport: http(RPC) });
+diff --git a/scripts/deploy-backpack-v2.mjs b/scripts/deploy-backpack-v2.mjs
+index ef52b02b..3f45ea10 100644
+--- a/scripts/deploy-backpack-v2.mjs
++++ b/scripts/deploy-backpack-v2.mjs
+@@ -19,13 +19,14 @@ import { readFileSync, writeFileSync } from "node:fs";
+ import { createPublicClient, createWalletClient, formatEther, getContractAddress, http } from "viem";
+ import { privateKeyToAccount } from "viem/accounts";
+ import { sepolia } from "viem/chains";
++import { CONTRACTS_ROOT } from "../tools/keel/contracts-root.mjs";
+ 
+ const RPC = process.env.SEPOLIA_RPC ?? "https://ethereum-sepolia-rpc.publicnode.com";
+ const MAINNET_RPC = "https://ethereum-rpc.publicnode.com";
+ const argv = process.argv.slice(2);
+ const tokenId = BigInt(argv[argv.indexOf("--token") + 1] ?? 4);
+ 
+-const art = (file, name) => JSON.parse(readFileSync(`packages/contracts/out/${file}/${name}.json`, "utf8"));
++const art = (file, name) => JSON.parse(readFileSync(`${CONTRACTS_ROOT}/out/${file}/${name}.json`, "utf8"));
+ const FACTORY = art("KeelBackpackFactory.sol", "KeelBackpackFactory");
+ const LEDGER = art("KeelBackpackProofLedger.sol", "KeelBackpackProofLedger");
+ const BACKPACK = art("KeelBackpack721.sol", "KeelBackpack721");
+diff --git a/scripts/deploy-backpack-viewer-final.mjs b/scripts/deploy-backpack-viewer-final.mjs
+index 74e31d94..9408e0d9 100644
+--- a/scripts/deploy-backpack-viewer-final.mjs
++++ b/scripts/deploy-backpack-viewer-final.mjs
+@@ -5,11 +5,12 @@ import { readFileSync, writeFileSync } from "node:fs";
+ import { createPublicClient, createWalletClient, getContractAddress, http, formatEther } from "viem";
+ import { privateKeyToAccount } from "viem/accounts";
+ import { sepolia } from "viem/chains";
++import { CONTRACTS_ROOT } from "../tools/keel/contracts-root.mjs";
+ 
+ const RPC = "https://ethereum-sepolia-rpc.publicnode.com";
+ const KEY = JSON.parse(readFileSync(".secrets/vault-sepolia-deployer.json", "utf8")).privateKey;
+ const D = JSON.parse(readFileSync("scripts/backpack-sepolia.json", "utf8"));
+-const art = (p, n) => JSON.parse(readFileSync(`packages/contracts/out/${p}/${n}.json`, "utf8"));
++const art = (p, n) => JSON.parse(readFileSync(`${CONTRACTS_ROOT}/out/${p}/${n}.json`, "utf8"));
+ 
+ // The live Keel viewer, read off the LINES collection.
+ const VIEWER_BUILDER = "0x3C7A3c23Fefc682df3a06E5314311C3D9A3668bE";
+diff --git a/scripts/deploy-module-review-registry-sepolia.mjs b/scripts/deploy-module-review-registry-sepolia.mjs
+index 4dcf73cd..85136e0c 100644
+--- a/scripts/deploy-module-review-registry-sepolia.mjs
++++ b/scripts/deploy-module-review-registry-sepolia.mjs
+@@ -18,6 +18,7 @@ import {
+ } from "../apps/studio/node_modules/viem/_esm/index.js";
+ import { privateKeyToAccount } from "../apps/studio/node_modules/viem/_esm/accounts/index.js";
+ import { sepolia } from "../apps/studio/node_modules/viem/_esm/chains/index.js";
++import { CONTRACTS_ROOT } from "../tools/keel/contracts-root.mjs";
+ 
+ const CHAIN_ID = 11_155_111;
+ const RPC = process.env.OCA_RPC_URL?.trim() || "https://ethereum-sepolia-rpc.publicnode.com";
+@@ -36,7 +37,7 @@ async function readKey() {
+ }
+ 
+ async function loadArtifact(name) {
+-  const file = path.resolve(`packages/contracts/out/${name}.sol/${name}.json`);
++  const file = path.resolve(`${CONTRACTS_ROOT}/out/${name}.sol/${name}.json`);
+   const doc = JSON.parse(await readFile(file, "utf8"));
+   return { abi: doc.abi, bytecode: doc.bytecode.object };
+ }
+diff --git a/scripts/finish-viewer.mjs b/scripts/finish-viewer.mjs
+index aca1ac9c..02a75aa6 100644
+--- a/scripts/finish-viewer.mjs
++++ b/scripts/finish-viewer.mjs
+@@ -2,10 +2,11 @@ import { readFileSync, writeFileSync } from "node:fs";
+ import { createPublicClient, createWalletClient, http, formatEther } from "viem";
+ import { privateKeyToAccount } from "viem/accounts";
+ import { sepolia } from "viem/chains";
++import { CONTRACTS_ROOT } from "../tools/keel/contracts-root.mjs";
+ const RPC = "https://ethereum-sepolia-rpc.publicnode.com";
+ const KEY = JSON.parse(readFileSync(".secrets/vault-sepolia-deployer.json", "utf8")).privateKey;
+ const D = JSON.parse(readFileSync("scripts/backpack-sepolia.json", "utf8"));
+-const art = (p, n) => JSON.parse(readFileSync(`packages/contracts/out/${p}/${n}.json`, "utf8"));
++const art = (p, n) => JSON.parse(readFileSync(`${CONTRACTS_ROOT}/out/${p}/${n}.json`, "utf8"));
+ const FACTORY_ADDR = "0x3147b4e9dc457857eaec4b7e5dade216bf2b0573";
+ const account = privateKeyToAccount(KEY);
+ const pub = createPublicClient({ chain: sepolia, transport: http(RPC) });
+diff --git a/scripts/fix-and-deploy-viewer.mjs b/scripts/fix-and-deploy-viewer.mjs
+index 18e7e0de..91a22b3d 100644
+--- a/scripts/fix-and-deploy-viewer.mjs
++++ b/scripts/fix-and-deploy-viewer.mjs
+@@ -2,11 +2,12 @@ import { readFileSync, writeFileSync } from "node:fs";
+ import { createPublicClient, createWalletClient, http, formatEther } from "viem";
+ import { privateKeyToAccount } from "viem/accounts";
+ import { sepolia } from "viem/chains";
++import { CONTRACTS_ROOT } from "../tools/keel/contracts-root.mjs";
+ 
+ const RPC = "https://ethereum-sepolia-rpc.publicnode.com";
+ const KEY = JSON.parse(readFileSync(".secrets/vault-sepolia-deployer.json", "utf8")).privateKey;
+ const D = JSON.parse(readFileSync("scripts/backpack-sepolia.json", "utf8"));
+-const art = (p, n) => JSON.parse(readFileSync(`packages/contracts/out/${p}/${n}.json`, "utf8"));
++const art = (p, n) => JSON.parse(readFileSync(`${CONTRACTS_ROOT}/out/${p}/${n}.json`, "utf8"));
+ 
+ const VIEWER_BUILDER = "0x3C7A3c23Fefc682df3a06E5314311C3D9A3668bE";
+ const VIEWER_OBJECT = "0x9648488907d74ae8787ecf27eb0fef8dd1572c22b5c11e3d6b98dfa88db255fe";
+diff --git a/scripts/keel-backpack-demo.mjs b/scripts/keel-backpack-demo.mjs
+index 4021a938..265a7beb 100644
+--- a/scripts/keel-backpack-demo.mjs
++++ b/scripts/keel-backpack-demo.mjs
+@@ -25,6 +25,7 @@ import {
+ } from "viem";
+ import { privateKeyToAccount } from "viem/accounts";
+ import { sepolia } from "viem/chains";
++import { CONTRACTS_ROOT } from "../tools/keel/contracts-root.mjs";
+ 
+ const RPC = process.env.SEPOLIA_RPC ?? "https://ethereum-sepolia-rpc.publicnode.com";
+ // Costs are reported at real mainnet gas, never at the sending chain's. Sepolia
+@@ -33,7 +34,7 @@ const RPC = process.env.SEPOLIA_RPC ?? "https://ethereum-sepolia-rpc.publicnode.
+ // make preserving an artwork look several times more expensive than it is.
+ const MAINNET_RPC = process.env.MAINNET_RPC ?? "https://ethereum-rpc.publicnode.com";
+ const BOOK = "scripts/backpack-sepolia.json";
+-const FIXTURES = "packages/contracts/test/fixtures";
++const FIXTURES = `${CONTRACTS_ROOT}/test/fixtures`;
+ const VIEWER = process.env.KEEL_VIEWER_HTML;
+ 
+ const argv = process.argv.slice(2);
+@@ -42,7 +43,7 @@ if (!recipient?.startsWith("0x") || recipient.length !== 42) {
+   throw new Error("pass --to 0x… (the wallet that should receive the testable set)");
+ }
+ 
+-const art = (file, name) => JSON.parse(readFileSync(`packages/contracts/out/${file}/${name}.json`, "utf8"));
++const art = (file, name) => JSON.parse(readFileSync(`${CONTRACTS_ROOT}/out/${file}/${name}.json`, "utf8"));
+ const CS = art("KeelHold.sol", "KeelHold");
+ const FACTORY = art("KeelBackpackFactory.sol", "KeelBackpackFactory");
+ const LEDGER = art("KeelBackpackProofLedger.sol", "KeelBackpackProofLedger");
+diff --git a/scripts/keel-backpack-final.mjs b/scripts/keel-backpack-final.mjs
+index 04f7a6bc..3e0e6188 100644
+--- a/scripts/keel-backpack-final.mjs
++++ b/scripts/keel-backpack-final.mjs
+@@ -2,11 +2,12 @@ import { readFileSync, writeFileSync } from "node:fs";
+ import { createPublicClient, createWalletClient, getContractAddress, http, formatEther, keccak256, toHex } from "viem";
+ import { privateKeyToAccount } from "viem/accounts";
+ import { sepolia } from "viem/chains";
++import { CONTRACTS_ROOT } from "../tools/keel/contracts-root.mjs";
+ const RPC = "https://ethereum-sepolia-rpc.publicnode.com";
+ const KEY = JSON.parse(readFileSync(".secrets/vault-sepolia-deployer.json", "utf8")).privateKey;
+ const D = JSON.parse(readFileSync("scripts/backpack-sepolia.json", "utf8"));
+ const S = process.env.KEEL_SHELL_DIR;
+-const art = (p, n) => JSON.parse(readFileSync(`packages/contracts/out/${p}/${n}.json`, "utf8"));
++const art = (p, n) => JSON.parse(readFileSync(`${CONTRACTS_ROOT}/out/${p}/${n}.json`, "utf8"));
+ const CS = art("KeelHold.sol", "KeelHold");
+ const account = privateKeyToAccount(KEY);
+ const pub = createPublicClient({ chain: sepolia, transport: http(RPC) });
+diff --git a/scripts/keel-factory-local-e2e.mjs b/scripts/keel-factory-local-e2e.mjs
+index 5e824905..ce6e8c37 100644
+--- a/scripts/keel-factory-local-e2e.mjs
++++ b/scripts/keel-factory-local-e2e.mjs
+@@ -12,6 +12,7 @@ import {
+ import { privateKeyToAccount } from "viem/accounts";
+ import { createOcaFactoryConfigDigest, createViemOcaFactoryConnectors, executeOcaFactoryCollection } from "@keel/ethereum-adapter";
+ import { createKeelWalletLink, keelFactoryAbi } from "@keel/sdk";
++import { CONTRACTS_ROOT } from "../tools/keel/contracts-root.mjs";
+ 
+ const PORT = Number(process.env.OCA_LOCAL_E2E_PORT ?? 18_545);
+ const RPC_URL = `http://127.0.0.1:${PORT}`;
+@@ -20,7 +21,7 @@ const DEPLOYER_KEY = "0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7b
+ const CREATOR_KEY = "0x59c6995e998f97a5a0044966f0945389dc9e86dae88c7a8412f4603b6b78690d";
+ const AGENT_KEY = "0x5de4111afa1a4b94908f83103eb1f1706367c2e68ca870fc3fb9a804cdab365a";
+ const ABI = parseAbi(keelFactoryAbi);
+-const artifactPath = path.resolve("packages/contracts/out/KeelFactory.sol/KeelFactory.json");
++const artifactPath = path.resolve(`${CONTRACTS_ROOT}/out/KeelFactory.sol/KeelFactory.json`);
+ const LOCAL_CHAIN = {
+   id: CHAIN_ID,
+   name: "Keel local Anvil",
+diff --git a/scripts/module-registry-deprecate-sepolia.mjs b/scripts/module-registry-deprecate-sepolia.mjs
+index fffa14a6..7d0070f2 100644
+--- a/scripts/module-registry-deprecate-sepolia.mjs
++++ b/scripts/module-registry-deprecate-sepolia.mjs
+@@ -11,6 +11,7 @@ import path from "node:path";
+ import { createPublicClient, createWalletClient, http, keccak256, toHex, getContract } from "../apps/studio/node_modules/viem/_esm/index.js";
+ import { privateKeyToAccount } from "../apps/studio/node_modules/viem/_esm/accounts/index.js";
+ import { sepolia } from "../apps/studio/node_modules/viem/_esm/chains/index.js";
++import { CONTRACTS_ROOT } from "../tools/keel/contracts-root.mjs";
+ 
+ const CHAIN_ID = 11_155_111;
+ const RPC = process.env.OCA_RPC_URL?.trim() || "https://ethereum-sepolia-rpc.publicnode.com";
+@@ -38,10 +39,10 @@ async function main() {
+   if (liveChainId !== CHAIN_ID) throw new Error(`Refusing to broadcast: chainId ${liveChainId} is not Sepolia.`);
+ 
+   const artifact = JSON.parse(
+-    await readFile(path.resolve("packages/contracts/out/KeelModuleReviewRegistry.sol/KeelModuleReviewRegistry.json"), "utf8"),
++    await readFile(path.resolve(`${CONTRACTS_ROOT}/out/KeelModuleReviewRegistry.sol/KeelModuleReviewRegistry.json`), "utf8"),
+   );
+   const graphArtifact = JSON.parse(
+-    await readFile(path.resolve("packages/contracts/out/KeelGraphRegistry.sol/KeelGraphRegistry.json"), "utf8"),
++    await readFile(path.resolve(`${CONTRACTS_ROOT}/out/KeelGraphRegistry.sol/KeelGraphRegistry.json`), "utf8"),
+   );
+   const registry = getContract({ address: registryAddress, abi: artifact.abi, client: walletClient });
+   const graphs = getContract({ address: prior.graphRegistry, abi: graphArtifact.abi, client: publicClient });
+diff --git a/scripts/preserve-bayc-sepolia.mjs b/scripts/preserve-bayc-sepolia.mjs
+index 82281ea2..9a188aab 100644
+--- a/scripts/preserve-bayc-sepolia.mjs
++++ b/scripts/preserve-bayc-sepolia.mjs
+@@ -10,6 +10,7 @@ import { readFileSync, writeFileSync } from "node:fs";
+ import { createPublicClient, createWalletClient, http, formatEther } from "viem";
+ import { privateKeyToAccount } from "viem/accounts";
+ import { sepolia } from "viem/chains";
++import { CONTRACTS_ROOT } from "../tools/keel/contracts-root.mjs";
+ 
+ const RPC = process.env.KEEL_RPC_URL ?? "https://ethereum-sepolia-rpc.publicnode.com";
+ const KEY_FILE = process.env.KEEL_DEPLOYER_FILE ?? ".secrets/vault-sepolia-deployer.json";
+@@ -18,7 +19,7 @@ const KEY = process.env.OCA_DEPLOYER_PRIVATE_KEY || JSON.parse(readFileSync(KEY_
+ const D = JSON.parse(readFileSync("scripts/backpack-sepolia.json", "utf8"));
+ 
+ const art = (path, name) =>
+-  JSON.parse(readFileSync(`packages/contracts/out/${path}/${name}.json`, "utf8"));
++  JSON.parse(readFileSync(`${CONTRACTS_ROOT}/out/${path}/${name}.json`, "utf8"));
+ const CHUNK_STORE = art("KeelHold.sol", "KeelHold");
+ const FACTORY = art("KeelBackpackFactory.sol", "KeelBackpackFactory");
+ const LEDGER = art("KeelBackpackProofLedger.sol", "KeelBackpackProofLedger");
+@@ -104,9 +105,9 @@ if (!initialized) {
+ console.log(`backpack                 ${backpack}\n`);
+ 
+ // 3. The real blocks BAYC's tokenURI resolves to.
+-const directory = new Uint8Array(readFileSync("packages/contracts/test/fixtures/bayc-directory.bin"));
+-const metadata = new Uint8Array(readFileSync("packages/contracts/test/fixtures/bayc-token-1.json"));
+-const image = new Uint8Array(readFileSync("packages/contracts/test/fixtures/bayc-ape-1.png"));
++const directory = new Uint8Array(readFileSync(`${CONTRACTS_ROOT}/test/fixtures/bayc-directory.bin`));
++const metadata = new Uint8Array(readFileSync(`${CONTRACTS_ROOT}/test/fixtures/bayc-token-1.json`));
++const image = new Uint8Array(readFileSync(`${CONTRACTS_ROOT}/test/fixtures/bayc-ape-1.png`));
+ 
+ D.metadataObject = D.metadataObject ?? (await store("metadata", metadata, "application/json"));
+ writeFileSync("scripts/backpack-sepolia.json", JSON.stringify(D, null, 2));
+diff --git a/scripts/publish-doom-wasm-ethereum.mjs b/scripts/publish-doom-wasm-ethereum.mjs
+index c64ba240..154eea72 100644
+--- a/scripts/publish-doom-wasm-ethereum.mjs
++++ b/scripts/publish-doom-wasm-ethereum.mjs
+@@ -16,8 +16,8 @@ import {
+ } from "viem";
+ import { privateKeyToAccount } from "viem/accounts";
+ import { sha256Hex } from "@keel/protocol";
++import { CONTRACTS_ROOT } from "../tools/keel/contracts-root.mjs";
+ 
+-const repoRoot = path.resolve(import.meta.dirname, "..");
+ const args = new Map();
+ for (let index = 2; index < process.argv.length; index += 1) {
+   const value = process.argv[index];
+@@ -59,7 +59,7 @@ const chainId = await publicClient.getChainId();
+ if (!localMode && chainId === 31_337) throw new Error("Local Anvil chain requires --local; refusing an implicit local write.");
+ 
+ async function artifact(name) {
+-  const artifactPath = path.join(repoRoot, "packages/contracts/artifacts", `${name}.json`);
++  const artifactPath = path.join(CONTRACTS_ROOT, "artifacts", `${name}.json`);
+   return JSON.parse(await readFile(artifactPath, "utf8"));
+ }
+ 
+diff --git a/scripts/rebind-viewer.mjs b/scripts/rebind-viewer.mjs
+index 10a27985..1054bb8e 100644
+--- a/scripts/rebind-viewer.mjs
++++ b/scripts/rebind-viewer.mjs
+@@ -2,9 +2,10 @@ import { readFileSync, writeFileSync } from "node:fs";
+ import { createPublicClient, createWalletClient, http, formatEther, keccak256, toHex, encodeAbiParameters, encodePacked } from "viem";
+ import { privateKeyToAccount } from "viem/accounts";
+ import { sepolia } from "viem/chains";
++import { CONTRACTS_ROOT } from "../tools/keel/contracts-root.mjs";
+ const KEY = JSON.parse(readFileSync(".secrets/vault-sepolia-deployer.json", "utf8")).privateKey;
+ const D = JSON.parse(readFileSync("scripts/backpack-sepolia.json", "utf8"));
+-const art = (p, n) => JSON.parse(readFileSync(`packages/contracts/out/${p}/${n}.json`, "utf8"));
++const art = (p, n) => JSON.parse(readFileSync(`${CONTRACTS_ROOT}/out/${p}/${n}.json`, "utf8"));
+ const CS = art("KeelHold.sol", "KeelHold"), L = art("KeelBackpackProofLedger.sol", "KeelBackpackProofLedger"), BP = art("KeelBackpack721.sol", "KeelBackpack721");
+ const account = privateKeyToAccount(KEY);
+ const pub = createPublicClient({ chain: sepolia, transport: http("https://ethereum-sepolia-rpc.publicnode.com") });
+diff --git a/scripts/rewire-backpack-viewer-sepolia.mjs b/scripts/rewire-backpack-viewer-sepolia.mjs
+index a9c82eea..6af2f961 100644
+--- a/scripts/rewire-backpack-viewer-sepolia.mjs
++++ b/scripts/rewire-backpack-viewer-sepolia.mjs
+@@ -11,11 +11,12 @@ import { readFileSync, writeFileSync } from "node:fs";
+ import { createPublicClient, createWalletClient, getContractAddress, http, formatEther } from "viem";
+ import { privateKeyToAccount } from "viem/accounts";
+ import { sepolia } from "viem/chains";
++import { CONTRACTS_ROOT } from "../tools/keel/contracts-root.mjs";
+ 
+ const RPC = "https://ethereum-sepolia-rpc.publicnode.com";
+ const KEY = JSON.parse(readFileSync(".secrets/vault-sepolia-deployer.json", "utf8")).privateKey;
+ const D = JSON.parse(readFileSync("scripts/backpack-sepolia.json", "utf8"));
+-const art = (p, n) => JSON.parse(readFileSync(`packages/contracts/out/${p}/${n}.json`, "utf8"));
++const art = (p, n) => JSON.parse(readFileSync(`${CONTRACTS_ROOT}/out/${p}/${n}.json`, "utf8"));
+ 
+ const account = privateKeyToAccount(KEY);
+ const pub = createPublicClient({ chain: sepolia, transport: http(RPC) });
+diff --git a/scripts/solidity-compiler.mjs b/scripts/solidity-compiler.mjs
+index 4fed9e94..fae08f1d 100644
+--- a/scripts/solidity-compiler.mjs
++++ b/scripts/solidity-compiler.mjs
+@@ -3,10 +3,15 @@ import { readFile, readdir } from "node:fs/promises";
+ import path from "node:path";
+ 
+ import { root } from "./run.mjs";
++import { CONTRACTS_ROOT } from "../tools/keel/contracts-root.mjs";
+ 
+ export const EIP170_MAX_RUNTIME_BYTES = 24_576;
+ export const SOLIDITY_COMPILER_SETTINGS = Object.freeze({
+-  evmVersion: "cancun",
++  // Pectra. EIP-2537's BLS12-381 precompiles are what let Solidity check Tezos
++  // consensus signatures (keel-contracts src/modules/keel-codecs/libraries/Bls12381.sol);
++  // under cancun those tests cannot run at all. Kept in step with
++  // keel-contracts/foundry.toml, which `solidity-gas-check` compares against.
++  evmVersion: "prague",
+   optimizerRuns: 200,
+   viaIR: true,
+   bytecodeHash: "none",
+@@ -53,7 +58,7 @@ export async function compileCanonicalSolidityArtifacts(
+     options.sourceNames === undefined
+       ? undefined
+       : new Set(options.sourceNames);
+-  const contractsRoot = path.join(repositoryRoot, "packages", "contracts");
++  const contractsRoot = CONTRACTS_ROOT;
+   const sourceRoot = path.join(contractsRoot, "src");
+   const sources = {};
+   for (const file of await filesBelow(sourceRoot)) {
+@@ -65,6 +70,7 @@ export async function compileCanonicalSolidityArtifacts(
+   const importCallback = (importPath) => {
+     const candidates = [
+       path.join(contractsRoot, importPath),
++      path.join(contractsRoot, "node_modules", importPath),
+       path.join(repositoryRoot, "node_modules", importPath),
+     ];
+     for (const candidate of candidates) {
+diff --git a/scripts/solidity-gas-check.mjs b/scripts/solidity-gas-check.mjs
+index a6a0c32b..09dbf166 100644
+--- a/scripts/solidity-gas-check.mjs
++++ b/scripts/solidity-gas-check.mjs
+@@ -1,7 +1,7 @@
+ import { readFile, readdir } from "node:fs/promises";
+ import path from "node:path";
+ 
+-import { root } from "./run.mjs";
++import { CONTRACTS_ROOT } from "../tools/keel/contracts-root.mjs";
+ import { SOLIDITY_COMPILER_SETTINGS } from "./solidity-compiler.mjs";
+ 
+ async function filesBelow(directory) {
+@@ -28,7 +28,7 @@ function functionHeaders(code) {
+   ].map((match) => match[0]);
+ }
+ 
+-const contractsRoot = path.join(root, "packages", "contracts");
++const contractsRoot = CONTRACTS_ROOT;
+ const sourceRoot = path.join(contractsRoot, "src");
+ const foundryConfig = await readFile(
+   path.join(contractsRoot, "foundry.toml"),
+@@ -71,7 +71,7 @@ const expectedFoundrySettings = [
+ const failures = [];
+ for (const [label, pattern] of expectedFoundrySettings) {
+   if (!pattern.test(foundryConfig)) {
+-    failures.push(`packages/contracts/foundry.toml: expected ${label}`);
++    failures.push(`keel-contracts/foundry.toml: expected ${label}`);
+   }
+ }
+ 
+@@ -81,7 +81,7 @@ let payableEntrypoints = 0;
+ let transientProtectedEntrypoints = 0;
+ 
+ for (const file of await filesBelow(sourceRoot)) {
+-  const relative = path.relative(root, file);
++  const relative = `keel-contracts/${path.relative(contractsRoot, file)}`;
+   const source = await readFile(file, "utf8");
+   const code = policyCode(source);
+ 
+diff --git a/scripts/solidity-static-check.mjs b/scripts/solidity-static-check.mjs
+index f267e374..5991bc50 100644
+--- a/scripts/solidity-static-check.mjs
++++ b/scripts/solidity-static-check.mjs
+@@ -1,6 +1,6 @@
+ import { readFile, readdir } from "node:fs/promises";
+ import path from "node:path";
+-import { root } from "./run.mjs";
++import { CONTRACTS_ROOT } from "../tools/keel/contracts-root.mjs";
+ // The policy itself lives with the module tooling so the repo-wide gate and the
+ // per-module gate (`keel verify`) enforce exactly the same rules.
+ import { checkSource, staticPolicyCode } from "../tools/keel/static-policy.mjs";
+@@ -26,10 +26,10 @@ if (process.argv.includes("--self-test")) {
+ }
+ 
+ let failures = 0;
+-for (const file of await walk(path.join(root, "packages", "contracts", "src"))) {
++for (const file of await walk(path.join(CONTRACTS_ROOT, "src"))) {
+   const source = await readFile(file, "utf8");
+   for (const finding of checkSource(source)) {
+-    console.error(`${path.relative(root, file)}: ${finding}`);
++    console.error(`keel-contracts/${path.relative(CONTRACTS_ROOT, file)}: ${finding}`);
+     failures += 1;
+   }
+ }
+diff --git a/scripts/store-keel-shell-sepolia.mjs b/scripts/store-keel-shell-sepolia.mjs
+index 75576695..23808610 100644
+--- a/scripts/store-keel-shell-sepolia.mjs
++++ b/scripts/store-keel-shell-sepolia.mjs
+@@ -11,11 +11,12 @@ import { readFileSync, writeFileSync, existsSync } from "node:fs";
+ import { createPublicClient, createWalletClient, http, formatEther } from "viem";
+ import { privateKeyToAccount } from "viem/accounts";
+ import { sepolia } from "viem/chains";
++import { CONTRACTS_ROOT } from "../tools/keel/contracts-root.mjs";
+ 
+ const RPC = process.env.KEEL_RPC_URL ?? "https://ethereum-sepolia-rpc.publicnode.com";
+ const KEY = JSON.parse(readFileSync(".secrets/vault-sepolia-deployer.json", "utf8")).privateKey;
+ const D = JSON.parse(readFileSync("scripts/backpack-sepolia.json", "utf8"));
+-const CHUNK_STORE = JSON.parse(readFileSync("packages/contracts/out/KeelHold.sol/KeelHold.json", "utf8"));
++const CHUNK_STORE = JSON.parse(readFileSync(`${CONTRACTS_ROOT}/out/KeelHold.sol/KeelHold.json`, "utf8"));
+ 
+ const account = privateKeyToAccount(KEY);
+ const pub = createPublicClient({ chain: sepolia, transport: http(RPC) });
+diff --git a/scripts/studio-structure-check.mjs b/scripts/studio-structure-check.mjs
+deleted file mode 100644
+index 19964692..00000000
+--- a/scripts/studio-structure-check.mjs
++++ /dev/null
+@@ -1,202 +0,0 @@
+-import { execFileSync } from "node:child_process";
+-import { access, readFile, readdir } from "node:fs/promises";
+-import { createRequire } from "node:module";
+-import path from "node:path";
+-import { fileURLToPath } from "node:url";
+-
+-const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
+-const studio = path.join(root, "apps", "studio");
+-
+-async function loadTypeScript() {
+-  try {
+-    return await import("typescript");
+-  } catch {
+-    const globalRoot = execFileSync("npm", ["root", "-g"], { encoding: "utf8" }).trim();
+-    const require = createRequire(import.meta.url);
+-    return require(path.join(globalRoot, "typescript", "lib", "typescript.js"));
+-  }
+-}
+-
+-async function walk(directory) {
+-  const entries = await readdir(directory, { withFileTypes: true });
+-  const values = [];
+-  for (const entry of entries) {
+-    const absolute = path.join(directory, entry.name);
+-    if (entry.isDirectory()) values.push(...(await walk(absolute)));
+-    else values.push(absolute);
+-  }
+-  return values;
+-}
+-
+-function importCandidates(file, specifier) {
+-  const base = specifier.startsWith("~/")
+-    ? path.join(studio, "src", specifier.slice(2))
+-    : path.resolve(path.dirname(file), specifier);
+-  return [
+-    base,
+-    `${base}.ts`,
+-    `${base}.tsx`,
+-    `${base}.mjs`,
+-    `${base}.js`,
+-    path.join(base, "index.ts"),
+-    path.join(base, "index.tsx"),
+-  ];
+-}
+-
+-const required = [
+-  "package.json",
+-  "tsconfig.json",
+-  "drizzle.config.ts",
+-  "drizzle/0000_initial.sql",
+-  "drizzle/0001_keel_contract_kinds.sql",
+-  "drizzle/0002_library_index.sql",
+-  "drizzle/0003_source_verification_queue.sql",
+-  "src/app/create/page.tsx",
+-  "src/app/artifacts/page.tsx",
+-  "src/app/artifacts/[artifactId]/page.tsx",
+-  "src/app/collect/page.tsx",
+-  "src/app/collect/[chainId]/[collection]/[tokenId]/page.tsx",
+-  "src/app/indexer/page.tsx",
+-  "src/app/launch/page.tsx",
+-  "src/app/system/page.tsx",
+-  "src/app/keel/page.tsx",
+-  "src/app/api/keel/read/[chainId]/[address]/route.ts",
+-  "src/server/db/schema.ts",
+-  "src/server/services/artifact-service.ts",
+-  "src/server/services/collector-service.ts",
+-  "src/server/services/publication-service.ts",
+-  "src/server/indexer/indexer-service.ts",
+-  "src/server/security/write-access.ts",
+-  "src/stores/upload-store.ts",
+-  "scripts/deploy-local.ts",
+-];
+-await Promise.all(required.map((relative) => access(path.join(studio, relative))));
+-
+-const ts = await loadTypeScript();
+-const sourceFiles = [
+-  ...(await walk(path.join(studio, "src"))),
+-  ...(await walk(path.join(studio, "tests"))),
+-  path.join(studio, "playwright.config.ts"),
+-].filter((file) => /\.tsx?$/u.test(file));
+-let issueCount = 0;
+-for (const file of sourceFiles) {
+-  const source = await readFile(file, "utf8");
+-  const parsed = ts.createSourceFile(
+-    file,
+-    source,
+-    ts.ScriptTarget.Latest,
+-    true,
+-    file.endsWith(".tsx") ? ts.ScriptKind.TSX : ts.ScriptKind.TS,
+-  );
+-  for (const diagnostic of parsed.parseDiagnostics) {
+-    console.error(`TypeScript parse error in ${path.relative(root, file)}: ${ts.flattenDiagnosticMessageText(diagnostic.messageText, " ")}`);
+-    issueCount += 1;
+-  }
+-  const imports = [];
+-  const collect = (node) => {
+-    if (ts.isImportDeclaration(node) && ts.isStringLiteral(node.moduleSpecifier)) imports.push(node.moduleSpecifier.text);
+-    ts.forEachChild(node, collect);
+-  };
+-  collect(parsed);
+-  for (const specifier of imports) {
+-    if (!specifier.startsWith("~/") && !specifier.startsWith("./") && !specifier.startsWith("../")) continue;
+-    const candidates = importCandidates(file, specifier);
+-    let found = false;
+-    for (const candidate of candidates) {
+-      try {
+-        await access(candidate);
+-        found = true;
+-        break;
+-      } catch {
+-        // Try the next supported TypeScript module path.
+-      }
+-    }
+-    if (!found) {
+-      console.error(`Missing local import in ${path.relative(root, file)}: ${specifier}`);
+-      issueCount += 1;
+-    }
+-  }
+-}
+-
+-const schema = await readFile(path.join(studio, "src/server/db/schema.ts"), "utf8");
+-const migrationDirectory = path.join(studio, "drizzle");
+-const migrationFiles = (await readdir(migrationDirectory)).filter((name) => name.endsWith(".sql")).sort();
+-const migration = (await Promise.all(migrationFiles.map((name) => readFile(path.join(migrationDirectory, name), "utf8")))).join("\n");
+-const tableNames = [...schema.matchAll(/pgTable\(\s*["']([^"']+)["']/gu)].map((match) => match[1]);
+-for (const table of tableNames) {
+-  const escaped = table.replace(/[.*+?^${}()|[\]\\]/gu, "\\$&");
+-  if (!new RegExp(`CREATE TABLE(?: IF NOT EXISTS)? "${escaped}"`, "u").test(migration)) {
+-    console.error(`Drizzle migration is missing table ${table}.`);
+-    issueCount += 1;
+-  }
+-}
+-const enumNames = [...schema.matchAll(/pgEnum\(\s*["']([^"']+)["']/gu)].map((match) => match[1]);
+-for (const enumName of enumNames) {
+-  if (!migration.includes(`CREATE TYPE "${enumName}" AS ENUM`)) {
+-    console.error(`Drizzle migration is missing enum ${enumName}.`);
+-    issueCount += 1;
+-  }
+-}
+-
+-const protectedPostRoutes = [
+-  "src/app/api/artifacts/route.ts",
+-  "src/app/api/artifacts/import/route.ts",
+-  "src/app/api/deployment/[artifactId]/complete/route.ts",
+-  "src/app/api/indexer/run/route.ts",
+-];
+-for (const relative of protectedPostRoutes) {
+-  const source = await readFile(path.join(studio, relative), "utf8");
+-  if (!source.includes("assertStudioWriteAccess(request.headers)")) {
+-    console.error(`Mutating route ${relative} is missing the Studio write guard.`);
+-    issueCount += 1;
+-  }
+-}
+-for (const relative of [
+-  "src/app/api/onchain/[chainId]/[store]/[objectId]/route.ts",
+-  "src/app/api/presentation/[chainId]/[registry]/[collection]/[tokenId]/route.ts",
+-  "src/app/api/contract-call/[chainId]/[to]/route.ts",
+-  "src/app/api/keel/read/[chainId]/[address]/route.ts",
+-]) {
+-  const source = await readFile(path.join(studio, relative), "utf8");
+-  if (!source.includes("chainContracts") || !source.includes("eq(chainContracts.enabled, true)")) {
+-    console.error(`Verified gateway ${relative} does not enforce the configured-contract allowlist.`);
+-    issueCount += 1;
+-  }
+-}
+-
+-const keelGateway = await readFile(
+-  path.join(studio, "src/app/api/keel/read/[chainId]/[address]/route.ts"),
+-  "utf8",
+-);
+-if (!keelGateway.includes("configured.functions.has(body.functionName)")) {
+-  console.error("Keel browser gateway does not enforce its view-function allowlist.");
+-  issueCount += 1;
+-}
+-
+-
+-const routerFiles = (await walk(path.join(studio, "src/server/api/routers"))).filter((file) => file.endsWith(".ts"));
+-for (const file of routerFiles) {
+-  const source = await readFile(file, "utf8");
+-  const mutationCount = (source.match(/\.mutation\s*\(/gu) ?? []).length;
+-  const writeOccurrences = (source.match(/writeProcedure/gu) ?? []).length;
+-  const protectedCount = Math.max(0, writeOccurrences - 1);
+-  if (mutationCount > protectedCount) {
+-    console.error(`Mutating tRPC procedure in ${path.relative(root, file)} may bypass writeProcedure.`);
+-    issueCount += 1;
+-  }
+-}
+-
+-const packageJson = JSON.parse(await readFile(path.join(studio, "package.json"), "utf8"));
+-if (packageJson.version !== "0.3.0") {
+-  console.error("Studio package version must match release 0.3.0.");
+-  issueCount += 1;
+-}
+-if (packageJson.dependencies?.zustand === undefined || packageJson.dependencies?.["drizzle-orm"] === undefined) {
+-  console.error("Studio must retain Zustand and Drizzle dependencies.");
+-  issueCount += 1;
+-}
+-
+-if (issueCount > 0) process.exit(1);
+-console.log(
+-  `Studio structure passed: ${sourceFiles.length} TypeScript files parsed, local imports resolve, migration covers ${tableNames.length} tables, and write/gateway guards are present.`,
+-);
+diff --git a/scripts/test-stake-object-sepolia.mjs b/scripts/test-stake-object-sepolia.mjs
+index 7eadcd04..7742063f 100644
+--- a/scripts/test-stake-object-sepolia.mjs
++++ b/scripts/test-stake-object-sepolia.mjs
+@@ -11,6 +11,7 @@ import {
+   stringToHex,
+ } from "../apps/studio/node_modules/viem/_esm/index.js";
+ import { privateKeyToAccount } from "../apps/studio/node_modules/viem/_esm/accounts/index.js";
++import { CONTRACTS_ROOT } from "../tools/keel/contracts-root.mjs";
+ 
+ const repositoryRoot = path.resolve(new URL("..", import.meta.url).pathname);
+ const rpcUrl = process.env.VAULT_SEPOLIA_RPC ?? "https://ethereum-sepolia-rpc.publicnode.com";
+@@ -34,9 +35,9 @@ const artifact = async (relativePath) => {
+   return { abi: value.abi, bytecode };
+ };
+ 
+-const registryArtifact = await artifact("packages/contracts/out/KeelStakeObjectManager.t.sol/StakeObjectRegistryMock.json");
+-const nftArtifact = await artifact("packages/contracts/out/KeelStakeObjectManager.t.sol/StakeObject721Mock.json");
+-const managerArtifact = await artifact("packages/contracts/out/KeelStakeObjectManager.sol/KeelStakeObjectManager.json");
++const registryArtifact = await artifact(`${CONTRACTS_ROOT}/out/KeelStakeObjectManager.t.sol/StakeObjectRegistryMock.json`);
++const nftArtifact = await artifact(`${CONTRACTS_ROOT}/out/KeelStakeObjectManager.t.sol/StakeObject721Mock.json`);
++const managerArtifact = await artifact(`${CONTRACTS_ROOT}/out/KeelStakeObjectManager.sol/KeelStakeObjectManager.json`);
+ 
+ const operations = [];
+ const recordReceipt = (label, receipt) => {
+diff --git a/scripts/test.mjs b/scripts/test.mjs
+index c8f1eb7d..2f5b15dd 100644
+--- a/scripts/test.mjs
++++ b/scripts/test.mjs
+@@ -5,6 +5,7 @@ run("node", [
+   "--test",
+   "tests/protocol.test.mjs",
+   "tests/keel-modules.test.mjs",
++  "tests/keel-manifest-generation.test.mjs",
+   "tests/portable-root.test.mjs",
+   "tests/viewer.test.mjs",
+   "tests/host-bridge.test.mjs",
+diff --git a/scripts/verify-doom-wasm-ethereum.mjs b/scripts/verify-doom-wasm-ethereum.mjs
+index 342d655f..835fe84a 100644
+--- a/scripts/verify-doom-wasm-ethereum.mjs
++++ b/scripts/verify-doom-wasm-ethereum.mjs
+@@ -5,8 +5,8 @@ import path from "node:path";
+ 
+ import { createPublicClient, hexToBytes, http, zeroAddress } from "viem";
+ import { sha256Hex } from "@keel/protocol";
++import { CONTRACTS_ROOT } from "../tools/keel/contracts-root.mjs";
+ 
+-const repoRoot = path.resolve(import.meta.dirname, "..");
+ const args = new Map();
+ for (let index = 2; index < process.argv.length; index += 1) {
+   const value = process.argv[index];
+@@ -58,8 +58,8 @@ const readGasWei = BigInt(readGas);
+ if (readGasWei <= 0n) throw new Error("--read-gas must be positive.");
+ 
+ const [keelHoldArtifact, portableAnchorArtifact] = await Promise.all([
+-  readFile(path.join(repoRoot, "packages/contracts/artifacts/KeelHold.json"), "utf8"),
+-  readFile(path.join(repoRoot, "packages/contracts/artifacts/KeelPortableAnchorRegistry.json"), "utf8"),
++  readFile(path.join(CONTRACTS_ROOT, "artifacts/KeelHold.json"), "utf8"),
++  readFile(path.join(CONTRACTS_ROOT, "artifacts/KeelPortableAnchorRegistry.json"), "utf8"),
+ ]);
+ const client = createPublicClient({ transport: http(rpcUrl, { timeout: 120_000, retryCount: 1 }) });
+ const chainId = await client.getChainId();
+diff --git a/scripts/verify-examples.mjs b/scripts/verify-examples.mjs
+index c3961346..6f7c72d8 100644
+--- a/scripts/verify-examples.mjs
++++ b/scripts/verify-examples.mjs
+@@ -1,8 +1,13 @@
+-import { readFile } from "node:fs/promises";
++import { readFile, writeFile } from "node:fs/promises";
+ import path from "node:path";
+ import { manifestIntegrity, parseArtifactManifest } from "../packages/protocol/dist/index.js";
+ import { root } from "./run.mjs";
+ 
++// The sidecar attests the manifest, so the manifest is the authority: when one
++// drifts it is regenerated, never hand-edited. `--write` is that regeneration —
++// without it this only verifies, which is how it runs in `pnpm verify`.
++const write = process.argv.includes("--write");
++
+ const examples = [
+   ["examples/basic-manifest/manifest.json", "examples/basic-manifest/manifest.integrity.json"],
+   ["examples/image-wrapper/release/manifest.json", "examples/image-wrapper/release/manifest.integrity.json"],
+@@ -15,9 +20,17 @@ for (const [manifestName, sidecarName] of examples) {
+   const integrity = await manifestIntegrity(manifest);
+   if (sidecar.schema !== "oca-manifest-integrity@2") throw new Error(`${sidecarName}: wrong sidecar schema.`);
+   if (sidecar.canonicalization !== "RFC8785") throw new Error(`${sidecarName}: wrong canonicalization.`);
++  const stale = sidecar.integrity?.algorithm !== integrity.algorithm
++    || sidecar.integrity?.digest !== integrity.digest
++    || sidecar.integrity?.byteLength !== integrity.byteLength;
++  if (stale && write) {
++    await writeFile(path.join(root, sidecarName), `${JSON.stringify({ ...sidecar, integrity }, null, 2)}\n`);
++    console.log(`Rewrote ${sidecarName}: ${integrity.digest} (${integrity.byteLength} canonical bytes)`);
++    continue;
++  }
+   if (sidecar.integrity?.algorithm !== integrity.algorithm) throw new Error(`${sidecarName}: wrong algorithm.`);
+-  if (sidecar.integrity?.digest !== integrity.digest) throw new Error(`${sidecarName}: digest mismatch.`);
+-  if (sidecar.integrity?.byteLength !== integrity.byteLength) throw new Error(`${sidecarName}: canonical length mismatch.`);
++  if (sidecar.integrity?.digest !== integrity.digest) throw new Error(`${sidecarName}: digest mismatch. Re-run with --write to regenerate it from the manifest.`);
++  if (sidecar.integrity?.byteLength !== integrity.byteLength) throw new Error(`${sidecarName}: canonical length mismatch. Re-run with --write to regenerate it from the manifest.`);
+   console.log(`Verified example ${manifestName}: ${integrity.digest}`);
+ }
+ 
+diff --git a/scripts/verify-module-registry-sepolia.mjs b/scripts/verify-module-registry-sepolia.mjs
+index fd8cc3f9..0e722afe 100644
+--- a/scripts/verify-module-registry-sepolia.mjs
++++ b/scripts/verify-module-registry-sepolia.mjs
+@@ -7,6 +7,7 @@
+ import { readFile } from "node:fs/promises";
+ import path from "node:path";
+ import { createPublicClient, http, getContract } from "../apps/studio/node_modules/viem/_esm/index.js";
++import { CONTRACTS_ROOT } from "../tools/keel/contracts-root.mjs";
+ 
+ const CHAIN_ID = 11_155_111;
+ const RPC = process.env.OCA_RPC_URL?.trim() || "https://ethereum-sepolia-rpc.publicnode.com";
+@@ -29,7 +30,7 @@ async function main() {
+   if (!code || code.length <= 2) throw new Error(`No contract at ${registryAddress}.`);
+ 
+   const artifact = JSON.parse(
+-    await readFile(path.resolve("packages/contracts/out/KeelModuleReviewRegistry.sol/KeelModuleReviewRegistry.json"), "utf8"),
++    await readFile(path.resolve(`${CONTRACTS_ROOT}/out/KeelModuleReviewRegistry.sol/KeelModuleReviewRegistry.json`), "utf8"),
+   );
+   const registry = getContract({ address: registryAddress, abi: artifact.abi, client: publicClient });
+ 
+diff --git a/scripts/verify.mjs b/scripts/verify.mjs
+index aa473d89..427cb49c 100644
+--- a/scripts/verify.mjs
++++ b/scripts/verify.mjs
+@@ -1,6 +1,7 @@
+ import { access } from "node:fs/promises";
+ import path from "node:path";
+ import { root, run, tsc } from "./run.mjs";
++import { CONTRACTS_ROOT } from "../tools/keel/contracts-root.mjs";
+ 
+ run("node", ["scripts/check.mjs"]);
+ tsc("apps/demo/tsconfig.json");
+@@ -22,21 +23,6 @@ for (const required of [
+   "docs/GAS.md",
+   "docs/STORAGE.md",
+   "docs/KEEL_CONTRACTS.md",
+-  "packages/contracts/src/modules/keel-hold/KeelHold.sol",
+-  "packages/contracts/src/modules/keel-hold/KeelIndex.sol",
+-  "packages/contracts/src/modules/keel-mint-access/KeelMintGate.sol",
+-  "packages/contracts/src/modules/keel-die/KEEL721.sol",
+-  "packages/contracts/src/modules/keel-mint-access/OneMintController.sol",
+-  "packages/contracts/src/modules/keel-artifacts/KeelArtifactRegistry.sol",
+-  "packages/contracts/src/modules/keel-artifacts/KeelHarnessRegistry.sol",
+-  "packages/contracts/src/modules/keel-creator-identity/KeelAttributionRegistry.sol",
+-  "packages/contracts/src/modules/keel-artifacts/KeelLinkRegistry.sol",
+-  "packages/contracts/src/modules/keel-artifacts/KeelSeedRegistry.sol",
+-  "packages/contracts/src/modules/keel-equipment/KeelEquipmentInventory.sol",
+-  "packages/contracts/src/modules/keel-graph/KeelGraphRegistry.sol",
+-  "packages/contracts/src/modules/keel-graph/KeelPluginRegistry.sol",
+-  "packages/contracts/src/modules/keel-graph/KeelModuleReviewRegistry.sol",
+-  "packages/contracts/src/modules/keel-market/KeelMarket.sol",
+   "packages/viewer/src/gateway.ts",
+   "packages/viewer/src/registry-adapter.ts",
+   "packages/viewer/src/egress.ts",
+@@ -54,6 +40,27 @@ for (const required of [
+   await access(path.join(root, required));
+ }
+ 
++// contract sources live in the sibling keel-contracts repository, not here
++for (const required of [
++  "src/modules/keel-hold/KeelHold.sol",
++  "src/modules/keel-hold/KeelIndex.sol",
++  "src/modules/keel-mint-access/KeelMintGate.sol",
++  "src/modules/keel-die/KEEL721.sol",
++  "src/modules/keel-mint-access/OneMintController.sol",
++  "src/modules/keel-artifacts/KeelArtifactRegistry.sol",
++  "src/modules/keel-artifacts/KeelHarnessRegistry.sol",
++  "src/modules/keel-creator-identity/KeelAttributionRegistry.sol",
++  "src/modules/keel-artifacts/KeelLinkRegistry.sol",
++  "src/modules/keel-artifacts/KeelSeedRegistry.sol",
++  "src/modules/keel-equipment/KeelEquipmentInventory.sol",
++  "src/modules/keel-graph/KeelGraphRegistry.sol",
++  "src/modules/keel-graph/KeelPluginRegistry.sol",
++  "src/modules/keel-graph/KeelModuleReviewRegistry.sol",
++  "src/modules/keel-market/KeelMarket.sol",
++]) {
++  await access(path.join(CONTRACTS_ROOT, required));
++}
++
+ console.log(
+   "Repository verification passed: TypeScript packages, the complete Node test suite, demo typecheck, v2 examples, documentation links, Solidity policy gate, and compiler-script syntax. Exact Solidity compilation/Foundry tests run after dependencies are installed.",
+ );
+diff --git a/tests/keel-manifest-generation.test.mjs b/tests/keel-manifest-generation.test.mjs
+new file mode 100644
+index 00000000..a7878b1d
+--- /dev/null
++++ b/tests/keel-manifest-generation.test.mjs
+@@ -0,0 +1,190 @@
++/**
++ * `keel sync` derives each unit's `deployable` list from forge artifacts. When the
++ * artifacts are not on disk there is nothing to derive from, and the generator
++ * once recorded that absence as `deployable: []` — silently erasing the real list
++ * for the external apps, whose sources live in their own repositories and so are
++ * never built into keel-contracts/out locally. The loss surfaced only downstream,
++ * as a deployment record naming a contract the manifest no longer called
++ * deployable. These tests pin the distinction the fix rests on: a missing artifact
++ * directory is *unknown*, never *nothing*.
++ */
++import test from "node:test";
++import assert from "node:assert/strict";
++import { execFileSync } from "node:child_process";
++import { mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
++import { tmpdir } from "node:os";
++import { basename, join, resolve } from "node:path";
++
++import { MODULES } from "../tools/keel/module-map.mjs";
++import { artifactNames, deployableSources, resolveDeployable } from "../tools/keel/generate-manifests.mjs";
++
++const REPO = resolve(import.meta.dirname, "..");
++const GENERATOR = "tools/keel/generate-manifests.mjs";
++const EXTERNAL = MODULES.filter((m) => m.external);
++const LOCAL = MODULES.filter((m) => !m.external);
++
++const unitDir = (root, unit) => join(root, unit.kind === "app" ? "apps" : "modules", unit.id);
++const readManifest = (root, unit) =>
++  JSON.parse(readFileSync(join(unitDir(root, unit), "keel.module.json"), "utf8"));
++
++/** what an external unit's committed manifest claims, absent any local artifacts */
++const committedDeployable = (unit) => deployableSources(unit.contracts).map((c) => basename(c, ".sol")).sort();
++
++function seedArtifacts(root, unit, { bytecode = true } = {}) {
++  for (const file of deployableSources(unit.contracts)) {
++    const dir = join(root, "out", basename(file));
++    mkdirSync(dir, { recursive: true });
++    writeFileSync(join(dir, `${basename(file, ".sol")}.json`),
++      JSON.stringify({ abi: [], bytecode: { object: bytecode ? "0x60806040" : "0x" } }));
++  }
++}
++
++function seedManifest(root, unit, deployable) {
++  mkdirSync(unitDir(root, unit), { recursive: true });
++  writeFileSync(join(unitDir(root, unit), "keel.module.json"),
++    `${JSON.stringify({ schema: "keel.module@1", id: unit.id, kind: unit.kind, visibility: "private", deployable }, null, 2)}\n`);
++}
++
++/**
++ * A contracts tree shaped like the real one: every local unit is built, and every
++ * external unit has a committed manifest but no artifacts at all.
++ */
++function buildTree(t) {
++  const root = mkdtempSync(join(tmpdir(), "keel-manifests-"));
++  t.after(() => rmSync(root, { recursive: true, force: true }));
++  writeFileSync(join(root, "package.json"), JSON.stringify({ version: "9.9.9" }));
++  for (const unit of LOCAL) seedArtifacts(root, unit);
++  for (const unit of EXTERNAL) seedManifest(root, unit, committedDeployable(unit));
++  return root;
++}
++
++function generate(root) {
++  try {
++    return { status: 0, stdout: execFileSync("node", [GENERATOR], { cwd: REPO, encoding: "utf8", env: { ...process.env, KEEL_CONTRACTS_DIR: root } }), stderr: "" };
++  } catch (err) {
++    return { status: err.status ?? 1, stdout: err.stdout ?? "", stderr: err.stderr ?? "" };
++  }
++}
++
++test("a missing artifact directory reads as unknown, not as an empty list", (t) => {
++  const root = mkdtempSync(join(tmpdir(), "keel-artifacts-"));
++  t.after(() => rmSync(root, { recursive: true, force: true }));
++  const out = join(root, "out");
++
++  assert.equal(artifactNames(out, "Absent.sol"), null, "an absent directory is unknown");
++
++  // present but carrying no creation bytecode — an interface or abstract base —
++  // is the genuinely-not-deployable case, and must stay distinct from unknown.
++  mkdirSync(join(out, "Abstract.sol"), { recursive: true });
++  writeFileSync(join(out, "Abstract.sol", "Abstract.json"), JSON.stringify({ bytecode: { object: "0x" } }));
++  assert.deepEqual(artifactNames(out, "Abstract.sol"), []);
++
++  mkdirSync(join(out, "Real.sol"), { recursive: true });
++  writeFileSync(join(out, "Real.sol", "Real.json"), JSON.stringify({ bytecode: { object: "0x6080" } }));
++  writeFileSync(join(out, "Real.sol", "Helper.json"), JSON.stringify({ bytecode: { object: "0x6080" } }));
++  assert.deepEqual(artifactNames(out, "Real.sol"), ["Helper", "Real"]);
++});
++
++test("resolveDeployable keeps the prior list rather than deriving from a partial build", (t) => {
++  const root = mkdtempSync(join(tmpdir(), "keel-resolve-"));
++  t.after(() => rmSync(root, { recursive: true, force: true }));
++  const out = join(root, "out");
++  mkdirSync(join(out, "Built.sol"), { recursive: true });
++  writeFileSync(join(out, "Built.sol", "Built.json"), JSON.stringify({ bytecode: { object: "0x6080" } }));
++
++  const prior = ["Built", "Unbuilt"];
++  // Only one of the two files is built. Deriving here would write ["Built"] — a
++  // truncation that loses Unbuilt just as surely as writing [] would.
++  const partial = resolveDeployable({ contracts: ["Built.sol", "Unbuilt.sol"], outDir: out, prior });
++  assert.equal(partial.derived, false);
++  assert.deepEqual(partial.missing, ["Unbuilt.sol"]);
++  assert.deepEqual(partial.deployable, prior, "a partial build must not truncate the list");
++
++  const none = resolveDeployable({ contracts: ["Unbuilt.sol"], outDir: out, prior: null });
++  assert.equal(none.deployable, null, "unknown with nothing to preserve stays null, never []");
++
++  const full = resolveDeployable({ contracts: ["Built.sol"], outDir: out, prior });
++  assert.equal(full.derived, true);
++  assert.deepEqual(full.deployable, ["Built"], "a complete build derives fresh");
++
++  // interfaces and libraries never carry bytecode, so their absence is not a gap
++  const ignored = resolveDeployable({ contracts: ["Built.sol", "interfaces/IThing.sol", "libraries/Lib.sol"], outDir: out, prior });
++  assert.deepEqual(ignored.missing, []);
++  assert.deepEqual(ignored.deployable, ["Built"]);
++});
++
++test("regression: syncing an unbuilt external app does not empty its deployable list", (t) => {
++  const root = buildTree(t);
++  const before = Object.fromEntries(EXTERNAL.map((u) => [u.id, readManifest(root, u).deployable]));
++
++  const run = generate(root);
++  assert.equal(run.status, 0, `generator refused unexpectedly:\n${run.stderr}`);
++
++  for (const unit of EXTERNAL) {
++    const after = readManifest(root, unit).deployable;
++    assert.ok(after.length > 0, `${unit.id} was emptied by a sync with no artifacts present`);
++    assert.deepEqual(after, before[unit.id], `${unit.id} lost its deployable list`);
++  }
++  assert.match(run.stdout, /kept \d+ deployable from the existing manifest/u,
++    "preserving a list must be reported, not silent");
++
++  // The incident's downstream symptom: a deployment record naming a contract the
++  // manifest no longer called deployable.
++  const vault = EXTERNAL.find((u) => u.id === "vault-runner");
++  if (vault) {
++    const deployable = readManifest(root, vault).deployable;
++    for (const contract of ["VaultCharacter721", "VaultArcadeRegistry"]) {
++      assert.ok(deployable.includes(contract), `vault-runner no longer records ${contract} as deployable`);
++    }
++  }
++});
++
++test("a local unit with no artifacts is refused, and nothing on disk is touched", (t) => {
++  const root = buildTree(t);
++  const victim = LOCAL.find((u) => deployableSources(u.contracts).length > 0);
++  assert.ok(victim, "expected at least one local unit with deployable sources");
++  for (const file of deployableSources(victim.contracts)) {
++    rmSync(join(root, "out", basename(file)), { recursive: true, force: true });
++  }
++  const externalBefore = Object.fromEntries(EXTERNAL.map((u) => [u.id, readManifest(root, u).deployable]));
++
++  const run = generate(root);
++  assert.equal(run.status, 1, "an unbuilt local unit must fail the sync");
++  assert.match(run.stderr, /refusing to write manifests/u);
++  assert.match(run.stderr, new RegExp(`${victim.id}: no artifacts`, "u"));
++  assert.match(run.stderr, /forge build/u, "the message must say how to fix it");
++
++  // Refusal is atomic: units resolved before the failure are not half-written.
++  for (const unit of EXTERNAL) {
++    assert.deepEqual(readManifest(root, unit).deployable, externalBefore[unit.id],
++      `${unit.id} was rewritten despite the refusal`);
++  }
++});
++
++test("an external unit with neither artifacts nor a manifest is refused, not written as empty", (t) => {
++  const root = buildTree(t);
++  const orphan = EXTERNAL[0];
++  assert.ok(orphan, "expected at least one external unit");
++  rmSync(unitDir(root, orphan), { recursive: true, force: true });
++
++  const run = generate(root);
++  assert.equal(run.status, 1, "there is no source of truth for this unit, so it must not be guessed");
++  assert.match(run.stderr, new RegExp(`${orphan.id}: external unit with no artifacts`, "u"));
++});
++
++test("a built tree still derives deployable from bytecode, and abstract bases stay out", (t) => {
++  const root = buildTree(t);
++  const unit = LOCAL.find((u) => deployableSources(u.contracts).length > 1);
++  assert.ok(unit, "expected a local unit with more than one deployable source");
++  const [abstractFile, ...rest] = deployableSources(unit.contracts);
++  // rebuild this one file as bytecode-less: present, but genuinely not deployable
++  seedArtifacts(root, { ...unit, contracts: [abstractFile] }, { bytecode: false });
++
++  const run = generate(root);
++  assert.equal(run.status, 0, `generator refused unexpectedly:\n${run.stderr}`);
++
++  const deployable = readManifest(root, unit).deployable;
++  assert.ok(!deployable.includes(basename(abstractFile, ".sol")),
++    "a present-but-bytecode-less contract is not deployable");
++  assert.deepEqual(deployable, rest.map((c) => basename(c, ".sol")).sort());
++});
+diff --git a/tests/keel-modules.test.mjs b/tests/keel-modules.test.mjs
+index 6a4ccf89..b76d803d 100644
+--- a/tests/keel-modules.test.mjs
++++ b/tests/keel-modules.test.mjs
+@@ -21,13 +21,14 @@ import {
+ } from "../packages/sdk/dist/index.js";
+ 
+ import { MODULE_BY_ID as UNIT_MAP } from "../tools/keel/module-map.mjs";
++import { CONTRACTS_ROOT } from "../tools/keel/contracts-root.mjs";
+ 
+-const MODULES_DIR = "../keel-contracts/modules";
+-const APPS_DIR = "../keel-contracts/apps";
++const MODULES_DIR = join(CONTRACTS_ROOT, "modules");
++const APPS_DIR = join(CONTRACTS_ROOT, "apps");
+ /** modules and apps live in sibling trees; everything else about them matches */
+ const UNITS = [...KEEL_MODULES, ...KEEL_APPS];
+ const metaDir = (unit) => (unit.kind === "app" ? APPS_DIR : MODULES_DIR);
+-const srcDir = (unit) => `../keel-contracts/src/${unit.kind === "app" ? "apps" : "modules"}`;
++const srcDir = (unit) => join(CONTRACTS_ROOT, "src", unit.kind === "app" ? "apps" : "modules");
+ 
+ /**
+  * The checker only proves the map and the tree agree with each other. Deleting a
+diff --git a/tests/keel-rpc-policy.test.mjs b/tests/keel-rpc-policy.test.mjs
+index 50da32e4..b8553acf 100644
+--- a/tests/keel-rpc-policy.test.mjs
++++ b/tests/keel-rpc-policy.test.mjs
+@@ -48,7 +48,7 @@ test("the host list accepts exactly what the contract accepts", () => {
+ test("the digest preimage is byte-identical to the one KeelManager hashes", async () => {
+   const hosts = ["publicnode.com", "https://eth.example.org/v1/"];
+   // Pinned against `testRpcHostListDigestIsTheReproduciblePreimageAndTracksEveryInput`
+-  // in packages/contracts/test/KeelManager.t.sol. If these two ever
++  // in keel-contracts test/KeelManager.t.sol. If these two ever
+   // disagree a published digest stops meaning anything, so both sides assert
+   // the same literal rather than each computing its own idea of the format.
+   assert.equal(
+diff --git a/tests/keel-verification-consumer.test.mjs b/tests/keel-verification-consumer.test.mjs
+index 486fcbba..03275a93 100644
+--- a/tests/keel-verification-consumer.test.mjs
++++ b/tests/keel-verification-consumer.test.mjs
+@@ -2,7 +2,11 @@ import assert from "node:assert/strict";
+ import { readFile } from "node:fs/promises";
+ import test from "node:test";
+ 
++import { sibling } from "../tools/keel/contracts-root.mjs";
++
+ const source=async(path)=>readFile(new URL(path,import.meta.url),"utf8");
++/** sibling repositories are not reachable by a relative path from a git worktree */
++const siblingSource=async(...parts)=>readFile(sibling(...parts),"utf8");
+ 
+ test("consumer matrix uses the canonical builder for real media and hostile verifier cases",async()=>{
+   const [builder,app,index]=await Promise.all([
+@@ -48,9 +52,9 @@ test("consumer matrix uses the canonical builder for real media and hostile veri
+ 
+ test("both chain contract gates cover revisions, staking authority, immutable code, API manifests, and permanent materialization",async()=>{
+   const [evm,evmObjects,evmMint,tezos,tezosCheckpoint]=await Promise.all([
+-    source("../../keel-contracts/test/modules/keel-presentation/KeelPresentationStateRegistry.t.sol"),
+-    source("../../keel-contracts/test/modules/keel-artifacts/KeelArtifactRegistry.t.sol"),
+-    source("../../vault-of-the-fallen/contracts/test/VaultCharacter721.t.sol"),
++    siblingSource("keel-contracts","test/modules/keel-presentation/KeelPresentationStateRegistry.t.sol"),
++    siblingSource("keel-contracts","test/modules/keel-artifacts/KeelArtifactRegistry.t.sol"),
++    siblingSource("vault-of-the-fallen","contracts/test/VaultCharacter721.t.sol"),
+     source("../packages/tezos/tests/test_keel_presentation_state.py"),
+     source("../packages/tezos/tests/test_keel_immutable_checkpoint.py"),
+   ]);
+diff --git a/tests/studio-structure-check.test.mjs b/tests/studio-structure-check.test.mjs
+deleted file mode 100644
+index f5eeb079..00000000
+--- a/tests/studio-structure-check.test.mjs
++++ /dev/null
+@@ -1,19 +0,0 @@
+-import assert from "node:assert/strict";
+-import { spawnSync } from "node:child_process";
+-import { readFile } from "node:fs/promises";
+-import test from "node:test";
+-
+-test("Studio structure accepts canonical and idempotent Drizzle CREATE TABLE migrations", async () => {
+-  const [checker, migration] = await Promise.all([
+-    readFile(new URL("../scripts/studio-structure-check.mjs", import.meta.url), "utf8"),
+-    readFile(new URL("../apps/studio/drizzle/0004_vault_character_index.sql", import.meta.url), "utf8"),
+-  ]);
+-  assert.match(migration, /CREATE TABLE IF NOT EXISTS "indexed_vault_catalogs"/u);
+-  assert.match(migration, /CREATE TABLE IF NOT EXISTS "indexed_vault_characters"/u);
+-  assert.match(checker, /CREATE TABLE\(\?: IF NOT EXISTS\)\?/u);
+-  const result = spawnSync(process.execPath, ["scripts/studio-structure-check.mjs"], {
+-    cwd: process.cwd(), encoding: "utf8",
+-  });
+-  assert.equal(result.status, 0, result.stderr);
+-  assert.match(result.stdout, /Studio structure passed/u);
+-});
+diff --git a/tools/keel/adopt.mjs b/tools/keel/adopt.mjs
+index 4561a41d..0a72dcc7 100644
+--- a/tools/keel/adopt.mjs
++++ b/tools/keel/adopt.mjs
+@@ -11,10 +11,11 @@
+ import { readdirSync, readFileSync, writeFileSync, statSync, existsSync } from "node:fs";
+ import { join, relative, resolve } from "node:path";
+ import { MODULES, TIER_OF } from "./module-map.mjs";
++import { CONTRACTS_ROOT } from "./contracts-root.mjs";
+ 
+ const APPLY = process.argv.includes("--apply");
+ const REPO = resolve(import.meta.dirname, "../..");
+-const srcRoot = (id) => join(REPO, "packages/contracts/src", TIER_OF.get(id), id);
++const srcRoot = (id) => join(CONTRACTS_ROOT, "src", TIER_OF.get(id), id);
+ const MAP = join(import.meta.dirname, "module-map.mjs");
+ 
+ const owned = new Set(MODULES.flatMap((m) => m.contracts));
+diff --git a/tools/keel/check.mjs b/tools/keel/check.mjs
+index c099ec62..1d847392 100644
+--- a/tools/keel/check.mjs
++++ b/tools/keel/check.mjs
+@@ -11,9 +11,10 @@
+ import { readdirSync, readFileSync, statSync, existsSync } from "node:fs";
+ import { join, dirname, relative, resolve } from "node:path";
+ import { MODULES, MODULE_BY_ID, OWNER_OF, TIER_OF, isApp } from "./module-map.mjs";
++import { CONTRACTS_ROOT } from "./contracts-root.mjs";
+ 
+-const SRC = resolve(import.meta.dirname, "../../../keel-contracts/src");
+-const CONTRACTS = resolve(import.meta.dirname, "../../../keel-contracts");
++const SRC = join(CONTRACTS_ROOT, "src");
++const CONTRACTS = CONTRACTS_ROOT;
+ const TEST_TIERS = ["modules", "apps"];
+ const IMPORT_RE = /import\s+(?:[^"';]*?\s+from\s+)?["']([^"']+)["']/g;
+ 
+diff --git a/tools/keel/cli.mjs b/tools/keel/cli.mjs
+index 3ac69a84..cb538662 100755
+--- a/tools/keel/cli.mjs
++++ b/tools/keel/cli.mjs
+@@ -23,9 +23,10 @@ import { readFileSync, readdirSync, writeFileSync, mkdirSync, existsSync, statSy
+ import { execFileSync, spawnSync } from "node:child_process";
+ import { join, resolve } from "node:path";
+ import { MODULES, MODULE_BY_ID, TIER_OF } from "./module-map.mjs";
++import { CONTRACTS_ROOT } from "./contracts-root.mjs";
+ 
+ const REPO = resolve(import.meta.dirname, "../..");
+-const CONTRACTS = join(REPO, "../keel-contracts");
++const CONTRACTS = CONTRACTS_ROOT;
+ const MODULES_DIR = join(CONTRACTS, "modules");
+ const [cmd, ...rest] = process.argv.slice(2);
+ 
+diff --git a/tools/keel/contracts-root.mjs b/tools/keel/contracts-root.mjs
+new file mode 100644
+index 00000000..fdad565e
+--- /dev/null
++++ b/tools/keel/contracts-root.mjs
+@@ -0,0 +1,41 @@
++/**
++ * Where this repository's sibling repositories live.
++ *
++ * keel-contracts (and vault-of-the-fallen) sit beside this repository rather
++ * than inside it, so their paths have to be derived rather than declared — and
++ * the obvious derivation, `<repo>/..`, is wrong in a git worktree. A linked
++ * worktree checks out under `.claude/worktrees/<name>/`, where the siblings
++ * resolve to directories that do not exist; that is why the test suite could not
++ * run from one. Deriving the *main* worktree's parent instead fixes it without
++ * anyone having to pass a path, because a worktree's shared git directory
++ * always lives in the main checkout.
++ */
++import { execFileSync } from "node:child_process";
++import { existsSync } from "node:fs";
++import { dirname, join, resolve } from "node:path";
++
++export const REPO_ROOT = resolve(import.meta.dirname, "../..");
++
++/** the main worktree's root — the parent of the shared git directory */
++function mainWorktree(from) {
++  try {
++    const common = execFileSync("git", ["rev-parse", "--git-common-dir"], {
++      cwd: from, encoding: "utf8", stdio: ["ignore", "pipe", "ignore"],
++    }).trim();
++    return common ? dirname(resolve(from, common)) : null;
++  } catch { return null; }
++}
++
++/** the directory holding this repository and its siblings */
++export const SIBLING_ROOT = resolve(mainWorktree(REPO_ROOT) ?? REPO_ROOT, "..");
++
++/** a path inside a sibling repository, e.g. sibling("vault-of-the-fallen", "contracts") */
++export const sibling = (...parts) => join(SIBLING_ROOT, ...parts);
++
++/** `KEEL_CONTRACTS_DIR` overrides, so a run can be pointed at a scratch tree */
++export const CONTRACTS_ROOT = process.env.KEEL_CONTRACTS_DIR
++  ? resolve(process.env.KEEL_CONTRACTS_DIR)
++  : sibling("keel-contracts");
++
++/** true when the contracts tree is actually on disk; callers report their own errors */
++export const contractsPresent = () => existsSync(CONTRACTS_ROOT);
+diff --git a/tools/keel/generate-manifests.mjs b/tools/keel/generate-manifests.mjs
+index c60d66d1..5056f6cd 100644
+--- a/tools/keel/generate-manifests.mjs
++++ b/tools/keel/generate-manifests.mjs
+@@ -1,23 +1,50 @@
+ /**
+- * Writes packages/contracts/modules/<id>/keel.module.json from the module map.
++ * Writes ../keel-contracts/{modules,apps}/<id>/keel.module.json from the module map.
+  *
+  * `deployable` is derived from compiled artifacts rather than declared by hand: a
+  * contract is deployable when forge emitted non-empty creation bytecode for it,
+  * which excludes interfaces, libraries, and abstract bases automatically.
++ *
++ * Deriving from artifacts means an unbuilt tree has nothing to derive *from*, and
++ * "I cannot see any bytecode" must never be recorded as "nothing here deploys" —
++ * that silently erases a real list. So a missing artifact directory is `null`
++ * (unknown), distinct from a present-but-bytecode-less one (`[]`, genuinely not
++ * deployable), and a unit whose artifacts are unknown is never rederived:
++ *
++ *   external unit  its sources live in another repository, so absent artifacts are
++ *                  the normal local state — keep the committed list, as visibility
++ *                  is already kept across regeneration.
++ *   local unit     its sources are right here, so absent artifacts mean an unbuilt
++ *                  tree — refuse to write anything and ask for a `forge build`.
++ *
++ * Nothing is written until every unit resolves, so a refusal leaves the manifests
++ * exactly as they were rather than half-rewritten.
+  */
+-import { readdirSync, readFileSync, writeFileSync, mkdirSync, existsSync, statSync } from "node:fs";
+-import { join, resolve, basename } from "node:path";
++import { readdirSync, readFileSync, writeFileSync, mkdirSync, existsSync } from "node:fs";
++import { join, basename } from "node:path";
++import { pathToFileURL } from "node:url";
+ import { MODULES, TIER_OF } from "./module-map.mjs";
++import { CONTRACTS_ROOT } from "./contracts-root.mjs";
+ 
+-const REPO = resolve(import.meta.dirname, "../..");
+-const CONTRACTS = join(REPO, "../keel-contracts");
+-const OUT = join(CONTRACTS, "out");
+-const metaDir = (id) => join(CONTRACTS, TIER_OF.get(id));
+-const VERSION = JSON.parse(readFileSync(join(CONTRACTS, "package.json"), "utf8")).version;
++const metaDir = (id) => join(CONTRACTS_ROOT, TIER_OF.get(id));
+ 
+-function deployablesFor(solFile) {
+-  const dir = join(OUT, basename(solFile));
+-  if (!existsSync(dir)) return [];
++/**
++ * Source files that could carry creation bytecode. Interfaces are never deployed,
++ * and every library here is internal-only and inlined by the compiler — forge
++ * still emits a stub for them, so they are filtered by path rather than by
++ * bytecode. Excluding them here also means their absence from `out/` is not
++ * mistaken for an unbuilt tree.
++ */
++export const deployableSources = (contracts) =>
++  contracts.filter((c) => !c.startsWith("interfaces/") && !c.startsWith("libraries/"));
++
++/**
++ * Contract names with creation bytecode in `<out>/<SolFile>/`, or `null` when
++ * that directory does not exist — unknown, which is not the same as none.
++ */
++export function artifactNames(outDir, solFile) {
++  const dir = join(outDir, basename(solFile));
++  if (!existsSync(dir)) return null;
+   const names = [];
+   for (const f of readdirSync(dir)) {
+     if (!f.endsWith(".json")) continue;
+@@ -30,53 +57,113 @@ function deployablesFor(solFile) {
+   return names.sort();
+ }
+ 
+-/** preserve visibility across regeneration — it comes from GitHub, not the map */
+-function existingVisibility(id) {
++/**
++ * The `deployable` list for one unit, plus the source files whose artifacts are
++ * missing. Any missing artifact makes the whole derivation untrustworthy — a
++ * partial build would otherwise write a truncated list, which is the same data
++ * loss as an empty one — so the caller's `prior` list is kept intact instead.
++ */
++export function resolveDeployable({ contracts, outDir, prior = null }) {
++  const missing = [];
++  const found = [];
++  for (const file of deployableSources(contracts)) {
++    const names = artifactNames(outDir, file);
++    if (names === null) missing.push(file);
++    else found.push(...names);
++  }
++  if (missing.length) return { deployable: prior, missing, derived: false };
++  return { deployable: [...new Set(found)].sort(), missing, derived: true };
++}
++
++function existingManifest(id) {
+   const p = join(metaDir(id), id, "keel.module.json");
+   if (!existsSync(p)) return null;
+-  try { return JSON.parse(readFileSync(p, "utf8")).visibility ?? null; } catch { return null; }
++  try { return JSON.parse(readFileSync(p, "utf8")); } catch { return null; }
+ }
+ 
+-let written = 0;
+-for (const m of MODULES) {
+-  const dir = join(metaDir(m.id), m.id);
+-  mkdirSync(join(dir, "deployments"), { recursive: true });
+-  // interfaces are never deployed, and every library here is internal-only and
+-  // inlined by the compiler — forge still emits a stub for them, so filter by path.
+-  const deployable = [...new Set(
+-    m.contracts.filter((c) => !c.startsWith("interfaces/") && !c.startsWith("libraries/"))
+-      .flatMap(deployablesFor),
+-  )].sort();
+-  const manifest = {
+-    schema: "keel.module@1",
+-    id: m.id,
+-    kind: m.kind,
+-    title: m.title,
+-    group: m.group,
+-    summary: m.summary,
+-    version: VERSION,
+-    repo: m.kind === "app" ? null : `keel-web3/${m.id}`,
+-    // recorded by `keel repos --sync`; drives install instructions, nothing else
+-    visibility: existingVisibility(m.id),
+-    deps: m.deps,
+-    devDeps: m.devDeps ?? [],
+-    sources: `packages/contracts/src/${TIER_OF.get(m.id)}/${m.id}`,
+-    tests: `packages/contracts/test/${TIER_OF.get(m.id)}/${m.id}`,
+-    contracts: m.contracts,
+-    deployable,
+-    verify: {
+-      build: "forge build",
+-      test: `forge test --match-path 'test/${TIER_OF.get(m.id)}/${m.id}/*'`,
+-      static: "node scripts/solidity-static-check.mjs",
+-      sizeLimitBytes: 24576,
+-    },
+-  };
+-  writeFileSync(join(dir, "keel.module.json"), `${JSON.stringify(manifest, null, 2)}\n`);
+-  written++;
++function main() {
++  const OUT = join(CONTRACTS_ROOT, "out");
++  const VERSION = JSON.parse(readFileSync(join(CONTRACTS_ROOT, "package.json"), "utf8")).version;
++
++  // Resolve every unit before writing any of them, so a refusal is a no-op.
++  const planned = [];
++  const unbuilt = [];   // local units that need a build
++  const orphaned = [];  // artifacts unknown and no committed list to fall back on
++  const preserved = []; // external units keeping their committed list
++
++  for (const m of MODULES) {
++    const existing = existingManifest(m.id);
++    const { deployable, missing, derived } = resolveDeployable({
++      contracts: m.contracts,
++      outDir: OUT,
++      prior: existing?.deployable ?? null,
++    });
++
++    if (!derived) {
++      if (!m.external) unbuilt.push({ id: m.id, missing });
++      else if (deployable === null) orphaned.push({ id: m.id, missing });
++      else preserved.push({ id: m.id, kept: deployable.length });
++    }
++
++    planned.push({
++      m,
++      // recorded by `keel repos --sync`; drives install instructions, nothing else
++      visibility: existing?.visibility ?? null,
++      deployable: deployable ?? [],
++    });
++  }
++
++  if (unbuilt.length || orphaned.length) {
++    console.error("keel: refusing to write manifests — `deployable` cannot be derived.\n");
++    for (const { id, missing } of unbuilt) {
++      console.error(`  ${id}: no artifacts for ${missing.length} source file${missing.length === 1 ? "" : "s"} (${missing.slice(0, 3).join(", ")}${missing.length > 3 ? ", …" : ""})`);
++    }
++    if (unbuilt.length) console.error("\n  These units build from this tree — run `forge build` in keel-contracts, then retry.");
++    for (const { id } of orphaned) {
++      console.error(`  ${id}: external unit with no artifacts and no existing manifest to preserve.`);
++    }
++    if (orphaned.length) console.error("\n  Nothing on disk records what these deploy. Restore the manifest, or build the unit's own repository into keel-contracts/out.");
++    console.error("\nNo manifest was modified.");
++    process.exit(1);
++  }
++
++  let written = 0;
++  for (const { m, visibility, deployable } of planned) {
++    const dir = join(metaDir(m.id), m.id);
++    mkdirSync(join(dir, "deployments"), { recursive: true });
++    const manifest = {
++      schema: "keel.module@1",
++      id: m.id,
++      kind: m.kind,
++      title: m.title,
++      group: m.group,
++      summary: m.summary,
++      version: VERSION,
++      repo: m.kind === "app" ? null : `keel-web3/${m.id}`,
++      visibility,
++      deps: m.deps,
++      devDeps: m.devDeps ?? [],
++      sources: `src/${TIER_OF.get(m.id)}/${m.id}`,
++      tests: `test/${TIER_OF.get(m.id)}/${m.id}`,
++      contracts: m.contracts,
++      deployable,
++      verify: {
++        build: "forge build",
++        test: `forge test --match-path 'test/${TIER_OF.get(m.id)}/${m.id}/*'`,
++        static: "node scripts/solidity-static-check.mjs",
++        sizeLimitBytes: 24576,
++      },
++    };
++    writeFileSync(join(dir, "keel.module.json"), `${JSON.stringify(manifest, null, 2)}\n`);
++    written++;
++  }
++
++  console.log(`wrote ${written} manifests under keel-contracts/{modules,apps}/`);
++  console.log(planned.map(({ m, deployable }) =>
++    `  ${(m.kind === "app" ? "app " : "    ")}${m.id.padEnd(32)} ${String(m.contracts.length).padStart(3)} files, ${String(deployable.length).padStart(2)} deployable`).join("\n"));
++  for (const { id, kept } of preserved) {
++    console.log(`  note  ${id}: artifacts absent (external unit) — kept ${kept} deployable from the existing manifest`);
++  }
+ }
+-console.log(`wrote ${written} manifests under packages/contracts/{modules,apps}/`);
+-const counts = MODULES.map((m) => {
+-  const d = JSON.parse(readFileSync(join(metaDir(m.id), m.id, "keel.module.json"), "utf8"));
+-  return `  ${(m.kind === "app" ? "app " : "    ")}${m.id.padEnd(32)} ${String(d.contracts.length).padStart(3)} files, ${String(d.deployable.length).padStart(2)} deployable`;
+-});
+-console.log(counts.join("\n"));
++
++if (import.meta.url === pathToFileURL(process.argv[1] ?? "").href) main();
+diff --git a/tools/keel/relocate.mjs b/tools/keel/relocate.mjs
+index b400c392..a78f2bab 100644
+--- a/tools/keel/relocate.mjs
++++ b/tools/keel/relocate.mjs
+@@ -12,10 +12,11 @@ import { readdirSync, readFileSync, writeFileSync, statSync, mkdirSync, existsSy
+ import { execFileSync } from "node:child_process";
+ import { join, dirname, relative, resolve, basename } from "node:path";
+ import { MODULES } from "./module-map.mjs";
++import { CONTRACTS_ROOT } from "./contracts-root.mjs";
+ 
+ const APPLY = process.argv.includes("--apply");
+ const REPO = resolve(import.meta.dirname, "../..");
+-const CONTRACTS = join(REPO, "../keel-contracts");
++const CONTRACTS = CONTRACTS_ROOT;
+ const SRC = join(CONTRACTS, "src");
+ const TEST = join(CONTRACTS, "test");
+ const IMPORT_RE = /(import\s+(?:[^"';]*?\s+from\s+)?["'])([^"']+)(["'])/g;
+diff --git a/tools/keel/remap-imports.mjs b/tools/keel/remap-imports.mjs
+index 54cf40da..3be90280 100644
+--- a/tools/keel/remap-imports.mjs
++++ b/tools/keel/remap-imports.mjs
+@@ -18,11 +18,12 @@
+ import { readdirSync, readFileSync, writeFileSync, statSync, existsSync } from "node:fs";
+ import { join, dirname, relative, resolve } from "node:path";
+ import { MODULES } from "./module-map.mjs";
++import { CONTRACTS_ROOT } from "./contracts-root.mjs";
+ 
+ const APPLY = process.argv.includes("--apply");
+ const REPO = resolve(import.meta.dirname, "../..");
+-const SRC = join(REPO, "packages/contracts/src");
+-const TEST = join(REPO, "packages/contracts/test");
++const SRC = join(CONTRACTS_ROOT, "src");
++const TEST = join(CONTRACTS_ROOT, "test");
+ const MODROOT = join(SRC, "modules");
+ const IMPORT_RE = /(import\s+(?:[^"';]*?\s+from\s+)?["'])([^"']+)(["'])/g;
+ 
+diff --git a/tools/keel/repos.mjs b/tools/keel/repos.mjs
+index 99bf50d5..8d394868 100644
+--- a/tools/keel/repos.mjs
++++ b/tools/keel/repos.mjs
+@@ -11,13 +11,13 @@
+  */
+ import { readFileSync, writeFileSync } from "node:fs";
+ import { execFileSync } from "node:child_process";
+-import { join, resolve } from "node:path";
++import { join } from "node:path";
+ import { MODULES, TIER_OF } from "./module-map.mjs";
++import { CONTRACTS_ROOT } from "./contracts-root.mjs";
+ 
+ const SYNC = process.argv.includes("--sync");
+ const ORG = (() => { const i = process.argv.indexOf("--org"); return i === -1 ? "keel-web3" : process.argv[i + 1]; })();
+-const REPO = resolve(import.meta.dirname, "../..");
+-const metaFile = (id) => join(REPO, "../keel-contracts", TIER_OF.get(id), id, "keel.module.json");
++const metaFile = (id) => join(CONTRACTS_ROOT, TIER_OF.get(id), id, "keel.module.json");
+ 
+ let remote = new Map();
+ try {
+diff --git a/tools/keel/seed-deployments.mjs b/tools/keel/seed-deployments.mjs
+index ec251815..e6ff8024 100644
+--- a/tools/keel/seed-deployments.mjs
++++ b/tools/keel/seed-deployments.mjs
+@@ -17,9 +17,10 @@
+ import { readFileSync, writeFileSync, existsSync, mkdirSync } from "node:fs";
+ import { join, resolve } from "node:path";
+ import { MODULE_BY_ID, TIER_OF } from "./module-map.mjs";
++import { CONTRACTS_ROOT } from "./contracts-root.mjs";
+ 
+ const REPO = resolve(import.meta.dirname, "../..");
+-const metaDir = (id) => join(REPO, "../keel-contracts", TIER_OF.get(id), id);
++const metaDir = (id) => join(CONTRACTS_ROOT, TIER_OF.get(id), id);
+ const WRITE = process.argv.includes("--write");
+ 
+ /** source file -> { instance, pick(json) -> [{key, module, contract}] } */
+diff --git a/tools/keel/split.mjs b/tools/keel/split.mjs
+index f8d695d0..9475f79c 100644
+--- a/tools/keel/split.mjs
++++ b/tools/keel/split.mjs
+@@ -12,12 +12,13 @@
+ import { readdirSync, readFileSync, writeFileSync, mkdirSync, statSync, existsSync, cpSync, rmSync } from "node:fs";
+ import { join, resolve, relative, dirname } from "node:path";
+ import { MODULES, MODULE_BY_ID } from "./module-map.mjs";
++import { CONTRACTS_ROOT } from "./contracts-root.mjs";
+ 
+ const argv = process.argv.slice(2);
+ const APPLY = argv.includes("--apply");
+ const flag = (n) => { const i = argv.indexOf(`--${n}`); return i === -1 ? undefined : argv[i + 1]; };
+ const REPO = resolve(import.meta.dirname, "../..");
+-const CONTRACTS = join(REPO, "../keel-contracts");
++const CONTRACTS = CONTRACTS_ROOT;
+ const OUT = resolve(flag("out") ?? join(REPO, "build/keel-repos"));
+ const ORG = flag("org") ?? "keel-web3";
+ 
+diff --git a/tools/keel/sync-sdk.mjs b/tools/keel/sync-sdk.mjs
+index 69dd0756..10cef8cd 100644
+--- a/tools/keel/sync-sdk.mjs
++++ b/tools/keel/sync-sdk.mjs
+@@ -7,9 +7,10 @@
+ import { readFileSync, readdirSync, writeFileSync, existsSync, mkdirSync, rmSync } from "node:fs";
+ import { join, resolve } from "node:path";
+ import { MODULES, TIER_OF } from "./module-map.mjs";
++import { CONTRACTS_ROOT } from "./contracts-root.mjs";
+ 
+ const REPO = resolve(import.meta.dirname, "../..");
+-const metaDir = (id) => join(REPO, "../keel-contracts", TIER_OF.get(id), id);
++const metaDir = (id) => join(CONTRACTS_ROOT, TIER_OF.get(id), id);
+ const TARGET = join(REPO, "packages/sdk/src/modules.generated.ts");
+ const ABI_DIR = join(REPO, "packages/sdk/src/abis");
+ 
+@@ -57,7 +58,7 @@ const ids = onlyModules.map((m) => `"${m.id}"`).join(" | ");
+ const appIds = onlyApps.map((m) => `"${m.id}"`).join(" | ");
+ const groups = [...new Set(modules.map((m) => m.group))].sort().map((g) => `"${g}"`).join(" | ");
+ const out = `// GENERATED BY \`keel sync\` — DO NOT EDIT BY HAND.
+-// Source: packages/contracts/modules/*/keel.module.json and */deployments/*.json
++// Source: keel-contracts {modules,apps}/*/keel.module.json and */deployments/*.json
+ 
+ /** Reusable protocol infrastructure. Each module ships as its own repository. */
+ export type KeelModuleId = ${ids};
+diff --git a/tools/keel/verify.mjs b/tools/keel/verify.mjs
+index 1a6dbcae..779ec02d 100644
+--- a/tools/keel/verify.mjs
++++ b/tools/keel/verify.mjs
+@@ -14,15 +14,15 @@
+ import { readdirSync, readFileSync, writeFileSync, mkdirSync, existsSync, statSync } from "node:fs";
+ import { spawnSync } from "node:child_process";
+ import { createHash } from "node:crypto";
+-import { join, resolve, basename } from "node:path";
++import { join, basename } from "node:path";
+ import { MODULES, MODULE_BY_ID, TIER_OF } from "./module-map.mjs";
++import { CONTRACTS_ROOT } from "./contracts-root.mjs";
+ import { checkSource } from "./static-policy.mjs";
+ 
+ const argv = process.argv.slice(2);
+ const UPDATE = argv.includes("--update");
+ const EVIDENCE = argv.includes("--evidence");
+-const REPO = resolve(import.meta.dirname, "../..");
+-const CONTRACTS = join(REPO, "../keel-contracts");
++const CONTRACTS = CONTRACTS_ROOT;
+ const OUT = join(CONTRACTS, "out");
+ const metaDir = (id) => join(CONTRACTS, TIER_OF.get(id), id);
+ const SIZE_LIMIT = 24576;
