@@ -136,3 +136,22 @@ test('the historical Base90 token still decodes but cannot pass a fresh-publicat
  const forged=structuredClone(audit);forged.requiresExistingPreparedReuse=false;for(const payload of forged.payloads)payload.requiresExistingPreparedReuse=false;
  assert.throws(()=>assertKeelFreshPayloadAudit(forged),/Fresh prepared payloads/);
 });
+
+test("fresh preparation rejects legacy transports even when compression is enabled",()=>{
+ const source=Buffer.from("compressible source ".repeat(100));
+ for(const compression of ["auto","brotli","none"])for(const transportProfile of ["base90-v1","base91-v1","base90-block-v2"])assert.throws(()=>prepareKeelDensePayload(source,{compression,transportProfile}),/Fresh prepared COPY uses URI81/);
+});
+
+test('the historical Base90 token still decodes but cannot pass a fresh-publication audit',async()=>{
+ const {readFile}=await import('node:fs/promises');
+ const uri=await readFile(new URL('../deployments/creator-inline-20261005/minted-token.uri',import.meta.url),'utf8');
+ const metadata=JSON.parse(new TextDecoder().decode(decodeKeelInlineDataURI(uri,'application/json')));
+ const html=decodeKeelInlineDataURI(metadata.animation_url,'text/html');
+ const audit=inspectKeelInlinePayloadCarriage(html);
+ assert.equal(audit.preparedDenseCopy.transportProfile,'base90-v1');
+ assert.ok(audit.payloadCount>0);assert.equal(audit.requiresExistingPreparedReuse,true);
+ assert.throws(()=>assertKeelFreshPayloadAudit(audit),/fresh payload/);
+ assert.throws(()=>assertKeelFreshPayloadCarriage(html),/Legacy Base90/);
+ const forged=structuredClone(audit);forged.requiresExistingPreparedReuse=false;for(const payload of forged.payloads)payload.requiresExistingPreparedReuse=false;
+ assert.throws(()=>assertKeelFreshPayloadAudit(forged),/URI81/);
+});
