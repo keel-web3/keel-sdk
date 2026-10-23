@@ -38,7 +38,10 @@ const calls=Array.from({length:5},(_,i)=>({from:owner,to:reader,data:data('write
 const contextData=(name,args=[])=>encodeFunctionData({abi:contextArtifact.abi,functionName:name,args});
 const payload=(program,validation=true)=>({blockStateCalls:program.map(c=>({calls:[c]})),validation,traceTransfers:false,returnFullTransactions:true});
 const allowed=new Set(['web3_clientVersion','eth_chainId','eth_getBlockByNumber','eth_getBlockByHash','eth_getCode','eth_getProof','eth_getBalance','eth_getTransactionCount','eth_getStorageAt','eth_simulateV1']);
-function rpc(method,params=[]){assert.ok(allowed.has(method));writeFileSync(join(tmp,'request.json'),JSON.stringify({jsonrpc:'2.0',id:1,method,params}));const r=JSON.parse(docker('exec',container,'wget','-Y','off','-q','-O','-','--header=Content-Type: application/json','--post-file=/fixture/request.json','http://127.0.0.1:8545'));if(r.error)throw Object.assign(new Error(r.error.message),{code:r.error.code});return r.result;}
+// Pipe each complete fixture request over Docker stdin. Rewriting a shared
+// post-file can expose stale lengths through a VM filesystem and produce a
+// JSON-RPC parse error before the unchanged EVM program is evaluated.
+function rpc(method,params=[]){assert.ok(allowed.has(method));const r=JSON.parse(execFileSync('docker',['exec','-i',container,'wget','-Y','off','-q','-O','-','--header=Content-Type: application/json','--post-file=/dev/stdin','http://127.0.0.1:8545'],{input:JSON.stringify({jsonrpc:'2.0',id:1,method,params}),encoding:'utf8',timeout:60000,maxBuffer:40*1024*1024,stdio:['pipe','pipe','pipe']}));if(r.error)throw Object.assign(new Error(r.error.message),{code:r.error.code});return r.result;}
 let started=false,brokerStarted=false,socketVolumeCreated=false,processCount=0,base,lastNativeDiagnostic='';
 const brokerContainer=`${container}-broker`,socketVolume=`${container}-socket`;
 const upstream=[];

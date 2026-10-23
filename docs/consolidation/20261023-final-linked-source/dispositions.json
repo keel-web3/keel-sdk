@@ -1,0 +1,32 @@
+[
+  {
+    "path": "/Users/ravonus/dev/wt/keel-smart-account-pause-20261022/keel-sdk",
+    "base": "3d100ea30806b74f3eb9bb819ab858a1a76d3d58",
+    "checkpoint": "59353173e4ab041ef3a7b1037502dcbc4873a46e",
+    "sourceFiles": [],
+    "backup": "/Users/ravonus/Documents/Codex/2026-10-22/task/backups/fresh-dirty-source/036233224779",
+    "disposition": "Original branch already integrated. Exact dirty-source checkpoint and patch retained inactive; qualified current implementation remains selected. Generated runtime artifacts remain independently backed outside Git.",
+    "runtimeChange": false
+  },
+  {
+    "path": "/Users/ravonus/dev/wt/studio-prepared-source-diagnosis-20261020/keel-sdk",
+    "base": "1d768cfe84dc63227181b466c2eb6320a46c6846",
+    "checkpoint": "55c57a72dff98c8d21786d52dd12d2902e93e177",
+    "sourceFiles": [],
+    "backup": "/Users/ravonus/Documents/Codex/2026-10-22/task/backups/fresh-dirty-source/3d4bb5a3ee7a",
+    "disposition": "Original branch already integrated. Exact dirty-source checkpoint and patch retained inactive; qualified current implementation remains selected. Generated runtime artifacts remain independently backed outside Git.",
+    "runtimeChange": false
+  },
+  {
+    "path": "/Users/ravonus/dev/wt/studio-publication-20261019/review-sdk-factory4d16",
+    "base": "4d16be6c8a027832461efa3e4ea8333f75e6d995",
+    "checkpoint": "900ab8ffef8929b6b23eef8ee47872c1edb6a0cb",
+    "sourceFiles": [
+      "tests/independent-factory4d16-review.test.mjs",
+      "tests/independent-media4cf-baseline.test.mjs"
+    ],
+    "backup": "/Users/ravonus/Documents/Codex/2026-10-22/task/backups/fresh-dirty-source/4c6f18da57ae",
+    "disposition": "Original branch already integrated. Exact dirty-source checkpoint and patch retained inactive; qualified current implementation remains selected. Generated runtime artifacts remain independently backed outside Git.",
+    "runtimeChange": false
+  }
+]
