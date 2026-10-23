@@ -47,6 +47,15 @@ import {
   prepareKeelTezosEntrypointCapability,
   KEEL_TEZOS_ENTRYPOINT_CAPABILITY_ERRORS,
 } from "@keel/sdk/tezos-entrypoint-capability";
+import {
+  buildKeelTezosGovernorEnvelope,
+  buildKeelTezosSignatureApprovalCall,
+  buildKeelTezosSignatureValidation,
+  keelTezosContractSignaturePayload,
+  keelTezosSignatureApprovalArgs,
+  keelTezosSignatureApprovalCapability,
+  KEEL_TEZOS_SIGNATURE_AUTHORITY_ERRORS,
+} from "@keel/sdk/tezos-signature-authority";
 import type { JsonSchema, ToolContext, ToolDefinition } from "./types.js";
 
 /**
@@ -477,6 +486,57 @@ export const TEZOS_COLLECTION_TOOL_DEFINITIONS: readonly ToolDefinition[] = [
         };
       }
       return { ...base, capabilityKey: role.capabilityKey, ...buildKeelTezosAutomationEntrypointCall({ controller: args.controller, signer: action.signer, capabilityKey: role.capabilityKey, args: role.args, amount: action.amount, deadline: action.deadline, signature: action.signature }) };
+    },
+  ),
+  tool(
+    "keel-tezos-signature-authority-prepare",
+    "Prepare the Tezos side of EVM KeelManager as an ERC-1271 signer, on KeelSignatureAuthority. action.kind payload returns the bytes each governor signs for an envelope (EVM contractSignatureDigest: PACK of domain, manager, chain, digest, deadline and the current governance epoch); envelope returns the (deadline, epoch, signatures) argument with the signatures sorted by key hash, for signatures the caller supplies; validation returns the is_valid_signature view call a consuming contract or reader makes, with or without an envelope; approve and revoke return the governance call (pass it to keel-tezos-governance-prepare), refusing a zero digest or an expiry outside (now, now + 30 days] as EVM InvalidApproval; delegate returns the entrypoint capability and PACKed arguments that let a role or automation key approve or revoke through keel-tezos-entrypoint-capability-prepare, as EVM names approveSignature in an execution policy. Never signs or submits.",
+    {
+      type: "object", additionalProperties: false, required: ["network", "authority", "action"],
+      properties: {
+        network: NETWORK, authority: KT1,
+        action: {
+          type: "object", required: ["kind"],
+          properties: {
+            kind: { enum: ["payload", "envelope", "validation", "approve", "revoke", "delegate"] },
+            manager: KT1, digest: DIGEST, deadline: NATURAL, epoch: NATURAL, validUntil: NATURAL, now: NATURAL,
+            fn: { enum: ["approve", "revoke"] },
+            signatures: {
+              type: "array", minItems: 1, maxItems: 32,
+              items: { type: "object", additionalProperties: false, required: ["publicKey", "signature"],
+                properties: { publicKey: { type: "string", minLength: 1, maxLength: 128 }, signature: { type: "string", minLength: 1, maxLength: 256 } } },
+            },
+            envelope: { type: "object", additionalProperties: false, required: ["deadline", "epoch", "signatures"],
+              properties: { deadline: NATURAL, epoch: NATURAL, signatures: { type: "array", minItems: 1, maxItems: 32 } } },
+          },
+        },
+      },
+    },
+    async (_context, value) => {
+      const args = input(value, "the Tezos signature authority tool");
+      const action = args.action as Record<string, any>;
+      const digest = typeof action.digest === "string" ? `0x${action.digest.replace(/^0x/u, "").toLowerCase()}` : action.digest;
+      const base = { schema: "keel.tezos-signature-authority@1", family: "tezos", network: args.network, kind: action.kind,
+        errors: KEEL_TEZOS_SIGNATURE_AUTHORITY_ERRORS, signing: "not-performed", submission: "not-performed" };
+      if (action.kind === "payload") {
+        return { ...base, payload: keelTezosContractSignaturePayload({ network: args.network, manager: action.manager, digest, deadline: action.deadline, epoch: action.epoch }),
+          next: "Read the epoch from the manager's governance_roster view first. Each governor signs these bytes (Raw); this tool never signs." };
+      }
+      if (action.kind === "envelope") {
+        return { ...base, envelope: buildKeelTezosGovernorEnvelope({ deadline: action.deadline, epoch: action.epoch, signatures: action.signatures }) };
+      }
+      if (action.kind === "validation") {
+        const envelope = action.envelope === undefined ? undefined : buildKeelTezosGovernorEnvelope(action.envelope);
+        return { ...base, ...buildKeelTezosSignatureValidation({ authority: args.authority, digest, ...(envelope === undefined ? {} : { envelope }) }) };
+      }
+      if (action.kind === "approve" || action.kind === "revoke") {
+        return { ...base, governanceCall: buildKeelTezosSignatureApprovalCall({ kind: action.kind, authority: args.authority, digest, validUntil: action.validUntil, now: action.now }),
+          next: "Pass governanceCall to keel-tezos-governance-prepare; the manager's governors approve it." };
+      }
+      const fn = action.fn === "revoke" ? "revoke" : "approve";
+      return { ...base, capability: keelTezosSignatureApprovalCapability(args.authority, fn),
+        args: keelTezosSignatureApprovalArgs({ kind: fn, authority: args.authority, digest, validUntil: action.validUntil, now: action.now }),
+        next: "Configure the capability with keel-tezos-entrypoint-capability-prepare (policy), then call it there with these raw Micheline args (role or automation)." };
     },
   ),
   tool(
