@@ -1,0 +1,9 @@
+import assert from 'node:assert/strict';import{readFile,writeFile}from'node:fs/promises';import{createHash}from'node:crypto';
+import{parseMediaPreparationCapabilities,mediaCandidateFormats,mediaRecipeUnavailableReason}from'/private/tmp/keel-independent-codec-normal-20261022-02/keel-site/apps/studio/src/lib/media-capabilities.ts';
+import{getMediaPreparationCapabilities,ORIGINAL_MEDIA_EDIT_RECIPE as original}from'../keel-sdk/packages/builder/dist/media-preparation.js';
+const leaf='/private/tmp/keel-independent-codec-normal-20261022-02/keel-site/apps/studio/src/lib/media-capabilities.ts',source=await readFile(leaf),hash=createHash('sha256').update(source).digest('hex');assert.equal(hash,'a2123692965524c365d209f851dbc0a727bb5ce1e05dcc690e55376ee030f489');
+const caps=parseMediaPreparationCapabilities(await getMediaPreparationCapabilities()),results=[];
+for(const info of [{movie:true,animated:true,hasAudio:false},{movie:true,animated:true,hasAudio:true},{movie:false,animated:false,hasAudio:false}]){
+ const recipe={...original,mode:'lossless',format:'webm'}as const,copy=structuredClone(recipe),formats=mediaCandidateFormats(caps,info);assert.equal(formats.includes('webm'),false);const reason=mediaRecipeUnavailableReason(caps,info,recipe);assert.match(reason!,/WEBM conversion is unavailable.*saved edits and original are retained/);assert.equal(mediaRecipeUnavailableReason(caps,info,original),undefined);assert.deepEqual(recipe,copy);results.push({info,formats,reason});
+}
+assert.deepEqual(await readFile(leaf),source);await writeFile(new URL('./site-consumer.json',import.meta.url),JSON.stringify({sdk:'d46961461df319e26d4c947030fddf06337ed7f7',site:'230c8cff0e2075042cc0784c03beece7ddf14900',leafSHA256:hash,results,scope:'Actual unchanged pure Site capability consumer imported via normal TSX against own fresh SDK response; no browser, HTTP or live claim'},null,2)+'\n');console.log('actual Site capability consumer3contexts PASS');

@@ -1,0 +1,414 @@
+TAP version 13
+# Subtest: unchanged unqualified MOV webp cannot invent lossless color authority
+ok 1 - unchanged unqualified MOV webp cannot invent lossless color authority
+  ---
+  duration_ms: 81.274833
+  type: 'test'
+  ...
+# Subtest: unchanged unqualified MOV avif cannot invent lossless color authority
+ok 2 - unchanged unqualified MOV avif cannot invent lossless color authority
+  ---
+  duration_ms: 56.120834
+  type: 'test'
+  ...
+# Subtest: server capability must not advertise a WebM conversion absent a preserving WebM verifier
+ok 3 - server capability must not advertise a WebM conversion absent a preserving WebM verifier
+  ---
+  duration_ms: 29.005
+  type: 'test'
+  ...
+# (node:2021) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+# (Use `node --trace-deprecation ...` to show where the warning was created)
+# Subtest: fixture image/png: Original SDK/MCP exact parity, inferred role, Raw/Compact reconstruction
+ok 4 - fixture image/png: Original SDK/MCP exact parity, inferred role, Raw/Compact reconstruction
+  ---
+  duration_ms: 7.906959
+  type: 'test'
+  ...
+# Subtest: fixture image/jpeg: Original SDK/MCP exact parity, inferred role, Raw/Compact reconstruction
+ok 5 - fixture image/jpeg: Original SDK/MCP exact parity, inferred role, Raw/Compact reconstruction
+  ---
+  duration_ms: 2.731708
+  type: 'test'
+  ...
+# Subtest: fixture image/gif: Original SDK/MCP exact parity, inferred role, Raw/Compact reconstruction
+ok 6 - fixture image/gif: Original SDK/MCP exact parity, inferred role, Raw/Compact reconstruction
+  ---
+  duration_ms: 2.642166
+  type: 'test'
+  ...
+# Subtest: fixture image/webp: Original SDK/MCP exact parity, inferred role, Raw/Compact reconstruction
+ok 7 - fixture image/webp: Original SDK/MCP exact parity, inferred role, Raw/Compact reconstruction
+  ---
+  duration_ms: 2.365541
+  type: 'test'
+  ...
+# Subtest: fixture image/avif: Original SDK/MCP exact parity, inferred role, Raw/Compact reconstruction
+ok 8 - fixture image/avif: Original SDK/MCP exact parity, inferred role, Raw/Compact reconstruction
+  ---
+  duration_ms: 2.8055
+  type: 'test'
+  ...
+# Subtest: fixture image/svg+xml: Original SDK/MCP exact parity, inferred role, Raw/Compact reconstruction
+ok 9 - fixture image/svg+xml: Original SDK/MCP exact parity, inferred role, Raw/Compact reconstruction
+  ---
+  duration_ms: 2.929375
+  type: 'test'
+  ...
+# Subtest: fixture video/mp4: Original SDK/MCP exact parity, inferred role, Raw/Compact reconstruction
+ok 10 - fixture video/mp4: Original SDK/MCP exact parity, inferred role, Raw/Compact reconstruction
+  ---
+  duration_ms: 4.682583
+  type: 'test'
+  ...
+# Subtest: fixture video/quicktime: Original SDK/MCP exact parity, inferred role, Raw/Compact reconstruction
+ok 11 - fixture video/quicktime: Original SDK/MCP exact parity, inferred role, Raw/Compact reconstruction
+  ---
+  duration_ms: 4.143084
+  type: 'test'
+  ...
+# Subtest: fixture video/webm: Original SDK/MCP exact parity, inferred role, Raw/Compact reconstruction
+ok 12 - fixture video/webm: Original SDK/MCP exact parity, inferred role, Raw/Compact reconstruction
+  ---
+  duration_ms: 4.063375
+  type: 'test'
+  ...
+# Subtest: fixture audio/wav: Original SDK/MCP exact parity, inferred role, Raw/Compact reconstruction
+ok 13 - fixture audio/wav: Original SDK/MCP exact parity, inferred role, Raw/Compact reconstruction
+  ---
+  duration_ms: 2.671792
+  type: 'test'
+  ...
+# Subtest: fixture text/html: Original SDK/MCP exact parity, inferred role, Raw/Compact reconstruction
+ok 14 - fixture text/html: Original SDK/MCP exact parity, inferred role, Raw/Compact reconstruction
+  ---
+  duration_ms: 1.560667
+  type: 'test'
+  ...
+# Subtest: fixture application/wasm: Original SDK/MCP exact parity, inferred role, Raw/Compact reconstruction
+ok 15 - fixture application/wasm: Original SDK/MCP exact parity, inferred role, Raw/Compact reconstruction
+  ---
+  duration_ms: 1.3505
+  type: 'test'
+  ...
+# Subtest: fixture font/ttf: Original SDK/MCP exact parity, inferred role, Raw/Compact reconstruction
+ok 16 - fixture font/ttf: Original SDK/MCP exact parity, inferred role, Raw/Compact reconstruction
+  ---
+  duration_ms: 2.566666
+  type: 'test'
+  ...
+# Subtest: fixture model/gltf-binary: Original SDK/MCP exact parity, inferred role, Raw/Compact reconstruction
+ok 17 - fixture model/gltf-binary: Original SDK/MCP exact parity, inferred role, Raw/Compact reconstruction
+  ---
+  duration_ms: 1.947792
+  type: 'test'
+  ...
+# Subtest: fixture model/gltf+json: Original SDK/MCP exact parity, inferred role, Raw/Compact reconstruction
+ok 18 - fixture model/gltf+json: Original SDK/MCP exact parity, inferred role, Raw/Compact reconstruction
+  ---
+  duration_ms: 1.528083
+  type: 'test'
+  ...
+# Subtest: fixture text/css: Original SDK/MCP exact parity, inferred role, Raw/Compact reconstruction
+ok 19 - fixture text/css: Original SDK/MCP exact parity, inferred role, Raw/Compact reconstruction
+  ---
+  duration_ms: 1.390708
+  type: 'test'
+  ...
+# Subtest: fixture text/javascript: Original SDK/MCP exact parity, inferred role, Raw/Compact reconstruction
+ok 20 - fixture text/javascript: Original SDK/MCP exact parity, inferred role, Raw/Compact reconstruction
+  ---
+  duration_ms: 1.549833
+  type: 'test'
+  ...
+# Subtest: fixture application/json: Original SDK/MCP exact parity, inferred role, Raw/Compact reconstruction
+ok 21 - fixture application/json: Original SDK/MCP exact parity, inferred role, Raw/Compact reconstruction
+  ---
+  duration_ms: 1.316166
+  type: 'test'
+  ...
+# Subtest: fixture text/plain: Original SDK/MCP exact parity, inferred role, Raw/Compact reconstruction
+ok 22 - fixture text/plain: Original SDK/MCP exact parity, inferred role, Raw/Compact reconstruction
+  ---
+  duration_ms: 1.400542
+  type: 'test'
+  ...
+# Subtest: fixture application/octet-stream: Original SDK/MCP exact parity, inferred role, Raw/Compact reconstruction
+ok 23 - fixture application/octet-stream: Original SDK/MCP exact parity, inferred role, Raw/Compact reconstruction
+  ---
+  duration_ms: 1.277209
+  type: 'test'
+  ...
+# Subtest: encoded webp: SDK/MCP decoded parity, measured output integrity and source preservation
+ok 24 - encoded webp: SDK/MCP decoded parity, measured output integrity and source preservation
+  ---
+  duration_ms: 125.211458
+  type: 'test'
+  ...
+# Subtest: encoded avif: SDK/MCP decoded parity, measured output integrity and source preservation
+ok 25 - encoded avif: SDK/MCP decoded parity, measured output integrity and source preservation
+  ---
+  duration_ms: 119.459167
+  type: 'test'
+  ...
+# Subtest: encoded mp4: SDK/MCP decoded parity, measured output integrity and source preservation
+ok 26 - encoded mp4: SDK/MCP decoded parity, measured output integrity and source preservation
+  ---
+  duration_ms: 444.111125
+  type: 'test'
+  ...
+# Subtest: encoded mov: SDK/MCP decoded parity, measured output integrity and source preservation
+ok 27 - encoded mov: SDK/MCP decoded parity, measured output integrity and source preservation
+  ---
+  duration_ms: 446.73275
+  type: 'test'
+  ...
+# Subtest: encoded webm: SDK/MCP decoded parity, measured output integrity and source preservation
+ok 28 - encoded webm: SDK/MCP decoded parity, measured output integrity and source preservation
+  ---
+  duration_ms: 1.635583
+  type: 'test'
+  ...
+# Subtest: SDK/MCP synchronized compare parity on exact image frame
+ok 29 - SDK/MCP synchronized compare parity on exact image frame
+  ---
+  duration_ms: 8.412
+  type: 'test'
+  ...
+# Subtest: SDK/MCP capability parity reports conditional decode, not universal publication
+ok 30 - SDK/MCP capability parity reports conditional decode, not universal publication
+  ---
+  duration_ms: 64.543333
+  type: 'test'
+  ...
+# Subtest: bad-format corrupt.png: edit rejected SDK/MCP, original retained without decode claim
+ok 31 - bad-format corrupt.png: edit rejected SDK/MCP, original retained without decode claim
+  ---
+  duration_ms: 90.241792
+  type: 'test'
+  ...
+# Subtest: bad-format truncated.mp4: edit rejected SDK/MCP, original retained without decode claim
+ok 32 - bad-format truncated.mp4: edit rejected SDK/MCP, original retained without decode claim
+  ---
+  duration_ms: 71.936542
+  type: 'test'
+  ...
+# Subtest: bad-format unsupported.wasm: edit rejected SDK/MCP, original retained without decode claim
+ok 33 - bad-format unsupported.wasm: edit rejected SDK/MCP, original retained without decode claim
+  ---
+  duration_ms: 4.417708
+  type: 'test'
+  ...
+# Subtest: bad-format playlist.m3u8: edit rejected SDK/MCP, original retained without decode claim
+ok 34 - bad-format playlist.m3u8: edit rejected SDK/MCP, original retained without decode claim
+  ---
+  duration_ms: 1.524208
+  type: 'test'
+  ...
+# Subtest: media slots preserve explicit shell-off across every fixture MIME and reject full-read boundary violations
+ok 35 - media slots preserve explicit shell-off across every fixture MIME and reject full-read boundary violations
+  ---
+  duration_ms: 4.56375
+  type: 'test'
+  ...
+# Subtest: MCP invalid quality, traversal, unexpected operations and negative time reject without source writes
+ok 36 - MCP invalid quality, traversal, unexpected operations and negative time reject without source writes
+  ---
+  duration_ms: 0.856417
+  type: 'test'
+  ...
+# Subtest: actual independently encoded bytes pass every RGBA pixel and immutable source/recipe commitments
+ok 37 - actual independently encoded bytes pass every RGBA pixel and immutable source/recipe commitments
+  ---
+  duration_ms: 9.289792
+  type: 'test'
+  ...
+# Subtest: a changed last RGBA alpha sample fails even though dimensions and all other pixels match
+ok 38 - a changed last RGBA alpha sample fails even though dimensions and all other pixels match
+  ---
+  duration_ms: 3.346875
+  type: 'test'
+  ...
+# Subtest: actual animation verifies every frame, intrinsic infinite loop and exact variable timing
+ok 39 - actual animation verifies every frame, intrinsic infinite loop and exact variable timing
+  ---
+  duration_ms: 4.82725
+  type: 'test'
+  ...
+# Subtest: last-frame change, one millisecond duration change and finite-loop change are all rejected
+ok 40 - last-frame change, one millisecond duration change and finite-loop change are all rejected
+  ---
+  duration_ms: 8.106208
+  type: 'test'
+  ...
+# Subtest: finite identical animation loops remain exact and are not relabelled infinite
+ok 41 - finite identical animation loops remain exact and are not relabelled infinite
+  ---
+  duration_ms: 2.664334
+  type: 'test'
+  ...
+# Subtest: movie to actual checked animated WebP is conditional on authenticated canonical-player semantics
+ok 42 - movie to actual checked animated WebP is conditional on authenticated canonical-player semantics
+  ---
+  duration_ms: 151.822583
+  type: 'test'
+  ...
+# Subtest: actual AAC audio includes every canonical PCM sample, channels, presentation timestamps and hashes
+ok 43 - actual AAC audio includes every canonical PCM sample, channels, presentation timestamps and hashes
+  ---
+  duration_ms: 324.912875
+  type: 'test'
+  ...
+# Subtest: equal-duration audio with changed actual samples fails, rather than presence-only approval
+ok 44 - equal-duration audio with changed actual samples fails, rather than presence-only approval
+  ---
+  duration_ms: 186.172625
+  type: 'test'
+  ...
+# Subtest: audio disappearance fails even when all video samples remain exact
+ok 45 - audio disappearance fails even when all video samples remain exact
+  ---
+  duration_ms: 251.519125
+  type: 'test'
+  ...
+# Subtest: explicit edits stay selected without granting automatic fidelity or fallback-to-original authority
+ok 46 - explicit edits stay selected without granting automatic fidelity or fallback-to-original authority
+  ---
+  duration_ms: 1.80775
+  type: 'test'
+  ...
+# Subtest: decoder corruption, unsupported external containers and pre-aborted work fail closed
+ok 47 - decoder corruption, unsupported external containers and pre-aborted work fail closed
+  ---
+  duration_ms: 41.561209
+  type: 'test'
+  ...
+# Subtest: the verifier snapshots mutable caller arrays and nested recipe before its first await
+ok 48 - the verifier snapshots mutable caller arrays and nested recipe before its first await
+  ---
+  duration_ms: 2.242333
+  type: 'test'
+  ...
+# Subtest: actual float64 PCM retains precision below float32 and detects a change in the final audio sample
+ok 49 - actual float64 PCM retains precision below float32 and detects a change in the final audio sample
+  ---
+  duration_ms: 292.48375
+  type: 'test'
+  ...
+# Subtest: edited WebM lossless refuses before probing while retaining source and saved recipe
+ok 50 - edited WebM lossless refuses before probing while retaining source and saved recipe
+  ---
+  duration_ms: 1.044083
+  type: 'test'
+  ...
+# Subtest: edited WebM lossy refuses before probing while retaining source and saved recipe
+ok 51 - edited WebM lossy refuses before probing while retaining source and saved recipe
+  ---
+  duration_ms: 0.115916
+  type: 'test'
+  ...
+# Subtest: candidate formats exclude unavailable WebM and keep conditional qualified adapters
+ok 52 - candidate formats exclude unavailable WebM and keep conditional qualified adapters
+  ---
+  duration_ms: 49.06325
+  type: 'test'
+  ...
+# Subtest: native Original WebM and MOV exports remain exact without decoder or lossless claims
+ok 53 - native Original WebM and MOV exports remain exact without decoder or lossless claims
+  ---
+  duration_ms: 3.059792
+  type: 'test'
+  ...
+# Subtest: real portable MCP has identical capabilities, actionable WebM refusal and unchanged native Original
+ok 54 - real portable MCP has identical capabilities, actionable WebM refusal and unchanged native Original
+  ---
+  duration_ms: 223.860791
+  type: 'test'
+  ...
+# Subtest: original mode preserves arbitrary container bytes without decode or format eligibility claims
+ok 55 - original mode preserves arbitrary container bytes without decode or format eligibility claims
+  ---
+  duration_ms: 3.110792
+  type: 'test'
+  ...
+# Subtest: still lossless WebP fully decodes and verifies pixel identity with measured bytes
+ok 56 - still lossless WebP fully decodes and verifies pixel identity with measured bytes
+  ---
+  duration_ms: 5.815
+  type: 'test'
+  ...
+# Subtest: explicit still edits create a reversible recipe, preserve source and distinguish encoding lossless from source pixels
+ok 57 - explicit still edits create a reversible recipe, preserve source and distinguish encoding lossless from source pixels
+  ---
+  duration_ms: 5.328333
+  type: 'test'
+  ...
+# Subtest: compare returns decoded PNG frames at the same timestamp with original and processed geometry
+ok 58 - compare returns decoded PNG frames at the same timestamp with original and processed geometry
+  ---
+  duration_ms: 6.057083
+  type: 'test'
+  ...
+# Subtest: animated GIF retains all frames and their delays, comparison selects same source instant
+ok 59 - animated GIF retains all frames and their delays, comparison selects same source instant
+  ---
+  duration_ms: 242.899
+  type: 'test'
+  ...
+# Subtest: actual capability report and cancellation do not claim universal decode support
+ok 60 - actual capability report and cancellation do not claim universal decode support
+  ---
+  duration_ms: 36.07175
+  type: 'test'
+  ...
+# Subtest: MOV input is decoded by capability and exports MP4/MOV without changing source
+ok 61 - MOV input is decoded by capability and exports MP4/MOV without changing source
+  ---
+  duration_ms: 691.923625
+  type: 'test'
+  ...
+# Subtest: still layers compose ordered source copies with explicit alpha, rotation and output bounds
+ok 62 - still layers compose ordered source copies with explicit alpha, rotation and output bounds
+  ---
+  duration_ms: 13.580375
+  type: 'test'
+  ...
+# Subtest: animated layers fail closed rather than silently ignoring composition
+ok 63 - animated layers fail closed rather than silently ignoring composition
+  ---
+  duration_ms: 1.057709
+  type: 'test'
+  ...
+# Subtest: an animated AVIF reimport preserves the verified sequence stream, both frames and exact timing
+ok 64 - an animated AVIF reimport preserves the verified sequence stream, both frames and exact timing
+  ---
+  duration_ms: 705.529375
+  type: 'test'
+  ...
+# Subtest: [test gate] every suite is classified and browser/live checks stay outside the deterministic default
+ok 65 - [test gate] every suite is classified and browser/live checks stay outside the deterministic default
+  ---
+  duration_ms: 53.541125
+  type: 'test'
+  ...
+# Subtest: [test gate] a newly added test is unclassified until its execution boundary is reviewed
+ok 66 - [test gate] a newly added test is unclassified until its execution boundary is reviewed
+  ---
+  duration_ms: 10.247166
+  type: 'test'
+  ...
+# Subtest: [test gate] a removed test leaves a stale manifest entry instead of crashing validation
+ok 67 - [test gate] a removed test leaves a stale manifest entry instead of crashing validation
+  ---
+  duration_ms: 10.018334
+  type: 'test'
+  ...
+1..67
+# tests 67
+# suites 0
+# pass 67
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 6684.728583

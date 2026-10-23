@@ -1,0 +1,13 @@
+{
+  "command": [
+    "/Users/ravonus/.nvm/versions/node/v22.22.1/bin/node",
+    "node_modules/typescript/bin/tsc",
+    "-p",
+    "packages/builder/tsconfig.json",
+    "--noEmit"
+  ],
+  "cwd": "/private/tmp/keel-independent-media-capabilities-20261022-01/keel-sdk",
+  "gitCommit": "d46961461df319e26d4c947030fddf06337ed7f7",
+  "exit": 0,
+  "elapsed": 1.3446321487426758
+}

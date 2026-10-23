@@ -1,0 +1,137 @@
+[
+  {
+    "path": "README.md",
+    "bytes": 4120,
+    "sha256": "59a223d8412398ffc3e85cd0754e92aeddd58a5a5e13d832c81dbcdedb5e2cf4"
+  },
+  {
+    "path": "raw/acceptance-owned-temp/keel-acceptance-media-alg2BC/fixture.mov",
+    "bytes": 1927,
+    "sha256": "ea3b962dc878b4514ae1798fa10c90a10bac04d3f96459eccfec1d8ce8a4e736"
+  },
+  {
+    "path": "raw/builder-typecheck.json",
+    "bytes": 371,
+    "sha256": "6e158289694879e24a3b25ea20f9ea89bae38723f9ed60a15edada12e3509e88"
+  },
+  {
+    "path": "raw/builder-typecheck.stderr",
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "path": "raw/builder-typecheck.stdout",
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "path": "raw/capability-focused-67.json",
+    "bytes": 596,
+    "sha256": "a7eff94247607defb8ff1b8cf55e786c8847100e6c8674d87ef5829541c84dc3"
+  },
+  {
+    "path": "raw/capability-focused-67.stderr",
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "path": "raw/capability-focused-67.stdout",
+    "bytes": 17091,
+    "sha256": "8bf9915051b042856df3d8278b5437e521b34b19d4b369ff7ded96ffdf1fd9fd"
+  },
+  {
+    "path": "raw/normal-build.json",
+    "bytes": 293,
+    "sha256": "e57737e3122c89f400355da5bbdf81e0232d271a1140b09689169e4c925c412a"
+  },
+  {
+    "path": "raw/normal-build.stderr",
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "path": "raw/normal-build.stdout",
+    "bytes": 353,
+    "sha256": "529248c2b782711f46529edb4c620e4c8c6ba22eee5e432289e71a14c8143857"
+  },
+  {
+    "path": "raw/own-output-identities.json",
+    "bytes": 303513,
+    "sha256": "094e334e855873379a20befa888dd10874b00ea01c7e172c8aa591642a5fee64"
+  },
+  {
+    "path": "raw/setup.json",
+    "bytes": 53649,
+    "sha256": "612364ab7d521ac02b1a53202ca9e213962e7afebcb78b053e10913793eacccd"
+  },
+  {
+    "path": "raw/site-consumer-repaired.json",
+    "bytes": 421,
+    "sha256": "c8e97e68ac1c18fa3e5d73b9a3c47a8254035152026aff9b4aac59a905503c62"
+  },
+  {
+    "path": "raw/site-consumer-repaired.stderr",
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "path": "raw/site-consumer-repaired.stdout",
+    "bytes": 46,
+    "sha256": "4182e41fcdeea062912ae46a54571fe4bb966de6c9bdd18a2b68a6972c2d2416"
+  },
+  {
+    "path": "raw/site-consumer.json",
+    "bytes": 1340,
+    "sha256": "5a8f61b811793040fb1eae39d59e82f49696d71c5a11d8e435859005c3dc2714"
+  },
+  {
+    "path": "raw/site-consumer.mts",
+    "bytes": 1950,
+    "sha256": "4c39fa2defdc123dbf8c36fe3a212694794d4c9c36e65798dc0db0be57a5738d"
+  },
+  {
+    "path": "raw/site-consumer.stderr",
+    "bytes": 1045,
+    "sha256": "e811b6595e2ac6555ff53e8e967898b1dd9188c913a70b06e7bc0c7110599568"
+  },
+  {
+    "path": "raw/site-consumer.stdout",
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "path": "raw/source-471.patch",
+    "bytes": 10449,
+    "sha256": "e9442d394f0bcd805d2406c90fcca646fde9a3b4a5b42b12929b0583b68cbfe6"
+  },
+  {
+    "path": "raw/test-d469.patch",
+    "bytes": 3064,
+    "sha256": "16a5a2f0263880adfe5e54b0bfa6b7a0313376effb73463b75bc1c0e84436947"
+  },
+  {
+    "path": "receipt.json",
+    "bytes": 668,
+    "sha256": "b43fa41ff181a922ac0fb1042a830273393d23ef70ef47e23edc4719be4c9825"
+  },
+  {
+    "path": "reproduction/freeze.py",
+    "bytes": 1871,
+    "sha256": "e61ac3cb9d49fbd67986559ae8077d3e040ead8925043e76d81ea919e6a8a6c2"
+  },
+  {
+    "path": "reproduction/reviewer-acceptance-media-capability.test.mjs",
+    "bytes": 1618,
+    "sha256": "db78fd8e1078ac869dc6a1a00194cb0cbb6c8cbe7e3192006002cee98e2c4a76"
+  },
+  {
+    "path": "reproduction/run-local.py",
+    "bytes": 1091,
+    "sha256": "b98c30971fc7c1f1f6b405f6a8e992da7c0115b6bc11b3baf6304706ec5cf7bf"
+  },
+  {
+    "path": "reproduction/setup.py",
+    "bytes": 3301,
+    "sha256": "1e2bc27c9ca7b348b44f1c4540cfa21225e2bd53dc148f80496b025ad35306c7"
+  }
+]
