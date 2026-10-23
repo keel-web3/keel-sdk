@@ -1,0 +1,110 @@
+{
+  "sourceCommit": "49219d69e737ce6f7af45ccbf7a2d9ca2afcf61b",
+  "productionCommit": "cd55bf43b8dd7cdec855bb07b8cba5a8cefa3425",
+  "baseSDK": "edaa7446c2cfcec6eee27ca13d3f0cc4718822f7",
+  "node": "v22.22.1",
+  "sdkInitialDist": {
+    "source": "edaa7446c2cfcec6eee27ca13d3f0cc4718822f7",
+    "verifiedLeaves": 1735,
+    "manifestSHA256": "a3c99b194910aed2a22236075819b4ef9e9ea72f70d5975f6fa0f12beebfe651"
+  },
+  "authorVerification": [
+    {
+      "kind": "focused",
+      "commit": "49219d69e737ce6f7af45ccbf7a2d9ca2afcf61b",
+      "result": "93 PASS / 0 FAIL / 0 CANCEL / 0 SKIP",
+      "log": "exact-492-focused.log"
+    },
+    {
+      "kind": "actual local Chrome",
+      "commit": "49219d69e737ce6f7af45ccbf7a2d9ca2afcf61b",
+      "result": "1 PASS / 0 FAIL / 0 SKIP",
+      "log": "browser-exact-492.log",
+      "detail": "browser-exact-492/mp4.json"
+    },
+    {
+      "kind": "SDK normal TypeScript emit",
+      "commit": "cd55bf43b8dd7cdec855bb07b8cba5a8cefa3425",
+      "result": "PASS_EXIT_0",
+      "log": "sdk-emit-03.log"
+    },
+    {
+      "kind": "SDK typecheck",
+      "commit": "cd55bf43b8dd7cdec855bb07b8cba5a8cefa3425",
+      "productionBytesEqual492": true,
+      "result": "PASS_EXIT_0",
+      "log": "exact-cd55-typecheck.log"
+    },
+    {
+      "kind": "classification",
+      "commit": "49219d69e737ce6f7af45ccbf7a2d9ca2afcf61b",
+      "result": "PASS_0_ISSUES",
+      "log": "classification.log"
+    }
+  ],
+  "changedSources": [
+    {
+      "path": "packages/sdk/src/registered-native-gzip.ts",
+      "bytes": 14558,
+      "sha256": "628efaa3aa6b904e037b5a69f3d319a4bf70c7c8b36cdbe7d756684c9acb7d82"
+    },
+    {
+      "path": "packages/sdk/src/registered-native-none.ts",
+      "bytes": 12319,
+      "sha256": "da03d008e4f09e77d4e7a8e2d095d1a3d3d371630f2c8459abd33e41955d7048"
+    },
+    {
+      "path": "scripts/test-suites.mjs",
+      "bytes": 19681,
+      "sha256": "86a8108ecc41ae75b0a8b3ed52938a84fca8151f4cfe11b8b974a088665ccf4e"
+    },
+    {
+      "path": "tests/registered-native-none.test.mjs",
+      "bytes": 10896,
+      "sha256": "da2b87cd670697badc74ef69ac4793a41fbdab089d0cbde1ea88b30df378e7be"
+    },
+    {
+      "path": "tests/registered-native-none.browser.test.mjs",
+      "bytes": 7838,
+      "sha256": "086479f9f1bac439b8d5c84dedec5a9fb8764e36ca192c24f886d72c102a9988"
+    }
+  ],
+  "inputs": [
+    {
+      "path": "tests/fixtures/registered-native-none/normal-artwork.mp4",
+      "bytes": 1786,
+      "sha256": "a421a05635b124a135c770d3c9cc814c515cfcdaa4a7b3e68f24a332033e5561"
+    },
+    {
+      "path": "tests/fixtures/registered-native-none/synthetic-video.webm",
+      "bytes": 818,
+      "sha256": "5889cfc4e1e82c6a74c069187ddf526d136e21ed5deaa032f61314ecf24e477b"
+    },
+    {
+      "path": "tests/fixtures/registered-native-gzip-revision5.json.gz",
+      "bytes": 45210,
+      "sha256": "5fe950826007efe0aa57e9944b175d098729ea9e681a78d922707fbb5e8a89b9"
+    },
+    {
+      "path": "tests/fixtures/asset-display-1.1.0.js",
+      "bytes": 6172,
+      "sha256": "53957405312b1fe3b187a5c49b13d13a08fd6e960953c815c6e49b53637d97f4"
+    }
+  ],
+  "independentOriginalDiagnostic": {
+    "sourcePath": "/private/tmp/keel-independent-temporal-normal-pg-20261022-02/evidence/role-diagnostic-shape-pg/native-gzip-original-throw.json",
+    "sha256": "c458a3136d3d948c01e1c79d24d4372679a3ea66ba349cc77b6c568400842379",
+    "retainedFile": "independent-original-shape.json"
+  },
+  "newIndependentReview": "REQUIRED_NOT_PERFORMED_BY_AUTHOR",
+  "newIndependentNormalPGTest": "REQUIRED_NOT_PERFORMED_BY_AUTHOR",
+  "deployedAcceptance": "NOT_CLAIMED",
+  "walletSignatures": 0,
+  "chainWrites": 0,
+  "hostMutations": 0,
+  "limits": [
+    "Full integrated SDK normal package build is a separate lead gate.",
+    "Exact registered source-byte local browser proof does not authenticate a fresh live selected-chain read.",
+    "Unchanged real normal PG intake test and actual Studio live publication/wallet gates remain required."
+  ]
+}

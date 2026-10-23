@@ -1,0 +1,370 @@
+TAP version 13
+# Subtest: unchanged authentic native gzip frame and lower-case store pass actual COPY readback
+ok 1 - unchanged authentic native gzip frame and lower-case store pass actual COPY readback
+  ---
+  duration_ms: 30.542375
+  type: 'test'
+  ...
+# Subtest: same valid registered store with case-only spelling retains actual COPY readback
+ok 2 - same valid registered store with case-only spelling retains actual COPY readback
+  ---
+  duration_ms: 17.667625
+  type: 'test'
+  ...
+# Subtest: wrong store remains rejected before a COPY readback can qualify
+ok 3 - wrong store remains rejected before a COPY readback can qualify
+  ---
+  duration_ms: 11.303791
+  type: 'test'
+  ...
+# Subtest: unchanged generic fresh guard rejects actual rev5 gzip descriptor; exact recipe admits raw-percent only
+ok 4 - unchanged generic fresh guard rejects actual rev5 gzip descriptor; exact recipe admits raw-percent only
+  ---
+  duration_ms: 34.178458
+  type: 'test'
+  ...
+# Subtest: wrong chain/registration/frame/runtime cannot reuse native recipe
+ok 5 - wrong chain/registration/frame/runtime cannot reuse native recipe
+  ---
+  duration_ms: 1.005625
+  type: 'test'
+  ...
+# Subtest: changed compressed or decoded commitment, extra code and another codec remain rejected
+ok 6 - changed compressed or decoded commitment, extra code and another codec remain rejected
+  ---
+  duration_ms: 2.124334
+  type: 'test'
+  ...
+# Subtest: whole HTML Base64 carriage cannot reuse per-resource allowance
+ok 7 - whole HTML Base64 carriage cannot reuse per-resource allowance
+  ---
+  duration_ms: 8.979792
+  type: 'test'
+  ...
+# Subtest: proof and source snapshots reject mutations; explicitgzip eligible only when selected reader allows it
+ok 8 - proof and source snapshots reject mutations; explicitgzip eligible only when selected reader allows it
+  ---
+  duration_ms: 1.429041
+  type: 'test'
+  ...
+# Subtest: actual public rev5 nativeGzip whole-output candidate competes by returned URI, never source bytes alone
+ok 9 - actual public rev5 nativeGzip whole-output candidate competes by returned URI, never source bytes alone
+  ---
+  duration_ms: 37.349666
+  type: 'test'
+  ...
+# {"scope":"PROVISIONAL_TEMPLATE_NOT_ADOPTION_OR_FULL_SIMULATION","actualGatorrr":false,"source":[{"algorithm":"sha256","digest":"0xdd03cf819aecdb82a4a755ceebd0b1c8037f88b95124fac3ae175f7e65e21727","byteLength":1344},{"algorithm":"sha256","digest":"0x5331b957ef1f272fa51d16e8d6d844a4db5767975fb2ce987544594b2d96744f","byteLength":77}],"candidates":[{"id":"gzip","codec":"gzip","recipeDigest":"0xd78730f1e5090acda5c66bf280b89a67655d297fc9f7bd02f9fd78fc9abcffd2","measurementScope":{"kind":"provisional-template","templateDigest":"0x16065f7a79caa45206bca9251d980a9487ccbf4597d2beea421735671caddcc3"},"tokenURICommitment":{"digest":"0xb90515e61b6f6e4279e3607fee6afa6e396f55352428595dd0e78c54591db597","byteLength":119479},"derivedMetadataDigest":"0x44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a","metadataBytes":102577,"htmlBytes":85491,"imageBytes":77,"imageURIBytes":126,"imageDelivery":"inline","externalPreviewReadAuthenticated":false,"animationURIBytes":102344,"sourceBytes":1421,"compressedPayloadBytes":155,"encodedPayloadBytes":208,"completeTokenURIBytes":119479,"newStoredBytes":1467,"reusedStoredBytes":119848,"uniqueStoredBytes":121315,"uniqueObjects":4,"decoderObjectBytes":0,"bootObjectBytes":119848,"combinedBootDecoderObjectBytes":0,"generatedHtmlSuffixBytes":0,"nativeBrowserGzip":true,"javascriptCodecDecoderBytes":0,"decoderCostScope":"exact-distinct-stored-object-roles","javascriptGzipDecoderBytes":0,"sourceByteIdentity":"verified-exact"},{"id":"none","codec":"none","recipeDigest":"0x421cb56dd903261980c396d6b4c224d0537d0b9e050b57ac65bf4a611fa42d8a","measurementScope":{"kind":"provisional-template","templateDigest":"0x16065f7a79caa45206bca9251d980a9487ccbf4597d2beea421735671caddcc3"},"tokenURICommitment":{"digest":"0x8b1bd66b052cf73bbe8c0fc7f2dd11a00b2d2da07f59d7c740e1d7cc5f999789","byteLength":122025},"derivedMetadataDigest":"0x44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a","metadataBytes":104495,"htmlBytes":86781,"imageBytes":77,"imageURIBytes":126,"imageDelivery":"inline","externalPreviewReadAuthenticated":false,"animationURIBytes":104262,"sourceBytes":1421,"compressedPayloadBytes":1421,"encodedPayloadBytes":1448,"completeTokenURIBytes":122025,"newStoredBytes":4013,"reusedStoredBytes":119848,"uniqueStoredBytes":123861,"uniqueObjects":4,"decoderObjectBytes":0,"bootObjectBytes":119848,"combinedBootDecoderObjectBytes":0,"generatedHtmlSuffixBytes":0,"nativeBrowserGzip":false,"javascriptCodecDecoderBytes":null,"decoderCostScope":"exact-distinct-stored-object-roles","sourceByteIdentity":"verified-exact"}]}
+# Subtest: typed proof reaches COPY/readback audit; wrong chain and stale returned bytes reject
+ok 10 - typed proof reaches COPY/readback audit; wrong chain and stale returned bytes reject
+  ---
+  duration_ms: 38.212125
+  type: 'test'
+  ...
+# Subtest: explicitgzip is deterministic for incompressible URI81 payloads and never coerces to Brotli/None
+ok 11 - explicitgzip is deterministic for incompressible URI81 payloads and never coerces to Brotli/None
+  ---
+  duration_ms: 115.3135
+  type: 'test'
+  ...
+# (node:67616) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+# (Use `node --trace-deprecation ...` to show where the warning was created)
+# Subtest: Studio core explicitgzip stores exact deterministic gzip bytes, not its old Brotli else branch
+ok 12 - Studio core explicitgzip stores exact deterministic gzip bytes, not its old Brotli else branch
+  ---
+  duration_ms: 530.627792
+  type: 'test'
+  ...
+# Subtest: exact normal1786-byte MP4 default None survives the actual registered rev5 proof
+ok 13 - exact normal1786-byte MP4 default None survives the actual registered rev5 proof
+  ---
+  duration_ms: 4.467542
+  type: 'test'
+  ...
+# Subtest: complete native WebM video and existing PCM/AAC/MP3/Ogg/FLAC audio and GLB survive exact None identity proof
+    # Subtest: audio/wav
+    ok 1 - audio/wav
+      ---
+      duration_ms: 2.129042
+      type: 'test'
+      ...
+    # Subtest: audio/aac
+    ok 2 - audio/aac
+      ---
+      duration_ms: 1.788833
+      type: 'test'
+      ...
+    # Subtest: audio/mpeg
+    ok 3 - audio/mpeg
+      ---
+      duration_ms: 2.8995
+      type: 'test'
+      ...
+    # Subtest: audio/ogg
+    ok 4 - audio/ogg
+      ---
+      duration_ms: 2.451667
+      type: 'test'
+      ...
+    # Subtest: audio/flac
+    ok 5 - audio/flac
+      ---
+      duration_ms: 2.470458
+      type: 'test'
+      ...
+    # Subtest: audio/mp4
+    ok 6 - audio/mp4
+      ---
+      duration_ms: 1.619292
+      type: 'test'
+      ...
+    # Subtest: model/gltf-binary
+    ok 7 - model/gltf-binary
+      ---
+      duration_ms: 2.075625
+      type: 'test'
+      ...
+    1..7
+ok 14 - complete native WebM video and existing PCM/AAC/MP3/Ogg/FLAC audio and GLB survive exact None identity proof
+  ---
+  duration_ms: 18.72225
+  type: 'test'
+  ...
+# Subtest: native None proof rejects spoofed types, encoded text/scripts, malformed container bytes and wrong roles
+    # Subtest: unknown MIME
+    ok 1 - unknown MIME
+      ---
+      duration_ms: 0.483375
+      type: 'test'
+      ...
+    # Subtest: encoded HTML
+    ok 2 - encoded HTML
+      ---
+      duration_ms: 0.264375
+      type: 'test'
+      ...
+    # Subtest: encoded JavaScript
+    ok 3 - encoded JavaScript
+      ---
+      duration_ms: 0.191666
+      type: 'test'
+      ...
+    # Subtest: MIME-spoofed text
+    ok 4 - MIME-spoofed text
+      ---
+      duration_ms: 0.18775
+      type: 'test'
+      ...
+    # Subtest: module role
+    ok 5 - module role
+      ---
+      duration_ms: 0.190292
+      type: 'test'
+      ...
+    # Subtest: missing role
+    ok 6 - missing role
+      ---
+      duration_ms: 0.193958
+      type: 'test'
+      ...
+    # Subtest: truncated movie
+    ok 7 - truncated movie
+      ---
+      duration_ms: 0.200917
+      type: 'test'
+      ...
+    # Subtest: incomplete box
+    ok 8 - incomplete box
+      ---
+      duration_ms: 0.19775
+      type: 'test'
+      ...
+    # Subtest: wrong handler
+    ok 9 - wrong handler
+      ---
+      duration_ms: 0.321417
+      type: 'test'
+      ...
+    # Subtest: external media range
+    ok 10 - external media range
+      ---
+      duration_ms: 0.248333
+      type: 'test'
+      ...
+    # Subtest: wrong sample count
+    ok 11 - wrong sample count
+      ---
+      duration_ms: 0.262583
+      type: 'test'
+      ...
+    # Subtest: double encoded movie
+    ok 12 - double encoded movie
+      ---
+      duration_ms: 0.202583
+      type: 'test'
+      ...
+    # Subtest: bad canonical Base64
+    ok 13 - bad canonical Base64
+      ---
+      duration_ms: 0.186292
+      type: 'test'
+      ...
+    # Subtest: decoded digest mismatch
+    ok 14 - decoded digest mismatch
+      ---
+      duration_ms: 0.324792
+      type: 'test'
+      ...
+    # Subtest: stored digest mismatch
+    ok 15 - stored digest mismatch
+      ---
+      duration_ms: 0.222292
+      type: 'test'
+      ...
+    # Subtest: ambiguous text sibling
+    ok 16 - ambiguous text sibling
+      ---
+      duration_ms: 0.188584
+      type: 'test'
+      ...
+    1..16
+ok 15 - native None proof rejects spoofed types, encoded text/scripts, malformed container bytes and wrong roles
+  ---
+  duration_ms: 5.433083
+  type: 'test'
+  ...
+# Subtest: native None cannot bypass immutable frame/binding or the mandatory genuine Gzip member
+ok 16 - native None cannot bypass immutable frame/binding or the mandatory genuine Gzip member
+  ---
+  duration_ms: 3.004042
+  type: 'test'
+  ...
+# Subtest: None external glTF buffers require the exact complete referenced model resource graph
+    # Subtest: unreferenced extra buffer
+    ok 1 - unreferenced extra buffer
+      ---
+      duration_ms: 0.433166
+      type: 'test'
+      ...
+    # Subtest: missing model
+    ok 2 - missing model
+      ---
+      duration_ms: 0.24825
+      type: 'test'
+      ...
+    # Subtest: missing actual buffer
+    ok 3 - missing actual buffer
+      ---
+      duration_ms: 0.270958
+      type: 'test'
+      ...
+    # Subtest: ambiguous alias
+    ok 4 - ambiguous alias
+      ---
+      duration_ms: 0.256208
+      type: 'test'
+      ...
+    # Subtest: path escape
+    ok 5 - path escape
+      ---
+      duration_ms: 0.261958
+      type: 'test'
+      ...
+    # Subtest: module masquerading as buffer
+    ok 6 - module masquerading as buffer
+      ---
+      duration_ms: 0.215208
+      type: 'test'
+      ...
+    # Subtest: script MIME masquerading as buffer
+    ok 7 - script MIME masquerading as buffer
+      ---
+      duration_ms: 0.219416
+      type: 'test'
+      ...
+    # Subtest: truncated actual buffer
+    ok 8 - truncated actual buffer
+      ---
+      duration_ms: 0.51875
+      type: 'test'
+      ...
+    # Subtest: external dependency
+    ok 9 - external dependency
+      ---
+      duration_ms: 0.414583
+      type: 'test'
+      ...
+    1..9
+ok 17 - None external glTF buffers require the exact complete referenced model resource graph
+  ---
+  duration_ms: 5.709625
+  type: 'test'
+  ...
+# Subtest: None creator retains exact registered shared Gzip module with mandatory final proof
+ok 18 - None creator retains exact registered shared Gzip module with mandatory final proof
+  ---
+  duration_ms: 21.087709
+  type: 'test'
+  ...
+# Subtest: compressed shared unregistered cannot bypass exact module authority
+ok 19 - compressed shared unregistered cannot bypass exact module authority
+  ---
+  duration_ms: 10.647166
+  type: 'test'
+  ...
+# Subtest: compressed shared new cannot bypass exact module authority
+ok 20 - compressed shared new cannot bypass exact module authority
+  ---
+  duration_ms: 12.397834
+  type: 'test'
+  ...
+# Subtest: compressed shared boot cannot bypass exact module authority
+ok 21 - compressed shared boot cannot bypass exact module authority
+  ---
+  duration_ms: 12.007416
+  type: 'test'
+  ...
+# Subtest: compressed shared wrong-object cannot bypass exact module authority
+ok 22 - compressed shared wrong-object cannot bypass exact module authority
+  ---
+  duration_ms: 10.305709
+  type: 'test'
+  ...
+# Subtest: compressed shared wrong-bytes cannot bypass exact module authority
+ok 23 - compressed shared wrong-bytes cannot bypass exact module authority
+  ---
+  duration_ms: 8.538959
+  type: 'test'
+  ...
+# Subtest: compressed shared wrong-MIME cannot bypass exact module authority
+ok 24 - compressed shared wrong-MIME cannot bypass exact module authority
+  ---
+  duration_ms: 10.918084
+  type: 'test'
+  ...
+# Subtest: compressed shared wrong-member cannot bypass exact module authority
+ok 25 - compressed shared wrong-member cannot bypass exact module authority
+  ---
+  duration_ms: 11.328
+  type: 'test'
+  ...
+# Subtest: compressed shared wrong-proof cannot bypass exact module authority
+ok 26 - compressed shared wrong-proof cannot bypass exact module authority
+  ---
+  duration_ms: 9.156417
+  type: 'test'
+  ...
+# Subtest: Gzip original remains forbidden under selected None even with shared module proof
+ok 27 - Gzip original remains forbidden under selected None even with shared module proof
+  ---
+  duration_ms: 11.544125
+  type: 'test'
+  ...
+1..27
+# tests 59
+# suites 0
+# pass 59
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 951.426333

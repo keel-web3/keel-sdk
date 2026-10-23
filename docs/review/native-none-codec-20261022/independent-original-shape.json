@@ -1,0 +1,96 @@
+{
+  "scope": "diagnostic in-process inspector only; no production/source/assertion change",
+  "exception": "TypeError: Native Gzip cannot admit another encoded None body.\n    at inspectDocument (/private/tmp/keel-independent-temporal-normal-pg-20261022-01/keel-sdk/packages/sdk/src/registered-native-gzip.ts:109:20)\n    at createKeelRegisteredNativeGzipProof (/private/tmp/keel-independent-temporal-normal-pg-20261022-01/keel-sdk/packages/sdk/src/registered-native-gzip.ts:131:110)\n    at registeredNativeGzipForPublishedGraph (/private/tmp/keel-independent-temporal-normal-pg-20261022-02/keel-site/apps/studio/src/server/services/inline-fragment-catalog-service.ts:660:10)\n    at buildConfiguredCanonicalInlineCreatorRoot (/private/tmp/keel-independent-temporal-normal-pg-20261022-02/keel-site/apps/studio/src/server/services/inline-fragment-catalog-service.ts:876:32)\n    at async createArtifact (/private/tmp/keel-independent-temporal-normal-pg-20261022-02/keel-site/apps/studio/src/server/services/artifact-service.ts:528:20)\n    at async handleProjectRequest (/private/tmp/keel-independent-temporal-normal-pg-20261022-02/keel-site/apps/studio/src/server/http/create-project-request.ts:64:20)\n    at async createStudioProjectJson (/private/tmp/keel-independent-temporal-normal-pg-20261022-02/keel-site/apps/studio/src/server/services/studio-project-json.ts:23:20)\n    at async make (/private/tmp/keel-independent-temporal-normal-pg-20261022-02/keel-site/apps/studio/tests/integration/temporal-media-normal-continuation.test.ts:73:18)\n    at async TestContext.<anonymous> (/private/tmp/keel-independent-temporal-normal-pg-20261022-02/keel-site/apps/studio/tests/integration/temporal-media-normal-continuation.test.ts:78:15)\n    at async Test.run (node:internal/test_runner/test:1054:7)",
+  "stack": [
+    {
+      "functionName": "inspectDocument",
+      "url": "",
+      "line": 98,
+      "column": 17
+    },
+    {
+      "functionName": "createKeelRegisteredNativeGzipProof",
+      "url": "",
+      "line": 126,
+      "column": 114
+    },
+    {
+      "functionName": "registeredNativeGzipForPublishedGraph",
+      "url": "",
+      "line": 1,
+      "column": 33970
+    },
+    {
+      "functionName": "buildConfiguredCanonicalInlineCreatorRoot",
+      "url": "",
+      "line": 1,
+      "column": 44787
+    }
+  ],
+  "evaluationError": null,
+  "actual": {
+    "documentBytes": 91205,
+    "documentSHA256": "0x470f84532c209ca87b84062df2f74e693d360b10352b231337ca1ca8a477743b",
+    "binding": {
+      "profile": "keel.canonical-native-gzip@1",
+      "chainId": 11155111,
+      "revision": 5,
+      "reader": "0xfbbb2a0c470ac0e81ed35de6722e26ca8ff8134d",
+      "registry": "0x63a172ae55a6c7413a2f80be9de9cd9cb106973d",
+      "readerRuntimeCodeHash": "0x4b38e44025978596b6940908c5494c2358125b832e3086b54291bca626b35c2c"
+    },
+    "offending": {
+      "id": "artwork.mp4",
+      "role": "entrypoint",
+      "mediaType": "video/mp4",
+      "integrity": {
+        "algorithm": "sha256",
+        "byteLength": 1786,
+        "digest": "0xa421a05635b124a135c770d3c9cc814c515cfcdaa4a7b3e68f24a332033e5561"
+      },
+      "embeddedFields": [
+        "compression",
+        "storedBase64",
+        "storedIntegrity"
+      ],
+      "compression": "none",
+      "storedIntegrity": {
+        "algorithm": "sha256",
+        "byteLength": 1786,
+        "digest": "0xa421a05635b124a135c770d3c9cc814c515cfcdaa4a7b3e68f24a332033e5561"
+      }
+    },
+    "members": [
+      {
+        "id": "keel.asset-display",
+        "mediaType": "text/javascript",
+        "integrity": {
+          "algorithm": "sha256",
+          "byteLength": 6172,
+          "digest": "0x53957405312b1fe3b187a5c49b13d13a08fd6e960953c815c6e49b53637d97f4"
+        },
+        "compression": "gzip",
+        "embeddedFields": [
+          "compression",
+          "storedBase64",
+          "storedIntegrity"
+        ]
+      },
+      {
+        "id": "artwork.mp4",
+        "mediaType": "video/mp4",
+        "integrity": {
+          "algorithm": "sha256",
+          "byteLength": 1786,
+          "digest": "0xa421a05635b124a135c770d3c9cc814c515cfcdaa4a7b3e68f24a332033e5561"
+        },
+        "compression": "none",
+        "embeddedFields": [
+          "compression",
+          "storedBase64",
+          "storedIntegrity"
+        ]
+      }
+    ]
+  }
+}
