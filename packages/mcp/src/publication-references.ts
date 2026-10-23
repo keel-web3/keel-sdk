@@ -43,7 +43,9 @@ export async function searchKeelPublicationReferences(input: {
         runtimeCodeHash: record?.runtimeCodeHash,
       })) : [];
       const candidate = {
-        name: entry.name.replace(/\.json$/u, ""), chainId: reference.chainId,
+        name: entry.name.replace(/\.json$/u, ""),
+        displayName: typeof reference.name === "string" ? reference.name.slice(0, 160) : undefined,
+        chainId: reference.chainId,
         collection: reference.collection, tokenId: String(reference.tokenId),
         tokenURI: { byteLength: tokenURI.byteLength, sha256: tokenURI.sha256 },
         mintTransaction: reference.mintTransaction, shellId: reference.shellId, records,

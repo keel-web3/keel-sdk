@@ -71,9 +71,9 @@ export function decodeKeelInlineDataURI(uri: unknown, mediaPrefix: string): Uint
 function inspectSharedPpmdBoot(html:string) {
   const literal=/const __KEEL_PREPARED_BOOT__=(\{[\s\S]*?\});queueMicrotask/u.exec(html);
   if(!literal)throw new TypeError("Missing shared PPMd boot literal");
-  const boot=object(JSON.parse(literal[1]!)),keys=["profile","prefix64","decoder64","suffixDense","storedByteLength","decodedByteLength","suffixSHA256",...(boot.profile==="keel.prepared-ppmd-boot@3"?["transportProfile"]:[])];
-  const transportProfile=boot.profile==="keel.prepared-ppmd-boot@3"?boot.transportProfile:"uri81-block-v1";
-  if(Object.keys(boot).length!==keys.length||Object.keys(boot).some(k=>!keys.includes(k))||!["keel.prepared-ppmd-boot@1","keel.prepared-ppmd-boot@2","keel.prepared-ppmd-boot@3"].includes(String(boot.profile))||!["base90-v1","uri81-block-v1"].includes(String(transportProfile))
+  const boot=object(JSON.parse(literal[1]!)),keys=["profile","prefix64","decoder64","suffixDense","storedByteLength","decodedByteLength","suffixSHA256",...(["keel.prepared-ppmd-boot@3","keel.prepared-ppmd-boot@4"].includes(String(boot.profile))?["transportProfile"]:[])];
+  const transportProfile=["keel.prepared-ppmd-boot@3","keel.prepared-ppmd-boot@4"].includes(String(boot.profile))?boot.transportProfile:"uri81-block-v1";
+  if(Object.keys(boot).length!==keys.length||Object.keys(boot).some(k=>!keys.includes(k))||!["keel.prepared-ppmd-boot@1","keel.prepared-ppmd-boot@2","keel.prepared-ppmd-boot@3","keel.prepared-ppmd-boot@4"].includes(String(boot.profile))||!["base90-v1","uri81-block-v1"].includes(String(transportProfile))
     ||!Number.isSafeInteger(boot.storedByteLength)||Number(boot.storedByteLength)<9||Number(boot.storedByteLength)>MAX_BYTES
     ||!Number.isSafeInteger(boot.decodedByteLength)||Number(boot.decodedByteLength)<1||Number(boot.decodedByteLength)>MAX_BYTES
     ||typeof boot.suffixDense!=="string"||typeof boot.suffixSHA256!=="string"||!/^0x[0-9a-f]{64}$/u.test(boot.suffixSHA256))throw new TypeError("Invalid shared PPMd boot bounds");
@@ -84,7 +84,7 @@ function inspectSharedPpmdBoot(html:string) {
     return decoder.decode(gunzipSync(bytes,{maxOutputLength:MAX_BYTES}));
   };
   const prefix=gzip(boot.prefix64);gzip(boot.decoder64);
-  if(boot.profile==="keel.prepared-ppmd-boot@2"||boot.profile==="keel.prepared-ppmd-boot@3"){
+  if(boot.profile==="keel.prepared-ppmd-boot@2"||boot.profile==="keel.prepared-ppmd-boot@3"||boot.profile==="keel.prepared-ppmd-boot@4"){
     const expectedPrefix=prefix.replace("globalThis.__KEEL_EMBEDDED_CONTAINERS__=[","const __KEEL_PREPARED_DENSE_PACKS__=[");
     if(!html.startsWith(expectedPrefix)||!html.includes('globalThis.__KEEL_EMBEDDED_CONTAINERS__=__KEEL_PREPARED_DENSE_PACKS__;const text=new TextDecoder().decode(s),end=text.lastIndexOf("<"+"/script>"),script=document.createElement("script");if(!text.startsWith("];" )||end<2)throw Error("Boot boundaries invalid");script.textContent=text.slice(2,end);document.head.append(script);script.remove()'))throw new TypeError("Unsupported in-place shared PPMd boot formula");
   }
@@ -93,11 +93,14 @@ function inspectSharedPpmdBoot(html:string) {
   let suffix:string;try{while(!task.done)task.step(65536);const hash=createHash("sha256");hash.update(task.bytes);if('0x'+hash.digest("hex")!==boot.suffixSHA256)throw new TypeError("Shared boot integrity mismatch");suffix=decoder.decode(task.bytes);}finally{task.dispose();}
   const profiles=[...suffix.matchAll(/transportProfile:\s*"(base90-v1|base91-v1|base90-block-v2|uri81-block-v1)"/gu)].map(m=>m[1]);
   if(profiles.length!==1||profiles[0]!==transportProfile)throw new TypeError("Shared boot requires the matching dense reader");
-  const packs=readKeelInlineJSONArray(html,"const __KEEL_PREPARED_DENSE_PACKS__="),columns=readKeelInlineJSONArray(suffix,"globalThis.__KEEL_ITEMS__=");
+  const packs=readKeelInlineJSONArray(html,"const __KEEL_PREPARED_DENSE_PACKS__=");
+  const bodyDescriptors=boot.profile==="keel.prepared-ppmd-boot@4"&&html.includes("globalThis.__KEEL_ITEMS__=");
+  const columns=readKeelInlineJSONArray(bodyDescriptors?html:suffix,"globalThis.__KEEL_ITEMS__=");
+  if(boot.profile==="keel.prepared-ppmd-boot@4"&&!suffix.startsWith('];if(!Object.hasOwn(globalThis,"__KEEL_ITEMS__"))globalThis.__KEEL_ITEMS__='))throw new TypeError("Unsupported body descriptor fallback formula");
   const context=/\)\(globalThis\.__KEEL_ITEMS__,([0-9]+),("0x[0-9a-fA-F]{40}")\);/u.exec(suffix);
   if(!context||!packs.length||columns[0]!==null)throw new TypeError("Shared boot descriptors are incomplete");
   const items=unpackKeelInlineDescriptors(columns,Number(context[1]),JSON.parse(context[2]!));
-  return {html:prefix+serializeKeelDenseTransportJSON(packs).slice(1,-1)+suffix,items,transportProfile:transportProfile as "base90-v1"|"uri81-block-v1",shellBootEncoding:"base64" as const,shellBootCompression:"ppmd" as const,payloadPreparation:"build-time" as const,contractOperation:"verified-copy" as const};
+  return {html:prefix+serializeKeelDenseTransportJSON(packs).slice(1,-1)+(bodyDescriptors?"];globalThis.__KEEL_ITEMS__="+serializeKeelDenseTransportJSON(columns).slice(0,-1):"")+suffix,items,transportProfile:transportProfile as "base90-v1"|"uri81-block-v1",shellBootEncoding:"base64" as const,shellBootCompression:"ppmd" as const,payloadPreparation:"build-time" as const,contractOperation:"verified-copy" as const};
 }
 
 /** Inspect the two literal shell strings and data arrays without executing the bootstrap. */

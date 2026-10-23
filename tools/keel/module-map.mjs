@@ -84,7 +84,7 @@ export const MODULES = [
     summary: "Assembles viewer HTML from chunk-stored resources entirely on chain.",
     deps: ["keel-hold","keel-kernel","keel-artifacts"],
     devDeps: ["keel-die"],
-    contracts: ["KeelHarnessBuilder.sol","KeelPercentTokenURIBuilder.sol","interfaces/IKeelHarnessBuilder.sol","interfaces/IKeelPercentTokenURIBuilder.sol","libraries/KeelHarnessContextDispatch.sol","libraries/KeelPreEncodedTokenURI.sol","libraries/KeelPreparedTokenURI.sol","KeelObjectURIBuilder.sol","KeelRawTokenURIBuilder.sol","interfaces/IKeelObjectURIBuilder.sol","interfaces/IKeelRawTokenURIBuilder.sol","KeelSVGRenderer.sol","interfaces/IKeelSVGRenderer.sol","KeelRawInlineShellRegistry.sol","interfaces/IKeelRawInlineShellRegistry.sol"],
+    contracts: ["KeelHarnessBuilder.sol","KeelPercentTokenURIBuilder.sol","interfaces/IKeelHarnessBuilder.sol","interfaces/IKeelPercentTokenURIBuilder.sol","libraries/KeelHarnessContextDispatch.sol","libraries/KeelPreEncodedTokenURI.sol","libraries/KeelPreparedTokenURI.sol","KeelObjectURIBuilder.sol","KeelRawTokenURIBuilder.sol","interfaces/IKeelObjectURIBuilder.sol","interfaces/IKeelRawTokenURIBuilder.sol","KeelSVGRenderer.sol","interfaces/IKeelSVGRenderer.sol","KeelRawInlineShellRegistry.sol","interfaces/IKeelRawInlineShellRegistry.sol","KeelEvmPreparedCarrierInlineComposer.sol","interfaces/IKeelBinaryInlineComposer.sol","libraries/KeelPreparedContainerTable.sol"],
   },
   {
     id: "keel-presentation",

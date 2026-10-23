@@ -240,7 +240,7 @@ export const KEEL_MODULES: readonly KeelModule[] = [
     "title": "Graph trust lattice",
     "group": "core",
     "visibility": "private",
-    "summary": "Graph/plugin/library/module registries — the on-chain trust lattice the runtime re-derives against.",
+    "summary": "Graph/plugin/library/module registries \u2014 the on-chain trust lattice the runtime re-derives against.",
     "version": "0.3.0",
     "repo": "keel-web3/keel-graph",
     "deps": [],
@@ -290,14 +290,20 @@ export const KEEL_MODULES: readonly KeelModule[] = [
       "KeelSVGRenderer.sol",
       "interfaces/IKeelSVGRenderer.sol",
       "KeelRawInlineShellRegistry.sol",
-      "interfaces/IKeelRawInlineShellRegistry.sol"
+      "interfaces/IKeelRawInlineShellRegistry.sol",
+      "KeelLegacyHoldRawTokenURIBuilder.sol",
+      "KeelEvmPreparedCarrierInlineComposer.sol",
+      "interfaces/IKeelBinaryInlineComposer.sol",
+      "libraries/KeelPreparedContainerTable.sol"
     ],
     "deployable": [
       "KeelHarnessBuilder",
       "KeelPercentTokenURIBuilder",
       "KeelObjectURIBuilder",
       "KeelRawTokenURIBuilder",
-      "KeelRawInlineShellRegistry"
+      "KeelRawInlineShellRegistry",
+      "KeelLegacyHoldRawTokenURIBuilder",
+      "KeelEvmPreparedCarrierInlineComposer"
     ]
   },
   {
