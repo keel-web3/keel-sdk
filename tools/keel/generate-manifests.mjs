@@ -3,11 +3,13 @@
  *
  * `deployable` is derived from compiled artifacts rather than declared by hand: a
  * contract is deployable when forge emitted non-empty creation bytecode for it,
- * which excludes interfaces, libraries, and abstract bases automatically.
+ * which excludes interfaces and abstract bases. Internal-only library stubs are
+ * excluded; callable public/external libraries are required deployment dependencies.
  */
 import { readdirSync, readFileSync, writeFileSync, mkdirSync, existsSync, statSync } from "node:fs";
 import { join, resolve, basename } from "node:path";
 import { MODULES, TIER_OF } from "./module-map.mjs";
+import { compiledDeployableNames } from "./compiled-deployables.mjs";
 
 const REPO = resolve(import.meta.dirname, "../..");
 const CONTRACTS = join(REPO, "../keel-contracts");
@@ -15,19 +17,21 @@ const OUT = join(CONTRACTS, "out");
 const metaDir = (id) => join(CONTRACTS, TIER_OF.get(id));
 const VERSION = JSON.parse(readFileSync(join(CONTRACTS, "package.json"), "utf8")).version;
 
-function deployablesFor(solFile) {
+function deployableFor(solFile) {
   const dir = join(OUT, basename(solFile));
-  if (!existsSync(dir)) return [];
-  const names = [];
-  for (const f of readdirSync(dir)) {
-    if (!f.endsWith(".json")) continue;
-    try {
-      const a = JSON.parse(readFileSync(join(dir, f), "utf8"));
-      const code = a?.bytecode?.object ?? "";
-      if (code.replace(/^0x/, "").length > 0) names.push(f.replace(/\.json$/, ""));
-    } catch { /* artifact unreadable; treat as non-deployable */ }
-  }
-  return names.sort();
+  const contract = basename(solFile, ".sol");
+  const artifact = join(dir, `${contract}.json`);
+  if (!existsSync(artifact)) return [];
+  try {
+    const a = JSON.parse(readFileSync(artifact, "utf8"));
+    return compiledDeployableNames(solFile, a);
+  } catch { return []; }
+}
+
+function externalDeployables(id) {
+  const abiDir = join(metaDir(id), id, "abi");
+  if (!existsSync(abiDir)) return [];
+  return readdirSync(abiDir).filter((f) => f.endsWith(".json")).map((f) => f.replace(/\.json$/, "")).sort();
 }
 
 /** preserve visibility across regeneration — it comes from GitHub, not the map */
@@ -37,16 +41,25 @@ function existingVisibility(id) {
   try { return JSON.parse(readFileSync(p, "utf8")).visibility ?? null; } catch { return null; }
 }
 
+/** preserve optional cross-chain metadata owned by the module */
+function existingTezos(id) {
+  const p = join(metaDir(id), id, "keel.module.json");
+  if (!existsSync(p)) return null;
+  try { return JSON.parse(readFileSync(p, "utf8")).tezos ?? null; } catch { return null; }
+}
+
 let written = 0;
 for (const m of MODULES) {
   const dir = join(metaDir(m.id), m.id);
   mkdirSync(join(dir, "deployments"), { recursive: true });
-  // interfaces are never deployed, and every library here is internal-only and
-  // inlined by the compiler — forge still emits a stub for them, so filter by path.
-  const deployable = [...new Set(
-    m.contracts.filter((c) => !c.startsWith("interfaces/") && !c.startsWith("libraries/"))
-      .flatMap(deployablesFor),
-  )].sort();
+  // Interfaces are never deployed. Compiled callable libraries stay in the
+  // deployment closure; internal-only library stubs are excluded by their ABI.
+  const deployable = m.external
+    ? externalDeployables(m.id)
+    : [...new Set(
+      m.contracts.filter((c) => !c.startsWith("interfaces/"))
+        .flatMap(deployableFor),
+    )].sort();
   const manifest = {
     schema: "keel.module@1",
     id: m.id,
@@ -58,10 +71,11 @@ for (const m of MODULES) {
     repo: m.kind === "app" ? null : `keel-web3/${m.id}`,
     // recorded by `keel repos --sync`; drives install instructions, nothing else
     visibility: existingVisibility(m.id),
+    ...(existingTezos(m.id) === null ? {} : { tezos: existingTezos(m.id) }),
     deps: m.deps,
     devDeps: m.devDeps ?? [],
-    sources: `packages/contracts/src/${TIER_OF.get(m.id)}/${m.id}`,
-    tests: `packages/contracts/test/${TIER_OF.get(m.id)}/${m.id}`,
+    sources: `src/${TIER_OF.get(m.id)}/${m.id}`,
+    tests: `test/${TIER_OF.get(m.id)}/${m.id}`,
     contracts: m.contracts,
     deployable,
     verify: {

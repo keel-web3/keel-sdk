@@ -18,7 +18,9 @@ Creates a small, strict module workspace:
   description), the entry point, the license, and a `sourceRepository`
   placeholder. Replace the placeholder with the public repository, commit, and
   path holding this exact source before publishing; while it still says
-  `example.invalid` the build deliberately omits it from the receipt.
+  `example.invalid` the build deliberately omits it from the receipt. An
+  optional `inputs` list declares the settings people can change when they
+  include the module; see [Module settings](MODULE_SETTINGS.md).
 - `tsconfig.json`: `strict`, `noUncheckedIndexedAccess`,
   `exactOptionalPropertyTypes`, ES2022 modules, `noEmit` (esbuild does the
   emitting). The build refuses to run if these flags are weakened, because the

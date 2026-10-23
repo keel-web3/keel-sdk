@@ -1,8 +1,13 @@
 import {
   canonicalJson,
+  describeKeelReleasePolicy,
+  resolveHarnessTree,
+  type HarnessNode,
+  type HarnessWalkLimits,
   createIntegrity,
   encodeBase64,
   utf8ToBytes,
+  verifyIntegrity,
   type ArtifactManifest,
   type ArtifactResource,
   type Compression,
@@ -12,7 +17,6 @@ import {
   type OnchainSource,
   type ResourceSource,
   type KeelStakeObject,
-  type UriSource,
 } from "@keel/protocol";
 import type {
   CollectionFacetInput,
@@ -41,20 +45,8 @@ export const KEEL_INJECTION_PROTOCOL = "keel-injection@1" as const;
 export const KEEL_ANCHOR_TOKEN_ID = "$anchor.tokenId" as const;
 export const KEEL_STAKED_CHARACTER_ID = "$staked.characterId" as const;
 
-/**
- * How a bound resource reaches the reader.
- *
- *   `"off"`       chain only. The canonical KeelHold object is read over RPC
- *                 and no gateway is consulted for display. The default.
- *   `"fallback"`  chain first, a proven mirror behind it.
- *   `"preferred"` mirror first, the chain behind it. What Keel used to do.
- *
- * The RPC read is not free of hosts either — something answers the `eth_call` —
- * which is why the endpoint is itself governed (`keelRpcUrlAllowed`) and why
- * a viewer that reads the chain this way has to say so. What it buys is that
- * the bytes come from the ledger that proved them rather than from a copy
- * somebody else agreed to keep.
- */
+/** Gateway preference used by delivery callers. Verified native bindings
+ * always retain their native source; this preference cannot lower that tier. */
 export type KeelGatewayTransport = "off" | "fallback" | "preferred";
 
 export const DEFAULT_GATEWAY_TRANSPORT: KeelGatewayTransport = "off";
@@ -103,6 +95,7 @@ export type KeelInjectionField =
   | "character.emitterSeedDomainVersion"
   | "character.emitterPaletteMode"
   | "character.sceneId"
+  | "collection.release"
   | "collection.verification"
   | "map.characterSeed"
   | "map.seed"
@@ -209,6 +202,7 @@ export interface KeelRuntimeExtension {
   readonly linkRegistry?: Hex;
   readonly seedRegistry?: Hex;
   readonly attestedAnchorRegistry?: Hex;
+  readonly mintRouter?: Hex;
   readonly viewerId: Hex;
   readonly tokenId: string;
   readonly slotResources: readonly string[];
@@ -223,12 +217,16 @@ export interface KeelRuntimeExtension {
 }
 
 export type KeelContractFunction =
+  | "releaseSnapshot"
   | "keelIndex"
   | "approvedEvidenceRoot"
   | "characterCollection"
   | "characterRegistry"
   | "deriveTokenSeed"
   | "effectiveHarness"
+  | "harnessTree"
+  | "harnessNode"
+  | "tokenForkTree"
   | "equipmentSource"
   | "fidelityLink"
   | "linkExists"
@@ -258,7 +256,7 @@ export type KeelContractFunction =
   | "receiptCurrent"
   | "sourceAnchor"
   | "anchor"
-  | "seedSetForViewerRevision"
+  | "seedSetForHarnessRevision"
   | "harnessCollection"
   | "harnessRegistry"
   | "stakeObject"
@@ -605,33 +603,13 @@ export interface KeelRuntimeBinding {
 }
 
 export interface BindKeelManifestOptions {
+  readonly harnessTreeLimits?: HarnessWalkLimits;
   readonly readContract: KeelContractRead;
   readonly adapters?: ResolverAdapters;
-  /**
-   * Where the bytes a reader is shown are fetched from.
-   *
-   * `"off"` is the default: the artwork is read from KeelHold over RPC, and
-   * a declared IPFS, Arweave, or HTTPS mirror is not consulted for display at
-   * all. The bytes still come from the chain that proved them, and the reader
-   * is not made to depend on a content host staying alive and honest.
-   *
-   * This does not touch IPFS as *proof*. A CID the original collection
-   * committed to is still recomputed and still checked; `hybridSource` below
-   * still refuses a mirror whose committed digest, length, or media type
-   * disagrees with the object descriptor. What changes is only which of the
-   * two equally-proven copies is actually fetched.
-   *
-   * `"fallback"` keeps the mirror as a second chance behind the chain read,
-   * and `"preferred"` restores the old mirror-first order for a deployment
-   * that wants a gateway to absorb the read traffic. Both are opt-in.
-   */
+  /** Gateway preferences never override a verified native object binding.
+   * Declared mirrors remain available as provenance, not display fallbacks. */
   readonly gatewayTransport?: KeelGatewayTransport;
-  /**
-   * @deprecated Superseded by `gatewayTransport`. Honoured when supplied and
-   * `gatewayTransport` is not, so an existing caller keeps its old behaviour
-   * rather than being silently switched: `"hybrid-first"` maps to
-   * `"preferred"`, `"onchain-first"` to `"fallback"`.
-   */
+  /** Gateway preference for callers shared with non-native delivery paths. */
   readonly sourcePreference?: "hybrid-first" | "onchain-first";
   /** Staked character selected for a collection-shared map viewer. The arcade
    * registry still proves that this character is assigned to the anchored map. */
@@ -756,9 +734,12 @@ function digestAlgorithm(value: unknown, label: string): Exclude<DigestAlgorithm
   }
 }
 
-function compression(value: unknown, label: string): Compression {
+function compression(
+  value: unknown, label: string,
+  names: readonly Compression[] = ["none", "gzip", "deflate", "brotli"],
+): Compression {
   const code = safeNumber(value, label);
-  const result = ["none", "gzip", "deflate", "brotli"][code];
+  const result = names[code];
   if (result === undefined) throw new TypeError(`${label} is not a supported compression.`);
   return result as Compression;
 }
@@ -817,6 +798,7 @@ function injectionExtension(value: unknown, label: string): KeelInjectionExtensi
     "character.emitterPaletteMode",
     "character.sceneId",
     "collection.verification",
+    "collection.release",
     "map.characterSeed",
     "map.seed",
     "map.buildRevision",
@@ -999,6 +981,7 @@ export function parseKeelRuntimeExtension(manifest: ArtifactManifest): KeelRunti
     ...(state === undefined ? {} : { state }),
     ...(seasonalGroveState === undefined ? {} : { seasonalGroveState }),
     ...(collectionVerification === undefined ? {} : { collectionVerification }),
+    ...(data.mintRouter === undefined ? {} : { mintRouter: address(data.mintRouter, "keel.mintRouter") }),
     ...(data.linkRegistry === undefined ? {} : { linkRegistry: address(data.linkRegistry, "keel.linkRegistry") }),
     ...(data.seedRegistry === undefined ? {} : { seedRegistry: address(data.seedRegistry, "keel.seedRegistry") }),
     ...(data.attestedAnchorRegistry === undefined
@@ -1025,6 +1008,12 @@ export function parseKeelRuntimeExtension(manifest: ArtifactManifest): KeelRunti
   if (result.injection?.fields.includes("character.attestedAnchors") === true && result.attestedAnchorRegistry === undefined) {
     throw new TypeError("Keel character.attestedAnchors injection requires an attested-anchor registry binding.");
   }
+  if (result.injection?.fields.includes("collection.release") === true && result.mintRouter === undefined) {
+    throw new TypeError("Release disclosure requires a declared mint router.");
+  }
+  if (result.mintRouter !== undefined && result.injection?.fields.includes("collection.release") !== true) {
+    throw new TypeError("A mint router must be explicitly injected as collection.release.");
+  }
   const characterFields = result.injection?.fields.some((field) => field.startsWith("character.")) === true;
   if (characterFields && result.character === undefined) {
     throw new TypeError("Keel character injection requires a character registry binding.");
@@ -1050,18 +1039,18 @@ export function parseKeelRuntimeExtension(manifest: ArtifactManifest): KeelRunti
 }
 
 function parseEffectiveViewer(value: unknown): KeelEffectiveViewer {
-  const objectIds = array(tupleValue(value, "slotObjectIds", 5), "effectiveHarness.slotObjectIds").map((entry, index) =>
+  const objectIds = array(tupleValue(value, "slotObjectIds", 6), "effectiveHarness.slotObjectIds").map((entry, index) =>
     bytes32(entry, `effectiveHarness.slotObjectIds[${index}]`),
   );
-  const revisions = array(tupleValue(value, "selectedObjectRevisions", 6), "effectiveHarness.selectedObjectRevisions").map(
+  const revisions = array(tupleValue(value, "selectedObjectRevisions", 5), "effectiveHarness.selectedObjectRevisions").map(
     (entry, index) => safeNumber(entry, `effectiveHarness.selectedObjectRevisions[${index}]`, 1),
   );
-  if (objectIds.length === 0 || objectIds.length !== revisions.length) {
+  if (objectIds.length !== revisions.length) {
     throw new TypeError("Keel effective viewer returned an invalid slot selection.");
   }
   return {
-    harnessRevision: safeNumber(tupleValue(value, "harnessRevision", 0), "effectiveHarness.harnessRevision", 1),
-    forkRevision: safeNumber(tupleValue(value, "forkRevision", 1), "effectiveHarness.forkRevision"),
+    harnessRevision: safeNumber(tupleValue(value, "harnessRevision", 1), "effectiveHarness.harnessRevision", 1),
+    forkRevision: safeNumber(tupleValue(value, "forkRevision", 0), "effectiveHarness.forkRevision"),
     keelIndexRevision: safeNumber(
       tupleValue(value, "keelIndexRevision", 2),
       "effectiveHarness.keelIndexRevision",
@@ -1097,7 +1086,7 @@ function parseLink(value: unknown): KeelFidelityLink {
   if (fidelity > 2 || scheme > 3) throw new TypeError("Keel fidelity link returned an invalid enum value.");
   if (!bool(tupleValue(value, "exists", 14), "fidelityLink.exists")) throw new TypeError("Keel fidelity link is missing.");
   const uri = text(tupleValue(value, "uri", 6), "fidelityLink.uri");
-  const prefixes = ["https://", "ipfs://", "ipns://", "ar://"] as const;
+  const prefixes = ["ipfs://", "ipns://", "https://", "ar://"] as const;
   if (!uri.startsWith(prefixes[scheme]) || uri.length === prefixes[scheme].length) {
     throw new TypeError("Keel fidelity link URI does not match its scheme.");
   }
@@ -1111,7 +1100,7 @@ function parseLink(value: unknown): KeelFidelityLink {
     fidelity,
     scheme,
     digestAlgorithm: digestAlgorithm(tupleValue(value, "digestAlgorithm", 4), "fidelityLink.digestAlgorithm"),
-    compression: compression(tupleValue(value, "compression", 5), "fidelityLink.compression"),
+    compression: compression(tupleValue(value, "compression", 5), "fidelityLink.compression", ["none", "gzip", "brotli", "deflate"]),
     uri,
     mediaType,
     decodedDigest: bytes32(tupleValue(value, "decodedDigest", 8), "fidelityLink.decodedDigest"),
@@ -1541,37 +1530,6 @@ function onchainSource(chainId: number, source: KeelObjectSourceDescriptor): Onc
 }
 
 /**
- * A mirror is only a mirror if it is provably the same bytes. Every field here
- * is a proof input the fidelity link committed to on chain, and a link that
- * disagrees with the object descriptor on any of them is not a slower copy of
- * the artwork — it is a different artwork, and it is dropped.
- *
- * This check is unchanged by the transport default. Whether the mirror is ever
- * fetched is `gatewayTransport`'s business; whether it would have been the same
- * bytes is this function's, and those are separate questions.
- */
-function hybridSource(link: KeelFidelityLink, source: KeelObjectSourceDescriptor): UriSource | undefined {
-  if (
-    link.fidelity !== 2 ||
-    link.digestAlgorithm !== source.digestAlgorithm ||
-    link.decodedDigest !== source.decodedDigest ||
-    link.byteLength !== source.byteLength ||
-    link.mediaType !== source.mediaType
-  ) return undefined;
-  return {
-    kind: "uri",
-    uri: link.uri,
-    compression: link.compression,
-    integrity: {
-      algorithm: link.digestAlgorithm,
-      digest: link.decodedDigest,
-      byteLength: link.byteLength,
-    },
-    immutable: link.scheme === 1 || link.scheme === 3,
-  };
-}
-
-/**
  * Resolve the two knobs into one. `gatewayTransport` wins when both are given;
  * a caller that has migrated should not have an old option quietly override the
  * new one.
@@ -1590,29 +1548,18 @@ function bindResource(
   resource: ArtifactResource,
   chainId: number,
   source: KeelObjectSourceDescriptor,
-  links: readonly KeelFidelityLink[],
-  transport: KeelGatewayTransport = DEFAULT_GATEWAY_TRANSPORT,
 ): ArtifactResource {
   if (resource.mediaType !== source.mediaType) {
     throw new TypeError(`Resource ${resource.id} media type does not match its Keel object descriptor.`);
   }
   const integrity = integrityFor(source);
-  // A prior `uri` source is a gateway too, whatever it was declared for, so it
-  // is held to the same toggle as the fidelity mirror. Everything else already
-  // comes from the chain or from the document.
-  const prior = resource.sources.filter(
-    (candidate) => sameIntegrity(candidate, integrity) && (transport !== "off" || candidate.kind !== "uri"),
+  // The registry proves this exact revision exists in the native Hold. Retain
+  // only self-contained copies of those same bytes; gateway preferences, old
+  // contract calls and foreign-chain anchors cannot lower its delivery tier.
+  const inline = resource.sources.filter(
+    (candidate) => candidate.kind === "inline" && sameIntegrity(candidate, integrity),
   );
-  const hybrid = transport === "off"
-    ? undefined
-    : links.map((link) => hybridSource(link, source)).find((candidate) => candidate !== undefined);
-  const canonical = onchainSource(chainId, source);
-  return {
-    ...resource,
-    sources: transport === "preferred"
-      ? [...(hybrid === undefined ? [] : [hybrid]), canonical, ...prior]
-      : [canonical, ...(hybrid === undefined ? [] : [hybrid]), ...prior],
-  };
+  return { ...resource, sources: [onchainSource(chainId, source), ...inline] };
 }
 
 function requireCommitment(manifest: ArtifactManifest, commitment: ManifestCommitment, extension: KeelRuntimeExtension): void {
@@ -1683,6 +1630,13 @@ export async function bindKeelManifest(
   commitment: ManifestCommitment,
   options: BindKeelManifestOptions,
 ): Promise<BoundKeelManifest> {
+  // Snapshot and recheck the declaration before reading bindings. A caller must
+  // not add a URL to an already verified manifest or mutate it during RPC reads.
+  const declaration = canonicalJson(manifest);
+  manifest = JSON.parse(declaration) as ArtifactManifest;
+  if (!(await verifyIntegrity(utf8ToBytes(declaration), commitment.integrity, options.adapters?.customDigest))) {
+    throw new TypeError("Keel manifest declaration does not match its verified commitment.");
+  }
   const extension = resolveRuntimeExtension(parseKeelRuntimeExtension(manifest), commitment, options);
   requireCommitment(manifest, commitment, extension);
   if (extension.mode === "exact" && options.blockNumber === undefined) {
@@ -1706,7 +1660,7 @@ export async function bindKeelManifest(
     }
   }
   if (
-    extension.collectionVerification !== undefined
+    (extension.collectionVerification !== undefined || extension.mintRouter !== undefined)
     && (options.blockNumber === undefined || options.blockHash === undefined || options.blockTimestamp === undefined)
   ) throw new TypeError("Collection verification requires one pinned block number, hash, and timestamp.");
   const signal = options.signal ?? new AbortController().signal;
@@ -1739,9 +1693,36 @@ export async function bindKeelManifest(
     throw new Error("Keel viewer collection does not match the verified KeelIndex collection.");
   }
 
-  const effective = parseEffectiveViewer(effectiveValue);
+  let effective = parseEffectiveViewer(effectiveValue);
   if (effective.manifestDigest !== commitment.integrity.digest) {
     throw new Error("Effective Keel viewer does not commit the verified manifest digest.");
+  }
+  if (effective.slotObjectIds.length === 0) {
+    const value = effective.forkRevision === 0
+      ? await read(extension.harnessRegistry, "harnessTree", [extension.viewerId, BigInt(effective.harnessRevision)])
+      : await read(extension.harnessRegistry, "tokenForkTree", [extension.viewerId, BigInt(extension.tokenId), BigInt(effective.forkRevision)]);
+    const root: HarnessNode = {
+      metadata: uintBig(tupleValue(value, "metadata", 0), "harnessTree.metadata"),
+      children: array(tupleValue(value, "children", 1), "harnessTree.children").map(v => uintBig(v, "harnessTree.word")),
+      objects: [],
+    };
+    const objects = await resolveHarnessTree(root, async ({key, revision}) => {
+      const node = await read(extension.harnessRegistry, "harnessNode", [key, revision]);
+      const ids = array(tupleValue(node, "objectIds", 2), "harnessNode.objectIds");
+      const revisions = array(tupleValue(node, "revisions", 3), "harnessNode.revisions");
+      if (ids.length !== revisions.length) throw new Error("Harness node returned mismatched arrays.");
+      return {
+        metadata: uintBig(tupleValue(node, "metadata", 0), "harnessNode.metadata"),
+        children: array(tupleValue(node, "children", 1), "harnessNode.children").map(v => uintBig(v, "harnessNode.word")),
+        objects: ids.map((id, i) => ({objectId: bytes32(id, "harnessNode.objectId"), revision:uintBig(revisions[i], "harnessNode.revision")})),
+      };
+    }, {
+      ...options.harnessTreeLimits,
+      maxObjects: Math.min(options.harnessTreeLimits?.maxObjects ?? 1_000_000, extension.slotResources.length),
+      signal,
+    });
+    effective = {...effective, slotObjectIds:objects.map(o=>o.objectId),
+      selectedObjectRevisions:objects.map(o=>safeNumber(o.revision, "harnessNode.revision", 1))};
   }
   if (effective.slotObjectIds.length !== extension.slotResources.length) {
     throw new Error("Effective Keel viewer slot count does not match the manifest resource map.");
@@ -1930,7 +1911,7 @@ export async function bindKeelManifest(
     const [seedHarnessRegistry, seedKeelIndex, seedSetValue, seedSetIdValue] = await Promise.all([
       read(extension.seedRegistry, "harnessRegistry"),
       read(extension.seedRegistry, "keelIndex"),
-      read(extension.seedRegistry, "seedSetForViewerRevision", [extension.viewerId, BigInt(effective.harnessRevision)]),
+      read(extension.seedRegistry, "seedSetForHarnessRevision", [extension.viewerId, BigInt(effective.harnessRevision)]),
       read(extension.seedRegistry, "predictSeedSetId", [extension.viewerId, BigInt(effective.harnessRevision)]),
     ]);
     if (!sameAddress(contractAddress(scalar(seedHarnessRegistry), "seedRegistry.harnessRegistry"), extension.harnessRegistry)) {
@@ -1941,10 +1922,10 @@ export async function bindKeelManifest(
     }
     if (!bool(tupleValue(seedSetValue, "exists", 9), "seedSet.exists")) throw new Error("Keel seed set is missing.");
     if (
-      bytes32(tupleValue(seedSetValue, "viewerId", 0), "seedSet.viewerId") !== extension.viewerId ||
+      bytes32(tupleValue(seedSetValue, "harnessId", 0), "seedSet.harnessId") !== extension.viewerId ||
       safeNumber(tupleValue(seedSetValue, "harnessRevision", 1), "seedSet.harnessRevision", 1) !== effective.harnessRevision ||
       !sameAddress(contractAddress(tupleValue(seedSetValue, "collection", 2), "seedSet.collection"), anchor.collection) ||
-      bytes32(tupleValue(seedSetValue, "viewerManifestDigest", 3), "seedSet.viewerManifestDigest") !== effective.manifestDigest
+      bytes32(tupleValue(seedSetValue, "harnessManifestDigest", 3), "seedSet.harnessManifestDigest") !== effective.manifestDigest
     ) throw new Error("Keel seed set does not match the effective viewer.");
     const seedSetId = bytes32(scalar(seedSetIdValue), "seedSetId");
     const derivedTokenSeed = bytes32(
@@ -2190,7 +2171,6 @@ export async function bindKeelManifest(
   }
 
   const resources = new Map(manifest.resources.map((resource) => [resource.id, resource] as const));
-  const gatewayTransport = resolveGatewayTransport(options);
   for (const item of objects) {
     const resource = resources.get(item.resource);
     if (resource === undefined) throw new Error(`Keel resource ${item.resource} disappeared during binding.`);
@@ -2198,8 +2178,6 @@ export async function bindKeelManifest(
       resource,
       extension.chainId,
       item.source,
-      item.fidelityLinks,
-      gatewayTransport,
     ));
   }
   for (const mapping of extension.equipment?.resources ?? []) {
@@ -2207,7 +2185,7 @@ export async function bindKeelManifest(
     if (source === undefined) continue;
     const resource = resources.get(mapping.resource);
     if (resource === undefined) throw new Error(`Keel equipment resource ${mapping.resource} disappeared during binding.`);
-    resources.set(mapping.resource, bindResource(resource, extension.chainId, source, [], gatewayTransport));
+    resources.set(mapping.resource, bindResource(resource, extension.chainId, source));
   }
   if (extension.seasonalGroveState !== undefined && seasonalGroveStateSource !== undefined) {
     const resource = resources.get(extension.seasonalGroveState.resource);
@@ -2337,6 +2315,23 @@ export async function bindKeelManifest(
     };
   }
 
+  let releaseDisclosure: RuntimeContext["releaseDisclosure"];
+  if (extension.mintRouter !== undefined) {
+    const tokenAnchor = commitment.registry?.driveAnchor ?? anchor;
+    if (extension.tokenId !== String(tokenAnchor.tokenId)) throw new Error("Release disclosure must use the anchored token.");
+    const snapshot = await read(extension.mintRouter, "releaseSnapshot", [anchor.collection, BigInt(extension.tokenId)]);
+    const policyWord = uintBig(tupleValue(snapshot, "policy", 2), "release.policy").toString();
+    releaseDisclosure = {
+      source: "pinned-rpc", router: extension.mintRouter, collection: anchor.collection,
+      releaseId: uintBig(tupleValue(snapshot, "id", 0), "release.id").toString(),
+      localId: uintBig(tupleValue(snapshot, "local", 1), "release.local").toString(),
+      policyWord, targetMaximum: uintBig(tupleValue(snapshot, "targetMaximum", 3), "release.targetMaximum").toString(),
+      authority: contractAddress(tupleValue(snapshot, "authority", 4), "release.authority"),
+      blockNumber: options.blockNumber!.toString(), blockHash: options.blockHash!,
+      rows: describeKeelReleasePolicy(policyWord),
+    };
+  }
+
   let attestedAnchors: readonly KeelAnchoredChain[] | undefined;
   if (extension.injection?.fields.includes("character.attestedAnchors") === true) {
     const anchorRegistry = extension.attestedAnchorRegistry;
@@ -2404,6 +2399,7 @@ export async function bindKeelManifest(
             ...(fields.has("character.emitterSeedDomainVersion") ? { emitterSeedDomainVersion: characterRecipe!.emitterSeedDomainVersion } : {}),
             ...(fields.has("character.emitterPaletteMode") ? { emitterPaletteMode: characterRecipe!.emitterPaletteMode } : {}),
             ...(fields.has("character.sceneId") ? { sceneId: characterRecipe!.sceneId } : {}),
+            ...(fields.has("collection.release") ? { releaseDisclosure: releaseDisclosure! } : {}),
             ...(fields.has("collection.verification") ? { collectionVerification: collectionVerification! } : {}),
             ...(fields.has("map.characterSeed") ? { mapCharacterSeed: mapCharacterSeed! } : {}),
             ...(fields.has("map.seed") ? { mapSeed: mapSeed! } : {}),

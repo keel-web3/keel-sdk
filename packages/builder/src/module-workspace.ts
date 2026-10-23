@@ -1,3 +1,4 @@
+import { createKeelModuleTypes } from "./module-types.js";
 /**
  * Workspace support for the module pipeline: many art items in one directory.
  *
@@ -35,6 +36,7 @@ import {
   canonicalJson,
   type Hex,
   type KeelBuildRecipe,
+  type KeelModuleInputManifest,
   type KeelSourceReceipt,
 } from "@keel/protocol";
 import {
@@ -471,6 +473,10 @@ export interface KeelModuleCatalogEntry {
   readonly githubPath: string;
   /** The READABLE files the site shows, each pinned by digest. */
   readonly sourceFiles: readonly KeelCatalogSourceFile[];
+  readonly types?: Awaited<ReturnType<typeof createKeelModuleTypes>>;
+  /** Settings declared in keel.module.json, shown to whoever includes the module. */
+  readonly inputs?: KeelModuleInputManifest;
+  readonly runtime?: { readonly encoding: "base64"; readonly data: string; readonly format: string; readonly entry: string };
   readonly outputDigest: Hex;
   readonly receiptDigest: Hex;
   readonly disposition: KeelSourceReceipt["disposition"];
@@ -558,7 +564,20 @@ async function catalogEntry(module: KeelWorkspaceModule, options: IndexKeelWorks
   const manifestRepository = placeholderFree(module.manifest.sourceRepository.url);
   const placement = module.manifest.placement;
   const deployments = await readKeelModuleRevisions(module.directory);
+  let types: Awaited<ReturnType<typeof createKeelModuleTypes>> | undefined;
+  let storedTypes: string | undefined;
+  try { storedTypes = await readFile(path.join(distDirectory, "keel-module-types.json"), "utf8"); }
+  catch (error) {
+    if (!(typeof error === "object" && error !== null && "code" in error && error.code === "ENOENT")) throw error;
+  }
+  if (storedTypes !== undefined) {
+    types = await createKeelModuleTypes(module.directory, recipe);
+    if (canonicalJson(JSON.parse(storedTypes)) !== canonicalJson(types)) throw new Error("Module declarations differ from verified source; rebuild before indexing.");
+  }
   return {
+    ...(types === undefined ? {} : { types }),
+    ...(module.manifest.inputs === undefined ? {} : { inputs: module.manifest.inputs }),
+    runtime: { encoding: "base64", data: shippedBytes.toString("base64"), format: recipe.options.format, entry: recipe.entry },
     id: module.manifest.name,
     version: module.manifest.version,
     license: module.manifest.license,

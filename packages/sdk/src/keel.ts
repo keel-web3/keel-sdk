@@ -2,6 +2,7 @@ import {
   EquipmentAssetStandard,
   EquipmentSlot,
   KeelCompression,
+  KeelLinkCompression,
   KeelDigestAlgorithm,
   KeelFidelity,
   KeelLocatorScheme,
@@ -139,6 +140,16 @@ export function keelCompressionName(value: KeelCompression): "none" | "gzip" | "
   return ["none", "gzip", "deflate", "brotli"][normalized] as "none" | "gzip" | "deflate" | "brotli";
 }
 
+/** Decodes the link registry tag space without changing Hold's compression tags. */
+export function keelLinkCompressionName(value: KeelLinkCompression): "none" | "gzip" | "brotli" | "deflate" {
+  const normalized = enumValue(
+    value,
+    [KeelLinkCompression.None, KeelLinkCompression.Gzip, KeelLinkCompression.Brotli, KeelLinkCompression.Deflate],
+    "link compression",
+  );
+  return ["none", "gzip", "brotli", "deflate"][normalized] as "none" | "gzip" | "brotli" | "deflate";
+}
+
 export function validateKeelViewerSlots(input: KeelViewerSlots): KeelViewerSlots {
   if (input.objectIds.length === 0 || input.objectIds.length > KEEL_MAX_VIEWER_SLOTS) {
     throw new RangeError(`viewer requires 1-${KEEL_MAX_VIEWER_SLOTS} object slots.`);
@@ -170,14 +181,14 @@ export function validateKeelFidelityLinks(
   return inputs.map((input, index) => {
     const fidelity = enumValue(
       input.fidelity,
-      [KeelFidelity.Preview, KeelFidelity.HighResolution, KeelFidelity.HybridMirror],
+      [KeelFidelity.Preview, KeelFidelity.HybridMirror, KeelFidelity.HighResolution],
       `links[${index}].fidelity`,
     );
     if (fidelity <= previous) throw new RangeError("fidelity links must be strictly ordered and unique.");
     previous = fidelity;
     const scheme = enumValue(
       input.scheme,
-      [KeelLocatorScheme.Https, KeelLocatorScheme.Ipfs, KeelLocatorScheme.Ipns, KeelLocatorScheme.Arweave],
+      [KeelLocatorScheme.Ipfs, KeelLocatorScheme.Ipns, KeelLocatorScheme.Https, KeelLocatorScheme.Arweave],
       `links[${index}].scheme`,
     );
     if (!input.uri.startsWith(URI_PREFIX[scheme]) || input.uri.length === URI_PREFIX[scheme].length) {
@@ -210,7 +221,7 @@ export function validateKeelFidelityLinks(
       ),
       compression: enumValue(
         input.compression,
-        [KeelCompression.None, KeelCompression.Gzip, KeelCompression.Deflate, KeelCompression.Brotli],
+        [KeelLinkCompression.None, KeelLinkCompression.Gzip, KeelLinkCompression.Brotli, KeelLinkCompression.Deflate],
         `links[${index}].compression`,
       ),
       decodedDigest,
@@ -269,6 +280,7 @@ export function validateEquipmentDefinition(
  * provider and API relay. Keeping one policy prevents a viewer runtime read
  * from passing mocks while being rejected by a real host transport. */
 export const keelDirectReadPolicy = {
+  "keel-mint-route-registry": ["releaseSnapshot"],
   "keel-object-registry": ["artifactRevisionSource", "artifactCreator"],
   "keel-attribution-registry": [
     "artifactRegistry",
@@ -288,14 +300,21 @@ export const keelDirectReadPolicy = {
     "tokenRequirementCount",
     "tokenRequirement",
   ],
-  "keel-viewer-registry": ["artifactRegistry", "keelIndex", "harnessCreator", "harnessCollection", "effectiveHarness"],
+  "keel-viewer-registry": ["artifactRegistry", "keelIndex", "harnessCreator", "harnessCollection", "effectiveHarness", "harnessTree", "harnessNode", "tokenForkTree"],
   "keel-link-registry": ["artifactRegistry", "linkExists", "fidelityLink"],
   "keel-seed-registry": [
     "harnessRegistry",
     "keelIndex",
-    "seedSetForViewerRevision",
+    "seedSetForHarnessRevision",
     "predictSeedSetId",
     "deriveTokenSeed",
+  ],
+  "keel-equipment-inventory": [
+    "definition", "bindingPolicy", "bindingState", "inventoryCount",
+    "inventoryDefinitionAt", "equippedDefinition", "loadoutDigest",
+    "reader", "reservationEngine", "descriptorValidator",
+    "definitionDescriptorCommitment", "erc721Location", "characterCollection",
+    "artifactRegistry", "keelIndex", "runLootIssuer", "predictDefinitionId",
   ],
   "keel-presentation-state-registry": [
     "presentationPolicy",
@@ -306,13 +325,6 @@ export const keelDirectReadPolicy = {
     "policyMaterialization",
   ],
   "keel-seasonal-grove-state": ["currentState", "owner", "timezoneName", "regionName"],
-  "keel-equipment-inventory": [
-    "artifactRegistry",
-    "keelIndex",
-    "characterCollection",
-    "loadout",
-    "equipmentSource",
-  ],
   "keel-portable-anchor-registry": ["artifactRegistry", "sourceAnchor", "portableAnchor", "anchor"],
   "keel-attested-anchor-registry": [
     "artifactRegistry",
@@ -341,27 +353,12 @@ export const keelDirectReadPolicy = {
     "grip",
     "objectAnchoredChainAt",
   ],
-  "keel-chainlink-functions-verifier": [
-    "router",
-    "anchorRegistry",
-    "keelHold",
-    "donId",
-    "subscriptionId",
-    "callbackGasLimit",
-    "familyRoute",
-    "pendingRequest",
-    "taskRequest",
-  ],
   "keel-anchor-replication-bridge": ["anchorRegistry"],
-  "keel-cre-report-verifier": [
-    "anchorRegistry",
-    "forwarder",
-    "expectedWorkflowOwner",
-    "expectedWorkflowName",
-    "expectedWorkflowId",
-    "familyConfig",
-  ],
   "keel-manager": ["governanceEpoch", "rpcHostList", "rpcHostCount", "computeRpcHostListDigest", "rpcHostListPreimage"],
+  // The Onchaininator ships from its own repository and vendors its own ABIs, so
+  // no module entry or generated ABI for it lives in this SDK. This kind stays
+  // because the relay is Keel's: Studio serves these reads, so Keel owns the
+  // allowlist that bounds them.
   "onchaininator-proof-ledger": [
     "viewerCarriage",
     "viewerOf",

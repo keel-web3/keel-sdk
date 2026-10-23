@@ -9,6 +9,10 @@
     ".": {
       "types": "./dist/index.d.ts",
       "import": "./dist/index.js"
+    },
+    "./media": {
+      "types": "./dist/media.d.ts",
+      "import": "./dist/media.js"
     }
   },
   "files": [
@@ -28,5 +32,8 @@
     "@keel/protocol": "workspace:*",
     "onchfs": "0.1.0",
     "sharp": "0.35.3"
+  },
+  "devDependencies": {
+    "typescript": "^5.9.0"
   }
 }

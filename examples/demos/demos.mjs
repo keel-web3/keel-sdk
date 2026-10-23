@@ -59,6 +59,13 @@ export const DEMOS = [
         executable: true,
       },
       {
+        id: "scene-seed.mjs",
+        role: "script",
+        mediaType: "text/javascript",
+        file: "scene-seed.mjs",
+        executable: true,
+      },
+      {
         id: "poster.webp",
         role: "preview",
         mediaType: "image/webp",
@@ -98,6 +105,13 @@ export const DEMOS = [
         role: "script",
         mediaType: "text/javascript",
         file: "sketch.js",
+        executable: true,
+      },
+      {
+        id: "seeded-random.js",
+        role: "module",
+        mediaType: "text/javascript",
+        file: "../../library/seeded-random.js",
         executable: true,
       },
       {

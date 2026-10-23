@@ -153,7 +153,7 @@ projection cannot represent (§6); `500` unexpected store revert.
 ## 5. Loop protection — where each limit lives
 
 ```text
-KeelHold   deterministic primitive; MAX_READ_DEPTH (16) bounds descriptor
+KeelHold   deterministic primitive; limits().maxReadDepth (default 16) bounds descriptor
              recursion; descriptors are immutable and content-committed, so a
              chunk sequence cannot be extended after creation — an
              "intentionally infinite hasNext" object is unconstructible here.

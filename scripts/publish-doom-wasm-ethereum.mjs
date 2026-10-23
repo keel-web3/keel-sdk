@@ -107,7 +107,6 @@ let artifactRegistry = (args.get("object-registry") ?? process.env.DOOM_ETH_OBJE
 let portableAnchorRegistry = (args.get("portable-anchor-registry") ?? process.env.DOOM_ETH_PORTABLE_ANCHOR_REGISTRY ?? "").toLowerCase();
 if (!keelHold || !artifactRegistry || !portableAnchorRegistry) {
   if (!localMode) throw new Error("Provide existing Ethereum KeelHold, KeelArtifactRegistry, and KeelPortableAnchorRegistry addresses, or use --local.");
-  keelHold = await deploy("KeelHold");
   const managerImplementation = await deploy("KeelManager");
   const managerArtifact = await artifact("KeelManager");
   const governors = [account.address, "0x0000000000000000000000000000000000001001", "0x0000000000000000000000000000000000001002"];
@@ -117,6 +116,8 @@ if (!keelHold || !artifactRegistry || !portableAnchorRegistry) {
     args: [governors, [account.address], []],
   });
   const manager = await deploy("KeelManagerProxy", [managerImplementation, initializer]);
+  const treasury = await deploy("KeelFeeTreasury", [manager]);
+  keelHold = await deploy("KeelHold", [manager, treasury, [0n, 0n, 0n, 10, 1], 0n]);
   artifactRegistry = await deploy("KeelArtifactRegistry", [keelHold, manager]);
   portableAnchorRegistry = await deploy("KeelPortableAnchorRegistry", [artifactRegistry]);
 }

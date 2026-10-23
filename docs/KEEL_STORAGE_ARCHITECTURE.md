@@ -156,6 +156,32 @@ object bindings. Its receipt commits the full document SHA-256, custom-authority
 and stored identity. The Tezos batch builder can consume the document directly;
 it does not rebuild a ZIP or upload a second copy of any library.
 
+## Tezos NFT public path
+
+The native one-of-one collection has the same two-layer shape as the EVM
+collection, expressed through Tezos standards:
+
+1. FA2/TZIP-12 `token_metadata` is the public token surface. Its `""`,
+   `artifactUri`, `animation_url`, `displayUri`, and `thumbnailUri` fields point
+   at the selected ordinary carrier.
+2. The selected interactive carrier is `onchfs://<hex file CID>` when the
+   measured OnchFS reader is available. That CID is the standard file identity
+   produced by `write_chunk` plus `create_file`; the bytes are read back through
+   the standard `read_file` view.
+
+The KEEL route is additive, not the public animation URI. `harness_html` and
+`get_object` remain available for KEEL verification and exact-shell readback,
+and a token may keep a `keelArtifactUri` compatibility field or a raw
+`token_json` view for `KeelSleeve`. A `keel+tezos://` value must never be put in
+the ordinary `animation_url`/`artifactUri` fields.
+
+Carrier migration is a down-path, not a remint: an IPFS token can later switch
+its standard metadata pointer to the matching `onchfs://` file only after the
+same decoded SHA-256 and byte length have been read back from both carriers.
+The token ID, FA2 collection, Keel object identity, and canonical shell do not
+change. If no pinned OnchFS read profile exists, IPFS remains the selected
+fallback; ZIP is only an external marketplace compatibility projection.
+
 ## Marketplace API
 
 The open-source marketplace integration exposes both an ESM package and a

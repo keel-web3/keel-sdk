@@ -1,6 +1,6 @@
 import { readFile, readdir } from "node:fs/promises";
 import path from "node:path";
-import { root } from "./run.mjs";
+import { contractsRoot, root } from "./run.mjs";
 // The policy itself lives with the module tooling so the repo-wide gate and the
 // per-module gate (`keel verify`) enforce exactly the same rules.
 import { checkSource, staticPolicyCode } from "../tools/keel/static-policy.mjs";
@@ -26,7 +26,11 @@ if (process.argv.includes("--self-test")) {
 }
 
 let failures = 0;
-for (const file of await walk(path.join(root, "packages", "contracts", "src"))) {
+// The SDK gate owns reusable KEEL modules. Standalone creator examples keep
+// their policy and behavior tests in the project that owns them; pulling those
+// prototypes into the SDK gate makes unrelated project work look like an SDK
+// regression.
+for (const file of await walk(path.join(contractsRoot, "src", "modules"))) {
   const source = await readFile(file, "utf8");
   for (const finding of checkSource(source)) {
     console.error(`${path.relative(root, file)}: ${finding}`);

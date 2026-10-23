@@ -75,11 +75,11 @@ actions and governor signature envelopes remain available for recovery.
 per-object contribution is off by default and can be changed only by a
 manager call made through `executeGovernance`; role and automation lanes are
 rejected by the execution-context check. Each successful logical object
-creation must pay the exact configured amount, the amount is recorded in
-`protocolFeesAccrued`, and `claimProtocolFees` follows pull-payment CEI by
-decrementing accounting before the recipient call. The registry rejects
-unsolicited native transfers and guards object creation, policy callbacks, and
-fee claims against reentrancy.
+creation must pay the exact configured amount. The registry commits the lineage,
+first revision and events before forwarding that fee through the shared platform
+fee helper to its configured recipient, which can be the KEEL treasury. A failed
+transfer reverts the whole creation. Creation, revision, freeze and policy changes
+are guarded against reentrancy. Ordinary unsolicited native transfers are rejected.
 
 `OneMintController.createDrop`, `updateDropSupply`, and `closeDrop` all reserve
 or release capacity through external target calls and are explicitly

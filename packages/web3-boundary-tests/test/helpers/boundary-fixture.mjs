@@ -9,6 +9,7 @@ import { fileURLToPath } from "node:url";
 
 import {
   concatHex,
+  encodeFunctionData,
   createPublicClient,
   createWalletClient,
   http,
@@ -71,7 +72,7 @@ async function spawnAnvil() {
   for (let attempt = 0; attempt < 4; attempt += 1) {
     const port = 9000 + Math.floor(Math.random() * 20_000);
     const rpcUrl = `http://127.0.0.1:${port}`;
-    const anvil = spawn("anvil", ["--port", String(port), "--silent"], { stdio: "ignore" });
+    const anvil = spawn("anvil", ["--port", String(port), "--silent", "--prune-history"], { stdio: "ignore" });
     const exited = new Promise((resolve) => anvil.once("exit", () => resolve("exited")));
     try {
       const outcome = await Promise.race([waitForRpc(rpcUrl).then(() => "ready"), exited]);
@@ -113,7 +114,7 @@ export async function startBoundaryFixture() {
 
     async function deploy(name, args) {
       const hash = await walletClient.deployContract({
-        abi: name === "KeelWeb3ResourceAdapter" ? parseAbi(["constructor(address store_)"]) : [],
+        abi: JSON.parse(await readFile(path.join(contractsOut, `${name}.sol`, `${name}.json`), "utf8")).abi,
         bytecode: await forgeBytecode(name),
         args: args ?? [],
       });
@@ -122,7 +123,11 @@ export async function startBoundaryFixture() {
       return receipt.contractAddress;
     }
 
-    const store = await deploy("KeelHold");
+    const implementation = await deploy("KeelManager");
+    const initializer = encodeFunctionData({ abi: parseAbi(["function initialize(address[] governors,address[] admins,address[] moderators)"]), functionName: "initialize", args: [[account.address, "0x0000000000000000000000000000000000001001", "0x0000000000000000000000000000000000001002"], [account.address], []] });
+    const manager = await deploy("KeelManagerProxy", [implementation, initializer]);
+    const treasury = await deploy("KeelFeeTreasury", [manager]);
+    const store = await deploy("KeelHold", [manager, treasury, [0n, 0n, 0n, 10, 1], 0n]);
     const adapter = await deploy("KeelWeb3ResourceAdapter", [store]);
 
     /// Publishes a leaf object from raw payload bytes (Uint8Array), splitting

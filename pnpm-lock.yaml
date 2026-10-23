@@ -125,7 +125,11 @@ importers:
         specifier: workspace:*
         version: link:../sdk
 
-  packages/protocol: {}
+  packages/protocol:
+    devDependencies:
+      typescript:
+        specifier: ^5.9.0
+        version: 5.9.3
 
   packages/sandbox-sdk:
     dependencies:
@@ -145,6 +149,19 @@ importers:
       '@keel/protocol':
         specifier: workspace:*
         version: link:../protocol
+      esbuild:
+        specifier: 0.28.2
+        version: 0.28.2
+      viem:
+        specifier: ^2.38.0
+        version: 2.55.19(typescript@5.9.3)
+    devDependencies:
+      '@types/node':
+        specifier: ^22.15.0
+        version: 22.20.1
+      typescript:
+        specifier: ^5.9.0
+        version: 5.9.3
 
   packages/sprite-codex:
     dependencies:
@@ -183,6 +200,9 @@ importers:
       esbuild:
         specifier: ^0.25.0
         version: 0.25.12
+      typescript:
+        specifier: ^5.9.0
+        version: 5.9.3
 
   packages/web3-boundary-tests:
     devDependencies:

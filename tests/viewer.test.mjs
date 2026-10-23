@@ -3,6 +3,7 @@ import assert from "node:assert/strict";
 import {
   KEEL_REGISTRY_ANCHOR_PROTOCOL,
   canonicalJson,
+  intersectCapabilities,
   createIntegrity,
   encodeBase64,
   hexToBytes,
@@ -10,6 +11,7 @@ import {
   sha256Hex,
   utf8ToBytes,
 } from "../packages/protocol/dist/index.js";
+import { prepareStudioArtifact } from "../packages/studio-core/dist/index.js";
 import {
   INITIAL_VIEWER_VERIFICATION_HOST_STATE,
   createKeelIndexPresentationReader,
@@ -32,8 +34,11 @@ import {
   resolveArtifactFromManifestUri,
   resolveArtifactFromRegistry,
   resolveKeelContractPlugin,
+  createPublishedViewReader,
+  KEEL_CONTRACT_PLUGIN_PROTOCOL_HASH,
   resolveKeelArtifact,
   transitionViewerVerificationHost,
+  uriLocations,
   viewerLaunches,
 } from "../packages/viewer/dist/index.js";
 import { getAddress, keccak256 } from "viem";
@@ -55,6 +60,13 @@ test("sprite emitter identity matches the Solidity fixed-width event seed vector
   assert.deepEqual(
     Array.from({ length: 4 }, (_, counter) => splitMix64(seed64, counter)),
     [0x9f38b1561d0dac6dn, 0xc5df31db156ed072n, 0x256f98f112b55876n, 0x9ad36129f9147833n],
+  );
+});
+
+test("viewer root exports URI source policy for application consumers", () => {
+  assert.deepEqual(
+    uriLocations("ipfs://bafy-test/metadata.json", { ipfsGateways: ["https://gateway.example/ipfs/"] }),
+    ["https://gateway.example/ipfs/bafy-test/metadata.json"],
   );
 });
 
@@ -93,6 +105,54 @@ async function manifest() {
     fallback: { image: "image", animation: "viewer" },
   });
 }
+
+test("viewer decodes the one canonical Inline graph as its HTML entrypoint", async () => {
+  const source = '<!doctype html><html><body><main data-inline="ready">Inline</main></body></html>';
+  const html = `${source}${" ".repeat((9 - Buffer.byteLength(source) % 9) % 9)}`;
+  const inner = Buffer.from(html).toString("base64");
+  const graph = Buffer.from(inner).toString("base64");
+  assert.doesNotMatch(graph, /=/u);
+  const entry = await inline(
+    "keel-inline-token-uri-fragment",
+    "entrypoint",
+    "application/vnd.keel.token-uri-base64-fragment",
+    graph,
+    true,
+  );
+  const image = await inline("image", "fallback", "image/svg+xml", '<svg xmlns="http://www.w3.org/2000/svg"/>');
+  const value = baseManifest([entry, image], {
+    id: "inline-graph-viewer",
+    name: "Inline graph viewer",
+    entrypoint: { resource: entry.id, mode: "html" },
+    fallback: { image: image.id, animation: entry.id },
+  });
+  const sandbox = createSandboxDocument(await resolveArtifact(value));
+  assert.match(sandbox.html, /data-inline="ready"/u);
+  assert.doesNotMatch(sandbox.html, /keel-context=/u);
+});
+
+test("viewer decodes a compact percent Inline graph without an inner Base64 document", async () => {
+  const source = '<!doctype html><html><body><main data-inline="escaped">Inline</main></body></html>';
+  const escaped = encodeURIComponent(source);
+  const graph = Buffer.from(escaped).toString("base64");
+  const entry = await inline(
+    "keel-inline-percent-fragment",
+    "entrypoint",
+    "application/vnd.keel.token-uri-percent-fragment",
+    graph,
+    true,
+  );
+  const image = await inline("image", "fallback", "image/svg+xml", '<svg xmlns="http://www.w3.org/2000/svg"/>');
+  const value = baseManifest([entry, image], {
+    id: "inline-percent-viewer",
+    name: "Inline percent viewer",
+    entrypoint: { resource: entry.id, mode: "html" },
+    fallback: { image: image.id, animation: entry.id },
+  });
+  const sandbox = createSandboxDocument(await resolveArtifact(value));
+  assert.match(sandbox.html, /data-inline="escaped"/u);
+  assert.doesNotMatch(sandbox.html, /JTNDSA|data:text\/html;base64/u);
+});
 
 test("stake objects gate the staked entrypoint and expose global/token counters", async () => {
   const value = await manifest();
@@ -579,7 +639,8 @@ test("declared external URLs become local verified aliases instead of runtime ne
   const sandbox = createSandboxDocument(artifact);
   assert.ok(sandbox.html.includes("data:image/svg+xml;base64,"));
   assert.ok(sandbox.html.includes(externalUrl)); // alias table only; runtime lookup is local
-  assert.ok(sandbox.csp.includes("connect-src 'none'"));
+  assert.ok(sandbox.csp.includes("connect-src blob:"));
+  assert.equal(sandbox.csp.includes("connect-src 'none' blob:"), false);
 });
 
 test("sandbox wraps doctype-only HTML so CSP cannot be skipped", async () => {
@@ -615,7 +676,8 @@ test("sandbox materializes static virtual routes and blocks all raw creator netw
   assert.ok(sandbox.html.includes("!sameDocument && !download"));
   assert.ok(sandbox.sandboxTokens.includes("allow-scripts"));
   assert.equal(sandbox.sandboxTokens.includes("allow-same-origin"), false);
-  assert.ok(sandbox.csp.includes("connect-src 'none'"));
+  assert.ok(sandbox.csp.includes("connect-src blob:"));
+  assert.equal(sandbox.csp.includes("connect-src 'none' blob:"), false);
   // Chromium removed CSP `navigate-to`; retaining it only creates a noisy
   // unsupported-directive warning. Navigation stays blocked by the iframe
   // sandbox and the guarded Navigation/Location APIs asserted above.
@@ -773,6 +835,68 @@ test("recursive KeelHold reader verifies leaf and composite objects", async () =
   const controller = new AbortController();
   const result = await reader({ chainId: 1, store: "0x1111111111111111111111111111111111111111", objectId: rootObject }, controller.signal);
   assert.equal(new TextDecoder().decode(result), "left-right");
+});
+
+test("recursive KeelHold reader falls back to verified immutable descriptors", async () => {
+  const payload = new TextEncoder().encode("keel-descriptor-reader");
+  const integrity = await createIntegrity(payload);
+  const objectId = `0x${"44".repeat(32)}`;
+  const descriptorPointer = `0x${"cc".repeat(20)}`;
+  const carrierPointer = `0x${"dd".repeat(20)}`;
+  const media = new TextEncoder().encode("text/plain");
+  const descriptor = Buffer.alloc(93 + media.length + 20);
+  descriptor.set(Buffer.from("4b45454c", "hex"), 0);
+  descriptor[4] = 1;
+  descriptor.writeUInt32BE(1, 8);
+  descriptor.writeBigUInt64BE(BigInt(payload.length), 12);
+  descriptor.writeBigUInt64BE(BigInt(payload.length), 20);
+  descriptor.set(Buffer.from(integrity.digest.slice(2), "hex"), 28);
+  descriptor.set(Buffer.alloc(32, 0x11), 60);
+  descriptor[92] = media.length;
+  descriptor.set(media, 93);
+  descriptor.set(Buffer.from(carrierPointer.slice(2), "hex"), 93 + media.length);
+  const reader = createKeelHoldObjectReader({
+    async getObject() {
+      return {
+        digest: integrity.digest,
+        descriptorPointer,
+        byteLength: payload.length,
+        storedByteLength: payload.length,
+        chunkCount: 1,
+        compression: 0,
+        composite: false,
+      };
+    },
+    async getObjectSlugPointers() { throw new Error("pointer page unavailable"); },
+    async getObjectPartIds() { throw new Error("not composite"); },
+    async getCode({ address }) {
+      return address === descriptorPointer
+        ? new Uint8Array([0, ...descriptor])
+        : new Uint8Array([0, ...payload]);
+    },
+  });
+  const result = await reader(
+    { chainId: 11155111, store: "0x1111111111111111111111111111111111111111", objectId },
+    new AbortController().signal,
+  );
+  assert.equal(new TextDecoder().decode(result), "keel-descriptor-reader");
+  for (const tag of ["53545233", "4f434133", "00000000"]) {
+    descriptor.set(Buffer.from(tag, "hex"), 0);
+    await assert.rejects(reader(
+      {chainId:11155111,store:"0x1111111111111111111111111111111111111111",objectId},
+      new AbortController().signal,
+    ), /Unsupported KeelHold descriptor format/);
+  }
+  descriptor.set(Buffer.from("4b45454c", "hex"), 0);
+  for (const offset of [4,5,6,7]) {
+    const saved=descriptor[offset];descriptor[offset]=255;
+    await assert.rejects(reader(
+      {chainId:11155111,store:"0x1111111111111111111111111111111111111111",objectId},
+      new AbortController().signal,
+    ), /descriptor (format|metadata mismatch)/);
+    descriptor[offset]=saved;
+  }
+
 });
 
 test("manifest loader verifies RFC 8785 JSON and resolves relative resources", async () => {
@@ -952,11 +1076,114 @@ test("sandbox recursively materializes nested text resource references", async (
   assert.ok(css.includes("data:image/svg+xml;base64,"));
 });
 
+test("sandbox resolves creator imports through committed module file aliases", async () => {
+  const entrypoint = await inline(
+    "index.html",
+    "entrypoint",
+    "text/html",
+    '<script src="/content/p5.min.js"></script><script type="module" src="/content/sketch.js"></script>',
+    true,
+    ["/content/index.html"],
+  );
+  const p5 = await inline(
+    "module-p5-js",
+    "script",
+    "text/javascript",
+    'globalThis.p5RuntimeReady = true;',
+    true,
+    ["/content/module-p5-js", "/content/p5.min.js"],
+  );
+  const sketch = await inline(
+    "sketch.js",
+    "script",
+    "text/javascript",
+    'import { marker } from "/content/seeded-random.js"; globalThis.seedMarker = marker;',
+    true,
+    ["/content/sketch.js"],
+  );
+  const seed = await inline(
+    "module-keel-seeded-random",
+    "script",
+    "text/javascript",
+    'export const marker = "seed-alias-ok";',
+    true,
+    ["/content/module-keel-seeded-random", "/content/seeded-random.js"],
+  );
+  const value = baseManifest([entrypoint, p5, sketch, seed], {
+    id: "module-file-aliases",
+    name: "Module file aliases",
+    entrypoint: { resource: "index.html", mode: "html" },
+    fallback: { image: "index.html", animation: "index.html" },
+  });
+  const artifact = await resolveArtifact(value);
+  const route = createVerifiedContentGateway(artifact).resolve("/content/seeded-random.js");
+  assert.equal(route.status, 200);
+  assert.match(new TextDecoder().decode(route.body), /seed-alias-ok/u);
+  const sandbox = createSandboxDocument(artifact);
+  assert.match(sandbox.html, /"\/content\/seeded-random\.js":"module-keel-seeded-random"/u);
+  assert.doesNotMatch(sandbox.html, /src="\/content\//u);
+  assert.doesNotMatch(sandbox.html, /from "\/content\//u);
+  const classicScript = sandbox.html.indexOf('<script src="data:text/javascript;base64,');
+  const creatorModule = sandbox.html.indexOf('<script type="module" src="data:text/javascript;base64,');
+  assert.ok(classicScript >= 0, "the verified classic runtime must be materialized into the sandbox");
+  assert.ok(creatorModule > classicScript, "the creator module must execute after the verified classic runtime");
+});
+
 test("sandbox enables WebAssembly only when explicitly declared", async () => {
   const value = await manifest();
   value.runtime.capabilities.webAssembly = true;
   const sandbox = createSandboxDocument(await resolveArtifact(value));
   assert.ok(sandbox.csp.includes("'wasm-unsafe-eval'"));
+  assert.equal(sandbox.sandboxTokens.includes("allow-same-origin"), false);
+});
+
+test("sandbox mounts manifest-declared Flash through verified Ruffle resources without a nested SWF frame", async () => {
+  const javascript = new TextEncoder().encode("export const ready = true;");
+  const wasm = new Uint8Array([0, 97, 115, 109, 1, 0, 0, 0]);
+  const prepared = await prepareStudioArtifact({
+    id: "flash-sandbox",
+    name: "Ghost Circuit",
+    createdAt: "2026-08-26T00:00:00.000Z",
+    assets: [
+      { fileName: "GhostCircuit.swf", mediaType: "application/x-shockwave-flash", role: "original", bytes: new Uint8Array([67, 87, 83]) },
+      { fileName: "modules/ruffle-loader.js", mediaType: "text/javascript", role: "script", bytes: javascript },
+      { fileName: "modules/seeded-random.js", mediaType: "text/javascript", role: "script", bytes: javascript },
+      { fileName: "modules/flash-edition.js", mediaType: "text/javascript", role: "script", bytes: javascript },
+      { fileName: "runtime/ruffle.js", mediaType: "text/javascript", role: "script", bytes: javascript },
+      { fileName: "runtime/core-modern.js", mediaType: "text/javascript", role: "script", bytes: javascript },
+      { fileName: "runtime/core-legacy.js", mediaType: "text/javascript", role: "script", bytes: javascript },
+      { fileName: "runtime/modern.wasm", mediaType: "application/wasm", role: "script", bytes: wasm },
+      { fileName: "runtime/legacy.wasm", mediaType: "application/wasm", role: "script", bytes: wasm },
+    ],
+    flashRuntime: {
+      swfPath: "GhostCircuit.swf",
+      loaderPath: "modules/ruffle-loader.js",
+      seededRandomPath: "modules/seeded-random.js",
+      editionPath: "modules/flash-edition.js",
+      ruffleMainPath: "runtime/ruffle.js",
+      ruffleModernCorePath: "runtime/core-modern.js",
+      ruffleLegacyCorePath: "runtime/core-legacy.js",
+      ruffleModernWasmPath: "runtime/modern.wasm",
+      ruffleLegacyWasmPath: "runtime/legacy.wasm",
+      collectionSize: 111,
+    },
+  });
+  const inlineResources = prepared.resources.map((item) => ({
+    ...item.resource,
+    sources: [{ kind: "inline", data: encodeBase64(item.decodedBytes), encoding: "base64", integrity: item.decodedIntegrity }],
+  }));
+  const artifact = await resolveArtifact({ ...prepared.manifest, resources: inlineResources });
+  const entrypoint = new TextDecoder().decode(artifact.entrypoint.bytes);
+  assert.match(entrypoint, /loadModule\(/u);
+  assert.match(entrypoint, /loadModule\("modules\/ruffle-loader\.js"\)/u);
+  assert.match(entrypoint, /loadModule\("modules\/seeded-random\.js"\)/u);
+  assert.match(entrypoint, /loadModule\("modules\/flash-edition\.js"\)/u);
+  assert.doesNotMatch(entrypoint, /<iframe\b/iu);
+  const sandbox = createSandboxDocument(artifact);
+  assert.match(sandbox.html, /data-keel-flash-runtime="ruffle"/u);
+  assert.match(sandbox.csp, /frame-src 'none'/u);
+  assert.match(sandbox.csp, /'wasm-unsafe-eval'/u);
+  assert.ok(sandbox.sandboxTokens.includes("allow-scripts"));
   assert.equal(sandbox.sandboxTokens.includes("allow-same-origin"), false);
 });
 
@@ -1171,7 +1398,7 @@ function keelReader({
       case `${keelAddresses.seed}:harnessRegistry`:
         return keelAddresses.viewer;
       case `${keelAddresses.viewer}:effectiveHarness`:
-        return [1n, 0n, 0n, manifestDigest, keelIds.selection, [keelIds.object], [1n]];
+        return [0n, 1n, 0n, manifestDigest, keelIds.selection, [1n], [keelIds.object]];
       case `${keelAddresses.object}:artifactRevisionSource`: {
         const [objectId] = request.args;
         if (objectId === keelIds.gearObject) {
@@ -1180,13 +1407,13 @@ function keelReader({
         return [getAddress(keelAddresses.store), keelIds.content, 1, objectDigest, BigInt(objectBytes.length), 0, "image/svg+xml"];
       }
       case `${keelAddresses.link}:linkExists`:
-        return request.args[2] === 2;
+        return request.args[2] === 1;
       case `${keelAddresses.link}:fidelityLink`:
         return [
           keelIds.object,
           1n,
+          1,
           2,
-          0,
           1,
           0,
           "https://mirror.example/object.svg",
@@ -1199,7 +1426,7 @@ function keelReader({
           keelAddresses.collection,
           true,
         ];
-      case `${keelAddresses.seed}:seedSetForViewerRevision`:
+      case `${keelAddresses.seed}:seedSetForHarnessRevision`:
         return [
           keelIds.viewer,
           1n,
@@ -1237,6 +1464,71 @@ function keelReader({
   };
 }
 
+for (const representation of ["tuple", "named"]) {
+  test(`Harness return order preserves distinct revisions through the viewer (${representation})`, async () => {
+    const objectBytes = new TextEncoder().encode('<svg xmlns="http://www.w3.org/2000/svg"/>');
+    const extension = baseKeelExtension({
+      expectedViewer: { harnessRevision: 2, forkRevision: 3, selectionDigest: keelIds.selection },
+    });
+    const { value, integrity, commitment } = await keelManifest(extension);
+    const base = keelReader({ manifestDigest: integrity.digest, objectBytes });
+    const effective = {
+      forkRevision: 3n, harnessRevision: 2n, keelIndexRevision: 7n,
+      manifestDigest: integrity.digest, selectionDigest: keelIds.selection,
+      selectedObjectRevisions: [1n], slotObjectIds: [keelIds.object],
+    };
+    const result = await bindKeelManifest(value, commitment, {
+      async readContract(request) {
+        if (request.functionName === "effectiveHarness") {
+          return representation === "tuple" ? Object.values(effective) : effective;
+        }
+        return base(request);
+      },
+      blockNumber: 123n,
+    });
+    assert.equal(result.binding.effectiveHarness.forkRevision, 3);
+    assert.equal(result.binding.effectiveHarness.harnessRevision, 2);
+    assert.equal(result.binding.effectiveHarness.keelIndexRevision, 7);
+    assert.deepEqual(result.binding.effectiveHarness.slotObjectIds, [keelIds.object]);
+    assert.deepEqual(result.binding.effectiveHarness.selectedObjectRevisions, [1]);
+  });
+}
+
+test("Keel link decoding covers every locator and its own compression tags", async () => {
+  const objectBytes = new TextEncoder().encode('<svg xmlns="http://www.w3.org/2000/svg"/>');
+  const { value, integrity, commitment } = await keelManifest(baseKeelExtension());
+  const reader = keelReader({ manifestDigest: integrity.digest, objectBytes });
+  const uris = ["ipfs://content", "ipns://name", "https://mirror.example/object.svg", "ar://transaction"];
+  const names = ["none", "gzip", "brotli", "deflate"];
+  for (let scheme = 0; scheme < uris.length; scheme++) {
+    for (let code = 0; code < names.length; code++) {
+      const result = await resolveKeelArtifact(value, commitment, {
+        async readContract(request) {
+          const result = await reader(request);
+          if (request.address === keelAddresses.link && request.functionName === "fidelityLink") {
+            const record = [...result];
+            record[3] = scheme; record[5] = code; record[6] = uris[scheme];
+            return record;
+          }
+          return result;
+        },
+        blockNumber: 123n,
+        adapters: {
+          async fetch() { assert.fail("Native storage must not fetch the declared link."); },
+          async readOnchainObject() { return objectBytes; },
+          async customDigest(_algorithm, bytes) { return keccak256(bytes, "bytes"); },
+        },
+      });
+      const link = result.binding.objects[0].fidelityLinks[0];
+      assert.equal(link.fidelity, 1);
+      assert.equal(link.scheme, scheme);
+      assert.equal(link.uri, uris[scheme]);
+      assert.equal(link.compression, names[code]);
+      assert.equal(result.binding.objects[0].source.storageCompression, "none");
+    }
+  }
+});
+
 test("Keel reads the chain by default and never touches the declared mirror", async () => {
   // The default transport is the chain the proof lives on. A mirror that is
   // still declared, still committed, and still byte-identical is simply not
@@ -1269,7 +1561,7 @@ test("Keel reads the chain by default and never touches the declared mirror", as
   assert.deepEqual(audits.map(entry => entry.status), ["loaded"]);
 });
 
-test("Keel binds exact viewer state and falls back from a corrupt hybrid to verified Keccak onchain bytes", async () => {
+test("Keel native binding overrides a caller requesting a remote mirror", async () => {
   const objectBytes = new TextEncoder().encode('<svg xmlns="http://www.w3.org/2000/svg"><rect width="9" height="9"/></svg>');
   const { value, integrity, commitment } = await keelManifest(baseKeelExtension());
   const reader = keelReader({ manifestDigest: integrity.digest, objectBytes });
@@ -1277,14 +1569,11 @@ test("Keel binds exact viewer state and falls back from a corrupt hybrid to veri
     readContract: reader,
     blockNumber: 123n,
     sourceAllowlist: ["mirror.example"],
-    // Mirror-first is opt-in now. The corrupt-mirror rejection it proves still
-    // has to work for anyone who turns it on, so the proof runs against the
-    // opt-in rather than being deleted with the default.
+    // A transport preference cannot authorize a native-to-remote downgrade.
     gatewayTransport: "preferred",
     adapters: {
       async fetch(url) {
-        assert.equal(url, "https://mirror.example/object.svg");
-        return fetchResponse(url, new TextEncoder().encode("corrupt mirror"));
+        assert.fail(`Native binding must not fetch a mirror: ${url}`);
       },
       async readOnchainObject({ objectId }) {
         assert.equal(objectId, keelIds.content);
@@ -1300,7 +1589,7 @@ test("Keel binds exact viewer state and falls back from a corrupt hybrid to veri
   assert.equal(result.binding.objects[0].fidelityLinks.length, 1);
   assert.equal(result.artifact.resources.get("image").source.kind, "onchain");
   const audits = result.artifact.audit.entries.filter(entry => entry.resourceId === "image");
-  assert.deepEqual(audits.map(entry => entry.status), ["failed", "loaded"]);
+  assert.deepEqual(audits.map(entry => entry.status), ["loaded"]);
 });
 
 test("Keel live injection pins reads while exposing only manifest-declared context fields", async () => {
@@ -1913,10 +2202,35 @@ test("Keel replay requires the contract-derived seed and a pinned exact viewer s
   const bound = await bindKeelManifest(value, commitment, { readContract: reader, blockNumber: 123n });
   assert.equal(bound.binding.seed.derivedTokenSeed, derivedSeed);
 
+  // Named tuple results use the contract's Harness fields, just like ABI decoders.
+  const namedReader = async request => {
+    const result = await reader(request);
+    if (request.functionName !== "seedSetForHarnessRevision") return result;
+    return Object.fromEntries([
+      "harnessId", "harnessRevision", "collection", "harnessManifestDigest", "rootSeed",
+      "provenanceDigest", "createdAt", "publisher", "revealer", "exists",
+    ].map((name, index) => [name, result[index]]));
+  };
+  const named = await bindKeelManifest(value, commitment, { readContract: namedReader, blockNumber: 123n });
+  assert.deepEqual(named.binding.seed, bound.binding.seed);
+  const wrongHarnessReader = async request => {
+    const result = await namedReader(request);
+    return request.functionName === "seedSetForHarnessRevision"
+      ? { ...result, harnessId: `0x${"ee".repeat(32)}` } : result;
+  };
+  await assert.rejects(
+    () => bindKeelManifest(value, commitment, { readContract: wrongHarnessReader, blockNumber: 123n }),
+    /seed set does not match/i,
+  );
+
   const mismatched = structuredClone(value);
   mismatched.runtime.determinism.seed = `0x${"cd".repeat(32)}`;
+  const mismatchCommitment = structuredClone(commitment);
+  mismatchCommitment.integrity = await manifestIntegrity(mismatched);
+  mismatchCommitment.registry.presentation.manifestDigest = mismatchCommitment.integrity.digest;
+  const mismatchReader = keelReader({ manifestDigest: mismatchCommitment.integrity.digest, objectBytes, derivedSeed });
   await assert.rejects(
-    () => bindKeelManifest(mismatched, commitment, { readContract: reader, blockNumber: 123n }),
+    () => bindKeelManifest(mismatched, mismatchCommitment, { readContract: mismatchReader, blockNumber: 123n }),
     /replay seed does not match/i,
   );
   await assert.rejects(
@@ -1947,13 +2261,17 @@ test("Keel exact equipment overlays a manifest resource only after loadout and s
 
   const wrong = structuredClone(value);
   wrong.extensions["keel.runtime"].equipment.expectedLoadoutDigest = `0x${"ef".repeat(32)}`;
+  const wrongCommitment = structuredClone(commitment);
+  wrongCommitment.integrity = await manifestIntegrity(wrong);
+  wrongCommitment.registry.presentation.manifestDigest = wrongCommitment.integrity.digest;
+  const wrongReader = keelReader({ manifestDigest: wrongCommitment.integrity.digest, objectBytes, gearBytes });
   await assert.rejects(
-    () => bindKeelManifest(wrong, commitment, { readContract: reader, blockNumber: 123n }),
+    () => bindKeelManifest(wrong, wrongCommitment, { readContract: wrongReader, blockNumber: 123n }),
     /loadout does not match/i,
   );
 });
 
-async function contractPluginFixture() {
+async function contractPluginFixture(view = false) {
   const chainId = 31338;
   const graphRegistry = "0x1111111111111111111111111111111111111111";
   const pluginRegistry = "0x2222222222222222222222222222222222222222";
@@ -1974,8 +2292,8 @@ async function contractPluginFixture() {
       label: "Buy NFT",
       target: "plugin-contract",
       selector: "0x12345678",
-      stateMutability: "payable",
-      valuePolicy: "exact-quote",
+      stateMutability: view ? "view" : "payable",
+      valuePolicy: view ? "zero" : "exact-quote",
       confirmation: "Buy this exact token using the verified listing quote.",
     },
   ];
@@ -2063,6 +2381,7 @@ async function contractPluginFixture() {
       },
     ],
   };
+  if (view) outerManifest.extensions = { "keel-read-intents@1": { enabled: true, intents: [{ plugin: "keel-market", id: "market.buy" }] } };
   const outer = await resolveArtifact(outerManifest, {
     commitment: { integrity: await manifestIntegrity(outerManifest), digestVerified: true },
   });
@@ -2115,7 +2434,7 @@ async function contractPluginFixture() {
       case "walletAuthorized":
       case "bindingsMatch":
       case "supportsInterface": return true;
-      case "pluginProtocol": return "0x0e0eb5162ca8df7c079e8d31eaf2f514a536c16bf86ea734ab562928f4dac159";
+      case "pluginProtocol": return "0x6047fbc26549c6c27c3ef1062f7c9f92a95a30e97ad66f442f4015552aaf092b";
       case "pluginId": return pluginId;
       case "pluginVersion": return 1n;
       default: throw new Error(`Unexpected plugin read ${request.functionName}`);
@@ -2201,4 +2520,195 @@ test("plugin frame parser accepts only symbolic session-bound market intents", (
     }),
     /proposal/i,
   );
+});
+
+test("editor preview decodes the default saver without adding a Base64 document", async () => {
+  const source = '<!doctype html><html><body><main data-inline="raw">雪 100% # + / =</main></body></html>';
+  const entry = await inline("raw-inline", "entrypoint", "application/vnd.keel.token-uri-raw-percent-fragment", encodeURIComponent(encodeURIComponent(source)), true);
+  const image = await inline("image", "fallback", "image/svg+xml", '<svg xmlns="http://www.w3.org/2000/svg"/>');
+  const value = baseManifest([entry, image], { id: "raw-inline-viewer", name: "Compact viewer",
+    entrypoint: { resource: entry.id, mode: "html" }, fallback: { image: image.id, animation: entry.id } });
+  const sandbox = createSandboxDocument(await resolveArtifact(value));
+  assert.match(sandbox.html, /data-inline="raw">雪 100% # \+ \/ =/u);
+  assert.doesNotMatch(sandbox.html, /%253C!doctype|data:text\/html;base64/u);
+});
+
+
+const viewCapabilities = () => intersectCapabilities([
+  { label: "host", allow: ["network.manifested", "wallet.market.buy"], ceiling: true },
+  { label: "manifest", allow: ["network.manifested", "wallet.market.buy"] },
+], { strictCeiling: true });
+
+test("published read requires manifest enablement before any chain read", async () => {
+  const fixture = await contractPluginFixture();
+  let calls = 0;
+  await assert.rejects(() => createPublishedViewReader({ outer: fixture.outer, plugin: "keel-market", intentId: "market.buy",
+    capabilities: viewCapabilities(), operation: { selector: "0x12345678", encode: () => "0x12345678" },
+    verification: { ...fixture, readContract: async () => { calls++; throw Error("must not read"); } }, read: async () => { calls++; },
+  }), /manifest has not enabled/i);
+  assert.equal(calls, 0);
+});
+
+test("published read preserves host denial before verification networking", async () => {
+  const fixture = await contractPluginFixture(true);
+  let calls = 0;
+  await assert.rejects(() => createPublishedViewReader({ outer: fixture.outer, plugin: "keel-market", intentId: "market.buy",
+    capabilities: intersectCapabilities([{ label: "host", allow: [], ceiling: true }]),
+    operation: { selector: "0x12345678", encode: () => "0x12345678" },
+    verification: { ...fixture, readContract: async () => { calls++; throw Error("must not read"); } }, read: async () => { calls++; },
+  }), /host capability policy denies/i);
+  assert.equal(calls, 0);
+});
+
+test("published view verifies registry and pins target, selector and block", async () => {
+  const fixture = await contractPluginFixture(true);
+  const calls = [];
+  const reader = await createPublishedViewReader({ outer: fixture.outer, plugin: "keel-market", intentId: "market.buy",
+    capabilities: viewCapabilities(), operation: { selector: "0x12345678", encode: proposal => proposal },
+    verification: fixture, read: async request => { calls.push(request); return "0x01"; },
+  });
+  assert.equal(await reader.read("0x12345678"), "0x01");
+  assert.equal(calls[0].address, "0x3333333333333333333333333333333333333333");
+  assert.equal(calls[0].blockNumber, 91n);
+  assert.equal(calls[0].blockHash, `0x${"99".repeat(32)}`);
+  await assert.rejects(() => reader.read("0xffffffff"), /outside its published intent/i);
+  assert.equal(calls.length, 1);
+});
+
+
+test("a post-verification manifest toggle cannot enable network reads", async () => {
+  const fixture = await contractPluginFixture();
+  fixture.outer.manifest.extensions = { "keel-read-intents@1": { enabled: true, intents: [{ plugin: "keel-market", id: "market.buy" }] } };
+  let calls = 0;
+  await assert.rejects(() => createPublishedViewReader({ outer: fixture.outer, plugin: "keel-market", intentId: "market.buy",
+    capabilities: viewCapabilities(), operation: { selector: "0x12345678", encode: () => "0x12345678" },
+    verification: { ...fixture, readContract: async () => { calls++; throw Error("must not read"); } }, read: async () => { calls++; },
+  }), /manifest changed after verification/i);
+  assert.equal(calls, 0);
+});
+
+test("native plugin marker matches the deployed registry protocol domain", () => {
+  assert.equal(KEEL_CONTRACT_PLUGIN_PROTOCOL_HASH, keccak256(utf8ToBytes("keel.contract-plugin.v1")));
+});
+
+for (const preference of [{ gatewayTransport: 'preferred' }, { gatewayTransport: 'fallback' }, { sourcePreference: 'hybrid-first' }]) {
+  test(`native revision cannot reconnect declared remote or foreign-chain sources: ${JSON.stringify(preference)}`, async () => {
+    const objectBytes = utf8ToBytes('<svg xmlns="http://www.w3.org/2000/svg"/>');
+    const { value, commitment } = await keelManifest(baseKeelExtension());
+    const image = value.resources.find(resource => resource.id === 'image');
+    const integrity = { algorithm: 'keccak256', digest: keccak256(objectBytes), byteLength: objectBytes.length };
+    image.sources = [
+      ...['https://mirror.example/object.svg', 'ipfs://bafy-test/object.svg', 'ar://test-object'].map(uri => ({ kind: 'uri', uri, integrity })),
+      { kind: 'onchain', chainId: 1, store: keelAddresses.store, objectId: keelIds.content, integrity },
+      { kind: 'contract-call', chainId: 31337, to: keelAddresses.store, data: '0x12345678', decode: 'bytes', integrity },
+    ];
+    commitment.integrity = await manifestIntegrity(value);
+    commitment.registry.presentation.manifestDigest = commitment.integrity.digest;
+    let remoteCalls = 0;
+    await assert.rejects(() => resolveKeelArtifact(value, commitment, {
+      ...preference,
+      blockNumber: 123n,
+      readContract: keelReader({ manifestDigest: commitment.integrity.digest, objectBytes }),
+      adapters: {
+        async fetch() { remoteCalls++; throw new Error('Remote fallback must not run'); },
+        async callContract() { remoteCalls++; throw new Error('Old contract source must not run'); },
+        async readOnchainObject(request) {
+          assert.equal(request.chainId, 31337);
+          throw new Error('native RPC unavailable');
+        },
+        async customDigest(_algorithm, bytes) { return keccak256(bytes, 'bytes'); },
+      },
+    }), /native RPC unavailable/);
+    assert.equal(remoteCalls, 0);
+  });
+}
+
+test('native binding rejects a URL added after the revision manifest was committed', async () => {
+  const { value, commitment } = await keelManifest(baseKeelExtension());
+  value.resources.find(resource => resource.id === 'image').sources.push({
+    kind: 'uri', uri: 'https://undeclared.example/payload.svg',
+    integrity: { algorithm: 'sha256', digest: `0x${'11'.repeat(32)}`, byteLength: 1 },
+  });
+  let reads = 0;
+  await assert.rejects(() => bindKeelManifest(value, commitment, {
+    blockNumber: 123n,
+    async readContract() { reads++; throw new Error('Must reject before any chain reads'); },
+  }), /declaration does not match/);
+  assert.equal(reads, 0);
+});
+
+test('native binding snapshots declarations before asynchronous chain reads', async () => {
+  const objectBytes = utf8ToBytes('<svg xmlns="http://www.w3.org/2000/svg"/>');
+  const { value, commitment } = await keelManifest(baseKeelExtension());
+  const reader = keelReader({ manifestDigest: commitment.integrity.digest, objectBytes });
+  const bound = await bindKeelManifest(value, commitment, {
+    blockNumber: 123n,
+    readContract(request) {
+      value.resources.find(resource => resource.id === 'image').aliases = ['https://undeclared.example/injected'];
+      return reader(request);
+    },
+  });
+  assert.ok(!bound.manifest.resources.find(resource => resource.id === 'image').aliases?.includes('https://undeclared.example/injected'));
+});
+
+for (const fork of [false, true]) {
+  test(`viewer resolves a pinned child Harness ${fork ? 'fork' : 'base'} before resource binding`, async () => {
+    const objectBytes = new TextEncoder().encode('<svg xmlns="http://www.w3.org/2000/svg"/>');
+    const {value, integrity, commitment} = await keelManifest(baseKeelExtension({expectedViewer:{harnessRevision:1,forkRevision:fork?1:0,selectionDigest:keelIds.selection}}));
+    const base = keelReader({manifestDigest:integrity.digest,objectBytes});
+    const calls=[];
+    const result=await bindKeelManifest(value,commitment,{
+      blockNumber:123n,
+      async readContract(request) {
+        calls.push(request);
+        if(request.functionName==='effectiveHarness') return [fork?1n:0n,1n,fork?3n:0n,integrity.digest,keelIds.selection,[],[]];
+        if(request.functionName===(fork?'tokenForkTree':'harnessTree')) return [1n|(2n<<8n)|(1n<<16n),[(7n<<32n)|2n]];
+        if(request.functionName==='harnessNode') {
+          assert.deepEqual(request.args,[7,2]);assert.equal(request.blockNumber,123n);
+          return [0n,[],[keelIds.object],[1n]];
+        }
+        return base(request);
+      },
+    });
+    assert.deepEqual(result.binding.effectiveHarness.slotObjectIds,[keelIds.object]);
+    assert.equal(calls.filter(c=>c.functionName==='harnessNode').length,1);
+    assert.equal(calls.filter(c=>c.functionName===(fork?'harnessTree':'tokenForkTree')).length,0);
+  });
+}
+
+for (const collectionScoped of [false, true]) test(`logical release disclosure reads the pinned token (${collectionScoped ? "collection" : "token"} manifest)`, async () => {
+  const {encodeKeelReleasePolicy}=await import('../packages/protocol/dist/index.js');
+  const mintRouter='0x1111111111111111111111111111111111111111';
+  const extension=baseKeelExtension({tokenId:collectionScoped?'$anchor.tokenId':'7',mintRouter,injection:{protocol:'keel-injection@1',fields:['collection.release']}});
+  const {value,integrity,commitment}=await keelManifest(extension,undefined,collectionScoped?{collection:keelAddresses.collection,tokenId:'0',scope:'collection',requestTokenId:'7'}:undefined);
+  const blockHash=`0x${'de'.repeat(32)}`;
+  const baseReader=keelReader({manifestDigest:integrity.digest,objectBytes:new TextEncoder().encode('<svg xmlns="http://www.w3.org/2000/svg"/>')});
+  let snapshotReads=0;
+  const reader=async request=>{
+    if(request.functionName!=='releaseSnapshot')return baseReader(request);
+    snapshotReads++;assert.equal(request.address,mintRouter);assert.equal(request.blockHash,blockHash);assert.equal(request.blockNumber,123n);
+    assert.deepEqual(request.args,[keelAddresses.collection,7n]);
+    return [2n,5n,encodeKeelReleasePolicy({mode:'adjustable',limit:10n,ceiling:20n})|5n,100n,keelAddresses.collection];
+  };
+  const options={readContract:reader,blockNumber:123n,blockHash,blockTimestamp:1700000000n};
+  const bound=await bindKeelManifest(value,commitment,options);
+  const disclosure=bound.binding.runtimeContext.releaseDisclosure;
+  assert.equal(snapshotReads,1);assert.equal(disclosure.releaseId,'2');assert.equal(disclosure.localId,'5');
+  assert.equal(disclosure.source,'pinned-rpc');assert.match(JSON.stringify(disclosure.rows),/Adjustable maximum/);
+  await assert.rejects(()=>bindKeelManifest(value,commitment,{readContract:reader}),/pinned/);
+  await assert.rejects(()=>bindKeelManifest(value,commitment,{...options,readContract:async request=>request.functionName==='releaseSnapshot'?Promise.reject(Error('unassigned token')):reader(request)}),/unassigned/);
+});
+
+
+test("sandbox rejects forged supply labels and mismatched snapshot identity", async () => {
+  const {encodeKeelReleasePolicy,describeKeelReleasePolicy}=await import('../packages/protocol/dist/index.js');
+  const artifact=await resolveArtifact(await manifest());
+  const policyWord=encodeKeelReleasePolicy({mode:'adjustable',limit:10n,ceiling:20n}).toString();
+  const blockHash=`0x${'cd'.repeat(32)}`;
+  const release={source:'pinned-rpc',router:keelAddresses.collection,collection:keelAddresses.collection,authority:keelAddresses.collection,releaseId:'1',localId:'1',policyWord,targetMaximum:'100',blockNumber:'123',blockHash,rows:describeKeelReleasePolicy(policyWord)};
+  const context={protocol:'keel-context@1',blockNumber:'123',blockHash,releaseDisclosure:release};
+  assert.match(createSandboxDocument(artifact,{runtimeContext:context}).html,/Adjustable maximum/);
+  for(const invalid of [{...release,rows:[['Supply policy','Fixed maximum']]},{...release,blockNumber:'124'},{...release,releaseId:'0'},{...release,localId:(1n<<64n).toString()},{...release,policyWord:(1n<<254n).toString()}]) {
+    assert.throws(()=>createSandboxDocument(artifact,{runtimeContext:{...context,releaseDisclosure:invalid}}));
+  }
 });

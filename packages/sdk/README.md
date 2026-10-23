@@ -2,6 +2,63 @@
 
 Framework-neutral types, validation, ABIs, and EIP-712 helpers for the Keel contracts. The package deliberately does not depend on a wallet stack; its output can be passed to viem, ethers, wagmi, a relayer, or a smart-account client.
 
+## Choose Inline, Hybrid, or IPFS without changing storage
+
+KEEL uses a small uncompressed **boot shell** plus a digest-bound **resource
+graph**. Heavy child scripts, modules, assets, and data may be Brotli/Gzip/
+Deflate-compressed; the committed browser/WASM decoder expands them only after
+their stored bytes verify. The Solidity builder does not decompress Brotli.
+Gzip/Deflate use a capability-checked browser decoder path; Brotli uses an
+exact declared KEEL decoder module, normally the reusable thin WASM module
+published once per chain. Creator plans reference that module and must not
+carry another copy.
+
+For Node-side publication planning, `@keel/sdk/inline-viewer-graph` builds the
+once-per-chain Gzip shell/module fragments and the creator's ordered composite
+root. It reports creator publication bytes separately and rejects a shared
+fragment that is missing from the selected chain/store.
+
+- **Inline** means `animation_url` is the complete onchain-assembled
+  `data:text/html` document. It has no gateway, IPFS, `/content`, or RPC fetch.
+- **Hybrid** can still be entirely native KEEL storage. Its boot shell resolves
+  exact onchain objects through an RPC reader.
+- **IPFS** is an explicit external delivery selection and is never inferred
+  from Hybrid.
+
+Use `assessKeelInlinePresentation` from `@keel/sdk/presentation` before wallet
+review. It enforces the uncompressed root, 2 MB reconstruction ceiling,
+self-contained document, and configured-builder boundary. The exact builder
+read must also pass the 30M-gas public-RPC safety check. See
+[`docs/KEEL_PRESENTATION.md`](../../docs/KEEL_PRESENTATION.md) for the complete
+contract and SDK terminology.
+
+For binary KEEL resources, the optional canonical `onchain-recursive` profile stores compressed streams directly and returns small committed descriptors. It uses a governed, block-pinned reader and preserves independently revisioned resource handles. See [`docs/KEEL_BINARY_RESOURCE_DELIVERY.md`](../../docs/KEEL_BINARY_RESOURCE_DELIVERY.md) for storage versus presentation accounting, bounds and publication gates.
+
+## Stage creator projects without manufacturing a shell
+
+`stageKeelStudioProject` treats an omitted `viewer` as the canonical KEEL Inline
+graph selector (`keel-verification-shell`) and sends the existing canonical
+publication intent. `viewer: "none"` is the explicit artifact/storage-only
+opt-out and suppresses that intent. During later Studio preparation, the
+selected chain resolves the catalog-backed, pre-encoded Inline graph and must
+fail closed if that catalog is incomplete. Agents may stage only creator
+resources and modules; they must never manufacture or upload a local file
+declared as the default KEEL shell, a protected-harness wrapper, or a local
+replacement wrapper when catalog resolution fails. A creator-authored HTML file
+is ordinary project content, not a replacement shell.
+
+For one standalone image, video, or self-contained GLB, the canonical Inline
+composition is fixed: registered `keel-verification-shell`, registered
+`keel.asset-display@1`, then the direct creator media entrypoint. It is never a
+zero-module project and never writes a creator `index.html` wrapper. Use
+`buildKeelInlineNormalMediaDocument` to prepare that graph and
+`buildKeelRegisteredInlineNormalMediaTokenURIGraph` only after the selected
+chain supplies the exact shell-prefix, asset-display, and shell-suffix objects.
+The display module renders image and video data URLs and a self-contained GLB
+with WebGL; it has no network or wallet authority. AVIF and WebP entries are
+decoded onto their intrinsic-size canvas so a collector can right-click and
+save a PNG without adding a project-specific viewer.
+
 ## Discover a Studio before uploading
 
 `fetchStudioCapabilities` reads the non-mutating
@@ -187,10 +244,37 @@ Ethereum target, operation shapes, and SHA-256 envelope integrity while keeping
 encode ABI calldata, perform Tezos packing, query a chain, or expose a private
 key. Use `verifyKeelPublishReviewPlan` before handing the envelope to a
 future contract-specific adapter; generic Tezos descriptors fail closed until
-that adapter exists. Its `identifierSemantics` field makes clear that builder
+that adapter exists. The native Tezos FA2 adapter is exposed separately through
+`tezos-publication.ts`: `buildKeelCollectionSetTokenMetadata` writes ordinary
+FA2/TZIP-12 token metadata (including `onchfs://` or IPFS carriers),
+`buildKeelCollectionSetTokenJson` preserves the additive KEEL sleeve route, and
+`buildKeelCollectionFreezeTokenMetadata` permanently welds the reviewed values.
+Its `identifierSemantics` field makes clear that builder
 logical IDs are not chain IDs, and local source paths are deliberately omitted
 from the committed summary; adapters must bind their own workspace and
 recompute byte/receipt proofs.
+
+## Publish only an existing graph's changed module
+
+Use `planKeelGraphRevision` before planning an upload for an existing
+`KeelGraphRegistry` graph. Pass the live selected-chain snapshot, its exact
+next candidate version, and the one logical resource that changed. The
+automatic gate rejects any added, removed, renamed, reinterpreted, or
+undeclared resource; every unchanged resource must retain its exact object ID,
+integrity, version, role, media type, and measured byte length.
+
+The result separates `newStoredBytes` from `reusedStoredBytes` and exposes only
+the declared resource as uploadable. `assertKeelRevisionUploadMatchesPlan`
+then binds the chain-plan source digest, byte length, and media type to that
+resource. Identical-byte copies, non-sequential versions, and automatic deltas
+above 65,536 stored bytes fail before wallet review. A `follow-latest` binding
+publishes and activates the next graph version without rewriting the token
+presentation; a pinned binding updates only its small version reference.
+
+The MCP `publish-plan` tool requires a `publicationIntent`. Studio and the
+desktop derive it from the target's saved publication state so creators do not
+choose protocol mechanics. `existing-graph-revision` also requires the full
+revision input and recomputes the gate before returning a review envelope.
 
 ## Authorization semantics
 
@@ -248,6 +332,52 @@ onchain with `setStageMerkleRoot`, and have the wallet call `merkleMint` with it
 allowance and proof. The contract records consumed Merkle allowance per wallet
 and emits the root update so an indexer can rebuild the access state.
 
+### ERC-1155 item drops and creator collections
+
+`buildOneMintItemDrop` mirrors `OneMintController.createItemDrop`. It commits
+the ERC-1155 item id in the reviewed operation, so collector `mintData` cannot
+redirect a purchase to another item.
+
+Use `buildKeelCreator721Config` or `buildKeelCreator1155Config` before encoding
+a `KeelCreatorFactory` call. Both builders validate UTF-8 bounds, metadata
+digests, royalties, and integer widths. Shared ERC-1155 token ids are
+deterministic:
+
+Factory deployment is a separate release step: deploy the ERC-721A, standard
+ERC-721, and ERC-1155 implementations first, then pass those addresses with the
+mint manager and renderer to the factory constructor. The generated
+`KeelCreatorFactory` ABI contains that exact five-address constructor. Collection
+wallet builders call an already deployed, read-back-verified factory; they do
+not deploy or choose its implementations.
+
+```ts
+import {
+  keelSharedCollectionIdOf,
+  keelSharedItemIndexOf,
+  keelSharedTokenId,
+} from "@keel/sdk";
+
+const tokenId = keelSharedTokenId(logicalCollectionId, itemIndex);
+keelSharedCollectionIdOf(tokenId); // high 128 bits
+keelSharedItemIndexOf(tokenId);    // low 128 bits
+```
+
+For an agent-assisted collection, use
+`prepareKeelCreatorCollectionWalletReview`. It resolves one exact factory and
+renderer pair from the generated chain registry, returns one review-only
+EIP-5792 `wallet_sendCalls` request, and returns the durable operation envelope
+that Studio must save before submission. The envelope explicitly tracks the
+plan digest, cursor, receipts, completed and failed indexes, and read-back; a
+timeout must be reconciled before another approval is allowed. Missing or
+ambiguous deployments return `blocked` and no wallet request.
+
+The creator token contract is only the ownership/supply shell. `tokenURI`,
+ERC-1155 `uri`, and `contractURI` delegate to the shared KEEL renderer. The
+verification shell, p5, gzip loader, and other reusable modules are not copied
+into every creator collection or item; only project-specific object bindings
+belong to the work. A complete inline `animation_url` may still be returned at
+read time without duplicating those shared module bytes in token storage.
+
 ## Cool S release-readiness surface
 
 The SDK exports the creator-owned Cool S shell, visual registry, target table,
@@ -272,3 +402,54 @@ use `CoolSLinkedLibraryDeployment` for `KeelHarnessContextDispatch`,
 `KeelCollectionFreezeValidation`, and
 `KeelMintBoundEquipmentProvision`. Library addresses remain deployment
 evidence, not shell getter facts.
+
+### Manager errors and events
+
+Use the compiler-owned manager and recovery-proxy ABIs through browser-safe subpaths:
+
+```ts
+import { decodeKeelManagerError } from "@keel/sdk/manager-errors";
+import { decodeKeelManagerLog } from "@keel/sdk/manager-events";
+
+const failure = decodeKeelManagerError(revertData);
+const event = decodeKeelManagerLog({ topics: log.topics, data: log.data });
+```
+
+Both return `null` for unknown or malformed input and make no RPC request. Match the
+emitting manager address before trusting a log. RPC list events expose `digest`,
+`revision`, `epoch` and `hostCount`; recovery logs include both epochs and the roster.
+
+### Manager read snapshots
+
+Use `governanceState()` for `{ threshold, nonce, epoch, changeNonce }`,
+`executionPolicyState(target, selector)` for `{ maxValue, minimumTier, enabled, nonce }`,
+and `automationKeyState(signer)` for `{ validUntil, nonce, generation }`.
+These replace the separate counter/policy/key getters. `governanceEpoch()` and
+`executionMode()` remain narrow reads for contract authorization. Snapshot types
+are return values; they add no storage and preserve recovery-based key retirement.
+
+## Runtime module discovery
+
+See [runtime module discovery and reuse](../../docs/KEEL_RUNTIME_MODULE_DISCOVERY.md) for the shared SDK/API/MCP lookup, unverified module sandbox, coverage limits, and browser MP4 encoding workflow. Empty catalog results never authorize rebuilding an existing module.
+
+
+### Seed request and reveal lifecycle
+
+Import `readKeelSeedStatus` and `buildKeelSeedAction` from
+`@keel/sdk/mint-seed-lifecycle`. The reader resolves a token's batch and separates
+waiting, missing history, request-needed, ready-to-reveal and revealed states.
+It also checks the sending wallet's credits or request authority when needed.
+Supply the chosen chain and a matching block hash/number; pin every transport
+read to that canonical block hash. RPC errors propagate instead of becoming
+pending status.
+
+The action builder accepts `buy-credits`, `request`, `reveal` or `deliver` and
+returns exact unsigned calldata/native value for review. Use bigint or canonical
+decimal text for IDs and prices. Refresh price and status before signing; these
+helpers never send transactions, fund a Chainlink subscription or promise that a
+coordinator will fulfill a request. One VRF request covers one committed mint
+batch; unrelated minters do not share pending requests.
+
+### Contract SVG renderer
+
+Use `@keel/sdk/svg-renderer-authoring` to create editable designs, deterministic previews and reusable Solidity renderers. Use `@keel/sdk/svg-renderer` to read native contract SVGs, inspect hidden proof provenance and compare complete SVG bytes against finalized contract output. See [the renderer guide](../../docs/KEEL_SVG_RENDERER.md).

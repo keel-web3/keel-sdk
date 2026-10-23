@@ -8,8 +8,12 @@ import { buildKeelModule, initKeelModule, planKeelModule } from "./module-pipeli
 import { testKeelModule, verifyKeelModuleCandidate } from "./module-testing.js";
 import { buildKeelWorkspace, indexKeelWorkspace, testKeelWorkspace, verifyKeelWorkspaceRegistrations } from "./module-workspace.js";
 import { bumpKeelModuleRegistration, registerKeelModuleFromOrigin } from "./module-registration.js";
+import { runModuleAuthoringCommand } from "./module-authoring-cli.js";
+import { installKeelModule } from "./module-install.js";
 import { verifyKeelModuleFromOrigin } from "./module-verification.js";
+import { KEEL_MODULE_BUILD_OPTIONS } from "./build-recipe.js";
 import { analyzeCost } from "./cost-analysis.js";
+import { applyMediaOptimization, planMediaOptimization } from "./media-optimization.js";
 import { analyzeMedia, runMediaPipeline, verifyBuiltArtifact } from "./pipeline.js";
 import { createRecursiveUploadPlan } from "./recursive-plan.js";
 import { wrapImage } from "./wrap.js";
@@ -52,8 +56,34 @@ function required(value: string | undefined, message: string): string {
   return value;
 }
 
-function output(value: unknown, json: boolean, summary: string): void {
-  process.stdout.write(json ? `${JSON.stringify(value, null, 2)}\n` : `${summary}\n`);
+function yamlScalar(value: string | number | boolean | null): string {
+  return JSON.stringify(value);
+}
+
+function yaml(value: unknown, depth = 0): string {
+  const indent = "  ".repeat(depth);
+  if (value === null || typeof value === "string" || typeof value === "number" || typeof value === "boolean") return `${indent}${yamlScalar(value)}`;
+  if (Array.isArray(value)) {
+    if (value.length === 0) return `${indent}[]`;
+    return value.map((entry) => {
+      if (entry === null || typeof entry !== "object") return `${indent}- ${yamlScalar(entry as string | number | boolean | null)}`;
+      return `${indent}-\n${yaml(entry, depth + 1)}`;
+    }).join("\n");
+  }
+  if (typeof value === "object") {
+    const entries = Object.entries(value as Record<string, unknown>).sort(([left], [right]) => left.localeCompare(right));
+    if (entries.length === 0) return `${indent}{}`;
+    return entries.map(([key, entry]) => {
+      if (entry === null || typeof entry !== "object") return `${indent}${yamlScalar(key)}: ${yamlScalar(entry as string | number | boolean | null)}`;
+      return `${indent}${yamlScalar(key)}:\n${yaml(entry, depth + 1)}`;
+    }).join("\n");
+  }
+  throw new TypeError("YAML output only supports JSON-compatible values.");
+}
+
+function output(value: unknown, json: boolean, summary: string, yamlOutput = false): void {
+  if (json && yamlOutput) throw new TypeError("Choose either --json or --yaml, not both.");
+  process.stdout.write(json ? `${JSON.stringify(value, null, 2)}\n` : yamlOutput ? `${yaml(value)}\n` : `${summary}\n`);
 }
 
 const MAX_COST_INPUT_BYTES = 256 * 1024 * 1024;
@@ -79,21 +109,25 @@ function usage(): string {
 
 Commands:
   keel module init <dir> [--name <name>]
-  keel module build <dir> [--keep-comments] [--stamp <file>] [--no-compact] [--json]
+  keel module build <dir> [--keep-comments] [--stamp <file>] [--no-compact] [--no-types] [--json]
   keel module build --all [--root <workspace>] [--keep-comments] [--stamp <file>] [--json]
   keel module test <dir> [--json]
   keel module test --all [--root <workspace>] [--json]
   keel module compact <dir> --candidate <file> [--json]
   keel module index [--root <workspace>] [--repository <url>] [--json]
+  keel module observe --file <script.js> --out <discovery.html>
+  keel module infer --file <script.js> --observation <json> --name <id> --out <new-package-directory>
+  keel module editor [--root <project>] [--entry src/art.ts] [--includes keel.includes.json] [--watch]
+  keel module install --repo <owner/name> --commit <sha> --version <v> --expect <sha256> [--name <id>] [--root <project>]
   keel module verify --repo <owner/name> --commit <sha> [--path <dir>] [--entry src/index.ts]
-    [--expect <0xdigest>] [--no-compact] [--json]
+    [--format esm|iife|cjs] [--external <a,b>] [--expect <0xdigest>] [--no-compact] [--json]
   keel module verify --all [--root <workspace>] [--json]
   keel module bump <dir> --commit <sha> [--version <v>] [--summary <text>] [--json]
   keel module register --repo <owner/name> --commit <sha> --out <dir> [--path <dir>]
     [--entry src/index.ts] [--id <id>] [--category <name>] [--owner-user <handle>]
     [--owner-org <id>] [--owner-group <id>] [--owner-member <id>] [--license MIT]
     [--summary <text>] [--version 0.1.0] [--json]
-  keel module plan <dir> [--chain-id 11155111] [--address <0x...>] [--json]
+  keel module plan <dir> [--chain-id 11155111] [--address <0x...>] [--compression auto|gzip|deflate|brotli|none] [--json]
   keel analyze <input> [--media-type <type>] [--json]
   keel build <input> --out <directory> --created-at <ISO date> [--name <name>] [--description <text>]
     [--id <id>] [--quality 82] [--creator <value>] [--source-repository <value>]
@@ -101,6 +135,8 @@ Commands:
   keel verify <release-directory> [--manifest <file-name>] [--json]
   keel cost <input> [--media-type <type>] [--compression auto|none|brotli|gzip|deflate]
     [--chunk-bytes 23000] [--leaf-bytes 524288] [--parts 64] [--max-depth 8] [--json]
+  keel optimize <input> [--media-type <type>] [--quality 82] [--effort 6] [--video-crf 32] [--video-cpu-used 4]
+    [--storage-mode <mode>] [--json|--yaml] [--apply --out <new-file.{webp,webm,glb}>]
   keel module-resolve <snapshot.json> (--name <name> | --digest <0xsha256> --byte-length <n>)
     [--namespace npm|keel|github] [--version <version>] [--entry <path>]
     [--artist <artist>] [--tag <a,b>] [--json]
@@ -147,7 +183,7 @@ async function main(): Promise<void> {
       const verb = required(args.positional[0], "module requires a subcommand: init, build, test, compact, verify, register, bump, index, or plan.");
       const all = args.flags.all === true && (verb === "build" || verb === "test" || verb === "verify");
       const workspaceRoot = flag(args, "root") ?? process.cwd();
-      const directory = verb === "index" || verb === "verify" || verb === "register" || all
+      const directory = ["index", "verify", "register", "install", "observe", "infer", "editor"].includes(verb) || all
         ? undefined
         : required(args.positional[1], `module ${verb} requires a module directory (or --all).`);
       if (verb === "init") {
@@ -162,6 +198,8 @@ async function main(): Promise<void> {
           ...(args.flags["no-compact"] === true ? { compact: false } : {}),
           ...(args.flags["keep-comments"] === true ? { keepComments: true } : {}),
           ...(stampPath === undefined ? {} : { stampPath }),
+          // Declarations are optional; a linked module whose imports resolve outside its root opts out.
+          ...(args.flags["no-types"] === true ? { types: false } : {}),
         };
         if (all) {
           const results = await buildKeelWorkspace(workspaceRoot, buildOptions);
@@ -303,6 +341,26 @@ async function main(): Promise<void> {
         );
         return;
       }
+      if (await runModuleAuthoringCommand(verb, args.flags)) return;
+      if (verb === "install") {
+        const repository = required(flag(args, "repo"), "module install requires --repo <owner/name>.");
+        const [owner, repo] = repository.split("/");
+        if (!owner || !repo || repository.split("/").length !== 2) throw new TypeError("Invalid module repository.");
+        const entry = flag(args, "entry") ?? "src/index.ts";
+        const name = flag(args, "name") ?? repo;
+        const version = required(flag(args, "version"), "module install requires --version.");
+        const commit = required(flag(args, "commit"), "module install requires an exact --commit.");
+        const result = await installKeelModule({
+          origin: { protocol: "keel-source-origin@1", provider: "github", owner, repo, commit, visibility: "public" },
+          identity: { namespace: "keel", name, version, entry }, entry,
+          projectRoot: flag(args, "root") ?? process.cwd(), name,
+          expectedOutput: required(flag(args, "expect"), "module install requires --expect <sha256>.") as Hex,
+          ...(flag(args, "path") === undefined ? {} : { recipeRoot: flag(args, "path")! }),
+          ...(args.flags["no-compact"] === true ? {} : { compact: { keepComments: false } }),
+        });
+        output(result, args.flags.json === true, `Installed ${result.importPath} with verified runtime and IDE declarations.\nSource commit: ${result.sourceCommit}\nOutput digest: ${result.output.digest}`);
+        return;
+      }
       if (verb === "verify") {
         const repository = required(flag(args, "repo"), "module verify requires --repo <owner/name>.");
         const [owner, name] = repository.split("/");
@@ -312,11 +370,20 @@ async function main(): Promise<void> {
         const entry = flag(args, "entry") ?? "src/index.ts";
         const expected = flag(args, "expect");
         if (expected !== undefined && !/^0x[0-9a-f]{64}$/u.test(expected)) throw new TypeError("--expect must be a lower-case sha256 digest.");
+        // A module that links to its neighbours (keel.module.json "build") is
+        // reproduced with the same format and externals its recipe recorded.
+        const format = flag(args, "format");
+        if (format !== undefined && format !== "esm" && format !== "iife" && format !== "cjs") throw new TypeError("--format must be esm, iife, or cjs.");
+        const externalFlag = flag(args, "external");
+        const external = externalFlag === undefined ? undefined : externalFlag.split(",").map((item) => item.trim()).filter(Boolean);
         const verified = await verifyKeelModuleFromOrigin({
           origin: { protocol: "keel-source-origin@1", provider: "github", owner, repo: name, commit, visibility: "public" },
           identity: { namespace: "keel", name, version: "0.0.0", entry },
           entry,
           ...(recipeRoot === undefined ? {} : { recipeRoot }),
+          ...(format === undefined && external === undefined
+            ? {}
+            : { options: { ...KEEL_MODULE_BUILD_OPTIONS, ...(format === undefined ? {} : { format }), ...(external === undefined || external.length === 0 ? {} : { external }) } }),
           ...(args.flags["no-compact"] === true ? {} : { compact: { keepComments: false } }),
           mediaType: "text/javascript",
         });
@@ -356,7 +423,10 @@ async function main(): Promise<void> {
         if (chainId !== undefined && (!Number.isSafeInteger(chainId) || chainId <= 0)) throw new RangeError("--chain-id must be a positive safe integer.");
         const address = flag(args, "address");
         if (address !== undefined && !/^0x[0-9a-f]{40}$/u.test(address)) throw new TypeError("--address must be a lower-case 20-byte Ethereum address.");
+        const compression = flag(args, "compression");
+        if (compression !== undefined && !["auto", "gzip", "deflate", "brotli", "none"].includes(compression)) throw new TypeError("--compression must be auto, gzip, deflate, brotli, or none.");
         const result = await planKeelModule(directory as string, {
+          ...(compression === undefined ? {} : { compression: compression as Compression | "auto" }),
           ...(chainId === undefined ? {} : { chainId }),
           ...(address === undefined ? {} : { address: address as `0x${string}` }),
         });
@@ -439,6 +509,39 @@ async function main(): Promise<void> {
         args.flags.json === true,
         `${analysis.inputByteLength} bytes; compression=${analysis.selectedCompression}; strategy=${recommendation.strategy}; ` +
         `transactions=${recommendation.transactionCount}; calldata=${recommendation.calldataBytes} bytes (modeled estimate, not a gas quote).`,
+      );
+      return;
+    }
+
+    case "optimize": {
+      const input = required(args.positional[0], "optimize requires an input file.");
+      const mediaType = flag(args, "media-type");
+      const quality = flag(args, "quality");
+      const effort = flag(args, "effort");
+      const videoCrf = flag(args, "video-crf");
+      const videoCpuUsed = flag(args, "video-cpu-used");
+      const selectedStorageMode = flag(args, "storage-mode");
+      const plan = await planMediaOptimization({
+        input,
+        ...(mediaType === undefined ? {} : { mediaType }),
+        ...(quality === undefined ? {} : { quality: Number(quality) }),
+        ...(effort === undefined ? {} : { effort: Number(effort) }),
+        ...(videoCrf === undefined ? {} : { videoCrf: Number(videoCrf) }),
+        ...(videoCpuUsed === undefined ? {} : { videoCpuUsed: Number(videoCpuUsed) }),
+        ...(selectedStorageMode === undefined ? {} : { selectedStorageMode }),
+      });
+      const requestedOutput = flag(args, "out");
+      if (args.flags.apply !== true) {
+        if (requestedOutput !== undefined) throw new TypeError("optimize only accepts --out together with explicit --apply; dry-run does not write files.");
+        output(plan, args.flags.json === true, `${plan.input.fileName}: dry-run; ${plan.capability.available ? "ready for explicit apply" : plan.capability.reason ?? "adapter unavailable"}.`, args.flags.yaml === true);
+        return;
+      }
+      const result = await applyMediaOptimization({ plan, output: required(requestedOutput, "optimize --apply requires --out <a-new-file-with-the-planned-extension>.") });
+      output(
+        result,
+        args.flags.json === true,
+        `${result.input.fileName}: ${result.measurements.beforeBytes} -> ${result.measurements.afterBytes} bytes (${result.measurements.percentSaved}% saved); source retained.`,
+        args.flags.yaml === true,
       );
       return;
     }

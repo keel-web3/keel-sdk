@@ -1,4 +1,4 @@
-import { bytesToUtf8, encodeBase64, toDataUrl, type ResourceSource } from "@keel/protocol";
+import { describeKeelReleasePolicy, assertDataUriMediaType, bytesToUtf8, decodeBase64, encodeBase64, serializeScriptJSON, toDataUrl, type ResourceSource } from "@keel/protocol";
 import { createVerifiedContentGateway, resourceGatewayAliases } from "./gateway.js";
 import { evaluateCollectionVerification } from "./collection-verification.js";
 import type { RuntimeCapabilities } from "@keel/protocol";
@@ -16,10 +16,7 @@ function escapeAttribute(value: string): string {
 }
 
 function scriptSafeJson(value: unknown): string {
-  return JSON.stringify(value)
-    .replaceAll("<", "\\u003c")
-    .replaceAll("\u2028", "\\u2028")
-    .replaceAll("\u2029", "\\u2029");
+  return serializeScriptJSON(value);
 }
 
 function inlineModule(code: string): string {
@@ -87,7 +84,32 @@ function replaceResourceUrls(input: string, materializer: Materializer, active: 
 
 function entrypointText(materializer: Materializer): string {
   const id = materializer.artifact.entrypoint.resource.id;
-  return replaceResourceUrls(bytesToUtf8(materializer.artifact.entrypoint.bytes), materializer, new Set([id]));
+  const entrypoint = materializer.artifact.entrypoint;
+  let text: string;
+  if (entrypoint.mediaType === "application/vnd.keel.token-uri-base64-fragment") {
+    const outer = bytesToUtf8(decodeBase64(bytesToUtf8(entrypoint.bytes)));
+    const context = outer.lastIndexOf("#");
+    if (context >= 0 && !outer.slice(context).includes("keel-context=")) {
+      throw new TypeError("Legacy KEEL Inline graph has an invalid terminal context lane.");
+    }
+    text = bytesToUtf8(decodeBase64(context < 0 ? outer : outer.slice(0, context)));
+  } else if (entrypoint.mediaType === "application/vnd.keel.token-uri-raw-percent-fragment") {
+    try {
+      text = decodeURIComponent(decodeURIComponent(bytesToUtf8(entrypoint.bytes)));
+    } catch {
+      throw new TypeError("Compact KEEL Inline graph has an invalid percent-carried HTML stream.");
+    }
+  } else if (entrypoint.mediaType === "application/vnd.keel.token-uri-percent-fragment") {
+    const escaped = bytesToUtf8(decodeBase64(bytesToUtf8(entrypoint.bytes)));
+    try {
+      text = decodeURIComponent(escaped);
+    } catch {
+      throw new TypeError("Compact KEEL Inline graph has an invalid percent-carried HTML stream.");
+    }
+  } else {
+    text = bytesToUtf8(entrypoint.bytes);
+  }
+  return replaceResourceUrls(text, materializer, new Set([id]));
 }
 
 /**
@@ -145,7 +167,11 @@ function contentSecurityPolicy(capabilities: RuntimeCapabilities): string {
     "frame-src 'none'",
     "child-src 'none'",
     "manifest-src 'none'",
-    "connect-src 'none'",
+    // A user-selected fallback WASM is a local blob URL. CSP forbids combining
+    // 'none' with another source expression: browsers ignore 'none' in that
+    // invalid combination and emit an error. `blob:` keeps the fallback local
+    // without granting HTTP(S) network access.
+    "connect-src blob:",
     "worker-src 'none'",
     `script-src 'unsafe-inline' data: blob:${wasm}`,
     "style-src 'unsafe-inline' data: blob:",
@@ -277,6 +303,17 @@ function validateRuntimeContext(context: RuntimeContext): RuntimeContext {
   if (context.emitterPaletteMode !== undefined && context.emitterPaletteMode > 3) {
     throw new RangeError("Runtime emitter palette mode is outside emitter@1 bounds.");
   }
+  if (context.releaseDisclosure !== undefined) {
+    const r = context.releaseDisclosure;
+    const address = /^0x[0-9a-f]{40}$/u;
+    if (r.source !== "pinned-rpc" || !address.test(r.router) || !address.test(r.collection) || !address.test(r.authority)
+        || !bytes32.test(r.blockHash) || !decimal.test(r.blockNumber) || !decimal.test(r.releaseId) || !decimal.test(r.localId)
+        || !decimal.test(r.targetMaximum) || BigInt(r.releaseId) === 0n || BigInt(r.localId) === 0n
+        || BigInt(r.releaseId) >= (1n << 64n) || BigInt(r.localId) >= (1n << 64n) || BigInt(r.targetMaximum) >= (1n << 256n)
+        || (context.blockHash !== undefined && context.blockHash !== r.blockHash)
+        || (context.blockNumber !== undefined && context.blockNumber !== r.blockNumber)) throw new TypeError("Invalid release disclosure identity.");
+    if (JSON.stringify(r.rows) !== JSON.stringify(describeKeelReleasePolicy(r.policyWord))) throw new TypeError("Release disclosure rows disagree with the policy word.");
+  }
   if (context.collectionVerification !== undefined) {
     evaluateCollectionVerification(context.collectionVerification);
   }
@@ -303,7 +340,7 @@ function runtimeBootstrap(artifact: ResolvedArtifact, runtimeContext?: RuntimeCo
 function thumbnailBootstrap(artifact: ResolvedArtifact): string {
   const capture = artifact.manifest.thumbnail?.capture;
   const serialized = scriptSafeJson(capture ?? null);
-  return `(()=>{"use strict";const policy=${serialized};const started=performance.now();let timer;let stopTimer;let initialized=false;const emit=(action,label)=>parent.postMessage({protocol:"keel-thumbnail-capture@1",action,label:String(label||policy?.label||"hero").slice(0,64),elapsedMs:Math.max(0,Math.round(performance.now()-started))},"*");const stop=label=>{clearTimeout(timer);clearTimeout(stopTimer);emit("stop",label)};const capture=label=>{emit("capture",label);if(policy?.durationMs)stopTimer=setTimeout(()=>stop(label),policy.durationMs)};const init=label=>{if(initialized)return;initialized=true;emit("init",label);if(policy?.mode==="after-init")timer=setTimeout(()=>capture(label),policy.delayMs||0)};const api=Object.freeze({protocol:"keel-thumbnail-capture@1",init,capture,ready:capture,stop,after:(delayMs,label)=>{const delay=Number(delayMs);if(!Number.isFinite(delay)||delay<0||delay>30000)throw new RangeError("Thumbnail delay must be from 0 through 30000ms.");clearTimeout(timer);timer=setTimeout(()=>capture(label),delay)}});Object.defineProperty(globalThis,"__KEEL_THUMBNAIL__",{value:api,enumerable:true,configurable:false,writable:false});for(const [name,action] of [["KEEL_THUMBNAIL_INIT",init],["KEEL_THUMBNAIL_STOP",stop]]){let value=false;Object.defineProperty(globalThis,name,{enumerable:true,configurable:false,get:()=>value,set:next=>{value=Boolean(next);if(value)action()}})}if(policy?.mode==="time")addEventListener("DOMContentLoaded",()=>{timer=setTimeout(()=>capture(),policy.delayMs||0)},{once:true})})();`;
+  return `(()=>{"use strict";const policy=${serialized};const started=performance.now();let timer;let stopTimer;let initialized=false;const emit=(action,label)=>{const detail={protocol:"keel-thumbnail-capture@1",action,label:String(label||policy?.label||"hero").slice(0,64),elapsedMs:Math.max(0,Math.round(performance.now()-started))};dispatchEvent(new CustomEvent("keel-thumbnail-capture",{detail}));parent.postMessage(detail,"*")};const stop=label=>{clearTimeout(timer);clearTimeout(stopTimer);emit("stop",label)};const capture=label=>{emit("capture",label);if(policy?.durationMs)stopTimer=setTimeout(()=>stop(label),policy.durationMs)};const init=label=>{if(initialized)return;initialized=true;emit("init",label);if(policy?.mode==="after-init")timer=setTimeout(()=>capture(label),policy.delayMs||0)};const api=Object.freeze({protocol:"keel-thumbnail-capture@1",init,capture,ready:capture,stop,after:(delayMs,label)=>{const delay=Number(delayMs);if(!Number.isFinite(delay)||delay<0||delay>30000)throw new RangeError("Thumbnail delay must be from 0 through 30000ms.");clearTimeout(timer);timer=setTimeout(()=>capture(label),delay)}});Object.defineProperty(globalThis,"__KEEL_THUMBNAIL__",{value:api,enumerable:true,configurable:false,writable:false});for(const [name,action] of [["KEEL_THUMBNAIL_INIT",init],["KEEL_THUMBNAIL_STOP",stop]]){let value=false;Object.defineProperty(globalThis,name,{enumerable:true,configurable:false,get:()=>value,set:next=>{value=Boolean(next);if(value)action()}})}if(policy?.mode==="time")addEventListener("DOMContentLoaded",()=>{timer=setTimeout(()=>capture(),policy.delayMs||0)},{once:true})})();`;
 }
 
 interface GatewayPayloadResource {
@@ -357,6 +394,10 @@ function gatewayPayload(artifact: ResolvedArtifact): GatewayPayload {
   for (const route of gateway.routes) {
     const resource = artifact.resources.get(route.resourceId);
     if (resource === undefined) throw new Error(`Resolved resource ${route.resourceId} disappeared during gateway creation.`);
+    // The runtime turns this value into a data URI header. Validate it at the
+    // build boundary so a malformed manifest can never inject a second header
+    // or delimiter into the generated content gateway.
+    assertDataUriMediaType(resource.mediaType);
     resources[route.resourceId] = {
       body: encodeBase64(resource.bytes),
       mediaType: resource.mediaType,
@@ -374,16 +415,71 @@ function gatewayPayload(artifact: ResolvedArtifact): GatewayPayload {
     // into data URLs before reader code can request them by ID.
     aliases[route.resourceId] = route.resourceId;
   }
+  const flash = artifact.manifest.extensions?.["keel:flash"];
+  if (flash !== undefined) {
+    if (flash === null || typeof flash !== "object" || Array.isArray(flash)) {
+      throw new TypeError("keel:flash manifest extension must be an object.");
+    }
+    const ruffle = (flash as Record<string, unknown>).ruffle;
+    if (ruffle === null || typeof ruffle !== "object" || Array.isArray(ruffle)) {
+      throw new TypeError("keel:flash manifest extension is missing its Ruffle resource map.");
+    }
+    const runtimeFiles = [
+      ["main", "ruffle.js", "text/javascript"],
+      ["modernCore", "core.ruffle.15317142e75ce021ac04.js", "text/javascript"],
+      ["legacyCore", "core.ruffle.5e30dc5777a75720eae2.js", "text/javascript"],
+      ["legacyWasm", "a71cef02d58dcec6f55f.wasm", "application/wasm"],
+    ] as const;
+    for (const [key, fileName, mediaType] of runtimeFiles) {
+      const resourceId = (ruffle as Record<string, unknown>)[key];
+      if (typeof resourceId !== "string" || resourceId.length === 0) {
+        throw new TypeError(`keel:flash Ruffle resource ${key} is missing.`);
+      }
+      const resource = artifact.resources.get(resourceId);
+      if (resource === undefined) throw new TypeError(`keel:flash Ruffle resource ${resourceId} is not resolved.`);
+      if (resource.mediaType.toLowerCase().split(";", 1)[0] !== mediaType) {
+        throw new TypeError(`keel:flash Ruffle resource ${resourceId} must use ${mediaType}.`);
+      }
+      const alias = `keel://ruffle/${fileName}`;
+      const existing = aliases[alias];
+      if (existing !== undefined && existing !== resourceId) throw new TypeError(`keel:flash alias collision at ${alias}.`);
+      aliases[alias] = resourceId;
+    }
+    // The MVP/vanilla WASM is deliberately optional in the manifest. Modern
+    // hosts use the committed extensions build; unsupported hosts upload the
+    // second WASM locally and the Flash wrapper verifies it before use.
+    const modernWasm = (ruffle as Record<string, unknown>).modernWasm;
+    if (modernWasm !== undefined) {
+      if (typeof modernWasm !== "string" || modernWasm.length === 0) {
+        throw new TypeError("keel:flash Ruffle resource modernWasm must be a non-empty resource ID when declared.");
+      }
+      const resource = artifact.resources.get(modernWasm);
+      if (resource === undefined) throw new TypeError(`keel:flash Ruffle resource ${modernWasm} is not resolved.`);
+      if (resource.mediaType.toLowerCase().split(";", 1)[0] !== "application/wasm") {
+        throw new TypeError(`keel:flash Ruffle resource ${modernWasm} must use application/wasm.`);
+      }
+      const alias = "keel://ruffle/6ce4f603a1fe7cc88438.wasm";
+      const existing = aliases[alias];
+      if (existing !== undefined && existing !== modernWasm) throw new TypeError(`keel:flash alias collision at ${alias}.`);
+      aliases[alias] = modernWasm;
+    }
+  }
   return { protocol: "keel-content-gateway@1", manifestId: artifact.manifest.id, aliases, resources };
 }
 
 function contentGatewayBootstrap(artifact: ResolvedArtifact): string {
   const payload = scriptSafeJson(gatewayPayload(artifact));
+  const ruffleSupportUrls = [
+    "https://github.com/ruffle-rs/ruffle/wiki/Frequently-Asked-Questions-For-Users#chrome-hardware-acceleration",
+    "https://github.com/ruffle-rs/ruffle/wiki/Using-Ruffle#configuration-options",
+  ];
+  const ruffleSupportAllowed = artifact.manifest.extensions?.["keel:flash"] !== undefined;
   return `(() => {
   "use strict";
   const payload = ${payload};
   const aliases = Object.freeze(payload.aliases);
   const resources = Object.freeze(payload.resources);
+  const nativeFetch = typeof globalThis.fetch === "function" ? globalThis.fetch.bind(globalThis) : undefined;
   const blocked = value => new DOMException("Keel blocked undeclared content request: " + String(value), "SecurityError");
   const rawName = input => {
     if (typeof input === "string") return input;
@@ -417,7 +513,8 @@ function contentGatewayBootstrap(artifact: ResolvedArtifact): string {
   // Text resources have their /content/ references rewritten to data: URLs
   // before they run, so a script that fetches a declared resource at runtime
   // sees the rewritten form. Decode it here rather than reaching the network:
-  // connect-src is 'none', and the bytes are already the verified ones.
+  // connect-src permits only local blob URLs, and the bytes are already the
+  // verified ones. HTTP(S) creator networking remains unavailable.
   const dataResponse = raw => {
     const comma = raw.indexOf(",");
     if (comma < 0) return undefined;
@@ -444,6 +541,10 @@ function contentGatewayBootstrap(artifact: ResolvedArtifact): string {
   const safeUrl = value => {
     const raw = String(value);
     if (raw === "" || raw.startsWith("#") || raw.startsWith("data:") || raw.startsWith("blob:")) return raw;
+    // Ruffle renders a non-networking hardware-acceleration help link in its
+    // shadow UI. A Flash manifest may keep that inert informational href; the
+    // click guard below still prevents navigation from the opaque sandbox.
+    if (${ruffleSupportAllowed ? "true" : "false"} && ${scriptSafeJson(ruffleSupportUrls)}.includes(raw)) return raw;
     const found = lookup(raw);
     return found === undefined ? undefined : dataUrl(found.resource);
   };
@@ -460,6 +561,12 @@ function contentGatewayBootstrap(artifact: ResolvedArtifact): string {
     if (requested.startsWith("data:")) {
       const inline = dataResponse(requested);
       if (inline !== undefined) return inline;
+    }
+    // The Flash wrapper may create a blob URL from a user-selected, locally
+    // verified MVP WASM. It is not a manifest resource and never crosses the
+    // network boundary, so pass only blob GET/HEAD requests to the native fetch.
+    if (requested.startsWith("blob:") && nativeFetch !== undefined) {
+      return nativeFetch(input, init);
     }
     const found = lookup(input);
     if (found === undefined) {

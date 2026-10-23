@@ -162,9 +162,12 @@ async function runBuild(
  */
 export const KEEL_COMPACT_PASSES = 3;
 
-async function runTerser(bytes: Uint8Array, options: KeelCompactOptions): Promise<Uint8Array> {
+async function runTerser(bytes: Uint8Array, options: KeelCompactOptions, format: KeelBuildOptions["format"]): Promise<Uint8Array> {
   const result = await terserMinify(new TextDecoder("utf-8", { fatal: true }).decode(bytes), {
-    module: true,
+    // Module mode only for module output: it assumes strict code and drops the
+    // "use strict" a classic script (iife/cjs) needs to stay strict. The format
+    // is a recipe option, so this follows the recipe and reproduces from it.
+    module: format === "esm",
     ecma: 2020,
     compress: { passes: options.passes },
     mangle: options.mangle,
@@ -203,8 +206,9 @@ async function runCompactStage(
   esbuildBytes: Uint8Array,
   options: KeelCompactOptions,
   stampPath: string | undefined,
+  format: KeelBuildOptions["format"] = "esm",
 ): Promise<CompactStageResult> {
-  const terserBytes = await runTerser(esbuildBytes, options);
+  const terserBytes = await runTerser(esbuildBytes, options, format);
   const winner = terserBytes.byteLength < esbuildBytes.byteLength ? "terser" : "esbuild";
   const winnerBytes = winner === "terser" ? terserBytes : esbuildBytes;
   let stamp: KeelBuildCompact["stamp"];
@@ -254,7 +258,7 @@ export async function createKeelBuildRecipe(
       mangle: true,
       keepComments: options.compact.keepComments === true,
     };
-    const staged = await runCompactStage(root, bytes, compactOptions, options.compact.stamp);
+    const staged = await runCompactStage(root, bytes, compactOptions, options.compact.stamp, buildOptions.format);
     compactSection = staged.compact;
     outputBytes = staged.shippedBytes;
   }
@@ -318,7 +322,7 @@ export async function verifyKeelBuildRecipe(
   let rebuiltBytes = bytes;
   let actualCompact: KeelBuildCompact | undefined;
   if (recipe.compact !== undefined) {
-    const staged = await runCompactStage(root, bytes, recipe.compact.options, recipe.compact.stamp?.path);
+    const staged = await runCompactStage(root, bytes, recipe.compact.options, recipe.compact.stamp?.path, recipe.options.format);
     rebuiltBytes = staged.shippedBytes;
     actualCompact = staged.compact;
   }

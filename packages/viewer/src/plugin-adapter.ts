@@ -19,7 +19,7 @@ import { resolveArtifact } from "./resolver.js";
 import type { ResolveOptions, ResolvedArtifact, ResolvedResource } from "./types.js";
 
 export const KEEL_CONTRACT_PLUGIN_PROTOCOL_HASH =
-  "0x0e0eb5162ca8df7c079e8d31eaf2f514a536c16bf86ea734ab562928f4dac159" as const;
+  "0x6047fbc26549c6c27c3ef1062f7c9f92a95a30e97ad66f442f4015552aaf092b" as const;
 
 const ADDRESS = /^0x[0-9a-f]{40}$/u;
 const ADDRESS_ANY_CASE = /^0x[0-9a-fA-F]{40}$/u;

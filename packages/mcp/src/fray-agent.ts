@@ -1,5 +1,7 @@
 import { canonicalJson, createIntegrity, utf8ToBytes } from "@keel/protocol";
 import {
+  searchKeelRuntimeModules,
+  resolveKeelEndpoints,
   FRAY_AUCTION_POLICY_PROFILES,
   createFrayAuctionIntent,
   formatFrayAtomicAmount,
@@ -7,6 +9,8 @@ import {
   resolveFrayAuctionPolicy,
   type FrayAuctionFamily,
   type FrayAuctionPolicyProfile,
+  type FrayAuctionPresetId,
+  type FrayAuctionPresetKey,
 } from "@keel/sdk";
 import { createHash } from "node:crypto";
 
@@ -16,8 +20,8 @@ export const FRAY_APPROVAL_REQUEST_PROTOCOL = "fray-approval-request@1" as const
 export type FrayFamily = FrayAuctionFamily;
 
 export interface FrayAuctionPreset {
-  readonly id: 1 | 2 | 3;
-  readonly key: "quick-test" | "standard" | "collector";
+  readonly id: FrayAuctionPresetId;
+  readonly key: FrayAuctionPresetKey;
   readonly label: string;
   readonly summary: string;
 }
@@ -42,6 +46,12 @@ export const FRAY_AUCTION_PRESETS: readonly FrayAuctionPreset[] = [
     key: "collector",
     label: "Collector",
     summary: "Three-day auction with a larger patron edition for a centerpiece work.",
+  },
+  {
+    id: 4,
+    key: "showcase",
+    label: "Fray Auction showcase",
+    summary: "Thirty-minute patron-versus-whale showcase with no time extension.",
   },
 ] as const;
 
@@ -203,7 +213,7 @@ export interface FrayStageProjectInput {
   readonly description: string;
   readonly family: FrayFamily;
   readonly network: string;
-  readonly auctionPreset: 1 | 2 | 3;
+  readonly auctionPreset: FrayAuctionPresetId;
   readonly metadataMode: "IPFS" | "Onchain";
   readonly releaseOutcome: "bidder" | "patrons";
   readonly previewExecution: "none" | "doom-wasm-sandbox" | "html-sandbox";
@@ -251,8 +261,8 @@ export function parseFrayAuctionIntakeInput(value: unknown): FrayAuctionIntakeIn
     ? undefined
     : typeof rawAuctionPreset === "number"
       ? rawAuctionPreset
-      : (() => { throw new TypeError("auctionPreset must be 1, 2, or 3."); })();
-  if (auctionPreset !== undefined && (!Number.isSafeInteger(auctionPreset) || auctionPreset < 1 || auctionPreset > 3)) throw new TypeError("auctionPreset must be 1, 2, or 3.");
+      : (() => { throw new TypeError("auctionPreset must be 1, 2, 3, or 4."); })();
+  if (auctionPreset !== undefined && (!Number.isSafeInteger(auctionPreset) || auctionPreset < 1 || auctionPreset > 4)) throw new TypeError("auctionPreset must be 1, 2, 3, or 4.");
   const rawFamily = input.family;
   const family = rawFamily === undefined
     ? undefined
@@ -309,7 +319,7 @@ function missingQuestions(input: FrayAuctionIntakeInput): readonly IntakeQuestio
   if (input.description === undefined && input.useDefaultDescription !== true) {
     questions.push({ field: "description", question: "What description should I use? Reply with your text, or say `default` and I’ll use a short Keel/Fray description." });
   }
-  if (input.auctionPreset === undefined) questions.push({ field: "auctionPreset", question: "Which auction setup should I use? Pick 1, 2, or 3.", options: presetOptions(input.family) });
+  if (input.auctionPreset === undefined) questions.push({ field: "auctionPreset", question: "Which Fray Auction setup should I use? Pick 1, 2, 3, or 4.", options: presetOptions(input.family) });
   if (findChainProfile(input.family, input.network) === undefined) questions.push({ field: "chain", question: "Which supported testnet should receive it?", options: FRAY_CHAIN_PROFILES.map((profile) => `${profile.family} · ${profile.network} · ${profile.displayName}`) });
   return questions;
 }
@@ -383,12 +393,12 @@ export async function prepareFrayAuctionIntake(value: unknown): Promise<unknown>
  * wallet-facing handoff. The agent token is only used for this server-to-server
  * upload; it never has wallet authority and is never returned. */
 export async function stageFrayProject(input: FrayStageProjectInput): Promise<unknown> {
-  const base = safeStudioBase(input.studioUrl ?? process.env.FRAY_STUDIO_URL ?? process.env.KEEL_STUDIO_URL);
+  const base = safeStudioBase(input.studioUrl ?? process.env.KEEL_STUDIO_URL ?? process.env.FRAY_STUDIO_URL);
   if (base === undefined) {
     return {
       schema: FRAY_AGENT_PROTOCOL,
       status: "unconfigured",
-      message: "Set FRAY_STUDIO_URL (or KEEL_STUDIO_URL) and FRAY_STUDIO_AGENT_TOKEN to stage a project in the Studio.",
+      message: "Set KEEL_STUDIO_URL and FRAY_STUDIO_AGENT_TOKEN to stage a project in the Studio. FRAY_STUDIO_URL remains a deprecated compatibility alias.",
       wallet: { signing: "not-performed", submission: "not-performed" },
     };
   }
@@ -600,7 +610,7 @@ function safeStudioBase(value: string | undefined): string | undefined {
   if (value === undefined || value.trim().length === 0) return undefined;
   let url: URL;
   try { url = new URL(value); } catch { throw new TypeError("studioUrl must be an absolute URL."); }
-  if (url.protocol !== "https:" && !(url.protocol === "http:" && ["localhost", "127.0.0.1", "::1"].includes(url.hostname))) throw new TypeError("studioUrl must use HTTPS, except for loopback development.");
+  if (url.protocol !== "https:" && !(url.protocol === "http:" && ["localhost", "127.0.0.1", "[::1]"].includes(url.hostname))) throw new TypeError("studioUrl must use HTTPS, except for loopback development.");
   if (url.username || url.password) throw new TypeError("studioUrl must not contain credentials.");
   url.pathname = url.pathname.replace(/\/+$/u, "");
   url.search = "";
@@ -612,11 +622,17 @@ async function readJson(url: string, label: string): Promise<unknown> {
   const controller = new AbortController();
   const timeout = setTimeout(() => controller.abort(), 10_000);
   try {
-    const response = await fetch(url, { headers: { accept: "application/json" }, signal: controller.signal });
-    if (!response.ok) throw new Error(`${label} returned HTTP ${response.status}.`);
-    const text = await response.text();
-    if (new TextEncoder().encode(text).byteLength > 512 * 1024) throw new Error(`${label} response is too large.`);
-    return JSON.parse(text) as unknown;
+    const response = await fetch(url, { headers: { accept: "application/json" }, signal: controller.signal, redirect: "error" });
+    if (!response.ok) { await response.body?.cancel(); throw new Error(`${label} returned HTTP ${response.status}.`); }
+    const reader = response.body?.getReader(); if (!reader) throw new Error(`${label} returned no body.`);
+    const chunks: Uint8Array[] = []; let size = 0;
+    for (;;) {
+      const { value, done } = await reader.read(); if (done) break;
+      size += value.length;
+      if (size > 512 * 1024) { await reader.cancel(); throw new Error(`${label} response is too large.`); }
+      chunks.push(value);
+    }
+    return JSON.parse(Buffer.concat(chunks).toString("utf8")) as unknown;
   } finally {
     clearTimeout(timeout);
   }
@@ -662,30 +678,33 @@ function libraryCandidate(value: Record<string, unknown>): Record<string, unknow
 export async function searchKeelIndexes(input: { readonly studioUrl?: string; readonly query: string; readonly limit?: number }): Promise<unknown> {
   const query = boundedText(input.query, "query", 160);
   if (query === undefined) throw new TypeError("query is required.");
-  const base = safeStudioBase(input.studioUrl ?? process.env.KEEL_STUDIO_URL);
+  const base = safeStudioBase(input.studioUrl ?? process.env.KEEL_STUDIO_URL ?? resolveKeelEndpoints().studioUrl);
   if (base === undefined) return { schema: FRAY_AGENT_PROTOCOL, status: "unconfigured", query, message: "Set KEEL_STUDIO_URL or pass studioUrl to search a live Keel index. No carrier bytes were fetched." };
   const limit = Math.min(100, Math.max(1, Math.trunc(input.limit ?? 20)));
   const encoded = encodeURIComponent(query);
   const [libraryResult, moduleResult] = await Promise.allSettled([
     readJson(`${base}/api/library?q=${encoded}`, "Keel Library index"),
-    readJson(`${base}/api/modules?q=${encoded}`, "Keel module catalogue"),
+    searchKeelRuntimeModules({ studioUrl: base, query }),
   ]);
   const library = libraryResult.status === "fulfilled" ? arrayField(libraryResult.value, "assets").slice(0, limit).map(libraryCandidate) : [];
-  const modules = moduleResult.status === "fulfilled" ? arrayField(moduleResult.value, "modules").slice(0, limit) : [];
+  const modules = moduleResult.status === "fulfilled" ? moduleResult.value.modules.slice(0, limit) : [];
   const errors = [
+    ...(moduleResult.status === "fulfilled" ? moduleResult.value.sources.filter(source => !source.complete).map(source => `${source.source}: ${source.error}`) : []),
     ...(libraryResult.status === "rejected" ? [`library: ${libraryResult.reason instanceof Error ? libraryResult.reason.message : String(libraryResult.reason)}`] : []),
     ...(moduleResult.status === "rejected" ? [`modules: ${moduleResult.reason instanceof Error ? moduleResult.reason.message : String(moduleResult.reason)}`] : []),
   ];
   const total = library.length + modules.length;
   return {
     schema: FRAY_AGENT_PROTOCOL,
-    status: errors.length === 2 ? "unavailable" : errors.length === 1 ? "partial" : "ok",
+    status: libraryResult.status === "rejected" && moduleResult.status === "rejected" ? "unavailable" : errors.length > 0 ? "partial" : "ok",
     studioUrl: base,
     query,
     library,
     modules,
-    reuse: total === 0
-      ? { status: "none", action: "upload-new-bytes" }
+    reuse: errors.length > 0
+      ? { status: "incomplete-search", action: "retry-unavailable-indexes-before-deciding-reuse" }
+      : total === 0
+      ? { status: "not-indexed", action: "resolve-selected-chain-object-id-or-hash-before-proposing-new-bytes" }
       : total === 1
         ? { status: "candidate", action: "bind-after-exact-integrity-and-license-review" }
         : { status: "needs-selection", action: "ask-the-creator-to-select-one-exact-release" },

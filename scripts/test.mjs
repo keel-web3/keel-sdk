@@ -1,54 +1,10 @@
 import { run } from "./run.mjs";
+import { DEFAULT_TEST_FILES, validateTestSuiteClassification } from "./test-suites.mjs";
+
+const classificationIssues = validateTestSuiteClassification();
+if (classificationIssues.length > 0) throw new Error(classificationIssues.join("\n"));
 
 run("node", ["scripts/build.mjs"]);
-run("node", [
-  "--test",
-  "tests/protocol.test.mjs",
-  "tests/keel-modules.test.mjs",
-  "tests/portable-root.test.mjs",
-  "tests/viewer.test.mjs",
-  "tests/host-bridge.test.mjs",
-  "tests/host-bridge-transport.test.mjs",
-  "tests/presentation-bridge.test.mjs",
-  "tests/capability-policy.test.mjs",
-  "tests/keel-rpc-policy.test.mjs",
-  "tests/keel-build-recipe.test.mjs",
-  "tests/adversarial-boundary.test.mjs",
-  "tests/keel-frozen-dataset-limits.test.mjs",
-  "tests/readers.test.mjs",
-  "tests/sdk.test.mjs",
-  "tests/sdk-wallet-request.test.mjs",
-  "tests/sdk-wallet-intent.test.mjs",
-  "tests/keel-wallet-theft-simulator.test.mjs",
-  "tests/sdk-wallet-link.test.mjs",
-  "tests/sdk-module-review.test.mjs",
-  "tests/sdk-publish-plan.test.mjs",
-  "tests/ethereum-adapter.test.mjs",
-  "tests/ethereum-adapter-viem.test.mjs",
-  "tests/ethereum-adapter-preflight.test.mjs",
-  "tests/ethereum-adapter-executor.test.mjs",
-  "tests/one-mint-sdk.test.mjs",
-  "tests/builder.test.mjs",
-  "tests/builder-pipeline.test.mjs",
-  "tests/builder-module-resolver.test.mjs",
-  "tests/builder-module-pipeline.test.mjs",
-  "tests/builder-module-workspace.test.mjs",
-  "tests/keel-module-assurance.test.mjs",
-  "tests/keel-module-registration.test.mjs",
-  "tests/keel-modules-reproduction.test.mjs",
-  "tests/builder-cost-analysis.test.mjs",
-  "tests/mcp.test.mjs",
-  "tests/sprite-codex.test.mjs",
-  "tests/studio-core.test.mjs",
-  "tests/demos.test.mjs",
-  "tests/keel-corpus.test.mjs",
-  "tests/keel-bench.test.mjs",
-  "tests/keel-historical-evidence.test.mjs",
-  "tests/keel-market-wallet-runtime.test.mjs",
-  "tests/sandbox-sdk.test.mjs",
-  "tests/source-verification.test.mjs",
-  "tests/keel-presentation.test.mjs",
-  "tests/keel-verification-shell.test.mjs",
-  "tests/sdk-verification-wrap.test.mjs",
-  "tests/keel-verification-consumer.test.mjs",
-]);
+const concurrency = Number(process.env.KEEL_TEST_CONCURRENCY ?? "2");
+if (!Number.isInteger(concurrency) || concurrency < 1 || concurrency > 64) throw new Error("KEEL_TEST_CONCURRENCY must be an integer from 1 through 64.");
+run("node", ["--test", `--test-concurrency=${concurrency}`, ...DEFAULT_TEST_FILES]);

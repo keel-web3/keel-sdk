@@ -18,6 +18,16 @@
  *   keel repos [--sync]           reconcile module repositories with GitHub
  *   keel reconcile [--write]      check the registry against the repo's deployment files
  *   keel sync                     regenerate manifests + SDK registry
+ *   keel studio-drafts --config <file> [--format json|yaml]
+ *                                 run one creator-scoped Studio draft operation
+ *   keel studio-stage --config <file> [--format json|yaml]
+ *                                 stage a bounded project and return its Studio handoff
+ *   keel creator-collection --config <file> [--format json|yaml]
+ *                                 prepare one exact EIP-5792 creator collection review and recovery envelope
+ *   keel media-optimize --config <file> [--format json|yaml]
+ *                                 measure by default; explicitly apply a reviewed smaller file
+ *   keel data-pack --input <file> --output <file.kdp> [--no-gzip]
+ *                                 convert JSON/YAML to deterministic gzip-CBOR
  */
 import { readFileSync, readdirSync, writeFileSync, mkdirSync, existsSync, statSync } from "node:fs";
 import { execFileSync, spawnSync } from "node:child_process";
@@ -48,6 +58,12 @@ function deploymentsOf(id) {
 function die(msg) { console.error(`keel: ${msg}`); process.exit(1); }
 function run(cmdline, cwd = CONTRACTS) {
   const r = spawnSync("sh", ["-c", cmdline], { cwd, stdio: "inherit" });
+  return r.status ?? 1;
+}
+
+function runNodeScript(script, args) {
+  const r = spawnSync(process.execPath, [script, ...args], { cwd: REPO, stdio: "inherit" });
+  if (r.error) { console.error(`keel: ${r.error.message}`); return 1; }
   return r.status ?? 1;
 }
 
@@ -207,6 +223,11 @@ switch (cmd) {
   case "repos": process.exit(run(`node ${join(import.meta.dirname, "repos.mjs")} ${rest.join(" ")}`, REPO)); break;
   case "reconcile": process.exit(run(`node ${join(import.meta.dirname, "seed-deployments.mjs")} ${rest.join(" ")}`, REPO)); break;
   case "sync": cmdSync(); break;
+  case "studio-drafts": process.exit(runNodeScript(join(import.meta.dirname, "studio-drafts.mjs"), rest)); break;
+  case "studio-stage": process.exit(runNodeScript(join(import.meta.dirname, "studio-stage.mjs"), rest)); break;
+  case "creator-collection": process.exit(runNodeScript(join(import.meta.dirname, "creator-collection.mjs"), rest)); break;
+  case "media-optimize": process.exit(runNodeScript(join(import.meta.dirname, "media-optimize.mjs"), rest)); break;
+  case "data-pack": process.exit(runNodeScript(join(import.meta.dirname, "data-pack.mjs"), rest)); break;
   default:
     console.log(readFileSync(import.meta.filename, "utf8").split("\n").slice(2, 12).map((l) => l.replace(/^ \* ?/, "")).join("\n"));
 }

@@ -41,6 +41,14 @@ export enum KeelCompression {
   Brotli = 3,
 }
 
+/** Link registry compression tags; Hold uses KeelCompression. */
+export enum KeelLinkCompression {
+  None = 0,
+  Gzip = 1,
+  Brotli = 2,
+  Deflate = 3,
+}
+
 export enum KeelObjectEditPolicy {
   Immutable = 0,
   Creator = 1,
@@ -60,14 +68,14 @@ export enum KeelForkPolicy {
 
 export enum KeelFidelity {
   Preview = 0,
-  HighResolution = 1,
-  HybridMirror = 2,
+  HybridMirror = 1,
+  HighResolution = 2,
 }
 
 export enum KeelLocatorScheme {
-  Https = 0,
-  Ipfs = 1,
-  Ipns = 2,
+  Ipfs = 0,
+  Ipns = 1,
+  Https = 2,
   Arweave = 3,
 }
 
@@ -116,7 +124,7 @@ export interface KeelFidelityLinkInput {
   readonly fidelity: KeelFidelity;
   readonly scheme: KeelLocatorScheme;
   readonly digestAlgorithm: KeelDigestAlgorithm;
-  readonly compression: KeelCompression;
+  readonly compression: KeelLinkCompression;
   readonly uri: string;
   readonly mediaType: string;
   readonly decodedDigest: Hex;

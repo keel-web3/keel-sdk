@@ -1,6 +1,6 @@
 ---
 name: fray-keel-agent
-description: Prepare a Fray auction through Keel when a creator asks an agent to publish artwork, reuse an indexed module, choose a supported testnet, or hand work to a wallet for approval. Use with the portable Keel Keel MCP server; never sign, submit, claim faucet funds, or move wallet assets on the creator's behalf.
+description: Prepare a KEEL Studio storage-only project, optional release/listing, Fray auction, or large publication when a creator asks an agent to stage artwork, reuse an indexed module, or hand work to Studio for review. Use with the portable KEEL MCP server; never sign, submit, claim faucet funds, or move wallet assets on the creator's behalf.
 ---
 
 # Fray Keel Agent
@@ -10,7 +10,31 @@ Fray auction,” “reuse the Three.js module,” or “prepare this release for
 wallet.” The MCP server is the portable cross-agent layer; this skill supplies
 the conversation and safety rules.
 
-## Intake
+For a large object, storage-route decision, gas quote, retry, or recovery, read
+[publication-modes.md](references/publication-modes.md) before planning. Resolve
+the configured public endpoints with `keel-endpoint-config`; explicit tool input
+wins over KEEL environment configuration, which wins over the canonical KEEL
+test defaults. Never silently retain or substitute a Stratus hostname.
+
+## Studio project intake
+
+Call `keel-studio-project-intake` for an ordinary creator project. Give it every
+decision already present in the request and ask only the questions it returns.
+
+- “Put this on KEEL” may finish as `storage-only`: stage, sandbox, store, and
+  verify the work without inventing a token, sale, or listing.
+- “Make this a one-of-one and list it for 0.1 ETH” is `release`: prefill an
+  editable release intent and let Studio handle the remaining storage, quote,
+  contract, and listing choices.
+- If the requested outcome is ambiguous, ask once: storage and verification
+  only, or also an editable release/listing?
+
+Do not require a listing to complete storage. Do not silently create a sale.
+The MCP agent stages the exact project graph and returns one Studio link;
+Studio owns route benchmarking, the visual gas/read explanation, ETH/USD quote,
+and final editable decisions.
+
+## Fray auction intake
 
 Call `fray-auction-intake` before preparing a publication handoff.
 
@@ -57,6 +81,94 @@ The handoff attaches the project to the creator only after the creator signs in
 to Studio with the wallet session. The agent never receives a private key or a
 wallet signature. A project that has been attached appears in **Agent-prepared
 projects** and can be reopened later.
+
+For ordinary KEEL work that is not a Fray auction, use
+`keel-studio-stage-project`. Omit `viewer` for the normal path: the SDK selects
+`keel-verification-shell`, and Studio later resolves and reuses the selected
+chain's existing pre-encoded KEEL Inline shell graph. Studio does **not** ask
+the agent to create another shell. Use `viewer: "none"` only when the creator
+explicitly requests an artifact/storage-only project with no viewer.
+
+Declare only creator-owned project files. An image project normally uploads the
+image plus the `keel.module.json` control declaration; it does **not** mean a
+zero-module project. That declaration must select the registered KEEL
+verification shell and bind exactly one same-chain `keel.asset-display@1`
+module. The resulting collector graph is registered shell top, registered
+asset-display module, direct creator image/video/self-contained GLB, registered
+shell bottom. p5 or Three work likewise stages only its creator script/assets
+plus exact same-chain module declarations. Never manufacture or label a local
+`viewer.js`, `index.html`, protected-harness wrapper, or other file as the
+default KEEL verification shell. If the selected-chain shell or module catalog
+is missing, stale, or ambiguous, stop: do not substitute a local wrapper.
+Creator-authored HTML is still valid project content, including an actual
+artwork named `index.html`; it runs inside the canonical KEEL shell and does not
+replace it. The server-issued handoff URL is the only project link the agent
+should show.
+
+The canonical shell is not an HTML file the agent authors. It is the registered
+KEEL top and bottom around the ordered project/module graph. Its protected
+lower-left K opens the proof, resources, collector context, and bounded
+data-only extension panels. Creator code runs in the shell's opaque child and
+cannot rewrite that K or its proof state. Only when the creator explicitly asks
+to publish a new reusable presentation should the agent use
+`keel-shell-prepare`: create the creator/tag manifest first, publish the exact
+top/bottom/metadata objects through the normal reviewed storage flow, then
+prepare the immutable creator-namespaced registration call. Never confuse that
+with staging an ordinary artwork.
+
+Resolve that default shell only through the selected-chain Studio Inline
+catalog. The catalog builder must match Studio's active `keel-harness-builder`;
+derive the stable `KEEL_INLINE_PROTECTION_SHELL_ID` with the SDK, require the
+catalog's `shellId` to equal it, and verify the exact `shells(shellId)` prefix,
+suffix, metadata, `exists=true`, and `PreEncodedGraph` mode. The convenience
+contract getter `INLINE_PROTECTION_SHELL_ID()` is not a readiness requirement;
+compatible registered-shell builders may omit it. Never infer the active
+builder from an older deployment journal. `protectorPrefix()`,
+`protectorSuffix()`, `protectedHarnessDataURI(...)`, and `NoProtector` belong
+to the older complete-document protector lane and say nothing about whether the
+default registered Inline shell is ready. Do not manufacture a fallback shell.
+
+Use `keel-shell-search` to discover an existing verified shell by creator or
+tags. A zero-result search never authorizes manufacturing a wrapper: ordinary
+projects continue to omit `viewer` and use the canonical KEEL verification
+shell.
+
+## Repair an existing draft
+
+When a creator opens a draft and asks the agent to rename it, change the sale,
+or attach a corrected prepared artifact, use `keel-studio-draft`. The scoped
+key belongs in `KEEL_STUDIO_AGENT_TOKEN`; never copy it into tool arguments,
+chat, logs, or a handoff URL.
+
+1. `list` or `read` the creator-owned draft first.
+2. Preserve its returned `revision` and every field the creator did not ask to
+   change.
+3. For media changes, run `media-optimize` as a dry-run and show the measured
+   before/after bytes, percentage, exact output digest, adapter, and settings.
+   Do not change storage mode. Only after the creator approves that exact
+   result, call `media-optimize-apply` with its digest and byte length, or use
+   the JSON/YAML `keel media-optimize` CLI with `operation: apply-reviewed`.
+   Both paths remeasure before writing one new file; the source is retained.
+4. Stage corrected project bytes as a new project handoff. The creator still
+   signs in and prepares those bytes in Studio; an agent grant does not bypass
+   project verification.
+5. After Studio returns the new artifact ID, call `update` with the exact prior
+   `revision`. A stale revision stops instead of erasing newer browser work.
+
+Draft tools never review, cancel, sign, submit, or confirm a publication. If a
+release is already under review, stop and let the creator cancel that review in
+Studio before editing.
+
+When the creator wants a new token contract or wants to organize an existing
+contract, call `keel-creator-collection-prepare` only after the project and
+metadata digest are exact. Choose one lane: dedicated ERC-721 for individually
+numbered works, dedicated ERC-1155 for many edition items in one creator
+contract, shared ERC-1155 for the lowest deployment cost, or external for a
+creator-controlled bring-your-own contract. Never substitute one lane for
+another. Missing or ambiguous factory/renderer deployment records are a safe
+stop, not a reason to invent an address or request approval. A review-only plan
+still requires an exact factory-to-renderer read-back before Studio may show the
+wallet action; collection creation does not mint an item or create its sale.
 
 ## Approval handoff
 

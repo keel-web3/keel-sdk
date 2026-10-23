@@ -9,6 +9,11 @@ import { createIntegrity } from "../packages/protocol/dist/index.js";
 import { createMcpServer } from "../packages/mcp/dist/index.js";
 
 const bytes = (value) => new TextEncoder().encode(value);
+const ONE_PIXEL_PNG = Buffer.from(
+  "iVBORw0KGgoAAAANSUhEUgAAAAIAAAACCAYAAABytg0kAAAAFElEQVR4nGP8z8Dwn4GBgYGJAQoAHxcCAk+Uzr4AAAAASUVORK5CYII=",
+  "base64",
+);
+const ONE_PIXEL_WEBP = Buffer.from("RIFF\u0000\u0000\u0000\u0000WEBP", "latin1");
 
 async function moduleSnapshot() {
   const content = bytes("export const demo = true;\n");
@@ -44,6 +49,15 @@ const initializeParams = { protocolVersion: "2024-11-05", capabilities: {}, clie
 test("MCP initializes, lists strict tools, and returns JSON-RPC parameter errors", async () => {
   const directory = await mkdtemp(path.join("/tmp", "keel-mcp-"));
   try {
+    const agentSkill = await readFile(new URL("../skills/fray-keel-agent/SKILL.md", import.meta.url), "utf8");
+    assert.match(agentSkill, /omit `viewer` for the normal path/iu);
+    assert.match(agentSkill, /does \*\*not\*\* ask\s+the\s+agent\s+to create another shell/iu);
+    assert.match(agentSkill, /Creator-authored HTML\s+is\s+still\s+valid project content/iu);
+    assert.match(agentSkill, /Apply the Inline saver automatically/iu);
+    assert.match(agentSkill, /Never ask the creator to opt in/iu);
+    assert.match(agentSkill, /Revise one module without republishing the work/iu);
+    assert.match(agentSkill, /automatic platform behavior/iu);
+    assert.match(agentSkill, /exactly four/iu);
     const server = await createMcpServer({ workspaceRoot: directory });
     const before = await server.handle({ jsonrpc: "2.0", id: 1, method: "tools/list", params: {} });
     assert.equal(before?.error?.code, -32002);
@@ -61,13 +75,106 @@ test("MCP initializes, lists strict tools, and returns JSON-RPC parameter errors
     assert.equal(nullId?.error?.code, -32600);
     const malformedInitialize = await server.handle({ jsonrpc: "2.0", id: 2, method: "initialize", params: {} });
     assert.equal(malformedInitialize?.error?.code, -32602);
-    const unsupportedInitialize = await server.handle({ jsonrpc: "2.0", id: 3, method: "initialize", params: { ...initializeParams, protocolVersion: "2025-06-18" } });
+    const unsupportedInitialize = await server.handle({ jsonrpc: "2.0", id: 3, method: "initialize", params: { ...initializeParams, protocolVersion: "invalid" } });
     assert.equal(unsupportedInitialize?.error?.code, -32602);
     const initialized = await server.handle({ jsonrpc: "2.0", id: 4, method: "initialize", params: initializeParams });
     assert.equal(initialized?.result.serverInfo.name, "keel-mcp");
     assert.deepEqual(Object.keys(initialized?.result.capabilities), ["tools", "prompts", "resources"]);
+    assert.match(initialized?.result.instructions, /begin with keel-project-plan/iu);
+    assert.match(initialized?.result.instructions, /keel-contract-workflow-preflight/iu);
+    assert.match(initialized?.result.instructions, /registered canonical KEEL verification shell/iu);
+    assert.match(initialized?.result.instructions, /one declared changed resource/iu);
     const listed = await server.handle({ jsonrpc: "2.0", id: 5, method: "tools/list", params: {} });
-    assert.deepEqual(listed?.result.tools.map((tool) => tool.name), ["analyze", "build", "verify", "cost", "upload-plan", "chain-plan", "ethereum-encode", "publish-plan", "module-resolve", "module-lock", "wallet-request-prepare", "wallet-link", "module-review-prepare", "fray-auction-intake", "fray-stage-project", "keel-chain-guide", "keel-library-search", "keel-studio-capabilities"]);
+    assert.deepEqual(listed?.result.tools.map((tool) => tool.name), ["keel-tezos-shell-prepare", "keel-tezos-publication-prepare", "keel-network-inspect", "keel-tezos-standard-route-plan", "keel-contract-workflow-preflight", "keel-contract-controls", "keel-engine-catalog", "keel-revision-plan", "keel-project-decisions", "keel-editor-project-list", "keel-editor-project-read", "keel-editor-project-update", "keel-editor-project-open", "keel-layered-check", "keel-layered-select", "keel-layered-sample", "keel-layered-math", "keel-layered-reveal-plan", "keel-layered-direct-image-plan", "keel-svg-create", "keel-svg-inspect", "keel-svg-call-plan", "keel-layered-curation", "keel-token-matrix-prepare", "keel-arena-match-prepare", "keel-arena-claim-prepare", "analyze", "media-optimize", "media-optimize-apply", "build", "verify", "cost", "upload-plan", "chain-plan", "ethereum-encode", "publish-plan", "module-resolve", "module-lock", "wallet-request-prepare", "wallet-link", "module-review-prepare", "fray-auction-intake", "fray-stage-project", "keel-chain-guide", "keel-library-search", "keel-onchain-data-prepare", "keel-endpoint-config", "keel-studio-capabilities", "keel-studio-project-intake", "keel-studio-draft", "keel-studio-stage-project", "keel-creator-collection-prepare", "keel-shell-search", "keel-inline-prepare", "keel-shell-prepare"]);
+    const revisionTool = listed?.result.tools.find((tool) => tool.name === "keel-revision-plan");
+    assert.match(revisionTool?.description, /unchanged object ID.*reused/iu);
+    assert.equal(revisionTool?.inputSchema.properties.changedResourceIds.maxItems, 1);
+    const stageTool = listed?.result.tools.find((tool) => tool.name === "keel-studio-stage-project");
+    assert.match(stageTool?.description, /creator resources\/modules/iu);
+    assert.match(stageTool?.description, /canonical KEEL Inline graph/iu);
+    assert.match(stageTool?.description, /keel\.asset-display@1/iu);
+    assert.match(stageTool?.description, /never zero modules or a generated index\.html/iu);
+    assert.match(stageTool?.description, /selected-chain KeelRawTokenURIBuilder/iu);
+    assert.match(stageTool?.description, /never fall back to legacy Base64 carriage silently/iu);
+    assert.match(stageTool?.description, /legacy protector getters and NoProtector do not determine default Inline readiness/iu);
+    assert.match(stageTool?.inputSchema.properties.viewer.description, /opts out of the shell only/iu);
+    assert.match(stageTool?.inputSchema.properties.viewer.description, /released, minted, and retrieved through its contract read/iu);
+    assert.match(stageTool?.inputSchema.properties.viewer.description, /direct creator asset/iu);
+    const inlineTool = listed?.result.tools.find((tool) => tool.name === "keel-inline-prepare");
+    assert.match(inlineTool?.description, /automatic.*raw-percent saver/iu);
+    assert.deepEqual(inlineTool?.inputSchema.properties.carriage.enum, ["compact", "raw-percent", "percent", "follow-latest", "pinned"]);
+    const preflightTool = listed?.result.tools.find((tool) => tool.name === "keel-contract-workflow-preflight");
+    assert.match(preflightTool?.description, /target README/iu);
+    assert.match(preflightTool?.description, /module-catalog/iu);
+    await writeFile(path.join(directory, "README.md"), "# target\n");
+    await mkdir(path.join(directory, "docs"));
+    await writeFile(path.join(directory, "docs", "ARCHITECTURE.md"), "# architecture\n");
+    const preflight = await call(server, 30, "keel-contract-workflow-preflight", {});
+    assert.equal(preflight?.result.structuredContent.status, "docs-read-module-scan-required");
+    assert.deepEqual(preflight?.result.structuredContent.documents.map((document) => document.path), ["README.md", "docs/ARCHITECTURE.md"]);
+    const creatorPlan = await call(server, 31, "keel-creator-collection-prepare", {
+      chainId: 11155111,
+      creator: "0x1111111111111111111111111111111111111111",
+      instance: "creator-v1",
+      creatorNonce: "0",
+      operation: {
+        kind: "dedicated-erc721",
+        config: { name: "One of One", symbol: "ONE", maxSupply: 1, metadataDigest: `0x${"a".repeat(64)}` },
+      },
+    });
+    assert.equal(creatorPlan?.result.structuredContent.status, "blocked");
+    assert.equal(creatorPlan?.result.structuredContent.walletApproval, "not-requested");
+    assert.equal(creatorPlan?.result.structuredContent.signing, "not-performed");
+    assert.equal(creatorPlan?.result.structuredContent.submission, "not-performed");
+    const creatorTool = listed?.result.tools.find((tool) => tool.name === "keel-creator-collection-prepare");
+    assert.ok(creatorTool?.inputSchema.required.includes("creatorNonce"));
+    assert.deepEqual(creatorTool?.inputSchema.properties.operation.oneOf[0].properties.implementation.enum, ["erc721a", "erc721"]);
+    const shellPlan = await call(server, 32, "keel-shell-prepare", {
+      operation: "register",
+      creator: "0x1111111111111111111111111111111111111111",
+      name: "Gallery grid",
+      description: "A reusable verified presentation.",
+      version: "1.0.0",
+      tags: ["gallery", "grid"],
+      builderAddress: "0x4f04bf6aac1183c26cadf05cf69d6148c9f6440b",
+      salt: `0x${"1".repeat(64)}`,
+      prefixObjectId: `0x${"2".repeat(64)}`,
+      suffixObjectId: `0x${"3".repeat(64)}`,
+      metadataObjectId: `0x${"4".repeat(64)}`,
+      payloadMode: "sandboxed-html",
+    });
+    assert.equal(shellPlan?.result.structuredContent.status, "review-only");
+    assert.equal(shellPlan?.result.structuredContent.metadata.protocol, "keel-shell-manifest@1");
+    assert.equal(shellPlan?.result.structuredContent.call.functionName, "registerShell");
+    assert.equal(shellPlan?.result.structuredContent.call.signing, "not-performed");
+    assert.equal(shellPlan?.result.structuredContent.call.submission, "not-performed");
+    const shellId = shellPlan?.result.structuredContent.shellId;
+    const shellUpdate = await call(server, 33, "keel-shell-prepare", {
+      operation: "update",
+      creator: "0x1111111111111111111111111111111111111111",
+      name: "Gallery grid",
+      description: "The reviewed second revision.",
+      version: "2.0.0",
+      tags: ["gallery", "grid"],
+      builderAddress: "0x4f04bf6aac1183c26cadf05cf69d6148c9f6440b",
+      shellId,
+      prefixObjectId: `0x${"5".repeat(64)}`,
+      suffixObjectId: `0x${"6".repeat(64)}`,
+      metadataObjectId: `0x${"7".repeat(64)}`,
+      payloadMode: "pre-encoded-graph",
+    });
+    assert.equal(shellUpdate?.result.structuredContent.call.functionName, "updateShell");
+    assert.equal(shellUpdate?.result.structuredContent.shellId, shellId);
+    assert.equal(shellUpdate?.result.structuredContent.call.submission, "not-performed");
+    const shellFreeze = await call(server, 34, "keel-shell-prepare", {
+      operation: "freeze",
+      creator: "0x1111111111111111111111111111111111111111",
+      builderAddress: "0x4f04bf6aac1183c26cadf05cf69d6148c9f6440b",
+      shellId,
+    });
+    assert.equal(shellFreeze?.result.structuredContent.call.functionName, "freezeShell");
+    assert.equal(shellFreeze?.result.structuredContent.call.irreversible, true);
+    assert.equal(shellFreeze?.result.structuredContent.call.signing, "not-performed");
     const malformed = await server.handle({ jsonrpc: "2.0", id: 6, method: "tools/call", params: { name: "cost", unexpected: true } });
     assert.equal(malformed?.error?.code, -32602);
     const malformedArguments = await server.handle({ jsonrpc: "2.0", id: 12, method: "tools/call", params: { name: "cost", arguments: null } });
@@ -89,25 +196,89 @@ test("MCP initializes, lists strict tools, and returns JSON-RPC parameter errors
     const noIdResource = await server.handle({ jsonrpc: "2.0", method: "resources/list", params: {} });
     assert.equal(noIdResource?.error?.code, -32600);
     const promptList = await server.handle({ jsonrpc: "2.0", id: 9, method: "prompts/list", params: {} });
-    assert.deepEqual(promptList?.result.prompts.map((prompt) => prompt.name), ["keel-asset-review", "fray-auction-review"]);
+    assert.deepEqual(promptList?.result.prompts.map((prompt) => prompt.name), ["keel-project-plan", "keel-asset-review", "keel-draft-repair", "fray-auction-review"]);
+    const projectPlanPrompt = await server.handle({ jsonrpc: "2.0", id: 33, method: "prompts/get", params: { name: "keel-project-plan", arguments: { request: "Make a deterministic p5 collection with a claim", scope: "collection", runtime: "p5", outcome: "claim", chain: "sepolia" } } });
+    assert.equal(projectPlanPrompt?.result.description, "Intent-first, review-only KEEL project plan.");
+    assert.match(projectPlanPrompt?.result.messages[0].content.text, /scope=collection/iu);
+    assert.match(projectPlanPrompt?.result.messages[0].content.text, /runtime=p5/iu);
+    assert.match(projectPlanPrompt?.result.messages[0].content.text, /outcome="release"/iu);
+    assert.match(projectPlanPrompt?.result.messages[0].content.text, /release\.saleMechanism="claim"/iu);
+    assert.match(projectPlanPrompt?.result.messages[0].content.text, /never pass scope/iu);
+    assert.match(projectPlanPrompt?.result.messages[0].content.text, /numeric chainId/iu);
+    assert.match(projectPlanPrompt?.result.messages[0].content.text, /keel:\/\/mcp\/project-routes/iu);
+    assert.match(projectPlanPrompt?.result.messages[0].content.text, /Stop at a reviewable plan/iu);
+    const invalidProjectPlanPrompt = await server.handle({ jsonrpc: "2.0", id: 34, method: "prompts/get", params: { name: "keel-project-plan", arguments: { request: "Make art", runtime: "unknown-runtime" } } });
+    assert.equal(invalidProjectPlanPrompt?.error?.code, -32602);
     const frayPrompt = await server.handle({ jsonrpc: "2.0", id: 11, method: "prompts/get", params: { name: "fray-auction-review" } });
-    assert.match(frayPrompt?.result.messages[0].content.text, /exactly three auction setups/iu);
+    assert.match(frayPrompt?.result.messages[0].content.text, /exactly four auction setups/iu);
     assert.match(frayPrompt?.result.messages[0].content.text, /stop and wait/iu);
+    const keelPrompt = await server.handle({ jsonrpc: "2.0", id: 12, method: "prompts/get", params: { name: "keel-asset-review", arguments: { input: "asset.js" } } });
+    assert.match(keelPrompt?.result.messages[0].content.text, /canonical KEEL Inline graph/iu);
+    assert.match(keelPrompt?.result.messages[0].content.text, /protected-harness wrapper/iu);
+    assert.match(keelPrompt?.result.messages[0].content.text, /Never use protectorPrefix, protectorSuffix, protectedHarnessDataURI, or a NoProtector result/iu);
+    assert.match(keelPrompt?.result.messages[0].content.text, /automatic compact raw-percent saver/iu);
+    const repairPrompt = await server.handle({ jsonrpc: "2.0", id: 32, method: "prompts/get", params: { name: "keel-draft-repair", arguments: { releaseId: "release-1", expectedRevision: 7, request: "Optimize the poster without changing Inline mode.", presentationMode: "inline" } } });
+    assert.equal(repairPrompt?.result.description, "Revision-bound, wallet-neutral KEEL Studio draft repair.");
+    assert.match(repairPrompt?.result.messages[0].content.text, /media-optimize-apply/u);
+    assert.match(repairPrompt?.result.messages[0].content.text, /expectedRevision 7/u);
+    assert.match(repairPrompt?.result.messages[0].content.text, /Never cancel, sign, submit, publish, request wallet approval/u);
     const malformedPromptList = await server.handle({ jsonrpc: "2.0", id: 10, method: "prompts/list", params: { unexpected: true } });
     assert.equal(malformedPromptList?.error?.code, -32602);
     const malformedResourceList = await server.handle({ jsonrpc: "2.0", id: 22, method: "resources/list", params: null });
     assert.equal(malformedResourceList?.error?.code, -32602);
     const resourceFiles = await readdir(directory);
     const resourceList = await server.handle({ jsonrpc: "2.0", id: 23, method: "resources/list", params: {} });
-    assert.deepEqual(resourceList?.result.resources.map((resource) => resource.uri), ["keel://mcp/workflow", "keel://mcp/limits"]);
+    assert.deepEqual(resourceList?.result.resources.map((resource) => resource.uri), ["keel://mcp/engine", "keel://mcp/svg-renderer", "keel://mcp/workflow", "keel://mcp/limits", "keel://mcp/project-routes", "keel://mcp/publication-modes", "keel://mcp/arena"]);
     const resourceRead = await server.handle({ jsonrpc: "2.0", id: 24, method: "resources/read", params: { uri: "keel://mcp/limits" } });
     assert.equal(JSON.parse(resourceRead?.result.contents[0].text).kind, "offline-limits");
     const workflowRead = await server.handle({ jsonrpc: "2.0", id: 27, method: "resources/read", params: { uri: "keel://mcp/workflow" } });
     const workflow = JSON.parse(workflowRead?.result.contents[0].text);
+    assert.deepEqual(workflow.contractFirst.slice(0, 4), ["keel-contract-workflow-preflight", "keel-engine-catalog", "keel-network-inspect", "keel-library-search"]);
     assert.ok(workflow.steps.includes("module-resolve"));
     assert.ok(workflow.steps.includes("module-lock"));
     assert.ok(workflow.steps.includes("ethereum-encode"));
     assert.ok(workflow.steps.includes("publish-plan"));
+    assert.ok(workflow.steps.includes("keel-revision-plan"));
+    assert.ok(workflow.steps.includes("media-optimize"));
+    assert.ok(workflow.steps.includes("media-optimize-apply"));
+    assert.ok(workflow.steps.includes("studio-draft"));
+    assert.deepEqual(workflow.repair.order, ["studio-draft:read", "media-optimize", "creator-review", "media-optimize-apply", "studio-stage-project", "creator-prepare", "studio-draft:update"]);
+    assert.equal(workflow.repair.walletAuthority, "none");
+    const projectRoutesRead = await server.handle({ jsonrpc: "2.0", id: 35, method: "resources/read", params: { uri: "keel://mcp/project-routes" } });
+    const projectRoutes = JSON.parse(projectRoutesRead?.result.contents[0].text);
+    assert.equal(projectRoutes.planningPrompt, "keel-project-plan");
+    assert.equal(projectRoutes.intakeMapping.ordinary.outcomes.claim.outcome, "release");
+    assert.equal(projectRoutes.intakeMapping.ordinary.outcomes.claim.saleMechanism, "claim");
+    assert.equal(projectRoutes.intakeMapping.frayAuction.tool, "fray-auction-intake");
+    assert.equal(projectRoutes.intakeMapping.frayAuction.forbiddenTool, "keel-studio-project-intake");
+    assert.equal(projectRoutes.shell.default, "keel-verification-shell");
+    assert.match(projectRoutes.shell.selection, /Omit viewer/iu);
+    assert.deepEqual(projectRoutes.creationRoutes.find((route) => route.id === "fray-auction").presets, [1, 2, 3, 4]);
+    const oneMintRoute = projectRoutes.creationRoutes.find((route) => route.id === "one-mint-drop");
+    assert.equal(oneMintRoute.sdkBuilder, "buildOneMintDrop");
+    assert.match(oneMintRoute.classification, /not a storage or upload mode/iu);
+    assert.match(oneMintRoute.note, /does not create the drop, mint a token, or submit a wallet request/iu);
+    assert.deepEqual(projectRoutes.runtimeRoutes.map((route) => route.id), ["static-media", "p5", "three", "doom-wasm", "flash-as3"]);
+    assert.deepEqual(projectRoutes.proofLayers, ["sdk-unit", "forge-contract", "module-catalog", "browser-runtime", "live-chain-receipt-and-readback"]);
+    const publicationModesRead = await server.handle({ jsonrpc: "2.0", id: 29, method: "resources/read", params: { uri: "keel://mcp/publication-modes" } });
+    const publicationModes = JSON.parse(publicationModesRead?.result.contents[0].text);
+    assert.equal(publicationModes.defaultMode, "native-carrier-v1");
+    assert.equal(publicationModes.modes.find((mode) => mode.id === "history-inscription-v1").contractReadable, false);
+    assert.match(publicationModes.presentation.sdkPlanner.portableThreeDefault, /Three\.js r180/u);
+    assert.match(publicationModes.presentation.sdkPlanner.normalMediaDefault, /keel\.asset-display@1/u);
+    assert.match(publicationModes.presentation.sdkPlanner.assetDisplay, /no network or wallet authority/iu);
+    assert.equal(publicationModes.presentation.sdkPlanner.automaticCompactGraph, "buildKeelInlineRawPercentTokenURIGraph");
+    assert.match(publicationModes.presentation.sdkPlanner.sizeReporting, /complete prepared tokenURI bytes/iu);
+    assert.equal(publicationModes.staging.defaultViewer, "keel-verification-shell");
+    assert.match(publicationModes.staging.normalMedia, /never manufacture an index\.html wrapper/iu);
+    assert.match(publicationModes.staging.catalogFailure, /fail closed/iu);
+    assert.match(publicationModes.staging.existingGraphRevision, /without asking the creator/iu);
+    assert.match(publicationModes.staging.existingGraphRevision, /follow-latest.*without rewriting token presentation/iu);
+    assert.match(publicationModes.staging.activeBuilderResolution, /selected-chain KeelRawTokenURIBuilder.*Studio Inline catalog/iu);
+    assert.match(publicationModes.staging.activeBuilderResolution, /KeelRawTokenURIBuilder/iu);
+    assert.match(publicationModes.staging.activeBuilderResolution, /PreEncodedGraph mode/iu);
+    assert.match(publicationModes.staging.legacyProtectorLane, /older complete-document protector lane/iu);
+    assert.match(publicationModes.staging.legacyProtectorLane, /not the readiness check/iu);
     assert.deepEqual(await readdir(directory), resourceFiles);
     const unknownResource = await server.handle({ jsonrpc: "2.0", id: 25, method: "resources/read", params: { uri: "keel://mcp/unknown" } });
     assert.equal(unknownResource?.error?.code, -32002);
@@ -120,10 +291,117 @@ test("MCP initializes, lists strict tools, and returns JSON-RPC parameter errors
   }
 });
 
+test("project-plan aliases compose into exact intake routes and invalid values never collapse to fixed-price", async () => {
+  const directory = await mkdtemp(path.join("/tmp", "keel-mcp-route-"));
+  try {
+    const server = await createMcpServer({ workspaceRoot: directory });
+    await server.handle({ jsonrpc: "2.0", id: 1, method: "initialize", params: initializeParams });
+
+    const fixedPrompt = await server.handle({
+      jsonrpc: "2.0",
+      id: 2,
+      method: "prompts/get",
+      params: { name: "keel-project-plan", arguments: { request: "Sell one work", scope: "one-of-one", runtime: "static", outcome: "fixed-price", chain: "sepolia" } },
+    });
+    const fixedText = fixedPrompt?.result.messages[0].content.text;
+    assert.match(fixedText, /outcome="release"/iu);
+    assert.match(fixedText, /release\.saleMechanism="fixed-price"/iu);
+    assert.match(fixedText, /release\.type="one-of-one"/iu);
+    assert.match(fixedText, /runtime is not a keel-studio-project-intake argument/iu);
+
+    const frayPrompt = await server.handle({
+      jsonrpc: "2.0",
+      id: 3,
+      method: "prompts/get",
+      params: { name: "keel-project-plan", arguments: { request: "Auction this work", scope: "one-of-one", runtime: "three", outcome: "fray-auction", chain: "base-sepolia" } },
+    });
+    const frayText = frayPrompt?.result.messages[0].content.text;
+    assert.match(frayText, /do not call keel-studio-project-intake/iu);
+    assert.match(frayText, /Call fray-auction-intake/iu);
+    assert.match(frayText, /family plus network/iu);
+
+    for (const outcome of ["fixed-price", "claim", "fray-auction", "bogus"]) {
+      const rejected = await call(server, 4, "keel-studio-project-intake", {
+        title: "Must not collapse",
+        description: "An invalid direct intake alias.",
+        outcome,
+        chainId: 11_155_111,
+        release: { type: "one-of-one", saleMechanism: "fixed-price", priceEth: "0.1" },
+      });
+      assert.equal(rejected?.result.isError, true, outcome);
+      assert.match(rejected?.result.content[0].text, /outcome must be storage-only or release/iu, outcome);
+    }
+
+    for (const saleMechanism of ["fixed-price", "claim"]) {
+      const routed = await call(server, 5, "keel-studio-project-intake", {
+        title: "Exact route",
+        description: "A schema-valid release route.",
+        outcome: "release",
+        chainId: 11_155_111,
+        release: { type: "one-of-one", saleMechanism, priceEth: saleMechanism === "claim" ? "0" : "0.1" },
+      });
+      assert.equal(routed?.result.isError, undefined, saleMechanism);
+      assert.equal(routed?.result.structuredContent.releaseIntent.release.saleMechanism, saleMechanism);
+    }
+
+    const invalidMechanism = await call(server, 6, "keel-studio-project-intake", {
+      title: "Must reject",
+      description: "An invalid nested release mechanism.",
+      outcome: "release",
+      chainId: 11_155_111,
+      release: { type: "one-of-one", saleMechanism: "fray-auction", priceEth: "0.1" },
+    });
+    assert.equal(invalidMechanism?.result.isError, true);
+    assert.match(invalidMechanism?.result.content[0].text, /release\.saleMechanism must be fixed-price, auction, or claim/iu);
+
+    const invalidType = await call(server, 8, "keel-studio-project-intake", {
+      title: "Must reject",
+      description: "An invalid release type.",
+      outcome: "release",
+      chainId: 11_155_111,
+      release: { type: "collection", saleMechanism: "fixed-price", priceEth: "0.1" },
+    });
+    assert.equal(invalidType?.result.isError, true);
+    assert.match(invalidType?.result.content[0].text, /release\.type must be one-of-one, open-edition, or limited-edition/iu);
+
+    const missingReleaseChoices = await call(server, 9, "keel-studio-project-intake", {
+      title: "Must ask",
+      description: "Do not invent sale choices.",
+      outcome: "release",
+      chainId: 11_155_111,
+      release: { priceEth: "0.1" },
+    });
+    assert.deepEqual(
+      missingReleaseChoices?.result.structuredContent.questions.map(({ field }) => field),
+      ["releaseType", "saleMechanism"],
+    );
+
+    const contradictoryStorage = await call(server, 10, "keel-studio-project-intake", {
+      title: "Must reject",
+      description: "Storage-only cannot smuggle a sale.",
+      outcome: "storage-only",
+      release: { type: "one-of-one", saleMechanism: "fixed-price", priceEth: "0.1" },
+    });
+    assert.equal(contradictoryStorage?.result.isError, true);
+    assert.match(contradictoryStorage?.result.content[0].text, /release must be omitted for a storage-only project/iu);
+
+    const invalidPrompt = await server.handle({
+      jsonrpc: "2.0",
+      id: 7,
+      method: "prompts/get",
+      params: { name: "keel-project-plan", arguments: { request: "Bad route", outcome: "bogus" } },
+    });
+    assert.equal(invalidPrompt?.error?.code, -32602);
+  } finally {
+    await rm(directory, { recursive: true, force: true });
+  }
+});
+
 test("MCP cost, module lock, and wallet preparation stay offline and bounded", async () => {
   const directory = await mkdtemp(path.join("/tmp", "keel-mcp-"));
   try {
     await writeFile(path.join(directory, "asset.js"), "export const asset = true;\n");
+    await writeFile(path.join(directory, "art.png"), ONE_PIXEL_PNG);
     await writeFile(path.join(directory, "snapshot.json"), JSON.stringify(await moduleSnapshot()));
     const server = await createMcpServer({ workspaceRoot: directory });
     await server.handle({ jsonrpc: "2.0", id: 1, method: "initialize", params: initializeParams });
@@ -146,6 +424,14 @@ test("MCP cost, module lock, and wallet preparation stay offline and bounded", a
     assert.equal(oversizedPromptMedia?.error?.code, -32602);
     const cost = await call(server, 2, "cost", { input: "asset.js", compression: "none" });
     assert.equal(cost?.result.structuredContent.model.caveat, "modeled-estimate-not-gas-quote");
+    const optimizerFiles = await readdir(directory);
+    const optimize = await call(server, 7, "media-optimize", { input: "art.png", selectedStorageMode: "inline" });
+    assert.equal(optimize?.result.structuredContent.mode, "dry-run");
+    assert.equal(optimize?.result.structuredContent.measurements.state, "measured-in-memory");
+    assert.equal(typeof optimize?.result.structuredContent.measurements.afterBytes, "number");
+    assert.deepEqual(optimize?.result.structuredContent.storage, { selectedMode: "inline", changed: false });
+    assert.equal(optimize?.result.structuredContent.sourceRetention.sourceRemoved, false);
+    assert.deepEqual(await readdir(directory), optimizerFiles);
     const uploadPlan = await call(server, 8, "upload-plan", { input: "asset.js", objectName: "asset", mediaType: "text/javascript", strategy: "flat", compression: "none" });
     assert.equal(uploadPlan?.result.structuredContent.dryRun, true);
     assert.equal(uploadPlan?.result.structuredContent.materialized, false);
@@ -199,13 +485,96 @@ test("MCP cost, module lock, and wallet preparation stay offline and bounded", a
     assert.equal(encodedQr?.result.structuredContent.transport.qr, "unsupported");
     assert.equal(encodedQr?.result.structuredContent.transport.requested, true);
     assert.deepEqual(await readdir(directory), filesBeforeEncode);
-    const publishPlan = await call(server, 32, "publish-plan", { chainPlan: chainPlan?.result.structuredContent });
+    const publishPlan = await call(server, 32, "publish-plan", { publicationIntent: "new-object", chainPlan: chainPlan?.result.structuredContent });
     assert.equal(publishPlan?.result.structuredContent.status, "review-only");
     assert.equal(publishPlan?.result.structuredContent.chainReady, false);
     assert.equal(publishPlan?.result.structuredContent.envelope.plan.protocol, "keel-publish-plan@1");
     assert.equal(publishPlan?.result.structuredContent.envelope.integrity.algorithm, "sha256");
     assert.equal(publishPlan?.result.structuredContent.envelope.plan.source.path, undefined);
     assert.equal(publishPlan?.result.structuredContent.envelope.plan.operations[0].descriptor.chunkFiles, undefined);
+    const missingPublicationIntent = await call(server, 39, "publish-plan", { chainPlan: chainPlan?.result.structuredContent });
+    assert.equal(missingPublicationIntent?.result.isError, true);
+    assert.match(missingPublicationIntent?.result.content[0].text, /publicationIntent/iu);
+    const revisionSource = chainPlan?.result.structuredContent.sourcePlan;
+    const revisionResource = {
+      id: "keel.asset-display",
+      role: "module",
+      version: 2,
+      store: "0x0000000000000000000000000000000000000000",
+      objectId: `0x${"2".repeat(64)}`,
+      mediaType: revisionSource.mediaType,
+      integrity: revisionSource.integrity,
+      storedByteLength: revisionSource.integrity.byteLength,
+    };
+    const reusedArtwork = {
+      id: "creator.animation",
+      role: "asset",
+      version: 1,
+      store: "0x0000000000000000000000000000000000000000",
+      objectId: `0x${"3".repeat(64)}`,
+      mediaType: "image/avif",
+      integrity: { algorithm: "sha256", digest: `0x${"4".repeat(64)}`, byteLength: 468_223 },
+      storedByteLength: 468_223,
+    };
+    const revision = {
+      kind: "module-revision",
+      bindingMode: "follow-latest",
+      changedResourceIds: ["keel.asset-display"],
+      live: {
+        chainId: 1,
+        graphRegistry: "0x1111111111111111111111111111111111111111",
+        graphId: `0x${"5".repeat(64)}`,
+        graphVersion: 4,
+        resources: [{ ...revisionResource, version: 1, objectId: `0x${"6".repeat(64)}`, integrity: { algorithm: "sha256", digest: `0x${"7".repeat(64)}`, byteLength: 29 }, storedByteLength: 29 }, reusedArtwork],
+      },
+      candidate: { chainId: 1, graphRegistry: "0x1111111111111111111111111111111111111111", graphId: `0x${"5".repeat(64)}`, graphVersion: 5, resources: [revisionResource, reusedArtwork] },
+    };
+    const revisionPreview = await call(server, 35, "keel-revision-plan", revision);
+    assert.equal(revisionPreview?.result.structuredContent.bytes.newStoredBytes, revisionSource.integrity.byteLength);
+    assert.equal(revisionPreview?.result.structuredContent.bytes.avoidedRepublishBytes, 468_223);
+    assert.equal(revisionPreview?.result.structuredContent.publication.tokenPresentationAction, "none-follow-latest");
+    const revisionPublish = await call(server, 36, "publish-plan", {
+      publicationIntent: "existing-graph-revision",
+      chainPlan: chainPlan?.result.structuredContent,
+      revision,
+    });
+    assert.equal(revisionPublish?.result.structuredContent.revisionPlan.changedResources[0].id, "keel.asset-display");
+    assert.equal(revisionPublish?.result.structuredContent.publicationIntent, "existing-graph-revision");
+    const unrelated = structuredClone(revision);
+    unrelated.candidate.resources[1] = {
+      ...unrelated.candidate.resources[1],
+      integrity: { ...unrelated.candidate.resources[1].integrity, digest: `0x${"9".repeat(64)}` },
+      version: 2,
+      objectId: `0x${"8".repeat(64)}`,
+    };
+    const blockedUnrelated = await call(server, 37, "publish-plan", {
+      publicationIntent: "existing-graph-revision",
+      chainPlan: chainPlan?.result.structuredContent,
+      revision: unrelated,
+    });
+    assert.equal(blockedUnrelated?.result.isError, true);
+    assert.match(blockedUnrelated?.result.content[0].text, /graph changes keel\.asset-display, creator\.animation|Unrelated resources/iu);
+    const mismatchedUpload = structuredClone(revision);
+    mismatchedUpload.candidate.resources[0] = {
+      ...mismatchedUpload.candidate.resources[0],
+      integrity: { ...mismatchedUpload.candidate.resources[0].integrity, digest: `0x${"8".repeat(64)}` },
+    };
+    const blockedMismatch = await call(server, 38, "publish-plan", {
+      publicationIntent: "existing-graph-revision",
+      chainPlan: chainPlan?.result.structuredContent,
+      revision: mismatchedUpload,
+    });
+    assert.equal(blockedMismatch?.result.isError, true);
+    assert.match(blockedMismatch?.result.content[0].text, /upload source does not match/iu);
+    const falseSmallClaim = structuredClone(revision);
+    falseSmallClaim.candidate.resources[0] = { ...falseSmallClaim.candidate.resources[0], storedByteLength: 1 };
+    const blockedFalseSmallClaim = await call(server, 40, "publish-plan", {
+      publicationIntent: "existing-graph-revision",
+      chainPlan: chainPlan?.result.structuredContent,
+      revision: falseSmallClaim,
+    });
+    assert.equal(blockedFalseSmallClaim?.result.isError, true);
+    assert.match(blockedFalseSmallClaim?.result.content[0].text, /upload source does not match/iu);
     const materializedPlanPath = path.join(materializedDirectory, "upload-plan.json");
     const materializedPlan = JSON.parse(await readFile(materializedPlanPath, "utf8"));
     materializedPlan.integrity.digest = `0x${"0".repeat(64)}`;
@@ -342,6 +711,70 @@ test("MCP cost, module lock, and wallet preparation stay offline and bounded", a
   }
 });
 
+test("Inline MCP automatically uses the single-pack compact carriage for creator assets", async () => {
+  const directory = await mkdtemp(path.join("/tmp", "keel-mcp-inline-"));
+  try {
+    await writeFile(path.join(directory, "entry.html"), "<!doctype html><img id='art'><script>art.src=__KEEL_CONTENT__.url('keel.animation')</script>");
+    await writeFile(path.join(directory, "gif.js"), "globalThis.KEELGif=Object.freeze({ready:true});");
+    await writeFile(path.join(directory, "animation.avif"), Buffer.from(Array.from({ length: 16_384 }, (_, index) => (index * 73) & 0xff)));
+    await writeFile(path.join(directory, "poster.webp"), ONE_PIXEL_WEBP);
+    const server = await createMcpServer({ workspaceRoot: directory });
+    await server.handle({ jsonrpc: "2.0", id: 1, method: "initialize", params: initializeParams });
+    const result = await call(server, 2, "keel-inline-prepare", {
+
+      entry: "entry.html",
+      entryMediaType: "text/html",
+      modules: [{
+        moduleId: "keel.gif-encoder",
+        version: "1.0.0",
+        path: "gif.js",
+        mediaType: "text/javascript",
+        execution: "classic",
+      }],
+      assets: [{ assetId: "keel.animation", path: "animation.avif", mediaType: "image/avif" }],
+      collection: "0x1111111111111111111111111111111111111111",
+      collectionName: "Compact",
+      description: "Single-pack Inline test.",
+      imagePath: "poster.webp",
+      manifestDigest: `0x${"1".repeat(64)}`,
+      chainId: 11155111,
+    });
+    const plan = result?.result.structuredContent;
+    assert.equal(plan.carriage, "compact");
+    assert.equal(plan.resolvedCarriage, "raw-percent");
+    assert.equal(plan.mediaType, "application/vnd.keel.token-uri-raw-percent-fragment");
+    assert.equal(plan.storage.artworkBinaryPackingLayers, 1);
+    assert.equal(plan.storage.completeDocumentBase64Layers, 0);
+    assert.equal(plan.assets[0].binaryPackingLayers, 1);
+    assert.equal(plan.assets[0].sourceBytes, 16_384);
+    assert.equal(
+      plan.assets[0].sourceToPackedOverheadPercent,
+      ((plan.assets[0].packedFragmentBytes - plan.assets[0].sourceBytes) / plan.assets[0].sourceBytes) * 100,
+    );
+    assert.equal(plan.storage.assetSourceBytes, 16_384);
+    assert.equal(plan.storage.assetPackedBytes, plan.assets[0].packedFragmentBytes);
+    assert.equal(plan.storage.creatorSourceBytes, 16_384 + Buffer.byteLength(await readFile(path.join(directory, "entry.html"))));
+    assert.equal(plan.prepared.requiredBuilder, "KeelRawTokenURIBuilder");
+    assert.equal(plan.prepared.animationEncoding, "raw-percent");
+    assert.ok(plan.prepared.tokenURIBytes < 2_000_000);
+
+    const misclassified = await call(server, 3, "keel-inline-prepare", {
+
+      entry: "entry.html",
+      modules: [{
+        moduleId: "keel.animation",
+        version: "1.0.0",
+        path: "animation.avif",
+        mediaType: "image/avif",
+      }],
+    });
+    assert.equal(misclassified?.result.isError, true);
+    assert.match(misclassified?.result.content[0].text, /Declare it in assets/iu);
+  } finally {
+    await rm(directory, { recursive: true, force: true });
+  }
+});
+
 test("MCP rejects symlink inputs and CLI emits protocol JSON only", async () => {
   const directory = await mkdtemp(path.join("/tmp", "keel-mcp-"));
   const outside = await mkdtemp(path.join("/tmp", "keel-mcp-outside-"));
@@ -363,8 +796,11 @@ test("MCP rejects symlink inputs and CLI emits protocol JSON only", async () => 
     const lines = output.trim().split("\n").map((line) => JSON.parse(line));
     assert.equal(lines.length, 4);
     assert.equal(lines[0].id, 1);
-    assert.equal(lines[1].result.tools.length, 18);
-    assert.equal(lines[2].result.resources.length, 2);
+    const listed = await server.handle({ jsonrpc: "2.0", id: 5, method: "tools/list", params: {} });
+    assert.deepEqual(lines[1].result.tools, listed.result.tools);
+    assert.ok(lines[1].result.tools.some(tool => tool.name === "keel-editor-project-open"));
+    assert.equal(lines[2].result.resources.length, 6);
+    assert.ok(lines[2].result.resources.some(r=>r.uri === "keel://mcp/svg-renderer"));
     assert.equal(JSON.parse(lines[3].result.contents[0].text).kind, "offline-workflow");
   } finally {
     await rm(directory, { recursive: true, force: true });
@@ -380,9 +816,9 @@ test("Fray intake asks for creator choices and emits a digest-bound approval han
     const missing = await call(server, 2, "fray-auction-intake", { family: "ethereum", network: "sepolia" });
     assert.equal(missing?.result.structuredContent.status, "needs-input");
     assert.deepEqual(missing?.result.structuredContent.questions.map((question) => question.field), ["title", "description", "auctionPreset"]);
-    assert.equal(missing?.result.structuredContent.auctionPresets.length, 3);
+    assert.equal(missing?.result.structuredContent.auctionPresets.length, 4);
     assert.equal(missing?.result.structuredContent.auctionPresets[0].id, 1);
-    assert.equal(missing?.result.structuredContent.auctionPresets[2].id, 3);
+    assert.equal(missing?.result.structuredContent.auctionPresets[3].id, 4);
 
     const ready = await call(server, 3, "fray-auction-intake", {
       sourcePath: "doom.wasm",
@@ -417,9 +853,37 @@ test("Fray intake asks for creator choices and emits a digest-bound approval han
     assert.equal(chainGuide?.result.structuredContent.chains[0].network, "shadownet");
     assert.equal(chainGuide?.result.structuredContent.chains[0].faucet.agentAction, "show-links-only");
 
+    const missingOutcome = await call(server, 40, "keel-studio-project-intake", {
+      title: "Seed Current",
+      description: "A p5 work.",
+    });
+    assert.deepEqual(missingOutcome?.result.structuredContent.questions.map(({ field }) => field), ["outcome"]);
+    const storageOnly = await call(server, 41, "keel-studio-project-intake", {
+      title: "Seed Current",
+      description: "A p5 work.",
+      outcome: "storage-only",
+    });
+    assert.equal(storageOnly?.result.structuredContent.status, "ready");
+    assert.equal(storageOnly?.result.structuredContent.releaseIntent, undefined);
+    const release = await call(server, 42, "keel-studio-project-intake", {
+      title: "Seed Current",
+      description: "A p5 work.",
+      outcome: "release",
+      chainId: 11155111,
+      release: { type: "one-of-one", saleMechanism: "fixed-price", priceEth: "0.1" },
+    });
+    assert.equal(release?.result.structuredContent.releaseIntent.release.priceEth, "0.1");
+
     const search = await call(server, 5, "keel-library-search", { query: "three.js" });
     assert.equal(search?.result.structuredContent.status, "unconfigured");
     assert.match(search?.result.structuredContent.message, /no carrier bytes were fetched/iu);
+    const endpoints = await call(server, 6, "keel-endpoint-config", {
+      studioUrl: "https://studio.example",
+      publicRpcUrl: "https://rpc.example",
+      indexerUrl: "https://indexer.example",
+    });
+    assert.equal(endpoints?.result.structuredContent.studioUrl, "https://studio.example");
+    assert.equal(endpoints?.result.structuredContent.sources.studioUrl, "explicit");
     assert.deepEqual(await readdir(directory), []);
   } finally {
     await rm(directory, { recursive: true, force: true });
@@ -461,6 +925,27 @@ test("Keel index search reads bounded metadata and locks an exact reuse candidat
       }] }));
       return;
     }
+    if (request.url?.startsWith("/api/shells?")) {
+      response.end(JSON.stringify({ shells: [{
+        chainId: 11155111,
+        builder: "0x4f04bf6aac1183c26cadf05cf69d6148c9f6440b",
+        shellId: `0x${"9".repeat(64)}`,
+        creator: "0x404a6bd65ef48ae85da7b0e9358715a34a401b05",
+        name: "KEEL Verification Shell",
+        description: "Protected proof chrome.",
+        version: "1.0.0",
+        tags: ["proof", "sandbox"],
+        payloadMode: "sandboxed-html",
+        topObjectId: `0x${"1".repeat(64)}`,
+        bottomObjectId: `0x${"2".repeat(64)}`,
+        metadataObjectId: `0x${"3".repeat(64)}`,
+        metadataDigest: `0x${"4".repeat(64)}`,
+        revisionMode: "follow-latest",
+        latestRevision: 2,
+        frozen: false,
+      }] }));
+      return;
+    }
     response.statusCode = 404;
     response.end(JSON.stringify({ error: "not found" }));
   });
@@ -481,6 +966,10 @@ test("Keel index search reads bounded metadata and locks an exact reuse candidat
     assert.equal(content.modules[0].versions[0].identity.name, "three");
     assert.equal(content.reuse.status, "needs-selection");
     assert.match(content.carriers, /metadata-only/iu);
+    const shellResult = await call(server, 3, "keel-shell-search", { studioUrl: `http://127.0.0.1:${address.port}`, query: "proof" });
+    assert.equal(shellResult?.result.structuredContent.status, "ok");
+    assert.equal(shellResult?.result.structuredContent.shells[0].name, "KEEL Verification Shell");
+    assert.equal(shellResult?.result.structuredContent.carrierBytesFetched, false);
   } finally {
     await new Promise((resolve) => indexServer.close(resolve));
     await rm(directory, { recursive: true, force: true });
@@ -504,7 +993,9 @@ test("MCP CLI help, version, and self-test are explicit non-stdio modes", async 
     const health = JSON.parse(first);
     assert.equal(health.status, "ok");
     assert.equal(health.protocolVersion, "2024-11-05");
-    assert.equal(health.toolCount, 18);
+    assert.equal(health.toolCount, health.toolNames.length);
+    assert.equal(new Set(health.toolNames).size, health.toolCount);
+    assert.ok(health.toolNames.includes("keel-editor-project-open"));
     assert.deepEqual(health.checks, ["initialize", "ping", "tools/list", "prompts/list", "prompts/get", "resources/list", "resources/read"]);
     assert.equal(health.jsonrpc, undefined);
   } finally {

@@ -31,14 +31,14 @@ through them.
 
 | # | Layer | Its one job | Where it lives |
 |---|-------|-------------|----------------|
-| 01 | **THE DIE** | The artist's contract. Strikes the tokens: who may buy, how many exist, what each one points at. | [`KEEL721`](../packages/contracts/src/modules/keel-die/KEEL721.sol), [`KeelFactory`](../packages/contracts/src/modules/keel-die/KeelFactory.sol), [`KeelMintGate`](../packages/contracts/src/modules/keel-mint-access/KeelMintGate.sol) |
-| 02 | **THE HOLD** | Where the bytes live on the chain. Shared, permanent, never moves. | [`KeelHold`](../packages/contracts/src/modules/keel-hold/KeelHold.sol), [`Ingot`](../packages/contracts/src/modules/keel-hold/Ingot.sol) |
-| 03 | **THE INDEX** | The sealed inventory. Every piece the work is made of, and its Mark. | [`KeelIndex`](../packages/contracts/src/modules/keel-hold/KeelIndex.sol), [`KeelArtifactRegistry`](../packages/contracts/src/modules/keel-artifacts/KeelArtifactRegistry.sol) |
+| 01 | **THE DIE** | The artist's contract. Strikes the tokens: who may buy, how many exist, what each one points at. | [`KEEL721`](../../keel-contracts/src/modules/keel-die/KEEL721.sol), [`KeelFactory`](../../keel-contracts/src/modules/keel-die/KeelFactory.sol), [`KeelMintGate`](../../keel-contracts/src/modules/keel-mint-access/KeelMintGate.sol) |
+| 02 | **THE HOLD** | Where the bytes live on the chain. Shared, permanent, never moves. | [`KeelHold`](../../keel-contracts/src/modules/keel-hold/KeelHold.sol), [`Ingot`](../../keel-contracts/src/modules/keel-hold/Ingot.sol) |
+| 03 | **THE INDEX** | The sealed inventory. Every piece the work is made of, and its Mark. | [`KeelIndex`](../../keel-contracts/src/modules/keel-hold/KeelIndex.sol), [`KeelArtifactRegistry`](../../keel-contracts/src/modules/keel-artifacts/KeelArtifactRegistry.sol) |
 | 04 | **THE CRUCIBLE** | Proves the work on every open, on the viewer's own machine. Clean, or slag. | `keel-crucible/` registries + the viewer-side verifier |
-| 05 | **THE HARNESS** | Runs the art sealed off from your wallet and the open internet. Contains the Cage. | [`KeelHarnessRegistry`](../packages/contracts/src/modules/keel-artifacts/KeelHarnessRegistry.sol), [`KeelHarnessBuilder`](../packages/contracts/src/modules/keel-harness/KeelHarnessBuilder.sol) |
+| 05 | **THE HARNESS** | Runs the art sealed off from your wallet and the open internet. Contains the Cage. | [`KeelHarnessRegistry`](../../keel-contracts/src/modules/keel-artifacts/KeelHarnessRegistry.sol), [`KeelHarnessBuilder`](../../keel-contracts/src/modules/keel-harness/KeelHarnessBuilder.sol) |
 | 06 | **THE ANCHOR** | A copy of the exact bytes driven into another chain. | `keel-anchors/` — attested, portable, zk, IPFS |
 | 07 | **PARTS & INLAYS** | Art built out of other art, verified as hard as its host. | `keel-graph/`, `keel-equipment/` |
-| 08 | **THE SLEEVE** | What ordinary marketplaces see. Boring, standard, works everywhere. | [`KeelSleeve`](../packages/contracts/src/modules/keel-sleeve/KeelSleeve.sol), the ERC-721/2981/4906 surface of `KEEL721` |
+| 08 | **THE SLEEVE** | What ordinary marketplaces see. Boring, standard, works everywhere. | [`KeelSleeve`](../../keel-contracts/src/modules/keel-sleeve/KeelSleeve.sol), the ERC-721/2981/4906 surface of `KEEL721` |
 
 ## The parts
 
@@ -84,7 +84,7 @@ process they are:
 | `forgeArtifact` (+`For`, `WithRevisionPolicy`) | Register one complete work above the bytes. | `KeelArtifactRegistry` |
 | `appendArtifactRevision` / `freezeArtifact` | Move a work's lineage forward, or seal it forever. | `KeelArtifactRegistry` |
 | `forgeHarness` / `forkHarnessForToken` / `effectiveHarness` | Pin what runs, fork it per token, resolve what's live. | `KeelHarnessRegistry` |
-| `harnessHTML` / `protectedHarnessDataURI` | Rebuild the sealed runtime from chain bytes. | `KeelHarnessBuilder` |
+| `harnessHTML` / `shellDataURI` | Rebuild the sealed runtime from chain bytes. | `KeelHarnessBuilder` |
 | `castDie` / `castDieFor` / `predictDieAddress` | Deploy an artist's Die at a known address. Event: `DieCast`. | `KeelFactory` |
 | `strikeFromManager` / `adminStrike` / `reserveStrikeCapacity` | The Die strikes tokens; capacity lives on the die itself. | `KEEL721` |
 | `driveAnchor` / `stampNative` / `setAnchor` / `grip` | Drive a copy into another chain; sight it; set it; count the chains that hold it. | `keel-anchors` |
@@ -119,21 +119,16 @@ history, old deployments, or old ABIs:
 | `mintFromManager` / `adminMint` | `strikeFromManager` / `adminStrike` |
 | `requestAnchor` / `anchorNative` / `finalizeAnchor` | `driveAnchor` / `stampNative` / `setAnchor` |
 
-> Deployed contracts from the Stratus era keep their old ABIs. The rename is
-> source-level; anything already on a network answers to its old selectors and
-> domain strings until redeployed.
+### KEEL wire identifiers
 
-### Wire formats keep their bytes
+This unreleased EVM format uses `KEEL` (`0x4b45454c`) descriptor magic,
+version `1`. The reader accepts only this format; obsolete tags are rejected.
+The 93-byte header and object-ID derivation are specified in the contracts
+repository's `docs/EVM_HOLD_WIRE_FORMAT.md`.
 
-A few identifiers are **format magic, not branding**, and deliberately keep
-their old spelling until the format itself revs — changing them would orphan
-every manifest and descriptor already published on chain:
+- `keel-manifest@2` identifies the manifest schema.
+- `keel://` is the virtual route scheme inside the sandbox.
+- `keel.per-token-mint-data.v1` and related hash domains identify KEEL commitments.
+- `web3://` addresses contract resources; it is not a binary descriptor tag.
 
-- `keel-manifest@2` — the manifest format id (becomes `keel-manifest@3` at the
-  next format bump, not before)
-- `keel://` — the virtual route scheme inside the sandbox
-- `keel.per-token-mint-data.v1` and related KEEL hash domains
-- `STR3` (`0x53545233`) — the descriptor magic in `KeelHold`
-
-New domain separators introduced after the rename are `keel.*`; the recorded
-cross-language golden vectors were re-cut for every renamed domain.
+New domain separators use `keel.*`. Golden vectors track the current format.

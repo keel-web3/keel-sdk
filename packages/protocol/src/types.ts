@@ -72,7 +72,7 @@ export interface InlineSource {
 
 export interface UriSource {
   readonly kind: "uri";
-  /** HTTPS, IPFS, IPNS, Arweave, or a manifest-relative URI. */
+  /** HTTPS, IPFS, IPNS, Arweave, manifest-relative, or canonical whole-object KEEL Wake URI. */
   readonly uri: string;
   readonly gateways?: readonly string[];
   readonly compression?: Compression;
@@ -214,6 +214,7 @@ export type KeelComponentRole =
   | "audio-engine"
   | "wallet-runtime"
   | "audio"
+  | "video"
   | "image"
   | "font"
   | "model"

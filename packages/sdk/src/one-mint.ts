@@ -49,6 +49,15 @@ export interface NormalizedOneMintDrop {
   readonly metadataDigest: Hex;
 }
 
+export interface OneMintItemDropInput extends OneMintDropInput {
+  /** ERC-1155 item fixed into the drop at creation; collector mintData cannot redirect it. */
+  readonly targetTokenId: bigint | number;
+}
+
+export interface NormalizedOneMintItemDrop extends NormalizedOneMintDrop {
+  readonly targetTokenId: bigint;
+}
+
 export interface OneMintPerTokenMintDataInput {
   readonly quantity: bigint | number;
   /** Exact bytes consumed by each token's pre-receiver hook, in token order. */
@@ -171,6 +180,17 @@ export function buildOneMintDrop(input: OneMintDropInput): NormalizedOneMintDrop
   });
 }
 
+/**
+ * Mirrors OneMintController.createItemDrop. The item id is part of the
+ * reviewed operation itself, never inferred from collector-controlled
+ * mintData.
+ */
+export function buildOneMintItemDrop(input: OneMintItemDropInput): NormalizedOneMintItemDrop {
+  const drop = buildOneMintDrop(input);
+  const targetTokenId = uint(input.targetTokenId, 0n, "targetTokenId");
+  return Object.freeze({ ...drop, targetTokenId });
+}
+
 export function oneMintStageKindName(kind: OneMintStageKind): string {
   switch (enumValue(kind, ONE_MINT_SUPPORTED_STAGE_KINDS, "stage kind")) {
     case OneMintStageKind.Off: return "Off";
@@ -225,4 +245,37 @@ export function normalizeOneMintPerTokenMintData(
     throw new RangeError("non-empty batch mint data requires one ordered slice per token.");
   }
   return Object.freeze({ mode: "per-token-batch" as const, quantity, slices: Object.freeze(slices) });
+}
+
+/** Locate an NFT's flag in OneMintController.claimWord without truncating its id. */
+export function oneMintClaimPosition(tokenId: bigint | number): Readonly<{ wordIndex: bigint; mask: bigint }> {
+  const id = uint(tokenId, 0n, "tokenId");
+  return Object.freeze({ wordIndex: id >> 8n, mask: 1n << (id & 255n) });
+}
+
+/** Read each needed claim word once; preserve the caller's signed token-id order. */
+export function planOneMintClaimWords(tokenIds: readonly (bigint | number)[]): Readonly<{
+  tokenIds: readonly bigint[];
+  words: readonly Readonly<{ wordIndex: bigint; requestedMask: bigint }>[];
+}> {
+  if (tokenIds.length === 0 || tokenIds.length > 64) {
+    throw new RangeError("OneMint claims require between 1 and 64 NFT ids.");
+  }
+  const ids = tokenIds.map((value, index) => uint(value, 0n, `tokenIds[${index}]`));
+  const words = new Map<bigint, bigint>();
+  for (const id of ids) {
+    const { wordIndex, mask } = oneMintClaimPosition(id);
+    const previous = words.get(wordIndex) ?? 0n;
+    if ((previous & mask) !== 0n) throw new RangeError("An NFT id cannot appear twice in one claim.");
+    words.set(wordIndex, previous | mask);
+  }
+  return Object.freeze({
+    tokenIds: Object.freeze(ids),
+    words: Object.freeze([...words].map(([wordIndex, requestedMask]) => Object.freeze({ wordIndex, requestedMask }))),
+  });
+}
+
+/** A preflight check only: claimMint rechecks ownership and consumption onchain. */
+export function oneMintClaimUsed(word: bigint | number, tokenId: bigint | number): boolean {
+  return (uint(word, 0n, "claimWord") & oneMintClaimPosition(tokenId).mask) !== 0n;
 }

@@ -2,13 +2,13 @@
 // Source: packages/contracts/modules/*/keel.module.json and */deployments/*.json
 
 /** Reusable protocol infrastructure. Each module ships as its own repository. */
-export type KeelModuleId = "keel-kernel" | "keel-codecs" | "keel-hold" | "keel-artifacts" | "keel-graph" | "keel-harness" | "keel-presentation" | "keel-die" | "keel-creator-identity" | "keel-mint-access" | "keel-equipment" | "keel-market" | "keel-anchors" | "keel-crucible" | "keel-ip-control" | "keel-sleeve" | "keel-web3-url" | "keel-cross-chain-mint" | "keel-stake";
+export type KeelModuleId = "keel-kernel" | "keel-codecs" | "keel-hold" | "keel-artifacts" | "keel-graph" | "keel-harness" | "keel-presentation" | "keel-die" | "keel-creator-identity" | "keel-mint-access" | "keel-market" | "keel-anchors" | "keel-crucible" | "keel-ip-control" | "keel-sleeve" | "keel-web3-url" | "keel-cross-chain-mint" | "keel-publication" | "keel-stake";
 
 /**
  * Concrete products built on the modules. Apps consume modules exactly as an
  * outside integrator does, and no module may depend on one.
  */
-export type KeelAppId = "keel-canvas" | "cool-s" | "onchaininator" | "line" | "vault-runner";
+export type KeelAppId = "keel-canvas" | "cool-s" | "line" | "vault-runner";
 
 /** Anything with contracts on a chain — a module or an app. */
 export type KeelUnitId = KeelModuleId | KeelAppId;
@@ -61,9 +61,37 @@ export const KEEL_MODULES: readonly KeelModule[] = [
       "SafeAdminAccessControl.sol",
       "libraries/JsonEscape.sol",
       "libraries/KeelCodeIdentity.sol",
-      "libraries/KeelCollectionFreezeValidation.sol"
+      "libraries/KeelUriEscape.sol",
+      "KeelFeeTreasury.sol",
+      "libraries/KeelPlatformFees.sol",
+      "libraries/KeelGovernance.sol",
+      "KeelAccessGroups.sol",
+      "KeelLocalPause.sol",
+      "libraries/KeelPause.sol",
+      "libraries/KeelTokenURIEnvelope.sol",
+      "libraries/KeelMintSeeded.sol",
+      "libraries/KeelMintSeededBatches.sol",
+      "interfaces/IKeelMintSeededBatchErrors.sol",
+      "interfaces/IKeelMintSeededErrors.sol",
+      "interfaces/IKeelMintSeededData.sol",
+      "interfaces/IKeelVrfV2Plus.sol",
+      "interfaces/IKeelGovernanceErrors.sol",
+      "interfaces/IKeelPlatformFeeErrors.sol",
+      "interfaces/IKeelFeeTreasuryErrors.sol",
+      "interfaces/IKeelFeeTreasuryEvents.sol",
+      "interfaces/IKeelAccessGroupErrors.sol",
+      "interfaces/IKeelAccessGroupEvents.sol",
+      "KeelRecoveryGroups.sol",
+      "interfaces/IKeelRecoveryErrors.sol",
+      "interfaces/IKeelMetadataRelay.sol",
+      "libraries/KeelMetadataSubscriptions.sol",
+      "libraries/KeelRawStringReturn.sol"
     ],
-    "deployable": []
+    "deployable": [
+      "KeelFeeTreasury",
+      "KeelAccessGroups",
+      "KeelRecoveryGroups"
+    ]
   },
   {
     "id": "keel-codecs",
@@ -98,13 +126,26 @@ export const KEEL_MODULES: readonly KeelModule[] = [
     "summary": "Immutable content-addressed chunk storage and the artifact registry that activates revisions.",
     "version": "0.3.0",
     "repo": "keel-web3/keel-hold",
-    "deps": [],
+    "deps": [
+      "keel-kernel"
+    ],
     "contracts": [
       "KeelHold.sol",
       "Ingot.sol",
       "KeelIndex.sol",
       "interfaces/IKeelHold.sol",
-      "interfaces/IKeelIndex.sol"
+      "interfaces/IKeelHoldLimits.sol",
+      "interfaces/IKeelHoldSeal.sol",
+      "libraries/KeelSealValidation.sol",
+      "libraries/KeelCastDispatch.sol",
+      "interfaces/IKeelIndex.sol",
+      "interfaces/IKeelHoldHarness.sol",
+      "interfaces/IKeelHoldEvents.sol",
+      "libraries/KeelHoldMetadata.sol",
+      "interfaces/IKeelHoldErrors.sol",
+      "interfaces/IKeelIndexErrors.sol",
+      "interfaces/IKeelIndexEvents.sol",
+      "interfaces/IKeelIndexMetadataReceiver.sol"
     ],
     "deployable": [
       "Ingot",
@@ -122,7 +163,8 @@ export const KEEL_MODULES: readonly KeelModule[] = [
     "version": "0.3.0",
     "repo": "keel-web3/keel-artifacts",
     "deps": [
-      "keel-hold"
+      "keel-hold",
+      "keel-kernel"
     ],
     "contracts": [
       "KeelArtifactRegistry.sol",
@@ -131,10 +173,42 @@ export const KEEL_MODULES: readonly KeelModule[] = [
       "KeelHarnessRegistry.sol",
       "KeelLinkRegistry.sol",
       "KeelSeedRegistry.sol",
+      "interfaces/IKeelMintSeedSource.sol",
+      "interfaces/IKeelSeedRegistryErrors.sol",
+      "interfaces/IKeelSeedRegistryEvents.sol",
       "interfaces/IKeelArtifactRegistry.sol",
       "interfaces/IKeelManager.sol",
       "interfaces/IKeelArtifactRevisionPolicy.sol",
-      "interfaces/IKeelHarnessRegistry.sol"
+      "interfaces/IKeelHarnessRegistry.sol",
+      "interfaces/IKeelHarnessRegistryErrors.sol",
+      "interfaces/IKeelHarnessRegistryEvents.sol",
+      "KeelManagerRecovery.sol",
+      "KeelManagerRpcPolicy.sol",
+      "interfaces/IKeelManagerErrors.sol",
+      "interfaces/IKeelManagerEvents.sol",
+      "interfaces/IKeelManagerRecoveryErrors.sol",
+      "interfaces/IKeelManagerRecoveryEvents.sol",
+      "interfaces/IKeelManagerRpcErrors.sol",
+      "interfaces/IKeelManagerRpcEvents.sol",
+      "interfaces/IKeelManagerTypes.sol",
+      "libraries/KeelManagerGovernorState.sol",
+      "KeelLinkURIBuilder.sol",
+      "interfaces/IKeelLinkURIBuilder.sol",
+      "interfaces/IKeelLinkURIBuilderErrors.sol",
+      "interfaces/IKeelLinkRegistryErrors.sol",
+      "interfaces/IKeelLinkRegistryEvents.sol",
+      "KeelRawFragmentValidationRegistry.sol",
+      "KeelRawFragmentRevisionPolicy.sol",
+      "KeelRawImageRevisionPolicy.sol",
+      "KeelArtifactFragmentResolver.sol",
+      "KeelRegisteredArtifactFragmentResolver.sol",
+      "interfaces/IKeelArtifactFragmentResolver.sol",
+      "interfaces/IKeelRawCanonicalShellRegistry.sol",
+      "interfaces/IKeelRawFragmentRevisionPolicy.sol",
+      "interfaces/IKeelRawFragmentValidationRegistry.sol",
+      "interfaces/IKeelRawFragmentValidationRegistryEvents.sol",
+      "interfaces/IKeelRawImageRevisionPolicy.sol",
+      "interfaces/IKeelRevisionedRawTokenURIBuilder.sol"
     ],
     "deployable": [
       "KeelArtifactRegistry",
@@ -142,7 +216,15 @@ export const KEEL_MODULES: readonly KeelModule[] = [
       "KeelLinkRegistry",
       "KeelManager",
       "KeelManagerProxy",
-      "KeelSeedRegistry"
+      "KeelSeedRegistry",
+      "KeelManagerRecovery",
+      "KeelManagerRpcPolicy",
+      "KeelLinkURIBuilder",
+      "KeelRawFragmentValidationRegistry",
+      "KeelRawFragmentRevisionPolicy",
+      "KeelRawImageRevisionPolicy",
+      "KeelArtifactFragmentResolver",
+      "KeelRegisteredArtifactFragmentResolver"
     ]
   },
   {
@@ -160,10 +242,12 @@ export const KEEL_MODULES: readonly KeelModule[] = [
       "KeelPluginRegistry.sol",
       "KeelModuleReviewRegistry.sol",
       "KeelLibraryRegistry.sol",
+      "KeelAssetTagRegistry.sol",
       "interfaces/IKeelGraphRegistry.sol",
       "interfaces/IKeelContractPlugin.sol"
     ],
     "deployable": [
+      "KeelAssetTagRegistry",
       "KeelGraphRegistry",
       "KeelLibraryRegistry",
       "KeelModuleReviewRegistry",
@@ -180,15 +264,33 @@ export const KEEL_MODULES: readonly KeelModule[] = [
     "version": "0.3.0",
     "repo": "keel-web3/keel-harness",
     "deps": [
-      "keel-hold"
+      "keel-hold",
+      "keel-kernel",
+      "keel-artifacts"
     ],
     "contracts": [
       "KeelHarnessBuilder.sol",
+      "KeelPercentTokenURIBuilder.sol",
       "interfaces/IKeelHarnessBuilder.sol",
-      "libraries/KeelHarnessContextDispatch.sol"
+      "interfaces/IKeelPercentTokenURIBuilder.sol",
+      "libraries/KeelHarnessContextDispatch.sol",
+      "libraries/KeelPreEncodedTokenURI.sol",
+      "libraries/KeelPreparedTokenURI.sol",
+      "KeelObjectURIBuilder.sol",
+      "KeelRawTokenURIBuilder.sol",
+      "interfaces/IKeelObjectURIBuilder.sol",
+      "interfaces/IKeelRawTokenURIBuilder.sol",
+      "KeelSVGRenderer.sol",
+      "interfaces/IKeelSVGRenderer.sol",
+      "KeelRawInlineShellRegistry.sol",
+      "interfaces/IKeelRawInlineShellRegistry.sol"
     ],
     "deployable": [
-      "KeelHarnessBuilder"
+      "KeelHarnessBuilder",
+      "KeelPercentTokenURIBuilder",
+      "KeelObjectURIBuilder",
+      "KeelRawTokenURIBuilder",
+      "KeelRawInlineShellRegistry"
     ]
   },
   {
@@ -204,7 +306,13 @@ export const KEEL_MODULES: readonly KeelModule[] = [
     "contracts": [
       "KeelPresentationStateRegistry.sol",
       "KeelVisualStateLedger.sol",
-      "interfaces/IKeelPresentationRegistry.sol"
+      "interfaces/IKeelPresentationRegistry.sol",
+      "interfaces/IKeelImmutableObjectSource.sol",
+      "interfaces/IKeelPresentationStateErrors.sol",
+      "interfaces/IKeelPresentationStateEvents.sol",
+      "interfaces/IKeelStakingAdapter.sol",
+      "interfaces/IKeelVisualStateLedgerErrors.sol",
+      "interfaces/IKeelVisualStateLedgerEvents.sol"
     ],
     "deployable": [
       "KeelPresentationStateRegistry",
@@ -217,28 +325,96 @@ export const KEEL_MODULES: readonly KeelModule[] = [
     "title": "Token base",
     "group": "token",
     "visibility": "private",
-    "summary": "The KEEL721 base collection, its deployer, and the factories that stamp out collections.",
+    "summary": "Compact creator-owned ERC-721/ERC-1155 collections, a shared multi-creator ERC-1155, renderer boundaries, and factories that organize them.",
     "version": "0.3.0",
     "repo": "keel-web3/keel-die",
     "deps": [
       "keel-kernel",
       "keel-harness",
-      "keel-presentation"
+      "keel-presentation",
+      "keel-artifacts",
+      "keel-hold",
+      "keel-codecs"
     ],
     "contracts": [
       "KEEL721.sol",
+      "KeelMintSeeded721.sol",
+      "KeelMintSeeded721A.sol",
       "KEEL721Deployer.sol",
       "KeelFactory.sol",
       "KeelFactorySepolia.sol",
+      "KeelCreator721.sol",
+      "KeelCreator721A.sol",
+      "KeelCreatorSeeded721A.sol",
+      "KeelSeedBlockArchive.sol",
+      "KeelSeedVrfAdapter.sol",
+      "interfaces/IKeelSeedVrf.sol",
+      "interfaces/IKeelSeedVrfErrors.sol",
+      "interfaces/IKeelSeedVrfEvents.sol",
+      "interfaces/IKeelCreatorSeedErrors.sol",
+      "interfaces/IKeelCreatorSeedEvents.sol",
+      "KeelCreator1155.sol",
+      "interfaces/IKeelCreatorLifecycleEvents.sol",
+      "interfaces/IKeelCreatorItemErrors.sol",
+      "interfaces/IKeelItemCapacityEvents.sol",
+      "interfaces/IKeelCreator1155Events.sol",
+      "KeelShared1155.sol",
+      "interfaces/IKeelItemBatchMintTarget.sol",
+      "interfaces/IKeelMintBatchErrors.sol",
+      "interfaces/IKeelShared1155Errors.sol",
+      "interfaces/IKeelShared1155Events.sol",
+      "KeelCreatorFactory.sol",
+      "interfaces/IKeelCreatorFactoryErrors.sol",
+      "interfaces/IKeelCreatorFactoryEvents.sol",
+      "KeelArtifactTokenRenderer.sol",
       "interfaces/IKeelMintable.sol",
+      "interfaces/IKeelMintDataSource.sol",
       "interfaces/IKeelMintCapacity.sol",
-      "interfaces/IKeelCampaignAuthorizer.sol"
+      "interfaces/IKeelCampaignAuthorizer.sol",
+      "interfaces/IKeelItemMintTarget.sol",
+      "interfaces/IKeelTokenRenderer.sol",
+      "interfaces/IKeelCreatorDirectory.sol",
+      "KeelRawPrepared721.sol",
+      "KeelRouted721.sol",
+      "Keel721Presentation.sol",
+      "interfaces/IKeel721Errors.sol",
+      "interfaces/IKeel721Events.sol",
+      "interfaces/IKeelCreatorCollectionErrors.sol",
+      "interfaces/IKeelCreatorCollectionEvents.sol",
+      "interfaces/IKeelMintTargetErrors.sol",
+      "interfaces/IKeelStrikeCapacityEvents.sol",
+      "interfaces/IKeel721PresentationEvents.sol",
+      "interfaces/IKeelDeferredCollectionResolver.sol",
+      "interfaces/IKeelDeferredMintSetup.sol",
+      "interfaces/IKeelMetadataEvents.sol",
+      "interfaces/IKeelMetadataReceiver.sol",
+      "libraries/Keel721MetadataFormatting.sol",
+      "libraries/KeelSeedBlockEntropy.sol",
+      "KeelRevisioned721.sol",
+      "KeelRegisteredArtifactFragment721Presentation.sol",
+      "interfaces/IKeelDirect721Presentation.sol",
+      "interfaces/IKeelCollectionDescription.sol"
     ],
     "deployable": [
       "KEEL721",
       "KEEL721Deployer",
+      "KeelArtifactTokenRenderer",
+      "KeelCreator1155",
+      "KeelCreator721",
+      "KeelCreator721A",
+      "KeelCreatorFactory",
       "KeelFactory",
-      "KeelFactorySepolia"
+      "KeelFactorySepolia",
+      "KeelShared1155",
+      "KeelRawPrepared721",
+      "Keel721Presentation",
+      "KeelRouted721",
+      "KeelCreatorSeeded721A",
+      "KeelSeedBlockArchive",
+      "KeelSeedVrfAdapter",
+      "KeelRevisioned721",
+      "KeelRegisteredArtifactFragment721Presentation",
+      "Keel721MetadataFormatting"
     ]
   },
   {
@@ -251,7 +427,8 @@ export const KEEL_MODULES: readonly KeelModule[] = [
     "version": "0.3.0",
     "repo": "keel-web3/keel-creator-identity",
     "deps": [
-      "keel-artifacts"
+      "keel-artifacts",
+      "keel-kernel"
     ],
     "contracts": [
       "KeelCreatorProfileRegistry.sol",
@@ -271,56 +448,98 @@ export const KEEL_MODULES: readonly KeelModule[] = [
     "title": "Mint access",
     "group": "token",
     "visibility": "private",
-    "summary": "Campaign-based mint authorization: access gates, adapters, and ordered shared-allocation stages.",
+    "summary": "Shared mint routes, OneMint admission queues, verifiable queue/reward entropy, and community or achievement reward claims.",
     "version": "0.3.0",
     "repo": "keel-web3/keel-mint-access",
     "deps": [
-      "keel-die",
-      "keel-creator-identity"
-    ],
-    "contracts": [
-      "KeelMintGate.sol",
-      "OneMintController.sol",
-      "interfaces/IKeelAccessGate.sol",
-      "interfaces/IKeelMintAdapter.sol"
-    ],
-    "deployable": [
-      "KeelMintGate",
-      "OneMintController"
-    ]
-  },
-  {
-    "id": "keel-equipment",
-    "kind": "module",
-    "title": "Equipment",
-    "group": "assets",
-    "visibility": "private",
-    "summary": "Token-owned equipment: inventory custody, distribution lanes, reservations, and one-use duplication.",
-    "version": "0.3.0",
-    "repo": "keel-web3/keel-equipment",
-    "deps": [
       "keel-kernel",
-      "keel-artifacts",
+      "keel-die",
+      "keel-creator-identity",
       "keel-hold"
     ],
     "contracts": [
-      "KeelEquipmentInventory.sol",
-      "KeelEquipmentDistributor.sol",
-      "KeelEquipmentReservationEngine.sol",
-      "KeelEquipmentDescriptorValidator.sol",
-      "KeelEquipmentInventoryReader.sol",
-      "KeelOneUseDuplicator.sol",
-      "interfaces/IKeelERC1155EquipmentDescriptor.sol",
-      "interfaces/IKeelReservableMint1155.sol",
-      "libraries/KeelMintBoundEquipmentProvision.sol"
+      "KeelMintQueue.sol",
+      "QueuePriorityHeap.sol",
+      "KeelQueueAccess.sol",
+      "KeelRewardClaims.sol",
+      "KeelMintRewardEntropy.sol",
+      "FrayAuctionIssuer.sol",
+      "KeelMintGate.sol",
+      "KeelMintRouteRegistry.sol",
+      "interfaces/IKeelMintBatchRouteRegistry.sol",
+      "interfaces/IKeelMintRouteErrors.sol",
+      "interfaces/IKeelMintRouteEvents.sol",
+      "OneMintCore.sol",
+      "KeelOneMintBatch.sol",
+      "interfaces/IKeelOneMintBatch.sol",
+      "OneMintController.sol",
+      "OpenOneMintController.sol",
+      "interfaces/IKeelAccessGate.sol",
+      "interfaces/IKeelMintAdapter.sol",
+      "interfaces/IKeelMintHook.sol",
+      "interfaces/IKeelMintRouteRegistry.sol",
+      "interfaces/IKeelOneMintErrors.sol",
+      "interfaces/IKeelMintGateErrors.sol",
+      "interfaces/IKeelMintGateEvents.sol",
+      "libraries/KeelMintPricing.sol",
+      "libraries/KeelNftCouponClaims.sol",
+      "interfaces/IKeelMintPricingErrors.sol",
+      "interfaces/IKeelMintCoupons.sol",
+      "interfaces/IKeelOneMintEvents.sol",
+      "KeelMintReleases.sol",
+      "KeelMintReleaseInspector.sol",
+      "libraries/KeelReleasePolicy.sol",
+      "interfaces/IKeelReleaseErrors.sol",
+      "interfaces/IKeelReleaseEvents.sol",
+      "KeelQueueDemand.sol",
+      "KeelQueuePriority.sol",
+      "KeelQueueReadAdapter.sol",
+      "interfaces/IKeelQueueLifecycle.sol",
+      "KeelQueueLotteryEngine.sol",
+      "KeelQueueLotteryPool.sol",
+      "interfaces/IKeelLotteryQueueState.sol",
+      "interfaces/IKeelQueueEntropyRecovery.sol",
+      "interfaces/IKeelAchievementEligibility.sol",
+      "interfaces/IKeelAuctionIssuer.sol",
+      "interfaces/IKeelAuctionIssuerErrors.sol",
+      "interfaces/IKeelAuctionIssuerEvents.sol",
+      "interfaces/IKeelAuctionPublication.sol",
+      "interfaces/IKeelAuctionReleaseRouter.sol",
+      "interfaces/IKeelDeferredAuctionIssuer.sol",
+      "interfaces/IKeelMintQueueErrors.sol",
+      "interfaces/IKeelMintQueueEvents.sol",
+      "interfaces/IKeelMintRewardEntropyErrors.sol",
+      "interfaces/IKeelMintRewardEntropyEvents.sol",
+      "interfaces/IKeelQueueAccessErrors.sol",
+      "interfaces/IKeelQueueAccessEvents.sol",
+      "interfaces/IKeelQueueDemandErrors.sol",
+      "interfaces/IKeelQueueDemandEvents.sol",
+      "interfaces/IKeelQueueLotteryEngineErrors.sol",
+      "interfaces/IKeelQueueLotteryPoolErrors.sol",
+      "interfaces/IKeelQueuePeriod.sol",
+      "interfaces/IKeelQueuePriorityErrors.sol",
+      "interfaces/IKeelQueueReadAdapterErrors.sol",
+      "interfaces/IKeelRewardClaimsErrors.sol",
+      "interfaces/IKeelRewardClaimsEvents.sol",
+      "interfaces/IKeelRewardReceiver.sol",
+      "interfaces/IKeelUniqueTarget.sol"
     ],
     "deployable": [
-      "KeelEquipmentDescriptorValidator",
-      "KeelEquipmentDistributor",
-      "KeelEquipmentInventory",
-      "KeelEquipmentInventoryReader",
-      "KeelEquipmentReservationEngine",
-      "KeelOneUseDuplicator"
+      "FrayAuctionIssuer",
+      "KeelMintGate",
+      "KeelMintRouteRegistry",
+      "KeelOneMintBatch",
+      "OneMintController",
+      "OpenOneMintController",
+      "KeelMintQueue",
+      "KeelRewardClaims",
+      "KeelMintRewardEntropy",
+      "KeelQueueAccess",
+      "KeelQueueDemand",
+      "KeelQueuePriority",
+      "KeelQueueReadAdapter",
+      "KeelQueueLotteryEngine",
+      "KeelQueueLotteryPool"
     ]
   },
   {
@@ -333,7 +552,8 @@ export const KEEL_MODULES: readonly KeelModule[] = [
     "version": "0.3.0",
     "repo": "keel-web3/keel-market",
     "deps": [
-      "keel-graph"
+      "keel-graph",
+      "keel-kernel"
     ],
     "contracts": [
       "KeelMarket.sol"
@@ -348,16 +568,18 @@ export const KEEL_MODULES: readonly KeelModule[] = [
     "title": "Anchors",
     "group": "provenance",
     "visibility": "private",
-    "summary": "Cross-chain and off-chain anchoring: attested/portable anchors, L2 state proofs, zk backends, oracle verifiers.",
+    "summary": "Cross-chain and off-chain anchoring: portable commitments, permissionless L2 state proofs, and zk verification backends.",
     "version": "0.3.0",
     "repo": "keel-web3/keel-anchors",
     "deps": [
       "keel-kernel",
       "keel-codecs",
       "keel-artifacts",
-      "keel-graph"
+      "keel-graph",
+      "keel-hold"
     ],
     "contracts": [
+      "KeelProofUpgradeController.sol",
       "KeelAttestedAnchorRegistry.sol",
       "KeelPortableAnchorRegistry.sol",
       "KeelAnchorReplicationBridge.sol",
@@ -370,24 +592,22 @@ export const KEEL_MODULES: readonly KeelModule[] = [
       "KeelSp1GatewayProofBackend.sol",
       "KeelSp1GatewayProofVerifier.sol",
       "KeelIpfsCidVerifier.sol",
-      "KeelChainlinkFunctionsVerifier.sol",
-      "KeelCreReportVerifier.sol",
-      "KeelLocalFunctionsRouter.sol",
       "KeelNodeRegistry.sol",
       "interfaces/IKeelAnchorProofBackend.sol",
       "interfaces/IKeelAnchorProofVerifier.sol",
       "interfaces/IKeelAnchoredChainQueries.sol",
-      "interfaces/IKeelSettlementSource.sol"
+      "interfaces/IKeelSettlementSource.sol",
+      "vendor/sp1/ISP1Verifier.sol",
+      "vendor/sp1/v5.0.0/Groth16Verifier.sol",
+      "vendor/sp1/v5.0.0/SP1VerifierGroth16.sol"
     ],
     "deployable": [
+      "KeelProofUpgradeController",
       "KeelAnchorReplicationBridge",
       "KeelAttestedAnchorRegistry",
-      "KeelChainlinkFunctionsVerifier",
-      "KeelCreReportVerifier",
       "KeelIpfsCidVerifier",
       "KeelL2AnchorVerifier",
       "KeelL2StateVerifier",
-      "KeelLocalFunctionsRouter",
       "KeelNodeRegistry",
       "KeelPortableAnchorRegistry",
       "KeelSettlementRegistry",
@@ -404,7 +624,7 @@ export const KEEL_MODULES: readonly KeelModule[] = [
     "title": "Collection verification",
     "group": "provenance",
     "visibility": "private",
-    "summary": "Third-party collection attestation, URI/pixel fingerprints, community replication, and preservation bounties.",
+    "summary": "Collection attestation, community replication, and preservation bounties.",
     "version": "0.3.0",
     "repo": "keel-web3/keel-crucible",
     "deps": [
@@ -416,8 +636,6 @@ export const KEEL_MODULES: readonly KeelModule[] = [
       "KeelCollectionVerificationRegistry.sol",
       "KeelCollectionVerificationHookBase.sol",
       "KeelCollectionAttestationRegistry.sol",
-      "KeelUriAttestationRegistry.sol",
-      "KeelPixelFingerprintRegistry.sol",
       "KeelCommunityReplicationRegistry.sol",
       "interfaces/IKeelCollectionVerificationHook.sol",
       "interfaces/IKeelCollectionVerificationAdapter.sol",
@@ -426,9 +644,7 @@ export const KEEL_MODULES: readonly KeelModule[] = [
     "deployable": [
       "KeelCollectionAttestationRegistry",
       "KeelCollectionVerificationRegistry",
-      "KeelCommunityReplicationRegistry",
-      "KeelPixelFingerprintRegistry",
-      "KeelUriAttestationRegistry"
+      "KeelCommunityReplicationRegistry"
     ]
   },
   {
@@ -442,7 +658,8 @@ export const KEEL_MODULES: readonly KeelModule[] = [
     "repo": "keel-web3/keel-ip-control",
     "deps": [
       "keel-hold",
-      "keel-artifacts"
+      "keel-artifacts",
+      "keel-kernel"
     ],
     "contracts": [
       "KeelIPControl.sol",
@@ -466,13 +683,29 @@ export const KEEL_MODULES: readonly KeelModule[] = [
     "summary": "Token JSON resolution for collections that delegate metadata assembly.",
     "version": "0.3.0",
     "repo": "keel-web3/keel-sleeve",
-    "deps": [],
+    "deps": [
+      "keel-hold",
+      "keel-kernel"
+    ],
     "contracts": [
       "KeelSleeve.sol",
-      "interfaces/IKeelTokenJSONResolver.sol"
+      "interfaces/IKeelTokenJSONResolver.sol",
+      "KeelStoredTokenJSON.sol",
+      "KeelTokenMatrix.sol",
+      "interfaces/IKeelMatrixHold.sol",
+      "interfaces/IKeelTokenMatrixErrors.sol",
+      "interfaces/IKeelTokenMatrixEvents.sol",
+      "KeelMetadataRelay.sol",
+      "interfaces/IKeelMetadataRelayErrors.sol",
+      "interfaces/IKeelMetadataRelayEvents.sol",
+      "interfaces/IKeelSleeveErrors.sol",
+      "interfaces/IKeelStoredTokenJSONErrors.sol",
+      "interfaces/IKeelStoredTokenJSONEvents.sol"
     ],
     "deployable": [
-      "KeelSleeve"
+      "KeelSleeve",
+      "KeelStoredTokenJSON",
+      "KeelTokenMatrix"
     ]
   },
   {
@@ -499,24 +732,43 @@ export const KEEL_MODULES: readonly KeelModule[] = [
   {
     "id": "keel-cross-chain-mint",
     "kind": "module",
-    "title": "Cross-chain mint",
+    "title": "Optional cross-chain mint bridge",
     "group": "token",
     "visibility": "private",
-    "summary": "Bridged mint intents and the batcher that carries them between chains.",
+    "summary": "Optional attested cross-chain mint requests; not required for storage, publication, or local minting.",
     "version": "0.3.0",
     "repo": "keel-web3/keel-cross-chain-mint",
     "deps": [
       "keel-kernel",
-      "keel-die"
+      "keel-mint-access"
     ],
     "contracts": [
-      "KeelCrossChainMintBridge.sol",
+      "KeelCrossChainMintBridge.sol"
+    ],
+    "deployable": [
+      "KeelCrossChainMintBridge"
+    ]
+  },
+  {
+    "id": "keel-publication",
+    "kind": "module",
+    "title": "Publication",
+    "group": "core",
+    "visibility": "private",
+    "summary": "Optional upload batching and resumable publication jobs, including the explicitly selected history-inscription mode.",
+    "version": "0.3.0",
+    "repo": "keel-web3/keel-publication",
+    "deps": [
+      "keel-hold"
+    ],
+    "contracts": [
       "KeelCarrierBatcher.sol",
+      "KeelHistoryPublicationJob.sol",
       "KeelPublicationJob.sol"
     ],
     "deployable": [
       "KeelCarrierBatcher",
-      "KeelCrossChainMintBridge",
+      "KeelHistoryPublicationJob",
       "KeelPublicationJob"
     ]
   },
@@ -526,14 +778,18 @@ export const KEEL_MODULES: readonly KeelModule[] = [
     "title": "Stake objects",
     "group": "assets",
     "visibility": "private",
-    "summary": "Stake-object custody and the seasonal grove state that consumes it.",
+    "summary": "Configurable ERC-721 staking custody, frozen terms, and optional token-bound accounts.",
     "version": "0.3.0",
     "repo": "keel-web3/keel-stake",
     "deps": [
-      "keel-artifacts"
+      "keel-artifacts",
+      "keel-kernel"
     ],
     "contracts": [
-      "KeelStakeObjectManager.sol"
+      "KeelStakeObjectManager.sol",
+      "interfaces/IKeelStakeObjectErrors.sol",
+      "interfaces/IKeelStakeObjectEvents.sol",
+      "interfaces/IKeelTokenBoundAccountRegistry.sol"
     ],
     "deployable": [
       "KeelStakeObjectManager"
@@ -590,7 +846,6 @@ export const KEEL_APPS: readonly KeelModule[] = [
     "deps": [
       "keel-kernel",
       "keel-die",
-      "keel-equipment",
       "keel-presentation"
     ],
     "contracts": [
@@ -613,33 +868,6 @@ export const KEEL_APPS: readonly KeelModule[] = [
       "CoolSReleaseResolverV1",
       "CoolSTargetTableV1",
       "CoolSVisualRegistryV1"
-    ]
-  },
-  {
-    "id": "onchaininator",
-    "kind": "app",
-    "title": "Onchaininator",
-    "group": "apps",
-    "visibility": null,
-    "summary": "Wrapper collection that preserves a legacy token's art and proves the preservation on chain.",
-    "version": "0.3.0",
-    "repo": null,
-    "deps": [
-      "keel-kernel",
-      "keel-codecs"
-    ],
-    "contracts": [
-      "Onchaininator721.sol",
-      "OnchaininatorFactory.sol",
-      "OnchaininatorProofLedger.sol",
-      "PreservationBounty.sol",
-      "interfaces/IERC5192.sol"
-    ],
-    "deployable": [
-      "Onchaininator721",
-      "OnchaininatorFactory",
-      "OnchaininatorProofLedger",
-      "OnchaininatorProofRenderer"
     ]
   },
   {
@@ -681,7 +909,6 @@ export const KEEL_APPS: readonly KeelModule[] = [
       "keel-die",
       "keel-artifacts",
       "keel-hold",
-      "keel-equipment",
       "keel-crucible",
       "keel-harness"
     ],
@@ -729,36 +956,36 @@ export const KEEL_DEPLOYMENTS: readonly KeelDeployment[] = [
     "chainId": 11155111,
     "instance": "showcase",
     "contract": "KeelArtifactRegistry",
-    "address": "0x137965e2cf635b065ec676d0f706d797a844a8a2",
-    "block": "11476939",
-    "txHash": "0x77d4e92e2beaa236bc7505b1aa02db7040f127a84a1bd5f688ce8a06c98cb2fc"
+    "address": "0xe85884ba2af3932d4f98507668ed5fe8fed6db92",
+    "block": "11629038",
+    "txHash": "0x235a86349768f288282f939b4decfa211bf45acf691a74dc1490c70ea0037d41"
   },
   {
     "module": "keel-artifacts",
     "chainId": 11155111,
     "instance": "showcase",
     "contract": "KeelHarnessRegistry",
-    "address": "0x7890077a2ad124f3412a946f84c8c4802ad93cb0",
-    "block": "11476941",
-    "txHash": "0x58c29362d208f72457e1c204e26a8fea2c4d72f64fdf1cf60f5aadceaf8ad657"
+    "address": "0xa5d6ae35c327f998403aa1eb713df3741e3f3136",
+    "block": "11629039",
+    "txHash": "0xf7e21d4950805b330a8e11f532695586353ae1c41121efc237daee979bded83f"
   },
   {
     "module": "keel-artifacts",
     "chainId": 11155111,
     "instance": "showcase",
     "contract": "KeelLinkRegistry",
-    "address": "0x762fe971dba1e77c5cc7ca7e82b3ccd0e2e3135d",
-    "block": "11476943",
-    "txHash": "0x4b4b2771512b3a809a276ca19b713e6cfcfeb6dbad4663e956b71614d1ef7245"
+    "address": "0xc2b94319334359171a653c93e402b12b93e24102",
+    "block": "11629040",
+    "txHash": "0x2ede42b1097011f7485c99e85d0eefbd2d69fbe1234d52858bdd8f68e8c42f7e"
   },
   {
     "module": "keel-artifacts",
     "chainId": 11155111,
     "instance": "showcase",
     "contract": "KeelManager",
-    "address": "0x9be5cd3af690948472a614aa9b5aba97b29736b7",
-    "block": "11476922",
-    "txHash": "0xf201adb7424eed1844591f27411b761d120325dfa39abac03e70c93f768c3000"
+    "address": "0x940004faaee674c99b20ca7ecce6f877b996c3e5",
+    "block": "11629033",
+    "txHash": "0x0f0d3bbd3aa1266c13c763235b4fefaf999849ac971c78a9574f7a89b0d8229e"
   },
   {
     "module": "keel-artifacts",
@@ -774,9 +1001,9 @@ export const KEEL_DEPLOYMENTS: readonly KeelDeployment[] = [
     "chainId": 11155111,
     "instance": "showcase",
     "contract": "KeelSeedRegistry",
-    "address": "0x8d614a10631ee201997efd81a31e8b029869f8f6",
-    "block": "11476945",
-    "txHash": "0x838f690a9ed7ff3a365cdc957b950e04d2e72d06b65007f8ab24486787e45a31"
+    "address": "0xf6b301e56c813692aeb75b9659864c7e76cf4c8b",
+    "block": "11629041",
+    "txHash": "0xc44f7d534294cf1f47c46c9751fa56f007fff6ee09b06080918f20e2a302e672"
   },
   {
     "module": "keel-creator-identity",
@@ -792,9 +1019,9 @@ export const KEEL_DEPLOYMENTS: readonly KeelDeployment[] = [
     "chainId": 11155111,
     "instance": "showcase",
     "contract": "KeelCommunityReplicationRegistry",
-    "address": "0xee36d4123fda319ecf64363317658cfa8c3d96bf",
-    "block": "11478535",
-    "txHash": "0xe2101466daa17f050f91a144b16a67283a6b38681360431c8eb9fa71b331f262"
+    "address": "0xe8a4618e7327c75631afcdd2ff7b0f4a73d42595",
+    "block": "11629043",
+    "txHash": "0x10993ef95265d08e7beabc0c88584f2963ddc3a021c6c4e25a50c847277d8717"
   },
   {
     "module": "keel-die",
@@ -810,27 +1037,9 @@ export const KEEL_DEPLOYMENTS: readonly KeelDeployment[] = [
     "chainId": 11155111,
     "instance": "showcase",
     "contract": "KeelFactory",
-    "address": "0x4254a9911d3ad371bb129b5ef9a2a75f85ba3219",
-    "block": "11476933",
-    "txHash": "0x629e1fbfa482e2e82c82f66dc61ebcbb7bc9c1cd563cec25f3057f54c36656a1"
-  },
-  {
-    "module": "keel-equipment",
-    "chainId": 11155111,
-    "instance": "showcase",
-    "contract": "KeelEquipmentInventory",
-    "address": "0xf4b2044c15deed5f7bf1cf3468ae8c78fcfefccf",
-    "block": "11476947",
-    "txHash": "0x8c82308482b93b060fb499cf284d4b57355dd59df903f47827935062a01d6f59"
-  },
-  {
-    "module": "keel-equipment",
-    "chainId": 11155111,
-    "instance": "vault-runner",
-    "contract": "KeelEquipmentInventory",
-    "address": "0xe5f341AB0C6246E230412B464c298fa7980AAdC3",
-    "block": "11484773",
-    "txHash": "0x1ee75da2e0e69fb136c9d6cfb9dac31d33b0eaeb22380a074347a876dfa9ce7a"
+    "address": "0x8839dab4505128378947aa2f75a0556554043ce6",
+    "block": "11629044",
+    "txHash": "0xba468375724a1f02bc2baec26da7a57592c89dd16e734ae7d2fc7ced562671cd"
   },
   {
     "module": "keel-graph",
@@ -869,22 +1078,31 @@ export const KEEL_DEPLOYMENTS: readonly KeelDeployment[] = [
     "txHash": null
   },
   {
+    "module": "keel-harness",
+    "chainId": 11155111,
+    "instance": "showcase",
+    "contract": "KeelHarnessBuilder",
+    "address": "0x7ac86609d6781e896c541210fdd8d1d919c5584a",
+    "block": "11631488",
+    "txHash": "0x822a9256583393e43a4fbca24adbc5bf8ba8f5611ae889fcdb08ae46f4a7e2d6"
+  },
+  {
     "module": "keel-hold",
     "chainId": 11155111,
     "instance": "showcase",
     "contract": "KeelHold",
-    "address": "0x10a44bb5d9107ee2dd244a2fc0cea6cc8979c5a3",
-    "block": "11476918",
-    "txHash": "0x541fbe11dd80bb3a1da643371b681ce951b8b946d1d6aaa2090e459b1595acc8"
+    "address": "0x0a4f31d5ab08029e4c68f6f3227d9fa3a2d66267",
+    "block": "11559677",
+    "txHash": "0xae9e37ce8705258f4395498747e03682207d3a4e04e23e734086fedd01d404ef"
   },
   {
     "module": "keel-hold",
     "chainId": 11155111,
     "instance": "showcase",
     "contract": "KeelIndex",
-    "address": "0x0146f7b087d64ad6351c99471ce1fdbcc024ccb6",
-    "block": "11476920",
-    "txHash": "0xbccbbe39e0080a87404c0abd50e708a55a637aa3e9ab118f803e84a1c36dec52"
+    "address": "0x2b706ded15fb27a582da256321f2b3295413b8ac",
+    "block": "11559678",
+    "txHash": "0x93bdfd7694deb532a01aee4092020b8aad25a1720317d609949ab68166e944fc"
   },
   {
     "module": "keel-ip-control",
@@ -914,31 +1132,49 @@ export const KEEL_DEPLOYMENTS: readonly KeelDeployment[] = [
     "txHash": "0x8d2653dcc830a8a400ac5c6cd10d543d3d289fc3e1a1c34701c76e79f009888d"
   },
   {
+    "module": "keel-ip-control",
+    "chainId": 11155111,
+    "instance": "showcase",
+    "contract": "KeelIPControl",
+    "address": "0x1b982718504aef51423f20856b79c62378cb62eb",
+    "block": "11629049",
+    "txHash": "0x6372164607cc4ac7322669f4938909cc34821ffc04c357cb808e51c008d6ba50"
+  },
+  {
     "module": "keel-market",
     "chainId": 11155111,
     "instance": "showcase",
     "contract": "KeelMarket",
-    "address": "0xd87f72b751d2008c7365680653b79ff7eb0780b6",
-    "block": "11476953",
-    "txHash": "0x2500616c8bbf2c5f5642b70309513e8cb4ec90e8945045c1e1491e0edf33852a"
+    "address": "0x4f9c6ea07aed067c3f04d798bf22a1e6c5c524a8",
+    "block": "11629048",
+    "txHash": "0x58e89f90f505e167890dba648ede9e1811083a7fd7461dafa3abc2e5fd93c0ac"
   },
   {
     "module": "keel-mint-access",
     "chainId": 11155111,
     "instance": "showcase",
     "contract": "KeelMintGate",
-    "address": "0xec125031e5972f0f874b313e8e3c69d42503c9cf",
-    "block": "11476928",
-    "txHash": "0xa92c538456ad309617e5354e9110b0b404858ed343ee9baaa8d2e19dce46e0ed"
+    "address": "0x9f21416da06edddb7f21a70bcbc91cd732803262",
+    "block": "11629047",
+    "txHash": "0x8ed484bcf0319f0ecf56a3b727f0b8d7f6562d10ec81dc93bdd4fc924ea5b62f"
+  },
+  {
+    "module": "keel-mint-access",
+    "chainId": 11155111,
+    "instance": "showcase",
+    "contract": "KeelMintRouteRegistry",
+    "address": "0x4dcc1132decf43ce72bbfad6f3ae109e85196fde",
+    "block": "11629045",
+    "txHash": "0xa2dd281009ab971aa62c2cd5fc58f09059075fb7615ad04c8273a2c469fb792f"
   },
   {
     "module": "keel-mint-access",
     "chainId": 11155111,
     "instance": "showcase",
     "contract": "OneMintController",
-    "address": "0xf0e7ca391105fb34ef00db72027752998de1067a",
-    "block": "11476930",
-    "txHash": "0x3b4b4c71d975b5bc17563353add330dd36b23c7c9e396b0cd03c529ec5afd72e"
+    "address": "0xc5a82b8320b6ad23cda749f079e3d7ad7b45cec9",
+    "block": "11629046",
+    "txHash": "0xb261303956960015186934bf8ca1131ed4f1284d3f771621897cfd4c34e5f867"
   },
   {
     "module": "vault-runner",

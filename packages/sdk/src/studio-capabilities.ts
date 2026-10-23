@@ -1,6 +1,53 @@
 export const KEEL_STUDIO_CAPABILITIES_PROTOCOL = "keel-studio-capabilities@1" as const;
+export const KEEL_STUDIO_STAGING_CAPABILITIES_PROTOCOL = "keel-studio-capabilities@2" as const;
+
+export interface KeelStudioStagingCapabilities {
+  readonly schema: typeof KEEL_STUDIO_STAGING_CAPABILITIES_PROTOCOL;
+  readonly generatedAt: string;
+  readonly chainId: number;
+  readonly staging: {
+    readonly endpoint: "/api/agent/staging";
+    readonly transport: "multipart-form-data";
+    readonly authentication: "bearer";
+    readonly maxSourceBytes: number;
+    readonly maximumRetentionSeconds: number;
+    readonly resumable: false;
+    readonly oneUseHandoff: false;
+  };
+  readonly wallet: { readonly signing: false; readonly submission: false };
+  readonly publication: { readonly readiness: "requires-project-verification"; readonly canonicalShellRequired: true };
+}
+
+export type KeelStudioCapabilityDocument = KeelStudioCapabilities | KeelStudioStagingCapabilities;
 
 export type StudioChainFamily = "ethereum" | "tezos";
+
+/**
+ * How an agent or Studio planner reaches a Tezos KEEL collection when a
+ * capability document lists a ready Tezos chain: the review-only MCP tools and
+ * SDK functions of the creator-collection route, in launch order.
+ */
+export const KEEL_STUDIO_TEZOS_COLLECTION_ROUTE = Object.freeze({
+  family: "tezos" as const,
+  route: "keel.tezos.collection-route@1" as const,
+  plan: "keel-tezos-collection-launch-plan" as const,
+  tools: Object.freeze([
+    "keel-tezos-collection-launch-plan",
+    "keel-tezos-collection-originate-prepare",
+    "keel-tezos-hold-resources-prepare",
+    "keel-tezos-presentation-bind-prepare",
+    "keel-tezos-mint-gate-prepare",
+    "keel-tezos-mint-prepare",
+    "keel-tezos-token-metadata-prepare",
+    "keel-tezos-readback-check",
+  ] as const),
+  wallet: { signing: false as const, submission: false as const, approval: "creator wallet (Beacon) reviews every operation group" as const },
+});
+
+/** The route a planner should take for one capability chain entry, or null when the chain is not usable. */
+export function studioChainRoute(chain: StudioChainCapability): typeof KEEL_STUDIO_TEZOS_COLLECTION_ROUTE | null {
+  return chain.family === "tezos" && chain.status === "ready" ? KEEL_STUDIO_TEZOS_COLLECTION_ROUTE : null;
+}
 export type StudioChainStatus = "ready" | "blocked";
 
 export interface StudioChainCapability {
@@ -64,7 +111,7 @@ export interface StudioCapabilitiesFetchOptions {
 export async function fetchStudioCapabilities(
   studioUrl: string | URL,
   options: StudioCapabilitiesFetchOptions = {},
-): Promise<KeelStudioCapabilities> {
+): Promise<KeelStudioCapabilityDocument> {
   const url = new URL("/.well-known/keel-capabilities", studioUrl);
   if (url.protocol !== "https:" && url.protocol !== "http:") {
     throw new TypeError("Studio URL must use HTTP or HTTPS.");
@@ -80,8 +127,9 @@ export async function fetchStudioCapabilities(
   return parseStudioCapabilities(await response.json());
 }
 
-export function parseStudioCapabilities(value: unknown): KeelStudioCapabilities {
+export function parseStudioCapabilities(value: unknown): KeelStudioCapabilityDocument {
   const root = record(value, "Studio capabilities");
+  if (root.schema === KEEL_STUDIO_STAGING_CAPABILITIES_PROTOCOL) return parseStagingCapabilities(root);
   exact(root, ["schema", "generatedAt", "studio", "protocols", "sandbox", "staging", "authorization", "msp", "chains"], "Studio capabilities");
   literal(root.schema, KEEL_STUDIO_CAPABILITIES_PROTOCOL, "Studio capabilities schema");
   isoDate(root.generatedAt, "Studio capabilities generatedAt");
@@ -137,6 +185,30 @@ export function parseStudioCapabilities(value: unknown): KeelStudioCapabilities 
   const unique = new Set(chains.map((entry) => `${entry.family}:${entry.network}`));
   if (unique.size !== chains.length) throw new TypeError("Studio chains must not repeat a family and network.");
   return value as KeelStudioCapabilities;
+}
+
+function parseStagingCapabilities(root: Record<string, unknown>): KeelStudioStagingCapabilities {
+  exact(root, ["schema", "generatedAt", "chainId", "staging", "wallet", "publication"], "Studio capabilities");
+  isoDate(root.generatedAt, "Studio capabilities generatedAt");
+  positiveInteger(root.chainId, "Studio capabilities chainId");
+  const staging = record(root.staging, "Studio staging");
+  exact(staging, ["endpoint", "transport", "authentication", "maxSourceBytes", "maximumRetentionSeconds", "resumable", "oneUseHandoff"], "Studio staging");
+  literal(staging.endpoint, "/api/agent/staging", "Studio staging endpoint");
+  literal(staging.transport, "multipart-form-data", "Studio staging transport");
+  literal(staging.authentication, "bearer", "Studio staging authentication");
+  positiveInteger(staging.maxSourceBytes, "Studio staging maxSourceBytes");
+  positiveInteger(staging.maximumRetentionSeconds, "Studio staging maximumRetentionSeconds");
+  literal(staging.resumable, false, "Studio staging resumable");
+  literal(staging.oneUseHandoff, false, "Studio staging oneUseHandoff");
+  const wallet = record(root.wallet, "Studio wallet");
+  exact(wallet, ["signing", "submission"], "Studio wallet");
+  literal(wallet.signing, false, "Studio wallet signing");
+  literal(wallet.submission, false, "Studio wallet submission");
+  const publication = record(root.publication, "Studio publication");
+  exact(publication, ["readiness", "canonicalShellRequired"], "Studio publication");
+  literal(publication.readiness, "requires-project-verification", "Studio publication readiness");
+  literal(publication.canonicalShellRequired, true, "Studio publication canonicalShellRequired");
+  return root as unknown as KeelStudioStagingCapabilities;
 }
 
 function parseChain(value: unknown, index: number): StudioChainCapability {

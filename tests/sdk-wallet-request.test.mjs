@@ -77,3 +77,12 @@ test("wallet request validation rejects mixed or unsafe chain fields", async () 
   await assert.rejects(() => createKeelWalletRequest({ ...tezos, parameters: '{"int":"01"}' }), /int/u);
   await assert.rejects(() => createKeelWalletRequest({ ...ethereum, transport: "tezconnect", name: "ignored" }), /not supported/u);
 });
+
+test('Tezos contract data retains empty sequences, empty strings, whitespace and BLS addresses', () => {
+  for (const value of [[], { string: '' }, { string: '  art\n🌊 𝔸  ' }, { prim: 'Pair', args: [[], { string: '' }] }]) {
+    const request = parseKeelWalletRequest({ ...tezos, parameters: JSON.stringify(value, null, 2) });
+    assert.deepEqual(JSON.parse(request.parameters), value);
+  }
+  assert.equal(parseKeelWalletRequest({ ...tezos, destination: 'tz4' + 'a'.repeat(33) }).destination, 'tz4' + 'a'.repeat(33));
+  assert.throws(() => parseKeelWalletRequest({ ...tezos, parameters: '{"string":"\\ud800"}' }), /string is invalid/);
+});

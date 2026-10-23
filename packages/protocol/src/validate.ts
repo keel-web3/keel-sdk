@@ -20,6 +20,7 @@ import {
 import { assertValidKeelMediaDerivative } from "./keel-hold.js";
 import { assertValidKeelStakeObject } from "./stake-object.js";
 import { assertValidKeelAttributions } from "./keel-attribution.js";
+import { isKeelWakeObjectUri } from "./wake-uri.js";
 import {
   assertValidKeelCommunityReplicationPreference,
   KEEL_COMMUNITY_REPLICATION_EXTENSION_KEY,
@@ -95,6 +96,7 @@ function requireIntegrity(
 
 function validRetrievalUri(uri: string): boolean {
   if (uri.startsWith("./") || uri.startsWith("../")) return true;
+  if (isKeelWakeObjectUri(uri)) return true;
   if (uri.startsWith("ipfs://") || uri.startsWith("ipns://") || uri.startsWith("ar://")) return uri.length > uri.indexOf("://") + 3;
   try {
     return new URL(uri).protocol === "https:";
@@ -122,7 +124,7 @@ function validateSource(
           "error",
           `${path}.uri`,
           "uri.invalid",
-          "URI sources must be HTTPS, IPFS, IPNS, Arweave, or manifest-relative. data:, blob:, file:, javascript:, and HTTP are forbidden.",
+          "URI sources must be HTTPS, IPFS, IPNS, Arweave, manifest-relative, or canonical whole-object KEEL Wake. data:, blob:, file:, javascript:, HTTP, generic keel://, and Wake chunk URIs are forbidden.",
         );
       }
       for (const [index, gateway] of (source.gateways ?? []).entries()) {
@@ -194,6 +196,16 @@ function validateSource(
 }
 
 function validateAlias(alias: string, path: string, issues: ManifestValidationIssue[]): void {
+  if (alias.startsWith("keel://wake/")) {
+    issue(
+      issues,
+      "error",
+      path,
+      "alias.reserved",
+      "keel://wake/ is reserved for canonical KEEL Wake object and transport locators, not creator aliases.",
+    );
+    return;
+  }
   if (
     (!VIRTUAL_PATH.test(alias) && !KEEL_ALIAS.test(alias)) ||
     alias.includes("..") ||
@@ -222,6 +234,15 @@ function validateResource(
   const path = `$.resources[${index}]`;
   if (!RESOURCE_ID.test(resource.id)) {
     issue(issues, "error", `${path}.id`, "resource.id", "Resource ID contains unsupported characters or is too long.");
+  }
+  if (`keel://${resource.id}`.startsWith("keel://wake/")) {
+    issue(
+      issues,
+      "error",
+      `${path}.id`,
+      "resource.id.reserved",
+      "Resource IDs that generate keel://wake/ aliases are reserved for canonical KEEL Wake locators.",
+    );
   }
   if (!/^[\w.+-]+\/[\w.+-]+(?:;.*)?$/.test(resource.mediaType)) {
     issue(issues, "error", `${path}.mediaType`, "media.invalid", "mediaType must look like an Internet media type.");

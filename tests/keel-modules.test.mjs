@@ -55,6 +55,15 @@ test("no module disappears without the roster changing", () => {
   assert.deepEqual(present, [...EXPECTED_MODULES].sort());
 });
 
+test("mint access exposes both verified and public OneMint controller versions", async () => {
+  const mintAccess = getModule("keel-mint-access");
+  assert.ok(mintAccess.deployable.includes("OneMintController"));
+  assert.ok(mintAccess.deployable.includes("OpenOneMintController"));
+  assert.ok(moduleAbiContracts("keel-mint-access").includes("OpenOneMintController"));
+  const abi = await moduleAbi("keel-mint-access", "OpenOneMintController");
+  assert.ok(abi.some((item) => item?.type === "function" && item.name === "PROFILE_GATE_REQUIRED"));
+});
+
 test("the boundary checker passes on the current tree", () => {
   // Guards the checker itself: cross-module imports are remapped through
   // `@keel/`, and a checker that stopped resolving them would report a clean

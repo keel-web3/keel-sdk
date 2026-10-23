@@ -4,12 +4,15 @@ export * from "./sandbox.js";
 export * from "./mount.js";
 export * from "./chunk-store.js";
 export * from "./manifest.js";
+export * from "./wake-adapter.js";
 export * from "./gateway.js";
+export * from "./source-policy.js";
 export * from "./viewer-bundle.js";
 export * from "./registry-adapter.js";
 export * from "./keel-adapter.js";
 export * from "./ip-control.js";
 export * from "./plugin-adapter.js";
+export * from "./published-view-intents.js";
 export * from "./plugin-bridge.js";
 export * from "./host-bridge.js";
 export * from "./presentation-bridge.js";
@@ -22,3 +25,5 @@ export * from "./marketplace.js";
 
 export * from "./egress.js";
 export * from "./frozen-dataset.js";
+
+export * from "./thumbnail-capture.js";

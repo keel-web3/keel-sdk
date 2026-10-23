@@ -35,8 +35,8 @@ import {
   type KeelBehaviorVectorEvidence,
   type KeelSourceReceipt,
 } from "@keel/protocol";
-import { KEEL_MODULE_BUILD_OPTIONS, createKeelBuildRecipe } from "./build-recipe.js";
-import { readKeelModuleManifest, type KeelModuleManifest } from "./module-pipeline.js";
+import { createKeelBuildRecipe } from "./build-recipe.js";
+import { keelModuleBuildOptions, readKeelModuleManifest, type KeelModuleManifest } from "./module-pipeline.js";
 
 const execFileAsync = promisify(execFile);
 
@@ -140,12 +140,12 @@ export async function hasModuleVectors(directory: string): Promise<boolean> {
   return fileExists(path.join(path.resolve(directory), KEEL_MODULE_VECTORS_FILE));
 }
 
-/** The readable (unminified) build of the module's entry graph. */
-async function readableBuildBytes(root: string, entry: string): Promise<Uint8Array> {
+/** The readable (unminified) build of the module's entry graph, in the module's own format and linkage. */
+async function readableBuildBytes(root: string, manifest: KeelModuleManifest): Promise<Uint8Array> {
   const built = await createKeelBuildRecipe({
     root,
-    entry,
-    options: { ...KEEL_MODULE_BUILD_OPTIONS, minify: false },
+    entry: manifest.entry,
+    options: keelModuleBuildOptions(manifest, { minify: false }),
     mediaType: "text/javascript",
   });
   return built.outputBytes;
@@ -187,7 +187,7 @@ async function runAgainstSourceAndCandidate(
   if (!(await fileExists(vectorsPath))) {
     throw new Error(`${vectorsPath} not found. Behavioral testing needs the module's test vectors.`);
   }
-  const sourceBytes = await readableBuildBytes(root, manifest.entry);
+  const sourceBytes = await readableBuildBytes(root, manifest);
   const [sourceRuns, candidateRuns] = await Promise.all([
     runModuleVectors(vectorsPath, sourceBytes),
     runModuleVectors(vectorsPath, candidateBytes),
@@ -254,7 +254,7 @@ export async function verifyKeelModuleCandidate(directory: string, candidatePath
   const built = await createKeelBuildRecipe({
     root: compared.root,
     entry: compared.manifest.entry,
-    options: KEEL_MODULE_BUILD_OPTIONS,
+    options: keelModuleBuildOptions(compared.manifest),
     mediaType: "text/javascript",
   });
   const sourceParts = await Promise.all(

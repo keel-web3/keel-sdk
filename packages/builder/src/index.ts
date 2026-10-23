@@ -4,6 +4,7 @@ export * from "./plan.js";
 export * from "./wrap.js";
 export * from "./recursive-plan.js";
 export * from "./pipeline.js";
+export * from "./media-optimization.js";
 export * from "./module-resolver.js";
 export * from "./module-legacy.js";
 export * from "./module-receipt.js";
@@ -14,3 +15,17 @@ export * from "./module-testing.js";
 export * from "./module-registration.js";
 export * from "./module-workspace.js";
 export * from "./cost-analysis.js";
+export * from "./creator-module.js";
+
+export * from "./module-types.js";
+export * from "./module-globals.js";
+export * from "./module-install.js";
+export * from "./module-global-types.js";
+export * from "./module-observation.js";
+export * from "./module-inclusion.js";
+export * from "./module-unverified.js";
+
+export { syncKeelModuleEditor, checkKeelModuleEditor, watchKeelModuleEditor } from "./module-editor.js";
+export * from "./module-project.js";
+export * from "./module-project-bundle.js";
+export * from "./thumbnail-sequence.js";

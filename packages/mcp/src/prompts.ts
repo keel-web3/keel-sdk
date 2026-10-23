@@ -1,7 +1,10 @@
+import { PREPARED_COPY_GUIDANCE } from "./prepared-copy-guidance.js";
 import type { McpPrompt, McpPromptResult } from "./types.js";
 
 export const KEEL_ASSET_REVIEW_PROMPT = "keel-asset-review" as const;
+export const KEEL_DRAFT_REPAIR_PROMPT = "keel-draft-repair" as const;
 export const FRAY_AUCTION_REVIEW_PROMPT = "fray-auction-review" as const;
+export const KEEL_PROJECT_PLAN_PROMPT = "keel-project-plan" as const;
 
 const PROMPT_ARGUMENTS = [
   { name: "input", description: "Workspace-relative media path to review.", required: true },
@@ -10,9 +13,28 @@ const PROMPT_ARGUMENTS = [
 ] as const;
 
 export const PROMPT_DEFINITIONS: readonly McpPrompt[] = [{
+  name: KEEL_PROJECT_PLAN_PROMPT,
+  description: "Discover a creator's intent and return an explicit, review-only plan for a KEEL 1/1, collection, sale, or Fray auction.",
+  arguments: [
+    { name: "request", description: "What the creator wants to make or test.", required: true },
+    { name: "scope", description: "Optional one-of-one or collection scope." },
+    { name: "runtime", description: "Optional static, p5, three, doom-wasm, flash-as3, or other runtime." },
+    { name: "outcome", description: "Optional storage-only, release, fixed-price, claim, or fray-auction outcome." },
+    { name: "chain", description: "Optional requested chain or testnet." },
+  ],
+}, {
   name: KEEL_ASSET_REVIEW_PROMPT,
   description: "Guide an agent through an offline Keel asset analysis and human-reviewed upload workflow.",
   arguments: PROMPT_ARGUMENTS,
+}, {
+  name: KEEL_DRAFT_REPAIR_PROMPT,
+  description: "Repair one exact Studio draft revision without gaining wallet or publication authority.",
+  arguments: [
+    { name: "releaseId", description: "Exact Studio release draft identifier.", required: true },
+    { name: "expectedRevision", description: "Exact saved draft revision to preserve.", required: true },
+    { name: "request", description: "Concrete creator-requested change.", required: true },
+    { name: "presentationMode", description: "Current presentation mode that must not change silently." },
+  ],
 }, {
   name: FRAY_AUCTION_REVIEW_PROMPT,
   description: "Guide an agent through a Fray auction intake, Keel reuse search, and user approval handoff.",
@@ -21,6 +43,11 @@ export const PROMPT_DEFINITIONS: readonly McpPrompt[] = [{
 function object(value: unknown, label: string): Record<string, unknown> {
   if (value === null || typeof value !== "object" || Array.isArray(value)) throw new TypeError(`${label} must be an object.`);
   return value as Record<string, unknown>;
+}
+
+function positiveRevision(value: unknown, label: string): number {
+  if (!Number.isSafeInteger(value) || (value as number) < 1) throw new TypeError(`${label} must be a positive integer.`);
+  return value as number;
 }
 
 function exact(value: Record<string, unknown>, allowed: readonly string[], label: string): void {
@@ -55,6 +82,93 @@ function quote(value: string): string {
   return `\`${value.replaceAll("`", "\\`")}\``;
 }
 
+function optionalChoice(value: unknown, label: string, choices: readonly string[]): string | undefined {
+  if (value === undefined) return undefined;
+  const selected = promptText(value, label, 64);
+  if (!choices.includes(selected)) throw new TypeError(`${label} must be one of: ${choices.join(", ")}.`);
+  return selected;
+}
+
+function projectRouteInstructions(
+  scope: string | undefined,
+  runtime: string | undefined,
+  outcome: string | undefined,
+  chain: string | undefined,
+): readonly string[] {
+  const outcomeRoute = outcome === "fray-auction"
+    ? "For this Fray auction, do not call keel-studio-project-intake. Call fray-auction-intake with family/network and one of presets 1-4; use fray-stage-project only after intake is complete."
+    : outcome === "fixed-price" || outcome === "claim"
+      ? `For this ${outcome} route, call keel-studio-project-intake with outcome=\"release\" and release.saleMechanism=\"${outcome}\"; never pass outcome=\"${outcome}\" to that tool.`
+      : outcome === "release"
+        ? "For this ordinary release, call keel-studio-project-intake with outcome=\"release\" and ask for release.saleMechanism (fixed-price, auction, or claim) plus price before calling it."
+        : outcome === "storage-only"
+          ? "For this storage-only route, call keel-studio-project-intake with outcome=\"storage-only\" and no release object."
+          : "Call keel-studio-project-intake without outcome so it asks storage-only versus release; after the answer, use only outcome=\"storage-only\" or outcome=\"release\" in that tool.";
+  const scopeRoute = scope === "one-of-one"
+    ? "For an ordinary release, map scope=one-of-one to release.type=\"one-of-one\"."
+    : scope === "collection"
+      ? "For an ordinary collection release, ask limited-edition versus open-edition and map it to release.type; never pass scope to the intake tool or let it default to one-of-one."
+      : "Resolve scope before an ordinary release, then map it to release.type; scope is not an intake-tool argument.";
+  const runtimeRoute = runtime === undefined
+    ? "Runtime belongs in the project plan and later staging/module route, not in keel-studio-project-intake."
+    : `Keep runtime=${runtime} in the project plan and later staging/module route; runtime is not a keel-studio-project-intake argument.`;
+  const chainRoute = outcome === "fray-auction"
+    ? chain === undefined
+      ? "Resolve the Fray chain as family plus network for fray-auction-intake."
+      : `Resolve chain=${chain} to the exact Fray family plus network; do not pass textual chain or chainId to keel-studio-project-intake for this route.`
+    : chain === undefined
+      ? "For an ordinary release, resolve the selected network to the numeric chainId expected by keel-studio-project-intake."
+      : `Resolve chain=${chain} with keel-chain-guide and pass its numeric chainId for an ordinary release; never pass textual chain to keel-studio-project-intake.`;
+  return [
+    "Planning aliases are not MCP tool arguments: translate them to the advertised schema instead of forwarding scope, runtime, outcome aliases, or textual chain verbatim.",
+    outcomeRoute,
+    scopeRoute,
+    runtimeRoute,
+    chainRoute,
+  ];
+}
+
+export function getKeelProjectPlanPrompt(name: unknown, argumentsValue: unknown): McpPromptResult {
+  if (name !== KEEL_PROJECT_PLAN_PROMPT) throw new TypeError(`Unknown prompt: ${String(name)}.`);
+  const input = object(argumentsValue ?? {}, "prompt arguments");
+  exact(input, ["request", "scope", "runtime", "outcome", "chain"], "prompt arguments");
+  const request = promptText(input.request, "prompt arguments.request", 2_000);
+  const scope = optionalChoice(input.scope, "prompt arguments.scope", ["one-of-one", "collection"]);
+  const runtime = optionalChoice(input.runtime, "prompt arguments.runtime", ["static", "p5", "three", "doom-wasm", "flash-as3", "other"]);
+  const outcome = optionalChoice(input.outcome, "prompt arguments.outcome", ["storage-only", "release", "fixed-price", "claim", "fray-auction"]);
+  const chain = input.chain === undefined ? undefined : promptText(input.chain, "prompt arguments.chain", 64);
+  const supplied = [
+    ...(scope === undefined ? [] : [`scope=${scope}`]),
+    ...(runtime === undefined ? [] : [`runtime=${runtime}`]),
+    ...(outcome === undefined ? [] : [`outcome=${outcome}`]),
+    ...(chain === undefined ? [] : [`chain=${chain}`]),
+  ];
+  return {
+    description: "Intent-first, review-only KEEL project plan.",
+    messages: [{
+      role: "user",
+      content: {
+        type: "text",
+        text: [
+          `Plan this KEEL project before staging, uploading, preparing a wallet request, or changing chain state: ${quote(request)}.`,
+          supplied.length === 0 ? "No structured choices were supplied." : `Known choices: ${supplied.join(", ")}.`,
+          ...projectRouteInstructions(scope, runtime, outcome, chain),
+          "Use keel-project-decisions for the full creator decision worksheet and keel://mcp/engine for collection, mint, access and module setup discovery. Carry forward known answers and ask only returned nextQuestions, at most three at a time. Suggestions require selection; saved memory is not wallet authority. OneMint and MintGate configurations use distinct SDK builders and must not be squeezed into the simpler Studio intake schema.",
+          "Assume the creator is not a developer. For supplied assets, inventory actual types, digests and dependencies; preserve originals; discover reusable selected-chain objects; measure lossless storage and decoder costs; and automatically choose resource boundaries and compatible compression. Do not ask the user to choose modules or codecs. Ask only about creative intent, rights, budget or visible quality tradeoffs; never silently apply lossy conversion.",
+          PREPARED_COPY_GUIDANCE,
+          "Default to separate HTML, CSS, JavaScript ES modules with explicit imports, and assets. Search selected-chain registry/index modules first and verify compatible candidates before reuse. Preserve module identities through publication and compress resources independently. Only make a self-contained file when the user explicitly requests it; Inline/onchain storage does not imply bundling.",
+          "For collector-facing Inline, validate each supplied image, prepare its exact data:image/<type>;base64,<payload> carriage once at build time, and publish one receipt-bound ASCII payload or URI. Never publish raw image bytes plus a second encoded copy; the contract/viewer only copies the prepared header/payload/footer and never Base64-encodes media during tokenURI. GIF is direct data:image/gif from the exact high-quality source and is never wrapped in SVG, silently resized/re-encoded or replaced by a short fixture such as AA==. Keep the outer JSON and complete HTML in raw-percent form.",
+          "Return an explicit plan with these headings: Intent, Project graph, Storage and presentation, Contracts and sale, Verification, Approval boundary, and Open questions.",
+          "For every collector-facing viewer, use the registered canonical KEEL verification shell by omitting viewer. Never author, copy, shrink, replace, or upload a shell. viewer=none is only an explicit raw-artifact route with no viewer; it is not a custom-shell route.",
+          "Read keel://mcp/project-routes for p5, Three.js, Doom WASM, Flash AS3, OneMint, collection, fixed-sale, claim, and Fray routing. Read keel://mcp/publication-modes before selecting or pricing a storage route. Search the KEEL library before planning duplicate reusable runtime bytes.",
+          "Keep SDK/unit, Forge contract, module-catalog, browser/runtime, and live-chain evidence as separate plan gates. Local tests do not prove a browser render, receipt, public RPC read-back, or deployed module binding.",
+          "Stop at a reviewable plan. Do not stage, upload, sign, submit, claim faucet funds, or infer approval from this prompt.",
+        ].join(" "),
+      },
+    }],
+  };
+}
+
 function promptArguments(value: unknown): { readonly input: string; readonly objectName?: string; readonly mediaType?: string } {
   const input = object(value ?? {}, "prompt arguments");
   exact(input, ["input", "objectName", "mediaType"], "prompt arguments");
@@ -81,10 +195,13 @@ export function getKeelAssetReviewPrompt(name: unknown, argumentsValue: unknown)
           `Start with the analyze tool for ${quote(args.input)}, then compare modeled cost options with cost and plan a deterministic flat or recursive upload with upload-plan.`,
           "If a materialized artifact is explicitly available, build and verify it before preparing any chain request.",
           "When the asset uses a local module snapshot, resolve an exact module and write a lock only when its catalog receipt is available; bytes-unavailable is not content verification.",
-          "Use chain-plan only for local, review-only operation descriptors, then publish-plan to bind a canonical SDK review envelope; ABI encoding, wallet approval, signing, and submission remain separate human-approved steps.",
+          "Use chain-plan only for local, review-only operation descriptors, then publish-plan to bind a canonical SDK review envelope; ABI encoding, wallet approval, signing, and submission remain separate human-approved steps. When the target already has a versioned graph, derive that state automatically and call keel-revision-plan first. Publish only its one declared changed resource, reuse every other exact object binding, and do not rewrite a follow-latest token presentation. publish-plan must reject any upload whose digest is not the accepted delta.",
           "For a materialized Ethereum plan, ethereum-encode may derive and display exact unsigned KeelHold calldata; it does not query, simulate, sign, submit, or create a QR payload.",
           "For account-to-agent collection creation, wallet-link must receive the exact KeelFactory collectionConfig, verify its Keccak digest against the target, and only then return JSON-safe EIP-712 typed data; missing or mismatched config stays deferred, the account must review/sign separately, and MCP never approves custody or submits.",
+          PREPARED_COPY_GUIDANCE,
+          "Before any contract, collection, viewer, metadata, deployment or release work, call keel-contract-workflow-preflight first; it reads the target README and relevant docs and returns the required engine, exact-network, selected-chain module, edge-case, and contract-control sequence. Then call keel-engine-catalog, inspect the selected chain, and search selected-chain modules. At Studio staging, supply only creator resources/modules. For new creator source only, call keel-inline-prepare without a carriage or presentationPolicy override so the automatic compact raw-percent saver uses collector-inline policy, prepares one exact image carriage before publication, and does not Base64-wrap the complete HTML or metadata. The default image is a validated direct data:image/* URI/payload; the contract/viewer copies its prepared header/payload/footer and never encodes or decodes media during tokenURI. For GIF this is a direct high-quality GIF URI, never an SVG wrapper, silent resize/re-encode or placeholder. The default animation is complete data:text/html;charset=utf-8 HTML inside the registered canonical shell; IPFS, HTTP, web3 resolvers and legacy complete-HTML Base64 are explicit exceptions. Put executable reusable libraries in modules and artwork, animation, palettes, timing, and project data in assets; never embed a large Base64 artwork payload in entry HTML. Report original source, prepared image carriage, stored graph, complete tokenURI bytes, layer count, and overhead before staging, and fail above the public-read ceiling. Resolve the exact selected-chain KeelRawTokenURIBuilder plus canonical raw-percent shell fragment receipts and read-back; never switch an existing registered carriage or fall back to another carriage silently. Omitting viewer selects Studio's canonical KEEL Inline graph for later preparation; `none` opts out of the shell only, while the immutable artifact can still be released, minted, and retrieved by its contract read. A standalone image, video, or self-contained GLB resolves to registered shell plus registered keel.asset-display@1 plus the direct creator asset, never zero modules or a manufactured index.html. Never use protectorPrefix, protectorSuffix, protectedHarnessDataURI, or a NoProtector result as the default Inline readiness check. Never manufacture or upload a default KEEL shell, protected-harness wrapper, or local wrapper when catalog resolution fails; Studio must fail closed for an incomplete selected-chain catalog during preparation. Creator-authored HTML is project content, not a replacement shell.",
           "Report unavailable carriers and modeled estimates honestly, and never call a URI proof of bytes.",
+          "Before staging, unpack every embedded gzip or deflate resource and reject concrete http(s), IPFS, Arweave, web3 or keel-onchain locators in decoded creator bytes. An onchain content URL sentinel is not exempt; allow only the SVG namespace literal http://www.w3.org/2000/svg.",
           objectLine,
           mediaLine,
         ].join(" "),
@@ -106,12 +223,44 @@ export function getFrayAuctionReviewPrompt(name: unknown, argumentsValue: unknow
         text: [
           "Prepare a Fray auction through Keel, but do not sign, submit, claim faucet funds, or report a mint/upload without receipts.",
           "Call fray-auction-intake first. If title or description is missing, ask for it; the creator may choose the short default description.",
-          "Offer exactly three auction setups and accept only 1, 2, or 3: Quick test, Standard, or Collector. Do not invent a fourth preset or silently choose one when the creator has not selected it.",
+          "Offer exactly four auction setups and accept only 1, 2, 3, or 4: Quick test, Standard, Collector, or Fray Auction showcase. Do not invent another preset or silently choose one when the creator has not selected it.",
           "If the chain is missing, call keel-chain-guide and ask for a supported testnet. Faucet entries are links for the creator to open and claim manually.",
           "If the request names Three.js or another reusable dependency, call keel-library-search against the configured Keel Studio URL before planning new bytes. Use only an exact, policy/license-compatible candidate; ambiguous matches require creator selection.",
           "When a source path is available, call fray-stage-project after intake. For scripts, WASM, HTML, or video, ask when to capture the still and when the video should begin: hook, timestamp, or settle; collect duration and fps for video. The default is a three-second, twelve-fps hook preview only when the creator chooses the default.",
           "Show the returned Studio handoff URL. Explain that the agent staged the project but the creator's Studio wallet sign-in attaches it to the correct account. Show the fee preflight and say the Studio refreshes it on open; the wallet is still the final fee authority.",
           "When intake is complete, show the digest-bound fray-approval-request envelope, API scope, module bindings, and wallet mode. Prefer EIP-5792 on EVM or a Beacon batch on Tezos when the connected wallet supports it. If EIP-5792 is unavailable and Studio has a verified Keel carrier batcher configured, use it for immutable carriers and content descriptors, then keep the creator-bound logical registry write as a direct wallet approval; otherwise show sequential approvals. Stop and wait for the creator's approval.",
+        ].join(" "),
+      },
+    }],
+  };
+}
+
+export function getKeelDraftRepairPrompt(name: unknown, argumentsValue: unknown): McpPromptResult {
+  if (name !== KEEL_DRAFT_REPAIR_PROMPT) throw new TypeError(`Unknown prompt: ${String(name)}.`);
+  const args = object(argumentsValue ?? {}, "prompt arguments");
+  exact(args, ["releaseId", "expectedRevision", "request", "presentationMode"], "prompt arguments");
+  const releaseId = promptText(args.releaseId, "prompt arguments.releaseId", 128);
+  const expectedRevision = positiveRevision(args.expectedRevision, "prompt arguments.expectedRevision");
+  const request = promptText(args.request, "prompt arguments.request", 2_000);
+  const presentationMode = args.presentationMode === undefined
+    ? undefined
+    : promptText(args.presentationMode, "prompt arguments.presentationMode", 128);
+  return {
+    description: "Revision-bound, wallet-neutral KEEL Studio draft repair.",
+    messages: [{
+      role: "user",
+      content: {
+        type: "text",
+        text: [
+          `Repair Studio release draft ${quote(releaseId)} at exact revision ${expectedRevision}.`,
+          `Requested change: ${request}`,
+          "Read the draft first with keel-studio-draft and preserve every field the creator did not ask to change.",
+          ...(presentationMode === undefined ? [] : [`Keep presentation mode ${quote(presentationMode)} unless the creator explicitly changes it.`]),
+          "For image, video, or self-contained GLB changes, call media-optimize first and show exact before bytes, after bytes, percentage saved, adapter, settings, output digest, and byte length.",
+          "Do not write until the creator approves that exact measured result. Then call media-optimize-apply with the reviewed digest and byte length; it must write one new file and preserve the source.",
+          "Stage corrected project bytes with keel-studio-stage-project. The creator still performs Studio's gas-free preparation and chooses the resulting project before the draft can reference it.",
+          `Update the draft only with expectedRevision ${expectedRevision}. Stop on a revision conflict or reviewed publish action instead of retrying against newer state.`,
+          "Never cancel, sign, submit, publish, request wallet approval, or change storage/presentation mode implicitly.",
         ].join(" "),
       },
     }],
