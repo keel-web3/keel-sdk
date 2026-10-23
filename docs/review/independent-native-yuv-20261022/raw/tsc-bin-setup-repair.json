@@ -1,0 +1,8 @@
+{
+  "cause": "Thin alias-only copy omits old regular .bin shim; source/build assertion failure not product failure",
+  "path": "/private/tmp/keel-independent-native-yuv-20261022-01/keel-sdk/node_modules/.bin/tsc",
+  "target": "../typescript/bin/tsc",
+  "resolvedExactPublicCompiler": "/Users/ravonus/dev/keel-sdk/node_modules/.pnpm/typescript@5.9.3/node_modules/typescript/bin/tsc",
+  "sourceModified": false,
+  "oldBuildRED": "own-standard-build.stderr"
+}

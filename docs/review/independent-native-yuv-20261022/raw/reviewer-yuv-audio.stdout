@@ -1,0 +1,16 @@
+TAP version 13
+# Subtest: actual BT709 YUV B-frame Original with AAC keeps every source byte and audio indication without fidelity authority
+ok 1 - actual BT709 YUV B-frame Original with AAC keeps every source byte and audio indication without fidelity authority
+  ---
+  duration_ms: 200.475959
+  type: 'test'
+  ...
+1..1
+# tests 1
+# suites 0
+# pass 1
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 331.64625

@@ -1,0 +1,19 @@
+{
+  "source": "./keel-site/apps/studio/tests/fixtures/media-preview.mp4",
+  "bytes": 1828,
+  "sha256": "41bc415d0a2a142ee23db0de0089fb7d1675cc6718516a15da3f306bffb13193",
+  "site": "5b815a6001702484145b60742ac0ec8626b2c601",
+  "sdk": "05df85d7e801241ecc4a119e5d0a8e9c4d7377f3",
+  "recipe": {
+    "schema": "keel-media-edit@1",
+    "mode": "original",
+    "format": "original",
+    "quality": 82,
+    "noSound": false
+  },
+  "error": {
+    "name": "TypeError",
+    "message": "Movie color, field or sample-depth semantics require an exact preserving adapter; native media is retained.",
+    "stack": "TypeError: Movie color, field or sample-depth semantics require an exact preserving adapter; native media is retained.\n    at retain (file:///private/tmp/keel-independent-context-lifetime-20261022-01/keel-sdk/packages/builder/dist/movie-presentation-semantics.js:13:40)\n    at assertMoviePresentationSemantics (file:///private/tmp/keel-independent-context-lifetime-20261022-01/keel-sdk/packages/builder/dist/movie-presentation-semantics.js:27:9)\n    at decodeMovie (file:///private/tmp/keel-independent-context-lifetime-20261022-01/keel-sdk/packages/builder/dist/media-preparation.js:145:26)\n    at process.processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at async readFrame (file:///private/tmp/keel-independent-context-lifetime-20261022-01/keel-sdk/packages/builder/dist/media-preparation.js:399:25)\n    at async compareMediaFrames (file:///private/tmp/keel-independent-context-lifetime-20261022-01/keel-sdk/packages/builder/dist/media-preparation.js:419:22)\n    at async file:///private/tmp/keel-independent-composed-site-20261022-01/inspect-native-fallback.mjs:2:389"
+  }
+}

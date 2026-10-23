@@ -1,0 +1,40 @@
+TAP version 13
+# Subtest: exact ordinary YUV source mounts in the current verified canonical shell and matches native preview geometry
+ok 1 - exact ordinary YUV source mounts in the current verified canonical shell and matches native preview geometry
+  ---
+  duration_ms: 1867.91475
+  type: 'test'
+  ...
+# Subtest: native sar PNG inspection and canonical original movie agree on actual browser geometry
+ok 2 - native sar PNG inspection and canonical original movie agree on actual browser geometry
+  ---
+  duration_ms: 3140.092417
+  type: 'test'
+  ...
+# Subtest: native title PNG inspection and canonical original movie agree on actual browser geometry
+ok 3 - native title PNG inspection and canonical original movie agree on actual browser geometry
+  ---
+  duration_ms: 798.821666
+  type: 'test'
+  ...
+# Subtest: current canonical player keeps native sar bytes and actual browser display geometry
+ok 4 - current canonical player keeps native sar bytes and actual browser display geometry
+  ---
+  duration_ms: 2010.902833
+  type: 'test'
+  ...
+# Subtest: current canonical player keeps native title bytes and actual browser display geometry
+ok 5 - current canonical player keeps native title bytes and actual browser display geometry
+  ---
+  duration_ms: 785.304
+  type: 'test'
+  ...
+1..5
+# tests 5
+# suites 0
+# pass 5
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 4321.173333

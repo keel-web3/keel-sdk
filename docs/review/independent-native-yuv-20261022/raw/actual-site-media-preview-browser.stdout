@@ -1,0 +1,46 @@
+TAP version 13
+# Subtest: real H264 MP4, VP9 WebM and image formats preview locally through a server outage and download exact bytes
+ok 1 - real H264 MP4, VP9 WebM and image formats preview locally through a server outage and download exact bytes
+  ---
+  duration_ms: 1919.393916
+  type: 'test'
+  ...
+# Subtest: browser codec rejection falls back to the real checked SDK decoder without modifying the MP4
+ok 2 - browser codec rejection falls back to the real checked SDK decoder without modifying the MP4
+  ---
+  duration_ms: 511.112458
+  type: 'test'
+  ...
+# Subtest: truncated and misleading sources expose usable unsupported diagnostics and never execute content or lose originals
+ok 3 - truncated and misleading sources expose usable unsupported diagnostics and never execute content or lose originals
+  ---
+  duration_ms: 435.341041
+  type: 'test'
+  ...
+# Subtest: server frame cancellation, retry and source changes ignore late replies and keep one current preview
+ok 4 - server frame cancellation, retry and source changes ignore late replies and keep one current preview
+  ---
+  duration_ms: 425.621417
+  type: 'test'
+  ...
+# Subtest: server size limits preserve exact-original download and unsupported files remain selected
+ok 5 - server size limits preserve exact-original download and unsupported files remain selected
+  ---
+  duration_ms: 592.594375
+  type: 'test'
+  ...
+# Subtest: expired private media session has one sign-in error and resumes the exact original after sign-in
+ok 6 - expired private media session has one sign-in error and resumes the exact original after sign-in
+  ---
+  duration_ms: 527.2655
+  type: 'test'
+  ...
+1..6
+# tests 6
+# suites 0
+# pass 6
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 5858.359375

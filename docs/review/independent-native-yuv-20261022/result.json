@@ -1,0 +1,57 @@
+{
+  "verdict": "APPROVE_SCOPED_SOURCE",
+  "sdk": "4fa47717d9e9fac48cc6c9f925540f190e478564",
+  "site": "0345f43d337e4863ebee3ce3b2bd3e0d30d4a9c0",
+  "reviewerProductionAuthorship": false,
+  "existingAssertionOrReferenceChanges": false,
+  "unresolvedScopedBlockers": [],
+  "freshResults": {
+    "affectedSDKMCP": {
+      "pass": 88,
+      "fail": 0,
+      "skip": 0
+    },
+    "independentShortOriginal": {
+      "pass": 4,
+      "fail": 0
+    },
+    "independentAACOriginal": {
+      "pass": 1,
+      "fail": 0
+    },
+    "siteBrowser": {
+      "pass": 6,
+      "fail": 0
+    },
+    "actualCanonicalBrowser": {
+      "pass": 5,
+      "fail": 0
+    },
+    "siteServices": {
+      "pass": 3,
+      "fail": 0
+    },
+    "classification": {
+      "pass": 3,
+      "fail": 0
+    },
+    "standardBuildExit": 0,
+    "builderTSCExit": 0,
+    "siteTSCExit": 0
+  },
+  "remainingExternalScopes": [
+    "TEMPORAL-PLAYBACK-PROFILE-1 actual DB whole-cost AUTO continuation",
+    "real deployed Gatorrr/GIF and historical authenticated rendering",
+    "live image/build identity and wallet-signing boundary"
+  ],
+  "hostedChainOrSigningProof": false,
+  "priorFullSiteTuple": {
+    "site": "0345f43d337e4863ebee3ce3b2bd3e0d30d4a9c0",
+    "sdk": "8d9e23ee4e3f99cf9cf7cf18cd6dc593257021c9",
+    "files": 495,
+    "pass": 3807,
+    "fail": 0,
+    "skip": 0,
+    "cancel": 0
+  }
+}

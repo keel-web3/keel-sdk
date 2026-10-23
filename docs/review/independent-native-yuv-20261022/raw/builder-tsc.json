@@ -1,0 +1,25 @@
+{
+  "command": [
+    "/Users/ravonus/.nvm/versions/node/v22.22.1/bin/node",
+    "node_modules/typescript/bin/tsc",
+    "-p",
+    "packages/builder/tsconfig.json",
+    "--noEmit",
+    "--incremental",
+    "false"
+  ],
+  "cwd": "/private/tmp/keel-independent-native-yuv-20261022-01/keel-sdk",
+  "sdk": "4fa47717d9e9fac48cc6c9f925540f190e478564",
+  "site": "0345f43d337e4863ebee3ce3b2bd3e0d30d4a9c0",
+  "exit": 0,
+  "seconds": 1.552123785018921,
+  "environmentKeys": [
+    "HOME",
+    "PATH",
+    "NODE_ENV",
+    "LC_ALL",
+    "LANG",
+    "CHROMIUM_PATH"
+  ],
+  "productionTouched": false
+}

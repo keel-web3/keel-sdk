@@ -1,0 +1,64 @@
+{
+  "sdk": "4fa47717d9e9fac48cc6c9f925540f190e478564",
+  "site": "0345f43d337e4863ebee3ce3b2bd3e0d30d4a9c0",
+  "trackedUnchanged": [
+    {
+      "path": "packages/builder/src/media-preparation.ts",
+      "bytes": 51518,
+      "sha256": "74ec8e0e48edd666b998384b943b484cd07aead29a76693d3dc0cb4cd635c617"
+    },
+    {
+      "path": "packages/builder/src/movie-presentation-semantics.ts",
+      "bytes": 35554,
+      "sha256": "91b4033161821d6e9c019c75671262101a652f8caa2ffb276e3f1bcdfc757e43"
+    },
+    {
+      "path": "scripts/test-suites.mjs",
+      "bytes": 20221,
+      "sha256": "5e957dca201e0206a7addafd523f24a91fd67e9c7af91bf21366df37b00298d7"
+    },
+    {
+      "path": "tests/native-yuv-preview.test.mjs",
+      "bytes": 8412,
+      "sha256": "4ce5539fb7b4af82bb5893023fbfde3d27d3c8dec2fccabaa0144ed8b7c3b41a"
+    },
+    {
+      "path": "tests/native-movie-preview.browser.test.mjs",
+      "bytes": 2805,
+      "sha256": "ba23131079115930021d5bbd1127176d081d6f5efdf976142344d3c1e1595eea"
+    },
+    {
+      "path": "tests/native-presentation-guard.browser.test.mjs",
+      "bytes": 2540,
+      "sha256": "9b3a997ed8bdabf18d273d3531b4733ad47488d24470c471b0637bc0adfef2cc"
+    },
+    {
+      "path": "tests/fixtures/native-yuv-preview/media-preview.mp4",
+      "bytes": 1828,
+      "sha256": "41bc415d0a2a142ee23db0de0089fb7d1675cc6718516a15da3f306bffb13193"
+    },
+    {
+      "path": "site/apps/studio/tests/integration/media-local-preview.browser.test.ts",
+      "bytes": 13044,
+      "sha256": "c47e0cd2daab8879b0ee2acb4defb9c7d038a2f8d21a9ced6a0a100cac91d51f"
+    }
+  ],
+  "tools": [
+    {
+      "path": "/Users/ravonus/.nvm/versions/node/v22.22.1/bin/node",
+      "bytes": 112972416,
+      "sha256": "245e0321af97d3c21dd4e7104457334dfe3c3ba7982d0db75363e354565f8cbb"
+    },
+    {
+      "path": "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome",
+      "bytes": 367696,
+      "sha256": "6e156f2271cef44afce9db36a5b920e94518857b94a4160f082696f8c3bd1c9d"
+    },
+    {
+      "path": "/Users/ravonus/dev/keel-sdk/node_modules/.pnpm/ffmpeg-static@5.3.0/node_modules/ffmpeg-static/ffmpeg",
+      "bytes": 45568216,
+      "sha256": "a90e3db6a3fd35f6074b013f948b1aa45b31c6375489d39e572bea3f18336584"
+    }
+  ],
+  "productionSourceModified": false
+}

@@ -1,0 +1,540 @@
+TAP version 13
+# Subtest: actual three-frame APNG cannot be approved as its Sharp first-frame WebP
+ok 1 - actual three-frame APNG cannot be approved as its Sharp first-frame WebP
+  ---
+  duration_ms: 37.072625
+  type: 'test'
+  ...
+# {"source":{"bytes":642,"sha256":"dd52b281bd517e471500f635bd67c696c2a6658473a00938c155c3866c060e58"},"candidate":{"bytes":174,"sha256":"737a04d4c463eff7395bcf4043315533956295ce1c11184291e4ab2085a1ba05"},"actualFrames":3,"sharpPages":null}
+# Subtest: complete GIF block grammar and native zero-loop timing can qualify actual three-frame WebP
+ok 2 - complete GIF block grammar and native zero-loop timing can qualify actual three-frame WebP
+  ---
+  duration_ms: 4.0275
+  type: 'test'
+  ...
+# Subtest: concatenated GIFs and missing complete trailer cannot be relabelled one verified animation
+ok 3 - concatenated GIFs and missing complete trailer cannot be relabelled one verified animation
+  ---
+  duration_ms: 4.161709
+  type: 'test'
+  ...
+# Subtest: GIF creator comments stay native until a preserving adapter can establish metadata correspondence
+ok 4 - GIF creator comments stay native until a preserving adapter can establish metadata correspondence
+  ---
+  duration_ms: 2.198208
+  type: 'test'
+  ...
+# Subtest: duplicate WebP animation control is rejected even if the native decoder accepts its pixels
+ok 5 - duplicate WebP animation control is rejected even if the native decoder accepts its pixels
+  ---
+  duration_ms: 2.764542
+  type: 'test'
+  ...
+# Subtest: actual candidate bytes must match their recipe container even when all decoded RGBA is equal
+ok 6 - actual candidate bytes must match their recipe container even when all decoded RGBA is equal
+  ---
+  duration_ms: 2.146833
+  type: 'test'
+  ...
+# Subtest: complete AVIF traversal finds sequence brands beyond byte40 and rejects malformed box bounds
+ok 7 - complete AVIF traversal finds sequence brands beyond byte40 and rejects malformed box bounds
+  ---
+  duration_ms: 0.240792
+  type: 'test'
+  ...
+# Subtest: PNG creator text cannot disappear behind equal decoded RGBA samples
+ok 8 - PNG creator text cannot disappear behind equal decoded RGBA samples
+  ---
+  duration_ms: 2.665875
+  type: 'test'
+  ...
+# Subtest: actual independently encoded bytes pass every RGBA pixel and immutable source/recipe commitments
+ok 9 - actual independently encoded bytes pass every RGBA pixel and immutable source/recipe commitments
+  ---
+  duration_ms: 8.105542
+  type: 'test'
+  ...
+# Subtest: a changed last RGBA alpha sample fails even though dimensions and all other pixels match
+ok 10 - a changed last RGBA alpha sample fails even though dimensions and all other pixels match
+  ---
+  duration_ms: 3.098875
+  type: 'test'
+  ...
+# Subtest: actual animation verifies every frame, intrinsic infinite loop and exact variable timing
+ok 11 - actual animation verifies every frame, intrinsic infinite loop and exact variable timing
+  ---
+  duration_ms: 4.324875
+  type: 'test'
+  ...
+# Subtest: last-frame change, one millisecond duration change and finite-loop change are all rejected
+ok 12 - last-frame change, one millisecond duration change and finite-loop change are all rejected
+  ---
+  duration_ms: 7.224917
+  type: 'test'
+  ...
+# Subtest: finite identical animation loops remain exact and are not relabelled infinite
+ok 13 - finite identical animation loops remain exact and are not relabelled infinite
+  ---
+  duration_ms: 2.281792
+  type: 'test'
+  ...
+# Subtest: movie to actual checked animated WebP is conditional on authenticated canonical-player semantics
+ok 14 - movie to actual checked animated WebP is conditional on authenticated canonical-player semantics
+  ---
+  duration_ms: 174.06625
+  type: 'test'
+  ...
+# Subtest: actual AAC audio includes every canonical PCM sample, channels, presentation timestamps and hashes
+ok 15 - actual AAC audio includes every canonical PCM sample, channels, presentation timestamps and hashes
+  ---
+  duration_ms: 298.503708
+  type: 'test'
+  ...
+# Subtest: equal-duration audio with changed actual samples fails, rather than presence-only approval
+ok 16 - equal-duration audio with changed actual samples fails, rather than presence-only approval
+  ---
+  duration_ms: 185.252292
+  type: 'test'
+  ...
+# Subtest: audio disappearance fails even when all video samples remain exact
+ok 17 - audio disappearance fails even when all video samples remain exact
+  ---
+  duration_ms: 255.316042
+  type: 'test'
+  ...
+# Subtest: explicit edits stay selected without granting automatic fidelity or fallback-to-original authority
+ok 18 - explicit edits stay selected without granting automatic fidelity or fallback-to-original authority
+  ---
+  duration_ms: 1.77125
+  type: 'test'
+  ...
+# Subtest: decoder corruption, unsupported external containers and pre-aborted work fail closed
+ok 19 - decoder corruption, unsupported external containers and pre-aborted work fail closed
+  ---
+  duration_ms: 42.910375
+  type: 'test'
+  ...
+# Subtest: the verifier snapshots mutable caller arrays and nested recipe before its first await
+ok 20 - the verifier snapshots mutable caller arrays and nested recipe before its first await
+  ---
+  duration_ms: 2.379625
+  type: 'test'
+  ...
+# Subtest: actual float64 PCM retains precision below float32 and detects a change in the final audio sample
+ok 21 - actual float64 PCM retains precision below float32 and detects a change in the final audio sample
+  ---
+  duration_ms: 294.685375
+  type: 'test'
+  ...
+# Subtest: real MCP candidate rejects unmodeled complete audio pcm-coherent-count.mov with no persistence
+ok 22 - real MCP candidate rejects unmodeled complete audio pcm-coherent-count.mov with no persistence
+  ---
+  duration_ms: 146.021125
+  type: 'test'
+  ...
+# Subtest: real MCP compare rejects unmodeled complete audio pcm-coherent-count.mov with no persistence
+ok 23 - real MCP compare rejects unmodeled complete audio pcm-coherent-count.mov with no persistence
+  ---
+  duration_ms: 73.481792
+  type: 'test'
+  ...
+# Subtest: real MCP candidate rejects unmodeled complete audio aac-one-tick-tail.mp4 with no persistence
+ok 24 - real MCP candidate rejects unmodeled complete audio aac-one-tick-tail.mp4 with no persistence
+  ---
+  duration_ms: 82.178709
+  type: 'test'
+  ...
+# Subtest: real MCP compare rejects unmodeled complete audio aac-one-tick-tail.mp4 with no persistence
+ok 25 - real MCP compare rejects unmodeled complete audio aac-one-tick-tail.mp4 with no persistence
+  ---
+  duration_ms: 80.448458
+  type: 'test'
+  ...
+# Subtest: real MCP normal AAC candidate and comparison retain audio and remain unpublished
+ok 26 - real MCP normal AAC candidate and comparison retain audio and remain unpublished
+  ---
+  duration_ms: 456.798
+  type: 'test'
+  ...
+# Subtest: normal qualified AAC keeps full priming/padding PCM and exact presentation
+ok 27 - normal qualified AAC keeps full priming/padding PCM and exact presentation
+  ---
+  duration_ms: 164.927291
+  type: 'test'
+  ...
+# Subtest: AAC declared +1 final tick cannot hide in unchanged codec-tail PCM on source
+ok 28 - AAC declared +1 final tick cannot hide in unchanged codec-tail PCM on source
+  ---
+  duration_ms: 80.896459
+  type: 'test'
+  ...
+# Subtest: AAC declared +1 final tick cannot hide in unchanged codec-tail PCM on candidate
+ok 29 - AAC declared +1 final tick cannot hide in unchanged codec-tail PCM on candidate
+  ---
+  duration_ms: 154.126833
+  type: 'test'
+  ...
+# Subtest: unsupported AAC frame-length config retains exact original instead of inferring 1024 samples
+ok 30 - unsupported AAC frame-length config retains exact original instead of inferring 1024 samples
+  ---
+  duration_ms: 159.101625
+  type: 'test'
+  ...
+# Subtest: audio-only f64 PCM remains byte-exact native; no fictitious video equivalence is issued
+ok 31 - audio-only f64 PCM remains byte-exact native; no fictitious video equivalence is issued
+  ---
+  duration_ms: 9.952958
+  type: 'test'
+  ...
+# Subtest: nonstandard AAC edit priming cannot borrow a valid padded decoder result
+ok 32 - nonstandard AAC edit priming cannot borrow a valid padded decoder result
+  ---
+  duration_ms: 45.12075
+  type: 'test'
+  ...
+# Subtest: unmodeled PCM speaker layout keeps native bytes and cannot borrow mono sample hashes
+ok 33 - unmodeled PCM speaker layout keeps native bytes and cannot borrow mono sample hashes
+  ---
+  duration_ms: 43.63375
+  type: 'test'
+  ...
+# Subtest: original mode preserves arbitrary container bytes without decode or format eligibility claims
+ok 34 - original mode preserves arbitrary container bytes without decode or format eligibility claims
+  ---
+  duration_ms: 3.075833
+  type: 'test'
+  ...
+# Subtest: still lossless WebP fully decodes and verifies pixel identity with measured bytes
+ok 35 - still lossless WebP fully decodes and verifies pixel identity with measured bytes
+  ---
+  duration_ms: 5.607792
+  type: 'test'
+  ...
+# Subtest: explicit still edits create a reversible recipe, preserve source and distinguish encoding lossless from source pixels
+ok 36 - explicit still edits create a reversible recipe, preserve source and distinguish encoding lossless from source pixels
+  ---
+  duration_ms: 4.99225
+  type: 'test'
+  ...
+# Subtest: compare returns decoded PNG frames at the same timestamp with original and processed geometry
+ok 37 - compare returns decoded PNG frames at the same timestamp with original and processed geometry
+  ---
+  duration_ms: 5.762542
+  type: 'test'
+  ...
+# Subtest: animated GIF retains all frames and their delays, comparison selects same source instant
+ok 38 - animated GIF retains all frames and their delays, comparison selects same source instant
+  ---
+  duration_ms: 256.554459
+  type: 'test'
+  ...
+# Subtest: actual capability report and cancellation do not claim universal decode support
+ok 39 - actual capability report and cancellation do not claim universal decode support
+  ---
+  duration_ms: 33.44
+  type: 'test'
+  ...
+# Subtest: MOV input is decoded by capability and exports MP4/MOV without changing source
+ok 40 - MOV input is decoded by capability and exports MP4/MOV without changing source
+  ---
+  duration_ms: 684.3855
+  type: 'test'
+  ...
+# Subtest: still layers compose ordered source copies with explicit alpha, rotation and output bounds
+ok 41 - still layers compose ordered source copies with explicit alpha, rotation and output bounds
+  ---
+  duration_ms: 13.483833
+  type: 'test'
+  ...
+# Subtest: animated layers fail closed rather than silently ignoring composition
+ok 42 - animated layers fail closed rather than silently ignoring composition
+  ---
+  duration_ms: 1.106917
+  type: 'test'
+  ...
+# Subtest: an animated AVIF reimport preserves the verified sequence stream, both frames and exact timing
+ok 43 - an animated AVIF reimport preserves the verified sequence stream, both frames and exact timing
+  ---
+  duration_ms: 709.594334
+  type: 'test'
+  ...
+# Subtest: well-formed version0 and version1 identity edits retain all real decoded frames and exact timing
+ok 44 - well-formed version0 and version1 identity edits retain all real decoded frames and exact timing
+  ---
+  duration_ms: 290.000458
+  type: 'test'
+  ...
+# Subtest: edit-list length, segment, signed media-time, clocks and dwell/reverse forms reject with unchanged originals
+ok 45 - edit-list length, segment, signed media-time, clocks and dwell/reverse forms reject with unchanged originals
+  ---
+  duration_ms: 683.298833
+  type: 'test'
+  ...
+# Subtest: an AVIF brand cannot grant repeat-edit authority to a real H264 movie
+ok 46 - an AVIF brand cannot grant repeat-edit authority to a real H264 movie
+  ---
+  duration_ms: 50.177375
+  type: 'test'
+  ...
+# Subtest: coherently shortened header clocks cannot hide unchanged full sample timing
+ok 47 - coherently shortened header clocks cannot hide unchanged full sample timing
+  ---
+  duration_ms: 87.923333
+  type: 'test'
+  ...
+# Subtest: actual AV1 AVIF default infinite repeat remains supported; finite or inconsistent repeat profiles retain native
+ok 48 - actual AV1 AVIF default infinite repeat remains supported; finite or inconsistent repeat profiles retain native
+  ---
+  duration_ms: 307.970417
+  type: 'test'
+  ...
+# Subtest: exact retained extended movie duration cannot add an unmodelled tail to complete unchanged tracks
+ok 49 - exact retained extended movie duration cannot add an unmodelled tail to complete unchanged tracks
+  ---
+  duration_ms: 42.09375
+  type: 'test'
+  ...
+# Subtest: exact retained sar: shared preparation/comparison and actual candidate proof reject; original mode is byte exact
+ok 50 - exact retained sar: shared preparation/comparison and actual candidate proof reject; original mode is byte exact
+  ---
+  duration_ms: 136.040917
+  type: 'test'
+  ...
+# Subtest: exact retained title: shared preparation/comparison and actual candidate proof reject; original mode is byte exact
+ok 51 - exact retained title: shared preparation/comparison and actual candidate proof reject; original mode is byte exact
+  ---
+  duration_ms: 127.195
+  type: 'test'
+  ...
+# Subtest: creator, creation-time, stream title and language metadata are never stripped behind a lossless flag
+ok 52 - creator, creation-time, stream title and language metadata are never stripped behind a lossless flag
+  ---
+  duration_ms: 251.127875
+  type: 'test'
+  ...
+# Subtest: real remuxed display rotation is rejected instead of being baked into lossless pixels
+ok 53 - real remuxed display rotation is rejected instead of being baked into lossless pixels
+  ---
+  duration_ms: 58.492667
+  type: 'test'
+  ...
+# Subtest: raw movie and track matrix, display dimensions, clean aperture and explicit color boxes fail closed
+ok 54 - raw movie and track matrix, display dimensions, clean aperture and explicit color boxes fail closed
+  ---
+  duration_ms: 531.389791
+  type: 'test'
+  ...
+# Subtest: conflicting DAR, multiline metadata, extra side data and incomplete boxes cannot manufacture admission
+ok 55 - conflicting DAR, multiline metadata, extra side data and incomplete boxes cannot manufacture admission
+  ---
+  duration_ms: 12.46775
+  type: 'test'
+  ...
+# Subtest: original untagged movie fixtures retain native bytes instead of acquiring invented image color semantics
+ok 56 - original untagged movie fixtures retain native bytes instead of acquiring invented image color semantics
+  ---
+  duration_ms: 328.447
+  type: 'test'
+  ...
+# Subtest: ordinary no-edit video remains complete and equivalent through the actual shared APIs
+ok 57 - ordinary no-edit video remains complete and equivalent through the actual shared APIs
+  ---
+  duration_ms: 160.945542
+  type: 'test'
+  ...
+# Subtest: STSZ fullbox, fixed/variable byte bounds, counts, zero sizes, duplicate and compact ambiguity fail closed
+ok 58 - STSZ fullbox, fixed/variable byte bounds, counts, zero sizes, duplicate and compact ambiguity fail closed
+  ---
+  duration_ms: 600.662541
+  type: 'test'
+  ...
+# Subtest: fixed-size PCM sample tables and the video track each bind their own no-edit clocks and counts
+ok 59 - fixed-size PCM sample tables and the video track each bind their own no-edit clocks and counts
+  ---
+  duration_ms: 16.379875
+  type: 'test'
+  ...
+# Subtest: coherent extra STSZ/STTS/header sample cannot be certified from three actual decoded frames
+ok 60 - coherent extra STSZ/STTS/header sample cannot be certified from three actual decoded frames
+  ---
+  duration_ms: 112.477833
+  type: 'test'
+  ...
+# Subtest: native compare binds frame and declared timeline to the same initial actual source bytes
+ok 61 - native compare binds frame and declared timeline to the same initial actual source bytes
+  ---
+  duration_ms: 4.740875
+  type: 'test'
+  ...
+# {"committed":"0x19a488cb5a0d34f20c3d0d266797b65c62ab197554f7e484377954ee5acb83a5","initial":"0x19a488cb5a0d34f20c3d0d266797b65c62ab197554f7e484377954ee5acb83a5","mutated":"0x35fd32e1ac822834d6e945ce225c13a0c48731397a5578b86bd9aafae3546435","sourceFrameTimeMs":0,"declared":[120,240,200]}
+# Subtest: finite native GIF exposes all declared frames without approving altered playback
+ok 62 - finite native GIF exposes all declared frames without approving altered playback
+  ---
+  duration_ms: 7.216875
+  type: 'test'
+  ...
+# Subtest: finite GIF remains unavailable to strict preparation, edited comparison and actual-pair proof
+ok 63 - finite GIF remains unavailable to strict preparation, edited comparison and actual-pair proof
+  ---
+  duration_ms: 4.952208
+  type: 'test'
+  ...
+# Subtest: clamped native GIF exposes all declared frames without approving altered playback
+ok 64 - clamped native GIF exposes all declared frames without approving altered playback
+  ---
+  duration_ms: 1.866125
+  type: 'test'
+  ...
+# Subtest: clamped GIF remains unavailable to strict preparation, edited comparison and actual-pair proof
+ok 65 - clamped GIF remains unavailable to strict preparation, edited comparison and actual-pair proof
+  ---
+  duration_ms: 3.26175
+  type: 'test'
+  ...
+# Subtest: native finite WebP retains complete intrinsic timing and existing loop admission
+ok 66 - native finite WebP retains complete intrinsic timing and existing loop admission
+  ---
+  duration_ms: 2.219291
+  type: 'test'
+  ...
+# Subtest: native GIF inspection still refuses incomplete or interactive complete controls, exact export remains available
+ok 67 - native GIF inspection still refuses incomplete or interactive complete controls, exact export remains available
+  ---
+  duration_ms: 1.407167
+  type: 'test'
+  ...
+# Subtest: actual MCP native finite comparison/export stays byte bound and strict conversion still rejects
+ok 68 - actual MCP native finite comparison/export stays byte bound and strict conversion still rejects
+  ---
+  duration_ms: 9.124375
+  type: 'test'
+  ...
+# Subtest: actual MCP native clamped comparison/export stays byte bound and strict conversion still rejects
+ok 69 - actual MCP native clamped comparison/export stays byte bound and strict conversion still rejects
+  ---
+  duration_ms: 3.686209
+  type: 'test'
+  ...
+# Subtest: native movie geometry is exact, bounded and distinct from strict equivalence
+ok 70 - native movie geometry is exact, bounded and distinct from strict equivalence
+  ---
+  duration_ms: 4.280084
+  type: 'test'
+  ...
+# Subtest: native title is exactly one bounded UTF-8 type1 locale0 atom matching the actual decoder report
+ok 71 - native title is exactly one bounded UTF-8 type1 locale0 atom matching the actual decoder report
+  ---
+  duration_ms: 2.027958
+  type: 'test'
+  ...
+# Subtest: native Original keeps complete actual audio/video checks and timed frames without granting lossless authority
+ok 72 - native Original keeps complete actual audio/video checks and timed frames without granting lossless authority
+  ---
+  duration_ms: 248.45025
+  type: 'test'
+  ...
+# Subtest: unqualified QuickTime aperture and creator metadata remain native inspection capability refusals
+ok 73 - unqualified QuickTime aperture and creator metadata remain native inspection capability refusals
+  ---
+  duration_ms: 137.534708
+  type: 'test'
+  ...
+# Subtest: retained sar Original export stays byte exact without conversion
+ok 74 - retained sar Original export stays byte exact without conversion
+  ---
+  duration_ms: 2.122458
+  type: 'test'
+  ...
+# Subtest: retained sar native inspection returns complete displayed frame geometry and original identity
+ok 75 - retained sar native inspection returns complete displayed frame geometry and original identity
+  ---
+  duration_ms: 152.246417
+  type: 'test'
+  ...
+# Subtest: retained sar still cannot grant strict conversion or actual pair equivalence
+ok 76 - retained sar still cannot grant strict conversion or actual pair equivalence
+  ---
+  duration_ms: 167.332
+  type: 'test'
+  ...
+# Subtest: retained title Original export stays byte exact without conversion
+ok 77 - retained title Original export stays byte exact without conversion
+  ---
+  duration_ms: 0.687542
+  type: 'test'
+  ...
+# Subtest: retained title native inspection returns complete displayed frame geometry and original identity
+ok 78 - retained title native inspection returns complete displayed frame geometry and original identity
+  ---
+  duration_ms: 73.105959
+  type: 'test'
+  ...
+# Subtest: retained title still cannot grant strict conversion or actual pair equivalence
+ok 79 - retained title still cannot grant strict conversion or actual pair equivalence
+  ---
+  duration_ms: 163.402583
+  type: 'test'
+  ...
+# Subtest: actual portable MCP native sar inspection uses displayed geometry and retains exact original bytes
+ok 80 - actual portable MCP native sar inspection uses displayed geometry and retains exact original bytes
+  ---
+  duration_ms: 236.639333
+  type: 'test'
+  ...
+# Subtest: actual portable MCP native title inspection uses displayed geometry and retains exact original bytes
+ok 81 - actual portable MCP native title inspection uses displayed geometry and retains exact original bytes
+  ---
+  duration_ms: 179.91825
+  type: 'test'
+  ...
+# Subtest: exact ordinary YUV Original export remains byte exact without fidelity claims
+ok 82 - exact ordinary YUV Original export remains byte exact without fidelity claims
+  ---
+  duration_ms: 2.421
+  type: 'test'
+  ...
+# Subtest: exact ordinary YUV B-frame Original fully inspects and previews the selected source time
+ok 83 - exact ordinary YUV B-frame Original fully inspects and previews the selected source time
+  ---
+  duration_ms: 78.271208
+  type: 'test'
+  ...
+# Subtest: YUV native inspection cannot grant strict conversion or pair equivalence
+ok 84 - YUV native inspection cannot grant strict conversion or pair equivalence
+  ---
+  duration_ms: 135.494125
+  type: 'test'
+  ...
+# Subtest: native exact container presentation independently maps every bounded B-frame to its full cycle
+ok 85 - native exact container presentation independently maps every bounded B-frame to its full cycle
+  ---
+  duration_ms: 0.994959
+  type: 'test'
+  ...
+# Subtest: native B-frame clocks reject count mismatches, unknown offsets, overlaps, holes and changed edit origin
+ok 86 - native B-frame clocks reject count mismatches, unknown offsets, overlaps, holes and changed edit origin
+  ---
+  duration_ms: 1.665709
+  type: 'test'
+  ...
+# Subtest: native YUV sample admission refuses depth, chroma, HDR, interlace and unqualified color near-matches
+ok 87 - native YUV sample admission refuses depth, chroma, HDR, interlace and unqualified color near-matches
+  ---
+  duration_ms: 0.18875
+  type: 'test'
+  ...
+# Subtest: actual progressive 8-bit BT709 YUV planar profiles retain exact Original bytes and inspected timing
+ok 88 - actual progressive 8-bit BT709 YUV planar profiles retain exact Original bytes and inspected timing
+  ---
+  duration_ms: 265.750917
+  type: 'test'
+  ...
+1..88
+# tests 88
+# suites 0
+# pass 88
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 11735.576292

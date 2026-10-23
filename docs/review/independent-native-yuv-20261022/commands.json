@@ -1,0 +1,317 @@
+{
+  "author-affected-88": {
+    "command": [
+      "/Users/ravonus/.nvm/versions/node/v22.22.1/bin/node",
+      "--test",
+      "--test-concurrency=1",
+      "tests/media-preparation.test.mjs",
+      "tests/actual-media-container.test.mjs",
+      "tests/actual-media-pair.test.mjs",
+      "tests/movie-presentation-semantics.test.mjs",
+      "tests/movie-edit-list.test.mjs",
+      "tests/movie-track-binding.test.mjs",
+      "tests/audio-clock-binding.test.mjs",
+      "tests/audio-clock-binding-mcp.test.mjs",
+      "tests/native-media-frame-read.test.mjs",
+      "tests/native-gif-source-identity.test.mjs",
+      "tests/native-movie-inspection.test.mjs",
+      "tests/native-movie-mcp.test.mjs",
+      "tests/native-movie-boundaries.test.mjs",
+      "tests/native-yuv-preview.test.mjs"
+    ],
+    "cwd": "/private/tmp/keel-independent-native-yuv-20261022-01/keel-sdk",
+    "sdk": "4fa47717d9e9fac48cc6c9f925540f190e478564",
+    "site": "0345f43d337e4863ebee3ce3b2bd3e0d30d4a9c0",
+    "exit": 1,
+    "seconds": 9.531947135925293,
+    "environmentKeys": [
+      "HOME",
+      "PATH",
+      "NODE_ENV",
+      "LC_ALL",
+      "LANG",
+      "CHROMIUM_PATH"
+    ],
+    "productionTouched": false
+  },
+  "actual-site-media-preview-browser": {
+    "command": [
+      "/Users/ravonus/.nvm/versions/node/v22.22.1/bin/node",
+      "--import",
+      "tsx",
+      "--test",
+      "--test-concurrency=1",
+      "tests/integration/media-local-preview.browser.test.ts"
+    ],
+    "cwd": "/private/tmp/keel-independent-native-yuv-20261022-01/keel-site/apps/studio",
+    "sdk": "4fa47717d9e9fac48cc6c9f925540f190e478564",
+    "site": "0345f43d337e4863ebee3ce3b2bd3e0d30d4a9c0",
+    "exit": 0,
+    "seconds": 5.894054889678955,
+    "environmentKeys": [
+      "HOME",
+      "PATH",
+      "NODE_ENV",
+      "LC_ALL",
+      "LANG",
+      "CHROMIUM_PATH"
+    ],
+    "productionTouched": false
+  },
+  "own-standard-build": {
+    "command": [
+      "/Users/ravonus/.nvm/versions/node/v22.22.1/bin/node",
+      "scripts/build.mjs"
+    ],
+    "cwd": "/private/tmp/keel-independent-native-yuv-20261022-01/keel-sdk",
+    "sdk": "4fa47717d9e9fac48cc6c9f925540f190e478564",
+    "site": "0345f43d337e4863ebee3ce3b2bd3e0d30d4a9c0",
+    "exit": 1,
+    "seconds": 0.37336087226867676,
+    "environmentKeys": [
+      "HOME",
+      "PATH",
+      "NODE_ENV",
+      "LC_ALL",
+      "LANG",
+      "CHROMIUM_PATH"
+    ],
+    "productionTouched": false
+  },
+  "baseline-old-native-yuv": {
+    "command": [
+      "/Users/ravonus/.nvm/versions/node/v22.22.1/bin/node",
+      "baseline-old.mjs"
+    ],
+    "cwd": "/private/tmp/keel-independent-native-yuv-20261022-01",
+    "sdk": "4fa47717d9e9fac48cc6c9f925540f190e478564",
+    "site": "0345f43d337e4863ebee3ce3b2bd3e0d30d4a9c0",
+    "exit": 0,
+    "seconds": 0.19243717193603516,
+    "environmentKeys": [
+      "HOME",
+      "PATH",
+      "NODE_ENV",
+      "LC_ALL",
+      "LANG",
+      "CHROMIUM_PATH"
+    ],
+    "productionTouched": false
+  },
+  "own-standard-build-corrected": {
+    "command": [
+      "/Users/ravonus/.nvm/versions/node/v22.22.1/bin/node",
+      "scripts/build.mjs"
+    ],
+    "cwd": "/private/tmp/keel-independent-native-yuv-20261022-01/keel-sdk",
+    "sdk": "4fa47717d9e9fac48cc6c9f925540f190e478564",
+    "site": "0345f43d337e4863ebee3ce3b2bd3e0d30d4a9c0",
+    "exit": 0,
+    "seconds": 16.854028940200806,
+    "environmentKeys": [
+      "HOME",
+      "PATH",
+      "NODE_ENV",
+      "LC_ALL",
+      "LANG",
+      "CHROMIUM_PATH"
+    ],
+    "productionTouched": false
+  },
+  "reviewer-yuv-audio": {
+    "command": [
+      "/Users/ravonus/.nvm/versions/node/v22.22.1/bin/node",
+      "--test",
+      "reviewer-native-yuv-audio.test.mjs"
+    ],
+    "cwd": "/private/tmp/keel-independent-native-yuv-20261022-01/keel-sdk",
+    "sdk": "4fa47717d9e9fac48cc6c9f925540f190e478564",
+    "site": "0345f43d337e4863ebee3ce3b2bd3e0d30d4a9c0",
+    "exit": 0,
+    "seconds": 0.369035005569458,
+    "environmentKeys": [
+      "HOME",
+      "PATH",
+      "NODE_ENV",
+      "LC_ALL",
+      "LANG",
+      "CHROMIUM_PATH"
+    ],
+    "productionTouched": false
+  },
+  "site-tsc": {
+    "command": [
+      "/Users/ravonus/.nvm/versions/node/v22.22.1/bin/node",
+      "node_modules/typescript/bin/tsc",
+      "--noEmit",
+      "--incremental",
+      "false"
+    ],
+    "cwd": "/private/tmp/keel-independent-native-yuv-20261022-01/keel-site/apps/studio",
+    "sdk": "4fa47717d9e9fac48cc6c9f925540f190e478564",
+    "site": "0345f43d337e4863ebee3ce3b2bd3e0d30d4a9c0",
+    "exit": 0,
+    "seconds": 29.27202081680298,
+    "environmentKeys": [
+      "HOME",
+      "PATH",
+      "NODE_ENV",
+      "LC_ALL",
+      "LANG",
+      "CHROMIUM_PATH"
+    ],
+    "productionTouched": false
+  },
+  "site-services": {
+    "command": [
+      "/Users/ravonus/.nvm/versions/node/v22.22.1/bin/node",
+      "--conditions=react-server",
+      "--import",
+      "tsx",
+      "--test",
+      "--test-concurrency=1",
+      "tests/unit/temporal-media-service.test.ts",
+      "tests/unit/media-preparation-service.test.ts"
+    ],
+    "cwd": "/private/tmp/keel-independent-native-yuv-20261022-01/keel-site/apps/studio",
+    "sdk": "4fa47717d9e9fac48cc6c9f925540f190e478564",
+    "site": "0345f43d337e4863ebee3ce3b2bd3e0d30d4a9c0",
+    "exit": 0,
+    "seconds": 0.9722208976745605,
+    "environmentKeys": [
+      "HOME",
+      "PATH",
+      "NODE_ENV",
+      "LC_ALL",
+      "LANG",
+      "CHROMIUM_PATH"
+    ],
+    "productionTouched": false
+  },
+  "builder-tsc": {
+    "command": [
+      "/Users/ravonus/.nvm/versions/node/v22.22.1/bin/node",
+      "node_modules/typescript/bin/tsc",
+      "-p",
+      "packages/builder/tsconfig.json",
+      "--noEmit",
+      "--incremental",
+      "false"
+    ],
+    "cwd": "/private/tmp/keel-independent-native-yuv-20261022-01/keel-sdk",
+    "sdk": "4fa47717d9e9fac48cc6c9f925540f190e478564",
+    "site": "0345f43d337e4863ebee3ce3b2bd3e0d30d4a9c0",
+    "exit": 0,
+    "seconds": 1.552123785018921,
+    "environmentKeys": [
+      "HOME",
+      "PATH",
+      "NODE_ENV",
+      "LC_ALL",
+      "LANG",
+      "CHROMIUM_PATH"
+    ],
+    "productionTouched": false
+  },
+  "author-affected-88-corrected": {
+    "command": [
+      "/Users/ravonus/.nvm/versions/node/v22.22.1/bin/node",
+      "--test",
+      "--test-concurrency=1",
+      "tests/media-preparation.test.mjs",
+      "tests/actual-media-container.test.mjs",
+      "tests/actual-media-pair.test.mjs",
+      "tests/movie-presentation-semantics.test.mjs",
+      "tests/movie-edit-list.test.mjs",
+      "tests/movie-track-binding.test.mjs",
+      "tests/audio-clock-binding.test.mjs",
+      "tests/audio-clock-binding-mcp.test.mjs",
+      "tests/native-media-frame-read.test.mjs",
+      "tests/native-gif-source-identity.test.mjs",
+      "tests/native-movie-inspection.test.mjs",
+      "tests/native-movie-mcp.test.mjs",
+      "tests/native-movie-boundaries.test.mjs",
+      "tests/native-yuv-preview.test.mjs"
+    ],
+    "cwd": "/private/tmp/keel-independent-native-yuv-20261022-01/keel-sdk/../keel-sdk",
+    "sdk": "4fa47717d9e9fac48cc6c9f925540f190e478564",
+    "site": "0345f43d337e4863ebee3ce3b2bd3e0d30d4a9c0",
+    "exit": 0,
+    "seconds": 11.772308111190796,
+    "environmentKeys": [
+      "HOME",
+      "PATH",
+      "NODE_ENV",
+      "LC_ALL",
+      "LANG",
+      "CHROMIUM_PATH"
+    ],
+    "productionTouched": false
+  },
+  "reviewer-short-yuv": {
+    "command": [
+      "/Users/ravonus/.nvm/versions/node/v22.22.1/bin/node",
+      "--test",
+      "--test-concurrency=1",
+      "reviewer-native-short-yuv.test.mjs"
+    ],
+    "cwd": "/private/tmp/keel-independent-native-yuv-20261022-01/keel-sdk",
+    "sdk": "4fa47717d9e9fac48cc6c9f925540f190e478564",
+    "site": "0345f43d337e4863ebee3ce3b2bd3e0d30d4a9c0",
+    "exit": 0,
+    "seconds": 0.5778660774230957,
+    "environmentKeys": [
+      "HOME",
+      "PATH",
+      "NODE_ENV",
+      "LC_ALL",
+      "LANG",
+      "CHROMIUM_PATH"
+    ],
+    "productionTouched": false
+  },
+  "classification": {
+    "command": [
+      "/Users/ravonus/.nvm/versions/node/v22.22.1/bin/node",
+      "--test",
+      "tests/test-suite-classification.test.mjs"
+    ],
+    "cwd": "/private/tmp/keel-independent-native-yuv-20261022-01/keel-sdk",
+    "sdk": "4fa47717d9e9fac48cc6c9f925540f190e478564",
+    "site": "0345f43d337e4863ebee3ce3b2bd3e0d30d4a9c0",
+    "exit": 0,
+    "seconds": 0.14975523948669434,
+    "environmentKeys": [
+      "HOME",
+      "PATH",
+      "NODE_ENV",
+      "LC_ALL",
+      "LANG",
+      "CHROMIUM_PATH"
+    ],
+    "productionTouched": false
+  },
+  "actual-canonical-yuv-browser": {
+    "command": [
+      "/Users/ravonus/.nvm/versions/node/v22.22.1/bin/node",
+      "--test",
+      "reviewer-native-yuv.browser.test.mjs",
+      "tests/native-movie-preview.browser.test.mjs",
+      "tests/native-presentation-guard.browser.test.mjs"
+    ],
+    "cwd": "/private/tmp/keel-independent-native-yuv-20261022-01/keel-sdk",
+    "sdk": "4fa47717d9e9fac48cc6c9f925540f190e478564",
+    "site": "0345f43d337e4863ebee3ce3b2bd3e0d30d4a9c0",
+    "exit": 0,
+    "seconds": 4.35646915435791,
+    "environmentKeys": [
+      "HOME",
+      "PATH",
+      "NODE_ENV",
+      "LC_ALL",
+      "LANG",
+      "CHROMIUM_PATH"
+    ],
+    "productionTouched": false
+  }
+}

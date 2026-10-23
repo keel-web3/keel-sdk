@@ -1,0 +1,55 @@
+{
+  "bytes": 8779,
+  "sha256": "61f5a8f28081ecdd1fc02e96d5dc531aadbbac3e6daebbb1668286952719ab8d",
+  "sourceInfo": {
+    "width": 32,
+    "height": 24,
+    "durationMs": 600,
+    "frameCount": 15,
+    "animated": true,
+    "hasAudio": true,
+    "frameTimesMs": [
+      0,
+      40,
+      80,
+      120,
+      160,
+      200,
+      240,
+      280,
+      320,
+      360,
+      400,
+      440,
+      480,
+      520,
+      560
+    ],
+    "frameDurationsMs": [
+      40,
+      40,
+      40,
+      40,
+      40,
+      40,
+      40,
+      40,
+      40,
+      40,
+      40,
+      40,
+      40,
+      40,
+      40
+    ]
+  },
+  "verification": {
+    "sourcePreserved": true,
+    "completeDecode": false,
+    "framesAndTimingPreserved": true,
+    "losslessPixelsVerified": false,
+    "browserDecode": "requires-runtime-check"
+  },
+  "expected": "Native Original inspection/export; unchanged AAC-containing source, strict lossless proof refused",
+  "actual": "PASS"
+}

@@ -1,0 +1,43 @@
+{
+  "source": "/private/tmp/keel-independent-native-yuv-20261022-01/evidence/short-yuv/n3.mp4",
+  "bytes": 1878,
+  "sha256": "fa87ae9a0454121cde89fc46033ef4aaa6d7c624722d05b1a3cb34f91b185af2",
+  "expected": {
+    "frames": 3,
+    "durationMs": 600
+  },
+  "generator": "pinned public ffmpeg6.0 progressive8bitBT709/yuv420p/16x16/5fps with -bf3, no audio",
+  "actual": {
+    "info": {
+      "width": 16,
+      "height": 16,
+      "durationMs": 600,
+      "frameCount": 3,
+      "animated": true,
+      "hasAudio": false,
+      "frameTimesMs": [
+        0,
+        200,
+        400
+      ],
+      "frameDurationsMs": [
+        200,
+        200,
+        200
+      ]
+    },
+    "integrity": {
+      "algorithm": "sha256",
+      "digest": "0xfa87ae9a0454121cde89fc46033ef4aaa6d7c624722d05b1a3cb34f91b185af2",
+      "byteLength": 1878
+    },
+    "verification": {
+      "sourcePreserved": true,
+      "completeDecode": false,
+      "framesAndTimingPreserved": true,
+      "losslessPixelsVerified": false,
+      "browserDecode": "requires-runtime-check"
+    }
+  },
+  "result": "PASS"
+}

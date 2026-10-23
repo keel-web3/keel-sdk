@@ -1,0 +1,570 @@
+TAP version 13
+# Subtest: actual three-frame APNG cannot be approved as its Sharp first-frame WebP
+ok 1 - actual three-frame APNG cannot be approved as its Sharp first-frame WebP
+  ---
+  duration_ms: 19.61075
+  type: 'test'
+  ...
+# {"source":{"bytes":642,"sha256":"dd52b281bd517e471500f635bd67c696c2a6658473a00938c155c3866c060e58"},"candidate":{"bytes":174,"sha256":"737a04d4c463eff7395bcf4043315533956295ce1c11184291e4ab2085a1ba05"},"actualFrames":3,"sharpPages":null}
+# Subtest: complete GIF block grammar and native zero-loop timing can qualify actual three-frame WebP
+ok 2 - complete GIF block grammar and native zero-loop timing can qualify actual three-frame WebP
+  ---
+  duration_ms: 4.628042
+  type: 'test'
+  ...
+# Subtest: concatenated GIFs and missing complete trailer cannot be relabelled one verified animation
+ok 3 - concatenated GIFs and missing complete trailer cannot be relabelled one verified animation
+  ---
+  duration_ms: 3.482084
+  type: 'test'
+  ...
+# Subtest: GIF creator comments stay native until a preserving adapter can establish metadata correspondence
+ok 4 - GIF creator comments stay native until a preserving adapter can establish metadata correspondence
+  ---
+  duration_ms: 2.184458
+  type: 'test'
+  ...
+# Subtest: duplicate WebP animation control is rejected even if the native decoder accepts its pixels
+ok 5 - duplicate WebP animation control is rejected even if the native decoder accepts its pixels
+  ---
+  duration_ms: 2.575292
+  type: 'test'
+  ...
+# Subtest: actual candidate bytes must match their recipe container even when all decoded RGBA is equal
+ok 6 - actual candidate bytes must match their recipe container even when all decoded RGBA is equal
+  ---
+  duration_ms: 1.829958
+  type: 'test'
+  ...
+# Subtest: complete AVIF traversal finds sequence brands beyond byte40 and rejects malformed box bounds
+ok 7 - complete AVIF traversal finds sequence brands beyond byte40 and rejects malformed box bounds
+  ---
+  duration_ms: 0.208334
+  type: 'test'
+  ...
+# Subtest: PNG creator text cannot disappear behind equal decoded RGBA samples
+ok 8 - PNG creator text cannot disappear behind equal decoded RGBA samples
+  ---
+  duration_ms: 2.37175
+  type: 'test'
+  ...
+# Subtest: actual independently encoded bytes pass every RGBA pixel and immutable source/recipe commitments
+ok 9 - actual independently encoded bytes pass every RGBA pixel and immutable source/recipe commitments
+  ---
+  duration_ms: 7.945
+  type: 'test'
+  ...
+# Subtest: a changed last RGBA alpha sample fails even though dimensions and all other pixels match
+ok 10 - a changed last RGBA alpha sample fails even though dimensions and all other pixels match
+  ---
+  duration_ms: 2.984916
+  type: 'test'
+  ...
+# Subtest: actual animation verifies every frame, intrinsic infinite loop and exact variable timing
+ok 11 - actual animation verifies every frame, intrinsic infinite loop and exact variable timing
+  ---
+  duration_ms: 3.805042
+  type: 'test'
+  ...
+# Subtest: last-frame change, one millisecond duration change and finite-loop change are all rejected
+ok 12 - last-frame change, one millisecond duration change and finite-loop change are all rejected
+  ---
+  duration_ms: 6.945791
+  type: 'test'
+  ...
+# Subtest: finite identical animation loops remain exact and are not relabelled infinite
+ok 13 - finite identical animation loops remain exact and are not relabelled infinite
+  ---
+  duration_ms: 2.5355
+  type: 'test'
+  ...
+# Subtest: movie to actual checked animated WebP is conditional on authenticated canonical-player semantics
+ok 14 - movie to actual checked animated WebP is conditional on authenticated canonical-player semantics
+  ---
+  duration_ms: 147.591584
+  type: 'test'
+  ...
+# Subtest: actual AAC audio includes every canonical PCM sample, channels, presentation timestamps and hashes
+ok 15 - actual AAC audio includes every canonical PCM sample, channels, presentation timestamps and hashes
+  ---
+  duration_ms: 300.517916
+  type: 'test'
+  ...
+# Subtest: equal-duration audio with changed actual samples fails, rather than presence-only approval
+ok 16 - equal-duration audio with changed actual samples fails, rather than presence-only approval
+  ---
+  duration_ms: 183.707083
+  type: 'test'
+  ...
+# Subtest: audio disappearance fails even when all video samples remain exact
+ok 17 - audio disappearance fails even when all video samples remain exact
+  ---
+  duration_ms: 265.40275
+  type: 'test'
+  ...
+# Subtest: explicit edits stay selected without granting automatic fidelity or fallback-to-original authority
+ok 18 - explicit edits stay selected without granting automatic fidelity or fallback-to-original authority
+  ---
+  duration_ms: 1.885167
+  type: 'test'
+  ...
+# Subtest: decoder corruption, unsupported external containers and pre-aborted work fail closed
+ok 19 - decoder corruption, unsupported external containers and pre-aborted work fail closed
+  ---
+  duration_ms: 41.727834
+  type: 'test'
+  ...
+# Subtest: the verifier snapshots mutable caller arrays and nested recipe before its first await
+ok 20 - the verifier snapshots mutable caller arrays and nested recipe before its first await
+  ---
+  duration_ms: 2.581875
+  type: 'test'
+  ...
+# Subtest: actual float64 PCM retains precision below float32 and detects a change in the final audio sample
+ok 21 - actual float64 PCM retains precision below float32 and detects a change in the final audio sample
+  ---
+  duration_ms: 285.334916
+  type: 'test'
+  ...
+# node:internal/fs/promises:1162
+#   return await PromisePrototypeThen(
+#          ^
+# Error: ENOENT: no such file or directory, realpath '/private/tmp/keel-independent-native-yuv-20261022-01/keel-sdk/docs/review/temporal-audio-binding-20261022'
+#     at async realpath (node:internal/fs/promises:1162:10)
+#     at async createWorkspace (file:///private/tmp/keel-independent-native-yuv-20261022-01/keel-sdk/packages/mcp/dist/audio-test-paths.mjs:116:18)
+#     at async file:///private/tmp/keel-independent-native-yuv-20261022-01/keel-sdk/tests/audio-clock-binding-mcp.test.mjs:5:17 {
+#   errno: -2,
+#   code: 'ENOENT',
+#   syscall: 'realpath',
+#   path: '/private/tmp/keel-independent-native-yuv-20261022-01/keel-sdk/docs/review/temporal-audio-binding-20261022'
+# }
+# Node.js v22.22.1
+# Subtest: tests/audio-clock-binding-mcp.test.mjs
+not ok 3 - tests/audio-clock-binding-mcp.test.mjs
+  ---
+  duration_ms: 149.471042
+  type: 'test'
+  location: '/private/tmp/keel-independent-native-yuv-20261022-01/keel-sdk/tests/audio-clock-binding-mcp.test.mjs:1:1'
+  failureType: 'testCodeFailure'
+  exitCode: 1
+  signal: ~
+  error: 'test failed'
+  code: 'ERR_TEST_FAILURE'
+  ...
+# node:internal/fs/promises:636
+#   return new FileHandle(await PromisePrototypeThen(
+#                         ^
+# Error: ENOENT: no such file or directory, open '/private/tmp/keel-independent-native-yuv-20261022-01/keel-sdk/docs/review/temporal-audio-binding-20261022/aac-original.mp4'
+#     at async open (node:internal/fs/promises:636:25)
+#     at async readFile (node:internal/fs/promises:1235:14)
+#     at async file:///private/tmp/keel-independent-native-yuv-20261022-01/keel-sdk/tests/audio-clock-binding.test.mjs:5:29 {
+#   errno: -2,
+#   code: 'ENOENT',
+#   syscall: 'open',
+#   path: '/private/tmp/keel-independent-native-yuv-20261022-01/keel-sdk/docs/review/temporal-audio-binding-20261022/aac-original.mp4'
+# }
+# Node.js v22.22.1
+# Subtest: tests/audio-clock-binding.test.mjs
+not ok 4 - tests/audio-clock-binding.test.mjs
+  ---
+  duration_ms: 83.368834
+  type: 'test'
+  location: '/private/tmp/keel-independent-native-yuv-20261022-01/keel-sdk/tests/audio-clock-binding.test.mjs:1:1'
+  failureType: 'testCodeFailure'
+  exitCode: 1
+  signal: ~
+  error: 'test failed'
+  code: 'ERR_TEST_FAILURE'
+  ...
+# Subtest: original mode preserves arbitrary container bytes without decode or format eligibility claims
+ok 24 - original mode preserves arbitrary container bytes without decode or format eligibility claims
+  ---
+  duration_ms: 3.053875
+  type: 'test'
+  ...
+# Subtest: still lossless WebP fully decodes and verifies pixel identity with measured bytes
+ok 25 - still lossless WebP fully decodes and verifies pixel identity with measured bytes
+  ---
+  duration_ms: 6.040416
+  type: 'test'
+  ...
+# Subtest: explicit still edits create a reversible recipe, preserve source and distinguish encoding lossless from source pixels
+ok 26 - explicit still edits create a reversible recipe, preserve source and distinguish encoding lossless from source pixels
+  ---
+  duration_ms: 5.495083
+  type: 'test'
+  ...
+# Subtest: compare returns decoded PNG frames at the same timestamp with original and processed geometry
+ok 27 - compare returns decoded PNG frames at the same timestamp with original and processed geometry
+  ---
+  duration_ms: 6.0775
+  type: 'test'
+  ...
+# Subtest: animated GIF retains all frames and their delays, comparison selects same source instant
+ok 28 - animated GIF retains all frames and their delays, comparison selects same source instant
+  ---
+  duration_ms: 234.137375
+  type: 'test'
+  ...
+# Subtest: actual capability report and cancellation do not claim universal decode support
+ok 29 - actual capability report and cancellation do not claim universal decode support
+  ---
+  duration_ms: 34.182208
+  type: 'test'
+  ...
+# Subtest: MOV input is decoded by capability and exports MP4/MOV without changing source
+ok 30 - MOV input is decoded by capability and exports MP4/MOV without changing source
+  ---
+  duration_ms: 682.995458
+  type: 'test'
+  ...
+# Subtest: still layers compose ordered source copies with explicit alpha, rotation and output bounds
+ok 31 - still layers compose ordered source copies with explicit alpha, rotation and output bounds
+  ---
+  duration_ms: 13.293917
+  type: 'test'
+  ...
+# Subtest: animated layers fail closed rather than silently ignoring composition
+ok 32 - animated layers fail closed rather than silently ignoring composition
+  ---
+  duration_ms: 1.058792
+  type: 'test'
+  ...
+# Subtest: an animated AVIF reimport preserves the verified sequence stream, both frames and exact timing
+ok 33 - an animated AVIF reimport preserves the verified sequence stream, both frames and exact timing
+  ---
+  duration_ms: 848.449041
+  type: 'test'
+  ...
+# Subtest: well-formed version0 and version1 identity edits retain all real decoded frames and exact timing
+ok 34 - well-formed version0 and version1 identity edits retain all real decoded frames and exact timing
+  ---
+  duration_ms: 298.775792
+  type: 'test'
+  ...
+# Subtest: edit-list length, segment, signed media-time, clocks and dwell/reverse forms reject with unchanged originals
+ok 35 - edit-list length, segment, signed media-time, clocks and dwell/reverse forms reject with unchanged originals
+  ---
+  duration_ms: 748.619208
+  type: 'test'
+  ...
+# Subtest: an AVIF brand cannot grant repeat-edit authority to a real H264 movie
+ok 36 - an AVIF brand cannot grant repeat-edit authority to a real H264 movie
+  ---
+  duration_ms: 53.659459
+  type: 'test'
+  ...
+# Subtest: coherently shortened header clocks cannot hide unchanged full sample timing
+ok 37 - coherently shortened header clocks cannot hide unchanged full sample timing
+  ---
+  duration_ms: 94.230792
+  type: 'test'
+  ...
+# Subtest: actual AV1 AVIF default infinite repeat remains supported; finite or inconsistent repeat profiles retain native
+ok 38 - actual AV1 AVIF default infinite repeat remains supported; finite or inconsistent repeat profiles retain native
+  ---
+  duration_ms: 398.877041
+  type: 'test'
+  ...
+# Subtest: exact retained extended movie duration cannot add an unmodelled tail to complete unchanged tracks
+not ok 39 - exact retained extended movie duration cannot add an unmodelled tail to complete unchanged tracks
+  ---
+  duration_ms: 0.673125
+  type: 'test'
+  location: '/private/tmp/keel-independent-native-yuv-20261022-01/keel-sdk/tests/movie-edit-list.test.mjs:67:1'
+  failureType: 'testCodeFailure'
+  error: "ENOENT: no such file or directory, open '/private/tmp/keel-independent-native-yuv-20261022-01/keel-sdk/docs/review/temporal-edit-list-20261022/movie-tail-before-fix.mp4'"
+  code: 'ENOENT'
+  stack: |-
+    async open (node:internal/fs/promises:636:25)
+    async readFile (node:internal/fs/promises:1235:14)
+    async TestContext.<anonymous> (file:///private/tmp/keel-independent-native-yuv-20261022-01/keel-sdk/tests/movie-edit-list.test.mjs:68:29)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: exact retained sar: shared preparation/comparison and actual candidate proof reject; original mode is byte exact
+not ok 40 - exact retained sar: shared preparation/comparison and actual candidate proof reject; original mode is byte exact
+  ---
+  duration_ms: 1.943583
+  type: 'test'
+  location: '/private/tmp/keel-independent-native-yuv-20261022-01/keel-sdk/tests/movie-presentation-semantics.test.mjs:17:35'
+  failureType: 'testCodeFailure'
+  error: "ENOENT: no such file or directory, open '/private/tmp/keel-independent-native-yuv-20261022-01/keel-sdk/docs/review/temporal-display-metadata-20261022/reviewer-inputs/sar.mp4'"
+  code: 'ENOENT'
+  stack: |-
+    async open (node:internal/fs/promises:636:25)
+    async readFile (node:internal/fs/promises:1235:14)
+    async TestContext.<anonymous> (file:///private/tmp/keel-independent-native-yuv-20261022-01/keel-sdk/tests/movie-presentation-semantics.test.mjs:18:30)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async startSubtestAfterBootstrap (node:internal/test_runner/harness:296:3)
+  ...
+# Subtest: exact retained title: shared preparation/comparison and actual candidate proof reject; original mode is byte exact
+not ok 41 - exact retained title: shared preparation/comparison and actual candidate proof reject; original mode is byte exact
+  ---
+  duration_ms: 0.683042
+  type: 'test'
+  location: '/private/tmp/keel-independent-native-yuv-20261022-01/keel-sdk/tests/movie-presentation-semantics.test.mjs:17:35'
+  failureType: 'testCodeFailure'
+  error: "ENOENT: no such file or directory, open '/private/tmp/keel-independent-native-yuv-20261022-01/keel-sdk/docs/review/temporal-display-metadata-20261022/reviewer-inputs/title.mp4'"
+  code: 'ENOENT'
+  stack: |-
+    async open (node:internal/fs/promises:636:25)
+    async readFile (node:internal/fs/promises:1235:14)
+    async TestContext.<anonymous> (file:///private/tmp/keel-independent-native-yuv-20261022-01/keel-sdk/tests/movie-presentation-semantics.test.mjs:18:30)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: creator, creation-time, stream title and language metadata are never stripped behind a lossless flag
+ok 42 - creator, creation-time, stream title and language metadata are never stripped behind a lossless flag
+  ---
+  duration_ms: 373.057458
+  type: 'test'
+  ...
+# Subtest: real remuxed display rotation is rejected instead of being baked into lossless pixels
+ok 43 - real remuxed display rotation is rejected instead of being baked into lossless pixels
+  ---
+  duration_ms: 64.60375
+  type: 'test'
+  ...
+# Subtest: raw movie and track matrix, display dimensions, clean aperture and explicit color boxes fail closed
+ok 44 - raw movie and track matrix, display dimensions, clean aperture and explicit color boxes fail closed
+  ---
+  duration_ms: 571.973042
+  type: 'test'
+  ...
+# Subtest: conflicting DAR, multiline metadata, extra side data and incomplete boxes cannot manufacture admission
+ok 45 - conflicting DAR, multiline metadata, extra side data and incomplete boxes cannot manufacture admission
+  ---
+  duration_ms: 10.59525
+  type: 'test'
+  ...
+# Subtest: original untagged movie fixtures retain native bytes instead of acquiring invented image color semantics
+not ok 46 - original untagged movie fixtures retain native bytes instead of acquiring invented image color semantics
+  ---
+  duration_ms: 9.892041
+  type: 'test'
+  location: '/private/tmp/keel-independent-native-yuv-20261022-01/keel-sdk/tests/movie-presentation-semantics.test.mjs:69:1'
+  failureType: 'testCodeFailure'
+  error: "ENOENT: no such file or directory, open '/private/tmp/keel-independent-native-yuv-20261022-01/keel-sdk/docs/review/temporal-display-metadata-20261022/reviewer-inputs/sar.webp'"
+  code: 'ENOENT'
+  stack: |-
+    async open (node:internal/fs/promises:636:25)
+    async readFile (node:internal/fs/promises:1235:14)
+    async file:///private/tmp/keel-independent-native-yuv-20261022-01/keel-sdk/tests/movie-presentation-semantics.test.mjs:70:68
+    async inDir (file:///private/tmp/keel-independent-native-yuv-20261022-01/keel-sdk/tests/movie-presentation-semantics.test.mjs:23:107)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: ordinary no-edit video remains complete and equivalent through the actual shared APIs
+ok 47 - ordinary no-edit video remains complete and equivalent through the actual shared APIs
+  ---
+  duration_ms: 166.849167
+  type: 'test'
+  ...
+# Subtest: STSZ fullbox, fixed/variable byte bounds, counts, zero sizes, duplicate and compact ambiguity fail closed
+ok 48 - STSZ fullbox, fixed/variable byte bounds, counts, zero sizes, duplicate and compact ambiguity fail closed
+  ---
+  duration_ms: 700.357958
+  type: 'test'
+  ...
+# Subtest: fixed-size PCM sample tables and the video track each bind their own no-edit clocks and counts
+ok 49 - fixed-size PCM sample tables and the video track each bind their own no-edit clocks and counts
+  ---
+  duration_ms: 14.176375
+  type: 'test'
+  ...
+# Subtest: coherent extra STSZ/STTS/header sample cannot be certified from three actual decoded frames
+not ok 50 - coherent extra STSZ/STTS/header sample cannot be certified from three actual decoded frames
+  ---
+  duration_ms: 0.465625
+  type: 'test'
+  location: '/private/tmp/keel-independent-native-yuv-20261022-01/keel-sdk/tests/movie-track-binding.test.mjs:45:1'
+  failureType: 'testCodeFailure'
+  error: "ENOENT: no such file or directory, open '/private/tmp/keel-independent-native-yuv-20261022-01/keel-sdk/docs/review/temporal-track-binding-20261022/coherent-stsz-four.mp4'"
+  code: 'ENOENT'
+  stack: |-
+    async open (node:internal/fs/promises:636:25)
+    async readFile (node:internal/fs/promises:1235:14)
+    async TestContext.<anonymous> (file:///private/tmp/keel-independent-native-yuv-20261022-01/keel-sdk/tests/movie-track-binding.test.mjs:46:29)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: native compare binds frame and declared timeline to the same initial actual source bytes
+ok 51 - native compare binds frame and declared timeline to the same initial actual source bytes
+  ---
+  duration_ms: 4.912791
+  type: 'test'
+  ...
+# {"committed":"0x19a488cb5a0d34f20c3d0d266797b65c62ab197554f7e484377954ee5acb83a5","initial":"0x19a488cb5a0d34f20c3d0d266797b65c62ab197554f7e484377954ee5acb83a5","mutated":"0x35fd32e1ac822834d6e945ce225c13a0c48731397a5578b86bd9aafae3546435","sourceFrameTimeMs":0,"declared":[120,240,200]}
+# Subtest: finite native GIF exposes all declared frames without approving altered playback
+ok 52 - finite native GIF exposes all declared frames without approving altered playback
+  ---
+  duration_ms: 8.557625
+  type: 'test'
+  ...
+# Subtest: finite GIF remains unavailable to strict preparation, edited comparison and actual-pair proof
+ok 53 - finite GIF remains unavailable to strict preparation, edited comparison and actual-pair proof
+  ---
+  duration_ms: 7.000541
+  type: 'test'
+  ...
+# Subtest: clamped native GIF exposes all declared frames without approving altered playback
+ok 54 - clamped native GIF exposes all declared frames without approving altered playback
+  ---
+  duration_ms: 2.958916
+  type: 'test'
+  ...
+# Subtest: clamped GIF remains unavailable to strict preparation, edited comparison and actual-pair proof
+ok 55 - clamped GIF remains unavailable to strict preparation, edited comparison and actual-pair proof
+  ---
+  duration_ms: 4.336708
+  type: 'test'
+  ...
+# Subtest: native finite WebP retains complete intrinsic timing and existing loop admission
+ok 56 - native finite WebP retains complete intrinsic timing and existing loop admission
+  ---
+  duration_ms: 2.561958
+  type: 'test'
+  ...
+# Subtest: native GIF inspection still refuses incomplete or interactive complete controls, exact export remains available
+ok 57 - native GIF inspection still refuses incomplete or interactive complete controls, exact export remains available
+  ---
+  duration_ms: 2.310083
+  type: 'test'
+  ...
+# Subtest: actual MCP native finite comparison/export stays byte bound and strict conversion still rejects
+ok 58 - actual MCP native finite comparison/export stays byte bound and strict conversion still rejects
+  ---
+  duration_ms: 13.287041
+  type: 'test'
+  ...
+# Subtest: actual MCP native clamped comparison/export stays byte bound and strict conversion still rejects
+ok 59 - actual MCP native clamped comparison/export stays byte bound and strict conversion still rejects
+  ---
+  duration_ms: 5.655292
+  type: 'test'
+  ...
+# node:internal/fs/promises:636
+#   return new FileHandle(await PromisePrototypeThen(
+#                         ^
+# Error: ENOENT: no such file or directory, open '/private/tmp/keel-independent-native-yuv-20261022-01/keel-sdk/docs/review/temporal-display-metadata-20261022/reviewer-inputs/sar.mp4'
+#     at async open (node:internal/fs/promises:636:25)
+#     at async readFile (node:internal/fs/promises:1235:14)
+#     at async file:///private/tmp/keel-independent-native-yuv-20261022-01/keel-sdk/tests/native-movie-boundaries.test.mjs:12:23 {
+#   errno: -2,
+#   code: 'ENOENT',
+#   syscall: 'open',
+#   path: '/private/tmp/keel-independent-native-yuv-20261022-01/keel-sdk/docs/review/temporal-display-metadata-20261022/reviewer-inputs/sar.mp4'
+# }
+# Node.js v22.22.1
+# Subtest: tests/native-movie-boundaries.test.mjs
+not ok 11 - tests/native-movie-boundaries.test.mjs
+  ---
+  duration_ms: 89.637291
+  type: 'test'
+  location: '/private/tmp/keel-independent-native-yuv-20261022-01/keel-sdk/tests/native-movie-boundaries.test.mjs:1:1'
+  failureType: 'testCodeFailure'
+  exitCode: 1
+  signal: ~
+  error: 'test failed'
+  code: 'ERR_TEST_FAILURE'
+  ...
+# Subtest: retained sar Original export stays byte exact without conversion
+ok 61 - retained sar Original export stays byte exact without conversion
+  ---
+  duration_ms: 2.0545
+  type: 'test'
+  ...
+# Subtest: retained sar native inspection returns complete displayed frame geometry and original identity
+ok 62 - retained sar native inspection returns complete displayed frame geometry and original identity
+  ---
+  duration_ms: 95.936208
+  type: 'test'
+  ...
+# Subtest: retained sar still cannot grant strict conversion or actual pair equivalence
+ok 63 - retained sar still cannot grant strict conversion or actual pair equivalence
+  ---
+  duration_ms: 134.12675
+  type: 'test'
+  ...
+# Subtest: retained title Original export stays byte exact without conversion
+ok 64 - retained title Original export stays byte exact without conversion
+  ---
+  duration_ms: 0.683333
+  type: 'test'
+  ...
+# Subtest: retained title native inspection returns complete displayed frame geometry and original identity
+ok 65 - retained title native inspection returns complete displayed frame geometry and original identity
+  ---
+  duration_ms: 81.851667
+  type: 'test'
+  ...
+# Subtest: retained title still cannot grant strict conversion or actual pair equivalence
+ok 66 - retained title still cannot grant strict conversion or actual pair equivalence
+  ---
+  duration_ms: 152.426541
+  type: 'test'
+  ...
+# Subtest: actual portable MCP native sar inspection uses displayed geometry and retains exact original bytes
+ok 67 - actual portable MCP native sar inspection uses displayed geometry and retains exact original bytes
+  ---
+  duration_ms: 251.941958
+  type: 'test'
+  ...
+# Subtest: actual portable MCP native title inspection uses displayed geometry and retains exact original bytes
+ok 68 - actual portable MCP native title inspection uses displayed geometry and retains exact original bytes
+  ---
+  duration_ms: 165.440584
+  type: 'test'
+  ...
+# Subtest: exact ordinary YUV Original export remains byte exact without fidelity claims
+ok 69 - exact ordinary YUV Original export remains byte exact without fidelity claims
+  ---
+  duration_ms: 2.295875
+  type: 'test'
+  ...
+# Subtest: exact ordinary YUV B-frame Original fully inspects and previews the selected source time
+ok 70 - exact ordinary YUV B-frame Original fully inspects and previews the selected source time
+  ---
+  duration_ms: 78.527334
+  type: 'test'
+  ...
+# Subtest: YUV native inspection cannot grant strict conversion or pair equivalence
+ok 71 - YUV native inspection cannot grant strict conversion or pair equivalence
+  ---
+  duration_ms: 131.169166
+  type: 'test'
+  ...
+# Subtest: native exact container presentation independently maps every bounded B-frame to its full cycle
+ok 72 - native exact container presentation independently maps every bounded B-frame to its full cycle
+  ---
+  duration_ms: 0.999042
+  type: 'test'
+  ...
+# Subtest: native B-frame clocks reject count mismatches, unknown offsets, overlaps, holes and changed edit origin
+ok 73 - native B-frame clocks reject count mismatches, unknown offsets, overlaps, holes and changed edit origin
+  ---
+  duration_ms: 1.465292
+  type: 'test'
+  ...
+# Subtest: native YUV sample admission refuses depth, chroma, HDR, interlace and unqualified color near-matches
+ok 74 - native YUV sample admission refuses depth, chroma, HDR, interlace and unqualified color near-matches
+  ---
+  duration_ms: 0.151
+  type: 'test'
+  ...
+# Subtest: actual progressive 8-bit BT709 YUV planar profiles retain exact Original bytes and inspected timing
+ok 75 - actual progressive 8-bit BT709 YUV planar profiles retain exact Original bytes and inspected timing
+  ---
+  duration_ms: 270.887709
+  type: 'test'
+  ...
+1..75
+# tests 75
+# suites 0
+# pass 67
+# fail 8
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 9498.528542

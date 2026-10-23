@@ -1,0 +1,258 @@
+{
+  "sdk": "4fa47717d9e9fac48cc6c9f925540f190e478564",
+  "trackedBytesOnly": true,
+  "rows": [
+    {
+      "path": "docs/review/temporal-audio-binding-20261022/aac-one-tick-tail.mp4",
+      "bytes": 9175,
+      "sha256": "2b99a953e7732bea560e987ed919162d29318e646d5a6af5127bfe7dbd8c65fc",
+      "gitBlob": "c946f38e5f0f95ea2a57c5991e6a1f33eb3127d9"
+    },
+    {
+      "path": "docs/review/temporal-audio-binding-20261022/aac-original.mp4",
+      "bytes": 9175,
+      "sha256": "d02a5f6c0380b192e8b868f011ff1deedfcc010cd022fbe02bec8ccbc818f5e6",
+      "gitBlob": "b9ec3758cf84096a50fdd58300b474972731f8f0"
+    },
+    {
+      "path": "docs/review/temporal-audio-binding-20261022/pcm-coherent-count.mov",
+      "bytes": 233806,
+      "sha256": "9aea6febb834cede4531d6d5bcf428f6b82f7a6d12d0a3e1a7a9232fe5b2e8f8",
+      "gitBlob": "829cfc074b35aec4b89e3b9a4921d1f644b7ecf3"
+    },
+    {
+      "path": "docs/review/temporal-audio-binding-20261022/pcm-original.mov",
+      "bytes": 233806,
+      "sha256": "a757e325367ea0d7994f1a41b953abc780867444edcc0cb6d519e2806c4b5b5f",
+      "gitBlob": "f2417ddaabad291c4785cce845a495dfce71460a"
+    },
+    {
+      "path": "docs/review/temporal-display-metadata-20261022/reviewer-inputs/apng-first-frame.webp",
+      "bytes": 174,
+      "sha256": "737a04d4c463eff7395bcf4043315533956295ce1c11184291e4ab2085a1ba05",
+      "gitBlob": "6cd906e1d58b665d7dedb0661f29834f63b088db"
+    },
+    {
+      "path": "docs/review/temporal-display-metadata-20261022/reviewer-inputs/sar.mp4",
+      "bytes": 2918,
+      "sha256": "66f1276bd4fdeafa2b3eb370598250b40248bb7ed356829c7bf257635512cab3",
+      "gitBlob": "e2acda0910277cafce53dac41e04f78b6c473787"
+    },
+    {
+      "path": "docs/review/temporal-display-metadata-20261022/reviewer-inputs/sar.webp",
+      "bytes": 464,
+      "sha256": "15e160de0827a42f62a73490d690561125232cff77877db53148cbc1ece035db",
+      "gitBlob": "a4406f3193362b8c0acde112ebcdc84262b0e643"
+    },
+    {
+      "path": "docs/review/temporal-display-metadata-20261022/reviewer-inputs/title.mp4",
+      "bytes": 2972,
+      "sha256": "7c41053e177dd103e6a2a40e4b634a9cdaa48288b3ac3a028d64facffff636a7",
+      "gitBlob": "2e3df98569fce0facd069a85a324c5dafb3b6703"
+    },
+    {
+      "path": "docs/review/temporal-display-metadata-20261022/reviewer-inputs/title.webp",
+      "bytes": 464,
+      "sha256": "15e160de0827a42f62a73490d690561125232cff77877db53148cbc1ece035db",
+      "gitBlob": "a4406f3193362b8c0acde112ebcdc84262b0e643"
+    },
+    {
+      "path": "docs/review/temporal-edit-list-20261022/author-baseline-artifacts/duplicate-edts.mp4",
+      "bytes": 2973,
+      "sha256": "ec083cb7e5c9a53fc65e626b408fd4553d784889874914c30c2eacc970440c21",
+      "gitBlob": "59610c57c563752ee94aa51b2608d82da23b9231"
+    },
+    {
+      "path": "docs/review/temporal-edit-list-20261022/author-baseline-artifacts/duplicate-edts.webp",
+      "bytes": 464,
+      "sha256": "15e160de0827a42f62a73490d690561125232cff77877db53148cbc1ece035db",
+      "gitBlob": "a4406f3193362b8c0acde112ebcdc84262b0e643"
+    },
+    {
+      "path": "docs/review/temporal-edit-list-20261022/author-baseline-artifacts/duplicate.mp4",
+      "bytes": 2965,
+      "sha256": "f41bb7f4977ab4a34def60d30c170e9afdb385156dd9f6da686089b324f227ed",
+      "gitBlob": "5218565f4509204969ec652a3310f14437b635ab"
+    },
+    {
+      "path": "docs/review/temporal-edit-list-20261022/author-baseline-artifacts/duplicate.webp",
+      "bytes": 464,
+      "sha256": "15e160de0827a42f62a73490d690561125232cff77877db53148cbc1ece035db",
+      "gitBlob": "a4406f3193362b8c0acde112ebcdc84262b0e643"
+    },
+    {
+      "path": "docs/review/temporal-edit-list-20261022/author-baseline-artifacts/half-rate.mp4",
+      "bytes": 2937,
+      "sha256": "b2ad0f3b82fe2808a468d1f0e6ac283c869e9fc852483e48f2caf602583109e3",
+      "gitBlob": "8fd9b2c4f8c0affa4e809838bbb9bc64d9bcc18e"
+    },
+    {
+      "path": "docs/review/temporal-edit-list-20261022/author-baseline-artifacts/half-rate.webp",
+      "bytes": 464,
+      "sha256": "15e160de0827a42f62a73490d690561125232cff77877db53148cbc1ece035db",
+      "gitBlob": "a4406f3193362b8c0acde112ebcdc84262b0e643"
+    },
+    {
+      "path": "docs/review/temporal-edit-list-20261022/author-baseline-artifacts/unknown-flags.mp4",
+      "bytes": 2937,
+      "sha256": "33f37b310127315151ab0593177e2963aab85b245987d8ebea33a830925b9f1b",
+      "gitBlob": "dc92d7df17ad9caddf5f5fd68fc7ec390f7fe178"
+    },
+    {
+      "path": "docs/review/temporal-edit-list-20261022/author-baseline-artifacts/unknown-flags.webp",
+      "bytes": 464,
+      "sha256": "15e160de0827a42f62a73490d690561125232cff77877db53148cbc1ece035db",
+      "gitBlob": "a4406f3193362b8c0acde112ebcdc84262b0e643"
+    },
+    {
+      "path": "docs/review/temporal-edit-list-20261022/author-baseline-artifacts/unknown-version.mp4",
+      "bytes": 2937,
+      "sha256": "41bf356340d157a5b731e3ef498e9e9048c37f585913813fb0de1bbd9d958902",
+      "gitBlob": "32ab007def6201bb1e20c1c5fd1f6c2caaedec9e"
+    },
+    {
+      "path": "docs/review/temporal-edit-list-20261022/author-baseline-artifacts/unknown-version.webp",
+      "bytes": 464,
+      "sha256": "15e160de0827a42f62a73490d690561125232cff77877db53148cbc1ece035db",
+      "gitBlob": "a4406f3193362b8c0acde112ebcdc84262b0e643"
+    },
+    {
+      "path": "docs/review/temporal-edit-list-20261022/author-baseline-artifacts/wrong-count.mp4",
+      "bytes": 2937,
+      "sha256": "4182c1002ed7999774e8abaa86b259dfe8e068c307c35b2a0eb13323762fead5",
+      "gitBlob": "a7d060ea616c5b58465c6c5b7f77726343ac5e94"
+    },
+    {
+      "path": "docs/review/temporal-edit-list-20261022/author-baseline-artifacts/wrong-count.webp",
+      "bytes": 464,
+      "sha256": "15e160de0827a42f62a73490d690561125232cff77877db53148cbc1ece035db",
+      "gitBlob": "a4406f3193362b8c0acde112ebcdc84262b0e643"
+    },
+    {
+      "path": "docs/review/temporal-edit-list-20261022/movie-tail-before-fix.mp4",
+      "bytes": 2937,
+      "sha256": "24f30f1fc7fce04647dede03e4bb640ab180dbf721e60d613fc8ebfb358e9c06",
+      "gitBlob": "cba5e8319fef1d9b9367095cd2c0b3331e69d408"
+    },
+    {
+      "path": "docs/review/temporal-edit-list-20261022/reviewer-inputs/duplicate-edts.mp4",
+      "bytes": 2973,
+      "sha256": "ec083cb7e5c9a53fc65e626b408fd4553d784889874914c30c2eacc970440c21",
+      "gitBlob": "59610c57c563752ee94aa51b2608d82da23b9231"
+    },
+    {
+      "path": "docs/review/temporal-edit-list-20261022/reviewer-inputs/duplicate.mp4",
+      "bytes": 2965,
+      "sha256": "f41bb7f4977ab4a34def60d30c170e9afdb385156dd9f6da686089b324f227ed",
+      "gitBlob": "5218565f4509204969ec652a3310f14437b635ab"
+    },
+    {
+      "path": "docs/review/temporal-edit-list-20261022/reviewer-inputs/duplicate.webp",
+      "bytes": 464,
+      "sha256": "15e160de0827a42f62a73490d690561125232cff77877db53148cbc1ece035db",
+      "gitBlob": "a4406f3193362b8c0acde112ebcdc84262b0e643"
+    },
+    {
+      "path": "docs/review/temporal-edit-list-20261022/reviewer-inputs/half-rate.mp4",
+      "bytes": 2937,
+      "sha256": "b2ad0f3b82fe2808a468d1f0e6ac283c869e9fc852483e48f2caf602583109e3",
+      "gitBlob": "8fd9b2c4f8c0affa4e809838bbb9bc64d9bcc18e"
+    },
+    {
+      "path": "docs/review/temporal-edit-list-20261022/reviewer-inputs/half-rate.webp",
+      "bytes": 464,
+      "sha256": "15e160de0827a42f62a73490d690561125232cff77877db53148cbc1ece035db",
+      "gitBlob": "a4406f3193362b8c0acde112ebcdc84262b0e643"
+    },
+    {
+      "path": "docs/review/temporal-edit-list-20261022/reviewer-inputs/unknown-flags.mp4",
+      "bytes": 2937,
+      "sha256": "33f37b310127315151ab0593177e2963aab85b245987d8ebea33a830925b9f1b",
+      "gitBlob": "dc92d7df17ad9caddf5f5fd68fc7ec390f7fe178"
+    },
+    {
+      "path": "docs/review/temporal-edit-list-20261022/reviewer-inputs/unknown-version.mp4",
+      "bytes": 2937,
+      "sha256": "41bf356340d157a5b731e3ef498e9e9048c37f585913813fb0de1bbd9d958902",
+      "gitBlob": "32ab007def6201bb1e20c1c5fd1f6c2caaedec9e"
+    },
+    {
+      "path": "docs/review/temporal-edit-list-20261022/reviewer-inputs/unknown-version.webp",
+      "bytes": 464,
+      "sha256": "15e160de0827a42f62a73490d690561125232cff77877db53148cbc1ece035db",
+      "gitBlob": "a4406f3193362b8c0acde112ebcdc84262b0e643"
+    },
+    {
+      "path": "docs/review/temporal-edit-list-20261022/reviewer-inputs/wrong-count.mp4",
+      "bytes": 2937,
+      "sha256": "4182c1002ed7999774e8abaa86b259dfe8e068c307c35b2a0eb13323762fead5",
+      "gitBlob": "a7d060ea616c5b58465c6c5b7f77726343ac5e94"
+    },
+    {
+      "path": "docs/review/temporal-edit-list-20261022/reviewer-inputs/wrong-count.webp",
+      "bytes": 464,
+      "sha256": "15e160de0827a42f62a73490d690561125232cff77877db53148cbc1ece035db",
+      "gitBlob": "a4406f3193362b8c0acde112ebcdc84262b0e643"
+    },
+    {
+      "path": "docs/review/temporal-track-binding-20261022/coherent-stsz-four-unsafe.webp",
+      "bytes": 464,
+      "sha256": "af3d9003c447a0503c289d78c63ec6f11d6e9b719243387ace40842b71a19bd9",
+      "gitBlob": "8e94f860da2424f4bca1173d219c55f17112bb2a"
+    },
+    {
+      "path": "docs/review/temporal-track-binding-20261022/coherent-stsz-four.mp4",
+      "bytes": 2941,
+      "sha256": "6d1129149eccd627df7112e60dea6e791466710a260360b49d7cc165297d7576",
+      "gitBlob": "46e5a52d9519f287ad21396b269366782a11812d"
+    },
+    {
+      "path": "docs/review/temporal-track-binding-20261022/reviewer-retained-inputs/invented-sample.mp4",
+      "bytes": 2937,
+      "sha256": "3911e5d7363e348bd9f4dfc8b34801b3cf0c8559d35a06f96192ace15e014806",
+      "gitBlob": "66bf5cf49e41e5c967eda644a785ce1659c51721"
+    },
+    {
+      "path": "docs/review/temporal-track-binding-20261022/reviewer-retained-inputs/invented-sample.webp",
+      "bytes": 464,
+      "sha256": "af3d9003c447a0503c289d78c63ec6f11d6e9b719243387ace40842b71a19bd9",
+      "gitBlob": "8e94f860da2424f4bca1173d219c55f17112bb2a"
+    },
+    {
+      "path": "docs/review/temporal-track-binding-20261022/reviewer-retained-inputs/noedit-all-clock-tail.mp4",
+      "bytes": 2901,
+      "sha256": "6218f0b975d6def54a0c0a5b8878b342918f523e33d2444ea2237e4a8fb3fcee",
+      "gitBlob": "6c4ddca913fd7bf89220dcb0cbf6356dd82fbd97"
+    },
+    {
+      "path": "docs/review/temporal-track-binding-20261022/reviewer-retained-inputs/noedit-all-clock-tail.webp",
+      "bytes": 464,
+      "sha256": "15e160de0827a42f62a73490d690561125232cff77877db53148cbc1ece035db",
+      "gitBlob": "a4406f3193362b8c0acde112ebcdc84262b0e643"
+    },
+    {
+      "path": "docs/review/temporal-track-binding-20261022/reviewer-retained-inputs/noedit-media-tail.mp4",
+      "bytes": 2901,
+      "sha256": "b87d389151c2db4eac79ccb8adabe4cd635183414c676808343f26ecefa7b8ac",
+      "gitBlob": "9685f6f5701c051d900c10ff592722187014f111"
+    },
+    {
+      "path": "docs/review/temporal-track-binding-20261022/reviewer-retained-inputs/noedit-media-tail.webp",
+      "bytes": 464,
+      "sha256": "15e160de0827a42f62a73490d690561125232cff77877db53148cbc1ece035db",
+      "gitBlob": "a4406f3193362b8c0acde112ebcdc84262b0e643"
+    },
+    {
+      "path": "docs/review/temporal-track-binding-20261022/reviewer-retained-inputs/noedit-movie-track-tail.mp4",
+      "bytes": 2901,
+      "sha256": "42f7dee0db6a9e65c66c515b376d00703308d54ca96fbaf5033fc69dc1d5ffcf",
+      "gitBlob": "752c3feefdcc287e46f72d50d236956d73f61e96"
+    },
+    {
+      "path": "docs/review/temporal-track-binding-20261022/reviewer-retained-inputs/noedit-movie-track-tail.webp",
+      "bytes": 464,
+      "sha256": "15e160de0827a42f62a73490d690561125232cff77877db53148cbc1ece035db",
+      "gitBlob": "a4406f3193362b8c0acde112ebcdc84262b0e643"
+    }
+  ]
+}

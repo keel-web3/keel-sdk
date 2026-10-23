@@ -1,0 +1,30 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import {mkdir,readFile,writeFile} from 'node:fs/promises';
+import {createRequire} from 'node:module';
+import {execFileSync} from 'node:child_process';
+import {createHash} from 'node:crypto';
+import {compareMediaFrames,prepareMediaCandidate,verifyActualMediaPair,ORIGINAL_MEDIA_EDIT_RECIPE as original} from './packages/builder/dist/media-preparation.js';
+
+const require=createRequire(new URL('./packages/builder/package.json',import.meta.url));
+const evidence=new URL('../evidence/native-yuv-audio/',import.meta.url);
+await mkdir(evidence,{recursive:true});
+test('actual BT709 YUV B-frame Original with AAC keeps every source byte and audio indication without fidelity authority',async()=>{
+  const file=new URL('original.mp4',evidence);
+  execFileSync(require('ffmpeg-static'),['-v','error','-f','lavfi','-i','testsrc=size=32x24:rate=25','-f','lavfi','-i','sine=frequency=440:sample_rate=48000','-t','0.6','-c:v','libx264','-bf','3','-pix_fmt','yuv420p','-color_primaries','bt709','-color_trc','bt709','-colorspace','bt709','-color_range','tv','-threads','2','-c:a','aac','-y',file.pathname]);
+  const bytes=new Uint8Array(await readFile(file));
+  const exported=await prepareMediaCandidate({bytes,mediaType:'video/mp4',recipe:original});
+  assert.deepEqual(exported.bytes,bytes);
+  const inspected=await compareMediaFrames({bytes,mediaType:'video/mp4',recipe:original,timeMs:200});
+  assert.equal(inspected.sourceInfo.hasAudio,true);
+  assert.equal(inspected.sourceInfo.frameCount,15);
+  assert.equal(inspected.sourceInfo.durationMs,600);
+  assert.deepEqual(inspected.sourceInfo.frameTimesMs,Array.from({length:15},(_,i)=>i*40));
+  assert.deepEqual(inspected.sourceInfo.frameDurationsMs,Array(15).fill(40));
+  assert.equal(inspected.verification.losslessPixelsVerified,false);
+  assert.equal(inspected.verification.completeDecode,false);
+  assert.deepEqual(inspected.originalFrame,inspected.processedFrame);
+  const recipe={...original,mode:'lossless',format:'mp4'};
+  await assert.rejects(verifyActualMediaPair({sourceBytes:bytes,candidateBytes:bytes,recipe}),/color|sample.depth|field|semantics/);
+  await writeFile(new URL('result.json',evidence),JSON.stringify({bytes:bytes.length,sha256:createHash('sha256').update(bytes).digest('hex'),sourceInfo:inspected.sourceInfo,verification:inspected.verification,expected:'Native Original inspection/export; unchanged AAC-containing source, strict lossless proof refused',actual:'PASS'},null,2)+'\n');
+});

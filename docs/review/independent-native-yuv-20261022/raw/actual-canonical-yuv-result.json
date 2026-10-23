@@ -1,0 +1,24 @@
+{
+  "video": {
+    "width": 16,
+    "height": 16,
+    "duration": 0.4
+  },
+  "png": {
+    "width": 16,
+    "height": 16
+  },
+  "sha256": "41bc415d0a2a142ee23db0de0089fb7d1675cc6718516a15da3f306bffb13193",
+  "bytes": 1828,
+  "consoleErrors": [],
+  "externalRequests": [],
+  "failedRequests": [],
+  "verification": {
+    "sourcePreserved": true,
+    "completeDecode": false,
+    "framesAndTimingPreserved": true,
+    "losslessPixelsVerified": false,
+    "browserDecode": "requires-runtime-check"
+  },
+  "scope": "Actual installed browser + current canonical local shell and exact source; no hosted or chain/signing proof"
+}

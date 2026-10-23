@@ -1,0 +1,26 @@
+{
+  "command": [
+    "/Users/ravonus/.nvm/versions/node/v22.22.1/bin/node",
+    "--conditions=react-server",
+    "--import",
+    "tsx",
+    "--test",
+    "--test-concurrency=1",
+    "tests/unit/temporal-media-service.test.ts",
+    "tests/unit/media-preparation-service.test.ts"
+  ],
+  "cwd": "/private/tmp/keel-independent-native-yuv-20261022-01/keel-site/apps/studio",
+  "sdk": "4fa47717d9e9fac48cc6c9f925540f190e478564",
+  "site": "0345f43d337e4863ebee3ce3b2bd3e0d30d4a9c0",
+  "exit": 0,
+  "seconds": 0.9722208976745605,
+  "environmentKeys": [
+    "HOME",
+    "PATH",
+    "NODE_ENV",
+    "LC_ALL",
+    "LANG",
+    "CHROMIUM_PATH"
+  ],
+  "productionTouched": false
+}
