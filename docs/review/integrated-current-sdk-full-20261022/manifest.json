@@ -1,0 +1,35 @@
+{
+  "schema": "keel-evidence-manifest@1",
+  "entries": [
+    {
+      "path": "README.md",
+      "bytes": 1395,
+      "sha256": "fe44a2114f95ebd45aa01f3142393612be1e139d1a9e785aafa72fa077c643bb"
+    },
+    {
+      "path": "full-suite-canonical-node22.log",
+      "bytes": 760432,
+      "sha256": "012eb0558ec58a7a4884e06422078b60447aa79a8ef40260427209cdcc9696c2"
+    },
+    {
+      "path": "full-suite-node22.log",
+      "bytes": 802790,
+      "sha256": "37ddee3234a39a10122cb820297b65d2773a9f0f37f0525c3029e942ececef8a"
+    },
+    {
+      "path": "full-suite.log",
+      "bytes": 122770,
+      "sha256": "49a399c3b254f66786d8f100490fd3a1c8a69d1d772618f147697e49123238b3"
+    },
+    {
+      "path": "receipt.json",
+      "bytes": 2403,
+      "sha256": "361a977fd7f5987db0f0d6e59f4713e2057a5df557082488a7bcce831a243fd0"
+    },
+    {
+      "path": "runtime-output-manifest.json",
+      "bytes": 322574,
+      "sha256": "35ddf04a166c20912c3e75339191e51ea53e9d6b02b9ede539369cfbec80bc75"
+    }
+  ]
+}
