@@ -160,6 +160,9 @@ export const DETERMINISTIC_TEST_FILES = Object.freeze([
   "tests/acceptance-boundary-properties.test.mjs",
   "tests/acceptance-media-fixture-parity.test.mjs",
   "tests/acceptance-mcp-route-guards.test.mjs",
+  "tests/sdk-publication-recovery.test.mjs",
+  "tests/sdk-rpc-routing.test.mjs",
+  "tests/signature-privacy.test.mjs",
   "tests/creator-prepared-inline.test.mjs",
   "tests/inline-build-route.test.mjs",
   "tests/registered-native-gzip.test.mjs",
@@ -483,3 +486,4 @@ export function validateTestSuiteClassification(testFiles = TEST_FILES_ON_DISK) 
   }
   return Object.freeze(issues);
 }
+

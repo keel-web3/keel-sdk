@@ -31,6 +31,7 @@ export * from "./three-module.js";
 export * from "./audio-module.js";
 export * from "./studio-upload.js";
 export * from "./studio-agent-drafts.js";
+export * from "./studio-publication-failure.js";
 export * from "./studio-publication.js";
 export * from "./studio-project-intake.js";
 export * from "./wake-uri.js";

@@ -211,6 +211,8 @@ test('retired account, media, project and build choices reject without exposing 
     assert.throws(() => resolveKeelBuildDefaults(profile, layers));
     assert.throws(() => assertKeelRetainedBuildDefaultsCurrent(profile, { retained: saved, ...layers, build: { transportProfile: 'uri81-block-v1' } }), /Invalid retained build policy value/);
   }
+});
+
 test('collection type filters apply by exact axes and specificity after media, before explicit build and contract caps', async () => {
  const { KEEL_BUILD_DEFAULT_FIELDS, resolveKeelBuildDefaults } = await import('../packages/sdk/dist/studio-project-defaults.js');
  const buildMatrix = { schema:'keel-studio-plan-matrix@1',capabilityRevision:'filters',fields:KEEL_BUILD_DEFAULT_FIELDS };

@@ -21,6 +21,7 @@ test('missing timestamp, malformed block and unknown chain do not inherit a perm
  assert.throws(()=>policy(11155111,-1n),/timestamp/);
  assert.throws(()=>policy(11155111,1n,0n),/timestamp/);
  assert.throws(()=>policy(31337,1n),/registered/);
+ for (const chain of ['1', 1.1, 0, -1, NaN]) assert.throws(()=>policy(chain,KEEL_SEPOLIA_AMSTERDAM_TIMESTAMP),/numeric chain/);
 });
 
 import { estimateEthereumCalldataIntrinsicGasWithEip7623, estimateKeelHistoryInscriptionGas } from '../packages/sdk/dist/managed-publication.js';
@@ -49,7 +50,22 @@ test('simulated Amsterdam headers must advance block number, timestamp and known
  assert.throws(()=>assertKeelAmsterdamSimulationHeader(p,{...gethHeader,blockAccessListHash:undefined},parent),/simulator/);
  for (const patch of [{number:'0x2a'},{timestamp:'0x6ac4fd60'},{slotNumber:'0xa'},{parentHash:'0x'+'cd'.repeat(32)}])assert.throws(()=>assertKeelAmsterdamSimulationHeader(p,{...header,...patch},parent),/simulator/);
  const before=policy(11155111,KEEL_SEPOLIA_AMSTERDAM_TIMESTAMP-1n);
- assert.throws(()=>assertKeelAmsterdamSimulationHeader(before,header,parent),/crossed/);
+ assert.throws(()=>assertKeelAmsterdamSimulationHeader(before,header,parent),/selected fork|crossed/);
+});
+
+test('historical Prague and Osaka have their own execution/calldata rules, and unknown L2 profiles fail closed',()=>{
+ const prague=policy(11155111,1741159776n),osaka=policy(11155111,1760427360n);
+ assert.equal(prague.fork,'prague');assert.equal(prague.maximumExecutionGas,200_000_000n);assert.equal(prague.maximumTotalGas,200_000_000n);
+ assert.equal(osaka.fork,'osaka');assert.equal(osaka.maximumExecutionGas,16_777_216n);assert.equal(osaka.maximumTotalGas,16_777_216n);
+ assert.equal(prague.zeroCalldataFloorGas,10);assert.equal(prague.nonzeroCalldataFloorGas,40);
+ assert.equal(prague.feeModel,'ethereum-l1');assert.match(prague.rulesSource,/v1\.17\.7/);
+ assert.throws(()=>policy(11155111,1741159775n),/registered/);assert.throws(()=>policy(8453,1791475620n),/registered/);
+ assert.equal(policy(1,1760427360n).fork,'prague');assert.equal(policy(11155111,1760427360n).fork,'osaka');
+});
+test('a missing or different fork/header never authenticates a historical simulation',()=>{
+ const p=policy(11155111,1760427359n),hash='0x'+'ab'.repeat(32),parent={hash,number:1n,timestamp:1760427359n};
+ assert.throws(()=>assertKeelAmsterdamSimulationHeader(p,{},parent),/simulator/);
+ assert.throws(()=>assertKeelAmsterdamSimulationHeader(p,{hash,parentHash:hash,number:'0x2',timestamp:'0x'+(1760427360n).toString(16)},parent),/fork/);
 });
 
 

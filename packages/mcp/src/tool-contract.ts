@@ -13,7 +13,7 @@ import type { JsonSchema, McpTool } from "./types.js";
 const JSON_TYPES = new Set(["object", "string", "number", "integer", "boolean", "array", "null"]);
 const KNOWN_KEYWORDS = new Set([
   "$schema", "$id", "title", "exclusiveMinimum", "exclusiveMaximum", "type", "properties", "required", "additionalProperties", "items", "enum", "oneOf", "anyOf",
-  "minItems", "maxItems", "minLength", "maxLength", "minimum", "maximum", "description", "pattern", "const", "default",
+  "minItems", "maxItems", "uniqueItems", "minLength", "maxLength", "minimum", "maximum", "description", "pattern", "const", "default",
 ]);
 const TOOL_NAME = /^[A-Za-z0-9_-]{1,64}$/u;
 
@@ -27,6 +27,7 @@ function schemaIssues(schema: unknown, at: string, issues: string[], depth = 0):
     return;
   }
   const value = schema as Record<string, unknown>;
+  if (value.uniqueItems !== undefined && typeof value.uniqueItems !== "boolean") issues.push(`${at}.uniqueItems: must be boolean`);
   for (const key of Object.keys(value)) if (!KNOWN_KEYWORDS.has(key)) issues.push(`${at}: unknown JSON Schema keyword "${key}"`);
   if (value.type !== undefined && (typeof value.type !== "string" || !JSON_TYPES.has(value.type))) issues.push(`${at}: invalid type ${JSON.stringify(value.type)}`);
   if (value.properties !== undefined) {

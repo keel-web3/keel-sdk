@@ -31,9 +31,24 @@ export function createKeelLocalTestChainGasProfile(input: { readonly environment
     clientVersion: "anvil/v1.8.5" as const, genesisHash: genesis.hash.toLowerCase(), blockGasLimit: gasLimit.toString() });
   localProfiles.add(profile); return profile;
 }
+/** Pinned upstream chain schedules. New chains/forks need reviewed rules; an RPC estimate cannot register them. */
+const schedules: Readonly<Record<number, { readonly prague: bigint; readonly osaka: bigint; readonly amsterdam?: bigint }>> = {
+  1: { prague: 1_746_612_311n, osaka: 1_764_798_551n },
+  11_155_111: { prague: 1_741_159_776n, osaka: 1_760_427_360n, amsterdam: KEEL_SEPOLIA_AMSTERDAM_TIMESTAMP },
+};
+const source = "https://github.com/ethereum/go-ethereum/blob/v1.17.7/params/config.go";
+function selectedFork(chainId: number, timestamp: bigint): "prague" | "osaka" | "amsterdam" {
+  if (!Number.isSafeInteger(chainId) || chainId < 1) throw new TypeError("Transaction gas policy requires a valid numeric chain ID.");
+  const schedule = schedules[chainId];
+  if (!schedule || timestamp < schedule.prague) throw new TypeError("This historical chain/fork needs an explicitly registered transaction gas profile.");
+  return schedule.amsterdam !== undefined && timestamp >= schedule.amsterdam ? "amsterdam" : timestamp >= schedule.osaka ? "osaka" : "prague";
+}
 export interface KeelTransactionGasPolicy {
   readonly profile: "ethereum-pre-amsterdam" | "sepolia-amsterdam" | "local-anvil-osaka";
   readonly chainId: number;
+  readonly fork: "prague" | "osaka" | "amsterdam";
+  readonly rulesSource: string;
+  readonly feeModel: "ethereum-l1";
   readonly blockTimestamp: bigint;
   readonly maximumExecutionGas: bigint;
   readonly maximumTotalGas: bigint;
@@ -50,13 +65,12 @@ export function resolveKeelTransactionGasPolicy(input: { readonly chainId: numbe
   if (typeof input.blockTimestamp !== "bigint" || input.blockTimestamp < 0n || typeof input.blockGasLimit !== "bigint" || input.blockGasLimit <= 0n) throw new TypeError("Transaction gas policy requires the actual selected-chain block timestamp and gas limit.");
   const local = input.localTestChainProfile;
   if (local !== undefined && (input.chainId !== 31337 || !localProfiles.has(local) || input.blockGasLimit > BigInt(local.blockGasLimit))) throw new TypeError("The explicit local transaction gas profile does not match this chain or block.");
-  if (input.chainId !== 1 && input.chainId !== 11_155_111 && !(input.chainId === 31337 && local !== undefined)) throw new TypeError("This chain needs an explicitly registered transaction gas profile.");
-  const amsterdam = input.chainId === 11_155_111 && input.blockTimestamp >= KEEL_SEPOLIA_AMSTERDAM_TIMESTAMP;
-  const total = amsterdam ? 4_294_967_295n : 16_777_216n;
-  // Anvil's simulator/txpool can accept larger envelopes. The local fixture
-  // deliberately admits only the conservative 2^24 subset; no public-chain claim.
-  return Object.freeze({ profile: local ? "local-anvil-osaka" : amsterdam ? "sepolia-amsterdam" : "ethereum-pre-amsterdam", chainId: input.chainId, blockTimestamp: input.blockTimestamp,
-    maximumExecutionGas: 16_777_216n, maximumTotalGas: input.blockGasLimit < total ? input.blockGasLimit : total,
+  const fork = local ? "osaka" : selectedFork(input.chainId, input.blockTimestamp);
+  const amsterdam = fork === "amsterdam";
+  const total = amsterdam ? 4_294_967_295n : fork === "osaka" ? 16_777_216n : input.blockGasLimit;
+  const execution = fork === "prague" ? input.blockGasLimit : 16_777_216n;
+  return Object.freeze({ profile: local ? "local-anvil-osaka" : amsterdam ? "sepolia-amsterdam" : "ethereum-pre-amsterdam", chainId: input.chainId, fork, rulesSource: source, feeModel: "ethereum-l1", blockTimestamp: input.blockTimestamp,
+    maximumExecutionGas: execution < input.blockGasLimit ? execution : input.blockGasLimit, maximumTotalGas: input.blockGasLimit < total ? input.blockGasLimit : total,
     separateStateGas: amsterdam, transactionBaseGas: amsterdam ? 12_000 : 21_000, recipientAccessGas: amsterdam ? 3_000 : 0, valueTransferGas: amsterdam ? 6_000 : 0,
     zeroCalldataGas: 4, nonzeroCalldataGas: 16,
     zeroCalldataFloorGas: amsterdam ? 64 : 10, nonzeroCalldataFloorGas: amsterdam ? 64 : 40 });
@@ -72,10 +86,10 @@ export function assertKeelAmsterdamSimulationHeader(policy: KeelTransactionGasPo
   const quantity = (v: unknown) => typeof v === "string" && /^0x(?:0|[1-9a-f][0-9a-f]*)$/iu.test(v) ? BigInt(v) : undefined;
   const hash = (v: unknown) => typeof v === "string" && /^0x[0-9a-f]{64}$/iu.test(v);
   const timestamp = quantity(block?.timestamp);
-  if (!policy.separateStateGas) {
-    if (policy.chainId === 11_155_111 && timestamp !== undefined && timestamp >= KEEL_SEPOLIA_AMSTERDAM_TIMESTAMP) throw new TypeError("The simulated sequence crossed the selected transaction gas fork. Replan from a current block.");
-    return;
-  }
+  if (!block || timestamp === undefined || timestamp <= parent.timestamp || quantity(block.number) !== parent.number + 1n
+    || !hash(block.hash) || typeof block.parentHash !== "string" || block.parentHash.toLowerCase() !== parent.hash.toLowerCase()
+    || (policy.profile === "local-anvil-osaka" ? "osaka" : selectedFork(policy.chainId, timestamp)) !== policy.fork) throw new TypeError("The simulator did not prove the selected fork linked to the exact pinned snapshot.");
+  if (!policy.separateStateGas) return;
   const slotNumber = quantity(block?.slotNumber);
   if (!block || timestamp === undefined || timestamp < policy.blockTimestamp || timestamp < KEEL_SEPOLIA_AMSTERDAM_TIMESTAMP
     || timestamp <= parent.timestamp || quantity(block.number) !== parent.number + 1n

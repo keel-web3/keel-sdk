@@ -259,7 +259,7 @@ export interface KeelRetainedBuildReadPolicy {
    * callers must authenticate that snapshot independently. */
   readonly retainedPolicyDigest: Hex | null;
   readonly readLimits: Readonly<{ readonly rpcMaxConcurrentReads: number; readonly maxReadGas?: number; readonly maxOutputBytes?: number }>;
-  readonly readSources: Readonly<Record<string, "system" | "account" | "media" | "project" | "build" | "contract">>;
+  readonly readSources: Readonly<Record<string, "system" | "account" | "media" | "collection" | "project" | "build" | "contract">>;
   readonly requiresFullReadValidation: true;
 }
 

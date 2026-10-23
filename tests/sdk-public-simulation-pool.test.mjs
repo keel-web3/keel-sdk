@@ -1333,6 +1333,8 @@ test('body-capacity fallback shares the complete-request deadline and discards a
     assert.deepEqual(f.privateRequests().map(r=>r.index),[0,1]);
     for(const r of f.privateRequests())assert.deepEqual(r.body.params,before.params);
   }finally{await pool.close();await f.transport.close();}
+});
+
 // Synthetic protocol boundaries only: the real native EVM/witness integration
 // is qualified separately by verify-local-staged-publication.mjs. No reply here
 // is a captured project result or evidence of actual native execution.
@@ -1379,6 +1381,7 @@ function authenticatedLocalFixture(f, { root = hash(808), finishIncomplete = fal
   };
   return { options: { ...options, authenticatedLocalSession: capability }, clients, programs, sessions, witnessPrograms, stageEntered };
 }
+
 
 test('authenticated local capacity: exact45-call discovery, strict replay and complete metadata use fresh same-pin full native sessions', async () => {
   const f = fixture([{ cap: true }]), local = authenticatedLocalFixture(f);

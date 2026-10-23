@@ -146,7 +146,7 @@
     "./tezos-live-state": {
       "types": "./dist/tezos-live-state.d.ts",
       "import": "./dist/tezos-live-state.js"
-      },
+    },
     "./field-permissions": {
       "types": "./dist/field-permissions.d.ts",
       "import": "./dist/field-permissions.js"
@@ -478,6 +478,14 @@
     "./creator-setup-wallet": {
       "types": "./dist/creator-setup-wallet.d.ts",
       "import": "./dist/creator-setup-wallet.js"
+    },
+    "./rpc-method-capabilities": {
+      "types": "./dist/rpc-method-capabilities.d.ts",
+      "import": "./dist/rpc-method-capabilities.js"
+    },
+    "./rpc-method-capabilities-node": {
+      "types": "./dist/rpc-method-capabilities-node.d.ts",
+      "import": "./dist/rpc-method-capabilities-node.js"
     }
   },
   "files": [
