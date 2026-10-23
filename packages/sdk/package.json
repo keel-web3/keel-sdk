@@ -1,11 +1,15 @@
 {
   "name": "@keel/sdk",
-  "version": "0.3.0",
+  "version": "0.3.2",
   "description": "Typed campaign builders, EIP-712 payloads, ABIs, and signer-policy helpers for Keel contracts.",
   "type": "module",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "exports": {
+    "./module-runtime": {
+      "types": "./dist/module-runtime.d.ts",
+      "import": "./dist/module-runtime.js"
+    },
     "./decoders/node": {
       "types": "./dist/decoders/node.d.ts",
       "import": "./dist/decoders/node.js"
@@ -50,6 +54,10 @@
     "./managed-publication": {
       "types": "./dist/managed-publication.d.ts",
       "import": "./dist/managed-publication.js"
+    },
+    "./creator-prepared-publication": {
+      "types": "./dist/creator-prepared-publication.d.ts",
+      "import": "./dist/creator-prepared-publication.js"
     },
     "./revision-publication": {
       "types": "./dist/revision-publication.d.ts",
@@ -131,9 +139,17 @@
       "types": "./dist/tezos-collection.d.ts",
       "import": "./dist/tezos-collection.js"
     },
+    "./tezos-harness-tree": {
+      "types": "./dist/tezos-harness-tree.d.ts",
+      "import": "./dist/tezos-harness-tree.js"
+    },
     "./tezos-live-state": {
       "types": "./dist/tezos-live-state.d.ts",
       "import": "./dist/tezos-live-state.js"
+    },
+    "./chain-capability-map": {
+      "types": "./dist/chain-capability-map.d.ts",
+      "import": "./dist/chain-capability-map.js"
     },
     "./shell-registry": {
       "types": "./dist/shell-registry.d.ts",
@@ -146,6 +162,10 @@
     "./engine": {
       "types": "./dist/engine.d.ts",
       "import": "./dist/engine.js"
+    },
+    "./native-managed": {
+      "types": "./dist/native-managed.d.ts",
+      "import": "./dist/native-managed.js"
     },
     "./contract-controls": {
       "types": "./dist/contract-controls.d.ts",
@@ -263,6 +283,30 @@
       "types": "./dist/admin-pauses.d.ts",
       "import": "./dist/admin-pauses.js"
     },
+    "./tezos-pause": {
+      "types": "./dist/tezos-pause.d.ts",
+      "import": "./dist/tezos-pause.js"
+    },
+    "./tezos-automation": {
+      "types": "./dist/tezos-automation.d.ts",
+      "import": "./dist/tezos-automation.js"
+    },
+    "./tezos-token-bound-account": {
+      "types": "./dist/tezos-token-bound-account.d.ts",
+      "import": "./dist/tezos-token-bound-account.js"
+    },
+    "./tezos-recovery": {
+      "types": "./dist/tezos-recovery.d.ts",
+      "import": "./dist/tezos-recovery.js"
+    },
+    "./tezos-governance": {
+      "types": "./dist/tezos-governance.d.ts",
+      "import": "./dist/tezos-governance.js"
+    },
+    "./tezos-entrypoint-capability": {
+      "types": "./dist/tezos-entrypoint-capability.d.ts",
+      "import": "./dist/tezos-entrypoint-capability.js"
+    },
     "./hold-events": {
       "types": "./dist/hold-events.d.ts",
       "import": "./dist/hold-events.js"
@@ -311,6 +355,90 @@
       "types": "./dist/pre-reveal.d.ts",
       "import": "./dist/pre-reveal.js"
     },
+    "./rpc": {
+      "types": "./dist/rpc.d.ts",
+      "import": "./dist/rpc.js"
+    },
+    "./rpc-node": {
+      "types": "./dist/rpc-node.d.ts",
+      "import": "./dist/rpc-node.js"
+    },
+    "./network-index": {
+      "types": "./dist/network-index.d.ts",
+      "import": "./dist/network-index.js"
+    },
+    "./network-node": {
+      "types": "./dist/network-node.d.ts",
+      "import": "./dist/network-node.js"
+    },
+    "./network-verification": {
+      "types": "./dist/network-verification.d.ts",
+      "import": "./dist/network-verification.js"
+    },
+    "./studio-connection-node": {
+      "types": "./dist/studio-connection-node.d.ts",
+      "import": "./dist/studio-connection-node.js"
+    },
+    "./studio-access": {
+      "types": "./dist/studio-access.d.ts",
+      "import": "./dist/studio-access.js"
+    },
+    "./studio-project-planner": {
+      "types": "./dist/studio-project-planner.d.ts",
+      "import": "./dist/studio-project-planner.js"
+    },
+    "./publication-preflight": {
+      "types": "./dist/publication-preflight.d.ts",
+      "import": "./dist/publication-preflight.js"
+    },
+    "./owned-simulation-transport": {
+      "types": "./dist/owned-simulation-transport.d.ts",
+      "import": "./dist/owned-simulation-transport.js"
+    },
+    "./studio-project-intake": {
+      "types": "./dist/studio-project-intake.d.ts",
+      "import": "./dist/studio-project-intake.js"
+    },
+    "./studio-project-defaults": {
+      "types": "./dist/studio-project-defaults.d.ts",
+      "import": "./dist/studio-project-defaults.js"
+    },
+    "./studio-project-profiles": {
+      "types": "./dist/studio-project-profiles.d.ts",
+      "import": "./dist/studio-project-profiles.js"
+    },
+    "./studio-execution-authority": {
+      "types": "./dist/studio-execution-authority.d.ts",
+      "import": "./dist/studio-execution-authority.js"
+    },
+    "./rpc-read-manifest": {
+      "types": "./dist/rpc-read-manifest.d.ts",
+      "import": "./dist/rpc-read-manifest.js"
+    },
+    "./signature-privacy": {
+      "types": "./dist/signature-privacy.d.ts",
+      "import": "./dist/signature-privacy.js"
+    },
+    "./release-wallet-batch": {
+      "types": "./dist/release-wallet-batch.d.ts",
+      "import": "./dist/release-wallet-batch.js"
+    },
+    "./transaction-gas-policy": {
+      "types": "./dist/transaction-gas-policy.d.ts",
+      "import": "./dist/transaction-gas-policy.js"
+    },
+    "./public-simulation-pool": {
+      "types": "./dist/public-simulation-pool.d.ts",
+      "import": "./dist/public-simulation-pool.js"
+    },
+    "./sepolia-simulation-transport": {
+      "types": "./dist/sepolia-simulation-transport.d.ts",
+      "import": "./dist/sepolia-simulation-transport.js"
+    },
+    "./proof-simulation-node": {
+      "types": "./dist/proof-simulation-node.d.ts",
+      "import": "./dist/proof-simulation-node.js"
+    },
     "./selected-token-ids": {
       "types": "./dist/selected-token-ids.d.ts",
       "import": "./dist/selected-token-ids.js"
@@ -330,7 +458,7 @@
   ],
   "scripts": {
     "clean": "rm -rf dist",
-    "build": "tsc -p tsconfig.json && node scripts/package-canonical-shell.mjs && node scripts/package-layered-runtime.mjs && node scripts/package-storage-policy.mjs && node ../mint-queue/build.mjs"
+    "build": "tsc -p tsconfig.json && node scripts/package-proof-runtime.mjs && node scripts/package-canonical-shell.mjs && node scripts/package-layered-runtime.mjs && node scripts/package-storage-policy.mjs && node ../mint-queue/build.mjs"
   },
   "engines": {
     "node": ">=22"

@@ -1,3 +1,5 @@
+import { canonicalAbiEntries, readCompiledContractAbi } from "./abi-conformance.mjs";
+import { fileURLToPath } from "node:url";
 import nodeTest from 'node:test';
 import { siblingTest } from "./sibling-repository.mjs";
 const test = siblingTest(nodeTest, "keel-contracts");
@@ -43,11 +45,38 @@ for (const text of schemas) test(`${text.split('(')[0]} preserves named values a
   for (const decoder of [abi,humanAbi]) assert.deepEqual(decodeEventLog({abi:decoder,topics,data,strict:true}).args, expected);
 });
 
-test('router non-event ABI and all error selectors remain unchanged', () => {
+test('router historical non-event ABI and errors change only by the reviewed release additions', () => {
   const before=read('../../keel-contracts/benchmarks/evm-creator-review/router-style/KeelMintRouteRegistry.before.json').abi;
-  assert.deepEqual(abi.filter(e=>e.type!=='event'),before.filter(e=>e.type!=='event'));
+  const expected=before.filter(e=>e.type!=='event');
+  // The frozen style snapshot predates deferred releases (eb8cc73) and the named
+  // routeKey return (8cc57c2). Keep every other field, tuple and error exact.
+  const routeKey=expected.find(e=>e.type==='function' && e.name==='routeKey');
+  assert.deepEqual(routeKey.outputs,[{name:'',type:'bytes32',internalType:'bytes32'}]);
+  routeKey.outputs[0].name='key';
+  const insertion=expected.findIndex(e=>e.type==='function' && e.name==='registerERC1155Route');
+  assert.ok(insertion>=0);
+  expected.splice(insertion,0,{
+    type:'function', name:'registerDeferredRelease',
+    inputs:[
+      {name:'creator',type:'address',internalType:'address'},
+      {name:'target',type:'address',internalType:'address'},
+      {name:'tokenId',type:'uint256',internalType:'uint256'},
+      {name:'controller',type:'address',internalType:'address'},
+      {name:'allocationId',type:'bytes32',internalType:'bytes32'},
+      {name:'supply',type:'uint32',internalType:'uint32'},
+    ],
+    outputs:[{name:'routeId',type:'uint256',internalType:'uint256'}],
+    stateMutability:'nonpayable',
+  });
+  assert.deepEqual(abi.filter(e=>e.type!=='event'),expected);
+});
+
+test('SDK router ABI exactly matches the current checked-in contract ABI', () => {
   assert.deepEqual(abi,read('../../keel-contracts/modules/keel-mint-access/abi/KeelMintRouteRegistry.json'));
-  assert.deepEqual(abi,read('../../keel-contracts/out/KeelMintRouteRegistry.sol/KeelMintRouteRegistry.json').abi);
+});
+
+test('SDK router ABI exactly matches the current compiled contract ABI', () => {
+  assert.deepEqual(canonicalAbiEntries(abi),canonicalAbiEntries(readCompiledContractAbi(fileURLToPath(new URL('../../keel-contracts', import.meta.url)), 'KeelMintRouteRegistry')));
 });
 
 test('SDK decodes actual router receipts using generated and human ABIs', () => {

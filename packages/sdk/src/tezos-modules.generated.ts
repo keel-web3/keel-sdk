@@ -1,49 +1,130 @@
 // Generated from keel-contracts module manifests by script/tezos/generate-sdk-catalog.mjs.
 // Source availability only; this catalogue makes no deployment or behavioral-parity claim.
-export interface KeelTezosModule { readonly id: string; readonly sources: string; readonly contracts: readonly string[]; readonly deployable: readonly string[]; readonly entrypoints: Readonly<Record<string, readonly string[]>>; readonly views: Readonly<Record<string, readonly string[]>>; }
+// Shared declarations are inherited source components, not origination targets.
+export interface KeelTezosModule { readonly id: string; readonly sources: string; readonly contracts: readonly string[]; readonly deployable: readonly string[]; readonly shared?: readonly string[]; readonly splits?: Readonly<Record<string, readonly string[]>>; readonly bindings?: Readonly<Record<string, readonly { readonly on: string; readonly entrypoint: string; readonly argument: string }[]>>; readonly entrypoints: Readonly<Record<string, readonly string[]>>; readonly views: Readonly<Record<string, readonly string[]>>; }
 export const KEEL_TEZOS_MODULES: readonly KeelTezosModule[] = [
   {
     "id": "keel-anchors",
     "sources": "src/modules/keel-anchors/tezos",
     "contracts": [
+      "keel_anchor_receipt_registry.py",
+      "keel_anchor_types.py",
       "keel_btc_header_chain.py",
+      "keel_eth_attachment_registry.py",
+      "keel_eth_execution_state.py",
+      "keel_eth_hash_verifier.py",
+      "keel_eth_light_client.py",
+      "keel_eth_proof_controller.py",
       "keel_eth_state_proof.py",
-      "keel_eth_execution_state.py"
+      "keel_signed_anchor_verifier.py"
     ],
     "deployable": [
+      "KeelAnchorReceiptRegistry",
       "KeelBtcHeaderChain",
+      "KeelEthAccountProof",
+      "KeelEthAttachmentRegistry",
+      "KeelEthExecutionState",
+      "KeelEthHashVerifier",
+      "KeelEthLightClient",
+      "KeelEthProofController",
       "KeelEthStateProof",
       "KeelEthStorageProof",
-      "KeelEthAccountProof",
-      "KeelEthExecutionState"
+      "KeelGovernedEthAttachmentRegistry",
+      "KeelSignedAnchorVerifier"
     ],
     "entrypoints": {
+      "KeelAnchorReceiptRegistry": [
+        "record_receipt",
+        "register_verifier",
+        "retire_verifier"
+      ],
       "KeelBtcHeaderChain": [
+        "attach_receipt",
         "lock_configuration",
         "seed_anchor",
+        "set_policy",
+        "set_receipt_registry",
         "submit_headers",
         "verify_inscription"
+      ],
+      "KeelEthAccountProof": [],
+      "KeelEthAttachmentRegistry": [
+        "attach"
       ],
       "KeelEthExecutionState": [
         "publish_header"
       ],
+      "KeelEthHashVerifier": [],
+      "KeelEthLightClient": [
+        "bootstrap",
+        "cache_keys",
+        "update"
+      ],
+      "KeelEthProofController": [
+        "accept_manager",
+        "activate",
+        "approve",
+        "cancel",
+        "expire",
+        "nominate_manager",
+        "propose",
+        "recover",
+        "resume",
+        "suspend"
+      ],
       "KeelEthStateProof": [
         "verify_inclusion"
+      ],
+      "KeelEthStorageProof": [],
+      "KeelGovernedEthAttachmentRegistry": [
+        "attach"
+      ],
+      "KeelSignedAnchorVerifier": [
+        "retire",
+        "submit_attestation"
       ]
     },
     "views": {
+      "KeelAnchorReceiptRegistry": [
+        "claim_id",
+        "receipt",
+        "verifier"
+      ],
       "KeelBtcHeaderChain": [
         "anchor_of",
         "best",
         "is_anchor",
-        "is_verified"
+        "is_verified",
+        "receipt_of",
+        "source_status",
+        "verification_profile"
       ],
       "KeelEthAccountProof": [
         "verify_account"
       ],
+      "KeelEthAttachmentRegistry": [
+        "attachment",
+        "profile_id",
+        "profile_status",
+        "source_status"
+      ],
       "KeelEthExecutionState": [
         "exec_root_slot",
         "exec_root_updater"
+      ],
+      "KeelEthHashVerifier": [
+        "configuration_hash",
+        "verify"
+      ],
+      "KeelEthLightClient": [
+        "configuration_hash",
+        "finalized_execution_root",
+        "source_status"
+      ],
+      "KeelEthProofController": [
+        "is_admitted",
+        "profile",
+        "status"
       ],
       "KeelEthStateProof": [
         "last",
@@ -52,6 +133,18 @@ export const KEEL_TEZOS_MODULES: readonly KeelTezosModule[] = [
       ],
       "KeelEthStorageProof": [
         "verify"
+      ],
+      "KeelGovernedEthAttachmentRegistry": [
+        "admission_controller",
+        "attachment",
+        "profile_id",
+        "profile_status",
+        "source_status"
+      ],
+      "KeelSignedAnchorVerifier": [
+        "nonce_used",
+        "signing_payload",
+        "verification_profile"
       ]
     }
   },
@@ -59,29 +152,60 @@ export const KEEL_TEZOS_MODULES: readonly KeelTezosModule[] = [
     "id": "keel-artifacts",
     "sources": "src/modules/keel-artifacts/tezos",
     "contracts": [
+      "keel_access_controller.py",
       "keel_artifact_registry.py",
       "keel_harness_registry.py",
+      "keel_harness_tree_registry.py",
       "keel_immutable_checkpoint.py",
       "keel_link_registry.py",
       "keel_manager.py",
-      "keel_seed_registry.py"
+      "keel_manager_types.py",
+      "keel_recovery_groups.py",
+      "keel_seed_registry.py",
+      "keel_signature_authority.py"
     ],
     "deployable": [
       "KeelAccessController",
       "KeelArtifactRegistry",
       "KeelHarnessRegistry",
+      "KeelHarnessTreeRegistry",
       "KeelImmutableCheckpointRegistry",
       "KeelLinkRegistry",
       "KeelManager",
+      "KeelRecoveryGroups",
       "KeelSeedRegistry",
       "KeelSignatureAuthority"
     ],
+    "splits": {
+      "KeelHarnessRegistry": [
+        "KeelHarnessRegistry",
+        "KeelHarnessTreeRegistry"
+      ]
+    },
+    "bindings": {
+      "KeelHarnessRegistry": [
+        {
+          "on": "KeelHarnessRegistry",
+          "entrypoint": "bind_tree_registry",
+          "argument": "KeelHarnessTreeRegistry"
+        }
+      ]
+    },
     "entrypoints": {
       "KeelAccessController": [
+        "configure_automation_capability",
+        "configure_automation_key",
+        "configure_entrypoint_policy",
         "configure_policy",
         "configure_role",
+        "execute_automation",
+        "execute_automation_entrypoint",
         "execute_role",
+        "execute_role_entrypoint",
+        "finish_execution",
         "pause",
+        "pause_manager",
+        "pause_systems",
         "unpause"
       ],
       "KeelArtifactRegistry": [
@@ -99,13 +223,26 @@ export const KEEL_TEZOS_MODULES: readonly KeelTezosModule[] = [
       "KeelHarnessRegistry": [
         "activate_fork",
         "append_harness_revision",
+        "append_harness_selections",
+        "bind_tree_registry",
         "cancel_pending_fork",
         "forge_harness",
         "forge_harness_for",
         "fork_harness_for_token",
         "freeze_harness",
         "freeze_token_fork",
+        "record_tree_fork",
+        "record_tree_revision",
         "set_publication_job"
+      ],
+      "KeelHarnessTreeRegistry": [
+        "append_harness_tree",
+        "forge_harness_tree",
+        "forge_harness_tree_for",
+        "fork_harness_tree_for_token",
+        "register_harness_key",
+        "register_harness_keys",
+        "set_tree_limits"
       ],
       "KeelImmutableCheckpointRegistry": [
         "append_checkpoint_slug",
@@ -119,13 +256,28 @@ export const KEEL_TEZOS_MODULES: readonly KeelTezosModule[] = [
         "accept_governor_reconfiguration",
         "activate_governor_change",
         "approve",
+        "bind_recovery_groups",
         "cancel_governor_reconfiguration",
+        "configure_backup",
         "configure_module",
         "configure_rpc_host_list",
         "expire_governor_reconfiguration",
+        "finish_governance_execution",
         "freeze_module",
+        "pause",
+        "pause_systems",
         "propose",
-        "schedule_governor_change"
+        "propose_with_value",
+        "recover_governors",
+        "resume_systems",
+        "schedule_governor_change",
+        "unpause"
+      ],
+      "KeelRecoveryGroups": [
+        "authorize_bound",
+        "configure_binding",
+        "create_group",
+        "rotate_group"
       ],
       "KeelSeedRegistry": [
         "publish_mint_seed_set",
@@ -144,7 +296,14 @@ export const KEEL_TEZOS_MODULES: readonly KeelTezosModule[] = [
     },
     "views": {
       "KeelAccessController": [
+        "automation_capability",
+        "automation_key_state",
+        "automation_signing_payload",
         "capability_key_of",
+        "entrypoint_capability",
+        "entrypoint_capability_key",
+        "entrypoint_lambdas_of",
+        "entrypoint_signing_payload",
         "role_security"
       ],
       "KeelArtifactRegistry": [
@@ -156,6 +315,7 @@ export const KEEL_TEZOS_MODULES: readonly KeelTezosModule[] = [
         "artifact_revision_descriptor",
         "artifact_revision_exists",
         "artifact_revision_source",
+        "artifact_revisions_exist",
         "can_edit_artifact",
         "forging_fee",
         "keel_hold",
@@ -177,6 +337,7 @@ export const KEEL_TEZOS_MODULES: readonly KeelTezosModule[] = [
         "harness_revision_commitment",
         "harness_revision_exists",
         "harness_revision_publisher",
+        "harness_seed_context",
         "harness_slots",
         "keel_index",
         "latest_harness_revision",
@@ -185,7 +346,18 @@ export const KEEL_TEZOS_MODULES: readonly KeelTezosModule[] = [
         "publication_job",
         "token_fork_lineage",
         "token_fork_revision",
-        "token_fork_selections"
+        "token_fork_selections",
+        "tree_registry"
+      ],
+      "KeelHarnessTreeRegistry": [
+        "harness_id_of",
+        "harness_key_of",
+        "harness_node",
+        "harness_registry",
+        "harness_tree",
+        "token_fork_tree",
+        "tree_control",
+        "tree_keel_index"
       ],
       "KeelImmutableCheckpointRegistry": [
         "get_checkpoint",
@@ -202,16 +374,32 @@ export const KEEL_TEZOS_MODULES: readonly KeelTezosModule[] = [
         "fidelity_link",
         "link_by_id",
         "link_exists",
+        "link_for_presentation",
         "link_set",
+        "link_uri",
         "predict_link_id"
       ],
       "KeelManager": [
         "banner",
         "governance_threshold",
+        "lane_state",
         "module",
+        "require_systems_active",
         "resolve_module",
         "rpc_host_count",
-        "rpc_host_list"
+        "rpc_host_list",
+        "system_pause_state"
+      ],
+      "KeelRecoveryGroups": [
+        "acceptance_payload",
+        "action_payload",
+        "binding",
+        "binding_hash",
+        "bound_payload",
+        "check_bound",
+        "group",
+        "roster_payload",
+        "verify_new_keys"
       ],
       "KeelSeedRegistry": [
         "compute_seed_set_commitment",
@@ -305,7 +493,6 @@ export const KEEL_TEZOS_MODULES: readonly KeelTezosModule[] = [
         "retire_attestor",
         "set_administrator",
         "set_min_threshold_floor",
-        "set_mint_target",
         "set_route",
         "submit_cross_mint",
         "unpause"
@@ -314,13 +501,14 @@ export const KEEL_TEZOS_MODULES: readonly KeelTezosModule[] = [
     "views": {
       "KeelCrossChainMintAttestor": [
         "active_attestor_count",
+        "artifact_registry",
         "attestor",
         "authorization_payload",
         "current_epoch",
         "is_attestor_active",
         "min_threshold_floor",
-        "mint_target",
         "nonce_used",
+        "route",
         "route_enabled",
         "source_token_minted"
       ]
@@ -335,9 +523,30 @@ export const KEEL_TEZOS_MODULES: readonly KeelTezosModule[] = [
     "deployable": [
       "KeelCollectionAttestationRegistry",
       "KeelCollectionVerificationHookBase",
+      "KeelCollectionVerificationInspector",
       "KeelCollectionVerificationRegistry",
-      "KeelCommunityReplicationRegistry"
+      "KeelCommunityReplicationRegistry",
+      "KeelReplicationWorkRegistry"
     ],
+    "splits": {
+      "KeelCollectionVerificationRegistry": [
+        "KeelCollectionVerificationInspector",
+        "KeelCollectionVerificationRegistry"
+      ],
+      "KeelCommunityReplicationRegistry": [
+        "KeelCommunityReplicationRegistry",
+        "KeelReplicationWorkRegistry"
+      ]
+    },
+    "bindings": {
+      "KeelCommunityReplicationRegistry": [
+        {
+          "on": "KeelCommunityReplicationRegistry",
+          "entrypoint": "bind_work",
+          "argument": "KeelReplicationWorkRegistry"
+        }
+      ]
+    },
     "entrypoints": {
       "KeelCollectionAttestationRegistry": [
         "revoke",
@@ -346,6 +555,8 @@ export const KEEL_TEZOS_MODULES: readonly KeelTezosModule[] = [
         "set_threshold",
         "submit"
       ],
+      "KeelCollectionVerificationHookBase": [],
+      "KeelCollectionVerificationInspector": [],
       "KeelCollectionVerificationRegistry": [
         "observe_token_uri",
         "record_approved",
@@ -359,23 +570,27 @@ export const KEEL_TEZOS_MODULES: readonly KeelTezosModule[] = [
       ],
       "KeelCommunityReplicationRegistry": [
         "bind_object_revision",
-        "claim_carrier",
-        "claim_slugs",
+        "bind_work",
         "create_campaign",
         "enable_external_carriers",
         "finalize_evm_carrier",
         "record_artifact_revision",
-        "release_carrier_claim",
-        "release_slug_claim",
         "replace_campaign",
-        "review_carrier_proof",
         "set_artifact_editor",
         "set_artifact_frozen",
         "set_campaign_enabled",
+        "validate_revision_append"
+      ],
+      "KeelReplicationWorkRegistry": [
+        "claim_carrier",
+        "claim_slugs",
+        "open_campaign_work",
+        "release_carrier_claim",
+        "release_slug_claim",
+        "review_carrier_proof",
         "submit_carrier_proof",
         "submit_slug",
-        "submit_slugs",
-        "validate_revision_append"
+        "submit_slugs"
       ]
     },
     "views": {
@@ -389,32 +604,48 @@ export const KEEL_TEZOS_MODULES: readonly KeelTezosModule[] = [
         "keel_verification_protocol",
         "keel_verification_state"
       ],
+      "KeelCollectionVerificationInspector": [
+        "inspect"
+      ],
       "KeelCollectionVerificationRegistry": [
+        "adapter_identity",
         "approved_evidence_root",
         "inspect_current",
+        "inspection_witnesses",
         "last_receipt",
         "latest_receipt",
         "policy",
         "policy_id",
+        "portable_anchor",
         "presentation_content_digest",
         "receipt",
         "receipt_current"
       ],
       "KeelCommunityReplicationRegistry": [
-        "campaign_carrier_status",
-        "campaign_contributor_stats",
+        "active_campaign",
         "campaign_current",
         "campaign_state",
-        "carrier_proof",
-        "carrier_task",
-        "global_contributor_stats",
         "last_campaign_id",
         "last_content_object_id",
+        "may_advance_carrier_policy",
         "predict_artifact_id",
         "predict_campaign_id",
-        "predict_carrier_proof_digest",
         "predict_content_object_id",
+        "proof_verifier",
         "required_carrier_mask",
+        "work_registry"
+      ],
+      "KeelReplicationWorkRegistry": [
+        "accepted_carrier_mask",
+        "campaign_carrier_status",
+        "campaign_contributor_stats",
+        "carrier_proof",
+        "carrier_task",
+        "completed_slugs",
+        "global_contributor_stats",
+        "object_required_carrier_mask",
+        "predict_carrier_proof_digest",
+        "replication_registry",
         "slug_task"
       ]
     }
@@ -423,30 +654,71 @@ export const KEEL_TEZOS_MODULES: readonly KeelTezosModule[] = [
     "id": "keel-die",
     "sources": "src/modules/keel-die/tezos",
     "contracts": [
-      "keel_collection_fa2.py"
+      "keel_collection_fa2.py",
+      "keel_fa2_nft.py",
+      "keel_seeded_collection_fa2.py"
     ],
     "deployable": [
-      "KeelCollectionFA2"
+      "KeelCollectionFA2",
+      "KeelSeededCollectionFA2"
+    ],
+    "shared": [
+      "KeelNFTLedger"
     ],
     "entrypoints": {
       "KeelCollectionFA2": [
         "add_administrator",
         "balance_of",
         "enable_selected_token_ids",
+        "freeze_contract_metadata",
         "freeze_default_presentation",
         "freeze_token_metadata",
         "refresh_custody_metadata",
         "release_capacity",
         "remove_administrator",
         "reserve_capacity",
+        "set_contract_metadata",
         "set_custody_presentation",
         "set_default_presentation",
+        "set_default_royalty",
         "set_keel_index",
         "set_minter",
         "set_token_json",
         "set_token_metadata",
+        "set_token_owner_can_edit",
         "strike",
         "strike_selected",
+        "strike_unreserved",
+        "transfer",
+        "update_operators"
+      ],
+      "KeelSeededCollectionFA2": [
+        "add_administrator",
+        "balance_of",
+        "configure_seed_profile",
+        "enable_selected_token_ids",
+        "freeze_contract_metadata",
+        "freeze_default_presentation",
+        "freeze_token_metadata",
+        "fulfill_seed_batch",
+        "refresh_custody_metadata",
+        "release_capacity",
+        "remove_administrator",
+        "reserve_capacity",
+        "reveal_seed_batch",
+        "set_contract_metadata",
+        "set_custody_presentation",
+        "set_default_presentation",
+        "set_default_royalty",
+        "set_keel_index",
+        "set_minter",
+        "set_token_json",
+        "set_token_metadata",
+        "set_token_owner_can_edit",
+        "strike",
+        "strike_selected",
+        "strike_unreserved",
+        "strike_with_data",
         "transfer",
         "update_operators"
       ]
@@ -454,20 +726,58 @@ export const KEEL_TEZOS_MODULES: readonly KeelTezosModule[] = [
     "views": {
       "KeelCollectionFA2": [
         "administrator_count",
+        "contract_metadata_frozen",
         "custody_presentation",
         "default_presentation",
         "get_balance",
+        "get_total_balance",
         "is_administrator",
         "is_minter",
         "keel_index",
+        "owner_of",
         "presentation_frozen",
         "reserved_capacity_of",
+        "royalty_info",
         "selected_token_ids",
         "selection_policy",
         "token_exists",
         "token_json",
         "token_metadata",
         "token_metadata_frozen",
+        "token_owner_can_edit",
+        "total_supply"
+      ],
+      "KeelSeededCollectionFA2": [
+        "administrator_count",
+        "contract_metadata_frozen",
+        "custody_presentation",
+        "default_presentation",
+        "get_balance",
+        "get_total_balance",
+        "is_administrator",
+        "is_minter",
+        "keel_index",
+        "keel_mint_seeded_profile",
+        "keel_mint_seeded_seed",
+        "keel_mint_seeded_word",
+        "owner_of",
+        "presentation_frozen",
+        "reserved_capacity_of",
+        "royalty_info",
+        "seed_batch_id",
+        "seed_configured",
+        "seed_draw",
+        "seed_materialized",
+        "seed_profile",
+        "seed_vrf_requestable",
+        "selected_token_ids",
+        "selection_policy",
+        "token_exists",
+        "token_json",
+        "token_metadata",
+        "token_metadata_frozen",
+        "token_owner_can_edit",
+        "token_seed",
         "total_supply"
       ]
     }
@@ -480,10 +790,17 @@ export const KEEL_TEZOS_MODULES: readonly KeelTezosModule[] = [
     ],
     "deployable": [
       "KeelGraphRegistry",
+      "KeelLibraryAccessRegistry",
       "KeelLibraryRegistry",
       "KeelModuleReviewRegistry",
       "KeelPluginRegistry"
     ],
+    "splits": {
+      "KeelLibraryRegistry": [
+        "KeelLibraryRegistry",
+        "KeelLibraryAccessRegistry"
+      ]
+    },
     "entrypoints": {
       "KeelGraphRegistry": [
         "accept_publisher",
@@ -494,20 +811,22 @@ export const KEEL_TEZOS_MODULES: readonly KeelTezosModule[] = [
         "promote_minimum_tier",
         "publish_version"
       ],
-      "KeelLibraryRegistry": [
-        "accept_controller",
-        "activate_policy",
-        "begin_controller_transfer",
+      "KeelLibraryAccessRegistry": [
         "claim_allowlist_access",
-        "close_asset",
-        "freeze_asset",
-        "index_asset",
-        "promote_minimum_tier",
-        "publish_policy",
         "purchase_access",
         "resolve_access_request",
         "submit_access_request",
         "withdraw"
+      ],
+      "KeelLibraryRegistry": [
+        "accept_controller",
+        "activate_policy",
+        "begin_controller_transfer",
+        "close_asset",
+        "freeze_asset",
+        "index_asset",
+        "promote_minimum_tier",
+        "publish_policy"
       ],
       "KeelModuleReviewRegistry": [
         "deprecate_module",
@@ -540,12 +859,10 @@ export const KEEL_TEZOS_MODULES: readonly KeelTezosModule[] = [
         "predict_graph_id",
         "version_of"
       ],
-      "KeelLibraryRegistry": [
+      "KeelLibraryAccessRegistry": [
         "access_request",
-        "active_policy",
         "allowlist_claimed",
         "allowlist_leaf",
-        "asset",
         "credit_of",
         "entitlement",
         "grant_count",
@@ -554,10 +871,18 @@ export const KEEL_TEZOS_MODULES: readonly KeelTezosModule[] = [
         "has_access_at_policy",
         "has_access_with_proof",
         "has_access_with_proof_at_policy",
+        "total_credit_liability"
+      ],
+      "KeelLibraryRegistry": [
+        "active_policy",
+        "asset",
+        "asset_opt",
+        "check_asset",
+        "check_policy",
         "policy",
         "policy_commitment",
-        "predict_asset_id",
-        "total_credit_liability"
+        "policy_opt",
+        "predict_asset_id"
       ],
       "KeelModuleReviewRegistry": [
         "bindings_match",
@@ -675,6 +1000,7 @@ export const KEEL_TEZOS_MODULES: readonly KeelTezosModule[] = [
         "haul_object",
         "haul_slug",
         "predict_harness_id",
+        "predict_object_id",
         "read_chunk",
         "read_directory",
         "read_file"
@@ -710,21 +1036,19 @@ export const KEEL_TEZOS_MODULES: readonly KeelTezosModule[] = [
       "KeelIPBackpackFA2"
     ],
     "entrypoints": {
+      "KeelIPControl": [
+        "create_policy",
+        "freeze_policy",
+        "grant_access",
+        "revoke_access",
+        "set_allowlist",
+        "set_rule"
+      ],
       "KeelIPActionExecutor": [
         "execute_download",
         "execute_mint_to_backpack",
         "execute_remint",
         "set_execution_config"
-      ],
-      "KeelIPBackpackFA2": [
-        "mint_to_backpack"
-      ],
-      "KeelIPControl": [
-        "create_policy",
-        "grant_access",
-        "revoke_access",
-        "set_allowlist",
-        "set_rule"
       ],
       "KeelIPLicenseRegistry": [
         "register_custom_license",
@@ -736,10 +1060,24 @@ export const KEEL_TEZOS_MODULES: readonly KeelTezosModule[] = [
         "set_requirements"
       ],
       "KeelIPWrappedFA2": [
-        "mint_from_keel"
+        "balance_of",
+        "mint_from_keel",
+        "transfer",
+        "update_operators"
+      ],
+      "KeelIPBackpackFA2": [
+        "balance_of",
+        "deposit_to_backpack",
+        "mint_to_backpack",
+        "transfer",
+        "update_operators",
+        "withdraw_from_backpack"
       ]
     },
     "views": {
+      "KeelIPControl": [
+        "authorization_status"
+      ],
       "KeelIPActionExecutor": [
         "download_receipt",
         "download_receipt_id",
@@ -747,14 +1085,6 @@ export const KEEL_TEZOS_MODULES: readonly KeelTezosModule[] = [
         "nonce",
         "policy_control",
         "signature_payload"
-      ],
-      "KeelIPBackpackFA2": [
-        "backpack_id",
-        "get_balance",
-        "token_provenance"
-      ],
-      "KeelIPControl": [
-        "authorization_status"
       ],
       "KeelIPLicenseRegistry": [
         "canonical_license_identifier",
@@ -770,6 +1100,19 @@ export const KEEL_TEZOS_MODULES: readonly KeelTezosModule[] = [
       ],
       "KeelIPWrappedFA2": [
         "get_balance",
+        "get_total_balance",
+        "owner_of",
+        "token_metadata",
+        "token_provenance"
+      ],
+      "KeelIPBackpackFA2": [
+        "backpack_balance",
+        "backpack_id",
+        "get_balance",
+        "get_total_balance",
+        "owner_of",
+        "token_backpack",
+        "token_metadata",
         "token_provenance"
       ]
     }
@@ -799,6 +1142,7 @@ export const KEEL_TEZOS_MODULES: readonly KeelTezosModule[] = [
         "recover_untracked_fa2",
         "register_escrow_listing",
         "update_listing",
+        "verify_delivery",
         "withdraw"
       ]
     },
@@ -849,6 +1193,7 @@ export const KEEL_TEZOS_MODULES: readonly KeelTezosModule[] = [
         "set_campaign_paused",
         "set_platform_configuration",
         "unpause",
+        "verify_reservation",
         "withdraw"
       ],
       "OneMintController": [
@@ -864,6 +1209,7 @@ export const KEEL_TEZOS_MODULES: readonly KeelTezosModule[] = [
         "set_drop_paused",
         "set_stage_merkle_root",
         "update_drop_supply",
+        "verify_reservation",
         "withdraw"
       ]
     },
@@ -933,7 +1279,9 @@ export const KEEL_TEZOS_MODULES: readonly KeelTezosModule[] = [
     "deployable": [
       "KeelSleeve"
     ],
-    "entrypoints": {},
+    "entrypoints": {
+      "KeelSleeve": []
+    },
     "views": {
       "KeelSleeve": [
         "erc4804_uri",
@@ -947,20 +1295,32 @@ export const KEEL_TEZOS_MODULES: readonly KeelTezosModule[] = [
     "id": "keel-stake",
     "sources": "src/modules/keel-stake/tezos",
     "contracts": [
-      "keel_stake_object_manager.py"
+      "keel_stake_object_manager.py",
+      "keel_token_bound_account.py"
     ],
     "deployable": [
-      "KeelStakeObjectManager"
+      "KeelStakeObjectManager",
+      "KeelTokenBoundAccountRegistry",
+      "KeelTokenBoundAccount"
     ],
     "entrypoints": {
       "KeelStakeObjectManager": [
         "configure_lockup",
         "configure_runtime",
         "create_stake_object",
+        "freeze_stake_object",
         "set_enabled",
         "stake",
         "unstake",
-        "verify_stake_escrow"
+        "verify_stake_escrow",
+        "verify_unstake_delivery"
+      ],
+      "KeelTokenBoundAccountRegistry": [
+        "create_account"
+      ],
+      "KeelTokenBoundAccount": [
+        "default",
+        "execute"
       ]
     },
     "views": {
@@ -968,11 +1328,22 @@ export const KEEL_TEZOS_MODULES: readonly KeelTezosModule[] = [
         "global_stake_counts",
         "keel_stake_state",
         "packed_stake_counts",
+        "presentation_stake_state",
         "stake_counts",
         "stake_object_active",
         "stake_object_config",
+        "stake_object_frozen",
         "stake_object_runtime",
         "stake_object_state"
+      ],
+      "KeelTokenBoundAccountRegistry": [
+        "account"
+      ],
+      "KeelTokenBoundAccount": [
+        "is_valid_signer",
+        "owner",
+        "state",
+        "token"
       ]
     }
   }

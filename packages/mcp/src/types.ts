@@ -1,6 +1,6 @@
 export const MCP_PROTOCOL_VERSION = "2024-11-05" as const;
 export const MCP_SERVER_NAME = "keel-mcp" as const;
-export const MCP_SERVER_VERSION = "0.4.0" as const;
+export const MCP_SERVER_VERSION = "0.4.2" as const;
 
 export type JsonRpcId = string | number | null;
 
@@ -26,7 +26,7 @@ export interface JsonRpcResponse {
 
 export interface JsonSchema {
   readonly default?: unknown;
-  readonly type?: "object" | "string" | "number" | "integer" | "boolean" | "array";
+  readonly type?: "object" | "string" | "number" | "integer" | "boolean" | "array" | "null";
   readonly properties?: Readonly<Record<string, JsonSchema>>;
   readonly pattern?: string;
   readonly required?: readonly string[];
@@ -47,6 +47,7 @@ export interface JsonSchema {
 export interface McpTool {
   readonly name: string;
   readonly description: string;
+  /** MCP requires an object schema at the top; see tool-contract.ts. */
   readonly inputSchema: JsonSchema;
 }
 
@@ -103,9 +104,12 @@ export interface Workspace {
   resolveOutputDirectory(pathValue: string): Promise<string>;
   writeJson(pathValue: string, value: unknown): Promise<string>;
   writeBytes(pathValue: string, value: Uint8Array, options?: { readonly private?: boolean }): Promise<string>;
+  /** Write text, creating missing parent directories inside the workspace. */
+  writeText(pathValue: string, text: string): Promise<string>;
 }
 
 export interface ToolContext {
+  readonly signal?: AbortSignal;
   readonly workspace: Workspace;
 }
 

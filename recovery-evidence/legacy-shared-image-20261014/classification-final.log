@@ -1,0 +1,70 @@
+TAP version 13
+# Subtest: network defaults never invent a provider gas cap or a fork policy for an unregistered chain
+ok 1 - network defaults never invent a provider gas cap or a fork policy for an unregistered chain
+  ---
+  duration_ms: 3.666398
+  type: 'test'
+  ...
+# Subtest: exact program measurements vary with counts, bytes and gas without a thirty-call threshold
+ok 2 - exact program measurements vary with counts, bytes and gas without a thirty-call threshold
+  ---
+  duration_ms: 14.931954
+  type: 'test'
+  ...
+# Subtest: block, transaction and request measurements remain separate with multiple calls in a block
+ok 3 - block, transaction and request measurements remain separate with multiple calls in a block
+  ---
+  duration_ms: 0.587871
+  type: 'test'
+  ...
+# Subtest: Geth cumulative budget uses prior gasUsed plus each exact envelope, not envelope sum or maxUsedGas sum
+ok 4 - Geth cumulative budget uses prior gasUsed plus each exact envelope, not envelope sum or maxUsedGas sum
+  ---
+  duration_ms: 3.706951
+  type: 'test'
+  ...
+# Subtest: failed, clamped, incomplete and unmeasured responses cannot become execution measurements
+ok 5 - failed, clamped, incomplete and unmeasured responses cannot become execution measurements
+  ---
+  duration_ms: 1.078558
+  type: 'test'
+  ...
+# Subtest: provider limits snapshot independent dimensions and reject unbounded or ambiguous input
+ok 6 - provider limits snapshot independent dimensions and reject unbounded or ambiguous input
+  ---
+  duration_ms: 0.95977
+  type: 'test'
+  ...
+# Subtest: sanitized exhaustion diagnostics identify request scope without turning remaining gas into a fresh cap
+ok 7 - sanitized exhaustion diagnostics identify request scope without turning remaining gas into a fresh cap
+  ---
+  duration_ms: 4.490419
+  type: 'test'
+  ...
+# Subtest: [test gate] every suite is classified and browser/live checks stay outside the deterministic default
+ok 8 - [test gate] every suite is classified and browser/live checks stay outside the deterministic default
+  ---
+  duration_ms: 48.511468
+  type: 'test'
+  ...
+# Subtest: [test gate] a newly added test is unclassified until its execution boundary is reviewed
+ok 9 - [test gate] a newly added test is unclassified until its execution boundary is reviewed
+  ---
+  duration_ms: 34.100252
+  type: 'test'
+  ...
+# Subtest: [test gate] a removed test leaves a stale manifest entry instead of crashing validation
+ok 10 - [test gate] a removed test leaves a stale manifest entry instead of crashing validation
+  ---
+  duration_ms: 33.225087
+  type: 'test'
+  ...
+1..10
+# tests 10
+# suites 0
+# pass 10
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 2051.081004

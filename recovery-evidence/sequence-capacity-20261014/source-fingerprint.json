@@ -1,0 +1,129 @@
+{
+  "schema": "keel-sequence-capacity-source@1",
+  "baseCommit": "e6ad88099fe17485f01d36af6e2599af384cadd6",
+  "branch": "codex/creator-sequence-preflight-20261014",
+  "sourceFingerprintSha256": "6c23d98278adc6ed15adb24f2bce384a67fb9418180b34ab50c6ed2a753060ed",
+  "source": [
+    {
+      "path": "docs/SIMULATION_PROGRAM_CAPACITY.md",
+      "bytes": 5966,
+      "sha256": "a6098d7854f579629c9225432ddc4dbeb09b9ebea899ba45340a75cee4d7d910"
+    },
+    {
+      "path": "packages/sdk/src/index.ts",
+      "bytes": 5081,
+      "sha256": "7bd3f41db8f032414ff2897224d3f8edd6507b808e6a4914e5614fb7e7f75935"
+    },
+    {
+      "path": "packages/sdk/src/public-simulation-pool.ts",
+      "bytes": 32653,
+      "sha256": "2f3ce7ce9a417220734e0ee90bb586d861361fd04e3a66ad1ba87ddd476a85fe"
+    },
+    {
+      "path": "packages/sdk/src/publication-preflight.ts",
+      "bytes": 58357,
+      "sha256": "9ec4bde7964262cfe941023f324f65c09948afc082cb8f07500376ec04cb84f9"
+    },
+    {
+      "path": "packages/sdk/src/rpc.ts",
+      "bytes": 30378,
+      "sha256": "f946f27fe49ab4d48b2a469077f31d2322d282b7019d12fcca07917d3012d28e"
+    },
+    {
+      "path": "packages/sdk/src/simulation-capacity-policy.ts",
+      "bytes": 9556,
+      "sha256": "f05999e6939aafe2779fb34ed4320d42ea9ce8d21eeb5743bf74a6097e678253"
+    },
+    {
+      "path": "packages/sdk/src/simulation-connection.ts",
+      "bytes": 24791,
+      "sha256": "27a97fbba135c0ee1b7791d83ba011668a30573b3ee9a38432061aa1868d402e"
+    },
+    {
+      "path": "tests/rpc-publication-simulation.test.mjs",
+      "bytes": 4336,
+      "sha256": "b6896ddf8d6ea3a47a34eddb4d8db64f7a7367bb75831792b332350bcfaafde3"
+    },
+    {
+      "path": "tests/sdk-public-simulation-pool.test.mjs",
+      "bytes": 68141,
+      "sha256": "8f171a895a2b95b151fd66baa2034ccc0a42f96532f1726e443e63869e3fadb6"
+    },
+    {
+      "path": "tests/sdk-simulation-capacity-policy.test.mjs",
+      "bytes": 6801,
+      "sha256": "280c094c669bbccc8683b95820af2669f0a95f0fee5b6ac18c6aab7f33e8bf1c"
+    }
+  ],
+  "emitted": [
+    {
+      "path": "packages/sdk/dist/index.js",
+      "bytes": 4892,
+      "sha256": "09ac78dba26ca23d14144e893acd26bbeb80f05798da354bcf1b6bf863cf2560"
+    },
+    {
+      "path": "packages/sdk/dist/index.d.ts",
+      "bytes": 5012,
+      "sha256": "8fdfde0a10c39540cdca8a75331669a5aec424db6d2d76f89ffb4d20077f6ccc"
+    },
+    {
+      "path": "packages/sdk/dist/public-simulation-pool.js",
+      "bytes": 33672,
+      "sha256": "e3876922aa81691d285eb633c4f7f133eb10cbd1418ccf5adee2504b0be61477"
+    },
+    {
+      "path": "packages/sdk/dist/public-simulation-pool.d.ts",
+      "bytes": 2351,
+      "sha256": "b0f400719581b3456f643ea003e358e98672d10c731b1a26cdd03304ba67b823"
+    },
+    {
+      "path": "packages/sdk/dist/publication-preflight.js",
+      "bytes": 56706,
+      "sha256": "f088e769c24ab3f96b7450640c788214126d93dc47baaa56bb58ae17039a4b62"
+    },
+    {
+      "path": "packages/sdk/dist/publication-preflight.d.ts",
+      "bytes": 16502,
+      "sha256": "9c82b5c330c94532e4b53576435b3a2020d2f7454aa94e7a8b0afabb54341824"
+    },
+    {
+      "path": "packages/sdk/dist/rpc.js",
+      "bytes": 28396,
+      "sha256": "73a76630497e3f6d8d4e25258602de434e9449e5407aac2b2a9e2b1f7a0cbe41"
+    },
+    {
+      "path": "packages/sdk/dist/rpc.d.ts",
+      "bytes": 6973,
+      "sha256": "cc53c173a0e452d44df6bf67c2e4b726eb6e59827757ab232fb3f703406c375e"
+    },
+    {
+      "path": "packages/sdk/dist/simulation-connection.js",
+      "bytes": 25173,
+      "sha256": "7490d5e389dd4eb412c565446c3dae3ee0ca598554d593de27b91c4b3a9acfa2"
+    },
+    {
+      "path": "packages/sdk/dist/simulation-connection.d.ts",
+      "bytes": 3210,
+      "sha256": "1dc2948f56c0ec86ec254ae68f66f0f989166abd50ed5273d3670cb7cd5129eb"
+    },
+    {
+      "path": "packages/sdk/dist/simulation-capacity-policy.js",
+      "bytes": 8393,
+      "sha256": "f0538a19ced60ce6911a4008c31be60627b3ec2e9ee3664f1376221ebb427ae8"
+    },
+    {
+      "path": "packages/sdk/dist/simulation-capacity-policy.d.ts",
+      "bytes": 3037,
+      "sha256": "d4b1d227576a79b59383262a9f1bacf82637318e73b3f84792a3e4d196afce45"
+    }
+  ],
+  "canonicalShell": {
+    "path": "packages/sdk/src/verification-shell.ts",
+    "sha256": "46573447f549f3f4ac37bae857fcbed2e859bc2d7ea991ac8e762a0dec0338f5",
+    "unchangedFromBase": true
+  },
+  "generatedModuleType": "ESM with fresh normal TypeScript declarations",
+  "liveNetworkMeasurement": "not-performed",
+  "walletSubmission": "not-performed",
+  "deployment": "not-performed"
+}

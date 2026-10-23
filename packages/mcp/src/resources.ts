@@ -3,11 +3,13 @@ import { PREPARED_COPY_POLICY } from "./prepared-copy-guidance.js";
 import type { McpResource, McpResourceReadResult } from "./types.js";
 import { KEEL_ENGINE_CATALOG } from "@keel/sdk/engine";
 import { ARENA_RESOURCE_DEFINITION, ARENA_RESOURCE_TEXT } from "./arena-tools.js";
+import { STUDIO_WALLET_POLICY } from "./studio-wallet-guidance.js";
 
 export const KEEL_WORKFLOW_RESOURCE = "keel://mcp/workflow" as const;
 export const KEEL_LIMITS_RESOURCE = "keel://mcp/limits" as const;
 export const KEEL_PUBLICATION_MODES_RESOURCE = "keel://mcp/publication-modes" as const;
 export const KEEL_PROJECT_ROUTES_RESOURCE = "keel://mcp/project-routes" as const;
+export const KEEL_STUDIO_WALLET_REVIEW_RESOURCE = "keel://mcp/studio-wallet-review" as const;
 const MAX_RESOURCE_BYTES = 64 * 1024;
 
 export class McpResourceNotFoundError extends Error {
@@ -20,6 +22,7 @@ export class McpResourceNotFoundError extends Error {
 const resourceJson = (value: unknown): string => `${JSON.stringify(value)}\n`;
 
 const RESOURCE_TEXT: Readonly<Record<string, string>> = {
+  [KEEL_STUDIO_WALLET_REVIEW_RESOURCE]: resourceJson(STUDIO_WALLET_POLICY),
   "keel://mcp/svg-renderer": resourceJson({
     ...KEEL_ENGINE_CATALOG.svgRenderer,
     usage: { create: { tool: "keel-svg-create", inputs: ["preset or recipeJson", "tokenId (optional)"] }, inspect: { tool: "keel-svg-inspect", inputs: ["svg"] }, read: { tool: "keel-svg-call-plan", inputs: ["chainId", "address", "tokenId"] } },
@@ -41,8 +44,16 @@ const RESOURCE_TEXT: Readonly<Record<string, string>> = {
   [KEEL_WORKFLOW_RESOURCE]: resourceJson({
     schema: "keel-mcp-resource@1",
     kind: "offline-workflow",
+    walletReview: STUDIO_WALLET_POLICY,
     payloadStorage: KEEL_PAYLOAD_STORAGE_POLICY,
-    contractFirst: ["keel-contract-workflow-preflight", "keel-engine-catalog", "keel-network-inspect", "keel-library-search", "edge-case-resolution", "keel-contract-controls", "wallet-review"],
+    contractFirst: ["keel-network-discover", "keel-network-check", "keel-contract-workflow-preflight", "keel-engine-catalog", "keel-network-inspect", "keel-library-search", "edge-case-resolution", "keel-contract-controls", "build", "keel-token-standard-audit", "wallet-review"],
+    enforcement: {
+      evidence: "standards: { preflightReceipt, auditDigest }",
+      gatedTools: ["wallet-request-prepare", "publish-plan", "keel-creator-collection-prepare", "wallet-link", "keel-shell-prepare", "module-review-prepare", "keel-tezos-shell-prepare", "keel-tezos-publication-prepare"],
+      storageOnly: "KeelHold castSlugs/weldObject/weldComposite with zero value, and publish-plan of plain asset bytes, pass without evidence.",
+      audit: "Token, collection and metadata work needs a passing keel-token-standard-audit digest; a live token contract must be audited at the exact address the request targets.",
+      refusal: "isError result with structuredContent { code, nextTool, next }.",
+    },
     steps: ["studio-capabilities", "analyze", "media-optimize", "media-optimize-apply", "cost", "keel-revision-plan", "upload-plan", "build", "verify", "module-resolve", "module-lock", "studio-stage-project", "studio-draft", "chain-plan", "ethereum-encode", "publish-plan", "wallet-request-prepare", "wallet-link"],
     repair: {
       prompt: "keel-draft-repair",
@@ -183,6 +194,7 @@ const RESOURCE_TEXT: Readonly<Record<string, string>> = {
         tools: ["keel-tezos-collection-originate-prepare", "keel-tezos-hold-resources-prepare", "keel-tezos-presentation-bind-prepare", "keel-tezos-mint-gate-prepare", "keel-tezos-mint-prepare", "keel-tezos-token-metadata-prepare", "keel-tezos-readback-check"],
         contracts: ["KeelHoldOnchFS", "KeelIndex", "KeelPresentationStateRegistry", "KeelCreatorProfileRegistry", "KeelCollectionFA2", "OneMintController"],
         metadata: "TZIP-12 token_metadata with TZIP-21 fields; artifactUri/displayUri are raw-percent data: URIs or onchfs:// Hold files, never KEEL pointers.",
+        metadataEditing: "Creator administrators rewrite token metadata until a token is frozen. Holder editing and freezing are off unless the creator enables them (set-holder-metadata-editing).",
       },
     },
     presentation: {
@@ -198,7 +210,7 @@ const RESOURCE_TEXT: Readonly<Record<string, string>> = {
       },
       resourceDeliveryProfiles: {
         embeddedAssembled: "Inline: all bytes arrive in the tokenURI response; no runtime RPC. Existing prepared-carriage default is unchanged.",
-        denseBinaryTransport: "Fresh prepared COPY defaults to binaryPayloadCarriage:'uri81' and uri81-block-v1, with a bounded specialized decoder and URI-literal-safe storedDense payloads. Explicit Base90/91 choices remain available. Both JSON/HTML framing layers still require strict URI escaping. Preserve native compressed storage, measure full wrapper/decoder cost, and require the matching selected-chain registered composer/shell before publication; local capability is not a live registered route. See docs/KEEL_DENSE_TRANSPORT.md.",
+        denseBinaryTransport: "The supported Studio pipeline uses current raw-percent COPY with canonical resource items and the exact authenticated None/native-Gzip reader recipe. Local Dense/URI81 codec support is not a registered publication route; retired Base90/91 adapters cannot be selected. Compare the actual complete return and all new/reused bytes, including decoder/boot once.",
         embeddedSharedContainers: "Optional canonical embedded-shared-containers@1: the EVM composer reads raw compressed Hold packs but emits Base64 in its return. This is an expanding text carriage, not unchanged binary. SDK native return defaults to as-is and rejects this profile without an explicit creator-authorized binaryPayloadCarriage:'base64' choice. Never use it for a no-Base64/no-hex request. The offline shell checks table/stored/decoded/member SHA before mounting; selected-chain registration and full return/browser proof are still required.",
         onchainRecursive: "Hybrid: a governed browser RPC reader resolves native binary objects. keel-inline-prepare rejects this profile; changing a delivery label cannot make a fixed contract assemble the bytes.",
       },
@@ -223,12 +235,10 @@ const RESOURCE_TEXT: Readonly<Record<string, string>> = {
         automaticCompactGraph: "buildKeelInlineRawPercentTokenURIGraph",
         recommendedPublishableBody: "buildKeelInlineRawPercentTokenURIGraph; prepare each direct image carriage once, store one exact ASCII payload/URI slot, copy it opaquely at tokenURI, and keep the complete HTML and metadata in raw-percent form.",
         embeddedResourceAudit: "Before staging, decode every raw-percent layer and unpack every embedded gzip/deflate resource. Reject concrete http(s), IPFS, Arweave, web3 and keel-onchain locators in creator bytes; an onchain URL sentinel is not exempt. Allow only http://www.w3.org/2000/svg as the SVG namespace literal.",
-        legacyFollowLatestBody: "buildKeelInlineFollowLatestTokenURIBodyGraph; reuse existing bound prepared Base64 fragments unchanged with assembly-only context. New selection of this carriage remains explicit.",
         existingObjectReuse: PREPARED_COPY_POLICY,
         creatorAssets: "Declare artwork, animation, palettes, timing, and project data as creator assets. Reusable modules are executable libraries or runtimes published once per chain.",
         sizeReporting: "Always report original creator source bytes, creator graph bytes, complete prepared tokenURI bytes, packing-layer count, and percentage overhead before staging.",
-        pinnedPublishableGraph: "buildKeelInlinePreEncodedTokenURIGraph",
-        shellLifecycle: "The recommended body graph resolves the current registered KEEL shell when tokenURI is read. A full graph pins the selected shell revision. Creator shells can publish new revisions until their creator irreversibly freezes them.",
+        shellLifecycle: "Prepare current raw-percent snapshots from exact authenticated registered shell frames. A changed shell or source requires a new normal review and exact full-return validation; never infer historical carriage.",
         portableP5Default: "Once-per-chain Gzip p5 fragment plus the browser Gzip/Deflate shell profile.",
         portableThreeDefault: "Once-per-chain exact Three.js r180 ESM main/core graph. Bind both verified current-chain objects; never embed Three.js in each creator project.",
         normalMediaDefault: "A standalone image, video, or self-contained GLB is exactly registered KEEL shell prefix, registered keel.asset-display@1 module, direct creator media entrypoint, registered shell suffix. It is never a zero-module project or a creator-uploaded index.html wrapper.",
@@ -242,7 +252,7 @@ const RESOURCE_TEXT: Readonly<Record<string, string>> = {
       viewerChoices: KEEL_SHELL_CHOICES,
       defaultPresentation: "For new creator source, use collector-inline automatically: the compact raw-percent graph, exact supplied data:image/* bytes, complete data:text/html;charset=utf-8 HTML, and the registered canonical verification shell. For new source, prepare the exact image ASCII payload/URI once and publish one receipt-bound carriage; the metadata builder copies its header/payload/footer without encoding the body. Existing objects retain their exact stored bytes and compatible reader. For GIF use a direct data:image/gif URI, never an SVG wrapper or placeholder. The complete HTML and metadata are not Base64-wrapped again. IPFS, HTTP, web3 resolvers, and newly selected other carriages require an explicit reviewed policy and measured overhead.",
       imageCarriage: "Prepare one exact ASCII image carriage at build time for new source; copy header + prepared payload + footer at read time. Existing stored objects are inspected first and preserved; never upload an encoded duplicate or add a runtime media encoder. Verify source digest, decoded bytes, output length and public-RPC read-back. GIF remains direct GIF and is never auto-wrapped in SVG.",
-      activeBuilderResolution: "Resolve the exact selected-chain KeelRawTokenURIBuilder, Hold code and deployment receipts. The verification-shell choice also resolves canonical raw-percent shell fragments; explicit creator-owned HTML does not require or insert those unused fragments. Verify their receipts and read-back before binding. Existing prepared Base64 carriage requires the active keel-harness-builder plus INLINE_PROTECTION_SHELL_ID and the exact shells(shellId) prefix, suffix, metadata, exists=true, and PreEncodedGraph mode. Do not infer readiness from an old deployment journal or another builder address, and never fall back from compact to legacy carriage silently.",
+      activeBuilderResolution: "Resolve the exact selected-chain KeelRawTokenURIBuilder, Hold code and deployment receipts. The verification-shell choice also resolves canonical raw-percent shell fragments; explicit creator-owned HTML does not require or insert those unused fragments. Verify their receipts and read-back before binding. Historical prepared Base64/percent carriage is retired for publication; current reuse must match the exact raw-percent registered frames. Do not infer readiness from an old deployment journal or another builder address, and never fall back from compact to legacy carriage silently.",
       legacyProtectorLane: "protectorPrefix, protectorSuffix, protectedHarnessDataURI, and NoProtector belong to the older complete-document protector lane. They are not the readiness check for the default registered Inline shell and must not trigger a locally manufactured fallback.",
       normalMedia: "Normal standalone image/video/GLB preparation resolves the registered keel.asset-display@1 module as part of that catalog graph; agents provide only the direct creator asset and never manufacture an index.html wrapper.",
       viewerNone: "Explicit creator-owned self-contained HTML shell/direct artifact, independently releasable and contract-readable through raw-artifact policy. Persist viewer=none separately from Compact/Raw; never label its own shell as canonical protection.",
@@ -282,6 +292,7 @@ const RESOURCE_TEXT: Readonly<Record<string, string>> = {
 };
 
 export const RESOURCE_DEFINITIONS: readonly McpResource[] = [
+  { uri: KEEL_STUDIO_WALLET_REVIEW_RESOURCE, name: "keel-studio-wallet-review", description: "Default hosted Studio account and existing-wallet review workflow; desktop is optional.", mimeType: "application/json" },
   { uri: "keel://mcp/engine", name: "keel-engine", description: "Shared SDK and desktop collection, mint, permission, storage and module inventory.", mimeType: "application/json" },
   { uri: "keel://mcp/svg-renderer", name: "keel-svg-renderer", description: "Contract-generated SVGs, hidden proof provenance, SDK/MCP/editor usage and verification boundaries.", mimeType: "application/json" },
   { uri: KEEL_WORKFLOW_RESOURCE, name: "keel-workflow", description: "Machine-readable offline analyze-to-review workflow.", mimeType: "application/json" },

@@ -1,7 +1,9 @@
+import { snapshotKeelExplicitExternalPreview, type KeelExplicitExternalPreview } from "./external-preview.js";
+import { assertKeelRegisteredNativeGzipProof, type KeelRegisteredNativeGzipProof } from "./registered-native-gzip.js";
+import { resolveKeelTokenURIReadBounds, assertKeelNonstandardTokenURIIdentity, keelTokenURIRpcResponseBytes, type KeelExplicitNonstandardReadPolicy } from "@keel/protocol";
+import { keelRpcReaderTransport } from "./rpc.js";
 import { auditKeelInlineTokenURI } from "./inline-transport-audit.js";
-import { keelInlineReadGasLimit } from "./presentation.js";
 
-const MAX_URI = 2_000_000;
 const decoder = new TextDecoder("utf-8", { fatal: true, ignoreBOM: true });
 const quantity = (value: unknown): bigint => {
   if (typeof value !== "string" || !/^0x[0-9a-f]{1,64}$/iu.test(value)) throw new TypeError("Invalid RPC quantity.");
@@ -9,9 +11,20 @@ const quantity = (value: unknown): bigint => {
 };
 /** Read-only, bounded, block-pinned user-facing audit. Never signs or submits. */
 export async function readKeelInlineTokenAudit(input: {
-  readonly rpcUrl: string; readonly chainId: number; readonly collection: string; readonly tokenId: string;
+  readonly nonstandardReadPolicy?: KeelExplicitNonstandardReadPolicy;
+  readonly registeredNativeGzip?: KeelRegisteredNativeGzipProof;
+  readonly externalPreview?: KeelExplicitExternalPreview;
+  readonly rpcUrl?: string; readonly chainId: number; readonly collection: string; readonly tokenId: string;
 }, fetcher: typeof fetch = fetch) {
-  const {rpcUrl, chainId, collection, tokenId} = input;
+  const {chainId, collection, tokenId} = input;
+  const externalPreview = input.externalPreview === undefined ? undefined : snapshotKeelExplicitExternalPreview(input.externalPreview);
+  const registeredNativeGzip = input.registeredNativeGzip === undefined ? undefined : assertKeelRegisteredNativeGzipProof(input.registeredNativeGzip);
+  if (registeredNativeGzip !== undefined && registeredNativeGzip.binding.chainId !== chainId) throw new TypeError("Native Gzip readback changed the selected chain.");
+  const bounds = resolveKeelTokenURIReadBounds(input.nonstandardReadPolicy);
+  if (bounds.nonstandardReadPolicy && bounds.nonstandardReadPolicy.identity.chainId !== chainId) throw new TypeError("Nonstandard token read changed chain after acknowledgement.");
+  const transport = keelRpcReaderTransport(input.rpcUrl, chainId);
+  const rpcUrl = transport.rpcUrl;
+  if (fetcher === fetch) fetcher = transport.fetchImpl;
   const endpoint = new URL(rpcUrl);
   if (rpcUrl.length > 2048 || endpoint.username || endpoint.password || endpoint.hash
       || !(endpoint.protocol === "https:" || endpoint.protocol === "http:" && ["localhost", "127.0.0.1", "[::1]"].includes(endpoint.hostname))) throw new TypeError("Use HTTPS RPC or loopback HTTP without URL credentials.");
@@ -38,19 +51,21 @@ export async function readKeelInlineTokenAudit(input: {
   const block = await rpc("eth_getBlockByNumber",["latest",false]) as Record<string,unknown>;
   const blockNumber = quantity(block.number), blockHash = block.hash;
   if (typeof blockHash !== "string" || !/^0x[0-9a-f]{64}$/iu.test(blockHash)) throw new TypeError("Token RPC returned an invalid block hash.");
-  const tag = `0x${blockNumber.toString(16)}`, gasLimit = keelInlineReadGasLimit(quantity(block.gasLimit));
+  const blockGasLimit = quantity(block.gasLimit);
+  const tag = `0x${blockNumber.toString(16)}`, gasLimit = blockGasLimit < bounds.maximumReadGas ? blockGasLimit : bounds.maximumReadGas;
   const code = await rpc("eth_getCode",[collection,tag]);
   if (typeof code !== "string" || !/^0x(?:[0-9a-f]{2})+$/iu.test(code)) throw new Error("The selected collection has no code at the pinned block.");
-  const result = await rpc("eth_call",[{to:collection,data:`0xc87b56dd${BigInt(tokenId).toString(16).padStart(64,"0")}`,gas:`0x${gasLimit.toString(16)}`},tag],MAX_URI * 2 + 4096);
+  const result = await rpc("eth_call",[{to:collection,data:`0xc87b56dd${BigInt(tokenId).toString(16).padStart(64,"0")}`,gas:`0x${gasLimit.toString(16)}`},tag],bounds.nonstandardReadPolicy === undefined ? bounds.maximumRpcResponseBytes : Math.min(bounds.maximumRpcResponseBytes, keelTokenURIRpcResponseBytes(bounds.nonstandardReadPolicy.identity.completeTokenUriBytes)));
   if (typeof result !== "string" || !/^0x(?:[0-9a-f]{2})+$/iu.test(result)) throw new TypeError("Invalid tokenURI ABI return.");
   const bytes = new Uint8Array(Buffer.from(result.slice(2),"hex"));
   const word = (offset:number) => BigInt("0x" + Buffer.from(bytes.slice(offset,offset+32)).toString("hex"));
   if (bytes.length < 64 || word(0) !== 32n) throw new TypeError("TokenURI is not a canonical ABI string return.");
   const length = word(32);
-  if (length > BigInt(MAX_URI) || bytes.length !== 64 + Math.ceil(Number(length)/32)*32
+  if (length > BigInt(bounds.maximumTokenUriBytes) || bytes.length !== 64 + Math.ceil(Number(length)/32)*32
       || bytes.slice(64+Number(length)).some(byte=>byte!==0)) throw new RangeError("TokenURI ABI length/padding is invalid or oversized.");
   const tokenURI = decoder.decode(bytes.slice(64,64+Number(length)));
-  const audit = await auditKeelInlineTokenURI(tokenURI);
+  const audit = await auditKeelInlineTokenURI(tokenURI, { ...(bounds.nonstandardReadPolicy === undefined ? {} : { nonstandardReadPolicy: bounds.nonstandardReadPolicy }), ...(registeredNativeGzip === undefined ? {} : { registeredNativeGzip }), ...(externalPreview === undefined ? {} : { externalPreview }) });
+  assertKeelNonstandardTokenURIIdentity(bounds.nonstandardReadPolicy, { chainId, digest: audit.tokenURIIntegrity.digest, byteLength: new TextEncoder().encode(tokenURI).length });
   const after = await rpc("eth_getBlockByNumber",[tag,false]) as Record<string,unknown>;
   if (after.hash !== blockHash || quantity(await rpc("eth_chainId",[])) !== BigInt(chainId)) throw new Error("Token chain/block changed during the audit.");
   return {schema:"keel-public-token-audit@1" as const,chainId,collection:collection.toLowerCase(),tokenId,

@@ -16,7 +16,18 @@ test('motion preview preserves two distinct frames in a real AVIF sequence',asyn
   const dir=await mkdtemp(path.join(tmpdir(),'keel-avif-test-'));
   try{
     const file=path.join(dir,'preview.avif');await writeFile(file,avif);
-    const decoded=execFileSync(encoder.binary,['-v','error','-i',file,'-f','rawvideo','-pix_fmt','rgba','pipe:1']);
+    // Reviewed platform builds expose either one timed sequence or a separate
+    // primary still followed by that sequence. Verify the actual stream layout.
+    const {spawnSync}=await import('node:child_process');
+    const streamProbe=spawnSync(encoder.binary,['-hide_banner','-i',file,'-t','0','-map','0:v:0','-f','null','-'],{encoding:'utf8'});
+    assert.equal(streamProbe.status,0,streamProbe.stderr);
+    const streams=streamProbe.stderr.split('Output #')[0].split('\n').filter(line=>/^\s*Stream #.*Video:/u.test(line));
+    assert.ok(streams.length===1||streams.length===2,`Unexpected AVIF video streams: ${streams.length}`);
+    if(streams.length===2){
+      const primary=execFileSync(encoder.binary,['-v','error','-i',file,'-map','0:v:0','-f','rawvideo','-pix_fmt','rgba','pipe:1']);
+      assert.equal(primary.length,16);assert.ok(primary[0]>200&&primary[2]<40);
+    }
+    const decoded=execFileSync(encoder.binary,['-v','error','-i',file,'-map',streams.length===2?'0:v:1':'0:v:0','-fps_mode','passthrough','-f','rawvideo','-pix_fmt','rgba','pipe:1']);
     assert.equal(decoded.length,32);assert.ok(decoded[0]>200&&decoded[2]<40);assert.ok(decoded[16]<40&&decoded[18]>200);
   }finally{await rm(dir,{recursive:true,force:true});}
 });

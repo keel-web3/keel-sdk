@@ -1,0 +1,119 @@
+TAP version 13
+# Subtest: contract-returned canonical link URI verifies each HTTPS fetch before mounting artwork
+    # Subtest: SDK enum meanings match Solidity, including distinct Hold and link compression
+    ok 1 - SDK enum meanings match Solidity, including distinct Hold and link compression
+      ---
+      duration_ms: 3.175967
+      type: 'test'
+      ...
+    # Subtest: valid original, same-length tampering, restoration at the same HTTPS URL
+    ok 2 - valid original, same-length tampering, restoration at the same HTTPS URL
+      ---
+      duration_ms: 1795.2763
+      type: 'test'
+      ...
+    # Subtest: Keccak commitments verify and detect changed bytes
+    ok 3 - Keccak commitments verify and detect changed bytes
+      ---
+      duration_ms: 1137.912386
+      type: 'test'
+      ...
+    # Subtest: gzip and deflate verify decoded content; decompression overruns fail
+    ok 4 - gzip and deflate verify decoded content; decompression overruns fail
+      ---
+      duration_ms: 2240.128456
+      type: 'test'
+      ...
+    # Subtest: redirects, CORS rejection and oversized streams do not create frames
+    ok 5 - redirects, CORS rejection and oversized streams do not create frames
+      ---
+      duration_ms: 1622.746591
+      type: 'test'
+      ...
+    # Subtest: locator text stays data and cannot terminate the shell script
+    ok 6 - locator text stays data and cannot terminate the shell script
+      ---
+      duration_ms: 632.399649
+      type: 'test'
+      ...
+    # Subtest: direct image bytes use the pinned canonical asset-display module
+    ok 7 - direct image bytes use the pinned canonical asset-display module
+      ---
+      duration_ms: 629.365034
+      type: 'test'
+      ...
+    # Subtest: unsupported decoder and entry media fail at the contract
+    ok 8 - unsupported decoder and entry media fail at the contract
+      ---
+      duration_ms: 137.615423
+      type: 'test'
+      ...
+    # Subtest: IPNS uses its gateway through the canonical shell and rejects raw/custom delivery
+    ok 9 - IPNS uses its gateway through the canonical shell and rejects raw/custom delivery
+      ---
+      duration_ms: 591.636081
+      type: 'test'
+      ...
+    # Subtest: bare/custom HTTPS denied; bare immutable locators returned unchanged
+    ok 10 - bare/custom HTTPS denied; bare immutable locators returned unchanged
+      ---
+      duration_ms: 92.65403
+      type: 'test'
+      ...
+    1..10
+ok 1 - contract-returned canonical link URI verifies each HTTPS fetch before mounting artwork
+  ---
+  duration_ms: 9372.018161
+  type: 'test'
+  ...
+# Subtest: CDP navigates an exact oversized UTF8 data URI with the original 2500ms virtual budget
+ok 2 - CDP navigates an exact oversized UTF8 data URI with the original 2500ms virtual budget
+  ---
+  duration_ms: 550.167678
+  type: 'test'
+  ...
+# Subtest: CDP navigates an exact oversized UTF8 data URI with the original 5000ms virtual budget
+ok 3 - CDP navigates an exact oversized UTF8 data URI with the original 5000ms virtual budget
+  ---
+  duration_ms: 542.180961
+  type: 'test'
+  ...
+# Subtest: the protected K shell mounts only verified art inside an opaque network-denied frame
+ok 4 - the protected K shell mounts only verified art inside an opaque network-denied frame
+  ---
+  duration_ms: 1518.288934
+  type: 'test'
+  ...
+# Subtest: the marketplace-safe prepared animation URI installs token context before the K shell launches
+ok 5 - the marketplace-safe prepared animation URI installs token context before the K shell launches
+  ---
+  duration_ms: 483.736583
+  type: 'test'
+  ...
+# Subtest: the compact escaped animation URI is directly browser-readable without inner Base64 decoding
+ok 6 - the compact escaped animation URI is directly browser-readable without inner Base64 decoding
+  ---
+  duration_ms: 563.986341
+  type: 'test'
+  ...
+# Subtest: the unchanged canonical shell rejects changed artwork bytes and accepts the original again
+ok 7 - the unchanged canonical shell rejects changed artwork bytes and accepts the original again
+  ---
+  duration_ms: 1310.922649
+  type: 'test'
+  ...
+# Subtest: canonical chrome displays logical token identity and supply without an audit claim
+ok 8 - canonical chrome displays logical token identity and supply without an audit claim
+  ---
+  duration_ms: 458.038538
+  type: 'test'
+  ...
+1..8
+# tests 18
+# suites 0
+# pass 18
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 15452.786557

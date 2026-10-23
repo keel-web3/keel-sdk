@@ -5,6 +5,16 @@ description: Plan and prepare KEEL 1/1s, collections, reusable browser-art modul
 
 # Fray KEEL Agent
 
+**Account connection default:** Use `keel-studio-connect` (`start` → open its public `approveUrl` for the user → `complete`) before private draft/staging work. The SDK privately saves the approved scoped grant for this workspace and Studio origin. Do not ask for a key in chat or an environment file. The cross-platform terminal/browser helper is `pnpm studio:connect --window --workspace <project>`; manual import uses the hidden `--import-key` prompt. Desktop is entirely optional. Only the user approves account access and wallet actions. Read `docs/KEEL_STUDIO_WALLET_REVIEW.md`.
+
+**Website first:** Default to https://studio.onkeel.io for the full creator
+workflow, using the user's existing Studio account and connected wallet.
+KEEL Desktop is entirely optional. Do not require its installation/build,
+another wallet setup, or a separate signing page. Stage creator files, create
+an account-scoped release draft, and give the user its `handoffUrl` or
+`reviewUrl` for website review and wallet approval. The agent never signs.
+Read `docs/KEEL_STUDIO_WALLET_REVIEW.md` for exact SDK/MCP steps.
+
 **Shared storage and shell policy:** Default payloadStorage is Compact: native bytes stored once, beneficial compatible lossless compression, no generated encoded sibling. Raw preserves supplied bytes and intentional creator formatting. Shell selection is independent. Default to the registered KEEL verification shell; explicit viewer=none preserves creator-owned HTML/direct artifacts without a canonical protection claim. Requirements below for canonical shell records, protected K, and canonical mounting apply to the verification-shell choice. Native-container composers require native storage inventory, decoded source and selected-chain reader proof; their transient return encoding is not another stored copy. Read `docs/KEEL_PAYLOAD_STORAGE.md` and `docs/KEEL_BINARY_RESOURCE_DELIVERY.md`. Persist both choices and reject unsupported readers instead of silently changing storage or presentation.
 
 **Payload storage default:** Compact stores native bytes once and compares supported lossless compression; keep none when compression does not save bytes. Raw preserves exact supplied bytes and intentional creator-authored encodings without automatic compression. Do not generate a stored Base64/hex sibling for either choice. Prepared-COPY UTF-8 text uses storedText/none with exact byte verification; native compressed binary needs a verified compatible reader/composer. Existing prepared objects use exact assembly-only reuse. MIME type labels content; ;base64 selects decoding. Padding/newlines align already encoded slices and do not preserve arbitrary unencoded middle bytes. Read docs/KEEL_PAYLOAD_STORAGE.md and docs/KEEL_INLINE_PAYLOAD_BOUNDARIES.md. Audit actual stored objects separately from returned bytes; registry and browser proof remain separate.
@@ -31,6 +41,15 @@ existing graph objects before editing or wallet review. Complete-document
 Base64 prohibitions for new preparation do not authorize replacing an existing
 prepared Base64 copy binding.
 
+## Supported local MCP updates
+
+Use maintained `keel-web3/keel-sdk` `master` for local MCP. The historical
+`codex/studio-agent-connect` branch can report the same package versions while
+missing newer discovery. Inspect the active executable, source commit and tool
+schema, then follow `docs/FRIEND_QUICKSTART.md#update-an-existing-local-mcp`.
+Preserve local changes, custom skills, artwork paths and account pairing. Hosted
+MCP needs no local update; a local MCP update needs only the SDK checkout.
+
 ## Contract work is always a KEEL workflow
 
 When the request mentions a contract, collection, viewer, token metadata,
@@ -38,8 +57,12 @@ deployment, or release—even when it comes from an already detailed project
 context—do this automatically before editing or deploying:
 
 1. Read the target repository's `README.md` and the relevant `docs/` files for
-   architecture, contracts, modules, presentation, and the named edge case.
-2. Read `keel://mcp/engine` or call `keel-engine-catalog`.
+   architecture, contracts, modules, presentation, and the named edge case,
+   then call `keel-contract-workflow-preflight` and keep its `receipt.id`.
+2. Read `keel://mcp/engine` or call `keel-engine-catalog`. Proof-of-work mints
+   use the `mined-hash` mint system and upgradeable controllers use the
+   `module-router-controller` pattern; follow their `checks` exactly instead of
+   hand-rolling a design.
 3. Inspect the exact selected chain with `keel-network-inspect`.
 4. Search the selected-chain module/library catalog with `keel-library-search`.
 5. Resolve existing collections, proxies, graph revisions, shell/builder
@@ -148,7 +171,15 @@ replace a fixed reader. Use `inspectKeelInlineExistingObjectReuse` with
 `existingObjectReuse: { mode: "assembly-only", chainId, store }` for SDK work;
 its local byte checks do not authenticate chain evidence or grant authority.
 
-Only for explicitly new or changed source, call `keel-inline-prepare` without a
+For fresh modular game files using the index-selected modern creator factory/renderer,
+call `keel-creator-inline-prepare` (SDK: `prepareKeelCreatorInline`). It defaults
+to the `creator-inline-20261005` store and automatically prepares Brotli when
+smaller, escaped Base90 COPY carriers, container commitments and the registered
+gzip/Base64 shell references. Authenticate those exact shell references; keep
+the fee-aware upload, complete URI/MCP, gas, offline browser and mint read-back
+gates. Read `docs/KEEL_CREATOR_PREPARED_INLINE.md` and the Sepolia tester handoff.
+
+For other explicitly new or changed source, call `keel-inline-prepare` without a
 carriage override. New compact preparation uses the raw-percent builder:
 resource packing happens once and the complete HTML/metadata receive no new
 Base64 wrapper. Existing bound carriage is retained automatically; the creator
@@ -295,3 +326,66 @@ authentication, registered runtime and browser proof remain separate. Report
 the full returned size separately from compressed/stored bytes; 900 KB is not
 a universal promise. Direct wallet programs must call the same check; the
 SDK/MCP cannot intercept arbitrary programs.
+
+### RPC failures and provider setup
+
+Start chain-dependent work with `keel-network-discover`, then `keel-network-check`.
+The configured public index establishes recorded deployments, selected chain and
+active creator instance; wallet/faucet lists and source modules do not. Respect
+`.keel/config.json` and `KEEL_CHAIN_ID`/`KEEL_DEPLOYMENT_INSTANCE`/`KEEL_NETWORK_INDEX_URL`.
+Read-only tools default to the selected indexed network public RPC pool, with per-provider pacing, rate-limit cooldowns and bounded failover.
+Use `keel-rpc-check`; a successful chain-ID read alone does not prove historical
+receipt access. If a tool returns `rpc.setup-required`, explain its reason and
+retry-after, ask which provider the user prefers, and help set up an endpoint for the selected chain
+with Alchemy, Infura or QuickNode. From the SDK checkout, run
+`pnpm rpc:configure --workspace /path/to/artwork` to save private local settings,
+then `pnpm rpc:check --workspace /path/to/artwork` and the exact failed check.
+Read `docs/KEEL_RPC_SETUP.md`. Never request wallet keys, seed phrases or RPC API
+keys in chat; keep keyed URLs out of Git, logs and artwork. Do not bypass missing
+receipts or change chains. No browser minting page is implied by this workflow.
+
+Read [KEEL_NETWORK_DISCOVERY.md](../../docs/KEEL_NETWORK_DISCOVERY.md) for normal network discovery, configuration and selected-chain verification.
+
+## Studio collector access
+
+Use the Studio website for lists and condition setup; Desktop is optional. Read `docs/STUDIO_ACCESS.md` and the site's `/api/access/schema`. Request `access:read` and `access:write` through the user-approved secure connection; never assume a draft grant includes them. Local MCP `keel-studio-access` can read/update/test creator-owned lists and handle an external signer's pending packets. Remote MCP uses `keel_access_read/update/test/requests/approve`. Preserve revisions and unrelated member allocations/statuses. For unsupported social/history/custom sources use explicit agent-managed verification with real evidence. Never call an unavailable provider verified. A caller-owned signer keeps its key locally and sends only a signature over the reviewed packet. NFT ID consumption uses the onchain ERC-721 claim bitmap; ordinary ownership and ERC-1155/ERC-20 balances are separate reusable checks. Publishing/minting still needs the user's selected wallet in Studio.
+
+## Recover a failed paid release
+
+Keep the existing release, artifact, storage objects, metadata, owner and supply.
+Do not reupload, create a replacement release, switch delivery or retry unchanged calldata.
+A successful standalone tokenURI read is not proof that the complete wallet transaction fits.
+`InvalidPresentation()` can hide an envelope validator exhausting execution gas;
+removing a duplicate preview URI alone does not repair an over-budget reader.
+
+Run `keel-studio-draft` with `operation: "diagnose"` first (`drafts:read`).
+For one fully reverted atomic receipt, use `operation: "recover"`, the saved
+`releaseId`, `operationId` and `transactionHashes: [failedHash]` (`drafts:write`).
+The SDK client method is `client.recover(releaseId, operationId, [failedHash])`;
+the hosted MCP equivalent is `keel_release_recover`. Studio verifies the exact
+creator, selected chain, ordered calls and canonical receipt, retains the old
+operation, and unlocks another review without uploading, signing or submitting.
+Pending, unknown, mismatched or partially successful batches stay preserved.
+Then diagnose that same release. Prepare a new Studio website review only when
+the actual complete atomic wallet program passes selected-fork transaction
+validation and the final tokenURI matches the expected bytes. Keep regular
+execution gas, state gas and public read budgets separate. A platform reader
+deployment needs its own approval and deployed runtime proof; an agent cannot
+fix missing infrastructure by requesting another creator signature.
+
+Hosted Studio handles the entire workflow. Desktop is optional. Return the
+server-issued website review link for the existing connected wallet; do not
+build a new signing page or ask for keys in chat. Receipts and public read-back,
+not a prepared link, establish publication success.
+
+Sepolia simulation must use a consistent compatible provider. The public HTTP pool can return contradictory results for the same pinned request. Hosted Studio uses a persistent compatible Geth connection, chosen before any project calldata is sent, and never retries a reverted program to obtain success. SDK integrations can use `createKeelSepoliaSimulationTransport()` and close it when finished. The full atomic transaction is validated against the selected fork; collector metadata has its separate public-read budget.
+
+For exact reverted-receipt recovery, Hosted Studio preserves an existing plan confirmation at the same draft revision when only platform infrastructure changed and all creator terms, access phases and committed resources are identical. Do not restart or edit that unchanged plan to resolve a reader update. Fresh complete-transaction gas validation and exact collector metadata comparison remain required before the corrected Studio wallet review.
+
+Sepolia publication preflight probes the simulator version and transaction capacity using public empty calls on the exact retained socket before sending project calldata. It checks the actual gas envelope on every simulation response. Silent RPC gas clamping is a provider limit, not a contract compatibility failure. Never replay a failed program on another backend to manufacture success. Use receipt recovery and a fresh complete Studio wallet review; Desktop is optional.
+
+Before declaring an EVM module immutable or replacing infrastructure, run `keel-manager-modules-inspect` with the selected Hold or actual managed collection. Follow `presentationModule`, `composerManager` and `composerModuleId`; the manager selects replacements using `configureModule` through `executeGovernance`. Use `keel-manager-module-replacement-prepare` for unsigned preparation and verify consumer compatibility, existing artwork/resource byte parity and expected tokenURI context and read gas before signing. Publication references expose these bindings under `managedRoute`. Preserve unchanged engine objects.
+
+## Contract workflow evidence
+
+Contract preparation preflight returns a content-addressed receipt. Run the token standard audit for token, collection, metadata or viewer work and pass `standards: { preflightReceipt, auditDigest }` to wallet-request tools. Preserve explicit viewer=none and Compact/Raw choices; canonical protection checks apply to the verification-shell route. Use the actual selected-chain transaction policy, keeping total and execution gas distinct. Preparation never signs or broadcasts.

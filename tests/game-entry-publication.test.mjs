@@ -14,7 +14,7 @@ test("site and game publications use one module with distinct entries and option
     keelAudioScripts: async () => ["audio-script"],
     buildGameDocument: async (gameId, workspace, options) => {
       calls.push({ gameId, workspace, options });
-      return { html: new Uint8Array() };
+      return { html: new Uint8Array(), modules: [], document: { parts: [] } };
     },
   };
   try {

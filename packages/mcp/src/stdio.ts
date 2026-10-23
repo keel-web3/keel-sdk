@@ -1,3 +1,4 @@
+import type { McpPluginOptions } from "./plugins.js";
 import { createMcpServer } from "./server.js";
 import type { StdioInput, StdioOutput } from "./types.js";
 
@@ -11,8 +12,9 @@ export async function runStdio(
   input: StdioInput = (process as unknown as { readonly stdin: StdioInput }).stdin,
   output: StdioOutput = process.stdout,
   workspaceRoot = ".",
+  options: McpPluginOptions = {},
 ): Promise<void> {
-  const server = await createMcpServer({ workspaceRoot });
+  const server = await createMcpServer({ workspaceRoot, ...options });
   let buffer = "";
   let droppingOversized = false;
   let queue = Promise.resolve();
@@ -22,14 +24,15 @@ export async function runStdio(
       output.write(lineResponse({ jsonrpc: "2.0", id: null, error: { code: -32600, message: "JSON-RPC frame exceeds the 1 MiB limit." } }));
       return;
     }
+    let message: unknown;
+    try { message = JSON.parse(line) as unknown; }
+    catch { output.write(lineResponse({ jsonrpc: "2.0", id: null, error: { code: -32700, message: "Invalid JSON." } })); return; }
+    // Cancellation must reach the running tool instead of waiting behind it.
+    if (message && typeof message === "object" && !Array.isArray(message) && !("id" in message)
+      && "method" in message && ["notifications/cancelled", "$/cancelRequest"].includes(String(message.method))) {
+      void server.handle(message).catch(() => undefined); return;
+    }
     queue = queue.then(async () => {
-      let message: unknown;
-      try {
-        message = JSON.parse(line) as unknown;
-      } catch {
-        output.write(lineResponse({ jsonrpc: "2.0", id: null, error: { code: -32700, message: "Invalid JSON." } }));
-        return;
-      }
       try {
         const response = await server.handle(message);
         if (response !== undefined) output.write(lineResponse(response));

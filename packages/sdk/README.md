@@ -1,5 +1,10 @@
 # `@keel/sdk`
 
+Use https://studio.onkeel.io for the default creator and wallet-review flow.
+The SDK creates account-scoped Studio drafts and returns `reviewUrl`; the
+user reviews and signs in the website with their existing wallet. Desktop is
+optional. See [Studio wallet review](../../docs/KEEL_STUDIO_WALLET_REVIEW.md).
+
 Framework-neutral types, validation, ABIs, and EIP-712 helpers for the Keel contracts. The package deliberately does not depend on a wallet stack; its output can be passed to viem, ethers, wagmi, a relayer, or a smart-account client.
 
 ## Choose Inline, Hybrid, or IPFS without changing storage
@@ -477,3 +482,9 @@ Verify the exact account delegation, delegate runtime hash, configured manager
 and manager runtime hash against `KEEL_METAMASK_SETUP_PROFILE` before using it.
 The logical plan commitment remains unchanged. Extension UI acceptance and the
 owner's actual receipt are separate from public call simulation and fork tests.
+
+## Signed anchor approvals
+
+[Signed anchor preparation](../../docs/KEEL_SIGNED_ANCHORS.md) explains the offline
+service API, source-observer responsibility, EIP-712 binding, relay calldata and
+native Tezos receipt boundary.

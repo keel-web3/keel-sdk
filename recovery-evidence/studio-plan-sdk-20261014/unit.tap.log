@@ -1,0 +1,460 @@
+TAP version 13
+# Subtest: shared planner no longer auto-acknowledges a fresh Base64 carriage
+ok 1 - shared planner no longer auto-acknowledges a fresh Base64 carriage
+  ---
+  duration_ms: 2505.933276
+  type: 'test'
+  ...
+# Subtest: environment configuration cannot bypass fresh encoding review
+ok 2 - environment configuration cannot bypass fresh encoding review
+  ---
+  duration_ms: 5.391666
+  type: 'test'
+  ...
+# Subtest: complete compact COPY retains exact prepared bytes and binds the plan
+ok 3 - complete compact COPY retains exact prepared bytes and binds the plan
+  ---
+  duration_ms: 1821.228817
+  type: 'test'
+  ...
+# Subtest: complete pinned COPY retains exact prepared bytes and binds the plan
+ok 4 - complete pinned COPY retains exact prepared bytes and binds the plan
+  ---
+  duration_ms: 909.781109
+  type: 'test'
+  ...
+# Subtest: complete percent COPY retains exact prepared bytes and binds the plan
+ok 5 - complete percent COPY retains exact prepared bytes and binds the plan
+  ---
+  duration_ms: 1652.266146
+  type: 'test'
+  ...
+# Subtest: SDK refuses a prepared viewer plan with missing full-return evidence
+ok 6 - SDK refuses a prepared viewer plan with missing full-return evidence
+  ---
+  duration_ms: 1019.326221
+  type: 'test'
+  ...
+# Subtest: SDK stops a different return, transport or source before producing a plan
+ok 7 - SDK stops a different return, transport or source before producing a plan
+  ---
+  duration_ms: 1057.259934
+  type: 'test'
+  ...
+# Subtest: COPY checks are commitment-bound and cannot be stripped or moved to another chain/store
+ok 8 - COPY checks are commitment-bound and cannot be stripped or moved to another chain/store
+  ---
+  duration_ms: 939.299477
+  type: 'test'
+  ...
+# Subtest: read caps use the selected chain boundary and never stand in for authenticated gas proof
+ok 9 - read caps use the selected chain boundary and never stand in for authenticated gas proof
+  ---
+  duration_ms: 906.877777
+  type: 'test'
+  ...
+# Subtest: fresh MCP cannot select an alternative carriage under another presentation label
+ok 10 - fresh MCP cannot select an alternative carriage under another presentation label
+  ---
+  duration_ms: 1037.619832
+  type: 'test'
+  ...
+# Subtest: MCP publish-plan requires evidence, reruns the SDK gate and rejects file tampering
+ok 11 - MCP publish-plan requires evidence, reruns the SDK gate and rejects file tampering
+  ---
+  duration_ms: 1282.893443
+  type: 'test'
+  ...
+# Subtest: publication rejects browser-tolerated unescaped outer metadata
+ok 12 - publication rejects browser-tolerated unescaped outer metadata
+  ---
+  duration_ms: 756.432337
+  type: 'test'
+  ...
+# Subtest: publication rejects unescaped animation even when outer metadata is escaped
+ok 13 - publication rejects unescaped animation even when outer metadata is escaped
+  ---
+  duration_ms: 610.775443
+  type: 'test'
+  ...
+# Subtest: MCP publication check rejects unescaped characters at either URI boundary
+ok 14 - MCP publication check rejects unescaped characters at either URI boundary
+  ---
+  duration_ms: 1523.917734
+  type: 'test'
+  ...
+# Subtest: the verification shell remains the strict shared default; creator-owned is explicit
+ok 15 - the verification shell remains the strict shared default; creator-owned is explicit
+  ---
+  duration_ms: 7.652368
+  type: 'test'
+  ...
+# Subtest: creator-owned Compact and Raw retain exact UTF-8 HTML in one creator payload
+ok 16 - creator-owned Compact and Raw retain exact UTF-8 HTML in one creator payload
+  ---
+  duration_ms: 62.528975
+  type: 'test'
+  ...
+# Subtest: prepared metadata carries creator-owned HTML through the existing raw COPY builder
+ok 17 - prepared metadata carries creator-owned HTML through the existing raw COPY builder
+  ---
+  duration_ms: 102.076591
+  type: 'test'
+  ...
+# Subtest: explicit Raw preserves intentional creator-authored encoded markup without generating a sibling
+ok 18 - explicit Raw preserves intentional creator-authored encoded markup without generating a sibling
+  ---
+  duration_ms: 17.08978
+  type: 'test'
+  ...
+# Subtest: creator-owned HTML rejects missing, malformed, remote and adjacent runtime dependencies
+ok 19 - creator-owned HTML rejects missing, malformed, remote and adjacent runtime dependencies
+  ---
+  duration_ms: 6.860736
+  type: 'test'
+  ...
+# Subtest: Raw keeps embedded unquoted references and CSS data imports exactly supplied
+ok 20 - Raw keeps embedded unquoted references and CSS data imports exactly supplied
+  ---
+  duration_ms: 8.060071
+  type: 'test'
+  ...
+# Subtest: compiler emits exact paid calls, predicted factory binding, mint route and full URI but no wallet request
+ok 21 - compiler emits exact paid calls, predicted factory binding, mint route and full URI but no wallet request
+  ---
+  duration_ms: 6846.977183
+  type: 'test'
+  ...
+# Subtest: compiler rejects existing collections and mint manager drift before payment
+ok 22 - compiler rejects existing collections and mint manager drift before payment
+  ---
+  duration_ms: 13648.762851
+  type: 'test'
+  ...
+# Subtest: compiler rejects missing transaction fees and invalid gas/URI bounds
+ok 23 - compiler rejects missing transaction fees and invalid gas/URI bounds
+  ---
+  duration_ms: 4183.583532
+  type: 'test'
+  ...
+# Subtest: journal identity binds source, settings, exact fee quote and all source calls
+ok 24 - journal identity binds source, settings, exact fee quote and all source calls
+  ---
+  duration_ms: 7301.873156
+  type: 'test'
+  ...
+# Subtest: exact cached validation is reused, while changed source calls change journal identity
+ok 25 - exact cached validation is reused, while changed source calls change journal identity
+  ---
+  duration_ms: 15950.193914
+  type: 'test'
+  ...
+# Subtest: managed payload above 512KiB preserves its exact prepared graph under fee-aware publication
+ok 26 - managed payload above 512KiB preserves its exact prepared graph under fee-aware publication
+  ---
+  duration_ms: 10231.580376
+  type: 'test'
+  ...
+# Subtest: creator files automatically become modular Brotli/Base90 COPY objects with exact table commitments
+ok 27 - creator files automatically become modular Brotli/Base90 COPY objects with exact table commitments
+  ---
+  duration_ms: 2327.892972
+  type: 'test'
+  ...
+# Subtest: missing or duplicate entrypoints, empty resources and unsupported bindings reject before publication
+ok 28 - missing or duplicate entrypoints, empty resources and unsupported bindings reject before publication
+  ---
+  duration_ms: 4.01015
+  type: 'test'
+  ...
+# Subtest: address spelling cannot change registered shell bytes or container commitments
+ok 29 - address spelling cannot change registered shell bytes or container commitments
+  ---
+  duration_ms: 2914.962741
+  type: 'test'
+  ...
+# Subtest: shared creator compression default and explicit Off retain resource identity and account for decoder overhead
+ok 30 - shared creator compression default and explicit Off retain resource identity and account for decoder overhead
+  ---
+  duration_ms: 2519.207185
+  type: 'test'
+  ...
+# Subtest: prepared route authenticates pinned infrastructure and exact registered shell at one block before creating a local plan
+ok 31 - prepared route authenticates pinned infrastructure and exact registered shell at one block before creating a local plan
+  ---
+  duration_ms: 8157.814624
+  type: 'test'
+  ...
+# Subtest: wrong runtime, binding, codec revision, cached digest or shell bytes fail before returning a prepared route
+ok 32 - wrong runtime, binding, codec revision, cached digest or shell bytes fail before returning a prepared route
+  ---
+  duration_ms: 13112.053227
+  type: 'test'
+  ...
+# Subtest: authentication awaits cannot replace original publication bytes, aliases, poster or policy
+ok 33 - authentication awaits cannot replace original publication bytes, aliases, poster or policy
+  ---
+  duration_ms: 3072.750855
+  type: 'test'
+  ...
+# Subtest: authentication awaits retain the entry pool, selected instance and immutable deployment records
+ok 34 - authentication awaits retain the entry pool, selected instance and immutable deployment records
+  ---
+  duration_ms: 3835.859423
+  type: 'test'
+  ...
+# Subtest: MCP copies exact base64 references with zero writes
+ok 35 - MCP copies exact base64 references with zero writes
+  ---
+  duration_ms: 609.406718
+  type: 'test'
+  ...
+# Subtest: MCP copies exact raw references with zero writes
+ok 36 - MCP copies exact raw references with zero writes
+  ---
+  duration_ms: 168.822359
+  type: 'test'
+  ...
+# Subtest: MCP copies exact percent references with zero writes
+ok 37 - MCP copies exact percent references with zero writes
+  ---
+  duration_ms: 64.21231
+  type: 'test'
+  ...
+# Subtest: MCP copies exact follow-latest references with zero writes
+ok 38 - MCP copies exact follow-latest references with zero writes
+  ---
+  duration_ms: 201.171588
+  type: 'test'
+  ...
+# Subtest: MCP preserves an existing asset slot without preparing another copy
+ok 39 - MCP preserves an existing asset slot without preparing another copy
+  ---
+  duration_ms: 128.458078
+  type: 'test'
+  ...
+# Subtest: MCP rejects binary, mixed carriage, altered bytes, and unsafe preparation overrides
+ok 40 - MCP rejects binary, mixed carriage, altered bytes, and unsafe preparation overrides
+  ---
+  duration_ms: 136.80389
+  type: 'test'
+  ...
+# Subtest: MCP rejects padded raw LZMA labeled as a prepared Base64 body
+ok 41 - MCP rejects padded raw LZMA labeled as a prepared Base64 body
+  ---
+  duration_ms: 50.607175
+  type: 'test'
+  ...
+# Subtest: handshake, preflight, resource and tool discovery expose the same copy policy
+ok 42 - handshake, preflight, resource and tool discovery expose the same copy policy
+  ---
+  duration_ms: 50.338103
+  type: 'test'
+  ...
+# Subtest: distributed MCP skill includes its exact prepared-copy documentation
+ok 43 - distributed MCP skill includes its exact prepared-copy documentation
+  ---
+  duration_ms: 24.511641
+  type: 'test'
+  ...
+# Subtest: prepared aligned Base64 is inferred and copied exactly, with zero new source bytes
+ok 44 - prepared aligned Base64 is inferred and copied exactly, with zero new source bytes
+  ---
+  duration_ms: 389.031713
+  type: 'test'
+  ...
+# Subtest: raw-percent and percent infer exact existing carriages without repadding
+ok 45 - raw-percent and percent infer exact existing carriages without repadding
+  ---
+  duration_ms: 174.724931
+  type: 'test'
+  ...
+# Subtest: full shell plus prepared body media infers follow-latest and preserves body IDs
+ok 46 - full shell plus prepared body media infers follow-latest and preserves body IDs
+  ---
+  duration_ms: 63.325448
+  type: 'test'
+  ...
+# Subtest: explicit mismatching carriage and direct helper fail before fresh encoding
+ok 47 - explicit mismatching carriage and direct helper fail before fresh encoding
+  ---
+  duration_ms: 59.874466
+  type: 'test'
+  ...
+# Subtest: assembly-only requires every ordered part and forbids creator or unused parts
+ok 48 - assembly-only requires every ordered part and forbids creator or unused parts
+  ---
+  duration_ms: 31.655282
+  type: 'test'
+  ...
+# Subtest: selected-chain store and nonzero exact object IDs are mandatory
+ok 49 - selected-chain store and nonzero exact object IDs are mandatory
+  ---
+  duration_ms: 20.363151
+  type: 'test'
+  ...
+# Subtest: unsupported raw binary and mixed prepared media never transcode
+ok 50 - unsupported raw binary and mixed prepared media never transcode
+  ---
+  duration_ms: 13.507635
+  type: 'test'
+  ...
+# Subtest: stored SHA, exact lengths and compression are checked before assembly
+ok 51 - stored SHA, exact lengths and compression are checked before assembly
+  ---
+  duration_ms: 24.046438
+  type: 'test'
+  ...
+# Subtest: source edits, root edits and local unpadded source cannot hide behind old receipts
+ok 52 - source edits, root edits and local unpadded source cannot hide behind old receipts
+  ---
+  duration_ms: 100.139139
+  type: 'test'
+  ...
+# Subtest: shell order, exact Base64 alignment and inconsistent immutable IDs fail closed
+ok 53 - shell order, exact Base64 alignment and inconsistent immutable IDs fail closed
+  ---
+  duration_ms: 16.649543
+  type: 'test'
+  ...
+# Subtest: inspection clones Buffer-backed bytes rather than exposing caller aliasing
+ok 54 - inspection clones Buffer-backed bytes rather than exposing caller aliasing
+  ---
+  duration_ms: 48.708342
+  type: 'test'
+  ...
+# Subtest: ordinary default and explicit local carriage outputs remain byte-identical
+ok 55 - ordinary default and explicit local carriage outputs remain byte-identical
+  ---
+  duration_ms: 39.305075
+  type: 'test'
+  ...
+# Subtest: async digest suspension cannot change selected chain, future receipts, order or carriage
+ok 56 - async digest suspension cannot change selected chain, future receipts, order or carriage
+  ---
+  duration_ms: 14.959832
+  type: 'test'
+  ...
+# Subtest: async digest suspension compares root against its entry-time snapshot
+ok 57 - async digest suspension compares root against its entry-time snapshot
+  ---
+  duration_ms: 113.138631
+  type: 'test'
+  ...
+# Subtest: receipt module identity and execution labels cannot silently override the root
+ok 58 - receipt module identity and execution labels cannot silently override the root
+  ---
+  duration_ms: 195.185682
+  type: 'test'
+  ...
+# Subtest: near-limit source preparation keeps a provisional reserve while the exact complete URI and gas gate remain decisive
+ok 59 - near-limit source preparation keeps a provisional reserve while the exact complete URI and gas gate remain decisive
+  ---
+  duration_ms: 4096.931494
+  type: 'test'
+  ...
+# Subtest: public byte reader accepts an exactly 2,000,000-byte complete Inline return and rejects one byte more
+ok 60 - public byte reader accepts an exactly 2,000,000-byte complete Inline return and rejects one byte more
+  ---
+  duration_ms: 3556.818624
+  type: 'test'
+  ...
+# Subtest: noncanonical ABI framing, UTF-8 corruption and a changed pinned block fail before a public audit
+ok 61 - noncanonical ABI framing, UTF-8 corruption and a changed pinned block fail before a public audit
+  ---
+  duration_ms: 27.319649
+  type: 'test'
+  ...
+# Subtest: ordinary modular paths reach the production byte reader with exact source, codecs and independent IDs
+ok 62 - ordinary modular paths reach the production byte reader with exact source, codecs and independent IDs
+  ---
+  duration_ms: 1299.30082
+  type: 'test'
+  ...
+# Subtest: unsupported identities, alias collisions, Raw and creator-owned shell choices fail before claiming preparation
+ok 63 - unsupported identities, alias collisions, Raw and creator-owned shell choices fail before claiming preparation
+  ---
+  duration_ms: 2.472809
+  type: 'test'
+  ...
+# Subtest: identical bytes share one physical pack and table row while logical IDs, aliases and member copies stay independent
+ok 64 - identical bytes share one physical pack and table row while logical IDs, aliases and member copies stay independent
+  ---
+  duration_ms: 467.147846
+  type: 'test'
+  ...
+# Subtest: table, stored, decoded and member faults cannot pass a prepared source import
+ok 65 - table, stored, decoded and member faults cannot pass a prepared source import
+  ---
+  duration_ms: 1027.071675
+  type: 'test'
+  ...
+# Subtest: fresh descriptors order static imports, side effects and re-exports for the unchanged registered loader
+ok 66 - fresh descriptors order static imports, side effects and re-exports for the unchanged registered loader
+  ---
+  duration_ms: 443.318292
+  type: 'test'
+  ...
+# Subtest: cyclic and undeclared fresh imports stop before producing or inspecting storage objects
+ok 67 - cyclic and undeclared fresh imports stop before producing or inspecting storage objects
+  ---
+  duration_ms: 2.451621
+  type: 'test'
+  ...
+# Subtest: a suspended storage read cannot change original Buffer-backed creator sources
+ok 68 - a suspended storage read cannot change original Buffer-backed creator sources
+  ---
+  duration_ms: 338.498688
+  type: 'test'
+  ...
+# Subtest: metadata and alias mutation while storage awaits cannot change the selected chain, poster or preparation policy
+ok 69 - metadata and alias mutation while storage awaits cannot change the selected chain, poster or preparation policy
+  ---
+  duration_ms: 361.589687
+  type: 'test'
+  ...
+# Subtest: explicit URI81 LZMA and PPMd imports replay exact bytes without changing their declared transport
+ok 70 - explicit URI81 LZMA and PPMd imports replay exact bytes without changing their declared transport
+  ---
+  duration_ms: 990.166946
+  type: 'test'
+  ...
+# Subtest: Studio upload preserves the source-only preparation contract and rejects readiness or external route substitution
+ok 71 - Studio upload preserves the source-only preparation contract and rejects readiness or external route substitution
+  ---
+  duration_ms: 156.553136
+  type: 'test'
+  ...
+# Subtest: stage preserves explicit metadata slots, Raw and creator-owned shell without rewriting original file bytes
+ok 72 - stage preserves explicit metadata slots, Raw and creator-owned shell without rewriting original file bytes
+  ---
+  duration_ms: 7.122981
+  type: 'test'
+  ...
+# Subtest: [test gate] every suite is classified and browser/live checks stay outside the deterministic default
+ok 73 - [test gate] every suite is classified and browser/live checks stay outside the deterministic default
+  ---
+  duration_ms: 81.301838
+  type: 'test'
+  ...
+# Subtest: [test gate] a newly added test is unclassified until its execution boundary is reviewed
+ok 74 - [test gate] a newly added test is unclassified until its execution boundary is reviewed
+  ---
+  duration_ms: 42.202647
+  type: 'test'
+  ...
+# Subtest: [test gate] a removed test leaves a stale manifest entry instead of crashing validation
+ok 75 - [test gate] a removed test leaves a stale manifest entry instead of crashing validation
+  ---
+  duration_ms: 25.722582
+  type: 'test'
+  ...
+1..75
+# tests 75
+# suites 0
+# pass 75
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 89661.067345

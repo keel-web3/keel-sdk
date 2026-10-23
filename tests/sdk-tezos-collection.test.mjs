@@ -10,6 +10,7 @@ import {
   assertKeelTezosEntrypoint,
   buildKeelTezosAllowlistTree,
   buildKeelTezosCollectionFA2Storage,
+  keelTezosRoyaltyTokenMetadata,
   buildKeelTezosTokenInfo,
   checkKeelTezosCollectionPublication,
   decodeKeelTezosTokenMetadataView,
@@ -19,6 +20,7 @@ import {
   keelTezosOneMintMerkleLeaf,
   keelTezosOnchfsDirectoryCid,
   keelTezosOnchfsFileCid,
+  keelTezosOnchfsObjectId,
   planKeelTezosCollectionLaunch,
   planKeelTezosStandardRoute,
   predictKeelTezosOneMintDropId,
@@ -49,6 +51,10 @@ const surface = (contract) => KEEL_TEZOS_MODULES.flatMap((module) => module.entr
 test("the generated catalogue carries source entrypoints and views for every route contract", () => {
   for (const { contract } of Object.values(KEEL_TEZOS_COLLECTION_ROUTE_CONTRACTS)) assert.ok(surface(contract).length > 0, contract);
   assert.ok(surface("KeelCollectionFA2").includes("strike"));
+  // Inherited from the shared KeelNFTLedger source component.
+  for (const inherited of ["transfer", "update_operators", "balance_of", "strike_unreserved", "set_token_owner_can_edit"]) assert.ok(surface("KeelCollectionFA2").includes(inherited), inherited);
+  const views = KEEL_TEZOS_MODULES.flatMap((module) => module.views.KeelCollectionFA2 ?? []);
+  for (const inherited of ["token_metadata", "owner_of", "get_balance", "token_owner_can_edit"]) assert.ok(views.includes(inherited), inherited);
   assert.ok(surface("OneMintController").includes("public_mint"));
   assert.throws(() => assertKeelTezosEntrypoint("KeelCollectionFA2", "mint"), /no catalogued entrypoint/u);
 });
@@ -77,6 +83,33 @@ test("originations stage dependents behind receipt-backed bindings and check com
 test("FA2 storage builder matches the compiled initial storage shape", () => {
   const storage = buildKeelTezosCollectionFA2Storage({ administrator: creator, keelIndex: hold, maxSupply: 100 });
   assert.equal(JSON.stringify(storage).startsWith('{"prim":"Pair","args":[{"int":"1"},{"prim":"Pair","args":[[{"string":"tz1KqTpEZ7Yob7QbPE4Hy4Wo8fHG8LhKxZSx"}]'), true);
+  // 25 compiled fields; default_royalty (6th) is None, pause_authority (15th) defaults to the administrator,
+  // token_owner_can_edit (23rd) defaults to creator-only, and custody presentation (4th) and selected token IDs
+  // (18th, policy 19th) start disabled.
+  const fields = [];
+  for (let node = storage; ; node = node.args[1]) { if (node.prim !== "Pair") { fields.push(node); break; } fields.push(node.args[0]); }
+  assert.equal(fields.length, 25);
+  assert.deepEqual(fields[3], { prim: "None" });
+  assert.deepEqual(fields[5], { prim: "None" });
+  assert.deepEqual(fields[14], { string: creator });
+  assert.deepEqual(fields[17], { prim: "False" });
+  assert.deepEqual(fields[18], { prim: "None" });
+  assert.deepEqual(fields[22], { prim: "False" });
+  const open = buildKeelTezosCollectionFA2Storage({ administrator: creator, keelIndex: hold, maxSupply: 100, holderMetadataEditing: true });
+  const openFields = [];
+  for (let node = open; ; node = node.args[1]) { if (node.prim !== "Pair") { openFields.push(node); break; } openFields.push(node.args[0]); }
+  assert.deepEqual(openFields[22], { prim: "True" });
+  const royal = buildKeelTezosCollectionFA2Storage({ administrator: creator, keelIndex: hold, maxSupply: 100, defaultRoyalty: { receiver: creator, bps: 500 } });
+  const royalFields = [];
+  for (let node = royal; ; node = node.args[1]) { if (node.prim !== "Pair") { royalFields.push(node); break; } royalFields.push(node.args[0]); }
+  assert.deepEqual(royalFields[5], { prim: "Some", args: [{ prim: "Pair", args: [{ string: creator }, { int: "500" }] }] });
+  for (const bps of [0, 10_001, 1.5]) assert.throws(() => buildKeelTezosCollectionFA2Storage({ administrator: creator, keelIndex: hold, maxSupply: 1, defaultRoyalty: { receiver: creator, bps } }), /bps/u);
+  assert.throws(() => buildKeelTezosCollectionFA2Storage({ administrator: creator, keelIndex: hold, maxSupply: 1, defaultRoyalty: { receiver: "tz1burnburnburnburnburnburnburjAYjjX", bps: 1 } }), /burn/u);
+  assert.deepEqual(keelTezosRoyaltyTokenMetadata({ receiver: creator, bps: 500 }), { decimals: 4, shares: { [creator]: 500 } });
+  const staged = prepareKeelTezosCollectionOriginations({ network, creator, maxSupply: 5, royalty: { receiver: creator, bps: 500 }, code: {} });
+  assert.deepEqual(staged.collection.royalty, { receiver: creator, bps: 500, tokenMetadataRoyalties: { decimals: 4, shares: { [creator]: 500 } } });
+  assert.equal(prepareKeelTezosCollectionOriginations({ network, creator, maxSupply: 5, code: {} }).collection.royalty, null);
+  assert.throws(() => buildKeelTezosCollectionFA2Storage({ administrator: creator, keelIndex: hold, maxSupply: 1, holderMetadataEditing: "yes" }), /boolean/u);
   assert.throws(() => buildKeelTezosCollectionFA2Storage({ administrator: "tz1burnburnburnburnburnburnburjAYjjX", keelIndex: hold, maxSupply: 1 }), /burn/u);
 });
 
@@ -89,6 +122,14 @@ test("Hold resources match OnchFS CIDs, dedupe chunks, and fit operation batches
   assert.equal(plan.storage.newChunkCount, Math.ceil(html.length / 16384));
   assert.equal(first.objectId.length, 64);
   assert.notEqual(first.objectId, second.objectId);
+  // The weld carries the descriptor-bound id KeelHoldOnchFS requires, not the manifest digest.
+  assert.equal(first.objectId, keelTezosOnchfsObjectId({ ...first, storedByteLength: first.storedByteLength }));
+  assert.notEqual(first.objectId, first.manifestSha256);
+  const weld = plan.operations.find((operation) => operation.parameters.entrypoint === "weld_object");
+  const flat = (value) => (value.prim === "Pair" ? [value.args[0], ...flat(value.args[1])] : [value]);
+  const weldArgs = flat(weld.parameters.value);
+  assert.deepEqual(weldArgs[7], { bytes: first.objectId });
+  assert.deepEqual(weldArgs[5], { bytes: first.manifestSha256 });
   assert.deepEqual(plan.operations.map((operation) => operation.parameters.entrypoint).filter((name, position, all) => all.indexOf(name) === position), ["write_chunk", "create_file", "weld_object", "create_directory"]);
   for (const batch of plan.batches) assert.ok(batch.length > 0);
   // Exact vectors cross-checked against the official onchfs@0.1.0 library and the Octez mockup.
@@ -103,6 +144,9 @@ test("Hold resources match OnchFS CIDs, dedupe chunks, and fit operation batches
 test("presentation binding publishes, activates and binds the renderer, freezing only on request", () => {
   const plan = prepareKeelTezosPresentationBinding({ network, creator, collection, index, manifestUri: `onchfs://${"ab".repeat(32)}`, manifestDigest: "cd".repeat(32), presentationPolicy: { registry: presentation, salt: "01", mediaType: "text/html", maxBytes: 4096, valueDigest: "cd".repeat(32), byteLength: 100 } });
   assert.deepEqual(plan.operations.map((operation) => operation.parameters.entrypoint), ["register_collection", "publish_collection_revision", "activate_collection_revision", "set_default_presentation", "create_policy", "append_resource_revision"]);
+  // The parity registry accepts only the EVM ValueKind names; a resource revision is "binary".
+  const policyValue = JSON.stringify(plan.operations.find((operation) => operation.parameters.entrypoint === "create_policy").parameters.value);
+  assert.ok(policyValue.includes(Buffer.from("binary").toString("hex")) && !policyValue.includes(Buffer.from("keel-object").toString("hex")));
   assert.equal(plan.binding.frozen, false);
   assert.equal(plan.binding.revisionPolicy, "creator");
   const frozen = prepareKeelTezosPresentationBinding({ network, creator, collection, index, manifestUri: "data:text/html,x", manifestDigest: "cd".repeat(32), registerCollection: false, revision: 2, freeze: true });
@@ -114,6 +158,9 @@ test("mint gate prepares price, supply, allowlist and a paused start with a pred
   const allowlist = [{ account: collector, allowance: 2 }, { account: creator, allowance: 1 }, { account: "tz1faswCTDciRzE4oJ9jn2Vm2dvjeyA9fUzU", allowance: 1 }];
   const plan = prepareKeelTezosMintGate({ network, creator, collection, oneMint, supply: 333, maxPerTransaction: 3, maxPerWallet: 5, metadataDigest: "11".repeat(32), startPaused: true, creatorProfile: { registry, username: "nocturnes", metadataUri: "tezos-storage:profile" }, stages: [{ kind: "merkle", startTime: 0, endTime: 100, priceMutez: 500000, allowlist }, { kind: "public", startTime: 100, endTime: 200, priceMutez: 1000000 }] });
   assert.deepEqual(plan.operations.map((operation) => operation.parameters.entrypoint), ["create_profile", "set_minter", "create_drop"]);
+  // Unset bytes32 profile fields are 32 zero bytes; the parity registry refuses empty bytes.
+  const profileValue = JSON.stringify(plan.operations[0].parameters.value);
+  assert.equal(profileValue.split(`"bytes":"${"00".repeat(32)}"`).length - 1, 2);
   assert.deepEqual(plan.followUp.operations.map((operation) => operation.parameters.entrypoint), ["set_stage_merkle_root", "set_drop_paused"]);
   assert.equal(plan.drop.predictedDropId, predictKeelTezosOneMintDropId({ network, oneMint, creator, target: collection, metadataDigest: "11".repeat(32) }));
   const tree = plan.drop.allowlists[0];
@@ -131,6 +178,24 @@ test("mint gate prepares price, supply, allowlist and a paused start with a pred
   assert.throws(() => prepareKeelTezosMintGateAction({ network, creator, action: "pause", dropId: plan.drop.predictedDropId }), /oneMint/u);
   assert.equal(prepareKeelTezosMintGateAction({ network, creator, oneMint, action: "set-supply", dropId: plan.drop.predictedDropId, supply: 400 }).operation.parameters.entrypoint, "update_drop_supply");
   assert.equal(prepareKeelTezosMintGateAction({ network, creator, oneMint, action: "withdraw" }).operation.parameters.entrypoint, "withdraw");
+  const holders = prepareKeelTezosMintGateAction({ network, creator, action: "set-holder-metadata-editing", collection, enabled: false });
+  assert.equal(holders.operation.parameters.entrypoint, "set_token_owner_can_edit");
+  assert.deepEqual(holders.operation.parameters.value, { prim: "False" });
+  assert.equal(holders.metadataEditing.holders, false);
+  assert.equal(holders.metadataEditing.holderFreeze, false, "holders cannot freeze unless the creator opts in");
+  assert.throws(() => prepareKeelTezosMintGateAction({ network, creator, action: "set-holder-metadata-editing", collection, enabled: "no" }), /boolean/u);
+  const renamed = prepareKeelTezosMintGateAction({ network, creator, action: "set-collection-metadata", collection, collectionMetadata: { name: "Renamed" } });
+  assert.equal(renamed.operation.parameters.entrypoint, "set_contract_metadata");
+  assert.equal(renamed.contractMetadata.name, "Renamed");
+  assert.equal(renamed.operation.parameters.value.args[0].string, "content");
+  assert.equal(prepareKeelTezosMintGateAction({ network, creator, action: "freeze-collection-metadata", collection }).operation.parameters.entrypoint, "freeze_contract_metadata");
+  const royalty = prepareKeelTezosMintGateAction({ network, creator, action: "set-default-royalty", collection, royalty: { receiver: creator, bps: 750 } });
+  assert.equal(royalty.operation.parameters.entrypoint, "set_default_royalty");
+  assert.deepEqual(royalty.operation.parameters.value, { prim: "Some", args: [{ prim: "Pair", args: [{ string: creator }, { int: "750" }] }] });
+  assert.deepEqual(royalty.royalty.tokenMetadataRoyalties, { decimals: 4, shares: { [creator]: 750 } });
+  const removed = prepareKeelTezosMintGateAction({ network, creator, action: "remove-default-royalty", collection });
+  assert.deepEqual(removed.operation.parameters.value, { prim: "None" });
+  assert.throws(() => prepareKeelTezosMintGateAction({ network, creator, action: "set-default-royalty", collection, royalty: { receiver: creator, bps: 0 } }), /bps/u);
 });
 
 test("merkle leaf and drop id use Michelson PACK exactly as the mockup views returned", () => {
@@ -147,10 +212,11 @@ test("mint prepares exact payments for public, merkle, premint and direct batch 
     { mode: "merkle", dropId, stageIndex: 0, quantity: 1, priceMutez: 500000, allowance: 2, proof: ["bb".repeat(32)] },
     { mode: "premint", dropId, stageIndex: 0, quantity: 1, recipient: creator },
     { mode: "direct", quantity: 5 },
+    { mode: "direct", quantity: 1, unreserved: true },
   ] });
-  assert.deepEqual(plan.operations.map((operation) => [operation.parameters.entrypoint, operation.amount]), [["public_mint", "3000000"], ["merkle_mint", "500000"], ["admin_strike", "0"], ["strike", "0"]]);
+  assert.deepEqual(plan.operations.map((operation) => [operation.parameters.entrypoint, operation.amount]), [["public_mint", "3000000"], ["merkle_mint", "500000"], ["admin_strike", "0"], ["strike", "0"], ["strike_unreserved", "0"]]);
   assert.equal(plan.paymentMutez, "3500000");
-  assert.equal(plan.tokens, "10");
+  assert.equal(plan.tokens, "11");
   assert.equal(plan.operations[3].destination, collection);
 });
 
@@ -193,12 +259,16 @@ test("read-back verifies chain, gate, presentation and token metadata through in
     else {
       const request = JSON.parse(init.body);
       assert.equal(request.chain_id, network);
-      body = { data: { total_supply: { int: "1" }, is_minter: { prim: "True" }, default_presentation: { prim: "Pair", args: [{ bytes: "00" }, { bytes: "cd".repeat(32) }, { bytes: "00" }, { prim: "True" }] }, token_metadata: { prim: "Pair", args: [{ int: "1" }, tokenMap] } }[request.view] };
+      body = { data: { total_supply: { int: "1" }, is_minter: { prim: "True" }, token_owner_can_edit: { prim: "False" }, royalty_info: { prim: "Some", args: [{ prim: "Pair", args: [{ string: creator }, { int: "500" }] }] }, default_presentation: { prim: "Pair", args: [{ bytes: "00" }, { bytes: "cd".repeat(32) }, { bytes: "00" }, { prim: "True" }] }, token_metadata: { prim: "Pair", args: [{ int: "1" }, tokenMap] } }[request.view] };
     }
     return new Response(JSON.stringify(body), { status: 200 });
   };
   const result = await checkKeelTezosCollectionPublication({ network, rpcUrl: "http://127.0.0.1:1", collection, oneMint, expectedManifestDigest: "cd".repeat(32), expectedTokens: [{ tokenId: 1, tokenInfo: meta.tokens[0].tokenInfo, tokenInfoSha256: meta.tokens[0].tokenInfoSha256 }], fetchImpl });
   assert.equal(result.publicationVerified, true, JSON.stringify(result.checks));
+  const royal = await checkKeelTezosCollectionPublication({ network, rpcUrl: "http://127.0.0.1:1", collection, expectedRoyalty: { receiver: creator, bps: 500 }, fetchImpl });
+  assert.equal(royal.checks.find((check) => check.name === "default-royalty").ok, true);
+  const unexpected = await checkKeelTezosCollectionPublication({ network, rpcUrl: "http://127.0.0.1:1", collection, expectedRoyalty: null, fetchImpl });
+  assert.equal(unexpected.publicationVerified, false);
   const wrong = await checkKeelTezosCollectionPublication({ network: "NetXynUjJNZm7wi", rpcUrl: "http://127.0.0.1:1", collection, fetchImpl });
   assert.equal(wrong.publicationVerified, false);
   await assert.rejects(() => checkKeelTezosCollectionPublication({ network, rpcUrl: "http://rpc.example.com", collection, fetchImpl }), /HTTPS/u);

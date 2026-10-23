@@ -42,6 +42,7 @@ interface Materializer {
   readonly cache: Map<string, string>;
   readonly artifact: ResolvedArtifact;
   readonly aliasMap: ReadonlyMap<string, string>;
+  readonly materializeResourceUrls: boolean;
 }
 
 function materializeResource(materializer: Materializer, id: string, active: ReadonlySet<string>): string | undefined {
@@ -70,6 +71,7 @@ function materializeResource(materializer: Materializer, id: string, active: Rea
 }
 
 function replaceResourceUrls(input: string, materializer: Materializer, active: ReadonlySet<string>): string {
+  if (!materializer.materializeResourceUrls) return input;
   let output = input;
   const aliases = [...materializer.aliasMap.keys()].sort((left, right) => right.length - left.length);
   for (const alias of aliases) {
@@ -657,12 +659,61 @@ function contentGatewayBootstrap(artifact: ResolvedArtifact): string {
 
   const urlAttributes = new Set(["src", "srcset", "href", "ping", "poster", "data", "action", "formaction"]);
   const nativeSetAttribute = Element.prototype.setAttribute;
+  const nativeRemoveAttribute = Element.prototype.removeAttribute;
+  const inertReferenceViews = new WeakMap();
+  const clearInertReference = (element, name) => {
+    if (name !== "href" || !(element instanceof HTMLAnchorElement) || !element.hasAttribute("data-keel-reference")) return;
+    inertReferenceViews.get(element)?.remove();
+    inertReferenceViews.delete(element);
+    nativeRemoveAttribute.call(element, "data-keel-reference");
+    nativeRemoveAttribute.call(element, "aria-disabled");
+    nativeRemoveAttribute.call(element, "title");
+  };
+  // Optional verification chrome contains explorer/gallery references. A URL
+  // assignment is not a content read, but granting an actual external href
+  // would add navigation authority. Retain only a non-navigable reference;
+  // resource URLs, pings, forms, scripts and every navigation guard stay strict.
+  const retainInertReference = (element, name, value) => {
+    if (name !== "href" || !(element instanceof HTMLAnchorElement)) return false;
+    let url;
+    try { url = new URL(rawName(value)); } catch { return false; }
+    if (url.protocol !== "https:" || url.username || url.password) return false;
+    nativeRemoveAttribute.call(element, "href");
+    nativeSetAttribute.call(element, "data-keel-reference", url.href);
+    nativeSetAttribute.call(element, "aria-disabled", "true");
+    nativeSetAttribute.call(element, "title", "External reference (navigation disabled): " + url.href);
+    queueMicrotask(() => {
+      if (!element.isConnected || element.getAttribute("data-keel-reference") !== url.href) return;
+      let view = inertReferenceViews.get(element);
+      if (view?.isConnected) {
+        view.querySelector("code").textContent = url.href;
+        return;
+      }
+      view = document.createElement("span");
+      view.setAttribute("data-keel-inert-reference-view", "");
+      view.style.cssText = "display:block;overflow-wrap:anywhere;font:inherit";
+      const note = document.createElement("span");
+      note.textContent = "Reference only; navigation is disabled in this sandbox. Select the URL to copy it.";
+      const value = document.createElement("code");
+      value.setAttribute("aria-label", "External reference URL (navigation disabled)");
+      value.style.cssText = "display:block;user-select:text;cursor:text";
+      value.textContent = url.href;
+      view.append(note, value);
+      element.after(view);
+      inertReferenceViews.set(element, view);
+    });
+    return true;
+  };
   Object.defineProperty(Element.prototype, "setAttribute", {
     value: function(name, value) {
       const normalizedName = String(name).toLowerCase();
       if (urlAttributes.has(normalizedName)) {
         const safe = safeUrl(value);
-        if (safe === undefined) throw blocked(value);
+        if (safe === undefined) {
+          if (retainInertReference(this, normalizedName, value)) return;
+          throw blocked(value);
+        }
+        clearInertReference(this, normalizedName);
         return nativeSetAttribute.call(this, name, safe);
       }
       return nativeSetAttribute.call(this, name, value);
@@ -680,7 +731,11 @@ function contentGatewayBootstrap(artifact: ResolvedArtifact): string {
         get: descriptor.get,
         set(value) {
           const safe = safeUrl(value);
-          if (safe === undefined) throw blocked(value);
+          if (safe === undefined) {
+            if (retainInertReference(this, property, value)) return;
+            throw blocked(value);
+          }
+          clearInertReference(this, property);
           return descriptor.set.call(this, safe);
         },
         configurable: false,
@@ -904,7 +959,7 @@ function mediaDataUrl(resource: ResolvedResource): string {
 export function createSandboxDocument(artifact: ResolvedArtifact, options: SandboxOptions = {}): SandboxDocument {
   const warnings: string[] = [];
   const gateway = createVerifiedContentGateway(artifact);
-  const materializer: Materializer = { artifact, warnings, cache: new Map(), aliasMap: aliasMap(artifact) };
+  const materializer: Materializer = { artifact, warnings, cache: new Map(), aliasMap: aliasMap(artifact), materializeResourceUrls: options.materializeResourceUrls !== false };
   const mode = artifact.manifest.entrypoint.mode;
   const entry = artifact.entrypoint;
   const capabilities = resolveCapabilities(artifact, options.capabilityCeiling);

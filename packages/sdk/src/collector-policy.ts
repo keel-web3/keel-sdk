@@ -195,8 +195,15 @@ export function assertKeelCollectorInlineMetadata(
   if (typeof image !== "string") throw new TypeError("Collector Inline metadata must include image.");
   if (typeof animation !== "string") throw new TypeError("Collector Inline metadata must include animation_url.");
   if (/^(?:https?|ipfs|ar|web3|keel-onchain):/iu.test(image)) throw new TypeError("Collector Inline image cannot be an external locator.");
-  if (/^(?:https?|ipfs|ar|web3|keel-onchain):/iu.test(animation)) throw new TypeError("Collector Inline animation_url cannot be an external locator.");
   assertDataURI(image, "Collector Inline image", "data:image/");
+  assertKeelCollectorInlineAnimation(animation, options);
+}
+
+/** Shared canonical animation checks. Explicit external-image selection changes
+ * only the image slot; it never relaxes this registered Inline animation. */
+export function assertKeelCollectorInlineAnimation(animation: unknown, options: { readonly requireCanonicalShell?: boolean } = {}): void {
+  if (typeof animation !== "string") throw new TypeError("Collector Inline metadata must include animation_url.");
+  if (/^(?:https?|ipfs|ar|web3|keel-onchain):/iu.test(animation)) throw new TypeError("Collector Inline animation_url cannot be an external locator.");
   if (!animation.startsWith(INLINE_HTML_PREFIX)) {
     throw new TypeError("Collector Inline animation_url must be the raw-percent data:text/html;charset=utf-8 URI.");
   }

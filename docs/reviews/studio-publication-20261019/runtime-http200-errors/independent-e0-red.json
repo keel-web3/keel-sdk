@@ -1,0 +1,56 @@
+{
+  "schema": "independent-e0-revert-spelling-audit@1",
+  "sourceCommit": "e0e6033a93099e312c5c2c6d0f6f22adc7097f40",
+  "node": "v22.22.1",
+  "scope": "actual transport modules with explicit synthetic provider responses; no live/provider/EVM claim",
+  "results": [
+    {
+      "family": "protocol",
+      "inputHTTPStatus": 200,
+      "exactError": {
+        "code": -32000,
+        "message": "VM Exception while processing transaction: revert CustomError()",
+        "data": "0xdeadbeef"
+      },
+      "expected": "genuine revert is terminal; zero alternate executions",
+      "actual": {
+        "returned": "0x6000",
+        "executionCalls": [
+          {
+            "url": "https://one.example/rpc",
+            "method": "eth_call"
+          },
+          {
+            "url": "https://two.example/rpc",
+            "method": "eth_call"
+          }
+        ]
+      },
+      "invariant": "FAIL"
+    },
+    {
+      "family": "viewer",
+      "inputHTTPStatus": 200,
+      "exactError": {
+        "code": -32000,
+        "message": "VM Exception while processing transaction: revert CustomError()",
+        "data": "0xdeadbeef"
+      },
+      "expected": "genuine revert is terminal; zero alternate executions",
+      "actual": {
+        "returned": "0x6000",
+        "executionCalls": [
+          {
+            "url": "https://one.example/rpc",
+            "method": "eth_call"
+          },
+          {
+            "url": "https://two.example/rpc",
+            "method": "eth_call"
+          }
+        ]
+      },
+      "invariant": "FAIL"
+    }
+  ]
+}

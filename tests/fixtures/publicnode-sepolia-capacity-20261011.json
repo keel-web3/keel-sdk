@@ -1,0 +1,82 @@
+{
+  "schema": "keel-recorded-public-capability-evidence@1",
+  "sourceCommit": "50cb9bf691fc4fbc5336fb95d3e7daced074c2b1",
+  "runUrl": "https://github.com/keel-web3/keel-sdk/actions/runs/38140241723",
+  "jobId": 114472453508,
+  "artifactId": 11703195702,
+  "artifactZipSHA256": "30fbc00f22aac1b5428681634371ff944f30547d74ba8754c9a0fc555081128a",
+  "evidenceKind": "observed-live-public-only-sdk-report",
+  "privatePlanVerified": false,
+  "canonicalPublicationReceipt": null,
+  "deployedCollection": null,
+  "report": {
+    "schema": "keel-public-simulation-pool-probe@2",
+    "checkedAt": "2026-10-11T12:42:31.216Z",
+    "chainId": 11155111,
+    "privateProjectDataSent": false,
+    "signing": "not-performed",
+    "submission": "not-performed",
+    "publicationVerified": false,
+    "candidates": [
+      {
+        "endpoint": "https://ethereum-sepolia-rpc.publicnode.com",
+        "publicProbes": [
+          {
+            "blockCount": 2,
+            "validation": false,
+            "requestedGas": [
+              "199804689",
+              "21000"
+            ],
+            "requestBytes": 547,
+            "httpStatus": 200,
+            "returnedGas": [
+              "50000000",
+              "21000"
+            ],
+            "gasUsed": [
+              "12000",
+              "12000"
+            ],
+            "maxUsedGas": [
+              "12000",
+              "12000"
+            ]
+          }
+        ],
+        "largeRequestBodyCapacity": "not-tested",
+        "privateExecutionCapacity": "not-tested",
+        "lastResponse": {
+          "method": "eth_simulateV1",
+          "httpStatus": 200
+        },
+        "block": {
+          "number": "0xb5744b",
+          "hash": "0xdf512296fc57c4d98ddc3a580521e12f0f4def9a1f41511f47435878b6d62155",
+          "timestamp": "0x6acb8430",
+          "gasLimit": "0xbe8c711"
+        },
+        "requiredEnvelope": "199804689",
+        "requestedEnvelopeSum": "7992187560",
+        "failure": {
+          "kind": "provider-limit",
+          "diagnostic": {
+            "errorClass": "KeelPublicationSimulationError",
+            "causeDepth": 0,
+            "rpcMethod": "eth_simulateV1",
+            "phase": "public-qualification",
+            "stage": "read-capacity",
+            "transport": "https",
+            "transportFailure": "unknown",
+            "requestPayloadBytes": 6542,
+            "blockCount": 40,
+            "callCount": 40,
+            "requestedGasLimit": "199804689",
+            "providerGasCap": "50000000",
+            "requiredProgramGas": "7992187560"
+          }
+        }
+      }
+    ]
+  }
+}

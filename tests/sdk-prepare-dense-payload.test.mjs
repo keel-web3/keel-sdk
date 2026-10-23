@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import {createHash, randomBytes} from 'node:crypto';
 import {gunzipSync} from 'node:zlib';
-import {prepareKeelDensePayload,decodeKeelDenseTransport} from '../packages/sdk/dist/index.js';
+import {prepareKeelGzipDensePayload as prepareKeelDensePayload,decodeKeelDenseTransport} from '../packages/sdk/dist/index.js';
 const digest=b=>'0x'+createHash('sha256').update(b).digest('hex');
 const decode=p=>decodeKeelDenseTransport(p.storedDense,{profile:p.transportProfile,byteLength:p.storedIntegrity.byteLength});
 test('automatic dense payload saver preserves source, selects deterministic gzip and URI81',()=>{

@@ -1,11 +1,20 @@
 # `@keel/mcp`
 
+**Default to the [Studio website](https://studio.onkeel.io) and the user's
+existing wallet. KEEL Desktop is entirely optional.** Use
+`keel-studio-stage-project` and `keel-studio-draft` to prepare work in the
+user's approved Studio account and return `handoffUrl` / `reviewUrl`. The
+website handles verification, preparation, transaction review and publication.
+Do not build another signing page for this supported flow. Read
+`keel://mcp/studio-wallet-review` or the
+[wallet-review guide](../../docs/KEEL_STUDIO_WALLET_REVIEW.md).
+
 A stdio MCP server for the headless Keel/Keel builder and Fray agent
 workflow. It exposes strict local planning tools, conversational Fray auction
 intake, supported-testnet/faucet guidance, and an optional bounded search of an
 explicit Keel Studio Keel index. It never signs, submits, claims faucet funds,
 or mutates a wallet or chain; wallet output is a canonical request envelope for
-a separate user-approved wallet UI.
+the user-approved wallet review in the Studio website by default.
 
 Inline preparation defaults to the SDK's compact raw-percent graph. Omit the
 carriage override and repositoryRoot: the packaged canonical shell supplies local
@@ -45,6 +54,152 @@ node packages/mcp/dist/cli.js --workspace /path/to/project
 
 When `@keel/mcp` is installed as a package, the equivalent launcher is
 `keel-mcp --workspace /path/to/project`.
+
+## Enforced standards order
+
+For contract, NFT, collection, token metadata or viewer work the MCP enforces
+this order; it is not advice:
+
+1. `keel-contract-workflow-preflight` reads the target README/docs and returns
+   `receipt.id` (a content-addressed record under `.keel-mcp/receipts/`, valid
+   24 h and invalidated if any recorded doc changes).
+2. `keel-engine-catalog`
+3. `keel-network-inspect` (the exact selected chain)
+4. `keel-library-search` (selected-chain modules)
+5. `keel-contract-controls`
+6. build (`keel-inline-prepare`, `build`, `upload-plan`/`chain-plan`)
+7. `keel-token-standard-audit` returns a verdict, findings and a `digest`
+   (record under `.keel-mcp/audits/`). `keel-inline-prepare` audits its
+   prepared tokenURI automatically and returns `prepared.standardAudit`.
+8. The request: `wallet-request-prepare`, `publish-plan`,
+   `keel-creator-collection-prepare`, `wallet-link`, `keel-shell-prepare`,
+   `module-review-prepare`, `keel-tezos-shell-prepare`,
+   `keel-tezos-publication-prepare`.
+
+Every step-8 tool takes `standards: { preflightReceipt, auditDigest?, workKind? }`.
+Without valid evidence it refuses: the result has `isError: true` and
+`structuredContent` `{ code, nextTool, next }`, for example
+`standards-evidence-required` → `keel-contract-workflow-preflight`,
+`token-standard-audit-required` → `keel-token-standard-audit`,
+`token-standard-audit-failed`, `token-standard-audit-subject-mismatch`,
+`preflight-receipt-stale`. `workKind` defaults to `token-contract`, the
+strictest: a call to an existing token contract needs an audit of that exact
+contract on that chain. `collection` and `metadata` also need a passing audit
+(of the prepared tokenURI bytes or the live contract). `viewer` and
+`registry-or-module` need the receipt. The work kind is decided from the
+decoded function (KeelAuthority `execute`/`executeSigned`/`callAsDelegate` are
+unwrapped first): `grantRole`/`revokeRole`/`renounceRole` (and
+`grantRoles`/`revokeRoles`/`renounceRoles`) are `role-admin`, which needs the
+receipt plus the function confirmed as a listed write in the target's ABI
+(from `call`, or `controlsAbiPath`); calls to, and deployments of, an ERC-20
+(ABI with `decimals()` and no `tokenURI`/`uri`, or `targetRpcUrl` answering
+`decimals()` without ERC-721/1155 via ERC-165) are `fungible-token`. Neither
+needs a tokenURI audit, and neither can be declared for a call that is not one. Genuine storage stays open: KeelHold
+`castSlugs`/`weldObject`/`weldComposite` with zero value, and `publish-plan` of
+plain asset bytes, need no evidence. HTML, JSON and KEEL tokenURI fragment
+uploads are viewer/metadata work. Tezos tools require the receipt; the
+tokenURI audit is EVM-only for now and the clearance says so.
+
+### keel-token-standard-audit
+
+Input: `rpcUrl` + `contract` + `tokenId` (+ optional expected `chainId`) for a
+live read, or `tokenUri` / `tokenUriPath` for prepared bytes. The live read is a
+single `eth_call` capped at 60,000,000 gas at a pinned block; `eth_estimateGas`
+is reported but never trusted, because nodes can truncate large returns. It
+decodes the `data:application/json` URI (raw-percent or base64) and every
+embedded `data:` URI, unpacks gzip/deflate slots, and fails closed on any
+`http(s)`, `ipfs`, `ar`/`arweave`, `web3://` or `keel-onchain` locator (the one
+allowed literal is `http://www.w3.org/2000/svg`), an `image` that is not an
+onchain `data:image`, an HTML viewer that does not match its persisted shell
+choice (exact pinned canonical prefix/suffix by default; explicit `viewer: "none"`
+audits self-contained creator HTML without canonical-protection claims), complete-HTML
+Base64, relative resource tags, reads above 60M gas and tokenURI over 2 MB.
+Inside the canonical shell the audit parses the graph
+(`__KEEL_ITEMS__`), unpacks each item, checks it against its committed sha256,
+and scans it as its own media type. A packed creator entry document may load
+`<script src>`/`<link href>` only by a resource id present in that graph; any
+other reference, and any real locator in any item, fails. Live reads also
+report `measuredGas`: `debug_traceCall` gasUsed when the node offers it,
+otherwise the smallest eth_call gas limit whose returned bytes EQUAL the
+full-gas result (a contract that answers differently when gas runs low, like a
+renderer-less fallback, does not count). Both figures are reported.
+Base64-wrapped metadata JSON is a warning. A reviewed exception is an explicit
+input `{ codes, reason, reviewer, signature? }` naming exactly the findings it
+waives; read, size, gas, decode and missing-image findings cannot be waived. The
+verdict is then `pass-with-exception` and the exception travels with every
+clearance.
+
+### Graph publication and deployment
+
+- `keel-inline-prepare` with `outputDirectory` writes every graph part, the
+  full fragment and (with `collection`) `tokenURI.txt`; adding `hold` also
+  writes `graph-weld.json` with every part's object id, `castSlugs` and
+  `weldObject` calldata, and the root `weldComposite`. With `collection`, the
+  image is either `imagePath` (prepared data:image) or `imageRoute:
+  "contract-svg"` + `imageSvgPath` (a sample from `keel-svg-create` or the
+  renderer; audit the live contract after binding).
+- `keel-graph-weld-prepare` plans the same from ordered part files (or
+  already-published object ids plus `contentPath`).
+- `wallet-request-prepare` takes `call: { chainId, to, abiPath|abiJson,
+  signature, args, valueWei?, via? }`: calldata encoded through the contract
+  controls (exact signature, coerced args). An argument written as
+  `{ "call": {...} }` (anywhere, including inside tuples) is encoded first and
+  passed as bytes; `via: { authority, function? }` wraps the call in
+  `KeelAuthority.execute` or `callAsDelegate`. For any request, KeelAuthority
+  `execute`/`executeSigned`/`callAsDelegate` calldata is unwrapped and the
+  audit subject is matched against the forwarded target.
+- `wallet-request-prepare` takes `deploy: { artifactPath, chainId, args,
+  bytecode?, valueWei? }` for a contract deployment. The bytecode must equal
+  the compiler artifact's and constructor args are coerced like
+  `keel-contract-controls`; the same standards gate applies. Addresses may be
+  EIP-55 checksummed (normalized to lowercase; a bad checksum is refused).
+- The preflight reads KEEL's own `docs/KEEL_*.md` from the package when the
+  target repository does not vendor them (`keelDocuments`).
+- The public read cap is one constant, `KEEL_INLINE_SAFE_RPC_GAS` = 60,000,000,
+  used by network inspection, the Tezos route and the audit.
+
+### Selected-block transaction gas
+
+Prepared Ethereum requests carry an explicit total `gasLimit`. Offline planning
+without a selected block uses a conservative 16,777,216 bound; this is an estimate,
+not a universal network limit or transaction qualification. `keel-network-inspect`
+uses the actual block timestamp and gas limit with the registered chain profile.
+Amsterdam Sepolia keeps a 16,777,216 execution-gas bound while permitting a larger
+total limit bounded by the selected block and uint32. Unknown chains report an
+unregistered profile instead of inheriting Ethereum rules.
+
+KeelHold calls use the receipt-fitted offline model. Other calls require
+`gas: { rpcUrl, from }` or `gas: { limit }`. An explicit selected-block profile
+may accompany `blockTimestamp` and `blockGasLimit` as decimal text from the same
+block. The returned `policyEvidence` labels this local evidence; exact selected-chain
+simulation still has to qualify total and execution gas independently. A missing
+limit is `gas-limit-required`; exceeding the chosen bound is
+`transaction-gas-cap-exceeded`. No gas preparation signs or submits.
+
+`keel-graph-weld-prepare` packs the slugs of every part together (first-fit
+decreasing, at most 3 slugs per `castSlugs`, estimate at or under ~15.68M so the
+margined limit fits the cap). `chain-plan` packs by gas in order, and
+`ethereum-encode`, `chain-plan`, `upload-plan` and `cost` report
+`transactions { count, totalEstimatedGas, minimumPossible }`, where
+`minimumPossible` is total gas / cap. Welds cannot be batched: KeelHold has one
+weld per call and no KEEL weld batcher is deployed.
+
+### Large results
+
+`ethereum-encode`, `chain-plan` and `upload-plan` never refuse a valid result
+for size. Above the 256 KiB inline budget they write the complete result to a
+workspace file and return a summary plus `delivery: { path, sha256, byteLength }`
+(`out` chooses the path). `publish-plan` accepts that chain-plan file as
+`chainPlanPath`. Do not fall back to hand SDK encoding.
+
+### Tool list contract
+
+MCP clients reject the whole `tools/list` response when one tool's
+`inputSchema` is not `type: "object"` (a top-level `oneOf` did this to
+`keel-shell-prepare` and the desktop app showed 0 tools while connected).
+`--self-test` and `tests/mcp-standards.test.mjs` validate every descriptor with
+`mcpToolListIssues` and, when installed, the official SDK's
+`ListToolsResultSchema`.
 
 For a new work, start with the `keel-project-plan` prompt. For any contract,
 collection, viewer, metadata, deployment, or release work, call
@@ -100,7 +255,7 @@ Messages are newline-delimited JSON-RPC. Initialize first, then use
 `keel-tezos-shell-prepare`,
 `keel-tezos-publication-prepare`, `keel-network-inspect`,
 `keel-tezos-standard-route-plan`, `keel-contract-controls`, `keel-engine-catalog`,
-`keel-revision-plan`, `keel-project-decisions`, `keel-layered-check`,
+`keel-revision-plan`, `keel-project-decisions`, `keel-token-standard-audit`, `keel-layered-check`,
 `keel-layered-select`, `keel-layered-sample`, `keel-layered-reveal-plan`,
 `keel-layered-curation`, `keel-token-matrix-prepare`,
 `keel-arena-match-prepare`, `keel-arena-claim-prepare`, `analyze`,
@@ -392,7 +547,13 @@ URIs and extra parameters fail closed, and no workspace or network access occurs
 for contract, collection, viewer, metadata, deployment, and release work. It
 reads the target README and available relevant docs, records their digests, and
 returns the required engine, selected-chain, module-catalog, edge-case, and
-contract-control sequence. `keel-engine-catalog` exposes the browser-safe SDK catalog also used by the
+contract-control sequence. The catalog includes the `mined-hash` mint system
+(proof-of-work: digest bound to chainid, contract, minter and a recent block
+anchor inside an expiry window, single-use hashes, one transaction) and the
+`module-router-controller` contract pattern (fixed address, selector → module
+routing, KeelAuthority admin, ERC-7201 storage per module, one-way freeze).
+Both are documented patterns with the `checks` an agent must meet; neither is a
+shared KEEL contract. `keel-engine-catalog` exposes the browser-safe SDK catalog also used by the
 Electron editor. `keel-project-decisions` keeps explicit intent, recommends
 defaults without selecting them, and returns at most three next questions.
 Release type, collection model, mint system, storage, mint gates, library access
@@ -437,3 +598,33 @@ See [runtime module discovery and reuse](../../docs/KEEL_RUNTIME_MODULE_DISCOVER
 ### Native SVG tools
 
 `keel-svg-create` prepares an ordinary SVG renderer from a preset or recipe, with preview and Solidity export. `keel-svg-inspect` checks SVG structure and hidden provenance locally; `keel-svg-call-plan` prepares a read-only contract call. Neither tool claims verification from embedded labels. See [SVG renderer, SDK and editor integration](../../docs/KEEL_SVG_RENDERER.md).
+
+## Optional local plugins
+
+`keel-mcp` loads explicitly installed plugins from `~/.keel/plugins.json`. No project file, remote URL or npm package is automatically executed. Plugins are trusted local code with the same permissions as the server; the workspace helper scopes tool file operations but is not a code sandbox. Restart the MCP host after installing or removing a plugin.
+
+```sh
+# In the engine checkout; writes only the named user registry.
+node tools/plugins.mjs install ./packages/react
+node tools/plugins.mjs install /path/to/private/keel-trailer
+keel-mcp --workspace /path/to/project --self-test
+# Temporary invocation without changing the registry:
+keel-mcp --no-plugins --plugin /path/to/plugin/src/mcp.mjs
+```
+
+`keel-plugins-list` returns installed plugin identities, versions, paths and tools. Configuration schema: `{ "schema": "keel-plugins@1", "plugins": [{ "id": "keel/react", "entry": "/absolute/path/src/mcp.mjs", "enabled": true }] }`. Set `KEEL_MCP_PLUGIN_CONFIG` or `--plugin-config` for an isolated registry; `--no-plugins` disables the default registry. Invalid manifests, API versions, identities and duplicate tool names stop startup with an actionable error. No private trailer dependency is carried by the SDK.
+
+An entry exports `keelPlugin = { apiVersion: 1, id, version, instructions?, tools }`; each tool supplies `descriptor: { name, description, inputSchema: { type: "object", ... } }` and `async run({ workspace }, input)`. Public TypeScript interfaces are exported from `@keel/mcp`. Keep plugin input validation, media requirements and machine-load handling inside its package.
+
+Read-only Ethereum tools may omit `rpcUrl` for the public Sepolia pool or private workspace/env settings. `keel-rpc-check` verifies access and optional receipt history. Exhaustion returns structured `rpc.setup-required` instructions to help configure Alchemy, Infura or QuickNode. See [RPC setup](../../docs/KEEL_RPC_SETUP.md); API keys stay local and no wallet key is needed.
+
+## Connect your agent to Studio
+
+Run `pnpm studio:connect --window --workspace /path/to/project` in the SDK checkout,
+or call `keel-studio-connect` with `operation=start`, open `approveUrl` for the user,
+and call `operation=complete` after approval. Local drafts and staging then use
+the privately saved key automatically. No environment file or Desktop app is
+required. See [the account connection guide](../../docs/KEEL_STUDIO_WALLET_REVIEW.md).
+`--connection-status` prints metadata only; `--import-key` uses a hidden prompt.
+
+Sepolia publication preflight checks the simulator version and transaction capacity with public empty calls on the same retained socket before sending project calldata. Every actual simulation returns its transaction gas envelope; silent RPC gas clamping is a provider limit, not a contract compatibility failure. Never retry a failed program on another backend to manufacture success. Use Hosted Studio receipt recovery and a fresh complete review; Desktop remains optional.

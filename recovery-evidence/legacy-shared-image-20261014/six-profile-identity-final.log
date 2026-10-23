@@ -1,0 +1,17 @@
+TAP version 13
+# {"schema":"keel-existing-six-profile-identity@1","baselineSDK":"/workspace/keel-legacy-carriage-20261014/keel-sdk","profiles":[{"profile":"native","parts":{"prefix":{"bytes":15108,"sha256":"4a5405a5794aa91206ef4cebebee127d8917735d4d33546a0bbf8c6bead9a58e"},"suffix":{"bytes":143710,"sha256":"71e27b6cc8c5b5620d6428512ed8d55605f136dc7bed51367b3359f2113d99ef"}}},{"profile":"brotli","parts":{"prefix":{"bytes":15108,"sha256":"4a5405a5794aa91206ef4cebebee127d8917735d4d33546a0bbf8c6bead9a58e"},"suffix":{"bytes":305024,"sha256":"e15aa71c91a4b31818b8765fb7842e65c4ccd8fffb4c8d8717e00f5fc3a6cfd5"}}},{"profile":"lzma","parts":{"prefix":{"bytes":15108,"sha256":"4a5405a5794aa91206ef4cebebee127d8917735d4d33546a0bbf8c6bead9a58e"},"suffix":{"bytes":157646,"sha256":"adf88d8bc3ed95545a1acf6f91c884ef5b5197a309b3905edb9877237eaec1c4"}}},{"profile":"embedded-base90","parts":{"prefix":{"bytes":15118,"sha256":"f15a55cc1567a24f9aab872d8a419ab285e51642314b90bee386bc6d9b1873e0"},"containerBridge":{"bytes":33,"sha256":"b6ddb358a5a3bb50191323545c6341cf949f6b233b18852fecf25dd566c0fa5f"},"suffix":{"bytes":315208,"sha256":"9fc8d5d257df0b3f9ef0316421e020a22cdd9e51deccc02a2f9e5bb75a4798a6"}}},{"profile":"legacy-dense-gzip","parts":{"prefix":{"bytes":107,"sha256":"4c8a95566a16a19875b1f054abf5e1ecc319f92ae46ae46ac67fa39f7837d4c4"},"containerBridge":{"bytes":33,"sha256":"b6ddb358a5a3bb50191323545c6341cf949f6b233b18852fecf25dd566c0fa5f"},"suffix":{"bytes":189600,"sha256":"cb0785880cfeebef638072aca567ec4c0ba1bb7cf49e20f58f01548fbfa8cd7e"}}},{"profile":"legacy-dense-none","parts":{"prefix":{"bytes":107,"sha256":"4c8a95566a16a19875b1f054abf5e1ecc319f92ae46ae46ac67fa39f7837d4c4"},"containerBridge":{"bytes":33,"sha256":"b6ddb358a5a3bb50191323545c6341cf949f6b233b18852fecf25dd566c0fa5f"},"suffix":{"bytes":439269,"sha256":"dd168025df640ca834402fe588c6ad04d49ae7c7112ef7a3fbe46fed09d1efe0"}}}]}
+# Subtest: six existing canonical/legacy profile byte commitments remain identical to qualified baseline
+ok 1 - six existing canonical/legacy profile byte commitments remain identical to qualified baseline
+  ---
+  duration_ms: 6435.339088
+  type: 'test'
+  ...
+1..1
+# tests 1
+# suites 0
+# pass 1
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 8704.672144

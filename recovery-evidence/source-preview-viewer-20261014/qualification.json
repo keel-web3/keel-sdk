@@ -1,0 +1,52 @@
+{
+  "status": "local-viewer-qualified",
+  "capturedUtc": "2026-10-14T22:19:04.584160+00:00",
+  "productionSourceCommit": "827dbbb1cc549de1892ea14d79e6385acee3d91c",
+  "buildExit": 0,
+  "testCommand": "node --test tests/viewer.test.mjs",
+  "tests": 68,
+  "pass": 68,
+  "fail": 0,
+  "skip": 0,
+  "sourceAndDistFilesUnchanged": 148,
+  "firstTwoFailures": "Test fixture aliases violated the existing public manifest alias schema. All raw runs are preserved. Final normalized aliases pass; production code/dist unchanged.",
+  "scope": "Explicit materializeResourceUrls=false preserves draft reader literals; default URL materialization, verified gateway, CSP and sandbox remain covered. Actual mounted ArtifactViewer proof is separate Site evidence.",
+  "artifacts": {
+    "viewer-build-v1.exit": {
+      "bytes": 2,
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+    },
+    "viewer-build-v1.log": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "viewer-ready.json": {
+      "bytes": 17791,
+      "sha256": "2f57eda871174874393df842ebc856fe95f9356cadf882ec56b71768256a1c1b"
+    },
+    "viewer-regression-v1.exit": {
+      "bytes": 2,
+      "sha256": "4355a46b19d348dc2f57c046f8ef63d4538ebb936000f3c9ee954a27460dd865"
+    },
+    "viewer-regression-v1.log": {
+      "bytes": 16562,
+      "sha256": "8693e55e69f45119a76a3e54aa616b401ffabb1643edf54fa450e6c9df5ed641"
+    },
+    "viewer-regression-v2.exit": {
+      "bytes": 2,
+      "sha256": "4355a46b19d348dc2f57c046f8ef63d4538ebb936000f3c9ee954a27460dd865"
+    },
+    "viewer-regression-v2.log": {
+      "bytes": 16391,
+      "sha256": "1d7122151cc16f604121c50197695ae2c4135f60f0e13e8b31c654ded19f62b6"
+    },
+    "viewer-regression-v3.exit": {
+      "bytes": 2,
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+    },
+    "viewer-regression-v3.log": {
+      "bytes": 15509,
+      "sha256": "2b8c14e1b03b41d76897b4e6c5871c47ed00122a250f5c1f633a9432652b1469"
+    }
+  }
+}

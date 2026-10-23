@@ -46,7 +46,7 @@ import { buildKeelShellCatalog } from "./verification-shell-catalog.js";
 import {KEEL_LOADING_CSS,KEEL_LOADING_MARKUP,normalizeKeelLoadingManifest} from "./verification-shell-loading.js";
 import { createKeelShellClient } from "./verification-shell-client.js";
 import type { KeelShellMarketplaceConfig, startKeelShellMarketplaceInfo } from "./marketplace-reader.js";
-import { resolveModuleTarget } from "./modules.js";
+import { resolveDefaultKeelHoldTarget } from "./modules.js";
 
 type Sha256Integrity = { readonly algorithm: "sha256"; readonly digest: Hex; readonly byteLength: number };
 
@@ -132,6 +132,8 @@ function hasEmbeddedViewerSource(item: KeelStandaloneViewerItem): boolean {
 }
 
 export interface KeelStandaloneViewerItem {
+  /** Immutable prepared COPY payload identity; this does not claim a Hold object or receipt. */
+  readonly preparedCopy?: { readonly segments: readonly { readonly packId: Hex }[] };
   readonly containerBindings?: readonly KeelOnchainContainerBinding[];
   readonly backgroundColor?: string;
   readonly id: string;
@@ -1108,16 +1110,33 @@ function compactInlineRuntime(
   if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",start,{once:true});else start();
 }
 
-/** Build the two small reusable halves for the composable Inline lane. */
+/** Immutable registered-reader build identity. This is a package commitment,
+ * not selected-chain registration evidence; callers still authenticate that. */
+export const KEEL_PUBLISHED_VIEW_READER_V1 = Object.freeze({
+  algorithm: "sha256" as const,
+  digest: "0x978e5fed29103cc72a2272f908421f14a587009d959aa40d3a1853af130bae1a" as Hex,
+  byteLength: 251050,
+});
+
+/** Reuse the exact reader bytes used by the maintained canonical shell. */
+export async function buildPublishedViewReaderModule() {
+  const source = new Uint8Array(await readFile(new URL("./assets/keel-published-view-reader-v1.js", import.meta.url)));
+  const integrity = await sha256Integrity(source);
+  if (integrity.digest !== KEEL_PUBLISHED_VIEW_READER_V1.digest || integrity.byteLength !== KEEL_PUBLISHED_VIEW_READER_V1.byteLength) throw new Error("The immutable KEEL published reader package failed its digest or byte-length check.");
+  return { id: "keel.published-view-reader", source, integrity };
+}
+
+/** Review-only candidate from current source. A changed digest requires its
+ * own authenticated selected-chain module version before publication. */
 let publishedViewReaderBuild: Promise<{ id: string; source: Uint8Array; integrity: Sha256Integrity }> | undefined;
-export function buildPublishedViewReaderModule() {
+export function buildCurrentPublishedViewReaderModule() {
   return publishedViewReaderBuild ??= (async () => {
     const sourcePath = fileURLToPath(new URL("./fray-content-view-runtime.js", import.meta.url));
     const bundled = await build({ bundle: true, minify: true, platform: "browser", format: "iife", target: ["es2022"], write: false,
       stdin: { contents: `import {resolveInlinePublishedContent} from ${JSON.stringify(sourcePath)};Object.defineProperty(globalThis,"__KEEL_PUBLISHED_VIEW_READER__",{value:resolveInlinePublishedContent,writable:false,configurable:false});`,
         resolveDir: path.dirname(sourcePath), sourcefile: "keel-published-view-reader.js", loader: "js" } });
     const source = utf8ToBytes(bundled.outputFiles[0]!.text);
-    return { id: "keel.published-view-reader", source, integrity: await sha256Integrity(source) };
+    return { id: "keel.published-view-reader", source, integrity: await sha256Integrity(source), reviewOnly: true as const, selectedChainRegistrationRequired: true as const };
   })();
 }
 
@@ -1137,6 +1156,8 @@ export async function buildCompactInlineKeelShell(input: {
   };
   /** EVM-assembled compressed packs; the response contains every byte and never exposes a browser RPC transport. */
   readonly embeddedContainerDelivery?: { readonly chainId: number; readonly store: string };
+  /** Distinct registered reader for the legacy six-field prepared token context. */
+  readonly legacyPreparedDenseDelivery?: { readonly chainId: number; readonly sharedImage?: boolean };
   /** Optional RPC information only. Never changes embedded artwork delivery or the proof. */
   readonly optionalMarketplaceInfo?: KeelShellMarketplaceConfig;
   /** Contain an authored viewport without moving scene controls. */
@@ -1153,7 +1174,7 @@ export async function buildCompactInlineKeelShell(input: {
   readonly codecProfile: "native" | "brotli-js" | "lzma-js" | "brotli-lzma-js" | "ppmd-js";
   readonly supportedCodecs: readonly ("none" | "gzip" | "deflate" | "brotli" | "lzma" | "ppmd")[];
   readonly decoderIntegrity?: Sha256Integrity;
-  readonly resourceProfile?: "embedded-shared-containers@1" | "embedded-shared-containers-base90@1" | "embedded-shared-containers-base91@1" | "embedded-shared-containers-base90-block@2" | "embedded-shared-containers-uri81@1";
+  readonly resourceProfile?: "embedded-shared-containers@1" | "embedded-shared-containers-base90@1" | "embedded-shared-containers-base91@1" | "embedded-shared-containers-base90-block@2" | "embedded-shared-containers-uri81@1" | "legacy-prepared-dense-copy@1" | "legacy-prepared-dense-shared-image@1";
   readonly transportDecoderIntegrity?: Sha256Integrity;
   readonly containerBridge?: Uint8Array;
   readonly containerBridgeIntegrity?: Sha256Integrity;
@@ -1162,6 +1183,9 @@ export async function buildCompactInlineKeelShell(input: {
   readonly prefixIntegrity: Sha256Integrity;
   readonly suffixIntegrity: Sha256Integrity;
 }> {
+  if (input.legacyPreparedDenseDelivery && (!Number.isSafeInteger(input.legacyPreparedDenseDelivery.chainId) || input.legacyPreparedDenseDelivery.chainId <= 0
+      || input.embeddedContainerDelivery || input.onchainDelivery || input.binaryPayloadCarriage !== undefined || input.contextCarriage !== undefined || input.decoderDelivery !== undefined
+      || input.optionalMarketplaceInfo)) throw new TypeError("Legacy prepared dense delivery needs its own selected-chain, offline reader profile.");
   if (input.binaryPayloadCarriage !== undefined && !["as-is", "base64", "base90", "base91", "base90-block", "uri81"].includes(input.binaryPayloadCarriage)) throw new TypeError("Invalid binary payload carriage.");
   if (input.binaryPayloadCarriage !== undefined && !input.embeddedContainerDelivery) throw new TypeError("Binary payload carriage requires an embedded container profile.");
   if (input.embeddedContainerDelivery && input.onchainDelivery) throw new TypeError("Select exactly one KEEL delivery profile.");
@@ -1170,7 +1194,7 @@ export async function buildCompactInlineKeelShell(input: {
   if (input.embeddedContainerDelivery && (input.binaryPayloadCarriage ?? "as-is") === "as-is") throw new TypeError("Unchanged compressed bytes were requested. embedded-shared-containers@1 emits Base64 in the contract return and cannot satisfy as-is carriage. Three-byte padding does not make raw binary a valid Base64/UTF-8 tokenURI. No encoding or Hybrid fallback was selected. Use a proved native byte reader; Base64 return requires an explicit binaryPayloadCarriage choice.");
   if (input.contextCarriage !== undefined && (!["json","columns-v1"].includes(input.contextCarriage) || !input.embeddedContainerDelivery)) throw new TypeError("Context columns require offline delivery");
   if (input.decoderDelivery !== undefined && !["inline","preloaded"].includes(input.decoderDelivery)) throw new TypeError("Unknown decoder delivery");
-  if (input.decoderDelivery === "preloaded" && (!input.embeddedContainerDelivery || input.binaryPayloadCarriage !== "uri81" || input.codecProfile !== "ppmd-js")) throw new TypeError("Preloaded decoders require the explicit offline URI81/PPMd boot profile");
+  if (input.decoderDelivery === "preloaded" && (!input.embeddedContainerDelivery || !["base90", "uri81"].includes(input.binaryPayloadCarriage ?? "") || input.codecProfile !== "ppmd-js")) throw new TypeError("Preloaded decoders require an explicit offline Base90 or URI81/PPMd boot profile");
   if (input.fitViewport && (![input.fitViewport.width, input.fitViewport.height].every(value => Number.isSafeInteger(value) && value >= 64 && value <= 8192))) throw new RangeError("Invalid authored viewport dimensions.");
   // Offline assembly never ships or invokes the optional published RPC reader.
   if(input.optionalMarketplaceInfo){
@@ -1179,7 +1203,7 @@ export async function buildCompactInlineKeelShell(input: {
     for(const endpoint of config.rpcUrls)assertKeelRpcUrl(endpoint,config.rpcHosts);
     if((input.embeddedContainerDelivery?.chainId??input.onchainDelivery?.chainId??config.chainId)!==config.chainId)throw new TypeError("Optional marketplace reads must use the artwork's chain");
   }
-  const installedViewReader = input.embeddedContainerDelivery ? { integrity: { digest: `0x${"0".repeat(64)}` } } : await buildPublishedViewReaderModule();
+  const installedViewReader = input.embeddedContainerDelivery || input.legacyPreparedDenseDelivery ? { integrity: { digest: `0x${"0".repeat(64)}` } } : await buildPublishedViewReaderModule();
   // Packaged canonical source makes the default independent of the consumer's cwd.
   const verificationChromePath = fileURLToPath(new URL("./assets/keel-verification-chrome.js", import.meta.url));
   const canonical = await readFile(verificationChromePath);
@@ -1196,10 +1220,10 @@ export async function buildCompactInlineKeelShell(input: {
     ...(codecProfile === "ppmd-js" ? ["ppmd" as const] : []),
   ];
   const decoderModule = codecs.length ? await buildKeelDecoderModule({ codecs }) : undefined;
-  const transportProfile = input.binaryPayloadCarriage === "uri81" ? "uri81-block-v1" : input.binaryPayloadCarriage === "base90-block" ? "base90-block-v2" : input.binaryPayloadCarriage === "base90" ? "base90-v1" : input.binaryPayloadCarriage === "base91" ? "base91-v1" : undefined;
+  const transportProfile = input.legacyPreparedDenseDelivery ? "base90-v1" : input.binaryPayloadCarriage === "uri81" ? "uri81-block-v1" : input.binaryPayloadCarriage === "base90-block" ? "base90-block-v2" : input.binaryPayloadCarriage === "base90" ? "base90-v1" : input.binaryPayloadCarriage === "base91" ? "base91-v1" : undefined;
   const transportModule = transportProfile ? await buildKeelDenseTransportDecoder(transportProfile) : undefined;
   let runtimeSource = compactInlineRuntime.toString();
-  if (decoderModule || input.onchainDelivery || input.embeddedContainerDelivery) {
+  if (decoderModule || input.onchainDelivery || input.embeddedContainerDelivery || input.legacyPreparedDenseDelivery) {
     const replacement = `const decompress = async (compression, bytes, decodedByteLength) => {
       if (!Number.isSafeInteger(decodedByteLength) || decodedByteLength < 0 || decodedByteLength > 32 * 1024 * 1024) throw new RangeError("Committed decoded length exceeds shell limit.");
       if (compression === "none") return bytes;
@@ -1266,6 +1290,26 @@ export async function buildCompactInlineKeelShell(input: {
     runtimeSource = disabledPublishedReader;
     binaryReaderImport = `import {createKeelEmbeddedContainerReader} from ${JSON.stringify(fileURLToPath(new URL("./embedded-container-reader.js", import.meta.url)))};import {validateKeelEmbeddedContainerContext,unpackKeelEmbeddedContainerContext} from ${JSON.stringify(fileURLToPath(new URL("./embedded-container-context.js", import.meta.url)))};`;
   }
+  if (input.legacyPreparedDenseDelivery) {
+    const marker = "const resolve = async (item";
+    const prelude = `let legacyReader;
+    const initializeLegacyReader = async () => {
+      if(document.readyState === "loading")await new Promise(done=>document.addEventListener("DOMContentLoaded",done,{once:true}));
+      validateKeelLegacyPreparedContext(globals.__KEEL_CONTEXT__,${input.legacyPreparedDenseDelivery.chainId});
+      return createKeelLegacyPreparedDenseReader({items,payloads:globalThis.__KEEL_EMBEDDED_CONTAINERS__,verify,decompress,
+        transportProfile:"base90-v1",decodeTransport:(text,byteLength)=>KEEL_DENSE_TRANSPORT.decodeKeelDenseTransport(text,{profile:"base90-v1",byteLength})});
+    };\n`;
+    const withReader = runtimeSource.replace(marker, prelude + marker);
+    const withResolve = withReader.replace(/(const resolve = async \(item[^\n]*?\{)/u, `$1\n    return (await (legacyReader ??= initializeLegacyReader())).resolve(item);`);
+    const disabled = withResolve.replace("if (enabled) {", "if (false) {");
+    if (withReader === runtimeSource || withResolve === withReader || disabled === withResolve) throw new Error("Canonical legacy prepared reader hooks are missing.");
+    if (input.legacyPreparedDenseDelivery.sharedImage) {
+      const shared = disabled.replace(/(const replaceAliases = [\s\S]*?let output = )text;/u, '$1replaceKeelSharedImageCSSAliases(text, aliases);');
+      if (shared === disabled) throw new Error("Shared-image CSS alias hook is missing.");
+      runtimeSource = shared;
+    } else runtimeSource = disabled;
+    binaryReaderImport = `import {${input.legacyPreparedDenseDelivery.sharedImage ? "createKeelLegacySharedImageReader as createKeelLegacyPreparedDenseReader,replaceKeelSharedImageCSSAliases" : "createKeelLegacyPreparedDenseReader"},validateKeelLegacyPreparedContext} from ${JSON.stringify(fileURLToPath(new URL(input.legacyPreparedDenseDelivery.sharedImage ? "./legacy-shared-image-reader.js" : "./legacy-prepared-dense-reader.js", import.meta.url)))};`;
+  }
   if (input.fitViewport) {
     const {width, height} = input.fitViewport;
     const hook = "stage.replaceChildren(frame);";
@@ -1291,17 +1335,20 @@ export async function buildCompactInlineKeelShell(input: {
     stdin: {
       contents: `${input.optionalMarketplaceInfo ? `import {startKeelShellMarketplaceInfo} from ${JSON.stringify(fileURLToPath(new URL("./marketplace-reader.js",import.meta.url)))};` : ""}${binaryReaderImport}${input.decoderDelivery === "preloaded" ? "const KEEL_RESOURCE_DECODERS=globalThis.__KEEL_BOOT_RESOURCE_DECODERS__,KEEL_DENSE_TRANSPORT=globalThis.__KEEL_BOOT_DENSE_TRANSPORT__;" : (transportModule?.javascript ?? "")+(decoderModule?.javascript ?? "")}${input.onchainDelivery || input.embeddedContainerDelivery ? "" : 'import {keccak_256} from "@noble/hashes/sha3";'}import { mountKeelVerification } from ${JSON.stringify(verificationChromePath)};import {createKeelShellClient} from ${JSON.stringify(fileURLToPath(new URL("./verification-shell-client.js", import.meta.url)))};import {buildKeelShellCatalog} from ${JSON.stringify(fileURLToPath(new URL("./verification-shell-catalog.js", import.meta.url)))};import {normalizeKeelLoadingManifest} from ${JSON.stringify(fileURLToPath(new URL("./verification-shell-loading.js", import.meta.url)))};(${runtimeSource})(mountKeelVerification,${JSON.stringify(installedViewReader.integrity.digest)},${input.onchainDelivery || input.embeddedContainerDelivery ? "undefined" : "keccak_256"},createKeelShellClient,buildKeelShellCatalog,normalizeKeelLoadingManifest${input.optionalMarketplaceInfo ? `,{config:${JSON.stringify(input.optionalMarketplaceInfo)},start:startKeelShellMarketplaceInfo}` : ""})`,
       resolveDir: repositoryRoot,
-      sourcefile: "keel-inline-runtime.js",
+      // A virtual root keeps esbuild's license grouping independent of whether
+      // this SDK lives in a workspace or under node_modules. Canonical bytes
+      // must retain their existing identity after a portable npm installation.
+      sourcefile: "/keel-inline-runtime.js",
       loader: "js",
     },
   });
   const runtime = runtimeBuild.outputFiles[0]?.text;
   if (runtime === undefined) throw new Error("Compact KEEL Inline runtime produced no JavaScript.");
-  const prefix = utf8ToBytes(('<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><style>*{box-sizing:border-box}html,body,#keel-stage,iframe{width:100%;height:100%;margin:0;border:0;overflow:hidden;background:#0c0d10}body{position:relative;overflow:clip!important}[hidden]{display:none!important}'+KEEL_LOADING_CSS+'</style></head><body data-verification="pending"><div id="keel-stage"></div>'+KEEL_LOADING_MARKUP+'<script>globalThis.__KEEL_ITEMS__=[null').replace("globalThis.__KEEL_ITEMS__=[null", input.embeddedContainerDelivery ? "globalThis.__KEEL_EMBEDDED_CONTAINERS__=[" : "globalThis.__KEEL_ITEMS__=[null"));
-  const suffix = utf8ToBytes(`];${runtime}</script></body></html>`);
+  const prefix = utf8ToBytes(('<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><style>*{box-sizing:border-box}html,body,#keel-stage,iframe{width:100%;height:100%;margin:0;border:0;overflow:hidden;background:#0c0d10}body{position:relative;overflow:clip!important}[hidden]{display:none!important}'+KEEL_LOADING_CSS+'</style></head><body data-verification="pending"><div id="keel-stage"></div>'+KEEL_LOADING_MARKUP+'<script>globalThis.__KEEL_ITEMS__=[null').replace("globalThis.__KEEL_ITEMS__=[null", input.embeddedContainerDelivery || input.legacyPreparedDenseDelivery ? "globalThis.__KEEL_EMBEDDED_CONTAINERS__=[" : "globalThis.__KEEL_ITEMS__=[null"));
+  const suffix = utf8ToBytes(`];${input.legacyPreparedDenseDelivery ? 'const __KEEL_LEGACY_DENSE_PROFILE__="' + (input.legacyPreparedDenseDelivery.sharedImage ? 'keel.legacy-prepared-dense-shared-image@1' : 'keel.legacy-prepared-dense-copy@1') + '";' : ""}${runtime}</script></body></html>`);
   const [prefixIntegrity, suffixIntegrity] = await Promise.all([sha256Integrity(prefix), sha256Integrity(suffix)]);
-  const containerBridge = input.embeddedContainerDelivery ? utf8ToBytes("];globalThis.__KEEL_ITEMS__=[null") : undefined;
-  return { prefix, suffix, prefixIntegrity, suffixIntegrity, ...(containerBridge ? { resourceProfile: transportProfile === "uri81-block-v1" ? "embedded-shared-containers-uri81@1" as const : transportProfile === "base90-block-v2" ? "embedded-shared-containers-base90-block@2" as const : transportProfile === "base90-v1" ? "embedded-shared-containers-base90@1" as const : transportProfile === "base91-v1" ? "embedded-shared-containers-base91@1" as const : "embedded-shared-containers@1" as const, containerBridge,
+  const containerBridge = input.embeddedContainerDelivery || input.legacyPreparedDenseDelivery ? utf8ToBytes("];globalThis.__KEEL_ITEMS__=[null") : undefined;
+  return { prefix, suffix, prefixIntegrity, suffixIntegrity, ...(containerBridge ? { resourceProfile: input.legacyPreparedDenseDelivery ? input.legacyPreparedDenseDelivery.sharedImage ? "legacy-prepared-dense-shared-image@1" as const : "legacy-prepared-dense-copy@1" as const : transportProfile === "uri81-block-v1" ? "embedded-shared-containers-uri81@1" as const : transportProfile === "base90-block-v2" ? "embedded-shared-containers-base90-block@2" as const : transportProfile === "base90-v1" ? "embedded-shared-containers-base90@1" as const : transportProfile === "base91-v1" ? "embedded-shared-containers-base91@1" as const : "embedded-shared-containers@1" as const, containerBridge,
     containerBridgeIntegrity: await sha256Integrity(containerBridge) } : {}), deliveryProfile: input.onchainDelivery ? "onchain-recursive" : "embedded-assembled", codecProfile, supportedCodecs: ["none", "gzip", "deflate", ...codecs], ...(decoderModule ? { decoderIntegrity: decoderModule.integrity } : {}), ...(transportModule ? { transportDecoderIntegrity: transportModule.integrity } : {}) };
 }
 
@@ -1560,7 +1607,7 @@ export async function wrapInVerificationShell(options: WrapInVerificationShellOp
   });
   const target = options.target ?? {
     chainId: 11_155_111,
-    address: resolveModuleTarget({ module: "keel-hold", contract: "KeelHold", chainId: 11_155_111 }).address,
+    address: resolveDefaultKeelHoldTarget(11_155_111).address,
   };
   const chunks = chunkBytes(built.compressedHtml, MAX_SLUG_BYTES);
   const chunkIntegrities = await Promise.all(chunks.map((chunk) => sha256Integrity(chunk.bytes)));

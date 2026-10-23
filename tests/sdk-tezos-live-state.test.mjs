@@ -5,6 +5,7 @@ import {
   KEEL_TEZOS_LIVE_STATE_PROTOCOL,
   assertKeelTezosLiveSnapshot,
   buildKeelTezosLiveStateFragment,
+  checkKeelTezosStateRewriteAuthority,
   decodeKeelTezosLiveValue,
   keelTezosLiveMichelineType,
   keelTezosLiveMichelineValue,
@@ -12,6 +13,7 @@ import {
   orderKeelModules,
   packKeelTezosLiveKey,
   prepareKeelTezosLiveState,
+  prepareKeelTezosStateRewrite,
   readKeelTezosLiveState,
   resolveKeelTezosLiveReads,
   runKeelTezosLiveStateFragment,
@@ -251,4 +253,53 @@ test("snapshots, endpoints and options are validated before anything is emitted"
   const { fetchImpl } = chain({ bigmaps: { 41: { [expr7]: { int: "2" } } }, views: { image_count: () => ({ int: "5" }) } });
   const online = await prepareKeelTezosLiveState({ network, reads: READS, rpcUrl: rpc, rpcUrls: [rpc], fetchImpl });
   assert.deepEqual(online.snapshot.values, { generation: 2, cartHash: null, images: 5 });
+});
+
+/* Listing-visible traits: the creator rewrites them in the triggering call's own group. */
+const collection = "KT1TfufsGjCzV9qGyo5Y4KMUsTVdN1iZv13Q";
+const creator = "tz1KqTpEZ7Yob7QbPE4Hy4Wo8fHG8LhKxZSx";
+const supersede = { kind: "transaction", destination: cart, amount: "0", parameters: { entrypoint: "supersede", value: { prim: "Pair", args: [{ int: "7" }, { bytes: "c0ffee" }] } } };
+const traits = { tokenId: 7, name: "Cart #7", artifactUri: `onchfs://${"ab".repeat(32)}/index.html?t=7`, displayUri: `onchfs://${"ab".repeat(32)}/preview.svg`, attributes: [{ name: "Generation", value: "3" }] };
+
+test("the creator signs the trigger and the trait rewrite as one atomic group; no contract becomes an editor", () => {
+  const plan = prepareKeelTezosStateRewrite({ network, creator, collection, trigger: [supersede], tokens: [traits] });
+  assert.equal(plan.expectedSender, creator);
+  assert.equal(plan.atomic, true);
+  assert.deepEqual(plan.operations.map((operation) => [operation.destination, operation.parameters.entrypoint]), [[cart, "supersede"], [collection, "set_token_metadata"]]);
+  assert.deepEqual(plan.authority, { model: "creator-only", holderMetadataEditing: false, triggerContracts: [cart], triggerContractsAreAdministrators: false });
+  assert.equal(JSON.parse(plan.tokens[0].tokenInfo.attributes)[0].value, "3");
+  assert.equal(plan.signing, "not-performed");
+  // A trigger that calls the collection could widen who edits metadata (add_administrator, set_token_owner_can_edit).
+  for (const entrypoint of ["add_administrator", "set_token_owner_can_edit"]) {
+    assert.throws(() => prepareKeelTezosStateRewrite({ network, creator, collection, trigger: [{ ...supersede, destination: collection, parameters: { entrypoint, value: { prim: "True" } } }], tokens: [traits] }), /calls the collection/u);
+  }
+  assert.throws(() => prepareKeelTezosStateRewrite({ network, creator, collection, trigger: [], tokens: [traits] }), /trigger must list/u);
+  assert.throws(() => prepareKeelTezosStateRewrite({ network, creator, collection, trigger: [{ ...supersede, amount: "-1" }], tokens: [traits] }), /amount/u);
+  assert.throws(() => prepareKeelTezosStateRewrite({ network, creator, collection, trigger: [supersede], tokens: [traits], wallet: { secretKey: "edsk" } }), /Private signer material/u);
+});
+
+test("the authority check reads holder editing and whether each trigger contract is an administrator", async () => {
+  const code = [
+    { prim: "parameter", args: [{ prim: "unit" }] }, { prim: "storage", args: [{ prim: "unit" }] }, { prim: "code", args: [[]] },
+    { prim: "view", args: [{ string: "token_owner_can_edit" }, { prim: "unit" }, { prim: "bool" }, []] },
+    { prim: "view", args: [{ string: "is_administrator" }, { prim: "address" }, { prim: "bool" }, []] },
+  ];
+  const fake = ({ holderEditing, administrators }) => async (url, init = {}) => {
+    const { pathname } = new URL(url);
+    const reply = (body) => new Response(JSON.stringify(body), { status: 200, headers: { "content-type": "application/json" } });
+    if (pathname === "/chains/main/chain_id") return reply(network);
+    if (/\/blocks\/[^/]+\/header$/u.test(pathname)) return reply({ level: 9, hash: HASH });
+    if (pathname.endsWith(`/context/contracts/${collection}/script`)) return reply({ code, storage: { prim: "Unit" } });
+    const body = JSON.parse(init.body);
+    assert.equal(body.contract, collection);
+    if (body.view === "token_owner_can_edit") return reply({ data: { prim: holderEditing ? "True" : "False" } });
+    return reply({ data: { prim: administrators.includes(body.input.string) ? "True" : "False" } });
+  };
+  const clean = await checkKeelTezosStateRewriteAuthority({ network, rpcUrl: rpc, collection, triggerContracts: [cart], fetchImpl: fake({ holderEditing: false, administrators: [] }) });
+  assert.deepEqual(clean, { ok: true, level: 9, holderMetadataEditing: false, administrators: { [cart]: false } });
+  const admin = await checkKeelTezosStateRewriteAuthority({ network, rpcUrl: rpc, collection, triggerContracts: [cart], fetchImpl: fake({ holderEditing: false, administrators: [cart] }) });
+  assert.equal(admin.ok, false);
+  assert.equal(admin.administrators[cart], true);
+  const holders = await checkKeelTezosStateRewriteAuthority({ network, rpcUrl: rpc, collection, triggerContracts: [cart], fetchImpl: fake({ holderEditing: true, administrators: [] }) });
+  assert.deepEqual([holders.ok, holders.holderMetadataEditing], [false, true]);
 });

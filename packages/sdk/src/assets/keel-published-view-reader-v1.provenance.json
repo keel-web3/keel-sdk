@@ -1,0 +1,21 @@
+{
+  "schema": "keel-immutable-runtime-provenance@1",
+  "id": "keel.published-view-reader",
+  "profile": "registered-v1",
+  "sourceSdkCommit": "f0fca973ba0fd5fbe805ab5d21fd04bfad9ec44a",
+  "byteLength": 251050,
+  "sha256": "978e5fed29103cc72a2272f908421f14a587009d959aa40d3a1853af130bae1a",
+  "pnpmLockSha256": "188e360a1d74ecfd2b3cbf45ba3ea9b4d8b1edb49ec728f746d398ae011745dd",
+  "node": "22.22.1",
+  "typescript": "5.9.3",
+  "esbuild": "0.28.2",
+  "license": "Retain repository LICENSE and bundled dependency license notices; source derivation follows the pinned SDK and lockfile.",
+  "reproduction": [
+    "Check out sourceSdkCommit in an isolated workspace with its pinned pnpm-lock.yaml.",
+    "Run pnpm install --frozen-lockfile and pnpm build with Node 22.22.1.",
+    "Import packages/sdk/dist/verification-shell.js and call its buildPublishedViewReaderModule() at that source revision.",
+    "Write the returned source bytes unchanged and verify byteLength and sha256."
+  ],
+  "compatibility": "Default canonical shells copy this exact reader digest. Current-source candidate builds require a separately authenticated selected-chain module version and complete consumer/browser proof.",
+  "registrationEvidence": "This package identity does not assert selected-chain deployment, receipt or registration."
+}

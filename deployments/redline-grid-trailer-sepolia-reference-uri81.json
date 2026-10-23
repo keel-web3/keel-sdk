@@ -1,0 +1,2106 @@
+{
+  "protocol": "keel-sepolia-publication-reference@1",
+  "name": "REDLINE native Grid and trailer shared modules",
+  "chainId": 11155111,
+  "collection": "0x3F562678f56E46B47D42DC6251727ECF7Bd33ca2",
+  "tokenId": "1",
+  "mintTransaction": "0xc08a0cd6f230cd3b6f0074360224134acddfd9e25e86b96d77c71cfbb1fc5364",
+  "link": "https://onchainchecker.xyz/collection/sepolia/0x3F562678f56E46B47D42DC6251727ECF7Bd33ca2/1",
+  "blockNumber": "11899558",
+  "blockHash": "0x65898c0fb901131f5f808c2ecfac208762cd18ab0c08c12e40c6ce0343108eaa",
+  "tokenURI": {
+    "byteLength": 1059131,
+    "sha256": "0xda871690f9928179ccc72bb6c5c073f37981853921ff0da60ef50925eef0ccbe",
+    "matchesPublication": "live-canonical-shell-3-composer-7-performance-20261012"
+  },
+  "transport": {
+    "payload": "uri81-block-v1",
+    "compression": "brotli for new shared modules and scene; none for tiny music; unchanged PPMd engine reuse",
+    "shellBoot": "canonical gzip decoder and PPMd runtime, classic script with SHA-256",
+    "preparation": "build-time",
+    "contractOperation": "verified-copy",
+    "completeDocumentBase64Layers": 0
+  },
+  "uriCompatibility": {
+    "tokenURI": {
+      "strictURICompatible": true
+    },
+    "animationURL": {
+      "strictURICompatible": true
+    },
+    "image": {
+      "strictURICompatible": true
+    }
+  },
+  "resources": {
+    "logical": 77,
+    "containers": 5,
+    "resourceRPCs": 0,
+    "items": [
+      {
+        "aliases": [
+          "trailer.module-runtime",
+          "trailer.module-runtime.js"
+        ],
+        "id": "trailer.module-runtime",
+        "integrity": {
+          "algorithm": "sha256",
+          "byteLength": 709,
+          "digest": "0x29eae8fb2be03cb4b184680d9946823fba0cc56b69d20ca3d3a2ccf1a6117917"
+        },
+        "mediaType": "text/javascript",
+        "onchain": {
+          "containerId": "0x5c8db22fabcd41b5473c9692bae40f5600834985c6a51ebf99fd6adac32d3be8",
+          "offset": 0
+        },
+        "role": "module",
+        "containerBindings": [
+          {
+            "chainId": 11155111,
+            "compression": "brotli",
+            "integrity": {
+              "algorithm": "sha256",
+              "byteLength": 1887677,
+              "digest": "0x2c0f91db1cad9bede4fc480368ef78fc33bef88e43543a8d47a8c5befec682f2"
+            },
+            "objectId": "0x0edf7ae447764df5dfbd71eea2f8878b0ce6fcdbbd88a48273b07f7b3483af3c",
+            "store": "0xD820e337692A6Eb7a4878e42ce88CBCFF49B55CF",
+            "storedIntegrity": {
+              "algorithm": "sha256",
+              "byteLength": 540083,
+              "digest": "0x72751354d2a57facaf9eb95f37fe15a1a92a448a6a167497c8183405aace5990"
+            },
+            "id": "0x5c8db22fabcd41b5473c9692bae40f5600834985c6a51ebf99fd6adac32d3be8"
+          },
+          {
+            "chainId": 11155111,
+            "compression": "brotli",
+            "integrity": {
+              "algorithm": "sha256",
+              "byteLength": 904,
+              "digest": "0x465a35b1cc388dc42dc92000d5b348f18eb3aaf4ff3cc2220ad372aa8e42f88f"
+            },
+            "objectId": "0x00ea9b4a25b8c5e4c60045edd4e7ffbd0210036bdc9ade6be5645dcfb1790664",
+            "store": "0xD820e337692A6Eb7a4878e42ce88CBCFF49B55CF",
+            "storedIntegrity": {
+              "algorithm": "sha256",
+              "byteLength": 739,
+              "digest": "0x5fff2c550cb5bae9106242fdfd9dd4e8e7b174e17783db5c8211131d4d693575"
+            },
+            "id": "0x60d42d3ea2503d9e5040869208207497664bfad9e402498acd636bc843dedb37"
+          },
+          {
+            "chainId": 11155111,
+            "compression": "none",
+            "integrity": {
+              "algorithm": "sha256",
+              "byteLength": 15,
+              "digest": "0xb40c5c11d13a4e0080420a608c65c8d8ce988e57b88cfec74322fe052d40af6e"
+            },
+            "objectId": "0xba3245ca7390a224833283ef830a86485908946aa86a53d46099709ed9f89a61",
+            "store": "0xD820e337692A6Eb7a4878e42ce88CBCFF49B55CF",
+            "storedIntegrity": {
+              "algorithm": "sha256",
+              "byteLength": 15,
+              "digest": "0xb40c5c11d13a4e0080420a608c65c8d8ce988e57b88cfec74322fe052d40af6e"
+            },
+            "id": "0xd7ccc711f03e0b7320da49d5bcf2a6f5d4e3a7d9f8f7c531049c4c01483f9f16"
+          },
+          {
+            "chainId": 11155111,
+            "compression": "brotli",
+            "integrity": {
+              "algorithm": "sha256",
+              "byteLength": 131233,
+              "digest": "0x18d6f203588c654c25d5348bd047f66c1a02ab1fd0e3256273dbd72b63d4d7de"
+            },
+            "objectId": "0x80592c544f8178475b561ddbf8a4efc589be26efebc623420fc663c5ed46ace4",
+            "store": "0xD820e337692A6Eb7a4878e42ce88CBCFF49B55CF",
+            "storedIntegrity": {
+              "algorithm": "sha256",
+              "byteLength": 48173,
+              "digest": "0xef5526ef11665eae3463a73319cdd995ac424525a7a56628ac2d5b329d0028fa"
+            },
+            "id": "0x81b2f7dd74f35026abd38011370afe409c80b1d7f578672ffbf3d78dd5914a06"
+          },
+          {
+            "id": "0xf849f6070e2a506c007fd9bb1d6942c619f03fed0067cf0f4ddc45db1e9c5259",
+            "chainId": 11155111,
+            "store": "0xD820e337692A6Eb7a4878e42ce88CBCFF49B55CF",
+            "objectId": "0x86d02a8a8fdd647f79fa22d7e3751c327e38241455695bb980af7db5bb4cb50d",
+            "compression": "brotli",
+            "storedIntegrity": {
+              "algorithm": "sha256",
+              "digest": "0xe3032eabbe241ba58531bc89c0d9c5b5c6d1dc2334e8bb8c3c44aed657edc7b7",
+              "byteLength": 68448
+            },
+            "integrity": {
+              "algorithm": "sha256",
+              "digest": "0x16dd04ae390dcf5bbe0282b358abf7899906a5e8b535958b38d98b18b85c85cc",
+              "byteLength": 296355
+            }
+          }
+        ]
+      },
+      {
+        "aliases": [
+          "redline.trailer.damage.mesh",
+          "redline.trailer.damage.mesh.js"
+        ],
+        "id": "redline.trailer.damage.mesh",
+        "integrity": {
+          "algorithm": "sha256",
+          "byteLength": 714,
+          "digest": "0x63863f34fd0734625d4a87dbfde58f790c86c0ef5b5719505e619f8ed6d6e778"
+        },
+        "mediaType": "text/javascript",
+        "onchain": {
+          "containerId": "0x5c8db22fabcd41b5473c9692bae40f5600834985c6a51ebf99fd6adac32d3be8",
+          "offset": 709
+        },
+        "role": "module"
+      },
+      {
+        "aliases": [
+          "redline.trailer.damage.view",
+          "redline.trailer.damage.view.js"
+        ],
+        "id": "redline.trailer.damage.view",
+        "integrity": {
+          "algorithm": "sha256",
+          "byteLength": 15250,
+          "digest": "0x0bfdd622438d727f3012e54d5ca8558358e16d99500c0bf02b6b2c8a6ac58910"
+        },
+        "mediaType": "text/javascript",
+        "onchain": {
+          "containerId": "0x5c8db22fabcd41b5473c9692bae40f5600834985c6a51ebf99fd6adac32d3be8",
+          "offset": 1423
+        },
+        "role": "module"
+      },
+      {
+        "aliases": [
+          "redline.trailer.export.city-shot",
+          "redline.trailer.export.city-shot.js"
+        ],
+        "id": "redline.trailer.export.city-shot",
+        "integrity": {
+          "algorithm": "sha256",
+          "byteLength": 110694,
+          "digest": "0xf8ce3b6d1634ac5e6b0762a8dc3961166b9d6736243e18cbdd8d819b85bce6de"
+        },
+        "mediaType": "text/javascript",
+        "onchain": {
+          "containerId": "0x5c8db22fabcd41b5473c9692bae40f5600834985c6a51ebf99fd6adac32d3be8",
+          "offset": 16673
+        },
+        "role": "module"
+      },
+      {
+        "aliases": [
+          "redline.trailer.export.city-shot-motion",
+          "redline.trailer.export.city-shot-motion.js"
+        ],
+        "id": "redline.trailer.export.city-shot-motion",
+        "integrity": {
+          "algorithm": "sha256",
+          "byteLength": 653,
+          "digest": "0x988ca1c7230c6452eea774883544c991ed2645c350bb7f29f1570ce9790f91ae"
+        },
+        "mediaType": "text/javascript",
+        "onchain": {
+          "containerId": "0x5c8db22fabcd41b5473c9692bae40f5600834985c6a51ebf99fd6adac32d3be8",
+          "offset": 127367
+        },
+        "role": "module"
+      },
+      {
+        "aliases": [
+          "redline.trailer.export.shot-scenes",
+          "redline.trailer.export.shot-scenes.js"
+        ],
+        "id": "redline.trailer.export.shot-scenes",
+        "integrity": {
+          "algorithm": "sha256",
+          "byteLength": 605,
+          "digest": "0x0beb7bba8eadaef34350a67c1d1ba45ef17317a87c5a1e349c0f163939a3fe71"
+        },
+        "mediaType": "text/javascript",
+        "onchain": {
+          "containerId": "0x5c8db22fabcd41b5473c9692bae40f5600834985c6a51ebf99fd6adac32d3be8",
+          "offset": 128020
+        },
+        "role": "module"
+      },
+      {
+        "aliases": [
+          "redline.trailer.pose",
+          "redline.trailer.pose.js"
+        ],
+        "id": "redline.trailer.pose",
+        "integrity": {
+          "algorithm": "sha256",
+          "byteLength": 579,
+          "digest": "0xa40921af70f819f4bd3bd5eeb618949d7b6582592fcb15f4c075882f5111a387"
+        },
+        "mediaType": "text/javascript",
+        "onchain": {
+          "containerId": "0x5c8db22fabcd41b5473c9692bae40f5600834985c6a51ebf99fd6adac32d3be8",
+          "offset": 128625
+        },
+        "role": "module"
+      },
+      {
+        "aliases": [
+          "redline.trailer.shared.13f553c311da7edd",
+          "redline.trailer.shared.13f553c311da7edd.js"
+        ],
+        "id": "redline.trailer.shared.13f553c311da7edd",
+        "integrity": {
+          "algorithm": "sha256",
+          "byteLength": 2424,
+          "digest": "0x7acee809796f5cd1bd8f356849311e353f5b8452c4c855d124c40f3bf6e744e4"
+        },
+        "mediaType": "text/javascript",
+        "onchain": {
+          "containerId": "0x5c8db22fabcd41b5473c9692bae40f5600834985c6a51ebf99fd6adac32d3be8",
+          "offset": 129204
+        },
+        "role": "module"
+      },
+      {
+        "aliases": [
+          "redline.trailer.shared.15171d810b18dcec",
+          "redline.trailer.shared.15171d810b18dcec.js"
+        ],
+        "id": "redline.trailer.shared.15171d810b18dcec",
+        "integrity": {
+          "algorithm": "sha256",
+          "byteLength": 2174,
+          "digest": "0x45a593a8bab474fb1878e760bda384455610ced6a0a73ea75b85572e370329e7"
+        },
+        "mediaType": "text/javascript",
+        "onchain": {
+          "containerId": "0x5c8db22fabcd41b5473c9692bae40f5600834985c6a51ebf99fd6adac32d3be8",
+          "offset": 131628
+        },
+        "role": "module"
+      },
+      {
+        "aliases": [
+          "redline.trailer.shared.20630e2e44dd0a85",
+          "redline.trailer.shared.20630e2e44dd0a85.js"
+        ],
+        "id": "redline.trailer.shared.20630e2e44dd0a85",
+        "integrity": {
+          "algorithm": "sha256",
+          "byteLength": 60390,
+          "digest": "0x592da1568f0aa03194512e35ce11d83d20e691298685d848fbfbdebab904aa77"
+        },
+        "mediaType": "text/javascript",
+        "onchain": {
+          "containerId": "0x5c8db22fabcd41b5473c9692bae40f5600834985c6a51ebf99fd6adac32d3be8",
+          "offset": 133802
+        },
+        "role": "module"
+      },
+      {
+        "aliases": [
+          "redline.trailer.shared.277dcc2e382ac036",
+          "redline.trailer.shared.277dcc2e382ac036.js"
+        ],
+        "id": "redline.trailer.shared.277dcc2e382ac036",
+        "integrity": {
+          "algorithm": "sha256",
+          "byteLength": 1911,
+          "digest": "0x51b42cb22661143b1144d072bb1985f4de46d2cc9e77d6a8df65cfa69cd2079c"
+        },
+        "mediaType": "text/javascript",
+        "onchain": {
+          "containerId": "0x5c8db22fabcd41b5473c9692bae40f5600834985c6a51ebf99fd6adac32d3be8",
+          "offset": 194192
+        },
+        "role": "module"
+      },
+      {
+        "aliases": [
+          "redline.trailer.shared.279007bf74246d83",
+          "redline.trailer.shared.279007bf74246d83.js"
+        ],
+        "id": "redline.trailer.shared.279007bf74246d83",
+        "integrity": {
+          "algorithm": "sha256",
+          "byteLength": 743,
+          "digest": "0x3ddbd2dde79d565ae04b9b703ffd434ca925493d756fd0ae60d2ae229b09d5dd"
+        },
+        "mediaType": "text/javascript",
+        "onchain": {
+          "containerId": "0x5c8db22fabcd41b5473c9692bae40f5600834985c6a51ebf99fd6adac32d3be8",
+          "offset": 196103
+        },
+        "role": "module"
+      },
+      {
+        "aliases": [
+          "redline.trailer.shared.33dd9ce1072d74db",
+          "redline.trailer.shared.33dd9ce1072d74db.js"
+        ],
+        "id": "redline.trailer.shared.33dd9ce1072d74db",
+        "integrity": {
+          "algorithm": "sha256",
+          "byteLength": 6006,
+          "digest": "0x2af41fce5d91afad3638889a8d611f30d5dd2f465246aedbbe0a7251aa522d17"
+        },
+        "mediaType": "text/javascript",
+        "onchain": {
+          "containerId": "0x5c8db22fabcd41b5473c9692bae40f5600834985c6a51ebf99fd6adac32d3be8",
+          "offset": 196846
+        },
+        "role": "module"
+      },
+      {
+        "aliases": [
+          "redline.trailer.shared.3ee608e76b3ed5a5",
+          "redline.trailer.shared.3ee608e76b3ed5a5.js"
+        ],
+        "id": "redline.trailer.shared.3ee608e76b3ed5a5",
+        "integrity": {
+          "algorithm": "sha256",
+          "byteLength": 2199,
+          "digest": "0x9df00e864eaaf9ca8377f7b07a5c8b8080a0da17b8d590fa96e051897855e26d"
+        },
+        "mediaType": "text/javascript",
+        "onchain": {
+          "containerId": "0x5c8db22fabcd41b5473c9692bae40f5600834985c6a51ebf99fd6adac32d3be8",
+          "offset": 202852
+        },
+        "role": "module"
+      },
+      {
+        "aliases": [
+          "redline.trailer.shared.61fbdb1a3177df5f",
+          "redline.trailer.shared.61fbdb1a3177df5f.js"
+        ],
+        "id": "redline.trailer.shared.61fbdb1a3177df5f",
+        "integrity": {
+          "algorithm": "sha256",
+          "byteLength": 169781,
+          "digest": "0xbe01549e53e0870c68774433c5c5ad0bd90bd2e7aa4bbae80b02494b13dde1bb"
+        },
+        "mediaType": "text/javascript",
+        "onchain": {
+          "containerId": "0x5c8db22fabcd41b5473c9692bae40f5600834985c6a51ebf99fd6adac32d3be8",
+          "offset": 205051
+        },
+        "role": "module"
+      },
+      {
+        "aliases": [
+          "redline.trailer.shared.7784db84472b0f19",
+          "redline.trailer.shared.7784db84472b0f19.js"
+        ],
+        "id": "redline.trailer.shared.7784db84472b0f19",
+        "integrity": {
+          "algorithm": "sha256",
+          "byteLength": 1071,
+          "digest": "0xb959e4a8d50f213871ef4d20762a1e45260c283cdcce61095b112691c5b85ba6"
+        },
+        "mediaType": "text/javascript",
+        "onchain": {
+          "containerId": "0x5c8db22fabcd41b5473c9692bae40f5600834985c6a51ebf99fd6adac32d3be8",
+          "offset": 374832
+        },
+        "role": "module"
+      },
+      {
+        "aliases": [
+          "redline.trailer.shared.81001670c8724067",
+          "redline.trailer.shared.81001670c8724067.js"
+        ],
+        "id": "redline.trailer.shared.81001670c8724067",
+        "integrity": {
+          "algorithm": "sha256",
+          "byteLength": 62173,
+          "digest": "0xb59121196ccc2ac83eb95b24f01c91e9654a61f4bc12723e5529b3791c178800"
+        },
+        "mediaType": "text/javascript",
+        "onchain": {
+          "containerId": "0x5c8db22fabcd41b5473c9692bae40f5600834985c6a51ebf99fd6adac32d3be8",
+          "offset": 375903
+        },
+        "role": "module"
+      },
+      {
+        "aliases": [
+          "redline.trailer.shared.8b8588fbb284471a",
+          "redline.trailer.shared.8b8588fbb284471a.js"
+        ],
+        "id": "redline.trailer.shared.8b8588fbb284471a",
+        "integrity": {
+          "algorithm": "sha256",
+          "byteLength": 7076,
+          "digest": "0x2cc5d2b7acdf796f2c7e4d714c99b3304983b3c2ec028930534b8e1434a29170"
+        },
+        "mediaType": "text/javascript",
+        "onchain": {
+          "containerId": "0x5c8db22fabcd41b5473c9692bae40f5600834985c6a51ebf99fd6adac32d3be8",
+          "offset": 438076
+        },
+        "role": "module"
+      },
+      {
+        "aliases": [
+          "redline.trailer.shared.915f816beba4be27",
+          "redline.trailer.shared.915f816beba4be27.js"
+        ],
+        "id": "redline.trailer.shared.915f816beba4be27",
+        "integrity": {
+          "algorithm": "sha256",
+          "byteLength": 2215,
+          "digest": "0xc2f30fdb4346a3e576e075b4c28c6d686e3a2a072ca205f81b7c7fc973410f86"
+        },
+        "mediaType": "text/javascript",
+        "onchain": {
+          "containerId": "0x5c8db22fabcd41b5473c9692bae40f5600834985c6a51ebf99fd6adac32d3be8",
+          "offset": 445152
+        },
+        "role": "module"
+      },
+      {
+        "aliases": [
+          "redline.trailer.shared.919521e4673fa78b",
+          "redline.trailer.shared.919521e4673fa78b.js"
+        ],
+        "id": "redline.trailer.shared.919521e4673fa78b",
+        "integrity": {
+          "algorithm": "sha256",
+          "byteLength": 15451,
+          "digest": "0xa7b03a7a7a64bffd1f1e02f9448770a581506127d7ddd78f1c5c128cf2afd317"
+        },
+        "mediaType": "text/javascript",
+        "onchain": {
+          "containerId": "0x5c8db22fabcd41b5473c9692bae40f5600834985c6a51ebf99fd6adac32d3be8",
+          "offset": 447367
+        },
+        "role": "module"
+      },
+      {
+        "aliases": [
+          "redline.trailer.shared.98a1427b0e1ebc1a",
+          "redline.trailer.shared.98a1427b0e1ebc1a.js"
+        ],
+        "id": "redline.trailer.shared.98a1427b0e1ebc1a",
+        "integrity": {
+          "algorithm": "sha256",
+          "byteLength": 8956,
+          "digest": "0x869db57056ff6a91ffbaeff361a0f92ad3a9f6c503da5d10acb1730a3191aee1"
+        },
+        "mediaType": "text/javascript",
+        "onchain": {
+          "containerId": "0x5c8db22fabcd41b5473c9692bae40f5600834985c6a51ebf99fd6adac32d3be8",
+          "offset": 462818
+        },
+        "role": "module"
+      },
+      {
+        "aliases": [
+          "redline.trailer.shared.a1112f275edfc129",
+          "redline.trailer.shared.a1112f275edfc129.js"
+        ],
+        "id": "redline.trailer.shared.a1112f275edfc129",
+        "integrity": {
+          "algorithm": "sha256",
+          "byteLength": 27426,
+          "digest": "0x4f55f6aca50c32ff62abd330f8d3c9fb124e01805a8fa94ab6f6517597b2b205"
+        },
+        "mediaType": "text/javascript",
+        "onchain": {
+          "containerId": "0x5c8db22fabcd41b5473c9692bae40f5600834985c6a51ebf99fd6adac32d3be8",
+          "offset": 471774
+        },
+        "role": "module"
+      },
+      {
+        "aliases": [
+          "redline.trailer.shared.a1398287e39e48e0",
+          "redline.trailer.shared.a1398287e39e48e0.js"
+        ],
+        "id": "redline.trailer.shared.a1398287e39e48e0",
+        "integrity": {
+          "algorithm": "sha256",
+          "byteLength": 16377,
+          "digest": "0x1a217d93ebe6086e5dbbfee29e15f2222697c8482759d3b4a132c1a5b134064f"
+        },
+        "mediaType": "text/javascript",
+        "onchain": {
+          "containerId": "0x5c8db22fabcd41b5473c9692bae40f5600834985c6a51ebf99fd6adac32d3be8",
+          "offset": 499200
+        },
+        "role": "module"
+      },
+      {
+        "aliases": [
+          "redline.trailer.shared.a403485d81310f1c",
+          "redline.trailer.shared.a403485d81310f1c.js"
+        ],
+        "id": "redline.trailer.shared.a403485d81310f1c",
+        "integrity": {
+          "algorithm": "sha256",
+          "byteLength": 3558,
+          "digest": "0x1c42bd5931dd1d7405d4caf3750eecdb5db37a0d7bead3c70999eb79624f71b3"
+        },
+        "mediaType": "text/javascript",
+        "onchain": {
+          "containerId": "0x5c8db22fabcd41b5473c9692bae40f5600834985c6a51ebf99fd6adac32d3be8",
+          "offset": 515577
+        },
+        "role": "module"
+      },
+      {
+        "aliases": [
+          "redline.trailer.shared.abdf6ccef0b5656e",
+          "redline.trailer.shared.abdf6ccef0b5656e.js"
+        ],
+        "id": "redline.trailer.shared.abdf6ccef0b5656e",
+        "integrity": {
+          "algorithm": "sha256",
+          "byteLength": 21874,
+          "digest": "0xed2e52df15c2649d8422c46089401a4141b92670a4a6e37efa36744961f79ca8"
+        },
+        "mediaType": "text/javascript",
+        "onchain": {
+          "containerId": "0x5c8db22fabcd41b5473c9692bae40f5600834985c6a51ebf99fd6adac32d3be8",
+          "offset": 519135
+        },
+        "role": "module"
+      },
+      {
+        "aliases": [
+          "redline.trailer.shared.b353272708a98afe",
+          "redline.trailer.shared.b353272708a98afe.js"
+        ],
+        "id": "redline.trailer.shared.b353272708a98afe",
+        "integrity": {
+          "algorithm": "sha256",
+          "byteLength": 5772,
+          "digest": "0x6e9234b5f837405fa633061d4e0a2adf566adbc5733f6506d26369ca29149639"
+        },
+        "mediaType": "text/javascript",
+        "onchain": {
+          "containerId": "0x5c8db22fabcd41b5473c9692bae40f5600834985c6a51ebf99fd6adac32d3be8",
+          "offset": 541009
+        },
+        "role": "module"
+      },
+      {
+        "aliases": [
+          "redline.trailer.shared.b43636cf9503c424",
+          "redline.trailer.shared.b43636cf9503c424.js"
+        ],
+        "id": "redline.trailer.shared.b43636cf9503c424",
+        "integrity": {
+          "algorithm": "sha256",
+          "byteLength": 86662,
+          "digest": "0x5955a6f90617a8df159653b5fad089b7e7387cf129ba702ffddd89de84fdfb57"
+        },
+        "mediaType": "text/javascript",
+        "onchain": {
+          "containerId": "0x5c8db22fabcd41b5473c9692bae40f5600834985c6a51ebf99fd6adac32d3be8",
+          "offset": 546781
+        },
+        "role": "module"
+      },
+      {
+        "aliases": [
+          "redline.trailer.shared.b92be9994e503ec8",
+          "redline.trailer.shared.b92be9994e503ec8.js"
+        ],
+        "id": "redline.trailer.shared.b92be9994e503ec8",
+        "integrity": {
+          "algorithm": "sha256",
+          "byteLength": 3540,
+          "digest": "0x5320eb092980456727638741a6afc6122e7987c248f5fa510b065c2a89f75639"
+        },
+        "mediaType": "text/javascript",
+        "onchain": {
+          "containerId": "0x5c8db22fabcd41b5473c9692bae40f5600834985c6a51ebf99fd6adac32d3be8",
+          "offset": 633443
+        },
+        "role": "module"
+      },
+      {
+        "aliases": [
+          "redline.trailer.shared.bba147d03f421bd2",
+          "redline.trailer.shared.bba147d03f421bd2.js"
+        ],
+        "id": "redline.trailer.shared.bba147d03f421bd2",
+        "integrity": {
+          "algorithm": "sha256",
+          "byteLength": 170,
+          "digest": "0x907cf95e3f9d509b6368301a8db3af6f77881e14ceb4187eed18b24108d72239"
+        },
+        "mediaType": "text/javascript",
+        "onchain": {
+          "containerId": "0x5c8db22fabcd41b5473c9692bae40f5600834985c6a51ebf99fd6adac32d3be8",
+          "offset": 636983
+        },
+        "role": "module"
+      },
+      {
+        "aliases": [
+          "redline.trailer.shared.bda494dd921ee2fe",
+          "redline.trailer.shared.bda494dd921ee2fe.js"
+        ],
+        "id": "redline.trailer.shared.bda494dd921ee2fe",
+        "integrity": {
+          "algorithm": "sha256",
+          "byteLength": 25111,
+          "digest": "0x4e06dce1a46e646143fe422f3883fa8d0958010e840e86a6dcca81508e82cc23"
+        },
+        "mediaType": "text/javascript",
+        "onchain": {
+          "containerId": "0x5c8db22fabcd41b5473c9692bae40f5600834985c6a51ebf99fd6adac32d3be8",
+          "offset": 637153
+        },
+        "role": "module"
+      },
+      {
+        "aliases": [
+          "redline.trailer.shared.c133e7d51ab10801",
+          "redline.trailer.shared.c133e7d51ab10801.js"
+        ],
+        "id": "redline.trailer.shared.c133e7d51ab10801",
+        "integrity": {
+          "algorithm": "sha256",
+          "byteLength": 20944,
+          "digest": "0xb7f991860809396e4d5b02a7e2dabaed3be7ff0924f4008881191110f47e2c6a"
+        },
+        "mediaType": "text/javascript",
+        "onchain": {
+          "containerId": "0x5c8db22fabcd41b5473c9692bae40f5600834985c6a51ebf99fd6adac32d3be8",
+          "offset": 662264
+        },
+        "role": "module"
+      },
+      {
+        "aliases": [
+          "redline.trailer.shared.c2bdce65c06b7098",
+          "redline.trailer.shared.c2bdce65c06b7098.js"
+        ],
+        "id": "redline.trailer.shared.c2bdce65c06b7098",
+        "integrity": {
+          "algorithm": "sha256",
+          "byteLength": 26199,
+          "digest": "0xb8a90daa75870985a7e2b89edc26003607449a02199461e32169d77f895349de"
+        },
+        "mediaType": "text/javascript",
+        "onchain": {
+          "containerId": "0x5c8db22fabcd41b5473c9692bae40f5600834985c6a51ebf99fd6adac32d3be8",
+          "offset": 683208
+        },
+        "role": "module"
+      },
+      {
+        "aliases": [
+          "redline.trailer.shared.cf21149cc104d132",
+          "redline.trailer.shared.cf21149cc104d132.js"
+        ],
+        "id": "redline.trailer.shared.cf21149cc104d132",
+        "integrity": {
+          "algorithm": "sha256",
+          "byteLength": 12037,
+          "digest": "0x616fc5cdbb2432f04a84e2c698d0bb2a6547ada54ee70867e6b83e14fa68ccf3"
+        },
+        "mediaType": "text/javascript",
+        "onchain": {
+          "containerId": "0x5c8db22fabcd41b5473c9692bae40f5600834985c6a51ebf99fd6adac32d3be8",
+          "offset": 709407
+        },
+        "role": "module"
+      },
+      {
+        "aliases": [
+          "redline.trailer.shared.d4002f2df7fcee5c",
+          "redline.trailer.shared.d4002f2df7fcee5c.js"
+        ],
+        "id": "redline.trailer.shared.d4002f2df7fcee5c",
+        "integrity": {
+          "algorithm": "sha256",
+          "byteLength": 2768,
+          "digest": "0x1dfc80e2b5a6d20a4a95abb140cff56d92c96a6cc50bd691ba111c2a9a583549"
+        },
+        "mediaType": "text/javascript",
+        "onchain": {
+          "containerId": "0x5c8db22fabcd41b5473c9692bae40f5600834985c6a51ebf99fd6adac32d3be8",
+          "offset": 721444
+        },
+        "role": "module"
+      },
+      {
+        "aliases": [
+          "redline.trailer.shared.e11e62f8aa41a1ac",
+          "redline.trailer.shared.e11e62f8aa41a1ac.js"
+        ],
+        "id": "redline.trailer.shared.e11e62f8aa41a1ac",
+        "integrity": {
+          "algorithm": "sha256",
+          "byteLength": 4986,
+          "digest": "0x229e9db88363066877c906c8bd132266adfc0e91afc2015fc8438509214e4711"
+        },
+        "mediaType": "text/javascript",
+        "onchain": {
+          "containerId": "0x5c8db22fabcd41b5473c9692bae40f5600834985c6a51ebf99fd6adac32d3be8",
+          "offset": 724212
+        },
+        "role": "module"
+      },
+      {
+        "aliases": [
+          "redline.trailer.shared.e4a4ccbedc91a9bf",
+          "redline.trailer.shared.e4a4ccbedc91a9bf.js"
+        ],
+        "id": "redline.trailer.shared.e4a4ccbedc91a9bf",
+        "integrity": {
+          "algorithm": "sha256",
+          "byteLength": 1455,
+          "digest": "0xf7980ea709ac512f5f8253b0d83facc773cb174de3f83cd275e608cc46493fd6"
+        },
+        "mediaType": "text/javascript",
+        "onchain": {
+          "containerId": "0x5c8db22fabcd41b5473c9692bae40f5600834985c6a51ebf99fd6adac32d3be8",
+          "offset": 729198
+        },
+        "role": "module"
+      },
+      {
+        "aliases": [
+          "redline.trailer.shared.ea1b4bd07e6ea3f7",
+          "redline.trailer.shared.ea1b4bd07e6ea3f7.js"
+        ],
+        "id": "redline.trailer.shared.ea1b4bd07e6ea3f7",
+        "integrity": {
+          "algorithm": "sha256",
+          "byteLength": 26095,
+          "digest": "0xc9065908511af551335adde4845f7d49c5da2b345e408660a9161cd78e8346a4"
+        },
+        "mediaType": "text/javascript",
+        "onchain": {
+          "containerId": "0x5c8db22fabcd41b5473c9692bae40f5600834985c6a51ebf99fd6adac32d3be8",
+          "offset": 730653
+        },
+        "role": "module"
+      },
+      {
+        "aliases": [
+          "redline.trailer.sky",
+          "redline.trailer.sky.js"
+        ],
+        "id": "redline.trailer.sky",
+        "integrity": {
+          "algorithm": "sha256",
+          "byteLength": 598,
+          "digest": "0xbbaa66a1f08ebff99b339f4a28efd92c79868e4c648f2d488804b26764d546da"
+        },
+        "mediaType": "text/javascript",
+        "onchain": {
+          "containerId": "0x5c8db22fabcd41b5473c9692bae40f5600834985c6a51ebf99fd6adac32d3be8",
+          "offset": 756748
+        },
+        "role": "module"
+      },
+      {
+        "aliases": [
+          "redline.trailer.traffic.sim",
+          "redline.trailer.traffic.sim.js"
+        ],
+        "id": "redline.trailer.traffic.sim",
+        "integrity": {
+          "algorithm": "sha256",
+          "byteLength": 90073,
+          "digest": "0xa2fc7783f32711ef6707caa0b69038052e5910ff70e849de75bec0c6989cde66"
+        },
+        "mediaType": "text/javascript",
+        "onchain": {
+          "containerId": "0x5c8db22fabcd41b5473c9692bae40f5600834985c6a51ebf99fd6adac32d3be8",
+          "offset": 757346
+        },
+        "role": "module"
+      },
+      {
+        "aliases": [
+          "redline.trailer.ui.style",
+          "redline.trailer.ui.style.js"
+        ],
+        "id": "redline.trailer.ui.style",
+        "integrity": {
+          "algorithm": "sha256",
+          "byteLength": 676,
+          "digest": "0x1097f520c75a841ca33bfad130a789bceae26358b356697fea251b08d3edcea8"
+        },
+        "mediaType": "text/javascript",
+        "onchain": {
+          "containerId": "0x5c8db22fabcd41b5473c9692bae40f5600834985c6a51ebf99fd6adac32d3be8",
+          "offset": 847419
+        },
+        "role": "module"
+      },
+      {
+        "aliases": [
+          "redline.trailer.web.grid",
+          "redline.trailer.web.grid.js"
+        ],
+        "id": "redline.trailer.web.grid",
+        "integrity": {
+          "algorithm": "sha256",
+          "byteLength": 773,
+          "digest": "0x95d8915d4e62316ce98505426b62f7ca2ccf0def0b15045f4a1066521f5875ad"
+        },
+        "mediaType": "text/javascript",
+        "onchain": {
+          "containerId": "0x5c8db22fabcd41b5473c9692bae40f5600834985c6a51ebf99fd6adac32d3be8",
+          "offset": 848095
+        },
+        "role": "module"
+      },
+      {
+        "aliases": [
+          "redline.trailer.web.grid-effects",
+          "redline.trailer.web.grid-effects.js"
+        ],
+        "id": "redline.trailer.web.grid-effects",
+        "integrity": {
+          "algorithm": "sha256",
+          "byteLength": 3741,
+          "digest": "0x18768210e72e1667f4499ee3d281c70197846ef74e90b1e97ec4d2569dd236e8"
+        },
+        "mediaType": "text/javascript",
+        "onchain": {
+          "containerId": "0x5c8db22fabcd41b5473c9692bae40f5600834985c6a51ebf99fd6adac32d3be8",
+          "offset": 848868
+        },
+        "role": "module"
+      },
+      {
+        "aliases": [
+          "redline.trailer.web.grid-scene",
+          "redline.trailer.web.grid-scene.js"
+        ],
+        "id": "redline.trailer.web.grid-scene",
+        "integrity": {
+          "algorithm": "sha256",
+          "byteLength": 246545,
+          "digest": "0x26676e2919d927326f47534987c5d73d521c3d2da1761a6147ef76aa1258a5cd"
+        },
+        "mediaType": "text/javascript",
+        "onchain": {
+          "containerId": "0x5c8db22fabcd41b5473c9692bae40f5600834985c6a51ebf99fd6adac32d3be8",
+          "offset": 852609
+        },
+        "role": "module"
+      },
+      {
+        "aliases": [
+          "redline.trailer.web.grid-sky",
+          "redline.trailer.web.grid-sky.js"
+        ],
+        "id": "redline.trailer.web.grid-sky",
+        "integrity": {
+          "algorithm": "sha256",
+          "byteLength": 642,
+          "digest": "0xbf96601c414ace8f3158218158cd457453a3bee3f0d2d706da2768dbf1b4c1d3"
+        },
+        "mediaType": "text/javascript",
+        "onchain": {
+          "containerId": "0x5c8db22fabcd41b5473c9692bae40f5600834985c6a51ebf99fd6adac32d3be8",
+          "offset": 1099154
+        },
+        "role": "module"
+      },
+      {
+        "aliases": [
+          "redline.trailer.web.grid-structures",
+          "redline.trailer.web.grid-structures.js"
+        ],
+        "id": "redline.trailer.web.grid-structures",
+        "integrity": {
+          "algorithm": "sha256",
+          "byteLength": 693,
+          "digest": "0x1a45d81ec625676af428e9bb315101544f2f81ff876c0e425a0ae10eea7c9581"
+        },
+        "mediaType": "text/javascript",
+        "onchain": {
+          "containerId": "0x5c8db22fabcd41b5473c9692bae40f5600834985c6a51ebf99fd6adac32d3be8",
+          "offset": 1099796
+        },
+        "role": "module"
+      },
+      {
+        "aliases": [
+          "redline.trailer.web.grid-sun-logo",
+          "redline.trailer.web.grid-sun-logo.js"
+        ],
+        "id": "redline.trailer.web.grid-sun-logo",
+        "integrity": {
+          "algorithm": "sha256",
+          "byteLength": 2012,
+          "digest": "0x7d90eb13af99b9c62c22d67c0ee415ad9efc80be0c9c8d65f05848202dec0968"
+        },
+        "mediaType": "text/javascript",
+        "onchain": {
+          "containerId": "0x5c8db22fabcd41b5473c9692bae40f5600834985c6a51ebf99fd6adac32d3be8",
+          "offset": 1100489
+        },
+        "role": "module"
+      },
+      {
+        "aliases": [
+          "redline.trailer.web.grid-visibility",
+          "redline.trailer.web.grid-visibility.js"
+        ],
+        "id": "redline.trailer.web.grid-visibility",
+        "integrity": {
+          "algorithm": "sha256",
+          "byteLength": 2256,
+          "digest": "0x19b3deef385a7aaff5522442c346849825f09a6a514a0fac522876b8a3f3145e"
+        },
+        "mediaType": "text/javascript",
+        "onchain": {
+          "containerId": "0x5c8db22fabcd41b5473c9692bae40f5600834985c6a51ebf99fd6adac32d3be8",
+          "offset": 1102501
+        },
+        "role": "module"
+      },
+      {
+        "aliases": [
+          "redline.trailer.web.grid-weather",
+          "redline.trailer.web.grid-weather.js"
+        ],
+        "id": "redline.trailer.web.grid-weather",
+        "integrity": {
+          "algorithm": "sha256",
+          "byteLength": 651,
+          "digest": "0xe1dd11db9daf2661cf337408379a5b6f32b3218d0b09663039140cf64f6e5239"
+        },
+        "mediaType": "text/javascript",
+        "onchain": {
+          "containerId": "0x5c8db22fabcd41b5473c9692bae40f5600834985c6a51ebf99fd6adac32d3be8",
+          "offset": 1104757
+        },
+        "role": "module"
+      },
+      {
+        "aliases": [
+          "redline.trailer.world-city",
+          "redline.trailer.world-city.js"
+        ],
+        "id": "redline.trailer.world-city",
+        "integrity": {
+          "algorithm": "sha256",
+          "byteLength": 591,
+          "digest": "0xaff6f8ad3c648c6ea01c1343185fb05acf39bf55586435a7c3d89376cc15fee4"
+        },
+        "mediaType": "text/javascript",
+        "onchain": {
+          "containerId": "0x5c8db22fabcd41b5473c9692bae40f5600834985c6a51ebf99fd6adac32d3be8",
+          "offset": 1105408
+        },
+        "role": "module"
+      },
+      {
+        "aliases": [
+          "trailer.api.keel.architecture",
+          "trailer.api.keel.architecture.js"
+        ],
+        "id": "trailer.api.keel.architecture",
+        "integrity": {
+          "algorithm": "sha256",
+          "byteLength": 120668,
+          "digest": "0x915d9893773f1bf0e8fcc2dad9e37419008190a8935b49fab3f965ab84c31ce8"
+        },
+        "mediaType": "text/javascript",
+        "onchain": {
+          "containerId": "0x5c8db22fabcd41b5473c9692bae40f5600834985c6a51ebf99fd6adac32d3be8",
+          "offset": 1105999
+        },
+        "role": "module"
+      },
+      {
+        "aliases": [
+          "trailer.api.keel.arena",
+          "trailer.api.keel.arena.js"
+        ],
+        "id": "trailer.api.keel.arena",
+        "integrity": {
+          "algorithm": "sha256",
+          "byteLength": 721,
+          "digest": "0xd76fcef3bc0662bec7443488f25d54ba00bbc042d4e0dc89f7484ed05acac9b3"
+        },
+        "mediaType": "text/javascript",
+        "onchain": {
+          "containerId": "0x5c8db22fabcd41b5473c9692bae40f5600834985c6a51ebf99fd6adac32d3be8",
+          "offset": 1226667
+        },
+        "role": "module"
+      },
+      {
+        "aliases": [
+          "trailer.api.keel.audio",
+          "trailer.api.keel.audio.js"
+        ],
+        "id": "trailer.api.keel.audio",
+        "integrity": {
+          "algorithm": "sha256",
+          "byteLength": 46459,
+          "digest": "0x28ebd55fa82d91f537c82a456569a38203541ecc6dd4fb870e17416680f7b9c2"
+        },
+        "mediaType": "text/javascript",
+        "onchain": {
+          "containerId": "0x5c8db22fabcd41b5473c9692bae40f5600834985c6a51ebf99fd6adac32d3be8",
+          "offset": 1227388
+        },
+        "role": "module"
+      },
+      {
+        "aliases": [
+          "trailer.api.keel.bake",
+          "trailer.api.keel.bake.js"
+        ],
+        "id": "trailer.api.keel.bake",
+        "integrity": {
+          "algorithm": "sha256",
+          "byteLength": 144077,
+          "digest": "0xc59582a0d0d5361f37fcd7582ff01249f067e1cdccad92bc4dbcb449a57e518b"
+        },
+        "mediaType": "text/javascript",
+        "onchain": {
+          "containerId": "0x5c8db22fabcd41b5473c9692bae40f5600834985c6a51ebf99fd6adac32d3be8",
+          "offset": 1273847
+        },
+        "role": "module"
+      },
+      {
+        "aliases": [
+          "trailer.api.keel.camera",
+          "trailer.api.keel.camera.js"
+        ],
+        "id": "trailer.api.keel.camera",
+        "integrity": {
+          "algorithm": "sha256",
+          "byteLength": 1248,
+          "digest": "0x5e3c7b84a379dc3f845dd990470b53b0191ab781e5b6640eae5bddd9728a3d45"
+        },
+        "mediaType": "text/javascript",
+        "onchain": {
+          "containerId": "0x5c8db22fabcd41b5473c9692bae40f5600834985c6a51ebf99fd6adac32d3be8",
+          "offset": 1417924
+        },
+        "role": "module"
+      },
+      {
+        "aliases": [
+          "trailer.api.keel.capture",
+          "trailer.api.keel.capture.js"
+        ],
+        "id": "trailer.api.keel.capture",
+        "integrity": {
+          "algorithm": "sha256",
+          "byteLength": 4460,
+          "digest": "0x2032061e68a3f9836d8ef27df532f1d78e6f2f0cf4170f36d7f120f3ad3e1f2d"
+        },
+        "mediaType": "text/javascript",
+        "onchain": {
+          "containerId": "0x5c8db22fabcd41b5473c9692bae40f5600834985c6a51ebf99fd6adac32d3be8",
+          "offset": 1419172
+        },
+        "role": "module"
+      },
+      {
+        "aliases": [
+          "trailer.api.keel.city",
+          "trailer.api.keel.city.js"
+        ],
+        "id": "trailer.api.keel.city",
+        "integrity": {
+          "algorithm": "sha256",
+          "byteLength": 1232,
+          "digest": "0x1f325fce1e6b001aa2e6881bde332191e3649220a863a7028cdcd64e23cf2f4c"
+        },
+        "mediaType": "text/javascript",
+        "onchain": {
+          "containerId": "0x5c8db22fabcd41b5473c9692bae40f5600834985c6a51ebf99fd6adac32d3be8",
+          "offset": 1423632
+        },
+        "role": "module"
+      },
+      {
+        "aliases": [
+          "trailer.api.keel.codec",
+          "trailer.api.keel.codec.js"
+        ],
+        "id": "trailer.api.keel.codec",
+        "integrity": {
+          "algorithm": "sha256",
+          "byteLength": 1054,
+          "digest": "0x5a721c501cd811526e4b4bbe4bd9b2cd87752e75f9ee2a76ef0d9472f4edcb1b"
+        },
+        "mediaType": "text/javascript",
+        "onchain": {
+          "containerId": "0x5c8db22fabcd41b5473c9692bae40f5600834985c6a51ebf99fd6adac32d3be8",
+          "offset": 1424864
+        },
+        "role": "module"
+      },
+      {
+        "aliases": [
+          "trailer.api.keel.core",
+          "trailer.api.keel.core.js"
+        ],
+        "id": "trailer.api.keel.core",
+        "integrity": {
+          "algorithm": "sha256",
+          "byteLength": 586,
+          "digest": "0xb45ed7f5e6231476270d96e4d183d45e628c943fb43cd772683e09c83c60f917"
+        },
+        "mediaType": "text/javascript",
+        "onchain": {
+          "containerId": "0x5c8db22fabcd41b5473c9692bae40f5600834985c6a51ebf99fd6adac32d3be8",
+          "offset": 1425918
+        },
+        "role": "module"
+      },
+      {
+        "aliases": [
+          "trailer.api.keel.driver",
+          "trailer.api.keel.driver.js"
+        ],
+        "id": "trailer.api.keel.driver",
+        "integrity": {
+          "algorithm": "sha256",
+          "byteLength": 3902,
+          "digest": "0xc867375fd3ab2edb7b62f2f28e01158ef96d2fd8c986799de87eb38878ffe57a"
+        },
+        "mediaType": "text/javascript",
+        "onchain": {
+          "containerId": "0x5c8db22fabcd41b5473c9692bae40f5600834985c6a51ebf99fd6adac32d3be8",
+          "offset": 1426504
+        },
+        "role": "module"
+      },
+      {
+        "aliases": [
+          "trailer.api.keel.particles",
+          "trailer.api.keel.particles.js"
+        ],
+        "id": "trailer.api.keel.particles",
+        "integrity": {
+          "algorithm": "sha256",
+          "byteLength": 69725,
+          "digest": "0xc49c6d0bec5d745bedc878b5068899fc2630665e3aae01044c912b37e6862f67"
+        },
+        "mediaType": "text/javascript",
+        "onchain": {
+          "containerId": "0x5c8db22fabcd41b5473c9692bae40f5600834985c6a51ebf99fd6adac32d3be8",
+          "offset": 1430406
+        },
+        "role": "module"
+      },
+      {
+        "aliases": [
+          "trailer.api.keel.proof",
+          "trailer.api.keel.proof.js"
+        ],
+        "id": "trailer.api.keel.proof",
+        "integrity": {
+          "algorithm": "sha256",
+          "byteLength": 956,
+          "digest": "0xb7f3fe5bed98d582c4bd59c7752f7109b76b939893866c3a95574e9e3216ab55"
+        },
+        "mediaType": "text/javascript",
+        "onchain": {
+          "containerId": "0x5c8db22fabcd41b5473c9692bae40f5600834985c6a51ebf99fd6adac32d3be8",
+          "offset": 1500131
+        },
+        "role": "module"
+      },
+      {
+        "aliases": [
+          "trailer.api.keel.replay",
+          "trailer.api.keel.replay.js"
+        ],
+        "id": "trailer.api.keel.replay",
+        "integrity": {
+          "algorithm": "sha256",
+          "byteLength": 1208,
+          "digest": "0xb3cb3c371f9a777137ac8841d5feaf8bd3f7c4d75f7ca12361f7e8e45da470c8"
+        },
+        "mediaType": "text/javascript",
+        "onchain": {
+          "containerId": "0x5c8db22fabcd41b5473c9692bae40f5600834985c6a51ebf99fd6adac32d3be8",
+          "offset": 1501087
+        },
+        "role": "module"
+      },
+      {
+        "aliases": [
+          "trailer.api.keel.runtime",
+          "trailer.api.keel.runtime.js"
+        ],
+        "id": "trailer.api.keel.runtime",
+        "integrity": {
+          "algorithm": "sha256",
+          "byteLength": 595,
+          "digest": "0xf48efe9d0d61ac734b4d478e358885af267f5d9a9f4a60900a4e877857945347"
+        },
+        "mediaType": "text/javascript",
+        "onchain": {
+          "containerId": "0x5c8db22fabcd41b5473c9692bae40f5600834985c6a51ebf99fd6adac32d3be8",
+          "offset": 1502295
+        },
+        "role": "module"
+      },
+      {
+        "aliases": [
+          "trailer.api.keel.ui",
+          "trailer.api.keel.ui.js"
+        ],
+        "id": "trailer.api.keel.ui",
+        "integrity": {
+          "algorithm": "sha256",
+          "byteLength": 18724,
+          "digest": "0x485899dbb098525853b5a5d004d4d258f16307c021166a661b2264f96309c62d"
+        },
+        "mediaType": "text/javascript",
+        "onchain": {
+          "containerId": "0x5c8db22fabcd41b5473c9692bae40f5600834985c6a51ebf99fd6adac32d3be8",
+          "offset": 1502890
+        },
+        "role": "module"
+      },
+      {
+        "aliases": [
+          "trailer.api.keel.vehicle",
+          "trailer.api.keel.vehicle.js"
+        ],
+        "id": "trailer.api.keel.vehicle",
+        "integrity": {
+          "algorithm": "sha256",
+          "byteLength": 21935,
+          "digest": "0x8c940701f50aea838dd7b3e15cb7a7d73eab90f8e70dea304e2d9ba871d999be"
+        },
+        "mediaType": "text/javascript",
+        "onchain": {
+          "containerId": "0x5c8db22fabcd41b5473c9692bae40f5600834985c6a51ebf99fd6adac32d3be8",
+          "offset": 1521614
+        },
+        "role": "module"
+      },
+      {
+        "aliases": [
+          "trailer.api.packs.buildings",
+          "trailer.api.packs.buildings.js"
+        ],
+        "id": "trailer.api.packs.buildings",
+        "integrity": {
+          "algorithm": "sha256",
+          "byteLength": 30277,
+          "digest": "0xf7af5f12d0c01261024d3acd63f3c6d79fd5f5f86e03cb0a7daf6fb960557252"
+        },
+        "mediaType": "text/javascript",
+        "onchain": {
+          "containerId": "0x5c8db22fabcd41b5473c9692bae40f5600834985c6a51ebf99fd6adac32d3be8",
+          "offset": 1543549
+        },
+        "role": "module"
+      },
+      {
+        "aliases": [
+          "trailer.api.packs.vehicles",
+          "trailer.api.packs.vehicles.js"
+        ],
+        "id": "trailer.api.packs.vehicles",
+        "integrity": {
+          "algorithm": "sha256",
+          "byteLength": 1280,
+          "digest": "0x0d5129dd0a643a6ba45df0306bc00a90cc07b21fb90981ca3bc1047103ba8165"
+        },
+        "mediaType": "text/javascript",
+        "onchain": {
+          "containerId": "0x5c8db22fabcd41b5473c9692bae40f5600834985c6a51ebf99fd6adac32d3be8",
+          "offset": 1573826
+        },
+        "role": "module"
+      },
+      {
+        "aliases": [
+          "trailer.link.keel-engine.packages.core.src.index",
+          "trailer.link.keel-engine.packages.core.src.index.js"
+        ],
+        "id": "trailer.link.keel-engine.packages.core.src.index",
+        "integrity": {
+          "algorithm": "sha256",
+          "byteLength": 4388,
+          "digest": "0xb91d4f5efce27556dd82d1b846f10d74c8cfd76bbd6278f5c833827dcb5c21cf"
+        },
+        "mediaType": "text/javascript",
+        "onchain": {
+          "containerId": "0x5c8db22fabcd41b5473c9692bae40f5600834985c6a51ebf99fd6adac32d3be8",
+          "offset": 1575106
+        },
+        "role": "module"
+      },
+      {
+        "aliases": [
+          "trailer.engine-api",
+          "trailer.engine-api.js"
+        ],
+        "id": "trailer.engine-api",
+        "integrity": {
+          "algorithm": "sha256",
+          "byteLength": 87595,
+          "digest": "0x3d1317416db3e7d06b986876bdeeed4087d13b080ae1b85f9ccb641695a383f5"
+        },
+        "mediaType": "text/javascript",
+        "onchain": {
+          "containerId": "0x81b2f7dd74f35026abd38011370afe409c80b1d7f578672ffbf3d78dd5914a06",
+          "offset": 0
+        },
+        "role": "module"
+      },
+      {
+        "aliases": [
+          "trailer.tone",
+          "trailer.tone.js"
+        ],
+        "id": "trailer.tone",
+        "integrity": {
+          "algorithm": "sha256",
+          "byteLength": 235774,
+          "digest": "0x3c958bd766743343128220942f9798375c6d9782c61703cf3c84633cf3f74d76"
+        },
+        "mediaType": "text/javascript",
+        "onchain": {
+          "containerId": "0x5c8db22fabcd41b5473c9692bae40f5600834985c6a51ebf99fd6adac32d3be8",
+          "offset": 1604204
+        },
+        "role": "module"
+      },
+      {
+        "aliases": [
+          "trailer.audio",
+          "trailer.audio.js"
+        ],
+        "id": "trailer.audio",
+        "integrity": {
+          "algorithm": "sha256",
+          "byteLength": 8405,
+          "digest": "0x75cbdc41afc1636c4c5fd1c8a0508e2dbef2ed0d0af4c66c14149bdc8983efd3"
+        },
+        "mediaType": "text/javascript",
+        "onchain": {
+          "containerId": "0x5c8db22fabcd41b5473c9692bae40f5600834985c6a51ebf99fd6adac32d3be8",
+          "offset": 1839978
+        },
+        "role": "module"
+      },
+      {
+        "aliases": [
+          "trailer.player",
+          "trailer.player.js"
+        ],
+        "id": "trailer.player",
+        "integrity": {
+          "algorithm": "sha256",
+          "digest": "0xa7c0368b76df5c802abcf32403331a2079ca8f6e8863eb28f1ccb436fa99cdfe",
+          "byteLength": 27351
+        },
+        "mediaType": "text/javascript",
+        "onchain": {
+          "containerId": "0xf849f6070e2a506c007fd9bb1d6942c619f03fed0067cf0f4ddc45db1e9c5259",
+          "offset": 0
+        },
+        "role": "module"
+      },
+      {
+        "aliases": [
+          "trailer.adapter",
+          "trailer.adapter.js"
+        ],
+        "id": "trailer.adapter",
+        "integrity": {
+          "algorithm": "sha256",
+          "digest": "0x2d5874995854ec2f972c6397ff47f8b2f91b2e3ed0976c38c2f77a827dc682c5",
+          "byteLength": 20721
+        },
+        "mediaType": "text/javascript",
+        "onchain": {
+          "containerId": "0xf849f6070e2a506c007fd9bb1d6942c619f03fed0067cf0f4ddc45db1e9c5259",
+          "offset": 27351
+        },
+        "role": "asset"
+      },
+      {
+        "aliases": [
+          "trailer.entry",
+          "trailer.entry.html"
+        ],
+        "id": "trailer.entry",
+        "integrity": {
+          "algorithm": "sha256",
+          "digest": "0xebd21b6627897d489b2a9a9ade8a565ae33c670b85ae848786713ac7b7742806",
+          "byteLength": 6778
+        },
+        "mediaType": "text/html",
+        "onchain": {
+          "containerId": "0xf849f6070e2a506c007fd9bb1d6942c619f03fed0067cf0f4ddc45db1e9c5259",
+          "offset": 48072
+        },
+        "role": "entrypoint"
+      },
+      {
+        "aliases": [
+          "trailer.scene",
+          "trailer.scene.bin"
+        ],
+        "id": "trailer.scene",
+        "integrity": {
+          "algorithm": "sha256",
+          "byteLength": 904,
+          "digest": "0x465a35b1cc388dc42dc92000d5b348f18eb3aaf4ff3cc2220ad372aa8e42f88f"
+        },
+        "mediaType": "application/octet-stream",
+        "onchain": {
+          "containerId": "0x60d42d3ea2503d9e5040869208207497664bfad9e402498acd636bc843dedb37",
+          "offset": 0
+        },
+        "role": "asset"
+      },
+      {
+        "aliases": [
+          "trailer.music",
+          "trailer.music.bin"
+        ],
+        "id": "trailer.music",
+        "integrity": {
+          "algorithm": "sha256",
+          "byteLength": 15,
+          "digest": "0xb40c5c11d13a4e0080420a608c65c8d8ce988e57b88cfec74322fe052d40af6e"
+        },
+        "mediaType": "application/octet-stream",
+        "onchain": {
+          "containerId": "0xd7ccc711f03e0b7320da49d5bcf2a6f5d4e3a7d9f8f7c531049c4c01483f9f16",
+          "offset": 0
+        },
+        "role": "asset"
+      },
+      {
+        "aliases": [
+          "engine.capture.offline",
+          "engine.capture.offline.js"
+        ],
+        "id": "engine.capture.offline",
+        "integrity": {
+          "algorithm": "sha256",
+          "digest": "0x816669904d6f0fe9b939b1fb8851f4efe102395eb260853b366bd6f1e9fd5609",
+          "byteLength": 241505
+        },
+        "mediaType": "text/javascript",
+        "onchain": {
+          "containerId": "0xf849f6070e2a506c007fd9bb1d6942c619f03fed0067cf0f4ddc45db1e9c5259",
+          "offset": 54850
+        },
+        "role": "module"
+      }
+    ]
+  },
+  "readGasEstimate": "7078594",
+  "shellId": "0x14fbf5986c636c08a0bd9f919fe45905deba37d3271dcbfebbdee171f8a85882",
+  "shell": {
+    "address": "0xEEB9A431632b597bac3d5Dc2B4C901C608DA0f79",
+    "shellId": "0x14fbf5986c636c08a0bd9f919fe45905deba37d3271dcbfebbdee171f8a85882",
+    "revision": "3",
+    "prefixObjectId": "0x0d42370a239bddc8ef38421be6aae47284c1bc58ebef45636e913e1355655b61",
+    "suffixObjectId": "0xbb55c61297db41ebc12157d578eb833b93de735e4679916c5720fabfa8e5ce8f"
+  },
+  "engineCarrier": {
+    "objectId": "0x59b9c53563f0c9bef5035d533bea31621c3d545b202463d4ee4285eec745bad1",
+    "digest": "0xbb5ea043f129fa1d6a0e2f886f9c5761ba5605bfc027b6345415f6c551a0c01a",
+    "byteLength": 948738,
+    "returnedInTrailer": false,
+    "reusedByLegacyGame": true
+  },
+  "sharedCarrier": {
+    "chainId": 11155111,
+    "compression": "brotli",
+    "integrity": {
+      "algorithm": "sha256",
+      "byteLength": 1887677,
+      "digest": "0x2c0f91db1cad9bede4fc480368ef78fc33bef88e43543a8d47a8c5befec682f2"
+    },
+    "objectId": "0x0edf7ae447764df5dfbd71eea2f8878b0ce6fcdbbd88a48273b07f7b3483af3c",
+    "store": "0xD820e337692A6Eb7a4878e42ce88CBCFF49B55CF",
+    "storedIntegrity": {
+      "algorithm": "sha256",
+      "byteLength": 540083,
+      "digest": "0x72751354d2a57facaf9eb95f37fe15a1a92a448a6a167497c8183405aace5990"
+    },
+    "id": "0x5c8db22fabcd41b5473c9692bae40f5600834985c6a51ebf99fd6adac32d3be8"
+  },
+  "sceneMusicPreparedBytes": 953,
+  "engineReuploads": 0,
+  "mp4UploadBytes": 0,
+  "records": [
+    {
+      "contract": "KeelCarrierBatcher",
+      "address": "0x1854858Ea4574f4e293466DD0309BB3178d568E3",
+      "txHash": "0xe29fc6aa8bca6b986b266eb5e69a13c6e72f1966ccb3ce42cc42411424c48739",
+      "block": "11831595",
+      "runtimeCodeHash": "0x14e1b4260b30e4240c062b1c4562e2caefd45d0f70acaf086a31f695db8f0d21",
+      "runtimeIntegrity": {
+        "algorithm": "sha256",
+        "digest": "0x6c6ad86981a6032dc777bc01758d839ac0116176a5bac8b82996d628c7fd2713",
+        "byteLength": 3459
+      }
+    },
+    {
+      "contract": "KeelPreparedContainerTablePolicyV2",
+      "address": "0xeeE184aAB5109431d3C85753269F12dDC2E35c88",
+      "txHash": "0x5fb9d6950e0fca31adb1eafae3ca3b357dd5911ba9c25335893060dd6caf7952",
+      "block": "11844862",
+      "runtimeCodeHash": "0xd194c3f28c08e7136f95e96704dfa0a21d56152598fe7e7543b72ee8889e7b57",
+      "runtimeIntegrity": {
+        "algorithm": "sha256",
+        "digest": "0xe4947fa80101a6f72fc56dd51be90dc07fe99d66d576d24cfeb456c54014174f",
+        "byteLength": 4169
+      }
+    },
+    {
+      "contract": "KeelUri81RawTokenURIBuilder",
+      "address": "0x4957B01a17aF3ff45e09a494ADf58a9B9151C582",
+      "txHash": "0x101bb263c30a4462ef3fa450c598542d8c03b6c8893e3e7dcd887231df183d7f",
+      "block": "11845819",
+      "runtimeCodeHash": "0x04861fea44c79529f626c7937cb91a4c4c6972fca5a1a4915b986c7b2672db1e",
+      "runtimeIntegrity": {
+        "algorithm": "sha256",
+        "digest": "0x2d49f2e8ca8aaa8ab153bca02319b1010feae4e260dde8816c5805a41289150e",
+        "byteLength": 13253
+      }
+    },
+    {
+      "contract": "KeelUri81RawFragmentValidationRegistry",
+      "address": "0xd62E073ae13EF5A6c73ad63dA8683758A9430DC9",
+      "txHash": "0x4b6d1b7f1ba1548cc7cf023106904ff1fce5063586408eb27d475413313a5ea3",
+      "block": "11845820",
+      "runtimeCodeHash": "0x983afa48ba28c64365079436b25ba188811398de1d726b624db268e00a1a04a8",
+      "runtimeIntegrity": {
+        "algorithm": "sha256",
+        "digest": "0xc68f2f4cb1838941b98272b5a5e9c2f586144d49c038a222d7d1668044fdb42d",
+        "byteLength": 3084
+      }
+    },
+    {
+      "contract": "KeelUri81RawFragmentRevisionPolicy",
+      "address": "0x3C85BDc161bacA78929703c45E9ef0E8d5134CE7",
+      "txHash": "0x38b4e9b7ab0b107c3101081cc51be02bfc22adb69d926ebba306e9465576864a",
+      "block": "11845821",
+      "runtimeCodeHash": "0x78b6f8ed078bb45e0d5d19397ed0b67fcb5eaf1ac597be09c48e2d2493e4e47a",
+      "runtimeIntegrity": {
+        "algorithm": "sha256",
+        "digest": "0xed52511450849c2b75282babfc2b3544f127ee2113d49b02d671601b281906cc",
+        "byteLength": 933
+      }
+    },
+    {
+      "contract": "KeelUri81RawInlineShellRegistry",
+      "address": "0xEEB9A431632b597bac3d5Dc2B4C901C608DA0f79",
+      "txHash": "0x7eb5688121f3de04810a98d4578a3c31912babc80ab5eb58de85ea7e9b12bad0",
+      "block": "11845822",
+      "runtimeCodeHash": "0xd35757ebf1340d563a04322941ae41f0b18d3b8a5e820551b62858752f21e015",
+      "runtimeIntegrity": {
+        "algorithm": "sha256",
+        "digest": "0x7371303af7a984f25234384b860a5d3fdb340e3d2b16ff850a0a2272e7fa5318",
+        "byteLength": 2920
+      }
+    },
+    {
+      "contract": "KeelUri81PreparedContainerTablePolicy",
+      "address": "0xc45Dea684dA446545DAe9bE6709D6ac304419cFc",
+      "txHash": "0xce6e2c12e75b08a3ff442630af6d8fcc4c09f26ed571bff7d8bea23aabf7fe48",
+      "block": "11845822",
+      "runtimeCodeHash": "0xce21b7a23e6ea65bbae2b22514108a8d70df8fcc5cf150944f0a9d27eecaa6d8",
+      "runtimeIntegrity": {
+        "algorithm": "sha256",
+        "digest": "0x5ae0b6b076f068e5cc1648909ea8892de81a3a508d4aabb8c89b3af6613e5ab6",
+        "byteLength": 4169
+      }
+    },
+    {
+      "contract": "KeelModuleRevisioned721",
+      "address": "0x8c5731dc35301fA5c222e82bd5405414BDc45Ca2",
+      "txHash": "0x1fc06db70806a10478e798fea00c15f6fb8ead1be3f06490ab310a0c7fda08bf",
+      "block": "11845823",
+      "runtimeCodeHash": "0x979fb73b8a8cb46511c80e97e7930f988a759a08b48f6b36ed5bc696803b3682",
+      "runtimeIntegrity": {
+        "algorithm": "sha256",
+        "digest": "0x5ad9b15d77d6b78ee127228e8dab7dc027e0216e2689266fc9aeddbdb8b45311",
+        "byteLength": 18269
+      }
+    },
+    {
+      "contract": "KeelArtifactFragmentResolver",
+      "address": "0x7AE840d3388E3708e550538b3e98d728a8aD5893",
+      "txHash": "0x7a1bd4314eff627f3a79bf72ab045024fb9e8c4a1599c49947852f475ba7edbe",
+      "block": "11845846",
+      "runtimeCodeHash": "0x7158c67df9e59b91d2ff015ef62e6f2af0782b8df070b00ceaaaf55ee58cf5a9",
+      "runtimeIntegrity": {
+        "algorithm": "sha256",
+        "digest": "0x912cc77f7d701f26850e02aee036d05cb931be9c7011c2458222635dd7ee8e56",
+        "byteLength": 3749
+      }
+    },
+    {
+      "contract": "KeelUri81RawImageRevisionPolicy",
+      "address": "0x16d746c70e2a63c478033c30D722a3E5A753Bffe",
+      "txHash": "0x068b7d452a139d47abe3ba3d3e75d6c5b0c9f85c73276a5b4007f74f39755e65",
+      "block": "11845847",
+      "runtimeCodeHash": "0x2e8a59064067b8187637d31c8d7fc140a0217ef208eb12ff2b016c6157530bed",
+      "runtimeIntegrity": {
+        "algorithm": "sha256",
+        "digest": "0x893073048836a46918086a77414fd3150fa96dabebf458377c39fc1dd7ddbc0e",
+        "byteLength": 1003
+      }
+    },
+    {
+      "contract": "KeelRegisteredArtifactFragmentResolver",
+      "address": "0xcAD8401816D47Fa91CB4B2869b779Cc0fa4FDB85",
+      "txHash": "0x13e8492527330e9993da3e9ab785acfd72082d7ab80fd264c1994ace9a4d9bce",
+      "block": "11845851",
+      "runtimeCodeHash": "0x36d7887586c4369318bc57014c5f582b912431780c3271359acfdc439a7ec821",
+      "runtimeIntegrity": {
+        "algorithm": "sha256",
+        "digest": "0x6ce172dc3c9b28fcd2b7df240dc11f55ff3e6197a662d301ddff6e1d43875c76",
+        "byteLength": 7667
+      }
+    },
+    {
+      "contract": "KeelModulePrepared721PresentationV2",
+      "address": "0xa44e9A599f11315F4179fE132d65283f94874794",
+      "txHash": "0xde7e53fb52a71a66a4816706508d6108945edf2a51ce409409170606e4d6c02f",
+      "block": "11845852",
+      "runtimeCodeHash": "0xeaaa651857df909b8099a5db0f46164b9a1fd1977480b479ea71dcc1e7bd8a97",
+      "runtimeIntegrity": {
+        "algorithm": "sha256",
+        "digest": "0x2695a497a0e9b57fe9c7b9c215df4d59da06ba6febb6ff45749025a2d4dc48ec",
+        "byteLength": 16073
+      }
+    },
+    {
+      "contract": "ERC1967Proxy",
+      "address": "0x560AeEFAE5e9a9cC94198B25Dc359C1579763DB6",
+      "txHash": "0x189798d00ed2829cc1c640515fe2fd76b12da443c6dc492bbee36d0f58280ddf",
+      "block": "11831477",
+      "runtimeCodeHash": "0x46a010df31eb642b47284650e80051e8f6239a0c995003d230b437810bc4b9b4",
+      "runtimeIntegrity": {
+        "algorithm": "sha256",
+        "digest": "0x257725b3197c327ba0c61bc82c91d399b51be675971f186578c13e6b55cb0714",
+        "byteLength": 76
+      },
+      "source": "REDLINE public deployment journal",
+      "scope": "application-reference",
+      "verification": {
+        "status": "receipt-and-runtime-verified",
+        "blockNumber": "11852174",
+        "blockHash": "0xeb2e2fad4c45da995b345234478b78bfd6b618436676f771af3425fb938c29bb"
+      }
+    },
+    {
+      "contract": "KeelModuleRevisioned721",
+      "address": "0x3F562678f56E46B47D42DC6251727ECF7Bd33ca2",
+      "txHash": "0xf135f7b5b343ce2b12d3cfa1d32ab18e227fdf39f43d0c4945280a2987fa3ef9",
+      "block": "11895056",
+      "runtimeCodeHash": "0x979fb73b8a8cb46511c80e97e7930f988a759a08b48f6b36ed5bc696803b3682",
+      "runtimeIntegrity": {
+        "algorithm": "sha256",
+        "digest": "0x5ad9b15d77d6b78ee127228e8dab7dc027e0216e2689266fc9aeddbdb8b45311",
+        "byteLength": 18269
+      }
+    },
+    {
+      "contract": "KeelArtifactFragmentResolver",
+      "address": "0xd6C6635976f5608F492CA3D7a91E7D4A47243fE4",
+      "txHash": "0x3ed1d5eb34dc77b4233f9752ef34a3639871badee123c8b4ba90b7e4b1f610e7",
+      "block": "11895057",
+      "runtimeCodeHash": "0x7158c67df9e59b91d2ff015ef62e6f2af0782b8df070b00ceaaaf55ee58cf5a9",
+      "runtimeIntegrity": {
+        "algorithm": "sha256",
+        "digest": "0x912cc77f7d701f26850e02aee036d05cb931be9c7011c2458222635dd7ee8e56",
+        "byteLength": 3749
+      }
+    },
+    {
+      "contract": "KeelRegisteredArtifactFragmentResolver",
+      "address": "0xd68d7Cb092E78Fd390CB06e70F9C47A9015bbdFc",
+      "txHash": "0xbdb8e0eb8d357a78f2f5f5dc5e1aa67cafd14ef1c7163bf628ba72d42e6f9ee8",
+      "block": "11895058",
+      "runtimeCodeHash": "0x48671fff17c82752cce0e7794799de311082c78ec7ef23a8a5feacda6a2a00cc",
+      "runtimeIntegrity": {
+        "algorithm": "sha256",
+        "digest": "0xc8fd6c310452d9c18075379cdb087c568d4f21f4daa202d8c7d5ceb7c495f37d",
+        "byteLength": 7667
+      }
+    },
+    {
+      "contract": "KeelModulePrepared721PresentationV2",
+      "address": "0x28936eD3635B1bD40AFCa2C559C3619741b98eEF",
+      "txHash": "0xfde0d503ec99519b90775b156d2e3203cc9ff130eccdbd7a74c101e1acb3b5fc",
+      "block": "11895059",
+      "runtimeCodeHash": "0xbb988814a724405625a6ca2c227fb3735d03ffaf47f3f2d09d6b7f201953aba8",
+      "runtimeIntegrity": {
+        "algorithm": "sha256",
+        "digest": "0xda093b4d8f4762473f032d81b5f8d89aed549b6202e1912dcb82904cba2cb40d",
+        "byteLength": 16073
+      }
+    },
+    {
+      "contract": "KeelEvmPreparedCarrierInlineComposer",
+      "address": "0x23Ec9Fd2402F7876471A9970cf91708F29992D7D",
+      "txHash": "0x22a31b44f1ae78dc051b8967ed26de2c2215d992ad7e2d11e52056cb209fa566",
+      "runtimeCodeHash": "0x86eac3a188dab20f5ae537a12e40ef3ee25f6064b81c051e09c75643be865e41",
+      "runtimeIntegrity": {
+        "algorithm": "sha256",
+        "digest": "0xf762d52e6d71dd82be15c1671d01ba191831d8d6b3c089fc641c0482f9e3d451",
+        "byteLength": 8132
+      }
+    }
+  ],
+  "managedRoute": {
+    "manager": "0x560AeEFAE5e9a9cC94198B25Dc359C1579763DB6",
+    "moduleId": "0x8b822ec80d377753f8bc64d48821d9b5ffbbaae7f8a619da6ab9bd29dcd58158",
+    "consumer": "0x28936eD3635B1bD40AFCa2C559C3619741b98eEF",
+    "composer": "0x23Ec9Fd2402F7876471A9970cf91708F29992D7D",
+    "composerRevision": "7",
+    "composerCodeHash": "0x86eac3a188dab20f5ae537a12e40ef3ee25f6064b81c051e09c75643be865e41",
+    "composerCodeHashAlgorithm": "keccak256",
+    "replacementTool": "keel-manager-module-replacement-prepare",
+    "inspectionTool": "keel-manager-modules-inspect",
+    "status": "live-public-readback-verified",
+    "store": "0xD820e337692A6Eb7a4878e42ce88CBCFF49B55CF",
+    "collection": "0x3F562678f56E46B47D42DC6251727ECF7Bd33ca2",
+    "active": "0x23Ec9Fd2402F7876471A9970cf91708F29992D7D",
+    "revision": "7",
+    "modules": [
+      {
+        "moduleId": "0x8b822ec80d377753f8bc64d48821d9b5ffbbaae7f8a619da6ab9bd29dcd58158",
+        "active": "0x23Ec9Fd2402F7876471A9970cf91708F29992D7D",
+        "revision": "7",
+        "frozen": false,
+        "codeHash": "0x86eac3a188dab20f5ae537a12e40ef3ee25f6064b81c051e09c75643be865e41"
+      }
+    ],
+    "blockNumber": "11899558",
+    "blockHash": "0x65898c0fb901131f5f808c2ecfac208762cd18ab0c08c12e40c6ce0343108eaa",
+    "bodyRevision": "4",
+    "tableRevision": "4"
+  },
+  "revisionCaveat": "Follow-latest shell and manager: authenticate the selected-chain return and source identities before reuse. This is the approved one-minute WIP trailer; the reused engine object remains byte-identical.",
+  "composerVerification": {
+    "profile": "keel.evm-embedded-prepared-containers@1",
+    "boundCarrierIntegrity": "SHA-256 authenticated during construction after standard sealed-object validation; exact row commitment and lengths required on every read",
+    "unboundFragments": "SHA-256 checked on every read",
+    "sourceArtifact": "docs/media/redline-wip-20261009/onchain-r2/sepolia/shared-upgrade/reader-gas-fix/authenticated-headers/artifacts/KeelEvmPreparedCarrierInlineComposer.json",
+    "selectedChainCompleteReturnSimulation": true,
+    "publicReadGas": "7021699",
+    "active": "0x23Ec9Fd2402F7876471A9970cf91708F29992D7D",
+    "revision": "7",
+    "runtimeCodeHash": "0x86eac3a188dab20f5ae537a12e40ef3ee25f6064b81c051e09c75643be865e41",
+    "compatibleRuntimeCodeHash": true,
+    "address": "0x23Ec9Fd2402F7876471A9970cf91708F29992D7D",
+    "composerRevision": "7"
+  },
+  "export": {
+    "mode": "fixed-frames",
+    "automatic": true,
+    "video": "H264 High 4.2",
+    "videoBitrateTarget": 20000000,
+    "audio": "AAC-LC",
+    "audioBitrateTarget": 320000,
+    "sampleRate": 48000,
+    "integerScale": 6,
+    "frames": 3600,
+    "fps": 60
+  },
+  "source": {
+    "engineCommit": "7228599",
+    "engineBranch": "codex/trailer-smooth-playback",
+    "newEngineExport": "@keel-engine/capture/offline",
+    "trailerCommit": "75475bf",
+    "sdkCommit": "8b26589",
+    "candidateCommitment": "0xa2dde4fe0abb0cdf0d85f297583a27d8bcca08c32a0ee84fee6c9ccede5b3878"
+  },
+  "activationTransactions": [
+    "0x1b49f6e7b3ca6e1445ff5884df37a25edf64accebc941d57339ba3150bac02ff",
+    "0x0c693a32dcba10326e46040584538ce4cdaf54fd6d0080946fce505f6c45bbcb"
+  ],
+  "readGas": "7021699",
+  "optionalPackedReader": {
+    "schema": "redline-compact-descriptor-matrix-public@1",
+    "pass": true,
+    "chainId": 11155111,
+    "address": "0x8ECaE4Ff9C775724d77461EE896187bddFC4fd47",
+    "runtimeCodeHash": "0xe5b9e7af478d18fc3e9fdc531a81216f7b4c69963ed7c1127d2c79155b04a04f",
+    "collection": "0x3F562678f56E46B47D42DC6251727ECF7Bd33ca2",
+    "tokenId": "1",
+    "entries": 86,
+    "descriptorBytes": 13472,
+    "descriptorSha256": "0xb5c6178573b6c28fa81782df0ff109c0a5e4a3defd46b5dc062cfcd4c12227c3",
+    "selectorSlug": "0x88888235d612f3b74d6b71d7633bc94ac787fa551ebac04eec48e36fa9bbaf2f",
+    "selectorBytes": 24,
+    "reusedDictionarySlug": "0x6cb536d1d3f5cf0a4aa17b68bc6c0fca74d2924ff55ca4f3fd6df4d272700c11",
+    "engineUploads": 0,
+    "newSharedBytes": 0,
+    "frozen": true,
+    "completeTokenURIChanged": false,
+    "collectorRoute": "existing registered composer revision 7",
+    "capability": "verified optional packed table reader; not claimed as the active token renderer",
+    "transactions": [
+      {
+        "key": "deploy:trailer-compact-descriptor-matrix",
+        "hash": "0x27447be16b99603344b02ef75d76e1b592090cc6e2e0fb5e77b1252bf1684cc7",
+        "gasUsed": "17049595",
+        "blockNumber": "11896874"
+      },
+      {
+        "key": "call:0x8ecae4ff9c775724d77461ee896187bddfc4fd47:0x81301e405635aa316532ed408ac8ebc9cec4d847645ca7f40478e6dd93109237:0",
+        "hash": "0xb6d8ebcf1d3a3138be3c6358166a7e11013bd4f06eaad2be6f09390e8f443306",
+        "gasUsed": "10142123",
+        "blockNumber": "11896875"
+      },
+      {
+        "key": "call:0x8ecae4ff9c775724d77461ee896187bddfc4fd47:0x42b1a17052b3bc3f73da4cddcc5f85c37f2af8150f6f8b461604ccf4079e5fe5:0",
+        "hash": "0xcbd9ff3d9aa402c181b79160719365fae44830eba35117b10d332000420e9555",
+        "gasUsed": "999797",
+        "blockNumber": "11896886"
+      },
+      {
+        "key": "call:0xd820e337692a6eb7a4878e42ce88cbcff49b55cf:0x439e585eff071e06cfdbb77946493da6c3c276a4c6d6a5593f0c5cf601bd979b:0",
+        "hash": "0x1c2a706fe778e5816452443f9cc5fa4e4134b959a7d779784f87504f8fc2e47e",
+        "gasUsed": "381648",
+        "blockNumber": "11896887"
+      },
+      {
+        "key": "call:0x8ecae4ff9c775724d77461ee896187bddfc4fd47:0xf62de3d3caf879edc64c5d7ae62c3442d057c075c5f46d7ce4dda552283603f0:0",
+        "hash": "0xe99767a9adf01c0da9a5f540577030336b5546aac8b20d7535641cc61f4a7ac7",
+        "gasUsed": "209954",
+        "blockNumber": "11896888"
+      },
+      {
+        "key": "call:0x8ecae4ff9c775724d77461ee896187bddfc4fd47:0x5a28f35093492dcd7789bd9ac6ff99a76b7523a82bb0c85ebe43e9e2380a57cd:0",
+        "hash": "0xa6caa91651deb08197a890bfb683eb9e4489bc8bf9b93461561495b12b010151",
+        "gasUsed": "30348",
+        "blockNumber": "11896889"
+      }
+    ],
+    "collectionBound": true,
+    "activeCollectorRoute": false
+  },
+  "gasOptimizations": {
+    "liveComposerInitializerPercent": 10.036596412331544,
+    "packedTableBindingPercent": 44.13148019262676,
+    "packedTableReadPercent": 22.779115773791737,
+    "packedTableSetupPercent": 23.739400958193347,
+    "measurement": "Osaka EVM gas rules on Sepolia state; component comparisons"
+  },
+  "performanceUpdate": {
+    "checkedAt": "2026-10-12T14:46:58.764Z",
+    "player": {
+      "objectId": "0x86d02a8a8fdd647f79fa22d7e3751c327e38241455695bb980af7db5bb4cb50d",
+      "storedIntegrity": {
+        "algorithm": "sha256",
+        "digest": "0x149e6797ef559e698ea2c65b073339563a4f54b8c675afe0519b4ce7cba64a03",
+        "byteLength": 86461
+      },
+      "integrity": {
+        "algorithm": "sha256",
+        "digest": "0x149e6797ef559e698ea2c65b073339563a4f54b8c675afe0519b4ce7cba64a03",
+        "byteLength": 86461
+      },
+      "slugIds": [
+        "0xb1e635b908b0ba349e198a088e4f28725ace086bfe7eeb41cfb40bd110a94da5",
+        "0x3533d6a55526106a3daa02a3574914de35a2a1c039d1d9f9c13e195bc631c6ef",
+        "0xa08c2a526ec9deccb7170c899bb8febb25feed1ff8488ca7bdf0e9f339fac1e3",
+        "0x39f36d239e3e2f45cc629eabddc0268a49e97d0916c959e0b749f9cb683c8224"
+      ],
+      "slugCount": 4,
+      "mediaType": "application/vnd.keel.token-uri-raw-percent-fragment",
+      "store": "0xD820e337692A6Eb7a4878e42ce88CBCFF49B55CF",
+      "builder": "0x4957B01a17aF3ff45e09a494ADf58a9B9151C582",
+      "record": {
+        "digest": "0x149e6797ef559e698ea2c65b073339563a4f54b8c675afe0519b4ce7cba64a03",
+        "indexDigest": "0x78e1bed2d6b330da2a7cc41fd943e4df62388960e17bc3f6ebd4f09a7ad57ae8",
+        "descriptorPointer": "0x5A62Ae9Da18965010fb6fD731d50960A450135EC",
+        "byteLength": "86461",
+        "storedByteLength": "86461",
+        "slugCount": 4,
+        "compression": 0,
+        "composite": false,
+        "exists": true,
+        "mediaType": "application/vnd.keel.token-uri-raw-percent-fragment"
+      },
+      "readBackBlockNumber": "11899551"
+    },
+    "descriptors": {
+      "objectId": "0x8aff68dccb9f5112bc0818b8558b8f65f93c2ac104a9efaedb0d90369904c949",
+      "storedIntegrity": {
+        "algorithm": "sha256",
+        "digest": "0x43e9ad0d414e013b0d3a8c32168e8e172b01586f830ede2fc8fe4fc1ca80e52a",
+        "byteLength": 13471
+      },
+      "integrity": {
+        "algorithm": "sha256",
+        "digest": "0x43e9ad0d414e013b0d3a8c32168e8e172b01586f830ede2fc8fe4fc1ca80e52a",
+        "byteLength": 13471
+      },
+      "slugIds": [
+        "0x0a89f4c4f6b85d6213ebb3a20d6487416deaa3d9409939b0a3f93ef18e0c9e6e"
+      ],
+      "slugCount": 1,
+      "mediaType": "application/vnd.keel.token-uri-raw-percent-fragment",
+      "store": "0xD820e337692A6Eb7a4878e42ce88CBCFF49B55CF",
+      "builder": "0x4957B01a17aF3ff45e09a494ADf58a9B9151C582",
+      "record": {
+        "digest": "0x43e9ad0d414e013b0d3a8c32168e8e172b01586f830ede2fc8fe4fc1ca80e52a",
+        "indexDigest": "0x197ce27b6b39f7aec9d0befd58e4a2c6a2e1a8e329e26954787d6a490ea700ff",
+        "descriptorPointer": "0x196688653d19575205DeC6d295A36e3C85ebcc16",
+        "byteLength": "13471",
+        "storedByteLength": "13471",
+        "slugCount": 1,
+        "compression": 0,
+        "composite": false,
+        "exists": true,
+        "mediaType": "application/vnd.keel.token-uri-raw-percent-fragment"
+      },
+      "readBackBlockNumber": "11899551"
+    },
+    "table": {
+      "objectId": "0x32b46494df80907abe6571012afde946db474afae87621b0e4573d305cbaee43",
+      "storedIntegrity": {
+        "algorithm": "sha256",
+        "digest": "0x61fec7962a6ca3e860ac7a26aa3decb0bc063ee8093638bc6073026adabaf46a",
+        "byteLength": 704
+      },
+      "integrity": {
+        "algorithm": "sha256",
+        "digest": "0x61fec7962a6ca3e860ac7a26aa3decb0bc063ee8093638bc6073026adabaf46a",
+        "byteLength": 704
+      },
+      "slugIds": [
+        "0x20650953b49c1976fe950c9ce207cff921fe8782ca43d558c247c0cf8a1e0765"
+      ],
+      "slugCount": 1,
+      "mediaType": "application/vnd.keel.inline-prepared-container-table",
+      "store": "0xD820e337692A6Eb7a4878e42ce88CBCFF49B55CF",
+      "builder": "0x4957B01a17aF3ff45e09a494ADf58a9B9151C582",
+      "record": {
+        "digest": "0x61fec7962a6ca3e860ac7a26aa3decb0bc063ee8093638bc6073026adabaf46a",
+        "indexDigest": "0x98176255c5a08719134ead1484d5806d3729b0eec80233498e00305413200d5e",
+        "descriptorPointer": "0x596215a0c5cEa044Fb82f9a045aabA2DAd86A513",
+        "byteLength": "704",
+        "storedByteLength": "704",
+        "slugCount": 1,
+        "compression": 0,
+        "composite": false,
+        "exists": true,
+        "mediaType": "application/vnd.keel.inline-prepared-container-table"
+      },
+      "readBackBlockNumber": "11899554"
+    },
+    "engineReuploads": 0,
+    "mp4UploadBytes": 0,
+    "desktopBrowser": {
+      "readyMs": 8774.123291,
+      "encodingMs": 33478.60000002384,
+      "encodedFrames": 3600,
+      "sound": true,
+      "saveMp4": true,
+      "mp4Bytes": 145925091,
+      "handoffErrorSeconds": 0.044980666666667446
+    },
+    "transactions": [
+      {
+        "hash": "0x6a168ef4a84ff2f3a0211814ff90dffb931a979332c3b1472b4cff65be85fb0c",
+        "blockNumber": "11899532",
+        "gasUsed": "257779"
+      },
+      {
+        "hash": "0xaac4eb9017b09a1dc574c9927fbeafb63a1ec529438a39434273ebfb4d4ebc6f",
+        "blockNumber": "11899533",
+        "gasUsed": "35980784"
+      },
+      {
+        "hash": "0x1777abd30163f4fc974810d9ac0fd2a2d65694c68d10c29658c0f3901bebb660",
+        "blockNumber": "11899534",
+        "gasUsed": "35980784"
+      },
+      {
+        "hash": "0x73ad936c47ed57cc3254815c048d9384200bbe1e1639665825b6e6650a32a660",
+        "blockNumber": "11899535",
+        "gasUsed": "35980784"
+      },
+      {
+        "hash": "0x520d80ab0589affbe8b072da36c368c16b7d42fedb69cd7b6d9de424db906dd0",
+        "blockNumber": "11899536",
+        "gasUsed": "28096803"
+      },
+      {
+        "hash": "0x96ce2f690365e5c063108a092ad9a5a2869236a4817d916c22b6f6339f543a21",
+        "blockNumber": "11899537",
+        "gasUsed": "154825"
+      },
+      {
+        "hash": "0xd940867c1483cee18fda26ef38cd47cac9be69d4006cd1d3681bcdf3383e38e9",
+        "blockNumber": "11899543",
+        "gasUsed": "257779"
+      },
+      {
+        "hash": "0xc96400034bb62f1b92fe406d3599847d7b62d9cea4a9c58cefac8d1ff855e23e",
+        "blockNumber": "11899544",
+        "gasUsed": "21808857"
+      },
+      {
+        "hash": "0x398814382e2a4f0a2ab13a8d63af0830af1086d609f99a19cffd2f55bd697a83",
+        "blockNumber": "11899545",
+        "gasUsed": "154825"
+      },
+      {
+        "hash": "0x06dec3491ca6b37f448eeb254d810af08d3ff469f9dc3166d8fe6303fba7a2ec",
+        "blockNumber": "11899552",
+        "gasUsed": "257779"
+      },
+      {
+        "hash": "0x96f8e973fdfdd888e627cb4bf34f64a376dc9f43fe6538fc868af5af61d89191",
+        "blockNumber": "11899553",
+        "gasUsed": "2045587"
+      },
+      {
+        "hash": "0x8d0dd9dc693ba97beefca3bc32423967dd9c2b4f9259fc743c5d8ffdd73cc964",
+        "blockNumber": "11899554",
+        "gasUsed": "154825"
+      },
+      {
+        "hash": "0x4d5d33d950ec99ad8a45fbdf69899d1f1d5fe4e23e27b091c9e0880ea9612ab4",
+        "blockNumber": "11899556",
+        "gasUsed": "2581399"
+      },
+      {
+        "hash": "0x1b49f6e7b3ca6e1445ff5884df37a25edf64accebc941d57339ba3150bac02ff",
+        "blockNumber": "11899557",
+        "gasUsed": "760669"
+      },
+      {
+        "hash": "0x0c693a32dcba10326e46040584538ce4cdaf54fd6d0080946fce505f6c45bbcb",
+        "blockNumber": "11899558",
+        "gasUsed": "5370215"
+      }
+    ],
+    "spendWei": "169849201004801"
+  }
+}

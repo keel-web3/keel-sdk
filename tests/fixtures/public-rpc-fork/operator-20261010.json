@@ -1,0 +1,21 @@
+{
+  "schema": "keel-public-operator-regression@1",
+  "sourceLibraryFile": "libfile_bf7ede842b2081919bc7c130c019a4d6",
+  "observedWindowUtc": ["2026-10-10T10:29:30.147Z", "2026-10-10T10:34:40.036Z"],
+  "privateProjectBytesSent": 0,
+  "walletCalls": 0,
+  "publicNode": {
+    "requestBytes": 548,
+    "requestedEnvelopeGas": "200000000",
+    "returnedEnvelopeGas": "50000000",
+    "sharedBudget": {
+      "requestedEnvelopeGas": ["50000000", "50000000"],
+      "returnedEnvelopeGas": ["50000000", "49988000"],
+      "firstCallGasUsed": "12000"
+    }
+  },
+  "tenderly": { "method": "eth_simulateV1", "httpStatus": 429, "rpcCode": -32005, "retryAfterHeaderObserved": false },
+  "oneRpc": { "method": "eth_chainId", "httpStatus": 403, "responseBytes": 9 },
+  "ethPandaOps": { "method": "eth_simulateV1", "rpcCode": -32601 },
+  "bodyObservation": { "httpStatus": 503, "padding": "approximately 4 MB whitespace", "exactProviderBodyLimit": "not-established" }
+}

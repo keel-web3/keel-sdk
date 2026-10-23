@@ -1,3 +1,5 @@
+import { canonicalAbiEntries, readCompiledContractAbi } from "./abi-conformance.mjs";
+import { fileURLToPath } from "node:url";
 import nodeTest from 'node:test';
 import { siblingTest } from "./sibling-repository.mjs";
 const test = siblingTest(nodeTest, "keel-contracts");
@@ -11,8 +13,8 @@ const topic=s=>keccak256(stringToHex(s));
 const addressTopic=a=>`0x${'0'.repeat(24)}${a.slice(2)}`;
 const recorded=()=>JSON.parse(readFileSync(new URL('../../keel-contracts/modules/keel-die/abi/KeelCreator1155.json',import.meta.url)));
 test('creator1155 compiled, recorded and SDK ABI agree',()=>{
- const compiled=JSON.parse(readFileSync(new URL('../../keel-contracts/out/KeelCreator1155.sol/KeelCreator1155.json',import.meta.url))).abi;
- assert.deepEqual(abi,recorded());assert.deepEqual(recorded(),compiled);
+ const compiled=readCompiledContractAbi(fileURLToPath(new URL('../../keel-contracts', import.meta.url)), 'KeelCreator1155');
+ assert.deepEqual(abi,recorded());assert.deepEqual(canonicalAbiEntries(recorded()),canonicalAbiEntries(compiled));
 });
 for(const eventName of ['StrikeCapacityReserved','StrikeCapacityReleased','StrikeCapacityConsumed'])test(`${eventName} preserves item, manager and full quantity`,()=>{
  const quantity=(1n<<128n)-1n;

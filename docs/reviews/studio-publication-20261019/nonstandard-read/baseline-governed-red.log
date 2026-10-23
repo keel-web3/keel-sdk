@@ -1,0 +1,112 @@
+TAP version 13
+# Subtest: governed SDK reader treats 401 as sticky terminal without fallback
+not ok 1 - governed SDK reader treats 401 as sticky terminal without fallback
+  ---
+  duration_ms: 9.477916
+  type: 'test'
+  location: '/Users/ravonus/dev/wt/studio-native-beacon-witness-20261019/sdk-nonstandard-read/tests/governed-rpc-boundaries.test.mjs:13:31'
+  failureType: 'testCodeFailure'
+  error: |-
+    The validation function is expected to return "true". Received false
+    
+    Caught error:
+    
+    KeelRpcError: HTTP 401 from https://two.example/….
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  stack: |-
+    async TestContext.<anonymous> (file:///Users/ravonus/dev/wt/studio-native-beacon-witness-20261019/sdk-nonstandard-read/tests/governed-rpc-boundaries.test.mjs:15:3)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async startSubtestAfterBootstrap (node:internal/test_runner/harness:296:3)
+  ...
+# Subtest: governed SDK reader treats 403 as sticky terminal without fallback
+not ok 2 - governed SDK reader treats 403 as sticky terminal without fallback
+  ---
+  duration_ms: 0.268542
+  type: 'test'
+  location: '/Users/ravonus/dev/wt/studio-native-beacon-witness-20261019/sdk-nonstandard-read/tests/governed-rpc-boundaries.test.mjs:13:31'
+  failureType: 'testCodeFailure'
+  error: |-
+    The validation function is expected to return "true". Received false
+    
+    Caught error:
+    
+    KeelRpcError: HTTP 403 from https://two.example/….
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  stack: |-
+    async TestContext.<anonymous> (file:///Users/ravonus/dev/wt/studio-native-beacon-witness-20261019/sdk-nonstandard-read/tests/governed-rpc-boundaries.test.mjs:15:3)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: governed reader retains genuine nested revert inside HTTP 200
+not ok 3 - governed reader retains genuine nested revert inside HTTP 200
+  ---
+  duration_ms: 1.406041
+  type: 'test'
+  location: '/Users/ravonus/dev/wt/studio-native-beacon-witness-20261019/sdk-nonstandard-read/tests/governed-rpc-boundaries.test.mjs:19:31'
+  failureType: 'testCodeFailure'
+  error: |-
+    The validation function is expected to return "true". Received false
+    
+    Caught error:
+    
+    KeelRpcError: eth_call returned an invalid response.
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  stack: |-
+    async TestContext.<anonymous> (file:///Users/ravonus/dev/wt/studio-native-beacon-witness-20261019/sdk-nonstandard-read/tests/governed-rpc-boundaries.test.mjs:21:3)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: governed reader retains genuine nested revert inside HTTP 503
+not ok 4 - governed reader retains genuine nested revert inside HTTP 503
+  ---
+  duration_ms: 0.30925
+  type: 'test'
+  location: '/Users/ravonus/dev/wt/studio-native-beacon-witness-20261019/sdk-nonstandard-read/tests/governed-rpc-boundaries.test.mjs:19:31'
+  failureType: 'testCodeFailure'
+  error: |-
+    The validation function is expected to return "true". Received false
+    
+    Caught error:
+    
+    KeelRpcError: HTTP 503 from https://two.example/….
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  stack: |-
+    async TestContext.<anonymous> (file:///Users/ravonus/dev/wt/studio-native-beacon-witness-20261019/sdk-nonstandard-read/tests/governed-rpc-boundaries.test.mjs:21:3)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: governed reader limits physical fanout and retries only transient failures with identical calls
+not ok 5 - governed reader limits physical fanout and retries only transient failures with identical calls
+  ---
+  duration_ms: 8.78725
+  type: 'test'
+  location: '/Users/ravonus/dev/wt/studio-native-beacon-witness-20261019/sdk-nonstandard-read/tests/governed-rpc-boundaries.test.mjs:24:1'
+  failureType: 'testCodeFailure'
+  error: |-
+    The expression evaluated to a falsy value:
+    
+      assert.ok(maximum<=2)
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: true
+  actual: false
+  operator: '=='
+  stack: |-
+    TestContext.<anonymous> (file:///Users/ravonus/dev/wt/studio-native-beacon-witness-20261019/sdk-nonstandard-read/tests/governed-rpc-boundaries.test.mjs:28:10)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+1..5
+# tests 5
+# suites 0
+# pass 0
+# fail 5
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 50.397833

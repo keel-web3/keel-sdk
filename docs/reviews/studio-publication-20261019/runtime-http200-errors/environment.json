@@ -1,0 +1,75 @@
+{
+  "sourceCommit": "f159f32cf73b8ca144972d4cb11f109a522fcbe8",
+  "node": {
+    "path": "/Users/ravonus/.nvm/versions/node/v22.22.1/bin/node",
+    "version": "v22.22.1",
+    "zlib": "1.3.1-e00f703",
+    "platform": "darwin",
+    "arch": "arm64"
+  },
+  "pnpm": "10.15.0",
+  "dependencies": "pnpm install --frozen-lockfile --ignore-scripts; qualified ffmpeg restored only into this checkout",
+  "lockfile": {
+    "bytes": 230676,
+    "sha256": "188e360a1d74ecfd2b3cbf45ba3ea9b4d8b1edb49ec728f746d398ae011745dd"
+  },
+  "ffmpeg": {
+    "bytes": 45568216,
+    "sha256": "a90e3db6a3fd35f6074b013f948b1aa45b31c6375489d39e572bea3f18336584"
+  },
+  "neighbors": {
+    "keel-contracts": {
+      "path": "/Users/ravonus/dev/wt/studio-publication-20261019/outstanding-contracts",
+      "commit": "4015b92315ac425f7b2526c797f872a6da2cde64",
+      "trackedStatus": ""
+    },
+    "keel-site": {
+      "path": "/Users/ravonus/dev/wt/studio-publication-20261019/all-site-work",
+      "commit": "b4bda058dc71e78fc460a02c24b346c7fd723ce2",
+      "trackedStatus": ""
+    },
+    "fun-art": {
+      "path": "/Users/ravonus/dev/fun-art",
+      "commit": "f254de5b593ffbf4a7e3aedb3d412a1bf9bf83eb",
+      "trackedStatus": "D Active_Tezos_raffle_patron_exit/step_004_cont_2_contract.tz\n D Sold-out_STAMP_refund_safety/step_004_cont_1_contract.tz\n D Tezos_auction_creation/step_001_cont_0_contract.tz\n D Tezos_auction_deadline_boundary/step_004_cont_2_contract.tz\n D Tezos_demand-curve_patron_pricing/step_004_cont_2_contract.tz\n D Unique_bid_winner_paid-STAMP_exemption/step_004_cont_1_contract.tz\n D Weighted_patron_raffle/step_004_cont_2_contract.tz\n D Zero-price_STAMP_auction/step_004_cont_1_contract.tz\n M apps/feed-engine/Cargo.lock\n M apps/feed-engine/README.md\n M apps/feed-engine/crates/algo/src/lib.rs\n M apps/feed-engine/crates/api/src/assemble.rs\n M apps/feed-engine/crates/api/src/lib.rs\n M apps/feed-engine/crates/api/src/pools.rs\n M apps/feed-engine/crates/api/src/state.rs\n M apps/feed-engine/crates/domain/src/lib.rs\n M apps/feed-engine/crates/domain/src/page.rs\n M apps/feed-engine/crates/server/src/config.rs\n M apps/feed-engine/crates/server/src/main.rs\n M apps/feed-engine/crates/store/Cargo.toml\n M apps/feed-engine/crates/store/src/keys.rs\n M apps/feed-engine/crates/store/src/lib.rs\n M apps/feed-engine/scripts/e2e.sh\n M apps/indexer/src/projections/persist-art-drop-projections.ts\n M apps/indexer/src/projections/persist-participation-projections.ts\n M apps/indexer/src/projections/rebuild-event-projections.ts\n M apps/indexer/src/rpc/viem-chain-reader.ts\n M apps/indexer/src/service/internal/fray-agent-staging-internal-routes.ts\n M apps/indexer/src/service/read-api/public-read-models.test.ts\n M apps/indexer/src/service/wallet/wallet-action-read-model.ts\n M apps/indexer/src/service/wallet/wallet-read-model.ts\n M apps/indexer/src/service/wallet/wallet-read-model.types.ts\n M apps/web/next-env.d.ts\n M apps/web/src/app/api/publish/recovery/[publicationId]/route.ts\n M apps/web/src/app/api/publish/stratus-job/execute/route.ts\n M apps/web/src/env.ts\n M apps/web/src/features/artists/studio-shell.tsx\n M apps/web/src/features/artworks/publication/create-auction-adapter.ts\n M apps/web/src/features/artworks/publication/create-auction-transaction.ts\n M apps/web/src/features/artworks/publication/fray-agent-handoff.test.ts\n M apps/web/src/features/artworks/publication/fray-agent-handoff.ts\n M apps/web/src/features/artworks/publication/publish-wizard.tsx\n M apps/web/src/features/artworks/publication/stamp-publication-adapter.ts\n M apps/web/src/features/artworks/publication/stamp-style-fields.tsx\n M apps/web/src/features/artworks/publication/stratus-ethereum-adapter.ts\n M apps/web/src/features/artworks/publication/stratus-object-system.test.ts\n M apps/web/src/features/artworks/publication/stratus-object-system.ts\n M apps/web/src/features/artworks/publication/use-create-auction.ts\n M apps/web/src/features/rewards/claim-chain-adapter.ts\n M apps/web/src/features/wallet/transactions/wallet-first-rpc.test.ts\n M apps/web/src/features/wallet/transactions/wallet-first-rpc.ts\n M apps/web/src/server/services/art-optimizer.ts\n M apps/web/src/server/services/fray-agent-quote-response.ts\n M apps/web/src/server/services/fray-agent-quote-target.ts\n M apps/web/src/server/services/fray-agent-stage-preparation.ts\n M apps/web/src/server/services/fray-agent-staging-store.ts\n M apps/web/src/server/services/fray-agent-studio-capabilities.test.ts\n M apps/web/src/server/services/fray-agent-studio-capabilities.ts\n M apps/web/src/server/services/publication-recovery-store.ts\n M apps/web/src/server/services/stratus-publication-job-executor.test.ts\n M apps/web/src/server/services/stratus-publication-job-executor.ts\n D docs/generated/tezos-scenarios/Active_Tezos_raffle_patron_exit/step_004_cont_2_contract.tz\n D docs/generated/tezos-scenarios/Sold-out_STAMP_refund_safety/step_004_cont_1_contract.tz\n D docs/generated/tezos-scenarios/Tezos_auction_creation/step_001_cont_0_contract.tz\n D docs/generated/tezos-scenarios/Tezos_batch_patron_battle/step_004_cont_2_contract.tz\n D docs/generated/tezos-scenarios/Tezos_batch_patron_ranking_top-up/step_004_cont_2_contract.tz\n D docs/generated/tezos-scenarios/Tezos_collection_batch/step_001_cont_0_contract.tz\n D docs/generated/tezos-scenarios/Tezos_demand-curve_patron_pricing/step_004_cont_2_contract.tz\n D docs/generated/tezos-scenarios/Tezos_mixed_per-item_batch/step_004_cont_2_contract.tz\n D docs/generated/tezos-scenarios/Tezos_unique-only_collection_batch/step_004_cont_2_contract.tz\n D docs/generated/tezos-scenarios/Tezos_zero-price_batch/step_004_cont_2_contract.tz\n D docs/generated/tezos-scenarios/Unique_bid_winner_paid-STAMP_exemption/step_004_cont_1_contract.tz\n D docs/generated/tezos-scenarios/Weighted_patron_raffle/step_004_cont_2_contract.tz\n D docs/generated/tezos-scenarios/Zero-price_STAMP_auction/step_004_cont_1_contract.tz\n M ops/vultr/push-web-overlay.sh\n M ops/vultr/render-external-container-env.mjs\n M packages/abi/scripts/generate-abi.mjs\n M packages/abi/src/generated/index.ts\n M packages/abi/src/generated/patrons-auction-house.ts\n M packages/abi/src/generated/protocol-error-abi.ts\n M packages/abi/src/generated/stamp-registry.ts\n M packages/contracts/foundry.toml\n M packages/contracts/remappings.txt\n M packages/contracts/script/DeployPrimaryStampTest.s.sol\n M packages/contracts/script/DeployProtocol.s.sol\n M packages/contracts/src/ArtistContractsFactory.sol\n M packages/contracts/src/ArtistReleaseManager.sol\n M packages/contracts/src/AuctionDepositPolicy.sol\n M packages/contracts/src/ParticipationToken.sol\n M packages/contracts/src/PatronsAuctionHouse.sol\n M packages/contracts/src/RaffleEntropyOracle.sol\n M packages/contracts/src/RewardController.sol\n M packages/contracts/src/StampRegistry.sol\n M packages/contracts/src/StampRenderer.sol\n M packages/contracts/test/gas/ContractSizeAndAuctionGas.t.sol\n M packages/contracts/test/invariant/AuctionAccountingInvariant.t.sol\n M packages/contracts/test/unit/AuctionDepositPolicy.t.sol\n M packages/contracts/test/unit/CollectionBatchAuction.t.sol\n M packages/contracts/test/unit/DeployProtocolScript.t.sol\n M packages/contracts/test/unit/DeploymentVersioning.t.sol\n M packages/contracts/test/unit/PatronRaffle.t.sol\n M packages/contracts/test/unit/Stamp.t.sol\n M packages/db/migrations/meta/_journal.json\n M packages/db/src/agent/fray-agent-staging-repository.ts\n M packages/domain/src/acceptance-ports/publish-preview.ts\n M pnpm-lock.yaml\n M vendor/keel-protocol-0.3.0.tgz\n M vendor/keel-sandbox-sdk-0.1.0.tgz\n M vendor/keel-sdk-0.3.0.tgz\n M vendor/keel-viewer-0.3.0.tgz"
+    }
+  },
+  "builtPackageIndexFiles": {
+    "packages/builder/dist/index.js": {
+      "bytes": 1210,
+      "sha256": "3c335d58e7d59c10b149ad19846d2d758819b5427bb6fc7b54c92939d2101203"
+    },
+    "packages/ethereum-adapter/dist/index.js": {
+      "bytes": 255,
+      "sha256": "a0deb22d6e647cebddd102bdd85c2ee6af808c403fccf5843116104602347019"
+    },
+    "packages/mcp/dist/index.js": {
+      "bytes": 431,
+      "sha256": "6055a6a74ec3ef4d9faca5f77d680f395d0de3d1441a733299a7aa60fb419024"
+    },
+    "packages/protocol/dist/index.js": {
+      "bytes": 1395,
+      "sha256": "205807706798f71147a4ebe75da761227a06078ef60e40b713b86d7f1b1f9b88"
+    },
+    "packages/sandbox-sdk/dist/index.js": {
+      "bytes": 156,
+      "sha256": "a1cfd0a54769225e5bae8137111ff630be9373cf458a4ad4c9a152f829c735fe"
+    },
+    "packages/sdk/dist/index.js": {
+      "bytes": 5274,
+      "sha256": "5668f627fdabfe3c373807feb1f64992298baebf9670183c518e344f1995eb92"
+    },
+    "packages/sprite-codex/dist/index.js": {
+      "bytes": 338,
+      "sha256": "0a3d72a5471cb92e07fee58cda26262ae8a23d7895e6f43c30844afb946fa056"
+    },
+    "packages/studio-core/dist/index.js": {
+      "bytes": 703,
+      "sha256": "6edc2980cea946a8ec2b0626b0c29d94334b9ac719cc1baea1054913e113e661"
+    },
+    "packages/viewer/dist/index.js": {
+      "bytes": 990,
+      "sha256": "4490df711d8fc6afab100176dd90ae17193217ec1029f4c0ee7feacd645bcfbe"
+    }
+  }
+}

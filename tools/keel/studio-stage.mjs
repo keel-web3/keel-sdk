@@ -4,7 +4,7 @@ import { resolveKeelPayloadStorage } from "../../packages/protocol/dist/index.js
 import { lstat, readFile, realpath } from "node:fs/promises";
 import path from "node:path";
 import { resolveKeelEndpoints } from "../../packages/sdk/dist/endpoints.js";
-import { stageKeelStudioProject } from "../../packages/sdk/dist/studio-upload.js";
+import { stageKeelStudioProject, parseKeelStudioMediaSlots } from "../../packages/sdk/dist/studio-upload.js";
 import { readStudioConfig } from "./studio-config.mjs";
 
 const MAX_PROJECT_BYTES = 256 * 1024 * 1024;
@@ -48,7 +48,7 @@ async function sourceBytes(configDirectory, source, label) {
 
 async function validateConfig(value, configPath, environment = process.env) {
   const input = object(value, "Studio stage configuration");
-  exact(input, ["studioUrl", "title", "description", "storageStrategy", "payloadStorage", "marketplaceExportMode", "viewer", "files", "releaseIntent"], "Studio stage configuration");
+  exact(input, ["studioUrl", "title", "description", "storageStrategy", "payloadStorage", "marketplaceExportMode", "viewer", "files", "releaseIntent", "mediaSlots"], "Studio stage configuration");
   const token = environment.KEEL_STUDIO_AGENT_TOKEN;
   if (typeof token !== "string" || token.length < 48) throw new TypeError("Studio staging requires KEEL_STUDIO_AGENT_TOKEN.");
   const storageStrategy = text(input.storageStrategy, "storageStrategy", 32);
@@ -88,6 +88,7 @@ async function validateConfig(value, configPath, environment = process.env) {
     payloadStorage: resolveKeelPayloadStorage(input.payloadStorage),
     ...(marketplaceExportMode === undefined ? {} : { marketplaceExportMode }),
     ...(viewer === undefined ? {} : { viewer }),
+    ...(input.mediaSlots===undefined?{}:{mediaSlots:parseKeelStudioMediaSlots(input.mediaSlots)}),
     files,
     ...(input.releaseIntent === undefined ? {} : { releaseIntent: object(input.releaseIntent, "releaseIntent") }),
   };

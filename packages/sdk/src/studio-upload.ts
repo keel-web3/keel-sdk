@@ -1,4 +1,5 @@
-import { resolveKeelShell, resolveKeelPayloadStorage, type KeelPayloadStorageMode } from "@keel/protocol";
+import { parseKeelSelectedProjectProfile, type KeelSelectedProjectProfile } from "./studio-project-defaults.js";
+import { resolveKeelShell, resolveKeelPayloadStorage, classifyKeelAssetExecution, classifyKeelAssetMotion, planKeelSmartAssetPresentation, resolveKeelAssetPresentationSelection, parseKeelAssetPresentationPreference, parseKeelExternalPreviewUri, parseKeelPresentationFallbackDelivery, KEEL_ASSET_PRESENTATION_CANDIDATE_IDS, type KeelPresentationFallbackDelivery, type KeelAssetPresentationCandidateId, type KeelAssetPresentationPreference, type KeelPayloadStorageMode } from "@keel/protocol";
 import {
   defaultKeelStudioPublicationIntent,
   type KeelStudioPublicationIntent,
@@ -8,6 +9,13 @@ export const KEEL_STUDIO_ARTIFACT_UPLOAD_PROTOCOL = "keel-studio-artifact-upload
 
 export interface KeelStudioArtifactUploadResult {
   readonly id: string;
+  readonly preparation?: {
+    readonly route: "creator-prepared-copy";
+    readonly status: "source-staged" | "prepared";
+    readonly sourceRevision: `0x${string}`;
+    readonly reviewPath: string;
+    readonly publicationReady: false;
+  };
 }
 
 export interface UploadKeelStudioArtifactInput {
@@ -76,6 +84,12 @@ export interface KeelStudioStagedProjectFile {
 }
 
 export interface StageKeelStudioProjectInput {
+  /** New-project routing choice. A preview URL is project-specific and never an account default. */
+  readonly assetPresentation?: KeelAssetPresentationPreference;
+  readonly externalPreviewUri?: string;
+  readonly fallbackDelivery?: KeelPresentationFallbackDelivery;
+  readonly assetPresentationSelection?: KeelAssetPresentationCandidateId;
+  readonly nonstandardCompatibilityAcknowledged?: boolean;
   readonly payloadStorage?: KeelPayloadStorageMode;
   readonly studioUrl: string | URL;
   readonly agentToken: string;
@@ -89,6 +103,8 @@ export interface StageKeelStudioProjectInput {
    * read directly from its immutable contract source.
    */
   readonly viewer?: "keel-verification-shell" | "none";
+  /** Editable intent only. Unsupported readers block before storage funding. */
+  readonly mediaSlots?: {readonly image?: {readonly resourceId:string;readonly presentation:"direct"|"keel-shell";readonly delivery:"onchain"|"ipfs"|"hosted"}|null;readonly animation_url?: {readonly resourceId:string;readonly presentation:"direct"|"keel-shell";readonly delivery:"onchain"|"ipfs"|"hosted"}|null};
   readonly files: readonly KeelStudioStagedProjectFile[];
   readonly reusableModule?: {
     readonly resourcePaths: readonly string[];
@@ -97,6 +113,7 @@ export interface StageKeelStudioProjectInput {
     readonly accessMode?: "open" | "paid" | "license" | "subscription" | "request" | "special";
     readonly tags?: readonly string[];
   };
+  readonly projectProfile?: KeelSelectedProjectProfile;
   readonly releaseIntent?: {
     readonly schema: "keel-release-intent@1";
     readonly chainId: number;
@@ -140,24 +157,42 @@ interface UploadErrorBody {
   readonly error?: string;
 }
 
+export class KeelStudioUploadError extends Error {
+  override readonly name = "KeelStudioUploadError";
+  constructor(message: string, readonly status: number) { super(message); }
+}
+
 function result(value: unknown, status: number): KeelStudioArtifactUploadResult {
+  if ((status < 200 || status >= 300) && (typeof value !== "object" || value === null)) throw new KeelStudioUploadError(`KEEL Studio upload returned HTTP ${status} without a JSON result.`, status);
   if (typeof value !== "object" || value === null) {
     throw new Error(`KEEL Studio upload returned HTTP ${status} without a JSON result.`);
   }
-  const body = value as UploadErrorBody & { readonly id?: unknown };
+  const body = value as UploadErrorBody & { readonly id?: unknown; readonly preparation?: unknown };
   if (status < 200 || status >= 300) {
-    throw new Error(body.error ?? `KEEL Studio upload failed with HTTP ${status}.`);
+    throw new KeelStudioUploadError(body.error ?? `KEEL Studio upload failed with HTTP ${status}.`, status);
   }
   if (typeof body.id !== "string" || body.id.length === 0) {
     throw new Error("KEEL Studio upload did not return an artifact ID.");
   }
-  return Object.freeze({ id: body.id });
+  if (body.preparation === undefined) return Object.freeze({ id: body.id });
+  const preparation = body.preparation;
+  if (!preparation || typeof preparation !== "object" || Array.isArray(preparation)) throw new TypeError("Invalid Studio preparation result.");
+  const prepared = preparation as Record<string, unknown>;
+  const keys = ["route", "status", "sourceRevision", "reviewPath", "publicationReady"];
+  if (Object.keys(prepared).length !== keys.length || Object.keys(prepared).some(key => !keys.includes(key))
+    || prepared.route !== "creator-prepared-copy" || !["source-staged", "prepared"].includes(String(prepared.status))
+    || typeof prepared.sourceRevision !== "string" || !/^0x[0-9a-f]{64}$/u.test(prepared.sourceRevision)
+    || prepared.publicationReady !== false || typeof prepared.reviewPath !== "string" || prepared.reviewPath.length > 2048
+    || !prepared.reviewPath.startsWith("/") || prepared.reviewPath.startsWith("//") || /[\u0000-\u001f\u007f\\]/u.test(prepared.reviewPath)
+    || new URL(prepared.reviewPath, "https://studio.invalid").origin !== "https://studio.invalid") throw new TypeError("Invalid Studio preparation result.");
+  return Object.freeze({ id: body.id, preparation: Object.freeze(prepared) as NonNullable<KeelStudioArtifactUploadResult["preparation"]> });
 }
 
 /**
  * Uploads an artifact to KEEL Studio without performing any wallet or chain
- * action. Browser callers use their signed creator session; agents use the
- * server-side write token and an explicit creatorAddress form field.
+ * action. Creation requires the browser's signed creator session. An address
+ * or operator header alone is not authentication. Headless callers use
+ * createKeelStudioAgentDraftClient().createProject with a creator-approved grant.
  */
 export async function uploadKeelStudioArtifact(
   input: UploadKeelStudioArtifactInput,
@@ -174,7 +209,7 @@ export async function uploadKeelStudioArtifact(
       ? {}
       : { headers: { "x-keel-studio-write-token": input.writeToken } }),
   });
-  return result(await response.json(), response.status);
+  return result(await response.json().catch(() => undefined), response.status);
 }
 
 function safeProjectPath(value: string): string {
@@ -215,6 +250,21 @@ function stageComponents(files: readonly KeelStudioStagedProjectFile[], paths: r
   });
 }
 
+/** Validate metadata-slot intent before transmitting a stage request. */
+export function parseKeelStudioMediaSlots(value:unknown):NonNullable<StageKeelStudioProjectInput["mediaSlots"]> {
+  if(!value || typeof value!=="object" || Array.isArray(value) || Object.keys(value).some(key=>key!=="image" && key!=="animation_url"))throw new TypeError("Invalid metadata slot choices.");
+  const result:Record<string,unknown>={};
+  for(const [key,slot] of Object.entries(value)) {
+    if(slot===null){result[key]=null;continue;}
+    if(!slot || typeof slot!=="object" || Array.isArray(slot) || Object.keys(slot).length!==3 || Object.keys(slot).some(name=>!["resourceId","presentation","delivery"].includes(name)))throw new TypeError("Invalid metadata slot choice.");
+    const selected=slot as Record<string,unknown>;
+    if(typeof selected.resourceId!=="string" || !selected.resourceId.trim() || selected.resourceId.length>1024 || /[\u0000-\u001f\u007f]/u.test(selected.resourceId) || !["direct","keel-shell"].includes(String(selected.presentation)) || !["onchain","ipfs","hosted"].includes(String(selected.delivery)) || key==="image" && selected.presentation!=="direct")throw new TypeError("Invalid metadata slot choice.");
+    result[key]={resourceId:selected.resourceId,presentation:selected.presentation,delivery:selected.delivery};
+  }
+  if(result.image===null && result.animation_url===null)throw new TypeError("At least one metadata slot must present the media.");
+  return result as NonNullable<StageKeelStudioProjectInput["mediaSlots"]>;
+}
+
 /**
  * Stages a creator-editable project and returns a secret continuation URL.
  * This is an off-chain upload only: it neither requests a wallet signature nor
@@ -223,21 +273,50 @@ function stageComponents(files: readonly KeelStudioStagedProjectFile[], paths: r
 export async function stageKeelStudioProject(
   input: StageKeelStudioProjectInput,
 ): Promise<KeelStudioProjectHandoffResult> {
+  input = { ...input, files: input.files.map(file => ({ ...file, bytes: file.bytes instanceof Uint8Array ? file.bytes.slice() : file.bytes })),
+    ...(input.projectProfile===undefined?{}:{projectProfile:structuredClone(input.projectProfile)}),
+    ...(input.releaseIntent===undefined?{}:{releaseIntent:structuredClone(input.releaseIntent)}),
+    ...(input.publicationIntent===undefined?{}:{publicationIntent:structuredClone(input.publicationIntent)}),
+    ...(input.reusableModule===undefined?{}:{reusableModule:structuredClone(input.reusableModule)}),
+    ...(input.mediaSlots===undefined?{}:{mediaSlots:structuredClone(input.mediaSlots)}),
+    ...(input.flashRuntime===undefined?{}:{flashRuntime:structuredClone(input.flashRuntime)}) };
+  const files = input.files;
   const title = input.title.trim();
   if (title.length < 2 || title.length > 160) throw new RangeError("Staged project title must contain from 2 through 160 characters.");
   if (input.agentToken.length < 32) throw new TypeError("KEEL Studio agent token must contain at least 32 characters.");
-  if (input.files.length < 1 || input.files.length > 256) throw new RangeError("Stage from 1 through 256 project files.");
-  const payloadStorage = resolveKeelPayloadStorage(input.payloadStorage);
-  const viewer = resolveKeelShell(input.viewer);
+  if (files.length < 1 || files.length > 256) throw new RangeError("Stage from 1 through 256 project files.");
+  const projectProfile = input.projectProfile === undefined ? undefined : parseKeelSelectedProjectProfile(input.projectProfile);
+  const payloadStorage = resolveKeelPayloadStorage(input.payloadStorage ?? projectProfile?.snapshot.configuration.payloadStorage);
+  const mediaSlots=input.mediaSlots===undefined?undefined:parseKeelStudioMediaSlots(input.mediaSlots);
+  const assetPresentation=parseKeelAssetPresentationPreference(input.assetPresentation ?? "automatic");
+  const fallbackDelivery=input.fallbackDelivery===undefined?undefined:parseKeelPresentationFallbackDelivery(input.fallbackDelivery);
+  if(input.assetPresentationSelection!==undefined && !KEEL_ASSET_PRESENTATION_CANDIDATE_IDS.includes(input.assetPresentationSelection))throw new TypeError("Unsupported explicit presentation layout.");
+  if(input.nonstandardCompatibilityAcknowledged!==undefined && typeof input.nonstandardCompatibilityAcknowledged!=="boolean")throw new TypeError("Invalid compatibility preference.");
+  const externalPreviewUri=input.externalPreviewUri===undefined?undefined:parseKeelExternalPreviewUri(input.externalPreviewUri);
+
+  const onlyFile=files.length===1?files[0]:undefined;
+  const onlyFileBytes=onlyFile===undefined?undefined:onlyFile.bytes instanceof Uint8Array?onlyFile.bytes:new Uint8Array(await onlyFile.bytes.arrayBuffer());
+  // A byte-only recommendation is not selected-chain/complete-output authority.
+  // Keep default publication intent until Studio qualifies an automatic layout.
+  const automaticViewer=onlyFile===undefined?undefined:input.assetPresentationSelection===undefined?KEEL_VERIFICATION_SHELL:planKeelSmartAssetPresentation({
+    source:{resourceId:onlyFile.path,mediaType:onlyFile.mediaType,byteLength:onlyFileBytes!.byteLength},
+    execution:classifyKeelAssetExecution({mediaType:onlyFile.mediaType,bytes:onlyFileBytes!,declaredScript:onlyFile.format!=="asset"}),
+    sourceMotion:classifyKeelAssetMotion({mediaType:onlyFile.mediaType,bytes:onlyFileBytes!}),
+    assetPresentation,...(input.assetPresentationSelection===undefined?{}:{selection:resolveKeelAssetPresentationSelection(input.assetPresentationSelection,onlyFile.mediaType)}),
+    ...(fallbackDelivery===undefined?{}:{fallbackDelivery}),...(externalPreviewUri===undefined?{}:{externalPreviewUri}),
+  }).viewer;
+  const explicitSlotViewer = mediaSlots?.animation_url?.presentation === "keel-shell" ? "keel-verification-shell"
+    : mediaSlots?.animation_url === null && mediaSlots.image != null ? "none" : undefined;
+  const viewer = resolveKeelShell(input.viewer ?? projectProfile?.snapshot.configuration.viewer ?? explicitSlotViewer ?? automaticViewer);
   if (viewer !== KEEL_VERIFICATION_SHELL && viewer !== "none") throw new TypeError("viewer must be keel-verification-shell or none.");
   if (viewer === "none" && input.publicationIntent !== undefined) {
     throw new TypeError("An artifact-only project cannot also require the KEEL verification shell.");
   }
 
-  const paths = input.files.map((file) => safeProjectPath(file.path));
+  const paths = files.map((file) => safeProjectPath(file.path));
   if (new Set(paths).size !== paths.length) throw new TypeError("Staged project paths must be unique.");
   const form = new FormData();
-  const components = stageComponents(input.files, paths, viewer === "none");
+  const components = stageComponents(files, paths, viewer === "none");
   const publicationIntent = viewer === "none"
     ? undefined
     : input.publicationIntent ?? defaultKeelStudioPublicationIntent();
@@ -248,14 +327,21 @@ export async function stageKeelStudioProject(
     storageStrategy: input.storageStrategy,
     payloadStorage,
     viewer,
+    assetPresentation,
+    ...(fallbackDelivery===undefined?{}:{fallbackDelivery}),
+    ...(input.assetPresentationSelection===undefined?{}:{assetPresentationSelection:input.assetPresentationSelection}),
+    ...(input.nonstandardCompatibilityAcknowledged===undefined?{}:{nonstandardCompatibilityAcknowledged:input.nonstandardCompatibilityAcknowledged}),
+    ...(externalPreviewUri===undefined?{}:{externalPreviewUri}),
+    ...(mediaSlots===undefined?{}:{mediaSlots}),
     marketplaceExportMode: input.marketplaceExportMode ?? "recursive",
     components,
     ...(input.reusableModule === undefined ? {} : { reusableModule: input.reusableModule }),
+    ...(projectProfile === undefined ? {} : { projectProfile }),
     ...(input.releaseIntent === undefined ? {} : { releaseIntent: input.releaseIntent }),
     ...(publicationIntent === undefined ? {} : { publicationIntent }),
     ...(input.flashRuntime === undefined ? {} : { flashRuntime: input.flashRuntime }),
   }));
-  input.files.forEach((file, index) => {
+  files.forEach((file, index) => {
     const blob = file.bytes instanceof Blob ? file.bytes : new Blob([Uint8Array.from(file.bytes).buffer], { type: file.mediaType });
     form.append("files", blob, paths[index]);
   });

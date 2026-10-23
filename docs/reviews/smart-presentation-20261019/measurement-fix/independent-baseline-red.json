@@ -1,0 +1,51 @@
+{
+  "schema": "independent-smart-presentation-baseline-audit@1",
+  "sourceCommit": "af422159e589b424f67313771bc9282e9944fe69",
+  "checkout": "aa8f6a27cc931a786a721db4e69d85e4d04419e3",
+  "node": "v22.22.1",
+  "sourceSHA256": "6cc6394a2e7207490d163b9054ad067a48e6006bc16966c7d7c36bc932067ea4",
+  "dependencySHA256": {
+    "bytes": "fa513ed8c63350173be78d9bfd05ec2819648da44da43e8cef833824a8818bf3",
+    "canonical": "f0380726acadaac360effd118ae4c49547c5e59487c8eef65e7e63cde93ab967",
+    "integrity": "5f6ff79fe860808821120446790885ff88a21842cb734c2d1c57378a5caf172b"
+  },
+  "scope": "actual frozen production measurement functions compiled without edits; pure local render boundary, synthetic exact bytes/capability identity; no chain/readiness/live proof",
+  "findings": [
+    {
+      "expected": "actual encoded image contribution reported and above-target warning required",
+      "actual": {
+        "imageUriBytes": 1749990,
+        "actualOuterContribution": 1750025,
+        "emptyValueContribution": 1750002,
+        "completeTokenUriBytes": 1750255,
+        "encodedImageSlotBytesPresent": false,
+        "standardsCompatible": true,
+        "warnings": [],
+        "status": "requires-selected-chain-simulation"
+      },
+      "invariant": "FAIL"
+    },
+    {
+      "expected": "no external recommendation while actual embedded verifier program fits target",
+      "actual": {
+        "embeddedProgramBytes": 44,
+        "embeddedAnimationUriBytes": 93,
+        "completeVerifierOnlyMetadataBytes": 2000259,
+        "recommendations": [
+          {
+            "candidateId": "hybrid-verifier-only",
+            "code": "measured-embedded-verifier-alone-above-target",
+            "completeTokenUriBytes": 2000259
+          },
+          {
+            "candidateId": "ipfs-presentation",
+            "code": "review-external-presentation-after-measured-verifier-only",
+            "completeTokenUriBytes": 2000259
+          }
+        ],
+        "publicationReady": false
+      },
+      "invariant": "FAIL"
+    }
+  ]
+}

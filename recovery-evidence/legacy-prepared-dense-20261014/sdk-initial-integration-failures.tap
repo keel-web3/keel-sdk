@@ -1,0 +1,92 @@
+TAP version 13
+# Subtest: default Compact uses actual compatible Brotli/Dense legacy envelope and preserves exact source/poster
+not ok 1 - default Compact uses actual compatible Brotli/Dense legacy envelope and preserves exact source/poster
+  ---
+  duration_ms: 2350.141277
+  type: 'test'
+  location: '/workspace/keel-legacy-carriage-20261014/keel-sdk/tests/sdk-legacy-prepared-dense-copy.test.mjs:22:1'
+  failureType: 'testCodeFailure'
+  error: 'Collector Inline animation_url does not contain the registered canonical KEEL verification shell.'
+  code: 'ERR_TEST_FAILURE'
+  name: 'TypeError'
+  stack: |-
+    assertKeelCollectorInlineMetadata (file:///workspace/keel-legacy-carriage-20261014/keel-sdk/packages/sdk/dist/collector-policy.js:191:15)
+    buildKeelPreparedOneOfOneTokenURI (file:///workspace/keel-legacy-carriage-20261014/keel-sdk/packages/sdk/dist/inline-viewer-graph.js:1773:13)
+    async finish (file:///workspace/keel-legacy-carriage-20261014/keel-sdk/tests/sdk-legacy-prepared-dense-copy.test.mjs:17:20)
+    async TestContext.<anonymous> (file:///workspace/keel-legacy-carriage-20261014/keel-sdk/tests/sdk-legacy-prepared-dense-copy.test.mjs:24:16)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async startSubtestAfterBootstrap (node:internal/test_runner/harness:296:3)
+  ...
+# Subtest: auto keeps nonbeneficial exact bytes; explicit codec choices and Raw are preserved
+ok 2 - auto keeps nonbeneficial exact bytes; explicit codec choices and Raw are preserved
+  ---
+  duration_ms: 14081.854058
+  type: 'test'
+  ...
+# Subtest: 40/41,128/129,256 and configured1024 logical resources retain IDs/order without expanding the64-part root
+not ok 3 - 40/41,128/129,256 and configured1024 logical resources retain IDs/order without expanding the64-part root
+  ---
+  duration_ms: 1086.540987
+  type: 'test'
+  location: '/workspace/keel-legacy-carriage-20261014/keel-sdk/tests/sdk-legacy-prepared-dense-copy.test.mjs:58:1'
+  failureType: 'testCodeFailure'
+  error: 'Collector Inline animation_url does not contain the registered canonical KEEL verification shell.'
+  code: 'ERR_TEST_FAILURE'
+  name: 'TypeError'
+  stack: |-
+    assertKeelCollectorInlineMetadata (file:///workspace/keel-legacy-carriage-20261014/keel-sdk/packages/sdk/dist/collector-policy.js:191:15)
+    buildKeelPreparedOneOfOneTokenURI (file:///workspace/keel-legacy-carriage-20261014/keel-sdk/packages/sdk/dist/inline-viewer-graph.js:1773:13)
+    async finish (file:///workspace/keel-legacy-carriage-20261014/keel-sdk/tests/sdk-legacy-prepared-dense-copy.test.mjs:17:20)
+    async TestContext.<anonymous> (file:///workspace/keel-legacy-carriage-20261014/keel-sdk/tests/sdk-legacy-prepared-dense-copy.test.mjs:65:16)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: large sources are segmented without changing original identity or adding an aggregate32MiB limit
+ok 4 - large sources are segmented without changing original identity or adding an aggregate32MiB limit
+  ---
+  duration_ms: 5753.883106
+  type: 'test'
+  ...
+# Subtest: new profile rejects changed outer execution, missing/context impersonation and conflicting namespaces
+not ok 5 - new profile rejects changed outer execution, missing/context impersonation and conflicting namespaces
+  ---
+  duration_ms: 1538.070771
+  type: 'test'
+  location: '/workspace/keel-legacy-carriage-20261014/keel-sdk/tests/sdk-legacy-prepared-dense-copy.test.mjs:75:1'
+  failureType: 'testCodeFailure'
+  error: 'Collector Inline animation_url does not contain the registered canonical KEEL verification shell.'
+  code: 'ERR_TEST_FAILURE'
+  name: 'TypeError'
+  stack: |-
+    assertKeelCollectorInlineMetadata (file:///workspace/keel-legacy-carriage-20261014/keel-sdk/packages/sdk/dist/collector-policy.js:191:15)
+    buildKeelPreparedOneOfOneTokenURI (file:///workspace/keel-legacy-carriage-20261014/keel-sdk/packages/sdk/dist/inline-viewer-graph.js:1773:13)
+    async finish (file:///workspace/keel-legacy-carriage-20261014/keel-sdk/tests/sdk-legacy-prepared-dense-copy.test.mjs:17:20)
+    async TestContext.<anonymous> (file:///workspace/keel-legacy-carriage-20261014/keel-sdk/tests/sdk-legacy-prepared-dense-copy.test.mjs:76:83)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: existing registered text modules keep exact fragment bytes and data/module playback order
+not ok 6 - existing registered text modules keep exact fragment bytes and data/module playback order
+  ---
+  duration_ms: 286.99283
+  type: 'test'
+  location: '/workspace/keel-legacy-carriage-20261014/keel-sdk/tests/sdk-legacy-prepared-dense-copy.test.mjs:84:1'
+  failureType: 'testCodeFailure'
+  error: 'Existing module fragment differs from its exact committed descriptor.'
+  code: 'ERR_TEST_FAILURE'
+  name: 'TypeError'
+  stack: |-
+    buildKeelLegacyPreparedDenseDocument (file:///workspace/keel-legacy-carriage-20261014/keel-sdk/packages/sdk/dist/legacy-prepared-dense-copy.js:123:19)
+    async TestContext.<anonymous> (file:///workspace/keel-legacy-carriage-20261014/keel-sdk/tests/sdk-legacy-prepared-dense-copy.test.mjs:87:14)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+1..6
+# tests 6
+# suites 0
+# pass 2
+# fail 4
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 29787.254447

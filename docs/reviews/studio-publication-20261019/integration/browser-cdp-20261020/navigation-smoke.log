@@ -1,0 +1,40 @@
+TAP version 13
+# Subtest: CDP navigates an exact oversized UTF8 data URI with the original 2500ms virtual budget
+not ok 1 - CDP navigates an exact oversized UTF8 data URI with the original 2500ms virtual budget
+  ---
+  duration_ms: 732.008205
+  type: 'test'
+  location: '/root/keel-browser-cdp-20261020/keel-sdk/tests/sdk-browser-cdp-navigation.test.mjs:7:3'
+  failureType: 'testCodeFailure'
+  error: 'Browser DOM snapshot failed'
+  code: 'ERR_TEST_FAILURE'
+  stack: |-
+    dumpBrowserDom (file:///root/keel-browser-cdp-20261020/keel-sdk/tests/helpers/browser-dom-navigation.mjs:52:40)
+    async TestContext.<anonymous> (file:///root/keel-browser-cdp-20261020/keel-sdk/tests/sdk-browser-cdp-navigation.test.mjs:13:18)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async startSubtestAfterBootstrap (node:internal/test_runner/harness:296:3)
+  ...
+# Subtest: CDP navigates an exact oversized UTF8 data URI with the original 5000ms virtual budget
+not ok 2 - CDP navigates an exact oversized UTF8 data URI with the original 5000ms virtual budget
+  ---
+  duration_ms: 502.230016
+  type: 'test'
+  location: '/root/keel-browser-cdp-20261020/keel-sdk/tests/sdk-browser-cdp-navigation.test.mjs:7:3'
+  failureType: 'testCodeFailure'
+  error: 'Browser DOM snapshot failed'
+  code: 'ERR_TEST_FAILURE'
+  stack: |-
+    dumpBrowserDom (file:///root/keel-browser-cdp-20261020/keel-sdk/tests/helpers/browser-dom-navigation.mjs:52:40)
+    async TestContext.<anonymous> (file:///root/keel-browser-cdp-20261020/keel-sdk/tests/sdk-browser-cdp-navigation.test.mjs:13:18)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+1..2
+# tests 2
+# suites 0
+# pass 0
+# fail 2
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 1269.632043

@@ -10,6 +10,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
       - uses: pnpm/action-setup@v4
       - uses: actions/setup-node@v4
         with:
@@ -17,6 +19,52 @@ jobs:
           cache: pnpm
       - name: Fresh checkout setup without sibling repositories
         run: pnpm setup:friend --skip-desktop
+      - name: Exact simulation capacity and recovery
+        run: node --test tests/native-geth-capacity-fixture.test.mjs tests/sdk-simulation-connection.test.mjs tests/sdk-owned-simulation-transport.test.mjs tests/sdk-publication-preflight.test.mjs tests/sdk-public-simulation-pool.test.mjs tests/sdk-rpc.test.mjs tests/sdk-network-index.test.mjs tests/mcp-selected-chain-routing.test.mjs tests/transaction-gas-policy.test.mjs tests/sdk-release-wallet-batch.test.mjs tests/rpc-publication-simulation.test.mjs tests/sdk-intrinsic-validation-evidence.test.mjs
+      - name: Authenticated Studio and MCP parity
+        run: node --test tests/publication-action.test.mjs tests/sdk-studio-agent-drafts.test.mjs tests/mcp-studio-private.test.mjs tests/mcp-studio-draft.test.mjs tests/mcp.test.mjs
+      - name: Native Geth stateful publication validation (synthetic, isolated)
+        env:
+          KEEL_NATIVE_GETH_EVIDENCE: native-geth-publication-evidence.json
+          KEEL_NATIVE_FORK_COMPARISON: "1"
+        run: |
+          docker pull ethereum/client-go@sha256:abf3605177f8bdcfce436985a8054cca4ae59256323a4ffb72c56c04f3d1fadd
+          docker pull ghcr.io/foundry-rs/foundry@sha256:32c8ea9ef052a440cb1620175987a3f49eff8b068a0c6a3d09ebf7f5f9a0e043
+          pnpm verify:publication-native
+          cat native-geth-publication-evidence.json
+      - uses: actions/upload-artifact@v4
+        # The exact native receipt is already retained in the required test's
+        # job log. A quota failure in this convenience copy is not a test failure.
+        continue-on-error: true
+        with:
+          name: native-geth-publication-evidence
+          path: native-geth-publication-evidence.json
+          if-no-files-found: error
+      - name: Public-RPC-backed local fork differential (synthetic, network isolated)
+        env:
+          KEEL_FORK_EVIDENCE: public-rpc-fork-evidence.json
+        run: |
+          docker pull ghcr.io/foundry-rs/foundry@sha256:32c8ea9ef052a440cb1620175987a3f49eff8b068a0c6a3d09ebf7f5f9a0e043
+          docker pull node@sha256:6c74791e557ce11fc957704f6d4fe134a7bc8d6f5ca4403205b2966bd488f6b3
+          pnpm verify:public-rpc-fork
+      - uses: actions/upload-artifact@v4
+        if: ${{ always() }}
+        with:
+          name: public-rpc-fork-evidence
+          path: public-rpc-fork-evidence.json
+          if-no-files-found: error
+      - name: Record approved public-only HTTPS capacity (not private-plan proof)
+        if: ${{ github.event_name == 'workflow_dispatch' }}
+        run: node scripts/probe-approved-sepolia-http.mjs
+      - name: Record indexed public-only pool qualification (no project data)
+        if: ${{ github.event_name == 'workflow_dispatch' }}
+        run: node scripts/check-public-simulation-pool.mjs --public-only | tee public-simulation-pool-evidence.json
+      - uses: actions/upload-artifact@v4
+        if: ${{ github.event_name == 'workflow_dispatch' }}
+        with:
+          name: public-simulation-pool-evidence
+          path: public-simulation-pool-evidence.json
+          if-no-files-found: error
       - name: Setup and network rejection tests
         run: pnpm setup:test
       - name: MCP and generator preparation

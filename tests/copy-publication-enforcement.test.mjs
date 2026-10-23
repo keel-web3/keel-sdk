@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { mkdtemp, writeFile, rm } from "node:fs/promises";
+import { mkdir, mkdtemp, writeFile, rm } from "node:fs/promises";
 import path from "node:path";
 import { createIntegrity } from "../packages/protocol/dist/index.js";
 import {
@@ -22,7 +22,7 @@ async function document() {
 async function fixture(carriage = "compact") {
   const root = await document();
   const graph = await buildKeelInlineTokenURIGraph(root,
-    carriage === "compact" ? {} : { carriage, legacyCarriage: "acknowledged" });
+    { carriage });
   const prepared = await buildKeelPreparedOneOfOneTokenURI({ graph,
     chainId, collection: "0x2222222222222222222222222222222222222222",
     collectionName: "Original art", description: "COPY fixture", manifestURI: "",
@@ -61,7 +61,7 @@ async function fixture(carriage = "compact") {
 test("shared planner no longer auto-acknowledges a fresh Base64 carriage", async () => {
   const root = await document();
   for (const carriage of ["pinned", "percent", "follow-latest"]) {
-    await assert.rejects(buildKeelInlineTokenURIGraph(root, { carriage }), /explicit|acknowledged|raw-percent/i);
+    await assert.rejects(buildKeelInlineTokenURIGraph(root, { carriage }), /Unsupported Inline carriage:/i);
   }
 });
 
@@ -72,7 +72,7 @@ test("environment configuration cannot bypass fresh encoding review", () => {
   finally { if (before === undefined) delete process.env.KEEL_LEGACY_CARRIAGE; else process.env.KEEL_LEGACY_CARRIAGE = before; }
 });
 
-for (const carriage of ["compact", "pinned", "percent"]) test(`complete ${carriage} COPY retains exact prepared bytes and binds the plan`, async () => {
+for (const carriage of ["compact", "raw-percent"]) test(`complete ${carriage} COPY retains exact prepared bytes and binds the plan`, async () => {
   const f = await fixture(carriage);
   const checked = await assertKeelPreparedCopyRead(f.bound);
   assert.equal(checked.completeTokenURIBytes, Buffer.byteLength(f.prepared.tokenURI));
@@ -95,7 +95,7 @@ test("SDK stops a different return, transport or source before producing a plan"
     await assert.rejects(createKeelPublishReviewPlan(f.chainPlan, { preparedCopy: { ...f.evidence, returnedTokenURI } }), /differs from canonical/);
   }
   await assert.rejects(createKeelPublishReviewPlan(f.chainPlan, { preparedCopy: { ...f.evidence, graphBytes: bytes("different") } }), /source bytes/);
-  await assert.rejects(assertKeelPreparedCopyRead({ ...f.bound, mediaType: "application/octet-stream" }), /supported prepared COPY/);
+  await assert.rejects(assertKeelPreparedCopyRead({ ...f.bound, mediaType: "application/octet-stream" }), /current raw-percent prepared COPY/);
 });
 
 test("COPY checks are commitment-bound and cannot be stripped or moved to another chain/store", async () => {
@@ -117,6 +117,9 @@ test("read caps use the selected chain boundary and never stand in for authentic
 async function mcp(t) {
   const dir = await mkdtemp(path.join("/tmp", "keel-copy-enforcement-"));
   t.after(() => rm(dir, { recursive: true, force: true }));
+  await writeFile(path.join(dir, "README.md"), "# Local prepared COPY fixture\nSynthetic review only; no signing or submission.\n");
+  await mkdir(path.join(dir, "docs"));
+  await writeFile(path.join(dir, "docs", "ARCHITECTURE.md"), "# Fixture architecture\nThe standards preflight and exact returned-byte gate both precede a publish review.\n");
   const server = await createMcpServer({ workspaceRoot: dir });
   await server.handle({ jsonrpc: "2.0", id: 1, method: "initialize", params: { protocolVersion: "2024-11-05", capabilities: {}, clientInfo: { name: "copy-gate", version: "1" } } });
   let id = 2;
@@ -134,7 +137,7 @@ test("fresh MCP cannot select an alternative carriage under another presentation
   for (const carriage of ["pinned", "percent", "follow-latest"]) {
     const result = await call("keel-inline-prepare", { carriage, presentationPolicy: "raw-artifact", entry: "unused.js" });
     assert.equal(result.isError, true);
-    assert.match(result.content[0].text, /compact raw-percent COPY/);
+    assert.match(result.content[0].text, /Unsupported Inline carriage:/);
   }
 });
 
@@ -147,11 +150,18 @@ test("MCP publish-plan requires evidence, reruns the SDK gate and rejects file t
   const checked = await f.call("keel-inline-publication-check", { ...f.files, chainId, store, mediaType: f.graph.mediaType, digest: f.graph.fragmentIntegrity.digest, byteLength: f.graph.fragmentBytes.length });
   assert.equal(checked.isError, undefined, JSON.stringify(checked));
   assert.equal(checked.structuredContent.chainReady, false);
-  const accepted = await f.call("publish-plan", { ...plan, preparedCopy: f.files });
+  const missing = await f.call("publish-plan", { ...plan, preparedCopy: f.files });
+  assert.equal(missing.isError, true);
+  assert.equal(missing.structuredContent.code, "standards-evidence-required");
+  const preflight = await f.call("keel-contract-workflow-preflight", {});
+  assert.equal(preflight.isError, undefined, JSON.stringify(preflight));
+  const standards = { preflightReceipt: preflight.structuredContent.receipt.id };
+  const accepted = await f.call("publish-plan", { ...plan, preparedCopy: f.files, standards });
   assert.equal(accepted.isError, undefined, JSON.stringify(accepted));
   assert.equal(accepted.structuredContent.envelope.plan.preparedCopy.requiredBuilder, "KeelRawTokenURIBuilder");
+  assert.equal(accepted.structuredContent.standards.preflightReceipt.id, standards.preflightReceipt);
   await writeFile(path.join(f.dir, "returned.uri"), f.prepared.tokenURI + "extra transport");
-  const tampered = await f.call("publish-plan", { ...plan, preparedCopy: f.files });
+  const tampered = await f.call("publish-plan", { ...plan, preparedCopy: f.files, standards });
   assert.equal(tampered.isError, true);
   assert.match(tampered.content[0].text, /differs from canonical/);
 });

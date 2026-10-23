@@ -1,0 +1,52 @@
+{
+  "schema": "keel-proof-state-cache-own-validation@1",
+  "baseCommit": "4bbda2512792514c0969616367f5112ba9c9e5ec",
+  "node": "22.22.1",
+  "pnpm": "10.15.0",
+  "viem": "2.55.19",
+  "officialBuild": {
+    "command": "node scripts/build.mjs",
+    "exitCode": 0
+  },
+  "focusedTests": {
+    "command": "node --test tests/proof-state-reader.test.mjs tests/proof-state-reader-cache.test.mjs tests/proof-executor-transport.test.mjs tests/proof-runner-client.test.mjs tests/proof-runtime-package.test.mjs",
+    "passed": 58,
+    "failed": 0,
+    "skipped": 0
+  },
+  "canonicalDistFiles": 1360,
+  "changedCanonicalDistFiles": [
+    "packages/sdk/dist/proof-runtime/state-reader.js"
+  ],
+  "files": [
+    {
+      "path": "native/proof-executor/state-reader.mjs",
+      "bytes": 8050,
+      "sha256": "c3f989902301b41b8815c3e7dcc94336e6024a879f1243878c66b48987015442"
+    },
+    {
+      "path": "packages/sdk/dist/proof-runtime/state-reader.js",
+      "bytes": 8008,
+      "sha256": "a88a228f8be70b70705ec1124165fca71287048c8e9fc88d5a8b34b9254bc215"
+    },
+    {
+      "path": "docs/reviews/studio-publication-20261020/proof-state-cache/own-build.log",
+      "bytes": 271,
+      "sha256": "70108d48a2cf628ffc85d9a673017f82e66594b353c679bbc7e7bc7fc5297c6f"
+    },
+    {
+      "path": "docs/reviews/studio-publication-20261020/proof-state-cache/own-focused.log",
+      "bytes": 11738,
+      "sha256": "72d4c52d591be200f720392ff7db959d4c85376f682458d28a6e0042f2eaf893"
+    }
+  ],
+  "cacheByteLimit": 8388608,
+  "cacheEntryLimit": 1024,
+  "independentReview": "PENDING",
+  "liveGatorVerified": false,
+  "rpcRequests": 0,
+  "nativeExecutions": 0,
+  "productionMutation": false,
+  "signing": false,
+  "submission": false
+}

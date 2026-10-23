@@ -1,0 +1,73 @@
+✖ original images and GIF use only image without changing source or adding shell (4.414125ms)
+✔ small WebP and AVIF default to shell animation with no duplicate full-size image (0.373959ms)
+✔ explicit candidate changes animation resource only and thumbnail is separately configured (0.701583ms)
+✔ defaults filter asset and collection; independent explicit delivery choices win (0.321125ms)
+✔ both slots require explicit selection and exact complete read proof (0.232584ms)
+✖ the 1MB viewer boundary applies to every image format and unknown lengths retain verification (1.827584ms)
+✖ 500KB to 1MB collector images default to hosted independently of full artwork size and explicit delivery wins (0.353125ms)
+✔ a permissive caller limit cannot label a greater-than-2MB full initial tokenURI as standard compatible (0.168458ms)
+ℹ tests 8
+ℹ suites 0
+ℹ pass 5
+ℹ fail 3
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 99.287375
+
+✖ failing tests:
+
+test at tests/media-slot-plan.test.mjs:4:1
+✖ original images and GIF use only image without changing source or adding shell (4.414125ms)
+  TypeError: Cannot read properties of null (reading 'resourceId')
+      at TestContext.<anonymous> (file:///Users/ravonus/dev/wt/studio-native-beacon-witness-20261019/sdk-smart-presentation/tests/media-slot-plan.test.mjs:4:241)
+      at Test.runInAsyncScope (node:async_hooks:226:14)
+      at Test.run (node:internal/test_runner/test:1201:25)
+      at Test.start (node:internal/test_runner/test:1096:17)
+      at startSubtestAfterBootstrap (node:internal/test_runner/harness:385:17)
+
+test at tests/media-slot-plan.test.mjs:10:1
+✖ the 1MB viewer boundary applies to every image format and unknown lengths retain verification (1.827584ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  + actual - expected
+  
+  + 'none'
+  - 'keel-verification-shell'
+  
+      at TestContext.<anonymous> (file:///Users/ravonus/dev/wt/studio-native-beacon-witness-20261019/sdk-smart-presentation/tests/media-slot-plan.test.mjs:14:11)
+      at Test.runInAsyncScope (node:async_hooks:226:14)
+      at Test.run (node:internal/test_runner/test:1201:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:831:18)
+      at Test.postRun (node:internal/test_runner/test:1330:19)
+      at Test.run (node:internal/test_runner/test:1258:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:831:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: 'none',
+    expected: 'keel-verification-shell',
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at tests/media-slot-plan.test.mjs:20:1
+✖ 500KB to 1MB collector images default to hosted independently of full artwork size and explicit delivery wins (0.353125ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  + actual - expected
+  
+  + 'onchain'
+  - 'hosted'
+  
+      at TestContext.<anonymous> (file:///Users/ravonus/dev/wt/studio-native-beacon-witness-20261019/sdk-smart-presentation/tests/media-slot-plan.test.mjs:23:43)
+      at Test.runInAsyncScope (node:async_hooks:226:14)
+      at Test.run (node:internal/test_runner/test:1201:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:831:18)
+      at Test.postRun (node:internal/test_runner/test:1330:19)
+      at Test.run (node:internal/test_runner/test:1258:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:831:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: 'onchain',
+    expected: 'hosted',
+    operator: 'strictEqual',
+    diff: 'simple'
+  }

@@ -1,8 +1,25 @@
+# Hosted Studio is the default
+
+Use https://studio.onkeel.io and the creator's existing Studio account for
+preparation, previews, release drafts, contract review and wallet approval.
+KEEL Desktop is entirely optional. Do not require it, another wallet setup,
+or a separate signing page for the supported website workflow. Return the
+server-issued project handoff or release `reviewUrl`; never sign through an
+agent grant. Read `docs/KEEL_STUDIO_WALLET_REVIEW.md`.
+
 **Full Inline delivery default:** At or below 2,000,000 bytes for the complete prepared tokenURI, default to embedded-assembled Inline: one public tokenURI call returns all shell, modules and assets; no follow-up browser RPC. Count the complete metadata/carriage/envelope, not only compressed files. Before that measurement, compressed size is a provisional estimate. Preserve explicit creator choices. Internal descriptor/carrier calls are not additional browser requests and still require the selected-chain gas check. Never silently switch to Hybrid to work around resource count.
 
 # KEEL publication agent instructions
 
-**New collector Inline binary default:** Use `buildKeelPreparedDenseCopyShell` from `@keel/sdk`: prepare URI-safe URI81 payload text and shell Base64 literals at build time, upload one chosen representation for new work, and make `tokenURI` copy committed fragments. Never add a runtime payload encoder or a whole-document Base64 layer. Read `docs/KEEL_PREPARED_DENSE_COPY.md`. Keep explicit Raw/as-is and custom-shell choices intact. Existing native packs need an explicitly authorized transport migration and a separate new-storage quote; do not describe it as zero-upload reuse. Before publication, run the complete URI/MCP check, authenticate the registered composer/shell, and verify offline browser behavior.
+For Studio publication recovery, first read the current
+[owner requirements](https://github.com/keel-web3/keel-site/blob/master/docs/STUDIO_PUBLICATION_REQUIREMENTS.md),
+[active sprints](https://github.com/keel-web3/keel-site/blob/master/docs/STUDIO_PUBLICATION_SPRINTS.md)
+and [failure ledger](https://github.com/keel-web3/keel-site/blob/master/docs/gauntlet/publication-sprints.json).
+These supersede conflicting older format/default guidance. Requirements are not
+proof of deployed capability. Use the exact source, SDK, image and environment in
+each result; a local test, merged PR or archive is not a deployed signing boundary.
+
+**Current collector preparation:** Use the current registered canonical source/prepared-COPY route and authenticate its selected-chain reader, shell, modules and codec. Do not select retired Dense/URI81 or another historical format merely because an old guide calls it the default. The owner retired prelaunch compatibility work; keep original artwork, projects, permissions, receipts and rollback intact. Compare admissible None/native Gzip and other supported codecs by the complete graph and returned presentation, including exact decoder, shell and preview. Brotli needs the actual compatible registered decoder/reader and measured complete savings. Never bypass a guard or invent a replacement protocol. Before declaring infrastructure missing, inspect the selected Hold manager and actual consumer with `keel-manager-modules-inspect`; use the existing governed module path when supported. Publication still requires complete expected/returned bytes, selected-chain registration/read-back and actual browser verification.
 
 **No encoded-return substitution:** An explicit native/as-is payload requirement for no Base64, no hex, unchanged files or no expanding encoding covers the contract return and HTML as well as storage. Do not claim compliance because Hold bytes are raw while the composer encodes them on read. The SDK refuses the Base64 embedded-container profile without an explicit creator-authorized `binaryPayloadCarriage: "base64"` selection; never add that selection to bypass an as-is request. Test actual source bytes, padding, ABI string decoding and browser data-URL behavior. If exact bytes do not survive, report the unsupported boundary and stop before signing. Do not silently choose Hybrid or a custom viewer. No prototype, size claim or padding recipe is considered working until the exact full-return and browser byte checks pass.
 
@@ -16,8 +33,9 @@ apply the SDK/MCP publication workflow for the persisted shell choice. Read
 `docs/KEEL_PREPARED_COPY_ASSEMBLY.md` and its prototype/test map first.
 
 - Existing objects: `keel-inline-reuse-plan`, exact ordered receipt/read-back
-  commitments and the matching registered COPY builder. Zero new source bytes
-  for assembly-only work. Do not migrate an existing aligned Base64 lane.
+  commitments and the matching current registered COPY builder. Zero new source
+  bytes for assembly-only work. Retained historical objects are evidence, not
+  permission to re-enable a retired format or rewrite existing artwork.
 - New/changed source: use canonical SDK preparation; MCP
   `keel-inline-prepare` uses compact raw-percent COPY. Keep creator HTML, CSS,
   JavaScript and assets modular. The large body is prepared once and copied;

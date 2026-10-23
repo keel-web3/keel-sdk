@@ -1,0 +1,443 @@
+{
+  "timestampUtc": "2026-10-13T16:57:56.822623+00:00",
+  "sdkBaseCommit": "1f1d2ca65a0165113dcaf4766a14a9eef57ffb77",
+  "moduleCommit": "a3a5318736a44887c333b3f4f1b95c7c27b4ff83",
+  "branch": "codex/catalog-runtime-encoding-20261013",
+  "cause": "Current SDK indexer ignored the module repository's documented --runtime-encoding base64 option; CI also omitted that selection, so it replaced 14 approved legacy descriptors with URI81 descriptors.",
+  "repair": "Explicit uri81/base64 selection in builder API/CLI; the maintained module CI requests its approved Base64 catalog and retains the exact diff gate. URI81/Brotli remains the default for new catalogs.",
+  "sourceFiles": {
+    ".github/workflows/modules-verify.yml": "234ad18d0f93891e4c15b90fa79904c33cd845107afe0caae373d66f2ba97570",
+    "packages/builder/src/cli.ts": "6342656dd167d3ec905b0d2f7b4cb51e9502693d94082cf5e197d1c6cee54813",
+    "packages/builder/src/module-workspace.ts": "23fa03e44949bfcb5a3c485c7859dd70efbf1da5f70b954a90858a1348d66d11",
+    "tests/builder-module-workspace.test.mjs": "04f1197432e6382fbe84008ada10bd6f88f8dadbe11cd70aacc24ad7d3430980"
+  },
+  "runtimePreparationUnchanged": true,
+  "uri81DefaultAll14DescriptorsByteIdentical": true,
+  "uri81DefaultCatalogSha256": "3ccb7c092f08c4b1d44276bb9de947ac237c6f195426969f88bc5722a2e6d47c",
+  "approvedBase64CatalogSha256": "01bbf8e96dab4c263fe3896ac2720fb7b58944aa6e3bf75f03dd8d1d7d1face0",
+  "approvedBase64CatalogByteIdenticalOnTwoReindexes": true,
+  "all94ModuleRepositoryFilesUnchanged": true,
+  "existingSDKFilesCompared": 7556,
+  "onlyFourExistingSDKFilesChanged": true,
+  "trackedFixtureFilesCompared": 24,
+  "allTrackedFixturesUnchanged": true,
+  "dependencyPinsUnchanged": true,
+  "sdkBuildPassed": true,
+  "modulesRebuilt": 14,
+  "vectorsPassedAgainstReadableAndMinifiedBytes": 81,
+  "originValidationExitCode": 0,
+  "registeredOriginCount": 0,
+  "runtimeAndRegistrationChecks": {
+    "tests": 11,
+    "suites": 0,
+    "pass": 11,
+    "fail": 0,
+    "cancelled": 0,
+    "skipped": 0
+  },
+  "fullSuiteBefore": {
+    "tests": 1730,
+    "suites": 0,
+    "pass": 1659,
+    "fail": 1,
+    "cancelled": 0,
+    "skipped": 70
+  },
+  "fullSuiteAfter": {
+    "tests": 1731,
+    "suites": 0,
+    "pass": 1660,
+    "fail": 1,
+    "cancelled": 0,
+    "skipped": 70
+  },
+  "fullSuiteComparison": {
+    "baseline": {
+      "tests": "1730",
+      "pass": "1659",
+      "fail": "1",
+      "cancelled": "0",
+      "skipped": "70"
+    },
+    "repair": {
+      "tests": "1731",
+      "pass": "1660",
+      "fail": "1",
+      "cancelled": "0",
+      "skipped": "70"
+    },
+    "onlyAddedTest": "catalog runtime selection preserves legacy bytes and the URI81 default",
+    "sameAllOtherTestNames": true,
+    "failureTitles": [
+      "motion preview preserves two distinct frames in a real AVIF sequence"
+    ],
+    "failureIdenticalExceptDurationNumberAndCheckoutPath": true,
+    "normalizedFailure": "not ok <n> - motion preview preserves two distinct frames in a real AVIF sequence\n  ---\n  type: 'test'\n  location: '<sdk>/tests/thumbnail-sequence.test.mjs:10:1'\n  failureType: 'testCodeFailure'\n  error: |-\n    Expected values to be strictly equal:\n    \n    16 !== 32\n    \n  code: 'ERR_ASSERTION'\n  name: 'AssertionError'\n  expected: 32\n  actual: 16\n  operator: 'strictEqual'\n  stack: |-\n    TestContext.<anonymous> (file://<sdk>/tests/thumbnail-sequence.test.mjs:20:12)\n    async Test.run (node:internal/test_runner/test:1054:7)\n    async startSubtestAfterBootstrap (node:internal/test_runner/harness:296:3)\n  ...\n"
+  },
+  "reproductionChecksPassed": 6,
+  "initialReproductionRun": {
+    "tests": 6,
+    "suites": 0,
+    "pass": 4,
+    "fail": 0,
+    "cancelled": 0,
+    "skipped": 2
+  },
+  "publicNetworkResume": {
+    "tests": 2,
+    "suites": 0,
+    "pass": 2,
+    "fail": 0,
+    "cancelled": 0,
+    "skipped": 0
+  },
+  "networkQualification": "The initial public archive checks skipped on EAI_AGAIN DNS resolution. The same two unchanged checks passed with Node 22's --use-env-proxy option; certificate validation remained enabled.",
+  "previouslyRecordedIntegrationFailures": {
+    "report": "https://github.com/Ravonus/keel-contracts/blob/codex/contract-optimization-20261011/docs/reviews/contract-comments-20261012/MERGE_REPORT.md",
+    "recorded": "Three macOS animated-AVIF/media decoder failures and one private fun-art policy-conformance failure.",
+    "scope": "No media behavior, dependency pin, private application or existing acceptance assertion changed. This Linux/public-checkout run does not resolve or certify those four findings; optional sibling conformance remains skipped."
+  },
+  "allTestsGreen": false,
+  "remainingLinuxBaselineFailure": "tests/thumbnail-sequence.test.mjs: motion preview preserves two distinct frames in a real AVIF sequence; 16 bytes observed versus 32 expected, exactly matching unchanged master.",
+  "deployments": 0,
+  "walletKeyUse": 0,
+  "mainBranchMerges": 0,
+  "nodeVersion": "22.22.1",
+  "pnpmVersion": "10.15.0",
+  "nodeArchiveSha256": "9a6bc82f9b491279147219f6a18add1e18424dce90d41d2a5fcd69d4924ba3aa",
+  "receipts": {
+    "build-final": {
+      "stage": "build-final",
+      "command": [
+        "node",
+        "scripts/build.mjs"
+      ],
+      "cwd": "/workspace/catalog-repair-final-20261013/keel-sdk",
+      "startedUtc": "2026-10-13T16:42:34.548470+00:00",
+      "finishedUtc": "2026-10-13T16:44:00.550627+00:00",
+      "elapsedSeconds": 86.002,
+      "exitCode": 0,
+      "stdoutSha256": "44ebe8e0915d7fb1e1c5f3ad2f5c8235f7a71bfc808f1dd01c51417cc269e391",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "module-build-after": {
+      "stage": "module-build-after",
+      "command": [
+        "node",
+        "packages/builder/dist/cli.js",
+        "module",
+        "build",
+        "--all",
+        "--root",
+        "../keel-modules"
+      ],
+      "cwd": "/workspace/catalog-repair-final-20261013/keel-sdk",
+      "startedUtc": "2026-10-13T16:45:01.370236+00:00",
+      "finishedUtc": "2026-10-13T16:45:17.003444+00:00",
+      "elapsedSeconds": 15.633,
+      "exitCode": 0,
+      "stdoutSha256": "fcdf168673ce739f5655ac11dc16e18c37b40ac042258e3182b420f35cf8b587",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "module-vectors-after": {
+      "stage": "module-vectors-after",
+      "command": [
+        "node",
+        "packages/builder/dist/cli.js",
+        "module",
+        "test",
+        "--all",
+        "--root",
+        "../keel-modules"
+      ],
+      "cwd": "/workspace/catalog-repair-final-20261013/keel-sdk",
+      "startedUtc": "2026-10-13T16:45:17.054354+00:00",
+      "finishedUtc": "2026-10-13T16:45:19.104365+00:00",
+      "elapsedSeconds": 2.05,
+      "exitCode": 0,
+      "stdoutSha256": "ea538d3d7bb7f82757b9e4dfb744ea001d19692130701b74cdb96dee8cbcb63c",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "catalog-default-after": {
+      "stage": "catalog-default-after",
+      "command": [
+        "node",
+        "packages/builder/dist/cli.js",
+        "module",
+        "index",
+        "--root",
+        "../keel-modules",
+        "--repository",
+        "https://github.com/Ravonus/keel-modules"
+      ],
+      "cwd": "/workspace/catalog-repair-final-20261013/keel-sdk",
+      "startedUtc": "2026-10-13T16:45:19.150567+00:00",
+      "finishedUtc": "2026-10-13T16:45:25.388589+00:00",
+      "elapsedSeconds": 6.238,
+      "exitCode": 0,
+      "stdoutSha256": "30836c20f7ae1f9eca5824242396488993f7c4cd33ab1adcd8cd1a557f55d76c",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "catalog-legacy-after": {
+      "stage": "catalog-legacy-after",
+      "command": [
+        "node",
+        "packages/builder/dist/cli.js",
+        "module",
+        "index",
+        "--root",
+        "../keel-modules",
+        "--runtime-encoding",
+        "base64",
+        "--repository",
+        "https://github.com/Ravonus/keel-modules"
+      ],
+      "cwd": "/workspace/catalog-repair-final-20261013/keel-sdk",
+      "startedUtc": "2026-10-13T16:45:25.451024+00:00",
+      "finishedUtc": "2026-10-13T16:45:31.502156+00:00",
+      "elapsedSeconds": 6.051,
+      "exitCode": 0,
+      "stdoutSha256": "30836c20f7ae1f9eca5824242396488993f7c4cd33ab1adcd8cd1a557f55d76c",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "catalog-legacy-after-diff": {
+      "stage": "catalog-legacy-after-diff",
+      "command": [
+        "git",
+        "diff",
+        "--exit-code",
+        "--",
+        "catalog/catalog.json"
+      ],
+      "cwd": "/workspace/catalog-repair-final-20261013/keel-modules",
+      "startedUtc": "2026-10-13T16:45:31.548326+00:00",
+      "finishedUtc": "2026-10-13T16:45:31.558918+00:00",
+      "elapsedSeconds": 0.011,
+      "exitCode": 0,
+      "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "catalog-legacy-repeat": {
+      "stage": "catalog-legacy-repeat",
+      "command": [
+        "node",
+        "packages/builder/dist/cli.js",
+        "module",
+        "index",
+        "--root",
+        "../keel-modules",
+        "--runtime-encoding",
+        "base64",
+        "--repository",
+        "https://github.com/Ravonus/keel-modules"
+      ],
+      "cwd": "/workspace/catalog-repair-final-20261013/keel-sdk",
+      "startedUtc": "2026-10-13T16:45:31.620249+00:00",
+      "finishedUtc": "2026-10-13T16:45:37.978499+00:00",
+      "elapsedSeconds": 6.358,
+      "exitCode": 0,
+      "stdoutSha256": "30836c20f7ae1f9eca5824242396488993f7c4cd33ab1adcd8cd1a557f55d76c",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "catalog-legacy-repeat-diff": {
+      "stage": "catalog-legacy-repeat-diff",
+      "command": [
+        "git",
+        "diff",
+        "--exit-code",
+        "--",
+        "catalog/catalog.json"
+      ],
+      "cwd": "/workspace/catalog-repair-final-20261013/keel-modules",
+      "startedUtc": "2026-10-13T16:45:38.028452+00:00",
+      "finishedUtc": "2026-10-13T16:45:38.035740+00:00",
+      "elapsedSeconds": 0.007,
+      "exitCode": 0,
+      "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "origins-after": {
+      "stage": "origins-after",
+      "command": [
+        "node",
+        "packages/builder/dist/cli.js",
+        "module",
+        "verify",
+        "--all",
+        "--root",
+        "../keel-modules"
+      ],
+      "cwd": "/workspace/catalog-repair-final-20261013/keel-sdk",
+      "startedUtc": "2026-10-13T16:45:38.087360+00:00",
+      "finishedUtc": "2026-10-13T16:45:39.392171+00:00",
+      "elapsedSeconds": 1.305,
+      "exitCode": 0,
+      "stdoutSha256": "b6536041fe2389c5adf5e3df58e00377212268d8c7ee45ca1b80cf8874918488",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "catalog-source-after": {
+      "stage": "catalog-source-after",
+      "command": [
+        "node",
+        "scripts/check-catalog.mjs"
+      ],
+      "cwd": "/workspace/catalog-repair-final-20261013/keel-modules",
+      "startedUtc": "2026-10-13T16:45:39.461795+00:00",
+      "finishedUtc": "2026-10-13T16:45:39.533592+00:00",
+      "elapsedSeconds": 0.072,
+      "exitCode": 0,
+      "stdoutSha256": "95857d9fdab3f9f104711af4eef380080205cd8b164c96554cb5a29722461d4f",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "runtime-and-registration-after": {
+      "stage": "runtime-and-registration-after",
+      "command": [
+        "node",
+        "--test",
+        "--test-reporter=tap",
+        "tests/sdk-module-runtime.test.mjs",
+        "tests/keel-module-registration.test.mjs"
+      ],
+      "cwd": "/workspace/catalog-repair-final-20261013/keel-sdk",
+      "startedUtc": "2026-10-13T16:45:39.587299+00:00",
+      "finishedUtc": "2026-10-13T16:45:45.868884+00:00",
+      "elapsedSeconds": 6.282,
+      "exitCode": 0,
+      "stdoutSha256": "318683ec9dfd3c3e91e69af67a993859dbb5a10077c3e18faef489646ee76582",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "regression-after": {
+      "stage": "regression-after",
+      "command": [
+        "node",
+        "--test",
+        "--test-reporter=tap",
+        "--test-name-pattern",
+        "catalog runtime selection",
+        "tests/builder-module-workspace.test.mjs"
+      ],
+      "cwd": "/workspace/catalog-repair-final-20261013/keel-sdk",
+      "startedUtc": "2026-10-13T16:44:25.088645+00:00",
+      "finishedUtc": "2026-10-13T16:45:01.304802+00:00",
+      "elapsedSeconds": 36.216,
+      "exitCode": 0,
+      "stdoutSha256": "039b8f4b7413600c9035fdd78a417f2427a0fc930cc714f01df7e3a5b206c008",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "public-reproduction-after": {
+      "stage": "public-reproduction-after",
+      "command": [
+        "node",
+        "--test",
+        "--test-reporter=tap",
+        "../keel-modules/tests/reproduction.test.mjs"
+      ],
+      "cwd": "/workspace/catalog-repair-final-20261013/keel-sdk",
+      "startedUtc": "2026-10-13T16:51:40.646637+00:00",
+      "finishedUtc": "2026-10-13T16:53:22.151333+00:00",
+      "elapsedSeconds": 101.505,
+      "exitCode": 0,
+      "stdoutSha256": "3b107094eb649d27eba8e79880c594eefbc13b6aa36bc8400c17a0a425a48881",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "public-network-reproduction-after": {
+      "stage": "public-network-reproduction-after",
+      "command": [
+        "node",
+        "--test",
+        "--test-reporter=tap",
+        "--test-name-pattern",
+        "a stranger with only|verify lets a stranger",
+        "../keel-modules/tests/reproduction.test.mjs"
+      ],
+      "cwd": "/workspace/catalog-repair-final-20261013/keel-sdk",
+      "startedUtc": "2026-10-13T16:55:19.655294+00:00",
+      "finishedUtc": "2026-10-13T16:55:30.746216+00:00",
+      "elapsedSeconds": 11.091,
+      "exitCode": 0,
+      "stdoutSha256": "f12d96118f76f86f339b3d623de717692ce4a3ae1df621f9c384d272e67c0273",
+      "stderrSha256": "2e144076aee1713e626f4eaab5fda64c91b52e2ac6e95ec180cf3a8589a7630a",
+      "nodeOptions": "--use-env-proxy"
+    },
+    "full-suite-before": {
+      "stage": "full-suite-before",
+      "command": [
+        "node",
+        "scripts/test.mjs"
+      ],
+      "cwd": "/workspace/catalog-repair-20261013/keel-sdk",
+      "startedUtc": "2026-10-13T16:36:51.899455+00:00",
+      "finishedUtc": "2026-10-13T16:44:37.909636+00:00",
+      "elapsedSeconds": 466.011,
+      "exitCode": 1,
+      "stdoutSha256": "f2cc498d78d5328dcf5ddcedb516571ecf6f0d4cc52e5d7f1eae5b487d93fabc",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "full-suite-after": {
+      "stage": "full-suite-after",
+      "command": [
+        "node",
+        "/workspace/catalog-repair-evidence-20261013/run-default-suite.mjs"
+      ],
+      "cwd": "/workspace/catalog-repair-final-20261013/keel-sdk",
+      "startedUtc": "2026-10-13T16:45:45.929087+00:00",
+      "finishedUtc": "2026-10-13T16:51:40.566734+00:00",
+      "elapsedSeconds": 354.638,
+      "exitCode": 1,
+      "stdoutSha256": "d08960b4fb3da1feea8ab5d5177ac9be80a3d3ddd0a9be3808837d472e9f58a8",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "regression-before": {
+      "stage": "regression-before",
+      "command": [
+        "node",
+        "--test",
+        "--test-reporter=tap",
+        "--test-name-pattern",
+        "catalog runtime selection",
+        "tests/builder-module-workspace.test.mjs"
+      ],
+      "cwd": "/workspace/catalog-repair-final-20261013/keel-sdk",
+      "startedUtc": "2026-10-13T16:39:55.489685+00:00",
+      "finishedUtc": "2026-10-13T16:40:26.097356+00:00",
+      "elapsedSeconds": 30.608,
+      "exitCode": 1,
+      "stdoutSha256": "46d9280c808156823dbfa25fadfab0d5a2315969c5acf1143e8a1092d2f330c4",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  },
+  "logs": {
+    "full-suite-before": {
+      "path": "full-suite-before.log.gz",
+      "uncompressedSha256": "f2cc498d78d5328dcf5ddcedb516571ecf6f0d4cc52e5d7f1eae5b487d93fabc"
+    },
+    "full-suite-after": {
+      "path": "full-suite-after.log.gz",
+      "uncompressedSha256": "d08960b4fb3da1feea8ab5d5177ac9be80a3d3ddd0a9be3808837d472e9f58a8"
+    },
+    "regression-before": {
+      "path": "regression-before.log.gz",
+      "uncompressedSha256": "46d9280c808156823dbfa25fadfab0d5a2315969c5acf1143e8a1092d2f330c4"
+    },
+    "regression-after": {
+      "path": "regression-after.log.gz",
+      "uncompressedSha256": "039b8f4b7413600c9035fdd78a417f2427a0fc930cc714f01df7e3a5b206c008"
+    },
+    "runtime-and-registration-after": {
+      "path": "runtime-and-registration-after.log.gz",
+      "uncompressedSha256": "318683ec9dfd3c3e91e69af67a993859dbb5a10077c3e18faef489646ee76582"
+    },
+    "public-reproduction-after": {
+      "path": "public-reproduction-after.log.gz",
+      "uncompressedSha256": "3b107094eb649d27eba8e79880c594eefbc13b6aa36bc8400c17a0a425a48881"
+    },
+    "public-network-reproduction-after": {
+      "path": "public-network-reproduction-after.log.gz",
+      "uncompressedSha256": "f12d96118f76f86f339b3d623de717692ce4a3ae1df621f9c384d272e67c0273"
+    },
+    "module-vectors-after": {
+      "path": "module-vectors-after.log.gz",
+      "uncompressedSha256": "ea538d3d7bb7f82757b9e4dfb744ea001d19692130701b74cdb96dee8cbcb63c"
+    }
+  }
+}

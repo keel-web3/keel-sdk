@@ -10,16 +10,22 @@ const abi=parseAbi([
 (async()=>{
  await new Promise(r=>setTimeout(r,0));
  const c=globalThis.__KEEL_MANAGED_SHELL__;
- const chain=createKeelChain({rpc:c.rpcUrl,keelHold:c.store});
+ const controller=new AbortController();
+ globalThis.addEventListener?.('pagehide',()=>controller.abort(new Error('Artwork loading cancelled')),{once:true});
+ const progress={state:'loading',completedObjects:0,decodedBytes:0};
+ const chain=createKeelChain({signal:controller.signal,maxRetries:2,maxConcurrentReads:c.maxConcurrentReads??4,rpc:c.rpcUrls??c.rpcUrl,hosts:c.rpcHosts,keelHold:c.store,expectedChainId:c.chainId,listRevision:c.rpcHostListRevision??0,listEpoch:c.rpcHostListEpoch??0});
  if(Number(BigInt(await chain.request('eth_chainId',[])))!==c.chainId)throw Error('Wrong artwork network');
+ const pin=await chain.pinBlock();
  const call=async(name,args)=>decodeFunctionResult({abi,functionName:name,data:await chain.call(c.store,encodeFunctionData({abi,functionName:name,args}))});
  const read=createKeelHoldObjectReader({
   getObject:async r=>{const v=await call('getObject',[r.objectId]);if(!v.exists)throw Error('Artwork object unavailable');return v},
   getObjectSlugPointers:r=>call('getObjectSlugPointers',[r.objectId,BigInt(r.offset),BigInt(r.limit)]),
   getObjectPartIds:r=>call('getObjectPartIds',[r.objectId,BigInt(r.offset),BigInt(r.limit)]),
   getCode:async r=>hexToBytes(await chain.request('eth_getCode',[r.address,'latest'])),
- },{maxConcurrentReads:4});
- const bytes=await read({chainId:c.chainId,store:c.store,objectId:c.objectId},new AbortController().signal);
+ },{maxConcurrentReads:c.maxConcurrentReads??4,cacheBlockHash:pin.hash,onProgress:value=>{Object.assign(progress,value)}});
+ let running=null;
+ const mount=()=>running??(running=(async()=>{
+ const bytes=await read({chainId:c.chainId,store:c.store,objectId:c.objectId},controller.signal);
  const actual='0x'+Array.from(new Uint8Array(await crypto.subtle.digest('SHA-256',bytes)),b=>b.toString(16).padStart(2,'0')).join('');
  if(actual!==c.digest.toLowerCase())throw Error('Artwork integrity mismatch');
  let html=decodeURIComponent(decodeURIComponent(new TextDecoder('utf-8',{fatal:true}).decode(bytes)));
@@ -28,5 +34,9 @@ const abi=parseAbi([
  if(!context||typeof context.json!=='string')throw Error('Token context unavailable');
  const injection='<script>globalThis.__KEEL_ONCHAIN_CONTEXT__=Object.freeze('+JSON.stringify(context).replaceAll('<','\\u003c')+')</script>';
  html=html.replace(/<head(?:\s[^>]*)?>/i,m=>m+injection);
+ progress.state='verified';
  document.open();document.write(html);document.close();
+ })().catch(error=>{chain.cancelPending(error);if(!error?.terminal)chain.clearReadCache();progress.state=controller.signal.aborted?'cancelled':error?.terminal?'blocked':'resumable';throw error}).finally(()=>{running=null}));
+ Object.defineProperty(globalThis,'__KEEL_MANAGED_SHELL_CONTROL__',{value:Object.freeze({cancel:()=>controller.abort(new Error('Artwork loading cancelled')),resume:mount,progress:()=>Object.freeze({...progress})}),writable:false,configurable:false});
+ await mount();
 })().catch(e=>{document.getElementById('keel-loader-status').textContent=e.message;document.documentElement.dataset.keelLoader='failed'});

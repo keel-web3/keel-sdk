@@ -1,4 +1,5 @@
 import { buildKeelArtistContracts } from "@keel/sdk/artist-contracts";
+import { mcpRpc, RPC_TOOL_DEFINITIONS } from "./rpc-tools.js";
 import { TOKEN_AUDIT_TOOL_DEFINITIONS } from "./token-audit-tool.js";
 import { KEEL_ENGINE_CATALOG, KEEL_ENGINE_CHOICES, planKeelProject } from "@keel/sdk/engine";
 import { planKeelTezosStandardRoute } from "@keel/sdk/tezos-standard";
@@ -11,6 +12,8 @@ import { createIntegrity } from "@keel/protocol";
 import { PREPARED_COPY_TOOL_DEFINITIONS } from "./prepared-copy-tools.js";
 import { COPY_READ_TOOL_DEFINITIONS } from "./copy-read-tool.js";
 import { PREPARED_COPY_POLICY } from "./prepared-copy-guidance.js";
+import { issuePreflightReceipt, KEEL_STANDARD_WORKFLOW, readKeelSdkDocument } from "./standards.js";
+import type { ToolContext } from "./types.js";
 
 const properties: Record<string, JsonSchema> = {};
 for (const [key, choices] of Object.entries(KEEL_ENGINE_CHOICES)) {
@@ -94,6 +97,7 @@ const CONTRACT_WORKFLOW_DOCUMENTS = [
   "docs/EVM_HARNESS_REUSE_REVIEW.md",
   "docs/KEEL_DENSE_TRANSPORT.md",
   "docs/KEEL_CONTRACTS.md",
+  "docs/KEEL_AUTHORITY_SYSTEM.md",
   "docs/KEEL_MODULES.md",
   "docs/KEEL_PRESENTATION.md",
   "docs/KEEL_PREPARED_COPY_ASSEMBLY.md",
@@ -104,8 +108,9 @@ const CONTRACT_WORKFLOW_DOCUMENTS = [
   "docs/PROOF_MARKET_PACKING.md",
 ] as const;
 
-async function contractWorkflowPreflight(context: { readonly workspace: { readFile(pathValue: string, maxBytes: number): Promise<{ readonly path: string; readonly bytes: Uint8Array }> } }) {
+async function contractWorkflowPreflight(context: ToolContext, issueReceipt = false) {
   const documents: Array<{ path: string; byteLength: number; sha256: string; status: "read" }> = [];
+  const keelDocuments: Array<{ path: string; byteLength: number; sha256: string; status: "read"; source: "keel-sdk" }> = [];
   const unavailable: string[] = [];
   for (const relativePath of CONTRACT_WORKFLOW_DOCUMENTS) {
     try {
@@ -114,7 +119,10 @@ async function contractWorkflowPreflight(context: { readonly workspace: { readFi
       documents.push({ path: relativePath, byteLength: loaded.bytes.byteLength, sha256: integrity.digest, status: "read" });
     } catch (error) {
       if (error !== null && typeof error === "object" && (error as { readonly code?: unknown }).code === "ENOENT") {
-        unavailable.push(relativePath);
+        // KEEL's own standards docs ship with this package; a target that does not vendor them still reads them.
+        const bundled = relativePath === "README.md" ? undefined : await readKeelSdkDocument(relativePath);
+        if (bundled === undefined) unavailable.push(relativePath);
+        else keelDocuments.push({ path: relativePath, byteLength: bundled.byteLength, sha256: (await createIntegrity(bundled)).digest, status: "read", source: "keel-sdk" });
         continue;
       }
       throw error;
@@ -122,14 +130,20 @@ async function contractWorkflowPreflight(context: { readonly workspace: { readFi
   }
   if (!documents.some((document) => document.path === "README.md")) throw new Error("Contract workflow preflight requires the target repository README.md.");
   if (!documents.some((document) => document.path.startsWith("docs/"))) throw new Error("Contract workflow preflight requires at least one target repository docs/ file.");
+  const requiredNext = ["keel-engine-catalog", "keel-network-inspect", "keel-library-search", "keel-contract-controls", "keel-token-standard-audit"] as const;
+  const receipt = issueReceipt ? await issuePreflightReceipt(context.workspace, documents, requiredNext, undefined, keelDocuments) : undefined;
   return {
     schema: "keel-contract-workflow-preflight@1",
     status: "docs-read-module-scan-required" as const,
     workspace: context.workspace,
     documents,
+    keelDocuments,
     unavailable,
-    requiredNext: ["keel-engine-catalog", "keel-network-inspect", "keel-library-search", "keel-contract-controls"] as const,
-    moduleScan: { required: true, selectedChain: "not-inspected", action: "Call keel-library-search against the selected chain before creating or redeploying any reusable contract/module." },
+    requiredNext,
+    ...(receipt === undefined ? {} : { receipt }),
+    workflow: KEEL_STANDARD_WORKFLOW,
+    enforcement: "Signing-request tools (wallet-request-prepare, publish-plan for metadata/viewer bytes, keel-creator-collection-prepare, wallet-link, keel-shell-prepare, module-review-prepare, Tezos prepare tools) refuse without standards.preflightReceipt; token, collection and metadata work also needs a passing keel-token-standard-audit digest as standards.auditDigest.",
+    moduleScan: { required: true, selectedChain: "not-inspected", managerTool: "keel-manager-modules-inspect", replacementTool: "keel-manager-module-replacement-prepare", action: "Call keel-library-search against the selected chain. For EVM, inspect the existing Hold manager and actual consuming collection before concluding a module is immutable or proposing infrastructure replacement. Governed consumers use configureModule through executeGovernance; unchanged engine bytes stay in Hold." },
     preparedCopy: PREPARED_COPY_POLICY,
     edgeCases: ["existing-object copy-only assembly with zero new source bytes", "existing contract or proxy", "existing graph revision", "canonical shell and builder reuse", "selected-chain module/address ambiguity", "receipt and public byte read-back", "legacy presentation explicitly requested"],
     authority: "review-only",
@@ -154,13 +168,15 @@ export const ENGINE_TOOL_DEFINITIONS: readonly ToolDefinition[] = [{
   descriptor: {
     name: "keel-network-inspect",
     description: "Read the chosen EVM or Tezos RPC network now: chain identity, current head, gas boundaries, available fee quote and KEEL setup gaps. Custom networks are supported. Does not deploy, sign or establish contract authority; fee quotes need exact prepared calls before estimating publication cost.",
-    inputSchema: { type: "object", properties: { family: { type: "string", enum: ["ethereum", "tezos"] }, rpcUrl: { type: "string", minLength: 1, maxLength: 2048 }, chainId: { type: "integer", minimum: 1 }, network: { type: "string", minLength: 1, maxLength: 64 }, holdAddress: { type: "string", minLength: 42, maxLength: 42 }, builderAddress: { type: "string", minLength: 42, maxLength: 42 } }, required: ["family", "rpcUrl"], additionalProperties: false },
+    inputSchema: { type: "object", properties: { family: { type: "string", enum: ["ethereum", "tezos"] }, rpcUrl: { type: "string", minLength: 1, maxLength: 2048 }, chainId: { type: "integer", minimum: 1 }, network: { type: "string", minLength: 1, maxLength: 64 }, holdAddress: { type: "string", minLength: 42, maxLength: 42 }, builderAddress: { type: "string", minLength: 42, maxLength: 42 } }, required: ["family"], additionalProperties: false },
   },
-  async run(_context, value) {
+  async run(context, value) {
     if (!value || typeof value !== "object" || Array.isArray(value)) throw new TypeError("Network inspection requires an exact RPC target.");
     const input = value as Record<string, unknown>;
     if (Object.keys(input).some((key) => !["family", "rpcUrl", "chainId", "network", "holdAddress", "builderAddress"].includes(key))) throw new TypeError("Unsupported network inspection field.");
-    return inspectNetwork(input as unknown as KeelNetworkInspectionTarget);
+    if (input.family === "tezos") return inspectNetwork(input as unknown as KeelNetworkInspectionTarget);
+    const rpc = await mcpRpc(context, { ...(input.rpcUrl === undefined ? {} : { rpcUrl: input.rpcUrl as string }), ...(input.chainId === undefined ? {} : { chainId: input.chainId as number }) }, true);
+    return inspectNetwork({ ...input, rpcUrl: rpc.rpcUrl } as unknown as KeelNetworkInspectionTarget, rpc.fetchImpl);
   },
 }, {
   descriptor: {
@@ -172,12 +188,12 @@ export const ENGINE_TOOL_DEFINITIONS: readonly ToolDefinition[] = [{
 }, {
   descriptor: {
     name: "keel-contract-workflow-preflight",
-    description: "Mandatory read-only start for contract, collection, viewer, metadata, deployment or release work. Reads the target README and available relevant docs, records their byte digests, and returns the required engine, selected-chain, module-catalog, edge-case and contract-control checks. It never signs or submits.",
+    description: "Mandatory start for contract, collection, viewer, metadata, deployment or release work. Reads the target README and relevant docs, records their digests, lists the required engine, selected-chain, module-catalog, edge-case and contract-control checks, and returns a receipt (receipt.id) that every signing-request tool requires as standards.preflightReceipt. Then: keel-engine-catalog → keel-network-inspect → keel-library-search → keel-contract-controls → build → keel-token-standard-audit → request. Writes only the receipt under .keel-mcp/; never signs or submits.",
     inputSchema: { type: "object", properties: {}, additionalProperties: false },
   },
   async run(context, value) {
     if (!value || typeof value !== "object" || Array.isArray(value) || Object.keys(value).length) throw new TypeError("Contract workflow preflight accepts an empty object.");
-    const result = await contractWorkflowPreflight(context);
+    const result = await contractWorkflowPreflight(context, true);
     return { ...result, workspace: context.workspace.root };
   },
 }, {
@@ -221,4 +237,4 @@ export const ENGINE_TOOL_DEFINITIONS: readonly ToolDefinition[] = [{
     inputSchema: { type: "object", properties, additionalProperties: false },
   },
   async run(_context, value) { return planKeelProject(value); },
-}, ...PREPARED_COPY_TOOL_DEFINITIONS, ...COPY_READ_TOOL_DEFINITIONS, ...TOKEN_AUDIT_TOOL_DEFINITIONS];
+}, ...PREPARED_COPY_TOOL_DEFINITIONS, ...COPY_READ_TOOL_DEFINITIONS, ...TOKEN_AUDIT_TOOL_DEFINITIONS, ...RPC_TOOL_DEFINITIONS];

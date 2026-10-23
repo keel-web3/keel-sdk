@@ -55,6 +55,7 @@ declare module "node:fs/promises" {
 }
 
 declare module "node:os" {
+  export function homedir(): string;
   export function tmpdir(): string;
 }
 
@@ -100,6 +101,7 @@ declare module "node:crypto" {
 }
 
 declare module "node:zlib" {
+  export function brotliCompressSync(data: Uint8Array, options?: unknown): Buffer;
   export function deflateRawSync(data: Uint8Array, options?: unknown): Buffer;
   export function inflateRawSync(data: Uint8Array, options?: unknown): Buffer;
   export function deflateSync(data: Uint8Array, options?: unknown): Buffer;

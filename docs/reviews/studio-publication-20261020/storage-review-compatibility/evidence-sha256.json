@@ -1,0 +1,15 @@
+{
+  "311-app-tests.log": "029a1ac76cf3d397f8799452d0a1ddc78b6cc915c24fdc4f0b937bcca75a16dc",
+  "311-commands.json": "2b211e9b647bfbb5808e25e249c879e3e2f4d70c9d174a05eaebe79efad7f176",
+  "311-emitted-tests.log": "fdb6e0fa733b96cd07ca181f7cf40cf77c876ebfb43415f7f55d46f948a14619",
+  "311-independent.log": "f745d3a25b7f1e04069b61650b27d90d216b206833b7599949e2a5467744f67f",
+  "311-mcp-build.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "311-mcp-self-test.log": "ff03f303d5eb00feaad385724483a8e19e2496b7b8385dbfe5c1971fb190d70a",
+  "311-sdk-build.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "README.md": "c5ec8caddb47c8668545cf4450bb46c47e92c63669459eaa3ddba1ff56ec7681",
+  "baseline-dist.log": "e0478612622f8215eecca93535c71f7720b63fc5016c403e51c3424672a90c11",
+  "emitted-dist-equivalence.json": "850362f0f209e5145f88b8fe0a2cf89626bd25acf50d4da7e1967e5e012d6cb9",
+  "independent-storage-variant.test.mjs": "a3e60ac9c4bf39e491a68beab05aa579be723f3add2718a1b21a3d44e9637561",
+  "inherited-dist-sha256.json": "cf0da1f70502144ca2be25668f47873069f89ed1769088a7aa169252905df231",
+  "package-manifest.json": "68593f682ca577f68228072abf0f92225a7b0521378e0bfe75343b4ac1e275f5"
+}

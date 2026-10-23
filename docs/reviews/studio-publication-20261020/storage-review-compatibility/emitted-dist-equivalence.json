@@ -1,0 +1,35 @@
+{
+  "added": {},
+  "afterFiles": 1745,
+  "baseline": "a9cd9f8048bcd4096abafd0cc4e1c7265dc2c581; built runtime b524",
+  "beforeFiles": 1745,
+  "changed": {
+    "packages/mcp/dist/tools.js": {
+      "after": "98023da9021b13034e1437221d181160a8b4d47e1f21240001cf64ffcae2c026",
+      "before": "3fe74172489e4745ed6ceeb9e1ca870768817351d78b573f611e1fef93b6981c"
+    },
+    "packages/mcp/dist/tools.js.map": {
+      "after": "52535e7ea5f897b5493efd4490ae88fd04c9b5da306cc32d24f5c3a2520d2446",
+      "before": "5162fe23deb9bd4be913448194387f5b228879489b990caf5411ae9b263868f9"
+    },
+    "packages/sdk/dist/studio-agent-drafts.d.ts": {
+      "after": "27cc7157deb45f3d15a82d230c96b92b8ffb3e2c46bbc92d29d45ce8f2cdd6a2",
+      "before": "f6515402c2ab8b65d08b3aacd4dc0c1387477cd99baff6c1cfa7aecc007a1d3e"
+    },
+    "packages/sdk/dist/studio-agent-drafts.d.ts.map": {
+      "after": "814b661399ffa5d464b4d748fd6e581032bc41e18713981b77fb240cf213c137",
+      "before": "a3a64f44c05bee6125aafd940531bfc792e4409746c8ba35c91468396b6ae4e6"
+    },
+    "packages/sdk/dist/studio-agent-drafts.js": {
+      "after": "138835e5ca36194a34e348dec1f6930b189786b22a779e95563047bc10309fd5",
+      "before": "319640a1a9b541f2ab7dddfad39f88630102ba9b796656dc8bca110aae11ad38"
+    },
+    "packages/sdk/dist/studio-agent-drafts.js.map": {
+      "after": "e523e94e6eafd696967daada371361df345e51b27f53c747e6500714b830c208",
+      "before": "b509db71ac5fe185bf3aae1f6722b5a18388aea7ee4650c0faec2d6f5a260f5b"
+    }
+  },
+  "removed": {},
+  "source": "311d61526284248938e335d7ed879089408933be",
+  "unchangedFiles": 1739
+}

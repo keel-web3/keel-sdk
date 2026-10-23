@@ -1,0 +1,17 @@
+TAP version 13
+# Subtest: real local EVM returns the exact valid 2M+ URI under explicit policy, without signing or transactions
+ok 1 - real local EVM returns the exact valid 2M+ URI under explicit policy, without signing or transactions
+  ---
+  duration_ms: 234.496583
+  type: 'test'
+  ...
+# {"completeTokenURIBytes":2050429,"runtimeSHA256":"0xf646a8ca54a9b733c90e382446750c096e13445e0a424b2af11a4c88da65710e","ethCallResponseBytes":4101030,"status":"PASS_ACTUAL_LOCAL_EVM_READ_ONLY"}
+1..1
+# tests 1
+# suites 0
+# pass 1
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 444.54125

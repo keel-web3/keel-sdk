@@ -1,3 +1,4 @@
+import { canonicalAbiEntries } from "./abi-conformance.mjs";
 import assert from "node:assert/strict";
 import { spawnSync } from "node:child_process";
 import { createRequire } from "node:module";
@@ -107,4 +108,22 @@ nodeTest("a Vite browser consumer of @keel/sdk/abi stays clear of Node-only exte
   } finally {
     await rm(fixtureRoot, { recursive: true, force: true });
   }
+});
+
+nodeTest("ABI canonical comparison ignores only top-level entry order", () => {
+  const base = [{ type: "function", name: "f", inputs: [{ name: "a", type: "uint256" }, { name: "b", type: "address" }], outputs: [{ name: "value", type: "bytes32" }], stateMutability: "view" },
+    { type: "event", name: "E", anonymous: false, inputs: [{ name: "who", type: "address", indexed: true }] },
+    { type: "function", name: "tuple", inputs: [{ name: "value", type: "tuple", components: [{ name: "x", type: "uint256" }, { name: "y", type: "address" }] }], outputs: [], stateMutability: "pure" }];
+  const before = structuredClone(base);
+  assert.deepEqual(canonicalAbiEntries(base), canonicalAbiEntries([...base].reverse()));
+  for (const change of [
+    value => value[0].inputs.reverse(), value => value[0].outputs[0].type = "uint256",
+    value => value[0].stateMutability = "payable", value => value[1].inputs[0].indexed = false,
+    value => value[1].anonymous = true, value => value[2].inputs[0].components.reverse(),
+    value => value[2].inputs[0].components[0].name = "changed", value => value.pop(),
+  ]) {
+    const changed = structuredClone(base); change(changed);
+    assert.notDeepEqual(canonicalAbiEntries(changed), canonicalAbiEntries(base));
+  }
+  assert.deepEqual(base, before, "comparison must not mutate compiler or recorded evidence");
 });

@@ -56,9 +56,24 @@ export enum KeelObjectEditPolicy {
   CreatorOrTokenOwner = 3,
 }
 
+/**
+ * @deprecated Viewer-era numbering, from before `KeelHarnessRegistry` fixed
+ * `HarnessEditPolicy` as Creator 0, Immutable 1. These values are the reverse
+ * of what both chains read now; use {@link KeelHarnessEditPolicy}.
+ */
 export enum KeelViewerEditPolicy {
   Immutable = 0,
   Creator = 1,
+}
+
+/**
+ * Harness edit policy, as `KeelHarnessRegistry` reads it on EVM and Tezos.
+ * Creator lets the collection controller append revisions; Immutable starts
+ * the harness frozen.
+ */
+export enum KeelHarnessEditPolicy {
+  Creator = 0,
+  Immutable = 1,
 }
 
 export enum KeelForkPolicy {

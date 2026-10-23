@@ -1,4 +1,4 @@
-import { KEEL_DEFAULT_PAYLOAD_STORAGE, KEEL_PAYLOAD_STORAGE_MODES, KEEL_DEFAULT_SHELL, KEEL_SHELL_CHOICES } from "@keel/protocol";
+import { KEEL_ASSET_PRESENTATION_PREFERENCES, KEEL_ASSET_PRESENTATION_CANDIDATE_IDS, KEEL_ASSET_PRESENTATION_FALLBACK_DELIVERIES, KEEL_DEFAULT_PAYLOAD_STORAGE, KEEL_PAYLOAD_STORAGE_MODES, KEEL_DEFAULT_SHELL, KEEL_SHELL_CHOICES } from "@keel/protocol";
 import { COPY_READ_SCHEMA } from "./copy-read-tool.js";
 import type { JsonSchema } from "./types.js";
 
@@ -10,6 +10,21 @@ const object = (properties: Readonly<Record<string, JsonSchema>>, required: read
   properties,
   ...(required.length === 0 ? {} : { required }),
   additionalProperties: false,
+});
+
+/**
+ * Evidence every signing-request tool checks before it prepares anything for contract, collection, metadata or
+ * viewer work. Order: keel-contract-workflow-preflight (receipt) → keel-engine-catalog → keel-network-inspect →
+ * keel-library-search → keel-contract-controls → build → keel-token-standard-audit (auditDigest) → request.
+ */
+export const standardsEvidence: JsonSchema = object({
+  preflightReceipt: string("receipt.id returned by keel-contract-workflow-preflight (0x + 64 hex)."),
+  auditDigest: string("digest returned by a passing keel-token-standard-audit (0x + 64 hex). Required whenever a token contract, collection or token metadata is involved."),
+  workKind: {
+    type: "string",
+    enum: ["token-contract", "collection", "metadata", "viewer", "registry-or-module", "role-admin", "fungible-token", "storage-only"],
+    description: "What this request changes. Omitted: decided from the decoded (inner) function -- KeelHold storage writes are storage-only, grantRole/revokeRole/renounceRole-style calls are role-admin, calls to an ERC-20 are fungible-token (receipt only, no tokenURI audit); anything else is token-contract (the strictest). Declared kinds are verified.",
+  },
 });
 
 const moduleSelector: JsonSchema = {
@@ -30,6 +45,7 @@ const walletRequest: JsonSchema = {
     object({
       protocol: string(), requestId: string(), label: string(), transport: string(), family: { type: "string", enum: ["ethereum"] },
       chainId: integer(), to: string(), data: string(), valueWei: string(),
+      gasLimit: string("Explicit decimal total gas limit. Preparation enforces the selected-block profile; execution gas is a separate boundary."),
     }, ["protocol", "requestId", "label", "family", "chainId", "to", "data", "valueWei"]),
     object({
       protocol: string(), requestId: string(), label: string(), transport: string(), family: { type: "string", enum: ["tezos"] },
@@ -63,7 +79,7 @@ const walletLink: JsonSchema = object({
   accountAddress: string("Account/creator wallet address."),
   agentAddress: string("Agent wallet address."),
   target: walletLinkTarget,
-  scopes: { type: "array", items: { type: "string", enum: ["read", "analyze", "prepare", "request", "create-collection"] }, minItems: 1, maxItems: 5 },
+  scopes: { type: "array", items: { type: "string", enum: ["read", "analyze", "prepare", "request", "create-collection"] }, minItems: 1, maxItems: 7 },
   issuedAt: integer("Unix seconds.", 0),
   expiresAt: integer("Unix seconds; at most 30 days after issuedAt.", 1),
   nonce: string("Link nonce.", 96),
@@ -217,11 +233,45 @@ const studioProjectIntake: JsonSchema = object({
     endsAt: string("Optional ISO timestamp.", 64),
   }),
 });
+const studioConnect: JsonSchema = object({
+  operation: { type: "string", enum: ["start", "status", "complete"] },
+  studioUrl: string("Optional Studio HTTPS origin.", 512),
+  label: string("Name displayed to the user before they approve access.", 80),
+  scopes: { type: "array", items: { type: "string", enum: ["drafts:read", "drafts:create", "drafts:write", "contracts:read", "bridge:serve", "access:read", "access:write", "preferences:read", "preferences:write", "conversations:read", "conversations:write"] }, minItems: 1, maxItems: 11 },
+  reconnect: { type: "boolean", description: "Request a new grant instead of reusing the current connection." },
+}, ["operation"]);
 const studioDraft: JsonSchema = object({
+  limit: { type: "integer", minimum: 1, maximum: 100, description: "Workspace page size; default 50 per collection." },
+  cursor: { type: "string", maxLength: 4096, description: "pagination.nextCursor from the previous workspace page; preserve projectId filter." },
+  expectedState: { type: "object", description: "Exact agentProgress.binding from current owner-scoped status. Preserve owner, project, revisions, manifest digest and operation; never signing authority." },
+  expectedOperationId: { type: "string", pattern: "^[0-9a-fA-F]{8}(?:-[0-9a-fA-F]{4}){3}-[0-9a-fA-F]{12}$", description: "Current saved operation for continue-publication." },
   studioUrl: string("Optional HTTPS Studio URL; KEEL_STUDIO_URL is used otherwise.", 512),
-  operation: { type: "string", enum: ["list", "read", "create", "update"] },
-  releaseId: string("Required for read or update.", 128),
-  expectedRevision: integer("Required for update; prevents a stale agent from overwriting newer browser work.", 1),
+  operation: { type: "string", enum: ["capture-program", "resume-review", "updated-review-read", "updated-review-check", "updated-review-cancel", "list", "read", "diagnose", "continue-publication", "cancel-review", "storage-recovery", "recover", "recover-wallet-rejection", "plan", "plan-edit", "defaults", "defaults-edit", "profiles", "profiles-edit", "profile-select", "conversation", "conversation-suggest", "prepare-review", "read-review", "storage-review", "create", "update"] },
+  releaseId: string("Required for read, diagnose, plan, plan-edit, prepare-review, conversation, conversation-suggest, or update.", 128),
+  artifactRevision: integer("Exact original project revision for capture-program.", 1),
+  releaseRevision: integer("Exact original release revision for capture-program.", 1),
+  reviewCandidate: { type: "object", properties: { candidateId: {type:"string"}, candidateDigest: {type:"string"}, version:{type:"integer",minimum:1} }, required:["candidateId","candidateDigest","version"], additionalProperties:false },
+  projectId: string("Required for storage-review or storage-recovery; uses the owner-scoped project and never signs or submits.", 128),
+  operationId: string("For recover or cancel-review: the exact existing operation UUID.", 128),
+  transactionHashes: { type: "array", items: { type: "string", pattern: "^0x[0-9a-fA-F]{64}$" }, minItems: 1, maxItems: 1, description: "For recover: the failed atomic wallet transaction, never new calldata." },
+  recoveryInput: object({
+    attemptId: { type: "string", pattern: "^[0-9a-fA-F]{8}(?:-[0-9a-fA-F]{4}){3}-[0-9a-fA-F]{12}$" },
+    operationId: { type: "string", pattern: "^[0-9a-fA-F]{8}(?:-[0-9a-fA-F]{4}){3}-[0-9a-fA-F]{12}$" }, expectedRevision: integer("Saved draft revision from diagnose.", 1),
+    chainId: integer("Saved chain from diagnose.", 1),
+    preparedDigest: { type: "string", pattern: "^0x[0-9a-fA-F]{64}$" }, walletProofFingerprint: { type: "string", pattern: "^0x[0-9a-fA-F]{64}$" },
+    rejection: { oneOf: [
+      object({ kind: { enum: ["wallet-policy-rejected"] }, provider: { enum: ["metamask"] }, method: { enum: ["eth_sendTransaction"] }, code: { enum: [-32602] }, reason: { enum: ["internal-account-data"] } }, ["kind", "provider", "method", "code", "reason"]),
+      object({ kind: { enum: ["user-rejected"] }, provider: { enum: ["metamask", "eip1193"] }, method: { enum: ["eth_sendTransaction", "wallet_sendCalls"] }, code: { enum: [4001] }, reason: { enum: ["user-declined"] } }, ["kind", "provider", "method", "code", "reason"]),
+      object({ kind: { enum: ["dispatch-aborted"] }, provider: { enum: ["studio"] }, method: { enum: ["eth_sendTransaction", "wallet_sendCalls"] }, reason: { enum: ["browser-journal-unavailable"] } }, ["kind", "provider", "method", "reason"]),
+    ], description: "Use exactly the ownerRecordedRejection returned by diagnose. If absent, the owner must first record the actual outcome in Studio. A missing hash or transport failure is not proof of rejection." },
+  }, ["operationId", "attemptId", "expectedRevision", "chainId", "preparedDigest", "walletProofFingerprint", "rejection"]),
+  includeReadCall: { type: "boolean", description: "For diagnose only: include the exact private metadata eth_call calldata, pinned block/runtime hash, byte commitments and attempted gas envelopes. Read-only evidence, not a wallet request. Never forward it to a new provider without permission." },
+  conversationCommand: { type: "object", description: "For conversation-suggest: stable commandId UUID, expectedRevision, plain message, optional typed answers. Requires conversations:write and records an editable proposal, never a wallet action or automatic plan edit." },
+  profileCommand: { type: "object", description: "For profiles-edit: explicit create/edit/remove, stable commandId, expectedRevision, profileId and typed profile configuration. Requires preferences:write. Lifecycle and signing are never presets." },
+  profileSelection: { type: "object", properties: { profileId: { type: "string" }, expectedProfileRevision: { type: "integer", minimum: 1 } }, required: ["profileId", "expectedProfileRevision"], additionalProperties: false },
+  defaultsCommand: { type: "object", description: "For defaults-edit: explicit creator instruction, separate preferences:write permission, stable commandId UUID, expectedRevision, global or exact media scope, values (null clears), optional askToSave. Applies to future guided drafts only." },
+  planningCommand: { type: "object", description: "For plan-edit: operation answer/navigate/mode/review, stable commandId UUID, current expectedRevision, and the matching answers/fieldId/mode/configurationKey. Read plan first. This never signs or spends." },
+  expectedRevision: integer("Required for update and prepare-review; binds the request to the current saved revision.", 1),
   draft: {
     type: "object",
     description: "Complete Studio release draft. Required for create or update and validated again by the SDK and Studio.",
@@ -243,6 +293,11 @@ const studioReusableModule: JsonSchema = object({
   tags: { type: "array", items: string("Reusable-module search tag.", 64), minItems: 0, maxItems: 24 },
 }, ["resourcePaths", "assetType", "license"]);
 const studioStageProject: JsonSchema = object({
+  assetPresentation: { type: "string", enum: [...KEEL_ASSET_PRESENTATION_PREFERENCES], default: "automatic", description: "Shared candidate matrix: default registered verifier; static media above 500,000 bytes recommends native direct display, above 2,000,000 recommends RPC verification. These are recommendations, independent of actual encoded image/metadata and selected-chain constraints. Explicit slot layouts are preserved. The 2 MB complete metadata target is a compatibility warning; larger metadata requires explicit understanding and an actual supported read policy/full simulation. Nothing authorizes a payment." },
+  assetPresentationSelection: { type: "string", enum: [...KEEL_ASSET_PRESENTATION_CANDIDATE_IDS], description: "Explicit maintained metadata-slot pair; unavailable selected-chain capabilities remain blocked." },
+  fallbackDelivery: { type: "string", enum: [...KEEL_ASSET_PRESENTATION_FALLBACK_DELIVERIES], description: "Preferred IPFS or hosted alternative if the embedded verifier alone exceeds compatibility targets; never silently drops an image or moves content." },
+  nonstandardCompatibilityAcknowledged: { type: "boolean", description: "Creator understands that larger metadata may not load in outside readers. Exact limits, review and wallet approval still apply." },
+  externalPreviewUri: string("Explicit project-only HTTPS/IPFS preview URL. Required for external-preview; never invented or saved as a global URL default.", 2048),
   payloadStorage: { type: "string", enum: [...KEEL_PAYLOAD_STORAGE_MODES], default: KEEL_DEFAULT_PAYLOAD_STORAGE, description: "Compact stores losslessly compressed native bytes once. Raw preserves supplied bytes without automatic compression. Independent of viewer and Inline/Hybrid delivery; never store a second Base64/hex copy just for the shell." },
   studioUrl: string("Optional HTTPS Studio URL; KEEL_STUDIO_URL is used otherwise.", 512),
   title: string("Project title.", 160),
@@ -250,8 +305,13 @@ const studioStageProject: JsonSchema = object({
   storageStrategy: { type: "string", enum: ["local", "onchain", "hybrid"] },
   marketplaceExportMode: { type: "string", enum: ["recursive", "packed", "hybrid", "onchfs"] },
   viewer: { type: "string", enum: [...KEEL_SHELL_CHOICES], default: KEEL_DEFAULT_SHELL, description: "Default: registered KEEL verification shell. Explicit none: preserve creator-owned self-contained HTML with raw-artifact presentation and no canonical protection claim. Independent of payloadStorage. Both choices preserve immutable source, contract retrieval, and selected-chain checks." },
+  mediaSlots: object({
+    image: { oneOf: [{ type: "null" }, object({ resourceId: string("Exact creator resource identity.", 1024), presentation: { type: "string", enum: ["direct"] }, delivery: { type: "string", enum: ["onchain", "ipfs", "hosted"] } }, ["resourceId", "presentation", "delivery"])] },
+    animation_url: { oneOf: [{ type: "null" }, object({ resourceId: string("Exact creator resource identity.", 1024), presentation: { type: "string", enum: ["direct", "keel-shell"] }, delivery: { type: "string", enum: ["onchain", "ipfs", "hosted"] } }, ["resourceId", "presentation", "delivery"])] },
+  }, []),
   files: { type: "array", items: studioStageFile, minItems: 1, maxItems: 256 },
   reusableModule: studioReusableModule,
+  projectProfile: { type: "object", description: "Copied snapshot and defaults returned by keel-studio-draft profile-select. Keep it with the private project; explicit project values take precedence." },
   releaseIntent: { type: "object", description: "Optional editable keel-release-intent@1 produced by keel-studio-project-intake." },
 }, ["title", "storageStrategy", "files"]);
 const creator721Config: JsonSchema = object({
@@ -275,7 +335,8 @@ const creatorCollectionPrepare: JsonSchema = object({
   instance: string("Optional exact recorded deployment instance.", 96),
   creatorNonce: string("Exact creator nonce read before preparation, encoded as canonical unsigned decimal text.", 78),
   operation: creatorCollectionOperation,
-}, ["chainId", "creator", "creatorNonce", "operation"]);
+  standards: { ...standardsEvidence, description: "Required: preflightReceipt and a passing auditDigest for the collection's prepared tokenURI (or the external token contract)." },
+}, ["chainId", "creator", "creatorNonce", "operation", "standards"]);
 const shellManifestFields: Readonly<Record<string, JsonSchema>> = {
   creator: string("Creator wallet used for namespacing and catalogue indexing."),
   name: string("Human-readable shell name.", 96),
@@ -292,14 +353,12 @@ const shellMutationFields: Readonly<Record<string, JsonSchema>> = {
   metadataObjectId: string("Committed JSON manifest object ID."),
   payloadMode: { type: "string", enum: ["sandboxed-html", "gzip-base64", "pre-encoded-graph"] },
 };
-const shellPrepare: JsonSchema = {
-  oneOf: [
-    object({ operation: { type: "string", enum: ["manifest"] }, ...shellManifestFields }, ["operation", "creator", "name", "version"]),
-    object({ operation: { type: "string", enum: ["register"] }, ...shellManifestFields, ...shellMutationFields }, ["operation", "creator", "name", "version", "builderAddress", "salt", "prefixObjectId", "suffixObjectId", "metadataObjectId"]),
-    object({ operation: { type: "string", enum: ["update"] }, ...shellManifestFields, ...shellMutationFields }, ["operation", "creator", "name", "version", "builderAddress", "shellId", "prefixObjectId", "suffixObjectId", "metadataObjectId"]),
-    object({ operation: { type: "string", enum: ["freeze"] }, creator: shellManifestFields.creator!, builderAddress: shellMutationFields.builderAddress!, shellId: shellMutationFields.shellId! }, ["operation", "creator", "builderAddress", "shellId"]),
-  ],
-};
+const shellPrepare: JsonSchema = object({
+  operation: { type: "string", enum: ["manifest", "register", "update", "freeze"], description: "Operation requirements are checked by the runtime; register/update/freeze require standards evidence." },
+  ...shellManifestFields,
+  ...shellMutationFields,
+  standards: standardsEvidence,
+}, ["operation", "creator"]);
 const inlinePrepare: JsonSchema = object({
   viewer: { type: "string", enum: [...KEEL_SHELL_CHOICES], default: KEEL_DEFAULT_SHELL, description: "Default verification shell; none uses your self-contained HTML as a creator-owned shell. Independent of Compact/Raw storage. A custom shell does not claim canonical protection." },
   payloadStorage: { type: "string", enum: [...KEEL_PAYLOAD_STORAGE_MODES], default: KEEL_DEFAULT_PAYLOAD_STORAGE, description: "Compact uses native payload bytes with lossless compression when beneficial. Raw keeps supplied bytes unchanged; separate from shell and delivery." },
@@ -335,12 +394,12 @@ const inlinePrepare: JsonSchema = object({
   carriage: {
     type: "string",
     enum: ["compact", "raw-percent"],
-    description: "Fresh source uses compact raw-percent COPY only. Existing aligned Base64 or percent fragments go through keel-inline-reuse-plan without transcoding.",
+    description: "Current source and object reuse use compact raw-percent COPY only; historical carriage is not a publication option.",
   },
   presentationPolicy: {
     type: "string",
     enum: ["collector-inline", "external-resolver", "raw-artifact"],
-    description: "Optional. Defaults to collector-inline: self-contained data:image/* plus raw-percent data:text/html HTML inside the registered canonical KEEL verification shell. Prepare the exact image carriage once at build time and publish one ASCII payload or URI; never publish raw image bytes plus a second encoded copy. The contract/viewer only copies the prepared header/payload/footer and never Base64-encodes media during tokenURI. GIF is direct data:image/gif from the exact source, never an SVG wrapper, resize or placeholder. External resolvers and legacy artifact routes require an explicit policy.",
+    description: "Optional. Defaults to collector-inline: self-contained data:image/* plus raw-percent data:text/html HTML inside the registered canonical KEEL verification shell. Prepare the exact image carriage once at build time and publish one ASCII payload or URI; never publish raw image bytes plus a second encoded copy. The contract/viewer only copies the prepared header/payload/footer and never Base64-encodes media during tokenURI. GIF is direct data:image/gif from the exact source, never an SVG wrapper, resize or placeholder. External previews and creator-owned raw artifacts require their explicit current policy.",
   },
   collection: string("Collection address for a prepared one-of-one tokenURI.", 42),
   metadataTransport: { type: "string", enum: ["web3-json"], description: "Existing collection URI route: prepare raw JSON with inline SVG/image and canonical HTML, without KEEL721-specific binding calls." },
@@ -351,6 +410,10 @@ const inlinePrepare: JsonSchema = object({
   collectionName: string(undefined, 128),
   description: string(undefined, 1024),
   imagePath: string("Workspace-relative original image bytes. The SDK validates the source and prepares one exact data:image URI/payload carriage; the contract/viewer must only copy it and never encode/decode GIF at read time or wrap it in SVG."),
+  imageSvgPath: string("Workspace-relative SVG image (a sample svg(uint256) from keel-svg-create or the renderer). Inlined as data:image/svg+xml; must be passive."),
+  imageRoute: { type: "string", enum: ["prepared", "contract-svg"], description: "contract-svg: the live image is generated by an onchain SVG renderer; needs imageSvgPath. The live tokenURI must then pass keel-token-standard-audit." },
+  outputDirectory: string("Workspace directory for the graph part bytes, the full fragment and (with collection) tokenURI.txt."),
+  hold: string("KeelHold address. With outputDirectory, also writes graph-weld.json: every part's object id, castSlugs/weldObject calldata and the ROOT weldComposite."),
   manifestURI: string(undefined, 512),
   manifestDigest: string("0x-prefixed sha256 of the canonical manifest.", 66),
   chainId: integer("EVM chain id.", 1),
@@ -380,6 +443,7 @@ const onchainRead: JsonSchema = object({
   pick: integer("Take one member of a multi-value return instead of the whole tuple.", 0, 31),
 }, ["name", "address", "signature", "returns"]);
 const onchainData: JsonSchema = object({
+  chainId: integer("Selected EVM chain. The shared RPC pool verifies it before contract reads; a different-chain fallback is refused.", 1),
   rpcUrl: string("Optional JSON-RPC endpoint. Omit to resolve KEEL_ONCHAIN_RPC_URL, then the configured public RPC. HTTP is accepted only on a loopback host, which is how a local anvil is reached.", 512),
   reads: { type: "array", items: onchainRead, minItems: 0, maxItems: 64, description: "Additional values this artwork needs. Can be empty when record is supplied." },
   record: object({
@@ -393,6 +457,7 @@ const onchainData: JsonSchema = object({
   version: string("Inline module version recorded with the fragment. Defaults to 1.0.0.", 32),
 }, ["reads"]);
 const endpointConfig: JsonSchema = object({
+  chainId: integer("Selected EVM chain; resolves this chain's configured/indexed providers without changing the workspace default.", 1),
   studioUrl: string("Optional credential-free HTTPS Studio origin.", 512),
   publicRpcUrl: string("Optional credential-free HTTPS public wallet/browser RPC origin.", 512),
   indexerUrl: string("Optional credential-free HTTPS indexer origin.", 512),
@@ -438,28 +503,93 @@ export const TOOL_SCHEMAS = {
     plan: string("Workspace-relative materialized upload-plan JSON."),
     family: { type: "string", enum: ["ethereum"] },
     chainId: integer(undefined, 1), target: string(),
+    out: string("Optional workspace-relative .json path. Large descriptor plans are written in full to a file and returned as path + sha256; pass that path to publish-plan as chainPlanPath."),
   }, ["plan", "family", "chainId", "target"]),
   ethereumEncode: object({
     plan: string("Workspace-relative materialized upload-plan JSON."),
     family: { type: "string", enum: ["ethereum"] },
     chainId: integer(undefined, 1), target: string(), qr: boolean(),
+    out: string("Optional workspace-relative .json path. Results above the 256 KiB inline budget are always written in full to a file (default <plan>.ethereum-encode.json) and returned as path + sha256; never re-encode by hand."),
   }, ["plan", "family", "chainId", "target"]),
   publishPlan: object({
     chainPlan: { ...chainOperationPlan, description: "The structured result returned by chain-plan." },
     preparedCopy: { ...COPY_READ_SCHEMA, description: "Mandatory for prepared viewer source. Rechecked against the exact source commitment and selected chain/store; caller-supplied files are not authenticated chain evidence." },
+    chainPlanPath: string("Workspace-relative chain-plan result file (delivery.path from chain-plan)."),
     publicationIntent: {
       type: "string",
       enum: ["new-object", "existing-graph-revision"],
       description: "Derived from the target state by Studio or the caller; creators are not asked to identify protocol mechanics.",
     },
     revision: { ...graphRevision, description: "Required for an existing graph revision and forbidden for a new object." },
-  }, ["chainPlan", "publicationIntent"]),
+    standards: standardsEvidence,
+  }, ["publicationIntent"]),
   revisionPlan: graphRevision,
+  tokenStandardAudit: object({
+    viewer: { type: "string", enum: ["keel-verification-shell", "none"], description: "Persisted shell choice. Omitted uses canonical verification; none audits creator-owned self-contained HTML without claiming canonical protection." },
+    rpcUrl: string("Live read: http(s) JSON-RPC URL of the selected chain.", 2048),
+    contract: string("Live read: token contract address."),
+    tokenId: string("Live read: token ID as canonical unsigned decimal text.", 78),
+    chainId: integer("Optional expected chain ID; the audit fails if the RPC reports another.", 1),
+    tokenUri: string("Offline: complete prepared tokenURI text (small documents; the stdio frame is 1 MiB).", 900000),
+    tokenUriPath: string("Offline: workspace-relative file holding the complete prepared tokenURI text."),
+    exception: object({
+      codes: { type: "array", items: string(undefined, 64), minItems: 1, maxItems: 16, description: "Exact finding codes being waived. Read, size, gas and decode findings cannot be waived." },
+      reason: string("Why this reviewed exception is acceptable (at least 20 characters).", 2000),
+      reviewer: string("Who reviewed it: wallet address or name.", 256),
+      signature: string("Optional 65-byte hex signature by the reviewer over the reason (recorded, not verified)."),
+    }, ["codes", "reason", "reviewer"]),
+  }),
   moduleResolve: object({ snapshot: string(), selector: moduleSelector }, ["snapshot", "selector"]),
   moduleLock: object({ snapshot: string(), out: string(), selector: moduleSelector }, ["snapshot", "out", "selector"]),
-  walletRequestPrepare: object({ request: walletRequest, qr: boolean() }, ["request"]),
-  walletLink: object({ link: walletLink }, ["link"]),
-  moduleReview: object({ review: moduleReview }, ["review"]),
+  walletRequestPrepare: object({
+    request: walletRequest,
+    deploy: object({
+      artifactPath: string("Workspace compiler artifact JSON (Foundry out/*.json or Hardhat) with abi and creation bytecode."),
+      chainId: integer("Target EVM chain ID.", 1),
+      args: { type: "array", maxItems: 64, description: "Ordered constructor arguments; integers as decimal strings, tuples as arrays." },
+      bytecode: string("Optional creation bytecode; must equal the artifact byte for byte."),
+      valueWei: string("Native value for a payable constructor, decimal.", 78),
+      label: string(undefined, 128),
+      requestId: string(undefined, 128),
+    }, ["artifactPath", "chainId"]),
+    call: object({
+      chainId: integer("Target EVM chain ID.", 1),
+      to: string("Contract the call targets (EIP-55 or lowercase)."),
+      signature: string("Exact function signature, e.g. setRenderer(address).", 512),
+      args: { type: "array", maxItems: 64, description: "Ordered arguments: integers as decimal strings, tuples as arrays. A bytes argument may be {\"call\":{signature,args,abiPath|abiJson,to?}} to nest an encoded inner call." },
+      valueWei: string("Native value; only for payable functions.", 78),
+      abiPath: string("Workspace compiler artifact or ABI JSON."),
+      abiJson: string("Inline ABI or artifact JSON.", 512000),
+      via: object({ authority: string("KeelAuthority address."), function: { type: "string", enum: ["execute", "callAsDelegate"] } }, ["authority"]),
+      label: string(undefined, 128),
+      requestId: string(undefined, 128),
+    }, ["chainId", "to", "signature"]),
+    gas: object({
+      limit: integer("Explicit total gas limit. Without a selected-block snapshot use the conservative offline bound.", 12000, 4294967295),
+      blockTimestamp: string("Canonical decimal timestamp from the selected-chain block. Pair with blockGasLimit."),
+      blockGasLimit: string("Canonical decimal gas limit from the same selected-chain block. Local evidence requires later chain qualification."),
+      rpcUrl: string("Read-only RPC for eth_estimateGas; the limit is the estimate + 7%, refused above the cap.", 2048),
+      from: string("Signing wallet, so the estimate runs as the real sender."),
+    }),
+    controlsAbiPath: string("Workspace ABI/artifact of the (forwarded) target, for prepared calldata: confirms the function is a listed write and the token shape."),
+    targetRpcUrl: string("Optional read-only RPC to detect the target's token shape (ERC-165 NFT vs ERC-20 decimals()).", 2048),
+    qr: boolean(),
+    standards: standardsEvidence,
+  }),
+  graphWeld: object({
+    hold: string("KeelHold address on the selected chain."),
+    chainId: integer("Selected chain ID (recorded).", 1),
+    mediaType: string("Composite media type. Default application/vnd.keel.token-uri-raw-percent-fragment.", 128),
+    parts: {
+      type: "array", minItems: 1, maxItems: 128,
+      description: "Ordered graph parts. path = part bytes in the workspace (object planned here); objectId alone = an already-published part (then contentPath is required).",
+      items: object({ path: string(), objectId: string("bytes32 object id."), label: string(undefined, 128) }),
+    },
+    contentPath: string("The exact concatenated graph bytes the root commits to (checked against part files when all are given)."),
+    out: string("Optional workspace-relative .json path for the full plan."),
+  }, ["hold", "parts"]),
+  walletLink: object({ link: walletLink, standards: standardsEvidence }, ["link"]),
+  moduleReview: object({ review: moduleReview, standards: standardsEvidence }, ["review"]),
   frayAuctionIntake,
   frayStageProject,
   chainGuide,
@@ -468,6 +598,7 @@ export const TOOL_SCHEMAS = {
   endpointConfig,
   studioCapabilities,
   studioProjectIntake,
+  studioConnect,
   studioDraft,
   studioStageProject,
   creatorCollectionPrepare,

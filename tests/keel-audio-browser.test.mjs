@@ -13,6 +13,7 @@ import {
   buildKeelInlineShellFragments,
   loadKeelAudioModuleBytes,
 } from "../packages/sdk/dist/index.js";
+import {launchCspBrowser as launch} from "./helpers/marketplace-csp-browser.mjs";
 
 async function headlessChrome() {
   if (process.env.KEEL_CHROME_HEADLESS_SHELL) return process.env.KEEL_CHROME_HEADLESS_SHELL;
@@ -74,59 +75,6 @@ async function artworkServer() {
   return {
     url: `http://127.0.0.1:${server.address().port}/`,
     close: () => new Promise((resolve, reject) => server.close((error) => error ? reject(error) : resolve())),
-  };
-}
-
-/** Minimal flat-session CDP client over Node's built-in WebSocket. */
-async function launch(binary) {
-  const profile = await mkdtemp(join(tmpdir(), "keel-audio-chrome-"));
-  const child = spawn(binary, [
-    "--headless",
-    "--mute-audio",
-    "--autoplay-policy=document-user-activation-required",
-    "--remote-debugging-port=0",
-    `--user-data-dir=${profile}`,
-    "about:blank",
-  ], { stdio: ["ignore", "ignore", "pipe"] });
-  let stderr = "";
-  child.stderr.setEncoding("utf8");
-  const endpoint = await new Promise((resolve, reject) => {
-    const timer = setTimeout(() => reject(new Error(`Chrome did not expose DevTools: ${stderr}`)), 15_000);
-    child.stderr.on("data", (chunk) => {
-      stderr += chunk;
-      const match = /DevTools listening on (ws:\/\/\S+)/u.exec(stderr);
-      if (match) { clearTimeout(timer); resolve(match[1]); }
-    });
-    child.on("error", reject);
-  });
-  const socket = new WebSocket(endpoint);
-  await new Promise((resolve, reject) => { socket.onopen = resolve; socket.onerror = reject; });
-  let nextId = 0;
-  const pending = new Map();
-  const listeners = [];
-  socket.onmessage = ({ data }) => {
-    const message = JSON.parse(data);
-    if (message.id !== undefined) {
-      const entry = pending.get(message.id);
-      pending.delete(message.id);
-      if (message.error) entry.reject(new Error(`${entry.method}: ${message.error.message}`));
-      else entry.resolve(message.result);
-    } else for (const listener of listeners) listener(message);
-  };
-  const send = (method, params = {}, sessionId = undefined) => new Promise((resolve, reject) => {
-    const id = ++nextId;
-    pending.set(id, { resolve, reject, method });
-    socket.send(JSON.stringify({ id, method, params, ...(sessionId === undefined ? {} : { sessionId }) }));
-  });
-  return {
-    send,
-    on: (listener) => listeners.push(listener),
-    close: async () => {
-      socket.close();
-      child.kill("SIGKILL");
-      await once(child, "exit").catch(() => {});
-      await rm(profile, { recursive: true, force: true });
-    },
   };
 }
 
@@ -232,7 +180,7 @@ test("Tone + keel-audio load inside the compact Inline shell CSP and a real clic
   try {
     const page = await openArtwork(browser, artwork.url);
     const { point, after } = await assertGestureOnlyStart(page);
-    assert.equal(point.sandbox, "allow-scripts allow-pointer-lock");
+    assert.equal(point.sandbox, "allow-scripts allow-pointer-lock allow-downloads");
     assert.equal(point.allow, null, "the compact shell delegates no autoplay");
     assert.equal(after.clockSource, "worker", "the compact shell CSP lets Tone's blob-worker clock run");
     assert.deepEqual(page.problems, []);

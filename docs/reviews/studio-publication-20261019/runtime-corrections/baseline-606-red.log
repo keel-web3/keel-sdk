@@ -1,0 +1,292 @@
+TAP version 13
+# Subtest: governed SDK reader treats 401 as sticky terminal without fallback
+ok 1 - governed SDK reader treats 401 as sticky terminal without fallback
+  ---
+  duration_ms: 9.379458
+  type: 'test'
+  ...
+# Subtest: governed SDK reader treats 403 as sticky terminal without fallback
+ok 2 - governed SDK reader treats 403 as sticky terminal without fallback
+  ---
+  duration_ms: 0.266083
+  type: 'test'
+  ...
+# Subtest: governed reader retains genuine nested revert inside HTTP 200
+ok 3 - governed reader retains genuine nested revert inside HTTP 200
+  ---
+  duration_ms: 1.228459
+  type: 'test'
+  ...
+# Subtest: governed reader retains genuine nested revert inside HTTP 503
+ok 4 - governed reader retains genuine nested revert inside HTTP 503
+  ---
+  duration_ms: 0.256458
+  type: 'test'
+  ...
+# Subtest: governed thrown wrapper never becomes fallback: {"status":403}
+ok 5 - governed thrown wrapper never becomes fallback: {"status":403}
+  ---
+  duration_ms: 0.306208
+  type: 'test'
+  ...
+# Subtest: governed thrown wrapper never becomes fallback: {"status":503,"cause":{"code":3,"message":"execution reverted SECRET"}}
+ok 6 - governed thrown wrapper never becomes fallback: {"status":503,"cause":{"code":3,"message":"execution reverted SECRET"}}
+  ---
+  duration_ms: 0.114333
+  type: 'test'
+  ...
+# Subtest: governed incomplete/oversized error envelope fails closed without retry or another recipient: 80086
+not ok 7 - governed incomplete/oversized error envelope fails closed without retry or another recipient: 80086
+  ---
+  duration_ms: 9.860334
+  type: 'test'
+  location: '/Users/ravonus/dev/wt/studio-native-beacon-witness-20261019/sdk-nonstandard-read/tests/governed-rpc-boundaries.test.mjs:28:164'
+  failureType: 'testCodeFailure'
+  error: |-
+    The validation function is expected to return "true". Received false
+    
+    Caught error:
+    
+    KeelRpcError: HTTP 503 from https://two.example/….
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  stack: |-
+    async TestContext.<anonymous> (file:///Users/ravonus/dev/wt/studio-native-beacon-witness-20261019/sdk-nonstandard-read/tests/governed-rpc-boundaries.test.mjs:30:3)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: governed incomplete/oversized error envelope fails closed without retry or another recipient: 9
+not ok 8 - governed incomplete/oversized error envelope fails closed without retry or another recipient: 9
+  ---
+  duration_ms: 9.163
+  type: 'test'
+  location: '/Users/ravonus/dev/wt/studio-native-beacon-witness-20261019/sdk-nonstandard-read/tests/governed-rpc-boundaries.test.mjs:28:164'
+  failureType: 'testCodeFailure'
+  error: |-
+    The validation function is expected to return "true". Received false
+    
+    Caught error:
+    
+    KeelRpcError: HTTP 503 from https://two.example/….
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  stack: |-
+    async TestContext.<anonymous> (file:///Users/ravonus/dev/wt/studio-native-beacon-witness-20261019/sdk-nonstandard-read/tests/governed-rpc-boundaries.test.mjs:30:3)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: governed incomplete/oversized error envelope fails closed without retry or another recipient: 65537
+not ok 9 - governed incomplete/oversized error envelope fails closed without retry or another recipient: 65537
+  ---
+  duration_ms: 8.707917
+  type: 'test'
+  location: '/Users/ravonus/dev/wt/studio-native-beacon-witness-20261019/sdk-nonstandard-read/tests/governed-rpc-boundaries.test.mjs:28:164'
+  failureType: 'testCodeFailure'
+  error: |-
+    The validation function is expected to return "true". Received false
+    
+    Caught error:
+    
+    KeelRpcError: HTTP 503 from https://two.example/….
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  stack: |-
+    async TestContext.<anonymous> (file:///Users/ravonus/dev/wt/studio-native-beacon-witness-20261019/sdk-nonstandard-read/tests/governed-rpc-boundaries.test.mjs:30:3)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: governed incomplete HTTP error stream times out fail-closed while preserving its physical lease
+not ok 10 - governed incomplete HTTP error stream times out fail-closed while preserving its physical lease
+  ---
+  duration_ms: 22.409875
+  type: 'test'
+  location: '/Users/ravonus/dev/wt/studio-native-beacon-witness-20261019/sdk-nonstandard-read/tests/governed-rpc-boundaries.test.mjs:34:1'
+  failureType: 'testCodeFailure'
+  error: 'Missing expected rejection.'
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  stack: |-
+    async TestContext.<anonymous> (file:///Users/ravonus/dev/wt/studio-native-beacon-witness-20261019/sdk-nonstandard-read/tests/governed-rpc-boundaries.test.mjs:37:3)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: governed reader limits physical fanout and retries only transient failures with identical calls
+ok 11 - governed reader limits physical fanout and retries only transient failures with identical calls
+  ---
+  duration_ms: 41.753834
+  type: 'test'
+  ...
+# Subtest: governed reader cancellation rejects its queue and dispatches no hidden reads
+ok 12 - governed reader cancellation rejects its queue and dispatches no hidden reads
+  ---
+  duration_ms: 0.601417
+  type: 'test'
+  ...
+# Subtest: governed reader rejects a timed-out uncooperative fetch while retaining the physical lease
+ok 13 - governed reader rejects a timed-out uncooperative fetch while retaining the physical lease
+  ---
+  duration_ms: 20.990625
+  type: 'test'
+  ...
+# Subtest: HTTP 401 is sticky terminal and never reaches another recipient
+ok 14 - HTTP 401 is sticky terminal and never reaches another recipient
+  ---
+  duration_ms: 10.6945
+  type: 'test'
+  ...
+# Subtest: HTTP 403 is sticky terminal and never reaches another recipient
+ok 15 - HTTP 403 is sticky terminal and never reaches another recipient
+  ---
+  duration_ms: 0.588625
+  type: 'test'
+  ...
+# Subtest: a genuine contract revert is terminal, never retried or switched to a provider returning success
+ok 16 - a genuine contract revert is terminal, never retried or switched to a provider returning success
+  ---
+  duration_ms: 0.600042
+  type: 'test'
+  ...
+# Subtest: thrown HTTP wrappers retain terminal denial/revert semantics: {"status":403}
+ok 17 - thrown HTTP wrappers retain terminal denial/revert semantics: {"status":403}
+  ---
+  duration_ms: 0.5455
+  type: 'test'
+  ...
+# Subtest: thrown HTTP wrappers retain terminal denial/revert semantics: {"status":503,"cause":{"code":3,"message":"execution reverted SECRET"}}
+ok 18 - thrown HTTP wrappers retain terminal denial/revert semantics: {"status":503,"cause":{"code":3,"message":"execution reverted SECRET"}}
+  ---
+  duration_ms: 0.576584
+  type: 'test'
+  ...
+# Subtest: browser incomplete/oversized error envelope fails closed without retry or another recipient: 80086
+not ok 19 - browser incomplete/oversized error envelope fails closed without retry or another recipient: 80086
+  ---
+  duration_ms: 11.355917
+  type: 'test'
+  location: '/Users/ravonus/dev/wt/studio-native-beacon-witness-20261019/sdk-nonstandard-read/tests/hybrid-runtime-boundaries.test.mjs:31:163'
+  failureType: 'testCodeFailure'
+  error: |-
+    The validation function is expected to return "true". Received false
+    
+    Caught error:
+    
+    Error: RPC request failed (https://two.example/…)
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  stack: |-
+    async TestContext.<anonymous> (file:///Users/ravonus/dev/wt/studio-native-beacon-witness-20261019/sdk-nonstandard-read/tests/hybrid-runtime-boundaries.test.mjs:33:3)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: browser incomplete/oversized error envelope fails closed without retry or another recipient: 9
+not ok 20 - browser incomplete/oversized error envelope fails closed without retry or another recipient: 9
+  ---
+  duration_ms: 9.420666
+  type: 'test'
+  location: '/Users/ravonus/dev/wt/studio-native-beacon-witness-20261019/sdk-nonstandard-read/tests/hybrid-runtime-boundaries.test.mjs:31:163'
+  failureType: 'testCodeFailure'
+  error: |-
+    The validation function is expected to return "true". Received false
+    
+    Caught error:
+    
+    Error: RPC request failed (https://two.example/…)
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  stack: |-
+    async TestContext.<anonymous> (file:///Users/ravonus/dev/wt/studio-native-beacon-witness-20261019/sdk-nonstandard-read/tests/hybrid-runtime-boundaries.test.mjs:33:3)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: browser incomplete/oversized error envelope fails closed without retry or another recipient: 65537
+not ok 21 - browser incomplete/oversized error envelope fails closed without retry or another recipient: 65537
+  ---
+  duration_ms: 8.832834
+  type: 'test'
+  location: '/Users/ravonus/dev/wt/studio-native-beacon-witness-20261019/sdk-nonstandard-read/tests/hybrid-runtime-boundaries.test.mjs:31:163'
+  failureType: 'testCodeFailure'
+  error: |-
+    The validation function is expected to return "true". Received false
+    
+    Caught error:
+    
+    Error: RPC request failed (https://two.example/…)
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  stack: |-
+    async TestContext.<anonymous> (file:///Users/ravonus/dev/wt/studio-native-beacon-witness-20261019/sdk-nonstandard-read/tests/hybrid-runtime-boundaries.test.mjs:33:3)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: browser incomplete HTTP error stream times out fail-closed without another dispatch
+not ok 22 - browser incomplete HTTP error stream times out fail-closed without another dispatch
+  ---
+  duration_ms: 17.771417
+  type: 'test'
+  location: '/Users/ravonus/dev/wt/studio-native-beacon-witness-20261019/sdk-nonstandard-read/tests/hybrid-runtime-boundaries.test.mjs:37:1'
+  failureType: 'testCodeFailure'
+  error: 'Missing expected rejection.'
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  stack: |-
+    async TestContext.<anonymous> (file:///Users/ravonus/dev/wt/studio-native-beacon-witness-20261019/sdk-nonstandard-read/tests/hybrid-runtime-boundaries.test.mjs:40:3)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: pinned cache and in-flight identity include every execution argument and snapshot mutable inputs before awaiting
+not ok 23 - pinned cache and in-flight identity include every execution argument and snapshot mutable inputs before awaiting
+  ---
+  duration_ms: 1.059375
+  type: 'test'
+  location: '/Users/ravonus/dev/wt/studio-native-beacon-witness-20261019/sdk-nonstandard-read/tests/hybrid-runtime-boundaries.test.mjs:43:1'
+  failureType: 'testCodeFailure'
+  error: |-
+    Expected values to be strictly equal:
+    + actual - expected
+    
+    + '0x0000000000000000000000000000000000000000000000000000000000000009'
+    - '0x0000000000000000000000000000000000000000000000000000000000000001'
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: '0x0000000000000000000000000000000000000000000000000000000000000001'
+  actual: '0x0000000000000000000000000000000000000000000000000000000000000009'
+  operator: 'strictEqual'
+  stack: |-
+    TestContext.<anonymous> (file:///Users/ravonus/dev/wt/studio-native-beacon-witness-20261019/sdk-nonstandard-read/tests/hybrid-runtime-boundaries.test.mjs:51:10)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: a large logical sequence dispatches only a bounded physical active window
+ok 24 - a large logical sequence dispatches only a bounded physical active window
+  ---
+  duration_ms: 52.863916
+  type: 'test'
+  ...
+# Subtest: Retry-After retries the same pinned read and completed identical reads resume from bounded cache
+ok 25 - Retry-After retries the same pinned read and completed identical reads resume from bounded cache
+  ---
+  duration_ms: 2.400709
+  type: 'test'
+  ...
+# Subtest: cancellation rejects queued work without dispatching it
+ok 26 - cancellation rejects queued work without dispatching it
+  ---
+  duration_ms: 0.292166
+  type: 'test'
+  ...
+# Subtest: a timed-out uncooperative physical read retains its slot, fails boundedly and ignores its late success
+ok 27 - a timed-out uncooperative physical read retains its slot, fails boundedly and ignores its late success
+  ---
+  duration_ms: 17.777041
+  type: 'test'
+  ...
+1..27
+# tests 27
+# suites 0
+# pass 18
+# fail 9
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 168.435458

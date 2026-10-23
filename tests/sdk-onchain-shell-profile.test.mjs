@@ -7,9 +7,11 @@ const store='0x'+'11'.repeat(20),objectId='0x'+'22'.repeat(32),builder='0x'+'33'
 const c={algorithm:'sha256',digest:sha(bytes),byteLength:bytes.length};
 const delivery={chainId:31337,store,builder,storeCodeIntegrity:c,builderCodeIntegrity:c,rpcUrls:['http://127.0.0.1:8545'],rpcHosts:['127.0.0.1']};
 const full={id:'water',role:'module',mediaType:'text/javascript',bytes,chainId:31337,store,objectId,compression:'gzip',storedBytes};
-test('default embedded canonical shell bytes are retained for native and LZMA',async()=>{
- const expected={native:'0x9cc2cc2d865e513aad05de0392dd75f63297a3ad9b82964f9abe38a5f736d272','lzma-js':'0x522494e8a887ded1d0b10a8f03b0e3849c1adca1ef33f27f055aab34858dc253'};
- for(const codecProfile of ['native','lzma-js']){const a=await buildCompactInlineKeelShell({codecProfile});assert.equal(sha(a.prefix),'0xd9fb62d4b85337813dfd60cbd66a0d46601eccbff5f08d5ab566e816da429f31');assert.equal(sha(a.suffix),expected[codecProfile]);assert.equal(a.deliveryProfile,'embedded-assembled');}
+// Exact maintained master shell build goldens, including its explicit artwork
+// download permission. These are build identities, not onchain registration receipts.
+test('maintained embedded shell build goldens stay exact for native and LZMA',async()=>{
+ const expected={native:'0xb40f97a95bf3ed016e6cf773486679ab842d90b40e820ffc8bde7d096c62cbf8','lzma-js':'0xbc4af94db06fb2cd3af01e8ee45149ce3af6940ad1b3e64f2b850068d173e578'};
+ for(const codecProfile of ['native','lzma-js']){const a=await buildCompactInlineKeelShell({codecProfile});assert.equal(sha(a.prefix),'0x4a5405a5794aa91206ef4cebebee127d8917735d4d33546a0bbf8c6bead9a58e');assert.equal(sha(a.suffix),expected[codecProfile]);assert.equal(a.deliveryProfile,'embedded-assembled');}
 });
 test('binary profile uses same protected verifier and bounded reader with governed RPC',async()=>{
  const shell=await buildCompactInlineKeelShell({codecProfile:'lzma-js',onchainDelivery:delivery});assert.equal(shell.deliveryProfile,'onchain-recursive');assert.ok(shell.supportedCodecs.includes('lzma'));const text=Buffer.from(shell.suffix).toString();assert.ok(text.includes('KEEL binary object is not permanently registered and sealed.'));assert.ok(text.includes('Selected KEEL builder does not bind this Hold.'));assert.ok(text.includes('KEEL fallback RPC chain mismatch.'));assert.ok(text.includes('Unknown KEEL container reference.'));

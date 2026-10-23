@@ -1,23 +1,21 @@
+import { snapshotKeelExplicitExternalPreview, type KeelExplicitExternalPreview } from "./external-preview.js";
+import { assertKeelRegisteredNativeGzipProof, type KeelRegisteredNativeGzipProof } from "./registered-native-gzip.js";
 import { assertKeelDataURICompatibility, decodeKeelPreparedDenseCopyFragment } from "./dense-transport.js";
-import { assertKeelFreshPayloadCarriage, inspectKeelInlinePayloadCarriage } from "./inline-transport-audit.js";
-import { createIntegrity, type Integrity } from "@keel/protocol";
+import { assertKeelFreshPayloadCarriage, inspectKeelInlinePayloadCarriage, assertKeelPreparedCollectorInlineMetadata } from "./inline-transport-audit.js";
+import { createIntegrity, type Integrity, resolveKeelTokenURIReadBounds, assertKeelNonstandardTokenURIIdentity, type KeelExplicitNonstandardReadPolicy } from "@keel/protocol";
 import { assertKeelInlineImageBytes } from "./collector-policy.js";
 import { assertKeelInlineNoExternalDependencies, decodeKeelInlineGraphFragment } from "./inline-viewer-graph.js";
-import { KEEL_INLINE_MAX_TOKEN_URI_BYTES, keelInlineReadGasLimit } from "./presentation.js";
 
 const encoder = new TextEncoder();
 const decoder = new TextDecoder("utf-8", { fatal: true });
 const profiles = {
   "application/vnd.keel.token-uri-raw-percent-fragment": "KeelRawTokenURIBuilder",
-  "application/vnd.keel.token-uri-percent-fragment": "KeelPercentTokenURIBuilder",
-  "application/vnd.keel.token-uri-base64-fragment": "KeelHarnessBuilder",
-  "application/vnd.keel.token-uri-base64-body-fragment": "KeelHarnessBuilder",
 } as const;
 
 /** The existing fragment's media type selects its COPY builder; there is no
  * encoder/composer fallback for incompatible binary or a different transport. */
 export function keelPreparedCopyBuilder(mediaType: string): string {
-  if (!Object.hasOwn(profiles, mediaType)) throw new TypeError("Publication requires a supported prepared COPY fragment, not raw binary or a custom transport.");
+  if (!Object.hasOwn(profiles, mediaType)) throw new TypeError("Publication requires the current raw-percent prepared COPY fragment, not retired carriage, raw binary or a custom transport.");
   return profiles[mediaType as keyof typeof profiles];
 }
 
@@ -26,6 +24,9 @@ export function isKeelPreparedCopyMediaType(mediaType: string): boolean {
 }
 
 export interface KeelPreparedCopyReadInput {
+  readonly nonstandardReadPolicy?: KeelExplicitNonstandardReadPolicy;
+  readonly registeredNativeGzip?: KeelRegisteredNativeGzipProof;
+  readonly externalPreview?: KeelExplicitExternalPreview;
   readonly chainId: number;
   readonly store: string;
   readonly mediaType: string;
@@ -91,44 +92,55 @@ function auditCreatorItems(html: Uint8Array): void {
  * registration, wallet authority, a receipt, or visual/browser behavior. */
 export async function assertKeelPreparedCopyRead(input: KeelPreparedCopyReadInput) {
   // Snapshot caller-owned values before the first async digest.
+  const externalPreview = input.externalPreview === undefined ? undefined : snapshotKeelExplicitExternalPreview(input.externalPreview);
   const graphBytes = new Uint8Array(input.graphBytes);
+  const registeredNativeGzip = input.registeredNativeGzip === undefined ? undefined : assertKeelRegisteredNativeGzipProof(input.registeredNativeGzip);
+  if (registeredNativeGzip !== undefined && (registeredNativeGzip.binding.chainId !== input.chainId || registeredNativeGzip.binding.store.toLowerCase() !== input.store.toLowerCase())) throw new TypeError("Native Gzip COPY readback changed its selected chain/store.");
   const graphIntegrity = { ...input.graphIntegrity };
   const { chainId, store, mediaType, expectedTokenURI, returnedTokenURI, callGasLimit, blockGasLimit } = input;
+  const readBounds = resolveKeelTokenURIReadBounds(input.nonstandardReadPolicy);
   const requiredBuilder = keelPreparedCopyBuilder(mediaType);
   if (!Number.isSafeInteger(chainId) || chainId < 1 || !/^0x[0-9a-f]{40}$/iu.test(store) || /^0x0{40}$/iu.test(store)) throw new TypeError("Prepared COPY needs an exact selected-chain store.");
-  if (typeof callGasLimit !== "bigint" || typeof blockGasLimit !== "bigint" || callGasLimit <= 0n || callGasLimit > keelInlineReadGasLimit(blockGasLimit)) throw new RangeError("The complete collection read exceeds the selected-chain public RPC gas boundary.");
+  if (typeof callGasLimit !== "bigint" || typeof blockGasLimit !== "bigint" || callGasLimit <= 0n || callGasLimit > (blockGasLimit < readBounds.maximumReadGas ? blockGasLimit : readBounds.maximumReadGas)) throw new RangeError("The complete collection read exceeds the selected-chain public RPC gas boundary.");
   const actual = await createIntegrity(graphBytes);
   if (actual.algorithm !== graphIntegrity.algorithm || actual.digest.toLowerCase() !== graphIntegrity.digest?.toLowerCase() || actual.byteLength !== graphIntegrity.byteLength) throw new TypeError("Prepared COPY source bytes do not match the publish plan commitment.");
   if (typeof expectedTokenURI !== "string" || typeof returnedTokenURI !== "string" || expectedTokenURI !== returnedTokenURI) throw new TypeError("The complete returned tokenURI differs from canonical preparation. Extra wrapping, transcoding, hexadecimal transport and runtime encoding are not COPY reuse.");
   const returnedBytes = encoder.encode(returnedTokenURI);
-  if (returnedBytes.byteLength > KEEL_INLINE_MAX_TOKEN_URI_BYTES) throw new RangeError("The complete returned tokenURI exceeds the public-reader byte limit.");
+  if (returnedBytes.byteLength > readBounds.maximumTokenUriBytes) throw new RangeError("The complete returned tokenURI exceeds the public-reader byte limit.");
+  const tokenURIIntegrity = await createIntegrity(returnedBytes);
+  assertKeelNonstandardTokenURIIdentity(readBounds.nonstandardReadPolicy, { chainId, digest: tokenURIIntegrity.digest, byteLength: returnedBytes.byteLength });
   const graphText = decoder.decode(graphBytes);
   const at = expectedTokenURI.indexOf(graphText);
   if (graphText.length === 0 || at < 0 || expectedTokenURI.indexOf(graphText, at + graphText.length) >= 0) throw new TypeError("The complete URI must copy the exact prepared graph once, without another encoding layer.");
   const raw = mediaType === "application/vnd.keel.token-uri-raw-percent-fragment";
+  if (externalPreview !== undefined && !raw) throw new TypeError("Explicit external preview requires raw-percent COPY.");
   if (raw && !expectedTokenURI.startsWith("data:application/json;charset=utf-8,")) throw new TypeError("Compact COPY cannot add a complete-metadata Base64 layer.");
-  if (!raw && !expectedTokenURI.startsWith("data:application/json;base64,")) throw new TypeError("Preserve the existing prepared Base64/percent envelope.");
   assertKeelDataURICompatibility(expectedTokenURI, "Prepared tokenURI");
   const metadata = JSON.parse(decoder.decode(dataURI(expectedTokenURI, "application/json"))) as Record<string, unknown>;
   if (raw && (typeof metadata.animation_url !== "string" || !metadata.animation_url.startsWith("data:text/html;charset=utf-8,"))) throw new TypeError("Compact COPY cannot add a complete-HTML Base64 layer.");
   if (typeof metadata.animation_url !== "string") throw new TypeError("Prepared COPY requires animation_url.");
   assertKeelDataURICompatibility(metadata.animation_url, "Prepared animation_url");
   const html = dataURI(metadata.animation_url, "text/html");
-  assertKeelFreshPayloadCarriage(html);
-  const payloadCarriage = inspectKeelInlinePayloadCarriage(html);
+  assertKeelFreshPayloadCarriage(html, { registeredNativeGzip });
+  const payloadCarriage = inspectKeelInlinePayloadCarriage(html, { registeredNativeGzip });
   const sourceHTML = raw && payloadCarriage.preparedDenseCopy?.contractOperation === "verified-copy"
     ? decodeKeelPreparedDenseCopyFragment(graphBytes) : decodeKeelInlineGraphFragment(graphBytes, mediaType);
   if (!decoder.decode(html).includes(decoder.decode(sourceHTML))) throw new TypeError("Returned animation does not contain the exact decoded prepared graph.");
   auditCreatorItems(html);
-  if (typeof metadata.image !== "string" || !metadata.image.startsWith("data:image/")) throw new TypeError("Prepared COPY needs the self-contained original collector image.");
-  assertKeelDataURICompatibility(metadata.image, "Prepared image");
-  const imageHeader = metadata.image.slice(5, metadata.image.indexOf(",")).split(";", 1)[0]!;
-  assertKeelInlineImageBytes(dataURI(metadata.image, imageHeader), imageHeader);
+  if (externalPreview !== undefined) assertKeelPreparedCollectorInlineMetadata(metadata, { registeredNativeGzip, externalPreview });
+  else {
+    if (typeof metadata.image !== "string" || !metadata.image.startsWith("data:image/")) throw new TypeError("Prepared COPY needs the self-contained original collector image.");
+    assertKeelDataURICompatibility(metadata.image, "Prepared image");
+    const imageHeader = metadata.image.slice(5, metadata.image.indexOf(",")).split(";", 1)[0]!;
+    assertKeelInlineImageBytes(dataURI(metadata.image, imageHeader), imageHeader);
+  }
   return Object.freeze({
+    ...(externalPreview === undefined ? {} : { externalPreview }),
     schema: "keel-prepared-copy-read-check@1" as const,
     policy: "prepared-copy" as const, chainId, store: store.toLowerCase(), mediaType,
     requiredBuilder, readOperation: "copy-prepared-fragments" as const,
-    graphIntegrity: actual, tokenURIIntegrity: await createIntegrity(returnedBytes),
+    graphIntegrity: actual, tokenURIIntegrity,
+    ...(readBounds.nonstandardReadPolicy === undefined ? {} : { nonstandardReadPolicy: readBounds.nonstandardReadPolicy }),
     completeTokenURIBytes: returnedBytes.byteLength, payloadCarriage,
     callGasLimit: callGasLimit.toString(), blockGasLimit: blockGasLimit.toString(),
     selectedChainReadAuthenticated: false as const,
@@ -138,4 +150,4 @@ export async function assertKeelPreparedCopyRead(input: KeelPreparedCopyReadInpu
 
 export type KeelPreparedCopyReadCheck = Awaited<ReturnType<typeof assertKeelPreparedCopyRead>>;
 export type KeelPreparedCopyPublishEvidence = Pick<KeelPreparedCopyReadInput,
-  "graphBytes" | "expectedTokenURI" | "returnedTokenURI" | "callGasLimit" | "blockGasLimit">;
+  "graphBytes" | "expectedTokenURI" | "returnedTokenURI" | "callGasLimit" | "blockGasLimit" | "nonstandardReadPolicy" | "registeredNativeGzip" | "externalPreview">;

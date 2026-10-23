@@ -1,5 +1,4 @@
 import assert from "node:assert/strict";
-import { spawn } from "node:child_process";
 import { once } from "node:events";
 import { readFile, readdir, stat } from "node:fs/promises";
 import { createServer } from "node:http";
@@ -14,6 +13,8 @@ import {
   buildKeelPreparedOneOfOneTokenURI,
   buildKeelInlineShellFragments,
 } from "../packages/sdk/dist/index.js";
+import {observeOfflineShell} from "./support/offline-shell-browser.mjs";
+import {dumpBrowserDom} from "./helpers/browser-dom-navigation.mjs";
 
 async function headlessChrome() {
   if (process.env.KEEL_CHROME_HEADLESS_SHELL) return process.env.KEEL_CHROME_HEADLESS_SHELL;
@@ -26,18 +27,8 @@ async function headlessChrome() {
   return candidate;
 }
 
-function dumpDOM(binary, url) {
-  return new Promise((resolve, reject) => {
-    const child = spawn(binary, ["--headless", "--virtual-time-budget=2500", "--dump-dom", url], { stdio: ["ignore", "pipe", "pipe"] });
-    let stdout = "";
-    let stderr = "";
-    child.stdout.setEncoding("utf8");
-    child.stderr.setEncoding("utf8");
-    child.stdout.on("data", (value) => { stdout += value; });
-    child.stderr.on("data", (value) => { stderr += value; });
-    child.on("error", reject);
-    child.on("close", (code) => code === 0 ? resolve({ stdout, stderr }) : reject(new Error(`Chrome failed (${code}): ${stderr}`)));
-  });
+async function dumpDOM(binary,url) {
+  return await dumpBrowserDom(binary,url,{virtualTimeBudgetMs:2500,fixtureMode:'dom-dump'});
 }
 
 async function fixtureServer() {
@@ -60,6 +51,7 @@ async function fixtureServer() {
   await once(server, "listening");
   return {
     origin: `http://127.0.0.1:${server.address().port}`,
+    validHTML,
     close: () => new Promise((resolve, reject) => server.close((error) => error ? reject(error) : resolve())),
   };
 }
@@ -74,7 +66,13 @@ test("the protected K shell mounts only verified art inside an opaque network-de
     assert.match(valid.stdout, /class="verify-page-nav"/u);
     assert.match(valid.stdout, /data-keel-panel-placement="right"/u);
     assert.match(valid.stdout, /sandbox="allow-scripts allow-pointer-lock allow-downloads"/u);
-    assert.doesNotMatch(valid.stdout, /allow-same-origin|>PWNED<|https?:\/\//u);
+    assert.doesNotMatch(valid.stdout, /allow-same-origin|>PWNED</u);
+    const offline = await observeOfflineShell(fixture.validHTML, 'verified');
+    assert.deepEqual(offline.externalRequests, []);
+    assert.deepEqual(offline.pageNetworkRequests, []);
+    assert.deepEqual(offline.errors, []);
+    assert.equal(offline.opaque, true);
+    assert.equal(offline.frames, 1);
     assert.doesNotMatch(valid.stderr, /Uncaught|net::ERR|Failed to load resource/iu);
 
     const invalid = await dumpDOM(chrome, `${fixture.origin}/invalid`);
@@ -99,7 +97,7 @@ test("the marketplace-safe prepared animation URI installs token context before 
     },
   });
   const graph = await buildKeelInlinePreEncodedTokenURIGraph(local, { legacyCarriage: "acknowledged" });
-  const prepared = await buildKeelPreparedOneOfOneTokenURI({
+  const legacyInput = {
     graph,
     chainId: 11_155_111,
     collection: `0x${"ab".repeat(20)}`,
@@ -108,7 +106,9 @@ test("the marketplace-safe prepared animation URI installs token context before 
     imageURI: "data:image/svg+xml;base64,PHN2Zy8+",
     manifestURI: `web3://0x${"cd".repeat(20)}:11155111/object/0x${"ef".repeat(32)}`,
     manifestDigest: `0x${"12".repeat(32)}`,
-  });
+  };
+  await assert.rejects(() => buildKeelPreparedOneOfOneTokenURI(legacyInput), /automatic raw-percent carriage/u);
+  const prepared = await buildKeelPreparedOneOfOneTokenURI({...legacyInput, presentationPolicy: "raw-artifact"});
   const metadata = JSON.parse(Buffer.from(prepared.tokenURI.split(",", 2)[1], "base64").toString("utf8"));
   const animationPayload = metadata.animation_url.split(",", 2)[1];
   assert.match(animationPayload, /^(?:[A-Za-z0-9+/]{4})*(?:[A-Za-z0-9+/]{2}==|[A-Za-z0-9+/]{3}=)?$/u);
@@ -148,7 +148,7 @@ test("the compact escaped animation URI is directly browser-readable without inn
     },
   });
   const graph = await buildKeelInlineEscapedTokenURIGraph(local, { legacyCarriage: "acknowledged" });
-  const prepared = await buildKeelPreparedOneOfOneTokenURI({
+  const legacyInput = {
     graph,
     chainId: 11_155_111,
     collection: `0x${"ab".repeat(20)}`,
@@ -157,7 +157,9 @@ test("the compact escaped animation URI is directly browser-readable without inn
     imageURI: "data:image/svg+xml;base64,PHN2Zy8+",
     manifestURI: `web3://0x${"cd".repeat(20)}:11155111/object/0x${"ef".repeat(32)}`,
     manifestDigest: `0x${"12".repeat(32)}`,
-  });
+  };
+  await assert.rejects(() => buildKeelPreparedOneOfOneTokenURI(legacyInput), /automatic raw-percent carriage/u);
+  const prepared = await buildKeelPreparedOneOfOneTokenURI({...legacyInput, presentationPolicy: "raw-artifact"});
   const metadata = JSON.parse(Buffer.from(prepared.tokenURI.split(",", 2)[1], "base64").toString("utf8"));
   assert.equal(prepared.animationEncoding, "percent");
   assert.equal(prepared.requiredBuilder, "KeelPercentTokenURIBuilder");
@@ -185,11 +187,12 @@ test("the unchanged canonical shell rejects changed artwork bytes and accepts th
     entry: { id: "response.html", mediaType: "text/html", compression: "none", source: entry },
   });
   const original = new TextDecoder().decode(local.rootBytes);
-  const originalPayload = `"storedBase64":"${Buffer.from(entry).toString("base64")}"`;
+  const escapedString = value => JSON.stringify(value).replaceAll("<", "\\u003c").replaceAll(">", "\\u003e");
+  const originalPayload = `"storedText":${escapedString(new TextDecoder().decode(entry))}`;
   const changedBytes = Buffer.from(new TextDecoder().decode(entry).replace("ORIGINAL", "MODIFIED"));
   assert.equal(changedBytes.byteLength, entry.byteLength, "same-length substitution must require a digest check");
   assert.equal(original.split(originalPayload).length, 2, "exactly one creator payload is replaced");
-  const changed = original.replace(originalPayload, `"storedBase64":"${changedBytes.toString("base64")}"`);
+  const changed = original.replace(originalPayload, `"storedText":${escapedString(changedBytes.toString("utf8"))}`);
   assert.deepEqual([...changed.matchAll(/"digest":"0x[0-9a-f]{64}"/gu)].map(match => match[0]),
     [...original.matchAll(/"digest":"0x[0-9a-f]{64}"/gu)].map(match => match[0]),
     "all original digest commitments stay intact");

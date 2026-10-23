@@ -10,6 +10,16 @@ await cp(new URL("../../../skills/fray-keel-agent/", import.meta.url), new URL("
 
 // Bundle the exact documents referenced by the distributed skill.
 const documents = [
+  'ARCHITECTURE.md',
+  'KEEL_CONTRACTS.md',
+  'KEEL_MODULES.md',
+  'KEEL_VERIFICATION_SHELL.md',
+  'INLINE_RECORD.md',
+  'CONTENT_SYSTEM_STATUS.md',
+  'PROOF_MARKET_PACKING.md',
+  'KEEL_NETWORK_DISCOVERY.md',
+  'KEEL_RPC_SETUP.md',
+  'KEEL_STUDIO_WALLET_REVIEW.md',
   'KEEL_PREPARED_COPY_ASSEMBLY.md',
   'KEEL_PREPARED_DENSE_COPY.md',
   'KEEL_INLINE_PAYLOAD_BOUNDARIES.md',
@@ -23,5 +33,9 @@ const documents = [
 const documentOutput = new URL('../dist/docs/', import.meta.url);
 await mkdir(documentOutput, {recursive:true});
 for (const document of documents) {
-  await cp(new URL(`../../../docs/${document}`, import.meta.url), new URL(document, documentOutput));
+  try { await cp(new URL(`../../../docs/${document}`, import.meta.url), new URL(document, documentOutput)); }
+  catch (error) {
+    // Historical optional audit notes may be absent; current distributed skill references remain required.
+    if (!['INLINE_RECORD.md', 'CONTENT_SYSTEM_STATUS.md', 'PROOF_MARKET_PACKING.md'].includes(document) || error?.code !== 'ENOENT') throw error;
+  }
 }

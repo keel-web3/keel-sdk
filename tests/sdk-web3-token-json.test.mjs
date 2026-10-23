@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { mkdtemp, writeFile, rm } from 'node:fs/promises';
+import { mkdtemp, readFile, writeFile, rm } from 'node:fs/promises';
 import { buildKeelInlineShellFragments, buildKeelInlineLocalDocument, buildKeelInlineImageURI, buildKeelWeb3TokenJSONGraph } from '../packages/sdk/dist/inline-viewer-graph.js';
 import { createMcpServer } from '../packages/mcp/dist/server.js';
 import { buildKeelInlineRawPercentTokenURIGraph } from '../packages/sdk/dist/inline-viewer-graph.js';
@@ -10,17 +10,15 @@ const original = { name: 'TokenGator #0', description: 'Quotes " / percent % / Ã
 const decode = uri => decodeURIComponent(uri.slice(uri.indexOf(',')+1));
 
 test('web3 budgets the returned JSON, not an unused outer data URI encoding', async () => {
-  const base = await buildKeelInlineLocalDocument({shell:await buildKeelInlineShellFragments(),modules:[],entry:{id:'entry',mediaType:'text/html',source:Buffer.from('<p>Budget boundary</p>')}});
-  const documentWithComment = count => {
-    const parts = [...base.parts.slice(0,-1),{kind:'creator',role:'entry',bytes:Buffer.from(`<!--${'%'.repeat(count)}-->`)},base.parts.at(-1)];
-    return {...base,parts,rootBytes:Buffer.concat(parts.map(p=>Buffer.from(p.bytes)))};
-  };
-  const document = documentWithComment(420_000);
+  const shell = await buildKeelInlineShellFragments();
+  // Add the comment to creator source before serialization, never inside a JSON slot.
+  const documentWithComment = count => buildKeelInlineLocalDocument({shell,modules:[],entry:{id:'entry',mediaType:'text/html',source:Buffer.from(`<p>Budget boundary</p><!--${'%'.repeat(count)}-->`)}});
+  const document = await documentWithComment(420_000);
   await assert.rejects(buildKeelInlineRawPercentTokenURIGraph(document),/public-read ceiling/);
   const plan = await buildKeelWeb3TokenJSONGraph({document,metadata:original,imageURI:buildKeelInlineImageURI(svg,'image/svg+xml'),tokenId:'0'});
   assert.ok(plan.bytes.length < 2_000_000);
   assert.equal(decode(plan.metadata.animation_url),Buffer.from(document.rootBytes).toString());
-  await assert.rejects(buildKeelWeb3TokenJSONGraph({document:documentWithComment(700_000),metadata:original,imageURI:buildKeelInlineImageURI(svg,'image/svg+xml'),tokenId:'0'}),/Complete web3 JSON/);
+  await assert.rejects(buildKeelWeb3TokenJSONGraph({document:await documentWithComment(700_000),metadata:original,imageURI:buildKeelInlineImageURI(svg,'image/svg+xml'),tokenId:'0'}),/Complete web3 JSON/);
 });
 
 test('raw JSON preserves original fields, shares image payloads and carries the exact canonical HTML', async () => {
@@ -71,7 +69,7 @@ test('MCP external URI preparation keeps token zero and does not propose KEEL721
 });
 
 test('the standard SDK and MCP path shares each prepared layer across SVG and HTML',async()=>{
- const raw=Buffer.from('layer-data-+/=');
+ const raw=await readFile(new URL('../examples/demos/p5-flowfield/poster.webp',import.meta.url));
  const image=Buffer.from(`<svg xmlns="http://www.w3.org/2000/svg"><image href="data:image/webp;base64,${raw.toString('base64')}"/></svg>`);
  const entry=Buffer.from('<!doctype html><p>Layers</p>');
  const document=await buildKeelInlineLocalDocument({shell:await buildKeelInlineShellFragments(),modules:[],assets:[{id:'layer',mediaType:'image/webp',source:raw,compression:'none'}],entry:{id:'entry',mediaType:'text/html',source:entry}});

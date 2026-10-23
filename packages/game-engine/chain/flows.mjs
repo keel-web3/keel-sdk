@@ -8,7 +8,7 @@
 import { defaultEngine, engineBuilds } from "./build.mjs";
 import { publishEngineRecord } from "./engine-release.mjs";
 import { clientsFor, readRecord, writeRecord } from "./local-chain.mjs";
-import { gasByShare, missingOnChain, missingShared, planGame, planTotals, readGame, releaseRecordOf, sendAll, shareLinks, transactionsFor } from "./publication.mjs";
+import { gasByShare, missingOnChain, missingShared, planEngineRelease, planGame, planTotals, readGame, releaseRecordOf, sendAll, shareLinks, transactionsFor } from "./publication.mjs";
 import { reusePublishedSlots } from './reuse.mjs';
 
 const hex = (bytes) => Buffer.from(bytes).toString("hex");
@@ -21,7 +21,8 @@ export async function publishEngineRelease({ rpc, deployment, builds, shell, log
   const engine = await buildsOf(builds);
   const release = await engine.buildEngineRelease({ shell });
   if (release.failed.length) log(`Not published (didn't bundle): ${release.failed.map((f) => `${f.id} (${f.error})`).join("; ")}`);
-  const plan = await planGame({ doc: release.doc, engineModuleIds: release.engineModuleIds, hold: deployment.KeelHold, gameId: "keel-engine/release" });
+  const doc = await reusePublishedSlots({ doc: release.doc, engineModuleIds: release.engineModuleIds, release: readRecord("engine-release"), publicClient, chainId, hold: deployment.KeelHold });
+  const plan = await planEngineRelease({ doc, shell: release.shell, engineModuleIds: release.engineModuleIds, hold: deployment.KeelHold });
   const missing = await missingOnChain({ publicClient, plan });
   const txs = transactionsFor({ plan, missing, shares: ["shell", "engine"], root: false });
   log(`Engine release: ${plan.parts.filter((p) => p.share !== "game").length} shared objects, ${txs.length} transactions to send.`);

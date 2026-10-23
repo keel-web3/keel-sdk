@@ -1,8 +1,8 @@
 import { blake2b } from "@noble/hashes/blake2b";
 import { sha256 } from "@noble/hashes/sha256";
 
-import { keelTezosAddressBytes, keelTezosChainIdBytes } from "./tezos-collection.js";
-import type { TezosMichelineValue } from "./tezos-publication.js";
+import { keelTezosAddressBytes, keelTezosChainIdBytes, prepareKeelTezosTokenMetadata, type KeelTezosTokenMetadataInput } from "./tezos-collection.js";
+import type { TezosMichelineValue, TezosTransactionOperation } from "./tezos-publication.js";
 
 /**
  * LIVE TEZOS STATE AT VIEW TIME, WITH A FROZEN SNAPSHOT.
@@ -386,6 +386,11 @@ function encodeMicheline(node: TezosMichelineValue): number[] {
   if (args.length === 1) return [0x05, code, ...encodeMicheline(args[0] as TezosMichelineValue)];
   if (args.length === 2) return [0x07, code, ...encodeMicheline(args[0] as TezosMichelineValue), ...encodeMicheline(args[1] as TezosMichelineValue)];
   throw new TypeError("PACK of a primitive with more than two arguments is not supported here.");
+}
+
+/** Michelson `PACK` of Micheline already in PACK's optimized form (addresses, keys and chain IDs as bytes). */
+export function packKeelTezosMicheline(node: TezosMichelineValue): Uint8Array {
+  return Uint8Array.from([0x05, ...encodeMicheline(node)]);
 }
 
 /** Michelson `PACK` of a value of the declared (comparable) type: 0x05 followed by the binary Micheline. */
@@ -886,5 +891,96 @@ export async function prepareKeelTezosLiveState(input: KeelTezosLiveStatePrepare
     ],
     signing: "not-performed" as const,
     submission: "not-performed" as const,
+  };
+}
+
+/* ------------------------------------------------------------------------ */
+/* Listing-visible traits: a creator-only rewrite in the triggering call      */
+/* ------------------------------------------------------------------------ */
+
+/**
+ * Metadata state on Tezos is a live read in the token's HTML plus a small
+ * rewrite of the traits a marketplace lists, because indexers read the stored
+ * `token_metadata` and never evaluate a view. On EVM the same Studio call is
+ * `tokenURI` reading state directly, so nothing is rewritten there.
+ *
+ * The rewrite stays creator-only. It rides in the same operation group as the
+ * triggering call, signed by the creator, so the group applies atomically:
+ * the state change and its listed traits land together or not at all. The
+ * triggering contract is never made an FA2 administrator and holder editing
+ * (`token_owner_can_edit`) stays off, so no contract or holder gains a
+ * standing right to rewrite metadata.
+ */
+export interface KeelTezosStateRewriteInput {
+  readonly network: string;
+  /** The FA2 administrator who signs the whole group. */
+  readonly creator: string;
+  readonly collection: string;
+  /** The prepared triggering call(s), e.g. a cart registry's record. Never a call to the collection itself. */
+  readonly trigger: readonly TezosTransactionOperation[];
+  /** Small token_info carrying the listing-visible traits (shared artifact URIs, current attributes). */
+  readonly tokens: readonly KeelTezosTokenMetadataInput[];
+}
+
+const MAX_TRIGGER_CALLS = 16;
+
+export function prepareKeelTezosStateRewrite(input: KeelTezosStateRewriteInput) {
+  assertNoSecrets(input);
+  const network = assertNetwork(input.network);
+  const metadata = prepareKeelTezosTokenMetadata({ network, creator: input.creator, collection: input.collection, tokens: input.tokens });
+  if (!Array.isArray(input.trigger) || input.trigger.length === 0 || input.trigger.length > MAX_TRIGGER_CALLS) throw new TypeError(`trigger must list 1..${MAX_TRIGGER_CALLS} prepared calls.`);
+  const triggerContracts = new Set<string>();
+  for (const [index, operation] of input.trigger.entries()) {
+    const label = `trigger[${index}]`;
+    if (operation === null || typeof operation !== "object" || operation.kind !== "transaction") throw new TypeError(`${label} must be a prepared transaction.`);
+    if (typeof operation.destination !== "string" || !KT1.test(operation.destination)) throw new TypeError(`${label}.destination must be a KT1 contract.`);
+    keelTezosAddressBytes(operation.destination, `${label}.destination`);
+    // Collection writes come only from the rewrite below; a trigger cannot widen who edits metadata.
+    if (operation.destination === metadata.collection) throw new TypeError(`${label} calls the collection; the triggering call must be the action contract.`);
+    if (typeof operation.parameters?.entrypoint !== "string" || !VIEW_NAME.test(operation.parameters.entrypoint)) throw new TypeError(`${label}.parameters.entrypoint is required.`);
+    if (typeof operation.amount !== "string" || !/^(?:0|[1-9][0-9]*)$/u.test(operation.amount)) throw new TypeError(`${label}.amount must be mutez as a decimal string.`);
+    triggerContracts.add(operation.destination);
+  }
+  return {
+    schema: "keel.tezos-state-rewrite@1" as const,
+    status: "review-only" as const,
+    family: "tezos" as const,
+    network,
+    expectedSender: metadata.expectedSender,
+    collection: metadata.collection,
+    atomic: true as const,
+    operations: [...input.trigger, ...metadata.operations],
+    tokens: metadata.tokens,
+    authority: {
+      model: "creator-only" as const,
+      holderMetadataEditing: false as const,
+      triggerContracts: [...triggerContracts],
+      triggerContractsAreAdministrators: false as const,
+    },
+    evm: "The same Studio call reads state in tokenURI; there is no metadata write on EVM.",
+    readback: "checkKeelTezosStateRewriteAuthority confirms token_owner_can_edit is off and no trigger contract is an FA2 administrator before the group is signed.",
+    signing: "not-performed" as const,
+    submission: "not-performed" as const,
+  };
+}
+
+/**
+ * Read the collection's editor model before the creator signs: holder editing
+ * must be off and no trigger contract may be an administrator. Read-only.
+ */
+export async function checkKeelTezosStateRewriteAuthority(input: { readonly network: string; readonly rpcUrl: string; readonly collection: string; readonly triggerContracts: readonly string[]; readonly fetchImpl?: typeof fetch }) {
+  if (!Array.isArray(input.triggerContracts) || input.triggerContracts.length === 0 || input.triggerContracts.length > MAX_TRIGGER_CALLS) throw new TypeError(`triggerContracts must list 1..${MAX_TRIGGER_CALLS} contracts.`);
+  const reads: KeelTezosLiveRead[] = [
+    { name: "holderEditing", kind: "view", contract: input.collection, view: "token_owner_can_edit", returns: "bool" },
+    ...input.triggerContracts.map((contract, index): KeelTezosLiveRead => ({ name: `trigger${index}`, kind: "view", contract: input.collection, view: "is_administrator", input: { type: "address", value: contract }, returns: "bool" })),
+  ];
+  const layer = await readKeelTezosLiveState({ network: input.network, rpcUrl: input.rpcUrl, reads, ...(input.fetchImpl === undefined ? {} : { fetchImpl: input.fetchImpl }) });
+  const administrators = Object.fromEntries(input.triggerContracts.map((contract, index) => [contract, layer.snapshot.values[`trigger${index}`] === true]));
+  const holderMetadataEditing = layer.snapshot.values.holderEditing === true;
+  return {
+    ok: !holderMetadataEditing && Object.values(administrators).every((value) => !value),
+    level: layer.snapshot.level,
+    holderMetadataEditing,
+    administrators,
   };
 }

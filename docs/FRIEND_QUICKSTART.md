@@ -1,25 +1,33 @@
 # Try KEEL with your own code
 
-This is a source-based test release: SDK, local MCP, agent skills, visual editor,
+Use the normal [network discovery/configuration workflow](KEEL_NETWORK_DISCOVERY.md):
+`keel-network-discover` selects the deployed chain/creator instance from the public
+index and workspace settings; `keel-network-check` verifies it read-only.
+The Sepolia commands below are compatibility/release-fixture checks.
+
+This is a source-based test release: SDK, local MCP, agent skills, optional visual editor,
 and a pinned public game engine. You do not need the maintainer's sibling repos,
 Studio credentials, Docker, or a private key to build and practice locally.
-The desktop is a development preview, not a signed installer.
+Studio provides the full creator workflow and wallet review at
+[studio.onkeel.io](https://studio.onkeel.io/studio). The optional Desktop editor is a
+development preview, not a signed installer. Agents never need it for Studio work.
 
 ## Install once
 
 Install Git, **Node 22.18+** and **pnpm 10.15.0**. For chain practice, also
 install [Foundry](https://getfoundry.sh/) so `anvil --version` works.
-macOS is the currently exercised desktop platform. Linux needs Electron's GUI
-libraries and a display. Native Windows desktop/Anvil setup is not certified.
+The Studio connection opens your browser on macOS, Windows or Linux. Desktop
+is separate: macOS is the currently exercised Desktop platform; Linux needs
+Electron GUI libraries and a display. Native Windows Desktop/Anvil setup is not certified.
 
 ```sh
-git clone https://github.com/keel-web3/keel-sdk.git
+git clone --branch master https://github.com/keel-web3/keel-sdk.git
 cd keel-sdk
 pnpm setup:friend
 ```
 
 Setup installs locked dependencies, builds the SDK/MCP, fetches the exact engine
-commit in `packages/game-engine/engine.lock.json`, links it, builds the editor,
+commit in `packages/game-engine/engine.lock.json`, links it,
 and checks MCP discovery. It creates an empty `.keel-workspace` artwork folder
 with project-scoped MCP settings and copies of the available KEEL skills for
 Codex and Claude Code. It does not start a server, send a model request, or
@@ -29,8 +37,9 @@ absolute path and your Node executable.
 For existing artwork, use `pnpm setup:friend --workspace /absolute/path/to/art`.
 Existing agent settings and skill copies are preserved; setup prints anything
 that needs merging. The generated `.keel/codex.toml` and `.keel/mcp.json` always
-contain the new connection. Other MCP clients can use that JSON. For a headless
-agent, add `--skip-desktop`. `--skip-engine` supports SDK/MCP-only use.
+contain the new connection. Other MCP clients can use that JSON. Desktop is
+excluded by default; add `--desktop` only to build the optional editor.
+`--skip-engine` supports SDK/MCP-only use.
 After a successful build, `--connect-only --workspace /path/to/another/work`
 connects another folder without reinstalling. Review generated machine-specific
 settings before committing an artwork repository.
@@ -41,18 +50,91 @@ do not automatically upgrade; compare them with `skills/` when updating KEEL.
 See the official [Codex MCP documentation](https://developers.openai.com/codex/mcp/)
 and [skills documentation](https://developers.openai.com/codex/skills/).
 
-## Update to the latest test release
+## Connect the project to your Studio account
 
-From the SDK folder:
+After setup, run:
 
 ```sh
-git pull
-pnpm setup:friend
+pnpm studio:connect --window --workspace /absolute/path/to/art
 ```
 
-Setup fetches and links the engine commit the SDK now pins, and rebuilds the SDK,
-MCP and editor. Your artwork folders and agent settings are kept. Restart the
-editor and reload your agent's MCP connection afterwards.
+Studio opens in a small browser helper. Sign in with your selected wallet, check
+the approval code, choose the permissions, and approve. The SDK saves the scoped
+key privately outside your project; SDK and MCP draft/staging tools use it
+automatically. No `.env` file or Desktop app is required. Agents can use
+`keel-studio-connect` with `start`, open `approveUrl` for you, then call `complete`
+after approval. Wallet signatures and transaction approvals remain yours.
+
+## Update an existing local MCP
+
+First inspect the agent's active KEEL connection. A hosted MCP connection is
+updated on the server; it needs no repository update. Reload it and inspect its
+advertised tools. A local Node/stdio connection runs the `keel-sdk` checkout named
+in its executable arguments. Update that checkout only; `keel-contracts`,
+`keel-site` and Desktop are not required for a local MCP update.
+
+The maintained branch is `master` in `keel-web3/keel-sdk`. The old installation
+branch `codex/studio-agent-connect` is not an update lane. For example, its commit
+`66c83ca6c46fc2e8d1a6c86eb678dab8dfa47c1c` and maintained commit
+`7c8eb4ca5c1f879d75d03294bdb7de748052ba8f` both report SDK `0.3.2` / MCP `0.4.2`,
+but only the latter contains the merged owner-bound discovery/guidance changes
+from [PR 20](https://github.com/keel-web3/keel-sdk/pull/20). These are historical
+comparison commits, not pins for future installs. Verify source and capabilities
+instead of treating a matching package version as an update check.
+
+From the configured SDK checkout, inspect before changing it:
+
+```sh
+git remote get-url origin
+git status --short
+git branch --show-current
+git log -1 --format='%H %s'
+git fetch origin master
+git log -1 --format='%H %s' origin/master
+```
+
+Confirm `origin` is the intended `keel-web3/keel-sdk` repository. When the tree is
+clean and local `master` has no unmerged local commits, use `git switch master`
+and `git merge --ff-only origin/master`. If no local `master` exists, use
+`git switch --track origin/master`. Stop on any conflict; do not reset, clean,
+force-pull, or discard local work. `git pull` on the old branch will not switch
+it to maintained code.
+
+For a customized, dirty or diverged checkout, leave it intact and create a
+separate maintained worktree (choose unused branch/directory names):
+
+```sh
+git worktree add -b keel-sdk-maintained ../keel-sdk-maintained origin/master
+cd ../keel-sdk-maintained
+```
+
+Build and reconnect to the **same absolute artwork workspace** that the agent
+already uses:
+
+```sh
+pnpm setup:friend --skip-engine --workspace /absolute/path/to/art
+pnpm studio:connection-status --workspace /absolute/path/to/art
+```
+
+Setup rebuilds SDK/MCP and runs its discovery self-test. `--skip-engine` avoids
+the optional engine fetch; omit it when the artwork needs that engine. Setup
+preserves customized agent settings and existing skill copies, and reports paths
+needing a merge. Inspect the generated `.keel/codex.toml` or `.keel/mcp.json` and
+merge only the KEEL server entry into customized settings. Compare the maintained
+`skills/` with the workspace's `.agents/skills/` and `.claude/skills/`; merge KEEL
+guidance while retaining custom instructions. Existing skill copies are not
+automatically refreshed.
+
+Keep the same artwork path and Studio origin so the private workspace pairing
+remains applicable. Do not delete credentials, copy a key into chat, or reconnect
+merely because code changed. Only an absent, expired or insufficient grant needs
+the normal owner-approved connection flow. Reload the agent's MCP process after
+building and verify its executable path and available `keel-studio-draft`
+operations. Use `list`, then `read` on the same saved release and inspect its
+owner/revision-bound `agentProgress` and `nextActions`; see
+[saved-work discovery](KEEL_STUDIO_WALLET_REVIEW.md#discover-and-continue-saved-work).
+An older hosted server can still omit these fields; report that server boundary
+instead of restaging artwork, buying storage again or inventing a safe action.
 
 ## Pixel engine: part of the SDK
 
@@ -89,9 +171,11 @@ Give the agent this request with your original source attached or in the folder:
 > Plain JavaScript is supported: port JS code onto the engine as JavaScript and
 > don't treat converting it to TypeScript as a requirement or a porting cost.
 
-Then start the editor from the SDK folder:
+For the browser workflow, let your agent prepare the Studio draft and open its
+review/signing link. To use the optional Desktop editor instead:
 
 ```sh
+pnpm setup:friend --desktop
 pnpm desktop
 ```
 
@@ -105,8 +189,8 @@ can use the Interactive Art workflow and code preview without becoming a game.
 
 The editor's own assistant connections need your installed, signed-in agent CLI
 or your own model API credentials. The external MCP connection above is usable
-independently. No hosted Studio is needed for local work; Studio staging and
-hosted publication require a separately configured authorized Studio service.
+independently. Local work is available offline; hosted preparation and wallet
+review use your existing Studio account through the approval-code connection above.
 
 To let the external agent open and update projects in the running editor, copy
 the connection-file path from **Setup → Use your assistant from another app**,
@@ -151,20 +235,33 @@ alone does not establish public-chain size or gas eligibility.
 
 ## Check Sepolia without signing
 
+See [the Sepolia tester handoff](SEPOLIA_TESTER_HANDOFF.md) and
+[`deployments/ethereum-sepolia.json`](../deployments/ethereum-sepolia.json)
+for the current infrastructure inventory and tested modern creator route.
+`pnpm sepolia:manifest` lists the bundled records; `pnpm sepolia:verify`
+rechecks their receipts, runtime code and reader bindings.
+
 ```sh
 pnpm setup:sepolia
 ```
 
-This reads chain ID `11155111`, pins a block, checks both contract runtime hashes
-and deployment receipts, and verifies the builder points to the recorded storage
-contract. It uses a public RPC by default; set `KEEL_SEPOLIA_RPC_URL` for another
-provider. Keep credentials in your environment, not Git. An RPC outage fails the
-check; it never changes networks or reports readiness on failure.
+This reads chain ID `11155111`, pins a block, checks the modern creator instance's
+contract runtime hashes and deployment receipts, and verifies factory/renderer
+and reader/store bindings. It defaults to PublicNode, Tenderly and the documented public
+1RPC Sepolia endpoint, with pacing, rate-limit cooldowns and history failover.
+Use `pnpm rpc:check` to check access, and `pnpm sepolia:smoke-check` to recheck
+the recorded mint and exact tokenURI without signing.
 
-The checked contract addresses come from
-`packages/game-engine/chain/contracts.mjs`. This check proves infrastructure
-identity only. The agent must still inspect the selected network, search and
-verify shared module/shell records, and validate your project's exact bytes.
+If public endpoints are exhausted, the agent receives `rpc.setup-required`
+and helps configure Alchemy, Infura or QuickNode. Save a private provider locally
+with `pnpm rpc:configure --workspace /path/to/art`, or set
+`KEEL_SEPOLIA_RPC_URL(S)` privately in the process environment. See
+[RPC setup](KEEL_RPC_SETUP.md). No wallet keys are needed for these checks.
+An RPC outage fails verification; it never changes networks or reports readiness.
+
+The checked records are from the SDK registry's `creator-inline-20261005`
+instance. This proves infrastructure identity only. The agent must still search
+and verify shared module/shell records and validate your project's exact bytes.
 In the editor, use the Sepolia preparation action for an unsigned review.
 Actual publication needs your wallet on Sepolia, faucet-provided test ETH,
 explicit approval, successful receipts and exact public read-back. Setup never

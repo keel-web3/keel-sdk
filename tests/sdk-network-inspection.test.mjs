@@ -27,11 +27,11 @@ test('custom EVM networks return fresh fees and setup gaps without pretending de
   try {
     const input = { family: 'ethereum', rpcUrl: server.rpcUrl };
     const first = await inspectNetwork(input);
-    assert.equal(first.chainId, 999999); assert.equal(first.inlineReadGasLimit, '45000000');
+    assert.equal(first.chainId, 999999); assert.equal(first.inlineReadGasLimit, '45000000'); assert.equal(first.transactionGasCap.gasCap, null); assert.equal(first.transactionGasCap.source, 'unregistered-chain-profile'); // min(block 45M, KEEL's documented 30M public-RPC read cap)
     assert.equal(first.fees.gasPriceWei, '2000000000'); assert.ok(first.deployments.every((item) => item.status === 'needs-setup'));
     assert.equal(first.publicationReady, false);
     server.updateGas('0xee6b2800'); assert.equal((await inspectNetwork(input)).fees.gasPriceWei, '4000000000');
-    await assert.rejects(inspectNetwork({ ...input, chainId: 1 }), /chain changed/);
+    await assert.rejects(inspectNetwork({ ...input, chainId: 1 }), /wrong-chain|chain changed/);
     const custom = await inspectNetwork({ ...input, holdAddress: '0x'+'1'.repeat(40) });
     assert.equal(custom.deployments[0].status, 'code-present-identity-unverified');
     assert.ok(server.calls.every((call) => !/send|sign/.test(call.method)));

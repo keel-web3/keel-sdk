@@ -17,6 +17,7 @@ export * from "./keel-sleeve.js";
 export * from "./keel-document.js";
 export * from "./fray-upload.js";
 export * from "./collection-verification.js";
+export * from "./prepared-envelope-capability.js";
 export * from "./wallet-request.js";
 export * from "./wallet-intent.js";
 export * from "./wallet-link.js";
@@ -24,6 +25,7 @@ export * from "./publish-plan.js";
 export * from "./revision-publication.js";
 export * from "./library-publication-plan.js";
 export * from "./managed-publication.js";
+export * from "./rpc-read-manifest.js";
 export * from "./three-scene-publication.js";
 export * from "./three-module.js";
 export * from "./audio-module.js";
@@ -36,6 +38,7 @@ export * from "./drop-api.js";
 export * from "./fray-auction-intent.js";
 export * from "./studio-capabilities.js";
 export * from "./endpoints.js";
+export * from "./rpc.js";
 export * from "./standard-chain-stack.js";
 export * from "./presentation.js";
 export * from "./collector-policy.js";
@@ -63,7 +66,10 @@ export * from "./tezos-publication.js";
 export * from "./tezos-standard.js";
 export * from "./tezos-modules.generated.js";
 export * from "./tezos-collection.js";
+export * from "./tezos-split-registries.js";
+export * from "./tezos-harness-tree.js";
 export * from "./tezos-live-state.js";
+export * from "./chain-capability-map.js";
 
 export * from "./network-inspection.js";
 
@@ -74,6 +80,12 @@ export * from "./hold-publication.js";
 export * from "./treasury.js";
 
 export * from "./admin-pauses.js";
+export * from "./tezos-pause.js";
+export * from "./tezos-automation.js";
+export * from "./tezos-token-bound-account.js";
+export * from "./tezos-recovery.js";
+export * from "./tezos-governance.js";
+export * from "./tezos-entrypoint-capability.js";
 
 export * from "./hold-events.js";
 
@@ -101,6 +113,7 @@ export * from "./mint-pricing.js";
 
 export * from "./one-mint-coupons.js";
 export * from "./bitcoin-proof.js";
+export * from "./signed-anchor.js";
 
 export * from "./ethereum-tezos-proof.js";
 
@@ -119,11 +132,16 @@ export * from "./inline-delivery-profile.js";
 export * from "./prepared-copy-publication.js";
 
 export * from "./inline-transport-audit.js";
+export * from "./prepared-inline-sources.js";
 export * from "./inline-token-read.js";
 
 export * from "./dense-transport.js";
 
 export * from "./prepared-dense-copy.js";
+export * from "./legacy-prepared-dense-copy.js";
+export * from "./legacy-prepared-dense-reader.js";
+export * from "./creator-prepared-inline.js";
+export * from "./module-runtime.js";
 export * from "./inline-descriptor-columns.js";
 
 export * from "./prepared-ppmd-copy.js";
@@ -135,6 +153,29 @@ export {buildKeelShellCatalog,type KeelShellCatalog} from "./verification-shell-
 
 export * from "./marketplace-reader.js";
 export * from "./pre-reveal.js";
+
+export * from "./network-index.js";
+export * from "./network-verification.js";
+export * from "./manager-modules.js";
+
+export * from "./studio-access.js";
+
+export * from "./inline-build-route.js";
+
+export * from "./creator-prepared-route.js";
+
+export * from "./creator-publication-journal.js";
+
+export * from "./creator-prepared-compiler.js";
+
+export * from "./release-wallet-batch.js";
+
+export { createKeelSepoliaSimulationTransport } from "./sepolia-simulation-transport.js";
+export * from "./public-simulation-pool.js";
+export * from "./simulation-capacity-policy.js";
+
+export * from "./legacy-shared-image-program.js";
+export * from "./tx-gas.js";
 
 export * from "./selected-token-ids.js";
 export * from "./artist-contracts.js";

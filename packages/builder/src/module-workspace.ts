@@ -30,6 +30,7 @@ import { createKeelModuleTypes } from "./module-types.js";
 
 import { mkdir, readFile, readdir, stat, writeFile } from "node:fs/promises";
 import path from "node:path";
+import { prepareKeelModuleRuntime, type KeelModuleRuntime } from "@keel/sdk/module-runtime";
 import {
   createIntegrity,
   utf8ToBytes,
@@ -476,7 +477,7 @@ export interface KeelModuleCatalogEntry {
   readonly types?: Awaited<ReturnType<typeof createKeelModuleTypes>>;
   /** Settings declared in keel.module.json, shown to whoever includes the module. */
   readonly inputs?: KeelModuleInputManifest;
-  readonly runtime?: { readonly encoding: "base64"; readonly data: string; readonly format: string; readonly entry: string };
+  readonly runtime?: KeelModuleRuntime;
   readonly outputDigest: Hex;
   readonly receiptDigest: Hex;
   readonly disposition: KeelSourceReceipt["disposition"];
@@ -523,6 +524,8 @@ export interface KeelModuleCatalog {
 export interface IndexKeelWorkspaceOptions {
   /** Fallback repository URL for manifests that carry none (the keel-modules shape). */
   readonly repositoryUrl?: string;
+  /** URI81 for new catalogs; explicit Base64 preserves an existing catalog's approved consumers. */
+  readonly runtimeEncoding?: "uri81" | "base64";
 }
 
 export interface IndexKeelWorkspaceResult {
@@ -608,7 +611,9 @@ async function catalogEntry(module: KeelWorkspaceModule, options: IndexKeelWorks
     deployed: deployments.length > 0,
     provenance: "vendored",
     origin: null,
-    runtime: { encoding: "base64", data: shippedBytes.toString("base64"), format: recipe.options.format, entry: recipe.entry },
+    runtime: options.runtimeEncoding === "base64"
+      ? { encoding: "base64", data: shippedBytes.toString("base64"), format: recipe.options.format, entry: recipe.entry }
+      : await prepareKeelModuleRuntime(new Uint8Array(shippedBytes), { format: recipe.options.format, entry: recipe.entry }),
   };
 }
 
@@ -676,6 +681,9 @@ async function registrationCatalogEntry(
  * id and the file layout is stable, so a rebuild-free re-index is a no-op diff.
  */
 export async function indexKeelWorkspace(root: string, options: IndexKeelWorkspaceOptions = {}): Promise<IndexKeelWorkspaceResult> {
+  if (options.runtimeEncoding !== undefined && options.runtimeEncoding !== "uri81" && options.runtimeEncoding !== "base64") {
+    throw new TypeError("runtimeEncoding must be uri81 or base64.");
+  }
   const resolvedRoot = path.resolve(root);
   const modules = await discoverKeelWorkspaceModules(resolvedRoot, { allowEmpty: true });
   const publishers = await discoverKeelWorkspacePublishers(resolvedRoot);
@@ -720,6 +728,7 @@ export async function indexKeelWorkspace(root: string, options: IndexKeelWorkspa
   };
   const catalogPath = path.join(resolvedRoot, KEEL_MODULE_CATALOG_FILE);
   await mkdir(path.dirname(catalogPath), { recursive: true });
-  await writeFile(catalogPath, `${JSON.stringify(catalog, null, 2)}\n`);
+  const json = JSON.stringify(catalog, null, 2).replaceAll("<", "\\u003c").replaceAll(">", "\\u003e").replaceAll("&", "\\u0026").replaceAll("\u2028", "\\u2028").replaceAll("\u2029", "\\u2029");
+  await writeFile(catalogPath, `${json}\n`);
   return { catalogPath, catalog };
 }

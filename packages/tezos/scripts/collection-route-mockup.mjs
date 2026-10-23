@@ -19,7 +19,8 @@ import * as route from "../../sdk/dist/tezos-collection.js";
 
 const IMAGE = "tezos/tezos@sha256:c7adc1605e0ac167743e5ccc107c88719d201994b8166dd794ea10fd0488bea2";
 const PROTOCOL = "PsUshuai9Qap";
-const TARGETS = path.resolve(process.env.KEEL_TEZOS_ROUTE_TARGETS ?? path.join(import.meta.dirname, "../../../../keel-contracts/out/tezos-collection-route/targets"));
+const CONTRACTS = process.env.KEEL_CONTRACTS_DIR ?? path.join(import.meta.dirname, "../../../../keel-contracts");
+const TARGETS = path.resolve(process.env.KEEL_TEZOS_ROUTE_TARGETS ?? path.join(CONTRACTS, "out/tezos-collection-route/targets"));
 const outIndex = process.argv.indexOf("--out");
 const OUT = outIndex < 0 ? undefined : path.resolve(process.argv[outIndex + 1]);
 if (!existsSync(TARGETS)) throw new Error(`Compile the route first: keel-contracts/script/tezos/compile-collection-route.sh (${TARGETS})`);
@@ -70,7 +71,7 @@ function apply(step, label, operation, from = "bootstrap1") {
 
 function originate(step, entry, alias) {
   if (entry.operation === null) throw new Error(`${entry.contract} is unresolved: ${entry.unresolvedBindings}`);
-  const directory = `collection_route_${{ creatorProfile: "creator_profile", oneMint: "one_mint" }[entry.artifact] ?? entry.artifact}`;
+  const directory = `collection_route_${{ creatorProfile: "creator_profile", oneMint: "one_mint", entropyCollection: "seeded_collection" }[entry.artifact] ?? entry.artifact}`;
   const compiled = JSON.parse(execFileSync("cat", [path.join(TARGETS, directory, "step_001_cont_0_contract.json")], { encoding: "utf8", maxBuffer: 64 * 1024 * 1024 }));
   if (JSON.stringify(compiled) !== JSON.stringify(entry.operation.script.code)) throw new Error(`${alias} code differs from the prepared origination.`);
   const output = client("originate", "contract", alias, "transferring", "0", "from", "bootstrap1", "running", `/targets/${directory}/step_001_cont_0_contract.tz`, "--init", michelson(entry.operation.script.storage), "--burn-cap", "100", "--force");
@@ -122,16 +123,18 @@ try {
     oneMint: { code: loadCode("collection_route_one_mint") },
   };
   const collectionMetadata = { name: "KEEL Route Mockup", description: "Offline mockup of the KEEL Tezos creator-collection route.", version: "1" };
+  // A 5% default royalty, set at origination as ERC-2981 does in the EVM constructor.
+  const royalty = { receiver: listed2, bps: 500 };
 
   // 1. Foundation originations. The creator-profile manager must be an originated KT1; the mockup uses the Hold.
-  let plan = route.prepareKeelTezosCollectionOriginations({ network, creator, maxSupply: 100, collectionMetadata, code: { hold: code.hold, index: code.index, presentation: code.presentation } });
+  let plan = route.prepareKeelTezosCollectionOriginations({ network, creator, maxSupply: 100, collectionMetadata, royalty, code: { hold: code.hold, index: code.index, presentation: code.presentation } });
   const byKey = (stage, key) => plan.stages[stage].operations.find((entry) => entry.artifact === key);
   const hold = originate("originate", byKey(0, "hold"), "hold");
   const index = originate("originate", byKey(0, "index"), "index");
   const presentation = originate("originate", byKey(0, "presentation"), "presentation");
-  plan = route.prepareKeelTezosCollectionOriginations({ network, creator, maxSupply: 100, collectionMetadata, code, bindings: { hold, index, presentation, manager: hold } });
+  plan = route.prepareKeelTezosCollectionOriginations({ network, creator, maxSupply: 100, collectionMetadata, royalty, code, bindings: { hold, index, presentation, manager: hold } });
   const creatorProfile = originate("originate", byKey(0, "creatorProfile"), "creator_profile");
-  plan = route.prepareKeelTezosCollectionOriginations({ network, creator, maxSupply: 100, collectionMetadata, code, bindings: { hold, index, presentation, creatorProfile } });
+  plan = route.prepareKeelTezosCollectionOriginations({ network, creator, maxSupply: 100, collectionMetadata, royalty, code, bindings: { hold, index, presentation, creatorProfile } });
   const collection = originate("originate", byKey(1, "collection"), "collection");
   const oneMint = originate("originate", byKey(1, "oneMint"), "one_mint");
 
@@ -210,17 +213,74 @@ try {
   ] });
   for (const operation of metadata.operations) apply("token-metadata", `set_token_metadata ${operation.parameters.value.args[0].int}`, operation);
 
+  // 6b. Metadata authority: the creator rewrites; a holder cannot until the creator opts in.
+  const refusedBy = (fn, reason) => { try { fn(); return false; } catch (error) { return String(error.stderr ?? error.stdout ?? error).includes(reason); } };
+  expect("holder editing defaults to creator-only", view(collection, "token_owner_can_edit", "Unit"), "False");
+  const holderEdit = route.prepareKeelTezosTokenMetadata({ network, creator: collector, collection, tokens: [{ tokenId: 1, name: "Holder rename", html, previewSvg: svg }] });
+  expect("holder set_token_metadata refused by default", refusedBy(() => apply("metadata-authority", "holder set_token_metadata (refused)", holderEdit.operations[0], "bootstrap2"), "UNAUTHORIZED_PRESENTATION_EDITOR"), true);
+  const rewrite = route.prepareKeelTezosTokenMetadata({ network, creator, collection, tokens: [{ tokenId: 2, name: "KEEL Route #2 (rewritten)", html, previewSvg: svg }] });
+  apply("metadata-authority", "creator rewrite token 2", rewrite.operations[0]);
+  const holderFreeze = route.prepareKeelTezosTokenMetadata({ network, creator: collector, collection, freeze: true, tokens: [{ tokenId: 4, name: "Holder edit #4", html, previewSvg: svg }] });
+  const holderFreezeOnly = holderFreeze.operations.find((operation) => operation.parameters.entrypoint === "freeze_token_metadata");
+  expect("holder freeze_token_metadata refused by default", refusedBy(() => apply("metadata-authority", "holder freeze_token_metadata (refused)", holderFreezeOnly, "bootstrap2"), "UNAUTHORIZED_PRESENTATION_EDITOR"), true);
+  apply("metadata-authority", "creator enables holder editing", route.prepareKeelTezosMintGateAction({ network, creator, action: "set-holder-metadata-editing", collection, enabled: true }).operation);
+  for (const operation of holderFreeze.operations) apply("metadata-authority", `holder ${operation.parameters.entrypoint} token 4`, operation, "bootstrap2");
+  apply("metadata-authority", "creator disables holder editing", route.prepareKeelTezosMintGateAction({ network, creator, action: "set-holder-metadata-editing", collection, enabled: false }).operation);
+  const frozenRewrite = route.prepareKeelTezosTokenMetadata({ network, creator, collection, tokens: [{ tokenId: 4, name: "Creator after freeze", html, previewSvg: svg }] });
+  expect("creator rewrite of a holder-frozen token refused", refusedBy(() => apply("metadata-authority", "creator rewrite frozen token (refused)", frozenRewrite.operations[0]), "TOKEN_PRESENTATION_FROZEN"), true);
+  metadata.tokens[1] = rewrite.tokens[0];
+  // TZIP-16 collection metadata: creator-maintained until welded.
+  const rename = route.prepareKeelTezosMintGateAction({ network, creator, action: "set-collection-metadata", collection, collectionMetadata: { name: "KEEL Route Mockup (renamed)" } });
+  expect("holder set_contract_metadata refused", refusedBy(() => apply("metadata-authority", "holder set_contract_metadata (refused)", rename.operation, "bootstrap2"), "ADMIN_ONLY"), true);
+  apply("metadata-authority", "creator set_contract_metadata", rename.operation);
+  apply("metadata-authority", "creator freeze_contract_metadata", route.prepareKeelTezosMintGateAction({ network, creator, action: "freeze-collection-metadata", collection }).operation);
+  expect("contract metadata frozen", view(collection, "contract_metadata_frozen", "Unit"), "True");
+  expect("set_contract_metadata refused after the weld", refusedBy(() => apply("metadata-authority", "creator set_contract_metadata (refused)", rename.operation), "CONTRACT_METADATA_FROZEN"), true);
+
+  // 6c. Default royalty: what the KEEL market discovers through royalty_info. Creator-only.
+  const royaltyOf = (price) => view(collection, "royalty_info", `(Pair 1 ${price})`);
+  expect("origination royalty_info pays 5% of 2 tez", /^\(?Some \(Pair "(\w+)" 100000\)\)?$/u.exec(royaltyOf(2_000_000))?.[1], listed2);
+  const holderRoyalty = route.prepareKeelTezosMintGateAction({ network, creator: collector, action: "set-default-royalty", collection, royalty: { receiver: collector, bps: 1000 } });
+  expect("holder set_default_royalty refused", refusedBy(() => apply("royalty", "holder set_default_royalty (refused)", holderRoyalty.operation, "bootstrap2"), "ADMIN_ONLY"), true);
+  apply("royalty", "creator remove-default-royalty", route.prepareKeelTezosMintGateAction({ network, creator, action: "remove-default-royalty", collection }).operation);
+  expect("removed royalty reports None", royaltyOf(2_000_000), "None");
+  const finalRoyalty = { receiver: listed, bps: 750 };
+  apply("royalty", "creator set-default-royalty 7.5%", route.prepareKeelTezosMintGateAction({ network, creator, action: "set-default-royalty", collection, royalty: finalRoyalty }).operation);
+  expect("royalty_info rounds down like ERC-2981", /^\(?Some \(Pair "(\w+)" 1\)\)?$/u.exec(royaltyOf(19))?.[1], listed);
+
   // 7. Read-back through the SDK checker, served by the mockup RPC.
   const check = await route.checkKeelTezosCollectionPublication({
-    network, rpcUrl: "http://localhost:8732", collection, oneMint, hold, index, fetchImpl: mockupFetch,
+    network, rpcUrl: "http://localhost:8732", collection, oneMint, hold, index, fetchImpl: mockupFetch, expectedRoyalty: finalRoyalty,
     expectedManifestDigest: renderer.decodedSha256, expectedObjects: resources.resources.map((resource) => resource.objectId),
-    expectedTokens: metadata.tokens.map((token) => ({ tokenId: token.tokenId, tokenInfo: token.tokenInfo, tokenInfoSha256: token.tokenInfoSha256 })),
+    expectedTokens: [...metadata.tokens, holderFreeze.tokens[0]].map((token) => ({ tokenId: token.tokenId, tokenInfo: token.tokenInfo, tokenInfoSha256: token.tokenInfoSha256 })),
   });
   for (const item of check.checks) process.stdout.write(`  readback ${item.name}: ${item.ok ? "ok" : `FAIL ${JSON.stringify(item.detail)}`}\n`);
   expect("SDK read-back publicationVerified", check.publicationVerified, true);
 
   apply("mint-gate-action", "pause", route.prepareKeelTezosMintGateAction({ network, creator, oneMint, action: "pause", dropId: drop.drop.predictedDropId }).operation);
   apply("mint-gate-action", "withdraw proceeds", route.prepareKeelTezosMintGateAction({ network, creator, oneMint, action: "withdraw" }).operation);
+
+  // 8. Seeded collection: EVM KeelCreatorSeeded721A's profile on KeelSeededCollectionFA2, prepared by the SDK.
+  const seededPlan = route.prepareKeelTezosCollectionOriginations({ network, creator, maxSupply: 100, code: { ...code, entropyCollection: { code: loadCode("collection_route_seeded_collection") } },
+    bindings: { hold, index, presentation, creatorProfile }, entropyProfile: { mode: "derived", sealedTransfers: "allowed", storageOnTransfer: "full-seed" } });
+  const seededEntry = seededPlan.stages[1].operations.find((entry) => entry.artifact === "entropyCollection");
+  expect("seeded plan stages configure_seed_profile after the receipt", seededPlan.stages[2]?.id, "configure-seed-profile");
+  const seeded = originate("seeded", seededEntry, "seeded_collection");
+  const seededAction = (action, sender = creator) => route.prepareKeelTezosSeedAction({ network, sender, collection: seeded, action }).operation;
+  apply("seeded", "set_minter", route.prepareKeelTezosMintGateAction({ network, creator, action: "set-minter", collection: seeded, account: creator, enabled: true }).operation);
+  expect("an unconfigured seeded collection refuses mints", refusedBy(() => apply("seeded", "strike_with_data before the profile (refused)", seededAction({ kind: "mint", recipient: collector, quantity: 1 })), "INVALID_SEED_PROFILE"), true);
+  apply("seeded", "configure_seed_profile (immediate, derived)", seededAction(seededPlan.stages[2].operations[0].prepare.action));
+  expect("seed_configured after the profile", view(seeded, "seed_configured", "Unit"), "True");
+  apply("seeded", "strike_with_data x3", seededAction({ kind: "mint", recipient: collector, quantity: 3, data: "6b65656c" }));
+  expect("an immediate batch is revealed at mint", JSON.stringify(route.decodeKeelTezosSeedDraw(view(seeded, "seed_draw", "0"))), JSON.stringify({ provider: false, revealed: true }));
+  const seeds = [1, 2, 3].map((token) => view(seeded, "token_seed", String(token)));
+  expect("derived token seeds are distinct 32-byte words", new Set(seeds).size === 3 && seeds.every((seed) => /^0x[0-9a-f]{64}$/u.test(seed)), true);
+  expect("keel_mint_seeded_seed reads token_seed", view(seeded, "keel_mint_seeded_seed", "2"), seeds[1]);
+  apply("seeded", "reveal_seed_batch on an immediate batch", seededAction({ kind: "reveal", batchId: 0 }, collector), "bootstrap2");
+  const move = { kind: "transaction", amount: "0", destination: seeded, parameters: { entrypoint: "transfer", value: [{ prim: "Pair", args: [{ string: collector }, [{ prim: "Pair", args: [{ string: listed }, { prim: "Pair", args: [{ int: "2" }, { int: "1" }] }] }]] }] } };
+  apply("seeded", "transfer token 2 (FullSeed cache)", move, "bootstrap2");
+  expect("the transfer materializes token 2", view(seeded, "seed_materialized", "2"), "True");
+  expect("the materialized seed is unchanged", view(seeded, "token_seed", "2"), seeds[1]);
 
   const totals = {};
   for (const record of receipts) {

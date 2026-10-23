@@ -1,0 +1,254 @@
+{
+  "protocol": "keel-sepolia-publication-reference@1",
+  "chainId": 11155111,
+  "collection": "0x8c5731dc35301fA5c222e82bd5405414BDc45Ca2",
+  "tokenId": "1",
+  "mintTransaction": "0x44dc3a4b83de77eb74c0c7a8875a8b7b488de0c83145d1ba52d9e19ff342783c",
+  "link": "https://onchainchecker.xyz/collection/sepolia/0x8c5731dc35301fA5c222e82bd5405414BDc45Ca2/1",
+  "blockNumber": "11892646",
+  "blockHash": "0x452941e1d2edee8daea83f49fe40a6b86c045ae560ccadfd9611d33d5b8602dd",
+  "tokenURI": {
+    "byteLength": 1000126,
+    "sha256": "0x6ad9aada233de387cfa376471a4b2f47a44523bdcd5e33b1cd0c521a303aff10",
+    "matchesPublication": "live-revision-2"
+  },
+  "transport": {
+    "payload": "uri81-block-v1",
+    "compression": "ppmd",
+    "shellBoot": "gzip+base64 and ppmd",
+    "preparation": "build-time",
+    "contractOperation": "verified-copy",
+    "completeDocumentBase64Layers": 0
+  },
+  "uriCompatibility": {
+    "tokenURI": {
+      "strictURICompatible": true
+    },
+    "animationURL": {
+      "strictURICompatible": true
+    },
+    "image": {
+      "strictURICompatible": true
+    }
+  },
+  "resources": {
+    "logical": 28,
+    "containers": 1,
+    "resourceRPCs": 0
+  },
+  "readGasEstimate": "6822229",
+  "shellId": "0x14fbf5986c636c08a0bd9f919fe45905deba37d3271dcbfebbdee171f8a85882",
+  "shell": {
+    "address": "0xEEB9A431632b597bac3d5Dc2B4C901C608DA0f79",
+    "shellId": "0x14fbf5986c636c08a0bd9f919fe45905deba37d3271dcbfebbdee171f8a85882",
+    "revision": "2",
+    "parts": [
+      "0x68c045029106ee3f3d9541b9cec09f6aa6459d65a81c5fca4a74037f57dddb75",
+      "0x5ea017970980292d3a3d9c1700ab72f3e2bcf9c1f619e468ad9b228d71297de5",
+      3,
+      true,
+      "0x995f4158239d84f4ac8af7e22eb3ed11e9ded4f38e854ce00c1c703c02b7d9b0"
+    ]
+  },
+  "engineCarrier": {
+    "objectId": "0x59b9c53563f0c9bef5035d533bea31621c3d545b202463d4ee4285eec745bad1",
+    "digest": "0xbb5ea043f129fa1d6a0e2f886f9c5761ba5605bfc027b6345415f6c551a0c01a",
+    "byteLength": 948738
+  },
+  "records": [
+    {
+      "contract": "KeelCarrierBatcher",
+      "address": "0x1854858Ea4574f4e293466DD0309BB3178d568E3",
+      "txHash": "0xe29fc6aa8bca6b986b266eb5e69a13c6e72f1966ccb3ce42cc42411424c48739",
+      "block": "11831595",
+      "runtimeCodeHash": "0x14e1b4260b30e4240c062b1c4562e2caefd45d0f70acaf086a31f695db8f0d21",
+      "runtimeIntegrity": {
+        "algorithm": "sha256",
+        "digest": "0x6c6ad86981a6032dc777bc01758d839ac0116176a5bac8b82996d628c7fd2713",
+        "byteLength": 3459
+      }
+    },
+    {
+      "contract": "KeelPreparedContainerTablePolicyV2",
+      "address": "0xeeE184aAB5109431d3C85753269F12dDC2E35c88",
+      "txHash": "0x5fb9d6950e0fca31adb1eafae3ca3b357dd5911ba9c25335893060dd6caf7952",
+      "block": "11844862",
+      "runtimeCodeHash": "0xd194c3f28c08e7136f95e96704dfa0a21d56152598fe7e7543b72ee8889e7b57",
+      "runtimeIntegrity": {
+        "algorithm": "sha256",
+        "digest": "0xe4947fa80101a6f72fc56dd51be90dc07fe99d66d576d24cfeb456c54014174f",
+        "byteLength": 4169
+      }
+    },
+    {
+      "contract": "KeelUri81RawTokenURIBuilder",
+      "address": "0x4957B01a17aF3ff45e09a494ADf58a9B9151C582",
+      "txHash": "0x101bb263c30a4462ef3fa450c598542d8c03b6c8893e3e7dcd887231df183d7f",
+      "block": "11845819",
+      "runtimeCodeHash": "0x04861fea44c79529f626c7937cb91a4c4c6972fca5a1a4915b986c7b2672db1e",
+      "runtimeIntegrity": {
+        "algorithm": "sha256",
+        "digest": "0x2d49f2e8ca8aaa8ab153bca02319b1010feae4e260dde8816c5805a41289150e",
+        "byteLength": 13253
+      }
+    },
+    {
+      "contract": "KeelUri81RawFragmentValidationRegistry",
+      "address": "0xd62E073ae13EF5A6c73ad63dA8683758A9430DC9",
+      "txHash": "0x4b6d1b7f1ba1548cc7cf023106904ff1fce5063586408eb27d475413313a5ea3",
+      "block": "11845820",
+      "runtimeCodeHash": "0x983afa48ba28c64365079436b25ba188811398de1d726b624db268e00a1a04a8",
+      "runtimeIntegrity": {
+        "algorithm": "sha256",
+        "digest": "0xc68f2f4cb1838941b98272b5a5e9c2f586144d49c038a222d7d1668044fdb42d",
+        "byteLength": 3084
+      }
+    },
+    {
+      "contract": "KeelUri81RawFragmentRevisionPolicy",
+      "address": "0x3C85BDc161bacA78929703c45E9ef0E8d5134CE7",
+      "txHash": "0x38b4e9b7ab0b107c3101081cc51be02bfc22adb69d926ebba306e9465576864a",
+      "block": "11845821",
+      "runtimeCodeHash": "0x78b6f8ed078bb45e0d5d19397ed0b67fcb5eaf1ac597be09c48e2d2493e4e47a",
+      "runtimeIntegrity": {
+        "algorithm": "sha256",
+        "digest": "0xed52511450849c2b75282babfc2b3544f127ee2113d49b02d671601b281906cc",
+        "byteLength": 933
+      }
+    },
+    {
+      "contract": "KeelUri81RawInlineShellRegistry",
+      "address": "0xEEB9A431632b597bac3d5Dc2B4C901C608DA0f79",
+      "txHash": "0x7eb5688121f3de04810a98d4578a3c31912babc80ab5eb58de85ea7e9b12bad0",
+      "block": "11845822",
+      "runtimeCodeHash": "0xd35757ebf1340d563a04322941ae41f0b18d3b8a5e820551b62858752f21e015",
+      "runtimeIntegrity": {
+        "algorithm": "sha256",
+        "digest": "0x7371303af7a984f25234384b860a5d3fdb340e3d2b16ff850a0a2272e7fa5318",
+        "byteLength": 2920
+      }
+    },
+    {
+      "contract": "KeelUri81PreparedContainerTablePolicy",
+      "address": "0xc45Dea684dA446545DAe9bE6709D6ac304419cFc",
+      "txHash": "0xce6e2c12e75b08a3ff442630af6d8fcc4c09f26ed571bff7d8bea23aabf7fe48",
+      "block": "11845822",
+      "runtimeCodeHash": "0xce21b7a23e6ea65bbae2b22514108a8d70df8fcc5cf150944f0a9d27eecaa6d8",
+      "runtimeIntegrity": {
+        "algorithm": "sha256",
+        "digest": "0x5ae0b6b076f068e5cc1648909ea8892de81a3a508d4aabb8c89b3af6613e5ab6",
+        "byteLength": 4169
+      }
+    },
+    {
+      "contract": "KeelModuleRevisioned721",
+      "address": "0x8c5731dc35301fA5c222e82bd5405414BDc45Ca2",
+      "txHash": "0x1fc06db70806a10478e798fea00c15f6fb8ead1be3f06490ab310a0c7fda08bf",
+      "block": "11845823",
+      "runtimeCodeHash": "0x979fb73b8a8cb46511c80e97e7930f988a759a08b48f6b36ed5bc696803b3682",
+      "runtimeIntegrity": {
+        "algorithm": "sha256",
+        "digest": "0x5ad9b15d77d6b78ee127228e8dab7dc027e0216e2689266fc9aeddbdb8b45311",
+        "byteLength": 18269
+      }
+    },
+    {
+      "contract": "KeelEvmPreparedCarrierInlineComposer",
+      "address": "0x0f028b96DF836e8691f2327097156922FbFd561B",
+      "txHash": "0x04a5205b0e97f64a3fdc49cddc0e30e474239919338fe654e8ad917f3f705a3b",
+      "block": "11845823",
+      "runtimeCodeHash": "0x40a8f01adda4a2087a8a02683c375c0d501f2cf953e6e4df96cd551835b4ac3d",
+      "runtimeIntegrity": {
+        "algorithm": "sha256",
+        "digest": "0xace4cc0424ab59014c9f9cd118473fda0eead1f532e1e176b9737bc563d7844f",
+        "byteLength": 8015
+      }
+    },
+    {
+      "contract": "KeelArtifactFragmentResolver",
+      "address": "0x7AE840d3388E3708e550538b3e98d728a8aD5893",
+      "txHash": "0x7a1bd4314eff627f3a79bf72ab045024fb9e8c4a1599c49947852f475ba7edbe",
+      "block": "11845846",
+      "runtimeCodeHash": "0x7158c67df9e59b91d2ff015ef62e6f2af0782b8df070b00ceaaaf55ee58cf5a9",
+      "runtimeIntegrity": {
+        "algorithm": "sha256",
+        "digest": "0x912cc77f7d701f26850e02aee036d05cb931be9c7011c2458222635dd7ee8e56",
+        "byteLength": 3749
+      }
+    },
+    {
+      "contract": "KeelUri81RawImageRevisionPolicy",
+      "address": "0x16d746c70e2a63c478033c30D722a3E5A753Bffe",
+      "txHash": "0x068b7d452a139d47abe3ba3d3e75d6c5b0c9f85c73276a5b4007f74f39755e65",
+      "block": "11845847",
+      "runtimeCodeHash": "0x2e8a59064067b8187637d31c8d7fc140a0217ef208eb12ff2b016c6157530bed",
+      "runtimeIntegrity": {
+        "algorithm": "sha256",
+        "digest": "0x893073048836a46918086a77414fd3150fa96dabebf458377c39fc1dd7ddbc0e",
+        "byteLength": 1003
+      }
+    },
+    {
+      "contract": "KeelRegisteredArtifactFragmentResolver",
+      "address": "0xcAD8401816D47Fa91CB4B2869b779Cc0fa4FDB85",
+      "txHash": "0x13e8492527330e9993da3e9ab785acfd72082d7ab80fd264c1994ace9a4d9bce",
+      "block": "11845851",
+      "runtimeCodeHash": "0x36d7887586c4369318bc57014c5f582b912431780c3271359acfdc439a7ec821",
+      "runtimeIntegrity": {
+        "algorithm": "sha256",
+        "digest": "0x6ce172dc3c9b28fcd2b7df240dc11f55ff3e6197a662d301ddff6e1d43875c76",
+        "byteLength": 7667
+      }
+    },
+    {
+      "contract": "KeelModulePrepared721PresentationV2",
+      "address": "0xa44e9A599f11315F4179fE132d65283f94874794",
+      "txHash": "0xde7e53fb52a71a66a4816706508d6108945edf2a51ce409409170606e4d6c02f",
+      "block": "11845852",
+      "runtimeCodeHash": "0xeaaa651857df909b8099a5db0f46164b9a1fd1977480b479ea71dcc1e7bd8a97",
+      "runtimeIntegrity": {
+        "algorithm": "sha256",
+        "digest": "0x2695a497a0e9b57fe9c7b9c215df4d59da06ba6febb6ff45749025a2d4dc48ec",
+        "byteLength": 16073
+      }
+    },
+    {
+      "contract": "ERC1967Proxy",
+      "address": "0x560AeEFAE5e9a9cC94198B25Dc359C1579763DB6",
+      "txHash": "0x189798d00ed2829cc1c640515fe2fd76b12da443c6dc492bbee36d0f58280ddf",
+      "block": "11831477",
+      "runtimeCodeHash": "0x46a010df31eb642b47284650e80051e8f6239a0c995003d230b437810bc4b9b4",
+      "runtimeIntegrity": {
+        "algorithm": "sha256",
+        "digest": "0x257725b3197c327ba0c61bc82c91d399b51be675971f186578c13e6b55cb0714",
+        "byteLength": 76
+      },
+      "source": "REDLINE public deployment journal",
+      "scope": "application-reference",
+      "verification": {
+        "status": "receipt-and-runtime-verified",
+        "blockNumber": "11852174",
+        "blockHash": "0xeb2e2fad4c45da995b345234478b78bfd6b618436676f771af3425fb938c29bb"
+      }
+    }
+  ],
+  "evidence": {
+    "source": "existing REDLINE public publication plus current selected-chain receipts/runtime and byte readback",
+    "checkedAt": "2026-10-11T15:41:26.704Z",
+    "chainWrites": 0
+  },
+  "revisionCaveat": "Follow-latest shell: reauthenticate current URI, shell revision, source identities and composer before use. This reference is the published game, not the pending WIP trailer.",
+  "managedRoute": {
+    "manager": "0x560AeEFAE5e9a9cC94198B25Dc359C1579763DB6",
+    "moduleId": "0x8b822ec80d377753f8bc64d48821d9b5ffbbaae7f8a619da6ab9bd29dcd58158",
+    "consumer": "0xa44e9A599f11315F4179fE132d65283f94874794",
+    "composer": "0x0f028b96DF836e8691f2327097156922FbFd561B",
+    "composerRevision": "1",
+    "composerCodeHash": "0x40a8f01adda4a2087a8a02683c375c0d501f2cf953e6e4df96cd551835b4ac3d",
+    "composerCodeHashAlgorithm": "keccak256",
+    "replacementTool": "keel-manager-module-replacement-prepare",
+    "inspectionTool": "keel-manager-modules-inspect",
+    "status": "requires-selected-chain-consumer-binding-readback",
+    "store": "0xD820e337692A6Eb7a4878e42ce88CBCFF49B55CF"
+  }
+}

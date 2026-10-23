@@ -1,0 +1,116 @@
+{
+  "source": "311d61526284248938e335d7ed879089408933be",
+  "node": "v22.22.1",
+  "commands": [
+    {
+      "cwd": "/Users/ravonus/dev/wt/studio-storage-review-compat-20261020/keel-sdk",
+      "argv": [
+        "/Users/ravonus/.nvm/versions/node/v22.22.1/bin/node",
+        "node_modules/typescript/bin/tsc",
+        "-p",
+        "packages/sdk/tsconfig.json"
+      ],
+      "log": "311-sdk-build.log",
+      "exitCode": 0
+    },
+    {
+      "cwd": "/Users/ravonus/dev/wt/studio-storage-review-compat-20261020/keel-sdk",
+      "argv": [
+        "/Users/ravonus/.nvm/versions/node/v22.22.1/bin/node",
+        "node_modules/typescript/bin/tsc",
+        "-p",
+        "packages/mcp/tsconfig.json"
+      ],
+      "log": "311-mcp-build.log",
+      "exitCode": 0
+    },
+    {
+      "cwd": "/Users/ravonus/dev/wt/studio-storage-review-compat-20261020/keel-sdk",
+      "argv": [
+        "/Users/ravonus/.nvm/versions/node/v22.22.1/bin/node",
+        "--test",
+        "tests/sdk-studio-storage-review.test.mjs",
+        "tests/sdk-studio-agent-drafts.test.mjs",
+        "tests/mcp-studio-draft.test.mjs",
+        "tests/keel-studio-agent-drafts-cli.test.mjs",
+        "tests/sdk-studio-agent-guidance.test.mjs"
+      ],
+      "log": "311-emitted-tests.log",
+      "exitCode": 0
+    },
+    {
+      "cwd": "/Users/ravonus/dev/wt/studio-storage-review-compat-20261020/keel-sdk",
+      "argv": [
+        "/Users/ravonus/.nvm/versions/node/v22.22.1/bin/node",
+        "--test",
+        "/private/tmp/keel-storage-review-compat-20261020/independent-storage-variant.test.mjs"
+      ],
+      "log": "311-independent.log",
+      "exitCode": 0,
+      "env": {
+        "KEEL_QA_SDK_DRAFTS_URL": "file:///Users/ravonus/dev/wt/studio-storage-review-compat-20261020/keel-sdk/packages/sdk/dist/studio-agent-drafts.js",
+        "KEEL_QA_PUBLICATION_REVIEW_APP": "/Users/ravonus/dev/wt/studio-storage-review-compat-20261020/keel-site/apps/studio/src/server/agent/publication-review-app.ts"
+      }
+    },
+    {
+      "cwd": "/Users/ravonus/dev/wt/studio-storage-review-compat-20261020/keel-sdk/packages/protocol",
+      "argv": [
+        "/opt/homebrew/bin/pnpm",
+        "pack",
+        "--pack-destination",
+        "/private/tmp/keel-storage-review-compat-20261020/packages"
+      ],
+      "exitCode": 0
+    },
+    {
+      "cwd": "/Users/ravonus/dev/wt/studio-storage-review-compat-20261020/keel-sdk/packages/viewer",
+      "argv": [
+        "/opt/homebrew/bin/pnpm",
+        "pack",
+        "--pack-destination",
+        "/private/tmp/keel-storage-review-compat-20261020/packages"
+      ],
+      "exitCode": 0
+    },
+    {
+      "cwd": "/Users/ravonus/dev/wt/studio-storage-review-compat-20261020/keel-sdk/packages/builder",
+      "argv": [
+        "/opt/homebrew/bin/pnpm",
+        "pack",
+        "--pack-destination",
+        "/private/tmp/keel-storage-review-compat-20261020/packages"
+      ],
+      "exitCode": 0
+    },
+    {
+      "cwd": "/Users/ravonus/dev/wt/studio-storage-review-compat-20261020/keel-sdk/packages/sdk",
+      "argv": [
+        "/opt/homebrew/bin/pnpm",
+        "pack",
+        "--pack-destination",
+        "/private/tmp/keel-storage-review-compat-20261020/packages"
+      ],
+      "exitCode": 0
+    },
+    {
+      "cwd": "/Users/ravonus/dev/wt/studio-storage-review-compat-20261020/keel-sdk/packages/ethereum-adapter",
+      "argv": [
+        "/opt/homebrew/bin/pnpm",
+        "pack",
+        "--pack-destination",
+        "/private/tmp/keel-storage-review-compat-20261020/packages"
+      ],
+      "exitCode": 0
+    },
+    {
+      "cwd": "/Users/ravonus/dev/wt/studio-storage-review-compat-20261020/keel-sdk/packages/mcp",
+      "argv": [
+        "/opt/homebrew/bin/pnpm",
+        "pack",
+        "--pack-destination",
+        "/private/tmp/keel-storage-review-compat-20261020/packages"
+      ],
+      "exitCode": 0
+    }
+  ]
+}

@@ -1,0 +1,33 @@
+--- a/internal/ethapi/simulate.go
++++ b/internal/ethapi/simulate.go
+@@ -196,6 +196,8 @@
+ // simulator is a stateful object that simulates a series of blocks.
+ // it is not safe for concurrent use.
+ type simulator struct {
++	// Diagnostic-only wrapper; nil preserves upstream behavior.
++	keelGuard      func(vm.StateDB) vm.StateDB
+ 	b              Backend
+ 	state          *state.StateDB
+ 	base           *types.Header
+@@ -317,6 +319,9 @@
+ 	if hooks := tracer.Hooks(); hooks != nil {
+ 		tracingStateDB = state.NewHookedState(sim.state, hooks)
+ 	}
++	if sim.keelGuard != nil {
++		tracingStateDB = sim.keelGuard(tracingStateDB)
++	}
+ 	evm := vm.NewEVM(blockContext, tracingStateDB, sim.chainConfig, *vmConfig)
+ 	defer evm.Release()
+ 
+@@ -334,7 +339,10 @@
+ 		if err := ctx.Err(); err != nil {
+ 			return nil, nil, nil, err
+ 		}
+-		gasCapped, err := sim.sanitizeCall(&call, sim.state, header, gp)
++		gasCapped, err := sim.sanitizeCall(&call, tracingStateDB, header, gp)
++		if gasCapped && sim.keelGuard != nil {
++			return nil, nil, nil, errors.New("native staged budget would clip requested gas")
++		}
+ 		if err != nil {
+ 			return nil, nil, nil, err
+ 		}

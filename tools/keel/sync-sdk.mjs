@@ -20,36 +20,43 @@ const options = name => {
   if (value === "") throw new Error(`--${name} requires a value`);
   return value;
 };
-const deploymentOnlyArg = options("deployments-only");
-if (deploymentOnlyArg !== undefined) {
-  const ids = new Set(deploymentOnlyArg.split(","));
-  if (!ids.size || [...ids].some(id => !MODULES.some(m => m.id === id)) || ["abis-only", "contracts-only", "modules-only"].some(name => options(name) !== undefined)) throw new Error("Expected known module IDs for --deployments-only, without other scope flags");
-  const fresh = [];
-  for (const id of ids) {
-    const dir = join(metaDir(id), "deployments");
-    if (!existsSync(dir)) continue;
-    for (const file of readdirSync(dir).filter(name => name.endsWith(".json"))) {
-      const rec = JSON.parse(readFileSync(join(dir, file), "utf8"));
-      if (rec.module !== id) throw new Error(`Deployment identity differs from ${id}`);
-      for (const [instance, slot] of Object.entries(rec.deployments ?? {})) for (const c of Object.values(slot.contracts ?? {})) fresh.push({module: id, chainId: rec.chainId, instance, contract: c.contract, address: c.address, block: c.block ?? null, txHash: c.txHash ?? null});
-    }
-  }
-  const pattern = /(export const KEEL_DEPLOYMENTS: [^=]+ = )(\[[\s\S]*?\])( as const;)/;
-  const before = readFileSync(TARGET, "utf8"), match = pattern.exec(before);
-  if (!match) throw new Error("Cannot read generated deployment registry");
-  const next = [...JSON.parse(match[2]).filter(row => !ids.has(row.module)), ...fresh].sort((a,b) => a.module.localeCompare(b.module) || a.chainId-b.chainId || a.instance.localeCompare(b.instance) || a.contract.localeCompare(b.contract));
-  writeFileSync(TARGET, before.replace(pattern, (_all,prefix,_value,suffix) => prefix + JSON.stringify(next,null,2) + suffix));
-  console.log(`sync-sdk: deployments only for ${[...ids].join(", ")}; manifests and ABIs unchanged`);
-  process.exit(0);
-}
 const abiOnly = options("abis-only");
 const contractsOnlyArg = options("contracts-only");
 const contractsOnly = contractsOnlyArg === undefined ? null : new Set(contractsOnlyArg.split(","));
 if (contractsOnly && (!abiOnly || [...contractsOnly].some(name => !/^[A-Za-z_][A-Za-z0-9_]*$/.test(name)))) throw new Error("--contracts-only requires --abis-only and exact contract names");
+const deploymentsOnly = options("deployments-only");
 const selectedArg = options("modules-only");
 const selected = selectedArg === undefined ? null : new Set(selectedArg.split(","));
 if (selected && (abiOnly || !selected.size || [...selected].some(id => !MODULES.some(m => m.id === id)))) throw new Error("Expected known module IDs for --modules-only, without --abis-only");
 if (abiOnly && !MODULES.some(m => m.id === abiOnly)) throw new Error(`Unknown module: ${abiOnly}`);
+
+// Deployment-only refreshes preserve unrelated manifests and ABI baselines.
+if (deploymentsOnly) {
+  const ids = new Set(deploymentsOnly.split(","));
+  if (abiOnly || contractsOnly || selected || [...ids].some(id => !MODULES.some(m => m.id === id))) throw new Error("Expected known module IDs for --deployments-only, without other scopes");
+  const fresh = [];
+  for (const id of ids) {
+    const dir = join(metaDir(id), "deployments");
+    if (!existsSync(dir)) continue;
+    for (const file of readdirSync(dir).filter(f => f.endsWith(".json"))) {
+      const rec = JSON.parse(readFileSync(join(dir, file), "utf8"));
+      if (rec.module !== id) throw new Error(`Deployment module mismatch: ${id}`);
+      for (const [instance, slot] of Object.entries(rec.deployments ?? {})) for (const c of Object.values(slot.contracts ?? {})) {
+        fresh.push({ module: id, chainId: rec.chainId, instance, contract: c.contract, address: c.address, block: c.block ?? null, txHash: c.txHash ?? null, ...(c.runtimeCodeHash ? { runtimeCodeHash: c.runtimeCodeHash } : {}) });
+      }
+    }
+  }
+  let registry = readFileSync(TARGET, "utf8");
+  const pattern = /(export const KEEL_DEPLOYMENTS: [^=]+ = )(\[[\s\S]*?\])( as const;)/;
+  const match = pattern.exec(registry);
+  if (!match) throw new Error("Cannot read existing deployment registry");
+  const next = [...JSON.parse(match[2]).filter(row => !ids.has(row.module)), ...fresh];
+  next.sort((a, b) => a.module.localeCompare(b.module) || a.chainId - b.chainId || a.instance.localeCompare(b.instance) || a.contract.localeCompare(b.contract));
+  registry = registry.replace(pattern, (_, prefix, value, suffix) => prefix + JSON.stringify(next, null, 2) + suffix);
+  writeFileSync(TARGET, registry);
+  console.log(`sync-sdk: deployment records for ${[...ids].join(", ")}; manifests and ABIs unchanged`);
+  process.exit(0);
+}
 
 const modules = [];
 const deployments = [];
@@ -97,7 +104,7 @@ for (const m of MODULES) {
     const rec = JSON.parse(readFileSync(join(dir, f), "utf8"));
     for (const [instance, slot] of Object.entries(rec.deployments ?? {})) {
       for (const c of Object.values(slot.contracts ?? {})) {
-        deployments.push({ module: rec.module, chainId: rec.chainId, instance, contract: c.contract, address: c.address, block: c.block ?? null, txHash: c.txHash ?? null });
+        deployments.push({ module: rec.module, chainId: rec.chainId, instance, contract: c.contract, address: c.address, block: c.block ?? null, txHash: c.txHash ?? null, ...(c.runtimeCodeHash ? { runtimeCodeHash: c.runtimeCodeHash } : {}) });
       }
     }
   }
@@ -185,6 +192,8 @@ export interface KeelDeployment {
   readonly address: \`0x\${string}\`;
   readonly block: string | null;
   readonly txHash: string | null;
+  /** Exact deployed runtime commitment when authenticated separately from the ABI. */
+  readonly runtimeCodeHash?: \`0x\${string}\`;
 }
 
 export const KEEL_MODULES: readonly KeelModule[] = ${JSON.stringify(onlyModules, null, 2)} as const;

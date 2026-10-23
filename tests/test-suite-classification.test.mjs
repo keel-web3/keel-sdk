@@ -6,6 +6,7 @@ import {
   DEFAULT_TEST_FILES,
   DETERMINISTIC_TEST_FILES,
   LIVE_TEST_FILES,
+  LOCAL_EVM_TEST_FILES,
   SIBLING_CONFORMANCE_TEST_FILES,
   TEST_FILES_ON_DISK,
   validateTestSuiteClassification,
@@ -15,6 +16,7 @@ test("[test gate] every suite is classified and browser/live checks stay outside
   assert.deepEqual(validateTestSuiteClassification(), []);
   assert.equal(LIVE_TEST_FILES.length, 0, "live-chain/public-network tests must not enter node:test discovery");
   for (const file of BROWSER_TEST_FILES) assert.equal(DEFAULT_TEST_FILES.includes(file), false, file);
+  for (const file of LOCAL_EVM_TEST_FILES) assert.equal(DEFAULT_TEST_FILES.includes(file), false, file);
   for (const file of LIVE_TEST_FILES) assert.equal(DEFAULT_TEST_FILES.includes(file), false, file);
   for (const file of DETERMINISTIC_TEST_FILES) assert.equal(DEFAULT_TEST_FILES.includes(file), true, file);
   for (const file of SIBLING_CONFORMANCE_TEST_FILES) assert.equal(DEFAULT_TEST_FILES.includes(file), true, file);

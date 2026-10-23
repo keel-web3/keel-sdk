@@ -1,0 +1,62 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import { mkdir, mkdtemp, rm, writeFile } from 'node:fs/promises';
+import os from 'node:os';
+import path from 'node:path';
+const { createMcpServer } = await import('../packages/mcp/dist/index.js');
+const root = await mkdtemp(path.join(os.tmpdir(), 'keel-route-guards-'));
+await writeFile(path.join(root, 'README.md'), '# Local collection route fixture\nSynthetic review only; no signing, submission or external requests.\n');
+await mkdir(path.join(root, 'docs'));
+await writeFile(path.join(root, 'docs', 'ARCHITECTURE.md'), '# Fixture architecture\nThe MCP standards gate precedes the unavailable collection instance check.\n');
+const server = await createMcpServer({ workspaceRoot: root });
+await server.handle({ jsonrpc: '2.0', id: 1, method: 'initialize', params: { protocolVersion: '2024-11-05', capabilities: {}, clientInfo: { name: 'keel-guard-fixtures', version: '1' } } });
+const advertised = await server.handle({ jsonrpc: '2.0', id: 2, method: 'tools/list' });
+const tools = advertised.result.tools.filter(tool => /^(keel-(inline|studio|media|creator|tezos)|publish-plan)/.test(tool.name));
+let id = 2, requests = 0;
+const previousFetch = globalThis.fetch;
+globalThis.fetch = async () => {
+    requests++;
+    throw new Error('External request is forbidden in local acceptance guard test');
+};
+test.after(async () => {
+    globalThis.fetch = previousFetch;
+    await rm(root, { recursive: true, force: true });
+});
+for (const tool of tools)
+    test(`MCP ${tool.name}: malformed explicit operation fails before external request`, async () => {
+        requests = 0;
+        const result = await server.handle({ jsonrpc: '2.0', id: id++, method: 'tools/call', params: { name: tool.name, arguments: { __unsupportedAcceptanceField: true, operation: '__invalid_acceptance_operation__', studioUrl: 'not-a-url' } } });
+        assert.ok(result.error || result.result?.isError === true, JSON.stringify(result));
+        assert.equal(requests, 0, 'Malformed input must not start external I/O');
+    });
+test('creator collection MCP unavailable-instance route is blocked with no signing or submission', async () => {
+    requests = 0;
+    const call = async (name, args) => (await server.handle({ jsonrpc: '2.0', id: id++, method: 'tools/call', params: { name, arguments: args } })).result;
+    const args = { chainId: 11155111, creator: '0x1111111111111111111111111111111111111111', instance: 'acceptance-missing-instance', creatorNonce: '0', operation: { kind: 'dedicated-erc721', config: { name: 'One of One', symbol: 'ONE', maxSupply: 1, metadataDigest: '0x' + 'a'.repeat(64) } } };
+    const missing = await call('keel-creator-collection-prepare', args);
+    assert.equal(missing.isError, true);
+    assert.equal(missing.structuredContent.code, 'standards-evidence-required');
+    const preflight = await call('keel-contract-workflow-preflight', {});
+    assert.notEqual(preflight.isError, true, JSON.stringify(preflight));
+    const preflightReceipt = preflight.structuredContent.receipt.id;
+    const unaudited = await call('keel-creator-collection-prepare', { ...args, standards: { preflightReceipt } });
+    assert.equal(unaudited.isError, true);
+    assert.equal(unaudited.structuredContent.code, 'token-standard-audit-required');
+    const image = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAIAAAACCAYAAABytg0kAAAAFElEQVR4nGP8z8Dwn4GBgYGJAQoAHxcCAk+Uzr4AAAAASUVORK5CYII=';
+    const tokenUri = `data:application/json,${encodeURIComponent(JSON.stringify({ name: 'One of One', image }))}`;
+    const audited = await call('keel-token-standard-audit', { tokenUri });
+    assert.notEqual(audited.isError, true, JSON.stringify(audited));
+    assert.equal(audited.structuredContent.verdict, 'pass');
+    const standards = { preflightReceipt, auditDigest: audited.structuredContent.digest };
+    const result = await server.handle({ jsonrpc: '2.0', id: id++, method: 'tools/call', params: { name: 'keel-creator-collection-prepare', arguments: { ...args, standards } } });
+    assert.equal(result.error, undefined);
+    assert.notEqual(result.result?.isError, true, result.result?.content?.[0]?.text);
+    const p = result.result.structuredContent;
+    assert.equal(p.status, 'blocked');
+    assert.equal(p.walletApproval, 'not-requested');
+    assert.equal(p.signing, 'not-performed');
+    assert.equal(p.submission, 'not-performed');
+    assert.equal(p.standards.preflightReceipt.id, preflightReceipt);
+    assert.equal(p.standards.audit.digest, standards.auditDigest);
+    assert.equal(requests, 0);
+});

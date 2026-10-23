@@ -1,0 +1,59 @@
+{
+  "schema": "keel-shared-image-unqualified-source-checkpoint@1",
+  "baseCommit": "3a2fab4695604461f9e61acd6bbe262e8bc72d41",
+  "status": "unqualified-draft",
+  "files": {
+    "packages/sdk/src/index.ts": {
+      "bytes": 5232,
+      "sha256": "d474aa493b0eb739de13c59bc632703acd4f8ab7848c62f3a92bcda425006149"
+    },
+    "packages/sdk/src/inline-transport-audit.ts": {
+      "bytes": 28874,
+      "sha256": "7f5e8401529eb7ad1e2e5f397da3291d3643b6b8fc8747b4f29056603d0eef69"
+    },
+    "packages/sdk/src/legacy-prepared-dense-copy.ts": {
+      "bytes": 19747,
+      "sha256": "fc757900b3ecdd305ed39cb4ee10b7fb58bb338c3efd111e3c5b1270fe9e6e8e"
+    },
+    "packages/sdk/src/verification-shell.ts": {
+      "bytes": 114199,
+      "sha256": "f6b65f05ec21352f9f3ee73e2660bcce587dd357ed0a9fee065f19a84e6695b9"
+    },
+    "packages/sdk/src/legacy-shared-image-program.ts": {
+      "bytes": 6509,
+      "sha256": "c4231f1b0ffd1ce2638997a1cfc88f402c5f6212e0b07e7f2a7899d9b5c87e1f"
+    },
+    "packages/sdk/src/legacy-shared-image-reader.ts": {
+      "bytes": 14466,
+      "sha256": "fb47fa55fef23e746ceb63719cf5cce8fcca1ed563d5007bc54aa822c8d6496d"
+    },
+    "packages/sdk/contracts/KeelLegacySharedImageTokenURIBuilder.sol": {
+      "bytes": 10648,
+      "sha256": "1124ed40b6cac46da59e72f1fe1aae5fd75717218fd8433054d77b963db1b6a0"
+    },
+    "packages/studio-core/src/prepare.ts": {
+      "bytes": 37671,
+      "sha256": "1f97a9ec86d1c29f9165f66b08e4a9aa2605c28ad8cc48790862ce1c55a40f3c"
+    },
+    "tests/fixtures/legacy-shared-image/LocalHold.sol": {
+      "bytes": 2421,
+      "sha256": "3267ebe0a5cc12c2e175acfd609ac62a3ab308332d30deb20b244cad208b506c"
+    },
+    "tests/sdk-legacy-shared-image-evm-browser.test.mjs": {
+      "bytes": 13517,
+      "sha256": "5f543e84e190f9ea04e1998e50c5edf5e3b8e5f68637e57c8234a4821ec4da6c"
+    },
+    "tests/sdk-legacy-shared-image.test.mjs": {
+      "bytes": 3986,
+      "sha256": "a468e98026b6b8de6f8d732d051586a8c2ed78e86a3a9ab3a041c3a81758d175"
+    },
+    "tests/support/legacy-shared-image-fixture.mjs": {
+      "bytes": 2652,
+      "sha256": "62d85a913830a770841d19347473c960f6c3658f631fb7b1833015b01a5ed4cf"
+    },
+    "tests/support/shared-image-contracts.mjs": {
+      "bytes": 2325,
+      "sha256": "f65c6cf924064f3a94c0dace5acc6f6bcad5a970d634781d9510eb319b3fd7f3"
+    }
+  }
+}

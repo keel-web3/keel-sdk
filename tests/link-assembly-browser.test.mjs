@@ -11,6 +11,7 @@ import { gzipSync, deflateSync } from 'node:zlib';
 import { createPublicClient, createWalletClient, http, keccak256, sha256, toHex, zeroHash } from 'viem';
 import { privateKeyToAccount } from 'viem/accounts';
 import { ABIS } from '../packages/sdk/dist/abis/keel-artifacts.generated.js';
+import {dumpBrowserDom} from './helpers/browser-dom-navigation.mjs';
 import { buildKeelInlineShellFragments, buildKeelInlineModuleFragment, keelAssetDisplayModuleBytes, buildKeelLinkPresentationCall, KEEL_INLINE_PROTECTION_SHELL_ID, KeelFidelity, KeelLocatorScheme, KeelLinkCompression, KeelCompression, validateKeelFidelityLinks, KEEL_ASSET_DISPLAY_MODULE_VERSION } from '../packages/sdk/dist/index.js';
 
 // Local EVM + real browser integration. The three fixture contracts supply
@@ -30,23 +31,17 @@ async function chromePath() {
   assert.ok(names.length, 'Install Chrome headless shell or set KEEL_CHROME_HEADLESS_SHELL');
   return join(cache, names[0], 'chrome-headless-shell-mac-arm64/chrome-headless-shell');
 }
-async function render(chrome, uri) {
-  return new Promise((resolve, reject) => {
-    // Only this fixture exempts loopback TLS and private-network address space.
-    // Browser CORS remains enabled and is tested; production flags are unchanged.
-    const child = spawn(chrome, ['--headless', '--ignore-certificate-errors', '--disable-features=BlockInsecurePrivateNetworkRequests,LocalNetworkAccessChecks', '--virtual-time-budget=5000', '--dump-dom', uri]);
-    let out = '', err = '';
-    const timer = setTimeout(() => { child.kill('SIGTERM'); reject(Error('Browser timed out')); }, 20000);
-    child.stdout.on('data', b => out += b); child.stderr.on('data', b => err += b);
-    child.on('error', e => { clearTimeout(timer); reject(e); });
-    child.on('close', code => { clearTimeout(timer); code === 0 ? resolve({out, err}) : reject(Error(err)); });
-  });
+async function render(chrome,uri) {
+  // Same exact data URI, virtual-time budget, loopback TLS/private-network flags
+  // and CORS behavior. Only argv delivery changes to bounded CDP navigation.
+  const result=await dumpBrowserDom(chrome,uri,{virtualTimeBudgetMs:5000,fixtureMode:'link-dom-dump'});
+  return {out:result.stdout,err:result.stderr};
 }
 function verified(result) {
   assert.ok(result.out.includes('data-vault-verification="verified"'), result.out.slice(-5500) + '\n' + result.err);
-  assert.match(result.out, /id="verify-title">KEEL verified/);
+  assert.match(result.out, /id="verify-title">Files verified/);
   assert.match(result.out, /<iframe/);
-  assert.match(result.out, /sandbox="allow-scripts allow-pointer-lock"/);
+  assert.match(result.out, /sandbox="allow-scripts allow-pointer-lock allow-downloads"/);
 }
 function rejected(result, reason) {
   assert.match(result.out, /data-vault-verification="failed"/);
@@ -91,7 +86,13 @@ test('contract-returned canonical link URI verifies each HTTPS fetch before moun
       return {address:receipt.contractAddress, abi:a.abi};
     };
     const write = async (contract, functionName, args) => {
-      const hash = await wallet.writeContract({...contract,chain:null,functionName,args,gas:100000000n});
+      // Only the synthetic bulk-SSTORE fixture setup needs its measured gas.
+      // The production link builder/read limits and all other calls are unchanged.
+      const gas = functionName === 'put'
+        ? await client.estimateContractGas({...contract,account:account.address,functionName,args,gas:1000000000n})
+        : 100000000n;
+      assert.ok(gas > 0n && gas <= 1000000000n, 'fixture setup must fit the existing local block gas limit');
+      const hash = await wallet.writeContract({...contract,chain:null,functionName,args,gas});
       assert.equal((await client.waitForTransactionReceipt({hash})).status, 'success', functionName);
     };
     const probe = await deploy('KeelLinkURIBuilder.t','LinkEnumProbe');

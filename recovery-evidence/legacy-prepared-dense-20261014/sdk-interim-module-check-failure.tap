@@ -1,0 +1,56 @@
+TAP version 13
+# Subtest: default Compact uses actual compatible Brotli/Dense legacy envelope and preserves exact source/poster
+ok 1 - default Compact uses actual compatible Brotli/Dense legacy envelope and preserves exact source/poster
+  ---
+  duration_ms: 1900.555845
+  type: 'test'
+  ...
+# Subtest: auto keeps nonbeneficial exact bytes; explicit codec choices and Raw are preserved
+ok 2 - auto keeps nonbeneficial exact bytes; explicit codec choices and Raw are preserved
+  ---
+  duration_ms: 5501.586814
+  type: 'test'
+  ...
+# Subtest: 40/41,128/129,256 and configured1024 logical resources retain IDs/order without expanding the64-part root
+ok 3 - 40/41,128/129,256 and configured1024 logical resources retain IDs/order without expanding the64-part root
+  ---
+  duration_ms: 10441.318915
+  type: 'test'
+  ...
+# Subtest: large sources are segmented without changing original identity or adding an aggregate32MiB limit
+ok 4 - large sources are segmented without changing original identity or adding an aggregate32MiB limit
+  ---
+  duration_ms: 7950.192571
+  type: 'test'
+  ...
+# Subtest: new profile rejects changed outer execution, missing/context impersonation and conflicting namespaces
+ok 5 - new profile rejects changed outer execution, missing/context impersonation and conflicting namespaces
+  ---
+  duration_ms: 1453.570627
+  type: 'test'
+  ...
+# Subtest: existing registered text modules keep exact fragment bytes and data/module playback order
+not ok 6 - existing registered text modules keep exact fragment bytes and data/module playback order
+  ---
+  duration_ms: 427.091987
+  type: 'test'
+  location: '/workspace/keel-legacy-carriage-20261014/keel-sdk/tests/sdk-legacy-prepared-dense-copy.test.mjs:84:1'
+  failureType: 'testCodeFailure'
+  error: 'Existing module fragment differs from its exact committed descriptor.'
+  code: 'ERR_TEST_FAILURE'
+  name: 'TypeError'
+  stack: |-
+    buildKeelLegacyPreparedDenseDocument (file:///workspace/keel-legacy-carriage-20261014/keel-sdk/packages/sdk/dist/legacy-prepared-dense-copy.js:134:19)
+    async TestContext.<anonymous> (file:///workspace/keel-legacy-carriage-20261014/keel-sdk/tests/sdk-legacy-prepared-dense-copy.test.mjs:87:14)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+1..6
+# tests 6
+# suites 0
+# pass 5
+# fail 1
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 30108.154689

@@ -1,0 +1,27 @@
+{
+  "sdkBase": "64e5fa37667ac424ae87019c7609581dfc2ea364",
+  "productionDiff": false,
+  "assertionsChanged": false,
+  "actualOwnerLinuxResult": {
+    "tests": 18,
+    "pass": 18,
+    "fail": 0,
+    "skipped": 0
+  },
+  "navigationReceipts": 25,
+  "exactUrlShaAndSizeMatches": 22,
+  "requestedUtf8Bytes": {
+    "min": 22,
+    "max": 340358
+  },
+  "proposalSha256": "c5b36716260b7ce6924d70395b22f31bdb5ee6652f070fbec4bf8c61ee17022d",
+  "classificationPatchSha256": "5e044613538ea477bc9765e98353d61e6deb1c4be082af59df508b206e0268d2",
+  "originalQaE2bigSha256": "6b5601e72900a265a42e4c5c824dfbd99be895f19e583c58eff790204a1d040f",
+  "files": {
+    "tests/helpers/marketplace-csp-browser.mjs": "dcdd6b1e8041891f6950ee8a297f11e64ec293fce35af7227c8ebf289668b4e8",
+    "tests/helpers/browser-dom-navigation.mjs": "3686e97514364a4201e49e2f976df2959d6ccf30f75698122e656041fcf22862",
+    "tests/sdk-browser-cdp-navigation.test.mjs": "fa261a83c3f7aa7d41c5e8856ab947c4b7673e6dd6dd919490d4b9b358ddefef",
+    "tests/link-assembly-browser.test.mjs": "38f511014e14c0f8eb2915375f5a8f8bbb8ba288ab2c7c8c94860553f85eb477",
+    "tests/sdk-verification-shell-browser.test.mjs": "aabddc10ea9774eec4b1ae3d3272aec4054ea93f5c1b291a8657efa2da74d574"
+  }
+}

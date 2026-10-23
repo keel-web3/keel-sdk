@@ -2,7 +2,22 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { build } from 'esbuild';
 import { prepareKeelTezosShell, keelTezosCreatorShellId } from '../packages/sdk/dist/tezos-shell.js';
+import { mkdir, mkdtemp, writeFile } from 'node:fs/promises';
+import { tmpdir } from 'node:os';
+import path from 'node:path';
 import { toolByName } from '../packages/mcp/dist/tools.js';
+import { createWorkspace } from '../packages/mcp/dist/paths.js';
+
+/** Tezos prepare tools are signing-request tools: they need a live preflight receipt from this workspace. */
+async function preflighted() {
+  const directory = await mkdtemp(path.join(tmpdir(), 'keel-tezos-standards-'));
+  await writeFile(path.join(directory, 'README.md'), '# target\n');
+  await mkdir(path.join(directory, 'docs'));
+  await writeFile(path.join(directory, 'docs', 'ARCHITECTURE.md'), '# architecture\n');
+  const context = { workspace: await createWorkspace(directory) };
+  const preflight = await toolByName('keel-contract-workflow-preflight').run(context, {});
+  return { context, standards: { preflightReceipt: preflight.receipt.id } };
+}
 const base = {
   network: 'NetXdQprcVkpaWU', builder: 'KT1RJ6PbjHpwc3M5rw5s2Nbmefwbuwbdxton',
   creator: 'tz1VSUr8wwNhLAzempoch5d6hLRiTh8Cjcjb', action: 'register',
@@ -46,35 +61,43 @@ test('rejects cross-family identities, bad checksums and malformed actions', () 
 test('MCP exposes exactly the same review-only native preparation', async () => {
   const tool = toolByName('keel-tezos-shell-prepare');
   assert.ok(tool);
-  assert.deepEqual(await tool.run({},base),prepareKeelTezosShell(base));
-  await assert.rejects(tool.run({}, {...base, network:'1'}), TypeError);
+  const { context, standards } = await preflighted();
+  await assert.rejects(tool.run(context, base), /REFUSED standards-evidence-required/u);
+  const { standards: clearance, ...prepared } = await tool.run(context, { ...base, standards });
+  assert.deepEqual(prepared, prepareKeelTezosShell(base));
+  assert.equal(clearance.workKind, 'viewer');
+  await assert.rejects(tool.run(context, {...base, network:'1', standards}), TypeError);
 });
 test('MCP exposes the receipt-bound standard Tezos publication call adapter', async () => {
   const tool = toolByName('keel-tezos-publication-prepare');
   assert.ok(tool);
-  const result = await tool.run({}, { network: 'NetXsqzbfFenSTS', creator: 'tz1WKJQZ88sbVJFxQTNjZFPVHd7k6KKx9nzM', action: 'strike', collection: 'KT1RJ6PbjHpwc3M5rw5s2Nbmefwbuwbdxton', quantity: 1 });
+  const { context, standards } = await preflighted();
+  await assert.rejects(tool.run(context, { network: 'NetXsqzbfFenSTS', creator: 'tz1WKJQZ88sbVJFxQTNjZFPVHd7k6KKx9nzM', action: 'strike', collection: 'KT1RJ6PbjHpwc3M5rw5s2Nbmefwbuwbdxton', quantity: 1 }), /REFUSED standards-evidence-required/u);
+  const result = await tool.run(context, { network: 'NetXsqzbfFenSTS', creator: 'tz1WKJQZ88sbVJFxQTNjZFPVHd7k6KKx9nzM', action: 'strike', collection: 'KT1RJ6PbjHpwc3M5rw5s2Nbmefwbuwbdxton', quantity: 1, standards });
+  assert.equal(result.standards.audit.status, 'not-available');
   assert.equal(result.schema, 'keel.tezos.publication-call-prepare@1');
   assert.equal(result.status, 'review-only');
   assert.equal(result.operation.parameters.entrypoint, 'strike');
   assert.equal(result.signing, 'not-performed');
-  await assert.rejects(tool.run({}, { network: 'NetXsqzbfFenSTS', creator: 'tz1WKJQZ88sbVJFxQTNjZFPVHd7k6KKx9nzM', action: 'strike', collection: 'KT1RJ6PbjHpwc3M5rw5s2Nbmefwbuwbdxton', mnemonic: 'never' }), /Unsupported|quantity|secret|private signer/iu);
+  await assert.rejects(tool.run(context, { network: 'NetXsqzbfFenSTS', creator: 'tz1WKJQZ88sbVJFxQTNjZFPVHd7k6KKx9nzM', action: 'strike', collection: 'KT1RJ6PbjHpwc3M5rw5s2Nbmefwbuwbdxton', mnemonic: 'never', standards }), /Unsupported|quantity|secret|private signer/iu);
 });
 test('MCP exposes the public FA2 metadata path and separate KEEL JSON compatibility path', async () => {
   const tool = toolByName('keel-tezos-publication-prepare');
+  const { context, standards } = await preflighted();
   const standardUri = 'onchfs://' + '11'.repeat(32);
-  const metadata = await tool.run({}, {
+  const metadata = await tool.run(context, { standards,
     network: 'NetXsqzbfFenSTS', creator: 'tz1WKJQZ88sbVJFxQTNjZFPVHd7k6KKx9nzM', action: 'set-token-metadata',
     collection: 'KT1RJ6PbjHpwc3M5rw5s2Nbmefwbuwbdxton', tokenId: 1,
     tokenInfo: { '': standardUri, animation_url: standardUri, artifactUri: standardUri },
   });
   assert.equal(metadata.operation.parameters.entrypoint, 'set_token_metadata');
   assert.equal(metadata.operation.parameters.value.args?.[1]?.find((entry) => entry.args?.[0]?.string === 'animation_url')?.args?.[1]?.bytes, Buffer.from(standardUri).toString('hex'));
-  const json = await tool.run({}, {
+  const json = await tool.run(context, { standards,
     network: 'NetXsqzbfFenSTS', creator: 'tz1WKJQZ88sbVJFxQTNjZFPVHd7k6KKx9nzM', action: 'set-token-json',
     collection: 'KT1RJ6PbjHpwc3M5rw5s2Nbmefwbuwbdxton', tokenJson: JSON.stringify({ animation_url: standardUri }),
   });
   assert.equal(json.operation.parameters.entrypoint, 'set_token_json');
-  const freeze = await tool.run({}, {
+  const freeze = await tool.run(context, { standards,
     network: 'NetXsqzbfFenSTS', creator: 'tz1WKJQZ88sbVJFxQTNjZFPVHd7k6KKx9nzM', action: 'freeze-token-metadata',
     collection: 'KT1RJ6PbjHpwc3M5rw5s2Nbmefwbuwbdxton', tokenId: 1,
   });

@@ -1,7 +1,9 @@
+import { keelRpcReaderTransport } from "./rpc.js";
 import { KEEL_DEPLOYMENTS } from './modules.js';
 import { KEEL_INLINE_SAFE_RPC_GAS, keelInlineReadGasLimit } from './presentation.js';
+import { keelTransactionGasCap } from './tx-gas.js';
 export interface KeelNetworkInspectionTarget {
-  readonly rpcUrl: string;
+  readonly rpcUrl?: string;
   readonly family: "ethereum" | "tezos";
   readonly chainId?: number;
   readonly network?: string;
@@ -39,11 +41,13 @@ const integer = (value: unknown, label: string) => { if (typeof value !== 'strin
 
 /** Fresh read-only network facts. An unknown network is valid; its KEEL deployments need explicit setup. */
 export async function inspectNetwork(input: KeelNetworkInspectionTarget, fetcher: typeof fetch = fetch) {
-  if (!input || !['ethereum', 'tezos'].includes(input.family) || typeof input.rpcUrl !== 'string' || input.rpcUrl.length > 2048) throw new TypeError('Choose an EVM or Tezos family and an exact RPC URL.');
+  if (!input || !['ethereum', 'tezos'].includes(input.family) || input.rpcUrl !== undefined && (typeof input.rpcUrl !== 'string' || input.rpcUrl.length > 2048) || input.family === 'tezos' && input.rpcUrl === undefined) throw new TypeError('Choose an EVM or Tezos family and an exact RPC URL.');
   if (input.chainId !== undefined && (!Number.isSafeInteger(input.chainId) || input.chainId <= 0 || input.family !== 'ethereum')) throw new TypeError('An EVM target requires a positive safe chain ID.');
   if (input.network !== undefined && (typeof input.network !== 'string' || input.network.length > 64 || input.family !== 'tezos')) throw new TypeError('A network identity belongs to a Tezos target.');
   for (const address of [input.holdAddress, input.builderAddress]) if (address !== undefined && (input.family !== 'ethereum' || !/^0x[0-9a-f]{40}$/i.test(address))) throw new TypeError('KEEL EVM deployments require exact contract addresses.');
-  const endpoint = rpcUrl(input.rpcUrl);
+  const transport = input.family === "ethereum" ? keelRpcReaderTransport(input.rpcUrl, input.chainId) : undefined;
+  if (transport && fetcher === fetch) fetcher = transport.fetchImpl;
+  const endpoint = rpcUrl(input.rpcUrl ?? transport!.rpcUrl);
   if (input.family === 'tezos') {
     const get = (route: string) => { const url = new URL(endpoint); url.pathname = `${url.pathname.replace(/\/$/, '')}${route}`; return json(url.href, null, fetcher); };
     const [network, header, constants] = await Promise.all([get('/chains/main/chain_id'), get('/chains/main/blocks/head/header'), get('/chains/main/blocks/head/context/constants')]);
@@ -74,15 +78,17 @@ export async function inspectNetwork(input: KeelNetworkInspectionTarget, fetcher
     try { const code = await call('eth_getCode', [addresses[0], block.number]); if (typeof code !== 'string' || !/^0x(?:[0-9a-f]{2})*$/i.test(code)) throw new Error(); return { contract, address: addresses[0], status: code === '0x' ? 'no-code' : 'code-present-identity-unverified' }; }
     catch { return { contract, address: addresses[0], status: 'read-unavailable' }; }
   }));
-  return { family: 'ethereum' as const, chainId, block: blockNumber.toString(), checkedAt: new Date().toISOString(), blockTimestamp: new Date(timestamp * 1000).toISOString(), blockGasLimit: blockGasLimit.toString(), inlineReadGasLimit: keelInlineReadGasLimit(blockGasLimit).toString(), maximumInlineReadGas: KEEL_INLINE_SAFE_RPC_GAS.toString(), fees: { status: gasPrice === null ? 'unavailable' : 'live-rpc-quote', gasPriceWei: gasPrice?.toString() ?? null, baseFeeWei: baseFee?.toString() ?? null, priorityFeeWei: priorityFee?.toString() ?? null, note: 'Use exact prepared calls for estimation. Rollup L1 data fees and chain-specific charges may be additional.' }, deployments, publicationReady: false, setup: 'Resolve deployed KEEL instances, verify their code and active shell/module registry, or prepare deployment of missing modules. Never reuse another chain\'s addresses.' };
+  return { family: 'ethereum' as const, chainId, block: blockNumber.toString(), checkedAt: new Date().toISOString(), blockTimestamp: new Date(timestamp * 1000).toISOString(), blockGasLimit: blockGasLimit.toString(), transactionGasCap: (() => { if (chainId !== 1 && chainId !== 11155111) return { gasCap: null, executionGasCap: null, packingTargetGas: null, source: "unregistered-chain-profile", profile: null, note: "This network needs an explicitly registered transaction gas profile; inspection does not qualify its transactions." }; const cap = keelTransactionGasCap({ chainId, blockGasLimit, blockTimestamp: BigInt(timestamp) }); return { gasCap: cap.gasCap, source: cap.source, packingTargetGas: cap.targetGas, executionGasCap: cap.executionGasCap, profile: cap.source, note: 'Selected-block total gas and execution gas limits are distinct. Offline estimates do not qualify a transaction.' }; })(), inlineReadGasLimit: keelInlineReadGasLimit(blockGasLimit).toString(), maximumInlineReadGas: KEEL_INLINE_SAFE_RPC_GAS.toString(), fees: { status: gasPrice === null ? 'unavailable' : 'live-rpc-quote', gasPriceWei: gasPrice?.toString() ?? null, baseFeeWei: baseFee?.toString() ?? null, priorityFeeWei: priorityFee?.toString() ?? null, note: 'Use exact prepared calls for estimation. Rollup L1 data fees and chain-specific charges may be additional.' }, deployments, publicationReady: false, setup: 'Resolve deployed KEEL instances, verify their code and active shell/module registry, or prepare deployment of missing modules. Never reuse another chain\'s addresses.' };
 }
 
 export async function estimateNetworkCall(input: KeelNetworkCall, fetcher: typeof fetch = fetch) {
   if (!['publication', 'presentation-read'].includes(input.purpose)) throw new TypeError('Separate publication and presentation-read estimates.');
+  const transport = input.family === "ethereum" ? keelRpcReaderTransport(input.rpcUrl, input.chainId) : undefined;
+  if (transport && fetcher === fetch) fetcher = transport.fetchImpl;
   const snapshot = await inspectNetwork(input, fetcher);
   if (snapshot.family !== 'ethereum') throw new Error('Tezos costs require an operation simulation with exact manager contents.');
   const call = { to: input.to, data: input.data, value: input.value ?? '0x0', ...(input.from ? { from: input.from } : {}) };
   if (!/^0x[0-9a-f]{40}$/i.test(call.to) || !/^0x(?:[0-9a-f]{2})*$/i.test(call.data) || call.from && !/^0x[0-9a-f]{40}$/i.test(call.from) || !/^0x[0-9a-f]+$/i.test(call.value)) throw new Error('Estimate requires an exact target, calldata and value.');
-  const gas = quantity(await json(rpcUrl(input.rpcUrl), { jsonrpc: '2.0', id: 1, method: 'eth_estimateGas', params: [call, `0x${BigInt(snapshot.block).toString(16)}`] }, fetcher), 'gas estimate');
+  const gas = quantity(await json(rpcUrl(input.rpcUrl ?? transport!.rpcUrl), { jsonrpc: '2.0', id: 1, method: 'eth_estimateGas', params: [call, `0x${BigInt(snapshot.block).toString(16)}`] }, fetcher), 'gas estimate');
   return { ...snapshot, gas: gas.toString(), executionCostWei: snapshot.fees.gasPriceWei === null ? null : (gas * BigInt(snapshot.fees.gasPriceWei)).toString(), purpose: input.purpose, execution: 'not-submitted', exactCall: call, note: input.purpose === 'presentation-read' ? 'Read calls do not spend wallet gas. Compare this execution estimate with the RPC read boundary; this is not an upload fee.' : 'Execution fee estimate for this exact unsigned transaction. It excludes other transactions, native transfer value and any additional L1 data fee.' };
 }

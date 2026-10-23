@@ -1,3 +1,4 @@
+import { canonicalAbiEntries, readCompiledContractAbi } from "./abi-conformance.mjs";
 import assert from "node:assert/strict";
 import { execFileSync } from "node:child_process";
 import { readFileSync } from "node:fs";
@@ -13,12 +14,12 @@ const CONTRACTS_ROOT = resolve(SDK_ROOT, "../keel-contracts");
 const RECORDED_ABI = resolve(CONTRACTS_ROOT, "modules/keel-die/abi/KEEL721.json");
 
 test("KEEL721 compiled, recorded, and generated SDK ABIs are identical", () => {
-  const compiled = JSON.parse(execFileSync(
+  const compiled = process.env.KEEL_CONTRACTS_ARTIFACTS_DIR ? readCompiledContractAbi(CONTRACTS_ROOT, "KEEL721") : JSON.parse(execFileSync(
     "forge",
     ["inspect", "src/modules/keel-die/KEEL721.sol:KEEL721", "abi", "--json"],
     { cwd: CONTRACTS_ROOT, encoding: "utf8", maxBuffer: 8 * 1024 * 1024 },
   ));
   const recorded = JSON.parse(readFileSync(RECORDED_ABI, "utf8"));
-  assert.deepEqual(recorded, compiled, "checked-in KEEL721 ABI is stale relative to Solidity");
+  assert.deepEqual(canonicalAbiEntries(recorded), canonicalAbiEntries(compiled), "checked-in KEEL721 ABI is stale relative to Solidity");
   assert.deepEqual(keelDieAbis.KEEL721, recorded, "generated SDK ABI is stale relative to contracts");
 });

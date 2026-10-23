@@ -1,0 +1,61 @@
+{
+  "schema": "independent-a8-smart-source-audit@1",
+  "sourceCommit": "a8e17ce5a7d4902178d4188bc1a7dd713f81e09e",
+  "sourceSHA256": "781dda202efb49063b3012276d982eff7f8705a7f72775fccdc3c84405d587c8",
+  "dependencySHA256": {
+    "bytes": "fa513ed8c63350173be78d9bfd05ec2819648da44da43e8cef833824a8818bf3",
+    "canonical": "f0380726acadaac360effd118ae4c49547c5e59487c8eef65e7e63cde93ab967",
+    "integrity": "5f6ff79fe860808821120446790885ff88a21842cb734c2d1c57378a5caf172b"
+  },
+  "node": "v22.22.1",
+  "scope": "exact frozen production measurement functions source-compiled unchanged; synthetic local render/capability boundary; no network/readiness/live proof",
+  "findings": [
+    {
+      "case": "same retained exact image boundary",
+      "invariant": "PASS",
+      "inner": 1749990,
+      "outer": 1750025,
+      "complete": 1750255,
+      "warnings": [
+        "inline-image-above-compatibility-target"
+      ]
+    },
+    {
+      "case": "same tiny program plus unrelated oversized description",
+      "invariant": "PASS",
+      "programBytes": 44,
+      "complete": 2000259,
+      "recommendations": [
+        {
+          "candidateId": "hybrid-verifier-only",
+          "code": "measured-verifier-only-metadata-above-target",
+          "completeTokenUriBytes": 2000259
+        }
+      ]
+    },
+    {
+      "case": "actual encoded embedded program alone exceeds compatibility target",
+      "invariant": "FAIL",
+      "expected": "independent encoded animation-slot count and oversized-shell warning plus optional external recommendation; no forced change or universal hard size ban",
+      "actual": {
+        "decodedProgramBytes": 700000,
+        "innerAnimationUriBytes": 2100029,
+        "actualOuterAnimationContribution": 3500070,
+        "complete": 3500175,
+        "encodedAnimationSlotBytesPresent": false,
+        "warnings": [
+          "collection-grids-will-not-show-an-image",
+          "complete-metadata-above-standard-target"
+        ],
+        "recommendations": [
+          {
+            "candidateId": "hybrid-verifier-only",
+            "code": "measured-verifier-only-metadata-above-target",
+            "completeTokenUriBytes": 3500175
+          }
+        ],
+        "publicationReady": false
+      }
+    }
+  ]
+}
