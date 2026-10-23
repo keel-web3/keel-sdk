@@ -357,3 +357,5 @@ and outstanding wallet, provider, publication and release gates.
 ## Runtime module discovery
 
 See [runtime module discovery and reuse](docs/KEEL_RUNTIME_MODULE_DISCOVERY.md) for the shared SDK/API/MCP lookup, unverified module sandbox, coverage limits, and browser MP4 encoding workflow. Empty catalog results never authorize rebuilding an existing module.
+
+The canonical verifier follows the OnKEEL brand and supports bounded app panels through the [protected shell API](docs/KEEL_SHELL_APPLICATION_API.md). App data cannot override KEEL proof results.

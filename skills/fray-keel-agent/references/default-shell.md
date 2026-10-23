@@ -18,10 +18,10 @@ selected chain's active Inline catalog. Supply creator resources and exact
 module declarations without copying the canonical shell. Explicit viewer=none
 uses the creator-owned HTML route described below instead.
 
-This default is the collector-friendly K/Stratus experience: the protected K
+This default uses OnKEEL branding and its shared protected proof interface: the protected K
 opens Proof, Files, and Trail; the panel docks on the right without covering the
 art on desktop and becomes a bottom sheet on mobile. It also owns the frozen
-data-only `keel-shell-plugin@1` API. If those behaviors are missing, the agent is
+data-only `keel-shell-plugin@1` API (version 2) and source-bound `keel-shell-extension@1` artwork/host clients. App panels are separate from core proof, and file-evidence badges require exact passed resource matches. Read [KEEL_SHELL_APPLICATION_API.md](../../../docs/KEEL_SHELL_APPLICATION_API.md) and reuse the API instead of forking the shell. If those behaviors are missing, the agent is
 not looking at the canonical default and must stop instead of authoring one.
 
 For the verification-shell route, never:
@@ -96,3 +96,21 @@ shell revision.
 Inline must include the work bytes in the EVM tokenURI response. `onchain-recursive` is Hybrid browser-RPC delivery and cannot satisfy that requirement. Do not change labels or publish a locator-only shell as an Inline fix.
 
 The optional canonical `embedded-shared-containers@1` resource profile reuses raw compressed Hold objects through a registered EVM composer and a revision-selected ABI packtable. `buildCompactInlineKeelShell({codecProfile:"lzma-js",embeddedContainerDelivery:{chainId,store}})` returns canonical prefix/containerBridge/suffix. The composer emits each pack once; the offline shell checks table/stored/decoded/member SHA and context before mounting, without a browser transport. Preserve resource handles and exact unchanged descriptors; changed resources may use new standalone rows. Verify the selected-chain registered shell/composer/module/table bindings, full return bytes/gas and no-network browser behavior before claiming Inline readiness. A shell update cannot replace a permanently bound presentation module. This optional official source profile is not permission to create a project verifier or substitute unregistered bytes. It is not the prepared-copy default and cannot be selected automatically to repair incompatible existing fragments.
+
+The canonical surface uses one OnKEEL glyph/header and retains auto-hide. Token shows supplied metadata/attributes; Files exposes byte counts, compression, aliases and shared containers; System includes modules, checked manifests, plugin declarations and external sources. Read this data via `__KEEL_SHELL__.catalog()`; never execute manifest plugins or give application data authority over protected proof checks.
+
+
+### Optional information and prereveal modules
+
+Keep Inline delivery unchanged when adding optional RPC information. Reuse the
+governed KEEL RPC reader for marketplace/commitment enrichment; denial, offline
+nodes or stale listing data must not delay artwork or change protected file
+verification. Show only fresh token-specific listings; retain OnKEEL gallery.
+For hidden-art/trait/seed-rule commitments use the optional `@keel/sdk/pre-reveal`
+module and `keel-prereveal-prepare`, with separate private proof output. Read
+`docs/KEEL_PREREVEAL.md`: pin the original registry revision and runtime, do not
+mix its salted SHA-256 proof with OZ metadata leaves, do not publish salts/keys
+early, and do not claim a recipe or burn-rule hash proves final pixels or a burn.
+Reuse native sealed/layered envelopes and compact attribute pages. Enable this
+feature only when the creator chooses a prereveal; it adds no required network
+dependency or authority to the canonical file proof.

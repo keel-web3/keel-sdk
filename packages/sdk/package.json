@@ -294,6 +294,14 @@
     "./module/jsx-dev-runtime": {
       "types": "./dist/module/jsx-runtime.d.ts",
       "import": "./dist/module/jsx-runtime.js"
+    },
+    "./marketplace-reader": {
+      "types": "./dist/marketplace-reader.d.ts",
+      "import": "./dist/marketplace-reader.js"
+    },
+    "./pre-reveal": {
+      "types": "./dist/pre-reveal.d.ts",
+      "import": "./dist/pre-reveal.js"
     }
   },
   "files": [
@@ -315,6 +323,7 @@
     "@keel/viewer": "workspace:*",
     "@noble/hashes": "1.8.0",
     "esbuild": "0.28.2",
+    "terser": "5.44.0",
     "viem": "^2.38.0"
   },
   "devDependencies": {

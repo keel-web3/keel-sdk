@@ -12,7 +12,8 @@ export type KeelVerificationPanelType =
   | "commitments"
   | "object-trail"
   | "staking"
-  | "contract-facets";
+  | "contract-facets"
+  | "metadata" | "modules" | "manifests" | "plugins" | "external";
 export type KeelVerificationPageLayout = "stack" | "columns" | "grid";
 
 export interface KeelVerificationSealPresentation {
@@ -89,7 +90,7 @@ export interface KeelVerificationPresentationOverrides {
 
 export const DEFAULT_KEEL_VERIFICATION_PRESENTATION: KeelVerificationPresentationManifest = Object.freeze({
   protocol: KEEL_VERIFICATION_PRESENTATION_PROTOCOL,
-  revision: 2,
+  revision: 3,
   seal: Object.freeze({
     glyph: "K",
     shape: "stamp",
@@ -102,56 +103,27 @@ export const DEFAULT_KEEL_VERIFICATION_PRESENTATION: KeelVerificationPresentatio
   }),
   overlay: Object.freeze({
     placement: "right",
-    width: "wide",
+    width: "standard",
     navigation: "tabs",
     initialPage: "overview",
   }),
   theme: Object.freeze({
     accent: "verification-state",
-    surface: "#07120f",
-    text: "#d9e8e3",
-    muted: "#748d85",
-    radiusPx: 22,
+    surface: "#15171b",
+    text: "#f2f3f5",
+    muted: "#9aa0ab",
+    radiusPx: 2,
   }),
   pages: Object.freeze([
-    Object.freeze({
-      id: "overview",
-      label: "Proof",
-      layout: "stack",
-      columns: 1,
-      panels: Object.freeze([
-        Object.freeze({ id: "proof-summary", type: "overview", span: 1 }),
-        Object.freeze({ id: "verification-checks", type: "checks", span: 1 }),
-      ]),
-    }),
-    Object.freeze({
-      id: "sources",
-      label: "Files",
-      layout: "columns",
-      columns: 2,
-      panels: Object.freeze([
-        Object.freeze({ id: "storage-sources", type: "storage", span: 1 }),
-        Object.freeze({ id: "verified-resources", type: "resources", span: 1 }),
-      ]),
-    }),
-    Object.freeze({
-      id: "provenance",
-      label: "Trail",
-      layout: "grid",
-      columns: 2,
-      panels: Object.freeze([
-        Object.freeze({ id: "token-identity", type: "identity", span: 1 }),
-        Object.freeze({ id: "version-commitments", type: "commitments", span: 1 }),
-        Object.freeze({ id: "keel-object-trail", type: "object-trail", span: 2 }),
-        Object.freeze({ id: "stake-object", type: "staking", span: 2 }),
-        Object.freeze({ id: "contract-facets", type: "contract-facets", span: 2 }),
-      ]),
-    }),
+    Object.freeze({id:"overview",label:"Proof",layout:"stack",columns:1,panels:Object.freeze([Object.freeze({"id": "overview-overview", "type": "overview", "span": 1}),Object.freeze({"id": "overview-checks", "type": "checks", "span": 1})])}),
+    Object.freeze({id:"token",label:"Token",layout:"stack",columns:1,panels:Object.freeze([Object.freeze({"id": "token-identity", "type": "identity", "span": 1}),Object.freeze({"id": "token-metadata", "type": "metadata", "span": 1}),Object.freeze({"id": "token-staking", "type": "staking", "span": 1}),Object.freeze({"id": "token-contract-facets", "type": "contract-facets", "span": 1})])}),
+    Object.freeze({id:"sources",label:"Files",layout:"stack",columns:1,panels:Object.freeze([Object.freeze({"id": "sources-storage", "type": "storage", "span": 1}),Object.freeze({"id": "sources-resources", "type": "resources", "span": 1})])}),
+    Object.freeze({id:"provenance",label:"System",layout:"stack",columns:1,panels:Object.freeze([Object.freeze({"id": "provenance-modules", "type": "modules", "span": 1}),Object.freeze({"id": "provenance-manifests", "type": "manifests", "span": 1}),Object.freeze({"id": "provenance-plugins", "type": "plugins", "span": 1}),Object.freeze({"id": "provenance-external", "type": "external", "span": 1}),Object.freeze({"id": "provenance-commitments", "type": "commitments", "span": 1}),Object.freeze({"id": "provenance-object-trail", "type": "object-trail", "span": 1})])}),
   ]),
 });
 
 const PANEL_TYPES = new Set<KeelVerificationPanelType>([
-  "overview", "checks", "storage", "resources", "identity", "commitments", "object-trail", "staking", "contract-facets",
+  "overview", "checks", "storage", "resources", "identity", "commitments", "object-trail", "staking", "contract-facets", "metadata", "modules", "manifests", "plugins", "external",
 ]);
 const SEAL_SHAPES = new Set<KeelVerificationSealShape>(["stamp", "disc", "shield", "square"]);
 const SEAL_MOTIONS = new Set<KeelVerificationSealMotion>(["slide", "stamp", "scale", "rise", "none"]);

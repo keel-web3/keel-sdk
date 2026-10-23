@@ -2,6 +2,8 @@ import { resolveKeelShell, resolveKeelPayloadStorage, resolveKeelPayloadCompress
 import { loadCopyReadFiles } from "./copy-read-tool.js";
 import { CURATION_TOOL_DEFINITIONS } from './curation-tools.js';
 import { MATRIX_TOOL_DEFINITIONS } from './matrix-tools.js';
+import { METADATA_TOOL_DEFINITIONS } from './metadata-tools.js';
+import { PREREVEAL_TOOL_DEFINITIONS } from './prereveal-tools.js';
 import { ARENA_TOOL_DEFINITIONS } from './arena-tools.js';
 import { LAYERED_TOOL_DEFINITIONS } from './layered-tools.js';
 import { SVG_TOOL_DEFINITIONS } from './svg-tools.js';
@@ -1406,6 +1408,8 @@ export const TOOL_DEFINITIONS: readonly ToolDefinition[] = [
   ...SVG_TOOL_DEFINITIONS,
   ...CURATION_TOOL_DEFINITIONS,
   ...MATRIX_TOOL_DEFINITIONS,
+  ...METADATA_TOOL_DEFINITIONS,
+  ...PREREVEAL_TOOL_DEFINITIONS,
   ...ARENA_TOOL_DEFINITIONS,
   tool("analyze", "Analyze a workspace media file and report integrity and wrapper support.", TOOL_SCHEMAS.analyze, analyzeTool),
   tool("media-optimize", "Dry-run a reversible media optimization. It reports only repository-supported adapters and never writes, changes storage mode, uploads, or touches a chain.", TOOL_SCHEMAS.mediaOptimize, mediaOptimizeTool),

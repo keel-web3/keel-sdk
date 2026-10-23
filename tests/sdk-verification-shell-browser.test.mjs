@@ -70,7 +70,7 @@ test("the protected K shell mounts only verified art inside an opaque network-de
     const valid = await dumpDOM(chrome, fixture.origin);
     assert.match(valid.stdout, /data-vault-verification="verified"/u);
     assert.match(valid.stdout, /id="verify-seal"/u);
-    assert.match(valid.stdout, /id="verify-title">KEEL verified/u);
+    assert.match(valid.stdout, /id="verify-title">Files verified/u);
     assert.match(valid.stdout, /class="verify-page-nav"/u);
     assert.match(valid.stdout, /data-keel-panel-placement="right"/u);
     assert.match(valid.stdout, /sandbox="allow-scripts allow-pointer-lock"/u);
@@ -128,7 +128,7 @@ test("the marketplace-safe prepared animation URI installs token context before 
     const rendered = await dumpDOM(chrome, fixture.origin);
     assert.match(rendered.stdout, /data-vault-verification="verified"/u);
     assert.match(rendered.stdout, /id="verify-seal"/u);
-    assert.match(rendered.stdout, /id="verify-title">KEEL verified/u);
+    assert.match(rendered.stdout, /id="verify-title">Files verified/u);
     assert.match(rendered.stdout, /0xabababababababababababababababababababab/u);
     assert.doesNotMatch(rendered.stderr, /Uncaught|net::ERR|Failed to load resource/iu);
   } finally {
@@ -169,7 +169,7 @@ test("the compact escaped animation URI is directly browser-readable without inn
   const chrome = await headlessChrome();
   const rendered = await dumpDOM(chrome, metadata.animation_url);
   assert.match(rendered.stdout, /data-vault-verification="verified"/u);
-  assert.match(rendered.stdout, /id="verify-title">KEEL verified/u);
+  assert.match(rendered.stdout, /id="verify-title">Files verified/u);
   assert.match(rendered.stdout, /0xabababababababababababababababababababab/u);
   assert.doesNotMatch(rendered.stderr, /Uncaught|net::ERR|Failed to load resource/iu);
 });
