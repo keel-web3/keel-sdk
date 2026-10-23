@@ -53,7 +53,8 @@
     "snapshot": "920816791c1b4b10c5cee0744c7de074ef44f650",
     "files": 1,
     "verifiedBackup": "/Users/ravonus/Documents/Codex/2026-10-22/task/backups/fresh-dirty-source/d2b26bd95c8b",
-    "disposition": "Older test diagnostic expectation is superseded by current selected native presentation policy; current full suite and stricter exact source guards retained."
+    "disposition": "Preserve inactive the proposed test change that would recommend hosted/IPFS delivery based on encoded URI expansion alone. Current qualified implementation and tests retain decoded program-size policy. This is an unresolved product-policy choice, not a lost-source or assertion-weakening fix.",
+    "productDecision": "Should external delivery suggestions use encoded URI size or decoded embedded-program size when the exact work remains onchain? No behavior changed during consolidation."
   },
   {
     "source": "/Users/ravonus/dev/wt/studio-publication-20261019/review-sdk-f159",
