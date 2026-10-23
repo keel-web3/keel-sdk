@@ -53,6 +53,12 @@ export function createKeelConfiguredReadAccessDenialHandler(options: ConfiguredR
   const scheduler = configuredReadScheduler(options);
   return (status: 401 | 403) => scheduler.observeAccessDenial(status);
 }
+/** The HTTP layer preserves the Retry-After lower bound without replacing any
+ * RPC body error, changing retry ownership or granting a different recipient. */
+export function createKeelConfiguredReadRateLimitHandler(options: ConfiguredReadRecipient) {
+  const scheduler = configuredReadScheduler(options);
+  return (retryAfterMs: number) => scheduler.observeRateLimit(retryAfterMs);
+}
 
 /** Admit the caller's existing configured reader without discovering an endpoint,
  * changing recipients or adding a retry layer. The server must supply the exact

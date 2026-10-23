@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { createKeelScheduledReadTransport as create } from '../packages/sdk/dist/public-simulation-pool.js';
+import { createKeelScheduledReadTransport as create, createKeelConfiguredReadAccessDenialHandler, createKeelConfiguredReadRateLimitHandler } from '../packages/sdk/dist/public-simulation-pool.js';
 const tick = () => new Promise(resolve => setImmediate(resolve));
 const input = (method = 'eth_call', n = 0) => ({ method, params: [{ to: `0x${'11'.repeat(20)}`, data: `0x${n.toString(16).padStart(2,'0')}` }, 'latest'] });
 const scope = () => async () => { throw new Error('No network in this fixture'); };
@@ -86,5 +86,16 @@ test('all unsupported members restrict their own actual methods even when anothe
 for(const code of [401,403])test(`already observed ${code} in an incomplete result remains provider-wide terminal`,async()=>{
  const f=fixture(),denial=Object.assign(new Error('denied'),{code});const reader=create({...f,requestBatch:async()=>[{status:'rejected',reason:denial}]},f.options);
  const results=await Promise.allSettled([reader.request(input()),reader.request(input('eth_getCode'))]);assert.ok(results.every(item=>item.status==='rejected'&&item.reason===denial));
+ await assert.rejects(f.reader.request(input('eth_chainId')),error=>error.reason==='access-denied');assert.equal(f.singles.length,0);
+});
+
+test('physical rate deadline is shared, monotonic, bounded and independent of subscriber cancellation',async()=>{
+ const f=fixture({requestTimeoutMs:100});const observe=createKeelConfiguredReadRateLimitHandler(f.options);observe(1000);observe(1);
+ await assert.rejects(f.reader.request(input('eth_chainId')),error=>error.reason==='rate-limited');assert.equal(f.singles.length,0);
+ for(const invalid of [-1,NaN,Infinity,1.5])assert.throws(()=>observe(invalid),/finite nonnegative/);
+ observe(Number.MAX_SAFE_INTEGER);await assert.rejects(f.reader.request(input('eth_chainId')),error=>error.reason==='rate-limited');assert.equal(f.singles.length,0);
+});
+test('rate observation never clears an earlier provider access denial',async()=>{
+ const f=fixture();createKeelConfiguredReadAccessDenialHandler(f.options)(403);createKeelConfiguredReadRateLimitHandler(f.options)(1);
  await assert.rejects(f.reader.request(input('eth_chainId')),error=>error.reason==='access-denied');assert.equal(f.singles.length,0);
 });

@@ -218,6 +218,15 @@ export function createKeelProviderRequestScheduler(options: KeelProviderRequestS
       const failure: Failure = { retryable: false, retryAfterMs: 0, permanent: "access-denied", httpStatus: status };
       cacheCapability("*", { status: "access-denied", expiresAt: Date.now() + capabilityAge, failure });
     },
+    /** Preserve a physical response's server lower bound before its caller can
+     * abort or a third-party client can discard the HTTP response headers.
+     * Ordinary retry/circuit accounting still belongs to run(), exactly once. */
+    observeRateLimit(retryAfterMs: number) {
+      const now = Date.now();
+      if (!Number.isSafeInteger(retryAfterMs) || retryAfterMs < 0) throw new TypeError("An observed provider cooldown needs a finite nonnegative millisecond bound.");
+      cooldownUntil = Math.max(cooldownUntil, Math.min(Number.MAX_SAFE_INTEGER, now + retryAfterMs));
+      lastFailure = { retryable: true, retryAfterMs, httpStatus: 429, transportFailure: "rate-limited" };
+    },
     async run<T>(input: KeelProviderScheduledRequest, execute: (signal: AbortSignal, context: { readonly requestId: number; readonly attempt: number }) => Promise<T>): Promise<T> {
       if (typeof input.method !== "string" || !/^[a-z][a-z0-9_]{0,127}$/iu.test(input.method)) throw new TypeError("Provider scheduling needs a bounded RPC method name.");
       const methods = [...new Set(input.methods ?? [input.method])];
