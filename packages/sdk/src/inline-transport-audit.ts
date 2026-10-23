@@ -214,12 +214,20 @@ export function inspectKeelInlinePayloadCarriage(htmlBytes: Uint8Array, options:
         && (encoding === "text" && imageMedia === "image/svg+xml"
           || encoding === "base64" && ["image/png", "image/gif", "image/jpeg", "image/webp", "image/avif"].includes(imageMedia));
       if (directImage) assertKeelInlineImageBytes(bytes, mediaType);
+      // assertProof above authenticated this exact full HTML, including every
+      // None container/role and its equal original/stored commitments. Match the
+      // distinct None list; never relabel these resources as Gzip members.
+      const nativeNone = !container && encoding === "base64" && payload.compression === "none"
+        ? nativeGzip?.nativeNoneMembers?.find(member => member.id === item.id && member.role === item.role && member.mediaType === mediaType
+          && member.storedIntegrity.byteLength === bytes.length && member.storedIntegrity.digest === `0x${createHash("sha256").update(bytes).digest("hex")}`)
+        : undefined;
       payloads.push(Object.freeze({
         id: typeof item.id === "string" ? item.id : typeof item.objectId === "string" ? item.objectId : "container",
         mediaType, encoding, compression: typeof payload.compression === "string" ? payload.compression : "container-bound",
         binaryBytes: bytes.length, textCarriageBytes: encoder.encode(text).length,
-        directImage, requiresExistingPreparedReuse: encoding === "dense" ? preparedDenseCopy!.transportProfile !== "uri81-block-v1" || preparedDenseCopy!.legacyPreparedProfile !== undefined : encoding !== "text" && !directImage && !(encoding === "base64" && payload.compression === "gzip" && nativeGzip?.members.some(member => member.id === item.id && member.mediaType === mediaType
+        directImage, requiresExistingPreparedReuse: encoding === "dense" ? preparedDenseCopy!.transportProfile !== "uri81-block-v1" || preparedDenseCopy!.legacyPreparedProfile !== undefined : encoding !== "text" && !directImage && nativeNone === undefined && !(encoding === "base64" && payload.compression === "gzip" && nativeGzip?.members.some(member => member.id === item.id && member.mediaType === mediaType
             && member.storedIntegrity.byteLength === bytes.length && member.storedIntegrity.digest === `0x${createHash("sha256").update(bytes).digest("hex")}`)),
+        ...(nativeNone === undefined ? {} : {nativeNone: {role: nativeNone.role, integrity: {...nativeNone.integrity}, storedIntegrity: {...nativeNone.storedIntegrity}}}),
         ...(encoding === "dense" ? {transportProfile: preparedDenseCopy!.transportProfile} : {}),
       }));
     }
@@ -265,20 +273,31 @@ export function assertKeelPreparedCollectorInlineMetadata(metadata: Readonly<Rec
 /** Check the serialized audit again when reading a digest-bound review plan.
  * This does not replace parsing the source bytes when creating that plan. */
 export function assertKeelFreshPayloadAudit(value: unknown): void {
-  const audit = object(value);
+  const freshObject = (value: unknown) => {
+    const result = object(value);
+    if (Object.getPrototypeOf(result) !== Object.prototype || Reflect.ownKeys(result).length !== Object.keys(result).length
+      || Object.values(Object.getOwnPropertyDescriptors(result)).some(field => field.get || field.set)) throw new TypeError("Invalid fresh payload data record.");
+    return result;
+  };
+  const audit = freshObject(value);
   const fields = ["schema", "payloadCount", "packedPayloadBytes", "payloadTextCarriageBytes", "addedTextBytes", "requiresExistingPreparedReuse", "payloads", "preparedDenseCopy", "registeredNativeGzip"];
   if (Object.keys(audit).some(key => !fields.includes(key)) || audit.schema !== "keel-inline-payload-carriage@1"
       || audit.requiresExistingPreparedReuse !== false || !Array.isArray(audit.payloads) || audit.payloads.length > 16_384
       || audit.payloadCount !== audit.payloads.length) throw new TypeError("Invalid fresh payload carriage audit.");
-  const prepared = audit.preparedDenseCopy === undefined ? undefined : object(audit.preparedDenseCopy);
+  if (Object.getPrototypeOf(audit.payloads) !== Array.prototype || Object.keys(audit.payloads).length !== audit.payloads.length
+    || Reflect.ownKeys(audit.payloads).some(key => key !== "length" && (typeof key !== "string" || !/^(?:0|[1-9][0-9]*)$/u.test(key) || Number(key) >= (audit.payloads as unknown[]).length))
+    || Object.values(Object.getOwnPropertyDescriptors(audit.payloads)).some(field => field.get || field.set)) throw new TypeError("Invalid fresh payload array.");
+  const prepared = audit.preparedDenseCopy === undefined ? undefined : freshObject(audit.preparedDenseCopy);
   if (prepared && (Object.keys(prepared).some(key => !["transportProfile","shellBootEncoding","shellBootCompression","payloadPreparation","contractOperation"].includes(key))
     || prepared.transportProfile !== "uri81-block-v1" || prepared.shellBootEncoding !== "base64"
     || !["gzip", "none", "ppmd"].includes(String(prepared.shellBootCompression))
     || prepared.payloadPreparation !== "build-time" || prepared.contractOperation !== "verified-copy")) throw new TypeError("Fresh prepared payloads cannot use retired Base90/compatibility profiles.");
   const nativeGzip = audit.registeredNativeGzip === undefined ? undefined : assertKeelRegisteredNativeGzipProof(audit.registeredNativeGzip as KeelRegisteredNativeGzipProof);
-  let binary = 0, carried = 0;
+  let binary = 0, carried = 0; const noneIds = new Set<string>();
   for (const value of audit.payloads) {
-    const payload = object(value);
+    const payload = freshObject(value);
+    if (Object.keys(payload).some(key => !["id", "mediaType", "encoding", "compression", "binaryBytes", "textCarriageBytes", "directImage", "requiresExistingPreparedReuse", "transportProfile", "nativeNone"].includes(key))) throw new TypeError("Invalid fresh payload fields.");
+    if (Object.hasOwn(payload, "transportProfile") && payload.encoding !== "dense") throw new TypeError("Invalid fresh payload transport profile.");
     if (typeof payload.id !== "string" || payload.id.length > 512 || typeof payload.mediaType !== "string" || payload.mediaType.length > 128
         || !Number.isSafeInteger(payload.binaryBytes) || (payload.binaryBytes as number) <= 0 || (payload.binaryBytes as number) > MAX_BYTES
         || !Number.isSafeInteger(payload.textCarriageBytes) || (payload.textCarriageBytes as number) <= 0 || (payload.textCarriageBytes as number) > MAX_BYTES
@@ -293,9 +312,24 @@ export function assertKeelFreshPayloadAudit(value: unknown): void {
     const gzip = payload.encoding === "base64" && payload.compression === "gzip" && payload.directImage === false
       && payload.textCarriageBytes === Math.ceil((payload.binaryBytes as number) / 3) * 4
       && nativeGzip?.members.some(member => member.id === payload.id && member.mediaType === payload.mediaType && member.storedIntegrity.byteLength === payload.binaryBytes);
-    if (!rawText && !image && !dense && !gzip) throw new TypeError("Fresh payload audit contains a newly encoded body.");
+    let nativeNone = false;
+    if (Object.hasOwn(payload, "nativeNone")) {
+      const witness = freshObject(payload.nativeNone), original = freshObject(witness.integrity), stored = freshObject(witness.storedIntegrity);
+      if (Object.keys(witness).sort().join() !== "integrity,role,storedIntegrity"
+        || [original, stored].some(value => Object.keys(value).sort().join() !== "algorithm,byteLength,digest")
+        || typeof witness.role !== "string" || !["entrypoint", "asset", "data"].includes(witness.role)
+        || payload.encoding !== "base64" || payload.compression !== "none" || payload.directImage !== false
+        || payload.textCarriageBytes !== Math.ceil((payload.binaryBytes as number) / 3) * 4 || noneIds.has(payload.id)) throw new TypeError("Invalid native None payload witness.");
+      const member = nativeGzip?.nativeNoneMembers?.find(member => member.id === payload.id && member.role === witness.role && member.mediaType === payload.mediaType
+        && member.integrity.byteLength === payload.binaryBytes && member.integrity.algorithm === original.algorithm && member.integrity.digest === original.digest && member.integrity.byteLength === original.byteLength
+        && member.storedIntegrity.algorithm === stored.algorithm && member.storedIntegrity.digest === stored.digest && member.storedIntegrity.byteLength === stored.byteLength);
+      if (!member) throw new TypeError("Native None payload differs from its exact registered proof member.");
+      noneIds.add(payload.id); nativeNone = true;
+    }
+    if (!rawText && !image && !dense && !gzip && !nativeNone) throw new TypeError("Fresh payload audit contains a newly encoded body.");
     binary += payload.binaryBytes as number; carried += payload.textCarriageBytes as number;
   }
+  if (noneIds.size !== (nativeGzip?.nativeNoneMembers?.length ?? 0)) throw new TypeError("Fresh payload audit omits a registered native None member.");
   if (binary !== audit.packedPayloadBytes || carried !== audit.payloadTextCarriageBytes || carried - binary !== audit.addedTextBytes) throw new TypeError("Fresh payload carriage totals disagree.");
 }
 

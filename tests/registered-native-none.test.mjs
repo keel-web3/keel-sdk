@@ -3,8 +3,10 @@ import test from 'node:test';
 import {readFileSync} from 'node:fs';
 import {createHash} from 'node:crypto';
 import {gunzipSync} from 'node:zlib';
-import {buildKeelInlineLocalDocument,buildKeelInlineModuleFragment,decodeKeelInlineGraphFragment} from '../packages/sdk/dist/inline-viewer-graph.js';
+import {buildKeelInlineLocalDocument,buildKeelInlineModuleFragment,decodeKeelInlineGraphFragment,buildKeelInlineRawPercentTokenURIGraph,buildKeelPreparedOneOfOneTokenURI} from '../packages/sdk/dist/inline-viewer-graph.js';
 import {createKeelRegisteredNativeGzipProof,assertKeelRegisteredNativeGzipProof,KEEL_REGISTERED_NATIVE_GZIP_FRAME_PROFILE as p} from '../packages/sdk/dist/registered-native-gzip.js';
+import {inspectKeelInlinePayloadCarriage,assertKeelFreshPayloadCarriage,assertKeelFreshPayloadAudit,auditKeelInlineTokenURI} from '../packages/sdk/dist/inline-transport-audit.js';
+import {createKeelPublishReviewPlan,verifyKeelPublishReviewPlan} from '../packages/sdk/dist/publish-plan.js';
 const hash=b=>'0x'+createHash('sha256').update(b).digest('hex');
 const integrity=b=>({algorithm:'sha256',digest:hash(b),byteLength:b.length});
 const fixture=JSON.parse(gunzipSync(readFileSync(new URL('./fixtures/registered-native-gzip-revision5.json.gz',import.meta.url))));
@@ -28,7 +30,10 @@ test('exact normal1786-byte MP4 default None survives the actual registered rev5
  assert.equal(item.role,'entrypoint');assert.equal(item.mediaType,'video/mp4');assert.equal(item.embedded.compression,'none');
  assert.deepEqual(Buffer.from(item.embedded.storedBase64,'base64'),mp4);assert.deepEqual(item.embedded.storedIntegrity,integrity(mp4));assert.deepEqual(item.integrity,integrity(mp4));
  const result=proof(root);assert.equal(result.members.length,1);assert.equal(result.members[0].id,'keel.asset-display');
+ assert.equal(result.nativeNoneMembers.length,1);assert.deepEqual(result.nativeNoneMembers[0],{id:'artwork.mp4',role:'entrypoint',mediaType:'video/mp4',integrity:integrity(mp4),storedIntegrity:integrity(mp4)});
  assert.deepEqual(assertKeelRegisteredNativeGzipProof(result,root.rootBytes),result);
+ assert.doesNotThrow(()=>assertKeelFreshPayloadCarriage(root.rootBytes,{registeredNativeGzip:result}));
+ assert.doesNotThrow(()=>assertKeelFreshPayloadAudit(JSON.parse(JSON.stringify(inspectKeelInlinePayloadCarriage(root.rootBytes,{registeredNativeGzip:result})))));
 });
 
 test('complete native WebM video and existing PCM/AAC/MP3/Ogg/FLAC audio and GLB survive exact None identity proof',async t=>{
@@ -99,4 +104,67 @@ test('None external glTF buffers require the exact complete referenced model res
   'external dependency':items=>{const item=items.find(item=>item.id==='original-model'),value=JSON.parse(item.embedded.storedText);value.buffers[0].uri='https://invalid.test/scene.bin';const bytes=Buffer.from(JSON.stringify(value));item.integrity=integrity(bytes);item.embedded={compression:'none',storedText:bytes.toString(),storedIntegrity:integrity(bytes)}}
  };
  for(const[name,mutate]of Object.entries(cases))await t.test(name,()=>{const items=structuredClone(original);mutate(items);assert.throws(()=>proof(fromEntries(items)))});
+});
+
+test('registered native None proof and serialized audit reject malformed roles and one-to-one identity drift',async t=>{
+ const root=await document(),current=proof(root),audit=inspectKeelInlinePayloadCarriage(root.rootBytes,{registeredNativeGzip:current});
+ for(const role of [['entrypoint'],['asset'],['data'],{},null,7])await t.test('descriptor role '+JSON.stringify(role),()=>{
+  const items=entries(root);items.find(item=>item.id==='artwork.mp4').role=role;assert.throws(()=>proof(fromEntries(items)),/role|descriptor|Native None/);
+ });
+ const proofCases={
+  'None array null':value=>{value.nativeNoneMembers=null},
+  'None array empty':value=>{value.nativeNoneMembers=[]},
+  'missing member':value=>{delete value.nativeNoneMembers},
+  'duplicate member':value=>{value.nativeNoneMembers.push({...value.nativeNoneMembers[0]})},
+  'cross Gzip duplicate':value=>{value.nativeNoneMembers[0].id=value.members[0].id},
+  'extra member':value=>{value.nativeNoneMembers.push({...value.nativeNoneMembers[0],id:'not-in-source'})},
+  'unknown member field':value=>{value.nativeNoneMembers[0].compression='gzip'},
+  'coerced member role':value=>{value.nativeNoneMembers[0].role=['entrypoint']},
+  'script member MIME':value=>{value.nativeNoneMembers[0].mediaType='text/javascript'},
+  'original drift':value=>{value.nativeNoneMembers[0].integrity.digest=hash(Buffer.from('wrong'))},
+  'stored drift':value=>{value.nativeNoneMembers[0].storedIntegrity.digest=hash(Buffer.from('wrong'))},
+ };
+ for(const[name,mutate]of Object.entries(proofCases))await t.test('full proof '+name,()=>{const value=structuredClone(current);mutate(value);assert.throws(()=>assertKeelRegisteredNativeGzipProof(value,root.rootBytes))});
+ const auditCases={
+  'proof removed':value=>{delete value.registeredNativeGzip},
+  'None evidence removed':value=>{delete value.registeredNativeGzip.nativeNoneMembers},
+  'missing witness':(_value,payload)=>{delete payload.nativeNone},
+  'extra witness field':(_value,payload)=>{payload.nativeNone.other=true},
+  'witness role array':(_value,payload)=>{payload.nativeNone.role=['entrypoint']},
+  'witness role drift':(_value,payload)=>{payload.nativeNone.role='asset'},
+  'wrong payload ID':(_value,payload)=>{payload.id='different'},
+  'wrong MIME':(_value,payload)=>{payload.mediaType='video/webm'},
+  'wrong encoding':(_value,payload)=>{payload.encoding='hex'},
+  'wrong compression':(_value,payload)=>{payload.compression='gzip'},
+  'wrong original digest':(_value,payload)=>{payload.nativeNone.integrity.digest=hash(Buffer.from('wrong'))},
+  'wrong stored digest':(_value,payload)=>{payload.nativeNone.storedIntegrity.digest=hash(Buffer.from('wrong'))},
+  'wrong byte count':(_value,payload)=>{payload.binaryBytes++},
+  'wrong Base64 length':(_value,payload)=>{payload.textCarriageBytes++},
+  'duplicate payload':(value,payload)=>{value.payloads.push(structuredClone(payload));value.payloadCount++},
+  'missing payload':value=>{value.payloads=value.payloads.filter(payload=>!payload.nativeNone);value.payloadCount=value.payloads.length},
+  'witness on Gzip':value=>{value.payloads.find(payload=>payload.compression==='gzip').nativeNone=structuredClone(value.payloads.find(payload=>payload.nativeNone).nativeNone)},
+  'null witness':(_value,payload)=>{payload.nativeNone=null},
+  'unknown payload field':(_value,payload)=>{payload.other=true},
+  'foreign transport profile':(_value,payload)=>{payload.transportProfile='uri81-block-v1'},
+ };
+ for(const[name,mutate]of Object.entries(auditCases))await t.test('serialized audit '+name,()=>{const value=structuredClone(audit);mutate(value,value.payloads.find(payload=>payload.nativeNone));assert.throws(()=>assertKeelFreshPayloadAudit(value))});
+ let called=false;const getter=structuredClone(audit);Object.defineProperty(getter.payloads.find(payload=>payload.nativeNone).nativeNone,'role',{enumerable:true,get(){called=true;return'entrypoint'}});assert.throws(()=>assertKeelFreshPayloadAudit(getter));assert.equal(called,false);
+ const arrayGetter=structuredClone(current);Object.defineProperty(arrayGetter.nativeNoneMembers,0,{get(){called=true;return current.nativeNoneMembers[0]}});assert.throws(()=>assertKeelRegisteredNativeGzipProof(arrayGetter));assert.equal(called,false);
+ const hidden=structuredClone(current);Object.defineProperty(hidden.nativeNoneMembers[0],'other',{value:true});assert.throws(()=>assertKeelRegisteredNativeGzipProof(hidden));
+ const symbolic=structuredClone(audit);symbolic.payloads.find(payload=>payload.nativeNone).nativeNone[Symbol('extra')]=true;assert.throws(()=>assertKeelFreshPayloadAudit(symbolic));
+});
+
+test('actual native None full metadata audit and COPY review survive JSON recovery without changing Gzip membership',async()=>{
+ const root=await document(),registeredNativeGzip=proof(root),graph=await buildKeelInlineRawPercentTokenURIGraph(root,{registeredNativeGzip});
+ const image=readFileSync(new URL('./fixtures/media-viewers/still.png',import.meta.url));
+ const prepared=await buildKeelPreparedOneOfOneTokenURI({graph,registeredNativeGzip,chainId:p.chainId,collection:'0x1111111111111111111111111111111111111111',collectionName:'Native original video',description:'Exact retained original',imageURI:'data:image/png;base64,'+image.toString('base64'),manifestURI:'',manifestDigest:hash(Buffer.from('manifest'))});
+ const audit=await auditKeelInlineTokenURI(prepared.tokenURI,{registeredNativeGzip});assert.equal(audit.freshPayloadPolicySatisfied,true);assertKeelFreshPayloadAudit(JSON.parse(JSON.stringify(audit.carriage)));
+ const chunks=[];for(let at=0;at<graph.fragmentBytes.length;at+=23000){const bytes=graph.fragmentBytes.subarray(at,at+23000);chunks.push({byteLength:bytes.length,integrity:integrity(bytes)})}
+ const operations=[];for(let at=0;at<chunks.length;at+=3){const batch=chunks.slice(at,at+3);operations.push({kind:'castSlugs',function:'castSlugs(bytes[])',payloadEncoding:'raw-bytes-from-files',chunkCount:batch.length,chunkByteLengths:batch.map(chunk=>chunk.byteLength),chunkIntegrities:batch.map(chunk=>chunk.integrity),slugIds:'derived-keccak256-after-review'})}
+ operations.push({kind:'weldObject',function:'weldObject(bytes32[],bytes32,uint64,uint8,string)',slugIds:'from-preceding-castSlugs',digest:graph.fragmentIntegrity,byteLength:graph.fragmentBytes.length,compression:'none',mediaType:graph.mediaType});
+ const chainPlan={schema:'keel-chain-operation-plan@1',status:'review-only',materialized:true,descriptorMaterialized:true,chainReady:false,target:{family:'ethereum',chainId:p.chainId,address:p.store},sourcePlan:{schema:'keel-upload-plan@2',objectName:'video-viewer',mediaType:graph.mediaType,integrity:graph.fragmentIntegrity},operations,encoding:'deferred-contract-abi',walletApproval:'required',signing:'not-performed',submission:'not-performed',caveat:'Local byte-bound COPY/recovery validation only.'};
+ const envelope=await createKeelPublishReviewPlan(chainPlan,{preparedCopy:{registeredNativeGzip,graphBytes:graph.fragmentBytes,expectedTokenURI:prepared.tokenURI,returnedTokenURI:prepared.tokenURI,callGasLimit:30_000_000n,blockGasLimit:60_000_000n}});
+ const recovered=JSON.parse(JSON.stringify(envelope));assert.equal((await verifyKeelPublishReviewPlan(recovered)).valid,true);
+ const carriage=recovered.plan.preparedCopy.payloadCarriage;assert.equal(carriage.registeredNativeGzip.members.length,1);assert.equal(carriage.registeredNativeGzip.members[0].id,'keel.asset-display');assert.equal(carriage.registeredNativeGzip.nativeNoneMembers.length,1);assert.equal(carriage.payloads.find(payload=>payload.id==='artwork.mp4').nativeNone.role,'entrypoint');
+ delete carriage.payloads.find(payload=>payload.id==='artwork.mp4').nativeNone;assert.equal((await verifyKeelPublishReviewPlan(recovered)).valid,false);
 });

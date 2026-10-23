@@ -138,8 +138,17 @@ function inspectVideoWebM(bytes: Uint8Array): void {
   if (!videos.size || [...videos].some(n => !blocks.has(n))) invalid();
 }
 
+export function assertRegisteredNativeNoneIdentity(input: {readonly role: unknown; readonly mediaType: string}): void {
+  if (typeof input.role !== "string" || !["entrypoint", "asset", "data"].includes(input.role)) invalid();
+  if (["video/mp4", "video/webm"].includes(input.mediaType)) return;
+  if (input.role !== "entrypoint" && ((KEEL_NATIVE_AUDIO_MEDIA_TYPES as readonly string[]).includes(input.mediaType)
+    || ["model/gltf-binary", "application/octet-stream"].includes(input.mediaType))) return;
+  return invalid();
+}
+
 export function assertRegisteredNativeNoneBinary(input: {readonly id: string; readonly role: unknown; readonly mediaType: string; readonly source: Uint8Array}): "model" | void {
-  if (!["entrypoint", "asset", "data"].includes(String(input.role)) || !input.source.length || input.source.length > 32 * 1024 * 1024) invalid();
+  assertRegisteredNativeNoneIdentity(input);
+  if (!input.source.length || input.source.length > 32 * 1024 * 1024) invalid();
   if (input.mediaType === "video/mp4") return inspectVideoMP4(input.source);
   if (input.mediaType === "video/webm") return inspectVideoWebM(input.source);
   if ((KEEL_NATIVE_AUDIO_MEDIA_TYPES as readonly string[]).includes(input.mediaType)) {
@@ -166,12 +175,12 @@ export function assertRegisteredNativeNoneModelGraph(resources: readonly Registe
   if (!requiredIds.length) return;
   if (resources.length > 128 || resources.reduce((n, resource) => n + resource.source.length, 0) > 32 * 1024 * 1024) invalid();
   const models = resources.filter(resource => ["model/gltf-binary", "model/gltf+json"].includes(resource.mediaType));
-  if (models.length !== 1 || !["asset", "data"].includes(String(models[0]!.role))) invalid();
+  if (models.length !== 1 || typeof models[0]!.role !== "string" || !["asset", "data"].includes(models[0]!.role as string)) invalid();
   const asModelResource = (resource: RegisteredNativeDecodedResource) => {
     if (!Array.isArray(resource.aliases) || resource.aliases.length > 128 || resource.aliases.some(alias => typeof alias !== "string" || alias.length > 300)) invalid();
     return {id: resource.id, mediaType: resource.mediaType, source: resource.source, aliases: resource.aliases as string[]};
   };
-  const model = models[0]!, assets = resources.filter(resource => resource.id !== model.id && ["asset", "data"].includes(String(resource.role)));
+  const model = models[0]!, assets = resources.filter(resource => resource.id !== model.id && typeof resource.role === "string" && ["asset", "data"].includes(resource.role));
   const inspected = inspectKeelModelMedia(asModelResource(model), assets.map(asModelResource));
   const used = new Set([model.id, ...inspected.dependencyIds]);
   if (requiredIds.some(id => !used.has(id))) invalid();
