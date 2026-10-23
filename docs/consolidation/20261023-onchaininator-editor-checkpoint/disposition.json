@@ -1,0 +1,17 @@
+{
+  "source": "/Users/ravonus/dev/onchaininator/.claude/worktrees/keel-sdk",
+  "originalTreeRef": "facdec78e18a7bcf894211abe542353fdd0c2302",
+  "publicBase": "9dcd52c7071edb57bbf2def2f46581208fab7410",
+  "sourceCheckpointCommit": "b16a7b815d4a72cc52bdb2ca68046834163fca38",
+  "paths": [
+    "docs/KEEL_MODULES.md",
+    "packages/sdk/src/abi.ts",
+    "packages/sdk/src/abis.generated.ts",
+    "packages/sdk/src/index.ts",
+    "packages/sdk/src/keel.ts",
+    "packages/sdk/src/modules.generated.ts",
+    "tools/keel/module-map.mjs"
+  ],
+  "patchSHA256": "3dbdd92794f1221cd5201904483cd2f79599cb08e9b2d4fe98c985b1bc3af644",
+  "disposition": "Seven-file older ABI/module-map editor state retained inactive. Current generated catalogue and supported contract interfaces remain selected. Original noncommit ref and exact tree are preserved in the independent private recovery database."
+}
