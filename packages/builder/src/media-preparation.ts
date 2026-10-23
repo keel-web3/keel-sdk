@@ -44,7 +44,7 @@ export interface KeelMediaCandidate {
   readonly warnings: readonly string[];
 }
 function animatedAvif(bytes:Uint8Array) { return actualAvifContainer(bytes)?.sequence === true; }
-interface Decoded { info: KeelMediaInfo; hashes: readonly string[]; rgba?:Uint8Array; videoMap?:string; imageMetadata?: ImageMetadata; startTimeMs?: number; extraStreams?: boolean; srgbFull?:boolean; audio?:ActualMediaAudio; audioTimeline?:MovieAudioTimeline; }
+interface Decoded { info: KeelMediaInfo; hashes: readonly string[]; rgba?:Uint8Array; videoMap?:string; imageMetadata?: ImageMetadata; startTimeMs?: number; extraStreams?: boolean; srgbFull?:boolean; audio?:ActualMediaAudio; audioTimeline?:MovieAudioTimeline; nativePreviewFilter?:string;nativeWarnings?:readonly string[]; }
 function hash(bytes: Uint8Array) { const h = createHash("sha256"); h.update(bytes); return h.digest("hex"); }
 function bounded(bytes: Uint8Array) { if (!(bytes instanceof Uint8Array) || bytes.byteLength < 1 || bytes.byteLength > MAX_BYTES) throw new RangeError(`Media must contain 1–${MAX_BYTES} bytes.`); }
 function geometry(recipe: KeelMediaEditRecipe) { return recipe.crop !== undefined || recipe.width !== undefined || recipe.height !== undefined || (recipe.rotate ?? 0) !== 0 || (recipe.layers?.length ?? 0) > 0; }
@@ -134,7 +134,7 @@ async function imageCandidate(bytes: Uint8Array, recipe: KeelMediaEditRecipe): P
 async function ffmpegRun(binary: string, cwd: string, args: string[], signal?:AbortSignal) {
   return exec(binary, ["-hide_banner","-nostdin","-max_alloc",String(MAX_BYTES),...args], {cwd, timeout:120_000, maxBuffer:16*1024*1024, ...(signal ? {signal}: {})}) as Promise<{stdout:string;stderr:string}>;
 }
-async function decodeMovie(binary: string, cwd: string, input: string, signal?:AbortSignal, exactOrigin = false): Promise<Decoded> {
+async function decodeMovie(binary: string, cwd: string, input: string, signal?:AbortSignal, exactOrigin = false,purpose:"fidelity"|"native-inspection"="fidelity"): Promise<Decoded> {
   signal?.throwIfAborted();
   const containerBytes = new Uint8Array(await readFile(path.join(cwd,input)));
   const avifSequence = animatedAvif(containerBytes);
@@ -149,17 +149,28 @@ async function decodeMovie(binary: string, cwd: string, input: string, signal?:A
   const selectedStream = videoStreams[videoIndex]!;
   const dims = /Video:[^\n]*?\b(\d{1,5})x(\d{1,5})\b/u.exec(selectedStream);
   if (!dims || Number(dims[1])*Number(dims[2]) > MAX_PIXELS || Math.max(Number(dims[1]),Number(dims[2])) > 8192) throw new Error("Movie dimensions are unavailable or exceed the decode budget.");
-  const presentation = assertMoviePresentationSemantics(containerBytes,probe.stderr.split("Output #")[0]!,selectedStream,Number(dims[1]),Number(dims[2]));
+  const presentation = assertMoviePresentationSemantics(containerBytes,probe.stderr.split("Output #")[0]!,selectedStream,Number(dims[1]),Number(dims[2]),purpose);
+  const nativeDisplay=presentation.nativeDisplay;
+  // Native SAR previews may expand beyond the coded raster. Bind the same
+  // existing frame/pixel budgets to the complete parsed sample count before
+  // launching a scaled decode, rather than rejecting after processing it.
+  if(nativeDisplay&&(presentation.videoTimeline.samples>BigInt(MAX_FRAMES)
+    ||presentation.videoTimeline.samples*BigInt(nativeDisplay.width)*BigInt(nativeDisplay.height)>BigInt(MAX_MOVIE_PIXELS)))
+    throw new RangeError("Movie exceeds the bounded native display frame decode budget.");
+  const nativePreviewFilter=nativeDisplay&&(nativeDisplay.width!==nativeDisplay.codedWidth||nativeDisplay.height!==nativeDisplay.codedHeight)
+    ?`scale=${nativeDisplay.width}:${nativeDisplay.height}:flags=bilinear,setsar=1`:undefined;
+  const nativeVideoFilter=nativePreviewFilter?["-vf",nativePreviewFilter]:[];
   const duration=/Duration:\s*(\d+):(\d+):(\d+(?:\.\d+)?)/u.exec(probe.stderr), rate=/,\s*([\d.]+) fps/u.exec(selectedStream);
   if (duration && rate) {
     const expectedFrames=(Number(duration[1])*3600+Number(duration[2])*60+Number(duration[3]))*Number(rate[1]);
     if (expectedFrames>MAX_FRAMES+1 || expectedFrames*Number(dims[1])*Number(dims[2])>MAX_MOVIE_PIXELS) throw new RangeError("Movie exceeds the bounded duration/frame decode budget.");
   }
   // Local, immutable single-file input only. No network, concat files or external dependency protocols.
-  const {stdout,stderr} = await ffmpegRun(binary,cwd,["-protocol_whitelist","file,pipe","-threads","2",...origin,"-i",input,"-map",videoMap,"-an","-vsync","0","-pix_fmt","rgba","-threads","2","-frames:v",String(MAX_FRAMES+1),"-enc_time_base","-1","-f","framehash","-hash","sha256","pipe:1"],signal);
+  const {stdout,stderr} = await ffmpegRun(binary,cwd,["-protocol_whitelist","file,pipe","-threads","2",...origin,"-i",input,"-map",videoMap,"-an",...nativeVideoFilter,"-vsync","0","-pix_fmt","rgba","-threads","2","-frames:v",String(MAX_FRAMES+1),"-enc_time_base","-1","-f","framehash","-hash","sha256","pipe:1"],signal);
   const dimensions = /^#dimensions 0:\s*(\d+)x(\d+)/mu.exec(stdout), timebase = /^#tb 0:\s*(\d+)\/(\d+)/mu.exec(stdout);
   if (!dimensions || !timebase) throw new Error("The movie decoder did not expose complete frame dimensions or timing.");
   const width = Number(dimensions[1]), height = Number(dimensions[2]);
+  if(nativeDisplay&&(width!==nativeDisplay.width||height!==nativeDisplay.height))throw new Error("The actual native preview raster differs from its qualified display geometry; original bytes are retained.");
   const tb = Number(timebase[1])/Number(timebase[2])*1000;
   const frames = stdout.split("\n").filter(line => /^0,/.test(line)).map(line => line.split(",").map(s=>s.trim()));
   if (!frames.length || frames.length > MAX_FRAMES || width*height*frames.length > MAX_MOVIE_PIXELS) throw new RangeError("Movie exceeds the bounded full-frame verification budget.");
@@ -188,7 +199,11 @@ async function decodeMovie(binary: string, cwd: string, input: string, signal?:A
   const hasAudio=/Stream #.*Audio:/u.test(stderr),audioTimeline=presentation.audioTimeline;
   if(hasAudio!==!!audioTimeline)throw new Error("The actual audio tracks do not match the qualified container timeline; native media is retained.");
   const audio=hasAudio?await decodePairAudio(binary,cwd,input,audioTimeline!,signal):undefined;
-  return {info:{width,height,durationMs:times.at(-1)!+delays.at(-1)!,frameCount:frames.length,animated:frames.length>1,hasAudio,frameTimesMs:times,frameDurationsMs:delays},hashes:frames.map(f=>f[5]!),videoMap,startTimeMs:first*timingBase,extraStreams:/Stream #.*(?:Subtitle|Data|Attachment):/u.test(probe.stderr),srgbFull:presentation.srgbFull,...(audio?{audio,audioTimeline}:{} )};
+  return {info:{width,height,durationMs:times.at(-1)!+delays.at(-1)!,frameCount:frames.length,animated:frames.length>1,hasAudio,frameTimesMs:times,frameDurationsMs:delays},hashes:frames.map(f=>f[5]!),videoMap,startTimeMs:first*timingBase,extraStreams:/Stream #.*(?:Subtitle|Data|Attachment):/u.test(probe.stderr),srgbFull:presentation.srgbFull,...(audio?{audio,audioTimeline}:{} ),
+    ...(nativePreviewFilter?{nativePreviewFilter}:{}),
+    ...(nativeDisplay?{nativeWarnings:[
+      ...(nativePreviewFilter?[`Native display preview rasterizes coded ${nativeDisplay.codedWidth}x${nativeDisplay.codedHeight} at SAR ${nativeDisplay.sampleAspectRatio.numerator}:${nativeDisplay.sampleAspectRatio.denominator} to ${nativeDisplay.width}x${nativeDisplay.height}. This is preview-only; original encoded bytes are unchanged and no lossless conversion or pair proof is granted.`]:[]),
+      ...(presentation.nativeCreatorTitle?["Native inspection retains the creator title in the exact original container; the frame preview is not permission to remove that metadata from a converted carrier."]:[])]}:{} )};
 }
 function sameAudioPresentation(a:MovieAudioTimeline|undefined,b:MovieAudioTimeline|undefined) {
   return !a&&!b || !!a&&!!b&&(a.duration-a.priming)*b.scale===(b.duration-b.priming)*a.scale;
@@ -311,9 +326,9 @@ async function readFrame(bytes:Uint8Array,timeMs:number, signal?:AbortSignal,pur
   const dir=await mkdtemp(path.join(tmpdir(),"keel-frame-"));
   try {
     await writeFile(path.join(dir,"source"),bytes,{flag:"wx"});
-    const decoded=await decodeMovie(runtime.binary,dir,"source",signal), index=frameAt(decoded.info,timeMs);
-    await ffmpegRun(runtime.binary,dir,["-loglevel","error","-protocol_whitelist","file,pipe","-threads","2","-i","source","-map",decoded.videoMap ?? "0:v:0","-vf",`select=eq(n\\,${index})`,"-vsync","0","-frames:v","1","-threads","2","-n","frame.png"],signal);
-    return {bytes:new Uint8Array(await readFile(path.join(dir,"frame.png"))),info:decoded.info,frameTimeMs:decoded.info.frameTimesMs[index]!};
+    const decoded=await decodeMovie(runtime.binary,dir,"source",signal,false,purpose), index=frameAt(decoded.info,timeMs);
+    await ffmpegRun(runtime.binary,dir,["-loglevel","error","-protocol_whitelist","file,pipe","-threads","2","-i","source","-map",decoded.videoMap ?? "0:v:0","-vf",`select=eq(n\\,${index})${decoded.nativePreviewFilter?","+decoded.nativePreviewFilter:""}`,"-vsync","0","-frames:v","1","-threads","2","-n","frame.png"],signal);
+    return {bytes:new Uint8Array(await readFile(path.join(dir,"frame.png"))),info:decoded.info,frameTimeMs:decoded.info.frameTimesMs[index]!,...(decoded.nativeWarnings?{warnings:decoded.nativeWarnings}:{})};
   } finally {await rm(dir,{recursive:true,force:true});}
 }
 /** Decode both views at one source time. Never compares independently running animations. */

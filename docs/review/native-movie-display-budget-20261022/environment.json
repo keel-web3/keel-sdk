@@ -1,0 +1,39 @@
+{
+  "source": "fefd8fc91c7e286143a8857edfbb5cdddafbcb56",
+  "siteSource": "5453cfd7cd2380baac494a05971bffa441406ab8",
+  "os": "macOS-15.6.1-arm64-arm-64bit-Mach-O",
+  "nodeVersion": "v22.22.1",
+  "tools": [
+    {
+      "path": "/Users/ravonus/.nvm/versions/node/v22.22.1/bin/node",
+      "byteLength": 112972416,
+      "sha256": "245e0321af97d3c21dd4e7104457334dfe3c3ba7982d0db75363e354565f8cbb"
+    },
+    {
+      "path": "/Users/ravonus/dev/keel-sdk/node_modules/.pnpm/ffmpeg-static@5.3.0/node_modules/ffmpeg-static/ffmpeg",
+      "byteLength": 45568216,
+      "sha256": "a90e3db6a3fd35f6074b013f948b1aa45b31c6375489d39e572bea3f18336584"
+    },
+    {
+      "path": "/Users/ravonus/Library/Caches/ms-playwright/chromium_headless_shell-1234/chrome-headless-shell-mac-arm64/chrome-headless-shell",
+      "byteLength": 163329264,
+      "sha256": "7687bff7cb2db075f250e6d5848bbc8838cac3802ac3952a899c574f8eccab45"
+    }
+  ],
+  "builderSource": [
+    {
+      "path": "/private/tmp/keel-native-movie-display-budget-20261022-01/keel-sdk/packages/builder/src/media-preparation.ts",
+      "byteLength": 50343,
+      "sha256": "f026df721c094730b25ed1310ddf30ce1fffed74ccb19100998763d4a1be553f"
+    },
+    {
+      "path": "/private/tmp/keel-native-movie-display-budget-20261022-01/keel-sdk/packages/builder/src/movie-presentation-semantics.ts",
+      "byteLength": 31929,
+      "sha256": "6ef84624b9a6296a7401e6d13a266f3c2ad06e214e154c923f51bec79e82981c"
+    }
+  ],
+  "scope": "local public/synthetic media only; aliases point to own current SDK outputs; public cache readonly; local browser loopback authorized",
+  "siteFreshRun": "not rerun in this six-line internal guard wave; no interface/Site source changes",
+  "priorRuntimeBase": "9f5bf42309efae5ee933850c9afab618cf29121b",
+  "testClosureParent": "b3f60c2980a613559da577063a741b3639245adc"
+}

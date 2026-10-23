@@ -1,0 +1,11 @@
+--- reviewer-native-display-budget.test.mjs	2026-10-22 17:51:39
++++ reviewer-native-display-budget-corrected.test.mjs	2026-10-22 17:52:51
+@@ -8,7 +8,7 @@
+ const require=createRequire(new URL('./packages/builder/package.json',import.meta.url)),ffmpeg=require('ffmpeg-static');
+ const r=new URL('../evidence/',import.meta.url);await mkdir(r,{recursive:true});const file=new URL('native-overbudget-display.mp4',r);
+ // Tiny coded raster; actual qualified display is8192x1024 for300 frames.
+-cp.execFileSync(ffmpeg,['-hide_banner','-loglevel','error','-f','lavfi','-i','color=c=red:size=32x1024:rate=5','-frames:v','300','-vf','format=gbrp,setsar=256/1','-c:v','libx264rgb','-crf','0','-color_primaries','1','-color_trc','13','-colorspace','0','-color_range','pc','-threads','2','-an','-y',file.pathname]);
++cp.execFileSync(ffmpeg,['-hide_banner','-loglevel','error','-f','lavfi','-i','color=c=red:size=32x1024:rate=5','-frames:v','300','-vf','format=gbrp,setsar=256/1:max=1000','-c:v','libx264rgb','-crf','0','-color_primaries','1','-color_trc','13','-colorspace','0','-color_range','pc','-threads','2','-an','-y',file.pathname]);
+ const bytes=new Uint8Array(await readFile(file)),real=promisify(cp.execFile),launches=[];let heavy=false;
+ // Forward every actual probe/tool call. Refuse only the over-budget full scaled
+ // framehash launch, so this negative cannot consume2.5billion displayed pixels.

@@ -1,0 +1,11 @@
+{
+ "cwd":"keel-sdk",
+ "node":"/Users/ravonus/.nvm/versions/node/v22.22.1/bin/node",
+ "build":"node node_modules/typescript/bin/tsc -p packages/builder/tsconfig.json",
+ "builderTypecheck":"node node_modules/typescript/bin/tsc -p packages/builder/tsconfig.json --noEmit",
+ "sdk":"node --test --test-concurrency=1 reviewer-native-gif-mutable-input.test.mjs tests/media-frame-request-snapshot.test.mjs tests/native-media-frame-read.test.mjs tests/audio-clock-binding.test.mjs tests/audio-clock-binding-mcp.test.mjs tests/movie-track-binding.test.mjs tests/movie-edit-list.test.mjs tests/movie-presentation-semantics.test.mjs tests/actual-media-container.test.mjs tests/actual-media-pair.test.mjs tests/media-preparation.test.mjs tests/temporal-webp.test.mjs reviewer-temporal-pair-retained-bytes.mjs reviewer-shared-848.test.mjs reviewer-shared-848-mcp.test.mjs reviewer-editlist-byte-equality.test.mjs reviewer-noedit-timeline.test.mjs reviewer-audio-track-binding.test.mjs tests/native-movie-inspection.test.mjs tests/native-movie-mcp.test.mjs",
+ "browser":"CHROMIUM_PATH=<environment.json Chrome> KEEL_CHROME_HEADLESS_SHELL=<same> KEEL_TEMPORAL_EVIDENCE_DIR=<evidence>/browser-results node --test --test-concurrency=1 tests/temporal-carrier-sequence.browser.test.mjs tests/native-presentation-guard.browser.test.mjs tests/native-movie-preview.browser.test.mjs",
+ "siteCwd":"keel-site/apps/studio",
+ "siteTypecheck":"node node_modules/typescript/bin/tsc --noEmit --incremental false",
+ "site":"node --conditions=react-server --import tsx --import ./tests/unit/support/css-modules.mjs --test --test-concurrency=1 tests/unit/temporal-media-service.test.ts tests/unit/reviewer-native-gif-semantics.test.ts tests/unit/owned-temporal-complete-context.test.ts tests/unit/registered-inline-release-cost-scope.test.ts tests/unit/registered-inline-final-review.test.ts tests/unit/registered-inline-final-sdk.test.ts tests/unit/registered-inline-readonly.test.ts tests/unit/native-movie-inspection.test.ts"
+}

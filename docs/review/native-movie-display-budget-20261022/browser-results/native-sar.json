@@ -1,0 +1,13 @@
+{
+  "tag": "VIDEO",
+  "readyState": 4,
+  "width": 64,
+  "height": 24,
+  "fit": "contain",
+  "sourceSHA256": "66f1276bd4fdeafa2b3eb370598250b40248bb7ed356829c7bf257635512cab3",
+  "sourceBytes": 2918,
+  "scope": "local current canonical player; no chain, remote upload, signing or publication",
+  "consoleErrors": [],
+  "externalRequests": [],
+  "failedRequests": []
+}
