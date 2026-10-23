@@ -1,0 +1,358 @@
+TAP version 13
+# Subtest: binary digest mismatch performs neither state acquisition nor spawn
+ok 1 - binary digest mismatch performs neither state acquisition nor spawn
+  ---
+  duration_ms: 4.464333
+  type: 'test'
+  ...
+# Subtest: execution forwarding is rejected before forwarding
+ok 2 - execution forwarding is rejected before forwarding
+  ---
+  duration_ms: 4.084
+  type: 'test'
+  ...
+# Subtest: unapproved ancestor is rejected before forwarding
+ok 3 - unapproved ancestor is rejected before forwarding
+  ---
+  duration_ms: 0.987083
+  type: 'test'
+  ...
+# Subtest: unpinned proof is rejected before forwarding
+ok 4 - unpinned proof is rejected before forwarding
+  ---
+  duration_ms: 1.708292
+  type: 'test'
+  ...
+# Subtest: noncanonical proof is rejected before forwarding
+ok 5 - noncanonical proof is rejected before forwarding
+  ---
+  duration_ms: 0.96925
+  type: 'test'
+  ...
+# Subtest: unbounded slots is rejected before forwarding
+ok 6 - unbounded slots is rejected before forwarding
+  ---
+  duration_ms: 0.711792
+  type: 'test'
+  ...
+# Subtest: out of order read is rejected before forwarding
+ok 7 - out of order read is rejected before forwarding
+  ---
+  duration_ms: 0.656667
+  type: 'test'
+  ...
+# Subtest: mismatched input digest produces no proof
+ok 8 - mismatched input digest produces no proof
+  ---
+  duration_ms: 0.826458
+  type: 'test'
+  ...
+# Subtest: mismatched chain produces no proof
+ok 9 - mismatched chain produces no proof
+  ---
+  duration_ms: 0.654916
+  type: 'test'
+  ...
+# Subtest: mismatched engine produces no proof
+ok 10 - mismatched engine produces no proof
+  ---
+  duration_ms: 0.875167
+  type: 'test'
+  ...
+# Subtest: mismatched gas budget produces no proof
+ok 11 - mismatched gas budget produces no proof
+  ---
+  duration_ms: 0.507417
+  type: 'test'
+  ...
+# Subtest: mismatched base state produces no proof
+ok 12 - mismatched base state produces no proof
+  ---
+  duration_ms: 0.41975
+  type: 'test'
+  ...
+# Subtest: mismatched read count produces no proof
+ok 13 - mismatched read count produces no proof
+  ---
+  duration_ms: 0.312667
+  type: 'test'
+  ...
+# Subtest: mismatched block count produces no proof
+ok 14 - mismatched block count produces no proof
+  ---
+  duration_ms: 0.284875
+  type: 'test'
+  ...
+# Subtest: mismatched zero root produces no proof
+ok 15 - mismatched zero root produces no proof
+  ---
+  duration_ms: 0.297417
+  type: 'test'
+  ...
+# Subtest: native partial after result is rejected
+ok 16 - native partial after result is rejected
+  ---
+  duration_ms: 0.391083
+  type: 'test'
+  ...
+# Subtest: native second-result after result is rejected
+ok 17 - native second-result after result is rejected
+  ---
+  duration_ms: 0.298292
+  type: 'test'
+  ...
+# Subtest: a result is held until successful native process exit and canonical recheck
+ok 18 - a result is held until successful native process exit and canonical recheck
+  ---
+  duration_ms: 0.507792
+  type: 'test'
+  ...
+# Subtest: initial options are snapshotted before asynchronous binary verification
+ok 19 - initial options are snapshotted before asynchronous binary verification
+  ---
+  duration_ms: 0.324833
+  type: 'test'
+  ...
+# Subtest: valid broker identity and final zero exit permit completion
+ok 20 - valid broker identity and final zero exit permit completion
+  ---
+  duration_ms: 6.562666
+  type: 'test'
+  ...
+# Subtest: missing exit cannot be a successful native completion
+ok 21 - missing exit cannot be a successful native completion
+  ---
+  duration_ms: 1.299833
+  type: 'test'
+  ...
+# Subtest: nonzero exit cannot be a successful native completion
+ok 22 - nonzero exit cannot be a successful native completion
+  ---
+  duration_ms: 1.454584
+  type: 'test'
+  ...
+# Subtest: wrong identity cannot be a successful native completion
+ok 23 - wrong identity cannot be a successful native completion
+  ---
+  duration_ms: 1.092833
+  type: 'test'
+  ...
+# Subtest: wrong concurrency cannot be a successful native completion
+ok 24 - wrong concurrency cannot be a successful native completion
+  ---
+  duration_ms: 1.402209
+  type: 'test'
+  ...
+# Subtest: unbounded wall time cannot be a successful native completion
+ok 25 - unbounded wall time cannot be a successful native completion
+  ---
+  duration_ms: 1.262542
+  type: 'test'
+  ...
+# Subtest: primitive frame cannot be a successful native completion
+ok 26 - primitive frame cannot be a successful native completion
+  ---
+  duration_ms: 0.818125
+  type: 'test'
+  ...
+# Subtest: array frame cannot be a successful native completion
+ok 27 - array frame cannot be a successful native completion
+  ---
+  duration_ms: 0.80825
+  type: 'test'
+  ...
+# Subtest: result before identity cannot be a successful native completion
+ok 28 - result before identity cannot be a successful native completion
+  ---
+  duration_ms: 1.339958
+  type: 'test'
+  ...
+# Subtest: trailing result cannot be a successful native completion
+ok 29 - trailing result cannot be a successful native completion
+  ---
+  duration_ms: 1.166
+  type: 'test'
+  ...
+# Subtest: unknown frame cannot be a successful native completion
+ok 30 - unknown frame cannot be a successful native completion
+  ---
+  duration_ms: 0.76725
+  type: 'test'
+  ...
+# Subtest: invalid exit cannot be a successful native completion
+ok 31 - invalid exit cannot be a successful native completion
+  ---
+  duration_ms: 0.766042
+  type: 'test'
+  ...
+# Subtest: busy cannot be a successful native completion
+ok 32 - busy cannot be a successful native completion
+  ---
+  duration_ms: 0.629458
+  type: 'test'
+  ...
+# Subtest: the shipped Node runtime is the exact reviewed adapter, reader and IPC implementation
+ok 33 - the shipped Node runtime is the exact reviewed adapter, reader and IPC implementation
+  ---
+  duration_ms: 0.572584
+  type: 'test'
+  ...
+# Subtest: the public Node entry refuses missing approval or a missing verified executable before any provider read
+ok 34 - the public Node entry refuses missing approval or a missing verified executable before any provider read
+  ---
+  duration_ms: 2.678958
+  type: 'test'
+  ...
+# Subtest: immutable queries reuse one successful response and deep-copy caller-owned arrays
+ok 35 - immutable queries reuse one successful response and deep-copy caller-owned arrays
+  ---
+  duration_ms: 16.034542
+  type: 'test'
+  ...
+# Subtest: method/address/slot/hash keys are exact and case normalization does not change outgoing params
+ok 36 - method/address/slot/hash keys are exact and case normalization does not change outgoing params
+  ---
+  duration_ms: 2.404375
+  type: 'test'
+  ...
+# Subtest: chain/header/ancestor checks remain live while empty code is cached exactly
+ok 37 - chain/header/ancestor checks remain live while empty code is cached exactly
+  ---
+  duration_ms: 1.043875
+  type: 'test'
+  ...
+# Subtest: warmed response cannot bypass observed HTTP401 or shop another approved recipient
+ok 38 - warmed response cannot bypass observed HTTP401 or shop another approved recipient
+  ---
+  duration_ms: 1.7415
+  type: 'test'
+  ...
+# Subtest: warmed response cannot bypass observed HTTP403 or shop another approved recipient
+ok 39 - warmed response cannot bypass observed HTTP403 or shop another approved recipient
+  ---
+  duration_ms: 0.980542
+  type: 'test'
+  ...
+# Subtest: warmed response cannot bypass an observed canonical reorg
+ok 40 - warmed response cannot bypass an observed canonical reorg
+  ---
+  duration_ms: 0.542084
+  type: 'test'
+  ...
+# Subtest: separate readers never share response data even when their scheduler is shared
+ok 41 - separate readers never share response data even when their scheduler is shared
+  ---
+  duration_ms: 0.391292
+  type: 'test'
+  ...
+# Subtest: malformed proof/code result containers are never retained
+ok 42 - malformed proof/code result containers are never retained
+  ---
+  duration_ms: 0.457458
+  type: 'test'
+  ...
+# Subtest: close aborts a held response and prevents any late success
+ok 43 - close aborts a held response and prevents any late success
+  ---
+  duration_ms: 3.367875
+  type: 'test'
+  ...
+# Subtest: one canceled request cannot poison another in-flight caller or populate a stale cache epoch
+ok 44 - one canceled request cannot poison another in-flight caller or populate a stale cache epoch
+  ---
+  duration_ms: 1.01525
+  type: 'test'
+  ...
+# Subtest: public overload selects an already-approved paid proof source without remote execution
+ok 45 - public overload selects an already-approved paid proof source without remote execution
+  ---
+  duration_ms: 17.678834
+  type: 'test'
+  ...
+# Subtest: configured paid credentials do not authorize disclosure to that recipient
+ok 46 - configured paid credentials do not authorize disclosure to that recipient
+  ---
+  duration_ms: 1.440417
+  type: 'test'
+  ...
+# Subtest: paid HTTP 403 stops within one attempt and retains restriction/cooldown
+ok 47 - paid HTTP 403 stops within one attempt and retains restriction/cooldown
+  ---
+  duration_ms: 1.096875
+  type: 'test'
+  ...
+# Subtest: paid HTTP 429 stops within one attempt and retains restriction/cooldown
+ok 48 - paid HTTP 429 stops within one attempt and retains restriction/cooldown
+  ---
+  duration_ms: 0.674833
+  type: 'test'
+  ...
+# Subtest: wrong-chain paid source never receives address/key reads
+ok 49 - wrong-chain paid source never receives address/key reads
+  ---
+  duration_ms: 0.501041
+  type: 'test'
+  ...
+# Subtest: source snapshot mismatch is terminal instead of shopping another provider
+ok 50 - source snapshot mismatch is terminal instead of shopping another provider
+  ---
+  duration_ms: 0.397125
+  type: 'test'
+  ...
+# Subtest: invalid proof request is terminal, while unsupported proof method may use an approved alternative
+ok 51 - invalid proof request is terminal, while unsupported proof method may use an approved alternative
+  ---
+  duration_ms: 1.076667
+  type: 'test'
+  ...
+# Subtest: bounded response failure can select only an eligible alternative
+ok 52 - bounded response failure can select only an eligible alternative
+  ---
+  duration_ms: 5.973667
+  type: 'test'
+  ...
+# Subtest: cancel stops a pending read without selecting paid; fresh retry retains the exact query
+ok 53 - cancel stops a pending read without selecting paid; fresh retry retains the exact query
+  ---
+  duration_ms: 3.820958
+  type: 'test'
+  ...
+# Subtest: wallet, execution, unpinned and overscoped reads are rejected before any network request
+ok 54 - wallet, execution, unpinned and overscoped reads are rejected before any network request
+  ---
+  duration_ms: 0.460584
+  type: 'test'
+  ...
+# Subtest: captured public null response for eth_getProof fails closed without another recipient or latest fallback
+ok 55 - captured public null response for eth_getProof fails closed without another recipient or latest fallback
+  ---
+  duration_ms: 0.3775
+  type: 'test'
+  ...
+# Subtest: captured public null response for eth_getCode fails closed without another recipient or latest fallback
+ok 56 - captured public null response for eth_getCode fails closed without another recipient or latest fallback
+  ---
+  duration_ms: 0.217209
+  type: 'test'
+  ...
+# Subtest: captured public null response for eth_getBlockByHash fails closed without another recipient or latest fallback
+ok 57 - captured public null response for eth_getBlockByHash fails closed without another recipient or latest fallback
+  ---
+  duration_ms: 0.254208
+  type: 'test'
+  ...
+# Subtest: the captured public header, proof and code survive approved-reader framing without dropping Amsterdam fields
+ok 58 - the captured public header, proof and code survive approved-reader framing without dropping Amsterdam fields
+  ---
+  duration_ms: 0.514459
+  type: 'test'
+  ...
+1..58
+# tests 58
+# suites 0
+# pass 58
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 294.129042

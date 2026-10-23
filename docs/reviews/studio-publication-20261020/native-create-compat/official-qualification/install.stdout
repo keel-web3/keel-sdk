@@ -1,0 +1,42 @@
+Scope: all 17 workspace projects
+Lockfile is up to date, resolution step is skipped
+Progress: resolved 1, reused 0, downloaded 0, added 0
+Packages: +613
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+Progress: resolved 613, reused 612, downloaded 0, added 137
+Progress: resolved 613, reused 612, downloaded 0, added 565
+Progress: resolved 613, reused 612, downloaded 0, added 610
+Progress: resolved 613, reused 612, downloaded 0, added 611
+Progress: resolved 613, reused 612, downloaded 0, added 613, done
+ WARN  Failed to create bin at /Users/ravonus/dev/wt/studio-native-create-compat-20261020/keel-sdk/node_modules/.bin/oca. ENOENT: no such file or directory, open '/Users/ravonus/dev/wt/studio-native-create-compat-20261020/keel-sdk/packages/builder/dist/cli.js'
+ WARN  Failed to create bin at /Users/ravonus/dev/wt/studio-native-create-compat-20261020/keel-sdk/node_modules/.bin/keel-mcp. ENOENT: no such file or directory, open '/Users/ravonus/dev/wt/studio-native-create-compat-20261020/keel-sdk/packages/mcp/dist/cli.js'
+ WARN  Failed to create bin at /Users/ravonus/dev/wt/studio-native-create-compat-20261020/keel-sdk/node_modules/.bin/keel. ENOENT: no such file or directory, open '/Users/ravonus/dev/wt/studio-native-create-compat-20261020/keel-sdk/packages/builder/dist/cli.js'
+ WARN  Failed to create bin at /Users/ravonus/dev/wt/studio-native-create-compat-20261020/keel-sdk/node_modules/.bin/keel-sandbox. ENOENT: no such file or directory, open '/Users/ravonus/dev/wt/studio-native-create-compat-20261020/keel-sdk/packages/sandbox-sdk/dist/cli.js'
+ WARN  Failed to create bin at /Users/ravonus/dev/wt/studio-native-create-compat-20261020/keel-sdk/node_modules/.bin/sprite-codex. ENOENT: no such file or directory, open '/Users/ravonus/dev/wt/studio-native-create-compat-20261020/keel-sdk/packages/sprite-codex/dist/cli.js'
+ WARN  Failed to create bin at /Users/ravonus/dev/wt/studio-native-create-compat-20261020/keel-sdk/packages/mcp/node_modules/.bin/keel. ENOENT: no such file or directory, open '/Users/ravonus/dev/wt/studio-native-create-compat-20261020/keel-sdk/packages/builder/dist/cli.js'
+ WARN  Failed to create bin at /Users/ravonus/dev/wt/studio-native-create-compat-20261020/keel-sdk/packages/mcp/node_modules/.bin/oca. ENOENT: no such file or directory, open '/Users/ravonus/dev/wt/studio-native-create-compat-20261020/keel-sdk/packages/builder/dist/cli.js'
+ WARN  Failed to create bin at /Users/ravonus/dev/wt/studio-native-create-compat-20261020/keel-sdk/apps/desktop/node_modules/.bin/keel-mcp. ENOENT: no such file or directory, open '/Users/ravonus/dev/wt/studio-native-create-compat-20261020/keel-sdk/packages/mcp/dist/cli.js'
+ WARN  Failed to create bin at /Users/ravonus/dev/wt/studio-native-create-compat-20261020/keel-sdk/packages/studio-core/node_modules/.bin/keel. ENOENT: no such file or directory, open '/Users/ravonus/dev/wt/studio-native-create-compat-20261020/keel-sdk/packages/builder/dist/cli.js'
+ WARN  Failed to create bin at /Users/ravonus/dev/wt/studio-native-create-compat-20261020/keel-sdk/packages/studio-core/node_modules/.bin/oca. ENOENT: no such file or directory, open '/Users/ravonus/dev/wt/studio-native-create-compat-20261020/keel-sdk/packages/builder/dist/cli.js'
+
+devDependencies:
++ @keel/builder 0.3.0 <- packages/builder
++ @keel/ethereum-adapter 0.3.0 <- packages/ethereum-adapter
++ @keel/mcp 0.4.2 <- packages/mcp
++ @keel/protocol 0.3.0 <- packages/protocol
++ @keel/sandbox-sdk 0.1.0 <- packages/sandbox-sdk
++ @keel/sdk 0.3.2 <- packages/sdk
++ @keel/sprite-codex 0.1.0 <- packages/sprite-codex
++ @keel/studio-core 0.3.0 <- packages/studio-core
++ @keel/viewer 0.3.0 <- packages/viewer
++ @openzeppelin/contracts 5.6.1
++ @types/node 22.20.1
++ @wagmi/connectors 8.1.0
++ @wagmi/core 3.6.4
++ esbuild 0.28.2
++ solc 0.8.36
++ typescript 5.9.3
++ viem 2.55.19
++ yaml 2.8.2
+
+Done in 4.7s using pnpm v10.15.0

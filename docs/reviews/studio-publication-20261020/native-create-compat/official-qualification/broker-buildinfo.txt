@@ -1,0 +1,10 @@
+keel-proof-runner: go1.25.8
+	path	keel/proofrunner
+	mod	keel/proofrunner	(devel)	
+	build	-buildmode=exe
+	build	-compiler=gc
+	build	-trimpath=true
+	build	CGO_ENABLED=0
+	build	GOARCH=amd64
+	build	GOOS=linux
+	build	GOAMD64=v1
