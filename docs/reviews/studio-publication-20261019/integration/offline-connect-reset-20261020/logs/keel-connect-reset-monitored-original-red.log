@@ -1,0 +1,135 @@
+TAP version 13
+# Subtest: original raw CONNECT denial reproduces the uncaught real TCP reset
+ok 1 - original raw CONNECT denial reproduces the uncaught real TCP reset
+  ---
+  duration_ms: 77.801
+  type: 'test'
+  ...
+# Subtest: completed denial keeps exact target and response while accepting real TCP peer reset
+not ok 2 - completed denial keeps exact target and response while accepting real TCP peer reset
+  ---
+  duration_ms: 75.105041
+  type: 'test'
+  location: '/Users/ravonus/dev/wt/studio-prepared-source-diagnosis-20261020/keel-sdk/tests/offline-shell-connect-reset.test.mjs:57:3'
+  failureType: 'testCodeFailure'
+  error: |-
+    node:events:497
+          throw er; // Unhandled 'error' event
+          ^
+    
+    Error: read ECONNRESET
+        at TCP.onStreamRead (node:internal/stream_base_commons:216:20)
+    Emitted 'error' event on Socket instance at:
+        at emitErrorNT (node:internal/streams/destroy:170:8)
+        at emitErrorCloseNT (node:internal/streams/destroy:129:3)
+        at process.processTicksAndRejections (node:internal/process/task_queues:89:21) {
+      errno: -54,
+      code: 'ECONNRESET',
+      syscall: 'read'
+    }
+    
+    Node.js v22.22.1
+    
+    
+    1 !== 0
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: 0
+  actual: 1
+  operator: 'strictEqual'
+  stack: |-
+    TCP.onStreamRead (node:internal/stream_base_commons:216:20)
+    emitErrorNT (node:internal/streams/destroy:170:8)
+    emitErrorCloseNT (node:internal/streams/destroy:129:3)
+    process.processTicksAndRejections (node:internal/process/task_queues:89:21) {
+    TestContext.<anonymous> (file:///Users/ravonus/dev/wt/studio-prepared-source-diagnosis-20261020/keel-sdk/tests/offline-shell-connect-reset.test.mjs:58:46)
+    process.processTicksAndRejections (node:internal/process/task_queues:103:5)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: unexpected CONNECT socket error remains visible (finished=false, ECONNRESET)
+not ok 3 - unexpected CONNECT socket error remains visible (finished=false, ECONNRESET)
+  ---
+  duration_ms: 0.089125
+  type: 'test'
+  location: '/Users/ravonus/dev/wt/studio-prepared-source-diagnosis-20261020/keel-sdk/tests/offline-shell-connect-reset.test.mjs:64:5'
+  failureType: 'testCodeFailure'
+  error: 'preserved unexpected socket error'
+  code: 'ECONNRESET'
+  stack: |-
+    TestContext.<anonymous> (file:///Users/ravonus/dev/wt/studio-prepared-source-diagnosis-20261020/keel-sdk/tests/offline-shell-connect-reset.test.mjs:67:67)
+    Test.runInAsyncScope (node:async_hooks:214:14)
+    Test.run (node:internal/test_runner/test:1047:25)
+    Test.processPendingSubtests (node:internal/test_runner/test:744:18)
+    Test.postRun (node:internal/test_runner/test:1173:19)
+    Test.run (node:internal/test_runner/test:1101:12)
+    process.processTicksAndRejections (node:internal/process/task_queues:103:5)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: unexpected CONNECT socket error remains visible (finished=false, EPIPE)
+not ok 4 - unexpected CONNECT socket error remains visible (finished=false, EPIPE)
+  ---
+  duration_ms: 0.326292
+  type: 'test'
+  location: '/Users/ravonus/dev/wt/studio-prepared-source-diagnosis-20261020/keel-sdk/tests/offline-shell-connect-reset.test.mjs:64:5'
+  failureType: 'testCodeFailure'
+  error: 'preserved unexpected socket error'
+  code: 'EPIPE'
+  stack: |-
+    TestContext.<anonymous> (file:///Users/ravonus/dev/wt/studio-prepared-source-diagnosis-20261020/keel-sdk/tests/offline-shell-connect-reset.test.mjs:67:67)
+    Test.runInAsyncScope (node:async_hooks:214:14)
+    Test.run (node:internal/test_runner/test:1047:25)
+    Test.processPendingSubtests (node:internal/test_runner/test:744:18)
+    Test.postRun (node:internal/test_runner/test:1173:19)
+    Test.run (node:internal/test_runner/test:1101:12)
+    process.processTicksAndRejections (node:internal/process/task_queues:103:5)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: unexpected CONNECT socket error remains visible (finished=true, EPIPE)
+not ok 5 - unexpected CONNECT socket error remains visible (finished=true, EPIPE)
+  ---
+  duration_ms: 0.042542
+  type: 'test'
+  location: '/Users/ravonus/dev/wt/studio-prepared-source-diagnosis-20261020/keel-sdk/tests/offline-shell-connect-reset.test.mjs:64:5'
+  failureType: 'testCodeFailure'
+  error: 'preserved unexpected socket error'
+  code: 'EPIPE'
+  stack: |-
+    TestContext.<anonymous> (file:///Users/ravonus/dev/wt/studio-prepared-source-diagnosis-20261020/keel-sdk/tests/offline-shell-connect-reset.test.mjs:67:67)
+    Test.runInAsyncScope (node:async_hooks:214:14)
+    Test.run (node:internal/test_runner/test:1047:25)
+    Test.processPendingSubtests (node:internal/test_runner/test:744:18)
+    Test.postRun (node:internal/test_runner/test:1173:19)
+    Test.run (node:internal/test_runner/test:1101:12)
+    process.processTicksAndRejections (node:internal/process/task_queues:103:5)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: unexpected CONNECT socket error remains visible (finished=true, EACCES)
+not ok 6 - unexpected CONNECT socket error remains visible (finished=true, EACCES)
+  ---
+  duration_ms: 0.029208
+  type: 'test'
+  location: '/Users/ravonus/dev/wt/studio-prepared-source-diagnosis-20261020/keel-sdk/tests/offline-shell-connect-reset.test.mjs:64:5'
+  failureType: 'testCodeFailure'
+  error: 'preserved unexpected socket error'
+  code: 'EACCES'
+  stack: |-
+    TestContext.<anonymous> (file:///Users/ravonus/dev/wt/studio-prepared-source-diagnosis-20261020/keel-sdk/tests/offline-shell-connect-reset.test.mjs:67:67)
+    Test.runInAsyncScope (node:async_hooks:214:14)
+    Test.run (node:internal/test_runner/test:1047:25)
+    Test.processPendingSubtests (node:internal/test_runner/test:744:18)
+    Test.postRun (node:internal/test_runner/test:1173:19)
+    Test.run (node:internal/test_runner/test:1101:12)
+    process.processTicksAndRejections (node:internal/process/task_queues:103:5)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+1..6
+# tests 6
+# suites 0
+# pass 1
+# fail 5
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 242.943

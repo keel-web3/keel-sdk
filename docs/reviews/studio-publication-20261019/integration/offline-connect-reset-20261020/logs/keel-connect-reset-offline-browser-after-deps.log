@@ -1,0 +1,22 @@
+TAP version 13
+# Subtest: network attribution keeps opaque and unknown initiators and never exempts a hostname
+ok 1 - network attribution keeps opaque and unknown initiators and never exempts a hostname
+  ---
+  duration_ms: 1.808167
+  type: 'test'
+  ...
+# Subtest: maintained wrapper renders committed modules without external requests and rejects tampering before mounting
+ok 2 - maintained wrapper renders committed modules without external requests and rejects tampering before mounting
+  ---
+  duration_ms: 5410.437209
+  type: 'test'
+  ...
+1..2
+# tests 2
+# suites 0
+# pass 2
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 5631.038958

@@ -1,0 +1,58 @@
+TAP version 13
+# Subtest: original raw CONNECT denial reproduces the uncaught real TCP reset
+ok 1 - original raw CONNECT denial reproduces the uncaught real TCP reset
+  ---
+  duration_ms: 79.064333
+  type: 'test'
+  ...
+# Subtest: completed denial keeps exact target and response while accepting real TCP peer reset
+ok 2 - completed denial keeps exact target and response while accepting real TCP peer reset
+  ---
+  duration_ms: 76.175292
+  type: 'test'
+  ...
+# Subtest: unexpected CONNECT socket error remains visible (finished=false, ECONNRESET)
+ok 3 - unexpected CONNECT socket error remains visible (finished=false, ECONNRESET)
+  ---
+  duration_ms: 0.164958
+  type: 'test'
+  ...
+# Subtest: unexpected CONNECT socket error remains visible (finished=false, EPIPE)
+ok 4 - unexpected CONNECT socket error remains visible (finished=false, EPIPE)
+  ---
+  duration_ms: 0.05875
+  type: 'test'
+  ...
+# Subtest: unexpected CONNECT socket error remains visible (finished=true, EPIPE)
+ok 5 - unexpected CONNECT socket error remains visible (finished=true, EPIPE)
+  ---
+  duration_ms: 0.155375
+  type: 'test'
+  ...
+# Subtest: unexpected CONNECT socket error remains visible (finished=true, EACCES)
+ok 6 - unexpected CONNECT socket error remains visible (finished=true, EACCES)
+  ---
+  duration_ms: 0.085542
+  type: 'test'
+  ...
+# Subtest: network attribution keeps opaque and unknown initiators and never exempts a hostname
+ok 7 - network attribution keeps opaque and unknown initiators and never exempts a hostname
+  ---
+  duration_ms: 1.91825
+  type: 'test'
+  ...
+# Subtest: maintained wrapper renders committed modules without external requests and rejects tampering before mounting
+ok 8 - maintained wrapper renders committed modules without external requests and rejects tampering before mounting
+  ---
+  duration_ms: 5079.984333
+  type: 'test'
+  ...
+1..8
+# tests 8
+# suites 0
+# pass 8
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 5377.274625

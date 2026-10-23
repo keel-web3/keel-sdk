@@ -1,0 +1,36 @@
+verify	Verify wrapped shell offline behavior	﻿2026-10-20T14:18:06.8414210Z ##[group]Run node --test tests/sdk-verification-wrap-offline-browser.test.mjs
+verify	Verify wrapped shell offline behavior	2026-10-20T14:18:06.8415206Z [36;1mnode --test tests/sdk-verification-wrap-offline-browser.test.mjs[0m
+verify	Verify wrapped shell offline behavior	2026-10-20T14:18:06.8478357Z shell: /usr/bin/bash -e {0}
+verify	Verify wrapped shell offline behavior	2026-10-20T14:18:06.8478643Z env:
+verify	Verify wrapped shell offline behavior	2026-10-20T14:18:06.8478934Z   PNPM_HOME: /home/runner/setup-pnpm/node_modules/.bin
+verify	Verify wrapped shell offline behavior	2026-10-20T14:18:06.8479325Z   CHROMIUM_PATH: /usr/bin/google-chrome
+verify	Verify wrapped shell offline behavior	2026-10-20T14:18:06.8479850Z ##[endgroup]
+verify	Verify wrapped shell offline behavior	2026-10-20T14:18:06.9005624Z TAP version 13
+verify	Verify wrapped shell offline behavior	2026-10-20T14:18:07.2313582Z # Subtest: network attribution keeps opaque and unknown initiators and never exempts a hostname
+verify	Verify wrapped shell offline behavior	2026-10-20T14:18:07.2322434Z ok 1 - network attribution keeps opaque and unknown initiators and never exempts a hostname
+verify	Verify wrapped shell offline behavior	2026-10-20T14:18:07.2323677Z   ---
+verify	Verify wrapped shell offline behavior	2026-10-20T14:18:07.2324379Z   duration_ms: 2.601742
+verify	Verify wrapped shell offline behavior	2026-10-20T14:18:07.2330423Z   type: 'test'
+verify	Verify wrapped shell offline behavior	2026-10-20T14:18:07.2331062Z   ...
+verify	Verify wrapped shell offline behavior	2026-10-20T14:18:19.3150461Z # Subtest: maintained wrapper renders committed modules without external requests and rejects tampering before mounting
+verify	Verify wrapped shell offline behavior	2026-10-20T14:18:19.3153170Z not ok 2 - maintained wrapper renders committed modules without external requests and rejects tampering before mounting
+verify	Verify wrapped shell offline behavior	2026-10-20T14:18:19.3154466Z   ---
+verify	Verify wrapped shell offline behavior	2026-10-20T14:18:19.3155271Z   duration_ms: 12084.892495
+verify	Verify wrapped shell offline behavior	2026-10-20T14:18:19.3155922Z   type: 'test'
+verify	Verify wrapped shell offline behavior	2026-10-20T14:18:19.3157170Z   location: '/home/runner/work/keel-sdk/keel-sdk/keel-sdk/tests/sdk-verification-wrap-offline-browser.test.mjs:15:1'
+verify	Verify wrapped shell offline behavior	2026-10-20T14:18:19.3158573Z   failureType: 'uncaughtException'
+verify	Verify wrapped shell offline behavior	2026-10-20T14:18:19.3159274Z   error: 'read ECONNRESET'
+verify	Verify wrapped shell offline behavior	2026-10-20T14:18:19.3159916Z   code: 'ECONNRESET'
+verify	Verify wrapped shell offline behavior	2026-10-20T14:18:19.3160537Z   stack: |-
+verify	Verify wrapped shell offline behavior	2026-10-20T14:18:19.3161315Z     TCP.onStreamRead (node:internal/stream_base_commons:216:20)
+verify	Verify wrapped shell offline behavior	2026-10-20T14:18:19.3162244Z   ...
+verify	Verify wrapped shell offline behavior	2026-10-20T14:18:22.2437017Z 1..2
+verify	Verify wrapped shell offline behavior	2026-10-20T14:18:22.2437664Z # tests 2
+verify	Verify wrapped shell offline behavior	2026-10-20T14:18:22.2438521Z # suites 0
+verify	Verify wrapped shell offline behavior	2026-10-20T14:18:22.2439396Z # pass 1
+verify	Verify wrapped shell offline behavior	2026-10-20T14:18:22.2439945Z # fail 1
+verify	Verify wrapped shell offline behavior	2026-10-20T14:18:22.2441330Z # cancelled 0
+verify	Verify wrapped shell offline behavior	2026-10-20T14:18:22.2441939Z # skipped 0
+verify	Verify wrapped shell offline behavior	2026-10-20T14:18:22.2442529Z # todo 0
+verify	Verify wrapped shell offline behavior	2026-10-20T14:18:22.2443425Z # duration_ms 15355.92878
+verify	Verify wrapped shell offline behavior	2026-10-20T14:18:22.2518682Z ##[error]Process completed with exit code 1.

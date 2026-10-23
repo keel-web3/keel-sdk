@@ -1,0 +1,15 @@
+# Denial CONNECT teardown regression
+
+Source correction1d3ce42fd7d785ceca7886cf69c03bc12f02811c, baseSDK b524bf5fc19939c7523aada2e53f79e3360970ea. Test/helper only; no production source, dist, decoder, registered frame, reference artwork, network policy, existing test assertion or timeout changes. Independent review and fresh GitHub successor pending.
+
+PR67 modules-verify run39437797352 attempts1+2 both failed the unchanged wrapped-shell offline browser test with uncaught `read ECONNRESET` at TCP.onStreamRead. Two raw loopback CONNECT handlers wrote their fixed502 response and left the socket without an error listener. Existing request interception/denial still prevented external artwork access; the observer process failed on socket teardown.
+
+The new real loopback regression sends CONNECT blocked.invalid:443, reads the exact502 response and resets its TCP peer with resetAndDestroy. A child with the exact old handler exits1 on the same uncaught reset. The fixed handler installs its listener before writing; only ECONNRESET following the socket's denial-write finish is expected. An error monitor observes the real reset without consuming it (unlike an error listener). Before-finish ECONNRESET and EPIPE, plus after-finish EPIPE/EACCES, must remain reported by exact error identity. The attempted CONNECT target and502 bytes remain exact.
+
+The helper now uses that narrow handler for both denial proxies. Per-page CONNECT target recording is unchanged. Unexpected proxy errors join the existing browser errors array. That array is returned through browser shutdown/cleanup rather than copied before Browser.close, so late unexpected teardown errors remain observable. No unknown error is turned into an expected reset.
+
+Owner results: Node22.22.1/macOS real TCP/error cases6PASS; unchanged actual Chrome155.0.8059.85 wrapped-shell offline test2PASS; combined8PASS; suite classifier3PASS. The old browser test is byte-for-byte identical to b524, SHA9806a250d5af17ea3066ff9cc439d318b38434420b27b0ed142a84ebdbb34279. Its exact no-network, verified/tampered, committed module, opaque child-frame and negative external-request assertions all remain. This is synthetic local assurance, not publication/live/authenticated browser proof. No Linux/GitHub successor claim.
+
+Retained development RED includes: first missing new export; exploratory listener-based control2PASS4FAIL (that listener consumed the reset, so this is not the accepted real-reset control); corrected errorMonitor baseline1PASS5FAIL including the actual reset; first browser run lacked the repository's Brotli WASM dependency and stopped before browser launch. The final owned worktree used read-only symlinks to frozenb524 SDK dist and existing dependencies, then passed the unchanged test. No dependency or generated asset was rebuilt or changed.
+
+See owner-receipt.json for exact commands and raw logs for all outcomes. The deterministic classification adds only the new loopback/process test; existing browser classification stays unchanged.

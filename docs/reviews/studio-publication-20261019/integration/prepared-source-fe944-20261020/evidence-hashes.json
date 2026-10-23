@@ -1,0 +1,57 @@
+[
+  {
+    "path": "logs/binding-selector-red.json",
+    "bytes": 1375,
+    "sha256": "3277ae5133bb7c27ee214474230e831bf25cb5fb715e3ec59c1467e8db40b690"
+  },
+  {
+    "path": "logs/compiled-dense-final.stderr",
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "path": "logs/compiled-dense-final.stdout",
+    "bytes": 2082,
+    "sha256": "e998e1c79c8adcd3920b3a60f337ff11b042716aea33010a30fa0b188375cda3"
+  },
+  {
+    "path": "logs/compiled-dense-retained-legacy.stderr",
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "path": "logs/compiled-dense-retained-legacy.stdout",
+    "bytes": 2521,
+    "sha256": "a918a124c3fa220debaa0297fdc868f3ef45e55574827756c2531975b3995ffc"
+  },
+  {
+    "path": "logs/compiled-dense-retained.stderr",
+    "bytes": 16764,
+    "sha256": "2811e0dde235d3db58e87efbecff3b705f4a6623096727c25b56d59a2da9aa9f"
+  },
+  {
+    "path": "logs/compiled-dense-retained.stdout",
+    "bytes": 3145,
+    "sha256": "19c8b6a5e0af17ab473214f9be174a8051131cb10ffc794826aa32d9c680c87f"
+  },
+  {
+    "path": "private-input-retention.json",
+    "bytes": 704,
+    "sha256": "323e72721ce11281a885418d039f6ff3236556cd347d75b906e7fd83131e3465"
+  },
+  {
+    "path": "probe-compiled-dense-retained-legacy.mjs",
+    "bytes": 4603,
+    "sha256": "7801d9424a57926e40332df65cf7d6e662f6d60c94c75b73ad7c3f58fd6a3f0a"
+  },
+  {
+    "path": "probe-compiled-dense-retained.mjs",
+    "bytes": 4611,
+    "sha256": "be61ed4845c63859b85137f469ebae2e39c4021ad956ccb3d370f86dbdccea0c"
+  },
+  {
+    "path": "probe-compiled-dense.mjs",
+    "bytes": 3904,
+    "sha256": "e415b73979c4ba89fc6c1841de7bc52a50aa26e7a0aa96ab712015d753d8c3f3"
+  }
+]

@@ -1,0 +1,49 @@
+{
+  "schema": "keel-compiled-prepared-source-asset-path@1",
+  "scope": "actual emitted SDK creator preparation function, not HTTP/authentication/chain readiness",
+  "buildId": "pyrfdcquUJkhz22Y0jyAz",
+  "uid": 999,
+  "node": "v22.23.1",
+  "moduleId": 32633,
+  "exportName": "om",
+  "moduleDefinitionSha256": "f884f6e46a58fee6be5e78927258d66aba500f027d953fd482e6d5af3baaa77d",
+  "routeSha256": "d6102eb519fcdf983818c70584f94e1fc7859fb91560aa70d4a6a623434ab222",
+  "externalVerificationDefinition": "a=>{a.exports=import(\"@keel/sdk/verification-shell\")}",
+  "input": {
+    "synthetic": true,
+    "sourceBytes": 76,
+    "sourceSha256": "fe9b5e4f7ab1454c4bc657c5f83afef92e7e62a9f2f2ec913a98cefc7823b6aa",
+    "posterBytes": 68,
+    "posterSha256": "431ced6916a2a21a156e38701afe55bbd7f88969fbbfc56d7fe099d47f265460"
+  },
+  "httpEntryInvoked": false,
+  "databaseInvoked": false,
+  "walletInvoked": false,
+  "registeredReaderAuthenticated": false,
+  "results": [
+    {
+      "readerGrammar": "uri81",
+      "protocol": "keel.creator-prepared-inline@1",
+      "sourceBytes": 76,
+      "preparedBytesBeforeLiveEnvelope": 190050,
+      "completeTokenURIBytes": null,
+      "sourceSha256": "0xfe9b5e4f7ab1454c4bc657c5f83afef92e7e62a9f2f2ec913a98cefc7823b6aa",
+      "shellPrefixSha256": "544649250d343c45e02cc47cffbfc5e663fc61bb696724fb82d033b086b684be",
+      "shellSuffixSha256": "1260d4a2d662670b963b6767dee89a641c46d68df7f9f2ff49bf93a77d3bbeaf",
+      "publicationStatus": "review-only"
+    },
+    {
+      "readerGrammar": "legacy-strict",
+      "protocol": "keel.creator-prepared-inline@1",
+      "sourceBytes": 76,
+      "preparedBytesBeforeLiveEnvelope": 190066,
+      "completeTokenURIBytes": null,
+      "sourceSha256": "0xfe9b5e4f7ab1454c4bc657c5f83afef92e7e62a9f2f2ec913a98cefc7823b6aa",
+      "shellPrefixSha256": "544649250d343c45e02cc47cffbfc5e663fc61bb696724fb82d033b086b684be",
+      "shellSuffixSha256": "ecf58ec5fe1cc55a23420ed4ada2a16dd531afe45e736187a763fabd9cd145f1",
+      "publicationStatus": "review-only"
+    }
+  ],
+  "result": "PASS",
+  "connectionsAttempted": 0
+}

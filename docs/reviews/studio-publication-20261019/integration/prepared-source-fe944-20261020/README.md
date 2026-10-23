@@ -1,0 +1,19 @@
+# Final compiled prepared-source asset path
+
+Candidate: Site `f11db8fa497945f89a6ffd076ee0e7a6d9a111fe`, SDK `b524bf5fc19939c7523aada2e53f79e3360970ea`, image `sha256:fe94404ea7a860e6397e0964ef8dbe7d9fa9bb2777a57dd90cf8c63d802d8369`, build `pyrfdcquUJkhz22Y0jyAz`. Local Colima Linux/amd64 emulation, image Node22.23.1, UID999. Probe source based on SDK b524. No candidate production source or dist changed.
+
+The ordinary production UI copy `1cef1869-6d1b-4840-b3de-63d8def2e390` revision1 (manifest4932e81c124bd1d70e12ecd05370b8da8590f3bb8492f3af0196e38e831a84db) retained the exact HTML530981B SHA9761586c1f904925743521d3cba30e4c32f591ebb8f017864e2f34427a02bff1 and PNG5801B SHA884f889b56e371694e58e79e781568691448c3a0bac2ee23588cb04ae2a83ab7. On the old production app, one POST `/api/artifacts/prepared-source`, operation prepare, displayed `The "path" argument must be of type string or an instance of URL. Received an instance of URL.` No stack was recovered. This evidence does not prove the exact old exception source.
+
+Read-only tracing finds the handler calls owner/revision/source authentication, then authenticated selected-chain creator preparation, then local `prepareKeelCreatorInline`, whose Dense shell loader uses verification-shell's Node assets. Final f11 next.config externalizes the exact verification-shell SDK leaf. The emitted route's actual external module34372 is `a=>{a.exports=import("@keel/sdk/verification-shell")}`. We loaded the actual emitted module32633/export om unchanged and called only that local preparation function. No HTTP handler, auth, DB, chain registration, wallet, quote or native simulation was invoked. Its placeholder store is a local planning input, not an authenticated deployment.
+
+Results:
+
+- Synthetic76B HTML/68B PNG: both URI81 and legacy-strict local preparation PASS, with zero socket attempts.
+- Exact retained files: URI81 local preparation PASS, encoded preparation417242B. The second legacy-strict call in that same process failed because esbuild's Go service crashed (`found bad pointer in Go heap`). Preserve this RED; its cause is unproved.
+- A fresh container with one exact legacy-strict call PASS: encoded preparation449306B; source totals536782B; HTML Brotli167155B and PNG Brotli5306B; prepared body253396B, image carriage7758B, new stored bytes261474B. Both exact source hashes remain unchanged. The output is review-only and `completeTokenURIBytes:null`, because no live collection envelope was bound. No URL/path exception and zero socket attempts.
+
+This clears the isolated final compiled asset-loading boundary for the real bytes. It is not authenticated HTTP/registered-reader/full-tokenURI/wallet-boundary proof. Production remains unchanged. The first wrong export selector failed before local preparation and is retained separately as probe-scaffolding RED.
+
+The scripts load actual image route/chunk module bodies unchanged. Run with the exact image and read-only script/private-input mounts, network none, read-only root, UID999, no capabilities, no-new-privileges, CPU2, memory768MiB, pids64, no-healthcheck; tmpfs /tmp128MiB. An existing empty read-only Postgres volume mount avoids image VOLUME allocation. `net.Socket.prototype.connect` throws/counts any network/DB attempt. Creator code is never executed. Private originals were copied only to a local0700 temporary home cache because Colima does not share host /tmp, mounted read-only and then removed. See retention receipt: both originals remain intact; no private bytes are committed. Owned containers were removed by --rm.
+
+Raw logs, script hashes and the initial service crash are retained beside this report. Remaining acceptance: actual authenticated final Studio route against the saved project, exact current chain/reader, reviewed complete metadata and simulation, followed by the wallet boundary without signing.

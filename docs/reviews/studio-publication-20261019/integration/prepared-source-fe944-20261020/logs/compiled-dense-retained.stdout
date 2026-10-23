@@ -1,0 +1,80 @@
+{
+  "schema": "keel-compiled-prepared-source-asset-path@1",
+  "scope": "actual emitted SDK creator preparation function, not HTTP/authentication/chain readiness",
+  "buildId": "pyrfdcquUJkhz22Y0jyAz",
+  "uid": 999,
+  "node": "v22.23.1",
+  "moduleId": 32633,
+  "exportName": "om",
+  "moduleDefinitionSha256": "f884f6e46a58fee6be5e78927258d66aba500f027d953fd482e6d5af3baaa77d",
+  "routeSha256": "d6102eb519fcdf983818c70584f94e1fc7859fb91560aa70d4a6a623434ab222",
+  "externalVerificationDefinition": "a=>{a.exports=import(\"@keel/sdk/verification-shell\")}",
+  "input": {
+    "synthetic": false,
+    "retainedCreatorBytes": true,
+    "sourceBytes": 530981,
+    "sourceSha256": "9761586c1f904925743521d3cba30e4c32f591ebb8f017864e2f34427a02bff1",
+    "posterBytes": 5801,
+    "posterSha256": "884f889b56e371694e58e79e781568691448c3a0bac2ee23588cb04ae2a83ab7"
+  },
+  "httpEntryInvoked": false,
+  "databaseInvoked": false,
+  "walletInvoked": false,
+  "registeredReaderAuthenticated": false,
+  "results": [
+    {
+      "readerGrammar": "uri81",
+      "protocol": "keel.creator-prepared-inline@1",
+      "sourceBytes": 536782,
+      "preparedBytesBeforeLiveEnvelope": 417242,
+      "completeTokenURIBytes": null,
+      "sourceSha256": "0x9761586c1f904925743521d3cba30e4c32f591ebb8f017864e2f34427a02bff1",
+      "resourceCodecs": [
+        {
+          "id": "Gatorrr-0.3.html",
+          "sourceIntegrity": {
+            "algorithm": "sha256",
+            "digest": "0x9761586c1f904925743521d3cba30e4c32f591ebb8f017864e2f34427a02bff1",
+            "byteLength": 530981
+          },
+          "compression": "brotli",
+          "compressedBytes": 167155,
+          "preparedPayloadBytes": 211144
+        },
+        {
+          "id": "home-preview.png",
+          "sourceIntegrity": {
+            "algorithm": "sha256",
+            "digest": "0x884f889b56e371694e58e79e781568691448c3a0bac2ee23588cb04ae2a83ab7",
+            "byteLength": 5801
+          },
+          "compression": "brotli",
+          "compressedBytes": 5306,
+          "preparedPayloadBytes": 6703
+        }
+      ],
+      "completeEncodedPreparationBytes": 417242,
+      "encodedBodyBytes": 221336,
+      "imageCarriageBytes": 7758,
+      "newStoredBytes": 229414,
+      "shellPrefixSha256": "544649250d343c45e02cc47cffbfc5e663fc61bb696724fb82d033b086b684be",
+      "shellSuffixSha256": "1260d4a2d662670b963b6767dee89a641c46d68df7f9f2ff49bf93a77d3bbeaf",
+      "publicationStatus": "review-only"
+    }
+  ],
+  "result": "FAIL",
+  "error": {
+    "name": "Error",
+    "message": "The service was stopped",
+    "stack": [
+      "Error: The service was stopped",
+      "    at /app/keel-externals/node_modules/esbuild/lib/main.js:1234:34",
+      "    at responseCallbacks.<computed> (/app/keel-externals/node_modules/esbuild/lib/main.js:886:9)",
+      "    at Socket.afterClose (/app/keel-externals/node_modules/esbuild/lib/main.js:877:28)",
+      "    at Socket.emit (node:events:531:35)",
+      "    at endReadableNT (node:internal/streams/readable:1698:12)",
+      "    at process.processTicksAndRejections (node:internal/process/task_queues:89:21)"
+    ]
+  },
+  "connectionsAttempted": 0
+}

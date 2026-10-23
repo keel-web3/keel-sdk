@@ -1,0 +1,46 @@
+TAP version 13
+# Subtest: original raw CONNECT denial reproduces the uncaught real TCP reset
+ok 1 - original raw CONNECT denial reproduces the uncaught real TCP reset
+  ---
+  duration_ms: 75.997042
+  type: 'test'
+  ...
+# Subtest: completed denial keeps exact target and response while accepting real TCP peer reset
+ok 2 - completed denial keeps exact target and response while accepting real TCP peer reset
+  ---
+  duration_ms: 73.957708
+  type: 'test'
+  ...
+# Subtest: unexpected CONNECT socket error remains visible (finished=false, ECONNRESET)
+ok 3 - unexpected CONNECT socket error remains visible (finished=false, ECONNRESET)
+  ---
+  duration_ms: 0.123667
+  type: 'test'
+  ...
+# Subtest: unexpected CONNECT socket error remains visible (finished=false, EPIPE)
+ok 4 - unexpected CONNECT socket error remains visible (finished=false, EPIPE)
+  ---
+  duration_ms: 0.047208
+  type: 'test'
+  ...
+# Subtest: unexpected CONNECT socket error remains visible (finished=true, EPIPE)
+ok 5 - unexpected CONNECT socket error remains visible (finished=true, EPIPE)
+  ---
+  duration_ms: 0.124875
+  type: 'test'
+  ...
+# Subtest: unexpected CONNECT socket error remains visible (finished=true, EACCES)
+ok 6 - unexpected CONNECT socket error remains visible (finished=true, EACCES)
+  ---
+  duration_ms: 0.0775
+  type: 'test'
+  ...
+1..6
+# tests 6
+# suites 0
+# pass 6
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 228.29475

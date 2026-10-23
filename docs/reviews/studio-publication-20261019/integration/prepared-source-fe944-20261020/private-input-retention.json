@@ -1,0 +1,20 @@
+{
+  "schema": "keel-readonly-private-source-probe-retention@1",
+  "temporaryMirrorReason": "Colima does not share host /tmp; exact bytes mounted read-only from a private 0700 home cache, no Git or other-machine copy",
+  "files": [
+    {
+      "name": "Gatorrr-0.3.html",
+      "byteLength": 530981,
+      "sha256": "9761586c1f904925743521d3cba30e4c32f591ebb8f017864e2f34427a02bff1",
+      "privateTemporaryMirrorRemoved": true,
+      "originalRetained": true
+    },
+    {
+      "name": "home-preview.png",
+      "byteLength": 5801,
+      "sha256": "884f889b56e371694e58e79e781568691448c3a0bac2ee23588cb04ae2a83ab7",
+      "privateTemporaryMirrorRemoved": true,
+      "originalRetained": true
+    }
+  ]
+}
