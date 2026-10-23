@@ -12,6 +12,7 @@ export interface MovieNativeDisplay {
   readonly codedWidth:number;readonly codedHeight:number;readonly width:number;readonly height:number;
   readonly sampleAspectRatio:{readonly numerator:number;readonly denominator:number};
 }
+interface NativePresentation { readonly origin:bigint; readonly times:readonly bigint[]; readonly durations:readonly bigint[] }
 
 /** Conservative admission for the presentation semantics which RGBA hashes do
  * not contain. This is intentionally a small supported ISO profile, not a
@@ -23,7 +24,7 @@ export interface MovieNativeDisplay {
  * https://github.com/FFmpeg/FFmpeg/blob/n6.1.1/libavformat/mov.c
  * https://aomediacodec.github.io/av1-avif/v1.2.0.html
  */
-export function assertMoviePresentationSemantics(bytes: Uint8Array, inputReport: string, selectedStream: string, width: number, height: number,purpose:"fidelity"|"native-inspection"="fidelity"): { readonly nativeDisplay?:MovieNativeDisplay;readonly nativeCreatorTitle?:boolean;readonly srgbFull: boolean; readonly videoTimeline: {readonly samples:bigint; readonly scale:bigint; readonly duration:bigint}; readonly audioTimeline?:MovieAudioTimeline } {
+export function assertMoviePresentationSemantics(bytes: Uint8Array, inputReport: string, selectedStream: string, width: number, height: number,purpose:"fidelity"|"native-inspection"="fidelity",nativeMaxFrames=1800): { readonly nativeDisplay?:MovieNativeDisplay;readonly nativeCreatorTitle?:boolean;readonly srgbFull: boolean; readonly videoTimeline: {readonly samples:bigint; readonly scale:bigint; readonly duration:bigint;readonly nativePresentation?:NativePresentation}; readonly audioTimeline?:MovieAudioTimeline } {
   const retain = (reason: string): never => { throw new TypeError(`Movie ${reason} require an exact preserving adapter; native media is retained.`); };
   const native=purpose==="native-inspection",reportedTitles:string[]=[];
   const sar = /\[SAR (\d+):(\d+) DAR (\d+):(\d+)\]/u.exec(selectedStream);
@@ -33,7 +34,16 @@ export function assertMoviePresentationSemantics(bytes: Uint8Array, inputReport:
   // Autorotation can bake a matrix into pixels without preserving the original
   // display geometry. No side-data semantics are discarded by this adapter.
   if (/Side data:|displaymatrix|rotation of|rotate\s*:/iu.test(inputReport)) retain("display transform or side-data semantics");
-  if (!/\b(?:gbrp|rgb24|rgba|bgr24|bgra|gray)(?:\(|,)/u.test(selectedStream) || /interlaced|top first|bottom first|bt2020|smpte2084|arib-std-b67/iu.test(selectedStream)) retain("color, field or sample-depth semantics");
+  // These exact planar names are 8-bit in the pinned FFmpeg pixel profile.
+  // Native RGBA preview is not a claim of lossless YUV conversion.
+  const nativeYuv=native?/\byuv(?:420|422|444)p\(([^)]*)\)/u.exec(selectedStream):null;
+  const nativeYuvFields=nativeYuv?.[1]!.split(",").map(value=>value.trim())??[];
+  if(nativeYuv&&(!nativeYuvFields.includes("progressive")||new Set(nativeYuvFields).size!==nativeYuvFields.length
+    ||nativeYuvFields.some(value=>!["progressive","tv","pc","bt709"].includes(value))||nativeYuvFields.includes("tv")&&nativeYuvFields.includes("pc")))retain("unqualified native YUV color, field or sample-depth semantics");
+  if(nativeYuv&&/interlaced|top first|bottom first|bt2020|smpte2084|arib-std-b67/iu.test(selectedStream))retain("native color, field or sample-depth semantics");
+  if(!nativeYuv) {
+    if (!/\b(?:gbrp|rgb24|rgba|bgr24|bgra|gray)(?:\(|,)/u.test(selectedStream) || /interlaced|top first|bottom first|bt2020|smpte2084|arib-std-b67/iu.test(selectedStream)) retain("color, field or sample-depth semantics");
+  }
   // FFmpeg exposes container and stream metadata separately. Only technical
   // muxer/encoder bookkeeping is disposable; creator tags, language, chapters
   // and unrecognised multiline fields are not inferred from pixel equality.
@@ -59,10 +69,10 @@ export function assertMoviePresentationSemantics(bytes: Uint8Array, inputReport:
   type Box = {kind:string; start:number; end:number};
   type Clock = {scale:bigint; duration:bigint};
   type Edit = {flags:number; duration:bigint; mediaTime:bigint};
-  type Track = {duration?:bigint; media?:Clock; edit?:Edit; video?:boolean; codec?:string; timing?:{duration:bigint;samples:bigint;runs:{count:bigint;duration:bigint}[]}; compositionSamples?:bigint; encodedSamples?:bigint; audio?:{sampleRate:number;channels:number}; aac?:{sampleRate:number;channels:number}; channelLayout?:number;display?:{width16:bigint;height16:bigint};coded?:{width:number;height:number};aspect?:{numerator:bigint;denominator:bigint}};
+  type Track = {duration?:bigint; media?:Clock; edit?:Edit; video?:boolean; codec?:string; timing?:{duration:bigint;samples:bigint;runs:{count:bigint;duration:bigint}[]}; compositionSamples?:bigint;composition?:{count:bigint;offset:bigint}[]; encodedSamples?:bigint; audio?:{sampleRate:number;channels:number}; aac?:{sampleRate:number;channels:number}; channelLayout?:number;display?:{width16:bigint;height16:bigint};coded?:{width:number;height:number};aspect?:{numerator:bigint;denominator:bigint}};
   let count=0, movieHeaders=0, videoHeaders=0, srgbFull=false;
   let movie:Clock|undefined, avifItems=0, avifExtents=0;
-  const tracks:Track[]=[], avifConfigs:Uint8Array[]=[],nativeTitles:string[]=[];
+  const tracks:Track[]=[], avifConfigs:Uint8Array[]=[],nativeTitles:string[]=[],nativePresentations=new Map<Track,NativePresentation>();
   let majorBrand:string|undefined;
   const clock=(start:number,end:number):Clock=>{
     if(start+4>end || bytes[start]!>1 || (view.getUint32(start)&0xffffff)!==0)retain("unknown edit-list reference clock version or flags");
@@ -171,13 +181,14 @@ export function assertMoviePresentationSemantics(bytes: Uint8Array, inputReport:
         if(a+8>z || (view.getUint32(a)&0xffffff)!==0 || bytes[a]!>(kind==="stts"?0:1))retain("unsupported edit-list sample timeline version or flags");
         const n=view.getUint32(a+4);
         if(!n || n>65_536 || z-a!==8+n*8)retain("edit-list sample timeline count or byte bounds");
-        let duration=0n,samples=0n;const runs:{count:bigint;duration:bigint}[]=[];
+        let duration=0n,samples=0n;const runs:{count:bigint;duration:bigint}[]=[],composition:{count:bigint;offset:bigint}[]=[];
         for(let i=0;i<n;i++) {
           const at=a+8+i*8,count=view.getUint32(at),value=kind==="ctts"&&bytes[a]===1?view.getInt32(at+4):view.getUint32(at+4);
-          if(!count || kind==="stts"&&value<=0 || kind==="ctts"&&value!==0)retain("unsupported edit-list sample duration or composition offset");
+          if(!count || kind==="stts"&&value<=0 || kind==="ctts"&&value!==0&&!(native&&owner.video&&["avc1","avc3"].includes(owner.codec??"")&&bytes[a]===0))retain("unsupported edit-list sample duration or composition offset");
           samples+=BigInt(count);if(kind==="stts"){duration+=BigInt(count)*BigInt(value);runs.push({count:BigInt(count),duration:BigInt(value)});}
+          else composition.push({count:BigInt(count),offset:BigInt(value)});
         }
-        if(kind==="stts")owner.timing={duration,samples,runs};else owner.compositionSamples=samples;
+        if(kind==="stts")owner.timing={duration,samples,runs};else{owner.compositionSamples=samples;owner.composition=composition;}
       } else if(kind==="mvhd" || kind==="tkhd") {
         if(a+4>z || bytes[a]!>1)retain("unknown movie/track header semantics");
         const version=bytes[a]!, at=a+(kind==="mvhd"?36:40)+(version===1?12:0);matrix(at,z);
@@ -214,6 +225,11 @@ export function assertMoviePresentationSemantics(bytes: Uint8Array, inputReport:
           else if(numerator!==denominator)retain("unqualified native pixel aspect scope");
         }
       } else if(kind==="colr") {
+        if(nativeYuv) {
+          const nclx=z-a===11&&text(a)==="nclx"&&[0,128].includes(bytes[a+10]!);
+          const nclc=z-a===10&&text(a)==="nclc",range=nativeYuvFields.includes("pc")?128:nativeYuvFields.includes("tv")?0:undefined;
+          if(!(nclx||nclc)||range===undefined||!nativeYuvFields.includes("bt709")||view.getUint16(a+4)!==1||view.getUint16(a+6)!==1||view.getUint16(a+8)!==1||nclx&&bytes[a+10]!==range)retain("unqualified native BT709 color profile or range semantics");
+        }else {
         // IEC sRGB, RGB matrix, full range. Anything else (including ICC,
         // unspecified transfer, nclc or HDR) needs a preserving color adapter.
         const nclx=z-a===11 && text(a)==="nclx" && bytes[a+10]===128;
@@ -222,6 +238,7 @@ export function assertMoviePresentationSemantics(bytes: Uint8Array, inputReport:
         const nclc=z-a===10 && text(a)==="nclc" && /\b(?:gbrp|rgb24|rgba|bgr24|bgra)\(pc[,)]/u.test(selectedStream);
         if(!(nclx||nclc) || view.getUint16(a+4)!==1 || view.getUint16(a+6)!==13 || view.getUint16(a+8)!==0)retain("embedded color profile semantics");
         srgbFull=true;
+        }
       } else if(kind==="fiel") {
         if(z-a!==2 || bytes[a]!==1 || bytes[a+1]!==0)retain("field ordering semantics");
       } else if(kind==="stsd") {
@@ -305,19 +322,31 @@ export function assertMoviePresentationSemantics(bytes: Uint8Array, inputReport:
     const edit=track.edit;
     const movieClock=movie??retain("unavailable movie timeline clock"),media=track.media??retain("unavailable media timeline clock");
     if(!track.timing || track.timing.duration!==media.duration || track.encodedSamples!==track.timing.samples || track.compositionSamples!==undefined && track.compositionSamples!==track.timing.samples)retain("media bounds or encoded sample counts differ from the complete sample timeline");
+    if(native&&track.video) {
+      const timing=track.timing??retain("missing native sample timeline");
+      if(!Number.isSafeInteger(nativeMaxFrames)||nativeMaxFrames<1||nativeMaxFrames>1800||timing.samples>BigInt(nativeMaxFrames))retain("native bounded frame decode budget");
+      const durations=timing.runs.flatMap(run=>Array<bigint>(Number(run.count)).fill(run.duration));
+      const offsets=track.composition?.flatMap(run=>Array<bigint>(Number(run.count)).fill(run.offset))??Array<bigint>(durations.length).fill(0n);
+      if(offsets.length!==durations.length||offsets.some(offset=>offset!==0n)&&durations.some(value=>value!==durations[0]))retain("unqualified native reordered variable-duration timeline");
+      let dts=0n;const intervals=durations.map((duration,index)=>{const pts=dts+offsets[index]!;dts+=duration;return {pts,duration};}).sort((a,b)=>a.pts<b.pts?-1:a.pts>b.pts?1:0);
+      const origin=intervals[0]?.pts??retain("missing native presentation samples");
+      if(origin<0n||intervals.some((value,index)=>index>0&&value.pts!==intervals[index-1]!.pts+intervals[index-1]!.duration)||intervals.at(-1)!.pts+intervals.at(-1)!.duration-origin!==media.duration)retain("native presentation holes, overlaps or complete duration correspondence");
+      nativePresentations.set(track,Object.freeze({origin,times:Object.freeze(intervals.map(value=>value.pts-origin)),durations:Object.freeze(intervals.map(value=>value.duration))}));
+    }
+    const nativePresentation=nativePresentations.get(track);
     if(!edit) {
       // No edts is an identity mapping of the whole media timeline, not an
       // exemption from duration/sample checks. Use the same exact upward
       // movie-clock rescaling as the supported whole-segment edit profile.
       const duration=(media.duration*movieClock.scale+media.scale-1n)/media.scale;
-      if(track.duration!==duration || duration>movieClock.duration)retain("unedited track duration or media timeline clock correspondence");
+      if(nativePresentation&&nativePresentation.origin!==0n||track.duration!==duration || duration>movieClock.duration)retain("unedited track duration or media timeline clock correspondence");
       continue;
     }
-    if(track.duration===undefined || edit.mediaTime>=media.duration || track.video && edit.mediaTime!==0n)retain("edit-list segment or media bounds");
+    if(track.duration===undefined || edit.mediaTime>=media.duration || track.video && edit.mediaTime!==(nativePresentation?.origin??0n))retain("edit-list segment or media bounds");
     // Exact integer rescaling, including the muxer's specified upward movie-
     // clock rounding. No tolerance or duration repair is used. Only a whole
     // remaining media segment (audio priming included) has known semantics.
-    const cycle=((media.duration-edit.mediaTime)*movieClock.scale+media.scale-1n)/media.scale;
+    const cycle=((nativePresentation?media.duration:media.duration-edit.mediaTime)*movieClock.scale+media.scale-1n)/media.scale;
     if(edit.duration!==cycle || edit.duration>movieClock.duration)retain("edit-list segment duration or media clock correspondence");
     if(edit.flags===0) {
       if(track.duration!==edit.duration)retain("edit-list and track duration correspondence");
@@ -348,7 +377,8 @@ export function assertMoviePresentationSemantics(bytes: Uint8Array, inputReport:
   // This record is recomputed from the actual bytes on every decode; it is
   // not a caller-supplied claim that a permissive decoder read every sample.
   if(!["avc1","avc3","av01"].includes(video.codec??""))retain("unqualified one-frame-per-sample codec profile");
-  const videoTimeline=Object.freeze({samples:video.encodedSamples!,scale:video.media!.scale,duration:video.media!.duration});
+  const nativePresentation=nativePresentations.get(video);
+  const videoTimeline=Object.freeze({samples:video.encodedSamples!,scale:video.media!.scale,duration:video.media!.duration,...(nativePresentation?{nativePresentation}:{})});
   let nativeDisplay:MovieNativeDisplay|undefined;
   if(native){
     if(nativeTitles.length!==reportedTitles.length||nativeTitles.some((title,index)=>title!==reportedTitles[index]))retain("native creator title bytes differ from the actual decoder report");

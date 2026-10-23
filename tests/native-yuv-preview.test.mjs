@@ -1,0 +1,42 @@
+import test from 'node:test';import assert from 'node:assert/strict';import{readFile}from'node:fs/promises';import{createHash}from'node:crypto';import{createRequire}from'node:module';
+import{mkdtemp,rm}from'node:fs/promises';import{tmpdir}from'node:os';import{join}from'node:path';import{execFileSync,spawnSync}from'node:child_process';
+import{prepareMediaCandidate,compareMediaFrames,verifyActualMediaPair,ORIGINAL_MEDIA_EDIT_RECIPE as original}from'../packages/builder/dist/media-preparation.js';
+const source=new Uint8Array(await readFile(new URL('./fixtures/native-yuv-preview/media-preview.mp4',import.meta.url)));assert.equal(source.length,1828);assert.equal(createHash('sha256').update(source).digest('hex'),'41bc415d0a2a142ee23db0de0089fb7d1675cc6718516a15da3f306bffb13193');const require=createRequire(new URL('../packages/builder/package.json',import.meta.url)),sharp=require('sharp');
+test('exact ordinary YUV Original export remains byte exact without fidelity claims',async()=>{const kept=await prepareMediaCandidate({bytes:source,mediaType:'video/mp4',recipe:original});assert.deepEqual(kept.bytes,source);assert.equal(kept.mediaType,'video/mp4');assert.equal(kept.verification.losslessPixelsVerified,false)});
+test('exact ordinary YUV B-frame Original fully inspects and previews the selected source time',async()=>{const result=await compareMediaFrames({bytes:source,mediaType:'video/mp4',recipe:original,timeMs:150});assert.equal(result.sourceInfo.frameCount,10);assert.equal(result.sourceInfo.durationMs,400);assert.equal(result.sourceInfo.hasAudio,false);assert.deepEqual(result.sourceInfo.frameTimesMs,[0,40,80,120,160,200,240,280,320,360]);assert.deepEqual(result.sourceInfo.frameDurationsMs,Array(10).fill(40));assert.equal(result.sourceFrameTimeMs,120);assert.equal(result.sourceIntegrity.digest,'0x41bc415d0a2a142ee23db0de0089fb7d1675cc6718516a15da3f306bffb13193');assert.equal(result.verification.losslessPixelsVerified,false);assert.equal(result.verification.completeDecode,false);const png=await sharp(result.originalFrame).metadata();assert.equal(png.width,16);assert.equal(png.height,16);assert.deepEqual(result.originalFrame,result.processedFrame);assert.deepEqual(result.bytes,undefined)});
+test('YUV native inspection cannot grant strict conversion or pair equivalence',async()=>{const recipe={...original,mode:'lossless',format:'mp4'};for(const operation of [()=>prepareMediaCandidate({bytes:source,recipe}),()=>compareMediaFrames({bytes:source,recipe,timeMs:0}),()=>verifyActualMediaPair({sourceBytes:source,candidateBytes:source,recipe})])await assert.rejects(operation(),/color|field|sample.depth|semantics/)});
+const {assertMoviePresentationSemantics:admit}=await import('../packages/builder/dist/movie-presentation-semantics.js');
+const stream='Video: h264 (High) (avc1), yuv420p(progressive), 16x16 [SAR 1:1 DAR 1:1]';
+test('native exact container presentation independently maps every bounded B-frame to its full cycle',()=>{const result=admit(source,'',stream,16,16,'native-inspection');assert.equal(result.srgbFull,false);assert.deepEqual(result.videoTimeline.nativePresentation.times,Array.from({length:10},(_,i)=>BigInt(i*512)));assert.deepEqual(result.videoTimeline.nativePresentation.durations,Array(10).fill(512n));assert.equal(result.videoTimeline.nativePresentation.origin,1024n);assert.throws(()=>admit(source,'',stream,16,16),/color|field|sample.depth|semantics/)});
+function editAtom(kind,change){const b=Buffer.from(source),at=b.indexOf(Buffer.from(kind,'latin1'));assert.ok(at>4);change(b,at+4);return b;}
+test('native B-frame clocks reject count mismatches, unknown offsets, overlaps, holes and changed edit origin',()=>{
+ const cases=[
+  ['duplicate PTS',editAtom('ctts',(b,a)=>b.writeUInt32BE(1536,a+12))],
+  ['hole/overlap',editAtom('ctts',(b,a)=>b.writeUInt32BE(2561,a+20))],
+  ['offset overflow',editAtom('ctts',(b,a)=>b.writeUInt32BE(0xffffffff,a+12))],
+  ['unknown signed offset profile',editAtom('ctts',(b,a)=>b[a]=1)],
+  ['count mismatch',editAtom('ctts',(b,a)=>b.writeUInt32BE(2,a+8))],
+  ['edit origin mismatch',editAtom('elst',(b,a)=>b.writeUInt32BE(1023,a+12))],
+  ['duration mismatch',editAtom('stts',(b,a)=>b.writeUInt32BE(513,a+12))],
+  ['unknown timeline flags',editAtom('ctts',(b,a)=>b[a+3]=1)],
+ ];for(const[name,bytes]of cases)assert.throws(()=>admit(bytes,'',stream,16,16,'native-inspection'),/native|sample|timeline|edit|composition|bounds|semantics/i,name);
+ assert.throws(()=>admit(source,'',stream,16,16,'native-inspection',9),/bounded.*budget/);assert.throws(()=>admit(source,'',stream,16,16,'native-inspection',Number.MAX_SAFE_INTEGER),/bounded.*budget/);
+});
+test('native YUV sample admission refuses depth, chroma, HDR, interlace and unqualified color near-matches',()=>{
+ for(const sample of ['yuv420p10le(progressive)','yuv422p12le(progressive)','yuv444p16le(progressive)','yuvj420p(pc, progressive)','nv12(progressive)','yuv420p','yuv420p(tv, bt709/unknown/unknown, progressive)','yuv420p(tv, smpte170m, progressive)','yuv420p(tv, bt2020nc/bt2020/smpte2084, progressive)','yuv420p(tv, arib-std-b67, progressive)','yuv420p(top first)','yuv420p(progressive, tv, pc)','yuv420p(progressive, progressive)'])assert.throws(()=>admit(source,'',stream.replace('yuv420p(progressive)',sample),16,16,'native-inspection'),/color|field|sample.depth|semantics/);
+ assert.throws(()=>admit(source,'Side data: displaymatrix',stream,16,16,'native-inspection'),/display|side.data/);
+});
+test('actual progressive 8-bit BT709 YUV planar profiles retain exact Original bytes and inspected timing',async()=>{
+ const dir=await mkdtemp(join(tmpdir(),'keel-native-bt709-')),ffmpeg=require('ffmpeg-static');
+ try{for(const pixel of ['yuv420p','yuv422p','yuv444p']){
+  const file=join(dir,pixel+'.mp4');execFileSync(ffmpeg,['-v','error','-f','lavfi','-i','testsrc=size=32x24:rate=5','-t','0.6','-vf','format='+pixel,'-c:v','libx264','-pix_fmt',pixel,'-color_primaries','bt709','-color_trc','bt709','-colorspace','bt709','-color_range','tv','-threads','2','-an','-y',file]);
+  const bytes=new Uint8Array(await readFile(file)),digest='0x'+createHash('sha256').update(bytes).digest('hex');const result=await compareMediaFrames({bytes,mediaType:'video/mp4',recipe:original,timeMs:200});assert.equal(result.sourceIntegrity.digest,digest);assert.equal(result.sourceInfo.frameCount,3);assert.equal(result.sourceInfo.durationMs,600);assert.deepEqual(result.sourceInfo.frameTimesMs,[0,200,400]);assert.equal(result.verification.losslessPixelsVerified,false);assert.equal(result.verification.completeDecode,false);assert.deepEqual((await prepareMediaCandidate({bytes,mediaType:'video/mp4',recipe:original})).bytes,bytes);
+  const report=spawnSync(ffmpeg,['-hide_banner','-i',file,'-t','0','-f','null','-'],{encoding:'utf8'}).stderr;const selected=report.split('\n').find(line=>/Stream #.*Video:/u.test(line));assert.match(selected,new RegExp(pixel+'\\(tv, bt709, progressive\\)'));assert.equal(admit(bytes,report.split('Output #')[0],selected,32,24,'native-inspection').srgbFull,false);
+  const at=Buffer.from(bytes).indexOf(Buffer.from('colr'));assert.ok(at>4);assert.equal(Buffer.from(bytes).readUInt32BE(at-4),19);assert.equal(Buffer.from(bytes).toString('latin1',at+4,at+8),'nclx');
+  for(const[field,value]of [[8,9],[10,16],[12,9]]){const changed=Buffer.from(bytes);changed.writeUInt16BE(value,at+field);assert.throws(()=>admit(changed,report.split('Output #')[0],selected,32,24,'native-inspection'),/color|range|semantics/)}
+  for(const value of [1,127,128,255]){const changed=Buffer.from(bytes);changed[at+14]=value;assert.throws(()=>admit(changed,report.split('Output #')[0],selected,32,24,'native-inspection'),/color|range|semantics/)}
+  const icc=Buffer.from(bytes);icc.write('prof',at+4,'latin1');assert.throws(()=>admit(icc,report.split('Output #')[0],selected,32,24,'native-inspection'),/color|range|semantics/);
+  for(const length of [18,20]){const changed=Buffer.from(bytes);changed.writeUInt32BE(length,at-4);assert.throws(()=>admit(changed,report.split('Output #')[0],selected,32,24,'native-inspection'),/color|range|box|semantics/)}
+  assert.throws(()=>admit(bytes,report.split('Output #')[0],selected.replace('tv, bt709','pc, bt709'),32,24,'native-inspection'),/color|range|semantics/);assert.throws(()=>admit(bytes,report.split('Output #')[0],selected,32,24),/color|sample|semantics/);
+ }}finally{await rm(dir,{recursive:true,force:true})}
+});
