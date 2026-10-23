@@ -1,5 +1,10 @@
 # Browser failure diagnosis and UNAPPLIED fixture proposals
 
+> **Independent review rejected the original75902 proposal.** Its helper stopped
+> observing on readiness and missed a250ms runtime error. Original proposal and
+> author logs remain unchanged as rejected evidence. See `v2/README.md` and
+> `browser-fixtures.v2.proposed.patch` for the separate replacement under review.
+
 Source baseline: SDK `e4985920593539f468c16524e2f74d2adf2878c3`.
 This checkpoint changes **no production source, generated shell, registered profile,
 immutable reader asset, artifact reference, runtime limit, or credential**.

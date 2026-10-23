@@ -1,0 +1,120 @@
+TAP version 13
+# Subtest: CDP commands time out, ignore their late replies and cannot resolve a different command
+ok 1 - CDP commands time out, ignore their late replies and cannot resolve a different command
+  ---
+  duration_ms: 23.207209
+  type: 'test'
+  ...
+# Subtest: socket disconnect rejects every pending command and all subsequent commands
+ok 2 - socket disconnect rejects every pending command and all subsequent commands
+  ---
+  duration_ms: 0.333042
+  type: 'test'
+  ...
+# Subtest: malformed CDP responses fail the session instead of escaping event handlers
+ok 3 - malformed CDP responses fail the session instead of escaping event handlers
+  ---
+  duration_ms: 0.480333
+  type: 'test'
+  ...
+# Subtest: a synchronous socket send failure rejects its pending command
+ok 4 - a synchronous socket send failure rejects its pending command
+  ---
+  duration_ms: 0.158416
+  type: 'test'
+  ...
+# Subtest: disposing a session rejects pending work, removes listeners and is idempotent
+ok 5 - disposing a session rejects pending work, removes listeners and is idempotent
+  ---
+  duration_ms: 0.134792
+  type: 'test'
+  ...
+# Subtest: a nonexistent browser rejects and removes its owned profile
+ok 6 - a nonexistent browser rejects and removes its owned profile
+  ---
+  duration_ms: 4.597042
+  type: 'test'
+  ...
+# Subtest: a browser exiting before DevTools rejects and removes its owned profile
+ok 7 - a browser exiting before DevTools rejects and removes its owned profile
+  ---
+  duration_ms: 3.205875
+  type: 'test'
+  ...
+# Subtest: actual Chrome cleanup is idempotent, settles pending work and removes its owned profile
+ok 8 - actual Chrome cleanup is idempotent, settles pending work and removes its owned profile
+  ---
+  duration_ms: 355.081166
+  type: 'test'
+  ...
+# Subtest: a refused CDP connection terminates its owned child and removes its profile
+ok 9 - a refused CDP connection terminates its owned child and removes its profile
+  ---
+  duration_ms: 218.842125
+  type: 'test'
+  ...
+# Subtest: missing DevTools startup is bounded and cleans up the actual owned process
+ok 10 - missing DevTools startup is bounded and cleans up the actual owned process
+  ---
+  duration_ms: 10012.717792
+  type: 'test'
+  ...
+# Subtest: actual Chrome retains a250ms runtime error with readiness at50ms
+ok 11 - actual Chrome retains a250ms runtime error with readiness at50ms
+  ---
+  duration_ms: 4183.010542
+  type: 'test'
+  ...
+# Subtest: actual Chrome retains a250ms runtime error with readiness at500ms
+ok 12 - actual Chrome retains a250ms runtime error with readiness at500ms
+  ---
+  duration_ms: 4115.505583
+  type: 'test'
+  ...
+# {"elapsedMs":4124,"state":{"state":"passed","text":"module ran"},"events":[{"kind":"exception","text":"Error: REVIEW_LATE_RUNTIME_FAILURE\\n    at http://127.0.0.1:51127/:1:231"}]}
+# Subtest: observer retains a real runtime error after readiness but within its claimed unchanged4000ms observation window
+ok 13 - observer retains a real runtime error after readiness but within its claimed unchanged4000ms observation window
+  ---
+  duration_ms: 4128.757208
+  type: 'test'
+  ...
+# {"control":true,"state":{"state":"passed","text":"module ran"},"events":[{"kind":"exception","text":"Error: REVIEW_LATE_RUNTIME_FAILURE\\n    at http://127.0.0.1:51159/:1:232"}]}
+# Subtest: control captures the same real250ms exception while readiness is deliberately later
+ok 14 - control captures the same real250ms exception while readiness is deliberately later
+  ---
+  duration_ms: 4121.040167
+  type: 'test'
+  ...
+# Subtest: the canonical Inline shell runs verified data modules under a restrictive marketplace srcdoc CSP
+ok 15 - the canonical Inline shell runs verified data modules under a restrictive marketplace srcdoc CSP
+  ---
+  duration_ms: 4210.813125
+  type: 'test'
+  ...
+# Subtest: the canonical asset module starts only after its verified child mount exists
+ok 16 - the canonical asset module starts only after its verified child mount exists
+  ---
+  duration_ms: 4280.391208
+  type: 'test'
+  ...
+# Subtest: the exact p5 and seeded-random modules run under the marketplace CSP
+ok 17 - the exact p5 and seeded-random modules run under the marketplace CSP
+  ---
+  duration_ms: 4739.499875
+  type: 'test'
+  ...
+# Subtest: the exact Three.js r180 module pair runs under the marketplace CSP
+ok 18 - the exact Three.js r180 module pair runs under the marketplace CSP
+  ---
+  duration_ms: 4536.113667
+  type: 'test'
+  ...
+1..18
+# tests 18
+# suites 0
+# pass 18
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 45382.924416

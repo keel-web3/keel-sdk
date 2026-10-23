@@ -1,0 +1,22 @@
+TAP version 13
+# Subtest: Tone + keel-audio load inside the compact Inline shell CSP and a real click in the art frame starts sound
+ok 1 - Tone + keel-audio load inside the compact Inline shell CSP and a real click in the art frame starts sound
+  ---
+  duration_ms: 1455.1265
+  type: 'test'
+  ...
+# Subtest: under the reference viewer's worker-src 'none' CSP, keel-audio falls Tone back to its timer clock and the score still ticks
+ok 2 - under the reference viewer's worker-src 'none' CSP, keel-audio falls Tone back to its timer clock and the score still ticks
+  ---
+  duration_ms: 1004.022292
+  type: 'test'
+  ...
+1..2
+# tests 2
+# suites 0
+# pass 2
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 2979.845625

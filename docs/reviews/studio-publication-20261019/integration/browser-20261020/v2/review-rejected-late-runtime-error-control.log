@@ -1,0 +1,36 @@
+TAP version 13
+# {"elapsedMs":470,"state":{"state":"passed","text":"module ran"},"events":[]}
+# Subtest: observer retains a real runtime error after readiness but within its claimed unchanged4000ms observation window
+not ok 1 - observer retains a real runtime error after readiness but within its claimed unchanged4000ms observation window
+  ---
+  duration_ms: 474.469291
+  type: 'test'
+  location: '/private/tmp/keel-review-browser688/late-runtime-error.test.mjs:7:1'
+  failureType: 'testCodeFailure'
+  error: 'the actual post-readiness error within250ms must remain observable'
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: true
+  actual: false
+  operator: '=='
+  stack: |-
+    TestContext.<anonymous> (file:///private/tmp/keel-review-browser688/late-runtime-error.test.mjs:10:296)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async startSubtestAfterBootstrap (node:internal/test_runner/harness:296:3)
+  ...
+# {"control":true,"state":{"state":"passed","text":"module ran"},"events":[{"kind":"exception","text":"Error: REVIEW_LATE_RUNTIME_FAILURE\\n    at http://127.0.0.1:63626/:1:232"}]}
+# Subtest: control captures the same real250ms exception while readiness is deliberately later
+ok 2 - control captures the same real250ms exception while readiness is deliberately later
+  ---
+  duration_ms: 649.720125
+  type: 'test'
+  ...
+1..2
+# tests 2
+# suites 0
+# pass 1
+# fail 1
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 1171.260292
