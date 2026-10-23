@@ -1,6 +1,7 @@
 import { buildKeelArtistContracts } from "@keel/sdk/artist-contracts";
 import { mcpRpc, RPC_TOOL_DEFINITIONS } from "./rpc-tools.js";
 import { TOKEN_AUDIT_TOOL_DEFINITIONS } from "./token-audit-tool.js";
+import { CAMPAIGN_CONTROLS_TOOL_DEFINITIONS } from "./campaign-controls-tools.js";
 import { KEEL_ENGINE_CATALOG, KEEL_ENGINE_CHOICES, planKeelProject } from "@keel/sdk/engine";
 import { planKeelTezosStandardRoute } from "@keel/sdk/tezos-standard";
 import { planKeelGraphRevision } from "@keel/sdk/revision-publication";
@@ -237,4 +238,4 @@ export const ENGINE_TOOL_DEFINITIONS: readonly ToolDefinition[] = [{
     inputSchema: { type: "object", properties, additionalProperties: false },
   },
   async run(_context, value) { return planKeelProject(value); },
-}, ...PREPARED_COPY_TOOL_DEFINITIONS, ...COPY_READ_TOOL_DEFINITIONS, ...TOKEN_AUDIT_TOOL_DEFINITIONS, ...RPC_TOOL_DEFINITIONS];
+}, ...PREPARED_COPY_TOOL_DEFINITIONS, ...COPY_READ_TOOL_DEFINITIONS, ...TOKEN_AUDIT_TOOL_DEFINITIONS, ...RPC_TOOL_DEFINITIONS, ...CAMPAIGN_CONTROLS_TOOL_DEFINITIONS];

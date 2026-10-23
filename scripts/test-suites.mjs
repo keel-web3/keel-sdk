@@ -400,6 +400,7 @@ export const DETERMINISTIC_TEST_FILES = Object.freeze([
   "tests/viewer-wake.test.mjs",
   "tests/viewer.test.mjs",
   "tests/admin-pauses.test.mjs",
+  "tests/sdk-campaign-controls.test.mjs",
   "tests/auction-sales.test.mjs",
   "tests/bitcoin-attachment.test.mjs",
   "tests/bitcoin-immutable-profile.test.mjs",
