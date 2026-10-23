@@ -20,7 +20,7 @@ on:
     - cron: "41 5 * * *"
   workflow_dispatch:
   push:
-    branches: [master]
+    branches: [main]
   pull_request:
 
 jobs:

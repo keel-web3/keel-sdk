@@ -1,0 +1,14 @@
+{
+  "sdkVisibility": "public",
+  "trailerVisibility": "private",
+  "privateTrailerSourceTips": [
+    "0491e80148ba261f8ed32d3da0e0506c6269e7df",
+    "79deb61abbadded0814ba86a7d34332416422629"
+  ],
+  "disposition": "These local SDK-era Trailer source histories belong to the extracted private keel-web3/keel-trailer repository. Integrate there and preserve SDK recovery references locally; do not publish private Trailer code in the public SDK main ancestry.",
+  "nonCommitCheckpointTrees": [
+    "facdec78e18a7bcf894211abe542353fdd0c2302",
+    "cad869322ac2bef97fc411a13da194b2ee596d2c"
+  ],
+  "checkpointDisposition": "Raw Git backups preserve exact automated trees. They are diagnostic snapshots rather than outstanding branch/worktree commits; older monorepo snapshots may contain separately extracted private applications and are not published into SDK history."
+}

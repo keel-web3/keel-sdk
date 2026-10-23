@@ -39,7 +39,7 @@ test("execution explanation is bound to the same revision, operation, wallet and
   const input = describeKeelExecutionAuthority({ ...identity, operationId });
   const expected = { releaseId, revision: 4, operationId, wallet };
   const parsed = parseKeelExecutionAuthority({ ...input, sourceUrl: "https://untrusted.example" }, expected);
-  assert.equal(parsed.sourceUrl, "https://github.com/keel-web3/keel-sdk/blob/codex/gas-safety-recovery-20261008/docs/KEEL_STUDIO_AUTHORITY_REVIEW.md#choose-the-actual-route");
+  assert.equal(parsed.sourceUrl, "https://github.com/keel-web3/keel-sdk/blob/main/docs/KEEL_STUDIO_AUTHORITY_REVIEW.md#choose-the-actual-route");
   for (const changed of [{ revision: 5 }, { operationId: releaseId }, { wallet: agent }]) assert.throws(() => parseKeelExecutionAuthority(input, { ...expected, ...changed }));
   assert.throws(() => parseKeelExecutionAuthority({ ...input, grantChanges: "performed" }, expected));
   assert.throws(() => parseKeelExecutionAuthority({ ...input, deployedAuthorityVerified: true }, expected));

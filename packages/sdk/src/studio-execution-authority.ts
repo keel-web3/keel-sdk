@@ -6,7 +6,7 @@ export type KeelExecutionRoute = "studio-release" | "creator-factory-direct" | "
 export type KeelIdentityEvidence = { readonly address: string | null; readonly basis: "creator-account" | "requested-wallet" | "not-established"; readonly explanation: string };
 
 // Public SDK policy documentation is separate from selected-chain runtime proof.
-const source = "https://github.com/keel-web3/keel-sdk/blob/codex/gas-safety-recovery-20261008/docs/KEEL_STUDIO_AUTHORITY_REVIEW.md#choose-the-actual-route";
+const source = "https://github.com/keel-web3/keel-sdk/blob/main/docs/KEEL_STUDIO_AUTHORITY_REVIEW.md#choose-the-actual-route";
 export const KEEL_EXECUTION_ROUTES = Object.freeze({
   "studio-release": {
     title: "Studio release review",
