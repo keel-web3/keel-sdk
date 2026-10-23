@@ -26,7 +26,8 @@ interface NativePresentation { readonly origin:bigint; readonly times:readonly b
  */
 export function assertMoviePresentationSemantics(bytes: Uint8Array, inputReport: string, selectedStream: string, width: number, height: number,purpose:"fidelity"|"native-inspection"="fidelity",nativeMaxFrames=1800): { readonly nativeDisplay?:MovieNativeDisplay;readonly nativeCreatorTitle?:boolean;readonly srgbFull: boolean; readonly videoTimeline: {readonly samples:bigint; readonly scale:bigint; readonly duration:bigint;readonly nativePresentation?:NativePresentation}; readonly audioTimeline?:MovieAudioTimeline } {
   const retain = (reason: string): never => { throw new TypeError(`Movie ${reason} require an exact preserving adapter; native media is retained.`); };
-  const native=purpose==="native-inspection",reportedTitles:string[]=[];
+  const native=purpose==="native-inspection",reportedTitles:string[]=[],technicalAvifTitles:string[]=[];
+  const avifProfile=actualAvifContainer(bytes);
   const sar = /\[SAR (\d+):(\d+) DAR (\d+):(\d+)\]/u.exec(selectedStream);
   if(!native) {
     if (sar && (BigInt(sar[1]!) <= 0n || BigInt(sar[1]!) !== BigInt(sar[2]!) || BigInt(sar[3]!) * BigInt(height) !== BigInt(sar[4]!) * BigInt(width)) || !sar && /\[(?:SAR|DAR)/u.test(selectedStream)) retain("sample/display aspect ratio semantics");
@@ -47,13 +48,19 @@ export function assertMoviePresentationSemantics(bytes: Uint8Array, inputReport:
   // FFmpeg exposes container and stream metadata separately. Only technical
   // muxer/encoder bookkeeping is disposable; creator tags, language, chapters
   // and unrecognised multiline fields are not inferred from pixel equality.
-  let metadata = false;
+  let metadata = false, metadataStream:number|undefined;
   for (const line of inputReport.split("\n")) {
+    const stream=/^\s*Stream #0:(\d+)(?:\[|\(|:)/u.exec(line);
+    if(stream){metadataStream=Number(stream[1]);metadata=false;continue;}
+    if(/^Input #/u.test(line)){metadataStream=undefined;metadata=false;continue;}
     if (/^\s+Metadata:\s*$/u.test(line)) { metadata = true; continue; }
     if (!metadata) continue;
     const field = /^\s{4,}([^:]+?)\s*:\s*(.*)$/u.exec(line);
     if (!field) { if (line.trim()) metadata = false; continue; }
     const key=field[1]!.trim(), value=field[2]!.trim();
+    // Linux FFmpeg exposes the AVIF primary image item name as a title.
+    // Admit only the exact technical item, then bind it to parsed bytes below.
+    if(key==="title"&&avifProfile&&metadataStream===0&&value==="Color"){technicalAvifTitles.push(value);continue;}
     if(native&&key==="title"){reportedTitles.push(value);continue;}
     if (["major_brand","minor_version","compatible_brands"].includes(key)) continue;
     if (key === "encoder" && /^(?:Lavf\d+\.\d+\.\d+|Lavc\d+\.\d+\.\d+(?: [A-Za-z0-9_.-]+)?)$/u.test(value)) continue;
@@ -73,7 +80,7 @@ export function assertMoviePresentationSemantics(bytes: Uint8Array, inputReport:
   let count=0, movieHeaders=0, videoHeaders=0, srgbFull=false;
   let movie:Clock|undefined, avifItems=0, avifExtents=0;
   const tracks:Track[]=[], avifConfigs:Uint8Array[]=[],nativeTitles:string[]=[],nativePresentations=new Map<Track,NativePresentation>();
-  let majorBrand:string|undefined;
+  let majorBrand:string|undefined,avifItemName:string|undefined;
   const clock=(start:number,end:number):Clock=>{
     if(start+4>end || bytes[start]!>1 || (view.getUint32(start)&0xffffff)!==0)retain("unknown edit-list reference clock version or flags");
     const version=bytes[start]!,at=start+(version===1?20:12),size=version===1?8:4;
@@ -276,7 +283,8 @@ export function assertMoviePresentationSemantics(bytes: Uint8Array, inputReport:
         if(items.length!==1 || items[0]!.kind!=="infe")retain("AVIF creator item metadata semantics");
         const item=items[0]!;
         if(item.start+12>item.end || view.getUint32(item.start)!==0x02000000 || text(item.start+8)!=="av01")retain("AVIF non-image item metadata semantics");
-        if(!["Color\0","\0"].includes(new TextDecoder().decode(bytes.subarray(item.start+12,item.end))))retain("AVIF creator item-name metadata semantics");
+        avifItemName=new TextDecoder().decode(bytes.subarray(item.start+12,item.end));
+        if(!["Color\0","\0"].includes(avifItemName))retain("AVIF creator item-name metadata semantics");
         avifItems++;
       } else if(kind==="av1C") {
         if(parent==="visual" || parent==="ipco")avifConfigs.push(bytes.slice(a,z));
@@ -380,6 +388,7 @@ export function assertMoviePresentationSemantics(bytes: Uint8Array, inputReport:
   const nativePresentation=nativePresentations.get(video);
   const videoTimeline=Object.freeze({samples:video.encodedSamples!,scale:video.media!.scale,duration:video.media!.duration,...(nativePresentation?{nativePresentation}:{})});
   let nativeDisplay:MovieNativeDisplay|undefined;
+  if(technicalAvifTitles.length&&(technicalAvifTitles.length!==1||avifItems!==1||avifItemName!=="Color\0"))retain("AVIF technical item name differs from the actual decoder report");
   if(native){
     if(nativeTitles.length!==reportedTitles.length||nativeTitles.some((title,index)=>title!==reportedTitles[index]))retain("native creator title bytes differ from the actual decoder report");
     const coded=video.coded,display=video.display;

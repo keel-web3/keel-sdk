@@ -265,7 +265,10 @@ try {
   const impossibleBefore = structuredClone(impossiblePlan), impossiblePool = nativePool(base, { endpoints: [syntheticEndpoints[0]], measuredRequestCapacity });
   let impossibleDiagnostic;
   await assert.rejects(poolProof(impossiblePool, impossiblePlan), error => {
-    assert.equal(error.kind, "provider-limit"); assert.equal(error.diagnostic.stage, "discovery-minimum");
+    assert.equal(error.kind, "provider-limit");
+    assert.equal(error.diagnostic.capacitySource, "measured-profile");
+    assert.equal(error.diagnostic.gasCapacityScope, "request");
+    assert.equal(error.diagnostic.requestedGasLimit, "200305080");
     assert.equal(error.diagnostic.minimumProgramGas, "200305080");
     assert.equal(error.diagnostic.providerGasCap, "50000000");
     impossibleDiagnostic = error.diagnostic; return true;
