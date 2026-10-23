@@ -38,3 +38,8 @@ for(const profile of ['base90-v1','base91-v1']){
   let calls=0;await assert.rejects(reader(bad,{...extra,decompress:async()=>{calls++;return f.source;}}).resolve(bad.items[0]),/SHA/);assert.equal(calls,0);
  });
 }
+
+test('prepared-fragment context uses its own explicit commitment domain',()=>{
+ const c=context();c.presentationDigestType='keccak256:keel.evm-prepared-fragment-presentation@1';
+ assert.equal(validateKeelEmbeddedContainerContext(c,chainId).presentationDigestType,c.presentationDigestType);
+});

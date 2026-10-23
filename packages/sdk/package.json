@@ -127,6 +127,14 @@
       "types": "./dist/tezos-modules.generated.d.ts",
       "import": "./dist/tezos-modules.generated.js"
     },
+    "./tezos-collection": {
+      "types": "./dist/tezos-collection.d.ts",
+      "import": "./dist/tezos-collection.js"
+    },
+    "./tezos-live-state": {
+      "types": "./dist/tezos-live-state.d.ts",
+      "import": "./dist/tezos-live-state.js"
+    },
     "./shell-registry": {
       "types": "./dist/shell-registry.d.ts",
       "import": "./dist/shell-registry.js"
@@ -294,6 +302,26 @@
     "./module/jsx-dev-runtime": {
       "types": "./dist/module/jsx-runtime.d.ts",
       "import": "./dist/module/jsx-runtime.js"
+    },
+    "./marketplace-reader": {
+      "types": "./dist/marketplace-reader.d.ts",
+      "import": "./dist/marketplace-reader.js"
+    },
+    "./pre-reveal": {
+      "types": "./dist/pre-reveal.d.ts",
+      "import": "./dist/pre-reveal.js"
+    },
+    "./selected-token-ids": {
+      "types": "./dist/selected-token-ids.d.ts",
+      "import": "./dist/selected-token-ids.js"
+    },
+    "./artist-contracts": {
+      "types": "./dist/artist-contracts.d.ts",
+      "import": "./dist/artist-contracts.js"
+    },
+    "./creator-setup-wallet": {
+      "types": "./dist/creator-setup-wallet.d.ts",
+      "import": "./dist/creator-setup-wallet.js"
     }
   },
   "files": [
@@ -315,6 +343,7 @@
     "@keel/viewer": "workspace:*",
     "@noble/hashes": "1.8.0",
     "esbuild": "0.28.2",
+    "terser": "5.44.0",
     "viem": "^2.38.0"
   },
   "devDependencies": {

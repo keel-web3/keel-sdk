@@ -115,7 +115,7 @@ function decodeCBOR(bytes: Uint8Array, offset: { value: number }): KeelDataValue
 /** Encode JSON/YAML-compatible data as canonical CBOR, optionally deterministic gzip. */
 export function encodeKeelDataPack(value: KeelDataValue, compression: "none" | "gzip" = "gzip"): Uint8Array {
   const cbor = encodeCBOR(value);
-  const stored = compression === "gzip" ? new Uint8Array(gzipSync(cbor, { level: 9, mtime: 0 })) : cbor;
+  const stored = compression === "gzip" ? new Uint8Array(gzipSync(cbor, { level: 9 })) : cbor;
   return concat([MAGIC, Uint8Array.of(compression === "gzip" ? 1 : 0), stored]);
 }
 

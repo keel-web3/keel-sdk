@@ -1,3 +1,4 @@
+import { buildKeelArtistContracts } from "@keel/sdk/artist-contracts";
 import { TOKEN_AUDIT_TOOL_DEFINITIONS } from "./token-audit-tool.js";
 import { KEEL_ENGINE_CATALOG, KEEL_ENGINE_CHOICES, planKeelProject } from "@keel/sdk/engine";
 import { planKeelTezosStandardRoute } from "@keel/sdk/tezos-standard";
@@ -138,6 +139,18 @@ async function contractWorkflowPreflight(context: { readonly workspace: { readFi
 }
 
 export const ENGINE_TOOL_DEFINITIONS: readonly ToolDefinition[] = [{
+  descriptor: {
+    name: "keel-artist-contracts",
+    description: "Group an artist's Ethereum and Tezos collections and their sale, bridge, metadata and infrastructure contracts under the existing KEEL artist/profile system. Unconfigured contracts and unverified profile references stay explicit; this organization never grants authority or proves deployment. Returns a deterministic metadata commitment and collection groups. No signing, submission or network I/O.",
+    inputSchema: { type: "object", properties: { manifestJson: { type: "string", minLength: 2, maxLength: 262144 } }, required: ["manifestJson"], additionalProperties: false },
+  },
+  async run(_context, value) {
+    if (!value || typeof value !== "object" || Array.isArray(value) || Object.keys(value).some((key) => key !== "manifestJson")) throw new TypeError("Artist contracts require manifestJson only.");
+    const input = value as { manifestJson?: unknown };
+    if (typeof input.manifestJson !== "string" || input.manifestJson.length > 262144) throw new TypeError("Provide a bounded artist contracts manifest.");
+    return buildKeelArtistContracts(JSON.parse(input.manifestJson));
+  },
+}, {
   descriptor: {
     name: "keel-network-inspect",
     description: "Read the chosen EVM or Tezos RPC network now: chain identity, current head, gas boundaries, available fee quote and KEEL setup gaps. Custom networks are supported. Does not deploy, sign or establish contract authority; fee quotes need exact prepared calls before estimating publication cost.",

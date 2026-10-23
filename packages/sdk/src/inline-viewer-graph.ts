@@ -1,3 +1,4 @@
+import {buildKeelTokenContextHTMLTail as tokenContextHTMLTail} from './token-context-tail.js';
 import { assertKeelFreshPayloadCarriage } from "./inline-transport-audit.js";
 /**
  * Node-only planner for a modular Inline KEEL viewer.
@@ -1011,10 +1012,6 @@ export async function buildKeelPreparedTokenURIFragment(
   };
 }
 
-function tokenContextHTMLTail(contextJSON: string, contextDigest: Hex, contextByteLength: number): string {
-  const contextBase64URL = Buffer.from(contextJSON, "utf8").toString("base64url");
-  return `<script>(()=>{try{const v="${contextBase64URL}",b=v.replace(/-/g,"+").replace(/_/g,"/")+"=".repeat((4-v.length%4)%4),j=atob(b),c=Object.freeze(JSON.parse(j)),o=Object.freeze({json:j,digest:"${contextDigest}",byteLength:${contextByteLength}});Object.defineProperty(globalThis,"__KEEL_CONTEXT__",{value:c,enumerable:true,writable:false,configurable:false});Object.defineProperty(globalThis,"__KEEL_ONCHAIN_CONTEXT__",{value:o,enumerable:true,writable:false,configurable:false})}catch(e){document.documentElement.dataset.keelContext="failed";throw e}})()</script>`;
-}
 
 function assertMarketplaceSafeDataURI(value: string, label: string): void {
   if (!value.startsWith("data:")) return;
@@ -1086,6 +1083,7 @@ async function exactFragment(bytes: Uint8Array): Promise<KeelInlineFragmentBytes
 export async function buildKeelInlineShellFragments(input: {
   readonly repositoryRoot?: string;
   readonly codecProfile?: KeelInlineCodecProfile;
+  readonly optionalMarketplaceInfo?: import("./marketplace-reader.js").KeelShellMarketplaceConfig;
 } = {}): Promise<KeelInlineShellFragments> {
   const shell = await buildCompactInlineKeelShell(input);
   return {

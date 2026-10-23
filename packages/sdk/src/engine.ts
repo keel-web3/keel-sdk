@@ -84,7 +84,7 @@ export const KEEL_ENGINE_CATALOG = {
   choices: KEEL_ENGINE_CHOICES,
   collections: [
     { id: "erc721a", label: "Your own collection", behavior: "Dedicated ERC-721A clone; suggested for new unique works.", sdk: "buildKeelCreatorERC721ACall" },
-    { id: "erc721", label: "Standard ERC-721", behavior: "Dedicated compatibility collection.", sdk: "buildKeelCreatorStandardERC721Call" },
+    { id: "erc721", label: "Standard ERC-721", behavior: "Dedicated compatibility collection; new implementations offer irreversible opt-in chosen token IDs with an optional allocation policy before supply or reservations exist. Deployed capability requires readback.", sdk: "buildKeelCreatorStandardERC721Call" },
     { id: "erc1155", label: "Your own editions", behavior: "Dedicated ERC-1155 with item-specific supply and binding.", sdk: "buildKeelCreatorERC1155Call" },
     { id: "shared-erc1155", label: "Shared editions collection", behavior: "Logical creator collection in a shared contract; requires explicit selection.", sdk: "buildKeelCreatorSharedERC1155Call" },
     { id: "tezos-fa2", label: "Standard Tezos FA2", behavior: "KEEL's native Tezos one-of-one lane: receipt-bound Hold/Index/HarnessBuilder, FA2/TZIP-12 metadata, and KeelSleeve compatibility.", sdk: "planKeelTezosStandardRoute" },
@@ -220,9 +220,9 @@ export function planKeelProject(value: unknown = {}) {
   const nextTools = intent.mintSystem === "fray-auction" ? ["fray-auction-intake", "keel-library-search", "fray-stage-project"]
     : intent.outcome === "explore" ? ["analyze", "keel-library-search"]
     : [
-      ...(intent.family === "tezos" ? ["keel-tezos-standard-route-plan"] : []),
+      ...(intent.family === "tezos" ? ["keel-tezos-standard-route-plan", "keel-tezos-collection-launch-plan"] : []),
       "keel-studio-capabilities", "analyze", "cost", "keel-library-search",
-      ...(intent.family === "tezos" ? ["keel-tezos-publication-prepare"] : intent.storage === "inline" ? ["keel-inline-prepare"] : ["upload-plan"]), "keel-studio-stage-project",
+      ...(intent.family === "tezos" ? ["keel-tezos-collection-originate-prepare", "keel-tezos-hold-resources-prepare", "keel-tezos-presentation-bind-prepare", "keel-tezos-mint-gate-prepare", "keel-tezos-mint-prepare", "keel-tezos-token-metadata-prepare", "keel-tezos-readback-check", "keel-tezos-publication-prepare"] : intent.storage === "inline" ? ["keel-inline-prepare"] : ["upload-plan"]), "keel-studio-stage-project",
     ];
   return {
     schema: "keel-engine-plan@1" as const,

@@ -42,7 +42,9 @@ function verificationResult(state, error) {
   const checks = failed
     ? [Object.freeze({ id: "viewer-execution", label: "Committed object verification", passed: false, detail: error, severity: "fatal", plain: "The viewer rejected a committed object before presenting the creator content.", impact: "Unverified bytes are never passed into the creator iframe." })]
     : envelope.items.map((item) => Object.freeze({
-      id: `resource-${item.id}`,
+      id: item.id,
+      digest: item.integrity.digest,
+      byteLength: item.integrity.byteLength,
       label: `${item.role ?? "resource"} · ${item.id}`,
       passed: true,
       detail: `${item.integrity.digest} · ${item.integrity.byteLength} bytes`,
@@ -326,15 +328,16 @@ function instrumentEntrypoint(html, nonce, runtimeContext, contentUrls, childPro
     ? ""
     : `<script>globalThis.__KEEL_VERIFICATION__=Object.freeze(${scriptJson(childProof)})</script>`;
   const content = `<script>(()=>{const u=Object.freeze(${scriptJson(contentUrls)}),bytes=id=>{const value=u[id];if(typeof value!=="string")throw new Error("Undeclared verified content "+id);const encoded=value.slice(value.indexOf(",")+1);return Uint8Array.from(atob(encoded),character=>character.charCodeAt(0))};globalThis.__KEEL_CONTENT__=Object.freeze({url:id=>u[id]??null,bytes})})()</script>`;
+  const shellClient = `<script>Object.defineProperty(globalThis,"__KEEL_SHELL__",{value:(${createKeelShellClient.toString()})(parent),writable:false,configurable:false})</script>`;
   const inputBridge = `<script>(()=>{addEventListener("message",event=>{const data=event.data;if(event.source!==parent||data?.protocol!=="keel-child-input@1"||!['keydown','keyup'].includes(data.type)||typeof data.code!=="string"||data.code.length>48||typeof data.key!=="string"||data.key.length>48)return;document.documentElement.dataset.keelLastInput=data.type+':'+data.code;dispatchEvent(new KeyboardEvent(data.type,{code:data.code,key:data.key,repeat:data.repeat===true,altKey:data.altKey===true,ctrlKey:data.ctrlKey===true,metaKey:data.metaKey===true,shiftKey:data.shiftKey===true,bubbles:true,cancelable:true}))})})()</script>`;
   const probe = `<script>(()=>{const n=${JSON.stringify(nonce)},benign=["ResizeObserver loop completed with undelivered notifications.","ResizeObserver loop limit exceeded"],send=(state,detail={})=>parent.postMessage({protocol:"keel-child-runtime@1",nonce:n,state,...detail},"*"),report=detail=>{const message=String(detail);if(benign.includes(message.trim()))return;send("failed",{message})};addEventListener("error",event=>report(event.message||"Entrypoint runtime error."));addEventListener("unhandledrejection",event=>report(event.reason?.message??event.reason??"Unhandled entrypoint rejection."));addEventListener("load",()=>setTimeout(()=>send("ready",{canvasCount:document.querySelectorAll("canvas").length,childCount:document.body?.childElementCount??0,loadError:document.body?.dataset?.loadError??null}),500),{once:true})})()</script>`;
   if (/<head(?:\s[^>]*)?>/iu.test(html)) {
-    return html.replace(/<head(?:\s[^>]*)?>/iu, (match) => `${match}${context}${proof}${content}${inputBridge}${probe}`);
+    return html.replace(/<head(?:\s[^>]*)?>/iu, (match) => `${match}${context}${proof}${content}${shellClient}${inputBridge}${probe}`);
   }
   // A verified entrypoint may be a fragment (canvas/script) rather than a
   // complete document. Wrap it before injecting Keel globals so the child
   // always executes inside a real top-level document with a <head>.
-  return `<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">${context}${proof}${content}${inputBridge}${probe}</head><body>${html}</body></html>`;
+  return `<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">${context}${proof}${content}${shellClient}${inputBridge}${probe}</head><body>${html}</body></html>`;
 }
 
 /*
@@ -372,7 +375,7 @@ async function launch() {
   // authenticates every committed resource. Only an integrity-checked context
   // is copied into the verified child; failed resources never receive it.
   const runtimeContext = await verifiedRuntimeContext();
-  contextData = runtimeContext;
+  contextData = {...runtimeContext,tokenMetadata:globalThis.__KEEL_TOKEN_METADATA__,shellCatalog:buildKeelShellCatalog(envelope.items,resolved)};
   runtimeData = Object.freeze({
     manifestDigest: hex(await digest(new TextEncoder().encode(envelopeElement.textContent ?? ""))),
     revision: 1,
@@ -450,6 +453,8 @@ async function launch() {
     addEventListener("message", receive);
     frame.addEventListener("error", () => { clearTimeout(timer); removeEventListener("message", receive); reject(new Error("Verified entrypoint failed to load.")); }, { once: true });
   });
+  verificationUI = mountVerificationUI(verificationResult("verified"), runtimeData, contextData);
+  verificationUI.connectChild(frame);
   stage.replaceChildren(frame);
   await loaded;
   document.body.dataset.verification = "verified";
