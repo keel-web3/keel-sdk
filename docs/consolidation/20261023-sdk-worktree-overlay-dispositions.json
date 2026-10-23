@@ -1,0 +1,72 @@
+[
+  {
+    "source": "/Users/ravonus/.keel/keel-sdk",
+    "snapshot": "8872ddc0d24be3296fa7744c458f2821e7a532b1",
+    "files": 17,
+    "verifiedBackup": "/Users/ravonus/Documents/Codex/2026-10-22/task/backups/fresh-dirty-source/15ee1adb5969",
+    "disposition": "Older URI81 publication/preflight and catalog alternative is superseded by the current qualified native transport and guards. Nine unchanged files already match current source. Preserve the complete alternative inactive."
+  },
+  {
+    "source": "/Users/ravonus/dev/release-20260922/keel-sdk",
+    "snapshot": "d6f5f40c0495b103021867dc56d69904071cc2d4",
+    "files": 20,
+    "verifiedBackup": "/Users/ravonus/Documents/Codex/2026-10-22/task/backups/fresh-dirty-source/bdbe9be12718",
+    "disposition": "Nineteen source files, including offline arena CLI, already match main. Only locally generated package links differ; keep reproducible current dependency metadata."
+  },
+  {
+    "source": "/Users/ravonus/dev/wt/keel-tezos-parity-20261015/keel-sdk",
+    "snapshot": "396c7a40e85cbe21c8e19b1f8952134a21cdeb65",
+    "files": 9,
+    "verifiedBackup": "/Users/ravonus/Documents/Codex/2026-10-22/task/backups/fresh-dirty-source/7051a0c9459c",
+    "disposition": "Unsupported Tezos fresh governor-envelope capability remains inactive; current authority has no governor_signature. Exact source already preserved by prior2ec checkpoint; retain this matching worktree checkpoint too."
+  },
+  {
+    "source": "/Users/ravonus/dev/wt/redline-test-performance-20260928/keel-sdk",
+    "snapshot": "8aea3c201cb12d52d4af994fc13df5f1d4300a26",
+    "files": 19,
+    "verifiedBackup": "/Users/ravonus/Documents/Codex/2026-10-22/task/backups/fresh-dirty-source/469b82739096",
+    "disposition": "Eighteen source files already match main; only generated local package-link metadata differs. Keep current reproducible dependency declarations."
+  },
+  {
+    "source": "/Users/ravonus/dev/wt/rel-glass/keel-sdk",
+    "snapshot": "763deac7c88341e319729badfcf842e5b901e72c",
+    "files": 17,
+    "verifiedBackup": "/Users/ravonus/Documents/Codex/2026-10-22/task/backups/fresh-dirty-source/a07f820d29de",
+    "disposition": "Sixteen generated engine facade files already match main; only local package links differ. Keep current generated bridge and dependency metadata."
+  },
+  {
+    "source": "/Users/ravonus/dev/wt/relsrc/keel-sdk",
+    "snapshot": "b982ef5951c6faff784f46fd25b28ad9470503a4",
+    "files": 70,
+    "verifiedBackup": "/Users/ravonus/Documents/Codex/2026-10-22/task/backups/fresh-dirty-source/2f431567e61c",
+    "disposition": "Older Dense/PPMd transport and guidance alternatives are superseded by current qualified Compact/native storage and independent shell selection. Forty files already match main. Preserve complete alternatives inactive, without reactivating retired transport defaults."
+  },
+  {
+    "source": "/Users/ravonus/dev/wt/studio-publication-20261019/review-sdk-8fd",
+    "snapshot": "55588f119b3257c5c767acf839494a4886759ec1",
+    "files": 1,
+    "verifiedBackup": "/Users/ravonus/Documents/Codex/2026-10-22/task/backups/fresh-dirty-source/bb9297aebc9f",
+    "disposition": "Test is byte-identical to current main."
+  },
+  {
+    "source": "/Users/ravonus/dev/wt/studio-publication-20261019/review-sdk-d460",
+    "snapshot": "920816791c1b4b10c5cee0744c7de074ef44f650",
+    "files": 1,
+    "verifiedBackup": "/Users/ravonus/Documents/Codex/2026-10-22/task/backups/fresh-dirty-source/d2b26bd95c8b",
+    "disposition": "Older test diagnostic expectation is superseded by current selected native presentation policy; current full suite and stricter exact source guards retained."
+  },
+  {
+    "source": "/Users/ravonus/dev/wt/studio-publication-20261019/review-sdk-f159",
+    "snapshot": "254ea4566cd9611a0724d611e53e702d108ab11f",
+    "files": 1,
+    "verifiedBackup": "/Users/ravonus/Documents/Codex/2026-10-22/task/backups/fresh-dirty-source/943296a1961b",
+    "disposition": "Test is byte-identical to current main."
+  },
+  {
+    "source": "/Users/ravonus/dev/wt/test-release-20260924/keel-sdk",
+    "snapshot": "d69990321b84b54bb4493d218398706f77d4ee17",
+    "files": 17,
+    "verifiedBackup": "/Users/ravonus/Documents/Codex/2026-10-22/task/backups/fresh-dirty-source/e1fda3d99e23",
+    "disposition": "Sixteen generated facade files already match main; only local package links differ. Keep reproducible current dependency declarations."
+  }
+]
