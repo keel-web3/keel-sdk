@@ -3,6 +3,7 @@ import { keccak256, sha256 } from "viem";
 import { KeelChainCapabilityError, resolveKeelChainCapability } from "./chain-capability-map.js";
 import { KEEL_TEZOS_MODULES } from "./tezos-modules.generated.js";
 import type { TezosMichelineValue, TezosOperationDetailsBase, TezosTransactionOperation } from "./tezos-publication.js";
+import type { KeelTezosGlobalConstantOperation } from "./tezos-code-constants.js";
 
 /**
  * The KEEL Tezos creator-collection route.
@@ -257,7 +258,7 @@ function call(contract: KeelTezosRouteContract, destination: string, entrypoint:
 }
 
 /** Rough forged size of a prepared operation: parameter payload plus manager-operation overhead. */
-export function estimateKeelTezosOperationBytes(operation: TezosOperationDetailsBase | TezosTransactionOperation): number {
+export function estimateKeelTezosOperationBytes(operation: TezosOperationDetailsBase | TezosTransactionOperation | KeelTezosGlobalConstantOperation): number {
   const payload = (value: unknown): number => {
     if (Array.isArray(value)) return 5 + value.reduce((total: number, item) => total + payload(item), 0);
     if (value === null || typeof value !== "object") return 0;
@@ -268,12 +269,12 @@ export function estimateKeelTezosOperationBytes(operation: TezosOperationDetails
     const annots = Array.isArray(node.annots) ? 4 + node.annots.reduce((total: number, annot) => total + utf8(String(annot)).length + 1, 0) : 0;
     return 2 + annots + (Array.isArray(node.args) ? node.args.reduce((total: number, item) => total + payload(item), 0) : 0);
   };
-  const body = operation.kind === "origination" ? payload(operation.script?.code) + payload(operation.script?.storage) : payload(operation.parameters?.value) + 40;
+  const body = operation.kind === "register_global_constant" ? payload(operation.value) : operation.kind === "origination" ? payload(operation.script?.code) + payload(operation.script?.storage) : payload(operation.parameters?.value) + 40;
   return 120 + body;
 }
 
 /** Split operations into wallet batches that each fit the Tezos operation-size limit. */
-export function groupKeelTezosOperations<T extends TezosOperationDetailsBase | TezosTransactionOperation>(operations: readonly T[], budget: number = KEEL_TEZOS_OPERATION_GROUP_BUDGET): readonly (readonly T[])[] {
+export function groupKeelTezosOperations<T extends TezosOperationDetailsBase | TezosTransactionOperation | KeelTezosGlobalConstantOperation>(operations: readonly T[], budget: number = KEEL_TEZOS_OPERATION_GROUP_BUDGET): readonly (readonly T[])[] {
   const groups: T[][] = [];
   let current: T[] = [];
   let size = 0;
@@ -508,6 +509,7 @@ export function buildKeelTezosCollectionFA2Storage(input: { readonly administrat
     mInt(1), // administrator_count
     [mString(administrator)], // administrators
     mBool(false), // contract_metadata_frozen
+    mNone, // custody_presentation: optional custody-derived metadata; ordinary collections do not enable it.
     mPair([mBytes(""), mBytes(""), mBytes(""), mBool(false)]), // default_presentation
     royaltyValue(input.defaultRoyalty, "defaultRoyalty"), // default_royalty
     mString(keelIndex), // keel_index
@@ -521,6 +523,8 @@ export function buildKeelTezosCollectionFA2Storage(input: { readonly administrat
     mString(pauseAuthority), // pause_authority
     mBool(false), // presentation_frozen
     EMPTY, // reserved_capacity
+    mBool(false), // selected_token_ids
+    mNone, // selection_policy
     EMPTY, // token_jsons
     EMPTY, // token_metadata
     EMPTY, // token_metadata_frozen
@@ -611,20 +615,20 @@ export function buildKeelTezosSeededCollectionFA2Storage(input: Parameters<typeo
   let node = buildKeelTezosCollectionFA2Storage(input) as { prim?: string; args?: TezosMichelineValue[] };
   while (node.prim === "Pair" && node.args !== undefined) { base.push(node.args[0] as TezosMichelineValue); node = node.args[1] as typeof node; }
   base.push(node as TezosMichelineValue);
-  if (base.length !== 22) throw new Error("Unexpected KeelCollectionFA2 storage shape.");
-  // Alphabetical: ... reserved_capacity, seed_*, token_jsons ... token_owners, token_seed_batch, total_reserved_capacity.
+  if (base.length !== 25) throw new Error("Unexpected KeelCollectionFA2 storage shape.");
+  // Alphabetical: ... reserved_capacity, seed_*, selected_token_ids, selection_policy, token_jsons ... token_owners, token_seed_batch, total_reserved_capacity.
   const unset: KeelTezosEntropyProfile = { useVrf: false, lockUntilReveal: false, futureBlockDelay: "0", sourceGas: "0", source: null, transferStorage: 0, mode: 0 };
   return mPair([
-    ...base.slice(0, 16),
+    ...base.slice(0, 17),
     mInt(0), // seed_batch_count
     EMPTY, // seed_batches
     EMPTY, // seed_cache
     mBool(false), // seed_configured
     EMPTY, // seed_draws
     entropyProfileValue(unset), // seed_profile, set once by configure_seed_profile
-    ...base.slice(16, 21),
+    ...base.slice(17, 24),
     EMPTY, // token_seed_batch
-    base[21] as TezosMichelineValue, // total_reserved_capacity
+    base[24] as TezosMichelineValue, // total_reserved_capacity
   ]);
 }
 
@@ -1290,7 +1294,9 @@ export type KeelTezosMintRequest =
   | { readonly mode: "merkle"; readonly dropId: string; readonly stageIndex: number; readonly quantity: number; readonly priceMutez: number | string | bigint; readonly allowance: number; readonly proof: readonly string[] }
   | { readonly mode: "premint"; readonly dropId: string; readonly stageIndex: number; readonly quantity: number; readonly recipient: string }
   /** Direct FA2 issuance by an authorized minter. `unreserved` never consumes any drop's reserved supply. */
-  | { readonly mode: "direct"; readonly quantity: number; readonly recipient?: string; readonly unreserved?: boolean };
+  | { readonly mode: "direct"; readonly quantity: number; readonly recipient?: string; readonly unreserved?: boolean }
+  /** Chosen-ID FA2 issuance after `enable_selected_token_ids`; tokenIds must match quantity. */
+  | { readonly mode: "selected"; readonly quantity: number; readonly tokenIds: readonly (number | string | bigint)[]; readonly recipient?: string };
 
 export interface KeelTezosMintInput {
   readonly network: string;
@@ -1316,6 +1322,13 @@ export function prepareKeelTezosMint(input: KeelTezosMintInput) {
     const label = `mints[${index}]`;
     const quantity = natural(mint.quantity, `${label}.quantity`, { positive: true, max: 500n });
     tokens += quantity;
+    if (mint.mode === "selected") {
+      const collection = assertContract(input.collection, "collection");
+      if (!Array.isArray(mint.tokenIds) || mint.tokenIds.length !== Number(quantity)) throw new TypeError(`${label}.tokenIds must match quantity.`);
+      const seen = new Set<string>();
+      const ids = mint.tokenIds.map((value: number | string | bigint, i: number) => { const id = natural(value, `${label}.tokenIds[${i}]`, { positive: true }); if (seen.has(id.toString())) throw new TypeError("Duplicate token ID."); seen.add(id.toString()); return mInt(id); });
+      return call("collection", collection, "strike_selected", mPair([mString(assertAddress(mint.recipient ?? sender, `${label}.recipient`)), ids]));
+    }
     if (mint.mode === "direct") {
       const collection = assertContract(input.collection, "collection");
       return call("collection", collection, mint.unreserved === true ? "strike_unreserved" : "strike", mPair([mString(assertAddress(mint.recipient ?? sender, `${label}.recipient`)), mInt(quantity)]));
@@ -1331,7 +1344,7 @@ export function prepareKeelTezosMint(input: KeelTezosMintInput) {
       if (!Array.isArray(mint.proof) || mint.proof.length > 64) throw new TypeError(`${label}.proof must list at most 64 sibling digests.`);
       return call("oneMint", oneMint, "merkle_mint", mPair([dropId, stage, mInt(quantity), mInt(natural(mint.allowance, `${label}.allowance`, { positive: true })), (mint.proof as readonly string[]).map((sibling: string, position: number) => mBytes(hexValue(sibling, `${label}.proof[${position}]`, 32))), mintData]), amount);
     }
-    throw new TypeError(`${label}.mode must be public, merkle, premint or direct.`);
+    throw new TypeError(`${label}.mode must be public, merkle, premint, direct or selected.`);
   });
   return {
     schema: KEEL_TEZOS_COLLECTION_ROUTE,
@@ -1346,8 +1359,37 @@ export function prepareKeelTezosMint(input: KeelTezosMintInput) {
     batches: groupKeelTezosOperations(operations),
     signing: "not-performed" as const,
     submission: "not-performed" as const,
-    caveat: "Token ids are assigned by the FA2 in strike order. Read the `keel_collection_struck` event or `total_supply` from the applied receipt before writing token metadata.",
+    caveat: input.mints.some((mint) => mint.mode === "selected")
+      ? "Selected IDs require the exact deployed FA2 capability, irreversible selection mode and minter/policy authorization. Read every applied operation result and validate the emitted IDs and recipients; this plan grants no mint rights."
+      : "Token ids are assigned by the FA2 in strike order. Read the `keel_collection_struck` event or `total_supply` from the applied receipt before writing token metadata.",
   };
+}
+
+/** Exact native setup call before supply or reservations; no signing or submission. */
+export function prepareKeelTezosSelectedTokenIdsSetup(input: { readonly network: string; readonly sender: string; readonly collection: string; readonly policy?: string }) {
+  assertObject(input, "token selection");
+  const network = assertNetwork(input.network); const expectedSender = assertAddress(input.sender, "sender");
+  const policy = input.policy === undefined ? mNone : mSome(mString(assertContract(input.policy, "policy")));
+  const operation = call("collection", assertContract(input.collection, "collection"), "enable_selected_token_ids", policy);
+  return { schema: KEEL_TEZOS_COLLECTION_ROUTE, step: "token-selection" as const, status: "review-only" as const, family: "tezos" as const, network, expectedSender, operation, capability: "requires-selected-chain-readback" as const, signing: "not-performed" as const, submission: "not-performed" as const };
+}
+
+/** Opt-in generic custody metadata before any mint or reservation. Read-only
+ * preparation; exact deployed capability and renderer bytes require readback. */
+export function prepareKeelTezosCustodyPresentation(input: { readonly network: string; readonly sender: string; readonly collection: string; readonly custodian: string; readonly renderer: string }) {
+  assertObject(input, "custody presentation");
+  const network=assertNetwork(input.network), expectedSender=assertAddress(input.sender,"sender");
+  const operation=call("collection",assertContract(input.collection,"collection"),"set_custody_presentation",mPair([mString(assertAddress(input.custodian,"custodian")),mString(assertContract(input.renderer,"renderer"))]));
+  return {schema:KEEL_TEZOS_COLLECTION_ROUTE,step:"custody-presentation" as const,status:"review-only" as const,family:"tezos" as const,network,expectedSender,operation,capability:"requires-selected-chain-readback" as const,signing:"not-performed" as const,submission:"not-performed" as const};
+}
+
+/** Anyone may refresh the same custody-derived metadata. This grants no
+ * mint, transfer, approval, bridge release or arbitrary metadata-write power. */
+export function prepareKeelTezosCustodyRefresh(input: { readonly network: string; readonly sender: string; readonly collection: string; readonly tokenId: number | string | bigint }) {
+  assertObject(input,"custody refresh");
+  const network=assertNetwork(input.network),expectedSender=assertAddress(input.sender,"sender");
+  const operation=call("collection",assertContract(input.collection,"collection"),"refresh_custody_metadata",mInt(natural(input.tokenId,"tokenId",{positive:true})));
+  return {schema:KEEL_TEZOS_COLLECTION_ROUTE,step:"custody-refresh" as const,status:"review-only" as const,family:"tezos" as const,network,expectedSender,operation,signing:"not-performed" as const,submission:"not-performed" as const};
 }
 
 // ---------------------------------------------------------------------------

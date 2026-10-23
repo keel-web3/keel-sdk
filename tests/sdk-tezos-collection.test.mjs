@@ -83,22 +83,26 @@ test("originations stage dependents behind receipt-backed bindings and check com
 test("FA2 storage builder matches the compiled initial storage shape", () => {
   const storage = buildKeelTezosCollectionFA2Storage({ administrator: creator, keelIndex: hold, maxSupply: 100 });
   assert.equal(JSON.stringify(storage).startsWith('{"prim":"Pair","args":[{"int":"1"},{"prim":"Pair","args":[[{"string":"tz1KqTpEZ7Yob7QbPE4Hy4Wo8fHG8LhKxZSx"}]'), true);
-  // 22 compiled fields; default_royalty (5th) is None, pause_authority (14th) defaults to the administrator
-  // and token_owner_can_edit (20th) defaults to creator-only.
+  // 25 compiled fields; default_royalty (6th) is None, pause_authority (15th) defaults to the administrator,
+  // token_owner_can_edit (23rd) defaults to creator-only, and custody presentation (4th) and selected token IDs
+  // (18th, policy 19th) start disabled.
   const fields = [];
   for (let node = storage; ; node = node.args[1]) { if (node.prim !== "Pair") { fields.push(node); break; } fields.push(node.args[0]); }
-  assert.equal(fields.length, 22);
-  assert.deepEqual(fields[4], { prim: "None" });
-  assert.deepEqual(fields[13], { string: creator });
-  assert.deepEqual(fields[19], { prim: "False" });
+  assert.equal(fields.length, 25);
+  assert.deepEqual(fields[3], { prim: "None" });
+  assert.deepEqual(fields[5], { prim: "None" });
+  assert.deepEqual(fields[14], { string: creator });
+  assert.deepEqual(fields[17], { prim: "False" });
+  assert.deepEqual(fields[18], { prim: "None" });
+  assert.deepEqual(fields[22], { prim: "False" });
   const open = buildKeelTezosCollectionFA2Storage({ administrator: creator, keelIndex: hold, maxSupply: 100, holderMetadataEditing: true });
   const openFields = [];
   for (let node = open; ; node = node.args[1]) { if (node.prim !== "Pair") { openFields.push(node); break; } openFields.push(node.args[0]); }
-  assert.deepEqual(openFields[19], { prim: "True" });
+  assert.deepEqual(openFields[22], { prim: "True" });
   const royal = buildKeelTezosCollectionFA2Storage({ administrator: creator, keelIndex: hold, maxSupply: 100, defaultRoyalty: { receiver: creator, bps: 500 } });
   const royalFields = [];
   for (let node = royal; ; node = node.args[1]) { if (node.prim !== "Pair") { royalFields.push(node); break; } royalFields.push(node.args[0]); }
-  assert.deepEqual(royalFields[4], { prim: "Some", args: [{ prim: "Pair", args: [{ string: creator }, { int: "500" }] }] });
+  assert.deepEqual(royalFields[5], { prim: "Some", args: [{ prim: "Pair", args: [{ string: creator }, { int: "500" }] }] });
   for (const bps of [0, 10_001, 1.5]) assert.throws(() => buildKeelTezosCollectionFA2Storage({ administrator: creator, keelIndex: hold, maxSupply: 1, defaultRoyalty: { receiver: creator, bps } }), /bps/u);
   assert.throws(() => buildKeelTezosCollectionFA2Storage({ administrator: creator, keelIndex: hold, maxSupply: 1, defaultRoyalty: { receiver: "tz1burnburnburnburnburnburnburjAYjjX", bps: 1 } }), /burn/u);
   assert.deepEqual(keelTezosRoyaltyTokenMetadata({ receiver: creator, bps: 500 }), { decimals: 4, shares: { [creator]: 500 } });

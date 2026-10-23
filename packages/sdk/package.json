@@ -462,6 +462,18 @@
     "./authored-project/node": {
       "types": "./dist/authored-project.d.ts",
       "import": "./dist/authored-project.js"
+    },
+    "./selected-token-ids": {
+      "types": "./dist/selected-token-ids.d.ts",
+      "import": "./dist/selected-token-ids.js"
+    },
+    "./artist-contracts": {
+      "types": "./dist/artist-contracts.d.ts",
+      "import": "./dist/artist-contracts.js"
+    },
+    "./creator-setup-wallet": {
+      "types": "./dist/creator-setup-wallet.d.ts",
+      "import": "./dist/creator-setup-wallet.js"
     }
   },
   "files": [

@@ -11,6 +11,7 @@ export const KEEL_TEZOS_MODULES: readonly KeelTezosModule[] = [
       "keel_anchor_types.py",
       "keel_btc_header_chain.py",
       "keel_eth_attachment_registry.py",
+      "keel_eth_execution_state.py",
       "keel_eth_hash_verifier.py",
       "keel_eth_light_client.py",
       "keel_eth_proof_controller.py",
@@ -22,10 +23,12 @@ export const KEEL_TEZOS_MODULES: readonly KeelTezosModule[] = [
       "KeelBtcHeaderChain",
       "KeelEthAccountProof",
       "KeelEthAttachmentRegistry",
+      "KeelEthExecutionState",
       "KeelEthHashVerifier",
       "KeelEthLightClient",
       "KeelEthProofController",
       "KeelEthStateProof",
+      "KeelEthStorageProof",
       "KeelGovernedEthAttachmentRegistry",
       "KeelSignedAnchorVerifier"
     ],
@@ -48,6 +51,9 @@ export const KEEL_TEZOS_MODULES: readonly KeelTezosModule[] = [
       "KeelEthAttachmentRegistry": [
         "attach"
       ],
+      "KeelEthExecutionState": [
+        "publish_header"
+      ],
       "KeelEthHashVerifier": [],
       "KeelEthLightClient": [
         "bootstrap",
@@ -69,6 +75,7 @@ export const KEEL_TEZOS_MODULES: readonly KeelTezosModule[] = [
       "KeelEthStateProof": [
         "verify_inclusion"
       ],
+      "KeelEthStorageProof": [],
       "KeelGovernedEthAttachmentRegistry": [
         "attach"
       ],
@@ -101,6 +108,10 @@ export const KEEL_TEZOS_MODULES: readonly KeelTezosModule[] = [
         "profile_status",
         "source_status"
       ],
+      "KeelEthExecutionState": [
+        "exec_root_slot",
+        "exec_root_updater"
+      ],
       "KeelEthHashVerifier": [
         "configuration_hash",
         "verify"
@@ -119,6 +130,9 @@ export const KEEL_TEZOS_MODULES: readonly KeelTezosModule[] = [
         "last",
         "verify",
         "verify_account"
+      ],
+      "KeelEthStorageProof": [
+        "verify"
       ],
       "KeelGovernedEthAttachmentRegistry": [
         "admission_controller",
@@ -655,13 +669,16 @@ export const KEEL_TEZOS_MODULES: readonly KeelTezosModule[] = [
       "KeelCollectionFA2": [
         "add_administrator",
         "balance_of",
+        "enable_selected_token_ids",
         "freeze_contract_metadata",
         "freeze_default_presentation",
         "freeze_token_metadata",
+        "refresh_custody_metadata",
         "release_capacity",
         "remove_administrator",
         "reserve_capacity",
         "set_contract_metadata",
+        "set_custody_presentation",
         "set_default_presentation",
         "set_default_royalty",
         "set_keel_index",
@@ -670,6 +687,7 @@ export const KEEL_TEZOS_MODULES: readonly KeelTezosModule[] = [
         "set_token_metadata",
         "set_token_owner_can_edit",
         "strike",
+        "strike_selected",
         "strike_unreserved",
         "transfer",
         "update_operators"
@@ -678,15 +696,18 @@ export const KEEL_TEZOS_MODULES: readonly KeelTezosModule[] = [
         "add_administrator",
         "balance_of",
         "configure_seed_profile",
+        "enable_selected_token_ids",
         "freeze_contract_metadata",
         "freeze_default_presentation",
         "freeze_token_metadata",
         "fulfill_seed_batch",
+        "refresh_custody_metadata",
         "release_capacity",
         "remove_administrator",
         "reserve_capacity",
         "reveal_seed_batch",
         "set_contract_metadata",
+        "set_custody_presentation",
         "set_default_presentation",
         "set_default_royalty",
         "set_keel_index",
@@ -695,6 +716,7 @@ export const KEEL_TEZOS_MODULES: readonly KeelTezosModule[] = [
         "set_token_metadata",
         "set_token_owner_can_edit",
         "strike",
+        "strike_selected",
         "strike_unreserved",
         "strike_with_data",
         "transfer",
@@ -705,6 +727,7 @@ export const KEEL_TEZOS_MODULES: readonly KeelTezosModule[] = [
       "KeelCollectionFA2": [
         "administrator_count",
         "contract_metadata_frozen",
+        "custody_presentation",
         "default_presentation",
         "get_balance",
         "get_total_balance",
@@ -715,6 +738,9 @@ export const KEEL_TEZOS_MODULES: readonly KeelTezosModule[] = [
         "presentation_frozen",
         "reserved_capacity_of",
         "royalty_info",
+        "selected_token_ids",
+        "selection_policy",
+        "token_exists",
         "token_json",
         "token_metadata",
         "token_metadata_frozen",
@@ -724,6 +750,7 @@ export const KEEL_TEZOS_MODULES: readonly KeelTezosModule[] = [
       "KeelSeededCollectionFA2": [
         "administrator_count",
         "contract_metadata_frozen",
+        "custody_presentation",
         "default_presentation",
         "get_balance",
         "get_total_balance",
@@ -743,6 +770,9 @@ export const KEEL_TEZOS_MODULES: readonly KeelTezosModule[] = [
         "seed_materialized",
         "seed_profile",
         "seed_vrf_requestable",
+        "selected_token_ids",
+        "selection_policy",
+        "token_exists",
         "token_json",
         "token_metadata",
         "token_metadata_frozen",
@@ -1186,11 +1216,13 @@ export const KEEL_TEZOS_MODULES: readonly KeelTezosModule[] = [
     "views": {
       "KeelMintGate": [
         "authorization_digest",
+        "authorization_nonce",
         "campaign_capacity_status",
         "get_campaign",
         "is_campaign_admin",
         "latest_campaign",
         "merkle_leaf",
+        "minted_by_for",
         "pending_balance_of"
       ],
       "OneMintController": [

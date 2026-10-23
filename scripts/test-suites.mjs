@@ -440,6 +440,13 @@ export const DETERMINISTIC_TEST_FILES = Object.freeze([
   "tests/svg-renderer.test.mjs",
   "tests/thumbnail-sequence.test.mjs",
   "tests/treasury.test.mjs",
+  "tests/creator-setup-wallet.test.mjs",
+  "tests/custody-presentation.test.mjs",
+  "tests/mcp-artist-contracts.test.mjs",
+  "tests/sdk-artist-contracts.test.mjs",
+  "tests/sdk-selected-token-ids.test.mjs",
+  "tests/sdk-tezos-code-constants.test.mjs",
+  "tests/token-context-tail.test.mjs",
 ]);
 
 export const DEFAULT_TEST_FILES = Object.freeze([

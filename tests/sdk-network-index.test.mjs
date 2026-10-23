@@ -15,7 +15,7 @@ const response = value => async () => Response.json(value);
 
 test('deployed network catalog derives from actual records, not wallet/faucet support', () => {
   assert.deepEqual(snapshot.networks.map(n => n.chainId), [11155111]);
-  assert.equal(snapshot.networks[0].deployments.length, 62);
+  assert.equal(snapshot.networks[0].deployments.length, 66); // 62 + the four nocturnes-genesis records
   const creator = resolveKeelCreatorTarget(snapshot);
   assert.equal(creator.instance, 'creator-inline-20261005');
   assert.equal(creator.deployments.length, 15);

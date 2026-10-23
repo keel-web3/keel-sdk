@@ -1362,6 +1362,26 @@ export const KEEL_DEPLOYMENTS: readonly KeelDeployment[] = [
   {
     "module": "keel-die",
     "chainId": 11155111,
+    "instance": "nocturnes-genesis",
+    "contract": "KeelCreator721",
+    "address": "0xc277D26998506C2875E466EfD92a5FB6D794FEB7",
+    "block": "11955817",
+    "txHash": "0xb2ccc28c6947e33ab93283b76f3a6e164857547cf1877cdd4964450575afe656",
+    "runtimeCodeHash": "0x57e9d4e4e5521d74ce3dfb5e5d1ca9d5019b209c8da2fba978dcf2af3c80b8d4"
+  },
+  {
+    "module": "keel-die",
+    "chainId": 11155111,
+    "instance": "nocturnes-genesis",
+    "contract": "KeelCreatorFactory",
+    "address": "0xa2b763e1db6a80716fccff3b95562b2f4a217b3b",
+    "block": "11955818",
+    "txHash": "0xca598f61d1483968a33622ef7538360aaeb8ac7e8114bf73ccb08de8c5cca350",
+    "runtimeCodeHash": "0x6a8fe829b7f838a9fa94c43295d1a2fc54f62bcf648d4f4e808e0ef16f40fdf3"
+  },
+  {
+    "module": "keel-die",
+    "chainId": 11155111,
     "instance": "showcase",
     "contract": "KEEL721",
     "address": "0x71B25649E8A27992494eDAD355497c0Bea50A8e0",
@@ -1594,6 +1614,26 @@ export const KEEL_DEPLOYMENTS: readonly KeelDeployment[] = [
     "block": "11852705",
     "txHash": "0x420dc8294b5a9243d6aae643e1a9c8eb671981949cc07a157226f2b7c13013ac",
     "runtimeCodeHash": "0xe66621ec52c726a358dc740216f24abe2dbb658d16d80d2623d234275477928d"
+  },
+  {
+    "module": "keel-mint-access",
+    "chainId": 11155111,
+    "instance": "nocturnes-genesis",
+    "contract": "KeelMintGate",
+    "address": "0xeb3d9b9c4640fef57622b13d681b809e6301a72a",
+    "block": "11955814",
+    "txHash": "0x1f27b93a5061ec7db28492fb5954c65b7166f9d3446030f9ba5855de156d3fe9",
+    "runtimeCodeHash": "0x18dd4ccaee0b571ad9bc5a4f9bb45ad23f1fbe1073a9c8357c017c97d9627fec"
+  },
+  {
+    "module": "keel-mint-access",
+    "chainId": 11155111,
+    "instance": "nocturnes-genesis",
+    "contract": "KeelMintRouteRegistry",
+    "address": "0x8be5a31633dc83a489cdc48f6e49706bb7501143",
+    "block": "11955813",
+    "txHash": "0xf39159da97f8672a38685d7013b5723c11b709ce466d080e589bec32e120f865",
+    "runtimeCodeHash": "0x673fdf89dc176c99f81d184e191eb9d6ffb04c0802143d2f49ef91c39634b613"
   },
   {
     "module": "keel-mint-access",

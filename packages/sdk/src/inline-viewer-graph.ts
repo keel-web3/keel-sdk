@@ -1,4 +1,5 @@
 import { inspectKeelNativeSVG, inspectKeelNativeAudio, KEEL_NATIVE_AUDIO_MEDIA_TYPES } from "./native-media-inspection.js";
+import {buildKeelTokenContextHTMLTail as tokenContextHTMLTail} from './token-context-tail.js';
 import { snapshotKeelExplicitExternalPreview, assertKeelExternalPreviewImageURI, type KeelExplicitExternalPreview } from "./external-preview.js";
 export { prepareKeelExplicitExternalPreview, snapshotKeelExplicitExternalPreview } from "./external-preview.js";
 export type { KeelExplicitExternalPreview } from "./external-preview.js";
@@ -1025,10 +1026,6 @@ export async function buildKeelPreparedTokenURIFragment(
   throw new KeelLegacyCarriageError("buildKeelPreparedTokenURIFragment");
 }
 
-function tokenContextHTMLTail(contextJSON: string, contextDigest: Hex, contextByteLength: number): string {
-  const contextBase64URL = Buffer.from(contextJSON, "utf8").toString("base64url");
-  return `<script>(()=>{try{const v="${contextBase64URL}",b=v.replace(/-/g,"+").replace(/_/g,"/")+"=".repeat((4-v.length%4)%4),j=atob(b),c=Object.freeze(JSON.parse(j)),o=Object.freeze({json:j,digest:"${contextDigest}",byteLength:${contextByteLength}});Object.defineProperty(globalThis,"__KEEL_CONTEXT__",{value:c,enumerable:true,writable:false,configurable:false});Object.defineProperty(globalThis,"__KEEL_ONCHAIN_CONTEXT__",{value:o,enumerable:true,writable:false,configurable:false})}catch(e){document.documentElement.dataset.keelContext="failed";throw e}})()</script>`;
-}
 
 function assertMarketplaceSafeDataURI(value: string, label: string): void {
   if (!value.startsWith("data:")) return;

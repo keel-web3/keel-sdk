@@ -412,9 +412,15 @@ function base58check(prefix: readonly number[], payload: Uint8Array): string {
   return out;
 }
 
+/** Protocol expression address of exact Micheline binary, without PACK's 0x05 prefix. */
+export function keelTezosExpressionHash(encoded: Uint8Array): string {
+  if (encoded.length === 0) throw new TypeError("An encoded Micheline expression is required.");
+  return base58check([13, 44, 64, 27], blake2b(encoded, { dkLen: 32 }));
+}
+
 /** The `expr...` big_map key hash the RPC addresses a value by: Base58Check("expr", blake2b-256(PACK(key))). */
 export function keelTezosScriptExpr(type: KeelTezosLiveType, value: KeelTezosLiveValue): string {
-  return base58check([13, 44, 64, 27], blake2b(packKeelTezosLiveKey(type, value), { dkLen: 32 }));
+  return keelTezosExpressionHash(packKeelTezosLiveKey(type, value));
 }
 
 /* ------------------------------------------------------------------------ */

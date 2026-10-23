@@ -461,6 +461,28 @@ batch; unrelated minters do not share pending requests.
 
 Use `@keel/sdk/svg-renderer-authoring` to create editable designs, deterministic previews and reusable Solidity renderers. Use `@keel/sdk/svg-renderer` to read native contract SVGs, inspect hidden proof provenance and compare complete SVG bytes against finalized contract output. See [the renderer guide](../../docs/KEEL_SVG_RENDERER.md).
 
+
+### Creator setup wallet
+
+Use `buildKeelCreatorSetupBatch` with wagmi's `sendCalls` action, requiring
+`forceAtomic: true` and leaving serial fallback disabled. Track the ID returned
+by the wallet with wagmi's `getCallsStatus`; an application request ID is not a
+wallet batch ID. `keelAtomicSetupCapability` accepts both typed wagmi numeric
+chain keys and raw RPC hex keys. These helpers never sign or submit. A deployed
+smart-account self-call that succeeds in eth_call is not proof that a wallet
+allows it: MetaMask prohibits dapp contract data addressed to its own accounts.
+
+
+For the qualified Sepolia MetaMask account profile, use
+`buildKeelCreatorSetupManagerBatch(plan, observed)` to carry the reviewed logical
+settings in one external wallet call. MetaMask limits a wallet batch to ten
+calls. This helper uses the account's existing DelegationManager with an empty
+permission context and reverting batch mode; it installs no new authority.
+Verify the exact account delegation, delegate runtime hash, configured manager
+and manager runtime hash against `KEEL_METAMASK_SETUP_PROFILE` before using it.
+The logical plan commitment remains unchanged. Extension UI acceptance and the
+owner's actual receipt are separate from public call simulation and fork tests.
+
 ## Signed anchor approvals
 
 [Signed anchor preparation](../../docs/KEEL_SIGNED_ANCHORS.md) explains the offline

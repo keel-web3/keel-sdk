@@ -67,12 +67,13 @@ nodeTest('the seeded storage adds the seed fields in comb order and the plan sta
   let node = storage;
   while (node.prim === 'Pair') { fields.push(node.args[0]); node = node.args[1]; }
   fields.push(node);
-  assert.equal(fields.length, 29);
-  assert.deepEqual(fields[13], { string: CREATOR }); // pause_authority defaults to the administrator
-  assert.deepEqual(fields[16], { int: '0' }); // seed_batch_count
-  assert.deepEqual(fields[19], { prim: 'False' }); // seed_configured
-  assert.deepEqual(fields[27], []); // token_seed_batch
-  assert.deepEqual(fields[28], { int: '0' }); // total_reserved_capacity
+  assert.equal(fields.length, 32);
+  assert.deepEqual(fields[14], { string: CREATOR }); // pause_authority defaults to the administrator
+  assert.deepEqual(fields[17], { int: '0' }); // seed_batch_count
+  assert.deepEqual(fields[20], { prim: 'False' }); // seed_configured
+  assert.deepEqual(fields[23], { prim: 'False' }); // selected_token_ids
+  assert.deepEqual(fields[30], []); // token_seed_batch
+  assert.deepEqual(fields[31], { int: '0' }); // total_reserved_capacity
   const plan = prepareKeelTezosCollectionOriginations({ network: NETWORK, creator: CREATOR, maxSupply: 10, code: {}, bindings: { index: COLLECTION, creatorProfile: COLLECTION }, entropyProfile: { mode: 'derived' } });
   assert.equal(plan.stages[1].operations[0].contract, 'KeelSeededCollectionFA2');
   assert.deepEqual(plan.stages[1].operations[0].unresolvedBindings, ['code:entropyCollection']);

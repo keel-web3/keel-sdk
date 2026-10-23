@@ -135,12 +135,12 @@ nodeTest('collections and mint lanes store the pause authority EVM fixes at depl
   const creator = 'tz1KqTpEZ7Yob7QbPE4Hy4Wo8fHG8LhKxZSx';
   const comb = (node) => { const out = []; while (node.prim === 'Pair' && node.args.length === 2) { out.push(node.args[0]); node = node.args[1]; } out.push(node); return out; };
   const collection = comb(buildKeelTezosCollectionFA2Storage({ administrator: creator, keelIndex: MANAGER, maxSupply: 10 }));
-  assert.equal(collection.length, 22);
-  assert.deepEqual(collection[13], { string: creator });
-  assert.deepEqual(comb(buildKeelTezosCollectionFA2Storage({ administrator: creator, keelIndex: MANAGER, maxSupply: 10, pauseAuthority: MANAGER }))[13], { string: MANAGER });
+  assert.equal(collection.length, 25);
+  assert.deepEqual(collection[14], { string: creator });
+  assert.deepEqual(comb(buildKeelTezosCollectionFA2Storage({ administrator: creator, keelIndex: MANAGER, maxSupply: 10, pauseAuthority: MANAGER }))[14], { string: MANAGER });
   const seeded = comb(buildKeelTezosSeededCollectionFA2Storage({ administrator: creator, keelIndex: MANAGER, maxSupply: 10, pauseAuthority: MANAGER }));
-  assert.equal(seeded.length, 29);
-  assert.deepEqual(seeded[13], { string: MANAGER });
+  assert.equal(seeded.length, 32);
+  assert.deepEqual(seeded[14], { string: MANAGER });
   const oneMint = comb(buildKeelTezosOneMintStorage({ creatorProfileRegistry: CONTROLLER, pauseAuthority: MANAGER }));
   assert.equal(oneMint.length, 15);
   assert.deepEqual(oneMint[9], { string: MANAGER });

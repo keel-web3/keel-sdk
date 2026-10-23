@@ -4,6 +4,9 @@ import {
   prepareKeelTezosCollectionOriginations,
   prepareKeelTezosHoldResources,
   prepareKeelTezosMint,
+  prepareKeelTezosSelectedTokenIdsSetup,
+  prepareKeelTezosCustodyPresentation,
+  prepareKeelTezosCustodyRefresh,
   prepareKeelTezosMintGate,
   prepareKeelTezosMintGateAction,
   prepareKeelTezosPresentationBinding,
@@ -246,13 +249,31 @@ export const TEZOS_COLLECTION_TOOL_DEFINITIONS: readonly ToolDefinition[] = [
     },
   ),
   tool(
+    "keel-tezos-token-selection-prepare",
+    "Prepare irreversible chosen-token-ID mode for a new KEEL FA2 before any supply or reservations exist. An optional immutable allocation policy authorizes each selection. Does not establish deployed capability or caller authority, sign or submit.",
+    { type: "object", additionalProperties: false, required: ["network", "sender", "collection"], properties: { network: NETWORK, sender: ADDRESS, collection: KT1, policy: KT1 } },
+    async (_context, value) => prepareKeelTezosSelectedTokenIdsSetup(input(value, "the Tezos token selection tool") as never),
+  ),
+  tool(
+    "keel-tezos-custody-presentation-prepare",
+    "Prepare optional custody-derived NFT metadata for a new KEEL FA2 before minting or reservations. The collection supplies custody from its own ledger; the renderer returns prepared metadata. No separate staking, transfer authority or bridge release permission is created. Requires selected-chain code/renderer readback. Does not sign or submit.",
+    {type:"object",additionalProperties:false,required:["network","sender","collection","custodian","renderer"],properties:{network:NETWORK,sender:ADDRESS,collection:KT1,custodian:ADDRESS,renderer:KT1}},
+    async (_context,value) => prepareKeelTezosCustodyPresentation(input(value,"the Tezos custody presentation tool") as never),
+  ),
+  tool(
+    "keel-tezos-custody-refresh-prepare",
+    "Prepare a permissionless retry of the same ledger-derived NFT metadata. Cannot choose custody, replace metadata, transfer or release an NFT. Does not sign or submit.",
+    {type:"object",additionalProperties:false,required:["network","sender","collection","tokenId"],properties:{network:NETWORK,sender:ADDRESS,collection:KT1,tokenId:NATURAL}},
+    async (_context,value) => prepareKeelTezosCustodyRefresh(input(value,"the Tezos custody refresh tool") as never),
+  ),
+  tool(
     "keel-tezos-mint-prepare",
-    "Prepare Tezos KEEL mints: OneMint public_mint (exact mutez payment), merkle_mint with allowlist proof, admin_strike for a premint stage, or a direct FA2 strike by an authorized minter (unreserved=true never consumes a drop's reserved supply). Several requests become one batch; quantity >1 is a batch mint. Review-only.",
+    "Prepare Tezos KEEL mints: OneMint public_mint (exact mutez payment), merkle_mint with allowlist proof, admin_strike for a premint stage, or a direct FA2 strike by an authorized minter (unreserved=true never consumes a drop's reserved supply), or chosen tokenIds through strike_selected after selected-ID mode is enabled. Several requests become one batch; quantity >1 is a batch mint. Review-only.",
     {
       type: "object", additionalProperties: false, required: ["network", "sender", "mints"],
       properties: {
         network: NETWORK, sender: ADDRESS, oneMint: KT1, collection: KT1, mintData: { type: "string", pattern: "^(?:0x)?(?:[0-9a-fA-F]{2})*$" },
-        mints: { type: "array", minItems: 1, maxItems: 64, items: { type: "object", additionalProperties: false, required: ["mode", "quantity"], properties: { mode: { type: "string", enum: ["public", "merkle", "premint", "direct"] }, dropId: DIGEST, stageIndex: { type: "integer", minimum: 0 }, quantity: { type: "integer", minimum: 1, maximum: 500 }, priceMutez: NATURAL, allowance: { type: "integer", minimum: 1 }, proof: { type: "array", maxItems: 64, items: DIGEST }, recipient: ADDRESS, unreserved: { type: "boolean" } } } },
+        mints: { type: "array", minItems: 1, maxItems: 64, items: { type: "object", additionalProperties: false, required: ["mode", "quantity"], properties: { mode: { type: "string", enum: ["public", "merkle", "premint", "direct", "selected"] }, dropId: DIGEST, stageIndex: { type: "integer", minimum: 0 }, quantity: { type: "integer", minimum: 1, maximum: 500 }, priceMutez: NATURAL, allowance: { type: "integer", minimum: 1 }, proof: { type: "array", maxItems: 64, items: DIGEST }, tokenIds: { type: "array", minItems: 1, maxItems: 500, items: NATURAL }, recipient: ADDRESS, unreserved: { type: "boolean" } } } },
       },
     },
     async (_context, value) => prepareKeelTezosMint(input(value, "the Tezos mint tool") as never),
