@@ -1,0 +1,25 @@
+{
+  "scope": "Only four own post-test generated MCP helpers; full preceding hashes retained; no tracked source/assets/private data removed.",
+  "removed": [
+    {
+      "path": "packages/mcp/dist/audio-test-media-edit-tools.mjs",
+      "bytes": 6131,
+      "sha256": "3757bb9adb2421a34b9f9a3f6593fcbe40b8d1c39f90aed06cf8ed1592905fec"
+    },
+    {
+      "path": "packages/mcp/dist/audio-test-paths.mjs",
+      "bytes": 6607,
+      "sha256": "9316d288f8218b99cd44aca842fe3532e8adf102848c2558d178210d97ad59de"
+    },
+    {
+      "path": "packages/mcp/dist/native-movie-test-media-edit-tools.mjs",
+      "bytes": 6131,
+      "sha256": "3757bb9adb2421a34b9f9a3f6593fcbe40b8d1c39f90aed06cf8ed1592905fec"
+    },
+    {
+      "path": "packages/mcp/dist/native-movie-test-paths.mjs",
+      "bytes": 6607,
+      "sha256": "9316d288f8218b99cd44aca842fe3532e8adf102848c2558d178210d97ad59de"
+    }
+  ]
+}

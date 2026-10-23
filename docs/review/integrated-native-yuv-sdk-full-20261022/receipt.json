@@ -1,0 +1,18 @@
+{
+  "source": "5696dcba210526e4bcdab768a769deb2a77020bb",
+  "productionEquivalentSource": "4fa47717d9e9fac48cc6c9f925540f190e478564",
+  "checkedAt": "2026-10-23T02:45:31.286211+00:00",
+  "command": "PATH=/Users/ravonus/.nvm/versions/node/v22.22.1/bin:$PATH TMPDIR=/private/tmp node scripts/test.mjs",
+  "tests": 3219,
+  "pass": 3134,
+  "fail": 0,
+  "cancelled": 0,
+  "existingOptionalSiblingSkips": 85,
+  "excludedFiles": 0,
+  "tAPDurationMs": 141560.790625,
+  "runtime": "official NVM Node22.22.1/zlib1.3.1-e00f703",
+  "runtimeOutputCommon1821MatchIndependentAuthorBuild": true,
+  "actualOriginalGatorrrGIFNative": "NOT_PROVEN_BY_THIS_SUITE",
+  "productionActivation": false,
+  "walletSignatureOrSpend": false
+}
