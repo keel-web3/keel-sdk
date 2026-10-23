@@ -1,0 +1,256 @@
+TAP version 13
+# Subtest: actual old strict failure stays RED; derived complete forward reference passes offline only
+ok 1 - actual old strict failure stays RED; derived complete forward reference passes offline only
+  ---
+  duration_ms: 795.612292
+  type: 'test'
+  ...
+# Subtest: full drop rejects independently changed target
+ok 2 - full drop rejects independently changed target
+  ---
+  duration_ms: 308.513458
+  type: 'test'
+  ...
+# Subtest: full drop rejects independently changed payout
+ok 3 - full drop rejects independently changed payout
+  ---
+  duration_ms: 315.452334
+  type: 'test'
+  ...
+# Subtest: full drop rejects independently changed supply
+ok 4 - full drop rejects independently changed supply
+  ---
+  duration_ms: 358.204208
+  type: 'test'
+  ...
+# Subtest: full drop rejects independently changed maxPerTransaction
+ok 5 - full drop rejects independently changed maxPerTransaction
+  ---
+  duration_ms: 321.27425
+  type: 'test'
+  ...
+# Subtest: full drop rejects independently changed maxPerWallet
+ok 6 - full drop rejects independently changed maxPerWallet
+  ---
+  duration_ms: 328.43425
+  type: 'test'
+  ...
+# Subtest: full drop rejects independently changed stages[0].kind
+ok 7 - full drop rejects independently changed stages[0].kind
+  ---
+  duration_ms: 311.231375
+  type: 'test'
+  ...
+# Subtest: full drop rejects independently changed stages[0].startTime
+ok 8 - full drop rejects independently changed stages[0].startTime
+  ---
+  duration_ms: 349.96425
+  type: 'test'
+  ...
+# Subtest: full drop rejects independently changed stages[0].endTime
+ok 9 - full drop rejects independently changed stages[0].endTime
+  ---
+  duration_ms: 322.075625
+  type: 'test'
+  ...
+# Subtest: full drop rejects independently changed stages[0].unitPrice
+ok 10 - full drop rejects independently changed stages[0].unitPrice
+  ---
+  duration_ms: 324.186875
+  type: 'test'
+  ...
+# Subtest: full drop rejects independently changed stages[0].paymentAsset
+ok 11 - full drop rejects independently changed stages[0].paymentAsset
+  ---
+  duration_ms: 314.528417
+  type: 'test'
+  ...
+# Subtest: full drop rejects independently changed stages[0].signer
+ok 12 - full drop rejects independently changed stages[0].signer
+  ---
+  duration_ms: 354.915333
+  type: 'test'
+  ...
+# Subtest: full drop rejects independently changed stages[0].entitlementToken
+ok 13 - full drop rejects independently changed stages[0].entitlementToken
+  ---
+  duration_ms: 310.209834
+  type: 'test'
+  ...
+# Subtest: full drop rejects independently changed stages[0].maxPerTransaction
+ok 14 - full drop rejects independently changed stages[0].maxPerTransaction
+  ---
+  duration_ms: 310.126958
+  type: 'test'
+  ...
+# Subtest: full drop rejects independently changed stages[0].maxPerWallet
+ok 15 - full drop rejects independently changed stages[0].maxPerWallet
+  ---
+  duration_ms: 314.700041
+  type: 'test'
+  ...
+# Subtest: full drop rejects independently changed stages[0].metadataDigest
+ok 16 - full drop rejects independently changed stages[0].metadataDigest
+  ---
+  duration_ms: 354.877208
+  type: 'test'
+  ...
+# Subtest: full drop rejects independently changed metadataDigest
+ok 17 - full drop rejects independently changed metadataDigest
+  ---
+  duration_ms: 318.008542
+  type: 'test'
+  ...
+# Subtest: read/execution limit and identity stays bound: discoveryGasPolicy
+ok 18 - read/execution limit and identity stays bound: discoveryGasPolicy
+  ---
+  duration_ms: 207.687542
+  type: 'test'
+  ...
+# Subtest: read/execution limit and identity stays bound: chainId
+ok 19 - read/execution limit and identity stays bound: chainId
+  ---
+  duration_ms: 203.076083
+  type: 'test'
+  ...
+# Subtest: read/execution limit and identity stays bound: reader
+ok 20 - read/execution limit and identity stays bound: reader
+  ---
+  duration_ms: 240.355875
+  type: 'test'
+  ...
+# Subtest: read/execution limit and identity stays bound: readerRuntimeCodeHash
+ok 21 - read/execution limit and identity stays bound: readerRuntimeCodeHash
+  ---
+  duration_ms: 203.749
+  type: 'test'
+  ...
+# Subtest: read/execution limit and identity stays bound: maximumTokenUriBytes
+ok 22 - read/execution limit and identity stays bound: maximumTokenUriBytes
+  ---
+  duration_ms: 206.602041
+  type: 'test'
+  ...
+# Subtest: read/execution limit and identity stays bound: maximumReadGas
+ok 23 - read/execution limit and identity stays bound: maximumReadGas
+  ---
+  duration_ms: 228.213667
+  type: 'test'
+  ...
+# Subtest: read/execution limit and identity stays bound: collectionOverheadGas
+ok 24 - read/execution limit and identity stays bound: collectionOverheadGas
+  ---
+  duration_ms: 210.092625
+  type: 'test'
+  ...
+# Subtest: read/execution limit and identity stays bound: maximumTransactionGas
+ok 25 - read/execution limit and identity stays bound: maximumTransactionGas
+  ---
+  duration_ms: 208.120458
+  type: 'test'
+  ...
+# Subtest: unchanged structural guard rejects source GIF descriptor
+ok 26 - unchanged structural guard rejects source GIF descriptor
+  ---
+  duration_ms: 219.29475
+  type: 'test'
+  ...
+# Subtest: unchanged structural guard rejects WebP preview
+ok 27 - unchanged structural guard rejects WebP preview
+  ---
+  duration_ms: 187.030958
+  type: 'test'
+  ...
+# Subtest: unchanged structural guard rejects URI body
+ok 28 - unchanged structural guard rejects URI body
+  ---
+  duration_ms: 580.447458
+  type: 'test'
+  ...
+# Subtest: unchanged structural guard rejects old artifact restored to new envelope
+ok 29 - unchanged structural guard rejects old artifact restored to new envelope
+  ---
+  duration_ms: 579.951833
+  type: 'test'
+  ...
+# Subtest: unchanged structural guard rejects unexpected target
+ok 30 - unchanged structural guard rejects unexpected target
+  ---
+  duration_ms: 337.487458
+  type: 'test'
+  ...
+# Subtest: unchanged structural guard rejects unexpected sender
+ok 31 - unchanged structural guard rejects unexpected sender
+  ---
+  duration_ms: 297.35425
+  type: 'test'
+  ...
+# Subtest: unchanged structural guard rejects unexpected value
+ok 32 - unchanged structural guard rejects unexpected value
+  ---
+  duration_ms: 306.834833
+  type: 'test'
+  ...
+# Subtest: unchanged structural guard rejects stale revision
+ok 33 - unchanged structural guard rejects stale revision
+  ---
+  duration_ms: 175.972667
+  type: 'test'
+  ...
+# Subtest: unchanged structural guard rejects changed canonical header
+ok 34 - unchanged structural guard rejects changed canonical header
+  ---
+  duration_ms: 331.983333
+  type: 'test'
+  ...
+# Subtest: unchanged structural guard rejects extra override field
+ok 35 - unchanged structural guard rejects extra override field
+  ---
+  duration_ms: 306.210542
+  type: 'test'
+  ...
+# Subtest: canonical document every field participates in independently derived digest
+ok 36 - canonical document every field participates in independently derived digest
+  ---
+  duration_ms: 72.164792
+  type: 'test'
+  ...
+# Subtest: unchanged old graph is actual SDK input and whole old URI reproduces before forwarding
+ok 37 - unchanged old graph is actual SDK input and whole old URI reproduces before forwarding
+  ---
+  duration_ms: 77.294333
+  type: 'test'
+  ...
+# Subtest: three old strict module bytes are retained unchanged
+ok 38 - three old strict module bytes are retained unchanged
+  ---
+  duration_ms: 1.080834
+  type: 'test'
+  ...
+# Subtest: forward core differs ONLY by separately reviewed expected-drop derivation and truthful flags
+ok 39 - forward core differs ONLY by separately reviewed expected-drop derivation and truthful flags
+  ---
+  duration_ms: 0.113667
+  type: 'test'
+  ...
+# Subtest: no observed new URI/digest literal can serve as an expected value
+ok 40 - no observed new URI/digest literal can serve as an expected value
+  ---
+  duration_ms: 66.432
+  type: 'test'
+  ...
+# Subtest: forward original preserves all remaining original verifier bytes and guards
+ok 41 - forward original preserves all remaining original verifier bytes and guards
+  ---
+  duration_ms: 0.112125
+  type: 'test'
+  ...
+1..41
+# tests 41
+# suites 0
+# pass 41
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 11581.857166

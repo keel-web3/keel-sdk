@@ -1,0 +1,13 @@
+{
+  "argv": [
+    "/opt/homebrew/Cellar/python@3.14/3.14.7/Frameworks/Python.framework/Versions/3.14/bin/python3.14",
+    "/private/tmp/keel-gif-native95-sequence-20261020/docs/reviews/studio-publication-20261020/release/full-gif-native95/one-shot.py",
+    "/private/tmp/keel-gif-native95-sequence-20261020/sequence2/config.json",
+    "21108ffe7e59fd865e8013d819f8da074cdb937e9efb02c52433bb15057b510d",
+    "/private/tmp/keel-independent-gif-native95-static-20261020/whole-sequence-review02.json",
+    "0c93dccb94264dccb4ee72ccfa10d001c7e8767f9be25e70b28a7fbaa088ca99"
+  ],
+  "cwd": "/private/tmp/keel-gif-native95-sequence-20261020",
+  "scope": "ONE epoch2 fresh normal saved-v2 GIF assembly, canonical URI/drop plus authenticated header-gas validation and exact95/D97 native qualification; no production activation",
+  "maximumRuns": 1
+}

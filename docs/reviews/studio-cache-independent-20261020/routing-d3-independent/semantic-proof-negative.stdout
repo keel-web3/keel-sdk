@@ -1,0 +1,33 @@
+{
+  "scope": "actual frozen source; synthetic providers only; zero network/signing",
+  "results": [
+    {
+      "message": "invalid proof",
+      "walletPayloads": 1,
+      "managedPayloads": 1,
+      "outcome": "success",
+      "required": "rejected with zero alternate payloads"
+    },
+    {
+      "message": "canonical block hash mismatch; reorg detected",
+      "walletPayloads": 1,
+      "managedPayloads": 1,
+      "outcome": "success",
+      "required": "rejected with zero alternate payloads"
+    },
+    {
+      "message": "execution reverted",
+      "walletPayloads": 1,
+      "managedPayloads": 0,
+      "outcome": "rejected",
+      "required": "rejected with zero alternate payloads"
+    },
+    {
+      "message": "access denied",
+      "walletPayloads": 1,
+      "managedPayloads": 0,
+      "outcome": "rejected",
+      "required": "rejected with zero alternate payloads"
+    }
+  ]
+}

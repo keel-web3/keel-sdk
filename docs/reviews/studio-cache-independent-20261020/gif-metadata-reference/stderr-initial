@@ -1,0 +1,18 @@
+node:internal/modules/run_main:123
+    triggerUncaughtException(
+    ^
+
+AssertionError [ERR_ASSERTION]: Unknown wallet call
+    at file:///private/tmp/keel-independent-gif-metadata-20261020/derive.mjs:13:393
+    at Array.map (<anonymous>)
+    at derive (file:///private/tmp/keel-independent-gif-metadata-20261020/derive.mjs:13:363)
+    at file:///private/tmp/keel-independent-gif-metadata-20261020/derive.mjs:17:33 {
+  generatedMessage: false,
+  code: 'ERR_ASSERTION',
+  actual: undefined,
+  expected: true,
+  operator: '==',
+  diff: 'simple'
+}
+
+Node.js v22.22.1

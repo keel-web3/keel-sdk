@@ -1,0 +1,15 @@
+{
+  "argv": [
+    "/opt/homebrew/opt/node@22/bin/node",
+    "--test",
+    "--test-concurrency=1",
+    "/private/tmp/keel-gif-gas-reference-20261020/docs/tools/gif-forward-reference/forward-reference.test.mjs",
+    "/private/tmp/keel-gif-gas-reference-20261020/docs/tools/gif-forward-reference/header-gas-reference.test.mjs"
+  ],
+  "cwd": "/private/tmp/keel-gif-gas-reference-20261020",
+  "exitCode": 0,
+  "preexistingFilesChanged": [
+    "validate-retained.mjs"
+  ],
+  "original41TestSourceByteExact": true
+}

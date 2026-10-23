@@ -1,0 +1,16 @@
+[
+  {
+    "file": "qualify-final-image.mjs",
+    "oldSHA256": "9c61e6f5283c31b02d4c76a5fd0dd0a886fe788631898fe519cbd5af5e34776d",
+    "patchSHA256": "c924eb833f3ca2efafa8d0e734be47b7017fa87d1d4e0fabf9e1d48c5a09083a",
+    "proposedSHA256": "9a74cb0f583058b96a3beb322721478670decfdca746021dd813ea26cf72c53e",
+    "patchStdout": "patching file qualify-final-image.mjs\n"
+  },
+  {
+    "file": "discovery-http.mjs",
+    "oldSHA256": "0de71c6cb7590e37a777d4ef4f125297e47b7bf50357f8c5ecccd3fe5190e30e",
+    "patchSHA256": "c9271a4dcb3a3d3bc083775149cf93a01789df42cd12281a530d5018253ae2bc",
+    "proposedSHA256": "7ba994e0fc31f79f345e23a20428cd792fecdabc03b1ff326032d312b8af8974",
+    "patchStdout": "patching file discovery-http.mjs\n"
+  }
+]

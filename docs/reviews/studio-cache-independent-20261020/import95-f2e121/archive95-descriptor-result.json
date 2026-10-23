@@ -1,0 +1,17 @@
+{
+  "schema": "keel.independent-image95-archive-descriptor-check@1",
+  "rawBytes": 692871680,
+  "rawSHA256": "f015350eb2566bd9557d5033795713ba1d5aa97c04a55e84a837541e4d071407",
+  "descriptorChainSHA256": [
+    "sha256:95bdda05a7596553251e9d4ba9fe72758abc5137fcb661efed80ca94ab5e6bcb",
+    "sha256:22e16118f08cdccb0a3208273d99636a837cc5fa25cd12590fd0ae93f6b3e02f"
+  ],
+  "config": "sha256:2c98fcde40bec28cdd53353fb78a8b1e28a1661a66ea96f9af866c72c57658a7",
+  "all36DiffIdsMatchPlan": true,
+  "completeImageConfigMatch": true,
+  "archiveAuditSHA256": "4b6d1ae201b2fc6648ea06cf5f818e96500de04437e8d44f9172530a6b46ecc1",
+  "priorAuthorAllBlobAndDiffIdAuditRead": true,
+  "independentCompressedBlobDecompressionRepeated": false,
+  "requiredBytes": 2247132160,
+  "productionActions": false
+}

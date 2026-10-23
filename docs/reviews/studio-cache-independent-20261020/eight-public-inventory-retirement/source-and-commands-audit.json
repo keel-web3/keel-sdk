@@ -1,0 +1,33 @@
+{
+  "result": "PASS_BINDING_ONLY_EIGHT_SCOPE_AND_EXACT_COMMANDS",
+  "sourceSHA256": "c29dd8c12e088626bcd44a8c30eaa8015c27e6126a73ed9fecc0e6f711383e42",
+  "reverseScopeBindingsRestoresReviewed7e1SourceByteExact": true,
+  "planSHA256": "ac3b584a8c2a65b10190f317c6c0302cf5542988783d42a8df9a1041d0e55cef",
+  "commandsSHA256": "d0903bd104f1894b33442677dea43e4f660f0e56d160402237b64b282548c2ab",
+  "sourceRowsExactProtectedManifest": true,
+  "exactReceiverAndArgvChecks": true,
+  "freshMaintainedAndReviewerControlsPassed": 18,
+  "testBodiesAssertionsUnchanged": true,
+  "maintainedFixtureBinding": "Same unchanged test source, source bytes copied under its hardcoded sibling basename only; no source edits, assertions or inputs changed. Main entrypoint not invoked.",
+  "runs": [
+    {
+      "name": "maintained-eight",
+      "exit": 0,
+      "stdoutSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSHA256": "fdb64f76ee3faf48d76ab43bbb2a2d0a9d4cc51971bf0df9590990e31971669c"
+    },
+    {
+      "name": "reviewer-entry-three",
+      "exit": 0,
+      "stdoutSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSHA256": "9e076e5a48d0d00cb05ec6a43f97055d61dcf85db8fb89cbf900b33875cc55bf"
+    },
+    {
+      "name": "reviewer-reference-seven",
+      "exit": 0,
+      "stdoutSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSHA256": "38fdc48b0ed74852ff7b2c46084aa3f73d6e5ef3563bcf149d5fb8d109f86db9"
+    }
+  ],
+  "hostCalls": 0
+}

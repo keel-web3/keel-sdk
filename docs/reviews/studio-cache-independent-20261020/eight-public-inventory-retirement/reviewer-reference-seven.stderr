@@ -1,0 +1,12 @@
+test_actual_fd_reference_rejected (__main__.References.test_actual_fd_reference_rejected) ... ok
+test_map_inode_reference_rejected (__main__.References.test_map_inode_reference_rejected) ... ok
+test_no_references_passes (__main__.References.test_no_references_passes) ... ok
+test_running_container_ancestor_bind_rejected (__main__.References.test_running_container_ancestor_bind_rejected) ... ok
+test_running_container_exact_bind_rejected (__main__.References.test_running_container_exact_bind_rejected) ... ok
+test_still_live_missing_fd_directory_rejected (__main__.References.test_still_live_missing_fd_directory_rejected) ... ok
+test_unrelated_bind_is_not_reference (__main__.References.test_unrelated_bind_is_not_reference) ... ok
+
+----------------------------------------------------------------------
+Ran 7 tests in 0.006s
+
+OK

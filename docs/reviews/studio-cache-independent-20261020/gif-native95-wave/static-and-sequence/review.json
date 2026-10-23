@@ -1,0 +1,75 @@
+{
+  "schema": "keel.independent-gif95-source-and-conditional-sequence-review@1",
+  "reviewer": "cache-release-independent-reviewer",
+  "producer": {
+    "source": "99d482280622e02a32851dfaba5baec4cd3012aa",
+    "evidence": "3d6003b7b707121ace02bdf1a9c6db687aff48b7",
+    "packetSHA256": "6a8359955daceb7cf29ffdcace0a97fb24741ae7ca60005956e5de7d10638267",
+    "bundleReceiptSHA256": "720c2c5e5ee49ef75014e5e0ea9c408f68bf1fc74c8593bcd952ac32f3e757f4",
+    "reviewSHA256": "09c2be41629d7bfaed0dee066ee121b8aac2e0b6ce50a5746e538296c6d948b0",
+    "ownTestPass": 147,
+    "ownTestFail": 0,
+    "networkOrChildDuringBundleImport": 0,
+    "guardsByteUnchanged": 21,
+    "declaredTopFilesChanged": 5,
+    "sourceFilesGitByteExact": 192,
+    "toolFilesHashMatch": 33,
+    "forward380FilesByteExact": true
+  },
+  "staticHost": {
+    "source": "8eab85da4",
+    "evidence": "5768586bdfa8d845d3f8856b06de5a8935b04f6e",
+    "operatorSHA256": "f0cc57fd9fdd88e83e7e1f8031f4198f90e32333ee3bed5072f511bd5563b57a",
+    "profileSHA256": "958a073ea9c4f78934f3c5e7f544ceda0288d323554808886e8186d0173c26af",
+    "wholeSourceReverseOnlyAPPByteExact": true,
+    "ownControlsPass": 23
+  },
+  "adapter": {
+    "sha256": "044d8f8f07b49c70988a367ffeef04a54098025c372e3e4a0fc8110a9e0e8bec",
+    "bytes": 9269,
+    "ownReproductionByteExact": true,
+    "ownControlsPass": 4,
+    "scope": "Actual95 physical import receipt40af, plan5be, independent metadata d912; no older receipt relabel/new import claim"
+  },
+  "conditional": {
+    "predicateSHA256": "7c178356e26b54469e29a5ce1e28a910220984fded897c7a5b92b541084938d7",
+    "policySHA256": "26afd8b7c0106db1474d4bddc0f63af7cc25c81befad4b005b0749c415ffbb1a",
+    "templateSHA256": "b2b70b1c3c486dfc3c1a0b7078707a381523796dcbe9d95c31cb2e3229b6f201",
+    "templateDecision": "APPROVE_PREDICATE_PROJECTION_ONLY",
+    "wholeConfigSHA256": "badfcb3ae765bb9387e6f180dceb81ed1275555f4b74c05c95556504d294bc17",
+    "wholeReviewSHA256": "296ae8ad3bbd9c5d2491fe96ca7a73fe36d5e94dffdf29ed2bcaa969ebc09df8",
+    "sourceClosureRows": 251,
+    "allSourceRowsVerified": true,
+    "scopeHashTimeoutNegativeCases": 7,
+    "maximumAssemblies": 1,
+    "maximumNativeExecutions": 1,
+    "noRetryOrRepin": true
+  },
+  "actual95QAReceiptAccepted": {
+    "path": "/tmp/keel-qa-receipt-activation-20261020/keel-site/docs/reviews/studio-publication-20261020/qa-native95-actual/result.json",
+    "sha256": "5ec463452710f9a9fee92c61732d3566ee642caebbbd3688bee40a4511ccb27b",
+    "scope": "PackagedSDK/goldens/compiled canonical-shell factory/media/worker import and13 private-gate/discovery HTTP checks only; not actual artwork/native publication"
+  },
+  "denialLineage": {
+    "controlledOwnTestsPass": 6,
+    "exactB524SDK1360PackagedBytesQualifiedByQA": true,
+    "currentCompiledProofBodyEquivalentExceptWebpackDependencyNumericIDs": true,
+    "calls": 17,
+    "changedIDs": 5,
+    "singleSourceTerminal401And403Verified": true,
+    "liveDenialClaim": false,
+    "newFrameworkRequired": false
+  },
+  "activation": {
+    "sourceAlreadyApproved": "f2fc211641024af4637dbc618aa21a703e79eeab",
+    "planAdmission": false,
+    "newFullGIFProofStillRequired": true,
+    "freshLockedPreflightAndDurableSnapshotStillRequired": true,
+    "postDeployOwnGatorGIFUnsignedWalletAndHistoricalRenderingStillRequired": true
+  },
+  "sourceQA301AcceptedSeparately": true,
+  "sdk160Pass1EnvironmentClassIdentityRedAndUnchanged17PassSupplementNotCoalesced": true,
+  "signing": false,
+  "submission": false,
+  "applicationActivation": false
+}

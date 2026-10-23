@@ -1,0 +1,90 @@
+{
+  "schema": "keel.independent-source-security-review@1",
+  "decision": "APPROVE_SOURCE_CONDITIONAL_ON_FRESH_QA",
+  "reviewerId": "independent-release-reviewer",
+  "sourceCommit": "71cb0e31bab5e4ee93af9d3b3185978e46f1fe8e",
+  "sourceTree": "a41c88dfe6a8343f030892f220efea002c779743",
+  "baseSourceCommit": "9165a43699fc38bb13aa40c19a508cfcc8561a33",
+  "productionFiles": [
+    {
+      "path": "apps/studio/src/lib/release-review-phase.ts",
+      "sha256": "2c697b8c149a275f5a957fda9609eadbc407d6a73b99aeb243c9d3d031994834"
+    },
+    {
+      "path": "apps/studio/src/server/http/release-review-handoff-handler.ts",
+      "sha256": "cff6e68c7029aac559406a094dc19550d8d56bd5235a66e990316bb60ee0b7ae"
+    },
+    {
+      "path": "apps/studio/src/server/services/release-action-service.ts",
+      "sha256": "e164efc835796abd1c35cd91af75153561292c634651450eced704061980da41"
+    },
+    {
+      "path": "apps/studio/src/server/services/release-review-handoff-service.ts",
+      "sha256": "757e0574a1aed32edd51da5aa1b244fe1157c8cf78b0d4315e26996b5bb19194"
+    },
+    {
+      "path": "apps/studio/src/server/services/updated-publication-review-service.ts",
+      "sha256": "722ee1ca0bc1c999cd9b7e37ba9cc150f649a3979cfa1a2c2bfafde788f2d0d6"
+    },
+    {
+      "path": "apps/studio/src/server/services/updated-review-reconciliation.ts",
+      "sha256": "94c2fc6e134b70b97f4873d129a724a7ae6fe62db31429717e4143b9e08979f0"
+    }
+  ],
+  "resolvedFindings": [
+    "HISTORY-EE0-001"
+  ],
+  "blockingFindings": [],
+  "historyReview": {
+    "cacheAuthority": "Request-local private closure; no external or cross-request cache authority. Candidate/history/known funding identities cloned, concurrent/closed calls rejected. Cache arms only after complete no-funded-history and clears after follow-up or uncertainty.",
+    "bounds": "8MiB serialized page/key ceiling and512pages; original120s/pages2000blocks/jobs/log/RPC limits unchanged. Not a physical heap/HTTP metric claim.",
+    "canonicalAndRecoveryChecks": "Selected canonical pin hash/number/time at start/end and fresh cached-prefix ancestor hash/time at start/end; changed partial/tail fetched. Original runtime/deployment/receipt/known payment/expiry/authority/funded recovery checks retained.",
+    "signingEquivalence": "No transaction/simulation protocol, calldata/value/nonce/gas/fees/limits or wallet approval mutation. Full native validation is not cached. No preparation POST replay introduced."
+  },
+  "diagnosticReview": {
+    "privacy": "Fixed phase/class/structural-code vocabulary plus random correlation. No raw exception message/stack/URL/query/provider payload. Corrected DOM getter issue independently reproduced RED and GREEN.",
+    "authAndInterface": "Existing authenticated POST only; GET/auth/route/deadline/status/typed errors preserved. Internal phase callbacks stripped before downstream calls; synchronous observer errors ignored. No new private read endpoint or agent-supplied callback authority.",
+    "liveGatorCause": "Unknown; actual original compiler offline success is not a live cause claim."
+  },
+  "testIntegrity": {
+    "fixtureReviewSHA256": "83f79a9533c067be939519a8fd3712e1b547797e558073a6e4e52048ac688900",
+    "preservationSHA256": "b8ff5a068659a586a1bc8e0af8a5c06bb3dcb73074da8281cf656544b52e0df0",
+    "successorDelta": "Only fixed exception-name classification in production; one additive regression, prior14failure-boundary test bodies/assertions unchanged.",
+    "originalTests": "Original reconciliation assertions/body bytes preserved by reverse-byte check; service mock only newfactory export delegates unchanged existing reconciliation stub."
+  },
+  "ownVerification": {
+    "affectedActualSourceTests": {
+      "pass": 56,
+      "fail": 0,
+      "skip": 0
+    },
+    "unchangedAdversarialRegression": {
+      "pass": 3,
+      "fail": 0,
+      "skip": 0
+    },
+    "node": "22.22.1",
+    "sdkSource": "311d61526284248938e335d7ed879089408933be",
+    "sdk1745ManifestSHA256": "c9532de4faa56d5c0535475158dfdeb7400c7c53dad10d45f5f042fb319b89c5",
+    "runRecordSHA256": "0689f0275ebdd58e2e946f050ab5f10221272d285c52f55f4dd1da74b14e9890",
+    "executionScope": "Local synthetic RPC/DB only; no native proof, actual artwork, browser or host action"
+  },
+  "priorIndependentQA": {
+    "sourceCommit": "ee0acf1ab3863ac3b3c811d130cc0674f430024d",
+    "qaCommit": "c36ef97f20152dcacb8e000f47b53a29c02d2475",
+    "resultSHA256": "0b6138f65213b816f3b9098180ee10027352fff96b2a36e8ced580f37729401d",
+    "executionsPassed": 276,
+    "tscExit": 0,
+    "limitation": "Prior QA did not cover later privacy correction. Fresh independent QA on exact71cb remains pending and is required before ordinary source merge/release reliance."
+  },
+  "permittedNextWork": [
+    "Fresh independent QA exact successor",
+    "Ordinary reversible artifact preparation under separately reviewed recipe; no host build admission inferred"
+  ],
+  "activationApproved": false,
+  "livePublicationApproved": false,
+  "gate6": "FAILED_ON_CURRENT7b0; new candidate unbuilt/undeployed/unproven live",
+  "strictCompiledEquivalence": "No new equivalence claim; actual new artifact must be separately reviewed",
+  "hostActions": 0,
+  "productionEditsByReviewer": 0
+}

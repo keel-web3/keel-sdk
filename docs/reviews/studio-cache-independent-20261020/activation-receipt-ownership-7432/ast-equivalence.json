@@ -1,0 +1,25 @@
+{
+  "activate-receipt-bound-studio.py": {
+    "changedFunctions": [
+      "recover_runtime"
+    ],
+    "addedFunctions": [],
+    "allOtherExistingFunctionsASTEqual": true
+  },
+  "receipt-bound-dependencies.py": {
+    "changedFunctions": [
+      "assert_pg_only",
+      "pg_only_configuration"
+    ],
+    "addedFunctions": [
+      "neutral_daemon_value",
+      "ordinary_daemon_defaults"
+    ],
+    "allOtherExistingFunctionsASTEqual": true
+  },
+  "maintainedDependencyTestAssertions": {
+    "count": 71,
+    "ASTEqual": true,
+    "onlyFixturePublicDaemonDefaultsAdded": true
+  }
+}

@@ -1,0 +1,59 @@
+{
+  "schema": "keel.independent17cb-final-action-review@1",
+  "reviewerId": "independent-release-reviewer",
+  "decision": "APPROVE_EXACT_THREE_EXCLUSIVE_FINAL_INSTALLS_PREFLIGHT_AND_ONE_IMAGE_ONLY_CUTOVER",
+  "finalPlanSHA256": "d3d795443544b5beb6e2f9729f31512289248ae798404bade3e50fbbee510b06",
+  "finalPlanBytes": 3417,
+  "commandPacketSHA256": "bcf60a7960523a702a904ea34996d8b820b1c08f53e0ad00dec0e326d719c415",
+  "pendingPlanSHA256": "e39978f51efaf177a8ad5b5086dd2d6897e9c1113ab8645ee90d4c4fae43aec6",
+  "technicalReviewSHA256": "934c5347b8bf09ec2ae4e0254bb0b93eab3c5dec0801719e1a64069070d56b4c",
+  "technicalQASHA256": "b8583942eb1d04d1a4e78464f1a4eb3632e8e1a79111365c7a302e583e54921c",
+  "root": "/home/ubuntu/keel-studio-image-only-4c0acc2f-67e9-4d8f-92b0-71c9e95e83b5",
+  "candidate": {
+    "siteCommit": "71cb0e31bab5e4ee93af9d3b3185978e46f1fe8e",
+    "sdkCommit": "311d61526284248938e335d7ed879089408933be",
+    "buildId": "jfjIfW1-d41RR-j-i-YgL",
+    "appImageId": "sha256:17cb5aac36536e3d6026ba32b3bb3a66adc04af5bb7207082ee472dce66320c9"
+  },
+  "actualChangedPlanFields": [
+    "approval.independentQA",
+    "approval.independentReleaseReview",
+    "approval.leadExecuteApproved",
+    "evidence.qa.sha256",
+    "evidence.releaseReview.sha256",
+    "physicalPhase",
+    "pending"
+  ],
+  "everyProtectedFieldAndActualBuildEvidenceDeepExact": true,
+  "actualFinalValidatePassed": true,
+  "threeLateLocalBytesAndWholeExclusiveReceiverArgvExact": [
+    {
+      "remoteBasename": "qa-final.json",
+      "bytes": 11413,
+      "sha256": "b8583942eb1d04d1a4e78464f1a4eb3632e8e1a79111365c7a302e583e54921c"
+    },
+    {
+      "remoteBasename": "releaseReview-final.json",
+      "bytes": 15052,
+      "sha256": "934c5347b8bf09ec2ae4e0254bb0b93eab3c5dec0801719e1a64069070d56b4c"
+    },
+    {
+      "remoteBasename": "activation-plan.final.json",
+      "bytes": 3417,
+      "sha256": "d3d795443544b5beb6e2f9729f31512289248ae798404bade3e50fbbee510b06"
+    }
+  ],
+  "preflightExactRecipeArgv": true,
+  "executeExactRecipeOnlyFinalHashSubstitution": true,
+  "staticSourceStageOrPriorScopesReplayAdmitted": false,
+  "maximumActivationExecutions": 1,
+  "automaticRetry": false,
+  "requiredFreshRuntimeCondition": "Current5c97/7b0 fullConfig/Host/mount/healthy/pause, D97/socket/daemonprofile/image/unusednames and1GiB+256MiB reserve must freshlyPASS UNDER common lock; successful bounded new snapshot beforecandidate; >=1GiB aftersnapshot. Root alone executes. Anyfailure/denial/uncertainty stop, retainactualreceipt; noautomaticretry/fallback/guardwaiver.",
+  "leadAuthority": "Parent explicitly owns exact ordinary image-only deployment under existing userauthorization; no wallet action or credentials creation.",
+  "postguardStillRequired": "Following actualsuccessful durableactivation, bind reviewed82e8 onlyfinalSHA+actualnew64hexID; readonlyfullcandidate/SDK1360/native/newdump598TOC/fullpriorretention proof. No DBrestore/privateartworktrace.",
+  "metadataScope": "pending:false and preactivation physicalPhase describe no remaining technicalpreactivation binding only; do not assert liveGate6/publication completion.",
+  "postdeploymentLiveAcceptance": "FreshnormalownerGator/GIF fullsimulation->unsignedwallet andhistoricalH remain mandatory. OriginalA5/configuredMCP/browserextension hold/oldlivefailures retained, no blockedpathworkaround.",
+  "privateProgramReplaySigningSubmissionOrSpendingApproved": false,
+  "blockingFindings": [],
+  "reviewerHostCalls": 0
+}

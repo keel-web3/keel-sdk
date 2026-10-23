@@ -1,0 +1,95 @@
+{
+  "result": "PASS_EXACT_NEW_STATIC_STAGE_ONLY",
+  "sourceCommit": "530be956447dd6d5a9fff70edc40e94bb52f0022",
+  "staticCommit": "6acdbc0146077e233c302568b108d1ffdf81d781",
+  "packetSHA256": "ed33fad64d5e17a140b854bf2b63392f7e40eaf8e884995a4121f1c1a0cde718",
+  "operatorSHA256": "8c9584a951215a43b25d8f1599c69aed60553c80b7ab0f0ee6faebb01bce73ca",
+  "pendingSHA256": "49e141ef5578d6f6ec5dff7021f43f8ceefcb998c15ea84d1856840a46dacfee",
+  "newRoot": "/home/ubuntu/keel-studio-image-only-07a4de5e-f373-49bb-9e05-952906a8c4a4",
+  "files": [
+    {
+      "name": "activate-image-only.py",
+      "bytes": 17126,
+      "sha256": "8c9584a951215a43b25d8f1599c69aed60553c80b7ab0f0ee6faebb01bce73ca"
+    },
+    {
+      "name": "reviewed-activation-support.py",
+      "bytes": 43831,
+      "sha256": "a1594559c2c04159ac94827d0f4f2a991310fb06648379bca6081d5ce6a98de1"
+    },
+    {
+      "name": "guarded-deployment-checks.py",
+      "bytes": 5005,
+      "sha256": "b5f7d764b6c05db503a23ea63ca21a36bfcb0f17cc8292444d790d4a8aad6e00"
+    },
+    {
+      "name": "candidate-oom-default.py",
+      "bytes": 2033,
+      "sha256": "6621ff48fc02057d98d91ef5fd71e6e30eeea1ef847149170e316d9725e77c73"
+    },
+    {
+      "name": "snapshot-supervisor.cjs",
+      "bytes": 3386,
+      "sha256": "5d8d56588eba290773961d74152baf3728ffd2e00a75894beed92d38af06706e"
+    },
+    {
+      "name": "activation-plan.pending.json",
+      "bytes": 3551,
+      "sha256": "49e141ef5578d6f6ec5dff7021f43f8ceefcb998c15ea84d1856840a46dacfee"
+    },
+    {
+      "name": "actual-host-build-receipt.json",
+      "bytes": 6274,
+      "sha256": "63997bc00ab617cfbeabc95ffa510fe0ea889348e8d313a7db3b1e7d7c38a620"
+    }
+  ],
+  "changesAgainstPriorPending": [
+    [
+      "activationId",
+      "5895d3d5-5f83-4a1c-b144-42724651ac91",
+      "07a4de5e-f373-49bb-9e05-952906a8c4a4"
+    ],
+    [
+      "candidateName",
+      "keel-studio-candidate-5895d3d5-5f83-4a1c-b144-42724651ac91",
+      "keel-studio-candidate-07a4de5e-f373-49bb-9e05-952906a8c4a4"
+    ],
+    [
+      "rollbackName",
+      "keel-studio-rollback-5895d3d5-5f83-4a1c-b144-42724651ac91",
+      "keel-studio-rollback-07a4de5e-f373-49bb-9e05-952906a8c4a4"
+    ],
+    [
+      "failedName",
+      "keel-studio-failed-5895d3d5-5f83-4a1c-b144-42724651ac91",
+      "keel-studio-failed-07a4de5e-f373-49bb-9e05-952906a8c4a4"
+    ],
+    [
+      "operatorSHA256",
+      "981b482694d7db031d869d7c271487033c28f37b1ef3679528ab4150fbda42b7",
+      "8c9584a951215a43b25d8f1599c69aed60553c80b7ab0f0ee6faebb01bce73ca"
+    ],
+    [
+      "physicalPhase",
+      "ACTUAL_HOST_IMAGE_BUILT_PUBLIC_QUALIFICATION_PENDING",
+      "RENAME_BEFORE_STOP_SUCCESSOR_SOURCE_PENDING_INDEPENDENT_REVIEW"
+    ],
+    [
+      "pending",
+      [
+        "fullSAVE archive audit and actualimage three publicroles",
+        "exact independentQA/release approval hashes",
+        "lead activation authorization"
+      ],
+      [
+        "exact successor source+uncertain outcome/latewake recovery tests QA/review",
+        "freshunused stagedroot/finalplan/admission; prior5895 isconsumedFAIL",
+        "freshstrict baseline/reserves/normalhealth; no app/native rebuild or priorcandidate reuse"
+      ]
+    ]
+  ],
+  "finalPlanAndExecuteNotAdmitted": true,
+  "allProtectedPendingFieldsExact": true,
+  "rootAndReceiversExactExclusiveNoFollowFsync": true,
+  "noHostActionsByReviewer": true
+}

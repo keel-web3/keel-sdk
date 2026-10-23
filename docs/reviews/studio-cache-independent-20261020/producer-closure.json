@@ -1,0 +1,18 @@
+{
+  "schema": "keel-reviewer-producer-closure@1",
+  "packetSHA256": "50071e7efa5596aa464b8686006681e70a59050c846d33d5194d18f9d09e764f",
+  "bundleReceiptSHA256": "820012ba8c0dc3ae72e60cd470efd994909f2fd6d9cc6fee4415f59a56d6ba18",
+  "bundleSHA256": "7f97045aaeaa8a4161c3cc66deebc8685453f001da42315db13e242f5756f90c",
+  "sourceInputs": 192,
+  "toolFiles": 18,
+  "sourceInputsSHA256": "21f9457b2293deb1aaa75ab339f29c0b8d14cee00254e9b8208267f0e7408f55",
+  "toolFilesSHA256": "e8e991a1ebbcb948ec52b1b844ce00a0f46130471d61ea26225192ba870cc6f6",
+  "sdkBuiltTreeSHA256": "3effa2f2e594fe969f592d9446b5095484adf358033c76b83349385956c69df8",
+  "builtFiles": 1754,
+  "credentialDirectoryAbsent": true,
+  "allSourceBytesMatchPinnedGit": true,
+  "allToolBytesMatchReceipt": true,
+  "allPacketDependencyHashesVerified": true,
+  "programExecuted": false,
+  "networkRequests": 0
+}

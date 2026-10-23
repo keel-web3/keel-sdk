@@ -1,0 +1,33 @@
+{
+  "schema": "keel.independent-actual1058-static-activation-staging-review@1",
+  "decision": "APPROVE_EXACT_SEVEN_PUBLIC_FILE_STAGE_ONLY",
+  "reviewerId": "independent-release-reviewer",
+  "sourceFreeze": "4c24e17728b9b02efaa642f3995562a776da1b6a",
+  "root": "/home/ubuntu/keel-studio-image-only-7016f46a-afaa-45c6-b459-33d3b3b3e078",
+  "commandPath": "/private/tmp/keel-independent-funding1058-20261021/activation-static.commands.admitted.json",
+  "commandSHA256": "6cbec88031025c68d9a625fe97053dd489f3ebdfef6c6fc5196d65dda32ad39c",
+  "pendingPlanSHA256": "feec1f532f82b63d575ebed21105512d064c3c0ecf02594588d78ff2e39a5231",
+  "operatorSHA256": "980300685d48fcd3456a5788292ea353033c7c6db0c9bbb7243dc118795eaf55",
+  "checks": {
+    "all7PayloadHashesLengthsExact": true,
+    "all7ReceiversExclusiveNofollow0444SizeHashOwnerRootFileAndDirFsync": true,
+    "pendingAll3FlagsFalse": true,
+    "operatorReverseExactApprovedRenameFirst8c958AfterOnlyCurrentIDImageRetarget": true,
+    "supportGuardSnapshotOOMBytesUnchanged": true
+  },
+  "admittedPacketFields": [
+    "createExclusiveRootArgv",
+    "files[*].installArgv with exactstdinLocalPath bytes"
+  ],
+  "maximumRootCreations": 1,
+  "maximumInstallationsPerFile": 1,
+  "notAdmitted": [
+    "Finalplan or evidencefabrication",
+    "readOnlyPreflightArgvAfterFinalReview until exactreal finalplan admitted",
+    "executeArgvTemplateAfterExactLeadAndReviewerAdmission",
+    "Container/DB/snapshot/runtime mutation, activation, cleanup, private program or signing"
+  ],
+  "activationApproved": false,
+  "reviewerHostActions": 0,
+  "blockingFindings": []
+}

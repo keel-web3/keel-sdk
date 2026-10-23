@@ -1,0 +1,35 @@
+{
+  "schema": "keel.independent-maintained-handoff-fixture-review@1",
+  "decision": "APPROVE_EXACT_FIXTURE_BINDING_PATCH_ONLY",
+  "reviewerId": "cache-release-reviewer",
+  "sourceReviewed": "05e134d6b1fcfea83143d15d0ee3578e0fe54a22",
+  "patchPath": "/private/tmp/keel-source-release-handoff-fixture-v2.patch",
+  "patchSHA256": "4d93adf313dc92161d7f124032bc7857b67d6de28ed2ffb5ad77f74c13de310f",
+  "assertions": {
+    "identical": true,
+    "assertionCalls": 38,
+    "sha256": "f9281dc7db4807b9a278fa5662ce09b71a1461977b753d464780cf7b78f35fda"
+  },
+  "fixtureChanges": "Added actual schema/table selector/leftJoin and real continuation validator plus a review-required reconcile-only double. Existing collection prepare and saved-read calls/assertions remain exact; null project fixture explicitly covers collection-only branch, not storage behavior.",
+  "ownInitialSetupRed": "Missing owned app package.json caused TSX CommonJS export-condition setup error before registering four cases; retained before/after files. Fixed only owned exact package.json/tsconfig binding.",
+  "ownMaintainedBaseline": {
+    "pass": 2,
+    "fail": 2,
+    "skip": 0
+  },
+  "ownExactPatchedFixture": {
+    "pass": 4,
+    "fail": 0,
+    "skip": 0
+  },
+  "sourceTestStillUnmodified": true,
+  "noProductSourceChangesByReviewer": true,
+  "wholeApplicationSourceApproval": false,
+  "releaseDeploymentApproval": false,
+  "storageFullPreflightNotClaimedByThisFixture": true,
+  "network": 0,
+  "database": 0,
+  "signing": false,
+  "submission": false,
+  "blockingFindings": []
+}

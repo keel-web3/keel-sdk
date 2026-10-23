@@ -1,0 +1,174 @@
+{
+  "schema": "keel-independent-ui-source-checkpoint@1",
+  "reviewer": "cache-release-reviewer",
+  "decision": "BLOCK_CURRENT_COMBINED_RELEASE_FOR_SDK_AND_MCP_STORAGE_VARIANT_COMPATIBILITY",
+  "sourceCommit": "05e134d6b1fcfea83143d15d0ee3578e0fe54a22",
+  "combinedCommit": "e61e40162b5b439727d31f3c6b6f56be81603404",
+  "baseCommit": "9597d6907660751e310a36335028d27d114de32d",
+  "reviewScope": [
+    "All ten UI/shared-service production files against base; combined production only differs from source05 by separately approved capabilities allowlist",
+    "Owner/revision/manifest/source adoption, singleton draft lease/lost-response reuse, history refusal, internal reconciliation-only mode, cancellation and navigation authority",
+    "Current built SDK client and MCP operation dispatch; actual unchanged MCP Apps result parser"
+  ],
+  "productionFiles": [
+    {
+      "path": "apps/studio/src/lib/release-types.ts",
+      "sha256": "f2e57c54dfa73b8250a15cac1bde8241e686a3b1a285a58c938aca31d0197603",
+      "byteEqualSource05": true
+    },
+    {
+      "path": "apps/studio/src/lib/release-storage-review-handoff.ts",
+      "sha256": "80d28b1246acbea03be7f7e6548f9f80381d102e3cae0130cb1b4148d8915c4a",
+      "byteEqualSource05": true
+    },
+    {
+      "path": "apps/studio/src/lib/studio-wizard.ts",
+      "sha256": "6413b634810589b6ce2977f7b9af43f2827a74b2c1d98dabfaeceeb8d9457ac5",
+      "byteEqualSource05": true
+    },
+    {
+      "path": "apps/studio/src/lib/release-source-preparation.ts",
+      "sha256": "22db20cb178a8e75b3fc30df9d63cda6a976c5612998fb1948c1e6a4f136dc46",
+      "byteEqualSource05": true
+    },
+    {
+      "path": "apps/studio/src/components/studio/release-start.tsx",
+      "sha256": "fd3eecdb19a71400f4657fde489532f0d60d5218e6ac2eb6120b86cbbb8c9e7c",
+      "byteEqualSource05": true
+    },
+    {
+      "path": "apps/studio/src/components/studio/planning/release-plan-editor.tsx",
+      "sha256": "8d6e89834ddaecd420924359f2b6adc0ca0e59d98c0da25b28ac1e616155b9b1",
+      "byteEqualSource05": true
+    },
+    {
+      "path": "apps/studio/src/server/services/release-review-handoff-service.ts",
+      "sha256": "817f28d8f2b894c4f604d93fe4bfea2a8aada521354f5a8adb357795188fe382",
+      "byteEqualSource05": true
+    },
+    {
+      "path": "apps/studio/src/server/services/release-service.ts",
+      "sha256": "eb7046d300ee68c0c75807ce3dfaf3419de7b8a04639b667a306c8abad1e5cdc",
+      "byteEqualSource05": true
+    },
+    {
+      "path": "apps/studio/src/server/services/legacy-prepared-source-adoption-service.ts",
+      "sha256": "9033baca9e2d67564fc3c18ca26c8b018c5bb0a43c460490aec10496c72e05d1",
+      "byteEqualSource05": true
+    },
+    {
+      "path": "apps/studio/src/server/services/release-action-service.ts",
+      "sha256": "4e6a3929d0de4ac1deb41a1202af2902e47a3d89d38b8ad6e019e2fa59cc3699",
+      "byteEqualSource05": true
+    }
+  ],
+  "compiledSDK": {
+    "testedPath": "/Users/ravonus/dev/wt/studio-proof-state-cache-20261020/keel-sdk/packages/sdk/dist/studio-agent-drafts.js",
+    "sha256": "319640a1a9b541f2ab7dddfad39f88630102ba9b796656dc8bca110aae11ad38",
+    "sourceByteEqualB524": true,
+    "sdkWorktreeHead": "a9cd9f8048bcd4096abafd0cc4e1c7265dc2c581",
+    "candidateLinkResolvedPath": "/Users/ravonus/dev/wt/studio-routing-terminal-proof-20261020/keel-sdk/packages/sdk/dist/studio-agent-drafts.js",
+    "candidateLinkSHA256": "319640a1a9b541f2ab7dddfad39f88630102ba9b796656dc8bca110aae11ad38",
+    "byteEqualCandidateLink": true
+  },
+  "fixtureReview": {
+    "decision": "APPROVE_EXACT_FIXTURE_BINDING_PATCH_ONLY",
+    "patchPath": "/private/tmp/keel-source-release-handoff-fixture-v2.patch",
+    "patchSHA256": "4d93adf313dc92161d7f124032bc7857b67d6de28ed2ffb5ad77f74c13de310f",
+    "appliedFileSHA256": "85bb8c6b4dd6cb575ae2ac36298daaa1c4aec27f0b9a2507a90117bb0bb676e7",
+    "reviewSHA256": "1125d5596ba5a626843ba03bfbb2075461dad0875c7b7f53d1d14a1857a51cd7",
+    "baselinePass": 2,
+    "baselineFail": 2,
+    "patchedPass": 4,
+    "patchedFail": 0,
+    "assertionCallsUnchanged": 38
+  },
+  "blockingFindings": [
+    {
+      "id": "UI-E61-001",
+      "priority": "P1",
+      "title": "Current supported SDK and MCP paths reject the new storage handoff before exposing its review URL",
+      "introducedBoundary": {
+        "path": "apps/studio/src/server/services/release-review-handoff-service.ts",
+        "line": 62
+      },
+      "consumerReferences": [
+        {
+          "repository": "keel-sdk",
+          "path": "packages/sdk/src/studio-agent-drafts.ts",
+          "lines": [
+            734,
+            747
+          ]
+        },
+        {
+          "repository": "keel-sdk",
+          "path": "packages/mcp/src/tools.ts",
+          "lines": [
+            1156,
+            1167
+          ]
+        },
+        {
+          "repository": "keel-site",
+          "path": "apps/studio/src/server/agent/publication-review-app.ts",
+          "line": 13
+        }
+      ],
+      "trigger": "Unfunded creator-owned source returns successful keel-release-storage-review@1 from the existing POST review endpoint after the real storage service preflight.",
+      "observed": "Built SDK client.prepareReview and executeKeelStudioAgentDraftOperation both throw TypeError: Studio returned another or invalid wallet-review identity. Hosted MCP returns reviewUrl but its actual publication-review app exact() throws: The saved review identity is incomplete. No actionable storage URL is exposed through those supported consumers.",
+      "needed": "Strict explicit storage response support in the current SDK/MCP path and matching hosted MCP Apps handling, preserving exact project/release/revision/wallet/unsigned/preflight/path bindings. Keep collection operation validation unchanged; do not manufacture collection calls or bypass real storage preflight.",
+      "reproduction": "Node22 --test storage-variant-compatibility.regression.test.mjs; optional KEEL_QA_SDK_DRAFTS_URL and KEEL_QA_PUBLICATION_REVIEW_APP retarget exact successor.",
+      "desiredBehaviorBaseline": {
+        "pass": 2,
+        "fail": 3,
+        "skip": 0
+      }
+    }
+  ],
+  "otherReviewResults": {
+    "additionalConcreteSecurityBlockerFound": false,
+    "realFullPreflightStillRequired": true,
+    "ownerOrSourceChangeStillFailsClosed": true,
+    "singletonOnlyUnissuedCreatorPreparedSource": true,
+    "fullCollectionWalletPreparationUnchanged": true,
+    "no0050OrProtocolOrSDKChangeInUICommit": true,
+    "planningHintDoesNotGrantPublicationReadiness": true,
+    "ownLockedManifestTransition": "Existing storage service can change the predicted manifest through its own locked receipt. New bridge deliberately returns conflict/reload on revision or digest change rather than navigating from an outdated pin; this checkpoint does not claim a first-click live completion."
+  },
+  "independentChecks": {
+    "integratedFocused": {
+      "pass": 28,
+      "fail": 0,
+      "skip": 0,
+      "stdout": "integrated-focused.stdout"
+    },
+    "compatibilityRejectDiagnosticControls": {
+      "pass": 5,
+      "fail": 0,
+      "skip": 0,
+      "stdout": "sdk-storage-response-full.stdout"
+    },
+    "desiredBehaviorRegression": {
+      "pass": 2,
+      "fail": 3,
+      "skip": 0,
+      "stdout": "storage-variant-compatibility-baseline.stdout"
+    },
+    "actualIO": "No network, database, wallet, compiler, native, signing or release action in compatibility probes. Response payload is a labeled protocol fixture, not a full-preflight proof."
+  },
+  "ownerReportedSeparateChecks": {
+    "affectedTests": 91,
+    "tscExit": 0,
+    "source": "/private/tmp/keel-live-flow-e61-owner-checks-20261020",
+    "independentlyRerunHere": false
+  },
+  "notReviewedInThisCheckpoint": [
+    "Image-only operator cffa and its eventual activation plan",
+    "New compiled image/artifact",
+    "SDK successor not yet authored",
+    "Actual deployed upload-art and unsigned wallet outcome or historical acceptance"
+  ],
+  "releaseApproval": false,
+  "activationAuthority": false
+}

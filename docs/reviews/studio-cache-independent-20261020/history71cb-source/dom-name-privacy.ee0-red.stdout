@@ -1,0 +1,58 @@
+TAP version 13
+# Subtest: actual classifier never emits second DOMException.name getter value after AbortError allowlist check
+not ok 1 - actual classifier never emits second DOMException.name getter value after AbortError allowlist check
+  ---
+  duration_ms: 0.528417
+  type: 'test'
+  location: '/private/tmp/keel-independent-history-ee0-20261021/dom-name-privacy.regression.test.mjs:18:50'
+  failureType: 'testCodeFailure'
+  error: 'Only literal error classes may be emitted; received https://private.invalid/RAW_SECRET?payload=creator-bytes'
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: true
+  actual: false
+  operator: '=='
+  stack: |-
+    TestContext.<anonymous> (file:///private/tmp/keel-independent-history-ee0-20261021/dom-name-privacy.regression.test.mjs:22:2)
+    Test.runInAsyncScope (node:async_hooks:214:14)
+    Test.run (node:internal/test_runner/test:1047:25)
+    Test.start (node:internal/test_runner/test:944:17)
+    startSubtestAfterBootstrap (node:internal/test_runner/harness:296:17)
+  ...
+# Subtest: actual classifier never emits second DOMException.name getter value after TimeoutError allowlist check
+not ok 2 - actual classifier never emits second DOMException.name getter value after TimeoutError allowlist check
+  ---
+  duration_ms: 0.054541
+  type: 'test'
+  location: '/private/tmp/keel-independent-history-ee0-20261021/dom-name-privacy.regression.test.mjs:18:50'
+  failureType: 'testCodeFailure'
+  error: 'Only literal error classes may be emitted; received https://private.invalid/RAW_SECRET?payload=creator-bytes'
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: true
+  actual: false
+  operator: '=='
+  stack: |-
+    TestContext.<anonymous> (file:///private/tmp/keel-independent-history-ee0-20261021/dom-name-privacy.regression.test.mjs:22:2)
+    Test.runInAsyncScope (node:async_hooks:214:14)
+    Test.run (node:internal/test_runner/test:1047:25)
+    Test.processPendingSubtests (node:internal/test_runner/test:744:18)
+    Test.postRun (node:internal/test_runner/test:1173:19)
+    Test.run (node:internal/test_runner/test:1101:12)
+    async startSubtestAfterBootstrap (node:internal/test_runner/harness:296:3)
+  ...
+# Subtest: standard DOMException labels remain structural vocabulary
+ok 3 - standard DOMException labels remain structural vocabulary
+  ---
+  duration_ms: 0.117125
+  type: 'test'
+  ...
+1..3
+# tests 3
+# suites 0
+# pass 1
+# fail 2
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 159.53725

@@ -1,0 +1,153 @@
+{
+  "schema": "keel-independent-native-create-source-review@1",
+  "recordedAt": "2026-10-20T14:20:40.126275+00:00",
+  "reviewer": "cache-release-independent-reviewer",
+  "sourceProposalCommit": "38c0219cd9f0d1b9aebc8af21601aad5ab46dece",
+  "runtimeSourceCommit": "050449e0ec6d9973adf038ca1c0bcf06a50de629",
+  "baseSDKCommit": "b524bf5fc19939c7523aada2e53f79e3360970ea",
+  "pinnedGethCommit": "a579077007b98217c3e253a66e4b452ca0c32b96",
+  "decision": "APPROVE_EXACT_SOURCE_FOR_FRESH_OFFICIAL_QUALIFICATION_BUILD",
+  "blockingFindings": [],
+  "runtimeFile": {
+    "path": "/Users/ravonus/dev/wt/studio-native-create-compat-20261020/keel-sdk/native/proof-executor/geth-overlay/internal/ethapi/keel_sparse.go",
+    "bytes": 8136,
+    "sha256": "7d01c9e741d5335b3985e702832017acfb1855b6052c66f1967e6bf98ee04939"
+  },
+  "testInputCorrection": {
+    "decision": "APPROVE_EXACT_INPUT_LITERAL_ONLY",
+    "patch": {
+      "path": "/Users/ravonus/dev/wt/studio-native-create-compat-20261020/keel-sdk/docs/reviews/studio-publication-20261020/native-create-compat/evm-test-review/proposed-input-only.patch",
+      "bytes": 639,
+      "sha256": "1b78d617617b7ee6eb3f3438f13206bd777af464fed822d1b38f5decd7d88e8c"
+    },
+    "oldTestSHA256": "c4ee39488156af9b8b82fd388b04dc8e380a370053b99c968fb8a3e473460d21",
+    "approvedTestSHA256": "bab3fe5a28ed22e49777ae5b5c136a06dd65140ece90ce7b962a2ab8596b7646",
+    "onlyChange": "constructor0x6160016000f3 returns24577 bytes ->0x620100016000f3 returns65537 bytes",
+    "reason": "Actual pinned Amsterdam code cap is65536. CheckMaxCodeSize runs before code-deposit charging under that fork;24577 does not exercise intended oversized-runtime boundary.",
+    "unchanged": "10Mgas, expected max-code-size error, all success/failure/runtime assertions",
+    "initialRedEvidence": {
+      "path": "/Users/ravonus/dev/wt/studio-native-create-compat-20261020/keel-sdk/docs/reviews/studio-publication-20261020/native-create-compat/evm-test-review/initial-evm-red.jsonl",
+      "bytes": 36939,
+      "sha256": "faa897d04e2cba208f645a2faf8ee5ba591f5dfe5e2d25a60d48d6199050a62b"
+    },
+    "initialRedCounts": {
+      "pass": 36,
+      "fail": 2,
+      "detail": "code-size child and enclosing parent"
+    },
+    "sourceEvidence": [
+      {
+        "path": "/Users/ravonus/dev/wt/studio-publication-20261019/native-artifacts/64e-production-local/geth/params/protocol_params.go",
+        "bytes": 23593,
+        "sha256": "94657cdf80d2f0b136ff6d89003326f496d3b1ba1abcb1a855b7b98c941e9e28"
+      },
+      {
+        "path": "/Users/ravonus/dev/wt/studio-publication-20261019/native-artifacts/64e-production-local/geth/core/vm/common.go",
+        "bytes": 3824,
+        "sha256": "c7b2bac3e5d54a78f7c2ead6b1722871996c94cd102a5eb24a6158b9019f0e8d"
+      },
+      {
+        "path": "/Users/ravonus/dev/wt/studio-publication-20261019/native-artifacts/64e-production-local/geth/core/vm/evm.go",
+        "bytes": 32143,
+        "sha256": "a3a22a662f2a79d5a99e422c21c0254e985decb7013062928a8c5457e00d2d4d"
+      }
+    ]
+  },
+  "sourceReview": {
+    "onlyRuntimeDelta": "native/proof-executor/geth-overlay/internal/ethapi/keel_sparse.go",
+    "unchangedEngine": true,
+    "supportsOriginalShape": "Multiple sequential calls in one block, omitted/null CREATE recipient, exact requested full/hash response format",
+    "preserved": [
+      "Pinned Sepolia Amsterdam and nonzero authenticated base root checks",
+      "256block ceiling",
+      "Strict unknown top/block/transaction field and override rejection",
+      "Per-call gas/value/from checks now apply to every call",
+      "Original default request/witness/response/wall/gas limits outside shim",
+      "Actual Geth transaction validation and complete pre/post whole-block processing",
+      "Original raw payload is not split, rewritten or renumbered"
+    ],
+    "addedLimits": {
+      "callsPerBlock": 5000,
+      "callsTotal": 10000,
+      "source": "unchanged pinned upstream eth_simulateV1 API limits"
+    },
+    "resultChecks": "Fresh decode of raw input compares all block/call/transaction counts, nonzero roots, sender, nil/address target identity, calldata, value, gas and each explicit nonce/fee field. Local defaults cannot authorize a changed envelope."
+  },
+  "independentValidation": {
+    "platform": "darwin/arm64",
+    "go": "go1.25.8",
+    "loadBeforeGoTests": "5.74 6.82 5.93",
+    "readOnlyGoOverlay": {
+      "path": "/private/tmp/keel-independent-native-create-review-20261020/overlay.json",
+      "bytes": 1212,
+      "sha256": "9425ff4d72c1e08d1a24fa492600e075db48f3bec1ad3ffefa48a6d46e7f98ff"
+    },
+    "correctedParserAndEVM": {
+      "pass": 38,
+      "fail": 0,
+      "skip": 0,
+      "packageElapsedSeconds": 1.936,
+      "log": {
+        "path": "/Users/ravonus/dev/wt/studio-cache-independent-review-20261020/docs/reviews/studio-cache-independent-20261020/native-create-independent-go.jsonl",
+        "bytes": 36570,
+        "sha256": "03d29b9f8c27b0d1bc215ae1d8cce444c9f20a1bf9c73df76540416aa9359212"
+      }
+    },
+    "extraGenuineEVMBudgetCap": {
+      "pass": 1,
+      "fail": 0,
+      "skip": 0,
+      "case": "Two10Mgas input envelopes each fit10Mrequestbudget; first real transaction consumes gas, Geth caps later reservation, shim rejects changed later envelope",
+      "source": {
+        "path": "/Users/ravonus/dev/wt/studio-cache-independent-review-20261020/docs/reviews/studio-cache-independent-20261020/native-create-budget-envelope-review_test.go",
+        "bytes": 892,
+        "sha256": "ce73446ae954a43e74fed3a3e7674f1adf9331561a994aa498d86e178f73a83f"
+      },
+      "log": {
+        "path": "/Users/ravonus/dev/wt/studio-cache-independent-review-20261020/docs/reviews/studio-cache-independent-20261020/native-create-independent-budget.jsonl",
+        "bytes": 1484,
+        "sha256": "90ca97075f3e450438ff4d058dfd47be60b8942a6809dcf1d17c82d3594c999b"
+      }
+    },
+    "realEVMCoverage": [
+      "All six exact49d parent/child runtime hashes and lengths",
+      "Sender nonce299 and charged balance after three sequential CREATEs",
+      "Whole-block history/beacon preprocessing and request postprocessing",
+      "Default hash/full response formats preserve root and call output",
+      "Mixed CREATE followed by call observes newly created runtime",
+      "Genuine constructor revert and corrected over-Amsterdam-code-size failure",
+      "Nonce/fee/balance/intrinsic-gas validation and cancellation"
+    ],
+    "observedSyntheticGasUsed": [
+      "7449976",
+      "50745569",
+      "26360009"
+    ],
+    "actualStateScope": "Explicitly synthetic local allocated state with actual EVM; not live state proof",
+    "publicRPCRequests": 0,
+    "privateProgramExecutions": 0,
+    "officialBinaryBuiltByReviewer": false
+  },
+  "conditions": [
+    "Freeze the exact approved test correction and unchanged runtime source before official build",
+    "Fresh official Linux executor/broker/image provenance and hashes must reflect this new native source; never relabel d97/8a receipts",
+    "Independent QA must run meaningful affected tests against actual fresh binary/image",
+    "Any fresh current49d public prerequisite qualification requires exact new source/input/containment review and authenticated state/runtime/gas evidence",
+    "Retain consumed historical public claim/READ_TIMEOUT; no public-RPC replay/reset is admitted here",
+    "FE944/b524/d97 release candidate and completed Gator acceptance remain unchanged",
+    "No held-state compiler adapter, private GIF program execution, deployment, signature, spend, catalog or production activation is authorized by this source review"
+  ],
+  "remainingGates": [
+    "Actual official native build and fresh artifact qualification",
+    "Authenticated current-state three-CREATE qualification with exact runtime/state/gas results",
+    "Separate held counterfactual state/compiler interface if pursued",
+    "Normal complete original GIF proof and deployed unsigned wallet boundary",
+    "Selected-chain receipt/read-back and actual deployment approval remain separate"
+  ],
+  "actualPublicStateQualified": false,
+  "independentGasDimensionMeasurements": false,
+  "GIFQualified": false,
+  "productionApproved": false,
+  "signing": false,
+  "submission": false
+}

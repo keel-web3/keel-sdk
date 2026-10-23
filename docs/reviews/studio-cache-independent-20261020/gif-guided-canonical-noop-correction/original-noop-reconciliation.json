@@ -1,0 +1,14 @@
+{
+  "schema": "keel.guided-review-alias-noop-readonly-reconciliation@1",
+  "result": "PASS_NO_NORMAL_ACTION_OCCURRED",
+  "all100TableProjectionsUnchanged": true,
+  "actualSnapshotSHA256": "01ae15e98b0225315dfea06379ccd1c953307c93b922457601a9dda65819e9c0",
+  "beforeSnapshotSHA256": "01ae15e98b0225315dfea06379ccd1c953307c93b922457601a9dda65819e9c0",
+  "normalWriterReceiptAndConsumedAbsent": true,
+  "databaseReadOnly": true,
+  "databaseWrites": 0,
+  "originalAdmittedCommandExecutedOnce": true,
+  "originalCommandOutcome": "NOOP_NOT_GUIDED_REVIEW_SUCCESS",
+  "automaticRetry": false,
+  "sourceOfNoop": "argv1 /tmp alias differs from Node canonical /private/tmp fileURL main guard"
+}

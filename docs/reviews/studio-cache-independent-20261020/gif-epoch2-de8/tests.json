@@ -1,0 +1,30 @@
+[
+  {
+    "name": "producer104",
+    "exitCode": 0,
+    "argv": [
+      "/opt/homebrew/opt/node@22/bin/node",
+      "--test",
+      "--test-concurrency=1",
+      "/tmp/keel-qa-receipt-activation-20261020/keel-site/docs/tools/gif-fresh-forward2-capture/clone-state.test.mjs",
+      "/tmp/keel-qa-receipt-activation-20261020/keel-site/docs/tools/gif-fresh-forward2-capture/deployed-core.test.mjs",
+      "/tmp/keel-qa-receipt-activation-20261020/keel-site/docs/tools/gif-fresh-forward2-capture/drop-diff.test.mjs",
+      "/tmp/keel-qa-receipt-activation-20261020/keel-site/docs/tools/gif-fresh-forward2-capture/existing-candidate.test.mjs",
+      "/tmp/keel-qa-receipt-activation-20261020/keel-site/docs/tools/gif-fresh-forward2-capture/guided-review-receipt.test.mjs",
+      "/tmp/keel-qa-receipt-activation-20261020/keel-site/docs/tools/gif-fresh-forward2-capture/public-signer.test.mjs",
+      "/tmp/keel-qa-receipt-activation-20261020/keel-site/docs/tools/gif-fresh-forward2-capture/read-schema.test.mjs",
+      "/tmp/keel-qa-receipt-activation-20261020/keel-site/docs/tools/gif-fresh-forward2-capture/run-capture.test.mjs"
+    ]
+  },
+  {
+    "name": "forward63",
+    "exitCode": 0,
+    "argv": [
+      "/opt/homebrew/opt/node@22/bin/node",
+      "--test",
+      "--test-concurrency=1",
+      "/tmp/keel-qa-receipt-activation-20261020/keel-site/docs/tools/gif-fresh-forward2-capture/forward/forward-reference.test.mjs",
+      "/tmp/keel-qa-receipt-activation-20261020/keel-site/docs/tools/gif-fresh-forward2-capture/forward/header-gas-reference.test.mjs"
+    ]
+  }
+]

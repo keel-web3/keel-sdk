@@ -1,0 +1,39 @@
+{
+  "schema": "keel.independent-native-provenance-observer-source-review@1",
+  "decision": "APPROVE_EXACT_SOURCE_FOR_ORDINARY_PR_AND_MERGE",
+  "reviewerId": "independent-release-reviewer",
+  "sourceCommit": "62f5df235441a342871419ecc837907e42226596",
+  "approvedFundingParent": "5e0c95187dbb7412408cfddc3683098dbfd6cc3d",
+  "fundingParentReviewSHA256": "7af9fb51767e3fa8f6957c18d76cdce0da368b2885c2a5e78095200e7f740038",
+  "reviewedFilesSHA256": {
+    "apps/studio/src/server/chain/publication-simulation.ts": "60f01ae7d5b23c4fdf82e5d4d2eff9591ff5682c6fe2baedebcbb22d3dfefa86",
+    "apps/studio/tests/unit/native-publication-evidence-observer.test.ts": "11092bb6f671a2977f90294c8f53e3a26ef74a55bbf17fd743752ac474fbec52"
+  },
+  "semantics": "ExistingSDK311 onAttempt/onEvidence callbacks only. Hardcoded safeinteger/hash field allowlist omits URLs/headers/freeform provider messages/payload/unknownfields andstage, preservingcurrentphase. No request/call/recipient/chain/header/gas/resource/retry/limit/freshness/nativeprotocol/wallet/approval changes.",
+  "SDKPrimarySource": "Unchanged311 proof-simulation-node.ts16-30 passesoptions; native/proof-executor/transport.mjs63-65 verifiesnativeprovenance and93-95 canonicalpin beforeonEvidence, catchesobserverexceptions. state-reader.mjs98 catchesonAttempt observerexceptions.",
+  "IOFailure": "Async diagnosticnotifications catchrejections; existingownertracequeue/finish remainsfailclosed if its storage fails. No validationauthority or native-result replacement is added.",
+  "independentChecks": {
+    "node": "22.22.1",
+    "actualFactoryAndRealOwnerTraceStoreCohortPass": 7,
+    "failures": 0,
+    "skips": 0,
+    "cohortScope": "Factoryoptions/callbackwiring, exactrequestidentity, unchangedphase, ownerisolation, leakage and existingdiagnostic behavior; syntheticnativecallbacks, no nativeVM",
+    "additionalProjectionAssertions": 201,
+    "not201FullRuntimeTestCases": true,
+    "projectionCheckSHA256": "f37a38514016899816355923d7e100918d816fec3057f2fb26767069698db8d3",
+    "logsSHA256": {
+      "native-observer-cohort.stdout": "6321db760deb822a325c32f87ceab45c8d121227441bf4ebed82205fda1006d6",
+      "native-observer-cohort.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  },
+  "authorAdditionalEvidenceNotOwnRerun": {
+    "factoryDiagnosticCohortPass": 17,
+    "TSCExit": 0
+  },
+  "measurementLabels": "readRequests = nativeexecutorreadframes; responseBytes = framedstateresponsebytes consumedbynative. NeitherisphysicalHTTPrequestcount/bodymeasurements. Originalwiremetrics remainunobserved; no inferred liveclaims.",
+  "sourceOnlyApproval": true,
+  "artifactHostBuildActivationOrPrivateNativeExecutionApproved": false,
+  "deployedLiveEvidence": "1058 remainsGate6FAIL; no newsource/native/browser run performedbyreviewer",
+  "blockingSourceFindings": [],
+  "reviewerAuthoredProductionFix": false
+}

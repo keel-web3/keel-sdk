@@ -1,0 +1,134 @@
+{
+  "files": [
+    {
+      "path": "audit-command-and-bindings.py",
+      "bytes": 4193,
+      "sha256": "c2eb9e237efc57fc6e5c9d231668109e0d57adc11c29b3d622ed62e5fea9c4b0"
+    },
+    {
+      "path": "audit-context.py",
+      "bytes": 5780,
+      "sha256": "1b9d6bc415fb7544645b35ecaca17298d9c11b250b31195a7b7afdd74dbd02dd"
+    },
+    {
+      "path": "build-controls.test.py.stderr",
+      "bytes": 100,
+      "sha256": "6f283ee6225d2cef4c0127d95456a6f954c45141c92b97dd89016cb1c630e8f4"
+    },
+    {
+      "path": "build-controls.test.py.stdout",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "candidate-oom-default.test.py.stderr",
+      "bytes": 106,
+      "sha256": "698d16d7b93c4bd9707d3cfacda6fb1e0fea99ed0cda6e69bedc42772940540a"
+    },
+    {
+      "path": "candidate-oom-default.test.py.stdout",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "command-audit.exit",
+      "bytes": 2,
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+    },
+    {
+      "path": "command-audit.json",
+      "bytes": 1704,
+      "sha256": "d1faa7a49be99eb4ca330551a5a5c6f5411851d8f9b72de77123abe98998b466"
+    },
+    {
+      "path": "command-audit.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "command-audit.stdout",
+      "bytes": 133,
+      "sha256": "b3e00ff10396c48dfdf1c2f25b0dee549ece8655ef83dd0325d44a867e05bac5"
+    },
+    {
+      "path": "commands.admitted.json",
+      "bytes": 13765,
+      "sha256": "dfbf50d4e1c7a77b28f23aef40294e1d6d5ae5e8e683ea548b3e73eedcc11b5d"
+    },
+    {
+      "path": "context-audit.exit",
+      "bytes": 2,
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+    },
+    {
+      "path": "context-audit.json",
+      "bytes": 770,
+      "sha256": "83b2b65f238f812a63e043e6d734fd231877fcf03659b0ea243cecabbc089399"
+    },
+    {
+      "path": "context-audit.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "context-audit.stdout",
+      "bytes": 770,
+      "sha256": "83b2b65f238f812a63e043e6d734fd231877fcf03659b0ea243cecabbc089399"
+    },
+    {
+      "path": "delta-controls.test.py.stderr",
+      "bytes": 103,
+      "sha256": "d03ce458f2a6cd2b4f27522f3aacad03ce1872c028853507c3ad02ca621bdcad"
+    },
+    {
+      "path": "delta-controls.test.py.stdout",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "evidence-manifest.json",
+      "bytes": 3968,
+      "sha256": "b4ee8ca8a80c17f33a38ea264882f823e79785d19bb9c64492e85c87f2a7a767"
+    },
+    {
+      "path": "image-only-controls.test.py.stderr",
+      "bytes": 107,
+      "sha256": "603db52fd0016ca5cdcf83b2588160ae92bde08c66ba4c61dfc8a2a74cdb95c9"
+    },
+    {
+      "path": "image-only-controls.test.py.stdout",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "independent-controls.json",
+      "bytes": 1089,
+      "sha256": "c4cddd47da08a572ce283ce021a82f48cb5ec66ca758db205ae3496edc80fd4a"
+    },
+    {
+      "path": "qa-binding-review.json",
+      "bytes": 780,
+      "sha256": "c105faff87342ee9b78d160d1ffb57bbf8be1302897c2441246264c4c79db2ef"
+    },
+    {
+      "path": "review.json",
+      "bytes": 5163,
+      "sha256": "257a06848224a63aee248801bde61909f6e613fea805d0ef8beabc31ffadb53f"
+    },
+    {
+      "path": "review.md",
+      "bytes": 1440,
+      "sha256": "7d6c6023e73f8accc740bfcf785e387593301531d32ce56a0a24c1993e73a39a"
+    },
+    {
+      "path": "sdk-delta-controls.test.py.stderr",
+      "bytes": 103,
+      "sha256": "bfa162c0344e53e36740c42c0b6dabbcbd33697d8a89a4e494d03fe61202cb48"
+    },
+    {
+      "path": "sdk-delta-controls.test.py.stdout",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  ]
+}

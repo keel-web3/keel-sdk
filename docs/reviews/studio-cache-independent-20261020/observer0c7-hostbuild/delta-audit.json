@@ -1,0 +1,21 @@
+{
+  "schema": "keel.independent-observer-public-delta-audit@1",
+  "result": "PASS_PUBLIC_BUILD_INPUTS_ONLY",
+  "archiveSHA256": "c2a0871c0393108c452d76a4df20f749e46361ba6a5fcf0f650d4713efe71194",
+  "archiveBytes": 9145805,
+  "rawTarBytes": 43601920,
+  "rawTarSHA256": "a970a1602a94f306ee336b6ee90c1412f80e6f629e1f4f827b96b290ac20b4fe",
+  "tarEntries": 2426,
+  "regularFiles": 1640,
+  "regularBytes": 39978306,
+  "allTarMembersExactlyMatchFrozenDeltaContext": true,
+  "noSpecialHardlinkDuplicateOrEscapingMember": true,
+  "changedEntries": 1640,
+  "deletedPaths": 174,
+  "fullResultTreeSHA256": "9df3273c29d50154dfb783ef05b419317b803e47b847dbf7170d98d3fde74438",
+  "fullResultEntries": 36065,
+  "protectedExternalNativeOpsBootstrapWorkerEntriesUnchanged": 16140,
+  "compiledStrict280": "FAIL_UNPROVEN_SINGLE_PROTOCOL_MODULE_RETAINED",
+  "publicationQualificationClaimed": false,
+  "hostActions": false
+}

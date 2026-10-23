@@ -1,0 +1,136 @@
+{
+  "schema": "keel.independent-receipt-bound-activation-source-review@1",
+  "scope": "Independent source and synthetic fault review only; no production Docker, database, RPC, signing, import, activation, or cleanup action.",
+  "sourceCommit": "0ee9947af4b2fc73606150db0189471853cafcf3",
+  "observedEvidenceHead": "b34d4bfb0783d16d53106309af7d48ad0b468d3a",
+  "sourceFiles": {
+    "activate-receipt-bound-studio.py": {
+      "bytes": 42599,
+      "sha256": "478c69c5d3a452f937b2c75e9bf8bf7cee2772d38b212eab321ad19ef696ced5"
+    },
+    "receipt-bound-dependencies.py": {
+      "bytes": 17258,
+      "sha256": "0b4d17bb40ffc7ab0de8a9f3a96953424b5f6cbfeb93d28c252edbbe00f543ea"
+    },
+    "activation-plan.pending.json": {
+      "bytes": 4244,
+      "sha256": "d4ab3cf403bf72ddef5deb813fddefaf57043e6a09e711d68a747e73c00d94e2"
+    },
+    "factory-baseline.sql": {
+      "bytes": 1362,
+      "sha256": "1fc4a3c27c2afde33e24a69930195d792810748305ab4f1a2e5291287ad62deb"
+    },
+    "factory-enable.sql": {
+      "bytes": 2912,
+      "sha256": "2b62d8ee1b33228acb4ac19a1b95fae9ba2826496b72586d60a09ba4187fcf0e"
+    },
+    "factory-disable.sql": {
+      "bytes": 3710,
+      "sha256": "bf7b04e48d09027c57a15e203ab967f89735f1568eb3b2c65f27635ef1660c8b"
+    }
+  },
+  "result": "BLOCKED_SPECIFIC_OWNERSHIP_FINDINGS",
+  "operatorApproval": false,
+  "planAdmission": false,
+  "releaseApproval": false,
+  "findings": [
+    {
+      "id": "RB-1",
+      "priority": "P1",
+      "file": "/Users/ravonus/dev/wt/studio-receipt-bound-activation-20261020/keel-site/docs/reviews/studio-publication-20261020/release/activation-receipt-bound/activate-receipt-bound-studio.py",
+      "line": 415,
+      "relatedLine": 425,
+      "title": "Old restart occurs before candidate stop is confirmed",
+      "trigger": "Successful factory-disable CAS through running candidate; candidate stop fails before mutation and inspection still reports Running=true.",
+      "observed": "recover_runtime records replacement_stop_failed, renames the still-running candidate, and starts the old app. The synthetic model then has both owners running on the retained data volume. Final verification reports unconfirmed only after the unsafe start.",
+      "reproduction": "python3 stop-failure-regression.py /Users/ravonus/dev/wt/studio-receipt-bound-activation-20261020/keel-site/docs/reviews/studio-publication-20261020/release/activation-receipt-bound",
+      "requiredBehavior": "Require positive stopped-state inspection of every owned application before renaming/starting the old app. A failed or unavailable inspection leaves old stopped and recovery unconfirmed. Response loss after a successful stop may still recover when stopped state is positively verified.",
+      "unchangedRegression": "stop-failure-regression.py"
+    },
+    {
+      "id": "RB-2",
+      "priority": "P1",
+      "file": "/Users/ravonus/dev/wt/studio-receipt-bound-activation-20261020/keel-site/docs/reviews/studio-publication-20261020/release/activation-receipt-bound/receipt-bound-dependencies.py",
+      "line": 102,
+      "title": "PG helper ownership accepts additional host permissions",
+      "trigger": "An inspected same-label helper has a HostConfig field absent from the expected request: CapAdd SYS_ADMIN, Devices /dev/mem, or VolumesFrom unrelated:rw.",
+      "observed": "All three are accepted by assert_pg_only because it compares only keys present in expected HostConfig. Confirmed by independently running QA original adversary against hash-identical helper source.",
+      "requiredBehavior": "Reject extra host capabilities, devices, inherited volumes and other unsafe namespace/runtime settings before starting or adopting the helper. Account explicitly for actual Docker inspection defaults; preserve foreign occupants.",
+      "qaOriginalReproduction": "/tmp/keel-qa-receipt-activation-20261020/foreign-capability-adversarial.py"
+    }
+  ],
+  "independentResults": {
+    "existingDependencyControls": {
+      "pass": 20,
+      "fail": 0
+    },
+    "maintainedPureControls": {
+      "pass": 13,
+      "fail": 0
+    },
+    "newStopFailureRegression": {
+      "pass": 0,
+      "fail": 1,
+      "expectedSafeBehaviorFailed": true
+    },
+    "qaCapabilityAdversaryIndependentRerun": {
+      "pass": 0,
+      "fail": 1,
+      "unsafeCasesAccepted": 3
+    }
+  },
+  "nonBlockingReviewedBehavior": [
+    "Packaged d357 supervisor awaits complete bootstrap psql before web/router start.",
+    "Forward SQL compares complete selected-chain factory set and exact new UUID/address collision boundary; rollback disables only the exact added row.",
+    "Catalog remains content-addressed and only candidate receives its new environment binding.",
+    "Maintained uncertain-stop test simulates response loss after successful mutation; a positive stopped-state fence can preserve its assertions."
+  ],
+  "remainingGates": [
+    "Correct these two source findings and independently rerun unchanged adversaries.",
+    "Qualify exact old a53 PG-only configuration and bounded operation with original image; current FE944 Docker merge control is not old-image execution proof.",
+    "Freeze real final image/import provenance, fresh names/capacity/snapshot and required review/denial/state-source evidence in an executable final plan; pending plan is invalid and all approvals false.",
+    "Resolve consumed normal GIF assembly failure using a separately reviewed successor; no replay is authorized by this review. Actual full normal GIF/native and deployed unsigned Gator/GIF/own-copy acceptance remain outstanding."
+  ],
+  "preservedEvidence": {
+    "dependency-controls.stderr": {
+      "bytes": 2745,
+      "sha256": "3249913cbb23364d9e3edd2c496a656587bca5bba47b3ccd46892f8045b7e44f"
+    },
+    "dependency-controls.stdout": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "maintained-controls.stderr": {
+      "bytes": 2153,
+      "sha256": "c707b7c9f7ce600666892d9f1332d5f2ce40ec044773cd293536b224eec4bf7b"
+    },
+    "maintained-controls.stdout": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "qa-capability-independent-red.stderr": {
+      "bytes": 371,
+      "sha256": "63aacc2dbce06079a1ed3b152448014be4dcf70893ffd7128f4b59234b668c2a"
+    },
+    "qa-capability-independent-red.stdout": {
+      "bytes": 852,
+      "sha256": "df825c165a3a97bd3037eb118737b201eb6230c9279bfd028b973fbb866370b9"
+    },
+    "qa-foreign-capability-adversarial.py": {
+      "bytes": 1469,
+      "sha256": "e5822d5743bc237ba3fd61a21a0da50a24255aa5e2dc367ee4937cd634211a5b"
+    },
+    "stop-failure-red.stderr": {
+      "bytes": 396,
+      "sha256": "1d06f9fd71939c0712e29078276c3f385f0a3ef3903396119b5be8ee89a4a65d"
+    },
+    "stop-failure-red.stdout": {
+      "bytes": 1272,
+      "sha256": "529d1129a3d8f79af87b71984530647f4f9795cd157131a72896c0bf6e91dafb"
+    },
+    "stop-failure-regression.py": {
+      "bytes": 1237,
+      "sha256": "a8195a9654ad30ca0a5858be5f319f1c16235918f19199cb506a0cd54320f65f"
+    }
+  }
+}

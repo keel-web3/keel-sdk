@@ -1,0 +1,168 @@
+{
+  "schema": "keel.independent-gif-metadata-reference-correction-review@1",
+  "decision": "APPROVE_PRECISE_DERIVED_REFERENCE_CORRECTION_DESIGN_EXACT_PATCH_STILL_SEPARATE",
+  "actualCapture": {
+    "path": "/tmp/keel-private-gif-existing-v2-provisional-capture-20261020-01/normal.provisional.private.json",
+    "bytes": 9948499,
+    "sha256": "3ab9e07a248074e10cebf6f6515eb257926f29aff64355a3ae6102537e67c59a"
+  },
+  "actualFieldDiffSHA256": "472d8fb0103a7c6daf7c2c2df475dece3020dad90a6b88b1738dac38c4c009c8",
+  "actualDifferences": [
+    "stages[0].metadataDigest",
+    "metadataDigest"
+  ],
+  "allOther14FieldsExact": true,
+  "canonicalSource": "4002803ccfcb20c39ffe5c555b68d8e197f379f8:apps/studio/src/server/services/release-service.ts:3994-4020;4723",
+  "correction": "Keep original createDrop arguments, replace only target with the already admitted new collection, derive overall digest from complete canonical metadata JSON and fresh pre-drop walletCalls, then derive each old stage digest as keccak256(stringToHex(metadataDigest+\":stage:\"+index)). Re-encode entire580byte call and require exact equality. Do not read an observed new digest as expected input.",
+  "requiredInputs": [
+    "version",
+    "chainId",
+    "releaseId",
+    "title",
+    "artifactId",
+    "artifactManifestDigest",
+    "releaseType",
+    "supply",
+    "phases",
+    "accessList",
+    "collection",
+    "controller",
+    "presentationMode",
+    "separatePreview",
+    "presentationCalls"
+  ],
+  "propertyOrder": "Preserve canonical JSON insertion order and each canonical wallet-call object key order. In particular register-mint-route/image-module/image-source construct value before data while castDie/defaultPresentation/description/harness construct data before value.",
+  "optionalFields": "All optional metadata inputs are proven absent for this exact hash-bound retained release and artifact. Exact validator must fail on a changed/unknown optional state, or derive any present optional inputs from their canonical source; never silently drop them.",
+  "independentProof": {
+    "negativeMetadataFields": [
+      "version",
+      "chainId",
+      "releaseId",
+      "title",
+      "artifactId",
+      "artifactManifestDigest",
+      "releaseType",
+      "supply",
+      "phases",
+      "accessList",
+      "collection",
+      "controller",
+      "presentationMode",
+      "separatePreview",
+      "presentationCalls"
+    ],
+    "negativeDropFields": [
+      1,
+      2,
+      3,
+      4
+    ],
+    "schema": "keel.independent-gif-canonical-metadata-derivation@1",
+    "captureSHA256": "3ab9e07a248074e10cebf6f6515eb257926f29aff64355a3ae6102537e67c59a",
+    "baselineSHA256": "d7c08a3d3b93b3d4768861707529b6488e2c114631571007ab2a84dd9748e9e1",
+    "canonicalFormulaSource": "4002803ccfcb20c39ffe5c555b68d8e197f379f8:apps/studio/src/server/services/release-service.ts:3994-4020;4723",
+    "optionalInputsProvenAbsent": true,
+    "metadataObjectKeyOrder": [
+      "version",
+      "chainId",
+      "releaseId",
+      "title",
+      "artifactId",
+      "artifactManifestDigest",
+      "releaseType",
+      "supply",
+      "phases",
+      "accessList",
+      "collection",
+      "controller",
+      "presentationMode",
+      "separatePreview",
+      "presentationCalls"
+    ],
+    "walletCallKindAndPropertyOrderReconstructedFromCanonicalSource": true,
+    "oldWalletMethods": [
+      "castDie",
+      "registerERC721Route",
+      "setDefaultPresentation",
+      "setCollectionDescription",
+      "setPreparedOnchainHarness"
+    ],
+    "newWalletMethods": [
+      "castDie",
+      "registerERC721Route",
+      "setDefaultPresentation",
+      "setPresentationModule",
+      "setImageSource",
+      "setCollectionDescription",
+      "setPreEncodedOnchainHarness"
+    ],
+    "oldMetadataJSONSHA256": "8b6cc15e40fde8ab5a6f1cbe6538879b5a2a7d7eeb3ac8571999fe6979759dc5",
+    "newMetadataJSONSHA256": "756effdbb8f6487c44fb62d161e2c9441078b0a49e95f351d80d222828f89f86",
+    "oldDerivedMatchesOldObserved": true,
+    "newDerivedMatchesNewObserved": true,
+    "oldStageDerivedMatches": true,
+    "newStageDerivedMatches": true,
+    "entireNewDropCalldataMatchesIndependentlyDerivedDigests": true,
+    "metadataInputsUnchangedExceptCollectionAndPresentationCalls": true,
+    "observedNewDigestCopiedAsExpectation": false,
+    "programExecuted": false,
+    "RPC": 0
+  },
+  "scope": "Pure offline forensic calculation only; it reproduces BOTH retained old and new overall/stage digests and full new calldata from old14arguments plus independently derived newdigests. No capture replay, RPC, native/fullprogram execution or production mutation.",
+  "maintain": [
+    "Original config/target/sender/value/limits/assets/URI guards",
+    "All14other drop fields inclZEROsigner",
+    "All network/clock/candidate/db/credential assertions",
+    "Original consumed strictFAIL and rawprovisional evidence"
+  ],
+  "notApproved": [
+    "Unwritten validator/test patch",
+    "Fullprogram execution",
+    "Simulation acceptance",
+    "Signing/submission/spend",
+    "Production activation"
+  ],
+  "reviewerSetupFailure": "Initial pure helper omitted routed setPresentationModule ABI; it failed unknown selector8787d412. Added only actual source ABI declaration, preserving initial helper/error.",
+  "evidence": [
+    {
+      "path": "/Users/ravonus/dev/wt/studio-cache-independent-review-20261020/docs/reviews/studio-cache-independent-20261020/gif-metadata-reference/derive-initial.mjs",
+      "bytes": 6509,
+      "sha256": "0ec8ad1b368941b15f5de19797e7a288a671c619e45b212a11cf15fc90b19c25"
+    },
+    {
+      "path": "/Users/ravonus/dev/wt/studio-cache-independent-review-20261020/docs/reviews/studio-cache-independent-20261020/gif-metadata-reference/derive-missing-route-abi.mjs",
+      "bytes": 6557,
+      "sha256": "d61b2d27c90d381385cf2e9eaceb7658b42fd4e6e8c70eb226c939dc347c6591"
+    },
+    {
+      "path": "/Users/ravonus/dev/wt/studio-cache-independent-review-20261020/docs/reviews/studio-cache-independent-20261020/gif-metadata-reference/derive.mjs",
+      "bytes": 7189,
+      "sha256": "8a7b88a5fd317dd8a19b926489252a93be63591393f4982dd86052b778f5df85"
+    },
+    {
+      "path": "/Users/ravonus/dev/wt/studio-cache-independent-review-20261020/docs/reviews/studio-cache-independent-20261020/gif-metadata-reference/result.json",
+      "bytes": 2132,
+      "sha256": "b03ede16703172b10308a0efce8643af255a25a5b01e9276bfc7fdabc57e7eff"
+    },
+    {
+      "path": "/Users/ravonus/dev/wt/studio-cache-independent-review-20261020/docs/reviews/studio-cache-independent-20261020/gif-metadata-reference/stderr",
+      "bytes": 574,
+      "sha256": "0974e22aa3c79005d4be0f46cde56c88973a3aa53fa34dd920f52f8497a2d233"
+    },
+    {
+      "path": "/Users/ravonus/dev/wt/studio-cache-independent-review-20261020/docs/reviews/studio-cache-independent-20261020/gif-metadata-reference/stderr-final",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/Users/ravonus/dev/wt/studio-cache-independent-review-20261020/docs/reviews/studio-cache-independent-20261020/gif-metadata-reference/stderr-initial",
+      "bytes": 563,
+      "sha256": "f3b62df1ec0751de132200b8eec366e8aba87664d83980e6c2b15f00d59c75f7"
+    },
+    {
+      "path": "/Users/ravonus/dev/wt/studio-cache-independent-review-20261020/docs/reviews/studio-cache-independent-20261020/gif-metadata-reference/stdout-final",
+      "bytes": 1798,
+      "sha256": "c4e27dee87cc3d6047ef95c01a43cf1bcf47102af2c787847e266e979d259d62"
+    }
+  ]
+}

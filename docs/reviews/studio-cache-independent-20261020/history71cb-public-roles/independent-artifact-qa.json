@@ -1,0 +1,137 @@
+{
+  "schema": "keel.qa-actual-history17cb-artifact@1",
+  "result": "PASS_ACTUAL_COMPLETE_SAVE_PUBLIC_DELTA_AND_EXACT_CORE_BYTES_RUNTIME_PENDING",
+  "recordedAt": "2026-10-21T05:12:10.741722+00:00",
+  "candidate": {
+    "site": "71cb0e31bab5e4ee93af9d3b3185978e46f1fe8e",
+    "tree": "a41c88dfe6a8343f030892f220efea002c779743",
+    "sdk": "311d61526284248938e335d7ed879089408933be",
+    "build": "jfjIfW1-d41RR-j-i-YgL",
+    "image": "sha256:17cb5aac36536e3d6026ba32b3bb3a66adc04af5bb7207082ee472dce66320c9",
+    "actualImageBytes": 728593160,
+    "actualConfigSHA256": "b8ddaf6d68e76ad758ee46b7c8407b480dfb146113ba0f31a43f10943d80a38b",
+    "actualRootFSSHA256": "4c8ae79ca08fa02d6ce7209d2a9116550ab175a502572d850aec7fd2aa9fa2e0"
+  },
+  "execution": {
+    "actualOperator": "independentQA",
+    "authorization": "parent explicit coordination change allowed QA exact961234 wrapper onYuna only",
+    "wrapperSHA256": "961234f4644026ced0b0e9def7a6130b3a0c2e71e95de2c8128d329d97c27e49",
+    "wrapperInvocations": 1,
+    "YunaSSHInvocations": 1,
+    "productionSSHInvocations": 0,
+    "exitCode": 0,
+    "stderrBytes": 0,
+    "legacyEnvelopeLiteral": "root via exact QA-authored immutable controls; independentQA execution not claimed",
+    "legacyLiteralExplanation": "Written before subsequent explicit QA-execution authorization; immutable wrapper output retained exactly. Tool execution evidence and this addendum identify actual independentQA operator. No test/assertion/source modified.",
+    "command": "python3 /private/tmp/keel-qa-history71cb-artifact-20261021/retarget17cb/run-root-audit.py",
+    "localResultSHA256": "c38971611b41bed7caeeb54805e089c2e61ebf66c506e99e7e223b6137433eb3",
+    "remoteQAOutputRoot": "/private/tmp/keel-qa-71cb-image-20261021",
+    "fullSaveStaysYuna": true,
+    "compiled974JSStayYuna": true,
+    "localCopies": "public manifests/auditcode/hashinventory/sanitized JSON only"
+  },
+  "environment": {
+    "uptimeBefore": "23:10  up 56 days,  7:11, 1 user, load averages: 4.44 5.38 5.74",
+    "loadBefore": 4.44189453125,
+    "dfBefore": "Filesystem   1024-blocks      Used Available Capacity iused     ifree %iused  Mounted on\n/dev/disk3s5   482797652 410024204  22658328    95% 8963776 226583280    4%   /System/Volumes/Data\n",
+    "runs": [
+      {
+        "script": "audit-public-delta.py",
+        "exitCode": 0,
+        "elapsedSeconds": 0.3556383326649666,
+        "stdoutBytes": 1408,
+        "stdoutSHA256": "d4d139bd44b1ebe4b40c86d0b4c26625d35b361066b2933a095e25c649285780",
+        "stderrBytes": 0,
+        "stderrSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "script": "audit-image.py",
+        "exitCode": 0,
+        "elapsedSeconds": 12.994020333047956,
+        "stdoutBytes": 1172,
+        "stdoutSHA256": "c1263f299bd3ca88c69ed2e83f444ee18bede97d513af82361236d9ba54e04fe",
+        "stderrBytes": 0,
+        "stderrSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "script": "audit-compatible-manifest.py",
+        "exitCode": 0,
+        "elapsedSeconds": 0.052524583879858255,
+        "stdoutBytes": 520,
+        "stdoutSHA256": "5d481d2495559f53d0039561f4abf55dbd2040d2b5e7f53150a2e2a1eaefa900",
+        "stderrBytes": 0,
+        "stderrSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    ]
+  },
+  "archive": {
+    "bytes": 728640512,
+    "sha256": "f85233156f412f17f92aa609e20c1e13f377205cb885b97e5b2a9a108ec728bc",
+    "all48Blobs": true,
+    "all46ExpandedDIDs": true,
+    "all44ParentDIDsExact7b0": true,
+    "fullConfigExact": true,
+    "outerOCIAndDockerManifestExact": true,
+    "completeAppEntries": 36065,
+    "completeAppTreeSHA256": "89e7e64f96909cbb7ae7d553e057ef51b882e290073afb468de63edc362ac39d",
+    "duplicatePaths": [],
+    "hardlinksResolved": 4,
+    "whiteoutsApplied": 689,
+    "stableFileIdentityBeforeAfter": true,
+    "workspaceSDKDistExactFiles": 1745,
+    "installedFourCoreSDKExactFiles": 1360
+  },
+  "context": {
+    "fullDeltaMemberCount": 1293,
+    "changedEntries": 896,
+    "deletedEntries": 4,
+    "payloadFiles": 895,
+    "wholeAppReconstructionExact": true,
+    "nativeBootstrapOpsPausedWorkerPackageArchivesExternalDepsUnchanged": true,
+    "sourceBundleBuildAndExpectedTreeBindings": "6source review429 + own sourcefa15/treea41 and freshNext receipt3288/72067/log9c19/contractindexf412 + frozen publicdelta5c6fa/wholeapp89e + actualhostbuilddurable6760/b7d273 exactexecution + full actualimage verified against entire expectedapp",
+    "actualNativeExecutorSHA256": "8a2970e2cebc1f4b51bd228ab7fa53208e2d247030f46037991351115f12a3b5",
+    "nativeSourceSDKHonestHistorical": "64e5fa37667ac424ae87019c7609581dfc2ea364",
+    "SDKBuildPerformed": false,
+    "buildResourceEnforcementDirectlyObserved": false
+  },
+  "auditHashes": {
+    "image-audit.json": "9a2c36cb25f28d16093e543cf55826e8b6d8d61fcad4ef47445c227538b0f9a1",
+    "compatibility-manifest-audit.json": "5d481d2495559f53d0039561f4abf55dbd2040d2b5e7f53150a2e2a1eaefa900",
+    "context-audit.json": "d4d139bd44b1ebe4b40c86d0b4c26625d35b361066b2933a095e25c649285780",
+    "execution-record.json": "dcf6469b385da96f6f962d140f70f04c0f31bc6d6b2341f3c82aaf7ce50a9f1f",
+    "actual-compiled-inventory.json": "8b0e0f5fdd19ae391ba623035240e697e919d89f50eba10e16937740eea3def6"
+  },
+  "sourceQA": {
+    "commit": "fa15f00055207a0ef23ff12ad2630dc45fec7796",
+    "cases": 277,
+    "additionalPrivacyOracle": 3,
+    "TSC": 0,
+    "scope": "exact71cb freshsource evidence, not rerun here"
+  },
+  "mandatoryAutomatedCohort": {
+    "commit": "b1493680eed76bc24b26927f6ebae623fbfc44f8",
+    "distinctCases": 339,
+    "scope": "fresh71cb/311 B\u2013F scopedcontrolledautomated checks, not livequalification"
+  },
+  "remaining": {
+    "actualThreeLinuxPublicRuntimeRoles": "PENDING",
+    "activationReview": "PENDING",
+    "activation": "NOT_PERFORMED",
+    "newBuildHistorical": "PENDING",
+    "realOwnerGatorGIFUnsignedWallet": "PENDING; prior7b0 bothFAIL retained",
+    "originalA5OwnerWorkspace": "BLOCKED",
+    "normalMCPAuthentication": "BLOCKED_PRIOR_SIGNIN_ERROR",
+    "CUA": "HOLD_PENDING_USER_EXTENSION_UPDATE",
+    "directDiscoveryBrowser": "PRIOR_ERR_BLOCKED_BY_CLIENT_NO_STATUS_INFERRED",
+    "strictCompiledSemanticClosure": "FAIL_UNPROVEN_PRIOR_ATTRIBUTION_RETAINED"
+  },
+  "notPerformed": {
+    "DockerOrContainerExecution": true,
+    "productionHostCalls": true,
+    "privateArtworkOrDatabaseInputs": true,
+    "privateProgramReplay": true,
+    "browserActions": true,
+    "signingOrSubmission": true,
+    "runtimeOrActivationApproval": true
+  }
+}

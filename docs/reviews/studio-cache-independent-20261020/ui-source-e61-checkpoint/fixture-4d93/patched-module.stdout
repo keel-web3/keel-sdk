@@ -1,0 +1,34 @@
+TAP version 13
+# Subtest: owner handoff binds account wallet and saved operation without accepting a caller wallet
+ok 1 - owner handoff binds account wallet and saved operation without accepting a caller wallet
+  ---
+  duration_ms: 12.513208
+  type: 'test'
+  ...
+# Subtest: browser and agent review routes scope read and prepare, reject injected fields and sanitize failures
+ok 2 - browser and agent review routes scope read and prepare, reject injected fields and sanitize failures
+  ---
+  duration_ms: 35.686042
+  type: 'test'
+  ...
+# Subtest: hosted MCP prepares the same exact review only through the granted drafts writer
+ok 3 - hosted MCP prepares the same exact review only through the granted drafts writer
+  ---
+  duration_ms: 46.531458
+  type: 'test'
+  ...
+# Subtest: creator release handoff forwards cancellation to prepare and exact saved read
+ok 4 - creator release handoff forwards cancellation to prepare and exact saved read
+  ---
+  duration_ms: 7.834083
+  type: 'test'
+  ...
+1..4
+# tests 4
+# suites 0
+# pass 4
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 751.355666

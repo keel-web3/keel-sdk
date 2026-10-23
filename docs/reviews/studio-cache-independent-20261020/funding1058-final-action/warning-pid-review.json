@@ -1,0 +1,14 @@
+{
+  "schema": "keel.independent-actual1058-warning-pid-fixture-review@1",
+  "decision": "APPROVE_EXACT_ONE_CHARACTER_PID_BINDING_ONLY",
+  "reviewerId": "independent-release-reviewer",
+  "patchSHA256": "f00d1cd02a73fff0ce6a43953332233fbefcab08ddada5c174d9b90ff9e14f0f",
+  "beforeSHA256": "fdca7b778244ba2631d79821139b8af6598637ff3997dd2670791a735fb463c8",
+  "proposedSHA256": "9d160dbe351da7f45ff37e10deb417c05d2295ee98f78175225e7798816d47ed",
+  "actualSDKReceiptSHA256": "4090aeeb84256836ce09fae0955a91a7de100432864bf40169f34c2be724b224",
+  "change": "Only expectedNode43\u219244 processID digit. ActualSDK durable stderr exactly same twoDEP0040 lines with44; tree/HTTP remain noadditionalwarnings. Exactreverse bytes proven; all receipt/durable/observer/OOM/HTTP/golden assertions unchanged.",
+  "wildcardOrToleranceAdded": false,
+  "originalParserREDRetained": true,
+  "runtimeReplayRequired": false,
+  "activationApproved": false
+}

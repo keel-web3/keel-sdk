@@ -1,0 +1,117 @@
+{
+  "schema": "keel.independent-cache-cleanup-successor-review@1",
+  "decision": "BLOCK_NEW_LIVE_CWD_REFERENCE_GAP_NO_CLEANUP_ADMISSION",
+  "sourceCommit": "0e3cba39ef09228b8b70a3db9045074fe1ca24bc",
+  "evidenceCommit": "00f850c17d0d0a4f0613849766437f110ec74591",
+  "operatorSHA256": "72b647db286eeb16bef1c4c5e59f44fff8cfd6e1bc74289716132e5a91bbf1f3",
+  "priorFindingsClosed": [
+    "A missing cwd/exe no longer skips independent FD/maps/mount scans for a still-live process.",
+    "Move intent is persisted before rename; original/quarantine inode reconciliation handles post-mutation errors and restoration uncertainty."
+  ],
+  "independentExistingControls": {
+    "platform": "actual WSL Linux amd64",
+    "python": "3.12.3",
+    "counts": {
+      "cache": 31,
+      "heldImport": 4,
+      "originalReviewerRegressions": 2
+    },
+    "failures": 0,
+    "skips": 0,
+    "result": {
+      "path": "/Users/ravonus/dev/wt/studio-cache-independent-review-20261020/docs/reviews/studio-cache-independent-20261020/cache-cleanup-0e3/successor-linux.stdout",
+      "bytes": 2022,
+      "sha256": "b0426f4cee7829592ff69ec0f64f0430a19d2b2c5dca3e4a3015f607ceb32fe6"
+    }
+  },
+  "finding": {
+    "id": "CC3",
+    "file": "docs/reviews/studio-publication-20261019/release/routing-import-494d/cleanup-public-caches.py",
+    "line": 115,
+    "function": "no_references",
+    "severity": "blocking",
+    "problem": "cwd and exe are checked only against the original root path. After atomic quarantine, a process that entered a cache directory between scans keeps a cwd reference whose resolved path is now under quarantine, and can retain relative access despite the root-owned 0700 quarantine ancestor. The current second scan accepts this process.",
+    "reproduction": {
+      "syntheticRealDirectoryRename": {
+        "path": "/Users/ravonus/dev/wt/studio-cache-independent-review-20261020/docs/reviews/studio-cache-independent-20261020/cache-cleanup-0e3/quarantined-cwd.test.py",
+        "bytes": 1446,
+        "sha256": "5f361ecd5c23f5e9f09b433fc7c4bce07fc5564a4e385964c74ff906785b5512"
+      },
+      "actualLinuxOwnedChild": {
+        "path": "/Users/ravonus/dev/wt/studio-cache-independent-review-20261020/docs/reviews/studio-cache-independent-20261020/cache-cleanup-0e3/real-cwd-linux.stdout",
+        "bytes": 439,
+        "sha256": "61de3580d7ae78a704bd6fb12f802c9711b754a4cc938a63ed29bba82412e470"
+      },
+      "actualChildUID": 1000,
+      "actualChildAlive": true,
+      "quarantineUID": 0,
+      "quarantineMode": "0700",
+      "qualifiedCwdInodeMatches": true,
+      "relativeReadSucceededBytes": 1,
+      "guardRejected": false
+    },
+    "requiredChange": "Check cwd/exe target device and inode against the authenticated inode_set as well as original path relationships. Still-live unresolved references must remain fail closed."
+  },
+  "noProductionActions": true,
+  "cleanupApproved": false,
+  "imageImportApproved": false,
+  "activationApproved": false,
+  "scope": "Public-source tests used only owned temporary directories and child processes. No production caches, containers, images, volumes, artwork or database were changed.",
+  "evidence": [
+    {
+      "path": "/Users/ravonus/dev/wt/studio-cache-independent-review-20261020/docs/reviews/studio-cache-independent-20261020/cache-cleanup-0e3/successor-linux.stdout",
+      "bytes": 2022,
+      "sha256": "b0426f4cee7829592ff69ec0f64f0430a19d2b2c5dca3e4a3015f607ceb32fe6"
+    },
+    {
+      "path": "/Users/ravonus/dev/wt/studio-cache-independent-review-20261020/docs/reviews/studio-cache-independent-20261020/cache-cleanup-0e3/successor-linux.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/Users/ravonus/dev/wt/studio-cache-independent-review-20261020/docs/reviews/studio-cache-independent-20261020/cache-cleanup-0e3/successor-linux-process.json",
+      "bytes": 353,
+      "sha256": "ff120e32bd26978ebea205d6941681694681d6afe974fa768fd7b51c5556e133"
+    },
+    {
+      "path": "/Users/ravonus/dev/wt/studio-cache-independent-review-20261020/docs/reviews/studio-cache-independent-20261020/cache-cleanup-0e3/run-linux-successor.py",
+      "bytes": 4036,
+      "sha256": "769a8d386cc921819296f866da0b51a6a43f910cc414c9e9b9821f2dbab8db08"
+    },
+    {
+      "path": "/Users/ravonus/dev/wt/studio-cache-independent-review-20261020/docs/reviews/studio-cache-independent-20261020/cache-cleanup-0e3/quarantined-cwd.test.py",
+      "bytes": 1446,
+      "sha256": "5f361ecd5c23f5e9f09b433fc7c4bce07fc5564a4e385964c74ff906785b5512"
+    },
+    {
+      "path": "/Users/ravonus/dev/wt/studio-cache-independent-review-20261020/docs/reviews/studio-cache-independent-20261020/cache-cleanup-0e3/real-cwd-linux.stdout",
+      "bytes": 439,
+      "sha256": "61de3580d7ae78a704bd6fb12f802c9711b754a4cc938a63ed29bba82412e470"
+    },
+    {
+      "path": "/Users/ravonus/dev/wt/studio-cache-independent-review-20261020/docs/reviews/studio-cache-independent-20261020/cache-cleanup-0e3/real-cwd-linux.stderr",
+      "bytes": 160,
+      "sha256": "b92fcb44669e90165ec4e7817a765ec421d12eb63f729c0a5e5dc8da0efd3aa0"
+    },
+    {
+      "path": "/Users/ravonus/dev/wt/studio-cache-independent-review-20261020/docs/reviews/studio-cache-independent-20261020/cache-cleanup-0e3/real-cwd-linux-process.json",
+      "bytes": 145,
+      "sha256": "affd8ef4db96e69c706d73ab9bd72a4eb48f40864cfbdfb7862c5481b80f9532"
+    },
+    {
+      "path": "/Users/ravonus/dev/wt/studio-cache-independent-review-20261020/docs/reviews/studio-cache-independent-20261020/cache-cleanup-0e3/run-real-cwd-linux.py",
+      "bytes": 3858,
+      "sha256": "e8e7663bb6ac2feedda3afa3bd5bd44c0318432f3caacd608b1c206161ed7c4f"
+    },
+    {
+      "path": "/Users/ravonus/dev/wt/studio-cache-independent-review-20261020/docs/reviews/studio-cache-independent-20261020/cache-cleanup-0e3/real-cwd-linux-bootstrap.py",
+      "bytes": 28785,
+      "sha256": "a2f34e400999c116f01f4e894a0365ee6520ae6fbfe83dde58a0bf90a17e9fa5"
+    },
+    {
+      "path": "/Users/ravonus/dev/wt/studio-cache-independent-review-20261020/docs/reviews/studio-cache-independent-20261020/cache-cleanup-0e3/cleanup-public-caches-0e3.py",
+      "bytes": 19569,
+      "sha256": "72b647db286eeb16bef1c4c5e59f44fff8cfd6e1bc74289716132e5a91bbf1f3"
+    }
+  ]
+}

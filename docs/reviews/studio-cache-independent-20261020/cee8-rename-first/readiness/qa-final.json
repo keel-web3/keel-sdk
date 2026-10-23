@@ -1,0 +1,93 @@
+{
+  "schema": "keel.qa-observer-rename-first-cutover@1",
+  "result": "APPROVE_SCOPED_OBSERVER_ONLY_SOURCE_AND_TECHNICAL_CANDIDATE",
+  "recordedAt": "2026-10-21T00:52:23.635545+00:00",
+  "sourceCommit": "530be956447dd6d5a9fff70edc40e94bb52f0022",
+  "staticPacketCommit": "6acdbc0146077e233c302568b108d1ffdf81d781",
+  "operatorSHA256": "8c9584a951215a43b25d8f1599c69aed60553c80b7ab0f0ee6faebb01bce73ca",
+  "pendingPlanSHA256": "49e141ef5578d6f6ec5dff7021f43f8ceefcb998c15ea84d1856840a46dacfee",
+  "staticCommandsSHA256": "ed33fad64d5e17a140b854bf2b63392f7e40eaf8e884995a4121f1c1a0cde718",
+  "activationId": "07a4de5e-f373-49bb-9e05-952906a8c4a4",
+  "candidate": {
+    "site": "0c7b01e3acae5ec787568d6b5931b002654b4de0",
+    "sdk": "311d61526284248938e335d7ed879089408933be",
+    "buildId": "F2eKiuWl2rvz5hqBZQ9wi",
+    "image": "sha256:cee8c0b777f78372c6ee56bd9ff1c66dbeafd6393d04cb7f298fab6eb7bac9b7",
+    "nativeRemains": "D97/executor8a"
+  },
+  "freshFocusedTests": {
+    "mainAndRecovery": 13,
+    "unchangedOOM": 8,
+    "unchangedRecovery": 9,
+    "unchangedReviewerNameWaker": 1,
+    "successorTotalPass": 31,
+    "successorFail": 0,
+    "successorSkip": 0,
+    "baselineUnchangedWaker": "0PASS1FAIL expected and retained on original981b; not counted green"
+  },
+  "sourceIntegrity": {
+    "path": "source-integrity.json",
+    "sha256": "bff96e3608a1bde5339fa166c1e310d0f1fa30eebe71e33c843268b80f13e45a",
+    "unchangedGuardValidationFunctions": 14,
+    "onlyChangedFunctions": [
+      "main",
+      "recover"
+    ],
+    "allOtherModuleASTExact": true,
+    "unchangedSnapshotGuardOOMSupportAndMaintainedTestFiles": true,
+    "pendingAllFalseRejected": "required_approval_missing"
+  },
+  "expectedActual": {
+    "observedStopFirstWaker": "Actual baseline main reproduced oldrestart/portfailure and rollback under controlledDocker double",
+    "renameFirstMain": "Late currentnamewaker sees namegap and cannotrestart retiredold; exactcallordercreate/renameold/stopold/renamecandidate/startcandidate; publishedcandidate wake idempotent",
+    "lostResponses": "Before/aftereachrename/stop/start plus createafterapply allretained/recoveredwithoutglobalreplay",
+    "recoveryWaker": "CandidateCURRENT retiredtofailed beforestop; sameunchangedregressionbaselineRED\u2192successorPASS",
+    "retentionRenameReplyLost": "ReadsameauthenticatedID/name; no secondrename; stoponlyafterretirementconfirmed",
+    "foreignAndUnknown": "Foreigncurrent/rollback/failed preserved; unsafeoldrestore blocked",
+    "snapshotFailure": "No create/rename/stop; old remainsrunning",
+    "schemaApprovalsAndResources": "14originalfunctions/helpers byte/AST exact; actualpendingfalseapprovedflags rejected;8unchangedOOM9recovery pass"
+  },
+  "priorUnaffectedBindings": {
+    "actualSource89TSC": {
+      "path": "docs/reviews/studio-publication-20261020/qa-observer0c7/result.json",
+      "sha256": "31cfeb1ddc0af01c769e241d721592394184f68ce78e6dd467ea97f11e55b7ab",
+      "notRerun": true
+    },
+    "actualCEE8FullArchive": {
+      "path": "docs/reviews/studio-publication-20261020/qa-observer-actual-cee8/result.json",
+      "sha256": "197cf3a83fd16d0f351889bc0bcdc067dc370d799f50f5383a478a2ce44b7978",
+      "notRebuiltOrReaudited": true
+    },
+    "actualCEE8Linux3Roles": {
+      "path": "docs/reviews/studio-publication-20261020/qa-observer-cee8-runtime/qa-final.json",
+      "sha256": "4c307f5e8ae93dff80adec048bbacfe6dfce4a8ab9f49a8675760ecfa1e15ca9",
+      "unchangedImageEvidenceNotNewLiveProof": true
+    },
+    "consumed5895Failure": {
+      "path": "docs/reviews/studio-publication-20261020/qa-observer-cee8-cutover-failure/result.json",
+      "sha256": "795d2ab17cb7616bc4f79cf86722e2f20bc13b51e9ea9552ce26668d9bf3d230",
+      "mustPreserveFailedCandidateSnapshotAndOldLogs": true,
+      "cannotRetryOldPlan": true
+    }
+  },
+  "approvalScope": {
+    "observerOnlyTechnicalQA": true,
+    "newFinalExactPlanAndCommandAdmission": false,
+    "hostOrBrowserActionsByQA": 0,
+    "productionActivated": false,
+    "privateProgramReplay": false,
+    "signatures": false,
+    "submissions": false,
+    "operatorFixAuthoredByQA": false,
+    "requireNext": "Fresh finalplan/independentreviewer command admission, exactcurrentfa0baseline/paused/runner/snapshot/reserve guards; maximumonecutover,new07a4scope,noautomaticretry"
+  },
+  "strictCompiledClosure": "Original280FAIL protocoldefinition with source-attribution remainsretained; not fullnativeequivalence",
+  "livePublicationGate6": "FAIL_UNRESOLVED actualfe455ownGator/GIF; no simulationretry or walletrequest authorized",
+  "postDeployStillRequired": [
+    "newbuildprovenance",
+    "normalownerstatus/private diagnosticdownload",
+    "realownGator+GIFfullsimulation to unsignedwallet",
+    "freshhistoricalH on newbuild"
+  ],
+  "testEnvironment": "Darwin/officialPython3.14; realmain/recover code with explicitDocker/PG boundary doubles and ownedtempstageuid shim. No daemon/PG/privateprogram/hostexecution."
+}

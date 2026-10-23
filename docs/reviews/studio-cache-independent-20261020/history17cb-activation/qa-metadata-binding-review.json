@@ -1,0 +1,45 @@
+{
+  "schema": "keel.independent-runtime-receipt-binding-review@1",
+  "decision": "APPROVE_EXACT_METADATA_BINDING_CORRECTION_ONLY",
+  "reviewerId": "independent-release-reviewer",
+  "patchSHA256": "30ca2ca022458cf2ae8a3281252432b5f6d8cd945c49f265d298511650520274",
+  "beforeSHA256": "1cb131a6be19976e0a146f648426edf7079e383bdc5f42670e8a608b42ed708a",
+  "proposedParserSHA256": "5f39987377f1a01327acd430de4cae7585250d92b04c8246e82878b73d21c898",
+  "candidateIdentityBindings": "Image17cb/source71cb/buildjfj/current5c97 Configa519/rootfefa/tree89e substitute exact independently qualified target. Host/native/SDK/goldens/warnings/privacy thresholds unchanged.",
+  "exactDelta": "Actual13/14/15 stdout/stderr paths, results step selector, durable record filename/raw paths and complete actual dirfd reader argv. No product/reference/golden/guard assertions changed.",
+  "readerAttribution": "Actual reader opens verified root O_DIRECTORY|O_NOFOLLOW and exact basename relative to dirfd O_NOFOLLOW; verifies root/fileUID/GID0, file0600/nlink1/regular/capped size and exact read length. Expected remote reader hash function is no longer fabricated. Local independent metadataSHA and stdout==durable assertions remain strict.",
+  "preservedChecks": [
+    "Exactly7 durable metadata keys",
+    "Finite nonnegative elapsed time excluding bool",
+    "SSH pinned host identity and complete exact reader argv",
+    "Status0/PASS, image/source/build/full baseline, immutable owned ids stopped/OOMfalse",
+    "Exact2 Node43 DEP0040 warnings only; all other stderr forbidden",
+    "1360SDK/native8a/canonicalfactorygoldens/readerchrome/media/zero socket worker",
+    "20HTTP privacy checks and no native/RPC/production activation"
+  ],
+  "actualByteBindingsIndependentlyChecked": [
+    {
+      "role": "tree",
+      "bytes": 2540,
+      "sha256": "a786d3edb82f7a9b0903a251281a6295af811b6508551706e5ffe3fa1e1e2d90",
+      "durableByteExact": true
+    },
+    {
+      "role": "sdk",
+      "bytes": 40118,
+      "sha256": "1d94057b450051b639fa5820a89879031f16a1aa3697abcf6b4e17b5f67a66a2",
+      "durableByteExact": true
+    },
+    {
+      "role": "http",
+      "bytes": 15164,
+      "sha256": "77971fae894e80e6a5b8e593782486e0ac33bbfe681a747a6bfc1e67146756d6",
+      "durableByteExact": true
+    }
+  ],
+  "parserQualifiedExecutionNotYetClaimed": true,
+  "runtimeReplayRequired": false,
+  "activationOrLiveApproval": false,
+  "reviewerHostActions": 0,
+  "blockingFindings": []
+}

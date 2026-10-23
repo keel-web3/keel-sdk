@@ -1,0 +1,108 @@
+{
+  "schema": "keel.funding1058-exact-final-activation-commands@1",
+  "root": "/home/ubuntu/keel-studio-image-only-7016f46a-afaa-45c6-b459-33d3b3b3e078",
+  "candidate": {
+    "siteCommit": "d64027b868c1d038854b6181049785fe50da0dcb",
+    "sdkCommit": "311d61526284248938e335d7ed879089408933be",
+    "buildId": "IETVxBFih4T2X8_Bx9hK0",
+    "appImageId": "sha256:1058a269e6eec831d62945fe0b2623a2c25747a7a900b1e215b24691196ea3db"
+  },
+  "staticStageAlreadyVerified": true,
+  "staticStageVerificationPath": "/private/tmp/keel-1058-activation-actual-20261021/static-stage-verification.json",
+  "files": [
+    {
+      "name": "qa-final.json",
+      "localPath": "/private/tmp/keel-1058-activation-final-20261021/qa-final.json",
+      "stdinLocalPath": "/private/tmp/keel-1058-activation-final-20261021/qa-final.json",
+      "bytes": 9590,
+      "sha256": "7ab739a04fe363689f41e63742a5c0999b1bd0e1243c9b10dc996b2442ff3b50",
+      "installArgv": [
+        "/usr/bin/ssh",
+        "-o",
+        "BatchMode=yes",
+        "-o",
+        "ConnectTimeout=12",
+        "-o",
+        "StrictHostKeyChecking=yes",
+        "-o",
+        "UserKnownHostsFile=/Users/ravonus/dev/hashers/ops/servers/known_hosts",
+        "ubuntu@40.160.39.155",
+        "sudo -n /usr/bin/python3 -B -c 'import os,stat,hashlib,sys;from pathlib import Path;r=Path('\"'\"'/home/ubuntu/keel-studio-image-only-7016f46a-afaa-45c6-b459-33d3b3b3e078'\"'\"');s=r.lstat();assert stat.S_ISDIR(s.st_mode)and s.st_uid==0 and stat.S_IMODE(s.st_mode)==0o700 and r.resolve()==r;n=int(sys.argv[1]);expected=sys.argv[2];raw=sys.stdin.buffer.read(n+1);assert len(raw)==n and hashlib.sha256(raw).hexdigest()==expected;f=os.fdopen(os.open(r/'\"'\"'qa-final.json'\"'\"',os.O_WRONLY|os.O_CREAT|os.O_EXCL|os.O_NOFOLLOW,0o444),'\"'\"'wb'\"'\"');f.write(raw);f.flush();os.fsync(f.fileno());f.close();d=os.open(r,os.O_DIRECTORY|os.O_NOFOLLOW);os.fsync(d);os.close(d)' 9590 7ab739a04fe363689f41e63742a5c0999b1bd0e1243c9b10dc996b2442ff3b50"
+      ]
+    },
+    {
+      "name": "releaseReview-final.json",
+      "localPath": "/private/tmp/keel-1058-activation-final-20261021/releaseReview-final.json",
+      "stdinLocalPath": "/private/tmp/keel-1058-activation-final-20261021/releaseReview-final.json",
+      "bytes": 8482,
+      "sha256": "ae5c6ad015ea74a1763ec01e7534e8f9d68470ba637f590a369e95912e5296eb",
+      "installArgv": [
+        "/usr/bin/ssh",
+        "-o",
+        "BatchMode=yes",
+        "-o",
+        "ConnectTimeout=12",
+        "-o",
+        "StrictHostKeyChecking=yes",
+        "-o",
+        "UserKnownHostsFile=/Users/ravonus/dev/hashers/ops/servers/known_hosts",
+        "ubuntu@40.160.39.155",
+        "sudo -n /usr/bin/python3 -B -c 'import os,stat,hashlib,sys;from pathlib import Path;r=Path('\"'\"'/home/ubuntu/keel-studio-image-only-7016f46a-afaa-45c6-b459-33d3b3b3e078'\"'\"');s=r.lstat();assert stat.S_ISDIR(s.st_mode)and s.st_uid==0 and stat.S_IMODE(s.st_mode)==0o700 and r.resolve()==r;n=int(sys.argv[1]);expected=sys.argv[2];raw=sys.stdin.buffer.read(n+1);assert len(raw)==n and hashlib.sha256(raw).hexdigest()==expected;f=os.fdopen(os.open(r/'\"'\"'releaseReview-final.json'\"'\"',os.O_WRONLY|os.O_CREAT|os.O_EXCL|os.O_NOFOLLOW,0o444),'\"'\"'wb'\"'\"');f.write(raw);f.flush();os.fsync(f.fileno());f.close();d=os.open(r,os.O_DIRECTORY|os.O_NOFOLLOW);os.fsync(d);os.close(d)' 8482 ae5c6ad015ea74a1763ec01e7534e8f9d68470ba637f590a369e95912e5296eb"
+      ]
+    },
+    {
+      "name": "activation-plan.final.json",
+      "localPath": "/private/tmp/keel-1058-activation-final-20261021/activation-plan.final.json",
+      "stdinLocalPath": "/private/tmp/keel-1058-activation-final-20261021/activation-plan.final.json",
+      "bytes": 3448,
+      "sha256": "2083d6e4f233f3b5d0808d55398cd8599701ed76b915aecb7e18e7409730a8ba",
+      "installArgv": [
+        "/usr/bin/ssh",
+        "-o",
+        "BatchMode=yes",
+        "-o",
+        "ConnectTimeout=12",
+        "-o",
+        "StrictHostKeyChecking=yes",
+        "-o",
+        "UserKnownHostsFile=/Users/ravonus/dev/hashers/ops/servers/known_hosts",
+        "ubuntu@40.160.39.155",
+        "sudo -n /usr/bin/python3 -B -c 'import os,stat,hashlib,sys;from pathlib import Path;r=Path('\"'\"'/home/ubuntu/keel-studio-image-only-7016f46a-afaa-45c6-b459-33d3b3b3e078'\"'\"');s=r.lstat();assert stat.S_ISDIR(s.st_mode)and s.st_uid==0 and stat.S_IMODE(s.st_mode)==0o700 and r.resolve()==r;n=int(sys.argv[1]);expected=sys.argv[2];raw=sys.stdin.buffer.read(n+1);assert len(raw)==n and hashlib.sha256(raw).hexdigest()==expected;f=os.fdopen(os.open(r/'\"'\"'activation-plan.final.json'\"'\"',os.O_WRONLY|os.O_CREAT|os.O_EXCL|os.O_NOFOLLOW,0o444),'\"'\"'wb'\"'\"');f.write(raw);f.flush();os.fsync(f.fileno());f.close();d=os.open(r,os.O_DIRECTORY|os.O_NOFOLLOW);os.fsync(d);os.close(d)' 3448 2083d6e4f233f3b5d0808d55398cd8599701ed76b915aecb7e18e7409730a8ba"
+      ]
+    }
+  ],
+  "finalPlanSHA256": "2083d6e4f233f3b5d0808d55398cd8599701ed76b915aecb7e18e7409730a8ba",
+  "readOnlyPreflightArgv": [
+    "/usr/bin/ssh",
+    "-o",
+    "BatchMode=yes",
+    "-o",
+    "ConnectTimeout=12",
+    "-o",
+    "StrictHostKeyChecking=yes",
+    "-o",
+    "UserKnownHostsFile=/Users/ravonus/dev/hashers/ops/servers/known_hosts",
+    "ubuntu@40.160.39.155",
+    "sudo -n /usr/bin/python3 -B /home/ubuntu/keel-studio-image-only-7016f46a-afaa-45c6-b459-33d3b3b3e078/activate-image-only.py /home/ubuntu/keel-studio-image-only-7016f46a-afaa-45c6-b459-33d3b3b3e078/activation-plan.final.json"
+  ],
+  "executeArgv": [
+    "/usr/bin/ssh",
+    "-o",
+    "BatchMode=yes",
+    "-o",
+    "ConnectTimeout=12",
+    "-o",
+    "StrictHostKeyChecking=yes",
+    "-o",
+    "UserKnownHostsFile=/Users/ravonus/dev/hashers/ops/servers/known_hosts",
+    "ubuntu@40.160.39.155",
+    "sudo -n /usr/bin/python3 -B /home/ubuntu/keel-studio-image-only-7016f46a-afaa-45c6-b459-33d3b3b3e078/activate-image-only.py /home/ubuntu/keel-studio-image-only-7016f46a-afaa-45c6-b459-33d3b3b3e078/activation-plan.final.json --execute-approved-sha256 2083d6e4f233f3b5d0808d55398cd8599701ed76b915aecb7e18e7409730a8ba"
+  ],
+  "immutablePendingPlanPreserved": true,
+  "onlySevenPermittedFieldsUpdated": true,
+  "leadExecuteApprovedUnderCurrentUserAuthorization": true,
+  "reviewerExactCommandAdmissionPending": true,
+  "oneShotNoRetry": true,
+  "signing": false,
+  "artworkTransactions": false
+}

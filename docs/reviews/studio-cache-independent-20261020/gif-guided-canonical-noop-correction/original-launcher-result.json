@@ -1,0 +1,12 @@
+{
+  "schema": "keel-guided-review-launcher@1",
+  "category": "completed",
+  "exitCode": 0,
+  "stdoutObservedBytes": 0,
+  "stderrObservedBytes": 0,
+  "hardDeadlineSeconds": 45,
+  "perStreamByteCap": 65536,
+  "automaticRetry": false,
+  "databaseRestore": false,
+  "mayHaveCommittedReview": false
+}

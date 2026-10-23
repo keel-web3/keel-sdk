@@ -1,0 +1,14 @@
+{
+  "exitCode": 0,
+  "argv": [
+    "/usr/bin/ssh",
+    "-o",
+    "BatchMode=yes",
+    "-o",
+    "ConnectTimeout=8",
+    "windows",
+    "wsl -d Fray-Prover -- /usr/bin/python3 -"
+  ],
+  "payloadSHA256": "9ee41e097ca26d216f84aa563e48736fa357cabb96ada363ba26d5c08eb9071a",
+  "scope": "public-source tests in exclusive temporary root; no production host"
+}

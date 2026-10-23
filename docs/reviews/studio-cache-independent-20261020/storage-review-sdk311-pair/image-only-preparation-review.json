@@ -1,0 +1,26 @@
+{
+  "schema": "keel-independent-image-only-preparation-review@1",
+  "reviewerId": "cache-release-reviewer",
+  "sourceCommit": "3d814439b1d9fe1366c807995ea829f2030ca6ea",
+  "decision": "APPROVE_CANDIDATE_OOM_COMPARISON_SOURCE_ONLY_HOLD_OLD_B524_OPERATOR_DELTA_TUPLE",
+  "candidateOOMSHA256": "6621ff48fc02057d98d91ef5fd71e6e30eeea1ef847149170e316d9725e77c73",
+  "boundedOOMProjection": "Only candidate expected identityFalse / present actualNone under the exact fresh full unsupported-daemon profile; comparison copy only; original objects/full original hashes unchanged. No Running-only shortcut; true, zero, string, missing and all other field drift remain strict failures.",
+  "independentChecks": {
+    "oom": 8,
+    "current95ImageOnlyLifecycle": 8,
+    "delta": 5,
+    "fail": 0,
+    "actualHostActions": 0
+  },
+  "reviewedPreparationSHA256": {
+    "activate-image-only.py": "08a4bd2a2665c7a1bdf46aecbc45eb07fbb68005aed9479b0dd971bfd79915b0",
+    "prepare-delta.py": "05b8893d22469ed9e719a45fc43d84ea08a202a00a7b41c2a27149c8f743f7d9",
+    "scan-app.cjs": "0052bea161b10e1c3d304742b1acc98fe011de86cc339b21c88dfa63b4b6caab",
+    "candidate-oom-default.py": "6621ff48fc02057d98d91ef5fd71e6e30eeea1ef847149170e316d9725e77c73"
+  },
+  "holdReasons": [
+    "SDK b524 constants and unchanged-package constraints do not describe reviewed SDK311; exact six emitted-file and six archive correspondence must be bound in a successor.",
+    "No concrete new image/import/activation plan or actual new-image qualification was admitted by this source-only review."
+  ],
+  "activationAuthority": false
+}

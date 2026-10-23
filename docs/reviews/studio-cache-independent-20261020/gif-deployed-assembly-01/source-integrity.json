@@ -1,0 +1,16 @@
+{
+  "sourceCommit": "3e50d15bb74f939951de0cc0333a7baa9d8018c1",
+  "sdkCommit": "b524bf5fc19939c7523aada2e53f79e3360970ea",
+  "toolCommit": "0092d3c0f71d8be0090714d195c4506826e4023c",
+  "appSourcesVerified": 192,
+  "toolFilesVerified": 19,
+  "siteDomainFilesVerified": 45,
+  "siteDomainTreeSHA256": "8f78956f3993430eddbd6d5a70834531c9dabd35c43938add0c47659f3ddbac4",
+  "sourceInputsSHA256": "21f9457b2293deb1aaa75ab339f29c0b8d14cee00254e9b8208267f0e7408f55",
+  "toolFilesSHA256": "f51a49f4c7b9b0df3fc5159c0b5a60692bf49dda76728c3d0380003dec2f4b1a",
+  "bundleSHA256": "21fe4e7b4eab1e1ce4baa47868cb3a0d01b669db12038a879df6b0dbe2c58ac6",
+  "offlineImportExistingReceiptVerified": true,
+  "externalPackages": 14,
+  "compilerInvoked": false,
+  "rpcPerformed": false
+}

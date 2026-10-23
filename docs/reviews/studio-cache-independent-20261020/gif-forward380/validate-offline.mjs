@@ -1,0 +1,15 @@
+import assert from 'node:assert/strict';
+import {writeFileSync,readFileSync} from 'node:fs';
+import {createHash} from 'node:crypto';
+import {syncBuiltinESMExports} from 'node:module';
+import net from 'node:net';import tls from 'node:tls';import http from 'node:http';import https from 'node:https';import dns from 'node:dns';import cp from 'node:child_process';
+const events=[];const deny=(kind)=>(...args)=>{events.push(kind);throw Error('FORBIDDEN_OFFLINE_'+kind);};
+globalThis.fetch=deny('fetch');net.Socket.prototype.connect=deny('socket');net.connect=deny('net.connect');net.createConnection=deny('net.createConnection');tls.connect=deny('tls');http.request=deny('http.request');http.get=deny('http.get');https.request=deny('https.request');https.get=deny('https.get');
+for(const k of ['lookup','resolve','resolve4','resolve6'])dns[k]=deny('dns.'+k);
+for(const k of ['spawn','exec','execFile','fork','spawnSync','execSync','execFileSync'])cp[k]=deny('child.'+k);
+syncBuiltinESMExports();
+const m=await import('file:///private/tmp/keel-gif-forward-reference-20261020/docs/tools/gif-forward-reference/validate-retained.mjs');
+const value=await m.validate(m.load());assert.equal(events.length,0);assert.equal(value.result,'PASS_OFFLINE_CANONICAL_REFERENCE_ONLY');assert.equal(value.programExecuted,false);assert.equal(value.rpcRequests,0);
+const output={...value,independentNetworkAndChildGuard:{attempts:events.length,blockedAPIs:['fetch','net','tls','http','https','dns','child_process']}};
+writeFileSync('/private/tmp/keel-independent-forward380-20261020/retained-offline-result.json',JSON.stringify(output,null,2)+'\n',{flag:'wx',mode:0o600});
+console.log(JSON.stringify({result:value.result,networkOrChildAttempts:events.length,tokenURIBytes:value.tokenURIBytes,tokenURISHA256:value.tokenURISHA256,completeInputSHA256:value.completeInputSHA256,derivedDrop:value.derivedDrop}));

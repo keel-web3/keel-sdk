@@ -1,0 +1,51 @@
+{
+  "schema": "keel.independent-exact-funding1058-final-action-admission@1",
+  "decision": "APPROVE_ONE_EXACT_GUARDED_IMAGE_ONLY_CUTOVER",
+  "reviewerId": "independent-release-reviewer",
+  "commandPath": "/private/tmp/keel-independent-funding1058-20261021/final-activation.commands.admitted.json",
+  "commandSHA256": "21d4b94e1bf3c57e4ad9a51dbde3166800deefe3c023d37602591fd794a21af9",
+  "finalPlanSHA256": "2083d6e4f233f3b5d0808d55398cd8599701ed76b915aecb7e18e7409730a8ba",
+  "finalPlanBytes": 3448,
+  "pendingPlanSHA256": "feec1f532f82b63d575ebed21105512d064c3c0ecf02594588d78ff2e39a5231",
+  "QACommit": "033ee8bd94afeef006d19184fbb3e6af639f7877",
+  "QASHA256": "7ab739a04fe363689f41e63742a5c0999b1bd0e1243c9b10dc996b2442ff3b50",
+  "releaseReviewSHA256": "ae5c6ad015ea74a1763ec01e7534e8f9d68470ba637f590a369e95912e5296eb",
+  "root": "/home/ubuntu/keel-studio-image-only-7016f46a-afaa-45c6-b459-33d3b3b3e078",
+  "candidate": {
+    "siteCommit": "d64027b868c1d038854b6181049785fe50da0dcb",
+    "sdkCommit": "311d61526284248938e335d7ed879089408933be",
+    "buildId": "IETVxBFih4T2X8_Bx9hK0",
+    "appImageId": "sha256:1058a269e6eec831d62945fe0b2623a2c25747a7a900b1e215b24691196ea3db"
+  },
+  "operatorSHA256": "980300685d48fcd3456a5788292ea353033c7c6db0c9bbb7243dc118795eaf55",
+  "ownChecks": {
+    "onlyExactSevenPermittedFinalPlanFieldsDiffer": true,
+    "allOtherOperationalAndEvidenceImportFieldsDeepExactPending": true,
+    "allThreeRealPayloadLengthsHashesExact": true,
+    "QAAndReviewCopiesByteExactOriginals": true,
+    "threeRootOwnedExclusiveNofollow0444FileAndDirectoryFsyncReceivers": true,
+    "existingReadOnlyPreflightExactPath": true,
+    "executeOnlyExactPlanDigestAddition": true,
+    "actualSourceValidateFinalPASSAndPendingRequiredApprovalReject": true,
+    "staticSevenActualFreshVerificationBound": true
+  },
+  "admittedSequence": [
+    "Install exactthree latefiles using packet.files.installArgv and exactstdin bytes; no staticstage/root/role replay",
+    "Run exactreadOnlyPreflightArgv; requirePASS all existing freshfullc63/CEE8/D97/socket/pause/healthy/daemonprofile/namesunused/reserveguards",
+    "Execute exactexecuteArgv ONCE with2083 planhash under sameexisting guards/lock; successfuldurable bounded snapshot beforecandidatecreate; rename-before-stop main+guardedrecovery unchanged"
+  ],
+  "maximumCutoverExecutions": 1,
+  "automaticRetryAllowed": false,
+  "failureRule": "Stop on anynonzero/uncertainty/guardfailure; retain consumedclaim/receipts/snapshot/candidate/rollback, use only already-reviewed authenticated recovery in operator; no changednames/repin/replay.",
+  "leadAuthority": "Root explicitly authorizes this exactordinary image-onlycutover under existinguserdeploymentauthorization.",
+  "operationalScope": "Image+rolloutLabels only; keepSDK311/nativeD97/runner/socket/backendEnv/catalog/factories/migrations/data/pausedworker unchanged; nocleanup/signing/artworktransaction/privatepreparationorRPCreplay.",
+  "postdeploymentRequired": [
+    "Independentactualimage/source/build/1360SDK/native8a/fullConfigHostMounts/healthy/pause/D97/socket/oldc63stoppedrollback checks",
+    "Newretainedsnapshot fullhash/PGDMP/boundedprivateTOC verification, no restore; keep latest07a4",
+    "Normalauthenticated historicalH plus ownexactGator and realGIF fullsimulation\u2192unsignedwallet; no signatures/spend/staleprogram replay/blockedaccess workaround"
+  ],
+  "liveGate6Approved": false,
+  "compiledWholeNativeEquivalenceClaimed": false,
+  "reviewerHostActions": 0,
+  "blockingFindings": []
+}

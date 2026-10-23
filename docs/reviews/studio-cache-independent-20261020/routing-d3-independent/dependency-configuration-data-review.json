@@ -1,0 +1,120 @@
+{
+  "schema": "keel-independent-dependency-configuration-data-review@1",
+  "decision": "APPROVE_EXACT_CONFIGURATION_DATA_FOR_CLONE_AND_OPERATOR_PREPARATION_ONLY",
+  "productionMutationOrActivationApproved": false,
+  "catalogDelta": [
+    "compact.collectionCreationCodeHash only:0182d140506795efa1e8e009f9eae5b04fe3bc5a179387fa366c6118be563f0f to0504f9bc293efe4137a0b54744e879ea5b4a47745b04861f56981e300fd397fb",
+    "Add imagePresentation924c5fA733CF9eF24dc7b355261660dddb24cb1D/runtime3605de5ffc3c243724537e639fbb9feca2d3fe90091d70758e377ae254a9393d/actualtx0cedbca40d4920e0cbbc19c575fd3a436c7f5ca23e9f5f3aea70b69aa34641ff"
+  ],
+  "allOtherCatalogFieldsDeepEqual": true,
+  "factoryRow": {
+    "id": "f4efbc67-5dc2-4c1d-9dcf-e8247e351165",
+    "chain_id": 11155111,
+    "kind": "factory",
+    "address": "0xa1496dcee98fcf986bee0e105439e684d79e37fd",
+    "label": "KEEL native media compatible factory 20261020",
+    "start_block": 11956740,
+    "enabled": true
+  },
+  "oldFactoryRowsPreserved": true,
+  "receiptBindingsVerifiedLocally": true,
+  "offlineActualParserAndSelection": {
+    "scope": "Offline exact-source parser and selector; no DB/network/config mutation",
+    "sourceCommit": "d3cdaf2b5b3822454353215c23eff7d8af9deb97",
+    "parserSHA256": "4a04132808bc7dd1fdb9b915f5a5a101c74f6009d789e56d9e8fa7a810f356d4",
+    "selectorSHA256": "0b9a618701845a35af83847dec1c4f25b9ef5cdad9f43922ca5806ffc2df0a91",
+    "catalogParse": true,
+    "exactTwoFieldDelta": true,
+    "newestFactorySelection": true,
+    "disabledRowRestoresOldSelection": true,
+    "tiedDistinctFactoryRejected": true,
+    "activationApproval": false
+  },
+  "orderingReview": {
+    "oldContainerOwnsPostgres": "Stopping the old container also stops that DB process; recovery must identify which already-owned container can execute the CAS. No unrelated DB daemon or volume change is implied.",
+    "preStopInsertCaveat": "Do not claim every old-app request fails closed in a mixed DB/catalog interval. Production cacc release-service.ts3192-3196 runs its compact factoryhash gate only for supply other than1; old catalog lacks imagePresentation, so the later image check is not universal.",
+    "acceptablePreparationDirection": "A candidate supervisor startup hook may apply bounded transaction-scoped factory CAS after its owned PG is ready and before Studio/worker/host router starts, if the exact supervisor ordering, bootstrap SQL, image provenance and failure behavior are independently shown. No such operator is approved here.",
+    "casRules": [
+      "Fresh exact relevant row-set before-image under the exclusive rollout scope; reject unexpected rows, id/address collisions or drift.",
+      "Insert only exact rowf4efbc67-5dc2-4c1d-9dcf-e8247e351165 at actual receipt startBlock11956740; do not update or delete old rows.",
+      "A repeated candidate startup may accept only an already-applied exact tuple; it must not silently reactivate a disabled rollback row.",
+      "Verify immutable hash-named new catalog before using its explicit new-container env binding. Preserve original catalog file and original absent binding."
+    ],
+    "rollback": "Disable only the exact unchanged owned new row while candidate DB is available before stopping it when possible. If the candidate is already dead, exact old restart/PG-ready/CAS repair must be bounded and durably recorded; do not declare rollback healthy while the new row remains active. Address any old-app traffic interval with concrete sequencing or proven safety, not an assumed universal fail-closed gate.",
+    "staleRollbackProposal": "The reviewed rollback.json still orders CAS disable before old restart. Update it to the selected executable DB-owner sequence and bind the new hash in the future operator plan.",
+    "wholeDatabaseRestore": false
+  },
+  "remainingSeparateGates": [
+    "Frozen corrected routing source and independent affected QA.",
+    "Exact new application/config/startup image and concrete activation+CAS rollback operator review.",
+    "Receipt-bound clone applies this exact catalog/row, then unchanged normal full GIF compiler/proof; no fixture success substituted.",
+    "Production rollout still requires lead/QA/release exact plan gates; deployed own Gator/GIF unsigned wallet and historical authenticated decode/canvas evidence remain distinct."
+  ],
+  "boundFiles": [
+    {
+      "path": "/private/tmp/keel-dependency-configuration-20261020/before-image.json",
+      "bytes": 1716,
+      "sha256": "f0cf92670506726634918fc705c7efd861b87380e9d42134d05daaa43b33fcbe"
+    },
+    {
+      "path": "/private/tmp/keel-dependency-configuration-20261020/catalog.before.json",
+      "bytes": 12408,
+      "sha256": "16e9a686827d500eb2a85803e48820244abdd12ef1e35f21ee7dd1c7988df191"
+    },
+    {
+      "path": "/private/tmp/keel-dependency-configuration-20261020/catalog.proposed.json",
+      "bytes": 12694,
+      "sha256": "2d54c8a4ab1e3360fdf702af0113c27739dcddf44abd4e0682f68606005652d7"
+    },
+    {
+      "path": "/private/tmp/keel-dependency-configuration-20261020/chain-contracts-change.proposed.json",
+      "bytes": 1721,
+      "sha256": "9b066d8f9e7dbf45ec2afcddf2076e9d8a256c001c0b40ad8c28915b672664ad"
+    },
+    {
+      "path": "/private/tmp/keel-dependency-configuration-20261020/rollback.json",
+      "bytes": 984,
+      "sha256": "095aa02258fb694eddb8a908040b0efa963aa6b5b0b535a967b45ba3c26a5ee0"
+    },
+    {
+      "path": "/private/tmp/keel-dependency-configuration-20261020/owner-validation.json",
+      "bytes": 435,
+      "sha256": "863164076116b457648f5b97e2e15c58069a7350b8e4a3c765a441d2ddfcb6ad"
+    }
+  ],
+  "qaEvidence": [
+    {
+      "path": "/Users/ravonus/dev/wt/studio-publication-20261019/qa-final/keel-site/docs/reviews/studio-publication-20261019/qa/factory-chain-receipt-02/result.json",
+      "bytes": 5918,
+      "sha256": "c0425996586df9e3bf429cec1a716f4b9f39ae1608707f059c07b2080be8cb5d"
+    },
+    {
+      "path": "/Users/ravonus/dev/wt/studio-publication-20261019/qa-final/keel-site/docs/reviews/studio-publication-20261019/qa/factory-chain-receipt-02/children-result.json",
+      "bytes": 12399,
+      "sha256": "7c53899fdbe19d35f3faea1621084eae14e88d55902de0053e1d4550e585a5dc"
+    },
+    {
+      "path": "/Users/ravonus/dev/wt/studio-publication-20261019/qa-final/keel-site/docs/reviews/studio-publication-20261019/qa/native-media-chain-receipt-03/result.json",
+      "bytes": 5879,
+      "sha256": "6ca5803fa8c27bc0ca659ea1b3c2296c0e01e4bd3bcabb732010776dd64d7cfd"
+    }
+  ],
+  "oldProductionSource": {
+    "siteCommit": "cacc1555beab35ebf123448d539439989a54b36c",
+    "file": "apps/studio/src/server/services/release-service.ts",
+    "sha256": "6681ab22cd38bc640fda596eb96735d06f6a76524fccb5b838dc53e8ffe1c83d",
+    "lines": [
+      3192,
+      3196,
+      3211,
+      3229
+    ]
+  },
+  "reviewer": {
+    "network": false,
+    "signing": false,
+    "submission": false,
+    "dbOrCatalogMutation": false,
+    "productionSourceEdits": false
+  }
+}

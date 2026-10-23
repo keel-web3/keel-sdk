@@ -1,0 +1,163 @@
+{
+  "schema": "keel.independent-observer-only-release-review@1",
+  "decision": "APPROVE_OBSERVER_ONLY_CANDIDATE_FOR_SEPARATELY_REVIEWED_IMAGE_ONLY_CUTOVER",
+  "reviewerId": "independent-release-reviewer",
+  "independentReleaseReview": true,
+  "candidate": {
+    "siteCommit": "0c7b01e3acae5ec787568d6b5931b002654b4de0",
+    "sdkCommit": "311d61526284248938e335d7ed879089408933be",
+    "buildId": "F2eKiuWl2rvz5hqBZQ9wi",
+    "appImageId": "sha256:cee8c0b777f78372c6ee56bd9ff1c66dbeafd6393d04cb7f298fab6eb7bac9b7"
+  },
+  "actualImageDescriptor": {
+    "imageBytes": 713038494,
+    "configSHA256": "b8ddaf6d68e76ad758ee46b7c8407b480dfb146113ba0f31a43f10943d80a38b",
+    "rootFSSHA256": "089fc8c7150dc9b4a5c209773ed4d715f2bbac89511814ceb0387e6e4c1b00be"
+  },
+  "sourceFreeze": "b2aa74104 (evidence only; runtime0c7 and operator981b unchanged)",
+  "scope": "Intermediate owner-bound saved-plan status/private diagnostic UI observer only. Does not qualify or claim a fix for failing artwork publication.",
+  "qa": {
+    "commit": "25d3f9456e452ed211e68bde6cffd594990d7112",
+    "path": "/tmp/keel-qa-receipt-activation-20261020/keel-site/docs/reviews/studio-publication-20261020/qa-observer-cee8-runtime/qa-final.json",
+    "sha256": "4c307f5e8ae93dff80adec048bbacfe6dfce4a8ab9f49a8675760ecfa1e15ca9",
+    "source89AndTsc": "PASS exact0c7/311, prior sourcewave attribution retained",
+    "actualArchive": "PASS exact42blobs/40layers/38parent/fullConfig/36065tree/1360SDK311; result197cf3a83fd16d0f351889bc0bcdc067dc370d799f50f5383a478a2ce44b7978",
+    "actualPublicRoles": "Fresh actualCEE8 Linux tree/SDK/HTTP PASS; root operator and independent pure receipt audits",
+    "parserRetargetReview": "APPROVE e912888 binding-only candidate/raw-layout retargets and stronger assertions; original exactNode43warning exception retained, no weakened status/authority/HTTP/golden/OOM assertion"
+  },
+  "actualBuildReceiptSHA256": "63997bc00ab617cfbeabc95ffa510fe0ea889348e8d313a7db3b1e7d7c38a620",
+  "fullSave": {
+    "bytes": 713080832,
+    "sha256": "4c3c46568867ad1236f4834988b9a9f87fb318098c760e6a036cb8a77228e9a1"
+  },
+  "fullApp": {
+    "entries": 36065,
+    "sha256": "9df3273c29d50154dfb783ef05b419317b803e47b847dbf7170d98d3fde74438",
+    "onlyExternalSdkOrDependencyDifferences": [],
+    "nativeOpsBootstrapPublisherExactFe455": true
+  },
+  "actualPublicRoleReceipts": [
+    {
+      "role": "tree",
+      "bytes": 2539,
+      "sha256": "99705aa32c08764aae69860555cd279f67fe49e19852182dfe8527480ed148dc",
+      "durableBytesExactStdout": true,
+      "status": "PASS",
+      "exitCode": 0,
+      "retainedStoppedId": "87a356f79626853bc36788c177e1a71d881a640101e032894a4ffcf7a7dbf1c5",
+      "elapsedSeconds": 8.13035945314914,
+      "observerSamples": 0,
+      "cgroupPeakBytes": null,
+      "allObservedOomCountersZero": true
+    },
+    {
+      "role": "sdk",
+      "bytes": 40145,
+      "sha256": "8f138fc8d49872b8e0901be0e298f4f623ce0ea10fe5d6a91c7606d2d478e77f",
+      "durableBytesExactStdout": true,
+      "status": "PASS",
+      "exitCode": 0,
+      "retainedStoppedId": "aa347ccaf601582e75cee433b196b6d4f8a808d8ec9d4f7b282726083be1b9bb",
+      "elapsedSeconds": 6.150425722822547,
+      "observerSamples": 15,
+      "cgroupPeakBytes": 315383808,
+      "allObservedOomCountersZero": true
+    },
+    {
+      "role": "http",
+      "bytes": 15262,
+      "sha256": "14cc0f61f4e80fbd2b0e28897b9331dcb10ecbb3df7f742f53357fe9ccdc30ec",
+      "durableBytesExactStdout": true,
+      "status": "PASS",
+      "exitCode": 0,
+      "retainedStoppedId": "1dd0aae8c1b14cc6c41fe14e820bbf0d695e8280d9e034364f952d803bbfd2c8",
+      "elapsedSeconds": 8.595651286887005,
+      "observerSamples": 21,
+      "cgroupPeakBytes": 271130624,
+      "allObservedOomCountersZero": true
+    }
+  ],
+  "independentTerminalAuditSHA256": "edc542e05cdebd502c36aa53c1044fed2d9f30c6f003f1a1b0cf3b84a60f4dba",
+  "sourceReviewSHA256": "4a077b245468767499af6a0e8b879045d9e3533a169cbad86d70e2a47c9cddca",
+  "publicRoleAdmissionSHA256": "d3a8eaebc26c20f42a3c7c2f54854df9fe3f5ada63bf489c346a127193d1f01b",
+  "staticAdmissionSHA256": "eb1201f683a3f9e6c75c9a267f567c9ea609fc011fc2fb586ae5146e147a59c6",
+  "operator": {
+    "sha256": "981b482694d7db031d869d7c271487033c28f37b1ef3679528ab4150fbda42b7",
+    "files": {
+      "reviewed-activation-support.py": "a1594559c2c04159ac94827d0f4f2a991310fb06648379bca6081d5ce6a98de1",
+      "guarded-deployment-checks.py": "b5f7d764b6c05db503a23ea63ca21a36bfcb0f17cc8292444d790d4a8aad6e00",
+      "candidate-oom-default.py": "6621ff48fc02057d98d91ef5fd71e6e30eeea1ef847149170e316d9725e77c73"
+    },
+    "snapshotSupervisorSHA256": "5d8d56588eba290773961d74152baf3728ffd2e00a75894beed92d38af06706e",
+    "pendingPlanSHA256": "72eb6810dc906f0a55e1c0e419b4ca3ad11492e7384ab139f92931248ecc5913",
+    "sourceDifference": "Only current image/container constants vs prior reviewed e548; all cutover/snapshot/recovery logic unchanged",
+    "existingCurrent": {
+      "id": "fa0eb0299164407e24e1cda31b21b196ea8a8071a1a39ce71efd414234ef1659",
+      "image": "sha256:fe455169d3d10b37696ed17053ff0be167649f5a490acd7e4cea61c2412d6ccb",
+      "configSHA256": "4b0d3c5b22fb8d7c5550d8fc6bc84a8d9528fbf1737e2aa3ce72f16a231e39a2",
+      "hostConfigSHA256": "186e487039113f582118064bce13b98c79f75eca5b3fa0d788c7d79b8fb14049",
+      "mountsSHA256": "74cc304b0955c822f88ffdbcbff56d89857f5ea3d7c51246ec106f00247ade89"
+    },
+    "runner": {
+      "id": "434316eff6e19951807f95ba8aee03a4db684d760039dfeb723c7bf9203a8649",
+      "image": "sha256:d97ddf2aba94cb963646fdf05bc8dc8c99b7e69b8c19bad85c06bea7c67fc9f5",
+      "configSHA256": "23f5b528017bd47ac37f47ea6d4a56efd3926e4ca1fa0aad13f02652b1570113",
+      "hostConfigSHA256": "6fc9390416de4dd4ff6872f14b3430c76838f6bcef8abd428b6c63fd3d55dd82",
+      "mountsSHA256": "07f01d55cebb43e5ed07f5bdcafc33bf85d6a294839179d72e9ba5121609937f"
+    },
+    "socket": {
+      "Name": "keel-studio-proof-socket-2779804f-f8fe-4fcd-8153-f45ad70b03b6",
+      "Driver": "local",
+      "Options": {
+        "device": "tmpfs",
+        "o": "size=16m,uid=999,gid=999,mode=0700,noexec,nosuid",
+        "type": "tmpfs"
+      }
+    },
+    "changes": {
+      "image": true,
+      "rolloutLabels": true,
+      "runner": false,
+      "backendEnvironment": false,
+      "catalog": false,
+      "factories": false,
+      "migrations": false,
+      "data": false
+    },
+    "reserveBytes": 1073741824,
+    "snapshotBudgetBytes": 268435456,
+    "freshSnapshotBeforeCreate": "Require successful bounded durable PGdump supervised owned groupTERM150/KILL155s with host180s bound;256MiBbudget and file/dirfsync/partialfailure preservation; no cutover if failed",
+    "candidateOnlyOomProjection": "Presentnull versus explicitFalse only under fresh pinned exact daemon capabilityprofile; strict other fields/types/complete mounts",
+    "recovery": "Authenticate exact image/config/mounts/labels before stopping onlyownedcandidate; preserve foreignoccupants; restore exactfa0/fe455 only after ownedapps stopped and D97 unchanged; no datarestore or runner/catalog/factory mutation",
+    "retention": "All prior old95/a53 snapshots and previous failed/successful scopes remain; no cleanup or image/container/volume deletion"
+  },
+  "compiledProofStatus": {
+    "strict280": "FAIL_UNPROVEN_SDK311_PROTOCOL_BARREL_MODULE_RETAINED",
+    "attributionSHA256": "59d176592acadeaed7f1ab61117faae415ebd6e5a39f5fdfa068036fd68df9e6",
+    "source156ProtocolInputsExact311": true,
+    "wholeCompiledEquivalenceApproved": false,
+    "nativePublicationCapacityApproved": false,
+    "basisForObserverOnly": "Source-reviewed read-only observation delta; actualcompleteartifact/SDK/goldens/privacy roles qualify this intermediate diagnostic UI deployment. No inferred fix or full-native equivalence."
+  },
+  "blockingFindingsForObserverOnlyCutoverReadiness": [],
+  "leadExecutionAuthority": "Root separately owns observer-only cutover under existing user deployment authority; final exactplan and commands must still be independently reviewed",
+  "finalExactPlanReviewStillRequired": true,
+  "activationExecutionCommandAdmitted": false,
+  "permittedEvidenceBinding": {
+    "independentQA": "Only exact current4c307f above",
+    "independentReleaseReview": true,
+    "leadExecuteApproved": "Separately by lead"
+  },
+  "remainingAfterSeparatelyAdmittedCutover": [
+    "Independent actualimage/build/completecandidateconfiguration/oldfa0rollback/D97/socket/paused/reserve/snapshotreadbacks",
+    "Existing normal authenticated ownerUI saved-status/private diagnostic download; no alternate directblockedAPI/admin/hosttrace/cookie bypass",
+    "Determine exact retained failure cause before new preparation request; no replay authorized by this review",
+    "After cause/fix review, primary delivery still needs actualnormal ownGator/GIF fullnative to unsignedwallet plus historicalrender on exactdeployedbuild"
+  ],
+  "Gate6": "FAIL_UNRESOLVED_LIVE_GATOR_GIF_PREPARATION_FAILURES",
+  "overallPublicationAcceptance": false,
+  "privatePreparationReplayApproved": false,
+  "signing": false,
+  "submission": false,
+  "reviewerHostOrBrowserActions": false
+}

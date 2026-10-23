@@ -1,0 +1,72 @@
+{
+  "schema": "independent-current49d-sdk-source-compatibility@1",
+  "result": "PASS",
+  "sdkCommit": "b524bf5fc19939c7523aada2e53f79e3360970ea",
+  "qualifierDistSHA256": "2d3cbc48ef553d5eaca71834c921e9169bc6886ae07c8f042d1a6b66f501394d",
+  "fixtureSHA256": "5fd56b1f8e53c1b3d8d6c7c6d24c7ea49d80bbf10ecfbbb02f386521a3684bf0",
+  "staticPacketSHA256": "ef45b0d16c25698af7691005be8a883ccddaff9f0ac189408f4f2a1a6c86f324",
+  "verifiedCompilerRuntimeTuple": [
+    {
+      "role": "library",
+      "address": "0x368c3d58D4409774ba6014C97778F22E3cffaC35",
+      "bytes": 4683,
+      "sha256": "0c0378cd53af45c0b9a0df29db7615bf122fc0ac68cc59918efcb98593293584",
+      "keccak256": "0xd7d042765a972c73fac3a803a10874591793e54ccac7f6405b9fe851bf07e928"
+    },
+    {
+      "role": "factory",
+      "address": "0xa1496dCEe98FCF986Bee0e105439E684D79e37FD",
+      "bytes": 4563,
+      "sha256": "526bdb9a141827bd0fc1223c4c614fc2365c92e3e6d1dd2d077349d29738016a",
+      "keccak256": "0xfea1d1c22f57fdac48ad13f4b90dc041c1489471f055591efc9587fddc3a7b7b"
+    },
+    {
+      "role": "deployer",
+      "address": "0xC92a327def73Ef466A259B71f400c454f7d0cCCC",
+      "bytes": 1203,
+      "sha256": "f19bff41330fc4a2662d21f843846fa15db87d64430a84d1461b0e31ecb8e9de",
+      "keccak256": "0x6dda1c3b65383dcc4e6fc1037047264ab00f2d769b89384c4f326845cafbe16d"
+    },
+    {
+      "role": "carrier0",
+      "address": "0xe47A237B3eEd893C22137656eE94fB6Dc6290c8A",
+      "bytes": 13182,
+      "sha256": "9a8bb30facfef12d7fb7361d6c88220f5855485e57d01c39e36c46f7d464a364",
+      "keccak256": "0xfc1fcfb459fcf8f29bd0c690a4a2872d2df7415d706fc4b5619b6f6ec0752680"
+    },
+    {
+      "role": "carrier1",
+      "address": "0x00dCb304b099CcBd95f280C17210eC54E90DC39C",
+      "bytes": 13182,
+      "sha256": "c682f73d50bcf59d556f4b22e8d57ba1772ed8dfdd267757c03f7ec8c4add983",
+      "keccak256": "0xd95fad84b509214bcd86b322c364c8ab2641006ac41b2412f0139a25a87ef817"
+    }
+  ],
+  "collectionCreation": {
+    "bytes": 26364,
+    "sha256": "ee0402f5c708d3255d7e7e15030a99372ecb7eb70dbe76e1d67d778db4cdf796",
+    "keccak256": "0x0504f9bc293efe4137a0b54744e879ea5b4a47745b04861f56981e300fd397fb"
+  },
+  "fingerprints": {
+    "factory": "0xb01f2470dabda7abb69504a82b7e0b5a8ce2d39b9f513d5910b423a27de73f15",
+    "deployer": "0x4b5bc008b1c3d73cf34bee82a23e8d0ce40ff486c516ed04718fcb03f2932e7b",
+    "collection": "0x7f636ad8e43975569ee1c2c2a00aea3bb441b89bb57f0e6b998a8bdbd2e68bf1",
+    "library": "0xd7d042765a972c73fac3a803a10874591793e54ccac7f6405b9fe851bf07e928"
+  },
+  "actualNativeTopRuntimeEquality": true,
+  "qualifiedSourceTuple": true,
+  "exactLargeEnvelopeCapability": {
+    "prefixBytes": 256001,
+    "suffixBytes": 2042,
+    "prefixMaxBytes": null,
+    "requiresFullSimulation": true
+  },
+  "changedLibraryNegative": "KEEL_PREPARED_ENVELOPE_UNQUALIFIED",
+  "offlineAdapterReads": 29,
+  "networkRequests": 0,
+  "current49dChildrenActuallyReadBack": false,
+  "originalGIFCompilationPerformed": false,
+  "originalGIFQualified": false,
+  "activationApproved": false,
+  "scope": "Expected compiler bytes from exact ef45 tuple only. Offline qualifier identity compatibility, not public state, receipts, deployed child runtime or normal GIF live proof."
+}

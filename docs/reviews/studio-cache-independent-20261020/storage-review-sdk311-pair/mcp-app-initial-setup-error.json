@@ -1,0 +1,7 @@
+{
+  "phase": "before-test-start",
+  "shellExit": 1,
+  "cause": "Reviewer parallelized output-directory creation with the app command; output directory did not yet exist when shell redirected stdout. No app test ran.",
+  "stderr": "zsh:1: no such file or directory: /private/tmp/keel-independent-storage311-20261020/mcp-app.stdout\nzsh:3: no such file or directory: /private/tmp/keel-independent-storage311-20261020/mcp-app.exit\n",
+  "correction": "Run exact app command after directory exists; no assertion/source changes."
+}

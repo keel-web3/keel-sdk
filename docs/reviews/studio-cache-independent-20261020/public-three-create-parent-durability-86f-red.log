@@ -1,0 +1,48 @@
+TAP version 13
+# {"mode":"prepare","syncs":[{"directory":"/private/var/folders/zk/40xbztxx7tb90tl4nnryd2780000gn/T/keel-review-parent-sync-9Uoc6f/parent-durability-case","childExists":true},{"directory":"/private/var/folders/zk/40xbztxx7tb90tl4nnryd2780000gn/T/keel-review-parent-sync-9Uoc6f/parent-durability-case","childExists":true},{"directory":"/private/var/folders/zk/40xbztxx7tb90tl4nnryd2780000gn/T/keel-review-parent-sync-9Uoc6f/parent-durability-case","childExists":true}],"reads":1,"actualNetwork":0}
+# Subtest: prepare: actual run entry is parent-directory synced before first RPC
+not ok 1 - prepare: actual run entry is parent-directory synced before first RPC
+  ---
+  duration_ms: 41.017
+  type: 'test'
+  location: '/Users/ravonus/dev/wt/studio-cache-independent-review-20261020/docs/reviews/studio-cache-independent-20261020/public-three-create-parent-durability.test.mjs:10:41'
+  failureType: 'testCodeFailure'
+  error: 'The newly created run directory entry must be synced in its containing base AFTER mkdir and BEFORE any RPC; syncing only files within the child does not persist its parent entry'
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: true
+  actual: false
+  operator: '=='
+  stack: |-
+    TestContext.<anonymous> (file:///Users/ravonus/dev/wt/studio-cache-independent-review-20261020/docs/reviews/studio-cache-independent-20261020/public-three-create-parent-durability.test.mjs:22:10)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async startSubtestAfterBootstrap (node:internal/test_runner/harness:296:3)
+  ...
+# {"mode":"execute","syncs":[{"directory":"/private/var/folders/zk/40xbztxx7tb90tl4nnryd2780000gn/T/keel-review-parent-sync-mPQ4Ve","childExists":false},{"directory":"/private/var/folders/zk/40xbztxx7tb90tl4nnryd2780000gn/T/keel-review-parent-sync-mPQ4Ve/parent-durability-case","childExists":true},{"directory":"/private/var/folders/zk/40xbztxx7tb90tl4nnryd2780000gn/T/keel-review-parent-sync-mPQ4Ve/parent-durability-case","childExists":true},{"directory":"/private/var/folders/zk/40xbztxx7tb90tl4nnryd2780000gn/T/keel-review-parent-sync-mPQ4Ve/parent-durability-case","childExists":true}],"reads":1,"actualNetwork":0}
+# Subtest: execute: actual run entry is parent-directory synced before first RPC
+not ok 2 - execute: actual run entry is parent-directory synced before first RPC
+  ---
+  duration_ms: 25.203833
+  type: 'test'
+  location: '/Users/ravonus/dev/wt/studio-cache-independent-review-20261020/docs/reviews/studio-cache-independent-20261020/public-three-create-parent-durability.test.mjs:10:41'
+  failureType: 'testCodeFailure'
+  error: 'The newly created run directory entry must be synced in its containing base AFTER mkdir and BEFORE any RPC; syncing only files within the child does not persist its parent entry'
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: true
+  actual: false
+  operator: '=='
+  stack: |-
+    TestContext.<anonymous> (file:///Users/ravonus/dev/wt/studio-cache-independent-review-20261020/docs/reviews/studio-cache-independent-20261020/public-three-create-parent-durability.test.mjs:22:10)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+1..2
+# tests 2
+# suites 0
+# pass 0
+# fail 2
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 101.611125

@@ -1,0 +1,216 @@
+{
+  "schema": "keel.independent-exact-image-only-release-review@1",
+  "reviewerId": "independent-release-reviewer",
+  "decision": "APPROVE_TECHNICAL_IMAGE_ONLY_ACTIVATION_READINESS_SUBJECT_TO_EXACT_FINAL_PLAN_AND_COMMAND_ADMISSION",
+  "scope": "Exact71cb/SDK311/17cb fixes deployed publication flow history rechecks and safe handoff diagnostics. This is technical preactivation approval of the source, actual artifact, isolated runtime and unchanged operational mechanism; no completed creator publication or live wallet acceptance claim.",
+  "candidate": {
+    "siteCommit": "71cb0e31bab5e4ee93af9d3b3185978e46f1fe8e",
+    "sourceTree": "a41c88dfe6a8343f030892f220efea002c779743",
+    "sdkCommit": "311d61526284248938e335d7ed879089408933be",
+    "appImageId": "sha256:17cb5aac36536e3d6026ba32b3bb3a66adc04af5bb7207082ee472dce66320c9",
+    "imageBytes": 728593160,
+    "buildId": "jfjIfW1-d41RR-j-i-YgL",
+    "completeAppEntries": 36065,
+    "completeAppTreeSHA256": "89e7e64f96909cbb7ae7d553e057ef51b882e290073afb468de63edc362ac39d",
+    "fullConfigSHA256": "b8ddaf6d68e76ad758ee46b7c8407b480dfb146113ba0f31a43f10943d80a38b",
+    "rootFSSHA256": "4c8ae79ca08fa02d6ce7209d2a9116550ab175a502572d850aec7fd2aa9fa2e0",
+    "unchangedRunnerImage": "sha256:d97ddf2aba94cb963646fdf05bc8dc8c99b7e69b8c19bad85c06bea7c67fc9f5",
+    "nativeExecutorSHA256": "8a2970e2cebc1f4b51bd228ab7fa53208e2d247030f46037991351115f12a3b5"
+  },
+  "pendingPlanSHA256": "e39978f51efaf177a8ad5b5086dd2d6897e9c1113ab8645ee90d4c4fae43aec6",
+  "operatorSHA256": "1c880e9caffa55d868ff2c9930822c9ce97508c33520fc86e95b02ef138a7e4f",
+  "operatorFiles": {
+    "reviewed-activation-support.py": "a1594559c2c04159ac94827d0f4f2a991310fb06648379bca6081d5ce6a98de1",
+    "guarded-deployment-checks.py": "b5f7d764b6c05db503a23ea63ca21a36bfcb0f17cc8292444d790d4a8aad6e00",
+    "candidate-oom-default.py": "6621ff48fc02057d98d91ef5fd71e6e30eeea1ef847149170e316d9725e77c73"
+  },
+  "snapshotSupervisorSHA256": "5d8d56588eba290773961d74152baf3728ffd2e00a75894beed92d38af06706e",
+  "baseline": {
+    "id": "5c97c6f105e06838a3a82f42003b76cd3f896b2cc072ac1afbcd72456fc97735",
+    "image": "sha256:7b0c99bf7c5cd6a8ea639c7ea35a605e7e16b54b155b4300043651db0e2865d3",
+    "configSHA256": "a519e731b1b84be411ef1b8841b6814613267cdb375e12b1ff98a1d4de09dd5e",
+    "hostConfigSHA256": "186e487039113f582118064bce13b98c79f75eca5b3fa0d788c7d79b8fb14049",
+    "mountsSHA256": "74cc304b0955c822f88ffdbcbff56d89857f5ea3d7c51246ec106f00247ade89"
+  },
+  "existingRunner": {
+    "id": "434316eff6e19951807f95ba8aee03a4db684d760039dfeb723c7bf9203a8649",
+    "image": "sha256:d97ddf2aba94cb963646fdf05bc8dc8c99b7e69b8c19bad85c06bea7c67fc9f5",
+    "configSHA256": "23f5b528017bd47ac37f47ea6d4a56efd3926e4ca1fa0aad13f02652b1570113",
+    "hostConfigSHA256": "6fc9390416de4dd4ff6872f14b3430c76838f6bcef8abd428b6c63fd3d55dd82",
+    "mountsSHA256": "07f01d55cebb43e5ed07f5bdcafc33bf85d6a294839179d72e9ba5121609937f"
+  },
+  "existingSocket": {
+    "Name": "keel-studio-proof-socket-2779804f-f8fe-4fcd-8153-f45ad70b03b6",
+    "Driver": "local",
+    "Options": {
+      "device": "tmpfs",
+      "o": "size=16m,uid=999,gid=999,mode=0700,noexec,nosuid",
+      "type": "tmpfs"
+    }
+  },
+  "technicalQA": {
+    "commit": "07bc958b1119409c6d9f7409614112965d1f5ee2",
+    "path": "/tmp/keel-qa-receipt-activation-20261020/keel-site/docs/reviews/studio-publication-20261021/qa-history17cb-runtime/qa-final.json",
+    "sha256": "b8583942eb1d04d1a4e78464f1a4eb3632e8e1a79111365c7a302e583e54921c",
+    "runtimeAuditSHA256": "bea907efe50f1d43679a963b6c59d6aa4ca1e3aedae30e0a36ca91f23f1995c1",
+    "parserBindingApprovalSHA256": "2ed6c9414edceb63b02b4ef6c1d02623839a787fa78cd0295f142af9f4250db8"
+  },
+  "sourceReview": {
+    "reviewSHA256": "429bade6b66bf908a67cce95479f5dc98609533a8d60ac936f063c12cb0572bd",
+    "freshQAConditionFulfilledSHA256": "5e692e190a6e122df532bfa6e529aab62acc3a4e3e2df2fba6b1ca8082f5480c",
+    "sourceQASHA256": "4bb940a5cc0dd47ebe97dba89641470ff2a0d01c5738c548f10898f84209b643",
+    "passingMainExecutions": 277,
+    "additionalUnchangedPrivacyOraclePass": 3,
+    "TSCExit": 0,
+    "SDK1745Exact": true,
+    "separateMandatoryCohortSHA256": "ebfb07dcee75d4526bd1c796355442e584a3a5f1ea79ec7c30e5b7d6fa0dbd4b",
+    "separateSDKCases": 200,
+    "separateSiteCases": 139,
+    "separateCohortPassingExecutions": 341,
+    "countsAreSeparateNotSummedAsUnique": true,
+    "privacyFindingResolved": "Exact71cb reads DOMException.name once and emits only literal labels; unchanged sourceoracle independently reproducedee0 RED/71cb GREEN.",
+    "historyAuthority": "Request-local immutable candidate/history/knownTx prefix only after complete initial no-funded result; fresh canonical ancestor+pin hash/time start/end, changed partial/tail and all runtime/deployment/receipt/payment/expiry/state checks retained. Private8MiB/512pages, unchanged120s read deadline, no fullproof/nonce/fee/calldata mutation or cached validation authority.",
+    "handoffPrivacy": "Authenticated existing POST emits fixed phase/structuralcode plus randomcorrelation only; internal callback stripped, no rawexception/URL/query/stack/payload/newGET/newauthroute or request retry.",
+    "remainingSourceBlockers": []
+  },
+  "artifactReview": {
+    "independentQACommit": "8e91b53f18bd18f7d51cf62869444ca842457ee3",
+    "independentQAResultSHA256": "b83a0702a4ada47249ee5d5f159cee7daa7f18af87f703cc4a14dcabb6ac53d0",
+    "fullSaveBytes": 728640512,
+    "fullSaveSHA256": "f85233156f412f17f92aa609e20c1e13f377205cb885b97e5b2a9a108ec728bc",
+    "all48Blobs46Layers44BasePrefixCompleteConfigRootFS": true,
+    "wholeAppEntries": 36065,
+    "wholeAppTreeSHA256": "89e7e64f96909cbb7ae7d553e057ef51b882e290073afb468de63edc362ac39d",
+    "SDK1360Installed1745SourceNative8aOpsBootstrapPausedWorker": true,
+    "actualBuildDurableBytes": 6760,
+    "actualBuildDurableSHA256": "b7d273249cb1f278ab67d9f73a1ad4b85eb46f0da59fa052e5149dc24ef7f427",
+    "durableByteExactStdout": true,
+    "fullArchivesAndCompiledInventoriesRemainYuna": true
+  },
+  "actualRuntime": {
+    "roles": [
+      {
+        "role": "tree",
+        "stdoutSHA256": "a786d3edb82f7a9b0903a251281a6295af811b6508551706e5ffe3fa1e1e2d90",
+        "durableSHA256": "a786d3edb82f7a9b0903a251281a6295af811b6508551706e5ffe3fa1e1e2d90",
+        "bytes": 2540,
+        "durableBytesExactStdout": true,
+        "retainedStoppedId": "bafc82a262f12d59fd798c4f5967dde45ee868ff2e0873525d88565f2a8f69f4",
+        "exitCode": 0,
+        "runnerEnforcedStoppedAndOOMFalse": true,
+        "fullCreatedConfigSHA256": "6658fe3c74e38be35205553500db5b6ae38586e2408d1185d74ce1bfcc235c54",
+        "fullCreatedHostSHA256": "d885342bf67f59235558d0fbc2ac2f1f8cc1dd338e85c32d897e3f64c180339b",
+        "elapsedSeconds": 7.241746353916824,
+        "observerSamples": 0,
+        "observedCgroupPeakBytes": null,
+        "allObservedOOMCountersZero": true,
+        "retainedExactNodeDeprecationWarning": []
+      },
+      {
+        "role": "sdk",
+        "stdoutSHA256": "1d94057b450051b639fa5820a89879031f16a1aa3697abcf6b4e17b5f67a66a2",
+        "durableSHA256": "1d94057b450051b639fa5820a89879031f16a1aa3697abcf6b4e17b5f67a66a2",
+        "bytes": 40118,
+        "durableBytesExactStdout": true,
+        "retainedStoppedId": "dd97eaadecf0a00698aa8b3cf30f66880bea271019c087aa6652489c88ce1fe7",
+        "exitCode": 0,
+        "runnerEnforcedStoppedAndOOMFalse": true,
+        "fullCreatedConfigSHA256": "2d6828f5723a88732bb6d2cb5daba422b7ddae5ca5a2aa7a71b939aaead42922",
+        "fullCreatedHostSHA256": "5db70c9008b51eda24d76ed076d8d9cb20308307a757f6bfcc3edbbcadba81c4",
+        "elapsedSeconds": 6.175102181034163,
+        "observerSamples": 15,
+        "observedCgroupPeakBytes": 316837888,
+        "allObservedOOMCountersZero": true,
+        "retainedExactNodeDeprecationWarning": [
+          "(node:43) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.",
+          "(Use `node --trace-deprecation ...` to show where the warning was created)"
+        ]
+      },
+      {
+        "role": "http",
+        "stdoutSHA256": "77971fae894e80e6a5b8e593782486e0ac33bbfe681a747a6bfc1e67146756d6",
+        "durableSHA256": "77971fae894e80e6a5b8e593782486e0ac33bbfe681a747a6bfc1e67146756d6",
+        "bytes": 15164,
+        "durableBytesExactStdout": true,
+        "retainedStoppedId": "e70024992ae8fdad4000be45d7f42597c297c6a6d302d3dc298b12280d798eac",
+        "exitCode": 0,
+        "runnerEnforcedStoppedAndOOMFalse": true,
+        "fullCreatedConfigSHA256": "f701a39f3e07b9c6570357c54ec070556613a8775f335cb6b9f00cface3d16fe",
+        "fullCreatedHostSHA256": "d09c631126a585c48bb7073b6df43ed30e48b402da2ecd51e41f69728f390081",
+        "elapsedSeconds": 8.89797977404669,
+        "observerSamples": 20,
+        "observedCgroupPeakBytes": 271806464,
+        "allObservedOOMCountersZero": true,
+        "retainedExactNodeDeprecationWarning": []
+      }
+    ],
+    "all3Status0StoppedRetainedOOMFalse": true,
+    "beforeAfterOriginalFullConfigHostMountPausedAndRunnerExact": {
+      "originalId": "5c97c6f105e06838a3a82f42003b76cd3f896b2cc072ac1afbcd72456fc97735",
+      "configSHA256": "a519e731b1b84be411ef1b8841b6814613267cdb375e12b1ff98a1d4de09dd5e",
+      "hostSHA256": "186e487039113f582118064bce13b98c79f75eca5b3fa0d788c7d79b8fb14049",
+      "mountsSHA256": "74cc304b0955c822f88ffdbcbff56d89857f5ea3d7c51246ec106f00247ade89",
+      "runnerId": "434316eff6e19951807f95ba8aee03a4db684d760039dfeb723c7bf9203a8649",
+      "workerPaused": true,
+      "healthy": true
+    },
+    "SDKAll1360GoldensCompiledNativeLzmaFactoryReaderChromeMediaWorkerZeroSockets": true,
+    "HTTPPublicGETHEAD200": 4,
+    "HTTPPrivateWrongMethod401": 16,
+    "HTTPIsolatedSyntheticServerOnly": true,
+    "noProductionDBSocketCredentialsArtworkPrivateProgramOrExternalRPCUsed": true
+  },
+  "operationalReview": {
+    "staticStageProposalSHA256": "8e6df25f84d9ede20058db84148a78243d32227c2bc5d17ae2a008ecdd80a5f4",
+    "staticStageReviewSHA256": "6ac4c7659c6857362acaa40c29716993a6c703be0a4565ad97d89d74b03a7726",
+    "finalBindingRecipeSHA256": "bdceba43c06eb1c19970ba27ad3d907266b6ed0b356aa768cdddce39189b0c65",
+    "onlyPermittedPendingToFinalChanges": [
+      "evidence.qa.sha256",
+      "evidence.releaseReview.sha256",
+      "approval.independentQA",
+      "approval.independentReleaseReview",
+      "approval.leadExecuteApproved",
+      "physicalPhase",
+      "pending"
+    ],
+    "everyOtherPlanFieldMustRemainDeepExact": true,
+    "operatorCorrespondence": "Previously qualified1c880 main and recover unchanged except current baseline ID/image literals. Full reverse byteexact to dcec; original renames healthyold off proxywakeup name before immutableIDstop; recovery also renames ownedreplacement off wakeup name before stop. No proxy change.",
+    "preservation": "Copy complete oldConfig/Host/mounts; only newImage+rolloutLabels+explicit qualified CREATE OOMfalse default. Fresh exact pinned unsupportedcapability profile permits candidate actualNone expectedFalse only; true/type/missing/other field drift remain strict. BackendEnv/catalog/factories/data/schema/runner/socket/workerpause unchanged.",
+    "reserveAndSnapshot": "Fresh >=1GiB+256MiB under exclusive existing lock before consumption and bounded snapshot; successful new server-local snapshot before candidatecreate; >=1GiB after snapshot. Same5d8 bounded child supervision/inode/header/fsync receipt checks; no backup egress or DBrestore authority.",
+    "rollback": "Preserve original5c97/7b0 fully authenticated as stopped4crollback. On failure unchanged recover authenticates all owned/foreignnames, refuses foreign/unresolved, stops every ownedreplacement before oldrestart, waits healthy/fullbaseline. No consumedmain replay or automatic action retry. Deliberate post-success rollback needs exact actualID binding and reviewed one-shot invocation, no DBrestore.",
+    "olderPreservation": "Currentb9 snapshot0a6/124261128 and58fc1058,7016/c63CEE8,07a4/fa0fe455 and95/allimagesvolumesdata preserved; protected earlierprivatebackups unchanged. Public9+8duplicate retirements do not relax any reserve or restore guard.",
+    "postguardSourceSHA256": "82e8ca2535a3b1f221e486cc4bbec78280d4b2546d6f54ffc9a13eb194844d7f",
+    "postguardAndRollbackLineageReviewSHA256": "fc4ad1ccd8c473f48c5f5cc2cafa3dba763acb9d0dda5fc86920bfce361dc5f8",
+    "postguardScope": "Only actual finalplanSHA/newID from successful durableactivationreceipt may bind template; fullConfigHostmountcandidateOOM/SDK1360/native8a/newdump fullhash/pg_restore--list598TOC/oldrollback+priorretention must PASS. Read-only diagnostics, no DBrestore/privateartworktrace."
+  },
+  "preCutoverRequired": [
+    "Lead explicitly owns one current authorized image-only cutover; this receipt does not supply lead approval.",
+    "Root freshly reconciles canonicalSite master tree against exact71cb source; no silent source/image repin.",
+    "Concrete late3exclusivefiles/finalplanhash/preflight/execute commands require separate exact reviewer admission.",
+    "Fresh normal bounded configuredproxy health window and commonlocked full5c97/7b0/D97/socket/daemon/profile/unusednames/workerpause/reserves guards must PASS. Anydenial/unknown/failedguard STOP, no fallback or automatic retry."
+  ],
+  "liveBoundary": {
+    "Gate6Status": "PENDING_NEW17CB; CURRENT7B0_GATOR_GIF_FAIL_RETAINED",
+    "requiredAfterActivation": [
+      "exactnewdeployedprovenance/rollback/runner/pauseguards",
+      "freshauthenticatedhistoricalH root628198/SHA95b614 +decodedindex419486/SHA95c26/render onnewbuild",
+      "ownGator1cef/release7f687 exactinput normalunsignedwallet handoff",
+      "actualGIFfcf/release0c6 exactinput normalunsignedwallet handoff"
+    ],
+    "browserHold": "Extension-update tool denial remains stopped until restored through normal supported path; no alternate caller/private trace/DB read workaround.",
+    "originalA5AndConfiguredMCP": "OriginalA5 owner not executed; configuredMCP signinerror/noHTTPstatus remains blocked and distinct from owncopy/local API tests.",
+    "artworkSigningOrSpendingApproved": false,
+    "publicationCompleted": false,
+    "noOldProofRelabeledAsCurrent": "All historical FE/GIF/native proofs retain actual source/image/header attributions. Newimage isolatedgoldens/fullSDK/native byte checks are components, not new livefullprogram proof."
+  },
+  "semanticComparisonNote": {
+    "previousStrictCompiled280": "FAIL_UNPROVEN_RETAINED",
+    "specificUnresolvedCurrentProductionDefectFound": false,
+    "standaloneExtraActivationBlocker": false,
+    "meaning": "Unproven whole compiled-definition semantics from earlier bundleroutlining comparison. No formal/general equivalence, freshprivatefullnative replay or livewallet PASS claimed. Exactsource+artifact/component+actualgolden evidence supports technical cutover so new liveacceptance can occur."
+  },
+  "blockingTechnicalFindings": [],
+  "finalExactActionAdmittedByThisReceipt": false,
+  "automaticRetryAllowed": false,
+  "reviewerProductionAuthorshipOrHostActions": 0
+}

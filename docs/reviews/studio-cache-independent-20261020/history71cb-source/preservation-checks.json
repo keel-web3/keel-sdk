@@ -1,0 +1,8 @@
+{
+  "oldReconciliationTestFullSHA256": "e0824366ec4f714fa821654976a047d07d80393b69ff082c882c2b97afc3cff2",
+  "candidateTestFullSHA256": "8107920803d1223a1869ab7ee4d5dfb74eb25c13e9a4fa392e027c341d8fe8c8",
+  "reverseOnlyNewFactoryImportAndThreeInsertedTestsRestoresOriginal": true,
+  "allOldTestBodiesByteExact": true,
+  "SDK311Actual1745DistExact": true,
+  "sdkManifestSHA256": "c9532de4faa56d5c0535475158dfdeb7400c7c53dad10d45f5f042fb319b89c5"
+}

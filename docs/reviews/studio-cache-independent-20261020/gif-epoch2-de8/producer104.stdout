@@ -1,0 +1,634 @@
+TAP version 13
+# Subtest: real owned clone preflight verifies99 postconfiguration projections and156 exact input files without writes
+ok 1 - real owned clone preflight verifies99 postconfiguration projections and156 exact input files without writes
+  ---
+  duration_ms: 255.95325
+  type: 'test'
+  ...
+# Subtest: wrong clone endpoint or review hash is rejected before any database query
+ok 2 - wrong clone endpoint or review hash is rejected before any database query
+  ---
+  duration_ms: 2.511666
+  type: 'test'
+  ...
+# Subtest: read-only capture accepts unchanged state as its postcondition
+ok 3 - read-only capture accepts unchanged state as its postcondition
+  ---
+  duration_ms: 87.037542
+  type: 'test'
+  ...
+# Subtest: wrong copied roots cannot be accepted
+ok 4 - wrong copied roots cannot be accepted
+  ---
+  duration_ms: 0.223375
+  type: 'test'
+  ...
+# Subtest: synthetic NEW program passes structural gate without claiming original execution equivalence
+ok 5 - synthetic NEW program passes structural gate without claiming original execution equivalence
+  ---
+  duration_ms: 505.019375
+  type: 'test'
+  ...
+# Subtest: rejects wrong chain
+ok 6 - rejects wrong chain
+  ---
+  duration_ms: 424.22525
+  type: 'test'
+  ...
+# Subtest: rejects CREATE
+ok 7 - rejects CREATE
+  ---
+  duration_ms: 484.331042
+  type: 'test'
+  ...
+# Subtest: rejects state overrides
+ok 8 - rejects state overrides
+  ---
+  duration_ms: 414.854083
+  type: 'test'
+  ...
+# Subtest: rejects unknown target
+ok 9 - rejects unknown target
+  ---
+  duration_ms: 432.236541
+  type: 'test'
+  ...
+# Subtest: rejects unknown sender
+ok 10 - rejects unknown sender
+  ---
+  duration_ms: 435.732542
+  type: 'test'
+  ...
+# Subtest: rejects new nonfunding value
+ok 11 - rejects new nonfunding value
+  ---
+  duration_ms: 457.408
+  type: 'test'
+  ...
+# Subtest: rejects wrong factory
+ok 12 - rejects wrong factory
+  ---
+  duration_ms: 413.645542
+  type: 'test'
+  ...
+# Subtest: rejects wrong metadata token id
+ok 13 - rejects wrong metadata token id
+  ---
+  duration_ms: 469.00475
+  type: 'test'
+  ...
+# Subtest: rejects stale canonical hash
+ok 14 - rejects stale canonical hash
+  ---
+  duration_ms: 422.811042
+  type: 'test'
+  ...
+# Subtest: rejects changed job deadline
+ok 15 - rejects changed job deadline
+  ---
+  duration_ms: 456.833917
+  type: 'test'
+  ...
+# Subtest: rejects lost new image reader
+ok 16 - rejects lost new image reader
+  ---
+  duration_ms: 457.802917
+  type: 'test'
+  ...
+# Subtest: actual retained GIF/WebP/descriptor/fullURI bytes survive the offline new-program fixture; no compiler proof
+ok 17 - actual retained GIF/WebP/descriptor/fullURI bytes survive the offline new-program fixture; no compiler proof
+  ---
+  duration_ms: 1036.95625
+  type: 'test'
+  ...
+# Subtest: diagnostic exact target-only case has no diff and still grants no acceptance
+ok 18 - diagnostic exact target-only case has no diff and still grants no acceptance
+  ---
+  duration_ms: 39.945125
+  type: 'test'
+  ...
+# Subtest: overall and stage digest changes are independently reported; no reference mutation
+ok 19 - overall and stage digest changes are independently reported; no reference mutation
+  ---
+  duration_ms: 28.698375
+  type: 'test'
+  ...
+# Subtest: non-digest payout mismatch is preserved
+ok 20 - non-digest payout mismatch is preserved
+  ---
+  duration_ms: 28.712083
+  type: 'test'
+  ...
+# Subtest: non-digest supply mismatch is preserved
+ok 21 - non-digest supply mismatch is preserved
+  ---
+  duration_ms: 27.622709
+  type: 'test'
+  ...
+# Subtest: non-digest limit mismatch is preserved
+ok 22 - non-digest limit mismatch is preserved
+  ---
+  duration_ms: 25.447292
+  type: 'test'
+  ...
+# Subtest: non-digest stage signer mismatch is preserved
+ok 23 - non-digest stage signer mismatch is preserved
+  ---
+  duration_ms: 25.180333
+  type: 'test'
+  ...
+# Subtest: actual CLI saves explicitly unaccepted private diagnostics BEFORE the separately reviewed canonical forward verifier
+ok 24 - actual CLI saves explicitly unaccepted private diagnostics BEFORE the separately reviewed canonical forward verifier
+  ---
+  duration_ms: 3.899833
+  type: 'test'
+  ...
+# Subtest: new private diagnostic requires its explicit independent review permission
+ok 25 - new private diagnostic requires its explicit independent review permission
+  ---
+  duration_ms: 279.574625
+  type: 'test'
+  ...
+# Subtest: only exact existing candidate identity/version/deadline is allowed; expiry is not repinned
+ok 26 - only exact existing candidate identity/version/deadline is allowed; expiry is not repinned
+  ---
+  duration_ms: 1.060958
+  type: 'test'
+  ...
+# Subtest: normal saved-view binding rejects readiness and changed selection
+ok 27 - normal saved-view binding rejects readiness and changed selection
+  ---
+  duration_ms: 0.152541
+  type: 'test'
+  ...
+# Subtest: actual tool entry calls normal status once and capture once; it imports no Check/renewal/funding API
+ok 28 - actual tool entry calls normal status once and capture once; it imports no Check/renewal/funding API
+  ---
+  duration_ms: 27.169125
+  type: 'test'
+  ...
+# Subtest: changed normal saved-view causes no capture and still closes the owned SQL client
+ok 29 - changed normal saved-view causes no capture and still closes the owned SQL client
+  ---
+  duration_ms: 4.416667
+  type: 'test'
+  ...
+# Subtest: actual successful normal review is bound; earlier alias no-op cannot authorize capture
+ok 30 - actual successful normal review is bound; earlier alias no-op cannot authorize capture
+  ---
+  duration_ms: 2.503417
+  type: 'test'
+  ...
+# Subtest: scope, normal writer, preserved answers/assets and no-execution flags remain strict
+ok 31 - scope, normal writer, preserved answers/assets and no-execution flags remain strict
+  ---
+  duration_ms: 0.2705
+  type: 'test'
+  ...
+# Subtest: changed receipt hash or path cannot authorize a new revision
+ok 32 - changed receipt hash or path cannot authorize a new revision
+  ---
+  duration_ms: 0.142583
+  type: 'test'
+  ...
+# Subtest: actual capture CLI main entry resolves both /tmp alias and canonical path before reading config
+ok 33 - actual capture CLI main entry resolves both /tmp alias and canonical path before reading config
+  ---
+  duration_ms: 486.825834
+  type: 'test'
+  ...
+# Subtest: only exact484-byte public receipt with original image/container/UID999 and no side effects is accepted
+ok 34 - only exact484-byte public receipt with original image/container/UID999 and no side effects is accepted
+  ---
+  duration_ms: 0.95025
+  type: 'test'
+  ...
+# Subtest: public receipt loader rejects any other path/hash/size before opening it
+ok 35 - public receipt loader rejects any other path/hash/size before opening it
+  ---
+  duration_ms: 0.201791
+  type: 'test'
+  ...
+# Subtest: clone credential guard inspects directory existence only; copy receipt binds exact no-key roots
+ok 36 - clone credential guard inspects directory existence only; copy receipt binds exact no-key roots
+  ---
+  duration_ms: 2.53825
+  type: 'test'
+  ...
+# Subtest: actual SDK4cf ABI rejects stage signer drift and conflicting SDK/native views before capture persistence
+ok 37 - actual SDK4cf ABI rejects stage signer drift and conflicting SDK/native views before capture persistence
+  ---
+  duration_ms: 99.937583
+  type: 'test'
+  ...
+# Subtest: unexpected eth_call authorizationList cannot dispatch
+ok 38 - unexpected eth_call authorizationList cannot dispatch
+  ---
+  duration_ms: 20.288625
+  type: 'test'
+  ...
+# Subtest: unexpected eth_call accessList cannot dispatch
+ok 39 - unexpected eth_call accessList cannot dispatch
+  ---
+  duration_ms: 0.354833
+  type: 'test'
+  ...
+# Subtest: unexpected eth_call stateOverride cannot dispatch
+ok 40 - unexpected eth_call stateOverride cannot dispatch
+  ---
+  duration_ms: 0.451959
+  type: 'test'
+  ...
+# Subtest: unexpected eth_call stateDiff cannot dispatch
+ok 41 - unexpected eth_call stateDiff cannot dispatch
+  ---
+  duration_ms: 0.449459
+  type: 'test'
+  ...
+# Subtest: unexpected eth_call blockOverrides cannot dispatch
+ok 42 - unexpected eth_call blockOverrides cannot dispatch
+  ---
+  duration_ms: 0.463625
+  type: 'test'
+  ...
+# Subtest: unexpected eth_call code cannot dispatch
+ok 43 - unexpected eth_call code cannot dispatch
+  ---
+  duration_ms: 0.249042
+  type: 'test'
+  ...
+# Subtest: unexpected eth_call nonce cannot dispatch
+ok 44 - unexpected eth_call nonce cannot dispatch
+  ---
+  duration_ms: 0.231834
+  type: 'test'
+  ...
+# Subtest: unexpected eth_call chainId cannot dispatch
+ok 45 - unexpected eth_call chainId cannot dispatch
+  ---
+  duration_ms: 0.344291
+  type: 'test'
+  ...
+# Subtest: unexpected eth_call unknown cannot dispatch
+ok 46 - unexpected eth_call unknown cannot dispatch
+  ---
+  duration_ms: 0.733208
+  type: 'test'
+  ...
+# Subtest: malformed or override call cannot dispatch [{"to":"0x1111111111111111111111111111111111111111","data":"0x12345678"},"0xb6254a",{}]
+ok 47 - malformed or override call cannot dispatch [{"to":"0x1111111111111111111111111111111111111111","data":"0x12345678"},"0xb6254a",{}]
+  ---
+  duration_ms: 0.404708
+  type: 'test'
+  ...
+# Subtest: malformed or override call cannot dispatch [{"to":"0x1111111111111111111111111111111111111111","data":"0x12345678"},"0xb6254a",{},{}]
+ok 48 - malformed or override call cannot dispatch [{"to":"0x1111111111111111111111111111111111111111","data":"0x12345678"},"0xb6254a",{},{}]
+  ---
+  duration_ms: 0.153584
+  type: 'test'
+  ...
+# Subtest: malformed or override call cannot dispatch [{"to":"0x1111111111111111111111111111111111111111","data":"0x12345678"},["0xb6254a"]]
+ok 49 - malformed or override call cannot dispatch [{"to":"0x1111111111111111111111111111111111111111","data":"0x12345678"},["0xb6254a"]]
+  ---
+  duration_ms: 0.201625
+  type: 'test'
+  ...
+# Subtest: malformed or override call cannot dispatch {"0":{"to":"0x1111111111111111111111111111111111111111","data":"0x12345678"},"1":"0xb6254a","length":2}
+ok 50 - malformed or override call cannot dispatch {"0":{"to":"0x1111111111111111111111111111111111111111","data":"0x12345678"},"1":"0xb6254a","length":2}
+  ---
+  duration_ms: 0.117583
+  type: 'test'
+  ...
+# Subtest: credential/semantic denial is terminal: rate limit; invalid API key
+ok 51 - credential/semantic denial is terminal: rate limit; invalid API key
+  ---
+  duration_ms: 1.966
+  type: 'test'
+  ...
+# Subtest: credential/semantic denial is terminal: rate limit; authentication failed
+ok 52 - credential/semantic denial is terminal: rate limit; authentication failed
+  ---
+  duration_ms: 0.329958
+  type: 'test'
+  ...
+# Subtest: credential/semantic denial is terminal: rate limit; token expired
+ok 53 - credential/semantic denial is terminal: rate limit; token expired
+  ---
+  duration_ms: 0.260125
+  type: 'test'
+  ...
+# Subtest: credential/semantic denial is terminal: rate limit; authorization failed
+ok 54 - credential/semantic denial is terminal: rate limit; authorization failed
+  ---
+  duration_ms: 0.342167
+  type: 'test'
+  ...
+# Subtest: credential/semantic denial is terminal: rate limit; credentials revoked
+ok 55 - credential/semantic denial is terminal: rate limit; credentials revoked
+  ---
+  duration_ms: 0.290416
+  type: 'test'
+  ...
+# Subtest: credential/semantic denial is terminal: rate limit; permission denied
+ok 56 - credential/semantic denial is terminal: rate limit; permission denied
+  ---
+  duration_ms: 0.230291
+  type: 'test'
+  ...
+# Subtest: credential/semantic denial is terminal: rate limit; unauthorized
+ok 57 - credential/semantic denial is terminal: rate limit; unauthorized
+  ---
+  duration_ms: 0.285333
+  type: 'test'
+  ...
+# Subtest: credential/semantic denial is terminal: rate limit; execution reverted
+ok 58 - credential/semantic denial is terminal: rate limit; execution reverted
+  ---
+  duration_ms: 0.261167
+  type: 'test'
+  ...
+# Subtest: rate allowlist rejects nested aliases, unknown keys, oversized text and noninteger codes
+ok 59 - rate allowlist rejects nested aliases, unknown keys, oversized text and noninteger codes
+  ---
+  duration_ms: 0.148042
+  type: 'test'
+  ...
+# Subtest: public read schemas retain bounded actual reader/history/fee forms
+ok 60 - public read schemas retain bounded actual reader/history/fee forms
+  ---
+  duration_ms: 0.320084
+  type: 'test'
+  ...
+# Subtest: read schemas forbid storage overrides, ambiguous block objects and oversized proof batches
+ok 61 - read schemas forbid storage overrides, ambiguous block objects and oversized proof batches
+  ---
+  duration_ms: 0.137917
+  type: 'test'
+  ...
+# Subtest: exact assembly-only gate refuses any expanded authority or changed identity
+ok 62 - exact assembly-only gate refuses any expanded authority or changed identity
+  ---
+  duration_ms: 1.021292
+  type: 'test'
+  ...
+# Subtest: ordinary bounded public reads succeed without private execution
+ok 63 - ordinary bounded public reads succeed without private execution
+  ---
+  duration_ms: 19.732125
+  type: 'test'
+  ...
+# Subtest: network guard refuses eth_simulateV1 before dispatch
+ok 64 - network guard refuses eth_simulateV1 before dispatch
+  ---
+  duration_ms: 0.440709
+  type: 'test'
+  ...
+# Subtest: network guard refuses eth_sendRawTransaction before dispatch
+ok 65 - network guard refuses eth_sendRawTransaction before dispatch
+  ---
+  duration_ms: 0.522875
+  type: 'test'
+  ...
+# Subtest: network guard refuses eth_sendTransaction before dispatch
+ok 66 - network guard refuses eth_sendTransaction before dispatch
+  ---
+  duration_ms: 0.286791
+  type: 'test'
+  ...
+# Subtest: network guard refuses personal_sign before dispatch
+ok 67 - network guard refuses personal_sign before dispatch
+  ---
+  duration_ms: 0.266875
+  type: 'test'
+  ...
+# Subtest: network guard refuses eth_estimateGas before dispatch
+ok 68 - network guard refuses eth_estimateGas before dispatch
+  ---
+  duration_ms: 0.218083
+  type: 'test'
+  ...
+# Subtest: HTTP301 is terminal without fallback
+ok 69 - HTTP301 is terminal without fallback
+  ---
+  duration_ms: 0.936833
+  type: 'test'
+  ...
+# Subtest: HTTP401 is terminal without fallback
+ok 70 - HTTP401 is terminal without fallback
+  ---
+  duration_ms: 0.604959
+  type: 'test'
+  ...
+# Subtest: HTTP403 is terminal without fallback
+ok 71 - HTTP403 is terminal without fallback
+  ---
+  duration_ms: 0.849125
+  type: 'test'
+  ...
+# Subtest: recipient, private payload, oversized body, large call and unbounded logs fail before dispatch
+ok 72 - recipient, private payload, oversized body, large call and unbounded logs fail before dispatch
+  ---
+  duration_ms: 0.9775
+  type: 'test'
+  ...
+# Subtest: cumulative request count and cancellation remain bounded
+ok 73 - cumulative request count and cancellation remain bounded
+  ---
+  duration_ms: 57.166792
+  type: 'test'
+  ...
+# Subtest: HTTP200 RPC error 403 is terminal
+ok 74 - HTTP200 RPC error 403 is terminal
+  ---
+  duration_ms: 0.641959
+  type: 'test'
+  ...
+# Subtest: HTTP200 RPC error 401 is terminal
+ok 75 - HTTP200 RPC error 401 is terminal
+  ---
+  duration_ms: 0.150042
+  type: 'test'
+  ...
+# Subtest: HTTP200 RPC error 3 is terminal
+ok 76 - HTTP200 RPC error 3 is terminal
+  ---
+  duration_ms: 0.166208
+  type: 'test'
+  ...
+# Subtest: HTTP200 RPC error -32000 is terminal
+ok 77 - HTTP200 RPC error -32000 is terminal
+  ---
+  duration_ms: 0.122875
+  type: 'test'
+  ...
+# Subtest: malformed HTTP200 response is terminal
+ok 78 - malformed HTTP200 response is terminal
+  ---
+  duration_ms: 0.146584
+  type: 'test'
+  ...
+# Subtest: only explicit RPC rate limits permit at most three consecutive physical attempts
+ok 79 - only explicit RPC rate limits permit at most three consecutive physical attempts
+  ---
+  duration_ms: 0.412708
+  type: 'test'
+  ...
+# Subtest: contradictory rate error is terminal {"code":429,"message":"access denied"}
+ok 80 - contradictory rate error is terminal {"code":429,"message":"access denied"}
+  ---
+  duration_ms: 0.132209
+  type: 'test'
+  ...
+# Subtest: contradictory rate error is terminal {"code":429,"message":"execution reverted"}
+ok 81 - contradictory rate error is terminal {"code":429,"message":"execution reverted"}
+  ---
+  duration_ms: 0.105042
+  type: 'test'
+  ...
+# Subtest: contradictory rate error is terminal {"code":429,"message":"rate limit","data":{"code":403,"message":"denied"}}
+ok 82 - contradictory rate error is terminal {"code":429,"message":"rate limit","data":{"code":403,"message":"denied"}}
+  ---
+  duration_ms: 0.101375
+  type: 'test'
+  ...
+# Subtest: stream failure is terminal before another request
+ok 83 - stream failure is terminal before another request
+  ---
+  duration_ms: 0.237375
+  type: 'test'
+  ...
+# Subtest: HTTP429 without a known rate error is terminal
+ok 84 - HTTP429 without a known rate error is terminal
+  ---
+  duration_ms: 0.131167
+  type: 'test'
+  ...
+# Subtest: uncorrelated or unknown response envelope is terminal {"jsonrpc":"2.0","id":2,"error":{"code":429,"message":"rate limit"}}
+ok 85 - uncorrelated or unknown response envelope is terminal {"jsonrpc":"2.0","id":2,"error":{"code":429,"message":"rate limit"}}
+  ---
+  duration_ms: 0.1195
+  type: 'test'
+  ...
+# Subtest: uncorrelated or unknown response envelope is terminal {"jsonrpc":"1.0","id":1,"error":{"code":429,"message":"rate limit"}}
+ok 86 - uncorrelated or unknown response envelope is terminal {"jsonrpc":"1.0","id":1,"error":{"code":429,"message":"rate limit"}}
+  ---
+  duration_ms: 0.105666
+  type: 'test'
+  ...
+# Subtest: uncorrelated or unknown response envelope is terminal {"jsonrpc":"2.0","id":1,"error":{"code":429,"message":"rate limit"},"data":{"code":403,"message":"denied"}}
+ok 87 - uncorrelated or unknown response envelope is terminal {"jsonrpc":"2.0","id":1,"error":{"code":429,"message":"rate limit"},"data":{"code":403,"message":"denied"}}
+  ---
+  duration_ms: 0.104292
+  type: 'test'
+  ...
+# Subtest: uncorrelated or unknown response envelope is terminal {"jsonrpc":"2.0","id":1,"result":null,"error":{"code":429,"message":"rate limit"}}
+ok 88 - uncorrelated or unknown response envelope is terminal {"jsonrpc":"2.0","id":1,"result":null,"error":{"code":429,"message":"rate limit"}}
+  ---
+  duration_ms: 0.094959
+  type: 'test'
+  ...
+# Subtest: uncorrelated or unknown response envelope is terminal [{"jsonrpc":"2.0","id":1,"error":{"code":429,"message":"rate limit"}}]
+ok 89 - uncorrelated or unknown response envelope is terminal [{"jsonrpc":"2.0","id":1,"error":{"code":429,"message":"rate limit"}}]
+  ---
+  duration_ms: 0.102125
+  type: 'test'
+  ...
+# Subtest: batch correlation permits reordered unique responses
+ok 90 - batch correlation permits reordered unique responses
+  ---
+  duration_ms: 0.162333
+  type: 'test'
+  ...
+# Subtest: batch duplicate response ids are terminal
+ok 91 - batch duplicate response ids are terminal
+  ---
+  duration_ms: 0.140084
+  type: 'test'
+  ...
+# Subtest: exact closed-job read returns its unchanged ABI error for normal canonical history proof
+ok 92 - exact closed-job read returns its unchanged ABI error for normal canonical history proof
+  ---
+  duration_ms: 0.927958
+  type: 'test'
+  ...
+# Subtest: closed-job exception refuses different request [{"to":"0x0000000000000000000000000000000000000001","data":"0xbf22c4570000000000000000000000000000000000000000000000000000000000000000"},"0xb65aca"]
+ok 93 - closed-job exception refuses different request [{"to":"0x0000000000000000000000000000000000000001","data":"0xbf22c4570000000000000000000000000000000000000000000000000000000000000000"},"0xb65aca"]
+  ---
+  duration_ms: 0.141417
+  type: 'test'
+  ...
+# Subtest: closed-job exception refuses different request [{"to":"0x93f8bb414f22d5Df29Db6d67b78224D69453A094","data":"0x123456780000000000000000000000000000000000000000000000000000000000000000"},"0xb65aca"]
+ok 94 - closed-job exception refuses different request [{"to":"0x93f8bb414f22d5Df29Db6d67b78224D69453A094","data":"0x123456780000000000000000000000000000000000000000000000000000000000000000"},"0xb65aca"]
+  ---
+  duration_ms: 0.122375
+  type: 'test'
+  ...
+# Subtest: closed-job exception refuses different request [{"to":"0x93f8bb414f22d5Df29Db6d67b78224D69453A094","data":"0xbf22c4570000000000000000000000000000000000000000000000000000000000000000"},"latest"]
+ok 95 - closed-job exception refuses different request [{"to":"0x93f8bb414f22d5Df29Db6d67b78224D69453A094","data":"0xbf22c4570000000000000000000000000000000000000000000000000000000000000000"},"latest"]
+  ---
+  duration_ms: 0.114208
+  type: 'test'
+  ...
+# Subtest: closed-job exception refuses different request [{"to":"0x93f8bb414f22d5Df29Db6d67b78224D69453A094","data":"0xbf22c4570000000000000000000000000000000000000000000000000000000000000000"},["0xb65aca"]]
+ok 96 - closed-job exception refuses different request [{"to":"0x93f8bb414f22d5Df29Db6d67b78224D69453A094","data":"0xbf22c4570000000000000000000000000000000000000000000000000000000000000000"},["0xb65aca"]]
+  ---
+  duration_ms: 0.0745
+  type: 'test'
+  ...
+# Subtest: closed-job exception refuses different request {"0":{"to":"0x93f8bb414f22d5Df29Db6d67b78224D69453A094","data":"0xbf22c4570000000000000000000000000000000000000000000000000000000000000000"},"1":"0xb65aca","length":2}
+ok 97 - closed-job exception refuses different request {"0":{"to":"0x93f8bb414f22d5Df29Db6d67b78224D69453A094","data":"0xbf22c4570000000000000000000000000000000000000000000000000000000000000000"},"1":"0xb65aca","length":2}
+  ---
+  duration_ms: 0.069167
+  type: 'test'
+  ...
+# Subtest: closed-job exception refuses different request [{"to":"0x93f8bb414f22d5Df29Db6d67b78224D69453A094","data":"0xbf22c4570000000000000000000000000000000000000000000000000000000000000000"},"0xb65aca",{}]
+ok 98 - closed-job exception refuses different request [{"to":"0x93f8bb414f22d5Df29Db6d67b78224D69453A094","data":"0xbf22c4570000000000000000000000000000000000000000000000000000000000000000"},"0xb65aca",{}]
+  ---
+  duration_ms: 0.064125
+  type: 'test'
+  ...
+# Subtest: closed-job exception refuses different request [{"to":"0x93f8bb414f22d5Df29Db6d67b78224D69453A094","data":"0xbf22c4570000000000000000000000000000000000000000000000000000000000000000","from":"0x0000000000000000000000000000000000000001"},"0xb65aca"]
+ok 99 - closed-job exception refuses different request [{"to":"0x93f8bb414f22d5Df29Db6d67b78224D69453A094","data":"0xbf22c4570000000000000000000000000000000000000000000000000000000000000000","from":"0x0000000000000000000000000000000000000001"},"0xb65aca"]
+  ---
+  duration_ms: 0.279958
+  type: 'test'
+  ...
+# Subtest: closed-job exception refuses different error {"code":3,"message":"execution reverted","data":"0xdeadbeef"}
+ok 100 - closed-job exception refuses different error {"code":3,"message":"execution reverted","data":"0xdeadbeef"}
+  ---
+  duration_ms: 0.24
+  type: 'test'
+  ...
+# Subtest: closed-job exception refuses different error {"code":403,"message":"execution reverted","data":"0x1ad3309b"}
+ok 101 - closed-job exception refuses different error {"code":403,"message":"execution reverted","data":"0x1ad3309b"}
+  ---
+  duration_ms: 0.158291
+  type: 'test'
+  ...
+# Subtest: closed-job exception refuses different error {"code":3,"message":"access denied","data":"0x1ad3309b"}
+ok 102 - closed-job exception refuses different error {"code":3,"message":"access denied","data":"0x1ad3309b"}
+  ---
+  duration_ms: 0.151375
+  type: 'test'
+  ...
+# Subtest: closed-job exception refuses different error {"code":3,"message":"execution reverted","data":"0x1ad3309b","extra":"denied"}
+ok 103 - closed-job exception refuses different error {"code":3,"message":"execution reverted","data":"0x1ad3309b","extra":"denied"}
+  ---
+  duration_ms: 0.147209
+  type: 'test'
+  ...
+# Subtest: canonical forward permission cannot be absent or false and grants no execution authority
+ok 104 - canonical forward permission cannot be absent or false and grants no execution authority
+  ---
+  duration_ms: 0.10725
+  type: 'test'
+  ...
+1..104
+# tests 104
+# suites 0
+# pass 104
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 9592.212875

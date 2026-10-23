@@ -1,0 +1,7 @@
+{
+  "result": "PASS_EXACT_PROJECTION_HOSTILE_VALUE_CONTROLS",
+  "sourceSHA256": "60f01ae7d5b23c4fdf82e5d4d2eff9591ff5682c6fe2baedebcbb22d3dfefa86",
+  "assertions": 201,
+  "fullRuntimeNativeExecution": false,
+  "productionSourceModified": false
+}

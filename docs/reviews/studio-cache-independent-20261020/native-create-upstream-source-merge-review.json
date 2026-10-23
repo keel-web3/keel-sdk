@@ -1,0 +1,64 @@
+{
+  "schema": "independent-native-create-upstream-source-merge-review@1",
+  "decision": "APPROVE_MINIMAL_SOURCE_PR_AND_MERGE_AFTER_REQUIRED_CHECKS",
+  "reviewerId": "cache-release-independent-reviewer",
+  "baseCommit": "492d4bd2b223d385ccb983a1185932336be09bf6",
+  "qualifiedSourceCommit": "c4e852b769dbfc7de9c9ba2a3f7da94e547b763a",
+  "blockingFindings": [],
+  "permittedRuntimeAndTestFiles": [
+    {
+      "path": "native/proof-executor/geth-overlay/internal/ethapi/keel_sparse.go",
+      "bytes": 8136,
+      "sha256": "7d01c9e741d5335b3985e702832017acfb1855b6052c66f1967e6bf98ee04939"
+    },
+    {
+      "path": "native/proof-executor/geth-overlay/internal/ethapi/keel_sparse_test.go",
+      "bytes": 8910,
+      "sha256": "d3e94e3b70eca2e468bf813750f96ca2b2d59fc3c7fd833d39826b7f888a09c4"
+    },
+    {
+      "path": "native/proof-executor/geth-overlay/internal/ethapi/keel_sparse_evm_test.go",
+      "bytes": 10743,
+      "sha256": "bab3fe5a28ed22e49777ae5b5c136a06dd65140ece90ce7b962a2ab8596b7646"
+    },
+    {
+      "path": "native/proof-executor/fixtures/current49d-public-three-create.json",
+      "bytes": 112111,
+      "sha256": "de76973a117dbe9aba405f4753baf6d8e81e424fa0d2c1d196c064cb0effcbeb"
+    }
+  ],
+  "minimalNativePatch": {
+    "bytes": 140972,
+    "sha256": "d15d08e9c4e8f786a4a7812f129d21b89e95c415d003c1cfa785fe3162e7294b"
+  },
+  "documentationScope": "Associated native-create-compat documentation and truthful historical/new qualification evidence may accompany the exact four-file source delta. Describe c4 build and 481 actual proof as their exact existing artifacts; do not relabel them as builds from the future merge commit. Include the fixture environment/Go overlay invocation so the controls can be reproduced.",
+  "mustPreserveCurrentMasterFiles": [
+    "scripts/test-suites.mjs",
+    "tests/offline-shell-connect-reset.test.mjs",
+    "tests/support/offline-shell-browser.mjs"
+  ],
+  "reasonWholeBranchMustNotBeRestored": "The c4 branch predates merged PR67 a9cd9f8 test helper correction. Whole-tree checkout or restoring c4 over492d would remove the new completed-denial reset test/classification and revert its helper. Use isolated current-master integration plus only approved native paths/docs.",
+  "sourceIntegrationAssessment": "Current492d native/proof-executor tree and official native build scripts are byte-identical to b524. Exact reviewed c4 production shim, parser/EVM controls and hash-bound public fixture remain unchanged. No re-review gap arises from the unrelated preserved a9 test-only delta.",
+  "validationAvailable": {
+    "independentParserAndWholeBlockEVM": "38 corrected controls plus independent envelope budget regression passed in prior reviewer record ffcf04d27b2b6adb7ad783954c5541b79c6983ad6ad74018de2c1a3587dcfd3b",
+    "officialBuild": "Fresh c4 Linux executor3f9c and image481 built; unchanged broker9936;58 native JS and85 pinned Geth controls passed, historical Darwin cmd compilation RED retained separately; actualLinux EOF/startup controls later passed.",
+    "genuineCurrentNativeProof": {
+      "reviewerAuditSHA256": "b4d2c8735b4459f79a7f5d31aa86947f90fd3d1fb19900fc5afae46e7402426d",
+      "independentQAResultSHA256": "9a2b799e76e289de818164aadd99333b99b0d50981005aca21a3ca15af241c38",
+      "nativeExecutions": 1,
+      "factoryStdoutSHA256": "dde5065538c2e18fc4a4426b47197d40d8850b61fdea1d1a31590981dccb1c72",
+      "scope": "Actual FE944/b524 consumer with481/3f9c executed exact fresh three CREATEs, status/runtime/gas/authenticated base provenance; no remote simulation or replay."
+    }
+  },
+  "remainingSourceIntegrationChecks": [
+    "Build minimal isolated branch from492d preserving all existing source/tests. Verify resulting four file hashes and absence of unrelated reversions.",
+    "Run the ordinary required upstream PR checks against the exact integration head; do not bypass failed checks.",
+    "No full native rebuild or live replay is required merely for unrelated preserved test-helper metadata; any new runtime/build-input changes require renewed validation."
+  ],
+  "productionCandidate": "FE944/b524/d97 unchanged",
+  "nativeImageActivationApproved": false,
+  "productionActivationApproved": false,
+  "signatureOrSpendApproved": false,
+  "originalGIFQualified": false,
+  "publicationApproved": false
+}

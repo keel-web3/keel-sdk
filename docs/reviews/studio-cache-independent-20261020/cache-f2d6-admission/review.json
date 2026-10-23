@@ -1,0 +1,102 @@
+{
+  "schema": "keel.independent-cache-namespace-terminal-review@1",
+  "decision": "APPROVE_EXACT_ONE_CACHE_CLEANUP_CONDITIONAL_ON_FRESH_PREFLIGHT",
+  "sourceCommit": "f2d6de9477074559f9c365aa80925edd6cfc49a9",
+  "review": {
+    "path": "/Users/ravonus/dev/wt/studio-cache-independent-review-20261020/docs/reviews/studio-cache-independent-20261020/cache-f2d6-admission/cache-cleanup-review.json",
+    "bytes": 4069,
+    "sha256": "30b9a385a1320e8992eeff5191f9a91283f5d43856bb6ba49db1c31ba575407c"
+  },
+  "commandAdmission": {
+    "path": "/Users/ravonus/dev/wt/studio-cache-independent-review-20261020/docs/reviews/studio-cache-independent-20261020/cache-f2d6-admission/command-admission.json",
+    "bytes": 7323,
+    "sha256": "e6cdb2d7d44e4b97c2465f34fc870692f43e94bcaf447a15817d209b25e38862"
+  },
+  "noHostActionByReviewer": true,
+  "priorFailuresPreserved": true,
+  "independentResults": {
+    "actualLinux": 62,
+    "realRetainedCwdChild": 1,
+    "failures": 0,
+    "skips": 0
+  },
+  "importAuthority": false,
+  "activationAuthority": false,
+  "evidence": [
+    {
+      "path": "/Users/ravonus/dev/wt/studio-cache-independent-review-20261020/docs/reviews/studio-cache-independent-20261020/cache-f2d6-admission/cache-cleanup-plan.json",
+      "bytes": 596390,
+      "sha256": "28dbfac54fa26c38e27da64a7dee062926ed1fa06ade2f33ac6895e0a65acd59"
+    },
+    {
+      "path": "/Users/ravonus/dev/wt/studio-cache-independent-review-20261020/docs/reviews/studio-cache-independent-20261020/cache-f2d6-admission/cache-cleanup-review.json",
+      "bytes": 4069,
+      "sha256": "30b9a385a1320e8992eeff5191f9a91283f5d43856bb6ba49db1c31ba575407c"
+    },
+    {
+      "path": "/Users/ravonus/dev/wt/studio-cache-independent-review-20261020/docs/reviews/studio-cache-independent-20261020/cache-f2d6-admission/cache-cleanup-transfer-proposal.json",
+      "bytes": 5259,
+      "sha256": "a8f9fb71529474930250444288310ea54613c94ed111662ea4865c6b0201c848"
+    },
+    {
+      "path": "/Users/ravonus/dev/wt/studio-cache-independent-review-20261020/docs/reviews/studio-cache-independent-20261020/cache-f2d6-admission/cache-namespace.test.py",
+      "bytes": 5566,
+      "sha256": "77ecacbd80f1147c104a32f5965c55dacae3d3ed2c810cae391f02fdead3b627"
+    },
+    {
+      "path": "/Users/ravonus/dev/wt/studio-cache-independent-review-20261020/docs/reviews/studio-cache-independent-20261020/cache-f2d6-admission/cleanup-public-caches.py",
+      "bytes": 21869,
+      "sha256": "d32238756e3f3a2d00344f4f652a30dd9b88ac960378a5c0c00f1bd2801a5e0d"
+    },
+    {
+      "path": "/Users/ravonus/dev/wt/studio-cache-independent-review-20261020/docs/reviews/studio-cache-independent-20261020/cache-f2d6-admission/cleanup-public-caches.test.py",
+      "bytes": 17834,
+      "sha256": "ee406e495e724bb0a4ea25f376fae81fa4a9ffe22ad0bef92956dde33e7bcad5"
+    },
+    {
+      "path": "/Users/ravonus/dev/wt/studio-cache-independent-review-20261020/docs/reviews/studio-cache-independent-20261020/cache-f2d6-admission/command-admission.json",
+      "bytes": 7323,
+      "sha256": "e6cdb2d7d44e4b97c2465f34fc870692f43e94bcaf447a15817d209b25e38862"
+    },
+    {
+      "path": "/Users/ravonus/dev/wt/studio-cache-independent-review-20261020/docs/reviews/studio-cache-independent-20261020/cache-f2d6-admission/independent62-linux-process.json",
+      "bytes": 139,
+      "sha256": "ee48ac88692d07bf2d5ebf84c1e182a2ecab30afb187c44f75fdb00a7ce26da3"
+    },
+    {
+      "path": "/Users/ravonus/dev/wt/studio-cache-independent-review-20261020/docs/reviews/studio-cache-independent-20261020/cache-f2d6-admission/independent62-linux.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/Users/ravonus/dev/wt/studio-cache-independent-review-20261020/docs/reviews/studio-cache-independent-20261020/cache-f2d6-admission/independent62-linux.stdout",
+      "bytes": 3220,
+      "sha256": "bf41f52fca87d23b7354c973b10a9c83e82385f5d4467bc91f5a9307dab1ed9a"
+    },
+    {
+      "path": "/Users/ravonus/dev/wt/studio-cache-independent-review-20261020/docs/reviews/studio-cache-independent-20261020/cache-f2d6-admission/parity.json",
+      "bytes": 353,
+      "sha256": "2b74dbd0c731de375e447f388cbb7e4b812008c6fd6e445d393130a368511b18"
+    },
+    {
+      "path": "/Users/ravonus/dev/wt/studio-cache-independent-review-20261020/docs/reviews/studio-cache-independent-20261020/cache-f2d6-admission/real-cwd-process.json",
+      "bytes": 145,
+      "sha256": "0ca71bcf0972465847aa71b2d76f17f2260ed20c790caae1c32d3153d4919fb1"
+    },
+    {
+      "path": "/Users/ravonus/dev/wt/studio-cache-independent-review-20261020/docs/reviews/studio-cache-independent-20261020/cache-f2d6-admission/real-cwd-run.py",
+      "bytes": 3821,
+      "sha256": "bb8154881573401e23789e21023cd38b649e8750721af2bd7d07f798e3872a85"
+    },
+    {
+      "path": "/Users/ravonus/dev/wt/studio-cache-independent-review-20261020/docs/reviews/studio-cache-independent-20261020/cache-f2d6-admission/real-cwd.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/Users/ravonus/dev/wt/studio-cache-independent-review-20261020/docs/reviews/studio-cache-independent-20261020/cache-f2d6-admission/real-cwd.stdout",
+      "bytes": 483,
+      "sha256": "26f62877b531cef6bac60015043a80458f499a6819bb88ec8bc12523cbc52cbd"
+    }
+  ]
+}

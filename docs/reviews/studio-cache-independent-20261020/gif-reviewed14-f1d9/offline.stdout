@@ -1,0 +1,490 @@
+TAP version 13
+# file:///private/tmp/keel-qa-receipt-activation-20261020/keel-site/docs/tools/gif-reviewed14-capture/deployed-core.test.mjs:4
+# const root=process.env.KEEL_GIF_TEST_SDK;if(!root)throw Error('Explicit real built SDK required; no synthetic SDK fallback');
+#                                                         ^
+# Error: Explicit real built SDK required; no synthetic SDK fallback
+#     at file:///private/tmp/keel-qa-receipt-activation-20261020/keel-site/docs/tools/gif-reviewed14-capture/deployed-core.test.mjs:4:57
+#     at ModuleJob.run (node:internal/modules/esm/module_job:343:25)
+#     at async onImport.tracePromise.__proto__ (node:internal/modules/esm/loader:665:26)
+#     at async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:117:5)
+# Node.js v22.22.1
+# Subtest: docs/tools/gif-reviewed14-capture/deployed-core.test.mjs
+not ok 1 - docs/tools/gif-reviewed14-capture/deployed-core.test.mjs
+  ---
+  duration_ms: 39.18175
+  type: 'test'
+  location: '/private/tmp/keel-qa-receipt-activation-20261020/keel-site/docs/tools/gif-reviewed14-capture/deployed-core.test.mjs:1:1'
+  failureType: 'testCodeFailure'
+  exitCode: 1
+  signal: ~
+  error: 'test failed'
+  code: 'ERR_TEST_FAILURE'
+  ...
+# Subtest: actual successful normal review is bound; earlier alias no-op cannot authorize capture
+ok 2 - actual successful normal review is bound; earlier alias no-op cannot authorize capture
+  ---
+  duration_ms: 3.067334
+  type: 'test'
+  ...
+# Subtest: scope, normal writer, preserved answers/assets and no-execution flags remain strict
+ok 3 - scope, normal writer, preserved answers/assets and no-execution flags remain strict
+  ---
+  duration_ms: 0.310583
+  type: 'test'
+  ...
+# Subtest: changed receipt hash or path cannot authorize a new revision
+ok 4 - changed receipt hash or path cannot authorize a new revision
+  ---
+  duration_ms: 0.124833
+  type: 'test'
+  ...
+# Subtest: actual capture CLI main entry resolves both /tmp alias and canonical path before reading config
+ok 5 - actual capture CLI main entry resolves both /tmp alias and canonical path before reading config
+  ---
+  duration_ms: 78.369084
+  type: 'test'
+  ...
+# Subtest: only exact484-byte public receipt with original image/container/UID999 and no side effects is accepted
+ok 6 - only exact484-byte public receipt with original image/container/UID999 and no side effects is accepted
+  ---
+  duration_ms: 0.809458
+  type: 'test'
+  ...
+# Subtest: public receipt loader rejects any other path/hash/size before opening it
+ok 7 - public receipt loader rejects any other path/hash/size before opening it
+  ---
+  duration_ms: 0.141583
+  type: 'test'
+  ...
+# Subtest: clone credential guard inspects directory existence only; copy receipt binds exact no-key roots
+ok 8 - clone credential guard inspects directory existence only; copy receipt binds exact no-key roots
+  ---
+  duration_ms: 4.077209
+  type: 'test'
+  ...
+# Subtest: actual SDK4cf ABI rejects stage signer drift and conflicting SDK/native views before capture persistence
+not ok 9 - actual SDK4cf ABI rejects stage signer drift and conflicting SDK/native views before capture persistence
+  ---
+  duration_ms: 0.42425
+  type: 'test'
+  location: '/private/tmp/keel-qa-receipt-activation-20261020/keel-site/docs/tools/gif-reviewed14-capture/public-signer.test.mjs:18:1'
+  failureType: 'testCodeFailure'
+  error: 'Explicit qualified SDK test root required'
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: true
+  operator: '=='
+  stack: |-
+    TestContext.<anonymous> (file:///private/tmp/keel-qa-receipt-activation-20261020/keel-site/docs/tools/gif-reviewed14-capture/public-signer.test.mjs:19:53)
+    Test.runInAsyncScope (node:async_hooks:214:14)
+    Test.run (node:internal/test_runner/test:1047:25)
+    Test.processPendingSubtests (node:internal/test_runner/test:744:18)
+    Test.postRun (node:internal/test_runner/test:1173:19)
+    Test.run (node:internal/test_runner/test:1101:12)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: unexpected eth_call authorizationList cannot dispatch
+ok 10 - unexpected eth_call authorizationList cannot dispatch
+  ---
+  duration_ms: 11.277917
+  type: 'test'
+  ...
+# Subtest: unexpected eth_call accessList cannot dispatch
+ok 11 - unexpected eth_call accessList cannot dispatch
+  ---
+  duration_ms: 0.310709
+  type: 'test'
+  ...
+# Subtest: unexpected eth_call stateOverride cannot dispatch
+ok 12 - unexpected eth_call stateOverride cannot dispatch
+  ---
+  duration_ms: 0.534208
+  type: 'test'
+  ...
+# Subtest: unexpected eth_call stateDiff cannot dispatch
+ok 13 - unexpected eth_call stateDiff cannot dispatch
+  ---
+  duration_ms: 0.482625
+  type: 'test'
+  ...
+# Subtest: unexpected eth_call blockOverrides cannot dispatch
+ok 14 - unexpected eth_call blockOverrides cannot dispatch
+  ---
+  duration_ms: 0.519916
+  type: 'test'
+  ...
+# Subtest: unexpected eth_call code cannot dispatch
+ok 15 - unexpected eth_call code cannot dispatch
+  ---
+  duration_ms: 0.282375
+  type: 'test'
+  ...
+# Subtest: unexpected eth_call nonce cannot dispatch
+ok 16 - unexpected eth_call nonce cannot dispatch
+  ---
+  duration_ms: 0.242292
+  type: 'test'
+  ...
+# Subtest: unexpected eth_call chainId cannot dispatch
+ok 17 - unexpected eth_call chainId cannot dispatch
+  ---
+  duration_ms: 0.356958
+  type: 'test'
+  ...
+# Subtest: unexpected eth_call unknown cannot dispatch
+ok 18 - unexpected eth_call unknown cannot dispatch
+  ---
+  duration_ms: 0.8275
+  type: 'test'
+  ...
+# Subtest: malformed or override call cannot dispatch [{"to":"0x1111111111111111111111111111111111111111","data":"0x12345678"},"0xb6254a",{}]
+ok 19 - malformed or override call cannot dispatch [{"to":"0x1111111111111111111111111111111111111111","data":"0x12345678"},"0xb6254a",{}]
+  ---
+  duration_ms: 0.429292
+  type: 'test'
+  ...
+# Subtest: malformed or override call cannot dispatch [{"to":"0x1111111111111111111111111111111111111111","data":"0x12345678"},"0xb6254a",{},{}]
+ok 20 - malformed or override call cannot dispatch [{"to":"0x1111111111111111111111111111111111111111","data":"0x12345678"},"0xb6254a",{},{}]
+  ---
+  duration_ms: 0.147209
+  type: 'test'
+  ...
+# Subtest: malformed or override call cannot dispatch [{"to":"0x1111111111111111111111111111111111111111","data":"0x12345678"},["0xb6254a"]]
+ok 21 - malformed or override call cannot dispatch [{"to":"0x1111111111111111111111111111111111111111","data":"0x12345678"},["0xb6254a"]]
+  ---
+  duration_ms: 0.220458
+  type: 'test'
+  ...
+# Subtest: malformed or override call cannot dispatch {"0":{"to":"0x1111111111111111111111111111111111111111","data":"0x12345678"},"1":"0xb6254a","length":2}
+ok 22 - malformed or override call cannot dispatch {"0":{"to":"0x1111111111111111111111111111111111111111","data":"0x12345678"},"1":"0xb6254a","length":2}
+  ---
+  duration_ms: 1.623
+  type: 'test'
+  ...
+# Subtest: credential/semantic denial is terminal: rate limit; invalid API key
+ok 23 - credential/semantic denial is terminal: rate limit; invalid API key
+  ---
+  duration_ms: 2.554125
+  type: 'test'
+  ...
+# Subtest: credential/semantic denial is terminal: rate limit; authentication failed
+ok 24 - credential/semantic denial is terminal: rate limit; authentication failed
+  ---
+  duration_ms: 0.374375
+  type: 'test'
+  ...
+# Subtest: credential/semantic denial is terminal: rate limit; token expired
+ok 25 - credential/semantic denial is terminal: rate limit; token expired
+  ---
+  duration_ms: 0.274542
+  type: 'test'
+  ...
+# Subtest: credential/semantic denial is terminal: rate limit; authorization failed
+ok 26 - credential/semantic denial is terminal: rate limit; authorization failed
+  ---
+  duration_ms: 0.405666
+  type: 'test'
+  ...
+# Subtest: credential/semantic denial is terminal: rate limit; credentials revoked
+ok 27 - credential/semantic denial is terminal: rate limit; credentials revoked
+  ---
+  duration_ms: 0.313875
+  type: 'test'
+  ...
+# Subtest: credential/semantic denial is terminal: rate limit; permission denied
+ok 28 - credential/semantic denial is terminal: rate limit; permission denied
+  ---
+  duration_ms: 0.237292
+  type: 'test'
+  ...
+# Subtest: credential/semantic denial is terminal: rate limit; unauthorized
+ok 29 - credential/semantic denial is terminal: rate limit; unauthorized
+  ---
+  duration_ms: 0.279625
+  type: 'test'
+  ...
+# Subtest: credential/semantic denial is terminal: rate limit; execution reverted
+ok 30 - credential/semantic denial is terminal: rate limit; execution reverted
+  ---
+  duration_ms: 0.216292
+  type: 'test'
+  ...
+# Subtest: rate allowlist rejects nested aliases, unknown keys, oversized text and noninteger codes
+ok 31 - rate allowlist rejects nested aliases, unknown keys, oversized text and noninteger codes
+  ---
+  duration_ms: 0.096167
+  type: 'test'
+  ...
+# Subtest: public read schemas retain bounded actual reader/history/fee forms
+ok 32 - public read schemas retain bounded actual reader/history/fee forms
+  ---
+  duration_ms: 0.312291
+  type: 'test'
+  ...
+# Subtest: read schemas forbid storage overrides, ambiguous block objects and oversized proof batches
+ok 33 - read schemas forbid storage overrides, ambiguous block objects and oversized proof batches
+  ---
+  duration_ms: 0.125042
+  type: 'test'
+  ...
+# Subtest: exact assembly-only gate refuses any expanded authority or changed identity
+ok 34 - exact assembly-only gate refuses any expanded authority or changed identity
+  ---
+  duration_ms: 0.812084
+  type: 'test'
+  ...
+# Subtest: ordinary bounded public reads succeed without private execution
+ok 35 - ordinary bounded public reads succeed without private execution
+  ---
+  duration_ms: 13.796708
+  type: 'test'
+  ...
+# Subtest: network guard refuses eth_simulateV1 before dispatch
+ok 36 - network guard refuses eth_simulateV1 before dispatch
+  ---
+  duration_ms: 0.50775
+  type: 'test'
+  ...
+# Subtest: network guard refuses eth_sendRawTransaction before dispatch
+ok 37 - network guard refuses eth_sendRawTransaction before dispatch
+  ---
+  duration_ms: 0.537875
+  type: 'test'
+  ...
+# Subtest: network guard refuses eth_sendTransaction before dispatch
+ok 38 - network guard refuses eth_sendTransaction before dispatch
+  ---
+  duration_ms: 0.332416
+  type: 'test'
+  ...
+# Subtest: network guard refuses personal_sign before dispatch
+ok 39 - network guard refuses personal_sign before dispatch
+  ---
+  duration_ms: 0.285834
+  type: 'test'
+  ...
+# Subtest: network guard refuses eth_estimateGas before dispatch
+ok 40 - network guard refuses eth_estimateGas before dispatch
+  ---
+  duration_ms: 0.2095
+  type: 'test'
+  ...
+# Subtest: HTTP301 is terminal without fallback
+ok 41 - HTTP301 is terminal without fallback
+  ---
+  duration_ms: 0.913042
+  type: 'test'
+  ...
+# Subtest: HTTP401 is terminal without fallback
+ok 42 - HTTP401 is terminal without fallback
+  ---
+  duration_ms: 2.903292
+  type: 'test'
+  ...
+# Subtest: HTTP403 is terminal without fallback
+ok 43 - HTTP403 is terminal without fallback
+  ---
+  duration_ms: 1.233209
+  type: 'test'
+  ...
+# Subtest: recipient, private payload, oversized body, large call and unbounded logs fail before dispatch
+ok 44 - recipient, private payload, oversized body, large call and unbounded logs fail before dispatch
+  ---
+  duration_ms: 0.714291
+  type: 'test'
+  ...
+# Subtest: cumulative request count and cancellation remain bounded
+ok 45 - cumulative request count and cancellation remain bounded
+  ---
+  duration_ms: 62.56525
+  type: 'test'
+  ...
+# Subtest: HTTP200 RPC error 403 is terminal
+ok 46 - HTTP200 RPC error 403 is terminal
+  ---
+  duration_ms: 0.832916
+  type: 'test'
+  ...
+# Subtest: HTTP200 RPC error 401 is terminal
+ok 47 - HTTP200 RPC error 401 is terminal
+  ---
+  duration_ms: 0.172125
+  type: 'test'
+  ...
+# Subtest: HTTP200 RPC error 3 is terminal
+ok 48 - HTTP200 RPC error 3 is terminal
+  ---
+  duration_ms: 0.210166
+  type: 'test'
+  ...
+# Subtest: HTTP200 RPC error -32000 is terminal
+ok 49 - HTTP200 RPC error -32000 is terminal
+  ---
+  duration_ms: 0.140209
+  type: 'test'
+  ...
+# Subtest: malformed HTTP200 response is terminal
+ok 50 - malformed HTTP200 response is terminal
+  ---
+  duration_ms: 0.176167
+  type: 'test'
+  ...
+# Subtest: only explicit RPC rate limits permit at most three consecutive physical attempts
+ok 51 - only explicit RPC rate limits permit at most three consecutive physical attempts
+  ---
+  duration_ms: 0.472
+  type: 'test'
+  ...
+# Subtest: contradictory rate error is terminal {"code":429,"message":"access denied"}
+ok 52 - contradictory rate error is terminal {"code":429,"message":"access denied"}
+  ---
+  duration_ms: 0.159959
+  type: 'test'
+  ...
+# Subtest: contradictory rate error is terminal {"code":429,"message":"execution reverted"}
+ok 53 - contradictory rate error is terminal {"code":429,"message":"execution reverted"}
+  ---
+  duration_ms: 0.121375
+  type: 'test'
+  ...
+# Subtest: contradictory rate error is terminal {"code":429,"message":"rate limit","data":{"code":403,"message":"denied"}}
+ok 54 - contradictory rate error is terminal {"code":429,"message":"rate limit","data":{"code":403,"message":"denied"}}
+  ---
+  duration_ms: 0.123917
+  type: 'test'
+  ...
+# Subtest: stream failure is terminal before another request
+ok 55 - stream failure is terminal before another request
+  ---
+  duration_ms: 0.281875
+  type: 'test'
+  ...
+# Subtest: HTTP429 without a known rate error is terminal
+ok 56 - HTTP429 without a known rate error is terminal
+  ---
+  duration_ms: 0.159416
+  type: 'test'
+  ...
+# Subtest: uncorrelated or unknown response envelope is terminal {"jsonrpc":"2.0","id":2,"error":{"code":429,"message":"rate limit"}}
+ok 57 - uncorrelated or unknown response envelope is terminal {"jsonrpc":"2.0","id":2,"error":{"code":429,"message":"rate limit"}}
+  ---
+  duration_ms: 0.144625
+  type: 'test'
+  ...
+# Subtest: uncorrelated or unknown response envelope is terminal {"jsonrpc":"1.0","id":1,"error":{"code":429,"message":"rate limit"}}
+ok 58 - uncorrelated or unknown response envelope is terminal {"jsonrpc":"1.0","id":1,"error":{"code":429,"message":"rate limit"}}
+  ---
+  duration_ms: 0.118584
+  type: 'test'
+  ...
+# Subtest: uncorrelated or unknown response envelope is terminal {"jsonrpc":"2.0","id":1,"error":{"code":429,"message":"rate limit"},"data":{"code":403,"message":"denied"}}
+ok 59 - uncorrelated or unknown response envelope is terminal {"jsonrpc":"2.0","id":1,"error":{"code":429,"message":"rate limit"},"data":{"code":403,"message":"denied"}}
+  ---
+  duration_ms: 0.122083
+  type: 'test'
+  ...
+# Subtest: uncorrelated or unknown response envelope is terminal {"jsonrpc":"2.0","id":1,"result":null,"error":{"code":429,"message":"rate limit"}}
+ok 60 - uncorrelated or unknown response envelope is terminal {"jsonrpc":"2.0","id":1,"result":null,"error":{"code":429,"message":"rate limit"}}
+  ---
+  duration_ms: 0.118375
+  type: 'test'
+  ...
+# Subtest: uncorrelated or unknown response envelope is terminal [{"jsonrpc":"2.0","id":1,"error":{"code":429,"message":"rate limit"}}]
+ok 61 - uncorrelated or unknown response envelope is terminal [{"jsonrpc":"2.0","id":1,"error":{"code":429,"message":"rate limit"}}]
+  ---
+  duration_ms: 0.1115
+  type: 'test'
+  ...
+# Subtest: batch correlation permits reordered unique responses
+ok 62 - batch correlation permits reordered unique responses
+  ---
+  duration_ms: 0.188959
+  type: 'test'
+  ...
+# Subtest: batch duplicate response ids are terminal
+ok 63 - batch duplicate response ids are terminal
+  ---
+  duration_ms: 0.179291
+  type: 'test'
+  ...
+# Subtest: exact closed-job read returns its unchanged ABI error for normal canonical history proof
+ok 64 - exact closed-job read returns its unchanged ABI error for normal canonical history proof
+  ---
+  duration_ms: 0.865917
+  type: 'test'
+  ...
+# Subtest: closed-job exception refuses different request [{"to":"0x0000000000000000000000000000000000000001","data":"0xbf22c4570000000000000000000000000000000000000000000000000000000000000000"},"0xb65aca"]
+ok 65 - closed-job exception refuses different request [{"to":"0x0000000000000000000000000000000000000001","data":"0xbf22c4570000000000000000000000000000000000000000000000000000000000000000"},"0xb65aca"]
+  ---
+  duration_ms: 0.179416
+  type: 'test'
+  ...
+# Subtest: closed-job exception refuses different request [{"to":"0x93f8bb414f22d5Df29Db6d67b78224D69453A094","data":"0x123456780000000000000000000000000000000000000000000000000000000000000000"},"0xb65aca"]
+ok 66 - closed-job exception refuses different request [{"to":"0x93f8bb414f22d5Df29Db6d67b78224D69453A094","data":"0x123456780000000000000000000000000000000000000000000000000000000000000000"},"0xb65aca"]
+  ---
+  duration_ms: 0.131708
+  type: 'test'
+  ...
+# Subtest: closed-job exception refuses different request [{"to":"0x93f8bb414f22d5Df29Db6d67b78224D69453A094","data":"0xbf22c4570000000000000000000000000000000000000000000000000000000000000000"},"latest"]
+ok 67 - closed-job exception refuses different request [{"to":"0x93f8bb414f22d5Df29Db6d67b78224D69453A094","data":"0xbf22c4570000000000000000000000000000000000000000000000000000000000000000"},"latest"]
+  ---
+  duration_ms: 0.1275
+  type: 'test'
+  ...
+# Subtest: closed-job exception refuses different request [{"to":"0x93f8bb414f22d5Df29Db6d67b78224D69453A094","data":"0xbf22c4570000000000000000000000000000000000000000000000000000000000000000"},["0xb65aca"]]
+ok 68 - closed-job exception refuses different request [{"to":"0x93f8bb414f22d5Df29Db6d67b78224D69453A094","data":"0xbf22c4570000000000000000000000000000000000000000000000000000000000000000"},["0xb65aca"]]
+  ---
+  duration_ms: 0.083417
+  type: 'test'
+  ...
+# Subtest: closed-job exception refuses different request {"0":{"to":"0x93f8bb414f22d5Df29Db6d67b78224D69453A094","data":"0xbf22c4570000000000000000000000000000000000000000000000000000000000000000"},"1":"0xb65aca","length":2}
+ok 69 - closed-job exception refuses different request {"0":{"to":"0x93f8bb414f22d5Df29Db6d67b78224D69453A094","data":"0xbf22c4570000000000000000000000000000000000000000000000000000000000000000"},"1":"0xb65aca","length":2}
+  ---
+  duration_ms: 0.08625
+  type: 'test'
+  ...
+# Subtest: closed-job exception refuses different request [{"to":"0x93f8bb414f22d5Df29Db6d67b78224D69453A094","data":"0xbf22c4570000000000000000000000000000000000000000000000000000000000000000"},"0xb65aca",{}]
+ok 70 - closed-job exception refuses different request [{"to":"0x93f8bb414f22d5Df29Db6d67b78224D69453A094","data":"0xbf22c4570000000000000000000000000000000000000000000000000000000000000000"},"0xb65aca",{}]
+  ---
+  duration_ms: 0.076
+  type: 'test'
+  ...
+# Subtest: closed-job exception refuses different request [{"to":"0x93f8bb414f22d5Df29Db6d67b78224D69453A094","data":"0xbf22c4570000000000000000000000000000000000000000000000000000000000000000","from":"0x0000000000000000000000000000000000000001"},"0xb65aca"]
+ok 71 - closed-job exception refuses different request [{"to":"0x93f8bb414f22d5Df29Db6d67b78224D69453A094","data":"0xbf22c4570000000000000000000000000000000000000000000000000000000000000000","from":"0x0000000000000000000000000000000000000001"},"0xb65aca"]
+  ---
+  duration_ms: 0.130791
+  type: 'test'
+  ...
+# Subtest: closed-job exception refuses different error {"code":3,"message":"execution reverted","data":"0xdeadbeef"}
+ok 72 - closed-job exception refuses different error {"code":3,"message":"execution reverted","data":"0xdeadbeef"}
+  ---
+  duration_ms: 0.151041
+  type: 'test'
+  ...
+# Subtest: closed-job exception refuses different error {"code":403,"message":"execution reverted","data":"0x1ad3309b"}
+ok 73 - closed-job exception refuses different error {"code":403,"message":"execution reverted","data":"0x1ad3309b"}
+  ---
+  duration_ms: 0.124042
+  type: 'test'
+  ...
+# Subtest: closed-job exception refuses different error {"code":3,"message":"access denied","data":"0x1ad3309b"}
+ok 74 - closed-job exception refuses different error {"code":3,"message":"access denied","data":"0x1ad3309b"}
+  ---
+  duration_ms: 0.12675
+  type: 'test'
+  ...
+# Subtest: closed-job exception refuses different error {"code":3,"message":"execution reverted","data":"0x1ad3309b","extra":"denied"}
+ok 75 - closed-job exception refuses different error {"code":3,"message":"execution reverted","data":"0x1ad3309b","extra":"denied"}
+  ---
+  duration_ms: 0.120292
+  type: 'test'
+  ...
+1..75
+# tests 75
+# suites 0
+# pass 73
+# fail 2
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 456.900208

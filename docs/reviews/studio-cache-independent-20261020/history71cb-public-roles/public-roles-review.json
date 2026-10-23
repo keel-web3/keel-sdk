@@ -1,0 +1,88 @@
+{
+  "schema": "keel.independent-exact17cb-public-roles-review@1",
+  "decision": "APPROVE_EXACT_PUBLIC_STAGE_AND_THREE_SERIAL_ISOLATED_ROLES_ONLY",
+  "reviewerId": "independent-release-reviewer",
+  "sourceFreezeCommit": "c68c958a876dcff3da8dc70a27073db8516da073",
+  "source": "71cb0e31bab5e4ee93af9d3b3185978e46f1fe8e",
+  "sdk": "311d61526284248938e335d7ed879089408933be",
+  "buildId": "jfjIfW1-d41RR-j-i-YgL",
+  "image": "sha256:17cb5aac36536e3d6026ba32b3bb3a66adc04af5bb7207082ee472dce66320c9",
+  "imageBytes": 728593160,
+  "imageConfigSHA256": "b8ddaf6d68e76ad758ee46b7c8407b480dfb146113ba0f31a43f10943d80a38b",
+  "imageRootFSSHA256": "4c8ae79ca08fa02d6ce7209d2a9116550ab175a502572d850aec7fd2aa9fa2e0",
+  "transferCommandsSHA256": "69622878e12584eb01075d4f8f28c92bc32e4643f91a94366b9c494bf32484d8",
+  "rolePacketSHA256": "9098fea599e5fc3f0302fd12ae57e5bf3219c7feda2866a7f181f4122473493a",
+  "runnerSHA256": "11513996f17768d50e1bab826c76a253a9ea3cc900a4c8e3773c097094add49f",
+  "inputSourceAuditSHA256": "b4d8485eb833105da10876fe5e6a177009cf4ea66f16db27f543a64cff9d11b2",
+  "sourceCorrespondence": "Runner reverse exact to previously reviewed a5ed after immutable image/size/rootFS, public root/current baseline guard, source/build and basefilename bindings. SDK/HTTP only source/build reference retarget; tree only expected/base hash/file bindings. Four helper files byte-exact. Original assertions/resources/timers and cleanup unchanged.",
+  "freshIndependentLocalControls": {
+    "pass": 5,
+    "fail": 0,
+    "scope": "Actual authenticate function with synthetic Docker inspections. No container or host execution."
+  },
+  "artifactQualification": {
+    "qaCommit": "8e91b53f18bd18f7d51cf62869444ca842457ee3",
+    "qaResultPath": "/tmp/keel-qa-receipt-activation-20261020/keel-site/docs/reviews/studio-publication-20261021/qa-actual-history17cb/result.json",
+    "qaResultSHA256": "b83a0702a4ada47249ee5d5f159cee7daa7f18af87f703cc4a14dcabb6ac53d0",
+    "operator": "Independent QA once on Yuna, not production/root operator; exact authorized public audit wrapper preserved",
+    "safeRawWrapperOutputSHA256": "c38971611b41bed7caeeb54805e089c2e61ebf66c506e99e7e223b6137433eb3",
+    "wholeImageAuditSHA256": "9a2c36cb25f28d16093e543cf55826e8b6d8d61fcad4ef47445c227538b0f9a1",
+    "compatibilityAuditSHA256": "5d481d2495559f53d0039561f4abf55dbd2040d2b5e7f53150a2e2a1eaefa900",
+    "contextAuditSHA256": "d4d139bd44b1ebe4b40c86d0b4c26625d35b361066b2933a095e25c649285780",
+    "fullSAVEOnlyOnYuna": true,
+    "fullSaveBytes": 728640512,
+    "fullSaveSHA256": "f85233156f412f17f92aa609e20c1e13f377205cb885b97e5b2a9a108ec728bc",
+    "scope": "48blobs/46expandedlayers/full44parentprefix/fullConfig/36065app89e/1360installed+1745workspace/native8a/bootstrap/worker; no runtime or private proof pass inferred"
+  },
+  "permittedActions": {
+    "exclusiveNewRoot": "/home/ubuntu/keel-studio-image-qualification-fefa0600-ecc0-4584-b211-8cd0d139e601",
+    "exclusivePublicFiles0444": 11,
+    "emptyPostgresCover0555": true,
+    "serialRoleOrder": [
+      "tree",
+      "sdk",
+      "http"
+    ],
+    "maximumExecutionsPerRole": 1,
+    "allPostCreateLifecycleByAuthenticatedImmutableId": true,
+    "retainStoppedOwnedContainersAndResults": true,
+    "foreignOccupantsPreserved": true,
+    "automaticRetry": false
+  },
+  "isolation": {
+    "network": "none",
+    "rootfsReadOnly": true,
+    "user": "999:999",
+    "capDrop": "ALL",
+    "securityOpt": "no-new-privileges",
+    "memoryBytes": 805306368,
+    "memorySwapBytes": 805306368,
+    "cpus": {
+      "tree": 1,
+      "sdk": 2,
+      "http": 1
+    },
+    "pidsLimit": 64,
+    "postgresRealDataCoveredByEmptyReadOnlyDirectory": true,
+    "hostSocketOrCredentialOrProductionEnvOrArtworkMounts": false,
+    "boundedTmpfsAndLogs": true,
+    "nativeOrRPCProgramsExecuted": false,
+    "HTTPCheck": "Synthetic isolated localserver only; publicGET/HEAD and authdenial/privacy assertions. No real creator session/project or publication POST.",
+    "productionSupervisorEntrypointExecuted": false,
+    "actualNextHTTPServerStartedByIsolatedHarness": true
+  },
+  "requiredFreshGuards": "Before and after EACH role: original5c97/7b0 full Config/Host/mount/healthy/paused and D97/socket exact, pinned daemon/profile/image, common exclusive lock, fresh1GiB+256MiB disk reserve and1GiB memory/load<4, unused owned names. Bound normal health window max20/45s/900s, stop on failure. Fail/unknown never authorizes retry/fallback/foreign cleanup.",
+  "runtimeTestOutputsPending": true,
+  "technicalActivationApproved": false,
+  "privatePreparationSimulationOrProgramApproved": false,
+  "signingSubmissionOrWalletApproved": false,
+  "semanticComparisonClarification": {
+    "retainedStrict280Status": "FAIL_UNPROVEN",
+    "isCurrentSpecificProductionDefectOrStandaloneGate": false,
+    "why": "Original compiler barrel-definition comparison did not prove whole semantic equivalence. No source defect remaining on exact71cb. Exact installedSDK311/native8a/D97 and public canonicalfactorygoldens qualify components; old fullproofs keep historical attribution.",
+    "newFullNativeWholeClosureOrLiveSuccessClaim": false
+  },
+  "currentLiveGate6": "Gator/GIF failures retained; fresh actual deployed owner acceptance mandatory. HistoricalH pass is separate.",
+  "blockingPublicRoleFindings": [],
+  "reviewerHostActions": 0
+}

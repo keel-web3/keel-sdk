@@ -1,0 +1,106 @@
+{
+  "schema": "keel.independent-funding-public-host-build-review@1",
+  "decision": "APPROVE_ONE_PUBLIC_HOST_BUILD_SUBJECT_TO_EXISTING_FULL_POSTSTAGE_GUARD",
+  "reviewerId": "independent-release-reviewer",
+  "sourceFreeze": "08e699f8451900211ef15bdf080c44604269c7b6",
+  "siteCommit": "d64027b868c1d038854b6181049785fe50da0dcb",
+  "sdkCommit": "311d61526284248938e335d7ed879089408933be",
+  "buildId": "IETVxBFih4T2X8_Bx9hK0",
+  "sourceReviewSHA256": "73abf95247354421c5d857250d7b4178ef43248547a8a5ee8ca5f3d4c6c2a4d7",
+  "offlineProducerReviewSHA256": "17d4720a3c8bd4b8384b25ac297d28f0a6cea66e50aef79e88203e3a1e075afe",
+  "planSHA256": "cea50098df7d61bd377d84f2d9bdc41314cb9ede47bdf741416872cd55a85da9",
+  "commandPath": "/private/tmp/keel-independent-fundingd640-20261021/host-build-commands.admitted.json",
+  "commandSHA256": "94bab7ebfd21e7b4c97083a4d2af7844305bd5d1b94c7f49093b1d37271ce336",
+  "remoteRoot": "/home/ubuntu/keel-studio-funding-build-631074fc-e4c1-47df-968d-f7abffaabf52",
+  "buildOperatorSHA256": "7269e82743c0d031f219916ca7031f2762d0b01cd9d7b16a7bd4b593a18b2112",
+  "currentGuardOperatorSHA256": "980300685d48fcd3456a5788292ea353033c7c6db0c9bbb7243dc118795eaf55",
+  "baseCurrent": {
+    "id": "c63d763ca03989cf4685104a3b9069cb7a40ec0cb7d45bac4359c22f78adcce8",
+    "image": "sha256:cee8c0b777f78372c6ee56bd9ff1c66dbeafd6393d04cb7f298fab6eb7bac9b7",
+    "configSHA256": "cbc1421f48129b305185026d7154a3e559c849ad394e41ace8cedea87c65c7d0",
+    "hostConfigSHA256": "186e487039113f582118064bce13b98c79f75eca5b3fa0d788c7d79b8fb14049",
+    "mountsSHA256": "74cc304b0955c822f88ffdbcbff56d89857f5ea3d7c51246ec106f00247ade89"
+  },
+  "baseImageConfigSHA256": "b8ddaf6d68e76ad758ee46b7c8407b480dfb146113ba0f31a43f10943d80a38b",
+  "baseImageRootFSSHA256": "089fc8c7150dc9b4a5c209773ed4d715f2bbac89511814ceb0387e6e4c1b00be",
+  "runnerRetained": {
+    "id": "434316eff6e19951807f95ba8aee03a4db684d760039dfeb723c7bf9203a8649",
+    "image": "sha256:d97ddf2aba94cb963646fdf05bc8dc8c99b7e69b8c19bad85c06bea7c67fc9f5",
+    "configSHA256": "23f5b528017bd47ac37f47ea6d4a56efd3926e4ca1fa0aad13f02652b1570113",
+    "hostConfigSHA256": "6fc9390416de4dd4ff6872f14b3430c76838f6bcef8abd428b6c63fd3d55dd82",
+    "mountsSHA256": "07f01d55cebb43e5ed07f5bdcafc33bf85d6a294839179d72e9ba5121609937f"
+  },
+  "socketRetained": {
+    "Name": "keel-studio-proof-socket-2779804f-f8fe-4fcd-8153-f45ad70b03b6",
+    "Driver": "local",
+    "Options": {
+      "device": "tmpfs",
+      "o": "size=16m,uid=999,gid=999,mode=0700,noexec,nosuid",
+      "type": "tmpfs"
+    }
+  },
+  "archive": {
+    "bytes": 7580336,
+    "sha256": "d4f08cd5410e8133e2c36005f3d5fe51ff0b11798f6babca9739cb19d4a41b35",
+    "rawBytes": 38993920,
+    "rawSHA256": "2151e3413edf60e19c12b2e54eeb440910aabdf636dd9051e3f22e539d551ee1",
+    "expectedResultTreeSHA256": "9bad445483cd8b8f76bfe1916261dc1337c06bd0854b8e32e514ba5b8ce89c1b",
+    "expectedEntries": 36065,
+    "changedEntries": 1567,
+    "deletedPaths": 149,
+    "all2353ArchiveEntriesMatchFrozenContext": true
+  },
+  "ownStaticChecks": {
+    "exactSevenLocalPayloadLengthsAndHashes": true,
+    "allReceiversRootModeOwnerNofollowExclusive0444SizeHashFileAndDirectoryFsync": true,
+    "executeDiffersFromReadOnlyPreflightOnlyExactPlanDigestArgument": true,
+    "builderReverseExactAfterOnlySourceLiteralRetarget": true,
+    "guardOperatorReverseExactAfterOnlyCurrentIDImageRetarget": true,
+    "helperBytesUnchanged": true,
+    "deltaSafetyControls": {
+      "passed": 5,
+      "failed": 0,
+      "skipped": 0
+    }
+  },
+  "scope": [
+    "Create exact new exclusive root631074fc and install seven exact hash-bound public payloads0444",
+    "Existing read-only builder preflight with full currentCEE8/c63/runner/socket/profile/pause checks",
+    "At most ONE exactcea500 plan-hash-bound legacyDocker public delta build, no ENTRYPOINT/application/DB/private/native program run",
+    "After successful build only, complete immutable public DockerSAVE may stream directly offhost into new exclusive0600 file for actual image QA; never create server raw archive"
+  ],
+  "budget": {
+    "rollbackReserveBytes": 1073741824,
+    "snapshotReserveBytes": 268435456,
+    "additionalMetadataBytes": 67108864,
+    "compressedStagedContextBytes": 7580336,
+    "daemonRawTarScratchBytes": 38993920,
+    "unpackedContextPlusExpandedLayerPlusContentStoreCopies": 117620736,
+    "requiredInitialFreeBytes": 1573481136,
+    "freshObservedFreeBytes": null,
+    "postStageGuardRequired": true,
+    "operationalHeadroomProven": false
+  },
+  "mandatoryExecutionCondition": "Existing builder must freshly PASS all strict checks and full1,573,481,136B free reserve UNDER exclusive rolloutlock AFTER staging and again on execute BEFORE consume. Planning cleanup observation is not operational fit. Stop on any guard failure; no lowering reserves/accounting, cleanup, fallback, or retry.",
+  "resourceRequest": {
+    "memoryBytes": 805306368,
+    "memorySwapBytes": 805306368,
+    "cpuPeriod": 100000,
+    "cpuQuota": 200000,
+    "network": "none",
+    "pull": false
+  },
+  "maximumBuildExecutions": 1,
+  "automaticRetryAllowed": false,
+  "newImageId": "UNKNOWN_PENDING_ACTUAL_DURABLE_SUCCESS",
+  "activationApproved": false,
+  "cleanupApproved": false,
+  "privateProgramOrRPCReplayApproved": false,
+  "signing": false,
+  "submission": false,
+  "sourceOrNativeWholeEquivalenceClaimed": false,
+  "newImageQARequiredBeforeActivation": true,
+  "Gate6": "FAIL_UNRESOLVED_OWN_GATOR_AND_REAL_GIF_HANDOFF",
+  "blockingBuildSourceFindings": [],
+  "reviewerHostActions": false
+}

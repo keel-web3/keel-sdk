@@ -1,0 +1,34 @@
+{
+  "sourceCommit": "0ee9947af4b2fc73606150db0189471853cafcf3",
+  "scope": "actual helper source and explicit synthetic Docker inspection, no Docker or host execution",
+  "results": [
+    {
+      "field": "CapAdd",
+      "value": [
+        "SYS_ADMIN"
+      ],
+      "rejected": false,
+      "expected": "reject foreign extra privileged host configuration"
+    },
+    {
+      "field": "Devices",
+      "value": [
+        {
+          "PathOnHost": "/dev/mem",
+          "PathInContainer": "/dev/mem",
+          "CgroupPermissions": "rwm"
+        }
+      ],
+      "rejected": false,
+      "expected": "reject foreign extra privileged host configuration"
+    },
+    {
+      "field": "VolumesFrom",
+      "value": [
+        "unrelated:rw"
+      ],
+      "rejected": false,
+      "expected": "reject foreign extra privileged host configuration"
+    }
+  ]
+}

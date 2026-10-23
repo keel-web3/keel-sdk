@@ -1,0 +1,178 @@
+TAP version 13
+# Subtest: owner handoff binds account wallet and saved operation without accepting a caller wallet
+ok 1 - owner handoff binds account wallet and saved operation without accepting a caller wallet
+  ---
+  duration_ms: 13.419583
+  type: 'test'
+  ...
+# Subtest: browser and agent review routes scope read and prepare, reject injected fields and sanitize failures
+ok 2 - browser and agent review routes scope read and prepare, reject injected fields and sanitize failures
+  ---
+  duration_ms: 39.561833
+  type: 'test'
+  ...
+# Subtest: hosted MCP prepares the same exact review only through the granted drafts writer
+ok 3 - hosted MCP prepares the same exact review only through the granted drafts writer
+  ---
+  duration_ms: 73.415333
+  type: 'test'
+  ...
+# Subtest: creator release handoff forwards cancellation to prepare and exact saved read
+ok 4 - creator release handoff forwards cancellation to prepare and exact saved read
+  ---
+  duration_ms: 14.989375
+  type: 'test'
+  ...
+# Subtest: signed out, the page asks for sign-in and sends nothing
+ok 5 - signed out, the page asks for sign-in and sends nothing
+  ---
+  duration_ms: 93.053625
+  type: 'test'
+  ...
+# Subtest: one explicit click creates exactly one guided draft for the exact project, then opens its plan
+ok 6 - one explicit click creates exactly one guided draft for the exact project, then opens its plan
+  ---
+  duration_ms: 29.581458
+  type: 'test'
+  ...
+# Subtest: a project that already has a draft continues it and never creates another unless asked
+ok 7 - a project that already has a draft continues it and never creates another unless asked
+  ---
+  duration_ms: 16.383292
+  type: 'test'
+  ...
+# Subtest: a prepared or submitted release continues on its exact saved review, and archived drafts are ignored
+ok 8 - a prepared or submitted release continues on its exact saved review, and archived drafts are ignored
+  ---
+  duration_ms: 15.261042
+  type: 'test'
+  ...
+# Subtest: an exact project that is not in the workspace is reported, never replaced by another
+ok 9 - an exact project that is not in the workspace is reported, never replaced by another
+  ---
+  duration_ms: 9.8525
+  type: 'test'
+  ...
+# Subtest: a project that is not prepared yet cannot be turned into a draft
+ok 10 - a project that is not prepared yet cannot be turned into a draft
+  ---
+  duration_ms: 10.203
+  type: 'test'
+  ...
+# Subtest: a lost answer is reconciled by reading the saved draft back, never by creating a second one
+ok 11 - a lost answer is reconciled by reading the saved draft back, never by creating a second one
+  ---
+  duration_ms: 11.957334
+  type: 'test'
+  ...
+# Subtest: a refused create is shown plainly and leaves the page ready to try again
+ok 12 - a refused create is shown plainly and leaves the page ready to try again
+  ---
+  duration_ms: 10.148
+  type: 'test'
+  ...
+# Subtest: without a focus the page lists the creator's own projects and points to project creation when there are none
+ok 13 - without a focus the page lists the creator's own projects and points to project creation when there are none
+  ---
+  duration_ms: 22.406541
+  type: 'test'
+  ...
+# Subtest: saved original sources can start one exact draft without pretending storage is published
+ok 14 - saved original sources can start one exact draft without pretending storage is published
+  ---
+  duration_ms: 9.069583
+  type: 'test'
+  ...
+# Subtest: a saved source with an existing draft continues it and cannot start another source draft
+ok 15 - a saved source with an existing draft continues it and cannot start another source draft
+  ---
+  duration_ms: 7.657917
+  type: 'test'
+  ...
+# Subtest: normal source review reconciles/adopts the exact saved release before returning its actual simulated approval
+ok 16 - normal source review reconciles/adopts the exact saved release before returning its actual simulated approval
+  ---
+  duration_ms: 12.663958
+  type: 'test'
+  ...
+# Subtest: ordinary stored release reconciles first and keeps the existing exact collection review
+ok 17 - ordinary stored release reconciles first and keeps the existing exact collection review
+  ---
+  duration_ms: 7.474833
+  type: 'test'
+  ...
+# Subtest: a stale source release revision cannot reach adoption or preparation
+ok 18 - a stale source release revision cannot reach adoption or preparation
+  ---
+  duration_ms: 10.164417
+  type: 'test'
+  ...
+# Subtest: source denial remains terminal and never tries direct preparation
+ok 19 - source denial remains terminal and never tries direct preparation
+  ---
+  duration_ms: 5.593541
+  type: 'test'
+  ...
+# Subtest: a one-step advanced review returns conflict without carrying wallet authority
+ok 20 - a one-step advanced review returns conflict without carrying wallet authority
+  ---
+  duration_ms: 5.895833
+  type: 'test'
+  ...
+# Subtest: the planning hint accepts only an exact saved-source declaration, never grants readiness
+ok 21 - the planning hint accepts only an exact saved-source declaration, never grants readiness
+  ---
+  duration_ms: 2.11525
+  type: 'test'
+  ...
+# Subtest: pending, blocked and invalid next actions never become a wallet review or direct prepare fallback
+ok 22 - pending, blocked and invalid next actions never become a wallet review or direct prepare fallback
+  ---
+  duration_ms: 54.03
+  type: 'test'
+  ...
+# Subtest: a cancelled source review never returns an approval
+ok 23 - a cancelled source review never returns an approval
+  ---
+  duration_ms: 2.931917
+  type: 'test'
+  ...
+# Subtest: the real plan review action reloads a server-advanced revision and stops before wallet navigation
+ok 24 - the real plan review action reloads a server-advanced revision and stops before wallet navigation
+  ---
+  duration_ms: 20.191791
+  type: 'test'
+  ...
+# Subtest: unfunded GIF and source-adopted projects enter the REAL owner storage-review service before collection preparation
+ok 25 - unfunded GIF and source-adopted projects enter the REAL owner storage-review service before collection preparation
+  ---
+  duration_ms: 27.735958
+  type: 'test'
+  ...
+# Subtest: a failed or unrelated funding proof cannot produce the new navigation handoff
+ok 26 - a failed or unrelated funding proof cannot produce the new navigation handoff
+  ---
+  duration_ms: 12.479209
+  type: 'test'
+  ...
+# Subtest: storage navigation validates exact release/project and forbids an injected URL or unsigned collection authority
+ok 27 - storage navigation validates exact release/project and forbids an injected URL or unsigned collection authority
+  ---
+  duration_ms: 0.283917
+  type: 'test'
+  ...
+# Subtest: the actual plan action opens only the validated existing same-project storage panel, never a wallet
+ok 28 - the actual plan action opens only the validated existing same-project storage panel, never a wallet
+  ---
+  duration_ms: 6.382833
+  type: 'test'
+  ...
+1..28
+# tests 28
+# suites 0
+# pass 28
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 3199.156375

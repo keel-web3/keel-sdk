@@ -1,0 +1,23 @@
+{
+  "schema": "keel.current-docker-default-capabilities@1",
+  "readOnly": true,
+  "daemon": {
+    "/version": {
+      "Version": "29.1.3",
+      "GitCommit": "29.1.3-0ubuntu3~24.04.2",
+      "ApiVersion": "1.52",
+      "MinAPIVersion": "1.44",
+      "Os": "linux",
+      "Arch": "amd64",
+      "KernelVersion": "6.8.0-106-generic"
+    },
+    "/info": {
+      "ServerVersion": "29.1.3",
+      "CgroupVersion": "2",
+      "OomKillDisable": false,
+      "MemoryLimit": true,
+      "MemorySwap": null,
+      "DockerRootDir": "/var/lib/docker"
+    }
+  }
+}

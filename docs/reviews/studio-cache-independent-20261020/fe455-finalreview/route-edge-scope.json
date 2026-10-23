@@ -1,0 +1,39 @@
+{
+  "schema": "keel.independent-proof-loader-edge-scope@1",
+  "reachable": 279,
+  "oldRuntimeCallbacks": [],
+  "candidateRuntimeCallbacks": [],
+  "supplementalLoaderCalls": [
+    {
+      "module": "14367",
+      "kind": "e",
+      "call": "c.e(28424)"
+    },
+    {
+      "module": "14367",
+      "kind": "bind",
+      "call": "c.bind(c,28424)"
+    },
+    {
+      "module": "62148",
+      "kind": "e",
+      "call": "c.e(99882)"
+    },
+    {
+      "module": "62148",
+      "kind": "e",
+      "call": "c.e(58636)"
+    },
+    {
+      "module": "62148",
+      "kind": "bind",
+      "call": "c.bind(c,58636)"
+    },
+    {
+      "module": "71131",
+      "kind": "t",
+      "call": "c.t(d,2)"
+    }
+  ],
+  "normalizationSourceUnchanged": true
+}

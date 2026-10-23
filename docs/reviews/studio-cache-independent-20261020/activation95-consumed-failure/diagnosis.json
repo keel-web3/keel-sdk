@@ -1,0 +1,69 @@
+{
+  "schema": "keel.independent-activation95-consumed-failure-diagnosis@1",
+  "result": "CONFIRMED_GUARD_BLOCKED_BEFORE_OLD_STOP_OR_CANDIDATE_START",
+  "consumedPlanSHA256": "4c17cc98989f9a7e80027218aa5b6e8f96357075d3af9627d8624acbe400e7ad",
+  "consumedAdmissionSHA256": "5e21c2dc16c8bf3fa8080dc6443fcacfb9b8e8d5887dd90d5c478a2039a8c638",
+  "actualHostReceiptSHA256": "26bf9ef1033b351553e35a36bf564cd010410cafdc52f79b0d757334c794fbae",
+  "onlyConfigurationDifference": [
+    {
+      "section": "HostConfig",
+      "key": "OomKillDisable",
+      "expectedSHA256": "74234e98afe7498fb5daf1f36ac2d78acc339464f950703b8c019892f982b90b",
+      "actualSHA256": "fcbcf165908dd18a9e49f7ff27810176db8e9f63b4352213741664245224f8aa",
+      "expectedType": "NoneType",
+      "actualType": "bool",
+      "expectedPresent": true,
+      "actualPresent": true,
+      "expected": null,
+      "actual": false
+    }
+  ],
+  "oldServiceObservedHealthyRunningOriginalName": true,
+  "candidateNeverStarted": true,
+  "runnerStoppedRetained": true,
+  "factoryEnableDidNotExecute": true,
+  "privateSnapshotRetained": {
+    "path": "/home/ubuntu/keel-studio-activation-9fc5c1d4-34c8-4164-a1ae-33136375d1ba/retained-database-before.dump",
+    "bytes": 123386980,
+    "sha256": "8f84944c6ca183018c79ecf11e7bcea1c3a44886c809b1d3d101c5fe22a47094",
+    "snapshotResultSHA256": "027606f61439f38aaa5598269e676a8f6bb777c1b82ab3ab896f5175fb429f5e"
+  },
+  "catalogContentAddressedInstalledOldBindingUnchanged": {
+    "schema": "keel.catalog-install@1",
+    "sha256": "2d54c8a4ab1e3360fdf702af0113c27739dcddf44abd4e0682f68606005652d7",
+    "bytes": 12694,
+    "path": "/data/studio/keel-inline-fragment-catalog-2d54c8a4ab1e3360fdf702af0113c27739dcddf44abd4e0682f68606005652d7.json"
+  },
+  "guardedRecoveryUnconfirmedReason": "Full application guard treated the null/false CREATE default mismatch as unvalidated ownership; no PG helper or old restart was attempted.",
+  "newMutationApproved": false,
+  "oldAdmissionReusable": false,
+  "reviewedContinuationDesign": "New source with explicit false for pinned null OomKillDisable CREATE default, preserving strict whole-field guards; new UUID/root/plan/names and fresh preflight/snapshot. Preserve all failed-run objects and receipt. Final exact admission still required.",
+  "primarySourceCorroboration": {
+    "url": "https://github.com/moby/moby/blob/master/daemon/daemon_unix.go",
+    "function": "adaptContainerSettings",
+    "behavior": "nil OomKillDisable is assigned false during container creation",
+    "exactHostDaemonCommitClaim": false
+  },
+  "baselineIndependentRegression": {
+    "path": "/private/tmp/keel-independent-activation95-failure-20261020/oom-default-regression.py",
+    "sha256": "2e1918724e67d3488785db2341ab7b1b271c7151976b46c737d10095d69bd173",
+    "tests": 6,
+    "pass": 4,
+    "fail": 1,
+    "error": 1,
+    "productionFilesChanged": false
+  },
+  "readOnlyEvidence": [
+    {
+      "path": "/private/tmp/keel-activation95-failed-readonly-20261020/state.stdout",
+      "bytes": 6941,
+      "sha256": "b3366e87e3b6d61068ae1e7e9352210b6faa426a59b70abee3b231a26e3e3475"
+    },
+    {
+      "path": "/private/tmp/keel-activation95-failed-readonly-20261020/guard.stdout",
+      "bytes": 4808,
+      "sha256": "f1b29a183a7b4ecd6c012b732168d0d937b22536e5e82c512693796fd92579dd"
+    }
+  ],
+  "noHostMutationByReviewer": true
+}

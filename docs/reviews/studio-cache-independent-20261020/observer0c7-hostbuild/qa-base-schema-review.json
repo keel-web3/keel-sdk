@@ -1,0 +1,12 @@
+{
+  "schema": "keel.independent-test-reference-binding-review@1",
+  "decision": "APPROVE",
+  "patchSHA256": "8cf17271fced95c8b5cdf1b163b43ae28b9a059493bfc4d807b656454f55a8fb",
+  "beforeSHA256": "4457c31c99415a35ba277bff8332a8852c733d57ed1b0cc0c899fc637a254a79",
+  "proposedSHA256": "62bfc92125783311e3350f43368855fb7724f72a1977775e013974dea2c0aa36",
+  "scope": "Only separate exact wrapper schema assertion from whole entries and sha256 equality. Actual wrapper differs only schema key; all36064complete rows and345e digest remain exact.",
+  "allUnderlyingMetadataFieldsAndMultiplicityPreserved": true,
+  "noReferenceAssetProductOrGuardChanged": true,
+  "initialRedRetained": true,
+  "hostOrActivationAuthority": false
+}

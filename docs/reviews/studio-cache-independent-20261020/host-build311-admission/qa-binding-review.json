@@ -1,0 +1,15 @@
+{
+  "decision": "APPROVE_EXACT_QA_SOURCE_BINDING_PATCHES_ONLY",
+  "reviewerId": "cache-release-reviewer",
+  "qaCommit": "a90e6df4bf4acac5921b95062439f4b30d97348d",
+  "hostilePatchSHA256": "220d27dfd6f3d112bd12fbec1718960c175c672043ceff491dafc527afc364fc",
+  "singleSourcePatchSHA256": "f020c155fb8185bf2c149587341162a99843b40e61b0dd1deb99972d2f2a2269",
+  "bothReverseByteExactOriginal": true,
+  "assertionAndSemanticInputChanges": false,
+  "sourcePair": [
+    "311d61526284248938e335d7ed879089408933be",
+    "fb3c24e12ffb9a316e894747418146b7b38f243a"
+  ],
+  "acceptedScope": "Fresh independent source cohort377PASS/build/TSC/PG15(no0050)/MCPselftest; no new image or deployed-artwork proof.",
+  "resultSHA256": "4c664dee654f86a1fb40e51c72c4ecfc7d83fe5c584e65061a166090974850c1"
+}

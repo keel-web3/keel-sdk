@@ -1,0 +1,9 @@
+import assert from 'node:assert/strict';
+import test from 'node:test';
+import { createKeelStudioAgentDraftClient } from '/Users/ravonus/dev/wt/studio-storage-review-compat-20261020/keel-sdk/packages/sdk/dist/studio-agent-drafts.js';
+const releaseId='11111111-1111-4111-8111-111111111111';
+const binding={chainId:11155111,binding:{artifactId:'22222222-2222-4222-8222-222222222222',artifactRevision:3,releaseId,releaseRevision:7}};
+const dto={schema:'keel-release-planning@1',releaseId,revision:7,publicationCheck:binding,signing:'not-performed',submission:'not-performed'};
+function client(value){const calls=[];return {calls,client:createKeelStudioAgentDraftClient({studioUrl:'https://studio.example',grantToken:'synthetic-observer-review-grant'.repeat(2),fetchImplementation:async(url,init)=>{calls.push({url:String(url),method:init?.method??'GET',body:init?.body});return Response.json(value);}})};}
+test('actual emitted311 plan reader accepts additive observer DTO with one GET and no preparation authority',async()=>{const f=client(dto),result=await f.client.plan(releaseId);assert.deepEqual(result.publicationCheck,binding);assert.equal(result.signing,'not-performed');assert.equal(result.submission,'not-performed');assert.equal(result.preparation,undefined);assert.equal(f.calls.length,1);assert.equal(f.calls[0].method,'GET');assert.equal(f.calls[0].body,undefined);assert.equal(result.planningUrl,`https://studio.example/studio/releases/${releaseId}/plan`);});
+test('actual emitted311 still rejects another release or invalid revision before exposing planning result',async()=>{for(const value of [{...dto,releaseId:'33333333-3333-4333-8333-333333333333'},{...dto,revision:0}]){const f=client(value);await assert.rejects(f.client.plan(releaseId),/another or invalid planning revision/);assert.equal(f.calls.length,1);assert.equal(f.calls[0].method,'GET');}});

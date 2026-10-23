@@ -1,0 +1,5 @@
+Current combined release e61 is blocked by one compatibility issue. The new storage handoff reaches the shared review service, but the current built SDK prepareReview, its packaged MCP dispatch, and the hosted MCP Apps parser reject the new schema before offering the storage review URL. The desired-behavior regression has three failing storage cases and two passing unchanged collection controls.
+
+The ten source05 production files are byte-identical in e61. The only additional production change is the separately approved exact public capabilities path. Independent focused UI/shared-review tests pass 28/28. The exact maintained fixture patch 4d93 remains approved, with all 38 assertion calls unchanged and baseline 2/2 becoming 4/0. No additional concrete security blocker was found in the source review. This is not release or deployed-flow approval.
+
+The compatibility regression exercises actual built SDK methods and the exact current MCP Apps parser with a synthetic unsigned protocol response; it does not claim a real storage preflight or wallet result.

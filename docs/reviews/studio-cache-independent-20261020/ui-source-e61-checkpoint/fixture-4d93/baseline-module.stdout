@@ -1,0 +1,56 @@
+TAP version 13
+# Subtest: owner handoff binds account wallet and saved operation without accepting a caller wallet
+not ok 1 - owner handoff binds account wallet and saved operation without accepting a caller wallet
+  ---
+  duration_ms: 13.894875
+  type: 'test'
+  location: '/private/tmp/keel-independent-handoff-fixture05-20261020/apps/studio/tests/unit/release-review-handoff.test.ts:2:1060'
+  failureType: 'testCodeFailure'
+  error: "Cannot read properties of undefined (reading 'revision')"
+  code: 'ERR_TEST_FAILURE'
+  name: 'TypeError'
+  stack: |-
+    snapshot (/private/tmp/keel-independent-handoff-fixture05-20261020/apps/studio/src/server/services/release-review-handoff-service.ts:26:82)
+    Object.prepareCreatorReleaseReview (/private/tmp/keel-independent-handoff-fixture05-20261020/apps/studio/src/server/services/release-review-handoff-service.ts:36:11)
+    async TestContext.<anonymous> (/private/tmp/keel-independent-handoff-fixture05-20261020/apps/studio/tests/unit/release-review-handoff.test.ts:33:20)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async startSubtestAfterBootstrap (node:internal/test_runner/harness:296:3)
+  ...
+# Subtest: browser and agent review routes scope read and prepare, reject injected fields and sanitize failures
+ok 2 - browser and agent review routes scope read and prepare, reject injected fields and sanitize failures
+  ---
+  duration_ms: 38.2275
+  type: 'test'
+  ...
+# Subtest: hosted MCP prepares the same exact review only through the granted drafts writer
+ok 3 - hosted MCP prepares the same exact review only through the granted drafts writer
+  ---
+  duration_ms: 53.702167
+  type: 'test'
+  ...
+# Subtest: creator release handoff forwards cancellation to prepare and exact saved read
+not ok 4 - creator release handoff forwards cancellation to prepare and exact saved read
+  ---
+  duration_ms: 5.213875
+  type: 'test'
+  location: '/private/tmp/keel-independent-handoff-fixture05-20261020/apps/studio/tests/unit/release-review-handoff.test.ts:2:7274'
+  failureType: 'testCodeFailure'
+  error: "Cannot read properties of undefined (reading 'revision')"
+  code: 'ERR_TEST_FAILURE'
+  name: 'TypeError'
+  stack: |-
+    snapshot (/private/tmp/keel-independent-handoff-fixture05-20261020/apps/studio/src/server/services/release-review-handoff-service.ts:26:82)
+    Object.prepareCreatorReleaseReview (/private/tmp/keel-independent-handoff-fixture05-20261020/apps/studio/src/server/services/release-review-handoff-service.ts:36:11)
+    async TestContext.<anonymous> (/private/tmp/keel-independent-handoff-fixture05-20261020/apps/studio/tests/unit/release-review-handoff.test.ts:97:3)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+1..4
+# tests 4
+# suites 0
+# pass 2
+# fail 2
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 924.144417

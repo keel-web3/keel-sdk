@@ -1,0 +1,131 @@
+{
+  "schema": "keel.independent-image-only-release-review@1",
+  "decision": "APPROVE_TECHNICAL_PREACTIVATION_EXACT_CANDIDATE",
+  "reviewerId": "independent-release-reviewer",
+  "independentReleaseReview": true,
+  "candidate": {
+    "siteCommit": "fb3c24e12ffb9a316e894747418146b7b38f243a",
+    "sdkCommit": "311d61526284248938e335d7ed879089408933be",
+    "buildId": "nuYbnoJa19cODlsCvyQcG",
+    "appImageId": "sha256:fe455169d3d10b37696ed17053ff0be167649f5a490acd7e4cea61c2412d6ccb"
+  },
+  "actualImage": {
+    "bytes": 703916050,
+    "configSHA256": "b8ddaf6d68e76ad758ee46b7c8407b480dfb146113ba0f31a43f10943d80a38b",
+    "rootFSSHA256": "4d3fdbf45a284484f2287b2ddb4cf0dc0f07855a86ec376713658fd1534c63b2",
+    "fullSaveBytes": 703956480,
+    "fullSaveSHA256": "d7b01b81ba15044693511d2d1ec2acaecda0d9f97c62a309a2ba9282d9b6383e",
+    "fullAppEntries": 36064,
+    "fullAppTreeSHA256": "345ea159bdf35662cfb79769546f570a41c9ed8426185fc846ea26c44720cf14",
+    "actualBuildReceiptSHA256": "2730154b0343cc53f214ca6cc9c072771b888eca7f098f870cfd6a7bc1345b50"
+  },
+  "sourceApproval": {
+    "sdk311SiteFb3ReviewSHA256": "067ecf6616ce476a44253064f6be829911544889b9a3ac459022a787b39c021d",
+    "unchangedOracleAndHostileControls": "PASS",
+    "currentStorageReviewSDKMCPCompatibilityBlocker": "CLOSED_BY_EXACT311_AND_FB3",
+    "sourceQA": "377 PASS; full SDK build and Site TSC PASS; realPG15 with0050 absent;MCP117tools/8checks; six packages1599 members"
+  },
+  "actualQA": {
+    "aggregatePath": "/tmp/keel-qa-receipt-activation-20261020/keel-site/docs/reviews/studio-publication-20261020/qa-fe455-artifact/qa-final02.json",
+    "aggregateSHA256": "f57d5d1f36d6db96eaca656bff54ec2f8e336bc0785817e24aa7084bc8d73c0d",
+    "lazyAddendumSHA256": "ec15200ac215050e3758fa7f200c4e14519490f202d7ccb4516ab0a18b7fb820",
+    "runtimeReceiptAuditSHA256": "0f18991b9f3215b2eeb5e6a7a826caef05b907a0eeff1a01973bb297a7025cd9",
+    "allThreeActualHostRoles": "PASS_TREE_SDK_HTTP",
+    "hostExecutionAttribution": "Root sole operator; QA independently audited actual durable receipts and archive; reviewer independently audited evidence and source, did not execute host roles",
+    "treeReceiptSHA256": "2a6e6c5583ac322fa79c59a266fe7c8470bb98a32b63958e1b4dfa68241a309a",
+    "sdkReceiptSHA256": "33f27bcb01ef07c2cb9a75b75da82aa18f44c19b2fe2945a97da1d8742821550",
+    "httpReceiptSHA256": "dd5483bcfe49f99dd9ee85d9ccc4e406c87bdaa45ae9235f2ac813540663c84c",
+    "stderrCorrectionReviewSHA256": "e4942504e3d128b6563c96585634a0cd396eb78fd30e04e775343454a0d68db1"
+  },
+  "compiledProofEquivalence": {
+    "direct279OriginalScopePreserved": true,
+    "directAndIdentifiedLazyDefinitions": 280,
+    "result": "PASS",
+    "lazyTarget28424": "Additional definition differs only mapped direct require14367->36748; all its transitive requirements covered",
+    "lazy99882And58636": "Whole chunk bytes exact95",
+    "webpackRuntimeSHA256": "1731fff704be69a53af89b19deb207302d095f4174685dd3682dbbeb674f0033",
+    "namespaceMode2": "Actual runtime requires only if bit1 set; mode2 unset",
+    "noUntrackedNonliteralDirectLoads": true,
+    "independentScriptSHA256": "00ad93750b39d0a08ec59d7cf29d2fdfc4f3cbacd95b945de8f2c5274bbdd963",
+    "independentResultSHA256": "9c4eb02781521cc320e21e9f339318a4fa706dae87d1e8fb57492ae938d03e3e",
+    "lazyBodyMutationControl": "FAIL_CLOSED_EXACT_MODULE28424",
+    "moduleFactoriesNetworkNativeInvoked": false
+  },
+  "historicalNativeAttribution": {
+    "Gator": "Actual34-call full proof on FE944/b524 retains old attribution",
+    "GIF": "Actual25-call full proof on95/b524/D97 retains old attribution; durable0dbd3104146b0e54e7db2276e4ed73489c5fec28765ff34a8d9b973d2fa007b8",
+    "componentReuseBasis": "Actual proof factory direct+lazy closure,1360 installed SDK files except four reviewed agent-drafts client files, native D97/binary8a, backendEnv/socket/catalog/factories exact95; current actual image SDK/goldens/HTTP and sourceQA pass",
+    "newPrivatePreactivationRunClaimed": false,
+    "oldCapturesReplayedOrRepinned": false
+  },
+  "rolloutReview": {
+    "sourceFreeze": "38b1e44f2f3efd55d200cc6e37d8be93df5b4876",
+    "operatorSHA256": "e54843846d8fdda712e8dc49d5b019622651a6dfe1d1f9bc86d43d717f8c38a1",
+    "operatorFiles": {
+      "reviewed-activation-support.py": "a1594559c2c04159ac94827d0f4f2a991310fb06648379bca6081d5ce6a98de1",
+      "guarded-deployment-checks.py": "b5f7d764b6c05db503a23ea63ca21a36bfcb0f17cc8292444d790d4a8aad6e00",
+      "candidate-oom-default.py": "6621ff48fc02057d98d91ef5fd71e6e30eeea1ef847149170e316d9725e77c73"
+    },
+    "snapshotSupervisorSHA256": "5d8d56588eba290773961d74152baf3728ffd2e00a75894beed92d38af06706e",
+    "pendingPlanSHA256": "6917f963d1f004df632f126671217c563ba3d88c8ae66de0b0a6f0a36c21a932",
+    "staticCommandSHA256": "91216dd61e3bf5d64d5a762c4faaaa64ce94722f143374c9dcbca91473b9586d",
+    "staticReviewSHA256": "313f06eab6f031e5b39666270e229cdf04a524d77ba73783b90413b369b45657",
+    "current95FullRawBaseline": {
+      "id": "7fd10f4d82afd155b2bd2df5d4ae57017fc5f4ecea4b284c13e493d6abae59a1",
+      "image": "sha256:95bdda05a7596553251e9d4ba9fe72758abc5137fcb661efed80ca94ab5e6bcb",
+      "configSHA256": "4bcd9f4748cb653ea4bbafc483662c1dc32ec90339b0777dcf4f7e906707d055",
+      "hostConfigSHA256": "186e487039113f582118064bce13b98c79f75eca5b3fa0d788c7d79b8fb14049",
+      "mountsSHA256": "74cc304b0955c822f88ffdbcbff56d89857f5ea3d7c51246ec106f00247ade89"
+    },
+    "runnerRetained": {
+      "id": "434316eff6e19951807f95ba8aee03a4db684d760039dfeb723c7bf9203a8649",
+      "image": "sha256:d97ddf2aba94cb963646fdf05bc8dc8c99b7e69b8c19bad85c06bea7c67fc9f5",
+      "configSHA256": "23f5b528017bd47ac37f47ea6d4a56efd3926e4ca1fa0aad13f02652b1570113",
+      "hostConfigSHA256": "6fc9390416de4dd4ff6872f14b3430c76838f6bcef8abd428b6c63fd3d55dd82",
+      "mountsSHA256": "07f01d55cebb43e5ed07f5bdcafc33bf85d6a294839179d72e9ba5121609937f"
+    },
+    "socketRetained": {
+      "Name": "keel-studio-proof-socket-2779804f-f8fe-4fcd-8153-f45ad70b03b6",
+      "Driver": "local",
+      "Options": {
+        "device": "tmpfs",
+        "o": "size=16m,uid=999,gid=999,mode=0700,noexec,nosuid",
+        "type": "tmpfs"
+      }
+    },
+    "changes": {
+      "image": true,
+      "rolloutLabels": true,
+      "runner": false,
+      "backendEnvironment": false,
+      "catalog": false,
+      "factories": false,
+      "migrations": false,
+      "data": false
+    },
+    "reserveBytes": 1073741824,
+    "snapshotBudgetBytes": 268435456,
+    "freshSnapshotBeforeCandidateCreate": true,
+    "candidateFullConfigHostMountChecksBeforeOldStopAndAfterStart": true,
+    "candidateOnlyOomProjection": "Only explicit expected false/presentactualnull under fresh exact authenticated daemon profile; all other types/fields remain strict",
+    "rollback": "Authenticate candidate full identity/config before stop; preserve foreign occupants; restore exact old95 only after owned replacement stopped and runner unchanged; no automatic DBrestore or runner mutation",
+    "existingImagesContainersVolumesAndPriorEvidenceDeleted": false
+  },
+  "blockingFindings": [],
+  "allowedEvidenceBinding": {
+    "independentQA": "Only exact qa-final02 f57d5d above",
+    "independentReleaseReview": true,
+    "leadExecuteApproved": "Lead authority separately supplied by root"
+  },
+  "finalExactPlanAndCommandReviewStillRequired": true,
+  "activationExecutionAuthority": false,
+  "postDeploymentGate6StillRequired": [
+    "Fresh normal deployed exact owner-copy Gator native fullpreflight to unsigned wallet",
+    "Fresh normal deployed realGIF native fullpreflight to unsigned wallet",
+    "Authenticated historical exact MIME/bytes/SDKdecode/canvas on this build; rawHTTPstatus claimed only if observed"
+  ],
+  "overallDeliveryAcceptance": false,
+  "signing": false,
+  "submission": false,
+  "reviewerHostMutation": false
+}

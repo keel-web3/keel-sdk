@@ -1,0 +1,31 @@
+{
+  "schema": "keel.independent-source-finding@1",
+  "id": "HISTORY-EE0-001",
+  "severity": "P1",
+  "status": "RESOLVED_IN_EXACT_SUCCESSOR",
+  "blockedSourceCommit": "ee0acf1ab3863ac3b3c811d130cc0674f430024d",
+  "correctedSourceCommit": "71cb0e31bab5e4ee93af9d3b3185978e46f1fe8e",
+  "path": "apps/studio/src/server/http/release-review-handoff-handler.ts",
+  "oldLines": [
+    32,
+    33
+  ],
+  "newLines": [
+    32,
+    34
+  ],
+  "cause": "DOMException.name was evaluated twice: an accessor returned allowlisted AbortError/TimeoutError during the condition and arbitrary synthetic private text during assignment. The resulting errorType reached operational console observation. No real private content was used in reproduction.",
+  "correction": "Read exception name once; choose only literal AbortError or TimeoutError labels. All other error classes, structural vocabulary and guards unchanged.",
+  "unchangedRegressionSHA256": "d52287669b01e9abdccd5f3e3526f25148a231093ee49ceaf59b5a2a98fb96ff",
+  "baseline": {
+    "pass": 1,
+    "fail": 2,
+    "stdoutSHA256": "8e478ddff1fc5acd5fdd00723f7042cd94f4db411520c9d7a5cf1e84ccf70836"
+  },
+  "successor": {
+    "pass": 3,
+    "fail": 0,
+    "stdoutSHA256": "b07c674b6247d931e0fc4b2db108be3b9995074f61717854167475891c977fc2"
+  },
+  "hostActions": 0
+}

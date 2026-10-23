@@ -1,0 +1,128 @@
+{
+  "schema": "keel.independent-two-archive-retention-command@1",
+  "decision": "APPROVE_ONE_EXACT_TWO_ARCHIVE_RETENTION_ACTION",
+  "createRootArgv": [
+    "/usr/bin/ssh",
+    "-o",
+    "BatchMode=yes",
+    "-o",
+    "ConnectTimeout=12",
+    "-o",
+    "StrictHostKeyChecking=yes",
+    "-o",
+    "UserKnownHostsFile=/Users/ravonus/dev/hashers/ops/servers/known_hosts",
+    "ubuntu@40.160.39.155",
+    "sudo -n /usr/bin/python3 -c 'import os,stat\nfrom pathlib import Path\np=Path('\"'\"'/home/ubuntu/keel-older-input-retention-488d2679-fb95-4f3c-ac5f-e208a25dc47a'\"'\"');q=p.parent;s=q.lstat();assert q.resolve()==q and stat.S_ISDIR(s.st_mode)and s.st_uid==1000 and s.st_dev==2049 and s.st_ino==143\nos.mkdir(p,0o700)\nf=os.open(q,os.O_RDONLY|os.O_DIRECTORY|os.O_NOFOLLOW);os.fsync(f);os.close(f)\nprint('\"'\"'exclusive-root-created'\"'\"')'"
+  ],
+  "files": [
+    {
+      "localPath": "/private/tmp/keel-mount-order-20261020/docs/reviews/studio-publication-20261020/release/older-input-retention/retain-older-inputs.py",
+      "bytes": 13083,
+      "sha256": "c2dc22d61a7c715b83680366b3208f3252ff404477676ea8b70b9b785b3f442e",
+      "argv": [
+        "/usr/bin/ssh",
+        "-o",
+        "BatchMode=yes",
+        "-o",
+        "ConnectTimeout=12",
+        "-o",
+        "StrictHostKeyChecking=yes",
+        "-o",
+        "UserKnownHostsFile=/Users/ravonus/dev/hashers/ops/servers/known_hosts",
+        "ubuntu@40.160.39.155",
+        "sudo -n /usr/bin/python3 -c 'import os,stat,sys,hashlib\nfrom pathlib import Path\nr=Path('\"'\"'/home/ubuntu/keel-older-input-retention-488d2679-fb95-4f3c-ac5f-e208a25dc47a'\"'\"');s=r.lstat();assert r.resolve()==r and stat.S_ISDIR(s.st_mode)and s.st_uid==0 and stat.S_IMODE(s.st_mode)==0o700\nb=sys.stdin.buffer.read(13084);assert len(b)==13083 and hashlib.sha256(b).hexdigest()=='\"'\"'c2dc22d61a7c715b83680366b3208f3252ff404477676ea8b70b9b785b3f442e'\"'\"'\np=os.open(r,os.O_RDONLY|os.O_DIRECTORY|os.O_NOFOLLOW);fd=os.open('\"'\"'retain-older-inputs.py'\"'\"',os.O_WRONLY|os.O_CREAT|os.O_EXCL|os.O_NOFOLLOW,0o444,dir_fd=p)\ntry:\n with os.fdopen(fd,'\"'\"'wb'\"'\"')as f:f.write(b);f.flush();os.fsync(f.fileno())\n os.fsync(p)\nfinally:os.close(p)\nprint('\"'\"'c2dc22d61a7c715b83680366b3208f3252ff404477676ea8b70b9b785b3f442e'\"'\"')'"
+      ]
+    },
+    {
+      "localPath": "/private/tmp/keel-mount-order-20261020/docs/reviews/studio-publication-20261020/release/older-input-retention/archive-retention-plan.json",
+      "bytes": 3504,
+      "sha256": "de25dbdcfa3faca4bba4fa160beb6e5af8126c418fc2f6645772d21f8294ded6",
+      "argv": [
+        "/usr/bin/ssh",
+        "-o",
+        "BatchMode=yes",
+        "-o",
+        "ConnectTimeout=12",
+        "-o",
+        "StrictHostKeyChecking=yes",
+        "-o",
+        "UserKnownHostsFile=/Users/ravonus/dev/hashers/ops/servers/known_hosts",
+        "ubuntu@40.160.39.155",
+        "sudo -n /usr/bin/python3 -c 'import os,stat,sys,hashlib\nfrom pathlib import Path\nr=Path('\"'\"'/home/ubuntu/keel-older-input-retention-488d2679-fb95-4f3c-ac5f-e208a25dc47a'\"'\"');s=r.lstat();assert r.resolve()==r and stat.S_ISDIR(s.st_mode)and s.st_uid==0 and stat.S_IMODE(s.st_mode)==0o700\nb=sys.stdin.buffer.read(3505);assert len(b)==3504 and hashlib.sha256(b).hexdigest()=='\"'\"'de25dbdcfa3faca4bba4fa160beb6e5af8126c418fc2f6645772d21f8294ded6'\"'\"'\np=os.open(r,os.O_RDONLY|os.O_DIRECTORY|os.O_NOFOLLOW);fd=os.open('\"'\"'archive-retention-plan.json'\"'\"',os.O_WRONLY|os.O_CREAT|os.O_EXCL|os.O_NOFOLLOW,0o444,dir_fd=p)\ntry:\n with os.fdopen(fd,'\"'\"'wb'\"'\"')as f:f.write(b);f.flush();os.fsync(f.fileno())\n os.fsync(p)\nfinally:os.close(p)\nprint('\"'\"'de25dbdcfa3faca4bba4fa160beb6e5af8126c418fc2f6645772d21f8294ded6'\"'\"')'"
+      ]
+    }
+  ],
+  "reviewLocalPath": "/private/tmp/keel-independent-mount8ee-20261020/archive-retention-review.json",
+  "reviewBytes": 3288,
+  "reviewSHA256": "e5ca4412ff1b2e876a09efb88008e2278f50393e39a11d062ca8f91a9b9f0589",
+  "reviewInstallArgv": [
+    "/usr/bin/ssh",
+    "-o",
+    "BatchMode=yes",
+    "-o",
+    "ConnectTimeout=12",
+    "-o",
+    "StrictHostKeyChecking=yes",
+    "-o",
+    "UserKnownHostsFile=/Users/ravonus/dev/hashers/ops/servers/known_hosts",
+    "ubuntu@40.160.39.155",
+    "sudo -n /usr/bin/python3 -c 'import os,stat,sys,hashlib\nfrom pathlib import Path\nr=Path('\"'\"'/home/ubuntu/keel-older-input-retention-488d2679-fb95-4f3c-ac5f-e208a25dc47a'\"'\"');s=r.lstat();assert r.resolve()==r and stat.S_ISDIR(s.st_mode)and s.st_uid==0 and stat.S_IMODE(s.st_mode)==0o700\nb=sys.stdin.buffer.read(3289);assert len(b)==3288 and hashlib.sha256(b).hexdigest()=='\"'\"'e5ca4412ff1b2e876a09efb88008e2278f50393e39a11d062ca8f91a9b9f0589'\"'\"'\np=os.open(r,os.O_RDONLY|os.O_DIRECTORY|os.O_NOFOLLOW);fd=os.open('\"'\"'archive-retention-review.json'\"'\"',os.O_WRONLY|os.O_CREAT|os.O_EXCL|os.O_NOFOLLOW,0o444,dir_fd=p)\ntry:\n with os.fdopen(fd,'\"'\"'wb'\"'\"')as f:f.write(b);f.flush();os.fsync(f.fileno())\n os.fsync(p)\nfinally:os.close(p)\nprint('\"'\"'e5ca4412ff1b2e876a09efb88008e2278f50393e39a11d062ca8f91a9b9f0589'\"'\"')'"
+  ],
+  "preflightArgv": [
+    "/usr/bin/ssh",
+    "-o",
+    "BatchMode=yes",
+    "-o",
+    "ConnectTimeout=12",
+    "-o",
+    "StrictHostKeyChecking=yes",
+    "-o",
+    "UserKnownHostsFile=/Users/ravonus/dev/hashers/ops/servers/known_hosts",
+    "ubuntu@40.160.39.155",
+    "sudo -n /usr/bin/python3 /home/ubuntu/keel-older-input-retention-488d2679-fb95-4f3c-ac5f-e208a25dc47a/retain-older-inputs.py --root /home/ubuntu/keel-older-input-retention-488d2679-fb95-4f3c-ac5f-e208a25dc47a --plan-sha256 de25dbdcfa3faca4bba4fa160beb6e5af8126c418fc2f6645772d21f8294ded6"
+  ],
+  "executeArgv": [
+    "/usr/bin/ssh",
+    "-o",
+    "BatchMode=yes",
+    "-o",
+    "ConnectTimeout=12",
+    "-o",
+    "StrictHostKeyChecking=yes",
+    "-o",
+    "UserKnownHostsFile=/Users/ravonus/dev/hashers/ops/servers/known_hosts",
+    "ubuntu@40.160.39.155",
+    "sudo -n /usr/bin/python3 /home/ubuntu/keel-older-input-retention-488d2679-fb95-4f3c-ac5f-e208a25dc47a/retain-older-inputs.py --root /home/ubuntu/keel-older-input-retention-488d2679-fb95-4f3c-ac5f-e208a25dc47a --plan-sha256 de25dbdcfa3faca4bba4fa160beb6e5af8126c418fc2f6645772d21f8294ded6 --execute --review-sha256 e5ca4412ff1b2e876a09efb88008e2278f50393e39a11d062ca8f91a9b9f0589"
+  ],
+  "root": "/home/ubuntu/keel-older-input-retention-488d2679-fb95-4f3c-ac5f-e208a25dc47a",
+  "executions": 1,
+  "automaticRetry": false,
+  "requiredLocalFullHashesBeforeExecute": [
+    {
+      "source": "/home/ubuntu/keel-studio-alias-171f635e-20261014/keel-showcase.tar.gz",
+      "retainedLocalPath": "/Users/ravonus/dev/wt/studio-publication-20261019/native-artifacts/retained-older-build-inputs-20261020/alias-171f635e-keel-showcase.tar.gz",
+      "sha256": "7cd9852035ef222fb8dd806b28da05561cf2ec30127d0025b84c8d0bf2f61f01",
+      "bytes": 555623546,
+      "originalUID": 1000,
+      "originalGID": 1000,
+      "originalMode": 420,
+      "originalMTimeNs": 1791950418000000000
+    },
+    {
+      "source": "/home/ubuntu/keel-studio-primary-0bd2db80-20261014/keel-showcase.tar.gz",
+      "retainedLocalPath": "/Users/ravonus/dev/wt/studio-publication-20261019/native-artifacts/retained-older-build-inputs-20261020/primary-0bd2db80-keel-showcase.tar.gz",
+      "sha256": "8ac4dc36a1dbc44da7a12efa985497980a31b3d3e8bcec4f01a2477be731bd77",
+      "bytes": 555608603,
+      "originalUID": 1000,
+      "originalGID": 1000,
+      "originalMode": 384,
+      "originalMTimeNs": 1791937590000000000
+    }
+  ],
+  "requiredNormalConfiguredProxyAndOriginalGuards": true,
+  "expectedMaximumUnlinkedFiles": 2,
+  "allocationReclaimCeilingBytes": 1111244800,
+  "actualSpaceMustBeMeasured": true,
+  "noOtherCleanupOrImportOrActivationAuthority": true,
+  "noSigningOrSubmission": true
+}

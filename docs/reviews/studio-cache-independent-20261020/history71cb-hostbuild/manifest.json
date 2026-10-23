@@ -1,0 +1,20 @@
+{
+  "schema": "keel.independent-public-evidence-manifest@1",
+  "files": [
+    {
+      "path": "host-build-review.json",
+      "bytes": 4163,
+      "sha256": "3f41daac34a042af70e7666b010334ec0c12a26e5cf75cb080bb7c157450365b"
+    },
+    {
+      "path": "host-build-commands.admitted.json",
+      "bytes": 13767,
+      "sha256": "e94d733215729e077181e4cbf4fecd7a1d52bee0175a19daf016dbc0e6373bde"
+    },
+    {
+      "path": "delta-audit.json",
+      "bytes": 1588,
+      "sha256": "2f9514eb13aa1e4b1e6a6a017d2b48cc95efc154983f850f0e29a27f70d981b2"
+    }
+  ]
+}

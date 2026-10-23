@@ -1,0 +1,12 @@
+{
+  "schema": "keel.independent-dependency-mount-permutation-repro@1",
+  "source": "/private/tmp/keel-activation95-static-stage-20261020/docs/reviews/studio-publication-20261020/release/activation95-static-stage/files/receipt-bound-dependencies.py",
+  "sourceSHA256": "8c7b95514f750b95663c83f850c51fd5d3538c108a082d8072505dfaece01ff5",
+  "sourceMOUNTS_SHA": "8227ad2f93c93f7a55ba2006d6b73695ae8b04f636a637bc54b08dc65298996f",
+  "scope": "Synthetic same-full-element-multiset; only fixture expected hashes patched to fixture values, exact helper code unchanged",
+  "baseline": "PASS",
+  "permuted": "old_configuration_changed",
+  "allCompleteMountFieldsAndMultiplicityUnchanged": true,
+  "productionAccess": false,
+  "sourceEdited": false
+}

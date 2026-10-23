@@ -1,0 +1,44 @@
+test_exact_public_file_can_retire (__main__.EntryReplacement.test_exact_public_file_can_retire) ... FAIL
+test_foreign_replacement_after_durable_intent_is_preserved (__main__.EntryReplacement.test_foreign_replacement_after_durable_intent_is_preserved) ... FAIL
+test_foreign_replacement_during_reference_scan_is_preserved (__main__.EntryReplacement.test_foreign_replacement_during_reference_scan_is_preserved) ... FAIL
+
+======================================================================
+FAIL: test_exact_public_file_can_retire (__main__.EntryReplacement.test_exact_public_file_can_retire)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/private/tmp/keel-independent-nine-public-retention-20261021/entry-replacement.regression.py", line 32, in test_exact_public_file_can_retire
+    def test_exact_public_file_can_retire(self):self.fixture('exact')
+                                                ~~~~~~~~~~~~^^^^^^^^^
+  File "/private/tmp/keel-independent-nine-public-retention-20261021/entry-replacement.regression.py", line 26, in fixture
+    self.assertIsNone(error);self.assertEqual(r['result'],'PASS');self.assertFalse(p.exists());self.assertEqual(r['removedCount'],1)
+    ~~~~~~~~~~~~~~~~~^^^^^^^
+AssertionError: NotADirectoryError(20, 'Not a directory') is not None
+
+======================================================================
+FAIL: test_foreign_replacement_after_durable_intent_is_preserved (__main__.EntryReplacement.test_foreign_replacement_after_durable_intent_is_preserved)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/private/tmp/keel-independent-nine-public-retention-20261021/entry-replacement.regression.py", line 34, in test_foreign_replacement_after_durable_intent_is_preserved
+    def test_foreign_replacement_after_durable_intent_is_preserved(self):self.fixture('intent')
+                                                                         ~~~~~~~~~~~~^^^^^^^^^^
+  File "/private/tmp/keel-independent-nine-public-retention-20261021/entry-replacement.regression.py", line 28, in fixture
+    self.assertTrue(replaced,'adversary must replace real path')
+    ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: False is not true : adversary must replace real path
+
+======================================================================
+FAIL: test_foreign_replacement_during_reference_scan_is_preserved (__main__.EntryReplacement.test_foreign_replacement_during_reference_scan_is_preserved)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/private/tmp/keel-independent-nine-public-retention-20261021/entry-replacement.regression.py", line 33, in test_foreign_replacement_during_reference_scan_is_preserved
+    def test_foreign_replacement_during_reference_scan_is_preserved(self):self.fixture('scan')
+                                                                          ~~~~~~~~~~~~^^^^^^^^
+  File "/private/tmp/keel-independent-nine-public-retention-20261021/entry-replacement.regression.py", line 28, in fixture
+    self.assertTrue(replaced,'adversary must replace real path')
+    ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: False is not true : adversary must replace real path
+
+----------------------------------------------------------------------
+Ran 3 tests in 0.004s
+
+FAILED (failures=3)

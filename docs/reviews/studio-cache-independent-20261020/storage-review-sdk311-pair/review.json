@@ -1,0 +1,226 @@
+{
+  "schema": "keel-independent-sdk-site-review@1",
+  "reviewerId": "cache-release-reviewer",
+  "decision": "APPROVE_EXACT_SOURCE_PAIR_AND_FROZEN_PACKAGES_FOR_BUILD_AND_INDEPENDENT_QA",
+  "sdkSourceCommit": "311d61526284248938e335d7ed879089408933be",
+  "sdkCanonicalParent": "fb90011f1ce0ef4dc0883378ffbed39522b1cbfe",
+  "sdkCompatibilitySourceCommit": "09914c94e9110ac90bbecbfc295e42a3fb348d75",
+  "sdkCurrentEvidenceHead": "991635725c06a6138becdfb8c018c180ec3fd521",
+  "siteAdapterCommit": "56e835862b9bdf5b824e6adf06382f098a7f386a",
+  "siteIntegratedCommit": "fb3c24e12ffb9a316e894747418146b7b38f243a",
+  "sourceFileSHA256": {
+    "packages/sdk/src/studio-agent-drafts.ts": "aa2fa4fd77a8d928ac09ab0fb09e6e69e7d3fec193dde9ab5c4af4198335b7aa",
+    "packages/mcp/src/tools.ts": "f91aa08b8b9a580088260955b09cf5a9972657d5510768a77489b4b6073f9538",
+    "apps/studio/src/server/agent/publication-review-app.ts": "f496c63992c13acd116c97f1d4f449edd2a0f5a1e87142d1e7315294a4573996",
+    "apps/studio/public/.well-known/keel.json": "2e4896620cb0d443576d1ae37202f04702a11868f32de958d6b545c4e5c3da9f",
+    "apps/studio/public/llms.txt": "cef1100a42c6784116c250c4b4ee752def7170de507037cd58e3dbe5d68a4332"
+  },
+  "blockingFindings": [],
+  "closedFinding": {
+    "id": "UI-E61-001",
+    "priorIndependentReviewSHA256": "54ee22e77a1424ed00689a9ce89e974ae6ab5688a6fe95cb1fb87ba7e82be807",
+    "baseline": "Built b524 SDK client/MCP dispatch and current hosted app rejected the new storage handoff: three desired storage cases failed, two collection controls passed.",
+    "closure": "Exact unchanged a3e60ac9 oracle now passes all five on built SDK311 and Sitefb3 actual MCP App parser. Real emitted SDK/MCP server and complete host-mediated app tests also pass.",
+    "scope": "Source/protocol compatibility only; actual creator program preflight remains owned by unchanged real storage service, and deployed UI/wallet delivery remains pending."
+  },
+  "securityAndEquivalence": {
+    "prepareOnlyDiscriminatedUnion": true,
+    "expectedStateExactProjectRevisionDigestReleaseAndNullOperationBound": true,
+    "unrecognizedAuthorityFieldsRejected": true,
+    "storageURLDerivedFromFixedArtifactPathAndTrustedOrigin": true,
+    "canSignAlwaysFalse": true,
+    "noFabricatedCollectionCalls": true,
+    "collectionOnlyGETReadResumeValidatorByteExact": true,
+    "hostAppStorageRefreshUsesPrepareAndCannotCallCollectionCancelResume": true,
+    "hostAppRejectsSourceOwnerPlanSubstitutionBeforeOpen": true,
+    "oldCollectionPathStillAccepted": true,
+    "allNativeDecoderProofSimulationDistUnchanged": true,
+    "newDeterministicTestClassifiedWithoutExclusion": true
+  },
+  "independentChecks": {
+    "node": "22.22.1",
+    "totalPassed": 103,
+    "checks": [
+      {
+        "name": "unchanged-oracle",
+        "pass": 5,
+        "fail": 0,
+        "skip": 0,
+        "stdout": "unchanged-oracle.stdout",
+        "sha256": "f2f9ec90e9b0a58e78f7026e0e3197c0fc2c328c3fd920b5fa5c676a824bb0ae"
+      },
+      {
+        "name": "sdk-affected",
+        "pass": 38,
+        "fail": 0,
+        "skip": 0,
+        "stdout": "sdk-affected.stdout",
+        "sha256": "164cd3a8ebec94d441e89fc31ef02d74fd6126c9db0b89976821062c17736967"
+      },
+      {
+        "name": "mcp-app",
+        "pass": 3,
+        "fail": 0,
+        "skip": 0,
+        "stdout": "mcp-app.stdout",
+        "sha256": "16ebee36e7e30938bc4a49a8568f463b86252a21f90bc7d713d3c25ff6a092c4"
+      },
+      {
+        "name": "adversarial-storage",
+        "pass": 34,
+        "fail": 0,
+        "skip": 0,
+        "stdout": "adversarial-storage.stdout",
+        "sha256": "26098516514e6c73b3cdea98b923d3fad225a56d72717d8fed0692138819009c"
+      },
+      {
+        "name": "cli-loopback",
+        "pass": 1,
+        "fail": 0,
+        "skip": 0,
+        "stdout": "cli-loopback.stdout",
+        "sha256": "9e56526d0a1d887c767af22e1b769754a87a94d7470e4f2deb6d2e40cdd50119"
+      },
+      {
+        "name": "mcp-host-server-condition",
+        "pass": 12,
+        "fail": 0,
+        "skip": 0,
+        "stdout": "mcp-host-server-condition.stdout",
+        "sha256": "52d14b30c79e086f046a6c21f2d7bec055999cb28b74c2a89c6d8c9869149a62"
+      },
+      {
+        "name": "mcp-unchanged-existing",
+        "pass": 10,
+        "fail": 0,
+        "scope": "Ten MCP cases passed in original mixed invocation; separate CLI loopback setup EPERM preserved and exact CLI rerun passed.",
+        "stdout": "mcp-cli.stdout"
+      }
+    ],
+    "newAdversarialSourceSHA256": "546a0ac7b37e3d543e275a4a50efcb99050cbfb79ebe753530bc0fa9e0c77d7e",
+    "noRemoteNetworkOrDatabaseOrWalletOrNativeProgramAction": true,
+    "localCLI": "Unchanged CLI fixture owns its ephemeral loopback HTTP server; scoped sandbox escalation after listen EPERM, no remote/production communication."
+  },
+  "emittedCorrespondence": {
+    "baselineFiles": 1745,
+    "currentFiles": 1745,
+    "byteIdenticalFiles": 1739,
+    "changedFiles": {
+      "packages/mcp/dist/tools.js": {
+        "before": "3fe74172489e4745ed6ceeb9e1ca870768817351d78b573f611e1fef93b6981c",
+        "after": "98023da9021b13034e1437221d181160a8b4d47e1f21240001cf64ffcae2c026"
+      },
+      "packages/mcp/dist/tools.js.map": {
+        "before": "5162fe23deb9bd4be913448194387f5b228879489b990caf5411ae9b263868f9",
+        "after": "52535e7ea5f897b5493efd4490ae88fd04c9b5da306cc32d24f5c3a2520d2446"
+      },
+      "packages/sdk/dist/studio-agent-drafts.js.map": {
+        "before": "b509db71ac5fe185bf3aae1f6722b5a18388aea7ee4650c0faec2d6f5a260f5b",
+        "after": "e523e94e6eafd696967daada371361df345e51b27f53c747e6500714b830c208"
+      },
+      "packages/sdk/dist/studio-agent-drafts.js": {
+        "before": "319640a1a9b541f2ab7dddfad39f88630102ba9b796656dc8bca110aae11ad38",
+        "after": "138835e5ca36194a34e348dec1f6930b189786b22a779e95563047bc10309fd5"
+      },
+      "packages/sdk/dist/studio-agent-drafts.d.ts": {
+        "before": "f6515402c2ab8b65d08b3aacd4dc0c1387477cd99baff6c1cfa7aecc007a1d3e",
+        "after": "27cc7157deb45f3d15a82d230c96b92b8ffb3e2c46bbc92d29d45ce8f2cdd6a2"
+      },
+      "packages/sdk/dist/studio-agent-drafts.d.ts.map": {
+        "before": "a3a64f44c05bee6125aafd940531bfc792e4409746c8ba35c91468396b6ae4e6",
+        "after": "814b661399ffa5d464b4d748fd6e581032bc41e18713981b77fb240cf213c137"
+      }
+    },
+    "reference": "artifact-and-source-equivalence.json",
+    "sha256": "689bf7f6d5d94788eff0a3b63af8d257eee8f6c4a11c34b89cb2bc9a44e7bd20",
+    "independentActualOldSDKBaselineProof": "independent-baseline-binding.json",
+    "independentActualOldSDKBaselineSHA256": "22cbaa3fd9e7cf8733669d26825d68624a2ae861c70f37e5af54865eea6d1af8"
+  },
+  "packages": {
+    "manifestSHA256": "68593f682ca577f68228072abf0f92225a7b0521378e0bfe75343b4ac1e275f5",
+    "allSixTarHashesAndSizesMatch": true,
+    "all1599RegularMembersVerified": true,
+    "duplicateOrNonregularMembersRejected": true,
+    "correspondence": "All non-metadata members byte-exact current source outputs. Package metadata equals frozen311 with only literal workspace:* dependencies resolved to referenced frozen311 versions. Only absent package/LICENSE is compared to exact frozen311 root LICENSE.",
+    "expectationCorrection": {
+      "patchSHA256": "bbf2c32101284a38ce5ec509fd4f10ef3aca47b53cdc62254498fd1f3cd05911",
+      "independentApprovalSHA256": "c5a59258b466d99ca8c36e3634a4d422fde724f4cbdb270c0e86933d7ec3ffc9",
+      "appliedProbeSHA256": "30be5a55374487d580b7da77367d451d8aac267f8139ba06c15a737501a19316",
+      "originalAndFirstUnappliedProposalPreserved": true
+    },
+    "verifiedPackages": [
+      {
+        "package": "@keel/builder",
+        "sha256": "5c28f6d67b3e94a8530c1a498a2481ddf850dbd63049447a4f714801e55df689",
+        "bytes": 216487,
+        "distMembers": 156,
+        "nonMetadataMembersByteExactIncludingOnlyFrozenRootLICENSEFallback": true,
+        "archiveNamesUniqueAndTypesRegularOrDirectory": true,
+        "packageMetadataExactExceptFrozenWorkspaceVersions": true
+      },
+      {
+        "package": "@keel/ethereum-adapter",
+        "sha256": "b926172c07bcebf086611fcb973cad071e783fde6328258e60bc92d92978994d",
+        "bytes": 42253,
+        "distMembers": 28,
+        "nonMetadataMembersByteExactIncludingOnlyFrozenRootLICENSEFallback": true,
+        "archiveNamesUniqueAndTypesRegularOrDirectory": true,
+        "packageMetadataExactExceptFrozenWorkspaceVersions": true
+      },
+      {
+        "package": "@keel/mcp",
+        "sha256": "2437277589eb80675a050dd0fe188bfec1f2b5871d5f97d5805a3e96e82e2b04",
+        "bytes": 385308,
+        "distMembers": 193,
+        "nonMetadataMembersByteExactIncludingOnlyFrozenRootLICENSEFallback": true,
+        "archiveNamesUniqueAndTypesRegularOrDirectory": true,
+        "packageMetadataExactExceptFrozenWorkspaceVersions": true
+      },
+      {
+        "package": "@keel/protocol",
+        "sha256": "fc665a5f115815ddbb0bcb0a123caa6123856142d8208f361af67e79b920ff4d",
+        "bytes": 253182,
+        "distMembers": 156,
+        "nonMetadataMembersByteExactIncludingOnlyFrozenRootLICENSEFallback": true,
+        "archiveNamesUniqueAndTypesRegularOrDirectory": true,
+        "packageMetadataExactExceptFrozenWorkspaceVersions": true
+      },
+      {
+        "package": "@keel/sdk",
+        "sha256": "693e357852288d98a42c74c7955ee59ac8c6a04ea3d2e9ded1ce09657f7d040a",
+        "bytes": 2259847,
+        "distMembers": 936,
+        "nonMetadataMembersByteExactIncludingOnlyFrozenRootLICENSEFallback": true,
+        "archiveNamesUniqueAndTypesRegularOrDirectory": true,
+        "packageMetadataExactExceptFrozenWorkspaceVersions": true
+      },
+      {
+        "package": "@keel/viewer",
+        "sha256": "6a13ab97e15e498c178d96f18dfe6579791c91560db97f4002453222809b1fc3",
+        "bytes": 212496,
+        "distMembers": 112,
+        "nonMetadataMembersByteExactIncludingOnlyFrozenRootLICENSEFallback": true,
+        "archiveNamesUniqueAndTypesRegularOrDirectory": true,
+        "packageMetadataExactExceptFrozenWorkspaceVersions": true
+      }
+    ],
+    "registryPublishedClaim": false
+  },
+  "discovery": {
+    "decision": "APPROVE_EXACT_STATIC_METADATA_DIFF",
+    "immutableSDKDocPathsVerified": 9,
+    "currentCreatorRevision": "311d61526284248938e335d7ed879089408933be",
+    "historicNetworksObjectAndFeatureReleaseLinkUnchanged": true,
+    "newFreshBase90InstructionRemoved": true,
+    "selectedChainProfileAndSavedProjectCostReviewDocumented": true,
+    "publicDocRemotePublicationNotClaimed": "This is local source review. The immutable311 links must be published through ordinary source merge/push before this metadata is deployed. No registry tag or live SDK distribution is asserted."
+  },
+  "limitations": [
+    "No new image/artifact import or activation authority. New Next/context must actually use SDK311 and the reviewed package/output manifest; current95 still packages b524.",
+    "Deployed Gator/GIF upload-art unsigned wallet flow and requested historical browser acceptance remain live-delivery work, not inferred from protocol fixtures.",
+    "Existing genuine full Gator/GIF native proofs use unchanged b524 proof runtime/D97; this SDK source includes unrelated canonical Go changes without rebuilding/replacing the deployed D97 image.",
+    "The current image-only tools still name b524 and require their exact planned311 correspondence successor review."
+  ],
+  "releaseApproval": false,
+  "activationAuthority": false
+}

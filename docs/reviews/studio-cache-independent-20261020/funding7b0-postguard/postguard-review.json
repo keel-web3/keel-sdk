@@ -1,0 +1,75 @@
+{
+  "schema": "keel.independent-actual7b0-readonly-postguard-review@1",
+  "decision": "APPROVE_ONE_EXACT_READONLY_POSTGUARD",
+  "reviewerId": "independent-release-reviewer",
+  "releaseSourceCommit": "1cc54e644d3245c62054a7aac1029027419a16b9",
+  "preparedPacketSHA256": "621b7b991e56775e7fcf243dc22ea1be583ccb1b67d36e514e1b85d6c558bfe6",
+  "templateSHA256": "5b86865549184db1987bd1452c46fdad620362e431c7ee27ddb4bc8b69621a61",
+  "actualSuccessfulReceipt": {
+    "path": "/private/tmp/keel-7b0-activation-actual-20261021/06-durable-activation-receipt.stdout",
+    "bytes": 1756,
+    "sha256": "25034fb467f365eef9fc4ff630d56219a0535d4dd1153616921a4a56b8e2e89b",
+    "productionActivated": true,
+    "newContainer": "5c97c6f105e06838a3a82f42003b76cd3f896b2cc072ac1afbcd72456fc97735",
+    "candidate": {
+      "siteCommit": "62f5df235441a342871419ecc837907e42226596",
+      "sdkCommit": "311d61526284248938e335d7ed879089408933be",
+      "buildId": "oPM_JP5lg4vgS2ZQciiei",
+      "appImageId": "sha256:7b0c99bf7c5cd6a8ea639c7ea35a605e7e16b54b155b4300043651db0e2865d3"
+    },
+    "snapshotBytes": 124261128,
+    "snapshotSHA256": "0a6c6eec0bbaecd15da5b5d39a09953c9b0b8006537dafdb0833eb613b3251c6",
+    "privatePublicationAcceptanceNotClaimed": true
+  },
+  "sourceBinding": {
+    "binderSource": "Reviewed exact template/durable hash and exactcandidate/old58fc/new64hexID; sole ID marker replaced once; ASTparse; exclusive600 source andfsync, nohost action",
+    "actualBoundPath": "/private/tmp/keel-7b0-activation-actual-20261021/postcheck-readonly.bound.py",
+    "actualBoundSHA256": "7b0d08210d9545e8a8998ba96787d164ef755c0a9fb8eda1f0fede770547cb3f",
+    "independentComparison": "Actual bound bytes EXACT5btemplate after one actualnewID substitution; nothingelse",
+    "localBindAlreadyPerformed": "No repeat required or admitted"
+  },
+  "priorGuardLineage": {
+    "baseSourceSHA256": "057bd70197b57b1310064c8c011fa8b26588882598ba6e7a083fd33284214626",
+    "coreReverse": "Byteexact after only root/finalplan/newID/source/build/qualificationroot/outputlabel literals retarget. No priorassertion, auth, timeout or command logic removed.",
+    "additionsOnly": "Read/hash previous7016snapshot98c938124235723; fullrawstoppedc63/CEE8 baseline. Existing07a4snapshot153259 andstoppedfe455/95 checks remain.",
+    "currentAuth": "Wholeactualnewcandidate/config/host/mount/healthy/pause; fullold58fc1058 stopped/rollbackname; D97/socket/profile/image descriptor; exact1360SDK/source62f/oPM/native8a",
+    "snapshotScope": "Samehost reads only, fresh full new snapshot SHA/PGDMP plus pg_restore --list count598/digest only; no dump/TOC content egress or DBrestore; old protected snapshot hashes only"
+  },
+  "admittedCommand": {
+    "argv": [
+      "/usr/bin/ssh",
+      "-o",
+      "BatchMode=yes",
+      "-o",
+      "ConnectTimeout=12",
+      "-o",
+      "StrictHostKeyChecking=yes",
+      "-o",
+      "UserKnownHostsFile=/Users/ravonus/dev/hashers/ops/servers/known_hosts",
+      "ubuntu@40.160.39.155",
+      "sudo -n /usr/bin/python3 -B -"
+    ],
+    "stdinLocalPath": "/private/tmp/keel-7b0-activation-actual-20261021/postcheck-readonly.bound.py",
+    "stdinSHA256": "7b0d08210d9545e8a8998ba96787d164ef755c0a9fb8eda1f0fede770547cb3f",
+    "transportTimeoutSeconds": 120,
+    "maximumInvocations": 1,
+    "automaticRetry": false,
+    "originalAuthorizedInfrastructureSudoNOnly": true,
+    "allOtherRootStageRoleCutoverCommandsNotAdmitted": true
+  },
+  "executionMeaning": "Read-only inspection includes DockerGET and exact dockerexec node publicfilehashes and pg_restore --list on samehost. No containerstart/stop/rename/configchange, SQL/privateproject/artwork/trace read, filecontentwrite, liveDBrestore, cleanup, newnativeprogram/RPC orsigning/submission. Rolloutlock only.",
+  "successPredicate": {
+    "wholeCommandExitCode": 0,
+    "allThreeRecordResults": "PASS",
+    "schemas": [
+      "keel.actual-funding7b0-running-postguard@1",
+      "keel.7b0-prior-rollback-retention@1",
+      "keel.7b0-previous1058-rollback-preservation@1"
+    ],
+    "partialFirstPASSIsNotSuccess": true,
+    "anyFailureOrUncertainty": "STOP; preserve output, no automatic repair/retry or broadening"
+  },
+  "remainingOutcome": "Independent actualpostguard audit then leadhealthyGO before normal owner liveH/Gator/GIF/unsignedwallet acceptance. No Gate6PASS implied.",
+  "reviewerHostActions": 0,
+  "blockingFindings": []
+}

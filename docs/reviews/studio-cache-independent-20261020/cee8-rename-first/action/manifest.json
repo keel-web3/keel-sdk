@@ -1,0 +1,36 @@
+{
+  "schema": "keel.independent-rename-first-final-action-evidence@1",
+  "scope": "Exact one new07a4 observer-only cutover after preflight PASS, no retry or consumed5895 reuse/private preparation/access bypass. Gate6/publication unresolved.",
+  "files": [
+    {
+      "path": "commands.admitted.json",
+      "bytes": 5982,
+      "sha256": "9fcb13491e5c99746e5a07559cce3931de15d1ece18478c66ed57a4602d28787",
+      "source": "/private/tmp/keel-independent-cee8-rename-first-20261021/commands.admitted.json"
+    },
+    {
+      "path": "command-review.json",
+      "bytes": 2574,
+      "sha256": "0932bb05b497f2c5fe10b840507b81465b4311a4da020adfce4e1a19a20d04ac",
+      "source": "/private/tmp/keel-independent-cee8-rename-first-20261021/command-review.json"
+    },
+    {
+      "path": "final-command-validation.json",
+      "bytes": 2235,
+      "sha256": "e6236452b60de562d11495d166436ada12891d3f6c59592e790e93172f77acea",
+      "source": "/private/tmp/keel-independent-cee8-rename-first-20261021/final-command-validation.json"
+    },
+    {
+      "path": "activation-plan.final.json",
+      "bytes": 3552,
+      "sha256": "0598dd9afde00a92aa1fb02552f8c2018b0f8da900de707a2bd2f8ce1dda3442",
+      "source": "/private/tmp/keel-cee8-rename-first-final-20261021/activation-plan.final.json"
+    },
+    {
+      "path": "lead-admission.json",
+      "bytes": 507,
+      "sha256": "2777844a2bfab4d0799c215192c81e3c94d8a9d3039bc6055d7134d9303cbde7",
+      "source": "/private/tmp/keel-cee8-rename-first-final-20261021/lead-admission.json"
+    }
+  ]
+}

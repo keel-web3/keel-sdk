@@ -1,0 +1,348 @@
+TAP version 13
+# Subtest: actual owner POST identifies owner-wallet without relying on a visible trace or selected chain
+ok 1 - actual owner POST identifies owner-wallet without relying on a visible trace or selected chain
+  ---
+  duration_ms: 72.762
+  type: 'test'
+  ...
+# Subtest: actual owner POST identifies release-snapshot without relying on a visible trace or selected chain
+ok 2 - actual owner POST identifies release-snapshot without relying on a visible trace or selected chain
+  ---
+  duration_ms: 20.130333
+  type: 'test'
+  ...
+# Subtest: actual owner POST identifies source-trace-create without relying on a visible trace or selected chain
+ok 3 - actual owner POST identifies source-trace-create without relying on a visible trace or selected chain
+  ---
+  duration_ms: 21.876375
+  type: 'test'
+  ...
+# Subtest: actual owner POST identifies source-history without relying on a visible trace or selected chain
+ok 4 - actual owner POST identifies source-history without relying on a visible trace or selected chain
+  ---
+  duration_ms: 13.174583
+  type: 'test'
+  ...
+# Subtest: actual owner POST identifies source-reader without relying on a visible trace or selected chain
+ok 5 - actual owner POST identifies source-reader without relying on a visible trace or selected chain
+  ---
+  duration_ms: 14.348125
+  type: 'test'
+  ...
+# Subtest: actual owner POST identifies source-adoption without relying on a visible trace or selected chain
+ok 6 - actual owner POST identifies source-adoption without relying on a visible trace or selected chain
+  ---
+  duration_ms: 13.88975
+  type: 'test'
+  ...
+# Subtest: actual owner POST identifies storage-binding without relying on a visible trace or selected chain
+ok 7 - actual owner POST identifies storage-binding without relying on a visible trace or selected chain
+  ---
+  duration_ms: 11.4275
+  type: 'test'
+  ...
+# Subtest: actual owner POST identifies storage-review without relying on a visible trace or selected chain
+ok 8 - actual owner POST identifies storage-review without relying on a visible trace or selected chain
+  ---
+  duration_ms: 13.951792
+  type: 'test'
+  ...
+# Subtest: ordinary source without the legacy extension reports its real reconciliation boundary
+ok 9 - ordinary source without the legacy extension reports its real reconciliation boundary
+  ---
+  duration_ms: 11.4275
+  type: 'test'
+  ...
+# Subtest: successful owner handoff and a failing observer preserve exact downstream options and funding proof
+ok 10 - successful owner handoff and a failing observer preserve exact downstream options and funding proof
+  ---
+  duration_ms: 12.825583
+  type: 'test'
+  ...
+# Subtest: failure projection emits only fixed structural vocabulary, including the historical URL shape
+ok 11 - failure projection emits only fixed structural vocabulary, including the historical URL shape
+  ---
+  duration_ms: 8.980709
+  type: 'test'
+  ...
+# Subtest: a changing DOMException name cannot escape the fixed diagnostic vocabulary
+ok 12 - a changing DOMException name cannot escape the fixed diagnostic vocabulary
+  ---
+  duration_ms: 12.100375
+  type: 'test'
+  ...
+# Subtest: unknown service errors keep their existing HTTP status, with a matching safe owner reference
+ok 13 - unknown service errors keep their existing HTTP status, with a matching safe owner reference
+  ---
+  duration_ms: 9.891583
+  type: 'test'
+  ...
+# Subtest: response serialization has its own safe phase without exposing the prepared response
+ok 14 - response serialization has its own safe phase without exposing the prepared response
+  ---
+  duration_ms: 12.5535
+  type: 'test'
+  ...
+# Subtest: failed authentication does not enter service observation or receive an owner correlation
+ok 15 - failed authentication does not enter service observation or receive an owner correlation
+  ---
+  duration_ms: 11.606833
+  type: 'test'
+  ...
+# (node:55796) ExperimentalWarning: The MockTimers API is an experimental feature and might change at any time
+# (Use `node --trace-warnings ...` to show where the warning was created)
+# Subtest: one review reuses only fully authenticated unchanged pages and fetches its changed tail
+ok 16 - one review reuses only fully authenticated unchanged pages and fetches its changed tail
+  ---
+  duration_ms: 16.347667
+  type: 'test'
+  ...
+# Subtest: a canonical prefix reorg after simulation cannot authorize cached history
+ok 17 - a canonical prefix reorg after simulation cannot authorize cached history
+  ---
+  duration_ms: 3.053333
+  type: 'test'
+  ...
+# Subtest: partial history never arms the request's page cache
+ok 18 - partial history never arms the request's page cache
+  ---
+  duration_ms: 4.156041
+  type: 'test'
+  ...
+# Subtest: actual historical runtime fixture retains compiler/source and exact code hash
+ok 19 - actual historical runtime fixture retains compiler/source and exact code hash
+  ---
+  duration_ms: 0.298041
+  type: 'test'
+  ...
+# Subtest: initial and post-fee reconciliation use independent fresh read lifetimes
+ok 20 - initial and post-fee reconciliation use independent fresh read lifetimes
+  ---
+  duration_ms: 4.914708
+  type: 'test'
+  ...
+# Subtest: owner cancellation stops its current reads while another reconciliation completes
+ok 21 - owner cancellation stops its current reads while another reconciliation completes
+  ---
+  duration_ms: 3.23475
+  type: 'test'
+  ...
+# Subtest: the unchanged 120-second history deadline aborts its physical read signal
+ok 22 - the unchanged 120-second history deadline aborts its physical read signal
+  ---
+  duration_ms: 1.314667
+  type: 'test'
+  ...
+# Subtest: the history deadline also bounds a read-client factory that ignores cancellation
+ok 23 - the history deadline also bounds a read-client factory that ignores cancellation
+  ---
+  duration_ms: 0.607208
+  type: 'test'
+  ...
+# Subtest: full canonical deployment-through-pin history and each exact expired envelope are required
+ok 24 - full canonical deployment-through-pin history and each exact expired envelope are required
+  ---
+  duration_ms: 3.398875
+  type: 'test'
+  ...
+# Subtest: old matching cancelled job remains funded beyond a recent64 scan
+ok 25 - old matching cancelled job remains funded beyond a recent64 scan
+  ---
+  duration_ms: 16.044792
+  type: 'test'
+  ...
+# Subtest: same plan digest with different owner/executor is not a matching funded job
+ok 26 - same plan digest with different owner/executor is not a matching funded job
+  ---
+  duration_ms: 2.252542
+  type: 'test'
+  ...
+# Subtest: missing deployment hint cannot become deploymentVerified
+ok 27 - missing deployment hint cannot become deploymentVerified
+  ---
+  duration_ms: 1.241958
+  type: 'test'
+  ...
+# Subtest: startBlock without matching direct creation blocks rather than inventing receipt
+ok 28 - startBlock without matching direct creation blocks rather than inventing receipt
+  ---
+  duration_ms: 1.149125
+  type: 'test'
+  ...
+# Subtest: deployment receipt contract and runtime/lower-bound mismatches fail closed
+ok 29 - deployment receipt contract and runtime/lower-bound mismatches fail closed
+  ---
+  duration_ms: 3.017667
+  type: 'test'
+  ...
+# Subtest: truncated opening results cannot pass nextJobId coverage
+ok 30 - truncated opening results cannot pass nextJobId coverage
+  ---
+  duration_ms: 1.560334
+  type: 'test'
+  ...
+# Subtest: closed job missing its closure event cannot hide behind getJob revert
+ok 31 - closed job missing its closure event cannot hide behind getJob revert
+  ---
+  duration_ms: 1.599042
+  type: 'test'
+  ...
+# Subtest: duplicate page events fail instead of silently deduplicating coverage
+ok 32 - duplicate page events fail instead of silently deduplicating coverage
+  ---
+  duration_ms: 1.643375
+  type: 'test'
+  ...
+# Subtest: removed log and receipt log tampering fail
+ok 33 - removed log and receipt log tampering fail
+  ---
+  duration_ms: 3.332
+  type: 'test'
+  ...
+# Subtest: canonical event receipt reorg and final pin reorg fail
+ok 34 - canonical event receipt reorg and final pin reorg fail
+  ---
+  duration_ms: 4.146916
+  type: 'test'
+  ...
+# Subtest: RPC failure in any page or deleted-job read is unknown, never empty history
+ok 35 - RPC failure in any page or deleted-job read is unknown, never empty history
+  ---
+  duration_ms: 3.462625
+  type: 'test'
+  ...
+# Subtest: known pending funding is reconciled but cannot produce complete proof
+ok 36 - known pending funding is reconciled but cannot produce complete proof
+  ---
+  duration_ms: 1.62275
+  type: 'test'
+  ...
+# Subtest: known not-found transaction stays unknown; absence is not a dropped approval
+ok 37 - known not-found transaction stays unknown; absence is not a dropped approval
+  ---
+  duration_ms: 1.874667
+  type: 'test'
+  ...
+# Subtest: canonical reverted known funding clears known pending without erasing provenance
+ok 38 - canonical reverted known funding clears known pending without erasing provenance
+  ---
+  duration_ms: 3.010417
+  type: 'test'
+  ...
+# Subtest: altered exact archived funding envelope never receives expiry proof
+ok 39 - altered exact archived funding envelope never receives expiry proof
+  ---
+  duration_ms: 1.571208
+  type: 'test'
+  ...
+# Subtest: missing archived original identity and cross-contract history block explicitly
+ok 40 - missing archived original identity and cross-contract history block explicitly
+  ---
+  duration_ms: 2.434792
+  type: 'test'
+  ...
+# Subtest: known transaction mined after the pin is unresolved until a new canonical reconciliation
+ok 41 - known transaction mined after the pin is unresolved until a new canonical reconciliation
+  ---
+  duration_ms: 1.65575
+  type: 'test'
+  ...
+# Subtest: historical deployment-state outage reports the missing read phase without fabricating an anchor
+ok 42 - historical deployment-state outage reports the missing read phase without fabricating an anchor
+  ---
+  duration_ms: 1.200208
+  type: 'test'
+  ...
+# Subtest: nonexpired archived exact funding call blocks although the primary journal is expired
+ok 43 - nonexpired archived exact funding call blocks although the primary journal is expired
+  ---
+  duration_ms: 2.419958
+  type: 'test'
+  ...
+# Subtest: matching completed job is also preserved after its getter is deleted
+ok 44 - matching completed job is also preserved after its getter is deleted
+  ---
+  duration_ms: 1.952708
+  type: 'test'
+  ...
+# Subtest: a known paid job id cannot become no-funded evidence through identity mismatch
+ok 45 - a known paid job id cannot become no-funded evidence through identity mismatch
+  ---
+  duration_ms: 2.134834
+  type: 'test'
+  ...
+# Subtest: canonical current job0 among70 receives a bounded receipt-bound adoption hint
+ok 46 - canonical current job0 among70 receives a bounded receipt-bound adoption hint
+  ---
+  duration_ms: 13.941916
+  type: 'test'
+  ...
+# Subtest: funded archived executor is preserved without a current-program adoption hint
+ok 47 - funded archived executor is preserved without a current-program adoption hint
+  ---
+  duration_ms: 14.019833
+  type: 'test'
+  ...
+# Subtest: multiple canonical matching paid jobs cannot silently pick a current replacement
+ok 48 - multiple canonical matching paid jobs cannot silently pick a current replacement
+  ---
+  duration_ms: 2.269208
+  type: 'test'
+  ...
+# Subtest: closed matching job hint does not claim completed storage or publication
+ok 49 - closed matching job hint does not claim completed storage or publication
+  ---
+  duration_ms: 2.159042
+  type: 'test'
+  ...
+# Subtest: matching digest with different authenticated chunk count cannot be adopted
+ok 50 - matching digest with different authenticated chunk count cannot be adopted
+  ---
+  duration_ms: 1.794625
+  type: 'test'
+  ...
+# Subtest: funded recovery adapter reauthenticates exact current bytes and canonical opening without writes
+ok 51 - funded recovery adapter reauthenticates exact current bytes and canonical opening without writes
+  ---
+  duration_ms: 13.9705
+  type: 'test'
+  ...
+# Subtest: funded recovery adapter rejects a reorganized or mismatched opening receipt
+ok 52 - funded recovery adapter rejects a reorganized or mismatched opening receipt
+  ---
+  duration_ms: 2.143167
+  type: 'test'
+  ...
+# Subtest: funded recovery rejects caller-supplied matching digest with different stored commitments
+ok 53 - funded recovery rejects caller-supplied matching digest with different stored commitments
+  ---
+  duration_ms: 1.776042
+  type: 'test'
+  ...
+# Subtest: funded recovery blocks unverified internal or wrapped openings without adoption
+ok 54 - funded recovery blocks unverified internal or wrapped openings without adoption
+  ---
+  duration_ms: 5.294709
+  type: 'test'
+  ...
+# Subtest: funded recovery rejects changed transaction identity and escrow
+ok 55 - funded recovery rejects changed transaction identity and escrow
+  ---
+  duration_ms: 8.817
+  type: 'test'
+  ...
+# Subtest: different archived program is preserved and never supplied as current-job adoption hint
+ok 56 - different archived program is preserved and never supplied as current-job adoption hint
+  ---
+  duration_ms: 15.027
+  type: 'test'
+  ...
+1..56
+# tests 56
+# suites 0
+# pass 56
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 931.884417

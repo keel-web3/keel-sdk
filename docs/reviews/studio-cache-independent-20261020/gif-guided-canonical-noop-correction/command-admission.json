@@ -1,0 +1,64 @@
+{
+  "schema": "keel.separate-canonical-guided-review-command@1",
+  "approvedScope": "One normal planning confirmation13 to14 on original private55459 clone after independently reconciled NOOP; no capture or simulation.",
+  "rootReviewOfNewAdmissionWrapperRequired": true,
+  "argv": [
+    "/opt/homebrew/opt/python@3.14/bin/python3.14",
+    "/private/tmp/keel-independent-gif-guided-canonical-20261020/run-canonical.py"
+  ],
+  "cwd": "/Users/ravonus/dev/wt/studio-wallet-read-routing-qa-20261020/candidate-3e50",
+  "executions": 1,
+  "automaticRetry": false,
+  "databaseRestore": false,
+  "files": [
+    {
+      "path": "/private/tmp/keel-independent-gif-guided-canonical-20261020/run-canonical.py",
+      "bytes": 8005,
+      "sha256": "81315e269bb7fa162c855d06f19b5ac3d5218329127a377906f752b6b1b2bd6a"
+    },
+    {
+      "path": "/private/tmp/keel-independent-gif-guided-canonical-20261020/runtime-pins.json",
+      "bytes": 5686,
+      "sha256": "2fe35f9ee2ce4925d1f04f70e1fb1bcae5e28a494d5524f7bd18f1c34c407b4d"
+    },
+    {
+      "path": "/private/tmp/keel-independent-gif-guided-review-20261020/guided-review-admission.json",
+      "bytes": 1017,
+      "sha256": "980cad9d2e563378f8bae55e3d17bfeb83e17568118e816a5196744d330df9e4"
+    },
+    {
+      "path": "/tmp/keel-private-gif-guided-review-20261020-01/run-config.json",
+      "bytes": 417,
+      "sha256": "a11d99cba2b4e2b90d40f91c1a1728f47af28011664b0625026521b8f11b9d14"
+    }
+  ],
+  "canonicalNodeArgv": [
+    "/Users/ravonus/.nvm/versions/node/v22.22.1/bin/node",
+    "--conditions=react-server",
+    "/private/tmp/keel-qa-receipt-activation-20261020/keel-site/docs/tools/gif-guided-review-only/run-review.mjs",
+    "/tmp/keel-private-gif-guided-review-20261020-01/run-config.json"
+  ],
+  "newLogDirectory": "/private/tmp/keel-gif-guided-canonical-20261020-01",
+  "originalOutputFilesPreservedAndHashBound": true,
+  "normalActionReceiptRequired": "PASS_NORMAL_GUIDED_REVIEW_ONLY plus normalWriterCalls1/exactsource/100beforeprojections/99others/originalproject/156assets/4onlytargetfields/0candidates/0deniedIO/0compiler/0RPC/0signing/0submission/durableconsumed marker",
+  "oldCommandAlreadyExecuted": {
+    "path": "/private/tmp/keel-independent-gif-guided-review-20261020/command-admission.json",
+    "sha256": "09368cd84baf23516f848a4b14ef44447302cae060a7599176dc4f5d990e5729",
+    "outcome": "NOOP_NOT_GUIDED_REVIEW_SUCCESS",
+    "supersededForExecution": true
+  },
+  "independentReconciliation": {
+    "path": "/private/tmp/keel-independent-gif-guided-review-20261020/independent-noop-reconciliation.json",
+    "bytes": 408,
+    "sha256": "b0244d82c9adff3c5bc853ef5370559c887f67320c04c2ce836332aea2a97293"
+  },
+  "sourceToolCommit": "83d868557c3ce9a71c14d1d9a7f82b22e18fb195",
+  "sourceToolModified": false,
+  "strictOneWriterAdmissionUnchanged": true,
+  "capture": false,
+  "native": false,
+  "signing": false,
+  "submission": false,
+  "activation": false,
+  "releaseApproval": false
+}

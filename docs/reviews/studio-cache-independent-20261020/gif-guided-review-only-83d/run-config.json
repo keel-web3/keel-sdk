@@ -1,0 +1,12 @@
+{
+  "packet": {
+    "path": "/tmp/keel-private-gif-guided-review-20261020-01/packet.json",
+    "bytes": 1974,
+    "sha256": "d1b12a5b22c51e9d18c536f0cda46f614aa85c11f53d966aacf3c285b66496a5"
+  },
+  "review": {
+    "path": "/private/tmp/keel-independent-gif-guided-review-20261020/guided-review-admission.json",
+    "bytes": 1017,
+    "sha256": "980cad9d2e563378f8bae55e3d17bfeb83e17568118e816a5196744d330df9e4"
+  }
+}

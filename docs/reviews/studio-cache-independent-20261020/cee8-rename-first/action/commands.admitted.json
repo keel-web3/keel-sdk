@@ -1,0 +1,100 @@
+{
+  "schema": "keel.observer-cee8-rename-first-final-action@1",
+  "candidate": {
+    "siteCommit": "0c7b01e3acae5ec787568d6b5931b002654b4de0",
+    "sdkCommit": "311d61526284248938e335d7ed879089408933be",
+    "buildId": "F2eKiuWl2rvz5hqBZQ9wi",
+    "appImageId": "sha256:cee8c0b777f78372c6ee56bd9ff1c66dbeafd6393d04cb7f298fab6eb7bac9b7"
+  },
+  "operatorSHA256": "8c9584a951215a43b25d8f1599c69aed60553c80b7ab0f0ee6faebb01bce73ca",
+  "pendingPlanSHA256": "49e141ef5578d6f6ec5dff7021f43f8ceefcb998c15ea84d1856840a46dacfee",
+  "finalPlanSHA256": "0598dd9afde00a92aa1fb02552f8c2018b0f8da900de707a2bd2f8ce1dda3442",
+  "protectedOperationalFieldsExact": true,
+  "remoteRoot": "/home/ubuntu/keel-studio-image-only-07a4de5e-f373-49bb-9e05-952906a8c4a4",
+  "files": [
+    {
+      "name": "qa-final.json",
+      "localPath": "/private/tmp/keel-cee8-rename-first-final-20261021/qa-final.json",
+      "bytes": 4950,
+      "sha256": "22d615400163f84b472daa1beeb1ab28c48a7d2c3303243217aae8499c0566b9",
+      "installArgv": [
+        "/usr/bin/ssh",
+        "-o",
+        "BatchMode=yes",
+        "-o",
+        "ConnectTimeout=12",
+        "-o",
+        "StrictHostKeyChecking=yes",
+        "-o",
+        "UserKnownHostsFile=/Users/ravonus/dev/hashers/ops/servers/known_hosts",
+        "ubuntu@40.160.39.155",
+        "sudo -n /usr/bin/python3 -B -c 'import os,stat,hashlib,sys;from pathlib import Path;r=Path('\"'\"'/home/ubuntu/keel-studio-image-only-07a4de5e-f373-49bb-9e05-952906a8c4a4'\"'\"');s=r.lstat();assert stat.S_ISDIR(s.st_mode)and s.st_uid==0 and stat.S_IMODE(s.st_mode)==0o700 and r.resolve()==r;raw=sys.stdin.buffer.read(4951);assert len(raw)==4950 and hashlib.sha256(raw).hexdigest()=='\"'\"'22d615400163f84b472daa1beeb1ab28c48a7d2c3303243217aae8499c0566b9'\"'\"';f=os.fdopen(os.open(r/'\"'\"'qa-final.json'\"'\"',os.O_WRONLY|os.O_CREAT|os.O_EXCL|os.O_NOFOLLOW,0o444),'\"'\"'wb'\"'\"');f.write(raw);f.flush();os.fsync(f.fileno());f.close();d=os.open(r,os.O_DIRECTORY|os.O_NOFOLLOW);os.fsync(d);os.close(d)'"
+      ]
+    },
+    {
+      "name": "releaseReview-final.json",
+      "localPath": "/private/tmp/keel-cee8-rename-first-final-20261021/releaseReview-final.json",
+      "bytes": 11379,
+      "sha256": "b8cd2c3d7164bd7a4c774374f5cbe14329e9fec690ed5f9ab484eb3e4087c10e",
+      "installArgv": [
+        "/usr/bin/ssh",
+        "-o",
+        "BatchMode=yes",
+        "-o",
+        "ConnectTimeout=12",
+        "-o",
+        "StrictHostKeyChecking=yes",
+        "-o",
+        "UserKnownHostsFile=/Users/ravonus/dev/hashers/ops/servers/known_hosts",
+        "ubuntu@40.160.39.155",
+        "sudo -n /usr/bin/python3 -B -c 'import os,stat,hashlib,sys;from pathlib import Path;r=Path('\"'\"'/home/ubuntu/keel-studio-image-only-07a4de5e-f373-49bb-9e05-952906a8c4a4'\"'\"');s=r.lstat();assert stat.S_ISDIR(s.st_mode)and s.st_uid==0 and stat.S_IMODE(s.st_mode)==0o700 and r.resolve()==r;raw=sys.stdin.buffer.read(11380);assert len(raw)==11379 and hashlib.sha256(raw).hexdigest()=='\"'\"'b8cd2c3d7164bd7a4c774374f5cbe14329e9fec690ed5f9ab484eb3e4087c10e'\"'\"';f=os.fdopen(os.open(r/'\"'\"'releaseReview-final.json'\"'\"',os.O_WRONLY|os.O_CREAT|os.O_EXCL|os.O_NOFOLLOW,0o444),'\"'\"'wb'\"'\"');f.write(raw);f.flush();os.fsync(f.fileno());f.close();d=os.open(r,os.O_DIRECTORY|os.O_NOFOLLOW);os.fsync(d);os.close(d)'"
+      ]
+    },
+    {
+      "name": "activation-plan.final.json",
+      "localPath": "/private/tmp/keel-cee8-rename-first-final-20261021/activation-plan.final.json",
+      "bytes": 3552,
+      "sha256": "0598dd9afde00a92aa1fb02552f8c2018b0f8da900de707a2bd2f8ce1dda3442",
+      "installArgv": [
+        "/usr/bin/ssh",
+        "-o",
+        "BatchMode=yes",
+        "-o",
+        "ConnectTimeout=12",
+        "-o",
+        "StrictHostKeyChecking=yes",
+        "-o",
+        "UserKnownHostsFile=/Users/ravonus/dev/hashers/ops/servers/known_hosts",
+        "ubuntu@40.160.39.155",
+        "sudo -n /usr/bin/python3 -B -c 'import os,stat,hashlib,sys;from pathlib import Path;r=Path('\"'\"'/home/ubuntu/keel-studio-image-only-07a4de5e-f373-49bb-9e05-952906a8c4a4'\"'\"');s=r.lstat();assert stat.S_ISDIR(s.st_mode)and s.st_uid==0 and stat.S_IMODE(s.st_mode)==0o700 and r.resolve()==r;raw=sys.stdin.buffer.read(3553);assert len(raw)==3552 and hashlib.sha256(raw).hexdigest()=='\"'\"'0598dd9afde00a92aa1fb02552f8c2018b0f8da900de707a2bd2f8ce1dda3442'\"'\"';f=os.fdopen(os.open(r/'\"'\"'activation-plan.final.json'\"'\"',os.O_WRONLY|os.O_CREAT|os.O_EXCL|os.O_NOFOLLOW,0o444),'\"'\"'wb'\"'\"');f.write(raw);f.flush();os.fsync(f.fileno());f.close();d=os.open(r,os.O_DIRECTORY|os.O_NOFOLLOW);os.fsync(d);os.close(d)'"
+      ]
+    }
+  ],
+  "readOnlyPreflightArgv": [
+    "/usr/bin/ssh",
+    "-o",
+    "BatchMode=yes",
+    "-o",
+    "ConnectTimeout=12",
+    "-o",
+    "StrictHostKeyChecking=yes",
+    "-o",
+    "UserKnownHostsFile=/Users/ravonus/dev/hashers/ops/servers/known_hosts",
+    "ubuntu@40.160.39.155",
+    "sudo -n /usr/bin/python3 -B /home/ubuntu/keel-studio-image-only-07a4de5e-f373-49bb-9e05-952906a8c4a4/activate-image-only.py /home/ubuntu/keel-studio-image-only-07a4de5e-f373-49bb-9e05-952906a8c4a4/activation-plan.final.json"
+  ],
+  "executeArgv": [
+    "/usr/bin/ssh",
+    "-o",
+    "BatchMode=yes",
+    "-o",
+    "ConnectTimeout=12",
+    "-o",
+    "StrictHostKeyChecking=yes",
+    "-o",
+    "UserKnownHostsFile=/Users/ravonus/dev/hashers/ops/servers/known_hosts",
+    "ubuntu@40.160.39.155",
+    "sudo -n /usr/bin/python3 -B /home/ubuntu/keel-studio-image-only-07a4de5e-f373-49bb-9e05-952906a8c4a4/activate-image-only.py /home/ubuntu/keel-studio-image-only-07a4de5e-f373-49bb-9e05-952906a8c4a4/activation-plan.final.json --execute-approved-sha256 0598dd9afde00a92aa1fb02552f8c2018b0f8da900de707a2bd2f8ce1dda3442"
+  ],
+  "scope": "One new07a4 rename-before-stop observer-only cutover; preserve all consumed5895/aab/snapshot, strict1GiB+256MiB reserves/ownership/pausedpublisher/D97/data/auth. Stop on failure, no retry or private preparation/signature/submission/spend."
+}

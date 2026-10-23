@@ -1,0 +1,8 @@
+Traceback (most recent call last):
+  File "/Users/ravonus/dev/wt/studio-cache-independent-review-20261020/docs/reviews/studio-cache-independent-20261020/current-create-postrun-review.py", line 50, in <module>
+    health=[json.loads(s) for s in (P/'health-window.jsonl').read_text().splitlines()]; assert health and all(r['status']==200 for r in health)
+                                                                                                          ^^^
+  File "/Users/ravonus/dev/wt/studio-cache-independent-review-20261020/docs/reviews/studio-cache-independent-20261020/current-create-postrun-review.py", line 50, in <genexpr>
+    health=[json.loads(s) for s in (P/'health-window.jsonl').read_text().splitlines()]; assert health and all(r['status']==200 for r in health)
+                                                                                                              ~^^^^^^^^^^
+KeyError: 'status'

@@ -1,0 +1,25 @@
+{
+  "schema": "keel.independent-actual-image-save-audit@1",
+  "imageId": "sha256:fe455169d3d10b37696ed17053ff0be167649f5a490acd7e4cea61c2412d6ccb",
+  "configDigest": "sha256:b2811d170e752c2f93527a1e7d464e2e592e30598dd7cf8ae674d4f9724c23ce",
+  "archiveBytes": 703956480,
+  "archiveSHA256": "d7b01b81ba15044693511d2d1ec2acaecda0d9f97c62a309a2ba9282d9b6383e",
+  "protectedMode": "0600",
+  "stableBeforeAfterFileIdentity": true,
+  "ociAndDockerLegacyDescriptorsAgree": true,
+  "manifestImageIdentityMatchesActualDaemonReceipt": true,
+  "fullConfigExactActualReceipt": true,
+  "allRootFSDiffIDsMatchActualReceipt": true,
+  "blobCount": 40,
+  "layerCount": 38,
+  "allCompressedAndExpandedDigestsVerified": true,
+  "totalExpandedLayerBytes": 2033252352,
+  "first36ParentLayersAlreadyBoundByBuildReceiptReview": true,
+  "newTwoLayersExpandedBytes": 53903360,
+  "elapsedSeconds": 3.776858667,
+  "filesExtracted": 0,
+  "hostActions": 0,
+  "activationAuthority": false,
+  "appAndHTTPRuntimeQualificationPending": true
+}
+auditSHA256 b69a885c3a57329cb9cb8306f1c5f3ff693be51bc42093b381874b9f7e590891

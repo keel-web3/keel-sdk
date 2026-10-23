@@ -1,0 +1,86 @@
+{
+  "schema": "keel.independent-cee8-failure-attribution@1",
+  "result": "CONSUMED602988_FAILED_CONFIRMED_OLD_FE455_RECOVERY",
+  "consumedPlanSHA256": "602988e239087b9f9f1fee3503890edfa7dce64dde9160b7838ce690192f5ebb",
+  "actualEvents": [
+    {
+      "action": "create",
+      "id": "aab5b8d1ef40d28b7aff10919905a9305bbf588cc25f3de1fbeb72b0e335dc79",
+      "name": "keel-studio-candidate-5895d3d5-5f83-4a1c-b144-42724651ac91",
+      "timeNano": 1792543054893458256
+    },
+    {
+      "action": "stop",
+      "id": "fa0eb0299164407e24e1cda31b21b196ea8a8071a1a39ce71efd414234ef1659",
+      "name": "keel-showcase-paid-release-capacity-20261008",
+      "timeNano": 1792543060597893914
+    },
+    {
+      "action": "die",
+      "id": "fa0eb0299164407e24e1cda31b21b196ea8a8071a1a39ce71efd414234ef1659",
+      "name": "keel-showcase-paid-release-capacity-20261008",
+      "timeNano": 1792543060600078956
+    },
+    {
+      "action": "start",
+      "id": "fa0eb0299164407e24e1cda31b21b196ea8a8071a1a39ce71efd414234ef1659",
+      "name": "keel-showcase-paid-release-capacity-20261008",
+      "timeNano": 1792543060768560527
+    },
+    {
+      "action": "rename",
+      "id": "fa0eb0299164407e24e1cda31b21b196ea8a8071a1a39ce71efd414234ef1659",
+      "name": "keel-studio-rollback-5895d3d5-5f83-4a1c-b144-42724651ac91",
+      "timeNano": 1792543060773732828
+    },
+    {
+      "action": "rename",
+      "id": "aab5b8d1ef40d28b7aff10919905a9305bbf588cc25f3de1fbeb72b0e335dc79",
+      "name": "keel-showcase-paid-release-capacity-20261008",
+      "timeNano": 1792543060778519145
+    },
+    {
+      "action": "rename",
+      "id": "aab5b8d1ef40d28b7aff10919905a9305bbf588cc25f3de1fbeb72b0e335dc79",
+      "name": "keel-studio-failed-5895d3d5-5f83-4a1c-b144-42724651ac91",
+      "timeNano": 1792543061081979399
+    },
+    {
+      "action": "rename",
+      "id": "fa0eb0299164407e24e1cda31b21b196ea8a8071a1a39ce71efd414234ef1659",
+      "name": "keel-showcase-paid-release-capacity-20261008",
+      "timeNano": 1792543061092092346
+    }
+  ],
+  "oldDieToRestartMs": 168.481571,
+  "candidateNeverStarted": true,
+  "portAllocated": true,
+  "originalAndRunnerExactRecovered": true,
+  "snapshot": {
+    "path": "/home/ubuntu/keel-studio-image-only-5895d3d5-5f83-4a1c-b144-42724651ac91/retained-database-before.dump",
+    "bytes": 124210275,
+    "sha256": "994a046b87e9db335797e99c49ad16108a4ba5e56e5b2017a967a795417451db",
+    "snapshotResultSHA256": "589afaef341f557ec0b748e7790b3445a4dedc65b4720d3308759b32d0e65f46"
+  },
+  "sourceCompatibleNameWaker": {
+    "path": "/private/tmp/keel-cee8-activation-actual-20261021/actual-sleep-proxy-server.mjs",
+    "sha256": "fb8d882f802471c93792eeb58f7200627bc70c0d70ada3c2dc1d2b41af5b0e88",
+    "lineRange": "171-177",
+    "description": "Each inspect/start uses dynamic pipeline.container name, no stored old ID; restart caller not identified by Docker events"
+  },
+  "independentRecoveryRegression": {
+    "path": "/private/tmp/keel-independent-cee8-rename-first-20261021/recovery-name-waker.regression.test.py",
+    "sha256": "00d3dd1e4f36bdbad64039a18fed9158198273c1e99343f1476b2082eeb2b93a",
+    "baseline": "FAIL observed candidate wake while CURRENT between stop confirmation and rename",
+    "baselineStderrSHA256": "1eb12c8cb5bedaeaf8c5a99f578e72007a0af671709bd0cf2f8c5d0584f19ad5"
+  },
+  "raw": {
+    "docker-events.stdout": "9e2775370b120807cd6ebdf536e2d4387b542fc807b3cc8de7f8b80d4f8b190f",
+    "failed-readonly.stdout": "392ed18fe7e3ebf73f92fe7e33c3ecf8a3f96b8dd108c974856a20e81bd28e0d",
+    "remote-activation-receipt.json.json": "a0aaa391ec69c78f0aa4732f88b5737145d846e3c53d90211921b86a0d58484e",
+    "remote-database-snapshot-result.json.json": "589afaef341f557ec0b748e7790b3445a4dedc65b4720d3308759b32d0e65f46"
+  },
+  "newActionAdmitted": false,
+  "noPrivateOrHostActionByReviewer": true,
+  "publicationGate6": "FAILED_UNRESOLVED"
+}

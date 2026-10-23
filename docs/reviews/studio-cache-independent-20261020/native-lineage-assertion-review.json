@@ -1,0 +1,23 @@
+{
+  "schema": "keel-independent-native-lineage-assertion-review@1",
+  "at": "2026-10-20T08:42:23.181484+00:00",
+  "decision": "APPROVE_EXACT_COMPONENT_BINDING_CORRECTION",
+  "proposalSHA256": "3effc9541faf380f305d1e47e208fc4ad44bb9ebbf75b0b4cde2b7d627c572e9",
+  "sourceEquivalenceSHA256": "7faa525a609d4b21863d1eda2166ecc465e8e7e5c7409f6c53928967b6fa84ae",
+  "independentlyGitVerifiedInputs": 17,
+  "nativeSourceCommit": "64e5fa37667ac424ae87019c7609581dfc2ea364",
+  "compiledAndRuntimeSourceCommit": "b524bf5fc19939c7523aada2e53f79e3360970ea",
+  "changedStateReaderJSIsNotNativeBuildInput": true,
+  "onlyChange": "One invalid cross-component commit equality replaced by native exact64e plus manifest-native/receipt and manifest-compiled/runtime bindings.",
+  "unchangedChecks": [
+    "ActualbinarySHA8a2970e2",
+    "Native/LZMA canonical shell hashes",
+    "All1360dist byte equality",
+    "Published reader/chrome hashes",
+    "Worker import guard"
+  ],
+  "priorFailureMustBeRetained": true,
+  "nativeReceiptRelabelApproved": false,
+  "releaseApproved": false,
+  "programExecuted": false
+}

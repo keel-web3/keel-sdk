@@ -1,0 +1,30 @@
+{
+  "unchanged22OriginalFiles": [
+    "deployed-core.test.mjs",
+    "capture-signer.mjs",
+    "read-schema.test.mjs",
+    "guided-review-receipt.test.mjs",
+    "public-signer.test.mjs",
+    "assembly-failure.mjs",
+    "guided-review-receipt.mjs",
+    "capture-entry.ts",
+    "identity.mjs",
+    "existing-candidate.test.mjs",
+    "clone-state.mjs",
+    "clone-state.test.mjs",
+    "public-signer-receipt.mjs",
+    "verify-original.mjs",
+    "diagnostic-signer-context.ts",
+    "README.md",
+    "existing-candidate.mjs",
+    "deployed-core.mjs",
+    "check-bundle-import.mjs",
+    "build-bundle.mjs",
+    "diagnostic-signer-context.test.ts",
+    "read-schema.mjs"
+  ],
+  "networkGuardByteIdentical": true,
+  "runReviewFixtureSchemaAndOnePermissionOnlyReverseExact": true,
+  "runFixtureOriginalSHA256": "ef243394ce57d473bd89cd61272e5a1620236fd3d6e05f6e550ebb2c99439936",
+  "runFixtureNewSHA256": "c2ddb0a5c42487f709c12bc5b35dc0d323f063bdadbb473e7ac2aabd49cc288a"
+}

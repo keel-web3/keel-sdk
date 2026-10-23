@@ -1,0 +1,20 @@
+{
+  "contextSHA256": "b9cc594d66269aa02b5f49ab6632b6bc1deb386112a869a6ea7d73e48dd28485",
+  "compressedBytes": 11051960,
+  "rawTarBytes": 55767040,
+  "tarMembers": 2545,
+  "regularPayloadFiles": 1752,
+  "directoryCOPYEntries": 791,
+  "changedEntries": 1753,
+  "deletedEntries": 288,
+  "regularPayloadBytes": 51997532,
+  "completePredictedAppEntries": 36064,
+  "completePredictedAppTreeSHA256": "345ea159bdf35662cfb79769546f570a41c9ed8426185fc846ea26c44720cf14",
+  "allTarCOPYMetadataAndBytesMatchExpected": true,
+  "DockerfileExactlyFourReviewedInstructions": true,
+  "deletionsOnlyManagedAppPaths": true,
+  "exact1360InstalledSDKWithOnly4ReviewedClientChanges": true,
+  "pausedWorkerExact": true,
+  "reservesAndThreeCopiesRecomputed": true,
+  "hostOrDockerActions": 0
+}

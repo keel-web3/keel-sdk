@@ -1,0 +1,20 @@
+{
+  "schema": "keel.independent-actual7b0-durable-observation-binding-review@1",
+  "decision": "APPROVE_EXACT_OBSERVATION_METADATA_AND_REBOUND_PID_CORRECTIONS",
+  "reviewerId": "independent-release-reviewer",
+  "metadataPatchSHA256": "87f3d0383dcb8307011503a4353ea5e8a7a155c65fb489040443c222870a84b3",
+  "metadataBoundPid44ParserSHA256": "cdc931a206cfde57b5ff3521f446a7b92732333a4b73c219ad5bf6f34031d552",
+  "reboundPidOnlyPatchSHA256": "8b450f198bc47e470fe4c83be8d4a91e51f8d614c17316ac9b99926b1e08ab0e",
+  "finalParserSHA256": "d57e6af1111aeae05c91e9b76afd97c137fb625d0f47b0b3352745c69a05c815",
+  "checks": {
+    "all3Durables": "Independently byteequal actual raw stdout; exact exit0/size/SHA/identity metadata",
+    "readerSource": "All3 complete argv independently reconstructed from known qualification root, role, actual bytes and rawSHA; bounded readonlyPython/nofollow/root0600/nlink1 exactly rather than fabricating oldcat invocation",
+    "metadataSchema": "Exact actual7keys; finite nonnegative elapsedSeconds checked; no broad schema normalization",
+    "oneCharPid": "Final parser equals bound parser except one44\u219243 character; retains exact2 SDK-only warning lines and rejects allothers",
+    "allOtherAssertions": "Actual receipt/identity/status/goldens/observer/OOM/HTTP/baseline/rawdurablebyte equality guards remain unchanged",
+    "actualRed": "Original expectedPID44 failure against real durables retained; no missingfixture error relabeled"
+  },
+  "priorPidApprovalSHA256": "72dff1d2b105d04d7c759bd50d390fcda7b3da47201361944f3796897ec76b6d",
+  "scope": "New pureQA receipt parser only, no productsource/host/runtime replay/activation/privateprogram changes",
+  "hostActions": 0
+}

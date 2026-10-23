@@ -1,0 +1,159 @@
+{
+  "schema": "keel-independent-fe944-activation-implementation-review@1",
+  "recordedAt": "2026-10-20T14:48:08.856639+00:00",
+  "reviewer": "cache-release-independent-reviewer",
+  "sourceCommit": "d7cee490b42220f2262e1508459179c902760e2b",
+  "decision": "APPROVE_EXACT_OPERATOR_IMPLEMENTATION_ONLY",
+  "blockingSourceFindings": [],
+  "operator": {
+    "path": "/Users/ravonus/dev/wt/studio-publication-20261019/release-proof-qualification/docs/reviews/studio-publication-20261019/release/final-candidate/activation-fe944/activate-qualified-studio.py",
+    "bytes": 39808,
+    "sha256": "b13dc18e35b092014ea91d287f49656594168586b3c766145d140507aaa999d2"
+  },
+  "snapshotSupervisor": {
+    "path": "/Users/ravonus/dev/wt/studio-publication-20261019/release-proof-qualification/docs/reviews/studio-publication-20261019/release/final-candidate/activation-fe944/snapshot-supervisor.cjs",
+    "bytes": 3386,
+    "sha256": "5d8d56588eba290773961d74152baf3728ffd2e00a75894beed92d38af06706e"
+  },
+  "pendingPlan": {
+    "path": "/Users/ravonus/dev/wt/studio-publication-20261019/release-proof-qualification/docs/reviews/studio-publication-20261019/release/final-candidate/activation-fe944/activation-plan.pending.json",
+    "bytes": 3623,
+    "sha256": "77e95dbe4cbd7b5edd23c75e3b7df0646d66f7f11ea7b69cd3ee73838eb7062b"
+  },
+  "pendingPlanRejects": "required_approval_missing",
+  "activationPlanApproved": false,
+  "executionCommandAdmissionProduced": false,
+  "allPendingApprovalFlagsFalse": true,
+  "unchangedCutoverAndRollback": {
+    "declaredFunctionASTsCompared": 13,
+    "allEqualToOriginal493296Operator": true,
+    "cutoverPausedWorkerOriginalFullConfigAndMountsUncertainCreateRollbackPreserved": true
+  },
+  "closedPriorFindings": [
+    "9e container deadline/cancellation missing: owned detachedpg_dumpgroup TERM150s/KILL155s plus unchanged outer180s",
+    "9e diagnostics unbounded: inner16KiB prefix and host64KiB retained cap with bounded streaming and failure on excess",
+    "9e timeout partialevidence fsync missing: new finally path persists snapshot,diagnostics,result and containing directory on success/failure",
+    "7a zero-length stderrviews retained wholebuffers: d7 keeps only nonempty copiedprefix buffers"
+  ],
+  "independentTests": {
+    "maintainedAndSuccessor": {
+      "pass": 32,
+      "fail": 0,
+      "log": {
+        "path": "/Users/ravonus/dev/wt/studio-cache-independent-review-20261020/docs/reviews/studio-cache-independent-20261020/activation-d7-32-green.log",
+        "bytes": 131,
+        "sha256": "b6fe3d0160ed8eaf108d40f143026b5506010d049c34d7024e5e5f4a4594c975"
+      }
+    },
+    "realChildAndBoundary": {
+      "pass": 10,
+      "fail": 0,
+      "log": {
+        "path": "/Users/ravonus/dev/wt/studio-cache-independent-review-20261020/docs/reviews/studio-cache-independent-20261020/activation-d7-10-green.log",
+        "bytes": 109,
+        "sha256": "d25c30adf08ee8eb75981eefa1fcdcf3c457235003c47e1b4ba0563531206b8d"
+      }
+    },
+    "exactUnchangedBackingBufferAdversary": {
+      "baselineHelperSHA256": "418242a3ff058750229ab4ec346a2f3d21f5cf85a42c7377a42a701a8854a69c",
+      "baselineFail": 1,
+      "baselineObserved": {
+        "stderrBytes": 4194304,
+        "reportedRetainedBytes": 16384,
+        "zeroLengthViews": 63,
+        "uniqueRetainedBackingBytes": 4194304
+      },
+      "fixedPass": 1,
+      "source": {
+        "path": "/Users/ravonus/dev/wt/studio-cache-independent-review-20261020/docs/reviews/studio-cache-independent-20261020/snapshot-supervisor-backing-memory-review.test.cjs",
+        "bytes": 2473,
+        "sha256": "22f06fa47cc8aa456b603a7077b66da46dd6b73598e82275f68953c7a11209b5"
+      },
+      "red": {
+        "path": "/Users/ravonus/dev/wt/studio-cache-independent-review-20261020/docs/reviews/studio-cache-independent-20261020/snapshot-supervisor-7a2-backing-red.log",
+        "bytes": 1471,
+        "sha256": "78e51f3f9b38a02b20424e307f210a1b388afd41caa1630282a32b6274c6f567"
+      },
+      "green": {
+        "path": "/Users/ravonus/dev/wt/studio-cache-independent-review-20261020/docs/reviews/studio-cache-independent-20261020/snapshot-supervisor-d7-backing-green.log",
+        "bytes": 507,
+        "sha256": "28edf7b45a167e347850114b1d97414de38fc5dd872de595fb74e4645fd0cc1e"
+      }
+    },
+    "actualProcessGroupOwnership": {
+      "pass": 1,
+      "case": "TERM-ignoring same-group descendant closes inherited pipes; directparent exits onTERM; supervisor killsremainingownedgroup; separateownedneighborprocessgroup survives",
+      "source": {
+        "path": "/Users/ravonus/dev/wt/studio-cache-independent-review-20261020/docs/reviews/studio-cache-independent-20261020/snapshot-supervisor-group-ownership-review.test.cjs",
+        "bytes": 3091,
+        "sha256": "283561fe6f3a81a521e3368e67da2d3ff7cb9fb050c864c1ab9a89da00454739"
+      },
+      "log": {
+        "path": "/Users/ravonus/dev/wt/studio-cache-independent-review-20261020/docs/reviews/studio-cache-independent-20261020/snapshot-supervisor-d7-group-green.log",
+        "bytes": 487,
+        "sha256": "558ab41024d44f8d959633fb83b000a1c2c287aacbf5d664bbf8cca3776318f6"
+      }
+    },
+    "originalUnchangedTimeoutRegression": {
+      "result": "ERROR_ARTIFACT_FILE_MISSING_AT_NEW_HELPER_GATE",
+      "log": {
+        "path": "/Users/ravonus/dev/wt/studio-cache-independent-review-20261020/docs/reviews/studio-cache-independent-20261020/activation-snapshot-7a2-original-unchanged.log",
+        "bytes": 1789,
+        "sha256": "036813b21064afaaf52e2497a3efa61ee93adc7ae212a75744435c689c69e749"
+      },
+      "explanation": "Original fixture creates no pinned helper and mocks obsolete subprocess.run. It was rerun unchanged as requested but cannot exercise the new helper/Popen path; no pass relabel."
+    },
+    "newBoundarySameDurabilityInvariant": {
+      "pass": 1,
+      "partialBytes": 20,
+      "fileFsyncs": 3,
+      "directoryFsync": true,
+      "failureMetadataResult": "FAIL",
+      "outerCLIProcessKilled": true,
+      "source": {
+        "path": "/Users/ravonus/dev/wt/studio-cache-independent-review-20261020/docs/reviews/studio-cache-independent-20261020/activation-snapshot-popen-timeout-review.test.py",
+        "bytes": 2350,
+        "sha256": "f162c910ee99bda880b47067944a6a83d0b2e52828d0acefd8674c9c1736a206"
+      },
+      "log": {
+        "path": "/Users/ravonus/dev/wt/studio-cache-independent-review-20261020/docs/reviews/studio-cache-independent-20261020/activation-snapshot-d7-adapted-timeout-green.log",
+        "bytes": 217,
+        "sha256": "f0905179ee05f98499bd5d0aaed9bc80f21b21878e5f12a3b6bcdd7000f00e15"
+      },
+      "initialFixtureErrorRetained": {
+        "path": "/Users/ravonus/dev/wt/studio-cache-independent-review-20261020/docs/reviews/studio-cache-independent-20261020/activation-snapshot-7a2-adapted-fixture-error.log",
+        "bytes": 1163,
+        "sha256": "9cc1bced66677f1cc697a73b8ed8a28afc65055bc8098e5073beab8eac4ccefc"
+      },
+      "fixtureCorrection": "Resolve private temporary root to canonical path, retain original file/directory durability assertions and add failuremetadata assertions; no author test/assertion edits"
+    }
+  },
+  "actualOldNodeReadOnlyEvidence": {
+    "path": "/Users/ravonus/dev/wt/studio-publication-20261019/release-proof-qualification/docs/reviews/studio-publication-20261019/release/final-candidate/activation-fe944/actual-old-node-readonly.json",
+    "bytes": 627,
+    "sha256": "4ae4931d66a08ce69ae01962538b86ac29ff61c9a7f88da9717310919bb69908"
+  },
+  "oldNode": "/usr/local/bin/node v22.23.1 actualb6ff/a53 identitybefore==after; zeroappDBwrites",
+  "migrationEvidence": "Prior reviewed genuinePG17.10/full62411Bbootstrap7556/99oldprojections/restore308commands0; unchanged and not rerun/reclassified as currentproductionbackup",
+  "scopeLimits": [
+    "Reviewer ran no Docker/container/host/DB operation for these snapshot tests",
+    "Actual local Node and owned subprocess groups, signals/pipes/filesystem are exercised; no actual Docker daemon disconnect simulation",
+    "Tests inject shorttimer scheduling only; production150000ms+5000ms constants unchanged",
+    "This source approval is not concrete finalplan/execution approval or livepublication acceptance"
+  ],
+  "remainingPreactivationGates": [
+    "Independent QA approval for exactd7 helper/operator/currentcandidate, with fresh actualcompiled401/403 terminalnegative evidence and genuineall200native proof kept separate",
+    "Mandatory originalGIF prerequisite/currentnative/wholeprogram gate is not waived for the Juniper copy",
+    "Resolve candidateDense/Inline behavior probe and finalappreadiness; oldlivecopyURLtypefailure is not proof of candidateHTTPsuccess",
+    "Bind all actual QA/review/state/denial evidence hashes in a separate concrete finalplan with exact leadapproval",
+    "Review exact exclusive transfer/preflight/execute commands; freshlocked originalidentity/fullConfig/mount/pausedworker/images/resources; actual bounded beforecutover privatebackup"
+  ],
+  "afterDeploymentRequired": [
+    "Independent servedbuildpyrfd/FE944/API/browser check and normal user-directed exactJuniperGatorcopy project1cef1869-6d1b-4840-b3de-63d8def2e390 rev1 reaches unsignedwallet handoff",
+    "Historical authenticatedHTTP200/MIME/tokenURIdecode/canonical-shell/canvas evidence and originalowneraccess remain separate",
+    "No signature/spend/submission or owneraccess bypass authorized"
+  ],
+  "productionActivated": false,
+  "signing": false,
+  "submission": false
+}

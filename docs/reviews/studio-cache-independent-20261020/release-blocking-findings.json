@@ -1,0 +1,48 @@
+{
+  "schema": "keel-independent-release-blocking-findings@1",
+  "at": "2026-10-20T08:24:23.397150+00:00",
+  "candidateImage": "sha256:5c961bf73aab9549167a8d7c5afbf88f6c8b92fcc1502d6294c55e4669a8ca8d",
+  "decision": "BLOCK_RELEASE_ACTIVATION",
+  "findings": [
+    {
+      "severity": "P1",
+      "title": "Rebuild the compiled Studio proof consumer before shipping the cache fix",
+      "file": "docs/reviews/studio-publication-20261019/release/server-sdk-runtime-patch/prepare-patch.py",
+      "line": 106,
+      "description": "The Dockerfile inherits compiled Sitef11/SDK64e Next server chunks and replaces only four external SDK directories. Studio publication-simulation imports proof-simulation-node into its Webpack server graph; it is not an external module at runtime. Exact final5c961 chunk96429.js module44950 contains the old uncached reader, and its proof backend invokes that inline H factory. The separate packaged b524 state reader is fixed, but actual Studio does not use it. Therefore standalone SDK/native-driver tests cannot establish that this image fixes the Studio timeout.",
+      "repro": "Run the recorded no-network UID999 read-only image probe and inspect actual chunk96429.js; hash441f46351ad4853d597af842a7339ad82f57eeba803e4437121e003b9cf47988; old reader starts near byte124950 and proof branch calls H near byte131430.",
+      "evidence": [
+        "actual-compiled-consumer.stdout",
+        "actual-compiled-consumer-receipt.json"
+      ],
+      "requiredCorrection": "Build the actual Next app against SDKb524, or use a supported external proof-runtime module and rebuild. Verify the resulting compiled consumer uses the fixed reader before native/UI/deployment acceptance. Do not patch emitted minified code or relabel the old build."
+    }
+  ],
+  "scopedPriorApprovalsRemain": [
+    "SDKsource/auditorpin review",
+    "Exact duplicate archive cleanup and image import, whose original-state guards passed",
+    "Public seven-file staging/read-only preflight",
+    "Assembly-only producer and pureoffline comparator steps, with no complete pipeline/native approval"
+  ],
+  "fullCanonicalQAReported": {
+    "total": 2679,
+    "pass": 2671,
+    "fail": 0,
+    "optionalSkip": 8,
+    "rawSHA256": "44209d6ab221da6e9c3161c9a4d3da065f3b0b8cd00fe81fed1b55e5ef0d51c5",
+    "reviewerExecuted": false
+  },
+  "exactInstalledImageQA": {
+    "pass": 127,
+    "fail": 0,
+    "skip": 0,
+    "rawHashesIndependentlyChecked": true,
+    "proofScope": "Installed packages only; not compiled Studio proof consumer."
+  },
+  "newNativeExecuted": false,
+  "productionActivated": false,
+  "signing": false,
+  "submission": false,
+  "probeReceiptSHA256": "7aa0d9affae28f19e62b4b90427231f08c19cae4ff1eac7e78128b1e5215e829",
+  "probeStdoutSHA256": "497d50d78bce1fb813c3012a7ad80c1d9fa2e22a8c66d60603a213f91cc838f1"
+}

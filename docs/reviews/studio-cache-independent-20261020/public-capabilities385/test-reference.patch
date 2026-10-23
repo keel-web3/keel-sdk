@@ -1,0 +1,31 @@
+diff --git a/apps/studio/tests/unit/studio-wallet-access.test.ts b/apps/studio/tests/unit/studio-wallet-access.test.ts
+index 68be768c6..747f09af4 100644
+--- a/apps/studio/tests/unit/studio-wallet-access.test.ts
++++ b/apps/studio/tests/unit/studio-wallet-access.test.ts
+@@ -257,7 +257,7 @@ test("the exact static agent discovery document is public for GET and HEAD witho
+ });
+ 
+ test("public discovery grants no release, wildcard discovery or write access", async () => {
+-  for (const url of ["/.well-known/private.json", "/.well-known/keel.json/other", "/.well-known/KEEL.json", "/.well-known/keel-capabilities", "/api/mcp", "/api/studio/projects", "/api/agent/drafts"]) {
++  for (const url of ["/.well-known/private.json", "/.well-known/keel.json/other", "/.well-known/KEEL.json", "/.well-known/keel-capabilities/private", "/.well-known/KEEL-capabilities", "/api/mcp", "/api/studio/projects", "/api/agent/drafts"]) {
+     assert.equal(isStudioAccessPublicPath(url, "GET"), false, url);
+     assert.equal((await gate({}).proxy(request(url))).status, 401, url);
+     assert.equal((await gate({ authenticated: true }).proxy(request(url))).status, 403, url);
+@@ -267,3 +267,17 @@ test("public discovery grants no release, wildcard discovery or write access", a
+     assert.equal((await gate({}).proxy(request("/.well-known/keel.json", method))).status, 401, method);
+   }
+ });
++
++
++test("the SDK public compatibility endpoint is exact GET/HEAD discovery without wallet lookup", async () => {
++  const unavailable = gate({ unavailable: true });
++  for (const method of ["GET", "HEAD"]) {
++    assert.equal(isStudioAccessPublicPath("/.well-known/keel-capabilities", method), true);
++    assert.equal((await unavailable.proxy(request("/.well-known/keel-capabilities", method))).status, 200);
++  }
++  assert.deepEqual(unavailable.calls.allowAgent, []);
++  for (const method of ["POST", "PUT", "PATCH", "DELETE", "OPTIONS"]) {
++    assert.equal(isStudioAccessPublicPath("/.well-known/keel-capabilities", method), false);
++    assert.equal((await gate({}).proxy(request("/.well-known/keel-capabilities", method))).status, 401);
++  }
++});

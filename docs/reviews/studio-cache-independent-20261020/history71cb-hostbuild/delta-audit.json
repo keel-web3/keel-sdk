@@ -1,0 +1,31 @@
+{
+  "result": "PASS_FULL_PREDICTED_APP_TREE_AND_BOUNDED_PUBLIC_DOCKERFILE",
+  "compressedBytes": 1681623,
+  "compressedSHA256": "5c6fa0327d062be9eb6353f84450e2227ca915e4741d0b03bc413ce09c5493d3",
+  "rawBytes": 16158720,
+  "rawSHA256": "70a638a53bbe92d0361ae1f33e83aa99fea2d913a7e5d0a29e88a21c217afd3f",
+  "tarEntries": 1293,
+  "changedEntries": 896,
+  "deletedPaths": [
+    "web/apps/studio/.next-discovery-4002-b524-portable22-20261020/static/chunks/webpack-0ca5a4d7c92bccba.js",
+    "web/apps/studio/.next-discovery-4002-b524-portable22-20261020/static/oPM_JP5lg4vgS2ZQciiei",
+    "web/apps/studio/.next-discovery-4002-b524-portable22-20261020/static/oPM_JP5lg4vgS2ZQciiei/_buildManifest.js",
+    "web/apps/studio/.next-discovery-4002-b524-portable22-20261020/static/oPM_JP5lg4vgS2ZQciiei/_ssgManifest.js"
+  ],
+  "baseAppEntries": 36065,
+  "resultAppEntries": 36065,
+  "baseAppTreeSHA256": "468d9005135840016b5eb97178f06ea6960870aa2c6e8f3ce685fdecd0aeeba9",
+  "predictedAppTreeSHA256": "89e7e64f96909cbb7ae7d553e057ef51b882e290073afb468de63edc362ac39d",
+  "baseManifestFileSHA256": "eab2bf89d3243e171e082daa74e46845c97fc1b021f124b12ec1c114cf0e2299",
+  "changedOutsideNext": [
+    "context-manifest.json",
+    "web/apps/studio/public/keel-build.json"
+  ],
+  "protectedOutsideStudioOrContextEntriesExact": 18640,
+  "sdkAndPnpmEntriesExact": 6348,
+  "allExternalDependenciesChanged": 0,
+  "dockerfileInstructionCount": 4,
+  "dockerfileSHA256": "9658702daa12d8fa6574ab2422155990e7f5691e691dccf5771fcc8bb81bdc4f",
+  "nativeOrAppExecuted": false,
+  "runtimeEnvOrArtworkOrDBIncluded": false
+}

@@ -1,0 +1,132 @@
+{
+  "schema": "keel.independent-funding1058-final-release-readiness-review@1",
+  "decision": "APPROVE_EXACT_IMAGE_ONLY_FUNDING_CORRECTION_ACTIVATION_READINESS",
+  "reviewerId": "independent-release-reviewer",
+  "productionFixAuthoredByReviewer": false,
+  "sourceFreeze": "4c24e17728b9b02efaa642f3995562a776da1b6a",
+  "bindingRecipeFreeze": "3f7e0ce125fd640239fcf302d3ea158e74f3b218",
+  "bindingRecipeSHA256": "0b0304df0fc1e8dab972f82ffdfaadae0d7d5047dced18ab465ad91e9b51a4c3",
+  "candidate": {
+    "siteCommit": "d64027b868c1d038854b6181049785fe50da0dcb",
+    "sdkCommit": "311d61526284248938e335d7ed879089408933be",
+    "buildId": "IETVxBFih4T2X8_Bx9hK0",
+    "appImageId": "sha256:1058a269e6eec831d62945fe0b2623a2c25747a7a900b1e215b24691196ea3db"
+  },
+  "actualImageAudit": {
+    "imageBytes": 720611802,
+    "configSHA256": "b8ddaf6d68e76ad758ee46b7c8407b480dfb146113ba0f31a43f10943d80a38b",
+    "rootFSSHA256": "2041f5532020f331f10a65e63bea094a903c8776f82f39744bd8d5fcfb691488"
+  },
+  "completeAppTree": {
+    "entries": 36065,
+    "sha256": "9bad445483cd8b8f76bfe1916261dc1337c06bd0854b8e32e514ba5b8ce89c1b"
+  },
+  "exactSourceReview": {
+    "sha256": "73abf95247354421c5d857250d7b4178ef43248547a8a5ee8ca5f3d4c6c2a4d7",
+    "FUNDING44_001": "CLOSED_FOR_EXACT_D640_SOURCE",
+    "own46FocusedTestsAndActualSaveRegression": "PASS paid240 unchanged/current236 returned and persisted; original44RED retained",
+    "QA342AndTSC0": "bound by exactqa-final; no new private/native proof claimed"
+  },
+  "independentQA": {
+    "commit": "033ee8bd94afeef006d19184fbb3e6af639f7877",
+    "path": "/tmp/keel-qa-receipt-activation-20261020/keel-site/docs/reviews/studio-publication-20261021/qa-funding1058-runtime/qa-final.json",
+    "sha256": "7ab739a04fe363689f41e63742a5c0999b1bd0e1243c9b10dc996b2442ff3b50",
+    "technicalPreactivationApproval": true,
+    "scope": "Source342+TSC0; actualSAVE44blobs/42layers/40CEE8parentprefix/fullConfig/RootFS/36065tree/1360SDK311; actual3isolatedpublicroles/goldens/20HTTP/baselinepreservation, not live artwork acceptance"
+  },
+  "actualRoleReceiptChecks": {
+    "ownCheckSHA256": "743a3528ce79c70a134fc0b9139228a065c198a1cb840c87a87b9aef29cad627",
+    "all3OuterInnerExit0PASS": true,
+    "all3DurableByteExactStdout": true,
+    "all3StoppedRetained": true,
+    "oldCurrentAndD97BeforeAfterExact": true,
+    "sdkHTTPObservedPeakBytes": [
+      315633664,
+      274874368
+    ],
+    "SDKHTTPObservedOOMCounters": 0,
+    "treeOOM": "runner enforced DockerOOMfalse; no observer/peak claim",
+    "exactWarningPIDCorrectionReviewSHA256": "4f10aebf15b0bb3aa73d94a565a328bc597b5f2ccc561a15d09da425b4e774a9",
+    "isolatedHTTP": "4publicGETHEAD200+16private/wrongmethod401, syntheticdeadDB/noauth/noexternalnetwork; not a deployed browser proof"
+  },
+  "operatorReview": {
+    "operatorSHA256": "980300685d48fcd3456a5788292ea353033c7c6db0c9bbb7243dc118795eaf55",
+    "knownApprovedParentSHA256": "8c9584a951215a43b25d8f1599c69aed60553c80b7ab0f0ee6faebb01bce73ca",
+    "reverseExactAfterOnlyCurrentIDImageRetarget": true,
+    "mainCutover": "Snapshot PASS, fullcandidateCREATE guard; rename healthycurrent c63 to ownedrollback BEFORE immutableIDstop; confirmoldstopped, publishcandidatecurrentname, startID, boundhealth, strictcompleteConfig/Host/mount/pause/D97checks.",
+    "recovery": "Fullownership/immutableID/exactprofile guard; rename ownedcandidate offcurrent wakeupname before stop; preserve foreign/unknown occupants; requireallownedstopped andrunnerexact beforeoldrename/start/boundhealth. No automatic replay/DBrestore/cleanup.",
+    "helperFiles": {
+      "reviewed-activation-support.py": "a1594559c2c04159ac94827d0f4f2a991310fb06648379bca6081d5ce6a98de1",
+      "guarded-deployment-checks.py": "b5f7d764b6c05db503a23ea63ca21a36bfcb0f17cc8292444d790d4a8aad6e00",
+      "candidate-oom-default.py": "6621ff48fc02057d98d91ef5fd71e6e30eeea1ef847149170e316d9725e77c73"
+    },
+    "snapshotSupervisorSHA256": "5d8d56588eba290773961d74152baf3728ffd2e00a75894beed92d38af06706e",
+    "snapshot": "Reviewed150sTERM/155sKILL ownedgroup, copiedprefixmemorybound, outputbudget+1/backpressure and cappeddiagnostics, file+directoryfsync. Durable successful snapshot required beforecandidatecreate; full1GiB reserve rechecked after snapshot.",
+    "unchangedStrictFields": "Entire Config/Host/mount records; only reviewed explicitFalse\u2192presentNone OOM projection under exactfresh pinneddaemonprofile; rejecttrue/wrongtypes/missing/allotherdrift. No broad normalization."
+  },
+  "pendingPlanSHA256": "feec1f532f82b63d575ebed21105512d064c3c0ecf02594588d78ff2e39a5231",
+  "remoteRoot": "/home/ubuntu/keel-studio-image-only-7016f46a-afaa-45c6-b459-33d3b3b3e078",
+  "currentMustRemain": {
+    "id": "c63d763ca03989cf4685104a3b9069cb7a40ec0cb7d45bac4359c22f78adcce8",
+    "image": "sha256:cee8c0b777f78372c6ee56bd9ff1c66dbeafd6393d04cb7f298fab6eb7bac9b7",
+    "configSHA256": "cbc1421f48129b305185026d7154a3e559c849ad394e41ace8cedea87c65c7d0",
+    "hostConfigSHA256": "186e487039113f582118064bce13b98c79f75eca5b3fa0d788c7d79b8fb14049",
+    "mountsSHA256": "74cc304b0955c822f88ffdbcbff56d89857f5ea3d7c51246ec106f00247ade89"
+  },
+  "runnerMustRemain": {
+    "id": "434316eff6e19951807f95ba8aee03a4db684d760039dfeb723c7bf9203a8649",
+    "image": "sha256:d97ddf2aba94cb963646fdf05bc8dc8c99b7e69b8c19bad85c06bea7c67fc9f5",
+    "configSHA256": "23f5b528017bd47ac37f47ea6d4a56efd3926e4ca1fa0aad13f02652b1570113",
+    "hostConfigSHA256": "6fc9390416de4dd4ff6872f14b3430c76838f6bcef8abd428b6c63fd3d55dd82",
+    "mountsSHA256": "07f01d55cebb43e5ed07f5bdcafc33bf85d6a294839179d72e9ba5121609937f"
+  },
+  "socketMustRemain": {
+    "Name": "keel-studio-proof-socket-2779804f-f8fe-4fcd-8153-f45ad70b03b6",
+    "Driver": "local",
+    "Options": {
+      "device": "tmpfs",
+      "o": "size=16m,uid=999,gid=999,mode=0700,noexec,nosuid",
+      "type": "tmpfs"
+    }
+  },
+  "staticStaging": {
+    "reviewSHA256": "0beb084b41dd2941f5bcad3394b9fbf7ef9dffb719115f992a35ef1da6cdc901",
+    "commandsSHA256": "6cbec88031025c68d9a625fe97053dd489f3ebdfef6c6fc5196d65dda32ad39c",
+    "actualVerificationPath": "/private/tmp/keel-1058-activation-actual-20261021/static-stage-verification.json",
+    "actualVerificationSHA256": "c03fe5f028a3a61ca19dd2da156cb96f972e750aa0a7e4d44878d07294c83492",
+    "all7FilesExact": true,
+    "finalPlanAndConsumedAbsentAtReadback": true
+  },
+  "finalPlanPermittedUpdates": [
+    "evidence.qa.sha256",
+    "evidence.releaseReview.sha256",
+    "approval.independentQA",
+    "approval.independentReleaseReview",
+    "approval.leadExecuteApproved",
+    "physicalPhase",
+    "pending"
+  ],
+  "allOtherFinalPlanFieldsMustDeepEqualPending": true,
+  "minimumReserveBytes": 1073741824,
+  "snapshotBudgetBytes": 268435456,
+  "exactFinalActionAdmissionStillRequired": "New realQA+thisreview+finalplan only3exclusive receivers; verifyexact finalhash andprotectedfields; existing readonlypreflight thenONEhashboundexecute underfreshfullguards andnormalboundedhealth. No static/root/role replay.",
+  "leadExecuteAuthority": "Root explicitly authorizes ordinaryguarded image-onlycutover under existinguserdeploymentauthority; finalexactpacket still requires this reviewer admission.",
+  "mandatoryPostDeployment": [
+    "Independentactual1058/source d640/IETV/1360SDK/native8a/fullConfig/Host/mount/healthy/pause/currentrollback/D97/socket checks",
+    "New retainedsnapshot fullhash/PGDMP and bounded private pg_restore--list only, no restore; keep latest07a4 and all othernonretired rollbackresources",
+    "Normal authenticated historicalH actualMIME/hash/decode/render on newbuild",
+    "OwnexactsourceGator and realGIF normal fullsimulation to unsignedwallet throughsupporteddeployedUI/API/MCP; report actual outcomes, no signatures/spend or stalecapture replay"
+  ],
+  "Gate6": "PENDING_NEW1058_LIVE_ACCEPTANCE; prior Gator/GIF failures retained",
+  "retainedLimits": [
+    "Historicalstrict280FAIL/sourceattribution is not wholecompilednative equivalence",
+    "Earlierblocked directbrowsernavigation remains stopped; no alternatecaller/privateAPI/trace/DB workaround",
+    "Prior fullnative proofs keep exactoldsource/image scopes; not claimednew1058proof",
+    "No source/native/backend/catalog/factory/runner/socket/migration/data changes authorized by this image-onlyaction"
+  ],
+  "blockingTechnicalPreactivationFindings": [],
+  "exactFinalCommandExecutionApprovedByThisReceipt": false,
+  "reviewerHostActions": 0,
+  "signing": false,
+  "submission": false
+}

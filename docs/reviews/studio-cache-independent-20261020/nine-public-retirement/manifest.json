@@ -1,0 +1,125 @@
+{
+  "schema": "keel.independent-public-evidence-manifest@1",
+  "files": [
+    {
+      "path": "cleanup-review.json",
+      "bytes": 5689,
+      "sha256": "d56f5ab118cd7e2a5f66e99d4e7a4952aead9e793be7494b699a8008802972d3"
+    },
+    {
+      "path": "cleanup-commands.admitted.json",
+      "bytes": 9529,
+      "sha256": "e6fdfe24757f8b780de30a98f4c2504ddf0ee0de5ca619303352029aa92fba35"
+    },
+    {
+      "path": "retention-audit.json",
+      "bytes": 4291,
+      "sha256": "94d854e8432123198f379dc92b16035d6d9c6b0109eae7854cd30edfc9131c86"
+    },
+    {
+      "path": "provenance-and-restore.json",
+      "bytes": 3101,
+      "sha256": "9e1303ca9987badd18f50f9a8ed9883d1c592ba465299ac1783b48d70d3a25d0"
+    },
+    {
+      "path": "command-input-audit.json",
+      "bytes": 832,
+      "sha256": "1df95e3e89cf89791c252f2a2365261b3d576f0eb86ccf7ef1f424d6f593da81"
+    },
+    {
+      "path": "freeze.json",
+      "bytes": 520,
+      "sha256": "41ba0472161db9e1c3e775ffa4513c4f6baebf216bfabd730180d81b5de7ae99"
+    },
+    {
+      "path": "final-local-controls.json",
+      "bytes": 1664,
+      "sha256": "b97a389cfd898ffb3719f9a935d3e72bf39fb5ef30f0d0776e3720e3d8f7956c"
+    },
+    {
+      "path": "cleanup-nine-public.initial-inspected.py",
+      "bytes": 11367,
+      "sha256": "586793d0e556cf70f0c0cb6f69587e1089bf98a4c5005a9e04502353af5a0d6a"
+    },
+    {
+      "path": "entry-replacement.regression.py",
+      "bytes": 2322,
+      "sha256": "05d3f769c7e0c5b844dae7ec5664bf045b0f4c3a834b3742da7a8e8434ea9735"
+    },
+    {
+      "path": "entry-replacement.initial-red.stdout",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "entry-replacement.initial-red.stderr",
+      "bytes": 3493,
+      "sha256": "690170a2a9f723423f956d3fb8e35b0a312e6c87393720648cada33b2ba5ff45"
+    },
+    {
+      "path": "entry-replacement.initial-real-red.stdout",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "entry-replacement.initial-real-red.stderr",
+      "bytes": 2629,
+      "sha256": "c3a91624b7a86485e401ecd6b8c09d102aa4330e3e3af6c179ebf8e7663603b9"
+    },
+    {
+      "path": "entry-replacement.initial-real-red.json",
+      "bytes": 603,
+      "sha256": "39f87c7bfc8ca094eb4757c81598e65381be0e527ea5bfe1d978e6dc6b8d5214"
+    },
+    {
+      "path": "entry-replacement-final.stdout",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "entry-replacement-final.stderr",
+      "bytes": 509,
+      "sha256": "2abf7a65d711a21c1b6ea676b2531434979a98f49665cc93e5574507aefa88b4"
+    },
+    {
+      "path": "author-eight-final.stdout",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "author-eight-final.stderr",
+      "bytes": 106,
+      "sha256": "f41dcd6bb4c47a8cfd051c6146cc5c4ce810845249725ce89362bfcb2b60bb01"
+    },
+    {
+      "path": "reference-scope.test.py",
+      "bytes": 2320,
+      "sha256": "c76c4bba07b68f84b7f79d90142c9689368c0d7360738e9b376aafac69f32d17"
+    },
+    {
+      "path": "reference-scope-final.stdout",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "reference-scope-final.stderr",
+      "bytes": 833,
+      "sha256": "38fdc48b0ed74852ff7b2c46084aa3f73d6e5ef3563bcf149d5fb8d109f86db9"
+    },
+    {
+      "path": "cleanup-nine-public.py",
+      "bytes": 12552,
+      "sha256": "7e1e6243ffd5fa813a3f8ce23f0a503a32a60de80106760d308225af1e5c776a"
+    },
+    {
+      "path": "cleanup-plan.proposed.json",
+      "bytes": 5967,
+      "sha256": "61e2fb3048f98b3ff1e2e36c8c66bfe5ab76096f3e679fed8cfd38628bfdcfda"
+    },
+    {
+      "path": "cleanup-commands.proposed.json",
+      "bytes": 7681,
+      "sha256": "1cb5efbeb53a13565616a5fb3e067f07725fb5b86c08a9852163b78e353b6df3"
+    }
+  ]
+}

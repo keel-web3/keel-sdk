@@ -1,0 +1,170 @@
+{
+  "schema": "independent-current-create-fresh-plan-audit@1",
+  "result": "PASS",
+  "directory": "/private/tmp/keel-native49d-bounded-20261020/native481-949-prepare-01",
+  "planBytes": 129858,
+  "planSHA256": "6c88643d56e4e181231480b8b4090bbe53e205849987407c06266b24e667e79f",
+  "requestBytes": 112205,
+  "requestSHA256": "b7c95872efa3e65f94888219a8bf89572e71c3ebd1515004ba022904e23c16d4",
+  "canonicalBlock": {
+    "number": "0xb66f65",
+    "hash": "0xc991ca990f1b2b8eb6bc8483eb199137c5ff16318524d71f03b8c128dafaffe6",
+    "timestamp": "0x6ad782e0"
+  },
+  "headerAgeSecondsAtReview": 50.78093695640564,
+  "checkedAtUTC": "2026-10-20T15:04:50.781457+00:00",
+  "nonce": 296,
+  "chainId": 11155111,
+  "priorityFee": 1000000,
+  "maxFeePerGas": 1000030,
+  "ceilings": [
+    9012324,
+    61379375,
+    31884460
+  ],
+  "requestCount": 17,
+  "publicSimulations": 0,
+  "physicalRequestBytes": 1715,
+  "physicalResponseBytes": 22881,
+  "rawRPC": [
+    {
+      "id": 1,
+      "method": "eth_chainId",
+      "requestSHA256": "09fabe0af56b7726f1666ddd147482df4d951f86f66124b936716c53ab0e8471",
+      "bodySHA256": "87736a36920a1f2877bb0104fa79f9b3e6edf758c45fb517d71f55f9899ea119",
+      "requestBytes": 59,
+      "responseBytes": 44
+    },
+    {
+      "id": 2,
+      "method": "eth_getBlockByNumber",
+      "requestSHA256": "ea099c30d3683d74a056405807b4ab857a06189f3e4702981d75935407ac986e",
+      "bodySHA256": "28e7dda9d29ec82df81f2f9261cccbbefe733d78371328457484300ba88d3c08",
+      "requestBytes": 82,
+      "responseBytes": 11105
+    },
+    {
+      "id": 3,
+      "method": "eth_getTransactionCount",
+      "requestSHA256": "295187dafcee2d696a033ba337c8a9e522f5770fa334649899bae3629954347a",
+      "bodySHA256": "47444c8f206ba21533bf332021cb31a94953c77c1fc089683c7f23feb2818d53",
+      "requestBytes": 126,
+      "responseBytes": 41
+    },
+    {
+      "id": 4,
+      "method": "eth_getTransactionCount",
+      "requestSHA256": "4237cc7edcbf7fa2bfeb5fe377db7f4537dd8038dba6ccc1b5f9f821bf9a6530",
+      "bodySHA256": "3f6020e3f9bfc4d23c3f63246177f2843909bc0b3c8ead8ce38cb1f52a92e2b0",
+      "requestBytes": 125,
+      "responseBytes": 41
+    },
+    {
+      "id": 5,
+      "method": "eth_getBalance",
+      "requestSHA256": "4c2b5067fbf4c5f9416a4acfa41ac5efc4e09b426ea5583f306b94c462ae9dde",
+      "bodySHA256": "e9c7b867250aa5f7b3d2636853eab58e5e372fb07f9b3cbd739ac097088d1919",
+      "requestBytes": 117,
+      "responseBytes": 54
+    },
+    {
+      "id": 6,
+      "method": "eth_getCode",
+      "requestSHA256": "62287fa6cf28edf8731aa217064339cbde53d217da83d03a97d7d5d79295b4cd",
+      "bodySHA256": "b7d615df809b7022da2d45315d31d1fba8a192aef01b48276a54a65ec57e0564",
+      "requestBytes": 114,
+      "responseBytes": 84
+    },
+    {
+      "id": 7,
+      "method": "eth_maxPriorityFeePerGas",
+      "requestSHA256": "c20783b5f1bd72de7ec9e08f5619bd7879d4324ef57a0f301e17d42817aba6a6",
+      "bodySHA256": "9c93e5cd2dd3359bedc44b117c621e5fe682e880e379615eb70075f04e2964a6",
+      "requestBytes": 72,
+      "responseBytes": 43
+    },
+    {
+      "id": 8,
+      "method": "eth_gasPrice",
+      "requestSHA256": "9b678f347a8124239c3c60db45283504de97a5e87bbfc95d66e292e7376e2f3f",
+      "bodySHA256": "181c0ee1b374b91bcfbed86e6ac621638343995bc99086497370501a8f22b9fb",
+      "requestBytes": 60,
+      "responseBytes": 43
+    },
+    {
+      "id": 9,
+      "method": "eth_getCode",
+      "requestSHA256": "a64f19c4c6f390fefa50af781794ba7e1384ce6885411c0e63549be596f84e5e",
+      "bodySHA256": "1b49a77ab532b3227289d6798ca8a0dea44f9e67ce88c0c8685c590a8f9fc831",
+      "requestBytes": 114,
+      "responseBytes": 38
+    },
+    {
+      "id": 10,
+      "method": "eth_getCode",
+      "requestSHA256": "8c6f41395fdb88d6e8d34b6e1d18a8b02f735e39e14c7e3a350e3fe9ef4f32a5",
+      "bodySHA256": "d9992f1261b03bb094a8c0be582af6681615a11e0d5048ac78f64cf1573cfbff",
+      "requestBytes": 115,
+      "responseBytes": 39
+    },
+    {
+      "id": 11,
+      "method": "eth_getCode",
+      "requestSHA256": "a8fd8e05e4268c1df074773bc32cac0dc14f02b2669838ad6824e6cf22fac666",
+      "bodySHA256": "e44b77072fb20f80e30229ae8f640c2b39147084aa5154c47bfc2e00c64ceb7e",
+      "requestBytes": 115,
+      "responseBytes": 39
+    },
+    {
+      "id": 12,
+      "method": "eth_getCode",
+      "requestSHA256": "73412ec0c4d3d4411ca25dbab0097af82517ebc9449d6995caf7f1ab5f3f290a",
+      "bodySHA256": "54896796db5bc5bef1f5eb02f006c261cbbd06e20bdaac8e2b94195add4d0f60",
+      "requestBytes": 115,
+      "responseBytes": 39
+    },
+    {
+      "id": 13,
+      "method": "eth_getCode",
+      "requestSHA256": "08508181e0ba6477469fc50f93ca3fcadfdddf6beed5be66ca22202afea48df6",
+      "bodySHA256": "b15c5af37c2ad573da4217cd188d86f133a53232b5931c6314202a37fc1f444b",
+      "requestBytes": 115,
+      "responseBytes": 39
+    },
+    {
+      "id": 14,
+      "method": "eth_getCode",
+      "requestSHA256": "aa0cd28ea8fcd70fae9689355ef17ff55f6eddf9a47721ae3499b547330990cf",
+      "bodySHA256": "99c9f7f720e8511f1a6be0bd5096844c47add5abd299590fdb406e82b8aff5f8",
+      "requestBytes": 115,
+      "responseBytes": 39
+    },
+    {
+      "id": 15,
+      "method": "eth_getBlockByNumber",
+      "requestSHA256": "50c36616edd381c087a14e0eb8877a552002b2191b7b490d1fecca186010088f",
+      "bodySHA256": "83814b424a56bbf46699da112bbc85b07a7ae8c01af19cf1a5183e825a700c17",
+      "requestBytes": 85,
+      "responseBytes": 11106
+    },
+    {
+      "id": 16,
+      "method": "eth_chainId",
+      "requestSHA256": "16674d5f66c5700a6cfa4dc4b4b0547bfdb11bb6995c56a504dbcb545b6c3398",
+      "bodySHA256": "b1587743059342d0a1d6ef7d2b35750028cd56fdbc6b96be1bee9f6a9761dcc9",
+      "requestBytes": 60,
+      "responseBytes": 45
+    },
+    {
+      "id": 17,
+      "method": "eth_getTransactionCount",
+      "requestSHA256": "adbad072d1e292b67797a1a3d1c1829af47a8c2b437df8cca350d4ac90b703d3",
+      "bodySHA256": "4d354193438db2efcb53ab5144e4869ecc9edaec7ece9265e2c8e825966d3dda",
+      "requestBytes": 126,
+      "responseBytes": 42
+    }
+  ],
+  "expectedRuntimeCount": 6,
+  "originalConsumedClaimPreserved": true,
+  "historicalFixture": false
+}

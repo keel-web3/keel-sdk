@@ -1,0 +1,8 @@
+{
+  "allFunctionsAndClassesASTEqual": true,
+  "wholeOperatorReverseLiteralByteExact": true,
+  "helperByteExact": true,
+  "operatorSHA256": "22ee9270e2a3613429debbb55c2e3b3a9dbdb6f312f4e3509172a4356c83b414",
+  "helperSHA256": "8c7b95514f750b95663c83f850c51fd5d3538c108a082d8072505dfaece01ff5",
+  "parent": "b0ae8caf4001392fe148200a81c1fa1b5d57a794"
+}

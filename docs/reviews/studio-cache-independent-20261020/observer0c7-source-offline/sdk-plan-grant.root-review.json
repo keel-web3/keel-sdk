@@ -1,0 +1,10 @@
+{
+  "schema": "keel.independent-fixture-correction-review@1",
+  "reviewer": "root lead; not author of this supplemental fixture or production observer fix",
+  "result": "APPROVED_EXACT_SYNTHETIC_GRANT_LENGTH_FIX_ONLY",
+  "patchSHA256": "4723e5767f015807ee70ccf6e0c32b9ac08ce581693fabbe97624893f9b4ea4b",
+  "reason": "SDK311 createKeelStudioAgentDraftClient rejects tokens shorter than48 before fetch. Original31-character synthetic literal was invalid test setup; repeating the same literal creates62 characters without a real credential or permission. All assertions, request boundaries and production guards remain identical.",
+  "scope": "Only supplemental controlled-fetch SDK client test; original two RED retained and labeled setup failures",
+  "productionSource": "0c7b01e3acae5ec787568d6b5931b002654b4de0",
+  "sdk": "311d61526284248938e335d7ed879089408933be"
+}

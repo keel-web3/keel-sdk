@@ -1,0 +1,25 @@
+test_unresolved_cwd_does_not_hide_live_cache_fd (__main__.MissingCwdReference.test_unresolved_cwd_does_not_hide_live_cache_fd) ... FAIL
+test_rename_postmutation_error_is_reconciled_and_shell_restored (__main__.PostMoveError.test_rename_postmutation_error_is_reconciled_and_shell_restored) ... FAIL
+
+======================================================================
+FAIL: test_unresolved_cwd_does_not_hide_live_cache_fd (__main__.MissingCwdReference.test_unresolved_cwd_does_not_hide_live_cache_fd)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/private/tmp/keel-independent-cache-cleanup-20261020/cache-adversarial.test.py", line 14, in test_unresolved_cwd_does_not_hide_live_cache_fd
+    self.assertTrue(rejected,'a missing cwd path must not skip remaining reference checks for a live PID')
+    ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: False is not true : a missing cwd path must not skip remaining reference checks for a live PID
+
+======================================================================
+FAIL: test_rename_postmutation_error_is_reconciled_and_shell_restored (__main__.PostMoveError.test_rename_postmutation_error_is_reconciled_and_shell_restored)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/private/tmp/keel-independent-cache-cleanup-20261020/cache-adversarial.test.py", line 27, in test_rename_postmutation_error_is_reconciled_and_shell_restored
+    self.assertTrue(all(states.values()),'a successful rename followed by fsync failure must still be reconciled/restored')
+    ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: False is not true : a successful rename followed by fsync failure must still be reconciled/restored
+
+----------------------------------------------------------------------
+Ran 2 tests in 0.017s
+
+FAILED (failures=2)

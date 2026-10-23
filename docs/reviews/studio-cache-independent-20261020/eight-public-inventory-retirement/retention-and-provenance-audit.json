@@ -1,0 +1,144 @@
+{
+  "result": "PASS_ALL_EIGHT_RETAINED_AND_PUBLIC_GIT_BYTE_EXACT",
+  "archiveSHA256": "ff0d2ba29998cbf3545f252a137486ac5dbfb3b0a13d21b7c930ef93c7b08663",
+  "archiveBytes": 66252800,
+  "archiveMode": 384,
+  "archiveLinks": 1,
+  "payloadBytes": 66240746,
+  "retentionReceiptSHA256": "2bd0df4fbccb02d95bea6b8d01ce70dd9c95e0bcee26584e66a9618378f288bd",
+  "sourceManifestSHA256": "3128801d1e40f60cb9054bec2cdf2918266faf996a72b949a52c0e457dd89304",
+  "members": [
+    {
+      "member": "00",
+      "path": "/home/ubuntu/keel-studio-image-qualification-9f7b1a8a-d2df-4e04-8fb2-189d4791f0c3/expected-app-tree.json",
+      "bytes": 8545921,
+      "sha256": "f5254bf5efc4c4a51b5f258ef3821696cbf1f08a08217d21d1bb1fabb6e12e39",
+      "entries": 36064,
+      "treeSHA256": "345ea159bdf35662cfb79769546f570a41c9ed8426185fc846ea26c44720cf14",
+      "trackedGitExactMatches": [
+        {
+          "path": "docs/reviews/studio-publication-20261020/release/image-only311/evidence/expected-app-tree.json",
+          "sha256": "f5254bf5efc4c4a51b5f258ef3821696cbf1f08a08217d21d1bb1fabb6e12e39"
+        },
+        {
+          "path": "docs/reviews/studio-publication-20261020/release/image-only-observer311/evidence/qualified-base-fe455-app-tree.json",
+          "sha256": "f5254bf5efc4c4a51b5f258ef3821696cbf1f08a08217d21d1bb1fabb6e12e39"
+        }
+      ]
+    },
+    {
+      "member": "01",
+      "path": "/home/ubuntu/keel-studio-image-qualification-ce7d492f-915a-4c11-8ce2-3c02bd366c5a/base-fe455-app-tree.json",
+      "bytes": 8545921,
+      "sha256": "f5254bf5efc4c4a51b5f258ef3821696cbf1f08a08217d21d1bb1fabb6e12e39",
+      "entries": 36064,
+      "treeSHA256": "345ea159bdf35662cfb79769546f570a41c9ed8426185fc846ea26c44720cf14",
+      "trackedGitExactMatches": [
+        {
+          "path": "docs/reviews/studio-publication-20261020/release/image-only311/evidence/expected-app-tree.json",
+          "sha256": "f5254bf5efc4c4a51b5f258ef3821696cbf1f08a08217d21d1bb1fabb6e12e39"
+        },
+        {
+          "path": "docs/reviews/studio-publication-20261020/release/image-only-observer311/evidence/qualified-base-fe455-app-tree.json",
+          "sha256": "f5254bf5efc4c4a51b5f258ef3821696cbf1f08a08217d21d1bb1fabb6e12e39"
+        }
+      ]
+    },
+    {
+      "member": "02",
+      "path": "/home/ubuntu/keel-studio-image-qualification-ce7d492f-915a-4c11-8ce2-3c02bd366c5a/expected-app-tree.json",
+      "bytes": 8546193,
+      "sha256": "d019310b0217d2ec00bff38962fe92532649fd300c2b31cca8f601d48049b94e",
+      "entries": 36065,
+      "treeSHA256": "9df3273c29d50154dfb783ef05b419317b803e47b847dbf7170d98d3fde74438",
+      "trackedGitExactMatches": [
+        {
+          "path": "docs/reviews/studio-publication-20261020/release/image-only-observer311/evidence/expected-app-tree.json",
+          "sha256": "d019310b0217d2ec00bff38962fe92532649fd300c2b31cca8f601d48049b94e"
+        }
+      ]
+    },
+    {
+      "member": "03",
+      "path": "/home/ubuntu/keel-studio-image-qualification-fe61b712-e05f-4858-88f7-e88ea0cf7318/base-cee8-app-tree.json",
+      "bytes": 8546193,
+      "sha256": "d019310b0217d2ec00bff38962fe92532649fd300c2b31cca8f601d48049b94e",
+      "entries": 36065,
+      "treeSHA256": "9df3273c29d50154dfb783ef05b419317b803e47b847dbf7170d98d3fde74438",
+      "trackedGitExactMatches": [
+        {
+          "path": "docs/reviews/studio-publication-20261020/release/image-only-observer311/evidence/expected-app-tree.json",
+          "sha256": "d019310b0217d2ec00bff38962fe92532649fd300c2b31cca8f601d48049b94e"
+        }
+      ]
+    },
+    {
+      "member": "04",
+      "path": "/home/ubuntu/keel-studio-image-qualification-fe61b712-e05f-4858-88f7-e88ea0cf7318/expected-app-tree.json",
+      "bytes": 8546193,
+      "sha256": "ae7320cd60de66b852212b2ff7730b240ac5e56819ac2ad4ae9695b371a7d266",
+      "entries": 36065,
+      "treeSHA256": "9bad445483cd8b8f76bfe1916261dc1337c06bd0854b8e32e514ba5b8ce89c1b",
+      "trackedGitExactMatches": [
+        {
+          "path": "docs/reviews/studio-publication-20261020/release/funding-image311/evidence/expected-app-tree.json",
+          "sha256": "ae7320cd60de66b852212b2ff7730b240ac5e56819ac2ad4ae9695b371a7d266"
+        },
+        {
+          "path": "docs/reviews/studio-publication-20261020/release/funding-correction311/actual1058-app-tree.json",
+          "sha256": "ae7320cd60de66b852212b2ff7730b240ac5e56819ac2ad4ae9695b371a7d266"
+        }
+      ]
+    },
+    {
+      "member": "05",
+      "path": "/home/ubuntu/keel-studio-image-qualification-7d99be0a-ee20-4b59-8880-f4f5d0f8a447/base1058-app-tree.json",
+      "bytes": 8546193,
+      "sha256": "ae7320cd60de66b852212b2ff7730b240ac5e56819ac2ad4ae9695b371a7d266",
+      "entries": 36065,
+      "treeSHA256": "9bad445483cd8b8f76bfe1916261dc1337c06bd0854b8e32e514ba5b8ce89c1b",
+      "trackedGitExactMatches": [
+        {
+          "path": "docs/reviews/studio-publication-20261020/release/funding-image311/evidence/expected-app-tree.json",
+          "sha256": "ae7320cd60de66b852212b2ff7730b240ac5e56819ac2ad4ae9695b371a7d266"
+        },
+        {
+          "path": "docs/reviews/studio-publication-20261020/release/funding-correction311/actual1058-app-tree.json",
+          "sha256": "ae7320cd60de66b852212b2ff7730b240ac5e56819ac2ad4ae9695b371a7d266"
+        }
+      ]
+    },
+    {
+      "member": "06",
+      "path": "/home/ubuntu/keel-studio-image-qualification-7d99be0a-ee20-4b59-8880-f4f5d0f8a447/expected-app-tree.json",
+      "bytes": 8546189,
+      "sha256": "eab2bf89d3243e171e082daa74e46845c97fc1b021f124b12ec1c114cf0e2299",
+      "entries": 36065,
+      "treeSHA256": "468d9005135840016b5eb97178f06ea6960870aa2c6e8f3ce685fdecd0aeeba9",
+      "trackedGitExactMatches": [
+        {
+          "path": "docs/reviews/studio-publication-20261020/release/funding-correction311/evidence/expected-app-tree.json",
+          "sha256": "eab2bf89d3243e171e082daa74e46845c97fc1b021f124b12ec1c114cf0e2299"
+        }
+      ]
+    },
+    {
+      "member": "07",
+      "path": "/home/ubuntu/keel-studio-image-qualification-9f7b1a8a-d2df-4e04-8fb2-189d4791f0c3/base95-app-tree.json",
+      "bytes": 6417943,
+      "sha256": "989aaec9b9a9c5a78585dc813947a8d68df69dd818303d96ca6b1e1d9312db36",
+      "entries": 36063,
+      "treeSHA256": "faa2e39570d38f09936718d50427f52eec686d2db24e5c0293c9655be39fce17",
+      "trackedGitExactMatches": [
+        {
+          "path": "docs/reviews/studio-publication-20261020/release/image-only95/evidence/base95-app-tree-02.json",
+          "sha256": "989aaec9b9a9c5a78585dc813947a8d68df69dd818303d96ca6b1e1d9312db36"
+        }
+      ]
+    }
+  ],
+  "elapsedSeconds": 0.3322963749524206,
+  "initialComparatorSetupFailure": "Initial exploration also tried base95-app-tree.json (0-byte retained old producer failure), causing JSONDecodeError. No byte/hash assertion failed. Correct canonical candidate base95-app-tree-02.json6417943B is complete tracked byte-exact989aaec9 match; no normalization or expected-value correction.",
+  "restoreUsable": "Eight complete regular member streams00-07 retain exact original paths/modes/mtime mapping from source manifest. Bytes/mode/mtime can be exclusively restored. Original inode/ctime cannot be restored; no restore action authorized here.",
+  "noExtractionOrHostAction": true
+}

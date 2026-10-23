@@ -1,0 +1,11 @@
+{
+  "recordedAt": "2026-10-21T00:35:38.857493+00:00",
+  "lead": "root",
+  "action": "Approve one guarded observer-only cutover after independent exact command admission and read-only preflight PASS",
+  "userAuthority": "Ordinary development and deployment authorized; exact live error diagnosis necessary",
+  "finalPlanSHA256": "602988e239087b9f9f1fee3503890edfa7dce64dde9160b7838ce690192f5ebb",
+  "commandPacketSHA256": "2325a9733615c5fa2926fccec3ca88e982892663846cf730996999776bdaf70e",
+  "privateAccessBypass": false,
+  "publicationReadinessApproved": false,
+  "signingApproved": false
+}

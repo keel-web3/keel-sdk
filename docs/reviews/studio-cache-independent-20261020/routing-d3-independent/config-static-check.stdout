@@ -1,0 +1,12 @@
+{
+  "scope": "Offline exact-source parser and selector; no DB/network/config mutation",
+  "sourceCommit": "d3cdaf2b5b3822454353215c23eff7d8af9deb97",
+  "parserSHA256": "4a04132808bc7dd1fdb9b915f5a5a101c74f6009d789e56d9e8fa7a810f356d4",
+  "selectorSHA256": "0b9a618701845a35af83847dec1c4f25b9ef5cdad9f43922ca5806ffc2df0a91",
+  "catalogParse": true,
+  "exactTwoFieldDelta": true,
+  "newestFactorySelection": true,
+  "disabledRowRestoresOldSelection": true,
+  "tiedDistinctFactoryRejected": true,
+  "activationApproval": false
+}

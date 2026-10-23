@@ -1,0 +1,157 @@
+{
+  "schema": "keel-independent-routing-final-source-review@1",
+  "decision": "APPROVE_EXACT_FROZEN_ROUTING_SOURCE_FOR_INTEGRATION_AND_BUILD",
+  "sourceCommit": "3e50d15bb74f939951de0cc0333a7baa9d8018c1",
+  "baseCommit": "6c51775534b487e938917a7ac589a42941cfab42",
+  "sourceRoot": "/Users/ravonus/dev/wt/studio-routing-terminal-proof-20261020/keel-site",
+  "runtimeFilesReviewed": 8,
+  "sourceWorkingTreeClean": true,
+  "closedFinding": {
+    "priorD3ReviewSHA256": "de7204951122c6a7741fb000ff734b8268d52ba260d0391bc6441320cddf296e",
+    "priorD3": "Invalid proof and canonical reorg messages wrapped in503 each dispatched an alternate managed success.",
+    "intermediate7c8": "Original4 controls passed; reverse/hyphen semantic-context variants still rotated. Both REDs retained.",
+    "final": "Bounded error graph treats proof, witness, canonical, reorg, state/storage-root, block-hash, denial and revert context as terminal in message/shortMessage/details/plain body; nested body/object controls remain fail closed. Only wallet-first-rpc runtime differs from d3.",
+    "availabilityTradeoff": "Ambiguous proof-service errors also stop; this conservative choice avoids provider-answer shopping. Ordinary transport503 and unsupported4200 still fall back unchanged."
+  },
+  "independentActualChecks": {
+    "originalFour": "4PASS0FAIL unchanged test61207dc952514fd77d955c2f3b008b24b01cd94497d6aae0ef3bf67f84d05a53",
+    "wordOrderFour": "4PASS0FAIL unchanged test3300cd02592dfebb61e502f85515200e66e2de6fbb0137a413beedcd7e66f821",
+    "combined": {
+      "cases": 18,
+      "pass": 18,
+      "fail": 0,
+      "testSHA256": "9dd1a7ea1ad10e145bd14aff8f64b6ac78c1d6e198621a55f7c0d2f201996a5f",
+      "stdoutSHA256": "75e136d6d0923aaa370d552496798a68c6ec9d9560f9a526089babad6bd12533",
+      "semantics": "Sixteen terminal message/body cases produce zero managed target reads;503/4200 positives each produce one exact same pinned read.",
+      "boundary": "Actual frozen TypeScript modules loaded with existing QA TypeScript/viem; synthetic EIP1193/managed providers; no HTTP, real wallet, signing or chain execution."
+    }
+  },
+  "securityAndEquivalence": {
+    "authorization": "Existing same-origin and creator-session checks plus database-shared fail-closed quota; eth_call/estimate from may only match the session wallet.",
+    "fixedRecipient": "Only enabled chain registry lookup chooses the upstream; client cannot provide URL, headers, private credentials, redirects or alternate providers. Generic sanitized errors avoid server provider details.",
+    "methodScope": "Strict public-read allowlist, no signing/send/eth_simulateV1/state override. Selected-wallet publication simulation and unknown-execution lock stay separate.",
+    "immutability": "Deep clone before asynchronous routing and exact method/params/sender/fee/gas/value/pin retained in fallback. No gas/body shrinking or program rewrite.",
+    "chainAndAccount": "Selected connector/account state and wallet/managed chain are checked before and after reads; stale/foreign results stop.",
+    "bounds": "512KiB request;10MiB streamed upstream/browser reply;20s physical server abort;25s browser abort;180/minute shared quota. Known method/body/gas/block facts are honored before target dispatch, but actual ordinary wallet gas/block capacity remains UNKNOWN when none is supplied. Managed32KiB preference is a serialization policy, not an asserted upstream gas capacity.",
+    "activity": "Only exact canonical deployment-hash/chain/route/client pending jobs settle; no receipt guess, resend or unrelated/server-job retirement. No UI redesign or wallet signing change."
+  },
+  "fixtureCorrection": {
+    "decision": "APPROVED exact974765dd465e6a0876dca5a8cb956ac6dfc866cf91422418c4fde9b7389d939e",
+    "beforeSHA256": "2cb0140592101a1efe13be6bc0212a97f78c9f64031ac129437f51baf855e9a2",
+    "afterSHA256": "215cbda541fe4df9ac10cf5dd90af858c538602f914fe789382b78e53d99f5ce",
+    "singleProperty": "snapshot:()=>[] on empty Activity double; all9 existing test bodies/inputs/assertions unchanged",
+    "actualFinalFileMatchesApprovedAfter": true,
+    "originalRedPreserved": true
+  },
+  "additionalSourceTestChanges": "Two appended cases only; original d3 wallet-capable test file remains an exact prefix, all original assertions preserved.",
+  "otherEvidence": "Owner56 and mounted QA16 are separate author/QA results; this reviewer does not claim to have rerun them. Required ordinary CI and independent affected checks still apply.",
+  "scopeLimits": {
+    "sourceIntegrationAndFreshBuild": true,
+    "productionActivationApproved": false,
+    "provisional7cImageQualifiesFinal3e50": false,
+    "configurationOperatorApproved": false,
+    "normalGIFOrDeployedUnsignedWalletProvenByTheseTests": false,
+    "customContractFeatureExpansion": false,
+    "signing": false,
+    "submission": false,
+    "network": false,
+    "reviewerProductionEdits": false
+  },
+  "sourceInputs": [
+    {
+      "path": "apps/studio/src/app/api/wallet/read/[chainId]/route.ts",
+      "bytes": 3963,
+      "sha256": "87e8ed9739efc5e06bfb293c115f7c092f64b6f73c564de3fec84d0c5cca02eb",
+      "unchangedFromD3": true
+    },
+    {
+      "path": "apps/studio/src/components/studio/workspace/contracts/deployment-review.tsx",
+      "bytes": 12724,
+      "sha256": "68835bb9a1e511f4a87bbaff12951877428af4e5662997a5fc142b7aff8492c8",
+      "unchangedFromD3": true
+    },
+    {
+      "path": "apps/studio/src/features/wallet/transactions/managed-wallet-read.ts",
+      "bytes": 3557,
+      "sha256": "0d2d302169b3e951a1f48e2b425e37b0f07f481fd35b173b352f5ac7320e8bdf",
+      "unchangedFromD3": true
+    },
+    {
+      "path": "apps/studio/src/features/wallet/transactions/wallet-first-rpc.ts",
+      "bytes": 24423,
+      "sha256": "bed48ed2bc275d394ad9e977beb184acfc6e77c551bc1767d0507093d5e14ecc",
+      "unchangedFromD3": false
+    },
+    {
+      "path": "apps/studio/src/lib/contract-deployment-activity.ts",
+      "bytes": 1136,
+      "sha256": "180dd798fc9dfd91d291c2027a43add0366a28ac141a89493b7b2caeb51378c2",
+      "unchangedFromD3": true
+    },
+    {
+      "path": "apps/studio/src/lib/wallet-read-policy.ts",
+      "bytes": 8999,
+      "sha256": "936b3ec7a859c0c0bfbba837a338f796759f469e52c6836bdde8be6aaf142bff",
+      "unchangedFromD3": true
+    },
+    {
+      "path": "apps/studio/src/lib/wallet.ts",
+      "bytes": 4098,
+      "sha256": "c1c3e6610513f84a9fc7921220c213e92b607349aae2b41ddd79ad45c645ff60",
+      "unchangedFromD3": true
+    },
+    {
+      "path": "apps/studio/src/server/services/wallet-read-service.ts",
+      "bytes": 6679,
+      "sha256": "5f0724ba24784eb296c4863e2593878235d7d12266ebf4bb0494d0b61b5de0ff",
+      "unchangedFromD3": true
+    }
+  ],
+  "freshEvidence": [
+    {
+      "path": "/private/tmp/keel-independent-routing-d3-20261020/semantic-proof-3e50.stdout",
+      "bytes": 898,
+      "sha256": "d4e25d5b1321b68fb4ac495c540f581196edb30dcecb54b234c49e11f9e152f6"
+    },
+    {
+      "path": "/private/tmp/keel-independent-routing-d3-20261020/semantic-proof-3e50.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/private/tmp/keel-independent-routing-d3-20261020/semantic-word-order-3e50.stdout",
+      "bytes": 898,
+      "sha256": "ceca597b77c2c18fec8c8439078439ddf6f8c5da852bcc57b21e486d233d99fa"
+    },
+    {
+      "path": "/private/tmp/keel-independent-routing-d3-20261020/semantic-word-order-3e50.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/private/tmp/keel-independent-routing-d3-20261020/semantic-routing-complete.cjs",
+      "bytes": 2931,
+      "sha256": "9dd1a7ea1ad10e145bd14aff8f64b6ac78c1d6e198621a55f7c0d2f201996a5f"
+    },
+    {
+      "path": "/private/tmp/keel-independent-routing-d3-20261020/semantic-routing-7c8-complete.stdout",
+      "bytes": 2771,
+      "sha256": "a13fe0df2925c89ca5ac84209f49197453932feef605a766eb846185eac286ca"
+    },
+    {
+      "path": "/private/tmp/keel-independent-routing-d3-20261020/semantic-routing-7c8-complete.stderr",
+      "bytes": 103,
+      "sha256": "57dd7cfc06daf01d1a717190e0283f55fca45291a788777d6cb7c4cfc0f7bd29"
+    },
+    {
+      "path": "/private/tmp/keel-independent-routing-d3-20261020/semantic-routing-3e50-complete.stdout",
+      "bytes": 2755,
+      "sha256": "75e136d6d0923aaa370d552496798a68c6ec9d9560f9a526089babad6bd12533"
+    },
+    {
+      "path": "/private/tmp/keel-independent-routing-d3-20261020/semantic-routing-3e50-complete.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  ]
+}

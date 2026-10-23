@@ -1,0 +1,47 @@
+{
+  "actions": [
+    [
+      "cas-confirmation",
+      true
+    ],
+    [
+      "stop",
+      "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+    ],
+    [
+      "rename",
+      "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+    ],
+    [
+      "rename",
+      "b6ff8c7a6f5c2282e29883de917f2d376a8e92efffecc45d115338e0516a5201"
+    ],
+    [
+      "start",
+      "b6ff8c7a6f5c2282e29883de917f2d376a8e92efffecc45d115338e0516a5201"
+    ]
+  ],
+  "candidateRunning": true,
+  "oldRunning": true,
+  "result": {
+    "actionFailures": [
+      "replacement_stop_failed",
+      "rollback_verification_failed"
+    ],
+    "databaseRestorePerformed": false,
+    "dependencyRollback": {
+      "confirmed": true
+    },
+    "destructiveCleanupPerformed": false,
+    "oldContainerRetained": true,
+    "oldRestartFencedOnFactoryDisable": true,
+    "preservedUnrelatedOccupants": [],
+    "recoveredApplicationIds": [
+      "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+    ],
+    "recoveredRunnerIds": [],
+    "status": "unconfirmed",
+    "unresolvedLookups": []
+  },
+  "sourceRoot": "/Users/ravonus/dev/wt/studio-receipt-bound-activation-20261020/keel-site/docs/reviews/studio-publication-20261020/release/activation-receipt-bound"
+}

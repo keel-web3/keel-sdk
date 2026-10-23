@@ -1,0 +1,14 @@
+{
+  "packetSHA256": "d1b12a5b22c51e9d18c536f0cda46f614aa85c11f53d966aacf3c285b66496a5",
+  "bundleReceiptSHA256": "8168df6dd2bd43fbb1e4a55ee4c4994940048ccdb0c67c856306ab33bf6be4c7",
+  "bundleSHA256": "6eb56fbbcf84c4bfef941a6b1c630b4ff076e2f6ec5be6f47e412cf2ca750bbc",
+  "actualSourceFiles": 192,
+  "actualToolFiles": 12,
+  "actualSDKFiles": 1754,
+  "actualSDKDigest": "3effa2f2e594fe969f592d9446b5095484adf358033c76b83349385956c69df8",
+  "externalPackages": 14,
+  "externalSiteDomainFiles": 45,
+  "sourceInstrumentation": [],
+  "appExportCalls": 0,
+  "RPC": 0
+}

@@ -1,0 +1,48 @@
+{
+  "sourceCommit": "71442a84578daecc935bd6d970d00deda1293fa6",
+  "buildSourceSHA256": "9097abbc36dc7c2be9f27c819a19bc2498b3ca37e8af97bedff52a562a3a1a9c",
+  "planSHA256": "5174c328fe646976dbf123400c86ba8de66fabc64e1d36375d7e5e9ba4382afc",
+  "proposedCommandsSHA256": "fcffaa222a17255d1aa9a23e6109beee5ae3596e20cc55642b6e30516c24c9f5",
+  "exclusivePublicFiles": [
+    {
+      "basename": "activate-image-only.py",
+      "bytes": 15358,
+      "sha256": "e54843846d8fdda712e8dc49d5b019622651a6dfe1d1f9bc86d43d717f8c38a1"
+    },
+    {
+      "basename": "reviewed-activation-support.py",
+      "bytes": 43831,
+      "sha256": "a1594559c2c04159ac94827d0f4f2a991310fb06648379bca6081d5ce6a98de1"
+    },
+    {
+      "basename": "guarded-deployment-checks.py",
+      "bytes": 5005,
+      "sha256": "b5f7d764b6c05db503a23ea63ca21a36bfcb0f17cc8292444d790d4a8aad6e00"
+    },
+    {
+      "basename": "candidate-oom-default.py",
+      "bytes": 2033,
+      "sha256": "6621ff48fc02057d98d91ef5fd71e6e30eeea1ef847149170e316d9725e77c73"
+    },
+    {
+      "basename": "build-public-delta.py",
+      "bytes": 9152,
+      "sha256": "9097abbc36dc7c2be9f27c819a19bc2498b3ca37e8af97bedff52a562a3a1a9c"
+    },
+    {
+      "basename": "delta-build-context.tar.gz",
+      "bytes": 11051960,
+      "sha256": "b9cc594d66269aa02b5f49ab6632b6bc1deb386112a869a6ea7d73e48dd28485"
+    },
+    {
+      "basename": "host-build-plan.json",
+      "bytes": 3948,
+      "sha256": "5174c328fe646976dbf123400c86ba8de66fabc64e1d36375d7e5e9ba4382afc"
+    }
+  ],
+  "hostAndNamespaceExact": true,
+  "exclusiveReceiversBoundedHashedFsyncedOnly": true,
+  "executeArgvExactPlanHash": true,
+  "qaEvidenceInventoryVerified": 43,
+  "actualHostActions": 0
+}

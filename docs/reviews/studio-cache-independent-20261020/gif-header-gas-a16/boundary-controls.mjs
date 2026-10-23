@@ -1,0 +1,10 @@
+import assert from'node:assert/strict';import{readFileSync,writeFileSync}from'node:fs';
+import{assertCanonicalGasEnvelope}from'/private/tmp/keel-gif-gas-reference-20261020/docs/tools/gif-forward-reference/header-gas-reference.mjs';
+import{api}from'/private/tmp/keel-gif-gas-reference-20261020/docs/tools/gif-forward-reference/canonical-reference.mjs';
+const base=JSON.parse(readFileSync('/tmp/keel-private-gif-fresh-forward-capture-20261020-01/normal.provisional.private.json')).capture;
+const rows=[];for(const [name,limit,time,cap]of[['postfork-block-cap',200000001n,1792531140n,200000001n],['postfork-hard-ceiling',4294967296n,1792531140n,4294967295n],['prefork-hard-ceiling',200000001n,1791294815n,16777216n]]){
+ const x=structuredClone(base),fields=api.fromRlp(x.nativeAssembly.headerRlp,'hex'),scalar=n=>'0x'+n.toString(16).padStart(Math.ceil(n.toString(16).length/2)*2,'0');fields[9]=scalar(limit);fields[11]=scalar(time);const rlp=api.toRlp(fields);x.nativeAssembly.headerRlp=x.nativeCapture.headerRlp=rlp;x.canonicalBlock.hash=api.keccak256(rlp);x.canonicalBlock.timestamp=time.toString();const i=x.nativeAssembly.exactSimulationInput;i.maximumTransactionGas=cap.toString();for(const call of[...i.preparationCalls,...i.observationCalls])call.gas='0x'+cap.toString(16);
+ const before=JSON.stringify(x),r=assertCanonicalGasEnvelope(x);assert.equal(r.maximumTotalGas,cap.toString());assert.equal(r.maximumExecutionGas,'16777216');assert.equal(JSON.stringify(x),before);rows.push({name,result:'PASS',syntheticHeaderPolicyOnly:true,actualOriginalCaptureMutated:false});
+ i.maximumTransactionGas=(cap+1n).toString();assert.throws(()=>assertCanonicalGasEnvelope(x));rows.push({name:name+'-above-policy',result:'REJECT_AS_EXPECTED',syntheticHeaderPolicyOnly:true});
+}
+writeFileSync('/private/tmp/keel-independent-gas-reference-a16-20261020/boundary-controls.json',JSON.stringify({schema:'keel.independent-synthetic-gas-policy-controls@1',results:rows,pass:6,fail:0,programExecuted:false,RPC:0,signing:false},null,2)+'\n',{flag:'wx'});console.log(JSON.stringify({pass:6,fail:0,scope:'SYNTHETIC_HEADER_POLICY_ONLY_NO_PROGRAM_EXECUTION'}));

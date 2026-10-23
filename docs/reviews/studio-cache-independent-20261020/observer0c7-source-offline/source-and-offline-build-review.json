@@ -1,0 +1,107 @@
+{
+  "schema": "keel.independent-observer-source-and-offline-build-review@1",
+  "decision": "APPROVE_OBSERVER_ONLY_SOURCE_AND_OWNED_OFFLINE_BUILD_PREPARATION",
+  "reviewerId": "independent-release-reviewer",
+  "source": "0c7b01e3acae5ec787568d6b5931b002654b4de0",
+  "sourceEvidenceCommit": "6865770c611b5627e20156587ad8bc6a025f03d2",
+  "baseMaster": "81cea94aba1f7086c782877ea53ea477f130ca18",
+  "baseTreeExactLiveFb3": "56d76903fa63088701a24da6a576dd746b75e7a8",
+  "sdk": "311d61526284248938e335d7ed879089408933be",
+  "scope": "Intermediate saved-plan status observer and private diagnostic download through the existing owner-authorized normal UI; no publication failure fix is claimed.",
+  "productionDelta": [
+    "components/launch/publication-check-progress.tsx",
+    "components/studio/planning/release-plan-editor.tsx",
+    "lib/studio-release-plan.ts",
+    "server/services/release-planning-service.ts"
+  ],
+  "productionReview": {
+    "owner": "Existing release bycreatorId and artifact bycreatorId queries precede new binding projection; foreign/missing owner fails closed",
+    "identity": "Server derives chain/artifactId/activeRevision/releaseId/releaseRevision from same existing snapshot; browser correlates plan release/project/revision and keys observer by exact identity",
+    "authority": "DTO contains identity only; no preparation, calls, wallet approval or execution authority",
+    "status": "Readonly uses existing no-store single-flight serial GET and exact trace matching; same-render old trace/download suppression, abort oldbinding requests and lower-sequence handling",
+    "mutations": "Readonly hides and guards cancellation and wallet handlers; reconnect cannot issue/repeat preparation POST; existing default non-readonly caller semantics preserved",
+    "auth": "Planning/diagnostic handlers and private download owner/grant/session/rate/same-origin/security code byte-identical to base; no alternate access path",
+    "sdkMcp": "Actual emitted311 plan reader accepts additive publicationCheck with one GET and retains existing invalidrelease/revision rejection",
+    "simulationSigningEquivalence": "All simulation, limits, calldata, gas/fees, provider, wallet preparation/submission/signing and recovery authority code byte-identical to parent outside the four declared observer/DTO files"
+  },
+  "freshReviewerChecks": {
+    "affected66": {
+      "pass": 66,
+      "fail": 0,
+      "skip": 0,
+      "stdoutSHA256": "d9a813b799aa1e180bfc5a9caf8570249f15bcd8c284a58e165f4800d38610d2",
+      "stderrSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "emittedSdkPlanCompatibility2": {
+      "pass": 2,
+      "fail": 0,
+      "skip": 0,
+      "stdoutSHA256": "d0ed3043f5952e0babe67679e4f09210cc71922bfb876b62219aca57386a9fad",
+      "fixtureCorrectionPatchSHA256": "4723e5767f015807ee70ccf6e0c32b9ac08ce581693fabbe97624893f9b4ea4b",
+      "independentRootApprovalSHA256": "1151556d56b52b11d8af70e2afb34a4a51aafe03784bd855ac6926575d1b9d94",
+      "initialSetupRed": "Invalid31char synthetic grant stopped before fetch; approved only repeat2x to62; product guard and all assertions unchanged. First raw timing record superseded by same-old-fixture rerun; preserved rerun/source and hash-change note explicitly."
+    },
+    "offlineTools22": {
+      "oom": 8,
+      "operator": 9,
+      "delta": 5,
+      "allPass": true
+    },
+    "actualSDKClientSHA256": "138835e5ca36194a34e348dec1f6930b189786b22a779e95563047bc10309fd5"
+  },
+  "independentQA": {
+    "commit": "22da7ea8bad4d5a47afbcdb8625b62bda560d272",
+    "resultSHA256": "31cfeb1ddc0af01c769e241d721592394184f68ce78e6dd467ea97f11e55b7ab",
+    "pass": 89,
+    "fail": 0,
+    "skip": 0,
+    "nonincrementalTSC": "PASS",
+    "sdk1745Unchanged": true,
+    "new429TestCorrectionReviewSHA256": "06389c5df23e4cabd647c3aa7117e8f75743596318c4a788cbc725c32d94abb8"
+  },
+  "offlinePreparation": {
+    "sourceFreeze": "73dc52f30dd9c18f716fff0c0946a7d7fd1e52eb",
+    "recipePath": "/private/tmp/keel-independent-observer0c7-20261020/offline-next-build.recipe.admitted.json",
+    "recipeSHA256": "98d659d5a45a7be8b1dfb374b3d20628f235eaea1d49500f33d1179f53cb3f12",
+    "newOwnedRoot": "/private/tmp/keel-plan-observer-image-build-20261020-01",
+    "deltaProducerSHA256": "ca9869e5c89ff2204c5f31fab51527c897b55e025bac2d65b5e87ee7551e53f9",
+    "hostBuildProducerReviewedButNotExecutedSHA256": "965fb974792eb078f9225c8bab3831cfb68bf0aef62e493a6d731af0ff420ac7",
+    "activationOperatorBaselineOnlyReviewedNotAdmittedSHA256": "981b482694d7db031d869d7c271487033c28f37b1ef3679528ab4150fbda42b7",
+    "saveAuditorSHA256": "e0b48996897a1e897913b1d3e83c5d98ec426db07058414628def77425df92e6",
+    "actualFe455BaseAppTreeSHA256": "345ea159bdf35662cfb79769546f570a41c9ed8426185fc846ea26c44720cf14",
+    "baselineCurrentId": "fa0eb0299164407e24e1cda31b21b196ea8a8071a1a39ce71efd414234ef1659",
+    "freshNextIdentityRequired": true,
+    "sdk1745CopiedFilesMustMatchReviewed311BeforeBuild": true,
+    "allWorkspaceAndZodLinksMustResolveOwnedPairBeforeBuild": true,
+    "Node": "22.22.1 pinned PATH and executable; corepack shebang resolves this Node",
+    "macBeforeHeavyJob": "Fresh uptime<=40 and enough local disk required; observed load6.89/free~23.6GB at this review",
+    "allowedActions": [
+      "New owned exact source/SDK checkouts and APFS dependency copies with recipe link/hash checks",
+      "One fresh local Next compile using exact recipe settings synthetic dead DB and paused worker",
+      "Local app context packaging using unchanged public receipt-backed deployment record",
+      "Offline whole-result-verified same-SDK delta generation and save-auditor preparation"
+    ],
+    "constraints": [
+      "No old checkout/source/generated Next output is rewritten",
+      "All1360 installed SDK files, D97/binary8a, ops/bootstrap/catalog/factories and inherited workerb331 stay exact",
+      "Complete old actual app tree is authenticated; changed managed app tree and explicit stale deletions checked; no minified partial patch",
+      "Host budget and candidate image/build identity remain unqualified until actual output; retain1GiB+256MiB and full scratch formula",
+      "No host staging, Dockerhostbuild/import/cutover/cleanup authority is inferred"
+    ]
+  },
+  "blockingSourceFindings": [],
+  "ordinarySourceIntegrationReviewApproved": true,
+  "ciStatus": "PR71 GitHub job not started due billing/spending limit per lead; no green CI claim or administrative/access-rule bypass approved. Frozen source local build may proceed.",
+  "publicationReadiness": "BLOCKED_UNRESOLVED_NORMAL_LIVE_GATOR_AND_GIF_PREPARATION_FAILURES",
+  "Gate6Approved": false,
+  "simulationRootCauseKnown": false,
+  "preparationReplayAllowed": false,
+  "browserOrHostPrivateDiagnosticsByReviewer": false,
+  "actualArtifactQualification": "PENDING_NEW_BUILD",
+  "hostBuildApproved": false,
+  "productionActivationApproved": false,
+  "signing": false,
+  "submission": false,
+  "reviewerProductionEdits": false,
+  "finalObserverArtifactAndExactHostActionRequireLaterReview": true
+}

@@ -1,0 +1,23 @@
+{
+  "files": [
+    {
+      "path": "cleanup-nine-public.py",
+      "bytes": 12552,
+      "sha256": "7e1e6243ffd5fa813a3f8ce23f0a503a32a60de80106760d308225af1e5c776a"
+    },
+    {
+      "path": "cleanup-plan.proposed.json",
+      "bytes": 5967,
+      "sha256": "61e2fb3048f98b3ff1e2e36c8c66bfe5ab76096f3e679fed8cfd38628bfdcfda"
+    },
+    {
+      "path": "cleanup-commands.proposed.json",
+      "bytes": 7681,
+      "sha256": "1cb5efbeb53a13565616a5fb3e067f07725fb5b86c08a9852163b78e353b6df3"
+    }
+  ],
+  "exactBoundedReceivers": true,
+  "exactPreflightExecute": true,
+  "noHostCommandsExecuted": true,
+  "initialAuditDisplayError": "After all assertions passed, printing absent optional sourceCommitAtPreparation caused KeyError. No source/test assertion changed; commit provenance is separately bound to frozen release commit."
+}

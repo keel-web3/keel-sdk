@@ -1,0 +1,33 @@
+{
+  "scope": "actual frozen source; synthetic providers only; zero network/signing",
+  "results": [
+    {
+      "message": "invalid state root",
+      "walletPayloads": 1,
+      "managedPayloads": 0,
+      "outcome": "rejected",
+      "required": "rejected with zero alternate payloads"
+    },
+    {
+      "message": "state-root mismatch",
+      "walletPayloads": 1,
+      "managedPayloads": 0,
+      "outcome": "rejected",
+      "required": "rejected with zero alternate payloads"
+    },
+    {
+      "message": "failed to verify proof",
+      "walletPayloads": 1,
+      "managedPayloads": 0,
+      "outcome": "rejected",
+      "required": "rejected with zero alternate payloads"
+    },
+    {
+      "message": "block hash no longer canonical",
+      "walletPayloads": 1,
+      "managedPayloads": 0,
+      "outcome": "rejected",
+      "required": "rejected with zero alternate payloads"
+    }
+  ]
+}

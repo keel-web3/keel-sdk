@@ -1,0 +1,40 @@
+{
+  "schema": "keel.independent-gif-fresh-epoch2-review@1",
+  "sourceCommit": "de8f2ea33022092d3d0abdf4b3ae31102a697030",
+  "decision": "APPROVE_EXACT_ONE_ASSEMBLY_AND_CONDITIONAL_NATIVE_SEQUENCE",
+  "producerReviewSHA256": "5199b31b12634ce9035326879a5d173b2e9ecea125219de148faf23ccc84b1c9",
+  "conditionalTemplateSHA256": "131b2d7c0c0d6d5a5427b0d7e4852ccb463724f0319ede840f203a31810d286c",
+  "wholeReviewSHA256": "0c93dccb94264dccb4ee72ccfa10d001c7e8767f9be25e70b28a7fbaa088ca99",
+  "configSHA256": "21108ffe7e59fd865e8013d819f8da074cdb937e9efb02c52433bb15057b510d",
+  "producerControls": 104,
+  "forwardGasControls": 63,
+  "pass": 167,
+  "fail": 0,
+  "skip": 0,
+  "priorActual400Credential2ReusedByUnchangedSourceNotRerun": true,
+  "actualBundleImportNetworkChildAttempts": 0,
+  "sourceRows": 254,
+  "allRowsRehashedAndCanonical": true,
+  "changedEpoch1Files": [
+    "README.md",
+    "forward/validate-retained.mjs",
+    "run-capture.mjs"
+  ],
+  "newFiles": [
+    "forward/header-gas-reference.mjs",
+    "forward/header-gas-reference.test.mjs"
+  ],
+  "sameEpoch1Files": 32,
+  "URIAndDropReferenceParent": "380fa21a10eb77e161ed1cae3513e5e2f819f1ae",
+  "separatelyApprovedGasReference": "a16d75a22b61a41bbfc33c5623bb380d2563ff98",
+  "prior01PreservedConsumedFailure": true,
+  "allOutputsAbsentAtAdmission": true,
+  "maximumNativeExecutions": 1,
+  "reviewerPerformedCaptureOrRPCOrNative": false,
+  "rootReported02Started": true,
+  "terminalResultAudited": false,
+  "noRetryRepinOrGasInputMutation": true,
+  "signing": false,
+  "submission": false,
+  "activationApproved": false
+}

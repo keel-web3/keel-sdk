@@ -1,0 +1,117 @@
+{
+  "schema": "keel.independent-offline-reference-review@1",
+  "decision": "APPROVE_EXACT_REFERENCE_CORRECTION_AND_RETAINED_OFFLINE_VALIDATION_ONLY",
+  "sourceCommit": "380fa21a10eb77e161ed1cae3513e5e2f819f1ae",
+  "evidenceCommit": "0412dcd0a85bc421f4d1cf62449ff670028ff0cc",
+  "productionSiteCommit": "4002803ccfcb20c39ffe5c555b68d8e197f379f8",
+  "sdkCommit": "b524bf5fc19939c7523aada2e53f79e3360970ea",
+  "sourceFiles": [
+    {
+      "path": "/private/tmp/keel-gif-forward-reference-20261020/docs/tools/gif-forward-reference/canonical-reference.mjs",
+      "bytes": 9620,
+      "sha256": "804108a41b5ac69ff109fc7799589929847c012c4046308da5b2e9fd43bfb67e"
+    },
+    {
+      "path": "/private/tmp/keel-gif-forward-reference-20261020/docs/tools/gif-forward-reference/forward-core.mjs",
+      "bytes": 10274,
+      "sha256": "0881fa00167f0ceb863537aa0b5fb2ff93fe6085fbf87938e42fbc9ab86af954"
+    },
+    {
+      "path": "/private/tmp/keel-gif-forward-reference-20261020/docs/tools/gif-forward-reference/forward-original.mjs",
+      "bytes": 6903,
+      "sha256": "dddfb0882d581dc01ab51d23fc89b556e4515d43ced2f0fc54ee9ebbb2d56825"
+    },
+    {
+      "path": "/private/tmp/keel-gif-forward-reference-20261020/docs/tools/gif-forward-reference/forward-reference.test.mjs",
+      "bytes": 9082,
+      "sha256": "69cc388c35fdc8f0848dec639f5dee28df6ccf73a344e412fbe35f40a8bcf3fd"
+    },
+    {
+      "path": "/private/tmp/keel-gif-forward-reference-20261020/docs/tools/gif-forward-reference/strict/deployed-core.mjs",
+      "bytes": 10163,
+      "sha256": "71e3d17dcdcbfa14655b8099c2d0df278ea2424efcf7126c0f758669cde687c9"
+    },
+    {
+      "path": "/private/tmp/keel-gif-forward-reference-20261020/docs/tools/gif-forward-reference/strict/identity.mjs",
+      "bytes": 2223,
+      "sha256": "426164037f2013bdc4053fc03d1f76f256f23ff75454d2de9aa4301f932d4f2a"
+    },
+    {
+      "path": "/private/tmp/keel-gif-forward-reference-20261020/docs/tools/gif-forward-reference/strict/verify-original.mjs",
+      "bytes": 6401,
+      "sha256": "4a226a9459833dee0dc9560f1cc951ed3d9e54d4184bc60fe59a8f196ce23d7e"
+    },
+    {
+      "path": "/private/tmp/keel-gif-forward-reference-20261020/docs/tools/gif-forward-reference/validate-retained.mjs",
+      "bytes": 3368,
+      "sha256": "3d41983663d773d0dcdbd9601025233da5913e3dc20e7de1aca96160afb79957"
+    }
+  ],
+  "retainedInput": {
+    "path": "/tmp/keel-private-gif-existing-v2-provisional-capture-20261020-01/normal.provisional.private.json",
+    "bytes": 9948499,
+    "sha256": "3ab9e07a248074e10cebf6f6515eb257926f29aff64355a3ae6102537e67c59a"
+  },
+  "result": {
+    "path": "/private/tmp/keel-independent-forward380-20261020/retained-offline-result.json",
+    "bytes": 13713,
+    "sha256": "a55d83f65ae44c3f0de1163ebdf95d9398c350703b9f8097d981317a84433551",
+    "completeInputSHA256": "ae646b91ceb3282b1e79ba87380b7031d0599a07aa6a46d62822176e8e7781e7",
+    "tokenURIBytes": 555958,
+    "tokenURISHA256": "1d057277c522b141d1a93448923bbf17e80c9f89d3f7dd95bb8a86bb06cf04d0"
+  },
+  "independentChecks": {
+    "authorControlsRerun": {
+      "pass": 41,
+      "fail": 0,
+      "skip": 0
+    },
+    "strictOriginalModulesByteExact": true,
+    "remainingStrictVerifierSourceReverseByteExact": true,
+    "all1360SDKDistFilesHashVerifiedBeforeImport": true,
+    "oldURIReproducedByteExactBeforeForwarding": true,
+    "historicalGraphBytesPreserved": 298462,
+    "whole580ByteCreateDropCompared": true,
+    "dropLeafMutationNegatives": 16,
+    "networkAndChildAttempts": 0,
+    "networkAndChildGuardSourceSHA256": "557389b9c571f36815d26f476fdd20b4d04427db21dbecc24ac548bff4920e19"
+  },
+  "canonicalSourceReferences": [
+    {
+      "path": "apps/studio/src/server/services/release-service.ts",
+      "lines": [
+        3657,
+        3855,
+        3994,
+        4020,
+        4723
+      ],
+      "meaning": "artifact conditional, same prepared envelope, ordered metadata preimage and stage domain"
+    },
+    {
+      "path": "packages/sdk/dist/inline-viewer-graph.js",
+      "lines": [
+        1672,
+        1712,
+        1725,
+        1730,
+        1780
+      ],
+      "meaning": "exact reviewed b524 builder derives collection context seed, integrity and optional artifact annotation"
+    }
+  ],
+  "interpretation": [
+    "Expected values are independently derived from historical URI/graph, immutable saved DB projection and canonical source; no observed new URI or digest literals serve as expected values.",
+    "The new 555958-byte URI has the same graph/GIF/preview; current collection and derived seed replace only the SDK context tail; absent artifact follows the explicit image-module condition.",
+    "The new drop uses the historical 14 other ABI values, current collection and canonical metadata plus stage digests.",
+    "This is a NEW normal compiler program with executionCoreEquivalent false. Its retained header has no freshness/execution admission."
+  ],
+  "fullProgramExecuted": false,
+  "nativeExecutionApproved": false,
+  "newCaptureApproved": false,
+  "rpcApproved": false,
+  "signingApproved": false,
+  "submissionApproved": false,
+  "activationApproved": false,
+  "publicationReady": false
+}

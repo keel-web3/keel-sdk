@@ -1,0 +1,9 @@
+file:///private/tmp/keel-qa-receipt-activation-20261020/keel-site/docs/tools/gif-existing-v2-capture/build-bundle.mjs:47
+  if(relative.startsWith('..')||relative.includes('/node_modules/'))throw Error('Unexpected bundled dependency/source: '+relative);
+                                                                          ^
+
+Error: Unexpected bundled dependency/source: ../../keel-qa-receipt-activation-20261020/keel-site/docs/tools/gif-existing-v2-capture/capture-entry.ts
+    at buildCapacityBundle (file:///private/tmp/keel-qa-receipt-activation-20261020/keel-site/docs/tools/gif-existing-v2-capture/build-bundle.mjs:47:75)
+    at async file:///Users/ravonus/dev/keel-pixel-pfps/[eval1]:1:157
+
+Node.js v22.22.1

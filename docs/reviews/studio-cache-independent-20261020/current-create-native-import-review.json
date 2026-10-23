@@ -1,0 +1,15 @@
+{
+  "schema": "keel-native-create-stdin-import-review@1",
+  "decision": "APPROVE",
+  "reviewerId": "cache-release-independent-reviewer",
+  "planSHA256": "827f05ae182484013886a668c7e4154974fdbfd332ffdf2e3c6dea99680d96cf",
+  "allowedPhases": [
+    "native"
+  ],
+  "blockingFindings": [],
+  "sourceFreeze": "a2a3fc18f8a0230732fa36fcca6943c392987586",
+  "operatorSHA256": "1b1e5f298f374d24bf58224be1201376d7bd6d1a4d4374e3e4aff75e7952ae71",
+  "scope": "One exact 11032064-byte archive 3ca58e95c5cf67d5990ad20b5e9bb7844137839f64dbd3281298bfd26e0c8714 through authenticated retained stdin loader into qualification image 48144d982e4edaf62198f3ca583dd5ded6c7f1228c6cc39322fd5a90341cba43 at root 949e7f71-f4ef-43a0-99db-4d40bea55a0c. No cleanup, container start, application activation, database mutation, signing, submission, or replay. Keep consume and failure evidence.",
+  "requiredFreeBytes": 1375229440,
+  "artifactProofSHA256": "ba46f469c248d1e0fd48ce3733e00a81821b1ec3a87edc1f24eb56aeb1dc91c3"
+}

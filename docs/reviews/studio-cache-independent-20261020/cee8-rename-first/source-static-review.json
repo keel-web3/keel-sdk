@@ -1,0 +1,58 @@
+{
+  "schema": "keel.independent-rename-first-source-static-review@1",
+  "decision": "APPROVE_EXACT_SOURCE_AND_STATIC_STORAGE_ONLY",
+  "reviewerId": "independent-release-reviewer",
+  "sourceCommit": "530be956447dd6d5a9fff70edc40e94bb52f0022",
+  "staticCommit": "6acdbc0146077e233c302568b108d1ffdf81d781",
+  "operatorSHA256": "8c9584a951215a43b25d8f1599c69aed60553c80b7ab0f0ee6faebb01bce73ca",
+  "pendingPlanSHA256": "49e141ef5578d6f6ec5dff7021f43f8ceefcb998c15ea84d1856840a46dacfee",
+  "sourceControlsSHA256": "7bd94d0103ee64896e6cb4ca2b8b925bcf147bdee39924b337adf73a3b25350c",
+  "failureAuditSHA256": "71bc71b6ab1551a91cfa48f2877225f3094d5649e9e07d490ed34808e3b706d0",
+  "sourceReview": "Only main/recover changed: retire old canonical name while still healthy then stop immutable ID; in recovery retire authenticated candidate canonical name before stop; reconcile failed-name/uncertain rename by same full identity; record bounded safe phase/code. All helpers/validators/configuration/reserve/snapshot/runner controls unchanged.",
+  "independentControls": {
+    "mainAndRecovery": 13,
+    "byteUnchangedMaintained": 9,
+    "unchangedReviewerWakeRegression": 1,
+    "PASS": 23,
+    "FAIL": 0,
+    "SKIP": 0,
+    "baseline981bWakeRegression": "RED retained"
+  },
+  "priorArtifactQA": {
+    "sha256": "4c307f5e8ae93dff80adec048bbacfe6dfce4a8ab9f49a8675760ecfa1e15ca9",
+    "scope": "Unchanged actualCEE8/source0c7/SDK311/F2 public roles and fullarchive; not new operatorQA or livepublication success"
+  },
+  "static": {
+    "admittedPacket": "/private/tmp/keel-independent-cee8-rename-first-20261021/static-stage.admitted.json",
+    "sha256": "ed33fad64d5e17a140b854bf2b63392f7e40eaf8e884995a4121f1c1a0cde718",
+    "validationSHA256": "fdea077f2f5208beaa96f4fb7953c47b43a592064b3f063e31ec79198db5244a",
+    "newRoot": "/home/ubuntu/keel-studio-image-only-07a4de5e-f373-49bb-9e05-952906a8c4a4",
+    "permittedPacketFields": [
+      "createExclusiveRootArgv",
+      "files[*].installArgv with exact corresponding stdinLocalPath bytes"
+    ],
+    "files": 7,
+    "bytes": 81206,
+    "maximumRootCreates": 1,
+    "maximumEachFileInstall": 1,
+    "sameExistingExclusiveNoFollowFsyncReceivers": true
+  },
+  "allPendingApprovalFlagsFalse": true,
+  "notAdmitted": [
+    "readOnlyPreflightArgvAfterFinalReview",
+    "executeArgvTemplateAfterExactLeadAndReviewerAdmission",
+    "Any final plan generation as independently approved before fresh QA/reviewer/lead binding",
+    "Old consumed5895/aab/capture/activation replay",
+    "Private preparation/RPC/native artwork replay, alternative trace access, signing/submission/spend, deletion/restore"
+  ],
+  "stopOnFailureOrUncertain": true,
+  "rootSoleOperator": true,
+  "maximumActivationExecutions": 0,
+  "independentNewOperatorQAAndFinalExactActionReviewStillRequired": true,
+  "preservation": "Consumed602988/5895/aab/994a snapshot and all prior rollback/artifact evidence remain. No shared proxy/app/image/auth/native/config/data change.",
+  "blockingFindingsWithinSourceAndStaticScope": [],
+  "publicationReadinessApproved": false,
+  "Gate6": "FAILED_UNRESOLVED_LIVE_GATOR_GIF_PREPARATION_FAILURES",
+  "strict280WholeEquivalenceApproved": false,
+  "reviewerHostActions": false
+}

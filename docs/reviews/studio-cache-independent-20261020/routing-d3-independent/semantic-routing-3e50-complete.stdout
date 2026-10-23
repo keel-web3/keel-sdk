@@ -1,0 +1,134 @@
+{
+  "scope": "Actual source with synthetic provider boundaries only; no network or signing",
+  "cases": 18,
+  "pass": 18,
+  "fail": 0,
+  "results": [
+    {
+      "label": "invalid proof [message]",
+      "wallet": 1,
+      "managed": 0,
+      "rejected": true,
+      "pass": true
+    },
+    {
+      "label": "invalid proof [body]",
+      "wallet": 1,
+      "managed": 0,
+      "rejected": true,
+      "pass": true
+    },
+    {
+      "label": "canonical block hash mismatch; reorg detected [message]",
+      "wallet": 1,
+      "managed": 0,
+      "rejected": true,
+      "pass": true
+    },
+    {
+      "label": "canonical block hash mismatch; reorg detected [body]",
+      "wallet": 1,
+      "managed": 0,
+      "rejected": true,
+      "pass": true
+    },
+    {
+      "label": "execution reverted [message]",
+      "wallet": 1,
+      "managed": 0,
+      "rejected": true,
+      "pass": true
+    },
+    {
+      "label": "execution reverted [body]",
+      "wallet": 1,
+      "managed": 0,
+      "rejected": true,
+      "pass": true
+    },
+    {
+      "label": "access denied [message]",
+      "wallet": 1,
+      "managed": 0,
+      "rejected": true,
+      "pass": true
+    },
+    {
+      "label": "access denied [body]",
+      "wallet": 1,
+      "managed": 0,
+      "rejected": true,
+      "pass": true
+    },
+    {
+      "label": "invalid state root [message]",
+      "wallet": 1,
+      "managed": 0,
+      "rejected": true,
+      "pass": true
+    },
+    {
+      "label": "invalid state root [body]",
+      "wallet": 1,
+      "managed": 0,
+      "rejected": true,
+      "pass": true
+    },
+    {
+      "label": "state-root mismatch [message]",
+      "wallet": 1,
+      "managed": 0,
+      "rejected": true,
+      "pass": true
+    },
+    {
+      "label": "state-root mismatch [body]",
+      "wallet": 1,
+      "managed": 0,
+      "rejected": true,
+      "pass": true
+    },
+    {
+      "label": "failed to verify proof [message]",
+      "wallet": 1,
+      "managed": 0,
+      "rejected": true,
+      "pass": true
+    },
+    {
+      "label": "failed to verify proof [body]",
+      "wallet": 1,
+      "managed": 0,
+      "rejected": true,
+      "pass": true
+    },
+    {
+      "label": "block hash no longer canonical [message]",
+      "wallet": 1,
+      "managed": 0,
+      "rejected": true,
+      "pass": true
+    },
+    {
+      "label": "block hash no longer canonical [body]",
+      "wallet": 1,
+      "managed": 0,
+      "rejected": true,
+      "pass": true
+    },
+    {
+      "label": "ordinary transport503 positive",
+      "wallet": 1,
+      "managed": 1,
+      "rejected": false,
+      "pass": true
+    },
+    {
+      "label": "unsupported4200 positive",
+      "wallet": 1,
+      "managed": 1,
+      "rejected": false,
+      "pass": true
+    }
+  ]
+}

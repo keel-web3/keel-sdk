@@ -1,0 +1,19 @@
+{
+  "schema": "keel.independent-source-review-condition-fulfilled@1",
+  "decision": "APPROVE_EXACT_SOURCE_ONLY",
+  "sourceCommit": "71cb0e31bab5e4ee93af9d3b3185978e46f1fe8e",
+  "tree": "a41c88dfe6a8343f030892f220efea002c779743",
+  "sourceReviewSHA256": "429bade6b66bf908a67cce95479f5dc98609533a8d60ac936f063c12cb0572bd",
+  "qaCommit": "fa15f00055207a0ef23ff12ad2630dc45fec7796",
+  "qaResultSHA256": "4bb940a5cc0dd47ebe97dba89641470ff2a0d01c5738c548f10898f84209b643",
+  "freshMainExecutionsPassed": 277,
+  "additionalPrivacyOraclePassed": 3,
+  "fullTSCExit": 0,
+  "SDK1745Exact": true,
+  "allSixReviewedProductionHashesExact": true,
+  "remainingSourceBlockers": [],
+  "ordinarySourceIntegrationPermitted": true,
+  "artifactHostBuildActivationOrLiveApproval": false,
+  "currentLiveGate6": "FAIL_RETAINED",
+  "reviewerHostActions": 0
+}

@@ -1,0 +1,107 @@
+{
+  "schema": "keel.independent-public-cache-cleanup-review@1",
+  "sourceCommit": "5ada244f03afa35cd6e1d07c34e17a98d79d63cd",
+  "observedEvidenceHead": "5e02366e92b6c51b3c5a58144eab675992743ca5",
+  "result": "BLOCKED_SPECIFIC_REFERENCE_AND_RESTORATION_FAILURES",
+  "cleanupApproval": false,
+  "cleanupCommandAdmission": false,
+  "importApproval": false,
+  "activationApproval": false,
+  "scope": "Source review and two no-host adversarial controls only. No production cache, container, image, volume, keys, artwork, database, process or network action.",
+  "sourceFiles": {
+    "cleanup-public-caches.py": {
+      "bytes": 15885,
+      "sha256": "e968524faa9c06cc1a0c3063ee020ef79b788f72de3682496261ef5c5fc5348a"
+    },
+    "cache-cleanup-plan.json": {
+      "bytes": 595843,
+      "sha256": "931ea314b2381bdf5abd030895b6ed10ca6508b5a999a4205519cc8cc119aabe"
+    },
+    "cache-cleanup-transfer-proposal.json": {
+      "bytes": 5259,
+      "sha256": "7997dc0498c0df79b647ea0370946808304c388c0f99bcd8a236d07b310332b5"
+    },
+    "import-whole-studio.py": {
+      "bytes": 7070,
+      "sha256": "7407a9286c011c5253de158d75e9409d1ca2d752fe60c26bf1a408d24dce3ca6"
+    },
+    "whole-studio-plan-HELD.json": {
+      "bytes": 10599,
+      "sha256": "26e8884e60587033869e4458134be665db5ca70ad387dfe76bc167bf3ecca50c"
+    }
+  },
+  "findings": [
+    {
+      "id": "CC-1",
+      "priority": "P2",
+      "file": "/private/tmp/keel-release-494d-20261020/docs/reviews/studio-publication-20261019/release/routing-import-494d/cleanup-public-caches.py",
+      "line": 112,
+      "relatedLine": 125,
+      "title": "Missing cwd or executable path hides remaining live process references",
+      "trigger": "A process entry still has a cache-file FD while its cwd or exe target no longer resolves.",
+      "observed": "The broad FileNotFoundError/ProcessLookupError handler skips the entire PID before scanning fd/maps/mountinfo. The independent fake-proc fixture has an existing cache FD, but no_references accepts it. A deleted cwd is not proof that its process exited.",
+      "requiredBehavior": "Continue the remaining reference checks for a still-present process. Confirm a PID is gone before discarding its whole entry; unresolved live reference state must fail closed.",
+      "regression": "cache-adversarial.test.py::MissingCwdReference"
+    },
+    {
+      "id": "CC-2",
+      "priority": "P2",
+      "file": "/private/tmp/keel-release-494d-20261020/docs/reviews/studio-publication-20261019/release/routing-import-494d/cleanup-public-caches.py",
+      "line": 177,
+      "relatedLine": 189,
+      "title": "Post-rename error loses quarantine tracking and restoration",
+      "trigger": "renameat2 has succeeded, then source/destination fsync or the registered signal handler raises before moved.append.",
+      "observed": "Using a real test-owned rename followed by an injected error, the first cache root disappears from its original path, remains in quarantine-0, and the durable failure receipt reports restoration:[] and removed:[]. The root is never reconciled or restored.",
+      "requiredBehavior": "Track an attempted move before the uncertain operation and reconcile source/quarantine by exact authenticated inode before restoration. Preserve foreign occupants, attempt both known/uncertain roots, and durably report retained quarantine if restoration cannot be confirmed.",
+      "regression": "cache-adversarial.test.py::PostMoveError"
+    }
+  ],
+  "independentControls": {
+    "total": 2,
+    "pass": 0,
+    "fail": 2,
+    "scope": "Synthetic proc fixture plus real macOS test-owned directory rename with injected post-mutation error. No Linux renameat2 or real live-host qualification claimed."
+  },
+  "authorLinuxControls": {
+    "reportedPass": 29,
+    "independentlyRerun": false,
+    "reason": "Specific new source blockers reproduced first; heavy local runs avoided at load1=82.98. Author25cache/4held-import results retained separately and do not cover these two cases."
+  },
+  "metadataReview": {
+    "exact888PlanFileMetadataMatchesQualifiedEvidence": true,
+    "allocatedFileBytes": 488615936,
+    "directoryReclaimCount": 0,
+    "qualificationClasses": [
+      "integrity-verified-public-npm-registry-cache-content",
+      "public-npm-registry-package-metadata",
+      "public-npm-registry-response-index"
+    ],
+    "actualRemoteContentsRehashedByReviewer": false
+  },
+  "heldImport": {
+    "candidate494dImportRemainsHeld": true,
+    "releaseHoldExecuteGuardPresent": true,
+    "newDiscovery400TupleRequiresFreshArchiveProvenanceCapacityPlanAndReview": true,
+    "predecessorImportIsNotNewImageProof": true
+  },
+  "nonblockingMetadataNote": "Transfer sourceCommitAtPreparation still names old d7cee490 rather than5ada. Correct this lineage label when freezing a successor; exact source/plan hashes are bound here.",
+  "remaining": [
+    "Correct both findings; independently rerun unchanged adversaries and affected Linux controls.",
+    "Then prepare separate exact cleanup-only admission and bounded normal health window.",
+    "Final discovery-fixed import remains held until its own actual tuple, budget and independent review."
+  ],
+  "evidence": {
+    "adversarial-red.stderr": {
+      "bytes": 2064,
+      "sha256": "8d4c0ac5e85c2d5325c51312e4642cd07cac534b0871d227504f49e91d1c75eb"
+    },
+    "adversarial-red.stdout": {
+      "bytes": 293,
+      "sha256": "c299fe3db9106a23d74a0cccd08473efae7cb86a7af19f9a1d85d531620ade51"
+    },
+    "cache-adversarial.test.py": {
+      "bytes": 2458,
+      "sha256": "9ba4710f1cf653bdd907b96c3ec311d0c921b7242f84a4e78798ce1e00f79f2a"
+    }
+  }
+}

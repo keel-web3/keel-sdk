@@ -1,0 +1,54 @@
+{
+  "schema": "keel-independent-actual-compiled-state-cache@1",
+  "buildId": "pyrfdcquUJkhz22Y0jyAz",
+  "moduleId": "44950",
+  "moduleDefinitionSHA256": "b452390e6c7c9d46345aeb17d341931a3763ea76c5ae6fde98c811b8ce601ef2",
+  "actualOriginalModuleDefinition": true,
+  "httpEntryInvoked": false,
+  "databaseInvoked": false,
+  "walletInvoked": false,
+  "syntheticStateReads": true,
+  "actualExports": [
+    {
+      "name": "T",
+      "type": "function",
+      "preview": "function R(a,b,c){let s={...c},t=b.request.bind(b);if(\"proof\"===g._.KEEL_PUBLICATION_SIMULATION_BACKEND){let b=Promise.resolve().then(()=>{if(0xaa36a7!==a||!g._.KEEL_PUBLICATION_PROOF_RPC_URLS||!g._.KEEL_PUBLICATION_PROO"
+    },
+    {
+      "name": "z",
+      "type": "function",
+      "preview": "async function Q(a,b,c={}){let d,{signal:e}=c,f=!1,g=!1,h=()=>{},i=new Promise((a,b)=>{h=b});i.catch(()=>{});let j=()=>Object.assign(Error(\"The publication simulation was cancelled. No wallet approval was prepared.\"),{na"
+    }
+  ],
+  "exportName": "T",
+  "physicalCodeReads": 1,
+  "result": "PASS_COMPILED_CONSUMER_CACHE",
+  "requests": [
+    {
+      "method": "eth_chainId",
+      "params": []
+    },
+    {
+      "method": "eth_getBlockByNumber",
+      "params": [
+        "0x4",
+        false
+      ]
+    },
+    {
+      "method": "eth_getCode",
+      "params": [
+        "0xabababababababababababababababababababab",
+        {
+          "blockHash": "0x1111111111111111111111111111111111111111111111111111111111111111",
+          "requireCanonical": true
+        }
+      ]
+    }
+  ],
+  "socketAttempts": 0,
+  "childAttempts": 0,
+  "nativeExecuted": false,
+  "realRPCRequests": 0,
+  "signing": false
+}

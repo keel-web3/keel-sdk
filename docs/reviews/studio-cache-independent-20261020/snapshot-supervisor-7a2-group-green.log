@@ -1,0 +1,17 @@
+TAP version 13
+# {"result":"FAIL","category":"snapshot-timeout","ownedDescendantTerminated":true,"otherGroupPreserved":true,"actualDockerCalls":0}
+# Subtest: timeout kills a TERM-ignoring owned descendant and preserves another process group
+ok 1 - timeout kills a TERM-ignoring owned descendant and preserves another process group
+  ---
+  duration_ms: 514.792375
+  type: 'test'
+  ...
+1..1
+# tests 1
+# suites 0
+# pass 1
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 545.647042

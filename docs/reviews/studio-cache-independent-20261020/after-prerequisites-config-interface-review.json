@@ -1,0 +1,152 @@
+{
+  "schema": "independent-after-prerequisites-configuration-interface-review@1",
+  "decision": "INTERFACE_REVIEW_ONLY_NO_UPDATE_OR_ACTIVATION_APPROVAL",
+  "reviewerId": "cache-release-independent-reviewer",
+  "currentCandidate": {
+    "site": "f11db8fa497945f89a6ffd076ee0e7a6d9a111fe",
+    "sdk": "b524bf5fc19939c7523aada2e53f79e3360970ea",
+    "build": "pyrfdcquUJkhz22Y0jyAz",
+    "app": "sha256:fe94404ea7a860e6397e0964ef8dbe7d9fa9bb2777a57dd90cf8c63d802d8369",
+    "runner": "sha256:d97ddf2aba94cb963646fdf05bc8dc8c99b7e69b8c19bad85c06bea7c67fc9f5",
+    "executor": "8a2970e2cebc1f4b51bd228ab7fa53208e2d247030f46037991351115f12a3b5"
+  },
+  "receiptReadiness": "First formatter canonical/readback passed as independently recorded by QA. Parent reports factory transaction84bb19006925a4d3c24c06366671d10c591090cc2b4e1ec098fe0078e879af59 has uncertain UI outcome and is being reconciled; never resend. Third receipt not yet bound by this review.",
+  "acceptedRootOwnedInterface": "docs/reviews/studio-publication-20261019/release/dependency-configuration/",
+  "interfaceFiles": {
+    "before-image.json": "Exact existing catalog path/hash/bytes and sanitized selected factory DB row set including row IDs/startBlock/enabled; preserve original rows and file.",
+    "receipt-bindings.json": "Canonical successful3CREATE receipts, exact deployment addresses/transaction envelopes, top and child/carrier/library bytes/hashes, collection creation commitment; block/hash identity.",
+    "catalog.proposed.json": "Exact baseline catalog with only compact.collectionCreationCodeHash and imagePresentation replaced/added from actual readbacks.",
+    "chain-contracts-change.proposed.json": "Compare-and-set insertion/selection of exact new chain11155111 kind=factory addressa149 with actual receipt startBlock; prove unique newest enabled selection. Retain old row, never invent an onchain registry ID.",
+    "rollback.json": "Exact reversible DB row before/after images and original catalog path/hash; restore both by CAS before restarting old runtime if cutover fails."
+  },
+  "minimalFactorySelection": {
+    "table": "chain_contracts",
+    "chain_id": 11155111,
+    "kind": "factory",
+    "address": "0xa1496dCEe98FCF986Bee0e105439E684D79e37FD",
+    "start_block": "ACTUAL canonical factory receipt block, not guessed0 or artificialpriority",
+    "enabled": true,
+    "selectionRule": "Newest enabled startBlock; distinct addresses tied at newestblock are ambiguous and rejected.",
+    "oldRows": "Preserve old factorye7F record/config; normal existing collection paths retain their identity/minter, not replaced by this default selection."
+  },
+  "minimalCatalogDelta": {
+    "pathSource": "process.env.KEEL_INLINE_FRAGMENT_CATALOG_PATH, fallback validated env value",
+    "compact.collectionCreationCodeHash": "ACTUAL factory dieCreationCodeHash, expected0x0504f9bc293efe4137a0b54744e879ea5b4a47745b04861f56981e300fd397fb",
+    "imagePresentation": {
+      "address": "0x924c5fA733CF9eF24dc7b355261660dddb24cb1D",
+      "runtimeCodeHash": "ACTUAL code Keccak, expected0x3605de5ffc3c243724537e639fbb9feca2d3fe90091d70758e377ae254a9393d",
+      "deploymentTransactionHash": "ACTUAL third successful canonical CREATE receipt hash, not predicted/earlierfactorytx"
+    },
+    "preserve": "Existing canonical builder, Hold/store, shell registration/revision/fragments, module sources, paid resources, other catalog fields and original collections. Do not turn on legacySharedImage/legacyPreparedDense or invent new reader IDs for this direct image-hook fix."
+  },
+  "additionalOnchainInfrastructureRegistration": {
+    "foundRequired": false,
+    "scope": "Existing direct Routed721 image-module hook. Source setPresentationModule requires collection admin, unminted/unboundcollection and modulecode; module calls back collection authorization. No shared owner/governance registration call exists.",
+    "notAnExtraPrerequisite": "Later per-collection setPresentationModule and setImageSource are ordinary creator publication calls, not a fourth approved infrastructure transaction. Existing canonical shell verification and required receipt-backed onchain reads remain mandatory.",
+    "sourceReferences": [
+      "Contracts49d KeelRouted721.sol50-78",
+      "Contracts49d KeelNativeMediaPresentation.sol84-99",
+      "release-service.ts3213-3233,3334-3341"
+    ]
+  },
+  "activationIntegrationGap": {
+    "operatorSHA256": "b13dc18e35b092014ea91d287f49656594168586b3c766145d140507aaa999d2",
+    "currentBehavior": "d7 operator preserves old Env/mounts except four proof keys/socket. It has no catalog/DB configuration apply or restore step.",
+    "requiredPlanShape": "Hash-bind an explicit separately reviewed configuration/cutover successor; stage proposed catalog immutably, apply exact selected DB/catalog bindings only with ordered cutover, and restore them before old runtime restart on rollback. Never mutate active config ahead of cutover while old SDK505 still serves.",
+    "qualificationFirst": "Apply proposed selection/catalog only to owned qualification clone, then unchanged normal GIF compile and full D97 proof against real3deployed dependencies.",
+    "globalImpact": "New defaults also affect freshly prepared Gator collections. Old original34call/d97 proof remains exact oldtuple historical evidence; postconfig ownJuniper Gator UI/fullproof must bind proposedconfig."
+  },
+  "preActivationApprovalRequirements": [
+    "All3 canonical receipts and exact top/child/carrier/library runtime readbacks bound to config; confirmed factory getter/creationhash and b524 qualifier compatibility.",
+    "Unchanged originalGIF full normal compiler/native program proof on actual dependencies and proposed configuration; original source/preview identities preserved.",
+    "Candidate-attributed actual compiled FE944 terminal401/403 controlled evidence; olda1a4 source6PASS evidence alone is not a replacement. Keep actual EthPanda all200 provenance separate.",
+    "Exact independent QA/release evidence plus lead-approved final activation plan hashes; original allfalse pendingplan remains nonexecutable.",
+    "Fresh locked original healthy/paused fullConfig/mounts/resources/name/volume guards, exact preloadedFE944/D97 import provenance and sufficient disk/memory.",
+    "Fresh bounded durable privateDB snapshot immediately before cutover; retained schema/backup restore compatibility and inactive0050 exclusion; config rollback ordering reviewed."
+  ],
+  "postActivationAcceptanceRequirements": [
+    "Served buildpyrfdcquUJkhz22Y0jyAz/API/MCP/runtime/source pins and workerpaused health verified independently.",
+    "Same exact saved ownJuniper Gator copy normal simulation to unsignedwallet boundary before involving Kthings again; no artwork signing/spend.",
+    "Mandatory originalGIF actual deployed normal simulation and unsignedwallet boundary.",
+    "Authenticated historical HTTP200/MIME/exact628198B95b6141a digest/SDKdecode/canonicalcanvas acceptance.",
+    "Original projects/releases/permissions/storage/operations preserved and rollback retained; final release acceptance only after required live gates."
+  ],
+  "noDuplicateLoops": "No full SDK/Go test or consumed native program replay required merely to inspect this config. Reuse exact scoped source/build/native/QA evidence; run only the genuinely new real-dependency normalGIF and required deployed UI acceptance.",
+  "source": [
+    {
+      "path": "apps/studio/src/server/services/release-service.ts",
+      "sha256": "6681ab22cd38bc640fda596eb96735d06f6a76524fccb5b838dc53e8ffe1c83d",
+      "relevantLines": [
+        3076,
+        3119,
+        3138,
+        3150,
+        3195,
+        3213,
+        3228,
+        3334,
+        3338,
+        3359
+      ]
+    },
+    {
+      "path": "apps/studio/src/lib/release-infrastructure-selection.ts",
+      "sha256": "0b9a618701845a35af83847dec1c4f25b9ef5cdad9f43922ca5806ffc2df0a91",
+      "relevantLines": [
+        7,
+        10
+      ]
+    },
+    {
+      "path": "apps/studio/src/server/db/schema.ts",
+      "sha256": "a73eb3d2760c7f6da8825e9de546292a02f84374ae107a39186bfb110e8884e3",
+      "relevantLines": [
+        754,
+        755,
+        761,
+        763,
+        764
+      ]
+    },
+    {
+      "path": "apps/studio/src/lib/inline-fragment-catalog.ts",
+      "sha256": "4442792153f9fffc38f580e9ce2847a79cf617ae9d02526e1e89366e01478c84",
+      "relevantLines": [
+        56,
+        60,
+        105
+      ]
+    },
+    {
+      "path": "apps/studio/src/server/services/inline-fragment-catalog-service.ts",
+      "sha256": "c54ef122c2649453791fe23f2f84e6d35b4a6f3a2b48c1f20237831485cbf6e1",
+      "relevantLines": [
+        69,
+        72,
+        279,
+        397
+      ]
+    },
+    {
+      "path": "docs/reviews/studio-publication-20261019/release/final-candidate/activation-fe944/activate-qualified-studio.py",
+      "sha256": "b13dc18e35b092014ea91d287f49656594168586b3c766145d140507aaa999d2",
+      "relevantLines": [
+        64,
+        77,
+        102,
+        111,
+        365,
+        368,
+        506,
+        539,
+        543,
+        551
+      ]
+    }
+  ],
+  "productionWritesPerformed": false,
+  "sourceEditsPerformed": false,
+  "newRPCPerformed": false,
+  "signingPerformed": false,
+  "activationApproved": false
+}

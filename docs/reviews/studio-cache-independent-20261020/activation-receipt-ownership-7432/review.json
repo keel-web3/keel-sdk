@@ -1,0 +1,158 @@
+{
+  "schema": "keel.independent-receipt-ownership-source-approval@1",
+  "sourceCommit": "7432def3b0015922a5864fc1baec225b2e7c5d8a",
+  "observedEvidenceHead": "0052b7cfa7e98f25da46e00e13c87eec0bc6fce9",
+  "scope": "Exact source successor only. No execution, activation, production Docker, database, RPC, signature, import, or cleanup authority.",
+  "sourceApproval": true,
+  "activationPlanAdmission": false,
+  "finalReleaseApproval": false,
+  "sourceFiles": {
+    "activate-receipt-bound-studio.py": {
+      "bytes": 43653,
+      "sha256": "d8c8a7a8e5a3789beea3eab5038a723a6bf5a0d720a4bddce781f852a8d55143"
+    },
+    "receipt-bound-dependencies.py": {
+      "bytes": 19385,
+      "sha256": "7054725176ef50f543bc7ca6dcdc134b98ad32b34b659ab41fa073284482ee99"
+    },
+    "activation-plan.pending.json": {
+      "bytes": 4244,
+      "sha256": "9e2bc69fc595d7fb7c0029fb756e750b9563586da4787348b0dc567604ace516"
+    },
+    "dependency-contract.test.py": {
+      "bytes": 14962,
+      "sha256": "46828ccb6dfa389ce28c084713b00fa2f1a6b141bcaff7b54ff8b469b9ffc54f"
+    },
+    "host-ownership-regression.test.py": {
+      "bytes": 7434,
+      "sha256": "57c72a4e817252306ae4a02748e3a8040f099d1a37c6c7284fcb65b645b5da2d"
+    },
+    "daemon-defaults.local-control.json": {
+      "bytes": 585,
+      "sha256": "96af8a68ee8daafa3ea339bae1bab6f3aa8e8a723bd22a96220297772c68a45d"
+    }
+  },
+  "predecessorReview": {
+    "commit": "76721599b59b64bcf6005d145b07148c21117cc1",
+    "receiptSHA256": "c76bc251cbac5014e69fc3ddeaafdcd1aed8a8dc1bfc27ca9e000cc826ebf2b4",
+    "status": "Both reported source blockers closed by this successor; predecessor RED remains retained."
+  },
+  "findingClosures": [
+    {
+      "id": "RB-1",
+      "result": "PASS",
+      "unchangedTestSHA256": "a8195a9654ad30ca0a5858be5f319f1c16235918f19199cb506a0cd54320f65f",
+      "observed": "Stop failure before mutation leaves candidate running, old stopped and unrenamed, recovery unconfirmed. Source positively verifies all owned application identities and boolean stopped state before old rename and immediately before old start; final confirmation rechecks. Response loss after successful stop remains recoverable after positive inspection."
+    },
+    {
+      "id": "RB-2",
+      "result": "PASS",
+      "qaOriginalSHA256": "e5822d5743bc237ba3fd61a21a0da50a24255aa5e2dc367ee4937cd634211a5b",
+      "bindingOnly": "QA original has one import-root path literal rebound; reverse restores original. Its printed sourceCommit remains the original label intentionally; actual successor hashes are bound separately here.",
+      "observed": "Original CapAdd SYS_ADMIN, Devices /dev/mem and VolumesFrom unrelated:rw are all rejected. Additional unknown nonempty host fields reject. Exact reviewed Docker ordinary defaults are copied only from full-hash-pinned old HostConfig and compared; sandbox fields remain explicit. No runtime/environment/capability settings copied."
+    }
+  ],
+  "independentTests": {
+    "unchangedReviewerStopFailure": {
+      "pass": 1,
+      "fail": 0
+    },
+    "qaOriginalCapabilityCases": {
+      "rejected": 3,
+      "accepted": 0
+    },
+    "dependencyControls": {
+      "pass": 20,
+      "fail": 0
+    },
+    "maintainedControls": {
+      "pass": 13,
+      "fail": 0
+    },
+    "newOwnershipControls": {
+      "pass": 8,
+      "fail": 0
+    }
+  },
+  "diffReview": {
+    "changedOperatorFunctions": [
+      "recover_runtime"
+    ],
+    "changedHelperFunctions": [
+      "pg_only_configuration",
+      "assert_pg_only"
+    ],
+    "addedHelperFunctions": [
+      "ordinary_daemon_defaults",
+      "neutral_daemon_value"
+    ],
+    "allOtherExistingFunctionsASTEqual": true,
+    "all71MaintainedDependencyAssertionASTsIdentical": true,
+    "onlyTestFixtureChange": "Add public ordinary daemon defaults needed by stricter request/inspection contract.",
+    "SQLCatalogSnapshotRunnerCutoverUnchanged": true,
+    "noApplicationSourceChanges": true
+  },
+  "remainingGates": [
+    "Actual a53 helper never-started configuration inspection qualification; the local FE944 default merge control does not establish this.",
+    "Freeze exact final application/import receipt producer lineage, source evidence, fresh names and capacity/snapshot in an executable activation plan, then independent exact plan review. Current pending plan remains invalid with all six approval flags false.",
+    "Consumed normal GIF assembly failed before RPC; any successor diagnostic/assembly needs its exact separate admission. Full normal GIF proof and deployed unsigned wallet acceptance for original/own-copy Gator and GIF remain outstanding."
+  ],
+  "evidenceFiles": {
+    "ast-equivalence.json": {
+      "bytes": 581,
+      "sha256": "31d1f544fa8fde468e5dc4452884a92a55beb05325fc6f90d0e2396d999de031"
+    },
+    "dependency.stderr": {
+      "bytes": 2745,
+      "sha256": "a06ec43dbd7cce6a4041ae840e424cc6abaaf1e90f8d1d7a43e6b8b0525d2b05"
+    },
+    "dependency.stdout": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "host-ownership.stderr": {
+      "bytes": 1378,
+      "sha256": "da50e5fdbe67cd6c4626385e751d82e2d45c071450f4d3585e98c120fecff47a"
+    },
+    "host-ownership.stdout": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "maintained.stderr": {
+      "bytes": 2153,
+      "sha256": "c707b7c9f7ce600666892d9f1332d5f2ce40ec044773cd293536b224eec4bf7b"
+    },
+    "maintained.stdout": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "qa-adversary-path-binding.json": {
+      "bytes": 587,
+      "sha256": "929adafd71863a25ee2be1a55be3f9bb274cc7bf1d74db59162b85ee4e2ba6a8"
+    },
+    "qa-capability-green.stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "qa-capability-green.stdout": {
+      "bytes": 849,
+      "sha256": "82c3b0a2bbe22228ff87c68a979972f1b6f8872ae48c55a0d931af85e131feda"
+    },
+    "qa-foreign-capability-bound.py": {
+      "bytes": 1484,
+      "sha256": "68c26a90e58be9d8072cea5fb038c93e7c9812835223e123839b5720c27f92db"
+    },
+    "stop-failure-green.stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "stop-failure-green.stdout": {
+      "bytes": 1017,
+      "sha256": "754223afe2f69995222b36524b5dea7d4ea4ed38f10da583b5c1730eed58370b"
+    },
+    "stop-failure-regression.py": {
+      "bytes": 1237,
+      "sha256": "a8195a9654ad30ca0a5858be5f319f1c16235918f19199cb506a0cd54320f65f"
+    }
+  }
+}

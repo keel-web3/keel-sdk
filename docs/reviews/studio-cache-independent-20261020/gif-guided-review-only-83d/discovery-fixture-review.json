@@ -1,0 +1,11 @@
+{
+  "schema": "keel.independent-public-discovery-test-correction@1",
+  "patchSHA256": "24caf25ec43c59118f5ee914d1dc59a723fce703d3949a3d65ec508daf5e7cec",
+  "beforeSHA256": "3e45dfc2b555d8b6feb6f43b637e5075201905505f6a9188244172cbb73eaebf",
+  "afterSHA256": "ebd45793e8552f6d9570e93d4bac5cd780d6b7d6e2a101559fd8156b51440815",
+  "fixtureCorrectionApproved": true,
+  "sourceApproval": false,
+  "deploymentApproval": false,
+  "scope": "Remove only the exact newly public GET/HEAD static discovery path from the obsolete all-method negative input list. Assertions and all other inputs are byte-identical; reverse exact. New positive GET/HEAD controls and method/private/wildcard negative controls remain.",
+  "remaining": "Separate frozen complete source review and affected tests required; no live authentication bypass or activation authorized."
+}

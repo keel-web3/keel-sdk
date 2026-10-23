@@ -1,0 +1,32 @@
+[
+  {
+    "name": "native-absence",
+    "argv": [
+      "python3",
+      "/private/tmp/keel-mount-order-20261020/docs/reviews/studio-publication-20261020/release/older-input-retention/resume95/native95-cli-absence.test.py"
+    ],
+    "exitCode": 0,
+    "stdoutSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stderrSHA256": "34a82a30511a2175a5286cff0751874e9220ce5fb08cab87b09cc04e220f6b31"
+  },
+  {
+    "name": "native-controls",
+    "argv": [
+      "python3",
+      "/private/tmp/keel-mount-order-20261020/docs/reviews/studio-publication-20261020/release/older-input-retention/resume95/native95-controls.test.py"
+    ],
+    "exitCode": 0,
+    "stdoutSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stderrSHA256": "e6ec182765cd965f2837d8eeaef5a64af48a104f245cd1a0b7281559194c57c1"
+  },
+  {
+    "name": "mount-order",
+    "argv": [
+      "python3",
+      "/private/tmp/keel-mount-order-20261020/docs/reviews/studio-publication-20261020/release/older-input-retention/mount-order.test.py"
+    ],
+    "exitCode": 0,
+    "stdoutSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stderrSHA256": "36e632bbf6589bac8037ace7030ead9f8c8947bdb0f34d0e4b025484e5464ee7"
+  }
+]

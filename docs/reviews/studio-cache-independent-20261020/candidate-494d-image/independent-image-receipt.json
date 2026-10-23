@@ -1,0 +1,31 @@
+{
+  "schema": "keel-independent-exact-image-qualification@1",
+  "imageId": "sha256:494d4677672c3c56e6bfca487c5a1b82a36392d583bc16b71ad485ef646b707e",
+  "startedAt": "2026-10-20T18:24:02.842138+00:00",
+  "elapsedSeconds": 20.90303987497464,
+  "exitCode": 0,
+  "timedOut": false,
+  "ownerCommandOnlyDifference": {
+    "oldName": "keel-routing-3e50-owner-qualification-03",
+    "newName": "keel-routing-3e50-independent-qualification-01"
+  },
+  "commandPath": "/private/tmp/keel-independent-gif-deployed-review-20261020/independent-image-command.json",
+  "commandSHA256": "8653a5c68c58a3c9aee35782ba1edaac3f5188a9b1de24a4a354dfa8dea8398d",
+  "stdout": {
+    "path": "/private/tmp/keel-independent-gif-deployed-review-20261020/independent-image.stdout",
+    "bytes": 3759,
+    "sha256": "d1149e033fa6ef8b4ff694933a8f73bcabdecc0b167af34246354a03f428f96b"
+  },
+  "stderr": {
+    "path": "/private/tmp/keel-independent-gif-deployed-review-20261020/independent-image.stderr",
+    "bytes": 195,
+    "sha256": "5c56529f049919d7aa73172f057e007c55affc71cc6c8501b39eed74c86a69ec"
+  },
+  "timeoutOwnedCleanup": null,
+  "network": "none",
+  "uid": "999:999",
+  "productionStarted": false,
+  "databaseStarted": false,
+  "signing": false,
+  "submission": false
+}

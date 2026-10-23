@@ -1,0 +1,88 @@
+{
+  "schema": "keel.qa-postguard-diagnostic@1",
+  "result": "FAIL_UNCHANGED_STRICT_APPLICATION_GUARD",
+  "errorType": "DeploymentGuardError",
+  "reason": "replacement_configuration_mismatch",
+  "differences": [
+    {
+      "section": "HostConfig",
+      "key": "OomKillDisable",
+      "expectedType": "bool",
+      "actualType": "NoneType",
+      "expectedPresent": true,
+      "actualPresent": true,
+      "expectedSHA256": "fcbcf165908dd18a9e49f7ff27810176db8e9f63b4352213741664245224f8aa",
+      "actualSHA256": "74234e98afe7498fb5daf1f36ac2d78acc339464f950703b8c019892f982b90b",
+      "expected": false,
+      "actual": null
+    }
+  ],
+  "newState": {
+    "Status": "running",
+    "Running": true,
+    "Paused": false,
+    "Restarting": false,
+    "OOMKilled": false,
+    "Dead": false,
+    "Pid": 2755761,
+    "ExitCode": 0,
+    "Error": "",
+    "StartedAt": "2026-10-20T22:00:52.490670377Z",
+    "FinishedAt": "0001-01-01T00:00:00Z",
+    "Health": {
+      "Status": "healthy",
+      "FailingStreak": 0,
+      "Log": [
+        {
+          "Start": "2026-10-20T22:03:14.576066685Z",
+          "End": "2026-10-20T22:03:14.764310589Z",
+          "ExitCode": 0,
+          "Output": ""
+        },
+        {
+          "Start": "2026-10-20T22:03:29.765484244Z",
+          "End": "2026-10-20T22:03:29.967854419Z",
+          "ExitCode": 0,
+          "Output": ""
+        },
+        {
+          "Start": "2026-10-20T22:03:44.969894126Z",
+          "End": "2026-10-20T22:03:45.156949941Z",
+          "ExitCode": 0,
+          "Output": ""
+        },
+        {
+          "Start": "2026-10-20T22:04:00.158016105Z",
+          "End": "2026-10-20T22:04:00.386879011Z",
+          "ExitCode": 0,
+          "Output": ""
+        },
+        {
+          "Start": "2026-10-20T22:04:15.388115038Z",
+          "End": "2026-10-20T22:04:15.576615085Z",
+          "ExitCode": 0,
+          "Output": ""
+        }
+      ]
+    }
+  },
+  "oldState": {
+    "running": false,
+    "status": "exited"
+  },
+  "runnerState": {
+    "Status": "running",
+    "Running": true,
+    "Paused": false,
+    "Restarting": false,
+    "OOMKilled": false,
+    "Dead": false,
+    "Pid": 2755650,
+    "ExitCode": 0,
+    "Error": "",
+    "StartedAt": "2026-10-20T22:00:47.633850086Z",
+    "FinishedAt": "0001-01-01T00:00:00Z"
+  },
+  "durableReceiptSHA256": "e57f7c943b7b4ab3001f813e70a053123cf5462046127ffe1c72dedf3f30df2c",
+  "noMutations": true
+}

@@ -1,0 +1,20 @@
+{
+  "schema": "keel-production-proof-host-review@1",
+  "decision": "APPROVE",
+  "planSha256": "958a073ea9c4f78934f3c5e7f544ceda0288d323554808886e8186d0173c26af",
+  "mode": "factory",
+  "phases": [
+    "execute"
+  ],
+  "blockingFindings": [],
+  "reviewerId": "cache-release-independent-reviewer",
+  "scope": "Exact95/D97 static host source/profile only. Execution requires a separately admitted whole automatic sequence and its dynamically projected independent program review.",
+  "conditions": [
+    "No capture/native execution until whole-sequence conditional admission is frozen.",
+    "One fresh normal GIF program only; no CREATE prefixes, source/header/deadline/fee/nonce/SDK limit overrides.",
+    "All source/profile/late program hashes and original/resource/image/ownership guards remain mandatory."
+  ],
+  "signing": false,
+  "submission": false,
+  "applicationActivation": false
+}

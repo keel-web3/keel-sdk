@@ -1,0 +1,227 @@
+{
+  "schema": "keel.current-image-only-activation-static-proposal@1",
+  "sourceFreeze": null,
+  "root": "/home/ubuntu/keel-studio-image-only-4c0acc2f-67e9-4d8f-92b0-71c9e95e83b5",
+  "candidate": {
+    "siteCommit": "71cb0e31bab5e4ee93af9d3b3185978e46f1fe8e",
+    "sdkCommit": "311d61526284248938e335d7ed879089408933be",
+    "buildId": "jfjIfW1-d41RR-j-i-YgL",
+    "appImageId": "sha256:17cb5aac36536e3d6026ba32b3bb3a66adc04af5bb7207082ee472dce66320c9"
+  },
+  "operatorSHA256": "1c880e9caffa55d868ff2c9930822c9ce97508c33520fc86e95b02ef138a7e4f",
+  "pendingPlanSHA256": "e39978f51efaf177a8ad5b5086dd2d6897e9c1113ab8645ee90d4c4fae43aec6",
+  "createExclusiveRootArgv": [
+    "/usr/bin/ssh",
+    "-o",
+    "BatchMode=yes",
+    "-o",
+    "ConnectTimeout=12",
+    "-o",
+    "StrictHostKeyChecking=yes",
+    "-o",
+    "UserKnownHostsFile=/Users/ravonus/dev/hashers/ops/servers/known_hosts",
+    "ubuntu@40.160.39.155",
+    "sudo -n /usr/bin/python3 -B -c 'import os;from pathlib import Path;r=Path('\"'\"'/home/ubuntu/keel-studio-image-only-4c0acc2f-67e9-4d8f-92b0-71c9e95e83b5'\"'\"');assert r.parent.resolve()==r.parent;os.mkdir(r,0o700);d=os.open(r.parent,os.O_DIRECTORY|os.O_NOFOLLOW);os.fsync(d);os.close(d)'"
+  ],
+  "files": [
+    {
+      "name": "activate-image-only.py",
+      "localPath": "/private/tmp/keel-image-only-release-20261020/docs/reviews/studio-publication-20261020/release/history-prefix311/activate-image-only.py",
+      "bytes": 17126,
+      "sha256": "1c880e9caffa55d868ff2c9930822c9ce97508c33520fc86e95b02ef138a7e4f",
+      "installArgv": [
+        "/usr/bin/ssh",
+        "-o",
+        "BatchMode=yes",
+        "-o",
+        "ConnectTimeout=12",
+        "-o",
+        "StrictHostKeyChecking=yes",
+        "-o",
+        "UserKnownHostsFile=/Users/ravonus/dev/hashers/ops/servers/known_hosts",
+        "ubuntu@40.160.39.155",
+        "sudo -n /usr/bin/python3 -B -c 'import os,stat,hashlib,sys;from pathlib import Path;r=Path('\"'\"'/home/ubuntu/keel-studio-image-only-4c0acc2f-67e9-4d8f-92b0-71c9e95e83b5'\"'\"');s=r.lstat();assert stat.S_ISDIR(s.st_mode)and s.st_uid==0 and stat.S_IMODE(s.st_mode)==0o700 and r.resolve()==r;raw=sys.stdin.buffer.read(17127);assert len(raw)==17126 and hashlib.sha256(raw).hexdigest()=='\"'\"'1c880e9caffa55d868ff2c9930822c9ce97508c33520fc86e95b02ef138a7e4f'\"'\"';f=os.fdopen(os.open(r/'\"'\"'activate-image-only.py'\"'\"',os.O_WRONLY|os.O_CREAT|os.O_EXCL|os.O_NOFOLLOW,0o600),'\"'\"'wb'\"'\"');f.write(raw);f.flush();os.fchmod(f.fileno(),0o444);os.fsync(f.fileno());f.close();d=os.open(r,os.O_DIRECTORY|os.O_NOFOLLOW);os.fsync(d);os.close(d)'"
+      ],
+      "stdinLocalPath": "/private/tmp/keel-image-only-release-20261020/docs/reviews/studio-publication-20261020/release/history-prefix311/activate-image-only.py"
+    },
+    {
+      "name": "reviewed-activation-support.py",
+      "localPath": "/private/tmp/keel-image-only-release-20261020/docs/reviews/studio-publication-20261020/release/history-prefix311/reviewed-activation-support.py",
+      "bytes": 43831,
+      "sha256": "a1594559c2c04159ac94827d0f4f2a991310fb06648379bca6081d5ce6a98de1",
+      "installArgv": [
+        "/usr/bin/ssh",
+        "-o",
+        "BatchMode=yes",
+        "-o",
+        "ConnectTimeout=12",
+        "-o",
+        "StrictHostKeyChecking=yes",
+        "-o",
+        "UserKnownHostsFile=/Users/ravonus/dev/hashers/ops/servers/known_hosts",
+        "ubuntu@40.160.39.155",
+        "sudo -n /usr/bin/python3 -B -c 'import os,stat,hashlib,sys;from pathlib import Path;r=Path('\"'\"'/home/ubuntu/keel-studio-image-only-4c0acc2f-67e9-4d8f-92b0-71c9e95e83b5'\"'\"');s=r.lstat();assert stat.S_ISDIR(s.st_mode)and s.st_uid==0 and stat.S_IMODE(s.st_mode)==0o700 and r.resolve()==r;raw=sys.stdin.buffer.read(43832);assert len(raw)==43831 and hashlib.sha256(raw).hexdigest()=='\"'\"'a1594559c2c04159ac94827d0f4f2a991310fb06648379bca6081d5ce6a98de1'\"'\"';f=os.fdopen(os.open(r/'\"'\"'reviewed-activation-support.py'\"'\"',os.O_WRONLY|os.O_CREAT|os.O_EXCL|os.O_NOFOLLOW,0o600),'\"'\"'wb'\"'\"');f.write(raw);f.flush();os.fchmod(f.fileno(),0o444);os.fsync(f.fileno());f.close();d=os.open(r,os.O_DIRECTORY|os.O_NOFOLLOW);os.fsync(d);os.close(d)'"
+      ],
+      "stdinLocalPath": "/private/tmp/keel-image-only-release-20261020/docs/reviews/studio-publication-20261020/release/history-prefix311/reviewed-activation-support.py"
+    },
+    {
+      "name": "guarded-deployment-checks.py",
+      "localPath": "/private/tmp/keel-image-only-release-20261020/docs/reviews/studio-publication-20261020/release/history-prefix311/guarded-deployment-checks.py",
+      "bytes": 5005,
+      "sha256": "b5f7d764b6c05db503a23ea63ca21a36bfcb0f17cc8292444d790d4a8aad6e00",
+      "installArgv": [
+        "/usr/bin/ssh",
+        "-o",
+        "BatchMode=yes",
+        "-o",
+        "ConnectTimeout=12",
+        "-o",
+        "StrictHostKeyChecking=yes",
+        "-o",
+        "UserKnownHostsFile=/Users/ravonus/dev/hashers/ops/servers/known_hosts",
+        "ubuntu@40.160.39.155",
+        "sudo -n /usr/bin/python3 -B -c 'import os,stat,hashlib,sys;from pathlib import Path;r=Path('\"'\"'/home/ubuntu/keel-studio-image-only-4c0acc2f-67e9-4d8f-92b0-71c9e95e83b5'\"'\"');s=r.lstat();assert stat.S_ISDIR(s.st_mode)and s.st_uid==0 and stat.S_IMODE(s.st_mode)==0o700 and r.resolve()==r;raw=sys.stdin.buffer.read(5006);assert len(raw)==5005 and hashlib.sha256(raw).hexdigest()=='\"'\"'b5f7d764b6c05db503a23ea63ca21a36bfcb0f17cc8292444d790d4a8aad6e00'\"'\"';f=os.fdopen(os.open(r/'\"'\"'guarded-deployment-checks.py'\"'\"',os.O_WRONLY|os.O_CREAT|os.O_EXCL|os.O_NOFOLLOW,0o600),'\"'\"'wb'\"'\"');f.write(raw);f.flush();os.fchmod(f.fileno(),0o444);os.fsync(f.fileno());f.close();d=os.open(r,os.O_DIRECTORY|os.O_NOFOLLOW);os.fsync(d);os.close(d)'"
+      ],
+      "stdinLocalPath": "/private/tmp/keel-image-only-release-20261020/docs/reviews/studio-publication-20261020/release/history-prefix311/guarded-deployment-checks.py"
+    },
+    {
+      "name": "candidate-oom-default.py",
+      "localPath": "/private/tmp/keel-image-only-release-20261020/docs/reviews/studio-publication-20261020/release/history-prefix311/candidate-oom-default.py",
+      "bytes": 2033,
+      "sha256": "6621ff48fc02057d98d91ef5fd71e6e30eeea1ef847149170e316d9725e77c73",
+      "installArgv": [
+        "/usr/bin/ssh",
+        "-o",
+        "BatchMode=yes",
+        "-o",
+        "ConnectTimeout=12",
+        "-o",
+        "StrictHostKeyChecking=yes",
+        "-o",
+        "UserKnownHostsFile=/Users/ravonus/dev/hashers/ops/servers/known_hosts",
+        "ubuntu@40.160.39.155",
+        "sudo -n /usr/bin/python3 -B -c 'import os,stat,hashlib,sys;from pathlib import Path;r=Path('\"'\"'/home/ubuntu/keel-studio-image-only-4c0acc2f-67e9-4d8f-92b0-71c9e95e83b5'\"'\"');s=r.lstat();assert stat.S_ISDIR(s.st_mode)and s.st_uid==0 and stat.S_IMODE(s.st_mode)==0o700 and r.resolve()==r;raw=sys.stdin.buffer.read(2034);assert len(raw)==2033 and hashlib.sha256(raw).hexdigest()=='\"'\"'6621ff48fc02057d98d91ef5fd71e6e30eeea1ef847149170e316d9725e77c73'\"'\"';f=os.fdopen(os.open(r/'\"'\"'candidate-oom-default.py'\"'\"',os.O_WRONLY|os.O_CREAT|os.O_EXCL|os.O_NOFOLLOW,0o600),'\"'\"'wb'\"'\"');f.write(raw);f.flush();os.fchmod(f.fileno(),0o444);os.fsync(f.fileno());f.close();d=os.open(r,os.O_DIRECTORY|os.O_NOFOLLOW);os.fsync(d);os.close(d)'"
+      ],
+      "stdinLocalPath": "/private/tmp/keel-image-only-release-20261020/docs/reviews/studio-publication-20261020/release/history-prefix311/candidate-oom-default.py"
+    },
+    {
+      "name": "snapshot-supervisor.cjs",
+      "localPath": "/private/tmp/keel-image-only-release-20261020/docs/reviews/studio-publication-20261020/release/history-prefix311/snapshot-supervisor.cjs",
+      "bytes": 3386,
+      "sha256": "5d8d56588eba290773961d74152baf3728ffd2e00a75894beed92d38af06706e",
+      "installArgv": [
+        "/usr/bin/ssh",
+        "-o",
+        "BatchMode=yes",
+        "-o",
+        "ConnectTimeout=12",
+        "-o",
+        "StrictHostKeyChecking=yes",
+        "-o",
+        "UserKnownHostsFile=/Users/ravonus/dev/hashers/ops/servers/known_hosts",
+        "ubuntu@40.160.39.155",
+        "sudo -n /usr/bin/python3 -B -c 'import os,stat,hashlib,sys;from pathlib import Path;r=Path('\"'\"'/home/ubuntu/keel-studio-image-only-4c0acc2f-67e9-4d8f-92b0-71c9e95e83b5'\"'\"');s=r.lstat();assert stat.S_ISDIR(s.st_mode)and s.st_uid==0 and stat.S_IMODE(s.st_mode)==0o700 and r.resolve()==r;raw=sys.stdin.buffer.read(3387);assert len(raw)==3386 and hashlib.sha256(raw).hexdigest()=='\"'\"'5d8d56588eba290773961d74152baf3728ffd2e00a75894beed92d38af06706e'\"'\"';f=os.fdopen(os.open(r/'\"'\"'snapshot-supervisor.cjs'\"'\"',os.O_WRONLY|os.O_CREAT|os.O_EXCL|os.O_NOFOLLOW,0o600),'\"'\"'wb'\"'\"');f.write(raw);f.flush();os.fchmod(f.fileno(),0o444);os.fsync(f.fileno());f.close();d=os.open(r,os.O_DIRECTORY|os.O_NOFOLLOW);os.fsync(d);os.close(d)'"
+      ],
+      "stdinLocalPath": "/private/tmp/keel-image-only-release-20261020/docs/reviews/studio-publication-20261020/release/history-prefix311/snapshot-supervisor.cjs"
+    },
+    {
+      "name": "actual-host-build-receipt.json",
+      "localPath": "/private/tmp/keel-71cb-host-image-build-actual-20261021/durable-build-receipt.stdout",
+      "bytes": 6760,
+      "sha256": "b7d273249cb1f278ab67d9f73a1ad4b85eb46f0da59fa052e5149dc24ef7f427",
+      "installArgv": [
+        "/usr/bin/ssh",
+        "-o",
+        "BatchMode=yes",
+        "-o",
+        "ConnectTimeout=12",
+        "-o",
+        "StrictHostKeyChecking=yes",
+        "-o",
+        "UserKnownHostsFile=/Users/ravonus/dev/hashers/ops/servers/known_hosts",
+        "ubuntu@40.160.39.155",
+        "sudo -n /usr/bin/python3 -B -c 'import os,stat,hashlib,sys;from pathlib import Path;r=Path('\"'\"'/home/ubuntu/keel-studio-image-only-4c0acc2f-67e9-4d8f-92b0-71c9e95e83b5'\"'\"');s=r.lstat();assert stat.S_ISDIR(s.st_mode)and s.st_uid==0 and stat.S_IMODE(s.st_mode)==0o700 and r.resolve()==r;raw=sys.stdin.buffer.read(6761);assert len(raw)==6760 and hashlib.sha256(raw).hexdigest()=='\"'\"'b7d273249cb1f278ab67d9f73a1ad4b85eb46f0da59fa052e5149dc24ef7f427'\"'\"';f=os.fdopen(os.open(r/'\"'\"'actual-host-build-receipt.json'\"'\"',os.O_WRONLY|os.O_CREAT|os.O_EXCL|os.O_NOFOLLOW,0o600),'\"'\"'wb'\"'\"');f.write(raw);f.flush();os.fchmod(f.fileno(),0o444);os.fsync(f.fileno());f.close();d=os.open(r,os.O_DIRECTORY|os.O_NOFOLLOW);os.fsync(d);os.close(d)'"
+      ],
+      "stdinLocalPath": "/private/tmp/keel-71cb-host-image-build-actual-20261021/durable-build-receipt.stdout"
+    },
+    {
+      "name": "activation-plan.pending.json",
+      "localPath": "/private/tmp/keel-image-only-release-20261020/docs/reviews/studio-publication-20261020/release/history-prefix311/activation-plan.pending.json",
+      "bytes": 3733,
+      "sha256": "e39978f51efaf177a8ad5b5086dd2d6897e9c1113ab8645ee90d4c4fae43aec6",
+      "installArgv": [
+        "/usr/bin/ssh",
+        "-o",
+        "BatchMode=yes",
+        "-o",
+        "ConnectTimeout=12",
+        "-o",
+        "StrictHostKeyChecking=yes",
+        "-o",
+        "UserKnownHostsFile=/Users/ravonus/dev/hashers/ops/servers/known_hosts",
+        "ubuntu@40.160.39.155",
+        "sudo -n /usr/bin/python3 -B -c 'import os,stat,hashlib,sys;from pathlib import Path;r=Path('\"'\"'/home/ubuntu/keel-studio-image-only-4c0acc2f-67e9-4d8f-92b0-71c9e95e83b5'\"'\"');s=r.lstat();assert stat.S_ISDIR(s.st_mode)and s.st_uid==0 and stat.S_IMODE(s.st_mode)==0o700 and r.resolve()==r;raw=sys.stdin.buffer.read(3734);assert len(raw)==3733 and hashlib.sha256(raw).hexdigest()=='\"'\"'e39978f51efaf177a8ad5b5086dd2d6897e9c1113ab8645ee90d4c4fae43aec6'\"'\"';f=os.fdopen(os.open(r/'\"'\"'activation-plan.pending.json'\"'\"',os.O_WRONLY|os.O_CREAT|os.O_EXCL|os.O_NOFOLLOW,0o600),'\"'\"'wb'\"'\"');f.write(raw);f.flush();os.fchmod(f.fileno(),0o444);os.fsync(f.fileno());f.close();d=os.open(r,os.O_DIRECTORY|os.O_NOFOLLOW);os.fsync(d);os.close(d)'"
+      ],
+      "stdinLocalPath": "/private/tmp/keel-image-only-release-20261020/docs/reviews/studio-publication-20261020/release/history-prefix311/activation-plan.pending.json"
+    }
+  ],
+  "flagsRemainFalse": {
+    "independentQA": false,
+    "independentReleaseReview": false,
+    "leadExecuteApproved": false
+  },
+  "unusedNames": [
+    "keel-studio-candidate-4c0acc2f-67e9-4d8f-92b0-71c9e95e83b5",
+    "keel-studio-rollback-4c0acc2f-67e9-4d8f-92b0-71c9e95e83b5",
+    "keel-studio-failed-4c0acc2f-67e9-4d8f-92b0-71c9e95e83b5"
+  ],
+  "notYetGenerated": [
+    "qa-final.json",
+    "releaseReview-final.json",
+    "activation-plan.final.json"
+  ],
+  "finalPlanRecipe": "/private/tmp/keel-image-only-release-20261020/docs/reviews/studio-publication-20261020/release/history-prefix311/final-activation.actual17cb.binding.recipe.pending.json",
+  "readOnlyPreflightArgvAfterFinalReview": [
+    "/usr/bin/ssh",
+    "-o",
+    "BatchMode=yes",
+    "-o",
+    "ConnectTimeout=12",
+    "-o",
+    "StrictHostKeyChecking=yes",
+    "-o",
+    "UserKnownHostsFile=/Users/ravonus/dev/hashers/ops/servers/known_hosts",
+    "ubuntu@40.160.39.155",
+    "sudo -n /usr/bin/python3 -B /home/ubuntu/keel-studio-image-only-4c0acc2f-67e9-4d8f-92b0-71c9e95e83b5/activate-image-only.py /home/ubuntu/keel-studio-image-only-4c0acc2f-67e9-4d8f-92b0-71c9e95e83b5/activation-plan.final.json"
+  ],
+  "executeArgvTemplateAfterExactLeadAndReviewerAdmission": [
+    "/usr/bin/ssh",
+    "-o",
+    "BatchMode=yes",
+    "-o",
+    "ConnectTimeout=12",
+    "-o",
+    "StrictHostKeyChecking=yes",
+    "-o",
+    "UserKnownHostsFile=/Users/ravonus/dev/hashers/ops/servers/known_hosts",
+    "ubuntu@40.160.39.155",
+    "sudo -n /usr/bin/python3 -B /home/ubuntu/keel-studio-image-only-4c0acc2f-67e9-4d8f-92b0-71c9e95e83b5/activate-image-only.py /home/ubuntu/keel-studio-image-only-4c0acc2f-67e9-4d8f-92b0-71c9e95e83b5/activation-plan.final.json --execute-approved-sha256 __EXACT_FINAL_PLAN_SHA256__"
+  ],
+  "productionActivationAdmitted": false,
+  "authorHostActions": false,
+  "cleanupApproved": false,
+  "retryConsumedPriorScope": false,
+  "verifyStaticSevenArgv": [
+    "/usr/bin/ssh",
+    "-o",
+    "BatchMode=yes",
+    "-o",
+    "ConnectTimeout=12",
+    "-o",
+    "StrictHostKeyChecking=yes",
+    "-o",
+    "UserKnownHostsFile=/Users/ravonus/dev/hashers/ops/servers/known_hosts",
+    "ubuntu@40.160.39.155",
+    "sudo -n /usr/bin/python3 -B -c 'import os,stat,json,hashlib;from pathlib import Path;r=Path('\"'\"'/home/ubuntu/keel-studio-image-only-4c0acc2f-67e9-4d8f-92b0-71c9e95e83b5'\"'\"');assert r.resolve()==r and r.stat().st_uid==0 and stat.S_IMODE(r.stat().st_mode)==0o700;expected={'\"'\"'activate-image-only.py'\"'\"': [17126, '\"'\"'1c880e9caffa55d868ff2c9930822c9ce97508c33520fc86e95b02ef138a7e4f'\"'\"'], '\"'\"'reviewed-activation-support.py'\"'\"': [43831, '\"'\"'a1594559c2c04159ac94827d0f4f2a991310fb06648379bca6081d5ce6a98de1'\"'\"'], '\"'\"'guarded-deployment-checks.py'\"'\"': [5005, '\"'\"'b5f7d764b6c05db503a23ea63ca21a36bfcb0f17cc8292444d790d4a8aad6e00'\"'\"'], '\"'\"'candidate-oom-default.py'\"'\"': [2033, '\"'\"'6621ff48fc02057d98d91ef5fd71e6e30eeea1ef847149170e316d9725e77c73'\"'\"'], '\"'\"'snapshot-supervisor.cjs'\"'\"': [3386, '\"'\"'5d8d56588eba290773961d74152baf3728ffd2e00a75894beed92d38af06706e'\"'\"'], '\"'\"'actual-host-build-receipt.json'\"'\"': [6760, '\"'\"'b7d273249cb1f278ab67d9f73a1ad4b85eb46f0da59fa052e5149dc24ef7f427'\"'\"'], '\"'\"'activation-plan.pending.json'\"'\"': [3733, '\"'\"'e39978f51efaf177a8ad5b5086dd2d6897e9c1113ab8645ee90d4c4fae43aec6'\"'\"']}\nfor name,(n,h) in expected.items():\n p=r/name;s=p.lstat();assert stat.S_ISREG(s.st_mode)and s.st_uid==0 and s.st_nlink==1 and stat.S_IMODE(s.st_mode)==0o444 and s.st_size==n and hashlib.sha256(p.read_bytes()).hexdigest()==h\np=json.loads((r/'\"'\"'activation-plan.pending.json'\"'\"').read_bytes());assert all(v is False for v in p['\"'\"'approval'\"'\"'].values());assert not any((r/n).exists()for n in ['\"'\"'activation-consumed.json'\"'\"','\"'\"'activation-receipt.json'\"'\"','\"'\"'activation-plan.final.json'\"'\"']);print(json.dumps({'\"'\"'result'\"'\"':'\"'\"'PASS_STATIC_SEVEN_ONLY'\"'\"','\"'\"'files'\"'\"':len(expected),'\"'\"'approvalFlagsFalse'\"'\"':True,'\"'\"'activation'\"'\"':False}))'"
+  ]
+}

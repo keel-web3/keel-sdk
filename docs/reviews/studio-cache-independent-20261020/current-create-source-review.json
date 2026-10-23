@@ -1,0 +1,31 @@
+{
+  "schema": "independent-current-create-source-review@1",
+  "decision": "APPROVE_EXACT_IMPORT_AND_HOST_PROFILE_ONLY",
+  "sourceFreeze": "a2a3fc18f8a0230732fa36fcca6943c392987586",
+  "reviewerId": "cache-release-independent-reviewer",
+  "blockingFindings": [],
+  "nativeImportReview": "current-create-native-import-review.json",
+  "hostReview": "current-create-host-review.json",
+  "sourceChecks": [
+    "Native importer authenticates the successful retained ff b6 import source, plan and exact durable receipt before reusing its reviewed loader and complete original-service guard chain.",
+    "Native import takes the rollout lock, validates retained FE944 and d97 images, requires selected 481 absent, reserves full raw archive plus expansion plus 1 GiB and 256 MiB, exclusively consumes before load, and enforces a 180 second alarm.",
+    "Exact stream bytes/hash and full image RootFS/Config are verified; strong original before/after and retained images are checked on failure as well as success, followed by durable receipt.",
+    "All 21 host function ASTs and complete identity module equal the qualified cache profile; driver differs from current64e by exactly manifest and executor hashes.",
+    "Native archive is independently recursively verified: nine blobs, three layer hashes, executor 3f9c and unchanged broker 9936; actual daemon Config includes four null defaults.",
+    "Executor staging mode 0444 is intentional read/hash evidence; actual executor is inside selected 481 image and runtime UID remains 999:999.",
+    "Native public program has strict three-call bytes/nonces/gas and fees, no overrides/signing/submission, fixed approved pinned proof state, one native execution, exact successful return runtime hashes and gas bounds.",
+    "Fresh dynamic plan, actual canonical age and exact request require separate independent program admission; old consumed public RPC READ_TIMEOUT is preserved."
+  ],
+  "validation": {
+    "artifactProofSHA256": "ba46f469c248d1e0fd48ce3733e00a81821b1ec3a87edc1f24eb56aeb1dc91c3",
+    "hostControls": 23,
+    "hostControlsLogSHA256": "acd7463507aa2d0f15e5ac782b3cdcb3ae89877c3de9fdca4e0f0e3a2933e9b0"
+  },
+  "remainingGates": [
+    "Fresh current public-state three-CREATE plan admission and actual native proof; this review is not execution proof.",
+    "Mandatory exact original GIF qualification and independent full release acceptance remain open.",
+    "Final activation plan is still pending with approvals false; d7 implementation approval is source only.",
+    "Exact own-Juniper Gator deployed UI unsigned wallet boundary, historical 200 read-back/decode/canvas and other mandatory release gates are not waived."
+  ],
+  "hostActionsByReviewer": false
+}

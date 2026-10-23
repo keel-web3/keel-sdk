@@ -1,0 +1,139 @@
+{
+  "schema": "keel.independent-image95-harness-review@1",
+  "decision": "APPROVE_EXACT_TEST_HARNESS_CORRECTIONS_ONLY",
+  "proposalSourceCommit": "f5c86e93625f690373482ce2644ee6d3dfd55460",
+  "proposalEvidenceCommit": "2dbe2509ea22f7139a0bb9548aa814c90d9e935f",
+  "image": "sha256:95bdda05a7596553251e9d4ba9fe72758abc5137fcb661efed80ca94ab5e6bcb",
+  "patches": [
+    {
+      "file": "qualify-final-image.mjs",
+      "oldSHA256": "9c61e6f5283c31b02d4c76a5fd0dd0a886fe788631898fe519cbd5af5e34776d",
+      "patchSHA256": "c924eb833f3ca2efafa8d0e734be47b7017fa87d1d4e0fabf9e1d48c5a09083a",
+      "proposedSHA256": "9a74cb0f583058b96a3beb322721478670decfdca746021dd813ea26cf72c53e",
+      "patchStdout": "patching file qualify-final-image.mjs\n"
+    },
+    {
+      "file": "discovery-http.mjs",
+      "oldSHA256": "0de71c6cb7590e37a777d4ef4f125297e47b7bf50357f8c5ecccd3fe5190e30e",
+      "patchSHA256": "c9271a4dcb3a3d3bc083775149cf93a01789df42cd12281a530d5018253ae2bc",
+      "proposedSHA256": "7ba994e0fc31f79f345e23a20428cd792fecdabc03b1ff326032d312b8af8974",
+      "patchStdout": "patching file discovery-http.mjs\n"
+    }
+  ],
+  "independentChecks": {
+    "patchesAppliedOnlyToReviewerTemporaryCopies": true,
+    "workerLineAnd64StatementMultisetsByteIdentical": true,
+    "workerAssertCallsUnchanged": 32,
+    "httpAssertCallsUnchanged": 15,
+    "startupControlCases": 11,
+    "result": {
+      "path": "/Users/ravonus/dev/wt/studio-cache-independent-review-20261020/docs/reviews/studio-cache-independent-20261020/image95-harness-f5c86/controls-result.json",
+      "bytes": 3034,
+      "sha256": "0053b7f2899e29c80b3660f84b155af28262a894ca01a48079e694e9890a8249"
+    }
+  },
+  "reason": {
+    "worker": "The independent worker import probe has no dependency on media-capability, sharp or codec results. Moving its exact statements ahead of those allocations avoids retaining capability buffers during a separate child process. Every test and resulting PASS condition remains required.",
+    "http": "The first health request can time out during cold startup. Only an actual DOMException named TimeoutError joins existing ECONNREFUSED as startup-transient. Remaining-budget clamping retains the original 30000ms startup window and 5000ms per-request maximum. Non-readiness errors are not retried."
+  },
+  "unchanged": {
+    "memoryBytes": 805306368,
+    "cpuCount": 2,
+    "workerTimeoutMs": 20000,
+    "httpStartupMs": 30000,
+    "httpPerRequestMaxMs": 5000,
+    "httpOuterKillMs": 45000,
+    "httpShutdownMs": 2000,
+    "uid": 999,
+    "readOnly": true,
+    "network": "none",
+    "imageSourceOrReferencesChanged": false
+  },
+  "authorDiagnosticReceiptsReadNotIndependentlyRerun": [
+    {
+      "path": "/Users/ravonus/dev/wt/studio-image-qualification-diagnostics-20261020/keel-site/docs/reviews/studio-publication-20261020/image-qualification-diagnostics/runs/keel-image-diagnostic-new-full-45340b6f/result.json",
+      "bytes": 1023,
+      "sha256": "09a7329da0e80b01927908e08a21c867f9469195cf3fc25c53f7b35859c2ef3f"
+    },
+    {
+      "path": "/Users/ravonus/dev/wt/studio-image-qualification-diagnostics-20261020/keel-site/docs/reviews/studio-publication-20261020/image-qualification-diagnostics/runs/keel-image-diagnostic-worker-only-b3bda4cd/result.json",
+      "bytes": 1028,
+      "sha256": "be73b7204d7182a5816613398432c8fc6985f4e19ef8a7f37d036b0d3285d891"
+    },
+    {
+      "path": "/Users/ravonus/dev/wt/studio-image-qualification-diagnostics-20261020/keel-site/docs/reviews/studio-publication-20261020/image-qualification-diagnostics/runs/keel-image-diagnostic-new-http-52d5db55/result.json",
+      "bytes": 1021,
+      "sha256": "f0e93fa3186f2b3f992bb8a83ee853d6a9bd697aac57ec03c2fac4bd8805ef95"
+    },
+    {
+      "path": "/Users/ravonus/dev/wt/studio-image-qualification-diagnostics-20261020/keel-site/docs/reviews/studio-publication-20261020/image-qualification-diagnostics/runs/keel-image-diagnostic-old-http-cf7f1466/result.json",
+      "bytes": 1021,
+      "sha256": "b8f1c09ee9bca6645938f375f2d83c93c695fc5cdcfaf8239390b3ce3b4c5b3a"
+    },
+    {
+      "path": "/Users/ravonus/dev/wt/studio-image-qualification-diagnostics-20261020/keel-site/docs/reviews/studio-publication-20261020/image-qualification-diagnostics/runs/keel-image-diagnostic-old-http-4e215cd8/result.json",
+      "bytes": 1022,
+      "sha256": "6224304427b503a21b7a7bf04c6887850290500a1f5d6140467ac80245cccafd"
+    }
+  ],
+  "preservePriorFailures": [
+    "Original image95 OOM at unchanged 768MiB",
+    "Original new-image and old-image cold HTTP TimeoutError controls"
+  ],
+  "scopeExclusions": {
+    "independentImageQualificationPerformedThisReview": false,
+    "httpGatePassClaim": false,
+    "productionMemoryCapacityClaim": false,
+    "hostImportApproved": false,
+    "cleanupApproved": false,
+    "activationApproved": false,
+    "publicationApproved": false
+  },
+  "evidence": [
+    {
+      "path": "/Users/ravonus/dev/wt/studio-cache-independent-review-20261020/docs/reviews/studio-cache-independent-20261020/image95-harness-f5c86/qualify-final-image.mjs.before",
+      "bytes": 6384,
+      "sha256": "9c61e6f5283c31b02d4c76a5fd0dd0a886fe788631898fe519cbd5af5e34776d"
+    },
+    {
+      "path": "/Users/ravonus/dev/wt/studio-cache-independent-review-20261020/docs/reviews/studio-cache-independent-20261020/image95-harness-f5c86/qualify-final-image.mjs",
+      "bytes": 6384,
+      "sha256": "9a74cb0f583058b96a3beb322721478670decfdca746021dd813ea26cf72c53e"
+    },
+    {
+      "path": "/Users/ravonus/dev/wt/studio-cache-independent-review-20261020/docs/reviews/studio-cache-independent-20261020/image95-harness-f5c86/discovery-http.mjs.before",
+      "bytes": 3744,
+      "sha256": "0de71c6cb7590e37a777d4ef4f125297e47b7bf50357f8c5ecccd3fe5190e30e"
+    },
+    {
+      "path": "/Users/ravonus/dev/wt/studio-cache-independent-review-20261020/docs/reviews/studio-cache-independent-20261020/image95-harness-f5c86/discovery-http.mjs",
+      "bytes": 3953,
+      "sha256": "7ba994e0fc31f79f345e23a20428cd792fecdabc03b1ff326032d312b8af8974"
+    },
+    {
+      "path": "/Users/ravonus/dev/wt/studio-cache-independent-review-20261020/docs/reviews/studio-cache-independent-20261020/image95-harness-f5c86/worker-before-media.UNAPPLIED.patch",
+      "bytes": 5616,
+      "sha256": "c924eb833f3ca2efafa8d0e734be47b7017fa87d1d4e0fabf9e1d48c5a09083a"
+    },
+    {
+      "path": "/Users/ravonus/dev/wt/studio-cache-independent-review-20261020/docs/reviews/studio-cache-independent-20261020/image95-harness-f5c86/http-startup-budget.UNAPPLIED.patch",
+      "bytes": 2140,
+      "sha256": "c9271a4dcb3a3d3bc083775149cf93a01789df42cd12281a530d5018253ae2bc"
+    },
+    {
+      "path": "/Users/ravonus/dev/wt/studio-cache-independent-review-20261020/docs/reviews/studio-cache-independent-20261020/image95-harness-f5c86/patch-reconstruction.json",
+      "bytes": 735,
+      "sha256": "b2b1da82233ba03c3a0d5e38c9d1afa47ce7bcac141625c22adedad6e0587270"
+    },
+    {
+      "path": "/Users/ravonus/dev/wt/studio-cache-independent-review-20261020/docs/reviews/studio-cache-independent-20261020/image95-harness-f5c86/review-controls.cjs",
+      "bytes": 5330,
+      "sha256": "b05107c318340ac285c90efc9f16c1284606dc2503fca7bccc2d592d602fffe0"
+    },
+    {
+      "path": "/Users/ravonus/dev/wt/studio-cache-independent-review-20261020/docs/reviews/studio-cache-independent-20261020/image95-harness-f5c86/controls-result.json",
+      "bytes": 3034,
+      "sha256": "0053b7f2899e29c80b3660f84b155af28262a894ca01a48079e694e9890a8249"
+    }
+  ]
+}

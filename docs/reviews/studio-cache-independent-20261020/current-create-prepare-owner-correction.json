@@ -1,0 +1,13 @@
+{
+  "schema": "independent-prepare-admission-owner-correction@1",
+  "initialAdmissionSHA256": "935af0f77a16cddf410c58bb0fa2d8581ad85ca87d2d7fdb0fc8098b84fbed35",
+  "successorAdmissionSHA256": "d258b5a3ed9fccf4dfda812ab3650ccf0c4e89c062973ac48d9f99ec27688fb4",
+  "onlyChange": "executionUID:0 -> 501",
+  "reason": "Reviewer readiness assumption was incorrect; fresh lstat verifies base UID501/GID0 mode0700 and caller euid501/egid20.",
+  "sourceOrBoundsChanged": false,
+  "newOutputAbsent": true,
+  "consumedClaimUnchanged": true,
+  "parentReportedAttempt": "Stager stopped before prepare; sudo -n required password and was not retried. No RPC or new capture occurred.",
+  "authorization": "Normal owner execution; no elevated approval or bypass requested.",
+  "reviewerObservation": "Read-only lstat/geteuid/getegid/claim SHA verified immediately before correction."
+}

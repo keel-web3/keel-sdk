@@ -1,0 +1,10 @@
+{
+  "originalReviewerScriptSHA256": "e8e7663bb6ac2feedda3afa3bd5bd44c0318432f3caacd608b1c206161ed7c4f",
+  "operatorSHA256": "028905e213821a2d75327cc6748f2a7121d5b521dac93095213d187d59ad4af8",
+  "changes": [
+    "frozenSourcePath",
+    "exactSourceSHA256",
+    "newEvidenceOutputDirectory"
+  ],
+  "assertionsUnchanged": true
+}

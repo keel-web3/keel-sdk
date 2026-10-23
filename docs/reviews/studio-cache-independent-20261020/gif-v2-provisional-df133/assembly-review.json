@@ -1,0 +1,20 @@
+{
+  "schema": "keel-reviewed-gif-existing-v2-provisional-capture@1",
+  "approved": true,
+  "packetSHA256": "eb40a93faf886dd13ee0a902606f96b7da1db7cb34043c8662838f88828d8cb7",
+  "bundleReceiptSHA256": "14fe18281be138e9c3553776c9b7020f698cbd5d882d3cbd415c9656f4075f29",
+  "bundleSHA256": "b90bccc1347c646867b3def3229677dc66803967662431c0b09fbb53dd2ea8e2",
+  "sourceInputsSHA256": "d212f3e153cef8521e5d6f1d0845756211904569bec9f3f8898cd017377a0f09",
+  "toolFilesSHA256": "fc9f11386ca296c7055e10b6928db1f27189ef1253f1b5eb37f052ecc2da9b08",
+  "sdkBuiltTreeSHA256": "3effa2f2e594fe969f592d9446b5095484adf358033c76b83349385956c69df8",
+  "prefixMode": "none-existing-deployments",
+  "prefixTransactions": 0,
+  "allowCompilerAssembly": true,
+  "allowLocalCandidateRenewal": false,
+  "allowReadOnlyExistingCandidateCapture": true,
+  "allowUnacceptedPrivateCaptureDiagnostic": true,
+  "allowRemoteSimulation": false,
+  "allowPrivateProgramExecution": false,
+  "allowSigning": false,
+  "allowSubmission": false
+}

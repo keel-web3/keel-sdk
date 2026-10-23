@@ -1,0 +1,406 @@
+TAP version 13
+# Subtest: slow server progress renders stages, known calls and retry countdown; duplicate cancel clicks do not repeat mutations
+ok 1 - slow server progress renders stages, known calls and retry countdown; duplicate cancel clicks do not repeat mutations
+  ---
+  duration_ms: 34.247416
+  type: 'test'
+  ...
+# Subtest: reconnect reads saved progress without replaying Publish and stale release responses are rejected
+ok 2 - reconnect reads saved progress without replaying Publish and stale release responses are rejected
+  ---
+  duration_ms: 6.136209
+  type: 'test'
+  ...
+# Subtest: a delayed cancellation acknowledgement cannot abort a different release or revision
+ok 3 - a delayed cancellation acknowledgement cannot abort a different release or revision
+  ---
+  duration_ms: 8.776208
+  type: 'test'
+  ...
+# Subtest: a check that finishes during cancellation reconnects without aborting a prepared flow
+ok 4 - a check that finishes during cancellation reconnects without aborting a prepared flow
+  ---
+  duration_ms: 9.237292
+  type: 'test'
+  ...
+# Subtest: status 429 disables duplicate reconnects until the complete Retry-After lower bound
+ok 5 - status 429 disables duplicate reconnects until the complete Retry-After lower bound
+  ---
+  duration_ms: 4.207917
+  type: 'test'
+  ...
+# Subtest: a late same-binding cancellation keeps the controller captured when cancellation began
+ok 6 - a late same-binding cancellation keeps the controller captured when cancellation began
+  ---
+  duration_ms: 11.918542
+  type: 'test'
+  ...
+# Subtest: atomic batch progress stays indeterminate until returned results are validated in that phase
+ok 7 - atomic batch progress stays indeterminate until returned results are validated in that phase
+  ---
+  duration_ms: 4.153667
+  type: 'test'
+  ...
+# Subtest: reload resumes recorded phase counters and exposes the last error and heartbeat without repeating Publish
+ok 8 - reload resumes recorded phase counters and exposes the last error and heartbeat without repeating Publish
+  ---
+  duration_ms: 5.5495
+  type: 'test'
+  ...
+# Subtest: candidate-bound capacity failure displays exact reported gas with unknown returned gas and no wallet request
+ok 9 - candidate-bound capacity failure displays exact reported gas with unknown returned gas and no wallet request
+  ---
+  duration_ms: 5.437792
+  type: 'test'
+  ...
+# Subtest: a candidate switch cannot cancel the previous trace while the new status read is pending
+ok 10 - a candidate switch cannot cancel the previous trace while the new status read is pending
+  ---
+  duration_ms: 6.344292
+  type: 'test'
+  ...
+# Subtest: slow operations show actual stage and elapsed time with no invented percentage or call total
+ok 11 - slow operations show actual stage and elapsed time with no invented percentage or call total
+  ---
+  duration_ms: 0.730792
+  type: 'test'
+  ...
+# Subtest: atomic dependent simulation never turns estimated totals or stale prefixes into a progress bar
+ok 12 - atomic dependent simulation never turns estimated totals or stale prefixes into a progress bar
+  ---
+  duration_ms: 0.110917
+  type: 'test'
+  ...
+# Subtest: only explicitly reported parts or chunks are shown, and invalid progress is rejected
+ok 13 - only explicitly reported parts or chunks are shown, and invalid progress is rejected
+  ---
+  duration_ms: 0.311792
+  type: 'test'
+  ...
+# Subtest: retrying an unchanged saved failed check preserves its exact release revision and retained media
+ok 14 - retrying an unchanged saved failed check preserves its exact release revision and retained media
+  ---
+  duration_ms: 0.128459
+  type: 'test'
+  ...
+# Subtest: different releases, revisions and invalid counts never produce accepted progress
+ok 15 - different releases, revisions and invalid counts never produce accepted progress
+  ---
+  duration_ms: 0.792583
+  type: 'test'
+  ...
+# Subtest: duplicate clicks share one status read and no Publish mutation
+ok 16 - duplicate clicks share one status read and no Publish mutation
+  ---
+  duration_ms: 13.4065
+  type: 'test'
+  ...
+# Subtest: cancelled slow reads cannot overwrite current progress
+ok 17 - cancelled slow reads cannot overwrite current progress
+  ---
+  duration_ms: 0.277833
+  type: 'test'
+  ...
+# Subtest: auth errors and 429 are returned to the polling policy without repeating requests
+ok 18 - auth errors and 429 are returned to the polling policy without repeating requests
+  ---
+  duration_ms: 0.546542
+  type: 'test'
+  ...
+# Subtest: candidate identity and safe capacity are validated before displaying a saved check
+ok 19 - candidate identity and safe capacity are validated before displaying a saved check
+  ---
+  duration_ms: 0.429208
+  type: 'test'
+  ...
+# Subtest: guided release: sections, cards, a follow-up that only appears when it applies, and a Continue that says why it waits
+ok 20 - guided release: sections, cards, a follow-up that only appears when it applies, and a Continue that says why it waits
+  ---
+  duration_ms: 70.668792
+  type: 'test'
+  ...
+# Subtest: price screen keeps limits and timing under Advanced options, shows Studio's starting values, and confirms them on Continue
+ok 21 - price screen keeps limits and timing under Advanced options, shows Studio's starting values, and confirms them on Continue
+  ---
+  duration_ms: 53.6375
+  type: 'test'
+  ...
+# Subtest: earlier steps can be revisited, later ones cannot, and the review step is never a navigation button
+ok 22 - earlier steps can be revisited, later ones cannot, and the review step is never a navigation button
+  ---
+  duration_ms: 30.192542
+  type: 'test'
+  ...
+# Subtest: saved defaults are labelled, survive Continue untouched, and can be reset
+ok 23 - saved defaults are labelled, survive Continue untouched, and can be reset
+  ---
+  duration_ms: 78.6825
+  type: 'test'
+  ...
+# Subtest: changing the edition after clearing a box does not leave an unsendable answer that blocks Continue
+ok 24 - changing the edition after clearing a box does not leave an unsendable answer that blocks Continue
+  ---
+  duration_ms: 51.426375
+  type: 'test'
+  ...
+# Subtest: a cleared limit stays empty and says what is needed; Studio's starting value only fills a box nobody touched
+ok 25 - a cleared limit stays empty and says what is needed; Studio's starting value only fills a box nobody touched
+  ---
+  duration_ms: 23.809958
+  type: 'test'
+  ...
+# Subtest: an invite-only release points to the invite list; a public one does not
+ok 26 - an invite-only release points to the invite list; a public one does not
+  ---
+  duration_ms: 18.193583
+  type: 'test'
+  ...
+# Subtest: real plan exposes the retained failed phase and exact private download after reload with GET-only observation
+ok 27 - real plan exposes the retained failed phase and exact private download after reload with GET-only observation
+  ---
+  duration_ms: 55.029917
+  type: 'test'
+  ...
+# Subtest: running review and failed response retain saved diagnostics; reconnect never repeats the original POST
+ok 28 - running review and failed response retain saved diagnostics; reconnect never repeats the original POST
+  ---
+  duration_ms: 30.96525
+  type: 'test'
+  ...
+# Subtest: wrong project/revision traces and a stale plan binding cannot expose another saved diagnostic
+ok 29 - wrong project/revision traces and a stale plan binding cannot expose another saved diagnostic
+  ---
+  duration_ms: 18.504292
+  type: 'test'
+  ...
+# Subtest: read-only observer discards a later-arriving lower sequence without exposing mutation or wallet controls
+ok 30 - read-only observer discards a later-arriving lower sequence without exposing mutation or wallet controls
+  ---
+  duration_ms: 2.856
+  type: 'test'
+  ...
+# Subtest: observer removes a previously valid trace and download in the same render as its binding changes
+ok 31 - observer removes a previously valid trace and download in the same render as its binding changes
+  ---
+  duration_ms: 2.215042
+  type: 'test'
+  ...
+# Subtest: actual authenticated planning service projects only the exact existing source/release/chain binding with no preflight or operation
+ok 32 - actual authenticated planning service projects only the exact existing source/release/chain binding with no preflight or operation
+  ---
+  duration_ms: 48.621583
+  type: 'test'
+  ...
+# Subtest: release and source ownership are verified before any progress binding is returned
+ok 33 - release and source ownership are verified before any progress binding is returned
+  ---
+  duration_ms: 27.642458
+  type: 'test'
+  ...
+# Subtest: a release without an owned project or selected chain never invents a source binding
+ok 34 - a release without an owned project or selected chain never invents a source binding
+  ---
+  duration_ms: 38.476875
+  type: 'test'
+  ...
+# Subtest: actual release review starts with a short outcome, keeps details folded, and returns focused edits to review
+ok 35 - actual release review starts with a short outcome, keeps details folded, and returns focused edits to review
+  ---
+  duration_ms: 84.595625
+  type: 'test'
+  ...
+# Subtest: the exact shared resolver asks one question and keeps answers in the existing draft
+ok 36 - the exact shared resolver asks one question and keeps answers in the existing draft
+  ---
+  duration_ms: 5.374166
+  type: 'test'
+  ...
+# Subtest: one-of-one branches remove supply and limits without reuploading or requesting a wallet
+ok 37 - one-of-one branches remove supply and limits without reuploading or requesting a wallet
+  ---
+  duration_ms: 1.223125
+  type: 'test'
+  ...
+# Subtest: direct mode and Back keep the same configuration, while an edition edit reopens dependent questions
+ok 38 - direct mode and Back keep the same configuration, while an edition edit reopens dependent questions
+  ---
+  duration_ms: 1.683084
+  type: 'test'
+  ...
+# Subtest: review is bound to exact metadata inputs and resource revision, including edits through direct Studio
+ok 39 - review is bound to exact metadata inputs and resource revision, including edits through direct Studio
+  ---
+  duration_ms: 1.158917
+  type: 'test'
+  ...
+# Subtest: unsupported delivery and auctions never become a ready or substituted plan
+ok 40 - unsupported delivery and auctions never become a ready or substituted plan
+  ---
+  duration_ms: 0.876459
+  type: 'test'
+  ...
+# Subtest: actual planning service persists once, resumes exact retries, rejects conflicts and scopes ownership
+ok 41 - actual planning service persists once, resumes exact retries, rejects conflicts and scopes ownership
+  ---
+  duration_ms: 18.204667
+  type: 'test'
+  ...
+# Subtest: browser and agent planning handlers enforce their existing auth and never leak transport errors
+ok 42 - browser and agent planning handlers enforce their existing auth and never leak transport errors
+  ---
+  duration_ms: 16.331208
+  type: 'test'
+  ...
+# Subtest: release planning can precede storage, while the existing storage-readiness gate remains strict
+ok 43 - release planning can precede storage, while the existing storage-readiness gate remains strict
+  ---
+  duration_ms: 5.713709
+  type: 'test'
+  ...
+# Subtest: adopting an existing draft keeps every explicit decision rather than asking again
+ok 44 - adopting an existing draft keeps every explicit decision rather than asking again
+  ---
+  duration_ms: 1.009792
+  type: 'test'
+  ...
+# Subtest: new guided drafts seed only accepted release intent, never recommendations or unrelated defaults
+ok 45 - new guided drafts seed only accepted release intent, never recommendations or unrelated defaults
+  ---
+  duration_ms: 5.248625
+  type: 'test'
+  ...
+# Subtest: the actual production normalizer accepts one-question schedule repair and ordered mint limits
+ok 46 - the actual production normalizer accepts one-question schedule repair and ordered mint limits
+  ---
+  duration_ms: 6.219042
+  type: 'test'
+  ...
+# Subtest: existing access phases stay authoritative and conflicting scalar edits cannot be silently saved
+ok 47 - existing access phases stay authoritative and conflicting scalar edits cannot be silently saved
+  ---
+  duration_ms: 1.242
+  type: 'test'
+  ...
+# Subtest: removed editor routes stay absent and the exact saved review coexists with the retained compatibility component
+ok 48 - removed editor routes stay absent and the exact saved review coexists with the retained compatibility component
+  ---
+  duration_ms: 4.625333
+  type: 'test'
+  ...
+# Subtest: new guided drafts pin explicit defaults and preserve their precedence through production normalization
+ok 49 - new guided drafts pin explicit defaults and preserve their precedence through production normalization
+  ---
+  duration_ms: 0.596833
+  type: 'test'
+  ...
+# Subtest: incompatible saved purchase limits reopen a question instead of blocking creation or storing a contradictory draft
+ok 50 - incompatible saved purchase limits reopen a question instead of blocking creation or storing a contradictory draft
+  ---
+  duration_ms: 0.303458
+  type: 'test'
+  ...
+# Subtest: the actual release creation entrypoint pins defaults once before persisting normalized native settings
+ok 51 - the actual release creation entrypoint pins defaults once before persisting normalized native settings
+  ---
+  duration_ms: 142.017625
+  type: 'test'
+  ...
+# Subtest: actual release creation uses the private copied project profile and preserves later explicit answers
+ok 52 - actual release creation uses the private copied project profile and preserves later explicit answers
+  ---
+  duration_ms: 119.415
+  type: 'test'
+  ...
+# Subtest: all public release projections and the unauthenticated slug handler strip private planning and wallet recovery
+ok 53 - all public release projections and the unauthenticated slug handler strip private planning and wallet recovery
+  ---
+  duration_ms: 146.226042
+  type: 'test'
+  ...
+# Subtest: normal source review reconciles/adopts the exact saved release before returning its actual simulated approval
+ok 54 - normal source review reconciles/adopts the exact saved release before returning its actual simulated approval
+  ---
+  duration_ms: 14.402833
+  type: 'test'
+  ...
+# Subtest: ordinary stored release reconciles first and keeps the existing exact collection review
+ok 55 - ordinary stored release reconciles first and keeps the existing exact collection review
+  ---
+  duration_ms: 8.086041
+  type: 'test'
+  ...
+# Subtest: a stale source release revision cannot reach adoption or preparation
+ok 56 - a stale source release revision cannot reach adoption or preparation
+  ---
+  duration_ms: 13.328542
+  type: 'test'
+  ...
+# Subtest: source denial remains terminal and never tries direct preparation
+ok 57 - source denial remains terminal and never tries direct preparation
+  ---
+  duration_ms: 5.069334
+  type: 'test'
+  ...
+# Subtest: a one-step advanced review returns conflict without carrying wallet authority
+ok 58 - a one-step advanced review returns conflict without carrying wallet authority
+  ---
+  duration_ms: 5.357834
+  type: 'test'
+  ...
+# Subtest: the planning hint accepts only an exact saved-source declaration, never grants readiness
+ok 59 - the planning hint accepts only an exact saved-source declaration, never grants readiness
+  ---
+  duration_ms: 2.126167
+  type: 'test'
+  ...
+# Subtest: pending, blocked and invalid next actions never become a wallet review or direct prepare fallback
+ok 60 - pending, blocked and invalid next actions never become a wallet review or direct prepare fallback
+  ---
+  duration_ms: 76.033
+  type: 'test'
+  ...
+# Subtest: a cancelled source review never returns an approval
+ok 61 - a cancelled source review never returns an approval
+  ---
+  duration_ms: 2.793875
+  type: 'test'
+  ...
+# Subtest: the real plan review action reloads a server-advanced revision and stops before wallet navigation
+ok 62 - the real plan review action reloads a server-advanced revision and stops before wallet navigation
+  ---
+  duration_ms: 21.41925
+  type: 'test'
+  ...
+# Subtest: unfunded GIF and source-adopted projects enter the REAL owner storage-review service before collection preparation
+ok 63 - unfunded GIF and source-adopted projects enter the REAL owner storage-review service before collection preparation
+  ---
+  duration_ms: 34.545291
+  type: 'test'
+  ...
+# Subtest: a failed or unrelated funding proof cannot produce the new navigation handoff
+ok 64 - a failed or unrelated funding proof cannot produce the new navigation handoff
+  ---
+  duration_ms: 14.532584
+  type: 'test'
+  ...
+# Subtest: storage navigation validates exact release/project and forbids an injected URL or unsigned collection authority
+ok 65 - storage navigation validates exact release/project and forbids an injected URL or unsigned collection authority
+  ---
+  duration_ms: 0.463375
+  type: 'test'
+  ...
+# Subtest: the actual plan action opens only the validated existing same-project storage panel, never a wallet
+ok 66 - the actual plan action opens only the validated existing same-project storage panel, never a wallet
+  ---
+  duration_ms: 7.958542
+  type: 'test'
+  ...
+1..66
+# tests 66
+# suites 0
+# pass 66
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 1681.262958

@@ -1,0 +1,127 @@
+{
+  "schema": "keel.independent-one-normal-guided-review-command@1",
+  "approved": true,
+  "cwd": "/Users/ravonus/dev/wt/studio-wallet-read-routing-qa-20261020/candidate-3e50",
+  "argv": [
+    "/opt/homebrew/opt/python@3.14/bin/python3.14",
+    "/tmp/keel-qa-receipt-activation-20261020/keel-site/docs/tools/gif-guided-review-only/launch-review.py",
+    "/tmp/keel-private-gif-guided-review-20261020-01/run-config.json"
+  ],
+  "executions": 1,
+  "automaticRetry": false,
+  "afterAnyUncertainOutcome": "Preserve consumed marker and files; readonly reconciliation only. No restoration, deletion, rename or rerun.",
+  "scope": {
+    "creatorId": "ac001c30-ad5e-465a-b784-854be440f0be",
+    "releaseId": "0c6c734d-20c0-4d3a-959a-fb7ac8143af2",
+    "projectId": "fcf16528-aa7e-43c0-a7f0-8a4542ed96e6",
+    "projectRevision": 1,
+    "beforeReleaseRevision": 13,
+    "afterReleaseRevision": 14,
+    "socket": "/tmp/keel-diag-capacity-gif-deployed1/.s.PGSQL.55459",
+    "method": "normal changeReleasePlanning review",
+    "publicRPC": false,
+    "compiler": false,
+    "capture": false,
+    "native": false,
+    "signing": false,
+    "submission": false,
+    "publicationApproval": false,
+    "activation": false
+  },
+  "files": [
+    {
+      "path": "/tmp/keel-qa-receipt-activation-20261020/keel-site/docs/tools/gif-guided-review-only/assets.mjs",
+      "bytes": 1099,
+      "sha256": "fbc78d28d47f880920eb16f55b4d5fa4395a55e116da443af1c2476dbb23fd6c"
+    },
+    {
+      "path": "/tmp/keel-qa-receipt-activation-20261020/keel-site/docs/tools/gif-guided-review-only/authority.test.mjs",
+      "bytes": 2447,
+      "sha256": "24dacd1593108ba09bf454411cdaf23024dd91120d6d368e1c241f58108b00a0"
+    },
+    {
+      "path": "/tmp/keel-qa-receipt-activation-20261020/keel-site/docs/tools/gif-guided-review-only/build-bundle.mjs",
+      "bytes": 6619,
+      "sha256": "f7a7600a5d3341d4a19316b63d7c236ed967eaea58214d95a69e05251ae70068"
+    },
+    {
+      "path": "/tmp/keel-qa-receipt-activation-20261020/keel-site/docs/tools/gif-guided-review-only/check-bundle-import.mjs",
+      "bytes": 4283,
+      "sha256": "b1c8e9b04d468425cb28b4263d96eef7423cb3dc155f5f4e389c6d7fd7304222"
+    },
+    {
+      "path": "/tmp/keel-qa-receipt-activation-20261020/keel-site/docs/tools/gif-guided-review-only/identity.mjs",
+      "bytes": 2223,
+      "sha256": "426164037f2013bdc4053fc03d1f76f256f23ff75454d2de9aa4301f932d4f2a"
+    },
+    {
+      "path": "/tmp/keel-qa-receipt-activation-20261020/keel-site/docs/tools/gif-guided-review-only/launch-review.py",
+      "bytes": 3380,
+      "sha256": "18ec097bc101d72f416193cd642136e986a718635e99e19733230fc84c8fbe97"
+    },
+    {
+      "path": "/tmp/keel-qa-receipt-activation-20261020/keel-site/docs/tools/gif-guided-review-only/launcher.test.py",
+      "bytes": 1223,
+      "sha256": "6057d60c6c8d11f8705b2ce6e53ae404fee94f651851c654e88b89ab51ef1398"
+    },
+    {
+      "path": "/tmp/keel-qa-receipt-activation-20261020/keel-site/docs/tools/gif-guided-review-only/network-guard.mjs",
+      "bytes": 2543,
+      "sha256": "34ae6f84af1072753171b2048cc9633c77789f03f8cfaa7373559b901cad0cb0"
+    },
+    {
+      "path": "/tmp/keel-qa-receipt-activation-20261020/keel-site/docs/tools/gif-guided-review-only/review-entry.ts",
+      "bytes": 2430,
+      "sha256": "baab1f45fdc0efb59b7a8abe5e1a9e75118a1d418271594eecb8e044fa493b79"
+    },
+    {
+      "path": "/tmp/keel-qa-receipt-activation-20261020/keel-site/docs/tools/gif-guided-review-only/run-review.mjs",
+      "bytes": 8754,
+      "sha256": "b699a387cba4cd800d14c12a6126df2c8d66aee13b1a24d11f3051a47390f64b"
+    },
+    {
+      "path": "/tmp/keel-qa-receipt-activation-20261020/keel-site/docs/tools/gif-guided-review-only/transition.mjs",
+      "bytes": 6680,
+      "sha256": "980f3f8e320e1102e556b2becec4663a71ef9fade2998106550ea7086cfd9b5b"
+    },
+    {
+      "path": "/tmp/keel-qa-receipt-activation-20261020/keel-site/docs/tools/gif-guided-review-only/transition.test.mjs",
+      "bytes": 4170,
+      "sha256": "6de9f704507ee477e3af0a5903c7102e306655c5b93e350761e5fd7d56bc3d48"
+    },
+    {
+      "path": "/tmp/keel-private-gif-guided-review-20261020-01/run-config.json",
+      "bytes": 417,
+      "sha256": "a11d99cba2b4e2b90d40f91c1a1728f47af28011664b0625026521b8f11b9d14"
+    },
+    {
+      "path": "/private/tmp/keel-independent-gif-guided-review-20261020/guided-review-admission.json",
+      "bytes": 1017,
+      "sha256": "980cad9d2e563378f8bae55e3d17bfeb83e17568118e816a5196744d330df9e4"
+    },
+    {
+      "path": "/tmp/keel-private-gif-guided-review-20261020-01/packet.json",
+      "bytes": 1974,
+      "sha256": "d1b12a5b22c51e9d18c536f0cda46f614aa85c11f53d966aacf3c285b66496a5"
+    },
+    {
+      "path": "/tmp/keel-private-gif-guided-review-bundle-20261020-02/bundle-receipt.json",
+      "bytes": 43081,
+      "sha256": "8168df6dd2bd43fbb1e4a55ee4c4994940048ccdb0c67c856306ab33bf6be4c7"
+    },
+    {
+      "path": "/tmp/keel-private-gif-guided-review-bundle-20261020-02/normal-guided-review.mjs",
+      "bytes": 471511,
+      "sha256": "6eb56fbbcf84c4bfef941a6b1c630b4ff076e2f6ec5be6f47e412cf2ca750bbc"
+    }
+  ],
+  "limits": {
+    "hostSeconds": 45,
+    "terminationGraceSeconds": 2,
+    "perStreamBytes": 65536,
+    "runtimeAbortSeconds": 30,
+    "statementMs": 5000,
+    "lockMs": 1000
+  },
+  "allFutureOutputsAbsentAtReview": true
+}

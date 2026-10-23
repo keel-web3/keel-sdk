@@ -1,0 +1,71 @@
+{
+  "result": "PASS_EXACT_NEW07A4_OBSERVER_ONLY_FINAL_ACTION",
+  "planSHA256": "0598dd9afde00a92aa1fb02552f8c2018b0f8da900de707a2bd2f8ce1dda3442",
+  "packetSHA256": "9fcb13491e5c99746e5a07559cce3931de15d1ece18478c66ed57a4602d28787",
+  "pendingSHA256": "49e141ef5578d6f6ec5dff7021f43f8ceefcb998c15ea84d1856840a46dacfee",
+  "changedPaths": [
+    [
+      "approval.independentQA",
+      false,
+      true
+    ],
+    [
+      "approval.independentReleaseReview",
+      false,
+      true
+    ],
+    [
+      "approval.leadExecuteApproved",
+      false,
+      true
+    ],
+    [
+      "evidence.qa.sha256",
+      null,
+      "22d615400163f84b472daa1beeb1ab28c48a7d2c3303243217aae8499c0566b9"
+    ],
+    [
+      "evidence.releaseReview.sha256",
+      null,
+      "b8cd2c3d7164bd7a4c774374f5cbe14329e9fec690ed5f9ab484eb3e4087c10e"
+    ],
+    [
+      "physicalPhase",
+      "RENAME_BEFORE_STOP_SUCCESSOR_SOURCE_PENDING_INDEPENDENT_REVIEW",
+      "RENAME_FIRST_OBSERVER_ONLY_ACTUAL_IMAGE_AND_OPERATOR_QA_REVIEW_READY"
+    ],
+    [
+      "pending",
+      [
+        "exact successor source+uncertain outcome/latewake recovery tests QA/review",
+        "freshunused stagedroot/finalplan/admission; prior5895 isconsumedFAIL",
+        "freshstrict baseline/reserves/normalhealth; no app/native rebuild or priorcandidate reuse"
+      ],
+      [
+        "Live publication failure diagnosis and Gate6 remain unresolved; no private preparation replay authorized by this cutover."
+      ]
+    ]
+  ],
+  "protectedOperationalFieldsExact": true,
+  "receiversExactExclusiveNoFollowFsync": true,
+  "files": [
+    {
+      "name": "qa-final.json",
+      "bytes": 4950,
+      "sha256": "22d615400163f84b472daa1beeb1ab28c48a7d2c3303243217aae8499c0566b9"
+    },
+    {
+      "name": "releaseReview-final.json",
+      "bytes": 11379,
+      "sha256": "b8cd2c3d7164bd7a4c774374f5cbe14329e9fec690ed5f9ab484eb3e4087c10e"
+    },
+    {
+      "name": "activation-plan.final.json",
+      "bytes": 3552,
+      "sha256": "0598dd9afde00a92aa1fb02552f8c2018b0f8da900de707a2bd2f8ce1dda3442"
+    }
+  ],
+  "preflightAndExecuteArgvExactFrozenTemplates": true,
+  "leadAdmissionSHA256": "2777844a2bfab4d0799c215192c81e3c94d8a9d3039bc6055d7134d9303cbde7",
+  "reviewerHostActions": false
+}

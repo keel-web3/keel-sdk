@@ -1,0 +1,118 @@
+{
+  "schema": "keel-public-package-cache-cleanup-command-admission@1",
+  "decision": "APPROVE_ONE_EXACT_CACHE_CLEANUP_ONLY",
+  "sourceCommitAtPreparation": "f2d6de9477074559f9c365aa80925edd6cfc49a9",
+  "sourceProposalSHA256": "a8f9fb71529474930250444288310ea54613c94ed111662ea4865c6b0201c848",
+  "root": "/home/ubuntu/keel-proof-qualification-5bfca534-28c0-4344-a8f7-8e8188e1515c",
+  "createRootArgv": [
+    "/usr/bin/ssh",
+    "-o",
+    "BatchMode=yes",
+    "-o",
+    "ConnectTimeout=12",
+    "-o",
+    "StrictHostKeyChecking=yes",
+    "-o",
+    "UserKnownHostsFile=/Users/ravonus/dev/hashers/ops/servers/known_hosts",
+    "ubuntu@40.160.39.155",
+    "sudo -n /usr/bin/python3 -c 'import os,stat\nfrom pathlib import Path\np=Path('\"'\"'/home/ubuntu/keel-proof-qualification-5bfca534-28c0-4344-a8f7-8e8188e1515c'\"'\"');parent=p.parent\ns=parent.lstat();assert parent.resolve()==parent and stat.S_ISDIR(s.st_mode) and s.st_uid==1000 and s.st_ino==143 and s.st_dev==2049\nos.mkdir(p,0o700)\nfd=os.open(parent,os.O_RDONLY|os.O_DIRECTORY|os.O_NOFOLLOW);os.fsync(fd);os.close(fd)\nprint('\"'\"'exclusive-root-created'\"'\"')'"
+  ],
+  "files": [
+    {
+      "localPath": "/private/tmp/keel-release-494d-20261020/docs/reviews/studio-publication-20261019/release/routing-import-494d/cleanup-public-caches.py",
+      "bytes": 21869,
+      "sha256": "d32238756e3f3a2d00344f4f652a30dd9b88ac960378a5c0c00f1bd2801a5e0d",
+      "argv": [
+        "/usr/bin/ssh",
+        "-o",
+        "BatchMode=yes",
+        "-o",
+        "ConnectTimeout=12",
+        "-o",
+        "StrictHostKeyChecking=yes",
+        "-o",
+        "UserKnownHostsFile=/Users/ravonus/dev/hashers/ops/servers/known_hosts",
+        "ubuntu@40.160.39.155",
+        "sudo -n /usr/bin/python3 -c 'import os,stat,sys,hashlib\nfrom pathlib import Path\nroot=Path('\"'\"'/home/ubuntu/keel-proof-qualification-5bfca534-28c0-4344-a8f7-8e8188e1515c'\"'\"');s=root.lstat();assert root.resolve()==root and stat.S_ISDIR(s.st_mode) and s.st_uid==0 and stat.S_IMODE(s.st_mode)==0o700\nraw=sys.stdin.buffer.read(21870);assert len(raw)==21869 and hashlib.sha256(raw).hexdigest()=='\"'\"'d32238756e3f3a2d00344f4f652a30dd9b88ac960378a5c0c00f1bd2801a5e0d'\"'\"'\nparent=os.open(root,os.O_RDONLY|os.O_DIRECTORY|os.O_NOFOLLOW);fd=os.open('\"'\"'cleanup-public-caches.py'\"'\"',os.O_WRONLY|os.O_CREAT|os.O_EXCL|os.O_NOFOLLOW,0o444,dir_fd=parent)\ntry:\n with os.fdopen(fd,'\"'\"'wb'\"'\"')as f:f.write(raw);f.flush();os.fsync(f.fileno())\n os.fsync(parent)\nfinally:os.close(parent)\nprint('\"'\"'d32238756e3f3a2d00344f4f652a30dd9b88ac960378a5c0c00f1bd2801a5e0d'\"'\"')'"
+      ]
+    },
+    {
+      "localPath": "/private/tmp/keel-release-494d-20261020/docs/reviews/studio-publication-20261019/release/routing-import-494d/cache-cleanup-plan.json",
+      "bytes": 596390,
+      "sha256": "28dbfac54fa26c38e27da64a7dee062926ed1fa06ade2f33ac6895e0a65acd59",
+      "argv": [
+        "/usr/bin/ssh",
+        "-o",
+        "BatchMode=yes",
+        "-o",
+        "ConnectTimeout=12",
+        "-o",
+        "StrictHostKeyChecking=yes",
+        "-o",
+        "UserKnownHostsFile=/Users/ravonus/dev/hashers/ops/servers/known_hosts",
+        "ubuntu@40.160.39.155",
+        "sudo -n /usr/bin/python3 -c 'import os,stat,sys,hashlib\nfrom pathlib import Path\nroot=Path('\"'\"'/home/ubuntu/keel-proof-qualification-5bfca534-28c0-4344-a8f7-8e8188e1515c'\"'\"');s=root.lstat();assert root.resolve()==root and stat.S_ISDIR(s.st_mode) and s.st_uid==0 and stat.S_IMODE(s.st_mode)==0o700\nraw=sys.stdin.buffer.read(596391);assert len(raw)==596390 and hashlib.sha256(raw).hexdigest()=='\"'\"'28dbfac54fa26c38e27da64a7dee062926ed1fa06ade2f33ac6895e0a65acd59'\"'\"'\nparent=os.open(root,os.O_RDONLY|os.O_DIRECTORY|os.O_NOFOLLOW);fd=os.open('\"'\"'cache-cleanup-plan.json'\"'\"',os.O_WRONLY|os.O_CREAT|os.O_EXCL|os.O_NOFOLLOW,0o444,dir_fd=parent)\ntry:\n with os.fdopen(fd,'\"'\"'wb'\"'\"')as f:f.write(raw);f.flush();os.fsync(f.fileno())\n os.fsync(parent)\nfinally:os.close(parent)\nprint('\"'\"'28dbfac54fa26c38e27da64a7dee062926ed1fa06ade2f33ac6895e0a65acd59'\"'\"')'"
+      ]
+    }
+  ],
+  "preflightArgv": [
+    "/usr/bin/ssh",
+    "-o",
+    "BatchMode=yes",
+    "-o",
+    "ConnectTimeout=12",
+    "-o",
+    "StrictHostKeyChecking=yes",
+    "-o",
+    "UserKnownHostsFile=/Users/ravonus/dev/hashers/ops/servers/known_hosts",
+    "ubuntu@40.160.39.155",
+    "sudo -n /usr/bin/python3 /home/ubuntu/keel-proof-qualification-5bfca534-28c0-4344-a8f7-8e8188e1515c/cleanup-public-caches.py --root /home/ubuntu/keel-proof-qualification-5bfca534-28c0-4344-a8f7-8e8188e1515c --plan-sha256 28dbfac54fa26c38e27da64a7dee062926ed1fa06ade2f33ac6895e0a65acd59"
+  ],
+  "reviewBasename": "cache-cleanup-review.json",
+  "reviewLocalPath": "/Users/ravonus/dev/wt/studio-cache-independent-review-20261020/docs/reviews/studio-cache-independent-20261020/cache-f2d6-admission/cache-cleanup-review.json",
+  "reviewBytes": 4069,
+  "reviewSHA256": "30b9a385a1320e8992eeff5191f9a91283f5d43856bb6ba49db1c31ba575407c",
+  "reviewInstallArgv": [
+    "/usr/bin/ssh",
+    "-o",
+    "BatchMode=yes",
+    "-o",
+    "ConnectTimeout=12",
+    "-o",
+    "StrictHostKeyChecking=yes",
+    "-o",
+    "UserKnownHostsFile=/Users/ravonus/dev/hashers/ops/servers/known_hosts",
+    "ubuntu@40.160.39.155",
+    "sudo -n /usr/bin/python3 -c 'import os,stat,sys,hashlib\nfrom pathlib import Path\nroot=Path('\"'\"'/home/ubuntu/keel-proof-qualification-5bfca534-28c0-4344-a8f7-8e8188e1515c'\"'\"');s=root.lstat();assert root.resolve()==root and stat.S_ISDIR(s.st_mode) and s.st_uid==0 and stat.S_IMODE(s.st_mode)==0o700\nraw=sys.stdin.buffer.read(4070);assert len(raw)==4069 and hashlib.sha256(raw).hexdigest()=='\"'\"'30b9a385a1320e8992eeff5191f9a91283f5d43856bb6ba49db1c31ba575407c'\"'\"'\nparent=os.open(root,os.O_RDONLY|os.O_DIRECTORY|os.O_NOFOLLOW);fd=os.open('\"'\"'cache-cleanup-review.json'\"'\"',os.O_WRONLY|os.O_CREAT|os.O_EXCL|os.O_NOFOLLOW,0o444,dir_fd=parent)\ntry:\n with os.fdopen(fd,'\"'\"'wb'\"'\"')as f:f.write(raw);f.flush();os.fsync(f.fileno())\n os.fsync(parent)\nfinally:os.close(parent)\nprint('\"'\"'30b9a385a1320e8992eeff5191f9a91283f5d43856bb6ba49db1c31ba575407c'\"'\"')'"
+  ],
+  "executeArgv": [
+    "/usr/bin/ssh",
+    "-o",
+    "BatchMode=yes",
+    "-o",
+    "ConnectTimeout=12",
+    "-o",
+    "StrictHostKeyChecking=yes",
+    "-o",
+    "UserKnownHostsFile=/Users/ravonus/dev/hashers/ops/servers/known_hosts",
+    "ubuntu@40.160.39.155",
+    "sudo -n /usr/bin/python3 /home/ubuntu/keel-proof-qualification-5bfca534-28c0-4344-a8f7-8e8188e1515c/cleanup-public-caches.py --root /home/ubuntu/keel-proof-qualification-5bfca534-28c0-4344-a8f7-8e8188e1515c --plan-sha256 28dbfac54fa26c38e27da64a7dee062926ed1fa06ade2f33ac6895e0a65acd59 --execute --review-sha256 30b9a385a1320e8992eeff5191f9a91283f5d43856bb6ba49db1c31ba575407c"
+  ],
+  "allowedFileCount": 888,
+  "allocatedReclaimBytes": 488615936,
+  "healthPolicy": {
+    "normalConfiguredProxyRouteOnly": true,
+    "freshProxyPredicateRequired": true,
+    "maxRequests": 20,
+    "intervalSeconds": 45,
+    "maxWindowSeconds": 900,
+    "stopOnFailureOrEnd": true
+  },
+  "requiredExactNewPreflightPass": true,
+  "cleanupOnly": true,
+  "imageImportApproved": false,
+  "applicationActivation": false,
+  "databaseMutation": false,
+  "signingApproved": false,
+  "transactionSubmission": false
+}

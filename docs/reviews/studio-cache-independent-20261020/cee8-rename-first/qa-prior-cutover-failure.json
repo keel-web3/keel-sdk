@@ -1,0 +1,55 @@
+{
+  "schema": "keel.qa-cee8-failed-cutover-audit@1",
+  "result": "FAIL_ACTIVATION_CONFIRMED_ROLLBACK_TO_FE455",
+  "candidate": {
+    "siteCommit": "0c7b01e3acae5ec787568d6b5931b002654b4de0",
+    "sdkCommit": "311d61526284248938e335d7ed879089408933be",
+    "buildId": "F2eKiuWl2rvz5hqBZQ9wi",
+    "appImageId": "sha256:cee8c0b777f78372c6ee56bd9ff1c66dbeafd6393d04cb7f298fab6eb7bac9b7"
+  },
+  "currentOldContainer": "fa0eb0299164407e24e1cda31b21b196ea8a8071a1a39ce71efd414234ef1659",
+  "runner": "434316eff6e19951807f95ba8aee03a4db684d760039dfeb723c7bf9203a8649",
+  "failedRetainedCandidate": "aab5b8d1ef40d28b7aff10919905a9305bbf588cc25f3de1fbeb72b0e335dc79",
+  "candidateNeverStarted": true,
+  "observedFailure": "Docker port10.77.0.2:4470 allocated; oldruntime restarted before stop\u2192rename cutover completed",
+  "oldDieToRestartMs": 168.481571,
+  "oldRestartBeforeRollbackRenameMs": 5.172301,
+  "oldRestartBeforeCandidateRenameMs": 9.958618,
+  "proxySourceSHA256": "fb8d882f802471c93792eeb58f7200627bc70c0d70ada3c2dc1d2b41af5b0e88",
+  "sourceAttribution": {
+    "normalGET": "nonpassive request\u2192ensureRuntimeAwake\u2192lifecycle.start\u2192DockerPOSTstart when pipeline.container stopped",
+    "upgrade": "also ensureRuntimeAwake",
+    "rolloutCoordination": "No sharedrollout lock in fetched actualsource",
+    "operator": "owns rolloutlock, stops old, confirms stopped, then renames before starting candidate; oldstart event precedes both renames so not its later rollback-start branch"
+  },
+  "attributionLimit": "Docker event has no caller PID/request URL. Exact restart initiator/request and browser4spoll attribution remain unproven; source provides a concrete compatible wake path, not proof of that specific caller.",
+  "baseline": "Exactoldfe455/fa0 Config4b0d/Host186e/canonicalMount74cc/healthy/paused and D97runner434 restored per unchanged readonlyguard; no newQAhostrecheck",
+  "rollback": {
+    "confirmed": true,
+    "recoveredCandidateIds": [
+      "aab5b8d1ef40d28b7aff10919905a9305bbf588cc25f3de1fbeb72b0e335dc79"
+    ],
+    "preservedForeignIds": [],
+    "errors": [],
+    "runnerTouched": false,
+    "databaseRestorePerformed": false
+  },
+  "snapshot": {
+    "result": "PASS_RECEIPT_VERIFIED_NOT_REHASHED_ON_HOST_BY_QA",
+    "bytes": 124210275,
+    "sha256": "994a046b87e9db335797e99c49ad16108a4ba5e56e5b2017a967a795417451db",
+    "budgetBytes": 268435456,
+    "outerDeadlineSeconds": 180,
+    "restored": false
+  },
+  "noObservedRunnerEvent": true,
+  "newImageAppProcessCrash": false,
+  "newCEE8PublicRolePASSRetainedOnlyIsolatedScope": true,
+  "observerDeployed": false,
+  "livePublicationGate6": "FAIL_UNRESOLVED; no retry",
+  "qaHostActions": 0,
+  "qaBrowserActions": 0,
+  "qaPrivateProgramReplays": 0,
+  "qaSourceFixAuthored": false,
+  "automaticRetryApproved": false
+}

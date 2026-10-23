@@ -1,0 +1,17 @@
+{
+  "argv": [
+    "/opt/homebrew/opt/node@22/bin/node",
+    "--test",
+    "--test-concurrency=1",
+    "/tmp/keel-qa-receipt-activation-20261020/keel-site/docs/tools/gif-fresh-forward-capture/clone-state.test.mjs",
+    "/tmp/keel-qa-receipt-activation-20261020/keel-site/docs/tools/gif-fresh-forward-capture/deployed-core.test.mjs",
+    "/tmp/keel-qa-receipt-activation-20261020/keel-site/docs/tools/gif-fresh-forward-capture/drop-diff.test.mjs",
+    "/tmp/keel-qa-receipt-activation-20261020/keel-site/docs/tools/gif-fresh-forward-capture/existing-candidate.test.mjs",
+    "/tmp/keel-qa-receipt-activation-20261020/keel-site/docs/tools/gif-fresh-forward-capture/guided-review-receipt.test.mjs",
+    "/tmp/keel-qa-receipt-activation-20261020/keel-site/docs/tools/gif-fresh-forward-capture/public-signer.test.mjs",
+    "/tmp/keel-qa-receipt-activation-20261020/keel-site/docs/tools/gif-fresh-forward-capture/read-schema.test.mjs",
+    "/tmp/keel-qa-receipt-activation-20261020/keel-site/docs/tools/gif-fresh-forward-capture/run-capture.test.mjs"
+  ],
+  "cwd": "/tmp/keel-qa-receipt-activation-20261020/keel-site",
+  "exitCode": 1
+}

@@ -1,0 +1,36 @@
+{
+  "schema": "keel.independent-observer-only-final-action-evidence@1",
+  "files": [
+    {
+      "path": "commands.admitted.json",
+      "bytes": 5807,
+      "sha256": "2325a9733615c5fa2926fccec3ca88e982892663846cf730996999776bdaf70e",
+      "source": "/private/tmp/keel-independent-cee8-final-review-20261021/commands.admitted.json"
+    },
+    {
+      "path": "command-review.json",
+      "bytes": 3235,
+      "sha256": "e648cbb6f5d98ba426a697353e7723599d197199657fe63c60383b13d2e70c95",
+      "source": "/private/tmp/keel-independent-cee8-final-review-20261021/command-review.json"
+    },
+    {
+      "path": "final-command-validation.json",
+      "bytes": 2257,
+      "sha256": "9690c6c0bcec02d78bf8a93ad41dc82b44ab45d93be034bcc287cc0ca716d12d",
+      "source": "/private/tmp/keel-independent-cee8-final-review-20261021/final-command-validation.json"
+    },
+    {
+      "path": "activation-plan.final.json",
+      "bytes": 3531,
+      "sha256": "602988e239087b9f9f1fee3503890edfa7dce64dde9160b7838ce690192f5ebb",
+      "source": "/private/tmp/keel-cee8-activation-final-20261021/activation-plan.final.json"
+    },
+    {
+      "path": "lead-admission.json",
+      "bytes": 591,
+      "sha256": "547b7ea1ea8ee4e885ce1a4463dedebd881984d994af4aeec4661ee36e4eb7cf",
+      "source": "/private/tmp/keel-cee8-activation-final-20261021/lead-admission.json"
+    }
+  ],
+  "scope": "Maximum one independently admitted observer-only image cutover by root after exact read-only preflight PASS. No private preparation replay or publication acceptance."
+}

@@ -1,0 +1,1214 @@
+{
+  "schema": "keel.source-pinned-gif-native-sequence-policy@1",
+  "hostPlanSha256": "958a073ea9c4f78934f3c5e7f544ceda0288d323554808886e8186d0173c26af",
+  "producerSources": [
+    {
+      "path": "/private/tmp/keel-qa-receipt-activation-20261020/keel-site/docs/tools/gif-fresh-forward-capture/assembly-failure.mjs",
+      "bytes": 2284,
+      "sha256": "a9d250ac5a915864003230bd5f6031a2a7b923749a55a9bfba1bf2f20011176d"
+    },
+    {
+      "path": "/private/tmp/keel-qa-receipt-activation-20261020/keel-site/docs/tools/gif-fresh-forward-capture/build-bundle.mjs",
+      "bytes": 7241,
+      "sha256": "cf4c56599f7ed001d7fa49a468c31217de8349101ac115f3a2db8b13582f6966"
+    },
+    {
+      "path": "/private/tmp/keel-qa-receipt-activation-20261020/keel-site/docs/tools/gif-fresh-forward-capture/capture-entry.ts",
+      "bytes": 2012,
+      "sha256": "7ebd480858c00770379ee2855a567dc0ea34b46a68374552ffaf29ad10f164ec"
+    },
+    {
+      "path": "/private/tmp/keel-qa-receipt-activation-20261020/keel-site/docs/tools/gif-fresh-forward-capture/capture-signer.mjs",
+      "bytes": 3290,
+      "sha256": "66b2420ade80d1e19a6d64db41a5bbbab0e34f22c79bbdf68ecf5d9b2b80c680"
+    },
+    {
+      "path": "/private/tmp/keel-qa-receipt-activation-20261020/keel-site/docs/tools/gif-fresh-forward-capture/check-bundle-import.mjs",
+      "bytes": 4147,
+      "sha256": "d1a32e65a0256691e96cc0af31faa94fcbf5e61da36f45d21b8774c7ef4dad5d"
+    },
+    {
+      "path": "/private/tmp/keel-qa-receipt-activation-20261020/keel-site/docs/tools/gif-fresh-forward-capture/clone-state.mjs",
+      "bytes": 5737,
+      "sha256": "f67d3c69658e29f242d7a532f4fa587e3b3506d1fd12157836a8391df01a268e"
+    },
+    {
+      "path": "/private/tmp/keel-qa-receipt-activation-20261020/keel-site/docs/tools/gif-fresh-forward-capture/clone-state.test.mjs",
+      "bytes": 1374,
+      "sha256": "8298154e8de871450fce229ba61afb803fc240fd2d562d946addb477eb20ba43"
+    },
+    {
+      "path": "/private/tmp/keel-qa-receipt-activation-20261020/keel-site/docs/tools/gif-fresh-forward-capture/deployed-core.mjs",
+      "bytes": 10163,
+      "sha256": "71e3d17dcdcbfa14655b8099c2d0df278ea2424efcf7126c0f758669cde687c9"
+    },
+    {
+      "path": "/private/tmp/keel-qa-receipt-activation-20261020/keel-site/docs/tools/gif-fresh-forward-capture/deployed-core.test.mjs",
+      "bytes": 7283,
+      "sha256": "932663d4cbd6685c8ece5a8ff81b116f6f4c410b00027725209fae073b0e6d1e"
+    },
+    {
+      "path": "/private/tmp/keel-qa-receipt-activation-20261020/keel-site/docs/tools/gif-fresh-forward-capture/diagnostic-signer-context.test.ts",
+      "bytes": 2337,
+      "sha256": "36a27c24c56a011fdc25287771e911d96fc48bbcee1e6c5cd4d3b5a88ca2724c"
+    },
+    {
+      "path": "/private/tmp/keel-qa-receipt-activation-20261020/keel-site/docs/tools/gif-fresh-forward-capture/diagnostic-signer-context.ts",
+      "bytes": 760,
+      "sha256": "2595ec2221292b8144ebf455e6285a76a7847960b3e40a12e568270329515948"
+    },
+    {
+      "path": "/private/tmp/keel-qa-receipt-activation-20261020/keel-site/docs/tools/gif-fresh-forward-capture/drop-diff.mjs",
+      "bytes": 2694,
+      "sha256": "983bc4f561699740a86c06bee3279ac99e13c3f3791ee4e6f4837c020f519e31"
+    },
+    {
+      "path": "/private/tmp/keel-qa-receipt-activation-20261020/keel-site/docs/tools/gif-fresh-forward-capture/drop-diff.test.mjs",
+      "bytes": 4611,
+      "sha256": "ace09cc7054cf6cd4f3bbc633d6bdb4e2ab17a2c142aa5dc94c3dc211dca1d3e"
+    },
+    {
+      "path": "/private/tmp/keel-qa-receipt-activation-20261020/keel-site/docs/tools/gif-fresh-forward-capture/existing-candidate.mjs",
+      "bytes": 827,
+      "sha256": "2e456299679ff3de75046ffca5cd01f8158673a40f68583859eaeb8605f9ad25"
+    },
+    {
+      "path": "/private/tmp/keel-qa-receipt-activation-20261020/keel-site/docs/tools/gif-fresh-forward-capture/existing-candidate.test.mjs",
+      "bytes": 3794,
+      "sha256": "5fc217fa60197311d366498d13ea244eae888d8cbd1b7be7c85abed045666bc7"
+    },
+    {
+      "path": "/private/tmp/keel-qa-receipt-activation-20261020/keel-site/docs/tools/gif-fresh-forward-capture/forward/canonical-reference.mjs",
+      "bytes": 9620,
+      "sha256": "804108a41b5ac69ff109fc7799589929847c012c4046308da5b2e9fd43bfb67e"
+    },
+    {
+      "path": "/private/tmp/keel-qa-receipt-activation-20261020/keel-site/docs/tools/gif-fresh-forward-capture/forward/forward-core.mjs",
+      "bytes": 10274,
+      "sha256": "0881fa00167f0ceb863537aa0b5fb2ff93fe6085fbf87938e42fbc9ab86af954"
+    },
+    {
+      "path": "/private/tmp/keel-qa-receipt-activation-20261020/keel-site/docs/tools/gif-fresh-forward-capture/forward/forward-original.mjs",
+      "bytes": 6903,
+      "sha256": "dddfb0882d581dc01ab51d23fc89b556e4515d43ced2f0fc54ee9ebbb2d56825"
+    },
+    {
+      "path": "/private/tmp/keel-qa-receipt-activation-20261020/keel-site/docs/tools/gif-fresh-forward-capture/forward/forward-reference.test.mjs",
+      "bytes": 9082,
+      "sha256": "69cc388c35fdc8f0848dec639f5dee28df6ccf73a344e412fbe35f40a8bcf3fd"
+    },
+    {
+      "path": "/private/tmp/keel-qa-receipt-activation-20261020/keel-site/docs/tools/gif-fresh-forward-capture/forward/strict/deployed-core.mjs",
+      "bytes": 10163,
+      "sha256": "71e3d17dcdcbfa14655b8099c2d0df278ea2424efcf7126c0f758669cde687c9"
+    },
+    {
+      "path": "/private/tmp/keel-qa-receipt-activation-20261020/keel-site/docs/tools/gif-fresh-forward-capture/forward/strict/identity.mjs",
+      "bytes": 2223,
+      "sha256": "426164037f2013bdc4053fc03d1f76f256f23ff75454d2de9aa4301f932d4f2a"
+    },
+    {
+      "path": "/private/tmp/keel-qa-receipt-activation-20261020/keel-site/docs/tools/gif-fresh-forward-capture/forward/strict/verify-original.mjs",
+      "bytes": 6401,
+      "sha256": "4a226a9459833dee0dc9560f1cc951ed3d9e54d4184bc60fe59a8f196ce23d7e"
+    },
+    {
+      "path": "/private/tmp/keel-qa-receipt-activation-20261020/keel-site/docs/tools/gif-fresh-forward-capture/forward/validate-retained.mjs",
+      "bytes": 3368,
+      "sha256": "3d41983663d773d0dcdbd9601025233da5913e3dc20e7de1aca96160afb79957"
+    },
+    {
+      "path": "/private/tmp/keel-qa-receipt-activation-20261020/keel-site/docs/tools/gif-fresh-forward-capture/guided-review-receipt.mjs",
+      "bytes": 1710,
+      "sha256": "c098d0c8b2bdd1e649688948e7ad74308614dee7ceb4dd10bfdf5007d31c75e8"
+    },
+    {
+      "path": "/private/tmp/keel-qa-receipt-activation-20261020/keel-site/docs/tools/gif-fresh-forward-capture/guided-review-receipt.test.mjs",
+      "bytes": 2284,
+      "sha256": "489859359f1faa9fcc7f7daa7c4945c851812017244109476ce78df6ca875c7f"
+    },
+    {
+      "path": "/private/tmp/keel-qa-receipt-activation-20261020/keel-site/docs/tools/gif-fresh-forward-capture/identity.mjs",
+      "bytes": 2223,
+      "sha256": "426164037f2013bdc4053fc03d1f76f256f23ff75454d2de9aa4301f932d4f2a"
+    },
+    {
+      "path": "/private/tmp/keel-qa-receipt-activation-20261020/keel-site/docs/tools/gif-fresh-forward-capture/public-signer-receipt.mjs",
+      "bytes": 2961,
+      "sha256": "a44972e65aa584554726637dd5119682b617c4977e8ab465b30d4d9580d2bf15"
+    },
+    {
+      "path": "/private/tmp/keel-qa-receipt-activation-20261020/keel-site/docs/tools/gif-fresh-forward-capture/public-signer.test.mjs",
+      "bytes": 5725,
+      "sha256": "90ec77dfdc3a38db98ad1b60d487891cf415128005e4a19c8d7010da1f1f16a7"
+    },
+    {
+      "path": "/private/tmp/keel-qa-receipt-activation-20261020/keel-site/docs/tools/gif-fresh-forward-capture/read-schema.mjs",
+      "bytes": 3734,
+      "sha256": "76358b052c390ae7c30f1a99bea29414a29762c15632e62052a1ba924b7445ef"
+    },
+    {
+      "path": "/private/tmp/keel-qa-receipt-activation-20261020/keel-site/docs/tools/gif-fresh-forward-capture/read-schema.test.mjs",
+      "bytes": 3401,
+      "sha256": "f2eaeda588b68ff018b0dd5d5975ba69d714ac3d6f694d70ad73a12729ba2da7"
+    },
+    {
+      "path": "/private/tmp/keel-qa-receipt-activation-20261020/keel-site/docs/tools/gif-fresh-forward-capture/run-capture.mjs",
+      "bytes": 21672,
+      "sha256": "ef671e9f9064835f15cac565eca2b3fdc3adc4e43c0f91339197a75d1afaaf44"
+    },
+    {
+      "path": "/private/tmp/keel-qa-receipt-activation-20261020/keel-site/docs/tools/gif-fresh-forward-capture/run-capture.test.mjs",
+      "bytes": 10036,
+      "sha256": "ebb708bf19254cde00b41fb02be518963aaceef1e093a81d7ad3b6649c74faa5"
+    },
+    {
+      "path": "/private/tmp/keel-qa-receipt-activation-20261020/keel-site/docs/tools/gif-fresh-forward-capture/verify-original.mjs",
+      "bytes": 6401,
+      "sha256": "4a226a9459833dee0dc9560f1cc951ed3d9e54d4184bc60fe59a8f196ce23d7e"
+    },
+    {
+      "path": "/private/tmp/keel-qa-gif-reviewed14-20261020/candidate-400/apps/studio/src/env.ts",
+      "bytes": 13499,
+      "sha256": "436bf222800d0070ee9a20f7ce5524c15fee749d192438e017a97b2bc6ae179c"
+    },
+    {
+      "path": "/private/tmp/keel-qa-gif-reviewed14-20261020/candidate-400/apps/studio/src/features/search/search-text.ts",
+      "bytes": 2975,
+      "sha256": "be6cc810d6704f585d29056ff9177ed4d626170735ab236b17f860929fd55364"
+    },
+    {
+      "path": "/private/tmp/keel-qa-gif-reviewed14-20261020/candidate-400/apps/studio/src/lib/access-audience-groups.ts",
+      "bytes": 1105,
+      "sha256": "198fee5cdc62b8e12129e5fb3e2b242ca8ddd902698c253bc785d6465e751b1e"
+    },
+    {
+      "path": "/private/tmp/keel-qa-gif-reviewed14-20261020/candidate-400/apps/studio/src/lib/access-condition-checks.ts",
+      "bytes": 7561,
+      "sha256": "e6682c40e5cfff203f06248423e6b51ae52e40e8553e2b9b73c5eb452a671e58"
+    },
+    {
+      "path": "/private/tmp/keel-qa-gif-reviewed14-20261020/candidate-400/apps/studio/src/lib/access-history.ts",
+      "bytes": 2940,
+      "sha256": "2681e260c4519209fc05b744107374abe34cc7b369d665eb4dac93dc052f102f"
+    },
+    {
+      "path": "/private/tmp/keel-qa-gif-reviewed14-20261020/candidate-400/apps/studio/src/lib/access-providers.ts",
+      "bytes": 1942,
+      "sha256": "b6a7f93f1f79f10a6e49b7ce7bc237da812142bb6c0225a9683ebd469da9ed04"
+    },
+    {
+      "path": "/private/tmp/keel-qa-gif-reviewed14-20261020/candidate-400/apps/studio/src/lib/access-raffle.ts",
+      "bytes": 4639,
+      "sha256": "a82f7e48b05352dc15a93f8aa3fb6224603743db069c5c439f1d8bbaee9fcf8d"
+    },
+    {
+      "path": "/private/tmp/keel-qa-gif-reviewed14-20261020/candidate-400/apps/studio/src/lib/access-tezos-proof.ts",
+      "bytes": 1122,
+      "sha256": "a5a98fdaa465beccf70ecf3dec990149c133c78b433852439ab5e1c15ccf8dd4"
+    },
+    {
+      "path": "/private/tmp/keel-qa-gif-reviewed14-20261020/candidate-400/apps/studio/src/lib/access-x-permissions.ts",
+      "bytes": 963,
+      "sha256": "0cb0f2453d81e84d2eb54bd5c0db245be993705912e6b729c02ed1e3b06da1da"
+    },
+    {
+      "path": "/private/tmp/keel-qa-gif-reviewed14-20261020/candidate-400/apps/studio/src/lib/agent-draft-scope.ts",
+      "bytes": 1315,
+      "sha256": "0f5094242613bb9927e460c1015d6245ef2294fed2fbaea77e12bda14b8ad934"
+    },
+    {
+      "path": "/private/tmp/keel-qa-gif-reviewed14-20261020/candidate-400/apps/studio/src/lib/asset-presentation.ts",
+      "bytes": 4521,
+      "sha256": "c5944d11fbdd0cce752fc0539cd3031d9247a61898df7aa51286738a0fe9026b"
+    },
+    {
+      "path": "/private/tmp/keel-qa-gif-reviewed14-20261020/candidate-400/apps/studio/src/lib/browser-rpc.ts",
+      "bytes": 1236,
+      "sha256": "780ebc4db454a88defe2580c37c830631dd581fdf36b39c40a5ffde14918bf24"
+    },
+    {
+      "path": "/private/tmp/keel-qa-gif-reviewed14-20261020/candidate-400/apps/studio/src/lib/canonical-inline-artifact.ts",
+      "bytes": 8263,
+      "sha256": "418e6ea35672ef19aca7f6ff45ac951997c8ff6d6606409473e1e77c83a94cd2"
+    },
+    {
+      "path": "/private/tmp/keel-qa-gif-reviewed14-20261020/candidate-400/apps/studio/src/lib/canonical-simulation-capture.ts",
+      "bytes": 2697,
+      "sha256": "552de4d3bbfb04ca9e144661910856bfc4373c14ab65c297d024807a29e33c31"
+    },
+    {
+      "path": "/private/tmp/keel-qa-gif-reviewed14-20261020/candidate-400/apps/studio/src/lib/creation-output-settings.ts",
+      "bytes": 706,
+      "sha256": "1146f1a8405eaa82722f4d95d2012ec45455c07a84d614db10a130d87be1735e"
+    },
+    {
+      "path": "/private/tmp/keel-qa-gif-reviewed14-20261020/candidate-400/apps/studio/src/lib/creator-owned-shell.ts",
+      "bytes": 2686,
+      "sha256": "5dc2761a2fe2ebacab79d249383358ae96b94ffd5f856eb447ead5ba1e4ac19d"
+    },
+    {
+      "path": "/private/tmp/keel-qa-gif-reviewed14-20261020/candidate-400/apps/studio/src/lib/creator-prepared-publication-capability.ts",
+      "bytes": 646,
+      "sha256": "268744fa3945553778e53ebcc2caa2585fa4fdd1f7ec8ad69468ff06206020a5"
+    },
+    {
+      "path": "/private/tmp/keel-qa-gif-reviewed14-20261020/candidate-400/apps/studio/src/lib/erc20-release-payment.ts",
+      "bytes": 1393,
+      "sha256": "cc841426a9dee6d1c54055e095252c9a0e1fae2c30fe749ed99772ab6e7edb8a"
+    },
+    {
+      "path": "/private/tmp/keel-qa-gif-reviewed14-20261020/candidate-400/apps/studio/src/lib/executor-transaction-fees.ts",
+      "bytes": 8429,
+      "sha256": "f2545dbe6ac237410ad28457e5b12fa981daec1d6424bb091d04b4e310b4a99b"
+    },
+    {
+      "path": "/private/tmp/keel-qa-gif-reviewed14-20261020/candidate-400/apps/studio/src/lib/generated-project-shell.ts",
+      "bytes": 8620,
+      "sha256": "4eca836002258ac56192bb45c24e5df9525ea369b96e1ea35a1e3eeaf6a131cb"
+    },
+    {
+      "path": "/private/tmp/keel-qa-gif-reviewed14-20261020/candidate-400/apps/studio/src/lib/inline-contract-read.ts",
+      "bytes": 10770,
+      "sha256": "69649c6ea4a61c2ce60dc029425cd45c742e2f819c233e3466d55e9f9236fd18"
+    },
+    {
+      "path": "/private/tmp/keel-qa-gif-reviewed14-20261020/candidate-400/apps/studio/src/lib/inline-creator-html.ts",
+      "bytes": 2867,
+      "sha256": "d72d85c37e30c0c37d6e2d2839c9023b7d4298abcb92bfca8a12be1f0f4cdea4"
+    },
+    {
+      "path": "/private/tmp/keel-qa-gif-reviewed14-20261020/candidate-400/apps/studio/src/lib/inline-data-uri.ts",
+      "bytes": 4813,
+      "sha256": "77bdb0cff793eba30fd8465ce6d62515ff799bf08be13636eaa94574db56794d"
+    },
+    {
+      "path": "/private/tmp/keel-qa-gif-reviewed14-20261020/candidate-400/apps/studio/src/lib/inline-fragment-catalog.ts",
+      "bytes": 7279,
+      "sha256": "4a04132808bc7dd1fdb9b915f5a5a101c74f6009d789e56d9e8fa7a810f356d4"
+    },
+    {
+      "path": "/private/tmp/keel-qa-gif-reviewed14-20261020/candidate-400/apps/studio/src/lib/inline-presentation.ts",
+      "bytes": 1846,
+      "sha256": "2aa13867eef4bd78d36481f3abf71be82b92561c9d8f5b02b5493e4784efa066"
+    },
+    {
+      "path": "/private/tmp/keel-qa-gif-reviewed14-20261020/candidate-400/apps/studio/src/lib/inline-read-provider.ts",
+      "bytes": 4079,
+      "sha256": "fa887fd659f04263cea8c45f518b47b219606b87a4471003ed80bc1a149ea438"
+    },
+    {
+      "path": "/private/tmp/keel-qa-gif-reviewed14-20261020/candidate-400/apps/studio/src/lib/keel-asset-tags.ts",
+      "bytes": 9368,
+      "sha256": "b6b5b456aaaa77c9c8c85bf542e8deb62888c09274a544ca936d624b7826324d"
+    },
+    {
+      "path": "/private/tmp/keel-qa-gif-reviewed14-20261020/candidate-400/apps/studio/src/lib/keel-sdk-safe.ts",
+      "bytes": 2812,
+      "sha256": "d9a789adcfa351b352206369f03d9e80ebee1caed20702ce173e5be27d3ad5db"
+    },
+    {
+      "path": "/private/tmp/keel-qa-gif-reviewed14-20261020/candidate-400/apps/studio/src/lib/legacy-prepared-source-adoption.ts",
+      "bytes": 3791,
+      "sha256": "75438396f8d3f3bf9a685e36cec7306ce309f0f0c3e1ec389f92c261b2e46f42"
+    },
+    {
+      "path": "/private/tmp/keel-qa-gif-reviewed14-20261020/candidate-400/apps/studio/src/lib/legacy-preview-observation.ts",
+      "bytes": 4271,
+      "sha256": "5979a05dc6732e2b7b9f3b6aab75c6946839df44ad047831e4f9489f11c47285"
+    },
+    {
+      "path": "/private/tmp/keel-qa-gif-reviewed14-20261020/candidate-400/apps/studio/src/lib/legacy-shared-image-program.ts",
+      "bytes": 5786,
+      "sha256": "72474358c8fc5f11a8bf0f69d34cbf4fb7f38f14cddbce1ec2573010a33d29a2"
+    },
+    {
+      "path": "/private/tmp/keel-qa-gif-reviewed14-20261020/candidate-400/apps/studio/src/lib/library-catalogue.ts",
+      "bytes": 2011,
+      "sha256": "d4186c6f9b739f157c649b70c7a35cfaa060f4392e5644e0277febd9578e3dda"
+    },
+    {
+      "path": "/private/tmp/keel-qa-gif-reviewed14-20261020/candidate-400/apps/studio/src/lib/local-publication-simulation-request.ts",
+      "bytes": 2327,
+      "sha256": "5f0e245001c1b3e694c0e39380c58ac6c4cfa308954dac0004f8e0b1324d14b7"
+    },
+    {
+      "path": "/private/tmp/keel-qa-gif-reviewed14-20261020/candidate-400/apps/studio/src/lib/local-test-chain-configuration.ts",
+      "bytes": 1032,
+      "sha256": "d83379f2cc8cce6e60c2b7d8bdfa00e9fd825b546dca61a939e13c13f9830ba9"
+    },
+    {
+      "path": "/private/tmp/keel-qa-gif-reviewed14-20261020/candidate-400/apps/studio/src/lib/mainnet-gas-price.ts",
+      "bytes": 3343,
+      "sha256": "cfc70efb95a3dca2b9495909970ffe74fa54b1f65c9f660995af8c5acc90bc37"
+    },
+    {
+      "path": "/private/tmp/keel-qa-gif-reviewed14-20261020/candidate-400/apps/studio/src/lib/managed-hybrid-derivation.ts",
+      "bytes": 4274,
+      "sha256": "cc42d1cfcc6d29ff632d75f16bda70b5645b6ed33d6d48ab6334b6b04c6fa35c"
+    },
+    {
+      "path": "/private/tmp/keel-qa-gif-reviewed14-20261020/candidate-400/apps/studio/src/lib/managed-publication-operations.ts",
+      "bytes": 2127,
+      "sha256": "a7a5ff7dc6b7318fbfd015752961fc7c3fe30b87d038cbd91e8728ebfeef3cdf"
+    },
+    {
+      "path": "/private/tmp/keel-qa-gif-reviewed14-20261020/candidate-400/apps/studio/src/lib/managed-publication.ts",
+      "bytes": 9145,
+      "sha256": "5bd800f09335bbf419bcddd1cfe398652ef61481dff47b820f108caa32578c0b"
+    },
+    {
+      "path": "/private/tmp/keel-qa-gif-reviewed14-20261020/candidate-400/apps/studio/src/lib/media-slot-policy.ts",
+      "bytes": 4515,
+      "sha256": "6d4382099053bc9cf23d988ed799c8e9ba5d43e54ddd17940125f989e8b9b019"
+    },
+    {
+      "path": "/private/tmp/keel-qa-gif-reviewed14-20261020/candidate-400/apps/studio/src/lib/module-inputs.ts",
+      "bytes": 1027,
+      "sha256": "b97bb9130ca4cb3adea84b6ab0c04e025cba6b7afe09a7dd4f663768b8405ab8"
+    },
+    {
+      "path": "/private/tmp/keel-qa-gif-reviewed14-20261020/candidate-400/apps/studio/src/lib/module-resource-path.ts",
+      "bytes": 393,
+      "sha256": "f625c5f99542c32d3858a66d7982166fe3e5fdc790587cee72f471228034377b"
+    },
+    {
+      "path": "/private/tmp/keel-qa-gif-reviewed14-20261020/candidate-400/apps/studio/src/lib/native-media-presentation-profile.json",
+      "bytes": 1184,
+      "sha256": "bd1d60ba7fb4ab623544738e67e1aae7bc80882657ef620d46f68087cf65b2e3"
+    },
+    {
+      "path": "/private/tmp/keel-qa-gif-reviewed14-20261020/candidate-400/apps/studio/src/lib/onchain-read-budget.ts",
+      "bytes": 1859,
+      "sha256": "14967ff51e11e865f8fafe95a2ec11d51bd5099f7d86d6f4af7c4aee64bb401d"
+    },
+    {
+      "path": "/private/tmp/keel-qa-gif-reviewed14-20261020/candidate-400/apps/studio/src/lib/project-modules.ts",
+      "bytes": 3739,
+      "sha256": "8f55a472759acfbfd05725f6eb0def7f52717ddb54473bd0661c61a8a3f6d311"
+    },
+    {
+      "path": "/private/tmp/keel-qa-gif-reviewed14-20261020/candidate-400/apps/studio/src/lib/publication-capacity-diagnostic.ts",
+      "bytes": 6250,
+      "sha256": "09d4c5d8eee62133b4d19c1a4ec9953f06ee7574be24ee1f96a2042f76f6153f"
+    },
+    {
+      "path": "/private/tmp/keel-qa-gif-reviewed14-20261020/candidate-400/apps/studio/src/lib/publication-capture-candidate.ts",
+      "bytes": 2044,
+      "sha256": "686dae5eec941163890a903c80047d5c955be8eeed86656931d64793caa90fce"
+    },
+    {
+      "path": "/private/tmp/keel-qa-gif-reviewed14-20261020/candidate-400/apps/studio/src/lib/publication-diagnostic-trace.ts",
+      "bytes": 21495,
+      "sha256": "4a54165e61a32c3302c54bbb45507c7c2322f99a35d7bc2efc9d2c2d4935c415"
+    },
+    {
+      "path": "/private/tmp/keel-qa-gif-reviewed14-20261020/candidate-400/apps/studio/src/lib/publication-job-capabilities.ts",
+      "bytes": 1271,
+      "sha256": "7d389f6297c52ce49110a524dd1b9b9cf8448dc4190ed8f32945f1fea900f722"
+    },
+    {
+      "path": "/private/tmp/keel-qa-gif-reviewed14-20261020/candidate-400/apps/studio/src/lib/publication-resource-selection.ts",
+      "bytes": 611,
+      "sha256": "cdacdc9dccf1c74db96f3568433804e3400ed53e4aced349a2f72a72f28f7381"
+    },
+    {
+      "path": "/private/tmp/keel-qa-gif-reviewed14-20261020/candidate-400/apps/studio/src/lib/publication-run-schedule.ts",
+      "bytes": 4193,
+      "sha256": "569e465bd05c71fe60df856091142b32f684c9589d00f65302497d45d312124f"
+    },
+    {
+      "path": "/private/tmp/keel-qa-gif-reviewed14-20261020/candidate-400/apps/studio/src/lib/publication-simulation-configuration.ts",
+      "bytes": 3722,
+      "sha256": "c674f30e9460c86d5edb29b7238b5b9bf1dba6d322db4b82918120fbc841203d"
+    },
+    {
+      "path": "/private/tmp/keel-qa-gif-reviewed14-20261020/candidate-400/apps/studio/src/lib/publication-simulation-transport.ts",
+      "bytes": 7647,
+      "sha256": "f679de614a6d01131042b020e168ad87d7c565196619595a639eefdafece0896"
+    },
+    {
+      "path": "/private/tmp/keel-qa-gif-reviewed14-20261020/candidate-400/apps/studio/src/lib/raw-preview-plan.ts",
+      "bytes": 3133,
+      "sha256": "7eb580d756c91cf91ca4062da3209a50a1c882124a908b510027d28c26ebf7cf"
+    },
+    {
+      "path": "/private/tmp/keel-qa-gif-reviewed14-20261020/candidate-400/apps/studio/src/lib/recovered-plan-confirmation.ts",
+      "bytes": 1899,
+      "sha256": "82b36426c5418bc65169695dae90ac3b57bdd6abb4cdde7b1819e085f9c0e42b"
+    },
+    {
+      "path": "/private/tmp/keel-qa-gif-reviewed14-20261020/candidate-400/apps/studio/src/lib/release-access-campaign.ts",
+      "bytes": 18917,
+      "sha256": "a4771b7712b4575c3d2ea7028ea540bf76f14011e5d1c49d1688a762416473b9"
+    },
+    {
+      "path": "/private/tmp/keel-qa-gif-reviewed14-20261020/candidate-400/apps/studio/src/lib/release-access.ts",
+      "bytes": 7699,
+      "sha256": "61b88367e80976002e567f2381b36f1c52d43c5f673d065fc8f565c866480779"
+    },
+    {
+      "path": "/private/tmp/keel-qa-gif-reviewed14-20261020/candidate-400/apps/studio/src/lib/release-controller-profile-read.ts",
+      "bytes": 529,
+      "sha256": "679648419cce5c052734791cff6f0de85521ff8c600aee25c46a7d2cc4da4895"
+    },
+    {
+      "path": "/private/tmp/keel-qa-gif-reviewed14-20261020/candidate-400/apps/studio/src/lib/release-controller-selection.ts",
+      "bytes": 578,
+      "sha256": "94e99d2bd1f30b429b1a576baf9675f49e524e1d06e615b0e8131bc20c2ac504"
+    },
+    {
+      "path": "/private/tmp/keel-qa-gif-reviewed14-20261020/candidate-400/apps/studio/src/lib/release-draft-chain.ts",
+      "bytes": 886,
+      "sha256": "6162e8eb10b036dd472667f9a729815f02aba9371373318addad322db1ec9382"
+    },
+    {
+      "path": "/private/tmp/keel-qa-gif-reviewed14-20261020/candidate-400/apps/studio/src/lib/release-finalization.ts",
+      "bytes": 23877,
+      "sha256": "a00fc343dec870cbdfc6bedd400c969f7b9fd835c94e249cd016743939b1e532"
+    },
+    {
+      "path": "/private/tmp/keel-qa-gif-reviewed14-20261020/candidate-400/apps/studio/src/lib/release-infrastructure-selection.ts",
+      "bytes": 960,
+      "sha256": "0b9a618701845a35af83847dec1c4f25b9ef5cdad9f43922ca5806ffc2df0a91"
+    },
+    {
+      "path": "/private/tmp/keel-qa-gif-reviewed14-20261020/candidate-400/apps/studio/src/lib/release-presentation-repair.ts",
+      "bytes": 3547,
+      "sha256": "69c133391c70f7dd9ab2a9d87902ad79421df5915e6647473c464f6dcfebe658"
+    },
+    {
+      "path": "/private/tmp/keel-qa-gif-reviewed14-20261020/candidate-400/apps/studio/src/lib/release-preview-reference.ts",
+      "bytes": 1692,
+      "sha256": "881c48c671211f6c4944cf30f69619ecfd5e2870d309766525a69cf8f4c6835b"
+    },
+    {
+      "path": "/private/tmp/keel-qa-gif-reviewed14-20261020/candidate-400/apps/studio/src/lib/release-program.ts",
+      "bytes": 4731,
+      "sha256": "fbb1bb224267a8d43aa7b1f2c01241118ff0e66ef704842c6f47b37106a76fbb"
+    },
+    {
+      "path": "/private/tmp/keel-qa-gif-reviewed14-20261020/candidate-400/apps/studio/src/lib/release-publish-kind.ts",
+      "bytes": 5187,
+      "sha256": "9e6e1325e6403c6470f874416718640d6a7e391e6bb2b494fbf8abd992f8f34c"
+    },
+    {
+      "path": "/private/tmp/keel-qa-gif-reviewed14-20261020/candidate-400/apps/studio/src/lib/release-publish-receipt.ts",
+      "bytes": 5365,
+      "sha256": "92c9b60611622db907ff4320881bf12d2ada95538af15f1e0d822ebc8c290a20"
+    },
+    {
+      "path": "/private/tmp/keel-qa-gif-reviewed14-20261020/candidate-400/apps/studio/src/lib/release-publish-state.ts",
+      "bytes": 379,
+      "sha256": "c235723c5382f899c1c1a955419eac6b8ab738723e148f0f390616558653c8ca"
+    },
+    {
+      "path": "/private/tmp/keel-qa-gif-reviewed14-20261020/candidate-400/apps/studio/src/lib/release-read-diagnostic.ts",
+      "bytes": 3792,
+      "sha256": "f5b64ce2ee5ba12b42aaba4c88c6827e23513b745b82679f4aed47cabeb5fa45"
+    },
+    {
+      "path": "/private/tmp/keel-qa-gif-reviewed14-20261020/candidate-400/apps/studio/src/lib/release-review-handoff.ts",
+      "bytes": 2748,
+      "sha256": "8826463711c8d7924933fee25b6dd5e01017f72eb1608743f115cf2cb76db13f"
+    },
+    {
+      "path": "/private/tmp/keel-qa-gif-reviewed14-20261020/candidate-400/apps/studio/src/lib/release-schema.ts",
+      "bytes": 7768,
+      "sha256": "a9c5cd75cadb43c1db54e49d540db7d0dcfdb8497ff09186ba9020358ff10798"
+    },
+    {
+      "path": "/private/tmp/keel-qa-gif-reviewed14-20261020/candidate-400/apps/studio/src/lib/release-types.ts",
+      "bytes": 14099,
+      "sha256": "7bb05fed45ed8bc9d69898eb9056fb32e0dc90d366dbb46fc01557eba46130ed"
+    },
+    {
+      "path": "/private/tmp/keel-qa-gif-reviewed14-20261020/candidate-400/apps/studio/src/lib/release-wallet-batch.ts",
+      "bytes": 2023,
+      "sha256": "90d4f4f39b051a1e5fbacfc012c8314b0bfce98dc9b1005612d75fa552470e4a"
+    },
+    {
+      "path": "/private/tmp/keel-qa-gif-reviewed14-20261020/candidate-400/apps/studio/src/lib/release-wallet-prerequisite.ts",
+      "bytes": 517,
+      "sha256": "5f00279c0fcc6bc83d5403e8e56c7fddebdeef0588594d6bd22e0f3c62f86014"
+    },
+    {
+      "path": "/private/tmp/keel-qa-gif-reviewed14-20261020/candidate-400/apps/studio/src/lib/release-wallet-rejection.ts",
+      "bytes": 3178,
+      "sha256": "22610e5b58b06970a8c3b787a4b2fcbcec65f2ead74d5a76c2f42442e0201eb0"
+    },
+    {
+      "path": "/private/tmp/keel-qa-gif-reviewed14-20261020/candidate-400/apps/studio/src/lib/release-wallet-transaction.ts",
+      "bytes": 3019,
+      "sha256": "49d5a1473fff91b656ac6e4de8ffa218637c36150da6b8d89cf75402d6e12244"
+    },
+    {
+      "path": "/private/tmp/keel-qa-gif-reviewed14-20261020/candidate-400/apps/studio/src/lib/replanned-preview-review.ts",
+      "bytes": 634,
+      "sha256": "3ea5a3427ed6bf2ebaa4f03ac7c06c71dc05bb9557c5c8e59a4af30842154ca6"
+    },
+    {
+      "path": "/private/tmp/keel-qa-gif-reviewed14-20261020/candidate-400/apps/studio/src/lib/reusable-asset-paths.ts",
+      "bytes": 3490,
+      "sha256": "e11030ef124f7e56d6401e4322b2fb7053804452e150eacdf5b933bdee70bccc"
+    },
+    {
+      "path": "/private/tmp/keel-qa-gif-reviewed14-20261020/candidate-400/apps/studio/src/lib/reusable-asset.ts",
+      "bytes": 14678,
+      "sha256": "fb53a9bb47be47d40f44301d556ad03a714ee4224db86c362fea80813d6e23bb"
+    },
+    {
+      "path": "/private/tmp/keel-qa-gif-reviewed14-20261020/candidate-400/apps/studio/src/lib/saved-byte-length.ts",
+      "bytes": 943,
+      "sha256": "5622e909c0d15aad7a4569a93f5ab00ee95ac6f9d1de39627acb1e66497f13d6"
+    },
+    {
+      "path": "/private/tmp/keel-qa-gif-reviewed14-20261020/candidate-400/apps/studio/src/lib/saved-publication-activity.ts",
+      "bytes": 1481,
+      "sha256": "e781a36e17be1948069466663c3d755026d15749c08904f7167a8b903696244b"
+    },
+    {
+      "path": "/private/tmp/keel-qa-gif-reviewed14-20261020/candidate-400/apps/studio/src/lib/shared-edition-copy.ts",
+      "bytes": 5708,
+      "sha256": "f9b519859862c171d989a8893d7a17b48d0ce9c43a7d1725bb44d16ec7c4c25e"
+    },
+    {
+      "path": "/private/tmp/keel-qa-gif-reviewed14-20261020/candidate-400/apps/studio/src/lib/shared-edition-discovery.ts",
+      "bytes": 4744,
+      "sha256": "6d40b475f7672b2c24a05b0b7fb62c3813ed7e7d740855a5847bc66bdf4bc0d3"
+    },
+    {
+      "path": "/private/tmp/keel-qa-gif-reviewed14-20261020/candidate-400/apps/studio/src/lib/shared-edition.ts",
+      "bytes": 74603,
+      "sha256": "cc58ba921e2ae3594f38b409eed0c55a6f449e9fc8a9e82cf13a9adf00667dc9"
+    },
+    {
+      "path": "/private/tmp/keel-qa-gif-reviewed14-20261020/candidate-400/apps/studio/src/lib/studio-access-policy.ts",
+      "bytes": 3965,
+      "sha256": "47a0c9460cfc269aa9cf649ee8493c24052ddb02b4e014cb8e7180c767f6696b"
+    },
+    {
+      "path": "/private/tmp/keel-qa-gif-reviewed14-20261020/candidate-400/apps/studio/src/lib/studio-api-routes.ts",
+      "bytes": 5836,
+      "sha256": "4228a1afcc1dd832049aca0164f863cda85997575dd60b282404a03bcbbdfb73"
+    },
+    {
+      "path": "/private/tmp/keel-qa-gif-reviewed14-20261020/candidate-400/apps/studio/src/lib/studio-creator-asset-inspection.ts",
+      "bytes": 1948,
+      "sha256": "edb5ced9c43988f83a844e937d0fc145aecdc806425c952f3fbafd3776b8f138"
+    },
+    {
+      "path": "/private/tmp/keel-qa-gif-reviewed14-20261020/candidate-400/apps/studio/src/lib/studio-inline-compression.ts",
+      "bytes": 621,
+      "sha256": "638b7768111bd70c4b1bb990142a6dd4d30ed859388b259cd73052bd95314f8f"
+    },
+    {
+      "path": "/private/tmp/keel-qa-gif-reviewed14-20261020/candidate-400/apps/studio/src/lib/studio-plan-state.ts",
+      "bytes": 2244,
+      "sha256": "bc8fe96b654eee1434caf69354eb312e6cbd438e29276b61aeb78ebd09317537"
+    },
+    {
+      "path": "/private/tmp/keel-qa-gif-reviewed14-20261020/candidate-400/apps/studio/src/lib/studio-project-defaults.ts",
+      "bytes": 1943,
+      "sha256": "f8c4f3206f88d01739be90042764056aaea4fe1d497909bdb2c6eb8aa18df4e2"
+    },
+    {
+      "path": "/private/tmp/keel-qa-gif-reviewed14-20261020/candidate-400/apps/studio/src/lib/studio-project-schema.ts",
+      "bytes": 17090,
+      "sha256": "44134eeda00f7fd189f6c05cd0690b5465734f43def9c02bad8462def9d80de9"
+    },
+    {
+      "path": "/private/tmp/keel-qa-gif-reviewed14-20261020/candidate-400/apps/studio/src/lib/studio-release-plan.ts",
+      "bytes": 24790,
+      "sha256": "3098ae58ee71f73e1527d888d294e066b81b5e06df5f22c37b05804fd267e2fe"
+    },
+    {
+      "path": "/private/tmp/keel-qa-gif-reviewed14-20261020/candidate-400/apps/studio/src/lib/studio-wizard.ts",
+      "bytes": 13695,
+      "sha256": "5b52448d555fcb42c6cced5e3dcf812dcc254e604e559036524bd8f9c13182de"
+    },
+    {
+      "path": "/private/tmp/keel-qa-gif-reviewed14-20261020/candidate-400/apps/studio/src/lib/unfunded-preview-replan.ts",
+      "bytes": 44600,
+      "sha256": "25c93ffa2e5b901b0230059d5900389f4e85e145d550dabc11211bc37ce06a06"
+    },
+    {
+      "path": "/private/tmp/keel-qa-gif-reviewed14-20261020/candidate-400/apps/studio/src/lib/unfunded-publication-deadline.ts",
+      "bytes": 13293,
+      "sha256": "a4617947d9e33560d9fc187f636e8566603f6dbe0b069bca981e5d6ef92b6ea0"
+    },
+    {
+      "path": "/private/tmp/keel-qa-gif-reviewed14-20261020/candidate-400/apps/studio/src/lib/updated-publication-review-plan.ts",
+      "bytes": 23668,
+      "sha256": "842bba3aba3f01e89ea0c94cbca58c6a468a53d46b21f50bfa436242137f922a"
+    },
+    {
+      "path": "/private/tmp/keel-qa-gif-reviewed14-20261020/candidate-400/apps/studio/src/lib/upload-plan-generation.ts",
+      "bytes": 590,
+      "sha256": "cb06ecaa845557144658cdabe5ff9ca0abb2c93612013b1ad29222e8ed5c0c73"
+    },
+    {
+      "path": "/private/tmp/keel-qa-gif-reviewed14-20261020/candidate-400/apps/studio/src/server/chain/chunk-store-reader.ts",
+      "bytes": 8669,
+      "sha256": "dbbff15c60d47eae2a97b7b0da24c2cc9956f9559319b2d84eb254e46c8fd1bc"
+    },
+    {
+      "path": "/private/tmp/keel-qa-gif-reviewed14-20261020/candidate-400/apps/studio/src/server/chain/local-test-chain-gas-profile.ts",
+      "bytes": 1968,
+      "sha256": "6221652b3e11a4914b114cefce314f35995b59b791ed6b1d99a1ff8fd13a6d5b"
+    },
+    {
+      "path": "/private/tmp/keel-qa-gif-reviewed14-20261020/candidate-400/apps/studio/src/server/chain/public-client.ts",
+      "bytes": 6227,
+      "sha256": "8d401557a3467fcb682783ba984f399e4c879705f12d3d0b6e3a4109fb599d40"
+    },
+    {
+      "path": "/private/tmp/keel-qa-gif-reviewed14-20261020/candidate-400/apps/studio/src/server/chain/publication-simulation.ts",
+      "bytes": 11230,
+      "sha256": "542b810a2004121728bc9a4f555ccc70d525ea22b95f89f7201311140a64bf17"
+    },
+    {
+      "path": "/private/tmp/keel-qa-gif-reviewed14-20261020/candidate-400/apps/studio/src/server/db/index.ts",
+      "bytes": 1608,
+      "sha256": "307362555bc2ca7b389aa451308814778dc0bbd71c7bdbe4a8f25b898730713e"
+    },
+    {
+      "path": "/private/tmp/keel-qa-gif-reviewed14-20261020/candidate-400/apps/studio/src/server/db/query-timeouts.ts",
+      "bytes": 628,
+      "sha256": "a116269fc7783464c6e157bcb01d4d42692c9661d1f7c34dff027cfdba94251d"
+    },
+    {
+      "path": "/private/tmp/keel-qa-gif-reviewed14-20261020/candidate-400/apps/studio/src/server/db/read-only-context.ts",
+      "bytes": 1948,
+      "sha256": "852994fec81af2e13262a8b23b3808390a47f23c7e65af5bc68e40021bfa2c68"
+    },
+    {
+      "path": "/private/tmp/keel-qa-gif-reviewed14-20261020/candidate-400/apps/studio/src/server/db/schema.ts",
+      "bytes": 120343,
+      "sha256": "a01b3c8433f43fd507de8812ec52455ba438717438357c66d974d4c5e2328e49"
+    },
+    {
+      "path": "/private/tmp/keel-qa-gif-reviewed14-20261020/candidate-400/apps/studio/src/server/lib/bounded-work.ts",
+      "bytes": 1122,
+      "sha256": "88d5e33b12a33cc2a1744e1d5062de975cfa1d0c2674618e32e52b0c4f9e02d5"
+    },
+    {
+      "path": "/private/tmp/keel-qa-gif-reviewed14-20261020/candidate-400/apps/studio/src/server/publisher/managed-execution-lock.ts",
+      "bytes": 2342,
+      "sha256": "7fc6867cc245c8e77f26c50dadecf5a501d9bae8dbb7ad8039c78b67fcc6b7c6"
+    },
+    {
+      "path": "/private/tmp/keel-qa-gif-reviewed14-20261020/candidate-400/apps/studio/src/server/security/account-session.ts",
+      "bytes": 7285,
+      "sha256": "4d387e24d309719b88397375ca03e3335086df21fe455d865d730618a0db8ca1"
+    },
+    {
+      "path": "/private/tmp/keel-qa-gif-reviewed14-20261020/candidate-400/apps/studio/src/server/security/agent-draft-grant.ts",
+      "bytes": 5851,
+      "sha256": "8f3c1157214d0b0d6c81ec2cf0662d7be53467975c87d039af973edf8732594c"
+    },
+    {
+      "path": "/private/tmp/keel-qa-gif-reviewed14-20261020/candidate-400/apps/studio/src/server/security/credential-policy.ts",
+      "bytes": 3153,
+      "sha256": "208e5b4a551323ed81d4cf22d07639ec10c84f21e118fc340d3295de8229b16f"
+    },
+    {
+      "path": "/private/tmp/keel-qa-gif-reviewed14-20261020/candidate-400/apps/studio/src/server/security/private-credential-file.ts",
+      "bytes": 1634,
+      "sha256": "8fb9b3db45d6c04815c0e532e0d0c4007c448e4cf389dc739d74e0c97d9d79a4"
+    },
+    {
+      "path": "/private/tmp/keel-qa-gif-reviewed14-20261020/candidate-400/apps/studio/src/server/security/private-credentials.ts",
+      "bytes": 2756,
+      "sha256": "60e5d094f017945b391c58faa1cd508886929169714ddc938e7b7c15025368b3"
+    },
+    {
+      "path": "/private/tmp/keel-qa-gif-reviewed14-20261020/candidate-400/apps/studio/src/server/security/project-creation-actor.ts",
+      "bytes": 1214,
+      "sha256": "a3a1bf689878d859b8c19dcc44f8d32d66dfd2c41fe7cf748bac897d581db490"
+    },
+    {
+      "path": "/private/tmp/keel-qa-gif-reviewed14-20261020/candidate-400/apps/studio/src/server/security/request-origin.ts",
+      "bytes": 1295,
+      "sha256": "2dbb9306c4b93c4b22c44d1b30331b00571b7ce02e0369ce47b7501e391fe7c0"
+    },
+    {
+      "path": "/private/tmp/keel-qa-gif-reviewed14-20261020/candidate-400/apps/studio/src/server/security/studio-access-config.ts",
+      "bytes": 239,
+      "sha256": "3cef40ca93cc64686fdfc4afcf32865c3c2b09b2a07106ee4d7b7dd870fc9d3d"
+    },
+    {
+      "path": "/private/tmp/keel-qa-gif-reviewed14-20261020/candidate-400/apps/studio/src/server/security/write-access.ts",
+      "bytes": 4689,
+      "sha256": "0e001bf4adb898a8125e535b05c3650df26d1561d2fe8644920b3fb6e5cef5c6"
+    },
+    {
+      "path": "/private/tmp/keel-qa-gif-reviewed14-20261020/candidate-400/apps/studio/src/server/services/access-condition-reader.ts",
+      "bytes": 1851,
+      "sha256": "1fa2aa0c74d6312f2d5fde9bc2e2c9bae44b3fa410ba309c5b47992b01c0564b"
+    },
+    {
+      "path": "/private/tmp/keel-qa-gif-reviewed14-20261020/candidate-400/apps/studio/src/server/services/access-discord-service.ts",
+      "bytes": 12254,
+      "sha256": "8917738da2bf29c7308624316fca5d83c39583b5e2caf90c23203296081f6a2e"
+    },
+    {
+      "path": "/private/tmp/keel-qa-gif-reviewed14-20261020/candidate-400/apps/studio/src/server/services/access-email-service.ts",
+      "bytes": 5399,
+      "sha256": "5c85ad30800f6299493da9009249cdedb0d846ae88500054e0f0ae43885feb6b"
+    },
+    {
+      "path": "/private/tmp/keel-qa-gif-reviewed14-20261020/candidate-400/apps/studio/src/server/services/access-history-service.ts",
+      "bytes": 4823,
+      "sha256": "288140c79b8012ef7f26e716345e9259d1664b8c26c07bcbe9828923c2626f4f"
+    },
+    {
+      "path": "/private/tmp/keel-qa-gif-reviewed14-20261020/candidate-400/apps/studio/src/server/services/access-provider-service.ts",
+      "bytes": 4817,
+      "sha256": "26f8d0ac7b999ab1543f5679a52d461627272d1d67ec846f1bc35dfadf6ff1ec"
+    },
+    {
+      "path": "/private/tmp/keel-qa-gif-reviewed14-20261020/candidate-400/apps/studio/src/server/services/access-raffle-service.ts",
+      "bytes": 16055,
+      "sha256": "0aed809c06984aafa32b9e7d8752daa4917337f6d9af8dfa470039d64c36abbf"
+    },
+    {
+      "path": "/private/tmp/keel-qa-gif-reviewed14-20261020/candidate-400/apps/studio/src/server/services/access-tezos-service.ts",
+      "bytes": 12236,
+      "sha256": "3b094e1966ca96105a376bfba9e86883b46301edc44216ca10c43123dd6d404f"
+    },
+    {
+      "path": "/private/tmp/keel-qa-gif-reviewed14-20261020/candidate-400/apps/studio/src/server/services/access-x-service.ts",
+      "bytes": 11031,
+      "sha256": "737bfc3dfc0e7536b015afe993da94f623c42d4638aef011ef72e890d9f0a6d8"
+    },
+    {
+      "path": "/private/tmp/keel-qa-gif-reviewed14-20261020/candidate-400/apps/studio/src/server/services/agent-state-service.ts",
+      "bytes": 3544,
+      "sha256": "d212de2e763cdea31b79453e4215b0e18f64dc289798726c6d6207a53b784638"
+    },
+    {
+      "path": "/private/tmp/keel-qa-gif-reviewed14-20261020/candidate-400/apps/studio/src/server/services/artifact-build-defaults-service.ts",
+      "bytes": 6902,
+      "sha256": "bc1756eb7f5620914524e1247e1bc4d87c3a5d3f12865711075996b43511eff8"
+    },
+    {
+      "path": "/private/tmp/keel-qa-gif-reviewed14-20261020/candidate-400/apps/studio/src/server/services/artifact-query-service.ts",
+      "bytes": 25259,
+      "sha256": "3ac58d1355fee06a5fe7267660fd62990480bcec09fbfcd06b1db7357e021f1f"
+    },
+    {
+      "path": "/private/tmp/keel-qa-gif-reviewed14-20261020/candidate-400/apps/studio/src/server/services/artifact-service.ts",
+      "bytes": 41774,
+      "sha256": "5b9762c0d3057749bc2811a967e342cbd0f0bbe667eeae267c83681948477055"
+    },
+    {
+      "path": "/private/tmp/keel-qa-gif-reviewed14-20261020/candidate-400/apps/studio/src/server/services/asset-preparation.ts",
+      "bytes": 17703,
+      "sha256": "523ad62d29b614cc8414f95e4e91be5a9cea2558aaf1f13c8441fd798e63466a"
+    },
+    {
+      "path": "/private/tmp/keel-qa-gif-reviewed14-20261020/candidate-400/apps/studio/src/server/services/blob-record-service.ts",
+      "bytes": 531,
+      "sha256": "6cfc208f9ed3b83cc4e1710d66c518d49f171e41a4f9ff02d34ce00dae5ba38c"
+    },
+    {
+      "path": "/private/tmp/keel-qa-gif-reviewed14-20261020/candidate-400/apps/studio/src/server/services/community-replication-source-service.ts",
+      "bytes": 34694,
+      "sha256": "b219a1bfe5151397fd712629599dfaece2a1ff13c372b592d353db92b452a40d"
+    },
+    {
+      "path": "/private/tmp/keel-qa-gif-reviewed14-20261020/candidate-400/apps/studio/src/server/services/creation-module-service.ts",
+      "bytes": 7821,
+      "sha256": "ef17ac3c47e7ab279f8556cf18a9b3481d88e1a97b3848fe0442c9fb065dcc31"
+    },
+    {
+      "path": "/private/tmp/keel-qa-gif-reviewed14-20261020/candidate-400/apps/studio/src/server/services/creator-prepared-compatibility-service.ts",
+      "bytes": 9163,
+      "sha256": "7904a76c7a7b2b5c6d193b2119f582ee1b92a3037252949d17392183df063fbd"
+    },
+    {
+      "path": "/private/tmp/keel-qa-gif-reviewed14-20261020/candidate-400/apps/studio/src/server/services/creator-prepared-publication-intake-service.ts",
+      "bytes": 11044,
+      "sha256": "5b4635c771b30b9cdb0ed522be0c868dae5204fb7b52aaaef9bb2ea6dde37cd6"
+    },
+    {
+      "path": "/private/tmp/keel-qa-gif-reviewed14-20261020/candidate-400/apps/studio/src/server/services/creator-prepared-publication-service.ts",
+      "bytes": 20936,
+      "sha256": "dd1c33b2df18fb31cf236f3b0678c16d5b022476bcba01045ad8a10aaa8f5ab4"
+    },
+    {
+      "path": "/private/tmp/keel-qa-gif-reviewed14-20261020/candidate-400/apps/studio/src/server/services/creator-prepared-source-service.ts",
+      "bytes": 14245,
+      "sha256": "20fa9e5b22e774643faef8012fc98b88ba3dc52c86e3ae4e50473f555ee5e29b"
+    },
+    {
+      "path": "/private/tmp/keel-qa-gif-reviewed14-20261020/candidate-400/apps/studio/src/server/services/creator-prepared-source.ts",
+      "bytes": 6614,
+      "sha256": "95f243a1ef9318613b09acc709ef8833295523253d241d80ea8c2c961c7f4c89"
+    },
+    {
+      "path": "/private/tmp/keel-qa-gif-reviewed14-20261020/candidate-400/apps/studio/src/server/services/creator-service.ts",
+      "bytes": 1990,
+      "sha256": "0d52c63ecdbf1c54b4aa5df84828212359854eaf697aa50199b0d014007a9700"
+    },
+    {
+      "path": "/private/tmp/keel-qa-gif-reviewed14-20261020/candidate-400/apps/studio/src/server/services/initial-storage-preflight-service.ts",
+      "bytes": 37440,
+      "sha256": "57ed300c39fb89ce3c96328f9754b8944140e5a089efbe143b95af178d3fea65"
+    },
+    {
+      "path": "/private/tmp/keel-qa-gif-reviewed14-20261020/candidate-400/apps/studio/src/server/services/inline-fragment-catalog-service.ts",
+      "bytes": 79248,
+      "sha256": "38e3df32ba8c01848f16d9860fcefbb156dca0c6ed904be646d10b2710b0c5c1"
+    },
+    {
+      "path": "/private/tmp/keel-qa-gif-reviewed14-20261020/candidate-400/apps/studio/src/server/services/inline-reader-compatibility.ts",
+      "bytes": 1158,
+      "sha256": "af4a4619e7e7738196f122a0ae3525809d8af924f153bb1293e3c346cc3f4f79"
+    },
+    {
+      "path": "/private/tmp/keel-qa-gif-reviewed14-20261020/candidate-400/apps/studio/src/server/services/inline-upload-plan.ts",
+      "bytes": 14493,
+      "sha256": "25bbb10b9bf8ad9e48fa5d8e24fd23482f3acd3d99b6c84a98dc9f680d3cc297"
+    },
+    {
+      "path": "/private/tmp/keel-qa-gif-reviewed14-20261020/candidate-400/apps/studio/src/server/services/keel-object-identity.ts",
+      "bytes": 1576,
+      "sha256": "38a3e4042c9086d5666f7003ab4651981e3c2f18ecf9cf891d30fe1d2926db3a"
+    },
+    {
+      "path": "/private/tmp/keel-qa-gif-reviewed14-20261020/candidate-400/apps/studio/src/server/services/legacy-prepared-source-adoption-service.ts",
+      "bytes": 59390,
+      "sha256": "9157353ab6a15c8f2316f287c06b6f1004c3813037bb57bda7f86fa2b991e5a7"
+    },
+    {
+      "path": "/private/tmp/keel-qa-gif-reviewed14-20261020/candidate-400/apps/studio/src/server/services/legacy-shared-image-artifact.ts",
+      "bytes": 12538,
+      "sha256": "7a3b7993ea4c3d83917b8421f7888a2c3eeb2258c2d9b5f609855000bd3fb04a"
+    },
+    {
+      "path": "/private/tmp/keel-qa-gif-reviewed14-20261020/candidate-400/apps/studio/src/server/services/library-index-service.ts",
+      "bytes": 57981,
+      "sha256": "19c2752433907087d21b4824d95110746e6ea4cfa5892be77b69624460d2c62c"
+    },
+    {
+      "path": "/private/tmp/keel-qa-gif-reviewed14-20261020/candidate-400/apps/studio/src/server/services/library-selection-service.ts",
+      "bytes": 8085,
+      "sha256": "041a4afdbd7469d4dc2b3c3c98628278e7bc0fb621db1de376569a9d431db203"
+    },
+    {
+      "path": "/private/tmp/keel-qa-gif-reviewed14-20261020/candidate-400/apps/studio/src/server/services/library-tag-binding-service.ts",
+      "bytes": 3871,
+      "sha256": "fce3065419cc2d16f48988587ac1d19edcbc28dc890c780eade7a9966604ea20"
+    },
+    {
+      "path": "/private/tmp/keel-qa-gif-reviewed14-20261020/candidate-400/apps/studio/src/server/services/managed-hybrid-candidate-selection.ts",
+      "bytes": 9150,
+      "sha256": "f0d46a8b61abfa64893fcda08e0c428d0a2e0a3a6a446d0ccc058a0f514a1cf5"
+    },
+    {
+      "path": "/private/tmp/keel-qa-gif-reviewed14-20261020/candidate-400/apps/studio/src/server/services/managed-hybrid-phase-client.ts",
+      "bytes": 1748,
+      "sha256": "77d9450e7c02983f5bdb896b150c7a9dfbbb3fe1771f6fe41fa81e16bcb046f5"
+    },
+    {
+      "path": "/private/tmp/keel-qa-gif-reviewed14-20261020/candidate-400/apps/studio/src/server/services/managed-hybrid-presentation.ts",
+      "bytes": 35837,
+      "sha256": "518da2f01ff7978bc5addc59b72a2def6e7826254bd40655cc4600078ead3cc7"
+    },
+    {
+      "path": "/private/tmp/keel-qa-gif-reviewed14-20261020/candidate-400/apps/studio/src/server/services/managed-hybrid-release-compiler.ts",
+      "bytes": 15483,
+      "sha256": "623d63aeec347a4b1c6b9769fa82b11abd12acee35e0b4460e47d0fcef570ae3"
+    },
+    {
+      "path": "/private/tmp/keel-qa-gif-reviewed14-20261020/candidate-400/apps/studio/src/server/services/managed-hybrid-release-readback.ts",
+      "bytes": 6493,
+      "sha256": "ea9dc8027ecc2031cc2402ba817ee8fc5afb9b1329e8678bcf5278ce2bfb36c2"
+    },
+    {
+      "path": "/private/tmp/keel-qa-gif-reviewed14-20261020/candidate-400/apps/studio/src/server/services/managed-hybrid-staging-service.ts",
+      "bytes": 42486,
+      "sha256": "bb84895d575df230d3254efe1e4a10a93f968f257d28c08404984acd82b55065"
+    },
+    {
+      "path": "/private/tmp/keel-qa-gif-reviewed14-20261020/candidate-400/apps/studio/src/server/services/managed-ipfs-service.ts",
+      "bytes": 8414,
+      "sha256": "a4acbc321c094843b3972ed420177bc00c8d414f758857ccfde77861d02c4a6c"
+    },
+    {
+      "path": "/private/tmp/keel-qa-gif-reviewed14-20261020/candidate-400/apps/studio/src/server/services/module-binding-service.ts",
+      "bytes": 4032,
+      "sha256": "488d2340049c326df483ad2e7e52fe12d78a81dc5fbf70a3091201807680a2b3"
+    },
+    {
+      "path": "/private/tmp/keel-qa-gif-reviewed14-20261020/candidate-400/apps/studio/src/server/services/native-media-presentation.ts",
+      "bytes": 29993,
+      "sha256": "d929787c58429534d877209f679dbb353682e6dbfddd1bd08aacbf28c15fc0b3"
+    },
+    {
+      "path": "/private/tmp/keel-qa-gif-reviewed14-20261020/candidate-400/apps/studio/src/server/services/publication-build-identity.ts",
+      "bytes": 1517,
+      "sha256": "8670bd3c70e8e1afa36419263d9683982c0d0d9da07aa8f11e73f2c827e074c9"
+    },
+    {
+      "path": "/private/tmp/keel-qa-gif-reviewed14-20261020/candidate-400/apps/studio/src/server/services/publication-diagnostics-service.ts",
+      "bytes": 5818,
+      "sha256": "b468a7a47fb339da63a4c2380532764ce0e060060940fdf8cb67a71c78c3b4f3"
+    },
+    {
+      "path": "/private/tmp/keel-qa-gif-reviewed14-20261020/candidate-400/apps/studio/src/server/services/publication-service.ts",
+      "bytes": 52681,
+      "sha256": "35b387ad522fd0039f63420982285f1ab138934ff6f04ae7602719ad5003df76"
+    },
+    {
+      "path": "/private/tmp/keel-qa-gif-reviewed14-20261020/candidate-400/apps/studio/src/server/services/published-metadata-bounds.ts",
+      "bytes": 2989,
+      "sha256": "1c02369057ec86c7fa57f734b349a03b66b9dad033cdd589b6f2bdcc2732005e"
+    },
+    {
+      "path": "/private/tmp/keel-qa-gif-reviewed14-20261020/candidate-400/apps/studio/src/server/services/registered-inline-candidate-plan.ts",
+      "bytes": 5961,
+      "sha256": "0ba13a9229a431d38af763ace398bd5ea09ef4ec33ab54ab401dd3ae02646ec6"
+    },
+    {
+      "path": "/private/tmp/keel-qa-gif-reviewed14-20261020/candidate-400/apps/studio/src/server/services/registered-inline-final-render.ts",
+      "bytes": 10395,
+      "sha256": "0191d3c1e34f9dc3b636752a64f3a9c2a85f7819f3e2609125b90b4a0fda6d28"
+    },
+    {
+      "path": "/private/tmp/keel-qa-gif-reviewed14-20261020/candidate-400/apps/studio/src/server/services/registered-inline-final-review.ts",
+      "bytes": 6858,
+      "sha256": "2a28fb7971b0c785219b25b71acb415f1a949170d6a49293197a632eddaeae57"
+    },
+    {
+      "path": "/private/tmp/keel-qa-gif-reviewed14-20261020/candidate-400/apps/studio/src/server/services/registered-inline-release-review.ts",
+      "bytes": 11083,
+      "sha256": "2ee89bb22605c03394e2b3c0e91d9fcaa250c9643f6e074d83367d220207f1bb"
+    },
+    {
+      "path": "/private/tmp/keel-qa-gif-reviewed14-20261020/candidate-400/apps/studio/src/server/services/registered-inline-saved-review.ts",
+      "bytes": 4780,
+      "sha256": "0d36565d9735ef146f0ad2b2b4d0bdd11095349ace2e2bd0918d818901cb6ac5"
+    },
+    {
+      "path": "/private/tmp/keel-qa-gif-reviewed14-20261020/candidate-400/apps/studio/src/server/services/release-asset-presentation.ts",
+      "bytes": 26472,
+      "sha256": "e0c7efbfb8dcdcdb8a647e740ef080278133a1ca45657423e575fe8e7717451e"
+    },
+    {
+      "path": "/private/tmp/keel-qa-gif-reviewed14-20261020/candidate-400/apps/studio/src/server/services/release-compatibility-policy.ts",
+      "bytes": 8207,
+      "sha256": "728b1c2414bee6380bfe8d34faf25dbacf017f0e562f3d2ee09ccf15f7db805b"
+    },
+    {
+      "path": "/private/tmp/keel-qa-gif-reviewed14-20261020/candidate-400/apps/studio/src/server/services/release-compatibility-service.ts",
+      "bytes": 10248,
+      "sha256": "4c37ae1d4f9a89658f963e3c809dd35b9ab9d208636464d1e696dd0ac64272e5"
+    },
+    {
+      "path": "/private/tmp/keel-qa-gif-reviewed14-20261020/candidate-400/apps/studio/src/server/services/release-finalization-discovery.ts",
+      "bytes": 28571,
+      "sha256": "c7a1f6f7dad65c91ced114e8456cbdb3b5c31483a14182b56200a49b114e4cf5"
+    },
+    {
+      "path": "/private/tmp/keel-qa-gif-reviewed14-20261020/candidate-400/apps/studio/src/server/services/release-planning-service.ts",
+      "bytes": 9386,
+      "sha256": "72f36dc5b73a9e59c440463c3ee328db715c30127d0099b186d92181b7a63cc0"
+    },
+    {
+      "path": "/private/tmp/keel-qa-gif-reviewed14-20261020/candidate-400/apps/studio/src/server/services/release-service.ts",
+      "bytes": 484007,
+      "sha256": "971d97a724bd8539dda3eca86390aa87a386fd32a0f2844c9a038ac6e94c3fc3"
+    },
+    {
+      "path": "/private/tmp/keel-qa-gif-reviewed14-20261020/candidate-400/apps/studio/src/server/services/release-shared-publisher.ts",
+      "bytes": 74543,
+      "sha256": "a218a325881ff7a9f54451fb5588d3b71231c670495e3228f2bb1489cabb6a77"
+    },
+    {
+      "path": "/private/tmp/keel-qa-gif-reviewed14-20261020/candidate-400/apps/studio/src/server/services/release-wallet-preflight.ts",
+      "bytes": 11997,
+      "sha256": "2e81955b13e72ec461596b76dc97e2dff06c94685a85162a4a7e59fc663586e5"
+    },
+    {
+      "path": "/private/tmp/keel-qa-gif-reviewed14-20261020/candidate-400/apps/studio/src/server/services/remote-source.ts",
+      "bytes": 8923,
+      "sha256": "817af1260d5a2c907ab9ade90316ccde2518911727de8da21d3fd6839873e657"
+    },
+    {
+      "path": "/private/tmp/keel-qa-gif-reviewed14-20261020/candidate-400/apps/studio/src/server/services/saved-publication-activity-reconciliation.ts",
+      "bytes": 10410,
+      "sha256": "0b257806bce722cb18843489ac306157abcb78622b8c530070f29e09b16ef746"
+    },
+    {
+      "path": "/private/tmp/keel-qa-gif-reviewed14-20261020/candidate-400/apps/studio/src/server/services/shared-edition-capability-service.ts",
+      "bytes": 29581,
+      "sha256": "686defe9af94a921422b7c37246bbb374dd72c54ec1fcae97e6ed2ec2e39a4ab"
+    },
+    {
+      "path": "/private/tmp/keel-qa-gif-reviewed14-20261020/candidate-400/apps/studio/src/server/services/shared-image-store-policy.ts",
+      "bytes": 3236,
+      "sha256": "9ce043a368e2071182d26086e1f06cd19e8e3c9f9ef52a09284b79f872e189bc"
+    },
+    {
+      "path": "/private/tmp/keel-qa-gif-reviewed14-20261020/candidate-400/apps/studio/src/server/services/studio-project-defaults-service.ts",
+      "bytes": 5144,
+      "sha256": "bf164a1e3a67ec869e94412c84ac7d55c076ffc15025082d2acf79271249efe7"
+    },
+    {
+      "path": "/private/tmp/keel-qa-gif-reviewed14-20261020/candidate-400/apps/studio/src/server/services/studio-project-profiles-service.ts",
+      "bytes": 3408,
+      "sha256": "d82edd7f028c7ef2eec26b764a023b9e4ca5c96612761c41216123c2a6c5e11d"
+    },
+    {
+      "path": "/private/tmp/keel-qa-gif-reviewed14-20261020/candidate-400/apps/studio/src/server/services/tezos-read-profile-service.ts",
+      "bytes": 1124,
+      "sha256": "52895ccbd5d92c66cba3e320c9f9ea450742fe69f41e8bf7b8a133d449edc789"
+    },
+    {
+      "path": "/private/tmp/keel-qa-gif-reviewed14-20261020/candidate-400/apps/studio/src/server/services/unfunded-preview-replan-service.ts",
+      "bytes": 24132,
+      "sha256": "f3d8af5fe61319bc9ae7448f450508959a1eea9d9838a18f4141e55c6d9fbc02"
+    },
+    {
+      "path": "/private/tmp/keel-qa-gif-reviewed14-20261020/candidate-400/apps/studio/src/server/services/unfunded-publication-deadline-service.ts",
+      "bytes": 7484,
+      "sha256": "8170e42056ebf83031f43b632718cdf6fe9535a5cd090856e7e612bd4084ee48"
+    },
+    {
+      "path": "/private/tmp/keel-qa-gif-reviewed14-20261020/candidate-400/apps/studio/src/server/services/updated-publication-review-service.ts",
+      "bytes": 41652,
+      "sha256": "f43f482cd36da6866860d2328f628a48c0ea37e554883d6594e176d5439e54e4"
+    },
+    {
+      "path": "/private/tmp/keel-qa-gif-reviewed14-20261020/candidate-400/apps/studio/src/server/services/updated-review-candidate-service.ts",
+      "bytes": 21004,
+      "sha256": "dbddfdee17895c2e5bee35013b02814cedb352f2c4a4988697adff221053bb9c"
+    },
+    {
+      "path": "/private/tmp/keel-qa-gif-reviewed14-20261020/candidate-400/apps/studio/src/server/services/updated-review-funded-recovery.ts",
+      "bytes": 8322,
+      "sha256": "b266ea0ed1eb676e8f9f2dc79644899cfbf0d7ef6b9beda12a7bf5d59a7a6b9f"
+    },
+    {
+      "path": "/private/tmp/keel-qa-gif-reviewed14-20261020/candidate-400/apps/studio/src/server/services/updated-review-funding.ts",
+      "bytes": 3180,
+      "sha256": "6de97c624280c1400ca5d4161187295d9943fa57ead966a50d1ae540905dd520"
+    },
+    {
+      "path": "/private/tmp/keel-qa-gif-reviewed14-20261020/candidate-400/apps/studio/src/server/services/updated-review-reconciliation.ts",
+      "bytes": 29707,
+      "sha256": "d467216b15dca3bc14a6b4b4280f86e8e8b465a9ca91717f60513e12d67efc21"
+    },
+    {
+      "path": "/private/tmp/keel-qa-gif-reviewed14-20261020/candidate-400/apps/studio/src/server/services/upload-plan-builder.ts",
+      "bytes": 4404,
+      "sha256": "7ea55684987b2eba54c2e00a5cdcddb9bfe644ddb831bd0bcddfcc73757e38d5"
+    },
+    {
+      "path": "/private/tmp/keel-qa-gif-reviewed14-20261020/candidate-400/apps/studio/src/server/services/upload-plan-byte-proof.ts",
+      "bytes": 4004,
+      "sha256": "a0f46987dcced059ea298f162b6dc44c1fdc9935bf8ccf63a1023de53adf53a5"
+    },
+    {
+      "path": "/private/tmp/keel-qa-gif-reviewed14-20261020/candidate-400/apps/studio/src/server/services/upload-plan-object-identity.ts",
+      "bytes": 5906,
+      "sha256": "014ada6c6095b405837baa3bf855eeae86f5cdefebc04c6123512e8662af6d9d"
+    },
+    {
+      "path": "/private/tmp/keel-qa-gif-reviewed14-20261020/candidate-400/apps/studio/src/server/services/upload-plan-staging.ts",
+      "bytes": 3123,
+      "sha256": "8ef94136fbcf754de792191dd60e82c1335751fbf48626707cdb4f600520d36e"
+    },
+    {
+      "path": "/private/tmp/keel-qa-gif-reviewed14-20261020/candidate-400/apps/studio/src/server/storage/content-store.ts",
+      "bytes": 4349,
+      "sha256": "f5f05bfe858693e1f633cf9a31983ab3ffc547af0aaab19f9c471e99551feb35"
+    },
+    {
+      "path": "/private/tmp/keel-private-gif-fresh-forward-20261020-01/packet.json",
+      "bytes": 3267,
+      "sha256": "6a8359955daceb7cf29ffdcace0a97fb24741ae7ca60005956e5de7d10638267"
+    },
+    {
+      "path": "/private/tmp/keel-private-gif-fresh-forward-bundle-20261020-01/bundle-receipt.json",
+      "bytes": 46928,
+      "sha256": "720c2c5e5ee49ef75014e5e0ea9c408f68bf1fc74c8593bcd952ac32f3e757f4"
+    },
+    {
+      "path": "/private/tmp/keel-private-gif-fresh-forward-bundle-20261020-01/normal-original.mjs",
+      "bytes": 1347931,
+      "sha256": "6988226fab81105e2ec2a6e233e1dd902a08d2eecc4381c8b661730f57b52647"
+    },
+    {
+      "path": "/private/tmp/keel-independent-gif-fresh99-20261020/producer-review.json",
+      "bytes": 1032,
+      "sha256": "09c2be41629d7bfaed0dee066ee121b8aac2e0b6ce50a5746e538296c6d948b0"
+    }
+  ],
+  "forwardSources": [
+    {
+      "path": "/private/tmp/keel-qa-receipt-activation-20261020/keel-site/docs/tools/gif-fresh-forward-capture/forward/README.md",
+      "bytes": 3521,
+      "sha256": "84a6ce753c428e49fcb61105d8f72033c6123038db71306729eae145f70810b9"
+    },
+    {
+      "path": "/private/tmp/keel-qa-receipt-activation-20261020/keel-site/docs/tools/gif-fresh-forward-capture/forward/canonical-reference.mjs",
+      "bytes": 9620,
+      "sha256": "804108a41b5ac69ff109fc7799589929847c012c4046308da5b2e9fd43bfb67e"
+    },
+    {
+      "path": "/private/tmp/keel-qa-receipt-activation-20261020/keel-site/docs/tools/gif-fresh-forward-capture/forward/forward-core.mjs",
+      "bytes": 10274,
+      "sha256": "0881fa00167f0ceb863537aa0b5fb2ff93fe6085fbf87938e42fbc9ab86af954"
+    },
+    {
+      "path": "/private/tmp/keel-qa-receipt-activation-20261020/keel-site/docs/tools/gif-fresh-forward-capture/forward/forward-original.mjs",
+      "bytes": 6903,
+      "sha256": "dddfb0882d581dc01ab51d23fc89b556e4515d43ced2f0fc54ee9ebbb2d56825"
+    },
+    {
+      "path": "/private/tmp/keel-qa-receipt-activation-20261020/keel-site/docs/tools/gif-fresh-forward-capture/forward/forward-reference.test.mjs",
+      "bytes": 9082,
+      "sha256": "69cc388c35fdc8f0848dec639f5dee28df6ccf73a344e412fbe35f40a8bcf3fd"
+    },
+    {
+      "path": "/private/tmp/keel-qa-receipt-activation-20261020/keel-site/docs/tools/gif-fresh-forward-capture/forward/strict/deployed-core.mjs",
+      "bytes": 10163,
+      "sha256": "71e3d17dcdcbfa14655b8099c2d0df278ea2424efcf7126c0f758669cde687c9"
+    },
+    {
+      "path": "/private/tmp/keel-qa-receipt-activation-20261020/keel-site/docs/tools/gif-fresh-forward-capture/forward/strict/identity.mjs",
+      "bytes": 2223,
+      "sha256": "426164037f2013bdc4053fc03d1f76f256f23ff75454d2de9aa4301f932d4f2a"
+    },
+    {
+      "path": "/private/tmp/keel-qa-receipt-activation-20261020/keel-site/docs/tools/gif-fresh-forward-capture/forward/strict/verify-original.mjs",
+      "bytes": 6401,
+      "sha256": "4a226a9459833dee0dc9560f1cc951ed3d9e54d4184bc60fe59a8f196ce23d7e"
+    },
+    {
+      "path": "/private/tmp/keel-qa-receipt-activation-20261020/keel-site/docs/tools/gif-fresh-forward-capture/forward/validate-retained.mjs",
+      "bytes": 3368,
+      "sha256": "3d41983663d773d0dcdbd9601025233da5913e3dc20e7de1aca96160afb79957"
+    }
+  ],
+  "producerReview": {
+    "path": "/private/tmp/keel-independent-gif-fresh99-20261020/producer-review.json",
+    "bytes": 1032,
+    "sha256": "09c2be41629d7bfaed0dee066ee121b8aac2e0b6ce50a5746e538296c6d948b0"
+  },
+  "packetSha256": "6a8359955daceb7cf29ffdcace0a97fb24741ae7ca60005956e5de7d10638267",
+  "bundleSha256": "6988226fab81105e2ec2a6e233e1dd902a08d2eecc4381c8b661730f57b52647",
+  "forwardEntry": "/private/tmp/keel-qa-receipt-activation-20261020/keel-site/docs/tools/gif-fresh-forward-capture/forward/validate-retained.mjs",
+  "source": {
+    "path": "/tmp/keel-private-gif-existing-inputs-20261019-04/blobs/c4/ff/c4ff4691aadf85cb5c7e2848d94a2874acdb862b5e6f498db2a350d98e1c3f00",
+    "sha256": "c4ff4691aadf85cb5c7e2848d94a2874acdb862b5e6f498db2a350d98e1c3f00"
+  },
+  "preview": {
+    "path": "/tmp/keel-private-gif-existing-inputs-20261019-04/blobs/c4/cc/c4cc1d08196fa856853906f6123c53193b8670ed1ec69a46d767eecdf6cb3df6",
+    "sha256": "c4cc1d08196fa856853906f6123c53193b8670ed1ec69a46d767eecdf6cb3df6"
+  }
+}

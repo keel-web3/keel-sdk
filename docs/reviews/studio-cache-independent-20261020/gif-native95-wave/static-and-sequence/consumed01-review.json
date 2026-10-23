@@ -1,0 +1,51 @@
+{
+  "schema": "keel.independent-gif95-consumed01-status@1",
+  "reviewScope": "Accepted source and one-shot admission did not imply actual run success",
+  "actualProgram": {
+    "path": "/tmp/keel-private-gif-fresh-forward-capture-20261020-01/normal.provisional.private.json",
+    "bytes": 9948247,
+    "sha256": "aeaea2a45589b51b51532ff2491da3d67698edc12093fc7d993f153dde4ff04e"
+  },
+  "pipelineFailure": {
+    "path": "/private/tmp/keel-gif95-one-shot-actual-20261020/failure.json",
+    "sha256": "6b853c9a611c6f9e1a1b71921a4d483a4a9cc31190e52f33b0bd724c686690ca",
+    "record": {
+      "schema": "keel-gator-one-shot-failure@1",
+      "status": "STOPPED_NO_RETRY",
+      "errorClass": "RuntimeError",
+      "completedSteps": [
+        {
+          "name": "normal-assembly",
+          "exitCode": 1,
+          "seconds": 9.859
+        }
+      ],
+      "seconds": 9.868,
+      "signing": false,
+      "submission": false,
+      "productionActivated": false
+    }
+  },
+  "qaPureAudit": {
+    "path": "/tmp/keel-qa-gif95-actual01-20261020/post-run-audit.json",
+    "sha256": "c0d847762340668c762eecfdce2500d44f915b9e72df72b23ebeb44838708fcf"
+  },
+  "status": "CONSUMED_ASSEMBLY_STRICT_REFERENCE_FAILURE_NO_NATIVE",
+  "maximumTransactionGas": {
+    "historicalReference": "200000000",
+    "freshInput": "199219141",
+    "freshHeaderGasLimit": "199219141",
+    "canonicalPolicy": "b524 resolveKeelTransactionGasPolicy(chain11155111,authenticated timestamp/gasLimit) maximumTotalGas=min(blockGasLimit,4294967295) afterAmsterdam",
+    "separateExecutionGasCap": "16777216",
+    "proposedCorrectionStatus": "DESIGN_ATTRIBUTED_EXACT_PATCH_NOT_YET_REVIEWED"
+  },
+  "sourceRefs": [
+    "Site400 initial-storage-preflight-service.ts66-68,245,274",
+    "Site400 executor-transaction-fees.ts47-48",
+    "b524 transaction-gas-policy.ts53-66"
+  ],
+  "newRetryOrExecutionApproved": false,
+  "signing": false,
+  "submission": false,
+  "activation": false
+}

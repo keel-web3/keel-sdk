@@ -1,0 +1,51 @@
+{
+  "schema": "keel-independent-source-cache-review@1",
+  "reviewedAt": "2026-10-20T08:14:31.814316+00:00",
+  "reviewerAuthoredFix": false,
+  "candidateCommit": "b524bf5fc19939c7523aada2e53f79e3360970ea",
+  "baseCommit": "4bbda2512792514c0969616367f5112ba9c9e5ec",
+  "productionFiles": [
+    "native/proof-executor/state-reader.mjs"
+  ],
+  "decision": "APPROVE_SOURCE_DELTA_ONLY",
+  "blockingFindings": [],
+  "sourceChecks": [
+    "Successful EIP-1898 proof/code only; normalized keys, provider-specific entries, reader-instance isolation.",
+    "Inclusive UTF8 key+JSON result 8MiB and1024FIFO; deep copies at retention and return.",
+    "Live chain/header/ancestor checks unchanged; native root authentication unchanged.",
+    "Failed awaited reads invalidate epoch and cache; observed401/403/reorg terminal; close/cancel rejects late completions.",
+    "Only canonical test-suite classification added atb524; no weakened assertion or test exclusion."
+  ],
+  "ownExecutions": {
+    "QAAdversarial": {
+      "pass": 24,
+      "fail": 0,
+      "logSHA256": "444943db72e29d34dcf9a4fec413d7b373ff35ff02ba380aad39b421eaeb2356"
+    },
+    "maintainedReaders": {
+      "pass": 24,
+      "fail": 0,
+      "logSHA256": "7094b50d1939048c002dff51877d2f4d0604e077ae2f6c807daaa665ae0a08c8"
+    },
+    "auditorComparison": {
+      "pass": 19,
+      "fail": 0,
+      "logSHA256": "d9ecfc51ec0e11e5c82d91378face9d10b2f4b08207d236bc8ff0d41a5935b26"
+    }
+  },
+  "auditorPinReview": {
+    "decision": "APPROVE_LITERAL_ONLY_B524_PIN",
+    "newSHA256": "56bba683d3e36415e1d048e95e01b81b16e42caa693bca1b312c42eb430ca6b1",
+    "reversedOneLiteralSHA256": "10523d7ce9df71d483ca9265c3afe5eceb687d4b6e73e11f93676fb92c827c4c",
+    "comparisonUnchangedSHA256": "6ce1d106afd8b58c17583fda9974f298ce65fda27f2c67ca905602c058c419d1",
+    "newCaptureAudited": false
+  },
+  "releaseApproved": false,
+  "remaining": [
+    "Final exact-image QA and full canonical gate closure.",
+    "Fresh full strict actual Gatorrr program and authenticated result predicate.",
+    "Historical deployed HTTP200 decoded tokenURI/image/canvas and requested browser acceptance.",
+    "Owner wallet authority and any signing/submission remain separate."
+  ],
+  "originalFailedEvidenceRetained": true
+}

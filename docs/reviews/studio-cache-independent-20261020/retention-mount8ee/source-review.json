@@ -1,0 +1,27 @@
+{
+  "schema": "keel.independent-full-mount-order-source-review@1",
+  "decision": "APPROVE_EXACT_TWO_EXPRESSIONS_SOURCE_ONLY_AND_SEPARATE_RETENTION_COMMAND",
+  "source": "8ee80c4184b8e779ad4d40f05c032e985f83a716",
+  "runtimeRows": [
+    {
+      "path": "retain-older-inputs.py",
+      "newSHA256": "c2dc22d61a7c715b83680366b3208f3252ff404477676ea8b70b9b785b3f442e",
+      "onlyFullMountOuterArrayOrderNormalization": true,
+      "allOtherSourceBytesIdentical": true
+    },
+    {
+      "path": "resume95/native95-host-controls.py",
+      "newSHA256": "9cfc420d79ca42afe76ddff8d3683435cf61db70d9898a9e1a6aa6b4891b72f2",
+      "onlyFullMountOuterArrayOrderNormalization": true,
+      "allOtherSourceBytesIdentical": true
+    }
+  ],
+  "completeFieldsTypesNestedArrayOrderAndDuplicateMultiplicityPreserved": true,
+  "independentLinuxTests": 26,
+  "failures": 0,
+  "skips": 0,
+  "actualProtectedCopiesFreshFullHashMatch": true,
+  "retentionOnlyCommandSHA256": "9720c64802ba14b19e9ec15d6088b48934ee24518ed042214f4d1f808d92d608",
+  "nativeQualificationExecuted": false,
+  "productionActivationApproved": false
+}

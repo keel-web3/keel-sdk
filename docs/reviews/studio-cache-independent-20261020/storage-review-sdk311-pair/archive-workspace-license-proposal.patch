@@ -1,0 +1,39 @@
+--- archive-equivalence-probe.py
++++ archive-equivalence-probe.py
+@@ -14,14 +14,34 @@
+  packageFolder=sdk/'packages'/x['name'].removeprefix('@keel/')
+  count=0
+  with tarfile.open(p,'r:gz') as t:
++  seen=set()
+   for m in t.getmembers():
++   assert m.name not in seen and (m.isdir() or m.isfile()),(x['name'],m.name,'duplicate_or_nonregular')
++   seen.add(m.name)
+    assert m.name.startswith('package/') and '..' not in Path(m.name).parts
+    if m.isfile():
+     data=t.extractfile(m).read();actual=packageFolder/Path(m.name).relative_to('package')
+-    assert actual.is_file() and actual.read_bytes()==data,(x['name'],m.name)
++    if m.name=='package/LICENSE' and not actual.exists():
++     assert not actual.is_symlink()
++     assert data==subprocess.check_output(['git','-C',str(sdk),'show',packages['sdkSource']+':LICENSE'])
++    elif m.name=='package/package.json':
++     assert actual.is_file(),(x['name'],m.name)
++     frozen=subprocess.check_output(['git','-C',str(sdk),'show',packages['sdkSource']+':'+str(actual.relative_to(sdk))])
++     assert actual.read_bytes()==frozen
++     expectedMetadata=json.loads(frozen)
++     for dependency,spec in expectedMetadata.get('dependencies',{}).items():
++      if spec=='workspace:*':
++       assert dependency.startswith('@keel/') and '/' not in dependency.removeprefix('@keel/')
++       dependencyPath='packages/'+dependency.removeprefix('@keel/')+'/package.json'
++       target=json.loads(subprocess.check_output(['git','-C',str(sdk),'show',packages['sdkSource']+':'+dependencyPath]))
++       assert target['name']==dependency and isinstance(target['version'],str)
++       expectedMetadata['dependencies'][dependency]=target['version']
++     assert json.loads(data)==expectedMetadata,(x['name'],m.name)
++    else:
++     assert actual.is_file() and actual.read_bytes()==data,(x['name'],m.name)
+     if m.name.startswith('package/dist/'):count+=1
+  assert count==x['distFileCount']
+- checks.append({'package':x['name'],'sha256':x['sha256'],'bytes':x['bytes'],'distMembers':count,'allRegularMembersMatchSourcePackage':True})
++ checks.append({'package':x['name'],'sha256':x['sha256'],'bytes':x['bytes'],'distMembers':count,'nonMetadataMembersByteExactIncludingOnlyFrozenRootLICENSEFallback':True,'archiveNamesUniqueAndTypesRegularOrDirectory':True,'packageMetadataExactExceptFrozenWorkspaceVersions':True})
+ new=(sdk/'packages/sdk/src/studio-agent-drafts.ts').read_text();old=subprocess.check_output(['git','-C',str(sdk),'show','fb90011f1ce0ef4dc0883378ffbed39522b1cbfe:packages/sdk/src/studio-agent-drafts.ts'],text=True)
+ start='  const checkedReview = ';end='  const reviewIdentity = '
+ assert new[new.index(start):new.index(end)]==old[old.index(start):old.index(end)]

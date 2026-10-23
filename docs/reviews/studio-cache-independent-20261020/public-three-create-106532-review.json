@@ -1,0 +1,144 @@
+{
+  "schema": "keel-independent-public-three-create-review@1",
+  "recordedAt": "2026-10-20T09:44:55.954260+00:00",
+  "reviewer": "cache-release-independent-reviewer",
+  "sourceCommit": "106532c1cfc2f2bfdc6e8bf3ba0729b58f7e6cb9",
+  "sourceDecision": "ACCEPT_BOUNDED_TOOLING_FIX_ONLY",
+  "operationalDecision": "DO_NOT_EXECUTE_ALREADY_CONSUMED_PUBLIC_ATTEMPT",
+  "executionAdmissionProduced": false,
+  "sourceFiles": [
+    {
+      "path": "/Users/ravonus/dev/wt/native-prerequisites-49d-20261020/keel-contracts/docs/reviews/studio-publication-20261020/native-prerequisites/bounded/recipe.json",
+      "bytes": 1068,
+      "sha256": "aae91d2d22020e5b81181e917f3095543bd1e6277c68f34fdc7953ecdec0e951"
+    },
+    {
+      "path": "/Users/ravonus/dev/wt/native-prerequisites-49d-20261020/keel-contracts/docs/reviews/studio-publication-20261020/native-prerequisites/bounded/runner.mjs",
+      "bytes": 15995,
+      "sha256": "61c88f0218dc789e9781a0b80d99ff81603e869605ef442d6c01bc9e6b55eca8"
+    },
+    {
+      "path": "/Users/ravonus/dev/wt/native-prerequisites-49d-20261020/keel-contracts/docs/reviews/studio-publication-20261020/native-prerequisites/bounded/transport.mjs",
+      "bytes": 12749,
+      "sha256": "49994549b36984d4bfc2bf7f16e721e3702cd7149b2cd9419366d41002dc1aba"
+    }
+  ],
+  "staticPacket": {
+    "path": "/Users/ravonus/dev/wt/native-prerequisites-49d-20261020/keel-contracts/docs/reviews/studio-publication-20261020/native-prerequisites/public-run-01/unsigned.json",
+    "bytes": 142858,
+    "sha256": "ef45b0d16c25698af7691005be8a883ccddaff9f0ac189408f4f2a1a6c86f324"
+  },
+  "currentSourceArtifactCheck": {
+    "result": "PASS",
+    "compiledSourcesChecked": 67,
+    "genuineArtifactNames": [
+      "KeelFactory",
+      "KEEL721Deployer",
+      "KeelRouted721",
+      "KeelNativeMediaPresentation",
+      "Keel721MetadataFormatting"
+    ],
+    "fullThreeInitcodeAndRuntimeHashesAndPredictedAddressesMatch": true,
+    "profileSHA256": "10fcbd587524f8616a35d60c72de55db63ef20e0a79a239f3c3bbb776249e654",
+    "productionSourceUnchangedFrom49d": true,
+    "RPCRequestsByReviewer": 0
+  },
+  "durabilityReview": {
+    "original86fContainingDirectoryTests": 4,
+    "newRunParentRegression86f": {
+      "pass": 0,
+      "fail": 2
+    },
+    "correction": "runner.mjs:61 syncs checked containing base immediately after mkdir and before first RPC; failure propagates",
+    "finalMaintainedAndDirectoryAndParentTests": {
+      "pass": 24,
+      "fail": 0,
+      "skip": 0
+    },
+    "extraIndependentParentSyncFailureInjection": {
+      "pass": 2,
+      "fail": 0,
+      "RPCRequests": 0
+    },
+    "testsUnweakened": true
+  },
+  "scopeReview": {
+    "endpoint": "https://rpc.sepolia.ethpandaops.io",
+    "publicCREATEs": 3,
+    "nonces": [
+      "0x128",
+      "0x129",
+      "0x12a"
+    ],
+    "gasCeilings": [
+      "9012324",
+      "61379375",
+      "31884460"
+    ],
+    "freshFormula": "2 * pinned base fee + current priority, priority <=1e9 and max fee <=2e9",
+    "headerAgeSeconds": 120,
+    "overallMs": 90000,
+    "requestBytes": 524288,
+    "responseBytes": 2097152,
+    "aggregateRequestBytes": 1048576,
+    "aggregateResponseBytes": 4194304,
+    "maxRequests": 24,
+    "pacingMs": 250,
+    "requestMethodsOnly": "chain/header/own nonce/balance/known future code/fee and one exact public3CREATE",
+    "noOverrides": true,
+    "noPrivateProgram": true,
+    "noFallbackOrRedirectOrRetry": true,
+    "claimConsumedBeforeNetwork": true,
+    "onlyFreshPlanMayBeExecuted": true,
+    "runtimeUnobservedNeverRelabeledAsProven": true
+  },
+  "blockingFinding": {
+    "id": "CONSUMED_PUBLIC_THREE_CREATE_ATTEMPT",
+    "path": "/private/tmp/keel-native49d-bounded-20261020/one-native-3create-v1.claim.json",
+    "detail": "Existing actual global claim at 2026-10-20T05:02:41Z binds recipe cb26ae70d01b2d8b256bf760a2eff19b2642cc56296899adce2070c65608dcb8 and admission cb6c4d33cf23948f0ef11ec4b3f2aae31c3b4df76b62f9af50f804d7e637a214. Run cumulative-reviewed-01 sent 17 public reads and the actual18th eth_simulateV1 request, then terminal READ_TIMEOUT at05:03:01Z with0responsebody. All three calldata/sender/nonce/gas/value identities exactly equal the current frozen packet. Parent-directory durability fixes do not authorize a second unchanged attempt.",
+    "requiredAction": "Preserve global claim and all run files. Reconcile the historical actual source/admission and timeout. No claim deletion, new base/name or longer timeout to replay unchanged input under this review. A separately reviewed meaningful successor may be prepared."
+  },
+  "retainedActualAttempt": [
+    {
+      "path": "/private/tmp/keel-native49d-bounded-20261020/one-native-3create-v1.claim.json",
+      "bytes": 287,
+      "sha256": "cb58ad8b60a9d5028cb2b6fd4c5d1497579f787847eda7dd79b74b43f1b11a49"
+    },
+    {
+      "path": "/private/tmp/keel-native49d-bounded-20261020/cumulative-reviewed-01/claim.json",
+      "bytes": 351,
+      "sha256": "d8950ace123116b7164ffb8c1b7f9e611d70b1d4f68d29147bf83e5db240ec22"
+    },
+    {
+      "path": "/private/tmp/keel-native49d-bounded-20261020/cumulative-reviewed-01/failure.json",
+      "bytes": 406,
+      "sha256": "8325b523e7a4a3eef5028fbd97d80feb15ec236f0714d5fa38ecc620e15cea5f"
+    },
+    {
+      "path": "/private/tmp/keel-native49d-bounded-20261020/cumulative-reviewed-01/18-eth_simulateV1.request.json",
+      "bytes": 112184,
+      "sha256": "ba76e2267773b22818e6eedbb80a151dbb0ac89b583c52858143ef31aebd2f03"
+    },
+    {
+      "path": "/private/tmp/keel-native49d-bounded-20261020/cumulative-reviewed-01/18-eth_simulateV1.receipt.json",
+      "bytes": 514,
+      "sha256": "ccd2d939ae02eb098d7ae3dd01645106feff8ffd54c31517036df2f9f74ce3c6"
+    },
+    {
+      "path": "/private/tmp/keel-native49d-bounded-20261020/cumulative-reviewed-01/18-eth_simulateV1.response.body",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  ],
+  "sourceOwnerCorrection": "Reader acknowledged stale absent-claim/no-cumulative statement; no execute by reader this resumed wave. Historical evidence reconciliation underway.",
+  "remainingProof": [
+    "public3 provider result is timed out, not successful",
+    "shipped b524/d97 native shim rejects nil target, multiple calls per block and omitted return flag",
+    "held counterfactual state/code/getters are not an existing SDK public API",
+    "exact current49d normal original GIF plan + complete counterfactual native program remains unqualified",
+    "no deployment, wallet signature, spend, production activation or catalog mutation authorized"
+  ],
+  "signing": false,
+  "submission": false,
+  "productionActivated": false
+}

@@ -1,0 +1,22 @@
+{
+  "README.md": "a7d91c46bdbefb844cae389832d49df504faf5b53c8da4ee458e5deb1d4647b2",
+  "affected66.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "affected66.stdout": "d9a813b799aa1e180bfc5a9caf8570249f15bcd8c284a58e165f4800d38610d2",
+  "approval-hash-change-note.json": "82ee91d6ca499e00cf8024136b94a20430d59f754c5438693464047a39c123d8",
+  "initial-sdk-plan-compatibility.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "initial-sdk-plan-compatibility.stdout": "823acb13ebf880a5487452d44ba31bcf7031bc8a0c1c4fd4a9e350657fadc08d",
+  "initial-sdk-plan-compatibility.test.mjs": "2d018edbeeb11627b4fd35f076079b8d3f395dc400490131af3f2978078f2269",
+  "offline-delta5.log": "d03ce458f2a6cd2b4f27522f3aacad03ce1872c028853507c3ad02ca621bdcad",
+  "offline-next-build.recipe.admitted.json": "98d659d5a45a7be8b1dfb374b3d20628f235eaea1d49500f33d1179f53cb3f12",
+  "offline-oom8.log": "698d16d7b93c4bd9707d3cfacda6fb1e0fea99ed0cda6e69bedc42772940540a",
+  "offline-operator9.log": "603db52fd0016ca5cdcf83b2588160ae92bde08c66ba4c61dfc8a2a74cdb95c9",
+  "qa-clock-fixture-review.json": "06389c5df23e4cabd647c3aa7117e8f75743596318c4a788cbc725c32d94abb8",
+  "qa-result.json": "31cfeb1ddc0af01c769e241d721592394184f68ce78e6dd467ea97f11e55b7ab",
+  "sdk-plan-compatibility.proposed.mjs": "cd934ae992b334181a0a2501473d7ee7085f718c57ca3507591d5ee3431709f2",
+  "sdk-plan-compatibility.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "sdk-plan-compatibility.stdout": "d0ed3043f5952e0babe67679e4f09210cc71922bfb876b62219aca57386a9fad",
+  "sdk-plan-compatibility.test.mjs": "cd934ae992b334181a0a2501473d7ee7085f718c57ca3507591d5ee3431709f2",
+  "sdk-plan-grant.proposal.patch": "4723e5767f015807ee70ccf6e0c32b9ac08ce581693fabbe97624893f9b4ea4b",
+  "sdk-plan-grant.root-review.json": "1151556d56b52b11d8af70e2afb34a4a51aafe03784bd855ac6926575d1b9d94",
+  "source-and-offline-build-review.json": "4a077b245468767499af6a0e8b879045d9e3533a169cbad86d70e2a47c9cddca"
+}

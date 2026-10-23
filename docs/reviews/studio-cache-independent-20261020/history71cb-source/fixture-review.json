@@ -1,0 +1,24 @@
+{
+  "schema": "keel.independent-history-fixture-binding-review@1",
+  "decision": "APPROVE_EXACT_FIXTURE_BINDINGS_ONLY",
+  "reviewerId": "independent-release-reviewer",
+  "qaMutationFixture": {
+    "patchSHA256": "c82afcd0532e9fa56d8cd9af12146fb0474eb235977f2cdb7ec1038d97def37e",
+    "originalSHA256": "c71264dc3888c5d4add4484945255ceb2638a63083c4d924987932d2504cbab8",
+    "proposedSHA256": "61089b74ac0c9429ff8c47512ed714b702c4db9a4c6b08d92d0b91a04e24a025",
+    "mechanicalReverse": "One same-value structuredClone candidate before session construction, reverse restores complete original exact; all mutation/identity/authority assertions and all other25cases exact",
+    "actualOriginalFailure": "SDK candidate is frozen: first reconcile completed, then caller chainId mutation threw TypeError before the second production reconciliation. Fixture correction lets intended caller-mutation isolation test reach second API call.",
+    "whyValid": "StructuredClone already supported by fixture and preserves candidate field/digest values; this creates caller-owned mutable synthetic input, not a changed expected result or a weakened production freeze guard.",
+    "prior25PASS1RED": "Retain initial-independent.stdout; no green qualification presumed until actual rerun"
+  },
+  "maintainedServiceMock": {
+    "path": "apps/studio/tests/unit/updated-publication-review-service.test.ts",
+    "beforeSHA256": "2e72f37a8847b5e0b0769f4c2ea29c7cd5f12f900f9516386641b6849cc24386",
+    "afterSHA256": "3961d700ce461ab9b839f9f349b29e8d873a56b1e8adccb2ba4fda48a383ad19",
+    "exactChange": "Additional newfactory export wrapping the same existing state.reconcile with {...input,pin}, and no-op close. Oldexport and all original testbody/assertion bytes unchanged.",
+    "whyValid": "Real service now constructs request-local reconciler with reconcile(pin)/close(); binding mock to existingstate preserves prior simulated reconciliation semantics. Cache/freshness behavior requires separate actualreconciler tests."
+  },
+  "productionSourceApproval": false,
+  "releaseOrLiveApproval": false,
+  "hostActions": 0
+}

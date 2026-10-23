@@ -1,0 +1,115 @@
+{
+  "schema": "keel.independent-pg-health-default-source-review@1",
+  "sourceCommit": "b0ae8caf4001392fe148200a81c1fa1b5d57a794",
+  "helperSource": {
+    "bytes": 19620,
+    "sha256": "8c7b95514f750b95663c83f850c51fd5d3538c108a082d8072505dfaece01ff5"
+  },
+  "operator": {
+    "bytes": 43653,
+    "sha256": "d8c8a7a8e5a3789beea3eab5038a723a6bf5a0d720a4bddce781f852a8d55143"
+  },
+  "sourceApproval": true,
+  "actualA53NeverStartedConfigurationQualificationAccepted": true,
+  "activationPlanAdmission": false,
+  "releaseApproval": false,
+  "scope": "Healthcheck image-default merge only. No PG start, SQL, production mutation, activation or additional host operation performed by reviewer.",
+  "diff": {
+    "onlyChangedExistingHelperFunction": "pg_only_configuration",
+    "allOtherHelperFunctionASTEqual": true,
+    "exactHealthcheckCopiedFromPinnedOldImage": true,
+    "TestForcedNONE": true,
+    "actualInspectionStillRequiresExactHealthcheck": true
+  },
+  "tests": {
+    "healthcheckCases": {
+      "pass": 6,
+      "fail": 0
+    },
+    "dependencyControls": {
+      "pass": 20,
+      "fail": 0
+    },
+    "ownershipControls": {
+      "pass": 8,
+      "fail": 0
+    },
+    "maintainedControls": {
+      "pass": 13,
+      "fail": 0
+    }
+  },
+  "actualReceipt": {
+    "path": "/private/tmp/keel-pg-config-1d6f22c2-bbf9-49e1-a7fc-07d029fdc762/stdout.json",
+    "bytes": 4337,
+    "sha256": "76ee3e0cd854aec30d18138db034ded847ee6d3e4880d01017e9f0821a1bc9cd",
+    "qualificationId": "1d6f22c2-bbf9-49e1-a7fc-07d029fdc762",
+    "containerId": "c3db7bd7c9d4605b99898637d93d36ab904703583ea67e6d1a2f4220717c3c22",
+    "sourceEmbeddedInExecutedQualificationMatchesExactReviewedHelper": true,
+    "helperNeverStarted": true,
+    "oldBeforeAfterProjectionEqual": true,
+    "additionalAuthorityNegativeControls": [
+      {
+        "field": "CapAdd",
+        "result": "REJECT",
+        "reason": "pg_helper_unreviewed_host_CapAdd"
+      },
+      {
+        "field": "Devices",
+        "result": "REJECT",
+        "reason": "pg_helper_unreviewed_host_Devices"
+      },
+      {
+        "field": "VolumesFrom",
+        "result": "REJECT",
+        "reason": "pg_helper_unreviewed_host_VolumesFrom"
+      }
+    ]
+  },
+  "limits": [
+    "Accepts actual never-started a53 configuration only, not running PG, DB readiness, CAS or rollback success.",
+    "Final exact activation/import plan remains separately unapproved; no GIF or deployed unsigned wallet acceptance is established."
+  ],
+  "files": {
+    "actual-a53-never-started.stdout.json": {
+      "bytes": 4337,
+      "sha256": "76ee3e0cd854aec30d18138db034ded847ee6d3e4880d01017e9f0821a1bc9cd"
+    },
+    "actual-a53-qualification-source.py": {
+      "bytes": 24882,
+      "sha256": "9df61e83d1f2e6efc9cfb9bc9868947fa0a4a7e3e3d4e7a159ce764d6509163e"
+    },
+    "dependency.stderr": {
+      "bytes": 2745,
+      "sha256": "b6d377fae7cc14c0bec5dbda3f6476c355bdaf1508ab01f3b89307832874aa42"
+    },
+    "dependency.stdout": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "health.stderr": {
+      "bytes": 104,
+      "sha256": "65378dcad145da2497120819bebfc3c46534dce9714ce064b3d809a56654aca2"
+    },
+    "health.stdout": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "maintained.stderr": {
+      "bytes": 2153,
+      "sha256": "c707b7c9f7ce600666892d9f1332d5f2ce40ec044773cd293536b224eec4bf7b"
+    },
+    "maintained.stdout": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "ownership.stderr": {
+      "bytes": 1378,
+      "sha256": "a8575b29286bcb11fd38ca8a16ca3f90760eec0af448b7c47e44a76ece47f82a"
+    },
+    "ownership.stdout": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  }
+}

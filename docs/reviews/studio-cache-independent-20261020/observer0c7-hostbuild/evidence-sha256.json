@@ -1,0 +1,19 @@
+{
+  "README.md": "37639d10c7a7caf27a22f681255389e3fd3bb6e8ca44db32258f32ebca068015",
+  "commands.admitted.json": "754f918a3b54e859d6e6448e7c57ad1bb065d3aa01c0b78bf2ad8314f5cfa625",
+  "compare-protocol-bindings.mjs": "a256307bbda4e202a6a1145cdffba371b8a1083323a2b59cf42e05a35311fdc5",
+  "compare-protocol-statements.mjs": "1d86bf2c881290d47dbf43eecd49d94b758a903d080719844538bee9af832ef0",
+  "delta-audit.json": "0bfd930be39f374916a41114538a31cac6627d2b34e8da43c0b696cc9a04a5c5",
+  "host-build-input-check.json": "30e45022e37c0f5149c6123d098d11f92bf422632f7fbb4e45f286a0dab3017c",
+  "host-build-review.json": "1874dab86e663c5097144ebd731f9c43ac5dcf5e3b3e32c0bd0efa2aff7bc5f2",
+  "protocol-added-declarations.json": "1f1e8b5135a0b1c0355d469196a7901742c0ac50dce6028c5d44d58ddc7d345c",
+  "protocol-binding-comparison.json": "7ad41cde077a7f9114c12ff975805469a76e9cf2c3693b4d980745716f302d11",
+  "protocol-binding-comparison.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "protocol-binding-comparison.stdout": "6b028bb447823315c04cccc3f8d1e4c340c616813be4d99ca26533381b6ef9ac",
+  "protocol-binding-failures.json": "15dcc2e013d839aea347d2f85748b8afbb66257731afaeff40e36eff89e1304d",
+  "protocol-candidate.statements.json": "a3a370ffca5599e659958fbc1d58be56075b79ef0c0d18c04d545a8bbf188189",
+  "protocol-codegen-attribution.json": "59d176592acadeaed7f1ab61117faae415ebd6e5a39f5fdfa068036fd68df9e6",
+  "protocol-old.statements.json": "affc3cf2c43b10467432c2ef6461b930389fda4fda2f599527766cb0a8cff3cb",
+  "protocol-statements-summary.json": "efbd5fce7fcccbcb66acca09506753c22bd7dcd551dd75e726e77262fc5baf64",
+  "qa-base-schema-review.json": "8f22e09f6c924d622015cec7025261e17f084699e35d0e95e634c4b4854e640f"
+}

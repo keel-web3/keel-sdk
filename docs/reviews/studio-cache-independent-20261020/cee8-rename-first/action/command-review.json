@@ -1,0 +1,42 @@
+{
+  "schema": "keel.independent-rename-first-observer-exact-action-review@1",
+  "decision": "APPROVE_EXACT_ONE_NEW07A4_OBSERVER_ONLY_CUTOVER",
+  "reviewerId": "independent-release-reviewer",
+  "commandsPath": "/private/tmp/keel-independent-cee8-rename-first-20261021/commands.admitted.json",
+  "commandsSHA256": "9fcb13491e5c99746e5a07559cce3931de15d1ece18478c66ed57a4602d28787",
+  "finalPlanSHA256": "0598dd9afde00a92aa1fb02552f8c2018b0f8da900de707a2bd2f8ce1dda3442",
+  "pendingPlanSHA256": "49e141ef5578d6f6ec5dff7021f43f8ceefcb998c15ea84d1856840a46dacfee",
+  "operatorSHA256": "8c9584a951215a43b25d8f1599c69aed60553c80b7ab0f0ee6faebb01bce73ca",
+  "readinessReviewSHA256": "b8cd2c3d7164bd7a4c774374f5cbe14329e9fec690ed5f9ab484eb3e4087c10e",
+  "validationSHA256": "e6236452b60de562d11495d166436ada12891d3f6c59592e790e93172f77acea",
+  "leadAdmissionSHA256": "2777844a2bfab4d0799c215192c81e3c94d8a9d3039bc6055d7134d9303cbde7",
+  "operations": [
+    "Install only exact3 final evidence/plan files via frozenexclusive root0444 receivers into stagednew07a4 root",
+    "Exact read-only preflight must terminate PASS",
+    "Maximum ONE exact executeArgv for0598; renamehealthyold to rollback BEFOREstopimmutableID, bounded snapshot/reserves/fullownership/pause/D97 guards unchanged"
+  ],
+  "maximumActivationExecutions": 1,
+  "maximumPrivatePreparationExecutions": 0,
+  "rootSoleOperator": true,
+  "snapshotRequiredBeforeCandidateCreate": true,
+  "reserveBytes": 1073741824,
+  "snapshotBudgetBytes": 268435456,
+  "failed5895PlanAndAllObjectsPreserved": true,
+  "stopOnAnyFailureOrUncertainty": true,
+  "automaticRetryOrResume": false,
+  "rollback": "Only reviewed recovery ownership semantics: remove authenticated candidate from canonical wakeupname beforestop, reconcile lostrename by sameID/fullconfiguration/retiredname, preserveforeign, restoreexactfa0 onlyafterownedappsstop/D97unchanged; noDBrestore",
+  "notAdmitted": [
+    "Consumed602988/5895/aab reuse or anyoldactionreplay",
+    "Newprivatepreparation/nativeartwork/RPC/replay/signature/submission/spend",
+    "Alternate blockedAPI/admin/rawDB/hosttrace/cookie access",
+    "Proxy/app/native/Env/catalog/factory/migration/data change, cleanup/deletion",
+    "Different argv/bytes/plan or unreviewed recovery"
+  ],
+  "observerOnly": true,
+  "Gate6": "FAILED_UNRESOLVED_LIVE_GATOR_GIF_PREPARATION_FAILURES",
+  "strict280WholeEquivalenceApproved": false,
+  "publicationReadinessApproved": false,
+  "independentPostcutoverReadbackRequired": true,
+  "reviewerHostActions": false,
+  "blockingFindingsWithinExactScope": []
+}

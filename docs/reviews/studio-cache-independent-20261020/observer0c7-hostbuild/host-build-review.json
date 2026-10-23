@@ -1,0 +1,106 @@
+{
+  "schema": "keel.independent-observer-public-host-build-review@1",
+  "decision": "APPROVE_ONE_PUBLIC_HOST_BUILD_SUBJECT_TO_EXISTING_FULL_POSTSTAGE_GUARD",
+  "reviewerId": "independent-release-reviewer",
+  "sourceFreeze": "dfa544263473f0c743196e8172630f7ad6928e21",
+  "source": "0c7b01e3acae5ec787568d6b5931b002654b4de0",
+  "sdk": "311d61526284248938e335d7ed879089408933be",
+  "buildId": "F2eKiuWl2rvz5hqBZQ9wi",
+  "sourceAndOfflineReviewSHA256": "4a077b245468767499af6a0e8b879045d9e3533a169cbad86d70e2a47c9cddca",
+  "planSHA256": "69e4d723e6d3811d38982f65500c6c8f4a74e843e4784877fa68d7c62eb91712",
+  "commandPath": "/private/tmp/keel-independent-observer-build-20261020/commands.admitted.json",
+  "commandSHA256": "754f918a3b54e859d6e6448e7c57ad1bb065d3aa01c0b78bf2ad8314f5cfa625",
+  "remoteRoot": "/home/ubuntu/keel-studio-observer-build-df9a57fc-e7ef-49fc-9af7-10528dd885b1",
+  "operatorSHA256": "965fb974792eb078f9225c8bab3831cfb68bf0aef62e493a6d731af0ff420ac7",
+  "baseCurrent": {
+    "id": "fa0eb0299164407e24e1cda31b21b196ea8a8071a1a39ce71efd414234ef1659",
+    "image": "sha256:fe455169d3d10b37696ed17053ff0be167649f5a490acd7e4cea61c2412d6ccb",
+    "configSHA256": "4b0d3c5b22fb8d7c5550d8fc6bc84a8d9528fbf1737e2aa3ce72f16a231e39a2",
+    "hostConfigSHA256": "186e487039113f582118064bce13b98c79f75eca5b3fa0d788c7d79b8fb14049",
+    "mountsSHA256": "74cc304b0955c822f88ffdbcbff56d89857f5ea3d7c51246ec106f00247ade89"
+  },
+  "runnerRetained": {
+    "id": "434316eff6e19951807f95ba8aee03a4db684d760039dfeb723c7bf9203a8649",
+    "image": "sha256:d97ddf2aba94cb963646fdf05bc8dc8c99b7e69b8c19bad85c06bea7c67fc9f5",
+    "configSHA256": "23f5b528017bd47ac37f47ea6d4a56efd3926e4ca1fa0aad13f02652b1570113",
+    "hostConfigSHA256": "6fc9390416de4dd4ff6872f14b3430c76838f6bcef8abd428b6c63fd3d55dd82",
+    "mountsSHA256": "07f01d55cebb43e5ed07f5bdcafc33bf85d6a294839179d72e9ba5121609937f"
+  },
+  "socketRetained": {
+    "Name": "keel-studio-proof-socket-2779804f-f8fe-4fcd-8153-f45ad70b03b6",
+    "Driver": "local",
+    "Options": {
+      "device": "tmpfs",
+      "o": "size=16m,uid=999,gid=999,mode=0700,noexec,nosuid",
+      "type": "tmpfs"
+    }
+  },
+  "publicInputAuditSHA256": "0bfd930be39f374916a41114538a31cac6627d2b34e8da43c0b696cc9a04a5c5",
+  "packetInputCheckSHA256": "30e45022e37c0f5149c6123d098d11f92bf422632f7fbb4e45f286a0dab3017c",
+  "archive": {
+    "sha256": "c2a0871c0393108c452d76a4df20f749e46361ba6a5fcf0f650d4713efe71194",
+    "bytes": 9145805,
+    "rawTarBytes": 43601920,
+    "changedAllocatedBytes": 43896832,
+    "resultTreeSHA256": "9df3273c29d50154dfb783ef05b419317b803e47b847dbf7170d98d3fde74438",
+    "changedEntries": 1640,
+    "deletedPaths": 174,
+    "all2426TarEntriesMatchFrozenContext": true,
+    "protectedExternalNativeOpsBootstrapWorkerEntriesUnchanged": 16140
+  },
+  "buildScope": [
+    "Create only exact new exclusive root and install seven exact hash/length-bound public files0444",
+    "Read-only preflight via existing reviewed builder",
+    "At most one exact69e4 plan-hash-bound networknone/pullfalse768MiB2CPUlegacyDocker public image build; retain failure and no fallback/retry",
+    "Actual complete immutable SAVE streamed offhost into new0600 file after successful build, never a server raw archive"
+  ],
+  "budget": {
+    "rollbackReserveBytes": 1073741824,
+    "snapshotReserveBytes": 268435456,
+    "additionalMetadataBytes": 67108864,
+    "compressedStagedContextBytes": 9145805,
+    "daemonRawTarScratchBytes": 43601920,
+    "unpackedContextPlusExpandedLayerPlusContentStoreCopies": 131690496,
+    "requiredInitialFreeBytes": 1593724365,
+    "freshObservedFreeBytes": 1594028032,
+    "observedBeforeStaging": true,
+    "postStageGuardRequired": true,
+    "operationalHeadroomProven": false
+  },
+  "postStageFitProven": false,
+  "mandatoryExecutionCondition": "Existing builder must freshly PASS full1,593,724,365B free guard UNDER rolloutlock AFTER staging and again on execute before consuming/building.303667B pre-stage margin is not proof of fit; never lower formula/reserves or ignore actual deficit.",
+  "resourceRequest": {
+    "memoryBytes": 805306368,
+    "memorySwapBytes": 805306368,
+    "cpuPeriod": 100000,
+    "cpuQuota": 200000,
+    "network": "none",
+    "pull": false
+  },
+  "compiledProofStatus": {
+    "originalStrict280": "FAIL_UNPROVEN_SINGLE_PROTOCOL_MODULE",
+    "matchingDefinitions": 279,
+    "differentOld": "95997",
+    "differentCandidate": "33504",
+    "sourceAttribution": "Unchanged SDK311 @keel/protocol barrel,89->105exports with16 additions; four common exported definitions use newly outlined helpers/constants rather than old inlined expressions; initialization statement list unchanged",
+    "strictMismatchRetained": true,
+    "bindingAnalysisAlsoUnprovenForFourDefinitions": true,
+    "wholeByteEquivalenceOrFullNativeQualificationClaimed": false,
+    "whyBuildCanProceed": "Source0c7 observer-only code independently approved; this action merely builds a frozen public image with no application/native/private program execution. This build admission is not a protocol-equivalence exception or deployment admission. Actual artifact/observer-runtime qualification remains separate."
+  },
+  "retentionScope": "No deletion or retention action admitted here; any exact f31 public archive relocation requires its own source/command review. No FD/maps sweeper is categorically required for the separately proposed completed public build scratch.",
+  "maximumExecutions": 1,
+  "automaticRetryAllowed": false,
+  "beforeAndAfterFullCurrentAndRunnerChecks": "Required by unchanged guarded builder",
+  "newImageIdentity": "UNKNOWN until successful durable actual build receipt",
+  "productionActivationApproved": false,
+  "hostCleanupApproved": false,
+  "privatePreparationOrSimulationReplayApproved": false,
+  "Gate6Approved": false,
+  "publicationReadiness": "BLOCKED_UNRESOLVED_LIVE_GATOR_GIF_PREPARATION_FAILURES",
+  "signing": false,
+  "submission": false,
+  "reviewerHostActions": false,
+  "blockingBuildSourceFindings": [],
+  "currentOperationalCondition": "POSTSTAGE_FREE_SPACE_NOT_PROVEN; existing guard must enforce before any build"
+}

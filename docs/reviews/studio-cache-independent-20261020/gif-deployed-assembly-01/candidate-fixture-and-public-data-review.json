@@ -1,0 +1,33 @@
+{
+  "schema": "keel-independent-candidate-qualification-fixture-review@1",
+  "decision": "APPROVE_EXACT_TUPLE_AND_PATH_REBINDING_ONLY",
+  "qualifier": {
+    "originalSHA256": "3effc9541faf380f305d1e47e208fc4ad44bb9ebbf75b0b4cde2b7d627c572e9",
+    "successorSHA256": "0312415b9794f1fdd4a1aa1e4ae705b0a40db30e61ba567d486b098d93c4b492",
+    "changes": [
+      "One expectedSitef11\u21923e50",
+      "One expectedNextbuildpyrfd\u2192CPddY2YOI5t9Yf2F1s4nZ"
+    ],
+    "allOtherBytesIdentical": true
+  },
+  "compiledHelper": {
+    "originalSHA256": "ead7fa6e2e362f156d76c9ee739a870482ff70354fc88a9632c80fa77a9f56e1",
+    "successorSHA256": "5124d1252ef0c52322e32a1eea71d85e6b737f390c67e5b55cea14e3078599cf",
+    "changes": "Exactly two directory literals .next-final-f11-b524-portable22-20261020\u2192.next-routing-3e50-b524-portable22-20261020",
+    "allOtherBytesIdentical": true
+  },
+  "assertionsRemoved": 0,
+  "sdkReaderChromeNativeWorkerReferencesChanged": false,
+  "oldFailuresPreserved": true,
+  "actualImageQualificationRunByReviewer": false,
+  "newImagePassClaimed": false,
+  "activationApproved": false,
+  "publicDeploymentData": {
+    "decision": "APPROVE_EXACT_DATA_DELTA_FOR_CANDIDATE",
+    "originalSHA256": "cf7928297c40e23d9fd63855e9c7f09218546722f27c0385682345044d26702f",
+    "successorSHA256": "99d7997aed9ce58a1a31d4c2dc3761044c4cd0ae9e8b090bc71b426e8eb0011a",
+    "onlyDelta": "contracts.factory points to actuala149 and append its factory/startBlock11956740 row; all other JSON values preserved.",
+    "payerAttribution": "Top-level historical404A stack deployer is unchanged; do not treat it as the actual sender of the newa149 transaction. Actual owner broadcast and canonical receipt provenance remain in independent QA.",
+    "productionMutationApproved": false
+  }
+}

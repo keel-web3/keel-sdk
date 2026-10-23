@@ -1,0 +1,63 @@
+{
+  "schema": "keel.independent-import95-source-review@1",
+  "decision": "APPROVE_EXACT_ONE_IMAGE_IMPORT_ONLY",
+  "sourceCommit": "f2e1217881dfca9405ba5936aff1d788da7e92bb",
+  "retainedEvidenceHEAD": "52e5dd3af04c5e82edbff7ab3413cd216fd0c3a5",
+  "review": {
+    "path": "/Users/ravonus/dev/wt/studio-cache-independent-review-20261020/docs/reviews/studio-cache-independent-20261020/import95-f2e121/whole-studio-review.json",
+    "bytes": 3094,
+    "sha256": "aab4fe308ce853958f5b7640324a6c0b353238098535531ae95934c45b959eb0"
+  },
+  "commandAdmission": {
+    "path": "/Users/ravonus/dev/wt/studio-cache-independent-review-20261020/docs/reviews/studio-cache-independent-20261020/import95-f2e121/command-admission.json",
+    "bytes": 7424,
+    "sha256": "d120b4b3aa97019977805ea778e19caef3cfba2f686c9407cc71110877535546"
+  },
+  "requiredFreeBytes": 2247132160,
+  "cacheCleanupApproved": false,
+  "imageQualificationCompletedByThisReview": false,
+  "activationApproved": false,
+  "previousFailuresPreserved": true,
+  "evidence": [
+    {
+      "path": "/Users/ravonus/dev/wt/studio-cache-independent-review-20261020/docs/reviews/studio-cache-independent-20261020/import95-f2e121/import-whole-studio.py",
+      "bytes": 6989,
+      "sha256": "5d87a7e33e8cd1d4c833220f489bf8d74df596bea587a32a3b33bc5d75855f1b"
+    },
+    {
+      "path": "/Users/ravonus/dev/wt/studio-cache-independent-review-20261020/docs/reviews/studio-cache-independent-20261020/import95-f2e121/import-whole-studio.test.py",
+      "bytes": 2556,
+      "sha256": "f32335c4132d4ce907abc9fba8061bd542806cb855846f4afb18c5bde6382dda"
+    },
+    {
+      "path": "/Users/ravonus/dev/wt/studio-cache-independent-review-20261020/docs/reviews/studio-cache-independent-20261020/import95-f2e121/whole-studio-plan.json",
+      "bytes": 10719,
+      "sha256": "5be18ef338864a7e03b97add5adb96ccacf9faad16c63273b8b58c3d29591e96"
+    },
+    {
+      "path": "/Users/ravonus/dev/wt/studio-cache-independent-review-20261020/docs/reviews/studio-cache-independent-20261020/import95-f2e121/archive-full-audit.json",
+      "bytes": 21986,
+      "sha256": "4b6d1ae201b2fc6648ea06cf5f818e96500de04437e8d44f9172530a6b46ecc1"
+    },
+    {
+      "path": "/Users/ravonus/dev/wt/studio-cache-independent-review-20261020/docs/reviews/studio-cache-independent-20261020/import95-f2e121/import-transfer-proposal.json",
+      "bytes": 5613,
+      "sha256": "8d5a99c9580ecf2d5e3f6e75c5c41890f15f0aba95802b24f857300fdb211c03"
+    },
+    {
+      "path": "/Users/ravonus/dev/wt/studio-cache-independent-review-20261020/docs/reviews/studio-cache-independent-20261020/import95-f2e121/independent49-linux.stdout",
+      "bytes": 3002,
+      "sha256": "eecad9326608007ae6da085718126772cb70fe3e6b80be1c73f73a508231b97c"
+    },
+    {
+      "path": "/Users/ravonus/dev/wt/studio-cache-independent-review-20261020/docs/reviews/studio-cache-independent-20261020/import95-f2e121/independent49-linux-process.json",
+      "bytes": 139,
+      "sha256": "2e82c135ecdcf5cd15380447e336a4342ba205bb22fd6449ea566485fb71fe76"
+    },
+    {
+      "path": "/Users/ravonus/dev/wt/studio-cache-independent-review-20261020/docs/reviews/studio-cache-independent-20261020/import95-f2e121/archive95-descriptor-result.json",
+      "bytes": 785,
+      "sha256": "ad2b5fdcd05cb4b628f7927f3d405f2259034c00e257705f5e68a905e3f0d513"
+    }
+  ]
+}

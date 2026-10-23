@@ -1,0 +1,21 @@
+F
+======================================================================
+FAIL: test_recovery_removes_owned_candidate_from_wake_name_before_stop (__main__.RecoveryNameWaker.test_recovery_removes_owned_candidate_from_wake_name_before_stop)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/private/tmp/keel-independent-cee8-rename-first-20261021/recovery-name-waker.regression.test.py", line 33, in test_recovery_removes_owned_candidate_from_wake_name_before_stop
+    self.assertEqual(docker.wakes,[],"canonical-name waker must not restart an owned candidate during recovery")
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: Lists differ: ['newid'] != []
+
+First list contains 1 additional elements.
+First extra element 0:
+'newid'
+
+- ['newid']
++ [] : canonical-name waker must not restart an owned candidate during recovery
+
+----------------------------------------------------------------------
+Ran 1 test in 0.001s
+
+FAILED (failures=1)

@@ -1,0 +1,172 @@
+TAP version 13
+# Subtest: independent admission binds complete source/command/before-state and grants only one normal review
+ok 1 - independent admission binds complete source/command/before-state and grants only one normal review
+  ---
+  duration_ms: 0.693042
+  type: 'test'
+  ...
+# Subtest: only exact owned Unix database socket is eligible; TCP/alternate/ambiguous options refuse
+ok 2 - only exact owned Unix database socket is eligible; TCP/alternate/ambiguous options refuse
+  ---
+  duration_ms: 0.102917
+  type: 'test'
+  ...
+# Subtest: actual guard denies fetch/process/TCP before dispatch and restores builtin functions
+ok 3 - actual guard denies fetch/process/TCP before dispatch and restores builtin functions
+  ---
+  duration_ms: 1.231458
+  type: 'test'
+  ...
+# Subtest: actual SQL-bound100-table baseline and exact key pass preflight without invoking service
+ok 4 - actual SQL-bound100-table baseline and exact key pass preflight without invoking service
+  ---
+  duration_ms: 1.989333
+  type: 'test'
+  ...
+# Subtest: actual pure planner-produced page gives only exact13-to14 synthetic transition, not service-execution proof
+ok 5 - actual pure planner-produced page gives only exact13-to14 synthetic transition, not service-execution proof
+  ---
+  duration_ms: 9.3925
+  type: 'test'
+  ...
+# Subtest: rejects changed answer
+ok 6 - rejects changed answer
+  ---
+  duration_ms: 3.480916
+  type: 'test'
+  ...
+# Subtest: rejects changed native answer
+ok 7 - rejects changed native answer
+  ---
+  duration_ms: 2.770167
+  type: 'test'
+  ...
+# Subtest: rejects changed term
+ok 8 - rejects changed term
+  ---
+  duration_ms: 1.458333
+  type: 'test'
+  ...
+# Subtest: rejects wrong revision
+ok 9 - rejects wrong revision
+  ---
+  duration_ms: 2.389625
+  type: 'test'
+  ...
+# Subtest: rejects changed project
+ok 10 - rejects changed project
+  ---
+  duration_ms: 2.636416
+  type: 'test'
+  ...
+# Subtest: rejects wrong command id
+ok 11 - rejects wrong command id
+  ---
+  duration_ms: 2.119834
+  type: 'test'
+  ...
+# Subtest: rejects wrong command digest
+ok 12 - rejects wrong command digest
+  ---
+  duration_ms: 2.102292
+  type: 'test'
+  ...
+# Subtest: rejects wrong saved key
+ok 13 - rejects wrong saved key
+  ---
+  duration_ms: 2.562041
+  type: 'test'
+  ...
+# Subtest: rejects wrong timestamp
+ok 14 - rejects wrong timestamp
+  ---
+  duration_ms: 2.033458
+  type: 'test'
+  ...
+# Subtest: rejects new candidate
+ok 15 - rejects new candidate
+  ---
+  duration_ms: 1.078458
+  type: 'test'
+  ...
+# Subtest: rejects new operation
+ok 16 - rejects new operation
+  ---
+  duration_ms: 2.034875
+  type: 'test'
+  ...
+# Subtest: rejects other table mutation
+ok 17 - rejects other table mutation
+  ---
+  duration_ms: 1.154208
+  type: 'test'
+  ...
+# Subtest: rejects schema drift
+ok 18 - rejects schema drift
+  ---
+  duration_ms: 1.20075
+  type: 'test'
+  ...
+# Subtest: rejects post service not reviewed
+ok 19 - rejects post service not reviewed
+  ---
+  duration_ms: 4.671167
+  type: 'test'
+  ...
+# Subtest: rejects post service stale key
+ok 20 - rejects post service stale key
+  ---
+  duration_ms: 3.770083
+  type: 'test'
+  ...
+# Subtest: rejects post service wrong revision
+ok 21 - rejects post service wrong revision
+  ---
+  duration_ms: 3.757208
+  type: 'test'
+  ...
+# Subtest: rejects command expansion expectedRevision
+ok 22 - rejects command expansion expectedRevision
+  ---
+  duration_ms: 0.097875
+  type: 'test'
+  ...
+# Subtest: rejects command expansion operation
+ok 23 - rejects command expansion operation
+  ---
+  duration_ms: 0.036125
+  type: 'test'
+  ...
+# Subtest: rejects command expansion commandId
+ok 24 - rejects command expansion commandId
+  ---
+  duration_ms: 0.030583
+  type: 'test'
+  ...
+# Subtest: rejects command expansion configurationKey
+ok 25 - rejects command expansion configurationKey
+  ---
+  duration_ms: 0.029958
+  type: 'test'
+  ...
+# Subtest: rejects command expansion answers
+ok 26 - rejects command expansion answers
+  ---
+  duration_ms: 0.026875
+  type: 'test'
+  ...
+# Subtest: replayed revision14 state cannot satisfy before admission
+ok 27 - replayed revision14 state cannot satisfy before admission
+  ---
+  duration_ms: 1.36
+  type: 'test'
+  ...
+1..27
+# tests 27
+# suites 0
+# pass 27
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 226.657125

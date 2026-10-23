@@ -1,0 +1,20 @@
+{
+  "packetSHA256": "fdf1c7c85682a62b215572747e076f3374eba3c02de03d4af7996f337eb72c42",
+  "bundleReceiptSHA256": "d69d812e66950b18df535225ba195dc30f90857d7fddaa78d3764978077f398f",
+  "bundleSHA256": "2ffd2af15a66685e4877ba988e2f39c74c3133c06da0bdc583f155398387e096",
+  "appSources": 192,
+  "toolFiles": 21,
+  "SDKFiles": 1754,
+  "SDKDigest": "3effa2f2e594fe969f592d9446b5095484adf358033c76b83349385956c69df8",
+  "externalPackages": 14,
+  "externalDomainFiles": 45,
+  "actualGuidedAfterProjectionsMatch": 99,
+  "actualGuidedReceiptSHA256": "4d16e109235ef6aebd515c5306f7184b2aa1f0881520006ed499487f80c3deb5",
+  "changedSourcePathsVersusOld3e50": [
+    "apps/studio/src/lib/studio-access-policy.ts"
+  ],
+  "sourceInstrumentation": [],
+  "prefixTransactions": 0,
+  "compilerInvoked": false,
+  "RPC": 0
+}

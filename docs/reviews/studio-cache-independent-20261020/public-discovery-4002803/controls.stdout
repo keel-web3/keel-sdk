@@ -1,0 +1,94 @@
+TAP version 13
+# Subtest: activation defaults off; an active empty, malformed or mistyped configuration fails closed
+ok 1 - activation defaults off; an active empty, malformed or mistyped configuration fails closed
+  ---
+  duration_ms: 1.733709
+  type: 'test'
+  ...
+# Subtest: only the full wallet from a verified session matches the server roster
+ok 2 - only the full wallet from a verified session matches the server roster
+  ---
+  duration_ms: 0.273917
+  type: 'test'
+  ...
+# Subtest: minimal public paths never expose a creator route or broaden writes
+ok 3 - minimal public paths never expose a creator route or broaden writes
+  ---
+  duration_ms: 0.97525
+  type: 'test'
+  ...
+# Subtest: return destinations remain local pages and discard authorization query values
+ok 4 - return destinations remain local pages and discard authorization query values
+  ---
+  duration_ms: 1.461583
+  type: 'test'
+  ...
+# Subtest: return destinations retain exact existing review, private artifact and public pairing selectors
+ok 5 - return destinations retain exact existing review, private artifact and public pairing selectors
+  ---
+  duration_ms: 2.146375
+  type: 'test'
+  ...
+# Subtest: the existing operator can run the indexer through the wallet gate without obtaining creator access
+ok 6 - the existing operator can run the indexer through the wallet gate without obtaining creator access
+  ---
+  duration_ms: 193.966875
+  type: 'test'
+  ...
+# Subtest: proxy and actual production indexer handler together require the operator capability even for invited wallets
+ok 7 - proxy and actual production indexer handler together require the operator capability even for invited wallets
+  ---
+  duration_ms: 165.491
+  type: 'test'
+  ...
+# Subtest: direct pages redirect; API denials stay JSON and never consume mutation bodies
+ok 8 - direct pages redirect; API denials stay JSON and never consume mutation bodies
+  ---
+  duration_ms: 34.835666
+  type: 'test'
+  ...
+# Subtest: access lookup failures fail closed; public sign-in still works without a database lookup in the gate
+ok 9 - access lookup failures fail closed; public sign-in still works without a database lookup in the gate
+  ---
+  duration_ms: 16.863458
+  type: 'test'
+  ...
+# Subtest: invited requests keep existing routes; caller layout markers are replaced and grants are restricted to agent routes
+ok 10 - invited requests keep existing routes; caller layout markers are replaced and grants are restricted to agent routes
+  ---
+  duration_ms: 14.288083
+  type: 'test'
+  ...
+# Subtest: the public signed-session endpoint withholds creator profiles from uninvited wallets
+ok 11 - the public signed-session endpoint withholds creator profiles from uninvited wallets
+  ---
+  duration_ms: 71.155125
+  type: 'test'
+  ...
+# Subtest: existing wallet login can reach the challenge after a gate denial without swallowing other errors
+ok 12 - existing wallet login can reach the challenge after a gate denial without swallowing other errors
+  ---
+  duration_ms: 67.878041
+  type: 'test'
+  ...
+# Subtest: the exact static agent discovery document is public for GET and HEAD without access lookup
+ok 13 - the exact static agent discovery document is public for GET and HEAD without access lookup
+  ---
+  duration_ms: 23.52475
+  type: 'test'
+  ...
+# Subtest: public discovery grants no release, wildcard discovery or write access
+ok 14 - public discovery grants no release, wildcard discovery or write access
+  ---
+  duration_ms: 443.504083
+  type: 'test'
+  ...
+1..14
+# tests 14
+# suites 0
+# pass 14
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 2867.430084

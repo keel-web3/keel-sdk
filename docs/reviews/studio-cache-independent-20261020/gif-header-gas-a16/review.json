@@ -1,0 +1,66 @@
+{
+  "schema": "keel.independent-header-gas-reference-review@1",
+  "decision": "APPROVE_EXACT_EXPECTED_VALUE_CORRECTION_ONLY",
+  "sourceCommit": "a16d75a22b61a41bbfc33c5623bb380d2563ff98",
+  "parentURIDropReferenceSourceCommit": "380fa21a10eb77e161ed1cae3513e5e2f819f1ae",
+  "sourceFiles": [
+    {
+      "path": "/private/tmp/keel-gif-gas-reference-20261020/docs/tools/gif-forward-reference/header-gas-reference.mjs",
+      "bytes": 2269,
+      "sha256": "1ec0c39251ea7611e2308d60a77226bcf5990cdfddf42eb981f1a3c10db30b92"
+    },
+    {
+      "path": "/private/tmp/keel-gif-gas-reference-20261020/docs/tools/gif-forward-reference/header-gas-reference.test.mjs",
+      "bytes": 3028,
+      "sha256": "b60c9c99d48da3eb48d6408265e5e2927b7e87565c00ea5e26c249433f4d8227"
+    },
+    {
+      "path": "/private/tmp/keel-gif-gas-reference-20261020/docs/tools/gif-forward-reference/validate-retained.mjs",
+      "bytes": 3498,
+      "sha256": "0cfc16f49e018bb06153576393c1597a15231b442c6b277cda978e034202eb14"
+    }
+  ],
+  "preexistingForwardFilesChangedOnly": [
+    "validate-retained.mjs"
+  ],
+  "unchangedStrictModulesAndForwardCoreAndForwardOriginalAndCanonicalURIAndDropDerivation": true,
+  "original41TestSourceByteExact": true,
+  "independentChecks": {
+    "original41PlusNew22": {
+      "pass": 63,
+      "fail": 0,
+      "skip": 0
+    },
+    "syntheticHeaderPolicyBoundaryControls": {
+      "pass": 6,
+      "fail": 0,
+      "scope": "Pure helper only, not program/native execution; currentblock and postfork4_294_967_295 ceiling, prefork16_777_216 ceiling and all three above-cap refusals"
+    },
+    "historicalAndConsumedFreshActualCapturesValidatedOfflineWithoutInputMutation": true,
+    "sevenOtherOriginalLimitEqualitiesPreserved": true
+  },
+  "acceptedSemantics": [
+    "Authenticate entire headerRLP against canonicalhash; require native/compiler sameRLP, decodednumber/timestamp tied to canonicalpin and SDKinput.",
+    "Use actual pinnedb524 resolveKeelTransactionGasPolicy on decoded RLP gasLimit/timestamp and selectedchain; maximumTotalGas is exact policy result.",
+    "Require every normal preparation and observation gas envelope to equal that same result; do not modify capturedgas or input.",
+    "SDK total hardceiling and separate regular-execution cap remain unchanged; whole native validation/freshness remains required."
+  ],
+  "observedValueHardcodedAsProductionExpectation": false,
+  "reuseStaticHostProfile": {
+    "profileSHA256": "958a073ea9c4f78934f3c5e7f544ceda0288d323554808886e8186d0173c26af",
+    "hostOperatorSHA256": "f0cc57fd9fdd88e83e7e1f8031f4198f90e32333ee3bed5072f511bd5563b57a",
+    "root": "/home/ubuntu/keel-proof-qualification-9d94c44e-ad0f-45d1-b258-540e204f6ebd",
+    "allowedIfUnconsumedAndNoLateProgramFiles": true,
+    "provenance": "Keep380 as URI/drop reference parent; new producer receipt/policy must separately bind gasReferenceSourceCommit a16 and all new source hashes."
+  },
+  "priorOneShotConsumed01Preserved": true,
+  "priorCaptureMustNotBeRepinnedOrReplayed": true,
+  "newProducerPacketBundleConditionalPolicyAndWholeSequenceRequireExactNewReview": true,
+  "compiler": 0,
+  "RPC": 0,
+  "nativeExecution": 0,
+  "newCaptureAdmitted": false,
+  "signing": false,
+  "submission": false,
+  "activation": false
+}

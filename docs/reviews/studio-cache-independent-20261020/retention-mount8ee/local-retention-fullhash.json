@@ -1,0 +1,16 @@
+{
+  "protectedLocalCopyHashes": [
+    {
+      "path": "/Users/ravonus/dev/wt/studio-publication-20261019/native-artifacts/retained-older-build-inputs-20261020/alias-171f635e-keel-showcase.tar.gz",
+      "bytes": 555623546,
+      "sha256": "7cd9852035ef222fb8dd806b28da05561cf2ec30127d0025b84c8d0bf2f61f01"
+    },
+    {
+      "path": "/Users/ravonus/dev/wt/studio-publication-20261019/native-artifacts/retained-older-build-inputs-20261020/primary-0bd2db80-keel-showcase.tar.gz",
+      "bytes": 555608603,
+      "sha256": "8ac4dc36a1dbc44da7a12efa985497980a31b3d3e8bcec4f01a2477be731bd77"
+    }
+  ],
+  "archivesExtracted": false,
+  "productionActions": false
+}

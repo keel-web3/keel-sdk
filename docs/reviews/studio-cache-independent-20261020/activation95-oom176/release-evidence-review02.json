@@ -1,0 +1,165 @@
+{
+  "schema": "keel.independent-current95-preactivation-release-evidence@1",
+  "recordedAt": "2026-10-20T21:56:20.334292+00:00",
+  "reviewerId": "cache-release-reviewer",
+  "decision": "APPROVE_PREACTIVATION_TECHNICAL_EVIDENCE_FOR_EXACT_FINAL_PLAN_REVIEW",
+  "candidate": {
+    "site": "4002803ccfcb20c39ffe5c555b68d8e197f379f8",
+    "sdk": "b524bf5fc19939c7523aada2e53f79e3360970ea",
+    "appImage": "sha256:95bdda05a7596553251e9d4ba9fe72758abc5137fcb661efed80ca94ab5e6bcb",
+    "nativeImage": "sha256:d97ddf2aba94cb963646fdf05bc8dc8c99b7e69b8c19bad85c06bea7c67fc9f5",
+    "buildId": "jtZVm1JMsE-biSFoBQzjQ"
+  },
+  "blockingFindings": [],
+  "actualGIF": {
+    "qaReceipt": {
+      "path": "/tmp/keel-qa-receipt-activation-20261020/keel-site/docs/reviews/studio-publication-20261020/qa-gif95-actual02/result.json",
+      "bytes": 5536,
+      "sha256": "43058d883ac2a6af728855c96bdcd8468f3524784718e218fea5ec37d076dd85"
+    },
+    "ownPureAudit": {
+      "path": "/private/tmp/keel-independent-gif95-terminal02-20261020/capture-proof-audit.json",
+      "bytes": 8731,
+      "sha256": "a1ab2acc866e22c46dcb4a59960af9b4301e3fdfc4f9e06b98135ff2b4baddfd"
+    },
+    "ownIntegrity": {
+      "path": "/private/tmp/keel-independent-gif95-terminal02-20261020/independent-integrity.json",
+      "bytes": 589,
+      "sha256": "2face9a15617f020568a08aa63d2261835b954e078bcdd4436a3c74ce57bd773"
+    },
+    "wholePureOutputDeepEqualsQA": true,
+    "wholeDurableRecordReconstructed": true,
+    "durableBytes": 93969,
+    "durableSHA256": "0dbd3104146b0e54e7db2276e4ed73489c5fec28765ff34a8d9b973d2fa007b8",
+    "all25CallsAnd21StrictTransactionValidationPreserved": true,
+    "threeActualNativeExecutionsMs": [
+      57563,
+      430,
+      10105
+    ],
+    "singleSourceHTTP": {
+      "requests": 280,
+      "all200": true,
+      "maxBodyBytes": 284,
+      "totalBodyBytes": 70407,
+      "fallbackAttempts": 0,
+      "remoteSimulationRequests": 0
+    },
+    "sourceAssetsAndWhole555958ByteURIExact": true,
+    "all100CloneTables155ImmutableFilesAndCursorPreservedByIndependentQA": true,
+    "notOriginal23CallProgramRelabel": true
+  },
+  "actualPackaged95SDKAndHTTP": {
+    "path": "/tmp/keel-qa-receipt-activation-20261020/keel-site/docs/reviews/studio-publication-20261020/qa-native95-actual/result.json",
+    "bytes": 13928,
+    "sha256": "5ec463452710f9a9fee92c61732d3566ee642caebbbd3688bee40a4511ccb27b"
+  },
+  "controlledTerminalDenialAndCompiledIdentity": {
+    "priorOwnReviewCommit": "325f517",
+    "ownSixControlledB524401403TestsPass": true,
+    "current400CompiledProofModule26099NormalizedWholeBodyByteExactPrior44950Except17DirectWebpackCallsFiveIDs": true,
+    "actualPackaged1360SDKFilesByteExactB524": true,
+    "liveDenialObservedClaim": false,
+    "newQualificationFrameworkNeeded": false
+  },
+  "rollbackAndSnapshot": {
+    "migrationReceipt": {
+      "path": "/Users/ravonus/dev/wt/studio-publication-20261019/qa-final/keel-site/docs/reviews/studio-publication-20261019/qa/activation-fe944-9e12/migration-result.json",
+      "bytes": 1614,
+      "sha256": "24bf8e431a3e623ea672bdf2ba884d4719cd3d5a06b9dc1d313bd5212bb40c36"
+    },
+    "migrationCommandReceipt": {
+      "path": "/Users/ravonus/dev/wt/studio-publication-20261019/qa-final/keel-site/docs/reviews/studio-publication-20261019/qa/activation-fe944-9e12/migration-command-receipt.json",
+      "bytes": 612,
+      "sha256": "f9a4dd654153f8a972bcf40b2d5bdfd3f7d850fa015c973b4c191c8de57b24d2"
+    },
+    "fullOriginal62411ByteBootstrapSHA256": "7556a9091ed6646ca329f9442ee30cca3319a3092151c27099b9a2ddbb7f17c3",
+    "candidateBootstrapSHA256": "5a162c659511c8679678c1ee14c2f2317e7a1550060f7dc7bcf918515611de8b",
+    "candidateBootstrapOnlyAddsReviewed2912ByteFactoryCAS": true,
+    "CASAndRollbackSQLBytesUnchanged": true,
+    "newHelperMountCorrection": {
+      "path": "/private/tmp/keel-independent-activation-mount0da-20261020/review.json",
+      "bytes": 2351,
+      "sha256": "f2ece0f5e6996915278ca3705f6a870e828db2a078b078d9da2185a15cab3c99"
+    },
+    "ownAffectedTestsPass": 75,
+    "snapshotSupervisorSHA256": "5d8d56588eba290773961d74152baf3728ffd2e00a75894beed92d38af06706e",
+    "snapshot150sTERM155sKILL180sOuterAndBoundedMemoryControlsPreviouslyQualifiedUnchanged": true,
+    "retainedProductionBeforeActivationUnchangedClaim": false,
+    "freshDurableSnapshotRequiredDuringApprovedCutover": true,
+    "actualPriorSnapshot": {
+      "bytes": 123386980,
+      "sha256": "8f84944c6ca183018c79ecf11e7bcea1c3a44886c809b1d3d101c5fe22a47094",
+      "resultSHA256": "027606f61439f38aaa5598269e676a8f6bb777c1b82ab3ab896f5175fb429f5e",
+      "retainedUnderConsumed9fcRoot": true,
+      "newRolloutStillRequiresFreshBoundedSnapshot": true
+    }
+  },
+  "operator": {
+    "sha256": "a1594559c2c04159ac94827d0f4f2a991310fb06648379bca6081d5ce6a98de1",
+    "dependencyHelperSHA256": "7d1650301c9201f1e54294ad91a7b00291e1941b10bda29da1be8fe177876bcf",
+    "actual95ImportAdapterSHA256": "044d8f8f07b49c70988a367ffeef04a54098025c372e3e4a0fc8110a9e0e8bec",
+    "actual95PhysicalImportReceiptSHA256": "40af7068350612432dab565600aa2e187caa2fba2f356dc84306999e056383e3",
+    "staticStageAdmission": {
+      "path": "/private/tmp/keel-independent-activation95-oom176-20261020/review.json",
+      "bytes": 1906,
+      "sha256": "5c31808521c6317363252c2504e0f45e9b1e00fee122ff494be928adfb030c1b"
+    },
+    "freshActivationId": "2779804f-f8fe-4fcd-8153-f45ad70b03b6",
+    "sourceSuccessor": "176c93d1"
+  },
+  "factualPlanFlagsSupported": {
+    "independentQA": true,
+    "independentReleaseReview": true,
+    "rollbackSchemaCompatible": true,
+    "singleSourceTerminal401And403Verified": true,
+    "qualifiedActualStateSource": true
+  },
+  "leadExecuteApproved": "Lead-owned explicit authorization decision, to bind only in separately reviewed final plan",
+  "remainingPreCutoverWork": [
+    "Freeze exact final plan and four evidence files; independently review every final digest and delta from pending plan.",
+    "Fresh unchanged operator preflight and held-lock guards must pass before cutover; uncertain snapshot or ownership state stops without bypass."
+  ],
+  "mandatoryPostActivationAcceptance": [
+    "Actual candidate build/backend/image identity and durable cutover/postguards.",
+    "Own exact-byte Gator project1cef1869 rev1 deployed UI full simulation to unsigned wallet before involving original creator again.",
+    "Real GIF deployed UI full simulation to unsigned wallet.",
+    "Authenticated historical628198B HTTP/MIME/exact bytes/SDK decode/canvas and UI/API/MCP prepare/recovery/history/resource preservation."
+  ],
+  "postActivationChecksDoNotCircularlyBlockReviewedGate5Cutover": true,
+  "finalUserAcceptanceClaim": false,
+  "finalPlanHashAdmitted": null,
+  "activationCommandAdmitted": false,
+  "artworkSigningApproved": false,
+  "artworkSubmissionApproved": false,
+  "reviewerProgramReplay": false,
+  "reviewerRPC": 0,
+  "reviewerDatabaseWrites": 0,
+  "previousTechnicalEvidence": {
+    "path": "/private/tmp/keel-independent-gif95-terminal02-20261020/release-evidence-review.json",
+    "sha256": "07e754cbabab306fa79f487496d0f32aa3eff94a035a59afb55f26c09ef028b9",
+    "scope": "Historical400/b524/95/D97 GIF/SDK/denial/migration lineage, no old plan replay or old operator currentness claim"
+  },
+  "rolloutDefaultCorrection": {
+    "parentOperatorSHA256": "22ee9270e2a3613429debbb55c2e3b3a9dbdb6f312f4e3509172a4356c83b414",
+    "newOperatorSHA256": "a1594559c2c04159ac94827d0f4f2a991310fb06648379bca6081d5ce6a98de1",
+    "onlyRuntimeChange": "Explicit OomKillDisable=false in CREATE request only when copied original value is null; explicit true retained; strict guard not normalized",
+    "wholeSourceReverseThreeLinesByteExact": true,
+    "sixActualDefaultRegressionsPass": true,
+    "maintainedMountRecoveryOwnershipHealthAndStagePass": 69,
+    "totalOwnAffectedControls": 75,
+    "oldSixCaseBaseline": "4PASS/1FAIL/1ERROR retained",
+    "initialNewStaticRootMismatch": "Held f00 before any host action; successor176 only two exact readiness UUID literals, root/plan binding fifth stage control PASS",
+    "artworkSDKAppNativeSourceAndBytesChanged": false
+  },
+  "consumedPriorCutover": {
+    "path": "/private/tmp/keel-independent-activation95-failure-20261020/diagnosis.json",
+    "sha256": "82bb70c3476f071257b4741de640aff4b2fe7614ab637534956b1a4190dade2a",
+    "planSHA256": "4c17cc98989f9a7e80027218aa5b6e8f96357075d3af9627d8624acbe400e7ad",
+    "status": "CONSUMED_FAILED_GUARD_BEFORE_OLD_STOP_OR_CANDIDATE_START",
+    "oldHealthyRunning": true,
+    "allFailedRunObjectsAndReceiptsPreserved": true,
+    "notReplayable": true
+  },
+  "independentOperatorQASupplement": "The final separately hash-bound QA aggregate must record current source supplement; this review independently reran75 and preserves prior artifact QA labels."
+}

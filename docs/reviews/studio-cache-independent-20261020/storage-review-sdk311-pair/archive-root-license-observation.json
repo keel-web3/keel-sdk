@@ -1,0 +1,10 @@
+{
+  "reportedBy": "root independent six-tar audit",
+  "priorMetadataProposalAppliedOrExecutedByReviewer": false,
+  "cause": "Package LICENSE absent in package subdirectory; pnpm pack copies exact frozen repository-root LICENSE.",
+  "exactName": "package/LICENSE",
+  "bytes": 1088,
+  "sha256": "cabead0e38fc8766f174225e5e9a5c566cc4570676bb0bc31ca23f7af143211a",
+  "newProposalExecuted": false,
+  "preserves": "Old raw metadata failure and first unapplied proposal unchanged."
+}

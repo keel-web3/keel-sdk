@@ -1,0 +1,12 @@
+{
+  "schema": "keel.independent-test-metadata-binding-review@1",
+  "decision": "APPROVE",
+  "reviewerId": "independent-release-reviewer",
+  "patchSHA256": "92587d8870c23a53ea743c8ff8b15e063cd5f92428221514216072e8ac8d00bc",
+  "proposedSHA256": "148d66aaa78b801002f8244552a191f9cd9c31dbaf3b480e28f6ad552add389d",
+  "reason": "Actual unchanged hash-bound context schema uses binarySha256; prior uppercase key is a new auditor lookup typo.",
+  "scope": "One key literal only; expected8a hash and context full deep equality/assertions remain exact",
+  "initialKeyErrorRetained": true,
+  "productArtifactReferenceChanged": false,
+  "hostOrActivationAuthority": false
+}

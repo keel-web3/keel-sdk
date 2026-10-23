@@ -1,0 +1,37 @@
+{
+  "result": "PASS_PUBLIC_ROLES_RAW_DURABLE_BASELINE_ONLY",
+  "roles": [
+    {
+      "role": "tree",
+      "sha256": "52deb22846739f410c366bfde439e4bc50ea3c951c1fc1e6030a1384ba0c1312",
+      "bytes": 2540,
+      "result": "PASS",
+      "exit": 0,
+      "elapsed": 7.948331331834197,
+      "retainedStoppedContainerId": "0f90cca9d911bbc09400413009324a75bbb9c0ab468cd401c0a864ab6af265c4",
+      "beforeAfterFullCurrentRunnerExact": true
+    },
+    {
+      "role": "sdk",
+      "sha256": "4090aeeb84256836ce09fae0955a91a7de100432864bf40169f34c2be724b224",
+      "bytes": 40102,
+      "result": "PASS",
+      "exit": 0,
+      "elapsed": 6.5513016930781305,
+      "retainedStoppedContainerId": "5913e54f0fa4b40b9d0a63e914ec330008899573d8317779a5cd2ad373f4ed94",
+      "beforeAfterFullCurrentRunnerExact": true
+    },
+    {
+      "role": "http",
+      "sha256": "c22e9bf5d27f9f7f32ef6112805e55dcd2a6eb9c946ec6cf98785c5466eebb87",
+      "bytes": 15826,
+      "result": "PASS",
+      "exit": 0,
+      "elapsed": 9.013214708073065,
+      "retainedStoppedContainerId": "b81f6e3c4f3191a83ab88380c5eb0524d4d8fac87874eb4808b87823b4dcb2ea",
+      "beforeAfterFullCurrentRunnerExact": true
+    }
+  ],
+  "hostActionsByReviewer": 0,
+  "nativePrivateOrLiveClaims": false
+}

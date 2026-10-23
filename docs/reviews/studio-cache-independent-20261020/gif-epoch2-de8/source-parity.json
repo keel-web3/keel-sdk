@@ -1,0 +1,18 @@
+{
+  "changedEpoch1Files": [
+    "README.md",
+    "forward/validate-retained.mjs",
+    "run-capture.mjs"
+  ],
+  "newEpoch2Files": [
+    "forward/header-gas-reference.mjs",
+    "forward/header-gas-reference.test.mjs"
+  ],
+  "sameEpoch1Files": 32,
+  "allA16ForwardFilesByteExact": true,
+  "sourceInputsActual400GitByteExact": 192,
+  "toolFiles": 35,
+  "packetSHA256": "3e08eeee6d169c72b0378563f681e72e0b77f48d9bfdad78b090a2b8fe4f796e",
+  "bundleReceiptSHA256": "7b04082c5ad7cfc392aff2363512f53161f6d7fa810935f3bfc0ac96d913e119",
+  "bundleSHA256": "22ea0fdfb083e24dc483e2aa1dd4b6dda0eedc0231fe8cf658609f3b05acfa7f"
+}

@@ -1,0 +1,16 @@
+TAP version 13
+# Subtest: studio draft CLI reads JSON and YAML configs without wallet or chain actions
+ok 1 - studio draft CLI reads JSON and YAML configs without wallet or chain actions
+  ---
+  duration_ms: 1180.928417
+  type: 'test'
+  ...
+1..1
+# tests 1
+# suites 0
+# pass 1
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 1224.629584

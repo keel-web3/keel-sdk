@@ -1,0 +1,44 @@
+{
+  "schema": "keel-sdk-only-stream-stage-review@1",
+  "decision": "APPROVE",
+  "reviewer": "independent cache release reviewer; did not author production fix or staging source",
+  "reviewedAt": "2026-10-20T08:13:38.284009+00:00",
+  "planSHA256": "8c8531bf8f595ff4395481da1c7c71d9000c902f4c448d6311d363c501ea68b6",
+  "operatorSHA256": "d9b0e8d2e87a5be121bed63f356e7c2a6451694302265c4cd22c111808a3b8f2",
+  "transferProposalSHA256": "7d4d0a4e7869d0f0a0197b04a00737e67052533a750aa9dd02db47831b505659",
+  "allowedPhases": [
+    "cleanup",
+    "app"
+  ],
+  "blockingFindings": [],
+  "scope": "Exactly one redundant public archive unlink, then one verified stdin image import; no container activation, native program, signing, submission or publication approval.",
+  "sourceSdkCommit": "b524bf5fc19939c7523aada2e53f79e3360970ea",
+  "image": "sha256:5c961bf73aab9549167a8d7c5afbf88f6c8b92fcc1502d6294c55e4669a8ca8d",
+  "archiveSHA256": "335f0d33df0015354615aae689bd02921f4999d06c1a8f5e6e2b018912f9dbae",
+  "reviewedEvidence": {
+    "ownStageTests": 9,
+    "ownPreparerTests": 8,
+    "ownPriorStreamTests": 13,
+    "ownCacheTests": 48,
+    "ownComparisonTests": 19,
+    "ownRetainedOffhostFullHash": "c2d4609a9c25b5077a632c4441de0034302551f0bd3839384838a58e55dc4409",
+    "ownRecursiveOCIProof": "ecf08607b469436cf5fc294b4f14e3421a5bad11f99b10f6ecf38d4c36e7080e",
+    "ownRuntimeCorrespondence": "bad0eea65a1bb50d8183174e969eb105a0982a93637c93457af8c2920fd0ee20",
+    "all1360DistFilesMatchCandidateBytes": true,
+    "all38OCIHashesAnd32ExpandedLayersVerified": true,
+    "unchangedImageConfig": true,
+    "requiredAppBytes": 1925813248
+  },
+  "executionConstraints": [
+    "Fresh configured normal proxy predicate and current production guard required.",
+    "Execute each phase once; retain a consumed failure without automatic retry.",
+    "Revalidate the exact inode and hash, active references and free capacity under the rollout lock.",
+    "Retain all images, containers, volumes, directories, receipts and user data.",
+    "A fresh full strict actual Gatorrr native run and QA evidence remain required before release approval."
+  ],
+  "releaseApproved": false,
+  "nativeProgramApproved": false,
+  "productionActivationApproved": false,
+  "signingApproved": false,
+  "submissionApproved": false
+}

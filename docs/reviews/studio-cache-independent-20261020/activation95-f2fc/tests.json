@@ -1,0 +1,22 @@
+[
+  {
+    "file": "maintained-controls.test.py",
+    "exitCode": 0,
+    "stderr": "ct.test_stream_budget_immediate_boundaries) ... ok\n\n----------------------------------------------------------------------\nRan 13 tests in 0.003s\n\nOK\n"
+  },
+  {
+    "file": "dependency-contract.test.py",
+    "exitCode": 0,
+    "stderr": "d_foreign_candidate_never_starts_pg_or_old) ... ok\n\n----------------------------------------------------------------------\nRan 20 tests in 0.094s\n\nOK\n"
+  },
+  {
+    "file": "host-ownership-regression.test.py",
+    "exitCode": 0,
+    "stderr": "ost_after_mutation_allows_verified_recovery) ... ok\n\n----------------------------------------------------------------------\nRan 8 tests in 0.005s\n\nOK\n"
+  },
+  {
+    "file": "healthcheck-defaults.test.py",
+    "exitCode": 0,
+    "stderr": "......\n----------------------------------------------------------------------\nRan 6 tests in 0.001s\n\nOK\n"
+  }
+]

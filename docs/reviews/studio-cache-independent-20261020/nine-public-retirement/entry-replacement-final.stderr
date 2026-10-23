@@ -1,0 +1,8 @@
+test_exact_public_file_can_retire (__main__.EntryReplacement.test_exact_public_file_can_retire) ... ok
+test_foreign_replacement_after_durable_intent_is_preserved (__main__.EntryReplacement.test_foreign_replacement_after_durable_intent_is_preserved) ... ok
+test_foreign_replacement_during_reference_scan_is_preserved (__main__.EntryReplacement.test_foreign_replacement_during_reference_scan_is_preserved) ... ok
+
+----------------------------------------------------------------------
+Ran 3 tests in 0.005s
+
+OK

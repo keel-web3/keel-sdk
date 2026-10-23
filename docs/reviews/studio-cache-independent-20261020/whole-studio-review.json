@@ -1,0 +1,47 @@
+{
+  "schema": "keel-whole-studio-stdin-import-review@1",
+  "decision": "APPROVE",
+  "reviewerId": "independent-release-reviewer",
+  "reviewedAt": "2026-10-20T09:13:32.160307+00:00",
+  "planSHA256": "e75c63a4903863927a16e65297faf79106c7a092d0df67dbb8c2e73617413fc1",
+  "operatorSHA256": "678a06e47042918d319694f9c93bca156d218cf64913ee51ec56241940e05251",
+  "transferProposalSHA256": "2f6fa3339ae5e636ac67b20a54e8230fe897aaa49a355b67d5d540980e4cac36",
+  "allowedPhases": [
+    "app"
+  ],
+  "blockingFindings": [],
+  "scope": "One exact verified stdin image import only. No cleanup, containers, volumes, private/native program, production activation, signing or submission.",
+  "image": "sha256:fe94404ea7a860e6397e0964ef8dbe7d9fa9bb2777a57dd90cf8c63d802d8369",
+  "archiveBytes": 604859904,
+  "archiveSHA256": "00f52eef4f7ef040e9b298c6b7af70f3e336cd35b3e9a4e361b8ca07856d1a75",
+  "requiredFreeBytes": 2109738496,
+  "newExpandedBytes": 162701312,
+  "fullRawScratchBytes": 604859904,
+  "rollbackReserveBytes": 1073741824,
+  "metadataReserveBytes": 268435456,
+  "evidence": {
+    "ownRecursiveOCIProofSHA256": "b1f66a3b1fe9a955cf74efce76432560b7ee45994ca06b1e68cfe4a6196537ac",
+    "all40BlobAnd34ExpandedLayerHashesVerified": true,
+    "all32ParentLayersVerified": true,
+    "fullImageConfigVerified": true,
+    "ownImportTests": 4,
+    "unchangedStreamHelperPreviouslyReviewedAnd13TestsPassed": true,
+    "actualPriorParentImportReceiptSHA256": "bd73889acd74c7eb57abed5927cb2cab94f08aee55ea0127d671b9864db389f2",
+    "independentQAReceiptSHA256": "8e62b8c52a5f9d8238a12e150f8425a6b74645d7f90c9b5493de18f4b4992974",
+    "actualOverlayAndFullReferenceAppEntries": 36052,
+    "actualRawAppManifestsEqualWithoutNormalization": true,
+    "compiledConsumerSameProbePhysicalReads": 1,
+    "packageAPIs": 127,
+    "manifestSDKFiles": 1360
+  },
+  "conditions": [
+    "Fresh normal configured proxy predicate and full original-state guard.",
+    "Fresh available bytes must meet full2109738496 under rollout lock; no cleanup or accounting discount.",
+    "Import once; stop and retain any consumed failure.",
+    "Preserve current production, all images/containers/volumes/user data, and previous failed evidence."
+  ],
+  "releaseApproved": false,
+  "nativeProgramApproved": false,
+  "productionActivationApproved": false,
+  "signingApproved": false
+}

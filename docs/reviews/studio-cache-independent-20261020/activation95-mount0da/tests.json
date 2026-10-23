@@ -1,0 +1,87 @@
+[
+  {
+    "argv": [
+      "python3",
+      "/private/tmp/keel-independent-activation-static646-20261020/dependency-mount-order-regression.py",
+      "/private/tmp/keel-activation95-mount-correction-20261020/docs/reviews/studio-publication-20261020/release/activation95-static-stage/files/receipt-bound-dependencies.py"
+    ],
+    "exitCode": 0,
+    "stderrSHA256": "7b0fa23d05e8481af14f9120583a485ff5550cd169920652b4c7b290fdb5d6d5",
+    "summary": [
+      "----------------------------------------------------------------------",
+      "Ran 17 tests in 0.001s",
+      "",
+      "OK"
+    ]
+  },
+  {
+    "argv": [
+      "python3",
+      "/private/tmp/keel-activation95-mount-correction-20261020/docs/reviews/studio-publication-20261020/release/activation95-static-stage/evidence/mount-order/maintained/maintained-controls.test.py"
+    ],
+    "exitCode": 0,
+    "stderrSHA256": "1ed1a17a0a3c10f939c3a98a55804bb0ad1e9a0f27d013f8a5c6644889a7e970",
+    "summary": [
+      "----------------------------------------------------------------------",
+      "Ran 13 tests in 0.003s",
+      "",
+      "OK"
+    ]
+  },
+  {
+    "argv": [
+      "python3",
+      "/private/tmp/keel-activation95-mount-correction-20261020/docs/reviews/studio-publication-20261020/release/activation95-static-stage/evidence/mount-order/maintained/dependency-contract.test.py"
+    ],
+    "exitCode": 0,
+    "stderrSHA256": "ecd9c174ef257ee87ae3c97f5cc8dad616e4b1c3bbec95839b2a5ada366495c7",
+    "summary": [
+      "----------------------------------------------------------------------",
+      "Ran 20 tests in 0.095s",
+      "",
+      "OK"
+    ]
+  },
+  {
+    "argv": [
+      "python3",
+      "/private/tmp/keel-activation95-mount-correction-20261020/docs/reviews/studio-publication-20261020/release/activation95-static-stage/evidence/mount-order/maintained/host-ownership-regression.test.py"
+    ],
+    "exitCode": 0,
+    "stderrSHA256": "a8575b29286bcb11fd38ca8a16ca3f90760eec0af448b7c47e44a76ece47f82a",
+    "summary": [
+      "----------------------------------------------------------------------",
+      "Ran 8 tests in 0.006s",
+      "",
+      "OK"
+    ]
+  },
+  {
+    "argv": [
+      "python3",
+      "/private/tmp/keel-activation95-mount-correction-20261020/docs/reviews/studio-publication-20261020/release/activation95-static-stage/evidence/mount-order/maintained/healthcheck-defaults.test.py"
+    ],
+    "exitCode": 0,
+    "stderrSHA256": "c6b9b1f09add0403cc07e90bfdf272129b1ddfa2f8f7675ea8218862f2516371",
+    "summary": [
+      "----------------------------------------------------------------------",
+      "Ran 6 tests in 0.001s",
+      "",
+      "OK"
+    ]
+  },
+  {
+    "argv": [
+      "python3",
+      "/private/tmp/keel-activation95-mount-correction-20261020/docs/reviews/studio-publication-20261020/release/activation95-static-stage/stage-controls.test.py"
+    ],
+    "exitCode": 0,
+    "stderrSHA256": "7137eeba0f1475e79f6dce65a349431fdd4c73ecad493315cc596f599d3a273f",
+    "summary": [
+      "----------------------------------------------------------------------",
+      "Ran 4 tests in 0.019s",
+      "",
+      "OK"
+    ]
+  }
+]

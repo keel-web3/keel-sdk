@@ -1,0 +1,154 @@
+TAP version 13
+# Subtest: immutable queries reuse one successful response and deep-copy caller-owned arrays
+ok 1 - immutable queries reuse one successful response and deep-copy caller-owned arrays
+  ---
+  duration_ms: 14.30025
+  type: 'test'
+  ...
+# Subtest: method/address/slot/hash keys are exact and case normalization does not change outgoing params
+ok 2 - method/address/slot/hash keys are exact and case normalization does not change outgoing params
+  ---
+  duration_ms: 3.806917
+  type: 'test'
+  ...
+# Subtest: chain/header/ancestor checks remain live while empty code is cached exactly
+ok 3 - chain/header/ancestor checks remain live while empty code is cached exactly
+  ---
+  duration_ms: 1.111667
+  type: 'test'
+  ...
+# Subtest: warmed response cannot bypass observed HTTP401 or shop another approved recipient
+ok 4 - warmed response cannot bypass observed HTTP401 or shop another approved recipient
+  ---
+  duration_ms: 1.835083
+  type: 'test'
+  ...
+# Subtest: warmed response cannot bypass observed HTTP403 or shop another approved recipient
+ok 5 - warmed response cannot bypass observed HTTP403 or shop another approved recipient
+  ---
+  duration_ms: 0.99825
+  type: 'test'
+  ...
+# Subtest: warmed response cannot bypass an observed canonical reorg
+ok 6 - warmed response cannot bypass an observed canonical reorg
+  ---
+  duration_ms: 0.540125
+  type: 'test'
+  ...
+# Subtest: separate readers never share response data even when their scheduler is shared
+ok 7 - separate readers never share response data even when their scheduler is shared
+  ---
+  duration_ms: 0.396125
+  type: 'test'
+  ...
+# Subtest: malformed proof/code result containers are never retained
+ok 8 - malformed proof/code result containers are never retained
+  ---
+  duration_ms: 0.456375
+  type: 'test'
+  ...
+# Subtest: close aborts a held response and prevents any late success
+ok 9 - close aborts a held response and prevents any late success
+  ---
+  duration_ms: 3.143583
+  type: 'test'
+  ...
+# Subtest: one canceled request cannot poison another in-flight caller or populate a stale cache epoch
+ok 10 - one canceled request cannot poison another in-flight caller or populate a stale cache epoch
+  ---
+  duration_ms: 1.158708
+  type: 'test'
+  ...
+# Subtest: public overload selects an already-approved paid proof source without remote execution
+ok 11 - public overload selects an already-approved paid proof source without remote execution
+  ---
+  duration_ms: 17.816958
+  type: 'test'
+  ...
+# Subtest: configured paid credentials do not authorize disclosure to that recipient
+ok 12 - configured paid credentials do not authorize disclosure to that recipient
+  ---
+  duration_ms: 1.4785
+  type: 'test'
+  ...
+# Subtest: paid HTTP 403 stops within one attempt and retains restriction/cooldown
+ok 13 - paid HTTP 403 stops within one attempt and retains restriction/cooldown
+  ---
+  duration_ms: 1.443459
+  type: 'test'
+  ...
+# Subtest: paid HTTP 429 stops within one attempt and retains restriction/cooldown
+ok 14 - paid HTTP 429 stops within one attempt and retains restriction/cooldown
+  ---
+  duration_ms: 0.908541
+  type: 'test'
+  ...
+# Subtest: wrong-chain paid source never receives address/key reads
+ok 15 - wrong-chain paid source never receives address/key reads
+  ---
+  duration_ms: 0.564291
+  type: 'test'
+  ...
+# Subtest: source snapshot mismatch is terminal instead of shopping another provider
+ok 16 - source snapshot mismatch is terminal instead of shopping another provider
+  ---
+  duration_ms: 0.528375
+  type: 'test'
+  ...
+# Subtest: invalid proof request is terminal, while unsupported proof method may use an approved alternative
+ok 17 - invalid proof request is terminal, while unsupported proof method may use an approved alternative
+  ---
+  duration_ms: 1.525917
+  type: 'test'
+  ...
+# Subtest: bounded response failure can select only an eligible alternative
+ok 18 - bounded response failure can select only an eligible alternative
+  ---
+  duration_ms: 6.0095
+  type: 'test'
+  ...
+# Subtest: cancel stops a pending read without selecting paid; fresh retry retains the exact query
+ok 19 - cancel stops a pending read without selecting paid; fresh retry retains the exact query
+  ---
+  duration_ms: 3.620709
+  type: 'test'
+  ...
+# Subtest: wallet, execution, unpinned and overscoped reads are rejected before any network request
+ok 20 - wallet, execution, unpinned and overscoped reads are rejected before any network request
+  ---
+  duration_ms: 0.447833
+  type: 'test'
+  ...
+# Subtest: captured public null response for eth_getProof fails closed without another recipient or latest fallback
+ok 21 - captured public null response for eth_getProof fails closed without another recipient or latest fallback
+  ---
+  duration_ms: 0.368541
+  type: 'test'
+  ...
+# Subtest: captured public null response for eth_getCode fails closed without another recipient or latest fallback
+ok 22 - captured public null response for eth_getCode fails closed without another recipient or latest fallback
+  ---
+  duration_ms: 0.217208
+  type: 'test'
+  ...
+# Subtest: captured public null response for eth_getBlockByHash fails closed without another recipient or latest fallback
+ok 23 - captured public null response for eth_getBlockByHash fails closed without another recipient or latest fallback
+  ---
+  duration_ms: 0.256958
+  type: 'test'
+  ...
+# Subtest: the captured public header, proof and code survive approved-reader framing without dropping Amsterdam fields
+ok 24 - the captured public header, proof and code survive approved-reader framing without dropping Amsterdam fields
+  ---
+  duration_ms: 0.520042
+  type: 'test'
+  ...
+1..24
+# tests 24
+# suites 0
+# pass 24
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 177.759708

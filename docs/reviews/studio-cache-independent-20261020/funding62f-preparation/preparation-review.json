@@ -1,0 +1,154 @@
+{
+  "schema": "keel.independent-funding62f-public-preparation-review@1",
+  "decision": "APPROVE_PREPARATION_MECHANICS_ONLY",
+  "reviewerId": "independent-release-reviewer",
+  "releaseSourceCommit": "9ba1c7880a31ee6226e3bc9f72b34837ae3115d9",
+  "candidateSourceCommit": "62f5df235441a342871419ecc837907e42226596",
+  "sdkCommit": "311d61526284248938e335d7ed879089408933be",
+  "lineageSHA256": "59ef9c9cf20767718a19ece96e910c5280aa3ecae3ca42f5248788c4dde5528d",
+  "files": {
+    "README.md": {
+      "bytes": 2984,
+      "sha256": "68663624f678048bdaace63ea4e37b5efb6a9513923e1d077bffe9c35c425170"
+    },
+    "activate-image-only.py": {
+      "bytes": 17126,
+      "sha256": "dcec1958b0802f88b815c8d923308315aa92d11ba660969e39f258f05eb12fba"
+    },
+    "activation-plan.pending.json": {
+      "bytes": 3366,
+      "sha256": "9fc54980c201412a66d89a70f035231715b5032f5c57338b99c90c00b57e0c50"
+    },
+    "actual1058-app-tree.json": {
+      "bytes": 8546193,
+      "sha256": "ae7320cd60de66b852212b2ff7730b240ac5e56819ac2ad4ae9695b371a7d266"
+    },
+    "build-public-delta.py": {
+      "bytes": 9152,
+      "sha256": "4980f28054d8bddeb8cc7e3365669efb17436e427593a0cb648304e32274a04f"
+    },
+    "candidate-oom-default.py": {
+      "bytes": 2033,
+      "sha256": "6621ff48fc02057d98d91ef5fd71e6e30eeea1ef847149170e316d9725e77c73"
+    },
+    "context-preparation.recipe.json": {
+      "bytes": 3269,
+      "sha256": "c27994b5b2046d22c294ac4e3fbd0575ab86a8c326afb4d6a75059a85a31e78f"
+    },
+    "delta-controls.test.py": {
+      "bytes": 2881,
+      "sha256": "711278c911454b6310e02b8e99553e4c66ce29ed6ccb2f092e3fe4b77f2bc09a"
+    },
+    "guarded-deployment-checks.py": {
+      "bytes": 5005,
+      "sha256": "b5f7d764b6c05db503a23ea63ca21a36bfcb0f17cc8292444d790d4a8aad6e00"
+    },
+    "next-build.recipe.json": {
+      "bytes": 2473,
+      "sha256": "4ecad9a92ee4d99e45640db07530330b09ae04aceaffba0d2a7d65850bde1036"
+    },
+    "pack-delta-context.py": {
+      "bytes": 2538,
+      "sha256": "597ab471f13e443af3bedfc8327df7f17d1ab2ec6c3189d109c4d5f616af7626"
+    },
+    "prepare-delta.py": {
+      "bytes": 8331,
+      "sha256": "7d86958d929da25f8635d798b7ce842a796651178cb000c11d8866b2c09906c7"
+    },
+    "prepare-owned-context.py": {
+      "bytes": 4673,
+      "sha256": "a3b1822781652aecf4603d4aabb14dcfcec6aa420aed45794c01a4034a0cde2d"
+    },
+    "qualified-context-transfer.json": {
+      "bytes": 2402751,
+      "sha256": "c5fb631c57f11c695d0e85ef5c6af0cf6ec42ae3462bb98aabd8835064e7625e"
+    },
+    "reuse-qualified-sdk311-packages.py": {
+      "bytes": 4377,
+      "sha256": "29f51180ab35d1312e1656095b375d141eaaeae7db9ae1ca88925fe8f1a3cb37"
+    },
+    "reviewed-activation-support.py": {
+      "bytes": 43831,
+      "sha256": "a1594559c2c04159ac94827d0f4f2a991310fb06648379bca6081d5ce6a98de1"
+    },
+    "run-yuna-next.py": {
+      "bytes": 5520,
+      "sha256": "663bef98af884a777e205fc31006cf1ec0d073cdebb512168346ac5205badd39"
+    },
+    "scan-app.cjs": {
+      "bytes": 964,
+      "sha256": "0052bea161b10e1c3d304742b1acc98fe011de86cc339b21c88dfa63b4b6caab"
+    },
+    "sdk311-1745-dist.json": {
+      "bytes": 261085,
+      "sha256": "c9532de4faa56d5c0535475158dfdeb7400c7c53dad10d45f5f042fb319b89c5"
+    },
+    "snapshot-supervisor.cjs": {
+      "bytes": 3386,
+      "sha256": "5d8d56588eba290773961d74152baf3728ffd2e00a75894beed92d38af06706e"
+    },
+    "verify-qualified-context.py": {
+      "bytes": 1217,
+      "sha256": "21c578783bac6e867b5dab70014d3c4357a92a83ab068ae415a3d63c7644880a"
+    },
+    "yuna-context.commands.json": {
+      "bytes": 6200,
+      "sha256": "2fc4268a14dac7f08818a09d3e703062b4ff44c2c99a46f0d5c0528d2407a625"
+    }
+  },
+  "checks": {
+    "frozen22FullHashAndBytes": "PASS",
+    "deltaProducerReverse": "Only BASE image CEE8 to1058",
+    "hostBuilderReverse": "Only source pin d640 to62f5",
+    "activationMainAndRecoveryReverse": "Only CURRENT_ID c63 to58fc and CURRENT_IMAGE CEE8 to1058",
+    "supportGuardOomSnapshotScannerAndFiveTests": "BYTE_EXACT_PREDECESSOR",
+    "unchangedDeltaControls": {
+      "pass": 5,
+      "fail": 0,
+      "skip": 0
+    },
+    "packageCorrespondence": "Same strict original1372 raw member comparisons, sole exact two-line builder dependency representation; ships original four qualified archives",
+    "qualifiedContextTransfer": "Complete9227 lstat records and content/link sets are checked, not a directory-name assertion",
+    "freshNextRecipe": "Exact clean source+1745 SDK311 files, no SDK build, Node22.22.1/pnpm10.15.0, load<=40/free>=8GiB, absent prior dist and absent sibling Contracts with tracked-index before/after hashes",
+    "deltaScope": "App Next/server/public/context only; complete base/result tree, stale deletions, installed externalSDK/dependencies/native/bootstrap/catalog/paused b331 worker preservation",
+    "archiveBudget": "Deterministic public delta only; measures gzip/raw/4KiB delta copies and fixed1GiB rollback+256MiB snapshot+64MiB metadata; no fit claim until separately bound production preflight"
+  },
+  "qa": {
+    "commit": "ac61db34a59136a5792c9fbd19bb82cd538cdfdb",
+    "resultSHA256": "6f5f6fdfd1a12b27647d1acd8d4dc85fe82d9f9291f5a9489d5c993792ba15b0",
+    "passingExecutions": 356,
+    "uniqueCountClaimed": false,
+    "tscExit": 0,
+    "scope": "SOURCE_ONLY synthetic DB/RPC/callbacks, no live native VM or publication proof"
+  },
+  "admittedPreparation": {
+    "packetSHA256": "2fc4268a14dac7f08818a09d3e703062b4ff44c2c99a46f0d5c0528d2407a625",
+    "host": "Yuna owned task root only",
+    "steps": [
+      "read-only complete qualified public context audit",
+      "fresh context from successful exact Next output",
+      "strict package archive correspondence and original archive reuse",
+      "app-only delta creation",
+      "archive and conservative measured budget"
+    ],
+    "actualReportedBuildAndContext": "Parent reports completion; this receipt reviews mechanics and does not independently assert remote execution success"
+  },
+  "permissions": {
+    "productionHostStageBuild": false,
+    "productionActivation": false,
+    "privateArtworkReplay": false,
+    "nativeExecution": false,
+    "walletSignatureOrSubmission": false,
+    "cleanup": false
+  },
+  "deniedAdHocDockerRead": "Retain denial, no retry or alternate identity; separately reviewed production commands may only use the unchanged previously authorized sudo-n deployment mechanism and must stop if that mechanism denies",
+  "unchangedFailureEvidence": [
+    "Initial Yuna tracked-source admission RED, exact restored links followed by unchanged runner",
+    "Prior strict compiled closure FAIL_UNPROVEN",
+    "Current1058 Gator/GIF live Gate6 FAIL",
+    "Blocked direct navigation/API paths remain stopped"
+  ],
+  "workingTreeAfterFreeze": "New uncommitted host-plan/commands and pending plan changes excluded from9ba1 approval",
+  "blockingFindings": [],
+  "nextGate": "Measured artifact/context and exact immutable production host-build packet require separate review; actual image/runtime and final activation later"
+}

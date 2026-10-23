@@ -1,0 +1,77 @@
+{
+  "result": "PASS_READ_ONLY_CORRESPONDENCE",
+  "preparerReverseExact": true,
+  "members": 1372,
+  "records": [
+    {
+      "name": "keel-builder-0.3.0.tgz",
+      "generatedSHA256": "d37d8d19e18bfc244f87cf3825cc4e1bfcbb4670a179ed54e904573f84299436",
+      "qualifiedSHA256": "5c28f6d67b3e94a8530c1a498a2481ddf850dbd63049447a4f714801e55df689",
+      "members": 159,
+      "allMembersExceptDeclaredManifestRepresentationExact": true,
+      "rawManifestMemberExact": false,
+      "exactTwoLineBuilderManifestRepresentation": true,
+      "shippedArchiveSHA256": "5c28f6d67b3e94a8530c1a498a2481ddf850dbd63049447a4f714801e55df689"
+    },
+    {
+      "name": "keel-protocol-0.3.0.tgz",
+      "generatedSHA256": "dbfa0f6a0e39c086caec58a49fa8dfe5fc351a1b53c2048d857f36a04eba37d1",
+      "qualifiedSHA256": "fc665a5f115815ddbb0bcb0a123caa6123856142d8208f361af67e79b920ff4d",
+      "members": 159,
+      "allMembersExceptDeclaredManifestRepresentationExact": true,
+      "rawManifestMemberExact": true,
+      "exactTwoLineBuilderManifestRepresentation": false,
+      "shippedArchiveSHA256": "fc665a5f115815ddbb0bcb0a123caa6123856142d8208f361af67e79b920ff4d"
+    },
+    {
+      "name": "keel-sdk-0.3.2.tgz",
+      "generatedSHA256": "95738040c93ad6268b61ca9e2901731f1343a90de4b9e06ec3ba85a50eba5b07",
+      "qualifiedSHA256": "693e357852288d98a42c74c7955ee59ac8c6a04ea3d2e9ded1ce09657f7d040a",
+      "members": 939,
+      "allMembersExceptDeclaredManifestRepresentationExact": true,
+      "rawManifestMemberExact": true,
+      "exactTwoLineBuilderManifestRepresentation": false,
+      "shippedArchiveSHA256": "693e357852288d98a42c74c7955ee59ac8c6a04ea3d2e9ded1ce09657f7d040a"
+    },
+    {
+      "name": "keel-viewer-0.3.0.tgz",
+      "generatedSHA256": "e3d7eec556bdafa84581bd67cd6ac0590e216dbd33b6140a26362c8a8baf8fd7",
+      "qualifiedSHA256": "6a13ab97e15e498c178d96f18dfe6579791c91560db97f4002453222809b1fc3",
+      "members": 115,
+      "allMembersExceptDeclaredManifestRepresentationExact": true,
+      "rawManifestMemberExact": true,
+      "exactTwoLineBuilderManifestRepresentation": false,
+      "shippedArchiveSHA256": "6a13ab97e15e498c178d96f18dfe6579791c91560db97f4002453222809b1fc3"
+    }
+  ],
+  "mutationNegativesRejected": [
+    "dependencyVersion",
+    "whitespace",
+    "addedField",
+    "oldOrder"
+  ],
+  "currentOwnedPaths": {
+    "image-context": {
+      "exists": true,
+      "symlink": false
+    },
+    "regenerated-package-archives": {
+      "exists": true,
+      "symlink": false
+    },
+    "image-context.strict-member-red": {
+      "exists": false,
+      "symlink": false
+    },
+    "regenerated-package-archives.strict-member-red": {
+      "exists": false,
+      "symlink": false
+    },
+    "fresh-packed-sdk311-archives": {
+      "exists": false,
+      "symlink": false
+    }
+  },
+  "reusePerformed": false,
+  "hostAction": false
+}

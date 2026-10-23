@@ -1,0 +1,8 @@
+{
+  "producerSources": 229,
+  "forwardSources": 9,
+  "allRowsHashAndLengthMatch": true,
+  "policySHA256": "26afd8b7c0106db1474d4bddc0f63af7cc25c81befad4b005b0749c415ffbb1a",
+  "predicateSHA256": "7c178356e26b54469e29a5ce1e28a910220984fded897c7a5b92b541084938d7",
+  "sequenceBindingsSHA256": "db509ab37c42f1d78bf1e6c7fc6468b9e5c03b180ee53d8e38fd9ccd0e9b34ba"
+}
