@@ -1,0 +1,11 @@
+{
+  "base": "51cf835a17cc5e0fe080d1de271619d009ef5fd6",
+  "command": [
+    "/Users/ravonus/.nvm/versions/node/v22.22.1/bin/node",
+    "--test",
+    "tests/build-runtime-artifacts.test.mjs"
+  ],
+  "exit": 1,
+  "elapsed": 0.08984208293259144,
+  "actualCleanNormalBuild": "../integrated-51cf-build/receipt.json"
+}

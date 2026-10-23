@@ -1,0 +1,71 @@
+TAP version 13
+# Subtest: normal build supplies the declared public wrapper-viewer runtime
+not ok 1 - normal build supplies the declared public wrapper-viewer runtime
+  ---
+  duration_ms: 2.27325
+  type: 'test'
+  location: '/private/tmp/keel-sdk-integration-20261022-01/tests/build-runtime-artifacts.test.mjs:10:1'
+  failureType: 'testCodeFailure'
+  error: "Cannot find module '/private/tmp/keel-sdk-integration-20261022-01/node_modules/@keel/viewer/dist/wrapper-viewer.js' imported from /private/tmp/keel-sdk-integration-20261022-01/tests/build-runtime-artifacts.test.mjs"
+  code: 'ERR_MODULE_NOT_FOUND'
+  stack: |-
+    finalizeResolution (node:internal/modules/esm/resolve:275:11)
+    moduleResolve (node:internal/modules/esm/resolve:861:10)
+    defaultResolve (node:internal/modules/esm/resolve:985:11)
+    #cachedDefaultResolve (node:internal/modules/esm/loader:731:20)
+    ModuleLoader.resolve (node:internal/modules/esm/loader:708:38)
+    ModuleLoader.getModuleJobForImport (node:internal/modules/esm/loader:310:38)
+    onImport.tracePromise.__proto__ (node:internal/modules/esm/loader:664:36)
+    TracingChannel.tracePromise (node:diagnostics_channel:350:14)
+    ModuleLoader.import (node:internal/modules/esm/loader:663:21)
+    defaultImportModuleDynamicallyForModule (node:internal/modules/esm/utils:222:31)
+  ...
+# Subtest: normal build packages exact current storage policy documents
+not ok 2 - normal build packages exact current storage policy documents
+  ---
+  duration_ms: 1.894875
+  type: 'test'
+  location: '/private/tmp/keel-sdk-integration-20261022-01/tests/build-runtime-artifacts.test.mjs:16:1'
+  failureType: 'testCodeFailure'
+  error: "ENOENT: no such file or directory, open '/private/tmp/keel-sdk-integration-20261022-01/packages/sdk/dist/docs/KEEL_PAYLOAD_STORAGE.md'"
+  code: 'ENOENT'
+  stack: |-
+    async open (node:internal/fs/promises:636:25)
+    async readFile (node:internal/fs/promises:1235:14)
+    async TestContext.<anonymous> (file:///private/tmp/keel-sdk-integration-20261022-01/tests/build-runtime-artifacts.test.mjs:18:22)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: normal build refreshes the dependency-free mint-queue public entry
+ok 3 - normal build refreshes the dependency-free mint-queue public entry
+  ---
+  duration_ms: 3.254292
+  type: 'test'
+  ...
+# Subtest: clean build removes stale mint-queue output and keeps unrelated source
+not ok 4 - clean build removes stale mint-queue output and keeps unrelated source
+  ---
+  duration_ms: 2.65525
+  type: 'test'
+  location: '/private/tmp/keel-sdk-integration-20261022-01/tests/build-runtime-artifacts.test.mjs:31:1'
+  failureType: 'testCodeFailure'
+  error: 'Missing expected rejection.'
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected:
+    code: 'ENOENT'
+  operator: 'rejects'
+  stack: |-
+    async TestContext.<anonymous> (file:///private/tmp/keel-sdk-integration-20261022-01/tests/build-runtime-artifacts.test.mjs:39:5)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+1..4
+# tests 4
+# suites 0
+# pass 1
+# fail 3
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 41.371375

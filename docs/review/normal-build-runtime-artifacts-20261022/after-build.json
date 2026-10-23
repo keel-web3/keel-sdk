@@ -1,0 +1,9 @@
+{
+  "source": "317a0d495d6931c665f5cdbae41482b2ca3ae59a",
+  "command": [
+    "/Users/ravonus/.nvm/versions/node/v22.22.1/bin/node",
+    "scripts/build.mjs"
+  ],
+  "exit": 0,
+  "elapsed": 16.498057625023648
+}

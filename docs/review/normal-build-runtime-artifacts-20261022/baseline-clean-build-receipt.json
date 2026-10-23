@@ -1,0 +1,12 @@
+{
+  "source": "51cf835a17cc5e0fe080d1de271619d009ef5fd6",
+  "command": [
+    "/Users/ravonus/.nvm/versions/node/v22.22.1/bin/node",
+    "scripts/build.mjs"
+  ],
+  "cwd": "/private/tmp/keel-sdk-integration-20261022-01",
+  "node": "22.22.1",
+  "exit": 0,
+  "elapsedSeconds": 16.17232137499377,
+  "cleanBuildEntry": true
+}

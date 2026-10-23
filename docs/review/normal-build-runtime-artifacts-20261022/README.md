@@ -1,0 +1,9 @@
+# Normal build runtime artifact closure — author evidence
+
+Candidate317a0d495d6931c665f5cdbae41482b2ca3ae59a, parent51cf835a17cc5e0fe080d1de271619d009ef5fd6. The actual clean normal root build at51cf exited0 after16.172s but omitted the declared public wrapper-viewer runtime and packaged SDK storage policy documents. Its cleanup also left mint-queue dist outside the owned output set. The new unchanged regression on those actual outputs was1PASS/3FAIL; baseline raw logs are retained. Existing mint-queue files happened to match51cf before the fix, so that baseline PASS alone was not freshness proof.
+
+The root build now invokes the same three maintained packagers already specified by viewer/SDK package build scripts, in dependency order: wrapper after viewer compilation, storage documents and dependency-free mint-queue after SDK compilation. Cleanup includes only mint-queue's compiler-owned dist. No dependency, runtime protocol, source assets, viewer selection, request policy or publication guard changed. No user files/dependencies/evidence are deleted.
+
+Fresh normal root build317a0d exits0 after16.498s. Exact unchanged new regression4PASS; existing output-cleanup2PASS and classification3PASS (total9). This exercises the declared public module import, exact documentation bytes, actual exported mint-queue entry/type identity and a temporary stale-output sentinel with unrelated-source preservation. No expected value/assertion was changed after the retained RED. Independently approved native-movie boundary case is also registered in317's ancestor51cf; final combined review must inspect that one additive classification line.
+
+Independent review remains required. No full SDK suite, release artifact, native execution, deployment or wallet proof is claimed here. Current source is an integration checkpoint; later RPC/codec source must receive fresh compiled runtime identity.

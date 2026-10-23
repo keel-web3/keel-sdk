@@ -1,0 +1,12 @@
+{
+  "source": "317a0d495d6931c665f5cdbae41482b2ca3ae59a",
+  "command": [
+    "/Users/ravonus/.nvm/versions/node/v22.22.1/bin/node",
+    "--test",
+    "tests/build-runtime-artifacts.test.mjs",
+    "tests/build-output.test.mjs",
+    "tests/test-suite-classification.test.mjs"
+  ],
+  "exit": 0,
+  "elapsed": 0.19015675014816225
+}

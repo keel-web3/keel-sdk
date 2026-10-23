@@ -1,0 +1,72 @@
+[
+  {
+    "path": "README.md",
+    "bytes": 1899,
+    "sha256": "564a51e020b19dbc266402eec5d94050832d174330d3241c14209d2aa48686a3"
+  },
+  {
+    "path": "after-build.json",
+    "bytes": 208,
+    "sha256": "5067f281af108e9f1f9700b1a1030726116548e5e29a935278349925a84986f2"
+  },
+  {
+    "path": "after-build.stderr",
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "path": "after-build.stdout",
+    "bytes": 329,
+    "sha256": "1829a0bdad839b83dd0957a4d6023501047fe7c2a54e5770825d0bca551a4ac7"
+  },
+  {
+    "path": "after-tests.json",
+    "bytes": 327,
+    "sha256": "96e513dd705177a64bd63e54fed989bc8bf12138a2ca40bfd975a4595e8e5078"
+  },
+  {
+    "path": "after-tests.stderr",
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "path": "after-tests.stdout",
+    "bytes": 2089,
+    "sha256": "6dd3c0148a27fc1c5dd53ed3e43fa765ba65835030f5755939e79f22c359220b"
+  },
+  {
+    "path": "baseline-clean-build-receipt.json",
+    "bytes": 320,
+    "sha256": "71246cabc920bd507f9569d84d6fcdb603a93ae7a8c48f1b886cb45fcd47f59d"
+  },
+  {
+    "path": "baseline-clean-build-stderr.log",
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "path": "baseline-clean-build-stdout.log",
+    "bytes": 252,
+    "sha256": "d8fb1e519bd0cb6e365d9dbd11a5eefe3b9bc21fd088f484b10b06e53a90c02a"
+  },
+  {
+    "path": "before.json",
+    "bytes": 311,
+    "sha256": "f4b2f9c7e98b2a8ef801a7c5b3c17c28503c51da4057f41c25f7de51ebc904b7"
+  },
+  {
+    "path": "before.stderr",
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "path": "before.stdout",
+    "bytes": 3284,
+    "sha256": "21719fa71adb0bcfe5f0a4794803cd1416e33cbd19aef23381b48bbb28fd4247"
+  },
+  {
+    "path": "source.diff",
+    "bytes": 4519,
+    "sha256": "ffe02af83cce57523be601f704250e20270917601fda991ed59ca7bb3acceaec"
+  }
+]
