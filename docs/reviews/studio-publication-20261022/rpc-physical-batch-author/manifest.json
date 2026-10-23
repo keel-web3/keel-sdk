@@ -1,23 +1,23 @@
 {
   "schema": "keel.rpc-physical-batch-evidence-manifest@1",
-  "sourceCommit": "5f49cb6c865fd69262e0fa943a611414157b0833",
+  "sourceCommit": "670e324170264d6d146a6b9c30aa11e813e446f2",
   "rows": [
     {
       "path": "packages/sdk/src/public-simulation-pool.ts",
-      "bytes": 48259,
-      "sha256": "069ec7f918dd2b037a9c98c160e0f30c395a7722dc831bd5d6fb222b445bb663",
+      "bytes": 48646,
+      "sha256": "9d02b210ce011a9b9bba80ec61d32169e84f937c1dd3dfb851dffcfe0b1950fc",
       "role": "source-or-test"
     },
     {
       "path": "packages/sdk/src/provider-request-scheduler.ts",
-      "bytes": 24798,
-      "sha256": "9811b27ced6acc18853b168337d190741490bad3ad93b8415fd78d2dbc26afc7",
+      "bytes": 25493,
+      "sha256": "59b96cf1ae66a1b262cc6a1e1cddf16e57408019295bdb8df3d64c8f4216a58f",
       "role": "source-or-test"
     },
     {
       "path": "tests/sdk-configured-read-batch.test.mjs",
-      "bytes": 9909,
-      "sha256": "29ec04ac327792c6e8b1733257f356f2cbb292b3e4a080026c3fed3425b5b22d",
+      "bytes": 11004,
+      "sha256": "39acbaf617c78ceb878cc8357d60f1a1b969257461e046936fb96fb72d33d629",
       "role": "source-or-test"
     },
     {
@@ -34,8 +34,8 @@
     },
     {
       "path": "docs/reviews/studio-publication-20261022/rpc-physical-batch-author/README.md",
-      "bytes": 7269,
-      "sha256": "af6007bf97bef761430aeaca6389640d6fee6207394ae2ef4f3f05cc3a730d9b",
+      "bytes": 8831,
+      "sha256": "cae20f7b5dc0f93db4c711a1c8a710140ed175337c9b10c0426025b15e854e07",
       "role": "evidence"
     },
     {
@@ -45,9 +45,21 @@
       "role": "evidence"
     },
     {
-      "path": "docs/reviews/studio-publication-20261022/rpc-physical-batch-author/qualification.json",
+      "path": "docs/reviews/studio-publication-20261022/rpc-physical-batch-author/manifest-5f49-a029.json",
+      "bytes": 5988,
+      "sha256": "6335f15e06e329b303de4f4718c1f444f07d0ae0ffc623b2798bbb24c10cb41c",
+      "role": "evidence"
+    },
+    {
+      "path": "docs/reviews/studio-publication-20261022/rpc-physical-batch-author/qualification-5f49-a029.json",
       "bytes": 4390,
       "sha256": "845993ae68bc4cc1dc6e33da84a544a6a87d64a420116e786c6cf5808185c74e",
+      "role": "evidence"
+    },
+    {
+      "path": "docs/reviews/studio-publication-20261022/rpc-physical-batch-author/qualification.json",
+      "bytes": 4845,
+      "sha256": "223b7b0f41a7edfa382567843a7e958ef359ecf0baf3add183ea14cfe6620746",
       "role": "evidence"
     },
     {
@@ -94,6 +106,30 @@
     },
     {
       "path": "docs/reviews/studio-publication-20261022/rpc-physical-batch-author/sdk-denial-correction-tsc.stdout",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "role": "evidence"
+    },
+    {
+      "path": "docs/reviews/studio-publication-20261022/rpc-physical-batch-author/sdk-http429-maintained.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "role": "evidence"
+    },
+    {
+      "path": "docs/reviews/studio-publication-20261022/rpc-physical-batch-author/sdk-http429-maintained.stdout",
+      "bytes": 31997,
+      "sha256": "b9dea28cc2e502bc09282a48372f387aefb84bda30c896891ac91b606c987f03",
+      "role": "evidence"
+    },
+    {
+      "path": "docs/reviews/studio-publication-20261022/rpc-physical-batch-author/sdk-http429-tsc.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "role": "evidence"
+    },
+    {
+      "path": "docs/reviews/studio-publication-20261022/rpc-physical-batch-author/sdk-http429-tsc.stdout",
       "bytes": 0,
       "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
       "role": "evidence"

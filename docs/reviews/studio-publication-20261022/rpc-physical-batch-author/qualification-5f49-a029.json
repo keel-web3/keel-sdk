@@ -1,0 +1,131 @@
+{
+  "schema": "keel.rpc-physical-batch-author-qualification@1",
+  "recordedAt": "2026-10-23T00:25:04.651715+00:00",
+  "siteSource": "a029e35451370435e58fb962f7209587b1598400",
+  "sdkSource": "5f49cb6c865fd69262e0fa943a611414157b0833",
+  "originalBlockedSite": "0e7867f350cff0ed127d326ac2f2515a8e55eff0",
+  "originalBlockedSDK": "679dc9549df0fa4b36aa46f6b4400b4dc139b77b",
+  "sourceHashes": {
+    "apps/studio/src/server/chain/public-client.ts": "c75db747539b90a5dfca38f9add15c9f8d91b9ff92fa926a08d2b50d6d15022c",
+    "apps/studio/src/server/chain/configured-read-batch.ts": "9a3e9a9915dd0830e8c80cb14768cdc409858bff041f43f8817556c4ac7d6d7f",
+    "packages/sdk/src/public-simulation-pool.ts": "069ec7f918dd2b037a9c98c160e0f30c395a7722dc831bd5d6fb222b445bb663",
+    "packages/sdk/src/provider-request-scheduler.ts": "9811b27ced6acc18853b168337d190741490bad3ad93b8415fd78d2dbc26afc7"
+  },
+  "runtimeHashes": {
+    "packages/sdk/dist/public-simulation-pool.js": "c8a701da777cc435d0c71b1a8df5a482da9d2a373e46bdef08ad3414b02fade6",
+    "packages/sdk/dist/provider-request-scheduler.js": "2afef5f32ae9b65208665d4dd7070b8d0b5cda9c9b9c64aa682199a7f050dd28"
+  },
+  "node": "v22.22.1",
+  "commands": [
+    {
+      "repo": "sdk",
+      "command": "node node_modules/typescript/lib/tsc.js -p packages/sdk/tsconfig.json",
+      "exit": 0
+    },
+    {
+      "repo": "sdk",
+      "command": "node --test tests/sdk-configured-read-batch.test.mjs tests/sdk-provider-request-scheduler.test.mjs tests/sdk-public-simulation-pool.test.mjs",
+      "exit": 0,
+      "passed": 120
+    },
+    {
+      "repo": "site/apps/studio",
+      "command": "node node_modules/typescript/lib/tsc.js --noEmit --project tsconfig.json",
+      "exit": 0
+    },
+    {
+      "repo": "site",
+      "command": "node --experimental-strip-types --test apps/studio/tests/unit/public-client-cancellation.test.ts apps/studio/tests/unit/configured-read-batch.test.ts",
+      "exit": 0,
+      "passed": 23
+    },
+    {
+      "repo": "site",
+      "command": "node docs/reviews/studio-publication-20261022/rpc-physical-batch-author/reviewer-denial-after-observed-cancellation.mjs",
+      "exit": 0
+    },
+    {
+      "repo": "site",
+      "command": "node docs/reviews/studio-publication-20261022/rpc-physical-batch-author/reviewer-incomplete-denial.mjs",
+      "exit": 0
+    }
+  ],
+  "providerCalls": 0,
+  "hostCalls": 0,
+  "walletSigning": "not-performed",
+  "submission": "not-performed",
+  "productionActivated": false,
+  "actualGatorAndGIFAcceptance": "OPEN",
+  "independentReview": "OPEN",
+  "testCorrectionAdmission": {
+    "patchSHA256": "951b5bb49f2d82adbe319b807dbf238d87fd102fbc05873f57b8dbc0ec74c0dc",
+    "reviewer": "/root/independent_integrated_release",
+    "receipt": "/private/tmp/keel-independent-rpc-physical-batch-20261022-01/cancellation-fixture-admission.json",
+    "fourAddedZeroRemoved": true
+  },
+  "localPhysicalBatchMeasurement": {
+    "sourceSite": "3df02f2cdd2cc3e98c65a6409a385468435f6e77",
+    "nativeOrWallet": false,
+    "unchangedMinIntervalMs": 250,
+    "measurements": [
+      {
+        "name": "baseline",
+        "elapsedMs": 3523.6586249999996,
+        "physicalHTTP": 15,
+        "logicalReads": 15,
+        "wireBytes": [
+          136,
+          133,
+          133,
+          133,
+          133,
+          136,
+          133,
+          133,
+          133,
+          133,
+          136,
+          133,
+          133,
+          133,
+          133
+        ],
+        "startsMs": [
+          2.4645419999999376,
+          253.04725000000008,
+          506.14149999999995,
+          756.6730419999999,
+          1008.874542,
+          1259.968542,
+          1510.3042500000001,
+          1762.7791670000001,
+          2013.3511250000001,
+          2265.766959,
+          2517.980209,
+          2769.7620840000004,
+          3019.737834,
+          3271.9072920000003,
+          3523.3769589999997
+        ]
+      },
+      {
+        "name": "candidate",
+        "elapsedMs": 506.4280410000001,
+        "physicalHTTP": 3,
+        "logicalReads": 15,
+        "wireBytes": [
+          664,
+          664,
+          664
+        ],
+        "startsMs": [
+          2.2557080000005953,
+          253.43029100000058,
+          505.9280000000008
+        ]
+      }
+    ],
+    "candidateSiteSource": "a029e35451370435e58fb962f7209587b1598400",
+    "candidateSDKSource": "5f49cb6c865fd69262e0fa943a611414157b0833"
+  }
+}
