@@ -149,7 +149,7 @@ async function decodeMovie(binary: string, cwd: string, input: string, signal?:A
   const selectedStream = videoStreams[videoIndex]!;
   const dims = /Video:[^\n]*?\b(\d{1,5})x(\d{1,5})\b/u.exec(selectedStream);
   if (!dims || Number(dims[1])*Number(dims[2]) > MAX_PIXELS || Math.max(Number(dims[1]),Number(dims[2])) > 8192) throw new Error("Movie dimensions are unavailable or exceed the decode budget.");
-  const presentation = assertMoviePresentationSemantics(containerBytes,probe.stderr.split("Output #")[0]!,selectedStream,Number(dims[1]),Number(dims[2]),purpose);
+  const presentation = assertMoviePresentationSemantics(containerBytes,probe.stderr.split("Output #")[0]!,selectedStream,Number(dims[1]),Number(dims[2]),purpose,MAX_FRAMES);
   const nativeDisplay=presentation.nativeDisplay;
   // Native SAR previews may expand beyond the coded raster. Bind the same
   // existing frame/pixel budgets to the complete parsed sample count before
@@ -186,6 +186,9 @@ async function decodeMovie(binary: string, cwd: string, input: string, signal?:A
     if (!packetBase || timingFrames.length !== frames.length) throw new Error("The movie packet timeline does not match every decoded frame.");
     const first=timingFrames[0]!,last=timingFrames.at(-1)!,clock=presentation.videoTimeline;
     if(BigInt(first[2]!)!==0n || (BigInt(last[2]!)+BigInt(last[3]!))*BigInt(packetBase[1]!)*clock.scale!==clock.duration*BigInt(packetBase[2]!)) throw new Error("The complete movie media duration does not match the actual packet timeline; native media is retained.");
+    if(clock.nativePresentation&&timingFrames.some((frame,index)=>BigInt(frame[2]!)*BigInt(packetBase[1]!)*clock.scale!==clock.nativePresentation!.times[index]!*BigInt(packetBase[2]!)
+      ||BigInt(frame[3]!)*BigInt(packetBase[1]!)*clock.scale!==clock.nativePresentation!.durations[index]!*BigInt(packetBase[2]!)
+      ||BigInt(frames[index]![2]!)*BigInt(timebase[1]!)*clock.scale!==clock.nativePresentation!.times[index]!*BigInt(timebase[2]!)))throw new Error("The native presentation samples do not match every actual decoded frame PTS and packet duration; original retained.");
     timingBase = Number(packetBase[1])/Number(packetBase[2])*1000;
     const firstPacket = Number(timingFrames[0]![2]), firstDecoded = Number(frames[0]![2]);
     if (timingFrames.some((frame,index) => exactOrigin
@@ -202,6 +205,7 @@ async function decodeMovie(binary: string, cwd: string, input: string, signal?:A
   return {info:{width,height,durationMs:times.at(-1)!+delays.at(-1)!,frameCount:frames.length,animated:frames.length>1,hasAudio,frameTimesMs:times,frameDurationsMs:delays},hashes:frames.map(f=>f[5]!),videoMap,startTimeMs:first*timingBase,extraStreams:/Stream #.*(?:Subtitle|Data|Attachment):/u.test(probe.stderr),srgbFull:presentation.srgbFull,...(audio?{audio,audioTimeline}:{} ),
     ...(nativePreviewFilter?{nativePreviewFilter}:{}),
     ...(nativeDisplay?{nativeWarnings:[
+      "Native frame inspection is a decoded preview of the exact Original. Encoded artwork remains unchanged; this does not grant lossless conversion or publication authority.",
       ...(nativePreviewFilter?[`Native display preview rasterizes coded ${nativeDisplay.codedWidth}x${nativeDisplay.codedHeight} at SAR ${nativeDisplay.sampleAspectRatio.numerator}:${nativeDisplay.sampleAspectRatio.denominator} to ${nativeDisplay.width}x${nativeDisplay.height}. This is preview-only; original encoded bytes are unchanged and no lossless conversion or pair proof is granted.`]:[]),
       ...(presentation.nativeCreatorTitle?["Native inspection retains the creator title in the exact original container; the frame preview is not permission to remove that metadata from a converted carrier."]:[])]}:{} )};
 }

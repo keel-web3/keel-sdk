@@ -97,6 +97,7 @@ export const DETERMINISTIC_TEST_FILES = Object.freeze([
   "tests/native-movie-inspection.test.mjs",
   "tests/native-movie-mcp.test.mjs",
   "tests/native-movie-boundaries.test.mjs",
+  "tests/native-yuv-preview.test.mjs",
   "tests/proof-state-reader-fallback-safety.test.mjs",
   "tests/reviewer-denial-cancellation.test.mjs",
   "tests/reviewer-rpc-denial-cancellation.test.mjs",
