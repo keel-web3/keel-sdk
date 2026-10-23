@@ -201,6 +201,7 @@ export const DETERMINISTIC_TEST_FILES = Object.freeze([
   "tests/rpc-read-manifest.test.mjs",
   "tests/mcp-media-edit.test.mjs",
   "tests/media-preparation.test.mjs",
+  "tests/media-conversion-capabilities.test.mjs",
   "tests/media-frame-request-snapshot.test.mjs",
   "tests/native-media-frame-read.test.mjs",
   "tests/native-gif-source-identity.test.mjs",
