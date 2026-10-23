@@ -1,0 +1,10 @@
+[
+  {
+    "path": "/Users/ravonus/Documents/Codex/2026-10-20/task-2/diagnostic-candidate/workspace/keel-sdk",
+    "checkpoint": "ecc57ae79070af39eb7a43037c75fec4a00f3d01",
+    "sourceFiles": 17,
+    "bytesAlreadyInSelectedMain": 17,
+    "backup": "/Users/ravonus/Documents/Codex/2026-10-22/task/backups/fresh-dirty-source/0479a534a442",
+    "disposition": "All17generated facade bytes already match current generator/main; checkpoint history retained with no active source change."
+  }
+]
