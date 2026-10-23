@@ -273,6 +273,33 @@ test("MCP prepares entrypoint capabilities that match the shared golden vector a
   assert.equal(protectedName.isError, true);
 });
 
+test("MCP prepares governor envelopes, validation and delegated approvals that match the shared golden vector", async (t) => {
+  const { call } = await fixture(t);
+  const authority = "KT1Tezooo2zzSmartPyzzSTATiCzzzwqqQ4H";
+  const payload = await call("keel-tezos-signature-authority-prepare", { network: "NetXjD3HPJJjmcd", authority,
+    action: { kind: "payload", manager: "KT1TezoooozzSmartPyzzSTATiCzzzwwBFA1", digest: "ab".repeat(32), deadline: 1800000000, epoch: 1 } });
+  assert.equal(payload.isError, undefined, JSON.stringify(payload));
+  assert.equal(payload.structuredContent.payload, "0x0507070a000000206b65656c2e74657a6f732e636f6e74726163742d7369676e61747572652e763107070a0000001601d1371b91fdbd07c8855659c84652230be0eaecd50007070a000000049caecab907070a00000020abababababababababababababababababababababababababababababababab07070080c8ceb40d0001");
+  assert.equal(payload.structuredContent.signing, "not-performed");
+  const signature = "edsigtXomBKi5CTRf5cjATJWSyaRvhfYNHqSUGrn4SdbYRcGwQrUGjzEfQDTuqHhuA8b2d8NarZjz8TRf65WkpQmo423BtomS8Q";
+  const signatures = ["edpkuBknW28nW72KG6RoHtYW7p12T6GKc7nAbwYX5m8Wd9sDVC9yav", "edpktzNbDAUjUk697W7gYg2CRuBQjyPxbEg8dLccYYwKSKvkPvjtV9"].map((publicKey) => ({ publicKey, signature }));
+  const validation = await call("keel-tezos-signature-authority-prepare", { network, authority,
+    action: { kind: "validation", digest: "d1".repeat(32), envelope: { deadline: 2000, epoch: 1, signatures } } });
+  assert.equal(validation.isError, undefined, JSON.stringify(validation));
+  assert.equal(validation.structuredContent.view, "is_valid_signature");
+  assert.equal(validation.structuredContent.argument.args[1].prim, "Some");
+  const approve = await call("keel-tezos-signature-authority-prepare", { network, authority, action: { kind: "approve", digest: "d1".repeat(32), validUntil: 4600, now: 1000 } });
+  assert.equal(approve.structuredContent.governanceCall.entrypoint, "approve_signature");
+  const zero = await call("keel-tezos-signature-authority-prepare", { network, authority, action: { kind: "approve", digest: "00".repeat(32), validUntil: 4600, now: 1000 } });
+  assert.equal(zero.isError, true);
+  const delegate = await call("keel-tezos-signature-authority-prepare", { network, authority, action: { kind: "delegate", fn: "approve", digest: "d1".repeat(32), validUntil: 4600, now: 1000 } });
+  assert.equal(delegate.isError, undefined, JSON.stringify(delegate));
+  const role = await call("keel-tezos-entrypoint-capability-prepare", { network, controller: "KT1Tezooo1zzSmartPyzzSTATiCzzzyfC8eF",
+    capability: delegate.structuredContent.capability, action: { kind: "role", args: delegate.structuredContent.args, amount: 0 } });
+  assert.equal(role.isError, undefined, JSON.stringify(role));
+  assert.equal(role.structuredContent.operation.parameters.entrypoint, "execute_role_entrypoint");
+});
+
 test("MCP prepares seeded-collection calls and returns the typed refusal for EVM-only seed modes", async (t) => {
   const { call } = await fixture(t);
   const configure = await call("keel-tezos-seed-action-prepare", { network, sender: creator, collection, action: { kind: "configure", profile: { reveal: "immediate", mode: "derived" } } });
