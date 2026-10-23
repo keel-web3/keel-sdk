@@ -1,0 +1,66 @@
+{
+  "schema": "keel.independent-source-review@1",
+  "verdict": "APPROVED_SCOPED_M4V_SOURCE",
+  "sourceCommit": "e946bde7140d4ce1eb04ecac735c7ed216d2bf46",
+  "baseCommit": "0dc7e6f342b228515b1eecf783c9fd3629802eef",
+  "authorEvidenceCommit": "0a66a6472d1087d971cff5abd994d2632fdc6a72",
+  "checkout": "/private/tmp/keel-independent-native-movie-mime-20261022-01",
+  "environment": {
+    "node": "v22.22.1",
+    "typescript": "5.9.3",
+    "os": "macOS-15.6.1-arm64-arm-64bit-Mach-O",
+    "chrome": "Google Chrome for Testing151.0.7922.34/headless-shell1234"
+  },
+  "results": [
+    {
+      "check": "fresh standard build",
+      "command": "PATH=/Users/ravonus/.nvm/versions/node/v22.22.1/bin:$PATH node scripts/build.mjs",
+      "exitCode": 0,
+      "evidence": "own-standard-build-complete.stdout",
+      "allFreshOutputFilesByteEqualAuthor": 1821
+    },
+    {
+      "check": "maintained focused plus independent malformed container/brand/role/subarray controls",
+      "command": "node --test tests/registered-native-none.test.mjs tests/studio-core.test.mjs tests/registered-native-gzip.test.mjs tests/registered-shared-module-codec.test.mjs tests/current-publication-carriage.test.mjs tests/media-viewer-adapters.test.mjs tests/reviewer-native-movie-mime.test.mjs",
+      "pass": 160,
+      "fail": 0,
+      "skipped": 0,
+      "maintainedPass": 145,
+      "independentPass": 15,
+      "evidence": "focused.stdout"
+    },
+    {
+      "check": "actual retained registered-frame original MP4/M4V Chromium playback",
+      "command": "KEEL_CHROME_HEADLESS_SHELL=<installed1234binary> KEEL_NATIVE_NONE_BROWSER_EVIDENCE=<owned evidence>/browser node --test tests/registered-native-none.browser.test.mjs",
+      "pass": 2,
+      "fail": 0,
+      "skipped": 0,
+      "evidence": "browser.stdout"
+    }
+  ],
+  "blockingFindings": [],
+  "preservation": {
+    "productionChangesAuthoredByReviewer": 0,
+    "registeredRendererSchemaChanges": 0,
+    "inputBytesPreserved": true,
+    "serverProviderWalletCalls": 0
+  },
+  "notQualified": [
+    "Direct QuickTime playback; explicitly rejected and original bytes retained",
+    "Fresh selected-chain authentication",
+    "Normal Postgres/API/MCP intake",
+    "Actual Gatorrr/GIF whole publication",
+    "Final Linux release artifact",
+    "Deployed Studio or wallet handoff"
+  ],
+  "setupFailuresRetained": [
+    "own-standard-build.stderr: sparse examples absent and initial child Node25 (not passing evidence)",
+    "own-standard-build-corrected.stderr: own .bin/tsc alias absent",
+    "own-standard-build-final.stderr: sparse skills absent"
+  ],
+  "notes": [
+    "Sparse examples/skills populated byte-exact from candidate; own tsc bin alias points to pinned public TypeScript; no production fix or assertion changes.",
+    "Actual browser proves these two exact H.264 fixtures, not every possible codec or browser.",
+    "Author failed QuickTime browser/initial typed comparison RED receipts inspected and remain intact in author evidence; no rejected result relabeled as success."
+  ]
+}

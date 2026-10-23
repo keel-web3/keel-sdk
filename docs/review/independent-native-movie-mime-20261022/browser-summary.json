@@ -1,0 +1,60 @@
+[
+  {
+    "input": "mp4",
+    "identity": {
+      "digest": "a421a05635b124a135c770d3c9cc814c515cfcdaa4a7b3e68f24a332033e5561",
+      "bytes": 1786,
+      "width": 32,
+      "height": 24,
+      "duration": 0.56
+    },
+    "documentBytes": 91196,
+    "documentSHA256": "b2569985fc3849c3c4a24a45f98fd84bfe2cff0a044e07ff26d85e873af713e6",
+    "samples": [
+      [
+        255,
+        0,
+        0,
+        255
+      ],
+      [
+        0,
+        0,
+        255,
+        255
+      ]
+    ],
+    "errors": [],
+    "external": [],
+    "scope": "Actual local byte-authenticated retained registered rev5 frame and native MP4 decode/seek. No fresh chain authentication, live Studio, wallet or publication proof."
+  },
+  {
+    "input": "m4v",
+    "identity": {
+      "digest": "eb417767725dbb6fc81fd5e88313f1c2d2a6e91206d2bc8d88075854d5d2f719",
+      "bytes": 1775,
+      "width": 32,
+      "height": 24,
+      "duration": 0.56
+    },
+    "documentBytes": 91182,
+    "documentSHA256": "ab12c1a8915c433cdc233d514f8ff199255a939c03f6fc2c7edd9c57d7dedcd3",
+    "samples": [
+      [
+        255,
+        0,
+        0,
+        255
+      ],
+      [
+        0,
+        0,
+        255,
+        255
+      ]
+    ],
+    "errors": [],
+    "external": [],
+    "scope": "Actual local byte-authenticated retained registered rev5 frame and native M4V decode/seek. No fresh chain authentication, live Studio, wallet or publication proof."
+  }
+]

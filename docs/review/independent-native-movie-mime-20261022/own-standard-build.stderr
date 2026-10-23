@@ -1,0 +1,21 @@
+/Users/ravonus/dev/keel-sdk/node_modules/.pnpm/esbuild@0.28.2/node_modules/esbuild/lib/main.js:1752
+  let error = new Error(text);
+              ^
+
+Error: Build failed with 1 error:
+error: Could not resolve "/private/tmp/keel-independent-native-movie-mime-20261022-01/examples/plugins/keel-market/wallet-runtime-wagmi-v1.ts"
+    at failureErrorWithLog (/Users/ravonus/dev/keel-sdk/node_modules/.pnpm/esbuild@0.28.2/node_modules/esbuild/lib/main.js:1752:15)
+    at /Users/ravonus/dev/keel-sdk/node_modules/.pnpm/esbuild@0.28.2/node_modules/esbuild/lib/main.js:1211:25
+    at /Users/ravonus/dev/keel-sdk/node_modules/.pnpm/esbuild@0.28.2/node_modules/esbuild/lib/main.js:1163:52
+    at buildResponseToResult (/Users/ravonus/dev/keel-sdk/node_modules/.pnpm/esbuild@0.28.2/node_modules/esbuild/lib/main.js:1209:7)
+    at /Users/ravonus/dev/keel-sdk/node_modules/.pnpm/esbuild@0.28.2/node_modules/esbuild/lib/main.js:1236:16
+    at responseCallbacks.<computed> (/Users/ravonus/dev/keel-sdk/node_modules/.pnpm/esbuild@0.28.2/node_modules/esbuild/lib/main.js:886:9)
+    at handleIncomingPacket (/Users/ravonus/dev/keel-sdk/node_modules/.pnpm/esbuild@0.28.2/node_modules/esbuild/lib/main.js:941:12)
+    at Socket.readFromStdout (/Users/ravonus/dev/keel-sdk/node_modules/.pnpm/esbuild@0.28.2/node_modules/esbuild/lib/main.js:864:7)
+    at Socket.emit (node:events:508:20)
+    at addChunk (node:internal/streams/readable:564:12) {
+  errors: [Getter/Setter],
+  warnings: [Getter/Setter]
+}
+
+Node.js v25.8.2

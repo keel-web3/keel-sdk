@@ -1,0 +1,32 @@
+{
+  "base": "0dc7e6f342b228515b1eecf783c9fd3629802eef",
+  "candidate": "e946bde7140d4ce1eb04ecac735c7ed216d2bf46",
+  "productionLeaves": [
+    {
+      "path": "packages/sdk/src/asset-display.ts",
+      "bytes": 11141,
+      "sha256": "6b3cb6a14d8e51c7cf6617b2c33250d755d9e58231ced41582ef5ccd88f3d7cc"
+    },
+    {
+      "path": "packages/sdk/src/inline-viewer-graph.ts",
+      "bytes": 147474,
+      "sha256": "f0b4300bf5195835b7326791f4ad62a89c52558d529aa487cea2f668afa2f907"
+    },
+    {
+      "path": "packages/sdk/src/registered-native-gzip.ts",
+      "bytes": 18054,
+      "sha256": "373867774ea2af0bac80931cb2941261ae552e8b4ff2fba87e232f2140ecc5a1"
+    },
+    {
+      "path": "packages/sdk/src/registered-native-none.ts",
+      "bytes": 13436,
+      "sha256": "cc28ec9df37c7d0644a8da03a42b317c423ca827042c8b48dfc90302fde285f7"
+    },
+    {
+      "path": "packages/studio-core/src/media.ts",
+      "bytes": 5970,
+      "sha256": "442e1fb9fc5604453186fe743d706fa0b7674a818279740447808d8f2d46438d"
+    }
+  ],
+  "productionUnmodified": true
+}

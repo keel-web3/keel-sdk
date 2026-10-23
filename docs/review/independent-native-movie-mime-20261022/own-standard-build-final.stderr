@@ -1,0 +1,15 @@
+node:internal/fs/promises:636
+  return new FileHandle(await PromisePrototypeThen(
+                        ^
+
+Error: ENOENT: no such file or directory, open '/private/tmp/keel-independent-native-movie-mime-20261022-01/skills/keel-sdk-mcp/SKILL.md'
+    at async open (node:internal/fs/promises:636:25)
+    at async readFile (node:internal/fs/promises:1235:14)
+    at async file:///private/tmp/keel-independent-native-movie-mime-20261022-01/packages/mcp/scripts/package-skills.mjs:5:15 {
+  errno: -2,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: '/private/tmp/keel-independent-native-movie-mime-20261022-01/skills/keel-sdk-mcp/SKILL.md'
+}
+
+Node.js v22.22.1

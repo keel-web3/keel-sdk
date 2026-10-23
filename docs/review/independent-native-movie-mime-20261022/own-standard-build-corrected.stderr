@@ -1,0 +1,18 @@
+node:internal/child_process:1120
+    result.error = new ErrnoException(result.error, 'spawnSync ' + options.file);
+                   ^
+
+Error: spawnSync tsc ENOENT
+    at Object.spawnSync (node:internal/child_process:1120:20)
+    at spawnSync (node:child_process:902:24)
+    at run (file:///private/tmp/keel-independent-native-movie-mime-20261022-01/scripts/run.mjs:15:18)
+    at tsc (file:///private/tmp/keel-independent-native-movie-mime-20261022-01/scripts/run.mjs:28:3)
+    at file:///private/tmp/keel-independent-native-movie-mime-20261022-01/scripts/build.mjs:11:1 {
+  errno: -2,
+  code: 'ENOENT',
+  syscall: 'spawnSync tsc',
+  path: 'tsc',
+  spawnargs: [ '-p', 'packages/protocol/tsconfig.json' ]
+}
+
+Node.js v22.22.1
