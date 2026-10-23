@@ -252,7 +252,7 @@ export const KEEL_MODULES: readonly KeelModule[] = [
     "title": "Storage",
     "group": "core",
     "visibility": "private",
-    "summary": "The Hold: immutable content-addressed slug storage, on EVM and Tezos, and the index that activates revisions.",
+    "summary": "Immutable content-addressed chunk storage and the artifact registry that activates revisions.",
     "version": "0.3.0",
     "repo": "keel-web3/keel-hold",
     "deps": [
@@ -288,7 +288,7 @@ export const KEEL_MODULES: readonly KeelModule[] = [
     "title": "Object model",
     "group": "core",
     "visibility": "private",
-    "summary": "The Keel object graph: objects, harnesses, links, seeds, and the manager that fronts them.",
+    "summary": "The Keel object graph: objects, viewers, links, seeds, and the manager that fronts them.",
     "version": "0.3.0",
     "repo": "keel-web3/keel-artifacts",
     "deps": [
@@ -391,7 +391,7 @@ export const KEEL_MODULES: readonly KeelModule[] = [
     "title": "On-chain HTML builder",
     "group": "render",
     "visibility": "private",
-    "summary": "Assembles harness HTML from slugs held on chain, entirely on chain.",
+    "summary": "Assembles viewer HTML from chunk-stored resources entirely on chain.",
     "version": "0.3.0",
     "repo": "keel-web3/keel-harness",
     "deps": [
