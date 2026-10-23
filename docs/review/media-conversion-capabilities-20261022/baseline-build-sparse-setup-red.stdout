@@ -1,0 +1,21 @@
+/private/tmp/keel-sdk-integration-20261022-01/node_modules/.pnpm/esbuild@0.28.2/node_modules/esbuild/lib/main.js:1752
+  let error = new Error(text);
+              ^
+
+Error: Build failed with 1 error:
+error: Could not resolve "/private/tmp/keel-media-conversion-capabilities-20261022-01/keel-sdk/examples/plugins/keel-market/wallet-runtime-wagmi-v1.ts"
+    at failureErrorWithLog (/private/tmp/keel-sdk-integration-20261022-01/node_modules/.pnpm/esbuild@0.28.2/node_modules/esbuild/lib/main.js:1752:15)
+    at /private/tmp/keel-sdk-integration-20261022-01/node_modules/.pnpm/esbuild@0.28.2/node_modules/esbuild/lib/main.js:1211:25
+    at /private/tmp/keel-sdk-integration-20261022-01/node_modules/.pnpm/esbuild@0.28.2/node_modules/esbuild/lib/main.js:1163:52
+    at buildResponseToResult (/private/tmp/keel-sdk-integration-20261022-01/node_modules/.pnpm/esbuild@0.28.2/node_modules/esbuild/lib/main.js:1209:7)
+    at /private/tmp/keel-sdk-integration-20261022-01/node_modules/.pnpm/esbuild@0.28.2/node_modules/esbuild/lib/main.js:1236:16
+    at responseCallbacks.<computed> (/private/tmp/keel-sdk-integration-20261022-01/node_modules/.pnpm/esbuild@0.28.2/node_modules/esbuild/lib/main.js:886:9)
+    at handleIncomingPacket (/private/tmp/keel-sdk-integration-20261022-01/node_modules/.pnpm/esbuild@0.28.2/node_modules/esbuild/lib/main.js:941:12)
+    at Socket.readFromStdout (/private/tmp/keel-sdk-integration-20261022-01/node_modules/.pnpm/esbuild@0.28.2/node_modules/esbuild/lib/main.js:864:7)
+    at Socket.emit (node:events:519:28)
+    at addChunk (node:internal/streams/readable:561:12) {
+  errors: [Getter/Setter],
+  warnings: [Getter/Setter]
+}
+
+Node.js v22.22.1

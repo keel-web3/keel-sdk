@@ -1,0 +1,9 @@
+{
+  "originalSHA256": "18f79dc8df2bfa9381ed50d80869171b587c91d7ae2b013cb0fe1feca7662ffe",
+  "admittedSuccessorSHA256": "71625818283b913f1bdcb7fa77d9a774027684aaca50a67f438572ecc82ff2a1",
+  "patchSHA256": "27bf586a67b4f84241faa07716bfdb7f5fac79558b0982dc2b4d768874afbae2",
+  "singleInsertionBytes": 1874,
+  "inverseRemovalExactlyEqualsOriginal": true,
+  "allGeneratorsReferencesAndOtherAssertionsUnchanged": true,
+  "independentAdmissionSHA256": "00db88442b0568e4553c629f333d090db0d95cec7fe042e186f5409a2b0f2c85"
+}

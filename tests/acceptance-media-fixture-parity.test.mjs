@@ -120,6 +120,31 @@ else {
         test(`encoded ${format}: SDK/MCP decoded parity, measured output integrity and source preservation`, async () => {
             const f = fixtures.find(f => f.name === 'fixture.mov');
             const recipe = { ...original, mode: 'lossless', format, noSound: true };
+            if (['webp', 'avif', 'webm'].includes(format)) {
+                const snapshot = f.bytes.slice(), savedRecipe = structuredClone(recipe);
+                const reason = format === 'webm' ? /WebM conversion is unavailable/ : /unspecified color semantics/;
+                await assert.rejects(prepareMediaCandidate({ bytes: f.bytes, mediaType: f.mime, recipe }), error => {
+                    assert.ok(error instanceof Error);
+                    if (format === 'webm') assert.ok(error instanceof TypeError);
+                    assert.match(error.message, reason);
+                    assert.match(error.message, format === 'webm' ? /Keep original/ : /Native media is retained/);
+                    return true;
+                });
+                const refused = await call('keel-media-candidate', { inputPath: f.name, mediaType: f.mime, recipe });
+                assert.equal(refused.error, undefined);
+                assert.equal(refused.result.isError, true);
+                assert.match(refused.result.content[0].text, reason);
+                const keptDirect = await prepareMediaCandidate({ bytes: f.bytes, mediaType: f.mime, recipe: original });
+                const keptRemote = await accepted('keel-media-candidate', { inputPath: f.name, mediaType: f.mime, recipe: original });
+                assert.deepEqual(keptDirect.bytes, snapshot);
+                assert.deepEqual(Buffer.from(keptRemote.bytesBase64, 'base64'), Buffer.from(snapshot));
+                assert.equal(keptDirect.verification.completeDecode, false);
+                assert.equal(keptRemote.verification.completeDecode, false);
+                assert.deepEqual(f.bytes, snapshot);
+                assert.deepEqual(recipe, savedRecipe);
+                assert.deepEqual(await fs.readFile(path.join(temp, f.name)), Buffer.from(snapshot));
+                return;
+            }
             const direct = await prepareMediaCandidate({ bytes: f.bytes, mediaType: f.mime, recipe });
             const remote = await accepted('keel-media-candidate', { inputPath: f.name, mediaType: f.mime, recipe });
             const remoteBytes = new Uint8Array(Buffer.from(remote.bytesBase64, 'base64'));

@@ -289,7 +289,9 @@ async function movieCandidate(bytes: Uint8Array, recipe: KeelMediaEditRecipe, si
 }
 /** Optional candidate only. Never replaces the source, chooses a storage mode or publishes. */
 export async function prepareMediaCandidate(input: { readonly bytes:Uint8Array; readonly mediaType?:string; readonly recipe:unknown; readonly signal?:AbortSignal }): Promise<KeelMediaCandidate> {
-  input.signal?.throwIfAborted(); bounded(input.bytes); const sourceBytes = new Uint8Array(input.bytes), recipe = parseKeelMediaEditRecipe(input.recipe), sourceIntegrity = await createIntegrity(sourceBytes);
+  input.signal?.throwIfAborted(); bounded(input.bytes); const sourceBytes = new Uint8Array(input.bytes), recipe = parseKeelMediaEditRecipe(input.recipe);
+  if(recipe.mode!=="original"&&recipe.format==="webm")throw new TypeError("WebM conversion is unavailable: the current verifier cannot qualify WebM container metadata and presentation semantics. Keep original bytes or choose another advertised format; every conversion still requires source fidelity checks.");
+  const sourceIntegrity = await createIntegrity(sourceBytes);
   if (recipe.mode === "original") return { bytes:sourceBytes, mediaType:input.mediaType ?? "application/octet-stream", extension:"",recipe,sourceIntegrity,outputIntegrity:sourceIntegrity,sourceInfo:null,candidateInfo:null,measurements:{beforeBytes:sourceBytes.length,afterBytes:sourceBytes.length,savedBytes:0},verification:{sourcePreserved:true,completeDecode:false,framesAndTimingPreserved:true,losslessPixelsVerified:false,browserDecode:"requires-runtime-check"},warnings:["Original bytes are preserved exactly. Storage eligibility does not imply a browser can decode this media."] };
   let result: {bytes:Uint8Array;source:Decoded;candidate:Decoded};
   let imageDecodable = false; let imageAnimated = false;
@@ -305,7 +307,7 @@ export async function getMediaPreparationCapabilities() {
   const movie = await resolveBundledFfmpeg();
   let image = false;
   try { await sharpFactory(); image = true; } catch { /* Optional pinned adapter absent. */ }
-  return {schema:"keel-media-capabilities@1",original:{available:true,bytePreserving:true,requiresDecoder:false},image:{available:image,formats:["webp","avif"],animation:"WebP only, with full frame/timing verification",geometry:"still-image crop, resize, rotation and ordered duplicate-original layers; no implicit clipping"},movie:{available:movie.available,...(movie.reason?{reason:movie.reason}:{}),formats:["webp","avif","webm","mp4","mov"],input:"actual complete decoder probe of self-contained container bytes",audio:"preserved by stream copy unless No sound is explicitly enabled"},limits:{maxInputBytes:MAX_BYTES,maxDecodedPixels:MAX_PIXELS,maxMovieDecodedPixels:MAX_MOVIE_PIXELS,maxFrames:MAX_FRAMES},browserDecode:"requires-runtime-check",publication:"separate complete-tokenURI and selected-shell verification"};
+  return {schema:"keel-media-capabilities@1",original:{available:true,bytePreserving:true,requiresDecoder:false},image:{available:image,formats:["webp","avif"],animation:"WebP only, with full frame/timing verification",geometry:"still-image crop, resize, rotation and ordered duplicate-original layers; no implicit clipping"},movie:{available:movie.available,...(movie.reason?{reason:movie.reason}:{}),formats:["webp","avif","mp4","mov"],input:"conditional complete decoder, container, color, timing and audio admission for self-contained source bytes; unsupported conversion retains native originals",audio:"preserved by stream copy unless No sound is explicitly enabled"},limits:{maxInputBytes:MAX_BYTES,maxDecodedPixels:MAX_PIXELS,maxMovieDecodedPixels:MAX_MOVIE_PIXELS,maxFrames:MAX_FRAMES},browserDecode:"requires-runtime-check",publication:"separate complete-tokenURI and selected-shell verification"};
 }
 function frameAt(info:KeelMediaInfo,timeMs:number) {
   let index=0;

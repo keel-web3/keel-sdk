@@ -1,0 +1,20 @@
+Built immutable Wagmi wallet runtime: 139212 bytes, sha256 0xd74a0ffa495787ba1b510a7e39cbba5f4ff1530c1149acd17f252f348be0bc0c
+wrapper viewer: css 8775 B · markup 1200 B · app 22191 B · chrome 32166 B
+Packaged reviewed native proof transport into /private/tmp/keel-media-conversion-capabilities-20261022-01/keel-sdk/packages/sdk/dist/proof-runtime/
+node:internal/fs/promises:1020
+  const result = await PromisePrototypeThen(
+                 ^
+
+Error: ENOENT: no such file or directory, lstat '/private/tmp/keel-media-conversion-capabilities-20261022-01/keel-sdk/docs/ARCHITECTURE.md'
+    at async lstat (node:internal/fs/promises:1020:18)
+    at async Promise.all (index 0)
+    at async checkPaths (node:internal/fs/cp/cp:76:39)
+    at async cpFn (node:internal/fs/cp/cp:65:17)
+    at async file:///private/tmp/keel-media-conversion-capabilities-20261022-01/keel-sdk/packages/mcp/scripts/package-skills.mjs:36:9 {
+  errno: -2,
+  code: 'ENOENT',
+  syscall: 'lstat',
+  path: '/private/tmp/keel-media-conversion-capabilities-20261022-01/keel-sdk/docs/ARCHITECTURE.md'
+}
+
+Node.js v22.22.1

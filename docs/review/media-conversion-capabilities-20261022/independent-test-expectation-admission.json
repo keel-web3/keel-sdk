@@ -1,0 +1,26 @@
+{
+  "verdict": "ADMIT TEST_EXPECTATION_ONLY EXACT PATCH",
+  "patchSHA256": "27bf586a67b4f84241faa07716bfdb7f5fac79558b0982dc2b4d768874afbae2",
+  "originalSHA256": "18f79dc8df2bfa9381ed50d80869171b587c91d7ae2b013cb0fe1feca7662ffe",
+  "proposedSHA256": "71625818283b913f1bdcb7fa77d9a774027684aaca50a67f438572ecc82ff2a1",
+  "inverseInsertionByteExact": true,
+  "insertedBytes": 1874,
+  "generatorsReferencesAndOtherAssertionsUnchanged": true,
+  "unchangedOriginalBaseline": "SDK8bf33tests30P3F, frozen158a997; actual1927BuntaggedMOVea3b962d and generated1489BWebM6013f6fd retained",
+  "independentProposedBaseline": {
+    "sdk": "0dc7e6f342b228515b1eecf783c9fd3629802eef",
+    "tests": 33,
+    "pass": 32,
+    "fail": 1,
+    "remainingFailure": "WebM actionable-unavailable guard not implemented in old source",
+    "raw": "../capability-expectation-proposal-baseline.stdout"
+  },
+  "basis": [
+    "Unspecified movie color has no lossless image-color authority; correct refusal must retain original bytes",
+    "Existing WebM ISO-only verifier cannot qualify generated EBML; capability correction must accompany refusal expectation",
+    "New assertions explicitly check SDK/MCP refusal and exact source retention; old unsupportedpositive expectations were wrong",
+    "Keep qualified positive formats/tests and exact unchanged reviewer db78 capability regression; no metadata/color/timeline loosening"
+  ],
+  "productionSourceApproval": false,
+  "liveApproval": false
+}
