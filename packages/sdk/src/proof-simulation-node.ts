@@ -15,6 +15,8 @@ export interface KeelProofSimulationOptions {
   readonly signal?: AbortSignal;
   readonly onAttempt?: (diagnostic: Readonly<Record<string, string | number>>) => void;
   readonly onEvidence?: (evidence: Readonly<Record<string, unknown>>) => void;
+  /** Bounded fixed-field native stage/read counters; no calldata or endpoints. */
+  readonly onProgress?: (event: Readonly<Record<string, string | number>>) => void;
 }
 
 /** Server-only, local proof execution. Never falls back to remote execution.

@@ -31,7 +31,7 @@ export function createIsolatedRunnerSpawner({socketPath,binarySha256}) {
         if(!ready){
           if(frame.type==='error'&&frame.category==='runner-busy'){child.stdout.write(`${JSON.stringify(frame)}\n`);finish(1);return;}
           if(frame.type!=='runner'||frame.schema!=='keel-proof-runner@1'||frame.binarySha256!==binarySha256||frame.maximumConcurrency!==1||!Number.isSafeInteger(frame.maximumWallTimeMs)||frame.maximumWallTimeMs<=0||frame.maximumWallTimeMs>180000){finish(1);return;}
-          ready=true;child.stdin.pipe(socket,{end:false});continue;
+          ready=true;child.emit('runner-ready');child.stdin.pipe(socket,{end:false});continue;
         }
         if(frame.type==='runner-exit'){
           if(![0,1].includes(frame.code)){finish(1);return;}exitCode=frame.code;continue;

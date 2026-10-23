@@ -11,7 +11,7 @@ const fail = message => new KeelPublicationSimulationError('rpc-unavailable', me
  * The caller must supply its explicitly approved state reader and a bounded,
  * network-isolated native process. It receives neither an RPC URL nor credentials.
  */
-export async function createProofBackedSimulationTransport({ binaryPath, binarySha256, spawnExecutor, stateReader, block, signal, onEvidence,
+export async function createProofBackedSimulationTransport({ binaryPath, binarySha256, spawnExecutor, stateReader, block, signal, onEvidence, onProgress,
   now = Date.now, limits = { gasBudget: 1_000_000_000, requests: 5000, witnessBytes: 32 * 1024 * 1024, responseBytes: 128 * 1024 * 1024, wallTimeMs: 90000 } }) {
   block=Object.freeze({...block});limits=Object.freeze({...limits});
   if (!HASH.test(block.hash) || typeof block.number !== 'bigint' || block.number < 0n || typeof spawnExecutor !== 'function' || !/^[\da-f]{64}$/.test(binarySha256)) throw new TypeError('Exact executor identity, pinned block and isolated runner required.');
@@ -34,20 +34,31 @@ export async function createProofBackedSimulationTransport({ binaryPath, binaryS
   };
   async function simulate(payload) {
     if (busy) throw fail('A native simulation is already in progress.');busy=true;
+    // Fixed-field, bounded observations. These count authenticated state reads,
+    // never completed EVM calls; a whole-program result still needs final exit.
+    const started=performance.now();let stage='state-chain',pendingMethod,pendingStarted,requestDigest,readCount=0,completedReads=0,readMs=0,observations=0;
+    const elapsed=()=>Math.max(0,Math.round(performance.now()-started));
+    const snapshot=()=>({nativeStage:stage,nativeElapsedMs:elapsed(),nativeStateReads:readCount,nativeCompletedStateReads:completedReads,nativeStateReadMs:Math.round(readMs+(pendingStarted===undefined?0:performance.now()-pendingStarted)),...(pendingMethod?{nativePendingMethod:pendingMethod}:{}),...(requestDigest?{nativeRequestSha256:requestDigest}:{})});
+    const observe=(type,final=false)=>{if(observations>=64&&!final)return;observations++;try{onProgress?.(Object.freeze({kind:'native-progress',type,...snapshot()}));}catch{/* Observation cannot grant proof or alter execution. */}};
     const executionAbort = new AbortController(), executionSignal = AbortSignal.any([combined,executionAbort.signal]);
-    const deadline = setTimeout(()=>executionAbort.abort(fail('Local simulation deadline exceeded.')),limits.wallTimeMs);
+    const deadline = setTimeout(()=>{observe('deadline',true);executionAbort.abort(new KeelPublicationSimulationError('rpc-unavailable','Local simulation deadline exceeded.',{transportFailure:'timeout',...snapshot()}));},limits.wallTimeMs);
     const read = (method,params) => ask(method,params,executionSignal);
     try {
+      observe('state-chain');
       if (BigInt(await read('eth_chainId', [])) !== 11155111n) throw fail('State source returned another chain.');
+      stage='state-header';observe('state-header');
       const header = structuredClone(await read('eth_getBlockByNumber',[blockTag,false]));
       const fresh=()=>{const age=BigInt(Math.floor(now()/1000))-BigInt(header.timestamp);if(age>180n||age< -30n)throw fail('Pinned simulation snapshot is stale or in the future.');};
       if (header?.hash?.toLowerCase() !== block.hash.toLowerCase() || BigInt(header.number) !== block.number) throw fail('Pinned simulation block changed.');
       fresh();
       const request = {schema:'keel-proof-executor@1',chainId:11155111,blockHash:block.hash,header,payload,limits};
       const encoded = JSON.stringify(request)+'\n', requestSha256=createHash('sha256').update(encoded.slice(0,-1)).digest('hex');if (Buffer.byteLength(encoded)>34*1024*1024) throw fail('Native simulation input exceeds its byte budget.');
+      requestDigest=requestSha256;
       const ancestorHashes = new Set([header.parentHash?.toLowerCase()]);
       const result = await new Promise((resolve,reject) => {
+        stage='runner-start';observe('runner-start');
         const child=spawnExecutor();
+        child.once('runner-ready',()=>{if(executionSignal.aborted)return;stage='native-execution';observe('runner-ready');});
         let stopped=false,finished=false,buffer=Buffer.alloc(0),outputBytes=0,stderrBytes=0,count=0,responseBytes=0,pendingResult,tail=Promise.resolve();
         const cancel=()=>finish(executionSignal.reason instanceof KeelPublicationSimulationError ? executionSignal.reason : fail('Local simulation cancelled.'));
         const finish=(error,value)=>{if(stopped)return;stopped=true;executionSignal.removeEventListener('abort',cancel);child.kill('SIGKILL');error?reject(error):resolve(value);};
@@ -62,7 +73,7 @@ export async function createProofBackedSimulationTransport({ binaryPath, binaryS
             const e=message.evidence;
             if(!Array.isArray(message.result)||message.result.length!==payload.blockStateCalls.length||e?.schema!=='keel-proof-executor-evidence@1'||e.gethCommit!==GETH_COMMIT||e.requestSha256!==requestSha256||e.chainId!==11155111||e.gasBudget!==limits.gasBudget||e.blockHash?.toLowerCase()!==block.hash.toLowerCase()||e.baseStateRoot!==header.stateRoot||e.signing!=='not-performed'||e.submission!=='not-performed'||e.readRequests!==count)throw fail('Native execution provenance mismatch.');
             for(const b of message.result)if(!HASH.test(b.stateRoot)||/^0x0+$/.test(b.stateRoot))throw fail('Native execution omitted an authenticated state root.');
-            finished=true;pendingResult=message;return;
+            finished=true;pendingResult=message;stage='runner-exit';observe('native-result');return;
           }
           if(message.type!=='read'||message.id!==++count||count>limits.requests||!Array.isArray(message.params))throw fail('Unexpected native state request.');
           const p=message.params;
@@ -72,7 +83,12 @@ export async function createProofBackedSimulationTransport({ binaryPath, binaryS
           } else if(message.method==='eth_getBlockByHash') {
             if(p.length!==2||!HASH.test(p[0])||p[1]!==false||!ancestorHashes.has(p[0].toLowerCase()))throw fail('Native ancestor read escaped its pinned chain.');
           } else throw fail('Native executor requested a disallowed upstream method.');
+          stage='state-read';pendingMethod=message.method;readCount++;pendingStarted=performance.now();
+          const sampled=readCount<=3||(readCount&(readCount-1))===0;
+          if(sampled)observe('state-read-start');
           const value=await read(message.method,p);if(stopped)return;
+          readMs+=performance.now()-pendingStarted;pendingStarted=undefined;completedReads++;pendingMethod=undefined;stage='native-execution';
+          if(sampled)observe('state-read-complete');
           if(message.method==='eth_getBlockByHash') {
             if(value?.hash?.toLowerCase()!==p[0].toLowerCase()||!HASH.test(value.parentHash))throw fail('Pinned ancestor response mismatch.');
             ancestorHashes.add(value.parentHash.toLowerCase());
@@ -90,11 +106,13 @@ export async function createProofBackedSimulationTransport({ binaryPath, binaryS
         child.stdin.on('error',()=>finish(fail('Native simulation input closed.')));child.stdin.write(encoded);
       });
       fresh();
+      stage='canonical-recheck';observe('canonical-recheck');
       const canonical=await read('eth_getBlockByNumber',[blockTag,false]);
       if(canonical?.hash?.toLowerCase()!==block.hash.toLowerCase())throw new KeelPublicationSimulationError('chain-reorganized','Pinned block changed during local simulation.');
       try{onEvidence?.({...result.evidence,binarySha256});}catch{/* Observers cannot change proof. */}
+      stage='complete';observe('complete',true);
       return result.result;
-    } catch(error) { throw error instanceof KeelPublicationSimulationError ? error : keelSimulationTransportFailure(error); }
+    } catch(error) { observe('failed',true);throw error instanceof KeelPublicationSimulationError ? error : keelSimulationTransportFailure(error); }
     finally {clearTimeout(deadline);executionAbort.abort();busy=false;}
   }
   return {async request(input) {

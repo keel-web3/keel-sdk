@@ -11,11 +11,11 @@ async function fixture(t,frames){
  const server=createServer(socket=>{socket.on('error',()=>{});socket.on('data',c=>input+=c);socket.end(frames.map(frame=>JSON.stringify(frame)).join('\n')+'\n');});
  await new Promise(resolve=>server.listen(socketPath,resolve));
  t.after(async()=>{await new Promise(resolve=>server.close(resolve));await rm(dir,{recursive:true,force:true});});
- const child=createIsolatedRunnerSpawner({socketPath,binarySha256:digest})();let output='';child.stdout.on('data',c=>output+=c);child.stderr.resume();child.stdin.write('PRIVATE TEST INPUT\n');
- const code=await new Promise(resolve=>child.once('close',resolve));return {code,input,output};
+ const child=createIsolatedRunnerSpawner({socketPath,binarySha256:digest})();let output='',ready=0;child.on('runner-ready',()=>ready++);child.stdout.on('data',c=>output+=c);child.stderr.resume();child.stdin.write('PRIVATE TEST INPUT\n');
+ const code=await new Promise(resolve=>child.once('close',resolve));return {code,input,output,ready};
 }
 test('valid broker identity and final zero exit permit completion',async t=>{
- const result=await fixture(t,[hello,{type:'result',synthetic:true},{type:'runner-exit',code:0}]);assert.equal(result.code,0);assert.match(result.output,/synthetic/);
+ const result=await fixture(t,[hello,{type:'result',synthetic:true},{type:'runner-exit',code:0}]);assert.equal(result.code,0);assert.match(result.output,/synthetic/);assert.equal(result.ready,1);
 });
 for(const [name,frames] of [
  ['missing exit',[hello,{type:'result'}]],['nonzero exit',[hello,{type:'result'},{type:'runner-exit',code:1}]],
@@ -26,5 +26,5 @@ for(const [name,frames] of [
  ['busy',[{type:'error',category:'runner-busy'}]],
 ])test(`${name} cannot be a successful native completion`,async t=>{
  const result=await fixture(t,frames);assert.equal(result.code,1);
- if(frames[0]?.type!=='runner'||frames[0].binarySha256!==digest||frames[0].maximumConcurrency!==1||frames[0].maximumWallTimeMs>180000)assert.equal(result.input,'');
+ if(frames[0]?.type!=='runner'||frames[0].binarySha256!==digest||frames[0].maximumConcurrency!==1||frames[0].maximumWallTimeMs>180000){assert.equal(result.input,'');assert.equal(result.ready,0);}
 });
