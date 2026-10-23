@@ -979,10 +979,12 @@ test('no compatible validator reports an honest infrastructure failure and leave
   const transport = createKeelPublicSimulationPool({ ...f.options, chainId: 11155111, providerCapabilities: [capability(0, { requestGasCap: 50000000n })] });
   const input = variableProgram(30, 4450000n, 32768), before = structuredClone(input);
   try {
-    await assert.rejects(transport.request(input), error => error.kind === 'provider-limit' && error.diagnostic.phase === 'project-request'
+    await assert.rejects(transport.request(input), error => error.kind === 'provider-limit' && error.diagnostic.capacitySource === 'measured-profile'
+      && error.diagnostic.gasCapacityScope === 'request' && BigInt(error.diagnostic.intrinsicProgramGas) > 50000000n
       && error.diagnostic.callCount === 30 && error.diagnostic.largestTransactionGas === '4450000');
-    assert.deepEqual(input, before); assert.deepEqual(f.privateRequests()[0].body.params, before.params);
-    assert.ok(Buffer.byteLength(JSON.stringify(input)) > 1900000); assert.equal(f.privateRequests().length, 1);
+    assert.deepEqual(input, before);
+    assert.ok(Buffer.byteLength(JSON.stringify(input)) > 1900000); assert.equal(f.privateRequests().length, 0);
+    assert.equal(f.requests.length, 0, 'A verified intrinsic lower bound avoids every impossible provider sequence');
   } finally { await transport.close(); await f.transport.close(); }
 });
 
@@ -1331,4 +1333,153 @@ test('body-capacity fallback shares the complete-request deadline and discards a
     assert.deepEqual(f.privateRequests().map(r=>r.index),[0,1]);
     for(const r of f.privateRequests())assert.deepEqual(r.body.params,before.params);
   }finally{await pool.close();await f.transport.close();}
+// Synthetic protocol boundaries only: the real native EVM/witness integration
+// is qualified separately by verify-local-staged-publication.mjs. No reply here
+// is a captured project result or evidence of actual native execution.
+function authenticatedLocalFixture(f, { root = hash(808), finishIncomplete = false, pauseStage, nativeFault = {} } = {}) {
+  const clients = [], programs = [], sessions = [], witnessPrograms = [], stageEntered = {};
+  let entered;
+  stageEntered.promise = new Promise(resolve => { entered = resolve; });
+  const ordinary = fixture([nativeFault]);
+  const previousRead = f.options.readTransport;
+  const options = { ...f.options, readTransport: { request: async input => input.method === 'eth_getBlockByNumber'
+    ? { ...snapshot, stateRoot: hash(808) } : previousRead.request(input) } };
+  const capability = { stateRoot: root,
+    witnessResolution: { async prepare(input) { witnessPrograms.push(structuredClone(input)); }, async resolve() { assert.fail('No missing synthetic witness expected'); } },
+    onSession: value => sessions.push(value),
+    async createClient() {
+      const state = { closed: 0, next: 0, stages: [], program: undefined, results: undefined }; clients.push(state);
+      return { async close() { state.closed++; }, async request(body, { signal }) {
+        const binding = { sessionId: body.sessionId, canonicalHash: body.canonicalHash, programDigest: body.programDigest };
+        if (body.type === 'begin') {
+          state.program = JSON.parse(body.programJSON); programs.push(structuredClone(state.program));
+          const response = await ordinary.options.fetchImpl(urls[0], { body: JSON.stringify({ jsonrpc: '2.0', id: 1,
+            method: 'eth_simulateV1', params: [state.program, snapshot.number] }) });
+          state.results = (await response.json()).result;
+          return { id: body.id, result: { ...binding, status: 'open', nextIndex: 0, stageCount: state.program.blockStateCalls.length, checkpoint: snapshot.hash, acceptance: false } };
+        }
+        if (body.type === 'stage') {
+          assert.equal(body.index, state.next, 'Never run a suffix without its original complete prefix');
+          assert.equal(body.expectedCheckpoint, state.next ? hash(900 + state.next - 1) : snapshot.hash);
+          if (body.index === pauseStage) {
+            entered();
+            await new Promise((_resolve, reject) => signal.addEventListener('abort', () => reject(new Error('synthetic cancelled native stage')), { once: true }));
+          }
+          const result = { ...binding, index: state.next, previousCheckpoint: body.expectedCheckpoint,
+            checkpoint: hash(900 + state.next), result: state.results[state.next] };
+          state.next++; state.stages.push(result);
+          return { id: body.id, result };
+        }
+        assert.equal(body.type, 'finish');
+        return { id: body.id, result: { ...binding, status: 'completed', acceptance: false,
+          stageCount: state.next, checkpoint: state.stages.at(-1).checkpoint, results: state.results,
+          fullWitnessComplete: !finishIncomplete, headerHistoryComplete: true, stickyStateError: false } };
+      } };
+    },
+  };
+  return { options: { ...options, authenticatedLocalSession: capability }, clients, programs, sessions, witnessPrograms, stageEntered };
+}
+
+test('authenticated local capacity: exact45-call discovery, strict replay and complete metadata use fresh same-pin full native sessions', async () => {
+  const f = fixture([{ cap: true }]), local = authenticatedLocalFixture(f);
+  const transport = createKeelPublicSimulationPool({ ...local.options, chainId: 11155111 });
+  const input = { ...fullPlan(), preparationCalls: Array.from({ length: 45 }, (_, i) => call(i)), assertions: [] }, before = structuredClone(input);
+  try {
+    const proof = await simulateKeelPublicationBeforeFunding(input, transport);
+    assert.equal(proof.validatedTransactionCalls, 45);
+    assert.equal(proof.simulatedCalls, 47);
+    assert.equal(proof.completeTokenUriBytes, Buffer.byteLength(tokenURI));
+    assert.deepEqual(local.programs.map(p => [p.validation, p.blockStateCalls.length]), [[false,45],[true,45],[false,47]]);
+    assert.equal(new Set(local.sessions.map(s => s.programDigest)).size, 3);
+    for (const program of local.programs) {
+      for (let i = 0; i < 45; i++) for (const field of ['from','to','data','value'])
+        assert.equal(program.blockStateCalls[i].calls[0][field], before.preparationCalls[i][field]);
+      assert.ok(program.blockStateCalls.every(block => Object.keys(block).join(',') === 'calls'));
+    }
+    assert.ok(local.clients.every(c => c.closed === 1 && c.next === c.program.blockStateCalls.length));
+    assert.ok(local.sessions.every(s => s.fullWitnessComplete && s.headerHistoryComplete && !s.stickyStateError));
+    assert.equal(local.witnessPrograms.length, 3);
+    assert.deepEqual(input, before);
+    assert.equal(f.privateRequests().length, 0, 'Approved capacity refusal precedes private provider disclosure');
+  } finally { await transport.close(); await f.transport.close(); }
+});
+
+test('authenticated local capacity: absent or incomplete capability never bypasses provider capacity or missing authenticated witness', async () => {
+  const f = fixture([{cap:true}]);
+  await assert.rejects(f.transport.request(program()), e => e.kind === 'provider-limit');
+  assert.throws(() => createKeelPublicSimulationPool({ ...f.options, chainId:11155111,
+    authenticatedLocalSession: { stateRoot:hash(808), createClient:async()=>assert.fail('No client'), witnessResolution:{} } }), /complete witness resolver/);
+  const local = authenticatedLocalFixture(f, { finishIncomplete:true });
+  const transport = createKeelPublicSimulationPool({ ...local.options, chainId:11155111 });
+  try { await assert.rejects(transport.request(program()),e=>e.kind==='unsupported-simulation');
+    assert.equal(local.sessions.length,0); assert.equal(local.clients.length,1); assert.equal(local.clients[0].closed,1);
+  } finally { await transport.close(); await f.transport.close(); }
+});
+
+test('authenticated local capacity: unauthorized recipients and ambiguous limits do not activate native capability', async () => {
+  for (const [fault, approved] of [[{cap:true},[]],[{error:-38026},[urls[0]]]]) {
+    const f=fixture([fault],approved),local=authenticatedLocalFixture(f),transport=createKeelPublicSimulationPool({...local.options,chainId:11155111});
+    try { await assert.rejects(transport.request(program())); assert.equal(local.clients.length,0); }
+    finally { await transport.close(); await f.transport.close(); }
+  }
+});
+
+test('authenticated local capacity: genuine primary execution failure and metadata mismatch remain terminal with no native replay',async()=>{
+  for(const [fault,kind] of [[{revert:true},'execution-reverted'],[{metadata:tokenURI+' changed'},'metadata-mismatch']]) {
+    const f=fixture([fault]),local=authenticatedLocalFixture(f),transport=createKeelPublicSimulationPool({...local.options,chainId:11155111});
+    try {await assert.rejects(simulateKeelPublicationBeforeFunding(fullPlan(),transport),e=>e.kind===kind);assert.equal(local.clients.length,0);}
+    finally {await transport.close();await f.transport.close();}
+  }
+});
+
+test('authenticated local capacity: canonical state-root mismatch fails before creating a native process',async()=>{
+  const f=fixture([{cap:true}]),local=authenticatedLocalFixture(f,{root:hash(809)}),transport=createKeelPublicSimulationPool({...local.options,chainId:11155111});
+  try {await assert.rejects(transport.request(program()),e=>e.kind==='chain-reorganized');assert.equal(local.clients.length,0);}
+  finally {await transport.close();await f.transport.close();}
+});
+
+test('authenticated local capacity: cancellation while primary request waits never activates local replay',async()=>{
+  let entered;const started=new Promise(resolve=>{entered=resolve;});
+  const f=fixture([{wait:true,started:entered}]),local=authenticatedLocalFixture(f),transport=createKeelPublicSimulationPool({...local.options,chainId:11155111});
+  const pending=transport.request(program());await started;await transport.close();
+  await assert.rejects(pending,e=>e.kind==='rpc-unavailable');assert.equal(local.clients.length,0);await f.transport.close();
+});
+
+test('authenticated local capacity: cancellation closes a pending native stage and publishes no completed session',async()=>{
+  const f=fixture([{cap:true}]),local=authenticatedLocalFixture(f,{pauseStage:1}),transport=createKeelPublicSimulationPool({...local.options,chainId:11155111});
+  const pending=transport.request(program());await local.stageEntered.promise;await transport.close();
+  await assert.rejects(pending);assert.equal(local.clients.length,1);assert.equal(local.clients[0].closed,1);assert.equal(local.sessions.length,0);await f.transport.close();
+});
+
+test('authenticated local capacity: one atomic wallet outer call remains one indivisible stage per complete check',async()=>{
+  const f=fixture([{cap:true}]),local=authenticatedLocalFixture(f),transport=createKeelPublicSimulationPool({...local.options,chainId:11155111});
+  const input=program();input.params[0].blockStateCalls.splice(1);
+  try {await transport.request(input);assert.equal(local.programs.length,1);assert.deepEqual(local.programs[0],input.params[0]);assert.equal(local.clients[0].next,1);}
+  finally {await transport.close();await f.transport.close();}
+});
+
+test('authenticated local capacity: native revert and wrong complete metadata fail existing validators without returning to a provider',async()=>{
+  for(const [nativeFault,kind] of [[{revert:true},'execution-reverted'],[{metadata:tokenURI+' changed'},'metadata-mismatch']]) {
+    const f=fixture([{cap:true}]),local=authenticatedLocalFixture(f,{nativeFault}),transport=createKeelPublicSimulationPool({...local.options,chainId:11155111});
+    try {await assert.rejects(simulateKeelPublicationBeforeFunding(fullPlan(),transport),e=>e.kind===kind);
+      assert.ok(local.clients.length>0);assert.ok(local.clients.every(c=>c.closed===1));assert.equal(f.privateRequests().length,0);}
+    finally {await transport.close();await f.transport.close();}
+  }
+});
+
+test('authenticated local capacity: original bounded request deadline closes native execution and cannot yield a session proof',async t=>{
+  t.mock.timers.enable({apis:['setTimeout']});
+  const f=fixture([{cap:true}]),local=authenticatedLocalFixture(f,{pauseStage:1}),transport=createKeelPublicSimulationPool({...local.options,chainId:11155111,requestTimeoutMs:100});
+  const pending=transport.request(program());await local.stageEntered.promise;
+  const rejected=assert.rejects(pending,e=>e.kind==='rpc-unavailable');t.mock.timers.tick(100);await rejected;await transport.close();
+  assert.equal(local.clients.length,1);assert.equal(local.clients[0].closed,1);assert.equal(local.sessions.length,0);await f.transport.close();
+});
+
+test('authenticated local capacity: verified whole-request cap rejects impossible exact intrinsic floor before any provider sequence',async()=>{
+  const f=fixture([{}]),local=authenticatedLocalFixture(f),transport=createKeelPublicSimulationPool({...local.options,chainId:11155111,
+    providerCapabilities:[{chainId:11155111,rpcUrl:urls[0],measuredAt:new Date().toISOString(),limits:{requestGasCap:50_000_000n}}]});
+  const input=program();input.params[0].blockStateCalls=Array.from({length:45},(_,i)=>({calls:[{...call(i),gas:'0x2faf080',data:`0x${'00'.repeat(20_000)}`}]}));
+  try{const result=await transport.request(input);assert.equal(result.length,45);assert.equal(f.requests.length,0,'No expensive public or project sequence can fit this authenticated lower bound');
+    assert.equal(local.clients.length,1);assert.deepEqual(local.programs[0],input.params[0]);}
+  finally{await transport.close();await f.transport.close();}
 });

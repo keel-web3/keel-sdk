@@ -88,3 +88,21 @@ test('sanitized exhaustion diagnostics identify request scope without turning re
   const unknown = keelSimulationTransportFailure({ code: -32000, message: 'gas cap: 50000000' });
   assert.equal(unknown.diagnostic.providerGasCap, '50000000'); assert.equal(unknown.diagnostic.gasCapacityScope, undefined);
 });
+
+test('actual selected-fork intrinsic lower bound excludes only a measured whole-request cap, never an envelope sum',async()=>{
+  const { measureKeelSimulationIntrinsicGas }=await import('../packages/sdk/dist/simulation-capacity-policy.js');
+  const {resolveKeelTransactionGasPolicy,KEEL_SEPOLIA_AMSTERDAM_TIMESTAMP}=await import('../packages/sdk/dist/transaction-gas-policy.js');
+  const selected=resolveKeelTransactionGasPolicy({chainId:11155111,blockTimestamp:KEEL_SEPOLIA_AMSTERDAM_TIMESTAMP,blockGasLimit:200_000_000n});
+  const input={method:'eth_simulateV1',params:[{blockStateCalls:Array.from({length:45},()=>({calls:[{from:`0x${'11'.repeat(20)}`,to:`0x${'22'.repeat(20)}`,data:`0x${'00'.repeat(20_000)}`,value:'0x0',gas:'0x2faf080'}]}))},'0x1']};
+  const metric=measureKeelSimulationProgram(input), floor=measureKeelSimulationIntrinsicGas(input,selected);
+  assert.equal(floor.intrinsicProgramGas,58_275_000n);assert.equal(floor.calldataFloorGas,57_600_000n);
+  assert.equal(floor.largestIntrinsicCallGas,1_295_000n);
+  const failure=keelSimulationProviderCapacityFailure(metric,{requestGasCap:50_000_000n},undefined,floor);
+  assert.equal(failure.kind,'provider-limit');assert.equal(failure.diagnostic.gasCapacityScope,'request');assert.equal(failure.diagnostic.minimumProgramGas,'58275000');
+  assert.equal(keelSimulationProviderCapacityFailure(metric,{transactionGasCap:50_000_000n},undefined,floor),undefined,'Per-transaction cap cannot be treated as a whole-request cap');
+  assert.equal(keelSimulationProviderCapacityFailure(metric,{requestGasCap:60_000_000n},undefined,floor),undefined,'A large requested-envelope sum is not an exclusion');
+  const cheap={method:'eth_simulateV1',params:[{blockStateCalls:[{calls:[{from:`0x${'11'.repeat(20)}`,to:`0x${'11'.repeat(20)}`,data:'0x',value:'0x0',gas:'0x5208'}]}]},'0x1']};
+  assert.equal(measureKeelSimulationIntrinsicGas(cheap,selected).intrinsicProgramGas,12_000n,'Do not substitute21000 public-probe allocation for actual fork intrinsic gas');
+  const pre=resolveKeelTransactionGasPolicy({chainId:11155111,blockTimestamp:KEEL_SEPOLIA_AMSTERDAM_TIMESTAMP-1n,blockGasLimit:200_000_000n});
+  assert.equal(measureKeelSimulationIntrinsicGas(input,pre).intrinsicProgramGas,9_945_000n,'Use pinned fork, not wall-clock Amsterdam pricing');
+});

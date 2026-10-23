@@ -87,7 +87,9 @@ Fallback qualifies another explicitly approved configured provider and replays
 the complete request unchanged. If no compatible validator is available, the
 pool returns an actionable sanitized infrastructure failure. It preserves all
 source/upload/write capacity, content, storage mode and strict gas envelopes.
-No supported state-preserving continuation is established by this implementation.
+Without an explicit authenticated native capability, no state-preserving
+continuation is selected. The default remains the unchanged approved-provider
+program or a refusal.
 
 The current reported fresh release's raw plan, provider error and deployed pair
 were unavailable during this work. All numerical regression cases are synthetic;
@@ -97,3 +99,59 @@ capacity.
 References: [Geth RPC documentation](https://geth.ethereum.org/docs/interacting-with-geth/rpc/ns-eth#eth-simulatev1)
 the [Geth simulator implementation](https://github.com/ethereum/go-ethereum/blob/master/internal/ethapi/simulate.go)
 and [Geth error definitions](https://github.com/ethereum/go-ethereum/blob/master/internal/ethapi/errors.go).
+
+
+## Explicit authenticated local-session composition
+
+`authenticatedLocalSession` is an optional reviewed capability on
+`createKeelPublicSimulationPool`, containing `{ stateRoot, createClient,
+witnessResolution, onSession? }`. It is restricted to Sepolia and the pool's
+exact selected block number/hash and existing read transport. A caller must
+supply both witness `prepare`/`resolve` callbacks and a reviewed native client;
+there is no environment switch or automatic executable/download/recipient.
+
+Only typed capacity exhaustion from an already-approved configured provider can
+activate it. Unapproved providers, ambiguous client-limit errors, genuine
+transaction/revert failures, metadata mismatch and cancellation cannot activate
+native replay. Existing approved alternatives are attempted first. After the
+first successful full native response, subsequent discovery/strict/full-return
+phases start fresh native sessions from the same canonical pin. No successful
+public prefix, simulated state, independent-block result or partial receipt is
+carried into those new sessions. An atomic wallet outer call remains one stage.
+The pool's original bounded deadline covers provider qualification plus native
+replay; cancellation closes both resources. Existing SDK validators still check
+the entire response, strict transaction bounds, exact returns and complete URI.
+
+The capability is not enabled by Studio's current production factory or packaged
+by the existing app image. Protocol fixtures qualify composition only. Actual
+acceptance requires the hash-bound `keel-sparse` executable, network-isolated
+process wrapper, a fresh exact original program/header and complete authenticated
+state/code/ancestor witness. The maintained resolver and process wrapper are
+`scripts/lib/native-witness-resolver.mjs` and
+`scripts/lib/native-session-process.mjs`; the reproducible engine source/build is
+`scripts/native/canonical-state-engine`. Neither a seed proof nor synthetic
+responses qualify a creator's complete program. See
+[the local-session boundary](KEEL_STATEFUL_PUBLICATION_SIMULATION.md) and the
+`verify-local-staged-publication.mjs` / `verify-native-witness-resolution.mjs`
+mechanism runners. No new provider approval is granted by this capability.
+
+
+## Bounded latency and verified lower bounds
+
+A fresh measured `requestGasCap` can exclude an impossible backend before public
+sequence qualification or project disclosure: the SDK reads the exact numbered
+header through the existing reader and computes the selected-fork transaction
+and calldata intrinsic floor. It compares the sum of those actual minima to the
+verified **whole-request** cap. It does not use requested-envelope sums or the
+public probe's conservative21000 allocation, and it never converts a later
+returned envelope remainder into a whole-request cap. Expired profiles and
+transaction-only caps do not authorize this exclusion.
+
+The120-second limit covers each pool request's provider qualification, original
+RPC replay and any native fallback together. Each later SDK phase has its own
+pool request; an uninstrumented108-second whole review does not reveal the
+remaining budget in one request. If most of a request deadline was already used,
+local verification can still time out and fail closed. This change does not grant
+extra time, assume native witness collection is fast, or turn an unfinished
+native run into success. Fresh already-approved provider capacity facts can avoid
+wasting that bounded time on a mathematically impossible backend.
